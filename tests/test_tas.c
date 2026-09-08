@@ -30,6 +30,8 @@ static void frame_grid_is_70224_cycles(void) {
   ASSERT_EQ(gb.cycles / FRAME_CYCLES, BOOT_CYCLES / FRAME_CYCLES + 2);
 }
 
+static uint8_t tas_cb(void *ctx, uint64_t frame) { return tas_input_at((const Tas *)ctx, frame); }
+
 static void full_tas_matches_reference(void) {
   const char *rom_path = GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc";
   size_t n, bn;
@@ -52,10 +54,9 @@ static void full_tas_matches_reference(void) {
   uint64_t limit = limit_env ? strtoull(limit_env, NULL, 10) : 20000;
   unsigned long long f = 0, want = 0;
   bool have_ref = fscanf(ref, "%llu %llx", &f, &want) == 2;
+  gb->input_at = tas_cb; gb->input_ctx = &t;
   for (uint64_t i = 0; i < limit; i++) {
-    uint64_t frame = GRID_FRAME(gb->cycles);
-    gb->joy_pending = tas_input_at(&t, frame);
-    gb_run_frame(gb);
+    uint64_t frame = gb_run_frame(gb);
     while (have_ref && f < frame) have_ref = fscanf(ref, "%llu %llx", &f, &want) == 2;
     if (have_ref && f == frame) {
       if (want != gb_state_hash(gb)) { fprintf(stderr, "state mismatch at frame %llu\n", f); ASSERT(0); }

@@ -18,6 +18,10 @@ enum { INT_VBLANK = 1, INT_STAT = 2, INT_TIMER = 4, INT_SERIAL = 8, INT_JOYPAD =
 enum { JOY_A = 1, JOY_B = 2, JOY_SELECT = 4, JOY_START = 8, JOY_RIGHT = 16, JOY_LEFT = 32, JOY_UP = 64, JOY_DOWN = 128 };
 enum { MBC_NONE = 0, MBC_1 = 1, MBC_5 = 5 };
 
+#define FZ 0x80
+#define FN 0x40
+#define FH 0x20
+#define FC 0x10
 #define FRAME_CYCLES 70224
 #define GRID_OFFSET -8
 extern int64_t gb_grid_offset;
@@ -26,6 +30,14 @@ extern int64_t gb_grid_offset;
 #define BOOT_CYCLES 0
 #define FB_W 160
 #define FB_H 144
+
+typedef struct {
+  uint64_t frame;
+  uint8_t wram[8][4096], hram[127], vram[2][8192], oam[160], io[128], bg_pal[64], ob_pal[64], ie, ram_bank;
+  uint32_t rom_bank;
+  uint16_t framebuffer[FB_W * FB_H];
+  bool joy_latched, joy_read;
+} GBSample;
 
 typedef struct GB {
   uint8_t a, f, b, c, d, e, h, l;
@@ -68,7 +80,7 @@ typedef struct GB {
   uint8_t hdma_len;
   bool hdma_active, hdma_chunk_pending;
 
-  uint8_t joy, joy_pending;
+  uint8_t joy;
   bool init_ram_loaded;
   bool joy_latched;
   void (*serial_out)(void *ctx, uint8_t byte);
@@ -76,8 +88,14 @@ typedef struct GB {
 
   Apu apu;
   uint64_t cycles, mcycles;
-  uint64_t sample_at; bool sampled, joy_read, vblank_if_raised;
-  uint8_t sample_wram[8][4096], sample_hram[127];
+  bool joy_read, vblank_if_raised, hooks_checked, hooks_ok;
+  uint16_t hook_pc;
+  uint8_t (*input_at)(void *ctx, uint64_t frame);
+  void *input_ctx;
+  uint64_t next_sample_at;
+  int sample_head, sample_count;
+  GBSample samples[4];
+  const GBSample *sample;
 } GB;
 
 void gb_init(GB *gb);
@@ -86,8 +104,10 @@ void gb_set_boot_rom(GB *gb, const uint8_t *boot, size_t size);
 void gb_reset(GB *gb);
 void gb_tick(GB *gb);
 void gb_step(GB *gb);
+void cpu_dispatch_interrupt(GB *gb);
 void gb_run_cycles(GB *gb, uint64_t target);
-void gb_run_frame(GB *gb);
+uint64_t gb_run_frame(GB *gb);
+uint8_t gb_input_now(GB *gb);
 void gb_run_until_vblank(GB *gb);
 uint64_t gb_state_hash(const GB *gb);
 uint64_t gb_frame_hash(const GB *gb);

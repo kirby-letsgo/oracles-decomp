@@ -1,0 +1,35 @@
+# bank 0 memory utilities
+clearMemory
+fillMemory
+clearMemoryBc
+fillMemoryBc
+copyMemoryReverse
+copyMemory
+copyMemoryBcReverse
+copyMemoryBc
+# bank 0 math, flags, rng
+addAToDe
+addAToBc
+addDoubleIndexToDe
+addDoubleIndexToBc
+getNumSetBits
+addDecimalToHlRef
+subDecimalFromHlRef
+multiplyAByC
+multiplyABy16
+multiplyABy8
+multiplyABy4
+s8ToS16
+compareHlToBc
+getHighestSetBit
+getLowestSetBit
+checkFlag
+setFlag
+unsetFlag
+decHlRef16WithCap
+incHlRefWithCap
+incHlRef16WithCap
+hexToDec
+getRandomNumber
+getRandomNumber_noPreserveVars
+getRandomIndexFromProbabilityDistribution

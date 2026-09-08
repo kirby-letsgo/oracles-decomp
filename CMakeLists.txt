@@ -23,6 +23,8 @@ add_library(oraclescore STATIC
   src/platform/png.c
   src/platform/tas.c
   src/platform/setup.c
+  src/hooks/hooks.c
+  src/game/bank0.c
 )
 target_include_directories(oraclescore PUBLIC src)
 

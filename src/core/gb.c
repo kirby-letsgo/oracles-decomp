@@ -65,6 +65,7 @@ void gb_reset(GB *gb) {
   gb->boot = boot; gb->boot_size = boot_size;
   gb->serial_out = serial_out; gb->serial_ctx = serial_ctx;
   gb->rom_bank = 1;
+  gb->sample = &gb->samples[0];
   for (int i = 0; i < FB_W * FB_H; i++) gb->framebuffer[i] = 0x7fff;
   apu_reset(&gb->apu);
   if (gb->boot) {
@@ -82,6 +83,9 @@ void gb_reset(GB *gb) {
     post_boot_state(gb);
     gb->cycles = BOOT_CYCLES;
   }
+  gb->next_sample_at = GRID_END(GRID_FRAME(gb->cycles) + 1);
+  gb->sample_head = gb->sample_count = 0;
+  gb->joy_latched = false; gb->joy_read = false;
 }
 
 void gb_tick(GB *gb) {
@@ -91,7 +95,27 @@ void gb_tick(GB *gb) {
   apu_tick(&gb->apu, dots);
   gb->cycles += dots;
   gb->mcycles++;
-  if (!gb->sampled && gb->cycles >= gb->sample_at) { gb->sampled = true; memcpy(gb->sample_wram, gb->wram, sizeof gb->sample_wram); memcpy(gb->sample_hram, gb->hram, sizeof gb->sample_hram); }
+  while (gb->cycles >= gb->next_sample_at) {
+    if (!gb->joy_latched && gb->halted && (gb->ie & 0x10)) gb->joy = gb_input_now(gb);
+    if (gb->sample_count < 4) {
+      GBSample *sm = &gb->samples[(gb->sample_head + gb->sample_count) % 4];
+      sm->frame = GRID_FRAME(gb->next_sample_at) - 1;
+      memcpy(sm->wram, gb->wram, sizeof sm->wram);
+      memcpy(sm->hram, gb->hram, sizeof sm->hram);
+      memcpy(sm->vram, gb->vram, sizeof sm->vram);
+      memcpy(sm->oam, gb->oam, sizeof sm->oam);
+      memcpy(sm->io, gb->io, sizeof sm->io);
+      memcpy(sm->bg_pal, gb->bg_pal, sizeof sm->bg_pal);
+      memcpy(sm->ob_pal, gb->ob_pal, sizeof sm->ob_pal);
+      memcpy(sm->framebuffer, gb->framebuffer, sizeof sm->framebuffer);
+      sm->ie = gb->ie; sm->rom_bank = gb->rom_bank; sm->ram_bank = gb->ram_bank;
+      sm->joy_latched = gb->joy_latched; sm->joy_read = gb->joy_read;
+      gb->sample_count++;
+    }
+    gb->joy_latched = false; gb->joy_read = false;
+    gb->next_sample_at += FRAME_CYCLES;
+  }
+
 }
 
 void gb_run_cycles(GB *gb, uint64_t target) {
@@ -99,11 +123,15 @@ void gb_run_cycles(GB *gb, uint64_t target) {
 }
 
 int64_t gb_grid_offset = GRID_OFFSET;
-void gb_run_frame(GB *gb) {
-  uint64_t target = GRID_END(GRID_FRAME(gb->cycles) + 1);
-  gb->joy_latched = false;
-  gb_run_cycles(gb, target);
-  if (!gb->joy_latched && gb->halted && (gb->ie & 0x10)) { gb->joy = gb->joy_pending; if (getenv("JOYLOG")) printf("%llu LATCH halted joy %02x\n", (unsigned long long)GRID_FRAME(gb->cycles) - 1, gb->joy); }
+uint8_t gb_input_now(GB *gb) { return gb->input_at ? gb->input_at(gb->input_ctx, GRID_FRAME(gb->cycles)) : gb->joy; }
+
+uint64_t gb_run_frame(GB *gb) {
+  while (gb->sample_count == 0 && !gb->hung) gb_step(gb);
+  if (gb->sample_count == 0) return GRID_FRAME(gb->cycles);
+  gb->sample = &gb->samples[gb->sample_head];
+  gb->sample_head = (gb->sample_head + 1) % 4;
+  gb->sample_count--;
+  return gb->sample->frame;
 }
 
 void gb_run_until_vblank(GB *gb) {
@@ -114,20 +142,19 @@ void gb_run_until_vblank(GB *gb) {
 }
 
 uint64_t gb_state_hash(const GB *gb) {
+  const GBSample *sm = gb->sample;
   uint64_t h = FNV1A64_INIT;
-  h = fnv1a64_update(h, (const unsigned char *)gb->wram, sizeof gb->wram);
-  h = fnv1a64_update(h, gb->hram, sizeof gb->hram);
-  h = fnv1a64_update(h, (const unsigned char *)gb->vram, sizeof gb->vram);
-  h = fnv1a64_update(h, gb->oam, sizeof gb->oam);
-  h = fnv1a64_update(h, gb->bg_pal, sizeof gb->bg_pal);
-  h = fnv1a64_update(h, gb->ob_pal, sizeof gb->ob_pal);
-  h = fnv1a64_update(h, gb->io, sizeof gb->io);
-  uint8_t regs[] = {gb->a, gb->f, gb->b, gb->c, gb->d, gb->e, gb->h, gb->l,
-                    (uint8_t)gb->sp, (uint8_t)(gb->sp >> 8), (uint8_t)gb->pc, (uint8_t)(gb->pc >> 8),
-                    gb->ie, (uint8_t)gb->rom_bank, (uint8_t)(gb->rom_bank >> 8), gb->ram_bank};
-  return fnv1a64_update(h, regs, sizeof regs);
+  h = fnv1a64_update(h, (const unsigned char *)sm->wram, sizeof sm->wram);
+  h = fnv1a64_update(h, sm->hram, sizeof sm->hram);
+  h = fnv1a64_update(h, (const unsigned char *)sm->vram, sizeof sm->vram);
+  h = fnv1a64_update(h, sm->oam, sizeof sm->oam);
+  h = fnv1a64_update(h, sm->bg_pal, sizeof sm->bg_pal);
+  h = fnv1a64_update(h, sm->ob_pal, sizeof sm->ob_pal);
+  h = fnv1a64_update(h, sm->io, sizeof sm->io);
+  uint8_t extra[] = {sm->ie, (uint8_t)sm->rom_bank, (uint8_t)(sm->rom_bank >> 8), sm->ram_bank};
+  return fnv1a64_update(h, extra, sizeof extra);
 }
 
 uint64_t gb_frame_hash(const GB *gb) {
-  return fnv1a64_update(FNV1A64_INIT, (const unsigned char *)gb->framebuffer, sizeof gb->framebuffer);
+  return fnv1a64_update(FNV1A64_INIT, (const unsigned char *)gb->sample->framebuffer, sizeof gb->sample->framebuffer);
 }

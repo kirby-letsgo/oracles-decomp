@@ -4,6 +4,8 @@
 #include "platform/render.h"
 #include "platform/tas.h"
 #include "platform/setup.h"
+#include "hooks/hooks.h"
+#include "core/hash.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,6 +14,9 @@
 extern uint64_t dbg_dma_bytes, dbg_dma_calls, dbg_hblank_chunks, dbg_instr_count, dbg_int_count[5];
 extern int dbg_log_dma, dbg_log_lcdc;
 
+
+static uint64_t tas_input_offset;
+static uint8_t tas_input_cb(void *ctx, uint64_t frame) { const Tas *t = ctx; return t->count ? tas_input_at(t, frame + tas_input_offset) : 0; }
 
 static void serial_print(void *ctx, uint8_t b) { (void)ctx; fputc(b, stdout); fflush(stdout); }
 
@@ -62,6 +67,10 @@ int main(int argc, char **argv) {
   }
   const char *init_ram = arg_value(argc, argv, "--init-ram");
   if (arg_flag(argc, argv, "--serial")) gb->serial_out = serial_print;
+  hooks_init();
+  if (arg_flag(argc, argv, "--no-hooks")) hook_mode = HOOK_MODE_OFF;
+  if (arg_flag(argc, argv, "--verify-hooks")) hook_mode = HOOK_MODE_VERIFY;
+  if (arg_flag(argc, argv, "--verify-hooks-continue")) { hook_mode = HOOK_MODE_VERIFY; hook_verify_abort = false; }
   if (arg_flag(argc, argv, "--log-lcdc")) dbg_log_lcdc = 1;
   if (init_ram && !oracles_load_init_ram(gb, init_ram)) { fprintf(stderr, "cannot read %s\n", init_ram); return 2; }
   gb_reset(gb);
@@ -90,6 +99,7 @@ int main(int argc, char **argv) {
   bool probe = arg_flag(argc, argv, "--probe");
   const char *offset_arg = arg_value(argc, argv, "--input-offset");
   uint64_t input_offset = offset_arg ? strtoull(offset_arg, NULL, 10) : 0;
+  tas_input_offset = input_offset;
 
   FILE *ref_out = NULL, *fh_out = NULL, *ref_check = NULL, *fh_check = NULL;
   if ((p = arg_value(argc, argv, "--ref-out"))) ref_out = fopen(p, "w");
@@ -111,14 +121,12 @@ int main(int argc, char **argv) {
   uint64_t anchor_start = 0, anchor_end = 0; int anchor_every = 1;
   if (anchor_arg) sscanf(anchor_arg, "%llu-%llu/%d", (unsigned long long *)&anchor_start, (unsigned long long *)&anchor_end, &anchor_every);
   static uint8_t anchor_seen[65536]; int anchor_count = 0;
+  gb->input_at = tas_input_cb; gb->input_ctx = &tas;
   for (uint64_t i = 0; i < max_frames; i++) {
     uint64_t frame = GRID_FRAME(gb->cycles);
-    gb->sample_at = GRID_END(frame + 1) + (getenv("SAMPLE_SHIFT") ? atoll(getenv("SAMPLE_SHIFT")) : 0); gb->sampled = false; gb->joy_read = false;
-    gb->joy_pending = tas.count ? tas_input_at(&tas, frame + input_offset) : 0;
     if (anchor_arg && frame + input_offset >= anchor_start && frame + input_offset <= anchor_end) {
       uint64_t target = GRID_END(frame + 1);
       dbg_log_dma = getenv("ANCHOR_DMA") != NULL;
-      gb->joy_latched = false;
       while (gb->cycles < target && !gb->hung) {
         uint16_t pc = gb->pc;
         if (!gb->halted && !(gb->ime && (gb->ie & gb->io[R_IF] & 0x1f)) && getenv("ANCHOR_ALL")) { const char *q = getenv("ANCHOR_ALL"); while (*q) { if (pc == strtol(q, NULL, 16)) { printf("ANCHOR %04x %llu bank %u ALL\n", pc, (unsigned long long)gb->mcycles, gb->rom_bank); break; } while (*q && *q != ' ') q++; while (*q == ' ') q++; } }
@@ -148,7 +156,6 @@ int main(int argc, char **argv) {
         }
         gb_step(gb);
       }
-      if (!gb->joy_latched && gb->halted && (gb->ie & 0x10)) gb->joy = gb->joy_pending;
       continue;
     }
     if (trace_arg && frame + input_offset >= trace_start && frame + input_offset <= trace_end) {
@@ -156,7 +163,6 @@ int main(int argc, char **argv) {
       uint64_t target = GRID_END(frame + 1);
       printf("%llu FRAME fc=%02x dma_bytes=%llu hblank_chunks=%llu instr=%llu ints=%llu/%llu/%llu\n", (unsigned long long)(frame + input_offset), gb->wram[0][0xc00],
              (unsigned long long)dbg_dma_bytes, (unsigned long long)dbg_hblank_chunks, (unsigned long long)dbg_instr_count, (unsigned long long)dbg_int_count[0], (unsigned long long)dbg_int_count[1], (unsigned long long)dbg_int_count[2]);
-      gb->joy_latched = false;
       dbg_log_dma = 1;
       static uint32_t hist[65536];
       memset(hist, 0, sizeof hist);
@@ -180,10 +186,9 @@ int main(int argc, char **argv) {
         printf("  %04x %u\n", bi, best); hist[bi] = 0;
       }
       dbg_log_dma = 0;
-      if (!gb->joy_latched && gb->halted && (gb->ie & 0x10)) gb->joy = gb->joy_pending;
       continue;
     }
-    gb_run_frame(gb);
+    frame = gb_run_frame(gb);
     if (gb->hung) { fprintf(stderr, "cpu hung at frame %llu pc %04x\n", (unsigned long long)frame, gb->pc); return 1; }
 
     if (fh_out || fh_check) {
@@ -211,8 +216,17 @@ int main(int argc, char **argv) {
     if (out_dir && ((shot_every && frame % shot_every == 0) || screenshot_wanted(shot_at, frame))) {
       char path[1024];
       snprintf(path, sizeof path, "%s/frame_%07llu.png", out_dir, (unsigned long long)frame);
-      framebuffer_to_rgb(gb->framebuffer, rgb);
+      framebuffer_to_rgb(gb->sample->framebuffer, rgb);
       png_write_rgb(path, rgb, FB_W, FB_H);
+    }
+    if (getenv("SAMPLE_HASH_AT") && frame + input_offset == strtoull(getenv("SAMPLE_HASH_AT"), NULL, 10)) {
+      const GBSample *sm = gb->sample;
+      printf("SAMPLE %llu wram %016llx hram %016llx vram %016llx oam %016llx io %016llx bg %016llx ob %016llx ie %02x rom %u ram %u\n", (unsigned long long)sm->frame,
+             (unsigned long long)fnv1a64_update(FNV1A64_INIT, (const unsigned char *)sm->wram, sizeof sm->wram), (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->hram, sizeof sm->hram),
+             (unsigned long long)fnv1a64_update(FNV1A64_INIT, (const unsigned char *)sm->vram, sizeof sm->vram), (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->oam, sizeof sm->oam),
+             (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->io, sizeof sm->io), (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->bg_pal, sizeof sm->bg_pal), (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->ob_pal, sizeof sm->ob_pal), sm->ie, sm->rom_bank, sm->ram_bank);
+      for (int i = 0; i < 128; i++) printf("%02x", sm->io[i]);
+      printf("\n");
     }
     if (dump) {
       uint64_t movie_frame = frame + input_offset;
@@ -221,18 +235,18 @@ int main(int argc, char **argv) {
       if (getenv("WRAMDUMP_AT") && movie_frame >= wd_a && movie_frame <= wd_b) {
         FILE *wf = fopen(getenv("WRAMDUMP_FILE") ? getenv("WRAMDUMP_FILE") : "wram_at.txt", "a");
         fprintf(wf, "FRAME %llu mcycles %llu cycles %llu ly %u\n", (unsigned long long)movie_frame, (unsigned long long)gb->mcycles, (unsigned long long)gb->cycles, gb->io[R_LY]);
-        for (int b = 0; b < 8; b++) for (int i = 0; i < 4096; i++) fprintf(wf, "%02x", gb->sample_wram[b][i]);
+        for (int b = 0; b < 8; b++) for (int i = 0; i < 4096; i++) fprintf(wf, "%02x", gb->sample->wram[b][i]);
         fprintf(wf, "\n");
-        for (int i = 0; i < 127; i++) fprintf(wf, "%02x", gb->sample_hram[i]);
+        for (int i = 0; i < 127; i++) fprintf(wf, "%02x", gb->sample->hram[i]);
         fprintf(wf, "\n");
         fclose(wf);
       }
       if ((movie_frame + 1) % 60 == 0) {
         uint32_t h = 0xcbf29ce4u;
-        for (int i = 0x300; i < 0x1000; i++) { h ^= gb->sample_wram[0][i]; h *= 16777619u; }
-        fprintf(dump, "%llu %02x %02x %02x %02x %02x %d %08x\n", (unsigned long long)movie_frame, gb->sample_wram[0][0xc2d], gb->sample_wram[0][0xc30], gb->sample_wram[0][0xc00], gb->sample_hram[0x14], gb->sample_hram[0x15], (gb->joy_latched || gb->joy_read) ? 0 : 1, h);
+        for (int i = 0x300; i < 0x1000; i++) { h ^= gb->sample->wram[0][i]; h *= 16777619u; }
+        fprintf(dump, "%llu %02x %02x %02x %02x %02x %d %08x\n", (unsigned long long)movie_frame, gb->sample->wram[0][0xc2d], gb->sample->wram[0][0xc30], gb->sample->wram[0][0xc00], gb->sample->hram[0x14], gb->sample->hram[0x15], (gb->sample->joy_latched || gb->sample->joy_read) ? 0 : 1, h);
       } else {
-        fprintf(dump, "%llu %02x %02x %02x %02x %02x %d\n", (unsigned long long)movie_frame, gb->sample_wram[0][0xc2d], gb->sample_wram[0][0xc30], gb->sample_wram[0][0xc00], gb->sample_hram[0x14], gb->sample_hram[0x15], (gb->joy_latched || gb->joy_read) ? 0 : 1);
+        fprintf(dump, "%llu %02x %02x %02x %02x %02x %d\n", (unsigned long long)movie_frame, gb->sample->wram[0][0xc2d], gb->sample->wram[0][0xc30], gb->sample->wram[0][0xc00], gb->sample->hram[0x14], gb->sample->hram[0x15], (gb->sample->joy_latched || gb->sample->joy_read) ? 0 : 1);
       }
     }
     if (probe) {
@@ -249,6 +263,7 @@ int main(int argc, char **argv) {
   if (ref_out) fclose(ref_out);
   if (fh_out) fclose(fh_out);
   if (dump) fclose(dump);
+  if (hook_mode != HOOK_MODE_OFF) hooks_report();
   printf("done: %llu frames, state %016llx\n", (unsigned long long)GRID_FRAME(gb->cycles),
          (unsigned long long)gb_state_hash(gb));
   return 0;

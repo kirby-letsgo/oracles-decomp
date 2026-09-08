@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+static uint8_t live_joy;
+static uint8_t live_input(void *ctx, uint64_t frame) { (void)ctx; (void)frame; return live_joy; }
 
 #define SCALE 4
 #define AUDIO_TARGET_BYTES (APU_SAMPLE_RATE / 10 * 4)
@@ -104,6 +106,7 @@ int main(int argc, char **argv) {
   static uint8_t rgb[FB_W * FB_H * 3];
   static int16_t samples[APU_RING * 2];
   bool running = true;
+  gb->input_at = live_input;
   uint64_t frames = 0;
   while (running) {
     SDL_Event ev;
@@ -115,14 +118,14 @@ int main(int argc, char **argv) {
         else if (ev.key.scancode == SDL_SCANCODE_F12) {
           char path[256];
           snprintf(path, sizeof path, "out/screenshot_%llu.png", (unsigned long long)frames);
-          framebuffer_to_rgb(gb->framebuffer, rgb);
+          framebuffer_to_rgb(gb->sample->framebuffer, rgb);
           png_write_rgb(path, rgb, FB_W, FB_H);
-        } else gb->joy_pending |= key_bit(ev.key.scancode);
+        } else live_joy |= key_bit(ev.key.scancode);
         break;
-      case SDL_EVENT_KEY_UP: gb->joy_pending &= ~key_bit(ev.key.scancode); break;
+      case SDL_EVENT_KEY_UP: live_joy &= ~key_bit(ev.key.scancode); break;
       case SDL_EVENT_GAMEPAD_ADDED: SDL_OpenGamepad(ev.gdevice.which); break;
-      case SDL_EVENT_GAMEPAD_BUTTON_DOWN: gb->joy_pending |= pad_bit(ev.gbutton.button); break;
-      case SDL_EVENT_GAMEPAD_BUTTON_UP: gb->joy_pending &= ~pad_bit(ev.gbutton.button); break;
+      case SDL_EVENT_GAMEPAD_BUTTON_DOWN: live_joy |= pad_bit(ev.gbutton.button); break;
+      case SDL_EVENT_GAMEPAD_BUTTON_UP: live_joy &= ~pad_bit(ev.gbutton.button); break;
       }
     }
     if (audio && SDL_GetAudioStreamQueued(audio) > AUDIO_TARGET_BYTES) { SDL_Delay(1); continue; }
@@ -130,7 +133,7 @@ int main(int argc, char **argv) {
     frames++;
     uint32_t n = apu_read_samples(&gb->apu, samples, APU_RING);
     if (audio) SDL_PutAudioStreamData(audio, samples, n * 4);
-    framebuffer_to_rgb(gb->framebuffer, rgb);
+    framebuffer_to_rgb(gb->sample->framebuffer, rgb);
     SDL_UpdateTexture(tex, NULL, rgb, FB_W * 3);
     SDL_RenderClear(ren);
     SDL_RenderTexture(ren, tex, NULL, NULL);

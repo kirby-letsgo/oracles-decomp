@@ -24,7 +24,7 @@ void ppu_write_lcdc(GB *gb, uint8_t v) {
   if (dbg_log_lcdc && ((v ^ gb->io[R_LCDC]) & 0x80)) printf("%llu LCDC %02x at %llu cyc %llu mode %d ly %u dot %d latched %d\n", (unsigned long long)GRID_FRAME(gb->cycles), v, (unsigned long long)gb->mcycles, (unsigned long long)gb->cycles, gb->ppu_mode, gb->io[R_LY], gb->ppu_dot, gb->joy_latched);
   gb->io[R_LCDC] = v;
   if (was_on && !(v & 0x80)) {
-    if (gb->ppu_mode != 1) { gb->joy = gb->joy_pending; gb->joy_latched = true; if (getenv("JOYLOG")) printf("%llu LATCH lcdoff joy %02x at %llu\n", (unsigned long long)GRID_FRAME(gb->cycles), gb->joy, (unsigned long long)gb->mcycles); }
+    if (gb->ppu_mode != 1) { gb->joy = gb_input_now(gb); gb->joy_latched = true; if (getenv("JOYLOG")) printf("%llu LATCH lcdoff joy %02x at %llu\n", (unsigned long long)GRID_FRAME(gb->cycles), gb->joy, (unsigned long long)gb->mcycles); }
     gb->io[R_LY] = 0;
     gb->ppu_dot = 0;
     gb->window_line = 0;
@@ -107,7 +107,7 @@ void ppu_tick(GB *gb, int dots) {
         if (gb->hdma_active) gb->hdma_chunk_pending = true;
       } else if (mode == 1) {
         if (dbg_log_lcdc && GRID_FRAME(gb->cycles) < 200) printf("%llu VBLANK at %llu cyc %llu (frame start %llu)\n", (unsigned long long)GRID_FRAME(gb->cycles), (unsigned long long)gb->mcycles, (unsigned long long)gb->cycles, (unsigned long long)GRID_END(GRID_FRAME(gb->cycles)));
-        gb->joy = gb->joy_pending;
+        gb->joy = gb_input_now(gb);
         gb->joy_latched = true;
         if (getenv("JOYLOG")) printf("%llu LATCH vblank joy %02x at %llu\n", (unsigned long long)GRID_FRAME(gb->cycles), gb->joy, (unsigned long long)gb->mcycles);
         if (!gb->vblank_if_raised) gb->io[R_IF] |= INT_VBLANK;

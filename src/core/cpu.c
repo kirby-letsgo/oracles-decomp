@@ -1,10 +1,7 @@
 #include "gb.h"
 #include "bus.h"
+#include "hooks/hooks.h"
 
-#define FZ 0x80
-#define FN 0x40
-#define FH 0x20
-#define FC 0x10
 
 #define HL (((uint16_t)gb->h << 8) | gb->l)
 #define BC (((uint16_t)gb->b << 8) | gb->c)
@@ -265,7 +262,7 @@ static void execute(GB *gb, uint8_t op) {
 #include <stdio.h>
 uint64_t dbg_instr_count, dbg_int_count[5];
 int dbg_log_ints;
-static void dispatch_interrupt(GB *gb) {
+void cpu_dispatch_interrupt(GB *gb) {
   uint8_t pending = gb->ie & gb->io[R_IF] & 0x1f;
   gb_tick(gb);
   gb_tick(gb);
@@ -289,8 +286,9 @@ void gb_step(GB *gb) {
     gb->halted = false;
     gb_tick(gb);
   }
-  if (gb->ime && pending) { dispatch_interrupt(gb); return; }
+  if (gb->ime && pending) { cpu_dispatch_interrupt(gb); return; }
   if (gb->ime_delay) { gb->ime = true; gb->ime_delay = false; }
+  if (hook_dispatch(gb)) return;
   dbg_instr_count++;
   execute(gb, fetch(gb));
 }

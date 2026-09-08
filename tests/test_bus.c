@@ -74,7 +74,6 @@ static void vram_banking_and_palettes(void) {
 static void joypad(void) {
   GB *gb = fresh(0x1b);
   gb->joy = JOY_A | JOY_LEFT;
-  gb->joy_pending = gb->joy;
   bus_write(gb, 0xff00, 0x20);
   ASSERT_EQ(bus_read(gb, 0xff00), 0xc0 | 0x20 | 0x0d);
   bus_write(gb, 0xff00, 0x10);
