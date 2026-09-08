@@ -1,3 +1,9 @@
 roms/*.gbc
+roms/*.bin
 .DS_Store
+build/
+build-sdl/
+out/
 docs/
+build-quirk/
+CLAUDE.md

@@ -1,0 +1,8 @@
+#pragma once
+#include "core/gb.h"
+#include <stddef.h>
+#include <stdbool.h>
+
+uint8_t *oracles_read_file(const char *path, size_t *size);
+void oracles_apply_agb_boot_patch(uint8_t *boot, size_t size);
+bool oracles_load_init_ram(GB *gb, const char *path);

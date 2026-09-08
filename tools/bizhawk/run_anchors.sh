@@ -1,0 +1,5 @@
+#!/bin/bash
+# usage: gbhawk_anchors_bg.sh START END PCSFILE OUT DISPLAYNUM
+SC=/private/tmp/claude-501/-Users-saravieira-Projects-oracles-decomp/d34b26a7-c8b4-4346-a4bc-a5a44d19120e/scratchpad
+D=$SC/bizhawk/data_$5; mkdir -p $D; cp -n $SC/bizhawk/data/{ages.gbc,ages.bk2,config.ini,anchors.lua} $D/ 2>/dev/null; cp -Rn $SC/bizhawk/data/Firmware $SC/bizhawk/data/dll-arm64 $D/ 2>/dev/null
+docker run --rm -e START=$1 -e END=$2 -e PCS="$(cat $3)" -v $D:/data bizhawk-gbhawk bash -c "export TERM=xterm LIBGL_ALWAYS_SOFTWARE=1; Xvfb :$5 -screen 0 1280x900x24 +extension GLX >/dev/null 2>&1 & export DISPLAY=:$5; sleep 2; cp /data/config.ini config.ini; cp /data/Firmware/GBC_cgb.bin Firmware/; cp /data/dll-arm64/libblip_buf.so /data/dll-arm64/libcimgui.so dll/; ln -sf /usr/lib/aarch64-linux-gnu/libsqlite3.so.0 dll/libe_sqlite3.so; ./EmuHawkMono.sh --config=/bizhawk/BizHawk-2.11.1-linux-x64/config.ini --movie=/data/ages.bk2 --lua=/data/anchors.lua /data/ages.gbc >/dev/null 2>&1; cat /data/anchors.txt" > $4 2>/dev/null; echo ANCHORS_DONE >> $4
