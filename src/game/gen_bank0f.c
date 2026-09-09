@@ -3610,7 +3610,7 @@ L_4cb5:
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
   if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x7805: goto L_7805; default: HANDOFF(HL); }
+  switch (HL) {  default: HANDOFF(HL); }
 L_4ccb:
   I(0x4ccb, 1); B = alu_dec8(gb, B);  // dec b
   I(0x4ccc, 1); A = B;  // ld a,b
@@ -3618,34 +3618,7 @@ L_4ccb:
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
   if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x64c2: goto L_64c2; default: HANDOFF(HL); }
-L_64c2:
-  I(0x64c2, 1); alu_xor(gb, A);  // xor a
-  I(0x64c3, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x64c4, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x64c5, 2); L = 0xa4;  // ld l,$a4
-  I(0x64c7, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CALL(0x64c9, objectSetVisiblec2, 0x1e45, 0x64cc);  // call $1e45
-  CALL(0x64cc, ecom_updateCardinalAngleAwayFromTarget_b0f, 0x43ab, 0x64cf);  // call $43ab
-  I(0x64cf, 2); A = 0x0a;  // ld a,$0a
-  I(0x64d1, 4); enemySetAnimation(gb); return;  // jp $282b
-L_7805:
-  I(0x7805, 1); H = D;  // ld h,d
-  I(0x7806, 2); L = 0xb5;  // ld l,$b5
-  I(0x7808, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x7809); return; } I(0x7809, 2);  // ret nz
-  I(0x780a, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
-  I(0x780c, 2); L = 0x88;  // ld l,$88
-  I(0x780e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x780f, 2); alu_xor(gb, 0x01);  // xor $01
-  I(0x7811, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x7812, enemySetAnimation, 0x282b, 0x7815);  // call $282b
-  I(0x7815, 2); E = 0x82;  // ld e,$82
-  I(0x7817, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x7818, 1); alu_or(gb, A);  // or a
-  I(0x7819, 2); A = 0x88;  // ld a,$88
-  if (!(F & FZ)) { I(0x781b, 4); playSound_b00(gb); return; } I(0x781b, 3);  // jp nz,$0c98
-  octogon_doSplashAnimation(gb); return;  // fallthrough
+  switch (HL) {  default: HANDOFF(HL); }
 }
 
 // 0f:4cb2
@@ -3665,7 +3638,7 @@ L_4cb5:
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
   if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x7805: goto L_7805; default: HANDOFF(HL); }
+  switch (HL) {  default: HANDOFF(HL); }
 L_4ccb:
   I(0x4ccb, 1); B = alu_dec8(gb, B);  // dec b
   I(0x4ccc, 1); A = B;  // ld a,b
@@ -3673,34 +3646,7 @@ L_4ccb:
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
   if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x64c2: goto L_64c2; default: HANDOFF(HL); }
-L_64c2:
-  I(0x64c2, 1); alu_xor(gb, A);  // xor a
-  I(0x64c3, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x64c4, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x64c5, 2); L = 0xa4;  // ld l,$a4
-  I(0x64c7, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CALL(0x64c9, objectSetVisiblec2, 0x1e45, 0x64cc);  // call $1e45
-  CALL(0x64cc, ecom_updateCardinalAngleAwayFromTarget_b0f, 0x43ab, 0x64cf);  // call $43ab
-  I(0x64cf, 2); A = 0x0a;  // ld a,$0a
-  I(0x64d1, 4); enemySetAnimation(gb); return;  // jp $282b
-L_7805:
-  I(0x7805, 1); H = D;  // ld h,d
-  I(0x7806, 2); L = 0xb5;  // ld l,$b5
-  I(0x7808, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x7809); return; } I(0x7809, 2);  // ret nz
-  I(0x780a, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
-  I(0x780c, 2); L = 0x88;  // ld l,$88
-  I(0x780e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x780f, 2); alu_xor(gb, 0x01);  // xor $01
-  I(0x7811, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x7812, enemySetAnimation, 0x282b, 0x7815);  // call $282b
-  I(0x7815, 2); E = 0x82;  // ld e,$82
-  I(0x7817, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x7818, 1); alu_or(gb, A);  // or a
-  I(0x7819, 2); A = 0x88;  // ld a,$88
-  if (!(F & FZ)) { I(0x781b, 4); playSound_b00(gb); return; } I(0x781b, 3);  // jp nz,$0c98
-  octogon_doSplashAnimation(gb); return;  // fallthrough
+  switch (HL) {  default: HANDOFF(HL); }
 }
 
 // 0f:4ccb
@@ -3713,17 +3659,7 @@ L_4ccb:
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
   if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x64c2: goto L_64c2; default: HANDOFF(HL); }
-L_64c2:
-  I(0x64c2, 1); alu_xor(gb, A);  // xor a
-  I(0x64c3, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x64c4, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x64c5, 2); L = 0xa4;  // ld l,$a4
-  I(0x64c7, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CALL(0x64c9, objectSetVisiblec2, 0x1e45, 0x64cc);  // call $1e45
-  CALL(0x64cc, ecom_updateCardinalAngleAwayFromTarget_b0f, 0x43ab, 0x64cf);  // call $43ab
-  I(0x64cf, 2); A = 0x0a;  // ld a,$0a
-  I(0x64d1, 4); enemySetAnimation(gb); return;  // jp $282b
+  switch (HL) {  default: HANDOFF(HL); }
 }
 
 // 0f:4cd4
@@ -6912,7 +6848,65 @@ L_57c3:
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
   if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x5716: goto L_5716; default: HANDOFF(HL); }
+  switch (HL) { case 0x5716: goto L_5716; case 0x57d2: goto L_57d2; case 0x57f9: goto L_57f9; case 0x5817: goto L_5817; case 0x582d: goto L_582d; default: HANDOFF(HL); }
+L_57d2:
+  I(0x57d2, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
+  I(0x57d5, 2); alu_and(gb, 0x03);  // and $03
+  if (!(F & FZ)) { I(0x57d7, 3); goto L_57e6; } I(0x57d7, 2);  // jr nz,$57e6
+  CALL(0x57d9, ecom_decCounter1_b0f, 0x439a, 0x57dc);  // call $439a
+  if ((F & FZ)) { I(0x57dc, 3); goto L_57ec; } I(0x57dc, 2);  // jr z,$57ec
+  I(0x57de, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x57df, 2); alu_and(gb, 0x1f);  // and $1f
+  I(0x57e1, 2); B = 0x01;  // ld b,$01
+  if ((F & FZ)) { CALL(0x57e3, vire_mainForm_fireProjectileWithSubid, 0x5b1b, 0x57e6); } else I(0x57e3, 3);  // call z,$5b1b
+L_57e6:
+  CALL(0x57e6, vire_mainForm_checkLinkTooClose, 0x5aff, 0x57e9);  // call $5aff
+  if (!(F & FC)) { I(0x57e9, 4); vire_mainForm_circleAroundScreen(gb); return; } I(0x57e9, 3);  // jp nc,$5aa4
+L_57ec:
+  I(0x57ec, 2); L = 0x85;  // ld l,$85
+  I(0x57ee, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  I(0x57ef, 2); L = 0x90;  // ld l,$90
+  I(0x57f1, 3); mem_wr(gb, HL, 0x50);  // ld (hl),$50
+  CALL(0x57f3, ecom_updateAngleTowardTarget_b0f, 0x43bf, 0x57f6);  // call $43bf
+L_57f6:
+  I(0x57f6, 4); enemyAnimate(gb); return;  // jp $2818
+L_57f9:
+  I(0x57f9, 4); A = mem_rd(gb, 0xcc5f);  // ld a,($cc5f)
+  I(0x57fc, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { I(0x57fd, 3); goto L_580e; } I(0x57fd, 2);  // jr z,$580e
+  I(0x57ff, 1); H = D;  // ld h,d
+  I(0x5800, 1); L = E;  // ld l,e
+  I(0x5801, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  I(0x5802, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x5803, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
+  I(0x5805, 2); L = 0x90;  // ld l,$90
+  I(0x5807, 3); mem_wr(gb, HL, 0x78);  // ld (hl),$78
+  CALL(0x5809, ecom_updateCardinalAngleAwayFromTarget_b0f, 0x43ab, 0x580c);  // call $43ab
+  I(0x580c, 3); goto L_57f6;  // jr $57f6
+L_580e:
+  CALL(0x580e, vire_checkOffScreen, 0x5a98, 0x5811);  // call $5a98
+  if (!(F & FC)) { I(0x5811, 4); vire_mainForm_leftScreen(gb); return; } I(0x5811, 3);  // jp nc,$5a86
+  I(0x5814, 4); vire_mainForm_applySpeedAndAnimate(gb); return;  // jp $5af9
+L_5817:
+  CALL(0x5817, ecom_decCounter1_b0f, 0x439a, 0x581a);  // call $439a
+  if (!(F & FZ)) { I(0x581a, 4); vire_mainForm_applySpeedAndAnimate(gb); return; } I(0x581a, 3);  // jp nz,$5af9
+  I(0x581d, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
+  I(0x581f, 1); L = E;  // ld l,e
+  I(0x5820, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  I(0x5821, 2); B = 0x3a;  // ld b,$3a
+  CALL(0x5823, ecom_spawnProjectile_b0f, 0x437c, 0x5826);  // call $437c
+  I(0x5826, 2); A = 0x87;  // ld a,$87
+  CALL(0x5828, playSound_b00, 0x0c98, 0x582b);  // call $0c98
+  I(0x582b, 3); goto L_57f6;  // jr $57f6
+L_582d:
+  CALL(0x582d, ecom_decCounter1_b0f, 0x439a, 0x5830);  // call $439a
+  if (!(F & FZ)) { I(0x5830, 3); goto L_57f6; } I(0x5830, 2);  // jr nz,$57f6
+  I(0x5832, 1); L = E;  // ld l,e
+  I(0x5833, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  I(0x5834, 2); L = 0x90;  // ld l,$90
+  I(0x5836, 3); mem_wr(gb, HL, 0x46);  // ld (hl),$46
+  CALL(0x5838, ecom_updateCardinalAngleAwayFromTarget_b0f, 0x43ab, 0x583b);  // call $43ab
+  I(0x583b, 3); goto L_57f6;  // jr $57f6
 }
 
 // 0f:57d2
@@ -8549,7 +8543,7 @@ L_5da7:
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
   if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x7805: goto L_7805; default: HANDOFF(HL); }
+  switch (HL) {  default: HANDOFF(HL); }
 L_5dbd:
   I(0x5dbd, 1); B = alu_dec8(gb, B);  // dec b
   I(0x5dbe, 1); A = B;  // ld a,b
@@ -8558,23 +8552,6 @@ L_5dbd:
   if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) {  default: HANDOFF(HL); }
-L_7805:
-  I(0x7805, 1); H = D;  // ld h,d
-  I(0x7806, 2); L = 0xb5;  // ld l,$b5
-  I(0x7808, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x7809); return; } I(0x7809, 2);  // ret nz
-  I(0x780a, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
-  I(0x780c, 2); L = 0x88;  // ld l,$88
-  I(0x780e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x780f, 2); alu_xor(gb, 0x01);  // xor $01
-  I(0x7811, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x7812, enemySetAnimation, 0x282b, 0x7815);  // call $282b
-  I(0x7815, 2); E = 0x82;  // ld e,$82
-  I(0x7817, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x7818, 1); alu_or(gb, A);  // or a
-  I(0x7819, 2); A = 0x88;  // ld a,$88
-  if (!(F & FZ)) { I(0x781b, 4); playSound_b00(gb); return; } I(0x781b, 3);  // jp nz,$0c98
-  octogon_doSplashAnimation(gb); return;  // fallthrough
 }
 
 // 0f:5da7
@@ -8587,7 +8564,7 @@ L_5da7:
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
   if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x7805: goto L_7805; default: HANDOFF(HL); }
+  switch (HL) {  default: HANDOFF(HL); }
 L_5dbd:
   I(0x5dbd, 1); B = alu_dec8(gb, B);  // dec b
   I(0x5dbe, 1); A = B;  // ld a,b
@@ -8596,23 +8573,6 @@ L_5dbd:
   if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) {  default: HANDOFF(HL); }
-L_7805:
-  I(0x7805, 1); H = D;  // ld h,d
-  I(0x7806, 2); L = 0xb5;  // ld l,$b5
-  I(0x7808, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x7809); return; } I(0x7809, 2);  // ret nz
-  I(0x780a, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
-  I(0x780c, 2); L = 0x88;  // ld l,$88
-  I(0x780e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x780f, 2); alu_xor(gb, 0x01);  // xor $01
-  I(0x7811, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x7812, enemySetAnimation, 0x282b, 0x7815);  // call $282b
-  I(0x7815, 2); E = 0x82;  // ld e,$82
-  I(0x7817, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x7818, 1); alu_or(gb, A);  // or a
-  I(0x7819, 2); A = 0x88;  // ld a,$88
-  if (!(F & FZ)) { I(0x781b, 4); playSound_b00(gb); return; } I(0x781b, 3);  // jp nz,$0c98
-  octogon_doSplashAnimation(gb); return;  // fallthrough
 }
 
 // 0f:5dbd

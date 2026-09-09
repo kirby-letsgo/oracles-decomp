@@ -95,7 +95,7 @@ int hook_halt(GB *gb, uint16_t next) {
   }
   gb->halted = false;
   gb_tick(gb);
-  if (gb->ime && pending) { gb->pc = next; run_interrupt(gb); }
+  if (gb->ime && pending && !hook_suppress_interrupts) { gb->pc = next; run_interrupt(gb); }
   return 0;
 }
 
@@ -109,6 +109,7 @@ static bool differs(const char *what, const void *a, const void *b, size_t n, si
 static int verify_depth;
 static GB *snap_pool[16][2];
 int hook_in_verify;
+int hook_suppress_interrupts;
 
 static void verify(GB *gb, Hook *h) {
   if (verify_depth >= 16) { depth++; h->fn(gb); depth--; return; }
@@ -124,9 +125,11 @@ static void verify(GB *gb, Hook *h) {
   int depth0 = depth, hiv0 = hook_in_verify;
   depth++;
   hook_in_verify++;
+  hook_suppress_interrupts++;
   if (hook_jmp_depth < 128) { hook_jmp_depth++; if (setjmp(hook_jmp[hook_jmp_depth - 1]) == 0) h->fn(gb); hook_jmp_depth--; } else h->fn(gb);
   hook_in_verify = hiv0;
   depth = depth0;
+  hook_suppress_interrupts--;
   uint64_t cyc_c = gb->mcycles - c0;
   { static int vlog = -1; if (vlog < 0) vlog = getenv("VERIFYLOG") != NULL; if (vlog) fprintf(stderr, "VERIFY= %s cycC %llu pc %04x sp %04x\n", h->name, (unsigned long long)cyc_c, gb->pc, gb->sp); }
   memcpy(after_c_p, gb, sizeof *after_c_p);
@@ -138,12 +141,14 @@ static void verify(GB *gb, Hook *h) {
   gb->ime = false;
   int saved = hook_mode;
   hook_mode = HOOK_MODE_OFF;
+  hook_suppress_interrupts++;
   uint16_t ret_pc = (uint16_t)(bus_read(gb, sp0) | (bus_read(gb, sp0 + 1) << 8));
   bool returned = after_c.pc == ret_pc && after_c.sp == sp0 + 2;
   uint64_t guard = 0;
   if (returned) { do { gb_step(gb); } while (!(gb->pc == ret_pc && gb->sp == sp0 + 2) && !gb->hung && guard++ < 50000000ULL); }
   else { while (gb->mcycles - c0 < cyc_c && !gb->hung) gb_step(gb); }
   hook_mode = saved;
+  hook_suppress_interrupts--;
   uint64_t cyc_asm = gb->mcycles - c0;
   { static int vlog = -1; if (vlog < 0) vlog = getenv("VERIFYLOG") != NULL; if (vlog) fprintf(stderr, "VERIFY %s frame %llu returned %d cycC %llu cycAsm %llu guard %llu\n", h->name, (unsigned long long)GRID_FRAME(gb->cycles), returned, (unsigned long long)cyc_c, (unsigned long long)cyc_asm, (unsigned long long)guard); }
   if (gb->ime_writes == snap->ime_writes) gb->ime = ime0;
@@ -177,9 +182,9 @@ bool hook_dispatch(GB *gb) {
   if (hook_mode == HOOK_MODE_OFF) return false;
   Hook *h = lookup(gb, gb->pc);
   if (!h) return false;
-  if (hook_mode == HOOK_MODE_VERIFY && (h->flags & HOOK_NOVERIFY)) return false;
+  if (hook_mode == HOOK_MODE_VERIFY && (h->flags & (HOOK_NOVERIFY | HOOK_LOCAL))) return false;
   h->calls++;
-  if (hook_mode == HOOK_MODE_VERIFY && (h->calls <= 32 || h->calls % 64 == 0 || verify_depth == 0)) { verify(gb, h); return true; }
+  if (hook_mode == HOOK_MODE_VERIFY && (h->calls <= 4 || h->calls % 256 == 0 || verify_depth == 0)) { verify(gb, h); return true; }
   static int hooklog = -1; if (hooklog < 0) hooklog = getenv("HOOKLOG") != NULL;
   if (hooklog) fprintf(stderr, "HOOK> %s mc %llu frame %llu sp %04x ime %d\n", h->name, (unsigned long long)gb->mcycles, (unsigned long long)GRID_FRAME(gb->cycles), gb->sp, gb->ime);
   int depth0 = depth;

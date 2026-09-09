@@ -8226,3 +8226,24 @@ void interactiondc_spawnPuff(GB *gb) {
   RET(0x7bfa); return;  // ret
 }
 
+// 15:4315
+void getObjectDataAddress(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x4315, 4); A = mem_rd(gb, 0xcc2d);  // ld a,($cc2d)
+  I(0x4318, 3); SET_HL(0x432b);  // ld hl,$432b
+  RST_PUSH(0x431b, 0x431c);  // rst $18 (addDoubleIndexToHl)
+  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
+  I(0x431c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x431d, 2); H = mem_rd(gb, HL);  // ld h,(hl)
+  I(0x431e, 1); L = A;  // ld l,a
+  I(0x431f, 4); A = mem_rd(gb, 0xcc30);  // ld a,($cc30)
+  I(0x4322, 1); E = A;  // ld e,a
+  I(0x4323, 2); D = 0x00;  // ld d,$00
+  I(0x4325, 2); alu_add_hl(gb, DE);  // add hl,de
+  I(0x4326, 2); alu_add_hl(gb, DE);  // add hl,de
+  I(0x4327, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x4328, 2); D = mem_rd(gb, HL);  // ld d,(hl)
+  I(0x4329, 1); E = A;  // ld e,a
+  RET(0x432a); return;  // ret
+}
+

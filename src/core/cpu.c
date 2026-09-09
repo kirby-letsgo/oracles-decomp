@@ -289,7 +289,7 @@ void gb_step(GB *gb) {
     gb->halted = false;
     gb_tick(gb);
   }
-  if (gb->ime && pending) { cpu_dispatch_interrupt(gb); return; }
+  if (gb->ime && pending && !hook_suppress_interrupts) { cpu_dispatch_interrupt(gb); return; }
   if (gb->ime_delay) { gb->ime = true; gb->ime_delay = false; }
   if (hook_dispatch(gb)) return;
   { static long long tr_at = -1, tr_n = 0; if (tr_at < 0) { tr_at = 0; if (getenv("PCTRACE")) sscanf(getenv("PCTRACE"), "%lld,%lld", &tr_at, &tr_n); }

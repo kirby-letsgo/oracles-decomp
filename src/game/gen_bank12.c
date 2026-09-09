@@ -5,13 +5,6 @@
 // 12:55d4
 void parseGivenObjectData_b12(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_55d4;
-L_545d:
-  I(0x545d, 1); B = B;  // ld b,b
-  I(0x545e, 4); mem_wr(gb, 0x8028, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x8029, gb->sp >> 8);  // ld ($8028),sp
-  CALL_ASM_RST(0x5461, 0x0038, 0x5462);  // rst $38
-  HANDOFF(0x5462);  // fallthrough to objectData5462
-L_55d4:
   I(0x55d4, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x55d5, 2); alu_cp(gb, 0xfe);  // cp $fe
   if (!(F & FZ)) { I(0x55d7, 3); goto L_55da; } I(0x55d7, 2);  // jr nz,$55da
@@ -26,7 +19,7 @@ L_55da:
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
   if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x545d: goto L_545d; default: HANDOFF(HL); }
+  switch (HL) {  default: HANDOFF(HL); }
 }
 
 // 12:5872
@@ -469,25 +462,12 @@ void objectDataOp2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_566b:
   CALL(0x566b, continueObjectLoopIfOpDone, 0x5805, 0x566e);  // call $5805
-L_566e:
   CALL(0x566e, getFreeInteractionSlot, 0x3aef, 0x5671);  // call $3aef
   if (!(F & FZ)) { I(0x5671, 3); skipToOpEnd_4byte(gb); return; } I(0x5671, 2);  // jr nz,$567d
   CALL(0x5673, read2Bytes, 0x580d, 0x5676);  // call $580d
   I(0x5676, 2); L = 0x4b;  // ld l,$4b
   CALL(0x5678, readCoordinates, 0x5814, 0x567b);  // call $5814
   I(0x567b, 3); goto L_566b;  // jr $566b
-}
-
-// 12:566e
-void objectDataOp2__afterCall566e(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_566e:
-  CALL(0x566e, getFreeInteractionSlot, 0x3aef, 0x5671);  // call $3aef
-  if (!(F & FZ)) { I(0x5671, 3); skipToOpEnd_4byte(gb); return; } I(0x5671, 2);  // jr nz,$567d
-  CALL(0x5673, read2Bytes, 0x580d, 0x5676);  // call $580d
-  I(0x5676, 2); L = 0x4b;  // ld l,$4b
-  CALL(0x5678, readCoordinates, 0x5814, 0x567b);  // call $5814
-  I(0x567b, 3); objectDataOp2(gb); return;  // jr $566b
 }
 
 // 12:55b7
@@ -512,7 +492,6 @@ void objectDataOp9(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_579b:
   CALL(0x579b, continueObjectLoopIfOpDone, 0x5805, 0x579e);  // call $5805
-L_579e:
   CALL(0x579e, objectDataOp9__allocateObjectType, 0x57c3, 0x57a1);  // call $57c3
   if (!(F & FZ)) { I(0x57a1, 3); goto L_57bc; } I(0x57a1, 2);  // jr nz,$57bc
   I(0x57a3, 2); SET_DE(DE + 1);  // inc de
@@ -541,40 +520,6 @@ L_57bc:
   I(0x57bc, 2); A = 0x06;  // ld a,$06
   CALL(0x57be, addAToDe, 0x0068, 0x57c1);  // call $0068
   I(0x57c1, 3); goto L_579b;  // jr $579b
-}
-
-// 12:579e
-void objectDataOp9__afterCall579e(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_579e:
-  CALL(0x579e, objectDataOp9__allocateObjectType, 0x57c3, 0x57a1);  // call $57c3
-  if (!(F & FZ)) { I(0x57a1, 3); goto L_57bc; } I(0x57a1, 2);  // jr nz,$57bc
-  I(0x57a3, 2); SET_DE(DE + 1);  // inc de
-  I(0x57a4, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x57a5, 2); SET_DE(DE + 1);  // inc de
-  I(0x57a6, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x57a7, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x57a8, 2); SET_DE(DE + 1);  // inc de
-  I(0x57a9, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x57aa, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x57ab, 2); SET_DE(DE + 1);  // inc de
-  I(0x57ac, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x57ad, 1); A = L;  // ld a,l
-  I(0x57ae, 2); alu_and(gb, 0xc0);  // and $c0
-  I(0x57b0, 2); alu_add(gb, 0x0b);  // add $0b
-  I(0x57b2, 1); L = A;  // ld l,a
-  I(0x57b3, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x57b4, 2); SET_DE(DE + 1);  // inc de
-  I(0x57b5, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x57b6, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x57b7, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x57b8, 2); SET_DE(DE + 1);  // inc de
-  I(0x57b9, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x57ba, 3); objectDataOp9(gb); return;  // jr $579b
-L_57bc:
-  I(0x57bc, 2); A = 0x06;  // ld a,$06
-  CALL(0x57be, addAToDe, 0x0068, 0x57c1);  // call $0068
-  I(0x57c1, 3); objectDataOp9(gb); return;  // jr $579b
 }
 
 // 12:57bc
@@ -684,21 +629,10 @@ void objectDataOp1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5653:
   CALL(0x5653, continueObjectLoopIfOpDone, 0x5805, 0x5656);  // call $5805
-L_5656:
   CALL(0x5656, getFreeInteractionSlot, 0x3aef, 0x5659);  // call $3aef
   if (!(F & FZ)) { I(0x5659, 3); skipToOpEnd_2byte(gb); return; } I(0x5659, 2);  // jr nz,$5660
   CALL(0x565b, read2Bytes, 0x580d, 0x565e);  // call $580d
   I(0x565e, 3); goto L_5653;  // jr $5653
-}
-
-// 12:5656
-void objectDataOp1__afterCall5656(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5656:
-  CALL(0x5656, getFreeInteractionSlot, 0x3aef, 0x5659);  // call $3aef
-  if (!(F & FZ)) { I(0x5659, 3); skipToOpEnd_2byte(gb); return; } I(0x5659, 2);  // jr nz,$5660
-  CALL(0x565b, read2Bytes, 0x580d, 0x565e);  // call $580d
-  I(0x565e, 3); objectDataOp1(gb); return;  // jr $5653
 }
 
 // 12:56ba

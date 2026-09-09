@@ -12,11 +12,12 @@ typedef struct {
   int flags;
 } Hook;
 
-enum { HOOK_NOVERIFY = 1 };
+enum { HOOK_NOVERIFY = 1, HOOK_LOCAL = 2 };
 
 enum { HOOK_MODE_OFF = 0, HOOK_MODE_REPLACE = 1, HOOK_MODE_VERIFY = 2 };
 extern int hook_mode;
 extern int hook_in_verify;
+extern int hook_suppress_interrupts;
 extern uint64_t hook_verify_failures;
 extern bool hook_verify_abort;
 

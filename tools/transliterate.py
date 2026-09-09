@@ -166,11 +166,14 @@ def routine_body(bank, start):
         if kind == 'rst' and info[0] == 0:
             table = []
             pos = a + ln
-            while True:
+            while pos < 0x8000:
                 w = rd(bank, pos) | (rd(bank, pos + 1) << 8)
+                if not (0x0150 <= w < 0x8000): break
+                if table and ((bank, pos) in by_addr or (bank, pos) in local_by_addr): break
+                if any(pos <= t < pos + 2 for t in table): break
                 table.append(w)
                 pos += 2
-                if pos >= min(table) or pos >= 0x8000: break
+            if not table: table = [rd(bank, a + ln) | (rd(bank, a + ln + 1) << 8)]
             kind, info = 'jumptable', (table, a + ln)
             succ = list(table)
         elif kind in ('jp', 'jpcc'):
@@ -190,9 +193,25 @@ def target_name(bank, t, insns_addrs):
 
 def cname(n): return n.replace('@', '__')
 
+def infer_banks(bank, insns):
+    """For bank 0 code, map each jp/call to a switchable-bank address to the bank selected by the
+    preceding `ld a,n` / `ld ($2222),a` pair, when that is what precedes it."""
+    out = {}
+    if bank != 0: return out
+    last_a, sel = None, None
+    for a, m, ln, cy, kind, info in insns:
+        mm = re.match(r'ld a,\$([0-9a-f]{2})$', m)
+        if mm: last_a = int(mm.group(1), 16); continue
+        if m == 'ld ($2222),a': sel = last_a; continue
+        if kind in ('jp', 'jpcc', 'call', 'callcc') and info[0] >= 0x4000 and sel is not None: out[a] = sel
+        if kind in ('call', 'callcc'): sel = None
+        if m.startswith('ld a,') or m.startswith('ldh a,') or m.startswith('pop af'): last_a = None
+    return out
+
 def gen(name, bank=None, start=None):
     if bank is None: bank, start = labels[name]
     insns = routine_body(bank, start)
+    banks_at = infer_banks(bank, insns)
     bad = [m for a, m, ln, cy, kind, info in insns if kind == 'unsupported']
     if bad:
         print(f'warning: {name} skipped ({bad[0]})', file=sys.stderr)
@@ -237,6 +256,7 @@ def gen(name, bank=None, start=None):
                 jump = f'goto L_{t:04x};'
             else:
                 tb = target_bank(bank, t)
+                if tb is None: tb = banks_at.get(a)
                 tn = by_addr.get((tb, t)) or local_by_addr.get((tb, t))
                 if (tb, t) in entries: jump = f'{entries[(tb, t)]}(gb); return;'
                 else: jump = f'HANDOFF(0x{t:04x}); /* {tn or "unported"} */'
@@ -247,6 +267,7 @@ def gen(name, bank=None, start=None):
         elif kind in ('call', 'callcc'):
             t, cond = info
             tb = target_bank(bank, t)
+            if tb is None: tb = banks_at.get(a)
             tn = by_addr.get((tb, t)) or local_by_addr.get((tb, t))
             ra = a + ln
             if (tb, t) in entries: c = f'CALL(0x{a:04x}, {entries[(tb, t)]}, 0x{t:04x}, 0x{ra:04x});'
@@ -285,7 +306,7 @@ def gen(name, bank=None, start=None):
             if (bank, nxt_a) in entries: out.emit(f'{entries[(bank, nxt_a)]}(gb); return;  // fallthrough')
             else: out.emit(f'HANDOFF(0x{nxt_a:04x});  // fallthrough to {nn or "unlabeled"}')
     out.lines.append('}')
-    gen.flags = 'H' if any(k == 'halt' for _, _, _, _, k, _ in insns) else '-'
+    gen.flags = ('H' if any(k == 'halt' for _, _, _, _, k, _ in insns) else '') + ('L' if '@' in name else '') or '-'
     return '\n'.join(out.lines)
 
 if names and names[0] == '--out':
@@ -308,10 +329,12 @@ if names and names[0] == '--out':
             addrs = set(a for a, *_ in body)
             for a, m, ln, cy, k, info in body:
                 nxt = []
-                if k in ('jp', 'jpcc') and info[0] not in addrs: nxt.append(info[0])
+                if k in ('jp', 'jpcc', 'call', 'callcc') and info[0] not in addrs: nxt.append(info[0])
                 if k not in ('ret', 'reti', 'jp', 'jphl', 'jumptable', 'unsupported', 'spload') and a + ln not in addrs: nxt.append(a + ln)
+                banks_here = infer_banks(tb, body)
                 for x in nxt:
                     nb = target_bank(tb, x)
+                    if nb is None: nb = banks_here.get(a)
                     if nb is not None and switches_threads(nb, x, seen + ((tb, t),)): r = True; break
                 if r: break
         _switches[(tb, t)] = r
@@ -319,10 +342,13 @@ if names and names[0] == '--out':
     for n in names:
         for (b, a) in instances.get(n, []):
             if (b, a) in externs: continue
-            for ia, m, ln, cy, kind, info in routine_body(b, a):
+            body = routine_body(b, a)
+            banks_at = infer_banks(b, body)
+            for ia, m, ln, cy, kind, info in body:
                 if kind == 'spload' and (b, ia + ln) not in by_addr: local_by_addr.setdefault((b, ia + ln), f'{n}@afterSp{ia + ln:04x}')
                 if kind in ('call', 'callcc'):
                     tb = target_bank(b, info[0])
+                    if tb is None: tb = banks_at.get(ia)
                     if tb is not None and switches_threads(tb, info[0]) and (b, ia + ln) not in by_addr: local_by_addr.setdefault((b, ia + ln), f'{n}@afterCall{ia + ln:04x}')
     owner = {}
     for n in names:

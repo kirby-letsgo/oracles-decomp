@@ -5538,3 +5538,5 @@ enemyCode5f
 dragonfly_state0
 enemyBoss_initializeRoomWithoutExtraGfx
 ramrockArm_subid4_substate2
+# batch 14: indented labels
+getObjectDataAddress
