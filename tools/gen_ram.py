@@ -29,7 +29,7 @@ for line in open(sym):
         mb = re.match(r'w([1-7])[A-Z]', name)
         bank = int(mb.group(1)) if mb else (0 if addr < 0xd000 or addr >= 0xff80 else None)
         if bank is None: continue
-    if '@' in name or not re.match(r'[wh][A-Z0-9]', name): continue
+    if '@' in name or not re.match(r'[wh][A-Za-z0-9]', name): continue
     if not (0xc000 <= addr < 0xe000 or 0xff80 <= addr < 0xffff): continue
     cn = name.replace('.', '_')
     if cn.split('_')[0] in code: continue

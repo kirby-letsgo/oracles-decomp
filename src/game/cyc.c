@@ -1,4 +1,6 @@
 #include "game/game.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 static uint8_t rom_byte(const GB *gb, int bank, uint16_t addr) {
   size_t off = addr < 0x4000 ? addr : (size_t)bank * 0x4000 + (addr - 0x4000);
@@ -74,6 +76,10 @@ void burn_rom(GB *gb, int bank, uint16_t from, uint16_t to, bool last_taken) {
     uint8_t op = rom_byte(gb, bank, a), op2 = rom_byte(gb, bank, a + 1);
     int len = insn_len(op);
     bool last = (uint16_t)(a + len) >= to;
+    if (!last && (op == 0x18 || op == 0xc3 || op == 0xc9 || op == 0xd9 || op == 0xe9)) {
+      fprintf(stderr, "burn_rom: range %02x:%04x-%04x runs past an unconditional jump at %04x\n", bank, from, to, a);
+      exit(4);
+    }
     gb->hook_pc = a;
     gb_burn(gb, insn_cycles(op, op2, last_taken && last));
     a = (uint16_t)(a + len);

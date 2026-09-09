@@ -233,7 +233,7 @@ void applyRoomSpecificTileChanges(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x642c, 4); A = mem_rd(gb, 0xcc30);  // ld a,($cc30)
   I(0x642f, 3); SET_HL(0x64a7);  // ld hl,$64a7
-  CALL(0x6432, findRoomSpecificData, 0x1dfe, 0x6435);  // call $1dfe
+  CALL(0x6432, findRoomSpecificData_hook, 0x1dfe, 0x6435);  // call $1dfe
   if (!(F & FC)) { RET_TAKEN(0x6435); return; } I(0x6435, 2);  // ret nc
   RST_PUSH(0x6436, 0x6437);  // rst $00 (jump table)
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
@@ -1536,7 +1536,7 @@ L_69ad:
   I(0x69ad, 3); SET_DE(0x69c0);  // ld de,$69c0
   CALL(0x69b0, replaceTiles, 0x6096, 0x69b3);  // call $6096
   I(0x69b3, 2); A = 0xd6;  // ld a,$d6
-  CALL(0x69b5, findTileInRoom, 0x15cc, 0x69b8);  // call $15cc
+  CALL(0x69b5, findTileInRoom_hook, 0x15cc, 0x69b8);  // call $15cc
   if (!(F & FZ)) { RET_TAKEN(0x69b8); return; } I(0x69b8, 2);  // ret nz
   I(0x69b9, 1); A = L;  // ld a,l
   I(0x69ba, 2); alu_add(gb, 0x10);  // add $10
@@ -1563,7 +1563,7 @@ void setTileToWitheredVine(GB *gb) {
   I(0x69c8, 2); H = 0xcf;  // ld h,$cf
   I(0x69ca, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   PUSH(0x69cb, HL);  // push hl
-  CALL(0x69cc, retrieveTileCollisionValue, 0x156e, 0x69cf);  // call $156e
+  CALL(0x69cc, retrieveTileCollisionValue_hook, 0x156e, 0x69cf);  // call $156e
   SET_HL(POP(0x69cf));  // pop hl
   I(0x69d0, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x69d1); return; } I(0x69d1, 2);  // ret nz
@@ -2178,7 +2178,7 @@ L_6096:
   I(0x609a, 2); SET_DE(DE + 1);  // inc de
   I(0x609b, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x609c, 2); SET_DE(DE + 1);  // inc de
-  CALL(0x609d, findTileInRoom, 0x15cc, 0x60a0);  // call $15cc
+  CALL(0x609d, findTileInRoom_hook, 0x15cc, 0x60a0);  // call $15cc
   if (!(F & FZ)) { I(0x60a0, 3); goto L_6096; } I(0x60a0, 2);  // jr nz,$6096
   I(0x60a2, 2); mem_wr(gb, HL, B);  // ld (hl),b
   I(0x60a3, 1); C = A;  // ld c,a
@@ -2188,7 +2188,7 @@ L_6096:
 L_60a8:
   I(0x60a8, 1); L = alu_dec8(gb, L);  // dec l
   I(0x60a9, 1); A = C;  // ld a,c
-  CALL(0x60aa, backwardsSearch, 0x15d0, 0x60ad);  // call $15d0
+  CALL(0x60aa, backwardsSearch_hook, 0x15d0, 0x60ad);  // call $15d0
   if (!(F & FZ)) { I(0x60ad, 3); goto L_6096; } I(0x60ad, 2);  // jr nz,$6096
   I(0x60af, 2); mem_wr(gb, HL, B);  // ld (hl),b
   I(0x60b0, 1); C = A;  // ld c,a
@@ -3577,7 +3577,7 @@ void replaceOpenedChest(GB *gb) {
   CALL(0x626f, getThisRoomFlags_hook, 0x197d, 0x6272);  // call $197d
   I(0x6272, 2); alu_bit(gb, 5, A);  // bit 5,a
   if ((F & FZ)) { RET_TAKEN(0x6274); return; } I(0x6274, 2);  // ret z
-  CALL(0x6275, getChestData, 0x10cc, 0x6278);  // call $10cc
+  CALL(0x6275, getChestData_hook, 0x10cc, 0x6278);  // call $10cc
   I(0x6278, 2); D = 0xcf;  // ld d,$cf
   I(0x627a, 2); A = 0xf0;  // ld a,$f0
   I(0x627c, 2); mem_wr(gb, DE, A);  // ld (de),a

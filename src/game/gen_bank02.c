@@ -2188,7 +2188,7 @@ L_54c9:
   I(0x54cd, 3); SET_HL(0x4000);  // ld hl,$4000
   I(0x54d0, 2); alu_add_hl(gb, BC);  // add hl,bc
   I(0x54d1, 2); B = 0x19;  // ld b,$19
-  I(0x54d3, 4); copy20BytesFromBank(gb); return;  // jp $1a83
+  I(0x54d3, 4); if (hook_enabled_at(0x1a83)) { copy20BytesFromBank_hook(gb); return; } HANDOFF(0x1a83);  // jp $1a83
 L_54d6:
   I(0x54d6, 1); H = D;  // ld h,d
   I(0x54d7, 1); L = E;  // ld l,e
@@ -2212,7 +2212,7 @@ L_54c9:
   I(0x54cd, 3); SET_HL(0x4000);  // ld hl,$4000
   I(0x54d0, 2); alu_add_hl(gb, BC);  // add hl,bc
   I(0x54d1, 2); B = 0x19;  // ld b,$19
-  I(0x54d3, 4); copy20BytesFromBank(gb); return;  // jp $1a83
+  I(0x54d3, 4); if (hook_enabled_at(0x1a83)) { copy20BytesFromBank_hook(gb); return; } HANDOFF(0x1a83);  // jp $1a83
 L_54d6:
   I(0x54d6, 1); H = D;  // ld h,d
   I(0x54d7, 1); L = E;  // ld l,e
@@ -4999,7 +4999,7 @@ L_7312:
   I(0x7315, 3); SET_HL(0x57a0);  // ld hl,$57a0
   I(0x7318, 2); alu_add_hl(gb, BC);  // add hl,bc
   PUSH(0x7319, DE);  // push de
-  CALL(0x731a, copy8BytesFromRingMapToCec0, 0x1af7, 0x731d);  // call $1af7
+  CALL(0x731a, copy8BytesFromRingMapToCec0_hook, 0x1af7, 0x731d);  // call $1af7
   SET_HL(POP(0x731d));  // pop hl
   I(0x731e, 3); SET_DE(0xcec0);  // ld de,$cec0
   CALL(0x7321, getRingTiles__drawTile, 0x732f, 0x7324);  // call $732f
@@ -5141,7 +5141,7 @@ void applyRoomSpecificTileChangesAfterGfxLoad(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x7a88, 4); A = mem_rd(gb, 0xcc30);  // ld a,($cc30)
   I(0x7a8b, 3); SET_HL(0x7aaa);  // ld hl,$7aaa
-  CALL(0x7a8e, findRoomSpecificData, 0x1dfe, 0x7a91);  // call $1dfe
+  CALL(0x7a8e, findRoomSpecificData_hook, 0x1dfe, 0x7a91);  // call $1dfe
   if (!(F & FC)) { RET_TAKEN(0x7a91); return; } I(0x7a91, 2);  // ret nc
   RST_PUSH(0x7a92, 0x7a93);  // rst $00 (jump table)
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
@@ -5826,7 +5826,7 @@ void roomTileChangesAfterLoad08(GB *gb) {
   CALL(0x7cef, getIndexOfGashaSpotInRoom_body, 0x7a54, 0x7cf2);  // call $7a54
   if ((F & FZ)) { RET_TAKEN(0x7cf2); return; } I(0x7cf2, 2);  // ret z
   I(0x7cf3, 2); A = 0xd2;  // ld a,$d2
-  CALL(0x7cf5, findTileInRoom, 0x15cc, 0x7cf8);  // call $15cc
+  CALL(0x7cf5, findTileInRoom_hook, 0x15cc, 0x7cf8);  // call $15cc
   if (!(F & FZ)) { RET_TAKEN(0x7cf8); return; } I(0x7cf8, 2);  // ret nz
   I(0x7cf9, 1); E = L;  // ld e,l
   I(0x7cfa, 2); D = 0xcf;  // ld d,$cf
@@ -6364,7 +6364,7 @@ void checkTileValidForEnemySpawn(GB *gb) {
   I(0x7888, 2); B = 0xcf;  // ld b,$cf
   I(0x788a, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x788b, 3); SET_HL(0x791f);  // ld hl,$791f
-  CALL(0x788e, lookupCollisionTable, 0x1e1f, 0x7891);  // call $1e1f
+  CALL(0x788e, lookupCollisionTable_hook, 0x1e1f, 0x7891);  // call $1e1f
   if (!(F & FC)) { RET_TAKEN(0x7891); return; } I(0x7891, 2);  // ret nc
 L_7892:
   I(0x7892, 1); alu_scf(gb);  // scf
@@ -6960,7 +6960,7 @@ L_7a1b:
   I(0x7a1c, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { RET_TAKEN(0x7a1d); return; } I(0x7a1d, 2);  // ret z
   PUSH(0x7a1e, HL);  // push hl
-  CALL(0x7a1f, findTileInRoom, 0x15cc, 0x7a22);  // call $15cc
+  CALL(0x7a1f, findTileInRoom_hook, 0x15cc, 0x7a22);  // call $15cc
   SET_HL(POP(0x7a22));  // pop hl
   if (!(F & FZ)) { I(0x7a23, 3); goto L_7a1b; } I(0x7a23, 2);  // jr nz,$7a1b
   CALL(0x7a25, getFreePartSlot, 0x3e8e, 0x7a28);  // call $3e8e
@@ -6978,7 +6978,7 @@ void b2_updateMenus(GB *gb) {
   I(0x4fd5, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
   I(0x4fd8, 2); alu_and(gb, 0x0e);  // and $0e
   if (!(F & FZ)) { RET_TAKEN(0x4fda); return; } I(0x4fda, 2);  // ret nz
-  CALL(0x4fdb, retIfTextIsActive, 0x1859, 0x4fde);  // call $1859
+  CALL(0x4fdb, retIfTextIsActive_hook, 0x1859, 0x4fde);  // call $1859
   I(0x4fde, 4); A = mem_rd(gb, 0xcdd5);  // ld a,($cdd5)
   I(0x4fe1, 1); B = A;  // ld b,a
   I(0x4fe2, 4); A = mem_rd(gb, 0xcc8d);  // ld a,($cc8d)
@@ -14305,7 +14305,7 @@ void reloadGraphicsOnExitMenu_body(GB *gb) {
 L_510d:
   CALL(0x510d, loadTilesetData, 0x3889, 0x5110);  // call $3889
   CALL(0x5110, loadTilesetGraphics, 0x3796, 0x5113);  // call $3796
-  CALL(0x5113, reloadTileMap, 0x12fc, 0x5116);  // call $12fc
+  CALL(0x5113, reloadTileMap_hook, 0x12fc, 0x5116);  // call $12fc
   CALL(0x5116, fastFadeinFromWhiteToRoom, 0x335d, 0x5119);  // call $335d
   I(0x5119, 4); A = mem_rd(gb, 0xcbe3);  // ld a,($cbe3)
   I(0x511c, 1); alu_or(gb, A);  // or a
@@ -14325,7 +14325,7 @@ void reloadGraphicsOnExitMenu_body__afterCall510d(GB *gb) {
 L_510d:
   CALL(0x510d, loadTilesetData, 0x3889, 0x5110);  // call $3889
   CALL(0x5110, loadTilesetGraphics, 0x3796, 0x5113);  // call $3796
-  CALL(0x5113, reloadTileMap, 0x12fc, 0x5116);  // call $12fc
+  CALL(0x5113, reloadTileMap_hook, 0x12fc, 0x5116);  // call $12fc
   CALL(0x5116, fastFadeinFromWhiteToRoom, 0x335d, 0x5119);  // call $335d
   I(0x5119, 4); A = mem_rd(gb, 0xcbe3);  // ld a,($cbe3)
   I(0x511c, 1); alu_or(gb, A);  // or a
@@ -17012,7 +17012,7 @@ L_5f9b:
 // 02:5f9d
 void galeSeedMenu_state2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5f9d, retIfTextIsActive, 0x1859, 0x5fa0);  // call $1859
+  CALL(0x5f9d, retIfTextIsActive_hook, 0x1859, 0x5fa0);  // call $1859
   I(0x5fa0, 4); A = mem_rd(gb, 0xcba5);  // ld a,($cba5)
   I(0x5fa3, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x5fa4, 3); galeSeedMenu_gotoState1(gb); return; } I(0x5fa4, 2);  // jr nz,$5fd1
@@ -17046,7 +17046,7 @@ void galeSeedMenu_gotoState1(GB *gb) {
 // 02:5fd7
 void galeSeedMenu_state3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5fd7, retIfTextIsActive, 0x1859, 0x5fda);  // call $1859
+  CALL(0x5fd7, retIfTextIsActive_hook, 0x1859, 0x5fda);  // call $1859
   I(0x5fda, 4); A = mem_rd(gb, 0xcba5);  // ld a,($cba5)
   I(0x5fdd, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x5fde, 3); galeSeedMenu_gotoState1(gb); return; } I(0x5fde, 2);  // jr z,$5fd1
@@ -17332,7 +17332,7 @@ L_613c:
   I(0x6142, 1); A = alu_dec8(gb, A);  // dec a
   I(0x6143, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
 L_6146:
-  CALL(0x6146, retIfTextIsActive, 0x1859, 0x6149);  // call $1859
+  CALL(0x6146, retIfTextIsActive_hook, 0x1859, 0x6149);  // call $1859
   I(0x6149, 3); SET_HL(0x6199);  // ld hl,$6199
   CALL(0x614c, getDirectionButtonOffsetFromHl, 0x5883, 0x614f);  // call $5883
   if (!(F & FC)) { I(0x614f, 3); goto L_6182; } I(0x614f, 2);  // jr nc,$6182
@@ -17406,7 +17406,7 @@ L_613c:
   I(0x6142, 1); A = alu_dec8(gb, A);  // dec a
   I(0x6143, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
 L_6146:
-  CALL(0x6146, retIfTextIsActive, 0x1859, 0x6149);  // call $1859
+  CALL(0x6146, retIfTextIsActive_hook, 0x1859, 0x6149);  // call $1859
   I(0x6149, 3); SET_HL(0x6199);  // ld hl,$6199
   CALL(0x614c, getDirectionButtonOffsetFromHl, 0x5883, 0x614f);  // call $5883
   if (!(F & FC)) { I(0x614f, 3); goto L_6182; } I(0x614f, 2);  // jr nc,$6182
@@ -19123,11 +19123,11 @@ void ringMenu_unappraisedRings_state1(GB *gb) {
   CALL(0x6e46, ringMenu_checkObtainedRingBox, 0x6f29, 0x6e49);  // call $6f29
   if ((F & FZ)) { I(0x6e49, 3); goto L_6e5a; } I(0x6e49, 2);  // jr z,$6e5a
   I(0x6e4b, 2); A = 0x05;  // ld a,$05
-  CALL(0x6e4d, cpRupeeValue, 0x1765, 0x6e50);  // call $1765
+  CALL(0x6e4d, cpRupeeValue_hook, 0x1765, 0x6e50);  // call $1765
   I(0x6e50, 2); B = 0x06;  // ld b,$06
   if (!(F & FZ)) { I(0x6e52, 4); ringMenu_unappraisedRings_gotoState5(gb); return; } I(0x6e52, 3);  // jp nz,$6f05
   I(0x6e55, 2); A = 0x05;  // ld a,$05
-  CALL(0x6e57, removeRupeeValue, 0x1778, 0x6e5a);  // call $1778
+  CALL(0x6e57, removeRupeeValue_hook, 0x1778, 0x6e5a);  // call $1778
 L_6e5a:
   I(0x6e5a, 3); SET_HL(0xc6ce);  // ld hl,$c6ce
   CALL(0x6e5d, incHlRefWithCap_hook, 0x0245, 0x6e60);  // call $0245
@@ -19223,7 +19223,7 @@ void ringMenu_unappraisedRings_state4(GB *gb) {
   I(0x6ed7, 1); alu_or(gb, A);  // or a
   I(0x6ed8, 1); C = A;  // ld c,a
   I(0x6ed9, 2); A = 0x28;  // ld a,$28
-  if (!(F & FZ)) { CALL(0x6edb, giveTreasure, 0x171c, 0x6ede); } else I(0x6edb, 3);  // call nz,$171c
+  if (!(F & FZ)) { CALL(0x6edb, giveTreasure_hook, 0x171c, 0x6ede); } else I(0x6edb, 3);  // call nz,$171c
   I(0x6ede, 3); SET_HL(0x4697);  // ld hl,$4697
   I(0x6ee1, 2); E = 0x3f;  // ld e,$3f
   CALL(0x6ee3, interBankCall, 0x008a, 0x6ee6);  // call $008a

@@ -27,7 +27,7 @@ void runRoomSpecificCode(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x5872, 4); A = mem_rd(gb, 0xcc30);  // ld a,($cc30)
   I(0x5875, 3); SET_HL(0x5898);  // ld hl,$5898
-  CALL(0x5878, findRoomSpecificData, 0x1dfe, 0x587b);  // call $1dfe
+  CALL(0x5878, findRoomSpecificData_hook, 0x1dfe, 0x587b);  // call $1dfe
   if (!(F & FC)) { RET_TAKEN(0x587b); return; } I(0x587b, 2);  // ret nc
   RST_PUSH(0x587c, 0x587d);  // rst $00 (jump table)
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
