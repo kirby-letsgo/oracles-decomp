@@ -5,7 +5,7 @@
 #include "hash.h"
 #include <string.h>
 
-void gb_init(GB *gb) { memset(gb, 0, sizeof *gb); }
+void gb_init(GB *gb) { memset(gb, 0, sizeof *gb); gb->samples = calloc(16, sizeof *gb->samples); }
 
 bool gb_load_rom(GB *gb, const uint8_t *rom, size_t size) {
   if (size < 0x8000 || (size & 0x3fff)) return false;
@@ -55,9 +55,12 @@ void gb_reset(GB *gb) {
   void (*serial_out)(void *, uint8_t) = gb->serial_out;
   void *serial_ctx = gb->serial_ctx;
   static uint8_t saved_wram[8][4096], saved_hram[127];
+  GBSample *samples = gb->samples;
   bool keep_ram = gb->init_ram_loaded;
   if (keep_ram) { memcpy(saved_wram, gb->wram, sizeof saved_wram); memcpy(saved_hram, gb->hram, sizeof saved_hram); }
   memset(gb, 0, sizeof *gb);
+  gb->samples = samples ? samples : calloc(16, sizeof *gb->samples);
+  gb->next_sample_at = UINT64_MAX;
   if (keep_ram) { memcpy(gb->wram, saved_wram, sizeof saved_wram); memcpy(gb->hram, saved_hram, sizeof saved_hram); }
   gb->init_ram_loaded = keep_ram;
   gb->rom = rom; gb->rom_size = rom_size; gb->mbc = mbc; gb->eram_size = eram_size;
@@ -97,8 +100,16 @@ void gb_tick(GB *gb) {
   gb->mcycles++;
   while (gb->cycles >= gb->next_sample_at) {
     if (!gb->joy_latched && gb->halted && (gb->ie & 0x10)) gb->joy = gb_input_now(gb);
-    if (gb->sample_count < 4) {
-      GBSample *sm = &gb->samples[(gb->sample_head + gb->sample_count) % 4];
+    if (gb->sample_count == 16) {
+      if (gb->frame_cb) {
+        gb->sample = &gb->samples[gb->sample_head];
+        gb->sample_head = (gb->sample_head + 1) % 16;
+        gb->sample_count--;
+        gb->frame_cb(gb, gb->sample, gb->frame_ctx);
+      } else gb->sample_overflow++;
+    }
+    if (gb->sample_count < 16) {
+      GBSample *sm = &gb->samples[(gb->sample_head + gb->sample_count) % 16];
       sm->frame = GRID_FRAME(gb->next_sample_at) - 1;
       memcpy(sm->wram, gb->wram, sizeof sm->wram);
       memcpy(sm->hram, gb->hram, sizeof sm->hram);
@@ -129,8 +140,9 @@ uint64_t gb_run_frame(GB *gb) {
   while (gb->sample_count == 0 && !gb->hung) gb_step(gb);
   if (gb->sample_count == 0) return GRID_FRAME(gb->cycles);
   gb->sample = &gb->samples[gb->sample_head];
-  gb->sample_head = (gb->sample_head + 1) % 4;
+  gb->sample_head = (gb->sample_head + 1) % 16;
   gb->sample_count--;
+  if (gb->frame_cb) gb->frame_cb(gb, gb->sample, gb->frame_ctx);
   return gb->sample->frame;
 }
 

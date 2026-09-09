@@ -12,7 +12,7 @@
 
 #define REF_INTERVAL 60
 extern uint64_t dbg_dma_bytes, dbg_dma_calls, dbg_hblank_chunks, dbg_instr_count, dbg_int_count[5];
-extern int dbg_log_dma, dbg_log_lcdc;
+extern int dbg_log_dma, dbg_log_lcdc, dbg_log_ints;
 
 
 static uint64_t tas_input_offset;
@@ -44,6 +44,89 @@ static bool screenshot_wanted(const char *list, uint64_t frame) {
 
 typedef struct { uint8_t group, room; } RoomKey;
 
+typedef struct {
+  FILE *fh_out, *fh_check, *ref_out, *ref_check, *dump;
+  const char *out_dir, *shot_at;
+  uint64_t shot_every, input_offset;
+  bool probe, fail;
+  RoomKey seen[4096];
+  int nseen;
+} FrameCtx;
+
+static void on_frame(GB *gb, const GBSample *sm, void *ctx) {
+  FrameCtx *c = ctx;
+  static uint8_t rgb[FB_W * FB_H * 3];
+  uint64_t frame = sm->frame;
+  if (c->fail) return;
+  if (c->fh_out || c->fh_check) {
+    uint64_t h = gb_frame_hash(gb);
+    if (c->fh_out) fwrite(&h, 8, 1, c->fh_out);
+    if (c->fh_check) {
+      uint64_t want;
+      if (fread(&want, 8, 1, c->fh_check) == 1 && want != h) {
+        fprintf(stderr, "frame hash mismatch at frame %llu\n", (unsigned long long)frame);
+        { c->fail = true; return; }
+      }
+    }
+  }
+  if ((c->ref_out || c->ref_check) && frame % REF_INTERVAL == 0) {
+    uint64_t h = gb_state_hash(gb);
+    if (c->ref_out) fprintf(c->ref_out, "%llu %016llx\n", (unsigned long long)frame, (unsigned long long)h);
+    if (c->ref_check) {
+      unsigned long long f, want;
+      if (fscanf(c->ref_check, "%llu %llx", &f, &want) == 2 && (f != frame || want != h)) {
+        fprintf(stderr, "state hash mismatch at frame %llu (ref frame %llu)\n", (unsigned long long)frame, f);
+        { c->fail = true; return; }
+      }
+    }
+  }
+  if (c->out_dir && ((c->shot_every && frame % c->shot_every == 0) || screenshot_wanted(c->shot_at, frame))) {
+    char path[1024];
+    snprintf(path, sizeof path, "%s/frame_%07llu.png", c->out_dir, (unsigned long long)frame);
+    framebuffer_to_rgb(sm->framebuffer, rgb);
+    png_write_rgb(path, rgb, FB_W, FB_H);
+  }
+  if (getenv("SAMPLE_HASH_AT") && frame + c->input_offset == strtoull(getenv("SAMPLE_HASH_AT"), NULL, 10)) {
+    const GBSample *sm = sm;
+    printf("SAMPLE %llu wram %016llx hram %016llx vram %016llx oam %016llx io %016llx bg %016llx ob %016llx ie %02x rom %u ram %u\n", (unsigned long long)sm->frame,
+           (unsigned long long)fnv1a64_update(FNV1A64_INIT, (const unsigned char *)sm->wram, sizeof sm->wram), (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->hram, sizeof sm->hram),
+           (unsigned long long)fnv1a64_update(FNV1A64_INIT, (const unsigned char *)sm->vram, sizeof sm->vram), (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->oam, sizeof sm->oam),
+           (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->io, sizeof sm->io), (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->bg_pal, sizeof sm->bg_pal), (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->ob_pal, sizeof sm->ob_pal), sm->ie, sm->rom_bank, sm->ram_bank);
+    for (int i = 0; i < 128; i++) printf("%02x", sm->io[i]);
+    printf("\n");
+  }
+  if (c->dump) {
+    uint64_t movie_frame = frame + c->input_offset;
+    static uint64_t wd_a = 0, wd_b = 0; static bool wd_init = false;
+    if (!wd_init) { wd_init = true; if (getenv("WRAMDUMP_AT")) { if (sscanf(getenv("WRAMDUMP_AT"), "%llu-%llu", (unsigned long long *)&wd_a, (unsigned long long *)&wd_b) < 2) wd_b = wd_a; } }
+    if (getenv("WRAMDUMP_AT") && movie_frame >= wd_a && movie_frame <= wd_b) {
+      FILE *wf = fopen(getenv("WRAMDUMP_FILE") ? getenv("WRAMDUMP_FILE") : "wram_at.txt", "a");
+      fprintf(wf, "FRAME %llu mcycles %llu cycles %llu ly %u\n", (unsigned long long)movie_frame, (unsigned long long)gb->mcycles, (unsigned long long)gb->cycles, gb->io[R_LY]);
+      for (int b = 0; b < 8; b++) for (int i = 0; i < 4096; i++) fprintf(wf, "%02x", sm->wram[b][i]);
+      fprintf(wf, "\n");
+      for (int i = 0; i < 127; i++) fprintf(wf, "%02x", sm->hram[i]);
+      fprintf(wf, "\n");
+      fclose(wf);
+    }
+    if ((movie_frame + 1) % 60 == 0) {
+      uint32_t h = 0xcbf29ce4u;
+      for (int i = 0x300; i < 0x1000; i++) { h ^= sm->wram[0][i]; h *= 16777619u; }
+      fprintf(c->dump, "%llu %02x %02x %02x %02x %02x %d %08x\n", (unsigned long long)movie_frame, sm->wram[0][0xc2d], sm->wram[0][0xc30], sm->wram[0][0xc00], sm->hram[0x14], sm->hram[0x15], (sm->joy_latched || sm->joy_read) ? 0 : 1, h);
+    } else {
+      fprintf(c->dump, "%llu %02x %02x %02x %02x %02x %d\n", (unsigned long long)movie_frame, sm->wram[0][0xc2d], sm->wram[0][0xc30], sm->wram[0][0xc00], sm->hram[0x14], sm->hram[0x15], (sm->joy_latched || sm->joy_read) ? 0 : 1);
+    }
+  }
+  if (c->probe) {
+    RoomKey k = {sm->wram[0][0x0c2d], sm->wram[0][0x0c30]};
+    bool known = false;
+    for (int j = 0; j < c->nseen; j++) if (c->seen[j].group == k.group && c->seen[j].room == k.room) { known = true; break; }
+    if (!known && c->nseen < 4096) {
+      c->seen[c->nseen++] = k;
+      printf("frame %llu group %02x room %02x\n", (unsigned long long)frame, k.group, k.room);
+    }
+  }
+}
+
 int main(int argc, char **argv) {
   const char *rom_path = arg_value(argc, argv, "--rom");
   if (!rom_path) { fprintf(stderr, "usage: oracles-run --rom FILE [options]\n"); return 2; }
@@ -67,7 +150,9 @@ int main(int argc, char **argv) {
   }
   const char *init_ram = arg_value(argc, argv, "--init-ram");
   if (arg_flag(argc, argv, "--serial")) gb->serial_out = serial_print;
+  if (getenv("PCTRACE") || getenv("HOOKLOG")) setvbuf(stdout, NULL, _IOLBF, 0);
   hooks_init();
+  static uint64_t il_a, il_b; if (getenv("INTLOG")) sscanf(getenv("INTLOG"), "%llu-%llu", (unsigned long long *)&il_a, (unsigned long long *)&il_b);
   if (arg_flag(argc, argv, "--no-hooks")) hook_mode = HOOK_MODE_OFF;
   if (arg_flag(argc, argv, "--verify-hooks")) hook_mode = HOOK_MODE_VERIFY;
   if (arg_flag(argc, argv, "--verify-hooks-continue")) { hook_mode = HOOK_MODE_VERIFY; hook_verify_abort = false; }
@@ -109,9 +194,10 @@ int main(int argc, char **argv) {
 
   FILE *dump = NULL;
   if ((p = arg_value(argc, argv, "--dump"))) dump = fopen(p, "w");
-  RoomKey seen[4096];
-  int nseen = 0;
-  static uint8_t rgb[FB_W * FB_H * 3];
+  static FrameCtx fc;
+  fc.fh_out = fh_out; fc.fh_check = fh_check; fc.ref_out = ref_out; fc.ref_check = ref_check; fc.dump = dump;
+  fc.out_dir = out_dir; fc.shot_at = shot_at; fc.shot_every = shot_every; fc.input_offset = input_offset; fc.probe = probe;
+  gb->frame_cb = on_frame; gb->frame_ctx = &fc;
 
   const char *trace_arg = arg_value(argc, argv, "--trace-frames");
   uint64_t trace_start = 0, trace_end = 0;
@@ -188,82 +274,18 @@ int main(int argc, char **argv) {
       dbg_log_dma = 0;
       continue;
     }
+    if (getenv("INTLOG")) dbg_log_ints = (frame >= il_a && frame <= il_b);
     frame = gb_run_frame(gb);
     if (gb->hung) { fprintf(stderr, "cpu hung at frame %llu pc %04x\n", (unsigned long long)frame, gb->pc); return 1; }
 
-    if (fh_out || fh_check) {
-      uint64_t h = gb_frame_hash(gb);
-      if (fh_out) fwrite(&h, 8, 1, fh_out);
-      if (fh_check) {
-        uint64_t want;
-        if (fread(&want, 8, 1, fh_check) == 1 && want != h) {
-          fprintf(stderr, "frame hash mismatch at frame %llu\n", (unsigned long long)frame);
-          return 1;
-        }
-      }
-    }
-    if ((ref_out || ref_check) && frame % REF_INTERVAL == 0) {
-      uint64_t h = gb_state_hash(gb);
-      if (ref_out) fprintf(ref_out, "%llu %016llx\n", (unsigned long long)frame, (unsigned long long)h);
-      if (ref_check) {
-        unsigned long long f, want;
-        if (fscanf(ref_check, "%llu %llx", &f, &want) == 2 && (f != frame || want != h)) {
-          fprintf(stderr, "state hash mismatch at frame %llu (ref frame %llu)\n", (unsigned long long)frame, f);
-          return 1;
-        }
-      }
-    }
-    if (out_dir && ((shot_every && frame % shot_every == 0) || screenshot_wanted(shot_at, frame))) {
-      char path[1024];
-      snprintf(path, sizeof path, "%s/frame_%07llu.png", out_dir, (unsigned long long)frame);
-      framebuffer_to_rgb(gb->sample->framebuffer, rgb);
-      png_write_rgb(path, rgb, FB_W, FB_H);
-    }
-    if (getenv("SAMPLE_HASH_AT") && frame + input_offset == strtoull(getenv("SAMPLE_HASH_AT"), NULL, 10)) {
-      const GBSample *sm = gb->sample;
-      printf("SAMPLE %llu wram %016llx hram %016llx vram %016llx oam %016llx io %016llx bg %016llx ob %016llx ie %02x rom %u ram %u\n", (unsigned long long)sm->frame,
-             (unsigned long long)fnv1a64_update(FNV1A64_INIT, (const unsigned char *)sm->wram, sizeof sm->wram), (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->hram, sizeof sm->hram),
-             (unsigned long long)fnv1a64_update(FNV1A64_INIT, (const unsigned char *)sm->vram, sizeof sm->vram), (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->oam, sizeof sm->oam),
-             (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->io, sizeof sm->io), (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->bg_pal, sizeof sm->bg_pal), (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->ob_pal, sizeof sm->ob_pal), sm->ie, sm->rom_bank, sm->ram_bank);
-      for (int i = 0; i < 128; i++) printf("%02x", sm->io[i]);
-      printf("\n");
-    }
-    if (dump) {
-      uint64_t movie_frame = frame + input_offset;
-      static uint64_t wd_a = 0, wd_b = 0; static bool wd_init = false;
-      if (!wd_init) { wd_init = true; if (getenv("WRAMDUMP_AT")) { if (sscanf(getenv("WRAMDUMP_AT"), "%llu-%llu", (unsigned long long *)&wd_a, (unsigned long long *)&wd_b) < 2) wd_b = wd_a; } }
-      if (getenv("WRAMDUMP_AT") && movie_frame >= wd_a && movie_frame <= wd_b) {
-        FILE *wf = fopen(getenv("WRAMDUMP_FILE") ? getenv("WRAMDUMP_FILE") : "wram_at.txt", "a");
-        fprintf(wf, "FRAME %llu mcycles %llu cycles %llu ly %u\n", (unsigned long long)movie_frame, (unsigned long long)gb->mcycles, (unsigned long long)gb->cycles, gb->io[R_LY]);
-        for (int b = 0; b < 8; b++) for (int i = 0; i < 4096; i++) fprintf(wf, "%02x", gb->sample->wram[b][i]);
-        fprintf(wf, "\n");
-        for (int i = 0; i < 127; i++) fprintf(wf, "%02x", gb->sample->hram[i]);
-        fprintf(wf, "\n");
-        fclose(wf);
-      }
-      if ((movie_frame + 1) % 60 == 0) {
-        uint32_t h = 0xcbf29ce4u;
-        for (int i = 0x300; i < 0x1000; i++) { h ^= gb->sample->wram[0][i]; h *= 16777619u; }
-        fprintf(dump, "%llu %02x %02x %02x %02x %02x %d %08x\n", (unsigned long long)movie_frame, gb->sample->wram[0][0xc2d], gb->sample->wram[0][0xc30], gb->sample->wram[0][0xc00], gb->sample->hram[0x14], gb->sample->hram[0x15], (gb->sample->joy_latched || gb->sample->joy_read) ? 0 : 1, h);
-      } else {
-        fprintf(dump, "%llu %02x %02x %02x %02x %02x %d\n", (unsigned long long)movie_frame, gb->sample->wram[0][0xc2d], gb->sample->wram[0][0xc30], gb->sample->wram[0][0xc00], gb->sample->hram[0x14], gb->sample->hram[0x15], (gb->sample->joy_latched || gb->sample->joy_read) ? 0 : 1);
-      }
-    }
-    if (probe) {
-      RoomKey k = {gb->wram[0][0x0c2d], gb->wram[0][0x0c30]};
-      bool known = false;
-      for (int j = 0; j < nseen; j++) if (seen[j].group == k.group && seen[j].room == k.room) { known = true; break; }
-      if (!known && nseen < 4096) {
-        seen[nseen++] = k;
-        printf("frame %llu group %02x room %02x\n", (unsigned long long)frame, k.group, k.room);
-      }
-    }
+    if (fc.fail) return 1;
   }
-  if (probe) printf("distinct rooms: %d\n", nseen);
+  if (probe) printf("distinct rooms: %d\n", fc.nseen);
   if (ref_out) fclose(ref_out);
   if (fh_out) fclose(fh_out);
   if (dump) fclose(dump);
   if (hook_mode != HOOK_MODE_OFF) hooks_report();
+  if (gb->sample_overflow) fprintf(stderr, "sample ring overflow: %llu frames dropped\n", (unsigned long long)gb->sample_overflow);
   printf("done: %llu frames, state %016llx\n", (unsigned long long)GRID_FRAME(gb->cycles),
          (unsigned long long)gb_state_hash(gb));
   return 0;

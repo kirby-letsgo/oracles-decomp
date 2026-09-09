@@ -32,6 +32,17 @@ static void frame_grid_is_70224_cycles(void) {
 
 static uint8_t tas_cb(void *ctx, uint64_t frame) { return tas_input_at((const Tas *)ctx, frame); }
 
+typedef struct { FILE *ref; unsigned long long f, want; bool have; uint64_t mismatch; } RefCheck;
+static void ref_cb(GB *gb, const GBSample *sm, void *ctx) {
+  RefCheck *r = ctx;
+  if (r->mismatch) return;
+  while (r->have && r->f < sm->frame) r->have = fscanf(r->ref, "%llu %llx", &r->f, &r->want) == 2;
+  if (r->have && r->f == sm->frame) {
+    if (r->want != gb_state_hash(gb)) r->mismatch = sm->frame;
+    r->have = fscanf(r->ref, "%llu %llx", &r->f, &r->want) == 2;
+  }
+}
+
 static void full_tas_matches_reference(void) {
   const char *rom_path = GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc";
   size_t n, bn;
@@ -52,17 +63,12 @@ static void full_tas_matches_reference(void) {
   gb_reset(gb);
   const char *limit_env = getenv("TAS_FRAMES");
   uint64_t limit = limit_env ? strtoull(limit_env, NULL, 10) : 20000;
-  unsigned long long f = 0, want = 0;
-  bool have_ref = fscanf(ref, "%llu %llx", &f, &want) == 2;
+  RefCheck rc = {ref, 0, 0, false, 0};
+  rc.have = fscanf(ref, "%llu %llx", &rc.f, &rc.want) == 2;
   gb->input_at = tas_cb; gb->input_ctx = &t;
-  for (uint64_t i = 0; i < limit; i++) {
-    uint64_t frame = gb_run_frame(gb);
-    while (have_ref && f < frame) have_ref = fscanf(ref, "%llu %llx", &f, &want) == 2;
-    if (have_ref && f == frame) {
-      if (want != gb_state_hash(gb)) { fprintf(stderr, "state mismatch at frame %llu\n", f); ASSERT(0); }
-      have_ref = fscanf(ref, "%llu %llx", &f, &want) == 2;
-    }
-  }
+  gb->frame_cb = ref_cb; gb->frame_ctx = &rc;
+  for (uint64_t i = 0; i < limit && !rc.mismatch; i++) gb_run_frame(gb);
+  if (rc.mismatch) { fprintf(stderr, "state mismatch at frame %llu\n", rc.mismatch); ASSERT(0); }
   fclose(ref); free(gb); free(rom); free(boot); tas_free(&t);
 }
 

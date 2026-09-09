@@ -1,9 +1,10 @@
 #include "hooks/hooks.h"
 #include "core/bus.h"
-#include "game/game.h"
+#include "game/gen.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <setjmp.h>
 
 int hook_mode = HOOK_MODE_REPLACE;
 uint64_t hook_verify_failures;
@@ -17,12 +18,31 @@ static Hook hooks[] = {
 #define NHOOKS (sizeof hooks / sizeof hooks[0])
 static int16_t first_at[65536];
 static int depth;
+static jmp_buf hook_jmp[64];
+static int hook_jmp_depth;
+
+void hook_handoff(GB *gb, uint16_t pc) {
+  gb->pc = pc;
+  if (hook_jmp_depth > 0 && hook_mode != HOOK_MODE_OFF) longjmp(hook_jmp[hook_jmp_depth - 1], 1);
+}
 static bool inited;
+
+static bool name_listed(const char *list, const char *name) {
+  size_t n = strlen(name);
+  for (const char *p = list; (p = strstr(p, name)); p += n)
+    if ((p == list || p[-1] == ' ') && (p[n] == 0 || p[n] == ' ')) return true;
+  return false;
+}
 
 void hooks_init(void) {
   inited = true;
   memset(first_at, -1, sizeof first_at);
-  for (int i = (int)NHOOKS - 1; i >= 0; i--) first_at[hooks[i].addr] = (int16_t)i;
+  const char *only = getenv("HOOK_ONLY"), *skip = getenv("HOOK_SKIP");
+  for (int i = (int)NHOOKS - 1; i >= 0; i--) {
+    if (only && !name_listed(only, hooks[i].name)) continue;
+    if (skip && name_listed(skip, hooks[i].name)) continue;
+    first_at[hooks[i].addr] = (int16_t)i;
+  }
 }
 
 static Hook *lookup(const GB *gb, uint16_t pc) {
@@ -33,9 +53,11 @@ static Hook *lookup(const GB *gb, uint16_t pc) {
   int i = first_at[pc];
   if (i < 0) return NULL;
   for (; i < (int)NHOOKS && hooks[i].addr == pc; i++)
-    if (pc < 0x4000 || hooks[i].bank == gb->rom_bank) return &hooks[i];
+    if ((pc < 0x4000 || hooks[i].bank == gb->rom_bank) && first_at[hooks[i].addr] >= 0) return &hooks[i];
   return NULL;
 }
+
+void gb_burn_nb(GB *gb, int mcycles) { for (int i = 0; i < mcycles; i++) gb_tick(gb); }
 
 void gb_burn(GB *gb, int mcycles) {
   if (depth > 0 && hook_mode == HOOK_MODE_REPLACE) {
@@ -58,25 +80,41 @@ static bool differs(const char *what, const void *a, const void *b, size_t n, si
   return false;
 }
 
+static int verify_depth;
+static GB *snap_pool[16][2];
+int hook_in_verify;
+
 static void verify(GB *gb, Hook *h) {
-  static GB snap, after_c;
+  if (verify_depth >= 16) { depth++; h->fn(gb); depth--; return; }
+  if (!snap_pool[verify_depth][0]) { snap_pool[verify_depth][0] = malloc(sizeof(GB)); snap_pool[verify_depth][1] = malloc(sizeof(GB)); }
+  GB *snap = snap_pool[verify_depth][0], *after_c_p = snap_pool[verify_depth][1];
+  verify_depth++;
   uint16_t sp0 = gb->sp;
   bool ime0 = gb->ime;
-  memcpy(&snap, gb, sizeof snap);
+  memcpy(snap, gb, sizeof *snap);
   gb->ime = false;
   uint64_t c0 = gb->mcycles;
+  int depth0 = depth, hiv0 = hook_in_verify;
   depth++;
-  h->fn(gb);
-  depth--;
+  hook_in_verify++;
+  if (hook_jmp_depth < 64) { hook_jmp_depth++; if (setjmp(hook_jmp[hook_jmp_depth - 1]) == 0) h->fn(gb); hook_jmp_depth--; } else h->fn(gb);
+  hook_in_verify = hiv0;
+  depth = depth0;
   uint64_t cyc_c = gb->mcycles - c0;
-  memcpy(&after_c, gb, sizeof after_c);
-  memcpy(gb, &snap, sizeof snap);
+  memcpy(after_c_p, gb, sizeof *after_c_p);
+  GB *samples_keep = gb->samples;
+  memcpy(gb, snap, sizeof *snap);
+  gb->samples = samples_keep;
+  GB after_c_regs = *after_c_p;
+  #define after_c after_c_regs
   gb->ime = false;
   int saved = hook_mode;
   hook_mode = HOOK_MODE_OFF;
   uint16_t ret_pc = (uint16_t)(bus_read(gb, sp0) | (bus_read(gb, sp0 + 1) << 8));
+  bool returned = after_c.pc == ret_pc && after_c.sp == sp0 + 2;
   uint64_t guard = 0;
-  do { gb_step(gb); } while (!(gb->pc == ret_pc && gb->sp == sp0 + 2) && !gb->hung && guard++ < 50000000ULL);
+  if (returned) { do { gb_step(gb); } while (!(gb->pc == ret_pc && gb->sp == sp0 + 2) && !gb->hung && guard++ < 50000000ULL); }
+  else { while (gb->mcycles - c0 < cyc_c && !gb->hung) gb_step(gb); }
   hook_mode = saved;
   uint64_t cyc_asm = gb->mcycles - c0;
   gb->ime = ime0;
@@ -100,17 +138,25 @@ static void verify(GB *gb, Hook *h) {
             ra[0], ra[1], ra[2], ra[3], ra[4], ra[5], ra[6], ra[7], rb[0], rb[1], rb[2], rb[3], rb[4], rb[5], rb[6], rb[7]);
     if (hook_verify_abort) exit(3);
   }
+  #undef after_c
+  verify_depth--;
 }
+
+bool hook_enabled_at(uint16_t addr) { if (!inited) hooks_init(); return first_at[addr] >= 0; }
 
 bool hook_dispatch(GB *gb) {
   if (hook_mode == HOOK_MODE_OFF) return false;
   Hook *h = lookup(gb, gb->pc);
   if (!h) return false;
   h->calls++;
-  if (hook_mode == HOOK_MODE_VERIFY) { verify(gb, h); return true; }
+  if (hook_mode == HOOK_MODE_VERIFY && (h->calls <= 32 || h->calls % 64 == 0 || verify_depth == 0)) { verify(gb, h); return true; }
+  static int hooklog = -1; if (hooklog < 0) hooklog = getenv("HOOKLOG") != NULL;
+  if (hooklog) fprintf(stderr, "HOOK> %s mc %llu frame %llu sp %04x ime %d\n", h->name, (unsigned long long)gb->mcycles, (unsigned long long)GRID_FRAME(gb->cycles), gb->sp, gb->ime);
+  int depth0 = depth;
   depth++;
-  h->fn(gb);
-  depth--;
+  if (hook_jmp_depth < 64) { hook_jmp_depth++; if (setjmp(hook_jmp[hook_jmp_depth - 1]) == 0) h->fn(gb); hook_jmp_depth--; } else h->fn(gb);
+  depth = depth0;
+  if (hooklog) fprintf(stderr, "HOOK< %s mc %llu frame %llu sp %04x pc %04x ime %d\n", h->name, (unsigned long long)gb->mcycles, (unsigned long long)GRID_FRAME(gb->cycles), gb->sp, gb->pc, gb->ime);
   return true;
 }
 
@@ -119,4 +165,24 @@ void hooks_report(void) {
   for (size_t i = 0; i < NHOOKS; i++) total += hooks[i].calls;
   fprintf(stderr, "hooks: %zu routines, %llu calls, %llu verify failures\n", NHOOKS, (unsigned long long)total, (unsigned long long)hook_verify_failures);
   for (size_t i = 0; i < NHOOKS; i++) fprintf(stderr, "  %02x:%04x %-28s %llu\n", hooks[i].bank, hooks[i].addr, hooks[i].name, (unsigned long long)hooks[i].calls);
+}
+
+void asm_call(GB *gb, uint16_t target, uint16_t ret_addr) {
+  uint16_t sp0 = gb->sp;
+  static int hooklog = -1; if (hooklog < 0) hooklog = getenv("HOOKLOG") != NULL;
+  if (hooklog) fprintf(stderr, "ASM> %04x bank %u mc %llu sp %04x ime %d\n", target, gb->rom_bank, (unsigned long long)gb->mcycles, sp0, gb->ime);
+  gb->pc = target;
+  depth--;
+  while (!(gb->pc == ret_addr && gb->sp == (uint16_t)(sp0 + 2)) && !gb->hung) {
+    if ((uint16_t)(gb->sp - sp0) > 2 && (uint16_t)(gb->sp - sp0) < 0x8000) { depth++; hook_handoff(gb, gb->pc); }
+    gb_step(gb);
+  }
+  depth++;
+  if (hooklog) fprintf(stderr, "ASM< %04x mc %llu sp %04x ime %d\n", target, (unsigned long long)gb->mcycles, gb->sp, gb->ime);
+}
+
+void asm_continue(GB *gb, uint16_t ret_addr, uint16_t sp0) {
+  depth--;
+  while (!(gb->pc == ret_addr && gb->sp == sp0 + 2) && !gb->hung) gb_step(gb);
+  depth++;
 }

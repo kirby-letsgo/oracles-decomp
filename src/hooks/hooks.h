@@ -13,10 +13,14 @@ typedef struct {
 
 enum { HOOK_MODE_OFF = 0, HOOK_MODE_REPLACE = 1, HOOK_MODE_VERIFY = 2 };
 extern int hook_mode;
+extern int hook_in_verify;
 extern uint64_t hook_verify_failures;
 extern bool hook_verify_abort;
 
 void hooks_init(void);
 bool hook_dispatch(GB *gb);
+bool hook_enabled_at(uint16_t addr);
 void gb_burn(GB *gb, int mcycles);
+void gb_burn_nb(GB *gb, int mcycles);
 void hooks_report(void);
+void hook_handoff(GB *gb, uint16_t pc);

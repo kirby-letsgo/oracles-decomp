@@ -1,5 +1,6 @@
 #include "bus.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 int dbg_log_timer_writes, dbg_log_dma;
 
@@ -46,7 +47,10 @@ static void mbc_write(GB *gb, uint16_t a, uint8_t v) {
   }
 }
 
+static uint16_t watch_addr; static int watch_init;
 void bus_write(GB *gb, uint16_t a, uint8_t v) {
+  if (!watch_init) { watch_init = 1; watch_addr = getenv("WATCH") ? (uint16_t)strtoul(getenv("WATCH"), NULL, 16) : 0; }
+  if (watch_addr && (a == watch_addr || a == watch_addr + 1)) printf("WATCH %04x=%02x frame %llu mc %llu pc %04x hookpc %04x sp %04x\n", a, v, (unsigned long long)GRID_FRAME(gb->cycles), (unsigned long long)gb->mcycles, gb->pc, gb->hook_pc, gb->sp);
   if (a < 0x8000) { mbc_write(gb, a, v); return; }
   if (a < 0xa000) { gb->vram[gb->io[R_VBK] & 1][a - 0x8000] = v; return; }
   if (a < 0xc000) {

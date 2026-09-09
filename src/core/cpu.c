@@ -149,7 +149,7 @@ static void execute(GB *gb, uint8_t op) {
       default: { int8_t d = fetch(gb); if (cond(gb, y - 4)) { gb_tick(gb); gb->pc += d; } return; }
       }
     case 1:
-      if (q == 0) { set_rp(gb, p, fetch16(gb)); return; }
+      if (q == 0) { set_rp(gb, p, fetch16(gb)); if (p == 3) hook_handoff(gb, gb->pc); return; }
       { uint16_t hl = HL, v = get_rp(gb, p); uint32_t r = hl + v;
         gb->f = (gb->f & FZ) | ((hl & 0xfff) + (v & 0xfff) > 0xfff ? FH : 0) | (r > 0xffff ? FC : 0);
         set_hl(gb, r); gb_tick(gb); return; }
@@ -221,7 +221,7 @@ static void execute(GB *gb, uint8_t op) {
       case 0: gb->pc = pop(gb); gb_tick(gb); return;
       case 1: gb->pc = pop(gb); gb_tick(gb); gb->ime = true; return;
       case 2: gb->pc = HL; return;
-      default: gb->sp = HL; gb_tick(gb); return;
+      default: gb->sp = HL; gb_tick(gb); hook_handoff(gb, gb->pc); return;
       }
     case 2:
       switch (y) {
@@ -260,6 +260,7 @@ static void execute(GB *gb, uint8_t op) {
 }
 
 #include <stdio.h>
+#include <stdlib.h>
 uint64_t dbg_instr_count, dbg_int_count[5];
 int dbg_log_ints;
 void cpu_dispatch_interrupt(GB *gb) {
@@ -271,7 +272,7 @@ void cpu_dispatch_interrupt(GB *gb) {
   while (!(pending & (1 << i))) i++;
   gb->io[R_IF] &= ~(1 << i);
   dbg_int_count[i]++;
-  if (dbg_log_ints) printf("  OURS int %d at cycle %llu (LY=%d dot=%d) TIMA=%02x TMA=%02x TAC=%02x div=%04x\n", i, (unsigned long long)gb->cycles, gb->io[R_LY], gb->ppu_dot, gb->io[R_TIMA], gb->io[R_TMA], gb->io[R_TAC], gb->div_counter);
+  if (dbg_log_ints) printf("INT %d mc %llu frame %llu pc %04x sp %04x\n", i, (unsigned long long)gb->mcycles, (unsigned long long)GRID_FRAME(gb->cycles), gb->pc, gb->sp);
   push(gb, gb->pc);
   gb->pc = 0x40 + i * 8;
 }
@@ -282,6 +283,7 @@ void gb_step(GB *gb) {
   if (gb->halted) {
     gb_tick(gb);
     pending = gb->ie & gb->io[R_IF] & 0x1f;
+    { static long long n; if (getenv("PCTRACE") && ++n % 2000000 == 0) printf("HALTED mc %llu pc %04x ime %d ie %02x if %02x tac %02x sp %04x\n", (unsigned long long)gb->mcycles, gb->pc, gb->ime, gb->ie, gb->io[R_IF], gb->io[R_TAC], gb->sp); }
     if (!pending) return;
     gb->halted = false;
     gb_tick(gb);
@@ -289,6 +291,8 @@ void gb_step(GB *gb) {
   if (gb->ime && pending) { cpu_dispatch_interrupt(gb); return; }
   if (gb->ime_delay) { gb->ime = true; gb->ime_delay = false; }
   if (hook_dispatch(gb)) return;
+  { static long long tr_at = -1, tr_n = 0; if (tr_at < 0) { tr_at = 0; if (getenv("PCTRACE")) sscanf(getenv("PCTRACE"), "%lld,%lld", &tr_at, &tr_n); }
+    if (tr_n > 0 && (long long)gb->mcycles >= tr_at) { printf("PCT %04x bank %u sp %04x mc %llu%s\n", gb->pc, gb->rom_bank, gb->sp, (unsigned long long)gb->mcycles, gb->halted ? " halted" : ""); tr_n--; } }
   dbg_instr_count++;
   execute(gb, fetch(gb));
 }

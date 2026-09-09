@@ -94,8 +94,11 @@ typedef struct GB {
   void *input_ctx;
   uint64_t next_sample_at;
   int sample_head, sample_count;
-  GBSample samples[4];
+  GBSample *samples;
+  uint64_t sample_overflow;
   const GBSample *sample;
+  void (*frame_cb)(struct GB *gb, const GBSample *sample, void *ctx);
+  void *frame_ctx;
 } GB;
 
 void gb_init(GB *gb);
