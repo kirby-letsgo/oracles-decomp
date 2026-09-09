@@ -13,7 +13,7 @@ void interactionCodee1(GB *gb) {
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x7d0e: goto L_7d0e; case 0x7d3d: goto L_7d3d; case 0x7d88: goto L_7d88; case 0x7d96: goto L_7d96; default: HANDOFF(HL); }
 L_7d0e:
-  CALL(0x7d0e, objectSetVisible83, 0x1e72, 0x7d11);  // call $1e72
+  CALL(0x7d0e, objectSetVisible83_hook, 0x1e72, 0x7d11);  // call $1e72
   I(0x7d11, 2); B = 0x01;  // ld b,$01
   CALL(0x7d13, objectFlickerVisibility, 0x24e6, 0x7d16);  // call $24e6
   CALL(0x7d16, interactionAnimate, 0x261b, 0x7d19);  // call $261b
@@ -29,7 +29,7 @@ L_7d0e:
   I(0x7d2b, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7d2c, 2); alu_bit(gb, 6, A);  // bit 6,a
   if ((F & FZ)) { I(0x7d2e, 3); goto L_7d35; } I(0x7d2e, 2);  // jr z,$7d35
-  CALL(0x7d30, getThisRoomFlags, 0x197d, 0x7d33);  // call $197d
+  CALL(0x7d30, getThisRoomFlags_hook, 0x197d, 0x7d33);  // call $197d
   I(0x7d33, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1)));  // set 1,(hl)
 L_7d35:
   I(0x7d35, 3); SET_HL(0x7bce);  // ld hl,$7bce
@@ -70,12 +70,12 @@ L_7d67:
   I(0x7d71, 2); B = mem_rd(gb, HL);  // ld b,(hl)
   I(0x7d72, 2); alu_bit(gb, 6, B);  // bit 6,b
   if ((F & FZ)) { I(0x7d74, 3); goto L_7d7f; } I(0x7d74, 2);  // jr z,$7d7f
-  CALL(0x7d76, getThisRoomFlags, 0x197d, 0x7d79);  // call $197d
+  CALL(0x7d76, getThisRoomFlags_hook, 0x197d, 0x7d79);  // call $197d
   I(0x7d79, 2); alu_and(gb, 0x02);  // and $02
   if (!(F & FZ)) { I(0x7d7b, 3); goto L_7d7f; } I(0x7d7b, 2);  // jr nz,$7d7f
   I(0x7d7d, 2); B = (uint8_t)(B | (1 << 7));  // set 7,b
 L_7d7f:
-  CALL(0x7d7f, interactionIncState, 0x23e0, 0x7d82);  // call $23e0
+  CALL(0x7d7f, interactionIncState_hook, 0x23e0, 0x7d82);  // call $23e0
   I(0x7d82, 2); alu_bit(gb, 7, B);  // bit 7,b
   if ((F & FZ)) { RET_TAKEN(0x7d84); return; } I(0x7d84, 2);  // ret z
   I(0x7d85, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
@@ -84,9 +84,9 @@ L_7d88:
   I(0x7d88, 4); A = mem_rd(gb, 0xcc8d);  // ld a,($cc8d)
   I(0x7d8b, 1); A = alu_dec8(gb, A);  // dec a
   if (!(F & FZ)) { RET_TAKEN(0x7d8c); return; } I(0x7d8c, 2);  // ret nz
-  CALL(0x7d8d, interactionIncState, 0x23e0, 0x7d90);  // call $23e0
+  CALL(0x7d8d, interactionIncState_hook, 0x23e0, 0x7d90);  // call $23e0
 L_7d90:
-  CALL(0x7d90, getThisRoomFlags, 0x197d, 0x7d93);  // call $197d
+  CALL(0x7d90, getThisRoomFlags_hook, 0x197d, 0x7d93);  // call $197d
   I(0x7d93, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 3)));  // set 3,(hl)
   RET(0x7d95); return;  // ret
 L_7d96:
@@ -97,14 +97,14 @@ L_7d96:
   CALL(0x7d9d, playSound_b00, 0x0c98, 0x7da0);  // call $0c98
   I(0x7da0, 2); A = 0x8d;  // ld a,$8d
   CALL(0x7da2, playSound_b00, 0x0c98, 0x7da5);  // call $0c98
-  I(0x7da5, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x7da5, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7d0e
 void interactionCodee1__state3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7d0e:
-  CALL(0x7d0e, objectSetVisible83, 0x1e72, 0x7d11);  // call $1e72
+  CALL(0x7d0e, objectSetVisible83_hook, 0x1e72, 0x7d11);  // call $1e72
   I(0x7d11, 2); B = 0x01;  // ld b,$01
   CALL(0x7d13, objectFlickerVisibility, 0x24e6, 0x7d16);  // call $24e6
   CALL(0x7d16, interactionAnimate, 0x261b, 0x7d19);  // call $261b
@@ -120,7 +120,7 @@ L_7d0e:
   I(0x7d2b, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7d2c, 2); alu_bit(gb, 6, A);  // bit 6,a
   if ((F & FZ)) { I(0x7d2e, 3); goto L_7d35; } I(0x7d2e, 2);  // jr z,$7d35
-  CALL(0x7d30, getThisRoomFlags, 0x197d, 0x7d33);  // call $197d
+  CALL(0x7d30, getThisRoomFlags_hook, 0x197d, 0x7d33);  // call $197d
   I(0x7d33, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1)));  // set 1,(hl)
 L_7d35:
   I(0x7d35, 3); SET_HL(0x7bce);  // ld hl,$7bce
@@ -166,12 +166,12 @@ L_7d67:
   I(0x7d71, 2); B = mem_rd(gb, HL);  // ld b,(hl)
   I(0x7d72, 2); alu_bit(gb, 6, B);  // bit 6,b
   if ((F & FZ)) { I(0x7d74, 3); goto L_7d7f; } I(0x7d74, 2);  // jr z,$7d7f
-  CALL(0x7d76, getThisRoomFlags, 0x197d, 0x7d79);  // call $197d
+  CALL(0x7d76, getThisRoomFlags_hook, 0x197d, 0x7d79);  // call $197d
   I(0x7d79, 2); alu_and(gb, 0x02);  // and $02
   if (!(F & FZ)) { I(0x7d7b, 3); goto L_7d7f; } I(0x7d7b, 2);  // jr nz,$7d7f
   I(0x7d7d, 2); B = (uint8_t)(B | (1 << 7));  // set 7,b
 L_7d7f:
-  CALL(0x7d7f, interactionIncState, 0x23e0, 0x7d82);  // call $23e0
+  CALL(0x7d7f, interactionIncState_hook, 0x23e0, 0x7d82);  // call $23e0
   I(0x7d82, 2); alu_bit(gb, 7, B);  // bit 7,b
   if ((F & FZ)) { RET_TAKEN(0x7d84); return; } I(0x7d84, 2);  // ret z
   I(0x7d85, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
@@ -203,12 +203,12 @@ L_7d67:
   I(0x7d71, 2); B = mem_rd(gb, HL);  // ld b,(hl)
   I(0x7d72, 2); alu_bit(gb, 6, B);  // bit 6,b
   if ((F & FZ)) { I(0x7d74, 3); goto L_7d7f; } I(0x7d74, 2);  // jr z,$7d7f
-  CALL(0x7d76, getThisRoomFlags, 0x197d, 0x7d79);  // call $197d
+  CALL(0x7d76, getThisRoomFlags_hook, 0x197d, 0x7d79);  // call $197d
   I(0x7d79, 2); alu_and(gb, 0x02);  // and $02
   if (!(F & FZ)) { I(0x7d7b, 3); goto L_7d7f; } I(0x7d7b, 2);  // jr nz,$7d7f
   I(0x7d7d, 2); B = (uint8_t)(B | (1 << 7));  // set 7,b
 L_7d7f:
-  CALL(0x7d7f, interactionIncState, 0x23e0, 0x7d82);  // call $23e0
+  CALL(0x7d7f, interactionIncState_hook, 0x23e0, 0x7d82);  // call $23e0
   I(0x7d82, 2); alu_bit(gb, 7, B);  // bit 7,b
   if ((F & FZ)) { RET_TAKEN(0x7d84); return; } I(0x7d84, 2);  // ret z
   I(0x7d85, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
@@ -239,12 +239,12 @@ L_7d67:
   I(0x7d71, 2); B = mem_rd(gb, HL);  // ld b,(hl)
   I(0x7d72, 2); alu_bit(gb, 6, B);  // bit 6,b
   if ((F & FZ)) { I(0x7d74, 3); goto L_7d7f; } I(0x7d74, 2);  // jr z,$7d7f
-  CALL(0x7d76, getThisRoomFlags, 0x197d, 0x7d79);  // call $197d
+  CALL(0x7d76, getThisRoomFlags_hook, 0x197d, 0x7d79);  // call $197d
   I(0x7d79, 2); alu_and(gb, 0x02);  // and $02
   if (!(F & FZ)) { I(0x7d7b, 3); goto L_7d7f; } I(0x7d7b, 2);  // jr nz,$7d7f
   I(0x7d7d, 2); B = (uint8_t)(B | (1 << 7));  // set 7,b
 L_7d7f:
-  CALL(0x7d7f, interactionIncState, 0x23e0, 0x7d82);  // call $23e0
+  CALL(0x7d7f, interactionIncState_hook, 0x23e0, 0x7d82);  // call $23e0
   I(0x7d82, 2); alu_bit(gb, 7, B);  // bit 7,b
   if ((F & FZ)) { RET_TAKEN(0x7d84); return; } I(0x7d84, 2);  // ret z
   I(0x7d85, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
@@ -271,12 +271,12 @@ L_7d67:
   I(0x7d71, 2); B = mem_rd(gb, HL);  // ld b,(hl)
   I(0x7d72, 2); alu_bit(gb, 6, B);  // bit 6,b
   if ((F & FZ)) { I(0x7d74, 3); goto L_7d7f; } I(0x7d74, 2);  // jr z,$7d7f
-  CALL(0x7d76, getThisRoomFlags, 0x197d, 0x7d79);  // call $197d
+  CALL(0x7d76, getThisRoomFlags_hook, 0x197d, 0x7d79);  // call $197d
   I(0x7d79, 2); alu_and(gb, 0x02);  // and $02
   if (!(F & FZ)) { I(0x7d7b, 3); goto L_7d7f; } I(0x7d7b, 2);  // jr nz,$7d7f
   I(0x7d7d, 2); B = (uint8_t)(B | (1 << 7));  // set 7,b
 L_7d7f:
-  CALL(0x7d7f, interactionIncState, 0x23e0, 0x7d82);  // call $23e0
+  CALL(0x7d7f, interactionIncState_hook, 0x23e0, 0x7d82);  // call $23e0
   I(0x7d82, 2); alu_bit(gb, 7, B);  // bit 7,b
   if ((F & FZ)) { RET_TAKEN(0x7d84); return; } I(0x7d84, 2);  // ret z
   I(0x7d85, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
@@ -299,12 +299,12 @@ L_7d67:
   I(0x7d71, 2); B = mem_rd(gb, HL);  // ld b,(hl)
   I(0x7d72, 2); alu_bit(gb, 6, B);  // bit 6,b
   if ((F & FZ)) { I(0x7d74, 3); goto L_7d7f; } I(0x7d74, 2);  // jr z,$7d7f
-  CALL(0x7d76, getThisRoomFlags, 0x197d, 0x7d79);  // call $197d
+  CALL(0x7d76, getThisRoomFlags_hook, 0x197d, 0x7d79);  // call $197d
   I(0x7d79, 2); alu_and(gb, 0x02);  // and $02
   if (!(F & FZ)) { I(0x7d7b, 3); goto L_7d7f; } I(0x7d7b, 2);  // jr nz,$7d7f
   I(0x7d7d, 2); B = (uint8_t)(B | (1 << 7));  // set 7,b
 L_7d7f:
-  CALL(0x7d7f, interactionIncState, 0x23e0, 0x7d82);  // call $23e0
+  CALL(0x7d7f, interactionIncState_hook, 0x23e0, 0x7d82);  // call $23e0
   I(0x7d82, 2); alu_bit(gb, 7, B);  // bit 7,b
   if ((F & FZ)) { RET_TAKEN(0x7d84); return; } I(0x7d84, 2);  // ret z
   I(0x7d85, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
@@ -322,12 +322,12 @@ L_7d67:
   I(0x7d71, 2); B = mem_rd(gb, HL);  // ld b,(hl)
   I(0x7d72, 2); alu_bit(gb, 6, B);  // bit 6,b
   if ((F & FZ)) { I(0x7d74, 3); goto L_7d7f; } I(0x7d74, 2);  // jr z,$7d7f
-  CALL(0x7d76, getThisRoomFlags, 0x197d, 0x7d79);  // call $197d
+  CALL(0x7d76, getThisRoomFlags_hook, 0x197d, 0x7d79);  // call $197d
   I(0x7d79, 2); alu_and(gb, 0x02);  // and $02
   if (!(F & FZ)) { I(0x7d7b, 3); goto L_7d7f; } I(0x7d7b, 2);  // jr nz,$7d7f
   I(0x7d7d, 2); B = (uint8_t)(B | (1 << 7));  // set 7,b
 L_7d7f:
-  CALL(0x7d7f, interactionIncState, 0x23e0, 0x7d82);  // call $23e0
+  CALL(0x7d7f, interactionIncState_hook, 0x23e0, 0x7d82);  // call $23e0
   I(0x7d82, 2); alu_bit(gb, 7, B);  // bit 7,b
   if ((F & FZ)) { RET_TAKEN(0x7d84); return; } I(0x7d84, 2);  // ret z
   I(0x7d85, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
@@ -338,7 +338,7 @@ L_7d7f:
 void interactionCodee1__nextState(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7d7f:
-  CALL(0x7d7f, interactionIncState, 0x23e0, 0x7d82);  // call $23e0
+  CALL(0x7d7f, interactionIncState_hook, 0x23e0, 0x7d82);  // call $23e0
   I(0x7d82, 2); alu_bit(gb, 7, B);  // bit 7,b
   if ((F & FZ)) { RET_TAKEN(0x7d84); return; } I(0x7d84, 2);  // ret z
   I(0x7d85, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
@@ -352,9 +352,9 @@ L_7d88:
   I(0x7d88, 4); A = mem_rd(gb, 0xcc8d);  // ld a,($cc8d)
   I(0x7d8b, 1); A = alu_dec8(gb, A);  // dec a
   if (!(F & FZ)) { RET_TAKEN(0x7d8c); return; } I(0x7d8c, 2);  // ret nz
-  CALL(0x7d8d, interactionIncState, 0x23e0, 0x7d90);  // call $23e0
+  CALL(0x7d8d, interactionIncState_hook, 0x23e0, 0x7d90);  // call $23e0
 L_7d90:
-  CALL(0x7d90, getThisRoomFlags, 0x197d, 0x7d93);  // call $197d
+  CALL(0x7d90, getThisRoomFlags_hook, 0x197d, 0x7d93);  // call $197d
   I(0x7d93, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 3)));  // set 3,(hl)
   RET(0x7d95); return;  // ret
 }
@@ -363,7 +363,7 @@ L_7d90:
 void interactionCodee1__markSpotDiscovered(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7d90:
-  CALL(0x7d90, getThisRoomFlags, 0x197d, 0x7d93);  // call $197d
+  CALL(0x7d90, getThisRoomFlags_hook, 0x197d, 0x7d93);  // call $197d
   I(0x7d93, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 3)));  // set 3,(hl)
   RET(0x7d95); return;  // ret
 }
@@ -379,13 +379,13 @@ L_7d96:
   CALL(0x7d9d, playSound_b00, 0x0c98, 0x7da0);  // call $0c98
   I(0x7da0, 2); A = 0x8d;  // ld a,$8d
   CALL(0x7da2, playSound_b00, 0x0c98, 0x7da5);  // call $0c98
-  I(0x7da5, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x7da5, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:74c9
 void interactiondc_subid08(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x74c9, checkInteractionState, 0x23fe, 0x74cc);  // call $23fe
+  CALL(0x74c9, checkInteractionState_hook, 0x23fe, 0x74cc);  // call $23fe
   if ((F & FZ)) { I(0x74cc, 3); goto L_74e6; } I(0x74cc, 2);  // jr z,$74e6
 L_74ce:
   I(0x74ce, 2); E = 0x4b;  // ld e,$4b
@@ -398,14 +398,14 @@ L_74ce:
   I(0x74d8, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x74d9, 1); alu_cp(gb, L);  // cp l
   if ((F & FZ)) { RET_TAKEN(0x74da); return; } I(0x74da, 2);  // ret z
-  CALL(0x74db, getThisRoomFlags, 0x197d, 0x74de);  // call $197d
+  CALL(0x74db, getThisRoomFlags_hook, 0x197d, 0x74de);  // call $197d
   I(0x74de, 2); E = 0x4d;  // ld e,$4d
   I(0x74e0, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x74e1, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
   I(0x74e2, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x74e3, 4); interactionDelete(gb); return;  // jp $3b05
 L_74e6:
-  CALL(0x74e6, getThisRoomFlags, 0x197d, 0x74e9);  // call $197d
+  CALL(0x74e6, getThisRoomFlags_hook, 0x197d, 0x74e9);  // call $197d
   I(0x74e9, 2); E = 0x4d;  // ld e,$4d
   I(0x74eb, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x74ec, 2); alu_and(gb, mem_rd(gb, HL));  // and (hl)
@@ -417,7 +417,7 @@ L_74e6:
   I(0x74f6, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x74f7, 2); E = 0x43;  // ld e,$43
   I(0x74f9, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x74fa, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x74fa, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:74ce
@@ -434,7 +434,7 @@ L_74ce:
   I(0x74d8, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x74d9, 1); alu_cp(gb, L);  // cp l
   if ((F & FZ)) { RET_TAKEN(0x74da); return; } I(0x74da, 2);  // ret z
-  CALL(0x74db, getThisRoomFlags, 0x197d, 0x74de);  // call $197d
+  CALL(0x74db, getThisRoomFlags_hook, 0x197d, 0x74de);  // call $197d
   I(0x74de, 2); E = 0x4d;  // ld e,$4d
   I(0x74e0, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x74e1, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
@@ -446,7 +446,7 @@ L_74ce:
 void interactiondc_subid08__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_74e6:
-  CALL(0x74e6, getThisRoomFlags, 0x197d, 0x74e9);  // call $197d
+  CALL(0x74e6, getThisRoomFlags_hook, 0x197d, 0x74e9);  // call $197d
   I(0x74e9, 2); E = 0x4d;  // ld e,$4d
   I(0x74eb, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x74ec, 2); alu_and(gb, mem_rd(gb, HL));  // and (hl)
@@ -458,7 +458,7 @@ L_74e6:
   I(0x74f6, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x74f7, 2); E = 0x43;  // ld e,$43
   I(0x74f9, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x74fa, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x74fa, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7481
@@ -498,7 +498,7 @@ L_6f1b:
   I(0x6f20, 3); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
   I(0x6f22, 2); L = 0x4d;  // ld l,$4d
   I(0x6f24, 3); mem_wr(gb, HL, 0xb0);  // ld (hl),$b0
-  I(0x6f26, 4); objectSetVisible80(gb); return;  // jp $1e57
+  I(0x6f26, 4); if (hook_enabled_at(0x1e57)) { objectSetVisible80_hook(gb); return; } HANDOFF(0x1e57);  // jp $1e57
 L_6f29:
   I(0x6f29, 1); H = D;  // ld h,d
   I(0x6f2a, 2); L = 0x4d;  // ld l,$4d
@@ -513,7 +513,7 @@ L_6f29:
   I(0x6f37, 3); mem_wr(gb, HL, 0x28);  // ld (hl),$28
   RET(0x6f39); return;  // ret
 L_6f3a:
-  CALL(0x6f3a, interactionDecCounter1, 0x23cc, 0x6f3d);  // call $23cc
+  CALL(0x6f3a, interactionDecCounter1_hook, 0x23cc, 0x6f3d);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x6f3d); return; } I(0x6f3d, 2);  // ret nz
   I(0x6f3e, 1); L = E;  // ld l,e
   I(0x6f3f, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
@@ -550,7 +550,7 @@ L_6f1b:
   I(0x6f20, 3); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
   I(0x6f22, 2); L = 0x4d;  // ld l,$4d
   I(0x6f24, 3); mem_wr(gb, HL, 0xb0);  // ld (hl),$b0
-  I(0x6f26, 4); objectSetVisible80(gb); return;  // jp $1e57
+  I(0x6f26, 4); if (hook_enabled_at(0x1e57)) { objectSetVisible80_hook(gb); return; } HANDOFF(0x1e57);  // jp $1e57
 }
 
 // 10:6f1b
@@ -562,7 +562,7 @@ L_6f1b:
   I(0x6f20, 3); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
   I(0x6f22, 2); L = 0x4d;  // ld l,$4d
   I(0x6f24, 3); mem_wr(gb, HL, 0xb0);  // ld (hl),$b0
-  I(0x6f26, 4); objectSetVisible80(gb); return;  // jp $1e57
+  I(0x6f26, 4); if (hook_enabled_at(0x1e57)) { objectSetVisible80_hook(gb); return; } HANDOFF(0x1e57);  // jp $1e57
 }
 
 // 10:6f29
@@ -587,7 +587,7 @@ L_6f29:
 void interactionCodee0__state2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6f3a:
-  CALL(0x6f3a, interactionDecCounter1, 0x23cc, 0x6f3d);  // call $23cc
+  CALL(0x6f3a, interactionDecCounter1_hook, 0x23cc, 0x6f3d);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x6f3d); return; } I(0x6f3d, 2);  // ret nz
   I(0x6f3e, 1); L = E;  // ld l,e
   I(0x6f3f, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
@@ -626,7 +626,7 @@ void interactionCodedd(GB *gb) {
 // 10:7a50
 void timewarp_subid0_state2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7a50, interactionDecCounter1, 0x23cc, 0x7a53);  // call $23cc
+  CALL(0x7a50, interactionDecCounter1_hook, 0x23cc, 0x7a53);  // call $23cc
   if ((F & FZ)) { I(0x7a53, 3); goto L_7a81; } I(0x7a53, 2);  // jr z,$7a81
   I(0x7a55, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x7a56, 2); alu_cp(gb, 0x24);  // cp $24
@@ -658,14 +658,14 @@ void timewarp_subid0_state2(GB *gb) {
   I(0x7a79, 2); L = 0xd0;  // ld l,$d0
   I(0x7a7b, 2); mem_wr(gb, HL, B);  // ld (hl),b
   I(0x7a7c, 2); B = 0x00;  // ld b,$00
-  I(0x7a7e, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x7a7e, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 L_7a81:
   I(0x7a81, 2); A = 0x01;  // ld a,$01
   CALL(0x7a83, interactionSetAnimation, 0x262e, 0x7a86);  // call $262e
   I(0x7a86, 2); A = 0x04;  // ld a,$04
   CALL(0x7a88, objectGetRelatedObject2Var, 0x2164, 0x7a8b);  // call $2164
   I(0x7a8b, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x7a8c, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x7a8c, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7a81
@@ -677,7 +677,7 @@ L_7a81:
   I(0x7a86, 2); A = 0x04;  // ld a,$04
   CALL(0x7a88, objectGetRelatedObject2Var, 0x2164, 0x7a8b);  // call $2164
   I(0x7a8b, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x7a8c, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x7a8c, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:6f53
@@ -691,7 +691,7 @@ void interactionCodee2(GB *gb) {
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x6f61: goto L_6f61; case 0x6f7b: goto L_6f7b; case 0x6fcc: goto L_6fcc; case 0x6ff3: goto L_6ff3; case 0x700f: goto L_700f; default: HANDOFF(HL); }
 L_6f61:
-  CALL(0x6f61, checkInteractionState, 0x23fe, 0x6f64);  // call $23fe
+  CALL(0x6f61, checkInteractionState_hook, 0x23fe, 0x6f64);  // call $23fe
   if ((F & FZ)) { I(0x6f64, 3); goto L_6f72; } I(0x6f64, 2);  // jr z,$6f72
   I(0x6f66, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
   I(0x6f69, 2); alu_and(gb, 0x01);  // and $01
@@ -703,9 +703,9 @@ L_6f72:
   I(0x6f74, 2); mem_wr(gb, DE, A);  // ld (de),a
   CALL(0x6f75, interactionInitGraphics, 0x15fb, 0x6f78);  // call $15fb
 L_6f78:
-  I(0x6f78, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x6f78, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 L_6f7b:
-  CALL(0x6f7b, checkInteractionState, 0x23fe, 0x6f7e);  // call $23fe
+  CALL(0x6f7b, checkInteractionState_hook, 0x23fe, 0x6f7e);  // call $23fe
   if ((F & FZ)) { I(0x6f7e, 3); goto L_6f72; } I(0x6f7e, 2);  // jr z,$6f72
   I(0x6f80, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
   I(0x6f83, 2); alu_and(gb, 0x01);  // and $01
@@ -745,7 +745,7 @@ L_6ff3:
   I(0x6ffb, 2); A = 0x00;  // ld a,$00
   if (!(F & FC)) { I(0x6ffd, 3); goto L_7008; } I(0x6ffd, 2);  // jr nc,$7008
 L_6fff:
-  CALL(0x6fff, getRandomNumber, 0x043e, 0x7002);  // call $043e
+  CALL(0x6fff, getRandomNumber_hook, 0x043e, 0x7002);  // call $043e
   I(0x7002, 2); alu_and(gb, 0x03);  // and $03
   I(0x7004, 2); alu_cp(gb, 0x02);  // cp $02
   if ((F & FZ)) { I(0x7006, 3); goto L_6fff; } I(0x7006, 2);  // jr z,$6fff
@@ -764,9 +764,9 @@ L_700f:
 L_7019:
   CALL(0x7019, checkInteractionSubstate, 0x2403, 0x701c);  // call $2403
   if ((F & FZ)) { I(0x701c, 3); goto L_7046; } I(0x701c, 2);  // jr z,$7046
-  CALL(0x701e, interactionDecCounter1, 0x23cc, 0x7021);  // call $23cc
+  CALL(0x701e, interactionDecCounter1_hook, 0x23cc, 0x7021);  // call $23cc
   if (!(F & FZ)) { I(0x7021, 3); goto L_7038; } I(0x7021, 2);  // jr nz,$7038
-  CALL(0x7023, interactionIncState, 0x23e0, 0x7026);  // call $23e0
+  CALL(0x7023, interactionIncState_hook, 0x23e0, 0x7026);  // call $23e0
   I(0x7026, 4); A = mem_rd(gb, 0xcca5);  // ld a,($cca5)
   I(0x7029, 1); B = A;  // ld b,a
 L_702a:
@@ -782,7 +782,7 @@ L_7038:
   I(0x7038, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x703b, 2); alu_and(gb, 0x03);  // and $03
   if (!(F & FZ)) { RET_TAKEN(0x703d); return; } I(0x703d, 2);  // ret nz
-  CALL(0x703e, getRandomNumber, 0x043e, 0x7041);  // call $043e
+  CALL(0x703e, getRandomNumber_hook, 0x043e, 0x7041);  // call $043e
   I(0x7041, 2); alu_and(gb, 0x07);  // and $07
   I(0x7043, 4); goto L_6f89;  // jp $6f89
 L_7046:
@@ -797,7 +797,7 @@ L_7046:
 void interactionCodee2__subid0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6f61:
-  CALL(0x6f61, checkInteractionState, 0x23fe, 0x6f64);  // call $23fe
+  CALL(0x6f61, checkInteractionState_hook, 0x23fe, 0x6f64);  // call $23fe
   if ((F & FZ)) { I(0x6f64, 3); goto L_6f72; } I(0x6f64, 2);  // jr z,$6f72
   I(0x6f66, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
   I(0x6f69, 2); alu_and(gb, 0x01);  // and $01
@@ -809,7 +809,7 @@ L_6f72:
   I(0x6f74, 2); mem_wr(gb, DE, A);  // ld (de),a
   CALL(0x6f75, interactionInitGraphics, 0x15fb, 0x6f78);  // call $15fb
 L_6f78:
-  I(0x6f78, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x6f78, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:6f72
@@ -820,14 +820,14 @@ L_6f72:
   I(0x6f74, 2); mem_wr(gb, DE, A);  // ld (de),a
   CALL(0x6f75, interactionInitGraphics, 0x15fb, 0x6f78);  // call $15fb
 L_6f78:
-  I(0x6f78, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x6f78, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:6f78
 void interactionCodee2__afterCall6f78(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6f78:
-  I(0x6f78, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x6f78, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:6f7b
@@ -839,9 +839,9 @@ L_6f72:
   I(0x6f74, 2); mem_wr(gb, DE, A);  // ld (de),a
   CALL(0x6f75, interactionInitGraphics, 0x15fb, 0x6f78);  // call $15fb
 L_6f78:
-  I(0x6f78, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x6f78, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 L_6f7b:
-  CALL(0x6f7b, checkInteractionState, 0x23fe, 0x6f7e);  // call $23fe
+  CALL(0x6f7b, checkInteractionState_hook, 0x23fe, 0x6f7e);  // call $23fe
   if ((F & FZ)) { I(0x6f7e, 3); goto L_6f72; } I(0x6f7e, 2);  // jr z,$6f72
   I(0x6f80, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
   I(0x6f83, 2); alu_and(gb, 0x01);  // and $01
@@ -901,7 +901,7 @@ L_6f9d:
   I(0x6fab, 1); B = alu_dec8(gb, B);  // dec b
   I(0x6fac, 1); alu_rlca(gb);  // rlca
 L_6fad:
-  CALL(0x6fad, objectCenterOnTile, 0x20db, 0x6fb0);  // call $20db
+  CALL(0x6fad, objectCenterOnTile_hook, 0x20db, 0x6fb0);  // call $20db
 L_6fb0:
   CALL(0x6fb0, objectGetAngleTowardLink, 0x1e9c, 0x6fb3);  // call $1e9c
   I(0x6fb3, 1); B = A;  // ld b,a
@@ -927,7 +927,7 @@ L_6fc6:
 void interactionCodee2__centerOnTileAndGetDirectionToFace(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6fad:
-  CALL(0x6fad, objectCenterOnTile, 0x20db, 0x6fb0);  // call $20db
+  CALL(0x6fad, objectCenterOnTile_hook, 0x20db, 0x6fb0);  // call $20db
 L_6fb0:
   CALL(0x6fb0, objectGetAngleTowardLink, 0x1e9c, 0x6fb3);  // call $1e9c
   I(0x6fb3, 1); B = A;  // ld b,a
@@ -1024,7 +1024,7 @@ L_6fdd:
   I(0x6fe3, 1); L = alu_inc8(gb, L);  // inc l
   I(0x6fe4, 2); mem_wr(gb, HL, E);  // ld (hl),e
   PUSH(0x6fe5, BC);  // push bc
-  CALL(0x6fe6, convertShortToLongPosition_paramC, 0x20cc, 0x6fe9);  // call $20cc
+  CALL(0x6fe6, convertShortToLongPosition_paramC_hook, 0x20cc, 0x6fe9);  // call $20cc
   I(0x6fe9, 2); L = 0x4b;  // ld l,$4b
   I(0x6feb, 1); B = alu_dec8(gb, B);  // dec b
   I(0x6fec, 1); B = alu_dec8(gb, B);  // dec b
@@ -1056,7 +1056,7 @@ L_6ff3:
   I(0x6ffb, 2); A = 0x00;  // ld a,$00
   if (!(F & FC)) { I(0x6ffd, 3); goto L_7008; } I(0x6ffd, 2);  // jr nc,$7008
 L_6fff:
-  CALL(0x6fff, getRandomNumber, 0x043e, 0x7002);  // call $043e
+  CALL(0x6fff, getRandomNumber_hook, 0x043e, 0x7002);  // call $043e
   I(0x7002, 2); alu_and(gb, 0x03);  // and $03
   I(0x7004, 2); alu_cp(gb, 0x02);  // cp $02
   if ((F & FZ)) { I(0x7006, 3); goto L_6fff; } I(0x7006, 2);  // jr z,$6fff
@@ -1075,7 +1075,7 @@ L_6f72:
   I(0x6f74, 2); mem_wr(gb, DE, A);  // ld (de),a
   CALL(0x6f75, interactionInitGraphics, 0x15fb, 0x6f78);  // call $15fb
 L_6f78:
-  I(0x6f78, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x6f78, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 L_6f89:
   I(0x6f89, 3); SET_HL(0x6f9d);  // ld hl,$6f9d
   RST_PUSH(0x6f8c, 0x6f8d);  // rst $18 (addDoubleIndexToHl)
@@ -1103,9 +1103,9 @@ L_700f:
 L_7019:
   CALL(0x7019, checkInteractionSubstate, 0x2403, 0x701c);  // call $2403
   if ((F & FZ)) { I(0x701c, 3); goto L_7046; } I(0x701c, 2);  // jr z,$7046
-  CALL(0x701e, interactionDecCounter1, 0x23cc, 0x7021);  // call $23cc
+  CALL(0x701e, interactionDecCounter1_hook, 0x23cc, 0x7021);  // call $23cc
   if (!(F & FZ)) { I(0x7021, 3); goto L_7038; } I(0x7021, 2);  // jr nz,$7038
-  CALL(0x7023, interactionIncState, 0x23e0, 0x7026);  // call $23e0
+  CALL(0x7023, interactionIncState_hook, 0x23e0, 0x7026);  // call $23e0
   I(0x7026, 4); A = mem_rd(gb, 0xcca5);  // ld a,($cca5)
   I(0x7029, 1); B = A;  // ld b,a
 L_702a:
@@ -1121,7 +1121,7 @@ L_7038:
   I(0x7038, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x703b, 2); alu_and(gb, 0x03);  // and $03
   if (!(F & FZ)) { RET_TAKEN(0x703d); return; } I(0x703d, 2);  // ret nz
-  CALL(0x703e, getRandomNumber, 0x043e, 0x7041);  // call $043e
+  CALL(0x703e, getRandomNumber_hook, 0x043e, 0x7041);  // call $043e
   I(0x7041, 2); alu_and(gb, 0x07);  // and $07
   I(0x7043, 4); goto L_6f89;  // jp $6f89
 L_7046:
@@ -1155,9 +1155,9 @@ L_6f89:
 L_7019:
   CALL(0x7019, checkInteractionSubstate, 0x2403, 0x701c);  // call $2403
   if ((F & FZ)) { I(0x701c, 3); goto L_7046; } I(0x701c, 2);  // jr z,$7046
-  CALL(0x701e, interactionDecCounter1, 0x23cc, 0x7021);  // call $23cc
+  CALL(0x701e, interactionDecCounter1_hook, 0x23cc, 0x7021);  // call $23cc
   if (!(F & FZ)) { I(0x7021, 3); goto L_7038; } I(0x7021, 2);  // jr nz,$7038
-  CALL(0x7023, interactionIncState, 0x23e0, 0x7026);  // call $23e0
+  CALL(0x7023, interactionIncState_hook, 0x23e0, 0x7026);  // call $23e0
   I(0x7026, 4); A = mem_rd(gb, 0xcca5);  // ld a,($cca5)
   I(0x7029, 1); B = A;  // ld b,a
 L_702a:
@@ -1173,7 +1173,7 @@ L_7038:
   I(0x7038, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x703b, 2); alu_and(gb, 0x03);  // and $03
   if (!(F & FZ)) { RET_TAKEN(0x703d); return; } I(0x703d, 2);  // ret nz
-  CALL(0x703e, getRandomNumber, 0x043e, 0x7041);  // call $043e
+  CALL(0x703e, getRandomNumber_hook, 0x043e, 0x7041);  // call $043e
   I(0x7041, 2); alu_and(gb, 0x07);  // and $07
   I(0x7043, 4); goto L_6f89;  // jp $6f89
 L_7046:
@@ -1208,7 +1208,7 @@ L_7038:
   I(0x7038, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x703b, 2); alu_and(gb, 0x03);  // and $03
   if (!(F & FZ)) { RET_TAKEN(0x703d); return; } I(0x703d, 2);  // ret nz
-  CALL(0x703e, getRandomNumber, 0x043e, 0x7041);  // call $043e
+  CALL(0x703e, getRandomNumber_hook, 0x043e, 0x7041);  // call $043e
   I(0x7041, 2); alu_and(gb, 0x07);  // and $07
   I(0x7043, 4); goto L_6f89;  // jp $6f89
 }
@@ -1271,23 +1271,23 @@ void timewarp_subid2(GB *gb) {
 L_7ae6:
   CALL(0x7ae6, interactionInitGraphics, 0x15fb, 0x7ae9);  // call $15fb
 L_7ae9:
-  CALL(0x7ae9, interactionIncState, 0x23e0, 0x7aec);  // call $23e0
+  CALL(0x7ae9, interactionIncState_hook, 0x23e0, 0x7aec);  // call $23e0
   I(0x7aec, 2); L = 0x51;  // ld l,$51
   I(0x7aee, 3); mem_wr(gb, HL, 0xfc);  // ld (hl),$fc
   I(0x7af0, 2); L = 0x46;  // ld l,$46
   I(0x7af2, 3); mem_wr(gb, HL, 0x06);  // ld (hl),$06
-  I(0x7af4, 4); objectSetVisible81(gb); return;  // jp $1e60
+  I(0x7af4, 4); if (hook_enabled_at(0x1e60)) { objectSetVisible81_hook(gb); return; } HANDOFF(0x1e60);  // jp $1e60
 L_7af7:
   CALL(0x7af7, timewarp_animate, 0x7b60, 0x7afa);  // call $7b60
   if (!(F & FZ)) { RET_TAKEN(0x7afa); return; } I(0x7afa, 2);  // ret nz
-  I(0x7afb, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x7afb, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 L_7afe:
   CALL(0x7afe, objectApplyComponentSpeed, 0x2008, 0x7b01);  // call $2008
   I(0x7b01, 2); E = 0x4b;  // ld e,$4b
   I(0x7b03, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7b04, 2); alu_cp(gb, 0xf0);  // cp $f0
   if (!(F & FC)) { I(0x7b06, 4); interactionDelete(gb); return; } I(0x7b06, 3);  // jp nc,$3b05
-  CALL(0x7b09, interactionDecCounter1, 0x23cc, 0x7b0c);  // call $23cc
+  CALL(0x7b09, interactionDecCounter1_hook, 0x23cc, 0x7b0c);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7b0c); return; } I(0x7b0c, 2);  // ret nz
   I(0x7b0d, 3); mem_wr(gb, HL, 0x06);  // ld (hl),$06
   I(0x7b0f, 3); SET_BC(0x8401);  // ld bc,$8401
@@ -1304,24 +1304,24 @@ void timewarp_subid2__state0(GB *gb) {
 L_7ae6:
   CALL(0x7ae6, interactionInitGraphics, 0x15fb, 0x7ae9);  // call $15fb
 L_7ae9:
-  CALL(0x7ae9, interactionIncState, 0x23e0, 0x7aec);  // call $23e0
+  CALL(0x7ae9, interactionIncState_hook, 0x23e0, 0x7aec);  // call $23e0
   I(0x7aec, 2); L = 0x51;  // ld l,$51
   I(0x7aee, 3); mem_wr(gb, HL, 0xfc);  // ld (hl),$fc
   I(0x7af0, 2); L = 0x46;  // ld l,$46
   I(0x7af2, 3); mem_wr(gb, HL, 0x06);  // ld (hl),$06
-  I(0x7af4, 4); objectSetVisible81(gb); return;  // jp $1e60
+  I(0x7af4, 4); if (hook_enabled_at(0x1e60)) { objectSetVisible81_hook(gb); return; } HANDOFF(0x1e60);  // jp $1e60
 }
 
 // 10:7ae9
 void timewarp_subid2__afterCall7ae9(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7ae9:
-  CALL(0x7ae9, interactionIncState, 0x23e0, 0x7aec);  // call $23e0
+  CALL(0x7ae9, interactionIncState_hook, 0x23e0, 0x7aec);  // call $23e0
   I(0x7aec, 2); L = 0x51;  // ld l,$51
   I(0x7aee, 3); mem_wr(gb, HL, 0xfc);  // ld (hl),$fc
   I(0x7af0, 2); L = 0x46;  // ld l,$46
   I(0x7af2, 3); mem_wr(gb, HL, 0x06);  // ld (hl),$06
-  I(0x7af4, 4); objectSetVisible81(gb); return;  // jp $1e60
+  I(0x7af4, 4); if (hook_enabled_at(0x1e60)) { objectSetVisible81_hook(gb); return; } HANDOFF(0x1e60);  // jp $1e60
 }
 
 // 10:7af7
@@ -1330,7 +1330,7 @@ void timewarp_subid2__state1(GB *gb) {
 L_7af7:
   CALL(0x7af7, timewarp_animate, 0x7b60, 0x7afa);  // call $7b60
   if (!(F & FZ)) { RET_TAKEN(0x7afa); return; } I(0x7afa, 2);  // ret nz
-  I(0x7afb, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x7afb, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7afe
@@ -1342,7 +1342,7 @@ L_7afe:
   I(0x7b03, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7b04, 2); alu_cp(gb, 0xf0);  // cp $f0
   if (!(F & FC)) { I(0x7b06, 4); interactionDelete(gb); return; } I(0x7b06, 3);  // jp nc,$3b05
-  CALL(0x7b09, interactionDecCounter1, 0x23cc, 0x7b0c);  // call $23cc
+  CALL(0x7b09, interactionDecCounter1_hook, 0x23cc, 0x7b0c);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7b0c); return; } I(0x7b0c, 2);  // ret nz
   I(0x7b0d, 3); mem_wr(gb, HL, 0x06);  // ld (hl),$06
   I(0x7b0f, 3); SET_BC(0x8401);  // ld bc,$8401
@@ -1369,7 +1369,7 @@ void timewarp_subid1(GB *gb) {
 void timewarp_subid0_state1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x7a28, timewarp_animate, 0x7b60, 0x7a2b);  // call $7b60
-  if ((F & FZ)) { I(0x7a2b, 4); interactionIncState(gb); return; } I(0x7a2b, 3);  // jp z,$23e0
+  if ((F & FZ)) { I(0x7a2b, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0); } I(0x7a2b, 3);  // jp z,$23e0
   I(0x7a2e, 1); A = alu_dec8(gb, A);  // dec a
   if (!(F & FZ)) { I(0x7a2f, 3); goto L_7a32; } I(0x7a2f, 2);  // jr nz,$7a32
   RET(0x7a31); return;  // ret
@@ -2356,7 +2356,7 @@ L_4318:
 void ecom_randomBitwiseAndBCE_b10(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x434f, BC);  // push bc
-  CALL(0x4350, getRandomNumber_noPreserveVars, 0x0453, 0x4353);  // call $0453
+  CALL(0x4350, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4353);  // call $0453
   SET_BC(POP(0x4353));  // pop bc
   I(0x4354, 1); alu_and(gb, E);  // and e
   I(0x4355, 1); E = A;  // ld e,a
@@ -2374,7 +2374,7 @@ void ecom_randomBitwiseAndBCE_b10(GB *gb) {
 void ecom_setSpeedAndState8AndVisible_b10(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x435e, ecom_setSpeedAndState8_b10, 0x4364, 0x4361);  // call $4364
-  I(0x4361, 4); objectSetVisiblec2(gb); return;  // jp $1e45
+  I(0x4361, 4); if (hook_enabled_at(0x1e45)) { objectSetVisiblec2_hook(gb); return; } HANDOFF(0x1e45);  // jp $1e45
 }
 
 // 10:4364
@@ -2420,7 +2420,7 @@ void ecom_spawnProjectile_b10(GB *gb) {
   CALL(0x437c, getFreePartSlot, 0x3e8e, 0x437f);  // call $3e8e
   if (!(F & FZ)) { RET_TAKEN(0x437f); return; } I(0x437f, 2);  // ret nz
   I(0x4380, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  CALL(0x4381, objectCopyPosition, 0x2242, 0x4384);  // call $2242
+  CALL(0x4381, objectCopyPosition_hook, 0x2242, 0x4384);  // call $2242
   I(0x4384, 2); L = 0xd6;  // ld l,$d6
   I(0x4386, 2); A = 0x80;  // ld a,$80
   I(0x4388, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
@@ -2501,7 +2501,7 @@ void ecom_updateAngleTowardTarget_b10(GB *gb) {
 // 10:43c6
 void ecom_setRandomCardinalAngle_b10(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x43c6, getRandomNumber_noPreserveVars, 0x0453, 0x43c9);  // call $0453
+  CALL(0x43c6, getRandomNumber_noPreserveVars_hook, 0x0453, 0x43c9);  // call $0453
   I(0x43c9, 2); alu_and(gb, 0x18);  // and $18
   I(0x43cb, 2); E = 0x89;  // ld e,$89
   I(0x43cd, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -2511,7 +2511,7 @@ void ecom_setRandomCardinalAngle_b10(GB *gb) {
 // 10:43cf
 void ecom_setRandomAngle_b10(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x43cf, getRandomNumber_noPreserveVars, 0x0453, 0x43d2);  // call $0453
+  CALL(0x43cf, getRandomNumber_noPreserveVars_hook, 0x0453, 0x43d2);  // call $0453
   I(0x43d2, 2); alu_and(gb, 0x1f);  // and $1f
   I(0x43d4, 2); E = 0x89;  // ld e,$89
   I(0x43d6, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -2526,7 +2526,7 @@ void ecom_updateAnimationFromAngle_b10(GB *gb) {
   I(0x43db, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
   I(0x43dc, 1); E = A;  // ld e,a
   I(0x43dd, 3); SET_BC(0x43ff);  // ld bc,$43ff
-  CALL(0x43e0, addAToBc, 0x006d, 0x43e3);  // call $006d
+  CALL(0x43e0, addAToBc_hook, 0x006d, 0x43e3);  // call $006d
   I(0x43e3, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x43e4, 2); alu_cp(gb, 0x04);  // cp $04
   if ((F & FC)) { I(0x43e6, 3); goto L_43f9; } I(0x43e6, 2);  // jr c,$43f9
@@ -2863,7 +2863,7 @@ L_4507:
   I(0x4515, 2); E = 0x81;  // ld e,$81
   I(0x4517, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x4518, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x4519, objectCopyPosition, 0x2242, 0x451c);  // call $2242
+  CALL(0x4519, objectCopyPosition_hook, 0x2242, 0x451c);  // call $2242
   CALL(0x451c, markEnemyAsKilledInRoom_b00, 0x320d, 0x451f);  // call $320d
   I(0x451f, 2); E = 0x81;  // ld e,$81
   I(0x4521, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -2891,7 +2891,7 @@ L_4507:
   I(0x4515, 2); E = 0x81;  // ld e,$81
   I(0x4517, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x4518, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x4519, objectCopyPosition, 0x2242, 0x451c);  // call $2242
+  CALL(0x4519, objectCopyPosition_hook, 0x2242, 0x451c);  // call $2242
   CALL(0x451c, markEnemyAsKilledInRoom_b00, 0x320d, 0x451f);  // call $320d
   I(0x451f, 2); E = 0x81;  // ld e,$81
   I(0x4521, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -3144,7 +3144,7 @@ void mergedTwinrova_state_uninitialized(GB *gb) {
   I(0x463b, 3); mem_wr(gb, HL, 0x05);  // ld (hl),$05
   I(0x463d, 2); L = 0x8f;  // ld l,$8f
   I(0x463f, 3); mem_wr(gb, HL, 0xff);  // ld (hl),$ff
-  CALL(0x4641, objectSetVisible83, 0x1e72, 0x4644);  // call $1e72
+  CALL(0x4641, objectSetVisible83_hook, 0x1e72, 0x4644);  // call $1e72
   I(0x4644, 3); SET_BC(0x2f0b);  // ld bc,$2f0b
   I(0x4647, 4); showText(gb); return;  // jp $1872
 }
@@ -3164,7 +3164,7 @@ void mergedTwinrova_state8(GB *gb) {
   I(0x4650, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x4651, 2); L = 0xa4;  // ld l,$a4
   I(0x4653, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CALL(0x4655, getRandomNumber_noPreserveVars, 0x0453, 0x4658);  // call $0453
+  CALL(0x4655, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4658);  // call $0453
   I(0x4658, 2); alu_and(gb, 0x01);  // and $01
   I(0x465a, 2); E = 0x82;  // ld e,$82
   I(0x465c, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -3279,7 +3279,7 @@ L_46e2:
 L_46fb:
   I(0x46fb, 2); A = 0x03;  // ld a,$03
   I(0x46fd, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x46fe, disableLcd, 0x02c1, 0x4701);  // call $02c1
+  CALL(0x46fe, disableLcd_hook, 0x02c1, 0x4701);  // call $02c1
   I(0x4701, 2); E = 0x82;  // ld e,$82
   I(0x4703, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x4704, 1); A = alu_inc8(gb, A);  // inc a
@@ -3383,7 +3383,7 @@ void mergedTwinrova_stateA__substate2(GB *gb) {
 L_46fb:
   I(0x46fb, 2); A = 0x03;  // ld a,$03
   I(0x46fd, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x46fe, disableLcd, 0x02c1, 0x4701);  // call $02c1
+  CALL(0x46fe, disableLcd_hook, 0x02c1, 0x4701);  // call $02c1
   I(0x4701, 2); E = 0x82;  // ld e,$82
   I(0x4703, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x4704, 1); A = alu_inc8(gb, A);  // inc a
@@ -3467,14 +3467,14 @@ void mergedTwinrova_chooseTargetPosition(GB *gb) {
   I(0x4755, 1); L = E;  // ld l,e
   I(0x4756, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
 L_4757:
-  CALL(0x4757, getRandomNumber, 0x043e, 0x475a);  // call $043e
+  CALL(0x4757, getRandomNumber_hook, 0x043e, 0x475a);  // call $043e
   I(0x475a, 2); alu_and(gb, 0x0e);  // and $0e
   I(0x475c, 2); L = 0xb6;  // ld l,$b6
   I(0x475e, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
   if ((F & FZ)) { I(0x475f, 3); goto L_4757; } I(0x475f, 2);  // jr z,$4757
   I(0x4761, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x4762, 3); SET_BC(0x4775);  // ld bc,$4775
-  CALL(0x4765, addAToBc, 0x006d, 0x4768);  // call $006d
+  CALL(0x4765, addAToBc_hook, 0x006d, 0x4768);  // call $006d
   I(0x4768, 2); E = 0xb7;  // ld e,$b7
   I(0x476a, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x476b, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -3490,14 +3490,14 @@ L_4757:
 void mergedTwinrova_chooseTargetPosition__chooseTargetPositionIndex(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4757:
-  CALL(0x4757, getRandomNumber, 0x043e, 0x475a);  // call $043e
+  CALL(0x4757, getRandomNumber_hook, 0x043e, 0x475a);  // call $043e
   I(0x475a, 2); alu_and(gb, 0x0e);  // and $0e
   I(0x475c, 2); L = 0xb6;  // ld l,$b6
   I(0x475e, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
   if ((F & FZ)) { I(0x475f, 3); goto L_4757; } I(0x475f, 2);  // jr z,$4757
   I(0x4761, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x4762, 3); SET_BC(0x4775);  // ld bc,$4775
-  CALL(0x4765, addAToBc, 0x006d, 0x4768);  // call $006d
+  CALL(0x4765, addAToBc_hook, 0x006d, 0x4768);  // call $006d
   I(0x4768, 2); E = 0xb7;  // ld e,$b7
   I(0x476a, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x476b, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -3571,7 +3571,7 @@ L_47d7:
   I(0x47ec, 2); L = 0xc9;  // ld l,$c9
   I(0x47ee, 2); mem_wr(gb, HL, B);  // ld (hl),b
   I(0x47ef, 3); SET_BC(0x1000);  // ld bc,$1000
-  I(0x47f2, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x47f2, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 L_47f5:
   CALL(0x47f5, ecom_decCounter1_b10, 0x439a, 0x47f8);  // call $439a
   if (!(F & FZ)) { I(0x47f8, 4); enemyAnimate(gb); return; } I(0x47f8, 3);  // jp nz,$2818
@@ -3634,7 +3634,7 @@ L_4835:
   I(0x4852, 2); mem_wr(gb, HL, D);  // ld (hl),d
   I(0x4853, 1); L = alu_dec8(gb, L);  // dec l
   I(0x4854, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
-  I(0x4856, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x4856, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 L_4859:
   I(0x4859, 1); L = alu_dec8(gb, L);  // dec l
   I(0x485a, 3); mem_wr(gb, HL, 0xb4);  // ld (hl),$b4
@@ -3757,7 +3757,7 @@ L_47d7:
   I(0x47ec, 2); L = 0xc9;  // ld l,$c9
   I(0x47ee, 2); mem_wr(gb, HL, B);  // ld (hl),b
   I(0x47ef, 3); SET_BC(0x1000);  // ld bc,$1000
-  I(0x47f2, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x47f2, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 L_47f5:
   CALL(0x47f5, ecom_decCounter1_b10, 0x439a, 0x47f8);  // call $439a
   if (!(F & FZ)) { I(0x47f8, 4); enemyAnimate(gb); return; } I(0x47f8, 3);  // jp nz,$2818
@@ -3820,7 +3820,7 @@ L_4835:
   I(0x4852, 2); mem_wr(gb, HL, D);  // ld (hl),d
   I(0x4853, 1); L = alu_dec8(gb, L);  // dec l
   I(0x4854, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
-  I(0x4856, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x4856, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 L_4859:
   I(0x4859, 1); L = alu_dec8(gb, L);  // dec l
   I(0x485a, 3); mem_wr(gb, HL, 0xb4);  // ld (hl),$b4
@@ -3853,7 +3853,7 @@ L_47d7:
   I(0x47ec, 2); L = 0xc9;  // ld l,$c9
   I(0x47ee, 2); mem_wr(gb, HL, B);  // ld (hl),b
   I(0x47ef, 3); SET_BC(0x1000);  // ld bc,$1000
-  I(0x47f2, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x47f2, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 }
 
 // 10:47f5
@@ -3959,7 +3959,7 @@ L_4835:
   I(0x4852, 2); mem_wr(gb, HL, D);  // ld (hl),d
   I(0x4853, 1); L = alu_dec8(gb, L);  // dec l
   I(0x4854, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
-  I(0x4856, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x4856, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 L_4859:
   I(0x4859, 1); L = alu_dec8(gb, L);  // dec l
   I(0x485a, 3); mem_wr(gb, HL, 0xb4);  // ld (hl),$b4
@@ -4013,7 +4013,7 @@ L_4835:
   I(0x4852, 2); mem_wr(gb, HL, D);  // ld (hl),d
   I(0x4853, 1); L = alu_dec8(gb, L);  // dec l
   I(0x4854, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
-  I(0x4856, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x4856, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 L_4859:
   I(0x4859, 1); L = alu_dec8(gb, L);  // dec l
   I(0x485a, 3); mem_wr(gb, HL, 0xb4);  // ld (hl),$b4
@@ -4063,7 +4063,7 @@ L_4846:
   I(0x4852, 2); mem_wr(gb, HL, D);  // ld (hl),d
   I(0x4853, 1); L = alu_dec8(gb, L);  // dec l
   I(0x4854, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
-  I(0x4856, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x4856, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 L_4863:
   I(0x4863, 1);  // nop
   if (!(F & FZ)) { I(0x4864, 3); goto L_4846; } I(0x4864, 2);  // jr nz,$4846
@@ -4122,7 +4122,7 @@ void mergedTwinrova_iceRoom_stateC(GB *gb) {
   I(0x4886, 3); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
   I(0x4888, 2); L = 0xb9;  // ld l,$b9
   I(0x488a, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  CALL(0x488c, getRandomNumber_noPreserveVars, 0x0453, 0x488f);  // call $0453
+  CALL(0x488c, getRandomNumber_noPreserveVars_hook, 0x0453, 0x488f);  // call $0453
   I(0x488f, 2); alu_and(gb, 0x01);  // and $01
   I(0x4891, 2); E = 0xb5;  // ld e,$b5
   I(0x4893, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -4189,7 +4189,7 @@ L_48d6:
   I(0x48e2, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
   I(0x48e4, 1); L = alu_inc8(gb, L);  // inc l
   I(0x48e5, 2); mem_wr(gb, HL, D);  // ld (hl),d
-  I(0x48e6, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x48e6, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 L_48e9:
   I(0x48e9, 1); L = E;  // ld l,e
   I(0x48ea, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
@@ -4252,7 +4252,7 @@ L_48d6:
   I(0x48e2, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
   I(0x48e4, 1); L = alu_inc8(gb, L);  // inc l
   I(0x48e5, 2); mem_wr(gb, HL, D);  // ld (hl),d
-  I(0x48e6, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x48e6, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 L_48e9:
   I(0x48e9, 1); L = E;  // ld l,e
   I(0x48ea, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
@@ -4323,7 +4323,7 @@ void mergedTwinrova_iceRoom_stateF(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(0x4946); return; } I(0x4946, 2);  // ret nz
   I(0x4947, 3); mem_wr(gb, HL, 0x4e);  // ld (hl),$4e
   I(0x4949, 3); SET_BC(0xe800);  // ld bc,$e800
-  I(0x494c, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x494c, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 }
 
 // 10:494f
@@ -4900,7 +4900,7 @@ void twinrova_state8(GB *gb) {
   I(0x4b46, 1); alu_or(gb, A);  // or a
   I(0x4b47, 3); SET_BC(0x2f04);  // ld bc,$2f04
   if ((F & FZ)) { CALL(0x4b4a, showText, 0x1872, 0x4b4d); } else I(0x4b4a, 3);  // call z,$1872
-  CALL(0x4b4d, getRandomNumber_noPreserveVars, 0x0453, 0x4b50);  // call $0453
+  CALL(0x4b4d, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4b50);  // call $0453
   I(0x4b50, 2); E = 0xb1;  // ld e,$b1
   I(0x4b52, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x4b53, 4); twinrova_updateAnimationFromAngle(gb); return;  // jp $4ed2
@@ -4987,7 +4987,7 @@ L_4bb7:
   I(0x4bc7, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x4bc8, 2); L = 0xb2;  // ld l,$b2
   I(0x4bca, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
-  I(0x4bcc, 4); objectSetInvisible(gb); return;  // jp $1e7b
+  I(0x4bcc, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp $1e7b
 L_4bcf:
   I(0x4bcf, 2); A = 0x21;  // ld a,$21
   CALL(0x4bd1, objectGetRelatedObject2Var, 0x2164, 0x4bd4);  // call $2164
@@ -5126,7 +5126,7 @@ L_4bb7:
   I(0x4bc7, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x4bc8, 2); L = 0xb2;  // ld l,$b2
   I(0x4bca, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
-  I(0x4bcc, 4); objectSetInvisible(gb); return;  // jp $1e7b
+  I(0x4bcc, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp $1e7b
 }
 
 // 10:4bcf
@@ -5188,7 +5188,7 @@ L_4c1d:
   I(0x4c25, 2); alu_and(gb, 0x07);  // and $07
   I(0x4c27, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x4c28, 3); SET_HL(0x4c32);  // ld hl,$4c32
-  CALL(0x4c2b, checkFlag, 0x0205, 0x4c2e);  // call $0205
+  CALL(0x4c2b, checkFlag_hook, 0x0205, 0x4c2e);  // call $0205
   if (!(F & FZ)) { I(0x4c2e, 4); twinrova_chooseObjectToAttack(gb); return; } I(0x4c2e, 3);  // jp nz,$4f4d
   RET(0x4c31); return;  // ret
 }
@@ -5205,7 +5205,7 @@ L_4c1d:
   I(0x4c25, 2); alu_and(gb, 0x07);  // and $07
   I(0x4c27, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x4c28, 3); SET_HL(0x4c32);  // ld hl,$4c32
-  CALL(0x4c2b, checkFlag, 0x0205, 0x4c2e);  // call $0205
+  CALL(0x4c2b, checkFlag_hook, 0x0205, 0x4c2e);  // call $0205
   if (!(F & FZ)) { I(0x4c2e, 4); twinrova_chooseObjectToAttack(gb); return; } I(0x4c2e, 3);  // jp nz,$4f4d
   RET(0x4c31); return;  // ret
 }
@@ -5225,7 +5225,7 @@ void twinrova_subid0_stateC(GB *gb) {
   if (!(F & FZ)) { I(0x4c36, 4); enemyAnimate(gb); return; } I(0x4c36, 3);  // jp nz,$2818
   I(0x4c39, 1); L = E;  // ld l,e
   I(0x4c3a, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  CALL(0x4c3b, getRandomNumber_noPreserveVars, 0x0453, 0x4c3e);  // call $0453
+  CALL(0x4c3b, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4c3e);  // call $0453
   I(0x4c3e, 2); alu_and(gb, 0x03);  // and $03
   I(0x4c40, 2); E = 0xb3;  // ld e,$b3
   I(0x4c42, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -5367,7 +5367,7 @@ L_4cec:
   I(0x4cf5, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
   I(0x4cf7, 2); L = 0x86;  // ld l,$86
   I(0x4cf9, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x4cfb, 4); objectSetInvisible(gb); return;  // jp $1e7b
+  I(0x4cfb, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp $1e7b
 L_4cfe:
   I(0x4cfe, 2); E = 0x82;  // ld e,$82
   I(0x4d00, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -5400,7 +5400,7 @@ L_4d11:
 L_4d29:
   I(0x4d29, 2); L = 0xb2;  // ld l,$b2
   I(0x4d2b, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CALL(0x4d2d, objectSetVisiblec2, 0x1e45, 0x4d30);  // call $1e45
+  CALL(0x4d2d, objectSetVisiblec2_hook, 0x1e45, 0x4d30);  // call $1e45
   I(0x4d30, 2); A = 0xd3;  // ld a,$d3
   CALL(0x4d32, playSound_b00, 0x0c98, 0x4d35);  // call $0c98
 L_4d35:
@@ -5486,7 +5486,7 @@ L_4db0:
   I(0x4db1, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x4db2, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x4db3, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  CALL(0x4db5, objectCopyPosition, 0x2242, 0x4db8);  // call $2242
+  CALL(0x4db5, objectCopyPosition_hook, 0x2242, 0x4db8);  // call $2242
   I(0x4db8, 2); A = 0x01;  // ld a,$01
   I(0x4dba, 4); mem_wr(gb, 0xcc18, A);  // ld ($cc18),a
   I(0x4dbd, 4); enemyDelete(gb); return;  // jp $2e47
@@ -5545,7 +5545,7 @@ L_4cec:
   I(0x4cf5, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
   I(0x4cf7, 2); L = 0x86;  // ld l,$86
   I(0x4cf9, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x4cfb, 4); objectSetInvisible(gb); return;  // jp $1e7b
+  I(0x4cfb, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp $1e7b
 L_4d60:
   I(0x4d60, 4); enemyAnimate(gb); return;  // jp $2818
 }
@@ -5590,7 +5590,7 @@ L_4d11:
 L_4d29:
   I(0x4d29, 2); L = 0xb2;  // ld l,$b2
   I(0x4d2b, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CALL(0x4d2d, objectSetVisiblec2, 0x1e45, 0x4d30);  // call $1e45
+  CALL(0x4d2d, objectSetVisiblec2_hook, 0x1e45, 0x4d30);  // call $1e45
   I(0x4d30, 2); A = 0xd3;  // ld a,$d3
   CALL(0x4d32, playSound_b00, 0x0c98, 0x4d35);  // call $0c98
 L_4d35:
@@ -5732,7 +5732,7 @@ L_4db0:
   I(0x4db1, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x4db2, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x4db3, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  CALL(0x4db5, objectCopyPosition, 0x2242, 0x4db8);  // call $2242
+  CALL(0x4db5, objectCopyPosition_hook, 0x2242, 0x4db8);  // call $2242
   I(0x4db8, 2); A = 0x01;  // ld a,$01
   I(0x4dba, 4); mem_wr(gb, 0xcc18, A);  // ld ($cc18),a
   I(0x4dbd, 4); enemyDelete(gb); return;  // jp $2e47
@@ -5755,7 +5755,7 @@ L_4db0:
   I(0x4db1, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x4db2, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x4db3, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  CALL(0x4db5, objectCopyPosition, 0x2242, 0x4db8);  // call $2242
+  CALL(0x4db5, objectCopyPosition_hook, 0x2242, 0x4db8);  // call $2242
   I(0x4db8, 2); A = 0x01;  // ld a,$01
   I(0x4dba, 4); mem_wr(gb, 0xcc18, A);  // ld ($cc18),a
   I(0x4dbd, 4); enemyDelete(gb); return;  // jp $2e47
@@ -5769,7 +5769,7 @@ L_4db0:
   I(0x4db1, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x4db2, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x4db3, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  CALL(0x4db5, objectCopyPosition, 0x2242, 0x4db8);  // call $2242
+  CALL(0x4db5, objectCopyPosition_hook, 0x2242, 0x4db8);  // call $2242
   I(0x4db8, 2); A = 0x01;  // ld a,$01
   I(0x4dba, 4); mem_wr(gb, 0xcc18, A);  // ld ($cc18),a
   I(0x4dbd, 4); enemyDelete(gb); return;  // jp $2e47
@@ -5815,7 +5815,7 @@ void twinrova_subid1_stateC(GB *gb) {
   if (!(F & FZ)) { I(0x4def, 4); enemyAnimate(gb); return; } I(0x4def, 3);  // jp nz,$2818
   I(0x4df2, 1); L = E;  // ld l,e
   I(0x4df3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  CALL(0x4df4, getRandomNumber_noPreserveVars, 0x0453, 0x4df7);  // call $0453
+  CALL(0x4df4, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4df7);  // call $0453
   I(0x4df7, 2); alu_and(gb, 0x03);  // and $03
   I(0x4df9, 2); E = 0xb3;  // ld e,$b3
   I(0x4dfb, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -6174,7 +6174,7 @@ L_4f42:
 // 10:4f4d
 void twinrova_chooseObjectToAttack(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4f4d, getRandomNumber_noPreserveVars, 0x0453, 0x4f50);  // call $0453
+  CALL(0x4f4d, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4f50);  // call $0453
   I(0x4f50, 1); alu_rrca(gb);  // rrca
   I(0x4f51, 1); H = D;  // ld h,d
   I(0x4f52, 2); L = 0xb2;  // ld l,$b2
@@ -6265,7 +6265,7 @@ void enemyCode04(GB *gb) {
   CALL(0x5083, ganon_loadGfxHeader, 0x56de, 0x5086);  // call $56de
   I(0x5086, 2); A = 0x0e;  // ld a,$0e
   CALL(0x5088, enemySetAnimation, 0x282b, 0x508b);  // call $282b
-  CALL(0x508b, getThisRoomFlags, 0x197d, 0x508e);  // call $197d
+  CALL(0x508b, getThisRoomFlags_hook, 0x197d, 0x508e);  // call $197d
   I(0x508e, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   I(0x5090, 2); L = 0xf1;  // ld l,$f1
   I(0x5092, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
@@ -6352,7 +6352,7 @@ void ganon_state_uninitialized(GB *gb) {
   I(0x5113, 1); E = alu_inc8(gb, E);  // inc e
   I(0x5114, 1); A = H;  // ld a,h
   I(0x5115, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x5116, disableLcd, 0x02c1, 0x5119);  // call $02c1
+  CALL(0x5116, disableLcd_hook, 0x02c1, 0x5119);  // call $02c1
   I(0x5119, 2); A = 0xf5;  // ld a,$f5
   I(0x511b, 4); mem_wr(gb, 0xcc30, A);  // ld ($cc30),a
   I(0x511e, 2); A = 0x03;  // ld a,$03
@@ -6373,7 +6373,7 @@ void ganon_state_uninitialized(GB *gb) {
   CALL(0x5146, loadGfxRegisterStateIndex, 0x02ea, 0x5149);  // call $02ea
   I(0x5149, 3); A = mem_rd(gb, 0xffaf);  // ldh a,($ffaf)
   I(0x514b, 1); D = A;  // ld d,a
-  CALL(0x514c, objectSetVisible83, 0x1e72, 0x514f);  // call $1e72
+  CALL(0x514c, objectSetVisible83_hook, 0x1e72, 0x514f);  // call $1e72
   I(0x514f, 4); fadeinFromWhite(gb); return;  // jp $3299
 }
 
@@ -6408,7 +6408,7 @@ void ganon_state2(GB *gb) {
   I(0x5176, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x5177, 2); A = 0x0d;  // ld a,$0d
   CALL(0x5179, enemySetAnimation, 0x282b, 0x517c);  // call $282b
-  I(0x517c, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x517c, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:517f
@@ -6552,7 +6552,7 @@ void ganon_state8_substate1(GB *gb) {
   I(0x5236, 1); L = E;  // ld l,e
   I(0x5237, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CALL(0x5238, ganon_decideTeleportLocationAndCounter, 0x5787, 0x523b);  // call $5787
-  I(0x523b, 4); objectSetInvisible(gb); return;  // jp $1e7b
+  I(0x523b, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp $1e7b
 }
 
 // 10:523e
@@ -6579,7 +6579,7 @@ void ganon_state8_substate3(GB *gb) {
   I(0x5256, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x5257, 2); L = 0xa4;  // ld l,$a4
   I(0x5259, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  I(0x525b, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x525b, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:525e
@@ -6643,7 +6643,7 @@ void ganon_state8_spawnProjectile(GB *gb) {
   I(0x52a9, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x52aa, 2); L = 0xd0;  // ld l,$d0
   I(0x52ac, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x52ad, 4); objectCopyPosition(gb); return;  // jp $2242
+  I(0x52ad, 4); if (hook_enabled_at(0x2242)) { objectCopyPosition_hook(gb); return; } HANDOFF(0x2242);  // jp $2242
 }
 
 // 10:52b0
@@ -6687,7 +6687,7 @@ void ganon_state9_substate1(GB *gb) {
   I(0x52dd, 3); mem_wr(gb, HL, 0x58);  // ld (hl),$58
   I(0x52df, 2); L = 0x8d;  // ld l,$8d
   I(0x52e1, 3); mem_wr(gb, HL, 0x78);  // ld (hl),$78
-  I(0x52e3, 4); objectSetInvisible(gb); return;  // jp $1e7b
+  I(0x52e3, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp $1e7b
 }
 
 // 10:52e6
@@ -6700,7 +6700,7 @@ void ganon_state9_substate3(GB *gb) {
   I(0x52ef, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x52f0, 2); L = 0xa4;  // ld l,$a4
   I(0x52f2, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  I(0x52f4, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x52f4, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:52f7
@@ -6733,7 +6733,7 @@ L_531a:
   I(0x5327, 2); mem_wr(gb, HL, D);  // ld (hl),d
   I(0x5328, 1); L = alu_dec8(gb, L);  // dec l
   I(0x5329, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
-  I(0x532b, 4); objectCopyPosition(gb); return;  // jp $2242
+  I(0x532b, 4); if (hook_enabled_at(0x2242)) { objectCopyPosition_hook(gb); return; } HANDOFF(0x2242);  // jp $2242
 }
 
 // 10:531a
@@ -6750,7 +6750,7 @@ L_531a:
   I(0x5327, 2); mem_wr(gb, HL, D);  // ld (hl),d
   I(0x5328, 1); L = alu_dec8(gb, L);  // dec l
   I(0x5329, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
-  I(0x532b, 4); objectCopyPosition(gb); return;  // jp $2242
+  I(0x532b, 4); if (hook_enabled_at(0x2242)) { objectCopyPosition_hook(gb); return; } HANDOFF(0x2242);  // jp $2242
 }
 
 // 10:532e
@@ -6807,7 +6807,7 @@ void ganon_stateA_substate1(GB *gb) {
   I(0x536d, 3); mem_wr(gb, HL, 0x78);  // ld (hl),$78
   I(0x536f, 1); L = E;  // ld l,e
   I(0x5370, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x5371, 4); objectSetInvisible(gb); return;  // jp $1e7b
+  I(0x5371, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp $1e7b
 }
 
 // 10:5374
@@ -6859,7 +6859,7 @@ void ganon_stateA_substate3(GB *gb) {
   CALL(0x53b9, ecom_updateAngleTowardTarget_b10, 0x43bf, 0x53bc);  // call $43bf
   I(0x53bc, 2); E = 0x50;  // ld e,$50
   CALL(0x53be, ganon_spawnPart, 0x57c4, 0x53c1);  // call $57c4
-  I(0x53c1, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x53c1, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:53c4
@@ -6961,7 +6961,7 @@ void ganon_stateB_substate1(GB *gb) {
   I(0x5438, 3); mem_wr(gb, HL, 0xb4);  // ld (hl),$b4
   I(0x543a, 1); L = E;  // ld l,e
   I(0x543b, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x543c, 4); objectSetInvisible(gb); return;  // jp $1e7b
+  I(0x543c, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp $1e7b
 }
 
 // 10:543f
@@ -6992,12 +6992,12 @@ void ganon_stateB_substate3(GB *gb) {
   I(0x5463, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x5464, 2); L = 0xa4;  // ld l,$a4
   I(0x5466, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CALL(0x5468, objectSetVisible83, 0x1e72, 0x546b);  // call $1e72
+  CALL(0x5468, objectSetVisible83_hook, 0x1e72, 0x546b);  // call $1e72
   I(0x546b, 2); E = 0x51;  // ld e,$51
   CALL(0x546d, ganon_spawnPart, 0x57c4, 0x5470);  // call $57c4
   if (!(F & FZ)) { RET_TAKEN(0x5470); return; } I(0x5470, 2);  // ret nz
   I(0x5471, 3); SET_BC(0xf810);  // ld bc,$f810
-  I(0x5474, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x5474, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 }
 
 // 10:5477
@@ -7084,7 +7084,7 @@ void ganon_stateB_substate7(GB *gb) {
   I(0x54e9, 2); L = 0xc2;  // ld l,$c2
   I(0x54eb, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x54ec, 3); SET_BC(0xf810);  // ld bc,$f810
-  I(0x54ef, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x54ef, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 }
 
 // 10:54f2
@@ -7146,7 +7146,7 @@ void ganon_stateC_substate1(GB *gb) {
   I(0x5540, 3); mem_wr(gb, HL, 0x58);  // ld (hl),$58
   I(0x5542, 2); L = 0x8d;  // ld l,$8d
   I(0x5544, 3); mem_wr(gb, HL, 0x78);  // ld (hl),$78
-  I(0x5546, 4); objectSetInvisible(gb); return;  // jp $1e7b
+  I(0x5546, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp $1e7b
 }
 
 // 10:5549
@@ -7159,7 +7159,7 @@ void ganon_stateC_substate3(GB *gb) {
   I(0x5552, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x5553, 2); L = 0xa4;  // ld l,$a4
   I(0x5555, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CALL(0x5557, objectSetVisible83, 0x1e72, 0x555a);  // call $1e72
+  CALL(0x5557, objectSetVisible83_hook, 0x1e72, 0x555a);  // call $1e72
   I(0x555a, 2); A = 0xb4;  // ld a,$b4
   I(0x555c, 4); playSound_b00(gb); return;  // jp $0c98
 }
@@ -7242,7 +7242,7 @@ void ganon_stateC_substate6(GB *gb) {
   I(0x55a1, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   I(0x55a3, 2); L = 0x90;  // ld l,$90
   I(0x55a5, 3); mem_wr(gb, HL, 0x14);  // ld (hl),$14
-  CALL(0x55a7, getRandomNumber_noPreserveVars, 0x0453, 0x55aa);  // call $0453
+  CALL(0x55a7, getRandomNumber_noPreserveVars_hook, 0x0453, 0x55aa);  // call $0453
   I(0x55aa, 2); alu_and(gb, 0x07);  // and $07
   I(0x55ac, 3); SET_HL(0x55b7);  // ld hl,$55b7
   RST_PUSH(0x55af, 0x55b0);  // rst $10 (addAToHl)
@@ -7322,7 +7322,7 @@ void ganon_stateC_substate8(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(0x561a); return; } I(0x561a, 2);  // ret nz
   I(0x561b, 2); L = 0xc2;  // ld l,$c2
   I(0x561d, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  I(0x561f, 4); objectCopyPosition(gb); return;  // jp $2242
+  I(0x561f, 4); if (hook_enabled_at(0x2242)) { objectCopyPosition_hook(gb); return; } HANDOFF(0x2242);  // jp $2242
 L_5622:
   I(0x5622, 2); L = 0x85;  // ld l,$85
   I(0x5624, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
@@ -7392,7 +7392,7 @@ void ganon_stateD_substate3(GB *gb) {
   I(0x5664, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x5665, 2); L = 0x8d;  // ld l,$8d
   I(0x5667, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5668, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x5668, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:566b
@@ -7418,7 +7418,7 @@ void ganon_stateE_substate0(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(0x5682); return; } I(0x5682, 2);  // ret nz
   I(0x5683, 2); L = 0xc2;  // ld l,$c2
   I(0x5685, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x5686, objectCopyPosition, 0x2242, 0x5689);  // call $2242
+  CALL(0x5686, objectCopyPosition_hook, 0x2242, 0x5689);  // call $2242
   I(0x5689, 2); E = 0x98;  // ld e,$98
   I(0x568b, 2); A = 0xc0;  // ld a,$c0
   I(0x568d, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -7432,7 +7432,7 @@ void ganon_stateE_substate0(GB *gb) {
   I(0x5698, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x5699, 2); L = 0x8f;  // ld l,$8f
   I(0x569b, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x569d, objectSetInvisible, 0x1e7b, 0x56a0);  // call $1e7b
+  CALL(0x569d, objectSetInvisible_hook, 0x1e7b, 0x56a0);  // call $1e7b
   I(0x56a0, 2); A = 0xbc;  // ld a,$bc
   I(0x56a2, 4); playSound_b00(gb); return;  // jp $0c98
 }
@@ -7593,7 +7593,7 @@ void ganon_decideNextMove(GB *gb) {
   if (!(F & FC)) { I(0x5747, 3); goto L_574b; } I(0x5747, 2);  // jr nc,$574b
   I(0x5749, 2); C = 0x04;  // ld c,$04
 L_574b:
-  CALL(0x574b, getRandomNumber, 0x043e, 0x574e);  // call $043e
+  CALL(0x574b, getRandomNumber_hook, 0x043e, 0x574e);  // call $043e
   I(0x574e, 2); alu_and(gb, 0x03);  // and $03
   I(0x5750, 1); alu_add(gb, C);  // add c
   I(0x5751, 3); SET_HL(0x575b);  // ld hl,$575b
@@ -8134,7 +8134,7 @@ void veranFinal_turtleForm_state0(GB *gb) {
   CALL(0x58ac, enemyBoss_spawnShadow_b10, 0x4534, 0x58af);  // call $4534
   if (!(F & FZ)) { RET_TAKEN(0x58af); return; } I(0x58af, 2);  // ret nz
   CALL(0x58b0, ecom_incState_b10, 0x4000, 0x58b3);  // call $4000
-  CALL(0x58b3, checkIsLinkedGame, 0x1992, 0x58b6);  // call $1992
+  CALL(0x58b3, checkIsLinkedGame_hook, 0x1992, 0x58b6);  // call $1992
   I(0x58b6, 2); L = 0xa9;  // ld l,$a9
   I(0x58b8, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x58b9, 3); SET_BC(0x0c18);  // ld bc,$0c18
@@ -8148,7 +8148,7 @@ L_58c4:
   I(0x58c7, 2); mem_wr(gb, HL, B);  // ld (hl),b
   I(0x58c8, 1); L = alu_inc8(gb, L);  // inc l
   I(0x58c9, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x58ca, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x58ca, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:58cd
@@ -8262,7 +8262,7 @@ void veranFinal_turtleForm_state2(GB *gb) {
   I(0x5929, 1); L = alu_inc8(gb, L);  // inc l
   I(0x592a, 3); mem_wr(gb, HL, 0xfc);  // ld (hl),$fc
   CALL(0x592c, ecom_updateAngleTowardTarget_b10, 0x43bf, 0x592f);  // call $43bf
-  CALL(0x592f, objectSetVisible81, 0x1e60, 0x5932);  // call $1e60
+  CALL(0x592f, objectSetVisible81_hook, 0x1e60, 0x5932);  // call $1e60
   I(0x5932, 2); A = 0x69;  // ld a,$69
   CALL(0x5934, playSound_b00, 0x0c98, 0x5937);  // call $0c98
   I(0x5937, 2); A = 0x02;  // ld a,$02
@@ -8315,7 +8315,7 @@ L_5976:
   CALL(0x597b, ecom_incState_b10, 0x4000, 0x597e);  // call $4000
   I(0x597e, 2); L = 0x86;  // ld l,$86
   I(0x5980, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
-  CALL(0x5982, objectSetVisible83, 0x1e72, 0x5985);  // call $1e72
+  CALL(0x5982, objectSetVisible83_hook, 0x1e72, 0x5985);  // call $1e72
   I(0x5985, 2); A = 0x98;  // ld a,$98
   CALL(0x5987, playSound_b00, 0x0c98, 0x598a);  // call $0c98
   I(0x598a, 2); B = 0x57;  // ld b,$57
@@ -8331,7 +8331,7 @@ L_5976:
   CALL(0x597b, ecom_incState_b10, 0x4000, 0x597e);  // call $4000
   I(0x597e, 2); L = 0x86;  // ld l,$86
   I(0x5980, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
-  CALL(0x5982, objectSetVisible83, 0x1e72, 0x5985);  // call $1e72
+  CALL(0x5982, objectSetVisible83_hook, 0x1e72, 0x5985);  // call $1e72
   I(0x5985, 2); A = 0x98;  // ld a,$98
   CALL(0x5987, playSound_b00, 0x0c98, 0x598a);  // call $0c98
   I(0x598a, 2); B = 0x57;  // ld b,$57
@@ -8353,13 +8353,13 @@ void veranFinal_turtleForm_state5(GB *gb) {
 L_59a0:
   I(0x59a0, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x59a1, 3); SET_BC(0x59d7);  // ld bc,$59d7
-  CALL(0x59a4, addAToBc, 0x006d, 0x59a7);  // call $006d
+  CALL(0x59a4, addAToBc_hook, 0x006d, 0x59a7);  // call $006d
   I(0x59a7, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x59a8, 1); B = A;  // ld b,a
   I(0x59a9, 1); A = alu_inc8(gb, A);  // inc a
   I(0x59aa, 1); L = E;  // ld l,e
   if ((F & FZ)) { I(0x59ab, 3); goto L_59ba; } I(0x59ab, 2);  // jr z,$59ba
-  CALL(0x59ad, getRandomNumber, 0x043e, 0x59b0);  // call $043e
+  CALL(0x59ad, getRandomNumber_hook, 0x043e, 0x59b0);  // call $043e
   I(0x59b0, 1); alu_and(gb, B);  // and b
   if ((F & FZ)) { I(0x59b1, 4); veranFinal_transformToBeeOrSpider(gb); return; } I(0x59b1, 3);  // jp z,$5eba
   I(0x59b4, 2); E = 0xb3;  // ld e,$b3
@@ -8367,7 +8367,7 @@ L_59a0:
   I(0x59b7, 1); alu_rrca(gb);  // rrca
   if ((F & FC)) { I(0x59b8, 3); goto L_59d0; } I(0x59b8, 2);  // jr c,$59d0
 L_59ba:
-  CALL(0x59ba, getRandomNumber, 0x043e, 0x59bd);  // call $043e
+  CALL(0x59ba, getRandomNumber_hook, 0x043e, 0x59bd);  // call $043e
   I(0x59bd, 2); alu_cp(gb, 0x5a);  // cp $5a
   if (!(F & FC)) { I(0x59bf, 3); goto L_59d0; } I(0x59bf, 2);  // jr nc,$59d0
   I(0x59c1, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
@@ -8549,7 +8549,7 @@ L_5a52:
   CALL(0x5a63, dropLinkHeldItem, 0x2c43, 0x5a66);  // call $2c43
   CALL(0x5a66, clearAllParentItems, 0x2c10, 0x5a69);  // call $2c10
   CALL(0x5a69, ecom_incSubstate_b10, 0x4005, 0x5a6c);  // call $4005
-  CALL(0x5a6c, checkIsLinkedGame, 0x1992, 0x5a6f);  // call $1992
+  CALL(0x5a6c, checkIsLinkedGame_hook, 0x1992, 0x5a6f);  // call $1992
   I(0x5a6f, 3); SET_BC(0x5615);  // ld bc,$5615
   if ((F & FZ)) { I(0x5a72, 3); goto L_5a77; } I(0x5a72, 2);  // jr z,$5a77
   I(0x5a74, 3); SET_BC(0x5616);  // ld bc,$5616
@@ -8603,7 +8603,7 @@ L_5a52:
   CALL(0x5a63, dropLinkHeldItem, 0x2c43, 0x5a66);  // call $2c43
   CALL(0x5a66, clearAllParentItems, 0x2c10, 0x5a69);  // call $2c10
   CALL(0x5a69, ecom_incSubstate_b10, 0x4005, 0x5a6c);  // call $4005
-  CALL(0x5a6c, checkIsLinkedGame, 0x1992, 0x5a6f);  // call $1992
+  CALL(0x5a6c, checkIsLinkedGame_hook, 0x1992, 0x5a6f);  // call $1992
   I(0x5a6f, 3); SET_BC(0x5615);  // ld bc,$5615
   if ((F & FZ)) { I(0x5a72, 3); goto L_5a77; } I(0x5a72, 2);  // jr z,$5a77
   I(0x5a74, 3); SET_BC(0x5616);  // ld bc,$5616
@@ -8707,7 +8707,7 @@ void veranFinal_spiderForm_initState2(GB *gb) {
   I(0x5ae0, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
   I(0x5ae2, 2); L = 0x90;  // ld l,$90
   I(0x5ae4, 3); mem_wr(gb, HL, 0x1e);  // ld (hl),$1e
-  CALL(0x5ae6, getRandomNumber_noPreserveVars, 0x0453, 0x5ae9);  // call $0453
+  CALL(0x5ae6, getRandomNumber_noPreserveVars_hook, 0x0453, 0x5ae9);  // call $0453
   I(0x5ae9, 2); alu_and(gb, 0x03);  // and $03
   I(0x5aeb, 3); SET_HL(0x5af8);  // ld hl,$5af8
   RST_PUSH(0x5aee, 0x5aef);  // rst $10 (addAToHl)
@@ -8780,7 +8780,7 @@ void veranFinal_spiderForm_state3(GB *gb) {
 L_5b2d:
   I(0x5b2d, 2); L = 0x8f;  // ld l,$8f
   I(0x5b2f, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x5b31, objectSetVisible83, 0x1e72, 0x5b34);  // call $1e72
+  CALL(0x5b31, objectSetVisible83_hook, 0x1e72, 0x5b34);  // call $1e72
   CALL(0x5b34, veranFinal_spiderForm_resetCollisionData, 0x5c16, 0x5b37);  // call $5c16
   I(0x5b37, 3); veranFinal_spiderForm_initState2(gb); return;  // jr $5add
 }
@@ -8791,7 +8791,7 @@ void veranFinal_spiderForm_state3__gotoState2(GB *gb) {
 L_5b2d:
   I(0x5b2d, 2); L = 0x8f;  // ld l,$8f
   I(0x5b2f, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x5b31, objectSetVisible83, 0x1e72, 0x5b34);  // call $1e72
+  CALL(0x5b31, objectSetVisible83_hook, 0x1e72, 0x5b34);  // call $1e72
   CALL(0x5b34, veranFinal_spiderForm_resetCollisionData, 0x5c16, 0x5b37);  // call $5c16
   I(0x5b37, 3); veranFinal_spiderForm_initState2(gb); return;  // jr $5add
 }
@@ -8876,7 +8876,7 @@ L_5b74:
   I(0x5b7d, 2); L = 0xb8;  // ld l,$b8
   I(0x5b7f, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   CALL(0x5b81, veranFinal_spiderForm_setVulnerableCollisionData, 0x5c2d, 0x5b84);  // call $5c2d
-  I(0x5b84, 4); objectSetVisible81(gb); return;  // jp $1e60
+  I(0x5b84, 4); if (hook_enabled_at(0x1e60)) { objectSetVisible81_hook(gb); return; } HANDOFF(0x1e60);  // jp $1e60
 L_5b87:
   I(0x5b87, 2); E = 0xb8;  // ld e,$b8
   I(0x5b89, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -8908,7 +8908,7 @@ L_5ba5:
   I(0x5bad, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
   I(0x5baf, 2); L = 0x8f;  // ld l,$8f
   I(0x5bb1, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x5bb3, 4); objectSetInvisible(gb); return;  // jp $1e7b
+  I(0x5bb3, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp $1e7b
 L_5bb6:
   CALL(0x5bb6, ecom_decCounter1_b10, 0x439a, 0x5bb9);  // call $439a
   if (!(F & FZ)) { RET_TAKEN(0x5bb9); return; } I(0x5bb9, 2);  // ret nz
@@ -8929,7 +8929,7 @@ L_5bb6:
   I(0x5bcf, 2); C = 0x08;  // ld c,$08
   CALL(0x5bd1, ecom_setZAboveScreen_b10, 0x4446, 0x5bd4);  // call $4446
   CALL(0x5bd4, veranFinal_spiderForm_resetCollisionData, 0x5c16, 0x5bd7);  // call $5c16
-  I(0x5bd7, 4); objectSetVisible81(gb); return;  // jp $1e60
+  I(0x5bd7, 4); if (hook_enabled_at(0x1e60)) { objectSetVisible81_hook(gb); return; } HANDOFF(0x1e60);  // jp $1e60
 L_5bda:
   I(0x5bda, 2); C = 0x20;  // ld c,$20
   CALL(0x5bdc, objectUpdateSpeedZ_paramC, 0x1f46, 0x5bdf);  // call $1f46
@@ -8942,7 +8942,7 @@ L_5bda:
   CALL(0x5be8, playSound_b00, 0x0c98, 0x5beb);  // call $0c98
   I(0x5beb, 2); A = 0x5a;  // ld a,$5a
   CALL(0x5bed, setScreenShakeCounter, 0x24bb, 0x5bf0);  // call $24bb
-  I(0x5bf0, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x5bf0, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 L_5bf3:
   CALL(0x5bf3, ecom_decCounter1_b10, 0x439a, 0x5bf6);  // call $439a
   if (!(F & FZ)) { RET_TAKEN(0x5bf6); return; } I(0x5bf6, 2);  // ret nz
@@ -8960,7 +8960,7 @@ L_5b74:
   I(0x5b7d, 2); L = 0xb8;  // ld l,$b8
   I(0x5b7f, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   CALL(0x5b81, veranFinal_spiderForm_setVulnerableCollisionData, 0x5c2d, 0x5b84);  // call $5c2d
-  I(0x5b84, 4); objectSetVisible81(gb); return;  // jp $1e60
+  I(0x5b84, 4); if (hook_enabled_at(0x1e60)) { objectSetVisible81_hook(gb); return; } HANDOFF(0x1e60);  // jp $1e60
 }
 
 // 10:5b87
@@ -8997,7 +8997,7 @@ L_5ba5:
   I(0x5bad, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
   I(0x5baf, 2); L = 0x8f;  // ld l,$8f
   I(0x5bb1, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x5bb3, 4); objectSetInvisible(gb); return;  // jp $1e7b
+  I(0x5bb3, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp $1e7b
 }
 
 // 10:5bb6
@@ -9023,7 +9023,7 @@ L_5bb6:
   I(0x5bcf, 2); C = 0x08;  // ld c,$08
   CALL(0x5bd1, ecom_setZAboveScreen_b10, 0x4446, 0x5bd4);  // call $4446
   CALL(0x5bd4, veranFinal_spiderForm_resetCollisionData, 0x5c16, 0x5bd7);  // call $5c16
-  I(0x5bd7, 4); objectSetVisible81(gb); return;  // jp $1e60
+  I(0x5bd7, 4); if (hook_enabled_at(0x1e60)) { objectSetVisible81_hook(gb); return; } HANDOFF(0x1e60);  // jp $1e60
 }
 
 // 10:5bda
@@ -9041,7 +9041,7 @@ L_5bda:
   CALL(0x5be8, playSound_b00, 0x0c98, 0x5beb);  // call $0c98
   I(0x5beb, 2); A = 0x5a;  // ld a,$5a
   CALL(0x5bed, setScreenShakeCounter, 0x24bb, 0x5bf0);  // call $24bb
-  I(0x5bf0, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x5bf0, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:5bf3
@@ -9155,7 +9155,7 @@ void veranFinal_spiderForm_webAttack_updateLinkPosition(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x5c6e, 3); SET_HL(0xd000);  // ld hl,$d000
   I(0x5c71, 2); C = 0x00;  // ld c,$00
-  I(0x5c73, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x5c73, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 }
 
 // 10:5c76
@@ -9379,7 +9379,7 @@ L_5d8f:
   CALL(0x5d99, ecom_incState_b10, 0x4000, 0x5d9c);  // call $4000
   I(0x5d9c, 2); L = 0x86;  // ld l,$86
   I(0x5d9e, 3); mem_wr(gb, HL, 0x1e);  // ld (hl),$1e
-  I(0x5da0, 4); objectSetInvisible(gb); return;  // jp $1e7b
+  I(0x5da0, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp $1e7b
 }
 
 // 10:5da3
@@ -9392,7 +9392,7 @@ void veranFinal_beeForm_state5(GB *gb) {
   I(0x5daa, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x5dab, 2); L = 0x8b;  // ld l,$8b
   I(0x5dad, 3); mem_wr(gb, HL, 0x20);  // ld (hl),$20
-  CALL(0x5daf, getRandomNumber, 0x043e, 0x5db2);  // call $043e
+  CALL(0x5daf, getRandomNumber_hook, 0x043e, 0x5db2);  // call $043e
   I(0x5db2, 2); alu_and(gb, 0x10);  // and $10
   I(0x5db4, 3); SET_BC(0x08e8);  // ld bc,$08e8
   if ((F & FZ)) { I(0x5db7, 3); goto L_5dbc; } I(0x5db7, 2);  // jr z,$5dbc
@@ -9406,7 +9406,7 @@ L_5dbc:
   I(0x5dc3, 2); mem_wr(gb, HL, B);  // ld (hl),b
   I(0x5dc4, 2); L = 0xb7;  // ld l,$b7
   I(0x5dc6, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x5dc7, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x5dc7, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:5dca
@@ -9432,7 +9432,7 @@ L_5dd6:
   I(0x5deb, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x5ded, 2); L = 0xa4;  // ld l,$a4
   I(0x5def, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
-  I(0x5df1, 4); objectSetInvisible(gb); return;  // jp $1e7b
+  I(0x5df1, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp $1e7b
 }
 
 // 10:5df4
@@ -9442,7 +9442,7 @@ void veranFinal_beeForm_state7(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(0x5df7); return; } I(0x5df7, 2);  // ret nz
   CALL(0x5df8, veranFinal_getQuadrant, 0x6036, 0x5dfb);  // call $6036
 L_5dfb:
-  CALL(0x5dfb, getRandomNumber, 0x043e, 0x5dfe);  // call $043e
+  CALL(0x5dfb, getRandomNumber_hook, 0x043e, 0x5dfe);  // call $043e
   I(0x5dfe, 1); C = A;  // ld c,a
   I(0x5dff, 2); alu_and(gb, 0x03);  // and $03
   I(0x5e01, 1); alu_cp(gb, B);  // cp b
@@ -9474,7 +9474,7 @@ L_5dfb:
   CALL(0x5e25, ecom_incState_b10, 0x4000, 0x5e28);  // call $4000
   I(0x5e28, 2); L = 0xa4;  // ld l,$a4
   I(0x5e2a, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  I(0x5e2c, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x5e2c, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:5e2f
@@ -9529,7 +9529,7 @@ void veranFinal_beeForm_stateA(GB *gb) {
   I(0x5e66, 3); mem_wr(gb, HL, 0x1f);  // ld (hl),$1f
   I(0x5e68, 1); L = alu_inc8(gb, L);  // inc l
   I(0x5e69, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  CALL(0x5e6a, objectCopyPosition, 0x2242, 0x5e6d);  // call $2242
+  CALL(0x5e6a, objectCopyPosition_hook, 0x2242, 0x5e6d);  // call $2242
   I(0x5e6d, 2); A = 0xba;  // ld a,$ba
   CALL(0x5e6f, playSound_b00, 0x0c98, 0x5e72);  // call $0c98
   I(0x5e72, 3); veranFinal_beeForm_animate2(gb); return;  // jr $5e4c
@@ -9559,7 +9559,7 @@ void veranFinal_beeForm_stateB(GB *gb) {
   I(0x5e88, 3); mem_wr(gb, HL, 0x08);  // ld (hl),$08
   CALL(0x5e8a, veranFinal_getQuadrant, 0x6036, 0x5e8d);  // call $6036
 L_5e8d:
-  CALL(0x5e8d, getRandomNumber, 0x043e, 0x5e90);  // call $043e
+  CALL(0x5e8d, getRandomNumber_hook, 0x043e, 0x5e90);  // call $043e
   I(0x5e90, 2); alu_and(gb, 0x03);  // and $03
   I(0x5e92, 1); alu_cp(gb, B);  // cp b
   if ((F & FZ)) { I(0x5e93, 3); goto L_5e8d; } I(0x5e93, 2);  // jr z,$5e8d
@@ -9585,7 +9585,7 @@ L_5e8d:
 void veranFinal_beeForm_stateB__chooseQuadrant(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5e8d:
-  CALL(0x5e8d, getRandomNumber, 0x043e, 0x5e90);  // call $043e
+  CALL(0x5e8d, getRandomNumber_hook, 0x043e, 0x5e90);  // call $043e
   I(0x5e90, 2); alu_and(gb, 0x03);  // and $03
   I(0x5e92, 1); alu_cp(gb, B);  // cp b
   if ((F & FZ)) { I(0x5e93, 3); goto L_5e8d; } I(0x5e93, 2);  // jr z,$5e8d
@@ -9621,7 +9621,7 @@ void veranFinal_transformToBeeOrSpider(GB *gb) {
   I(0x5ec8, 2); A = 0x07;  // ld a,$07
   I(0x5eca, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x5ecb, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x5ecc, getRandomNumber_noPreserveVars, 0x0453, 0x5ecf);  // call $0453
+  CALL(0x5ecc, getRandomNumber_noPreserveVars_hook, 0x0453, 0x5ecf);  // call $0453
   I(0x5ecf, 2); alu_and(gb, 0x03);  // and $03
   I(0x5ed1, 1); B = A;  // ld b,a
   I(0x5ed2, 2); E = 0xb5;  // ld e,$b5
@@ -9635,7 +9635,7 @@ void veranFinal_transformToBeeOrSpider(GB *gb) {
   I(0x5edc, 1); alu_add(gb, A);  // add a
   I(0x5edd, 1); alu_add(gb, B);  // add b
   I(0x5ede, 3); SET_HL(0x5ef6);  // ld hl,$5ef6
-  CALL(0x5ee1, checkFlag, 0x0205, 0x5ee4);  // call $0205
+  CALL(0x5ee1, checkFlag_hook, 0x0205, 0x5ee4);  // call $0205
   if ((F & FZ)) { I(0x5ee4, 3); goto L_5ee8; } I(0x5ee4, 2);  // jr z,$5ee8
   I(0x5ee6, 2); A = 0x01;  // ld a,$01
 L_5ee8:
@@ -9939,7 +9939,7 @@ L_5f9a:
   if ((F & FC)) { I(0x5f9f, 3); goto L_5fa3; } I(0x5f9f, 2);  // jr c,$5fa3
   I(0x5fa1, 2); B = (uint8_t)(B | (1 << 3));  // set 3,b
 L_5fa3:
-  CALL(0x5fa3, getRandomNumber, 0x043e, 0x5fa6);  // call $043e
+  CALL(0x5fa3, getRandomNumber_hook, 0x043e, 0x5fa6);  // call $043e
   I(0x5fa6, 2); alu_and(gb, 0x07);  // and $07
   I(0x5fa8, 1); alu_add(gb, B);  // add b
   I(0x5fa9, 3); SET_HL(0x5fb2);  // ld hl,$5fb2
@@ -10117,7 +10117,7 @@ L_606f:
   I(0x6090, 2); A = 0x3c;  // ld a,$3c
 L_6092:
   CALL(0x6092, ecom_setSpeedAndState8_b10, 0x4364, 0x6095);  // call $4364
-  I(0x6095, 4); objectSetVisiblec0(gb); return;  // jp $1e33
+  I(0x6095, 4); if (hook_enabled_at(0x1e33)) { objectSetVisiblec0_hook(gb); return; } HANDOFF(0x1e33);  // jp $1e33
 L_6098:
   I(0x6098, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x6099, 2); alu_add(gb, 0x02);  // add $02
@@ -10186,7 +10186,7 @@ L_606f:
   I(0x6090, 2); A = 0x3c;  // ld a,$3c
 L_6092:
   CALL(0x6092, ecom_setSpeedAndState8_b10, 0x4364, 0x6095);  // call $4364
-  I(0x6095, 4); objectSetVisiblec0(gb); return;  // jp $1e33
+  I(0x6095, 4); if (hook_enabled_at(0x1e33)) { objectSetVisiblec0_hook(gb); return; } HANDOFF(0x1e33);  // jp $1e33
 }
 
 // 10:6092
@@ -10194,7 +10194,7 @@ void ramrockArm_state0__commonInit(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6092:
   CALL(0x6092, ecom_setSpeedAndState8_b10, 0x4364, 0x6095);  // call $4364
-  I(0x6095, 4); objectSetVisiblec0(gb); return;  // jp $1e33
+  I(0x6095, 4); if (hook_enabled_at(0x1e33)) { objectSetVisiblec0_hook(gb); return; } HANDOFF(0x1e33);  // jp $1e33
 }
 
 // 10:6098
@@ -10203,7 +10203,7 @@ void ramrockArm_state0__initSubid2(GB *gb) {
   goto L_6098;
 L_6092:
   CALL(0x6092, ecom_setSpeedAndState8_b10, 0x4364, 0x6095);  // call $4364
-  I(0x6095, 4); objectSetVisiblec0(gb); return;  // jp $1e33
+  I(0x6095, 4); if (hook_enabled_at(0x1e33)) { objectSetVisiblec0_hook(gb); return; } HANDOFF(0x1e33);  // jp $1e33
 L_6098:
   I(0x6098, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x6099, 2); alu_add(gb, 0x02);  // add $02
@@ -10220,7 +10220,7 @@ void ramrockArm_state0__initSubid4(GB *gb) {
   goto L_60a7;
 L_6092:
   CALL(0x6092, ecom_setSpeedAndState8_b10, 0x4364, 0x6095);  // call $4364
-  I(0x6095, 4); objectSetVisiblec0(gb); return;  // jp $1e33
+  I(0x6095, 4); if (hook_enabled_at(0x1e33)) { objectSetVisiblec0_hook(gb); return; } HANDOFF(0x1e33);  // jp $1e33
 L_60a7:
   I(0x60a7, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x60a8, 2); alu_sub(gb, 0x04);  // sub $04
@@ -10672,7 +10672,7 @@ L_62c9:
   PUSH(0x62ce, HL);  // push hl
   CALL(0x62cf, ramrockArm_setRelativePosition, 0x63b0, 0x62d2);  // call $63b0
   SET_HL(POP(0x62d2));  // pop hl
-  CALL(0x62d3, objectCopyPosition, 0x2242, 0x62d6);  // call $2242
+  CALL(0x62d3, objectCopyPosition_hook, 0x2242, 0x62d6);  // call $2242
   I(0x62d6, 2); E = 0x82;  // ld e,$82
   I(0x62d8, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x62d9, 1); A = alu_dec8(gb, A);  // dec a
@@ -10735,7 +10735,7 @@ L_62c9:
   PUSH(0x62ce, HL);  // push hl
   CALL(0x62cf, ramrockArm_setRelativePosition, 0x63b0, 0x62d2);  // call $63b0
   SET_HL(POP(0x62d2));  // pop hl
-  CALL(0x62d3, objectCopyPosition, 0x2242, 0x62d6);  // call $2242
+  CALL(0x62d3, objectCopyPosition_hook, 0x2242, 0x62d6);  // call $2242
   I(0x62d6, 2); E = 0x82;  // ld e,$82
   I(0x62d8, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x62d9, 1); A = alu_dec8(gb, A);  // dec a
@@ -10755,7 +10755,7 @@ L_62c9:
   PUSH(0x62ce, HL);  // push hl
   CALL(0x62cf, ramrockArm_setRelativePosition, 0x63b0, 0x62d2);  // call $63b0
   SET_HL(POP(0x62d2));  // pop hl
-  CALL(0x62d3, objectCopyPosition, 0x2242, 0x62d6);  // call $2242
+  CALL(0x62d3, objectCopyPosition_hook, 0x2242, 0x62d6);  // call $2242
   I(0x62d6, 2); E = 0x82;  // ld e,$82
   I(0x62d8, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x62d9, 1); A = alu_dec8(gb, A);  // dec a
@@ -11082,7 +11082,7 @@ void veranFairy_state0(GB *gb) {
   I(0x6462, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
   I(0x6463, 2); A = 0x02;  // ld a,$02
   CALL(0x6465, enemySetAnimation, 0x282b, 0x6468);  // call $282b
-  I(0x6468, 4); objectSetVisible82(gb); return;  // jp $1e69
+  I(0x6468, 4); if (hook_enabled_at(0x1e69)) { objectSetVisible82_hook(gb); return; } HANDOFF(0x1e69);  // jp $1e69
 }
 
 // 10:646b
@@ -11101,7 +11101,7 @@ L_6488:
   I(0x648e, 3); mem_wr(gb, HL, 0x08);  // ld (hl),$08
   I(0x6490, 1); L = E;  // ld l,e
   I(0x6491, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x6492, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x6492, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 L_6495:
   CALL(0x6495, ecom_decCounter1_b10, 0x439a, 0x6498);  // call $439a
   if (!(F & FZ)) { RET_TAKEN(0x6498); return; } I(0x6498, 2);  // ret nz
@@ -11128,7 +11128,7 @@ L_64b7:
   if (!(F & FZ)) { RET_TAKEN(0x64ba); return; } I(0x64ba, 2);  // ret nz
   I(0x64bb, 3); mem_wr(gb, HL, 0x27);  // ld (hl),$27
   I(0x64bd, 2); L = 0xcb;  // ld l,$cb
-  I(0x64bf, 4); setShortPosition_paramC(gb); return;  // jp $20b9
+  I(0x64bf, 4); if (hook_enabled_at(0x20b9)) { setShortPosition_paramC_hook(gb); return; } HANDOFF(0x20b9);  // jp $20b9
 L_64c2:
   I(0x64c2, 2); C = 0x7b;  // ld c,$7b
   I(0x64c4, 3); goto L_64af;  // jr $64af
@@ -11175,7 +11175,7 @@ L_6507:
   if (!(F & FZ)) { I(0x650d, 3); goto L_6516; } I(0x650d, 2);  // jr nz,$6516
   I(0x650f, 3); mem_wr(gb, HL, 0x64);  // ld (hl),$64
   I(0x6511, 2); L = 0x8b;  // ld l,$8b
-  CALL(0x6513, setShortPosition_paramC, 0x20b9, 0x6516);  // call $20b9
+  CALL(0x6513, setShortPosition_paramC_hook, 0x20b9, 0x6516);  // call $20b9
 L_6516:
   SET_HL(POP(0x6516));  // pop hl
   I(0x6517, 1); B = alu_dec8(gb, B);  // dec b
@@ -11189,7 +11189,7 @@ L_6516:
   I(0x6525, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x6526, 2); L = 0x8f;  // ld l,$8f
   I(0x6528, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  CALL(0x6529, objectSetVisible83, 0x1e72, 0x652c);  // call $1e72
+  CALL(0x6529, objectSetVisible83_hook, 0x1e72, 0x652c);  // call $1e72
   I(0x652c, 2); A = 0x05;  // ld a,$05
   CALL(0x652e, enemySetAnimation, 0x282b, 0x6531);  // call $282b
   I(0x6531, 2); A = 0x04;  // ld a,$04
@@ -11222,7 +11222,7 @@ L_6488:
   I(0x648e, 3); mem_wr(gb, HL, 0x08);  // ld (hl),$08
   I(0x6490, 1); L = E;  // ld l,e
   I(0x6491, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x6492, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x6492, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:6495
@@ -11264,7 +11264,7 @@ L_64b7:
   if (!(F & FZ)) { RET_TAKEN(0x64ba); return; } I(0x64ba, 2);  // ret nz
   I(0x64bb, 3); mem_wr(gb, HL, 0x27);  // ld (hl),$27
   I(0x64bd, 2); L = 0xcb;  // ld l,$cb
-  I(0x64bf, 4); setShortPosition_paramC(gb); return;  // jp $20b9
+  I(0x64bf, 4); if (hook_enabled_at(0x20b9)) { setShortPosition_paramC_hook(gb); return; } HANDOFF(0x20b9);  // jp $20b9
 }
 
 // 10:64af
@@ -11281,7 +11281,7 @@ L_64b7:
   if (!(F & FZ)) { RET_TAKEN(0x64ba); return; } I(0x64ba, 2);  // ret nz
   I(0x64bb, 3); mem_wr(gb, HL, 0x27);  // ld (hl),$27
   I(0x64bd, 2); L = 0xcb;  // ld l,$cb
-  I(0x64bf, 4); setShortPosition_paramC(gb); return;  // jp $20b9
+  I(0x64bf, 4); if (hook_enabled_at(0x20b9)) { setShortPosition_paramC_hook(gb); return; } HANDOFF(0x20b9);  // jp $20b9
 }
 
 // 10:64b7
@@ -11292,7 +11292,7 @@ L_64b7:
   if (!(F & FZ)) { RET_TAKEN(0x64ba); return; } I(0x64ba, 2);  // ret nz
   I(0x64bb, 3); mem_wr(gb, HL, 0x27);  // ld (hl),$27
   I(0x64bd, 2); L = 0xcb;  // ld l,$cb
-  I(0x64bf, 4); setShortPosition_paramC(gb); return;  // jp $20b9
+  I(0x64bf, 4); if (hook_enabled_at(0x20b9)) { setShortPosition_paramC_hook(gb); return; } HANDOFF(0x20b9);  // jp $20b9
 }
 
 // 10:64c2
@@ -11310,7 +11310,7 @@ L_64b7:
   if (!(F & FZ)) { RET_TAKEN(0x64ba); return; } I(0x64ba, 2);  // ret nz
   I(0x64bb, 3); mem_wr(gb, HL, 0x27);  // ld (hl),$27
   I(0x64bd, 2); L = 0xcb;  // ld l,$cb
-  I(0x64bf, 4); setShortPosition_paramC(gb); return;  // jp $20b9
+  I(0x64bf, 4); if (hook_enabled_at(0x20b9)) { setShortPosition_paramC_hook(gb); return; } HANDOFF(0x20b9);  // jp $20b9
 L_64c2:
   I(0x64c2, 2); C = 0x7b;  // ld c,$7b
   I(0x64c4, 3); goto L_64af;  // jr $64af
@@ -11331,7 +11331,7 @@ L_64b7:
   if (!(F & FZ)) { RET_TAKEN(0x64ba); return; } I(0x64ba, 2);  // ret nz
   I(0x64bb, 3); mem_wr(gb, HL, 0x27);  // ld (hl),$27
   I(0x64bd, 2); L = 0xcb;  // ld l,$cb
-  I(0x64bf, 4); setShortPosition_paramC(gb); return;  // jp $20b9
+  I(0x64bf, 4); if (hook_enabled_at(0x20b9)) { setShortPosition_paramC_hook(gb); return; } HANDOFF(0x20b9);  // jp $20b9
 L_64c6:
   I(0x64c6, 2); C = 0x55;  // ld c,$55
   I(0x64c8, 3); goto L_64af;  // jr $64af
@@ -11352,7 +11352,7 @@ L_64b7:
   if (!(F & FZ)) { RET_TAKEN(0x64ba); return; } I(0x64ba, 2);  // ret nz
   I(0x64bb, 3); mem_wr(gb, HL, 0x27);  // ld (hl),$27
   I(0x64bd, 2); L = 0xcb;  // ld l,$cb
-  I(0x64bf, 4); setShortPosition_paramC(gb); return;  // jp $20b9
+  I(0x64bf, 4); if (hook_enabled_at(0x20b9)) { setShortPosition_paramC_hook(gb); return; } HANDOFF(0x20b9);  // jp $20b9
 L_64ca:
   I(0x64ca, 2); C = 0x3b;  // ld c,$3b
   I(0x64cc, 3); goto L_64af;  // jr $64af
@@ -11373,7 +11373,7 @@ L_64b7:
   if (!(F & FZ)) { RET_TAKEN(0x64ba); return; } I(0x64ba, 2);  // ret nz
   I(0x64bb, 3); mem_wr(gb, HL, 0x27);  // ld (hl),$27
   I(0x64bd, 2); L = 0xcb;  // ld l,$cb
-  I(0x64bf, 4); setShortPosition_paramC(gb); return;  // jp $20b9
+  I(0x64bf, 4); if (hook_enabled_at(0x20b9)) { setShortPosition_paramC_hook(gb); return; } HANDOFF(0x20b9);  // jp $20b9
 L_64ce:
   I(0x64ce, 2); C = 0x73;  // ld c,$73
   I(0x64d0, 3); goto L_64af;  // jr $64af
@@ -11456,7 +11456,7 @@ L_6507:
   if (!(F & FZ)) { I(0x650d, 3); goto L_6516; } I(0x650d, 2);  // jr nz,$6516
   I(0x650f, 3); mem_wr(gb, HL, 0x64);  // ld (hl),$64
   I(0x6511, 2); L = 0x8b;  // ld l,$8b
-  CALL(0x6513, setShortPosition_paramC, 0x20b9, 0x6516);  // call $20b9
+  CALL(0x6513, setShortPosition_paramC_hook, 0x20b9, 0x6516);  // call $20b9
 L_6516:
   SET_HL(POP(0x6516));  // pop hl
   I(0x6517, 1); B = alu_dec8(gb, B);  // dec b
@@ -11470,7 +11470,7 @@ L_6516:
   I(0x6525, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x6526, 2); L = 0x8f;  // ld l,$8f
   I(0x6528, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  CALL(0x6529, objectSetVisible83, 0x1e72, 0x652c);  // call $1e72
+  CALL(0x6529, objectSetVisible83_hook, 0x1e72, 0x652c);  // call $1e72
   I(0x652c, 2); A = 0x05;  // ld a,$05
   CALL(0x652e, enemySetAnimation, 0x282b, 0x6531);  // call $282b
   I(0x6531, 2); A = 0x04;  // ld a,$04
@@ -11491,7 +11491,7 @@ L_6507:
   if (!(F & FZ)) { I(0x650d, 3); goto L_6516; } I(0x650d, 2);  // jr nz,$6516
   I(0x650f, 3); mem_wr(gb, HL, 0x64);  // ld (hl),$64
   I(0x6511, 2); L = 0x8b;  // ld l,$8b
-  CALL(0x6513, setShortPosition_paramC, 0x20b9, 0x6516);  // call $20b9
+  CALL(0x6513, setShortPosition_paramC_hook, 0x20b9, 0x6516);  // call $20b9
 L_6516:
   SET_HL(POP(0x6516));  // pop hl
   I(0x6517, 1); B = alu_dec8(gb, B);  // dec b
@@ -11505,7 +11505,7 @@ L_6516:
   I(0x6525, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x6526, 2); L = 0x8f;  // ld l,$8f
   I(0x6528, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  CALL(0x6529, objectSetVisible83, 0x1e72, 0x652c);  // call $1e72
+  CALL(0x6529, objectSetVisible83_hook, 0x1e72, 0x652c);  // call $1e72
   I(0x652c, 2); A = 0x05;  // ld a,$05
   CALL(0x652e, enemySetAnimation, 0x282b, 0x6531);  // call $282b
   I(0x6531, 2); A = 0x04;  // ld a,$04
@@ -11523,7 +11523,7 @@ L_6507:
   if (!(F & FZ)) { I(0x650d, 3); goto L_6516; } I(0x650d, 2);  // jr nz,$6516
   I(0x650f, 3); mem_wr(gb, HL, 0x64);  // ld (hl),$64
   I(0x6511, 2); L = 0x8b;  // ld l,$8b
-  CALL(0x6513, setShortPosition_paramC, 0x20b9, 0x6516);  // call $20b9
+  CALL(0x6513, setShortPosition_paramC_hook, 0x20b9, 0x6516);  // call $20b9
 L_6516:
   SET_HL(POP(0x6516));  // pop hl
   I(0x6517, 1); B = alu_dec8(gb, B);  // dec b
@@ -11537,7 +11537,7 @@ L_6516:
   I(0x6525, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x6526, 2); L = 0x8f;  // ld l,$8f
   I(0x6528, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  CALL(0x6529, objectSetVisible83, 0x1e72, 0x652c);  // call $1e72
+  CALL(0x6529, objectSetVisible83_hook, 0x1e72, 0x652c);  // call $1e72
   I(0x652c, 2); A = 0x05;  // ld a,$05
   CALL(0x652e, enemySetAnimation, 0x282b, 0x6531);  // call $282b
   I(0x6531, 2); A = 0x04;  // ld a,$04
@@ -11594,7 +11594,7 @@ L_654b:
 // 10:6556
 void veranFairy_state2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6556, getRandomNumber_noPreserveVars, 0x0453, 0x6559);  // call $0453
+  CALL(0x6556, getRandomNumber_noPreserveVars_hook, 0x0453, 0x6559);  // call $0453
   I(0x6559, 2); alu_and(gb, 0x07);  // and $07
   I(0x655b, 1); B = A;  // ld b,a
   I(0x655c, 2); E = 0xb5;  // ld e,$b5
@@ -11615,7 +11615,7 @@ void veranFairy_state2(GB *gb) {
   I(0x6572, 2); L = 0xb6;  // ld l,$b6
   I(0x6574, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
 L_6576:
-  CALL(0x6576, getRandomNumber, 0x043e, 0x6579);  // call $043e
+  CALL(0x6576, getRandomNumber_hook, 0x043e, 0x6579);  // call $043e
   I(0x6579, 2); alu_and(gb, 0x03);  // and $03
   I(0x657b, 2); L = 0xb0;  // ld l,$b0
   I(0x657d, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
@@ -11735,7 +11735,7 @@ L_65f0:
   if (!(F & FZ)) { I(0x65f3, 4); ecom_flickerVisibility_b10(gb); return; } I(0x65f3, 3);  // jp nz,$441f
   I(0x65f6, 1); L = E;  // ld l,e
   I(0x65f7, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x65f8, 4); objectSetVisible82(gb); return;  // jp $1e69
+  I(0x65f8, 4); if (hook_enabled_at(0x1e69)) { objectSetVisible82_hook(gb); return; } HANDOFF(0x1e69);  // jp $1e69
 L_65fb:
   CALL(0x65fb, ecom_incSubstate_b10, 0x4005, 0x65fe);  // call $4005
   I(0x65fe, 2); L = 0x87;  // ld l,$87
@@ -11767,7 +11767,7 @@ L_6608:
   I(0x6628, 3); mem_wr(gb, HL, 0x56);  // ld (hl),$56
   I(0x662a, 2); L = 0x43;  // ld l,$43
   I(0x662c, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x662d, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x662d, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 L_6630:
   I(0x6630, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x6633, 1); alu_or(gb, A);  // or a
@@ -11787,7 +11787,7 @@ L_65f0:
   if (!(F & FZ)) { I(0x65f3, 4); ecom_flickerVisibility_b10(gb); return; } I(0x65f3, 3);  // jp nz,$441f
   I(0x65f6, 1); L = E;  // ld l,e
   I(0x65f7, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x65f8, 4); objectSetVisible82(gb); return;  // jp $1e69
+  I(0x65f8, 4); if (hook_enabled_at(0x1e69)) { objectSetVisible82_hook(gb); return; } HANDOFF(0x1e69);  // jp $1e69
 }
 
 // 10:65fb
@@ -11829,7 +11829,7 @@ L_6608:
   I(0x6628, 3); mem_wr(gb, HL, 0x56);  // ld (hl),$56
   I(0x662a, 2); L = 0x43;  // ld l,$43
   I(0x662c, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x662d, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x662d, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 L_6630:
   I(0x6630, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x6633, 1); alu_or(gb, A);  // or a
@@ -11858,10 +11858,10 @@ L_6630:
 // 10:6698
 void veranFairy_checkLoopAroundScreen(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6698, objectGetShortPosition, 0x2096, 0x669b);  // call $2096
+  CALL(0x6698, objectGetShortPosition_hook, 0x2096, 0x669b);  // call $2096
   I(0x669b, 1); E = A;  // ld e,a
   I(0x669c, 3); SET_HL(0x66b4);  // ld hl,$66b4
-  CALL(0x669f, lookupKey, 0x1e06, 0x66a2);  // call $1e06
+  CALL(0x669f, lookupKey_hook, 0x1e06, 0x66a2);  // call $1e06
   if (!(F & FC)) { RET_TAKEN(0x66a2); return; } I(0x66a2, 2);  // ret nc
   I(0x66a3, 3); SET_HL(0x66c9);  // ld hl,$66c9
   RST_PUSH(0x66a6, 0x66a7);  // rst $10 (addAToHl)
@@ -12004,7 +12004,7 @@ void attack0(GB *gb) {
   I(0x66fd, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x66fe, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x66ff, 3); goto L_671f; } I(0x66ff, 2);  // jr nz,$671f
-  CALL(0x6701, getRandomNumber_noPreserveVars, 0x0453, 0x6704);  // call $0453
+  CALL(0x6701, getRandomNumber_noPreserveVars_hook, 0x0453, 0x6704);  // call $0453
   I(0x6704, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x6706, 1); B = A;  // ld b,a
   I(0x6707, 1); H = D;  // ld h,d
@@ -12126,7 +12126,7 @@ void attack1(GB *gb) {
   if (!(F & FZ)) { I(0x6751, 3); goto L_677d; } I(0x6751, 2);  // jr nz,$677d
   CALL(0x6753, veranFairy_checkWithinBoundary, 0x67be, 0x6756);  // call $67be
   if (!(F & FC)) { RET_TAKEN(0x6756); return; } I(0x6756, 2);  // ret nc
-  CALL(0x6757, getRandomNumber_noPreserveVars, 0x0453, 0x675a);  // call $0453
+  CALL(0x6757, getRandomNumber_noPreserveVars_hook, 0x0453, 0x675a);  // call $0453
   I(0x675a, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x675c, 1); B = A;  // ld b,a
   I(0x675d, 1); H = D;  // ld h,d
@@ -12257,7 +12257,7 @@ void ramrock_state0(GB *gb) {
   I(0x67fd, 2); B = 0x00;  // ld b,$00
   I(0x67ff, 2); C = 0x0c;  // ld c,$0c
   CALL(0x6801, enemyBoss_spawnShadow_b10, 0x4534, 0x6804);  // call $4534
-  I(0x6804, 4); objectSetVisible81(gb); return;  // jp $1e60
+  I(0x6804, 4); if (hook_enabled_at(0x1e60)) { objectSetVisible81_hook(gb); return; } HANDOFF(0x1e60);  // jp $1e60
 }
 
 // 10:6807
@@ -12956,7 +12956,7 @@ void ramrock_seedPhase_substate2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x6ab9, enemyAnimate, 0x2818, 0x6abc);  // call $2818
   CALL(0x6abc, ramrock_updateHorizontalMovement, 0x6c3f, 0x6abf);  // call $6c3f
-  CALL(0x6abf, getRandomNumber, 0x043e, 0x6ac2);  // call $043e
+  CALL(0x6abf, getRandomNumber_hook, 0x043e, 0x6ac2);  // call $043e
   I(0x6ac2, 1); alu_rrca(gb);  // rrca
   if (!(F & FC)) { RET_TAKEN(0x6ac3); return; } I(0x6ac3, 2);  // ret nc
   CALL(0x6ac4, ecom_decCounter2_b10, 0x43a3, 0x6ac7);  // call $43a3
@@ -12965,7 +12965,7 @@ void ramrock_seedPhase_substate2(GB *gb) {
   I(0x6aca, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x6acb, 2); alu_cp(gb, 0x0c);  // cp $0c
   if (!(F & FZ)) { RET_TAKEN(0x6acd); return; } I(0x6acd, 2);  // ret nz
-  CALL(0x6ace, getRandomNumber, 0x043e, 0x6ad1);  // call $043e
+  CALL(0x6ace, getRandomNumber_hook, 0x043e, 0x6ad1);  // call $043e
   I(0x6ad1, 2); alu_and(gb, 0x03);  // and $03
   I(0x6ad3, 1); L = E;  // ld l,e
   if ((F & FZ)) { I(0x6ad4, 3); goto L_6aed; } I(0x6ad4, 2);  // jr z,$6aed
@@ -12977,7 +12977,7 @@ void ramrock_seedPhase_substate2(GB *gb) {
   I(0x6ae0, 2); B = 0x4f;  // ld b,$4f
   CALL(0x6ae2, ecom_spawnProjectile_b10, 0x437c, 0x6ae5);  // call $437c
   I(0x6ae5, 3); SET_BC(0x1000);  // ld bc,$1000
-  CALL(0x6ae8, objectCopyPositionWithOffset, 0x225a, 0x6aeb);  // call $225a
+  CALL(0x6ae8, objectCopyPositionWithOffset_hook, 0x225a, 0x6aeb);  // call $225a
   I(0x6aeb, 3); goto L_6af6;  // jr $6af6
 L_6aed:
   I(0x6aed, 3); mem_wr(gb, HL, 0x0e);  // ld (hl),$0e
@@ -13029,7 +13029,7 @@ void ramrock_seedPhase_substate3(GB *gb) {
   I(0x6b15, 2); L = 0xc2;  // ld l,$c2
   I(0x6b17, 3); mem_wr(gb, HL, 0x0e);  // ld (hl),$0e
   I(0x6b19, 3); SET_BC(0x0400);  // ld bc,$0400
-  I(0x6b1c, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x6b1c, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 }
 
 // 10:6b1f
@@ -13127,7 +13127,7 @@ L_6b7d:
   PUSH(0x6b87, BC);  // push bc
   I(0x6b88, 1); C = B;  // ld c,b
   I(0x6b89, 2); B = 0x18;  // ld b,$18
-  CALL(0x6b8b, objectCopyPositionWithOffset, 0x225a, 0x6b8e);  // call $225a
+  CALL(0x6b8b, objectCopyPositionWithOffset_hook, 0x225a, 0x6b8e);  // call $225a
   SET_BC(POP(0x6b8e));  // pop bc
   I(0x6b8f, 1); C = alu_dec8(gb, C);  // dec c
   I(0x6b90, 2); A = 0x04;  // ld a,$04
@@ -13157,7 +13157,7 @@ L_6b7d:
   PUSH(0x6b87, BC);  // push bc
   I(0x6b88, 1); C = B;  // ld c,b
   I(0x6b89, 2); B = 0x18;  // ld b,$18
-  CALL(0x6b8b, objectCopyPositionWithOffset, 0x225a, 0x6b8e);  // call $225a
+  CALL(0x6b8b, objectCopyPositionWithOffset_hook, 0x225a, 0x6b8e);  // call $225a
   SET_BC(POP(0x6b8e));  // pop bc
   I(0x6b8f, 1); C = alu_dec8(gb, C);  // dec c
   I(0x6b90, 2); A = 0x04;  // ld a,$04
@@ -13250,11 +13250,11 @@ void ramrock_glovePhase_substate3(GB *gb) {
   I(0x6c0b, 2); L = 0x82;  // ld l,$82
   I(0x6c0d, 2); A = 0x12;  // ld a,$12
   I(0x6c0f, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  CALL(0x6c10, getRandomNumber, 0x043e, 0x6c13);  // call $043e
+  CALL(0x6c10, getRandomNumber_hook, 0x043e, 0x6c13);  // call $043e
   I(0x6c13, 2); alu_and(gb, 0x01);  // and $01
   I(0x6c15, 2); A = alu_swap(gb, A);  // swap a
   I(0x6c17, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x6c18, getRandomNumber, 0x043e, 0x6c1b);  // call $043e
+  CALL(0x6c18, getRandomNumber_hook, 0x043e, 0x6c1b);  // call $043e
   I(0x6c1b, 2); alu_and(gb, 0x0f);  // and $0f
   if (!(F & FZ)) { I(0x6c1d, 3); goto L_6c21; } I(0x6c1d, 2);  // jr nz,$6c21
   I(0x6c1f, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 5)));  // set 5,(hl)
@@ -13443,7 +13443,7 @@ void kingMoblinMinion_state0(GB *gb) {
   I(0x6cc6, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x6cc7, 2); A = 0x02;  // ld a,$02
   CALL(0x6cc9, enemySetAnimation, 0x282b, 0x6ccc);  // call $282b
-  I(0x6ccc, 4); objectSetVisiblec2(gb); return;  // jp $1e45
+  I(0x6ccc, 4); if (hook_enabled_at(0x1e45)) { objectSetVisiblec2_hook(gb); return; } HANDOFF(0x1e45);  // jp $1e45
 }
 
 // 10:6ccf
@@ -14866,7 +14866,7 @@ L_706b:
   I(0x706e, 2); A = 0x30;  // ld a,$30
   CALL(0x7070, interactionSetHighTextIndex, 0x253b, 0x7073);  // call $253b
   CALL(0x7073, interactionSetAlwaysUpdateBit, 0x2701, 0x7076);  // call $2701
-  CALL(0x7076, interactionIncState, 0x23e0, 0x7079);  // call $23e0
+  CALL(0x7076, interactionIncState_hook, 0x23e0, 0x7079);  // call $23e0
   I(0x7079, 2); A = 0x06;  // ld a,$06
   CALL(0x707b, objectSetCollideRadius, 0x24a1, 0x707e);  // call $24a1
   I(0x707e, 2); E = 0x42;  // ld e,$42
@@ -14895,7 +14895,7 @@ L_706b:
   I(0x706e, 2); A = 0x30;  // ld a,$30
   CALL(0x7070, interactionSetHighTextIndex, 0x253b, 0x7073);  // call $253b
   CALL(0x7073, interactionSetAlwaysUpdateBit, 0x2701, 0x7076);  // call $2701
-  CALL(0x7076, interactionIncState, 0x23e0, 0x7079);  // call $23e0
+  CALL(0x7076, interactionIncState_hook, 0x23e0, 0x7079);  // call $23e0
   I(0x7079, 2); A = 0x06;  // ld a,$06
   CALL(0x707b, objectSetCollideRadius, 0x24a1, 0x707e);  // call $24a1
   I(0x707e, 2); E = 0x42;  // ld e,$42
@@ -14938,9 +14938,9 @@ L_7110:
   I(0x7113, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x7114); return; } I(0x7114, 2);  // ret nz
   CALL(0x7115, incCbc2, 0x3067, 0x7118);  // call $3067
-  CALL(0x7118, disableLcd, 0x02c1, 0x711b);  // call $02c1
+  CALL(0x7118, disableLcd_hook, 0x02c1, 0x711b);  // call $02c1
   CALL(0x711b, clearDynamicInteractions, 0x35d2, 0x711e);  // call $35d2
-  CALL(0x711e, clearOam, 0x049f, 0x7121);  // call $049f
+  CALL(0x711e, clearOam_hook, 0x049f, 0x7121);  // call $049f
   I(0x7121, 1); alu_xor(gb, A);  // xor a
   I(0x7122, 4); mem_wr(gb, 0xcfde, A);  // ld ($cfde),a
   I(0x7125, 2); A = 0x95;  // ld a,$95
@@ -14970,9 +14970,9 @@ L_7146:
   I(0x7153, 4); incCbc2(gb); return;  // jp $3067
 L_7156:
   I(0x7156, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
-  CALL(0x7159, decHlRef16WithCap, 0x0237, 0x715c);  // call $0237
+  CALL(0x7159, decHlRef16WithCap_hook, 0x0237, 0x715c);  // call $0237
   if (!(F & FZ)) { RET_TAKEN(0x715c); return; } I(0x715c, 2);  // ret nz
-  CALL(0x715d, checkIsLinkedGame, 0x1992, 0x7160);  // call $1992
+  CALL(0x715d, checkIsLinkedGame_hook, 0x1992, 0x7160);  // call $1992
   if (!(F & FZ)) { I(0x7160, 3); goto L_7174; } I(0x7160, 2);  // jr nz,$7174
   I(0x7162, 3); SET_HL(0x6086);  // ld hl,$6086
   I(0x7165, 2); E = 0x03;  // ld e,$03
@@ -15030,7 +15030,7 @@ L_71c4:
   I(0x71c7, 2); B = 0x01;  // ld b,$01
   CALL(0x71c9, flashScreen, 0x2d73, 0x71cc);  // call $2d73
   if ((F & FZ)) { RET_TAKEN(0x71cc); return; } I(0x71cc, 2);  // ret z
-  CALL(0x71cd, disableLcd, 0x02c1, 0x71d0);  // call $02c1
+  CALL(0x71cd, disableLcd_hook, 0x02c1, 0x71d0);  // call $02c1
   I(0x71d0, 2); A = 0x9a;  // ld a,$9a
   CALL(0x71d2, loadGfxHeader, 0x0626, 0x71d5);  // call $0626
   I(0x71d5, 2); A = 0x9f;  // ld a,$9f
@@ -15142,9 +15142,9 @@ L_7110:
   I(0x7113, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x7114); return; } I(0x7114, 2);  // ret nz
   CALL(0x7115, incCbc2, 0x3067, 0x7118);  // call $3067
-  CALL(0x7118, disableLcd, 0x02c1, 0x711b);  // call $02c1
+  CALL(0x7118, disableLcd_hook, 0x02c1, 0x711b);  // call $02c1
   CALL(0x711b, clearDynamicInteractions, 0x35d2, 0x711e);  // call $35d2
-  CALL(0x711e, clearOam, 0x049f, 0x7121);  // call $049f
+  CALL(0x711e, clearOam_hook, 0x049f, 0x7121);  // call $049f
   I(0x7121, 1); alu_xor(gb, A);  // xor a
   I(0x7122, 4); mem_wr(gb, 0xcfde, A);  // ld ($cfde),a
   I(0x7125, 2); A = 0x95;  // ld a,$95
@@ -15184,9 +15184,9 @@ void agesFunc_10_70f6__substate2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7156:
   I(0x7156, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
-  CALL(0x7159, decHlRef16WithCap, 0x0237, 0x715c);  // call $0237
+  CALL(0x7159, decHlRef16WithCap_hook, 0x0237, 0x715c);  // call $0237
   if (!(F & FZ)) { RET_TAKEN(0x715c); return; } I(0x715c, 2);  // ret nz
-  CALL(0x715d, checkIsLinkedGame, 0x1992, 0x7160);  // call $1992
+  CALL(0x715d, checkIsLinkedGame_hook, 0x1992, 0x7160);  // call $1992
   if (!(F & FZ)) { I(0x7160, 3); goto L_7174; } I(0x7160, 2);  // jr nz,$7174
   I(0x7162, 3); SET_HL(0x6086);  // ld hl,$6086
   I(0x7165, 2); E = 0x03;  // ld e,$03
@@ -15300,7 +15300,7 @@ L_71c4:
   I(0x71c7, 2); B = 0x01;  // ld b,$01
   CALL(0x71c9, flashScreen, 0x2d73, 0x71cc);  // call $2d73
   if ((F & FZ)) { RET_TAKEN(0x71cc); return; } I(0x71cc, 2);  // ret z
-  CALL(0x71cd, disableLcd, 0x02c1, 0x71d0);  // call $02c1
+  CALL(0x71cd, disableLcd_hook, 0x02c1, 0x71d0);  // call $02c1
   I(0x71d0, 2); A = 0x9a;  // ld a,$9a
   CALL(0x71d2, loadGfxHeader, 0x0626, 0x71d5);  // call $0626
   I(0x71d5, 2); A = 0x9f;  // ld a,$9f
@@ -15562,19 +15562,19 @@ void agesFunc_10_7298(GB *gb) {
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x72b5: goto L_72b5; case 0x7313: goto L_7313; case 0x7341: goto L_7341; case 0x734b: goto L_734b; case 0x7362: goto L_7362; case 0x73c1: goto L_73c1; case 0x73dd: goto L_73dd; case 0x73f7: goto L_73f7; case 0x7417: goto L_7417; case 0x7440: goto L_7440; case 0x745e: goto L_745e; case 0x7476: goto L_7476; default: HANDOFF(HL); }
 L_72b5:
-  CALL(0x72b5, checkIsLinkedGame, 0x1992, 0x72b8);  // call $1992
+  CALL(0x72b5, checkIsLinkedGame_hook, 0x1992, 0x72b8);  // call $1992
   if (!(F & FZ)) { CALL(0x72b8, agesFunc_10_70f6__func_71fd, 0x71fd, 0x72bb); } else I(0x72b8, 3);  // call nz,$71fd
   I(0x72bb, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x72be, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x72bf); return; } I(0x72bf, 2);  // ret nz
-  CALL(0x72c0, disableLcd, 0x02c1, 0x72c3);  // call $02c1
+  CALL(0x72c0, disableLcd_hook, 0x02c1, 0x72c3);  // call $02c1
   CALL(0x72c3, incCbc2, 0x3067, 0x72c6);  // call $3067
   I(0x72c6, 3); SET_HL(0x60f1);  // ld hl,$60f1
   I(0x72c9, 2); E = 0x03;  // ld e,$03
   CALL(0x72cb, interBankCall, 0x008a, 0x72ce);  // call $008a
   CALL(0x72ce, clearDynamicInteractions, 0x35d2, 0x72d1);  // call $35d2
-  CALL(0x72d1, clearOam, 0x049f, 0x72d4);  // call $049f
-  CALL(0x72d4, checkIsLinkedGame, 0x1992, 0x72d7);  // call $1992
+  CALL(0x72d1, clearOam_hook, 0x049f, 0x72d4);  // call $049f
+  CALL(0x72d4, checkIsLinkedGame_hook, 0x1992, 0x72d7);  // call $1992
   if ((F & FZ)) { I(0x72d7, 4); goto L_72ec; } I(0x72d7, 3);  // jp z,$72ec
   I(0x72da, 2); A = 0x99;  // ld a,$99
   CALL(0x72dc, loadGfxHeader, 0x0626, 0x72df);  // call $0626
@@ -15610,7 +15610,7 @@ L_7313:
   if (!(F & FZ)) { RET_TAKEN(0x7317); return; } I(0x7317, 2);  // ret nz
   CALL(0x7318, incCbc2, 0x3067, 0x731b);  // call $3067
 L_731b:
-  CALL(0x731b, checkIsLinkedGame, 0x1992, 0x731e);  // call $1992
+  CALL(0x731b, checkIsLinkedGame_hook, 0x1992, 0x731e);  // call $1992
   if ((F & FZ)) { RET_TAKEN(0x731e); return; } I(0x731e, 2);  // ret z
   I(0x731f, 3); SET_HL(0xcbb4);  // ld hl,$cbb4
   I(0x7322, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -15623,10 +15623,10 @@ L_7328:
   I(0x7329, 2); A = 0xaa;  // ld a,$aa
   CALL(0x732b, playSound_b00, 0x0c98, 0x732e);  // call $0c98
   SET_HL(POP(0x732e));  // pop hl
-  CALL(0x732f, getRandomNumber, 0x043e, 0x7332);  // call $043e
+  CALL(0x732f, getRandomNumber_hook, 0x043e, 0x7332);  // call $043e
   I(0x7332, 2); alu_and(gb, 0x03);  // and $03
   I(0x7334, 3); SET_BC(0x733d);  // ld bc,$733d
-  CALL(0x7337, addAToBc, 0x006d, 0x733a);  // call $006d
+  CALL(0x7337, addAToBc_hook, 0x006d, 0x733a);  // call $006d
   I(0x733a, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x733b, 2); mem_wr(gb, HL, A);  // ld (hl),a
   RET(0x733c); return;  // ret
@@ -15652,7 +15652,7 @@ L_7362:
   I(0x7365, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x7366); return; } I(0x7366, 2);  // ret nz
   CALL(0x7367, incCbc2, 0x3067, 0x736a);  // call $3067
-  CALL(0x736a, disableLcd, 0x02c1, 0x736d);  // call $02c1
+  CALL(0x736a, disableLcd_hook, 0x02c1, 0x736d);  // call $02c1
   I(0x736d, 3); SET_HL(0x481b);  // ld hl,$481b
   I(0x7370, 2); E = 0x03;  // ld e,$03
   CALL(0x7372, interBankCall, 0x008a, 0x7375);  // call $008a
@@ -15678,11 +15678,11 @@ L_738a:
   CALL(0x739b, loadPaletteHeader, 0x050b, 0x739e);  // call $050b
   I(0x739e, 2); A = 0x2b;  // ld a,$2b
   CALL(0x73a0, loadUncompressedGfxHeader, 0x05da, 0x73a3);  // call $05da
-  CALL(0x73a3, checkIsLinkedGame, 0x1992, 0x73a6);  // call $1992
+  CALL(0x73a3, checkIsLinkedGame_hook, 0x1992, 0x73a6);  // call $1992
   I(0x73a6, 2); A = 0x06;  // ld a,$06
   if (!(F & FZ)) { CALL(0x73a8, loadGfxHeader, 0x0626, 0x73ab); } else I(0x73a8, 3);  // call nz,$0626
   CALL(0x73ab, clearDynamicInteractions, 0x35d2, 0x73ae);  // call $35d2
-  CALL(0x73ae, clearOam, 0x049f, 0x73b1);  // call $049f
+  CALL(0x73ae, clearOam_hook, 0x049f, 0x73b1);  // call $049f
   I(0x73b1, 2); A = 0x04;  // ld a,$04
   CALL(0x73b3, loadGfxRegisterStateIndex, 0x02ea, 0x73b6);  // call $02ea
   I(0x73b6, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
@@ -15698,7 +15698,7 @@ L_73c1:
   if (!(F & FZ)) { RET_TAKEN(0x73cc); return; } I(0x73cc, 2);  // ret nz
   I(0x73cd, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x73d0, 2); B = 0x3c;  // ld b,$3c
-  CALL(0x73d2, checkIsLinkedGame, 0x1992, 0x73d5);  // call $1992
+  CALL(0x73d2, checkIsLinkedGame_hook, 0x1992, 0x73d5);  // call $1992
   if ((F & FZ)) { I(0x73d5, 3); goto L_73d9; } I(0x73d5, 2);  // jr z,$73d9
   I(0x73d7, 2); B = 0xb4;  // ld b,$b4
 L_73d9:
@@ -15708,7 +15708,7 @@ L_73dd:
   CALL(0x73dd, fileSelect_redrawDecorations, 0x3099, 0x73e0);  // call $3099
   CALL(0x73e0, decCbb3, 0x305d, 0x73e3);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x73e3); return; } I(0x73e3, 2);  // ret nz
-  CALL(0x73e4, checkIsLinkedGame, 0x1992, 0x73e7);  // call $1992
+  CALL(0x73e4, checkIsLinkedGame_hook, 0x1992, 0x73e7);  // call $1992
   if (!(F & FZ)) { I(0x73e7, 3); goto L_73f4; } I(0x73e7, 2);  // jr nz,$73f4
   CALL(0x73e9, getFreeInteractionSlot, 0x3aef, 0x73ec);  // call $3aef
   if (!(F & FZ)) { I(0x73ec, 3); goto L_73f4; } I(0x73ec, 2);  // jr nz,$73f4
@@ -15719,7 +15719,7 @@ L_73f4:
   I(0x73f4, 4); incCbc2(gb); return;  // jp $3067
 L_73f7:
   CALL(0x73f7, fileSelect_redrawDecorations, 0x3099, 0x73fa);  // call $3099
-  CALL(0x73fa, checkIsLinkedGame, 0x1992, 0x73fd);  // call $1992
+  CALL(0x73fa, checkIsLinkedGame_hook, 0x1992, 0x73fd);  // call $1992
   if ((F & FZ)) { I(0x73fd, 3); goto L_7407; } I(0x73fd, 2);  // jr z,$7407
   I(0x73ff, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x7402, 2); alu_and(gb, 0x01);  // and $01
@@ -15739,10 +15739,10 @@ L_7417:
   I(0x741a, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x741d, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x741e); return; } I(0x741e, 2);  // ret nz
-  CALL(0x741f, checkIsLinkedGame, 0x1992, 0x7422);  // call $1992
+  CALL(0x741f, checkIsLinkedGame_hook, 0x1992, 0x7422);  // call $1992
   if (!(F & FZ)) { I(0x7422, 4); resetGame(gb); return; } I(0x7422, 3);  // jp nz,$0169
-  CALL(0x7425, disableLcd, 0x02c1, 0x7428);  // call $02c1
-  CALL(0x7428, clearOam, 0x049f, 0x742b);  // call $049f
+  CALL(0x7425, disableLcd_hook, 0x02c1, 0x7428);  // call $02c1
+  CALL(0x7428, clearOam_hook, 0x049f, 0x742b);  // call $049f
   CALL(0x742b, incCbc2, 0x3067, 0x742e);  // call $3067
   I(0x742e, 2); A = 0x96;  // ld a,$96
   CALL(0x7430, loadGfxHeader, 0x0626, 0x7433);  // call $0626
@@ -15785,19 +15785,19 @@ L_7476:
 void agesFunc_10_7298__substate0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_72b5:
-  CALL(0x72b5, checkIsLinkedGame, 0x1992, 0x72b8);  // call $1992
+  CALL(0x72b5, checkIsLinkedGame_hook, 0x1992, 0x72b8);  // call $1992
   if (!(F & FZ)) { CALL(0x72b8, agesFunc_10_70f6__func_71fd, 0x71fd, 0x72bb); } else I(0x72b8, 3);  // call nz,$71fd
   I(0x72bb, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x72be, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x72bf); return; } I(0x72bf, 2);  // ret nz
-  CALL(0x72c0, disableLcd, 0x02c1, 0x72c3);  // call $02c1
+  CALL(0x72c0, disableLcd_hook, 0x02c1, 0x72c3);  // call $02c1
   CALL(0x72c3, incCbc2, 0x3067, 0x72c6);  // call $3067
   I(0x72c6, 3); SET_HL(0x60f1);  // ld hl,$60f1
   I(0x72c9, 2); E = 0x03;  // ld e,$03
   CALL(0x72cb, interBankCall, 0x008a, 0x72ce);  // call $008a
   CALL(0x72ce, clearDynamicInteractions, 0x35d2, 0x72d1);  // call $35d2
-  CALL(0x72d1, clearOam, 0x049f, 0x72d4);  // call $049f
-  CALL(0x72d4, checkIsLinkedGame, 0x1992, 0x72d7);  // call $1992
+  CALL(0x72d1, clearOam_hook, 0x049f, 0x72d4);  // call $049f
+  CALL(0x72d4, checkIsLinkedGame_hook, 0x1992, 0x72d7);  // call $1992
   if ((F & FZ)) { I(0x72d7, 4); goto L_72ec; } I(0x72d7, 3);  // jp z,$72ec
   I(0x72da, 2); A = 0x99;  // ld a,$99
   CALL(0x72dc, loadGfxHeader, 0x0626, 0x72df);  // call $0626
@@ -15863,7 +15863,7 @@ L_7313:
   if (!(F & FZ)) { RET_TAKEN(0x7317); return; } I(0x7317, 2);  // ret nz
   CALL(0x7318, incCbc2, 0x3067, 0x731b);  // call $3067
 L_731b:
-  CALL(0x731b, checkIsLinkedGame, 0x1992, 0x731e);  // call $1992
+  CALL(0x731b, checkIsLinkedGame_hook, 0x1992, 0x731e);  // call $1992
   if ((F & FZ)) { RET_TAKEN(0x731e); return; } I(0x731e, 2);  // ret z
   I(0x731f, 3); SET_HL(0xcbb4);  // ld hl,$cbb4
   I(0x7322, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -15876,10 +15876,10 @@ L_7328:
   I(0x7329, 2); A = 0xaa;  // ld a,$aa
   CALL(0x732b, playSound_b00, 0x0c98, 0x732e);  // call $0c98
   SET_HL(POP(0x732e));  // pop hl
-  CALL(0x732f, getRandomNumber, 0x043e, 0x7332);  // call $043e
+  CALL(0x732f, getRandomNumber_hook, 0x043e, 0x7332);  // call $043e
   I(0x7332, 2); alu_and(gb, 0x03);  // and $03
   I(0x7334, 3); SET_BC(0x733d);  // ld bc,$733d
-  CALL(0x7337, addAToBc, 0x006d, 0x733a);  // call $006d
+  CALL(0x7337, addAToBc_hook, 0x006d, 0x733a);  // call $006d
   I(0x733a, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x733b, 2); mem_wr(gb, HL, A);  // ld (hl),a
   RET(0x733c); return;  // ret
@@ -15889,7 +15889,7 @@ L_7328:
 void agesFunc_10_7298__func_731b(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_731b:
-  CALL(0x731b, checkIsLinkedGame, 0x1992, 0x731e);  // call $1992
+  CALL(0x731b, checkIsLinkedGame_hook, 0x1992, 0x731e);  // call $1992
   if ((F & FZ)) { RET_TAKEN(0x731e); return; } I(0x731e, 2);  // ret z
   I(0x731f, 3); SET_HL(0xcbb4);  // ld hl,$cbb4
   I(0x7322, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -15902,10 +15902,10 @@ L_7328:
   I(0x7329, 2); A = 0xaa;  // ld a,$aa
   CALL(0x732b, playSound_b00, 0x0c98, 0x732e);  // call $0c98
   SET_HL(POP(0x732e));  // pop hl
-  CALL(0x732f, getRandomNumber, 0x043e, 0x7332);  // call $043e
+  CALL(0x732f, getRandomNumber_hook, 0x043e, 0x7332);  // call $043e
   I(0x7332, 2); alu_and(gb, 0x03);  // and $03
   I(0x7334, 3); SET_BC(0x733d);  // ld bc,$733d
-  CALL(0x7337, addAToBc, 0x006d, 0x733a);  // call $006d
+  CALL(0x7337, addAToBc_hook, 0x006d, 0x733a);  // call $006d
   I(0x733a, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x733b, 2); mem_wr(gb, HL, A);  // ld (hl),a
   RET(0x733c); return;  // ret
@@ -15919,10 +15919,10 @@ L_7328:
   I(0x7329, 2); A = 0xaa;  // ld a,$aa
   CALL(0x732b, playSound_b00, 0x0c98, 0x732e);  // call $0c98
   SET_HL(POP(0x732e));  // pop hl
-  CALL(0x732f, getRandomNumber, 0x043e, 0x7332);  // call $043e
+  CALL(0x732f, getRandomNumber_hook, 0x043e, 0x7332);  // call $043e
   I(0x7332, 2); alu_and(gb, 0x03);  // and $03
   I(0x7334, 3); SET_BC(0x733d);  // ld bc,$733d
-  CALL(0x7337, addAToBc, 0x006d, 0x733a);  // call $006d
+  CALL(0x7337, addAToBc_hook, 0x006d, 0x733a);  // call $006d
   I(0x733a, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x733b, 2); mem_wr(gb, HL, A);  // ld (hl),a
   RET(0x733c); return;  // ret
@@ -15975,7 +15975,7 @@ L_7362:
   I(0x7365, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x7366); return; } I(0x7366, 2);  // ret nz
   CALL(0x7367, incCbc2, 0x3067, 0x736a);  // call $3067
-  CALL(0x736a, disableLcd, 0x02c1, 0x736d);  // call $02c1
+  CALL(0x736a, disableLcd_hook, 0x02c1, 0x736d);  // call $02c1
   I(0x736d, 3); SET_HL(0x481b);  // ld hl,$481b
   I(0x7370, 2); E = 0x03;  // ld e,$03
   CALL(0x7372, interBankCall, 0x008a, 0x7375);  // call $008a
@@ -16001,11 +16001,11 @@ L_738a:
   CALL(0x739b, loadPaletteHeader, 0x050b, 0x739e);  // call $050b
   I(0x739e, 2); A = 0x2b;  // ld a,$2b
   CALL(0x73a0, loadUncompressedGfxHeader, 0x05da, 0x73a3);  // call $05da
-  CALL(0x73a3, checkIsLinkedGame, 0x1992, 0x73a6);  // call $1992
+  CALL(0x73a3, checkIsLinkedGame_hook, 0x1992, 0x73a6);  // call $1992
   I(0x73a6, 2); A = 0x06;  // ld a,$06
   if (!(F & FZ)) { CALL(0x73a8, loadGfxHeader, 0x0626, 0x73ab); } else I(0x73a8, 3);  // call nz,$0626
   CALL(0x73ab, clearDynamicInteractions, 0x35d2, 0x73ae);  // call $35d2
-  CALL(0x73ae, clearOam, 0x049f, 0x73b1);  // call $049f
+  CALL(0x73ae, clearOam_hook, 0x049f, 0x73b1);  // call $049f
   I(0x73b1, 2); A = 0x04;  // ld a,$04
   CALL(0x73b3, loadGfxRegisterStateIndex, 0x02ea, 0x73b6);  // call $02ea
   I(0x73b6, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
@@ -16026,7 +16026,7 @@ L_73c1:
   if (!(F & FZ)) { RET_TAKEN(0x73cc); return; } I(0x73cc, 2);  // ret nz
   I(0x73cd, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x73d0, 2); B = 0x3c;  // ld b,$3c
-  CALL(0x73d2, checkIsLinkedGame, 0x1992, 0x73d5);  // call $1992
+  CALL(0x73d2, checkIsLinkedGame_hook, 0x1992, 0x73d5);  // call $1992
   if ((F & FZ)) { I(0x73d5, 3); goto L_73d9; } I(0x73d5, 2);  // jr z,$73d9
   I(0x73d7, 2); B = 0xb4;  // ld b,$b4
 L_73d9:
@@ -16041,7 +16041,7 @@ L_73dd:
   CALL(0x73dd, fileSelect_redrawDecorations, 0x3099, 0x73e0);  // call $3099
   CALL(0x73e0, decCbb3, 0x305d, 0x73e3);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x73e3); return; } I(0x73e3, 2);  // ret nz
-  CALL(0x73e4, checkIsLinkedGame, 0x1992, 0x73e7);  // call $1992
+  CALL(0x73e4, checkIsLinkedGame_hook, 0x1992, 0x73e7);  // call $1992
   if (!(F & FZ)) { I(0x73e7, 3); goto L_73f4; } I(0x73e7, 2);  // jr nz,$73f4
   CALL(0x73e9, getFreeInteractionSlot, 0x3aef, 0x73ec);  // call $3aef
   if (!(F & FZ)) { I(0x73ec, 3); goto L_73f4; } I(0x73ec, 2);  // jr nz,$73f4
@@ -16057,7 +16057,7 @@ void agesFunc_10_7298__substate7(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_73f7:
   CALL(0x73f7, fileSelect_redrawDecorations, 0x3099, 0x73fa);  // call $3099
-  CALL(0x73fa, checkIsLinkedGame, 0x1992, 0x73fd);  // call $1992
+  CALL(0x73fa, checkIsLinkedGame_hook, 0x1992, 0x73fd);  // call $1992
   if ((F & FZ)) { I(0x73fd, 3); goto L_7407; } I(0x73fd, 2);  // jr z,$7407
   I(0x73ff, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x7402, 2); alu_and(gb, 0x01);  // and $01
@@ -16095,10 +16095,10 @@ L_7417:
   I(0x741a, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x741d, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x741e); return; } I(0x741e, 2);  // ret nz
-  CALL(0x741f, checkIsLinkedGame, 0x1992, 0x7422);  // call $1992
+  CALL(0x741f, checkIsLinkedGame_hook, 0x1992, 0x7422);  // call $1992
   if (!(F & FZ)) { I(0x7422, 4); resetGame(gb); return; } I(0x7422, 3);  // jp nz,$0169
-  CALL(0x7425, disableLcd, 0x02c1, 0x7428);  // call $02c1
-  CALL(0x7428, clearOam, 0x049f, 0x742b);  // call $049f
+  CALL(0x7425, disableLcd_hook, 0x02c1, 0x7428);  // call $02c1
+  CALL(0x7428, clearOam_hook, 0x049f, 0x742b);  // call $049f
   CALL(0x742b, incCbc2, 0x3067, 0x742e);  // call $3067
   I(0x742e, 2); A = 0x96;  // ld a,$96
   CALL(0x7430, loadGfxHeader, 0x0626, 0x7433);  // call $0626
@@ -16178,19 +16178,19 @@ L_7476:
 // 10:74b5
 void interactiondc_subid07(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x74b5, getThisRoomFlags, 0x197d, 0x74b8);  // call $197d
+  CALL(0x74b5, getThisRoomFlags_hook, 0x197d, 0x74b8);  // call $197d
   I(0x74b8, 2); alu_and(gb, 0x20);  // and $20
   if (!(F & FZ)) { I(0x74ba, 4); interactionDelete(gb); return; } I(0x74ba, 3);  // jp nz,$3b05
   I(0x74bd, 3); SET_BC(0x2b00);  // ld bc,$2b00
   CALL(0x74c0, createTreasure, 0x27d4, 0x74c3);  // call $27d4
-  CALL(0x74c3, objectCopyPosition, 0x2242, 0x74c6);  // call $2242
+  CALL(0x74c3, objectCopyPosition_hook, 0x2242, 0x74c6);  // call $2242
   I(0x74c6, 4); interactionDelete(gb); return;  // jp $3b05
 }
 
 // 10:74fd
 void interactiondc_subid00(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x74fd, getThisRoomFlags, 0x197d, 0x7500);  // call $197d
+  CALL(0x74fd, getThisRoomFlags_hook, 0x197d, 0x7500);  // call $197d
   I(0x7500, 2); alu_and(gb, 0x20);  // and $20
   if (!(F & FZ)) { I(0x7502, 4); interactionDelete(gb); return; } I(0x7502, 3);  // jp nz,$3b05
   I(0x7505, 4); A = mem_rd(gb, 0xcc8f);  // ld a,($cc8f)
@@ -16198,22 +16198,22 @@ void interactiondc_subid00(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(0x750a); return; } I(0x750a, 2);  // ret nz
   I(0x750b, 3); SET_BC(0x4200);  // ld bc,$4200
   CALL(0x750e, createTreasure, 0x27d4, 0x7511);  // call $27d4
-  CALL(0x7511, objectCopyPosition, 0x2242, 0x7514);  // call $2242
+  CALL(0x7511, objectCopyPosition_hook, 0x2242, 0x7514);  // call $2242
   I(0x7514, 4); interactionDelete(gb); return;  // jp $3b05
 }
 
 // 10:7517
 void interactiondc_subid01(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7517, checkInteractionState, 0x23fe, 0x751a);  // call $23fe
+  CALL(0x7517, checkInteractionState_hook, 0x23fe, 0x751a);  // call $23fe
   if (!(F & FZ)) { I(0x751a, 4); interactionRunScript(gb); return; } I(0x751a, 3);  // jp nz,$2552
-  CALL(0x751d, getThisRoomFlags, 0x197d, 0x7520);  // call $197d
+  CALL(0x751d, getThisRoomFlags_hook, 0x197d, 0x7520);  // call $197d
   I(0x7520, 2); alu_and(gb, 0x80);  // and $80
   if (!(F & FZ)) { I(0x7522, 4); interactionDelete(gb); return; } I(0x7522, 3);  // jp nz,$3b05
   I(0x7525, 3); SET_HL(0x7f62);  // ld hl,$7f62
   CALL(0x7528, interactionSetScript, 0x2544, 0x752b);  // call $2544
   CALL(0x752b, interactionSetAlwaysUpdateBit, 0x2701, 0x752e);  // call $2701
-  I(0x752e, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x752e, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7531
@@ -16228,7 +16228,7 @@ void interactiondc_subid02(GB *gb) {
   switch (HL) { case 0x753b: goto L_753b; case 0x7559: goto L_7559; case 0x7580: goto L_7580; default: HANDOFF(HL); }
 L_753b:
   CALL(0x753b, interactionDeleteAndRetIfEnabled02, 0x26ec, 0x753e);  // call $26ec
-  CALL(0x753e, getThisRoomFlags, 0x197d, 0x7541);  // call $197d
+  CALL(0x753e, getThisRoomFlags_hook, 0x197d, 0x7541);  // call $197d
   I(0x7541, 2); alu_and(gb, 0x80);  // and $80
   if (!(F & FZ)) { I(0x7543, 4); interactionDelete(gb); return; } I(0x7543, 3);  // jp nz,$3b05
   I(0x7546, 1); A = D;  // ld a,d
@@ -16239,7 +16239,7 @@ L_753b:
   I(0x7550, 1); C = L;  // ld c,l
   I(0x7551, 2); A = 0x1c;  // ld a,$1c
   CALL(0x7553, setTile, 0x3a9c, 0x7556);  // call $3a9c
-  I(0x7556, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x7556, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 L_7559:
   I(0x7559, 4); A = mem_rd(gb, 0xcc5a);  // ld a,($cc5a)
   I(0x755c, 2); alu_cp(gb, 0x83);  // cp $83
@@ -16257,7 +16257,7 @@ L_7559:
   CALL(0x7575, resetLinkInvincibility, 0x2ba9, 0x7578);  // call $2ba9
   I(0x7578, 2); A = 0xf0;  // ld a,$f0
   CALL(0x757a, playSound_b00, 0x0c98, 0x757d);  // call $0c98
-  I(0x757d, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x757d, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 L_7580:
   I(0x7580, 2); E = 0x45;  // ld e,$45
   I(0x7582, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -16267,7 +16267,7 @@ L_7580:
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x7588: goto L_7588; case 0x759f: goto L_759f; default: HANDOFF(HL); }
 L_7588:
-  CALL(0x7588, interactionDecCounter1, 0x23cc, 0x758b);  // call $23cc
+  CALL(0x7588, interactionDecCounter1_hook, 0x23cc, 0x758b);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x758b); return; } I(0x758b, 2);  // ret nz
   I(0x758c, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x758e, 2); A = 0x3c;  // ld a,$3c
@@ -16275,11 +16275,11 @@ L_7588:
   CALL(0x7593, objectCreateExclamationMark, 0x27e0, 0x7596);  // call $27e0
   CALL(0x7596, clearAllParentItems, 0x2c10, 0x7599);  // call $2c10
   CALL(0x7599, dropLinkHeldItem, 0x2c43, 0x759c);  // call $2c43
-  I(0x759c, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x759c, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 L_759f:
   I(0x759f, 2); A = 0x28;  // ld a,$28
   CALL(0x75a1, setScreenShakeCounter, 0x24bb, 0x75a4);  // call $24bb
-  CALL(0x75a4, interactionDecCounter1, 0x23cc, 0x75a7);  // call $23cc
+  CALL(0x75a4, interactionDecCounter1_hook, 0x23cc, 0x75a7);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x75a7); return; } I(0x75a7, 2);  // ret nz
   I(0x75a8, 2); A = 0x1a;  // ld a,$1a
   I(0x75aa, 4); mem_wr(gb, 0xcc04, A);  // ld ($cc04),a
@@ -16291,7 +16291,7 @@ void interactiondc_subid02__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_753b:
   CALL(0x753b, interactionDeleteAndRetIfEnabled02, 0x26ec, 0x753e);  // call $26ec
-  CALL(0x753e, getThisRoomFlags, 0x197d, 0x7541);  // call $197d
+  CALL(0x753e, getThisRoomFlags_hook, 0x197d, 0x7541);  // call $197d
   I(0x7541, 2); alu_and(gb, 0x80);  // and $80
   if (!(F & FZ)) { I(0x7543, 4); interactionDelete(gb); return; } I(0x7543, 3);  // jp nz,$3b05
   I(0x7546, 1); A = D;  // ld a,d
@@ -16302,7 +16302,7 @@ L_753b:
   I(0x7550, 1); C = L;  // ld c,l
   I(0x7551, 2); A = 0x1c;  // ld a,$1c
   CALL(0x7553, setTile, 0x3a9c, 0x7556);  // call $3a9c
-  I(0x7556, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x7556, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7559
@@ -16325,7 +16325,7 @@ L_7559:
   CALL(0x7575, resetLinkInvincibility, 0x2ba9, 0x7578);  // call $2ba9
   I(0x7578, 2); A = 0xf0;  // ld a,$f0
   CALL(0x757a, playSound_b00, 0x0c98, 0x757d);  // call $0c98
-  I(0x757d, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x757d, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7580
@@ -16340,7 +16340,7 @@ L_7580:
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x7588: goto L_7588; case 0x759f: goto L_759f; default: HANDOFF(HL); }
 L_7588:
-  CALL(0x7588, interactionDecCounter1, 0x23cc, 0x758b);  // call $23cc
+  CALL(0x7588, interactionDecCounter1_hook, 0x23cc, 0x758b);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x758b); return; } I(0x758b, 2);  // ret nz
   I(0x758c, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x758e, 2); A = 0x3c;  // ld a,$3c
@@ -16348,11 +16348,11 @@ L_7588:
   CALL(0x7593, objectCreateExclamationMark, 0x27e0, 0x7596);  // call $27e0
   CALL(0x7596, clearAllParentItems, 0x2c10, 0x7599);  // call $2c10
   CALL(0x7599, dropLinkHeldItem, 0x2c43, 0x759c);  // call $2c43
-  I(0x759c, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x759c, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 L_759f:
   I(0x759f, 2); A = 0x28;  // ld a,$28
   CALL(0x75a1, setScreenShakeCounter, 0x24bb, 0x75a4);  // call $24bb
-  CALL(0x75a4, interactionDecCounter1, 0x23cc, 0x75a7);  // call $23cc
+  CALL(0x75a4, interactionDecCounter1_hook, 0x23cc, 0x75a7);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x75a7); return; } I(0x75a7, 2);  // ret nz
   I(0x75a8, 2); A = 0x1a;  // ld a,$1a
   I(0x75aa, 4); mem_wr(gb, 0xcc04, A);  // ld ($cc04),a
@@ -16363,7 +16363,7 @@ L_759f:
 void interactiondc_subid02__substate0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7588:
-  CALL(0x7588, interactionDecCounter1, 0x23cc, 0x758b);  // call $23cc
+  CALL(0x7588, interactionDecCounter1_hook, 0x23cc, 0x758b);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x758b); return; } I(0x758b, 2);  // ret nz
   I(0x758c, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x758e, 2); A = 0x3c;  // ld a,$3c
@@ -16371,7 +16371,7 @@ L_7588:
   CALL(0x7593, objectCreateExclamationMark, 0x27e0, 0x7596);  // call $27e0
   CALL(0x7596, clearAllParentItems, 0x2c10, 0x7599);  // call $2c10
   CALL(0x7599, dropLinkHeldItem, 0x2c43, 0x759c);  // call $2c43
-  I(0x759c, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x759c, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 }
 
 // 10:759f
@@ -16380,7 +16380,7 @@ void interactiondc_subid02__substate1(GB *gb) {
 L_759f:
   I(0x759f, 2); A = 0x28;  // ld a,$28
   CALL(0x75a1, setScreenShakeCounter, 0x24bb, 0x75a4);  // call $24bb
-  CALL(0x75a4, interactionDecCounter1, 0x23cc, 0x75a7);  // call $23cc
+  CALL(0x75a4, interactionDecCounter1_hook, 0x23cc, 0x75a7);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x75a7); return; } I(0x75a7, 2);  // ret nz
   I(0x75a8, 2); A = 0x1a;  // ld a,$1a
   I(0x75aa, 4); mem_wr(gb, 0xcc04, A);  // ld ($cc04),a
@@ -16390,29 +16390,29 @@ L_759f:
 // 10:75b0
 void interactiondc_subid03(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x75b0, checkInteractionState, 0x23fe, 0x75b3);  // call $23fe
+  CALL(0x75b0, checkInteractionState_hook, 0x23fe, 0x75b3);  // call $23fe
   if (!(F & FZ)) { I(0x75b3, 3); interactiondc_subid3And4_state1(gb); return; } I(0x75b3, 2);  // jr nz,$75c5
 L_75b5:
-  CALL(0x75b5, getThisRoomFlags, 0x197d, 0x75b8);  // call $197d
+  CALL(0x75b5, getThisRoomFlags_hook, 0x197d, 0x75b8);  // call $197d
   I(0x75b8, 2); alu_and(gb, 0x02);  // and $02
   if (!(F & FZ)) { I(0x75ba, 4); interactionDelete(gb); return; } I(0x75ba, 3);  // jp nz,$3b05
   I(0x75bd, 2); E = 0x43;  // ld e,$43
   I(0x75bf, 2); A = 0x02;  // ld a,$02
   I(0x75c1, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x75c2, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x75c2, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:75b5
 void interactiondc_subid03__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_75b5:
-  CALL(0x75b5, getThisRoomFlags, 0x197d, 0x75b8);  // call $197d
+  CALL(0x75b5, getThisRoomFlags_hook, 0x197d, 0x75b8);  // call $197d
   I(0x75b8, 2); alu_and(gb, 0x02);  // and $02
   if (!(F & FZ)) { I(0x75ba, 4); interactionDelete(gb); return; } I(0x75ba, 3);  // jp nz,$3b05
   I(0x75bd, 2); E = 0x43;  // ld e,$43
   I(0x75bf, 2); A = 0x02;  // ld a,$02
   I(0x75c1, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x75c2, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x75c2, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:75c5
@@ -16424,7 +16424,7 @@ void interactiondc_subid3And4_state1(GB *gb) {
   I(0x75cb, 2); A = 0xd7;  // ld a,$d7
   I(0x75cd, 1); C = L;  // ld c,l
   CALL(0x75ce, setTile, 0x3a9c, 0x75d1);  // call $3a9c
-  CALL(0x75d1, getThisRoomFlags, 0x197d, 0x75d4);  // call $197d
+  CALL(0x75d1, getThisRoomFlags_hook, 0x197d, 0x75d4);  // call $197d
   I(0x75d4, 2); E = 0x43;  // ld e,$43
   I(0x75d6, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x75d7, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
@@ -16437,29 +16437,29 @@ void interactiondc_subid3And4_state1(GB *gb) {
 // 10:75e1
 void interactiondc_subid04(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x75e1, checkInteractionState, 0x23fe, 0x75e4);  // call $23fe
+  CALL(0x75e1, checkInteractionState_hook, 0x23fe, 0x75e4);  // call $23fe
   if (!(F & FZ)) { I(0x75e4, 3); interactiondc_subid3And4_state1(gb); return; } I(0x75e4, 2);  // jr nz,$75c5
 L_75e6:
-  CALL(0x75e6, getThisRoomFlags, 0x197d, 0x75e9);  // call $197d
+  CALL(0x75e6, getThisRoomFlags_hook, 0x197d, 0x75e9);  // call $197d
   I(0x75e9, 2); alu_and(gb, 0x04);  // and $04
   if (!(F & FZ)) { I(0x75eb, 4); interactionDelete(gb); return; } I(0x75eb, 3);  // jp nz,$3b05
   I(0x75ee, 2); E = 0x43;  // ld e,$43
   I(0x75f0, 2); A = 0x04;  // ld a,$04
   I(0x75f2, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x75f3, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x75f3, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:75e6
 void interactiondc_subid04__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_75e6:
-  CALL(0x75e6, getThisRoomFlags, 0x197d, 0x75e9);  // call $197d
+  CALL(0x75e6, getThisRoomFlags_hook, 0x197d, 0x75e9);  // call $197d
   I(0x75e9, 2); alu_and(gb, 0x04);  // and $04
   if (!(F & FZ)) { I(0x75eb, 4); interactionDelete(gb); return; } I(0x75eb, 3);  // jp nz,$3b05
   I(0x75ee, 2); E = 0x43;  // ld e,$43
   I(0x75f0, 2); A = 0x04;  // ld a,$04
   I(0x75f2, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x75f3, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x75f3, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:75f6
@@ -16484,14 +16484,14 @@ L_7600:
   CALL(0x7615, interactiondc_subid05__setRandomShakeDuration, 0x7641, 0x7618);  // call $7641
   I(0x7618, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x761b, 1); alu_rrca(gb);  // rrca
-  if ((F & FC)) { CALL(0x761c, interactionIncState, 0x23e0, 0x761f); } else I(0x761c, 3);  // call c,$23e0
-  I(0x761f, 4); interactionIncState(gb); return;  // jp $23e0
+  if ((F & FC)) { CALL(0x761c, interactionIncState_hook, 0x23e0, 0x761f); } else I(0x761c, 3);  // call c,$23e0
+  I(0x761f, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 L_7622:
   I(0x7622, 1); alu_xor(gb, A);  // xor a
   CALL(0x7623, interactiondc_subid05__shakeScreen, 0x764e, 0x7626);  // call $764e
   if (!(F & FZ)) { RET_TAKEN(0x7626); return; } I(0x7626, 2);  // ret nz
   CALL(0x7627, interactiondc_subid05__setRandomShakeDuration, 0x7641, 0x762a);  // call $7641
-  I(0x762a, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x762a, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 L_762d:
   I(0x762d, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x7630, 2); alu_and(gb, 0x0f);  // and $0f
@@ -16503,7 +16503,7 @@ L_762d:
   I(0x763d, 2); L = 0x44;  // ld l,$44
   I(0x763f, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
 L_7641:
-  CALL(0x7641, getRandomNumber, 0x043e, 0x7644);  // call $043e
+  CALL(0x7641, getRandomNumber_hook, 0x043e, 0x7644);  // call $043e
   I(0x7644, 2); alu_and(gb, 0x7f);  // and $7f
   I(0x7646, 2); alu_sub(gb, 0x40);  // sub $40
   I(0x7648, 2); alu_add(gb, 0x60);  // add $60
@@ -16527,8 +16527,8 @@ L_7600:
   CALL(0x7615, interactiondc_subid05__setRandomShakeDuration, 0x7641, 0x7618);  // call $7641
   I(0x7618, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x761b, 1); alu_rrca(gb);  // rrca
-  if ((F & FC)) { CALL(0x761c, interactionIncState, 0x23e0, 0x761f); } else I(0x761c, 3);  // call c,$23e0
-  I(0x761f, 4); interactionIncState(gb); return;  // jp $23e0
+  if ((F & FC)) { CALL(0x761c, interactionIncState_hook, 0x23e0, 0x761f); } else I(0x761c, 3);  // call c,$23e0
+  I(0x761f, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7622
@@ -16539,7 +16539,7 @@ L_7622:
   CALL(0x7623, interactiondc_subid05__shakeScreen, 0x764e, 0x7626);  // call $764e
   if (!(F & FZ)) { RET_TAKEN(0x7626); return; } I(0x7626, 2);  // ret nz
   CALL(0x7627, interactiondc_subid05__setRandomShakeDuration, 0x7641, 0x762a);  // call $7641
-  I(0x762a, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x762a, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:762d
@@ -16556,7 +16556,7 @@ L_762d:
   I(0x763d, 2); L = 0x44;  // ld l,$44
   I(0x763f, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
 L_7641:
-  CALL(0x7641, getRandomNumber, 0x043e, 0x7644);  // call $043e
+  CALL(0x7641, getRandomNumber_hook, 0x043e, 0x7644);  // call $043e
   I(0x7644, 2); alu_and(gb, 0x7f);  // and $7f
   I(0x7646, 2); alu_sub(gb, 0x40);  // sub $40
   I(0x7648, 2); alu_add(gb, 0x60);  // add $60
@@ -16569,7 +16569,7 @@ L_7641:
 void interactiondc_subid05__setRandomShakeDuration(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7641:
-  CALL(0x7641, getRandomNumber, 0x043e, 0x7644);  // call $043e
+  CALL(0x7641, getRandomNumber_hook, 0x043e, 0x7644);  // call $043e
   I(0x7644, 2); alu_and(gb, 0x7f);  // and $7f
   I(0x7646, 2); alu_sub(gb, 0x40);  // sub $40
   I(0x7648, 2); alu_add(gb, 0x60);  // add $60
@@ -16586,7 +16586,7 @@ L_764e:
   I(0x7651, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x7654, 1); alu_rrca(gb);  // rrca
   if ((F & FC)) { RET_TAKEN(0x7655); return; } I(0x7655, 2);  // ret c
-  I(0x7656, 4); interactionDecCounter1(gb); return;  // jp $23cc
+  I(0x7656, 4); if (hook_enabled_at(0x23cc)) { interactionDecCounter1_hook(gb); return; } HANDOFF(0x23cc);  // jp $23cc
 }
 
 // 10:7659
@@ -16625,7 +16625,7 @@ L_7675:
   I(0x767a, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x767d, 2); alu_and(gb, 0x07);  // and $07
   if (!(F & FZ)) { RET_TAKEN(0x767f); return; } I(0x767f, 2);  // ret nz
-  CALL(0x7680, getRandomNumber_noPreserveVars, 0x0453, 0x7683);  // call $0453
+  CALL(0x7680, getRandomNumber_noPreserveVars_hook, 0x0453, 0x7683);  // call $0453
   I(0x7683, 2); alu_and(gb, 0x07);  // and $07
   if (!(F & FZ)) { RET_TAKEN(0x7685); return; } I(0x7685, 2);  // ret nz
   I(0x7686, 2); E = 0x45;  // ld e,$45
@@ -16633,8 +16633,8 @@ L_7675:
   I(0x7689, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x768a, 3); A = mem_rd(gb, 0xff95);  // ldh a,($ff95)
   I(0x768c, 1); alu_rrca(gb);  // rrca
-  if ((F & FC)) { CALL(0x768d, interactionIncState, 0x23e0, 0x7690); } else I(0x768d, 3);  // call c,$23e0
-  I(0x7690, 4); interactionIncState(gb); return;  // jp $23e0
+  if ((F & FC)) { CALL(0x768d, interactionIncState_hook, 0x23e0, 0x7690); } else I(0x768d, 3);  // call c,$23e0
+  I(0x7690, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 L_7693:
   I(0x7693, 2); E = 0x45;  // ld e,$45
   I(0x7695, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -16650,15 +16650,15 @@ L_769d:
   I(0x76a2, 3); SET_HL(0x76fc);  // ld hl,$76fc
 L_76a5:
   CALL(0x76a5, interactiondc_subid09__replaceTileList, 0x76f0, 0x76a8);  // call $76f0
-  I(0x76a8, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x76a8, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 L_76ab:
-  CALL(0x76ab, interactionDecCounter1, 0x23cc, 0x76ae);  // call $23cc
+  CALL(0x76ab, interactionDecCounter1_hook, 0x23cc, 0x76ae);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x76ae); return; } I(0x76ae, 2);  // ret nz
   I(0x76af, 3); mem_wr(gb, HL, 0x08);  // ld (hl),$08
   I(0x76b1, 3); SET_HL(0x7705);  // ld hl,$7705
   I(0x76b4, 3); goto L_76a5;  // jr $76a5
 L_76b6:
-  CALL(0x76b6, interactionDecCounter1, 0x23cc, 0x76b9);  // call $23cc
+  CALL(0x76b6, interactionDecCounter1_hook, 0x23cc, 0x76b9);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x76b9); return; } I(0x76b9, 2);  // ret nz
   I(0x76ba, 2); E = 0x44;  // ld e,$44
   I(0x76bc, 2); A = 0x01;  // ld a,$01
@@ -16679,15 +16679,15 @@ L_76cc:
   I(0x76d1, 3); SET_HL(0x770e);  // ld hl,$770e
 L_76d4:
   CALL(0x76d4, interactiondc_subid09__replaceTileList, 0x76f0, 0x76d7);  // call $76f0
-  I(0x76d7, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x76d7, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 L_76da:
-  CALL(0x76da, interactionDecCounter1, 0x23cc, 0x76dd);  // call $23cc
+  CALL(0x76da, interactionDecCounter1_hook, 0x23cc, 0x76dd);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x76dd); return; } I(0x76dd, 2);  // ret nz
   I(0x76de, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
   I(0x76e0, 3); SET_HL(0x771f);  // ld hl,$771f
   I(0x76e3, 3); goto L_76d4;  // jr $76d4
 L_76e5:
-  CALL(0x76e5, interactionDecCounter1, 0x23cc, 0x76e8);  // call $23cc
+  CALL(0x76e5, interactionDecCounter1_hook, 0x23cc, 0x76e8);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x76e8); return; } I(0x76e8, 2);  // ret nz
   I(0x76e9, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
   I(0x76eb, 3); SET_HL(0x7730);  // ld hl,$7730
@@ -16704,7 +16704,7 @@ L_7675:
   I(0x767a, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x767d, 2); alu_and(gb, 0x07);  // and $07
   if (!(F & FZ)) { RET_TAKEN(0x767f); return; } I(0x767f, 2);  // ret nz
-  CALL(0x7680, getRandomNumber_noPreserveVars, 0x0453, 0x7683);  // call $0453
+  CALL(0x7680, getRandomNumber_noPreserveVars_hook, 0x0453, 0x7683);  // call $0453
   I(0x7683, 2); alu_and(gb, 0x07);  // and $07
   if (!(F & FZ)) { RET_TAKEN(0x7685); return; } I(0x7685, 2);  // ret nz
   I(0x7686, 2); E = 0x45;  // ld e,$45
@@ -16712,8 +16712,8 @@ L_7675:
   I(0x7689, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x768a, 3); A = mem_rd(gb, 0xff95);  // ldh a,($ff95)
   I(0x768c, 1); alu_rrca(gb);  // rrca
-  if ((F & FC)) { CALL(0x768d, interactionIncState, 0x23e0, 0x7690); } else I(0x768d, 3);  // call c,$23e0
-  I(0x7690, 4); interactionIncState(gb); return;  // jp $23e0
+  if ((F & FC)) { CALL(0x768d, interactionIncState_hook, 0x23e0, 0x7690); } else I(0x768d, 3);  // call c,$23e0
+  I(0x7690, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7693
@@ -16734,15 +16734,15 @@ L_769d:
   I(0x76a2, 3); SET_HL(0x76fc);  // ld hl,$76fc
 L_76a5:
   CALL(0x76a5, interactiondc_subid09__replaceTileList, 0x76f0, 0x76a8);  // call $76f0
-  I(0x76a8, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x76a8, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 L_76ab:
-  CALL(0x76ab, interactionDecCounter1, 0x23cc, 0x76ae);  // call $23cc
+  CALL(0x76ab, interactionDecCounter1_hook, 0x23cc, 0x76ae);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x76ae); return; } I(0x76ae, 2);  // ret nz
   I(0x76af, 3); mem_wr(gb, HL, 0x08);  // ld (hl),$08
   I(0x76b1, 3); SET_HL(0x7705);  // ld hl,$7705
   I(0x76b4, 3); goto L_76a5;  // jr $76a5
 L_76b6:
-  CALL(0x76b6, interactionDecCounter1, 0x23cc, 0x76b9);  // call $23cc
+  CALL(0x76b6, interactionDecCounter1_hook, 0x23cc, 0x76b9);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x76b9); return; } I(0x76b9, 2);  // ret nz
   I(0x76ba, 2); E = 0x44;  // ld e,$44
   I(0x76bc, 2); A = 0x01;  // ld a,$01
@@ -16760,7 +16760,7 @@ L_769d:
   I(0x76a2, 3); SET_HL(0x76fc);  // ld hl,$76fc
 L_76a5:
   CALL(0x76a5, interactiondc_subid09__replaceTileList, 0x76f0, 0x76a8);  // call $76f0
-  I(0x76a8, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x76a8, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 }
 
 // 10:76a5
@@ -16768,7 +16768,7 @@ void interactiondc_subid09__replaceTileListAndIncSubstateA(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_76a5:
   CALL(0x76a5, interactiondc_subid09__replaceTileList, 0x76f0, 0x76a8);  // call $76f0
-  I(0x76a8, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x76a8, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 }
 
 // 10:76ab
@@ -16777,9 +16777,9 @@ void interactiondc_subid09__state2Substate1(GB *gb) {
   goto L_76ab;
 L_76a5:
   CALL(0x76a5, interactiondc_subid09__replaceTileList, 0x76f0, 0x76a8);  // call $76f0
-  I(0x76a8, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x76a8, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 L_76ab:
-  CALL(0x76ab, interactionDecCounter1, 0x23cc, 0x76ae);  // call $23cc
+  CALL(0x76ab, interactionDecCounter1_hook, 0x23cc, 0x76ae);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x76ae); return; } I(0x76ae, 2);  // ret nz
   I(0x76af, 3); mem_wr(gb, HL, 0x08);  // ld (hl),$08
   I(0x76b1, 3); SET_HL(0x7705);  // ld hl,$7705
@@ -16790,7 +16790,7 @@ L_76ab:
 void interactiondc_subid09__returnToState1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_76b6:
-  CALL(0x76b6, interactionDecCounter1, 0x23cc, 0x76b9);  // call $23cc
+  CALL(0x76b6, interactionDecCounter1_hook, 0x23cc, 0x76b9);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x76b9); return; } I(0x76b9, 2);  // ret nz
   I(0x76ba, 2); E = 0x44;  // ld e,$44
   I(0x76bc, 2); A = 0x01;  // ld a,$01
@@ -16803,7 +16803,7 @@ void interactiondc_subid09__state3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_76c0;
 L_76b6:
-  CALL(0x76b6, interactionDecCounter1, 0x23cc, 0x76b9);  // call $23cc
+  CALL(0x76b6, interactionDecCounter1_hook, 0x23cc, 0x76b9);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x76b9); return; } I(0x76b9, 2);  // ret nz
   I(0x76ba, 2); E = 0x44;  // ld e,$44
   I(0x76bc, 2); A = 0x01;  // ld a,$01
@@ -16824,15 +16824,15 @@ L_76cc:
   I(0x76d1, 3); SET_HL(0x770e);  // ld hl,$770e
 L_76d4:
   CALL(0x76d4, interactiondc_subid09__replaceTileList, 0x76f0, 0x76d7);  // call $76f0
-  I(0x76d7, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x76d7, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 L_76da:
-  CALL(0x76da, interactionDecCounter1, 0x23cc, 0x76dd);  // call $23cc
+  CALL(0x76da, interactionDecCounter1_hook, 0x23cc, 0x76dd);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x76dd); return; } I(0x76dd, 2);  // ret nz
   I(0x76de, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
   I(0x76e0, 3); SET_HL(0x771f);  // ld hl,$771f
   I(0x76e3, 3); goto L_76d4;  // jr $76d4
 L_76e5:
-  CALL(0x76e5, interactionDecCounter1, 0x23cc, 0x76e8);  // call $23cc
+  CALL(0x76e5, interactionDecCounter1_hook, 0x23cc, 0x76e8);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x76e8); return; } I(0x76e8, 2);  // ret nz
   I(0x76e9, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
   I(0x76eb, 3); SET_HL(0x7730);  // ld hl,$7730
@@ -16849,7 +16849,7 @@ L_76cc:
   I(0x76d1, 3); SET_HL(0x770e);  // ld hl,$770e
 L_76d4:
   CALL(0x76d4, interactiondc_subid09__replaceTileList, 0x76f0, 0x76d7);  // call $76f0
-  I(0x76d7, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x76d7, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 }
 
 // 10:76d4
@@ -16857,7 +16857,7 @@ void interactiondc_subid09__replaceTileListAndIncSubstateB(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_76d4:
   CALL(0x76d4, interactiondc_subid09__replaceTileList, 0x76f0, 0x76d7);  // call $76f0
-  I(0x76d7, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x76d7, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 }
 
 // 10:76da
@@ -16866,9 +16866,9 @@ void interactiondc_subid09__state3Substate1(GB *gb) {
   goto L_76da;
 L_76d4:
   CALL(0x76d4, interactiondc_subid09__replaceTileList, 0x76f0, 0x76d7);  // call $76f0
-  I(0x76d7, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x76d7, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 L_76da:
-  CALL(0x76da, interactionDecCounter1, 0x23cc, 0x76dd);  // call $23cc
+  CALL(0x76da, interactionDecCounter1_hook, 0x23cc, 0x76dd);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x76dd); return; } I(0x76dd, 2);  // ret nz
   I(0x76de, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
   I(0x76e0, 3); SET_HL(0x771f);  // ld hl,$771f
@@ -16881,9 +16881,9 @@ void interactiondc_subid09__state3Substate2(GB *gb) {
   goto L_76e5;
 L_76d4:
   CALL(0x76d4, interactiondc_subid09__replaceTileList, 0x76f0, 0x76d7);  // call $76f0
-  I(0x76d7, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x76d7, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 L_76e5:
-  CALL(0x76e5, interactionDecCounter1, 0x23cc, 0x76e8);  // call $23cc
+  CALL(0x76e5, interactionDecCounter1_hook, 0x23cc, 0x76e8);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x76e8); return; } I(0x76e8, 2);  // ret nz
   I(0x76e9, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
   I(0x76eb, 3); SET_HL(0x7730);  // ld hl,$7730
@@ -17146,7 +17146,7 @@ L_7730:
 // 10:7741
 void interactiondc_subid0A(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7741, checkInteractionState, 0x23fe, 0x7744);  // call $23fe
+  CALL(0x7741, checkInteractionState_hook, 0x23fe, 0x7744);  // call $23fe
   if ((F & FZ)) { I(0x7744, 3); goto L_7762; } I(0x7744, 2);  // jr z,$7762
 L_7746:
   I(0x7746, 2); A = 0x31;  // ld a,$31
@@ -17161,10 +17161,10 @@ L_7746:
   I(0x775c, 4); mem_wr(gb, 0xcc04, A);  // ld ($cc04),a
   I(0x775f, 4); interactionDelete(gb); return;  // jp $3b05
 L_7762:
-  CALL(0x7762, getThisRoomFlags, 0x197d, 0x7765);  // call $197d
+  CALL(0x7762, getThisRoomFlags_hook, 0x197d, 0x7765);  // call $197d
   I(0x7765, 2); alu_and(gb, 0x02);  // and $02
   if (!(F & FZ)) { I(0x7767, 4); interactionDelete(gb); return; } I(0x7767, 3);  // jp nz,$3b05
-  I(0x776a, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x776a, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7746
@@ -17188,10 +17188,10 @@ L_7746:
 void interactiondc_subid0A__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7762:
-  CALL(0x7762, getThisRoomFlags, 0x197d, 0x7765);  // call $197d
+  CALL(0x7762, getThisRoomFlags_hook, 0x197d, 0x7765);  // call $197d
   I(0x7765, 2); alu_and(gb, 0x02);  // and $02
   if (!(F & FZ)) { I(0x7767, 4); interactionDelete(gb); return; } I(0x7767, 3);  // jp nz,$3b05
-  I(0x776a, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x776a, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:776d
@@ -17221,22 +17221,22 @@ L_7787:
   I(0x7794, 2); A = 0x50;  // ld a,$50
   CALL(0x7796, playSound_b00, 0x0c98, 0x7799);  // call $0c98
   I(0x7799, 3); SET_HL(0xd000);  // ld hl,$d000
-  CALL(0x779c, objectTakePosition, 0x2274, 0x779f);  // call $2274
+  CALL(0x779c, objectTakePosition_hook, 0x2274, 0x779f);  // call $2274
   I(0x779f, 2); E = 0x46;  // ld e,$46
   I(0x77a1, 2); A = 0x1e;  // ld a,$1e
   I(0x77a3, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x77a4, 3); SET_BC(0xf808);  // ld bc,$f808
   CALL(0x77a7, objectCreateExclamationMark, 0x27e0, 0x77aa);  // call $27e0
-  I(0x77aa, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x77aa, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 L_77ad:
-  CALL(0x77ad, interactionDecCounter1, 0x23cc, 0x77b0);  // call $23cc
+  CALL(0x77ad, interactionDecCounter1_hook, 0x23cc, 0x77b0);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x77b0); return; } I(0x77b0, 2);  // ret nz
   I(0x77b1, 3); mem_wr(gb, HL, 0x1e);  // ld (hl),$1e
   I(0x77b3, 1); alu_xor(gb, A);  // xor a
   I(0x77b4, 4); mem_wr(gb, 0xcc8a, A);  // ld ($cc8a),a
-  I(0x77b7, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x77b7, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 L_77ba:
-  CALL(0x77ba, interactionDecCounter1, 0x23cc, 0x77bd);  // call $23cc
+  CALL(0x77ba, interactionDecCounter1_hook, 0x23cc, 0x77bd);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x77bd); return; } I(0x77bd, 2);  // ret nz
   I(0x77be, 3); mem_wr(gb, HL, 0x07);  // ld (hl),$07
   CALL(0x77c0, interactionGetMiniScript, 0x2791, 0x77c3);  // call $2791
@@ -17275,32 +17275,32 @@ L_7787:
   I(0x7794, 2); A = 0x50;  // ld a,$50
   CALL(0x7796, playSound_b00, 0x0c98, 0x7799);  // call $0c98
   I(0x7799, 3); SET_HL(0xd000);  // ld hl,$d000
-  CALL(0x779c, objectTakePosition, 0x2274, 0x779f);  // call $2274
+  CALL(0x779c, objectTakePosition_hook, 0x2274, 0x779f);  // call $2274
   I(0x779f, 2); E = 0x46;  // ld e,$46
   I(0x77a1, 2); A = 0x1e;  // ld a,$1e
   I(0x77a3, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x77a4, 3); SET_BC(0xf808);  // ld bc,$f808
   CALL(0x77a7, objectCreateExclamationMark, 0x27e0, 0x77aa);  // call $27e0
-  I(0x77aa, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x77aa, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:77ad
 void interactiondc_subid0B__state2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_77ad:
-  CALL(0x77ad, interactionDecCounter1, 0x23cc, 0x77b0);  // call $23cc
+  CALL(0x77ad, interactionDecCounter1_hook, 0x23cc, 0x77b0);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x77b0); return; } I(0x77b0, 2);  // ret nz
   I(0x77b1, 3); mem_wr(gb, HL, 0x1e);  // ld (hl),$1e
   I(0x77b3, 1); alu_xor(gb, A);  // xor a
   I(0x77b4, 4); mem_wr(gb, 0xcc8a, A);  // ld ($cc8a),a
-  I(0x77b7, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x77b7, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:77ba
 void interactiondc_subid0B__state3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_77ba:
-  CALL(0x77ba, interactionDecCounter1, 0x23cc, 0x77bd);  // call $23cc
+  CALL(0x77ba, interactionDecCounter1_hook, 0x23cc, 0x77bd);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x77bd); return; } I(0x77bd, 2);  // ret nz
   I(0x77be, 3); mem_wr(gb, HL, 0x07);  // ld (hl),$07
   CALL(0x77c0, interactionGetMiniScript, 0x2791, 0x77c3);  // call $2791
@@ -17354,7 +17354,7 @@ L_7812:
   I(0x7814, 2); mem_wr(gb, HL, C);  // ld (hl),c
   I(0x7815, 2); L = 0xcb;  // ld l,$cb
   I(0x7817, 2); mem_wr(gb, HL, E);  // ld (hl),e
-  CALL(0x7818, getThisRoomFlags, 0x197d, 0x781b);  // call $197d
+  CALL(0x7818, getThisRoomFlags_hook, 0x197d, 0x781b);  // call $197d
   I(0x781b, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   I(0x781d, 2); A = 0x4d;  // ld a,$4d
   CALL(0x781f, playSound_b00, 0x0c98, 0x7822);  // call $0c98
@@ -17364,7 +17364,7 @@ L_7812:
 // 10:77ee
 void interactiondc_subid0C(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x77ee, checkInteractionState, 0x23fe, 0x77f1);  // call $23fe
+  CALL(0x77ee, checkInteractionState_hook, 0x23fe, 0x77f1);  // call $23fe
   if ((F & FZ)) { I(0x77f1, 3); goto L_7825; } I(0x77f1, 2);  // jr z,$7825
 L_77f3:
   I(0x77f3, 4); A = mem_rd(gb, 0xcca0);  // ld a,($cca0)
@@ -17388,16 +17388,16 @@ L_7809:
   I(0x7814, 2); mem_wr(gb, HL, C);  // ld (hl),c
   I(0x7815, 2); L = 0xcb;  // ld l,$cb
   I(0x7817, 2); mem_wr(gb, HL, E);  // ld (hl),e
-  CALL(0x7818, getThisRoomFlags, 0x197d, 0x781b);  // call $197d
+  CALL(0x7818, getThisRoomFlags_hook, 0x197d, 0x781b);  // call $197d
   I(0x781b, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   I(0x781d, 2); A = 0x4d;  // ld a,$4d
   CALL(0x781f, playSound_b00, 0x0c98, 0x7822);  // call $0c98
   I(0x7822, 4); interactionDelete(gb); return;  // jp $3b05
 L_7825:
-  CALL(0x7825, getThisRoomFlags, 0x197d, 0x7828);  // call $197d
+  CALL(0x7825, getThisRoomFlags_hook, 0x197d, 0x7828);  // call $197d
   I(0x7828, 2); alu_and(gb, 0x80);  // and $80
   if (!(F & FZ)) { I(0x782a, 4); interactionDelete(gb); return; } I(0x782a, 3);  // jp nz,$3b05
-  I(0x782d, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x782d, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:77f3
@@ -17425,7 +17425,7 @@ L_7809:
   I(0x7814, 2); mem_wr(gb, HL, C);  // ld (hl),c
   I(0x7815, 2); L = 0xcb;  // ld l,$cb
   I(0x7817, 2); mem_wr(gb, HL, E);  // ld (hl),e
-  CALL(0x7818, getThisRoomFlags, 0x197d, 0x781b);  // call $197d
+  CALL(0x7818, getThisRoomFlags_hook, 0x197d, 0x781b);  // call $197d
   I(0x781b, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   I(0x781d, 2); A = 0x4d;  // ld a,$4d
   CALL(0x781f, playSound_b00, 0x0c98, 0x7822);  // call $0c98
@@ -17436,10 +17436,10 @@ L_7809:
 void interactiondc_subid0D__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7825:
-  CALL(0x7825, getThisRoomFlags, 0x197d, 0x7828);  // call $197d
+  CALL(0x7825, getThisRoomFlags_hook, 0x197d, 0x7828);  // call $197d
   I(0x7828, 2); alu_and(gb, 0x80);  // and $80
   if (!(F & FZ)) { I(0x782a, 4); interactionDelete(gb); return; } I(0x782a, 3);  // jp nz,$3b05
-  I(0x782d, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x782d, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7830
@@ -17453,10 +17453,10 @@ void interactiondc_subid0E(GB *gb) {
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x783a: goto L_783a; case 0x7845: goto L_7845; case 0x7895: goto L_7895; default: HANDOFF(HL); }
 L_783a:
-  CALL(0x783a, getThisRoomFlags, 0x197d, 0x783d);  // call $197d
+  CALL(0x783a, getThisRoomFlags_hook, 0x197d, 0x783d);  // call $197d
   I(0x783d, 2); alu_and(gb, 0x80);  // and $80
   if (!(F & FZ)) { I(0x783f, 4); interactionDelete(gb); return; } I(0x783f, 3);  // jp nz,$3b05
-  I(0x7842, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x7842, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 L_7845:
   CALL(0x7845, objectGetTileAtPosition, 0x1444, 0x7848);  // call $1444
   I(0x7848, 2); alu_cp(gb, 0x02);  // cp $02
@@ -17469,7 +17469,7 @@ L_7845:
   I(0x7857, 2); E = 0x46;  // ld e,$46
   I(0x7859, 2); A = 0x2d;  // ld a,$2d
   I(0x785b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x785c, interactionIncState, 0x23e0, 0x785f);  // call $23e0
+  CALL(0x785c, interactionIncState_hook, 0x23e0, 0x785f);  // call $23e0
   I(0x785f, 2); C = 0x04;  // ld c,$04
   I(0x7861, 2); A = 0x30;  // ld a,$30
   CALL(0x7863, setTile, 0x3a9c, 0x7866);  // call $3a9c
@@ -17494,13 +17494,13 @@ L_788a:
   if (!(F & FZ)) { RET_TAKEN(0x788d); return; } I(0x788d, 2);  // ret nz
   I(0x788e, 3); mem_wr(gb, HL, 0x05);  // ld (hl),$05
   I(0x7890, 2); L = 0x4b;  // ld l,$4b
-  I(0x7892, 4); setShortPosition_paramC(gb); return;  // jp $20b9
+  I(0x7892, 4); if (hook_enabled_at(0x20b9)) { setShortPosition_paramC_hook(gb); return; } HANDOFF(0x20b9);  // jp $20b9
 L_7895:
-  CALL(0x7895, interactionDecCounter1, 0x23cc, 0x7898);  // call $23cc
+  CALL(0x7895, interactionDecCounter1_hook, 0x23cc, 0x7898);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7898); return; } I(0x7898, 2);  // ret nz
   I(0x7899, 2); A = 0x4d;  // ld a,$4d
   CALL(0x789b, playSound_b00, 0x0c98, 0x789e);  // call $0c98
-  CALL(0x789e, getThisRoomFlags, 0x197d, 0x78a1);  // call $197d
+  CALL(0x789e, getThisRoomFlags_hook, 0x197d, 0x78a1);  // call $197d
   I(0x78a1, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   I(0x78a3, 1); alu_xor(gb, A);  // xor a
   I(0x78a4, 4); mem_wr(gb, 0xcc8a, A);  // ld ($cc8a),a
@@ -17512,10 +17512,10 @@ L_7895:
 void interactiondc_subid0E__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_783a:
-  CALL(0x783a, getThisRoomFlags, 0x197d, 0x783d);  // call $197d
+  CALL(0x783a, getThisRoomFlags_hook, 0x197d, 0x783d);  // call $197d
   I(0x783d, 2); alu_and(gb, 0x80);  // and $80
   if (!(F & FZ)) { I(0x783f, 4); interactionDelete(gb); return; } I(0x783f, 3);  // jp nz,$3b05
-  I(0x7842, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x7842, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7845
@@ -17533,7 +17533,7 @@ L_7845:
   I(0x7857, 2); E = 0x46;  // ld e,$46
   I(0x7859, 2); A = 0x2d;  // ld a,$2d
   I(0x785b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x785c, interactionIncState, 0x23e0, 0x785f);  // call $23e0
+  CALL(0x785c, interactionIncState_hook, 0x23e0, 0x785f);  // call $23e0
   I(0x785f, 2); C = 0x04;  // ld c,$04
   I(0x7861, 2); A = 0x30;  // ld a,$30
   CALL(0x7863, setTile, 0x3a9c, 0x7866);  // call $3a9c
@@ -17558,7 +17558,7 @@ L_788a:
   if (!(F & FZ)) { RET_TAKEN(0x788d); return; } I(0x788d, 2);  // ret nz
   I(0x788e, 3); mem_wr(gb, HL, 0x05);  // ld (hl),$05
   I(0x7890, 2); L = 0x4b;  // ld l,$4b
-  I(0x7892, 4); setShortPosition_paramC(gb); return;  // jp $20b9
+  I(0x7892, 4); if (hook_enabled_at(0x20b9)) { setShortPosition_paramC_hook(gb); return; } HANDOFF(0x20b9);  // jp $20b9
 }
 
 // 10:788a
@@ -17569,18 +17569,18 @@ L_788a:
   if (!(F & FZ)) { RET_TAKEN(0x788d); return; } I(0x788d, 2);  // ret nz
   I(0x788e, 3); mem_wr(gb, HL, 0x05);  // ld (hl),$05
   I(0x7890, 2); L = 0x4b;  // ld l,$4b
-  I(0x7892, 4); setShortPosition_paramC(gb); return;  // jp $20b9
+  I(0x7892, 4); if (hook_enabled_at(0x20b9)) { setShortPosition_paramC_hook(gb); return; } HANDOFF(0x20b9);  // jp $20b9
 }
 
 // 10:7895
 void interactiondc_subid0E__state2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7895:
-  CALL(0x7895, interactionDecCounter1, 0x23cc, 0x7898);  // call $23cc
+  CALL(0x7895, interactionDecCounter1_hook, 0x23cc, 0x7898);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7898); return; } I(0x7898, 2);  // ret nz
   I(0x7899, 2); A = 0x4d;  // ld a,$4d
   CALL(0x789b, playSound_b00, 0x0c98, 0x789e);  // call $0c98
-  CALL(0x789e, getThisRoomFlags, 0x197d, 0x78a1);  // call $197d
+  CALL(0x789e, getThisRoomFlags_hook, 0x197d, 0x78a1);  // call $197d
   I(0x78a1, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   I(0x78a3, 1); alu_xor(gb, A);  // xor a
   I(0x78a4, 4); mem_wr(gb, 0xcc8a, A);  // ld ($cc8a),a
@@ -17591,7 +17591,7 @@ L_7895:
 // 10:78ad
 void interactiondc_subid0F(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x78ad, checkInteractionState, 0x23fe, 0x78b0);  // call $23fe
+  CALL(0x78ad, checkInteractionState_hook, 0x23fe, 0x78b0);  // call $23fe
   if ((F & FZ)) { I(0x78b0, 3); goto L_78c9; } I(0x78b0, 2);  // jr z,$78c9
   CALL(0x78b2, objectCheckCollidedWithLink_notDead, 0x1c2e, 0x78b5);  // call $1c2e
   if (!(F & FC)) { RET_TAKEN(0x78b5); return; } I(0x78b5, 2);  // ret nc
@@ -17612,7 +17612,7 @@ L_78c9:
   if ((F & FC)) { I(0x78d6, 4); interactionDelete(gb); return; } I(0x78d6, 3);  // jp c,$3b05
   I(0x78d9, 2); A = 0x08;  // ld a,$08
   CALL(0x78db, objectSetCollideRadius, 0x24a1, 0x78de);  // call $24a1
-  I(0x78de, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x78de, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:78c3
@@ -17635,7 +17635,7 @@ L_78c9:
   if ((F & FC)) { I(0x78d6, 4); interactionDelete(gb); return; } I(0x78d6, 3);  // jp c,$3b05
   I(0x78d9, 2); A = 0x08;  // ld a,$08
   CALL(0x78db, objectSetCollideRadius, 0x24a1, 0x78de);  // call $24a1
-  I(0x78de, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x78de, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:78e1
@@ -17656,18 +17656,18 @@ L_78eb:
   I(0x78f1, 3); SET_BC(0x0410);  // ld bc,$0410
   CALL(0x78f4, objectSetCollideRadii, 0x24a9, 0x78f7);  // call $24a9
   CALL(0x78f7, objectCheckCollidedWithLink_notDeadAndNotGrabbing, 0x1c28, 0x78fa);  // call $1c28
-  if (!(F & FC)) { CALL(0x78fa, interactionIncState, 0x23e0, 0x78fd); } else I(0x78fa, 3);  // call nc,$23e0
-  I(0x78fd, 4); interactionIncState(gb); return;  // jp $23e0
+  if (!(F & FC)) { CALL(0x78fa, interactionIncState_hook, 0x23e0, 0x78fd); } else I(0x78fa, 3);  // call nc,$23e0
+  I(0x78fd, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 L_7900:
   CALL(0x7900, objectCheckCollidedWithLink_notDeadAndNotGrabbing, 0x1c28, 0x7903);  // call $1c28
   if ((F & FC)) { RET_TAKEN(0x7903); return; } I(0x7903, 2);  // ret c
-  I(0x7904, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x7904, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 L_7907:
   CALL(0x7907, objectCheckCollidedWithLink_notDeadAndNotGrabbing, 0x1c28, 0x790a);  // call $1c28
   if (!(F & FC)) { RET_TAKEN(0x790a); return; } I(0x790a, 2);  // ret nc
   CALL(0x790b, checkLinkVulnerable, 0x1d28, 0x790e);  // call $1d28
   if (!(F & FC)) { RET_TAKEN(0x790e); return; } I(0x790e, 2);  // ret nc
-  CALL(0x790f, getThisRoomFlags, 0x197d, 0x7912);  // call $197d
+  CALL(0x790f, getThisRoomFlags_hook, 0x197d, 0x7912);  // call $197d
   I(0x7912, 2); alu_and(gb, 0x01);  // and $01
   I(0x7914, 3); SET_HL(0x7927);  // ld hl,$7927
   if ((F & FZ)) { I(0x7917, 3); goto L_791c; } I(0x7917, 2);  // jr z,$791c
@@ -17690,8 +17690,8 @@ L_78eb:
   I(0x78f1, 3); SET_BC(0x0410);  // ld bc,$0410
   CALL(0x78f4, objectSetCollideRadii, 0x24a9, 0x78f7);  // call $24a9
   CALL(0x78f7, objectCheckCollidedWithLink_notDeadAndNotGrabbing, 0x1c28, 0x78fa);  // call $1c28
-  if (!(F & FC)) { CALL(0x78fa, interactionIncState, 0x23e0, 0x78fd); } else I(0x78fa, 3);  // call nc,$23e0
-  I(0x78fd, 4); interactionIncState(gb); return;  // jp $23e0
+  if (!(F & FC)) { CALL(0x78fa, interactionIncState_hook, 0x23e0, 0x78fd); } else I(0x78fa, 3);  // call nc,$23e0
+  I(0x78fd, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7900
@@ -17700,7 +17700,7 @@ void interactiondc_subid10__state1(GB *gb) {
 L_7900:
   CALL(0x7900, objectCheckCollidedWithLink_notDeadAndNotGrabbing, 0x1c28, 0x7903);  // call $1c28
   if ((F & FC)) { RET_TAKEN(0x7903); return; } I(0x7903, 2);  // ret c
-  I(0x7904, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x7904, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7907
@@ -17711,7 +17711,7 @@ L_7907:
   if (!(F & FC)) { RET_TAKEN(0x790a); return; } I(0x790a, 2);  // ret nc
   CALL(0x790b, checkLinkVulnerable, 0x1d28, 0x790e);  // call $1d28
   if (!(F & FC)) { RET_TAKEN(0x790e); return; } I(0x790e, 2);  // ret nc
-  CALL(0x790f, getThisRoomFlags, 0x197d, 0x7912);  // call $197d
+  CALL(0x790f, getThisRoomFlags_hook, 0x197d, 0x7912);  // call $197d
   I(0x7912, 2); alu_and(gb, 0x01);  // and $01
   I(0x7914, 3); SET_HL(0x7927);  // ld hl,$7927
   if ((F & FZ)) { I(0x7917, 3); goto L_791c; } I(0x7917, 2);  // jr z,$791c
@@ -17740,7 +17740,7 @@ L_7927:
   if ((F & FZ)) { RET_TAKEN(0x7936); return; } I(0x7936, 2);  // ret z
   I(0x7937, 3); SET_HL(0xc682);  // ld hl,$c682
   I(0x793a, 2); A = 0x0c;  // ld a,$0c
-  I(0x793c, 4); setFlag(gb); return;  // jp $020e
+  I(0x793c, 4); if (hook_enabled_at(0x020e)) { setFlag_hook(gb); return; } HANDOFF(0x020e);  // jp $020e
 }
 
 // 10:792c
@@ -17757,24 +17757,24 @@ L_792c:
   if ((F & FZ)) { RET_TAKEN(0x7936); return; } I(0x7936, 2);  // ret z
   I(0x7937, 3); SET_HL(0xc682);  // ld hl,$c682
   I(0x793a, 2); A = 0x0c;  // ld a,$0c
-  I(0x793c, 4); setFlag(gb); return;  // jp $020e
+  I(0x793c, 4); if (hook_enabled_at(0x020e)) { setFlag_hook(gb); return; } HANDOFF(0x020e);  // jp $020e
 }
 
 // 10:7931
 void interactiondc_subid11(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7931, getThisRoomFlags, 0x197d, 0x7934);  // call $197d
+  CALL(0x7931, getThisRoomFlags_hook, 0x197d, 0x7934);  // call $197d
   I(0x7934, 2); alu_and(gb, 0x20);  // and $20
   if ((F & FZ)) { RET_TAKEN(0x7936); return; } I(0x7936, 2);  // ret z
   I(0x7937, 3); SET_HL(0xc682);  // ld hl,$c682
   I(0x793a, 2); A = 0x0c;  // ld a,$0c
-  I(0x793c, 4); setFlag(gb); return;  // jp $020e
+  I(0x793c, 4); if (hook_enabled_at(0x020e)) { setFlag_hook(gb); return; } HANDOFF(0x020e);  // jp $020e
 }
 
 // 10:793f
 void interactiondc_subid12(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x793f, getThisRoomFlags, 0x197d, 0x7942);  // call $197d
+  CALL(0x793f, getThisRoomFlags_hook, 0x197d, 0x7942);  // call $197d
   I(0x7942, 2); alu_and(gb, 0x40);  // and $40
   if (!(F & FZ)) { I(0x7944, 4); interactionDelete(gb); return; } I(0x7944, 3);  // jp nz,$3b05
   I(0x7947, 4); A = mem_rd(gb, 0xcdd2);  // ld a,($cdd2)
@@ -17789,7 +17789,7 @@ void interactiondc_subid12(GB *gb) {
   I(0x7958, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
   I(0x795a, 2); L = 0xcb;  // ld l,$cb
   I(0x795c, 3); mem_wr(gb, HL, 0x13);  // ld (hl),$13
-  CALL(0x795e, getThisRoomFlags, 0x197d, 0x7961);  // call $197d
+  CALL(0x795e, getThisRoomFlags_hook, 0x197d, 0x7961);  // call $197d
   I(0x7961, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));  // set 6,(hl)
   I(0x7963, 2); A = 0x4d;  // ld a,$4d
   CALL(0x7965, playSound_b00, 0x0c98, 0x7968);  // call $0c98
@@ -17835,10 +17835,10 @@ L_798c:
 // 10:798f
 void interactiondc_subid15(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x798f, checkInteractionState, 0x23fe, 0x7992);  // call $23fe
+  CALL(0x798f, checkInteractionState_hook, 0x23fe, 0x7992);  // call $23fe
   if ((F & FZ)) { I(0x7992, 3); interactiondc_subid15And16_state0(gb); return; } I(0x7992, 2);  // jr z,$79af
 L_7994:
-  CALL(0x7994, checkIsLinkedGame, 0x1992, 0x7997);  // call $1992
+  CALL(0x7994, checkIsLinkedGame_hook, 0x1992, 0x7997);  // call $1992
   I(0x7997, 2); A = 0x01;  // ld a,$01
   if (!(F & FZ)) { I(0x7999, 3); interactiondc_subid15And16_setChestContents(gb); return; } I(0x7999, 2);  // jr nz,$799c
   I(0x799b, 1); A = alu_dec8(gb, A);  // dec a
@@ -17849,7 +17849,7 @@ L_7994:
 void interactiondc_subid15__state1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7994:
-  CALL(0x7994, checkIsLinkedGame, 0x1992, 0x7997);  // call $1992
+  CALL(0x7994, checkIsLinkedGame_hook, 0x1992, 0x7997);  // call $1992
   I(0x7997, 2); A = 0x01;  // ld a,$01
   if (!(F & FZ)) { I(0x7999, 3); interactiondc_subid15And16_setChestContents(gb); return; } I(0x7999, 2);  // jr nz,$799c
   I(0x799b, 1); A = alu_dec8(gb, A);  // dec a
@@ -17881,18 +17881,18 @@ L_79ab:
 // 10:79af
 void interactiondc_subid15And16_state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x79af, getThisRoomFlags, 0x197d, 0x79b2);  // call $197d
+  CALL(0x79af, getThisRoomFlags_hook, 0x197d, 0x79b2);  // call $197d
   I(0x79b2, 2); alu_and(gb, 0x20);  // and $20
   if (!(F & FZ)) { I(0x79b4, 4); interactionDelete(gb); return; } I(0x79b4, 3);  // jp nz,$3b05
-  I(0x79b7, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x79b7, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:79ba
 void interactiondc_subid16(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x79ba, checkInteractionState, 0x23fe, 0x79bd);  // call $23fe
+  CALL(0x79ba, checkInteractionState_hook, 0x23fe, 0x79bd);  // call $23fe
   if ((F & FZ)) { I(0x79bd, 3); interactiondc_subid15And16_state0(gb); return; } I(0x79bd, 2);  // jr z,$79af
-  CALL(0x79bf, checkIsLinkedGame, 0x1992, 0x79c2);  // call $1992
+  CALL(0x79bf, checkIsLinkedGame_hook, 0x1992, 0x79c2);  // call $1992
   I(0x79c2, 2); A = 0x00;  // ld a,$00
   if (!(F & FZ)) { I(0x79c4, 3); interactiondc_subid15And16_setChestContents(gb); return; } I(0x79c4, 2);  // jr nz,$799c
   I(0x79c6, 1); A = alu_inc8(gb, A);  // inc a
@@ -17902,8 +17902,8 @@ void interactiondc_subid16(GB *gb) {
 // 10:79c9
 void interactiondc_subid17(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x79c9, checkInteractionState, 0x23fe, 0x79cc);  // call $23fe
-  if ((F & FZ)) { I(0x79cc, 4); interactionIncState(gb); return; } I(0x79cc, 3);  // jp z,$23e0
+  CALL(0x79c9, checkInteractionState_hook, 0x23fe, 0x79cc);  // call $23fe
+  if ((F & FZ)) { I(0x79cc, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0); } I(0x79cc, 3);  // jp z,$23e0
 L_79cf:
   I(0x79cf, 4); A = mem_rd(gb, 0xd00b);  // ld a,($d00b)
   I(0x79d2, 1); B = A;  // ld b,a
@@ -17964,7 +17964,7 @@ void timewarp_common_state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x7a14, interactionInitGraphics, 0x15fb, 0x7a17);  // call $15fb
 L_7a17:
-  CALL(0x7a17, interactionIncState, 0x23e0, 0x7a1a);  // call $23e0
+  CALL(0x7a17, interactionIncState_hook, 0x23e0, 0x7a1a);  // call $23e0
   I(0x7a1a, 2); L = 0x4b;  // ld l,$4b
   I(0x7a1c, 3); A = mem_rd(gb, 0xffb0);  // ldh a,($ffb0)
   I(0x7a1e, 2); alu_add(gb, 0x08);  // add $08
@@ -17972,14 +17972,14 @@ L_7a17:
   I(0x7a21, 1); L = alu_inc8(gb, L);  // inc l
   I(0x7a22, 3); A = mem_rd(gb, 0xffb1);  // ldh a,($ffb1)
   I(0x7a24, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x7a25, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x7a25, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:7a17
 void timewarp_common_state0__afterCall7a17(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7a17:
-  CALL(0x7a17, interactionIncState, 0x23e0, 0x7a1a);  // call $23e0
+  CALL(0x7a17, interactionIncState_hook, 0x23e0, 0x7a1a);  // call $23e0
   I(0x7a1a, 2); L = 0x4b;  // ld l,$4b
   I(0x7a1c, 3); A = mem_rd(gb, 0xffb0);  // ldh a,($ffb0)
   I(0x7a1e, 2); alu_add(gb, 0x08);  // add $08
@@ -17987,7 +17987,7 @@ L_7a17:
   I(0x7a21, 1); L = alu_inc8(gb, L);  // inc l
   I(0x7a22, 3); A = mem_rd(gb, 0xffb1);  // ldh a,($ffb1)
   I(0x7a24, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x7a25, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x7a25, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:7a36
@@ -18009,7 +18009,7 @@ void timewarp_spawnChild(GB *gb) {
   I(0x7a48, 1); A = H;  // ld a,h
   I(0x7a49, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x7a4a, 3); SET_BC(0xf800);  // ld bc,$f800
-  I(0x7a4d, 4); objectCopyPositionWithOffset(gb); return;  // jp $225a
+  I(0x7a4d, 4); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp $225a
 }
 
 // 10:7aaf
@@ -18035,7 +18035,7 @@ L_7ace:
   I(0x7ace, 2); A = 0x04;  // ld a,$04
   CALL(0x7ad0, objectGetRelatedObject2Var, 0x2164, 0x7ad3);  // call $2164
   I(0x7ad3, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x7ad4, interactionIncState, 0x23e0, 0x7ad7);  // call $23e0
+  CALL(0x7ad4, interactionIncState_hook, 0x23e0, 0x7ad7);  // call $23e0
   I(0x7ad7, 2); A = 0x01;  // ld a,$01
   I(0x7ad9, 4); interactionSetAnimation(gb); return;  // jp $262e
 }
@@ -18049,16 +18049,16 @@ void itemwarp_subid3Or4_state0(GB *gb) {
   CALL(0x7b2d, loadPaletteHeader, 0x050b, 0x7b30);  // call $050b
   CALL(0x7b30, interactionInitGraphics, 0x15fb, 0x7b33);  // call $15fb
 L_7b33:
-  CALL(0x7b33, interactionIncState, 0x23e0, 0x7b36);  // call $23e0
-  I(0x7b36, 4); objectSetVisible82(gb); return;  // jp $1e69
+  CALL(0x7b33, interactionIncState_hook, 0x23e0, 0x7b36);  // call $23e0
+  I(0x7b36, 4); if (hook_enabled_at(0x1e69)) { objectSetVisible82_hook(gb); return; } HANDOFF(0x1e69);  // jp $1e69
 }
 
 // 10:7b33
 void itemwarp_subid3Or4_state0__afterCall7b33(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7b33:
-  CALL(0x7b33, interactionIncState, 0x23e0, 0x7b36);  // call $23e0
-  I(0x7b36, 4); objectSetVisible82(gb); return;  // jp $1e69
+  CALL(0x7b33, interactionIncState_hook, 0x23e0, 0x7b36);  // call $23e0
+  I(0x7b36, 4); if (hook_enabled_at(0x1e69)) { objectSetVisible82_hook(gb); return; } HANDOFF(0x1e69);  // jp $1e69
 }
 
 // 10:7b39
@@ -18068,13 +18068,13 @@ void timewarp_subid3_state1(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(0x7b3c); return; } I(0x7b3c, 2);  // ret nz
   I(0x7b3d, 2); A = 0x03;  // ld a,$03
   CALL(0x7b3f, interactionSetAnimation, 0x262e, 0x7b42);  // call $262e
-  I(0x7b42, 4); interactionIncState(gb); return;  // jp $23e0
+  I(0x7b42, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7b45
 void timewarp_subid3Or4_state3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7b45, interactionIncState, 0x23e0, 0x7b48);  // call $23e0
+  CALL(0x7b45, interactionIncState_hook, 0x23e0, 0x7b48);  // call $23e0
   I(0x7b48, 2); A = 0x04;  // ld a,$04
   I(0x7b4a, 4); interactionSetAnimation(gb); return;  // jp $262e
 }
@@ -18106,8 +18106,8 @@ void interactionCodede(GB *gb) {
   I(0x7b6a, 4); mem_wr(gb, 0xcddd, A);  // ld ($cddd),a
   I(0x7b6d, 4); A = mem_rd(gb, 0xcc02);  // ld a,($cc02)
   I(0x7b70, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x7b71, 4); objectSetInvisible(gb); return; } I(0x7b71, 3);  // jp nz,$1e7b
-  CALL(0x7b74, objectSetVisible, 0x1e84, 0x7b77);  // call $1e84
+  if (!(F & FZ)) { I(0x7b71, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b); } I(0x7b71, 3);  // jp nz,$1e7b
+  CALL(0x7b74, objectSetVisible_hook, 0x1e84, 0x7b77);  // call $1e84
   I(0x7b77, 2); E = 0x44;  // ld e,$44
   I(0x7b79, 2); A = mem_rd(gb, DE);  // ld a,(de)
   RST_PUSH(0x7b7a, 0x7b7b);  // rst $00 (jump table)
@@ -18123,19 +18123,19 @@ L_7b81:
   if (!(F & FZ)) { I(0x7b88, 4); interactionDelete(gb); return; } I(0x7b88, 3);  // jp nz,$3b05
   I(0x7b8b, 2); A = 0x03;  // ld a,$03
   CALL(0x7b8d, objectSetCollideRadius, 0x24a1, 0x7b90);  // call $24a1
-  CALL(0x7b90, objectGetShortPosition, 0x2096, 0x7b93);  // call $2096
+  CALL(0x7b90, objectGetShortPosition_hook, 0x2096, 0x7b93);  // call $2096
   I(0x7b93, 1); C = A;  // ld c,a
-  CALL(0x7b94, interactionIncState, 0x23e0, 0x7b97);  // call $23e0
+  CALL(0x7b94, interactionIncState_hook, 0x23e0, 0x7b97);  // call $23e0
   I(0x7b97, 2); L = 0x43;  // ld l,$43
   I(0x7b99, 2); mem_wr(gb, HL, C);  // ld (hl),c
   CALL(0x7b9a, objectCheckCollidedWithLink_notDeadAndNotGrabbing, 0x1c28, 0x7b9d);  // call $1c28
-  if (!(F & FC)) { CALL(0x7b9d, interactionIncState, 0x23e0, 0x7ba0); } else I(0x7b9d, 3);  // call nc,$23e0
+  if (!(F & FC)) { CALL(0x7b9d, interactionIncState_hook, 0x23e0, 0x7ba0); } else I(0x7b9d, 3);  // call nc,$23e0
   CALL(0x7ba0, interactionInitGraphics, 0x15fb, 0x7ba3);  // call $15fb
 L_7ba3:
-  I(0x7ba3, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x7ba3, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 L_7ba6:
   CALL(0x7ba6, objectCheckCollidedWithLink_notDeadAndNotGrabbing, 0x1c28, 0x7ba9);  // call $1c28
-  if (!(F & FC)) { I(0x7ba9, 4); interactionIncState(gb); return; } I(0x7ba9, 3);  // jp nc,$23e0
+  if (!(F & FC)) { I(0x7ba9, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0); } I(0x7ba9, 3);  // jp nc,$23e0
   I(0x7bac, 3); timeportal_updatePalette(gb); return;  // jr $7bff
 L_7bae:
   I(0x7bae, 2); E = 0x43;  // ld e,$43
@@ -18168,23 +18168,23 @@ L_7b81:
   if (!(F & FZ)) { I(0x7b88, 4); interactionDelete(gb); return; } I(0x7b88, 3);  // jp nz,$3b05
   I(0x7b8b, 2); A = 0x03;  // ld a,$03
   CALL(0x7b8d, objectSetCollideRadius, 0x24a1, 0x7b90);  // call $24a1
-  CALL(0x7b90, objectGetShortPosition, 0x2096, 0x7b93);  // call $2096
+  CALL(0x7b90, objectGetShortPosition_hook, 0x2096, 0x7b93);  // call $2096
   I(0x7b93, 1); C = A;  // ld c,a
-  CALL(0x7b94, interactionIncState, 0x23e0, 0x7b97);  // call $23e0
+  CALL(0x7b94, interactionIncState_hook, 0x23e0, 0x7b97);  // call $23e0
   I(0x7b97, 2); L = 0x43;  // ld l,$43
   I(0x7b99, 2); mem_wr(gb, HL, C);  // ld (hl),c
   CALL(0x7b9a, objectCheckCollidedWithLink_notDeadAndNotGrabbing, 0x1c28, 0x7b9d);  // call $1c28
-  if (!(F & FC)) { CALL(0x7b9d, interactionIncState, 0x23e0, 0x7ba0); } else I(0x7b9d, 3);  // call nc,$23e0
+  if (!(F & FC)) { CALL(0x7b9d, interactionIncState_hook, 0x23e0, 0x7ba0); } else I(0x7b9d, 3);  // call nc,$23e0
   CALL(0x7ba0, interactionInitGraphics, 0x15fb, 0x7ba3);  // call $15fb
 L_7ba3:
-  I(0x7ba3, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x7ba3, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:7ba3
 void interactionCodede__afterCall7ba3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7ba3:
-  I(0x7ba3, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x7ba3, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:7ba6
@@ -18192,7 +18192,7 @@ void interactionCodede__state1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7ba6:
   CALL(0x7ba6, objectCheckCollidedWithLink_notDeadAndNotGrabbing, 0x1c28, 0x7ba9);  // call $1c28
-  if (!(F & FC)) { I(0x7ba9, 4); interactionIncState(gb); return; } I(0x7ba9, 3);  // jp nc,$23e0
+  if (!(F & FC)) { I(0x7ba9, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0); } I(0x7ba9, 3);  // jp nc,$23e0
   I(0x7bac, 3); timeportal_updatePalette(gb); return;  // jr $7bff
 }
 
@@ -18224,7 +18224,7 @@ void interactionBeginTimewarp(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x7bce, resetLinkInvincibility, 0x2ba9, 0x7bd1);  // call $2ba9
   I(0x7bd1, 3); SET_HL(0xd000);  // ld hl,$d000
-  CALL(0x7bd4, objectCopyPosition, 0x2242, 0x7bd7);  // call $2242
+  CALL(0x7bd4, objectCopyPosition_hook, 0x2242, 0x7bd7);  // call $2242
   I(0x7bd7, 2); L = 0x08;  // ld l,$08
   I(0x7bd9, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
   I(0x7bdb, 2); A = 0x81;  // ld a,$81
@@ -18290,8 +18290,8 @@ L_7c1e:
   I(0x7c2b, 2); L = 0x42;  // ld l,$42
   I(0x7c2d, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x7c2e, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x7c2f, 4); objectSetVisiblec2(gb); return; } I(0x7c2f, 3);  // jp z,$1e45
-  I(0x7c32, 4); objectSetVisiblec0(gb); return;  // jp $1e33
+  if ((F & FZ)) { I(0x7c2f, 4); if (hook_enabled_at(0x1e45)) { objectSetVisiblec2_hook(gb); return; } HANDOFF(0x1e45); } I(0x7c2f, 3);  // jp z,$1e45
+  I(0x7c32, 4); if (hook_enabled_at(0x1e33)) { objectSetVisiblec0_hook(gb); return; } HANDOFF(0x1e33);  // jp $1e33
 L_7c35:
   I(0x7c35, 2); E = 0x45;  // ld e,$45
   I(0x7c37, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -18301,15 +18301,15 @@ L_7c35:
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x7c47: goto L_7c47; case 0x7c4e: goto L_7c4e; case 0x7c68: goto L_7c68; case 0x7c7d: goto L_7c7d; case 0x7ccd: goto L_7ccd; case 0x7ce4: goto L_7ce4; case 0x7cf2: goto L_7cf2; default: HANDOFF(HL); }
 L_7c47:
-  CALL(0x7c47, interactionDecCounter1, 0x23cc, 0x7c4a);  // call $23cc
+  CALL(0x7c47, interactionDecCounter1_hook, 0x23cc, 0x7c4a);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7c4a); return; } I(0x7c4a, 2);  // ret nz
-  CALL(0x7c4b, interactionIncSubstate, 0x23e5, 0x7c4e);  // call $23e5
+  CALL(0x7c4b, interactionIncSubstate_hook, 0x23e5, 0x7c4e);  // call $23e5
 L_7c4e:
   CALL(0x7c4e, interactionAnimate, 0x261b, 0x7c51);  // call $261b
   CALL(0x7c51, objectApplySpeed, 0x201d, 0x7c54);  // call $201d
   I(0x7c54, 2); alu_cp(gb, 0x68);  // cp $68
   if (!(F & FZ)) { RET_TAKEN(0x7c56); return; } I(0x7c56, 2);  // ret nz
-  CALL(0x7c57, interactionIncSubstate, 0x23e5, 0x7c5a);  // call $23e5
+  CALL(0x7c57, interactionIncSubstate_hook, 0x23e5, 0x7c5a);  // call $23e5
   I(0x7c5a, 2); L = 0x46;  // ld l,$46
   I(0x7c5c, 3); mem_wr(gb, HL, 0xb4);  // ld (hl),$b4
   I(0x7c5e, 2); L = 0x42;  // ld l,$42
@@ -18319,11 +18319,11 @@ L_7c4e:
   I(0x7c63, 2); A = 0x05;  // ld a,$05
   I(0x7c65, 4); interactionSetAnimation(gb); return;  // jp $262e
 L_7c68:
-  CALL(0x7c68, interactionDecCounter1, 0x23cc, 0x7c6b);  // call $23cc
+  CALL(0x7c68, interactionDecCounter1_hook, 0x23cc, 0x7c6b);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7c6b); return; } I(0x7c6b, 2);  // ret nz
   I(0x7c6c, 3); SET_HL(0xcfd0);  // ld hl,$cfd0
   I(0x7c6f, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  CALL(0x7c71, interactionIncSubstate, 0x23e5, 0x7c74);  // call $23e5
+  CALL(0x7c71, interactionIncSubstate_hook, 0x23e5, 0x7c74);  // call $23e5
   I(0x7c74, 2); L = 0x46;  // ld l,$46
   I(0x7c76, 3); mem_wr(gb, HL, 0x04);  // ld (hl),$04
   I(0x7c78, 1); L = alu_inc8(gb, L);  // inc l
@@ -18332,9 +18332,9 @@ L_7c68:
 L_7c7d:
   I(0x7c7d, 1); H = D;  // ld h,d
   I(0x7c7e, 2); L = 0x46;  // ld l,$46
-  CALL(0x7c80, decHlRef16WithCap, 0x0237, 0x7c83);  // call $0237
+  CALL(0x7c80, decHlRef16WithCap_hook, 0x0237, 0x7c83);  // call $0237
   if (!(F & FZ)) { I(0x7c83, 3); goto L_7ca7; } I(0x7c83, 2);  // jr nz,$7ca7
-  CALL(0x7c85, interactionIncSubstate, 0x23e5, 0x7c88);  // call $23e5
+  CALL(0x7c85, interactionIncSubstate_hook, 0x23e5, 0x7c88);  // call $23e5
   I(0x7c88, 2); L = 0x46;  // ld l,$46
   I(0x7c8a, 3); mem_wr(gb, HL, 0x64);  // ld (hl),$64
   I(0x7c8c, 2); B = 0x14;  // ld b,$14
@@ -18371,7 +18371,7 @@ L_7ca7:
   I(0x7cbc, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
   CALL(0x7cbd, interactionSetAnimation, 0x262e, 0x7cc0);  // call $262e
 L_7cc0:
-  CALL(0x7cc0, getRandomNumber_noPreserveVars, 0x0453, 0x7cc3);  // call $0453
+  CALL(0x7cc0, getRandomNumber_noPreserveVars_hook, 0x0453, 0x7cc3);  // call $0453
   I(0x7cc3, 2); alu_and(gb, 0x03);  // and $03
   I(0x7cc5, 2); A = alu_swap(gb, A);  // swap a
   I(0x7cc7, 2); alu_add(gb, 0x20);  // add $20
@@ -18379,7 +18379,7 @@ L_7cc0:
   I(0x7ccb, 2); mem_wr(gb, DE, A);  // ld (de),a
   RET(0x7ccc); return;  // ret
 L_7ccd:
-  CALL(0x7ccd, interactionDecCounter1, 0x23cc, 0x7cd0);  // call $23cc
+  CALL(0x7ccd, interactionDecCounter1_hook, 0x23cc, 0x7cd0);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7cd0); return; } I(0x7cd0, 2);  // ret nz
   I(0x7cd1, 2); B = 0x78;  // ld b,$78
   I(0x7cd3, 2); E = 0x42;  // ld e,$42
@@ -18391,18 +18391,18 @@ L_7cdb:
   I(0x7cdb, 2); mem_wr(gb, HL, B);  // ld (hl),b
   I(0x7cdc, 3); SET_HL(0xcfd0);  // ld hl,$cfd0
   I(0x7cdf, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
-  I(0x7ce1, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x7ce1, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 L_7ce4:
-  CALL(0x7ce4, interactionDecCounter1, 0x23cc, 0x7ce7);  // call $23cc
+  CALL(0x7ce4, interactionDecCounter1_hook, 0x23cc, 0x7ce7);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7ce7); return; } I(0x7ce7, 2);  // ret nz
   I(0x7ce8, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x7cea, 3); SET_HL(0xcfd0);  // ld hl,$cfd0
   I(0x7ced, 3); mem_wr(gb, HL, 0x04);  // ld (hl),$04
-  I(0x7cef, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x7cef, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 L_7cf2:
   CALL(0x7cf2, interactionAnimate, 0x261b, 0x7cf5);  // call $261b
   CALL(0x7cf5, objectApplySpeed, 0x201d, 0x7cf8);  // call $201d
-  CALL(0x7cf8, interactionDecCounter1, 0x23cc, 0x7cfb);  // call $23cc
+  CALL(0x7cf8, interactionDecCounter1_hook, 0x23cc, 0x7cfb);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7cfb); return; } I(0x7cfb, 2);  // ret nz
   I(0x7cfc, 3); SET_HL(0xcfdf);  // ld hl,$cfdf
   I(0x7cff, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
@@ -18427,8 +18427,8 @@ L_7c1e:
   I(0x7c2b, 2); L = 0x42;  // ld l,$42
   I(0x7c2d, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x7c2e, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x7c2f, 4); objectSetVisiblec2(gb); return; } I(0x7c2f, 3);  // jp z,$1e45
-  I(0x7c32, 4); objectSetVisiblec0(gb); return;  // jp $1e33
+  if ((F & FZ)) { I(0x7c2f, 4); if (hook_enabled_at(0x1e45)) { objectSetVisiblec2_hook(gb); return; } HANDOFF(0x1e45); } I(0x7c2f, 3);  // jp z,$1e45
+  I(0x7c32, 4); if (hook_enabled_at(0x1e33)) { objectSetVisiblec0_hook(gb); return; } HANDOFF(0x1e33);  // jp $1e33
 }
 
 // 10:7c1e
@@ -18445,8 +18445,8 @@ L_7c1e:
   I(0x7c2b, 2); L = 0x42;  // ld l,$42
   I(0x7c2d, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x7c2e, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x7c2f, 4); objectSetVisiblec2(gb); return; } I(0x7c2f, 3);  // jp z,$1e45
-  I(0x7c32, 4); objectSetVisiblec0(gb); return;  // jp $1e33
+  if ((F & FZ)) { I(0x7c2f, 4); if (hook_enabled_at(0x1e45)) { objectSetVisiblec2_hook(gb); return; } HANDOFF(0x1e45); } I(0x7c2f, 3);  // jp z,$1e45
+  I(0x7c32, 4); if (hook_enabled_at(0x1e33)) { objectSetVisiblec0_hook(gb); return; } HANDOFF(0x1e33);  // jp $1e33
 }
 
 // 10:7c35
@@ -18461,15 +18461,15 @@ L_7c35:
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x7c47: goto L_7c47; case 0x7c4e: goto L_7c4e; case 0x7c68: goto L_7c68; case 0x7c7d: goto L_7c7d; case 0x7ccd: goto L_7ccd; case 0x7ce4: goto L_7ce4; case 0x7cf2: goto L_7cf2; default: HANDOFF(HL); }
 L_7c47:
-  CALL(0x7c47, interactionDecCounter1, 0x23cc, 0x7c4a);  // call $23cc
+  CALL(0x7c47, interactionDecCounter1_hook, 0x23cc, 0x7c4a);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7c4a); return; } I(0x7c4a, 2);  // ret nz
-  CALL(0x7c4b, interactionIncSubstate, 0x23e5, 0x7c4e);  // call $23e5
+  CALL(0x7c4b, interactionIncSubstate_hook, 0x23e5, 0x7c4e);  // call $23e5
 L_7c4e:
   CALL(0x7c4e, interactionAnimate, 0x261b, 0x7c51);  // call $261b
   CALL(0x7c51, objectApplySpeed, 0x201d, 0x7c54);  // call $201d
   I(0x7c54, 2); alu_cp(gb, 0x68);  // cp $68
   if (!(F & FZ)) { RET_TAKEN(0x7c56); return; } I(0x7c56, 2);  // ret nz
-  CALL(0x7c57, interactionIncSubstate, 0x23e5, 0x7c5a);  // call $23e5
+  CALL(0x7c57, interactionIncSubstate_hook, 0x23e5, 0x7c5a);  // call $23e5
   I(0x7c5a, 2); L = 0x46;  // ld l,$46
   I(0x7c5c, 3); mem_wr(gb, HL, 0xb4);  // ld (hl),$b4
   I(0x7c5e, 2); L = 0x42;  // ld l,$42
@@ -18479,11 +18479,11 @@ L_7c4e:
   I(0x7c63, 2); A = 0x05;  // ld a,$05
   I(0x7c65, 4); interactionSetAnimation(gb); return;  // jp $262e
 L_7c68:
-  CALL(0x7c68, interactionDecCounter1, 0x23cc, 0x7c6b);  // call $23cc
+  CALL(0x7c68, interactionDecCounter1_hook, 0x23cc, 0x7c6b);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7c6b); return; } I(0x7c6b, 2);  // ret nz
   I(0x7c6c, 3); SET_HL(0xcfd0);  // ld hl,$cfd0
   I(0x7c6f, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  CALL(0x7c71, interactionIncSubstate, 0x23e5, 0x7c74);  // call $23e5
+  CALL(0x7c71, interactionIncSubstate_hook, 0x23e5, 0x7c74);  // call $23e5
   I(0x7c74, 2); L = 0x46;  // ld l,$46
   I(0x7c76, 3); mem_wr(gb, HL, 0x04);  // ld (hl),$04
   I(0x7c78, 1); L = alu_inc8(gb, L);  // inc l
@@ -18492,9 +18492,9 @@ L_7c68:
 L_7c7d:
   I(0x7c7d, 1); H = D;  // ld h,d
   I(0x7c7e, 2); L = 0x46;  // ld l,$46
-  CALL(0x7c80, decHlRef16WithCap, 0x0237, 0x7c83);  // call $0237
+  CALL(0x7c80, decHlRef16WithCap_hook, 0x0237, 0x7c83);  // call $0237
   if (!(F & FZ)) { I(0x7c83, 3); goto L_7ca7; } I(0x7c83, 2);  // jr nz,$7ca7
-  CALL(0x7c85, interactionIncSubstate, 0x23e5, 0x7c88);  // call $23e5
+  CALL(0x7c85, interactionIncSubstate_hook, 0x23e5, 0x7c88);  // call $23e5
   I(0x7c88, 2); L = 0x46;  // ld l,$46
   I(0x7c8a, 3); mem_wr(gb, HL, 0x64);  // ld (hl),$64
   I(0x7c8c, 2); B = 0x14;  // ld b,$14
@@ -18531,7 +18531,7 @@ L_7ca7:
   I(0x7cbc, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
   CALL(0x7cbd, interactionSetAnimation, 0x262e, 0x7cc0);  // call $262e
 L_7cc0:
-  CALL(0x7cc0, getRandomNumber_noPreserveVars, 0x0453, 0x7cc3);  // call $0453
+  CALL(0x7cc0, getRandomNumber_noPreserveVars_hook, 0x0453, 0x7cc3);  // call $0453
   I(0x7cc3, 2); alu_and(gb, 0x03);  // and $03
   I(0x7cc5, 2); A = alu_swap(gb, A);  // swap a
   I(0x7cc7, 2); alu_add(gb, 0x20);  // add $20
@@ -18539,7 +18539,7 @@ L_7cc0:
   I(0x7ccb, 2); mem_wr(gb, DE, A);  // ld (de),a
   RET(0x7ccc); return;  // ret
 L_7ccd:
-  CALL(0x7ccd, interactionDecCounter1, 0x23cc, 0x7cd0);  // call $23cc
+  CALL(0x7ccd, interactionDecCounter1_hook, 0x23cc, 0x7cd0);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7cd0); return; } I(0x7cd0, 2);  // ret nz
   I(0x7cd1, 2); B = 0x78;  // ld b,$78
   I(0x7cd3, 2); E = 0x42;  // ld e,$42
@@ -18551,18 +18551,18 @@ L_7cdb:
   I(0x7cdb, 2); mem_wr(gb, HL, B);  // ld (hl),b
   I(0x7cdc, 3); SET_HL(0xcfd0);  // ld hl,$cfd0
   I(0x7cdf, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
-  I(0x7ce1, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x7ce1, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 L_7ce4:
-  CALL(0x7ce4, interactionDecCounter1, 0x23cc, 0x7ce7);  // call $23cc
+  CALL(0x7ce4, interactionDecCounter1_hook, 0x23cc, 0x7ce7);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7ce7); return; } I(0x7ce7, 2);  // ret nz
   I(0x7ce8, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x7cea, 3); SET_HL(0xcfd0);  // ld hl,$cfd0
   I(0x7ced, 3); mem_wr(gb, HL, 0x04);  // ld (hl),$04
-  I(0x7cef, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x7cef, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 L_7cf2:
   CALL(0x7cf2, interactionAnimate, 0x261b, 0x7cf5);  // call $261b
   CALL(0x7cf5, objectApplySpeed, 0x201d, 0x7cf8);  // call $201d
-  CALL(0x7cf8, interactionDecCounter1, 0x23cc, 0x7cfb);  // call $23cc
+  CALL(0x7cf8, interactionDecCounter1_hook, 0x23cc, 0x7cfb);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7cfb); return; } I(0x7cfb, 2);  // ret nz
   I(0x7cfc, 3); SET_HL(0xcfdf);  // ld hl,$cfdf
   I(0x7cff, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
@@ -18573,15 +18573,15 @@ L_7cf2:
 void interactionCodedf__substate0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7c47:
-  CALL(0x7c47, interactionDecCounter1, 0x23cc, 0x7c4a);  // call $23cc
+  CALL(0x7c47, interactionDecCounter1_hook, 0x23cc, 0x7c4a);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7c4a); return; } I(0x7c4a, 2);  // ret nz
-  CALL(0x7c4b, interactionIncSubstate, 0x23e5, 0x7c4e);  // call $23e5
+  CALL(0x7c4b, interactionIncSubstate_hook, 0x23e5, 0x7c4e);  // call $23e5
 L_7c4e:
   CALL(0x7c4e, interactionAnimate, 0x261b, 0x7c51);  // call $261b
   CALL(0x7c51, objectApplySpeed, 0x201d, 0x7c54);  // call $201d
   I(0x7c54, 2); alu_cp(gb, 0x68);  // cp $68
   if (!(F & FZ)) { RET_TAKEN(0x7c56); return; } I(0x7c56, 2);  // ret nz
-  CALL(0x7c57, interactionIncSubstate, 0x23e5, 0x7c5a);  // call $23e5
+  CALL(0x7c57, interactionIncSubstate_hook, 0x23e5, 0x7c5a);  // call $23e5
   I(0x7c5a, 2); L = 0x46;  // ld l,$46
   I(0x7c5c, 3); mem_wr(gb, HL, 0xb4);  // ld (hl),$b4
   I(0x7c5e, 2); L = 0x42;  // ld l,$42
@@ -18600,7 +18600,7 @@ L_7c4e:
   CALL(0x7c51, objectApplySpeed, 0x201d, 0x7c54);  // call $201d
   I(0x7c54, 2); alu_cp(gb, 0x68);  // cp $68
   if (!(F & FZ)) { RET_TAKEN(0x7c56); return; } I(0x7c56, 2);  // ret nz
-  CALL(0x7c57, interactionIncSubstate, 0x23e5, 0x7c5a);  // call $23e5
+  CALL(0x7c57, interactionIncSubstate_hook, 0x23e5, 0x7c5a);  // call $23e5
   I(0x7c5a, 2); L = 0x46;  // ld l,$46
   I(0x7c5c, 3); mem_wr(gb, HL, 0xb4);  // ld (hl),$b4
   I(0x7c5e, 2); L = 0x42;  // ld l,$42
@@ -18615,18 +18615,18 @@ L_7c4e:
 void interactionCodedf__substate2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7c68:
-  CALL(0x7c68, interactionDecCounter1, 0x23cc, 0x7c6b);  // call $23cc
+  CALL(0x7c68, interactionDecCounter1_hook, 0x23cc, 0x7c6b);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7c6b); return; } I(0x7c6b, 2);  // ret nz
   I(0x7c6c, 3); SET_HL(0xcfd0);  // ld hl,$cfd0
   I(0x7c6f, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  CALL(0x7c71, interactionIncSubstate, 0x23e5, 0x7c74);  // call $23e5
+  CALL(0x7c71, interactionIncSubstate_hook, 0x23e5, 0x7c74);  // call $23e5
   I(0x7c74, 2); L = 0x46;  // ld l,$46
   I(0x7c76, 3); mem_wr(gb, HL, 0x04);  // ld (hl),$04
   I(0x7c78, 1); L = alu_inc8(gb, L);  // inc l
   I(0x7c79, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
   I(0x7c7b, 3); goto L_7cc0;  // jr $7cc0
 L_7cc0:
-  CALL(0x7cc0, getRandomNumber_noPreserveVars, 0x0453, 0x7cc3);  // call $0453
+  CALL(0x7cc0, getRandomNumber_noPreserveVars_hook, 0x0453, 0x7cc3);  // call $0453
   I(0x7cc3, 2); alu_and(gb, 0x03);  // and $03
   I(0x7cc5, 2); A = alu_swap(gb, A);  // swap a
   I(0x7cc7, 2); alu_add(gb, 0x20);  // add $20
@@ -18641,9 +18641,9 @@ void interactionCodedf__substate3(GB *gb) {
 L_7c7d:
   I(0x7c7d, 1); H = D;  // ld h,d
   I(0x7c7e, 2); L = 0x46;  // ld l,$46
-  CALL(0x7c80, decHlRef16WithCap, 0x0237, 0x7c83);  // call $0237
+  CALL(0x7c80, decHlRef16WithCap_hook, 0x0237, 0x7c83);  // call $0237
   if (!(F & FZ)) { I(0x7c83, 3); goto L_7ca7; } I(0x7c83, 2);  // jr nz,$7ca7
-  CALL(0x7c85, interactionIncSubstate, 0x23e5, 0x7c88);  // call $23e5
+  CALL(0x7c85, interactionIncSubstate_hook, 0x23e5, 0x7c88);  // call $23e5
   I(0x7c88, 2); L = 0x46;  // ld l,$46
   I(0x7c8a, 3); mem_wr(gb, HL, 0x64);  // ld (hl),$64
   I(0x7c8c, 2); B = 0x14;  // ld b,$14
@@ -18680,7 +18680,7 @@ L_7ca7:
   I(0x7cbc, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
   CALL(0x7cbd, interactionSetAnimation, 0x262e, 0x7cc0);  // call $262e
 L_7cc0:
-  CALL(0x7cc0, getRandomNumber_noPreserveVars, 0x0453, 0x7cc3);  // call $0453
+  CALL(0x7cc0, getRandomNumber_noPreserveVars_hook, 0x0453, 0x7cc3);  // call $0453
   I(0x7cc3, 2); alu_and(gb, 0x03);  // and $03
   I(0x7cc5, 2); A = alu_swap(gb, A);  // swap a
   I(0x7cc7, 2); alu_add(gb, 0x20);  // add $20
@@ -18710,7 +18710,7 @@ L_7ca7:
   I(0x7cbc, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
   CALL(0x7cbd, interactionSetAnimation, 0x262e, 0x7cc0);  // call $262e
 L_7cc0:
-  CALL(0x7cc0, getRandomNumber_noPreserveVars, 0x0453, 0x7cc3);  // call $0453
+  CALL(0x7cc0, getRandomNumber_noPreserveVars_hook, 0x0453, 0x7cc3);  // call $0453
   I(0x7cc3, 2); alu_and(gb, 0x03);  // and $03
   I(0x7cc5, 2); A = alu_swap(gb, A);  // swap a
   I(0x7cc7, 2); alu_add(gb, 0x20);  // add $20
@@ -18723,7 +18723,7 @@ L_7cc0:
 void interactionCodedf__setRandomVar38(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7cc0:
-  CALL(0x7cc0, getRandomNumber_noPreserveVars, 0x0453, 0x7cc3);  // call $0453
+  CALL(0x7cc0, getRandomNumber_noPreserveVars_hook, 0x0453, 0x7cc3);  // call $0453
   I(0x7cc3, 2); alu_and(gb, 0x03);  // and $03
   I(0x7cc5, 2); A = alu_swap(gb, A);  // swap a
   I(0x7cc7, 2); alu_add(gb, 0x20);  // add $20
@@ -18736,7 +18736,7 @@ L_7cc0:
 void interactionCodedf__substate4(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7ccd:
-  CALL(0x7ccd, interactionDecCounter1, 0x23cc, 0x7cd0);  // call $23cc
+  CALL(0x7ccd, interactionDecCounter1_hook, 0x23cc, 0x7cd0);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7cd0); return; } I(0x7cd0, 2);  // ret nz
   I(0x7cd1, 2); B = 0x78;  // ld b,$78
   I(0x7cd3, 2); E = 0x42;  // ld e,$42
@@ -18748,19 +18748,19 @@ L_7cdb:
   I(0x7cdb, 2); mem_wr(gb, HL, B);  // ld (hl),b
   I(0x7cdc, 3); SET_HL(0xcfd0);  // ld hl,$cfd0
   I(0x7cdf, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
-  I(0x7ce1, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x7ce1, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 }
 
 // 10:7ce4
 void interactionCodedf__substate5(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7ce4:
-  CALL(0x7ce4, interactionDecCounter1, 0x23cc, 0x7ce7);  // call $23cc
+  CALL(0x7ce4, interactionDecCounter1_hook, 0x23cc, 0x7ce7);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7ce7); return; } I(0x7ce7, 2);  // ret nz
   I(0x7ce8, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x7cea, 3); SET_HL(0xcfd0);  // ld hl,$cfd0
   I(0x7ced, 3); mem_wr(gb, HL, 0x04);  // ld (hl),$04
-  I(0x7cef, 4); interactionIncSubstate(gb); return;  // jp $23e5
+  I(0x7cef, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 }
 
 // 10:7cf2
@@ -18769,7 +18769,7 @@ void interactionCodedf__substate6(GB *gb) {
 L_7cf2:
   CALL(0x7cf2, interactionAnimate, 0x261b, 0x7cf5);  // call $261b
   CALL(0x7cf5, objectApplySpeed, 0x201d, 0x7cf8);  // call $201d
-  CALL(0x7cf8, interactionDecCounter1, 0x23cc, 0x7cfb);  // call $23cc
+  CALL(0x7cf8, interactionDecCounter1_hook, 0x23cc, 0x7cfb);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x7cfb); return; } I(0x7cfb, 2);  // ret nz
   I(0x7cfc, 3); SET_HL(0xcfdf);  // ld hl,$cfdf
   I(0x7cff, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
@@ -18779,7 +18779,7 @@ L_7cf2:
 // 10:7da8
 void interactionCodee3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7da8, checkInteractionState, 0x23fe, 0x7dab);  // call $23fe
+  CALL(0x7da8, checkInteractionState_hook, 0x23fe, 0x7dab);  // call $23fe
   if (!(F & FZ)) { I(0x7dab, 3); goto L_7dee; } I(0x7dab, 2);  // jr nz,$7dee
 L_7dad:
   I(0x7dad, 2); A = 0x01;  // ld a,$01
@@ -18788,7 +18788,7 @@ L_7dad:
 L_7db3:
   I(0x7db3, 3); SET_HL(0x7f75);  // ld hl,$7f75
   CALL(0x7db6, interactionSetScript, 0x2544, 0x7db9);  // call $2544
-  CALL(0x7db9, getRandomNumber_noPreserveVars, 0x0453, 0x7dbc);  // call $0453
+  CALL(0x7db9, getRandomNumber_noPreserveVars_hook, 0x0453, 0x7dbc);  // call $0453
   I(0x7dbc, 2); alu_and(gb, 0x01);  // and $01
   I(0x7dbe, 2); E = 0x48;  // ld e,$48
   I(0x7dc0, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -18810,7 +18810,7 @@ L_7db3:
   I(0x7ddb, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x7ddc, 2); A = 0x32;  // ld a,$32
   CALL(0x7dde, interactionSetHighTextIndex, 0x253b, 0x7de1);  // call $253b
-  I(0x7de1, 4); objectSetVisible82(gb); return;  // jp $1e69
+  I(0x7de1, 4); if (hook_enabled_at(0x1e69)) { objectSetVisible82_hook(gb); return; } HANDOFF(0x1e69);  // jp $1e69
 L_7dee:
   CALL(0x7dee, interactionRunScript, 0x2552, 0x7df1);  // call $2552
   CALL(0x7df1, checkInteractionSubstate, 0x2403, 0x7df4);  // call $2403
@@ -18820,7 +18820,7 @@ L_7df6:
   I(0x7df8, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7df9, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x7dfa, 3); goto L_7e07; } I(0x7dfa, 2);  // jr z,$7e07
-  CALL(0x7dfc, interactionIncSubstate, 0x23e5, 0x7dff);  // call $23e5
+  CALL(0x7dfc, interactionIncSubstate_hook, 0x23e5, 0x7dff);  // call $23e5
   I(0x7dff, 2); L = 0x48;  // ld l,$48
   I(0x7e01, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x7e02, 2); alu_add(gb, 0x02);  // add $02
@@ -18830,7 +18830,7 @@ L_7e07:
   if (!(F & FZ)) { I(0x7e0a, 3); goto L_7e20; } I(0x7e0a, 2);  // jr nz,$7e20
   I(0x7e0c, 2); L = 0x76;  // ld l,$76
   I(0x7e0e, 3); mem_wr(gb, HL, 0x1e);  // ld (hl),$1e
-  CALL(0x7e10, getRandomNumber, 0x043e, 0x7e13);  // call $043e
+  CALL(0x7e10, getRandomNumber_hook, 0x043e, 0x7e13);  // call $043e
   I(0x7e13, 2); alu_and(gb, 0x07);  // and $07
   if (!(F & FZ)) { I(0x7e15, 3); goto L_7e20; } I(0x7e15, 2);  // jr nz,$7e20
   I(0x7e17, 2); L = 0x48;  // ld l,$48
@@ -18877,7 +18877,7 @@ L_7dad:
 L_7db3:
   I(0x7db3, 3); SET_HL(0x7f75);  // ld hl,$7f75
   CALL(0x7db6, interactionSetScript, 0x2544, 0x7db9);  // call $2544
-  CALL(0x7db9, getRandomNumber_noPreserveVars, 0x0453, 0x7dbc);  // call $0453
+  CALL(0x7db9, getRandomNumber_noPreserveVars_hook, 0x0453, 0x7dbc);  // call $0453
   I(0x7dbc, 2); alu_and(gb, 0x01);  // and $01
   I(0x7dbe, 2); E = 0x48;  // ld e,$48
   I(0x7dc0, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -18899,7 +18899,7 @@ L_7db3:
   I(0x7ddb, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x7ddc, 2); A = 0x32;  // ld a,$32
   CALL(0x7dde, interactionSetHighTextIndex, 0x253b, 0x7de1);  // call $253b
-  I(0x7de1, 4); objectSetVisible82(gb); return;  // jp $1e69
+  I(0x7de1, 4); if (hook_enabled_at(0x1e69)) { objectSetVisible82_hook(gb); return; } HANDOFF(0x1e69);  // jp $1e69
 }
 
 // 10:7db3
@@ -18908,7 +18908,7 @@ void interactionCodee3__afterCall7db3(GB *gb) {
 L_7db3:
   I(0x7db3, 3); SET_HL(0x7f75);  // ld hl,$7f75
   CALL(0x7db6, interactionSetScript, 0x2544, 0x7db9);  // call $2544
-  CALL(0x7db9, getRandomNumber_noPreserveVars, 0x0453, 0x7dbc);  // call $0453
+  CALL(0x7db9, getRandomNumber_noPreserveVars_hook, 0x0453, 0x7dbc);  // call $0453
   I(0x7dbc, 2); alu_and(gb, 0x01);  // and $01
   I(0x7dbe, 2); E = 0x48;  // ld e,$48
   I(0x7dc0, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -18930,7 +18930,7 @@ L_7db3:
   I(0x7ddb, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x7ddc, 2); A = 0x32;  // ld a,$32
   CALL(0x7dde, interactionSetHighTextIndex, 0x253b, 0x7de1);  // call $253b
-  I(0x7de1, 4); objectSetVisible82(gb); return;  // jp $1e69
+  I(0x7de1, 4); if (hook_enabled_at(0x1e69)) { objectSetVisible82_hook(gb); return; } HANDOFF(0x1e69);  // jp $1e69
 }
 
 // 10:7de4
@@ -18951,7 +18951,7 @@ L_7df6:
   I(0x7df8, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7df9, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x7dfa, 3); goto L_7e07; } I(0x7dfa, 2);  // jr z,$7e07
-  CALL(0x7dfc, interactionIncSubstate, 0x23e5, 0x7dff);  // call $23e5
+  CALL(0x7dfc, interactionIncSubstate_hook, 0x23e5, 0x7dff);  // call $23e5
   I(0x7dff, 2); L = 0x48;  // ld l,$48
   I(0x7e01, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x7e02, 2); alu_add(gb, 0x02);  // add $02
@@ -18961,7 +18961,7 @@ L_7e07:
   if (!(F & FZ)) { I(0x7e0a, 3); goto L_7e20; } I(0x7e0a, 2);  // jr nz,$7e20
   I(0x7e0c, 2); L = 0x76;  // ld l,$76
   I(0x7e0e, 3); mem_wr(gb, HL, 0x1e);  // ld (hl),$1e
-  CALL(0x7e10, getRandomNumber, 0x043e, 0x7e13);  // call $043e
+  CALL(0x7e10, getRandomNumber_hook, 0x043e, 0x7e13);  // call $043e
   I(0x7e13, 2); alu_and(gb, 0x07);  // and $07
   if (!(F & FZ)) { I(0x7e15, 3); goto L_7e20; } I(0x7e15, 2);  // jr nz,$7e20
   I(0x7e17, 2); L = 0x48;  // ld l,$48
@@ -19010,7 +19010,7 @@ L_7df6:
   I(0x7df8, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7df9, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x7dfa, 3); goto L_7e07; } I(0x7dfa, 2);  // jr z,$7e07
-  CALL(0x7dfc, interactionIncSubstate, 0x23e5, 0x7dff);  // call $23e5
+  CALL(0x7dfc, interactionIncSubstate_hook, 0x23e5, 0x7dff);  // call $23e5
   I(0x7dff, 2); L = 0x48;  // ld l,$48
   I(0x7e01, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x7e02, 2); alu_add(gb, 0x02);  // add $02
@@ -19020,7 +19020,7 @@ L_7e07:
   if (!(F & FZ)) { I(0x7e0a, 3); goto L_7e20; } I(0x7e0a, 2);  // jr nz,$7e20
   I(0x7e0c, 2); L = 0x76;  // ld l,$76
   I(0x7e0e, 3); mem_wr(gb, HL, 0x1e);  // ld (hl),$1e
-  CALL(0x7e10, getRandomNumber, 0x043e, 0x7e13);  // call $043e
+  CALL(0x7e10, getRandomNumber_hook, 0x043e, 0x7e13);  // call $043e
   I(0x7e13, 2); alu_and(gb, 0x07);  // and $07
   if (!(F & FZ)) { I(0x7e15, 3); goto L_7e20; } I(0x7e15, 2);  // jr nz,$7e20
   I(0x7e17, 2); L = 0x48;  // ld l,$48
@@ -19065,7 +19065,7 @@ L_7df6:
   I(0x7df8, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7df9, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x7dfa, 3); goto L_7e07; } I(0x7dfa, 2);  // jr z,$7e07
-  CALL(0x7dfc, interactionIncSubstate, 0x23e5, 0x7dff);  // call $23e5
+  CALL(0x7dfc, interactionIncSubstate_hook, 0x23e5, 0x7dff);  // call $23e5
   I(0x7dff, 2); L = 0x48;  // ld l,$48
   I(0x7e01, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x7e02, 2); alu_add(gb, 0x02);  // add $02
@@ -19075,7 +19075,7 @@ L_7e07:
   if (!(F & FZ)) { I(0x7e0a, 3); goto L_7e20; } I(0x7e0a, 2);  // jr nz,$7e20
   I(0x7e0c, 2); L = 0x76;  // ld l,$76
   I(0x7e0e, 3); mem_wr(gb, HL, 0x1e);  // ld (hl),$1e
-  CALL(0x7e10, getRandomNumber, 0x043e, 0x7e13);  // call $043e
+  CALL(0x7e10, getRandomNumber_hook, 0x043e, 0x7e13);  // call $043e
   I(0x7e13, 2); alu_and(gb, 0x07);  // and $07
   if (!(F & FZ)) { I(0x7e15, 3); goto L_7e20; } I(0x7e15, 2);  // jr nz,$7e20
   I(0x7e17, 2); L = 0x48;  // ld l,$48
@@ -19095,7 +19095,7 @@ L_7e07:
   if (!(F & FZ)) { I(0x7e0a, 3); goto L_7e20; } I(0x7e0a, 2);  // jr nz,$7e20
   I(0x7e0c, 2); L = 0x76;  // ld l,$76
   I(0x7e0e, 3); mem_wr(gb, HL, 0x1e);  // ld (hl),$1e
-  CALL(0x7e10, getRandomNumber, 0x043e, 0x7e13);  // call $043e
+  CALL(0x7e10, getRandomNumber_hook, 0x043e, 0x7e13);  // call $043e
   I(0x7e13, 2); alu_and(gb, 0x07);  // and $07
   if (!(F & FZ)) { I(0x7e15, 3); goto L_7e20; } I(0x7e15, 2);  // jr nz,$7e20
   I(0x7e17, 2); L = 0x48;  // ld l,$48
@@ -19216,12 +19216,12 @@ L_7e87:
   SET_DE(POP(0x7e8d));  // pop de
   CALL(0x7e8e, interactionInitGraphics, 0x15fb, 0x7e91);  // call $15fb
 L_7e91:
-  CALL(0x7e91, interactionIncState, 0x23e0, 0x7e94);  // call $23e0
+  CALL(0x7e91, interactionIncState_hook, 0x23e0, 0x7e94);  // call $23e0
   I(0x7e94, 2); E = 0x48;  // ld e,$48
   I(0x7e96, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7e97, 2); alu_and(gb, 0x01);  // and $01
   CALL(0x7e99, interactionSetAnimation, 0x262e, 0x7e9c);  // call $262e
-  I(0x7e9c, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x7e9c, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 L_7e9f:
   CALL(0x7e9f, interactionAnimate, 0x261b, 0x7ea2);  // call $261b
   I(0x7ea2, 2); A = 0x09;  // ld a,$09
@@ -19258,8 +19258,8 @@ L_7ed1:
   I(0x7edb, 2); L = 0x08;  // ld l,$08
   I(0x7edd, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7ede, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  CALL(0x7edf, objectCopyPosition, 0x2242, 0x7ee2);  // call $2242
-  I(0x7ee2, 4); interactionIncState(gb); return;  // jp $23e0
+  CALL(0x7edf, objectCopyPosition_hook, 0x2242, 0x7ee2);  // call $2242
+  I(0x7ee2, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7e5b
@@ -19296,12 +19296,12 @@ L_7e87:
   SET_DE(POP(0x7e8d));  // pop de
   CALL(0x7e8e, interactionInitGraphics, 0x15fb, 0x7e91);  // call $15fb
 L_7e91:
-  CALL(0x7e91, interactionIncState, 0x23e0, 0x7e94);  // call $23e0
+  CALL(0x7e91, interactionIncState_hook, 0x23e0, 0x7e94);  // call $23e0
   I(0x7e94, 2); E = 0x48;  // ld e,$48
   I(0x7e96, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7e97, 2); alu_and(gb, 0x01);  // and $01
   CALL(0x7e99, interactionSetAnimation, 0x262e, 0x7e9c);  // call $262e
-  I(0x7e9c, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x7e9c, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:7e65
@@ -19330,12 +19330,12 @@ L_7e87:
   SET_DE(POP(0x7e8d));  // pop de
   CALL(0x7e8e, interactionInitGraphics, 0x15fb, 0x7e91);  // call $15fb
 L_7e91:
-  CALL(0x7e91, interactionIncState, 0x23e0, 0x7e94);  // call $23e0
+  CALL(0x7e91, interactionIncState_hook, 0x23e0, 0x7e94);  // call $23e0
   I(0x7e94, 2); E = 0x48;  // ld e,$48
   I(0x7e96, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7e97, 2); alu_and(gb, 0x01);  // and $01
   CALL(0x7e99, interactionSetAnimation, 0x262e, 0x7e9c);  // call $262e
-  I(0x7e9c, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x7e9c, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:7e6d
@@ -19360,12 +19360,12 @@ L_7e87:
   SET_DE(POP(0x7e8d));  // pop de
   CALL(0x7e8e, interactionInitGraphics, 0x15fb, 0x7e91);  // call $15fb
 L_7e91:
-  CALL(0x7e91, interactionIncState, 0x23e0, 0x7e94);  // call $23e0
+  CALL(0x7e91, interactionIncState_hook, 0x23e0, 0x7e94);  // call $23e0
   I(0x7e94, 2); E = 0x48;  // ld e,$48
   I(0x7e96, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7e97, 2); alu_and(gb, 0x01);  // and $01
   CALL(0x7e99, interactionSetAnimation, 0x262e, 0x7e9c);  // call $262e
-  I(0x7e9c, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x7e9c, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:7e87
@@ -19378,24 +19378,24 @@ L_7e87:
   SET_DE(POP(0x7e8d));  // pop de
   CALL(0x7e8e, interactionInitGraphics, 0x15fb, 0x7e91);  // call $15fb
 L_7e91:
-  CALL(0x7e91, interactionIncState, 0x23e0, 0x7e94);  // call $23e0
+  CALL(0x7e91, interactionIncState_hook, 0x23e0, 0x7e94);  // call $23e0
   I(0x7e94, 2); E = 0x48;  // ld e,$48
   I(0x7e96, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7e97, 2); alu_and(gb, 0x01);  // and $01
   CALL(0x7e99, interactionSetAnimation, 0x262e, 0x7e9c);  // call $262e
-  I(0x7e9c, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x7e9c, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:7e91
 void interactionCodee6__afterCall7e91(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7e91:
-  CALL(0x7e91, interactionIncState, 0x23e0, 0x7e94);  // call $23e0
+  CALL(0x7e91, interactionIncState_hook, 0x23e0, 0x7e94);  // call $23e0
   I(0x7e94, 2); E = 0x48;  // ld e,$48
   I(0x7e96, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7e97, 2); alu_and(gb, 0x01);  // and $01
   CALL(0x7e99, interactionSetAnimation, 0x262e, 0x7e9c);  // call $262e
-  I(0x7e9c, 4); objectSetVisible83(gb); return;  // jp $1e72
+  I(0x7e9c, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
 // 10:7e9f
@@ -19437,8 +19437,8 @@ L_7ed1:
   I(0x7edb, 2); L = 0x08;  // ld l,$08
   I(0x7edd, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7ede, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  CALL(0x7edf, objectCopyPosition, 0x2242, 0x7ee2);  // call $2242
-  I(0x7ee2, 4); interactionIncState(gb); return;  // jp $23e0
+  CALL(0x7edf, objectCopyPosition_hook, 0x2242, 0x7ee2);  // call $2242
+  I(0x7ee2, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7eba
@@ -19465,8 +19465,8 @@ L_7ed1:
   I(0x7edb, 2); L = 0x08;  // ld l,$08
   I(0x7edd, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7ede, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  CALL(0x7edf, objectCopyPosition, 0x2242, 0x7ee2);  // call $2242
-  I(0x7ee2, 4); interactionIncState(gb); return;  // jp $23e0
+  CALL(0x7edf, objectCopyPosition_hook, 0x2242, 0x7ee2);  // call $2242
+  I(0x7ee2, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 
 // 10:7ee5

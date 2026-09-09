@@ -6,7 +6,7 @@
 void twinrova_writePositionWithXOffsetTocfd5(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x741c, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  CALL(0x741e, objectGetPosition, 0x208a, 0x7421);  // call $208a
+  CALL(0x741e, objectGetPosition_hook, 0x208a, 0x7421);  // call $208a
   I(0x7421, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x7423, 3); SET_HL(0xcfd5);  // ld hl,$cfd5
   I(0x7426, 2); mem_wr(gb, HL, B);  // ld (hl),b
@@ -222,7 +222,7 @@ void faroreSpawnSecretChest(GB *gb) {
   I(0x4059, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x405a, 2); L = 0x4b;  // ld l,$4b
   I(0x405c, 2); C = 0x75;  // ld c,$75
-  I(0x405e, 4); setShortPosition_paramC(gb); return;  // jp $20b9
+  I(0x405e, 4); if (hook_enabled_at(0x20b9)) { setShortPosition_paramC_hook(gb); return; } HANDOFF(0x20b9);  // jp $20b9
 }
 
 // 15:4061
@@ -236,7 +236,7 @@ void faroreGenerateGameTransferSecret(GB *gb) {
 // 15:4069
 void doorController_updateLinkRespawn(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4069, objectGetShortPosition, 0x2096, 0x406c);  // call $2096
+  CALL(0x4069, objectGetShortPosition_hook, 0x2096, 0x406c);  // call $2096
   I(0x406c, 1); C = A;  // ld c,a
   I(0x406d, 4); A = mem_rd(gb, 0xcc21);  // ld a,($cc21)
   I(0x4070, 2); alu_and(gb, 0xf0);  // and $f0
@@ -538,7 +538,7 @@ L_417e:
 L_4185:
   SET_HL(POP(0x4185));  // pop hl
   I(0x4186, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  CALL(0x4187, s8ToS16, 0x01cd, 0x418a);  // call $01cd
+  CALL(0x4187, s8ToS16_hook, 0x01cd, 0x418a);  // call $01cd
   I(0x418a, 2); alu_add_hl(gb, BC);  // add hl,bc
   I(0x418b, 3); goto L_4145;  // jr $4145
 L_418d:
@@ -618,7 +618,7 @@ L_417e:
 L_4185:
   SET_HL(POP(0x4185));  // pop hl
   I(0x4186, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  CALL(0x4187, s8ToS16, 0x01cd, 0x418a);  // call $01cd
+  CALL(0x4187, s8ToS16_hook, 0x01cd, 0x418a);  // call $01cd
   I(0x418a, 2); alu_add_hl(gb, BC);  // add hl,bc
   I(0x418b, 3); goto L_4145;  // jr $4145
 L_418d:
@@ -727,7 +727,7 @@ L_417e:
 L_4185:
   SET_HL(POP(0x4185));  // pop hl
   I(0x4186, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  CALL(0x4187, s8ToS16, 0x01cd, 0x418a);  // call $01cd
+  CALL(0x4187, s8ToS16_hook, 0x01cd, 0x418a);  // call $01cd
   I(0x418a, 2); alu_add_hl(gb, BC);  // add hl,bc
   I(0x418b, 3); goto L_4145;  // jr $4145
 L_418d:
@@ -808,7 +808,7 @@ L_417e:
 L_4185:
   SET_HL(POP(0x4185));  // pop hl
   I(0x4186, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  CALL(0x4187, s8ToS16, 0x01cd, 0x418a);  // call $01cd
+  CALL(0x4187, s8ToS16_hook, 0x01cd, 0x418a);  // call $01cd
   I(0x418a, 2); alu_add_hl(gb, BC);  // add hl,bc
   I(0x418b, 3); goto L_4145;  // jr $4145
 L_418d:
@@ -889,7 +889,7 @@ L_417e:
 L_4185:
   SET_HL(POP(0x4185));  // pop hl
   I(0x4186, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  CALL(0x4187, s8ToS16, 0x01cd, 0x418a);  // call $01cd
+  CALL(0x4187, s8ToS16_hook, 0x01cd, 0x418a);  // call $01cd
   I(0x418a, 2); alu_add_hl(gb, BC);  // add hl,bc
   I(0x418b, 3); goto L_4145;  // jr $4145
 L_418d:
@@ -970,7 +970,7 @@ L_417e:
 L_4185:
   SET_HL(POP(0x4185));  // pop hl
   I(0x4186, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  CALL(0x4187, s8ToS16, 0x01cd, 0x418a);  // call $01cd
+  CALL(0x4187, s8ToS16_hook, 0x01cd, 0x418a);  // call $01cd
   I(0x418a, 2); alu_add_hl(gb, BC);  // add hl,bc
   I(0x418b, 3); goto L_4145;  // jr $4145
 L_418d:
@@ -1142,7 +1142,7 @@ void movingPlatform_setScript(GB *gb) {
 void essence_createEnergySwirl(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4248:
-  CALL(0x4248, objectGetPosition, 0x208a, 0x424b);  // call $208a
+  CALL(0x4248, objectGetPosition_hook, 0x208a, 0x424b);  // call $208a
   I(0x424b, 2); A = 0xff;  // ld a,$ff
   I(0x424d, 4); createEnergySwirlGoingIn(gb); return;  // jp $29d8
 }
@@ -1358,7 +1358,7 @@ void makeTorchesLightable(GB *gb) {
 // 15:4f5d
 void func_4f5d(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4f5d, getThisRoomFlags, 0x197d, 0x4f60);  // call $197d
+  CALL(0x4f5d, getThisRoomFlags_hook, 0x197d, 0x4f60);  // call $197d
   I(0x4f60, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   I(0x4f62, 2); A = 0x4d;  // ld a,$4d
   I(0x4f64, 4); playSound_b00(gb); return;  // jp $0c98
@@ -1382,7 +1382,7 @@ void spawnBridge(GB *gb) {
 // 15:4f77
 void mermaidsCave_spawnBridge_room38(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4f77, getThisRoomFlags, 0x197d, 0x4f7a);  // call $197d
+  CALL(0x4f77, getThisRoomFlags_hook, 0x197d, 0x4f7a);  // call $197d
   I(0x4f7a, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));  // set 6,(hl)
   I(0x4f7c, 2); A = 0x4d;  // ld a,$4d
   CALL(0x4f7e, playSound_b00, 0x0c98, 0x4f81);  // call $0c98
@@ -1394,7 +1394,7 @@ void mermaidsCave_spawnBridge_room38(GB *gb) {
 // 15:4f89
 void herosCave_spawnBridge_roomc9(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4f89, getThisRoomFlags, 0x197d, 0x4f8c);  // call $197d
+  CALL(0x4f89, getThisRoomFlags_hook, 0x197d, 0x4f8c);  // call $197d
   I(0x4f8c, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));  // set 6,(hl)
   I(0x4f8e, 2); A = 0x4d;  // ld a,$4d
   CALL(0x4f90, playSound_b00, 0x0c98, 0x4f93);  // call $0c98
@@ -1490,14 +1490,14 @@ void setNextChildStage(GB *gb) {
 void setc6e2Bit(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x4fe6, 3); SET_HL(0xc6e2);  // ld hl,$c6e2
-  I(0x4fe9, 4); setFlag(gb); return;  // jp $020e
+  I(0x4fe9, 4); if (hook_enabled_at(0x020e)) { setFlag_hook(gb); return; } HANDOFF(0x020e);  // jp $020e
 }
 
 // 15:4fec
 void checkc6e2BitSet(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x4fec, 3); SET_HL(0xc6e2);  // ld hl,$c6e2
-  CALL(0x4fef, checkFlag, 0x0205, 0x4ff2);  // call $0205
+  CALL(0x4fef, checkFlag_hook, 0x0205, 0x4ff2);  // call $0205
   I(0x4ff2, 2); A = 0x01;  // ld a,$01
   if (!(F & FZ)) { I(0x4ff4, 3); goto L_4ff7; } I(0x4ff4, 2);  // jr nz,$4ff7
   I(0x4ff6, 1); alu_xor(gb, A);  // xor a
@@ -1645,7 +1645,7 @@ L_5074:
   I(0x507e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x507f, 2); H = mem_rd(gb, HL);  // ld h,(hl)
   I(0x5080, 1); L = A;  // ld l,a
-  CALL(0x5081, compareHlToBc, 0x01d6, 0x5084);  // call $01d6
+  CALL(0x5081, compareHlToBc_hook, 0x01d6, 0x5084);  // call $01d6
   I(0x5084, 1); A = alu_inc8(gb, A);  // inc a
   if (!(F & FZ)) { I(0x5085, 3); goto L_5089; } I(0x5085, 2);  // jr nz,$5089
   I(0x5087, 1); A = alu_inc8(gb, A);  // inc a
@@ -1864,7 +1864,7 @@ void giveRingAToLink(GB *gb) {
 // 15:5139
 void shootingGallery_giveRandomRingToLink(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5139, getRandomNumber, 0x043e, 0x513c);  // call $043e
+  CALL(0x5139, getRandomNumber_hook, 0x043e, 0x513c);  // call $043e
   I(0x513c, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x513e, 3); SET_HL(0x5145);  // ld hl,$5145
   RST_PUSH(0x5141, 0x5142);  // rst $10 (addAToHl)
@@ -1957,14 +1957,14 @@ void setLinkToState08(GB *gb) {
 // 15:5180
 void checkIsLinkedGameForScript(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5180, checkIsLinkedGame, 0x1992, 0x5183);  // call $1992
+  CALL(0x5180, checkIsLinkedGame_hook, 0x1992, 0x5183);  // call $1992
   I(0x5183, 4); writeFlagsTocddb(gb); return;  // jp $5118
 }
 
 // 15:5186
 void shootingGallery_checkIsNotLinkedGame(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5186, checkIsLinkedGame, 0x1992, 0x5189);  // call $1992
+  CALL(0x5186, checkIsLinkedGame_hook, 0x1992, 0x5189);  // call $1992
   CALL(0x5189, writeFlagsTocddb, 0x5118, 0x518c);  // call $5118
   I(0x518c, 1); alu_cpl(gb);  // cpl
   I(0x518d, 4); mem_wr(gb, 0xcddb, A);  // ld ($cddb),a
@@ -2062,7 +2062,7 @@ L_5442:
   I(0x5446, 3); mem_wr(gb, HL, 0x26);  // ld (hl),$26
   I(0x5448, 2); L = 0xc3;  // ld l,$c3
   I(0x544a, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x544b, objectCopyPositionWithOffset, 0x225a, 0x544e);  // call $225a
+  CALL(0x544b, objectCopyPositionWithOffset_hook, 0x225a, 0x544e);  // call $225a
   I(0x544e, 1); A = C;  // ld a,c
   I(0x544f, 2); alu_add(gb, 0x08);  // add $08
   I(0x5451, 1); C = A;  // ld c,a
@@ -2080,7 +2080,7 @@ L_5442:
   I(0x5446, 3); mem_wr(gb, HL, 0x26);  // ld (hl),$26
   I(0x5448, 2); L = 0xc3;  // ld l,$c3
   I(0x544a, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x544b, objectCopyPositionWithOffset, 0x225a, 0x544e);  // call $225a
+  CALL(0x544b, objectCopyPositionWithOffset_hook, 0x225a, 0x544e);  // call $225a
   I(0x544e, 1); A = C;  // ld a,c
   I(0x544f, 2); alu_add(gb, 0x08);  // add $08
   I(0x5451, 1); C = A;  // ld c,a
@@ -2180,7 +2180,7 @@ void ralph_createLinkedSwordAnimation(GB *gb) {
   I(0x5640, 2); L = 0x57;  // ld l,$57
   I(0x5642, 1); A = D;  // ld a,d
   I(0x5643, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5644, 4); objectCopyPosition(gb); return;  // jp $2242
+  I(0x5644, 4); if (hook_enabled_at(0x2242)) { objectCopyPosition_hook(gb); return; } HANDOFF(0x2242);  // jp $2242
 }
 
 // 15:5647
@@ -2356,7 +2356,7 @@ void monkey_decideTextIndex(GB *gb) {
   if ((F & FZ)) { I(0x5807, 3); goto L_580b; } I(0x5807, 2);  // jr z,$580b
   I(0x5809, 2); B = 0x05;  // ld b,$05
 L_580b:
-  CALL(0x580b, getRandomNumber, 0x043e, 0x580e);  // call $043e
+  CALL(0x580b, getRandomNumber_hook, 0x043e, 0x580e);  // call $043e
   I(0x580e, 2); alu_and(gb, 0x03);  // and $03
   I(0x5810, 1); alu_add(gb, B);  // add b
   I(0x5811, 2); alu_add(gb, 0x08);  // add $08
@@ -2601,7 +2601,7 @@ void soldierUpdateMinimap(GB *gb) {
 // 15:5a37
 void soldierGetRandomVar32Val(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5a37, getRandomNumber, 0x043e, 0x5a3a);  // call $043e
+  CALL(0x5a37, getRandomNumber_hook, 0x043e, 0x5a3a);  // call $043e
   I(0x5a3a, 2); alu_and(gb, 0x03);  // and $03
   I(0x5a3c, 3); SET_HL(0x5a49);  // ld hl,$5a49
   RST_PUSH(0x5a3f, 0x5a40);  // rst $10 (addAToHl)
@@ -2666,7 +2666,7 @@ L_5a5d:
 // 15:5acc
 void tokayGame_resetRoomFlag40(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5acc, getThisRoomFlags, 0x197d, 0x5acf);  // call $197d
+  CALL(0x5acc, getThisRoomFlags_hook, 0x197d, 0x5acf);  // call $197d
   I(0x5acf, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 6)));  // res 6,(hl)
   RET(0x5ad1); return;  // ret
 }
@@ -2674,7 +2674,7 @@ void tokayGame_resetRoomFlag40(GB *gb) {
 // 15:5ad2
 void tokayGame_resetRoomFlag80(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5ad2, getThisRoomFlags, 0x197d, 0x5ad5);  // call $197d
+  CALL(0x5ad2, getThisRoomFlags_hook, 0x197d, 0x5ad5);  // call $197d
   I(0x5ad5, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
   RET(0x5ad7); return;  // ret
 }
@@ -2686,7 +2686,7 @@ void tokayGame_determinePrizeAndCheckRupees(GB *gb) {
   I(0x5ad9, 4); A = mem_rd(gb, 0xc6ea);  // ld a,($c6ea)
   I(0x5adc, 2); alu_cp(gb, 0x04);  // cp $04
   if (!(F & FZ)) { I(0x5ade, 3); goto L_5aea; } I(0x5ade, 2);  // jr nz,$5aea
-  CALL(0x5ae0, getRandomNumber, 0x043e, 0x5ae3);  // call $043e
+  CALL(0x5ae0, getRandomNumber_hook, 0x043e, 0x5ae3);  // call $043e
   I(0x5ae3, 2); alu_and(gb, 0x07);  // and $07
   I(0x5ae5, 2); A = 0x04;  // ld a,$04
   if (!(F & FZ)) { I(0x5ae7, 3); goto L_5aea; } I(0x5ae7, 2);  // jr nz,$5aea
@@ -2701,7 +2701,7 @@ void tokayGame_checkRupees(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x5aed, 4); A = mem_rd(gb, 0xcfdd);  // ld a,($cfdd)
   I(0x5af0, 3); SET_BC(0x5b04);  // ld bc,$5b04
-  CALL(0x5af3, addAToBc, 0x006d, 0x5af6);  // call $006d
+  CALL(0x5af3, addAToBc_hook, 0x006d, 0x5af6);  // call $006d
   I(0x5af6, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x5af7, 1); H = D;  // ld h,d
   I(0x5af8, 2); L = 0x43;  // ld l,$43
@@ -2787,7 +2787,7 @@ L_5b41:
   CALL(0x5b41, createTreasure, 0x27d4, 0x5b44);  // call $27d4
   if (!(F & FZ)) { RET_TAKEN(0x5b44); return; } I(0x5b44, 2);  // ret nz
   I(0x5b45, 3); SET_DE(0xd00b);  // ld de,$d00b
-  I(0x5b48, 4); objectCopyPosition_rawAddress(gb); return;  // jp $2247
+  I(0x5b48, 4); if (hook_enabled_at(0x2247)) { objectCopyPosition_rawAddress_hook(gb); return; } HANDOFF(0x2247);  // jp $2247
 }
 
 // 15:5b4b
@@ -2822,7 +2822,7 @@ L_5b73:
   I(0x5b75, 2); A = 0x03;  // ld a,$03
   I(0x5b77, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x5b78, 3); SET_DE(0xd00b);  // ld de,$d00b
-  I(0x5b7b, 4); objectCopyPosition_rawAddress(gb); return;  // jp $2247
+  I(0x5b7b, 4); if (hook_enabled_at(0x2247)) { objectCopyPosition_rawAddress_hook(gb); return; } HANDOFF(0x2247);  // jp $2247
 }
 
 // 15:5b7e
@@ -2837,7 +2837,7 @@ void tokayGame_givePrizeToLink(GB *gb) {
   I(0x5b8b, 1); L = alu_inc8(gb, L);  // inc l
   I(0x5b8c, 4); A = mem_rd(gb, 0xc6ea);  // ld a,($c6ea)
   I(0x5b8f, 3); SET_BC(0x5bbb);  // ld bc,$5bbb
-  CALL(0x5b92, addDoubleIndexToBc, 0x007e, 0x5b95);  // call $007e
+  CALL(0x5b92, addDoubleIndexToBc_hook, 0x007e, 0x5b95);  // call $007e
   I(0x5b95, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x5b96, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x5b97, 2); SET_BC(BC + 1);  // inc bc
@@ -2847,7 +2847,7 @@ void tokayGame_givePrizeToLink(GB *gb) {
   I(0x5b9c, 2); A = 0x03;  // ld a,$03
   I(0x5b9e, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x5b9f, 3); SET_DE(0xd00b);  // ld de,$d00b
-  CALL(0x5ba2, objectCopyPosition_rawAddress, 0x2247, 0x5ba5);  // call $2247
+  CALL(0x5ba2, objectCopyPosition_rawAddress_hook, 0x2247, 0x5ba5);  // call $2247
   I(0x5ba5, 3); goto L_5bb2;  // jr $5bb2
 L_5ba7:
   I(0x5ba7, 2); C = 0x02;  // ld c,$02
@@ -2993,7 +2993,7 @@ void tokayFlipDirection(GB *gb) {
 // 15:5c06
 void tokayPlantScentSeedling(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5c06, getThisRoomFlags, 0x197d, 0x5c09);  // call $197d
+  CALL(0x5c06, getThisRoomFlags_hook, 0x197d, 0x5c09);  // call $197d
   I(0x5c09, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   I(0x5c0b, 1); H = alu_dec8(gb, H);  // dec h
   I(0x5c0c, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
@@ -3009,7 +3009,7 @@ void tokayGiveBombUpgrade(GB *gb) {
   I(0x5c17, 2); alu_add(gb, 0x20);  // add $20
   I(0x5c19, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
   I(0x5c1a, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5c1b, 4); setStatusBarNeedsRefreshBit1(gb); return;  // jp $17d8
+  I(0x5c1b, 4); if (hook_enabled_at(0x17d8)) { setStatusBarNeedsRefreshBit1_hook(gb); return; } HANDOFF(0x17d8);  // jp $17d8
 }
 
 // 15:5c1e
@@ -3077,7 +3077,7 @@ L_5d25:
   I(0x5d30, 2); mem_wr(gb, HL, C);  // ld (hl),c
   PUSH(0x5d31, DE);  // push de
   I(0x5d32, 3); SET_DE(0xd00b);  // ld de,$d00b
-  CALL(0x5d35, objectCopyPosition_rawAddress, 0x2247, 0x5d38);  // call $2247
+  CALL(0x5d35, objectCopyPosition_rawAddress_hook, 0x2247, 0x5d38);  // call $2247
   SET_DE(POP(0x5d38));  // pop de
   RET(0x5d39); return;  // ret
 }
@@ -3110,7 +3110,7 @@ void mamamuYanRandomizeDogLocation(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x5de7, 3); SET_HL(0xcde2);  // ld hl,$cde2
 L_5dea:
-  CALL(0x5dea, getRandomNumber, 0x043e, 0x5ded);  // call $043e
+  CALL(0x5dea, getRandomNumber_hook, 0x043e, 0x5ded);  // call $043e
   I(0x5ded, 2); alu_and(gb, 0x03);  // and $03
   I(0x5def, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
   if ((F & FZ)) { I(0x5df0, 3); goto L_5dea; } I(0x5df0, 2);  // jr z,$5dea
@@ -3122,7 +3122,7 @@ L_5dea:
 void mamamuYanRandomizeDogLocation__loop(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5dea:
-  CALL(0x5dea, getRandomNumber, 0x043e, 0x5ded);  // call $043e
+  CALL(0x5dea, getRandomNumber_hook, 0x043e, 0x5ded);  // call $043e
   I(0x5ded, 2); alu_and(gb, 0x03);  // and $03
   I(0x5def, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
   if ((F & FZ)) { I(0x5df0, 3); goto L_5dea; } I(0x5df0, 2);  // jr z,$5dea
@@ -3170,7 +3170,7 @@ void mamamuDog_reverseDirection(GB *gb) {
 // 15:5eb5
 void mamamuDog_setCounterRandomly(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5eb5, getRandomNumber, 0x043e, 0x5eb8);  // call $043e
+  CALL(0x5eb5, getRandomNumber_hook, 0x043e, 0x5eb8);  // call $043e
   I(0x5eb8, 2); alu_and(gb, 0x07);  // and $07
   I(0x5eba, 3); SET_HL(0x5ecc);  // ld hl,$5ecc
   RST_PUSH(0x5ebd, 0x5ebe);  // rst $10 (addAToHl)
@@ -3222,7 +3222,7 @@ void mamamuDog_decCounter(GB *gb) {
 // 15:5f15
 void pickaxeWorker_setRandomDelay(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5f15, getRandomNumber_noPreserveVars, 0x0453, 0x5f18);  // call $0453
+  CALL(0x5f15, getRandomNumber_noPreserveVars_hook, 0x0453, 0x5f18);  // call $0453
   I(0x5f18, 2); alu_and(gb, 0x1f);  // and $1f
   I(0x5f1a, 2); alu_sub(gb, 0x10);  // sub $10
   I(0x5f1c, 2); alu_add(gb, 0x3c);  // add $3c
@@ -3258,7 +3258,7 @@ L_5f2d:
 // 15:5f35
 void pickaxeWorker_chooseRandomBlackTowerText(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5f35, getRandomNumber, 0x043e, 0x5f38);  // call $043e
+  CALL(0x5f35, getRandomNumber_hook, 0x043e, 0x5f38);  // call $043e
   I(0x5f38, 2); alu_and(gb, 0x07);  // and $07
   I(0x5f3a, 3); SET_HL(0x5f47);  // ld hl,$5f47
   RST_PUSH(0x5f3d, 0x5f3e);  // rst $10 (addAToHl)
@@ -3330,7 +3330,7 @@ L_5f9e:
 void hardhatWorker_storeLinkVarsSomewhere(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x5fa9, 3); SET_DE(0xd00b);  // ld de,$d00b
-  CALL(0x5fac, getShortPositionFromDE, 0x209b, 0x5faf);  // call $209b
+  CALL(0x5fac, getShortPositionFromDE_hook, 0x209b, 0x5faf);  // call $209b
   I(0x5faf, 4); mem_wr(gb, 0xcfd3, A);  // ld ($cfd3),a
   I(0x5fb2, 2); E = 0x08;  // ld e,$08
   I(0x5fb4, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -3396,7 +3396,7 @@ void hardhatWorker_chooseTextForPatroller(GB *gb) {
   I(0x5fe5, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x5fe6, 2); alu_cp(gb, 0x04);  // cp $04
   if ((F & FZ)) { I(0x5fe8, 3); goto L_5fef; } I(0x5fe8, 2);  // jr z,$5fef
-  CALL(0x5fea, getRandomNumber, 0x043e, 0x5fed);  // call $043e
+  CALL(0x5fea, getRandomNumber_hook, 0x043e, 0x5fed);  // call $043e
   I(0x5fed, 2); alu_and(gb, 0x03);  // and $03
 L_5fef:
   I(0x5fef, 3); SET_HL(0x5ffc);  // ld hl,$5ffc
@@ -3452,16 +3452,16 @@ void poe_decCounterAndFlickerVisibility(GB *gb) {
   I(0x613c, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x613f, 1); alu_rrca(gb);  // rrca
   I(0x6140, 1); alu_rrca(gb);  // rrca
-  if (!(F & FC)) { I(0x6141, 4); objectSetInvisible(gb); return; } I(0x6141, 3);  // jp nc,$1e7b
+  if (!(F & FC)) { I(0x6141, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b); } I(0x6141, 3);  // jp nc,$1e7b
 L_6144:
-  I(0x6144, 4); objectSetVisible(gb); return;  // jp $1e84
+  I(0x6144, 4); if (hook_enabled_at(0x1e84)) { objectSetVisible_hook(gb); return; } HANDOFF(0x1e84);  // jp $1e84
 }
 
 // 15:6144
 void poe_decCounterAndFlickerVisibility__setVisible(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6144:
-  I(0x6144, 4); objectSetVisible(gb); return;  // jp $1e84
+  I(0x6144, 4); if (hook_enabled_at(0x1e84)) { objectSetVisible_hook(gb); return; } HANDOFF(0x1e84);  // jp $1e84
 }
 
 // 15:61b9
@@ -3568,7 +3568,7 @@ void toiletHand_checkVisibility(GB *gb) {
 void comedian_checkGameProgress(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x6259, 4); A = mem_rd(gb, 0xc6bf);  // ld a,($c6bf)
-  CALL(0x625c, getHighestSetBit, 0x01ea, 0x625f);  // call $01ea
+  CALL(0x625c, getHighestSetBit_hook, 0x01ea, 0x625f);  // call $01ea
   I(0x625f, 2); alu_cp(gb, 0x03);  // cp $03
   if ((F & FC)) { I(0x6261, 3); goto L_6265; } I(0x6261, 2);  // jr c,$6265
   I(0x6263, 2); A = 0x02;  // ld a,$02
@@ -3591,7 +3591,7 @@ void checkEssenceObtained(GB *gb) {
 void checkEssenceNotObtained(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x6271, 3); SET_HL(0xc6bf);  // ld hl,$c6bf
-  CALL(0x6274, checkFlag, 0x0205, 0x6277);  // call $0205
+  CALL(0x6274, checkFlag_hook, 0x0205, 0x6277);  // call $0205
   I(0x6277, 4); writeFlagsTocddb(gb); return;  // jp $5118
 }
 
@@ -3646,7 +3646,7 @@ void goronDance_clearVariables(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x62ef, 2); B = 0x20;  // ld b,$20
   I(0x62f1, 3); SET_HL(0xcfc0);  // ld hl,$cfc0
-  CALL(0x62f4, clearMemory, 0x046f, 0x62f7);  // call $046f
+  CALL(0x62f4, clearMemory_hook, 0x046f, 0x62f7);  // call $046f
   I(0x62f7, 2); A = 0x02;  // ld a,$02
   I(0x62f9, 4); mem_wr(gb, 0xcfd2, A);  // ld ($cfd2),a
   I(0x62fc, 3); SET_HL(0xd008);  // ld hl,$d008
@@ -3772,7 +3772,7 @@ L_637b:
   if ((F & FZ)) { I(0x6382, 3); goto L_6386; } I(0x6382, 2);  // jr z,$6386
   I(0x6384, 2); B = 0x02;  // ld b,$02
 L_6386:
-  CALL(0x6386, getRandomNumber, 0x043e, 0x6389);  // call $043e
+  CALL(0x6386, getRandomNumber_hook, 0x043e, 0x6389);  // call $043e
   I(0x6389, 2); alu_and(gb, 0x01);  // and $01
   I(0x638b, 1); alu_add(gb, B);  // add b
   I(0x638c, 3); SET_HL(0x6394);  // ld hl,$6394
@@ -3793,7 +3793,7 @@ L_637b:
   if ((F & FZ)) { I(0x6382, 3); goto L_6386; } I(0x6382, 2);  // jr z,$6386
   I(0x6384, 2); B = 0x02;  // ld b,$02
 L_6386:
-  CALL(0x6386, getRandomNumber, 0x043e, 0x6389);  // call $043e
+  CALL(0x6386, getRandomNumber_hook, 0x043e, 0x6389);  // call $043e
   I(0x6389, 2); alu_and(gb, 0x01);  // and $01
   I(0x638b, 1); alu_add(gb, B);  // add b
   I(0x638c, 3); SET_HL(0x6394);  // ld hl,$6394
@@ -3808,7 +3808,7 @@ L_6386:
 void goronDance_giveRandomRingPrize__giveRingForLevel(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6386:
-  CALL(0x6386, getRandomNumber, 0x043e, 0x6389);  // call $043e
+  CALL(0x6386, getRandomNumber_hook, 0x043e, 0x6389);  // call $043e
   I(0x6389, 2); alu_and(gb, 0x01);  // and $01
   I(0x638b, 1); alu_add(gb, B);  // add b
   I(0x638c, 3); SET_HL(0x6394);  // ld hl,$6394
@@ -3864,7 +3864,7 @@ L_63a6:
 void goron_decideTextToShow_differentForLinkedInPast(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x63ab, 1); C = A;  // ld c,a
-  CALL(0x63ac, checkIsLinkedGame, 0x1992, 0x63af);  // call $1992
+  CALL(0x63ac, checkIsLinkedGame_hook, 0x1992, 0x63af);  // call $1992
   if (!(F & FZ)) { I(0x63af, 3); goto L_63c3; } I(0x63af, 2);  // jr nz,$63c3
   I(0x63b1, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
   I(0x63b4, 2); alu_and(gb, 0x80);  // and $80
@@ -4061,7 +4061,7 @@ L_6469:
   I(0x6486, 1); A = B;  // ld a,b
   I(0x6487, 2); alu_cp(gb, 0x27);  // cp $27
   if (!(F & FZ)) { RET_TAKEN(0x6489); return; } I(0x6489, 2);  // ret nz
-  CALL(0x648a, checkIsLinkedGame, 0x1992, 0x648d);  // call $1992
+  CALL(0x648a, checkIsLinkedGame_hook, 0x1992, 0x648d);  // call $1992
   if (!(F & FZ)) { RET_TAKEN(0x648d); return; } I(0x648d, 2);  // ret nz
   I(0x648e, 2); A = 0xff;  // ld a,$ff
   I(0x6490, 1); E = alu_dec8(gb, E);  // dec e
@@ -4093,7 +4093,7 @@ L_6440:
   if (!(F & FZ)) { I(0x644c, 3); goto L_645f; } I(0x644c, 2);  // jr nz,$645f
   I(0x644e, 2); A = 0x03;  // ld a,$03
   I(0x6450, 3); SET_HL(0xc6bf);  // ld hl,$c6bf
-  CALL(0x6453, checkFlag, 0x0205, 0x6456);  // call $0205
+  CALL(0x6453, checkFlag_hook, 0x0205, 0x6456);  // call $0205
   if (!(F & FZ)) { I(0x6456, 3); goto L_645b; } I(0x6456, 2);  // jr nz,$645b
 L_6458:
   I(0x6458, 1); alu_xor(gb, A);  // xor a
@@ -4150,7 +4150,7 @@ L_6440:
   if (!(F & FZ)) { I(0x644c, 3); goto L_645f; } I(0x644c, 2);  // jr nz,$645f
   I(0x644e, 2); A = 0x03;  // ld a,$03
   I(0x6450, 3); SET_HL(0xc6bf);  // ld hl,$c6bf
-  CALL(0x6453, checkFlag, 0x0205, 0x6456);  // call $0205
+  CALL(0x6453, checkFlag_hook, 0x0205, 0x6456);  // call $0205
   if (!(F & FZ)) { I(0x6456, 3); goto L_645b; } I(0x6456, 2);  // jr nz,$645b
 L_6458:
   I(0x6458, 1); alu_xor(gb, A);  // xor a
@@ -4260,7 +4260,7 @@ L_6469:
   I(0x6486, 1); A = B;  // ld a,b
   I(0x6487, 2); alu_cp(gb, 0x27);  // cp $27
   if (!(F & FZ)) { RET_TAKEN(0x6489); return; } I(0x6489, 2);  // ret nz
-  CALL(0x648a, checkIsLinkedGame, 0x1992, 0x648d);  // call $1992
+  CALL(0x648a, checkIsLinkedGame_hook, 0x1992, 0x648d);  // call $1992
   if (!(F & FZ)) { RET_TAKEN(0x648d); return; } I(0x648d, 2);  // ret nz
   I(0x648e, 2); A = 0xff;  // ld a,$ff
   I(0x6490, 1); E = alu_dec8(gb, E);  // dec e
@@ -4484,7 +4484,7 @@ void goron_decMovementCounter(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x65bd, 1); H = D;  // ld h,d
   I(0x65be, 2); L = 0x7c;  // ld l,$7c
-  CALL(0x65c0, decHlRef16WithCap, 0x0237, 0x65c3);  // call $0237
+  CALL(0x65c0, decHlRef16WithCap_hook, 0x0237, 0x65c3);  // call $0237
   I(0x65c3, 4); writeFlagsTocddb(gb); return;  // jp $5118
 }
 
@@ -4614,7 +4614,7 @@ void goron_createRockDebrisToLeft(GB *gb) {
   I(0x661a, 3); SET_BC(0xf6fa);  // ld bc,$f6fa
   I(0x661d, 3); goto L_6622;  // jr $6622
 L_6622:
-  CALL(0x6622, getRandomNumber, 0x043e, 0x6625);  // call $043e
+  CALL(0x6622, getRandomNumber_hook, 0x043e, 0x6625);  // call $043e
   I(0x6625, 2); alu_and(gb, 0x01);  // and $01
   I(0x6627, 3); mem_wr(gb, 0xff8d, A);  // ldh ($ff8d),a
   I(0x6629, 1); alu_xor(gb, A);  // xor a
@@ -4633,7 +4633,7 @@ L_662a:
   I(0x663e, 2); L = 0x49;  // ld l,$49
   I(0x6640, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x6642, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x6643, objectCopyPositionWithOffset, 0x225a, 0x6646);  // call $225a
+  CALL(0x6643, objectCopyPositionWithOffset_hook, 0x225a, 0x6646);  // call $225a
   I(0x6646, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x6648, 1); A = alu_inc8(gb, A);  // inc a
   I(0x6649, 2); alu_cp(gb, 0x04);  // cp $04
@@ -4647,7 +4647,7 @@ L_664d:
 void goron_createRockDebrisToRight(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x661f, 3); SET_BC(0xf606);  // ld bc,$f606
-  CALL(0x6622, getRandomNumber, 0x043e, 0x6625);  // call $043e
+  CALL(0x6622, getRandomNumber_hook, 0x043e, 0x6625);  // call $043e
   I(0x6625, 2); alu_and(gb, 0x01);  // and $01
   I(0x6627, 3); mem_wr(gb, 0xff8d, A);  // ldh ($ff8d),a
   I(0x6629, 1); alu_xor(gb, A);  // xor a
@@ -4666,7 +4666,7 @@ L_662a:
   I(0x663e, 2); L = 0x49;  // ld l,$49
   I(0x6640, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x6642, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x6643, objectCopyPositionWithOffset, 0x225a, 0x6646);  // call $225a
+  CALL(0x6643, objectCopyPositionWithOffset_hook, 0x225a, 0x6646);  // call $225a
   I(0x6646, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x6648, 1); A = alu_inc8(gb, A);  // inc a
   I(0x6649, 2); alu_cp(gb, 0x04);  // cp $04
@@ -4694,7 +4694,7 @@ L_662a:
   I(0x663e, 2); L = 0x49;  // ld l,$49
   I(0x6640, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x6642, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x6643, objectCopyPositionWithOffset, 0x225a, 0x6646);  // call $225a
+  CALL(0x6643, objectCopyPositionWithOffset_hook, 0x225a, 0x6646);  // call $225a
   I(0x6646, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x6648, 1); A = alu_inc8(gb, A);  // inc a
   I(0x6649, 2); alu_cp(gb, 0x04);  // cp $04
@@ -4736,7 +4736,7 @@ void goron_tryTakeEmberSeedsAndBombs(GB *gb) {
   I(0x6677, 2); alu_sub(gb, 0x20);  // sub $20
   I(0x6679, 1); alu_daa(gb);  // daa
   I(0x667a, 4); mem_wr(gb, 0xc6b9, A);  // ld ($c6b9),a
-  CALL(0x667d, setStatusBarNeedsRefreshBit1, 0x17d8, 0x6680);  // call $17d8
+  CALL(0x667d, setStatusBarNeedsRefreshBit1_hook, 0x17d8, 0x6680);  // call $17d8
   I(0x6680, 1); alu_xor(gb, A);  // xor a
   I(0x6681, 4); writeFlagsTocddb(gb); return;  // jp $5118
 L_6684:
@@ -4785,13 +4785,13 @@ void goron_clearRefillBit(GB *gb) {
 // 15:6698
 void goron_targetCarts_spawnPrize(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6698, getThisRoomFlags, 0x197d, 0x669b);  // call $197d
+  CALL(0x6698, getThisRoomFlags_hook, 0x197d, 0x669b);  // call $197d
   I(0x669b, 3); alu_bit(gb, 5, mem_rd(gb, HL));  // bit 5,(hl)
   if (!(F & FZ)) { I(0x669d, 3); goto L_66a2; } I(0x669d, 2);  // jr nz,$66a2
   I(0x669f, 1); alu_xor(gb, A);  // xor a
   I(0x66a0, 3); goto L_66bb;  // jr $66bb
 L_66a2:
-  CALL(0x66a2, getRandomNumber, 0x043e, 0x66a5);  // call $043e
+  CALL(0x66a2, getRandomNumber_hook, 0x043e, 0x66a5);  // call $043e
   I(0x66a5, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x66a7, 3); SET_HL(0x66d8);  // ld hl,$66d8
   RST_PUSH(0x66aa, 0x66ab);  // rst $10 (addAToHl)
@@ -4831,7 +4831,7 @@ L_66bb:
 void goron_targetCarts_spawnPrize__alreadyGotBrisket(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_66a2:
-  CALL(0x66a2, getRandomNumber, 0x043e, 0x66a5);  // call $043e
+  CALL(0x66a2, getRandomNumber_hook, 0x043e, 0x66a5);  // call $043e
   I(0x66a5, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x66a7, 3); SET_HL(0x66d8);  // ld hl,$66d8
   RST_PUSH(0x66aa, 0x66ab);  // rst $10 (addAToHl)
@@ -4919,7 +4919,7 @@ L_66e8:
   I(0x66f9, 1); alu_xor(gb, A);  // xor a
   I(0x66fa, 3); goto L_6706;  // jr $6706
 L_66fc:
-  CALL(0x66fc, getRandomNumber, 0x043e, 0x66ff);  // call $043e
+  CALL(0x66fc, getRandomNumber_hook, 0x043e, 0x66ff);  // call $043e
   I(0x66ff, 2); alu_and(gb, 0x0f);  // and $0f
 L_6700:
   I(0x6700, 1); alu_rrca(gb);  // rrca
@@ -4931,7 +4931,7 @@ L_6700:
 L_6706:
   I(0x6706, 2); alu_cp(gb, 0x04);  // cp $04
   if (!(F & FZ)) { I(0x6708, 3); goto L_6711; } I(0x6708, 2);  // jr nz,$6711
-  CALL(0x670a, getRandomNumber, 0x043e, 0x670d);  // call $043e
+  CALL(0x670a, getRandomNumber_hook, 0x043e, 0x670d);  // call $043e
   I(0x670d, 2); alu_and(gb, 0x01);  // and $01
   I(0x670f, 2); alu_add(gb, 0x04);  // add $04
 L_6711:
@@ -4974,7 +4974,7 @@ L_66e8:
   I(0x66f9, 1); alu_xor(gb, A);  // xor a
   I(0x66fa, 3); goto L_6706;  // jr $6706
 L_66fc:
-  CALL(0x66fc, getRandomNumber, 0x043e, 0x66ff);  // call $043e
+  CALL(0x66fc, getRandomNumber_hook, 0x043e, 0x66ff);  // call $043e
   I(0x66ff, 2); alu_and(gb, 0x0f);  // and $0f
 L_6700:
   I(0x6700, 1); alu_rrca(gb);  // rrca
@@ -4986,7 +4986,7 @@ L_6700:
 L_6706:
   I(0x6706, 2); alu_cp(gb, 0x04);  // cp $04
   if (!(F & FZ)) { I(0x6708, 3); goto L_6711; } I(0x6708, 2);  // jr nz,$6711
-  CALL(0x670a, getRandomNumber, 0x043e, 0x670d);  // call $043e
+  CALL(0x670a, getRandomNumber_hook, 0x043e, 0x670d);  // call $043e
   I(0x670d, 2); alu_and(gb, 0x01);  // and $01
   I(0x670f, 2); alu_add(gb, 0x04);  // add $04
 L_6711:
@@ -5016,13 +5016,13 @@ L_6711:
 // 15:66f2
 void goron_bigBang_spawnPrize(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x66f2, getThisRoomFlags, 0x197d, 0x66f5);  // call $197d
+  CALL(0x66f2, getThisRoomFlags_hook, 0x197d, 0x66f5);  // call $197d
   I(0x66f5, 3); alu_bit(gb, 5, mem_rd(gb, HL));  // bit 5,(hl)
   if (!(F & FZ)) { I(0x66f7, 3); goto L_66fc; } I(0x66f7, 2);  // jr nz,$66fc
   I(0x66f9, 1); alu_xor(gb, A);  // xor a
   I(0x66fa, 3); goto L_6706;  // jr $6706
 L_66fc:
-  CALL(0x66fc, getRandomNumber, 0x043e, 0x66ff);  // call $043e
+  CALL(0x66fc, getRandomNumber_hook, 0x043e, 0x66ff);  // call $043e
   I(0x66ff, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x6701, 3); SET_HL(0x6732);  // ld hl,$6732
   RST_PUSH(0x6704, 0x6705);  // rst $10 (addAToHl)
@@ -5032,7 +5032,7 @@ L_66fc:
 L_6706:
   I(0x6706, 2); alu_cp(gb, 0x04);  // cp $04
   if (!(F & FZ)) { I(0x6708, 3); goto L_6711; } I(0x6708, 2);  // jr nz,$6711
-  CALL(0x670a, getRandomNumber, 0x043e, 0x670d);  // call $043e
+  CALL(0x670a, getRandomNumber_hook, 0x043e, 0x670d);  // call $043e
   I(0x670d, 2); alu_and(gb, 0x01);  // and $01
   I(0x670f, 2); alu_add(gb, 0x04);  // add $04
 L_6711:
@@ -5063,7 +5063,7 @@ L_6711:
 void goron_bigBang_spawnPrize__alreadyGotMermaidKey(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_66fc:
-  CALL(0x66fc, getRandomNumber, 0x043e, 0x66ff);  // call $043e
+  CALL(0x66fc, getRandomNumber_hook, 0x043e, 0x66ff);  // call $043e
   I(0x66ff, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x6701, 3); SET_HL(0x6732);  // ld hl,$6732
   RST_PUSH(0x6704, 0x6705);  // rst $10 (addAToHl)
@@ -5073,7 +5073,7 @@ L_66fc:
 L_6706:
   I(0x6706, 2); alu_cp(gb, 0x04);  // cp $04
   if (!(F & FZ)) { I(0x6708, 3); goto L_6711; } I(0x6708, 2);  // jr nz,$6711
-  CALL(0x670a, getRandomNumber, 0x043e, 0x670d);  // call $043e
+  CALL(0x670a, getRandomNumber_hook, 0x043e, 0x670d);  // call $043e
   I(0x670d, 2); alu_and(gb, 0x01);  // and $01
   I(0x670f, 2); alu_add(gb, 0x04);  // add $04
 L_6711:
@@ -5106,7 +5106,7 @@ void goron_bigBang_spawnPrize__checkSpawnPrize(GB *gb) {
 L_6706:
   I(0x6706, 2); alu_cp(gb, 0x04);  // cp $04
   if (!(F & FZ)) { I(0x6708, 3); goto L_6711; } I(0x6708, 2);  // jr nz,$6711
-  CALL(0x670a, getRandomNumber, 0x043e, 0x670d);  // call $043e
+  CALL(0x670a, getRandomNumber_hook, 0x043e, 0x670d);  // call $043e
   I(0x670d, 2); alu_and(gb, 0x01);  // and $01
   I(0x670f, 2); alu_add(gb, 0x04);  // add $04
 L_6711:
@@ -5420,7 +5420,7 @@ void goron_targetCarts_endGame(GB *gb) {
 // 15:67b1
 void goron_targetCarts_setPlayingFlag(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x67b1, getThisRoomFlags, 0x197d, 0x67b4);  // call $197d
+  CALL(0x67b1, getThisRoomFlags_hook, 0x197d, 0x67b4);  // call $197d
   I(0x67b4, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   RET(0x67b6); return;  // ret
 }
@@ -5428,7 +5428,7 @@ void goron_targetCarts_setPlayingFlag(GB *gb) {
 // 15:67b7
 void goron_targetCarts_clearPlayingFlag(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x67b7, getThisRoomFlags, 0x197d, 0x67ba);  // call $197d
+  CALL(0x67b7, getThisRoomFlags_hook, 0x197d, 0x67ba);  // call $197d
   I(0x67ba, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
   RET(0x67bc); return;  // ret
 }
@@ -5620,11 +5620,11 @@ void goron_targetCarts_restoreInventory(GB *gb) {
 // 15:6839
 void goron_targetCarts_loadCrystals(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6839, getThisRoomFlags, 0x197d, 0x683c);  // call $197d
+  CALL(0x6839, getThisRoomFlags_hook, 0x197d, 0x683c);  // call $197d
   I(0x683c, 3); alu_bit(gb, 5, mem_rd(gb, HL));  // bit 5,(hl)
   I(0x683e, 2); A = 0x00;  // ld a,$00
   if ((F & FZ)) { I(0x6840, 3); goto L_6848; } I(0x6840, 2);  // jr z,$6848
-  CALL(0x6842, getRandomNumber, 0x043e, 0x6845);  // call $043e
+  CALL(0x6842, getRandomNumber_hook, 0x043e, 0x6845);  // call $043e
   I(0x6845, 2); alu_and(gb, 0x01);  // and $01
   I(0x6847, 1); A = alu_inc8(gb, A);  // inc a
 L_6848:
@@ -5640,7 +5640,7 @@ void goron_targetCarts_reloadCrystalsInFirstRoom(GB *gb) {
 L_6852:
   I(0x6852, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   I(0x6854, 3); SET_HL(0xcfdd);  // ld hl,$cfdd
-  CALL(0x6857, checkFlag, 0x0205, 0x685a);  // call $0205
+  CALL(0x6857, checkFlag_hook, 0x0205, 0x685a);  // call $0205
   if (!(F & FZ)) { I(0x685a, 3); goto L_6865; } I(0x685a, 2);  // jr nz,$6865
   CALL(0x685c, getFreeEnemySlot, 0x2e27, 0x685f);  // call $2e27
   I(0x685f, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
@@ -5661,7 +5661,7 @@ void goron_targetCarts_reloadCrystalsInFirstRoom__loop(GB *gb) {
 L_6852:
   I(0x6852, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   I(0x6854, 3); SET_HL(0xcfdd);  // ld hl,$cfdd
-  CALL(0x6857, checkFlag, 0x0205, 0x685a);  // call $0205
+  CALL(0x6857, checkFlag_hook, 0x0205, 0x685a);  // call $0205
   if (!(F & FZ)) { I(0x685a, 3); goto L_6865; } I(0x685a, 2);  // jr nz,$6865
   CALL(0x685c, getFreeEnemySlot, 0x2e27, 0x685f);  // call $2e27
   I(0x685f, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
@@ -5683,7 +5683,7 @@ void goron_targetCarts_reloadCrystalsInFirstRoom__nextCrystal(GB *gb) {
 L_6852:
   I(0x6852, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   I(0x6854, 3); SET_HL(0xcfdd);  // ld hl,$cfdd
-  CALL(0x6857, checkFlag, 0x0205, 0x685a);  // call $0205
+  CALL(0x6857, checkFlag_hook, 0x0205, 0x685a);  // call $0205
   if (!(F & FZ)) { I(0x685a, 3); goto L_6865; } I(0x685a, 2);  // jr nz,$6865
   CALL(0x685c, getFreeEnemySlot, 0x2e27, 0x685f);  // call $2e27
   I(0x685f, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
@@ -5783,7 +5783,7 @@ L_68b0:
   PUSH(0x68b4, BC);  // push bc
   I(0x68b5, 2); A = 0x03;  // ld a,$03
   I(0x68b7, 2); B = 0x3e;  // ld b,$3e
-  CALL(0x68b9, getRoomFlags, 0x198a, 0x68bc);  // call $198a
+  CALL(0x68b9, getRoomFlags_hook, 0x198a, 0x68bc);  // call $198a
   SET_BC(POP(0x68bc));  // pop bc
   I(0x68bd, 3); alu_bit(gb, 6, mem_rd(gb, HL));  // bit 6,(hl)
   if ((F & FZ)) { I(0x68bf, 3); goto L_68c3; } I(0x68bf, 2);  // jr z,$68c3
@@ -5832,7 +5832,7 @@ L_68b0:
   PUSH(0x68b4, BC);  // push bc
   I(0x68b5, 2); A = 0x03;  // ld a,$03
   I(0x68b7, 2); B = 0x3e;  // ld b,$3e
-  CALL(0x68b9, getRoomFlags, 0x198a, 0x68bc);  // call $198a
+  CALL(0x68b9, getRoomFlags_hook, 0x198a, 0x68bc);  // call $198a
   SET_BC(POP(0x68bc));  // pop bc
   I(0x68bd, 3); alu_bit(gb, 6, mem_rd(gb, HL));  // bit 6,(hl)
   if ((F & FZ)) { I(0x68bf, 3); goto L_68c3; } I(0x68bf, 2);  // jr z,$68c3
@@ -5873,7 +5873,7 @@ L_68b0:
   PUSH(0x68b4, BC);  // push bc
   I(0x68b5, 2); A = 0x03;  // ld a,$03
   I(0x68b7, 2); B = 0x3e;  // ld b,$3e
-  CALL(0x68b9, getRoomFlags, 0x198a, 0x68bc);  // call $198a
+  CALL(0x68b9, getRoomFlags_hook, 0x198a, 0x68bc);  // call $198a
   SET_BC(POP(0x68bc));  // pop bc
   I(0x68bd, 3); alu_bit(gb, 6, mem_rd(gb, HL));  // bit 6,(hl)
   if ((F & FZ)) { I(0x68bf, 3); goto L_68c3; } I(0x68bf, 2);  // jr z,$68c3
@@ -5963,7 +5963,7 @@ void goron_bigBang_hideSelf(GB *gb) {
   I(0x68e9, 2); L = 0x66;  // ld l,$66
   I(0x68eb, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x68ec, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x68ed, 4); objectSetInvisible(gb); return;  // jp $1e7b
+  I(0x68ed, 4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp $1e7b
 }
 
 // 15:68f0
@@ -5976,7 +5976,7 @@ void goron_bigBang_unhideSelf(GB *gb) {
   I(0x68f7, 2); L = 0x66;  // ld l,$66
   I(0x68f9, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x68fa, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x68fb, 4); objectSetVisible(gb); return;  // jp $1e84
+  I(0x68fb, 4); if (hook_enabled_at(0x1e84)) { objectSetVisible_hook(gb); return; } HANDOFF(0x1e84);  // jp $1e84
 }
 
 // 15:68fe
@@ -6032,14 +6032,14 @@ void goron_countdownToNextExplosionGroup(GB *gb) {
   I(0x6934, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x6935, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   I(0x6937, 3); SET_BC(0x695e);  // ld bc,$695e
-  CALL(0x693a, addAToBc, 0x006d, 0x693d);  // call $006d
+  CALL(0x693a, addAToBc_hook, 0x006d, 0x693d);  // call $006d
   I(0x693d, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x693e, 2); L = 0x7a;  // ld l,$7a
   I(0x6940, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x6941, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x6943, 1); alu_add(gb, A);  // add a
   I(0x6944, 3); SET_BC(0x6966);  // ld bc,$6966
-  CALL(0x6947, addDoubleIndexToBc, 0x007e, 0x694a);  // call $007e
+  CALL(0x6947, addDoubleIndexToBc_hook, 0x007e, 0x694a);  // call $007e
   I(0x694a, 2); A = 0x04;  // ld a,$04
 L_694c:
   I(0x694c, 3); mem_wr(gb, 0xff8d, A);  // ldh ($ff8d),a
@@ -6152,7 +6152,7 @@ L_6966:
 void goron_createExplosionIndex(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x6986, 3); SET_BC(0x699c);  // ld bc,$699c
-  CALL(0x6989, addDoubleIndexToBc, 0x007e, 0x698c);  // call $007e
+  CALL(0x6989, addDoubleIndexToBc_hook, 0x007e, 0x698c);  // call $007e
   CALL(0x698c, getFreeInteractionSlot, 0x3aef, 0x698f);  // call $3aef
   if (!(F & FZ)) { RET_TAKEN(0x698f); return; } I(0x698f, 2);  // ret nz
   I(0x6990, 3); mem_wr(gb, HL, 0x56);  // ld (hl),$56
@@ -7037,7 +7037,7 @@ void bombUpgradeFairy_loseAllBombs(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x6fd2, 2); A = 0x01;  // ld a,$01
   I(0x6fd4, 4); mem_wr(gb, 0xc6b0, A);  // ld ($c6b0),a
-  CALL(0x6fd7, decNumBombs, 0x17c8, 0x6fda);  // call $17c8
+  CALL(0x6fd7, decNumBombs_hook, 0x17c8, 0x6fda);  // call $17c8
   I(0x6fda, 3); bombUpgradeFairy_linkCollapsed(gb); return;  // jr $6fcc
 }
 
@@ -7146,7 +7146,7 @@ void makuTree_checkLinkedAndUpdateMapText(GB *gb) {
 void makuTree_modifyTextIndexForLinked(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x70b2, 1); C = A;  // ld c,a
-  CALL(0x70b3, checkIsLinkedGame, 0x1992, 0x70b6);  // call $1992
+  CALL(0x70b3, checkIsLinkedGame_hook, 0x1992, 0x70b6);  // call $1992
   if ((F & FZ)) { RET_TAKEN(0x70b6); return; } I(0x70b6, 2);  // ret z
   CALL(0x70b7, makuTree_modifyTextIndexForLinked__getLinkedTextOffset, 0x70c2, 0x70ba);  // call $70c2
   I(0x70ba, 3); SET_HL(0x70ce);  // ld hl,$70ce
@@ -7177,7 +7177,7 @@ L_70cb:
 // 15:70d1
 void makuTree_dropSeedSatchel(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x70d1, getThisRoomFlags, 0x197d, 0x70d4);  // call $197d
+  CALL(0x70d1, getThisRoomFlags_hook, 0x197d, 0x70d4);  // call $197d
   I(0x70d4, 2); alu_bit(gb, 7, A);  // bit 7,a
   if (!(F & FZ)) { RET_TAKEN(0x70d6); return; } I(0x70d6, 2);  // ret nz
   I(0x70d7, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
@@ -7221,7 +7221,7 @@ L_70fd:
 // 15:7105
 void makuTree_checkSpawnSeedSatchel(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7105, getThisRoomFlags, 0x197d, 0x7108);  // call $197d
+  CALL(0x7105, getThisRoomFlags_hook, 0x197d, 0x7108);  // call $197d
   I(0x7108, 2); alu_bit(gb, 5, A);  // bit 5,a
   if (!(F & FZ)) { RET_TAKEN(0x710a); return; } I(0x710a, 2);  // ret nz
   I(0x710b, 2); alu_bit(gb, 7, A);  // bit 7,a
@@ -7252,7 +7252,7 @@ void makuTree_spawnMakuSeed(GB *gb) {
 void makuTree_chooseTextAfterSeeingTwinrova(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x712b, 2); C = 0x5b;  // ld c,$5b
-  CALL(0x712d, checkIsLinkedGame, 0x1992, 0x7130);  // call $1992
+  CALL(0x712d, checkIsLinkedGame_hook, 0x1992, 0x7130);  // call $1992
   if ((F & FZ)) { I(0x7130, 3); goto L_7134; } I(0x7130, 2);  // jr z,$7134
   I(0x7132, 2); C = 0x5f;  // ld c,$5f
 L_7134:
@@ -7541,7 +7541,7 @@ void moblin_spawnEnemyHere(GB *gb) {
   CALL(0x7592, getFreeEnemySlot, 0x2e27, 0x7595);  // call $2e27
   if (!(F & FZ)) { RET_TAKEN(0x7595); return; } I(0x7595, 2);  // ret nz
   I(0x7596, 3); mem_wr(gb, HL, 0x20);  // ld (hl),$20
-  I(0x7598, 4); objectCopyPosition(gb); return;  // jp $2242
+  I(0x7598, 4); if (hook_enabled_at(0x2242)) { objectCopyPosition_hook(gb); return; } HANDOFF(0x2242);  // jp $2242
 }
 
 // 15:759b
@@ -7584,7 +7584,7 @@ void tokkey_jump(GB *gb) {
 void tokkey_centerLinkOnTile(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x765a, 3); SET_HL(0xd00a);  // ld hl,$d00a
-  CALL(0x765d, centerCoordinatesOnTile, 0x20e1, 0x7660);  // call $20e1
+  CALL(0x765d, centerCoordinatesOnTile_hook, 0x20e1, 0x7660);  // call $20e1
   I(0x7660, 2); L = 0x08;  // ld l,$08
   I(0x7662, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
   RET(0x7664); return;  // ret
@@ -7653,7 +7653,7 @@ L_770a:
 // 15:770e
 void zora_checkIsLinkedGame(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x770e, checkIsLinkedGame, 0x1992, 0x7711);  // call $1992
+  CALL(0x770e, checkIsLinkedGame_hook, 0x1992, 0x7711);  // call $1992
   I(0x7711, 2); A = 0x01;  // ld a,$01
   if (!(F & FZ)) { I(0x7713, 3); goto L_7716; } I(0x7713, 2);  // jr nz,$7716
   I(0x7715, 1); A = alu_dec8(gb, A);  // dec a
@@ -7772,7 +7772,7 @@ L_77fd:
 // 15:7802
 void symmetryNpc_setRoomFlagIfTalkedToRightSister(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7802, getThisRoomFlags, 0x197d, 0x7805);  // call $197d
+  CALL(0x7802, getThisRoomFlags_hook, 0x197d, 0x7805);  // call $197d
   I(0x7805, 2); E = 0x42;  // ld e,$42
   I(0x7807, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7808, 2); alu_sub(gb, 0x08);  // sub $08
@@ -7792,7 +7792,7 @@ void symmetryNpc_getTuniNutStateForSister(GB *gb) {
   I(0x7817, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7818, 2); alu_sub(gb, 0x08);  // sub $08
   I(0x781a, 1); B = A;  // ld b,a
-  CALL(0x781b, getThisRoomFlags, 0x197d, 0x781e);  // call $197d
+  CALL(0x781b, getThisRoomFlags_hook, 0x197d, 0x781e);  // call $197d
   I(0x781e, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x7820, 1); alu_cp(gb, B);  // cp b
   I(0x7821, 2); C = 0x00;  // ld c,$00
@@ -7847,7 +7847,7 @@ L_7841:
 void pirateCaptain_warpOut(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x7930, 3); SET_HL(0x793e);  // ld hl,$793e
-  CALL(0x7933, checkIsLinkedGame, 0x1992, 0x7936);  // call $1992
+  CALL(0x7933, checkIsLinkedGame_hook, 0x1992, 0x7936);  // call $1992
   if ((F & FZ)) { I(0x7936, 3); goto L_793b; } I(0x7936, 2);  // jr z,$793b
   I(0x7938, 3); SET_HL(0x7943);  // ld hl,$7943
 L_793b:
@@ -7918,7 +7918,7 @@ void tingle_createGlowAroundLink(GB *gb) {
 // 15:79a7
 void troy_chooseRandomAnimalText(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x79a7, getRandomNumber, 0x043e, 0x79aa);  // call $043e
+  CALL(0x79a7, getRandomNumber_hook, 0x043e, 0x79aa);  // call $043e
   I(0x79aa, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x79ac, 2); alu_add(gb, 0x13);  // add $13
   I(0x79ae, 4); mem_wr(gb, 0xcbaf, A);  // ld ($cbaf),a
@@ -7928,7 +7928,7 @@ void troy_chooseRandomAnimalText(GB *gb) {
 // 15:7a54
 void linkedNpc_checkShouldSpawn(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7a54, checkIsLinkedGame, 0x1992, 0x7a57);  // call $1992
+  CALL(0x7a54, checkIsLinkedGame_hook, 0x1992, 0x7a57);  // call $1992
   if (!(F & FZ)) { I(0x7a57, 3); goto L_7a5c; } I(0x7a57, 2);  // jr nz,$7a5c
   I(0x7a59, 4); writeFlagsTocddb(gb); return;  // jp $5118
 L_7a5c:
@@ -8110,7 +8110,7 @@ void slateSlot_placeSlate(GB *gb) {
   I(0x7b3c, 2); A = 0xd4;  // ld a,$d4
   I(0x7b3e, 1); alu_add(gb, B);  // add b
   CALL(0x7b3f, setTile, 0x3a9c, 0x7b42);  // call $3a9c
-  CALL(0x7b42, getThisRoomFlags, 0x197d, 0x7b45);  // call $197d
+  CALL(0x7b42, getThisRoomFlags_hook, 0x197d, 0x7b45);  // call $197d
   I(0x7b45, 2); E = 0x42;  // ld e,$42
   I(0x7b47, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x7b48, 3); SET_BC(0x00f8);  // ld bc,$00f8

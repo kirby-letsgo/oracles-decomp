@@ -44,7 +44,7 @@ void roomSpecificCode0(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(0x58cf); return; } I(0x58cf, 2);  // ret nz
   I(0x58d0, 3); SET_HL(0xcfd0);  // ld hl,$cfd0
   I(0x58d3, 2); B = 0x10;  // ld b,$10
-  I(0x58d5, 4); clearMemory(gb); return;  // jp $046f
+  I(0x58d5, 4); if (hook_enabled_at(0x046f)) { clearMemory_hook(gb); return; } HANDOFF(0x046f);  // jp $046f
 }
 
 // 12:58d8
@@ -86,7 +86,7 @@ L_58ed:
 // 12:58f5
 void roomSpecificCode3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x58f5, getThisRoomFlags, 0x197d, 0x58f8);  // call $197d
+  CALL(0x58f5, getThisRoomFlags_hook, 0x197d, 0x58f8);  // call $197d
   I(0x58f8, 2); alu_bit(gb, 6, A);  // bit 6,a
   if (!(F & FZ)) { RET_TAKEN(0x58fa); return; } I(0x58fa, 2);  // ret nz
   I(0x58fb, 2); A = 0x24;  // ld a,$24
@@ -110,7 +110,7 @@ void roomSpecificCode7(GB *gb) {
   I(0x5915, 2); A = 0x15;  // ld a,$15
   CALL(0x5917, checkGlobalFlag, 0x31f3, 0x591a);  // call $31f3
   if ((F & FZ)) { RET_TAKEN(0x591a); return; } I(0x591a, 2);  // ret z
-  CALL(0x591b, getThisRoomFlags, 0x197d, 0x591e);  // call $197d
+  CALL(0x591b, getThisRoomFlags_hook, 0x197d, 0x591e);  // call $197d
   I(0x591e, 2); alu_bit(gb, 6, A);  // bit 6,a
   if (!(F & FZ)) { RET_TAKEN(0x5920); return; } I(0x5920, 2);  // ret nz
   I(0x5921, 2); A = 0x35;  // ld a,$35
@@ -265,7 +265,7 @@ L_793d:
   I(0x7946, 1); A = B;  // ld a,b
   I(0x7947, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x7949, 2); alu_xor(gb, 0x0f);  // xor $0f
-  CALL(0x794b, checkFlag, 0x0205, 0x794e);  // call $0205
+  CALL(0x794b, checkFlag_hook, 0x0205, 0x794e);  // call $0205
   if (!(F & FZ)) { I(0x794e, 3); goto L_795b; } I(0x794e, 2);  // jr nz,$795b
   I(0x7950, 1); alu_scf(gb);  // scf
   I(0x7951, 3); goto L_795b;  // jr $795b
@@ -429,7 +429,7 @@ void assignRandomPositionToEnemy(GB *gb) {
   I(0x5848, 3); A = mem_rd(gb, 0xff91);  // ldh a,($ff91)
   I(0x584a, 1); H = A;  // ld h,a
   I(0x584b, 2); L = 0x8b;  // ld l,$8b
-  CALL(0x584d, setShortPosition_paramC, 0x20b9, 0x5850);  // call $20b9
+  CALL(0x584d, setShortPosition_paramC_hook, 0x20b9, 0x5850);  // call $20b9
   I(0x5850, 1); alu_xor(gb, A);  // xor a
   RET(0x5851); return;  // ret
 }
@@ -478,7 +478,7 @@ void parseObjectData(GB *gb) {
   I(0x55bb, 4); mem_wr(gb, 0xcfc0, A);  // ld ($cfc0),a
   I(0x55be, 3); SET_HL(0xcec0);  // ld hl,$cec0
   I(0x55c1, 2); B = 0x20;  // ld b,$20
-  CALL(0x55c3, clearMemory, 0x046f, 0x55c6);  // call $046f
+  CALL(0x55c3, clearMemory_hook, 0x046f, 0x55c6);  // call $046f
   CALL(0x55c6, addRoomToEnemiesKilledList_b00, 0x3209, 0x55c9);  // call $3209
   CALL(0x55c9, generateRandomBuffer_b00, 0x3215, 0x55cc);  // call $3215
   I(0x55cc, 3); SET_HL(0x4315);  // ld hl,$4315
@@ -518,7 +518,7 @@ L_579b:
   I(0x57ba, 3); goto L_579b;  // jr $579b
 L_57bc:
   I(0x57bc, 2); A = 0x06;  // ld a,$06
-  CALL(0x57be, addAToDe, 0x0068, 0x57c1);  // call $0068
+  CALL(0x57be, addAToDe_hook, 0x0068, 0x57c1);  // call $0068
   I(0x57c1, 3); goto L_579b;  // jr $579b
 }
 
@@ -527,7 +527,7 @@ void objectDataOp9__allocationFailure(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_57bc:
   I(0x57bc, 2); A = 0x06;  // ld a,$06
-  CALL(0x57be, addAToDe, 0x0068, 0x57c1);  // call $0068
+  CALL(0x57be, addAToDe_hook, 0x0068, 0x57c1);  // call $0068
   I(0x57c1, 3); objectDataOp9(gb); return;  // jr $579b
 }
 
@@ -583,7 +583,7 @@ L_5632:
   if ((F & FZ)) { RET_TAKEN(0x563d); return; } I(0x563d, 2);  // ret z
   I(0x563e, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x5640, 3); SET_DE(0x55fe);  // ld de,$55fe
-  CALL(0x5643, addDoubleIndexToDe, 0x0072, 0x5646);  // call $0072
+  CALL(0x5643, addDoubleIndexToDe_hook, 0x0072, 0x5646);  // call $0072
   I(0x5646, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x5647, 1); C = A;  // ld c,a
   I(0x5648, 2); alu_add_hl(gb, BC);  // add hl,bc
@@ -610,7 +610,7 @@ L_5632:
   if ((F & FZ)) { RET_TAKEN(0x563d); return; } I(0x563d, 2);  // ret z
   I(0x563e, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x5640, 3); SET_DE(0x55fe);  // ld de,$55fe
-  CALL(0x5643, addDoubleIndexToDe, 0x0072, 0x5646);  // call $0072
+  CALL(0x5643, addDoubleIndexToDe_hook, 0x0072, 0x5646);  // call $0072
   I(0x5646, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x5647, 1); C = A;  // ld c,a
   I(0x5648, 2); alu_add_hl(gb, BC);  // add hl,bc
@@ -648,7 +648,7 @@ void objectDataOp4(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x56c1, checkSkipPointer, 0x568a, 0x56c4);  // call $568a
   if ((F & FZ)) { I(0x56c4, 3); skipPointer(gb); return; } I(0x56c4, 2);  // jr z,$56aa
-  CALL(0x56c6, getThisRoomFlags, 0x197d, 0x56c9);  // call $197d
+  CALL(0x56c6, getThisRoomFlags_hook, 0x197d, 0x56c9);  // call $197d
   I(0x56c9, 2); alu_bit(gb, 7, A);  // bit 7,a
   if (!(F & FZ)) { I(0x56cb, 3); skipPointer(gb); return; } I(0x56cb, 2);  // jr nz,$56aa
   I(0x56cd, 3); parsePointer(gb); return;  // jr $56af
@@ -659,7 +659,7 @@ void objectDataOp5(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x56cf, checkSkipPointer, 0x568a, 0x56d2);  // call $568a
   if ((F & FZ)) { I(0x56d2, 3); skipPointer(gb); return; } I(0x56d2, 2);  // jr z,$56aa
-  CALL(0x56d4, getThisRoomFlags, 0x197d, 0x56d7);  // call $197d
+  CALL(0x56d4, getThisRoomFlags_hook, 0x197d, 0x56d7);  // call $197d
   I(0x56d7, 2); alu_bit(gb, 7, A);  // bit 7,a
   if ((F & FZ)) { I(0x56d9, 3); skipPointer(gb); return; } I(0x56d9, 2);  // jr z,$56aa
   I(0x56db, 3); parsePointer(gb); return;  // jr $56af
@@ -866,7 +866,7 @@ L_577a:
   I(0x578a, 1); C = A;  // ld c,a
   I(0x578b, 2); SET_DE(DE + 1);  // inc de
   I(0x578c, 2); L = 0xcb;  // ld l,$cb
-  CALL(0x578e, setShortPosition, 0x20b8, 0x5791);  // call $20b8
+  CALL(0x578e, setShortPosition_hook, 0x20b8, 0x5791);  // call $20b8
   CALL(0x5791, addPositionToPlacedEnemyPositions, 0x5829, 0x5794);  // call $5829
   I(0x5794, 3); goto L_577a;  // jr $577a
 L_5796:
@@ -907,7 +907,7 @@ L_57e8:
   I(0x57f4, 2); L = 0x8b;  // ld l,$8b
   I(0x57f6, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x57f7, 2); SET_DE(DE + 1);  // inc de
-  CALL(0x57f8, setShortPosition, 0x20b8, 0x57fb);  // call $20b8
+  CALL(0x57f8, setShortPosition_hook, 0x20b8, 0x57fb);  // call $20b8
   CALL(0x57fb, addPositionToPlacedEnemyPositions, 0x5829, 0x57fe);  // call $5829
   I(0x57fe, 2); L = 0x80;  // ld l,$80
   I(0x5800, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
@@ -943,7 +943,7 @@ L_57e8:
   I(0x57f4, 2); L = 0x8b;  // ld l,$8b
   I(0x57f6, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x57f7, 2); SET_DE(DE + 1);  // inc de
-  CALL(0x57f8, setShortPosition, 0x20b8, 0x57fb);  // call $20b8
+  CALL(0x57f8, setShortPosition_hook, 0x20b8, 0x57fb);  // call $20b8
   CALL(0x57fb, addPositionToPlacedEnemyPositions, 0x5829, 0x57fe);  // call $5829
   I(0x57fe, 2); L = 0x80;  // ld l,$80
   I(0x5800, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)

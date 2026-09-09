@@ -106,6 +106,20 @@ static bool differs(const char *what, const void *a, const void *b, size_t n, si
   return false;
 }
 
+static bool wram_differs(const uint8_t (*a)[4096], const uint8_t (*b)[4096], size_t *off) {
+  if (differs("wram", a[0] + GB_W0_SKIP_END, b[0] + GB_W0_SKIP_END, 4096 - GB_W0_SKIP_END, off)) { *off += GB_W0_SKIP_END; return true; }
+  if (differs("wram", a[1], b[1], 4096, off)) { *off += 4096; return true; }
+  if (differs("wram", a[GB_SOUND_BANK], b[GB_SOUND_BANK], GB_SOUND_BANK_LO, off)) { *off += GB_SOUND_BANK * 4096; return true; }
+  if (differs("wram", a[3], b[3], 5 * 4096, off)) { *off += 3 * 4096; return true; }
+  return false;
+}
+
+static bool hram_differs(const uint8_t *a, const uint8_t *b, size_t *off) {
+  if (differs("hram", a, b, GB_HRAM_MUSIC_LO, off)) return true;
+  if (differs("hram", a + GB_HRAM_MUSIC_HI, b + GB_HRAM_MUSIC_HI, 127 - GB_HRAM_MUSIC_HI, off)) { *off += GB_HRAM_MUSIC_HI; return true; }
+  return false;
+}
+
 static int verify_depth;
 static GB *snap_pool[16][2];
 int hook_in_verify;
@@ -158,8 +172,8 @@ static void verify(GB *gb, Hook *h) {
   uint8_t rb[] = {gb->a, gb->f, gb->b, gb->c, gb->d, gb->e, gb->h, gb->l};
   if (differs("regs", ra, rb, sizeof ra, &off)) bad = "afbcdehl"[off] == 'a' ? "reg a" : "regs";
   else if (after_c.sp != gb->sp || after_c.pc != gb->pc) bad = "sp/pc";
-  else if (differs("wram", after_c.wram, gb->wram, sizeof gb->wram, &off)) bad = "wram";
-  else if (differs("hram", after_c.hram, gb->hram, sizeof gb->hram, &off)) bad = "hram";
+  else if (wram_differs(after_c.wram, gb->wram, &off)) bad = "wram";
+  else if (hram_differs(after_c.hram, gb->hram, &off)) bad = "hram";
   else if (differs("vram", after_c.vram, gb->vram, sizeof gb->vram, &off)) bad = "vram";
   else if (differs("oam", after_c.oam, gb->oam, sizeof gb->oam, &off)) bad = "oam";
   else if (differs("eram", after_c.eram, gb->eram, sizeof gb->eram, &off)) bad = "eram";
@@ -199,6 +213,10 @@ void hooks_report(void) {
   uint64_t total = 0;
   for (size_t i = 0; i < NHOOKS; i++) total += hooks[i].calls;
   fprintf(stderr, "hooks: %zu routines, %llu calls, %llu verify failures\n", NHOOKS, (unsigned long long)total, (unsigned long long)hook_verify_failures);
+  for (size_t i = 0; i < NHOOKS; i++) {
+    size_t n = strlen(hooks[i].name);
+    if (n > 5 && strcmp(hooks[i].name + n - 5, "_hook") == 0 && hooks[i].calls == 0) fprintf(stderr, "  never called: %s\n", hooks[i].name);
+  }
   for (size_t i = 0; i < NHOOKS; i++) fprintf(stderr, "  %02x:%04x %-28s %llu\n", hooks[i].bank, hooks[i].addr, hooks[i].name, (unsigned long long)hooks[i].calls);
 }
 

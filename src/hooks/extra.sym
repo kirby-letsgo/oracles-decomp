@@ -7,3 +7,4 @@
 00:ff80 hramOamDmaFunction = 03:4091
 00:c000 wMusicReadFunction = 39:404b
 00:c4b7 wRamFunction extern
+03:4071 setCpuToDoubleSpeed extern

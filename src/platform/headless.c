@@ -88,7 +88,6 @@ static void on_frame(GB *gb, const GBSample *sm, void *ctx) {
     png_write_rgb(path, rgb, FB_W, FB_H);
   }
   if (getenv("SAMPLE_HASH_AT") && frame + c->input_offset == strtoull(getenv("SAMPLE_HASH_AT"), NULL, 10)) {
-    const GBSample *sm = sm;
     printf("SAMPLE %llu wram %016llx hram %016llx vram %016llx oam %016llx io %016llx bg %016llx ob %016llx ie %02x rom %u ram %u\n", (unsigned long long)sm->frame,
            (unsigned long long)fnv1a64_update(FNV1A64_INIT, (const unsigned char *)sm->wram, sizeof sm->wram), (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->hram, sizeof sm->hram),
            (unsigned long long)fnv1a64_update(FNV1A64_INIT, (const unsigned char *)sm->vram, sizeof sm->vram), (unsigned long long)fnv1a64_update(FNV1A64_INIT, sm->oam, sizeof sm->oam),

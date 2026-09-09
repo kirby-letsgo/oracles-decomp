@@ -124,15 +124,19 @@ static void cb(GB *gb) {
   else set_r(gb, z, v | (1 << y));
 }
 
-static void stop(GB *gb) {
-  fetch(gb);
-  if (!gb->speed_armed) { gb->halted = true; return; }
+void gb_speed_switch(GB *gb) {
   gb->speed_armed = false;
   gb->double_speed = !gb->double_speed;
   timer_write_div(gb);
   ppu_tick(gb, 12);
   int stall = 32769;
   for (int i = 0; i < stall; i++) gb_tick(gb);
+}
+
+static void stop(GB *gb) {
+  fetch(gb);
+  if (!gb->speed_armed) { gb->halted = true; return; }
+  gb_speed_switch(gb);
 }
 
 static void execute(GB *gb, uint8_t op) {

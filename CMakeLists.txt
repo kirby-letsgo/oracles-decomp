@@ -10,7 +10,7 @@ add_compile_options(-Wall -Wextra -Wno-unused-parameter)
 
 option(ORACLES_SDL "Build the SDL3 frontend" ON)
 
-file(GLOB ORACLES_GAME_SRC ${CMAKE_SOURCE_DIR}/src/game/gen_bank*.c ${CMAKE_SOURCE_DIR}/src/game/ram_code.c)
+file(GLOB ORACLES_GAME_SRC ${CMAKE_SOURCE_DIR}/src/game/*.c)
 add_library(oraclescore STATIC ${ORACLES_GAME_SRC}
   src/core/gb.c
   src/core/bus.c

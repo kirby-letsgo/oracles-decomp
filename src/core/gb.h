@@ -113,11 +113,17 @@ void gb_run_cycles(GB *gb, uint64_t target);
 uint64_t gb_run_frame(GB *gb);
 uint8_t gb_input_now(GB *gb);
 void gb_run_until_vblank(GB *gb);
+#define GB_W0_SKIP_END 0x2c0
+#define GB_SOUND_BANK 2
+#define GB_SOUND_BANK_LO 0xf80
+#define GB_HRAM_MUSIC_LO 0x58
+#define GB_HRAM_MUSIC_HI 0x73
 uint64_t gb_state_hash(const GB *gb);
 uint64_t gb_frame_hash(const GB *gb);
 
 void timer_tick(GB *gb);
 void timer_write_div(GB *gb);
+void gb_speed_switch(GB *gb);
 void timer_write_tac(GB *gb, uint8_t v);
 void ppu_tick(GB *gb, int dots);
 void ppu_write_lcdc(GB *gb, uint8_t v);

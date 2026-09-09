@@ -48,6 +48,7 @@ def body_ok(bank, addr):
         _body_ok[(bank, addr)] = not any(kind == 'unsupported' for a, m, ln, cy, kind, info in routine_body(bank, addr))
     return _body_ok[(bank, addr)]
 ported = set(l.split('#')[0].strip() for l in open(sys.argv[3]) if l.split('#')[0].strip())
+rewritten = set(l.split('#')[0].strip() for l in open('src/hooks/rewritten.txt') if l.split('#')[0].strip()) if _os.path.exists('src/hooks/rewritten.txt') else set()
 def has_unsupported(n):
     if n not in labels: return True
     return all(any(kind == 'unsupported' for a, m, ln, cy, kind, info in routine_body(b, s0)) for (b, s0) in instances.get(n, [labels[n]]))
@@ -153,8 +154,10 @@ def target_bank(bank, t):
     if t < 0x4000 or t >= 0x8000: return 0
     return bank if bank != 0 else None
 
+_bodies = {}
 def routine_body(bank, start):
     """Decode every instruction reachable from start without crossing into another labeled routine or bank."""
+    if (bank, start) in _bodies: return _bodies[(bank, start)]
     seen = {}
     work = [start]
     while work:
@@ -185,7 +188,8 @@ def routine_body(bank, start):
             succ.append(a + ln)
         seen[a] = (a, m, ln, cy, kind, info)
         work.extend(t for t in succ if (t < 0x4000) == (start < 0x4000) and (t >= 0x8000) == (start >= 0x8000))
-    return [seen[a] for a in sorted(seen)]
+    _bodies[(bank, start)] = [seen[a] for a in sorted(seen)]
+    return _bodies[(bank, start)]
 
 def target_name(bank, t, insns_addrs):
     if t in insns_addrs: return None
@@ -207,6 +211,27 @@ def infer_banks(bank, insns):
         if kind in ('call', 'callcc'): sel = None
         if m.startswith('ld a,') or m.startswith('ldh a,') or m.startswith('pop af'): last_a = None
     return out
+
+_switches = {}
+def switches_threads(tb, t, seen=()):
+    if (tb, t) in _switches: return _switches[(tb, t)]
+    if (tb, t) in externs or (tb, t) in seen or t >= 0x8000: return False
+    body = routine_body(tb, t)
+    r = any(k == 'spload' for _, _, _, _, k, _ in body)
+    if not r:
+        addrs = set(a for a, *_ in body)
+        for a, m, ln, cy, k, info in body:
+            nxt = []
+            if k in ('jp', 'jpcc', 'call', 'callcc') and info[0] not in addrs: nxt.append(info[0])
+            if k not in ('ret', 'reti', 'jp', 'jphl', 'jumptable', 'unsupported', 'spload') and a + ln not in addrs: nxt.append(a + ln)
+            banks_here = infer_banks(tb, body)
+            for x in nxt:
+                nb = target_bank(tb, x)
+                if nb is None: nb = banks_here.get(a)
+                if nb is not None and switches_threads(nb, x, seen + ((tb, t),)): r = True; break
+            if r: break
+    _switches[(tb, t)] = r
+    return r
 
 def gen(name, bank=None, start=None):
     if bank is None: bank, start = labels[name]
@@ -258,7 +283,8 @@ def gen(name, bank=None, start=None):
                 tb = target_bank(bank, t)
                 if tb is None: tb = banks_at.get(a)
                 tn = by_addr.get((tb, t)) or local_by_addr.get((tb, t))
-                if (tb, t) in entries: jump = f'{entries[(tb, t)]}(gb); return;'
+                if (tb, t) in entries and entries[(tb, t)].endswith('_hook'): jump = f'if (hook_enabled_at(0x{t:04x})) {{ {entries[(tb, t)]}(gb); return; }} HANDOFF(0x{t:04x});'
+                elif (tb, t) in entries: jump = f'{entries[(tb, t)]}(gb); return;'
                 else: jump = f'HANDOFF(0x{t:04x}); /* {tn or "unported"} */'
             if cond is None:
                 out.emit(f'I(0x{a:04x}, {taken}); {jump}{com}')
@@ -303,7 +329,8 @@ def gen(name, bank=None, start=None):
         nxt_a = a + ln
         if falls and nxt_a not in addrs:
             nn = by_addr.get((bank, nxt_a)) or local_by_addr.get((bank, nxt_a))
-            if (bank, nxt_a) in entries: out.emit(f'{entries[(bank, nxt_a)]}(gb); return;  // fallthrough')
+            if (bank, nxt_a) in entries and entries[(bank, nxt_a)].endswith('_hook'): out.emit(f'if (hook_enabled_at(0x{nxt_a:04x})) {{ {entries[(bank, nxt_a)]}(gb); return; }} HANDOFF(0x{nxt_a:04x});  // fallthrough')
+            elif (bank, nxt_a) in entries: out.emit(f'{entries[(bank, nxt_a)]}(gb); return;  // fallthrough')
             else: out.emit(f'HANDOFF(0x{nxt_a:04x});  // fallthrough to {nn or "unlabeled"}')
     out.lines.append('}')
     gen.flags = ('H' if any(k == 'halt' for _, _, _, _, k, _ in insns) else '') + ('L' if '@' in name else '') or '-'
@@ -319,29 +346,9 @@ if names and names[0] == '--out':
     for n in missing: print(f'warning: unknown routine {n} (skipped)', file=sys.stderr)
     names = list(dict.fromkeys(n for n in names if n in labels))
     ported = set(n for n in ported if n in labels and not has_unsupported(n))
-    _switches = {}
-    def switches_threads(tb, t, seen=()):
-        if (tb, t) in _switches: return _switches[(tb, t)]
-        if (tb, t) in externs or (tb, t) in seen or t >= 0x8000: return False
-        body = routine_body(tb, t)
-        r = any(k == 'spload' for _, _, _, _, k, _ in body)
-        if not r:
-            addrs = set(a for a, *_ in body)
-            for a, m, ln, cy, k, info in body:
-                nxt = []
-                if k in ('jp', 'jpcc', 'call', 'callcc') and info[0] not in addrs: nxt.append(info[0])
-                if k not in ('ret', 'reti', 'jp', 'jphl', 'jumptable', 'unsupported', 'spload') and a + ln not in addrs: nxt.append(a + ln)
-                banks_here = infer_banks(tb, body)
-                for x in nxt:
-                    nb = target_bank(tb, x)
-                    if nb is None: nb = banks_here.get(a)
-                    if nb is not None and switches_threads(nb, x, seen + ((tb, t),)): r = True; break
-                if r: break
-        _switches[(tb, t)] = r
-        return r
     for n in names:
         for (b, a) in instances.get(n, []):
-            if (b, a) in externs: continue
+            if (b, a) in externs or n in rewritten: continue
             body = routine_body(b, a)
             banks_at = infer_banks(b, body)
             for ia, m, ln, cy, kind, info in body:
@@ -365,7 +372,9 @@ if names and names[0] == '--out':
                 tb = target_bank(b, info[0])
                 if tb is None or (tb, info[0]) in by_addr or (tb, info[0]) in local_by_addr: continue
                 o = owner.get((tb, info[0]))
-                if o and o[1] != info[0]: local_by_addr[(tb, info[0])] = f'{o[0]}@jump{info[0]:04x}'
+                if o and o[1] != info[0]:
+                    local_by_addr[(tb, info[0])] = f'{o[0]}@jump{info[0]:04x}'
+                    if o[0] in rewritten: print(f'warning: {n} jumps into rewritten {o[0]} at {info[0]:04x} (interpreted)', file=sys.stderr)
     locals_of = collections.defaultdict(list)
     for (lb, la), ln in local_by_addr.items():
         if (lb, la) not in by_addr: locals_of[(lb, ln.split('@')[0])].append((la, ln))
@@ -375,6 +384,10 @@ if names and names[0] == '--out':
         for (b, a) in instances.get(n, []):
             if (b, a) in seen_addrs: continue
             seen_addrs.add((b, a))
+            if n in rewritten:
+                entries[(b, a)] = cname_at(b, a) + '_hook'
+                items_by_bank.setdefault(b, []).append((n, b, a))
+                continue
             if body_ok(b, a): entries[(b, a)] = cname_at(b, a)
             items_by_bank.setdefault(b, []).append((n, b, a))
             for la, ln in sorted(locals_of.get((b, n), [])):
@@ -392,6 +405,7 @@ if names and names[0] == '--out':
         with open(os.path.join(outdir, f'gen_bank{bank:02x}.c'), 'w') as f:
             f.write('// generated by tools/transliterate.py; do not edit\n#include "game/asm.h"\n#include "game/gen.h"\n\n')
             for n, b, a in items:
+                if n in rewritten: generated.append((b, a, cname_at(b, a) + '_hook', '-')); continue
                 if (b, a) in externs: generated.append((b, a, cname_at(b, a), '-')); continue
                 code = gen(n, b, a)
                 if code: f.write(code + '\n\n'); generated.append((b, a, cname_at(b, a), gen.flags))
@@ -401,6 +415,88 @@ if names and names[0] == '--out':
     with open('src/hooks/generated.txt', 'w') as g:
         for b, a, cn, fl in generated: g.write(f'{b:02x}:{a:04x} {cn} {fl}\n')
     print(f'{len(generated)} routines in {len(by_bank)} bank files')
+elif names and names[0] == '--report':
+    import glob
+    src_files = sorted(glob.glob('ref/oracles-disasm/code/**/*.s', recursive=True) + glob.glob('ref/oracles-disasm/object_code/**/*.s', recursive=True))
+    def source_comment(n):
+        for path in src_files:
+            lines = open(path, errors='replace').read().split('\n')
+            for i, l in enumerate(lines):
+                if l.rstrip() == n + ':':
+                    j = i
+                    while j > 0 and lines[j - 1].startswith(';'): j -= 1
+                    return path, i + 1, lines[j:i]
+        return None, None, []
+    pnames = [l.split('#')[0].strip() for l in open(sys.argv[3])]
+    pnames = [x for x in pnames if x and x in labels]
+    def report(n):
+        if n not in labels: print(f'unknown routine {n}'); return
+        path, ln, com = source_comment(n)
+        print(f'== {n}  ({path}:{ln})' if path else f'== {n}')
+        for l in com: print(l)
+        for (b, a) in instances.get(n, [labels[n]]):
+            body = routine_body(b, a)
+            addrs = set(ia for ia, *_ in body)
+            banks_at = infer_banks(b, body)
+            targets = set()
+            for ia, m, l_, cy, kind, info in body:
+                if kind in ('jp', 'jpcc', 'callcc') and info[0] in addrs: targets.add(info[0])
+                if kind == 'jumptable': targets.update(t for t in info[0] if t in addrs)
+            print(f'-- {b:02x}:{a:04x}  {len(body)} instructions')
+            block, bsum, first = None, 0, True
+            def flush():
+                if block is not None: print(f'   [{block:04x}] block {bsum} cycles')
+            for ia, m, l_, cy, kind, info in body:
+                if ia == a or ia in targets or (b, ia) in local_by_addr:
+                    flush(); block, bsum = ia, 0
+                    lab = local_by_addr.get((b, ia)) or ('' if ia == a else f'L_{ia:04x}')
+                    print(f'{lab}:' if lab else '')
+                c = cy if not isinstance(cy, tuple) else cy[1]
+                bsum += c
+                cs = f'{cy[0]}/{cy[1]}' if isinstance(cy, tuple) else f'{cy}'
+                note = ''
+                if kind in ('call', 'callcc', 'jp', 'jpcc') and info[0] not in addrs:
+                    tb = target_bank(b, info[0])
+                    if tb is None: tb = banks_at.get(ia)
+                    tn = by_addr.get((tb, info[0])) or local_by_addr.get((tb, info[0])) or '?'
+                    fl = []
+                    if tb is not None:
+                        if tn in rewritten: fl.append('rewritten')
+                        elif tn in ported: fl.append('hooked')
+                        else: fl.append('NOT HOOKED')
+                        if switches_threads(tb, info[0]): fl.append('SWITCHES THREADS')
+                        tbody = routine_body(tb, info[0])
+                        if any(k == 'halt' for _, _, _, _, k, _ in tbody): fl.append('halt')
+                        if any(k == 'unsupported' for _, _, _, _, k, _ in tbody): fl.append('unsupported')
+                    note = f'  -> {tn} ({", ".join(fl)})'
+                if kind in ('halt', 'spload', 'unsupported', 'jphl', 'jumptable', 'rst'): note += f'  !! {kind}'
+                print(f'  {ia:04x}  {cs:>4}  {m}{note}')
+            flush()
+            last = body[-1]
+            if last[4] not in ('ret', 'reti', 'jp', 'jphl', 'jumptable', 'unsupported', 'spload'):
+                nxt = last[0] + last[2]
+                print(f'   falls through to {by_addr.get((b, nxt)) or local_by_addr.get((b, nxt)) or f"{nxt:04x}"}')
+            callers, jumpers, fallers = [], [], []
+            for pn in pnames:
+                for (pb, pa) in instances.get(pn, []):
+                    if (pb, pa) == (b, a) or (pb, pa) in externs: continue
+                    pbody = routine_body(pb, pa)
+                    pbanks = infer_banks(pb, pbody)
+                    paddrs = set(ia for ia, *_ in pbody)
+                    for ia, m, l_, cy, kind, info in pbody:
+                        if kind in ('jp', 'jpcc', 'call', 'callcc') and info[0] not in paddrs:
+                            tb = target_bank(pb, info[0])
+                            if tb is None: tb = pbanks.get(ia)
+                            if tb != b or info[0] not in addrs: continue
+                            if info[0] == a: callers.append(pn)
+                            else: jumpers.append(f'{pn} -> {info[0]:04x}')
+                    pl = pbody[-1]
+                    if pl[4] not in ('ret', 'reti', 'jp', 'jphl', 'jumptable', 'unsupported', 'spload') and pb == b and pl[0] + pl[2] == a: fallers.append(pn)
+            print(f'   callers: {len(callers)}' + (f' ({", ".join(sorted(set(callers))[:12])}{"..." if len(set(callers)) > 12 else ""})' if callers else ''))
+            if jumpers: print(f'   INCOMING JUMPS: {", ".join(sorted(set(jumpers)))}')
+            if fallers: print(f'   FALLEN INTO FROM: {", ".join(sorted(set(fallers)))}')
+        print()
+    for n in names[1:]: report(n)
 else:
     print('#include "game/asm.h"\n#include "game/gen.h"\n')
     for n in names:

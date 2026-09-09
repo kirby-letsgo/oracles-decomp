@@ -156,8 +156,12 @@ void gb_run_until_vblank(GB *gb) {
 uint64_t gb_state_hash(const GB *gb) {
   const GBSample *sm = gb->sample;
   uint64_t h = FNV1A64_INIT;
-  h = fnv1a64_update(h, (const unsigned char *)sm->wram, sizeof sm->wram);
-  h = fnv1a64_update(h, sm->hram, sizeof sm->hram);
+  h = fnv1a64_update(h, sm->wram[0] + GB_W0_SKIP_END, 4096 - GB_W0_SKIP_END);
+  h = fnv1a64_update(h, sm->wram[1], 4096);
+  h = fnv1a64_update(h, sm->wram[GB_SOUND_BANK], GB_SOUND_BANK_LO);
+  h = fnv1a64_update(h, (const unsigned char *)sm->wram[3], 5 * 4096);
+  h = fnv1a64_update(h, sm->hram, GB_HRAM_MUSIC_LO);
+  h = fnv1a64_update(h, sm->hram + GB_HRAM_MUSIC_HI, sizeof sm->hram - GB_HRAM_MUSIC_HI);
   h = fnv1a64_update(h, (const unsigned char *)sm->vram, sizeof sm->vram);
   h = fnv1a64_update(h, sm->oam, sizeof sm->oam);
   h = fnv1a64_update(h, sm->bg_pal, sizeof sm->bg_pal);

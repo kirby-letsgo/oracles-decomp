@@ -47,7 +47,7 @@ void scriptCmd_stopIfRoomFlag80Set(GB *gb) {
 // 0c:410f
 void scriptFunc_checkRoomFlag(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x410f, getThisRoomFlags, 0x197d, 0x4112);  // call $197d
+  CALL(0x410f, getThisRoomFlags_hook, 0x197d, 0x4112);  // call $197d
   I(0x4112, 1); alu_and(gb, B);  // and b
   if ((F & FZ)) { I(0x4113, 4); scriptFunc_popHlAndInc(gb); return; } I(0x4113, 3);  // jp z,$415a
   SET_HL(POP(0x4116));  // pop hl
@@ -475,7 +475,7 @@ void scriptCmd_getRandomBits(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   SET_HL(POP(0x426a));  // pop hl
   I(0x426b, 2); SET_HL(HL + 1);  // inc hl
-  CALL(0x426c, getRandomNumber, 0x043e, 0x426f);  // call $043e
+  CALL(0x426c, getRandomNumber_hook, 0x043e, 0x426f);  // call $043e
   I(0x426f, 1); B = A;  // ld b,a
   I(0x4270, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x4271, 1); E = A;  // ld e,a
@@ -595,7 +595,7 @@ void scriptCmd_showTextDifferentForLinked(GB *gb) {
   I(0x42e5, 2); SET_HL(HL + 1);  // inc hl
   I(0x42e6, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x42e7, 1); B = A;  // ld b,a
-  CALL(0x42e8, checkIsLinkedGame, 0x1992, 0x42eb);  // call $1992
+  CALL(0x42e8, checkIsLinkedGame_hook, 0x1992, 0x42eb);  // call $1992
   if (!(F & FZ)) { I(0x42eb, 3); goto L_42f1; } I(0x42eb, 2);  // jr nz,$42f1
 L_42ed:
   I(0x42ed, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
@@ -873,7 +873,7 @@ void scriptCmd_jumpIfRoomFlagSet(GB *gb) {
   I(0x43c1, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x43c2, 1); B = A;  // ld b,a
   PUSH(0x43c3, HL);  // push hl
-  CALL(0x43c4, getThisRoomFlags, 0x197d, 0x43c7);  // call $197d
+  CALL(0x43c4, getThisRoomFlags_hook, 0x197d, 0x43c7);  // call $197d
   I(0x43c7, 1); alu_and(gb, B);  // and b
   if (!(F & FZ)) { I(0x43c8, 3); goto L_43cf; } I(0x43c8, 2);  // jr nz,$43cf
 L_43ca:
@@ -914,7 +914,7 @@ void scriptCmd_orRoomFlags(GB *gb) {
   I(0x43d5, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x43d6, 1); B = A;  // ld b,a
   PUSH(0x43d7, HL);  // push hl
-  CALL(0x43d8, getThisRoomFlags, 0x197d, 0x43db);  // call $197d
+  CALL(0x43d8, getThisRoomFlags_hook, 0x197d, 0x43db);  // call $197d
   I(0x43db, 1); alu_or(gb, B);  // or b
   I(0x43dc, 2); mem_wr(gb, HL, A);  // ld (hl),a
   SET_HL(POP(0x43dd));  // pop hl
@@ -1018,14 +1018,14 @@ void scriptCmd_spawnItem(GB *gb) {
   I(0x4434, 1); A = E;  // ld a,e
   I(0x4435, 2); alu_cp(gb, 0xde);  // cp $de
   if ((F & FZ)) { I(0x4437, 3); goto L_443f; } I(0x4437, 2);  // jr z,$443f
-  CALL(0x4439, objectCopyPosition, 0x2242, 0x443c);  // call $2242
+  CALL(0x4439, objectCopyPosition_hook, 0x2242, 0x443c);  // call $2242
   I(0x443c, 4); scriptFunc_restoreActiveObject(gb); return;  // jp $41ca
 L_443f:
   I(0x443f, 2); E = 0x46;  // ld e,$46
   I(0x4441, 2); A = 0x03;  // ld a,$03
   I(0x4443, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x4444, 3); SET_DE(0xd00b);  // ld de,$d00b
-  CALL(0x4447, objectCopyPosition_rawAddress, 0x2247, 0x444a);  // call $2247
+  CALL(0x4447, objectCopyPosition_rawAddress_hook, 0x2247, 0x444a);  // call $2247
   I(0x444a, 4); scriptFunc_restoreActiveObject(gb); return;  // jp $41ca
 }
 
@@ -1119,7 +1119,7 @@ L_4486:
 L_448f:
   SET_HL(POP(0x448f));  // pop hl
   I(0x4490, 2); SET_HL(HL + 1);  // inc hl
-  CALL(0x4491, objectGetShortPosition, 0x2096, 0x4494);  // call $2096
+  CALL(0x4491, objectGetShortPosition_hook, 0x2096, 0x4494);  // call $2096
   I(0x4494, 3); goto L_4486;  // jr $4486
 }
 
@@ -1272,7 +1272,7 @@ void scriptCmd_checkFlagSet(GB *gb) {
   I(0x4511, 2); H = mem_rd(gb, HL);  // ld h,(hl)
   I(0x4512, 1); L = A;  // ld l,a
   I(0x4513, 1); A = B;  // ld a,b
-  CALL(0x4514, checkFlag, 0x0205, 0x4517);  // call $0205
+  CALL(0x4514, checkFlag_hook, 0x0205, 0x4517);  // call $0205
   SET_HL(POP(0x4517));  // pop hl
   if ((F & FZ)) { RET_TAKEN(0x4518); return; } I(0x4518, 2);  // ret z
   I(0x4519, 3); SET_BC(0x0004);  // ld bc,$0004
@@ -1551,7 +1551,7 @@ void scriptCmd_delay(GB *gb) {
   I(0x45d5, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x45d6, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x45d8, 3); SET_BC(0x45e2);  // ld bc,$45e2
-  CALL(0x45db, addAToBc, 0x006d, 0x45de);  // call $006d
+  CALL(0x45db, addAToBc_hook, 0x006d, 0x45de);  // call $006d
   I(0x45de, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x45df, 4); scriptFunc_4310(gb); return;  // jp $4310
 }

@@ -1024,7 +1024,7 @@ L_40e9:
 L_40f3:
   I(0x40f3, 1); A = B;  // ld a,b
   I(0x40f4, 3); SET_DE(0xd9e5);  // ld de,$d9e5
-  CALL(0x40f7, addAToDe, 0x0068, 0x40fa);  // call $0068
+  CALL(0x40f7, addAToDe_hook, 0x0068, 0x40fa);  // call $0068
   I(0x40fa, 1); A = B;  // ld a,b
   I(0x40fb, 1); A = alu_inc8(gb, A);  // inc a
   I(0x40fc, 4); mem_wr(gb, 0xd981, A);  // ld ($d981),a
@@ -1063,7 +1063,7 @@ L_40e9:
 L_40f3:
   I(0x40f3, 1); A = B;  // ld a,b
   I(0x40f4, 3); SET_DE(0xd9e5);  // ld de,$d9e5
-  CALL(0x40f7, addAToDe, 0x0068, 0x40fa);  // call $0068
+  CALL(0x40f7, addAToDe_hook, 0x0068, 0x40fa);  // call $0068
   I(0x40fa, 1); A = B;  // ld a,b
   I(0x40fb, 1); A = alu_inc8(gb, A);  // inc a
   I(0x40fc, 4); mem_wr(gb, 0xd981, A);  // ld ($d981),a
@@ -1100,7 +1100,7 @@ L_40e9:
 L_40f3:
   I(0x40f3, 1); A = B;  // ld a,b
   I(0x40f4, 3); SET_DE(0xd9e5);  // ld de,$d9e5
-  CALL(0x40f7, addAToDe, 0x0068, 0x40fa);  // call $0068
+  CALL(0x40f7, addAToDe_hook, 0x0068, 0x40fa);  // call $0068
   I(0x40fa, 1); A = B;  // ld a,b
   I(0x40fb, 1); A = alu_inc8(gb, A);  // inc a
   I(0x40fc, 4); mem_wr(gb, 0xd981, A);  // ld ($d981),a
@@ -1121,7 +1121,7 @@ void receivePacketByte__getNextByte(GB *gb) {
 L_40f3:
   I(0x40f3, 1); A = B;  // ld a,b
   I(0x40f4, 3); SET_DE(0xd9e5);  // ld de,$d9e5
-  CALL(0x40f7, addAToDe, 0x0068, 0x40fa);  // call $0068
+  CALL(0x40f7, addAToDe_hook, 0x0068, 0x40fa);  // call $0068
   I(0x40fa, 1); A = B;  // ld a,b
   I(0x40fb, 1); A = alu_inc8(gb, A);  // inc a
   I(0x40fc, 4); mem_wr(gb, 0xd981, A);  // ld ($d981),a
@@ -1265,7 +1265,7 @@ void waitForSerialByte(GB *gb) {
   I(0x41e4, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x41e5, 3); goto L_41ef; } I(0x41e5, 2);  // jr nz,$41ef
   I(0x41e7, 3); SET_HL(0xd989);  // ld hl,$d989
-  CALL(0x41ea, decHlRef16WithCap, 0x0237, 0x41ed);  // call $0237
+  CALL(0x41ea, decHlRef16WithCap_hook, 0x0237, 0x41ed);  // call $0237
   if ((F & FZ)) { I(0x41ed, 3); goto L_41f1; } I(0x41ed, 2);  // jr z,$41f1
 L_41ef:
   SET_AF(POP(0x41ef));  // pop af
@@ -1427,7 +1427,7 @@ void func_4293(GB *gb) {
   I(0x4299, 3); SET_HL(0xd98d);  // ld hl,$d98d
   I(0x429c, 3); SET_DE(0xd9ee);  // ld de,$d9ee
   I(0x429f, 2); B = 0x07;  // ld b,$07
-  CALL(0x42a1, copyMemoryReverse, 0x047f, 0x42a4);  // call $047f
+  CALL(0x42a1, copyMemoryReverse_hook, 0x047f, 0x42a4);  // call $047f
   I(0x42a4, 4); sendAckPacket(gb); return;  // jp $43f5
 }
 
@@ -1473,7 +1473,7 @@ void receiveLinkState10(GB *gb) {
   I(0x42e1, 3); SET_HL(0xd98d);  // ld hl,$d98d
   I(0x42e4, 3); SET_DE(0xc616);  // ld de,$c616
   I(0x42e7, 2); B = 0x08;  // ld b,$08
-  CALL(0x42e9, copyMemoryReverse, 0x047f, 0x42ec);  // call $047f
+  CALL(0x42e9, copyMemoryReverse_hook, 0x047f, 0x42ec);  // call $047f
   I(0x42ec, 3); func_4350(gb); return;  // jr $4350
 }
 
@@ -1512,7 +1512,7 @@ void receiveLinkState13(GB *gb) {
   I(0x431b, 3); SET_HL(0xd98d);  // ld hl,$d98d
   I(0x431e, 3); SET_DE(0xd9e6);  // ld de,$d9e6
   I(0x4321, 2); B = 0x08;  // ld b,$08
-  CALL(0x4323, copyMemoryReverse, 0x047f, 0x4326);  // call $047f
+  CALL(0x4323, copyMemoryReverse_hook, 0x047f, 0x4326);  // call $047f
   I(0x4326, 4); prepareForNextPacket(gb); return;  // jp $4269
 }
 
@@ -1535,7 +1535,7 @@ L_4337:
   I(0x433f, 3); SET_HL(0xd98d);  // ld hl,$d98d
   I(0x4342, 3); SET_DE(0xd9e6);  // ld de,$d9e6
   I(0x4345, 2); B = 0x08;  // ld b,$08
-  CALL(0x4347, copyMemoryReverse, 0x047f, 0x434a);  // call $047f
+  CALL(0x4347, copyMemoryReverse_hook, 0x047f, 0x434a);  // call $047f
   I(0x434a, 4); sendAckPacket(gb); return;  // jp $43f5
 }
 
@@ -1587,7 +1587,7 @@ void func_437b(GB *gb) {
   I(0x4380, 3); SET_DE(0xd98d);  // ld de,$d98d
   I(0x4383, 3); SET_HL(0xc616);  // ld hl,$c616
   I(0x4386, 2); B = 0x08;  // ld b,$08
-  CALL(0x4388, copyMemoryReverse, 0x047f, 0x438b);  // call $047f
+  CALL(0x4388, copyMemoryReverse_hook, 0x047f, 0x438b);  // call $047f
   I(0x438b, 4); saveFile_b00(gb); return;  // jp $09d8
 }
 
@@ -1732,7 +1732,7 @@ L_4432:
   if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
   I(0x4442, 3); SET_DE(0xd9f0);  // ld de,$d9f0
   I(0x4445, 2); B = 0x06;  // ld b,$06
-  CALL(0x4447, copyMemoryReverse, 0x047f, 0x444a);  // call $047f
+  CALL(0x4447, copyMemoryReverse_hook, 0x047f, 0x444a);  // call $047f
   I(0x444a, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x444c, 1); A = alu_inc8(gb, A);  // inc a
   I(0x444d, 3); SET_HL(0xd98d);  // ld hl,$d98d
@@ -1745,7 +1745,7 @@ L_4453:
 L_4459:
   I(0x4459, 2); B = 0x16;  // ld b,$16
   I(0x445b, 3); SET_DE(0xd9ee);  // ld de,$d9ee
-  CALL(0x445e, copyMemoryReverse, 0x047f, 0x4461);  // call $047f
+  CALL(0x445e, copyMemoryReverse_hook, 0x047f, 0x4461);  // call $047f
   I(0x4461, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
   I(0x4464, 2); alu_cp(gb, 0x08);  // cp $08
   if (!(F & FZ)) { I(0x4466, 3); goto L_447c; } I(0x4466, 2);  // jr nz,$447c
@@ -1807,7 +1807,7 @@ L_4432:
   if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
   I(0x4442, 3); SET_DE(0xd9f0);  // ld de,$d9f0
   I(0x4445, 2); B = 0x06;  // ld b,$06
-  CALL(0x4447, copyMemoryReverse, 0x047f, 0x444a);  // call $047f
+  CALL(0x4447, copyMemoryReverse_hook, 0x047f, 0x444a);  // call $047f
   I(0x444a, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x444c, 1); A = alu_inc8(gb, A);  // inc a
   I(0x444d, 3); SET_HL(0xd98d);  // ld hl,$d98d
@@ -1820,7 +1820,7 @@ L_4453:
 L_4459:
   I(0x4459, 2); B = 0x16;  // ld b,$16
   I(0x445b, 3); SET_DE(0xd9ee);  // ld de,$d9ee
-  CALL(0x445e, copyMemoryReverse, 0x047f, 0x4461);  // call $047f
+  CALL(0x445e, copyMemoryReverse_hook, 0x047f, 0x4461);  // call $047f
   I(0x4461, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
   I(0x4464, 2); alu_cp(gb, 0x08);  // cp $08
   if (!(F & FZ)) { I(0x4466, 3); goto L_447c; } I(0x4466, 2);  // jr nz,$447c
@@ -1880,7 +1880,7 @@ L_4432:
   if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
   I(0x4442, 3); SET_DE(0xd9f0);  // ld de,$d9f0
   I(0x4445, 2); B = 0x06;  // ld b,$06
-  CALL(0x4447, copyMemoryReverse, 0x047f, 0x444a);  // call $047f
+  CALL(0x4447, copyMemoryReverse_hook, 0x047f, 0x444a);  // call $047f
   I(0x444a, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x444c, 1); A = alu_inc8(gb, A);  // inc a
   I(0x444d, 3); SET_HL(0xd98d);  // ld hl,$d98d
@@ -1893,7 +1893,7 @@ L_4453:
 L_4459:
   I(0x4459, 2); B = 0x16;  // ld b,$16
   I(0x445b, 3); SET_DE(0xd9ee);  // ld de,$d9ee
-  CALL(0x445e, copyMemoryReverse, 0x047f, 0x4461);  // call $047f
+  CALL(0x445e, copyMemoryReverse_hook, 0x047f, 0x4461);  // call $047f
   I(0x4461, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
   I(0x4464, 2); alu_cp(gb, 0x08);  // cp $08
   if (!(F & FZ)) { I(0x4466, 3); goto L_447c; } I(0x4466, 2);  // jr nz,$447c
@@ -1970,7 +1970,7 @@ void markFileAsBlank(GB *gb) {
   I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
   if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
   I(0x44a4, 2); B = 0x06;  // ld b,$06
-  CALL(0x44a6, clearMemory, 0x046f, 0x44a9);  // call $046f
+  CALL(0x44a6, clearMemory_hook, 0x046f, 0x44a9);  // call $046f
   I(0x44a9, 4); sendAckPacket(gb); return;  // jp $43f5
 }
 
@@ -2024,7 +2024,7 @@ void interactionLoadTreasureData(GB *gb) {
   I(0x4523, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x4524, 3); SET_HL(0x5332);  // ld hl,$5332
 L_4527:
-  CALL(0x4527, multiplyABy4, 0x01c3, 0x452a);  // call $01c3
+  CALL(0x4527, multiplyABy4_hook, 0x01c3, 0x452a);  // call $01c3
   I(0x452a, 2); alu_add_hl(gb, BC);  // add hl,bc
   I(0x452b, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
   if ((F & FZ)) { I(0x452d, 3); goto L_4538; } I(0x452d, 2);  // jr z,$4538
@@ -2076,7 +2076,7 @@ void loadD6ChangingFloorPatternToBigBuffer(GB *gb) {
   I(0x576f, 1); E = A;  // ld e,a
   I(0x5770, 2); B = 0x41;  // ld b,$41
   I(0x5772, 3); SET_HL(0xc300);  // ld hl,$c300
-  CALL(0x5775, copyMemoryReverse, 0x047f, 0x5778);  // call $047f
+  CALL(0x5775, copyMemoryReverse_hook, 0x047f, 0x5778);  // call $047f
   SET_HL(POP(0x5778));  // pop hl
   I(0x5779, 2); SET_HL(HL + 1);  // inc hl
   I(0x577a, 2); SET_HL(HL + 1);  // inc hl
@@ -2085,7 +2085,7 @@ void loadD6ChangingFloorPatternToBigBuffer(GB *gb) {
   I(0x577d, 1); E = A;  // ld e,a
   I(0x577e, 2); B = 0x41;  // ld b,$41
   I(0x5780, 3); SET_HL(0xc380);  // ld hl,$c380
-  CALL(0x5783, copyMemoryReverse, 0x047f, 0x5786);  // call $047f
+  CALL(0x5783, copyMemoryReverse_hook, 0x047f, 0x5786);  // call $047f
   I(0x5786, 3); A = mem_rd(gb, 0xffaf);  // ldh a,($ffaf)
   I(0x5788, 1); D = A;  // ld d,a
   RET(0x5789); return;  // ret
