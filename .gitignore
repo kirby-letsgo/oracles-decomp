@@ -7,3 +7,4 @@ out/
 docs/
 build-quirk/
 CLAUDE.md
+.cache
