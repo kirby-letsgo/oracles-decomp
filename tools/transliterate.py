@@ -19,10 +19,34 @@ for line in open(sys.argv[2]):
         by_addr.setdefault((b, a), n)
         instances.setdefault(n, [])
         if (b, a) not in instances[n]: instances[n].append((b, a))
+relocs = []
+externs = set()
+import os as _os
+if _os.path.exists('src/hooks/extra.sym'):
+    for line in open('src/hooks/extra.sym'):
+        line = line.split('#')[0].strip()
+        m = re.match(r'([0-9a-f]{2}):([0-9a-f]{4}) (\S+)(?: = ([0-9a-f]{2}):([0-9a-f]{4})| (extern))?$', line)
+        if not m: continue
+        b, a, n = int(m.group(1), 16), int(m.group(2), 16), m.group(3)
+        labels.setdefault(n, (b, a)); by_addr.setdefault((b, a), n); instances.setdefault(n, [(b, a)])
+        if m.group(4): relocs.append((a, a + 0x80, int(m.group(4), 16), int(m.group(5), 16)))
+        if m.group(6): externs.add((b, a))
+def in_reloc(a): return any(lo <= a < hi for lo, hi, sb, sa in relocs)
 def cname_at(bank, addr):
-    n = by_addr[(bank, addr)]
-    n = n.replace('@', '_')
-    return n if len(instances.get(by_addr[(bank, addr)], [])) <= 1 else f'{n}_b{bank:02x}'
+    n = by_addr.get((bank, addr))
+    parent = n if n is not None else local_by_addr[(bank, addr)].split('@')[0]
+    base = cname(n if n is not None else local_by_addr[(bank, addr)])
+    inst = instances.get(parent, [])
+    if len(inst) <= 1: return base
+    if sum(1 for b, a in inst if b == bank) > 1: return f'{base}_b{bank:02x}_{addr:04x}' if n is not None else f'{base}_b{bank:02x}_{[a for b, a in inst if b == bank and a <= addr][-1]:04x}'
+    return f'{base}_b{bank:02x}'
+entries = {}
+_body_ok = {}
+def body_ok(bank, addr):
+    if (bank, addr) in externs: return True
+    if (bank, addr) not in _body_ok:
+        _body_ok[(bank, addr)] = not any(kind == 'unsupported' for a, m, ln, cy, kind, info in routine_body(bank, addr))
+    return _body_ok[(bank, addr)]
 ported = set(l.split('#')[0].strip() for l in open(sys.argv[3]) if l.split('#')[0].strip())
 def has_unsupported(n):
     if n not in labels: return True
@@ -39,6 +63,8 @@ ROTF = ['alu_rlc', 'alu_rrc', 'alu_rl', 'alu_rr', 'alu_sla', 'alu_sra', 'alu_swa
 
 def rd(bank, addr, off=0):
     a = addr + off
+    for lo, hi, sb, sa in relocs:
+        if lo <= a < hi: return rom[sb * 0x4000 + (sa - 0x4000) + (a - lo)]
     return rom[(bank * 0x4000 + (a - 0x4000)) if a >= 0x4000 else a]
 
 def get8(r):
@@ -59,8 +85,8 @@ def decode(bank, addr):
     """Return (mnemonic, length, cycles, kind, info)."""
     op = rd(bank, addr)
     if op in ILLEGAL: return f'illegal ${op:02x}', 1, 1, 'unsupported', ()
-    n1 = rd(bank, addr, 1) if addr + 1 < 0x8000 else 0
-    n16 = n1 | (rd(bank, addr, 2) << 8) if addr + 2 < 0x8000 else 0
+    n1 = rd(bank, addr, 1) if addr + 1 < 0x8000 or in_reloc(addr) else 0
+    n16 = n1 | (rd(bank, addr, 2) << 8) if addr + 2 < 0x8000 or in_reloc(addr) else 0
     rel = (addr + 2 + ((n1 ^ 0x80) - 0x80)) & 0xffff
     x, y, z, p, q = op >> 6, (op >> 3) & 7, op & 7, (op >> 4) & 3, (op >> 3) & 1
     if op == 0xcb:
@@ -124,7 +150,7 @@ def decode(bank, addr):
     return f'rst ${y*8:02x}', 1, 4, 'rst', (y * 8,)
 
 def target_bank(bank, t):
-    if t < 0x4000: return 0
+    if t < 0x4000 or t >= 0x8000: return 0
     return bank if bank != 0 else None
 
 def routine_body(bank, start):
@@ -133,7 +159,7 @@ def routine_body(bank, start):
     work = [start]
     while work:
         a = work.pop()
-        if a in seen or a >= 0x8000: continue
+        if a in seen or (a >= 0x8000 and not in_reloc(a)): continue
         if a != start and by_addr.get((bank, a)): continue
         m, ln, cy, kind, info = decode(bank, a)
         succ = []
@@ -155,14 +181,14 @@ def routine_body(bank, start):
         else:
             succ.append(a + ln)
         seen[a] = (a, m, ln, cy, kind, info)
-        work.extend(t for t in succ if (t < 0x4000) == (start < 0x4000))
+        work.extend(t for t in succ if (t < 0x4000) == (start < 0x4000) and (t >= 0x8000) == (start >= 0x8000))
     return [seen[a] for a in sorted(seen)]
 
 def target_name(bank, t, insns_addrs):
     if t in insns_addrs: return None
     return by_addr.get((bank, t))
 
-def cname(n): return n.replace('@', '_')
+def cname(n): return n.replace('@', '__')
 
 def gen(name, bank=None, start=None):
     if bank is None: bank, start = labels[name]
@@ -179,6 +205,7 @@ def gen(name, bank=None, start=None):
     out = Out()
     out.lines.append(f'// {bank:02x}:{start:04x}')
     out.lines.append(f'void {cname_at(bank, start)}(GB *gb) {{')
+    out.emit('uint16_t sp0_ = gb->sp; (void)sp0_;')
     if insns[0][0] != start:
         jump_targets.add(start)
         out.emit(f'goto L_{start:04x};')
@@ -210,8 +237,8 @@ def gen(name, bank=None, start=None):
                 jump = f'goto L_{t:04x};'
             else:
                 tb = target_bank(bank, t)
-                tn = by_addr.get((tb, t)) or (local_by_addr.get((tb, t)) or '').split('@')[0]
-                if tn in ported and (tb, t) in by_addr: jump = f'{cname_at(tb, t)}(gb); return;'
+                tn = by_addr.get((tb, t)) or local_by_addr.get((tb, t))
+                if (tb, t) in entries: jump = f'{entries[(tb, t)]}(gb); return;'
                 else: jump = f'HANDOFF(0x{t:04x}); /* {tn or "unported"} */'
             if cond is None:
                 out.emit(f'I(0x{a:04x}, {taken}); {jump}{com}')
@@ -220,9 +247,9 @@ def gen(name, bank=None, start=None):
         elif kind in ('call', 'callcc'):
             t, cond = info
             tb = target_bank(bank, t)
-            tn = by_addr.get((tb, t))
+            tn = by_addr.get((tb, t)) or local_by_addr.get((tb, t))
             ra = a + ln
-            if tn in ported: c = f'CALL(0x{a:04x}, {cname_at(tb, t)}, 0x{t:04x}, 0x{ra:04x});'
+            if (tb, t) in entries: c = f'CALL(0x{a:04x}, {entries[(tb, t)]}, 0x{t:04x}, 0x{ra:04x});'
             else: c = f'CALL_ASM(0x{a:04x}, 0x{t:04x}, 0x{ra:04x}); /* {tn or "unported"} */'
             if cond is None: out.emit(c + com)
             else: out.emit(f'if ({cond}) {{ {c} }} else I(0x{a:04x}, 3);{com}')
@@ -248,14 +275,14 @@ def gen(name, bank=None, start=None):
         elif kind == 'jphl':
             out.emit(f'I(0x{a:04x}, 1); HANDOFF(HL);{com}')
         elif kind == 'spload':
-            out.emit(f'I(0x{a:04x}, {cy}); {info[0]}; gb->sp_loads++; HANDOFF(0x{a + ln:04x});{com}')
+            out.emit(f'I(0x{a:04x}, {cy}); {info[0]}; gb->sp_loads++; HANDOFF_UP(0x{a + ln:04x});{com}')
         else:
             out.emit(f'#error unsupported instruction {m} at {a:04x}')
         falls = kind not in ('ret', 'reti', 'jp', 'jphl', 'jumptable', 'unsupported', 'spload')
         nxt_a = a + ln
         if falls and nxt_a not in addrs:
-            nn = by_addr.get((bank, nxt_a))
-            if nn in ported: out.emit(f'{cname_at(bank, nxt_a)}(gb); return;  // fallthrough')
+            nn = by_addr.get((bank, nxt_a)) or local_by_addr.get((bank, nxt_a))
+            if (bank, nxt_a) in entries: out.emit(f'{entries[(bank, nxt_a)]}(gb); return;  // fallthrough')
             else: out.emit(f'HANDOFF(0x{nxt_a:04x});  // fallthrough to {nn or "unlabeled"}')
     out.lines.append('}')
     gen.flags = 'H' if any(k == 'halt' for _, _, _, _, k, _ in insns) else '-'
@@ -271,19 +298,75 @@ if names and names[0] == '--out':
     for n in missing: print(f'warning: unknown routine {n} (skipped)', file=sys.stderr)
     names = list(dict.fromkeys(n for n in names if n in labels))
     ported = set(n for n in ported if n in labels and not has_unsupported(n))
+    _switches = {}
+    def switches_threads(tb, t, seen=()):
+        if (tb, t) in _switches: return _switches[(tb, t)]
+        if (tb, t) in externs or (tb, t) in seen or t >= 0x8000: return False
+        body = routine_body(tb, t)
+        r = any(k == 'spload' for _, _, _, _, k, _ in body)
+        if not r:
+            addrs = set(a for a, *_ in body)
+            for a, m, ln, cy, k, info in body:
+                nxt = []
+                if k in ('jp', 'jpcc') and info[0] not in addrs: nxt.append(info[0])
+                if k not in ('ret', 'reti', 'jp', 'jphl', 'jumptable', 'unsupported', 'spload') and a + ln not in addrs: nxt.append(a + ln)
+                for x in nxt:
+                    nb = target_bank(tb, x)
+                    if nb is not None and switches_threads(nb, x, seen + ((tb, t),)): r = True; break
+                if r: break
+        _switches[(tb, t)] = r
+        return r
+    for n in names:
+        for (b, a) in instances.get(n, []):
+            if (b, a) in externs: continue
+            for ia, m, ln, cy, kind, info in routine_body(b, a):
+                if kind == 'spload' and (b, ia + ln) not in by_addr: local_by_addr.setdefault((b, ia + ln), f'{n}@afterSp{ia + ln:04x}')
+                if kind in ('call', 'callcc'):
+                    tb = target_bank(b, info[0])
+                    if tb is not None and switches_threads(tb, info[0]) and (b, ia + ln) not in by_addr: local_by_addr.setdefault((b, ia + ln), f'{n}@afterCall{ia + ln:04x}')
+    owner = {}
+    for n in names:
+        for (b, a) in instances.get(n, []):
+            if (b, a) in externs: continue
+            for ia, *_ in routine_body(b, a): owner.setdefault((b, ia), (n, a))
+    for n in names:
+        for (b, a) in instances.get(n, []):
+            if (b, a) in externs: continue
+            body = routine_body(b, a)
+            addrs = set(ia for ia, *_ in body)
+            for ia, m, ln, cy, kind, info in body:
+                if kind not in ('jp', 'jpcc') or info[0] in addrs: continue
+                tb = target_bank(b, info[0])
+                if tb is None or (tb, info[0]) in by_addr or (tb, info[0]) in local_by_addr: continue
+                o = owner.get((tb, info[0]))
+                if o and o[1] != info[0]: local_by_addr[(tb, info[0])] = f'{o[0]}@jump{info[0]:04x}'
+    locals_of = collections.defaultdict(list)
+    for (lb, la), ln in local_by_addr.items():
+        if (lb, la) not in by_addr: locals_of[(lb, ln.split('@')[0])].append((la, ln))
+    items_by_bank = collections.OrderedDict()
+    seen_addrs = set()
+    for n in names:
+        for (b, a) in instances.get(n, []):
+            if (b, a) in seen_addrs: continue
+            seen_addrs.add((b, a))
+            if body_ok(b, a): entries[(b, a)] = cname_at(b, a)
+            items_by_bank.setdefault(b, []).append((n, b, a))
+            for la, ln in sorted(locals_of.get((b, n), [])):
+                if not body_ok(b, la): print(f'warning: {ln} skipped (unsupported)', file=sys.stderr); continue
+                entries[(b, la)] = cname_at(b, la)
+                items_by_bank[b].append((ln, b, la))
     for n in names:
         by_bank.setdefault(labels[n][0], []).append(n)
     with open(os.path.join(outdir, 'gen.h'), 'w') as h:
         h.write('// generated by tools/transliterate.py; do not edit\n#pragma once\n#include "core/gb.h"\n')
         for n in names: h.write(f'void {cname(n)}(GB *gb);\n')
     generated = []
-    by_bank = collections.OrderedDict()
-    for n in names:
-        for (b, a) in instances.get(n, []): by_bank.setdefault(b, []).append((n, b, a))
+    by_bank = items_by_bank
     for bank, items in by_bank.items():
         with open(os.path.join(outdir, f'gen_bank{bank:02x}.c'), 'w') as f:
             f.write('// generated by tools/transliterate.py; do not edit\n#include "game/asm.h"\n#include "game/gen.h"\n\n')
             for n, b, a in items:
+                if (b, a) in externs: generated.append((b, a, cname_at(b, a), '-')); continue
                 code = gen(n, b, a)
                 if code: f.write(code + '\n\n'); generated.append((b, a, cname_at(b, a), gen.flags))
     with open(os.path.join(outdir, 'gen.h'), 'w') as h:

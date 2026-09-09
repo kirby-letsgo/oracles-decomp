@@ -4,12 +4,14 @@
 
 // 00:046f
 void clearMemory(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x046f, 1); alu_xor(gb, A);  // xor a
   fillMemory(gb); return;  // fallthrough
 }
 
 // 00:0470
 void fillMemory(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_0470:
   I(0x0470, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x0471, 1); B = alu_dec8(gb, B);  // dec b
@@ -19,12 +21,14 @@ L_0470:
 
 // 00:0475
 void clearMemoryBc(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0475, 1); alu_xor(gb, A);  // xor a
   fillMemoryBc(gb); return;  // fallthrough
 }
 
 // 00:0476
 void fillMemoryBc(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0476, 1); E = A;  // ld e,a
 L_0477:
   I(0x0477, 1); A = E;  // ld a,e
@@ -38,6 +42,7 @@ L_0477:
 
 // 00:047f
 void copyMemoryReverse(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_047f:
   I(0x047f, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x0480, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
@@ -49,6 +54,7 @@ L_047f:
 
 // 00:0486
 void copyMemory(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_0486:
   I(0x0486, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x0487, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -60,6 +66,7 @@ L_0486:
 
 // 00:048d
 void copyMemoryBcReverse(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_048d:
   I(0x048d, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x048e, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
@@ -73,6 +80,7 @@ L_048d:
 
 // 00:0496
 void copyMemoryBc(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_0496:
   I(0x0496, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x0497, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -86,6 +94,7 @@ L_0496:
 
 // 00:0068
 void addAToDe(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0068, 1); alu_add(gb, E);  // add e
   I(0x0069, 1); E = A;  // ld e,a
   if (!(F & FC)) { RET_TAKEN(0x006a); return; } I(0x006a, 2);  // ret nc
@@ -95,6 +104,7 @@ void addAToDe(GB *gb) {
 
 // 00:006d
 void addAToBc(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x006d, 1); alu_add(gb, C);  // add c
   I(0x006e, 1); C = A;  // ld c,a
   if (!(F & FC)) { RET_TAKEN(0x006f); return; } I(0x006f, 2);  // ret nc
@@ -104,6 +114,7 @@ void addAToBc(GB *gb) {
 
 // 00:0072
 void addDoubleIndexToDe(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x0072, HL);  // push hl
   I(0x0073, 1); alu_add(gb, A);  // add a
   I(0x0074, 1); L = A;  // ld l,a
@@ -119,6 +130,7 @@ void addDoubleIndexToDe(GB *gb) {
 
 // 00:007e
 void addDoubleIndexToBc(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x007e, HL);  // push hl
   I(0x007f, 1); alu_add(gb, A);  // add a
   I(0x0080, 1); L = A;  // ld l,a
@@ -134,6 +146,7 @@ void addDoubleIndexToBc(GB *gb) {
 
 // 00:0176
 void getNumSetBits(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0176, 2); B = 0x00;  // ld b,$00
 L_0178:
   I(0x0178, 1); alu_add(gb, A);  // add a
@@ -148,6 +161,7 @@ L_017c:
 
 // 00:0181
 void addDecimalToHlRef(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0181, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x0182, 1); alu_add(gb, C);  // add c
   I(0x0183, 1); alu_daa(gb);  // daa
@@ -165,6 +179,7 @@ void addDecimalToHlRef(GB *gb) {
 
 // 00:018f
 void subDecimalFromHlRef(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x018f, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x0190, 1); alu_sub(gb, C);  // sub c
   I(0x0191, 1); alu_daa(gb);  // daa
@@ -183,6 +198,7 @@ void subDecimalFromHlRef(GB *gb) {
 
 // 00:019d
 void multiplyAByC(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x019d, 2); E = 0x08;  // ld e,$08
   I(0x019f, 2); B = 0x00;  // ld b,$00
   I(0x01a1, 1); L = B;  // ld l,b
@@ -200,6 +216,7 @@ L_01a8:
 
 // 00:01ac
 void multiplyABy16(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x01ac, 2); A = alu_swap(gb, A);  // swap a
   I(0x01ae, 1); B = A;  // ld b,a
   I(0x01af, 2); alu_and(gb, 0xf0);  // and $f0
@@ -212,6 +229,7 @@ void multiplyABy16(GB *gb) {
 
 // 00:01b7
 void multiplyABy8(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x01b7, 2); A = alu_swap(gb, A);  // swap a
   I(0x01b9, 1); alu_rrca(gb);  // rrca
   I(0x01ba, 1); B = A;  // ld b,a
@@ -225,6 +243,7 @@ void multiplyABy8(GB *gb) {
 
 // 00:01c3
 void multiplyABy4(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x01c3, 2); B = 0x00;  // ld b,$00
   I(0x01c5, 1); alu_add(gb, A);  // add a
   I(0x01c6, 2); B = alu_rl(gb, B);  // rl b
@@ -236,6 +255,7 @@ void multiplyABy4(GB *gb) {
 
 // 00:01cd
 void s8ToS16(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x01cd, 2); B = 0xff;  // ld b,$ff
   I(0x01cf, 2); alu_bit(gb, 7, A);  // bit 7,a
   if (!(F & FZ)) { I(0x01d1, 3); goto L_01d4; } I(0x01d1, 2);  // jr nz,$01d4
@@ -247,6 +267,7 @@ L_01d4:
 
 // 00:01d6
 void compareHlToBc(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x01d6, 1); A = H;  // ld a,h
   I(0x01d7, 1); alu_cp(gb, B);  // cp b
   if ((F & FC)) { I(0x01d8, 3); goto L_01e4; } I(0x01d8, 2);  // jr c,$01e4
@@ -267,6 +288,7 @@ L_01e7:
 
 // 00:01ea
 void getHighestSetBit(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x01ea, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { RET_TAKEN(0x01eb); return; } I(0x01eb, 2);  // ret z
   PUSH(0x01ec, BC);  // push bc
@@ -283,6 +305,7 @@ L_01ef:
 
 // 00:01f8
 void getLowestSetBit(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x01f8, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { RET_TAKEN(0x01f9); return; } I(0x01f9, 2);  // ret z
   PUSH(0x01fa, BC);  // push bc
@@ -299,6 +322,7 @@ L_01fd:
 
 // 00:0205
 void checkFlag(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x0205, HL);  // push hl
   PUSH(0x0206, BC);  // push bc
   CALL(0x0207, _flagHlpr, 0x0223, 0x020a);  // call $0223
@@ -310,6 +334,7 @@ void checkFlag(GB *gb) {
 
 // 00:020e
 void setFlag(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x020e, HL);  // push hl
   PUSH(0x020f, BC);  // push bc
   CALL(0x0210, _flagHlpr, 0x0223, 0x0213);  // call $0223
@@ -322,6 +347,7 @@ void setFlag(GB *gb) {
 
 // 00:0218
 void unsetFlag(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x0218, HL);  // push hl
   PUSH(0x0219, BC);  // push bc
   CALL(0x021a, _flagHlpr, 0x0223, 0x021d);  // call $0223
@@ -335,6 +361,7 @@ void unsetFlag(GB *gb) {
 
 // 00:0237
 void decHlRef16WithCap(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0237, 2); SET_HL(HL + 1);  // inc hl
   I(0x0238, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
   I(0x0239, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
@@ -351,6 +378,7 @@ void decHlRef16WithCap(GB *gb) {
 
 // 00:0245
 void incHlRefWithCap(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0245, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   if (!(F & FZ)) { RET_TAKEN(0x0246); return; } I(0x0246, 2);  // ret nz
   I(0x0247, 3); mem_wr(gb, HL, 0xff);  // ld (hl),$ff
@@ -359,6 +387,7 @@ void incHlRefWithCap(GB *gb) {
 
 // 00:024a
 void incHlRef16WithCap(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x024a, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   if (!(F & FZ)) { RET_TAKEN(0x024b); return; } I(0x024b, 2);  // ret nz
   I(0x024c, 2); SET_HL(HL + 1);  // inc hl
@@ -377,6 +406,7 @@ L_0252:
 
 // 00:0259
 void hexToDec(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0259, 3); SET_BC(0x0000);  // ld bc,$0000
 L_025c:
   I(0x025c, 2); alu_cp(gb, 0x64);  // cp $64
@@ -392,8 +422,20 @@ L_0265:
   I(0x026b, 3); goto L_0265;  // jr $0265
 }
 
+// 00:0265
+void hexToDec__doneHundreds(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0265:
+  I(0x0265, 2); alu_cp(gb, 0x0a);  // cp $0a
+  if ((F & FC)) { RET_TAKEN(0x0267); return; } I(0x0267, 2);  // ret c
+  I(0x0268, 2); alu_sub(gb, 0x0a);  // sub $0a
+  I(0x026a, 1); C = alu_inc8(gb, C);  // inc c
+  I(0x026b, 3); goto L_0265;  // jr $0265
+}
+
 // 00:043e
 void getRandomNumber(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x043e, HL);  // push hl
   PUSH(0x043f, BC);  // push bc
   I(0x0440, 3); A = mem_rd(gb, 0xff94);  // ldh a,($ff94)
@@ -415,6 +457,7 @@ void getRandomNumber(GB *gb) {
 
 // 00:0453
 void getRandomNumber_noPreserveVars(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0453, 3); A = mem_rd(gb, 0xff94);  // ldh a,($ff94)
   I(0x0455, 1); L = A;  // ld l,a
   I(0x0456, 1); C = A;  // ld c,a
@@ -432,6 +475,7 @@ void getRandomNumber_noPreserveVars(GB *gb) {
 
 // 00:0464
 void getRandomIndexFromProbabilityDistribution(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0464, 2); B = 0x00;  // ld b,$00
   CALL(0x0466, getRandomNumber, 0x043e, 0x0469);  // call $043e
 L_0469:
@@ -444,6 +488,7 @@ L_0469:
 
 // 00:049f
 void clearOam(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x049f, 1); alu_xor(gb, A);  // xor a
   I(0x04a0, 3); mem_wr(gb, 0xff9f, A);  // ldh ($ff9f),a
   I(0x04a2, 2); H = 0xcb;  // ld h,$cb
@@ -459,6 +504,7 @@ L_04a6:
 
 // 00:02c1
 void disableLcd(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x02c1, 3); A = mem_rd(gb, 0xff40);  // ldh a,($ff40)
   I(0x02c3, 1); alu_rlca(gb);  // rlca
   if (!(F & FC)) { RET_TAKEN(0x02c4); return; } I(0x02c4, 2);  // ret nc
@@ -487,6 +533,7 @@ L_02cd:
 
 // 00:04af
 void clearVram(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x04af, disableLcd, 0x02c1, 0x04b2);  // call $02c1
   CALL(0x04b2, clearOam, 0x049f, 0x04b5);  // call $049f
   I(0x04b5, 2); A = 0x01;  // ld a,$01
@@ -503,12 +550,14 @@ void clearVram(GB *gb) {
 
 // 00:04cd
 void initializeVramMaps(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x04cd, initializeVramMap1, 0x04ed, 0x04d0);  // call $04ed
   initializeVramMap0(gb); return;  // fallthrough
 }
 
 // 00:04d0
 void initializeVramMap0(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x04d0, disableLcd, 0x02c1, 0x04d3);  // call $02c1
   I(0x04d3, 2); A = 0x01;  // ld a,$01
   I(0x04d5, 3); mem_wr(gb, 0xff4f, A);  // ldh ($ff4f),a
@@ -525,6 +574,7 @@ void initializeVramMap0(GB *gb) {
 
 // 00:04ed
 void initializeVramMap1(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x04ed, disableLcd, 0x02c1, 0x04f0);  // call $02c1
   I(0x04f0, 2); A = 0x01;  // ld a,$01
   I(0x04f2, 3); mem_wr(gb, 0xff4f, A);  // ldh ($ff4f),a
@@ -541,6 +591,7 @@ void initializeVramMap1(GB *gb) {
 
 // 00:0878
 void dec16_ff8c(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x0878, HL);  // push hl
   I(0x0879, 3); SET_HL(0xff8c);  // ld hl,$ff8c
   CALL(0x087c, decHlRef16WithCap, 0x0237, 0x087f);  // call $0237
@@ -550,6 +601,7 @@ void dec16_ff8c(GB *gb) {
 
 // 00:0772
 void copyByteSequential(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0772, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x0773, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x0774, 2); SET_DE(DE + 1);  // inc de
@@ -559,6 +611,7 @@ void copyByteSequential(GB *gb) {
 
 // 00:0788
 void readByteSequential(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0788, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x0789, 2); alu_bit(gb, 7, H);  // bit 7,h
   if ((F & FZ)) { RET_TAKEN(0x078b); return; } I(0x078b, 2);  // ret z
@@ -574,11 +627,13 @@ void readByteSequential(GB *gb) {
 
 // 00:00a0
 void jpHl(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x00a0, 1); HANDOFF(HL);  // jp hl
 }
 
 // 00:0cda
 void jpBc(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0cda, 1); L = C;  // ld l,c
   I(0x0cdb, 1); H = B;  // ld h,b
   I(0x0cdc, 1); HANDOFF(HL);  // jp hl
@@ -586,6 +641,7 @@ void jpBc(GB *gb) {
 
 // 00:23a7
 void add16BitRefs(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x23a7, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x23a8, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
   I(0x23a9, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -599,6 +655,7 @@ void add16BitRefs(GB *gb) {
 
 // 00:23b0
 void cpActiveRing(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x23b0, HL);  // push hl
   I(0x23b1, 3); SET_HL(0xc6cb);  // ld hl,$c6cb
   I(0x23b4, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
@@ -608,6 +665,7 @@ void cpActiveRing(GB *gb) {
 
 // 00:23b7
 void disableActiveRing(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x23b7, HL);  // push hl
   I(0x23b8, 3); SET_HL(0xc6cb);  // ld hl,$c6cb
   I(0x23bb, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));  // set 6,(hl)
@@ -617,6 +675,7 @@ void disableActiveRing(GB *gb) {
 
 // 00:23bf
 void enableActiveRing(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x23bf, HL);  // push hl
   I(0x23c0, 3); SET_HL(0xc6cb);  // ld hl,$c6cb
   I(0x23c3, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -630,6 +689,7 @@ L_23ca:
 
 // 00:23cc
 void interactionDecCounter1(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x23cc, 1); H = D;  // ld h,d
   I(0x23cd, 2); L = 0x46;  // ld l,$46
   I(0x23cf, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
@@ -638,6 +698,7 @@ void interactionDecCounter1(GB *gb) {
 
 // 00:23d1
 void interactionDecCounter2(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x23d1, 1); H = D;  // ld h,d
   I(0x23d2, 2); L = 0x47;  // ld l,$47
   I(0x23d4, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
@@ -646,6 +707,7 @@ void interactionDecCounter2(GB *gb) {
 
 // 00:23d6
 void itemDecCounter1(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x23d6, 1); H = D;  // ld h,d
   I(0x23d7, 2); L = 0x06;  // ld l,$06
   I(0x23d9, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
@@ -654,6 +716,7 @@ void itemDecCounter1(GB *gb) {
 
 // 00:23db
 void itemDecCounter2(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x23db, 1); H = D;  // ld h,d
   I(0x23dc, 2); L = 0x07;  // ld l,$07
   I(0x23de, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
@@ -662,6 +725,7 @@ void itemDecCounter2(GB *gb) {
 
 // 00:23e0
 void interactionIncState(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x23e0, 1); H = D;  // ld h,d
   I(0x23e1, 2); L = 0x44;  // ld l,$44
   I(0x23e3, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
@@ -670,6 +734,7 @@ void interactionIncState(GB *gb) {
 
 // 00:23e5
 void interactionIncSubstate(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x23e5, 1); H = D;  // ld h,d
   I(0x23e6, 2); L = 0x45;  // ld l,$45
   I(0x23e8, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
@@ -678,6 +743,7 @@ void interactionIncSubstate(GB *gb) {
 
 // 00:23ea
 void itemIncState(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x23ea, 1); H = D;  // ld h,d
   I(0x23eb, 2); L = 0x04;  // ld l,$04
   I(0x23ed, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
@@ -686,6 +752,7 @@ void itemIncState(GB *gb) {
 
 // 00:23ef
 void itemIncSubstate(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x23ef, 1); H = D;  // ld h,d
   I(0x23f0, 2); L = 0x05;  // ld l,$05
   I(0x23f2, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
@@ -694,6 +761,7 @@ void itemIncSubstate(GB *gb) {
 
 // 00:23f4
 void cpInteractionState(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x23f4, 1); H = D;  // ld h,d
   I(0x23f5, 2); L = 0x44;  // ld l,$44
   I(0x23f7, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
@@ -702,6 +770,7 @@ void cpInteractionState(GB *gb) {
 
 // 00:23f9
 void cpInteractionSubstate(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x23f9, 1); H = D;  // ld h,d
   I(0x23fa, 2); L = 0x45;  // ld l,$45
   I(0x23fc, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
@@ -710,6 +779,7 @@ void cpInteractionSubstate(GB *gb) {
 
 // 00:23fe
 void checkInteractionState(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x23fe, 2); E = 0x44;  // ld e,$44
   I(0x2400, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x2401, 1); alu_or(gb, A);  // or a
@@ -718,6 +788,7 @@ void checkInteractionState(GB *gb) {
 
 // 00:1e33
 void objectSetVisiblec0(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e33, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1e35, 2); alu_add(gb, 0x1a);  // add $1a
   I(0x1e37, 1); E = A;  // ld e,a
@@ -728,6 +799,7 @@ void objectSetVisiblec0(GB *gb) {
 
 // 00:1e3c
 void objectSetVisiblec1(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e3c, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1e3e, 2); alu_add(gb, 0x1a);  // add $1a
   I(0x1e40, 1); E = A;  // ld e,a
@@ -738,6 +810,7 @@ void objectSetVisiblec1(GB *gb) {
 
 // 00:1e45
 void objectSetVisiblec2(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e45, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1e47, 2); alu_add(gb, 0x1a);  // add $1a
   I(0x1e49, 1); E = A;  // ld e,a
@@ -748,6 +821,7 @@ void objectSetVisiblec2(GB *gb) {
 
 // 00:1e4e
 void objectSetVisiblec3(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e4e, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1e50, 2); alu_add(gb, 0x1a);  // add $1a
   I(0x1e52, 1); E = A;  // ld e,a
@@ -758,6 +832,7 @@ void objectSetVisiblec3(GB *gb) {
 
 // 00:1e57
 void objectSetVisible80(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e57, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1e59, 2); alu_add(gb, 0x1a);  // add $1a
   I(0x1e5b, 1); E = A;  // ld e,a
@@ -768,6 +843,7 @@ void objectSetVisible80(GB *gb) {
 
 // 00:1e60
 void objectSetVisible81(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e60, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1e62, 2); alu_add(gb, 0x1a);  // add $1a
   I(0x1e64, 1); E = A;  // ld e,a
@@ -778,6 +854,7 @@ void objectSetVisible81(GB *gb) {
 
 // 00:1e69
 void objectSetVisible82(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e69, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1e6b, 2); alu_add(gb, 0x1a);  // add $1a
   I(0x1e6d, 1); E = A;  // ld e,a
@@ -788,6 +865,7 @@ void objectSetVisible82(GB *gb) {
 
 // 00:1e72
 void objectSetVisible83(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e72, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1e74, 2); alu_add(gb, 0x1a);  // add $1a
   I(0x1e76, 1); E = A;  // ld e,a
@@ -798,6 +876,7 @@ void objectSetVisible83(GB *gb) {
 
 // 00:1e7b
 void objectSetInvisible(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e7b, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1e7d, 2); alu_add(gb, 0x1a);  // add $1a
   I(0x1e7f, 1); L = A;  // ld l,a
@@ -808,6 +887,7 @@ void objectSetInvisible(GB *gb) {
 
 // 00:1e84
 void objectSetVisible(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e84, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1e86, 2); alu_add(gb, 0x1a);  // add $1a
   I(0x1e88, 1); L = A;  // ld l,a
@@ -818,6 +898,7 @@ void objectSetVisible(GB *gb) {
 
 // 00:1e8d
 void objectSetReservedBit1(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e8d, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1e8f, 1); L = A;  // ld l,a
   I(0x1e90, 1); H = D;  // ld h,d
@@ -827,12 +908,14 @@ void objectSetReservedBit1(GB *gb) {
 
 // 00:197d
 void getThisRoomFlags(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x197d, 4); A = mem_rd(gb, 0xcc30);  // ld a,($cc30)
   getARoomFlags(gb); return;  // fallthrough
 }
 
 // 00:1980
 void getARoomFlags(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x1980, BC);  // push bc
   I(0x1981, 1); B = A;  // ld b,a
   I(0x1982, 4); A = mem_rd(gb, 0xcc2d);  // ld a,($cc2d)
@@ -843,6 +926,7 @@ void getARoomFlags(GB *gb) {
 
 // 00:198a
 void getRoomFlags(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x198a, 3); SET_HL(0x09cc);  // ld hl,$09cc
   RST_PUSH(0x198d, 0x198e);  // rst $10 (addAToHl)
   I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
@@ -855,6 +939,7 @@ void getRoomFlags(GB *gb) {
 
 // 00:1992
 void checkIsLinkedGame(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1992, 4); A = mem_rd(gb, 0xcc01);  // ld a,($cc01)
   I(0x1995, 1); alu_or(gb, A);  // or a
   RET(0x1996); return;  // ret
@@ -862,6 +947,7 @@ void checkIsLinkedGame(GB *gb) {
 
 // 00:1e17
 void findByteAtHl(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_1e17:
   I(0x1e17, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x1e18, 1); alu_or(gb, A);  // or a
@@ -874,6 +960,7 @@ L_1e17:
 
 // 00:1e06
 void lookupKey(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_1e06:
   I(0x1e06, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x1e07, 1); alu_or(gb, A);  // or a
@@ -887,6 +974,7 @@ L_1e06:
 
 // 00:1e0f
 void findByteInGroupTable(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e0f, 1); E = A;  // ld e,a
   I(0x1e10, 4); A = mem_rd(gb, 0xcc2d);  // ld a,($cc2d)
   RST_PUSH(0x1e13, 0x1e14);  // rst $18 (addDoubleIndexToHl)
@@ -899,12 +987,14 @@ void findByteInGroupTable(GB *gb) {
 
 // 00:1e1f
 void lookupCollisionTable(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e1f, 1); E = A;  // ld e,a
   lookupCollisionTable_paramE(gb); return;  // fallthrough
 }
 
 // 00:1e20
 void lookupCollisionTable_paramE(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e20, 4); A = mem_rd(gb, 0xcc33);  // ld a,($cc33)
   RST_PUSH(0x1e23, 0x1e24);  // rst $18 (addDoubleIndexToHl)
   PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
@@ -916,12 +1006,14 @@ void lookupCollisionTable_paramE(GB *gb) {
 
 // 00:1e29
 void findByteInCollisionTable(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e29, 1); E = A;  // ld e,a
   findByteInCollisionTable_paramE(gb); return;  // fallthrough
 }
 
 // 00:1e2a
 void findByteInCollisionTable_paramE(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e2a, 4); A = mem_rd(gb, 0xcc33);  // ld a,($cc33)
   RST_PUSH(0x1e2d, 0x1e2e);  // rst $18 (addDoubleIndexToHl)
   PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
@@ -933,6 +1025,7 @@ void findByteInCollisionTable_paramE(GB *gb) {
 
 // 00:17d8
 void setStatusBarNeedsRefreshBit1(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x17d8, HL);  // push hl
   I(0x17d9, 3); SET_HL(0xcbe9);  // ld hl,$cbe9
   I(0x17dc, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1)));  // set 1,(hl)
@@ -942,6 +1035,7 @@ void setStatusBarNeedsRefreshBit1(GB *gb) {
 
 // 00:17bb
 void decNumActiveSeeds(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x17bb, 2); alu_and(gb, 0x07);  // and $07
   I(0x17bd, 3); SET_HL(0xc6b9);  // ld hl,$c6b9
   RST_PUSH(0x17c0, 0x17c1);  // rst $10 (addAToHl)
@@ -963,6 +1057,7 @@ L_17cb:
 
 // 00:17c3
 void decNumBombchus(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x17c3, 3); SET_HL(0xc6b3);  // ld hl,$c6b3
   I(0x17c6, 3); goto L_17cb;  // jr $17cb
 L_17cb:
@@ -980,6 +1075,7 @@ L_17cb:
 
 // 00:17c8
 void decNumBombs(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x17c8, 3); SET_HL(0xc6b0);  // ld hl,$c6b0
   I(0x17cb, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x17cc, 1); alu_or(gb, A);  // or a
@@ -995,6 +1091,7 @@ void decNumBombs(GB *gb) {
 
 // 00:209b
 void getShortPositionFromDE(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x209b, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x209c, 2); alu_and(gb, 0xf0);  // and $f0
   I(0x209e, 1); B = A;  // ld b,a
@@ -1009,12 +1106,14 @@ void getShortPositionFromDE(GB *gb) {
 
 // 00:20cb
 void convertShortToLongPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x20cb, 1); C = A;  // ld c,a
   convertShortToLongPosition_paramC(gb); return;  // fallthrough
 }
 
 // 00:20cc
 void convertShortToLongPosition_paramC(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x20cc, 1); A = C;  // ld a,c
   I(0x20cd, 2); alu_and(gb, 0xf0);  // and $f0
   I(0x20cf, 2); alu_or(gb, 0x08);  // or $08
@@ -1029,12 +1128,14 @@ void convertShortToLongPosition_paramC(GB *gb) {
 
 // 00:20b8
 void setShortPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x20b8, 1); C = A;  // ld c,a
   setShortPosition_paramC(gb); return;  // fallthrough
 }
 
 // 00:20b9
 void setShortPosition_paramC(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x20b9, BC);  // push bc
   CALL(0x20ba, convertShortToLongPosition_paramC, 0x20cc, 0x20bd);  // call $20cc
   I(0x20bd, 2); mem_wr(gb, HL, B);  // ld (hl),b
@@ -1047,6 +1148,7 @@ void setShortPosition_paramC(GB *gb) {
 
 // 00:20c3
 void objectSetShortPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x20c3, 1); H = D;  // ld h,d
   I(0x20c4, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x20c6, 2); alu_add(gb, 0x0b);  // add $0b
@@ -1056,6 +1158,7 @@ void objectSetShortPosition(GB *gb) {
 
 // 00:2096
 void objectGetShortPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2096, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x2098, 2); alu_add(gb, 0x0b);  // add $0b
   I(0x209a, 1); E = A;  // ld e,a
@@ -1064,6 +1167,7 @@ void objectGetShortPosition(GB *gb) {
 
 // 00:20a8
 void objectGetShortPosition_withYOffset(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_20a8;
 L_209c:
   I(0x209c, 2); alu_and(gb, 0xf0);  // and $f0
@@ -1087,6 +1191,7 @@ L_20a8:
 
 // 00:208a
 void objectGetPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x208a, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x208c, 2); alu_add(gb, 0x0b);  // add $0b
   I(0x208e, 1); E = A;  // ld e,a
@@ -1101,6 +1206,7 @@ void objectGetPosition(GB *gb) {
 
 // 00:20db
 void objectCenterOnTile(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x20db, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x20dd, 2); alu_add(gb, 0x0a);  // add $0a
   I(0x20df, 1); L = A;  // ld l,a
@@ -1110,6 +1216,7 @@ void objectCenterOnTile(GB *gb) {
 
 // 00:20e1
 void centerCoordinatesOnTile(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x20e1, 1); alu_xor(gb, A);  // xor a
   I(0x20e2, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x20e3, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -1127,6 +1234,7 @@ void centerCoordinatesOnTile(GB *gb) {
 
 // 00:2242
 void objectCopyPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2242, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x2244, 2); alu_add(gb, 0x0b);  // add $0b
   I(0x2246, 1); E = A;  // ld e,a
@@ -1135,6 +1243,7 @@ void objectCopyPosition(GB *gb) {
 
 // 00:2247
 void objectCopyPosition_rawAddress(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2247, 1); A = L;  // ld a,l
   I(0x2248, 2); alu_and(gb, 0xc0);  // and $c0
   I(0x224a, 2); alu_add(gb, 0x0b);  // add $0b
@@ -1156,6 +1265,7 @@ void objectCopyPosition_rawAddress(GB *gb) {
 
 // 00:225a
 void objectCopyPositionWithOffset(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x225a, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x225c, 2); alu_add(gb, 0x0b);  // add $0b
   I(0x225e, 1); E = A;  // ld e,a
@@ -1182,12 +1292,14 @@ void objectCopyPositionWithOffset(GB *gb) {
 
 // 00:2274
 void objectTakePosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2274, 3); SET_BC(0x0000);  // ld bc,$0000
   objectTakePositionWithOffset(gb); return;  // fallthrough
 }
 
 // 00:2277
 void objectTakePositionWithOffset(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2277, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x2279, 2); alu_add(gb, 0x0b);  // add $0b
   I(0x227b, 1); E = A;  // ld e,a
@@ -1214,10 +1326,11 @@ void objectTakePositionWithOffset(GB *gb) {
 
 // 00:20f2
 void checkBPartSlotsAvailable(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x20f2, 3); SET_HL(0xd0c0);  // ld hl,$d0c0
   I(0x20f5, 3); goto L_20fa;  // jr $20fa
 L_20fa:
-  CALL_ASM(0x20fa, 0x2104, 0x20fd); /* unported */  // call $2104
+  CALL(0x20fa, checkBEnemySlotsAvailable__checkSlotAvailable, 0x2104, 0x20fd);  // call $2104
   if ((F & FC)) { I(0x20fd, 3); goto L_20fa; } I(0x20fd, 2);  // jr c,$20fa
   if (!(F & FZ)) { RET_TAKEN(0x20ff); return; } I(0x20ff, 2);  // ret nz
   I(0x2100, 1); B = alu_dec8(gb, B);  // dec b
@@ -1227,9 +1340,10 @@ L_20fa:
 
 // 00:20f7
 void checkBEnemySlotsAvailable(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x20f7, 3); SET_HL(0xd080);  // ld hl,$d080
 L_20fa:
-  CALL_ASM(0x20fa, 0x2104, 0x20fd); /* unported */  // call $2104
+  CALL(0x20fa, checkBEnemySlotsAvailable__checkSlotAvailable, 0x2104, 0x20fd);  // call $2104
   if ((F & FC)) { I(0x20fd, 3); goto L_20fa; } I(0x20fd, 2);  // jr c,$20fa
   if (!(F & FZ)) { RET_TAKEN(0x20ff); return; } I(0x20ff, 2);  // ret nz
   I(0x2100, 1); B = alu_dec8(gb, B);  // dec b
@@ -1237,8 +1351,36 @@ L_20fa:
   RET(0x2103); return;  // ret
 }
 
+// 00:20fa
+void checkBEnemySlotsAvailable__nextSlot(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_20fa:
+  CALL(0x20fa, checkBEnemySlotsAvailable__checkSlotAvailable, 0x2104, 0x20fd);  // call $2104
+  if ((F & FC)) { I(0x20fd, 3); goto L_20fa; } I(0x20fd, 2);  // jr c,$20fa
+  if (!(F & FZ)) { RET_TAKEN(0x20ff); return; } I(0x20ff, 2);  // ret nz
+  I(0x2100, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x2101, 3); goto L_20fa; } I(0x2101, 2);  // jr nz,$20fa
+  RET(0x2103); return;  // ret
+}
+
+// 00:2104
+void checkBEnemySlotsAvailable__checkSlotAvailable(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_2104:
+  I(0x2104, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x2105, 1); H = alu_inc8(gb, H);  // inc h
+  I(0x2106, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { RET_TAKEN(0x2107); return; } I(0x2107, 2);  // ret z
+  I(0x2108, 1); A = H;  // ld a,h
+  I(0x2109, 2); alu_cp(gb, 0xe0);  // cp $e0
+  if ((F & FC)) { RET_TAKEN(0x210b); return; } I(0x210b, 2);  // ret c
+  I(0x210c, 1); alu_or(gb, H);  // or h
+  RET(0x210d); return;  // ret
+}
+
 // 00:2160
 void objectGetRelatedObject1Var(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2160, 2); L = 0x16;  // ld l,$16
   I(0x2162, 3); goto L_2166;  // jr $2166
 L_2166:
@@ -1257,6 +1399,7 @@ L_2166:
 
 // 00:2164
 void objectGetRelatedObject2Var(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2164, 2); L = 0x18;  // ld l,$18
   I(0x2166, 1); H = A;  // ld h,a
   I(0x2167, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
@@ -1273,6 +1416,7 @@ void objectGetRelatedObject2Var(GB *gb) {
 
 // 00:2172
 void objectGetZAboveScreen(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2172, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x2174, 2); alu_add(gb, 0x0b);  // add $0b
   I(0x2176, 1); E = A;  // ld e,a
@@ -1289,6 +1433,7 @@ void objectGetZAboveScreen(GB *gb) {
 
 // 00:2184
 void objectCheckWithinScreenBoundary(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2184, 3); A = mem_rd(gb, 0xffaa);  // ldh a,($ffaa)
   I(0x2186, 1); B = A;  // ld b,a
   I(0x2187, 3); A = mem_rd(gb, 0xffac);  // ldh a,($ffac)
@@ -1312,6 +1457,7 @@ void objectCheckWithinScreenBoundary(GB *gb) {
 
 // 00:219f
 void objectCheckWithinRoomBoundary(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x219f, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x21a1, 2); alu_add(gb, 0x0b);  // add $0b
   I(0x21a3, 1); E = A;  // ld e,a
@@ -1329,6 +1475,7 @@ void objectCheckWithinRoomBoundary(GB *gb) {
 
 // 00:1435
 void objectGetRelativeTile(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1435, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1437, 2); alu_or(gb, 0x0b);  // or $0b
   I(0x1439, 1); L = A;  // ld l,a
@@ -1345,12 +1492,14 @@ void objectGetRelativeTile(GB *gb) {
 
 // 00:1444
 void objectGetTileAtPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x1444, objectGetPosition, 0x208a, 0x1447);  // call $208a
   getTileAtPosition(gb); return;  // fallthrough
 }
 
 // 00:1447
 void getTileAtPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1447, 1); A = C;  // ld a,c
   I(0x1448, 2); alu_and(gb, 0xf0);  // and $f0
   I(0x144a, 2); A = alu_swap(gb, A);  // swap a
@@ -1366,38 +1515,52 @@ void getTileAtPosition(GB *gb) {
 
 // 00:1456
 void objectGetRelativePositionOfTile(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1456, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   CALL(0x1458, objectGetShortPosition, 0x2096, 0x145b);  // call $2096
   I(0x145b, 1); E = A;  // ld e,a
   I(0x145c, 2); H = 0xcf;  // ld h,$cf
   I(0x145e, 2); A = 0xf0;  // ld a,$f0
-  CALL_ASM(0x1460, 0x1481, 0x1463); /* unported */  // call $1481
+  CALL(0x1460, objectGetRelativePositionOfTile__checkTileAtOffset, 0x1481, 0x1463);  // call $1481
   I(0x1463, 2); A = 0x00;  // ld a,$00
   if ((F & FZ)) { RET_TAKEN(0x1465); return; } I(0x1465, 2);  // ret z
   I(0x1466, 2); A = 0x01;  // ld a,$01
-  CALL_ASM(0x1468, 0x1481, 0x146b); /* unported */  // call $1481
+  CALL(0x1468, objectGetRelativePositionOfTile__checkTileAtOffset, 0x1481, 0x146b);  // call $1481
   I(0x146b, 2); A = 0x01;  // ld a,$01
   if ((F & FZ)) { RET_TAKEN(0x146d); return; } I(0x146d, 2);  // ret z
   I(0x146e, 2); A = 0x10;  // ld a,$10
-  CALL_ASM(0x1470, 0x1481, 0x1473); /* unported */  // call $1481
+  CALL(0x1470, objectGetRelativePositionOfTile__checkTileAtOffset, 0x1481, 0x1473);  // call $1481
   I(0x1473, 2); A = 0x02;  // ld a,$02
   if ((F & FZ)) { RET_TAKEN(0x1475); return; } I(0x1475, 2);  // ret z
   I(0x1476, 2); A = 0xff;  // ld a,$ff
-  CALL_ASM(0x1478, 0x1481, 0x147b); /* unported */  // call $1481
+  CALL(0x1478, objectGetRelativePositionOfTile__checkTileAtOffset, 0x1481, 0x147b);  // call $1481
   I(0x147b, 2); A = 0x03;  // ld a,$03
   if ((F & FZ)) { RET_TAKEN(0x147d); return; } I(0x147d, 2);  // ret z
   I(0x147e, 2); A = 0xff;  // ld a,$ff
   RET(0x1480); return;  // ret
 }
 
+// 00:1481
+void objectGetRelativePositionOfTile__checkTileAtOffset(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1481:
+  I(0x1481, 1); alu_add(gb, E);  // add e
+  I(0x1482, 1); L = A;  // ld l,a
+  I(0x1483, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+  I(0x1485, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
+  RET(0x1486); return;  // ret
+}
+
 // 00:15d7
 void getTileIndexFromRoomLayoutBuffer(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x15d7, 1); C = A;  // ld c,a
   getTileIndexFromRoomLayoutBuffer_paramC(gb); return;  // fallthrough
 }
 
 // 00:15d8
 void getTileIndexFromRoomLayoutBuffer_paramC(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x15d8, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
   PUSH(0x15da, AF);  // push af
   I(0x15db, 2); A = 0x03;  // ld a,$03
@@ -1427,6 +1590,7 @@ L_15f9:
 
 // 00:1e94
 void objectGetAngleTowardEnemyTarget(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e94, 3); A = mem_rd(gb, 0xffb0);  // ldh a,($ffb0)
   I(0x1e96, 1); B = A;  // ld b,a
   I(0x1e97, 3); A = mem_rd(gb, 0xffb1);  // ldh a,($ffb1)
@@ -1436,6 +1600,7 @@ void objectGetAngleTowardEnemyTarget(GB *gb) {
 
 // 00:1e9c
 void objectGetAngleTowardLink(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1e9c, 4); A = mem_rd(gb, 0xd00b);  // ld a,($d00b)
   I(0x1e9f, 1); B = A;  // ld b,a
   I(0x1ea0, 4); A = mem_rd(gb, 0xd00d);  // ld a,($d00d)
@@ -1445,6 +1610,7 @@ void objectGetAngleTowardLink(GB *gb) {
 
 // 00:1ea4
 void objectGetRelativeAngle(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1ea4, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1ea6, 2); alu_or(gb, 0x0b);  // or $0b
   I(0x1ea8, 1); E = A;  // ld e,a
@@ -1453,17 +1619,28 @@ void objectGetRelativeAngle(GB *gb) {
 
 // 00:1ea9
 void getRelativeAngle(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1ea9, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x1eaa, 3); mem_wr(gb, 0xff8f, A);  // ldh ($ff8f),a
   I(0x1eac, 1); E = alu_inc8(gb, E);  // inc e
   I(0x1ead, 1); E = alu_inc8(gb, E);  // inc e
   I(0x1eae, 2); A = mem_rd(gb, DE);  // ld a,(de)
+L_1eaf:
+  I(0x1eaf, 3); mem_wr(gb, 0xff8e, A);  // ldh ($ff8e),a
+  objectGetRelativeAngleWithTempVars(gb); return;  // fallthrough
+}
+
+// 00:1eaf
+void getRelativeAngle__jump1eaf(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1eaf:
   I(0x1eaf, 3); mem_wr(gb, 0xff8e, A);  // ldh ($ff8e),a
   objectGetRelativeAngleWithTempVars(gb); return;  // fallthrough
 }
 
 // 00:1eb1
 void objectGetRelativeAngleWithTempVars(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1eb1, 2); E = 0x08;  // ld e,$08
   I(0x1eb3, 1); A = B;  // ld a,b
   I(0x1eb4, 1); alu_add(gb, E);  // add e
@@ -1535,6 +1712,7 @@ L_1ef7:
 
 // 00:1fd4
 void objectNudgeAngleTowards(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1fd4, 1); C = A;  // ld c,a
   I(0x1fd5, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1fd7, 2); alu_add(gb, 0x09);  // add $09
@@ -1559,6 +1737,7 @@ L_1fe9:
 
 // 00:1fee
 void objectCheckCenteredWithLink(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1fee, 1); C = B;  // ld c,b
   I(0x1fef, 2); C = alu_sla(gb, C);  // sla c
   I(0x1ff1, 1); C = alu_inc8(gb, C);  // inc c
@@ -1582,6 +1761,7 @@ void objectCheckCenteredWithLink(GB *gb) {
 
 // 00:1fa2
 void objectCheckLinkWithinDistance(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1fa2, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1fa4, 2); alu_add(gb, 0x0b);  // add $0b
   I(0x1fa6, 1); L = A;  // ld l,a
@@ -1624,14 +1804,29 @@ L_1fcf:
 
 // 00:2008
 void objectApplyComponentSpeed(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2008, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x200a, 2); alu_add(gb, 0x0a);  // add $0a
   I(0x200c, 1); L = A;  // ld l,a
   I(0x200d, 2); alu_add(gb, 0x06);  // add $06
   I(0x200f, 1); E = A;  // ld e,a
   I(0x2010, 1); H = D;  // ld h,d
-  CALL_ASM(0x2011, 0x2015, 0x2014); /* unported */  // call $2015
+  CALL(0x2011, objectApplyComponentSpeed__addSpeedComponent, 0x2015, 0x2014);  // call $2015
   I(0x2014, 1); E = alu_inc8(gb, E);  // inc e
+L_2015:
+  I(0x2015, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x2016, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x2017, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x2018, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x2019, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x201a, 2); alu_adc(gb, mem_rd(gb, HL));  // adc (hl)
+  I(0x201b, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  RET(0x201c); return;  // ret
+}
+
+// 00:2015
+void objectApplyComponentSpeed__addSpeedComponent(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_2015:
   I(0x2015, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x2016, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
@@ -1645,6 +1840,7 @@ L_2015:
 
 // 00:201d
 void objectApplySpeed(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x201d, 1); H = D;  // ld h,d
   I(0x201e, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x2020, 2); alu_add(gb, 0x09);  // add $09
@@ -1659,6 +1855,7 @@ void objectApplySpeed(GB *gb) {
 
 // 00:2029
 void objectApplyGivenSpeed(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x2029, getPositionOffsetForVelocity, 0x2041, 0x202c);  // call $2041
   if ((F & FZ)) { RET_TAKEN(0x202c); return; } I(0x202c, 2);  // ret z
   I(0x202d, 1); E = alu_inc8(gb, E);  // inc e
@@ -1685,6 +1882,7 @@ void objectApplyGivenSpeed(GB *gb) {
 
 // 00:2041
 void getPositionOffsetForVelocity(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2041, 2); alu_bit(gb, 7, C);  // bit 7,c
   if (!(F & FZ)) { I(0x2043, 3); goto L_2081; } I(0x2043, 2);  // jr nz,$2081
   I(0x2045, 2); B = alu_swap(gb, B);  // swap b
@@ -1738,14 +1936,29 @@ L_2081:
   RET(0x2089); return;  // ret
 }
 
+// 00:2081
+void getPositionOffsetForVelocity__invalid(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_2081:
+  I(0x2081, 3); SET_HL(0xcec3);  // ld hl,$cec3
+  I(0x2084, 1); alu_xor(gb, A);  // xor a
+  I(0x2085, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
+  I(0x2086, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
+  I(0x2087, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
+  I(0x2088, 2); mem_wr(gb, HL, A);  // ld (hl),a
+  RET(0x2089); return;  // ret
+}
+
 // 00:1f45
 void objectUpdateSpeedZ(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1f45, 1); C = A;  // ld c,a
   objectUpdateSpeedZ_paramC(gb); return;  // fallthrough
 }
 
 // 00:1f46
 void objectUpdateSpeedZ_paramC(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1f46, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1f48, 2); alu_add(gb, 0x0e);  // add $0e
   I(0x1f4a, 1); E = A;  // ld e,a
@@ -1773,14 +1986,28 @@ L_1f60:
   RET(0x1f65); return;  // ret
 }
 
+// 00:1f60
+void objectUpdateSpeedZ_paramC__belowGround(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1f60:
+  I(0x1f60, 1); alu_xor(gb, A);  // xor a
+  I(0x1f61, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x1f62, 1); E = alu_dec8(gb, E);  // dec e
+  I(0x1f63, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x1f64, 1); alu_xor(gb, A);  // xor a
+  RET(0x1f65); return;  // ret
+}
+
 // 00:1f66
 void objectUpdateSpeedZ_sidescroll(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1f66, 2); B = 0x06;  // ld b,$06
   objectUpdateSpeedZ_sidescroll_givenYOffset(gb); return;  // fallthrough
 }
 
 // 00:1f68
 void objectUpdateSpeedZ_sidescroll_givenYOffset(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1f68, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   I(0x1f6a, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1f6c, 2); alu_add(gb, 0x15);  // add $15
@@ -1823,8 +2050,31 @@ L_1f8b:
   RET(0x1fa1); return;  // ret
 }
 
+// 00:1f8b
+void objectUpdateSpeedZ_sidescroll_givenYOffset__notLanded(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1f8b:
+  I(0x1f8b, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
+  I(0x1f8d, 2); alu_add(gb, 0x0a);  // add $0a
+  I(0x1f8f, 1); E = A;  // ld e,a
+  I(0x1f90, 2); alu_add(gb, 0x0a);  // add $0a
+  I(0x1f92, 1); L = A;  // ld l,a
+  I(0x1f93, 1); H = D;  // ld h,d
+  CALL(0x1f94, add16BitRefs, 0x23a7, 0x1f97);  // call $23a7
+  I(0x1f97, 1); L = alu_dec8(gb, L);  // dec l
+  I(0x1f98, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+  I(0x1f9a, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x1f9b, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x1f9c, 2); A = 0x00;  // ld a,$00
+  I(0x1f9e, 2); alu_adc(gb, mem_rd(gb, HL));  // adc (hl)
+  I(0x1f9f, 2); mem_wr(gb, HL, A);  // ld (hl),a
+  I(0x1fa0, 1); alu_or(gb, D);  // or d
+  RET(0x1fa1); return;  // ret
+}
+
 // 00:239d
 void objectSetSpeedZ(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x239d, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x239f, 2); alu_add(gb, 0x14);  // add $14
   I(0x23a1, 1); L = A;  // ld l,a
@@ -1837,6 +2087,7 @@ void objectSetSpeedZ(GB *gb) {
 
 // 00:2374
 void objectNegateAndHalveSpeedZ(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2374, 1); H = D;  // ld h,d
   I(0x2375, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x2377, 2); alu_or(gb, 0x14);  // or $14
@@ -1872,6 +2123,7 @@ void objectNegateAndHalveSpeedZ(GB *gb) {
 
 // 00:2370
 void objectUpdateSpeedZAndBounce(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x2370, objectUpdateSpeedZ_paramC, 0x1f46, 0x2373);  // call $1f46
   if (!(F & FZ)) { RET_TAKEN(0x2373); return; } I(0x2373, 2);  // ret nz
   objectNegateAndHalveSpeedZ(gb); return;  // fallthrough
@@ -1879,6 +2131,7 @@ void objectUpdateSpeedZAndBounce(GB *gb) {
 
 // 00:1bdb
 void objectCheckContainsPoint(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1bdb, 1); H = D;  // ld h,d
   I(0x1bdc, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1bde, 1); L = A;  // ld l,a
@@ -1887,6 +2140,7 @@ void objectCheckContainsPoint(GB *gb) {
 
 // 00:1be1
 void interactionCheckContainsPoint(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1be1, 1); H = D;  // ld h,d
   I(0x1be2, 2); L = 0x40;  // ld l,$40
   objectHCheckContainsPoint(gb); return;  // fallthrough
@@ -1894,6 +2148,7 @@ void interactionCheckContainsPoint(GB *gb) {
 
 // 00:1be4
 void objectHCheckContainsPoint(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1be4, 1); A = L;  // ld a,l
   I(0x1be5, 2); alu_and(gb, 0xc0);  // and $c0
   I(0x1be7, 2); alu_add(gb, 0x0b);  // add $0b
@@ -1927,6 +2182,7 @@ L_1bf8:
 
 // 00:1c04
 void checkObjectsCollidedFromVariables(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1c04, 1); A = B;  // ld a,b
   I(0x1c05, 3); mem_wr(gb, 0xff8d, A);  // ldh ($ff8d),a
   I(0x1c07, 1); A = C;  // ld a,c
@@ -1959,6 +2215,7 @@ void checkObjectsCollidedFromVariables(GB *gb) {
 
 // 00:1c28
 void objectCheckCollidedWithLink_notDeadAndNotGrabbing(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1c28, 4); A = mem_rd(gb, 0xcc5a);  // ld a,($cc5a)
   I(0x1c2b, 2); alu_and(gb, 0xbe);  // and $be
   if (!(F & FZ)) { RET_TAKEN(0x1c2d); return; } I(0x1c2d, 2);  // ret nz
@@ -1967,6 +2224,7 @@ void objectCheckCollidedWithLink_notDeadAndNotGrabbing(GB *gb) {
 
 // 00:1c2e
 void objectCheckCollidedWithLink_notDead(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1c2e, 4); A = mem_rd(gb, 0xcdd5);  // ld a,($cdd5)
   I(0x1c31, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x1c32); return; } I(0x1c32, 2);  // ret nz
@@ -1975,6 +2233,7 @@ void objectCheckCollidedWithLink_notDead(GB *gb) {
 
 // 00:1c35
 void objectCheckCollidedWithLink_onGround(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1c35, 4); A = mem_rd(gb, 0xcc5c);  // ld a,($cc5c)
   I(0x1c38, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x1c39); return; } I(0x1c39, 2);  // ret nz
@@ -1986,6 +2245,7 @@ void objectCheckCollidedWithLink_onGround(GB *gb) {
 
 // 00:1c41
 void objectCheckCollidedWithLink(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1c41, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1c43, 2); alu_add(gb, 0x0f);  // add $0f
   I(0x1c45, 1); L = A;  // ld l,a
@@ -1995,6 +2255,7 @@ void objectCheckCollidedWithLink(GB *gb) {
 
 // 00:1c6f
 void objectCheckCollidedWithLink_ignoreZ(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_1c6f;
 L_1c56:
   I(0x1c56, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
@@ -2023,6 +2284,7 @@ L_1c6f:
 
 // 00:1c77
 void hObjectCheckCollidedWithLink(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x1c77, DE);  // push de
   I(0x1c78, 1); D = H;  // ld d,h
   I(0x1c79, 1); A = L;  // ld a,l
@@ -2036,6 +2298,7 @@ void hObjectCheckCollidedWithLink(GB *gb) {
 
 // 00:1c89
 void objectHCheckCollisionWithLink(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x1c89, DE);  // push de
   PUSH(0x1c8a, HL);  // push hl
   CALL(0x1c8b, _getLinkPositionPlusDirectionOffset, 0x1cd3, 0x1c8e);  // call $1cd3
@@ -2049,6 +2312,7 @@ void objectHCheckCollisionWithLink(GB *gb) {
 
 // 00:1d5a
 void checkObjectsCollided(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1d5a, 1); A = L;  // ld a,l
   I(0x1d5b, 2); alu_and(gb, 0xc0);  // and $c0
   I(0x1d5d, 1); L = A;  // ld l,a
@@ -2080,6 +2344,7 @@ void checkObjectsCollided(GB *gb) {
 
 // 00:1d18
 void checkLinkID0AndControlNormal(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1d18, 4); A = mem_rd(gb, 0xd001);  // ld a,($d001)
   I(0x1d1b, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x1d1c, 3); goto L_1d44; } I(0x1d1c, 2);  // jr z,$1d44
@@ -2104,6 +2369,7 @@ L_1d58:
 
 // 00:1d20
 void checkLinkVulnerableAndIDZero(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1d20, 4); A = mem_rd(gb, 0xd001);  // ld a,($d001)
   I(0x1d23, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x1d24, 3); checkLinkVulnerable(gb); return; } I(0x1d24, 2);  // jr z,$1d28
@@ -2113,6 +2379,7 @@ void checkLinkVulnerableAndIDZero(GB *gb) {
 
 // 00:1d28
 void checkLinkVulnerable(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1d28, 3); SET_HL(0xd02a);  // ld hl,$d02a
   I(0x1d2b, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x1d2c, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
@@ -2127,6 +2394,7 @@ L_1d58:
 
 // 00:1d32
 void checkLinkCollisionsEnabled(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1d32, 4); A = mem_rd(gb, 0xd024);  // ld a,($d024)
   I(0x1d35, 1); alu_rlca(gb);  // rlca
   if (!(F & FC)) { I(0x1d36, 3); goto L_1d58; } I(0x1d36, 2);  // jr nc,$1d58
@@ -2152,8 +2420,17 @@ L_1d58:
   RET(0x1d59); return;  // ret
 }
 
+// 00:1d58
+void checkLinkCollisionsEnabled__noCarry(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1d58:
+  I(0x1d58, 1); alu_xor(gb, A);  // xor a
+  RET(0x1d59); return;  // ret
+}
+
 // 00:1487
 void objectCheckSimpleCollision(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1487, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x1489, 2); alu_or(gb, 0x0b);  // or $0b
   I(0x148b, 1); L = A;  // ld l,a
@@ -2187,6 +2464,7 @@ L_14aa:
 
 // 00:14ad
 void objectGetTileCollisions(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x14ad, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x14af, 2); alu_or(gb, 0x0b);  // or $0b
   I(0x14b1, 1); L = A;  // ld l,a
@@ -2200,6 +2478,7 @@ void objectGetTileCollisions(GB *gb) {
 
 // 00:14b7
 void getTileCollisionsAtPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x14b7, 1); A = B;  // ld a,b
   I(0x14b8, 2); alu_and(gb, 0xf0);  // and $f0
   I(0x14ba, 1); L = A;  // ld l,a
@@ -2216,6 +2495,7 @@ void getTileCollisionsAtPosition(GB *gb) {
 
 // 00:14c7
 void objectCheckTileCollision_allowHoles(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x14c7, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x14c9, 2); alu_or(gb, 0x0b);  // or $0b
   I(0x14cb, 1); L = A;  // ld l,a
@@ -2229,6 +2509,7 @@ void objectCheckTileCollision_allowHoles(GB *gb) {
 
 // 00:14d1
 void checkTileCollisionAt_allowHoles(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x14d1, 1); A = B;  // ld a,b
   I(0x14d2, 2); alu_and(gb, 0xf0);  // and $f0
   I(0x14d4, 1); L = A;  // ld l,a
@@ -2242,6 +2523,7 @@ void checkTileCollisionAt_allowHoles(GB *gb) {
 
 // 00:14dc
 void checkTileCollision_allowHoles(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x14dc, 2); H = 0xce;  // ld h,$ce
   I(0x14de, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   checkGivenCollision_allowHoles(gb); return;  // fallthrough
@@ -2249,14 +2531,24 @@ void checkTileCollision_allowHoles(GB *gb) {
 
 // 00:14df
 void checkGivenCollision_allowHoles(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x14df, 2); alu_cp(gb, 0x10);  // cp $10
   if ((F & FC)) { I(0x14e1, 3); _simpleCollision(gb); return; } I(0x14e1, 2);  // jr c,$1545
   I(0x14e3, 3); SET_HL(0x14e8);  // ld hl,$14e8
   I(0x14e6, 3); _complexCollision(gb); return;  // jr $1552
 }
 
+// 00:14e8
+void checkGivenCollision_allowHoles__specialCollisions(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_14e8:
+  I(0x14e8, 1);  // nop
+  I(0x14e9, 4); HANDOFF(0xc003); /* unported */  // jp $c003
+}
+
 // 00:14f8
 void objectCheckTileCollision_disallowHoles(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x14f8, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x14fa, 2); alu_or(gb, 0x0b);  // or $0b
   I(0x14fc, 1); L = A;  // ld l,a
@@ -2270,6 +2562,7 @@ void objectCheckTileCollision_disallowHoles(GB *gb) {
 
 // 00:1502
 void checkTileCollisionAt_disallowHoles(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1502, 1); A = B;  // ld a,b
   I(0x1503, 2); alu_and(gb, 0xf0);  // and $f0
   I(0x1505, 1); L = A;  // ld l,a
@@ -2283,6 +2576,7 @@ void checkTileCollisionAt_disallowHoles(GB *gb) {
 
 // 00:150d
 void checkTileCollision_disallowHoles(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x150d, 2); H = 0xce;  // ld h,$ce
   I(0x150f, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   checkGivenCollision_disallowHoles(gb); return;  // fallthrough
@@ -2290,14 +2584,24 @@ void checkTileCollision_disallowHoles(GB *gb) {
 
 // 00:1510
 void checkGivenCollision_disallowHoles(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1510, 2); alu_cp(gb, 0x10);  // cp $10
   if ((F & FC)) { I(0x1512, 3); _simpleCollision(gb); return; } I(0x1512, 2);  // jr c,$1545
   I(0x1514, 3); SET_HL(0x1519);  // ld hl,$1519
   I(0x1517, 3); _complexCollision(gb); return;  // jr $1552
 }
 
+// 00:1519
+void checkGivenCollision_disallowHoles__specialCollisions(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1519:
+  CALL_ASM_RST(0x1519, 0x0038, 0x151a);  // rst $38
+  I(0x151a, 4); HANDOFF(0xc003); /* unported */  // jp $c003
+}
+
 // 00:1529
 void checkCollisionPosition_disallowSmallBridges(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1529, 2); H = 0xce;  // ld h,$ce
   I(0x152b, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x152c, 2); alu_cp(gb, 0x10);  // cp $10
@@ -2306,8 +2610,20 @@ void checkCollisionPosition_disallowSmallBridges(GB *gb) {
   I(0x1533, 3); _complexCollision(gb); return;  // jr $1552
 }
 
+// 00:1535
+void checkCollisionPosition_disallowSmallBridges__specialCollisions(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1535:
+  I(0x1535, 1);  // nop
+  CALL_ASM_RST(0x1536, 0x0038, 0x1537);  // rst $38
+  I(0x1537, 2); SET_BC(BC + 1);  // inc bc
+  if (!(F & FZ)) { RET_TAKEN(0x1538); return; } I(0x1538, 2);  // ret nz
+  I(0x1539, 4); HANDOFF(0xc3c3); /* unported */  // jp $c3c3
+}
+
 // 00:156e
 void retrieveTileCollisionValue(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x156e, 2); H = 0xdb;  // ld h,$db
   I(0x1570, 1); L = A;  // ld l,a
   I(0x1571, 2); A = 0x03;  // ld a,$03
@@ -2321,6 +2637,7 @@ void retrieveTileCollisionValue(GB *gb) {
 
 // 00:15cc
 void findTileInRoom(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x15cc, 2); H = 0xcf;  // ld h,$cf
   I(0x15ce, 2); L = 0xbf;  // ld l,$bf
   backwardsSearch(gb); return;  // fallthrough
@@ -2328,6 +2645,7 @@ void findTileInRoom(GB *gb) {
 
 // 00:15d0
 void backwardsSearch(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_15d0:
   I(0x15d0, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
   if ((F & FZ)) { RET_TAKEN(0x15d1); return; } I(0x15d1, 2);  // ret z
@@ -2339,6 +2657,7 @@ L_15d0:
 
 // 00:220d
 void objectCheckIsOnHazard(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x220d, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x220f, 2); alu_add(gb, 0x0f);  // add $0f
   I(0x2211, 1); E = A;  // ld e,a
@@ -2350,6 +2669,7 @@ void objectCheckIsOnHazard(GB *gb) {
 
 // 00:2216
 void objectCheckIsOverHazard(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2216, 3); SET_BC(0x0500);  // ld bc,$0500
   CALL(0x2219, objectGetRelativeTile, 0x1435, 0x221c);  // call $1435
   I(0x221c, 4); mem_wr(gb, 0xcd1f, A);  // ld ($cd1f),a
@@ -2359,6 +2679,7 @@ void objectCheckIsOverHazard(GB *gb) {
 
 // 00:21f6
 void checkLinkIsOverHazard(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x21f6, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
   I(0x21f9, 1); D = A;  // ld d,a
   I(0x21fa, 3); mem_wr(gb, 0xffaf, A);  // ldh ($ffaf),a
@@ -2378,6 +2699,7 @@ void checkLinkIsOverHazard(GB *gb) {
 
 // 00:22a9
 void objectCheckTileAtPositionIsWater(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x22a9, objectGetTileAtPosition, 0x1444, 0x22ac);  // call $1444
   I(0x22ac, 2); alu_sub(gb, 0xf9);  // sub $f9
   I(0x22ae, 2); alu_cp(gb, 0x05);  // cp $05
@@ -2386,6 +2708,7 @@ void objectCheckTileAtPositionIsWater(GB *gb) {
 
 // 00:22b1
 void checkTileAtPositionIsWater(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x22b1, getTileAtPosition, 0x1447, 0x22b4);  // call $1447
   I(0x22b4, 2); alu_sub(gb, 0xf9);  // sub $f9
   I(0x22b6, 2); alu_cp(gb, 0x05);  // cp $05
@@ -2394,6 +2717,7 @@ void checkTileAtPositionIsWater(GB *gb) {
 
 // 00:22b9
 void findItemWithID(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x22b9, 2); H = 0xd6;  // ld h,$d6
   I(0x22bb, 2); L = 0x01;  // ld l,$01
   I(0x22bd, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -2404,6 +2728,7 @@ void findItemWithID(GB *gb) {
 
 // 00:22c0
 void findItemWithID_startingAfterH(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_22c0;
 L_22bb:
   I(0x22bb, 2); L = 0x01;  // ld l,$01
@@ -2421,6 +2746,7 @@ L_22c0:
 
 // 00:22c8
 void objectFindSameTypeObjectWithID(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x22c8, 3); A = mem_rd(gb, 0xffaf);  // ldh a,($ffaf)
   I(0x22ca, 2); alu_and(gb, 0xf0);  // and $f0
   I(0x22cc, 1); H = A;  // ld h,a
@@ -2435,10 +2761,11 @@ void objectFindSameTypeObjectWithID(GB *gb) {
 
 // 00:22dc
 void objectSetPriorityRelativeToLink(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x22dc, 2); C = 0x80;  // ld c,$80
   I(0x22de, 3); goto L_22e2;  // jr $22e2
 L_22e2:
-  CALL_ASM(0x22e2, 0x22ee, 0x22e5); /* unported */  // call $22ee
+  CALL(0x22e2, objectSetPriorityRelativeToLink_withTerrainEffects__getPriority, 0x22ee, 0x22e5);  // call $22ee
   I(0x22e5, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x22e7, 2); alu_add(gb, 0x1a);  // add $1a
   I(0x22e9, 1); E = A;  // ld e,a
@@ -2450,6 +2777,7 @@ L_22e2:
 
 // 00:1765
 void cpRupeeValue(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1765, 3); SET_HL(0xc6ad);  // ld hl,$c6ad
   CALL(0x1768, getRupeeValue, 0x1781, 0x176b);  // call $1781
   I(0x176b, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
@@ -2467,6 +2795,7 @@ L_1776:
 
 // 00:1781
 void getRupeeValue(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x1781, HL);  // push hl
   I(0x1782, 2); alu_cp(gb, 0x14);  // cp $14
   if ((F & FC)) { I(0x1784, 3); goto L_1788; } I(0x1784, 2);  // jr c,$1788
@@ -2484,6 +2813,7 @@ L_1788:
 
 // 00:1859
 void retIfTextIsActive(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1859, 4); A = mem_rd(gb, 0xcba0);  // ld a,($cba0)
   I(0x185c, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { RET_TAKEN(0x185d); return; } I(0x185d, 2);  // ret z
@@ -2493,10 +2823,38 @@ void retIfTextIsActive(GB *gb) {
 
 // 00:212a
 void getScaledPositionOffsetForVelocity(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x212a, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   CALL(0x212c, getPositionOffsetForVelocity, 0x2041, 0x212f);  // call $2041
-  CALL_ASM(0x212f, 0x2133, 0x2132); /* unported */  // call $2133
+  CALL(0x212f, getScaledPositionOffsetForVelocity__scaleComponent, 0x2133, 0x2132);  // call $2133
   I(0x2132, 1); L = alu_inc8(gb, L);  // inc l
+L_2133:
+  PUSH(0x2133, HL);  // push hl
+  I(0x2134, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x2135, 1); C = A;  // ld c,a
+  I(0x2136, 2); B = mem_rd(gb, HL);  // ld b,(hl)
+  I(0x2137, 2); E = 0x08;  // ld e,$08
+  I(0x2139, 3); SET_HL(0x0000);  // ld hl,$0000
+  I(0x213c, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+L_213e:
+  I(0x213e, 2); alu_add_hl(gb, HL);  // add hl,hl
+  I(0x213f, 1); alu_rlca(gb);  // rlca
+  if (!(F & FC)) { I(0x2140, 3); goto L_2143; } I(0x2140, 2);  // jr nc,$2143
+  I(0x2142, 2); alu_add_hl(gb, BC);  // add hl,bc
+L_2143:
+  I(0x2143, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x2144, 3); goto L_213e; } I(0x2144, 2);  // jr nz,$213e
+  I(0x2146, 1); A = L;  // ld a,l
+  I(0x2147, 1); B = H;  // ld b,h
+  SET_HL(POP(0x2148));  // pop hl
+  I(0x2149, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x214a, 2); mem_wr(gb, HL, B);  // ld (hl),b
+  RET(0x214b); return;  // ret
+}
+
+// 00:2133
+void getScaledPositionOffsetForVelocity__scaleComponent(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_2133:
   PUSH(0x2133, HL);  // push hl
   I(0x2134, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
@@ -2523,6 +2881,7 @@ L_2143:
 
 // 00:214c
 void objectSetComponentSpeedByScaledVelocity(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x214c, getScaledPositionOffsetForVelocity, 0x212a, 0x214f);  // call $212a
   I(0x214f, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x2151, 2); alu_or(gb, 0x13);  // or $13
@@ -2543,6 +2902,7 @@ void objectSetComponentSpeedByScaledVelocity(GB *gb) {
 
 // 00:210e
 void objectSetPositionInCircleArc(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x210e, BC);  // push bc
   I(0x210f, 1); H = D;  // ld h,d
   I(0x2110, 1); L = E;  // ld l,e
@@ -2566,6 +2926,7 @@ void objectSetPositionInCircleArc(GB *gb) {
 
 // 00:1f05
 void pushDirectionData(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1f05, 3); goto L_1f20;  // jr $1f20
 L_1f20:
   I(0x1f20, 2); SET_BC(BC + 1);  // inc bc
@@ -2586,6 +2947,7 @@ L_1f3e:
 
 // 00:20b2
 void objectMakeTileSolid(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x20b2, objectGetTileCollisions, 0x14ad, 0x20b5);  // call $14ad
   I(0x20b5, 3); mem_wr(gb, HL, 0x0f);  // ld (hl),$0f
   RET(0x20b7); return;  // ret
@@ -2593,6 +2955,7 @@ void objectMakeTileSolid(GB *gb) {
 
 // 00:141c
 void setTileWithoutGfxReload(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x141c, 2); B = 0xcf;  // ld b,$cf
   I(0x141e, 2); mem_wr(gb, BC, A);  // ld (bc),a
   CALL(0x141f, retrieveTileCollisionValue, 0x156e, 0x1422);  // call $156e
@@ -2603,6 +2966,7 @@ void setTileWithoutGfxReload(GB *gb) {
 
 // 00:1426
 void setTileInRoomLayoutBuffer(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1426, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
   PUSH(0x1428, AF);  // push af
   I(0x1429, 2); A = 0x03;  // ld a,$03
@@ -2617,6 +2981,7 @@ void setTileInRoomLayoutBuffer(GB *gb) {
 
 // 00:13e9
 void extractColorComponents(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x13e9, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x13eb, AF);  // push af
   I(0x13ec, 2); A = 0x17;  // ld a,$17
@@ -2657,6 +3022,7 @@ L_13f5:
 
 // 00:0881
 void enableIntroInputs(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0881, 3); A = mem_rd(gb, 0xffb9);  // ldh a,($ffb9)
   I(0x0883, 2); alu_bit(gb, 7, A);  // bit 7,a
   if (!(F & FZ)) { RET_TAKEN(0x0885); return; } I(0x0885, 2);  // ret nz
@@ -2667,6 +3033,7 @@ void enableIntroInputs(GB *gb) {
 
 // 00:10cc
 void getChestData(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x10cc, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x10ce, AF);  // push af
   I(0x10cf, 2); A = 0x16;  // ld a,$16
@@ -2706,8 +3073,31 @@ L_10f9:
   RET(0x10ff); return;  // ret
 }
 
+// 00:10f6
+void getChestData__chestNotFound(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_10f6:
+  I(0x10f6, 3); SET_BC(0x2800);  // ld bc,$2800
+L_10f9:
+  SET_AF(POP(0x10f9));  // pop af
+  I(0x10fa, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x10fc, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  RET(0x10ff); return;  // ret
+}
+
+// 00:10f9
+void getChestData__end(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_10f9:
+  SET_AF(POP(0x10f9));  // pop af
+  I(0x10fa, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x10fc, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  RET(0x10ff); return;  // ret
+}
+
 // 00:1100
 void setDeathRespawnPoint(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1100, 3); SET_HL(0xc62b);  // ld hl,$c62b
   I(0x1103, 4); A = mem_rd(gb, 0xcc2d);  // ld a,($cc2d)
   I(0x1106, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
@@ -2739,6 +3129,7 @@ void setDeathRespawnPoint(GB *gb) {
 
 // 00:113a
 void updateLinkLocalRespawnPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x113a, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
   I(0x113d, 1); H = A;  // ld h,a
   I(0x113e, 2); L = 0x08;  // ld l,$08
@@ -2755,6 +3146,7 @@ void updateLinkLocalRespawnPosition(GB *gb) {
 
 // 00:1151
 void updateRoomFlagsForBrokenTile(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x1151, AF);  // push af
   I(0x1152, 3); SET_HL(0x11c1);  // ld hl,$11c1
   CALL(0x1155, lookupCollisionTable, 0x1e1f, 0x1158);  // call $1e1f
@@ -2787,6 +3179,7 @@ void updateRoomFlagsForBrokenTile(GB *gb) {
 
 // 00:11fc
 void setRoomFlagsForUnlockedKeyDoor(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x11fc, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x11fe, 3); SET_DE(0x122e);  // ld de,$122e
   CALL(0x1201, addAToDe, 0x0068, 0x1204);  // call $0068
@@ -2794,7 +3187,7 @@ void setRoomFlagsForUnlockedKeyDoor(GB *gb) {
   I(0x1207, 2); alu_cp(gb, 0xff);  // cp $ff
   if ((F & FZ)) { I(0x1209, 3); goto L_1227; } I(0x1209, 2);  // jr z,$1227
   CALL(0x120b, getActiveRoomFromDungeonMapPosition, 0x2e12, 0x120e);  // call $2e12
-  CALL_ASM(0x120e, 0x121c, 0x1211); /* unported */  // call $121c
+  CALL(0x120e, setRoomFlagsForUnlockedKeyDoor__setRoomFlag, 0x121c, 0x1211);  // call $121c
   I(0x1211, 2); SET_DE(DE + 1);  // inc de
   I(0x1212, 4); A = mem_rd(gb, 0xcc3a);  // ld a,($cc3a)
   I(0x1215, 1); L = A;  // ld l,a
@@ -2820,8 +3213,35 @@ L_1227:
   RET(0x122d); return;  // ret
 }
 
+// 00:121c
+void setRoomFlagsForUnlockedKeyDoor__setRoomFlag(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_121c:
+  I(0x121c, 1); C = A;  // ld c,a
+  I(0x121d, 4); A = mem_rd(gb, 0xcc3d);  // ld a,($cc3d)
+  I(0x1220, 1); B = A;  // ld b,a
+  I(0x1221, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x1222, 1); L = A;  // ld l,a
+  I(0x1223, 2); A = mem_rd(gb, BC);  // ld a,(bc)
+  I(0x1224, 1); alu_or(gb, L);  // or l
+  I(0x1225, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  RET(0x1226); return;  // ret
+}
+
+// 00:1227
+void setRoomFlagsForUnlockedKeyDoor__notInDungeon(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1227:
+  CALL(0x1227, getThisRoomFlags, 0x197d, 0x122a);  // call $197d
+  I(0x122a, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x122b, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
+  I(0x122c, 2); mem_wr(gb, HL, A);  // ld (hl),a
+  RET(0x122d); return;  // ret
+}
+
 // 00:123e
 void setRoomFlagsForUnlockedKeyDoor_overworldOnly(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x123e, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x1240, 3); SET_HL(0x122e);  // ld hl,$122e
   RST_PUSH(0x1243, 0x1244);  // rst $10 (addAToHl)
@@ -2845,6 +3265,7 @@ void setRoomFlagsForUnlockedKeyDoor_overworldOnly(GB *gb) {
 
 // 00:1255
 void checkAndUpdateLinkOnChest(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1255, 4); A = mem_rd(gb, 0xcc9f);  // ld a,($cc9f)
   I(0x1258, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x1259, 3); goto L_126d; } I(0x1259, 2);  // jr nz,$126d
@@ -2874,6 +3295,7 @@ L_126d:
 
 // 00:1280
 void interactWithTileBeforeLink_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1280, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x1282, AF);  // push af
   I(0x1283, 2); A = 0x06;  // ld a,$06
@@ -2890,6 +3312,7 @@ void interactWithTileBeforeLink_b00(GB *gb) {
 
 // 00:1298
 void showInfoTextForRoller(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1298, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x129a, AF);  // push af
   I(0x129b, 2); A = 0x06;  // ld a,$06
@@ -2905,6 +3328,7 @@ void showInfoTextForRoller(GB *gb) {
 
 // 00:12ae
 void updateCamera(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x12ae, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
   I(0x12b1, 2); alu_and(gb, 0x05);  // and $05
   if ((F & FZ)) { RET_TAKEN(0x12b3); return; } I(0x12b3, 2);  // ret z
@@ -2924,6 +3348,7 @@ void updateCamera(GB *gb) {
 
 // 00:12ce
 void resetCamera(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x12ce, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x12d0, AF);  // push af
   I(0x12d1, 2); A = 0x01;  // ld a,$01
@@ -2939,6 +3364,7 @@ void resetCamera(GB *gb) {
 
 // 00:12e5
 void setCameraFocusedObject(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x12e5, 3); A = mem_rd(gb, 0xffaf);  // ldh a,($ffaf)
   I(0x12e7, 4); mem_wr(gb, 0xcd17, A);  // ld ($cd17),a
   I(0x12ea, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
@@ -2948,6 +3374,7 @@ void setCameraFocusedObject(GB *gb) {
 
 // 00:12f0
 void setCameraFocusedObjectToLink(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x12f0, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
   I(0x12f3, 4); mem_wr(gb, 0xcd17, A);  // ld ($cd17),a
   I(0x12f6, 2); A = 0x00;  // ld a,$00
@@ -2957,6 +3384,7 @@ void setCameraFocusedObjectToLink(GB *gb) {
 
 // 00:12fc
 void reloadTileMap(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x12fc, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x12fe, AF);  // push af
   I(0x12ff, 1); alu_xor(gb, A);  // xor a
@@ -2977,6 +3405,7 @@ void reloadTileMap(GB *gb) {
 
 // 00:1384
 void initWaveScrollValues(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1384, 3); mem_wr(gb, 0xff93, A);  // ldh ($ff93),a
   I(0x1386, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
   I(0x1388, 1); C = A;  // ld c,a
@@ -3000,6 +3429,7 @@ void initWaveScrollValues(GB *gb) {
 
 // 00:13a5
 void loadBigBufferScrollValues(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x13a5, 3); mem_wr(gb, 0xff93, A);  // ldh ($ff93),a
   I(0x13a7, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
   I(0x13a9, 1); C = A;  // ld c,a
@@ -3023,6 +3453,7 @@ void loadBigBufferScrollValues(GB *gb) {
 
 // 00:157b
 void loadRoomCollisions(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x157b, 2); A = 0x03;  // ld a,$03
   I(0x157d, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
   I(0x157f, 2); D = 0xdb;  // ld d,$db
@@ -3037,14 +3468,83 @@ L_1586:
   I(0x158b, 1); H = alu_inc8(gb, H);  // inc h
   I(0x158c, 1); B = alu_dec8(gb, B);  // dec b
   if (!(F & FZ)) { I(0x158d, 3); goto L_1586; } I(0x158d, 2);  // jr nz,$1586
-  CALL_ASM(0x158f, 0x1596, 0x1592); /* unported */  // call $1596
+  CALL(0x158f, loadRoomCollisions__blankDataAroundCollisions, 0x1596, 0x1592);  // call $1596
   I(0x1592, 1); alu_xor(gb, A);  // xor a
   I(0x1593, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
   RET(0x1595); return;  // ret
 }
 
+// 00:1596
+void loadRoomCollisions__blankDataAroundCollisions(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1596:
+  I(0x1596, 3); SET_HL(0xcef0);  // ld hl,$cef0
+  CALL(0x1599, loadRoomCollisions__blankDataHorizontally, 0x15b6, 0x159c);  // call $15b6
+  I(0x159c, 3); SET_HL(0xce0f);  // ld hl,$ce0f
+  CALL(0x159f, loadRoomCollisions__blankDataVertically, 0x15bf, 0x15a2);  // call $15bf
+  I(0x15a2, 4); A = mem_rd(gb, 0xcc2d);  // ld a,($cc2d)
+  I(0x15a5, 2); alu_cp(gb, 0x04);  // cp $04
+  if ((F & FC)) { I(0x15a7, 3); goto L_15ad; } I(0x15a7, 2);  // jr c,$15ad
+  I(0x15a9, 2); L = 0xb0;  // ld l,$b0
+  I(0x15ab, 3); goto L_15b6;  // jr $15b6
+L_15ad:
+  I(0x15ad, 2); L = 0x80;  // ld l,$80
+  CALL(0x15af, loadRoomCollisions__blankDataHorizontally, 0x15b6, 0x15b2);  // call $15b6
+  I(0x15b2, 2); L = 0x0a;  // ld l,$0a
+  I(0x15b4, 3); goto L_15bf;  // jr $15bf
+L_15b6:
+  I(0x15b6, 2); A = 0xff;  // ld a,$ff
+  I(0x15b8, 2); B = 0x10;  // ld b,$10
+L_15ba:
+  I(0x15ba, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x15bb, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x15bc, 3); goto L_15ba; } I(0x15bc, 2);  // jr nz,$15ba
+  RET(0x15be); return;  // ret
+L_15bf:
+  I(0x15bf, 2); B = 0x0b;  // ld b,$0b
+  I(0x15c1, 2); C = 0xff;  // ld c,$ff
+L_15c3:
+  I(0x15c3, 2); mem_wr(gb, HL, C);  // ld (hl),c
+  I(0x15c4, 1); A = L;  // ld a,l
+  I(0x15c5, 2); alu_add(gb, 0x10);  // add $10
+  I(0x15c7, 1); L = A;  // ld l,a
+  I(0x15c8, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x15c9, 3); goto L_15c3; } I(0x15c9, 2);  // jr nz,$15c3
+  RET(0x15cb); return;  // ret
+}
+
+// 00:15b6
+void loadRoomCollisions__blankDataHorizontally(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_15b6:
+  I(0x15b6, 2); A = 0xff;  // ld a,$ff
+  I(0x15b8, 2); B = 0x10;  // ld b,$10
+L_15ba:
+  I(0x15ba, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x15bb, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x15bc, 3); goto L_15ba; } I(0x15bc, 2);  // jr nz,$15ba
+  RET(0x15be); return;  // ret
+}
+
+// 00:15bf
+void loadRoomCollisions__blankDataVertically(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_15bf:
+  I(0x15bf, 2); B = 0x0b;  // ld b,$0b
+  I(0x15c1, 2); C = 0xff;  // ld c,$ff
+L_15c3:
+  I(0x15c3, 2); mem_wr(gb, HL, C);  // ld (hl),c
+  I(0x15c4, 1); A = L;  // ld a,l
+  I(0x15c5, 2); alu_add(gb, 0x10);  // add $10
+  I(0x15c7, 1); L = A;  // ld l,a
+  I(0x15c8, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x15c9, 3); goto L_15c3; } I(0x15c9, 2);  // jr nz,$15c3
+  RET(0x15cb); return;  // ret
+}
+
 // 00:15fb
 void interactionInitGraphics(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x15fb, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x15fd, AF);  // push af
   I(0x15fe, 2); A = 0x3f;  // ld a,$3f
@@ -3061,6 +3561,7 @@ void interactionInitGraphics(GB *gb) {
 
 // 00:1613
 void refreshLoadedTreeGfx(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1613, 4); A = mem_rd(gb, 0xcc18);  // ld a,($cc18)
   I(0x1616, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { RET_TAKEN(0x1617); return; } I(0x1617, 2);  // ret z
@@ -3069,6 +3570,7 @@ void refreshLoadedTreeGfx(GB *gb) {
 
 // 00:1618
 void refreshObjectGfx(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1618, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x161a, AF);  // push af
   I(0x161b, 2); A = 0x3f;  // ld a,$3f
@@ -3085,6 +3587,7 @@ void refreshObjectGfx(GB *gb) {
 
 // 00:1630
 void reloadObjectGfx_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1630, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x1632, AF);  // push af
   I(0x1633, 2); A = 0x3f;  // ld a,$3f
@@ -3099,6 +3602,7 @@ void reloadObjectGfx_b00(GB *gb) {
 
 // 00:1644
 void loadObjectGfxHeaderToSlot4(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1644, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x1646, AF);  // push af
   I(0x1647, 2); A = 0x3f;  // ld a,$3f
@@ -3113,6 +3617,7 @@ void loadObjectGfxHeaderToSlot4(GB *gb) {
 
 // 00:1658
 void loadTreeGfx(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1658, 1); E = A;  // ld e,a
   I(0x1659, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x165b, AF);  // push af
@@ -3128,6 +3633,7 @@ void loadTreeGfx(GB *gb) {
 
 // 00:166d
 void loadWeaponGfx_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x166d, 1); E = A;  // ld e,a
   I(0x166e, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x1670, AF);  // push af
@@ -3143,6 +3649,7 @@ void loadWeaponGfx_b00(GB *gb) {
 
 // 00:1682
 void loadObjectGfx(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1682, 1); D = B;  // ld d,b
   I(0x1683, 2); E = 0x00;  // ld e,$00
   I(0x1685, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
@@ -3151,6 +3658,7 @@ void loadObjectGfx(GB *gb) {
 
 // 00:1686
 void loadObjectGfx2(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1686, 1); C = A;  // ld c,a
   I(0x1687, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x1688, 2); L = mem_rd(gb, HL);  // ld l,(hl)
@@ -3197,8 +3705,29 @@ L_16bd:
   RET(0x16d5); return;  // ret
 }
 
+// 00:16bd
+void loadObjectGfx2__label_00_192(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_16bd:
+  I(0x16bd, 1); A = D;  // ld a,d
+  I(0x16be, 2); alu_or(gb, 0xd0);  // or $d0
+  I(0x16c0, 1); D = A;  // ld d,a
+  I(0x16c1, 2); A = 0x05;  // ld a,$05
+  I(0x16c3, 1); alu_add(gb, E);  // add e
+  I(0x16c4, 1); E = A;  // ld e,a
+  I(0x16c5, 2); B = 0x1f;  // ld b,$1f
+  CALL(0x16c7, decompressGraphics, 0x0672, 0x16ca);  // call $0672
+  I(0x16ca, 2); A = 0x01;  // ld a,$01
+  I(0x16cc, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
+  I(0x16ce, 2); A = 0x3f;  // ld a,$3f
+  I(0x16d0, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x16d2, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  RET(0x16d5); return;  // ret
+}
+
 // 00:16d6
 void loadTreasureDisplayData_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x16d6, 1); L = A;  // ld l,a
   I(0x16d7, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x16d9, AF);  // push af
@@ -3214,6 +3743,7 @@ void loadTreasureDisplayData_b00(GB *gb) {
 
 // 00:16eb
 void decideItemDrop(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x16eb, 1); C = A;  // ld c,a
   I(0x16ec, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x16ee, AF);  // push af
@@ -3231,6 +3761,7 @@ void decideItemDrop(GB *gb) {
 
 // 00:1703
 void checkItemDropAvailable(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1703, 1); C = A;  // ld c,a
   I(0x1704, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x1706, AF);  // push af
@@ -3249,6 +3780,7 @@ void checkItemDropAvailable(GB *gb) {
 
 // 00:171c
 void giveTreasure(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x171c, 1); B = A;  // ld b,a
   I(0x171d, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x171f, AF);  // push af
@@ -3266,6 +3798,7 @@ void giveTreasure(GB *gb) {
 
 // 00:1733
 void loseTreasure(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1733, 1); B = A;  // ld b,a
   I(0x1734, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x1736, AF);  // push af
@@ -3281,6 +3814,7 @@ void loseTreasure(GB *gb) {
 
 // 00:1748
 void checkTreasureObtained(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x1748, HL);  // push hl
   I(0x1749, 1); L = A;  // ld l,a
   I(0x174a, 1); alu_or(gb, A);  // or a
@@ -3303,6 +3837,7 @@ L_1763:
 
 // 00:1778
 void removeRupeeValue(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1778, 3); SET_HL(0xc6ad);  // ld hl,$c6ad
   CALL(0x177b, getRupeeValue, 0x1781, 0x177e);  // call $1781
   I(0x177e, 4); subDecimalFromHlRef(gb); return;  // jp $018f
@@ -3310,6 +3845,7 @@ void removeRupeeValue(GB *gb) {
 
 // 00:17e0
 void getRandomRingOfGivenTier(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x17e0, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x17e2, AF);  // push af
   I(0x17e3, 2); A = 0x3f;  // ld a,$3f
@@ -3342,6 +3878,7 @@ L_17f3:
 
 // 00:180c
 void refillSeedSatchel(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x180c, 2); E = 0x20;  // ld e,$20
 L_180e:
   I(0x180e, 1); A = E;  // ld a,e
@@ -3360,6 +3897,7 @@ L_181a:
 
 // 00:1821
 void addToGashaMaturity(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x1821, HL);  // push hl
   I(0x1822, 3); SET_HL(0xc65f);  // ld hl,$c65f
   I(0x1825, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
@@ -3377,6 +3915,7 @@ L_1830:
 
 // 00:1832
 void makeActiveObjectFollowLink_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1832, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x1834, AF);  // push af
   I(0x1835, 2); A = 0x01;  // ld a,$01
@@ -3391,6 +3930,7 @@ void makeActiveObjectFollowLink_b00(GB *gb) {
 
 // 00:1846
 void clearFollowingLinkObject(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1846, 3); SET_HL(0xcce7);  // ld hl,$cce7
   I(0x1849, 1); alu_xor(gb, A);  // xor a
   I(0x184a, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
@@ -3400,6 +3940,7 @@ void clearFollowingLinkObject(GB *gb) {
 
 // 00:1997
 void setWarpDestVariables(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x1997, DE);  // push de
   I(0x1998, 3); SET_DE(0xcc47);  // ld de,$cc47
   I(0x199b, 2); B = 0x05;  // ld b,$05
@@ -3410,6 +3951,7 @@ void setWarpDestVariables(GB *gb) {
 
 // 00:19a2
 void setInstrumentsDisabledCounterAndScrollMode(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x19a2, 2); A = 0x08;  // ld a,$08
   I(0x19a4, 4); mem_wr(gb, 0xcc6b, A);  // ld ($cc6b),a
   I(0x19a7, 2); A = 0x01;  // ld a,$01
@@ -3419,6 +3961,7 @@ void setInstrumentsDisabledCounterAndScrollMode(GB *gb) {
 
 // 00:1a71
 void checkReloadStatusBarGraphics(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1a71, 3); SET_HL(0xcbe9);  // ld hl,$cbe9
   I(0x1a74, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x1a75, 1); alu_or(gb, A);  // or a
@@ -3434,6 +3977,7 @@ L_1a80:
 
 // 00:1a83
 void copy20BytesFromBank(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1a83, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x1a85, AF);  // push af
   I(0x1a86, 1); A = B;  // ld a,b
@@ -3449,6 +3993,7 @@ void copy20BytesFromBank(GB *gb) {
 
 // 00:1a98
 void loadCommonGraphics(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1a98, 2); H = 0x00;  // ld h,$00
   I(0x1a9a, 3); goto L_1aba;  // jr $1aba
 L_1aba:
@@ -3473,6 +4018,7 @@ L_1aba:
 
 // 00:1a9c
 void updateStatusBar(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1a9c, 2); H = 0x01;  // ld h,$01
   I(0x1a9e, 3); goto L_1aba;  // jr $1aba
 L_1aba:
@@ -3497,6 +4043,7 @@ L_1aba:
 
 // 00:1aa0
 void hideStatusBar(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1aa0, 2); H = 0x02;  // ld h,$02
   I(0x1aa2, 3); goto L_1aba;  // jr $1aba
 L_1aba:
@@ -3521,6 +4068,7 @@ L_1aba:
 
 // 00:1aa4
 void showStatusBar(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1aa4, 2); H = 0x03;  // ld h,$03
   I(0x1aa6, 3); goto L_1aba;  // jr $1aba
 L_1aba:
@@ -3545,6 +4093,7 @@ L_1aba:
 
 // 00:1aa8
 void saveGraphicsOnEnterMenu(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1aa8, 2); H = 0x04;  // ld h,$04
   I(0x1aaa, 3); goto L_1aba;  // jr $1aba
 L_1aba:
@@ -3569,6 +4118,7 @@ L_1aba:
 
 // 00:1aac
 void reloadGraphicsOnExitMenu(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1aac, 2); H = 0x05;  // ld h,$05
   I(0x1aae, 3); goto L_1aba;  // jr $1aba
 L_1aba:
@@ -3593,6 +4143,7 @@ L_1aba:
 
 // 00:1ab4
 void copyW2TilesetBgPalettesToW4PaletteData(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1ab4, 2); H = 0x07;  // ld h,$07
   I(0x1ab6, 3); goto L_1aba;  // jr $1aba
 L_1aba:
@@ -3617,6 +4168,7 @@ L_1aba:
 
 // 00:1ab8
 void copyW4PaletteDataToW2TilesetBgPalettes(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1ab8, 2); H = 0x08;  // ld h,$08
   I(0x1aba, 1); L = A;  // ld l,a
   I(0x1abb, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
@@ -3639,6 +4191,7 @@ void copyW4PaletteDataToW2TilesetBgPalettes(GB *gb) {
 
 // 00:1ad7
 void getRoomDungeonProperties(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1ad7, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x1ad9, AF);  // push af
   I(0x1ada, 2); A = 0x01;  // ld a,$01
@@ -3665,6 +4218,7 @@ void getRoomDungeonProperties(GB *gb) {
 
 // 00:1af7
 void copy8BytesFromRingMapToCec0(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1af7, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x1af9, AF);  // push af
   I(0x1afa, 2); A = 0x1c;  // ld a,$1c
@@ -3681,6 +4235,7 @@ void copy8BytesFromRingMapToCec0(GB *gb) {
 
 // 00:1b2c
 void objectAddToAButtonSensitiveObjectList(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1b2c, 1); alu_xor(gb, A);  // xor a
   I(0x1b2d, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x1b2e, 3); SET_HL(0xccb3);  // ld hl,$ccb3
@@ -3701,8 +4256,40 @@ L_1b3c:
   RET(0x1b40); return;  // ret
 }
 
+// 00:1b31
+void objectAddToAButtonSensitiveObjectList__next(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1b31:
+  I(0x1b31, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x1b32, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
+  if ((F & FZ)) { I(0x1b33, 3); goto L_1b3c; } I(0x1b33, 2);  // jr z,$1b3c
+  I(0x1b35, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x1b36, 1); A = L;  // ld a,l
+  I(0x1b37, 2); alu_cp(gb, 0xd3);  // cp $d3
+  if ((F & FC)) { I(0x1b39, 3); goto L_1b31; } I(0x1b39, 2);  // jr c,$1b31
+  RET(0x1b3b); return;  // ret
+L_1b3c:
+  I(0x1b3c, 1); A = E;  // ld a,e
+  I(0x1b3d, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
+  I(0x1b3e, 2); mem_wr(gb, HL, D);  // ld (hl),d
+  I(0x1b3f, 1); alu_scf(gb);  // scf
+  RET(0x1b40); return;  // ret
+}
+
+// 00:1b3c
+void objectAddToAButtonSensitiveObjectList__foundBlankEntry(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1b3c:
+  I(0x1b3c, 1); A = E;  // ld a,e
+  I(0x1b3d, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
+  I(0x1b3e, 2); mem_wr(gb, HL, D);  // ld (hl),d
+  I(0x1b3f, 1); alu_scf(gb);  // scf
+  RET(0x1b40); return;  // ret
+}
+
 // 00:1b41
 void objectRemoveFromAButtonSensitiveObjectList(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x1b41, DE);  // push de
   I(0x1b42, 1); A = E;  // ld a,e
   I(0x1b43, 2); alu_and(gb, 0xc0);  // and $c0
@@ -3727,8 +4314,32 @@ L_1b55:
   RET(0x1b5c); return;  // ret
 }
 
+// 00:1b55
+void objectRemoveFromAButtonSensitiveObjectList__next(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_1b55;
+L_1b49:
+  I(0x1b49, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x1b4a, 1); alu_cp(gb, D);  // cp d
+  if (!(F & FZ)) { I(0x1b4b, 3); goto L_1b55; } I(0x1b4b, 2);  // jr nz,$1b55
+  I(0x1b4d, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x1b4e, 2); alu_and(gb, 0xc0);  // and $c0
+  I(0x1b50, 1); alu_sub(gb, E);  // sub e
+  if (!(F & FZ)) { I(0x1b51, 3); goto L_1b55; } I(0x1b51, 2);  // jr nz,$1b55
+  I(0x1b53, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
+  I(0x1b54, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+L_1b55:
+  I(0x1b55, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x1b56, 1); A = L;  // ld a,l
+  I(0x1b57, 2); alu_cp(gb, 0xd3);  // cp $d3
+  if ((F & FC)) { I(0x1b59, 3); goto L_1b49; } I(0x1b59, 2);  // jr c,$1b49
+  SET_DE(POP(0x1b5b));  // pop de
+  RET(0x1b5c); return;  // ret
+}
+
 // 00:1b5d
 void linkInteractWithAButtonSensitiveObjects(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1b5d, 4); A = mem_rd(gb, 0xcc2a);  // ld a,($cc2a)
   I(0x1b60, 2); alu_and(gb, 0x01);  // and $01
   if ((F & FZ)) { RET_TAKEN(0x1b62); return; } I(0x1b62, 2);  // ret z
@@ -3810,8 +4421,92 @@ L_1bc1:
   RET(0x1bd2); return;  // ret
 }
 
+// 00:1ba7
+void linkInteractWithAButtonSensitiveObjects__foundObject(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1ba7:
+  I(0x1ba7, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
+  I(0x1ba9, 3); SET_HL(0xd02b);  // ld hl,$d02b
+  I(0x1bac, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x1bad, 1); alu_or(gb, A);  // or a
+  I(0x1bae, 2); A = 0xfc;  // ld a,$fc
+  if ((F & FZ)) { I(0x1bb0, 3); goto L_1bc0; } I(0x1bb0, 2);  // jr z,$1bc0
+  I(0x1bb2, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
+  if (!(F & FZ)) { I(0x1bb4, 3); goto L_1bbd; } I(0x1bb4, 2);  // jr nz,$1bbd
+  I(0x1bb6, 2); A = 0x04;  // ld a,$04
+  I(0x1bb8, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
+  if ((F & FC)) { I(0x1bb9, 3); goto L_1bc1; } I(0x1bb9, 2);  // jr c,$1bc1
+  I(0x1bbb, 3); goto L_1bc0;  // jr $1bc0
+L_1bbd:
+  I(0x1bbd, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
+  if (!(F & FC)) { I(0x1bbe, 3); goto L_1bc1; } I(0x1bbe, 2);  // jr nc,$1bc1
+L_1bc0:
+  I(0x1bc0, 2); mem_wr(gb, HL, A);  // ld (hl),a
+L_1bc1:
+  I(0x1bc1, 2); A = 0x08;  // ld a,$08
+  I(0x1bc3, 4); mem_wr(gb, 0xcc56, A);  // ld ($cc56),a
+  I(0x1bc6, 2); A = 0x80;  // ld a,$80
+  I(0x1bc8, 4); mem_wr(gb, 0xcc66, A);  // ld ($cc66),a
+  I(0x1bcb, 3); SET_HL(0xcc60);  // ld hl,$cc60
+  I(0x1bce, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
+  I(0x1bd0, 1); alu_scf(gb);  // scf
+  SET_DE(POP(0x1bd1));  // pop de
+  RET(0x1bd2); return;  // ret
+}
+
+// 00:1bbd
+void linkInteractWithAButtonSensitiveObjects__negativeValue(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1bbd:
+  I(0x1bbd, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
+  if (!(F & FC)) { I(0x1bbe, 3); goto L_1bc1; } I(0x1bbe, 2);  // jr nc,$1bc1
+  I(0x1bc0, 2); mem_wr(gb, HL, A);  // ld (hl),a
+L_1bc1:
+  I(0x1bc1, 2); A = 0x08;  // ld a,$08
+  I(0x1bc3, 4); mem_wr(gb, 0xcc56, A);  // ld ($cc56),a
+  I(0x1bc6, 2); A = 0x80;  // ld a,$80
+  I(0x1bc8, 4); mem_wr(gb, 0xcc66, A);  // ld ($cc66),a
+  I(0x1bcb, 3); SET_HL(0xcc60);  // ld hl,$cc60
+  I(0x1bce, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
+  I(0x1bd0, 1); alu_scf(gb);  // scf
+  SET_DE(POP(0x1bd1));  // pop de
+  RET(0x1bd2); return;  // ret
+}
+
+// 00:1bc1
+void linkInteractWithAButtonSensitiveObjects__doneWithInvincibility(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1bc1:
+  I(0x1bc1, 2); A = 0x08;  // ld a,$08
+  I(0x1bc3, 4); mem_wr(gb, 0xcc56, A);  // ld ($cc56),a
+  I(0x1bc6, 2); A = 0x80;  // ld a,$80
+  I(0x1bc8, 4); mem_wr(gb, 0xcc66, A);  // ld ($cc66),a
+  I(0x1bcb, 3); SET_HL(0xcc60);  // ld hl,$cc60
+  I(0x1bce, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
+  I(0x1bd0, 1); alu_scf(gb);  // scf
+  SET_DE(POP(0x1bd1));  // pop de
+  RET(0x1bd2); return;  // ret
+}
+
+// 00:1bd3
+void linkInteractWithAButtonSensitiveObjects__positionOffsets(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1bd3:
+  I(0x1bd3, 2); alu_or(gb, 0x00);  // or $00
+  I(0x1bd5, 1);  // nop
+  I(0x1bd6, 2); A = mem_rd(gb, BC);  // ld a,(bc)
+  I(0x1bd7, 2); A = mem_rd(gb, BC);  // ld a,(bc)
+  I(0x1bd8, 1);  // nop
+  I(0x1bd9, 1);  // nop
+  I(0x1bda, 2); alu_or(gb, 0x62);  // or $62
+  I(0x1bdc, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
+  I(0x1bde, 1); L = A;  // ld l,a
+  I(0x1bdf, 3); objectHCheckContainsPoint(gb); return;  // jr $1be4
+}
+
 // 00:1c97
 void checkGrabbableObjects(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1c97, 4); A = mem_rd(gb, 0xdc00);  // ld a,($dc00)
   I(0x1c9a, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x1c9b); return; } I(0x1c9b, 2);  // ret nz
@@ -3858,14 +4553,126 @@ L_1cbb:
   RET(0x1cd2); return;  // ret
 }
 
+// 00:1ca3
+void checkGrabbableObjects__objectLoop(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1ca3:
+  I(0x1ca3, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x1ca4, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
+  if ((F & FZ)) { I(0x1ca6, 3); goto L_1cb2; } I(0x1ca6, 2);  // jr z,$1cb2
+  PUSH(0x1ca8, HL);  // push hl
+  I(0x1ca9, 1); L = alu_dec8(gb, L);  // dec l
+  I(0x1caa, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x1cab, 2); H = mem_rd(gb, HL);  // ld h,(hl)
+  CALL(0x1cac, _checkCollisionWithHAndD, 0x1cf8, 0x1caf);  // call $1cf8
+  if ((F & FC)) { I(0x1caf, 3); goto L_1cbb; } I(0x1caf, 2);  // jr c,$1cbb
+  SET_HL(POP(0x1cb1));  // pop hl
+L_1cb2:
+  I(0x1cb2, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x1cb3, 1); A = L;  // ld a,l
+  I(0x1cb4, 2); alu_cp(gb, 0x84);  // cp $84
+  if ((F & FC)) { I(0x1cb6, 3); goto L_1ca3; } I(0x1cb6, 2);  // jr c,$1ca3
+  SET_DE(POP(0x1cb8));  // pop de
+  I(0x1cb9, 1); alu_xor(gb, A);  // xor a
+  RET(0x1cba); return;  // ret
+L_1cbb:
+  SET_AF(POP(0x1cbb));  // pop af
+  I(0x1cbc, 2); E = 0x19;  // ld e,$19
+  I(0x1cbe, 1); A = H;  // ld a,h
+  I(0x1cbf, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x1cc0, 1); E = alu_dec8(gb, E);  // dec e
+  I(0x1cc1, 1); A = L;  // ld a,l
+  I(0x1cc2, 2); alu_and(gb, 0xc0);  // and $c0
+  I(0x1cc4, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x1cc5, 1); L = A;  // ld l,a
+  I(0x1cc6, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1)));  // set 1,(hl)
+  I(0x1cc8, 2); alu_add(gb, 0x04);  // add $04
+  I(0x1cca, 1); L = A;  // ld l,a
+  I(0x1ccb, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
+  I(0x1ccd, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x1cce, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
+  SET_DE(POP(0x1cd0));  // pop de
+  I(0x1cd1, 1); alu_scf(gb);  // scf
+  RET(0x1cd2); return;  // ret
+}
+
+// 00:1cb2
+void checkGrabbableObjects__nextObject(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_1cb2;
+L_1ca3:
+  I(0x1ca3, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x1ca4, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
+  if ((F & FZ)) { I(0x1ca6, 3); goto L_1cb2; } I(0x1ca6, 2);  // jr z,$1cb2
+  PUSH(0x1ca8, HL);  // push hl
+  I(0x1ca9, 1); L = alu_dec8(gb, L);  // dec l
+  I(0x1caa, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x1cab, 2); H = mem_rd(gb, HL);  // ld h,(hl)
+  CALL(0x1cac, _checkCollisionWithHAndD, 0x1cf8, 0x1caf);  // call $1cf8
+  if ((F & FC)) { I(0x1caf, 3); goto L_1cbb; } I(0x1caf, 2);  // jr c,$1cbb
+  SET_HL(POP(0x1cb1));  // pop hl
+L_1cb2:
+  I(0x1cb2, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x1cb3, 1); A = L;  // ld a,l
+  I(0x1cb4, 2); alu_cp(gb, 0x84);  // cp $84
+  if ((F & FC)) { I(0x1cb6, 3); goto L_1ca3; } I(0x1cb6, 2);  // jr c,$1ca3
+  SET_DE(POP(0x1cb8));  // pop de
+  I(0x1cb9, 1); alu_xor(gb, A);  // xor a
+  RET(0x1cba); return;  // ret
+L_1cbb:
+  SET_AF(POP(0x1cbb));  // pop af
+  I(0x1cbc, 2); E = 0x19;  // ld e,$19
+  I(0x1cbe, 1); A = H;  // ld a,h
+  I(0x1cbf, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x1cc0, 1); E = alu_dec8(gb, E);  // dec e
+  I(0x1cc1, 1); A = L;  // ld a,l
+  I(0x1cc2, 2); alu_and(gb, 0xc0);  // and $c0
+  I(0x1cc4, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x1cc5, 1); L = A;  // ld l,a
+  I(0x1cc6, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1)));  // set 1,(hl)
+  I(0x1cc8, 2); alu_add(gb, 0x04);  // add $04
+  I(0x1cca, 1); L = A;  // ld l,a
+  I(0x1ccb, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
+  I(0x1ccd, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x1cce, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
+  SET_DE(POP(0x1cd0));  // pop de
+  I(0x1cd1, 1); alu_scf(gb);  // scf
+  RET(0x1cd2); return;  // ret
+}
+
+// 00:1cbb
+void checkGrabbableObjects__collision(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1cbb:
+  SET_AF(POP(0x1cbb));  // pop af
+  I(0x1cbc, 2); E = 0x19;  // ld e,$19
+  I(0x1cbe, 1); A = H;  // ld a,h
+  I(0x1cbf, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x1cc0, 1); E = alu_dec8(gb, E);  // dec e
+  I(0x1cc1, 1); A = L;  // ld a,l
+  I(0x1cc2, 2); alu_and(gb, 0xc0);  // and $c0
+  I(0x1cc4, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x1cc5, 1); L = A;  // ld l,a
+  I(0x1cc6, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1)));  // set 1,(hl)
+  I(0x1cc8, 2); alu_add(gb, 0x04);  // add $04
+  I(0x1cca, 1); L = A;  // ld l,a
+  I(0x1ccb, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
+  I(0x1ccd, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x1cce, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
+  SET_DE(POP(0x1cd0));  // pop de
+  I(0x1cd1, 1); alu_scf(gb);  // scf
+  RET(0x1cd2); return;  // ret
+}
+
 // 00:1d7f
 void preventObjectHFromPassingObjectD(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1d7f, 1); A = L;  // ld a,l
   I(0x1d80, 2); alu_and(gb, 0xc0);  // and $c0
   I(0x1d82, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   CALL(0x1d84, checkObjectsCollided, 0x1d5a, 0x1d87);  // call $1d5a
   if (!(F & FC)) { RET_TAKEN(0x1d87); return; } I(0x1d87, 2);  // ret nc
-  CALL_ASM(0x1d88, 0x1dab, 0x1d8b); /* unported */  // call $1dab
+  CALL(0x1d88, preventObjectHFromPassingObjectD__checkCollisionDirection, 0x1dab, 0x1d8b);  // call $1dab
   if (!(F & FC)) { I(0x1d8b, 3); goto L_1d94; } I(0x1d8b, 2);  // jr nc,$1d94
   I(0x1d8d, 2); B = 0x0b;  // ld b,$0b
   I(0x1d8f, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
@@ -3877,7 +4684,7 @@ L_1d94:
   I(0x1d98, 1); C = A;  // ld c,a
   I(0x1d99, 3); goto L_1d9b;  // jr $1d9b
 L_1d9b:
-  CALL_ASM(0x1d9b, 0x1dde, 0x1d9e); /* unported */  // call $1dde
+  CALL(0x1d9b, preventObjectHFromPassingObjectD__setBothObjectVariables, 0x1dde, 0x1d9e);  // call $1dde
   I(0x1d9e, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x1d9f, 2); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
   I(0x1da0, 1); A = C;  // ld a,c
@@ -3893,8 +4700,63 @@ L_1da5:
   RET(0x1daa); return;  // ret
 }
 
+// 00:1dab
+void preventObjectHFromPassingObjectD__checkCollisionDirection(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1dab:
+  I(0x1dab, 2); B = 0x0b;  // ld b,$0b
+  CALL(0x1dad, preventObjectHFromPassingObjectD__setBothObjectVariables, 0x1dde, 0x1db0);  // call $1dde
+  I(0x1db0, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x1db1, 2); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
+  if (!(F & FC)) { I(0x1db2, 3); goto L_1db6; } I(0x1db2, 2);  // jr nc,$1db6
+  I(0x1db4, 1); alu_cpl(gb);  // cpl
+  I(0x1db5, 1); A = alu_inc8(gb, A);  // inc a
+L_1db6:
+  I(0x1db6, 1); C = A;  // ld c,a
+  I(0x1db7, 2); B = 0x26;  // ld b,$26
+  CALL(0x1db9, preventObjectHFromPassingObjectD__setBothObjectVariables, 0x1dde, 0x1dbc);  // call $1dde
+  I(0x1dbc, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x1dbd, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x1dbe, 3); mem_wr(gb, 0xff8d, A);  // ldh ($ff8d),a
+  I(0x1dc0, 1); alu_sub(gb, C);  // sub c
+  I(0x1dc1, 3); mem_wr(gb, 0xff8f, A);  // ldh ($ff8f),a
+  I(0x1dc3, 2); B = 0x0d;  // ld b,$0d
+  CALL(0x1dc5, preventObjectHFromPassingObjectD__setBothObjectVariables, 0x1dde, 0x1dc8);  // call $1dde
+  I(0x1dc8, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x1dc9, 2); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
+  if (!(F & FC)) { I(0x1dca, 3); goto L_1dce; } I(0x1dca, 2);  // jr nc,$1dce
+  I(0x1dcc, 1); alu_cpl(gb);  // cpl
+  I(0x1dcd, 1); A = alu_inc8(gb, A);  // inc a
+L_1dce:
+  I(0x1dce, 1); C = A;  // ld c,a
+  I(0x1dcf, 2); B = 0x27;  // ld b,$27
+  CALL(0x1dd1, preventObjectHFromPassingObjectD__setBothObjectVariables, 0x1dde, 0x1dd4);  // call $1dde
+  I(0x1dd4, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x1dd5, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x1dd6, 3); mem_wr(gb, 0xff8c, A);  // ldh ($ff8c),a
+  I(0x1dd8, 1); alu_sub(gb, C);  // sub c
+  I(0x1dd9, 1); B = A;  // ld b,a
+  I(0x1dda, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
+  I(0x1ddc, 1); alu_cp(gb, B);  // cp b
+  RET(0x1ddd); return;  // ret
+}
+
+// 00:1dde
+void preventObjectHFromPassingObjectD__setBothObjectVariables(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1dde:
+  I(0x1dde, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
+  I(0x1de0, 1); alu_or(gb, B);  // or b
+  I(0x1de1, 1); E = A;  // ld e,a
+  I(0x1de2, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+  I(0x1de4, 1); alu_or(gb, B);  // or b
+  I(0x1de5, 1); L = A;  // ld l,a
+  RET(0x1de6); return;  // ret
+}
+
 // 00:1de7
 void checkEnemyAndPartCollisionsIfTextInactive(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x1de7, retIfTextIsActive, 0x1859, 0x1dea);  // call $1859
   I(0x1dea, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x1dec, AF);  // push af
@@ -3910,6 +4772,7 @@ void checkEnemyAndPartCollisionsIfTextInactive(GB *gb) {
 
 // 00:1dfe
 void findRoomSpecificData(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1dfe, 1); E = A;  // ld e,a
   I(0x1dff, 4); A = mem_rd(gb, 0xcc2d);  // ld a,($cc2d)
   RST_PUSH(0x1e02, 0x1e03);  // rst $18 (addDoubleIndexToHl)
@@ -3922,6 +4785,7 @@ void findRoomSpecificData(GB *gb) {
 
 // 00:21b0
 void objectReplaceWithID(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x21b0, 1); H = D;  // ld h,d
   PUSH(0x21b1, BC);  // push bc
   I(0x21b2, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
@@ -3966,6 +4830,7 @@ void objectReplaceWithID(GB *gb) {
 
 // 00:21e0
 void objectDelete_useActiveObjectType(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x21e0, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x21e2, 1); E = A;  // ld e,a
   objectDelete_de(gb); return;  // fallthrough
@@ -3973,6 +4838,7 @@ void objectDelete_useActiveObjectType(GB *gb) {
 
 // 00:21e3
 void objectDelete_de(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x21e3, 1); A = E;  // ld a,e
   I(0x21e4, 2); alu_and(gb, 0xc0);  // and $c0
   I(0x21e6, 1); E = A;  // ld e,a
@@ -3992,6 +4858,7 @@ L_21ec:
 
 // 00:2225
 void objectReplaceWithAnimationIfOnHazard(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x2225, objectCheckIsOnHazard, 0x220d, 0x2228);  // call $220d
   if (!(F & FC)) { RET_TAKEN(0x2228); return; } I(0x2228, 2);  // ret nc
   I(0x2229, 1); alu_rrca(gb);  // rrca
@@ -4010,6 +4877,7 @@ L_223d:
 
 // 00:2233
 void objectReplaceWithFallingDownHoleInteraction(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x2233, objectCreateFallingDownHoleInteraction, 0x24d1, 0x2236);  // call $24d1
   I(0x2236, 3); goto L_223d;  // jr $223d
 L_223d:
@@ -4020,6 +4888,7 @@ L_223d:
 
 // 00:2238
 void objectReplaceWithSplash(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2238, 2); B = 0x03;  // ld b,$03
 L_223a:
   CALL(0x223a, objectCreateInteractionWithSubid00, 0x24c3, 0x223d);  // call $24c3
@@ -4029,8 +4898,29 @@ L_223d:
   RET(0x2241); return;  // ret
 }
 
+// 00:223a
+void objectReplaceWithSplash__create(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_223a:
+  CALL(0x223a, objectCreateInteractionWithSubid00, 0x24c3, 0x223d);  // call $24c3
+L_223d:
+  CALL(0x223d, objectDelete_useActiveObjectType, 0x21e0, 0x2240);  // call $21e0
+  I(0x2240, 1); alu_scf(gb);  // scf
+  RET(0x2241); return;  // ret
+}
+
+// 00:223d
+void objectReplaceWithSplash__delete(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_223d:
+  CALL(0x223d, objectDelete_useActiveObjectType, 0x21e0, 0x2240);  // call $21e0
+  I(0x2240, 1); alu_scf(gb);  // scf
+  RET(0x2241); return;  // ret
+}
+
 // 00:2291
 void breakCrackedFloor(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x2291, BC);  // push bc
   CALL(0x2292, setTile, 0x3a9c, 0x2295);  // call $3a9c
   SET_BC(POP(0x2295));  // pop bc
@@ -4047,8 +4937,9 @@ void breakCrackedFloor(GB *gb) {
 
 // 00:22e0
 void objectSetPriorityRelativeToLink_withTerrainEffects(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x22e0, 2); C = 0xc0;  // ld c,$c0
-  CALL_ASM(0x22e2, 0x22ee, 0x22e5); /* unported */  // call $22ee
+  CALL(0x22e2, objectSetPriorityRelativeToLink_withTerrainEffects__getPriority, 0x22ee, 0x22e5);  // call $22ee
   I(0x22e5, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x22e7, 2); alu_add(gb, 0x1a);  // add $1a
   I(0x22e9, 1); E = A;  // ld e,a
@@ -4058,8 +4949,38 @@ void objectSetPriorityRelativeToLink_withTerrainEffects(GB *gb) {
   RET(0x22ed); return;  // ret
 }
 
+// 00:22ee
+void objectSetPriorityRelativeToLink_withTerrainEffects__getPriority(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_22ee:
+  I(0x22ee, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
+  I(0x22f0, 2); alu_add(gb, 0x0f);  // add $0f
+  I(0x22f2, 1); E = A;  // ld e,a
+  I(0x22f3, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x22f4, 1); A = alu_dec8(gb, A);  // dec a
+  I(0x22f5, 2); B = 0x03;  // ld b,$03
+  I(0x22f7, 2); alu_cp(gb, 0x10);  // cp $10
+  if ((F & FC)) { RET_TAKEN(0x22f9); return; } I(0x22f9, 2);  // ret c
+  I(0x22fa, 1); B = alu_dec8(gb, B);  // dec b
+  I(0x22fb, 1); A = E;  // ld a,e
+  I(0x22fc, 2); alu_add(gb, 0xfc);  // add $fc
+  I(0x22fe, 1); E = A;  // ld e,a
+  I(0x22ff, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x2300, 1); E = A;  // ld e,a
+  I(0x2301, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
+  I(0x2304, 1); H = A;  // ld h,a
+  I(0x2305, 2); L = 0x0b;  // ld l,$0b
+  I(0x2307, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x2308, 2); alu_add(gb, 0x0b);  // add $0b
+  I(0x230a, 1); alu_cp(gb, E);  // cp e
+  if (!(F & FC)) { RET_TAKEN(0x230b); return; } I(0x230b, 2);  // ret nc
+  I(0x230c, 1); B = alu_dec8(gb, B);  // dec b
+  RET(0x230d); return;  // ret
+}
+
 // 00:230e
 void objectPushLinkAwayOnCollision(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x230e, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
   I(0x2311, 1); H = A;  // ld h,a
   I(0x2312, 2); L = 0x00;  // ld l,$00
@@ -4073,6 +4994,7 @@ void objectPushLinkAwayOnCollision(GB *gb) {
 
 // 00:231e
 void updateLinkPositionGivenVelocity(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x231e, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x2320, AF);  // push af
   I(0x2321, 2); A = 0x05;  // ld a,$05
@@ -4093,6 +5015,7 @@ void updateLinkPositionGivenVelocity(GB *gb) {
 
 // 00:233b
 void objectMimicBgTile(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x233b, getTileMappingData, 0x3a72, 0x233e);  // call $3a72
   I(0x233e, 1); H = D;  // ld h,d
   I(0x233f, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
@@ -4129,6 +5052,7 @@ L_2361:
 
 // 00:2403
 void checkInteractionSubstate(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2403, 2); E = 0x45;  // ld e,$45
   I(0x2405, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x2406, 1); alu_or(gb, A);  // or a
@@ -4137,6 +5061,7 @@ void checkInteractionSubstate(GB *gb) {
 
 // 00:24a1
 void objectSetCollideRadius(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x24a1, BC);  // push bc
   I(0x24a2, 1); B = A;  // ld b,a
   I(0x24a3, 1); C = A;  // ld c,a
@@ -4147,6 +5072,7 @@ void objectSetCollideRadius(GB *gb) {
 
 // 00:24a9
 void objectSetCollideRadii(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x24a9, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x24ab, 2); alu_add(gb, 0x26);  // add $26
   I(0x24ad, 1); L = A;  // ld l,a
@@ -4159,6 +5085,7 @@ void objectSetCollideRadii(GB *gb) {
 
 // 00:24b3
 void decNumEnemies(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x24b3, 3); SET_HL(0xcdd1);  // ld hl,$cdd1
   I(0x24b6, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x24b7, 1); alu_or(gb, A);  // or a
@@ -4169,6 +5096,7 @@ void decNumEnemies(GB *gb) {
 
 // 00:24bb
 void setScreenShakeCounter(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x24bb, 3); SET_HL(0xcd18);  // ld hl,$cd18
   I(0x24be, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x24bf, 2); mem_wr(gb, HL, A);  // ld (hl),a
@@ -4177,18 +5105,21 @@ void setScreenShakeCounter(GB *gb) {
 
 // 00:24c1
 void objectCreatePuff(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x24c1, 2); B = 0x05;  // ld b,$05
   objectCreateInteractionWithSubid00(gb); return;  // fallthrough
 }
 
 // 00:24c3
 void objectCreateInteractionWithSubid00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x24c3, 2); C = 0x00;  // ld c,$00
   objectCreateInteraction(gb); return;  // fallthrough
 }
 
 // 00:24c5
 void objectCreateInteraction(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x24c5, getFreeInteractionSlot, 0x3aef, 0x24c8);  // call $3aef
   if (!(F & FZ)) { RET_TAKEN(0x24c8); return; } I(0x24c8, 2);  // ret nz
   I(0x24c9, 2); mem_wr(gb, HL, B);  // ld (hl),b
@@ -4201,6 +5132,7 @@ void objectCreateInteraction(GB *gb) {
 
 // 00:24d1
 void objectCreateFallingDownHoleInteraction(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x24d1, getFreeInteractionSlot, 0x3aef, 0x24d4);  // call $3aef
   if (!(F & FZ)) { RET_TAKEN(0x24d4); return; } I(0x24d4, 2);  // ret nz
   I(0x24d5, 3); mem_wr(gb, HL, 0x0f);  // ld (hl),$0f
@@ -4218,6 +5150,7 @@ void objectCreateFallingDownHoleInteraction(GB *gb) {
 
 // 00:24e6
 void objectFlickerVisibility(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x24e6, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x24e9, 1); alu_and(gb, B);  // and b
   if ((F & FZ)) { I(0x24ea, 4); objectSetInvisible(gb); return; } I(0x24ea, 3);  // jp z,$1e7b
@@ -4226,10 +5159,24 @@ void objectFlickerVisibility(GB *gb) {
 
 // 00:24f0
 void objectMarkSolidPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x24f0, objectGetShortPosition, 0x2096, 0x24f3);  // call $2096
   I(0x24f3, 1); B = A;  // ld b,a
   I(0x24f4, 2); A = 0x02;  // ld a,$02
   I(0x24f6, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
+L_24f8:
+  I(0x24f8, 1); A = B;  // ld a,b
+  I(0x24f9, 3); SET_HL(0xd980);  // ld hl,$d980
+  CALL(0x24fc, setFlag, 0x020e, 0x24ff);  // call $020e
+  I(0x24ff, 2); A = 0x00;  // ld a,$00
+  I(0x2501, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
+  RET(0x2503); return;  // ret
+}
+
+// 00:24f8
+void objectMarkSolidPosition__jump24f8(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_24f8:
   I(0x24f8, 1); A = B;  // ld a,b
   I(0x24f9, 3); SET_HL(0xd980);  // ld hl,$d980
   CALL(0x24fc, setFlag, 0x020e, 0x24ff);  // call $020e
@@ -4240,6 +5187,7 @@ void objectMarkSolidPosition(GB *gb) {
 
 // 00:2504
 void objectUnmarkSolidPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x2504, objectGetShortPosition, 0x2096, 0x2507);  // call $2096
   I(0x2507, 1); B = A;  // ld b,a
   I(0x2508, 2); A = 0x02;  // ld a,$02
@@ -4254,6 +5202,7 @@ void objectUnmarkSolidPosition(GB *gb) {
 
 // 00:253b
 void interactionSetHighTextIndex(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x253b, 2); E = 0x73;  // ld e,$73
   I(0x253d, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x253e, 2); E = 0x70;  // ld e,$70
@@ -4264,6 +5213,7 @@ void interactionSetHighTextIndex(GB *gb) {
 
 // 00:2544
 void interactionSetScript(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2544, 2); E = 0x58;  // ld e,$58
   I(0x2546, 1); A = L;  // ld a,l
   I(0x2547, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -4280,6 +5230,7 @@ void interactionSetScript(GB *gb) {
 
 // 00:2552
 void interactionRunScript(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2552, 4); A = mem_rd(gb, 0xcdd5);  // ld a,($cdd5)
   I(0x2555, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x2556); return; } I(0x2556, 2);  // ret nz
@@ -4323,6 +5274,7 @@ L_2583:
 
 // 00:2590
 void scriptCmd_asmCall(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   SET_HL(POP(0x2590));  // pop hl
   CALL(0x2591, _scriptFunc_setupAsmCall, 0x25bd, 0x2594);  // call $25bd
   I(0x2594, 3); goto L_259c;  // jr $259c
@@ -4345,6 +5297,7 @@ L_259c:
 
 // 00:2596
 void scriptCmd_asmCallWithParam(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   SET_HL(POP(0x2596));  // pop hl
   CALL(0x2597, _scriptFunc_setupAsmCall, 0x25bd, 0x259a);  // call $25bd
   I(0x259a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
@@ -4367,6 +5320,7 @@ void scriptCmd_asmCallWithParam(GB *gb) {
 
 // 00:25c5
 void scriptFunc_jump_scf(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x25c5, scriptFunc_jump, 0x25ca, 0x25c8);  // call $25ca
   I(0x25c8, 1); alu_scf(gb);  // scf
   RET(0x25c9); return;  // ret
@@ -4374,6 +5328,7 @@ void scriptFunc_jump_scf(GB *gb) {
 
 // 00:25ca
 void scriptFunc_jump(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x25ca, 1); A = H;  // ld a,h
   I(0x25cb, 2); alu_cp(gb, 0x80);  // cp $80
   if ((F & FC)) { I(0x25cd, 3); goto L_25e1; } I(0x25cd, 2);  // jr c,$25e1
@@ -4403,12 +5358,14 @@ L_25e1:
 
 // 00:25e9
 void scriptFunc_add3ToHl_scf(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x25e9, 1); alu_scf(gb);  // scf
   scriptFunc_add3ToHl(gb); return;  // fallthrough
 }
 
 // 00:25ea
 void scriptFunc_add3ToHl(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x25ea, 2); SET_HL(HL + 1);  // inc hl
   I(0x25eb, 2); SET_HL(HL + 1);  // inc hl
   I(0x25ec, 2); SET_HL(HL + 1);  // inc hl
@@ -4417,6 +5374,7 @@ void scriptFunc_add3ToHl(GB *gb) {
 
 // 00:25ee
 void scriptCmd_loadScript(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   SET_HL(POP(0x25ee));  // pop hl
   I(0x25ef, 2); SET_HL(HL + 1);  // inc hl
   I(0x25f0, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
@@ -4449,6 +5407,7 @@ void scriptCmd_loadScript(GB *gb) {
 
 // 00:261b
 void interactionAnimate(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x261b, 1); H = D;  // ld h,d
   I(0x261c, 2); L = 0x60;  // ld l,$60
   I(0x261e, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
@@ -4464,6 +5423,7 @@ void interactionAnimate(GB *gb) {
 
 // 00:262e
 void interactionSetAnimation(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x262e, 1); alu_add(gb, A);  // add a
   I(0x262f, 1); C = A;  // ld c,a
   I(0x2630, 2); B = 0x00;  // ld b,$00
@@ -4486,6 +5446,7 @@ void interactionSetAnimation(GB *gb) {
 
 // 00:2680
 void objectPreventLinkFromPassing(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2680, 4); A = mem_rd(gb, 0xcc8c);  // ld a,($cc8c)
   I(0x2683, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x2684); return; } I(0x2684, 2);  // ret nz
@@ -4511,8 +5472,17 @@ L_26a7:
   RET(0x26a8); return;  // ret
 }
 
+// 00:26a7
+void objectPreventLinkFromPassing__end(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_26a7:
+  SET_AF(POP(0x26a7));  // pop af
+  RET(0x26a8); return;  // ret
+}
+
 // 00:26a9
 void npcFaceLinkAndAnimate(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x26a9, 2); E = 0x6c;  // ld e,$6c
   I(0x26ab, 2); A = 0x01;  // ld a,$01
   I(0x26ad, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -4550,18 +5520,21 @@ L_26d7:
 
 // 00:26db
 void interactionAnimateAsNpc(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x26db, interactionAnimate, 0x261b, 0x26de);  // call $261b
   interactionPushLinkAwayAndUpdateDrawPriority(gb); return;  // fallthrough
 }
 
 // 00:26de
 void interactionPushLinkAwayAndUpdateDrawPriority(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x26de, objectPreventLinkFromPassing, 0x2680, 0x26e1);  // call $2680
   I(0x26e1, 4); objectSetPriorityRelativeToLink_withTerrainEffects(gb); return;  // jp $22e0
 }
 
 // 00:26e4
 void returnIfScrollMode01Unset(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x26e4, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
   I(0x26e7, 2); alu_and(gb, 0x01);  // and $01
   if (!(F & FZ)) { RET_TAKEN(0x26e9); return; } I(0x26e9, 2);  // ret nz
@@ -4571,6 +5544,7 @@ void returnIfScrollMode01Unset(GB *gb) {
 
 // 00:26ec
 void interactionDeleteAndRetIfEnabled02(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x26ec, 2); E = 0x40;  // ld e,$40
   I(0x26ee, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x26ef, 2); alu_and(gb, 0x03);  // and $03
@@ -4582,12 +5556,14 @@ void interactionDeleteAndRetIfEnabled02(GB *gb) {
 
 // 00:26f8
 void convertAngleDeToDirection(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x26f8, 2); A = mem_rd(gb, DE);  // ld a,(de)
   convertAngleToDirection(gb); return;  // fallthrough
 }
 
 // 00:26f9
 void convertAngleToDirection(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x26f9, 2); alu_add(gb, 0x04);  // add $04
   I(0x26fb, 1); alu_add(gb, A);  // add a
   I(0x26fc, 2); A = alu_swap(gb, A);  // swap a
@@ -4597,6 +5573,7 @@ void convertAngleToDirection(GB *gb) {
 
 // 00:2701
 void interactionSetAlwaysUpdateBit(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2701, 1); H = D;  // ld h,d
   I(0x2702, 2); L = 0x40;  // ld l,$40
   I(0x2704, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
@@ -4605,6 +5582,7 @@ void interactionSetAlwaysUpdateBit(GB *gb) {
 
 // 00:2707
 void objectCheckLinkPushingAgainstCenter(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2707, 4); A = mem_rd(gb, 0xd001);  // ld a,($d001)
   I(0x270a, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x270b); return; } I(0x270b, 2);  // ret nz
@@ -4620,6 +5598,7 @@ void objectCheckLinkPushingAgainstCenter(GB *gb) {
 
 // 00:271d
 void interactionCheckAdjacentTileIsSolid(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x271d, 2); E = 0x49;  // ld e,$49
   I(0x271f, 2); A = mem_rd(gb, DE);  // ld a,(de)
   CALL(0x2720, convertAngleDeToDirection, 0x26f8, 0x2723);  // call $26f8
@@ -4640,6 +5619,7 @@ L_272a:
 
 // 00:2725
 void interactionCheckAdjacentTileIsSolid_viaDirection(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2725, 2); E = 0x48;  // ld e,$48
   I(0x2727, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x2728, 2); A = alu_sra(gb, A);  // sra a
@@ -4658,6 +5638,7 @@ void interactionCheckAdjacentTileIsSolid_viaDirection(GB *gb) {
 
 // 00:273c
 void interactionDecCounter1IfTextNotActive(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x273c, 4); A = mem_rd(gb, 0xcba0);  // ld a,($cba0)
   I(0x273f, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x2740); return; } I(0x2740, 2);  // ret nz
@@ -4666,6 +5647,7 @@ void interactionDecCounter1IfTextNotActive(GB *gb) {
 
 // 00:2744
 void interactionDecCounter1IfPaletteNotFading(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2744, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x2747, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x2748); return; } I(0x2748, 2);  // ret nz
@@ -4674,24 +5656,28 @@ void interactionDecCounter1IfPaletteNotFading(GB *gb) {
 
 // 00:274c
 void interactionAnimate4Times(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x274c, interactionAnimate, 0x261b, 0x274f);  // call $261b
   interactionAnimate3Times(gb); return;  // fallthrough
 }
 
 // 00:274f
 void interactionAnimate3Times(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x274f, interactionAnimate, 0x261b, 0x2752);  // call $261b
   interactionAnimate2Times(gb); return;  // fallthrough
 }
 
 // 00:2752
 void interactionAnimate2Times(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x2752, interactionAnimate, 0x261b, 0x2755);  // call $261b
   I(0x2755, 4); interactionAnimate(gb); return;  // jp $261b
 }
 
 // 00:2758
 void interactionAnimateBasedOnSpeed(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x2758, interactionAnimate, 0x261b, 0x275b);  // call $261b
   I(0x275b, 2); E = 0x47;  // ld e,$47
   I(0x275d, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -4710,12 +5696,14 @@ void interactionAnimateBasedOnSpeed(GB *gb) {
 
 // 00:2773
 void interactionSetPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2773, 1); H = D;  // ld h,d
   interactionHSetPosition(gb); return;  // fallthrough
 }
 
 // 00:2774
 void interactionHSetPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2774, 2); L = 0x4b;  // ld l,$4b
   I(0x2776, 2); mem_wr(gb, HL, B);  // ld (hl),b
   I(0x2777, 2); L = 0x4d;  // ld l,$4d
@@ -4725,6 +5713,7 @@ void interactionHSetPosition(GB *gb) {
 
 // 00:277b
 void interactionUnsetAlwaysUpdateBit(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x277b, 1); H = D;  // ld h,d
   I(0x277c, 2); L = 0x40;  // ld l,$40
   I(0x277e, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
@@ -4733,6 +5722,7 @@ void interactionUnsetAlwaysUpdateBit(GB *gb) {
 
 // 00:2781
 void interactionLoadExtraGraphics(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2781, 2); E = 0x41;  // ld e,$41
   I(0x2783, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x2784, 4); mem_wr(gb, 0xcc1e, A);  // ld ($cc1e),a
@@ -4742,6 +5732,7 @@ void interactionLoadExtraGraphics(GB *gb) {
 
 // 00:278b
 void interactionFunc_278b(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x278b, 2); L = 0x58;  // ld l,$58
   I(0x278d, 2); mem_wr(gb, HL, C);  // ld (hl),c
   I(0x278e, 1); L = alu_inc8(gb, L);  // inc l
@@ -4751,6 +5742,7 @@ void interactionFunc_278b(GB *gb) {
 
 // 00:2791
 void interactionGetMiniScript(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2791, 1); H = D;  // ld h,d
   I(0x2792, 2); L = 0x58;  // ld l,$58
   I(0x2794, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
@@ -4761,6 +5753,7 @@ void interactionGetMiniScript(GB *gb) {
 
 // 00:2798
 void interactionSetMiniScript(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2798, 2); E = 0x58;  // ld e,$58
   I(0x279a, 1); A = L;  // ld a,l
   I(0x279b, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -4772,6 +5765,7 @@ void interactionSetMiniScript(GB *gb) {
 
 // 00:27a0
 void objectOscillateZ(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x27a0, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x27a2, AF);  // push af
   I(0x27a3, 2); A = 0x09;  // ld a,$09
@@ -4786,6 +5780,7 @@ void objectOscillateZ(GB *gb) {
 
 // 00:27b4
 void giveRingToLink(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x27b4, createRingTreasure, 0x27c2, 0x27b7);  // call $27c2
   if (!(F & FZ)) { RET_TAKEN(0x27b7); return; } I(0x27b7, 2);  // ret nz
   PUSH(0x27b8, DE);  // push de
@@ -4798,6 +5793,7 @@ void giveRingToLink(GB *gb) {
 
 // 00:27c2
 void createRingTreasure(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x27c2, getFreeInteractionSlot, 0x3aef, 0x27c5);  // call $3aef
   if (!(F & FZ)) { RET_TAKEN(0x27c5); return; } I(0x27c5, 2);  // ret nz
   I(0x27c6, 3); mem_wr(gb, HL, 0x60);  // ld (hl),$60
@@ -4814,6 +5810,7 @@ void createRingTreasure(GB *gb) {
 
 // 00:27d4
 void createTreasure(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x27d4, getFreeInteractionSlot, 0x3aef, 0x27d7);  // call $3aef
   if (!(F & FZ)) { RET_TAKEN(0x27d7); return; } I(0x27d7, 2);  // ret nz
   I(0x27d8, 3); mem_wr(gb, HL, 0x60);  // ld (hl),$60
@@ -4827,6 +5824,7 @@ void createTreasure(GB *gb) {
 
 // 00:27e0
 void objectCreateExclamationMark(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x27e0, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   I(0x27e2, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x27e4, AF);  // push af
@@ -4843,6 +5841,7 @@ void objectCreateExclamationMark(GB *gb) {
 
 // 00:27f8
 void objectCreateFloatingSnore(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x27f8, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   I(0x27fa, 2); A = 0x00;  // ld a,$00
   I(0x27fc, 3); goto L_2802;  // jr $2802
@@ -4862,6 +5861,7 @@ L_2802:
 
 // 00:27fe
 void objectCreateFloatingMusicNote(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x27fe, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   I(0x2800, 2); A = 0x01;  // ld a,$01
   I(0x2802, 3); mem_wr(gb, 0xff8d, A);  // ldh ($ff8d),a
@@ -4879,6 +5879,7 @@ void objectCreateFloatingMusicNote(GB *gb) {
 
 // 00:2818
 void enemyAnimate(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2818, 1); H = D;  // ld h,d
   I(0x2819, 2); L = 0xa0;  // ld l,$a0
   I(0x281b, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
@@ -4894,6 +5895,7 @@ void enemyAnimate(GB *gb) {
 
 // 00:282b
 void enemySetAnimation(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x282b, 1); alu_add(gb, A);  // add a
   I(0x282c, 1); C = A;  // ld c,a
   I(0x282d, 2); B = 0x00;  // ld b,$00
@@ -4916,10 +5918,11 @@ void enemySetAnimation(GB *gb) {
 
 // 00:287b
 void enemyDie_uncounted_withoutItemDrop(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x287b, 2); B = 0x80;  // ld b,$80
   I(0x287d, 3); goto L_2889;  // jr $2889
 L_2889:
-  CALL_ASM(0x2889, 0x28d3, 0x288c); /* unported */  // call $28d3
+  CALL(0x2889, enemyDie__enemyCreateDeathPuff, 0x28d3, 0x288c);  // call $28d3
   I(0x288c, 2); alu_bit(gb, 0, B);  // bit 0,b
   if (!(F & FZ)) { CALL(0x288e, markEnemyAsKilledInRoom_b00, 0x320d, 0x2891); } else I(0x288e, 3);  // call nz,$320d
   I(0x2891, 2); A = 0x00;  // ld a,$00
@@ -4960,10 +5963,11 @@ L_28c0:
 
 // 00:287f
 void enemyDie_withoutItemDrop(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x287f, 2); B = 0x81;  // ld b,$81
   I(0x2881, 3); goto L_2889;  // jr $2889
 L_2889:
-  CALL_ASM(0x2889, 0x28d3, 0x288c); /* unported */  // call $28d3
+  CALL(0x2889, enemyDie__enemyCreateDeathPuff, 0x28d3, 0x288c);  // call $28d3
   I(0x288c, 2); alu_bit(gb, 0, B);  // bit 0,b
   if (!(F & FZ)) { CALL(0x288e, markEnemyAsKilledInRoom_b00, 0x320d, 0x2891); } else I(0x288e, 3);  // call nz,$320d
   I(0x2891, 2); A = 0x00;  // ld a,$00
@@ -5004,10 +6008,11 @@ L_28c0:
 
 // 00:2883
 void enemyDie_uncounted(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2883, 2); B = 0x00;  // ld b,$00
   I(0x2885, 3); goto L_2889;  // jr $2889
 L_2889:
-  CALL_ASM(0x2889, 0x28d3, 0x288c); /* unported */  // call $28d3
+  CALL(0x2889, enemyDie__enemyCreateDeathPuff, 0x28d3, 0x288c);  // call $28d3
   I(0x288c, 2); alu_bit(gb, 0, B);  // bit 0,b
   if (!(F & FZ)) { CALL(0x288e, markEnemyAsKilledInRoom_b00, 0x320d, 0x2891); } else I(0x288e, 3);  // call nz,$320d
   I(0x2891, 2); A = 0x00;  // ld a,$00
@@ -5048,8 +6053,9 @@ L_28c0:
 
 // 00:2887
 void enemyDie(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2887, 2); B = 0x01;  // ld b,$01
-  CALL_ASM(0x2889, 0x28d3, 0x288c); /* unported */  // call $28d3
+  CALL(0x2889, enemyDie__enemyCreateDeathPuff, 0x28d3, 0x288c);  // call $28d3
   I(0x288c, 2); alu_bit(gb, 0, B);  // bit 0,b
   if (!(F & FZ)) { CALL(0x288e, markEnemyAsKilledInRoom_b00, 0x320d, 0x2891); } else I(0x288e, 3);  // call nz,$320d
   I(0x2891, 2); A = 0x00;  // ld a,$00
@@ -5088,8 +6094,40 @@ L_28c0:
   I(0x28d0, 4); enemyDelete(gb); return;  // jp $2e47
 }
 
+// 00:28d3
+void enemyDie__enemyCreateDeathPuff(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_28d3:
+  I(0x28d3, 2); E = 0xbf;  // ld e,$bf
+  I(0x28d5, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x28d6, 1); alu_rlca(gb);  // rlca
+  if ((F & FC)) { I(0x28d7, 4); decNumEnemies(gb); return; } I(0x28d7, 3);  // jp c,$24b3
+  CALL(0x28da, getFreePartSlot, 0x3e8e, 0x28dd);  // call $3e8e
+  if (!(F & FZ)) { RET_TAKEN(0x28dd); return; } I(0x28dd, 2);  // ret nz
+  I(0x28de, 2); E = 0x80;  // ld e,$80
+  I(0x28e0, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x28e1, 2); alu_and(gb, 0x03);  // and $03
+  I(0x28e3, 1); L = alu_dec8(gb, L);  // dec l
+  I(0x28e4, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x28e5, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
+  I(0x28e7, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x28e8, 2); E = 0x81;  // ld e,$81
+  I(0x28ea, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x28eb, 2); mem_wr(gb, HL, A);  // ld (hl),a
+  I(0x28ec, 2); L = 0xed;  // ld l,$ed
+  I(0x28ee, 2); E = 0xad;  // ld e,$ad
+  I(0x28f0, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x28f1, 2); mem_wr(gb, HL, A);  // ld (hl),a
+  CALL(0x28f2, objectCopyPosition, 0x2242, 0x28f5);  // call $2242
+  I(0x28f5, 2); L = 0xc7;  // ld l,$c7
+  I(0x28f7, 2); mem_wr(gb, HL, B);  // ld (hl),b
+  I(0x28f8, 2); A = 0x73;  // ld a,$73
+  I(0x28fa, 4); playSound_b00(gb); return;  // jp $0c98
+}
+
 // 00:28fd
 void enemyStandardUpdate(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x28fd, 1); H = D;  // ld h,d
   I(0x28fe, 2); L = 0x84;  // ld l,$84
   I(0x2900, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -5116,7 +6154,7 @@ L_291b:
 L_291e:
   I(0x291e, 3); SET_HL(0x4368);  // ld hl,$4368
   I(0x2921, 2); E = 0x3f;  // ld e,$3f
-  CALL_ASM(0x2923, 0x008a, 0x2926); /* interBankCall */  // call $008a
+  CALL(0x2923, interBankCall, 0x008a, 0x2926);  // call $008a
   CALL(0x2926, getRandomNumber_noPreserveVars, 0x0453, 0x2929);  // call $0453
   I(0x2929, 2); E = 0xbd;  // ld e,$bd
   I(0x292b, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -5177,8 +6215,133 @@ L_2975:
   RET(0x2977); return;  // ret
 }
 
+// 00:291b
+void enemyStandardUpdate__ret00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_291b:
+  I(0x291b, 2); C = 0x00;  // ld c,$00
+  RET(0x291d); return;  // ret
+}
+
+// 00:291e
+void enemyStandardUpdate__uninitialized(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_291e;
+L_291b:
+  I(0x291b, 2); C = 0x00;  // ld c,$00
+  RET(0x291d); return;  // ret
+L_291e:
+  I(0x291e, 3); SET_HL(0x4368);  // ld hl,$4368
+  I(0x2921, 2); E = 0x3f;  // ld e,$3f
+  CALL(0x2923, interBankCall, 0x008a, 0x2926);  // call $008a
+  CALL(0x2926, getRandomNumber_noPreserveVars, 0x0453, 0x2929);  // call $0453
+  I(0x2929, 2); E = 0xbd;  // ld e,$bd
+  I(0x292b, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x292c, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x292d, 2); A = 0x01;  // ld a,$01
+  I(0x292f, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x2930, 3); goto L_291b;  // jr $291b
+}
+
+// 00:2932
+void enemyStandardUpdate__ret04(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_2932:
+  I(0x2932, 2); C = 0x04;  // ld c,$04
+  RET(0x2934); return;  // ret
+}
+
+// 00:2935
+void enemyStandardUpdate__knockback(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_2935:
+  I(0x2935, 1); L = E;  // ld l,e
+  I(0x2936, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
+  I(0x2937, 2); C = 0x05;  // ld c,$05
+  RET(0x2939); return;  // ret
+}
+
+// 00:293a
+void enemyStandardUpdate__healthZero(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_293a;
+L_291b:
+  I(0x291b, 2); C = 0x00;  // ld c,$00
+  RET(0x291d); return;  // ret
+L_293a:
+  I(0x293a, 2); L = 0xbf;  // ld l,$bf
+  I(0x293c, 3); alu_bit(gb, 1, mem_rd(gb, HL));  // bit 1,(hl)
+  if (!(F & FZ)) { I(0x293e, 3); goto L_291b; } I(0x293e, 2);  // jr nz,$291b
+  I(0x2940, 2); C = 0x03;  // ld c,$03
+  RET(0x2942); return;  // ret
+}
+
+// 00:2943
+void enemyStandardUpdate__stunned(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_2943:
+  I(0x2943, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
+  I(0x2946, 1); alu_rrca(gb);  // rrca
+  if (!(F & FC)) { I(0x2947, 3); goto L_2959; } I(0x2947, 2);  // jr nc,$2959
+  I(0x2949, 1); L = E;  // ld l,e
+  I(0x294a, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
+  I(0x294b, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x294c, 2); alu_cp(gb, 0x1e);  // cp $1e
+  if (!(F & FC)) { I(0x294e, 3); goto L_2959; } I(0x294e, 2);  // jr nc,$2959
+  I(0x2950, 1); alu_rrca(gb);  // rrca
+  if (!(F & FC)) { I(0x2951, 3); goto L_2959; } I(0x2951, 2);  // jr nc,$2959
+  I(0x2953, 2); L = 0x8d;  // ld l,$8d
+  I(0x2955, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x2956, 2); alu_xor(gb, 0x01);  // xor $01
+  I(0x2958, 2); mem_wr(gb, HL, A);  // ld (hl),a
+L_2959:
+  I(0x2959, 2); L = 0x84;  // ld l,$84
+  I(0x295b, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x295c, 2); alu_cp(gb, 0x08);  // cp $08
+  if ((F & FC)) { I(0x295e, 3); goto L_2970; } I(0x295e, 2);  // jr c,$2970
+  I(0x2960, 2); L = 0x8f;  // ld l,$8f
+  I(0x2962, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x2963, 1); A = alu_dec8(gb, A);  // dec a
+  I(0x2964, 2); alu_cp(gb, 0x08);  // cp $08
+  if ((F & FC)) { I(0x2966, 3); goto L_2970; } I(0x2966, 2);  // jr c,$2970
+  I(0x2968, 2); C = 0x20;  // ld c,$20
+  CALL(0x296a, objectUpdateSpeedZAndBounce, 0x2370, 0x296d);  // call $2370
+  if (!(F & FC)) { I(0x296d, 3); goto L_2975; } I(0x296d, 2);  // jr nc,$2975
+  I(0x296f, 1); H = D;  // ld h,d
+L_2970:
+  I(0x2970, 2); L = 0x94;  // ld l,$94
+  I(0x2972, 1); alu_xor(gb, A);  // xor a
+  I(0x2973, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x2974, 2); mem_wr(gb, HL, A);  // ld (hl),a
+L_2975:
+  I(0x2975, 2); C = 0x02;  // ld c,$02
+  RET(0x2977); return;  // ret
+}
+
+// 00:2970
+void enemyStandardUpdate__reachedGround(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_2970:
+  I(0x2970, 2); L = 0x94;  // ld l,$94
+  I(0x2972, 1); alu_xor(gb, A);  // xor a
+  I(0x2973, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x2974, 2); mem_wr(gb, HL, A);  // ld (hl),a
+L_2975:
+  I(0x2975, 2); C = 0x02;  // ld c,$02
+  RET(0x2977); return;  // ret
+}
+
+// 00:2975
+void enemyStandardUpdate__ret02(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_2975:
+  I(0x2975, 2); C = 0x02;  // ld c,$02
+  RET(0x2977); return;  // ret
+}
+
 // 00:2978
 void partAnimate(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2978, 1); H = D;  // ld h,d
   I(0x2979, 2); L = 0xe0;  // ld l,$e0
   I(0x297b, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
@@ -5192,6 +6355,7 @@ void partAnimate(GB *gb) {
 
 // 00:2988
 void partSetAnimation(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2988, 1); alu_add(gb, A);  // add a
   I(0x2989, 1); C = A;  // ld c,a
   I(0x298a, 2); B = 0x00;  // ld b,$00
@@ -5212,6 +6376,7 @@ void partSetAnimation(GB *gb) {
 
 // 00:29d8
 void createEnergySwirlGoingIn(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x29d8, 1); L = A;  // ld l,a
   I(0x29d9, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x29db, AF);  // push af
@@ -5227,6 +6392,7 @@ void createEnergySwirlGoingIn(GB *gb) {
 
 // 00:29ed
 void createEnergySwirlGoingOut(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x29ed, 1); L = A;  // ld l,a
   I(0x29ee, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x29f0, AF);  // push af
@@ -5242,6 +6408,7 @@ void createEnergySwirlGoingOut(GB *gb) {
 
 // 00:2a02
 void convertLinkAngleToDirectionButtons(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2a02, 4); A = mem_rd(gb, 0xcc2b);  // ld a,($cc2b)
   I(0x2a05, 1); alu_add(gb, A);  // add a
   if ((F & FC)) { I(0x2a06, 3); goto L_2a13; } I(0x2a06, 2);  // jr c,$2a13
@@ -5262,6 +6429,7 @@ L_2a13:
 
 // 00:2a1d
 void setSimulatedInputAddress(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2a1d, 3); SET_DE(0xcbc6);  // ld de,$cbc6
   I(0x2a20, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x2a21, 1); E = alu_inc8(gb, E);  // inc e
@@ -5283,6 +6451,7 @@ void setSimulatedInputAddress(GB *gb) {
 
 // 00:2a33
 void getSimulatedInput(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2a33, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x2a36, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x2a37); return; } I(0x2a37, 2);  // ret nz
@@ -5326,8 +6495,17 @@ L_2a7a:
   RET(0x2a7d); return;  // ret
 }
 
+// 00:2a7a
+void getSimulatedInput__returnInput(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_2a7a:
+  I(0x2a7a, 4); A = mem_rd(gb, 0xcbc9);  // ld a,($cbc9)
+  RET(0x2a7d); return;  // ret
+}
+
 // 00:2a7e
 void itemSetState(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2a7e, 1); H = D;  // ld h,d
   I(0x2a7f, 2); L = 0x04;  // ld l,$04
   I(0x2a81, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
@@ -5337,6 +6515,7 @@ void itemSetState(GB *gb) {
 
 // 00:2a85
 void clearPegasusSeedCounter(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2a85, 3); SET_HL(0xcc6c);  // ld hl,$cc6c
   I(0x2a88, 1); alu_xor(gb, A);  // xor a
   I(0x2a89, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
@@ -5346,6 +6525,7 @@ void clearPegasusSeedCounter(GB *gb) {
 
 // 00:2a8c
 void putLinkOnGround(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2a8c, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
   I(0x2a8f, 1); alu_rrca(gb);  // rrca
   if ((F & FC)) { RET_TAKEN(0x2a90); return; } I(0x2a90, 2);  // ret c
@@ -5370,14 +6550,24 @@ L_2aab:
   RET(0x2aac); return;  // ret
 }
 
+// 00:2aab
+void putLinkOnGround__end(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_2aab:
+  SET_DE(POP(0x2aab));  // pop de
+  RET(0x2aac); return;  // ret
+}
+
 // 00:2aad
 void setLinkForceStateToState08(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2aad, 1); alu_xor(gb, A);  // xor a
   setLinkForceStateToState08_withParam(gb); return;  // fallthrough
 }
 
 // 00:2aae
 void setLinkForceStateToState08_withParam(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x2aae, HL);  // push hl
   I(0x2aaf, 3); SET_HL(0xcc50);  // ld hl,$cc50
   I(0x2ab2, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
@@ -5388,6 +6578,7 @@ void setLinkForceStateToState08_withParam(GB *gb) {
 
 // 00:2ab7
 void linkApplyDamage_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x2ab7, DE);  // push de
   I(0x2ab8, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x2aba, AF);  // push af
@@ -5405,6 +6596,7 @@ void linkApplyDamage_b00(GB *gb) {
 
 // 00:2acf
 void setLinkIDOverride(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2acf, 2); alu_or(gb, 0x80);  // or $80
   I(0x2ad1, 4); mem_wr(gb, 0xcc57, A);  // ld ($cc57),a
   I(0x2ad4, 3); SET_HL(0xd002);  // ld hl,$d002
@@ -5420,6 +6612,7 @@ L_2add:
 
 // 00:2ad9
 void setLinkID(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2ad9, 3); SET_HL(0xd001);  // ld hl,$d001
   I(0x2adc, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x2add, 1); alu_xor(gb, A);  // xor a
@@ -5432,6 +6625,7 @@ void setLinkID(GB *gb) {
 
 // 00:2ae3
 void respawnLink(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2ae3, 2); A = 0x02;  // ld a,$02
   I(0x2ae5, 4); mem_wr(gb, 0xcc4f, A);  // ld ($cc4f),a
   I(0x2ae8, 2); A = 0x02;  // ld a,$02
@@ -5442,6 +6636,7 @@ void respawnLink(GB *gb) {
 
 // 00:2aef
 void specialObjectAnimate(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2aef, 1); H = D;  // ld h,d
   I(0x2af0, 2); L = 0x20;  // ld l,$20
   I(0x2af2, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
@@ -5461,6 +6656,7 @@ void specialObjectAnimate(GB *gb) {
 
 // 00:2b0a
 void specialObjectSetAnimation(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2b0a, 2); E = 0x30;  // ld e,$30
   I(0x2b0c, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x2b0d, 1); alu_add(gb, A);  // add a
@@ -5480,6 +6676,7 @@ void specialObjectSetAnimation(GB *gb) {
 
 // 00:2b25
 void loadLinkAndCompanionAnimationFrame(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2b25, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x2b27, AF);  // push af
   I(0x2b28, 2); A = 0x06;  // ld a,$06
@@ -5494,6 +6691,7 @@ void loadLinkAndCompanionAnimationFrame(GB *gb) {
 
 // 00:2b39
 void checkLinkPushingAgainstWall(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x2b39, HL);  // push hl
   I(0x2b3a, 4); A = mem_rd(gb, 0xd008);  // ld a,($d008)
   I(0x2b3d, 3); SET_HL(0x2b55);  // ld hl,$2b55
@@ -5518,6 +6716,7 @@ L_2b52:
 
 // 00:2b5d
 void updateCompanionDirectionFromAngle(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x2b5d, BC);  // push bc
   PUSH(0x2b5e, HL);  // push hl
   I(0x2b5f, 3); SET_HL(0xd108);  // ld hl,$d108
@@ -5553,6 +6752,7 @@ L_2b86:
 
 // 00:2b64
 void updateLinkDirectionFromAngle(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x2b64, BC);  // push bc
   PUSH(0x2b65, HL);  // push hl
   I(0x2b66, 3); SET_HL(0xd008);  // ld hl,$d008
@@ -5584,8 +6784,19 @@ L_2b86:
   RET(0x2b89); return;  // ret
 }
 
+// 00:2b86
+void updateLinkDirectionFromAngle__end(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_2b86:
+  I(0x2b86, 1); A = B;  // ld a,b
+  SET_HL(POP(0x2b87));  // pop hl
+  SET_BC(POP(0x2b88));  // pop bc
+  RET(0x2b89); return;  // ret
+}
+
 // 00:2b8a
 void specialObjectSetCoordinatesToRespawnYX(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2b8a, 1); H = D;  // ld h,d
   I(0x2b8b, 2); L = 0x08;  // ld l,$08
   I(0x2b8d, 4); A = mem_rd(gb, 0xcc23);  // ld a,($cc23)
@@ -5609,6 +6820,7 @@ void specialObjectSetCoordinatesToRespawnYX(GB *gb) {
 
 // 00:2ba9
 void resetLinkInvincibility(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2ba9, 3); SET_HL(0xd01b);  // ld hl,$d01b
   I(0x2bac, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x2bad, 2); mem_wr(gb, HL, A);  // ld (hl),a
@@ -5629,6 +6841,7 @@ void resetLinkInvincibility(GB *gb) {
 
 // 00:2bbd
 void decPegasusSeedCounter(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2bbd, 3); SET_HL(0xcc6d);  // ld hl,$cc6d
   I(0x2bc0, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
   I(0x2bc2, 1); L = alu_dec8(gb, L);  // dec l
@@ -5660,6 +6873,7 @@ L_2be4:
 
 // 00:2be8
 void checkPegasusSeedCounter(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2be8, 3); SET_HL(0xcc6c);  // ld hl,$cc6c
   I(0x2beb, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x2bec, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
@@ -5669,6 +6883,7 @@ void checkPegasusSeedCounter(GB *gb) {
 
 // 00:2bef
 void itemTryToBreakTile(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2bef, 1); H = D;  // ld h,d
   I(0x2bf0, 2); L = 0x0b;  // ld l,$0b
   I(0x2bf2, 2); B = mem_rd(gb, HL);  // ld b,(hl)
@@ -5679,6 +6894,7 @@ void itemTryToBreakTile(GB *gb) {
 
 // 00:2bf6
 void tryToBreakTile(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2bf6, 3); mem_wr(gb, 0xff8f, A);  // ldh ($ff8f),a
   I(0x2bf8, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x2bfa, AF);  // push af
@@ -5696,6 +6912,7 @@ void tryToBreakTile(GB *gb) {
 
 // 00:2c10
 void clearAllParentItems(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2c10, 2); C = 0x00;  // ld c,$00
   I(0x2c12, 3); goto L_2c1a;  // jr $2c1a
 L_2c1a:
@@ -5713,6 +6930,7 @@ L_2c1a:
 
 // 00:2c14
 void updateParentItemButtonAssignment(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2c14, 2); C = 0x01;  // ld c,$01
   I(0x2c16, 3); goto L_2c1a;  // jr $2c1a
 L_2c1a:
@@ -5730,6 +6948,7 @@ L_2c1a:
 
 // 00:2c18
 void checkUseItems_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2c18, 2); C = 0x02;  // ld c,$02
   I(0x2c1a, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x2c1c, AF);  // push af
@@ -5745,6 +6964,7 @@ void checkUseItems_b00(GB *gb) {
 
 // 00:2c2e
 void objectAddToGrabbableObjectBuffer(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2c2e, 3); SET_HL(0xcc74);  // ld hl,$cc74
 L_2c31:
   I(0x2c31, 1); L = alu_inc8(gb, L);  // inc l
@@ -5765,6 +6985,7 @@ L_2c3d:
 
 // 00:2c43
 void dropLinkHeldItem(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2c43, 4); A = mem_rd(gb, 0xccd3);  // ld a,($ccd3)
   I(0x2c46, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x2c47, 3); goto L_2c6a; } I(0x2c47, 2);  // jr nz,$2c6a
@@ -5794,8 +7015,19 @@ L_2c6a:
   RET(0x2c71); return;  // ret
 }
 
+// 00:2c6a
+void dropLinkHeldItem__end(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_2c6a:
+  I(0x2c6a, 1); alu_xor(gb, A);  // xor a
+  I(0x2c6b, 4); mem_wr(gb, 0xcc5a, A);  // ld ($cc5a),a
+  I(0x2c6e, 4); mem_wr(gb, 0xcc5b, A);  // ld ($cc5b),a
+  RET(0x2c71); return;  // ret
+}
+
 // 00:2c72
 void clearVar3fForParentItems(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2c72, 3); SET_HL(0xd23f);  // ld hl,$d23f
 L_2c75:
   I(0x2c75, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
@@ -5808,6 +7040,7 @@ L_2c75:
 
 // 00:2c7e
 void linkCreateSplash(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2c7e, 2); B = 0x03;  // ld b,$03
   I(0x2c80, 4); A = mem_rd(gb, 0xcc5d);  // ld a,($cc5d)
   I(0x2c83, 2); alu_bit(gb, 6, A);  // bit 6,a
@@ -5826,6 +7059,7 @@ L_2c88:
 
 // 00:2c9b
 void clearVariousLinkVariables(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2c9b, 1); alu_xor(gb, A);  // xor a
   I(0x2c9c, 4); mem_wr(gb, 0xd036, A);  // ld ($d036),a
   I(0x2c9f, 4); mem_wr(gb, 0xd010, A);  // ld ($d010),a
@@ -5838,6 +7072,7 @@ void clearVariousLinkVariables(GB *gb) {
 
 // 00:2cad
 void linkState07(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2cad, 2); E = 0x05;  // ld e,$05
   I(0x2caf, 2); A = mem_rd(gb, DE);  // ld a,(de)
   RST_PUSH(0x2cb0, 0x2cb1);  // rst $00 (jump table)
@@ -5858,8 +7093,41 @@ L_2cb7:
   I(0x2ccb, 4); specialObjectSetAnimation(gb); return;  // jp $2b0a
 }
 
+// 00:2cb7
+void linkState07__substate0(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_2cb7:
+  CALL_ASM(0x2cb7, 0x4f45, 0x2cba); /* unported */  // call $4f45
+  CALL(0x2cba, itemIncSubstate, 0x23ef, 0x2cbd);  // call $23ef
+  I(0x2cbd, 1); alu_xor(gb, A);  // xor a
+  I(0x2cbe, 2); L = 0x24;  // ld l,$24
+  I(0x2cc0, 2); mem_wr(gb, HL, A);  // ld (hl),a
+  CALL(0x2cc1, clearVariousLinkVariables, 0x2c9b, 0x2cc4);  // call $2c9b
+  I(0x2cc4, 2); A = 0x80;  // ld a,$80
+  I(0x2cc6, 4); mem_wr(gb, 0xcc5c, A);  // ld ($cc5c),a
+  I(0x2cc9, 2); A = 0x03;  // ld a,$03
+  I(0x2ccb, 4); specialObjectSetAnimation(gb); return;  // jp $2b0a
+}
+
+// 00:2cce
+void linkState07__substate2(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_2cce:
+  I(0x2cce, 1); alu_xor(gb, A);  // xor a
+  I(0x2ccf, 4); mem_wr(gb, 0xcc5c, A);  // ld ($cc5c),a
+  I(0x2cd2, 2); A = 0x05;  // ld a,$05
+  I(0x2cd4, 4); mem_wr(gb, 0xcc49, A);  // ld ($cc49),a
+  I(0x2cd7, 2); E = 0x0b;  // ld e,$0b
+  I(0x2cd9, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x2cda, 2); alu_add(gb, 0x04);  // add $04
+  I(0x2cdc, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x2cdd, 2); A = 0x0a;  // ld a,$0a
+  I(0x2cdf, 4); HANDOFF(0x54c9); /* unported */  // jp $54c9
+}
+
 // 00:2ce2
 void itemDelete(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2ce2, 1); H = D;  // ld h,d
   I(0x2ce3, 2); L = 0x00;  // ld l,$00
   I(0x2ce5, 2); B = 0x10;  // ld b,$10
@@ -5876,6 +7144,7 @@ L_2ce8:
 
 // 00:2cf0
 void itemUpdateAngle(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2cf0, 1); H = D;  // ld h,d
   I(0x2cf1, 2); L = 0x08;  // ld l,$08
   I(0x2cf3, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
@@ -5887,6 +7156,7 @@ void itemUpdateAngle(GB *gb) {
 
 // 00:2cf9
 void getFreeItemSlot(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2cf9, 3); SET_HL(0xd700);  // ld hl,$d700
 L_2cfc:
   I(0x2cfc, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -5902,6 +7172,7 @@ L_2cfc:
 
 // 00:2d1a
 void intro_cinematic(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2d1a, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x2d1c, AF);  // push af
   I(0x2d1d, 2); A = 0x03;  // ld a,$03
@@ -5926,6 +7197,7 @@ void intro_cinematic(GB *gb) {
 
 // 00:2d5f
 void clearFadingPalettes(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2d5f, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x2d61, AF);  // push af
   I(0x2d62, 2); A = 0x03;  // ld a,$03
@@ -5940,6 +7212,7 @@ void clearFadingPalettes(GB *gb) {
 
 // 00:2d73
 void flashScreen(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2d73, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x2d75, AF);  // push af
   I(0x2d76, 2); A = 0x03;  // ld a,$03
@@ -5960,6 +7233,7 @@ L_2d85:
 
 // 00:2d8e
 void specialObjectCode_companionCutscene_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2d8e, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x2d90, AF);  // push af
   I(0x2d91, 2); A = 0x06;  // ld a,$06
@@ -5974,13 +7248,15 @@ void specialObjectCode_companionCutscene_b00(GB *gb) {
 
 // 00:2da2
 void specialObjectCode_linkInCutscene_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2da2, 3); SET_HL(0x70a0);  // ld hl,$70a0
   I(0x2da5, 2); E = 0x06;  // ld e,$06
-  I(0x2da7, 4); HANDOFF(0x008a); /* interBankCall */  // jp $008a
+  I(0x2da7, 4); interBankCall(gb); return;  // jp $008a
 }
 
 // 00:2daa
 void loadDungeonLayout(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2daa, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
   I(0x2dad, 2); alu_and(gb, 0x08);  // and $08
   if ((F & FZ)) { RET_TAKEN(0x2daf); return; } I(0x2daf, 2);  // ret z
@@ -5998,6 +7274,7 @@ void loadDungeonLayout(GB *gb) {
 
 // 00:2dc4
 void initializeDungeonStuff(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2dc4, 1); alu_xor(gb, A);  // xor a
   I(0x2dc5, 4); mem_wr(gb, 0xcdd2, A);  // ld ($cdd2),a
   I(0x2dc8, 4); mem_wr(gb, 0xcdd3, A);  // ld ($cdd3),a
@@ -6007,6 +7284,7 @@ void initializeDungeonStuff(GB *gb) {
 
 // 00:2dd1
 void setVisitedRoomFlag(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x2dd1, getThisRoomFlags, 0x197d, 0x2dd4);  // call $197d
   I(0x2dd4, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 4)));  // set 4,(hl)
   RET(0x2dd6); return;  // ret
@@ -6014,6 +7292,7 @@ void setVisitedRoomFlag(GB *gb) {
 
 // 00:2dd7
 void getThisRoomDungeonProperties(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2dd7, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x2dd9, AF);  // push af
   I(0x2dda, 2); A = 0x01;  // ld a,$01
@@ -6042,6 +7321,7 @@ void getThisRoomDungeonProperties(GB *gb) {
 
 // 00:2e01
 void getDungeonLayoutAddress(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x2e01, BC);  // push bc
   PUSH(0x2e02, DE);  // push de
   I(0x2e03, 4); A = mem_rd(gb, 0xcc3b);  // ld a,($cc3b)
@@ -6056,12 +7336,14 @@ void getDungeonLayoutAddress(GB *gb) {
 
 // 00:2e12
 void getActiveRoomFromDungeonMapPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2e12, 4); A = mem_rd(gb, 0xcc3a);  // ld a,($cc3a)
   getRoomInDungeon(gb); return;  // fallthrough
 }
 
 // 00:2e15
 void getRoomInDungeon(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2e15, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   I(0x2e17, 2); A = 0x02;  // ld a,$02
   I(0x2e19, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
@@ -6079,6 +7361,7 @@ void getRoomInDungeon(GB *gb) {
 
 // 00:2e27
 void getFreeEnemySlot(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x2e27, getFreeEnemySlot_uncounted, 0x2e34, 0x2e2a);  // call $2e34
   if (!(F & FZ)) { RET_TAKEN(0x2e2a); return; } I(0x2e2a, 2);  // ret nz
   I(0x2e2b, 4); A = mem_rd(gb, 0xcdd1);  // ld a,($cdd1)
@@ -6090,6 +7373,7 @@ void getFreeEnemySlot(GB *gb) {
 
 // 00:2e34
 void getFreeEnemySlot_uncounted(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2e34, 3); SET_HL(0xd080);  // ld hl,$d080
 L_2e37:
   I(0x2e37, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -6110,6 +7394,7 @@ L_2e43:
 
 // 00:2e47
 void enemyDelete(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2e47, 2); E = 0x80;  // ld e,$80
   CALL(0x2e49, objectRemoveFromAButtonSensitiveObjectList, 0x1b41, 0x2e4c);  // call $1b41
   I(0x2e4c, 1); L = E;  // ld l,e
@@ -6128,6 +7413,7 @@ L_2e51:
 
 // 00:2e59
 void enemyReplaceWithID(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2e59, 1); H = D;  // ld h,d
   PUSH(0x2e5a, BC);  // push bc
   I(0x2e5b, 2); L = 0x80;  // ld l,$80
@@ -6162,6 +7448,7 @@ void enemyReplaceWithID(GB *gb) {
 
 // 00:2ea5
 void updateEnemies(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2ea5, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
   I(0x2ea8, 2); alu_and(gb, 0x0e);  // and $0e
   if (!(F & FZ)) { I(0x2eaa, 3); _updateEnemiesIfStateIsZero(gb); return; } I(0x2eaa, 2);  // jr nz,$2e82
@@ -6226,8 +7513,165 @@ L_2f00:
   RET(0x2f06); return;  // ret
 }
 
+// 00:2efb
+void updateEnemies__label_00_348(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_2efb;
+L_2ec6:
+  I(0x2ec6, 3); mem_wr(gb, 0xffaf, A);  // ldh ($ffaf),a
+  I(0x2ec8, 2); E = 0x80;  // ld e,$80
+  I(0x2eca, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x2ecb, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { I(0x2ecc, 3); goto L_2f00; } I(0x2ecc, 2);  // jr z,$2f00
+  CALL(0x2ece, updateEnemy, 0x2f07, 0x2ed1);  // call $2f07
+  I(0x2ed1, 1); H = D;  // ld h,d
+  I(0x2ed2, 2); L = 0xaa;  // ld l,$aa
+  I(0x2ed4, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
+  I(0x2ed6, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x2ed7, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x2ed8, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { I(0x2ed9, 3); goto L_2efc; } I(0x2ed9, 2);  // jr z,$2efc
+  I(0x2edb, 1); alu_rlca(gb);  // rlca
+  if ((F & FC)) { I(0x2edc, 3); goto L_2efb; } I(0x2edc, 2);  // jr c,$2efb
+  I(0x2ede, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
+  if ((F & FZ)) { I(0x2edf, 3); goto L_2efc; } I(0x2edf, 2);  // jr z,$2efc
+  I(0x2ee1, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
+  I(0x2ee4, 2); alu_bit(gb, 2, A);  // bit 2,a
+  if (!(F & FZ)) { I(0x2ee6, 3); goto L_2efc; } I(0x2ee6, 2);  // jr nz,$2efc
+  I(0x2ee8, 2); B = 0x05;  // ld b,$05
+  I(0x2eea, 2); L = 0x9b;  // ld l,$9b
+  I(0x2eec, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x2eed, 2); alu_and(gb, 0x07);  // and $07
+  I(0x2eef, 1); alu_cp(gb, B);  // cp b
+  if (!(F & FZ)) { I(0x2ef0, 3); goto L_2ef4; } I(0x2ef0, 2);  // jr nz,$2ef4
+  I(0x2ef2, 2); B = 0x02;  // ld b,$02
+L_2ef4:
+  I(0x2ef4, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x2ef5, 2); alu_and(gb, 0xf8);  // and $f8
+  I(0x2ef7, 1); alu_or(gb, B);  // or b
+  I(0x2ef8, 2); mem_wr(gb, HL, A);  // ld (hl),a
+  I(0x2ef9, 3); goto L_2f00;  // jr $2f00
+L_2efb:
+  I(0x2efb, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+L_2efc:
+  I(0x2efc, 2); L = 0x9b;  // ld l,$9b
+  I(0x2efe, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x2eff, 2); mem_wr(gb, HL, A);  // ld (hl),a
+L_2f00:
+  I(0x2f00, 1); D = alu_inc8(gb, D);  // inc d
+  I(0x2f01, 1); A = D;  // ld a,d
+  I(0x2f02, 2); alu_cp(gb, 0xe0);  // cp $e0
+  if ((F & FC)) { I(0x2f04, 3); goto L_2ec6; } I(0x2f04, 2);  // jr c,$2ec6
+  RET(0x2f06); return;  // ret
+}
+
+// 00:2efc
+void updateEnemies__label_00_349(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_2efc;
+L_2ec6:
+  I(0x2ec6, 3); mem_wr(gb, 0xffaf, A);  // ldh ($ffaf),a
+  I(0x2ec8, 2); E = 0x80;  // ld e,$80
+  I(0x2eca, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x2ecb, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { I(0x2ecc, 3); goto L_2f00; } I(0x2ecc, 2);  // jr z,$2f00
+  CALL(0x2ece, updateEnemy, 0x2f07, 0x2ed1);  // call $2f07
+  I(0x2ed1, 1); H = D;  // ld h,d
+  I(0x2ed2, 2); L = 0xaa;  // ld l,$aa
+  I(0x2ed4, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
+  I(0x2ed6, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x2ed7, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x2ed8, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { I(0x2ed9, 3); goto L_2efc; } I(0x2ed9, 2);  // jr z,$2efc
+  I(0x2edb, 1); alu_rlca(gb);  // rlca
+  if ((F & FC)) { I(0x2edc, 3); goto L_2efb; } I(0x2edc, 2);  // jr c,$2efb
+  I(0x2ede, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
+  if ((F & FZ)) { I(0x2edf, 3); goto L_2efc; } I(0x2edf, 2);  // jr z,$2efc
+  I(0x2ee1, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
+  I(0x2ee4, 2); alu_bit(gb, 2, A);  // bit 2,a
+  if (!(F & FZ)) { I(0x2ee6, 3); goto L_2efc; } I(0x2ee6, 2);  // jr nz,$2efc
+  I(0x2ee8, 2); B = 0x05;  // ld b,$05
+  I(0x2eea, 2); L = 0x9b;  // ld l,$9b
+  I(0x2eec, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x2eed, 2); alu_and(gb, 0x07);  // and $07
+  I(0x2eef, 1); alu_cp(gb, B);  // cp b
+  if (!(F & FZ)) { I(0x2ef0, 3); goto L_2ef4; } I(0x2ef0, 2);  // jr nz,$2ef4
+  I(0x2ef2, 2); B = 0x02;  // ld b,$02
+L_2ef4:
+  I(0x2ef4, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x2ef5, 2); alu_and(gb, 0xf8);  // and $f8
+  I(0x2ef7, 1); alu_or(gb, B);  // or b
+  I(0x2ef8, 2); mem_wr(gb, HL, A);  // ld (hl),a
+  I(0x2ef9, 3); goto L_2f00;  // jr $2f00
+L_2efb:
+  I(0x2efb, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+L_2efc:
+  I(0x2efc, 2); L = 0x9b;  // ld l,$9b
+  I(0x2efe, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x2eff, 2); mem_wr(gb, HL, A);  // ld (hl),a
+L_2f00:
+  I(0x2f00, 1); D = alu_inc8(gb, D);  // inc d
+  I(0x2f01, 1); A = D;  // ld a,d
+  I(0x2f02, 2); alu_cp(gb, 0xe0);  // cp $e0
+  if ((F & FC)) { I(0x2f04, 3); goto L_2ec6; } I(0x2f04, 2);  // jr c,$2ec6
+  RET(0x2f06); return;  // ret
+}
+
+// 00:2f00
+void updateEnemies__next(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_2f00;
+L_2ec6:
+  I(0x2ec6, 3); mem_wr(gb, 0xffaf, A);  // ldh ($ffaf),a
+  I(0x2ec8, 2); E = 0x80;  // ld e,$80
+  I(0x2eca, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x2ecb, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { I(0x2ecc, 3); goto L_2f00; } I(0x2ecc, 2);  // jr z,$2f00
+  CALL(0x2ece, updateEnemy, 0x2f07, 0x2ed1);  // call $2f07
+  I(0x2ed1, 1); H = D;  // ld h,d
+  I(0x2ed2, 2); L = 0xaa;  // ld l,$aa
+  I(0x2ed4, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
+  I(0x2ed6, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x2ed7, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x2ed8, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { I(0x2ed9, 3); goto L_2efc; } I(0x2ed9, 2);  // jr z,$2efc
+  I(0x2edb, 1); alu_rlca(gb);  // rlca
+  if ((F & FC)) { I(0x2edc, 3); goto L_2efb; } I(0x2edc, 2);  // jr c,$2efb
+  I(0x2ede, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
+  if ((F & FZ)) { I(0x2edf, 3); goto L_2efc; } I(0x2edf, 2);  // jr z,$2efc
+  I(0x2ee1, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
+  I(0x2ee4, 2); alu_bit(gb, 2, A);  // bit 2,a
+  if (!(F & FZ)) { I(0x2ee6, 3); goto L_2efc; } I(0x2ee6, 2);  // jr nz,$2efc
+  I(0x2ee8, 2); B = 0x05;  // ld b,$05
+  I(0x2eea, 2); L = 0x9b;  // ld l,$9b
+  I(0x2eec, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x2eed, 2); alu_and(gb, 0x07);  // and $07
+  I(0x2eef, 1); alu_cp(gb, B);  // cp b
+  if (!(F & FZ)) { I(0x2ef0, 3); goto L_2ef4; } I(0x2ef0, 2);  // jr nz,$2ef4
+  I(0x2ef2, 2); B = 0x02;  // ld b,$02
+L_2ef4:
+  I(0x2ef4, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x2ef5, 2); alu_and(gb, 0xf8);  // and $f8
+  I(0x2ef7, 1); alu_or(gb, B);  // or b
+  I(0x2ef8, 2); mem_wr(gb, HL, A);  // ld (hl),a
+  I(0x2ef9, 3); goto L_2f00;  // jr $2f00
+L_2efb:
+  I(0x2efb, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+L_2efc:
+  I(0x2efc, 2); L = 0x9b;  // ld l,$9b
+  I(0x2efe, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x2eff, 2); mem_wr(gb, HL, A);  // ld (hl),a
+L_2f00:
+  I(0x2f00, 1); D = alu_inc8(gb, D);  // inc d
+  I(0x2f01, 1); A = D;  // ld a,d
+  I(0x2f02, 2); alu_cp(gb, 0xe0);  // cp $e0
+  if ((F & FC)) { I(0x2f04, 3); goto L_2ec6; } I(0x2f04, 2);  // jr c,$2ec6
+  RET(0x2f06); return;  // ret
+}
+
 // 00:2f07
 void updateEnemy(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x2f07, enemyStandardUpdate, 0x28fd, 0x2f0a);  // call $28fd
   I(0x2f0a, 2); E = 0x81;  // ld e,$81
   I(0x2f0c, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -6261,9 +7705,10 @@ L_2f1f:
 
 // 00:30fe
 void initializeRoom(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x30fe, 3); SET_HL(0x62da);  // ld hl,$62da
   I(0x3101, 2); E = 0x01;  // ld e,$01
-  CALL_ASM(0x3103, 0x008a, 0x3106); /* interBankCall */  // call $008a
+  CALL(0x3103, interBankCall, 0x008a, 0x3106);  // call $008a
   I(0x3106, 4); A = mem_rd(gb, 0xcdde);  // ld a,($cdde)
   I(0x3109, 1); A = alu_dec8(gb, A);  // dec a
   if (!(F & FZ)) { I(0x310a, 3); goto L_3111; } I(0x310a, 2);  // jr nz,$3111
@@ -6272,17 +7717,17 @@ void initializeRoom(GB *gb) {
 L_3111:
   I(0x3111, 3); SET_HL(0x79e2);  // ld hl,$79e2
   I(0x3114, 2); E = 0x02;  // ld e,$02
-  CALL_ASM(0x3116, 0x008a, 0x3119); /* interBankCall */  // call $008a
+  CALL(0x3116, interBankCall, 0x008a, 0x3119);  // call $008a
   CALL(0x3119, refreshObjectGfx, 0x1618, 0x311c);  // call $1618
   I(0x311c, 3); SET_HL(0x5872);  // ld hl,$5872
   I(0x311f, 2); E = 0x12;  // ld e,$12
-  CALL_ASM(0x3121, 0x008a, 0x3124); /* interBankCall */  // call $008a
+  CALL(0x3121, interBankCall, 0x008a, 0x3124);  // call $008a
   I(0x3124, 3); SET_HL(0x7a12);  // ld hl,$7a12
   I(0x3127, 2); E = 0x02;  // ld e,$02
-  CALL_ASM(0x3129, 0x008a, 0x312c); /* interBankCall */  // call $008a
+  CALL(0x3129, interBankCall, 0x008a, 0x312c);  // call $008a
   I(0x312c, 3); SET_HL(0x7de1);  // ld hl,$7de1
   I(0x312f, 2); E = 0x01;  // ld e,$01
-  CALL_ASM(0x3131, 0x008a, 0x3134); /* interBankCall */  // call $008a
+  CALL(0x3131, interBankCall, 0x008a, 0x3134);  // call $008a
   I(0x3134, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x3136, AF);  // push af
   I(0x3137, 2); A = 0x02;  // ld a,$02
@@ -6313,6 +7758,7 @@ L_3111:
 
 // 00:3171
 void parseGivenObjectData_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3171, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x3173, AF);  // push af
   I(0x3174, 2); A = 0x12;  // ld a,$12
@@ -6331,6 +7777,7 @@ void parseGivenObjectData_b00(GB *gb) {
 
 // 00:3189
 void loadStaticObjects(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3189, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x318b, AF);  // push af
   I(0x318c, 2); A = 0x16;  // ld a,$16
@@ -6347,6 +7794,7 @@ void loadStaticObjects(GB *gb) {
 
 // 00:319f
 void clearStaticObjects(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x319f, 3); SET_HL(0xcd80);  // ld hl,$cd80
   I(0x31a2, 2); B = 0x40;  // ld b,$40
   I(0x31a4, 4); clearMemory(gb); return;  // jp $046f
@@ -6354,6 +7802,7 @@ void clearStaticObjects(GB *gb) {
 
 // 00:31a7
 void findFreeStaticObjectSlot(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x31a7, 3); SET_HL(0xcd80);  // ld hl,$cd80
   I(0x31aa, 2); B = 0x08;  // ld b,$08
 L_31ac:
@@ -6371,6 +7820,7 @@ L_31ac:
 
 // 00:31b8
 void objectDeleteRelatedObj1AsStaticObject(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x31b8, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x31ba, 2); alu_add(gb, 0x16);  // add $16
   I(0x31bc, 1); L = A;  // ld l,a
@@ -6395,6 +7845,7 @@ L_31ca:
 
 // 00:31cf
 void objectSaveAsStaticObject(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x31cf, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x31d0, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
   I(0x31d2, 2); alu_add(gb, 0x16);  // add $16
@@ -6429,24 +7880,28 @@ void objectSaveAsStaticObject(GB *gb) {
 
 // 00:31f3
 void checkGlobalFlag(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x31f3, 3); SET_HL(0xc6d0);  // ld hl,$c6d0
   I(0x31f6, 4); checkFlag(gb); return;  // jp $0205
 }
 
 // 00:31f9
 void setGlobalFlag(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x31f9, 3); SET_HL(0xc6d0);  // ld hl,$c6d0
   I(0x31fc, 4); setFlag(gb); return;  // jp $020e
 }
 
 // 00:31ff
 void unsetGlobalFlag(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x31ff, 3); SET_HL(0xc6d0);  // ld hl,$c6d0
   I(0x3202, 4); unsetFlag(gb); return;  // jp $0218
 }
 
 // 00:3205
 void clearEnemiesKilledList_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3205, 2); H = 0x00;  // ld h,$00
   I(0x3207, 3); goto L_321f;  // jr $321f
 L_321f:
@@ -6467,6 +7922,7 @@ L_321f:
 
 // 00:3209
 void addRoomToEnemiesKilledList_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3209, 2); H = 0x01;  // ld h,$01
   I(0x320b, 3); goto L_321f;  // jr $321f
 L_321f:
@@ -6487,6 +7943,7 @@ L_321f:
 
 // 00:320d
 void markEnemyAsKilledInRoom_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x320d, 2); H = 0x02;  // ld h,$02
   I(0x320f, 3); goto L_321f;  // jr $321f
 L_321f:
@@ -6507,6 +7964,7 @@ L_321f:
 
 // 00:3215
 void generateRandomBuffer_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3215, 2); H = 0x04;  // ld h,$04
   I(0x3217, 3); goto L_321f;  // jr $321f
 L_321f:
@@ -6527,6 +7985,7 @@ L_321f:
 
 // 00:3219
 void getRandomPositionForEnemy_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3219, 2); H = 0x05;  // ld h,$05
   I(0x321b, 3); goto L_321f;  // jr $321f
 L_321f:
@@ -6547,6 +8006,7 @@ L_321f:
 
 // 00:321d
 void checkSpawnTimeportalInteraction_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x321d, 2); H = 0x06;  // ld h,$06
   I(0x321f, 1); L = A;  // ld l,a
   I(0x3220, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
@@ -6565,6 +8025,7 @@ void checkSpawnTimeportalInteraction_b00(GB *gb) {
 
 // 00:3238
 void clearPaletteFadeVariablesAndRefreshPalettes(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3238, 2); A = 0xff;  // ld a,$ff
   I(0x323a, 3); mem_wr(gb, 0xffa6, A);  // ldh ($ffa6),a
   I(0x323c, 3); mem_wr(gb, 0xffa7, A);  // ldh ($ffa7),a
@@ -6573,6 +8034,7 @@ void clearPaletteFadeVariablesAndRefreshPalettes(GB *gb) {
 
 // 00:323e
 void clearPaletteFadeVariables(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x323e, 1); alu_xor(gb, A);  // xor a
   I(0x323f, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
   I(0x3242, 4); mem_wr(gb, 0xc2ff, A);  // ld ($c2ff),a
@@ -6590,6 +8052,7 @@ void clearPaletteFadeVariables(GB *gb) {
 
 // 00:3257
 void fadeoutToWhiteWithDelay(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x3257, setPaletteThreadDelay, 0x337b, 0x325a);  // call $337b
   I(0x325a, 2); A = 0x09;  // ld a,$09
   I(0x325c, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
@@ -6604,6 +8067,7 @@ L_3273:
 
 // 00:3263
 void fastFadeoutToWhite(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3263, 2); A = 0x01;  // ld a,$01
   I(0x3265, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
   I(0x3268, 2); A = 0x03;  // ld a,$03
@@ -6617,6 +8081,7 @@ L_3273:
 
 // 00:326c
 void fadeoutToWhite(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x326c, 2); A = 0x01;  // ld a,$01
   I(0x326e, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
   I(0x3271, 2); A = 0x01;  // ld a,$01
@@ -6628,6 +8093,7 @@ void fadeoutToWhite(GB *gb) {
 
 // 00:327a
 void makeAllPaletteUseFading(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x327a, 2); A = 0xff;  // ld a,$ff
   I(0x327c, 3); SET_HL(0xc4b1);  // ld hl,$c4b1
   I(0x327f, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
@@ -6639,6 +8105,7 @@ void makeAllPaletteUseFading(GB *gb) {
 
 // 00:3284
 void fadeinFromWhiteWithDelay(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x3284, setPaletteThreadDelay, 0x337b, 0x3287);  // call $337b
   I(0x3287, 2); A = 0x0a;  // ld a,$0a
   I(0x3289, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
@@ -6653,6 +8120,7 @@ L_32a0:
 
 // 00:3290
 void fastFadeinFromWhite(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3290, 2); A = 0x02;  // ld a,$02
   I(0x3292, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
   I(0x3295, 2); A = 0x03;  // ld a,$03
@@ -6666,6 +8134,7 @@ L_32a0:
 
 // 00:3299
 void fadeinFromWhite(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3299, 2); A = 0x02;  // ld a,$02
   I(0x329b, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
   I(0x329e, 2); A = 0x01;  // ld a,$01
@@ -6677,6 +8146,7 @@ void fadeinFromWhite(GB *gb) {
 
 // 00:32ab
 void fadeoutToBlackWithDelay(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x32ab, setPaletteThreadDelay, 0x337b, 0x32ae);  // call $337b
   I(0x32ae, 2); A = 0x0b;  // ld a,$0b
   I(0x32b0, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
@@ -6691,6 +8161,7 @@ L_32c7:
 
 // 00:32b7
 void fastFadeoutToBlack(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x32b7, 2); A = 0x03;  // ld a,$03
   I(0x32b9, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
   I(0x32bc, 2); A = 0x03;  // ld a,$03
@@ -6704,6 +8175,7 @@ L_32c7:
 
 // 00:32c0
 void fadeoutToBlack(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x32c0, 2); A = 0x03;  // ld a,$03
   I(0x32c2, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
   I(0x32c5, 2); A = 0x01;  // ld a,$01
@@ -6715,6 +8187,7 @@ void fadeoutToBlack(GB *gb) {
 
 // 00:32d1
 void fadeinFromBlackWithDelay(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x32d1, setPaletteThreadDelay, 0x337b, 0x32d4);  // call $337b
   I(0x32d4, 2); A = 0x0c;  // ld a,$0c
   I(0x32d6, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
@@ -6729,6 +8202,7 @@ L_32ed:
 
 // 00:32dd
 void fastFadeinFromBlack(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x32dd, 2); A = 0x04;  // ld a,$04
   I(0x32df, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
   I(0x32e2, 2); A = 0x03;  // ld a,$03
@@ -6742,6 +8216,7 @@ L_32ed:
 
 // 00:32e6
 void fadeinFromBlack(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x32e6, 2); A = 0x04;  // ld a,$04
   I(0x32e8, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
   I(0x32eb, 2); A = 0x01;  // ld a,$01
@@ -6753,12 +8228,14 @@ void fadeinFromBlack(GB *gb) {
 
 // 00:32f8
 void darkenRoomLightly(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x32f8, 2); B = 0xf7;  // ld b,$f7
   I(0x32fa, 3); _darkenRoomHelper(gb); return;  // jr $3317
 }
 
 // 00:330a
 void darkenRoomWithSpeed(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x330a, 2); B = 0xf0;  // ld b,$f0
   CALL(0x330c, _setDarkeningVariables, 0x331e, 0x330f);  // call $331e
   I(0x330f, 2); A = 0x05;  // ld a,$05
@@ -6768,12 +8245,14 @@ void darkenRoomWithSpeed(GB *gb) {
 
 // 00:3315
 void darkenRoom(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3315, 2); B = 0xf0;  // ld b,$f0
   _darkenRoomHelper(gb); return;  // fallthrough
 }
 
 // 00:3338
 void brightenRoomLightly(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3338, 2); B = 0xf7;  // ld b,$f7
   I(0x333a, 2); A = 0x01;  // ld a,$01
   I(0x333c, 3); _brightenRoomHelper(gb); return;  // jr $3354
@@ -6781,12 +8260,14 @@ void brightenRoomLightly(GB *gb) {
 
 // 00:334c
 void brightenRoomWithSpeed(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x334c, 2); B = 0x00;  // ld b,$00
   I(0x334e, 3); _brightenRoomHelper(gb); return;  // jr $3354
 }
 
 // 00:3350
 void brightenRoom(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3350, 2); B = 0x00;  // ld b,$00
   I(0x3352, 2); A = 0x01;  // ld a,$01
   _brightenRoomHelper(gb); return;  // fallthrough
@@ -6794,6 +8275,7 @@ void brightenRoom(GB *gb) {
 
 // 00:335d
 void fastFadeinFromWhiteToRoom(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x335d, fastFadeinFromWhite, 0x3290, 0x3360);  // call $3290
   I(0x3360, 2); A = 0x1e;  // ld a,$1e
   I(0x3362, 4); mem_wr(gb, 0xc2ff, A);  // ld ($c2ff),a
@@ -6804,6 +8286,7 @@ void fastFadeinFromWhiteToRoom(GB *gb) {
 
 // 00:336b
 void fadeinFromWhiteToRoom(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_336b;
 L_3365:
   I(0x3365, 2); A = 0x07;  // ld a,$07
@@ -6816,6 +8299,7 @@ L_336b:
 
 // 00:3370
 void startFadeBetweenTwoPalettes(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3370, 2); A = 0x08;  // ld a,$08
   I(0x3372, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
   I(0x3375, 2); A = 0x20;  // ld a,$20
@@ -6825,6 +8309,7 @@ void startFadeBetweenTwoPalettes(GB *gb) {
 
 // 00:33cf
 void loadScreenMusic(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x33cf, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x33d1, AF);  // push af
   I(0x33d2, 2); A = 0x04;  // ld a,$04
@@ -6862,6 +8347,7 @@ L_33ff:
 
 // 00:3406
 void applyWarpDest(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3406, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x3408, AF);  // push af
   I(0x3409, 2); A = 0x04;  // ld a,$04
@@ -6876,6 +8362,7 @@ void applyWarpDest(GB *gb) {
 
 // 00:341a
 void loadScreenMusicAndSetRoomPack(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x341a, loadScreenMusic, 0x33cf, 0x341d);  // call $33cf
   I(0x341d, 4); A = mem_rd(gb, 0xcc30);  // ld a,($cc30)
   I(0x3420, 4); mem_wr(gb, 0xcc2f, A);  // ld ($cc2f),a
@@ -6890,6 +8377,7 @@ void loadScreenMusicAndSetRoomPack(GB *gb) {
 
 // 00:3431
 void dismountCompanionAndSetRememberedPositionToScreenCenter(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3431, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x3433, AF);  // push af
   I(0x3434, 2); A = 0x05;  // ld a,$05
@@ -6914,6 +8402,7 @@ void dismountCompanionAndSetRememberedPositionToScreenCenter(GB *gb) {
 
 // 00:345b
 void updateAllObjects(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x345b, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x345d, AF);  // push af
   I(0x345e, 2); A = 0x05;  // ld a,$05
@@ -6948,6 +8437,45 @@ void updateAllObjects(GB *gb) {
   I(0x34a7, 1); alu_rrca(gb);  // rrca
   if ((F & FC)) { CALL_ASM(0x34a8, 0x410d, 0x34ab); /* unported */ } else I(0x34a8, 3);  // call c,$410d
   I(0x34ab, 2); A = 0x06;  // ld a,$06
+L_34ad:
+  I(0x34ad, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x34af, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  I(0x34b2, 4); A = mem_rd(gb, 0xcc5a);  // ld a,($cc5a)
+  I(0x34b5, 1); alu_rlca(gb);  // rlca
+  if ((F & FC)) { CALL_ASM(0x34b6, 0x54df, 0x34b9); /* unported */ } else I(0x34b6, 3);  // call c,$54df
+  CALL(0x34b9, loadLinkAndCompanionAnimationFrame, 0x2b25, 0x34bc);  // call $2b25
+  I(0x34bc, 2); A = 0x07;  // ld a,$07
+  I(0x34be, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x34c0, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  CALL_ASM(0x34c3, 0x491a, 0x34c6); /* unported */  // call $491a
+  I(0x34c6, 2); A = 0x01;  // ld a,$01
+  I(0x34c8, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x34ca, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  CALL_ASM(0x34cd, 0x494d, 0x34d0); /* unported */  // call $494d
+  I(0x34d0, 2); A = 0x00;  // ld a,$00
+  I(0x34d2, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x34d4, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  CALL(0x34d7, updateCamera, 0x12ae, 0x34da);  // call $12ae
+  I(0x34da, 2); A = 0x04;  // ld a,$04
+  I(0x34dc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x34de, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  CALL_ASM(0x34e1, 0x6c32, 0x34e4); /* unported */  // call $6c32
+  I(0x34e4, 2); A = 0x04;  // ld a,$04
+  I(0x34e6, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x34e8, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  CALL_ASM(0x34eb, 0x5906, 0x34ee); /* unported */  // call $5906
+  I(0x34ee, 1); alu_xor(gb, A);  // xor a
+  I(0x34ef, 4); mem_wr(gb, 0xc4b6, A);  // ld ($c4b6),a
+  SET_AF(POP(0x34f2));  // pop af
+  I(0x34f3, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x34f5, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  RET(0x34f8); return;  // ret
+}
+
+// 00:34ad
+void updateAllObjects__jump34ad(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_34ad:
   I(0x34ad, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34af, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   I(0x34b2, 4); A = mem_rd(gb, 0xcc5a);  // ld a,($cc5a)
@@ -6984,6 +8512,7 @@ void updateAllObjects(GB *gb) {
 
 // 00:34f9
 void updateSpecialObjectsAndInteractions(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x34f9, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x34fb, AF);  // push af
   I(0x34fc, 2); A = 0x05;  // ld a,$05
@@ -7005,6 +8534,7 @@ void updateSpecialObjectsAndInteractions(GB *gb) {
 
 // 00:351e
 void updateInteractionsAndDrawAllSprites(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x351e, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x3520, AF);  // push af
   I(0x3521, 2); A = 0x00;  // ld a,$00
@@ -7022,6 +8552,7 @@ void updateInteractionsAndDrawAllSprites(GB *gb) {
 
 // 00:3597
 void clearWramBank1(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3597, 1); alu_xor(gb, A);  // xor a
   I(0x3598, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
   I(0x359a, 3); SET_HL(0xd000);  // ld hl,$d000
@@ -7031,12 +8562,14 @@ void clearWramBank1(GB *gb) {
 
 // 00:35a3
 void clearScreenVariablesAndWramBank1(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x35a3, clearWramBank1, 0x3597, 0x35a6);  // call $3597
   clearScreenVariables(gb); return;  // fallthrough
 }
 
 // 00:35a6
 void clearScreenVariables(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x35a6, 3); SET_HL(0xcd00);  // ld hl,$cd00
   I(0x35a9, 2); B = 0x30;  // ld b,$30
   CALL(0x35ab, clearMemory, 0x046f, 0x35ae);  // call $046f
@@ -7049,6 +8582,7 @@ void clearScreenVariables(GB *gb) {
 
 // 00:35ba
 void clearLinkObject(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x35ba, 3); SET_HL(0xd000);  // ld hl,$d000
   I(0x35bd, 2); B = 0x40;  // ld b,$40
   I(0x35bf, 4); clearMemory(gb); return;  // jp $046f
@@ -7056,6 +8590,7 @@ void clearLinkObject(GB *gb) {
 
 // 00:35c2
 void clearReservedInteraction0(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x35c2, 3); SET_HL(0xd040);  // ld hl,$d040
   I(0x35c5, 2); B = 0x40;  // ld b,$40
   CALL(0x35c7, clearMemory, 0x046f, 0x35ca);  // call $046f
@@ -7064,6 +8599,7 @@ void clearReservedInteraction0(GB *gb) {
 
 // 00:35ca
 void clearReservedInteraction1(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x35ca, 3); SET_HL(0xd140);  // ld hl,$d140
   I(0x35cd, 2); B = 0x40;  // ld b,$40
   I(0x35cf, 4); clearMemory(gb); return;  // jp $046f
@@ -7071,6 +8607,7 @@ void clearReservedInteraction1(GB *gb) {
 
 // 00:35d2
 void clearDynamicInteractions(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x35d2, 3); SET_DE(0xd240);  // ld de,$d240
 L_35d5:
   I(0x35d5, 1); H = D;  // ld h,d
@@ -7086,6 +8623,7 @@ L_35d5:
 
 // 00:35e3
 void clearItems(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x35e3, 3); SET_DE(0xd600);  // ld de,$d600
 L_35e6:
   I(0x35e6, 1); H = D;  // ld h,d
@@ -7101,6 +8639,7 @@ L_35e6:
 
 // 00:35f4
 void clearEnemies(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x35f4, 3); SET_DE(0xd080);  // ld de,$d080
 L_35f7:
   I(0x35f7, 1); H = D;  // ld h,d
@@ -7116,6 +8655,7 @@ L_35f7:
 
 // 00:3605
 void clearParts(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3605, 3); SET_DE(0xd0c0);  // ld de,$d0c0
 L_3608:
   I(0x3608, 1); H = D;  // ld h,d
@@ -7131,6 +8671,7 @@ L_3608:
 
 // 00:3616
 void setEnemyTargetToLinkPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3616, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
   I(0x3619, 1); H = A;  // ld h,a
   I(0x361a, 2); L = 0x0b;  // ld l,$0b
@@ -7153,6 +8694,7 @@ void setEnemyTargetToLinkPosition(GB *gb) {
 
 // 00:3632
 void getEntryFromObjectTable2(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3632, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x3634, AF);  // push af
   I(0x3635, 2); A = 0x12;  // ld a,$12
@@ -7173,6 +8715,7 @@ void getEntryFromObjectTable2(GB *gb) {
 
 // 00:364b
 void checkDungeonUsesToggleBlocks(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x364b, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
   I(0x364e, 2); alu_cp(gb, 0xff);  // cp $ff
   if ((F & FZ)) { RET_TAKEN(0x3650); return; } I(0x3650, 2);  // ret z
@@ -7182,6 +8725,7 @@ void checkDungeonUsesToggleBlocks(GB *gb) {
 
 // 00:3659
 void loadAnimationData(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3659, 1); B = A;  // ld b,a
   I(0x365a, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x365c, AF);  // push af
@@ -7199,13 +8743,13 @@ void loadAnimationData(GB *gb) {
   I(0x366d, 4); mem_wr(gb, 0xcd30, A);  // ld ($cd30),a
   PUSH(0x3670, DE);  // push de
   I(0x3671, 3); SET_DE(0xcd31);  // ld de,$cd31
-  CALL_ASM(0x3674, 0x3698, 0x3677); /* unported */  // call $3698
+  CALL(0x3674, loadAnimationData__helper, 0x3698, 0x3677);  // call $3698
   I(0x3677, 3); SET_DE(0xcd34);  // ld de,$cd34
-  CALL_ASM(0x367a, 0x3698, 0x367d); /* unported */  // call $3698
+  CALL(0x367a, loadAnimationData__helper, 0x3698, 0x367d);  // call $3698
   I(0x367d, 3); SET_DE(0xcd37);  // ld de,$cd37
-  CALL_ASM(0x3680, 0x3698, 0x3683); /* unported */  // call $3698
+  CALL(0x3680, loadAnimationData__helper, 0x3698, 0x3683);  // call $3698
   I(0x3683, 3); SET_DE(0xcd3a);  // ld de,$cd3a
-  CALL_ASM(0x3686, 0x3698, 0x3689); /* unported */  // call $3698
+  CALL(0x3686, loadAnimationData__helper, 0x3698, 0x3689);  // call $3698
   SET_DE(POP(0x3689));  // pop de
   SET_AF(POP(0x368a));  // pop af
   I(0x368b, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
@@ -7216,8 +8760,31 @@ void loadAnimationData(GB *gb) {
   RET(0x3697); return;  // ret
 }
 
+// 00:3698
+void loadAnimationData__helper(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3698:
+  PUSH(0x3698, HL);  // push hl
+  I(0x3699, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x369a, 2); H = mem_rd(gb, HL);  // ld h,(hl)
+  I(0x369b, 1); L = A;  // ld l,a
+  I(0x369c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x369d, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x369e, 2); SET_DE(DE + 1);  // inc de
+  I(0x369f, 1); A = L;  // ld a,l
+  I(0x36a0, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x36a1, 2); SET_DE(DE + 1);  // inc de
+  I(0x36a2, 1); A = H;  // ld a,h
+  I(0x36a3, 2); mem_wr(gb, DE, A);  // ld (de),a
+  SET_HL(POP(0x36a4));  // pop hl
+  I(0x36a5, 2); SET_HL(HL + 1);  // inc hl
+  I(0x36a6, 2); SET_HL(HL + 1);  // inc hl
+  RET(0x36a7); return;  // ret
+}
+
 // 00:36a8
 void getIndexOfGashaSpotInRoom(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x36a8, 1); C = A;  // ld c,a
   I(0x36a9, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x36ab, AF);  // push af
@@ -7236,6 +8803,7 @@ void getIndexOfGashaSpotInRoom(GB *gb) {
 
 // 00:36c0
 void getBlackTowerProgress(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x36c0, BC);  // push bc
   I(0x36c1, 2); C = 0x02;  // ld c,$02
   I(0x36c3, 4); A = mem_rd(gb, 0xc790);  // ld a,($c790)
@@ -7254,6 +8822,7 @@ L_36d3:
 
 // 00:36f6
 void forceLoadRoom(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x36f6, 2); alu_and(gb, 0x03);  // and $03
   I(0x36f8, 4); mem_wr(gb, 0xcc32, A);  // ld ($cc32),a
   I(0x36fb, 1); A = B;  // ld a,b
@@ -7269,6 +8838,7 @@ void forceLoadRoom(GB *gb) {
 
 // 00:3775
 void loadUniqueGfxHeader(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3775, 2); alu_and(gb, 0x7f);  // and $7f
   I(0x3777, 1); B = A;  // ld b,a
   I(0x3778, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
@@ -7292,6 +8862,7 @@ void loadUniqueGfxHeader(GB *gb) {
 
 // 00:37db
 void updateTilesetUniqueGfx(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x37db, 4); A = mem_rd(gb, 0xcd20);  // ld a,($cd20)
   I(0x37de, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { RET_TAKEN(0x37df); return; } I(0x37df, 2);  // ret z
@@ -7324,6 +8895,7 @@ void updateTilesetUniqueGfx(GB *gb) {
 
 // 00:380b
 void uniqueGfxFunc_380b(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x380b, 1); B = A;  // ld b,a
   I(0x380c, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x380e, AF);  // push af
@@ -7346,6 +8918,7 @@ void uniqueGfxFunc_380b(GB *gb) {
 
 // 00:3843
 void loadUniqueGfxHeaderEntry(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3843, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x3844, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x3845, 3); goto L_387f; } I(0x3845, 2);  // jr z,$387f
@@ -7395,8 +8968,22 @@ L_387f:
   RET(0x3888); return;  // ret
 }
 
+// 00:387f
+void loadUniqueGfxHeaderEntry__loadPaletteIndex(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_387f:
+  PUSH(0x387f, HL);  // push hl
+  I(0x3880, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x3881, 2); alu_and(gb, 0x7f);  // and $7f
+  CALL(0x3883, loadPaletteHeader, 0x050b, 0x3886);  // call $050b
+  SET_HL(POP(0x3886));  // pop hl
+  I(0x3887, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  RET(0x3888); return;  // ret
+}
+
 // 00:38dc
 void loadRoomLayout(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_38dc;
 L_0fe6:
   I(0x0fe6, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
@@ -7545,7 +9132,7 @@ L_3928:
   I(0x3941, 2); alu_add_hl(gb, BC);  // add hl,bc
   I(0x3942, 3); SET_BC(0xfe00);  // ld bc,$fe00
   I(0x3945, 2); alu_add_hl(gb, BC);  // add hl,bc
-  CALL_ASM(0x3946, 0x3a27, 0x3949); /* unported */  // call $3a27
+  CALL(0x3946, loadRoomLayout__loadLayoutData, 0x3a27, 0x3949);  // call $3a27
   I(0x3949, 3); SET_DE(0xcf00);  // ld de,$cf00
 L_394c:
   I(0x394c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
@@ -7572,7 +9159,7 @@ L_3962:
   I(0x3965, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x3966, 1); B = A;  // ld b,a
   PUSH(0x3967, HL);  // push hl
-  CALL_ASM(0x3968, 0x3913, 0x396b); /* unported */  // call $3913
+  CALL(0x3968, loadRoomLayout__loadLargeRoomLayoutHlpr, 0x3913, 0x396b);  // call $3913
   I(0x396b, 2); D = 0xcf;  // ld d,$cf
   I(0x396d, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
   I(0x396f, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
@@ -7612,7 +9199,7 @@ L_3986:
   I(0x399d, 1); B = A;  // ld b,a
   SET_HL(POP(0x399e));  // pop hl
   I(0x399f, 2); alu_add_hl(gb, BC);  // add hl,bc
-  CALL_ASM(0x39a0, 0x3a27, 0x39a3); /* unported */  // call $3a27
+  CALL(0x39a0, loadRoomLayout__loadLayoutData, 0x3a27, 0x39a3);  // call $3a27
   I(0x39a3, 2); alu_bit(gb, 7, E);  // bit 7,e
   if (!(F & FZ)) { I(0x39a5, 3); goto L_39c1; } I(0x39a5, 2);  // jr nz,$39c1
   I(0x39a7, 2); alu_bit(gb, 6, E);  // bit 6,e
@@ -7639,7 +9226,7 @@ L_39c1:
   I(0x39c4, 2); A = 0x05;  // ld a,$05
 L_39c6:
   PUSH(0x39c6, AF);  // push af
-  CALL_ASM(0x39c7, 0x39cf, 0x39ca); /* unported */  // call $39cf
+  CALL(0x39c7, loadRoomLayout__decompressLayoutMode2Helper, 0x39cf, 0x39ca);  // call $39cf
   SET_AF(POP(0x39ca));  // pop af
   I(0x39cb, 1); A = alu_dec8(gb, A);  // dec a
   if (!(F & FZ)) { I(0x39cc, 3); goto L_39c6; } I(0x39cc, 2);  // jr nz,$39c6
@@ -7649,15 +9236,470 @@ L_39e4:
   I(0x39e7, 2); A = 0x0a;  // ld a,$0a
 L_39e9:
   PUSH(0x39e9, AF);  // push af
-  CALL_ASM(0x39ea, 0x39f2, 0x39ed); /* unported */  // call $39f2
+  CALL(0x39ea, loadRoomLayout__decompressLayoutMode1Helper, 0x39f2, 0x39ed);  // call $39f2
   SET_AF(POP(0x39ed));  // pop af
   I(0x39ee, 1); A = alu_dec8(gb, A);  // dec a
   if (!(F & FZ)) { I(0x39ef, 3); goto L_39e9; } I(0x39ef, 2);  // jr nz,$39e9
   RET(0x39f1); return;  // ret
 }
 
+// 00:3913
+void loadRoomLayout__loadLargeRoomLayoutHlpr(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3913:
+  I(0x3913, 1); D = B;  // ld d,b
+  I(0x3914, 1); A = B;  // ld a,b
+  I(0x3915, 2); alu_and(gb, 0x0f);  // and $0f
+  I(0x3917, 1); B = A;  // ld b,a
+  I(0x3918, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
+  I(0x391a, 1); H = A;  // ld h,a
+  I(0x391b, 3); A = mem_rd(gb, 0xff8e);  // ldh a,($ff8e)
+  I(0x391d, 1); L = A;  // ld l,a
+  I(0x391e, 2); alu_add_hl(gb, BC);  // add hl,bc
+  I(0x391f, 1); A = D;  // ld a,d
+  I(0x3920, 2); A = alu_swap(gb, A);  // swap a
+  I(0x3922, 2); alu_and(gb, 0x0f);  // and $0f
+  I(0x3924, 2); alu_add(gb, 0x03);  // add $03
+  I(0x3926, 1); B = A;  // ld b,a
+  RET(0x3927); return;  // ret
+}
+
+// 00:3928
+void loadRoomLayout__loadLargeRoomLayout(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3928:
+  I(0x3928, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
+  I(0x392a, 1); H = A;  // ld h,a
+  I(0x392b, 3); A = mem_rd(gb, 0xff8e);  // ldh a,($ff8e)
+  I(0x392d, 1); L = A;  // ld l,a
+  I(0x392e, 3); SET_BC(0x1000);  // ld bc,$1000
+  I(0x3931, 2); alu_add_hl(gb, BC);  // add hl,bc
+  I(0x3932, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
+  I(0x3934, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x3936, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  I(0x3939, 4); A = mem_rd(gb, 0xcc2f);  // ld a,($cc2f)
+  RST_PUSH(0x393c, 0x393d);  // rst $18 (addDoubleIndexToHl)
+  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
+  I(0x393d, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x393e, 2); H = mem_rd(gb, HL);  // ld h,(hl)
+  I(0x393f, 1); L = A;  // ld l,a
+  SET_BC(POP(0x3940));  // pop bc
+  I(0x3941, 2); alu_add_hl(gb, BC);  // add hl,bc
+  I(0x3942, 3); SET_BC(0xfe00);  // ld bc,$fe00
+  I(0x3945, 2); alu_add_hl(gb, BC);  // add hl,bc
+  CALL(0x3946, loadRoomLayout__loadLayoutData, 0x3a27, 0x3949);  // call $3a27
+  I(0x3949, 3); SET_DE(0xcf00);  // ld de,$cf00
+L_394c:
+  I(0x394c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x394d, 2); B = 0x08;  // ld b,$08
+L_394f:
+  I(0x394f, 1); alu_rrca(gb);  // rrca
+  I(0x3950, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
+  if ((F & FC)) { I(0x3952, 3); goto L_3962; } I(0x3952, 2);  // jr c,$3962
+  I(0x3954, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3955, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x3956, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x3957, 1); A = E;  // ld a,e
+  I(0x3958, 2); alu_cp(gb, 0xb0);  // cp $b0
+  if ((F & FZ)) { RET_TAKEN(0x395a); return; } I(0x395a, 2);  // ret z
+L_395b:
+  I(0x395b, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+  I(0x395d, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x395e, 3); goto L_394f; } I(0x395e, 2);  // jr nz,$394f
+  I(0x3960, 3); goto L_394c;  // jr $394c
+L_3962:
+  PUSH(0x3962, BC);  // push bc
+  I(0x3963, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3964, 1); C = A;  // ld c,a
+  I(0x3965, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3966, 1); B = A;  // ld b,a
+  PUSH(0x3967, HL);  // push hl
+  CALL(0x3968, loadRoomLayout__loadLargeRoomLayoutHlpr, 0x3913, 0x396b);  // call $3913
+  I(0x396b, 2); D = 0xcf;  // ld d,$cf
+  I(0x396d, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
+  I(0x396f, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x3971, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+L_3974:
+  I(0x3974, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3975, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x3976, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x3977, 1); A = E;  // ld a,e
+  I(0x3978, 2); alu_cp(gb, 0xb0);  // cp $b0
+  if ((F & FZ)) { I(0x397a, 3); goto L_3983; } I(0x397a, 2);  // jr z,$3983
+  I(0x397c, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x397d, 3); goto L_3974; } I(0x397d, 2);  // jr nz,$3974
+  SET_HL(POP(0x397f));  // pop hl
+  SET_BC(POP(0x3980));  // pop bc
+  I(0x3981, 3); goto L_395b;  // jr $395b
+L_3983:
+  SET_HL(POP(0x3983));  // pop hl
+  SET_BC(POP(0x3984));  // pop bc
+  RET(0x3985); return;  // ret
+}
+
+// 00:394c
+void loadRoomLayout__next8(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_394c:
+  I(0x394c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x394d, 2); B = 0x08;  // ld b,$08
+L_394f:
+  I(0x394f, 1); alu_rrca(gb);  // rrca
+  I(0x3950, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
+  if ((F & FC)) { I(0x3952, 3); goto L_3962; } I(0x3952, 2);  // jr c,$3962
+  I(0x3954, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3955, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x3956, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x3957, 1); A = E;  // ld a,e
+  I(0x3958, 2); alu_cp(gb, 0xb0);  // cp $b0
+  if ((F & FZ)) { RET_TAKEN(0x395a); return; } I(0x395a, 2);  // ret z
+L_395b:
+  I(0x395b, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+  I(0x395d, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x395e, 3); goto L_394f; } I(0x395e, 2);  // jr nz,$394f
+  I(0x3960, 3); goto L_394c;  // jr $394c
+L_3962:
+  PUSH(0x3962, BC);  // push bc
+  I(0x3963, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3964, 1); C = A;  // ld c,a
+  I(0x3965, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3966, 1); B = A;  // ld b,a
+  PUSH(0x3967, HL);  // push hl
+  CALL(0x3968, loadRoomLayout__loadLargeRoomLayoutHlpr, 0x3913, 0x396b);  // call $3913
+  I(0x396b, 2); D = 0xcf;  // ld d,$cf
+  I(0x396d, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
+  I(0x396f, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x3971, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+L_3974:
+  I(0x3974, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3975, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x3976, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x3977, 1); A = E;  // ld a,e
+  I(0x3978, 2); alu_cp(gb, 0xb0);  // cp $b0
+  if ((F & FZ)) { I(0x397a, 3); goto L_3983; } I(0x397a, 2);  // jr z,$3983
+  I(0x397c, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x397d, 3); goto L_3974; } I(0x397d, 2);  // jr nz,$3974
+  SET_HL(POP(0x397f));  // pop hl
+  SET_BC(POP(0x3980));  // pop bc
+  I(0x3981, 3); goto L_395b;  // jr $395b
+L_3983:
+  SET_HL(POP(0x3983));  // pop hl
+  SET_BC(POP(0x3984));  // pop bc
+  RET(0x3985); return;  // ret
+}
+
+// 00:394f
+void loadRoomLayout__next(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_394f;
+L_394c:
+  I(0x394c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x394d, 2); B = 0x08;  // ld b,$08
+L_394f:
+  I(0x394f, 1); alu_rrca(gb);  // rrca
+  I(0x3950, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
+  if ((F & FC)) { I(0x3952, 3); goto L_3962; } I(0x3952, 2);  // jr c,$3962
+  I(0x3954, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3955, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x3956, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x3957, 1); A = E;  // ld a,e
+  I(0x3958, 2); alu_cp(gb, 0xb0);  // cp $b0
+  if ((F & FZ)) { RET_TAKEN(0x395a); return; } I(0x395a, 2);  // ret z
+L_395b:
+  I(0x395b, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+  I(0x395d, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x395e, 3); goto L_394f; } I(0x395e, 2);  // jr nz,$394f
+  I(0x3960, 3); goto L_394c;  // jr $394c
+L_3962:
+  PUSH(0x3962, BC);  // push bc
+  I(0x3963, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3964, 1); C = A;  // ld c,a
+  I(0x3965, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3966, 1); B = A;  // ld b,a
+  PUSH(0x3967, HL);  // push hl
+  CALL(0x3968, loadRoomLayout__loadLargeRoomLayoutHlpr, 0x3913, 0x396b);  // call $3913
+  I(0x396b, 2); D = 0xcf;  // ld d,$cf
+  I(0x396d, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
+  I(0x396f, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x3971, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+L_3974:
+  I(0x3974, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3975, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x3976, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x3977, 1); A = E;  // ld a,e
+  I(0x3978, 2); alu_cp(gb, 0xb0);  // cp $b0
+  if ((F & FZ)) { I(0x397a, 3); goto L_3983; } I(0x397a, 2);  // jr z,$3983
+  I(0x397c, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x397d, 3); goto L_3974; } I(0x397d, 2);  // jr nz,$3974
+  SET_HL(POP(0x397f));  // pop hl
+  SET_BC(POP(0x3980));  // pop bc
+  I(0x3981, 3); goto L_395b;  // jr $395b
+L_3983:
+  SET_HL(POP(0x3983));  // pop hl
+  SET_BC(POP(0x3984));  // pop bc
+  RET(0x3985); return;  // ret
+}
+
+// 00:3986
+void loadRoomLayout__loadSmallRoomLayout(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3986:
+  I(0x3986, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
+  I(0x3988, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x398a, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  I(0x398d, 3); A = mem_rd(gb, 0xff8e);  // ldh a,($ff8e)
+  I(0x398f, 1); L = A;  // ld l,a
+  I(0x3990, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
+  I(0x3992, 1); H = A;  // ld h,a
+  I(0x3993, 4); A = mem_rd(gb, 0xcc2f);  // ld a,($cc2f)
+  RST_PUSH(0x3996, 0x3997);  // rst $18 (addDoubleIndexToHl)
+  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
+  I(0x3997, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3998, 1); C = A;  // ld c,a
+  I(0x3999, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x399a, 1); E = A;  // ld e,a
+  I(0x399b, 2); alu_and(gb, 0x3f);  // and $3f
+  I(0x399d, 1); B = A;  // ld b,a
+  SET_HL(POP(0x399e));  // pop hl
+  I(0x399f, 2); alu_add_hl(gb, BC);  // add hl,bc
+  CALL(0x39a0, loadRoomLayout__loadLayoutData, 0x3a27, 0x39a3);  // call $3a27
+  I(0x39a3, 2); alu_bit(gb, 7, E);  // bit 7,e
+  if (!(F & FZ)) { I(0x39a5, 3); goto L_39c1; } I(0x39a5, 2);  // jr nz,$39c1
+  I(0x39a7, 2); alu_bit(gb, 6, E);  // bit 6,e
+  if (!(F & FZ)) { I(0x39a9, 3); goto L_39e4; } I(0x39a9, 2);  // jr nz,$39e4
+  I(0x39ab, 3); SET_DE(0xcf00);  // ld de,$cf00
+  I(0x39ae, 3); SET_BC(0x0a08);  // ld bc,$0a08
+L_39b1:
+  PUSH(0x39b1, BC);  // push bc
+L_39b2:
+  I(0x39b2, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x39b3, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x39b4, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x39b5, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x39b6, 3); goto L_39b2; } I(0x39b6, 2);  // jr nz,$39b2
+  I(0x39b8, 1); A = E;  // ld a,e
+  I(0x39b9, 2); alu_add(gb, 0x06);  // add $06
+  I(0x39bb, 1); E = A;  // ld e,a
+  SET_BC(POP(0x39bc));  // pop bc
+  I(0x39bd, 1); C = alu_dec8(gb, C);  // dec c
+  if (!(F & FZ)) { I(0x39be, 3); goto L_39b1; } I(0x39be, 2);  // jr nz,$39b1
+  RET(0x39c0); return;  // ret
+L_39c1:
+  I(0x39c1, 3); SET_DE(0xcf00);  // ld de,$cf00
+  I(0x39c4, 2); A = 0x05;  // ld a,$05
+L_39c6:
+  PUSH(0x39c6, AF);  // push af
+  CALL(0x39c7, loadRoomLayout__decompressLayoutMode2Helper, 0x39cf, 0x39ca);  // call $39cf
+  SET_AF(POP(0x39ca));  // pop af
+  I(0x39cb, 1); A = alu_dec8(gb, A);  // dec a
+  if (!(F & FZ)) { I(0x39cc, 3); goto L_39c6; } I(0x39cc, 2);  // jr nz,$39c6
+  RET(0x39ce); return;  // ret
+L_39e4:
+  I(0x39e4, 3); SET_DE(0xcf00);  // ld de,$cf00
+  I(0x39e7, 2); A = 0x0a;  // ld a,$0a
+L_39e9:
+  PUSH(0x39e9, AF);  // push af
+  CALL(0x39ea, loadRoomLayout__decompressLayoutMode1Helper, 0x39f2, 0x39ed);  // call $39f2
+  SET_AF(POP(0x39ed));  // pop af
+  I(0x39ee, 1); A = alu_dec8(gb, A);  // dec a
+  if (!(F & FZ)) { I(0x39ef, 3); goto L_39e9; } I(0x39ef, 2);  // jr nz,$39e9
+  RET(0x39f1); return;  // ret
+}
+
+// 00:39c1
+void loadRoomLayout__decompressLayoutMode2(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_39c1:
+  I(0x39c1, 3); SET_DE(0xcf00);  // ld de,$cf00
+  I(0x39c4, 2); A = 0x05;  // ld a,$05
+L_39c6:
+  PUSH(0x39c6, AF);  // push af
+  CALL(0x39c7, loadRoomLayout__decompressLayoutMode2Helper, 0x39cf, 0x39ca);  // call $39cf
+  SET_AF(POP(0x39ca));  // pop af
+  I(0x39cb, 1); A = alu_dec8(gb, A);  // dec a
+  if (!(F & FZ)) { I(0x39cc, 3); goto L_39c6; } I(0x39cc, 2);  // jr nz,$39c6
+  RET(0x39ce); return;  // ret
+}
+
+// 00:39cf
+void loadRoomLayout__decompressLayoutMode2Helper(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_39cf:
+  I(0x39cf, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x39d0, 1); C = A;  // ld c,a
+  I(0x39d1, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x39d2, 3); mem_wr(gb, 0xff8a, A);  // ldh ($ff8a),a
+  I(0x39d4, 1); alu_or(gb, C);  // or c
+  I(0x39d5, 2); B = 0x10;  // ld b,$10
+  if ((F & FZ)) { I(0x39d7, 3); goto L_39fe; } I(0x39d7, 2);  // jr z,$39fe
+  I(0x39d9, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x39da, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
+  CALL(0x39dc, loadRoomLayout__decompressLayoutHelper, 0x3a13, 0x39df);  // call $3a13
+  I(0x39df, 3); A = mem_rd(gb, 0xff8a);  // ldh a,($ff8a)
+  I(0x39e1, 1); C = A;  // ld c,a
+  I(0x39e2, 3); goto L_3a13;  // jr $3a13
+L_39fe:
+  I(0x39fe, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x39ff, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x3a00, 1); E = alu_inc8(gb, E);  // inc e
+  CALL(0x3a01, loadRoomLayout__checkDeNextLayoutRow, 0x3a08, 0x3a04);  // call $3a08
+  I(0x3a04, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x3a05, 3); goto L_39fe; } I(0x3a05, 2);  // jr nz,$39fe
+  RET(0x3a07); return;  // ret
+L_3a13:
+  I(0x3a13, 2); B = 0x08;  // ld b,$08
+L_3a15:
+  I(0x3a15, 2); C = alu_srl(gb, C);  // srl c
+  if ((F & FC)) { I(0x3a17, 3); goto L_3a1c; } I(0x3a17, 2);  // jr c,$3a1c
+  I(0x3a19, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3a1a, 3); goto L_3a1e;  // jr $3a1e
+L_3a1c:
+  I(0x3a1c, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+L_3a1e:
+  I(0x3a1e, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x3a1f, 1); E = alu_inc8(gb, E);  // inc e
+  CALL(0x3a20, loadRoomLayout__checkDeNextLayoutRow, 0x3a08, 0x3a23);  // call $3a08
+  I(0x3a23, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x3a24, 3); goto L_3a15; } I(0x3a24, 2);  // jr nz,$3a15
+  RET(0x3a26); return;  // ret
+}
+
+// 00:39e4
+void loadRoomLayout__decompressLayoutMode1(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_39e4:
+  I(0x39e4, 3); SET_DE(0xcf00);  // ld de,$cf00
+  I(0x39e7, 2); A = 0x0a;  // ld a,$0a
+L_39e9:
+  PUSH(0x39e9, AF);  // push af
+  CALL(0x39ea, loadRoomLayout__decompressLayoutMode1Helper, 0x39f2, 0x39ed);  // call $39f2
+  SET_AF(POP(0x39ed));  // pop af
+  I(0x39ee, 1); A = alu_dec8(gb, A);  // dec a
+  if (!(F & FZ)) { I(0x39ef, 3); goto L_39e9; } I(0x39ef, 2);  // jr nz,$39e9
+  RET(0x39f1); return;  // ret
+}
+
+// 00:39f2
+void loadRoomLayout__decompressLayoutMode1Helper(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_39f2:
+  I(0x39f2, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x39f3, 1); C = A;  // ld c,a
+  I(0x39f4, 1); alu_or(gb, A);  // or a
+  I(0x39f5, 2); B = 0x08;  // ld b,$08
+  if ((F & FZ)) { I(0x39f7, 3); goto L_39fe; } I(0x39f7, 2);  // jr z,$39fe
+  I(0x39f9, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x39fa, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
+  I(0x39fc, 3); goto L_3a13;  // jr $3a13
+L_39fe:
+  I(0x39fe, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x39ff, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x3a00, 1); E = alu_inc8(gb, E);  // inc e
+  CALL(0x3a01, loadRoomLayout__checkDeNextLayoutRow, 0x3a08, 0x3a04);  // call $3a08
+  I(0x3a04, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x3a05, 3); goto L_39fe; } I(0x3a05, 2);  // jr nz,$39fe
+  RET(0x3a07); return;  // ret
+L_3a13:
+  I(0x3a13, 2); B = 0x08;  // ld b,$08
+L_3a15:
+  I(0x3a15, 2); C = alu_srl(gb, C);  // srl c
+  if ((F & FC)) { I(0x3a17, 3); goto L_3a1c; } I(0x3a17, 2);  // jr c,$3a1c
+  I(0x3a19, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3a1a, 3); goto L_3a1e;  // jr $3a1e
+L_3a1c:
+  I(0x3a1c, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+L_3a1e:
+  I(0x3a1e, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x3a1f, 1); E = alu_inc8(gb, E);  // inc e
+  CALL(0x3a20, loadRoomLayout__checkDeNextLayoutRow, 0x3a08, 0x3a23);  // call $3a08
+  I(0x3a23, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x3a24, 3); goto L_3a15; } I(0x3a24, 2);  // jr nz,$3a15
+  RET(0x3a26); return;  // ret
+}
+
+// 00:39fe
+void loadRoomLayout__layoutCopyBytes(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_39fe:
+  I(0x39fe, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x39ff, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x3a00, 1); E = alu_inc8(gb, E);  // inc e
+  CALL(0x3a01, loadRoomLayout__checkDeNextLayoutRow, 0x3a08, 0x3a04);  // call $3a08
+  I(0x3a04, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x3a05, 3); goto L_39fe; } I(0x3a05, 2);  // jr nz,$39fe
+  RET(0x3a07); return;  // ret
+}
+
+// 00:3a08
+void loadRoomLayout__checkDeNextLayoutRow(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3a08:
+  I(0x3a08, 1); A = E;  // ld a,e
+  I(0x3a09, 2); alu_and(gb, 0x0f);  // and $0f
+  I(0x3a0b, 2); alu_cp(gb, 0x0a);  // cp $0a
+  if ((F & FC)) { RET_TAKEN(0x3a0d); return; } I(0x3a0d, 2);  // ret c
+  I(0x3a0e, 2); A = 0x06;  // ld a,$06
+  I(0x3a10, 1); alu_add(gb, E);  // add e
+  I(0x3a11, 1); E = A;  // ld e,a
+  RET(0x3a12); return;  // ret
+}
+
+// 00:3a13
+void loadRoomLayout__decompressLayoutHelper(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3a13:
+  I(0x3a13, 2); B = 0x08;  // ld b,$08
+L_3a15:
+  I(0x3a15, 2); C = alu_srl(gb, C);  // srl c
+  if ((F & FC)) { I(0x3a17, 3); goto L_3a1c; } I(0x3a17, 2);  // jr c,$3a1c
+  I(0x3a19, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3a1a, 3); goto L_3a1e;  // jr $3a1e
+L_3a1c:
+  I(0x3a1c, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+L_3a1e:
+  I(0x3a1e, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x3a1f, 1); E = alu_inc8(gb, E);  // inc e
+  CALL(0x3a20, loadRoomLayout__checkDeNextLayoutRow, 0x3a08, 0x3a23);  // call $3a08
+  I(0x3a23, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x3a24, 3); goto L_3a15; } I(0x3a24, 2);  // jr nz,$3a15
+  RET(0x3a26); return;  // ret
+}
+
+// 00:3a27
+void loadRoomLayout__loadLayoutData(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3a27:
+  PUSH(0x3a27, DE);  // push de
+  I(0x3a28, 3); A = mem_rd(gb, 0xff8c);  // ldh a,($ff8c)
+  I(0x3a2a, 1); E = A;  // ld e,a
+L_3a2b:
+  I(0x3a2b, 2); alu_bit(gb, 7, H);  // bit 7,h
+  if ((F & FZ)) { I(0x3a2d, 3); goto L_3a36; } I(0x3a2d, 2);  // jr z,$3a36
+  I(0x3a2f, 1); A = H;  // ld a,h
+  I(0x3a30, 2); alu_sub(gb, 0x40);  // sub $40
+  I(0x3a32, 1); H = A;  // ld h,a
+  I(0x3a33, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x3a34, 3); goto L_3a2b;  // jr $3a2b
+L_3a36:
+  I(0x3a36, 1); A = E;  // ld a,e
+  I(0x3a37, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x3a39, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  I(0x3a3c, 2); B = 0xb0;  // ld b,$b0
+  I(0x3a3e, 3); SET_DE(0xce00);  // ld de,$ce00
+L_3a41:
+  CALL(0x3a41, readByteSequential, 0x0788, 0x3a44);  // call $0788
+  I(0x3a44, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x3a45, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x3a46, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x3a47, 3); goto L_3a41; } I(0x3a47, 2);  // jr nz,$3a41
+  I(0x3a49, 3); SET_HL(0xce00);  // ld hl,$ce00
+  SET_DE(POP(0x3a4c));  // pop de
+  RET(0x3a4d); return;  // ret
+}
+
 // 00:3a4e
 void generateVramTilesWithRoomChanges(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3a4e, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
   I(0x3a50, 1); C = A;  // ld c,a
   I(0x3a51, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
@@ -7669,7 +9711,7 @@ void generateVramTilesWithRoomChanges(GB *gb) {
   CALL_ASM(0x3a5c, 0x6bf1, 0x3a5f); /* unported */  // call $6bf1
   I(0x3a5f, 3); SET_HL(0x7a88);  // ld hl,$7a88
   I(0x3a62, 2); E = 0x02;  // ld e,$02
-  CALL_ASM(0x3a64, 0x008a, 0x3a67); /* interBankCall */  // call $008a
+  CALL(0x3a64, interBankCall, 0x008a, 0x3a67);  // call $008a
   SET_BC(POP(0x3a67));  // pop bc
   I(0x3a68, 1); A = B;  // ld a,b
   I(0x3a69, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
@@ -7681,6 +9723,7 @@ void generateVramTilesWithRoomChanges(GB *gb) {
 
 // 00:3a72
 void getTileMappingData(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3a72, 1); C = A;  // ld c,a
   I(0x3a73, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
   PUSH(0x3a75, AF);  // push af
@@ -7704,6 +9747,7 @@ void getTileMappingData(GB *gb) {
 
 // 00:3a94
 void setHlToTileMappingDataPlusATimes8(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x3a94, multiplyABy8, 0x01b7, 0x3a97);  // call $01b7
   I(0x3a97, 3); SET_HL(0xd000);  // ld hl,$d000
   I(0x3a9a, 2); alu_add_hl(gb, BC);  // add hl,bc
@@ -7712,6 +9756,7 @@ void setHlToTileMappingDataPlusATimes8(GB *gb) {
 
 // 00:3a9c
 void setTile(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3a9c, 1); B = A;  // ld b,a
   I(0x3a9d, 4); A = mem_rd(gb, 0xcce0);  // ld a,($cce0)
   I(0x3aa0, 1); A = alu_inc8(gb, A);  // inc a
@@ -7745,6 +9790,7 @@ void setTile(GB *gb) {
 
 // 00:3ac6
 void setTileInAllBuffers(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3ac6, 1); E = A;  // ld e,a
   I(0x3ac7, 1); B = A;  // ld b,a
   CALL(0x3ac8, setTileInRoomLayoutBuffer, 0x1426, 0x3acb);  // call $1426
@@ -7754,6 +9800,7 @@ void setTileInAllBuffers(GB *gb) {
 
 // 00:3acf
 void setInterleavedTile(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x3acf, DE);  // push de
   I(0x3ad0, 1); E = A;  // ld e,a
   I(0x3ad1, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
@@ -7778,6 +9825,7 @@ void setInterleavedTile(GB *gb) {
 
 // 00:3aef
 void getFreeInteractionSlot(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3aef, 3); SET_HL(0xd240);  // ld hl,$d240
 L_3af2:
   I(0x3af2, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -7798,12 +9846,14 @@ L_3afe:
 
 // 00:3b02
 void interactionDeleteAndUnmarkSolidPosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x3b02, objectUnmarkSolidPosition, 0x2504, 0x3b05);  // call $2504
   interactionDelete(gb); return;  // fallthrough
 }
 
 // 00:3b05
 void interactionDelete(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3b05, 1); H = D;  // ld h,d
   I(0x3b06, 2); L = 0x40;  // ld l,$40
   I(0x3b08, 2); B = 0x10;  // ld b,$10
@@ -7820,6 +9870,7 @@ L_3b0b:
 
 // 00:3b36
 void updateInteractions(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3b36, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
   I(0x3b39, 2); alu_cp(gb, 0x08);  // cp $08
   if ((F & FZ)) { I(0x3b3b, 3); _updateInteractionsIfStateIsZero(gb); return; } I(0x3b3b, 2);  // jr z,$3b13
@@ -7840,6 +9891,44 @@ L_3b50:
   I(0x3b56, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { CALL(0x3b57, updateInteraction, 0x3b62, 0x3b5a); } else I(0x3b57, 3);  // call nz,$3b62
   I(0x3b5a, 3); A = mem_rd(gb, 0xffaf);  // ldh a,($ffaf)
+L_3b5c:
+  I(0x3b5c, 1); A = alu_inc8(gb, A);  // inc a
+  I(0x3b5d, 2); alu_cp(gb, 0xe0);  // cp $e0
+  if ((F & FC)) { I(0x3b5f, 3); goto L_3b50; } I(0x3b5f, 2);  // jr c,$3b50
+  RET(0x3b61); return;  // ret
+}
+
+// 00:3b50
+void updateInteractions__next(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3b50:
+  I(0x3b50, 3); mem_wr(gb, 0xffaf, A);  // ldh ($ffaf),a
+  I(0x3b52, 1); D = A;  // ld d,a
+  I(0x3b53, 2); E = 0x40;  // ld e,$40
+  I(0x3b55, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x3b56, 1); alu_or(gb, A);  // or a
+  if (!(F & FZ)) { CALL(0x3b57, updateInteraction, 0x3b62, 0x3b5a); } else I(0x3b57, 3);  // call nz,$3b62
+  I(0x3b5a, 3); A = mem_rd(gb, 0xffaf);  // ldh a,($ffaf)
+L_3b5c:
+  I(0x3b5c, 1); A = alu_inc8(gb, A);  // inc a
+  I(0x3b5d, 2); alu_cp(gb, 0xe0);  // cp $e0
+  if ((F & FC)) { I(0x3b5f, 3); goto L_3b50; } I(0x3b5f, 2);  // jr c,$3b50
+  RET(0x3b61); return;  // ret
+}
+
+// 00:3b5c
+void updateInteractions__jump3b5c(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_3b5c;
+L_3b50:
+  I(0x3b50, 3); mem_wr(gb, 0xffaf, A);  // ldh ($ffaf),a
+  I(0x3b52, 1); D = A;  // ld d,a
+  I(0x3b53, 2); E = 0x40;  // ld e,$40
+  I(0x3b55, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x3b56, 1); alu_or(gb, A);  // or a
+  if (!(F & FZ)) { CALL(0x3b57, updateInteraction, 0x3b62, 0x3b5a); } else I(0x3b57, 3);  // call nz,$3b62
+  I(0x3b5a, 3); A = mem_rd(gb, 0xffaf);  // ldh a,($ffaf)
+L_3b5c:
   I(0x3b5c, 1); A = alu_inc8(gb, A);  // inc a
   I(0x3b5d, 2); alu_cp(gb, 0xe0);  // cp $e0
   if ((F & FC)) { I(0x3b5f, 3); goto L_3b50; } I(0x3b5f, 2);  // jr c,$3b50
@@ -7848,6 +9937,7 @@ L_3b50:
 
 // 00:3b62
 void updateInteraction(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3b62, 2); E = 0x41;  // ld e,$41
   I(0x3b64, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x3b65, 2); B = 0x08;  // ld b,$08
@@ -7877,8 +9967,26 @@ L_3b7c:
   I(0x3b8a, 1); HANDOFF(HL);  // jp hl
 }
 
+// 00:3b7c
+void updateInteraction__cnt(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3b7c:
+  I(0x3b7c, 1); A = B;  // ld a,b
+  I(0x3b7d, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x3b7f, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  I(0x3b82, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x3b83, 3); SET_HL(0x3b8b);  // ld hl,$3b8b
+  RST_PUSH(0x3b86, 0x3b87);  // rst $18 (addDoubleIndexToHl)
+  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
+  I(0x3b87, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3b88, 2); H = mem_rd(gb, HL);  // ld h,(hl)
+  I(0x3b89, 1); L = A;  // ld l,a
+  I(0x3b8a, 1); HANDOFF(HL);  // jp hl
+}
+
 // 00:3d59
 void checkObjectIsCloseToPosition_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3d59, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   I(0x3d5b, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x3d5d, AF);  // push af
@@ -7902,6 +10010,7 @@ L_3d6d:
 
 // 00:3d78
 void checkNpcShouldExistAtGameStage(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3d78, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   I(0x3d7a, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x3d7c, AF);  // push af
@@ -7924,6 +10033,7 @@ L_3d8e:
 
 // 00:3da0
 void interactionSetSimpleScript(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3da0, 2); E = 0x58;  // ld e,$58
   I(0x3da2, 1); A = L;  // ld a,l
   I(0x3da3, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -7935,6 +10045,7 @@ void interactionSetSimpleScript(GB *gb) {
 
 // 00:3da8
 void interactionRunSimpleScript(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3da8, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x3daa, AF);  // push af
   I(0x3dab, 2); A = 0x0c;  // ld a,$0c
@@ -7949,7 +10060,7 @@ L_3db8:
   I(0x3db8, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x3db9, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x3dba, 3); goto L_3dcc; } I(0x3dba, 2);  // jr z,$3dcc
-  CALL_ASM(0x3dbc, 0x3dd4, 0x3dbf); /* unported */  // call $3dd4
+  CALL(0x3dbc, interactionRunSimpleScript__runCommand, 0x3dd4, 0x3dbf);  // call $3dd4
   if ((F & FC)) { I(0x3dbf, 3); goto L_3db8; } I(0x3dbf, 2);  // jr c,$3db8
   CALL(0x3dc1, interactionSetSimpleScript, 0x3da0, 0x3dc4);  // call $3da0
   SET_AF(POP(0x3dc4));  // pop af
@@ -7965,8 +10076,140 @@ L_3dcc:
   RET(0x3dd3); return;  // ret
 }
 
+// 00:3dcc
+void interactionRunSimpleScript__scriptEnd(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3dcc:
+  SET_AF(POP(0x3dcc));  // pop af
+  I(0x3dcd, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x3dcf, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  I(0x3dd2, 1); alu_scf(gb);  // scf
+  RET(0x3dd3); return;  // ret
+}
+
+// 00:3dd4
+void interactionRunSimpleScript__runCommand(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3dd4:
+  I(0x3dd4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  PUSH(0x3dd5, HL);  // push hl
+  RST_PUSH(0x3dd6, 0x3dd7);  // rst $00 (jump table)
+  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
+  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
+  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
+  switch (HL) { case 0x3de1: goto L_3de1; case 0x3de3: goto L_3de3; case 0x3dea: goto L_3dea; case 0x3df2: goto L_3df2; case 0x3dfd: goto L_3dfd; default: HANDOFF(HL); }
+L_3de1:
+  SET_HL(POP(0x3de1));  // pop hl
+  RET(0x3de2); return;  // ret
+L_3de3:
+  SET_HL(POP(0x3de3));  // pop hl
+  I(0x3de4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3de5, 2); E = 0x46;  // ld e,$46
+  I(0x3de7, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x3de8, 1); alu_xor(gb, A);  // xor a
+  RET(0x3de9); return;  // ret
+L_3dea:
+  SET_HL(POP(0x3dea));  // pop hl
+  I(0x3deb, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  PUSH(0x3dec, HL);  // push hl
+  CALL(0x3ded, playSound_b00, 0x0c98, 0x3df0);  // call $0c98
+  SET_HL(POP(0x3df0));  // pop hl
+  RET(0x3df1); return;  // ret
+L_3df2:
+  SET_HL(POP(0x3df2));  // pop hl
+  I(0x3df3, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3df4, 1); C = A;  // ld c,a
+  I(0x3df5, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  PUSH(0x3df6, HL);  // push hl
+  CALL(0x3df7, setTile, 0x3a9c, 0x3dfa);  // call $3a9c
+  SET_HL(POP(0x3dfa));  // pop hl
+  I(0x3dfb, 1); alu_scf(gb);  // scf
+  RET(0x3dfc); return;  // ret
+L_3dfd:
+  SET_HL(POP(0x3dfd));  // pop hl
+  I(0x3dfe, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3dff, 3); mem_wr(gb, 0xff8c, A);  // ldh ($ff8c),a
+  I(0x3e01, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3e02, 3); mem_wr(gb, 0xff8f, A);  // ldh ($ff8f),a
+  I(0x3e04, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3e05, 3); mem_wr(gb, 0xff8e, A);  // ldh ($ff8e),a
+  I(0x3e07, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  PUSH(0x3e08, HL);  // push hl
+  CALL(0x3e09, setInterleavedTile, 0x3acf, 0x3e0c);  // call $3acf
+  SET_HL(POP(0x3e0c));  // pop hl
+  I(0x3e0d, 1); alu_scf(gb);  // scf
+  RET(0x3e0e); return;  // ret
+}
+
+// 00:3de1
+void interactionRunSimpleScript__command0(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3de1:
+  SET_HL(POP(0x3de1));  // pop hl
+  RET(0x3de2); return;  // ret
+}
+
+// 00:3de3
+void interactionRunSimpleScript__command1(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3de3:
+  SET_HL(POP(0x3de3));  // pop hl
+  I(0x3de4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3de5, 2); E = 0x46;  // ld e,$46
+  I(0x3de7, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x3de8, 1); alu_xor(gb, A);  // xor a
+  RET(0x3de9); return;  // ret
+}
+
+// 00:3dea
+void interactionRunSimpleScript__command2(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3dea:
+  SET_HL(POP(0x3dea));  // pop hl
+  I(0x3deb, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  PUSH(0x3dec, HL);  // push hl
+  CALL(0x3ded, playSound_b00, 0x0c98, 0x3df0);  // call $0c98
+  SET_HL(POP(0x3df0));  // pop hl
+  RET(0x3df1); return;  // ret
+}
+
+// 00:3df2
+void interactionRunSimpleScript__command3(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3df2:
+  SET_HL(POP(0x3df2));  // pop hl
+  I(0x3df3, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3df4, 1); C = A;  // ld c,a
+  I(0x3df5, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  PUSH(0x3df6, HL);  // push hl
+  CALL(0x3df7, setTile, 0x3a9c, 0x3dfa);  // call $3a9c
+  SET_HL(POP(0x3dfa));  // pop hl
+  I(0x3dfb, 1); alu_scf(gb);  // scf
+  RET(0x3dfc); return;  // ret
+}
+
+// 00:3dfd
+void interactionRunSimpleScript__command4(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_3dfd:
+  SET_HL(POP(0x3dfd));  // pop hl
+  I(0x3dfe, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3dff, 3); mem_wr(gb, 0xff8c, A);  // ldh ($ff8c),a
+  I(0x3e01, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3e02, 3); mem_wr(gb, 0xff8f, A);  // ldh ($ff8f),a
+  I(0x3e04, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3e05, 3); mem_wr(gb, 0xff8e, A);  // ldh ($ff8e),a
+  I(0x3e07, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  PUSH(0x3e08, HL);  // push hl
+  CALL(0x3e09, setInterleavedTile, 0x3acf, 0x3e0c);  // call $3acf
+  SET_HL(POP(0x3e0c));  // pop hl
+  I(0x3e0d, 1); alu_scf(gb);  // scf
+  RET(0x3e0e); return;  // ret
+}
+
 // 00:3e0f
 void getWildTokayObjectDataIndex(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3e0f, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x3e11, AF);  // push af
   I(0x3e12, 2); A = 0x12;  // ld a,$12
@@ -7987,6 +10230,7 @@ void getWildTokayObjectDataIndex(GB *gb) {
 
 // 00:3e28
 void objectCreateSparkle(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x3e28, getFreeInteractionSlot, 0x3aef, 0x3e2b);  // call $3aef
   if (!(F & FZ)) { RET_TAKEN(0x3e2b); return; } I(0x3e2b, 2);  // ret nz
   I(0x3e2c, 3); mem_wr(gb, HL, 0x84);  // ld (hl),$84
@@ -7997,6 +10241,7 @@ void objectCreateSparkle(GB *gb) {
 
 // 00:3e34
 void objectCreateSparkleMovingUp(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x3e34, getFreeInteractionSlot, 0x3aef, 0x3e37);  // call $3aef
   if (!(F & FZ)) { RET_TAKEN(0x3e37); return; } I(0x3e37, 2);  // ret nz
   I(0x3e38, 3); mem_wr(gb, HL, 0x84);  // ld (hl),$84
@@ -8011,6 +10256,7 @@ void objectCreateSparkleMovingUp(GB *gb) {
 
 // 00:3e47
 void objectCreateRedBlueOrb(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x3e47, getFreeInteractionSlot, 0x3aef, 0x3e4a);  // call $3aef
   if (!(F & FZ)) { RET_TAKEN(0x3e4a); return; } I(0x3e4a, 2);  // ret nz
   I(0x3e4b, 3); mem_wr(gb, HL, 0x84);  // ld (hl),$84
@@ -8021,6 +10267,7 @@ void objectCreateRedBlueOrb(GB *gb) {
 
 // 00:3e53
 void incMakuTreeState(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3e53, 4); A = mem_rd(gb, 0xc6e8);  // ld a,($c6e8)
   I(0x3e56, 1); A = alu_inc8(gb, A);  // inc a
   I(0x3e57, 2); alu_cp(gb, 0x11);  // cp $11
@@ -8033,6 +10280,7 @@ L_3e5d:
 
 // 00:3e61
 void setLinkDirection(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3e61, 1); B = A;  // ld b,a
   I(0x3e62, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
   I(0x3e65, 1); H = A;  // ld h,a
@@ -8045,6 +10293,7 @@ void setLinkDirection(GB *gb) {
 
 // 00:3e6d
 void interactionFunc_3e6d(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x3e6d, DE);  // push de
   I(0x3e6e, 2); L = 0x43;  // ld l,$43
   I(0x3e70, 2); E = mem_rd(gb, HL);  // ld e,(hl)
@@ -8070,6 +10319,7 @@ void interactionFunc_3e6d(GB *gb) {
 
 // 00:3e8e
 void getFreePartSlot(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3e8e, 3); SET_HL(0xd0c0);  // ld hl,$d0c0
 L_3e91:
   I(0x3e91, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -8090,6 +10340,7 @@ L_3e9d:
 
 // 00:3ea1
 void partDelete(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3ea1, 1); H = D;  // ld h,d
   I(0x3ea2, 2); L = 0xc0;  // ld l,$c0
   I(0x3ea4, 2); B = 0x10;  // ld b,$10
@@ -8106,18 +10357,20 @@ L_3ea7:
 
 // 00:3eaf
 void checkLinkCanSurface(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3eaf, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
   I(0x3eb2, 2); alu_and(gb, 0x40);  // and $40
   if ((F & FZ)) { RET_TAKEN(0x3eb4); return; } I(0x3eb4, 2);  // ret z
   I(0x3eb5, 3); SET_HL(0x78e4);  // ld hl,$78e4
   I(0x3eb8, 2); E = 0x12;  // ld e,$12
-  CALL_ASM(0x3eba, 0x008a, 0x3ebd); /* interBankCall */  // call $008a
+  CALL(0x3eba, interBankCall, 0x008a, 0x3ebd);  // call $008a
   I(0x3ebd, 2); C = alu_srl(gb, C);  // srl c
   RET(0x3ebf); return;  // ret
 }
 
 // 00:3ec0
 void copy256BytesFromBank(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3ec0, 1); A = E;  // ld a,e
   I(0x3ec1, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
   I(0x3ec3, 1); A = C;  // ld a,c
@@ -8130,6 +10383,7 @@ void copy256BytesFromBank(GB *gb) {
 
 // 00:3035
 void objectLoadMovementScript(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3035, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x3037, AF);  // push af
   I(0x3038, 2); A = 0x0e;  // ld a,$0e
@@ -8144,6 +10398,7 @@ void objectLoadMovementScript(GB *gb) {
 
 // 00:3049
 void objectRunMovementScript(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3049, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x304b, AF);  // push af
   I(0x304c, 2); A = 0x0e;  // ld a,$0e
@@ -8158,6 +10413,7 @@ void objectRunMovementScript(GB *gb) {
 
 // 00:305d
 void decCbb3(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x305d, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x3060, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
   RET(0x3061); return;  // ret
@@ -8165,6 +10421,7 @@ void decCbb3(GB *gb) {
 
 // 00:3062
 void incCbc1(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3062, 3); SET_HL(0xcbc1);  // ld hl,$cbc1
   I(0x3065, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   RET(0x3066); return;  // ret
@@ -8172,6 +10429,7 @@ void incCbc1(GB *gb) {
 
 // 00:3067
 void incCbc2(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3067, 3); SET_HL(0xcbc2);  // ld hl,$cbc2
   I(0x306a, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   RET(0x306b); return;  // ret
@@ -8179,6 +10437,7 @@ void incCbc2(GB *gb) {
 
 // 00:306c
 void endgameCutsceneHandler(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x306c, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x306e, AF);  // push af
   I(0x306f, 2); A = 0x03;  // ld a,$03
@@ -8193,6 +10452,7 @@ void endgameCutsceneHandler(GB *gb) {
 
 // 00:3099
 void fileSelect_redrawDecorations(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3099, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x309b, AF);  // push af
   I(0x309c, 2); A = 0x02;  // ld a,$02
@@ -8209,6 +10469,7 @@ void fileSelect_redrawDecorations(GB *gb) {
 
 // 00:30b0
 void disableLcdAndLoadRoom(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x30b0, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x30b2, AF);  // push af
   I(0x30b3, 2); A = 0x03;  // ld a,$03
@@ -8223,6 +10484,7 @@ void disableLcdAndLoadRoom(GB *gb) {
 
 // 00:30c4
 void playWaveSoundAtRandomIntervals(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x30c4, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x30c6, AF);  // push af
   I(0x30c7, 2); A = 0x10;  // ld a,$10
@@ -8237,6 +10499,7 @@ void playWaveSoundAtRandomIntervals(GB *gb) {
 
 // 00:30d8
 void addSpritesFromBankToOam_withOffset(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x30d8, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x30da, AF);  // push af
   I(0x30db, 1); A = E;  // ld a,e
@@ -8251,6 +10514,7 @@ void addSpritesFromBankToOam_withOffset(GB *gb) {
 
 // 00:30eb
 void addSpritesFromBankToOam(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x30eb, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x30ed, AF);  // push af
   I(0x30ee, 1); A = E;  // ld a,e
@@ -8265,6 +10529,7 @@ void addSpritesFromBankToOam(GB *gb) {
 
 // 00:09d4
 void initializeFile_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x09d4, 2); C = 0x00;  // ld c,$00
   I(0x09d6, 3); goto L_09e2;  // jr $09e2
 L_09e2:
@@ -8284,6 +10549,7 @@ L_09e2:
 
 // 00:09d8
 void saveFile_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x09d8, 2); C = 0x01;  // ld c,$01
   I(0x09da, 3); goto L_09e2;  // jr $09e2
 L_09e2:
@@ -8303,6 +10569,7 @@ L_09e2:
 
 // 00:09dc
 void loadFile_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x09dc, 2); C = 0x02;  // ld c,$02
   I(0x09de, 3); goto L_09e2;  // jr $09e2
 L_09e2:
@@ -8322,6 +10589,7 @@ L_09e2:
 
 // 00:09e0
 void eraseFile_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x09e0, 2); C = 0x03;  // ld c,$03
   I(0x09e2, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x09e4, AF);  // push af
@@ -8339,6 +10607,7 @@ void eraseFile_b00(GB *gb) {
 
 // 00:0150
 void begin(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0150, 1);  // nop
   I(0x0151, 1); gb->ime = false; gb->ime_delay = false; gb->ime_writes++;  // di
   I(0x0152, 2); alu_cp(gb, 0x11);  // cp $11
@@ -8359,7 +10628,19 @@ L_015f:
 
 // 00:0169
 void resetGame(GB *gb) {
-  I(0x0169, 3); gb->sp = 0xc110; gb->sp_loads++; HANDOFF(0x016c);  // ld sp,$c110
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x0169, 3); gb->sp = 0xc110; gb->sp_loads++; HANDOFF_UP(0x016c);  // ld sp,$c110
+L_016c:
+  I(0x016c, 2); A = 0x03;  // ld a,$03
+  I(0x016e, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x0170, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  I(0x0173, 4); HANDOFF(0x4000); /* unported */  // jp $4000
+}
+
+// 00:016c
+void resetGame__afterSp016c(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_016c:
   I(0x016c, 2); A = 0x03;  // ld a,$03
   I(0x016e, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x0170, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -8368,6 +10649,7 @@ void resetGame(GB *gb) {
 
 // 00:0223
 void _flagHlpr(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0223, 1); B = A;  // ld b,a
   I(0x0224, 2); alu_and(gb, 0xf8);  // and $f8
   I(0x0226, 1); alu_rlca(gb);  // rlca
@@ -8386,6 +10668,7 @@ void _flagHlpr(GB *gb) {
 
 // 00:026d
 void pollInput(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x026d, 2); C = 0x00;  // ld c,$00
   I(0x026f, 2); A = 0x20;  // ld a,$20
   I(0x0271, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
@@ -8420,6 +10703,7 @@ void pollInput(GB *gb) {
 
 // 00:0294
 void getInputWithAutofire(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x0294, HL);  // push hl
   PUSH(0x0295, BC);  // push bc
   I(0x0296, 4); A = mem_rd(gb, 0xc481);  // ld a,($c481)
@@ -8455,6 +10739,7 @@ L_02be:
 
 // 00:02ea
 void loadGfxRegisterStateIndex(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x02ea, 1); L = A;  // ld l,a
   I(0x02eb, 1); alu_add(gb, A);  // add a
   I(0x02ec, 1); alu_add(gb, L);  // add l
@@ -8478,6 +10763,7 @@ L_02f7:
 
 // 00:050b
 void loadPaletteHeader(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x050b, DE);  // push de
   I(0x050c, 1); L = A;  // ld l,a
   I(0x050d, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
@@ -8575,6 +10861,7 @@ L_0572:
 
 // 00:058a
 void queueDmaTransfer(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x058a, 3); A = mem_rd(gb, 0xff40);  // ldh a,($ff40)
   I(0x058c, 1); alu_rlca(gb);  // rlca
   if (!(F & FC)) { I(0x058d, 3); goto L_05af; } I(0x058d, 2);  // jr nc,$05af
@@ -8638,8 +10925,45 @@ L_05af:
   RET(0x05d9); return;  // ret
 }
 
+// 00:05af
+void queueDmaTransfer__lcdOff(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_05af:
+  I(0x05af, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
+  PUSH(0x05b1, AF);  // push af
+  I(0x05b2, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
+  PUSH(0x05b4, AF);  // push af
+  PUSH(0x05b5, DE);  // push de
+  PUSH(0x05b6, HL);  // push hl
+  I(0x05b7, 1); A = C;  // ld a,c
+  I(0x05b8, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
+  I(0x05ba, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x05bc, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  SET_DE(POP(0x05bf));  // pop de
+  I(0x05c0, 3); SET_HL(0xff51);  // ld hl,$ff51
+  I(0x05c3, 2); mem_wr(gb, HL, D);  // ld (hl),d
+  I(0x05c4, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x05c5, 2); mem_wr(gb, HL, E);  // ld (hl),e
+  I(0x05c6, 1); L = alu_inc8(gb, L);  // inc l
+  SET_DE(POP(0x05c7));  // pop de
+  I(0x05c8, 1); A = E;  // ld a,e
+  I(0x05c9, 3); mem_wr(gb, 0xff4f, A);  // ldh ($ff4f),a
+  I(0x05cb, 2); mem_wr(gb, HL, D);  // ld (hl),d
+  I(0x05cc, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x05cd, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x05ce, 2); mem_wr(gb, HL, B);  // ld (hl),b
+  SET_AF(POP(0x05cf));  // pop af
+  I(0x05d0, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
+  SET_AF(POP(0x05d2));  // pop af
+  I(0x05d3, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x05d5, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  I(0x05d8, 1); alu_xor(gb, A);  // xor a
+  RET(0x05d9); return;  // ret
+}
+
 // 00:05da
 void loadUncompressedGfxHeader(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x05da, 1); E = A;  // ld e,a
   I(0x05db, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
   I(0x05dd, 1); C = A;  // ld c,a
@@ -8698,6 +11022,7 @@ L_05f1:
 
 // 00:0626
 void loadGfxHeader(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0626, 1); E = A;  // ld e,a
   I(0x0627, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
   I(0x0629, 1); C = A;  // ld c,a
@@ -8756,6 +11081,7 @@ L_063d:
 
 // 00:0672
 void decompressGraphics(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0672, 1); A = E;  // ld a,e
   I(0x0673, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x0675, 3); mem_wr(gb, 0xff4f, A);  // ldh ($ff4f),a
@@ -8771,9 +11097,9 @@ void decompressGraphics(GB *gb) {
   I(0x0685, 2); alu_and(gb, 0xc0);  // and $c0
   if ((F & FZ)) { I(0x0687, 4); func_06e0(gb); return; } I(0x0687, 3);  // jp z,$06e0
   I(0x068a, 2); alu_cp(gb, 0xc0);  // cp $c0
-  if ((F & FZ)) { I(0x068c, 3); HANDOFF(0x06ee); /* _label_00_059 */ } I(0x068c, 2);  // jr z,$06ee
+  if ((F & FZ)) { I(0x068c, 3); _label_00_059(gb); return; } I(0x068c, 2);  // jr z,$06ee
   I(0x068e, 2); alu_cp(gb, 0x40);  // cp $40
-  if ((F & FZ)) { I(0x0690, 3); HANDOFF(0x06f2); /* _label_00_060 */ } I(0x0690, 2);  // jr z,$06f2
+  if ((F & FZ)) { I(0x0690, 3); _label_00_060(gb); return; } I(0x0690, 2);  // jr z,$06f2
   I(0x0692, 1); A = B;  // ld a,b
 L_0693:
   PUSH(0x0693, AF);  // push af
@@ -8786,18 +11112,20 @@ L_0693:
 
 // 00:069c
 void func_069c(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x069c, readByteSequential, 0x0788, 0x069f);  // call $0788
   I(0x069f, 1); C = A;  // ld c,a
   CALL(0x06a0, readByteSequential, 0x0788, 0x06a3);  // call $0788
   I(0x06a3, 3); mem_wr(gb, 0xff8a, A);  // ldh ($ff8a),a
   I(0x06a5, 1); alu_or(gb, C);  // or c
-  if (!(F & FZ)) { I(0x06a6, 3); HANDOFF(0x06b3); /* _label_00_050 */ } I(0x06a6, 2);  // jr nz,$06b3
+  if (!(F & FZ)) { I(0x06a6, 3); _label_00_050(gb); return; } I(0x06a6, 2);  // jr nz,$06b3
   I(0x06a8, 2); B = 0x10;  // ld b,$10
-  HANDOFF(0x06aa);  // fallthrough to _label_00_049
+  _label_00_049(gb); return;  // fallthrough
 }
 
 // 00:06e0
 void func_06e0(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_06e0:
   I(0x06e0, 2); C = 0x10;  // ld c,$10
 L_06e2:
@@ -8813,6 +11141,7 @@ L_06e2:
 
 // 00:0776
 void _adjustHLSequential(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0776, 1); A = H;  // ld a,h
   I(0x0777, 2); alu_cp(gb, 0x80);  // cp $80
   if (!(F & FZ)) { I(0x0779, 3); goto L_0785; } I(0x0779, 2);  // jr nz,$0785
@@ -8829,6 +11158,7 @@ L_0785:
 
 // 00:0799
 void loadTileset(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0799, 1); E = A;  // ld e,a
   I(0x079a, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
   I(0x079c, 1); C = A;  // ld c,a
@@ -8905,6 +11235,7 @@ L_07b0:
 
 // 00:07fe
 void loadTilesetHlpr(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x07fe, 1); A = E;  // ld a,e
   I(0x07ff, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x0801, 3); mem_wr(gb, 0xff4f, A);  // ldh ($ff4f),a
@@ -8992,6 +11323,7 @@ L_0875:
 
 // 00:088b
 void threadFunc_088b(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x088b, HL);  // push hl
   I(0x088c, 1); L = A;  // ld l,a
   I(0x088d, 2); H = 0xc2;  // ld h,$c2
@@ -9002,6 +11334,7 @@ void threadFunc_088b(GB *gb) {
 
 // 00:0893
 void threadFunc_0893(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x0893, HL);  // push hl
   I(0x0894, 1); L = A;  // ld l,a
   I(0x0895, 2); H = 0xc2;  // ld h,$c2
@@ -9012,6 +11345,7 @@ void threadFunc_0893(GB *gb) {
 
 // 00:089b
 void threadStop(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x089b, HL);  // push hl
   I(0x089c, 1); L = A;  // ld l,a
   I(0x089d, 2); H = 0xc2;  // ld h,$c2
@@ -9022,6 +11356,7 @@ void threadStop(GB *gb) {
 
 // 00:08a3
 void threadRestart(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x08a3, HL);  // push hl
   PUSH(0x08a4, DE);  // push de
   PUSH(0x08a5, BC);  // push bc
@@ -9052,6 +11387,7 @@ L_08b4:
 
 // 00:08c3
 void restartThisThread(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x08c3, BC);  // push bc
   I(0x08c4, 3); A = mem_rd(gb, 0xff9e);  // ldh a,($ff9e)
   I(0x08c6, 1); E = A;  // ld e,a
@@ -9079,6 +11415,7 @@ L_08d4:
 
 // 00:08e2
 void stubThreadStart(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x08e2, 3); A = mem_rd(gb, 0xff9e);  // ldh a,($ff9e)
   I(0x08e4, 1); L = A;  // ld l,a
   I(0x08e5, 2); H = 0xc2;  // ld h,$c2
@@ -9088,6 +11425,7 @@ void stubThreadStart(GB *gb) {
 
 // 00:08eb
 void resumeThreadNextFrameAndSaveBank(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x08eb, 2); A = 0x01;  // ld a,$01
   PUSH(0x08ed, BC);  // push bc
   I(0x08ee, 1); B = A;  // ld b,a
@@ -9095,6 +11433,18 @@ void resumeThreadNextFrameAndSaveBank(GB *gb) {
   I(0x08f1, 1); C = A;  // ld c,a
   I(0x08f2, 1); A = B;  // ld a,b
   CALL(0x08f3, resumeThreadInAFrames, 0x0900, 0x08f6);  // call $0900
+L_08f6:
+  I(0x08f6, 1); A = C;  // ld a,c
+  I(0x08f7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x08f9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  SET_BC(POP(0x08fc));  // pop bc
+  RET(0x08fd); return;  // ret
+}
+
+// 00:08f6
+void resumeThreadNextFrameAndSaveBank__afterCall08f6(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_08f6:
   I(0x08f6, 1); A = C;  // ld a,c
   I(0x08f7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x08f9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -9104,12 +11454,14 @@ void resumeThreadNextFrameAndSaveBank(GB *gb) {
 
 // 00:08fe
 void resumeThreadNextFrame(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x08fe, 2); A = 0x01;  // ld a,$01
   resumeThreadInAFrames(gb); return;  // fallthrough
 }
 
 // 00:0900
 void resumeThreadInAFrames(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x0900, HL);  // push hl
   PUSH(0x0901, DE);  // push de
   PUSH(0x0902, BC);  // push bc
@@ -9131,7 +11483,19 @@ void resumeThreadInAFrames(GB *gb) {
 
 // 00:0917
 void _nextThread(GB *gb) {
-  I(0x0917, 3); gb->sp = 0xc110; gb->sp_loads++; HANDOFF(0x091a);  // ld sp,$c110
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x0917, 3); gb->sp = 0xc110; gb->sp_loads++; HANDOFF_UP(0x091a);  // ld sp,$c110
+L_091a:
+  I(0x091a, 2); H = 0xc2;  // ld h,$c2
+  I(0x091c, 2); A = 0x01;  // ld a,$01
+  I(0x091e, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
+  I(0x0920, 3); _mainLoop_nextThread(gb); return;  // jr $0955
+}
+
+// 00:091a
+void _nextThread__afterSp091a(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_091a:
   I(0x091a, 2); H = 0xc2;  // ld h,$c2
   I(0x091c, 2); A = 0x01;  // ld a,$01
   I(0x091e, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
@@ -9140,7 +11504,25 @@ void _nextThread(GB *gb) {
 
 // 00:0922
 void startGame(GB *gb) {
-  I(0x0922, 3); gb->sp = 0xc110; gb->sp_loads++; HANDOFF(0x0925);  // ld sp,$c110
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x0922, 3); gb->sp = 0xc110; gb->sp_loads++; HANDOFF_UP(0x0925);  // ld sp,$c110
+L_0925:
+  I(0x0925, 3); SET_HL(0x09ac);  // ld hl,$09ac
+  I(0x0928, 3); SET_DE(0xc2e0);  // ld de,$c2e0
+  I(0x092b, 2); B = 0x20;  // ld b,$20
+L_092d:
+  I(0x092d, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x092e, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x092f, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0930, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x0931, 3); goto L_092d; } I(0x0931, 2);  // jr nz,$092d
+  _mainLoop(gb); return;  // fallthrough
+}
+
+// 00:0925
+void startGame__afterSp0925(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0925:
   I(0x0925, 3); SET_HL(0x09ac);  // ld hl,$09ac
   I(0x0928, 3); SET_DE(0xc2e0);  // ld de,$c2e0
   I(0x092b, 2); B = 0x20;  // ld b,$20
@@ -9155,6 +11537,7 @@ L_092d:
 
 // 00:0933
 void _mainLoop(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x0933, pollInput, 0x026d, 0x0936);  // call $026d
   I(0x0936, 3); A = mem_rd(gb, 0xffb9);  // ldh a,($ffb9)
   I(0x0938, 1); alu_add(gb, A);  // add a
@@ -9179,6 +11562,7 @@ L_0943:
 
 // 00:0955
 void _mainLoop_nextThread(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_0955;
 L_094d:
   I(0x094d, 1); L = A;  // ld l,a
@@ -9222,6 +11606,7 @@ L_0983:
 
 // 00:098b
 void _countdownToRunThread(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x098b, 1); L = alu_inc8(gb, L);  // inc l
   I(0x098c, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
   if (!(F & FZ)) { I(0x098d, 3); _mainLoop_nextThread(gb); return; } I(0x098d, 2);  // jr nz,$0955
@@ -9232,7 +11617,18 @@ void _countdownToRunThread(GB *gb) {
   I(0x0994, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x0995, 2); H = mem_rd(gb, HL);  // ld h,(hl)
   I(0x0996, 1); L = A;  // ld l,a
-  I(0x0997, 2); gb->sp = HL; gb->sp_loads++; HANDOFF(0x0998);  // ld sp,hl
+  I(0x0997, 2); gb->sp = HL; gb->sp_loads++; HANDOFF_UP(0x0998);  // ld sp,hl
+L_0998:
+  SET_BC(POP(0x0998));  // pop bc
+  SET_DE(POP(0x0999));  // pop de
+  SET_HL(POP(0x099a));  // pop hl
+  RET(0x099b); return;  // ret
+}
+
+// 00:0998
+void _countdownToRunThread__afterSp0998(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0998:
   SET_BC(POP(0x0998));  // pop bc
   SET_DE(POP(0x0999));  // pop de
   SET_HL(POP(0x099a));  // pop hl
@@ -9241,6 +11637,7 @@ void _countdownToRunThread(GB *gb) {
 
 // 00:099c
 void _initializeThread(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x099c, 2); A = 0x03;  // ld a,$03
   I(0x099e, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x099f, 1); L = alu_inc8(gb, L);  // inc l
@@ -9253,13 +11650,23 @@ void _initializeThread(GB *gb) {
   I(0x09a6, 1); C = A;  // ld c,a
   I(0x09a7, 1); L = E;  // ld l,e
   I(0x09a8, 1); H = D;  // ld h,d
-  I(0x09a9, 2); gb->sp = HL; gb->sp_loads++; HANDOFF(0x09aa);  // ld sp,hl
+  I(0x09a9, 2); gb->sp = HL; gb->sp_loads++; HANDOFF_UP(0x09aa);  // ld sp,hl
+L_09aa:
+  PUSH(0x09aa, BC);  // push bc
+  RET(0x09ab); return;  // ret
+}
+
+// 00:09aa
+void _initializeThread__afterSp09aa(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_09aa:
   PUSH(0x09aa, BC);  // push bc
   RET(0x09ab); return;  // ret
 }
 
 // 00:09f8
 void vblankInterrupt(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x09f8, 3); A = mem_rd(gb, 0xff9d);  // ldh a,($ff9d)
   I(0x09fa, 3); mem_wr(gb, 0xff9b, A);  // ldh ($ff9b),a
   I(0x09fc, 1); alu_xor(gb, A);  // xor a
@@ -9310,7 +11717,7 @@ void vblankInterrupt(GB *gb) {
   if (!(F & FZ)) { CALL(0x0a3c, runVBlankFunctions, 0x0a71, 0x0a3f); } else I(0x0a3c, 3);  // call nz,$0a71
   CALL(0x0a3f, updateDirtyPalettes, 0x0b07, 0x0a42);  // call $0b07
   I(0x0a42, 1); gb->ime = false; gb->ime_delay = false; gb->ime_writes++;  // di
-  CALL_ASM(0x0a43, 0xff80, 0x0a46); /* unported */  // call $ff80
+  CALL(0x0a43, hramOamDmaFunction, 0xff80, 0x0a46);  // call $ff80
   SET_BC(POP(0x0a46));  // pop bc
   I(0x0a47, 1); A = C;  // ld a,c
   I(0x0a48, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
@@ -9341,6 +11748,7 @@ L_0a69:
 
 // 00:0a71
 void runVBlankFunctions(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0a71, 3); SET_HL(0xc400);  // ld hl,$c400
   I(0x0a74, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   PUSH(0x0a75, HL);  // push hl
@@ -9353,6 +11761,7 @@ void runVBlankFunctions(GB *gb) {
 
 // 00:0a7e
 void vblankFunctionRet(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_0a7e;
 L_0a74:
   I(0x0a74, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
@@ -9373,6 +11782,7 @@ L_0a7e:
 
 // 00:0a8e
 void vblankFunctionsStart(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   SET_HL(POP(0x0a8e));  // pop hl
   I(0x0a8f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x0a90, 3); mem_wr(gb, 0xff4f, A);  // ldh ($ff4f),a
@@ -9393,6 +11803,7 @@ L_0a98:
 
 // 00:0aa0
 void vblankRunBank4Function(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0aa0, 2); A = 0x04;  // ld a,$04
   I(0x0aa2, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   I(0x0aa5, 4); HANDOFF(0x45c0); /* unported */  // jp $45c0
@@ -9400,6 +11811,7 @@ void vblankRunBank4Function(GB *gb) {
 
 // 00:0aa8
 void vblankFunction0aa8(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   SET_HL(POP(0x0aa8));  // pop hl
   I(0x0aa9, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x0aaa, 1); C = A;  // ld c,a
@@ -9412,8 +11824,17 @@ void vblankFunction0aa8(GB *gb) {
   I(0x0ab3, 1); HANDOFF(HL);  // jp hl
 }
 
+// 00:0ab4
+void vblankFunction0aa8__return(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0ab4:
+  SET_HL(POP(0x0ab4));  // pop hl
+  I(0x0ab5, 3); vblankFunctionRet(gb); return;  // jr $0a7e
+}
+
 // 00:0ab7
 void vblankCopyTileFunction(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   SET_HL(POP(0x0ab7));  // pop hl
   I(0x0ab8, 3); SET_DE(0x0a7e);  // ld de,$0a7e
   PUSH(0x0abb, DE);  // push de
@@ -9424,7 +11845,7 @@ void vblankCopyTileFunction(GB *gb) {
   I(0x0ac1, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x0ac2, 1); D = A;  // ld d,a
   I(0x0ac3, 1); C = E;  // ld c,e
-  CALL_ASM(0x0ac4, 0x0acc, 0x0ac7); /* unported */  // call $0acc
+  CALL(0x0ac4, vblankCopyTileFunction__write4Bytes, 0x0acc, 0x0ac7);  // call $0acc
   I(0x0ac7, 1); E = C;  // ld e,c
   I(0x0ac8, 2); A = 0x01;  // ld a,$01
   I(0x0aca, 3); mem_wr(gb, 0xff4f, A);  // ldh ($ff4f),a
@@ -9444,8 +11865,28 @@ L_0acc:
   RET(0x0ad8); return;  // ret
 }
 
+// 00:0acc
+void vblankCopyTileFunction__write4Bytes(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0acc:
+  I(0x0acc, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0acd, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0ace, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0acf, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0ad0, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0ad1, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0ad2, 1); E = A;  // ld e,a
+  I(0x0ad3, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0ad4, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0ad5, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0ad6, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0ad7, 2); mem_wr(gb, DE, A);  // ld (de),a
+  RET(0x0ad8); return;  // ret
+}
+
 // 00:0ad9
 void vblankFunction0ad9(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   SET_HL(POP(0x0ad9));  // pop hl
   I(0x0ada, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x0adb, 3); mem_wr(gb, 0xff4f, A);  // ldh ($ff4f),a
@@ -9466,6 +11907,7 @@ L_0ae3:
 
 // 00:0aeb
 void vblankDmaFunction(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   SET_HL(POP(0x0aeb));  // pop hl
   I(0x0aec, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x0aed, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
@@ -9487,6 +11929,7 @@ void vblankDmaFunction(GB *gb) {
 
 // 00:0b07
 void updateDirtyPalettes(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0b07, 2); A = 0x02;  // ld a,$02
   I(0x0b09, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
   I(0x0b0b, 3); A = mem_rd(gb, 0xffa6);  // ldh a,($ffa6)
@@ -9495,7 +11938,7 @@ void updateDirtyPalettes(GB *gb) {
   I(0x0b0f, 3); mem_wr(gb, 0xffa6, A);  // ldh ($ffa6),a
   I(0x0b11, 2); C = 0x68;  // ld c,$68
   I(0x0b13, 3); SET_HL(0xdf00);  // ld hl,$df00
-  CALL_ASM(0x0b16, 0x0b23, 0x0b19); /* unported */  // call $0b23
+  CALL(0x0b16, updateDirtyPalettes__writePaletteRegs, 0x0b23, 0x0b19);  // call $0b23
   I(0x0b19, 3); A = mem_rd(gb, 0xffa7);  // ldh a,($ffa7)
   I(0x0b1b, 1); D = A;  // ld d,a
   I(0x0b1c, 1); alu_xor(gb, A);  // xor a
@@ -9535,8 +11978,45 @@ L_0b3f:
   I(0x0b44, 3); goto L_0b23;  // jr $0b23
 }
 
+// 00:0b23
+void updateDirtyPalettes__writePaletteRegs(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0b23:
+  I(0x0b23, 2); D = alu_srl(gb, D);  // srl d
+  if (!(F & FC)) { I(0x0b25, 3); goto L_0b3f; } I(0x0b25, 2);  // jr nc,$0b3f
+  I(0x0b27, 1); A = L;  // ld a,l
+  I(0x0b28, 2); alu_or(gb, 0x80);  // or $80
+  I(0x0b2a, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
+  I(0x0b2b, 1); C = alu_inc8(gb, C);  // inc c
+  I(0x0b2c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0b2d, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
+  I(0x0b2e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0b2f, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
+  I(0x0b30, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0b31, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
+  I(0x0b32, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0b33, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
+  I(0x0b34, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0b35, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
+  I(0x0b36, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0b37, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
+  I(0x0b38, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0b39, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
+  I(0x0b3a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0b3b, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
+  I(0x0b3c, 1); C = alu_dec8(gb, C);  // dec c
+  I(0x0b3d, 3); goto L_0b23;  // jr $0b23
+L_0b3f:
+  if ((F & FZ)) { RET_TAKEN(0x0b3f); return; } I(0x0b3f, 2);  // ret z
+  I(0x0b40, 1); A = L;  // ld a,l
+  I(0x0b41, 2); alu_add(gb, 0x08);  // add $08
+  I(0x0b43, 1); L = A;  // ld l,a
+  I(0x0b44, 3); goto L_0b23;  // jr $0b23
+}
+
 // 00:0b46
 void lcdInterrupt(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0b46, 3); A = mem_rd(gb, 0xff9b);  // ldh a,($ff9b)
   I(0x0b48, 2); alu_cp(gb, 0x02);  // cp $02
   if (!(F & FC)) { I(0x0b4a, 3); goto L_0b65; } I(0x0b4a, 2);  // jr nc,$0b65
@@ -9602,8 +12082,69 @@ L_0b96:
   switch (HL) {  default: HANDOFF(HL); }
 }
 
+// 00:0b65
+void lcdInterrupt__behaviour2OrHigher(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0b65:
+  PUSH(0x0b65, BC);  // push bc
+  I(0x0b66, 2); C = 0x03;  // ld c,$03
+  I(0x0b68, 3); A = mem_rd(gb, 0xff9c);  // ldh a,($ff9c)
+  I(0x0b6a, 1); alu_or(gb, A);  // or a
+  if (!(F & FZ)) { I(0x0b6b, 3); goto L_0b96; } I(0x0b6b, 2);  // jr nz,$0b96
+  I(0x0b6d, 3); SET_HL(0xc491);  // ld hl,$c491
+L_0b70:
+  I(0x0b70, 3); A = mem_rd(gb, 0xff41);  // ldh a,($ff41)
+  I(0x0b72, 1); alu_and(gb, C);  // and c
+  if (!(F & FZ)) { I(0x0b73, 3); goto L_0b70; } I(0x0b73, 2);  // jr nz,$0b70
+  I(0x0b75, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0b76, 3); mem_wr(gb, 0xff40, A);  // ldh ($ff40),a
+  I(0x0b78, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0b79, 3); mem_wr(gb, 0xff42, A);  // ldh ($ff42),a
+  I(0x0b7b, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0b7c, 3); mem_wr(gb, 0xff43, A);  // ldh ($ff43),a
+  I(0x0b7e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0b7f, 3); mem_wr(gb, 0xff4a, A);  // ldh ($ff4a),a
+  I(0x0b81, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0b82, 3); mem_wr(gb, 0xff4b, A);  // ldh ($ff4b),a
+  I(0x0b84, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0b85, 3); mem_wr(gb, 0xff45, A);  // ldh ($ff45),a
+  I(0x0b87, 3); A = mem_rd(gb, 0xff9b);  // ldh a,($ff9b)
+  I(0x0b89, 2); alu_cp(gb, 0x02);  // cp $02
+  if (!(F & FZ)) { I(0x0b8b, 3); goto L_0b90; } I(0x0b8b, 2);  // jr nz,$0b90
+  I(0x0b8d, 1); alu_xor(gb, A);  // xor a
+  I(0x0b8e, 3); mem_wr(gb, 0xff9b, A);  // ldh ($ff9b),a
+L_0b90:
+  I(0x0b90, 2); A = 0x01;  // ld a,$01
+  I(0x0b92, 3); mem_wr(gb, 0xff9c, A);  // ldh ($ff9c),a
+  I(0x0b94, 3); _lcdInterruptEnd(gb); return;  // jr $0be6
+L_0b96:
+  I(0x0b96, 3); A = mem_rd(gb, 0xff9b);  // ldh a,($ff9b)
+  I(0x0b98, 2); alu_cp(gb, 0x07);  // cp $07
+  if (!(F & FC)) { I(0x0b9a, 3); lcdInterrupt_clearLYC(gb); return; } I(0x0b9a, 2);  // jr nc,$0be2
+  RST_PUSH(0x0b9c, 0x0b9d);  // rst $00 (jump table)
+  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
+  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
+  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
+  switch (HL) {  default: HANDOFF(HL); }
+}
+
+// 00:0b96
+void lcdInterrupt__notStatusBar(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0b96:
+  I(0x0b96, 3); A = mem_rd(gb, 0xff9b);  // ldh a,($ff9b)
+  I(0x0b98, 2); alu_cp(gb, 0x07);  // cp $07
+  if (!(F & FC)) { I(0x0b9a, 3); lcdInterrupt_clearLYC(gb); return; } I(0x0b9a, 2);  // jr nc,$0be2
+  RST_PUSH(0x0b9c, 0x0b9d);  // rst $00 (jump table)
+  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
+  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
+  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
+  switch (HL) {  default: HANDOFF(HL); }
+}
+
 // 00:0bab
 void lcdInterrupt_setLcdcToA7(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_0bab:
   I(0x0bab, 3); A = mem_rd(gb, 0xff41);  // ldh a,($ff41)
   I(0x0bad, 1); alu_and(gb, C);  // and c
@@ -9615,6 +12156,7 @@ L_0bab:
 
 // 00:0bb6
 void lcdInterrupt_ringMenu(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_0bb6:
   I(0x0bb6, 3); A = mem_rd(gb, 0xff41);  // ldh a,($ff41)
   I(0x0bb8, 1); alu_and(gb, C);  // and c
@@ -9640,8 +12182,18 @@ L_0bd6:
   I(0x0bda, 3); lcdInterrupt_clearWXY(gb); return;  // jr $0bdc
 }
 
+// 00:0bd6
+void lcdInterrupt_ringMenu__afterTextbox(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0bd6:
+  I(0x0bd6, 2); A = 0x80;  // ld a,$80
+  I(0x0bd8, 3); mem_wr(gb, 0xff42, A);  // ldh ($ff42),a
+  I(0x0bda, 3); lcdInterrupt_clearWXY(gb); return;  // jr $0bdc
+}
+
 // 00:0bdc
 void lcdInterrupt_clearWXY(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0bdc, 2); A = 0xc7;  // ld a,$c7
   I(0x0bde, 3); mem_wr(gb, 0xff4a, A);  // ldh ($ff4a),a
   I(0x0be0, 3); mem_wr(gb, 0xff4b, A);  // ldh ($ff4b),a
@@ -9650,6 +12202,7 @@ void lcdInterrupt_clearWXY(GB *gb) {
 
 // 00:0be2
 void lcdInterrupt_clearLYC(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0be2, 2); A = 0xc7;  // ld a,$c7
   I(0x0be4, 3); mem_wr(gb, 0xff45, A);  // ldh ($ff45),a
   _lcdInterruptEnd(gb); return;  // fallthrough
@@ -9657,6 +12210,7 @@ void lcdInterrupt_clearLYC(GB *gb) {
 
 // 00:0be6
 void _lcdInterruptEnd(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   SET_BC(POP(0x0be6));  // pop bc
   SET_HL(POP(0x0be7));  // pop hl
   SET_AF(POP(0x0be8));  // pop af
@@ -9665,6 +12219,7 @@ void _lcdInterruptEnd(GB *gb) {
 
 // 00:0bea
 void lcdInterrupt_0bea(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_0bea:
   I(0x0bea, 3); A = mem_rd(gb, 0xff41);  // ldh a,($ff41)
   I(0x0bec, 1); alu_and(gb, C);  // and c
@@ -9681,6 +12236,7 @@ L_0bea:
 
 // 00:0c3d
 void serialInterrupt(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0c3d, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
   I(0x0c3f, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x0c40, 3); goto L_0c4e; } I(0x0c40, 2);  // jr z,$0c4e
@@ -9714,8 +12270,47 @@ L_0c5f:
   RETI(0x0c69); return;  // reti
 }
 
+// 00:0c42
+void serialInterrupt__externalClock(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0c42:
+  I(0x0c42, 3); A = mem_rd(gb, 0xff01);  // ldh a,($ff01)
+  I(0x0c44, 3); mem_wr(gb, 0xffbc, A);  // ldh ($ffbc),a
+  I(0x0c46, 1); alu_xor(gb, A);  // xor a
+  I(0x0c47, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
+  I(0x0c49, 1); A = alu_inc8(gb, A);  // inc a
+  I(0x0c4a, 3); mem_wr(gb, 0xffbb, A);  // ldh ($ffbb),a
+  SET_AF(POP(0x0c4c));  // pop af
+  RETI(0x0c4d); return;  // reti
+}
+
+// 00:0c4e
+void serialInterrupt__internalClock(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0c4e:
+  I(0x0c4e, 3); A = mem_rd(gb, 0xff01);  // ldh a,($ff01)
+  I(0x0c50, 2); alu_cp(gb, 0xe1);  // cp $e1
+  if ((F & FZ)) { I(0x0c52, 3); goto L_0c58; } I(0x0c52, 2);  // jr z,$0c58
+  I(0x0c54, 2); alu_cp(gb, 0xe0);  // cp $e0
+  if (!(F & FZ)) { I(0x0c56, 3); goto L_0c5f; } I(0x0c56, 2);  // jr nz,$0c5f
+L_0c58:
+  I(0x0c58, 3); mem_wr(gb, 0xffba, A);  // ldh ($ffba),a
+  I(0x0c5a, 1); alu_xor(gb, A);  // xor a
+  I(0x0c5b, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
+  SET_AF(POP(0x0c5d));  // pop af
+  RETI(0x0c5e); return;  // reti
+L_0c5f:
+  I(0x0c5f, 2); A = 0xe1;  // ld a,$e1
+  I(0x0c61, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
+  I(0x0c63, 2); A = 0x80;  // ld a,$80
+  CALL(0x0c65, writeToSC, 0x0c6a, 0x0c68);  // call $0c6a
+  SET_AF(POP(0x0c68));  // pop af
+  RETI(0x0c69); return;  // reti
+}
+
 // 00:0c6a
 void writeToSC(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x0c6a, AF);  // push af
   I(0x0c6b, 2); alu_and(gb, 0x01);  // and $01
   I(0x0c6d, 3); mem_wr(gb, 0xff02, A);  // ldh ($ff02),a
@@ -9726,6 +12321,7 @@ void writeToSC(GB *gb) {
 
 // 00:0c73
 void serialFunc_0c73(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0c73, 1); alu_xor(gb, A);  // xor a
   I(0x0c74, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
   I(0x0c76, 2); A = 0xe0;  // ld a,$e0
@@ -9736,6 +12332,7 @@ void serialFunc_0c73(GB *gb) {
 
 // 00:0c7e
 void disableSerialPort(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0c7e, 1); alu_xor(gb, A);  // xor a
   I(0x0c7f, 3); mem_wr(gb, 0xffba, A);  // ldh ($ffba),a
   I(0x0c81, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
@@ -9744,23 +12341,26 @@ void disableSerialPort(GB *gb) {
 
 // 00:0c85
 void serialFunc_0c85(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0c85, 3); SET_HL(0x44ac);  // ld hl,$44ac
   I(0x0c88, 2); E = 0x16;  // ld e,$16
-  I(0x0c8a, 4); HANDOFF(0x008a); /* interBankCall */  // jp $008a
+  I(0x0c8a, 4); interBankCall(gb); return;  // jp $008a
 }
 
 // 00:0c8d
 void serialFunc_0c8d(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x0c8d, DE);  // push de
   I(0x0c8e, 3); SET_HL(0x4000);  // ld hl,$4000
   I(0x0c91, 2); E = 0x16;  // ld e,$16
-  CALL_ASM(0x0c93, 0x008a, 0x0c96); /* interBankCall */  // call $008a
+  CALL(0x0c93, interBankCall, 0x008a, 0x0c96);  // call $008a
   SET_DE(POP(0x0c96));  // pop de
   RET(0x0c97); return;  // ret
 }
 
 // 00:0c98
 void playSound_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0c98, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { RET_TAKEN(0x0c99); return; } I(0x0c99, 2);  // ret z
   I(0x0c9a, 1); H = A;  // ld h,a
@@ -9780,6 +12380,7 @@ void playSound_b00(GB *gb) {
 
 // 00:0cad
 void setMusicVolume(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0cad, 2); alu_or(gb, 0x80);  // or $80
   I(0x0caf, 3); mem_wr(gb, 0xffb6, A);  // ldh ($ffb6),a
   RET(0x0cb1); return;  // ret
@@ -9787,18 +12388,21 @@ void setMusicVolume(GB *gb) {
 
 // 00:0cb2
 void restartSound(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0cb2, 3); SET_BC(0x4009);  // ld bc,$4009
   I(0x0cb5, 3); _startSound(gb); return;  // jr $0cba
 }
 
 // 00:0cb7
 void initSound_b00(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0cb7, 3); SET_BC(0x4000);  // ld bc,$4000
   _startSound(gb); return;  // fallthrough
 }
 
 // 00:0cba
 void _startSound(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x0cba, DE);  // push de
   I(0x0cbb, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x0cbd, AF);  // push af
@@ -9819,6 +12423,7 @@ void _startSound(GB *gb) {
 
 // 00:0cdd
 void disableTimer(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0cdd, 3); SET_HL(0xffb7);  // ld hl,$ffb7
   I(0x0ce0, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
   I(0x0ce2, 1); alu_xor(gb, A);  // xor a
@@ -9828,6 +12433,7 @@ void disableTimer(GB *gb) {
 
 // 00:0ce6
 void enableTimer(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0ce6, 1); alu_xor(gb, A);  // xor a
   I(0x0ce7, 3); mem_wr(gb, 0xff07, A);  // ldh ($ff07),a
   I(0x0ce9, 2); A = 0xa0;  // ld a,$a0
@@ -9852,6 +12458,7 @@ L_0cf8:
 
 // 00:0d07
 void timerInterrupt(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0d07, 3); SET_HL(0xffb7);  // ld hl,$ffb7
   I(0x0d0a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
   if (!(F & FZ)) { I(0x0d0c, 3); goto L_0d59; } I(0x0d0c, 2);  // jr nz,$0d59
@@ -9908,14 +12515,27 @@ L_0d59:
   RETI(0x0d5d); return;  // reti
 }
 
+// 00:0d59
+void timerInterrupt__interruptEnd(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0d59:
+  SET_HL(POP(0x0d59));  // pop hl
+  SET_DE(POP(0x0d5a));  // pop de
+  SET_BC(POP(0x0d5b));  // pop bc
+  SET_AF(POP(0x0d5c));  // pop af
+  RETI(0x0d5d); return;  // reti
+}
+
 // 00:0d5e
 void addSpritesToOam(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0d5e, 3); SET_BC(0x0000);  // ld bc,$0000
   addSpritesToOam_withOffset(gb); return;  // fallthrough
 }
 
 // 00:0d61
 void addSpritesToOam_withOffset(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0d61, 3); A = mem_rd(gb, 0xff9f);  // ldh a,($ff9f)
   I(0x0d63, 2); alu_cp(gb, 0xa0);  // cp $a0
   if (!(F & FC)) { RET_TAKEN(0x0d65); return; } I(0x0d65, 2);  // ret nc
@@ -9965,8 +12585,196 @@ L_0d93:
   I(0x0d98, 3); goto L_0d89;  // jr $0d89
 }
 
+// 00:0d6c
+void addSpritesToOam_withOffset__next(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0d6c:
+  I(0x0d6c, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
+  I(0x0d6e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d6f, 1); alu_add(gb, B);  // add b
+  I(0x0d70, 2); alu_cp(gb, 0xa0);  // cp $a0
+  if (!(F & FC)) { I(0x0d72, 3); goto L_0d92; } I(0x0d72, 2);  // jr nc,$0d92
+  I(0x0d74, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d75, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d76, 1); alu_add(gb, C);  // add c
+  I(0x0d77, 2); alu_cp(gb, 0xa8);  // cp $a8
+  if (!(F & FC)) { I(0x0d79, 3); goto L_0d93; } I(0x0d79, 2);  // jr nc,$0d93
+  I(0x0d7b, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d7c, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d7d, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d7e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d7f, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d80, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d81, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d82, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d83, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d84, 1); A = E;  // ld a,e
+  I(0x0d85, 2); alu_cp(gb, 0xa0);  // cp $a0
+  if (!(F & FC)) { I(0x0d87, 3); goto L_0d8f; } I(0x0d87, 2);  // jr nc,$0d8f
+L_0d89:
+  I(0x0d89, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+  I(0x0d8b, 1); A = alu_dec8(gb, A);  // dec a
+  if (!(F & FZ)) { I(0x0d8c, 3); goto L_0d6c; } I(0x0d8c, 2);  // jr nz,$0d6c
+  I(0x0d8e, 1); A = E;  // ld a,e
+L_0d8f:
+  I(0x0d8f, 3); mem_wr(gb, 0xff9f, A);  // ldh ($ff9f),a
+  RET(0x0d91); return;  // ret
+L_0d92:
+  I(0x0d92, 2); SET_HL(HL + 1);  // inc hl
+L_0d93:
+  I(0x0d93, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0d94, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0d95, 2); A = 0xe0;  // ld a,$e0
+  I(0x0d97, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d98, 3); goto L_0d89;  // jr $0d89
+}
+
+// 00:0d89
+void addSpritesToOam_withOffset__decCounter(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_0d89;
+L_0d6c:
+  I(0x0d6c, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
+  I(0x0d6e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d6f, 1); alu_add(gb, B);  // add b
+  I(0x0d70, 2); alu_cp(gb, 0xa0);  // cp $a0
+  if (!(F & FC)) { I(0x0d72, 3); goto L_0d92; } I(0x0d72, 2);  // jr nc,$0d92
+  I(0x0d74, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d75, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d76, 1); alu_add(gb, C);  // add c
+  I(0x0d77, 2); alu_cp(gb, 0xa8);  // cp $a8
+  if (!(F & FC)) { I(0x0d79, 3); goto L_0d93; } I(0x0d79, 2);  // jr nc,$0d93
+  I(0x0d7b, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d7c, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d7d, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d7e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d7f, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d80, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d81, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d82, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d83, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d84, 1); A = E;  // ld a,e
+  I(0x0d85, 2); alu_cp(gb, 0xa0);  // cp $a0
+  if (!(F & FC)) { I(0x0d87, 3); goto L_0d8f; } I(0x0d87, 2);  // jr nc,$0d8f
+L_0d89:
+  I(0x0d89, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+  I(0x0d8b, 1); A = alu_dec8(gb, A);  // dec a
+  if (!(F & FZ)) { I(0x0d8c, 3); goto L_0d6c; } I(0x0d8c, 2);  // jr nz,$0d6c
+  I(0x0d8e, 1); A = E;  // ld a,e
+L_0d8f:
+  I(0x0d8f, 3); mem_wr(gb, 0xff9f, A);  // ldh ($ff9f),a
+  RET(0x0d91); return;  // ret
+L_0d92:
+  I(0x0d92, 2); SET_HL(HL + 1);  // inc hl
+L_0d93:
+  I(0x0d93, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0d94, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0d95, 2); A = 0xe0;  // ld a,$e0
+  I(0x0d97, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d98, 3); goto L_0d89;  // jr $0d89
+}
+
+// 00:0d8f
+void addSpritesToOam_withOffset__end(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0d8f:
+  I(0x0d8f, 3); mem_wr(gb, 0xff9f, A);  // ldh ($ff9f),a
+  RET(0x0d91); return;  // ret
+}
+
+// 00:0d92
+void addSpritesToOam_withOffset__skip3Bytes(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_0d92;
+L_0d6c:
+  I(0x0d6c, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
+  I(0x0d6e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d6f, 1); alu_add(gb, B);  // add b
+  I(0x0d70, 2); alu_cp(gb, 0xa0);  // cp $a0
+  if (!(F & FC)) { I(0x0d72, 3); goto L_0d92; } I(0x0d72, 2);  // jr nc,$0d92
+  I(0x0d74, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d75, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d76, 1); alu_add(gb, C);  // add c
+  I(0x0d77, 2); alu_cp(gb, 0xa8);  // cp $a8
+  if (!(F & FC)) { I(0x0d79, 3); goto L_0d93; } I(0x0d79, 2);  // jr nc,$0d93
+  I(0x0d7b, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d7c, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d7d, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d7e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d7f, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d80, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d81, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d82, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d83, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d84, 1); A = E;  // ld a,e
+  I(0x0d85, 2); alu_cp(gb, 0xa0);  // cp $a0
+  if (!(F & FC)) { I(0x0d87, 3); goto L_0d8f; } I(0x0d87, 2);  // jr nc,$0d8f
+L_0d89:
+  I(0x0d89, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+  I(0x0d8b, 1); A = alu_dec8(gb, A);  // dec a
+  if (!(F & FZ)) { I(0x0d8c, 3); goto L_0d6c; } I(0x0d8c, 2);  // jr nz,$0d6c
+  I(0x0d8e, 1); A = E;  // ld a,e
+L_0d8f:
+  I(0x0d8f, 3); mem_wr(gb, 0xff9f, A);  // ldh ($ff9f),a
+  RET(0x0d91); return;  // ret
+L_0d92:
+  I(0x0d92, 2); SET_HL(HL + 1);  // inc hl
+L_0d93:
+  I(0x0d93, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0d94, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0d95, 2); A = 0xe0;  // ld a,$e0
+  I(0x0d97, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d98, 3); goto L_0d89;  // jr $0d89
+}
+
+// 00:0d93
+void addSpritesToOam_withOffset__skip2Bytes(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_0d93;
+L_0d6c:
+  I(0x0d6c, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
+  I(0x0d6e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d6f, 1); alu_add(gb, B);  // add b
+  I(0x0d70, 2); alu_cp(gb, 0xa0);  // cp $a0
+  if (!(F & FC)) { I(0x0d72, 3); goto L_0d92; } I(0x0d72, 2);  // jr nc,$0d92
+  I(0x0d74, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d75, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d76, 1); alu_add(gb, C);  // add c
+  I(0x0d77, 2); alu_cp(gb, 0xa8);  // cp $a8
+  if (!(F & FC)) { I(0x0d79, 3); goto L_0d93; } I(0x0d79, 2);  // jr nc,$0d93
+  I(0x0d7b, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d7c, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d7d, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d7e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d7f, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d80, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d81, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0d82, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d83, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0d84, 1); A = E;  // ld a,e
+  I(0x0d85, 2); alu_cp(gb, 0xa0);  // cp $a0
+  if (!(F & FC)) { I(0x0d87, 3); goto L_0d8f; } I(0x0d87, 2);  // jr nc,$0d8f
+L_0d89:
+  I(0x0d89, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+  I(0x0d8b, 1); A = alu_dec8(gb, A);  // dec a
+  if (!(F & FZ)) { I(0x0d8c, 3); goto L_0d6c; } I(0x0d8c, 2);  // jr nz,$0d6c
+  I(0x0d8e, 1); A = E;  // ld a,e
+L_0d8f:
+  I(0x0d8f, 3); mem_wr(gb, 0xff9f, A);  // ldh ($ff9f),a
+  RET(0x0d91); return;  // ret
+L_0d92:
+  I(0x0d92, 2); SET_HL(HL + 1);  // inc hl
+L_0d93:
+  I(0x0d93, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0d94, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0d95, 2); A = 0xe0;  // ld a,$e0
+  I(0x0d97, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0d98, 3); goto L_0d89;  // jr $0d89
+}
+
 // 00:0d9a
 void drawAllSprites(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0d9a, 3); SET_HL(0xc4b6);  // ld hl,$c4b6
   I(0x0d9d, 3); alu_bit(gb, 0, mem_rd(gb, HL));  // bit 0,(hl)
   if (!(F & FZ)) { RET_TAKEN(0x0d9f); return; } I(0x0d9f, 2);  // ret nz
@@ -9976,6 +12784,7 @@ void drawAllSprites(GB *gb) {
 
 // 00:0da2
 void drawAllSpritesUnconditionally(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0da2, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x0da4, AF);  // push af
   CALL(0x0da5, queueDrawEverything, 0x1078, 0x0da8);  // call $1078
@@ -10053,7 +12862,7 @@ L_0e21:
 L_0e24:
   I(0x0e24, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x0e25, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { CALL_ASM(0x0e26, 0x0e71, 0x0e29); /* unported */ } else I(0x0e26, 3);  // call nz,$0e71
+  if (!(F & FZ)) { CALL(0x0e26, drawAllSpritesUnconditionally__drawObject, 0x0e71, 0x0e29); } else I(0x0e26, 3);  // call nz,$0e71
   I(0x0e29, 1); L = alu_inc8(gb, L);  // inc l
   I(0x0e2a, 1); L = alu_inc8(gb, L);  // inc l
   I(0x0e2b, 2); alu_bit(gb, 7, L);  // bit 7,l
@@ -10105,8 +12914,328 @@ L_0e60:
   RET(0x0e70); return;  // ret
 }
 
+// 00:0dc1
+void drawAllSpritesUnconditionally__loop(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0dc1:
+  CALL(0x0dc1, objectQueueDraw, 0x10a8, 0x0dc4);  // call $10a8
+  I(0x0dc4, 1); D = alu_inc8(gb, D);  // inc d
+  I(0x0dc5, 1); A = D;  // ld a,d
+  I(0x0dc6, 2); alu_cp(gb, 0xd6);  // cp $d6
+  if ((F & FC)) { I(0x0dc8, 3); goto L_0dc1; } I(0x0dc8, 2);  // jr c,$0dc1
+  I(0x0dca, 2); A = 0x14;  // ld a,$14
+  I(0x0dcc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x0dce, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  I(0x0dd1, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
+  I(0x0dd4, 1); alu_add(gb, A);  // add a
+  I(0x0dd5, 2); A = alu_swap(gb, A);  // swap a
+  I(0x0dd7, 2); alu_and(gb, 0x03);  // and $03
+  I(0x0dd9, 3); SET_HL(0x405f);  // ld hl,$405f
+  RST_PUSH(0x0ddc, 0x0ddd);  // rst $18 (addDoubleIndexToHl)
+  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
+  I(0x0ddd, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0dde, 4); mem_wr(gb, 0xc4ba, A);  // ld ($c4ba),a
+  I(0x0de1, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0de2, 4); mem_wr(gb, 0xc4bb, A);  // ld ($c4bb),a
+  I(0x0de5, 3); SET_HL(0xc4b7);  // ld hl,$c4b7
+  I(0x0de8, 2); A = 0xc3;  // ld a,$c3
+  I(0x0dea, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x0deb, 2); A = 0x82;  // ld a,$82
+  I(0x0ded, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x0dee, 3); mem_wr(gb, HL, 0x0f);  // ld (hl),$0f
+  I(0x0df0, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
+  I(0x0df3, 2); alu_cp(gb, 0x08);  // cp $08
+  if (!(F & FZ)) { I(0x0df5, 3); goto L_0e21; } I(0x0df5, 2);  // jr nz,$0e21
+  I(0x0df7, 2); A = 0x0f;  // ld a,$0f
+  I(0x0df9, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
+  I(0x0dfa, 3); mem_wr(gb, HL, 0xc1);  // ld (hl),$c1
+  I(0x0dfc, 1); alu_xor(gb, A);  // xor a
+  I(0x0dfd, 1); B = A;  // ld b,a
+  I(0x0dfe, 1); A = alu_inc8(gb, A);  // inc a
+  I(0x0dff, 3); mem_wr(gb, 0xff8a, A);  // ldh ($ff8a),a
+  I(0x0e01, 4); A = mem_rd(gb, 0xcc2e);  // ld a,($cc2e)
+  I(0x0e04, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { I(0x0e05, 3); goto L_0e09; } I(0x0e05, 2);  // jr z,$0e09
+  I(0x0e07, 2); A = 0x04;  // ld a,$04
+L_0e09:
+  I(0x0e09, 1); C = A;  // ld c,a
+  I(0x0e0a, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
+  I(0x0e0d, 1); alu_add(gb, C);  // add c
+  I(0x0e0e, 1); alu_add(gb, A);  // add a
+  I(0x0e0f, 1); alu_add(gb, A);  // add a
+  I(0x0e10, 1); C = A;  // ld c,a
+  I(0x0e11, 3); SET_HL(0x1058);  // ld hl,$1058
+  I(0x0e14, 2); alu_add_hl(gb, BC);  // add hl,bc
+  I(0x0e15, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0e16, 3); mem_wr(gb, 0xff90, A);  // ldh ($ff90),a
+  I(0x0e18, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0e19, 3); mem_wr(gb, 0xff91, A);  // ldh ($ff91),a
+  I(0x0e1b, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0e1c, 3); mem_wr(gb, 0xff92, A);  // ldh ($ff92),a
+  I(0x0e1e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0e1f, 3); mem_wr(gb, 0xff93, A);  // ldh ($ff93),a
+L_0e21:
+  I(0x0e21, 3); SET_HL(0xc500);  // ld hl,$c500
+L_0e24:
+  I(0x0e24, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x0e25, 1); alu_or(gb, A);  // or a
+  if (!(F & FZ)) { CALL(0x0e26, drawAllSpritesUnconditionally__drawObject, 0x0e71, 0x0e29); } else I(0x0e26, 3);  // call nz,$0e71
+  I(0x0e29, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x0e2a, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x0e2b, 2); alu_bit(gb, 7, L);  // bit 7,l
+  if ((F & FZ)) { I(0x0e2d, 3); goto L_0e24; } I(0x0e2d, 2);  // jr z,$0e24
+  I(0x0e2f, 3); SET_HL(0xc4c0);  // ld hl,$c4c0
+  I(0x0e32, 3); A = mem_rd(gb, 0xffa0);  // ldh a,($ffa0)
+  I(0x0e34, 1); alu_rrca(gb);  // rrca
+  I(0x0e35, 2); A = alu_srl(gb, A);  // srl a
+  I(0x0e37, 1); B = A;  // ld b,a
+  if ((F & FZ)) { I(0x0e38, 3); goto L_0e4e; } I(0x0e38, 2);  // jr z,$0e4e
+L_0e3a:
+  PUSH(0x0e3a, BC);  // push bc
+  I(0x0e3b, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0e3c, 3); mem_wr(gb, 0xff8c, A);  // ldh ($ff8c),a
+  I(0x0e3e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0e3f, 3); mem_wr(gb, 0xff8d, A);  // ldh ($ff8d),a
+  I(0x0e41, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  PUSH(0x0e42, HL);  // push hl
+  I(0x0e43, 2); H = mem_rd(gb, HL);  // ld h,(hl)
+  I(0x0e44, 1); L = A;  // ld l,a
+  CALL(0x0e45, func_0eda, 0x0eda, 0x0e48);  // call $0eda
+  SET_HL(POP(0x0e48));  // pop hl
+  I(0x0e49, 1); L = alu_inc8(gb, L);  // inc l
+  SET_BC(POP(0x0e4a));  // pop bc
+  I(0x0e4b, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x0e4c, 3); goto L_0e3a; } I(0x0e4c, 2);  // jr nz,$0e3a
+L_0e4e:
+  I(0x0e4e, 3); A = mem_rd(gb, 0xff9f);  // ldh a,($ff9f)
+  I(0x0e50, 2); alu_cp(gb, 0xa0);  // cp $a0
+  if (!(F & FC)) { I(0x0e52, 3); goto L_0e60; } I(0x0e52, 2);  // jr nc,$0e60
+  I(0x0e54, 2); H = 0xcb;  // ld h,$cb
+  I(0x0e56, 2); B = 0xe0;  // ld b,$e0
+L_0e58:
+  I(0x0e58, 1); L = A;  // ld l,a
+  I(0x0e59, 2); mem_wr(gb, HL, B);  // ld (hl),b
+  I(0x0e5a, 2); alu_add(gb, 0x04);  // add $04
+  I(0x0e5c, 2); alu_cp(gb, 0xa0);  // cp $a0
+  if ((F & FC)) { I(0x0e5e, 3); goto L_0e58; } I(0x0e5e, 2);  // jr c,$0e58
+L_0e60:
+  I(0x0e60, 4); A = mem_rd(gb, 0xcc69);  // ld a,($cc69)
+  I(0x0e63, 1); alu_cpl(gb);  // cpl
+  I(0x0e64, 1); A = alu_inc8(gb, A);  // inc a
+  I(0x0e65, 3); SET_HL(0xd00b);  // ld hl,$d00b
+  I(0x0e68, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x0e69, 2); mem_wr(gb, HL, A);  // ld (hl),a
+  SET_AF(POP(0x0e6a));  // pop af
+  I(0x0e6b, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x0e6d, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  RET(0x0e70); return;  // ret
+}
+
+// 00:0e71
+void drawAllSpritesUnconditionally__drawObject(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0e71:
+  PUSH(0x0e71, HL);  // push hl
+  I(0x0e72, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x0e73, 2); H = mem_rd(gb, HL);  // ld h,(hl)
+  I(0x0e74, 1); L = A;  // ld l,a
+  CALL(0x0e75, wRamFunction, 0xc4b7, 0x0e78);  // call $c4b7
+  if (!(F & FC)) { I(0x0e78, 3); goto L_0ece; } I(0x0e78, 2);  // jr nc,$0ece
+  I(0x0e7a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0e7b, 3); mem_wr(gb, 0xff8f, A);  // ldh ($ff8f),a
+  I(0x0e7d, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0e7e, 3); mem_wr(gb, 0xff8e, A);  // ldh ($ff8e),a
+  I(0x0e80, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0e81, 2); H = mem_rd(gb, HL);  // ld h,(hl)
+  I(0x0e82, 1); L = A;  // ld l,a
+  I(0x0e83, 1); A = H;  // ld a,h
+  I(0x0e84, 2); alu_and(gb, 0xc0);  // and $c0
+  I(0x0e86, 1); alu_rlca(gb);  // rlca
+  I(0x0e87, 1); alu_rlca(gb);  // rlca
+  I(0x0e88, 2); alu_add(gb, 0x13);  // add $13
+  I(0x0e8a, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x0e8c, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  I(0x0e8f, 2); H = (uint8_t)(H | (1 << 6));  // set 6,h
+  I(0x0e91, 2); H = (uint8_t)(H & ~(1 << 7));  // res 7,h
+  I(0x0e93, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0e94, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { I(0x0e95, 3); goto L_0ece; } I(0x0e95, 2);  // jr z,$0ece
+  I(0x0e97, 1); C = A;  // ld c,a
+  I(0x0e98, 3); A = mem_rd(gb, 0xff9f);  // ldh a,($ff9f)
+  I(0x0e9a, 1); E = A;  // ld e,a
+  I(0x0e9b, 2); A = 0xa0;  // ld a,$a0
+  I(0x0e9d, 1); alu_sub(gb, E);  // sub e
+  if ((F & FZ)) { I(0x0e9e, 3); goto L_0ece; } I(0x0e9e, 2);  // jr z,$0ece
+  I(0x0ea0, 1); alu_rrca(gb);  // rrca
+  I(0x0ea1, 1); alu_rrca(gb);  // rrca
+  I(0x0ea2, 1); B = A;  // ld b,a
+  I(0x0ea3, 2); D = 0xcb;  // ld d,$cb
+L_0ea5:
+  I(0x0ea5, 3); A = mem_rd(gb, 0xff8c);  // ldh a,($ff8c)
+  I(0x0ea7, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x0ea8, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ea9, 2); alu_cp(gb, 0xa0);  // cp $a0
+  if (!(F & FC)) { I(0x0eab, 3); goto L_0ed2; } I(0x0eab, 2);  // jr nc,$0ed2
+  I(0x0ead, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0eae, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
+  I(0x0eb0, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x0eb1, 2); alu_cp(gb, 0xa8);  // cp $a8
+  if (!(F & FC)) { I(0x0eb3, 3); goto L_0ed2; } I(0x0eb3, 2);  // jr nc,$0ed2
+  I(0x0eb5, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0eb6, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0eb7, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0eb8, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0eb9, 3); A = mem_rd(gb, 0xff8e);  // ldh a,($ff8e)
+  I(0x0ebb, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x0ebc, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0ebd, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ebe, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0ebf, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
+  I(0x0ec1, 2); alu_xor(gb, mem_rd(gb, HL));  // xor (hl)
+  I(0x0ec2, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0ec3, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ec4, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0ec5, 1); B = alu_dec8(gb, B);  // dec b
+  if ((F & FZ)) { I(0x0ec6, 3); goto L_0ecb; } I(0x0ec6, 2);  // jr z,$0ecb
+  I(0x0ec8, 1); C = alu_dec8(gb, C);  // dec c
+  if (!(F & FZ)) { I(0x0ec9, 3); goto L_0ea5; } I(0x0ec9, 2);  // jr nz,$0ea5
+L_0ecb:
+  I(0x0ecb, 1); A = E;  // ld a,e
+  I(0x0ecc, 3); mem_wr(gb, 0xff9f, A);  // ldh ($ff9f),a
+L_0ece:
+  SET_HL(POP(0x0ece));  // pop hl
+  I(0x0ecf, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
+  RET(0x0ed1); return;  // ret
+L_0ed2:
+  I(0x0ed2, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ed3, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ed4, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ed5, 1); C = alu_dec8(gb, C);  // dec c
+  if (!(F & FZ)) { I(0x0ed6, 3); goto L_0ea5; } I(0x0ed6, 2);  // jr nz,$0ea5
+  I(0x0ed8, 3); goto L_0ecb;  // jr $0ecb
+}
+
+// 00:0ea5
+void drawAllSpritesUnconditionally__nextSprite(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0ea5:
+  I(0x0ea5, 3); A = mem_rd(gb, 0xff8c);  // ldh a,($ff8c)
+  I(0x0ea7, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x0ea8, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ea9, 2); alu_cp(gb, 0xa0);  // cp $a0
+  if (!(F & FC)) { I(0x0eab, 3); goto L_0ed2; } I(0x0eab, 2);  // jr nc,$0ed2
+  I(0x0ead, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0eae, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
+  I(0x0eb0, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x0eb1, 2); alu_cp(gb, 0xa8);  // cp $a8
+  if (!(F & FC)) { I(0x0eb3, 3); goto L_0ed2; } I(0x0eb3, 2);  // jr nc,$0ed2
+  I(0x0eb5, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0eb6, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0eb7, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0eb8, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0eb9, 3); A = mem_rd(gb, 0xff8e);  // ldh a,($ff8e)
+  I(0x0ebb, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x0ebc, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0ebd, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ebe, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0ebf, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
+  I(0x0ec1, 2); alu_xor(gb, mem_rd(gb, HL));  // xor (hl)
+  I(0x0ec2, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0ec3, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ec4, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0ec5, 1); B = alu_dec8(gb, B);  // dec b
+  if ((F & FZ)) { I(0x0ec6, 3); goto L_0ecb; } I(0x0ec6, 2);  // jr z,$0ecb
+  I(0x0ec8, 1); C = alu_dec8(gb, C);  // dec c
+  if (!(F & FZ)) { I(0x0ec9, 3); goto L_0ea5; } I(0x0ec9, 2);  // jr nz,$0ea5
+L_0ecb:
+  I(0x0ecb, 1); A = E;  // ld a,e
+  I(0x0ecc, 3); mem_wr(gb, 0xff9f, A);  // ldh ($ff9f),a
+L_0ece:
+  SET_HL(POP(0x0ece));  // pop hl
+  I(0x0ecf, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
+  RET(0x0ed1); return;  // ret
+L_0ed2:
+  I(0x0ed2, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ed3, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ed4, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ed5, 1); C = alu_dec8(gb, C);  // dec c
+  if (!(F & FZ)) { I(0x0ed6, 3); goto L_0ea5; } I(0x0ed6, 2);  // jr nz,$0ea5
+  I(0x0ed8, 3); goto L_0ecb;  // jr $0ecb
+}
+
+// 00:0ecb
+void drawAllSpritesUnconditionally__doneDrawing(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0ecb:
+  I(0x0ecb, 1); A = E;  // ld a,e
+  I(0x0ecc, 3); mem_wr(gb, 0xff9f, A);  // ldh ($ff9f),a
+L_0ece:
+  SET_HL(POP(0x0ece));  // pop hl
+  I(0x0ecf, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
+  RET(0x0ed1); return;  // ret
+}
+
+// 00:0ece
+void drawAllSpritesUnconditionally__return(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0ece:
+  SET_HL(POP(0x0ece));  // pop hl
+  I(0x0ecf, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
+  RET(0x0ed1); return;  // ret
+}
+
+// 00:0ed2
+void drawAllSpritesUnconditionally__incHlToNextSprite(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_0ed2;
+L_0ea5:
+  I(0x0ea5, 3); A = mem_rd(gb, 0xff8c);  // ldh a,($ff8c)
+  I(0x0ea7, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x0ea8, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ea9, 2); alu_cp(gb, 0xa0);  // cp $a0
+  if (!(F & FC)) { I(0x0eab, 3); goto L_0ed2; } I(0x0eab, 2);  // jr nc,$0ed2
+  I(0x0ead, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0eae, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
+  I(0x0eb0, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x0eb1, 2); alu_cp(gb, 0xa8);  // cp $a8
+  if (!(F & FC)) { I(0x0eb3, 3); goto L_0ed2; } I(0x0eb3, 2);  // jr nc,$0ed2
+  I(0x0eb5, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0eb6, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0eb7, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0eb8, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0eb9, 3); A = mem_rd(gb, 0xff8e);  // ldh a,($ff8e)
+  I(0x0ebb, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x0ebc, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0ebd, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ebe, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0ebf, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
+  I(0x0ec1, 2); alu_xor(gb, mem_rd(gb, HL));  // xor (hl)
+  I(0x0ec2, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0ec3, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ec4, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0ec5, 1); B = alu_dec8(gb, B);  // dec b
+  if ((F & FZ)) { I(0x0ec6, 3); goto L_0ecb; } I(0x0ec6, 2);  // jr z,$0ecb
+  I(0x0ec8, 1); C = alu_dec8(gb, C);  // dec c
+  if (!(F & FZ)) { I(0x0ec9, 3); goto L_0ea5; } I(0x0ec9, 2);  // jr nz,$0ea5
+L_0ecb:
+  I(0x0ecb, 1); A = E;  // ld a,e
+  I(0x0ecc, 3); mem_wr(gb, 0xff9f, A);  // ldh ($ff9f),a
+L_0ece:
+  SET_HL(POP(0x0ece));  // pop hl
+  I(0x0ecf, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
+  RET(0x0ed1); return;  // ret
+L_0ed2:
+  I(0x0ed2, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ed3, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ed4, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ed5, 1); C = alu_dec8(gb, C);  // dec c
+  if (!(F & FZ)) { I(0x0ed6, 3); goto L_0ea5; } I(0x0ed6, 2);  // jr nz,$0ea5
+  I(0x0ed8, 3); goto L_0ecb;  // jr $0ecb
+}
+
 // 00:0eda
 void func_0eda(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0eda, 2); A = 0x14;  // ld a,$14
   I(0x0edc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x0ede, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -10145,8 +13274,44 @@ L_0f07:
   RET(0x0f07); return;  // ret
 }
 
+// 00:0eef
+void func_0eda__nextSprite(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0eef:
+  I(0x0eef, 3); A = mem_rd(gb, 0xff8c);  // ldh a,($ff8c)
+  I(0x0ef1, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x0ef2, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0ef3, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0ef4, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0ef5, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
+  I(0x0ef7, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x0ef8, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0ef9, 2); SET_HL(HL + 1);  // inc hl
+  I(0x0efa, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0efb, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0efc, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0efd, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0efe, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0eff, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0f00, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0f01, 1); C = alu_dec8(gb, C);  // dec c
+  if (!(F & FZ)) { I(0x0f02, 3); goto L_0eef; } I(0x0f02, 2);  // jr nz,$0eef
+  I(0x0f04, 1); A = E;  // ld a,e
+  I(0x0f05, 3); mem_wr(gb, 0xff9f, A);  // ldh ($ff9f),a
+L_0f07:
+  RET(0x0f07); return;  // ret
+}
+
+// 00:0f07
+void func_0eda__end(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0f07:
+  RET(0x0f07); return;  // ret
+}
+
 // 00:0f08
 void _drawObjectTerrainEffects(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0f08, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
   I(0x0f0b, 2); alu_and(gb, 0x20);  // and $20
   if (!(F & FZ)) { RET_TAKEN(0x0f0d); return; } I(0x0f0d, 2);  // ret nz
@@ -10234,8 +13399,157 @@ L_0f80:
   RET(0x0f81); return;  // ret
 }
 
+// 00:0f16
+void _drawObjectTerrainEffects__inAir(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0f16:
+  I(0x0f16, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
+  I(0x0f19, 1); alu_xor(gb, H);  // xor h
+  I(0x0f1a, 1); alu_rrca(gb);  // rrca
+  if (!(F & FC)) { RET_TAKEN(0x0f1b); return; } I(0x0f1b, 2);  // ret nc
+  PUSH(0x0f1c, HL);  // push hl
+  I(0x0f1d, 3); A = mem_rd(gb, 0xffa0);  // ldh a,($ffa0)
+  I(0x0f1f, 2); alu_add(gb, 0xc0);  // add $c0
+  I(0x0f21, 1); L = A;  // ld l,a
+  I(0x0f22, 2); H = 0xc4;  // ld h,$c4
+  I(0x0f24, 3); A = mem_rd(gb, 0xff8c);  // ldh a,($ff8c)
+  I(0x0f26, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x0f27, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
+  I(0x0f29, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x0f2a, 2); A = 0x00;  // ld a,$00
+  I(0x0f2c, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x0f2d, 2); A = 0x40;  // ld a,$40
+  I(0x0f2f, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x0f30, 1); A = L;  // ld a,l
+  I(0x0f31, 2); alu_sub(gb, 0xc0);  // sub $c0
+  I(0x0f33, 3); mem_wr(gb, 0xffa0, A);  // ldh ($ffa0),a
+  SET_HL(POP(0x0f35));  // pop hl
+  RET(0x0f36); return;  // ret
+}
+
+// 00:0f37
+void _drawObjectTerrainEffects__onGround(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0f37:
+  I(0x0f37, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
+  I(0x0f3a, 2); alu_cp(gb, 0x08);  // cp $08
+  if ((F & FZ)) { RET_TAKEN(0x0f3c); return; } I(0x0f3c, 2);  // ret z
+  PUSH(0x0f3d, HL);  // push hl
+  I(0x0f3e, 1); A = L;  // ld a,l
+  I(0x0f3f, 2); alu_and(gb, 0xc0);  // and $c0
+  I(0x0f41, 2); alu_add(gb, 0x0b);  // add $0b
+  I(0x0f43, 1); L = A;  // ld l,a
+  I(0x0f44, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0f45, 1); B = A;  // ld b,a
+  I(0x0f46, 2); alu_add(gb, 0x05);  // add $05
+  I(0x0f48, 2); alu_and(gb, 0xf0);  // and $f0
+  I(0x0f4a, 1); C = A;  // ld c,a
+  I(0x0f4b, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x0f4c, 2); L = mem_rd(gb, HL);  // ld l,(hl)
+  I(0x0f4d, 1); A = L;  // ld a,l
+  I(0x0f4e, 1); alu_xor(gb, B);  // xor b
+  I(0x0f4f, 1); H = A;  // ld h,a
+  I(0x0f50, 1); A = L;  // ld a,l
+  I(0x0f51, 2); alu_and(gb, 0xf0);  // and $f0
+  I(0x0f53, 2); A = alu_swap(gb, A);  // swap a
+  I(0x0f55, 1); alu_or(gb, C);  // or c
+  I(0x0f56, 1); C = A;  // ld c,a
+  I(0x0f57, 2); B = 0xcf;  // ld b,$cf
+  I(0x0f59, 2); A = mem_rd(gb, BC);  // ld a,(bc)
+  I(0x0f5a, 2); alu_cp(gb, 0xf8);  // cp $f8
+  if ((F & FZ)) { I(0x0f5c, 3); goto L_0f6b; } I(0x0f5c, 2);  // jr z,$0f6b
+  I(0x0f5e, 2); alu_cp(gb, 0xf9);  // cp $f9
+  if (!(F & FZ)) { I(0x0f60, 3); goto L_0f80; } I(0x0f60, 2);  // jr nz,$0f80
+L_0f62:
+  I(0x0f62, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0f63, 3); SET_HL(0xc4ba);  // ld hl,$c4ba
+  I(0x0f66, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0f67, 2); H = mem_rd(gb, HL);  // ld h,(hl)
+  I(0x0f68, 1); L = A;  // ld l,a
+  I(0x0f69, 3); goto L_0f7b;  // jr $0f7b
+L_0f6b:
+  I(0x0f6b, 2); alu_bit(gb, 2, H);  // bit 2,h
+  I(0x0f6d, 4); A = mem_rd(gb, 0xcc36);  // ld a,($cc36)
+  if ((F & FZ)) { I(0x0f70, 3); goto L_0f74; } I(0x0f70, 2);  // jr z,$0f74
+  I(0x0f72, 2); alu_add(gb, 0x24);  // add $24
+L_0f74:
+  I(0x0f74, 1); C = A;  // ld c,a
+  I(0x0f75, 2); B = 0x00;  // ld b,$00
+  I(0x0f77, 3); SET_HL(0x4005);  // ld hl,$4005
+  I(0x0f7a, 2); alu_add_hl(gb, BC);  // add hl,bc
+L_0f7b:
+  PUSH(0x0f7b, DE);  // push de
+  CALL(0x0f7c, func_0eda, 0x0eda, 0x0f7f);  // call $0eda
+  SET_DE(POP(0x0f7f));  // pop de
+L_0f80:
+  SET_HL(POP(0x0f80));  // pop hl
+  RET(0x0f81); return;  // ret
+}
+
+// 00:0f62
+void _drawObjectTerrainEffects__walkingInPuddle(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0f62:
+  I(0x0f62, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x0f63, 3); SET_HL(0xc4ba);  // ld hl,$c4ba
+  I(0x0f66, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0f67, 2); H = mem_rd(gb, HL);  // ld h,(hl)
+  I(0x0f68, 1); L = A;  // ld l,a
+  I(0x0f69, 3); goto L_0f7b;  // jr $0f7b
+L_0f7b:
+  PUSH(0x0f7b, DE);  // push de
+  CALL(0x0f7c, func_0eda, 0x0eda, 0x0f7f);  // call $0eda
+  SET_DE(POP(0x0f7f));  // pop de
+L_0f80:
+  SET_HL(POP(0x0f80));  // pop hl
+  RET(0x0f81); return;  // ret
+}
+
+// 00:0f6b
+void _drawObjectTerrainEffects__walkingInGrass(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0f6b:
+  I(0x0f6b, 2); alu_bit(gb, 2, H);  // bit 2,h
+  I(0x0f6d, 4); A = mem_rd(gb, 0xcc36);  // ld a,($cc36)
+  if ((F & FZ)) { I(0x0f70, 3); goto L_0f74; } I(0x0f70, 2);  // jr z,$0f74
+  I(0x0f72, 2); alu_add(gb, 0x24);  // add $24
+L_0f74:
+  I(0x0f74, 1); C = A;  // ld c,a
+  I(0x0f75, 2); B = 0x00;  // ld b,$00
+  I(0x0f77, 3); SET_HL(0x4005);  // ld hl,$4005
+  I(0x0f7a, 2); alu_add_hl(gb, BC);  // add hl,bc
+L_0f7b:
+  PUSH(0x0f7b, DE);  // push de
+  CALL(0x0f7c, func_0eda, 0x0eda, 0x0f7f);  // call $0eda
+  SET_DE(POP(0x0f7f));  // pop de
+L_0f80:
+  SET_HL(POP(0x0f80));  // pop hl
+  RET(0x0f81); return;  // ret
+}
+
+// 00:0f7b
+void _drawObjectTerrainEffects__grassOrWater(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0f7b:
+  PUSH(0x0f7b, DE);  // push de
+  CALL(0x0f7c, func_0eda, 0x0eda, 0x0f7f);  // call $0eda
+  SET_DE(POP(0x0f7f));  // pop de
+L_0f80:
+  SET_HL(POP(0x0f80));  // pop hl
+  RET(0x0f81); return;  // ret
+}
+
+// 00:0f80
+void _drawObjectTerrainEffects__end(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_0f80:
+  SET_HL(POP(0x0f80));  // pop hl
+  RET(0x0f81); return;  // ret
+}
+
 // 00:0f82
 void _getObjectPositionOnScreen(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0f82, 3); A = mem_rd(gb, 0xffac);  // ldh a,($ffac)
   I(0x0f84, 1); C = A;  // ld c,a
   I(0x0f85, 3); A = mem_rd(gb, 0xffaa);  // ldh a,($ffaa)
@@ -10273,6 +13587,7 @@ void _getObjectPositionOnScreen(GB *gb) {
 
 // 00:0fc1
 void _getObjectPositionOnScreen_duringScreenTransition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x0fc1, 1); D = H;  // ld d,h
   I(0x0fc2, 1); A = L;  // ld a,l
   I(0x0fc3, 2); alu_and(gb, 0xc0);  // and $c0
@@ -10280,7 +13595,7 @@ void _getObjectPositionOnScreen_duringScreenTransition(GB *gb) {
   I(0x0fc6, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x0fc7, 2); alu_and(gb, 0x03);  // and $03
   I(0x0fc9, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FZ)) { I(0x0fcb, 3); HANDOFF(0x0faf); /* _label_00_152 */ } I(0x0fcb, 2);  // jr z,$0faf
+  if ((F & FZ)) { I(0x0fcb, 3); _label_00_152(gb); return; } I(0x0fcb, 2);  // jr z,$0faf
   I(0x0fcd, 2); D = 0x00;  // ld d,$00
   I(0x0fcf, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x0fd0, 2); alu_add(gb, 0x10);  // add $10
@@ -10392,8 +13707,27 @@ L_1056:
   RET(0x1057); return;  // ret
 }
 
+// 00:1048
+void _getObjectPositionOnScreen_duringScreenTransition__dontDraw(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1048:
+  SET_HL(POP(0x1048));  // pop hl
+  I(0x1049, 1); A = L;  // ld a,l
+  I(0x104a, 2); alu_and(gb, 0xc0);  // and $c0
+  I(0x104c, 1); L = A;  // ld l,a
+  I(0x104d, 3); alu_bit(gb, 1, mem_rd(gb, HL));  // bit 1,(hl)
+  if ((F & FZ)) { I(0x104f, 3); goto L_1056; } I(0x104f, 2);  // jr z,$1056
+  I(0x1051, 2); alu_or(gb, 0x1a);  // or $1a
+  I(0x1053, 1); L = A;  // ld l,a
+  I(0x1054, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
+L_1056:
+  I(0x1056, 1); alu_xor(gb, A);  // xor a
+  RET(0x1057); return;  // ret
+}
+
 // 00:1078
 void queueDrawEverything(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1078, 3); SET_HL(0xffa0);  // ld hl,$ffa0
   I(0x107b, 1); alu_xor(gb, A);  // xor a
   I(0x107c, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
@@ -10403,13 +13737,13 @@ void queueDrawEverything(GB *gb) {
   I(0x1080, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x1081, 3); SET_DE(0xd600);  // ld de,$d600
   I(0x1084, 2); B = 0x0b;  // ld b,$0b
-  CALL_ASM(0x1086, 0x109e, 0x1089); /* unported */  // call $109e
+  CALL(0x1086, queueDrawEverything__func, 0x109e, 0x1089);  // call $109e
   I(0x1089, 3); SET_DE(0xd080);  // ld de,$d080
   I(0x108c, 2); B = 0x8b;  // ld b,$8b
-  CALL_ASM(0x108e, 0x109e, 0x1091); /* unported */  // call $109e
+  CALL(0x108e, queueDrawEverything__func, 0x109e, 0x1091);  // call $109e
   I(0x1091, 3); SET_DE(0xd0c0);  // ld de,$d0c0
   I(0x1094, 2); B = 0xcb;  // ld b,$cb
-  CALL_ASM(0x1096, 0x109e, 0x1099); /* unported */  // call $109e
+  CALL(0x1096, queueDrawEverything__func, 0x109e, 0x1099);  // call $109e
   I(0x1099, 3); SET_DE(0xd040);  // ld de,$d040
   I(0x109c, 2); B = 0x4b;  // ld b,$4b
 L_109e:
@@ -10421,8 +13755,21 @@ L_109e:
   RET(0x10a7); return;  // ret
 }
 
+// 00:109e
+void queueDrawEverything__func(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_109e:
+  CALL(0x109e, objectQueueDraw, 0x10a8, 0x10a1);  // call $10a8
+  I(0x10a1, 1); D = alu_inc8(gb, D);  // inc d
+  I(0x10a2, 1); A = D;  // ld a,d
+  I(0x10a3, 2); alu_cp(gb, 0xe0);  // cp $e0
+  if ((F & FC)) { I(0x10a5, 3); goto L_109e; } I(0x10a5, 2);  // jr c,$109e
+  RET(0x10a7); return;  // ret
+}
+
 // 00:10a8
 void objectQueueDraw(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x10a8, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x10a9, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { RET_TAKEN(0x10aa); return; } I(0x10aa, 2);  // ret z
@@ -10456,6 +13803,7 @@ void objectQueueDraw(GB *gb) {
 
 // 00:1135
 void func_1135(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1135, 1); alu_xor(gb, A);  // xor a
   I(0x1136, 4); mem_wr(gb, 0xc632, A);  // ld ($c632),a
   RET(0x1139); return;  // ret
@@ -10463,6 +13811,7 @@ void func_1135(GB *gb) {
 
 // 00:131f
 void func_131f(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x131f, 1); alu_xor(gb, A);  // xor a
   I(0x1320, 4); mem_wr(gb, 0xcd08, A);  // ld ($cd08),a
   I(0x1323, 4); mem_wr(gb, 0xcd09, A);  // ld ($cd09),a
@@ -10479,10 +13828,10 @@ void func_131f(GB *gb) {
   if ((F & FZ)) { I(0x133d, 3); goto L_1356; } I(0x133d, 2);  // jr z,$1356
   I(0x133f, 3); SET_HL(0x6ed1);  // ld hl,$6ed1
   I(0x1342, 2); E = 0x04;  // ld e,$04
-  CALL_ASM(0x1344, 0x008a, 0x1347); /* interBankCall */  // call $008a
+  CALL(0x1344, interBankCall, 0x008a, 0x1347);  // call $008a
   I(0x1347, 3); SET_HL(0x6f31);  // ld hl,$6f31
   I(0x134a, 2); E = 0x04;  // ld e,$04
-  CALL_ASM(0x134c, 0x008a, 0x134f); /* interBankCall */  // call $008a
+  CALL(0x134c, interBankCall, 0x008a, 0x134f);  // call $008a
   I(0x134f, 2); A = 0x30;  // ld a,$30
   CALL(0x1351, loadUncompressedGfxHeader, 0x05da, 0x1354);  // call $05da
   I(0x1354, 3); goto L_1361;  // jr $1361
@@ -10504,6 +13853,7 @@ L_1361:
 
 // 00:1374
 void loadTilesetAnimation(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1374, 4); A = mem_rd(gb, 0xcd2b);  // ld a,($cd2b)
   I(0x1377, 1); B = A;  // ld b,a
   I(0x1378, 4); A = mem_rd(gb, 0xcd25);  // ld a,($cd25)
@@ -10515,11 +13865,13 @@ void loadTilesetAnimation(GB *gb) {
 
 // 00:1383
 void func_1383(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   RET(0x1383); return;  // ret
 }
 
 // 00:13c6
 void func_13c6(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x13c6, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x13c8, AF);  // push af
   I(0x13c9, 2); A = 0x02;  // ld a,$02
@@ -10542,6 +13894,7 @@ void func_13c6(GB *gb) {
 
 // 00:1545
 void _simpleCollision(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1545, 2); alu_bit(gb, 3, B);  // bit 3,b
   if (!(F & FZ)) { I(0x1547, 3); goto L_154b; } I(0x1547, 2);  // jr nz,$154b
   I(0x1549, 1); alu_rrca(gb);  // rrca
@@ -10557,6 +13910,7 @@ L_1550:
 
 // 00:1552
 void _complexCollision(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x1552, DE);  // push de
   I(0x1553, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x1555, 1); E = A;  // ld e,a
@@ -10583,6 +13937,7 @@ L_1560:
 
 // 00:184d
 void stopTextThread(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x184d, 1); alu_xor(gb, A);  // xor a
   I(0x184e, 4); mem_wr(gb, 0xcba0, A);  // ld ($cba0),a
   I(0x1851, 4); mem_wr(gb, 0xcbae, A);  // ld ($cbae),a
@@ -10592,28 +13947,32 @@ void stopTextThread(GB *gb) {
 
 // 00:1860
 void showTextOnInventoryMenu(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1860, 4); A = mem_rd(gb, 0xcbae);  // ld a,($cbae)
   I(0x1863, 2); A = (uint8_t)(A | (1 << 0));  // set 0,a
   I(0x1865, 4); mem_wr(gb, 0xcbae, A);  // ld ($cbae),a
   I(0x1868, 2); L = 0x00;  // ld l,$00
   I(0x186a, 2); E = 0x02;  // ld e,$02
-  I(0x186c, 3); HANDOFF(0x1876); /* _label_00_204 */  // jr $1876
+  I(0x186c, 3); _label_00_204(gb); return;  // jr $1876
 }
 
 // 00:186e
 void showTextNonExitable(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x186e, 2); L = 0x02;  // ld l,$02
-  I(0x1870, 3); HANDOFF(0x1874); /* _label_00_203 */  // jr $1874
+  I(0x1870, 3); _label_00_203(gb); return;  // jr $1874
 }
 
 // 00:1872
 void showText(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1872, 2); L = 0x00;  // ld l,$00
-  HANDOFF(0x1874);  // fallthrough to _label_00_203
+  _label_00_203(gb); return;  // fallthrough
 }
 
 // 00:18a0
 void textThreadStart(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x18a0, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
   I(0x18a3, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x18a4, 3); goto L_18b4; } I(0x18a4, 2);  // jr z,$18b4
@@ -10635,11 +13994,55 @@ L_18be:
   I(0x18c2, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   CALL_ASM(0x18c5, 0x4b1f, 0x18c8); /* unported */  // call $4b1f
   CALL(0x18c8, resumeThreadNextFrame, 0x08fe, 0x18cb);  // call $08fe
+L_18cb:
+  I(0x18cb, 3); goto L_18be;  // jr $18be
+}
+
+// 00:18aa
+void textThreadStart__dontShowText(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_18aa:
+  I(0x18aa, 1); alu_xor(gb, A);  // xor a
+  I(0x18ab, 4); mem_wr(gb, 0xcba0, A);  // ld ($cba0),a
+  I(0x18ae, 4); mem_wr(gb, 0xcbae, A);  // ld ($cbae),a
+  I(0x18b1, 4); stubThreadStart(gb); return;  // jp $08e2
+}
+
+// 00:18b4
+void textThreadStart__showText(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_18b4:
+  I(0x18b4, 2); A = 0x3f;  // ld a,$3f
+  I(0x18b6, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x18b8, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  CALL_ASM(0x18bb, 0x4af7, 0x18be); /* unported */  // call $4af7
+L_18be:
+  I(0x18be, 2); A = 0x3f;  // ld a,$3f
+  I(0x18c0, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x18c2, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  CALL_ASM(0x18c5, 0x4b1f, 0x18c8); /* unported */  // call $4b1f
+  CALL(0x18c8, resumeThreadNextFrame, 0x08fe, 0x18cb);  // call $08fe
+L_18cb:
+  I(0x18cb, 3); goto L_18be;  // jr $18be
+}
+
+// 00:18cb
+void textThreadStart__afterCall18cb(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_18cb;
+L_18be:
+  I(0x18be, 2); A = 0x3f;  // ld a,$3f
+  I(0x18c0, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x18c2, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  CALL_ASM(0x18c5, 0x4b1f, 0x18c8); /* unported */  // call $4b1f
+  CALL(0x18c8, resumeThreadNextFrame, 0x08fe, 0x18cb);  // call $08fe
+L_18cb:
   I(0x18cb, 3); goto L_18be;  // jr $18be
 }
 
 // 00:18cd
 void retrieveTextCharacter(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x18cd, HL);  // push hl
   PUSH(0x18ce, DE);  // push de
   PUSH(0x18cf, BC);  // push bc
@@ -10656,7 +14059,7 @@ void retrieveTextCharacter(GB *gb) {
   I(0x18df, 2); A = 0x1c;  // ld a,$1c
   I(0x18e1, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x18e3, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL_ASM(0x18e6, 0x18fd, 0x18e9); /* unported */  // call $18fd
+  CALL(0x18e6, retrieveTextCharacter__func_18fd, 0x18fd, 0x18e9);  // call $18fd
   I(0x18e9, 2); A = 0x3f;  // ld a,$3f
   I(0x18eb, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x18ed, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -10667,8 +14070,262 @@ void retrieveTextCharacter(GB *gb) {
   RET(0x18f6); return;  // ret
 }
 
+// 00:18f7
+void retrieveTextCharacter__data(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_18f7:
+  if (!(F & FZ)) { I(0x18f7, 3); goto L_1940; } I(0x18f7, 2);  // jr nz,$1940
+  I(0x18f9, 1);  // nop
+  I(0x18fa, 1); B = B;  // ld b,b
+  I(0x18fb, 1);  // nop
+  I(0x18fc, 2); B = mem_rd(gb, HL);  // ld b,(hl)
+L_18fd:
+  I(0x18fd, 2); E = 0x10;  // ld e,$10
+  I(0x18ff, 1); A = H;  // ld a,h
+  I(0x1900, 2); alu_cp(gb, 0x48);  // cp $48
+  if (!(F & FZ)) { I(0x1902, 3); goto L_1909; } I(0x1902, 2);  // jr nz,$1909
+  I(0x1904, 1); A = L;  // ld a,l
+  I(0x1905, 2); alu_cp(gb, 0x60);  // cp $60
+  if ((F & FZ)) { I(0x1907, 3); goto L_1933; } I(0x1907, 2);  // jr z,$1933
+L_1909:
+  I(0x1909, 4); A = mem_rd(gb, 0xcba6);  // ld a,($cba6)
+  I(0x190c, 2); alu_and(gb, 0x0f);  // and $0f
+  I(0x190e, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { I(0x190f, 3); goto L_192a; } I(0x190f, 2);  // jr z,$192a
+  I(0x1911, 1); A = alu_dec8(gb, A);  // dec a
+  if ((F & FZ)) { I(0x1912, 3); goto L_1933; } I(0x1912, 2);  // jr z,$1933
+  I(0x1914, 1); A = alu_dec8(gb, A);  // dec a
+  if ((F & FZ)) { I(0x1915, 3); goto L_193e; } I(0x1915, 2);  // jr z,$193e
+L_1917:
+  I(0x1917, 2); E = 0x20;  // ld e,$20
+L_1919:
+  I(0x1919, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x191a, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x191b, 2); SET_BC(BC + 1);  // inc bc
+  I(0x191c, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x191d, 3); goto L_1919; } I(0x191d, 2);  // jr nz,$1919
+  I(0x191f, 4); A = mem_rd(gb, 0xcba6);  // ld a,($cba6)
+  I(0x1922, 2); alu_and(gb, 0xf0);  // and $f0
+  I(0x1924, 2); A = alu_swap(gb, A);  // swap a
+  I(0x1926, 4); mem_wr(gb, 0xcba6, A);  // ld ($cba6),a
+  RET(0x1929); return;  // ret
+L_192a:
+  I(0x192a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x192b, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x192c, 1); C = alu_inc8(gb, C);  // inc c
+  I(0x192d, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x192e, 2); SET_BC(BC + 1);  // inc bc
+  I(0x192f, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x1930, 3); goto L_192a; } I(0x1930, 2);  // jr nz,$192a
+  RET(0x1932); return;  // ret
+L_1933:
+  I(0x1933, 2); A = 0xff;  // ld a,$ff
+  I(0x1935, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x1936, 1); C = alu_inc8(gb, C);  // inc c
+  I(0x1937, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x1938, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x1939, 2); SET_BC(BC + 1);  // inc bc
+  I(0x193a, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x193b, 3); goto L_1933; } I(0x193b, 2);  // jr nz,$1933
+  RET(0x193d); return;  // ret
+L_193e:
+  I(0x193e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x193f, 2); mem_wr(gb, BC, A);  // ld (bc),a
+L_1940:
+  I(0x1940, 1); C = alu_inc8(gb, C);  // inc c
+  I(0x1941, 2); A = 0xff;  // ld a,$ff
+  I(0x1943, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x1944, 2); SET_BC(BC + 1);  // inc bc
+  I(0x1945, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x1946, 3); goto L_193e; } I(0x1946, 2);  // jr nz,$193e
+  RET(0x1948); return;  // ret
+}
+
+// 00:18fd
+void retrieveTextCharacter__func_18fd(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_18fd:
+  I(0x18fd, 2); E = 0x10;  // ld e,$10
+  I(0x18ff, 1); A = H;  // ld a,h
+  I(0x1900, 2); alu_cp(gb, 0x48);  // cp $48
+  if (!(F & FZ)) { I(0x1902, 3); goto L_1909; } I(0x1902, 2);  // jr nz,$1909
+  I(0x1904, 1); A = L;  // ld a,l
+  I(0x1905, 2); alu_cp(gb, 0x60);  // cp $60
+  if ((F & FZ)) { I(0x1907, 3); goto L_1933; } I(0x1907, 2);  // jr z,$1933
+L_1909:
+  I(0x1909, 4); A = mem_rd(gb, 0xcba6);  // ld a,($cba6)
+  I(0x190c, 2); alu_and(gb, 0x0f);  // and $0f
+  I(0x190e, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { I(0x190f, 3); goto L_192a; } I(0x190f, 2);  // jr z,$192a
+  I(0x1911, 1); A = alu_dec8(gb, A);  // dec a
+  if ((F & FZ)) { I(0x1912, 3); goto L_1933; } I(0x1912, 2);  // jr z,$1933
+  I(0x1914, 1); A = alu_dec8(gb, A);  // dec a
+  if ((F & FZ)) { I(0x1915, 3); goto L_193e; } I(0x1915, 2);  // jr z,$193e
+L_1917:
+  I(0x1917, 2); E = 0x20;  // ld e,$20
+L_1919:
+  I(0x1919, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x191a, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x191b, 2); SET_BC(BC + 1);  // inc bc
+  I(0x191c, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x191d, 3); goto L_1919; } I(0x191d, 2);  // jr nz,$1919
+  I(0x191f, 4); A = mem_rd(gb, 0xcba6);  // ld a,($cba6)
+  I(0x1922, 2); alu_and(gb, 0xf0);  // and $f0
+  I(0x1924, 2); A = alu_swap(gb, A);  // swap a
+  I(0x1926, 4); mem_wr(gb, 0xcba6, A);  // ld ($cba6),a
+  RET(0x1929); return;  // ret
+L_192a:
+  I(0x192a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x192b, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x192c, 1); C = alu_inc8(gb, C);  // inc c
+  I(0x192d, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x192e, 2); SET_BC(BC + 1);  // inc bc
+  I(0x192f, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x1930, 3); goto L_192a; } I(0x1930, 2);  // jr nz,$192a
+  RET(0x1932); return;  // ret
+L_1933:
+  I(0x1933, 2); A = 0xff;  // ld a,$ff
+  I(0x1935, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x1936, 1); C = alu_inc8(gb, C);  // inc c
+  I(0x1937, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x1938, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x1939, 2); SET_BC(BC + 1);  // inc bc
+  I(0x193a, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x193b, 3); goto L_1933; } I(0x193b, 2);  // jr nz,$1933
+  RET(0x193d); return;  // ret
+L_193e:
+  I(0x193e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x193f, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x1940, 1); C = alu_inc8(gb, C);  // inc c
+  I(0x1941, 2); A = 0xff;  // ld a,$ff
+  I(0x1943, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x1944, 2); SET_BC(BC + 1);  // inc bc
+  I(0x1945, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x1946, 3); goto L_193e; } I(0x1946, 2);  // jr nz,$193e
+  RET(0x1948); return;  // ret
+}
+
+// 00:1909
+void retrieveTextCharacter__notHeart(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1909:
+  I(0x1909, 4); A = mem_rd(gb, 0xcba6);  // ld a,($cba6)
+  I(0x190c, 2); alu_and(gb, 0x0f);  // and $0f
+  I(0x190e, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { I(0x190f, 3); goto L_192a; } I(0x190f, 2);  // jr z,$192a
+  I(0x1911, 1); A = alu_dec8(gb, A);  // dec a
+  if ((F & FZ)) { I(0x1912, 3); goto L_1933; } I(0x1912, 2);  // jr z,$1933
+  I(0x1914, 1); A = alu_dec8(gb, A);  // dec a
+  if ((F & FZ)) { I(0x1915, 3); goto L_193e; } I(0x1915, 2);  // jr z,$193e
+L_1917:
+  I(0x1917, 2); E = 0x20;  // ld e,$20
+L_1919:
+  I(0x1919, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x191a, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x191b, 2); SET_BC(BC + 1);  // inc bc
+  I(0x191c, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x191d, 3); goto L_1919; } I(0x191d, 2);  // jr nz,$1919
+  I(0x191f, 4); A = mem_rd(gb, 0xcba6);  // ld a,($cba6)
+  I(0x1922, 2); alu_and(gb, 0xf0);  // and $f0
+  I(0x1924, 2); A = alu_swap(gb, A);  // swap a
+  I(0x1926, 4); mem_wr(gb, 0xcba6, A);  // ld ($cba6),a
+  RET(0x1929); return;  // ret
+L_192a:
+  I(0x192a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x192b, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x192c, 1); C = alu_inc8(gb, C);  // inc c
+  I(0x192d, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x192e, 2); SET_BC(BC + 1);  // inc bc
+  I(0x192f, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x1930, 3); goto L_192a; } I(0x1930, 2);  // jr nz,$192a
+  RET(0x1932); return;  // ret
+L_1933:
+  I(0x1933, 2); A = 0xff;  // ld a,$ff
+  I(0x1935, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x1936, 1); C = alu_inc8(gb, C);  // inc c
+  I(0x1937, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x1938, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x1939, 2); SET_BC(BC + 1);  // inc bc
+  I(0x193a, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x193b, 3); goto L_1933; } I(0x193b, 2);  // jr nz,$1933
+  RET(0x193d); return;  // ret
+L_193e:
+  I(0x193e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x193f, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x1940, 1); C = alu_inc8(gb, C);  // inc c
+  I(0x1941, 2); A = 0xff;  // ld a,$ff
+  I(0x1943, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x1944, 2); SET_BC(BC + 1);  // inc bc
+  I(0x1945, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x1946, 3); goto L_193e; } I(0x1946, 2);  // jr nz,$193e
+  RET(0x1948); return;  // ret
+}
+
+// 00:1917
+void retrieveTextCharacter__2bpp(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1917:
+  I(0x1917, 2); E = 0x20;  // ld e,$20
+L_1919:
+  I(0x1919, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x191a, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x191b, 2); SET_BC(BC + 1);  // inc bc
+  I(0x191c, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x191d, 3); goto L_1919; } I(0x191d, 2);  // jr nz,$1919
+  I(0x191f, 4); A = mem_rd(gb, 0xcba6);  // ld a,($cba6)
+  I(0x1922, 2); alu_and(gb, 0xf0);  // and $f0
+  I(0x1924, 2); A = alu_swap(gb, A);  // swap a
+  I(0x1926, 4); mem_wr(gb, 0xcba6, A);  // ld ($cba6),a
+  RET(0x1929); return;  // ret
+}
+
+// 00:192a
+void retrieveTextCharacter__color0(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_192a:
+  I(0x192a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x192b, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x192c, 1); C = alu_inc8(gb, C);  // inc c
+  I(0x192d, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x192e, 2); SET_BC(BC + 1);  // inc bc
+  I(0x192f, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x1930, 3); goto L_192a; } I(0x1930, 2);  // jr nz,$192a
+  RET(0x1932); return;  // ret
+}
+
+// 00:1933
+void retrieveTextCharacter__color1(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1933:
+  I(0x1933, 2); A = 0xff;  // ld a,$ff
+  I(0x1935, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x1936, 1); C = alu_inc8(gb, C);  // inc c
+  I(0x1937, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x1938, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x1939, 2); SET_BC(BC + 1);  // inc bc
+  I(0x193a, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x193b, 3); goto L_1933; } I(0x193b, 2);  // jr nz,$1933
+  RET(0x193d); return;  // ret
+}
+
+// 00:193e
+void retrieveTextCharacter__color2(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_193e:
+  I(0x193e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x193f, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x1940, 1); C = alu_inc8(gb, C);  // inc c
+  I(0x1941, 2); A = 0xff;  // ld a,$ff
+  I(0x1943, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  I(0x1944, 2); SET_BC(BC + 1);  // inc bc
+  I(0x1945, 1); E = alu_dec8(gb, E);  // dec e
+  if (!(F & FZ)) { I(0x1946, 3); goto L_193e; } I(0x1946, 2);  // jr nz,$193e
+  RET(0x1948); return;  // ret
+}
+
 // 00:1949
 void readByteFromW7ActiveBank(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x1949, BC);  // push bc
   I(0x194a, 4); A = mem_rd(gb, 0xd0d4);  // ld a,($d0d4)
   I(0x194d, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
@@ -10684,6 +14341,7 @@ void readByteFromW7ActiveBank(GB *gb) {
 
 // 00:195d
 void readByteFromW7TextTableBank(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x195d, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x195f, AF);  // push af
   I(0x1960, 4); A = mem_rd(gb, 0xd0f2);  // ld a,($d0f2)
@@ -10706,6 +14364,7 @@ L_196c:
 
 // 00:19ad
 void clearAllItemsAndPutLinkOnGround(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x19ad, DE);  // push de
   CALL(0x19ae, clearAllParentItems, 0x2c10, 0x19b1);  // call $2c10
   CALL(0x19b1, dropLinkHeldItem, 0x2c43, 0x19b4);  // call $2c43
@@ -10719,6 +14378,96 @@ L_19bb:
   I(0x19bf, 2); alu_cp(gb, 0x18);  // cp $18
   if (!(F & FZ)) { I(0x19c1, 3); goto L_19cf; } I(0x19c1, 2);  // jr nz,$19cf
   I(0x19c3, 2); L = 0x2f;  // ld l,$2f
+L_19c5:
+  I(0x19c5, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 5)));  // set 5,(hl)
+  I(0x19c7, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 4)));  // set 4,(hl)
+  I(0x19c9, 2); L = 0x1a;  // ld l,$1a
+  I(0x19cb, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
+  I(0x19cd, 3); goto L_19d5;  // jr $19d5
+L_19cf:
+  I(0x19cf, 1); L = E;  // ld l,e
+  I(0x19d0, 2); B = 0x40;  // ld b,$40
+  CALL(0x19d2, clearMemory, 0x046f, 0x19d5);  // call $046f
+L_19d5:
+  I(0x19d5, 1); D = alu_inc8(gb, D);  // inc d
+  I(0x19d6, 1); A = D;  // ld a,d
+  I(0x19d7, 2); alu_cp(gb, 0xe0);  // cp $e0
+  if ((F & FC)) { I(0x19d9, 3); goto L_19bb; } I(0x19d9, 2);  // jr c,$19bb
+  SET_DE(POP(0x19db));  // pop de
+  I(0x19dc, 4); putLinkOnGround(gb); return;  // jp $2a8c
+}
+
+// 00:19bb
+void clearAllItemsAndPutLinkOnGround__nextItem(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_19bb:
+  I(0x19bb, 1); H = D;  // ld h,d
+  I(0x19bc, 2); L = 0x01;  // ld l,$01
+  I(0x19be, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x19bf, 2); alu_cp(gb, 0x18);  // cp $18
+  if (!(F & FZ)) { I(0x19c1, 3); goto L_19cf; } I(0x19c1, 2);  // jr nz,$19cf
+  I(0x19c3, 2); L = 0x2f;  // ld l,$2f
+L_19c5:
+  I(0x19c5, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 5)));  // set 5,(hl)
+  I(0x19c7, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 4)));  // set 4,(hl)
+  I(0x19c9, 2); L = 0x1a;  // ld l,$1a
+  I(0x19cb, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
+  I(0x19cd, 3); goto L_19d5;  // jr $19d5
+L_19cf:
+  I(0x19cf, 1); L = E;  // ld l,e
+  I(0x19d0, 2); B = 0x40;  // ld b,$40
+  CALL(0x19d2, clearMemory, 0x046f, 0x19d5);  // call $046f
+L_19d5:
+  I(0x19d5, 1); D = alu_inc8(gb, D);  // inc d
+  I(0x19d6, 1); A = D;  // ld a,d
+  I(0x19d7, 2); alu_cp(gb, 0xe0);  // cp $e0
+  if ((F & FC)) { I(0x19d9, 3); goto L_19bb; } I(0x19d9, 2);  // jr c,$19bb
+  SET_DE(POP(0x19db));  // pop de
+  I(0x19dc, 4); putLinkOnGround(gb); return;  // jp $2a8c
+}
+
+// 00:19c5
+void clearAllItemsAndPutLinkOnGround__jump19c5(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_19c5;
+L_19bb:
+  I(0x19bb, 1); H = D;  // ld h,d
+  I(0x19bc, 2); L = 0x01;  // ld l,$01
+  I(0x19be, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x19bf, 2); alu_cp(gb, 0x18);  // cp $18
+  if (!(F & FZ)) { I(0x19c1, 3); goto L_19cf; } I(0x19c1, 2);  // jr nz,$19cf
+  I(0x19c3, 2); L = 0x2f;  // ld l,$2f
+L_19c5:
+  I(0x19c5, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 5)));  // set 5,(hl)
+  I(0x19c7, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 4)));  // set 4,(hl)
+  I(0x19c9, 2); L = 0x1a;  // ld l,$1a
+  I(0x19cb, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
+  I(0x19cd, 3); goto L_19d5;  // jr $19d5
+L_19cf:
+  I(0x19cf, 1); L = E;  // ld l,e
+  I(0x19d0, 2); B = 0x40;  // ld b,$40
+  CALL(0x19d2, clearMemory, 0x046f, 0x19d5);  // call $046f
+L_19d5:
+  I(0x19d5, 1); D = alu_inc8(gb, D);  // inc d
+  I(0x19d6, 1); A = D;  // ld a,d
+  I(0x19d7, 2); alu_cp(gb, 0xe0);  // cp $e0
+  if ((F & FC)) { I(0x19d9, 3); goto L_19bb; } I(0x19d9, 2);  // jr c,$19bb
+  SET_DE(POP(0x19db));  // pop de
+  I(0x19dc, 4); putLinkOnGround(gb); return;  // jp $2a8c
+}
+
+// 00:19cf
+void clearAllItemsAndPutLinkOnGround__notSomariaBlock(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_19cf;
+L_19bb:
+  I(0x19bb, 1); H = D;  // ld h,d
+  I(0x19bc, 2); L = 0x01;  // ld l,$01
+  I(0x19be, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x19bf, 2); alu_cp(gb, 0x18);  // cp $18
+  if (!(F & FZ)) { I(0x19c1, 3); goto L_19cf; } I(0x19c1, 2);  // jr nz,$19cf
+  I(0x19c3, 2); L = 0x2f;  // ld l,$2f
+L_19c5:
   I(0x19c5, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 5)));  // set 5,(hl)
   I(0x19c7, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 4)));  // set 4,(hl)
   I(0x19c9, 2); L = 0x1a;  // ld l,$1a
@@ -10739,6 +14488,7 @@ L_19d5:
 
 // 00:19df
 void copyTextCharacterGfx(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x19df, HL);  // push hl
   PUSH(0x19e0, BC);  // push bc
   I(0x19e1, 3); SET_HL(0x4000);  // ld hl,$4000
@@ -10778,6 +14528,7 @@ L_1a05:
 
 // 00:1a17
 void fileSelectThreadStart(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1a17, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x1a1a, 2); B = 0x10;  // ld b,$10
   CALL(0x1a1c, clearMemory, 0x046f, 0x1a1f);  // call $046f
@@ -10787,11 +14538,27 @@ L_1a1f:
   I(0x1a23, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   CALL_ASM(0x1a26, 0x412e, 0x1a29); /* unported */  // call $412e
   CALL(0x1a29, resumeThreadNextFrame, 0x08fe, 0x1a2c);  // call $08fe
+L_1a2c:
+  I(0x1a2c, 3); goto L_1a1f;  // jr $1a1f
+}
+
+// 00:1a2c
+void fileSelectThreadStart__afterCall1a2c(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_1a2c;
+L_1a1f:
+  I(0x1a1f, 2); A = 0x02;  // ld a,$02
+  I(0x1a21, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x1a23, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  CALL_ASM(0x1a26, 0x412e, 0x1a29); /* unported */  // call $412e
+  CALL(0x1a29, resumeThreadNextFrame, 0x08fe, 0x1a2c);  // call $08fe
+L_1a2c:
   I(0x1a2c, 3); goto L_1a1f;  // jr $1a1f
 }
 
 // 00:1a2e
 void secretFunctionCaller(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1a2e, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x1a30, AF);  // push af
   I(0x1a31, 2); A = 0x03;  // ld a,$03
@@ -10808,6 +14575,7 @@ void secretFunctionCaller(GB *gb) {
 
 // 00:1a44
 void openSecretInputMenu(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1a44, 4); mem_wr(gb, 0xcc88, A);  // ld ($cc88),a
   I(0x1a47, 2); A = 0x01;  // ld a,$01
   I(0x1a49, 4); mem_wr(gb, 0xcc89, A);  // ld ($cc89),a
@@ -10817,6 +14585,7 @@ void openSecretInputMenu(GB *gb) {
 
 // 00:1a51
 void updateMenus(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1a51, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
   I(0x1a53, 1); C = A;  // ld c,a
   I(0x1a54, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
@@ -10839,6 +14608,7 @@ void updateMenus(GB *gb) {
 
 // 00:1ab0
 void openMenu(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1ab0, 2); H = 0x06;  // ld h,$06
   I(0x1ab2, 3); goto L_1aba;  // jr $1aba
 L_1aba:
@@ -10863,6 +14633,7 @@ L_1aba:
 
 // 00:1b10
 void thread_1b10(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1b10, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x1b13, 2); B = 0x10;  // ld b,$10
   CALL(0x1b15, clearMemory, 0x046f, 0x1b18);  // call $046f
@@ -10874,11 +14645,27 @@ L_1b1d:
   I(0x1b21, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   CALL_ASM(0x1b24, 0x7380, 0x1b27); /* unported */  // call $7380
   CALL(0x1b27, resumeThreadNextFrame, 0x08fe, 0x1b2a);  // call $08fe
+L_1b2a:
+  I(0x1b2a, 3); goto L_1b1d;  // jr $1b1d
+}
+
+// 00:1b2a
+void thread_1b10__afterCall1b2a(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_1b2a;
+L_1b1d:
+  I(0x1b1d, 2); A = 0x02;  // ld a,$02
+  I(0x1b1f, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x1b21, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  CALL_ASM(0x1b24, 0x7380, 0x1b27); /* unported */  // call $7380
+  CALL(0x1b27, resumeThreadNextFrame, 0x08fe, 0x1b2a);  // call $08fe
+L_1b2a:
   I(0x1b2a, 3); goto L_1b1d;  // jr $1b1d
 }
 
 // 00:1c47
 void _checkCollidedWithLink(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1c47, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
   I(0x1c4a, 1); B = A;  // ld b,a
   I(0x1c4b, 2); C = 0x0f;  // ld c,$0f
@@ -10909,6 +14696,7 @@ void _checkCollidedWithLink(GB *gb) {
 
 // 00:1c84
 void func_1c84(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1c84, 4); A = mem_rd(gb, 0xdc00);  // ld a,($dc00)
   I(0x1c87, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x1c88); return; } I(0x1c88, 2);  // ret nz
@@ -10917,6 +14705,7 @@ void func_1c84(GB *gb) {
 
 // 00:1cd3
 void _getLinkPositionPlusDirectionOffset(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1cd3, 4); A = mem_rd(gb, 0xd008);  // ld a,($d008)
   I(0x1cd6, 3); SET_HL(0x1cf0);  // ld hl,$1cf0
   RST_PUSH(0x1cd9, 0x1cda);  // rst $18 (addDoubleIndexToHl)
@@ -10937,8 +14726,42 @@ void _getLinkPositionPlusDirectionOffset(GB *gb) {
   RET(0x1cef); return;  // ret
 }
 
+// 00:1cf0
+void _getLinkPositionPlusDirectionOffset__positionOffsets(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_1cf0:
+  I(0x1cf0, 4); A = mem_rd(gb, 0x0000);  // ld a,($0000)
+  I(0x1cf3, 1); B = alu_dec8(gb, B);  // dec b
+  I(0x1cf4, 1); B = alu_dec8(gb, B);  // dec b
+  I(0x1cf5, 1);  // nop
+  I(0x1cf6, 1);  // nop
+  I(0x1cf7, 4); A = mem_rd(gb, 0x2ac6);  // ld a,($2ac6)
+  I(0x1cfa, 1); L = A;  // ld l,a
+  I(0x1cfb, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
+  if (!(F & FZ)) { RET_TAKEN(0x1cfd); return; } I(0x1cfd, 2);  // ret nz
+  I(0x1cfe, 2); alu_sub(gb, 0x1b);  // sub $1b
+  I(0x1d00, 1); L = A;  // ld l,a
+  I(0x1d01, 3); A = mem_rd(gb, 0xff91);  // ldh a,($ff91)
+  I(0x1d03, 2); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
+  I(0x1d04, 2); alu_add(gb, 0x07);  // add $07
+  I(0x1d06, 2); alu_cp(gb, 0x0e);  // cp $0e
+  if (!(F & FC)) { RET_TAKEN(0x1d08); return; } I(0x1d08, 2);  // ret nc
+  I(0x1d09, 1); L = alu_dec8(gb, L);  // dec l
+  I(0x1d0a, 1); L = alu_dec8(gb, L);  // dec l
+  I(0x1d0b, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
+  I(0x1d0c, 1); L = alu_dec8(gb, L);  // dec l
+  I(0x1d0d, 2); B = mem_rd(gb, HL);  // ld b,(hl)
+  I(0x1d0e, 1); C = A;  // ld c,a
+  I(0x1d0f, 1); A = L;  // ld a,l
+  I(0x1d10, 2); alu_add(gb, 0x1b);  // add $1b
+  I(0x1d12, 1); L = A;  // ld l,a
+  I(0x1d13, 2); E = 0x26;  // ld e,$26
+  I(0x1d15, 4); checkObjectsCollidedFromVariables(gb); return;  // jp $1c04
+}
+
 // 00:1cf8
 void _checkCollisionWithHAndD(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x1cf8, 2); alu_add(gb, 0x2a);  // add $2a
   I(0x1cfa, 1); L = A;  // ld l,a
   I(0x1cfb, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
@@ -10965,6 +14788,7 @@ void _checkCollisionWithHAndD(GB *gb) {
 
 // 00:22d4
 void func_228f(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_22d4;
 L_22d1:
   I(0x22d1, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -10981,6 +14805,7 @@ L_22d4:
 
 // 00:2518
 void _interactionActuallyRunScript(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2518, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x251a, AF);  // push af
   I(0x251b, 2); A = 0x0c;  // ld a,$0c
@@ -11007,6 +14832,7 @@ L_2533:
 
 // 00:2588
 void _interactionSaveScriptAddress(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2588, 2); E = 0x58;  // ld e,$58
   I(0x258a, 1); A = L;  // ld a,l
   I(0x258b, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -11018,6 +14844,7 @@ void _interactionSaveScriptAddress(GB *gb) {
 
 // 00:25b1
 void _scriptCmd_asmRetFunc(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   SET_HL(POP(0x25b1));  // pop hl
   SET_AF(POP(0x25b2));  // pop af
   I(0x25b3, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
@@ -11030,6 +14857,7 @@ void _scriptCmd_asmRetFunc(GB *gb) {
 
 // 00:25bd
 void _scriptFunc_setupAsmCall(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x25bd, 2); SET_HL(HL + 1);  // inc hl
   I(0x25be, 2); D = 0x15;  // ld d,$15
   I(0x25c0, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
@@ -11041,6 +14869,7 @@ void _scriptFunc_setupAsmCall(GB *gb) {
 
 // 00:2647
 void _interactionNextAnimationFrame(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2647, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x2648, 2); H = mem_rd(gb, HL);  // ld h,(hl)
   I(0x2649, 1); L = A;  // ld l,a
@@ -11091,6 +14920,7 @@ L_2653:
 
 // 00:2844
 void _enemyNextAnimationFrame(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2844, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x2845, 2); H = mem_rd(gb, HL);  // ld h,(hl)
   I(0x2846, 1); L = A;  // ld l,a
@@ -11140,6 +14970,7 @@ L_2850:
 
 // 00:299e
 void _partNextAnimationFrame(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x299e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x299f, 2); H = mem_rd(gb, HL);  // ld h,(hl)
   I(0x29a0, 1); L = A;  // ld l,a
@@ -11190,6 +15021,7 @@ L_29aa:
 
 // 00:2d07
 void introThreadStart(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_2d07:
   I(0x2d07, 3); SET_HL(0xcbb7);  // ld hl,$cbb7
   I(0x2d0a, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
@@ -11198,11 +15030,20 @@ L_2d07:
   I(0x2d0f, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   CALL_ASM(0x2d12, 0x4cc9, 0x2d15); /* unported */  // call $4cc9
   CALL(0x2d15, resumeThreadNextFrame, 0x08fe, 0x2d18);  // call $08fe
+L_2d18:
   I(0x2d18, 3); goto L_2d07;  // jr $2d07
+}
+
+// 00:2d18
+void introThreadStart__afterCall2d18(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_2d18:
+  I(0x2d18, 3); introThreadStart(gb); return;  // jr $2d07
 }
 
 // 00:2d48
 void func_2d48(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2d48, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x2d4a, AF);  // push af
   I(0x2d4b, 2); A = 0x3f;  // ld a,$3f
@@ -11222,6 +15063,7 @@ void func_2d48(GB *gb) {
 
 // 00:2e82
 void _updateEnemiesIfStateIsZero(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x2e82, 2); A = 0x80;  // ld a,$80
   I(0x2e84, 3); mem_wr(gb, 0xffae, A);  // ldh ($ffae),a
   I(0x2e86, 2); D = 0xd0;  // ld d,$d0
@@ -11249,8 +15091,36 @@ L_2e9e:
   RET(0x2ea4); return;  // ret
 }
 
+// 00:2e9e
+void _updateEnemiesIfStateIsZero__next(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_2e9e;
+L_2e89:
+  I(0x2e89, 3); mem_wr(gb, 0xffaf, A);  // ldh ($ffaf),a
+  I(0x2e8b, 1); H = D;  // ld h,d
+  I(0x2e8c, 2); L = 0x80;  // ld l,$80
+  I(0x2e8e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x2e8f, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { I(0x2e90, 3); goto L_2e9e; } I(0x2e90, 2);  // jr z,$2e9e
+  I(0x2e92, 2); L = 0x84;  // ld l,$84
+  I(0x2e94, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x2e95, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
+  if ((F & FZ)) { CALL(0x2e96, updateEnemy, 0x2f07, 0x2e99); } else I(0x2e96, 3);  // call z,$2f07
+  I(0x2e99, 2); E = 0x9b;  // ld e,$9b
+  I(0x2e9b, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x2e9c, 1); E = alu_inc8(gb, E);  // inc e
+  I(0x2e9d, 2); mem_wr(gb, DE, A);  // ld (de),a
+L_2e9e:
+  I(0x2e9e, 1); D = alu_inc8(gb, D);  // inc d
+  I(0x2e9f, 1); A = D;  // ld a,d
+  I(0x2ea0, 2); alu_cp(gb, 0xe0);  // cp $e0
+  if ((F & FC)) { I(0x2ea2, 3); goto L_2e89; } I(0x2ea2, 2);  // jr c,$2e89
+  RET(0x2ea4); return;  // ret
+}
+
 // 00:3211
 void func_3211(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3211, 2); H = 0x03;  // ld h,$03
   I(0x3213, 3); goto L_321f;  // jr $321f
 L_321f:
@@ -11271,6 +15141,7 @@ L_321f:
 
 // 00:32fc
 void func_32fc(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x32fc, setPaletteThreadDelay, 0x337b, 0x32ff);  // call $337b
   I(0x32ff, 2); A = 0x0d;  // ld a,$0d
   I(0x3301, 2); B = 0xf0;  // ld b,$f0
@@ -11281,6 +15152,7 @@ void func_32fc(GB *gb) {
 
 // 00:3317
 void _darkenRoomHelper(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3317, 2); A = 0x05;  // ld a,$05
   I(0x3319, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
   I(0x331c, 2); A = 0x01;  // ld a,$01
@@ -11289,6 +15161,7 @@ void _darkenRoomHelper(GB *gb) {
 
 // 00:331e
 void _setDarkeningVariables(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x331e, 4); mem_wr(gb, 0xc4ac, A);  // ld ($c4ac),a
   I(0x3321, 4); A = mem_rd(gb, 0xc4ae);  // ld a,($c4ae)
   I(0x3324, 4); mem_wr(gb, 0xc2ff, A);  // ld ($c2ff),a
@@ -11306,6 +15179,7 @@ void _setDarkeningVariables(GB *gb) {
 
 // 00:333e
 void func_333e(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x333e, setPaletteThreadDelay, 0x337b, 0x3341);  // call $337b
   I(0x3341, 2); A = 0x0e;  // ld a,$0e
   I(0x3343, 2); B = 0x00;  // ld b,$00
@@ -11316,6 +15190,7 @@ void func_333e(GB *gb) {
 
 // 00:3354
 void _brightenRoomHelper(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x3354, _setDarkeningVariables, 0x331e, 0x3357);  // call $331e
   I(0x3357, 2); A = 0x06;  // ld a,$06
   I(0x3359, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
@@ -11324,6 +15199,7 @@ void _brightenRoomHelper(GB *gb) {
 
 // 00:337b
 void setPaletteThreadDelay(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x337b, 4); mem_wr(gb, 0xc4b0, A);  // ld ($c4b0),a
   I(0x337e, 2); A = 0x01;  // ld a,$01
   I(0x3380, 4); mem_wr(gb, 0xc4af, A);  // ld ($c4af),a
@@ -11332,6 +15208,7 @@ void setPaletteThreadDelay(GB *gb) {
 
 // 00:3384
 void paletteFadeThreadStart(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_3384:
   I(0x3384, 2); A = 0x02;  // ld a,$02
   I(0x3386, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
@@ -11346,11 +15223,20 @@ L_3384:
   I(0x339b, 1); A = alu_inc8(gb, A);  // inc a
 L_339c:
   CALL(0x339c, resumeThreadInAFrames, 0x0900, 0x339f);  // call $0900
+L_339f:
   I(0x339f, 3); goto L_3384;  // jr $3384
+}
+
+// 00:339f
+void paletteFadeThreadStart__afterCall339f(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_339f:
+  I(0x339f, 3); paletteFadeThreadStart(gb); return;  // jr $3384
 }
 
 // 00:33a1
 void mainThreadStart(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x33a1, restartSound, 0x0cb2, 0x33a4);  // call $0cb2
   CALL(0x33a4, stopTextThread, 0x184d, 0x33a7);  // call $184d
 L_33a7:
@@ -11374,11 +15260,70 @@ L_33ba:
   CALL(0x33c4, drawAllSprites, 0x0d9a, 0x33c7);  // call $0d9a
   CALL(0x33c7, checkReloadStatusBarGraphics, 0x1a71, 0x33ca);  // call $1a71
   CALL(0x33ca, resumeThreadNextFrame, 0x08fe, 0x33cd);  // call $08fe
+L_33cd:
+  I(0x33cd, 3); goto L_33a7;  // jr $33a7
+}
+
+// 00:33a7
+void mainThreadStart__mainThread(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_33a7:
+  I(0x33a7, 3); SET_HL(0xc622);  // ld hl,$c622
+  I(0x33aa, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  I(0x33ab, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x33ac, 4); mem_wr(gb, 0xcc00, A);  // ld ($cc00),a
+  if (!(F & FZ)) { I(0x33af, 3); goto L_33ba; } I(0x33af, 2);  // jr nz,$33ba
+  I(0x33b1, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  if (!(F & FZ)) { I(0x33b2, 3); goto L_33ba; } I(0x33b2, 2);  // jr nz,$33ba
+  I(0x33b4, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x33b5, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  if (!(F & FZ)) { I(0x33b6, 3); goto L_33ba; } I(0x33b6, 2);  // jr nz,$33ba
+  I(0x33b8, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x33b9, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+L_33ba:
+  I(0x33ba, 2); A = 0x01;  // ld a,$01
+  I(0x33bc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x33be, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  CALL_ASM(0x33c1, 0x596a, 0x33c4); /* unported */  // call $596a
+  CALL(0x33c4, drawAllSprites, 0x0d9a, 0x33c7);  // call $0d9a
+  CALL(0x33c7, checkReloadStatusBarGraphics, 0x1a71, 0x33ca);  // call $1a71
+  CALL(0x33ca, resumeThreadNextFrame, 0x08fe, 0x33cd);  // call $08fe
+L_33cd:
+  I(0x33cd, 3); goto L_33a7;  // jr $33a7
+}
+
+// 00:33cd
+void mainThreadStart__afterCall33cd(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_33cd;
+L_33a7:
+  I(0x33a7, 3); SET_HL(0xc622);  // ld hl,$c622
+  I(0x33aa, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  I(0x33ab, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x33ac, 4); mem_wr(gb, 0xcc00, A);  // ld ($cc00),a
+  if (!(F & FZ)) { I(0x33af, 3); goto L_33ba; } I(0x33af, 2);  // jr nz,$33ba
+  I(0x33b1, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  if (!(F & FZ)) { I(0x33b2, 3); goto L_33ba; } I(0x33b2, 2);  // jr nz,$33ba
+  I(0x33b4, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x33b5, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  if (!(F & FZ)) { I(0x33b6, 3); goto L_33ba; } I(0x33b6, 2);  // jr nz,$33ba
+  I(0x33b8, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x33b9, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+L_33ba:
+  I(0x33ba, 2); A = 0x01;  // ld a,$01
+  I(0x33bc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x33be, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  CALL_ASM(0x33c1, 0x596a, 0x33c4); /* unported */  // call $596a
+  CALL(0x33c4, drawAllSprites, 0x0d9a, 0x33c7);  // call $0d9a
+  CALL(0x33c7, checkReloadStatusBarGraphics, 0x1a71, 0x33ca);  // call $1a71
+  CALL(0x33ca, resumeThreadNextFrame, 0x08fe, 0x33cd);  // call $08fe
+L_33cd:
   I(0x33cd, 3); goto L_33a7;  // jr $33a7
 }
 
 // 00:3539
 void func_3539(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3539, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x353b, AF);  // push af
   I(0x353c, 2); A = 0x05;  // ld a,$05
@@ -11423,6 +15368,7 @@ void func_3539(GB *gb) {
 
 // 00:3712
 void loadTilesetLayout(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3712, 4); A = mem_rd(gb, 0xcd23);  // ld a,($cd23)
   CALL(0x3715, loadTileset, 0x0799, 0x3718);  // call $0799
   I(0x3718, 2); A = 0x18;  // ld a,$18
@@ -11435,17 +15381,67 @@ void loadTilesetLayout(GB *gb) {
   I(0x3729, 2); B = 0x00;  // ld b,$00
 L_372b:
   PUSH(0x372b, BC);  // push bc
-  CALL_ASM(0x372c, 0x373b, 0x372f); /* unported */  // call $373b
+  CALL(0x372c, loadTilesetLayout__helper, 0x373b, 0x372f);  // call $373b
   SET_BC(POP(0x372f));  // pop bc
   I(0x3730, 1); B = alu_dec8(gb, B);  // dec b
   if (!(F & FZ)) { I(0x3731, 3); goto L_372b; } I(0x3731, 2);  // jr nz,$372b
   I(0x3733, 3); SET_HL(0x6e63);  // ld hl,$6e63
   I(0x3736, 2); E = 0x04;  // ld e,$04
-  I(0x3738, 4); HANDOFF(0x008a); /* interBankCall */  // jp $008a
+  I(0x3738, 4); interBankCall(gb); return;  // jp $008a
+}
+
+// 00:373b
+void loadTilesetLayout__helper(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_373b:
+  I(0x373b, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x373c, 1); C = A;  // ld c,a
+  I(0x373d, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x373e, 1); B = A;  // ld b,a
+  PUSH(0x373f, HL);  // push hl
+  I(0x3740, 3); SET_HL(0x4004);  // ld hl,$4004
+  I(0x3743, 2); alu_add_hl(gb, BC);  // add hl,bc
+  I(0x3744, 2); alu_add_hl(gb, BC);  // add hl,bc
+  I(0x3745, 2); alu_add_hl(gb, BC);  // add hl,bc
+  I(0x3746, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3747, 1); C = A;  // ld c,a
+  I(0x3748, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x3749, 2); A = alu_swap(gb, A);  // swap a
+  I(0x374b, 2); alu_and(gb, 0x0f);  // and $0f
+  I(0x374d, 1); B = A;  // ld b,a
+  PUSH(0x374e, HL);  // push hl
+  I(0x374f, 3); SET_HL(0x4000);  // ld hl,$4000
+  I(0x3752, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3753, 2); H = mem_rd(gb, HL);  // ld h,(hl)
+  I(0x3754, 1); L = A;  // ld l,a
+  I(0x3755, 2); alu_add_hl(gb, BC);  // add hl,bc
+  I(0x3756, 2); alu_add_hl(gb, BC);  // add hl,bc
+  I(0x3757, 2); alu_add_hl(gb, BC);  // add hl,bc
+  I(0x3758, 2); alu_add_hl(gb, BC);  // add hl,bc
+  I(0x3759, 2); B = 0x04;  // ld b,$04
+  CALL(0x375b, copyMemory, 0x0486, 0x375e);  // call $0486
+  SET_HL(POP(0x375e));  // pop hl
+  I(0x375f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3760, 2); alu_and(gb, 0x0f);  // and $0f
+  I(0x3762, 1); B = A;  // ld b,a
+  I(0x3763, 2); C = mem_rd(gb, HL);  // ld c,(hl)
+  I(0x3764, 3); SET_HL(0x4002);  // ld hl,$4002
+  I(0x3767, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3768, 2); H = mem_rd(gb, HL);  // ld h,(hl)
+  I(0x3769, 1); L = A;  // ld l,a
+  I(0x376a, 2); alu_add_hl(gb, BC);  // add hl,bc
+  I(0x376b, 2); alu_add_hl(gb, BC);  // add hl,bc
+  I(0x376c, 2); alu_add_hl(gb, BC);  // add hl,bc
+  I(0x376d, 2); alu_add_hl(gb, BC);  // add hl,bc
+  I(0x376e, 2); B = 0x04;  // ld b,$04
+  CALL(0x3770, copyMemory, 0x0486, 0x3773);  // call $0486
+  SET_HL(POP(0x3773));  // pop hl
+  RET(0x3774); return;  // ret
 }
 
 // 00:3796
 void loadTilesetGraphics(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3796, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x3798, AF);  // push af
   I(0x3799, 4); A = mem_rd(gb, 0xcd21);  // ld a,($cd21)
@@ -11459,10 +15455,10 @@ void loadTilesetGraphics(GB *gb) {
   CALL_ASM(0x37af, 0x58e4, 0x37b2); /* unported */  // call $58e4
   I(0x37b2, 3); SET_HL(0x7a77);  // ld hl,$7a77
   I(0x37b5, 2); E = 0x02;  // ld e,$02
-  CALL_ASM(0x37b7, 0x008a, 0x37ba); /* interBankCall */  // call $008a
+  CALL(0x37b7, interBankCall, 0x008a, 0x37ba);  // call $008a
   I(0x37ba, 3); SET_HL(0x7dc7);  // ld hl,$7dc7
   I(0x37bd, 2); E = 0x02;  // ld e,$02
-  CALL_ASM(0x37bf, 0x008a, 0x37c2); /* interBankCall */  // call $008a
+  CALL(0x37bf, interBankCall, 0x008a, 0x37c2);  // call $008a
   I(0x37c2, 4); A = mem_rd(gb, 0xcd20);  // ld a,($cd20)
   I(0x37c5, 4); mem_wr(gb, 0xcd28, A);  // ld ($cd28),a
   I(0x37c8, 4); A = mem_rd(gb, 0xcd22);  // ld a,($cd22)
@@ -11477,6 +15473,7 @@ void loadTilesetGraphics(GB *gb) {
 
 // 00:3828
 void loadTilesetUniqueGfx(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3828, 2); A = 0x04;  // ld a,$04
   I(0x382a, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x382c, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -11498,6 +15495,7 @@ L_383c:
 
 // 00:3889
 void loadTilesetData(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3889, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x388b, AF);  // push af
   I(0x388c, 2); A = 0x04;  // ld a,$04
@@ -11506,7 +15504,7 @@ void loadTilesetData(GB *gb) {
   CALL_ASM(0x3893, 0x6d7a, 0x3896); /* unported */  // call $6d7a
   I(0x3896, 3); SET_HL(0x403e);  // ld hl,$403e
   I(0x3899, 2); E = 0x02;  // ld e,$02
-  CALL_ASM(0x389b, 0x008a, 0x389e); /* interBankCall */  // call $008a
+  CALL(0x389b, interBankCall, 0x008a, 0x389e);  // call $008a
   SET_AF(POP(0x389e));  // pop af
   I(0x389f, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x38a1, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -11515,6 +15513,7 @@ void loadTilesetData(GB *gb) {
 
 // 00:38a5
 void loadTilesetAndRoomLayout(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x38a5, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x38a7, AF);  // push af
   I(0x38a8, 4); A = mem_rd(gb, 0xcd2a);  // ld a,($cd2a)
@@ -11544,6 +15543,7 @@ void loadTilesetAndRoomLayout(GB *gb) {
 
 // 00:3b13
 void _updateInteractionsIfStateIsZero(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3b13, 2); A = 0x40;  // ld a,$40
   I(0x3b15, 3); mem_wr(gb, 0xffae, A);  // ldh ($ffae),a
   I(0x3b17, 2); A = 0xd0;  // ld a,$d0
@@ -11570,8 +15570,36 @@ L_3b2e:
   RET(0x3b35); return;  // ret
 }
 
+// 00:3b2e
+void _updateInteractionsIfStateIsZero__next(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_3b2e;
+L_3b19:
+  I(0x3b19, 3); mem_wr(gb, 0xffaf, A);  // ldh ($ffaf),a
+  I(0x3b1b, 1); D = A;  // ld d,a
+  I(0x3b1c, 2); E = 0x40;  // ld e,$40
+  I(0x3b1e, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x3b1f, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { I(0x3b20, 3); goto L_3b2e; } I(0x3b20, 2);  // jr z,$3b2e
+  I(0x3b22, 1); alu_rlca(gb);  // rlca
+  if ((F & FC)) { I(0x3b23, 3); goto L_3b2b; } I(0x3b23, 2);  // jr c,$3b2b
+  I(0x3b25, 2); E = 0x44;  // ld e,$44
+  I(0x3b27, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x3b28, 1); alu_or(gb, A);  // or a
+  if (!(F & FZ)) { I(0x3b29, 3); goto L_3b2e; } I(0x3b29, 2);  // jr nz,$3b2e
+L_3b2b:
+  CALL(0x3b2b, updateInteraction, 0x3b62, 0x3b2e);  // call $3b62
+L_3b2e:
+  I(0x3b2e, 3); A = mem_rd(gb, 0xffaf);  // ldh a,($ffaf)
+  I(0x3b30, 1); A = alu_inc8(gb, A);  // inc a
+  I(0x3b31, 2); alu_cp(gb, 0xe0);  // cp $e0
+  if ((F & FC)) { I(0x3b33, 3); goto L_3b19; } I(0x3b33, 2);  // jr c,$3b19
+  RET(0x3b35); return;  // ret
+}
+
 // 00:3ed0
 void func_3ed0(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3ed0, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x3ed2, AF);  // push af
   I(0x3ed3, 2); A = 0x03;  // ld a,$03
@@ -11586,6 +15614,7 @@ void func_3ed0(GB *gb) {
 
 // 00:3ee4
 void func_3ee4(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x3ee4, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
   PUSH(0x3ee6, AF);  // push af
   I(0x3ee7, 2); A = 0x03;  // ld a,$03
@@ -11596,5 +15625,407 @@ void func_3ee4(GB *gb) {
   I(0x3ef2, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3ef4, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   RET(0x3ef7); return;  // ret
+}
+
+// 00:008a
+void interBankCall(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x008a, 4); A = mem_rd(gb, 0xff97);  // ld a,($ff97)
+  PUSH(0x008d, AF);  // push af
+  I(0x008e, 1); A = E;  // ld a,e
+  I(0x008f, 4); mem_wr(gb, 0xff97, A);  // ld ($ff97),a
+  I(0x0092, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  CALL(0x0095, jpHl, 0x00a0, 0x0098);  // call $00a0
+  SET_AF(POP(0x0098));  // pop af
+  I(0x0099, 4); mem_wr(gb, 0xff97, A);  // ld ($ff97),a
+  I(0x009c, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  RET(0x009f); return;  // ret
+}
+
+// 00:06aa
+void _label_00_049(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_06aa:
+  CALL(0x06aa, readByteSequential, 0x0788, 0x06ad);  // call $0788
+  I(0x06ad, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x06ae, 2); SET_DE(DE + 1);  // inc de
+  I(0x06af, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x06b0, 3); goto L_06aa; } I(0x06b0, 2);  // jr nz,$06aa
+  RET(0x06b2); return;  // ret
+}
+
+// 00:06b3
+void _label_00_050(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL(0x06b3, readByteSequential, 0x0788, 0x06b6);  // call $0788
+  I(0x06b6, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
+  I(0x06b8, 2); B = 0x08;  // ld b,$08
+  _label_00_051(gb); return;  // fallthrough
+}
+
+// 00:06ba
+void _label_00_051(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x06ba, 2); C = alu_rl(gb, C);  // rl c
+  if ((F & FC)) { I(0x06bc, 3); _label_00_052(gb); return; } I(0x06bc, 2);  // jr c,$06c3
+  CALL(0x06be, readByteSequential, 0x0788, 0x06c1);  // call $0788
+  I(0x06c1, 3); _label_00_053(gb); return;  // jr $06c5
+}
+
+// 00:06c3
+void _label_00_052(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x06c3, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+  _label_00_053(gb); return;  // fallthrough
+}
+
+// 00:06c5
+void _label_00_053(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x06c5, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x06c6, 2); SET_DE(DE + 1);  // inc de
+  I(0x06c7, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x06c8, 3); _label_00_051(gb); return; } I(0x06c8, 2);  // jr nz,$06ba
+  I(0x06ca, 3); A = mem_rd(gb, 0xff8a);  // ldh a,($ff8a)
+  I(0x06cc, 1); C = A;  // ld c,a
+  I(0x06cd, 2); B = 0x08;  // ld b,$08
+  _label_00_054(gb); return;  // fallthrough
+}
+
+// 00:06cf
+void _label_00_054(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x06cf, 2); C = alu_rl(gb, C);  // rl c
+  if ((F & FC)) { I(0x06d1, 3); _label_00_055(gb); return; } I(0x06d1, 2);  // jr c,$06d8
+  CALL(0x06d3, readByteSequential, 0x0788, 0x06d6);  // call $0788
+  I(0x06d6, 3); _label_00_056(gb); return;  // jr $06da
+}
+
+// 00:06d8
+void _label_00_055(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x06d8, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+  _label_00_056(gb); return;  // fallthrough
+}
+
+// 00:06da
+void _label_00_056(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x06da, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x06db, 2); SET_DE(DE + 1);  // inc de
+  I(0x06dc, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x06dd, 3); _label_00_054(gb); return; } I(0x06dd, 2);  // jr nz,$06cf
+  RET(0x06df); return;  // ret
+}
+
+// 00:06ee
+void _label_00_059(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x06ee, 2); A = 0xff;  // ld a,$ff
+  I(0x06f0, 3); _label_00_061(gb); return;  // jr $06f5
+}
+
+// 00:06f2
+void _label_00_060(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x06f2, 1); alu_xor(gb, A);  // xor a
+  I(0x06f3, 3); mem_wr(gb, 0xff93, A);  // ldh ($ff93),a
+  _label_00_061(gb); return;  // fallthrough
+}
+
+// 00:06f5
+void _label_00_061(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x06f5, 3); mem_wr(gb, 0xff8e, A);  // ldh ($ff8e),a
+  I(0x06f7, 2); B = alu_swap(gb, B);  // swap b
+  I(0x06f9, 1); A = B;  // ld a,b
+  I(0x06fa, 2); alu_and(gb, 0xf0);  // and $f0
+  I(0x06fc, 1); C = A;  // ld c,a
+  I(0x06fd, 1); alu_xor(gb, B);  // xor b
+  I(0x06fe, 1); B = A;  // ld b,a
+  I(0x06ff, 2); A = 0x01;  // ld a,$01
+  I(0x0701, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
+  _label_00_062(gb); return;  // fallthrough
+}
+
+// 00:0703
+void _label_00_062(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x0703, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+  I(0x0705, 1); A = alu_dec8(gb, A);  // dec a
+  I(0x0706, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
+  if (!(F & FZ)) { I(0x0708, 3); _label_00_063(gb); return; } I(0x0708, 2);  // jr nz,$0714
+  I(0x070a, 2); A = 0x08;  // ld a,$08
+  I(0x070c, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
+  I(0x070e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x070f, 3); mem_wr(gb, 0xff8a, A);  // ldh ($ff8a),a
+  CALL(0x0711, _adjustHLSequential, 0x0776, 0x0714);  // call $0776
+  _label_00_063(gb); return;  // fallthrough
+}
+
+// 00:0714
+void _label_00_063(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x0714, 3); A = mem_rd(gb, 0xff8a);  // ldh a,($ff8a)
+  I(0x0716, 1); alu_add(gb, A);  // add a
+  I(0x0717, 3); mem_wr(gb, 0xff8a, A);  // ldh ($ff8a),a
+  if ((F & FC)) { I(0x0719, 3); _label_00_064(gb); return; } I(0x0719, 2);  // jr c,$0721
+  CALL(0x071b, copyByteSequential, 0x0772, 0x071e);  // call $0772
+  if (!(F & FZ)) { I(0x071e, 3); _label_00_062(gb); return; } I(0x071e, 2);  // jr nz,$0703
+  RET(0x0720); return;  // ret
+}
+
+// 00:0721
+void _label_00_064(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x0721, 3); A = mem_rd(gb, 0xff8e);  // ldh a,($ff8e)
+  I(0x0723, 1); alu_or(gb, A);  // or a
+  if (!(F & FZ)) { I(0x0724, 3); _label_00_065(gb); return; } I(0x0724, 2);  // jr nz,$0734
+  I(0x0726, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x0727, 2); alu_and(gb, 0x1f);  // and $1f
+  I(0x0729, 3); mem_wr(gb, 0xff92, A);  // ldh ($ff92),a
+  I(0x072b, 2); alu_xor(gb, mem_rd(gb, HL));  // xor (hl)
+  if ((F & FZ)) { I(0x072c, 3); _label_00_066(gb); return; } I(0x072c, 2);  // jr z,$0749
+  I(0x072e, 2); A = alu_swap(gb, A);  // swap a
+  I(0x0730, 1); alu_rrca(gb);  // rrca
+  I(0x0731, 1); A = alu_inc8(gb, A);  // inc a
+  I(0x0732, 3); _label_00_067(gb); return;  // jr $074e
+}
+
+// 00:0734
+void _label_00_065(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x0734, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0735, 3); mem_wr(gb, 0xff92, A);  // ldh ($ff92),a
+  CALL(0x0737, _adjustHLSequential, 0x0776, 0x073a);  // call $0776
+  I(0x073a, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x073b, 2); alu_and(gb, 0x07);  // and $07
+  I(0x073d, 3); mem_wr(gb, 0xff93, A);  // ldh ($ff93),a
+  I(0x073f, 2); alu_xor(gb, mem_rd(gb, HL));  // xor (hl)
+  if ((F & FZ)) { I(0x0740, 3); _label_00_066(gb); return; } I(0x0740, 2);  // jr z,$0749
+  I(0x0742, 1); alu_rrca(gb);  // rrca
+  I(0x0743, 1); alu_rrca(gb);  // rrca
+  I(0x0744, 1); alu_rrca(gb);  // rrca
+  I(0x0745, 2); alu_add(gb, 0x02);  // add $02
+  I(0x0747, 3); _label_00_067(gb); return;  // jr $074e
+}
+
+// 00:0749
+void _label_00_066(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x0749, 2); SET_HL(HL + 1);  // inc hl
+  CALL(0x074a, _adjustHLSequential, 0x0776, 0x074d);  // call $0776
+  I(0x074d, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  _label_00_067(gb); return;  // fallthrough
+}
+
+// 00:074e
+void _label_00_067(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x074e, 3); mem_wr(gb, 0xff8f, A);  // ldh ($ff8f),a
+  I(0x0750, 2); SET_HL(HL + 1);  // inc hl
+  CALL(0x0751, _adjustHLSequential, 0x0776, 0x0754);  // call $0776
+  PUSH(0x0754, HL);  // push hl
+  I(0x0755, 3); A = mem_rd(gb, 0xff92);  // ldh a,($ff92)
+  I(0x0757, 1); alu_cpl(gb);  // cpl
+  I(0x0758, 1); L = A;  // ld l,a
+  I(0x0759, 3); A = mem_rd(gb, 0xff93);  // ldh a,($ff93)
+  I(0x075b, 1); alu_cpl(gb);  // cpl
+  I(0x075c, 1); H = A;  // ld h,a
+  I(0x075d, 2); alu_add_hl(gb, DE);  // add hl,de
+  _label_00_068(gb); return;  // fallthrough
+}
+
+// 00:075e
+void _label_00_068(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_075e:
+  I(0x075e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x075f, 2); mem_wr(gb, DE, A);  // ld (de),a
+  I(0x0760, 2); SET_DE(DE + 1);  // inc de
+  I(0x0761, 2); SET_BC(BC - 1);  // dec bc
+  I(0x0762, 1); A = B;  // ld a,b
+  I(0x0763, 1); alu_or(gb, C);  // or c
+  if ((F & FZ)) { I(0x0764, 3); _label_00_069(gb); return; } I(0x0764, 2);  // jr z,$0770
+  I(0x0766, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
+  I(0x0768, 1); A = alu_dec8(gb, A);  // dec a
+  I(0x0769, 3); mem_wr(gb, 0xff8f, A);  // ldh ($ff8f),a
+  if (!(F & FZ)) { I(0x076b, 3); goto L_075e; } I(0x076b, 2);  // jr nz,$075e
+  SET_HL(POP(0x076d));  // pop hl
+  I(0x076e, 3); _label_00_062(gb); return;  // jr $0703
+}
+
+// 00:0770
+void _label_00_069(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  SET_HL(POP(0x0770));  // pop hl
+  RET(0x0771); return;  // ret
+}
+
+// 00:0faf
+void _label_00_152(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_0faf;
+L_0f92:
+  I(0x0f92, 3); mem_wr(gb, 0xff8d, A);  // ldh ($ff8d),a
+  I(0x0f94, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x0f95, 2); E = mem_rd(gb, HL);  // ld e,(hl)
+  I(0x0f96, 1); A = L;  // ld a,l
+  I(0x0f97, 2); alu_and(gb, 0xc0);  // and $c0
+  I(0x0f99, 2); alu_add(gb, 0x1a);  // add $1a
+  I(0x0f9b, 1); L = A;  // ld l,a
+  I(0x0f9c, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x0f9d, 1); alu_rlca(gb);  // rlca
+  if (!(F & FC)) { RET_TAKEN(0x0f9e); return; } I(0x0f9e, 2);  // ret nc
+  I(0x0f9f, 1); alu_rlca(gb);  // rlca
+  if ((F & FC)) { CALL(0x0fa0, _drawObjectTerrainEffects, 0x0f08, 0x0fa3); } else I(0x0fa0, 3);  // call c,$0f08
+  I(0x0fa3, 1); A = D;  // ld a,d
+  I(0x0fa4, 1); alu_add(gb, E);  // add e
+  I(0x0fa5, 3); mem_wr(gb, 0xff8c, A);  // ldh ($ff8c),a
+  I(0x0fa7, 1); A = L;  // ld a,l
+  I(0x0fa8, 2); alu_and(gb, 0xc0);  // and $c0
+  I(0x0faa, 2); alu_add(gb, 0x1c);  // add $1c
+  I(0x0fac, 1); L = A;  // ld l,a
+  I(0x0fad, 1); alu_scf(gb);  // scf
+  RET(0x0fae); return;  // ret
+L_0faf:
+  I(0x0faf, 3); A = mem_rd(gb, 0xffac);  // ldh a,($ffac)
+  I(0x0fb1, 1); C = A;  // ld c,a
+  I(0x0fb2, 3); A = mem_rd(gb, 0xffaa);  // ldh a,($ffaa)
+  I(0x0fb4, 1); B = A;  // ld b,a
+  I(0x0fb5, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0fb6, 1); alu_sub(gb, B);  // sub b
+  I(0x0fb7, 2); alu_add(gb, 0x10);  // add $10
+  I(0x0fb9, 3); mem_wr(gb, 0xff8c, A);  // ldh ($ff8c),a
+  I(0x0fbb, 1); D = A;  // ld d,a
+  I(0x0fbc, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x0fbd, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x0fbe, 1); alu_sub(gb, C);  // sub c
+  I(0x0fbf, 3); goto L_0f92;  // jr $0f92
+}
+
+// 00:1874
+void _label_00_203(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x1874, 2); E = 0x00;  // ld e,$00
+  _label_00_204(gb); return;  // fallthrough
+}
+
+// 00:1876
+void _label_00_204(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x1876, 4); A = mem_rd(gb, 0xcbae);  // ld a,($cbae)
+  I(0x1879, 1); alu_or(gb, L);  // or l
+  I(0x187a, 4); mem_wr(gb, 0xcbae, A);  // ld ($cbae),a
+  I(0x187d, 1); A = B;  // ld a,b
+  I(0x187e, 2); alu_add(gb, 0x04);  // add $04
+  I(0x1880, 1); B = A;  // ld b,a
+  I(0x1881, 3); SET_HL(0xcba1);  // ld hl,$cba1
+  I(0x1884, 2); mem_wr(gb, HL, E);  // ld (hl),e
+  I(0x1885, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x1886, 2); mem_wr(gb, HL, C);  // ld (hl),c
+  I(0x1887, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x1888, 1); A = B;  // ld a,b
+  I(0x1889, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x188a, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x188b, 3); mem_wr(gb, HL, 0xff);  // ld (hl),$ff
+  I(0x188d, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x188e, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
+  I(0x1890, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x1891, 3); mem_wr(gb, HL, 0x98);  // ld (hl),$98
+  I(0x1893, 2); A = 0x01;  // ld a,$01
+  I(0x1895, 4); mem_wr(gb, 0xcba0, A);  // ld ($cba0),a
+  I(0x1898, 3); SET_BC(0x18a0);  // ld bc,$18a0
+  I(0x189b, 2); A = 0xf0;  // ld a,$f0
+  I(0x189d, 4); threadRestart(gb); return;  // jp $08a3
+}
+
+// 00:0040
+void vblankVector(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  PUSH(0x0040, AF);  // push af
+  PUSH(0x0041, BC);  // push bc
+  PUSH(0x0042, DE);  // push de
+  PUSH(0x0043, HL);  // push hl
+  I(0x0044, 4); vblankInterrupt(gb); return;  // jp $09f8
+}
+
+// 00:0048
+void lcdVector(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  PUSH(0x0048, AF);  // push af
+  PUSH(0x0049, HL);  // push hl
+  I(0x004a, 4); lcdInterrupt(gb); return;  // jp $0b46
+}
+
+// 00:0050
+void timerVector(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x0050, 1); gb->ime_delay = true; gb->ime_writes++;  // ei
+  PUSH(0x0051, AF);  // push af
+  PUSH(0x0052, BC);  // push bc
+  PUSH(0x0053, DE);  // push de
+  PUSH(0x0054, HL);  // push hl
+  I(0x0055, 4); timerInterrupt(gb); return;  // jp $0d07
+}
+
+// 00:0058
+void serialVector(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  PUSH(0x0058, AF);  // push af
+  I(0x0059, 4); serialInterrupt(gb); return;  // jp $0c3d
+}
+
+// 00:ff80
+void hramOamDmaFunction(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0xff80, 2); A = 0xcb;  // ld a,$cb
+  I(0xff82, 3); mem_wr(gb, 0xff46, A);  // ldh ($ff46),a
+  I(0xff84, 2); A = 0x28;  // ld a,$28
+L_ff86:
+  I(0xff86, 1); A = alu_dec8(gb, A);  // dec a
+  if (!(F & FZ)) { I(0xff87, 3); goto L_ff86; } I(0xff87, 2);  // jr nz,$ff86
+  RET(0xff89); return;  // ret
+}
+
+// 00:c000
+void wMusicReadFunction(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0xc000, 3); mem_wr(gb, 0xffd8, A);  // ldh ($ffd8),a
+  I(0xc002, 4); mem_wr(gb, 0x2000, A);  // ld ($2000),a
+  I(0xc005, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0xc006, 1); C = A;  // ld c,a
+  I(0xc007, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
+  I(0xc009, 3); mem_wr(gb, 0xffd8, A);  // ldh ($ffd8),a
+  I(0xc00b, 4); mem_wr(gb, 0x2000, A);  // ld ($2000),a
+  I(0xc00e, 1); A = C;  // ld a,c
+  RET(0xc00f); return;  // ret
+}
+
+// 00:3034
+void enemyCodeNil(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  RET(0x3034); return;  // ret
+}
+
+// 00:3080
+void getEntryFromObjectTable1(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  I(0x3080, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
+  PUSH(0x3082, AF);  // push af
+  I(0x3083, 2); A = 0x12;  // ld a,$12
+  I(0x3085, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x3087, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  I(0x308a, 1); A = B;  // ld a,b
+  I(0x308b, 3); SET_HL(0x5482);  // ld hl,$5482
+  RST_PUSH(0x308e, 0x308f);  // rst $18 (addDoubleIndexToHl)
+  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
+  I(0x308f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x3090, 2); H = mem_rd(gb, HL);  // ld h,(hl)
+  I(0x3091, 1); L = A;  // ld l,a
+  SET_AF(POP(0x3092));  // pop af
+  I(0x3093, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
+  I(0x3095, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
+  RET(0x3098); return;  // ret
 }
 

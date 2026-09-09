@@ -64,7 +64,8 @@ static inline void ret_effect(GB *gb) { gb->pc = pop_effect(gb); }
 #define RETI(a) do { I((a), 4); ret_effect(gb); gb->ime = true; gb->ime_writes++; } while (0)
 #define HALT(a) do { int r_; do { I((a), 1); r_ = hook_halt(gb, (a) + 1); } while (r_ == 1); if (r_ < 0) HANDOFF((a) + 1); } while (0)
 #define CALL(a, fn, target, ra) do { I((a), 5); push_timed(gb, (ra)); uint16_t sp_ = gb->sp; if (hook_in_verify || !hook_enabled_at(target)) asm_call(gb, (target), (ra)); else { fn(gb); if (!(gb->pc == (ra) && gb->sp == (uint16_t)(sp_ + 2))) HANDOFF(gb->pc); } } while (0)
-#define HANDOFF(x) do { hook_handoff(gb, (x)); return; } while (0)
+#define HANDOFF(x) do { hook_continue(gb, (x), sp0_); return; } while (0)
+#define HANDOFF_UP(x) do { hook_handoff(gb, (x)); return; } while (0)
 
 static inline uint8_t alu_rlc(GB *gb, uint8_t v) { uint8_t r = (uint8_t)((v << 1) | (v >> 7)); gb->f = (r == 0 ? FZ : 0) | ((v & 0x80) ? FC : 0); return r; }
 static inline uint8_t alu_rrc(GB *gb, uint8_t v) { uint8_t r = (uint8_t)((v >> 1) | (v << 7)); gb->f = (r == 0 ? FZ : 0) | ((v & 1) ? FC : 0); return r; }

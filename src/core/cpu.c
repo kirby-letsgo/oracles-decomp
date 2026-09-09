@@ -262,6 +262,7 @@ static void execute(GB *gb, uint8_t op) {
 #include <stdio.h>
 #include <stdlib.h>
 uint64_t dbg_instr_count, dbg_int_count[5];
+uint32_t *dbg_pc_hist;
 int dbg_log_ints;
 void cpu_dispatch_interrupt(GB *gb) {
   uint8_t pending = gb->ie & gb->io[R_IF] & 0x1f;
@@ -294,5 +295,6 @@ void gb_step(GB *gb) {
   { static long long tr_at = -1, tr_n = 0; if (tr_at < 0) { tr_at = 0; if (getenv("PCTRACE")) sscanf(getenv("PCTRACE"), "%lld,%lld", &tr_at, &tr_n); }
     if (tr_n > 0 && (long long)gb->mcycles >= tr_at) { printf("PCT %04x bank %u sp %04x mc %llu%s\n", gb->pc, gb->rom_bank, gb->sp, (unsigned long long)gb->mcycles, gb->halted ? " halted" : ""); tr_n--; } }
   dbg_instr_count++;
+  if (dbg_pc_hist) dbg_pc_hist[((gb->pc < 0x4000 ? 0 : gb->rom_bank & 0x7f) << 15) | (gb->pc & 0x7fff)]++;
   execute(gb, fetch(gb));
 }

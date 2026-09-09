@@ -28,3 +28,4 @@ void gb_burn_nb(GB *gb, int mcycles);
 void hooks_report(void);
 void hook_handoff(GB *gb, uint16_t pc);
 int hook_halt(GB *gb, uint16_t next);
+void hook_continue(GB *gb, uint16_t pc, uint16_t sp0);

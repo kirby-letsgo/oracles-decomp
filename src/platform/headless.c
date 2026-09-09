@@ -12,6 +12,7 @@
 
 #define REF_INTERVAL 60
 extern uint64_t dbg_dma_bytes, dbg_dma_calls, dbg_hblank_chunks, dbg_instr_count, dbg_int_count[5];
+extern uint32_t *dbg_pc_hist;
 extern int dbg_log_dma, dbg_log_lcdc, dbg_log_ints;
 
 
@@ -198,6 +199,7 @@ int main(int argc, char **argv) {
   fc.fh_out = fh_out; fc.fh_check = fh_check; fc.ref_out = ref_out; fc.ref_check = ref_check; fc.dump = dump;
   fc.out_dir = out_dir; fc.shot_at = shot_at; fc.shot_every = shot_every; fc.input_offset = input_offset; fc.probe = probe;
   gb->frame_cb = on_frame; gb->frame_ctx = &fc;
+  if (getenv("PCHIST")) dbg_pc_hist = calloc(128 << 15, sizeof *dbg_pc_hist);
 
   const char *trace_arg = arg_value(argc, argv, "--trace-frames");
   uint64_t trace_start = 0, trace_end = 0;
@@ -285,6 +287,7 @@ int main(int argc, char **argv) {
   if (fh_out) fclose(fh_out);
   if (dump) fclose(dump);
   if (hook_mode != HOOK_MODE_OFF) hooks_report();
+  if (dbg_pc_hist) { FILE *hf = fopen(getenv("PCHIST"), "wb"); fwrite(dbg_pc_hist, sizeof *dbg_pc_hist, 128 << 15, hf); fclose(hf); }
   if (gb->sample_overflow) fprintf(stderr, "sample ring overflow: %llu frames dropped\n", (unsigned long long)gb->sample_overflow);
   printf("done: %llu frames, state %016llx\n", (unsigned long long)GRID_FRAME(gb->cycles),
          (unsigned long long)gb_state_hash(gb));

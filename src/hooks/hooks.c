@@ -18,7 +18,7 @@ static Hook hooks[] = {
 #define NHOOKS (sizeof hooks / sizeof hooks[0])
 static int16_t first_at[65536];
 static int depth;
-static jmp_buf hook_jmp[64];
+static jmp_buf hook_jmp[128];
 static int hook_jmp_depth;
 
 void hook_handoff(GB *gb, uint16_t pc) {
@@ -53,7 +53,7 @@ static Hook *lookup(const GB *gb, uint16_t pc) {
   int i = first_at[pc];
   if (i < 0) return NULL;
   for (; i < (int)NHOOKS && hooks[i].addr == pc; i++)
-    if ((pc < 0x4000 || hooks[i].bank == gb->rom_bank) && first_at[hooks[i].addr] >= 0) return &hooks[i];
+    if ((pc < 0x4000 || pc >= 0x8000 || hooks[i].bank == gb->rom_bank) && first_at[hooks[i].addr] >= 0) return &hooks[i];
   return NULL;
 }
 
@@ -124,7 +124,7 @@ static void verify(GB *gb, Hook *h) {
   int depth0 = depth, hiv0 = hook_in_verify;
   depth++;
   hook_in_verify++;
-  if (hook_jmp_depth < 64) { hook_jmp_depth++; if (setjmp(hook_jmp[hook_jmp_depth - 1]) == 0) h->fn(gb); hook_jmp_depth--; } else h->fn(gb);
+  if (hook_jmp_depth < 128) { hook_jmp_depth++; if (setjmp(hook_jmp[hook_jmp_depth - 1]) == 0) h->fn(gb); hook_jmp_depth--; } else h->fn(gb);
   hook_in_verify = hiv0;
   depth = depth0;
   uint64_t cyc_c = gb->mcycles - c0;
@@ -184,7 +184,7 @@ bool hook_dispatch(GB *gb) {
   if (hooklog) fprintf(stderr, "HOOK> %s mc %llu frame %llu sp %04x ime %d\n", h->name, (unsigned long long)gb->mcycles, (unsigned long long)GRID_FRAME(gb->cycles), gb->sp, gb->ime);
   int depth0 = depth;
   depth++;
-  if (hook_jmp_depth < 64) { hook_jmp_depth++; if (setjmp(hook_jmp[hook_jmp_depth - 1]) == 0) h->fn(gb); hook_jmp_depth--; } else h->fn(gb);
+  if (hook_jmp_depth < 128) { hook_jmp_depth++; if (setjmp(hook_jmp[hook_jmp_depth - 1]) == 0) h->fn(gb); hook_jmp_depth--; } else h->fn(gb);
   depth = depth0;
   if (hooklog) fprintf(stderr, "HOOK< %s mc %llu frame %llu sp %04x pc %04x ime %d\n", h->name, (unsigned long long)gb->mcycles, (unsigned long long)GRID_FRAME(gb->cycles), gb->sp, gb->pc, gb->ime);
   return true;
@@ -210,6 +210,18 @@ void asm_call(GB *gb, uint16_t target, uint16_t ret_addr) {
   }
   depth++;
   if (hooklog) fprintf(stderr, "ASM< %04x mc %llu sp %04x ime %d\n", target, (unsigned long long)gb->mcycles, gb->sp, gb->ime);
+}
+
+void hook_continue(GB *gb, uint16_t pc, uint16_t sp0) {
+  uint16_t ret_addr = (uint16_t)(bus_read(gb, sp0) | (bus_read(gb, sp0 + 1) << 8));
+  uint32_t sl0 = gb->sp_loads;
+  gb->pc = pc;
+  depth--;
+  while (!(gb->pc == ret_addr && gb->sp == (uint16_t)(sp0 + 2)) && !gb->hung) {
+    if (gb->sp_loads != sl0 || ((uint16_t)(gb->sp - sp0) > 2 && (uint16_t)(gb->sp - sp0) < 0x8000) || (gb->sp == sp0 && depth > 24 && lookup(gb, gb->pc))) { depth++; hook_handoff(gb, gb->pc); depth--; break; }
+    gb_step(gb);
+  }
+  depth++;
 }
 
 void asm_continue(GB *gb, uint16_t ret_addr, uint16_t sp0) {

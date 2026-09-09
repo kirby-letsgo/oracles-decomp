@@ -1,0 +1,9 @@
+# labels the disassembly's symbol file lacks: interrupt vectors, and code that runs from RAM
+# (bank:addr name [= source bank:addr the bytes are copied from])
+00:0040 vblankVector
+00:0048 lcdVector
+00:0050 timerVector
+00:0058 serialVector
+00:ff80 hramOamDmaFunction = 03:4091
+00:c000 wMusicReadFunction = 39:404b
+00:c4b7 wRamFunction extern
