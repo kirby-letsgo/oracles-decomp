@@ -30,72 +30,33 @@ L_55da:
 
 // 12:5872
 void runRoomSpecificCode(GB *gb) {
-  goto L_5872;
-L_1100:
-  I(0x1100, 3); SET_HL(0xc62b);  // ld hl,$c62b
-  I(0x1103, 4); A = mem_rd(gb, 0xcc2d);  // ld a,($cc2d)
-  I(0x1106, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x1107, 4); A = mem_rd(gb, 0xcc30);  // ld a,($cc30)
-  I(0x110a, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x110b, 4); A = mem_rd(gb, 0xcc32);  // ld a,($cc32)
-  I(0x110e, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x110f, 4); A = mem_rd(gb, 0xd008);  // ld a,($d008)
-  I(0x1112, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x1113, 4); A = mem_rd(gb, 0xd00b);  // ld a,($d00b)
-  I(0x1116, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x1117, 4); A = mem_rd(gb, 0xd00d);  // ld a,($d00d)
-  I(0x111a, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x111b, 4); A = mem_rd(gb, 0xcc24);  // ld a,($cc24)
-  I(0x111e, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x111f, 4); A = mem_rd(gb, 0xcc25);  // ld a,($cc25)
-  I(0x1122, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x1123, 4); A = mem_rd(gb, 0xcc26);  // ld a,($cc26)
-  I(0x1126, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x1127, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
-  I(0x112a, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x112b, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x112c, 4); A = mem_rd(gb, 0xcc27);  // ld a,($cc27)
-  I(0x112f, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x1130, 4); A = mem_rd(gb, 0xcc28);  // ld a,($cc28)
-  I(0x1133, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  RET(0x1134); return;  // ret
-L_5872:
   I(0x5872, 4); A = mem_rd(gb, 0xcc30);  // ld a,($cc30)
   I(0x5875, 3); SET_HL(0x5898);  // ld hl,$5898
-  CALL_ASM(0x5878, 0x1dfe, 0x587b); /* unported */  // call $1dfe
+  CALL(0x5878, findRoomSpecificData, 0x1dfe, 0x587b);  // call $1dfe
   if (!(F & FC)) { RET_TAKEN(0x587b); return; } I(0x587b, 2);  // ret nc
   RST_PUSH(0x587c, 0x587d);  // rst $00 (jump table)
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
   if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x1100: goto L_1100; default: HANDOFF(HL); }
+  switch (HL) {  default: HANDOFF(HL); }
 }
 
 // 12:58ca
 void roomSpecificCode0(GB *gb) {
-  goto L_58ca;
-L_046f:
-  I(0x046f, 1); alu_xor(gb, A);  // xor a
-L_0470:
-  I(0x0470, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x0471, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x0472, 3); goto L_0470; } I(0x0472, 2);  // jr nz,$0470
-  RET(0x0474); return;  // ret
-L_58ca:
   I(0x58ca, 2); A = 0x0e;  // ld a,$0e
-  CALL_ASM(0x58cc, 0x31f3, 0x58cf); /* unported */  // call $31f3
+  CALL(0x58cc, checkGlobalFlag, 0x31f3, 0x58cf);  // call $31f3
   if (!(F & FZ)) { RET_TAKEN(0x58cf); return; } I(0x58cf, 2);  // ret nz
   I(0x58d0, 3); SET_HL(0xcfd0);  // ld hl,$cfd0
   I(0x58d3, 2); B = 0x10;  // ld b,$10
-  I(0x58d5, 4); goto L_046f;  // jp $046f
+  I(0x58d5, 4); clearMemory(gb); return;  // jp $046f
 }
 
 // 12:58d8
 void roomSpecificCode1(GB *gb) {
   I(0x58d8, 2); A = 0x0f;  // ld a,$0f
-  CALL_ASM(0x58da, 0x31f3, 0x58dd); /* unported */  // call $31f3
+  CALL(0x58da, checkGlobalFlag, 0x31f3, 0x58dd);  // call $31f3
   if (!(F & FZ)) { RET_TAKEN(0x58dd); return; } I(0x58dd, 2);  // ret nz
-  CALL_ASM(0x58de, 0x3aef, 0x58e1); /* unported */  // call $3aef
+  CALL(0x58de, getFreeInteractionSlot, 0x3aef, 0x58e1);  // call $3aef
   if (!(F & FZ)) { RET_TAKEN(0x58e1); return; } I(0x58e1, 2);  // ret nz
   I(0x58e2, 3); mem_wr(gb, HL, 0x7d);  // ld (hl),$7d
   I(0x58e4, 2); L = 0x4b;  // ld l,$4b
@@ -109,7 +70,7 @@ void roomSpecificCode1(GB *gb) {
 void roomSpecificCode2(GB *gb) {
   goto L_58ed;
 L_58de:
-  CALL_ASM(0x58de, 0x3aef, 0x58e1); /* unported */  // call $3aef
+  CALL(0x58de, getFreeInteractionSlot, 0x3aef, 0x58e1);  // call $3aef
   if (!(F & FZ)) { RET_TAKEN(0x58e1); return; } I(0x58e1, 2);  // ret nz
   I(0x58e2, 3); mem_wr(gb, HL, 0x7d);  // ld (hl),$7d
   I(0x58e4, 2); L = 0x4b;  // ld l,$4b
@@ -119,22 +80,22 @@ L_58de:
   RET(0x58ec); return;  // ret
 L_58ed:
   I(0x58ed, 2); A = 0x0f;  // ld a,$0f
-  CALL_ASM(0x58ef, 0x31f3, 0x58f2); /* unported */  // call $31f3
+  CALL(0x58ef, checkGlobalFlag, 0x31f3, 0x58f2);  // call $31f3
   if ((F & FZ)) { RET_TAKEN(0x58f2); return; } I(0x58f2, 2);  // ret z
   I(0x58f3, 3); goto L_58de;  // jr $58de
 }
 
 // 12:58f5
 void roomSpecificCode3(GB *gb) {
-  CALL_ASM(0x58f5, 0x197d, 0x58f8); /* unported */  // call $197d
+  CALL(0x58f5, getThisRoomFlags, 0x197d, 0x58f8);  // call $197d
   I(0x58f8, 2); alu_bit(gb, 6, A);  // bit 6,a
   if (!(F & FZ)) { RET_TAKEN(0x58fa); return; } I(0x58fa, 2);  // ret nz
   I(0x58fb, 2); A = 0x24;  // ld a,$24
-  CALL_ASM(0x58fd, 0x1748, 0x5900); /* unported */  // call $1748
+  CALL(0x58fd, checkTreasureObtained, 0x1748, 0x5900);  // call $1748
   if (!(F & FC)) { RET_TAKEN(0x5900); return; } I(0x5900, 2);  // ret nc
   I(0x5901, 3); SET_HL(0xcc05);  // ld hl,$cc05
   I(0x5904, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 1)));  // res 1,(hl)
-  CALL_ASM(0x5906, 0x3aef, 0x5909); /* unported */  // call $3aef
+  CALL(0x5906, getFreeInteractionSlot, 0x3aef, 0x5909);  // call $3aef
   if (!(F & FZ)) { RET_TAKEN(0x5909); return; } I(0x5909, 2);  // ret nz
   I(0x590a, 3); mem_wr(gb, HL, 0x40);  // ld (hl),$40
   I(0x590c, 1); L = alu_inc8(gb, L);  // inc l
@@ -147,9 +108,9 @@ void roomSpecificCode3(GB *gb) {
 // 12:5915
 void roomSpecificCode7(GB *gb) {
   I(0x5915, 2); A = 0x15;  // ld a,$15
-  CALL_ASM(0x5917, 0x31f3, 0x591a); /* unported */  // call $31f3
+  CALL(0x5917, checkGlobalFlag, 0x31f3, 0x591a);  // call $31f3
   if ((F & FZ)) { RET_TAKEN(0x591a); return; } I(0x591a, 2);  // ret z
-  CALL_ASM(0x591b, 0x197d, 0x591e); /* unported */  // call $197d
+  CALL(0x591b, getThisRoomFlags, 0x197d, 0x591e);  // call $197d
   I(0x591e, 2); alu_bit(gb, 6, A);  // bit 6,a
   if (!(F & FZ)) { RET_TAKEN(0x5920); return; } I(0x5920, 2);  // ret nz
   I(0x5921, 2); A = 0x35;  // ld a,$35
@@ -160,7 +121,7 @@ void roomSpecificCode7(GB *gb) {
 // 12:5927
 void roomSpecificCode5(GB *gb) {
   I(0x5927, 2); A = 0x11;  // ld a,$11
-  CALL_ASM(0x5929, 0x31f3, 0x592c); /* unported */  // call $31f3
+  CALL(0x5929, checkGlobalFlag, 0x31f3, 0x592c);  // call $31f3
   if (!(F & FZ)) { RET_TAKEN(0x592c); return; } I(0x592c, 2);  // ret nz
   I(0x592d, 2); A = 0x1f;  // ld a,$1f
   I(0x592f, 4); mem_wr(gb, 0xcc46, A);  // ld ($cc46),a
@@ -182,7 +143,7 @@ void roomSpecificCode8(GB *gb) {
   I(0x5941, 2); alu_cp(gb, 0x01);  // cp $01
   if (!(F & FZ)) { RET_TAKEN(0x5943); return; } I(0x5943, 2);  // ret nz
   I(0x5944, 2); A = 0x40;  // ld a,$40
-  CALL_ASM(0x5946, 0x31f3, 0x5949); /* unported */  // call $31f3
+  CALL(0x5946, checkGlobalFlag, 0x31f3, 0x5949);  // call $31f3
   if (!(F & FZ)) { RET_TAKEN(0x5949); return; } I(0x5949, 2);  // ret nz
   I(0x594a, 2); A = 0x35;  // ld a,$35
   I(0x594c, 4); mem_wr(gb, 0xcc46, A);  // ld ($cc46),a
@@ -192,7 +153,7 @@ void roomSpecificCode8(GB *gb) {
 // 12:5950
 void roomSpecificCode9(GB *gb) {
   I(0x5950, 2); A = 0x14;  // ld a,$14
-  CALL_ASM(0x5952, 0x31f3, 0x5955); /* unported */  // call $31f3
+  CALL(0x5952, checkGlobalFlag, 0x31f3, 0x5955);  // call $31f3
   if ((F & FZ)) { RET_TAKEN(0x5955); return; } I(0x5955, 2);  // ret z
   I(0x5956, 2); A = 0x08;  // ld a,$08
   I(0x5958, 4); mem_wr(gb, 0xcc46, A);  // ld ($cc46),a
@@ -260,7 +221,7 @@ L_78fd:
   if ((F & FZ)) { I(0x790b, 3); goto L_793d; } I(0x790b, 2);  // jr z,$793d
   PUSH(0x790d, HL);  // push hl
   I(0x790e, 2); A = 0x30;  // ld a,$30
-  CALL_ASM(0x7910, 0x31f3, 0x7913); /* unported */  // call $31f3
+  CALL(0x7910, checkGlobalFlag, 0x31f3, 0x7913);  // call $31f3
   SET_HL(POP(0x7913));  // pop hl
   if ((F & FZ)) { I(0x7914, 3); goto L_793d; } I(0x7914, 2);  // jr z,$793d
   I(0x7916, 2); alu_bit(gb, 0, B);  // bit 0,b
@@ -296,7 +257,7 @@ L_793d:
   I(0x7946, 1); A = B;  // ld a,b
   I(0x7947, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x7949, 2); alu_xor(gb, 0x0f);  // xor $0f
-  CALL_ASM(0x794b, 0x0205, 0x794e); /* unported */  // call $0205
+  CALL(0x794b, checkFlag, 0x0205, 0x794e);  // call $0205
   if (!(F & FZ)) { I(0x794e, 3); goto L_795b; } I(0x794e, 2);  // jr nz,$795b
   I(0x7950, 1); alu_scf(gb);  // scf
   I(0x7951, 3); goto L_795b;  // jr $795b
@@ -441,7 +402,7 @@ void addPositionToPlacedEnemyPositions(GB *gb) {
 
 // 12:583d
 void assignRandomPositionToEnemy(GB *gb) {
-  CALL_ASM(0x583d, 0x3219, 0x5840); /* unported */  // call $3219
+  CALL(0x583d, getRandomPositionForEnemy_b00, 0x3219, 0x5840);  // call $3219
   if ((F & FC)) { RET_TAKEN(0x5840); return; } I(0x5840, 2);  // ret c
   I(0x5841, 4); A = mem_rd(gb, 0xcec2);  // ld a,($cec2)
   I(0x5844, 1); C = A;  // ld c,a
@@ -449,7 +410,7 @@ void assignRandomPositionToEnemy(GB *gb) {
   I(0x5848, 3); A = mem_rd(gb, 0xff91);  // ldh a,($ff91)
   I(0x584a, 1); H = A;  // ld h,a
   I(0x584b, 2); L = 0x8b;  // ld l,$8b
-  CALL_ASM(0x584d, 0x20b9, 0x5850); /* unported */  // call $20b9
+  CALL(0x584d, setShortPosition_paramC, 0x20b9, 0x5850);  // call $20b9
   I(0x5850, 1); alu_xor(gb, A);  // xor a
   RET(0x5851); return;  // ret
 }

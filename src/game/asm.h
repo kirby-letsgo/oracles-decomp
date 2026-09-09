@@ -61,6 +61,8 @@ static inline void ret_effect(GB *gb) { gb->pc = pop_effect(gb); }
 #define POP(a) (gb->hook_pc = (a), gb_burn(gb, 3), pop_effect(gb))
 #define RET(a) do { I((a), 4); ret_effect(gb); } while (0)
 #define RET_TAKEN(a) do { I((a), 5); ret_effect(gb); } while (0)
+#define RETI(a) do { I((a), 4); ret_effect(gb); gb->ime = true; gb->ime_writes++; } while (0)
+#define HALT(a) do { int r_; do { I((a), 1); r_ = hook_halt(gb, (a) + 1); } while (r_ == 1); if (r_ < 0) HANDOFF((a) + 1); } while (0)
 #define CALL(a, fn, target, ra) do { I((a), 5); push_timed(gb, (ra)); uint16_t sp_ = gb->sp; if (hook_in_verify || !hook_enabled_at(target)) asm_call(gb, (target), (ra)); else { fn(gb); if (!(gb->pc == (ra) && gb->sp == (uint16_t)(sp_ + 2))) HANDOFF(gb->pc); } } while (0)
 #define HANDOFF(x) do { hook_handoff(gb, (x)); return; } while (0)
 

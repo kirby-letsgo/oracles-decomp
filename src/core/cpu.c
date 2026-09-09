@@ -149,7 +149,7 @@ static void execute(GB *gb, uint8_t op) {
       default: { int8_t d = fetch(gb); if (cond(gb, y - 4)) { gb_tick(gb); gb->pc += d; } return; }
       }
     case 1:
-      if (q == 0) { set_rp(gb, p, fetch16(gb)); if (p == 3) hook_handoff(gb, gb->pc); return; }
+      if (q == 0) { set_rp(gb, p, fetch16(gb)); if (p == 3) { gb->sp_loads++; hook_handoff(gb, gb->pc); } return; }
       { uint16_t hl = HL, v = get_rp(gb, p); uint32_t r = hl + v;
         gb->f = (gb->f & FZ) | ((hl & 0xfff) + (v & 0xfff) > 0xfff ? FH : 0) | (r > 0xffff ? FC : 0);
         set_hl(gb, r); gb_tick(gb); return; }
@@ -219,9 +219,9 @@ static void execute(GB *gb, uint8_t op) {
       if (q == 0) { set_rp2(gb, p, pop(gb)); return; }
       switch (p) {
       case 0: gb->pc = pop(gb); gb_tick(gb); return;
-      case 1: gb->pc = pop(gb); gb_tick(gb); gb->ime = true; return;
+      case 1: gb->pc = pop(gb); gb_tick(gb); gb->ime = true; gb->ime_writes++; return;
       case 2: gb->pc = HL; return;
-      default: gb->sp = HL; gb_tick(gb); hook_handoff(gb, gb->pc); return;
+      default: gb->sp = HL; gb_tick(gb); gb->sp_loads++; hook_handoff(gb, gb->pc); return;
       }
     case 2:
       switch (y) {
@@ -235,8 +235,8 @@ static void execute(GB *gb, uint8_t op) {
       switch (y) {
       case 0: gb->pc = fetch16(gb); gb_tick(gb); return;
       case 1: cb(gb); return;
-      case 6: gb->ime = false; gb->ime_delay = false; return;
-      case 7: gb->ime_delay = true; return;
+      case 6: gb->ime = false; gb->ime_delay = false; gb->ime_writes++; return;
+      case 7: gb->ime_delay = true; gb->ime_writes++; return;
       default: gb->hung = true; return;
       }
     case 4:

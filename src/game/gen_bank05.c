@@ -4,15 +4,6 @@
 
 // 05:4000
 void updateSpecialObjects(GB *gb) {
-  goto L_4000;
-L_046f:
-  I(0x046f, 1); alu_xor(gb, A);  // xor a
-L_0470:
-  I(0x0470, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x0471, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x0472, 3); goto L_0470; } I(0x0472, 2);  // jr nz,$0470
-  RET(0x0474); return;  // ret
-L_4000:
   I(0x4000, 3); SET_HL(0xcc57);  // ld hl,$cc57
   I(0x4003, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x4004, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
@@ -26,7 +17,7 @@ L_400e:
   I(0x4012, 2); alu_and(gb, 0x3f);  // and $3f
   I(0x4014, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x4015, 2); A = 0x4a;  // ld a,$4a
-  CALL_ASM(0x4017, 0x1748, 0x401a); /* unported */  // call $1748
+  CALL(0x4017, checkTreasureObtained, 0x1748, 0x401a);  // call $1748
   if (!(F & FC)) { I(0x401a, 3); goto L_401e; } I(0x401a, 2);  // jr nc,$401e
   I(0x401c, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));  // set 6,(hl)
 L_401e:
@@ -72,7 +63,7 @@ L_4027:
 L_4075:
   I(0x4075, 3); SET_HL(0xcc74);  // ld hl,$cc74
   I(0x4078, 2); B = 0x10;  // ld b,$10
-  I(0x407a, 4); goto L_046f;  // jp $046f
+  I(0x407a, 4); clearMemory(gb); return;  // jp $046f
 }
 
 // 05:40b3
@@ -84,7 +75,7 @@ void updateGameKeysPressed(GB *gb) {
   if ((F & FZ)) { I(0x40bb, 3); goto L_40da; } I(0x40bb, 2);  // jr z,$40da
   I(0x40bd, 2); alu_cp(gb, 0x02);  // cp $02
   if ((F & FZ)) { I(0x40bf, 3); goto L_40c6; } I(0x40bf, 2);  // jr z,$40c6
-  CALL_ASM(0x40c1, 0x2a33, 0x40c4); /* unported */  // call $2a33
+  CALL(0x40c1, getSimulatedInput, 0x2a33, 0x40c4);  // call $2a33
   I(0x40c4, 3); goto L_40d9;  // jr $40d9
 L_40c6:
   I(0x40c6, 1); alu_xor(gb, A);  // xor a
@@ -136,41 +127,15 @@ L_40f8:
 
 // 05:6364
 void specialObjectCode_minecart_b05(GB *gb) {
-  goto L_6364;
-L_008a:
-  I(0x008a, 4); A = mem_rd(gb, 0xff97);  // ld a,($ff97)
-  PUSH(0x008d, AF);  // push af
-  I(0x008e, 1); A = E;  // ld a,e
-  I(0x008f, 4); mem_wr(gb, 0xff97, A);  // ld ($ff97),a
-  I(0x0092, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL_ASM(0x0095, 0x00a0, 0x0098); /* unported */  // call $00a0
-  SET_AF(POP(0x0098));  // pop af
-  I(0x0099, 4); mem_wr(gb, 0xff97, A);  // ld ($ff97),a
-  I(0x009c, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x009f); return;  // ret
-L_6364:
   I(0x6364, 3); SET_HL(0x563e);  // ld hl,$563e
   I(0x6367, 2); E = 0x06;  // ld e,$06
-  I(0x6369, 4); goto L_008a;  // jp $008a
+  I(0x6369, 4); HANDOFF(0x008a); /* interBankCall */  // jp $008a
 }
 
 // 05:7c66
 void specialObjectCode_raft_b05(GB *gb) {
-  goto L_7c66;
-L_008a:
-  I(0x008a, 4); A = mem_rd(gb, 0xff97);  // ld a,($ff97)
-  PUSH(0x008d, AF);  // push af
-  I(0x008e, 1); A = E;  // ld a,e
-  I(0x008f, 4); mem_wr(gb, 0xff97, A);  // ld ($ff97),a
-  I(0x0092, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL_ASM(0x0095, 0x00a0, 0x0098); /* unported */  // call $00a0
-  SET_AF(POP(0x0098));  // pop af
-  I(0x0099, 4); mem_wr(gb, 0xff97, A);  // ld ($ff97),a
-  I(0x009c, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x009f); return;  // ret
-L_7c66:
   I(0x7c66, 3); SET_HL(0x57ef);  // ld hl,$57ef
   I(0x7c69, 2); E = 0x06;  // ld e,$06
-  I(0x7c6b, 4); goto L_008a;  // jp $008a
+  I(0x7c6b, 4); HANDOFF(0x008a); /* interBankCall */  // jp $008a
 }
 

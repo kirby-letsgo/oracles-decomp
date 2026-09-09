@@ -96,7 +96,7 @@ def decode(bank, addr):
         f = ['alu_rlca', 'alu_rrca', 'alu_rla', 'alu_rra', 'alu_daa', 'alu_cpl', 'alu_scf', 'alu_ccf'][y]
         return f[4:], 1, 1, 'op', (f'{f}(gb)',)
     if x == 1:
-        if op == 0x76: return 'halt', 1, 1, 'unsupported', ()
+        if op == 0x76: return 'halt', 1, 1, 'halt', ()
         return f'ld {R8N[y]},{R8N[z]}', 1, 2 if (y == 6 or z == 6) else 1, 'op', (set8(y, get8(z)),)
     if x == 2: return f'{ALUF[y][4:]} {R8N[z]}', 1, 2 if z == 6 else 1, 'op', (f'{ALUF[y]}(gb, {get8(z)})',)
     if z == 0:
@@ -107,15 +107,15 @@ def decode(bank, addr):
         return f'ld hl,sp+${n1:02x}', 2, 3, 'op', (f'alu_ld_hl_sp(gb, 0x{n1:02x})',)
     if z == 1:
         if q == 0: return f'pop {R16P[p].lower()}', 1, 3, 'pop', (R16P[p],)
-        return [('ret', 1, 4, 'ret', ()), ('reti', 1, 4, 'unsupported', ()), ('jp hl', 1, 1, 'jphl', ()), ('ld sp,hl', 1, 2, 'spload', ('gb->sp = HL',))][p]
+        return [('ret', 1, 4, 'ret', ()), ('reti', 1, 4, 'reti', ()), ('jp hl', 1, 1, 'jphl', ()), ('ld sp,hl', 1, 2, 'spload', ('gb->sp = HL',))][p]
     if z == 2:
         if y < 4: return f'jp {CC[y]},${n16:04x}', 3, (4, 3), 'jpcc', (n16, CCEXPR[y])
         return [('ld ($ff00+c),a', 1, 2, 'op', ('mem_wr(gb, 0xff00 | C, A)',)), (f'ld (${n16:04x}),a', 3, 4, 'op', (f'mem_wr(gb, 0x{n16:04x}, A)',)),
                 ('ld a,($ff00+c)', 1, 2, 'op', ('A = mem_rd(gb, 0xff00 | C)',)), (f'ld a,(${n16:04x})', 3, 4, 'op', (f'A = mem_rd(gb, 0x{n16:04x})',))][y-4]
     if z == 3:
         if y == 0: return f'jp ${n16:04x}', 3, 4, 'jp', (n16, None)
-        if y == 6: return 'di', 1, 1, 'op', ('gb->ime = false; gb->ime_delay = false',)
-        if y == 7: return 'ei', 1, 1, 'unsupported', ()
+        if y == 6: return 'di', 1, 1, 'op', ('gb->ime = false; gb->ime_delay = false; gb->ime_writes++',)
+        if y == 7: return 'ei', 1, 1, 'op', ('gb->ime_delay = true; gb->ime_writes++',)
     if z == 4: return f'call {CC[y]},${n16:04x}', 3, (6, 3), 'callcc', (n16, CCEXPR[y])
     if z == 5:
         if q == 0: return f'push {R16P[p].lower()}', 1, 4, 'push', (R16P[p],)
@@ -123,8 +123,12 @@ def decode(bank, addr):
     if z == 6: return f'{ALUF[y][4:]} ${n1:02x}', 2, 2, 'op', (f'{ALUF[y]}(gb, 0x{n1:02x})',)
     return f'rst ${y*8:02x}', 1, 4, 'rst', (y * 8,)
 
+def target_bank(bank, t):
+    if t < 0x4000: return 0
+    return bank if bank != 0 else None
+
 def routine_body(bank, start):
-    """Decode every instruction reachable from start without crossing into another labeled routine."""
+    """Decode every instruction reachable from start without crossing into another labeled routine or bank."""
     seen = {}
     work = [start]
     while work:
@@ -146,12 +150,12 @@ def routine_body(bank, start):
         elif kind in ('jp', 'jpcc'):
             succ.append(info[0])
             if kind != 'jp': succ.append(a + ln)
-        elif kind in ('ret', 'jphl', 'unsupported'):
+        elif kind in ('ret', 'reti', 'jphl', 'unsupported'):
             pass
         else:
             succ.append(a + ln)
         seen[a] = (a, m, ln, cy, kind, info)
-        work.extend(succ)
+        work.extend(t for t in succ if (t < 0x4000) == (start < 0x4000))
     return [seen[a] for a in sorted(seen)]
 
 def target_name(bank, t, insns_addrs):
@@ -193,6 +197,10 @@ def gen(name, bank=None, start=None):
             out.emit((f'SET_AF(POP(0x{a:04x}));' if r == 'AF' else f'SET_{r}(POP(0x{a:04x}));') + com)
         elif kind == 'ret':
             out.emit(f'RET(0x{a:04x}); return;{com}')
+        elif kind == 'reti':
+            out.emit(f'RETI(0x{a:04x}); return;{com}')
+        elif kind == 'halt':
+            out.emit(f'HALT(0x{a:04x});{com}')
         elif kind == 'retcc':
             out.emit(f'if ({info[0]}) {{ RET_TAKEN(0x{a:04x}); return; }} I(0x{a:04x}, 2);{com}')
         elif kind in ('jp', 'jpcc'):
@@ -201,8 +209,9 @@ def gen(name, bank=None, start=None):
             if t in addrs:
                 jump = f'goto L_{t:04x};'
             else:
-                tn = by_addr.get((bank, t)) or (local_by_addr.get((bank, t)) or '').split('@')[0]
-                if tn in ported and (bank, t) in by_addr: jump = f'{cname_at(bank, t)}(gb); return;'
+                tb = target_bank(bank, t)
+                tn = by_addr.get((tb, t)) or (local_by_addr.get((tb, t)) or '').split('@')[0]
+                if tn in ported and (tb, t) in by_addr: jump = f'{cname_at(tb, t)}(gb); return;'
                 else: jump = f'HANDOFF(0x{t:04x}); /* {tn or "unported"} */'
             if cond is None:
                 out.emit(f'I(0x{a:04x}, {taken}); {jump}{com}')
@@ -210,9 +219,10 @@ def gen(name, bank=None, start=None):
                 out.emit(f'if ({cond}) {{ I(0x{a:04x}, {taken}); {jump} }} I(0x{a:04x}, {not_taken});{com}')
         elif kind in ('call', 'callcc'):
             t, cond = info
-            tn = by_addr.get((bank, t))
+            tb = target_bank(bank, t)
+            tn = by_addr.get((tb, t))
             ra = a + ln
-            if tn in ported: c = f'CALL(0x{a:04x}, {cname_at(bank, t)}, 0x{t:04x}, 0x{ra:04x});'
+            if tn in ported: c = f'CALL(0x{a:04x}, {cname_at(tb, t)}, 0x{t:04x}, 0x{ra:04x});'
             else: c = f'CALL_ASM(0x{a:04x}, 0x{t:04x}, 0x{ra:04x}); /* {tn or "unported"} */'
             if cond is None: out.emit(c + com)
             else: out.emit(f'if ({cond}) {{ {c} }} else I(0x{a:04x}, 3);{com}')
@@ -238,16 +248,17 @@ def gen(name, bank=None, start=None):
         elif kind == 'jphl':
             out.emit(f'I(0x{a:04x}, 1); HANDOFF(HL);{com}')
         elif kind == 'spload':
-            out.emit(f'I(0x{a:04x}, {cy}); {info[0]}; HANDOFF(0x{a + ln:04x});{com}')
+            out.emit(f'I(0x{a:04x}, {cy}); {info[0]}; gb->sp_loads++; HANDOFF(0x{a + ln:04x});{com}')
         else:
             out.emit(f'#error unsupported instruction {m} at {a:04x}')
-        falls = kind not in ('ret', 'jp', 'jphl', 'jumptable', 'unsupported', 'spload')
+        falls = kind not in ('ret', 'reti', 'jp', 'jphl', 'jumptable', 'unsupported', 'spload')
         nxt_a = a + ln
         if falls and nxt_a not in addrs:
             nn = by_addr.get((bank, nxt_a))
             if nn in ported: out.emit(f'{cname_at(bank, nxt_a)}(gb); return;  // fallthrough')
             else: out.emit(f'HANDOFF(0x{nxt_a:04x});  // fallthrough to {nn or "unlabeled"}')
     out.lines.append('}')
+    gen.flags = 'H' if any(k == 'halt' for _, _, _, _, k, _ in insns) else '-'
     return '\n'.join(out.lines)
 
 if names and names[0] == '--out':
@@ -274,12 +285,12 @@ if names and names[0] == '--out':
             f.write('// generated by tools/transliterate.py; do not edit\n#include "game/asm.h"\n#include "game/gen.h"\n\n')
             for n, b, a in items:
                 code = gen(n, b, a)
-                if code: f.write(code + '\n\n'); generated.append((b, a, cname_at(b, a)))
+                if code: f.write(code + '\n\n'); generated.append((b, a, cname_at(b, a), gen.flags))
     with open(os.path.join(outdir, 'gen.h'), 'w') as h:
         h.write('// generated by tools/transliterate.py; do not edit\n#pragma once\n#include "core/gb.h"\n')
-        for b, a, cn in generated: h.write(f'void {cn}(GB *gb);\n')
+        for b, a, cn, fl in generated: h.write(f'void {cn}(GB *gb);\n')
     with open('src/hooks/generated.txt', 'w') as g:
-        for b, a, cn in generated: g.write(f'{b:02x}:{a:04x} {cn}\n')
+        for b, a, cn, fl in generated: g.write(f'{b:02x}:{a:04x} {cn} {fl}\n')
     print(f'{len(generated)} routines in {len(by_bank)} bank files')
 else:
     print('#include "game/asm.h"\n#include "game/gen.h"\n')

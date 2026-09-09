@@ -90,6 +90,7 @@ typedef struct GB {
   uint64_t cycles, mcycles;
   bool joy_read, vblank_if_raised, hooks_checked, hooks_ok;
   uint16_t hook_pc;
+  uint32_t ime_writes, sp_loads;
   uint8_t (*input_at)(void *ctx, uint64_t frame);
   void *input_ctx;
   uint64_t next_sample_at;

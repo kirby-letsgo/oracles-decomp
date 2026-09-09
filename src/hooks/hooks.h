@@ -9,7 +9,10 @@ typedef struct {
   const char *name;
   HookFn fn;
   uint64_t calls;
+  int flags;
 } Hook;
+
+enum { HOOK_NOVERIFY = 1 };
 
 enum { HOOK_MODE_OFF = 0, HOOK_MODE_REPLACE = 1, HOOK_MODE_VERIFY = 2 };
 extern int hook_mode;
@@ -24,3 +27,4 @@ void gb_burn(GB *gb, int mcycles);
 void gb_burn_nb(GB *gb, int mcycles);
 void hooks_report(void);
 void hook_handoff(GB *gb, uint16_t pc);
+int hook_halt(GB *gb, uint16_t next);

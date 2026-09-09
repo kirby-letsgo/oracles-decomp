@@ -1,1356 +1,1494 @@
-00:046f clearMemory
-00:0470 fillMemory
-00:0475 clearMemoryBc
-00:0476 fillMemoryBc
-00:047f copyMemoryReverse
-00:0486 copyMemory
-00:048d copyMemoryBcReverse
-00:0496 copyMemoryBc
-00:0068 addAToDe
-00:006d addAToBc
-00:0072 addDoubleIndexToDe
-00:007e addDoubleIndexToBc
-00:0176 getNumSetBits
-00:0181 addDecimalToHlRef
-00:018f subDecimalFromHlRef
-00:019d multiplyAByC
-00:01ac multiplyABy16
-00:01b7 multiplyABy8
-00:01c3 multiplyABy4
-00:01cd s8ToS16
-00:01d6 compareHlToBc
-00:01ea getHighestSetBit
-00:01f8 getLowestSetBit
-00:0205 checkFlag
-00:020e setFlag
-00:0218 unsetFlag
-00:0237 decHlRef16WithCap
-00:0245 incHlRefWithCap
-00:024a incHlRef16WithCap
-00:0259 hexToDec
-00:043e getRandomNumber
-00:0453 getRandomNumber_noPreserveVars
-00:0464 getRandomIndexFromProbabilityDistribution
-00:049f clearOam
-00:02c1 disableLcd
-00:04af clearVram
-00:04cd initializeVramMaps
-00:04d0 initializeVramMap0
-00:04ed initializeVramMap1
-00:0878 dec16_ff8c
-00:0772 copyByteSequential
-00:0788 readByteSequential
-00:00a0 jpHl
-00:0cda jpBc
-00:23a7 add16BitRefs
-00:23b0 cpActiveRing
-00:23b7 disableActiveRing
-00:23bf enableActiveRing
-00:23cc interactionDecCounter1
-00:23d1 interactionDecCounter2
-00:23d6 itemDecCounter1
-00:23db itemDecCounter2
-00:23e0 interactionIncState
-00:23e5 interactionIncSubstate
-00:23ea itemIncState
-00:23ef itemIncSubstate
-00:23f4 cpInteractionState
-00:23f9 cpInteractionSubstate
-00:23fe checkInteractionState
-00:1e33 objectSetVisiblec0
-00:1e3c objectSetVisiblec1
-00:1e45 objectSetVisiblec2
-00:1e4e objectSetVisiblec3
-00:1e57 objectSetVisible80
-00:1e60 objectSetVisible81
-00:1e69 objectSetVisible82
-00:1e72 objectSetVisible83
-00:1e7b objectSetInvisible
-00:1e84 objectSetVisible
-00:1e8d objectSetReservedBit1
-00:197d getThisRoomFlags
-00:1980 getARoomFlags
-00:198a getRoomFlags
-00:1992 checkIsLinkedGame
-00:1e17 findByteAtHl
-00:1e06 lookupKey
-00:1e0f findByteInGroupTable
-00:1e1f lookupCollisionTable
-00:1e20 lookupCollisionTable_paramE
-00:1e29 findByteInCollisionTable
-00:1e2a findByteInCollisionTable_paramE
-00:17d8 setStatusBarNeedsRefreshBit1
-00:17bb decNumActiveSeeds
-00:17c3 decNumBombchus
-00:17c8 decNumBombs
-00:209b getShortPositionFromDE
-00:20cb convertShortToLongPosition
-00:20cc convertShortToLongPosition_paramC
-00:20b8 setShortPosition
-00:20b9 setShortPosition_paramC
-00:20c3 objectSetShortPosition
-00:2096 objectGetShortPosition
-00:20a8 objectGetShortPosition_withYOffset
-00:208a objectGetPosition
-00:20db objectCenterOnTile
-00:20e1 centerCoordinatesOnTile
-00:2242 objectCopyPosition
-00:2247 objectCopyPosition_rawAddress
-00:225a objectCopyPositionWithOffset
-00:2274 objectTakePosition
-00:2277 objectTakePositionWithOffset
-00:20f2 checkBPartSlotsAvailable
-00:20f7 checkBEnemySlotsAvailable
-00:2160 objectGetRelatedObject1Var
-00:2164 objectGetRelatedObject2Var
-00:2172 objectGetZAboveScreen
-00:2184 objectCheckWithinScreenBoundary
-00:219f objectCheckWithinRoomBoundary
-00:1435 objectGetRelativeTile
-00:1444 objectGetTileAtPosition
-00:1447 getTileAtPosition
-00:1456 objectGetRelativePositionOfTile
-00:15d7 getTileIndexFromRoomLayoutBuffer
-00:15d8 getTileIndexFromRoomLayoutBuffer_paramC
-00:1e94 objectGetAngleTowardEnemyTarget
-00:1e9c objectGetAngleTowardLink
-00:1ea4 objectGetRelativeAngle
-00:1ea9 getRelativeAngle
-00:1eb1 objectGetRelativeAngleWithTempVars
-00:1fd4 objectNudgeAngleTowards
-00:1fee objectCheckCenteredWithLink
-00:1fa2 objectCheckLinkWithinDistance
-00:2008 objectApplyComponentSpeed
-00:201d objectApplySpeed
-00:2029 objectApplyGivenSpeed
-00:2041 getPositionOffsetForVelocity
-00:1f45 objectUpdateSpeedZ
-00:1f46 objectUpdateSpeedZ_paramC
-00:1f66 objectUpdateSpeedZ_sidescroll
-00:1f68 objectUpdateSpeedZ_sidescroll_givenYOffset
-00:239d objectSetSpeedZ
-00:2374 objectNegateAndHalveSpeedZ
-00:2370 objectUpdateSpeedZAndBounce
-00:1bdb objectCheckContainsPoint
-00:1be1 interactionCheckContainsPoint
-00:1be4 objectHCheckContainsPoint
-00:1c04 checkObjectsCollidedFromVariables
-00:1c28 objectCheckCollidedWithLink_notDeadAndNotGrabbing
-00:1c2e objectCheckCollidedWithLink_notDead
-00:1c35 objectCheckCollidedWithLink_onGround
-00:1c41 objectCheckCollidedWithLink
-00:1c6f objectCheckCollidedWithLink_ignoreZ
-00:1c77 hObjectCheckCollidedWithLink
-00:1c89 objectHCheckCollisionWithLink
-00:1d5a checkObjectsCollided
-00:1d18 checkLinkID0AndControlNormal
-00:1d20 checkLinkVulnerableAndIDZero
-00:1d28 checkLinkVulnerable
-00:1d32 checkLinkCollisionsEnabled
-00:1487 objectCheckSimpleCollision
-00:14ad objectGetTileCollisions
-00:14b7 getTileCollisionsAtPosition
-00:14c7 objectCheckTileCollision_allowHoles
-00:14d1 checkTileCollisionAt_allowHoles
-00:14dc checkTileCollision_allowHoles
-00:14df checkGivenCollision_allowHoles
-00:14f8 objectCheckTileCollision_disallowHoles
-00:1502 checkTileCollisionAt_disallowHoles
-00:150d checkTileCollision_disallowHoles
-00:1510 checkGivenCollision_disallowHoles
-00:1529 checkCollisionPosition_disallowSmallBridges
-00:156e retrieveTileCollisionValue
-00:15cc findTileInRoom
-00:15d0 backwardsSearch
-00:220d objectCheckIsOnHazard
-00:2216 objectCheckIsOverHazard
-00:21f6 checkLinkIsOverHazard
-00:22a9 objectCheckTileAtPositionIsWater
-00:22b1 checkTileAtPositionIsWater
-00:22b9 findItemWithID
-00:22c0 findItemWithID_startingAfterH
-00:22c8 objectFindSameTypeObjectWithID
-00:22dc objectSetPriorityRelativeToLink
-00:1765 cpRupeeValue
-00:1781 getRupeeValue
-00:1859 retIfTextIsActive
-00:212a getScaledPositionOffsetForVelocity
-00:214c objectSetComponentSpeedByScaledVelocity
-00:210e objectSetPositionInCircleArc
-00:1f05 pushDirectionData
-00:20b2 objectMakeTileSolid
-00:141c setTileWithoutGfxReload
-00:1426 setTileInRoomLayoutBuffer
-00:13e9 extractColorComponents
-00:0881 enableIntroInputs
-00:10cc getChestData
-00:1100 setDeathRespawnPoint
-00:113a updateLinkLocalRespawnPosition
-00:1151 updateRoomFlagsForBrokenTile
-00:11fc setRoomFlagsForUnlockedKeyDoor
-00:123e setRoomFlagsForUnlockedKeyDoor_overworldOnly
-00:1255 checkAndUpdateLinkOnChest
-00:1280 interactWithTileBeforeLink_b00
-00:1298 showInfoTextForRoller
-00:12ae updateCamera
-00:12ce resetCamera
-00:12e5 setCameraFocusedObject
-00:12f0 setCameraFocusedObjectToLink
-00:12fc reloadTileMap
-00:1384 initWaveScrollValues
-00:13a5 loadBigBufferScrollValues
-00:157b loadRoomCollisions
-00:15fb interactionInitGraphics
-00:1613 refreshLoadedTreeGfx
-00:1618 refreshObjectGfx
-00:1630 reloadObjectGfx_b00
-00:1644 loadObjectGfxHeaderToSlot4
-00:1658 loadTreeGfx
-00:166d loadWeaponGfx_b00
-00:1682 loadObjectGfx
-00:1686 loadObjectGfx2
-00:16d6 loadTreasureDisplayData_b00
-00:16eb decideItemDrop
-00:1703 checkItemDropAvailable
-00:171c giveTreasure
-00:1733 loseTreasure
-00:1748 checkTreasureObtained
-00:1778 removeRupeeValue
-00:17e0 getRandomRingOfGivenTier
-00:180c refillSeedSatchel
-00:1821 addToGashaMaturity
-00:1832 makeActiveObjectFollowLink_b00
-00:1846 clearFollowingLinkObject
-00:1997 setWarpDestVariables
-00:19a2 setInstrumentsDisabledCounterAndScrollMode
-00:1a71 checkReloadStatusBarGraphics
-00:1a83 copy20BytesFromBank
-00:1a98 loadCommonGraphics
-00:1a9c updateStatusBar
-00:1aa0 hideStatusBar
-00:1aa4 showStatusBar
-00:1aa8 saveGraphicsOnEnterMenu
-00:1aac reloadGraphicsOnExitMenu
-00:1ab4 copyW2TilesetBgPalettesToW4PaletteData
-00:1ab8 copyW4PaletteDataToW2TilesetBgPalettes
-00:1ad7 getRoomDungeonProperties
-00:1af7 copy8BytesFromRingMapToCec0
-00:1b2c objectAddToAButtonSensitiveObjectList
-00:1b41 objectRemoveFromAButtonSensitiveObjectList
-00:1b5d linkInteractWithAButtonSensitiveObjects
-00:1c97 checkGrabbableObjects
-00:1d7f preventObjectHFromPassingObjectD
-00:1de7 checkEnemyAndPartCollisionsIfTextInactive
-00:1dfe findRoomSpecificData
-00:21b0 objectReplaceWithID
-00:21e0 objectDelete_useActiveObjectType
-00:21e3 objectDelete_de
-00:2225 objectReplaceWithAnimationIfOnHazard
-00:2233 objectReplaceWithFallingDownHoleInteraction
-00:2238 objectReplaceWithSplash
-00:2291 breakCrackedFloor
-00:22e0 objectSetPriorityRelativeToLink_withTerrainEffects
-00:230e objectPushLinkAwayOnCollision
-00:231e updateLinkPositionGivenVelocity
-00:233b objectMimicBgTile
-00:2403 checkInteractionSubstate
-00:24a1 objectSetCollideRadius
-00:24a9 objectSetCollideRadii
-00:24b3 decNumEnemies
-00:24bb setScreenShakeCounter
-00:24c1 objectCreatePuff
-00:24c3 objectCreateInteractionWithSubid00
-00:24c5 objectCreateInteraction
-00:24d1 objectCreateFallingDownHoleInteraction
-00:24e6 objectFlickerVisibility
-00:24f0 objectMarkSolidPosition
-00:2504 objectUnmarkSolidPosition
-00:253b interactionSetHighTextIndex
-00:2544 interactionSetScript
-00:2552 interactionRunScript
-00:2590 scriptCmd_asmCall
-00:2596 scriptCmd_asmCallWithParam
-00:25c5 scriptFunc_jump_scf
-00:25ca scriptFunc_jump
-00:25e9 scriptFunc_add3ToHl_scf
-00:25ea scriptFunc_add3ToHl
-00:25ee scriptCmd_loadScript
-00:261b interactionAnimate
-00:262e interactionSetAnimation
-00:2680 objectPreventLinkFromPassing
-00:26a9 npcFaceLinkAndAnimate
-00:26db interactionAnimateAsNpc
-00:26de interactionPushLinkAwayAndUpdateDrawPriority
-00:26e4 returnIfScrollMode01Unset
-00:26ec interactionDeleteAndRetIfEnabled02
-00:26f8 convertAngleDeToDirection
-00:26f9 convertAngleToDirection
-00:2701 interactionSetAlwaysUpdateBit
-00:2707 objectCheckLinkPushingAgainstCenter
-00:271d interactionCheckAdjacentTileIsSolid
-00:2725 interactionCheckAdjacentTileIsSolid_viaDirection
-00:273c interactionDecCounter1IfTextNotActive
-00:2744 interactionDecCounter1IfPaletteNotFading
-00:274c interactionAnimate4Times
-00:274f interactionAnimate3Times
-00:2752 interactionAnimate2Times
-00:2758 interactionAnimateBasedOnSpeed
-00:2773 interactionSetPosition
-00:2774 interactionHSetPosition
-00:277b interactionUnsetAlwaysUpdateBit
-00:2781 interactionLoadExtraGraphics
-00:278b interactionFunc_278b
-00:2791 interactionGetMiniScript
-00:2798 interactionSetMiniScript
-00:27a0 objectOscillateZ
-00:27b4 giveRingToLink
-00:27c2 createRingTreasure
-00:27d4 createTreasure
-00:27e0 objectCreateExclamationMark
-00:27f8 objectCreateFloatingSnore
-00:27fe objectCreateFloatingMusicNote
-00:2818 enemyAnimate
-00:282b enemySetAnimation
-00:287b enemyDie_uncounted_withoutItemDrop
-00:287f enemyDie_withoutItemDrop
-00:2883 enemyDie_uncounted
-00:2887 enemyDie
-00:28fd enemyStandardUpdate
-00:2978 partAnimate
-00:2988 partSetAnimation
-00:29d8 createEnergySwirlGoingIn
-00:29ed createEnergySwirlGoingOut
-00:2a02 convertLinkAngleToDirectionButtons
-00:2a1d setSimulatedInputAddress
-00:2a33 getSimulatedInput
-00:2a7e itemSetState
-00:2a85 clearPegasusSeedCounter
-00:2a8c putLinkOnGround
-00:2aad setLinkForceStateToState08
-00:2aae setLinkForceStateToState08_withParam
-00:2ab7 linkApplyDamage_b00
-00:2acf setLinkIDOverride
-00:2ad9 setLinkID
-00:2ae3 respawnLink
-00:2aef specialObjectAnimate
-00:2b0a specialObjectSetAnimation
-00:2b25 loadLinkAndCompanionAnimationFrame
-00:2b39 checkLinkPushingAgainstWall
-00:2b5d updateCompanionDirectionFromAngle
-00:2b64 updateLinkDirectionFromAngle
-00:2b8a specialObjectSetCoordinatesToRespawnYX
-00:2ba9 resetLinkInvincibility
-00:2bbd decPegasusSeedCounter
-00:2be8 checkPegasusSeedCounter
-00:2bef itemTryToBreakTile
-00:2bf6 tryToBreakTile
-00:2c10 clearAllParentItems
-00:2c14 updateParentItemButtonAssignment
-00:2c18 checkUseItems_b00
-00:2c2e objectAddToGrabbableObjectBuffer
-00:2c43 dropLinkHeldItem
-00:2c72 clearVar3fForParentItems
-00:2c7e linkCreateSplash
-00:2c9b clearVariousLinkVariables
-00:2cad linkState07
-00:2ce2 itemDelete
-00:2cf0 itemUpdateAngle
-00:2cf9 getFreeItemSlot
-00:2d1a intro_cinematic
-00:2d5f clearFadingPalettes
-00:2d73 flashScreen
-00:2d8e specialObjectCode_companionCutscene_b00
-00:2da2 specialObjectCode_linkInCutscene_b00
-00:2daa loadDungeonLayout
-00:2dc4 initializeDungeonStuff
-00:2dd1 setVisitedRoomFlag
-00:2dd7 getThisRoomDungeonProperties
-00:2e01 getDungeonLayoutAddress
-00:2e12 getActiveRoomFromDungeonMapPosition
-00:2e15 getRoomInDungeon
-00:2e27 getFreeEnemySlot
-00:2e34 getFreeEnemySlot_uncounted
-00:2e47 enemyDelete
-00:2e59 enemyReplaceWithID
-00:2ea5 updateEnemies
-00:2f07 updateEnemy
-00:30fe initializeRoom
-00:3171 parseGivenObjectData_b00
-00:3189 loadStaticObjects
-00:319f clearStaticObjects
-00:31a7 findFreeStaticObjectSlot
-00:31b8 objectDeleteRelatedObj1AsStaticObject
-00:31cf objectSaveAsStaticObject
-00:31f3 checkGlobalFlag
-00:31f9 setGlobalFlag
-00:31ff unsetGlobalFlag
-00:3205 clearEnemiesKilledList_b00
-00:3209 addRoomToEnemiesKilledList_b00
-00:320d markEnemyAsKilledInRoom_b00
-00:3215 generateRandomBuffer_b00
-00:3219 getRandomPositionForEnemy_b00
-00:321d checkSpawnTimeportalInteraction_b00
-00:3238 clearPaletteFadeVariablesAndRefreshPalettes
-00:323e clearPaletteFadeVariables
-00:3257 fadeoutToWhiteWithDelay
-00:3263 fastFadeoutToWhite
-00:326c fadeoutToWhite
-00:327a makeAllPaletteUseFading
-00:3284 fadeinFromWhiteWithDelay
-00:3290 fastFadeinFromWhite
-00:3299 fadeinFromWhite
-00:32ab fadeoutToBlackWithDelay
-00:32b7 fastFadeoutToBlack
-00:32c0 fadeoutToBlack
-00:32d1 fadeinFromBlackWithDelay
-00:32dd fastFadeinFromBlack
-00:32e6 fadeinFromBlack
-00:32f8 darkenRoomLightly
-00:330a darkenRoomWithSpeed
-00:3315 darkenRoom
-00:3338 brightenRoomLightly
-00:334c brightenRoomWithSpeed
-00:3350 brightenRoom
-00:335d fastFadeinFromWhiteToRoom
-00:336b fadeinFromWhiteToRoom
-00:3370 startFadeBetweenTwoPalettes
-00:33cf loadScreenMusic
-00:3406 applyWarpDest
-00:341a loadScreenMusicAndSetRoomPack
-00:3431 dismountCompanionAndSetRememberedPositionToScreenCenter
-00:345b updateAllObjects
-00:34f9 updateSpecialObjectsAndInteractions
-00:351e updateInteractionsAndDrawAllSprites
-00:3597 clearWramBank1
-00:35a3 clearScreenVariablesAndWramBank1
-00:35a6 clearScreenVariables
-00:35ba clearLinkObject
-00:35c2 clearReservedInteraction0
-00:35ca clearReservedInteraction1
-00:35d2 clearDynamicInteractions
-00:35e3 clearItems
-00:35f4 clearEnemies
-00:3605 clearParts
-00:3616 setEnemyTargetToLinkPosition
-00:3632 getEntryFromObjectTable2
-00:364b checkDungeonUsesToggleBlocks
-00:3659 loadAnimationData
-00:36a8 getIndexOfGashaSpotInRoom
-00:36c0 getBlackTowerProgress
-00:36f6 forceLoadRoom
-00:3775 loadUniqueGfxHeader
-00:37db updateTilesetUniqueGfx
-00:380b uniqueGfxFunc_380b
-00:3843 loadUniqueGfxHeaderEntry
-00:38dc loadRoomLayout
-00:3a4e generateVramTilesWithRoomChanges
-00:3a72 getTileMappingData
-00:3a94 setHlToTileMappingDataPlusATimes8
-00:3a9c setTile
-00:3ac6 setTileInAllBuffers
-00:3acf setInterleavedTile
-00:3aef getFreeInteractionSlot
-00:3b02 interactionDeleteAndUnmarkSolidPosition
-00:3b05 interactionDelete
-00:3b36 updateInteractions
-00:3b62 updateInteraction
-00:3d59 checkObjectIsCloseToPosition_b00
-00:3d78 checkNpcShouldExistAtGameStage
-00:3da0 interactionSetSimpleScript
-00:3da8 interactionRunSimpleScript
-00:3e0f getWildTokayObjectDataIndex
-00:3e28 objectCreateSparkle
-00:3e34 objectCreateSparkleMovingUp
-00:3e47 objectCreateRedBlueOrb
-00:3e53 incMakuTreeState
-00:3e61 setLinkDirection
-00:3e6d interactionFunc_3e6d
-00:3e8e getFreePartSlot
-00:3ea1 partDelete
-00:3eaf checkLinkCanSurface
-00:3ec0 copy256BytesFromBank
-00:3035 objectLoadMovementScript
-00:3049 objectRunMovementScript
-00:305d decCbb3
-00:3062 incCbc1
-00:3067 incCbc2
-00:306c endgameCutsceneHandler
-00:3099 fileSelect_redrawDecorations
-00:30b0 disableLcdAndLoadRoom
-00:30c4 playWaveSoundAtRandomIntervals
-00:30d8 addSpritesFromBankToOam_withOffset
-00:30eb addSpritesFromBankToOam
-00:09d4 initializeFile_b00
-00:09d8 saveFile_b00
-00:09dc loadFile_b00
-00:09e0 eraseFile_b00
-06:4000 interactWithTileBeforeLink_b06
-06:46bb linkApplyDamage_b06
-06:48b3 checkUseItems_b06
-06:6cec specialObjectCode_companionCutscene_b06
-06:70a0 specialObjectCode_linkInCutscene_b06
-06:4734 tryToBreakTile_body
-06:4809 itemMakeInteractionForBreakableTile
-06:4816 makeInteractionForBreakableTile
-06:483d decideItemDropForBrokenTile
-06:402d nextToChestTile
-06:40b4 nextToSignTile
-06:40ef checkFacingBottomOfTileAndPressedA
-06:40f6 checkFacingBottomOfTile
-06:410e nextToPushableBlock
-06:4191 nextToKeyBlock
-06:41c6 nextToKeyDoor
-06:420c resetPushingAgainstTileCounter
-06:4212 decPushingAgainstTileCounter
-06:4217 nextToOverworldKeyhole
-06:4283 jumpToShowInfoText
-06:4288 createKeySpriteInteraction
-06:4299 nextToSubrosiaKeydoor
-06:429b nextToGhiniSpawner
-06:42c3 nextToTileWithInfoText
-06:42fb showInfoTextForTile
-06:4329 specialObjectCheckPushingAgainstTile
-06:4350 checkAndDecKeyCount
-06:4373 specialObjectGetTileInFront
-06:437a specialObjectGetTileAtOffset
-06:4398 checkTileAfterNext
-06:4870 functionCaller_b06
-06:4878 clearAllParentItems_body
-06:4890 updateParentItemButtonAssignment_body
-06:4954 checkItemUsed
-06:4980 initializeParentItem
-06:498c chooseParentItemSlot
-06:49da checkShopInput
-06:49ef parentItemUpdate
-06:4a42 clearParentItem
-06:4a50 clearParentItemH
-06:441e specialObjectAnimate_optimized
-06:4427 specialObjectSetAnimation_body
-06:442a label_06_032
-06:4432 specialObjectNextAnimationFrame
-06:44c9 loadLinkAndCompanionAnimationFrame_body
-06:4516 getSpecialObjectGraphicsFrame
-06:462d getTransformedLinkID
-06:4668 linkUpdateDamageToApplyForRings
-06:563e specialObjectCode_minecart_b06
-06:57ef specialObjectCode_raft_b06
-3f:4125 reloadObjectGfx_b3f
-3f:445b loadWeaponGfx_b3f
-3f:46f8 loadTreasureDisplayData_b3f
-3f:59aa titlescreenPressStartSprites
-3f:4016 refreshDirtyPalettes
-3f:4133 agesFunc_3f_4133
-3f:4154 refreshObjectGfx_body
-3f:41ec loadObjectGfxHeaderToSlot4_body
-3f:41f5 loadTreeGfx_body
-3f:4201 updateTileIndexBaseForAllObjects
-3f:4270 findIndexInLoadedObjectGfx
-3f:428e findUnusedIndexInLoadedObjectGfx
-3f:42a9 incLoadedObjectGfxIndex
-3f:42b3 getAddressOfLoadedObjectGfxIndex
-3f:42bb addIndexToLoadedObjectGfx
-3f:42cf insertIndexIntoLoadedObjectGfx
-3f:430e markLoadedObjectGfxUsed
-3f:4327 markAllLoadedObjectGfxUnused
-3f:4337 enemyGetObjectGfxIndex
-3f:433a getObjectGfxIndexForEnemy
-3f:4347 partGetObjectGfxIndex
-3f:4355 interactionGetObjectGfxIndex
-3f:435c itemGetObjectGfxIndex
-3f:4368 enemyLoadGraphicsAndProperties
-3f:43c9 partLoadGraphicsAndProperties
-3f:4404 interactionLoadGraphics
-3f:4422 itemLoadGraphics
-3f:4af7 initTextbox
-3f:4cc8 textOptionCode
-3f:4d5d inventoryTextCode
-3f:4e72 initTextboxStuff
-3f:4f59 getTextAddress
-3f:4ff5 checkInitialTextCommands
-3f:5055 drawLineOfText
-3f:5091 clearTextGfxBuffer
-3f:509c clearLineTextBuffer
-3f:50a6 setLineTextBuffers
-3f:50cc dmaTextGfxBuffer
-3f:50dd saveTilesUnderTextbox
-3f:514a initTextboxMapping
-3f:5173 dmaTextboxMap
-3f:51b9 updateCharacterDisplayTimer
-3f:51db displayNextTextCharacter
-3f:5288 getNextCharacterToDisplay
-3f:52c8 label_3f_155
-3f:52e4 label_3f_157
-3f:52e9 label_3f_158
-3f:52ee label_3f_159
-3f:52f1 label_3f_160
-3f:52fd readNextTextByte
-3f:5305 getExtraTextIndex
-3f:5314 updateTextboxArrow
-3f:5354 clearTopRowOfTextMap
-3f:537d shiftTextboxMapUp
-3f:53b3 subFirstRowOfTextMapBy20
-3f:549e doInventoryTextFirstPass
-3f:557f shiftTextGfxBufferLeft
-3f:5597 decInvTextScrollTimer
-3f:55a0 handleTextControlCodeWithSpecialCase
-3f:55b4 updateSelectedTextPosition
-3f:55c8 getSelectedTextOptionAddress
-3f:55d0 getAddressInTextboxMap
-3f:55e1 removeCursorFromSelectedTextPosition
-3f:55f2 moveSelectedTextOptionRight
-3f:5602 moveSelectedTextOptionLeft
-3f:5611 textOptionCode_checkDirectionButtons
-3f:565c updateSelectedTextPositionAndDmaTextboxMap
-3f:5662 textOptionCode_checkBButton
-3f:567f pushToTextStack
-3f:56a4 popFromTextStack
-3f:56cf readByteFromW7ActiveBankAndIncHl
-3f:56d2 incHlAndUpdateBank
-3f:56e4 handleTextControlCode
-3f:5856 getCharacterDisplayLength
-3f:5864 textControlCodeC_0
-3f:589d textControlCodeC_7
-3f:58a4 textControlCodeC_5
-3f:58a9 textControlCodeC_3
-3f:58ae textControlCodeC_ret
-3f:58b1 textControlCodeC_6
-3f:58bd textControlCodeC_1
-3f:58e8 textControlCodeC_2
-3f:5915 extraTextIndices
-3f:446d checkTreasureObtained_body
-3f:44a1 loseTreasure_body
-3f:44a8 loseTreasure_helper
-3f:44c8 giveTreasure_body
-3f:466f realignUnappraisedRings
-3f:4697 getNumUnappraisedRings
-3f:46b6 addTreasureToInventory
-3f:4744 decideItemDrop_body
-3f:4782 checkItemDropAvailable_body
-3f:4846 itemDropSet0
-3f:4866 itemDropSet1
-3f:4886 itemDropSet2
-3f:48a6 itemDropSet3
-3f:48c6 itemDropSet4
-3f:48e6 itemDropSet5
-3f:4906 itemDropSet6
-3f:4926 itemDropSet7
-3f:4946 itemDropSet8
-3f:4966 itemDropSet9
-3f:4986 itemDropSetA
-3f:49a6 itemDropSetB
-3f:49c6 itemDropSetC
-3f:49e6 itemDropSetD
-3f:4a06 itemDropSetE
-3f:4a26 itemDropSetF
-3f:4ad6 checkIncreaseGashaMaturityForGettingTreasure
-01:4910 makeActiveObjectFollowLink_b01
-01:401b screenTransitionState0
-01:4027 initializeRoomBoundaryAndLoadAnimations
-01:4075 screenTransitionState1
-01:40f5 setScreenTransitionState02
-01:4105 screenTransitionState2
-01:4201 updateCameraPosition
-01:4256 calculateCameraPosition
-01:427d updateScreenShake
-01:42cb updateGfxRegs2Scroll
-01:42e2 screenTransitionState3
-01:430d checkDarkenRoomAndClearPaletteFadeState
-01:4311 checkDarkenRoom
-01:4323 checkBrightenRoom
-01:433a screenTransitionState4
-01:435a screenTransitionState5
-01:4364 screenTransitionState5Substate0
-01:43d8 transitionUpdateScrollAndLinkPosition
-01:442a finishScrollingTransition
-01:4440 label_01_037
-01:44a6 resetFollowingLinkObjectPosition
-01:44fa screenTransitionState5Substate2
-01:45a5 incrementScreenScrollRowVars
-01:45c4 addFunctionsToVBlankQueue
-01:45ed screenTransitionState5Substate1
-01:4712 copyTileRowToVramBuffer
-01:4762 updateTilesetPalette
-01:4771 cpLinkState0e
-01:477e initWaveScrollValues_body
-01:47da loadBigBufferScrollValues_body
-01:4805 checkAndApplyPaletteFadeTransition
-01:4862 checkSymmetryCityPaletteTransition
-01:4919 resetFollowingLinkPath
-01:494d checkUpdateFollowingLinkObject
-01:49af clearMemoryOnScreenReload
-01:49d7 setObjectsEnabledTo2
-01:49ea setItemsEnabledTo2
-01:49f1 setInteractionsEnabledTo2
-01:49f8 setEnemiesEnabledTo2
-01:49ff setPartsEnabledTo2
-01:4a04 setObjectsEnabledTo2_hlpr
-01:4a17 clearObjectsWithEnabled2
-01:4a2a clearItemsWithEnabled2
-01:4a31 clearInteractionsWithEnabled2
-01:4a38 clearEnemiesWithEnabled2
-01:4a3f clearPartsWithEnabled2
-01:4a44 clearObjectsWithEnabled2_hlpr
-01:4a81 updateLinkBeingShocked
-01:4ad2 initiateFallDownHoleWarp
-01:4af8 cutscene17
-01:4bd9 initWaveScrollValuesForEverySecondLine
-01:4bf0 cutscene15
-01:4d16 cutscene18
-01:4d1a cutscene19
-01:564e loadDungeonLayout_b01
-01:56a3 clearDungeonLayout
-01:56ac findActiveRoomInDungeonLayoutWithPointlessBankSwitch
-01:56b3 findActiveRoomInDungeonLayout
-01:56d3 getFirstDungeonLayoutAddress
-01:56e3 paletteFadeHandler
-01:5705 paletteFadeHandler09
-01:5709 paletteFadeHandler01
-01:571e updateFadingPalettes
-01:5736 paletteFadeHandler00
-01:5737 paletteFadeHandler0a
-01:573b paletteFadeHandler02
-01:574f paletteFadeHandler0b
-01:5753 paletteFadeHandler03
-01:5768 paletteFadeHandler0c
-01:576c paletteFadeHandler04
-01:579a paletteFadeHandler0d
-01:579e paletteFadeHandler05
-01:57ba paletteFadeHandler0e
-01:57be paletteFadeHandler06
-01:57e0 paletteFadeHandler07
-01:580f paletteFadeHandler08
-01:591e checkLockBG7Color3ToBlack
-01:5945 checkUpdateDungeonMinimap
-01:596a runGameLogic
-01:5976 initializeGame
-01:5a4f loadingRoom
-01:5b26 cutscene00
-01:5b65 cutscene01
-01:7c80 cutscene02
-01:5bd8 cutscene03
-01:5c82 setEnteredWarpPosition
-01:5c8c cutscene04
-01:5cb6 cutscene05
-01:7b6e tilesetLayoutGroup33
-01:5de4 cutscene16
-01:5e7d checkDisplayEraOrSeasonInfo
-01:5e06 triggerFadeoutTransition
-01:5e0e applyWarpTransition2
-01:5e3d setCutsceneIndexIfCutsceneTriggerSet
-01:5e9e updateGrassAnimationModifier
-01:5ea4 loadDeathRespawnBufferPreset
-01:5edd checkRoomPack
-01:5f00 calculateRoomEdge
-01:5f13 updateActiveRoom
-01:5f45 getNextActiveRoom
-01:5f5f screenTransitionStandard
-01:5f67 clearEyePuzzleVars
-01:5f96 screenTransitionForestScrambler
-01:5feb screenTransitionEyePuzzle
-01:6056 checkSeedTreeRefillIndex
-01:6143 checkWarpsTopDown
-01:614d checkWarpsSidescrolling
-01:615b initiateScreenEdgeWarp
-01:6163 initiateWarp
-01:6174 checkLinkCloseEnoughToWarpTileCenter
-01:6198 warpInitiated
-01:619f noWarpInitiated
-01:61a1 checkTileWarps
-01:61fd checkStandingOnDeactivatedWarpTile
-01:621a checkScreenEdgeWarps
-01:6232 checkTileIsWarpTile
-01:7b7c cutscene14
-01:7b8d linkSummonedCutscene
-01:7c65 updateLastToggleBlocksState
-01:7c6c checkUpdateToggleBlocks
-01:7f15 cutscene1f
-01:5d4e cutscene06
-01:5d5b cutscene07
-01:5d6c cutscene08
-01:5d70 cutscene0c
-01:5d77 cutscene09
-01:5d8e cutscene0f
-01:5d96 cutscene0a
-01:5d9b cutscene20
-01:5da2 cutscene0d
-01:5daf cutscene0e
-01:5dc2 cutscene21
-01:5dcd cutscene10
-01:5dd1 cutscene11
-01:5dd7 cutscene12
-01:7d6b cutscene0b
-01:7d76 cutscene1a
-01:7d81 cutscene1b
-01:7d92 warpToMoblinKeepUnderground
-01:7d9d cutscene1c
-01:7dab cutscene1d
-01:7dbe cutscene1e
-01:7dcc updatePirateShip
-01:7de1 checkLoadPirateShip
-01:7e1e updatePirateShipChangedTile
-01:7e40 updatePirateShipPosition
-01:7e6b updatePirateShipRoom
-01:7eaa updatePirateShipAngle
-01:62c4 checkSolidObjectAtWarpDestPos
-01:62da clearSolidObjectPositions
-01:62e9 checkLinkCanStandOnTile
-01:626e checkInitUnderwaterWaves
-01:6282 checkUpdateUnderwaterWaves
-01:62b4 checkDisableUnderwaterWaves
-12:55d4 parseGivenObjectData_b12
-12:5872 runRoomSpecificCode
-12:58ca roomSpecificCode0
-12:58d8 roomSpecificCode1
-12:58ed roomSpecificCode2
-12:58f5 roomSpecificCode3
-12:5915 roomSpecificCode7
-12:5927 roomSpecificCode5
-12:5933 roomSpecificCode4
-12:593e roomSpecificCode8
-12:5950 roomSpecificCode9
-12:595c roomSpecificCodeA
-12:5965 roomSpecificCodeB
-12:596e roomSpecificCodeC
-12:78e4 checkLinkCanSurface_isUnderwater
-12:5660 skipToOpEnd_2byte
-12:567d skipToOpEnd_4byte
-12:568a checkSkipPointer
-12:56aa skipPointer
-12:56af parsePointer
-12:5805 continueObjectLoopIfOpDone
-12:580d read2Bytes
-12:5814 readCoordinates
-12:581c decEnemyCounterIfApplicable
-12:5829 addPositionToPlacedEnemyPositions
-12:583d assignRandomPositionToEnemy
-12:5852 checkEnemyKilled
-02:7817 clearEnemiesKilledList_b02
-02:77c3 addRoomToEnemiesKilledList_b02
-02:77f5 markEnemyAsKilledInRoom_b02
-02:7823 generateRandomBuffer_b02
-02:785c getRandomPositionForEnemy_b02
-02:79be checkSpawnTimeportalInteraction_b02
-02:403e updateTilesetFlagsForIndoorRoomInAltWorld
-02:4152 setFileSelectCursorOffsetToFileSelectMode
-02:4159 setFileSelectModeTo1
-02:415b setFileSelectMode
-02:4165 loadGfxRegisterState5AndIncFileSelectMode2
-02:416a incFileSelectMode2
-02:416f decFileSelectMode2IfBPressed
-02:4175 decFileSelectMode2
-02:417a getFileDisplayVariableAddress
-02:417b getFileDisplayVariableAddress_paramE
-02:4626 getNameBufferLength
-02:4641 copyNameToW4NameBuffer
-02:467f label_02_038
-02:481e drawNameInputCursors
-02:487e drawSecretInputCursors
-02:49da loadFileDisplayVariables
-02:4f17 runBank2Function
-02:4f2c hideStatusBar_body
-02:4f64 showStatusBar_body
-02:5142 playHeartBeepAtInterval
-02:515c loadCommonGraphics_body
-02:518d updateStatusBar_body
-02:52cb correctAddressForExtraHeart
-02:52d2 loadEquippedItemGfx
-02:5358 drawItemTilesOnStatusBar
-02:53a0 drawTreasureExtraTiles
-02:543c inGameDrawHeartDisplay
-02:5449 drawHeartDisplay
-02:54b7 loadItemIconGfx
-02:54df loadStatusBarMap
-02:5883 getDirectionButtonOffsetFromHl
-02:5893 inventorySubscreen0CheckDirectionButtons
-02:595e inventorySubscreen0_drawCursor
-02:5af6 cpInventorySelectedItemToHarp
-02:5b19 getSeedTypeInventoryIndex
-02:5b2e drawEquippedSpriteForActiveRing
-02:5b5a inventorySubscreen0_drawStoredItems
-02:5ba2 inventorySubscreen1_drawTreasures
-02:5c3d inventorySubscreen2_drawTreasures
-02:5cf5 getRingBoxCapacity
-02:5d08 fillRectangleInTilemap
-02:60b5 loadMinimapDisplayRoom
-02:60dc dungeonMap_drawSmallKeyCount
-02:60ea dungeonMap_calculateVisitedFloorsAndLinkPosition
-02:6298 getMinimapPopupType
-02:62bc minimapPopupType_normal
-02:62be minimapPopupType_advanceShop
-02:62c5 minimapPopupType_cave
-02:62d2 minimapPopupType_gashaSpot
-02:62de minimapPopupType_portalSpot
-02:62f4 minimapPopupType_seedTree
-02:62fe minimapPopupType_moblinsKeep
-02:6306 minimapNoPopup
-02:6308 minimapPopupType_shop
-02:630b minimapPopupType_vasuOrSyrup
-02:6315 minimapPopupType_blackTower
-02:631b minimapPopupType_makuTree
-02:63d2 dungeonMap_checkDirectionButtons
-02:63da dungeonMap_scrollingState0
-02:641b dungeonMap_checkCanScrollDown
-02:6454 dungeonMap_checkCanScrollUp
-02:6488 dungeonMap_scrollingState1
-02:64da dungeonMap_drawItemSprites
-02:651f getNumSmallKeys
-02:6529 checkLinkHasBossKey
-02:6532 checkLinkHasCompass
-02:653e checkLinkHasMap
-02:654a dungeonMap_drawFloorCursor
-02:6566 dungeonMap_drawBossSymbolForFloor
-02:657f dungeonMap_drawLinkIcons
-02:65c7 dungeonMap_updateCursorFlickerCounter
-02:65d5 dungeonMap_drawCursor
-02:65fd dungeonMap_drawArrows
-02:6621 mapGetRoomIndexWithoutUnusedColumns
-02:674b checkMoblinsKeepDestroyed
-02:6750 checkAdvanceShopVisited
-02:6756 dungeonMap_getLinkIconPosition
-02:677c dungeonMap_drawFloorList
-02:67d5 drawTileABtoDE
-02:67de dungeonMap_generateScrollableTilemap
-02:682c dungeonMap_updateScroll
-02:6875 dungeonMap_getTileForRoom
-02:68bb dungeonMap_checkCanViewFloor
-02:68ce dungeonMap_checkCompassTile
-02:68ef dungeonMap_getFloorAddress
-02:68fa dungeonMapFloorNameTiles
-02:6910 dungeonMapFloorListStartPositions
-02:691e dungeonMapSymbolPositions
-02:72fe getRingTiles
-02:7641 runFakeReset
-02:7a54 getIndexOfGashaSpotInRoom_body
-02:7b04 roomTileChangesAfterLoad0a
-02:7b14 roomTileChangesAfterLoad09
-02:7b30 roomTileChangesAfterLoad06
-02:7b43 roomTileChangesAfterLoad07
-02:7b83 drawCrownDungeonOpeningTiles
-02:7bfc roomTileChangesAfterLoad00
-02:7c02 drawCollapsedWingDungeon
-02:7c2f roomTileChangesAfterLoad02
-02:7c37 roomTileChangesAfterLoad03
-02:7c3d roomTileChangesAfterLoad01
-02:7cec roomTileChangesAfterLoad08
-02:7d2b roomTileChangesAfterLoad05
-02:7d35 readParametersForRectangleDrawing
-02:7d3e drawRectangleToVramTiles_withParameters
-02:7d47 drawRectangleToVramTiles
-02:7d6c copyRectangleFromTmpGfxBuffer_paramBc
-02:7d6e copyRectangleFromTmpGfxBuffer
-02:7d9f copyRectangleToRoomLayoutAndCollisions
-02:7da3 copyRectangleToRoomLayoutAndCollisions_paramDe
-02:7dbd roomTileChangesAfterLoad04
-02:7dc7 checkLoadPastSignAndChestGfx
-02:77b2 functionCaller_b02
-02:768a loadRememberedCompanion
-02:76d3 checkAndSpawnMaple
-02:77f4 stub_02_77f4
-02:7882 checkTileValidForEnemySpawn
-02:7894 checkPositionValidForEnemySpawn
-02:7959 getNextValueFromRandomBuffer
-02:796b getCandidatePositionForEnemy
-02:79a7 checkEnemyPlacedAtPosition
-02:79e2 calculateRoomStateModifier
-02:7a12 createSeaEffectsPartIfApplicable
-08:5f86 checkObjectIsCloseToPosition_b08
-03:4091 oamDmaFunction
-03:481b generateGameTransferSecret
-03:4836 secretFunctionCaller_body
-03:4852 generateSecret
-03:48c1 insertBitsIntoSecretGenerationBuffer
-03:48e5 unpackSecret
-03:49a4 verifyUnpackedSecretGameID
-03:49be generateGameIDIfNeeded
-03:4a3e runXorCipherOnSecretBuffer
-03:4a5b getSecretBufferChecksum
-03:4a69 shiftSecretBufferContentsToFront
-03:4a7d andCWith3
-03:4ace getNumCharactersForSecretType
-03:4b10 incCutsceneState
-03:4b15 unused_incTmpcbb3
-03:4b1a decTmpcbb4
-03:4b1f setScreenShakeCounterTo255
-03:4b24 twinrovaCutscene_state0
-03:4b33 twinrovaCutscene_state1
-03:4b6f twinrovaCutscene_fadeinToRoom
-03:4b81 cutscene18_body
-03:4b91 twinrovaCutscene_state2
-03:4b9e twinrovaCutscene_state3
-03:4bb2 cutscene18_state4
-03:4bcd cutscene18_state5
-03:4c0d twinrovaCutscene_deleteAllInteractionsExceptFlames
-03:4c29 twinrovaCutscene_loadAngryFlames
-03:4c34 cutscene19_body
-03:4c4c cutscene19_state4
-03:4c55 cutscene19_strikeFlameWithLightning
-03:4c5b cutscene19_state5
-03:4c66 cutscene19_state6
-03:4c71 cutscene19_state7
-03:4c7f cutscene19_state8
-03:4c9b cutscene19_state9
-03:4cba twinrovaCutscene_createLightningStrike
-03:4cc9 runIntro
-03:4cf5 intro_runStage
-03:4d03 intro_gotoTitlescreen
-03:4d1b intro_restart
-03:4d23 intro_gotoNextStage
-03:4d33 intro_incState
-03:4d38 intro_japaneseOnlyScreen
-03:4d3c intro_capcomScreen
-03:4d88 intro_titlescreen
-03:4db3 intro_titlescreen_state0
-03:4de1 intro_titlescreen_state1
-03:4e08 intro_titlescreen_state2
-03:4e20 runIntroCinematic
-03:4e2a introCinematic_ridingHorse
-03:4e44 introCinematic_ridingHorse_state0
-03:4ebc introCinematic_ridingHorse_state1
-03:4ed2 introCinematic_ridingHorse_state2
-03:4eed introCinematic_ridingHorse_updateScrollingGround
-03:4f09 introCinematic_ridingHorse_state3
-03:4f44 introCinematic_ridingHorse_state4
-03:4fa7 introCinematic_ridingHorse_state5
-03:4fc4 introCinematic_ridingHorse_state6
-03:4fe3 introCinematic_ridingHorse_state7
-03:4ff1 introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_2
-03:5003 introCinematic_ridingHorse_state8
-03:504b introCinematic_ridingHorse_state9
-03:5075 introCinematic_ridingHorse_drawTempleSprites
-03:5087 introCinematic_ridingHorse_state10
-03:5092 introCinematic_preTitlescreen_updateScrollingTree
-03:50ca incIntroCinematicState
-03:50d3 introCinematic_inTemple
-03:50ed introCinematic_inTemple_state0
-03:5162 introCinematic_inTemple_state1
-03:5178 introCinematic_inTemple_state2
-03:5184 introCinematic_inTemple_state3
-03:51a1 introCinematic_inTemple_updateWave
-03:51aa introCinematic_inTemple_state4
-03:51ba introCinematic_inTemple_state5
-03:51cc introCinematic_inTemple_state6
-03:51e8 introCinematic_inTemple_state7
-03:5200 introCinematic_inTemple_state8
-03:520d introCinematic_inTemple_state9
-03:5220 introCinematic_inTemple_state10
-03:522e flashScreen_body
-03:525a clearFadingPalettes_body
-03:52b9 introCinematic_preTitlescreen
-03:52c5 introCinematic_preTitlescreen_state0
-03:5317 introCinematic_preTitlescreen_state1
-03:5345 introCinematic_preTitlescreen_updateScrollForTitle
-03:5375 introCinematic_preTitlescreen_state2
-03:53a6 introCinematic_preTitlescreen_state3
-03:53ba introCinematic_inTemple_updateCamera
-03:53d3 introCinematic_moveBlackBarsIn
-03:53eb introCinematic_moveBlackBarsOut
-03:5403 cutscene_clearObjects
-03:540c createInteraction
-03:5414 endgameCutsceneHandler_body
-03:542e clearFadingPalettes2
-04:6dd6 getAdjustedRoomGroup
-04:6de7 checkTilesetOverride
-04:6e63 setPastCliffPalettesToRed
-04:642c applyRoomSpecificTileChanges
-04:6533 tileReplacement_group1Map58
-04:653d tileReplacement_group5Mapf5
-04:6576 tileReplacement_group4Map1b
-04:6584 tileReplacement_group2Map7e
-04:65a4 tileReplacement_group4Mapc9
-04:65b2 tileReplacement_group4Mapc7
-04:65cf tileReplacement_group4Map4c
-04:65e8 tileReplacement_group4Map4e
-04:660b tileReplacement_group4Map59
-04:661a tileReplacement_group4Map60
-04:6649 tileReplacement_group4Map52
-04:665d tileReplacement_group0Map38
-04:6665 tileReplacement_group1Map38
-04:6673 tileReplacement_group0Map48
-04:6681 tileReplacement_group5Map38
-04:6697 tileReplacement_group5Map25
-04:66a5 d6RetractingWallRectPresent
-04:66a9 d6RetractingWallRectPast
-04:66ad tileReplacement_group5Map43
-04:66d7 tileReplacement_group5Map95
-04:66f9 tileReplacement_group5Mapc3
-04:676b tileReplacement_group2Mapf7
-04:67c5 tileReplacement_group5Map4c
-04:67da tileReplacement_group5Map4d
-04:67ea tileReplacement_group5Map5c
-04:6817 tileReplacement_group5Map5d
-04:6844 tileReplacement_group7Map4a
-04:6854 tileReplacement_group0Map5c
-04:6865 tileReplacement_group0Map73
-04:687d tileReplacement_group0Mapac
-04:688f tileReplacement_group0Map2c
-04:68a3 tileReplacement_group0Map1c
-04:68b7 tileReplacement_group0Mapba
-04:68d1 tileReplacement_group0Mapaa
-04:68e3 tileReplacement_group0Mapcc
-04:68f7 tileReplacement_group0Mapbc
-04:6909 tileReplacement_group0Mapda
-04:691d tileReplacement_group0Mapca
-04:692f tileReplacement_group0Map61
-04:6974 tileReplacement_group0Map51
-04:699b replaceVineTiles
-04:69c7 setTileToWitheredVine
-04:69d5 getVinePosition
-04:69dd initializeVinePositions
-04:69ee tileReplacement_group0Map54
-04:6a0d tileReplacement_group0Map25
-04:6a24 tileReplacement_group0Map3a
-04:6a30 tileReplacement_group0Map0b
-04:6a3c tileReplacement_group5Mapb9
-04:6a67 tileReplacement_group1Map27
-04:6aa1 tileReplacement_group5Mapc2
-04:6aac set4Bytes
-04:6aad set3Bytes
-04:6ab1 tileReplacement_group5Mape3
-04:6abe tileReplacement_group2Map90
-04:6ad9 tileReplacement_group1Map8c
-04:6af5 tileReplacement_group2Map9e
-04:6b0b tileReplacement_group0Mape0
-04:6b17 createInteraction90
-04:6b20 tileReplacement_group0Mape1
-04:6b34 tileReplacement_group0Mape2
-04:6b41 setTileToDoor
-04:6b46 tileReplacement_group4Mapea
-04:6b71 tileReplacement_group0Map98
-04:6b88 tileReplacement_group0Map76
-04:6b99 tileReplacement_group0Mapa5
-04:6bb5 fillRectInRoomLayout
-04:6bcf drawRectInRoomLayout
-04:5fef applyAllTileSubstitutions
-04:6046 replaceBreakableTileOverPortal
-04:6056 removeBreakableTileForTimeWarp
-04:606a replaceBreakableTileOverLinkTimeWarpingIn
-04:6078 replacePollutionWithWaterIfPollutionFixed
-04:6096 replaceTiles
-04:60b7 applyStandardTileSubstitutions
-04:617c replaceToggleBlocks
-04:61a1 replaceJabuTilesIfUnderwater
-04:58e4 initializeAnimations
-04:5906 updateAnimations
-04:591b updateAnimationQueue
-04:59b7 loadAnimationGfxIndex
-04:45d0 applyWarpDest_b04
-04:45d7 label_04_032
-04:45e1 label_04_033
-04:4629 findWarpSourceAndDest
-04:46b2 setWarpDestDefault
-04:46c8 findScreenEdgeWarpSource
-04:4742 getLinkWarpQuadrant
-04:61d8 replaceShutterForLinkEntering
-04:626f replaceOpenedChest
-04:627e replaceSwitchTiles
-04:62de applySingleTileChanges
-04:6bf1 generateW3VramTilesAndAttributes
-04:6c23 write4BytesToVramLayout
-04:6c32 updateChangedTileQueue
-04:6c89 getVramSubtileAddressOfTile
-04:6cb3 setInterleavedTile_body
-04:6d24 queueTileWriteAtVBlank
-07:41d1 checkEnemyAndPartCollisions
-07:4241 partCheckCollisions
-07:424b enemyCheckCollisions
-07:43f3 collisionEffect00
-07:43f4 collisionEffect3c
-07:4426 collisionEffect01
-07:442a collisionEffect02
-07:442e collisionEffect03
-07:4432 collisionEffect04
-07:443c collisionEffect08
-07:4440 collisionEffect09
-07:4444 collisionEffect0a
-07:4448 collisionEffect0b
-07:4450 collisionEffect21
-07:4452 label_07_027
-07:4461 collisionEffect12
-07:4464 collisionEffect0c
-07:4468 collisionEffect13
-07:446b collisionEffect0d
-07:446f collisionEffect14
-07:4472 collisionEffect0e
-07:4474 label_07_028
-07:4483 collisionEffect05
-07:4488 collisionEffect06
-07:448d collisionEffect07
-07:4492 collisionEffect18
-07:4495 collisionEffect0f
-07:449a collisionEffect19
-07:449d collisionEffect10
-07:44a2 collisionEffect15
-07:44aa collisionEffect16
-07:44b2 collisionEffect17
-07:44ba collisionEffect1a
-07:44bd collisionEffect11
-07:44c2 collisionEffect1b
-07:44ca collisionEffect1d
-07:44cf collisionEffect1e
-07:44d4 collisionEffect1f
-07:44d9 collisionEffect20
-07:44ee collisionEffect22
-07:44f1 applyDamageToBothObjects
-07:44fb collisionEffect26
-07:4500 collisionEffect27
-07:4511 collisionEffect28
-07:451f collisionEffect3a
-07:4524 collisionEffect3d
-07:4538 collisionEffect2b
-07:453d collisionEffect2c
-07:4542 collisionEffect2f
-07:4547 collisionEffect30
-07:454c collisionEffect1c
-07:4551 collisionEffect2e
-07:4584 collisionEffect23
-07:458d collisionEffect24
-07:45a5 collisionEffect25
-07:45b4 collisionEffect29
-07:4604 collisionEffect2a
-07:461a collisionEffect2d
-07:4620 collisionEffect31
-07:4625 collisionEffect32
-07:462a collisionEffect33
-07:462d label_07_033
-07:4633 collisionEffect34
-07:4643 collisionEffect35
-07:4649 killEnemyOrPart
-07:4657 collisionEffect36
-07:4693 collisionEffect37
-07:46b6 collisionEffect38
-07:46cd collisionEffect39
-07:46ce collisionEffect3b
-07:46d8 collisionEffect3e
-07:46d9 collisionEffect3f
-07:46da createFlamePart
-07:46e7 createClinkInteraction
-07:4707 applyDamageToEnemyOrPart
-07:47df applyDamageToLink_paramE
-07:47e0 applyDamageToLink
-07:4000 fileManagementFunction
-07:400a initializeFile_b07
-07:4059 saveFile_b07
-07:4085 loadFile_b07
-07:409e eraseFile_b07
-07:40b6 clearFileAtHl
-07:40bc verifyFileCopies
-07:40fe copyFileFromHlToDe
-07:4110 verifyFileAtHl
-07:4140 calculateFileChecksum
-07:4157 getFileAddress1
-07:415b getFileAddress2
-07:4176 initializeFileVariables
-07:41b1 initialFileVariables_standardGame
-07:41b5 initialFileVariables_heroGame
-07:41c9 saveVerificationString
-07:4872 updateItems
-07:491a updateItemsPost
-07:492f itemCodeNilPost
-07:4930 updateItemPost
-0e:6b2d objectLoadMovementScript_body
-0e:6b4c objectRunMovementScript_body
-0c:4000 runScriptCommand
-0c:4103 scriptCmd_none
-0c:4105 scriptCmd_stopIfItemFlagSet
-0c:4109 scriptCmd_stopIfRoomFlag40Set
-0c:410d scriptCmd_stopIfRoomFlag80Set
-0c:410f scriptFunc_checkRoomFlag
-0c:411c scriptCmd_showPasswordScreen
-0c:4147 scriptCmd_disableInput
-0c:414c scriptCmd_disableMenu
-0c:415a scriptFunc_popHlAndInc
-0c:415e scriptCmd_enableInput
-0c:4162 scriptCmd_enableMenu
-0c:4168 scriptCmd_setLinkCantMoveTo91
-0c:416a scriptFunc_setLinkCantMove
-0c:4170 scriptCmd_setLinkCantMoveTo00
-0c:4173 scriptCmd_setLinkCantMoveTo11
-0c:4186 scriptCmd_setState
-0c:418a scriptFunc_setState
-0c:4197 scriptCmd_setSubstate
-0c:419d scriptCmd_jump
-0c:41ba scriptCmd_spawnInteraction
-0c:41ca scriptFunc_restoreActiveObject
-0c:41cf scriptFunc_loadBcAndDe
-0c:41d8 scriptFunc_initializeObject
-0c:41e2 scriptCmd_spawnEnemy
-0c:41f4 scriptCmd_spawnEnemyHere
-0c:421b scriptCmd_setCoords
-0c:422b scriptCmd_setAngle
-0c:4232 scriptCmd_setSpeed
-0c:4239 scriptCmd_setZSpeed
-0c:4244 scriptCmd_checkCounter2ZeroAndReset
-0c:424e scriptCmd_setCollideRadii
-0c:4258 scriptCmd_writeInteractionByte
-0c:425f scriptCmd_addinteractionByte
-0c:426a scriptCmd_getRandomBits
-0c:4276 scriptCmd_loadSprite
-0c:4298 scriptCmd_turnToFaceLink
-0c:42a8 scriptCmd_setAngleAndExtra
-0c:42b8 scriptCmd_runGenericNpc
-0c:42c8 scriptFunc_getTextIndex
-0c:42d9 scriptCmd_showText
-0c:42e4 scriptCmd_showTextDifferentForLinked
-0c:4305 scriptCmd_waitForText
-0c:430d scriptCmd_setCounter1
-0c:4310 scriptFunc_4310
-0c:4315 scriptCmd_cpLinkX
-0c:432a scriptCmd_shakeScreen
-0c:4331 scriptCmd_writeMemory
-0c:433b scriptCmd_checkPaletteFadeDone
-0c:4343 scriptCmd_checkCFC0Bit
-0c:4355 scriptCmd_xorCFC0Bit
-0c:4369 scriptCmd_jumpIfNoEnemies
-0c:4375 scriptCmd_jumpIfC6xxSet
-0c:4384 scriptCmd_playSound
-0c:438d scriptCmd_updateLinkLocalRespawnPosition
-0c:4393 scriptCmd_jumpIfLinkVariableNe
-0c:43a9 scriptCmd_jumpIfMemoryEq
-0c:43b8 scriptCmd_jumpIfInteractionByteEq
-0c:43bf scriptCmd_jumpIfRoomFlagSet
-0c:43d3 scriptCmd_orRoomFlags
-0c:43df scriptCmd_checkSomething
-0c:43e9 scriptCmd_showLoadedText
-0c:43f6 scriptCmd_setTextID
-0c:4401 scriptCmd_setMusic
-0c:4414 scriptCmd_orMemory
-0c:4420 scriptCmd_spawnItem
-0c:444d scriptCmd_df
-0c:445e scriptCmd_jumpIfSomething
-0c:4474 scriptCmd_setLinkCantMove
-0c:447b scriptCmd_checkCounter2Zero
-0c:4483 scriptCmd_setTile
-0c:448f scriptCmd_setTileHere
-0c:4496 scriptCmd_callScript
-0c:44a6 scriptCmd_ret
-0c:44b3 scriptCmd_jumpIfCBA5Eq
-0c:44be scriptCmd_jumpRandom
-0c:44cc scriptCmd_jumpIfMemorySet
-0c:44db scriptCmd_writeC6xx
-0c:44e4 scriptCmd_checkCollidedWithLink_ignoreZ
-0c:44eb scriptCmd_checkCollidedWithLink_onGround
-0c:44f5 scriptCmd_checkAButton
-0c:4503 scriptCmd_checkNoEnemies
-0c:450b scriptCmd_checkFlagSet
-0c:451f scriptCmd_checkInteractionByteEq
-0c:452e scriptCmd_checkMemoryEq
-0c:453f scriptCmd_checkHeartDisplayUpdated
-0c:454f scriptCmd_checkRupeeDisplayUpdated
-0c:4563 scriptCmd_checkNotCollidedWithLink_ignoreZ
-0c:456d scriptCmd_createPuff
-0c:4573 scriptCmd_jumpIfGlobalFlagSet
-0c:4584 scriptCmd_setOrUnsetGlobalFlag
-0c:459b scriptCmd_initNpcHitbox
-0c:45b5 scriptCmd_moveNpcUp
-0c:45c8 scriptCmd_moveNpcRight
-0c:45cc scriptCmd_moveNpcDown
-0c:45d0 scriptCmd_moveNpcLeft
-0c:45d4 scriptCmd_delay
-05:4000 updateSpecialObjects
-05:40b3 updateGameKeysPressed
-05:6364 specialObjectCode_minecart_b05
-05:7c66 specialObjectCode_raft_b05
-16:5015 parseStaticObjects
-16:5085 loadStaticObjects_body
-11:5e3a label_11_212
-11:5e58 updateParts
+00:046f clearMemory -
+00:0470 fillMemory -
+00:0475 clearMemoryBc -
+00:0476 fillMemoryBc -
+00:047f copyMemoryReverse -
+00:0486 copyMemory -
+00:048d copyMemoryBcReverse -
+00:0496 copyMemoryBc -
+00:0068 addAToDe -
+00:006d addAToBc -
+00:0072 addDoubleIndexToDe -
+00:007e addDoubleIndexToBc -
+00:0176 getNumSetBits -
+00:0181 addDecimalToHlRef -
+00:018f subDecimalFromHlRef -
+00:019d multiplyAByC -
+00:01ac multiplyABy16 -
+00:01b7 multiplyABy8 -
+00:01c3 multiplyABy4 -
+00:01cd s8ToS16 -
+00:01d6 compareHlToBc -
+00:01ea getHighestSetBit -
+00:01f8 getLowestSetBit -
+00:0205 checkFlag -
+00:020e setFlag -
+00:0218 unsetFlag -
+00:0237 decHlRef16WithCap -
+00:0245 incHlRefWithCap -
+00:024a incHlRef16WithCap -
+00:0259 hexToDec -
+00:043e getRandomNumber -
+00:0453 getRandomNumber_noPreserveVars -
+00:0464 getRandomIndexFromProbabilityDistribution -
+00:049f clearOam -
+00:02c1 disableLcd -
+00:04af clearVram -
+00:04cd initializeVramMaps -
+00:04d0 initializeVramMap0 -
+00:04ed initializeVramMap1 -
+00:0878 dec16_ff8c -
+00:0772 copyByteSequential -
+00:0788 readByteSequential -
+00:00a0 jpHl -
+00:0cda jpBc -
+00:23a7 add16BitRefs -
+00:23b0 cpActiveRing -
+00:23b7 disableActiveRing -
+00:23bf enableActiveRing -
+00:23cc interactionDecCounter1 -
+00:23d1 interactionDecCounter2 -
+00:23d6 itemDecCounter1 -
+00:23db itemDecCounter2 -
+00:23e0 interactionIncState -
+00:23e5 interactionIncSubstate -
+00:23ea itemIncState -
+00:23ef itemIncSubstate -
+00:23f4 cpInteractionState -
+00:23f9 cpInteractionSubstate -
+00:23fe checkInteractionState -
+00:1e33 objectSetVisiblec0 -
+00:1e3c objectSetVisiblec1 -
+00:1e45 objectSetVisiblec2 -
+00:1e4e objectSetVisiblec3 -
+00:1e57 objectSetVisible80 -
+00:1e60 objectSetVisible81 -
+00:1e69 objectSetVisible82 -
+00:1e72 objectSetVisible83 -
+00:1e7b objectSetInvisible -
+00:1e84 objectSetVisible -
+00:1e8d objectSetReservedBit1 -
+00:197d getThisRoomFlags -
+00:1980 getARoomFlags -
+00:198a getRoomFlags -
+00:1992 checkIsLinkedGame -
+00:1e17 findByteAtHl -
+00:1e06 lookupKey -
+00:1e0f findByteInGroupTable -
+00:1e1f lookupCollisionTable -
+00:1e20 lookupCollisionTable_paramE -
+00:1e29 findByteInCollisionTable -
+00:1e2a findByteInCollisionTable_paramE -
+00:17d8 setStatusBarNeedsRefreshBit1 -
+00:17bb decNumActiveSeeds -
+00:17c3 decNumBombchus -
+00:17c8 decNumBombs -
+00:209b getShortPositionFromDE -
+00:20cb convertShortToLongPosition -
+00:20cc convertShortToLongPosition_paramC -
+00:20b8 setShortPosition -
+00:20b9 setShortPosition_paramC -
+00:20c3 objectSetShortPosition -
+00:2096 objectGetShortPosition -
+00:20a8 objectGetShortPosition_withYOffset -
+00:208a objectGetPosition -
+00:20db objectCenterOnTile -
+00:20e1 centerCoordinatesOnTile -
+00:2242 objectCopyPosition -
+00:2247 objectCopyPosition_rawAddress -
+00:225a objectCopyPositionWithOffset -
+00:2274 objectTakePosition -
+00:2277 objectTakePositionWithOffset -
+00:20f2 checkBPartSlotsAvailable -
+00:20f7 checkBEnemySlotsAvailable -
+00:2160 objectGetRelatedObject1Var -
+00:2164 objectGetRelatedObject2Var -
+00:2172 objectGetZAboveScreen -
+00:2184 objectCheckWithinScreenBoundary -
+00:219f objectCheckWithinRoomBoundary -
+00:1435 objectGetRelativeTile -
+00:1444 objectGetTileAtPosition -
+00:1447 getTileAtPosition -
+00:1456 objectGetRelativePositionOfTile -
+00:15d7 getTileIndexFromRoomLayoutBuffer -
+00:15d8 getTileIndexFromRoomLayoutBuffer_paramC -
+00:1e94 objectGetAngleTowardEnemyTarget -
+00:1e9c objectGetAngleTowardLink -
+00:1ea4 objectGetRelativeAngle -
+00:1ea9 getRelativeAngle -
+00:1eb1 objectGetRelativeAngleWithTempVars -
+00:1fd4 objectNudgeAngleTowards -
+00:1fee objectCheckCenteredWithLink -
+00:1fa2 objectCheckLinkWithinDistance -
+00:2008 objectApplyComponentSpeed -
+00:201d objectApplySpeed -
+00:2029 objectApplyGivenSpeed -
+00:2041 getPositionOffsetForVelocity -
+00:1f45 objectUpdateSpeedZ -
+00:1f46 objectUpdateSpeedZ_paramC -
+00:1f66 objectUpdateSpeedZ_sidescroll -
+00:1f68 objectUpdateSpeedZ_sidescroll_givenYOffset -
+00:239d objectSetSpeedZ -
+00:2374 objectNegateAndHalveSpeedZ -
+00:2370 objectUpdateSpeedZAndBounce -
+00:1bdb objectCheckContainsPoint -
+00:1be1 interactionCheckContainsPoint -
+00:1be4 objectHCheckContainsPoint -
+00:1c04 checkObjectsCollidedFromVariables -
+00:1c28 objectCheckCollidedWithLink_notDeadAndNotGrabbing -
+00:1c2e objectCheckCollidedWithLink_notDead -
+00:1c35 objectCheckCollidedWithLink_onGround -
+00:1c41 objectCheckCollidedWithLink -
+00:1c6f objectCheckCollidedWithLink_ignoreZ -
+00:1c77 hObjectCheckCollidedWithLink -
+00:1c89 objectHCheckCollisionWithLink -
+00:1d5a checkObjectsCollided -
+00:1d18 checkLinkID0AndControlNormal -
+00:1d20 checkLinkVulnerableAndIDZero -
+00:1d28 checkLinkVulnerable -
+00:1d32 checkLinkCollisionsEnabled -
+00:1487 objectCheckSimpleCollision -
+00:14ad objectGetTileCollisions -
+00:14b7 getTileCollisionsAtPosition -
+00:14c7 objectCheckTileCollision_allowHoles -
+00:14d1 checkTileCollisionAt_allowHoles -
+00:14dc checkTileCollision_allowHoles -
+00:14df checkGivenCollision_allowHoles -
+00:14f8 objectCheckTileCollision_disallowHoles -
+00:1502 checkTileCollisionAt_disallowHoles -
+00:150d checkTileCollision_disallowHoles -
+00:1510 checkGivenCollision_disallowHoles -
+00:1529 checkCollisionPosition_disallowSmallBridges -
+00:156e retrieveTileCollisionValue -
+00:15cc findTileInRoom -
+00:15d0 backwardsSearch -
+00:220d objectCheckIsOnHazard -
+00:2216 objectCheckIsOverHazard -
+00:21f6 checkLinkIsOverHazard -
+00:22a9 objectCheckTileAtPositionIsWater -
+00:22b1 checkTileAtPositionIsWater -
+00:22b9 findItemWithID -
+00:22c0 findItemWithID_startingAfterH -
+00:22c8 objectFindSameTypeObjectWithID -
+00:22dc objectSetPriorityRelativeToLink -
+00:1765 cpRupeeValue -
+00:1781 getRupeeValue -
+00:1859 retIfTextIsActive -
+00:212a getScaledPositionOffsetForVelocity -
+00:214c objectSetComponentSpeedByScaledVelocity -
+00:210e objectSetPositionInCircleArc -
+00:1f05 pushDirectionData -
+00:20b2 objectMakeTileSolid -
+00:141c setTileWithoutGfxReload -
+00:1426 setTileInRoomLayoutBuffer -
+00:13e9 extractColorComponents -
+00:0881 enableIntroInputs -
+00:10cc getChestData -
+00:1100 setDeathRespawnPoint -
+00:113a updateLinkLocalRespawnPosition -
+00:1151 updateRoomFlagsForBrokenTile -
+00:11fc setRoomFlagsForUnlockedKeyDoor -
+00:123e setRoomFlagsForUnlockedKeyDoor_overworldOnly -
+00:1255 checkAndUpdateLinkOnChest -
+00:1280 interactWithTileBeforeLink_b00 -
+00:1298 showInfoTextForRoller -
+00:12ae updateCamera -
+00:12ce resetCamera -
+00:12e5 setCameraFocusedObject -
+00:12f0 setCameraFocusedObjectToLink -
+00:12fc reloadTileMap -
+00:1384 initWaveScrollValues -
+00:13a5 loadBigBufferScrollValues -
+00:157b loadRoomCollisions -
+00:15fb interactionInitGraphics -
+00:1613 refreshLoadedTreeGfx -
+00:1618 refreshObjectGfx -
+00:1630 reloadObjectGfx_b00 -
+00:1644 loadObjectGfxHeaderToSlot4 -
+00:1658 loadTreeGfx -
+00:166d loadWeaponGfx_b00 -
+00:1682 loadObjectGfx -
+00:1686 loadObjectGfx2 -
+00:16d6 loadTreasureDisplayData_b00 -
+00:16eb decideItemDrop -
+00:1703 checkItemDropAvailable -
+00:171c giveTreasure -
+00:1733 loseTreasure -
+00:1748 checkTreasureObtained -
+00:1778 removeRupeeValue -
+00:17e0 getRandomRingOfGivenTier -
+00:180c refillSeedSatchel -
+00:1821 addToGashaMaturity -
+00:1832 makeActiveObjectFollowLink_b00 -
+00:1846 clearFollowingLinkObject -
+00:1997 setWarpDestVariables -
+00:19a2 setInstrumentsDisabledCounterAndScrollMode -
+00:1a71 checkReloadStatusBarGraphics -
+00:1a83 copy20BytesFromBank -
+00:1a98 loadCommonGraphics -
+00:1a9c updateStatusBar -
+00:1aa0 hideStatusBar -
+00:1aa4 showStatusBar -
+00:1aa8 saveGraphicsOnEnterMenu -
+00:1aac reloadGraphicsOnExitMenu -
+00:1ab4 copyW2TilesetBgPalettesToW4PaletteData -
+00:1ab8 copyW4PaletteDataToW2TilesetBgPalettes -
+00:1ad7 getRoomDungeonProperties -
+00:1af7 copy8BytesFromRingMapToCec0 -
+00:1b2c objectAddToAButtonSensitiveObjectList -
+00:1b41 objectRemoveFromAButtonSensitiveObjectList -
+00:1b5d linkInteractWithAButtonSensitiveObjects -
+00:1c97 checkGrabbableObjects -
+00:1d7f preventObjectHFromPassingObjectD -
+00:1de7 checkEnemyAndPartCollisionsIfTextInactive -
+00:1dfe findRoomSpecificData -
+00:21b0 objectReplaceWithID -
+00:21e0 objectDelete_useActiveObjectType -
+00:21e3 objectDelete_de -
+00:2225 objectReplaceWithAnimationIfOnHazard -
+00:2233 objectReplaceWithFallingDownHoleInteraction -
+00:2238 objectReplaceWithSplash -
+00:2291 breakCrackedFloor -
+00:22e0 objectSetPriorityRelativeToLink_withTerrainEffects -
+00:230e objectPushLinkAwayOnCollision -
+00:231e updateLinkPositionGivenVelocity -
+00:233b objectMimicBgTile -
+00:2403 checkInteractionSubstate -
+00:24a1 objectSetCollideRadius -
+00:24a9 objectSetCollideRadii -
+00:24b3 decNumEnemies -
+00:24bb setScreenShakeCounter -
+00:24c1 objectCreatePuff -
+00:24c3 objectCreateInteractionWithSubid00 -
+00:24c5 objectCreateInteraction -
+00:24d1 objectCreateFallingDownHoleInteraction -
+00:24e6 objectFlickerVisibility -
+00:24f0 objectMarkSolidPosition -
+00:2504 objectUnmarkSolidPosition -
+00:253b interactionSetHighTextIndex -
+00:2544 interactionSetScript -
+00:2552 interactionRunScript -
+00:2590 scriptCmd_asmCall -
+00:2596 scriptCmd_asmCallWithParam -
+00:25c5 scriptFunc_jump_scf -
+00:25ca scriptFunc_jump -
+00:25e9 scriptFunc_add3ToHl_scf -
+00:25ea scriptFunc_add3ToHl -
+00:25ee scriptCmd_loadScript -
+00:261b interactionAnimate -
+00:262e interactionSetAnimation -
+00:2680 objectPreventLinkFromPassing -
+00:26a9 npcFaceLinkAndAnimate -
+00:26db interactionAnimateAsNpc -
+00:26de interactionPushLinkAwayAndUpdateDrawPriority -
+00:26e4 returnIfScrollMode01Unset -
+00:26ec interactionDeleteAndRetIfEnabled02 -
+00:26f8 convertAngleDeToDirection -
+00:26f9 convertAngleToDirection -
+00:2701 interactionSetAlwaysUpdateBit -
+00:2707 objectCheckLinkPushingAgainstCenter -
+00:271d interactionCheckAdjacentTileIsSolid -
+00:2725 interactionCheckAdjacentTileIsSolid_viaDirection -
+00:273c interactionDecCounter1IfTextNotActive -
+00:2744 interactionDecCounter1IfPaletteNotFading -
+00:274c interactionAnimate4Times -
+00:274f interactionAnimate3Times -
+00:2752 interactionAnimate2Times -
+00:2758 interactionAnimateBasedOnSpeed -
+00:2773 interactionSetPosition -
+00:2774 interactionHSetPosition -
+00:277b interactionUnsetAlwaysUpdateBit -
+00:2781 interactionLoadExtraGraphics -
+00:278b interactionFunc_278b -
+00:2791 interactionGetMiniScript -
+00:2798 interactionSetMiniScript -
+00:27a0 objectOscillateZ -
+00:27b4 giveRingToLink -
+00:27c2 createRingTreasure -
+00:27d4 createTreasure -
+00:27e0 objectCreateExclamationMark -
+00:27f8 objectCreateFloatingSnore -
+00:27fe objectCreateFloatingMusicNote -
+00:2818 enemyAnimate -
+00:282b enemySetAnimation -
+00:287b enemyDie_uncounted_withoutItemDrop -
+00:287f enemyDie_withoutItemDrop -
+00:2883 enemyDie_uncounted -
+00:2887 enemyDie -
+00:28fd enemyStandardUpdate -
+00:2978 partAnimate -
+00:2988 partSetAnimation -
+00:29d8 createEnergySwirlGoingIn -
+00:29ed createEnergySwirlGoingOut -
+00:2a02 convertLinkAngleToDirectionButtons -
+00:2a1d setSimulatedInputAddress -
+00:2a33 getSimulatedInput -
+00:2a7e itemSetState -
+00:2a85 clearPegasusSeedCounter -
+00:2a8c putLinkOnGround -
+00:2aad setLinkForceStateToState08 -
+00:2aae setLinkForceStateToState08_withParam -
+00:2ab7 linkApplyDamage_b00 -
+00:2acf setLinkIDOverride -
+00:2ad9 setLinkID -
+00:2ae3 respawnLink -
+00:2aef specialObjectAnimate -
+00:2b0a specialObjectSetAnimation -
+00:2b25 loadLinkAndCompanionAnimationFrame -
+00:2b39 checkLinkPushingAgainstWall -
+00:2b5d updateCompanionDirectionFromAngle -
+00:2b64 updateLinkDirectionFromAngle -
+00:2b8a specialObjectSetCoordinatesToRespawnYX -
+00:2ba9 resetLinkInvincibility -
+00:2bbd decPegasusSeedCounter -
+00:2be8 checkPegasusSeedCounter -
+00:2bef itemTryToBreakTile -
+00:2bf6 tryToBreakTile -
+00:2c10 clearAllParentItems -
+00:2c14 updateParentItemButtonAssignment -
+00:2c18 checkUseItems_b00 -
+00:2c2e objectAddToGrabbableObjectBuffer -
+00:2c43 dropLinkHeldItem -
+00:2c72 clearVar3fForParentItems -
+00:2c7e linkCreateSplash -
+00:2c9b clearVariousLinkVariables -
+00:2cad linkState07 -
+00:2ce2 itemDelete -
+00:2cf0 itemUpdateAngle -
+00:2cf9 getFreeItemSlot -
+00:2d1a intro_cinematic -
+00:2d5f clearFadingPalettes -
+00:2d73 flashScreen -
+00:2d8e specialObjectCode_companionCutscene_b00 -
+00:2da2 specialObjectCode_linkInCutscene_b00 -
+00:2daa loadDungeonLayout -
+00:2dc4 initializeDungeonStuff -
+00:2dd1 setVisitedRoomFlag -
+00:2dd7 getThisRoomDungeonProperties -
+00:2e01 getDungeonLayoutAddress -
+00:2e12 getActiveRoomFromDungeonMapPosition -
+00:2e15 getRoomInDungeon -
+00:2e27 getFreeEnemySlot -
+00:2e34 getFreeEnemySlot_uncounted -
+00:2e47 enemyDelete -
+00:2e59 enemyReplaceWithID -
+00:2ea5 updateEnemies -
+00:2f07 updateEnemy -
+00:30fe initializeRoom -
+00:3171 parseGivenObjectData_b00 -
+00:3189 loadStaticObjects -
+00:319f clearStaticObjects -
+00:31a7 findFreeStaticObjectSlot -
+00:31b8 objectDeleteRelatedObj1AsStaticObject -
+00:31cf objectSaveAsStaticObject -
+00:31f3 checkGlobalFlag -
+00:31f9 setGlobalFlag -
+00:31ff unsetGlobalFlag -
+00:3205 clearEnemiesKilledList_b00 -
+00:3209 addRoomToEnemiesKilledList_b00 -
+00:320d markEnemyAsKilledInRoom_b00 -
+00:3215 generateRandomBuffer_b00 -
+00:3219 getRandomPositionForEnemy_b00 -
+00:321d checkSpawnTimeportalInteraction_b00 -
+00:3238 clearPaletteFadeVariablesAndRefreshPalettes -
+00:323e clearPaletteFadeVariables -
+00:3257 fadeoutToWhiteWithDelay -
+00:3263 fastFadeoutToWhite -
+00:326c fadeoutToWhite -
+00:327a makeAllPaletteUseFading -
+00:3284 fadeinFromWhiteWithDelay -
+00:3290 fastFadeinFromWhite -
+00:3299 fadeinFromWhite -
+00:32ab fadeoutToBlackWithDelay -
+00:32b7 fastFadeoutToBlack -
+00:32c0 fadeoutToBlack -
+00:32d1 fadeinFromBlackWithDelay -
+00:32dd fastFadeinFromBlack -
+00:32e6 fadeinFromBlack -
+00:32f8 darkenRoomLightly -
+00:330a darkenRoomWithSpeed -
+00:3315 darkenRoom -
+00:3338 brightenRoomLightly -
+00:334c brightenRoomWithSpeed -
+00:3350 brightenRoom -
+00:335d fastFadeinFromWhiteToRoom -
+00:336b fadeinFromWhiteToRoom -
+00:3370 startFadeBetweenTwoPalettes -
+00:33cf loadScreenMusic -
+00:3406 applyWarpDest -
+00:341a loadScreenMusicAndSetRoomPack -
+00:3431 dismountCompanionAndSetRememberedPositionToScreenCenter -
+00:345b updateAllObjects -
+00:34f9 updateSpecialObjectsAndInteractions -
+00:351e updateInteractionsAndDrawAllSprites -
+00:3597 clearWramBank1 -
+00:35a3 clearScreenVariablesAndWramBank1 -
+00:35a6 clearScreenVariables -
+00:35ba clearLinkObject -
+00:35c2 clearReservedInteraction0 -
+00:35ca clearReservedInteraction1 -
+00:35d2 clearDynamicInteractions -
+00:35e3 clearItems -
+00:35f4 clearEnemies -
+00:3605 clearParts -
+00:3616 setEnemyTargetToLinkPosition -
+00:3632 getEntryFromObjectTable2 -
+00:364b checkDungeonUsesToggleBlocks -
+00:3659 loadAnimationData -
+00:36a8 getIndexOfGashaSpotInRoom -
+00:36c0 getBlackTowerProgress -
+00:36f6 forceLoadRoom -
+00:3775 loadUniqueGfxHeader -
+00:37db updateTilesetUniqueGfx -
+00:380b uniqueGfxFunc_380b -
+00:3843 loadUniqueGfxHeaderEntry -
+00:38dc loadRoomLayout -
+00:3a4e generateVramTilesWithRoomChanges -
+00:3a72 getTileMappingData -
+00:3a94 setHlToTileMappingDataPlusATimes8 -
+00:3a9c setTile -
+00:3ac6 setTileInAllBuffers -
+00:3acf setInterleavedTile -
+00:3aef getFreeInteractionSlot -
+00:3b02 interactionDeleteAndUnmarkSolidPosition -
+00:3b05 interactionDelete -
+00:3b36 updateInteractions -
+00:3b62 updateInteraction -
+00:3d59 checkObjectIsCloseToPosition_b00 -
+00:3d78 checkNpcShouldExistAtGameStage -
+00:3da0 interactionSetSimpleScript -
+00:3da8 interactionRunSimpleScript -
+00:3e0f getWildTokayObjectDataIndex -
+00:3e28 objectCreateSparkle -
+00:3e34 objectCreateSparkleMovingUp -
+00:3e47 objectCreateRedBlueOrb -
+00:3e53 incMakuTreeState -
+00:3e61 setLinkDirection -
+00:3e6d interactionFunc_3e6d -
+00:3e8e getFreePartSlot -
+00:3ea1 partDelete -
+00:3eaf checkLinkCanSurface -
+00:3ec0 copy256BytesFromBank -
+00:3035 objectLoadMovementScript -
+00:3049 objectRunMovementScript -
+00:305d decCbb3 -
+00:3062 incCbc1 -
+00:3067 incCbc2 -
+00:306c endgameCutsceneHandler -
+00:3099 fileSelect_redrawDecorations -
+00:30b0 disableLcdAndLoadRoom -
+00:30c4 playWaveSoundAtRandomIntervals -
+00:30d8 addSpritesFromBankToOam_withOffset -
+00:30eb addSpritesFromBankToOam -
+00:09d4 initializeFile_b00 -
+00:09d8 saveFile_b00 -
+00:09dc loadFile_b00 -
+00:09e0 eraseFile_b00 -
+00:0150 begin -
+00:0169 resetGame -
+00:0223 _flagHlpr -
+00:026d pollInput -
+00:0294 getInputWithAutofire -
+00:02ea loadGfxRegisterStateIndex -
+00:050b loadPaletteHeader -
+00:058a queueDmaTransfer -
+00:05da loadUncompressedGfxHeader -
+00:0626 loadGfxHeader -
+00:0672 decompressGraphics -
+00:069c func_069c -
+00:06e0 func_06e0 -
+00:0776 _adjustHLSequential -
+00:0799 loadTileset -
+00:07fe loadTilesetHlpr -
+00:088b threadFunc_088b -
+00:0893 threadFunc_0893 -
+00:089b threadStop -
+00:08a3 threadRestart -
+00:08c3 restartThisThread -
+00:08e2 stubThreadStart -
+00:08eb resumeThreadNextFrameAndSaveBank -
+00:08fe resumeThreadNextFrame -
+00:0900 resumeThreadInAFrames -
+00:0917 _nextThread -
+00:0922 startGame -
+00:0933 _mainLoop -
+00:0955 _mainLoop_nextThread H
+00:098b _countdownToRunThread -
+00:099c _initializeThread -
+00:09f8 vblankInterrupt -
+00:0a71 runVBlankFunctions -
+00:0a7e vblankFunctionRet -
+00:0a8e vblankFunctionsStart -
+00:0aa0 vblankRunBank4Function -
+00:0aa8 vblankFunction0aa8 -
+00:0ab7 vblankCopyTileFunction -
+00:0ad9 vblankFunction0ad9 -
+00:0aeb vblankDmaFunction -
+00:0b07 updateDirtyPalettes -
+00:0b46 lcdInterrupt -
+00:0bab lcdInterrupt_setLcdcToA7 -
+00:0bb6 lcdInterrupt_ringMenu -
+00:0bdc lcdInterrupt_clearWXY -
+00:0be2 lcdInterrupt_clearLYC -
+00:0be6 _lcdInterruptEnd -
+00:0bea lcdInterrupt_0bea -
+00:0c3d serialInterrupt -
+00:0c6a writeToSC -
+00:0c73 serialFunc_0c73 -
+00:0c7e disableSerialPort -
+00:0c85 serialFunc_0c85 -
+00:0c8d serialFunc_0c8d -
+00:0c98 playSound_b00 -
+00:0cad setMusicVolume -
+00:0cb2 restartSound -
+00:0cb7 initSound_b00 -
+00:0cba _startSound -
+00:0cdd disableTimer -
+00:0ce6 enableTimer -
+00:0d07 timerInterrupt -
+00:0d5e addSpritesToOam -
+00:0d61 addSpritesToOam_withOffset -
+00:0d9a drawAllSprites -
+00:0da2 drawAllSpritesUnconditionally -
+00:0eda func_0eda -
+00:0f08 _drawObjectTerrainEffects -
+00:0f82 _getObjectPositionOnScreen -
+00:0fc1 _getObjectPositionOnScreen_duringScreenTransition -
+00:1078 queueDrawEverything -
+00:10a8 objectQueueDraw -
+00:1135 func_1135 -
+00:131f func_131f -
+00:1374 loadTilesetAnimation -
+00:1383 func_1383 -
+00:13c6 func_13c6 -
+00:1545 _simpleCollision -
+00:1552 _complexCollision -
+00:184d stopTextThread -
+00:1860 showTextOnInventoryMenu -
+00:186e showTextNonExitable -
+00:1872 showText -
+00:18a0 textThreadStart -
+00:18cd retrieveTextCharacter -
+00:1949 readByteFromW7ActiveBank -
+00:195d readByteFromW7TextTableBank -
+00:19ad clearAllItemsAndPutLinkOnGround -
+00:19df copyTextCharacterGfx -
+00:1a17 fileSelectThreadStart -
+00:1a2e secretFunctionCaller -
+00:1a44 openSecretInputMenu -
+00:1a51 updateMenus -
+00:1ab0 openMenu -
+00:1b10 thread_1b10 -
+00:1c47 _checkCollidedWithLink -
+00:1c84 func_1c84 -
+00:1cd3 _getLinkPositionPlusDirectionOffset -
+00:1cf8 _checkCollisionWithHAndD -
+00:22d4 func_228f -
+00:2518 _interactionActuallyRunScript -
+00:2588 _interactionSaveScriptAddress -
+00:25b1 _scriptCmd_asmRetFunc -
+00:25bd _scriptFunc_setupAsmCall -
+00:2647 _interactionNextAnimationFrame -
+00:2844 _enemyNextAnimationFrame -
+00:299e _partNextAnimationFrame -
+00:2d07 introThreadStart -
+00:2d48 func_2d48 -
+00:2e82 _updateEnemiesIfStateIsZero -
+00:3211 func_3211 -
+00:32fc func_32fc -
+00:3317 _darkenRoomHelper -
+00:331e _setDarkeningVariables -
+00:333e func_333e -
+00:3354 _brightenRoomHelper -
+00:337b setPaletteThreadDelay -
+00:3384 paletteFadeThreadStart -
+00:33a1 mainThreadStart -
+00:3539 func_3539 -
+00:3712 loadTilesetLayout -
+00:3796 loadTilesetGraphics -
+00:3828 loadTilesetUniqueGfx -
+00:3889 loadTilesetData -
+00:38a5 loadTilesetAndRoomLayout -
+00:3b13 _updateInteractionsIfStateIsZero -
+00:3ed0 func_3ed0 -
+00:3ee4 func_3ee4 -
+06:4000 interactWithTileBeforeLink_b06 -
+06:46bb linkApplyDamage_b06 -
+06:48b3 checkUseItems_b06 -
+06:6cec specialObjectCode_companionCutscene_b06 -
+06:70a0 specialObjectCode_linkInCutscene_b06 -
+06:4734 tryToBreakTile_body -
+06:4809 itemMakeInteractionForBreakableTile -
+06:4816 makeInteractionForBreakableTile -
+06:483d decideItemDropForBrokenTile -
+06:402d nextToChestTile -
+06:40b4 nextToSignTile -
+06:40ef checkFacingBottomOfTileAndPressedA -
+06:40f6 checkFacingBottomOfTile -
+06:410e nextToPushableBlock -
+06:4191 nextToKeyBlock -
+06:41c6 nextToKeyDoor -
+06:420c resetPushingAgainstTileCounter -
+06:4212 decPushingAgainstTileCounter -
+06:4217 nextToOverworldKeyhole -
+06:4283 jumpToShowInfoText -
+06:4288 createKeySpriteInteraction -
+06:4299 nextToSubrosiaKeydoor -
+06:429b nextToGhiniSpawner -
+06:42c3 nextToTileWithInfoText -
+06:42fb showInfoTextForTile -
+06:4329 specialObjectCheckPushingAgainstTile -
+06:4350 checkAndDecKeyCount -
+06:4373 specialObjectGetTileInFront -
+06:437a specialObjectGetTileAtOffset -
+06:4398 checkTileAfterNext -
+06:4870 functionCaller_b06 -
+06:4878 clearAllParentItems_body -
+06:4890 updateParentItemButtonAssignment_body -
+06:4954 checkItemUsed -
+06:4980 initializeParentItem -
+06:498c chooseParentItemSlot -
+06:49da checkShopInput -
+06:49ef parentItemUpdate -
+06:4a42 clearParentItem -
+06:4a50 clearParentItemH -
+06:441e specialObjectAnimate_optimized -
+06:4427 specialObjectSetAnimation_body -
+06:442a label_06_032 -
+06:4432 specialObjectNextAnimationFrame -
+06:44c9 loadLinkAndCompanionAnimationFrame_body -
+06:4516 getSpecialObjectGraphicsFrame -
+06:462d getTransformedLinkID -
+06:4668 linkUpdateDamageToApplyForRings -
+06:563e specialObjectCode_minecart_b06 -
+06:57ef specialObjectCode_raft_b06 -
+3f:4125 reloadObjectGfx_b3f -
+3f:445b loadWeaponGfx_b3f -
+3f:46f8 loadTreasureDisplayData_b3f -
+3f:595d titlescreenMakuSeedSprite H
+3f:59aa titlescreenPressStartSprites -
+3f:4016 refreshDirtyPalettes -
+3f:4133 agesFunc_3f_4133 -
+3f:4154 refreshObjectGfx_body -
+3f:41ec loadObjectGfxHeaderToSlot4_body -
+3f:41f5 loadTreeGfx_body -
+3f:4201 updateTileIndexBaseForAllObjects -
+3f:4270 findIndexInLoadedObjectGfx -
+3f:428e findUnusedIndexInLoadedObjectGfx -
+3f:42a9 incLoadedObjectGfxIndex -
+3f:42b3 getAddressOfLoadedObjectGfxIndex -
+3f:42bb addIndexToLoadedObjectGfx -
+3f:42cf insertIndexIntoLoadedObjectGfx -
+3f:430e markLoadedObjectGfxUsed -
+3f:4327 markAllLoadedObjectGfxUnused -
+3f:4337 enemyGetObjectGfxIndex -
+3f:433a getObjectGfxIndexForEnemy -
+3f:4347 partGetObjectGfxIndex -
+3f:4355 interactionGetObjectGfxIndex -
+3f:435c itemGetObjectGfxIndex -
+3f:4368 enemyLoadGraphicsAndProperties -
+3f:43c9 partLoadGraphicsAndProperties -
+3f:4404 interactionLoadGraphics -
+3f:4422 itemLoadGraphics -
+3f:4af7 initTextbox -
+3f:4b1f updateTextbox -
+3f:4cc8 textOptionCode -
+3f:4d5d inventoryTextCode -
+3f:4e72 initTextboxStuff -
+3f:4f59 getTextAddress -
+3f:4ff5 checkInitialTextCommands -
+3f:5055 drawLineOfText -
+3f:5091 clearTextGfxBuffer -
+3f:509c clearLineTextBuffer -
+3f:50a6 setLineTextBuffers -
+3f:50cc dmaTextGfxBuffer -
+3f:50dd saveTilesUnderTextbox -
+3f:514a initTextboxMapping -
+3f:5173 dmaTextboxMap -
+3f:51b9 updateCharacterDisplayTimer -
+3f:51db displayNextTextCharacter -
+3f:5288 getNextCharacterToDisplay -
+3f:52c8 label_3f_155 -
+3f:52e4 label_3f_157 -
+3f:52e9 label_3f_158 -
+3f:52ee label_3f_159 -
+3f:52f1 label_3f_160 -
+3f:52fd readNextTextByte -
+3f:5305 getExtraTextIndex -
+3f:5314 updateTextboxArrow -
+3f:5354 clearTopRowOfTextMap -
+3f:537d shiftTextboxMapUp -
+3f:53b3 subFirstRowOfTextMapBy20 -
+3f:549e doInventoryTextFirstPass -
+3f:557f shiftTextGfxBufferLeft -
+3f:5597 decInvTextScrollTimer -
+3f:55a0 handleTextControlCodeWithSpecialCase -
+3f:55b4 updateSelectedTextPosition -
+3f:55c8 getSelectedTextOptionAddress -
+3f:55d0 getAddressInTextboxMap -
+3f:55e1 removeCursorFromSelectedTextPosition -
+3f:55f2 moveSelectedTextOptionRight -
+3f:5602 moveSelectedTextOptionLeft -
+3f:5611 textOptionCode_checkDirectionButtons -
+3f:565c updateSelectedTextPositionAndDmaTextboxMap -
+3f:5662 textOptionCode_checkBButton -
+3f:567f pushToTextStack -
+3f:56a4 popFromTextStack -
+3f:56cf readByteFromW7ActiveBankAndIncHl -
+3f:56d2 incHlAndUpdateBank -
+3f:56e4 handleTextControlCode -
+3f:5856 getCharacterDisplayLength -
+3f:5864 textControlCodeC_0 -
+3f:589d textControlCodeC_7 -
+3f:58a4 textControlCodeC_5 -
+3f:58a9 textControlCodeC_3 -
+3f:58ae textControlCodeC_ret -
+3f:58b1 textControlCodeC_6 -
+3f:58bd textControlCodeC_1 -
+3f:58e8 textControlCodeC_2 -
+3f:5915 extraTextIndices -
+3f:446d checkTreasureObtained_body -
+3f:44a1 loseTreasure_body -
+3f:44a8 loseTreasure_helper -
+3f:44c8 giveTreasure_body -
+3f:466f realignUnappraisedRings -
+3f:4697 getNumUnappraisedRings -
+3f:46b6 addTreasureToInventory -
+3f:4744 decideItemDrop_body -
+3f:4782 checkItemDropAvailable_body -
+3f:4846 itemDropSet0 -
+3f:4866 itemDropSet1 -
+3f:4886 itemDropSet2 -
+3f:48a6 itemDropSet3 -
+3f:48c6 itemDropSet4 -
+3f:48e6 itemDropSet5 -
+3f:4906 itemDropSet6 -
+3f:4926 itemDropSet7 -
+3f:4946 itemDropSet8 -
+3f:4966 itemDropSet9 -
+3f:4986 itemDropSetA -
+3f:49a6 itemDropSetB -
+3f:49c6 itemDropSetC -
+3f:49e6 itemDropSetD -
+3f:4a06 itemDropSetE -
+3f:4a26 itemDropSetF -
+3f:4ad6 checkIncreaseGashaMaturityForGettingTreasure -
+01:4910 makeActiveObjectFollowLink_b01 -
+01:401b screenTransitionState0 -
+01:4027 initializeRoomBoundaryAndLoadAnimations -
+01:4075 screenTransitionState1 -
+01:40f5 setScreenTransitionState02 -
+01:4105 screenTransitionState2 -
+01:4201 updateCameraPosition -
+01:4256 calculateCameraPosition -
+01:427d updateScreenShake -
+01:42cb updateGfxRegs2Scroll -
+01:42e2 screenTransitionState3 -
+01:430d checkDarkenRoomAndClearPaletteFadeState -
+01:4311 checkDarkenRoom -
+01:4323 checkBrightenRoom -
+01:433a screenTransitionState4 -
+01:435a screenTransitionState5 -
+01:4364 screenTransitionState5Substate0 -
+01:43d8 transitionUpdateScrollAndLinkPosition -
+01:442a finishScrollingTransition -
+01:4440 label_01_037 -
+01:44a6 resetFollowingLinkObjectPosition -
+01:44fa screenTransitionState5Substate2 -
+01:45a5 incrementScreenScrollRowVars -
+01:45c4 addFunctionsToVBlankQueue -
+01:45ed screenTransitionState5Substate1 -
+01:4712 copyTileRowToVramBuffer -
+01:4762 updateTilesetPalette -
+01:4771 cpLinkState0e -
+01:477e initWaveScrollValues_body -
+01:47da loadBigBufferScrollValues_body -
+01:4805 checkAndApplyPaletteFadeTransition -
+01:4862 checkSymmetryCityPaletteTransition -
+01:4919 resetFollowingLinkPath -
+01:494d checkUpdateFollowingLinkObject -
+01:49af clearMemoryOnScreenReload -
+01:49d7 setObjectsEnabledTo2 -
+01:49ea setItemsEnabledTo2 -
+01:49f1 setInteractionsEnabledTo2 -
+01:49f8 setEnemiesEnabledTo2 -
+01:49ff setPartsEnabledTo2 -
+01:4a04 setObjectsEnabledTo2_hlpr -
+01:4a17 clearObjectsWithEnabled2 -
+01:4a2a clearItemsWithEnabled2 -
+01:4a31 clearInteractionsWithEnabled2 -
+01:4a38 clearEnemiesWithEnabled2 -
+01:4a3f clearPartsWithEnabled2 -
+01:4a44 clearObjectsWithEnabled2_hlpr -
+01:4a81 updateLinkBeingShocked -
+01:4ad2 initiateFallDownHoleWarp -
+01:4af8 cutscene17 -
+01:4bd9 initWaveScrollValuesForEverySecondLine -
+01:4bf0 cutscene15 -
+01:4d16 cutscene18 -
+01:4d1a cutscene19 -
+01:564e loadDungeonLayout_b01 -
+01:56a3 clearDungeonLayout -
+01:56ac findActiveRoomInDungeonLayoutWithPointlessBankSwitch -
+01:56b3 findActiveRoomInDungeonLayout -
+01:56d3 getFirstDungeonLayoutAddress -
+01:56e3 paletteFadeHandler -
+01:5705 paletteFadeHandler09 -
+01:5709 paletteFadeHandler01 -
+01:571e updateFadingPalettes -
+01:5736 paletteFadeHandler00 -
+01:5737 paletteFadeHandler0a -
+01:573b paletteFadeHandler02 -
+01:574f paletteFadeHandler0b -
+01:5753 paletteFadeHandler03 -
+01:5768 paletteFadeHandler0c -
+01:576c paletteFadeHandler04 -
+01:579a paletteFadeHandler0d -
+01:579e paletteFadeHandler05 -
+01:57ba paletteFadeHandler0e -
+01:57be paletteFadeHandler06 -
+01:57e0 paletteFadeHandler07 -
+01:580f paletteFadeHandler08 -
+01:591e checkLockBG7Color3ToBlack -
+01:5945 checkUpdateDungeonMinimap -
+01:596a runGameLogic -
+01:5976 initializeGame -
+01:5a4f loadingRoom -
+01:5abc standardGameState -
+01:5b26 cutscene00 -
+01:5b65 cutscene01 -
+01:7c80 cutscene02 -
+01:5bd8 cutscene03 -
+01:5c82 setEnteredWarpPosition -
+01:5c8c cutscene04 -
+01:5cb6 cutscene05 -
+01:7b6e tilesetLayoutGroup33 -
+01:5de4 cutscene16 -
+01:5e7d checkDisplayEraOrSeasonInfo -
+01:5e06 triggerFadeoutTransition -
+01:5e0e applyWarpTransition2 -
+01:5e3d setCutsceneIndexIfCutsceneTriggerSet -
+01:5e9e updateGrassAnimationModifier -
+01:5ea4 loadDeathRespawnBufferPreset -
+01:5edd checkRoomPack -
+01:5f00 calculateRoomEdge -
+01:5f13 updateActiveRoom -
+01:5f45 getNextActiveRoom -
+01:5f5f screenTransitionStandard -
+01:5f67 clearEyePuzzleVars -
+01:5f96 screenTransitionForestScrambler -
+01:5feb screenTransitionEyePuzzle -
+01:6056 checkSeedTreeRefillIndex -
+01:6143 checkWarpsTopDown -
+01:614d checkWarpsSidescrolling -
+01:615b initiateScreenEdgeWarp -
+01:6163 initiateWarp -
+01:6174 checkLinkCloseEnoughToWarpTileCenter -
+01:6198 warpInitiated -
+01:619f noWarpInitiated -
+01:61a1 checkTileWarps -
+01:61fd checkStandingOnDeactivatedWarpTile -
+01:621a checkScreenEdgeWarps -
+01:6232 checkTileIsWarpTile -
+01:7b7c cutscene14 -
+01:7b8d linkSummonedCutscene -
+01:7c65 updateLastToggleBlocksState -
+01:7c6c checkUpdateToggleBlocks -
+01:7f15 cutscene1f -
+01:5d4e cutscene06 -
+01:5d5b cutscene07 -
+01:5d6c cutscene08 -
+01:5d70 cutscene0c -
+01:5d77 cutscene09 -
+01:5d8e cutscene0f -
+01:5d96 cutscene0a -
+01:5d9b cutscene20 -
+01:5da2 cutscene0d -
+01:5daf cutscene0e -
+01:5dc2 cutscene21 -
+01:5dcd cutscene10 -
+01:5dd1 cutscene11 -
+01:5dd7 cutscene12 -
+01:7d6b cutscene0b -
+01:7d76 cutscene1a -
+01:7d81 cutscene1b -
+01:7d92 warpToMoblinKeepUnderground -
+01:7d9d cutscene1c -
+01:7dab cutscene1d -
+01:7dbe cutscene1e -
+01:7dcc updatePirateShip -
+01:7de1 checkLoadPirateShip -
+01:7e1e updatePirateShipChangedTile -
+01:7e40 updatePirateShipPosition -
+01:7e6b updatePirateShipRoom -
+01:7eaa updatePirateShipAngle -
+01:62c4 checkSolidObjectAtWarpDestPos -
+01:62da clearSolidObjectPositions -
+01:62e9 checkLinkCanStandOnTile -
+01:626e checkInitUnderwaterWaves -
+01:6282 checkUpdateUnderwaterWaves -
+01:62b4 checkDisableUnderwaterWaves -
+12:55d4 parseGivenObjectData_b12 -
+12:5872 runRoomSpecificCode -
+12:58ca roomSpecificCode0 -
+12:58d8 roomSpecificCode1 -
+12:58ed roomSpecificCode2 -
+12:58f5 roomSpecificCode3 -
+12:5915 roomSpecificCode7 -
+12:5927 roomSpecificCode5 -
+12:5933 roomSpecificCode4 -
+12:593e roomSpecificCode8 -
+12:5950 roomSpecificCode9 -
+12:595c roomSpecificCodeA -
+12:5965 roomSpecificCodeB -
+12:596e roomSpecificCodeC -
+12:78e4 checkLinkCanSurface_isUnderwater -
+12:5660 skipToOpEnd_2byte -
+12:567d skipToOpEnd_4byte -
+12:568a checkSkipPointer -
+12:56aa skipPointer -
+12:56af parsePointer -
+12:5805 continueObjectLoopIfOpDone -
+12:580d read2Bytes -
+12:5814 readCoordinates -
+12:581c decEnemyCounterIfApplicable -
+12:5829 addPositionToPlacedEnemyPositions -
+12:583d assignRandomPositionToEnemy -
+12:5852 checkEnemyKilled -
+02:7817 clearEnemiesKilledList_b02 -
+02:77c3 addRoomToEnemiesKilledList_b02 -
+02:77f5 markEnemyAsKilledInRoom_b02 -
+02:7823 generateRandomBuffer_b02 -
+02:785c getRandomPositionForEnemy_b02 -
+02:79be checkSpawnTimeportalInteraction_b02 -
+02:4000 checkDisplayDmgModeScreen H
+02:403e updateTilesetFlagsForIndoorRoomInAltWorld -
+02:4152 setFileSelectCursorOffsetToFileSelectMode -
+02:4159 setFileSelectModeTo1 -
+02:415b setFileSelectMode -
+02:4165 loadGfxRegisterState5AndIncFileSelectMode2 -
+02:416a incFileSelectMode2 -
+02:416f decFileSelectMode2IfBPressed -
+02:4175 decFileSelectMode2 -
+02:417a getFileDisplayVariableAddress -
+02:417b getFileDisplayVariableAddress_paramE -
+02:4626 getNameBufferLength -
+02:4641 copyNameToW4NameBuffer -
+02:467f label_02_038 -
+02:481e drawNameInputCursors -
+02:487e drawSecretInputCursors -
+02:49da loadFileDisplayVariables -
+02:4f17 runBank2Function -
+02:4f2c hideStatusBar_body -
+02:4f64 showStatusBar_body -
+02:5142 playHeartBeepAtInterval -
+02:515c loadCommonGraphics_body -
+02:518d updateStatusBar_body -
+02:52cb correctAddressForExtraHeart -
+02:52d2 loadEquippedItemGfx -
+02:5358 drawItemTilesOnStatusBar -
+02:53a0 drawTreasureExtraTiles -
+02:543c inGameDrawHeartDisplay -
+02:5449 drawHeartDisplay -
+02:54b7 loadItemIconGfx -
+02:54df loadStatusBarMap -
+02:5883 getDirectionButtonOffsetFromHl -
+02:5893 inventorySubscreen0CheckDirectionButtons -
+02:595e inventorySubscreen0_drawCursor -
+02:5af6 cpInventorySelectedItemToHarp -
+02:5b19 getSeedTypeInventoryIndex -
+02:5b2e drawEquippedSpriteForActiveRing -
+02:5b5a inventorySubscreen0_drawStoredItems -
+02:5ba2 inventorySubscreen1_drawTreasures -
+02:5c3d inventorySubscreen2_drawTreasures -
+02:5cf5 getRingBoxCapacity -
+02:5d08 fillRectangleInTilemap -
+02:60b5 loadMinimapDisplayRoom -
+02:60dc dungeonMap_drawSmallKeyCount -
+02:60ea dungeonMap_calculateVisitedFloorsAndLinkPosition -
+02:6298 getMinimapPopupType -
+02:62bc minimapPopupType_normal -
+02:62be minimapPopupType_advanceShop -
+02:62c5 minimapPopupType_cave -
+02:62d2 minimapPopupType_gashaSpot -
+02:62de minimapPopupType_portalSpot -
+02:62f4 minimapPopupType_seedTree -
+02:62fe minimapPopupType_moblinsKeep -
+02:6306 minimapNoPopup -
+02:6308 minimapPopupType_shop -
+02:630b minimapPopupType_vasuOrSyrup -
+02:6315 minimapPopupType_blackTower -
+02:631b minimapPopupType_makuTree -
+02:63d2 dungeonMap_checkDirectionButtons -
+02:63da dungeonMap_scrollingState0 -
+02:641b dungeonMap_checkCanScrollDown -
+02:6454 dungeonMap_checkCanScrollUp -
+02:6488 dungeonMap_scrollingState1 -
+02:64da dungeonMap_drawItemSprites -
+02:651f getNumSmallKeys -
+02:6529 checkLinkHasBossKey -
+02:6532 checkLinkHasCompass -
+02:653e checkLinkHasMap -
+02:654a dungeonMap_drawFloorCursor -
+02:6566 dungeonMap_drawBossSymbolForFloor -
+02:657f dungeonMap_drawLinkIcons -
+02:65c7 dungeonMap_updateCursorFlickerCounter -
+02:65d5 dungeonMap_drawCursor -
+02:65fd dungeonMap_drawArrows -
+02:6621 mapGetRoomIndexWithoutUnusedColumns -
+02:674b checkMoblinsKeepDestroyed -
+02:6750 checkAdvanceShopVisited -
+02:6756 dungeonMap_getLinkIconPosition -
+02:677c dungeonMap_drawFloorList -
+02:67d5 drawTileABtoDE -
+02:67de dungeonMap_generateScrollableTilemap -
+02:682c dungeonMap_updateScroll -
+02:6875 dungeonMap_getTileForRoom -
+02:68bb dungeonMap_checkCanViewFloor -
+02:68ce dungeonMap_checkCompassTile -
+02:68ef dungeonMap_getFloorAddress -
+02:68fa dungeonMapFloorNameTiles -
+02:6910 dungeonMapFloorListStartPositions -
+02:691e dungeonMapSymbolPositions -
+02:72fe getRingTiles -
+02:7641 runFakeReset -
+02:7a54 getIndexOfGashaSpotInRoom_body -
+02:7a88 applyRoomSpecificTileChangesAfterGfxLoad -
+02:7b04 roomTileChangesAfterLoad0a -
+02:7b14 roomTileChangesAfterLoad09 -
+02:7b30 roomTileChangesAfterLoad06 -
+02:7b43 roomTileChangesAfterLoad07 -
+02:7b83 drawCrownDungeonOpeningTiles -
+02:7bfc roomTileChangesAfterLoad00 -
+02:7c02 drawCollapsedWingDungeon -
+02:7c2f roomTileChangesAfterLoad02 -
+02:7c37 roomTileChangesAfterLoad03 -
+02:7c3d roomTileChangesAfterLoad01 -
+02:7cec roomTileChangesAfterLoad08 -
+02:7d2b roomTileChangesAfterLoad05 -
+02:7d35 readParametersForRectangleDrawing -
+02:7d3e drawRectangleToVramTiles_withParameters -
+02:7d47 drawRectangleToVramTiles -
+02:7d6c copyRectangleFromTmpGfxBuffer_paramBc -
+02:7d6e copyRectangleFromTmpGfxBuffer -
+02:7d9f copyRectangleToRoomLayoutAndCollisions -
+02:7da3 copyRectangleToRoomLayoutAndCollisions_paramDe -
+02:7dbd roomTileChangesAfterLoad04 -
+02:7dc7 checkLoadPastSignAndChestGfx -
+02:77b2 functionCaller_b02 -
+02:768a loadRememberedCompanion -
+02:76d3 checkAndSpawnMaple -
+02:77f4 stub_02_77f4 -
+02:7882 checkTileValidForEnemySpawn -
+02:7894 checkPositionValidForEnemySpawn -
+02:7959 getNextValueFromRandomBuffer -
+02:796b getCandidatePositionForEnemy -
+02:79a7 checkEnemyPlacedAtPosition -
+02:79e2 calculateRoomStateModifier -
+02:7a12 createSeaEffectsPartIfApplicable -
+08:5f86 checkObjectIsCloseToPosition_b08 -
+03:4000 init -
+03:4091 oamDmaFunction -
+03:481b generateGameTransferSecret -
+03:4836 secretFunctionCaller_body -
+03:4852 generateSecret -
+03:48c1 insertBitsIntoSecretGenerationBuffer -
+03:48e5 unpackSecret -
+03:49a4 verifyUnpackedSecretGameID -
+03:49be generateGameIDIfNeeded -
+03:4a3e runXorCipherOnSecretBuffer -
+03:4a5b getSecretBufferChecksum -
+03:4a69 shiftSecretBufferContentsToFront -
+03:4a7d andCWith3 -
+03:4ace getNumCharactersForSecretType -
+03:4b0a twinrovaCutsceneCaller -
+03:4b10 incCutsceneState -
+03:4b15 unused_incTmpcbb3 -
+03:4b1a decTmpcbb4 -
+03:4b1f setScreenShakeCounterTo255 -
+03:4b24 twinrovaCutscene_state0 -
+03:4b33 twinrovaCutscene_state1 -
+03:4b6f twinrovaCutscene_fadeinToRoom -
+03:4b81 cutscene18_body -
+03:4b91 twinrovaCutscene_state2 -
+03:4b9e twinrovaCutscene_state3 -
+03:4bb2 cutscene18_state4 -
+03:4bcd cutscene18_state5 -
+03:4c0d twinrovaCutscene_deleteAllInteractionsExceptFlames -
+03:4c29 twinrovaCutscene_loadAngryFlames -
+03:4c34 cutscene19_body -
+03:4c4c cutscene19_state4 -
+03:4c55 cutscene19_strikeFlameWithLightning -
+03:4c5b cutscene19_state5 -
+03:4c66 cutscene19_state6 -
+03:4c71 cutscene19_state7 -
+03:4c7f cutscene19_state8 -
+03:4c9b cutscene19_state9 -
+03:4cba twinrovaCutscene_createLightningStrike -
+03:4cc9 runIntro -
+03:4cf5 intro_runStage -
+03:4d03 intro_gotoTitlescreen -
+03:4d1b intro_restart -
+03:4d23 intro_gotoNextStage -
+03:4d33 intro_incState -
+03:4d38 intro_japaneseOnlyScreen -
+03:4d3c intro_capcomScreen -
+03:4d88 intro_titlescreen -
+03:4db3 intro_titlescreen_state0 -
+03:4de1 intro_titlescreen_state1 -
+03:4e08 intro_titlescreen_state2 -
+03:4e10 intro_titlescreen_state3 -
+03:4e20 runIntroCinematic -
+03:4e2a introCinematic_ridingHorse -
+03:4e44 introCinematic_ridingHorse_state0 -
+03:4ebc introCinematic_ridingHorse_state1 -
+03:4ed2 introCinematic_ridingHorse_state2 -
+03:4eed introCinematic_ridingHorse_updateScrollingGround -
+03:4f09 introCinematic_ridingHorse_state3 -
+03:4f44 introCinematic_ridingHorse_state4 -
+03:4fa7 introCinematic_ridingHorse_state5 -
+03:4fc4 introCinematic_ridingHorse_state6 -
+03:4fe3 introCinematic_ridingHorse_state7 -
+03:4ff1 introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_2 -
+03:5003 introCinematic_ridingHorse_state8 -
+03:504b introCinematic_ridingHorse_state9 -
+03:5075 introCinematic_ridingHorse_drawTempleSprites -
+03:5087 introCinematic_ridingHorse_state10 -
+03:5092 introCinematic_preTitlescreen_updateScrollingTree -
+03:50ca incIntroCinematicState -
+03:50d3 introCinematic_inTemple -
+03:50ed introCinematic_inTemple_state0 -
+03:5162 introCinematic_inTemple_state1 -
+03:5178 introCinematic_inTemple_state2 -
+03:5184 introCinematic_inTemple_state3 -
+03:51a1 introCinematic_inTemple_updateWave -
+03:51aa introCinematic_inTemple_state4 -
+03:51ba introCinematic_inTemple_state5 -
+03:51cc introCinematic_inTemple_state6 -
+03:51e8 introCinematic_inTemple_state7 -
+03:5200 introCinematic_inTemple_state8 -
+03:520d introCinematic_inTemple_state9 -
+03:5220 introCinematic_inTemple_state10 -
+03:522e flashScreen_body -
+03:525a clearFadingPalettes_body -
+03:52b9 introCinematic_preTitlescreen -
+03:52c5 introCinematic_preTitlescreen_state0 -
+03:5317 introCinematic_preTitlescreen_state1 -
+03:5345 introCinematic_preTitlescreen_updateScrollForTitle -
+03:5375 introCinematic_preTitlescreen_state2 -
+03:53a6 introCinematic_preTitlescreen_state3 -
+03:53ba introCinematic_inTemple_updateCamera -
+03:53d3 introCinematic_moveBlackBarsIn -
+03:53eb introCinematic_moveBlackBarsOut -
+03:5403 cutscene_clearObjects -
+03:540c createInteraction -
+03:5414 endgameCutsceneHandler_body -
+03:542e clearFadingPalettes2 -
+04:6dd6 getAdjustedRoomGroup -
+04:6de7 checkTilesetOverride -
+04:6e63 setPastCliffPalettesToRed -
+04:642c applyRoomSpecificTileChanges -
+04:6533 tileReplacement_group1Map58 -
+04:653d tileReplacement_group5Mapf5 -
+04:6576 tileReplacement_group4Map1b -
+04:6584 tileReplacement_group2Map7e -
+04:65a4 tileReplacement_group4Mapc9 -
+04:65b2 tileReplacement_group4Mapc7 -
+04:65cf tileReplacement_group4Map4c -
+04:65e8 tileReplacement_group4Map4e -
+04:660b tileReplacement_group4Map59 -
+04:661a tileReplacement_group4Map60 -
+04:6649 tileReplacement_group4Map52 -
+04:665d tileReplacement_group0Map38 -
+04:6665 tileReplacement_group1Map38 -
+04:6673 tileReplacement_group0Map48 -
+04:6681 tileReplacement_group5Map38 -
+04:6697 tileReplacement_group5Map25 -
+04:66a5 d6RetractingWallRectPresent -
+04:66a9 d6RetractingWallRectPast -
+04:66ad tileReplacement_group5Map43 -
+04:66d7 tileReplacement_group5Map95 -
+04:66f9 tileReplacement_group5Mapc3 -
+04:676b tileReplacement_group2Mapf7 -
+04:67c5 tileReplacement_group5Map4c -
+04:67da tileReplacement_group5Map4d -
+04:67ea tileReplacement_group5Map5c -
+04:6817 tileReplacement_group5Map5d -
+04:6844 tileReplacement_group7Map4a -
+04:6854 tileReplacement_group0Map5c -
+04:6865 tileReplacement_group0Map73 -
+04:687d tileReplacement_group0Mapac -
+04:688f tileReplacement_group0Map2c -
+04:68a3 tileReplacement_group0Map1c -
+04:68b7 tileReplacement_group0Mapba -
+04:68d1 tileReplacement_group0Mapaa -
+04:68e3 tileReplacement_group0Mapcc -
+04:68f7 tileReplacement_group0Mapbc -
+04:6909 tileReplacement_group0Mapda -
+04:691d tileReplacement_group0Mapca -
+04:692f tileReplacement_group0Map61 -
+04:6974 tileReplacement_group0Map51 -
+04:699b replaceVineTiles -
+04:69c7 setTileToWitheredVine -
+04:69d5 getVinePosition -
+04:69dd initializeVinePositions -
+04:69ee tileReplacement_group0Map54 -
+04:6a0d tileReplacement_group0Map25 -
+04:6a24 tileReplacement_group0Map3a -
+04:6a30 tileReplacement_group0Map0b -
+04:6a3c tileReplacement_group5Mapb9 -
+04:6a67 tileReplacement_group1Map27 -
+04:6aa1 tileReplacement_group5Mapc2 -
+04:6aac set4Bytes -
+04:6aad set3Bytes -
+04:6ab1 tileReplacement_group5Mape3 -
+04:6abe tileReplacement_group2Map90 -
+04:6ad9 tileReplacement_group1Map8c -
+04:6af5 tileReplacement_group2Map9e -
+04:6b0b tileReplacement_group0Mape0 -
+04:6b17 createInteraction90 -
+04:6b20 tileReplacement_group0Mape1 -
+04:6b34 tileReplacement_group0Mape2 -
+04:6b41 setTileToDoor -
+04:6b46 tileReplacement_group4Mapea -
+04:6b71 tileReplacement_group0Map98 -
+04:6b88 tileReplacement_group0Map76 -
+04:6b99 tileReplacement_group0Mapa5 -
+04:6bb5 fillRectInRoomLayout -
+04:6bcf drawRectInRoomLayout -
+04:5fef applyAllTileSubstitutions -
+04:6046 replaceBreakableTileOverPortal -
+04:6056 removeBreakableTileForTimeWarp -
+04:606a replaceBreakableTileOverLinkTimeWarpingIn -
+04:6078 replacePollutionWithWaterIfPollutionFixed -
+04:6096 replaceTiles -
+04:60b7 applyStandardTileSubstitutions -
+04:617c replaceToggleBlocks -
+04:61a1 replaceJabuTilesIfUnderwater -
+04:58e4 initializeAnimations -
+04:5906 updateAnimations -
+04:591b updateAnimationQueue -
+04:59b7 loadAnimationGfxIndex -
+04:45d0 applyWarpDest_b04 -
+04:45d7 label_04_032 -
+04:45e1 label_04_033 -
+04:4629 findWarpSourceAndDest -
+04:46b2 setWarpDestDefault -
+04:46c8 findScreenEdgeWarpSource -
+04:4742 getLinkWarpQuadrant -
+04:61d8 replaceShutterForLinkEntering -
+04:626f replaceOpenedChest -
+04:627e replaceSwitchTiles -
+04:62de applySingleTileChanges -
+04:6bf1 generateW3VramTilesAndAttributes -
+04:6c23 write4BytesToVramLayout -
+04:6c32 updateChangedTileQueue -
+04:6c89 getVramSubtileAddressOfTile -
+04:6cb3 setInterleavedTile_body -
+04:6d24 queueTileWriteAtVBlank -
+07:41d1 checkEnemyAndPartCollisions -
+07:4241 partCheckCollisions -
+07:424b enemyCheckCollisions -
+07:43f3 collisionEffect00 -
+07:43f4 collisionEffect3c -
+07:4426 collisionEffect01 -
+07:442a collisionEffect02 -
+07:442e collisionEffect03 -
+07:4432 collisionEffect04 -
+07:443c collisionEffect08 -
+07:4440 collisionEffect09 -
+07:4444 collisionEffect0a -
+07:4448 collisionEffect0b -
+07:4450 collisionEffect21 -
+07:4452 label_07_027 -
+07:4461 collisionEffect12 -
+07:4464 collisionEffect0c -
+07:4468 collisionEffect13 -
+07:446b collisionEffect0d -
+07:446f collisionEffect14 -
+07:4472 collisionEffect0e -
+07:4474 label_07_028 -
+07:4483 collisionEffect05 -
+07:4488 collisionEffect06 -
+07:448d collisionEffect07 -
+07:4492 collisionEffect18 -
+07:4495 collisionEffect0f -
+07:449a collisionEffect19 -
+07:449d collisionEffect10 -
+07:44a2 collisionEffect15 -
+07:44aa collisionEffect16 -
+07:44b2 collisionEffect17 -
+07:44ba collisionEffect1a -
+07:44bd collisionEffect11 -
+07:44c2 collisionEffect1b -
+07:44ca collisionEffect1d -
+07:44cf collisionEffect1e -
+07:44d4 collisionEffect1f -
+07:44d9 collisionEffect20 -
+07:44ee collisionEffect22 -
+07:44f1 applyDamageToBothObjects -
+07:44fb collisionEffect26 -
+07:4500 collisionEffect27 -
+07:4511 collisionEffect28 -
+07:451f collisionEffect3a -
+07:4524 collisionEffect3d -
+07:4538 collisionEffect2b -
+07:453d collisionEffect2c -
+07:4542 collisionEffect2f -
+07:4547 collisionEffect30 -
+07:454c collisionEffect1c -
+07:4551 collisionEffect2e -
+07:4584 collisionEffect23 -
+07:458d collisionEffect24 -
+07:45a5 collisionEffect25 -
+07:45b4 collisionEffect29 -
+07:4604 collisionEffect2a -
+07:461a collisionEffect2d -
+07:4620 collisionEffect31 -
+07:4625 collisionEffect32 -
+07:462a collisionEffect33 -
+07:462d label_07_033 -
+07:4633 collisionEffect34 -
+07:4643 collisionEffect35 -
+07:4649 killEnemyOrPart -
+07:4657 collisionEffect36 -
+07:4693 collisionEffect37 -
+07:46b6 collisionEffect38 -
+07:46cd collisionEffect39 -
+07:46ce collisionEffect3b -
+07:46d8 collisionEffect3e -
+07:46d9 collisionEffect3f -
+07:46da createFlamePart -
+07:46e7 createClinkInteraction -
+07:4707 applyDamageToEnemyOrPart -
+07:47df applyDamageToLink_paramE -
+07:47e0 applyDamageToLink -
+07:4000 fileManagementFunction -
+07:400a initializeFile_b07 -
+07:4059 saveFile_b07 -
+07:4085 loadFile_b07 -
+07:409e eraseFile_b07 -
+07:40b6 clearFileAtHl -
+07:40bc verifyFileCopies -
+07:40fe copyFileFromHlToDe -
+07:4110 verifyFileAtHl -
+07:4140 calculateFileChecksum -
+07:4157 getFileAddress1 -
+07:415b getFileAddress2 -
+07:4176 initializeFileVariables -
+07:41b1 initialFileVariables_standardGame -
+07:41b5 initialFileVariables_heroGame -
+07:41c9 saveVerificationString -
+07:4872 updateItems -
+07:491a updateItemsPost -
+07:492f itemCodeNilPost -
+07:4930 updateItemPost -
+0e:6b2d objectLoadMovementScript_body -
+0e:6b4c objectRunMovementScript_body -
+0c:4000 runScriptCommand -
+0c:4103 scriptCmd_none -
+0c:4105 scriptCmd_stopIfItemFlagSet -
+0c:4109 scriptCmd_stopIfRoomFlag40Set -
+0c:410d scriptCmd_stopIfRoomFlag80Set -
+0c:410f scriptFunc_checkRoomFlag -
+0c:411c scriptCmd_showPasswordScreen -
+0c:4147 scriptCmd_disableInput -
+0c:414c scriptCmd_disableMenu -
+0c:415a scriptFunc_popHlAndInc -
+0c:415e scriptCmd_enableInput -
+0c:4162 scriptCmd_enableMenu -
+0c:4168 scriptCmd_setLinkCantMoveTo91 -
+0c:416a scriptFunc_setLinkCantMove -
+0c:4170 scriptCmd_setLinkCantMoveTo00 -
+0c:4173 scriptCmd_setLinkCantMoveTo11 -
+0c:4186 scriptCmd_setState -
+0c:418a scriptFunc_setState -
+0c:4197 scriptCmd_setSubstate -
+0c:419d scriptCmd_jump -
+0c:41ba scriptCmd_spawnInteraction -
+0c:41ca scriptFunc_restoreActiveObject -
+0c:41cf scriptFunc_loadBcAndDe -
+0c:41d8 scriptFunc_initializeObject -
+0c:41e2 scriptCmd_spawnEnemy -
+0c:41f4 scriptCmd_spawnEnemyHere -
+0c:421b scriptCmd_setCoords -
+0c:422b scriptCmd_setAngle -
+0c:4232 scriptCmd_setSpeed -
+0c:4239 scriptCmd_setZSpeed -
+0c:4244 scriptCmd_checkCounter2ZeroAndReset -
+0c:424e scriptCmd_setCollideRadii -
+0c:4258 scriptCmd_writeInteractionByte -
+0c:425f scriptCmd_addinteractionByte -
+0c:426a scriptCmd_getRandomBits -
+0c:4276 scriptCmd_loadSprite -
+0c:4298 scriptCmd_turnToFaceLink -
+0c:42a8 scriptCmd_setAngleAndExtra -
+0c:42b8 scriptCmd_runGenericNpc -
+0c:42c8 scriptFunc_getTextIndex -
+0c:42d9 scriptCmd_showText -
+0c:42e4 scriptCmd_showTextDifferentForLinked -
+0c:4305 scriptCmd_waitForText -
+0c:430d scriptCmd_setCounter1 -
+0c:4310 scriptFunc_4310 -
+0c:4315 scriptCmd_cpLinkX -
+0c:432a scriptCmd_shakeScreen -
+0c:4331 scriptCmd_writeMemory -
+0c:433b scriptCmd_checkPaletteFadeDone -
+0c:4343 scriptCmd_checkCFC0Bit -
+0c:4355 scriptCmd_xorCFC0Bit -
+0c:4369 scriptCmd_jumpIfNoEnemies -
+0c:4375 scriptCmd_jumpIfC6xxSet -
+0c:4384 scriptCmd_playSound -
+0c:438d scriptCmd_updateLinkLocalRespawnPosition -
+0c:4393 scriptCmd_jumpIfLinkVariableNe -
+0c:43a9 scriptCmd_jumpIfMemoryEq -
+0c:43b8 scriptCmd_jumpIfInteractionByteEq -
+0c:43bf scriptCmd_jumpIfRoomFlagSet -
+0c:43d3 scriptCmd_orRoomFlags -
+0c:43df scriptCmd_checkSomething -
+0c:43e9 scriptCmd_showLoadedText -
+0c:43f6 scriptCmd_setTextID -
+0c:4401 scriptCmd_setMusic -
+0c:4414 scriptCmd_orMemory -
+0c:4420 scriptCmd_spawnItem -
+0c:444d scriptCmd_df -
+0c:445e scriptCmd_jumpIfSomething -
+0c:4474 scriptCmd_setLinkCantMove -
+0c:447b scriptCmd_checkCounter2Zero -
+0c:4483 scriptCmd_setTile -
+0c:448f scriptCmd_setTileHere -
+0c:4496 scriptCmd_callScript -
+0c:44a6 scriptCmd_ret -
+0c:44b3 scriptCmd_jumpIfCBA5Eq -
+0c:44be scriptCmd_jumpRandom -
+0c:44cc scriptCmd_jumpIfMemorySet -
+0c:44db scriptCmd_writeC6xx -
+0c:44e4 scriptCmd_checkCollidedWithLink_ignoreZ -
+0c:44eb scriptCmd_checkCollidedWithLink_onGround -
+0c:44f5 scriptCmd_checkAButton -
+0c:4503 scriptCmd_checkNoEnemies -
+0c:450b scriptCmd_checkFlagSet -
+0c:451f scriptCmd_checkInteractionByteEq -
+0c:452e scriptCmd_checkMemoryEq -
+0c:453f scriptCmd_checkHeartDisplayUpdated -
+0c:454f scriptCmd_checkRupeeDisplayUpdated -
+0c:4563 scriptCmd_checkNotCollidedWithLink_ignoreZ -
+0c:456d scriptCmd_createPuff -
+0c:4573 scriptCmd_jumpIfGlobalFlagSet -
+0c:4584 scriptCmd_setOrUnsetGlobalFlag -
+0c:459b scriptCmd_initNpcHitbox -
+0c:45b5 scriptCmd_moveNpcUp -
+0c:45c8 scriptCmd_moveNpcRight -
+0c:45cc scriptCmd_moveNpcDown -
+0c:45d0 scriptCmd_moveNpcLeft -
+0c:45d4 scriptCmd_delay -
+05:4000 updateSpecialObjects -
+05:40b3 updateGameKeysPressed -
+05:6364 specialObjectCode_minecart_b05 -
+05:7c66 specialObjectCode_raft_b05 -
+16:5015 parseStaticObjects -
+16:5085 loadStaticObjects_body -
+11:5e3a label_11_212 -
+11:5e58 updateParts -
+39:4b50 playSound_b39 -
+39:4015 initSound_b39 -
