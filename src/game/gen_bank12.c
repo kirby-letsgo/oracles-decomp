@@ -40,7 +40,7 @@ void runRoomSpecificCode(GB *gb) {
 void roomSpecificCode0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x58ca, 2); A = 0x0e;  // ld a,$0e
-  CALL(0x58cc, checkGlobalFlag, 0x31f3, 0x58cf);  // call $31f3
+  CALL(0x58cc, checkGlobalFlag_hook, 0x31f3, 0x58cf);  // call $31f3
   if (!(F & FZ)) { RET_TAKEN(0x58cf); return; } I(0x58cf, 2);  // ret nz
   I(0x58d0, 3); SET_HL(0xcfd0);  // ld hl,$cfd0
   I(0x58d3, 2); B = 0x10;  // ld b,$10
@@ -51,9 +51,9 @@ void roomSpecificCode0(GB *gb) {
 void roomSpecificCode1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x58d8, 2); A = 0x0f;  // ld a,$0f
-  CALL(0x58da, checkGlobalFlag, 0x31f3, 0x58dd);  // call $31f3
+  CALL(0x58da, checkGlobalFlag_hook, 0x31f3, 0x58dd);  // call $31f3
   if (!(F & FZ)) { RET_TAKEN(0x58dd); return; } I(0x58dd, 2);  // ret nz
-  CALL(0x58de, getFreeInteractionSlot, 0x3aef, 0x58e1);  // call $3aef
+  CALL(0x58de, getFreeInteractionSlot_hook, 0x3aef, 0x58e1);  // call $3aef
   if (!(F & FZ)) { RET_TAKEN(0x58e1); return; } I(0x58e1, 2);  // ret nz
   I(0x58e2, 3); mem_wr(gb, HL, 0x7d);  // ld (hl),$7d
   I(0x58e4, 2); L = 0x4b;  // ld l,$4b
@@ -68,7 +68,7 @@ void roomSpecificCode2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_58ed;
 L_58de:
-  CALL(0x58de, getFreeInteractionSlot, 0x3aef, 0x58e1);  // call $3aef
+  CALL(0x58de, getFreeInteractionSlot_hook, 0x3aef, 0x58e1);  // call $3aef
   if (!(F & FZ)) { RET_TAKEN(0x58e1); return; } I(0x58e1, 2);  // ret nz
   I(0x58e2, 3); mem_wr(gb, HL, 0x7d);  // ld (hl),$7d
   I(0x58e4, 2); L = 0x4b;  // ld l,$4b
@@ -78,7 +78,7 @@ L_58de:
   RET(0x58ec); return;  // ret
 L_58ed:
   I(0x58ed, 2); A = 0x0f;  // ld a,$0f
-  CALL(0x58ef, checkGlobalFlag, 0x31f3, 0x58f2);  // call $31f3
+  CALL(0x58ef, checkGlobalFlag_hook, 0x31f3, 0x58f2);  // call $31f3
   if ((F & FZ)) { RET_TAKEN(0x58f2); return; } I(0x58f2, 2);  // ret z
   I(0x58f3, 3); goto L_58de;  // jr $58de
 }
@@ -94,7 +94,7 @@ void roomSpecificCode3(GB *gb) {
   if (!(F & FC)) { RET_TAKEN(0x5900); return; } I(0x5900, 2);  // ret nc
   I(0x5901, 3); SET_HL(0xcc05);  // ld hl,$cc05
   I(0x5904, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 1)));  // res 1,(hl)
-  CALL(0x5906, getFreeInteractionSlot, 0x3aef, 0x5909);  // call $3aef
+  CALL(0x5906, getFreeInteractionSlot_hook, 0x3aef, 0x5909);  // call $3aef
   if (!(F & FZ)) { RET_TAKEN(0x5909); return; } I(0x5909, 2);  // ret nz
   I(0x590a, 3); mem_wr(gb, HL, 0x40);  // ld (hl),$40
   I(0x590c, 1); L = alu_inc8(gb, L);  // inc l
@@ -108,7 +108,7 @@ void roomSpecificCode3(GB *gb) {
 void roomSpecificCode7(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x5915, 2); A = 0x15;  // ld a,$15
-  CALL(0x5917, checkGlobalFlag, 0x31f3, 0x591a);  // call $31f3
+  CALL(0x5917, checkGlobalFlag_hook, 0x31f3, 0x591a);  // call $31f3
   if ((F & FZ)) { RET_TAKEN(0x591a); return; } I(0x591a, 2);  // ret z
   CALL(0x591b, getThisRoomFlags_hook, 0x197d, 0x591e);  // call $197d
   I(0x591e, 2); alu_bit(gb, 6, A);  // bit 6,a
@@ -122,7 +122,7 @@ void roomSpecificCode7(GB *gb) {
 void roomSpecificCode5(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x5927, 2); A = 0x11;  // ld a,$11
-  CALL(0x5929, checkGlobalFlag, 0x31f3, 0x592c);  // call $31f3
+  CALL(0x5929, checkGlobalFlag_hook, 0x31f3, 0x592c);  // call $31f3
   if (!(F & FZ)) { RET_TAKEN(0x592c); return; } I(0x592c, 2);  // ret nz
   I(0x592d, 2); A = 0x1f;  // ld a,$1f
   I(0x592f, 4); mem_wr(gb, 0xcc46, A);  // ld ($cc46),a
@@ -146,7 +146,7 @@ void roomSpecificCode8(GB *gb) {
   I(0x5941, 2); alu_cp(gb, 0x01);  // cp $01
   if (!(F & FZ)) { RET_TAKEN(0x5943); return; } I(0x5943, 2);  // ret nz
   I(0x5944, 2); A = 0x40;  // ld a,$40
-  CALL(0x5946, checkGlobalFlag, 0x31f3, 0x5949);  // call $31f3
+  CALL(0x5946, checkGlobalFlag_hook, 0x31f3, 0x5949);  // call $31f3
   if (!(F & FZ)) { RET_TAKEN(0x5949); return; } I(0x5949, 2);  // ret nz
   I(0x594a, 2); A = 0x35;  // ld a,$35
   I(0x594c, 4); mem_wr(gb, 0xcc46, A);  // ld ($cc46),a
@@ -157,7 +157,7 @@ void roomSpecificCode8(GB *gb) {
 void roomSpecificCode9(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x5950, 2); A = 0x14;  // ld a,$14
-  CALL(0x5952, checkGlobalFlag, 0x31f3, 0x5955);  // call $31f3
+  CALL(0x5952, checkGlobalFlag_hook, 0x31f3, 0x5955);  // call $31f3
   if ((F & FZ)) { RET_TAKEN(0x5955); return; } I(0x5955, 2);  // ret z
   I(0x5956, 2); A = 0x08;  // ld a,$08
   I(0x5958, 4); mem_wr(gb, 0xcc46, A);  // ld ($cc46),a
@@ -229,7 +229,7 @@ L_78fd:
   if ((F & FZ)) { I(0x790b, 3); goto L_793d; } I(0x790b, 2);  // jr z,$793d
   PUSH(0x790d, HL);  // push hl
   I(0x790e, 2); A = 0x30;  // ld a,$30
-  CALL(0x7910, checkGlobalFlag, 0x31f3, 0x7913);  // call $31f3
+  CALL(0x7910, checkGlobalFlag_hook, 0x31f3, 0x7913);  // call $31f3
   SET_HL(POP(0x7913));  // pop hl
   if ((F & FZ)) { I(0x7914, 3); goto L_793d; } I(0x7914, 2);  // jr z,$793d
   I(0x7916, 2); alu_bit(gb, 0, B);  // bit 0,b
@@ -462,7 +462,7 @@ void objectDataOp2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_566b:
   CALL(0x566b, continueObjectLoopIfOpDone, 0x5805, 0x566e);  // call $5805
-  CALL(0x566e, getFreeInteractionSlot, 0x3aef, 0x5671);  // call $3aef
+  CALL(0x566e, getFreeInteractionSlot_hook, 0x3aef, 0x5671);  // call $3aef
   if (!(F & FZ)) { I(0x5671, 3); skipToOpEnd_4byte(gb); return; } I(0x5671, 2);  // jr nz,$567d
   CALL(0x5673, read2Bytes, 0x580d, 0x5676);  // call $580d
   I(0x5676, 2); L = 0x4b;  // ld l,$4b
@@ -483,7 +483,7 @@ void parseObjectData(GB *gb) {
   CALL(0x55c9, generateRandomBuffer_b00, 0x3215, 0x55cc);  // call $3215
   I(0x55cc, 3); SET_HL(0x4315);  // ld hl,$4315
   I(0x55cf, 2); E = 0x15;  // ld e,$15
-  CALL(0x55d1, interBankCall, 0x008a, 0x55d4);  // call $008a
+  CALL(0x55d1, interBankCall_hook, 0x008a, 0x55d4);  // call $008a
   parseGivenObjectData_b12(gb); return;  // fallthrough
 }
 
@@ -629,7 +629,7 @@ void objectDataOp1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5653:
   CALL(0x5653, continueObjectLoopIfOpDone, 0x5805, 0x5656);  // call $5805
-  CALL(0x5656, getFreeInteractionSlot, 0x3aef, 0x5659);  // call $3aef
+  CALL(0x5656, getFreeInteractionSlot_hook, 0x3aef, 0x5659);  // call $3aef
   if (!(F & FZ)) { I(0x5659, 3); skipToOpEnd_2byte(gb); return; } I(0x5659, 2);  // jr nz,$5660
   CALL(0x565b, read2Bytes, 0x580d, 0x565e);  // call $580d
   I(0x565e, 3); goto L_5653;  // jr $5653
@@ -693,7 +693,7 @@ L_56f4:
   CALL(0x56fe, checkEnemyKilled, 0x5852, 0x5701);  // call $5852
   if (!(F & FC)) { I(0x5701, 3); goto L_572a; } I(0x5701, 2);  // jr nc,$572a
 L_5703:
-  CALL(0x5703, getFreeEnemySlot, 0x2e27, 0x5706);  // call $2e27
+  CALL(0x5703, getFreeEnemySlot_hook, 0x2e27, 0x5706);  // call $2e27
   if (!(F & FZ)) { I(0x5706, 4); parseGivenObjectData_b12(gb); return; } I(0x5706, 3);  // jp nz,$55d4
   CALL(0x5709, decEnemyCounterIfApplicable, 0x581c, 0x570c);  // call $581c
   I(0x570c, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
@@ -735,7 +735,7 @@ L_56f4:
   CALL(0x56fe, checkEnemyKilled, 0x5852, 0x5701);  // call $5852
   if (!(F & FC)) { I(0x5701, 3); goto L_572a; } I(0x5701, 2);  // jr nc,$572a
 L_5703:
-  CALL(0x5703, getFreeEnemySlot, 0x2e27, 0x5706);  // call $2e27
+  CALL(0x5703, getFreeEnemySlot_hook, 0x2e27, 0x5706);  // call $2e27
   if (!(F & FZ)) { I(0x5706, 4); parseGivenObjectData_b12(gb); return; } I(0x5706, 3);  // jp nz,$55d4
   CALL(0x5709, decEnemyCounterIfApplicable, 0x581c, 0x570c);  // call $581c
   I(0x570c, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
@@ -788,7 +788,7 @@ L_5738:
   I(0x5750, 2); SET_DE(DE + 1);  // inc de
   I(0x5751, 3); goto L_5738;  // jr $5738
 L_5753:
-  CALL(0x5753, getFreeEnemySlot, 0x2e27, 0x5756);  // call $2e27
+  CALL(0x5753, getFreeEnemySlot_hook, 0x2e27, 0x5756);  // call $2e27
   if (!(F & FZ)) { I(0x5756, 4); skipToOpEnd_4byte(gb); return; } I(0x5756, 3);  // jp nz,$567d
   CALL(0x5759, decEnemyCounterIfApplicable, 0x581c, 0x575c);  // call $581c
   CALL(0x575c, read2Bytes, 0x580d, 0x575f);  // call $580d
@@ -830,7 +830,7 @@ L_5738:
   I(0x5750, 2); SET_DE(DE + 1);  // inc de
   I(0x5751, 3); goto L_5738;  // jr $5738
 L_5753:
-  CALL(0x5753, getFreeEnemySlot, 0x2e27, 0x5756);  // call $2e27
+  CALL(0x5753, getFreeEnemySlot_hook, 0x2e27, 0x5756);  // call $2e27
   if (!(F & FZ)) { I(0x5756, 4); skipToOpEnd_4byte(gb); return; } I(0x5756, 3);  // jp nz,$567d
   CALL(0x5759, decEnemyCounterIfApplicable, 0x581c, 0x575c);  // call $581c
   CALL(0x575c, read2Bytes, 0x580d, 0x575f);  // call $580d
@@ -859,7 +859,7 @@ L_577a:
   I(0x577a, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x577b, 2); alu_bit(gb, 7, A);  // bit 7,a
   if (!(F & FZ)) { I(0x577d, 4); parseGivenObjectData_b12(gb); return; } I(0x577d, 3);  // jp nz,$55d4
-  CALL(0x5780, getFreePartSlot, 0x3e8e, 0x5783);  // call $3e8e
+  CALL(0x5780, getFreePartSlot_hook, 0x3e8e, 0x5783);  // call $3e8e
   if (!(F & FZ)) { I(0x5783, 4); goto L_5796; } I(0x5783, 3);  // jp nz,$5796
   CALL(0x5786, read2Bytes, 0x580d, 0x5789);  // call $580d
   I(0x5789, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -897,7 +897,7 @@ L_57cf:
   I(0x57e5, 2); SET_DE(DE + 1);  // inc de
   I(0x57e6, 3); goto L_57cf;  // jr $57cf
 L_57e8:
-  CALL(0x57e8, getFreeEnemySlot_uncounted, 0x2e34, 0x57eb);  // call $2e34
+  CALL(0x57e8, getFreeEnemySlot_uncounted_hook, 0x2e34, 0x57eb);  // call $2e34
   if (!(F & FZ)) { I(0x57eb, 4); skipToOpEnd_2byte(gb); return; } I(0x57eb, 3);  // jp nz,$5660
   I(0x57ee, 3); mem_wr(gb, HL, 0x59);  // ld (hl),$59
   I(0x57f0, 1); L = alu_inc8(gb, L);  // inc l
@@ -933,7 +933,7 @@ L_57cf:
   I(0x57e5, 2); SET_DE(DE + 1);  // inc de
   I(0x57e6, 3); goto L_57cf;  // jr $57cf
 L_57e8:
-  CALL(0x57e8, getFreeEnemySlot_uncounted, 0x2e34, 0x57eb);  // call $2e34
+  CALL(0x57e8, getFreeEnemySlot_uncounted_hook, 0x2e34, 0x57eb);  // call $2e34
   if (!(F & FZ)) { I(0x57eb, 4); skipToOpEnd_2byte(gb); return; } I(0x57eb, 3);  // jp nz,$5660
   I(0x57ee, 3); mem_wr(gb, HL, 0x59);  // ld (hl),$59
   I(0x57f0, 1); L = alu_inc8(gb, L);  // inc l

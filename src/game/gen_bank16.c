@@ -41,15 +41,15 @@ L_5044:
   I(0x5047, 1); E = A;  // ld e,a
   I(0x5048, 3); goto L_5018;  // jr $5018
 L_504a:
-  CALL(0x504a, getFreeInteractionSlot, 0x3aef, 0x504d);  // call $3aef
+  CALL(0x504a, getFreeInteractionSlot_hook, 0x3aef, 0x504d);  // call $3aef
   if (!(F & FZ)) { I(0x504d, 3); goto L_5044; } I(0x504d, 2);  // jr nz,$5044
   I(0x504f, 3); goto L_505d;  // jr $505d
 L_5051:
-  CALL(0x5051, getFreeEnemySlot, 0x2e27, 0x5054);  // call $2e27
+  CALL(0x5051, getFreeEnemySlot_hook, 0x2e27, 0x5054);  // call $2e27
   if (!(F & FZ)) { I(0x5054, 3); goto L_5044; } I(0x5054, 2);  // jr nz,$5044
   I(0x5056, 3); goto L_505d;  // jr $505d
 L_5058:
-  CALL(0x5058, getFreePartSlot, 0x3e8e, 0x505b);  // call $3e8e
+  CALL(0x5058, getFreePartSlot_hook, 0x3e8e, 0x505b);  // call $3e8e
   if (!(F & FZ)) { I(0x505b, 3); goto L_5044; } I(0x505b, 2);  // jr nz,$5044
 L_505d:
   I(0x505d, 1); E = alu_inc8(gb, E);  // inc e
@@ -125,15 +125,15 @@ L_5044:
   I(0x5047, 1); E = A;  // ld e,a
   I(0x5048, 3); goto L_5018;  // jr $5018
 L_504a:
-  CALL(0x504a, getFreeInteractionSlot, 0x3aef, 0x504d);  // call $3aef
+  CALL(0x504a, getFreeInteractionSlot_hook, 0x3aef, 0x504d);  // call $3aef
   if (!(F & FZ)) { I(0x504d, 3); goto L_5044; } I(0x504d, 2);  // jr nz,$5044
   I(0x504f, 3); goto L_505d;  // jr $505d
 L_5051:
-  CALL(0x5051, getFreeEnemySlot, 0x2e27, 0x5054);  // call $2e27
+  CALL(0x5051, getFreeEnemySlot_hook, 0x2e27, 0x5054);  // call $2e27
   if (!(F & FZ)) { I(0x5054, 3); goto L_5044; } I(0x5054, 2);  // jr nz,$5044
   I(0x5056, 3); goto L_505d;  // jr $505d
 L_5058:
-  CALL(0x5058, getFreePartSlot, 0x3e8e, 0x505b);  // call $3e8e
+  CALL(0x5058, getFreePartSlot_hook, 0x3e8e, 0x505b);  // call $3e8e
   if (!(F & FZ)) { I(0x505b, 3); goto L_5044; } I(0x505b, 2);  // jr nz,$5044
 L_505d:
   I(0x505d, 1); E = alu_inc8(gb, E);  // inc e
@@ -210,15 +210,15 @@ L_5044:
   I(0x5047, 1); E = A;  // ld e,a
   I(0x5048, 3); goto L_5018;  // jr $5018
 L_504a:
-  CALL(0x504a, getFreeInteractionSlot, 0x3aef, 0x504d);  // call $3aef
+  CALL(0x504a, getFreeInteractionSlot_hook, 0x3aef, 0x504d);  // call $3aef
   if (!(F & FZ)) { I(0x504d, 3); goto L_5044; } I(0x504d, 2);  // jr nz,$5044
   I(0x504f, 3); goto L_505d;  // jr $505d
 L_5051:
-  CALL(0x5051, getFreeEnemySlot, 0x2e27, 0x5054);  // call $2e27
+  CALL(0x5051, getFreeEnemySlot_hook, 0x2e27, 0x5054);  // call $2e27
   if (!(F & FZ)) { I(0x5054, 3); goto L_5044; } I(0x5054, 2);  // jr nz,$5044
   I(0x5056, 3); goto L_505d;  // jr $505d
 L_5058:
-  CALL(0x5058, getFreePartSlot, 0x3e8e, 0x505b);  // call $3e8e
+  CALL(0x5058, getFreePartSlot_hook, 0x3e8e, 0x505b);  // call $3e8e
   if (!(F & FZ)) { I(0x505b, 3); goto L_5044; } I(0x505b, 2);  // jr nz,$5044
 L_505d:
   I(0x505d, 1); E = alu_inc8(gb, E);  // inc e
@@ -295,15 +295,15 @@ L_5044:
   I(0x5047, 1); E = A;  // ld e,a
   I(0x5048, 3); goto L_5018;  // jr $5018
 L_504a:
-  CALL(0x504a, getFreeInteractionSlot, 0x3aef, 0x504d);  // call $3aef
+  CALL(0x504a, getFreeInteractionSlot_hook, 0x3aef, 0x504d);  // call $3aef
   if (!(F & FZ)) { I(0x504d, 3); goto L_5044; } I(0x504d, 2);  // jr nz,$5044
   I(0x504f, 3); goto L_505d;  // jr $505d
 L_5051:
-  CALL(0x5051, getFreeEnemySlot, 0x2e27, 0x5054);  // call $2e27
+  CALL(0x5051, getFreeEnemySlot_hook, 0x2e27, 0x5054);  // call $2e27
   if (!(F & FZ)) { I(0x5054, 3); goto L_5044; } I(0x5054, 2);  // jr nz,$5044
   I(0x5056, 3); goto L_505d;  // jr $505d
 L_5058:
-  CALL(0x5058, getFreePartSlot, 0x3e8e, 0x505b);  // call $3e8e
+  CALL(0x5058, getFreePartSlot_hook, 0x3e8e, 0x505b);  // call $3e8e
   if (!(F & FZ)) { I(0x505b, 3); goto L_5044; } I(0x505b, 2);  // jr nz,$5044
 L_505d:
   I(0x505d, 1); E = alu_inc8(gb, E);  // inc e
@@ -380,15 +380,15 @@ L_5044:
   I(0x5047, 1); E = A;  // ld e,a
   I(0x5048, 3); goto L_5018;  // jr $5018
 L_504a:
-  CALL(0x504a, getFreeInteractionSlot, 0x3aef, 0x504d);  // call $3aef
+  CALL(0x504a, getFreeInteractionSlot_hook, 0x3aef, 0x504d);  // call $3aef
   if (!(F & FZ)) { I(0x504d, 3); goto L_5044; } I(0x504d, 2);  // jr nz,$5044
   I(0x504f, 3); goto L_505d;  // jr $505d
 L_5051:
-  CALL(0x5051, getFreeEnemySlot, 0x2e27, 0x5054);  // call $2e27
+  CALL(0x5051, getFreeEnemySlot_hook, 0x2e27, 0x5054);  // call $2e27
   if (!(F & FZ)) { I(0x5054, 3); goto L_5044; } I(0x5054, 2);  // jr nz,$5044
   I(0x5056, 3); goto L_505d;  // jr $505d
 L_5058:
-  CALL(0x5058, getFreePartSlot, 0x3e8e, 0x505b);  // call $3e8e
+  CALL(0x5058, getFreePartSlot_hook, 0x3e8e, 0x505b);  // call $3e8e
   if (!(F & FZ)) { I(0x505b, 3); goto L_5044; } I(0x505b, 2);  // jr nz,$5044
 L_505d:
   I(0x505d, 1); E = alu_inc8(gb, E);  // inc e
@@ -465,15 +465,15 @@ L_5044:
   I(0x5047, 1); E = A;  // ld e,a
   I(0x5048, 3); goto L_5018;  // jr $5018
 L_504a:
-  CALL(0x504a, getFreeInteractionSlot, 0x3aef, 0x504d);  // call $3aef
+  CALL(0x504a, getFreeInteractionSlot_hook, 0x3aef, 0x504d);  // call $3aef
   if (!(F & FZ)) { I(0x504d, 3); goto L_5044; } I(0x504d, 2);  // jr nz,$5044
   I(0x504f, 3); goto L_505d;  // jr $505d
 L_5051:
-  CALL(0x5051, getFreeEnemySlot, 0x2e27, 0x5054);  // call $2e27
+  CALL(0x5051, getFreeEnemySlot_hook, 0x2e27, 0x5054);  // call $2e27
   if (!(F & FZ)) { I(0x5054, 3); goto L_5044; } I(0x5054, 2);  // jr nz,$5044
   I(0x5056, 3); goto L_505d;  // jr $505d
 L_5058:
-  CALL(0x5058, getFreePartSlot, 0x3e8e, 0x505b);  // call $3e8e
+  CALL(0x5058, getFreePartSlot_hook, 0x3e8e, 0x505b);  // call $3e8e
   if (!(F & FZ)) { I(0x505b, 3); goto L_5044; } I(0x505b, 2);  // jr nz,$5044
 L_505d:
   I(0x505d, 1); E = alu_inc8(gb, E);  // inc e
@@ -550,15 +550,15 @@ L_5044:
   I(0x5047, 1); E = A;  // ld e,a
   I(0x5048, 3); goto L_5018;  // jr $5018
 L_504a:
-  CALL(0x504a, getFreeInteractionSlot, 0x3aef, 0x504d);  // call $3aef
+  CALL(0x504a, getFreeInteractionSlot_hook, 0x3aef, 0x504d);  // call $3aef
   if (!(F & FZ)) { I(0x504d, 3); goto L_5044; } I(0x504d, 2);  // jr nz,$5044
   I(0x504f, 3); goto L_505d;  // jr $505d
 L_5051:
-  CALL(0x5051, getFreeEnemySlot, 0x2e27, 0x5054);  // call $2e27
+  CALL(0x5051, getFreeEnemySlot_hook, 0x2e27, 0x5054);  // call $2e27
   if (!(F & FZ)) { I(0x5054, 3); goto L_5044; } I(0x5054, 2);  // jr nz,$5044
   I(0x5056, 3); goto L_505d;  // jr $505d
 L_5058:
-  CALL(0x5058, getFreePartSlot, 0x3e8e, 0x505b);  // call $3e8e
+  CALL(0x5058, getFreePartSlot_hook, 0x3e8e, 0x505b);  // call $3e8e
   if (!(F & FZ)) { I(0x505b, 3); goto L_5044; } I(0x505b, 2);  // jr nz,$5044
 L_505d:
   I(0x505d, 1); E = alu_inc8(gb, E);  // inc e
@@ -635,15 +635,15 @@ L_5044:
   I(0x5047, 1); E = A;  // ld e,a
   I(0x5048, 3); goto L_5018;  // jr $5018
 L_504a:
-  CALL(0x504a, getFreeInteractionSlot, 0x3aef, 0x504d);  // call $3aef
+  CALL(0x504a, getFreeInteractionSlot_hook, 0x3aef, 0x504d);  // call $3aef
   if (!(F & FZ)) { I(0x504d, 3); goto L_5044; } I(0x504d, 2);  // jr nz,$5044
   I(0x504f, 3); goto L_505d;  // jr $505d
 L_5051:
-  CALL(0x5051, getFreeEnemySlot, 0x2e27, 0x5054);  // call $2e27
+  CALL(0x5051, getFreeEnemySlot_hook, 0x2e27, 0x5054);  // call $2e27
   if (!(F & FZ)) { I(0x5054, 3); goto L_5044; } I(0x5054, 2);  // jr nz,$5044
   I(0x5056, 3); goto L_505d;  // jr $505d
 L_5058:
-  CALL(0x5058, getFreePartSlot, 0x3e8e, 0x505b);  // call $3e8e
+  CALL(0x5058, getFreePartSlot_hook, 0x3e8e, 0x505b);  // call $3e8e
   if (!(F & FZ)) { I(0x505b, 3); goto L_5044; } I(0x505b, 2);  // jr nz,$5044
 L_505d:
   I(0x505d, 1); E = alu_inc8(gb, E);  // inc e
@@ -684,7 +684,7 @@ L_5068:
 // 16:5085
 void loadStaticObjects_body(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5085, clearStaticObjects, 0x319f, 0x5088);  // call $319f
+  CALL(0x5085, clearStaticObjects_hook, 0x319f, 0x5088);  // call $319f
   I(0x5088, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
   I(0x508b, 3); SET_HL(0x50a7);  // ld hl,$50a7
   RST_PUSH(0x508e, 0x508f);  // rst $18 (addDoubleIndexToHl)
