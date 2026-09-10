@@ -12390,3 +12390,172 @@ void _initializeThread_hook(GB *gb) {
   CYC(0x09a9, 0x09aa);
   hook_handoff(gb, 0x09aa);
 }
+
+void textThreadStart_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  A = mem_rd(gb, wScrollMode);
+  CYC(0x18a0, 0x18a3);
+  alu_or(gb, A);
+  CYC(0x18a3, 0x18a4);
+  if (F & FZ) CYCT(0x18a4, 0x18a6);
+  else {
+    CYC(0x18a4, 0x18a6);
+    alu_and(gb, 0x01);
+    CYC(0x18a6, 0x18a8);
+    if (!(F & FZ)) { CYCT(0x18a8, 0x18aa); }
+    else {
+      CYC(0x18a8, 0x18aa);
+      alu_xor(gb, A);
+      CYC(0x18aa, 0x18ab);
+      CYC(0x18ab, 0x18ae); mem_wr(gb, wTextIsActive, A);
+      CYC(0x18ae, 0x18b1); mem_wr(gb, wTextboxFlags, A);
+      CYCT(0x18b1, 0x18b4);
+      stubThreadStart_hook(gb);
+      return;
+    }
+  }
+  A = 0x3f;
+  CYC(0x18b4, 0x18b6);
+  CYC(0x18b6, 0x18b8); H8(hRomBank) = A;
+  CYC(0x18b8, 0x18bb); mem_wr(gb, MBC_ROM_BANK, A);
+  CALL_C(0x18bb, initTextbox, ROM_initTextbox, 0x18be);
+  for (;;) {
+    A = 0x3f;
+    CYC(0x18be, 0x18c0);
+    CYC(0x18c0, 0x18c2); H8(hRomBank) = A;
+    CYC(0x18c2, 0x18c5); mem_wr(gb, MBC_ROM_BANK, A);
+    CALL_C(0x18c5, updateTextbox, ROM_updateTextbox, 0x18c8);
+    CALL_C(0x18c8, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, 0x18cb);
+    CYCT(0x18cb, 0x18cd);
+  }
+}
+
+void fileSelectThreadStart_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  SET_HL(wFileSelect_mode);
+  CYC(0x1a17, 0x1a1a);
+  B = 0x10;
+  CYC(0x1a1a, 0x1a1c);
+  CALL_C(0x1a1c, clearMemory_hook, ROM_clearMemory, 0x1a1f);
+  for (;;) {
+    A = 0x02;
+    CYC(0x1a1f, 0x1a21);
+    CYC(0x1a21, 0x1a23); H8(hRomBank) = A;
+    CYC(0x1a23, 0x1a26); mem_wr(gb, MBC_ROM_BANK, A);
+    CALL_C(0x1a26, b2_fileSelectScreen, ROM_b2_fileSelectScreen, 0x1a29);
+    CALL_C(0x1a29, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, 0x1a2c);
+    CYCT(0x1a2c, 0x1a2e);
+  }
+}
+
+void thread_1b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  SET_HL(wSaveQuitMenu_state);
+  CYC(0x1b10, 0x1b13);
+  B = 0x10;
+  CYC(0x1b13, 0x1b15);
+  CALL_C(0x1b15, clearMemory_hook, ROM_clearMemory, 0x1b18);
+  A = 0x01;
+  CYC(0x1b18, 0x1b1a);
+  CYC(0x1b1a, 0x1b1d); mem_wr(gb, wSaveQuitMenu_gameOver, A);
+  for (;;) {
+    A = 0x02;
+    CYC(0x1b1d, 0x1b1f);
+    CYC(0x1b1f, 0x1b21); H8(hRomBank) = A;
+    CYC(0x1b21, 0x1b24); mem_wr(gb, MBC_ROM_BANK, A);
+    CALL_C(0x1b24, runSaveAndQuitMenu, ROM_runSaveAndQuitMenu, 0x1b27);
+    CALL_C(0x1b27, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, 0x1b2a);
+    CYCT(0x1b2a, 0x1b2c);
+  }
+}
+
+void introThreadStart_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  for (;;) {
+    SET_HL(wIntro_frameCounter);
+    CYC(0x2d07, 0x2d0a);
+    CYC(0x2d0a, 0x2d0b); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+    A = 0x03;
+    CYC(0x2d0b, 0x2d0d);
+    CYC(0x2d0d, 0x2d0f); H8(hRomBank) = A;
+    CYC(0x2d0f, 0x2d12); mem_wr(gb, MBC_ROM_BANK, A);
+    CALL_C(0x2d12, runIntro, ROM_runIntro, 0x2d15);
+    CALL_C(0x2d15, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, 0x2d18);
+    CYCT(0x2d18, 0x2d1a);
+  }
+}
+
+void paletteFadeThreadStart_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  for (;;) {
+    A = 0x02;
+    CYC(0x3384, 0x3386);
+    CYC(0x3386, 0x3388); mem_wr(gb, IO_SVBK, A);
+    A = 0x01;
+    CYC(0x3388, 0x338a);
+    CYC(0x338a, 0x338c); H8(hRomBank) = A;
+    CYC(0x338c, 0x338f); mem_wr(gb, MBC_ROM_BANK, A);
+    CALL_C(0x338f, paletteFadeHandler, ROM_paletteFadeHandler, 0x3392);
+    CALL_ROM(0x3392, ROM_checkLockBG7Color3ToBlack);
+    A = mem_rd(gb, wPaletteThread_updateRate);
+    CYC(0x3395, 0x3398);
+    alu_or(gb, A);
+    CYC(0x3398, 0x3399);
+    if (!(F & FZ)) CYCT(0x3399, 0x339b);
+    else {
+      CYC(0x3399, 0x339b);
+      A = alu_inc8(gb, A);
+      CYC(0x339b, 0x339c);
+    }
+    CALL_C(0x339c, resumeThreadInAFrames_hook, ROM_resumeThreadInAFrames, 0x339f);
+    CYCT(0x339f, 0x33a1);
+  }
+}
+
+void mainThreadStart_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x33a1, restartSound_hook, ROM_restartSound, 0x33a4);
+  CALL_C(0x33a4, stopTextThread_hook, ROM_stopTextThread, 0x33a7);
+  for (;;) {
+    SET_HL(wPlaytimeCounter);
+    CYC(0x33a7, 0x33aa);
+    CYC(0x33aa, 0x33ab); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+    A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x33ab, 0x33ac);
+    CYC(0x33ac, 0x33af); mem_wr(gb, wFrameCounter, A);
+    if (!(F & FZ)) {
+      CYCT(0x33af, 0x33b1);
+    } else {
+      CYC(0x33af, 0x33b1);
+      mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+      CYC(0x33b1, 0x33b2);
+      if (!(F & FZ)) {
+        CYCT(0x33b2, 0x33b4);
+      } else {
+        CYC(0x33b2, 0x33b4);
+        L = alu_inc8(gb, L);
+        CYC(0x33b4, 0x33b5);
+        mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+        CYC(0x33b5, 0x33b6);
+        if (!(F & FZ)) {
+          CYCT(0x33b6, 0x33b8);
+        } else {
+          CYC(0x33b6, 0x33b8);
+          L = alu_inc8(gb, L);
+          CYC(0x33b8, 0x33b9);
+          mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+          CYC(0x33b9, 0x33ba);
+        }
+      }
+    }
+    A = 0x01;
+    CYC(0x33ba, 0x33bc);
+    CYC(0x33bc, 0x33be); H8(hRomBank) = A;
+    CYC(0x33be, 0x33c1); mem_wr(gb, MBC_ROM_BANK, A);
+    CALL_C(0x33c1, runGameLogic, ROM_runGameLogic, 0x33c4);
+    CALL_C(0x33c4, drawAllSprites_hook, ROM_drawAllSprites, 0x33c7);
+    CALL_C(0x33c7, checkReloadStatusBarGraphics_hook, ROM_checkReloadStatusBarGraphics, 0x33ca);
+    CALL_C(0x33ca, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, 0x33cd);
+    CYCT(0x33cd, 0x33cf);
+  }
+}
