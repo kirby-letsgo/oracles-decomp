@@ -4,6 +4,15 @@
 
 #define IO_IF 0xff0f
 #define IO_LCDC 0xff40
+#define IO_SCY 0xff42
+#define IO_SCX 0xff43
+#define IO_LYC 0xff45
+#define IO_WY 0xff4a
+#define IO_WX 0xff4b
+#define IO_HDMA2 0xff52
+#define IO_HDMA3 0xff53
+#define IO_HDMA4 0xff54
+#define IO_HDMA5 0xff55
 #define IO_LY 0xff44
 #define IO_VBK 0xff4f
 #define IO_SVBK 0xff70
@@ -123,6 +132,12 @@
 #define ROM_lcdInterrupt 0x0b46
 #define ROM_timerInterrupt 0x0d07
 #define ROM_serialInterrupt 0x0c3d
+#define ROM_vblankFunctionsStart 0x0a8e
+#define ROM_runVBlankFunctions 0x0a71
+#define ROM_vblankFunctionRet 0x0a7e
+#define ROM_updateDirtyPalettes 0x0b07
+#define ROM_hramOamDmaFunction 0xff80
+#define ROM_b04_vblankRunBank4Function 0x45c0
 #define ROM_initialThreadStatesBase 0x08cc
 #define ROM__scriptCmd_asmRetFunc 0x25b1
 #define ROM_drawAllSprites_drawObject 0x0e71
@@ -271,6 +286,9 @@
 
 void burn_rom(GB *gb, int bank, uint16_t from, uint16_t to, bool last_taken);
 void burn_store_sp(GB *gb, uint16_t a, uint16_t addr);
+#define CALL_C_(a, fn, target, ra) do { push_effect(gb, (uint16_t)(ra)); uint16_t sp_ = gb->sp; if (hook_in_verify || !hook_enabled_at(target)) asm_call(gb, (target), (ra)); else { fn(gb); if (!(gb->pc == (uint16_t)(ra) && gb->sp == (uint16_t)(sp_ + 2))) { hook_continue(gb, gb->pc, sp0_); return; } } } while (0)
+#define CALL_C(a, fn, target, ra) do { CYC((a), (a) + 3); CALL_C_((a), fn, (target), (ra)); } while (0)
+#define CALL_C_CC(a, fn, target, ra) do { CYCT((a), (a) + 3); CALL_C_((a), fn, (target), (ra)); } while (0)
 #define CYC(from, to) burn_rom(gb, 0, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, 0, (from), (to), true)
 #define CALL_ROM_CC(a, target) do { CYCT((a), (a) + 3); push_effect(gb, (uint16_t)((a) + 3)); asm_call(gb, (target), (uint16_t)((a) + 3)); } while (0)

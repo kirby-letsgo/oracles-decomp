@@ -4830,7 +4830,7 @@ L_4004:
   if (!(F & FZ)) { I(0x4026, 3); goto L_4004; } I(0x4026, 2);  // jr nz,$4004
   I(0x4028, 1); L = C;  // ld l,c
   I(0x4029, 2); H = 0xc4;  // ld h,$c4
-  I(0x402b, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x402b, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:402e
@@ -4869,7 +4869,7 @@ L_4032:
   if (!(F & FZ)) { I(0x4054, 3); goto L_4032; } I(0x4054, 2);  // jr nz,$4032
   I(0x4056, 1); L = C;  // ld l,c
   I(0x4057, 2); H = 0xc4;  // ld h,$c4
-  I(0x4059, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x4059, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:41cc
@@ -4908,7 +4908,7 @@ L_41d0:
   if (!(F & FZ)) { I(0x41f2, 3); goto L_41d0; } I(0x41f2, 2);  // jr nz,$41d0
   I(0x41f4, 1); L = C;  // ld l,c
   I(0x41f5, 2); H = 0xc4;  // ld h,$c4
-  I(0x41f7, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x41f7, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:41fa
@@ -4947,7 +4947,7 @@ L_41fe:
   if (!(F & FZ)) { I(0x4220, 3); goto L_41fe; } I(0x4220, 2);  // jr nz,$41fe
   I(0x4222, 1); L = C;  // ld l,c
   I(0x4223, 2); H = 0xc4;  // ld h,$c4
-  I(0x4225, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x4225, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:4228
@@ -4986,7 +4986,7 @@ L_422c:
   if (!(F & FZ)) { I(0x424e, 3); goto L_422c; } I(0x424e, 2);  // jr nz,$422c
   I(0x4250, 1); L = C;  // ld l,c
   I(0x4251, 2); H = 0xc4;  // ld h,$c4
-  I(0x4253, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x4253, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:4256
@@ -5025,7 +5025,7 @@ L_425a:
   if (!(F & FZ)) { I(0x427c, 3); goto L_425a; } I(0x427c, 2);  // jr nz,$425a
   I(0x427e, 1); L = C;  // ld l,c
   I(0x427f, 2); H = 0xc4;  // ld h,$c4
-  I(0x4281, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x4281, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:4284
@@ -5064,7 +5064,7 @@ L_4288:
   if (!(F & FZ)) { I(0x42aa, 3); goto L_4288; } I(0x42aa, 2);  // jr nz,$4288
   I(0x42ac, 1); L = C;  // ld l,c
   I(0x42ad, 2); H = 0xc4;  // ld h,$c4
-  I(0x42af, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x42af, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:42b2
@@ -5103,7 +5103,7 @@ L_42b6:
   if (!(F & FZ)) { I(0x42d8, 3); goto L_42b6; } I(0x42d8, 2);  // jr nz,$42b6
   I(0x42da, 1); L = C;  // ld l,c
   I(0x42db, 2); H = 0xc4;  // ld h,$c4
-  I(0x42dd, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x42dd, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:42e0
@@ -5142,7 +5142,7 @@ L_42e4:
   if (!(F & FZ)) { I(0x4306, 3); goto L_42e4; } I(0x4306, 2);  // jr nz,$42e4
   I(0x4308, 1); L = C;  // ld l,c
   I(0x4309, 2); H = 0xc4;  // ld h,$c4
-  I(0x430b, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x430b, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:430e
@@ -5181,7 +5181,7 @@ L_4312:
   if (!(F & FZ)) { I(0x4334, 3); goto L_4312; } I(0x4334, 2);  // jr nz,$4312
   I(0x4336, 1); L = C;  // ld l,c
   I(0x4337, 2); H = 0xc4;  // ld h,$c4
-  I(0x4339, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x4339, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:433c
@@ -5220,7 +5220,7 @@ L_4340:
   if (!(F & FZ)) { I(0x4362, 3); goto L_4340; } I(0x4362, 2);  // jr nz,$4340
   I(0x4364, 1); L = C;  // ld l,c
   I(0x4365, 2); H = 0xc4;  // ld h,$c4
-  I(0x4367, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x4367, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:436a
@@ -5259,7 +5259,7 @@ L_436e:
   if (!(F & FZ)) { I(0x4390, 3); goto L_436e; } I(0x4390, 2);  // jr nz,$436e
   I(0x4392, 1); L = C;  // ld l,c
   I(0x4393, 2); H = 0xc4;  // ld h,$c4
-  I(0x4395, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x4395, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:405c
@@ -5298,7 +5298,7 @@ L_4060:
   if (!(F & FZ)) { I(0x4082, 3); goto L_4060; } I(0x4082, 2);  // jr nz,$4060
   I(0x4084, 1); L = C;  // ld l,c
   I(0x4085, 2); H = 0xc4;  // ld h,$c4
-  I(0x4087, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x4087, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:4398
@@ -5337,7 +5337,7 @@ L_439c:
   if (!(F & FZ)) { I(0x43be, 3); goto L_439c; } I(0x43be, 2);  // jr nz,$439c
   I(0x43c0, 1); L = C;  // ld l,c
   I(0x43c1, 2); H = 0xc4;  // ld h,$c4
-  I(0x43c3, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x43c3, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:43c6
@@ -5376,7 +5376,7 @@ L_43ca:
   if (!(F & FZ)) { I(0x43ec, 3); goto L_43ca; } I(0x43ec, 2);  // jr nz,$43ca
   I(0x43ee, 1); L = C;  // ld l,c
   I(0x43ef, 2); H = 0xc4;  // ld h,$c4
-  I(0x43f1, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x43f1, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:43f4
@@ -5415,7 +5415,7 @@ L_43f8:
   if (!(F & FZ)) { I(0x441a, 3); goto L_43f8; } I(0x441a, 2);  // jr nz,$43f8
   I(0x441c, 1); L = C;  // ld l,c
   I(0x441d, 2); H = 0xc4;  // ld h,$c4
-  I(0x441f, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x441f, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:4422
@@ -5454,7 +5454,7 @@ L_4426:
   if (!(F & FZ)) { I(0x4448, 3); goto L_4426; } I(0x4448, 2);  // jr nz,$4426
   I(0x444a, 1); L = C;  // ld l,c
   I(0x444b, 2); H = 0xc4;  // ld h,$c4
-  I(0x444d, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x444d, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:4450
@@ -5493,7 +5493,7 @@ L_4454:
   if (!(F & FZ)) { I(0x4476, 3); goto L_4454; } I(0x4476, 2);  // jr nz,$4454
   I(0x4478, 1); L = C;  // ld l,c
   I(0x4479, 2); H = 0xc4;  // ld h,$c4
-  I(0x447b, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x447b, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:447e
@@ -5532,7 +5532,7 @@ L_4482:
   if (!(F & FZ)) { I(0x44a4, 3); goto L_4482; } I(0x44a4, 2);  // jr nz,$4482
   I(0x44a6, 1); L = C;  // ld l,c
   I(0x44a7, 2); H = 0xc4;  // ld h,$c4
-  I(0x44a9, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x44a9, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:44ac
@@ -5571,7 +5571,7 @@ L_44b0:
   if (!(F & FZ)) { I(0x44d2, 3); goto L_44b0; } I(0x44d2, 2);  // jr nz,$44b0
   I(0x44d4, 1); L = C;  // ld l,c
   I(0x44d5, 2); H = 0xc4;  // ld h,$c4
-  I(0x44d7, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x44d7, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:44da
@@ -5610,7 +5610,7 @@ L_44de:
   if (!(F & FZ)) { I(0x4500, 3); goto L_44de; } I(0x4500, 2);  // jr nz,$44de
   I(0x4502, 1); L = C;  // ld l,c
   I(0x4503, 2); H = 0xc4;  // ld h,$c4
-  I(0x4505, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x4505, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:4508
@@ -5649,7 +5649,7 @@ L_450c:
   if (!(F & FZ)) { I(0x452e, 3); goto L_450c; } I(0x452e, 2);  // jr nz,$450c
   I(0x4530, 1); L = C;  // ld l,c
   I(0x4531, 2); H = 0xc4;  // ld h,$c4
-  I(0x4533, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x4533, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:4536
@@ -5688,7 +5688,7 @@ L_453a:
   if (!(F & FZ)) { I(0x455c, 3); goto L_453a; } I(0x455c, 2);  // jr nz,$453a
   I(0x455e, 1); L = C;  // ld l,c
   I(0x455f, 2); H = 0xc4;  // ld h,$c4
-  I(0x4561, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x4561, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:408a
@@ -5727,7 +5727,7 @@ L_408e:
   if (!(F & FZ)) { I(0x40b0, 3); goto L_408e; } I(0x40b0, 2);  // jr nz,$408e
   I(0x40b2, 1); L = C;  // ld l,c
   I(0x40b3, 2); H = 0xc4;  // ld h,$c4
-  I(0x40b5, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x40b5, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:4564
@@ -5766,7 +5766,7 @@ L_4568:
   if (!(F & FZ)) { I(0x458a, 3); goto L_4568; } I(0x458a, 2);  // jr nz,$4568
   I(0x458c, 1); L = C;  // ld l,c
   I(0x458d, 2); H = 0xc4;  // ld h,$c4
-  I(0x458f, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x458f, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:4592
@@ -5805,7 +5805,7 @@ L_4596:
   if (!(F & FZ)) { I(0x45b8, 3); goto L_4596; } I(0x45b8, 2);  // jr nz,$4596
   I(0x45ba, 1); L = C;  // ld l,c
   I(0x45bb, 2); H = 0xc4;  // ld h,$c4
-  I(0x45bd, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x45bd, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:40b8
@@ -5844,7 +5844,7 @@ L_40bc:
   if (!(F & FZ)) { I(0x40de, 3); goto L_40bc; } I(0x40de, 2);  // jr nz,$40bc
   I(0x40e0, 1); L = C;  // ld l,c
   I(0x40e1, 2); H = 0xc4;  // ld h,$c4
-  I(0x40e3, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x40e3, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:40e6
@@ -5883,7 +5883,7 @@ L_40ea:
   if (!(F & FZ)) { I(0x410c, 3); goto L_40ea; } I(0x410c, 2);  // jr nz,$40ea
   I(0x410e, 1); L = C;  // ld l,c
   I(0x410f, 2); H = 0xc4;  // ld h,$c4
-  I(0x4111, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x4111, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:4114
@@ -5922,7 +5922,7 @@ L_4118:
   if (!(F & FZ)) { I(0x413a, 3); goto L_4118; } I(0x413a, 2);  // jr nz,$4118
   I(0x413c, 1); L = C;  // ld l,c
   I(0x413d, 2); H = 0xc4;  // ld h,$c4
-  I(0x413f, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x413f, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:4142
@@ -5961,7 +5961,7 @@ L_4146:
   if (!(F & FZ)) { I(0x4168, 3); goto L_4146; } I(0x4168, 2);  // jr nz,$4146
   I(0x416a, 1); L = C;  // ld l,c
   I(0x416b, 2); H = 0xc4;  // ld h,$c4
-  I(0x416d, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x416d, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:4170
@@ -6000,7 +6000,7 @@ L_4174:
   if (!(F & FZ)) { I(0x4196, 3); goto L_4174; } I(0x4196, 2);  // jr nz,$4174
   I(0x4198, 1); L = C;  // ld l,c
   I(0x4199, 2); H = 0xc4;  // ld h,$c4
-  I(0x419b, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x419b, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:419e
@@ -6039,7 +6039,7 @@ L_41a2:
   if (!(F & FZ)) { I(0x41c4, 3); goto L_41a2; } I(0x41c4, 2);  // jr nz,$41a2
   I(0x41c6, 1); L = C;  // ld l,c
   I(0x41c7, 2); H = 0xc4;  // ld h,$c4
-  I(0x41c9, 4); vblankFunctionRet(gb); return;  // jp $0a7e
+  I(0x41c9, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:4732

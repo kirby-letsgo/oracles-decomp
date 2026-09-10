@@ -11309,7 +11309,7 @@ void enemyStandardUpdate_hook(GB *gb) {
 }
 
 void timerInterrupt_hook(GB *gb);
-void serialInterrupt_hook(GB *gb);
+void serialInterrupt_hook(GB *gb);void vblankInterrupt_hook(GB *gb);
 void resumeThreadInAFrames_hook(GB *gb);
 static void thread_state_flag(GB *gb, uint16_t a, bool set) {
   CYC(a, a + 1); push_effect(gb, HL);
@@ -11652,7 +11652,7 @@ void vblankVector_hook(GB *gb) {
   CYC(0x0042, 0x0043); push_effect(gb, DE);
   CYC(0x0043, 0x0044); push_effect(gb, HL);
   CYC(0x0044, 0x0047);
-  vblankInterrupt(gb);
+  vblankInterrupt_hook(gb);
 }
 
 void lcdVector_hook(GB *gb) {
@@ -11677,4 +11677,247 @@ void serialVector_hook(GB *gb) {
   CYC(0x0058, 0x0059); push_effect(gb, AF);
   CYC(0x0059, 0x005c);
   serialInterrupt_hook(gb);
+}
+
+void vblankFunctionRet_hook(GB *gb);
+
+static void vblank_queue_dispatch(GB *gb, uint16_t sp0) {
+  CYC(0x0a74, 0x0a75); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0a75, 0x0a76); push_effect(gb, HL);
+  C = A;
+  B = 0x00;
+  SET_HL(ROM_vblankFunctionsStart);
+  CYC(0x0a76, 0x0a7c);
+  alu_add_hl(gb, BC);
+  CYC(0x0a7c, 0x0a7d);
+  CYC(0x0a7d, 0x0a7e);
+  hook_continue(gb, HL, sp0);
+}
+
+void runVBlankFunctions_hook(GB *gb) {
+  uint16_t sp0 = gb->sp;
+  SET_HL(wVBlankFunctionQueue);
+  CYC(0x0a71, 0x0a74);
+  vblank_queue_dispatch(gb, sp0);
+}
+
+void vblankFunctionRet_hook(GB *gb) {
+  uint16_t sp0 = gb->sp;
+  CYC(0x0a7e, 0x0a80); A = H8(hVBlankFunctionQueueTail);
+  alu_cp(gb, L);
+  CYC(0x0a80, 0x0a81);
+  if (!(F & FZ)) { CYCT(0x0a81, 0x0a83); vblank_queue_dispatch(gb, sp0); return; }
+  CYC(0x0a81, 0x0a83);
+  alu_xor(gb, A);
+  CYC(0x0a83, 0x0a84);
+  CYC(0x0a84, 0x0a86); H8(hVBlankFunctionQueueTail) = A;
+  CYC(0x0a86, 0x0a87);
+  ret_effect(gb);
+}
+
+static void vblank_copy_block(GB *gb, uint16_t a) {
+  CYC(a, a + 1); SET_HL(pop_effect(gb));
+  CYC(a + 1, a + 2); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(a + 2, a + 4); mem_wr(gb, IO_VBK, A);
+  CYC(a + 4, a + 5); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  E = A;
+  CYC(a + 5, a + 6);
+  CYC(a + 6, a + 7); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  D = A;
+  CYC(a + 7, a + 8);
+  CYC(a + 8, a + 9); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  B = A;
+  CYC(a + 9, a + 10);
+  for (;;) {
+    CYC(a + 10, a + 11); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(a + 11, a + 12); mem_wr(gb, DE, A);
+    SET_DE(DE + 1);
+    CYC(a + 12, a + 13);
+    B = alu_dec8(gb, B);
+    CYC(a + 13, a + 14);
+    if (!(F & FZ)) { CYCT(a + 14, a + 16); continue; }
+    CYC(a + 14, a + 16);
+    break;
+  }
+  CYCT(a + 16, a + 18);
+  vblankFunctionRet_hook(gb);
+}
+
+void vblankFunctionsStart_hook(GB *gb) { vblank_copy_block(gb, 0x0a8e); }
+void vblankFunction0ad9_hook(GB *gb) { vblank_copy_block(gb, 0x0ad9); }
+
+void vblankRunBank4Function_hook(GB *gb) {
+  A = 0x04;
+  CYC(0x0aa0, 0x0aa2);
+  CYC(0x0aa2, 0x0aa5); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(0x0aa5, 0x0aa8);
+  vblankRunBank4Function_b04(gb);
+}
+
+void vblankFunction0aa8_hook(GB *gb) {
+  uint16_t sp0 = gb->sp;
+  CYC(0x0aa8, 0x0aa9); SET_HL(pop_effect(gb));
+  CYC(0x0aa9, 0x0aaa); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  C = A;
+  CYC(0x0aaa, 0x0aab);
+  CYC(0x0aab, 0x0aac); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0aac, 0x0aad); push_effect(gb, HL);
+  L = C;
+  H = A;
+  SET_BC(0x0ab4);
+  CYC(0x0aad, 0x0ab2);
+  CYC(0x0ab2, 0x0ab3); push_effect(gb, BC);
+  CYC(0x0ab3, 0x0ab4);
+  hook_continue(gb, HL, sp0);
+}
+
+static void vblank_write4_bytes(GB *gb) {
+  CYC(0x0acc, 0x0acd); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0acd, 0x0ace); mem_wr(gb, DE, A);
+  E = alu_inc8(gb, E);
+  CYC(0x0ace, 0x0acf);
+  CYC(0x0acf, 0x0ad0); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0ad0, 0x0ad1); mem_wr(gb, DE, A);
+  CYC(0x0ad1, 0x0ad2); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  E = A;
+  CYC(0x0ad2, 0x0ad3);
+  CYC(0x0ad3, 0x0ad4); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0ad4, 0x0ad5); mem_wr(gb, DE, A);
+  E = alu_inc8(gb, E);
+  CYC(0x0ad5, 0x0ad6);
+  CYC(0x0ad6, 0x0ad7); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0ad7, 0x0ad8); mem_wr(gb, DE, A);
+  CYC(0x0ad8, 0x0ad9);
+  ret_effect(gb);
+}
+
+void vblankCopyTileFunction_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x0ab7, 0x0ab8); SET_HL(pop_effect(gb));
+  SET_DE(ROM_vblankFunctionRet);
+  CYC(0x0ab8, 0x0abb);
+  CYC(0x0abb, 0x0abc); push_effect(gb, DE);
+  alu_xor(gb, A);
+  CYC(0x0abc, 0x0abd);
+  CYC(0x0abd, 0x0abf); mem_wr(gb, IO_VBK, A);
+  CYC(0x0abf, 0x0ac0); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  E = A;
+  CYC(0x0ac0, 0x0ac1);
+  CYC(0x0ac1, 0x0ac2); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  D = A;
+  CYC(0x0ac2, 0x0ac3);
+  C = E;
+  CYC(0x0ac3, 0x0ac4);
+  CYC(0x0ac4, 0x0ac7); push_effect(gb, 0x0ac7);
+  vblank_write4_bytes(gb);
+  E = C;
+  CYC(0x0ac7, 0x0ac8);
+  A = 0x01;
+  CYC(0x0ac8, 0x0aca);
+  CYC(0x0aca, 0x0acc); mem_wr(gb, IO_VBK, A);
+  vblank_write4_bytes(gb);
+}
+
+void vblankDmaFunction_hook(GB *gb) {
+  CYC(0x0aeb, 0x0aec); SET_HL(pop_effect(gb));
+  CYC(0x0aec, 0x0aed); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0aed, 0x0aef); mem_wr(gb, IO_SVBK, A);
+  CYC(0x0aef, 0x0af2); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(0x0af2, 0x0af3); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0af3, 0x0af5); mem_wr(gb, IO_HDMA1, A);
+  CYC(0x0af5, 0x0af6); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0af6, 0x0af8); mem_wr(gb, IO_HDMA2, A);
+  CYC(0x0af8, 0x0af9); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0af9, 0x0afb); mem_wr(gb, IO_VBK, A);
+  CYC(0x0afb, 0x0afc); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0afc, 0x0afe); mem_wr(gb, IO_HDMA3, A);
+  CYC(0x0afe, 0x0aff); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0aff, 0x0b01); mem_wr(gb, IO_HDMA4, A);
+  CYC(0x0b01, 0x0b02); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0b02, 0x0b04); mem_wr(gb, IO_HDMA5, A);
+  CYC(0x0b04, 0x0b07);
+  vblankFunctionRet_hook(gb);
+}
+
+void vblankInterrupt_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x09f8, 0x09fa); A = H8(hNextLcdInterruptBehaviour);
+  CYC(0x09fa, 0x09fc); H8(hLcdInterruptBehaviour) = A;
+  alu_xor(gb, A);
+  CYC(0x09fc, 0x09fd);
+  CYC(0x09fd, 0x09ff); H8(hLcdInterruptCounter) = A;
+  SET_HL(hFFB7);
+  CYC(0x09ff, 0x0a02);
+  CYC(0x0a02, 0x0a04); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x80));
+  SET_HL(wGfxRegsFinal);
+  CYC(0x0a04, 0x0a07);
+  static const uint16_t regs[] = {IO_LCDC, IO_SCY, IO_SCX, IO_WY, IO_WX, IO_LYC};
+  uint16_t a = 0x0a07;
+  for (int i = 0; i < 6; i++) {
+    CYC(a, a + 1); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(a + 1, a + 3); mem_wr(gb, regs[i], A);
+    a += 3;
+  }
+  CYC(0x0a19, 0x0a1a); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) CYCT(0x0a1a, 0x0a1c);
+  else {
+    CYC(0x0a1a, 0x0a1c);
+    SET_DE(wGfxRegs2);
+    CYC(0x0a1c, 0x0a1f);
+    L = wGfxRegs3 & 0xff;
+    CYC(0x0a1f, 0x0a21);
+    for (int i = 0; i < 6; i++) {
+      uint16_t b = (uint16_t)(0x0a21 + i * 3);
+      CYC(b, b + 1); A = mem_rd(gb, DE);
+      CYC(b + 1, b + 2); mem_wr(gb, HL, A); SET_HL(HL + 1);
+      if (i < 5) { E = alu_inc8(gb, E); CYC(b + 2, b + 3); }
+    }
+    CYC(0x0a32, 0x0a34); A = mem_rd(gb, IO_VBK);
+    B = A;
+    CYC(0x0a34, 0x0a35);
+    CYC(0x0a35, 0x0a37); A = mem_rd(gb, IO_SVBK);
+    C = A;
+    CYC(0x0a37, 0x0a38);
+    CYC(0x0a38, 0x0a39); push_effect(gb, BC);
+    CYC(0x0a39, 0x0a3b); A = H8(hVBlankFunctionQueueTail);
+    alu_or(gb, A);
+    CYC(0x0a3b, 0x0a3c);
+    if (!(F & FZ)) CALL_C_CC(0x0a3c, runVBlankFunctions_hook, ROM_runVBlankFunctions, 0x0a3f);
+    else CYC(0x0a3c, 0x0a3f);
+    CALL_C(0x0a3f, updateDirtyPalettes_hook, ROM_updateDirtyPalettes, 0x0a42);
+    CYC(0x0a42, 0x0a43); gb->ime = false; gb->ime_delay = false; gb->ime_writes++;
+    CALL_C(0x0a43, hramOamDmaFunction, ROM_hramOamDmaFunction, 0x0a46);
+    CYC(0x0a46, 0x0a47); SET_BC(pop_effect(gb));
+    A = C;
+    CYC(0x0a47, 0x0a48);
+    CYC(0x0a48, 0x0a4a); mem_wr(gb, IO_SVBK, A);
+    A = B;
+    CYC(0x0a4a, 0x0a4b);
+    CYC(0x0a4b, 0x0a4d); mem_wr(gb, IO_VBK, A);
+    SET_HL(wGfxRegs6_LCDC);
+    CYC(0x0a4d, 0x0a50);
+    static const uint16_t final[] = {wGfxRegs7_LCDC, wGfxRegs7_SCY, wGfxRegs7_SCX};
+    for (int i = 0; i < 3; i++) {
+      uint16_t b = (uint16_t)(0x0a50 + i * 4);
+      CYC(b, b + 1); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b + 1, b + 4); mem_wr(gb, final[i], A);
+    }
+  }
+  SET_HL(hFFB7);
+  CYC(0x0a5c, 0x0a5f);
+  CYC(0x0a5f, 0x0a61); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & 0x7f));
+  CYC(0x0a61, 0x0a63); A = H8(hRomBank);
+  CYC(0x0a63, 0x0a65); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (F & FZ) CYCT(0x0a65, 0x0a67);
+  else {
+    CYC(0x0a65, 0x0a67);
+    CYC(0x0a67, 0x0a69); A = H8(hSoundDataBaseBank2);
+  }
+  CYC(0x0a69, 0x0a6c); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(0x0a6c, 0x0a6d); SET_HL(pop_effect(gb));
+  CYC(0x0a6d, 0x0a6e); SET_DE(pop_effect(gb));
+  CYC(0x0a6e, 0x0a6f); SET_BC(pop_effect(gb));
+  CYC(0x0a6f, 0x0a70); SET_AF(pop_effect(gb));
+  CYC(0x0a70, 0x0a71);
+  reti_effect(gb);
 }

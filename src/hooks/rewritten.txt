@@ -588,3 +588,12 @@ vblankVector
 lcdVector
 timerVector
 serialVector
+vblankInterrupt
+runVBlankFunctions
+vblankFunctionRet
+vblankFunctionsStart
+vblankRunBank4Function
+vblankFunction0aa8
+vblankCopyTileFunction
+vblankFunction0ad9
+vblankDmaFunction
