@@ -14,6 +14,7 @@
 #define IO_HDMA4 0xff54
 #define IO_HDMA5 0xff55
 #define IO_LY 0xff44
+#define IO_STAT 0xff41
 #define IO_VBK 0xff4f
 #define IO_SVBK 0xff70
 #define IO_IE 0xffff
@@ -134,6 +135,11 @@
 #define ROM_serialInterrupt 0x0c3d
 #define ROM_vblankFunctionsStart 0x0a8e
 #define ROM_runVBlankFunctions 0x0a71
+#define ROM_lcdInterrupt_clearLYC 0x0be2
+#define ROM_lcdInterrupt_setLcdcToA7 0x0bab
+#define ROM_lcdInterrupt_clearWXY 0x0bdc
+#define ROM_lcdInterrupt_ringMenu 0x0bb6
+#define ROM_lcdInterrupt_0bea 0x0bea
 #define ROM_vblankFunctionRet 0x0a7e
 #define ROM_updateDirtyPalettes 0x0b07
 #define ROM_hramOamDmaFunction 0xff80

@@ -11310,6 +11310,7 @@ void enemyStandardUpdate_hook(GB *gb) {
 
 void timerInterrupt_hook(GB *gb);
 void serialInterrupt_hook(GB *gb);void vblankInterrupt_hook(GB *gb);
+void lcdInterrupt_hook(GB *gb);
 void resumeThreadInAFrames_hook(GB *gb);
 static void thread_state_flag(GB *gb, uint16_t a, bool set) {
   CYC(a, a + 1); push_effect(gb, HL);
@@ -11659,7 +11660,7 @@ void lcdVector_hook(GB *gb) {
   CYC(0x0048, 0x0049); push_effect(gb, AF);
   CYC(0x0049, 0x004a); push_effect(gb, HL);
   CYC(0x004a, 0x004d);
-  lcdInterrupt(gb);
+  lcdInterrupt_hook(gb);
 }
 
 void timerVector_hook(GB *gb) {
@@ -11920,4 +11921,204 @@ void vblankInterrupt_hook(GB *gb) {
   CYC(0x0a6f, 0x0a70); SET_AF(pop_effect(gb));
   CYC(0x0a70, 0x0a71);
   reti_effect(gb);
+}
+
+void _lcdInterruptEnd_hook(GB *gb) {
+  CYC(0x0be6, 0x0be7); SET_BC(pop_effect(gb));
+  CYC(0x0be7, 0x0be8); SET_HL(pop_effect(gb));
+  CYC(0x0be8, 0x0be9); SET_AF(pop_effect(gb));
+  CYC(0x0be9, 0x0bea);
+  reti_effect(gb);
+}
+
+void lcdInterrupt_clearLYC_hook(GB *gb) {
+  A = 0xc7;
+  CYC(0x0be2, 0x0be4); mem_wr(gb, IO_LYC, A);
+  CYC(0x0be4, 0x0be6);
+  _lcdInterruptEnd_hook(gb);
+}
+
+void lcdInterrupt_clearWXY_hook(GB *gb) {
+  A = 0xc7;
+  CYC(0x0bdc, 0x0bde); mem_wr(gb, IO_WY, A);
+  CYC(0x0bde, 0x0be0); mem_wr(gb, IO_WX, A);
+  CYC(0x0be0, 0x0be2);
+  lcdInterrupt_clearLYC_hook(gb);
+}
+
+void lcdInterrupt_setLcdcToA7_hook(GB *gb) {
+  for (;;) {
+    CYC(0x0bab, 0x0bad); A = mem_rd(gb, IO_STAT);
+    CYC(0x0bad, 0x0bae); alu_and(gb, C);
+    if (!(F & FZ)) { CYCT(0x0bae, 0x0bb0); continue; }
+    CYC(0x0bae, 0x0bb0);
+    break;
+  }
+  A = 0xa7;
+  CYC(0x0bb0, 0x0bb2);
+  CYC(0x0bb2, 0x0bb4); mem_wr(gb, IO_LCDC, A);
+  CYCT(0x0bb4, 0x0bb6);
+  lcdInterrupt_clearLYC_hook(gb);
+}
+
+void lcdInterrupt_ringMenu_hook(GB *gb) {
+  for (;;) {
+    CYC(0x0bb6, 0x0bb8); A = mem_rd(gb, IO_STAT);
+    CYC(0x0bb8, 0x0bb9); alu_and(gb, C);
+    if (!(F & FZ)) { CYCT(0x0bb9, 0x0bbb); continue; }
+    CYC(0x0bb9, 0x0bbb);
+    break;
+  }
+  CYC(0x0bbb, 0x0bbd); mem_wr(gb, IO_SCX, A);
+  A = 0x87;
+  CYC(0x0bbd, 0x0bbf);
+  CYC(0x0bbf, 0x0bc1); mem_wr(gb, IO_LCDC, A);
+  CYC(0x0bc1, 0x0bc3); A = H8(hLcdInterruptCounter);
+  A = alu_dec8(gb, A);
+  CYC(0x0bc3, 0x0bc4);
+  if (!(F & FZ)) {
+    CYCT(0x0bc4, 0x0bc6);
+  } else {
+    CYC(0x0bc4, 0x0bc6);
+    A = mem_rd(gb, wRingMenu_mode);
+    CYC(0x0bc6, 0x0bc9);
+    alu_or(gb, A);
+    CYC(0x0bc9, 0x0bca);
+    if (F & FZ) CYCT(0x0bca, 0x0bcc);
+    else {
+      CYC(0x0bca, 0x0bcc);
+      A = 0x87;
+      CYC(0x0bcc, 0x0bce);
+      CYC(0x0bce, 0x0bd0); mem_wr(gb, IO_LYC, A);
+    }
+    A = 0x02;
+    CYC(0x0bd0, 0x0bd2);
+    CYC(0x0bd2, 0x0bd4); H8(hLcdInterruptCounter) = A;
+    CYCT(0x0bd4, 0x0bd6);
+    _lcdInterruptEnd_hook(gb);
+    return;
+  }
+  A = 0x80;
+  CYC(0x0bd6, 0x0bd8);
+  CYC(0x0bd8, 0x0bda); mem_wr(gb, IO_SCY, A);
+  CYCT(0x0bda, 0x0bdc);
+  lcdInterrupt_clearWXY_hook(gb);
+}
+
+void lcdInterrupt_0bea_hook(GB *gb) {
+  for (;;) {
+    CYC(0x0bea, 0x0bec); A = mem_rd(gb, IO_STAT);
+    CYC(0x0bec, 0x0bed); alu_and(gb, C);
+    if (!(F & FZ)) { CYCT(0x0bed, 0x0bef); continue; }
+    CYC(0x0bed, 0x0bef);
+    break;
+  }
+  SET_HL(0xc4a5);
+  CYC(0x0bef, 0x0bf2);
+  A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0bf2, 0x0bf3);
+  CYC(0x0bf3, 0x0bf5); mem_wr(gb, IO_LCDC, A);
+  A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0bf5, 0x0bf6);
+  CYC(0x0bf6, 0x0bf8); mem_wr(gb, IO_SCY, A);
+  A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0bf8, 0x0bf9);
+  CYC(0x0bf9, 0x0bfb); mem_wr(gb, IO_SCX, A);
+  CYCT(0x0bfb, 0x0bfd);
+  lcdInterrupt_clearLYC_hook(gb);
+}
+
+static void lcd_interrupt_not_status_bar(GB *gb) {
+  A = H8(hLcdInterruptBehaviour);
+  CYC(0x0b96, 0x0b98);
+  alu_cp(gb, 0x07);
+  CYC(0x0b98, 0x0b9a);
+  if (!(F & FC)) { CYCT(0x0b9a, 0x0b9c); lcdInterrupt_clearLYC_hook(gb); return; }
+  CYC(0x0b9a, 0x0b9c);
+  CYC(0x0b9c, 0x0b9d);
+  push_effect(gb, 0x0b9d);
+  uint16_t target = rst_jump_table(gb);
+  if (target == ROM_lcdInterrupt_clearLYC) lcdInterrupt_clearLYC_hook(gb);
+  else if (target == ROM_lcdInterrupt_setLcdcToA7) lcdInterrupt_setLcdcToA7_hook(gb);
+  else if (target == ROM_lcdInterrupt_clearWXY) lcdInterrupt_clearWXY_hook(gb);
+  else if (target == ROM_lcdInterrupt_ringMenu) lcdInterrupt_ringMenu_hook(gb);
+  else if (target == ROM_lcdInterrupt_0bea) lcdInterrupt_0bea_hook(gb);
+  else hook_handoff(gb, target);
+}
+
+void lcdInterrupt_hook(GB *gb) {
+  A = H8(hLcdInterruptBehaviour);
+  CYC(0x0b46, 0x0b48);
+  alu_cp(gb, 0x02);
+  CYC(0x0b48, 0x0b4a);
+  if (F & FC) {
+    CYC(0x0b4a, 0x0b4c);
+    alu_or(gb, A);
+    A = mem_rd(gb, IO_LY);
+    CYC(0x0b4c, 0x0b4f);
+    L = A;
+    H = wBigBuffer >> 8;
+    CYC(0x0b4f, 0x0b52);
+    A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x0b52, 0x0b53);
+    if (F & FZ) {
+      CYC(0x0b53, 0x0b55);
+      CYC(0x0b55, 0x0b57); mem_wr(gb, IO_SCX, A);
+      CYCT(0x0b57, 0x0b59);
+    } else {
+      CYCT(0x0b53, 0x0b55);
+      CYC(0x0b59, 0x0b5b); mem_wr(gb, IO_SCY, A);
+    }
+    A = L;
+    CYC(0x0b5b, 0x0b5c);
+    alu_cp(gb, 0x90);
+    CYC(0x0b5c, 0x0b5e);
+    if (F & FC) { CYC(0x0b5e, 0x0b60); CYC(0x0b60, 0x0b62); mem_wr(gb, IO_LYC, A); }
+    else { CYCT(0x0b5e, 0x0b60); }
+    CYC(0x0b62, 0x0b63); SET_HL(pop_effect(gb));
+    CYC(0x0b63, 0x0b64); SET_AF(pop_effect(gb));
+    CYC(0x0b64, 0x0b65);
+    reti_effect(gb);
+    return;
+  }
+  CYCT(0x0b4a, 0x0b4c);
+  CYC(0x0b65, 0x0b66); push_effect(gb, BC);
+  C = 0x03;
+  CYC(0x0b66, 0x0b68);
+  CYC(0x0b68, 0x0b6a); A = H8(hLcdInterruptCounter);
+  alu_or(gb, A);
+  CYC(0x0b6a, 0x0b6b);
+  if (!(F & FZ)) { CYCT(0x0b6b, 0x0b6d); lcd_interrupt_not_status_bar(gb); return; }
+  CYC(0x0b6b, 0x0b6d);
+  SET_HL(wGfxRegs3);
+  CYC(0x0b6d, 0x0b70);
+  for (;;) {
+    CYC(0x0b70, 0x0b72); A = mem_rd(gb, IO_STAT);
+    CYC(0x0b72, 0x0b73); alu_and(gb, C);
+    if (!(F & FZ)) { CYCT(0x0b73, 0x0b75); continue; }
+    CYC(0x0b73, 0x0b75);
+    break;
+  }
+  static const uint16_t regs[] = {IO_LCDC, IO_SCY, IO_SCX, IO_WY, IO_WX, IO_LYC};
+  uint16_t a = 0x0b75;
+  for (int i = 0; i < 6; i++) {
+    CYC(a, a + 1); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(a + 1, a + 3); mem_wr(gb, regs[i], A);
+    a += 3;
+  }
+  CYC(0x0b87, 0x0b89); A = H8(hLcdInterruptBehaviour);
+  alu_cp(gb, 0x02);
+  CYC(0x0b89, 0x0b8b);
+  if (!(F & FZ)) CYCT(0x0b8b, 0x0b8d);
+  else {
+    CYC(0x0b8b, 0x0b8d);
+    alu_xor(gb, A);
+    CYC(0x0b8d, 0x0b8e);
+    CYC(0x0b8e, 0x0b90); H8(hLcdInterruptBehaviour) = A;
+  }
+  A = 0x01;
+  CYC(0x0b90, 0x0b92);
+  CYC(0x0b92, 0x0b94); H8(hLcdInterruptCounter) = A;
+  CYCT(0x0b94, 0x0b96);
+  _lcdInterruptEnd_hook(gb);
 }

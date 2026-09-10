@@ -597,3 +597,10 @@ vblankFunction0aa8
 vblankCopyTileFunction
 vblankFunction0ad9
 vblankDmaFunction
+lcdInterrupt
+lcdInterrupt_setLcdcToA7
+lcdInterrupt_ringMenu
+lcdInterrupt_clearWXY
+lcdInterrupt_clearLYC
+_lcdInterruptEnd
+lcdInterrupt_0bea
