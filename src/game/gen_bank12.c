@@ -90,7 +90,7 @@ void roomSpecificCode3(GB *gb) {
   I(0x58f8, 2); alu_bit(gb, 6, A);  // bit 6,a
   if (!(F & FZ)) { RET_TAKEN(0x58fa); return; } I(0x58fa, 2);  // ret nz
   I(0x58fb, 2); A = 0x24;  // ld a,$24
-  CALL(0x58fd, checkTreasureObtained, 0x1748, 0x5900);  // call $1748
+  CALL(0x58fd, checkTreasureObtained_hook, 0x1748, 0x5900);  // call $1748
   if (!(F & FC)) { RET_TAKEN(0x5900); return; } I(0x5900, 2);  // ret nc
   I(0x5901, 3); SET_HL(0xcc05);  // ld hl,$cc05
   I(0x5904, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 1)));  // res 1,(hl)
@@ -421,7 +421,7 @@ void addPositionToPlacedEnemyPositions(GB *gb) {
 // 12:583d
 void assignRandomPositionToEnemy(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x583d, getRandomPositionForEnemy_b00, 0x3219, 0x5840);  // call $3219
+  CALL(0x583d, getRandomPositionForEnemy_b00_hook, 0x3219, 0x5840);  // call $3219
   if ((F & FC)) { RET_TAKEN(0x5840); return; } I(0x5840, 2);  // ret c
   I(0x5841, 4); A = mem_rd(gb, 0xcec2);  // ld a,($cec2)
   I(0x5844, 1); C = A;  // ld c,a
@@ -479,8 +479,8 @@ void parseObjectData(GB *gb) {
   I(0x55be, 3); SET_HL(0xcec0);  // ld hl,$cec0
   I(0x55c1, 2); B = 0x20;  // ld b,$20
   CALL(0x55c3, clearMemory_hook, 0x046f, 0x55c6);  // call $046f
-  CALL(0x55c6, addRoomToEnemiesKilledList_b00, 0x3209, 0x55c9);  // call $3209
-  CALL(0x55c9, generateRandomBuffer_b00, 0x3215, 0x55cc);  // call $3215
+  CALL(0x55c6, addRoomToEnemiesKilledList_b00_hook, 0x3209, 0x55c9);  // call $3209
+  CALL(0x55c9, generateRandomBuffer_b00_hook, 0x3215, 0x55cc);  // call $3215
   I(0x55cc, 3); SET_HL(0x4315);  // ld hl,$4315
   I(0x55cf, 2); E = 0x15;  // ld e,$15
   CALL(0x55d1, interBankCall_hook, 0x008a, 0x55d4);  // call $008a

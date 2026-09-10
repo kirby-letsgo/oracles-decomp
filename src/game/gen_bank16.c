@@ -1165,7 +1165,7 @@ void receiveLinkState00(GB *gb) {
   I(0x4177, 3); goto L_417f;  // jr $417f
 L_417f:
   I(0x417f, 3); mem_wr(gb, 0xff9a, A);  // ldh ($ff9a),a
-  CALL(0x4181, loadFile_b00, 0x09dc, 0x4184);  // call $09dc
+  CALL(0x4181, loadFile_b00_hook, 0x09dc, 0x4184);  // call $09dc
   I(0x4184, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   sendFileHeader(gb); return;  // fallthrough
 }
@@ -1177,7 +1177,7 @@ void receiveLinkState03(GB *gb) {
   I(0x417b, 3); goto L_417f;  // jr $417f
 L_417f:
   I(0x417f, 3); mem_wr(gb, 0xff9a, A);  // ldh ($ff9a),a
-  CALL(0x4181, loadFile_b00, 0x09dc, 0x4184);  // call $09dc
+  CALL(0x4181, loadFile_b00_hook, 0x09dc, 0x4184);  // call $09dc
   I(0x4184, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   sendFileHeader(gb); return;  // fallthrough
 }
@@ -1187,7 +1187,7 @@ void receiveLinkState06(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x417d, 2); A = 0x02;  // ld a,$02
   I(0x417f, 3); mem_wr(gb, 0xff9a, A);  // ldh ($ff9a),a
-  CALL(0x4181, loadFile_b00, 0x09dc, 0x4184);  // call $09dc
+  CALL(0x4181, loadFile_b00_hook, 0x09dc, 0x4184);  // call $09dc
   I(0x4184, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   sendFileHeader(gb); return;  // fallthrough
 }
@@ -1460,7 +1460,7 @@ void func_42c5(GB *gb) {
   I(0x42cd, 3); mem_wr(gb, 0xff9a, A);  // ldh ($ff9a),a
   I(0x42cf, 2); alu_cp(gb, 0x03);  // cp $03
   if (!(F & FC)) { I(0x42d1, 4); disableSerialPort(gb); return; } I(0x42d1, 3);  // jp nc,$0c7e
-  CALL(0x42d4, loadFile_b00, 0x09dc, 0x42d7);  // call $09dc
+  CALL(0x42d4, loadFile_b00_hook, 0x09dc, 0x42d7);  // call $09dc
   I(0x42d7, 2); A = 0x0d;  // ld a,$0d
   I(0x42d9, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
   I(0x42db, 4); sendAckPacket(gb); return;  // jp $43f5
@@ -1588,7 +1588,7 @@ void func_437b(GB *gb) {
   I(0x4383, 3); SET_HL(0xc616);  // ld hl,$c616
   I(0x4386, 2); B = 0x08;  // ld b,$08
   CALL(0x4388, copyMemoryReverse_hook, 0x047f, 0x438b);  // call $047f
-  I(0x438b, 4); saveFile_b00(gb); return;  // jp $09d8
+  I(0x438b, 4); if (hook_enabled_at(0x09d8)) { saveFile_b00_hook(gb); return; } HANDOFF(0x09d8);  // jp $09d8
 }
 
 // 16:438e

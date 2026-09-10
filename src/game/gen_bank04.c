@@ -1966,7 +1966,7 @@ void tileReplacement_group0Map98(GB *gb) {
   I(0x6b78, 2); alu_and(gb, 0x01);  // and $01
   if ((F & FZ)) { I(0x6b7a, 3); goto L_6b82; } I(0x6b7a, 2);  // jr z,$6b82
   I(0x6b7c, 2); A = 0x48;  // ld a,$48
-  CALL(0x6b7e, checkTreasureObtained, 0x1748, 0x6b81);  // call $1748
+  CALL(0x6b7e, checkTreasureObtained_hook, 0x1748, 0x6b81);  // call $1748
   if (!(F & FC)) { RET_TAKEN(0x6b81); return; } I(0x6b81, 2);  // ret nc
 L_6b82:
   I(0x6b82, 2); A = 0x3a;  // ld a,$3a
@@ -2596,7 +2596,7 @@ L_468a:
   I(0x46a8, 2); A = 0x03;  // ld a,$03
   I(0x46aa, 4); mem_wr(gb, 0xcc4b, A);  // ld ($cc4b),a
   I(0x46ad, 2); A = 0x6e;  // ld a,$6e
-  I(0x46af, 4); playSound_b00(gb); return;  // jp $0c98
+  I(0x46af, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
 }
 
 // 04:463e
@@ -2669,7 +2669,7 @@ L_468a:
   I(0x46a8, 2); A = 0x03;  // ld a,$03
   I(0x46aa, 4); mem_wr(gb, 0xcc4b, A);  // ld ($cc4b),a
   I(0x46ad, 2); A = 0x6e;  // ld a,$6e
-  I(0x46af, 4); playSound_b00(gb); return;  // jp $0c98
+  I(0x46af, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
 }
 
 // 04:4653
@@ -2743,7 +2743,7 @@ L_468a:
   I(0x46a8, 2); A = 0x03;  // ld a,$03
   I(0x46aa, 4); mem_wr(gb, 0xcc4b, A);  // ld ($cc4b),a
   I(0x46ad, 2); A = 0x6e;  // ld a,$6e
-  I(0x46af, 4); playSound_b00(gb); return;  // jp $0c98
+  I(0x46af, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
 }
 
 // 04:4658
@@ -2817,7 +2817,7 @@ L_468a:
   I(0x46a8, 2); A = 0x03;  // ld a,$03
   I(0x46aa, 4); mem_wr(gb, 0xcc4b, A);  // ld ($cc4b),a
   I(0x46ad, 2); A = 0x6e;  // ld a,$6e
-  I(0x46af, 4); playSound_b00(gb); return;  // jp $0c98
+  I(0x46af, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
 }
 
 // 04:4665
@@ -2866,7 +2866,7 @@ L_468a:
   I(0x46a8, 2); A = 0x03;  // ld a,$03
   I(0x46aa, 4); mem_wr(gb, 0xcc4b, A);  // ld ($cc4b),a
   I(0x46ad, 2); A = 0x6e;  // ld a,$6e
-  I(0x46af, 4); playSound_b00(gb); return;  // jp $0c98
+  I(0x46af, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
 }
 
 // 04:46b2

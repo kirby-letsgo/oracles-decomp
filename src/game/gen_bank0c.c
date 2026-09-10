@@ -796,7 +796,7 @@ void scriptCmd_playSound(GB *gb) {
   I(0x4385, 2); SET_HL(HL + 1);  // inc hl
   I(0x4386, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   PUSH(0x4387, HL);  // push hl
-  CALL(0x4388, playSound_b00, 0x0c98, 0x438b);  // call $0c98
+  CALL(0x4388, playSound_b00_hook, 0x0c98, 0x438b);  // call $0c98
   SET_HL(POP(0x438b));  // pop hl
   RET(0x438c); return;  // ret
 }
@@ -975,7 +975,7 @@ void scriptCmd_setMusic(GB *gb) {
 L_440b:
   I(0x440b, 4); mem_wr(gb, 0xcc35, A);  // ld ($cc35),a
   PUSH(0x440e, HL);  // push hl
-  CALL(0x440f, playSound_b00, 0x0c98, 0x4412);  // call $0c98
+  CALL(0x440f, playSound_b00_hook, 0x0c98, 0x4412);  // call $0c98
   SET_HL(POP(0x4412));  // pop hl
   RET(0x4413); return;  // ret
 }
@@ -1035,7 +1035,7 @@ void scriptCmd_df(GB *gb) {
   SET_HL(POP(0x444d));  // pop hl
   I(0x444e, 2); SET_HL(HL + 1);  // inc hl
   I(0x444f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  CALL(0x4450, checkTreasureObtained, 0x1748, 0x4453);  // call $1748
+  CALL(0x4450, checkTreasureObtained_hook, 0x1748, 0x4453);  // call $1748
   I(0x4453, 4); mem_wr(gb, 0xcfc1, A);  // ld ($cfc1),a
   if (!(F & FC)) { I(0x4456, 3); goto L_445b; } I(0x4456, 2);  // jr nc,$445b
   I(0x4458, 4); if (hook_enabled_at(0x25ca)) { scriptFunc_jump_hook(gb); return; } HANDOFF(0x25ca);  // jp $25ca
@@ -1051,7 +1051,7 @@ void scriptCmd_jumpIfSomething(GB *gb) {
   SET_HL(POP(0x445e));  // pop hl
   I(0x445f, 2); SET_HL(HL + 1);  // inc hl
   I(0x4460, 2); A = 0x41;  // ld a,$41
-  CALL(0x4462, checkTreasureObtained, 0x1748, 0x4465);  // call $1748
+  CALL(0x4462, checkTreasureObtained_hook, 0x1748, 0x4465);  // call $1748
   if (!(F & FC)) { I(0x4465, 3); goto L_4470; } I(0x4465, 2);  // jr nc,$4470
   I(0x4467, 1); B = A;  // ld b,a
   I(0x4468, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
