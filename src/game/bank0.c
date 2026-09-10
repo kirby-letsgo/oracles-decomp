@@ -11307,3 +11307,374 @@ void enemyStandardUpdate_hook(GB *gb) {
   CYC(0x2975, 0x2978);
   ret_effect(gb);
 }
+
+void timerInterrupt_hook(GB *gb);
+void serialInterrupt_hook(GB *gb);
+void resumeThreadInAFrames_hook(GB *gb);
+static void thread_state_flag(GB *gb, uint16_t a, bool set) {
+  CYC(a, a + 1); push_effect(gb, HL);
+  L = A;
+  H = wThreadStateBuffer >> 8;
+  CYC(a + 1, a + 4);
+  uint8_t v = mem_rd(gb, HL);
+  CYC(a + 4, a + 6); mem_wr(gb, HL, set ? (uint8_t)(v | 0x80) : (uint8_t)(v & 0x7f));
+  CYC(a + 6, a + 7); SET_HL(pop_effect(gb));
+  CYC(a + 7, a + 8);
+  ret_effect(gb);
+}
+
+void threadFunc_088b_hook(GB *gb) { thread_state_flag(gb, 0x088b, true); }
+void threadFunc_0893_hook(GB *gb) { thread_state_flag(gb, 0x0893, false); }
+
+void threadStop_hook(GB *gb) {
+  CYC(0x089b, 0x089c); push_effect(gb, HL);
+  L = A;
+  H = wThreadStateBuffer >> 8;
+  CYC(0x089c, 0x089f);
+  CYC(0x089f, 0x08a1); mem_wr(gb, HL, 0x00);
+  CYC(0x08a1, 0x08a2); SET_HL(pop_effect(gb));
+  CYC(0x08a2, 0x08a3);
+  ret_effect(gb);
+}
+
+static void copy_initial_thread_state(GB *gb, uint16_t loop) {
+  for (;;) {
+    CYC(loop, loop + 1); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(loop + 1, loop + 2); mem_wr(gb, DE, A);
+    E = alu_inc8(gb, E);
+    B = alu_dec8(gb, B);
+    if (!(F & FZ)) { CYCT(loop + 2, loop + 6); continue; }
+    CYC(loop + 2, loop + 6);
+    break;
+  }
+}
+
+static void set_thread_restart_address(GB *gb, uint16_t a) {
+  L = C;
+  H = D;
+  CYC(a, a + 2);
+  CYC(a + 2, a + 3); SET_BC(pop_effect(gb));
+  CYC(a + 3, a + 4); mem_wr(gb, HL, C);
+  L = alu_inc8(gb, L);
+  CYC(a + 4, a + 5);
+  CYC(a + 5, a + 6); mem_wr(gb, HL, B);
+}
+
+void threadRestart_hook(GB *gb) {
+  CYC(0x08a3, 0x08a4); push_effect(gb, HL);
+  CYC(0x08a4, 0x08a5); push_effect(gb, DE);
+  CYC(0x08a5, 0x08a6); push_effect(gb, BC);
+  E = A;
+  alu_add(gb, 0x04);
+  C = A;
+  D = 0x00;
+  SET_HL(ROM_initialThreadStatesBase);
+  alu_add_hl(gb, DE);
+  D = wThreadStateBuffer >> 8;
+  B = 0x08;
+  CYC(0x08a6, 0x08b4);
+  copy_initial_thread_state(gb, 0x08b4);
+  set_thread_restart_address(gb, 0x08ba);
+  CYC(0x08c0, 0x08c1); SET_DE(pop_effect(gb));
+  CYC(0x08c1, 0x08c2); SET_HL(pop_effect(gb));
+  CYC(0x08c2, 0x08c3);
+  ret_effect(gb);
+}
+
+void restartThisThread_hook(GB *gb) {
+  CYC(0x08c3, 0x08c4); push_effect(gb, BC);
+  A = H8(hActiveThread);
+  E = A;
+  alu_add(gb, 0x04);
+  C = A;
+  D = 0x00;
+  SET_HL(ROM_initialThreadStatesBase);
+  alu_add_hl(gb, DE);
+  D = wThreadStateBuffer >> 8;
+  B = 0x08;
+  CYC(0x08c4, 0x08d4);
+  copy_initial_thread_state(gb, 0x08d4);
+  set_thread_restart_address(gb, 0x08da);
+  CYCT(0x08e0, 0x08e2);
+  _nextThread(gb);
+}
+
+void stubThreadStart_hook(GB *gb) {
+  A = H8(hActiveThread);
+  L = A;
+  H = wThreadStateBuffer >> 8;
+  CYC(0x08e2, 0x08e7);
+  CYC(0x08e7, 0x08e9); mem_wr(gb, HL, 0x00);
+  CYCT(0x08e9, 0x08eb);
+  _nextThread(gb);
+}
+
+void resumeThreadNextFrameAndSaveBank_hook(GB *gb) {
+  A = 0x01;
+  CYC(0x08eb, 0x08ed);
+  CYC(0x08ed, 0x08ee); push_effect(gb, BC);
+  B = A;
+  A = H8(hRomBank);
+  C = A;
+  A = B;
+  CYC(0x08ee, 0x08f3);
+  CYC(0x08f3, 0x08f6); push_effect(gb, 0x08f6);
+  resumeThreadInAFrames_hook(gb);
+  A = C;
+  CYC(0x08f6, 0x08f7);
+  CYC(0x08f7, 0x08f9); H8(hRomBank) = A;
+  CYC(0x08f9, 0x08fc); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(0x08fc, 0x08fd); SET_BC(pop_effect(gb));
+  CYC(0x08fd, 0x08fe);
+  ret_effect(gb);
+}
+
+void resumeThreadNextFrame_hook(GB *gb) {
+  A = 0x01;
+  CYC(0x08fe, 0x0900);
+  resumeThreadInAFrames_hook(gb);
+}
+
+void resumeThreadInAFrames_hook(GB *gb) {
+  CYC(0x0900, 0x0901); push_effect(gb, HL);
+  CYC(0x0901, 0x0902); push_effect(gb, DE);
+  CYC(0x0902, 0x0903); push_effect(gb, BC);
+  B = A;
+  CYC(0x0903, 0x0904);
+  CYC(0x0904, 0x0906); A = mem_rd(gb, hActiveThread);
+  L = A;
+  CYC(0x0906, 0x0907);
+  H = wThreadStateBuffer >> 8;
+  CYC(0x0907, 0x0909);
+  A = 0x01;
+  CYC(0x0909, 0x090b);
+  CYC(0x090b, 0x090c); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x090c, 0x090d); mem_wr(gb, HL, B);
+  L = alu_inc8(gb, L);
+  CYC(0x090d, 0x090e);
+  burn_store_sp(gb, 0x090e, hFF92);
+  CYC(0x0911, 0x0913); A = mem_rd(gb, hFF92);
+  CYC(0x0913, 0x0914); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x0914, 0x0916); A = mem_rd(gb, hFF93);
+  CYC(0x0916, 0x0917); mem_wr(gb, HL, A);
+  _nextThread(gb);
+}
+
+void writeToSC_hook(GB *gb) {
+  CYC(0x0c6a, 0x0c6b); push_effect(gb, AF);
+  alu_and(gb, 0x01);
+  CYC(0x0c6b, 0x0c6d);
+  CYC(0x0c6d, 0x0c6f); mem_wr(gb, IO_SC, A);
+  CYC(0x0c6f, 0x0c70); SET_AF(pop_effect(gb));
+  CYC(0x0c70, 0x0c72); mem_wr(gb, IO_SC, A);
+  CYC(0x0c72, 0x0c73);
+  ret_effect(gb);
+}
+
+static void serial_reti(GB *gb, uint16_t a) {
+  CYC(a, a + 1); SET_AF(pop_effect(gb));
+  CYC(a + 1, a + 2);
+  reti_effect(gb);
+}
+
+void serialInterrupt_hook(GB *gb) {
+  A = H8(hSerialInterruptBehaviour);
+  alu_or(gb, A);
+  CYC(0x0c3d, 0x0c40);
+  if (!(F & FZ)) {
+    CYC(0x0c40, 0x0c42);
+    CYC(0x0c42, 0x0c44); A = mem_rd(gb, IO_SB);
+    CYC(0x0c44, 0x0c46); H8(hSerialByte) = A;
+    alu_xor(gb, A);
+    CYC(0x0c46, 0x0c47);
+    CYC(0x0c47, 0x0c49); mem_wr(gb, IO_SB, A);
+    A = alu_inc8(gb, A);
+    CYC(0x0c49, 0x0c4a);
+    CYC(0x0c4a, 0x0c4c); H8(hReceivedSerialByte) = A;
+    serial_reti(gb, 0x0c4c);
+    return;
+  }
+  CYCT(0x0c40, 0x0c42);
+  CYC(0x0c4e, 0x0c50); A = mem_rd(gb, IO_SB);
+  alu_cp(gb, 0xe1);
+  CYC(0x0c50, 0x0c52);
+  if (F & FZ) CYCT(0x0c52, 0x0c54);
+  else {
+    CYC(0x0c52, 0x0c54);
+    alu_cp(gb, 0xe0);
+    CYC(0x0c54, 0x0c56);
+    if (!(F & FZ)) {
+      CYCT(0x0c56, 0x0c58);
+      A = 0xe1;
+      CYC(0x0c5f, 0x0c61);
+      CYC(0x0c61, 0x0c63); mem_wr(gb, IO_SB, A);
+      A = 0x80;
+      CYC(0x0c63, 0x0c65);
+      CALL_ROM(0x0c65, ROM_writeToSC);
+      serial_reti(gb, 0x0c68);
+      return;
+    }
+    CYC(0x0c56, 0x0c58);
+  }
+  CYC(0x0c58, 0x0c5a); H8(hSerialInterruptBehaviour) = A;
+  alu_xor(gb, A);
+  CYC(0x0c5a, 0x0c5b);
+  CYC(0x0c5b, 0x0c5d); mem_wr(gb, IO_SB, A);
+  serial_reti(gb, 0x0c5d);
+}
+
+void serialFunc_0c73_hook(GB *gb) {
+  alu_xor(gb, A);
+  CYC(0x0c73, 0x0c74);
+  CYC(0x0c74, 0x0c76); H8(hFFBD) = A;
+  A = 0xe0;
+  CYC(0x0c76, 0x0c78);
+  CYC(0x0c78, 0x0c7a); mem_wr(gb, IO_SB, A);
+  A = 0x81;
+  CYC(0x0c7a, 0x0c7c);
+  CYCT(0x0c7c, 0x0c7e);
+  writeToSC_hook(gb);
+}
+
+void disableSerialPort_hook(GB *gb) {
+  alu_xor(gb, A);
+  CYC(0x0c7e, 0x0c7f);
+  CYC(0x0c7f, 0x0c81); H8(hSerialInterruptBehaviour) = A;
+  CYC(0x0c81, 0x0c83); mem_wr(gb, IO_SB, A);
+  CYCT(0x0c83, 0x0c85);
+  writeToSC_hook(gb);
+}
+
+void serialFunc_0c85_hook(GB *gb) {
+  SET_HL(ROM_b16_serialFunc_44ac);
+  E = 0x16;
+  CYC(0x0c85, 0x0c8a);
+  CYC(0x0c8a, 0x0c8d);
+  interBankCall_hook(gb);
+}
+
+void serialFunc_0c8d_hook(GB *gb) {
+  CYC(0x0c8d, 0x0c8e); push_effect(gb, DE);
+  SET_HL(ROM_b16_serialFunc_4000);
+  E = 0x16;
+  CYC(0x0c8e, 0x0c93);
+  CALL_ROM(0x0c93, ROM_interBankCall);
+  CYC(0x0c96, 0x0c97); SET_DE(pop_effect(gb));
+  CYC(0x0c97, 0x0c98);
+  ret_effect(gb);
+}
+
+static void timer_interrupt_end(GB *gb) {
+  CYC(0x0d59, 0x0d5a); SET_HL(pop_effect(gb));
+  CYC(0x0d5a, 0x0d5b); SET_DE(pop_effect(gb));
+  CYC(0x0d5b, 0x0d5c); SET_BC(pop_effect(gb));
+  CYC(0x0d5c, 0x0d5d); SET_AF(pop_effect(gb));
+  CYC(0x0d5d, 0x0d5e);
+  reti_effect(gb);
+}
+
+void timerInterrupt_hook(GB *gb) {
+  SET_HL(hFFB7);
+  CYC(0x0d07, 0x0d0a);
+  CYC(0x0d0a, 0x0d0c); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(0x0d0c, 0x0d0e); timer_interrupt_end(gb); return; }
+  CYC(0x0d0c, 0x0d0e);
+  CYC(0x0d0e, 0x0d10); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(0x0d10, 0x0d12); timer_interrupt_end(gb); return; }
+  CYC(0x0d10, 0x0d12);
+  CYC(0x0d12, 0x0d14); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x01));
+  L = alu_inc8(gb, L);
+  CYC(0x0d14, 0x0d15);
+  CYC(0x0d15, 0x0d16); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (F & FZ) {
+    CYC(0x0d16, 0x0d18);
+    CYC(0x0d18, 0x0d1a); mem_wr(gb, HL, 0x07);
+    CYC(0x0d1a, 0x0d1c); A = mem_rd(gb, IO_TMA);
+    A = alu_dec8(gb, A);
+    CYC(0x0d1c, 0x0d1d);
+    CYC(0x0d1d, 0x0d1f); mem_wr(gb, IO_TIMA, A);
+  } else CYCT(0x0d16, 0x0d18);
+  A = 0x39;
+  CYC(0x0d1f, 0x0d21);
+  CYC(0x0d21, 0x0d24); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(0x0d24, 0x0d26); A = H8(hMusicVolume);
+  alu_bit(gb, 7, A);
+  CYC(0x0d26, 0x0d28);
+  if (F & FZ) CYCT(0x0d28, 0x0d2a);
+  else {
+    CYC(0x0d28, 0x0d2a);
+    alu_and(gb, 0x03);
+    CYC(0x0d2a, 0x0d2c);
+    CYC(0x0d2c, 0x0d2e); H8(hMusicVolume) = A;
+    CALL_ROM(0x0d2e, ROM_b39_updateMusicVolume);
+  }
+  CYC(0x0d31, 0x0d33); A = H8(hMusicQueueTail);
+  B = A;
+  CYC(0x0d33, 0x0d34);
+  CYC(0x0d34, 0x0d36); A = H8(hMusicQueueHead);
+  alu_cp(gb, B);
+  CYC(0x0d36, 0x0d37);
+  if (F & FZ) CYCT(0x0d37, 0x0d39);
+  else {
+    CYC(0x0d37, 0x0d39);
+    H = wMusicQueue >> 8;
+    CYC(0x0d39, 0x0d3b);
+    for (;;) {
+      L = A;
+      CYC(0x0d3b, 0x0d3c);
+      CYC(0x0d3c, 0x0d3d); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(0x0d3d, 0x0d3e); push_effect(gb, BC);
+      CYC(0x0d3e, 0x0d3f); push_effect(gb, HL);
+      CALL_ROM(0x0d3f, ROM_b39_playSound);
+      CYC(0x0d42, 0x0d43); SET_HL(pop_effect(gb));
+      CYC(0x0d43, 0x0d44); SET_BC(pop_effect(gb));
+      A = L;
+      alu_and(gb, 0xaf);
+      alu_cp(gb, B);
+      CYC(0x0d44, 0x0d48);
+      if (F & FZ) { CYC(0x0d48, 0x0d4a); break; }
+      CYCT(0x0d48, 0x0d4a);
+    }
+    CYC(0x0d4a, 0x0d4c); H8(hMusicQueueHead) = A;
+  }
+  CALL_ROM(0x0d4c, ROM_b39_updateSound);
+  SET_HL(hFFB7);
+  CYC(0x0d4f, 0x0d52);
+  CYC(0x0d52, 0x0d54); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & 0xfe));
+  CYC(0x0d54, 0x0d56); A = H8(hRomBank);
+  CYC(0x0d56, 0x0d59); mem_wr(gb, MBC_ROM_BANK, A);
+  timer_interrupt_end(gb);
+}
+
+void vblankVector_hook(GB *gb) {
+  CYC(0x0040, 0x0041); push_effect(gb, AF);
+  CYC(0x0041, 0x0042); push_effect(gb, BC);
+  CYC(0x0042, 0x0043); push_effect(gb, DE);
+  CYC(0x0043, 0x0044); push_effect(gb, HL);
+  CYC(0x0044, 0x0047);
+  vblankInterrupt(gb);
+}
+
+void lcdVector_hook(GB *gb) {
+  CYC(0x0048, 0x0049); push_effect(gb, AF);
+  CYC(0x0049, 0x004a); push_effect(gb, HL);
+  CYC(0x004a, 0x004d);
+  lcdInterrupt(gb);
+}
+
+void timerVector_hook(GB *gb) {
+  CYC(0x0050, 0x0051);
+  gb->ime_delay = true; gb->ime_writes++;
+  CYC(0x0051, 0x0052); push_effect(gb, AF);
+  CYC(0x0052, 0x0053); push_effect(gb, BC);
+  CYC(0x0053, 0x0054); push_effect(gb, DE);
+  CYC(0x0054, 0x0055); push_effect(gb, HL);
+  CYC(0x0055, 0x0058);
+  timerInterrupt_hook(gb);
+}
+
+void serialVector_hook(GB *gb) {
+  CYC(0x0058, 0x0059); push_effect(gb, AF);
+  CYC(0x0059, 0x005c);
+  serialInterrupt_hook(gb);
+}

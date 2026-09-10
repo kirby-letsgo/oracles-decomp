@@ -79,6 +79,9 @@
 #define ROM_loadTilesetAndRoomLayout 0x38a5
 #define ROM_loadUniqueGfxHeaderEntry 0x3843
 #define IO_P1 0xff00
+#define IO_SB 0xff01
+#define IO_SC 0xff02
+#define IO_TMA 0xff06
 #define IO_HDMA1 0xff51
 #define IO_TIMA 0xff05
 #define IO_TAC 0xff07
@@ -108,6 +111,19 @@
 #define ROM_b07_fileManagementFunction 0x4000
 #define ROM_b03_runIntroCinematic 0x4e20
 #define ROM_b0c_runScriptCommand 0x4000
+#define ROM_b39_updateSound 0x4003
+#define ROM_b39_playSound 0x4006
+#define ROM_b39_updateMusicVolume 0x4010
+#define ROM_writeToSC 0x0c6a
+#define ROM_nextThread 0x0917
+#define ROM_resumeThreadInAFrames 0x0900
+#define ROM_b16_serialFunc_4000 0x4000
+#define ROM_b16_serialFunc_44ac 0x44ac
+#define ROM_vblankInterrupt 0x09f8
+#define ROM_lcdInterrupt 0x0b46
+#define ROM_timerInterrupt 0x0d07
+#define ROM_serialInterrupt 0x0c3d
+#define ROM_initialThreadStatesBase 0x08cc
 #define ROM__scriptCmd_asmRetFunc 0x25b1
 #define ROM_drawAllSprites_drawObject 0x0e71
 #define ROM_loadRoomLayout_loadLayoutData 0x3a27
@@ -254,6 +270,7 @@
 #define PART_SLOTS 0xd0c0
 
 void burn_rom(GB *gb, int bank, uint16_t from, uint16_t to, bool last_taken);
+void burn_store_sp(GB *gb, uint16_t a, uint16_t addr);
 #define CYC(from, to) burn_rom(gb, 0, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, 0, (from), (to), true)
 #define CALL_ROM_CC(a, target) do { CYCT((a), (a) + 3); push_effect(gb, (uint16_t)((a) + 3)); asm_call(gb, (target), (uint16_t)((a) + 3)); } while (0)

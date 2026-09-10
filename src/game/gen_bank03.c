@@ -909,12 +909,12 @@ void runIntro(GB *gb) {
   I(0x4cc9, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
   I(0x4ccb, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x4ccc, 3); goto L_4cd8; } I(0x4ccc, 2);  // jr z,$4cd8
-  CALL(0x4cce, serialFunc_0c8d, 0x0c8d, 0x4cd1);  // call $0c8d
+  CALL(0x4cce, serialFunc_0c8d_hook, 0x0c8d, 0x4cd1);  // call $0c8d
   I(0x4cd1, 2); A = 0x09;  // ld a,$09
   I(0x4cd3, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
   I(0x4cd6, 3); goto L_4ce9;  // jr $4ce9
 L_4cd8:
-  CALL(0x4cd8, serialFunc_0c85, 0x0c85, 0x4cdb);  // call $0c85
+  CALL(0x4cd8, serialFunc_0c85_hook, 0x0c85, 0x4cdb);  // call $0c85
   I(0x4cdb, 2); A = 0x03;  // ld a,$03
   I(0x4cdd, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
   I(0x4cdf, 1); alu_xor(gb, A);  // xor a
@@ -1149,7 +1149,7 @@ void intro_titlescreen_state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x4db3, restartSound_hook, 0x0cb2, 0x4db6);  // call $0cb2
   I(0x4db6, 2); A = 0xe8;  // ld a,$e8
-  CALL(0x4db8, threadStop, 0x089b, 0x4dbb);  // call $089b
+  CALL(0x4db8, threadStop_hook, 0x089b, 0x4dbb);  // call $089b
   CALL(0x4dbb, stopTextThread_hook, 0x184d, 0x4dbe);  // call $184d
   CALL(0x4dbe, disableLcd_hook, 0x02c1, 0x4dc1);  // call $02c1
   I(0x4dc1, 2); A = 0x02;  // ld a,$02
@@ -1182,7 +1182,7 @@ void intro_titlescreen_state1(GB *gb) {
 L_4df3:
   I(0x4df3, 2); A = 0x56;  // ld a,$56
   CALL(0x4df5, playSound_b00_hook, 0x0c98, 0x4df8);  // call $0c98
-  CALL(0x4df8, disableSerialPort, 0x0c7e, 0x4dfb);  // call $0c7e
+  CALL(0x4df8, disableSerialPort_hook, 0x0c7e, 0x4dfb);  // call $0c7e
   I(0x4dfb, 2); A = 0x03;  // ld a,$03
 L_4dfd:
   I(0x4dfd, 4); mem_wr(gb, 0xc2e7, A);  // ld ($c2e7),a
@@ -1197,7 +1197,7 @@ void intro_titlescreen_state1__pressedStart(GB *gb) {
 L_4df3:
   I(0x4df3, 2); A = 0x56;  // ld a,$56
   CALL(0x4df5, playSound_b00_hook, 0x0c98, 0x4df8);  // call $0c98
-  CALL(0x4df8, disableSerialPort, 0x0c7e, 0x4dfb);  // call $0c7e
+  CALL(0x4df8, disableSerialPort_hook, 0x0c7e, 0x4dfb);  // call $0c7e
   I(0x4dfb, 2); A = 0x03;  // ld a,$03
 L_4dfd:
   I(0x4dfd, 4); mem_wr(gb, 0xc2e7, A);  // ld ($c2e7),a
@@ -1233,8 +1233,8 @@ void intro_titlescreen_state3(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(0x4e14); return; } I(0x4e14, 2);  // ret nz
   I(0x4e15, 2); A = 0xe8;  // ld a,$e8
   I(0x4e17, 3); SET_BC(0x1a17);  // ld bc,$1a17
-  CALL(0x4e1a, threadRestart, 0x08a3, 0x4e1d);  // call $08a3
-  I(0x4e1d, 4); stubThreadStart(gb); return;  // jp $08e2
+  CALL(0x4e1a, threadRestart_hook, 0x08a3, 0x4e1d);  // call $08a3
+  I(0x4e1d, 4); if (hook_enabled_at(0x08e2)) { stubThreadStart_hook(gb); return; } HANDOFF(0x08e2);  // jp $08e2
 }
 
 // 03:4e20

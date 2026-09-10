@@ -131,166 +131,6 @@ L_016c:
   I(0x0173, 4); init(gb); return;  // jp $4000
 }
 
-// 00:088b
-void threadFunc_088b(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x088b, HL);  // push hl
-  I(0x088c, 1); L = A;  // ld l,a
-  I(0x088d, 2); H = 0xc2;  // ld h,$c2
-  I(0x088f, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  SET_HL(POP(0x0891));  // pop hl
-  RET(0x0892); return;  // ret
-}
-
-// 00:0893
-void threadFunc_0893(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x0893, HL);  // push hl
-  I(0x0894, 1); L = A;  // ld l,a
-  I(0x0895, 2); H = 0xc2;  // ld h,$c2
-  I(0x0897, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
-  SET_HL(POP(0x0899));  // pop hl
-  RET(0x089a); return;  // ret
-}
-
-// 00:089b
-void threadStop(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x089b, HL);  // push hl
-  I(0x089c, 1); L = A;  // ld l,a
-  I(0x089d, 2); H = 0xc2;  // ld h,$c2
-  I(0x089f, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  SET_HL(POP(0x08a1));  // pop hl
-  RET(0x08a2); return;  // ret
-}
-
-// 00:08a3
-void threadRestart(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x08a3, HL);  // push hl
-  PUSH(0x08a4, DE);  // push de
-  PUSH(0x08a5, BC);  // push bc
-  I(0x08a6, 1); E = A;  // ld e,a
-  I(0x08a7, 2); alu_add(gb, 0x04);  // add $04
-  I(0x08a9, 1); C = A;  // ld c,a
-  I(0x08aa, 2); D = 0x00;  // ld d,$00
-  I(0x08ac, 3); SET_HL(0x08cc);  // ld hl,$08cc
-  I(0x08af, 2); alu_add_hl(gb, DE);  // add hl,de
-  I(0x08b0, 2); D = 0xc2;  // ld d,$c2
-  I(0x08b2, 2); B = 0x08;  // ld b,$08
-L_08b4:
-  I(0x08b4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x08b5, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x08b6, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x08b7, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x08b8, 3); goto L_08b4; } I(0x08b8, 2);  // jr nz,$08b4
-  I(0x08ba, 1); L = C;  // ld l,c
-  I(0x08bb, 1); H = D;  // ld h,d
-  SET_BC(POP(0x08bc));  // pop bc
-  I(0x08bd, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x08be, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x08bf, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  SET_DE(POP(0x08c0));  // pop de
-  SET_HL(POP(0x08c1));  // pop hl
-  RET(0x08c2); return;  // ret
-}
-
-// 00:08c3
-void restartThisThread(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x08c3, BC);  // push bc
-  I(0x08c4, 3); A = mem_rd(gb, 0xff9e);  // ldh a,($ff9e)
-  I(0x08c6, 1); E = A;  // ld e,a
-  I(0x08c7, 2); alu_add(gb, 0x04);  // add $04
-  I(0x08c9, 1); C = A;  // ld c,a
-  I(0x08ca, 2); D = 0x00;  // ld d,$00
-  I(0x08cc, 3); SET_HL(0x08cc);  // ld hl,$08cc
-  I(0x08cf, 2); alu_add_hl(gb, DE);  // add hl,de
-  I(0x08d0, 2); D = 0xc2;  // ld d,$c2
-  I(0x08d2, 2); B = 0x08;  // ld b,$08
-L_08d4:
-  I(0x08d4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x08d5, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x08d6, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x08d7, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x08d8, 3); goto L_08d4; } I(0x08d8, 2);  // jr nz,$08d4
-  I(0x08da, 1); L = C;  // ld l,c
-  I(0x08db, 1); H = D;  // ld h,d
-  SET_BC(POP(0x08dc));  // pop bc
-  I(0x08dd, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x08de, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x08df, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x08e0, 3); _nextThread(gb); return;  // jr $0917
-}
-
-// 00:08e2
-void stubThreadStart(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x08e2, 3); A = mem_rd(gb, 0xff9e);  // ldh a,($ff9e)
-  I(0x08e4, 1); L = A;  // ld l,a
-  I(0x08e5, 2); H = 0xc2;  // ld h,$c2
-  I(0x08e7, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x08e9, 3); _nextThread(gb); return;  // jr $0917
-}
-
-// 00:08eb
-void resumeThreadNextFrameAndSaveBank(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x08eb, 2); A = 0x01;  // ld a,$01
-  PUSH(0x08ed, BC);  // push bc
-  I(0x08ee, 1); B = A;  // ld b,a
-  I(0x08ef, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  I(0x08f1, 1); C = A;  // ld c,a
-  I(0x08f2, 1); A = B;  // ld a,b
-  CALL(0x08f3, resumeThreadInAFrames, 0x0900, 0x08f6);  // call $0900
-L_08f6:
-  I(0x08f6, 1); A = C;  // ld a,c
-  I(0x08f7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x08f9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  SET_BC(POP(0x08fc));  // pop bc
-  RET(0x08fd); return;  // ret
-}
-
-// 00:08f6
-void resumeThreadNextFrameAndSaveBank__afterCall08f6(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_08f6:
-  I(0x08f6, 1); A = C;  // ld a,c
-  I(0x08f7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x08f9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  SET_BC(POP(0x08fc));  // pop bc
-  RET(0x08fd); return;  // ret
-}
-
-// 00:08fe
-void resumeThreadNextFrame(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x08fe, 2); A = 0x01;  // ld a,$01
-  resumeThreadInAFrames(gb); return;  // fallthrough
-}
-
-// 00:0900
-void resumeThreadInAFrames(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x0900, HL);  // push hl
-  PUSH(0x0901, DE);  // push de
-  PUSH(0x0902, BC);  // push bc
-  I(0x0903, 1); B = A;  // ld b,a
-  I(0x0904, 3); A = mem_rd(gb, 0xff9e);  // ldh a,($ff9e)
-  I(0x0906, 1); L = A;  // ld l,a
-  I(0x0907, 2); H = 0xc2;  // ld h,$c2
-  I(0x0909, 2); A = 0x01;  // ld a,$01
-  I(0x090b, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x090c, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x090d, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x090e, 4); mem_wr(gb, 0xff92, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0xff93, gb->sp >> 8);  // ld ($ff92),sp
-  I(0x0911, 3); A = mem_rd(gb, 0xff92);  // ldh a,($ff92)
-  I(0x0913, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x0914, 3); A = mem_rd(gb, 0xff93);  // ldh a,($ff93)
-  I(0x0916, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  _nextThread(gb); return;  // fallthrough
-}
-
 // 00:0917
 void _nextThread(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -957,200 +797,6 @@ L_0bea:
   I(0x0bfb, 3); lcdInterrupt_clearLYC(gb); return;  // jr $0be2
 }
 
-// 00:0c3d
-void serialInterrupt(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x0c3d, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x0c3f, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x0c40, 3); goto L_0c4e; } I(0x0c40, 2);  // jr z,$0c4e
-L_0c42:
-  I(0x0c42, 3); A = mem_rd(gb, 0xff01);  // ldh a,($ff01)
-  I(0x0c44, 3); mem_wr(gb, 0xffbc, A);  // ldh ($ffbc),a
-  I(0x0c46, 1); alu_xor(gb, A);  // xor a
-  I(0x0c47, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  I(0x0c49, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x0c4a, 3); mem_wr(gb, 0xffbb, A);  // ldh ($ffbb),a
-  SET_AF(POP(0x0c4c));  // pop af
-  RETI(0x0c4d); return;  // reti
-L_0c4e:
-  I(0x0c4e, 3); A = mem_rd(gb, 0xff01);  // ldh a,($ff01)
-  I(0x0c50, 2); alu_cp(gb, 0xe1);  // cp $e1
-  if ((F & FZ)) { I(0x0c52, 3); goto L_0c58; } I(0x0c52, 2);  // jr z,$0c58
-  I(0x0c54, 2); alu_cp(gb, 0xe0);  // cp $e0
-  if (!(F & FZ)) { I(0x0c56, 3); goto L_0c5f; } I(0x0c56, 2);  // jr nz,$0c5f
-L_0c58:
-  I(0x0c58, 3); mem_wr(gb, 0xffba, A);  // ldh ($ffba),a
-  I(0x0c5a, 1); alu_xor(gb, A);  // xor a
-  I(0x0c5b, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  SET_AF(POP(0x0c5d));  // pop af
-  RETI(0x0c5e); return;  // reti
-L_0c5f:
-  I(0x0c5f, 2); A = 0xe1;  // ld a,$e1
-  I(0x0c61, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  I(0x0c63, 2); A = 0x80;  // ld a,$80
-  CALL(0x0c65, writeToSC, 0x0c6a, 0x0c68);  // call $0c6a
-  SET_AF(POP(0x0c68));  // pop af
-  RETI(0x0c69); return;  // reti
-}
-
-// 00:0c42
-void serialInterrupt__externalClock(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_0c42:
-  I(0x0c42, 3); A = mem_rd(gb, 0xff01);  // ldh a,($ff01)
-  I(0x0c44, 3); mem_wr(gb, 0xffbc, A);  // ldh ($ffbc),a
-  I(0x0c46, 1); alu_xor(gb, A);  // xor a
-  I(0x0c47, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  I(0x0c49, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x0c4a, 3); mem_wr(gb, 0xffbb, A);  // ldh ($ffbb),a
-  SET_AF(POP(0x0c4c));  // pop af
-  RETI(0x0c4d); return;  // reti
-}
-
-// 00:0c4e
-void serialInterrupt__internalClock(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_0c4e:
-  I(0x0c4e, 3); A = mem_rd(gb, 0xff01);  // ldh a,($ff01)
-  I(0x0c50, 2); alu_cp(gb, 0xe1);  // cp $e1
-  if ((F & FZ)) { I(0x0c52, 3); goto L_0c58; } I(0x0c52, 2);  // jr z,$0c58
-  I(0x0c54, 2); alu_cp(gb, 0xe0);  // cp $e0
-  if (!(F & FZ)) { I(0x0c56, 3); goto L_0c5f; } I(0x0c56, 2);  // jr nz,$0c5f
-L_0c58:
-  I(0x0c58, 3); mem_wr(gb, 0xffba, A);  // ldh ($ffba),a
-  I(0x0c5a, 1); alu_xor(gb, A);  // xor a
-  I(0x0c5b, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  SET_AF(POP(0x0c5d));  // pop af
-  RETI(0x0c5e); return;  // reti
-L_0c5f:
-  I(0x0c5f, 2); A = 0xe1;  // ld a,$e1
-  I(0x0c61, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  I(0x0c63, 2); A = 0x80;  // ld a,$80
-  CALL(0x0c65, writeToSC, 0x0c6a, 0x0c68);  // call $0c6a
-  SET_AF(POP(0x0c68));  // pop af
-  RETI(0x0c69); return;  // reti
-}
-
-// 00:0c6a
-void writeToSC(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x0c6a, AF);  // push af
-  I(0x0c6b, 2); alu_and(gb, 0x01);  // and $01
-  I(0x0c6d, 3); mem_wr(gb, 0xff02, A);  // ldh ($ff02),a
-  SET_AF(POP(0x0c6f));  // pop af
-  I(0x0c70, 3); mem_wr(gb, 0xff02, A);  // ldh ($ff02),a
-  RET(0x0c72); return;  // ret
-}
-
-// 00:0c73
-void serialFunc_0c73(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x0c73, 1); alu_xor(gb, A);  // xor a
-  I(0x0c74, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x0c76, 2); A = 0xe0;  // ld a,$e0
-  I(0x0c78, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  I(0x0c7a, 2); A = 0x81;  // ld a,$81
-  I(0x0c7c, 3); writeToSC(gb); return;  // jr $0c6a
-}
-
-// 00:0c7e
-void disableSerialPort(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x0c7e, 1); alu_xor(gb, A);  // xor a
-  I(0x0c7f, 3); mem_wr(gb, 0xffba, A);  // ldh ($ffba),a
-  I(0x0c81, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  I(0x0c83, 3); writeToSC(gb); return;  // jr $0c6a
-}
-
-// 00:0c85
-void serialFunc_0c85(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x0c85, 3); SET_HL(0x44ac);  // ld hl,$44ac
-  I(0x0c88, 2); E = 0x16;  // ld e,$16
-  I(0x0c8a, 4); if (hook_enabled_at(0x008a)) { interBankCall_hook(gb); return; } HANDOFF(0x008a);  // jp $008a
-}
-
-// 00:0c8d
-void serialFunc_0c8d(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x0c8d, DE);  // push de
-  I(0x0c8e, 3); SET_HL(0x4000);  // ld hl,$4000
-  I(0x0c91, 2); E = 0x16;  // ld e,$16
-  CALL(0x0c93, interBankCall_hook, 0x008a, 0x0c96);  // call $008a
-  SET_DE(POP(0x0c96));  // pop de
-  RET(0x0c97); return;  // ret
-}
-
-// 00:0d07
-void timerInterrupt(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x0d07, 3); SET_HL(0xffb7);  // ld hl,$ffb7
-  I(0x0d0a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if (!(F & FZ)) { I(0x0d0c, 3); goto L_0d59; } I(0x0d0c, 2);  // jr nz,$0d59
-  I(0x0d0e, 3); alu_bit(gb, 0, mem_rd(gb, HL));  // bit 0,(hl)
-  if (!(F & FZ)) { I(0x0d10, 3); goto L_0d59; } I(0x0d10, 2);  // jr nz,$0d59
-  I(0x0d12, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x0d14, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x0d15, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x0d16, 3); goto L_0d1f; } I(0x0d16, 2);  // jr nz,$0d1f
-  I(0x0d18, 3); mem_wr(gb, HL, 0x07);  // ld (hl),$07
-  I(0x0d1a, 3); A = mem_rd(gb, 0xff06);  // ldh a,($ff06)
-  I(0x0d1c, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x0d1d, 3); mem_wr(gb, 0xff05, A);  // ldh ($ff05),a
-L_0d1f:
-  I(0x0d1f, 2); A = 0x39;  // ld a,$39
-  I(0x0d21, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  I(0x0d24, 3); A = mem_rd(gb, 0xffb6);  // ldh a,($ffb6)
-  I(0x0d26, 2); alu_bit(gb, 7, A);  // bit 7,a
-  if ((F & FZ)) { I(0x0d28, 3); goto L_0d31; } I(0x0d28, 2);  // jr z,$0d31
-  I(0x0d2a, 2); alu_and(gb, 0x03);  // and $03
-  I(0x0d2c, 3); mem_wr(gb, 0xffb6, A);  // ldh ($ffb6),a
-  CALL(0x0d2e, b39_updateMusicVolume, 0x4010, 0x0d31);  // call $4010
-L_0d31:
-  I(0x0d31, 3); A = mem_rd(gb, 0xffb5);  // ldh a,($ffb5)
-  I(0x0d33, 1); B = A;  // ld b,a
-  I(0x0d34, 3); A = mem_rd(gb, 0xffb4);  // ldh a,($ffb4)
-  I(0x0d36, 1); alu_cp(gb, B);  // cp b
-  if ((F & FZ)) { I(0x0d37, 3); goto L_0d4c; } I(0x0d37, 2);  // jr z,$0d4c
-  I(0x0d39, 2); H = 0xc0;  // ld h,$c0
-L_0d3b:
-  I(0x0d3b, 1); L = A;  // ld l,a
-  I(0x0d3c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  PUSH(0x0d3d, BC);  // push bc
-  PUSH(0x0d3e, HL);  // push hl
-  CALL_ASM(0x0d3f, 0x4006, 0x0d42); /* unported */  // call $4006
-  SET_HL(POP(0x0d42));  // pop hl
-  SET_BC(POP(0x0d43));  // pop bc
-  I(0x0d44, 1); A = L;  // ld a,l
-  I(0x0d45, 2); alu_and(gb, 0xaf);  // and $af
-  I(0x0d47, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FZ)) { I(0x0d48, 3); goto L_0d3b; } I(0x0d48, 2);  // jr nz,$0d3b
-  I(0x0d4a, 3); mem_wr(gb, 0xffb4, A);  // ldh ($ffb4),a
-L_0d4c:
-  CALL_ASM(0x0d4c, 0x4003, 0x0d4f); /* unported */  // call $4003
-  I(0x0d4f, 3); SET_HL(0xffb7);  // ld hl,$ffb7
-  I(0x0d52, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 0)));  // res 0,(hl)
-  I(0x0d54, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  I(0x0d56, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-L_0d59:
-  SET_HL(POP(0x0d59));  // pop hl
-  SET_DE(POP(0x0d5a));  // pop de
-  SET_BC(POP(0x0d5b));  // pop bc
-  SET_AF(POP(0x0d5c));  // pop af
-  RETI(0x0d5d); return;  // reti
-}
-
-// 00:0d59
-void timerInterrupt__interruptEnd(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_0d59:
-  SET_HL(POP(0x0d59));  // pop hl
-  SET_DE(POP(0x0d5a));  // pop de
-  SET_BC(POP(0x0d5b));  // pop bc
-  SET_AF(POP(0x0d5c));  // pop af
-  RETI(0x0d5d); return;  // reti
-}
-
 // 00:18a0
 void textThreadStart(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1163,7 +809,7 @@ L_18aa:
   I(0x18aa, 1); alu_xor(gb, A);  // xor a
   I(0x18ab, 4); mem_wr(gb, 0xcba0, A);  // ld ($cba0),a
   I(0x18ae, 4); mem_wr(gb, 0xcbae, A);  // ld ($cbae),a
-  I(0x18b1, 4); stubThreadStart(gb); return;  // jp $08e2
+  I(0x18b1, 4); if (hook_enabled_at(0x08e2)) { stubThreadStart_hook(gb); return; } HANDOFF(0x08e2);  // jp $08e2
 L_18b4:
   I(0x18b4, 2); A = 0x3f;  // ld a,$3f
   I(0x18b6, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
@@ -1175,7 +821,7 @@ L_18be:
   I(0x18c2, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   CALL(0x18c5, updateTextbox, 0x4b1f, 0x18c8);  // call $4b1f
 L_18c8:
-  CALL(0x18c8, resumeThreadNextFrame, 0x08fe, 0x18cb);  // call $08fe
+  CALL(0x18c8, resumeThreadNextFrame_hook, 0x08fe, 0x18cb);  // call $08fe
 L_18cb:
   I(0x18cb, 3); goto L_18be;  // jr $18be
 }
@@ -1187,7 +833,7 @@ L_18aa:
   I(0x18aa, 1); alu_xor(gb, A);  // xor a
   I(0x18ab, 4); mem_wr(gb, 0xcba0, A);  // ld ($cba0),a
   I(0x18ae, 4); mem_wr(gb, 0xcbae, A);  // ld ($cbae),a
-  I(0x18b1, 4); stubThreadStart(gb); return;  // jp $08e2
+  I(0x18b1, 4); if (hook_enabled_at(0x08e2)) { stubThreadStart_hook(gb); return; } HANDOFF(0x08e2);  // jp $08e2
 }
 
 // 00:18b4
@@ -1204,7 +850,7 @@ L_18be:
   I(0x18c2, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   CALL(0x18c5, updateTextbox, 0x4b1f, 0x18c8);  // call $4b1f
 L_18c8:
-  CALL(0x18c8, resumeThreadNextFrame, 0x08fe, 0x18cb);  // call $08fe
+  CALL(0x18c8, resumeThreadNextFrame_hook, 0x08fe, 0x18cb);  // call $08fe
 L_18cb:
   I(0x18cb, 3); goto L_18be;  // jr $18be
 }
@@ -1219,7 +865,7 @@ L_18be:
   I(0x18c2, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   CALL(0x18c5, updateTextbox, 0x4b1f, 0x18c8);  // call $4b1f
 L_18c8:
-  CALL(0x18c8, resumeThreadNextFrame, 0x08fe, 0x18cb);  // call $08fe
+  CALL(0x18c8, resumeThreadNextFrame_hook, 0x08fe, 0x18cb);  // call $08fe
 L_18cb:
   I(0x18cb, 3); goto L_18be;  // jr $18be
 }
@@ -1234,7 +880,7 @@ L_18be:
   I(0x18c2, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   CALL(0x18c5, updateTextbox, 0x4b1f, 0x18c8);  // call $4b1f
 L_18c8:
-  CALL(0x18c8, resumeThreadNextFrame, 0x08fe, 0x18cb);  // call $08fe
+  CALL(0x18c8, resumeThreadNextFrame_hook, 0x08fe, 0x18cb);  // call $08fe
 L_18cb:
   I(0x18cb, 3); goto L_18be;  // jr $18be
 }
@@ -1250,7 +896,7 @@ L_1a1f:
   I(0x1a21, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x1a23, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   CALL(0x1a26, b2_fileSelectScreen, 0x412e, 0x1a29);  // call $412e
-  CALL(0x1a29, resumeThreadNextFrame, 0x08fe, 0x1a2c);  // call $08fe
+  CALL(0x1a29, resumeThreadNextFrame_hook, 0x08fe, 0x1a2c);  // call $08fe
 L_1a2c:
   I(0x1a2c, 3); goto L_1a1f;  // jr $1a1f
 }
@@ -1264,7 +910,7 @@ L_1a1f:
   I(0x1a21, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x1a23, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   CALL(0x1a26, b2_fileSelectScreen, 0x412e, 0x1a29);  // call $412e
-  CALL(0x1a29, resumeThreadNextFrame, 0x08fe, 0x1a2c);  // call $08fe
+  CALL(0x1a29, resumeThreadNextFrame_hook, 0x08fe, 0x1a2c);  // call $08fe
 L_1a2c:
   I(0x1a2c, 3); goto L_1a1f;  // jr $1a1f
 }
@@ -1282,7 +928,7 @@ L_1b1d:
   I(0x1b1f, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x1b21, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   CALL(0x1b24, runSaveAndQuitMenu, 0x7380, 0x1b27);  // call $7380
-  CALL(0x1b27, resumeThreadNextFrame, 0x08fe, 0x1b2a);  // call $08fe
+  CALL(0x1b27, resumeThreadNextFrame_hook, 0x08fe, 0x1b2a);  // call $08fe
 L_1b2a:
   I(0x1b2a, 3); goto L_1b1d;  // jr $1b1d
 }
@@ -1296,7 +942,7 @@ L_1b1d:
   I(0x1b1f, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x1b21, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   CALL(0x1b24, runSaveAndQuitMenu, 0x7380, 0x1b27);  // call $7380
-  CALL(0x1b27, resumeThreadNextFrame, 0x08fe, 0x1b2a);  // call $08fe
+  CALL(0x1b27, resumeThreadNextFrame_hook, 0x08fe, 0x1b2a);  // call $08fe
 L_1b2a:
   I(0x1b2a, 3); goto L_1b1d;  // jr $1b1d
 }
@@ -1312,7 +958,7 @@ L_2d07:
   I(0x2d0f, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   CALL(0x2d12, runIntro, 0x4cc9, 0x2d15);  // call $4cc9
 L_2d15:
-  CALL(0x2d15, resumeThreadNextFrame, 0x08fe, 0x2d18);  // call $08fe
+  CALL(0x2d15, resumeThreadNextFrame_hook, 0x08fe, 0x2d18);  // call $08fe
 L_2d18:
   I(0x2d18, 3); goto L_2d07;  // jr $2d07
 }
@@ -1321,7 +967,7 @@ L_2d18:
 void introThreadStart__afterCall2d15(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_2d15:
-  CALL(0x2d15, resumeThreadNextFrame, 0x08fe, 0x2d18);  // call $08fe
+  CALL(0x2d15, resumeThreadNextFrame_hook, 0x08fe, 0x2d18);  // call $08fe
 L_2d18:
   I(0x2d18, 3); introThreadStart(gb); return;  // jr $2d07
 }
@@ -1349,7 +995,7 @@ L_3384:
   if (!(F & FZ)) { I(0x3399, 3); goto L_339c; } I(0x3399, 2);  // jr nz,$339c
   I(0x339b, 1); A = alu_inc8(gb, A);  // inc a
 L_339c:
-  CALL(0x339c, resumeThreadInAFrames, 0x0900, 0x339f);  // call $0900
+  CALL(0x339c, resumeThreadInAFrames_hook, 0x0900, 0x339f);  // call $0900
 L_339f:
   I(0x339f, 3); goto L_3384;  // jr $3384
 }
@@ -1386,7 +1032,7 @@ L_33ba:
   CALL(0x33c1, runGameLogic, 0x596a, 0x33c4);  // call $596a
   CALL(0x33c4, drawAllSprites_hook, 0x0d9a, 0x33c7);  // call $0d9a
   CALL(0x33c7, checkReloadStatusBarGraphics_hook, 0x1a71, 0x33ca);  // call $1a71
-  CALL(0x33ca, resumeThreadNextFrame, 0x08fe, 0x33cd);  // call $08fe
+  CALL(0x33ca, resumeThreadNextFrame_hook, 0x08fe, 0x33cd);  // call $08fe
 L_33cd:
   I(0x33cd, 3); goto L_33a7;  // jr $33a7
 }
@@ -1414,7 +1060,7 @@ L_33ba:
   CALL(0x33c1, runGameLogic, 0x596a, 0x33c4);  // call $596a
   CALL(0x33c4, drawAllSprites_hook, 0x0d9a, 0x33c7);  // call $0d9a
   CALL(0x33c7, checkReloadStatusBarGraphics_hook, 0x1a71, 0x33ca);  // call $1a71
-  CALL(0x33ca, resumeThreadNextFrame, 0x08fe, 0x33cd);  // call $08fe
+  CALL(0x33ca, resumeThreadNextFrame_hook, 0x08fe, 0x33cd);  // call $08fe
 L_33cd:
   I(0x33cd, 3); goto L_33a7;  // jr $33a7
 }
@@ -1443,7 +1089,7 @@ L_33ba:
   CALL(0x33c1, runGameLogic, 0x596a, 0x33c4);  // call $596a
   CALL(0x33c4, drawAllSprites_hook, 0x0d9a, 0x33c7);  // call $0d9a
   CALL(0x33c7, checkReloadStatusBarGraphics_hook, 0x1a71, 0x33ca);  // call $1a71
-  CALL(0x33ca, resumeThreadNextFrame, 0x08fe, 0x33cd);  // call $08fe
+  CALL(0x33ca, resumeThreadNextFrame_hook, 0x08fe, 0x33cd);  // call $08fe
 L_33cd:
   I(0x33cd, 3); goto L_33a7;  // jr $33a7
 }
@@ -1743,43 +1389,7 @@ void _label_00_204(GB *gb) {
   I(0x1895, 4); mem_wr(gb, 0xcba0, A);  // ld ($cba0),a
   I(0x1898, 3); SET_BC(0x18a0);  // ld bc,$18a0
   I(0x189b, 2); A = 0xf0;  // ld a,$f0
-  I(0x189d, 4); threadRestart(gb); return;  // jp $08a3
-}
-
-// 00:0040
-void vblankVector(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x0040, AF);  // push af
-  PUSH(0x0041, BC);  // push bc
-  PUSH(0x0042, DE);  // push de
-  PUSH(0x0043, HL);  // push hl
-  I(0x0044, 4); vblankInterrupt(gb); return;  // jp $09f8
-}
-
-// 00:0048
-void lcdVector(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x0048, AF);  // push af
-  PUSH(0x0049, HL);  // push hl
-  I(0x004a, 4); lcdInterrupt(gb); return;  // jp $0b46
-}
-
-// 00:0050
-void timerVector(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x0050, 1); gb->ime_delay = true; gb->ime_writes++;  // ei
-  PUSH(0x0051, AF);  // push af
-  PUSH(0x0052, BC);  // push bc
-  PUSH(0x0053, DE);  // push de
-  PUSH(0x0054, HL);  // push hl
-  I(0x0055, 4); timerInterrupt(gb); return;  // jp $0d07
-}
-
-// 00:0058
-void serialVector(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x0058, AF);  // push af
-  I(0x0059, 4); serialInterrupt(gb); return;  // jp $0c3d
+  I(0x189d, 4); if (hook_enabled_at(0x08a3)) { threadRestart_hook(gb); return; } HANDOFF(0x08a3);  // jp $08a3
 }
 
 // 00:ff80

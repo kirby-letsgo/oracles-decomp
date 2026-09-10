@@ -4557,8 +4557,8 @@ L_5acd:
   if ((F & FZ)) { I(0x5ad1, 3); goto L_5ade; } I(0x5ad1, 2);  // jr z,$5ade
   I(0x5ad3, 2); A = 0xe0;  // ld a,$e0
   I(0x5ad5, 3); SET_BC(0x1b10);  // ld bc,$1b10
-  CALL(0x5ad8, threadRestart, 0x08a3, 0x5adb);  // call $08a3
-  I(0x5adb, 4); stubThreadStart(gb); return;  // jp $08e2
+  CALL(0x5ad8, threadRestart_hook, 0x08a3, 0x5adb);  // call $08a3
+  I(0x5adb, 4); if (hook_enabled_at(0x08e2)) { stubThreadStart_hook(gb); return; } HANDOFF(0x08e2);  // jp $08e2
 L_5ade:
   I(0x5ade, 4); A = mem_rd(gb, 0xc2ef);  // ld a,($c2ef)
   RST_PUSH(0x5ae1, 0x5ae2);  // rst $00 (jump table)

@@ -2128,7 +2128,7 @@ L_4b36:
   I(0x4b3c, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x4b3d); return; } I(0x4b3d, 2);  // ret nz
   I(0x4b3e, 4); mem_wr(gb, 0xcbae, A);  // ld ($cbae),a
-  I(0x4b41, 4); stubThreadStart(gb); return;  // jp $08e2
+  I(0x4b41, 4); if (hook_enabled_at(0x08e2)) { stubThreadStart_hook(gb); return; } HANDOFF(0x08e2);  // jp $08e2
 }
 
 // 3f:4b44
@@ -11043,7 +11043,7 @@ void resumeThreadNextFrameIfLcdIsOn(GB *gb) {
   I(0x411d, 3); A = mem_rd(gb, 0xff40);  // ldh a,($ff40)
   I(0x411f, 1); alu_rlca(gb);  // rlca
   if (!(F & FC)) { RET_TAKEN(0x4120); return; } I(0x4120, 2);  // ret nc
-  CALL(0x4121, resumeThreadNextFrameAndSaveBank, 0x08eb, 0x4124);  // call $08eb
+  CALL(0x4121, resumeThreadNextFrameAndSaveBank_hook, 0x08eb, 0x4124);  // call $08eb
 L_4124:
   RET(0x4124); return;  // ret
 }

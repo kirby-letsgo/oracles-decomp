@@ -85,3 +85,11 @@ void burn_rom(GB *gb, int bank, uint16_t from, uint16_t to, bool last_taken) {
     a = (uint16_t)(a + len);
   }
 }
+
+void burn_store_sp(GB *gb, uint16_t a, uint16_t addr) {
+  gb->hook_pc = a;
+  gb_burn(gb, 4);
+  bus_write(gb, addr, (uint8_t)gb->sp);
+  gb_burn_nb(gb, 1);
+  bus_write(gb, addr + 1, (uint8_t)(gb->sp >> 8));
+}

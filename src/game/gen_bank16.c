@@ -783,7 +783,7 @@ void func_4000_b16(GB *gb) {
   I(0x402b, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
 L_402d:
   I(0x402d, 2); alu_and(gb, 0x81);  // and $81
-  CALL(0x402f, writeToSC, 0x0c6a, 0x4032);  // call $0c6a
+  CALL(0x402f, writeToSC_hook, 0x0c6a, 0x4032);  // call $0c6a
 L_4032:
   SET_AF(POP(0x4032));  // pop af
   I(0x4033, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
@@ -814,7 +814,7 @@ void func_44ac(GB *gb) {
   I(0x44c9, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
   I(0x44cb, 2); A = 0x80;  // ld a,$80
   I(0x44cd, 4); mem_wr(gb, 0xd988, A);  // ld ($d988),a
-  CALL(0x44d0, writeToSC, 0x0c6a, 0x44d3);  // call $0c6a
+  CALL(0x44d0, writeToSC_hook, 0x0c6a, 0x44d3);  // call $0c6a
   SET_AF(POP(0x44d3));  // pop af
   I(0x44d4, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
   RET(0x44d6); return;  // ret
@@ -963,7 +963,7 @@ void func_4096(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x4096, waitForSerialByte, 0x41dc, 0x4099);  // call $41dc
   I(0x4099, 2); alu_cp(gb, 0x80);  // cp $80
-  if ((F & FZ)) { I(0x409b, 4); disableSerialPort(gb); return; } I(0x409b, 3);  // jp z,$0c7e
+  if ((F & FZ)) { I(0x409b, 4); if (hook_enabled_at(0x0c7e)) { disableSerialPort_hook(gb); return; } HANDOFF(0x0c7e); } I(0x409b, 3);  // jp z,$0c7e
   I(0x409e, 4); prepareForNextPacket(gb); return;  // jp $4269
 }
 
@@ -971,7 +971,7 @@ void func_4096(GB *gb) {
 void disableSerialIfByteReceived(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x40a1, waitForSerialByte, 0x41dc, 0x40a4);  // call $41dc
-  I(0x40a4, 4); disableSerialPort(gb); return;  // jp $0c7e
+  I(0x40a4, 4); if (hook_enabled_at(0x0c7e)) { disableSerialPort_hook(gb); return; } HANDOFF(0x0c7e);  // jp $0c7e
 }
 
 // 16:40a7
@@ -1331,7 +1331,7 @@ void FFBE_02(GB *gb) {
 // 16:422f
 void determineRingFortuneRing(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x422f, disableSerialPort, 0x0c7e, 0x4232);  // call $0c7e
+  CALL(0x422f, disableSerialPort_hook, 0x0c7e, 0x4232);  // call $0c7e
   I(0x4232, 1); alu_xor(gb, A);  // xor a
   I(0x4233, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
   CALL(0x4235, compareFileHeader, 0x44ec, 0x4238);  // call $44ec
@@ -1459,7 +1459,7 @@ void func_42c5(GB *gb) {
   I(0x42ca, 4); A = mem_rd(gb, 0xd9e7);  // ld a,($d9e7)
   I(0x42cd, 3); mem_wr(gb, 0xff9a, A);  // ldh ($ff9a),a
   I(0x42cf, 2); alu_cp(gb, 0x03);  // cp $03
-  if (!(F & FC)) { I(0x42d1, 4); disableSerialPort(gb); return; } I(0x42d1, 3);  // jp nc,$0c7e
+  if (!(F & FC)) { I(0x42d1, 4); if (hook_enabled_at(0x0c7e)) { disableSerialPort_hook(gb); return; } HANDOFF(0x0c7e); } I(0x42d1, 3);  // jp nc,$0c7e
   CALL(0x42d4, loadFile_b00_hook, 0x09dc, 0x42d7);  // call $09dc
   I(0x42d7, 2); A = 0x0d;  // ld a,$0d
   I(0x42d9, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
@@ -1575,14 +1575,14 @@ void gameLinkState0b(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x4370, waitForSerialByte, 0x41dc, 0x4373);  // call $41dc
   I(0x4373, 2); alu_cp(gb, 0x80);  // cp $80
-  if ((F & FZ)) { I(0x4375, 4); disableSerialPort(gb); return; } I(0x4375, 3);  // jp z,$0c7e
-  I(0x4378, 4); disableSerialPort(gb); return;  // jp $0c7e
+  if ((F & FZ)) { I(0x4375, 4); if (hook_enabled_at(0x0c7e)) { disableSerialPort_hook(gb); return; } HANDOFF(0x0c7e); } I(0x4375, 3);  // jp z,$0c7e
+  I(0x4378, 4); if (hook_enabled_at(0x0c7e)) { disableSerialPort_hook(gb); return; } HANDOFF(0x0c7e);  // jp $0c7e
 }
 
 // 16:437b
 void func_437b(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x437b, disableSerialPort, 0x0c7e, 0x437e);  // call $0c7e
+  CALL(0x437b, disableSerialPort_hook, 0x0c7e, 0x437e);  // call $0c7e
   I(0x437e, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
   I(0x4380, 3); SET_DE(0xd98d);  // ld de,$d98d
   I(0x4383, 3); SET_HL(0xc616);  // ld hl,$c616
@@ -1611,7 +1611,7 @@ void func_439a(GB *gb) {
   I(0x43a4, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x43a5, 3); func_43ab(gb); return; } I(0x43a5, 2);  // jr z,$43ab
   SET_AF(POP(0x43a7));  // pop af
-  I(0x43a8, 4); disableSerialPort(gb); return;  // jp $0c7e
+  I(0x43a8, 4); if (hook_enabled_at(0x0c7e)) { disableSerialPort_hook(gb); return; } HANDOFF(0x0c7e);  // jp $0c7e
 }
 
 // 16:43ab
@@ -1667,7 +1667,7 @@ void sendRetryPacket(GB *gb) {
   if ((F & FC)) { I(0x43ec, 3); setPacketBuffer(gb); return; } I(0x43ec, 2);  // jr c,$43fc
   I(0x43ee, 2); A = 0x80;  // ld a,$80
   I(0x43f0, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x43f2, 4); disableSerialPort(gb); return;  // jp $0c7e
+  I(0x43f2, 4); if (hook_enabled_at(0x0c7e)) { disableSerialPort_hook(gb); return; } HANDOFF(0x0c7e);  // jp $0c7e
 }
 
 // 16:43f5
@@ -1989,7 +1989,7 @@ L_44df:
   I(0x44e3, 2); alu_cp(gb, 0x81);  // cp $81
   if ((F & FZ)) { I(0x44e5, 4); sendRetryPacket(gb); return; } I(0x44e5, 3);  // jp z,$43e0
   SET_AF(POP(0x44e8));  // pop af
-  I(0x44e9, 4); disableSerialPort(gb); return;  // jp $0c7e
+  I(0x44e9, 4); if (hook_enabled_at(0x0c7e)) { disableSerialPort_hook(gb); return; } HANDOFF(0x0c7e);  // jp $0c7e
 }
 
 // 16:44ec

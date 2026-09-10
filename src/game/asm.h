@@ -57,6 +57,7 @@ static inline void push_effect(GB *gb, uint16_t v) { gb->sp -= 2; bus_write(gb, 
 static inline void push_timed(GB *gb, uint16_t v) { gb->sp -= 2; bus_write(gb, gb->sp + 1, v >> 8); gb_burn_nb(gb, 1); bus_write(gb, gb->sp, (uint8_t)v); }
 static inline uint16_t pop_effect(GB *gb) { uint16_t v = (uint16_t)(bus_read(gb, gb->sp) | (bus_read(gb, gb->sp + 1) << 8)); gb->sp += 2; return v; }
 static inline void ret_effect(GB *gb) { gb->pc = pop_effect(gb); }
+static inline void reti_effect(GB *gb) { ret_effect(gb); gb->ime = true; gb->ime_writes++; }
 #define PUSH(a, v) do { I((a), 3); push_timed(gb, (v)); } while (0)
 #define POP(a) (gb->hook_pc = (a), gb_burn(gb, 3), pop_effect(gb))
 #define RET(a) do { I((a), 4); ret_effect(gb); } while (0)

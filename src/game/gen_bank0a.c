@@ -6828,7 +6828,7 @@ L_48e2:
 L_48f5:
   I(0x48f5, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
   I(0x48f7, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x48f8, 4); serialFunc_0c73(gb); return; } I(0x48f8, 3);  // jp z,$0c73
+  if ((F & FZ)) { I(0x48f8, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73); } I(0x48f8, 3);  // jp z,$0c73
   I(0x48fb, 2); alu_and(gb, 0x01);  // and $01
   I(0x48fd, 2); alu_add(gb, 0x01);  // add $01
   I(0x48ff, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
@@ -6838,7 +6838,7 @@ L_48f5:
   I(0x4908, 3); SET_BC(0x3030);  // ld bc,$3030
   I(0x490b, 4); if (hook_enabled_at(0x186e)) { showTextNonExitable_hook(gb); return; } HANDOFF(0x186e);  // jp $186e
 L_490e:
-  CALL(0x490e, serialFunc_0c8d, 0x0c8d, 0x4911);  // call $0c8d
+  CALL(0x490e, serialFunc_0c8d_hook, 0x0c8d, 0x4911);  // call $0c8d
   I(0x4911, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
   I(0x4913, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x4914); return; } I(0x4914, 2);  // ret nz
@@ -7199,7 +7199,7 @@ L_48e2:
 L_48f5:
   I(0x48f5, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
   I(0x48f7, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x48f8, 4); serialFunc_0c73(gb); return; } I(0x48f8, 3);  // jp z,$0c73
+  if ((F & FZ)) { I(0x48f8, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73); } I(0x48f8, 3);  // jp z,$0c73
   I(0x48fb, 2); alu_and(gb, 0x01);  // and $01
   I(0x48fd, 2); alu_add(gb, 0x01);  // add $01
   I(0x48ff, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
@@ -7209,7 +7209,7 @@ L_48f5:
   I(0x4908, 3); SET_BC(0x3030);  // ld bc,$3030
   I(0x490b, 4); if (hook_enabled_at(0x186e)) { showTextNonExitable_hook(gb); return; } HANDOFF(0x186e);  // jp $186e
 L_490e:
-  CALL(0x490e, serialFunc_0c8d, 0x0c8d, 0x4911);  // call $0c8d
+  CALL(0x490e, serialFunc_0c8d_hook, 0x0c8d, 0x4911);  // call $0c8d
   I(0x4911, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
   I(0x4913, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x4914); return; } I(0x4914, 2);  // ret nz
@@ -7305,7 +7305,7 @@ L_48e2:
 L_48f5:
   I(0x48f5, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
   I(0x48f7, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x48f8, 4); serialFunc_0c73(gb); return; } I(0x48f8, 3);  // jp z,$0c73
+  if ((F & FZ)) { I(0x48f8, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73); } I(0x48f8, 3);  // jp z,$0c73
   I(0x48fb, 2); alu_and(gb, 0x01);  // and $01
   I(0x48fd, 2); alu_add(gb, 0x01);  // add $01
   I(0x48ff, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
@@ -7328,7 +7328,7 @@ void interactionCode89__label_0a_036(GB *gb) {
 L_48f5:
   I(0x48f5, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
   I(0x48f7, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x48f8, 4); serialFunc_0c73(gb); return; } I(0x48f8, 3);  // jp z,$0c73
+  if ((F & FZ)) { I(0x48f8, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73); } I(0x48f8, 3);  // jp z,$0c73
   I(0x48fb, 2); alu_and(gb, 0x01);  // and $01
   I(0x48fd, 2); alu_add(gb, 0x01);  // add $01
   I(0x48ff, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
@@ -7343,7 +7343,7 @@ L_48f5:
 void interactionCode89__state5Substate2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_490e:
-  CALL(0x490e, serialFunc_0c8d, 0x0c8d, 0x4911);  // call $0c8d
+  CALL(0x490e, serialFunc_0c8d_hook, 0x0c8d, 0x4911);  // call $0c8d
   I(0x4911, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
   I(0x4913, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x4914); return; } I(0x4914, 2);  // ret nz
