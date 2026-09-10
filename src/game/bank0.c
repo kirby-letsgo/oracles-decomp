@@ -11397,7 +11397,7 @@ void restartThisThread_hook(GB *gb) {
   copy_initial_thread_state(gb, 0x08d4);
   set_thread_restart_address(gb, 0x08da);
   CYCT(0x08e0, 0x08e2);
-  _nextThread(gb);
+  _nextThread_hook(gb);
 }
 
 void stubThreadStart_hook(GB *gb) {
@@ -11407,7 +11407,7 @@ void stubThreadStart_hook(GB *gb) {
   CYC(0x08e2, 0x08e7);
   CYC(0x08e7, 0x08e9); mem_wr(gb, HL, 0x00);
   CYCT(0x08e9, 0x08eb);
-  _nextThread(gb);
+  _nextThread_hook(gb);
 }
 
 void resumeThreadNextFrameAndSaveBank_hook(GB *gb) {
@@ -11458,7 +11458,7 @@ void resumeThreadInAFrames_hook(GB *gb) {
   CYC(0x0913, 0x0914); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(0x0914, 0x0916); A = mem_rd(gb, hFF93);
   CYC(0x0916, 0x0917); mem_wr(gb, HL, A);
-  _nextThread(gb);
+  _nextThread_hook(gb);
 }
 
 void writeToSC_hook(GB *gb) {
@@ -12121,4 +12121,272 @@ void lcdInterrupt_hook(GB *gb) {
   CYC(0x0b92, 0x0b94); H8(hLcdInterruptCounter) = A;
   CYCT(0x0b94, 0x0b96);
   _lcdInterruptEnd_hook(gb);
+}
+
+void begin_hook(GB *gb) {
+  CYC(0x0150, 0x0151);
+  CYC(0x0151, 0x0152); gb->ime = false; gb->ime_delay = false; gb->ime_writes++;
+  alu_cp(gb, 0x11);
+  CYC(0x0152, 0x0154);
+  A = 0x00;
+  CYC(0x0154, 0x0156);
+  if (F & FZ) {
+    CYC(0x0156, 0x0158);
+    A = alu_inc8(gb, A);
+    CYC(0x0158, 0x0159);
+    alu_bit(gb, 0, B);
+    CYC(0x0159, 0x015b);
+    if (F & FZ) CYCT(0x015b, 0x015d);
+    else {
+      CYC(0x015b, 0x015d);
+      A = 0xff;
+      CYC(0x015d, 0x015f);
+    }
+  } else CYCT(0x0156, 0x0158);
+  CYC(0x015f, 0x0161); H8(hGameboyType) = A;
+  A = 0x37;
+  CYC(0x0161, 0x0163);
+  CYC(0x0163, 0x0165); H8(hRng1) = A;
+  A = 0x0d;
+  CYC(0x0165, 0x0167);
+  CYC(0x0167, 0x0169); H8(hRng2) = A;
+  resetGame_hook(gb);
+}
+
+void resetGame__afterSp016c_hook(GB *gb) {
+  A = 0x03;
+  CYC(0x016c, 0x016e);
+  CYC(0x016e, 0x0170); H8(hRomBank) = A;
+  CYC(0x0170, 0x0173); mem_wr(gb, MBC_ROM_BANK, A);
+  CYCT(0x0173, 0x0176);
+  init(gb);
+}
+
+void resetGame_hook(GB *gb) {
+  CYC(0x0169, 0x016c); gb->sp = wMainStackTop; gb->sp_loads++;
+  hook_handoff(gb, 0x016c);
+}
+
+void _nextThread__afterSp091a_hook(GB *gb) {
+  H = wThreadStateBuffer >> 8;
+  CYC(0x091a, 0x091c);
+  A = 0x01;
+  CYC(0x091c, 0x091e);
+  CYC(0x091e, 0x0920); mem_wr(gb, IO_SVBK, A);
+  CYCT(0x0920, 0x0922);
+  _mainLoop_nextThread_hook(gb);
+}
+
+void _nextThread_hook(GB *gb) {
+  CYC(0x0917, 0x091a); gb->sp = wMainStackTop; gb->sp_loads++;
+  hook_handoff(gb, 0x091a);
+}
+
+void startGame__afterSp0925_hook(GB *gb) {
+  SET_HL(0x09ac);
+  CYC(0x0925, 0x0928);
+  SET_DE(wThreadStateBuffer);
+  CYC(0x0928, 0x092b);
+  B = 0x20;
+  CYC(0x092b, 0x092d);
+  for (;;) {
+    CYC(0x092d, 0x092e); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x092e, 0x092f); mem_wr(gb, DE, A);
+    E = alu_inc8(gb, E);
+    CYC(0x092f, 0x0930);
+    B = alu_dec8(gb, B);
+    CYC(0x0930, 0x0931);
+    if (!(F & FZ)) { CYCT(0x0931, 0x0933); continue; }
+    CYC(0x0931, 0x0933);
+    break;
+  }
+  _mainLoop_hook(gb);
+}
+
+void startGame_hook(GB *gb) {
+  CYC(0x0922, 0x0925); gb->sp = wMainStackTop; gb->sp_loads++;
+  hook_handoff(gb, 0x0925);
+}
+
+void _mainLoop_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x0933, pollInput_hook, ROM_pollInput, 0x0936);
+  A = mem_rd(gb, hIntroInputsEnabled);
+  CYC(0x0936, 0x0938);
+  alu_add(gb, A);
+  CYC(0x0938, 0x0939);
+  if (F & FZ) CYCT(0x0939, 0x093b);
+  else {
+    CYC(0x0939, 0x093b);
+    A = mem_rd(gb, wKeysPressed);
+    CYC(0x093b, 0x093e);
+    alu_sub(gb, (JOY_A | JOY_B | JOY_START | JOY_SELECT));
+    CYC(0x093e, 0x0940);
+    if (F & FZ) { CYCT(0x0940, 0x0943); resetGame_hook(gb); return; }
+    CYC(0x0940, 0x0943);
+  }
+  A = 0x10;
+  CYC(0x0943, 0x0945);
+  CYC(0x0945, 0x0947); H8(hOamTail) = A;
+  H = wThreadStateBuffer >> 8;
+  CYC(0x0947, 0x0949);
+  A = wThreadStateBuffer & 0xff;
+  CYC(0x0949, 0x094b);
+  CYC(0x094b, 0x094d); H8(hActiveThread) = A;
+  L = A;
+  CYC(0x094d, 0x094e);
+  A = mem_rd(gb, HL);
+  CYC(0x094e, 0x094f);
+  A = alu_dec8(gb, A);
+  CYC(0x094f, 0x0950);
+  if (F & FZ) { CYCT(0x0950, 0x0952); _countdownToRunThread_hook(gb); return; }
+  CYC(0x0950, 0x0952);
+  A = alu_dec8(gb, A);
+  CYC(0x0952, 0x0953);
+  if (F & FZ) { CYCT(0x0953, 0x0955); _initializeThread_hook(gb); return; }
+  CYC(0x0953, 0x0955);
+  _mainLoop_nextThread_hook(gb);
+}
+
+void _mainLoop_nextThread_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  for (;;) {
+    CYC(0x0955, 0x0957); A = mem_rd(gb, hActiveThread);
+    alu_add(gb, 0x08);
+    CYC(0x0957, 0x0959);
+    CYC(0x0959, 0x095b); H8(hActiveThread) = A;
+    alu_cp(gb, (wThreadStateBuffer + 4 * 8) & 0xff);
+    CYC(0x095b, 0x095d);
+    if (!(F & FZ)) {
+      CYCT(0x095d, 0x095f);
+      L = A;
+      CYC(0x094d, 0x094e);
+      A = mem_rd(gb, HL);
+      CYC(0x094e, 0x094f);
+      A = alu_dec8(gb, A);
+      CYC(0x094f, 0x0950);
+      if (F & FZ) { CYCT(0x0950, 0x0952); _countdownToRunThread_hook(gb); return; }
+      CYC(0x0950, 0x0952);
+      A = alu_dec8(gb, A);
+      CYC(0x0952, 0x0953);
+      if (F & FZ) { CYCT(0x0953, 0x0955); _initializeThread_hook(gb); return; }
+      CYC(0x0953, 0x0955);
+      continue;
+    }
+    CYC(0x095d, 0x095f);
+    break;
+  }
+  A = 0x3f;
+  CYC(0x095f, 0x0961);
+  CYC(0x0961, 0x0963); H8(hRomBank) = A;
+  CYC(0x0963, 0x0966); mem_wr(gb, MBC_ROM_BANK, A);
+  CALL_ROM(0x0966, ROM_refreshDirtyPalettes);
+  alu_xor(gb, A);
+  CYC(0x0969, 0x096a);
+  CYC(0x096a, 0x096c); mem_wr(gb, IO_SVBK, A);
+  SET_HL(0xc49e);
+  CYC(0x096c, 0x096f);
+  CYC(0x096f, 0x0970); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  SET_HL(wGfxRegs1);
+  CYC(0x0970, 0x0973);
+  SET_DE(wGfxRegsFinal);
+  CYC(0x0973, 0x0976);
+  B = 0x06;
+  CYC(0x0976, 0x0978);
+  for (;;) {
+    CYC(0x0978, 0x0979); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x0979, 0x097a); mem_wr(gb, DE, A);
+    E = alu_inc8(gb, E);
+    CYC(0x097a, 0x097b);
+    B = alu_dec8(gb, B);
+    CYC(0x097b, 0x097c);
+    if (!(F & FZ)) { CYCT(0x097c, 0x097e); continue; }
+    CYC(0x097c, 0x097e);
+    break;
+  }
+  SET_HL(wVBlankChecker);
+  CYC(0x097e, 0x0981);
+  A = 0xff;
+  CYC(0x0981, 0x0983); mem_wr(gb, HL, A);
+  for (;;) {
+    int halt_r;
+    do { I(0x0983, 1); halt_r = hook_halt(gb, 0x0984); } while (halt_r == 1);
+    if (halt_r < 0) { hook_handoff(gb, 0x0984); return; }
+    CYC(0x0984, 0x0985);
+    alu_bit(gb, 7, mem_rd(gb, HL));
+    CYC(0x0985, 0x0987);
+    if (!(F & FZ)) { CYCT(0x0987, 0x0989); continue; }
+    CYC(0x0987, 0x0989);
+    break;
+  }
+  CYCT(0x0989, 0x098b);
+  _mainLoop_hook(gb);
+}
+
+void _countdownToRunThread__afterSp0998_hook(GB *gb) {
+  CYC(0x0998, 0x0999); SET_BC(pop_effect(gb));
+  CYC(0x0999, 0x099a); SET_DE(pop_effect(gb));
+  CYC(0x099a, 0x099b); SET_HL(pop_effect(gb));
+  CYC(0x099b, 0x099c);
+  ret_effect(gb);
+}
+
+void _countdownToRunThread_hook(GB *gb) {
+  L = alu_inc8(gb, L);
+  CYC(0x098b, 0x098c);
+  uint8_t v = alu_dec8(gb, mem_rd(gb, HL));
+  CYC(0x098c, 0x098d); mem_wr(gb, HL, v);
+  if (F & FZ) CYC(0x098d, 0x098f);
+  else { CYCT(0x098d, 0x098f); _mainLoop_nextThread_hook(gb); return; }
+  L = alu_dec8(gb, L);
+  CYC(0x098f, 0x0990);
+  A = 0x03;
+  CYC(0x0990, 0x0992);
+  CYC(0x0992, 0x0993); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  L = alu_inc8(gb, L);
+  CYC(0x0993, 0x0994);
+  A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x0994, 0x0995);
+  H = mem_rd(gb, HL);
+  CYC(0x0995, 0x0996);
+  L = A;
+  CYC(0x0996, 0x0997);
+  gb->sp = HL; gb->sp_loads++;
+  CYC(0x0997, 0x0998);
+  hook_handoff(gb, 0x0998);
+}
+
+void _initializeThread__afterSp09aa_hook(GB *gb) {
+  CYC(0x09aa, 0x09ab); push_effect(gb, BC);
+  CYC(0x09ab, 0x09ac);
+  ret_effect(gb);
+}
+
+void _initializeThread_hook(GB *gb) {
+  A = 0x03;
+  CYC(0x099c, 0x099e);
+  CYC(0x099e, 0x099f); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  L = alu_inc8(gb, L);
+  CYC(0x099f, 0x09a0);
+  A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x09a0, 0x09a1);
+  E = A;
+  CYC(0x09a1, 0x09a2);
+  A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x09a2, 0x09a3);
+  D = A;
+  CYC(0x09a3, 0x09a4);
+  A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x09a4, 0x09a5);
+  B = mem_rd(gb, HL);
+  CYC(0x09a5, 0x09a6);
+  C = A;
+  CYC(0x09a6, 0x09a7);
+  L = E;
+  CYC(0x09a7, 0x09a8);
+  H = D;
+  CYC(0x09a8, 0x09a9);
+  gb->sp = HL; gb->sp_loads++;
+  CYC(0x09a9, 0x09aa);
+  hook_handoff(gb, 0x09aa);
 }

@@ -15740,7 +15740,7 @@ L_7417:
   I(0x741d, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x741e); return; } I(0x741e, 2);  // ret nz
   CALL(0x741f, checkIsLinkedGame_hook, 0x1992, 0x7422);  // call $1992
-  if (!(F & FZ)) { I(0x7422, 4); resetGame(gb); return; } I(0x7422, 3);  // jp nz,$0169
+  if (!(F & FZ)) { I(0x7422, 4); if (hook_enabled_at(0x0169)) { resetGame_hook(gb); return; } HANDOFF(0x0169); } I(0x7422, 3);  // jp nz,$0169
   CALL(0x7425, disableLcd_hook, 0x02c1, 0x7428);  // call $02c1
   CALL(0x7428, clearOam_hook, 0x049f, 0x742b);  // call $049f
   CALL(0x742b, incCbc2_hook, 0x3067, 0x742e);  // call $3067
@@ -15778,7 +15778,7 @@ L_7476:
   I(0x7479, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x747c, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x747d); return; } I(0x747d, 2);  // ret nz
-  I(0x747e, 4); resetGame(gb); return;  // jp $0169
+  I(0x747e, 4); if (hook_enabled_at(0x0169)) { resetGame_hook(gb); return; } HANDOFF(0x0169);  // jp $0169
 }
 
 // 10:72b5
@@ -16096,7 +16096,7 @@ L_7417:
   I(0x741d, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x741e); return; } I(0x741e, 2);  // ret nz
   CALL(0x741f, checkIsLinkedGame_hook, 0x1992, 0x7422);  // call $1992
-  if (!(F & FZ)) { I(0x7422, 4); resetGame(gb); return; } I(0x7422, 3);  // jp nz,$0169
+  if (!(F & FZ)) { I(0x7422, 4); if (hook_enabled_at(0x0169)) { resetGame_hook(gb); return; } HANDOFF(0x0169); } I(0x7422, 3);  // jp nz,$0169
   CALL(0x7425, disableLcd_hook, 0x02c1, 0x7428);  // call $02c1
   CALL(0x7428, clearOam_hook, 0x049f, 0x742b);  // call $049f
   CALL(0x742b, incCbc2_hook, 0x3067, 0x742e);  // call $3067
@@ -16172,7 +16172,7 @@ L_7476:
   I(0x7479, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x747c, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x747d); return; } I(0x747d, 2);  // ret nz
-  I(0x747e, 4); resetGame(gb); return;  // jp $0169
+  I(0x747e, 4); if (hook_enabled_at(0x0169)) { resetGame_hook(gb); return; } HANDOFF(0x0169);  // jp $0169
 }
 
 // 10:74b5

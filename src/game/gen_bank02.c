@@ -20751,7 +20751,7 @@ void saveQuitMenu_state2(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(0x743b); return; } I(0x743b, 2);  // ret nz
   I(0x743c, 4); A = mem_rd(gb, 0xcbb5);  // ld a,($cbb5)
   I(0x743f, 2); alu_cp(gb, 0x02);  // cp $02
-  if ((F & FZ)) { I(0x7441, 4); resetGame(gb); return; } I(0x7441, 3);  // jp z,$0169
+  if ((F & FZ)) { I(0x7441, 4); if (hook_enabled_at(0x0169)) { resetGame_hook(gb); return; } HANDOFF(0x0169); } I(0x7441, 3);  // jp z,$0169
   CALL(0x7444, saveQuitMenu_checkIsGameOver, 0x737b, 0x7447);  // call $737b
   if ((F & FZ)) { I(0x7447, 4); closeMenu(gb); return; } I(0x7447, 3);  // jp z,$4fba
   I(0x744a, 2); A = 0xe8;  // ld a,$e8

@@ -8,3 +8,8 @@
 00:c000 wMusicReadFunction = 39:404b
 00:c4b7 wRamFunction extern
 03:4071 setCpuToDoubleSpeed extern
+00:016c resetGame__afterSp016c
+00:091a _nextThread__afterSp091a
+00:0925 startGame__afterSp0925
+00:0998 _countdownToRunThread__afterSp0998
+00:09aa _initializeThread__afterSp09aa

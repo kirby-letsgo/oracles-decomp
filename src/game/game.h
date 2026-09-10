@@ -133,6 +133,13 @@
 #define ROM_lcdInterrupt 0x0b46
 #define ROM_timerInterrupt 0x0d07
 #define ROM_serialInterrupt 0x0c3d
+#define ROM_pollInput 0x026d
+#define ROM_refreshDirtyPalettes 0x4016
+#define ROM_init 0x4000
+#define ROM_mainLoop 0x0933
+#define ROM_mainLoop_nextThread 0x0955
+#define ROM_countdownToRunThread 0x098b
+#define ROM_initializeThread 0x099c
 #define ROM_vblankFunctionsStart 0x0a8e
 #define ROM_runVBlankFunctions 0x0a71
 #define ROM_lcdInterrupt_clearLYC 0x0be2

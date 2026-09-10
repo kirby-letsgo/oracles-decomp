@@ -1,0 +1,8 @@
+# rewritten routines whose direct-call chain reaches a halt without an intervening
+# hook boundary; nested verify's fixed-cycle-budget fallback can't sensibly compare
+# a routine that never returns, so these get HOOK_NOVERIFY like the generator already
+# does automatically for transliterated routines containing halt.
+_mainLoop
+_mainLoop_nextThread
+_nextThread__afterSp091a
+startGame__afterSp0925

@@ -56,7 +56,7 @@ L_4022:
   I(0x4066, 3); SET_HL(0x4000);  // ld hl,$4000
   I(0x4069, 2); E = 0x02;  // ld e,$02
   CALL(0x406b, interBankCall_hook, 0x008a, 0x406e);  // call $008a
-  I(0x406e, 4); startGame(gb); return;  // jp $0922
+  I(0x406e, 4); if (hook_enabled_at(0x0922)) { startGame_hook(gb); return; } HANDOFF(0x0922);  // jp $0922
 }
 
 // 03:4091

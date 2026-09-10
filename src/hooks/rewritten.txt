@@ -604,3 +604,16 @@ lcdInterrupt_clearWXY
 lcdInterrupt_clearLYC
 _lcdInterruptEnd
 lcdInterrupt_0bea
+begin
+resetGame
+_nextThread
+startGame
+_mainLoop
+_mainLoop_nextThread
+_countdownToRunThread
+_initializeThread
+resetGame__afterSp016c
+_nextThread__afterSp091a
+startGame__afterSp0925
+_countdownToRunThread__afterSp0998
+_initializeThread__afterSp09aa

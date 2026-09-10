@@ -5540,3 +5540,8 @@ enemyBoss_initializeRoomWithoutExtraGfx
 ramrockArm_subid4_substate2
 # batch 14: indented labels
 getObjectDataAddress
+resetGame__afterSp016c
+_nextThread__afterSp091a
+startGame__afterSp0925
+_countdownToRunThread__afterSp0998
+_initializeThread__afterSp09aa
