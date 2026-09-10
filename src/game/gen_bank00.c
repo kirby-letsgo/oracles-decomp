@@ -387,29 +387,3 @@ void _label_00_204(GB *gb) {
   I(0x189d, 4); if (hook_enabled_at(0x08a3)) { threadRestart_hook(gb); return; } HANDOFF(0x08a3);  // jp $08a3
 }
 
-// 00:ff80
-void hramOamDmaFunction(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0xff80, 2); A = 0xcb;  // ld a,$cb
-  I(0xff82, 3); mem_wr(gb, 0xff46, A);  // ldh ($ff46),a
-  I(0xff84, 2); A = 0x28;  // ld a,$28
-L_ff86:
-  I(0xff86, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0xff87, 3); goto L_ff86; } I(0xff87, 2);  // jr nz,$ff86
-  RET(0xff89); return;  // ret
-}
-
-// 00:c000
-void wMusicReadFunction(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0xc000, 3); mem_wr(gb, 0xffd8, A);  // ldh ($ffd8),a
-  I(0xc002, 4); mem_wr(gb, 0x2000, A);  // ld ($2000),a
-  I(0xc005, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0xc006, 1); C = A;  // ld c,a
-  I(0xc007, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  I(0xc009, 3); mem_wr(gb, 0xffd8, A);  // ldh ($ffd8),a
-  I(0xc00b, 4); mem_wr(gb, 0x2000, A);  // ld ($2000),a
-  I(0xc00e, 1); A = C;  // ld a,c
-  RET(0xc00f); return;  // ret
-}
-

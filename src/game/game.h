@@ -14,6 +14,7 @@
 #define IO_HDMA4 0xff54
 #define IO_HDMA5 0xff55
 #define IO_LY 0xff44
+#define IO_DMA 0xff46
 #define IO_STAT 0xff41
 #define IO_VBK 0xff4f
 #define IO_SVBK 0xff70

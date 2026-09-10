@@ -118,7 +118,7 @@ L_4c09:
   I(0x4c16, 1); H = B;  // ld h,b
 L_4c17:
   I(0x4c17, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4c19, wMusicReadFunction, 0xc000, 0x4c1c);  // call $c000
+  CALL(0x4c19, wMusicReadFunction_hook, 0xc000, 0x4c1c);  // call $c000
   I(0x4c1c, 2); alu_cp(gb, 0xff);  // cp $ff
   if (!(F & FZ)) { I(0x4c1e, 3); goto L_4c23; } I(0x4c1e, 2);  // jr nz,$4c23
   I(0x4c20, 4); goto L_4d10;  // jp $4d10
@@ -243,13 +243,13 @@ L_4ce5:
   I(0x4cf7, 1); B = A;  // ld b,a
   PUSH(0x4cf8, BC);  // push bc
   I(0x4cf9, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4cfb, wMusicReadFunction, 0xc000, 0x4cfe);  // call $c000
+  CALL(0x4cfb, wMusicReadFunction_hook, 0xc000, 0x4cfe);  // call $c000
   SET_BC(POP(0x4cfe));  // pop bc
   I(0x4cff, 2); C = 0xe2;  // ld c,$e2
   CALL(0x4d01, writeIndexedHighRamAndIncrement, 0x4d25, 0x4d04);  // call $4d25
   PUSH(0x4d04, BC);  // push bc
   I(0x4d05, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4d07, wMusicReadFunction, 0xc000, 0x4d0a);  // call $c000
+  CALL(0x4d07, wMusicReadFunction_hook, 0xc000, 0x4d0a);  // call $c000
   SET_BC(POP(0x4d0a));  // pop bc
   I(0x4d0b, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
   I(0x4d0c, 1); C = alu_inc8(gb, C);  // inc c
@@ -305,7 +305,7 @@ L_4c09:
   I(0x4c16, 1); H = B;  // ld h,b
 L_4c17:
   I(0x4c17, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4c19, wMusicReadFunction, 0xc000, 0x4c1c);  // call $c000
+  CALL(0x4c19, wMusicReadFunction_hook, 0xc000, 0x4c1c);  // call $c000
   I(0x4c1c, 2); alu_cp(gb, 0xff);  // cp $ff
   if (!(F & FZ)) { I(0x4c1e, 3); goto L_4c23; } I(0x4c1e, 2);  // jr nz,$4c23
   I(0x4c20, 4); goto L_4d10;  // jp $4d10
@@ -430,13 +430,13 @@ L_4ce5:
   I(0x4cf7, 1); B = A;  // ld b,a
   PUSH(0x4cf8, BC);  // push bc
   I(0x4cf9, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4cfb, wMusicReadFunction, 0xc000, 0x4cfe);  // call $c000
+  CALL(0x4cfb, wMusicReadFunction_hook, 0xc000, 0x4cfe);  // call $c000
   SET_BC(POP(0x4cfe));  // pop bc
   I(0x4cff, 2); C = 0xe2;  // ld c,$e2
   CALL(0x4d01, writeIndexedHighRamAndIncrement, 0x4d25, 0x4d04);  // call $4d25
   PUSH(0x4d04, BC);  // push bc
   I(0x4d05, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4d07, wMusicReadFunction, 0xc000, 0x4d0a);  // call $c000
+  CALL(0x4d07, wMusicReadFunction_hook, 0xc000, 0x4d0a);  // call $c000
   SET_BC(POP(0x4d0a));  // pop bc
   I(0x4d0b, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
   I(0x4d0c, 1); C = alu_inc8(gb, C);  // inc c
@@ -664,7 +664,7 @@ L_4c09:
   I(0x4c16, 1); H = B;  // ld h,b
 L_4c17:
   I(0x4c17, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4c19, wMusicReadFunction, 0xc000, 0x4c1c);  // call $c000
+  CALL(0x4c19, wMusicReadFunction_hook, 0xc000, 0x4c1c);  // call $c000
   I(0x4c1c, 2); alu_cp(gb, 0xff);  // cp $ff
   if (!(F & FZ)) { I(0x4c1e, 3); goto L_4c23; } I(0x4c1e, 2);  // jr nz,$4c23
   I(0x4c20, 4); goto L_4d10;  // jp $4d10
@@ -789,13 +789,13 @@ L_4ce5:
   I(0x4cf7, 1); B = A;  // ld b,a
   PUSH(0x4cf8, BC);  // push bc
   I(0x4cf9, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4cfb, wMusicReadFunction, 0xc000, 0x4cfe);  // call $c000
+  CALL(0x4cfb, wMusicReadFunction_hook, 0xc000, 0x4cfe);  // call $c000
   SET_BC(POP(0x4cfe));  // pop bc
   I(0x4cff, 2); C = 0xe2;  // ld c,$e2
   CALL(0x4d01, writeIndexedHighRamAndIncrement, 0x4d25, 0x4d04);  // call $4d25
   PUSH(0x4d04, BC);  // push bc
   I(0x4d05, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4d07, wMusicReadFunction, 0xc000, 0x4d0a);  // call $c000
+  CALL(0x4d07, wMusicReadFunction_hook, 0xc000, 0x4d0a);  // call $c000
   SET_BC(POP(0x4d0a));  // pop bc
   I(0x4d0b, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
   I(0x4d0c, 1); C = alu_inc8(gb, C);  // inc c
@@ -827,7 +827,7 @@ L_4c09:
   I(0x4c16, 1); H = B;  // ld h,b
 L_4c17:
   I(0x4c17, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4c19, wMusicReadFunction, 0xc000, 0x4c1c);  // call $c000
+  CALL(0x4c19, wMusicReadFunction_hook, 0xc000, 0x4c1c);  // call $c000
   I(0x4c1c, 2); alu_cp(gb, 0xff);  // cp $ff
   if (!(F & FZ)) { I(0x4c1e, 3); goto L_4c23; } I(0x4c1e, 2);  // jr nz,$4c23
   I(0x4c20, 4); goto L_4d10;  // jp $4d10
@@ -952,13 +952,13 @@ L_4ce5:
   I(0x4cf7, 1); B = A;  // ld b,a
   PUSH(0x4cf8, BC);  // push bc
   I(0x4cf9, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4cfb, wMusicReadFunction, 0xc000, 0x4cfe);  // call $c000
+  CALL(0x4cfb, wMusicReadFunction_hook, 0xc000, 0x4cfe);  // call $c000
   SET_BC(POP(0x4cfe));  // pop bc
   I(0x4cff, 2); C = 0xe2;  // ld c,$e2
   CALL(0x4d01, writeIndexedHighRamAndIncrement, 0x4d25, 0x4d04);  // call $4d25
   PUSH(0x4d04, BC);  // push bc
   I(0x4d05, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4d07, wMusicReadFunction, 0xc000, 0x4d0a);  // call $c000
+  CALL(0x4d07, wMusicReadFunction_hook, 0xc000, 0x4d0a);  // call $c000
   SET_BC(POP(0x4d0a));  // pop bc
   I(0x4d0b, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
   I(0x4d0c, 1); C = alu_inc8(gb, C);  // inc c
@@ -978,7 +978,7 @@ void playSound__nextSoundChannel_b39(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4c17:
   I(0x4c17, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4c19, wMusicReadFunction, 0xc000, 0x4c1c);  // call $c000
+  CALL(0x4c19, wMusicReadFunction_hook, 0xc000, 0x4c1c);  // call $c000
   I(0x4c1c, 2); alu_cp(gb, 0xff);  // cp $ff
   if (!(F & FZ)) { I(0x4c1e, 3); goto L_4c23; } I(0x4c1e, 2);  // jr nz,$4c23
   I(0x4c20, 4); goto L_4d10;  // jp $4d10
@@ -1103,13 +1103,13 @@ L_4ce5:
   I(0x4cf7, 1); B = A;  // ld b,a
   PUSH(0x4cf8, BC);  // push bc
   I(0x4cf9, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4cfb, wMusicReadFunction, 0xc000, 0x4cfe);  // call $c000
+  CALL(0x4cfb, wMusicReadFunction_hook, 0xc000, 0x4cfe);  // call $c000
   SET_BC(POP(0x4cfe));  // pop bc
   I(0x4cff, 2); C = 0xe2;  // ld c,$e2
   CALL(0x4d01, writeIndexedHighRamAndIncrement, 0x4d25, 0x4d04);  // call $4d25
   PUSH(0x4d04, BC);  // push bc
   I(0x4d05, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4d07, wMusicReadFunction, 0xc000, 0x4d0a);  // call $c000
+  CALL(0x4d07, wMusicReadFunction_hook, 0xc000, 0x4d0a);  // call $c000
   SET_BC(POP(0x4d0a));  // pop bc
   I(0x4d0b, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
   I(0x4d0c, 1); C = alu_inc8(gb, C);  // inc c
@@ -1130,7 +1130,7 @@ void playSound__waveChannel_b39(GB *gb) {
   goto L_4c8a;
 L_4c17:
   I(0x4c17, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4c19, wMusicReadFunction, 0xc000, 0x4c1c);  // call $c000
+  CALL(0x4c19, wMusicReadFunction_hook, 0xc000, 0x4c1c);  // call $c000
   I(0x4c1c, 2); alu_cp(gb, 0xff);  // cp $ff
   if (!(F & FZ)) { I(0x4c1e, 3); goto L_4c23; } I(0x4c1e, 2);  // jr nz,$4c23
   I(0x4c20, 4); goto L_4d10;  // jp $4d10
@@ -1255,13 +1255,13 @@ L_4ce5:
   I(0x4cf7, 1); B = A;  // ld b,a
   PUSH(0x4cf8, BC);  // push bc
   I(0x4cf9, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4cfb, wMusicReadFunction, 0xc000, 0x4cfe);  // call $c000
+  CALL(0x4cfb, wMusicReadFunction_hook, 0xc000, 0x4cfe);  // call $c000
   SET_BC(POP(0x4cfe));  // pop bc
   I(0x4cff, 2); C = 0xe2;  // ld c,$e2
   CALL(0x4d01, writeIndexedHighRamAndIncrement, 0x4d25, 0x4d04);  // call $4d25
   PUSH(0x4d04, BC);  // push bc
   I(0x4d05, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4d07, wMusicReadFunction, 0xc000, 0x4d0a);  // call $c000
+  CALL(0x4d07, wMusicReadFunction_hook, 0xc000, 0x4d0a);  // call $c000
   SET_BC(POP(0x4d0a));  // pop bc
   I(0x4d0b, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
   I(0x4d0c, 1); C = alu_inc8(gb, C);  // inc c
@@ -1282,7 +1282,7 @@ void playSound__squareChannel_b39(GB *gb) {
   goto L_4cae;
 L_4c17:
   I(0x4c17, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4c19, wMusicReadFunction, 0xc000, 0x4c1c);  // call $c000
+  CALL(0x4c19, wMusicReadFunction_hook, 0xc000, 0x4c1c);  // call $c000
   I(0x4c1c, 2); alu_cp(gb, 0xff);  // cp $ff
   if (!(F & FZ)) { I(0x4c1e, 3); goto L_4c23; } I(0x4c1e, 2);  // jr nz,$4c23
   I(0x4c20, 4); goto L_4d10;  // jp $4d10
@@ -1407,13 +1407,13 @@ L_4ce5:
   I(0x4cf7, 1); B = A;  // ld b,a
   PUSH(0x4cf8, BC);  // push bc
   I(0x4cf9, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4cfb, wMusicReadFunction, 0xc000, 0x4cfe);  // call $c000
+  CALL(0x4cfb, wMusicReadFunction_hook, 0xc000, 0x4cfe);  // call $c000
   SET_BC(POP(0x4cfe));  // pop bc
   I(0x4cff, 2); C = 0xe2;  // ld c,$e2
   CALL(0x4d01, writeIndexedHighRamAndIncrement, 0x4d25, 0x4d04);  // call $4d25
   PUSH(0x4d04, BC);  // push bc
   I(0x4d05, 3); A = mem_rd(gb, 0xffd9);  // ldh a,($ffd9)
-  CALL(0x4d07, wMusicReadFunction, 0xc000, 0x4d0a);  // call $c000
+  CALL(0x4d07, wMusicReadFunction_hook, 0xc000, 0x4d0a);  // call $c000
   SET_BC(POP(0x4d0a));  // pop bc
   I(0x4d0b, 2); mem_wr(gb, 0xff00 | C, A);  // ld ($ff00+c),a
   I(0x4d0c, 1); C = alu_inc8(gb, C);  // inc c
@@ -2962,7 +2962,7 @@ void getNextChannelByte(GB *gb) {
   I(0x437b, 1); C = A;  // ld c,a
   I(0x437c, 2); A = mem_rd(gb, 0xff00 | C);  // ld a,($ff00+c)
   I(0x437d, 1); C = alu_inc8(gb, C);  // inc c
-  CALL(0x437e, wMusicReadFunction, 0xc000, 0x4381);  // call $c000
+  CALL(0x437e, wMusicReadFunction_hook, 0xc000, 0x4381);  // call $c000
   PUSH(0x4381, AF);  // push af
   I(0x4382, 4); A = mem_rd(gb, 0xc01a);  // ld a,($c01a)
   I(0x4385, 2); A = alu_sla(gb, A);  // sla a

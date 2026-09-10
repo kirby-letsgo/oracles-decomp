@@ -623,3 +623,5 @@ thread_1b10
 introThreadStart
 paletteFadeThreadStart
 mainThreadStart
+hramOamDmaFunction
+wMusicReadFunction

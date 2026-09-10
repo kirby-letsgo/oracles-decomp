@@ -11887,7 +11887,7 @@ void vblankInterrupt_hook(GB *gb) {
     else CYC(0x0a3c, 0x0a3f);
     CALL_C(0x0a3f, updateDirtyPalettes_hook, ROM_updateDirtyPalettes, 0x0a42);
     CYC(0x0a42, 0x0a43); gb->ime = false; gb->ime_delay = false; gb->ime_writes++;
-    CALL_C(0x0a43, hramOamDmaFunction, ROM_hramOamDmaFunction, 0x0a46);
+    CALL_C(0x0a43, hramOamDmaFunction_hook, ROM_hramOamDmaFunction, 0x0a46);
     CYC(0x0a46, 0x0a47); SET_BC(pop_effect(gb));
     A = C;
     CYC(0x0a47, 0x0a48);
@@ -12558,4 +12558,29 @@ void mainThreadStart_hook(GB *gb) {
     CALL_C(0x33ca, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, 0x33cd);
     CYCT(0x33cd, 0x33cf);
   }
+}
+
+void hramOamDmaFunction_hook(GB *gb) {
+  I(0xff80, 2); A = 0xcb;
+  I(0xff82, 3); mem_wr(gb, IO_DMA, A);
+  I(0xff84, 2); A = 0x28;
+  for (;;) {
+    I(0xff86, 1); A = alu_dec8(gb, A);
+    if (!(F & FZ)) { I(0xff87, 3); continue; }
+    I(0xff87, 2);
+    break;
+  }
+  RET(0xff89); return;
+}
+
+void wMusicReadFunction_hook(GB *gb) {
+  I(0xc000, 3); H8(hSoundDataBaseBank2) = A;
+  I(0xc002, 4); mem_wr(gb, 0x2000, A);
+  I(0xc005, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  I(0xc006, 1); C = A;
+  I(0xc007, 3); A = H8(hSoundDataBaseBank);
+  I(0xc009, 3); H8(hSoundDataBaseBank2) = A;
+  I(0xc00b, 4); mem_wr(gb, 0x2000, A);
+  I(0xc00e, 1); A = C;
+  RET(0xc00f); return;
 }

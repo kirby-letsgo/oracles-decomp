@@ -641,8 +641,8 @@
 00:0048 lcdVector_hook -
 00:0050 timerVector_hook -
 00:0058 serialVector_hook -
-00:ff80 hramOamDmaFunction -
-00:c000 wMusicReadFunction -
+00:ff80 hramOamDmaFunction_hook -
+00:c000 wMusicReadFunction_hook -
 00:c4b7 wRamFunction -
 00:3034 enemyCodeNil_hook -
 00:3080 getEntryFromObjectTable1_hook -
