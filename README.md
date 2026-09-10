@@ -1,32 +1,77 @@
-# oracles
-
 Native reimplementation of The Legend of Zelda: Oracle of Ages and Oracle of Seasons in C.
 
 
-## Build
+# Oracles-Decomp Development Setup
 
-    cmake -S . -B build -G Ninja && cmake --build build
-    ctest --test-dir build
+## Prerequisites
+- macOS (Linux/Windows supported via CMake)
+- Xcode Command Line Tools
+- Homebrew (for dependencies)
+- CMake 3.15+
+- SDL3 (via Homebrew)
+- Clang
 
-## Run
+## Installation
 
-    ./build/oracles "roms/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc"
+1. **Install dependencies**:
+   ```bash
+   brew install cmake sdl3
+   ````
 
-ROMs are not included. Put your own US ROM in `roms/`.
+2. **Clone the repository**:
+   ```bash
+   git clone https://github.com/your-username/oracles-decomp.git
+   cd oracles-decomp
+   ````
 
-Controls: arrows, X = A, Z = B, Enter = Start, Right Shift = Select, F12 = screenshot to `out/`, Escape = quit.
+3. **Initialize submodules** (if needed):
+   ```bash
+   git submodule update --init --recursive
+   ````
 
-## Verify against the TAS
+## Build Instructions
 
-The core is checked against the console-verified Oracle of Ages movie recorded with BizHawk's
-GBHawk. It needs the ROM in `roms/` and the CGB boot ROM as `roms/cgb_boot.bin` (SHA1
-`1293d68bf9643bc4f36954c1e80e38f39864528d`).
+1. **Configure with CMake**:
+   ```bash
+   mkdir -p build && cd build
+   cmake -S .. -G Ninja
+   ````
 
-    ctest --test-dir build -R tas                   # first 20,000 frames, about 12 seconds
-    TAS_FRAMES=289518 ctest --test-dir build -R tas  # the whole movie, about 3 minutes
-    ./build/oracles-run --rom roms/<ages>.gbc --boot roms/cgb_boot.bin --init-ram tas/gbhawk-wram0.txt \
-        --tas tas/ages-consoleverified.inputs --ref-check tas/ages.ref --frame-hash-check tas/ages.frames
+2. **Build the project**:
+   ```bash
+   ninja
+   ````
 
-`tas/ages.ref` holds a state hash every 60 frames and `tas/ages.frames` a framebuffer hash per
-frame; both were recorded from a run that matches GBHawk's memory frame for frame. The reference
-emulator setup (BizHawk headless in Docker plus Lua probes) is in `tools/bizhawk/`.
+3. **Run tests**:
+   ```bash
+   ctest
+   ````
+
+## Running the Game
+
+1. **Prepare a ROM**:
+   - Place a US ROM in `roms/` (e.g., `roms/oracle_of_ages.gbc`)
+   - Ensure it matches the SHA1 hash in `porting-notes.md`
+
+2. **Launch the game**:
+   ```bash
+   ./build/oracles-run --rom roms/oracle_of_ages.gbc
+   ````
+
+## TAS Replay
+
+1. **Run the full movie**:
+   ```bash
+   TAS_FRAMES=289518 ctest -R tas
+   ````
+
+2. **Debug frame hashes**:
+   ```bash
+   ./build/oracles-run --tas tas/ages-consoleverified.inputs --probe
+   ````
+
+## Notes
+- ROMs are git-ignored (add to `.gitignore`)
+- Use `--no-hooks` for fast verification
+- Debug with `--report` for hook statistics
+- See `docs/progress.md` for milestone status
