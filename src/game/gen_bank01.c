@@ -4597,7 +4597,7 @@ L_5b4e:
   CALL(0x5b59, playCompassSoundIfKeyInRoom, 0x4a58, 0x5b5c);  // call $4a58
   CALL(0x5b5c, updateLastToggleBlocksState, 0x7c65, 0x5b5f);  // call $7c65
   CALL(0x5b5f, checkInitUnderwaterWaves_hook, 0x626e, 0x5b62);  // call $626e
-  I(0x5b62, 4); updateGrassAnimationModifier(gb); return;  // jp $5e9e
+  I(0x5b62, 4); if (hook_enabled_at(0x5e9e)) { updateGrassAnimationModifier_hook(gb); return; } HANDOFF(0x5e9e);  // jp $5e9e
 }
 
 // 01:5b2f
@@ -4626,7 +4626,7 @@ L_5b4e:
   CALL(0x5b59, playCompassSoundIfKeyInRoom, 0x4a58, 0x5b5c);  // call $4a58
   CALL(0x5b5c, updateLastToggleBlocksState, 0x7c65, 0x5b5f);  // call $7c65
   CALL(0x5b5f, checkInitUnderwaterWaves_hook, 0x626e, 0x5b62);  // call $626e
-  I(0x5b62, 4); updateGrassAnimationModifier(gb); return;  // jp $5e9e
+  I(0x5b62, 4); if (hook_enabled_at(0x5e9e)) { updateGrassAnimationModifier_hook(gb); return; } HANDOFF(0x5e9e);  // jp $5e9e
 }
 
 // 01:5b4e
@@ -4640,7 +4640,7 @@ L_5b4e:
   CALL(0x5b59, playCompassSoundIfKeyInRoom, 0x4a58, 0x5b5c);  // call $4a58
   CALL(0x5b5c, updateLastToggleBlocksState, 0x7c65, 0x5b5f);  // call $7c65
   CALL(0x5b5f, checkInitUnderwaterWaves_hook, 0x626e, 0x5b62);  // call $626e
-  I(0x5b62, 4); updateGrassAnimationModifier(gb); return;  // jp $5e9e
+  I(0x5b62, 4); if (hook_enabled_at(0x5e9e)) { updateGrassAnimationModifier_hook(gb); return; } HANDOFF(0x5e9e);  // jp $5e9e
 }
 
 // 01:5b65
@@ -4661,11 +4661,11 @@ L_5b68:
   CALL(0x5b83, checkUpdateToggleBlocks, 0x7c6c, 0x5b86);  // call $7c6c
   I(0x5b86, 4); A = mem_rd(gb, 0xcc04);  // ld a,($cc04)
   I(0x5b89, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x5b8a, 4); setCutsceneIndexIfCutsceneTriggerSet(gb); return; } I(0x5b8a, 3);  // jp nz,$5e3d
+  if (!(F & FZ)) { I(0x5b8a, 4); if (hook_enabled_at(0x5e3d)) { setCutsceneIndexIfCutsceneTriggerSet_hook(gb); return; } HANDOFF(0x5e3d); } I(0x5b8a, 3);  // jp nz,$5e3d
   CALL(0x5b8d, func_60e9, 0x60e9, 0x5b90);  // call $60e9
   I(0x5b90, 4); A = mem_rd(gb, 0xcc4b);  // ld a,($cc4b)
   I(0x5b93, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x5b94, 4); applyWarpTransition2(gb); return; } I(0x5b94, 3);  // jp nz,$5e0e
+  if (!(F & FZ)) { I(0x5b94, 4); if (hook_enabled_at(0x5e0e)) { applyWarpTransition2_hook(gb); return; } HANDOFF(0x5e0e); } I(0x5b94, 3);  // jp nz,$5e0e
   CALL(0x5b97, getNextActiveRoom, 0x5f45, 0x5b9a);  // call $5f45
   if (!(F & FC)) { I(0x5b9a, 4); if (hook_enabled_at(0x1de7)) { checkEnemyAndPartCollisionsIfTextInactive_hook(gb); return; } HANDOFF(0x1de7); } I(0x5b9a, 3);  // jp nc,$1de7
   CALL(0x5b9d, checkDisableUnderwaterWaves_hook, 0x62b4, 0x5ba0);  // call $62b4
@@ -4677,7 +4677,7 @@ L_5b68:
   CALL(0x5bae, loadScreenMusic_hook, 0x33cf, 0x5bb1);  // call $33cf
   CALL(0x5bb1, loadTilesetData_hook, 0x3889, 0x5bb4);  // call $3889
   CALL(0x5bb4, checkRoomPack, 0x5edd, 0x5bb7);  // call $5edd
-  if (!(F & FZ)) { I(0x5bb7, 4); triggerFadeoutTransition(gb); return; } I(0x5bb7, 3);  // jp nz,$5e06
+  if (!(F & FZ)) { I(0x5bb7, 4); if (hook_enabled_at(0x5e06)) { triggerFadeoutTransition_hook(gb); return; } HANDOFF(0x5e06); } I(0x5bb7, 3);  // jp nz,$5e06
   I(0x5bba, 4); A = mem_rd(gb, 0xcc30);  // ld a,($cc30)
   I(0x5bbd, 4); mem_wr(gb, 0xcc2f, A);  // ld ($cc2f),a
   I(0x5bc0, 2); A = 0x08;  // ld a,$08
@@ -4709,11 +4709,11 @@ L_5b68:
   CALL(0x5b83, checkUpdateToggleBlocks, 0x7c6c, 0x5b86);  // call $7c6c
   I(0x5b86, 4); A = mem_rd(gb, 0xcc04);  // ld a,($cc04)
   I(0x5b89, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x5b8a, 4); setCutsceneIndexIfCutsceneTriggerSet(gb); return; } I(0x5b8a, 3);  // jp nz,$5e3d
+  if (!(F & FZ)) { I(0x5b8a, 4); if (hook_enabled_at(0x5e3d)) { setCutsceneIndexIfCutsceneTriggerSet_hook(gb); return; } HANDOFF(0x5e3d); } I(0x5b8a, 3);  // jp nz,$5e3d
   CALL(0x5b8d, func_60e9, 0x60e9, 0x5b90);  // call $60e9
   I(0x5b90, 4); A = mem_rd(gb, 0xcc4b);  // ld a,($cc4b)
   I(0x5b93, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x5b94, 4); applyWarpTransition2(gb); return; } I(0x5b94, 3);  // jp nz,$5e0e
+  if (!(F & FZ)) { I(0x5b94, 4); if (hook_enabled_at(0x5e0e)) { applyWarpTransition2_hook(gb); return; } HANDOFF(0x5e0e); } I(0x5b94, 3);  // jp nz,$5e0e
   CALL(0x5b97, getNextActiveRoom, 0x5f45, 0x5b9a);  // call $5f45
   if (!(F & FC)) { I(0x5b9a, 4); if (hook_enabled_at(0x1de7)) { checkEnemyAndPartCollisionsIfTextInactive_hook(gb); return; } HANDOFF(0x1de7); } I(0x5b9a, 3);  // jp nc,$1de7
   CALL(0x5b9d, checkDisableUnderwaterWaves_hook, 0x62b4, 0x5ba0);  // call $62b4
@@ -4725,7 +4725,7 @@ L_5b68:
   CALL(0x5bae, loadScreenMusic_hook, 0x33cf, 0x5bb1);  // call $33cf
   CALL(0x5bb1, loadTilesetData_hook, 0x3889, 0x5bb4);  // call $3889
   CALL(0x5bb4, checkRoomPack, 0x5edd, 0x5bb7);  // call $5edd
-  if (!(F & FZ)) { I(0x5bb7, 4); triggerFadeoutTransition(gb); return; } I(0x5bb7, 3);  // jp nz,$5e06
+  if (!(F & FZ)) { I(0x5bb7, 4); if (hook_enabled_at(0x5e06)) { triggerFadeoutTransition_hook(gb); return; } HANDOFF(0x5e06); } I(0x5bb7, 3);  // jp nz,$5e06
   I(0x5bba, 4); A = mem_rd(gb, 0xcc30);  // ld a,($cc30)
   I(0x5bbd, 4); mem_wr(gb, 0xcc2f, A);  // ld ($cc2f),a
   I(0x5bc0, 2); A = 0x08;  // ld a,$08
@@ -5164,109 +5164,6 @@ void cutscene13__afterCall7b79(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7b79:
   I(0x7b79, 4); if (hook_enabled_at(0x345b)) { updateAllObjects_hook(gb); return; } HANDOFF(0x345b);  // jp $345b
-}
-
-// 01:5de4
-void cutscene16(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5de4, updateMenus_hook, 0x1a51, 0x5de7);  // call $1a51
-  if (!(F & FZ)) { RET_TAKEN(0x5de7); return; } I(0x5de7, 2);  // ret nz
-  I(0x5de8, 3); SET_HL(0xcc4b);  // ld hl,$cc4b
-  I(0x5deb, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5dec, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x5dee, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5def, 2); A = 0x03;  // ld a,$03
-  if (!(F & FZ)) { I(0x5df1, 3); goto L_5df8; } I(0x5df1, 2);  // jr nz,$5df8
-  CALL(0x5df3, updateAllObjects_hook, 0x345b, 0x5df6);  // call $345b
-  I(0x5df6, 2); A = 0x01;  // ld a,$01
-L_5df8:
-  I(0x5df8, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
-  I(0x5dfb, 1); alu_xor(gb, A);  // xor a
-  I(0x5dfc, 4); mem_wr(gb, 0xcc02, A);  // ld ($cc02),a
-  I(0x5dff, 4); mem_wr(gb, 0xcc8c, A);  // ld ($cc8c),a
-  I(0x5e02, 4); mem_wr(gb, 0xcc91, A);  // ld ($cc91),a
-  RET(0x5e05); return;  // ret
-}
-
-// 01:5e7d
-void checkDisplayEraOrSeasonInfo(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5e7d, 2); A = 0x16;  // ld a,$16
-  CALL(0x5e7f, checkGlobalFlag_hook, 0x31f3, 0x5e82);  // call $31f3
-  if ((F & FZ)) { I(0x5e82, 3); goto L_5e89; } I(0x5e82, 2);  // jr z,$5e89
-  I(0x5e84, 2); A = 0x16;  // ld a,$16
-  I(0x5e86, 4); if (hook_enabled_at(0x31ff)) { unsetGlobalFlag_hook(gb); return; } HANDOFF(0x31ff);  // jp $31ff
-L_5e89:
-  I(0x5e89, 4); A = mem_rd(gb, 0xcdde);  // ld a,($cdde)
-  I(0x5e8c, 1); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { RET_TAKEN(0x5e8d); return; } I(0x5e8d, 2);  // ret z
-  I(0x5e8e, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
-  I(0x5e91, 2); alu_bit(gb, 4, A);  // bit 4,a
-  if (!(F & FZ)) { RET_TAKEN(0x5e93); return; } I(0x5e93, 2);  // ret nz
-  I(0x5e94, 2); alu_bit(gb, 0, A);  // bit 0,a
-  if ((F & FZ)) { RET_TAKEN(0x5e96); return; } I(0x5e96, 2);  // ret z
-  CALL(0x5e97, getFreeInteractionSlot_hook, 0x3aef, 0x5e9a);  // call $3aef
-  if (!(F & FZ)) { RET_TAKEN(0x5e9a); return; } I(0x5e9a, 2);  // ret nz
-  I(0x5e9b, 3); mem_wr(gb, HL, 0xe0);  // ld (hl),$e0
-  RET(0x5e9d); return;  // ret
-}
-
-// 01:5e06
-void triggerFadeoutTransition(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5e06, 2); A = 0x05;  // ld a,$05
-  I(0x5e08, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
-  I(0x5e0b, 4); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c);  // jp $326c
-}
-
-// 01:5e0e
-void applyWarpTransition2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5e0e, 3); SET_HL(0xcc4b);  // ld hl,$cc4b
-  I(0x5e11, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5e12, 1); B = A;  // ld b,a
-  I(0x5e13, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x5e15, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x5e17, 2); alu_cp(gb, 0x02);  // cp $02
-  if (!(F & FC)) { I(0x5e19, 3); goto L_5e25; } I(0x5e19, 2);  // jr nc,$5e25
-  I(0x5e1b, 2); A = 0x01;  // ld a,$01
-  I(0x5e1d, 4); mem_wr(gb, 0xc2ee, A);  // ld ($c2ee),a
-  I(0x5e20, 1); alu_xor(gb, A);  // xor a
-  I(0x5e21, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
-  RET(0x5e24); return;  // ret
-L_5e25:
-  I(0x5e25, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
-  I(0x5e28, 2); alu_cp(gb, 0xd1);  // cp $d1
-  if (!(F & FZ)) { I(0x5e2a, 3); goto L_5e2d; } I(0x5e2a, 2);  // jr nz,$5e2d
-  I(0x5e2c, 1); B = alu_inc8(gb, B);  // inc b
-L_5e2d:
-  I(0x5e2d, 1); A = B;  // ld a,b
-  I(0x5e2e, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x5e30, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
-  I(0x5e33, 2); alu_bit(gb, 7, B);  // bit 7,b
-  if ((F & FZ)) { I(0x5e35, 4); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c); } I(0x5e35, 3);  // jp z,$326c
-  I(0x5e38, 2); A = 0x04;  // ld a,$04
-  I(0x5e3a, 4); if (hook_enabled_at(0x3257)) { fadeoutToWhiteWithDelay_hook(gb); return; } HANDOFF(0x3257);  // jp $3257
-}
-
-// 01:5e3d
-void setCutsceneIndexIfCutsceneTriggerSet(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5e3d, 4); A = mem_rd(gb, 0xcc04);  // ld a,($cc04)
-  I(0x5e40, 2); alu_and(gb, 0x7f);  // and $7f
-  I(0x5e42, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
-  I(0x5e45, 1); alu_xor(gb, A);  // xor a
-  I(0x5e46, 4); mem_wr(gb, 0xcc04, A);  // ld ($cc04),a
-  I(0x5e49, 4); mem_wr(gb, 0xcc03, A);  // ld ($cc03),a
-  RET(0x5e4c); return;  // ret
-}
-
-// 01:5e9e
-void updateGrassAnimationModifier(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5e9e, 2); A = 0x00;  // ld a,$00
-  I(0x5ea0, 4); mem_wr(gb, 0xcc36, A);  // ld ($cc36),a
-  RET(0x5ea3); return;  // ret
 }
 
 // 01:5ea4
@@ -7897,8 +7794,8 @@ void func_5a60(GB *gb) {
   CALL(0x5aa7, setEnteredWarpPosition, 0x5c82, 0x5aaa);  // call $5c82
   CALL(0x5aaa, initializeRoom_hook, 0x30fe, 0x5aad);  // call $30fe
 L_5aad:
-  CALL(0x5aad, checkDisplayEraOrSeasonInfo, 0x5e7d, 0x5ab0);  // call $5e7d
-  CALL(0x5ab0, updateGrassAnimationModifier, 0x5e9e, 0x5ab3);  // call $5e9e
+  CALL(0x5aad, checkDisplayEraOrSeasonInfo_hook, 0x5e7d, 0x5ab0);  // call $5e7d
+  CALL(0x5ab0, updateGrassAnimationModifier_hook, 0x5e9e, 0x5ab3);  // call $5e9e
   CALL(0x5ab3, checkPlayRoomMusic, 0x5e4d, 0x5ab6);  // call $5e4d
   CALL(0x5ab6, checkUpdateDungeonMinimap, 0x5945, 0x5ab9);  // call $5945
   I(0x5ab9, 4); func_593a(gb); return;  // jp $593a
@@ -7908,8 +7805,8 @@ L_5aad:
 void func_5a60__afterCall5aad(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5aad:
-  CALL(0x5aad, checkDisplayEraOrSeasonInfo, 0x5e7d, 0x5ab0);  // call $5e7d
-  CALL(0x5ab0, updateGrassAnimationModifier, 0x5e9e, 0x5ab3);  // call $5e9e
+  CALL(0x5aad, checkDisplayEraOrSeasonInfo_hook, 0x5e7d, 0x5ab0);  // call $5e7d
+  CALL(0x5ab0, updateGrassAnimationModifier_hook, 0x5e9e, 0x5ab3);  // call $5e9e
   CALL(0x5ab3, checkPlayRoomMusic, 0x5e4d, 0x5ab6);  // call $5e4d
   CALL(0x5ab6, checkUpdateDungeonMinimap, 0x5945, 0x5ab9);  // call $5945
   I(0x5ab9, 4); func_593a(gb); return;  // jp $593a
@@ -7922,7 +7819,7 @@ void func_5c6b(GB *gb) {
   CALL(0x5c6e, calculateRoomEdge, 0x5f00, 0x5c71);  // call $5f00
   CALL(0x5c71, initializeRoom_hook, 0x30fe, 0x5c74);  // call $30fe
 L_5c74:
-  CALL(0x5c74, checkDisplayEraOrSeasonInfo, 0x5e7d, 0x5c77);  // call $5e7d
+  CALL(0x5c74, checkDisplayEraOrSeasonInfo_hook, 0x5e7d, 0x5c77);  // call $5e7d
   CALL(0x5c77, checkDarkenRoomAndClearPaletteFadeState, 0x430d, 0x5c7a);  // call $430d
   I(0x5c7a, 2); A = 0x02;  // ld a,$02
   CALL(0x5c7c, fadeinFromWhiteWithDelay_hook, 0x3284, 0x5c7f);  // call $3284
@@ -7933,7 +7830,7 @@ L_5c74:
 void func_5c6b__afterCall5c74(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5c74:
-  CALL(0x5c74, checkDisplayEraOrSeasonInfo, 0x5e7d, 0x5c77);  // call $5e7d
+  CALL(0x5c74, checkDisplayEraOrSeasonInfo_hook, 0x5e7d, 0x5c77);  // call $5e7d
   CALL(0x5c77, checkDarkenRoomAndClearPaletteFadeState, 0x430d, 0x5c7a);  // call $430d
   I(0x5c7a, 2); A = 0x02;  // ld a,$02
   CALL(0x5c7c, fadeinFromWhiteWithDelay_hook, 0x3284, 0x5c7f);  // call $3284
@@ -8000,7 +7897,7 @@ void func_5d31(GB *gb) {
 L_5d34:
   I(0x5d34, 4); A = mem_rd(gb, 0xcc4b);  // ld a,($cc4b)
   I(0x5d37, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x5d38, 4); applyWarpTransition2(gb); return; } I(0x5d38, 3);  // jp nz,$5e0e
+  if (!(F & FZ)) { I(0x5d38, 4); if (hook_enabled_at(0x5e0e)) { applyWarpTransition2_hook(gb); return; } HANDOFF(0x5e0e); } I(0x5d38, 3);  // jp nz,$5e0e
   CALL(0x5d3b, updateStatusBar_hook, 0x1a9c, 0x5d3e);  // call $1a9c
   I(0x5d3e, 4); if (hook_enabled_at(0x345b)) { updateAllObjects_hook(gb); return; } HANDOFF(0x345b);  // jp $345b
 }
@@ -8011,30 +7908,9 @@ void func_5d31__afterCall5d34(GB *gb) {
 L_5d34:
   I(0x5d34, 4); A = mem_rd(gb, 0xcc4b);  // ld a,($cc4b)
   I(0x5d37, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x5d38, 4); applyWarpTransition2(gb); return; } I(0x5d38, 3);  // jp nz,$5e0e
+  if (!(F & FZ)) { I(0x5d38, 4); if (hook_enabled_at(0x5e0e)) { applyWarpTransition2_hook(gb); return; } HANDOFF(0x5e0e); } I(0x5d38, 3);  // jp nz,$5e0e
   CALL(0x5d3b, updateStatusBar_hook, 0x1a9c, 0x5d3e);  // call $1a9c
   I(0x5d3e, 4); if (hook_enabled_at(0x345b)) { updateAllObjects_hook(gb); return; } HANDOFF(0x345b);  // jp $345b
-}
-
-// 01:5d41
-void func_5d41(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5d41, refreshLoadedTreeGfx_hook, 0x1613, 0x5d44);  // call $1613
-L_5d44:
-  I(0x5d44, 4); A = mem_rd(gb, 0xcc4b);  // ld a,($cc4b)
-  I(0x5d47, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x5d48, 4); applyWarpTransition2(gb); return; } I(0x5d48, 3);  // jp nz,$5e0e
-  I(0x5d4b, 4); if (hook_enabled_at(0x345b)) { updateAllObjects_hook(gb); return; } HANDOFF(0x345b);  // jp $345b
-}
-
-// 01:5d44
-void func_5d41__afterCall5d44(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5d44:
-  I(0x5d44, 4); A = mem_rd(gb, 0xcc4b);  // ld a,($cc4b)
-  I(0x5d47, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x5d48, 4); applyWarpTransition2(gb); return; } I(0x5d48, 3);  // jp nz,$5e0e
-  I(0x5d4b, 4); if (hook_enabled_at(0x345b)) { updateAllObjects_hook(gb); return; } HANDOFF(0x345b);  // jp $345b
 }
 
 // 01:7f55
@@ -8178,7 +8054,7 @@ L_5c40:
   CALL(0x5c4c, calculateRoomEdge, 0x5f00, 0x5c4f);  // call $5f00
   CALL(0x5c4f, initializeRoom_hook, 0x30fe, 0x5c52);  // call $30fe
 L_5c52:
-  CALL(0x5c52, checkDisplayEraOrSeasonInfo, 0x5e7d, 0x5c55);  // call $5e7d
+  CALL(0x5c52, checkDisplayEraOrSeasonInfo_hook, 0x5e7d, 0x5c55);  // call $5e7d
   CALL(0x5c55, checkDarkenRoomAndClearPaletteFadeState, 0x430d, 0x5c58);  // call $430d
   CALL(0x5c58, fadeinFromWhiteToRoom_hook, 0x336b, 0x5c5b);  // call $336b
   CALL(0x5c5b, checkPlayRoomMusic, 0x5e4d, 0x5c5e);  // call $5e4d
@@ -8193,7 +8069,7 @@ L_5c52:
 void func_5c18__afterCall5c52(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5c52:
-  CALL(0x5c52, checkDisplayEraOrSeasonInfo, 0x5e7d, 0x5c55);  // call $5e7d
+  CALL(0x5c52, checkDisplayEraOrSeasonInfo_hook, 0x5e7d, 0x5c55);  // call $5e7d
   CALL(0x5c55, checkDarkenRoomAndClearPaletteFadeState, 0x430d, 0x5c58);  // call $430d
   CALL(0x5c58, fadeinFromWhiteToRoom_hook, 0x336b, 0x5c5b);  // call $336b
   CALL(0x5c5b, checkPlayRoomMusic, 0x5e4d, 0x5c5e);  // call $5e4d

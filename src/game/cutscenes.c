@@ -29,7 +29,7 @@ void func_5d5d_hook(GB *gb) {
   CYC(0x5d60, 0x5d61); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(0x5d61, 0x5d64);
-    applyWarpTransition2(gb);
+    applyWarpTransition2_hook(gb);
     return;
   }
   CYC(0x5d61, 0x5d64);
@@ -60,7 +60,7 @@ void cutscene09_hook(GB *gb) {
   CYC(0x5d7d, 0x5d7e); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(0x5d7e, 0x5d81);
-    setCutsceneIndexIfCutsceneTriggerSet(gb);
+    setCutsceneIndexIfCutsceneTriggerSet_hook(gb);
     return;
   }
   CYC(0x5d7e, 0x5d81);
@@ -80,7 +80,7 @@ void cutscene_endgameTail_hook(GB *gb) {
   }
   CYC(0x5d8a, 0x5d8b);
   CYC(0x5d8b, 0x5d8e);
-  applyWarpTransition2(gb);
+  applyWarpTransition2_hook(gb);
 }
 
 void cutscene0f_hook(GB *gb) {
@@ -122,7 +122,7 @@ void cutscene0e_hook(GB *gb) {
   CYC(0x5db5, 0x5db6); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(0x5db6, 0x5db8);
-    applyWarpTransition2(gb);
+    applyWarpTransition2_hook(gb);
     return;
   }
   CYC(0x5db6, 0x5db8);
@@ -138,7 +138,7 @@ void cutscene21_hook(GB *gb) {
   CYC(0x5dc5, 0x5dc6); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(0x5dc6, 0x5dc9);
-    setCutsceneIndexIfCutsceneTriggerSet(gb);
+    setCutsceneIndexIfCutsceneTriggerSet_hook(gb);
     return;
   }
   CYC(0x5dc6, 0x5dc9);
@@ -157,7 +157,7 @@ void cutscene11_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(0x5dd1, func_3ed0_hook, 0x3ed0, 0x5dd4);
   CYC(0x5dd4, 0x5dd7);
-  func_5d41(gb);
+  func_5d41_hook(gb);
 }
 
 void cutscene12_hook(GB *gb) {
@@ -166,11 +166,11 @@ void cutscene12_hook(GB *gb) {
   CYC(0x5dda, 0x5ddb); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(0x5ddb, 0x5dde);
-    setCutsceneIndexIfCutsceneTriggerSet(gb);
+    setCutsceneIndexIfCutsceneTriggerSet_hook(gb);
     return;
   }
   CYC(0x5ddb, 0x5dde);
   CALL_C(0x5dde, func_3ee4_hook, 0x3ee4, 0x5de1);
   CYC(0x5de1, 0x5de4);
-  func_5d41(gb);
+  func_5d41_hook(gb);
 }

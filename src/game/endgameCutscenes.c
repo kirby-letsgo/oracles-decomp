@@ -1064,3 +1064,155 @@ void endgameCutsceneHandler_0a__state3_hook(GB *gb) {
   CYC(0x5fe0, 0x5fe2); E = 0x10;
   CYC(0x5fe2, 0x5fe5); interBankCall_hook(gb);
 }
+
+void endgameCutsceneHandler_09_stage0__updateExplosionSoundsAndScreenShake_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x54de, 0x54e1); SET_HL(wTmpcbb6);
+  CYC(0x54e1, 0x54e2); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(0x54e2, 0x54e3); ret_effect(gb);
+    return;
+  }
+  CYC(0x54e2, 0x54e3);
+  CYC(0x54e3, 0x54e5); mem_wr(gb, HL, 0x10);
+  CYC(0x54e5, 0x54e7); A = 0x6f;
+  CALL_C(0x54e7, playSound_b00_hook, 0x0c98, 0x54ea);
+  CYC(0x54ea, 0x54ec); A = 0x08;
+  CALL_C(0x54ec, setScreenShakeCounter_hook, 0x24bb, 0x54ef);
+  CYC(0x54ef, 0x54f0); alu_xor(gb, A);
+  CYC(0x54f0, 0x54f1); ret_effect(gb);
+}
+
+void endgameCutsceneHandler_09_stage0__explosions_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x5536, endgameCutsceneHandler_09_stage0__updateExplosionSoundsAndScreenShake_hook, 0x54de, 0x5539);
+  if (!(F & FZ)) {
+    CYCT(0x5539, 0x553a); ret_effect(gb);
+    return;
+  }
+  CYC(0x5539, 0x553a);
+  CALL_C(0x553a, getFreeInteractionSlot_hook, 0x3aef, 0x553d);
+  if (!(F & FZ)) {
+    CYCT(0x553d, 0x553e); ret_effect(gb);
+    return;
+  }
+  CYC(0x553d, 0x553e);
+  CYC(0x553e, 0x5540); mem_wr(gb, HL, 0x99);
+  CYC(0x5540, 0x5541); L = alu_inc8(gb, L);
+  CYC(0x5541, 0x5542); L = alu_inc8(gb, L);
+  CYC(0x5542, 0x5543); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x5543, 0x5545); A = 0x01;
+  CYC(0x5545, 0x5548); mem_wr(gb, 0xcfd0, A);
+  CYC(0x5548, 0x5549); ret_effect(gb);
+}
+
+void endgameCutsceneHandler_09_stage0__state0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x548c, 0x548f); A = W8(wPaletteThread_mode);
+  CYC(0x548f, 0x5490); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x5490, 0x5491); ret_effect(gb);
+    return;
+  }
+  CYC(0x5490, 0x5491);
+  CALL_C(0x5491, cutscene_clearCFC0ToCFDF_hook, 0x608e, 0x5494);
+  CALL_C(0x5494, incCbc2_hook, 0x3067, 0x5497);
+  CYC(0x5497, 0x549a); SET_BC(0x0176);
+  CALL_C(0x549a, disableLcdAndLoadRoom_hook, 0x30b0, 0x549d);
+  CALL_C(0x549d, resetCamera_hook, 0x12ce, 0x54a0);
+  CYC(0x54a0, 0x54a2); A = 0xfa;
+  CALL_C(0x54a2, playSound_b00_hook, 0x0c98, 0x54a5);
+  CALL_C(0x54a5, clearAllParentItems_hook, 0x2c10, 0x54a8);
+  CALL_C(0x54a8, dropLinkHeldItem_hook, 0x2c43, 0x54ab);
+  CYC(0x54ab, 0x54ae); SET_HL(0x540c);
+  CALL_C(0x54ae, parseGivenObjectData_b00_hook, 0x3171, 0x54b1);
+  CYC(0x54b1, 0x54b4); SET_HL(wTmpcbb3);
+  CYC(0x54b4, 0x54b6); mem_wr(gb, HL, 0x3c);
+  CYC(0x54b6, 0x54b9); SET_HL(0x60ce);
+  CALL_C(0x54b9, cutscene_replaceListOfTiles_hook, 0x60be, 0x54bc);
+  CALL_C(0x54bc, refreshObjectGfx_hook, 0x1618, 0x54bf);
+  CYC(0x54bf, 0x54c1); A = 0x02;
+  CALL_C(0x54c1, loadGfxRegisterStateIndex_hook, 0x02ea, 0x54c4);
+  CYC(0x54c4, 0x54c7); fadeinFromWhiteToRoom_hook(gb);
+}
+
+void endgameCutsceneHandler_09_stage0__state1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x54c7, cutscene_decCBB3IfNotFadingOut_hook, 0x6070, 0x54ca);
+  if (!(F & FZ)) {
+    CYCT(0x54ca, 0x54cb); ret_effect(gb);
+    return;
+  }
+  CYC(0x54ca, 0x54cb);
+  CYC(0x54cb, 0x54cd); mem_wr(gb, HL, 0x78);
+  CYC(0x54cd, 0x54cf); L = 0xb6;
+  CYC(0x54cf, 0x54d1); mem_wr(gb, HL, 0x10);
+  CYC(0x54d1, 0x54d4); incCbc2_hook(gb);
+}
+
+void endgameCutsceneHandler_09_stage0__state2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x54d4, decCbb3_hook, 0x305d, 0x54d7);
+  if (!(F & FZ)) {
+    CYCT(0x54d7, 0x54d9);
+    endgameCutsceneHandler_09_stage0__updateExplosionSoundsAndScreenShake_hook(gb);
+    return;
+  }
+  CYC(0x54d7, 0x54d9);
+  CYC(0x54d9, 0x54db); mem_wr(gb, HL, 0x3c);
+  CYC(0x54db, 0x54de); incCbc2_hook(gb);
+}
+
+void endgameCutsceneHandler_09_stage0__state3_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x54f1, decCbb3_hook, 0x305d, 0x54f4);
+  if (!(F & FZ)) {
+    CYCT(0x54f4, 0x54f5); ret_effect(gb);
+    return;
+  }
+  CYC(0x54f4, 0x54f5);
+  CYC(0x54f5, 0x54f7); mem_wr(gb, HL, 0x1e);
+  CYC(0x54f7, 0x54fa); SET_BC(0x1d0a);
+  CALL_C(0x54fa, showText_hook, 0x1872, 0x54fd);
+  CYC(0x54fd, 0x5500); incCbc2_hook(gb);
+}
+
+void endgameCutsceneHandler_09_stage0__state4_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x5500, cutscene_decCBB3IfTextNotActive_hook, 0x6068, 0x5503);
+  if (!(F & FZ)) {
+    CYCT(0x5503, 0x5504); ret_effect(gb);
+    return;
+  }
+  CYC(0x5503, 0x5504);
+  CYC(0x5504, 0x5506); mem_wr(gb, HL, 0x78);
+  CYC(0x5506, 0x5508); L = 0xb6;
+  CYC(0x5508, 0x550a); mem_wr(gb, HL, 0x10);
+  CYC(0x550a, 0x550d); incCbc2_hook(gb);
+}
+
+void endgameCutsceneHandler_09_stage0__state5_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x550d, decCbb3_hook, 0x305d, 0x5510);
+  if (!(F & FZ)) {
+    CYCT(0x5510, 0x5512);
+    endgameCutsceneHandler_09_stage0__explosions_hook(gb);
+    return;
+  }
+  CYC(0x5510, 0x5512);
+  CYC(0x5512, 0x5514); mem_wr(gb, HL, 0x28);
+  CALL_C(0x5514, incCbc2_hook, 0x3067, 0x5517);
+  CYC(0x5517, 0x551a); SET_HL(w1Link);
+  CYC(0x551a, 0x551c); mem_wr(gb, HL, 0x03);
+  CYC(0x551c, 0x551e); L = 0x0b;
+  CYC(0x551e, 0x5520); mem_wr(gb, HL, 0x48);
+  CYC(0x5520, 0x5522); L = 0x0d;
+  CYC(0x5522, 0x5524); mem_wr(gb, HL, 0x50);
+  CYC(0x5524, 0x5526); L = 0x08;
+  CYC(0x5526, 0x5528); mem_wr(gb, HL, 0x02);
+  CYC(0x5528, 0x552b); SET_HL(0x70d2);
+  CYC(0x552b, 0x552d); A = 0x10;
+  CALL_C(0x552d, setSimulatedInputAddress_hook, 0x2a1d, 0x5530);
+  CYC(0x5530, 0x5533); SET_HL(0x60d7);
+  CYC(0x5533, 0x5536); cutscene_replaceListOfTiles_hook(gb);
+}

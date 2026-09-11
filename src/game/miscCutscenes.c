@@ -11,6 +11,13 @@ void nayruWarpToMakuTreeCutsceneHandler__func_6962_hook(GB *gb);
 void func_6f9e_hook(GB *gb);
 void func_6fb0_hook(GB *gb);
 void func_712f_hook(GB *gb);
+void func_03_7619__state1_hook(GB *gb);
+void func_03_7619__state2_hook(GB *gb);
+void func_03_7619__state3_hook(GB *gb);
+void func_03_7619__state4_hook(GB *gb);
+void func_03_7619__state5_hook(GB *gb);
+void func_03_7619__state5__cbb3_03_hook(GB *gb);
+void func_03_7619__state6_hook(GB *gb);
 
 static void add_double_index_to_hl(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -989,4 +996,174 @@ void func_03_7619__state4__cbb3_03_hook(GB *gb) {
   CYC(0x7793, 0x7795); L = 0x08;
   CYC(0x7795, 0x7797); mem_wr(gb, HL, 0x02);
   CYC(0x7797, 0x779a); setLinkForceStateToState08_hook(gb);
+}
+
+static uint16_t clean_seas_jump_table(GB *gb) {
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0004, false); alu_add(gb, L); L = A;
+  if (!(F & FC)) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0007, false); H = alu_inc8(gb, H);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  L = A;
+  burn_rom(gb, 0x00, 0x0009, 0x000b, false);
+  return HL;
+}
+
+void func_03_7619_hook(GB *gb) {
+  CYC(0x7619, 0x761c); A = mem_rd(gb, wCutsceneState);
+  CYC(0x761c, 0x761d); push_effect(gb, 0x761d);
+  switch (clean_seas_jump_table(gb)) {
+    case 0x762b: func_03_7619__state0_hook(gb); return;
+    case 0x767c: func_03_7619__state1_hook(gb); return;
+    case 0x7702: func_03_7619__state2_hook(gb); return;
+    case 0x772c: func_03_7619__state3_hook(gb); return;
+    case 0x775d: func_03_7619__state4_hook(gb); return;
+    case 0x779a: func_03_7619__state5_hook(gb); return;
+    case 0x77d6: func_03_7619__state6_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void func_03_7619__state1_hook(GB *gb) {
+  CYC(0x767c, 0x767f); A = mem_rd(gb, wTmpcbb3);
+  CYC(0x767f, 0x7680); push_effect(gb, 0x7680);
+  switch (clean_seas_jump_table(gb)) {
+    case 0x7688: func_03_7619__state1__cbb3_00_hook(gb); return;
+    case 0x7695: func_03_7619__state1__cbb3_01_hook(gb); return;
+    case 0x76ea: func_03_7619__state1__cbb3_03_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void func_03_7619__state2_hook(GB *gb) {
+  CYC(0x7702, 0x7705); A = mem_rd(gb, wTmpcbb3);
+  CYC(0x7705, 0x7706); push_effect(gb, 0x7706);
+  switch (clean_seas_jump_table(gb)) {
+    case 0x7688: func_03_7619__state1__cbb3_00_hook(gb); return;
+    case 0x7695: func_03_7619__state1__cbb3_01_hook(gb); return;
+    case 0x770e: func_03_7619__state2__cbb3_03_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void func_03_7619__state3_hook(GB *gb) {
+  CYC(0x772c, 0x772f); A = mem_rd(gb, wTmpcbb3);
+  CYC(0x772f, 0x7730); push_effect(gb, 0x7730);
+  switch (clean_seas_jump_table(gb)) {
+    case 0x7688: func_03_7619__state1__cbb3_00_hook(gb); return;
+    case 0x7695: func_03_7619__state1__cbb3_01_hook(gb); return;
+    case 0x7738: func_03_7619__state3__cbb3_03_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void func_03_7619__state4_hook(GB *gb) {
+  CYC(0x775d, 0x7760); A = mem_rd(gb, wTmpcbb3);
+  CYC(0x7760, 0x7761); push_effect(gb, 0x7761);
+  switch (clean_seas_jump_table(gb)) {
+    case 0x7688: func_03_7619__state1__cbb3_00_hook(gb); return;
+    case 0x7695: func_03_7619__state1__cbb3_01_hook(gb); return;
+    case 0x7769: func_03_7619__state4__cbb3_03_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void func_03_7619__state5_hook(GB *gb) {
+  CYC(0x779a, 0x779d); A = mem_rd(gb, wTmpcbb3);
+  CYC(0x779d, 0x779e); E = A;
+  CYC(0x779e, 0x779f); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x779f, 0x77a1);
+    goto dispatch;
+  }
+  CYC(0x779f, 0x77a1);
+  CYC(0x77a1, 0x77a4); A = mem_rd(gb, wFrameCounter);
+  CYC(0x77a4, 0x77a6); alu_and(gb, 0x1f);
+  if (!(F & FZ)) {
+    CYCT(0x77a6, 0x77a8);
+    goto dispatch;
+  }
+  CYC(0x77a6, 0x77a8);
+  CYC(0x77a8, 0x77ab); A = mem_rd(gb, w1Link_direction);
+  CYC(0x77ab, 0x77ad); alu_and(gb, 0x02);
+  CYC(0x77ad, 0x77af); alu_xor(gb, 0x02);
+  CYC(0x77af, 0x77b1); alu_or(gb, 0x01);
+  CYC(0x77b1, 0x77b4); mem_wr(gb, w1Link_direction, A);
+dispatch:
+  CYC(0x77b4, 0x77b5); A = E;
+  CYC(0x77b5, 0x77b6); push_effect(gb, 0x77b6);
+  switch (clean_seas_jump_table(gb)) {
+    case 0x7688: func_03_7619__state1__cbb3_00_hook(gb); return;
+    case 0x7695: func_03_7619__state1__cbb3_01_hook(gb); return;
+    case 0x77be: func_03_7619__state5__cbb3_03_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void func_03_7619__state5__cbb3_03_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x77be, 0x77c1); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x77c1, 0x77c2); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x77c2, 0x77c3); ret_effect(gb);
+    return;
+  }
+  CYC(0x77c2, 0x77c3);
+  CYC(0x77c3, 0x77c6); SET_HL(0xcfc0);
+  CYC(0x77c6, 0x77c8); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x77c8, 0x77c9); ret_effect(gb);
+    return;
+  }
+  CYC(0x77c8, 0x77c9);
+  CYC(0x77c9, 0x77cb); A = 0x3c;
+  CYC(0x77cb, 0x77ce); mem_wr(gb, wTmpcbb4, A);
+  CYC(0x77ce, 0x77d0); A = 0x5b;
+  CALL_C(0x77d0, playSound_b00_hook, 0x0c98, 0x77d3);
+  CYC(0x77d3, 0x77d6); cleanSeas_incState_hook(gb);
+}
+
+void func_03_7619__state6_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x77d6, cleanSeas_decCBB4_hook, 0x7609, 0x77d9);
+  if (!(F & FZ)) {
+    CYCT(0x77d9, 0x77da); ret_effect(gb);
+    return;
+  }
+  CYC(0x77d9, 0x77da);
+  CYC(0x77da, 0x77dc); A = 0x01;
+  CYC(0x77dc, 0x77df); mem_wr(gb, wScrollMode, A);
+  CYC(0x77df, 0x77e2); SET_HL(0x5f00);
+  CYC(0x77e2, 0x77e4); E = 0x01;
+  CALL_C(0x77e4, interBankCall_hook, 0x008a, 0x77e7);
+  CYC(0x77e7, 0x77ea); SET_HL(0x49c9);
+  CYC(0x77ea, 0x77ec); E = 0x01;
+  CALL_C(0x77ec, interBankCall_hook, 0x008a, 0x77ef);
+  CYC(0x77ef, 0x77f2); SET_HL(0x49d7);
+  CYC(0x77f2, 0x77f4); E = 0x01;
+  CALL_C(0x77f4, interBankCall_hook, 0x008a, 0x77f7);
+  CYC(0x77f7, 0x77f8); alu_xor(gb, A);
+  CYC(0x77f8, 0x77fb); mem_wr(gb, wMenuDisabled, A);
+  CYC(0x77fb, 0x77fe); mem_wr(gb, wDisabledObjects, A);
+  CYC(0x77fe, 0x7801); A = mem_rd(gb, wLoadingRoomPack);
+  CYC(0x7801, 0x7804); mem_wr(gb, wRoomPack, A);
+  CYC(0x7804, 0x7807); A = mem_rd(gb, wActiveRoom);
+  CYC(0x7807, 0x780a); mem_wr(gb, wLoadingRoom, A);
+  CYC(0x780a, 0x780c); A = 0x36;
+  CYC(0x780c, 0x780f); mem_wr(gb, wEnteredWarpPosition, A);
+  CYC(0x780f, 0x7812); A = mem_rd(gb, wActiveMusic2);
+  CYC(0x7812, 0x7815); mem_wr(gb, wActiveMusic, A);
+  CALL_C(0x7815, playSound_b00_hook, 0x0c98, 0x7818);
+  CYC(0x7818, 0x781a); A = 0x00;
+  CYC(0x781a, 0x781d); mem_wr(gb, 0xc2ef, A);
+  CYC(0x781d, 0x781f); A = 0x02;
+  CYC(0x781f, 0x7822); mem_wr(gb, w1Link_direction, A);
+  CYC(0x7822, 0x7824); A = 0x30;
+  CALL_C(0x7824, setGlobalFlag_hook, 0x31f9, 0x7827);
+  CYC(0x7827, 0x782a); setDeathRespawnPoint_hook(gb);
 }

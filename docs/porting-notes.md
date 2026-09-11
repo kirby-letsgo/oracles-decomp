@@ -500,3 +500,9 @@ desync to discover; keep them when porting routines.
   selected word, burns the one-byte `jp hl`, and only then calls `hook_handoff(HL)`. Jumping from
   the source-level index directly to a known table target would skip vector cycles and the real
   push/pop effects that dynamic dispatch and thread changes rely on.
+- A named local body that has its own symbol and readiness report is still a routine, even when
+  every current caller could use a file-local C helper. Batch 60 initially hid the endgame
+  explosion-update and explosion-dispatch bodies behind `static` helpers; integration review
+  promoted both addresses to real aliases in `extra.sym`, registered them in `ported.txt` and
+  `rewritten.txt`, and exposed normal `_hook` shims. This preserves direct hook dispatch and keeps
+  the rewritten count aligned with the reportable routine set.
