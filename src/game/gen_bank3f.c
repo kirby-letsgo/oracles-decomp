@@ -5218,39 +5218,6 @@ L_5836:
   switch (HL) {  default: HANDOFF(HL); }
 }
 
-// 3f:58e8
-void textControlCodeC_2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x58e8, textControlCodeC_2__getNextTextboxOptionPosition, 0x5904, 0x58eb);  // call $5904
-  I(0x58eb, 4); A = mem_rd(gb, 0xd0c1);  // ld a,($d0c1)
-  I(0x58ee, 2); alu_or(gb, 0x04);  // or $04
-  I(0x58f0, 4); mem_wr(gb, 0xd0c1, A);  // ld ($d0c1),a
-  I(0x58f3, 1); A = E;  // ld a,e
-  I(0x58f4, 1); alu_add(gb, A);  // add a
-  I(0x58f5, 2); alu_or(gb, 0x60);  // or $60
-  I(0x58f7, 1); B = A;  // ld b,a
-  I(0x58f8, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x58f9, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  SET_HL(POP(0x58fa));  // pop hl
-  SET_BC(POP(0x58fb));  // pop bc
-  I(0x58fc, 2); A = 0x20;  // ld a,$20
-  CALL(0x58fe, setLineTextBuffers_hook, 0x50a6, 0x5901);  // call $50a6
-  I(0x5901, 4); if (hook_enabled_at(0x18cd)) { retrieveTextCharacter_hook(gb); return; } HANDOFF(0x18cd);  // jp $18cd
-}
-
-// 3f:5904
-void textControlCodeC_2__getNextTextboxOptionPosition(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5904:
-  I(0x5904, 3); SET_HL(0xd0e0);  // ld hl,$d0e0
-L_5907:
-  I(0x5907, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5908, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x5909); return; } I(0x5909, 2);  // ret z
-  I(0x590a, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x590b, 3); goto L_5907;  // jr $5907
-}
-
 // 3f:5915
 void extraTextIndices(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

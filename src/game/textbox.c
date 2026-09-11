@@ -1383,3 +1383,38 @@ void textControlCodeC_1_drawDigit_hook(GB *gb) {
   CALL_C(0x58e2, setLineTextBuffers_hook, 0x50a6, 0x58e5);
   CYC(0x58e5, 0x58e8); retrieveTextCharacter_hook(gb);
 }
+
+static void textControlCodeC_2_getNextTextboxOptionPosition(GB *gb) {
+  CYC(0x5904, 0x5907); SET_HL(w7TextboxOptionPositions);
+  for (;;) {
+    CYC(0x5907, 0x5908); A = mem_rd(gb, HL);
+    CYC(0x5908, 0x5909); alu_or(gb, A);
+    if (F & FZ) {
+      CYCT(0x5909, 0x590a); ret_effect(gb);
+      return;
+    }
+    CYC(0x5909, 0x590a);
+    CYC(0x590a, 0x590b); L = alu_inc8(gb, L);
+    CYC(0x590b, 0x590d);
+  }
+}
+
+void textControlCodeC_2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x58e8, 0x58eb); push_effect(gb, 0x58eb);
+  textControlCodeC_2_getNextTextboxOptionPosition(gb);
+  CYC(0x58eb, 0x58ee); A = mem_rd(gb, w7d0c1);
+  CYC(0x58ee, 0x58f0); alu_or(gb, 0x04);
+  CYC(0x58f0, 0x58f3); mem_wr(gb, w7d0c1, A);
+  CYC(0x58f3, 0x58f4); A = E;
+  CYC(0x58f4, 0x58f5); alu_add(gb, A);
+  CYC(0x58f5, 0x58f7); alu_or(gb, 0x60);
+  CYC(0x58f7, 0x58f8); B = A;
+  CYC(0x58f8, 0x58f9); B = alu_inc8(gb, B);
+  CYC(0x58f9, 0x58fa); mem_wr(gb, HL, B);
+  CYC(0x58fa, 0x58fb); SET_HL(pop_effect(gb));
+  CYC(0x58fb, 0x58fc); SET_BC(pop_effect(gb));
+  CYC(0x58fc, 0x58fe); A = 0x20;
+  CALL_C(0x58fe, setLineTextBuffers_hook, 0x50a6, 0x5901);
+  CYC(0x5901, 0x5904); retrieveTextCharacter_hook(gb);
+}

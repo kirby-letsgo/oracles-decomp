@@ -7,7 +7,7 @@ Updated 2026-09-11. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 915 routines rewritten across thirteen code banks;
+  routine against the transliteration. Progress: 945 routines rewritten across thirteen code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -32,7 +32,9 @@ Updated 2026-09-11. Newest entries at the top of each section.
   commands, and the textbox character-display and heart-piece paths; batch 45 added room tile
   state handlers, script room/item commands, textbox option navigation, and text-stack helpers;
   batch 46 continued with Jabu/overworld tile replacements, script tile/call commands, and
-  textbox bank-reading, display-speed, and numeric-substitution paths.
+  textbox bank-reading, display-speed, and numeric-substitution paths; batch 47 finished the
+  textbox source and moved that lane into Twinrova cutscene helpers while continuing vine and
+  script condition handlers.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -137,6 +139,14 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-11: milestone 3 phase 5 batch 47 (30 routines): ten bank-4 vine and overworld
+  tile handlers including `replaceVineTiles`, ten bank-C collision/input/flag/display script
+  checks, the final bank-3F textbox routine, and nine bank-3 Twinrova cutscene helpers. Dynamic
+  RST dispatchers and one thread-switching cutscene state were deferred. Registering
+  `replaceVineTiles` removed its generated symbol, so four older readable callers were updated
+  to the `_hook` shim. Gates: lint 0, 30k verify 0 mismatches, whole-movie state hash clean
+  (`64bddd0dfe384126`), ctest 8/8 in both normal and quirk builds.
 
 - 2026-09-11: milestone 3 phase 5 batch 46 (30 routines): ten bank-4 Jabu and overworld
   tile-replacement handlers, ten bank-C script tile/call/jump/collision commands, and ten

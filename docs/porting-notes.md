@@ -450,5 +450,7 @@ desync to discover; keep them when porting routines.
 - Porting a generated callee can invalidate an older handwritten caller even though both use
   `CALL_C`. Batch 46 rewrote `readByteFromW7ActiveBankAndIncHl`; regeneration removed the plain
   generated C symbol, so batch 44's existing call no longer linked until its target changed to
-  `readByteFromW7ActiveBankAndIncHl_hook`. After registering a new rewrite, rebuild the whole
-  target and search compile failures for older smart calls that still name the generated symbol.
+  `readByteFromW7ActiveBankAndIncHl_hook`. Batch 47 repeated this with four direct/call sites for
+  `replaceVineTiles`, showing that both `CALL_C` and static C tails need the audit. After
+  registering a new rewrite, rebuild the whole target and search compile failures for older calls
+  that still name the generated symbol.
