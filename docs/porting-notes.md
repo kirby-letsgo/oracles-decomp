@@ -472,3 +472,9 @@ desync to discover; keep them when porting routines.
   found `if (F & FC)` where the taken no-carry edge required `if (!(F & FC))`. Keep the reference
   replay mandatory even after a clean hook-verification run, especially for helpers reached only
   through direct `CALL_C` chains.
+- A plausible temporary-variable name is not evidence that it matches a raw RAM address. Batch
+  54 translated `ld hl,$cbb7` in the Maku-tree palette helper as `wTmpcbb4`, which silently wrote
+  `$cbb4`; build, lint, review, and the routine verifier all passed, but the reference replay
+  diverged at frame 17,220. A hook-list bisection isolated the helper and checking the generated
+  `ram.h` values exposed the three-byte address error. When assembly uses a raw address, verify
+  the chosen named alias's numeric definition before accepting the readable spelling.

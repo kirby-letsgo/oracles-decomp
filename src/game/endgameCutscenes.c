@@ -10,6 +10,12 @@ void cutscene_decCBB3IfTextNotActive_hook(GB *gb);
 void cutscene_decCBB3IfNotFadingOut_hook(GB *gb);
 void cutscene_rumbleSoundWhenFrameCounterLowerNibbleIs0_hook(GB *gb);
 void cutscene_resetOamWithData_hook(GB *gb);
+void cutsceneFunc_6026_hook(GB *gb);
+void cutscene_loadAintoHL_BTimes_hook(GB *gb);
+void cutscene_load_24_ObjectGfx2Times_andReload_hook(GB *gb);
+void cutscene_load_26_ObjectGfx2Times_andReload_hook(GB *gb);
+void cutscene_load_04_ObjectGfx2Times_andReload_hook(GB *gb);
+void cutscene_loadAObjectGfxBTimes_andReload_hook(GB *gb);
 
 void cutscene_incCBC2setCBB3whenCBB3is0_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -162,4 +168,97 @@ void func_60f1_hook(GB *gb) {
   CYC(0x60ff, 0x6100); mem_wr(gb, HL, B);
   CYC(0x6100, 0x6104);
   enableActiveRing_hook(gb);
+}
+
+void cutscene_parseObjectData_andLoadObjectGfx_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x601a, getEntryFromObjectTable1_hook, 0x3080, 0x601d);
+  CALL_C(0x601d, parseGivenObjectData_b00_hook, 0x3171, 0x6020);
+  CALL_C(0x6020, refreshObjectGfx_hook, 0x1618, 0x6023);
+  CYC(0x6023, 0x6026); cutsceneFunc_6026_hook(gb);
+}
+
+void cutsceneFunc_6026_hook(GB *gb) {
+  CYC(0x6026, 0x6029); A = mem_rd(gb, 0xcfde);
+  CYC(0x6029, 0x602b); alu_cp(gb, 0x00);
+  if (F & FZ) {
+    CYCT(0x602b, 0x602d);
+    cutscene_load_04_ObjectGfx2Times_andReload_hook(gb);
+    return;
+  }
+  CYC(0x602b, 0x602d);
+  CYC(0x602d, 0x602f); alu_cp(gb, 0x01);
+  if (F & FZ) {
+    CYCT(0x602f, 0x6031);
+    cutscene_load_26_ObjectGfx2Times_andReload_hook(gb);
+    return;
+  }
+  CYC(0x602f, 0x6031);
+  CYC(0x6031, 0x6033); alu_cp(gb, 0x02);
+  if (F & FZ) {
+    CYCT(0x6033, 0x6035);
+    cutscene_load_24_ObjectGfx2Times_andReload_hook(gb);
+    return;
+  }
+  CYC(0x6033, 0x6035);
+  CYC(0x6035, 0x6037); alu_cp(gb, 0x04);
+  if (F & FZ) {
+    CYCT(0x6037, 0x6039);
+    cutscene_load_26_ObjectGfx2Times_andReload_hook(gb);
+    return;
+  }
+  CYC(0x6037, 0x6039);
+  CYC(0x6039, 0x603a); ret_effect(gb);
+}
+
+void cutscene_loadAObjectGfxBTimes_hook(GB *gb) {
+  CYC(0x603a, 0x603d); SET_HL(wLoadedObjectGfx);
+  cutscene_loadAintoHL_BTimes_hook(gb);
+}
+
+void cutscene_loadAintoHL_BTimes_hook(GB *gb) {
+  for (;;) {
+    CYC(0x603d, 0x603e); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x603e, 0x603f); A = alu_inc8(gb, A);
+    CYC(0x603f, 0x6041); mem_wr(gb, HL, 0x01);
+    CYC(0x6041, 0x6042); L = alu_inc8(gb, L);
+    CYC(0x6042, 0x6043); B = alu_dec8(gb, B);
+    if (!(F & FZ)) {
+      CYCT(0x6043, 0x6045);
+      continue;
+    }
+    CYC(0x6043, 0x6045);
+    CYC(0x6045, 0x6046); ret_effect(gb);
+    return;
+  }
+}
+
+void cutscene_load_24_ObjectGfx2Times_andReload_hook(GB *gb) {
+  CYC(0x6046, 0x6048); A = 0x24;
+  CYC(0x6048, 0x604a); B = 0x02;
+  CYC(0x604a, 0x604c); cutscene_loadAObjectGfxBTimes_andReload_hook(gb);
+}
+
+void cutscene_load_26_ObjectGfx2Times_andReload_hook(GB *gb) {
+  CYC(0x604c, 0x604e); A = 0x26;
+  CYC(0x604e, 0x6050); B = 0x02;
+  CYC(0x6050, 0x6052); cutscene_loadAObjectGfxBTimes_andReload_hook(gb);
+}
+
+void cutscene_load_04_ObjectGfx2Times_andReload_hook(GB *gb) {
+  CYC(0x6052, 0x6054); A = 0x04;
+  CYC(0x6054, 0x6056); B = 0x02;
+  cutscene_loadAObjectGfxBTimes_andReload_hook(gb);
+}
+
+void cutscene_loadAObjectGfxBTimes_andReload_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6056, cutscene_loadAObjectGfxBTimes_hook, 0x603a, 0x6059);
+  CYC(0x6059, 0x605c); reloadObjectGfx_b00_hook(gb);
+}
+
+void cutscene_clearTmpCBB3_hook(GB *gb) {
+  CYC(0x6086, 0x6089); SET_HL(wTmpcbb3);
+  CYC(0x6089, 0x608b); B = 0x10;
+  CYC(0x608b, 0x608e); clearMemory_hook(gb);
 }

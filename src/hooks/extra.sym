@@ -24,3 +24,16 @@
 10:7328 agesFunc_10_7298__playWaveSoundAtRandomIntervals_body
 10:7450 agesFunc_10_7298__func_7450
 10:746a agesFunc_10_7298__func_746a
+10:7146 agesFunc_10_70f6__substate1
+10:7156 agesFunc_10_70f6__substate2
+10:7174 agesFunc_10_70f6__func_7174
+10:719c agesFunc_10_70f6__substate3
+10:71c4 agesFunc_10_70f6__substate5
+10:7251 agesFunc_10_70f6__substate7
+10:727f agesFunc_10_70f6__substate8
+03:62c8 func_03_6275__bootedFromPalace_incState
+03:6397 nayruSingingCutsceneHandler__func_6397
+03:63db nayruSingingCutsceneHandler__func_63db
+03:6594 makuTreeDisappearingCutsceneHandler__label_03_119
+03:6838 nayruWarpToMakuTreeCutsceneHandler__func_6838
+03:692b nayruWarpToMakuTreeCutsceneHandler__func_692b

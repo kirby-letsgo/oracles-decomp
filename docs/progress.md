@@ -7,7 +7,7 @@ Updated 2026-09-11. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 1,089 routines rewritten across fifteen code banks;
+  routine against the transliteration. Progress: 1,112 routines rewritten across fifteen code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -43,7 +43,8 @@ Updated 2026-09-11. Newest entries at the top of each section.
   endgame cutscene leaf helpers and continued the temple-intro state path; batch 52 added the
   remaining linked-game spawn helpers, endgame tile/inventory helpers, and temple/pre-title
   cinematic states; batch 53 finished the linked-game source's safe routines, added the remaining
-  bank-3 temple camera/bar helpers, and opened bank 10's two large cutscene state machines.
+  bank-3 temple camera/bar helpers, and opened bank 10's two large cutscene state machines; batch
+  54 continued bank 10 and added endgame object-GFX and miscellaneous cutscene helpers.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -148,6 +149,14 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-11: milestone 3 phase 5 batch 54 (23 routines): nine bank-3 endgame
+  object-data/object-GFX helpers, seven bank-3 fairy/Nayru/Maku cutscene helpers, and seven more
+  bank-10 temple-intro state entries. Cross-review caught a missing `$727c` static-jump burn in
+  one bank-10 path. The reference gate then isolated a named-RAM typo where raw `$cbb7` had been
+  written as `wTmpcbb4` (`$cbb4`); changing it to `wTmpcbb7` restored movie sync. Gates: lint 0,
+  30k verify 0 mismatches, whole-movie state hash clean (`64bddd0dfe384126`), ctest 8/8 in both
+  normal and quirk builds.
 
 - 2026-09-11: milestone 3 phase 5 batch 53 (18 routines): the final five safe bank-3
   `linkedGameCutscenes.s` routines, four bank-3 temple camera/black-bar/palette helpers, and nine
