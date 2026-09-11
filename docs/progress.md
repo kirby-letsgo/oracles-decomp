@@ -7,7 +7,7 @@ Updated 2026-09-11. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 1,327 routines rewritten across fifteen code banks;
+  routine against the transliteration. Progress: 1,344 routines rewritten across fifteen code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -57,7 +57,8 @@ Updated 2026-09-11. Newest entries at the top of each section.
   endgame stage-0/stage-1 entries; batch 63 completed the top-level bank-3 cutscene source,
   added the bank-4 warp resolver cluster, and continued the endgame stage-1 states; batch 64
   finished the scripting source's remaining roots, added room-GFX drawing and pirate-room
-  dispatchers, and continued the stage-1/endgame-20 states.
+  dispatchers, and continued the stage-1/endgame-20 states; batch 65 added the remaining core
+  room/tileset dispatchers, five safe textbox roots, and seven more endgame-20 entries.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -162,6 +163,14 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-11: milestone 3 phase 5 batch 65 (17 routines): five core room/tileset/surfacing
+  dispatchers, five safe textbox roots including the dynamic control-code dispatcher, and seven
+  endgame-20 state/helper entries. Cross-review again split the bank-0 `rst $00` vector into its
+  true instruction boundaries; integration updated older readable textbox callers, kept the
+  unported `initTextboxStuff` static tail on its generated symbol, and used `WP(name)[1]` for
+  adjacent bytes of banked RAM symbols. Gates: lint 0, 30k verify 0 mismatches, whole-movie state
+  hash clean (`64bddd0dfe384126`), ctest 8/8 in both normal and quirk builds.
 
 - 2026-09-11: milestone 3 phase 5 batch 64 (24 routines): the seven remaining top-level
   `scripting.s` roots, nine room-GFX/pirate-room drawing and dispatch routines, and eight more

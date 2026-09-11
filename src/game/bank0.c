@@ -12429,7 +12429,7 @@ void textThreadStart_hook(GB *gb) {
   CYC(0x18b4, 0x18b6);
   CYC(0x18b6, 0x18b8); H8(hRomBank) = A;
   CYC(0x18b8, 0x18bb); mem_wr(gb, MBC_ROM_BANK, A);
-  CALL_C(0x18bb, initTextbox, ROM_initTextbox, 0x18be);
+  CALL_C(0x18bb, initTextbox_hook, ROM_initTextbox, 0x18be);
   for (;;) {
     A = 0x3f;
     CYC(0x18be, 0x18c0);

@@ -6,6 +6,38 @@
 #define CYC(from, to) burn_rom(gb, 0x12, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, 0x12, (from), (to), true)
 
+static uint16_t room_specific_code_jump_table(GB *gb) {
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  return HL;
+}
+
+void runRoomSpecificCode_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5872, 0x5875); A = W8(wActiveRoom);
+  CYC(0x5875, 0x5878); SET_HL(0x5898);
+  CALL_C(0x5878, findRoomSpecificData_hook, 0x1dfe, 0x587b);
+  if (!(F & FC)) {
+    CYCT(0x587b, 0x587c); ret_effect(gb);
+    return;
+  }
+  CYC(0x587b, 0x587c);
+  CYC(0x587c, 0x587d); push_effect(gb, 0x587d);
+  hook_handoff(gb, room_specific_code_jump_table(gb));
+}
+
 void roomSpecificCode0_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x58ca, 0x58cc); A = 0x0e;

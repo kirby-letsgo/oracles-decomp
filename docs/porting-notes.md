@@ -529,3 +529,8 @@ desync to discover; keep them when porting routines.
   rectangle helpers, and lint rejected the emulated-register access outside `_hook` shims. Pass
   `sp0_` into the helper from every hook entry instead, so nested-call verification retains the
   original routine boundary as well as satisfying the shim-only register rule.
+- `W8` token-pastes its argument to find the generated bank macro, so arithmetic cannot appear
+  inside it. Batch 65 used `W8(w7TextTableAddr + 1)`, which expanded to the invalid token
+  `1_BANK` during the integrated build. For an adjacent byte in the same named bank, use the
+  pointer form (`WP(w7TextTableAddr)[1]`); this preserves the symbol's generated bank selection
+  while making the offset ordinary C arithmetic.

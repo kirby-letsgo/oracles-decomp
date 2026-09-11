@@ -6,6 +6,104 @@
 #define CYC(from, to) burn_rom(gb, 0x04, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, 0x04, (from), (to), true)
 
+void checkTilesetOverride_hook(GB *gb);
+
+static void load_tileset_add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, false);
+    burn_rom(gb, 0x00, 0x0013, 0x0014, false); H = alu_inc8(gb, H);
+    burn_rom(gb, 0x00, 0x0014, 0x0015, false);
+  } else {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, true);
+  }
+  pop_effect(gb);
+}
+
+static void load_tileset_add_double_index_to_hl_from_rst(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0018, 0x0019, false); push_effect(gb, BC);
+  burn_rom(gb, 0x00, 0x0019, 0x001a, false); C = A;
+  burn_rom(gb, 0x00, 0x001a, 0x001c, false); B = 0x00;
+  burn_rom(gb, 0x00, 0x001c, 0x001d, false); alu_add_hl(gb, BC);
+  burn_rom(gb, 0x00, 0x001d, 0x001e, false); alu_add_hl(gb, BC);
+  burn_rom(gb, 0x00, 0x001e, 0x001f, false); SET_BC(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
+}
+
+static void load_tileset_data(GB *gb, uint16_t sp0_) {
+  CYC(0x6d94, 0x6d96); alu_and(gb, 0x80);
+  CYC(0x6d96, 0x6d98); H8(hFF8B) = A;
+  CYC(0x6d98, 0x6d9a); A = H8(hFF8D);
+  CYC(0x6d9a, 0x6d9c); alu_and(gb, 0x7f);
+  CALL_C(0x6d9c, multiplyABy8_hook, 0x01b7, 0x6d9f);
+  CYC(0x6d9f, 0x6da2); SET_HL(0x4f9c);
+  CYC(0x6da2, 0x6da3); alu_add_hl(gb, BC);
+  CYC(0x6da3, 0x6da4); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6da4, 0x6da5); E = A;
+  CYC(0x6da5, 0x6da6); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6da6, 0x6da9); W8(wTilesetFlags) = A;
+  CYC(0x6da9, 0x6dab); alu_bit(gb, 3, A);
+  if (F & FZ) {
+    CYCT(0x6dab, 0x6dad);
+    CYC(0x6db5, 0x6db7); A = 0xff;
+    CYC(0x6db7, 0x6dba); W8(wDungeonIndex) = A;
+  } else {
+    CYC(0x6dab, 0x6dad);
+    CYC(0x6dad, 0x6dae); A = E;
+    CYC(0x6dae, 0x6db0); alu_and(gb, 0x0f);
+    CYC(0x6db0, 0x6db3); W8(wDungeonIndex) = A;
+    CYC(0x6db3, 0x6db5);
+  }
+  CYC(0x6dba, 0x6dbb); A = E;
+  CYC(0x6dbb, 0x6dbd); A = alu_swap(gb, A);
+  CYC(0x6dbd, 0x6dbf); alu_and(gb, 0x07);
+  CYC(0x6dbf, 0x6dc2); W8(wActiveCollisions) = A;
+  CYC(0x6dc2, 0x6dc4); B = 0x06;
+  CYC(0x6dc4, 0x6dc7); SET_DE(wTilesetUniqueGfx);
+  do {
+    CYC(0x6dc7, 0x6dc8); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x6dc8, 0x6dc9); mem_wr(gb, DE, A);
+    CYC(0x6dc9, 0x6dca); E = alu_inc8(gb, E);
+    CYC(0x6dca, 0x6dcb); B = alu_dec8(gb, B);
+    if (!(F & FZ)) CYCT(0x6dcb, 0x6dcd);
+    else CYC(0x6dcb, 0x6dcd);
+  } while (!(F & FZ));
+  CYC(0x6dcd, 0x6dcf); E = 0x20;
+  CYC(0x6dcf, 0x6dd0); A = mem_rd(gb, DE);
+  CYC(0x6dd0, 0x6dd1); B = A;
+  CYC(0x6dd1, 0x6dd3); A = H8(hFF8B);
+  CYC(0x6dd3, 0x6dd4); alu_or(gb, B);
+  CYC(0x6dd4, 0x6dd5); mem_wr(gb, DE, A);
+  CYC(0x6dd5, 0x6dd6); ret_effect(gb);
+}
+
+void loadTilesetData_body_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6d7a, getAdjustedRoomGroup_hook, 0x6dd6, 0x6d7d);
+  CYC(0x6d7d, 0x6d80); SET_HL(0x52d4);
+  CYC(0x6d80, 0x6d81); load_tileset_add_double_index_to_hl_from_rst(gb, 0x6d81);
+  CYC(0x6d81, 0x6d82); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6d82, 0x6d83); H = mem_rd(gb, HL);
+  CYC(0x6d83, 0x6d84); L = A;
+  CYC(0x6d84, 0x6d87); A = W8(wActiveRoom);
+  CYC(0x6d87, 0x6d88); load_tileset_add_a_to_hl_from_rst(gb, 0x6d88);
+  CYC(0x6d88, 0x6d89); A = mem_rd(gb, HL);
+  CYC(0x6d89, 0x6d8b); H8(hFF8D) = A;
+  CYC(0x6d8b, 0x6d8e); push_effect(gb, 0x6d8e);
+  load_tileset_data(gb, sp0_);
+  CALL_C(0x6d8e, checkTilesetOverride_hook, 0x6de7, 0x6d91);
+  if (!(F & FC)) {
+    CYCT(0x6d91, 0x6d92); ret_effect(gb);
+    return;
+  }
+  CYC(0x6d91, 0x6d92);
+  CYC(0x6d92, 0x6d94); A = H8(hFF8D);
+  load_tileset_data(gb, sp0_);
+}
+
 void getAdjustedRoomGroup_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 
@@ -28,6 +126,54 @@ void getAdjustedRoomGroup_hook(GB *gb) {
   }
   CYC(0x6de5, 0x6de6); A = B;
   CYC(0x6de6, 0x6de7); ret_effect(gb);
+}
+
+void checkTilesetOverride_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_ROM(0x6de7, 0x6e0d);
+  if (F & FC) {
+    CYCT(0x6dea, 0x6deb); ret_effect(gb);
+    return;
+  }
+  CYC(0x6dea, 0x6deb);
+  CALL_ROM(0x6deb, 0x6e28);
+  if (F & FC) {
+    CYCT(0x6dee, 0x6def); ret_effect(gb);
+    return;
+  }
+  CYC(0x6dee, 0x6def);
+  CYC(0x6def, 0x6df2); A = W8(wActiveGroup);
+  CYC(0x6df2, 0x6df3); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x6df3, 0x6df5);
+    goto no_change;
+  }
+  CYC(0x6df3, 0x6df5);
+  CYC(0x6df5, 0x6df8); A = W8(wLoadingRoomPack);
+  CYC(0x6df8, 0x6dfa); alu_cp(gb, 0x7f);
+  if (!(F & FZ)) {
+    CYCT(0x6dfa, 0x6dfc);
+    goto no_change;
+  }
+  CYC(0x6dfa, 0x6dfc);
+  CYC(0x6dfc, 0x6dff); A = W8(wAnimalCompanion);
+  CYC(0x6dff, 0x6e01); alu_sub(gb, 0x0b);
+  if (F & FZ) {
+    CYCT(0x6e01, 0x6e03);
+    goto no_change;
+  }
+  CYC(0x6e01, 0x6e03);
+  CYC(0x6e03, 0x6e04); B = A;
+  CYC(0x6e04, 0x6e06); A = H8(hFF8D);
+  CYC(0x6e06, 0x6e07); alu_add(gb, B);
+  CYC(0x6e07, 0x6e09); H8(hFF8D) = A;
+  CYC(0x6e09, 0x6e0a); alu_scf(gb);
+  CYC(0x6e0a, 0x6e0b); ret_effect(gb);
+  return;
+
+no_change:
+  CYC(0x6e0b, 0x6e0c); alu_xor(gb, A);
+  CYC(0x6e0c, 0x6e0d); ret_effect(gb);
 }
 
 static void add_a_to_hl(GB *gb) {

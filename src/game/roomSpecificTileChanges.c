@@ -14,6 +14,38 @@ static void tileReplacement_group1Map27_write_tiles(GB *gb);
 void createInteraction90_hook(GB *gb);
 void setTileToDoor_hook(GB *gb);
 
+static uint16_t room_tile_changes_jump_table(GB *gb) {
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  return HL;
+}
+
+void applyRoomSpecificTileChanges_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x642c, 0x642f); A = W8(wActiveRoom);
+  CYC(0x642f, 0x6432); SET_HL(0x64a7);
+  CALL_C(0x6432, findRoomSpecificData_hook, 0x1dfe, 0x6435);
+  if (!(F & FC)) {
+    CYCT(0x6435, 0x6436); ret_effect(gb);
+    return;
+  }
+  CYC(0x6435, 0x6436);
+  CYC(0x6436, 0x6437); push_effect(gb, 0x6437);
+  hook_handoff(gb, room_tile_changes_jump_table(gb));
+}
+
 static void add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
   burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
