@@ -90,41 +90,6 @@ L_413a:
   RET(0x4146); return;  // ret
 }
 
-// 0c:4186
-void scriptCmd_setState(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x4186));  // pop hl
-  I(0x4187, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4188, 2); E = 0x44;  // ld e,$44
-  scriptFunc_setState(gb); return;  // fallthrough
-}
-
-// 0c:418a
-void scriptFunc_setState(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x418a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x418b, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { I(0x418d, 3); goto L_4192; } I(0x418d, 2);  // jr z,$4192
-  I(0x418f, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4190, 1); alu_xor(gb, A);  // xor a
-  RET(0x4191); return;  // ret
-L_4192:
-  I(0x4192, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4193, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4194, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4195, 1); alu_xor(gb, A);  // xor a
-  RET(0x4196); return;  // ret
-}
-
-// 0c:4197
-void scriptCmd_setSubstate(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x4197));  // pop hl
-  I(0x4198, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4199, 2); E = 0x45;  // ld e,$45
-  I(0x419b, 3); scriptFunc_setState(gb); return;  // jr $418a
-}
-
 // 0c:419d
 void scriptCmd_jump(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -154,72 +119,6 @@ L_41b5:
   RET(0x41b9); return;  // ret
 }
 
-// 0c:41ba
-void scriptCmd_spawnInteraction(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x41ba));  // pop hl
-  I(0x41bb, 2); SET_HL(HL + 1);  // inc hl
-  CALL(0x41bc, scriptFunc_loadBcAndDe, 0x41cf, 0x41bf);  // call $41cf
-  PUSH(0x41bf, HL);  // push hl
-  CALL(0x41c0, getFreeInteractionSlot_hook, 0x3aef, 0x41c3);  // call $3aef
-  if (!(F & FZ)) { I(0x41c3, 3); scriptFunc_restoreActiveObject(gb); return; } I(0x41c3, 2);  // jr nz,$41ca
-  I(0x41c5, 2); A = 0x4b;  // ld a,$4b
-  CALL(0x41c7, scriptFunc_initializeObject, 0x41d8, 0x41ca);  // call $41d8
-  scriptFunc_restoreActiveObject(gb); return;  // fallthrough
-}
-
-// 0c:41ca
-void scriptFunc_restoreActiveObject(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x41ca, 3); A = mem_rd(gb, 0xffaf);  // ldh a,($ffaf)
-  I(0x41cc, 1); D = A;  // ld d,a
-  SET_HL(POP(0x41cd));  // pop hl
-  RET(0x41ce); return;  // ret
-}
-
-// 0c:41cf
-void scriptFunc_loadBcAndDe(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x41cf, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x41d0, 1); B = A;  // ld b,a
-  I(0x41d1, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x41d2, 1); C = A;  // ld c,a
-  I(0x41d3, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x41d4, 1); D = A;  // ld d,a
-  I(0x41d5, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x41d6, 1); E = A;  // ld e,a
-  RET(0x41d7); return;  // ret
-}
-
-// 0c:41d8
-void scriptFunc_initializeObject(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x41d8, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x41d9, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x41da, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x41db, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x41dc, 1); L = A;  // ld l,a
-  I(0x41dd, 2); mem_wr(gb, HL, D);  // ld (hl),d
-  I(0x41de, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x41df, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x41e0, 2); mem_wr(gb, HL, E);  // ld (hl),e
-  RET(0x41e1); return;  // ret
-}
-
-// 0c:41e2
-void scriptCmd_spawnEnemy(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x41e2));  // pop hl
-  I(0x41e3, 2); SET_HL(HL + 1);  // inc hl
-  CALL(0x41e4, scriptFunc_loadBcAndDe, 0x41cf, 0x41e7);  // call $41cf
-  PUSH(0x41e7, HL);  // push hl
-  CALL(0x41e8, getFreeEnemySlot_hook, 0x2e27, 0x41eb);  // call $2e27
-  if (!(F & FZ)) { I(0x41eb, 3); scriptFunc_restoreActiveObject(gb); return; } I(0x41eb, 2);  // jr nz,$41ca
-  I(0x41ed, 2); A = 0x8b;  // ld a,$8b
-  CALL(0x41ef, scriptFunc_initializeObject, 0x41d8, 0x41f2);  // call $41d8
-  I(0x41f2, 3); scriptFunc_restoreActiveObject(gb); return;  // jr $41ca
-}
-
 // 0c:41f4
 void scriptCmd_spawnEnemyHere(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -238,66 +137,10 @@ void scriptCmd_spawnEnemyHere(GB *gb) {
   I(0x4202, 1); E = A;  // ld e,a
   I(0x4203, 1); D = L;  // ld d,l
   CALL(0x4204, getFreeEnemySlot_hook, 0x2e27, 0x4207);  // call $2e27
-  if (!(F & FZ)) { I(0x4207, 3); scriptFunc_restoreActiveObject(gb); return; } I(0x4207, 2);  // jr nz,$41ca
+  if (!(F & FZ)) { I(0x4207, 3); if (hook_enabled_at(0x41ca)) { scriptFunc_restoreActiveObject_hook(gb); return; } HANDOFF(0x41ca); } I(0x4207, 2);  // jr nz,$41ca
   I(0x4209, 2); A = 0x8b;  // ld a,$8b
-  CALL(0x420b, scriptFunc_initializeObject, 0x41d8, 0x420e);  // call $41d8
-  I(0x420e, 3); scriptFunc_restoreActiveObject(gb); return;  // jr $41ca
-}
-
-// 0c:421b
-void scriptCmd_setCoords(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x421b));  // pop hl
-  I(0x421c, 2); SET_HL(HL + 1);  // inc hl
-  I(0x421d, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x421e, 1); B = A;  // ld b,a
-  I(0x421f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4220, 1); C = A;  // ld c,a
-  PUSH(0x4221, HL);  // push hl
-  I(0x4222, 1); H = D;  // ld h,d
-  I(0x4223, 2); L = 0x4b;  // ld l,$4b
-  I(0x4225, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x4226, 2); L = 0x4d;  // ld l,$4d
-  I(0x4228, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  SET_HL(POP(0x4229));  // pop hl
-  RET(0x422a); return;  // ret
-}
-
-// 0c:422b
-void scriptCmd_setAngle(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x422b));  // pop hl
-  I(0x422c, 2); SET_HL(HL + 1);  // inc hl
-  I(0x422d, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x422e, 2); E = 0x49;  // ld e,$49
-  I(0x4230, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x4231); return;  // ret
-}
-
-// 0c:4232
-void scriptCmd_setSpeed(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x4232));  // pop hl
-  I(0x4233, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4234, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4235, 2); E = 0x50;  // ld e,$50
-  I(0x4237, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x4238); return;  // ret
-}
-
-// 0c:4239
-void scriptCmd_setZSpeed(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x4239));  // pop hl
-  I(0x423a, 2); SET_HL(HL + 1);  // inc hl
-  I(0x423b, 2); E = 0x54;  // ld e,$54
-  I(0x423d, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x423e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x423f, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4240, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4241, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4242, 1); alu_scf(gb);  // scf
-  RET(0x4243); return;  // ret
+  CALL(0x420b, scriptFunc_initializeObject_hook, 0x41d8, 0x420e);  // call $41d8
+  I(0x420e, 3); if (hook_enabled_at(0x41ca)) { scriptFunc_restoreActiveObject_hook(gb); return; } HANDOFF(0x41ca);  // jr $41ca
 }
 
 // 0c:4244
@@ -895,7 +738,7 @@ void scriptCmd_spawnItem(GB *gb) {
   I(0x4426, 1); C = A;  // ld c,a
   PUSH(0x4427, HL);  // push hl
   CALL(0x4428, getFreeInteractionSlot_hook, 0x3aef, 0x442b);  // call $3aef
-  if (!(F & FZ)) { I(0x442b, 4); scriptFunc_restoreActiveObject(gb); return; } I(0x442b, 3);  // jp nz,$41ca
+  if (!(F & FZ)) { I(0x442b, 4); if (hook_enabled_at(0x41ca)) { scriptFunc_restoreActiveObject_hook(gb); return; } HANDOFF(0x41ca); } I(0x442b, 3);  // jp nz,$41ca
   I(0x442e, 3); mem_wr(gb, HL, 0x60);  // ld (hl),$60
   I(0x4430, 1); L = alu_inc8(gb, L);  // inc l
   I(0x4431, 2); mem_wr(gb, HL, B);  // ld (hl),b
@@ -905,14 +748,14 @@ void scriptCmd_spawnItem(GB *gb) {
   I(0x4435, 2); alu_cp(gb, 0xde);  // cp $de
   if ((F & FZ)) { I(0x4437, 3); goto L_443f; } I(0x4437, 2);  // jr z,$443f
   CALL(0x4439, objectCopyPosition_hook, 0x2242, 0x443c);  // call $2242
-  I(0x443c, 4); scriptFunc_restoreActiveObject(gb); return;  // jp $41ca
+  I(0x443c, 4); if (hook_enabled_at(0x41ca)) { scriptFunc_restoreActiveObject_hook(gb); return; } HANDOFF(0x41ca);  // jp $41ca
 L_443f:
   I(0x443f, 2); E = 0x46;  // ld e,$46
   I(0x4441, 2); A = 0x03;  // ld a,$03
   I(0x4443, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x4444, 3); SET_DE(0xd00b);  // ld de,$d00b
   CALL(0x4447, objectCopyPosition_rawAddress_hook, 0x2247, 0x444a);  // call $2247
-  I(0x444a, 4); scriptFunc_restoreActiveObject(gb); return;  // jp $41ca
+  I(0x444a, 4); if (hook_enabled_at(0x41ca)) { scriptFunc_restoreActiveObject_hook(gb); return; } HANDOFF(0x41ca);  // jp $41ca
 }
 
 // 0c:444d

@@ -409,3 +409,9 @@ desync to discover; keep them when porting routines.
   directories. Batch 40 initially placed routines from `ages/cutscenes/miscCutscenes.s` in
   `cutscenes.c`; code review caught the collision in meaning with the separate
   `ages/cutscenes.s`. The correct file is `miscCutscenes.c`.
+- `lint_game.py` recognizes register-safe shim scope only on a line beginning
+  `void name_hook(GB *gb)`. A shared callable body declared `static void ..._hook` therefore left
+  its explicit `gb->sp` access outside recognized hook scope in batch 41. Shared bodies that need
+  an entry-stack capture must use the normal non-static hook-style declaration, as the rectangle
+  copy body does; a file-local helper is only suitable when it has no explicit emulated-register
+  access that the lint checks.
