@@ -459,3 +459,8 @@ desync to discover; keep them when porting routines.
   `$4c87`; cross-review found that the taken edge then burned the ordinary four-cycle call instead
   of the conditional call's six cycles. Use `CALL_C_CC` on the taken branch and the ordinary
   three-byte `CYC` on the fallthrough branch.
+- A disassembly-local label containing `@` needs a C-safe real alias when it becomes its own hook
+  entry. Batch 49 initially listed `intro_titlescreen_state1@pressedStart` and `@gotoState` in
+  `rewritten.txt` while the C shims used `__`; regeneration removed the generated entries, then
+  lint could not match either spelling. Add the `__` spelling at the same address in `extra.sym`,
+  and use that alias consistently in `ported.txt`, `rewritten.txt`, and the `_hook` function.

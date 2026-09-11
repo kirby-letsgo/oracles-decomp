@@ -7,7 +7,7 @@ Updated 2026-09-11. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 973 routines rewritten across thirteen code banks;
+  routine against the transliteration. Progress: 1,002 routines rewritten across fourteen code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -36,7 +36,8 @@ Updated 2026-09-11. Newest entries at the top of each section.
   textbox source and moved that lane into Twinrova cutscene helpers while continuing vine and
   script condition handlers; batch 48 added ten more room tile-state handlers, completed the
   remaining straightforward scripting commands, and continued the intro/Twinrova cutscene state
-  paths.
+  paths; batch 49 completed `roomSpecificTileChanges.s`, added underwater-wave maintenance and
+  the small Ages cutscene wrappers, and continued the title/riding-horse intro states.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -141,6 +142,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-11: milestone 3 phase 5 batch 49 (29 routines): the final seven bank-4
+  `roomSpecificTileChanges.s` entries (including the separately addressable shared bodies), three
+  bank-1 underwater-wave routines, ten bank-1 Ages cutscene wrappers, and nine bank-3 title and
+  riding-horse intro entries. Registration exposed that disassembly-local `@` names cannot be C
+  hook identifiers, so the two title-state local entries received explicit `__` aliases in
+  `extra.sym`. Review also corrected an old unconditional `jr` annotation from `CYCT` to `CYC`.
+  Gates: lint 0, 30k verify 0 mismatches, whole-movie state hash clean (`64bddd0dfe384126`),
+  ctest 8/8 in both normal and quirk builds.
 
 - 2026-09-11: milestone 3 phase 5 batch 48 (28 routines): ten bank-4 room tile-state
   handlers, eight bank-C global-flag/NPC-movement/delay script commands, and ten bank-3

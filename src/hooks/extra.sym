@@ -13,3 +13,5 @@
 00:0925 startGame__afterSp0925
 00:0998 _countdownToRunThread__afterSp0998
 00:09aa _initializeThread__afterSp09aa
+03:4df3 intro_titlescreen_state1__pressedStart
+03:4dfd intro_titlescreen_state1__gotoState

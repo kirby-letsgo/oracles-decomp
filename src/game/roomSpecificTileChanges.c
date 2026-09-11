@@ -11,8 +11,8 @@ void replaceVineTiles_hook(GB *gb);
 
 static void tileReplacement_group5Mapb9_write_tiles(GB *gb);
 static void tileReplacement_group1Map27_write_tiles(GB *gb);
-static void createInteraction90_local(GB *gb, uint16_t sp0_);
-static void setTileToDoor_local(GB *gb);
+void createInteraction90_hook(GB *gb);
+void setTileToDoor_hook(GB *gb);
 
 static void add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -1079,16 +1079,16 @@ void tileReplacement_group0Mape0_hook(GB *gb) {
   CYC(0x6b0e, 0x6b10); alu_bit(gb, 4, A);
   CYC(0x6b10, 0x6b12); L = 0x46;
   if (!(F & FZ)) {
-    CYCT(0x6b12, 0x6b15); push_effect(gb, 0x6b15);
-    setTileToDoor_local(gb);
+    CALL_C_CC(0x6b12, setTileToDoor_hook, 0x6b41, 0x6b15);
   } else {
     CYC(0x6b12, 0x6b15);
   }
   CYC(0x6b15, 0x6b17); C = 0x1b;
-  createInteraction90_local(gb, sp0_);
+  createInteraction90_hook(gb);
 }
 
-static void createInteraction90_local(GB *gb, uint16_t sp0_) {
+void createInteraction90_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(0x6b17, getFreeInteractionSlot_hook, 0x3aef, 0x6b1a);
   if (!(F & FZ)) {
     CYCT(0x6b1a, 0x6b1b); ret_effect(gb);
@@ -1104,14 +1104,12 @@ static void createInteraction90_local(GB *gb, uint16_t sp0_) {
 void tileReplacement_group0Mape1_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x6b20, 0x6b22); C = 0x1c;
-  CYC(0x6b22, 0x6b25); push_effect(gb, 0x6b25);
-  createInteraction90_local(gb, gb->sp);
+  CALL_C(0x6b22, createInteraction90_hook, 0x6b17, 0x6b25);
   CYC(0x6b25, 0x6b28); A = W8(wEssencesObtained);
   CYC(0x6b28, 0x6b29); alu_rrca(gb);
   CYC(0x6b29, 0x6b2b); L = 0x26;
   if (F & FC) {
-    CYCT(0x6b2b, 0x6b2e); push_effect(gb, 0x6b2e);
-    setTileToDoor_local(gb);
+    CALL_C_CC(0x6b2b, setTileToDoor_hook, 0x6b41, 0x6b2e);
   } else {
     CYC(0x6b2b, 0x6b2e);
   }
@@ -1122,13 +1120,120 @@ void tileReplacement_group0Mape1_hook(GB *gb) {
   }
   CYC(0x6b2f, 0x6b30);
   CYC(0x6b30, 0x6b32); L = 0x53;
-  CYC(0x6b32, 0x6b34); setTileToDoor_local(gb);
+  CYC(0x6b32, 0x6b34); setTileToDoor_hook(gb);
 }
 
-static void setTileToDoor_local(GB *gb) {
+void tileReplacement_group0Mape2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6b34, 0x6b36); C = 0x1d;
+  CALL_C(0x6b36, createInteraction90_hook, 0x6b17, 0x6b39);
+  CYC(0x6b39, 0x6b3c); A = W8(wEssencesObtained);
+  CYC(0x6b3c, 0x6b3e); alu_bit(gb, 2, A);
+  if (F & FZ) {
+    CYCT(0x6b3e, 0x6b3f); ret_effect(gb);
+    return;
+  }
+  CYC(0x6b3e, 0x6b3f);
+  CYC(0x6b3f, 0x6b41); L = 0x54;
+  setTileToDoor_hook(gb);
+}
+
+void setTileToDoor_hook(GB *gb) {
   CYC(0x6b41, 0x6b43); H = wRoomLayout >> 8;
   CYC(0x6b43, 0x6b45); mem_wr(gb, HL, 0xdd);
   CYC(0x6b45, 0x6b46); ret_effect(gb);
+}
+
+void tileReplacement_group4Mapea_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6b46, getThisRoomFlags_hook, 0x197d, 0x6b49);
+  CYC(0x6b49, 0x6b4b); alu_and(gb, 0x40);
+  if (F & FZ) {
+    CYCT(0x6b4b, 0x6b4c); ret_effect(gb);
+    return;
+  }
+  CYC(0x6b4b, 0x6b4c);
+  CYC(0x6b4c, 0x6b4e); A = 0xa3;
+  CYC(0x6b4e, 0x6b51); SET_HL(wRoomLayout + 0x33);
+  CALL_C(0x6b51, set3Bytes_hook, 0x6aad, 0x6b54);
+  CYC(0x6b54, 0x6b56); L = 0x39;
+  CALL_C(0x6b56, set3Bytes_hook, 0x6aad, 0x6b59);
+  CYC(0x6b59, 0x6b5b); A = 0xb7;
+  CYC(0x6b5b, 0x6b5d); L = 0x43;
+  CALL_C(0x6b5d, set3Bytes_hook, 0x6aad, 0x6b60);
+  CYC(0x6b60, 0x6b62); L = 0x49;
+  CALL_C(0x6b62, set3Bytes_hook, 0x6aad, 0x6b65);
+  CYC(0x6b65, 0x6b67); A = 0x88;
+  CYC(0x6b67, 0x6b69); L = 0x53;
+  CALL_C(0x6b69, set3Bytes_hook, 0x6aad, 0x6b6c);
+  CYC(0x6b6c, 0x6b6e); L = 0x59;
+  CYC(0x6b6e, 0x6b71); set3Bytes_hook(gb);
+}
+
+void tileReplacement_group0Map98_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6b71, 0x6b74); A = W8(wRickyState);
+  CYC(0x6b74, 0x6b76); alu_bit(gb, 5, A);
+  if (!(F & FZ)) {
+    CYCT(0x6b76, 0x6b78);
+    goto remove_dirt;
+  }
+  CYC(0x6b76, 0x6b78);
+  CYC(0x6b78, 0x6b7a); alu_and(gb, 0x01);
+  if (F & FZ) {
+    CYCT(0x6b7a, 0x6b7c);
+    goto remove_dirt;
+  }
+  CYC(0x6b7a, 0x6b7c);
+  CYC(0x6b7c, 0x6b7e); A = 0x48;
+  CALL_C(0x6b7e, checkTreasureObtained_hook, 0x1748, 0x6b81);
+  if (!(F & FC)) {
+    CYCT(0x6b81, 0x6b82); ret_effect(gb);
+    return;
+  }
+  CYC(0x6b81, 0x6b82);
+remove_dirt:
+  CYC(0x6b82, 0x6b84); A = 0x3a;
+  CYC(0x6b84, 0x6b87); mem_wr(gb, wRoomLayout + 0x24, A);
+  CYC(0x6b87, 0x6b88); ret_effect(gb);
+}
+
+void tileReplacement_group0Map76_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6b88, checkIsLinkedGame_hook, 0x1992, 0x6b8b);
+  if (F & FZ) {
+    CYCT(0x6b8b, 0x6b8c); ret_effect(gb);
+    return;
+  }
+  CYC(0x6b8b, 0x6b8c);
+  CALL_C(0x6b8c, getBlackTowerProgress_hook, 0x36c0, 0x6b8f);
+  CYC(0x6b8f, 0x6b90); A = alu_dec8(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x6b90, 0x6b91); ret_effect(gb);
+    return;
+  }
+  CYC(0x6b90, 0x6b91);
+  CYC(0x6b91, 0x6b94); SET_HL(wRoomLayout + 0x54);
+  CYC(0x6b94, 0x6b96); A = 0xa7;
+  CYC(0x6b96, 0x6b97); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x6b97, 0x6b98); mem_wr(gb, HL, A);
+  CYC(0x6b98, 0x6b99); ret_effect(gb);
+}
+
+void tileReplacement_group0Mapa5_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6b99, 0x6b9c); A = mem_rd(gb, wGroup1RoomFlags + 0xa5);
+  CYC(0x6b9c, 0x6b9e); alu_bit(gb, 7, A);
+  if (F & FZ) {
+    CYCT(0x6b9e, 0x6b9f); ret_effect(gb);
+    return;
+  }
+  CYC(0x6b9e, 0x6b9f);
+  CYC(0x6b9f, 0x6ba2); SET_HL(wRoomLayout + 0x22);
+  CYC(0x6ba2, 0x6ba4); mem_wr(gb, HL, 0xee);
+  CYC(0x6ba4, 0x6ba5); L = alu_inc8(gb, L);
+  CYC(0x6ba5, 0x6ba7); mem_wr(gb, HL, 0xef);
+  CYC(0x6ba7, 0x6ba8); ret_effect(gb);
 }
 
 void func_04_6ba8_hook(GB *gb) {
@@ -1146,7 +1251,7 @@ void func_04_6ba8_hook(GB *gb) {
     CYC(0x6bb0, 0x6bb1); E = A;
     CYC(0x6bb1, 0x6bb2); A = C;
     CYC(0x6bb2, 0x6bb3); mem_wr(gb, DE, A);
-    CYCT(0x6bb3, 0x6bb5);
+    CYC(0x6bb3, 0x6bb5);
   }
 }
 

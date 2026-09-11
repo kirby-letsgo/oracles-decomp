@@ -5545,3 +5545,5 @@ _nextThread__afterSp091a
 startGame__afterSp0925
 _countdownToRunThread__afterSp0998
 _initializeThread__afterSp09aa
+intro_titlescreen_state1__pressedStart
+intro_titlescreen_state1__gotoState

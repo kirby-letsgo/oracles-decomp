@@ -270,11 +270,11 @@
     status: "idle",
     statusDetail: "",
     totalHooks: 13103,
-    rewrittenTotal: 973,
+    rewrittenTotal: 1002,
     bank0Total: 664,
     bank0Rewritten: 626,
     codeBearingBanks: 23,
-    banksTouched: 13,
+    banksTouched: 14,
     targetLines: 55673,
     bank0Lines: 13946,
     banks: [{"id": "00", "code": true, "total": 653, "rewritten": 626}, {"id": "01", "code": true, "total": 341, "rewritten": 0}, {"id": "02", "code": true, "total": 705, "rewritten": 0}, {"id": "03", "code": true, "total": 666, "rewritten": 0}, {"id": "04", "code": true, "total": 243, "rewritten": 6}, {"id": "05", "code": true, "total": 698, "rewritten": 0}, {"id": "06", "code": true, "total": 427, "rewritten": 0}, {"id": "07", "code": true, "total": 449, "rewritten": 0}, {"id": "08", "code": true, "total": 898, "rewritten": 0}, {"id": "09", "code": true, "total": 935, "rewritten": 0}, {"id": "0a", "code": true, "total": 928, "rewritten": 0}, {"id": "0b", "code": true, "total": 875, "rewritten": 0}, {"id": "0c", "code": true, "total": 116, "rewritten": 0}, {"id": "0d", "code": true, "total": 675, "rewritten": 0}, {"id": "0e", "code": true, "total": 869, "rewritten": 0}, {"id": "0f", "code": true, "total": 810, "rewritten": 0}, {"id": "10", "code": true, "total": 799, "rewritten": 0}, {"id": "11", "code": true, "total": 803, "rewritten": 3}, {"id": "12", "code": true, "total": 47, "rewritten": 21}, {"id": "13", "code": false, "total": 0, "rewritten": 0}, {"id": "14", "code": false, "total": 0, "rewritten": 0}, {"id": "15", "code": true, "total": 517, "rewritten": 0}, {"id": "16", "code": true, "total": 73, "rewritten": 0}, {"id": "17", "code": false, "total": 0, "rewritten": 0}, {"id": "18", "code": false, "total": 0, "rewritten": 0}, {"id": "19", "code": false, "total": 0, "rewritten": 0}, {"id": "1a", "code": false, "total": 0, "rewritten": 0}, {"id": "1b", "code": false, "total": 0, "rewritten": 0}, {"id": "1c", "code": false, "total": 0, "rewritten": 0}, {"id": "1d", "code": false, "total": 0, "rewritten": 0}, {"id": "1e", "code": false, "total": 0, "rewritten": 0}, {"id": "1f", "code": false, "total": 0, "rewritten": 0}, {"id": "20", "code": false, "total": 0, "rewritten": 0}, {"id": "21", "code": false, "total": 0, "rewritten": 0}, {"id": "22", "code": false, "total": 0, "rewritten": 0}, {"id": "23", "code": false, "total": 0, "rewritten": 0}, {"id": "24", "code": false, "total": 0, "rewritten": 0}, {"id": "25", "code": false, "total": 0, "rewritten": 0}, {"id": "26", "code": false, "total": 0, "rewritten": 0}, {"id": "27", "code": false, "total": 0, "rewritten": 0}, {"id": "28", "code": false, "total": 0, "rewritten": 0}, {"id": "29", "code": false, "total": 0, "rewritten": 0}, {"id": "2a", "code": false, "total": 0, "rewritten": 0}, {"id": "2b", "code": false, "total": 0, "rewritten": 0}, {"id": "2c", "code": false, "total": 0, "rewritten": 0}, {"id": "2d", "code": false, "total": 0, "rewritten": 0}, {"id": "2e", "code": false, "total": 0, "rewritten": 0}, {"id": "2f", "code": false, "total": 0, "rewritten": 0}, {"id": "30", "code": false, "total": 0, "rewritten": 0}, {"id": "31", "code": false, "total": 0, "rewritten": 0}, {"id": "32", "code": false, "total": 0, "rewritten": 0}, {"id": "33", "code": false, "total": 0, "rewritten": 0}, {"id": "34", "code": false, "total": 0, "rewritten": 0}, {"id": "35", "code": false, "total": 0, "rewritten": 0}, {"id": "36", "code": false, "total": 0, "rewritten": 0}, {"id": "37", "code": false, "total": 0, "rewritten": 0}, {"id": "38", "code": false, "total": 0, "rewritten": 0}, {"id": "39", "code": true, "total": 123, "rewritten": 0}, {"id": "3a", "code": false, "total": 0, "rewritten": 0}, {"id": "3b", "code": false, "total": 0, "rewritten": 0}, {"id": "3c", "code": false, "total": 0, "rewritten": 0}, {"id": "3d", "code": false, "total": 0, "rewritten": 0}, {"id": "3e", "code": false, "total": 0, "rewritten": 0}, {"id": "3f", "code": true, "total": 442, "rewritten": 0}],
@@ -288,6 +288,7 @@
       { n: 6, name: "Sweep", desc: "Everything left in code/, until no routine is still generated.", status: "pending", meta: "remainder" },
     ],
     batches: [
+      { id: "49", delta: 29, tag: "Ph.5", text: "Finished <b>room-specific tile changes</b>, added underwater waves and Ages cutscene wrappers, and continued title/riding-horse intro states." },
       { id: "48", delta: 28, tag: "Ph.5", text: "Room <b>tile-state handlers</b>, the remaining straightforward script commands, and Twinrova/title-intro state helpers." },
       { id: "47", delta: 30, tag: "Ph.5", text: "Vine/overworld tile handlers, <b>script collision and flag checks</b>, the final textbox routine, and Twinrova cutscene helpers." },
       { id: "46", delta: 30, tag: "Ph.5", text: "Jabu/overworld <b>tile replacements</b>, script tile/call/jump commands, and textbox bank-reading, display-speed, and numeric-substitution paths." },
@@ -325,8 +326,9 @@
   INITIAL.banks.find(b => b.id === "07").rewritten = 4;
   INITIAL.banks.find(b => b.id === "16").rewritten = 2;
   INITIAL.banks.find(b => b.id === "02").rewritten = 34;
-  INITIAL.banks.find(b => b.id === "03").rewritten = 33;
-  INITIAL.banks.find(b => b.id === "04").rewritten = 70;
+  INITIAL.banks.find(b => b.id === "01").rewritten = 13;
+  INITIAL.banks.find(b => b.id === "03").rewritten = 42;
+  INITIAL.banks.find(b => b.id === "04").rewritten = 77;
   INITIAL.banks.find(b => b.id === "0c").rewritten = 94;
   INITIAL.banks.find(b => b.id === "3f").rewritten = 49;
 
