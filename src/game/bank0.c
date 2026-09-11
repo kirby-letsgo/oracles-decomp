@@ -4890,7 +4890,8 @@ void itemSetState_hook(GB *gb) {
   ret_effect(gb);
 }
 
-static void special_object_set_animation(GB *gb) {
+void special_object_set_animation_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   E = 0x30;
   CYC(0x2b0a, 0x2b0d); mem_wr(gb, DE, A);
   alu_add(gb, A);
@@ -4898,17 +4899,18 @@ static void special_object_set_animation(GB *gb) {
   B = 0x00;
   CYC(0x2b0d, 0x2b11);
   bank_push(gb, 0x2b11, 0x06);
-  CALL_ROM(0x2b1b, ROM_b06_specialObjectSetAnimation_body);
+  CALL_C(0x2b1b, specialObjectSetAnimation_body_hook, 0x4427, 0x2b1e);
   bank_pop(gb, 0x2b1e);
   CYC(0x2b24, 0x2b25);
 }
 
 void specialObjectSetAnimation_hook(GB *gb) {
-  special_object_set_animation(gb);
+  special_object_set_animation_hook(gb);
   ret_effect(gb);
 }
 
 void specialObjectAnimate_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   H = D;
   L = 0x20;
   CYC(0x2aef, 0x2af3); uint8_t v = alu_dec8(gb, mem_rd(gb, HL)); mem_wr(gb, HL, v);
@@ -4917,7 +4919,7 @@ void specialObjectAnimate_hook(GB *gb) {
   bank_push(gb, 0x2af4, 0x06);
   L = 0x22;
   CYC(0x2afe, 0x2b00);
-  CALL_ROM(0x2b00, ROM_b06_specialObjectNextAnimationFrame);
+  CALL_C(0x2b00, specialObjectNextAnimationFrame_hook, 0x4432, 0x2b03);
   bank_pop(gb, 0x2b03);
   CYC(0x2b09, 0x2b0a);
   ret_effect(gb);
@@ -4946,7 +4948,7 @@ void putLinkOnGround_hook(GB *gb) {
     D = H;
     A = 0x10;
     CYC(0x2aa5, 0x2aab);
-    special_object_set_animation(gb);
+    special_object_set_animation_hook(gb);
   }
   SET_DE(de);
   CYC(0x2aab, 0x2aad);
@@ -6964,8 +6966,9 @@ void copy256BytesFromBank_hook(GB *gb) {
 // movement scripts (bank $0e bodies)
 
 void objectLoadMovementScript_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   bank_push(gb, 0x3035, 0x0e);
-  CALL_ROM(0x303f, ROM_b0e_objectLoadMovementScript_body);
+  CALL_C(0x303f, objectLoadMovementScript_body_hook, 0x6b2d, 0x3042);
   bank_pop(gb, 0x3042);
   CYC(0x3048, 0x3049);
   ret_effect(gb);
@@ -9068,15 +9071,16 @@ void updateInteraction_hook(GB *gb) {
   hook_handoff(gb, HL);
 }
 
-static void load_link_and_companion_animation_frame(GB *gb) {
+void load_link_and_companion_animation_frame_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   bank_push(gb, 0x2b25, 0x06);
-  CALL_ROM(0x2b2f, ROM_b06_loadLinkAndCompanionAnimationFrame_body);
+  CALL_C(0x2b2f, loadLinkAndCompanionAnimationFrame_body_hook, 0x44c9, 0x2b32);
   bank_pop(gb, 0x2b32);
   CYC(0x2b38, 0x2b39);
 }
 
 void loadLinkAndCompanionAnimationFrame_hook(GB *gb) {
-  load_link_and_companion_animation_frame(gb);
+  load_link_and_companion_animation_frame_hook(gb);
   ret_effect(gb);
 }
 
@@ -9109,7 +9113,7 @@ void updateAllObjects_hook(GB *gb) {
   if (F & FC) CALL_ROM_CC(0x34b6, ROM_b06_updateGrabbedObjectPosition);
   else CYC(0x34b6, 0x34b9);
   CYC(0x34b9, 0x34bc);
-  load_link_and_companion_animation_frame(gb);
+  load_link_and_companion_animation_frame_hook(gb);
   switch_bank(gb, 0x34bc, 0x07);
   CALL_ROM(0x34c3, ROM_b07_updateItemsPost);
   switch_bank(gb, 0x34c6, 0x01);
@@ -9137,7 +9141,7 @@ void updateSpecialObjectsAndInteractions_hook(GB *gb) {
   switch_bank(gb, 0x3506, 0x00);
   CALL_ROM(0x350d, ROM_updateInteractions);
   CYC(0x3510, 0x3513);
-  load_link_and_companion_animation_frame(gb);
+  load_link_and_companion_animation_frame_hook(gb);
   alu_xor(gb, A);
   CYC(0x3513, 0x3517); W8(wc4b6) = A;
   CYC(0x3517, 0x3518); SET_AF(pop_effect(gb));
@@ -9179,7 +9183,7 @@ void func_3539_hook(GB *gb) {
   CALL_ROM(0x3575, ROM_b07_updateItemsPost);
   switch_bank(gb, 0x3578, 0x00);
   CYC(0x357f, 0x3582);
-  load_link_and_companion_animation_frame(gb);
+  load_link_and_companion_animation_frame_hook(gb);
   switch_bank(gb, 0x3582, 0x04);
   CALL_ROM(0x3589, ROM_b04_updateAnimations);
   alu_xor(gb, A);
@@ -9374,9 +9378,10 @@ void initializeRoom_hook(GB *gb) {
 }
 
 void loadStaticObjects_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   bank_push(gb, 0x3189, 0x16);
   CYC(0x3193, 0x3194); push_effect(gb, DE);
-  CALL_ROM(0x3194, ROM_b16_loadStaticObjects_body);
+  CALL_C(0x3194, loadStaticObjects_body_hook, 0x5085, 0x3197);
   CYC(0x3197, 0x3198); SET_DE(pop_effect(gb));
   bank_pop(gb, 0x3198);
   CYC(0x319e, 0x319f);
@@ -11188,7 +11193,7 @@ void intro_cinematic_hook(GB *gb) {
   switch_bank(gb, 0x2d27, 0x05);
   CALL_ROM(0x2d2e, ROM_b05_updateSpecialObjects);
   CYC(0x2d31, 0x2d34);
-  load_link_and_companion_animation_frame(gb);
+  load_link_and_companion_animation_frame_hook(gb);
   switch_bank(gb, 0x2d34, 0x04);
   CALL_ROM(0x2d3b, ROM_b04_updateAnimations);
   CALL_ROM(0x2d3e, ROM_updateInteractionsAndDrawAllSprites);

@@ -2,39 +2,6 @@
 #include "game/asm.h"
 #include "game/gen.h"
 
-// 0e:6b2d
-void objectLoadMovementScript_body(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6b2d, 3); A = mem_rd(gb, 0xffae);  // ldh a,($ffae)
-  I(0x6b2f, 2); alu_add(gb, 0x02);  // add $02
-  I(0x6b31, 1); E = A;  // ld e,a
-  I(0x6b32, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x6b33, 0x6b34);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x6b34, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6b35, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x6b36, 1); L = A;  // ld l,a
-  I(0x6b37, 1); A = E;  // ld a,e
-  I(0x6b38, 2); alu_add(gb, 0x0e);  // add $0e
-  I(0x6b3a, 1); E = A;  // ld e,a
-  I(0x6b3b, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6b3c, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x6b3d, 1); A = E;  // ld a,e
-  I(0x6b3e, 2); alu_add(gb, 0xf8);  // add $f8
-  I(0x6b40, 1); E = A;  // ld e,a
-  I(0x6b41, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6b42, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x6b43, 1); A = E;  // ld a,e
-  I(0x6b44, 2); alu_add(gb, 0x28);  // add $28
-  I(0x6b46, 1); E = A;  // ld e,a
-  I(0x6b47, 1); A = L;  // ld a,l
-  I(0x6b48, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x6b49, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x6b4a, 1); A = H;  // ld a,h
-  I(0x6b4b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  objectRunMovementScript_body(gb); return;  // fallthrough
-}
-
 // 0e:6b4c
 void objectRunMovementScript_body(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -12735,7 +12702,7 @@ L_6b26:
   I(0x6b29, 1); L = B;  // ld l,b
   I(0x6b2a, 1);  // nop
   I(0x6b2b, 2); H = 0x6b;  // ld h,$6b
-  objectLoadMovementScript_body(gb); return;  // fallthrough
+  if (hook_enabled_at(0x6b2d)) { objectLoadMovementScript_body_hook(gb); return; } HANDOFF(0x6b2d);  // fallthrough
 }
 
 // 0e:6be9

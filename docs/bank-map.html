@@ -270,11 +270,11 @@
     status: "idle",
     statusDetail: "",
     totalHooks: 13103,
-    rewrittenTotal: 661,
+    rewrittenTotal: 676,
     bank0Total: 664,
     bank0Rewritten: 626,
     codeBearingBanks: 23,
-    banksTouched: 4,
+    banksTouched: 8,
     targetLines: 55673,
     bank0Lines: 13946,
     banks: [{"id": "00", "code": true, "total": 653, "rewritten": 626}, {"id": "01", "code": true, "total": 341, "rewritten": 0}, {"id": "02", "code": true, "total": 705, "rewritten": 0}, {"id": "03", "code": true, "total": 666, "rewritten": 0}, {"id": "04", "code": true, "total": 243, "rewritten": 6}, {"id": "05", "code": true, "total": 698, "rewritten": 0}, {"id": "06", "code": true, "total": 427, "rewritten": 0}, {"id": "07", "code": true, "total": 449, "rewritten": 0}, {"id": "08", "code": true, "total": 898, "rewritten": 0}, {"id": "09", "code": true, "total": 935, "rewritten": 0}, {"id": "0a", "code": true, "total": 928, "rewritten": 0}, {"id": "0b", "code": true, "total": 875, "rewritten": 0}, {"id": "0c", "code": true, "total": 116, "rewritten": 0}, {"id": "0d", "code": true, "total": 675, "rewritten": 0}, {"id": "0e", "code": true, "total": 869, "rewritten": 0}, {"id": "0f", "code": true, "total": 810, "rewritten": 0}, {"id": "10", "code": true, "total": 799, "rewritten": 0}, {"id": "11", "code": true, "total": 803, "rewritten": 3}, {"id": "12", "code": true, "total": 47, "rewritten": 21}, {"id": "13", "code": false, "total": 0, "rewritten": 0}, {"id": "14", "code": false, "total": 0, "rewritten": 0}, {"id": "15", "code": true, "total": 517, "rewritten": 0}, {"id": "16", "code": true, "total": 73, "rewritten": 0}, {"id": "17", "code": false, "total": 0, "rewritten": 0}, {"id": "18", "code": false, "total": 0, "rewritten": 0}, {"id": "19", "code": false, "total": 0, "rewritten": 0}, {"id": "1a", "code": false, "total": 0, "rewritten": 0}, {"id": "1b", "code": false, "total": 0, "rewritten": 0}, {"id": "1c", "code": false, "total": 0, "rewritten": 0}, {"id": "1d", "code": false, "total": 0, "rewritten": 0}, {"id": "1e", "code": false, "total": 0, "rewritten": 0}, {"id": "1f", "code": false, "total": 0, "rewritten": 0}, {"id": "20", "code": false, "total": 0, "rewritten": 0}, {"id": "21", "code": false, "total": 0, "rewritten": 0}, {"id": "22", "code": false, "total": 0, "rewritten": 0}, {"id": "23", "code": false, "total": 0, "rewritten": 0}, {"id": "24", "code": false, "total": 0, "rewritten": 0}, {"id": "25", "code": false, "total": 0, "rewritten": 0}, {"id": "26", "code": false, "total": 0, "rewritten": 0}, {"id": "27", "code": false, "total": 0, "rewritten": 0}, {"id": "28", "code": false, "total": 0, "rewritten": 0}, {"id": "29", "code": false, "total": 0, "rewritten": 0}, {"id": "2a", "code": false, "total": 0, "rewritten": 0}, {"id": "2b", "code": false, "total": 0, "rewritten": 0}, {"id": "2c", "code": false, "total": 0, "rewritten": 0}, {"id": "2d", "code": false, "total": 0, "rewritten": 0}, {"id": "2e", "code": false, "total": 0, "rewritten": 0}, {"id": "2f", "code": false, "total": 0, "rewritten": 0}, {"id": "30", "code": false, "total": 0, "rewritten": 0}, {"id": "31", "code": false, "total": 0, "rewritten": 0}, {"id": "32", "code": false, "total": 0, "rewritten": 0}, {"id": "33", "code": false, "total": 0, "rewritten": 0}, {"id": "34", "code": false, "total": 0, "rewritten": 0}, {"id": "35", "code": false, "total": 0, "rewritten": 0}, {"id": "36", "code": false, "total": 0, "rewritten": 0}, {"id": "37", "code": false, "total": 0, "rewritten": 0}, {"id": "38", "code": false, "total": 0, "rewritten": 0}, {"id": "39", "code": true, "total": 123, "rewritten": 0}, {"id": "3a", "code": false, "total": 0, "rewritten": 0}, {"id": "3b", "code": false, "total": 0, "rewritten": 0}, {"id": "3c", "code": false, "total": 0, "rewritten": 0}, {"id": "3d", "code": false, "total": 0, "rewritten": 0}, {"id": "3e", "code": false, "total": 0, "rewritten": 0}, {"id": "3f", "code": true, "total": 442, "rewritten": 0}],
@@ -288,6 +288,7 @@
       { n: 6, name: "Sweep", desc: "Everything left in code/, until no routine is still generated.", status: "pending", meta: "remainder" },
     ],
     batches: [
+      { id: "35", delta: 15, tag: "Ph.4", text: "Movement/static-object loaders and the <b>special-object animation, graphics, and damage</b> paths across banks 5, 6, E, and 16." },
       { id: "34", delta: 5, tag: "Ph.4", text: "The remaining simple <b>objectLoading.s</b> opcode handlers &mdash; opcodes 0, 6, 7, 9, and A." },
       { id: "33", delta: 15, tag: "Ph.4", text: "Object-data parser flow &mdash; setup, pointer skips, allocation loops, and opcodes 1&ndash;5 and 8 in <b>objectLoading.s</b>." },
       { id: "32", delta: 15, tag: "Ph.4", text: "Object-system foundation &mdash; object-loading helpers, the part dispatcher, and the animation queue/data path across banks 12, 11, and 4." },
@@ -305,6 +306,10 @@
     ],
   };
   INITIAL.banks.find(b => b.id === "12").rewritten = 26;
+  INITIAL.banks.find(b => b.id === "05").rewritten = 2;
+  INITIAL.banks.find(b => b.id === "06").rewritten = 11;
+  INITIAL.banks.find(b => b.id === "0e").rewritten = 1;
+  INITIAL.banks.find(b => b.id === "16").rewritten = 1;
 
   function fmt(n) { return n.toLocaleString("en-US"); }
 

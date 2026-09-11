@@ -385,3 +385,8 @@ desync to discover; keep them when porting routines.
   around the instruction rather than inferring it from the data-flow pattern. `objectDataOp9`
   at bank 12 `$57b6` uses `inc l`, not an auto-increment memory load; treating it as the latter
   left `HL` one byte high and the hook verifier first caught the register mismatch at frame 1538.
+- Conditional and unconditional `jr` instructions are two bytes even when their report column
+  says three cycles. In batch 35, burning `specialObjectSetAnimationWithLinkData`'s `$441c` jump
+  through `$441f` treated its cycle count as an address range; `burn_rom` stopped at the jump
+  boundary before the verifier could run. Its range is `$441c`&ndash;`$441e`; always derive a
+  branch's `CYC` end from opcode bytes, not the printed cycle count.

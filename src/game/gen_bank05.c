@@ -281,22 +281,6 @@ L_40f8:
   RET(0x40fd); return;  // ret
 }
 
-// 05:6364
-void specialObjectCode_minecart_b05(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6364, 3); SET_HL(0x563e);  // ld hl,$563e
-  I(0x6367, 2); E = 0x06;  // ld e,$06
-  I(0x6369, 4); if (hook_enabled_at(0x008a)) { interBankCall_hook(gb); return; } HANDOFF(0x008a);  // jp $008a
-}
-
-// 05:7c66
-void specialObjectCode_raft_b05(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7c66, 3); SET_HL(0x57ef);  // ld hl,$57ef
-  I(0x7c69, 2); E = 0x06;  // ld e,$06
-  I(0x7c6b, 4); if (hook_enabled_at(0x008a)) { interBankCall_hook(gb); return; } HANDOFF(0x008a);  // jp $008a
-}
-
 // 05:54dd
 void linkState01(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
