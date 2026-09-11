@@ -6975,8 +6975,9 @@ void objectLoadMovementScript_hook(GB *gb) {
 }
 
 void objectRunMovementScript_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   bank_push(gb, 0x3049, 0x0e);
-  CALL_ROM(0x3053, ROM_b0e_objectRunMovementScript_body);
+  CALL_C(0x3053, objectRunMovementScript_body_hook, 0x6b4c, 0x3056);
   bank_pop(gb, 0x3056);
   CYC(0x305c, 0x305d);
   ret_effect(gb);
@@ -9085,10 +9086,11 @@ void loadLinkAndCompanionAnimationFrame_hook(GB *gb) {
 }
 
 void updateAllObjects_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x345b, 0x345d); A = H8(hRomBank);
   CYC(0x345d, 0x345e); push_effect(gb, AF);
   switch_bank(gb, 0x345e, 0x05);
-  CALL_ROM(0x3465, ROM_b05_updateSpecialObjects);
+  CALL_C(0x3465, updateSpecialObjects_hook, 0x4000, 0x3468);
   switch_bank(gb, 0x3468, 0x07);
   CALL_ROM(0x346f, ROM_b07_updateItems);
   CALL_ROM(0x3472, ROM_setEnemyTargetToLinkPosition);
@@ -9115,7 +9117,7 @@ void updateAllObjects_hook(GB *gb) {
   CYC(0x34b9, 0x34bc);
   load_link_and_companion_animation_frame_hook(gb);
   switch_bank(gb, 0x34bc, 0x07);
-  CALL_ROM(0x34c3, ROM_b07_updateItemsPost);
+  CALL_C(0x34c3, updateItemsPost_hook, 0x491a, 0x34c6);
   switch_bank(gb, 0x34c6, 0x01);
   CALL_ROM(0x34cd, ROM_b01_checkUpdateFollowingLinkObject);
   switch_bank(gb, 0x34d0, 0x00);
@@ -9134,10 +9136,11 @@ void updateAllObjects_hook(GB *gb) {
 }
 
 void updateSpecialObjectsAndInteractions_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x34f9, 0x34fb); A = H8(hRomBank);
   CYC(0x34fb, 0x34fc); push_effect(gb, AF);
   switch_bank(gb, 0x34fc, 0x05);
-  CALL_ROM(0x3503, ROM_b05_updateSpecialObjects);
+  CALL_C(0x3503, updateSpecialObjects_hook, 0x4000, 0x3506);
   switch_bank(gb, 0x3506, 0x00);
   CALL_ROM(0x350d, ROM_updateInteractions);
   CYC(0x3510, 0x3513);
@@ -9167,10 +9170,11 @@ void updateInteractionsAndDrawAllSprites_hook(GB *gb) {
 }
 
 void func_3539_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x3539, 0x353b); A = H8(hRomBank);
   CYC(0x353b, 0x353c); push_effect(gb, AF);
   switch_bank(gb, 0x353c, 0x05);
-  CALL_ROM(0x3543, ROM_b05_updateSpecialObjects);
+  CALL_C(0x3543, updateSpecialObjects_hook, 0x4000, 0x3546);
   switch_bank(gb, 0x3546, 0x07);
   CALL_ROM(0x354d, ROM_b07_updateItems);
   switch_bank(gb, 0x3550, 0x00);
@@ -9180,7 +9184,7 @@ void func_3539_hook(GB *gb) {
   switch_bank(gb, 0x3564, 0x00);
   CALL_ROM(0x356b, ROM_updateInteractions);
   switch_bank(gb, 0x356e, 0x07);
-  CALL_ROM(0x3575, ROM_b07_updateItemsPost);
+  CALL_C(0x3575, updateItemsPost_hook, 0x491a, 0x3578);
   switch_bank(gb, 0x3578, 0x00);
   CYC(0x357f, 0x3582);
   load_link_and_companion_animation_frame_hook(gb);
@@ -11188,10 +11192,11 @@ void initSound_b00_hook(GB *gb) {
 }
 
 void intro_cinematic_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   bank_push(gb, 0x2d1a, 0x03);
   CALL_ROM(0x2d24, ROM_b03_runIntroCinematic);
   switch_bank(gb, 0x2d27, 0x05);
-  CALL_ROM(0x2d2e, ROM_b05_updateSpecialObjects);
+  CALL_C(0x2d2e, updateSpecialObjects_hook, 0x4000, 0x2d31);
   CYC(0x2d31, 0x2d34);
   load_link_and_companion_animation_frame_hook(gb);
   switch_bank(gb, 0x2d34, 0x04);

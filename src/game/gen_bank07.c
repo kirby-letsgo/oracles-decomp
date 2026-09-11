@@ -3173,60 +3173,6 @@ L_48be:
   switch (HL) {  default: HANDOFF(HL); }
 }
 
-// 07:491a
-void updateItemsPost(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x491a, 1); alu_xor(gb, A);  // xor a
-  I(0x491b, 3); mem_wr(gb, 0xffae, A);  // ldh ($ffae),a
-  I(0x491d, 2); D = 0xd6;  // ld d,$d6
-  I(0x491f, 1); A = D;  // ld a,d
-L_4920:
-  I(0x4920, 3); mem_wr(gb, 0xffaf, A);  // ldh ($ffaf),a
-  I(0x4922, 2); E = 0x00;  // ld e,$00
-  I(0x4924, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4925, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { CALL(0x4926, updateItemPost, 0x4930, 0x4929); } else I(0x4926, 3);  // call nz,$4930
-  I(0x4929, 1); D = alu_inc8(gb, D);  // inc d
-  I(0x492a, 1); A = D;  // ld a,d
-  I(0x492b, 2); alu_cp(gb, 0xe0);  // cp $e0
-  if ((F & FC)) { I(0x492d, 3); goto L_4920; } I(0x492d, 2);  // jr c,$4920
-  itemCodeNilPost(gb); return;  // fallthrough
-}
-
-// 07:4920
-void updateItemsPost__itemLoop(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4920:
-  I(0x4920, 3); mem_wr(gb, 0xffaf, A);  // ldh ($ffaf),a
-  I(0x4922, 2); E = 0x00;  // ld e,$00
-  I(0x4924, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4925, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { CALL(0x4926, updateItemPost, 0x4930, 0x4929); } else I(0x4926, 3);  // call nz,$4930
-  I(0x4929, 1); D = alu_inc8(gb, D);  // inc d
-  I(0x492a, 1); A = D;  // ld a,d
-  I(0x492b, 2); alu_cp(gb, 0xe0);  // cp $e0
-  if ((F & FC)) { I(0x492d, 3); goto L_4920; } I(0x492d, 2);  // jr c,$4920
-  itemCodeNilPost(gb); return;  // fallthrough
-}
-
-// 07:492f
-void itemCodeNilPost(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  RET(0x492f); return;  // ret
-}
-
-// 07:4930
-void updateItemPost(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4930, 2); E = 0x01;  // ld e,$01
-  I(0x4932, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x4933, 0x4934);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
 // 07:6235
 void itemCalculateSwordDamage(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

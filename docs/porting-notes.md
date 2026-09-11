@@ -390,3 +390,7 @@ desync to discover; keep them when porting routines.
   through `$441f` treated its cycle count as an address range; `burn_rom` stopped at the jump
   boundary before the verifier could run. Its range is `$441c`&ndash;`$441e`; always derive a
   branch's `CYC` end from opcode bytes, not the printed cycle count.
+- `file(GLOB ...)` source discovery is evaluated at CMake configure time in this project. Adding
+  `src/game/updateItems.c` after the existing build was configured produced hook-table linker
+  errors for all three new post-item shims even though regeneration and lint succeeded. Run
+  `cmake -S . -B build -G Ninja` before building whenever a batch creates a new game-source file.

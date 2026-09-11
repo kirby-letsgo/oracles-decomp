@@ -6,6 +6,153 @@
 #define CYC(from, to) burn_rom(gb, 0x05, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, 0x05, (from), (to), true)
 
+void add_a_to_hl_b05_hook(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
+  if (!(F & FC)) {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, true);
+    pop_effect(gb);
+    return;
+  }
+  burn_rom(gb, 0x00, 0x0012, 0x0013, false);
+  burn_rom(gb, 0x00, 0x0013, 0x0014, false); H = alu_inc8(gb, H);
+  burn_rom(gb, 0x00, 0x0014, 0x0015, false);
+  pop_effect(gb);
+}
+
+void updateGameKeysPressed_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x40b3, 0x40b6); A = mem_rd(gb, 0xc481);
+  CYC(0x40b6, 0x40b7); C = A;
+  CYC(0x40b7, 0x40ba); A = mem_rd(gb, 0xcbc3);
+  CYC(0x40ba, 0x40bb); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x40bb, 0x40bd); goto update; }
+  CYC(0x40bb, 0x40bd);
+  CYC(0x40bd, 0x40bf); alu_cp(gb, 0x02);
+  if (F & FZ) { CYCT(0x40bf, 0x40c1); goto reverse; }
+  CYC(0x40bf, 0x40c1);
+  CALL_C(0x40c1, getSimulatedInput_hook, 0x2a33, 0x40c4);
+  CYC(0x40c4, 0x40c6); goto update_a;
+reverse:
+  CYC(0x40c6, 0x40c7); alu_xor(gb, A);
+  CYC(0x40c7, 0x40ca); mem_wr(gb, 0xcbc3, A);
+  CYC(0x40ca, 0x40cc); A = 0xa0;
+  CYC(0x40cc, 0x40cd); alu_and(gb, C);
+  CYC(0x40cd, 0x40ce); alu_rrca(gb);
+  CYC(0x40ce, 0x40cf); B = A;
+  CYC(0x40cf, 0x40d1); A = 0x50;
+  CYC(0x40d1, 0x40d2); alu_and(gb, C);
+  CYC(0x40d2, 0x40d3); alu_rlca(gb);
+  CYC(0x40d3, 0x40d4); alu_or(gb, B);
+  CYC(0x40d4, 0x40d5); B = A;
+  CYC(0x40d5, 0x40d7); A = 0x0f;
+  CYC(0x40d7, 0x40d8); alu_and(gb, C);
+  CYC(0x40d8, 0x40d9); alu_or(gb, B);
+update_a:
+  CYC(0x40d9, 0x40da); C = A;
+update:
+  CYC(0x40da, 0x40dd); A = mem_rd(gb, 0xcdd5);
+  CYC(0x40dd, 0x40de); alu_or(gb, A);
+  CYC(0x40de, 0x40e1); SET_HL(0xcc29);
+  if (!(F & FZ)) { CYCT(0x40e1, 0x40e3); goto dying; }
+  CYC(0x40e1, 0x40e3);
+  CYC(0x40e3, 0x40e4); A = mem_rd(gb, HL);
+  CYC(0x40e4, 0x40e5); alu_cpl(gb);
+  CYC(0x40e5, 0x40e6); B = A;
+  CYC(0x40e6, 0x40e7); A = C;
+  CYC(0x40e7, 0x40e8); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x40e8, 0x40e9); alu_and(gb, B);
+  CYC(0x40e9, 0x40ea); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x40ea, 0x40eb); A = C;
+  CYC(0x40eb, 0x40ed); alu_and(gb, 0xf0);
+  CYC(0x40ed, 0x40ef); A = alu_swap(gb, A);
+  CYC(0x40ef, 0x40f2); SET_HL(0x40fe);
+  CYC(0x40f2, 0x40f3); add_a_to_hl_b05_hook(gb, 0x40f3);
+  CYC(0x40f3, 0x40f4); A = mem_rd(gb, HL);
+  CYC(0x40f4, 0x40f7); mem_wr(gb, 0xcc2b, A);
+  CYC(0x40f7, 0x40f8);
+  ret_effect(gb);
+  return;
+dying:
+  CYC(0x40f8, 0x40f9); alu_xor(gb, A);
+  CYC(0x40f9, 0x40fa); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x40fa, 0x40fb); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x40fb, 0x40fc); A = alu_dec8(gb, A);
+  CYC(0x40fc, 0x40fd); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x40fd, 0x40fe);
+  ret_effect(gb);
+}
+
+void updateSpecialObjects_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4000, 0x4003); SET_HL(0xcc57);
+  CYC(0x4003, 0x4004); A = mem_rd(gb, HL);
+  CYC(0x4004, 0x4006); mem_wr(gb, HL, 0);
+  CYC(0x4006, 0x4007); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x4007, 0x4009); goto no_transformation; }
+  CYC(0x4007, 0x4009);
+  CYC(0x4009, 0x400b); alu_and(gb, 0x7f);
+  CYC(0x400b, 0x400e); mem_wr(gb, 0xd001, A);
+no_transformation:
+  CYC(0x400e, 0x4011); SET_HL(0xd02f);
+  CYC(0x4011, 0x4012); A = mem_rd(gb, HL);
+  CYC(0x4012, 0x4014); alu_and(gb, 0x3f);
+  CYC(0x4014, 0x4015); mem_wr(gb, HL, A);
+  CYC(0x4015, 0x4017); A = 0x4a;
+  CALL_C(0x4017, checkTreasureObtained_hook, 0x1748, 0x401a);
+  if (!(F & FC)) { CYCT(0x401a, 0x401c); goto no_seed_shooter; }
+  CYC(0x401a, 0x401c);
+  CYC(0x401c, 0x401e); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x40));
+no_seed_shooter:
+  CYC(0x401e, 0x4021); A = mem_rd(gb, 0xcc34);
+  CYC(0x4021, 0x4023); alu_and(gb, 0x40);
+  if (F & FZ) { CYCT(0x4023, 0x4025); goto no_input_block; }
+  CYC(0x4023, 0x4025);
+  CYC(0x4025, 0x4027); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x80));
+no_input_block:
+  CYC(0x4027, 0x4028); alu_xor(gb, A);
+  CYC(0x4028, 0x402b); mem_wr(gb, 0xcc64, A);
+  CYC(0x402b, 0x402e); mem_wr(gb, 0xcc92, A);
+  CYC(0x402e, 0x4031); mem_wr(gb, 0xcc66, A);
+  CYC(0x4031, 0x4034); SET_HL(0xcc95);
+  CYC(0x4034, 0x4035); A = mem_rd(gb, HL);
+  CYC(0x4035, 0x4037); alu_or(gb, 0x7f);
+  CYC(0x4037, 0x4038); mem_wr(gb, HL, A);
+  CYC(0x4038, 0x403b); SET_HL(0xcc60);
+  CYC(0x403b, 0x403d); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & 0x7f));
+  CALL_C(0x403d, updateGameKeysPressed_hook, 0x40b3, 0x4040);
+  CYC(0x4040, 0x4043); SET_HL(0xd100);
+  CALL_ROM(0x4043, 0x407d);
+  CYC(0x4046, 0x4047); alu_xor(gb, A);
+  CYC(0x4047, 0x404a); mem_wr(gb, 0xcc68, A);
+  CYC(0x404a, 0x404d); mem_wr(gb, 0xcc98, A);
+  CYC(0x404d, 0x4050); SET_HL(0xd000);
+  CALL_ROM(0x4050, 0x407d);
+  CALL_C(0x4053, updateLinkInvincibilityCounter, 0x4279, 0x4056);
+  CYC(0x4056, 0x4059); A = mem_rd(gb, 0xcc8d);
+  CYC(0x4059, 0x405c); mem_wr(gb, 0xcc96, A);
+  CYC(0x405c, 0x405f); SET_HL(0xcc61);
+  CYC(0x405f, 0x4060); A = mem_rd(gb, HL);
+  CYC(0x4060, 0x4062); alu_and(gb, 0x0f);
+  CYC(0x4062, 0x4063); mem_wr(gb, HL, A);
+  CYC(0x4063, 0x4064); alu_xor(gb, A);
+  CYC(0x4064, 0x4067); mem_wr(gb, 0xcc67, A);
+  CYC(0x4067, 0x406a); mem_wr(gb, 0xd02a, A);
+  CYC(0x406a, 0x406d); mem_wr(gb, 0xccd8, A);
+  CYC(0x406d, 0x4070); SET_HL(0xcc6b);
+  CYC(0x4070, 0x4071); A = mem_rd(gb, HL);
+  CYC(0x4071, 0x4072); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x4072, 0x4074); goto clear; }
+  CYC(0x4072, 0x4074);
+  CYC(0x4074, 0x4075); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+clear:
+  CYC(0x4075, 0x4078); SET_HL(0xcc74);
+  CYC(0x4078, 0x407a); B = 0x10;
+  CYC(0x407a, 0x407d);
+  clearMemory_hook(gb);
+}
+
 void specialObjectCode_minecart_b05_hook(GB *gb) {
   CYC(0x6364, 0x6367); SET_HL(0x563e);
   CYC(0x6367, 0x6369); E = 0x06;

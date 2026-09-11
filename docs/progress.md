@@ -7,7 +7,7 @@ Updated 2026-09-11. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 676 routines rewritten across eight code banks;
+  routine against the transliteration. Progress: 683 routines rewritten across nine code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -126,6 +126,13 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-11: milestone 3 phase 4 batch 36 (7 routines): `updateGameKeysPressed` and
+  `updateSpecialObjects` in bank 5, `updateItemsPost`, `updateItemPost`, and `itemCodeNilPost`
+  in bank 7, plus `parseStaticObjects` and `objectRunMovementScript_body` in banks 22 and 14.
+  The three ROM jump-table dispatchers stay explicit in C, handing off their unreworked dynamic
+  targets. Gates: lint 0, 30k verify 0 mismatches, whole-movie state hash clean, ctest 8/8 in
+  both normal and quirk builds.
 
 - 2026-09-11: milestone 3 phase 4 batch 35 (15 routines): movement-script and static-object
   loading in banks 14 and 22; minecart/raft bank-switch stubs; and the Link/companion animation,

@@ -652,6 +652,7 @@ objectDataOp7
 objectDataOp9
 objectDataOpA
 objectLoadMovementScript_body
+objectRunMovementScript_body
 getTransformedLinkID
 func_4553
 specialObjectCode_minecart_b05
@@ -665,6 +666,12 @@ specialObjectSetAnimation_body
 linkUpdateDamageToApplyForRings
 specialObjectAnimate_optimized
 fake_specialObjectLoadAnimationFrameToBuffer
+updateGameKeysPressed
+updateSpecialObjects
+updateItemsPost
+itemCodeNilPost
+updateItemPost
+parseStaticObjects
 loadStaticObjects_body
 read2Bytes
 readCoordinates
