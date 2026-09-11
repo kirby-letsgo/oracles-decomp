@@ -6,6 +6,99 @@
 #define CYC(from, to) burn_rom(gb, 0x06, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, 0x06, (from), (to), true)
 
+void linkApplyDamage_b06_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x46bb, 0x46bc); H = D;
+  CYC(0x46bc, 0x46be); L = 0x25;
+  CYC(0x46be, 0x46bf); A = mem_rd(gb, HL);
+  CYC(0x46bf, 0x46c1); mem_wr(gb, HL, 0);
+  CYC(0x46c1, 0x46c2); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x46c2, 0x46c4); goto damage_knockback; }
+  CYC(0x46c2, 0x46c4);
+  CYC(0x46c4, 0x46c5); B = A;
+  CYC(0x46c5, 0x46c7); A = 0x3f;
+  CALL_C(0x46c7, cpActiveRing_hook, 0x23b0, 0x46ca);
+  if (!(F & FZ)) { CYCT(0x46ca, 0x46cc); goto apply_damage; }
+  CYC(0x46ca, 0x46cc);
+  CYC(0x46cc, 0x46ce); B = 0xf8;
+apply_damage:
+  CYC(0x46ce, 0x46d0); L = 0x29;
+  CYC(0x46d0, 0x46d1); A = mem_rd(gb, HL);
+  CYC(0x46d1, 0x46d2); alu_add(gb, B);
+  CYC(0x46d2, 0x46d3); mem_wr(gb, HL, A);
+damage_knockback:
+  CYC(0x46d3, 0x46d5); L = 0x2a;
+  CYC(0x46d5, 0x46d6); A = mem_rd(gb, HL);
+  CYC(0x46d6, 0x46d7); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x46d7, 0x46d9); goto normalize_health; }
+  CYC(0x46d7, 0x46d9);
+  CYC(0x46d9, 0x46db); A = 0x10;
+  CALL_C(0x46db, cpActiveRing_hook, 0x23b0, 0x46de);
+  if (!(F & FZ)) { CYCT(0x46de, 0x46e0); goto normalize_health; }
+  CYC(0x46de, 0x46e0);
+  CYC(0x46e0, 0x46e2); L = 0x2d;
+  CYC(0x46e2, 0x46e4); mem_wr(gb, HL, alu_srl(gb, mem_rd(gb, HL)));
+normalize_health:
+  CYC(0x46e4, 0x46e7); SET_HL(0xc6aa);
+  CYC(0x46e7, 0x46e9); E = 0x29;
+  CYC(0x46e9, 0x46ea); A = mem_rd(gb, DE);
+  CYC(0x46ea, 0x46ec); alu_bit(gb, 7, A);
+  if (F & FZ) { CYCT(0x46ec, 0x46ee); goto potion; }
+  CYC(0x46ec, 0x46ee);
+  CYC(0x46ee, 0x46ef); A = mem_rd(gb, DE);
+normalize_loop:
+  CYC(0x46ef, 0x46f0); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x46f0, 0x46f2); alu_add(gb, 2);
+  if (!(F & FC)) { CYCT(0x46f2, 0x46f4); goto normalize_loop; }
+  CYC(0x46f2, 0x46f4);
+  CYC(0x46f4, 0x46f5); mem_wr(gb, DE, A);
+potion:
+  CYC(0x46f5, 0x46f6); A = mem_rd(gb, HL);
+  CYC(0x46f6, 0x46f7); A = alu_dec8(gb, A);
+  CYC(0x46f7, 0x46f8); alu_rlca(gb);
+  if (!(F & FC)) { CYCT(0x46f8, 0x46fa); goto finish; }
+  CYC(0x46f8, 0x46fa);
+  CYC(0x46fa, 0x46fc); A = 0x2f;
+  CALL_C(0x46fc, checkTreasureObtained_hook, 0x1748, 0x46ff);
+  if (!(F & FC)) { CYCT(0x46ff, 0x4701); goto no_potion; }
+  CYC(0x46ff, 0x4701);
+  CYC(0x4701, 0x4704); SET_HL(0xc6ab);
+  CYC(0x4704, 0x4705); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x4705, 0x4706); mem_wr(gb, HL, A);
+  CYC(0x4706, 0x4708); A = 1;
+  CYC(0x4708, 0x4709); mem_wr(gb, DE, A);
+  CYC(0x4709, 0x470b); A = 0x2f;
+  CALL_C(0x470b, loseTreasure_hook, 0x1733, 0x470e);
+  CYC(0x470e, 0x4710); goto finish;
+no_potion:
+  CYC(0x4710, 0x4711); alu_xor(gb, A);
+  CYC(0x4711, 0x4712); mem_wr(gb, DE, A);
+  CYC(0x4712, 0x4713); mem_wr(gb, HL, A);
+  CYC(0x4713, 0x4716); mem_wr(gb, 0xcc6f, A);
+  CYC(0x4716, 0x4718); E = 0x04;
+  CYC(0x4718, 0x4719); A = mem_rd(gb, DE);
+  CYC(0x4719, 0x471b); alu_cp(gb, 0x0d);
+  if (F & FZ) { CYCT(0x471b, 0x471d); goto finish; }
+  CYC(0x471b, 0x471d);
+  CYC(0x471d, 0x471f); A = 0xff;
+  CYC(0x471f, 0x4722); mem_wr(gb, 0xcdd5, A);
+  CALL_C(0x4722, clearAllParentItems_hook, 0x2c10, 0x4725);
+finish:
+  CYC(0x4725, 0x4728); A = mem_rd(gb, 0xcc00);
+  CYC(0x4728, 0x4729); alu_rrca(gb);
+  if (!(F & FC)) { CYCT(0x4729, 0x472b); goto end; }
+  CYC(0x4729, 0x472b);
+  CYC(0x472b, 0x472d); E = 0x2e;
+  CYC(0x472d, 0x472e); A = mem_rd(gb, DE);
+  CYC(0x472e, 0x472f); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x472f, 0x4731); goto end; }
+  CYC(0x472f, 0x4731);
+  CYC(0x4731, 0x4732); A = alu_dec8(gb, A);
+  CYC(0x4732, 0x4733); mem_wr(gb, DE, A);
+end:
+  CYC(0x4733, 0x4734); ret_effect(gb);
+}
+
 static void add_a_to_hl(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
   burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);

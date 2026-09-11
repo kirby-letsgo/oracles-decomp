@@ -666,8 +666,12 @@ specialObjectSetAnimation_body
 linkUpdateDamageToApplyForRings
 specialObjectAnimate_optimized
 fake_specialObjectLoadAnimationFrameToBuffer
+func_410d
+linkApplyDamage_b5
+linkApplyDamage_b06
 updateGameKeysPressed
 updateSpecialObjects
+updateItems
 updateItemsPost
 itemCodeNilPost
 updateItemPost

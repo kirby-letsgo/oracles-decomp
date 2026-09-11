@@ -9092,7 +9092,7 @@ void updateAllObjects_hook(GB *gb) {
   switch_bank(gb, 0x345e, 0x05);
   CALL_C(0x3465, updateSpecialObjects_hook, 0x4000, 0x3468);
   switch_bank(gb, 0x3468, 0x07);
-  CALL_ROM(0x346f, ROM_b07_updateItems);
+  CALL_C(0x346f, updateItems_hook, 0x4872, 0x3472);
   CALL_ROM(0x3472, ROM_setEnemyTargetToLinkPosition);
   switch_bank(gb, 0x3475, 0x00);
   CALL_ROM(0x347c, ROM_updateEnemies);
@@ -9106,7 +9106,7 @@ void updateAllObjects_hook(GB *gb) {
   CYC(0x34a4, 0x34a7); A = W8(wLinkObjectIndex);
   alu_rrca(gb);
   CYC(0x34a7, 0x34a8);
-  if (F & FC) CALL_ROM_CC(0x34a8, ROM_b05_func_410d);
+  if (F & FC) CALL_C_CC(0x34a8, func_410d_hook, 0x410d, 0x34ab);
   else CYC(0x34a8, 0x34ab);
   switch_bank(gb, 0x34ab, 0x06);
   CYC(0x34b2, 0x34b5); A = W8(wLinkGrabState);
@@ -9176,7 +9176,7 @@ void func_3539_hook(GB *gb) {
   switch_bank(gb, 0x353c, 0x05);
   CALL_C(0x3543, updateSpecialObjects_hook, 0x4000, 0x3546);
   switch_bank(gb, 0x3546, 0x07);
-  CALL_ROM(0x354d, ROM_b07_updateItems);
+  CALL_C(0x354d, updateItems_hook, 0x4872, 0x3550);
   switch_bank(gb, 0x3550, 0x00);
   CALL_ROM(0x3557, ROM_updateEnemies);
   switch_bank(gb, 0x355a, 0x11);
@@ -11114,6 +11114,7 @@ void specialObjectCode_linkInCutscene_b00_hook(GB *gb) {
 }
 
 void linkApplyDamage_b00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x2ab7, 0x2ab8); push_effect(gb, DE);
   CYC(0x2ab8, 0x2aba); A = H8(hRomBank);
   CYC(0x2aba, 0x2abb); push_effect(gb, AF);
@@ -11121,7 +11122,7 @@ void linkApplyDamage_b00_hook(GB *gb) {
   A = 0x05;
   CYC(0x2abb, 0x2ac1); H8(hRomBank) = A;
   CYC(0x2ac1, 0x2ac4); mem_wr(gb, MBC_ROM_BANK, A);
-  CALL_ROM(0x2ac4, ROM_b05_linkApplyDamage_b5);
+  CALL_C(0x2ac4, linkApplyDamage_b5_hook, 0x4270, 0x2ac7);
   bank_pop(gb, 0x2ac7);
   CYC(0x2acd, 0x2ace); SET_DE(pop_effect(gb));
   CYC(0x2ace, 0x2acf);

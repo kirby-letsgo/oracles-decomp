@@ -394,3 +394,9 @@ desync to discover; keep them when porting routines.
   `src/game/updateItems.c` after the existing build was configured produced hook-table linker
   errors for all three new post-item shims even though regeneration and lint succeeded. Run
   `cmake -S . -B build -G Ninja` before building whenever a batch creates a new game-source file.
+- Changing an existing hook's call from `CALL_ROM` to `CALL_C` requires an entry `sp0_` capture,
+  even if the hook previously had no dynamic control flow. `CALL_C` uses `sp0_` when a native
+  callee does not return normally and must continue through the interpreter; batch 37's
+  `linkApplyDamage_b00_hook` compiled only until its bank-5 bridge became native, then the
+  missing capture was diagnosed by the compiler. Add `uint16_t sp0_ = gb->sp; (void)sp0_;` before
+  introducing any `CALL_C` or `CALL_C_CC` into an older hook.
