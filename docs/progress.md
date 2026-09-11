@@ -7,7 +7,7 @@ Updated 2026-09-11. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 687 routines rewritten across nine code banks;
+  routine against the transliteration. Progress: 694 routines rewritten across ten code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -21,7 +21,7 @@ Updated 2026-09-11. Newest entries at the top of each section.
   `paletteFadeThreadStart`, `mainThreadStart`). Batch 31 finished the RAM-resident code
   (`hramOamDmaFunction`, `wMusicReadFunction`, `wRamFunction`), and batch 32 began phase 4 with
   object-loading, part-dispatch, and animation-queue routines in banks 12, 11, and 4; batch 34
-  completed the remaining simple object-data opcode handlers. Batch 37 completed phase 4: every
+  completed the remaining simple object-data opcode handlers. Batch 38 completed phase 4: every
   planned object-system source routine is now readable C and verified; phase 5 (rooms, scripting,
   and text) is next.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
@@ -129,7 +129,14 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
-- 2026-09-11: milestone 3 phase 4 batch 37 (4 routines), completing the phase: the Link/companion
+- 2026-09-11: milestone 3 phase 4 batch 38 (7 routines), completing the phase after the bank-2
+  audit: `functionCaller_b02`, the enemy-kill list routines, random-buffer generation, random
+  enemy placement, and timeportal spawning. The bank-0 trampoline now uses `CALL_C` while
+  preserving the selected-ROM-bank push/pop and its dynamic table hand-off. Gates: lint 0, 30k
+  verify 0 mismatches, whole-movie state hash clean (`64bddd0dfe384126`), ctest 8/8 in both
+  normal and quirk builds. Phase 4 complete.
+
+- 2026-09-11: milestone 3 phase 4 batch 37 (4 routines): the Link/companion
   riding dispatcher `func_410d`, the pre-object item dispatcher `updateItems`, and the bank-5 and
   bank-6 `linkApplyDamage` bridge/body. Static callers in bank 0 now use `CALL_C`; the item table
   remains a dynamic hand-off to its unreworked item-code targets. A formerly interpreted damage

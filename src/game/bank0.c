@@ -8593,13 +8593,13 @@ void enemyCodeNil_hook(GB *gb) {
   ret_effect(gb);
 }
 
-static void bank2_function_caller(GB *gb, uint16_t a, uint8_t h) {
+static void bank2_function_caller(GB *gb, uint16_t a, uint8_t h, uint16_t sp0_) {
   H = h;
   if (a != 0x321d) CYC(a, a + 4); else CYC(a, a + 2);
   L = A;
   CYC(0x321f, 0x3220);
   bank_push(gb, 0x3220, 0x02);
-  CALL_ROM(0x322a, ROM_b02_functionCaller);
+  CALL_C(0x322a, functionCaller_b02_hook, 0x77b2, 0x322d);
   C = alu_rl(gb, C);
   CYC(0x322d, 0x322f);
   bank_pop(gb, 0x322f);
@@ -8608,13 +8608,13 @@ static void bank2_function_caller(GB *gb, uint16_t a, uint8_t h) {
   ret_effect(gb);
 }
 
-void func_3211_hook(GB *gb) { bank2_function_caller(gb, 0x3211, 0x03); }
-void clearEnemiesKilledList_b00_hook(GB *gb) { bank2_function_caller(gb, 0x3205, 0x00); }
-void addRoomToEnemiesKilledList_b00_hook(GB *gb) { bank2_function_caller(gb, 0x3209, 0x01); }
-void markEnemyAsKilledInRoom_b00_hook(GB *gb) { bank2_function_caller(gb, 0x320d, 0x02); }
-void generateRandomBuffer_b00_hook(GB *gb) { bank2_function_caller(gb, 0x3215, 0x04); }
-void getRandomPositionForEnemy_b00_hook(GB *gb) { bank2_function_caller(gb, 0x3219, 0x05); }
-void checkSpawnTimeportalInteraction_b00_hook(GB *gb) { bank2_function_caller(gb, 0x321d, 0x06); }
+void func_3211_hook(GB *gb) { bank2_function_caller(gb, 0x3211, 0x03, gb->sp); }
+void clearEnemiesKilledList_b00_hook(GB *gb) { bank2_function_caller(gb, 0x3205, 0x00, gb->sp); }
+void addRoomToEnemiesKilledList_b00_hook(GB *gb) { bank2_function_caller(gb, 0x3209, 0x01, gb->sp); }
+void markEnemyAsKilledInRoom_b00_hook(GB *gb) { bank2_function_caller(gb, 0x320d, 0x02, gb->sp); }
+void generateRandomBuffer_b00_hook(GB *gb) { bank2_function_caller(gb, 0x3215, 0x04, gb->sp); }
+void getRandomPositionForEnemy_b00_hook(GB *gb) { bank2_function_caller(gb, 0x3219, 0x05, gb->sp); }
+void checkSpawnTimeportalInteraction_b00_hook(GB *gb) { bank2_function_caller(gb, 0x321d, 0x06, gb->sp); }
 
 // Link grabbing and A-button interaction with nearby objects
 

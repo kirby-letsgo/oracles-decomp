@@ -686,3 +686,10 @@ checkEnemyKilled
 label_11_212
 updateParts
 func_11_5e8a
+functionCaller_b02
+addRoomToEnemiesKilledList_b02
+markEnemyAsKilledInRoom_b02
+clearEnemiesKilledList_b02
+generateRandomBuffer_b02
+getRandomPositionForEnemy_b02
+checkSpawnTimeportalInteraction_b02
