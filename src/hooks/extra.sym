@@ -15,3 +15,12 @@
 00:09aa _initializeThread__afterSp09aa
 03:4df3 intro_titlescreen_state1__pressedStart
 03:4dfd intro_titlescreen_state1__gotoState
+10:71aa agesFunc_10_70f6__func_71aa
+10:71b8 agesFunc_10_70f6__substate4
+10:71fd agesFunc_10_70f6__func_71fd
+10:723d agesFunc_10_70f6__substate6
+10:7262 agesFunc_10_70f6__func_7262
+10:731b agesFunc_10_7298__func_731b
+10:7328 agesFunc_10_7298__playWaveSoundAtRandomIntervals_body
+10:7450 agesFunc_10_7298__func_7450
+10:746a agesFunc_10_7298__func_746a

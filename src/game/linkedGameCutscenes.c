@@ -13,6 +13,7 @@ static void linkedCutscene_decrementTimer(GB *gb);
 void func_7bd9_hook(GB *gb);
 void func_7bff_hook(GB *gb);
 void func_7c09_hook(GB *gb);
+void spawnZeldaKidnappedNPCs_hook(GB *gb);
 
 void func_03_7b81_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -155,4 +156,78 @@ void func_7c1f_hook(GB *gb) {
   CYC(0x7c24, 0x7c26); A = 0xbc;
   CYC(0x7c26, 0x7c29); W8(wInteractionIDToLoadExtraGfx) = A;
   CYC(0x7c29, 0x7c2a); ret_effect(gb);
+}
+
+void func_7c2a_hook(GB *gb) {
+  CYC(0x7c2a, 0x7c2d); SET_BC(0x7c4e);
+  CYC(0x7c2d, 0x7c2f); spawnZeldaKidnappedNPCs_hook(gb);
+}
+
+void func_7c2f_hook(GB *gb) {
+  CYC(0x7c2f, 0x7c32); SET_BC(0x7c5d);
+  spawnZeldaKidnappedNPCs_hook(gb);
+}
+
+void spawnZeldaKidnappedNPCs_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  for (;;) {
+    CYC(0x7c32, 0x7c33); A = mem_rd(gb, BC);
+    CYC(0x7c33, 0x7c34); alu_or(gb, A);
+    if (F & FZ) { CYCT(0x7c34, 0x7c35); ret_effect(gb); return; }
+    CYC(0x7c34, 0x7c35);
+    CALL_C(0x7c35, getFreeInteractionSlot_hook, 0x3aef, 0x7c38);
+    if (!(F & FZ)) { CYCT(0x7c38, 0x7c39); ret_effect(gb); return; }
+    CYC(0x7c38, 0x7c39);
+    CYC(0x7c39, 0x7c3a); A = mem_rd(gb, BC);
+    CYC(0x7c3a, 0x7c3b); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x7c3b, 0x7c3c); SET_BC(BC + 1);
+    CYC(0x7c3c, 0x7c3d); A = mem_rd(gb, BC);
+    CYC(0x7c3d, 0x7c3e); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x7c3e, 0x7c3f); SET_BC(BC + 1);
+    CYC(0x7c3f, 0x7c40); A = mem_rd(gb, BC);
+    CYC(0x7c40, 0x7c41); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x7c41, 0x7c42); SET_BC(BC + 1);
+    CYC(0x7c42, 0x7c44); L = 0x4b;
+    CYC(0x7c44, 0x7c45); A = mem_rd(gb, BC);
+    CYC(0x7c45, 0x7c46); mem_wr(gb, HL, A);
+    CYC(0x7c46, 0x7c47); SET_BC(BC + 1);
+    CYC(0x7c47, 0x7c49); L = 0x4d;
+    CYC(0x7c49, 0x7c4a); A = mem_rd(gb, BC);
+    CYC(0x7c4a, 0x7c4b); mem_wr(gb, HL, A);
+    CYC(0x7c4b, 0x7c4c); SET_BC(BC + 1);
+    CYCT(0x7c4c, 0x7c4e);
+  }
+}
+
+void func_7c68_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7c68, 0x7c6b); SET_BC(0x7c7f);
+  CALL_C(0x7c6b, addDoubleIndexToBc_hook, 0x007e, 0x7c6e);
+  CALL_C(0x7c6e, getFreePartSlot_hook, 0x3e8e, 0x7c71);
+  if (!(F & FZ)) { CYCT(0x7c71, 0x7c72); ret_effect(gb); return; }
+  CYC(0x7c71, 0x7c72); CYC(0x7c72, 0x7c74); mem_wr(gb, HL, 0x27);
+  CYC(0x7c74, 0x7c75); L = alu_inc8(gb, L);
+  CYC(0x7c75, 0x7c76); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x7c76, 0x7c78); L = 0xcb;
+  CYC(0x7c78, 0x7c79); A = mem_rd(gb, BC);
+  CYC(0x7c79, 0x7c7a); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x7c7a, 0x7c7b); SET_BC(BC + 1);
+  CYC(0x7c7b, 0x7c7c); L = alu_inc8(gb, L);
+  CYC(0x7c7c, 0x7c7d); A = mem_rd(gb, BC);
+  CYC(0x7c7d, 0x7c7e); mem_wr(gb, HL, A);
+  CYC(0x7c7e, 0x7c7f); ret_effect(gb);
+}
+
+void func_7c83_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7c83, 0x7c86); SET_BC(0x7c7f);
+  CALL_C(0x7c86, addDoubleIndexToBc_hook, 0x007e, 0x7c89);
+  CALL_C(0x7c89, getFreeInteractionSlot_hook, 0x3aef, 0x7c8c);
+  if (!(F & FZ)) { CYCT(0x7c8c, 0x7c8d); ret_effect(gb); return; }
+  CYC(0x7c8c, 0x7c8d); CYC(0x7c8d, 0x7c8f); mem_wr(gb, HL, 0x6b);
+  CYC(0x7c8f, 0x7c90); L = alu_inc8(gb, L);
+  CYC(0x7c90, 0x7c92); mem_wr(gb, HL, 0x16);
+  CYC(0x7c92, 0x7c94); L = 0x46;
+  CYC(0x7c94, 0x7c96); mem_wr(gb, HL, 0x78);
+  CYC(0x7c96, 0x7c99); func_7c09_hook(gb);
 }
