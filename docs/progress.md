@@ -7,7 +7,7 @@ Updated 2026-09-11. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 1,138 routines rewritten across fifteen code banks;
+  routine against the transliteration. Progress: 1,160 routines rewritten across fifteen code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -45,7 +45,8 @@ Updated 2026-09-11. Newest entries at the top of each section.
   cinematic states; batch 53 finished the linked-game source's safe routines, added the remaining
   bank-3 temple camera/bar helpers, and opened bank 10's two large cutscene state machines; batch
   54 continued bank 10 and added endgame object-GFX and miscellaneous cutscene helpers; batch 55
-  added deeper endgame, Maku/Nayru/intro, and bank-10 black-tower state helpers.
+  added deeper endgame, Maku/Nayru/intro, and bank-10 black-tower state helpers; batch 56 added
+  endgame-state, miscellaneous cutscene, graphics-copy, and final bank-10 cutscene helpers.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -150,6 +151,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-11: milestone 3 phase 5 batch 56 (22 routines): ten local endgame state
+  helpers, nine miscellaneous bank-3 cutscene and graphics-copy helpers, and the final three safe
+  bank-10 cutscene state entries. Cross-review corrected the carry path through the RAM-copied
+  `rst $10` body so its not-taken `ret nc`, `inc h`, and final `ret` each burn their own
+  instruction before applying effects. Integration also replaced a disassembly-only WRAM alias
+  and absolute HRAM constants with the generated/raw address forms accepted by readable C.
+  Gates: lint 0, 30k verify 0 mismatches, whole-movie state hash clean
+  (`64bddd0dfe384126`), ctest 8/8 in both normal and quirk builds.
 
 - 2026-09-11: milestone 3 phase 5 batch 55 (26 routines): eight bank-3 local endgame
   state helpers, nine bank-3 Maku/Nayru/black-tower/pregame helpers, and nine more bank-10

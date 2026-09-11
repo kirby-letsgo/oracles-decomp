@@ -478,3 +478,9 @@ desync to discover; keep them when porting routines.
   diverged at frame 17,220. A hook-list bisection isolated the helper and checking the generated
   `ram.h` values exposed the three-byte address error. When assembly uses a raw address, verify
   the chosen named alias's numeric definition before accepting the readable spelling.
+- A valid disassembly `.define` is not necessarily emitted into generated `ram.h`; only generated
+  RAM symbols are available to readable C. Batch 56 used `wCutsceneIndex`, which exists in the
+  assembly include as `wThreadStateBuffer + $f` but failed the integrated build because no C macro
+  was generated. Use the verified raw address (`$c2ef` here) or an available generated base plus
+  offset. Likewise, `hram_rd` and `hram_wr` take the low-byte offset, not an absolute `$ffxx`
+  constant; pass `$8c`, not `hFF8C`, so the address is explicit and does not rely on truncation.
