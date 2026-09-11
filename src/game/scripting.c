@@ -16,6 +16,7 @@ void scriptFunc_setState_hook(GB *gb);
 void scriptFunc_restoreActiveObject_hook(GB *gb);
 void scriptFunc_loadBcAndDe_hook(GB *gb);
 void scriptFunc_initializeObject_hook(GB *gb);
+void scriptFunc_4310_hook(GB *gb);
 void scriptFunc_getTextIndex_hook(GB *gb);
 
 // 0c:4103
@@ -390,4 +391,137 @@ load_text_index:
   CYC(0x42d6, 0x42d7); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(0x42d7, 0x42d8); C = A;
   CYC(0x42d8, 0x42d9); ret_effect(gb);
+}
+
+void scriptCmd_showText_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x42d9, 0x42da); SET_HL(pop_effect(gb));
+  CYC(0x42da, 0x42db); SET_HL(HL + 1);
+  CALL_C(0x42db, scriptFunc_getTextIndex_hook, 0x42c8, 0x42de);
+  CYC(0x42de, 0x42df); push_effect(gb, HL);
+  CALL_C(0x42df, showText_hook, 0x1872, 0x42e2);
+  CYC(0x42e2, 0x42e3); SET_HL(pop_effect(gb));
+  CYC(0x42e3, 0x42e4); ret_effect(gb);
+}
+
+void scriptCmd_showTextDifferentForLinked_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x42e4, 0x42e5); SET_HL(pop_effect(gb));
+  CYC(0x42e5, 0x42e6); SET_HL(HL + 1);
+  CYC(0x42e6, 0x42e7); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x42e7, 0x42e8); B = A;
+  CALL_C(0x42e8, checkIsLinkedGame_hook, 0x1992, 0x42eb);
+  if (!(F & FZ)) {
+    CYCT(0x42eb, 0x42ed);
+    goto linked;
+  }
+  CYC(0x42eb, 0x42ed);
+  CYC(0x42ed, 0x42ee); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x42ee, 0x42ef); SET_HL(HL + 1);
+  CYC(0x42ef, 0x42f1); goto show_text;
+linked:
+  CYC(0x42f1, 0x42f2); SET_HL(HL + 1);
+  CYC(0x42f2, 0x42f3); A = mem_rd(gb, HL); SET_HL(HL + 1);
+show_text:
+  CYC(0x42f3, 0x42f4); C = A;
+  CYC(0x42f4, 0x42f5); push_effect(gb, HL);
+  CALL_C(0x42f5, showText_hook, 0x1872, 0x42f8);
+  CYC(0x42f8, 0x42f9); SET_HL(pop_effect(gb));
+  CYC(0x42f9, 0x42fa); ret_effect(gb);
+}
+
+void scriptCmd_showTextNonExitable_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x42fa, 0x42fb); SET_HL(pop_effect(gb));
+  CYC(0x42fb, 0x42fc); SET_HL(HL + 1);
+  CALL_C(0x42fc, scriptFunc_getTextIndex_hook, 0x42c8, 0x42ff);
+  CYC(0x42ff, 0x4300); push_effect(gb, HL);
+  CALL_C(0x4300, showTextNonExitable_hook, 0x186e, 0x4303);
+  CYC(0x4303, 0x4304); SET_HL(pop_effect(gb));
+  CYC(0x4304, 0x4305); ret_effect(gb);
+}
+
+void scriptCmd_waitForText_hook(GB *gb) {
+  CYC(0x4305, 0x4306); SET_HL(pop_effect(gb));
+  CYC(0x4306, 0x4309); A = W8(wTextIsActive);
+  CYC(0x4309, 0x430a); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x430a, 0x430b); ret_effect(gb);
+    return;
+  }
+  CYC(0x430a, 0x430b);
+  CYC(0x430b, 0x430c); SET_HL(HL + 1);
+  CYC(0x430c, 0x430d); ret_effect(gb);
+}
+
+void scriptCmd_setCounter1_hook(GB *gb) {
+  CYC(0x430d, 0x430e); SET_HL(pop_effect(gb));
+  CYC(0x430e, 0x430f); SET_HL(HL + 1);
+  CYC(0x430f, 0x4310); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  scriptFunc_4310_hook(gb);
+}
+
+void scriptFunc_4310_hook(GB *gb) {
+  CYC(0x4310, 0x4312); E = 0x46;
+  CYC(0x4312, 0x4313); mem_wr(gb, DE, A);
+  CYC(0x4313, 0x4314); alu_xor(gb, A);
+  CYC(0x4314, 0x4315); ret_effect(gb);
+}
+
+void scriptCmd_cpLinkX_hook(GB *gb) {
+  CYC(0x4315, 0x4316); SET_HL(pop_effect(gb));
+  CYC(0x4316, 0x4317); SET_HL(HL + 1);
+  CYC(0x4317, 0x4318); push_effect(gb, HL);
+  CYC(0x4318, 0x431a); E = 0x4d;
+  CYC(0x431a, 0x431b); A = mem_rd(gb, DE);
+  CYC(0x431b, 0x431e); SET_HL(w1Link_xh);
+  CYC(0x431e, 0x431f); alu_cp(gb, mem_rd(gb, HL));
+  CYC(0x431f, 0x4320); SET_HL(pop_effect(gb));
+  CYC(0x4320, 0x4321); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4321, 0x4322); E = A;
+  CYC(0x4322, 0x4324); A = 0x00;
+  if (!(F & FC)) {
+    CYCT(0x4324, 0x4326);
+    goto store_result;
+  }
+  CYC(0x4324, 0x4326);
+  CYC(0x4326, 0x4327); A = alu_inc8(gb, A);
+store_result:
+  CYC(0x4327, 0x4328); mem_wr(gb, DE, A);
+  CYC(0x4328, 0x4329); alu_scf(gb);
+  CYC(0x4329, 0x432a); ret_effect(gb);
+}
+
+void scriptCmd_shakeScreen_hook(GB *gb) {
+  CYC(0x432a, 0x432b); SET_HL(pop_effect(gb));
+  CYC(0x432b, 0x432c); SET_HL(HL + 1);
+  CYC(0x432c, 0x432d); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x432d, 0x4330); W8(wScreenShakeCounterX) = A;
+  CYC(0x4330, 0x4331); ret_effect(gb);
+}
+
+void scriptCmd_writeMemory_hook(GB *gb) {
+  CYC(0x4331, 0x4332); SET_HL(pop_effect(gb));
+  CYC(0x4332, 0x4333); SET_HL(HL + 1);
+  CYC(0x4333, 0x4334); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4334, 0x4335); C = A;
+  CYC(0x4335, 0x4336); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4336, 0x4337); B = A;
+  CYC(0x4337, 0x4338); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4338, 0x4339); mem_wr(gb, BC, A);
+  CYC(0x4339, 0x433a); alu_scf(gb);
+  CYC(0x433a, 0x433b); ret_effect(gb);
+}
+
+void scriptCmd_checkPaletteFadeDone_hook(GB *gb) {
+  CYC(0x433b, 0x433c); SET_HL(pop_effect(gb));
+  CYC(0x433c, 0x433f); A = W8(wPaletteThread_mode);
+  CYC(0x433f, 0x4340); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x4340, 0x4341); ret_effect(gb);
+    return;
+  }
+  CYC(0x4340, 0x4341);
+  CYC(0x4341, 0x4342); SET_HL(HL + 1);
+  CYC(0x4342, 0x4343); ret_effect(gb);
 }

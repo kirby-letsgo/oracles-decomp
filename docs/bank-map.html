@@ -270,7 +270,7 @@
     status: "idle",
     statusDetail: "",
     totalHooks: 13103,
-    rewrittenTotal: 797,
+    rewrittenTotal: 827,
     bank0Total: 664,
     bank0Rewritten: 626,
     codeBearingBanks: 23,
@@ -288,6 +288,7 @@
       { n: 6, name: "Sweep", desc: "Everything left in code/, until no routine is still generated.", status: "pending", meta: "remainder" },
     ],
     batches: [
+      { id: "43", delta: 30, tag: "Ph.5", text: "Post-load room GFX, <b>script text and memory commands</b>, and textbox map save, DMA, arrow, clear, and scroll helpers." },
       { id: "42", delta: 28, tag: "Ph.5", text: "Tileset transfers and vine helpers, <b>script text/arithmetic/NPC commands</b>, textbox selection, and cutscene countdown leaves." },
       { id: "41", delta: 24, tag: "Ph.5", text: "All <b>roomSpecificCode</b> leaf handlers plus script state, object-spawn, coordinate, angle, and speed commands." },
       { id: "40", delta: 21, tag: "Ph.5", text: "Scripting <b>input/menu and movement controls</b>, textbox DMA/mapping, and bank-3 cutscene microhelpers." },
@@ -318,11 +319,11 @@
   INITIAL.banks.find(b => b.id === "0e").rewritten = 2;
   INITIAL.banks.find(b => b.id === "07").rewritten = 4;
   INITIAL.banks.find(b => b.id === "16").rewritten = 2;
-  INITIAL.banks.find(b => b.id === "02").rewritten = 24;
+  INITIAL.banks.find(b => b.id === "02").rewritten = 34;
   INITIAL.banks.find(b => b.id === "03").rewritten = 14;
   INITIAL.banks.find(b => b.id === "04").rewritten = 20;
-  INITIAL.banks.find(b => b.id === "0c").rewritten = 36;
-  INITIAL.banks.find(b => b.id === "3f").rewritten = 10;
+  INITIAL.banks.find(b => b.id === "0c").rewritten = 46;
+  INITIAL.banks.find(b => b.id === "3f").rewritten = 20;
 
   function fmt(n) { return n.toLocaleString("en-US"); }
 

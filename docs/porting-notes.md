@@ -426,3 +426,9 @@ desync to discover; keep them when porting routines.
   address clusters silently deleted five batch-39 definitions; regeneration succeeded, but the
   integrated link failed with undefined hook symbols. Diff the whole source file against `HEAD`
   after parallel edits, and merge new routines in address order instead of replacing the file.
+- The cycle-count/byte-count trap also applies to an unconditional `jr`: its report shows three
+  cycles, but its instruction is still two bytes. Batch 43 initially burned `dmaTextboxMap`'s
+  `$51b7` jump through `$51ba`, consuming the byte at `$51b9` that begins
+  `updateCharacterDisplayTimer`; cross-review against the report corrected the range to
+  `$51b7`&ndash;`$51b9` before integration. Derive every burn endpoint from the opcode length even
+  when a nearby routine boundary makes the cycle-count endpoint look plausible.

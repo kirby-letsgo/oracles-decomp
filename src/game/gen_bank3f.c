@@ -2169,9 +2169,9 @@ L_4b86:
 L_4b98:
   I(0x4b98, 2); A = 0x01;  // ld a,$01
   I(0x4b9a, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x4b9b, saveTilesUnderTextbox, 0x50dd, 0x4b9e);  // call $50dd
+  CALL(0x4b9b, saveTilesUnderTextbox_hook, 0x50dd, 0x4b9e);  // call $50dd
   CALL(0x4b9e, initTextboxMapping_hook, 0x514a, 0x4ba1);  // call $514a
-  I(0x4ba1, 4); dmaTextboxMap(gb); return;  // jp $5173
+  I(0x4ba1, 4); if (hook_enabled_at(0x5173)) { dmaTextboxMap_hook(gb); return; } HANDOFF(0x5173);  // jp $5173
 L_4ba4:
   I(0x4ba4, 1); H = D;  // ld h,d
   I(0x4ba5, 2); L = 0xc0;  // ld l,$c0
@@ -2184,14 +2184,14 @@ L_4ba4:
   CALL(0x4bb0, drawLineOfText, 0x5055, 0x4bb3);  // call $5055
   I(0x4bb3, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 L_4bb6:
-  CALL(0x4bb6, getNextCharacterToDisplay, 0x5288, 0x4bb9);  // call $5288
+  CALL(0x4bb6, getNextCharacterToDisplay_hook, 0x5288, 0x4bb9);  // call $5288
   if ((F & FZ)) { I(0x4bb9, 3); goto L_4bcb; } I(0x4bb9, 2);  // jr z,$4bcb
-  CALL(0x4bbb, updateCharacterDisplayTimer, 0x51b9, 0x4bbe);  // call $51b9
+  CALL(0x4bbb, updateCharacterDisplayTimer_hook, 0x51b9, 0x4bbe);  // call $51b9
   if (!(F & FZ)) { RET_TAKEN(0x4bbe); return; } I(0x4bbe, 2);  // ret nz
   CALL(0x4bbf, displayNextTextCharacter, 0x51db, 0x4bc2);  // call $51db
-  CALL(0x4bc2, dmaTextboxMap, 0x5173, 0x4bc5);  // call $5173
+  CALL(0x4bc2, dmaTextboxMap_hook, 0x5173, 0x4bc5);  // call $5173
   I(0x4bc5, 2); D = 0xd0;  // ld d,$d0
-  CALL(0x4bc7, getNextCharacterToDisplay, 0x5288, 0x4bca);  // call $5288
+  CALL(0x4bc7, getNextCharacterToDisplay_hook, 0x5288, 0x4bca);  // call $5288
   if (!(F & FZ)) { RET_TAKEN(0x4bca); return; } I(0x4bca, 2);  // ret nz
 L_4bcb:
   CALL(0x4bcb, func_53eb, 0x53eb, 0x4bce);  // call $53eb
@@ -2214,7 +2214,7 @@ L_4be4:
   I(0x4be4, 3); mem_wr(gb, HL, 0x0f);  // ld (hl),$0f
   RET(0x4be6); return;  // ret
 L_4be7:
-  CALL(0x4be7, updateCharacterDisplayTimer, 0x51b9, 0x4bea);  // call $51b9
+  CALL(0x4be7, updateCharacterDisplayTimer_hook, 0x51b9, 0x4bea);  // call $51b9
   if (!(F & FZ)) { RET_TAKEN(0x4bea); return; } I(0x4bea, 2);  // ret nz
   CALL(0x4beb, drawLineOfText, 0x5055, 0x4bee);  // call $5055
   I(0x4bee, 2); A = 0x02;  // ld a,$02
@@ -2230,7 +2230,7 @@ L_4be7:
 L_4c00:
   I(0x4c00, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x4c03, 2); alu_and(gb, 0x03);  // and $03
-  if ((F & FZ)) { I(0x4c05, 4); updateTextboxArrow(gb); return; } I(0x4c05, 3);  // jp z,$5314
+  if ((F & FZ)) { I(0x4c05, 4); if (hook_enabled_at(0x5314)) { updateTextboxArrow_hook(gb); return; } HANDOFF(0x5314); } I(0x4c05, 3);  // jp z,$5314
   I(0x4c08, 2); A = 0x89;  // ld a,$89
   CALL(0x4c0a, playSound_b00_hook, 0x0c98, 0x4c0d);  // call $0c98
   I(0x4c0d, 1); H = D;  // ld h,d
@@ -2241,13 +2241,13 @@ L_4c14:
   I(0x4c14, 1); H = D;  // ld h,d
   I(0x4c15, 1); L = E;  // ld l,e
   I(0x4c16, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4c17, 4); dmaTextboxMap(gb); return;  // jp $5173
+  I(0x4c17, 4); if (hook_enabled_at(0x5173)) { dmaTextboxMap_hook(gb); return; } HANDOFF(0x5173);  // jp $5173
 L_4c1a:
   I(0x4c1a, 1); H = D;  // ld h,d
   I(0x4c1b, 1); L = E;  // ld l,e
   I(0x4c1c, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x4c1d, shiftTextboxMapUp, 0x537d, 0x4c20);  // call $537d
-  I(0x4c20, 4); subFirstRowOfTextMapBy20(gb); return;  // jp $53b3
+  CALL(0x4c1d, shiftTextboxMapUp_hook, 0x537d, 0x4c20);  // call $537d
+  I(0x4c20, 4); if (hook_enabled_at(0x53b3)) { subFirstRowOfTextMapBy20_hook(gb); return; } HANDOFF(0x53b3);  // jp $53b3
 L_4c23:
   I(0x4c23, 1); H = D;  // ld h,d
   I(0x4c24, 1); L = E;  // ld l,e
@@ -2255,7 +2255,7 @@ L_4c23:
   I(0x4c26, 2); L = 0xc5;  // ld l,$c5
   I(0x4c28, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x4c29, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x4c2a, dmaTextboxMap, 0x5173, 0x4c2d);  // call $5173
+  CALL(0x4c2a, dmaTextboxMap_hook, 0x5173, 0x4c2d);  // call $5173
   I(0x4c2d, 1); alu_xor(gb, A);  // xor a
   I(0x4c2e, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 L_4c31:
@@ -2270,8 +2270,8 @@ L_4c31:
   I(0x4c3d, 1); L = A;  // ld l,a
   I(0x4c3e, 2); H = 0xd0;  // ld h,$d0
   I(0x4c40, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  CALL(0x4c42, shiftTextboxMapUp, 0x537d, 0x4c45);  // call $537d
-  I(0x4c45, 4); clearTopRowOfTextMap(gb); return;  // jp $5354
+  CALL(0x4c42, shiftTextboxMapUp_hook, 0x537d, 0x4c45);  // call $537d
+  I(0x4c45, 4); if (hook_enabled_at(0x5354)) { clearTopRowOfTextMap_hook(gb); return; } HANDOFF(0x5354);  // jp $5354
 L_4c48:
   I(0x4c48, 1); H = D;  // ld h,d
   I(0x4c49, 1); L = E;  // ld l,e
@@ -2279,7 +2279,7 @@ L_4c48:
   I(0x4c4c, 2); L = 0xc5;  // ld l,$c5
   I(0x4c4e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x4c4f, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x4c50, dmaTextboxMap, 0x5173, 0x4c53);  // call $5173
+  CALL(0x4c50, dmaTextboxMap_hook, 0x5173, 0x4c53);  // call $5173
   I(0x4c53, 1); alu_xor(gb, A);  // xor a
   I(0x4c54, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 L_4c57:
@@ -2320,11 +2320,11 @@ L_4c8e:
   I(0x4c98, 2); C = 0x40;  // ld c,$40
   CALL(0x4c9a, giveTreasure_hook, 0x171c, 0x4c9d);  // call $171c
 L_4c9d:
-  I(0x4c9d, 4); saveTilesUnderTextbox(gb); return;  // jp $50dd
+  I(0x4c9d, 4); if (hook_enabled_at(0x50dd)) { saveTilesUnderTextbox_hook(gb); return; } HANDOFF(0x50dd);  // jp $50dd
 L_4cc1:
   I(0x4cc1, 1); alu_xor(gb, A);  // xor a
   I(0x4cc2, 4); mem_wr(gb, 0xcba0, A);  // ld ($cba0),a
-  I(0x4cc5, 4); dmaTextboxMap(gb); return;  // jp $5173
+  I(0x4cc5, 4); if (hook_enabled_at(0x5173)) { dmaTextboxMap_hook(gb); return; } HANDOFF(0x5173);  // jp $5173
 L_4cdc:
   I(0x4cdc, 1); H = D;  // ld h,d
   I(0x4cdd, 2); L = 0xc6;  // ld l,$c6
@@ -2362,7 +2362,7 @@ L_4d12:
   I(0x4d16, 3); alu_bit(gb, 4, mem_rd(gb, HL));  // bit 4,(hl)
   if ((F & FZ)) { I(0x4d18, 3); goto L_4d2d; } I(0x4d18, 2);  // jr z,$4d2d
   PUSH(0x4d1a, HL);  // push hl
-  CALL(0x4d1b, readNextTextByte, 0x52fd, 0x4d1e);  // call $52fd
+  CALL(0x4d1b, readNextTextByte_hook, 0x52fd, 0x4d1e);  // call $52fd
   SET_HL(POP(0x4d1e));  // pop hl
   I(0x4d1f, 2); alu_cp(gb, 0xff);  // cp $ff
   if ((F & FZ)) { I(0x4d21, 4); goto L_4d2d; } I(0x4d21, 3);  // jp z,$4d2d
@@ -2541,9 +2541,9 @@ L_4b56:
 L_4b98:
   I(0x4b98, 2); A = 0x01;  // ld a,$01
   I(0x4b9a, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x4b9b, saveTilesUnderTextbox, 0x50dd, 0x4b9e);  // call $50dd
+  CALL(0x4b9b, saveTilesUnderTextbox_hook, 0x50dd, 0x4b9e);  // call $50dd
   CALL(0x4b9e, initTextboxMapping_hook, 0x514a, 0x4ba1);  // call $514a
-  I(0x4ba1, 4); dmaTextboxMap(gb); return;  // jp $5173
+  I(0x4ba1, 4); if (hook_enabled_at(0x5173)) { dmaTextboxMap_hook(gb); return; } HANDOFF(0x5173);  // jp $5173
 L_4ba4:
   I(0x4ba4, 1); H = D;  // ld h,d
   I(0x4ba5, 2); L = 0xc0;  // ld l,$c0
@@ -2556,14 +2556,14 @@ L_4ba4:
   CALL(0x4bb0, drawLineOfText, 0x5055, 0x4bb3);  // call $5055
   I(0x4bb3, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 L_4bb6:
-  CALL(0x4bb6, getNextCharacterToDisplay, 0x5288, 0x4bb9);  // call $5288
+  CALL(0x4bb6, getNextCharacterToDisplay_hook, 0x5288, 0x4bb9);  // call $5288
   if ((F & FZ)) { I(0x4bb9, 3); goto L_4bcb; } I(0x4bb9, 2);  // jr z,$4bcb
-  CALL(0x4bbb, updateCharacterDisplayTimer, 0x51b9, 0x4bbe);  // call $51b9
+  CALL(0x4bbb, updateCharacterDisplayTimer_hook, 0x51b9, 0x4bbe);  // call $51b9
   if (!(F & FZ)) { RET_TAKEN(0x4bbe); return; } I(0x4bbe, 2);  // ret nz
   CALL(0x4bbf, displayNextTextCharacter, 0x51db, 0x4bc2);  // call $51db
-  CALL(0x4bc2, dmaTextboxMap, 0x5173, 0x4bc5);  // call $5173
+  CALL(0x4bc2, dmaTextboxMap_hook, 0x5173, 0x4bc5);  // call $5173
   I(0x4bc5, 2); D = 0xd0;  // ld d,$d0
-  CALL(0x4bc7, getNextCharacterToDisplay, 0x5288, 0x4bca);  // call $5288
+  CALL(0x4bc7, getNextCharacterToDisplay_hook, 0x5288, 0x4bca);  // call $5288
   if (!(F & FZ)) { RET_TAKEN(0x4bca); return; } I(0x4bca, 2);  // ret nz
 L_4bcb:
   CALL(0x4bcb, func_53eb, 0x53eb, 0x4bce);  // call $53eb
@@ -2586,7 +2586,7 @@ L_4be4:
   I(0x4be4, 3); mem_wr(gb, HL, 0x0f);  // ld (hl),$0f
   RET(0x4be6); return;  // ret
 L_4be7:
-  CALL(0x4be7, updateCharacterDisplayTimer, 0x51b9, 0x4bea);  // call $51b9
+  CALL(0x4be7, updateCharacterDisplayTimer_hook, 0x51b9, 0x4bea);  // call $51b9
   if (!(F & FZ)) { RET_TAKEN(0x4bea); return; } I(0x4bea, 2);  // ret nz
   CALL(0x4beb, drawLineOfText, 0x5055, 0x4bee);  // call $5055
   I(0x4bee, 2); A = 0x02;  // ld a,$02
@@ -2602,7 +2602,7 @@ L_4be7:
 L_4c00:
   I(0x4c00, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x4c03, 2); alu_and(gb, 0x03);  // and $03
-  if ((F & FZ)) { I(0x4c05, 4); updateTextboxArrow(gb); return; } I(0x4c05, 3);  // jp z,$5314
+  if ((F & FZ)) { I(0x4c05, 4); if (hook_enabled_at(0x5314)) { updateTextboxArrow_hook(gb); return; } HANDOFF(0x5314); } I(0x4c05, 3);  // jp z,$5314
   I(0x4c08, 2); A = 0x89;  // ld a,$89
   CALL(0x4c0a, playSound_b00_hook, 0x0c98, 0x4c0d);  // call $0c98
   I(0x4c0d, 1); H = D;  // ld h,d
@@ -2613,13 +2613,13 @@ L_4c14:
   I(0x4c14, 1); H = D;  // ld h,d
   I(0x4c15, 1); L = E;  // ld l,e
   I(0x4c16, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4c17, 4); dmaTextboxMap(gb); return;  // jp $5173
+  I(0x4c17, 4); if (hook_enabled_at(0x5173)) { dmaTextboxMap_hook(gb); return; } HANDOFF(0x5173);  // jp $5173
 L_4c1a:
   I(0x4c1a, 1); H = D;  // ld h,d
   I(0x4c1b, 1); L = E;  // ld l,e
   I(0x4c1c, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x4c1d, shiftTextboxMapUp, 0x537d, 0x4c20);  // call $537d
-  I(0x4c20, 4); subFirstRowOfTextMapBy20(gb); return;  // jp $53b3
+  CALL(0x4c1d, shiftTextboxMapUp_hook, 0x537d, 0x4c20);  // call $537d
+  I(0x4c20, 4); if (hook_enabled_at(0x53b3)) { subFirstRowOfTextMapBy20_hook(gb); return; } HANDOFF(0x53b3);  // jp $53b3
 L_4c23:
   I(0x4c23, 1); H = D;  // ld h,d
   I(0x4c24, 1); L = E;  // ld l,e
@@ -2627,7 +2627,7 @@ L_4c23:
   I(0x4c26, 2); L = 0xc5;  // ld l,$c5
   I(0x4c28, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x4c29, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x4c2a, dmaTextboxMap, 0x5173, 0x4c2d);  // call $5173
+  CALL(0x4c2a, dmaTextboxMap_hook, 0x5173, 0x4c2d);  // call $5173
   I(0x4c2d, 1); alu_xor(gb, A);  // xor a
   I(0x4c2e, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 L_4c31:
@@ -2642,8 +2642,8 @@ L_4c31:
   I(0x4c3d, 1); L = A;  // ld l,a
   I(0x4c3e, 2); H = 0xd0;  // ld h,$d0
   I(0x4c40, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  CALL(0x4c42, shiftTextboxMapUp, 0x537d, 0x4c45);  // call $537d
-  I(0x4c45, 4); clearTopRowOfTextMap(gb); return;  // jp $5354
+  CALL(0x4c42, shiftTextboxMapUp_hook, 0x537d, 0x4c45);  // call $537d
+  I(0x4c45, 4); if (hook_enabled_at(0x5354)) { clearTopRowOfTextMap_hook(gb); return; } HANDOFF(0x5354);  // jp $5354
 L_4c48:
   I(0x4c48, 1); H = D;  // ld h,d
   I(0x4c49, 1); L = E;  // ld l,e
@@ -2651,7 +2651,7 @@ L_4c48:
   I(0x4c4c, 2); L = 0xc5;  // ld l,$c5
   I(0x4c4e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x4c4f, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x4c50, dmaTextboxMap, 0x5173, 0x4c53);  // call $5173
+  CALL(0x4c50, dmaTextboxMap_hook, 0x5173, 0x4c53);  // call $5173
   I(0x4c53, 1); alu_xor(gb, A);  // xor a
   I(0x4c54, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 L_4c57:
@@ -2692,11 +2692,11 @@ L_4c8e:
   I(0x4c98, 2); C = 0x40;  // ld c,$40
   CALL(0x4c9a, giveTreasure_hook, 0x171c, 0x4c9d);  // call $171c
 L_4c9d:
-  I(0x4c9d, 4); saveTilesUnderTextbox(gb); return;  // jp $50dd
+  I(0x4c9d, 4); if (hook_enabled_at(0x50dd)) { saveTilesUnderTextbox_hook(gb); return; } HANDOFF(0x50dd);  // jp $50dd
 L_4cc1:
   I(0x4cc1, 1); alu_xor(gb, A);  // xor a
   I(0x4cc2, 4); mem_wr(gb, 0xcba0, A);  // ld ($cba0),a
-  I(0x4cc5, 4); dmaTextboxMap(gb); return;  // jp $5173
+  I(0x4cc5, 4); if (hook_enabled_at(0x5173)) { dmaTextboxMap_hook(gb); return; } HANDOFF(0x5173);  // jp $5173
 }
 
 // 3f:4b7a
@@ -2746,7 +2746,7 @@ L_4d12:
   I(0x4d16, 3); alu_bit(gb, 4, mem_rd(gb, HL));  // bit 4,(hl)
   if ((F & FZ)) { I(0x4d18, 3); goto L_4d2d; } I(0x4d18, 2);  // jr z,$4d2d
   PUSH(0x4d1a, HL);  // push hl
-  CALL(0x4d1b, readNextTextByte, 0x52fd, 0x4d1e);  // call $52fd
+  CALL(0x4d1b, readNextTextByte_hook, 0x52fd, 0x4d1e);  // call $52fd
   SET_HL(POP(0x4d1e));  // pop hl
   I(0x4d1f, 2); alu_cp(gb, 0xff);  // cp $ff
   if ((F & FZ)) { I(0x4d21, 4); goto L_4d2d; } I(0x4d21, 3);  // jp z,$4d2d
@@ -2930,9 +2930,9 @@ void updateTextbox__standardTextState0(GB *gb) {
 L_4b98:
   I(0x4b98, 2); A = 0x01;  // ld a,$01
   I(0x4b9a, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x4b9b, saveTilesUnderTextbox, 0x50dd, 0x4b9e);  // call $50dd
+  CALL(0x4b9b, saveTilesUnderTextbox_hook, 0x50dd, 0x4b9e);  // call $50dd
   CALL(0x4b9e, initTextboxMapping_hook, 0x514a, 0x4ba1);  // call $514a
-  I(0x4ba1, 4); dmaTextboxMap(gb); return;  // jp $5173
+  I(0x4ba1, 4); if (hook_enabled_at(0x5173)) { dmaTextboxMap_hook(gb); return; } HANDOFF(0x5173);  // jp $5173
 }
 
 // 3f:4ba4
@@ -2955,14 +2955,14 @@ L_4ba4:
 void updateTextbox__standardTextState2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4bb6:
-  CALL(0x4bb6, getNextCharacterToDisplay, 0x5288, 0x4bb9);  // call $5288
+  CALL(0x4bb6, getNextCharacterToDisplay_hook, 0x5288, 0x4bb9);  // call $5288
   if ((F & FZ)) { I(0x4bb9, 3); goto L_4bcb; } I(0x4bb9, 2);  // jr z,$4bcb
-  CALL(0x4bbb, updateCharacterDisplayTimer, 0x51b9, 0x4bbe);  // call $51b9
+  CALL(0x4bbb, updateCharacterDisplayTimer_hook, 0x51b9, 0x4bbe);  // call $51b9
   if (!(F & FZ)) { RET_TAKEN(0x4bbe); return; } I(0x4bbe, 2);  // ret nz
   CALL(0x4bbf, displayNextTextCharacter, 0x51db, 0x4bc2);  // call $51db
-  CALL(0x4bc2, dmaTextboxMap, 0x5173, 0x4bc5);  // call $5173
+  CALL(0x4bc2, dmaTextboxMap_hook, 0x5173, 0x4bc5);  // call $5173
   I(0x4bc5, 2); D = 0xd0;  // ld d,$d0
-  CALL(0x4bc7, getNextCharacterToDisplay, 0x5288, 0x4bca);  // call $5288
+  CALL(0x4bc7, getNextCharacterToDisplay_hook, 0x5288, 0x4bca);  // call $5288
   if (!(F & FZ)) { RET_TAKEN(0x4bca); return; } I(0x4bca, 2);  // ret nz
 L_4bcb:
   CALL(0x4bcb, func_53eb, 0x53eb, 0x4bce);  // call $53eb
@@ -2998,7 +2998,7 @@ L_4be4:
 void updateTextbox__standardTextState3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4be7:
-  CALL(0x4be7, updateCharacterDisplayTimer, 0x51b9, 0x4bea);  // call $51b9
+  CALL(0x4be7, updateCharacterDisplayTimer_hook, 0x51b9, 0x4bea);  // call $51b9
   if (!(F & FZ)) { RET_TAKEN(0x4bea); return; } I(0x4bea, 2);  // ret nz
   CALL(0x4beb, drawLineOfText, 0x5055, 0x4bee);  // call $5055
   I(0x4bee, 2); A = 0x02;  // ld a,$02
@@ -3019,7 +3019,7 @@ void updateTextbox__standardTextState5(GB *gb) {
 L_4c00:
   I(0x4c00, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x4c03, 2); alu_and(gb, 0x03);  // and $03
-  if ((F & FZ)) { I(0x4c05, 4); updateTextboxArrow(gb); return; } I(0x4c05, 3);  // jp z,$5314
+  if ((F & FZ)) { I(0x4c05, 4); if (hook_enabled_at(0x5314)) { updateTextboxArrow_hook(gb); return; } HANDOFF(0x5314); } I(0x4c05, 3);  // jp z,$5314
   I(0x4c08, 2); A = 0x89;  // ld a,$89
   CALL(0x4c0a, playSound_b00_hook, 0x0c98, 0x4c0d);  // call $0c98
   I(0x4c0d, 1); H = D;  // ld h,d
@@ -3038,8 +3038,8 @@ L_4c31:
   I(0x4c3d, 1); L = A;  // ld l,a
   I(0x4c3e, 2); H = 0xd0;  // ld h,$d0
   I(0x4c40, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  CALL(0x4c42, shiftTextboxMapUp, 0x537d, 0x4c45);  // call $537d
-  I(0x4c45, 4); clearTopRowOfTextMap(gb); return;  // jp $5354
+  CALL(0x4c42, shiftTextboxMapUp_hook, 0x537d, 0x4c45);  // call $537d
+  I(0x4c45, 4); if (hook_enabled_at(0x5354)) { clearTopRowOfTextMap_hook(gb); return; } HANDOFF(0x5354);  // jp $5354
 }
 
 // 3f:4c14
@@ -3049,7 +3049,7 @@ L_4c14:
   I(0x4c14, 1); H = D;  // ld h,d
   I(0x4c15, 1); L = E;  // ld l,e
   I(0x4c16, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4c17, 4); dmaTextboxMap(gb); return;  // jp $5173
+  I(0x4c17, 4); if (hook_enabled_at(0x5173)) { dmaTextboxMap_hook(gb); return; } HANDOFF(0x5173);  // jp $5173
 }
 
 // 3f:4c1a
@@ -3059,8 +3059,8 @@ L_4c1a:
   I(0x4c1a, 1); H = D;  // ld h,d
   I(0x4c1b, 1); L = E;  // ld l,e
   I(0x4c1c, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x4c1d, shiftTextboxMapUp, 0x537d, 0x4c20);  // call $537d
-  I(0x4c20, 4); subFirstRowOfTextMapBy20(gb); return;  // jp $53b3
+  CALL(0x4c1d, shiftTextboxMapUp_hook, 0x537d, 0x4c20);  // call $537d
+  I(0x4c20, 4); if (hook_enabled_at(0x53b3)) { subFirstRowOfTextMapBy20_hook(gb); return; } HANDOFF(0x53b3);  // jp $53b3
 }
 
 // 3f:4c23
@@ -3073,7 +3073,7 @@ L_4c23:
   I(0x4c26, 2); L = 0xc5;  // ld l,$c5
   I(0x4c28, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x4c29, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x4c2a, dmaTextboxMap, 0x5173, 0x4c2d);  // call $5173
+  CALL(0x4c2a, dmaTextboxMap_hook, 0x5173, 0x4c2d);  // call $5173
   I(0x4c2d, 1); alu_xor(gb, A);  // xor a
   I(0x4c2e, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 }
@@ -3093,8 +3093,8 @@ L_4c31:
   I(0x4c3d, 1); L = A;  // ld l,a
   I(0x4c3e, 2); H = 0xd0;  // ld h,$d0
   I(0x4c40, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  CALL(0x4c42, shiftTextboxMapUp, 0x537d, 0x4c45);  // call $537d
-  I(0x4c45, 4); clearTopRowOfTextMap(gb); return;  // jp $5354
+  CALL(0x4c42, shiftTextboxMapUp_hook, 0x537d, 0x4c45);  // call $537d
+  I(0x4c45, 4); if (hook_enabled_at(0x5354)) { clearTopRowOfTextMap_hook(gb); return; } HANDOFF(0x5354);  // jp $5354
 }
 
 // 3f:4c48
@@ -3107,7 +3107,7 @@ L_4c48:
   I(0x4c4c, 2); L = 0xc5;  // ld l,$c5
   I(0x4c4e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x4c4f, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x4c50, dmaTextboxMap, 0x5173, 0x4c53);  // call $5173
+  CALL(0x4c50, dmaTextboxMap_hook, 0x5173, 0x4c53);  // call $5173
   I(0x4c53, 1); alu_xor(gb, A);  // xor a
   I(0x4c54, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 }
@@ -3153,7 +3153,7 @@ L_4c8e:
   I(0x4c98, 2); C = 0x40;  // ld c,$40
   CALL(0x4c9a, giveTreasure_hook, 0x171c, 0x4c9d);  // call $171c
 L_4c9d:
-  I(0x4c9d, 4); saveTilesUnderTextbox(gb); return;  // jp $50dd
+  I(0x4c9d, 4); if (hook_enabled_at(0x50dd)) { saveTilesUnderTextbox_hook(gb); return; } HANDOFF(0x50dd);  // jp $50dd
 }
 
 // 3f:4c84
@@ -3175,7 +3175,7 @@ L_4c8e:
   I(0x4c98, 2); C = 0x40;  // ld c,$40
   CALL(0x4c9a, giveTreasure_hook, 0x171c, 0x4c9d);  // call $171c
 L_4c9d:
-  I(0x4c9d, 4); saveTilesUnderTextbox(gb); return;  // jp $50dd
+  I(0x4c9d, 4); if (hook_enabled_at(0x50dd)) { saveTilesUnderTextbox_hook(gb); return; } HANDOFF(0x50dd);  // jp $50dd
 }
 
 // 3f:4ca0
@@ -3232,7 +3232,7 @@ void updateTextbox__standardTextState10(GB *gb) {
 L_4cc1:
   I(0x4cc1, 1); alu_xor(gb, A);  // xor a
   I(0x4cc2, 4); mem_wr(gb, 0xcba0, A);  // ld ($cba0),a
-  I(0x4cc5, 4); dmaTextboxMap(gb); return;  // jp $5173
+  I(0x4cc5, 4); if (hook_enabled_at(0x5173)) { dmaTextboxMap_hook(gb); return; } HANDOFF(0x5173);  // jp $5173
 }
 
 // 3f:4cc8
@@ -3333,7 +3333,7 @@ L_4d12:
   I(0x4d16, 3); alu_bit(gb, 4, mem_rd(gb, HL));  // bit 4,(hl)
   if ((F & FZ)) { I(0x4d18, 3); goto L_4d2d; } I(0x4d18, 2);  // jr z,$4d2d
   PUSH(0x4d1a, HL);  // push hl
-  CALL(0x4d1b, readNextTextByte, 0x52fd, 0x4d1e);  // call $52fd
+  CALL(0x4d1b, readNextTextByte_hook, 0x52fd, 0x4d1e);  // call $52fd
   SET_HL(POP(0x4d1e));  // pop hl
   I(0x4d1f, 2); alu_cp(gb, 0xff);  // cp $ff
   if ((F & FZ)) { I(0x4d21, 4); goto L_4d2d; } I(0x4d21, 3);  // jp z,$4d2d
@@ -4014,7 +4014,7 @@ L_5027:
 L_5031:
   CALL(0x5031, incHlAndUpdateBank, 0x56d2, 0x5034);  // call $56d2
   CALL(0x5034, readByteFromW7ActiveBank_hook, 0x1949, 0x5037);  // call $1949
-  CALL(0x5037, getExtraTextIndex, 0x5305, 0x503a);  // call $5305
+  CALL(0x5037, getExtraTextIndex_hook, 0x5305, 0x503a);  // call $5305
   I(0x503a, 2); alu_cp(gb, 0xff);  // cp $ff
   if ((F & FZ)) { I(0x503c, 4); goto L_5044; } I(0x503c, 3);  // jp z,$5044
   I(0x503f, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
@@ -4082,7 +4082,7 @@ void checkInitialTextCommands__cmd8(GB *gb) {
 L_5031:
   CALL(0x5031, incHlAndUpdateBank, 0x56d2, 0x5034);  // call $56d2
   CALL(0x5034, readByteFromW7ActiveBank_hook, 0x1949, 0x5037);  // call $1949
-  CALL(0x5037, getExtraTextIndex, 0x5305, 0x503a);  // call $5305
+  CALL(0x5037, getExtraTextIndex_hook, 0x5305, 0x503a);  // call $5305
   I(0x503a, 2); alu_cp(gb, 0xff);  // cp $ff
   if ((F & FZ)) { I(0x503c, 4); goto L_5044; } I(0x503c, 3);  // jp z,$5044
   I(0x503f, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
@@ -4154,637 +4154,6 @@ L_5086:
   I(0x508e, 1); alu_xor(gb, A);  // xor a
   I(0x508f, 2); mem_wr(gb, DE, A);  // ld (de),a
   RET(0x5090); return;  // ret
-}
-
-// 3f:50dd
-void saveTilesUnderTextbox(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x50dd, 3); SET_HL(0xd0ca);  // ld hl,$d0ca
-  I(0x50e0, 2); E = mem_rd(gb, HL);  // ld e,(hl)
-  I(0x50e1, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x50e2, 2); D = mem_rd(gb, HL);  // ld d,(hl)
-  I(0x50e3, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x50e4, 2); L = mem_rd(gb, HL);  // ld l,(hl)
-  I(0x50e5, 2); H = 0xd0;  // ld h,$d0
-  CALL(0x50e7, saveTilesUnderTextbox__copyTileMap, 0x50f6, 0x50ea);  // call $50f6
-  I(0x50ea, 3); SET_HL(0xd0ca);  // ld hl,$d0ca
-  I(0x50ed, 2); E = mem_rd(gb, HL);  // ld e,(hl)
-  I(0x50ee, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x50ef, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x50f0, 2); alu_add(gb, 0x04);  // add $04
-  I(0x50f2, 1); D = A;  // ld d,a
-  I(0x50f3, 2); L = mem_rd(gb, HL);  // ld l,(hl)
-  I(0x50f4, 2); H = 0xd1;  // ld h,$d1
-L_50f6:
-  I(0x50f6, 2); A = 0x03;  // ld a,$03
-L_50f8:
-  PUSH(0x50f8, AF);  // push af
-  PUSH(0x50f9, HL);  // push hl
-  I(0x50fa, 4); A = mem_rd(gb, 0xd0c9);  // ld a,($d0c9)
-  I(0x50fd, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x50ff, 3); SET_HL(0xcd40);  // ld hl,$cd40
-  I(0x5102, 2); A = 0x02;  // ld a,$02
-L_5104:
-  PUSH(0x5104, AF);  // push af
-  I(0x5105, 1); A = E;  // ld a,e
-  I(0x5106, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x5108, 1); C = A;  // ld c,a
-  I(0x5109, 2); B = 0x20;  // ld b,$20
-L_510b:
-  I(0x510b, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x510c, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x510d, 1); A = E;  // ld a,e
-  I(0x510e, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x510f, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5111, 1); alu_or(gb, C);  // or c
-  I(0x5112, 1); E = A;  // ld e,a
-  I(0x5113, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x5114, 3); goto L_510b; } I(0x5114, 2);  // jr nz,$510b
-  I(0x5116, 2); A = 0x20;  // ld a,$20
-  CALL(0x5118, addAToDe_hook, 0x0068, 0x511b);  // call $0068
-  SET_AF(POP(0x511b));  // pop af
-  I(0x511c, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x511d, 3); goto L_5104; } I(0x511d, 2);  // jr nz,$5104
-  I(0x511f, 2); A = 0x07;  // ld a,$07
-  I(0x5121, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  SET_HL(POP(0x5123));  // pop hl
-  PUSH(0x5124, DE);  // push de
-  I(0x5125, 3); SET_DE(0xcd40);  // ld de,$cd40
-  I(0x5128, 2); A = 0x02;  // ld a,$02
-L_512a:
-  PUSH(0x512a, AF);  // push af
-  I(0x512b, 1); A = L;  // ld a,l
-  I(0x512c, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x512e, 1); C = A;  // ld c,a
-  I(0x512f, 2); B = 0x20;  // ld b,$20
-L_5131:
-  I(0x5131, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5132, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5133, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x5134, 1); A = L;  // ld a,l
-  I(0x5135, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5136, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5138, 1); alu_or(gb, C);  // or c
-  I(0x5139, 1); L = A;  // ld l,a
-  I(0x513a, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x513b, 3); goto L_5131; } I(0x513b, 2);  // jr nz,$5131
-  I(0x513d, 2); A = 0x20;  // ld a,$20
-  RST_PUSH(0x513f, 0x5140);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  SET_AF(POP(0x5140));  // pop af
-  I(0x5141, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5142, 3); goto L_512a; } I(0x5142, 2);  // jr nz,$512a
-  SET_DE(POP(0x5144));  // pop de
-  SET_AF(POP(0x5145));  // pop af
-  I(0x5146, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5147, 3); goto L_50f8; } I(0x5147, 2);  // jr nz,$50f8
-  RET(0x5149); return;  // ret
-}
-
-// 3f:50f6
-void saveTilesUnderTextbox__copyTileMap(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_50f6:
-  I(0x50f6, 2); A = 0x03;  // ld a,$03
-L_50f8:
-  PUSH(0x50f8, AF);  // push af
-  PUSH(0x50f9, HL);  // push hl
-  I(0x50fa, 4); A = mem_rd(gb, 0xd0c9);  // ld a,($d0c9)
-  I(0x50fd, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x50ff, 3); SET_HL(0xcd40);  // ld hl,$cd40
-  I(0x5102, 2); A = 0x02;  // ld a,$02
-L_5104:
-  PUSH(0x5104, AF);  // push af
-  I(0x5105, 1); A = E;  // ld a,e
-  I(0x5106, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x5108, 1); C = A;  // ld c,a
-  I(0x5109, 2); B = 0x20;  // ld b,$20
-L_510b:
-  I(0x510b, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x510c, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x510d, 1); A = E;  // ld a,e
-  I(0x510e, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x510f, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5111, 1); alu_or(gb, C);  // or c
-  I(0x5112, 1); E = A;  // ld e,a
-  I(0x5113, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x5114, 3); goto L_510b; } I(0x5114, 2);  // jr nz,$510b
-  I(0x5116, 2); A = 0x20;  // ld a,$20
-  CALL(0x5118, addAToDe_hook, 0x0068, 0x511b);  // call $0068
-  SET_AF(POP(0x511b));  // pop af
-  I(0x511c, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x511d, 3); goto L_5104; } I(0x511d, 2);  // jr nz,$5104
-  I(0x511f, 2); A = 0x07;  // ld a,$07
-  I(0x5121, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  SET_HL(POP(0x5123));  // pop hl
-  PUSH(0x5124, DE);  // push de
-  I(0x5125, 3); SET_DE(0xcd40);  // ld de,$cd40
-  I(0x5128, 2); A = 0x02;  // ld a,$02
-L_512a:
-  PUSH(0x512a, AF);  // push af
-  I(0x512b, 1); A = L;  // ld a,l
-  I(0x512c, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x512e, 1); C = A;  // ld c,a
-  I(0x512f, 2); B = 0x20;  // ld b,$20
-L_5131:
-  I(0x5131, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5132, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5133, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x5134, 1); A = L;  // ld a,l
-  I(0x5135, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5136, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5138, 1); alu_or(gb, C);  // or c
-  I(0x5139, 1); L = A;  // ld l,a
-  I(0x513a, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x513b, 3); goto L_5131; } I(0x513b, 2);  // jr nz,$5131
-  I(0x513d, 2); A = 0x20;  // ld a,$20
-  RST_PUSH(0x513f, 0x5140);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  SET_AF(POP(0x5140));  // pop af
-  I(0x5141, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5142, 3); goto L_512a; } I(0x5142, 2);  // jr nz,$512a
-  SET_DE(POP(0x5144));  // pop de
-  SET_AF(POP(0x5145));  // pop af
-  I(0x5146, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5147, 3); goto L_50f8; } I(0x5147, 2);  // jr nz,$50f8
-  RET(0x5149); return;  // ret
-}
-
-// 3f:50f8
-void saveTilesUnderTextbox__next2Rows(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_50f8:
-  PUSH(0x50f8, AF);  // push af
-  PUSH(0x50f9, HL);  // push hl
-  I(0x50fa, 4); A = mem_rd(gb, 0xd0c9);  // ld a,($d0c9)
-  I(0x50fd, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x50ff, 3); SET_HL(0xcd40);  // ld hl,$cd40
-  I(0x5102, 2); A = 0x02;  // ld a,$02
-L_5104:
-  PUSH(0x5104, AF);  // push af
-  I(0x5105, 1); A = E;  // ld a,e
-  I(0x5106, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x5108, 1); C = A;  // ld c,a
-  I(0x5109, 2); B = 0x20;  // ld b,$20
-L_510b:
-  I(0x510b, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x510c, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x510d, 1); A = E;  // ld a,e
-  I(0x510e, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x510f, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5111, 1); alu_or(gb, C);  // or c
-  I(0x5112, 1); E = A;  // ld e,a
-  I(0x5113, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x5114, 3); goto L_510b; } I(0x5114, 2);  // jr nz,$510b
-  I(0x5116, 2); A = 0x20;  // ld a,$20
-  CALL(0x5118, addAToDe_hook, 0x0068, 0x511b);  // call $0068
-  SET_AF(POP(0x511b));  // pop af
-  I(0x511c, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x511d, 3); goto L_5104; } I(0x511d, 2);  // jr nz,$5104
-  I(0x511f, 2); A = 0x07;  // ld a,$07
-  I(0x5121, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  SET_HL(POP(0x5123));  // pop hl
-  PUSH(0x5124, DE);  // push de
-  I(0x5125, 3); SET_DE(0xcd40);  // ld de,$cd40
-  I(0x5128, 2); A = 0x02;  // ld a,$02
-L_512a:
-  PUSH(0x512a, AF);  // push af
-  I(0x512b, 1); A = L;  // ld a,l
-  I(0x512c, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x512e, 1); C = A;  // ld c,a
-  I(0x512f, 2); B = 0x20;  // ld b,$20
-L_5131:
-  I(0x5131, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5132, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5133, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x5134, 1); A = L;  // ld a,l
-  I(0x5135, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5136, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5138, 1); alu_or(gb, C);  // or c
-  I(0x5139, 1); L = A;  // ld l,a
-  I(0x513a, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x513b, 3); goto L_5131; } I(0x513b, 2);  // jr nz,$5131
-  I(0x513d, 2); A = 0x20;  // ld a,$20
-  RST_PUSH(0x513f, 0x5140);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  SET_AF(POP(0x5140));  // pop af
-  I(0x5141, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5142, 3); goto L_512a; } I(0x5142, 2);  // jr nz,$512a
-  SET_DE(POP(0x5144));  // pop de
-  SET_AF(POP(0x5145));  // pop af
-  I(0x5146, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5147, 3); goto L_50f8; } I(0x5147, 2);  // jr nz,$50f8
-  RET(0x5149); return;  // ret
-}
-
-// 3f:5104
-void saveTilesUnderTextbox__getNextRow(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_5104;
-L_50f8:
-  PUSH(0x50f8, AF);  // push af
-  PUSH(0x50f9, HL);  // push hl
-  I(0x50fa, 4); A = mem_rd(gb, 0xd0c9);  // ld a,($d0c9)
-  I(0x50fd, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x50ff, 3); SET_HL(0xcd40);  // ld hl,$cd40
-  I(0x5102, 2); A = 0x02;  // ld a,$02
-L_5104:
-  PUSH(0x5104, AF);  // push af
-  I(0x5105, 1); A = E;  // ld a,e
-  I(0x5106, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x5108, 1); C = A;  // ld c,a
-  I(0x5109, 2); B = 0x20;  // ld b,$20
-L_510b:
-  I(0x510b, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x510c, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x510d, 1); A = E;  // ld a,e
-  I(0x510e, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x510f, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5111, 1); alu_or(gb, C);  // or c
-  I(0x5112, 1); E = A;  // ld e,a
-  I(0x5113, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x5114, 3); goto L_510b; } I(0x5114, 2);  // jr nz,$510b
-  I(0x5116, 2); A = 0x20;  // ld a,$20
-  CALL(0x5118, addAToDe_hook, 0x0068, 0x511b);  // call $0068
-  SET_AF(POP(0x511b));  // pop af
-  I(0x511c, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x511d, 3); goto L_5104; } I(0x511d, 2);  // jr nz,$5104
-  I(0x511f, 2); A = 0x07;  // ld a,$07
-  I(0x5121, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  SET_HL(POP(0x5123));  // pop hl
-  PUSH(0x5124, DE);  // push de
-  I(0x5125, 3); SET_DE(0xcd40);  // ld de,$cd40
-  I(0x5128, 2); A = 0x02;  // ld a,$02
-L_512a:
-  PUSH(0x512a, AF);  // push af
-  I(0x512b, 1); A = L;  // ld a,l
-  I(0x512c, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x512e, 1); C = A;  // ld c,a
-  I(0x512f, 2); B = 0x20;  // ld b,$20
-L_5131:
-  I(0x5131, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5132, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5133, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x5134, 1); A = L;  // ld a,l
-  I(0x5135, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5136, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5138, 1); alu_or(gb, C);  // or c
-  I(0x5139, 1); L = A;  // ld l,a
-  I(0x513a, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x513b, 3); goto L_5131; } I(0x513b, 2);  // jr nz,$5131
-  I(0x513d, 2); A = 0x20;  // ld a,$20
-  RST_PUSH(0x513f, 0x5140);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  SET_AF(POP(0x5140));  // pop af
-  I(0x5141, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5142, 3); goto L_512a; } I(0x5142, 2);  // jr nz,$512a
-  SET_DE(POP(0x5144));  // pop de
-  SET_AF(POP(0x5145));  // pop af
-  I(0x5146, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5147, 3); goto L_50f8; } I(0x5147, 2);  // jr nz,$50f8
-  RET(0x5149); return;  // ret
-}
-
-// 3f:510b
-void saveTilesUnderTextbox__getNextTile(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_510b;
-L_50f8:
-  PUSH(0x50f8, AF);  // push af
-  PUSH(0x50f9, HL);  // push hl
-  I(0x50fa, 4); A = mem_rd(gb, 0xd0c9);  // ld a,($d0c9)
-  I(0x50fd, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x50ff, 3); SET_HL(0xcd40);  // ld hl,$cd40
-  I(0x5102, 2); A = 0x02;  // ld a,$02
-L_5104:
-  PUSH(0x5104, AF);  // push af
-  I(0x5105, 1); A = E;  // ld a,e
-  I(0x5106, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x5108, 1); C = A;  // ld c,a
-  I(0x5109, 2); B = 0x20;  // ld b,$20
-L_510b:
-  I(0x510b, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x510c, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x510d, 1); A = E;  // ld a,e
-  I(0x510e, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x510f, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5111, 1); alu_or(gb, C);  // or c
-  I(0x5112, 1); E = A;  // ld e,a
-  I(0x5113, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x5114, 3); goto L_510b; } I(0x5114, 2);  // jr nz,$510b
-  I(0x5116, 2); A = 0x20;  // ld a,$20
-  CALL(0x5118, addAToDe_hook, 0x0068, 0x511b);  // call $0068
-  SET_AF(POP(0x511b));  // pop af
-  I(0x511c, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x511d, 3); goto L_5104; } I(0x511d, 2);  // jr nz,$5104
-  I(0x511f, 2); A = 0x07;  // ld a,$07
-  I(0x5121, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  SET_HL(POP(0x5123));  // pop hl
-  PUSH(0x5124, DE);  // push de
-  I(0x5125, 3); SET_DE(0xcd40);  // ld de,$cd40
-  I(0x5128, 2); A = 0x02;  // ld a,$02
-L_512a:
-  PUSH(0x512a, AF);  // push af
-  I(0x512b, 1); A = L;  // ld a,l
-  I(0x512c, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x512e, 1); C = A;  // ld c,a
-  I(0x512f, 2); B = 0x20;  // ld b,$20
-L_5131:
-  I(0x5131, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5132, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5133, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x5134, 1); A = L;  // ld a,l
-  I(0x5135, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5136, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5138, 1); alu_or(gb, C);  // or c
-  I(0x5139, 1); L = A;  // ld l,a
-  I(0x513a, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x513b, 3); goto L_5131; } I(0x513b, 2);  // jr nz,$5131
-  I(0x513d, 2); A = 0x20;  // ld a,$20
-  RST_PUSH(0x513f, 0x5140);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  SET_AF(POP(0x5140));  // pop af
-  I(0x5141, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5142, 3); goto L_512a; } I(0x5142, 2);  // jr nz,$512a
-  SET_DE(POP(0x5144));  // pop de
-  SET_AF(POP(0x5145));  // pop af
-  I(0x5146, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5147, 3); goto L_50f8; } I(0x5147, 2);  // jr nz,$50f8
-  RET(0x5149); return;  // ret
-}
-
-// 3f:512a
-void saveTilesUnderTextbox__writeNextRow(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_512a;
-L_50f8:
-  PUSH(0x50f8, AF);  // push af
-  PUSH(0x50f9, HL);  // push hl
-  I(0x50fa, 4); A = mem_rd(gb, 0xd0c9);  // ld a,($d0c9)
-  I(0x50fd, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x50ff, 3); SET_HL(0xcd40);  // ld hl,$cd40
-  I(0x5102, 2); A = 0x02;  // ld a,$02
-L_5104:
-  PUSH(0x5104, AF);  // push af
-  I(0x5105, 1); A = E;  // ld a,e
-  I(0x5106, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x5108, 1); C = A;  // ld c,a
-  I(0x5109, 2); B = 0x20;  // ld b,$20
-L_510b:
-  I(0x510b, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x510c, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x510d, 1); A = E;  // ld a,e
-  I(0x510e, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x510f, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5111, 1); alu_or(gb, C);  // or c
-  I(0x5112, 1); E = A;  // ld e,a
-  I(0x5113, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x5114, 3); goto L_510b; } I(0x5114, 2);  // jr nz,$510b
-  I(0x5116, 2); A = 0x20;  // ld a,$20
-  CALL(0x5118, addAToDe_hook, 0x0068, 0x511b);  // call $0068
-  SET_AF(POP(0x511b));  // pop af
-  I(0x511c, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x511d, 3); goto L_5104; } I(0x511d, 2);  // jr nz,$5104
-  I(0x511f, 2); A = 0x07;  // ld a,$07
-  I(0x5121, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  SET_HL(POP(0x5123));  // pop hl
-  PUSH(0x5124, DE);  // push de
-  I(0x5125, 3); SET_DE(0xcd40);  // ld de,$cd40
-  I(0x5128, 2); A = 0x02;  // ld a,$02
-L_512a:
-  PUSH(0x512a, AF);  // push af
-  I(0x512b, 1); A = L;  // ld a,l
-  I(0x512c, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x512e, 1); C = A;  // ld c,a
-  I(0x512f, 2); B = 0x20;  // ld b,$20
-L_5131:
-  I(0x5131, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5132, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5133, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x5134, 1); A = L;  // ld a,l
-  I(0x5135, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5136, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5138, 1); alu_or(gb, C);  // or c
-  I(0x5139, 1); L = A;  // ld l,a
-  I(0x513a, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x513b, 3); goto L_5131; } I(0x513b, 2);  // jr nz,$5131
-  I(0x513d, 2); A = 0x20;  // ld a,$20
-  RST_PUSH(0x513f, 0x5140);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  SET_AF(POP(0x5140));  // pop af
-  I(0x5141, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5142, 3); goto L_512a; } I(0x5142, 2);  // jr nz,$512a
-  SET_DE(POP(0x5144));  // pop de
-  SET_AF(POP(0x5145));  // pop af
-  I(0x5146, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5147, 3); goto L_50f8; } I(0x5147, 2);  // jr nz,$50f8
-  RET(0x5149); return;  // ret
-}
-
-// 3f:5131
-void saveTilesUnderTextbox__writeNextTile(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_5131;
-L_50f8:
-  PUSH(0x50f8, AF);  // push af
-  PUSH(0x50f9, HL);  // push hl
-  I(0x50fa, 4); A = mem_rd(gb, 0xd0c9);  // ld a,($d0c9)
-  I(0x50fd, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x50ff, 3); SET_HL(0xcd40);  // ld hl,$cd40
-  I(0x5102, 2); A = 0x02;  // ld a,$02
-L_5104:
-  PUSH(0x5104, AF);  // push af
-  I(0x5105, 1); A = E;  // ld a,e
-  I(0x5106, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x5108, 1); C = A;  // ld c,a
-  I(0x5109, 2); B = 0x20;  // ld b,$20
-L_510b:
-  I(0x510b, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x510c, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x510d, 1); A = E;  // ld a,e
-  I(0x510e, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x510f, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5111, 1); alu_or(gb, C);  // or c
-  I(0x5112, 1); E = A;  // ld e,a
-  I(0x5113, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x5114, 3); goto L_510b; } I(0x5114, 2);  // jr nz,$510b
-  I(0x5116, 2); A = 0x20;  // ld a,$20
-  CALL(0x5118, addAToDe_hook, 0x0068, 0x511b);  // call $0068
-  SET_AF(POP(0x511b));  // pop af
-  I(0x511c, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x511d, 3); goto L_5104; } I(0x511d, 2);  // jr nz,$5104
-  I(0x511f, 2); A = 0x07;  // ld a,$07
-  I(0x5121, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  SET_HL(POP(0x5123));  // pop hl
-  PUSH(0x5124, DE);  // push de
-  I(0x5125, 3); SET_DE(0xcd40);  // ld de,$cd40
-  I(0x5128, 2); A = 0x02;  // ld a,$02
-L_512a:
-  PUSH(0x512a, AF);  // push af
-  I(0x512b, 1); A = L;  // ld a,l
-  I(0x512c, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x512e, 1); C = A;  // ld c,a
-  I(0x512f, 2); B = 0x20;  // ld b,$20
-L_5131:
-  I(0x5131, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5132, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5133, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x5134, 1); A = L;  // ld a,l
-  I(0x5135, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5136, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5138, 1); alu_or(gb, C);  // or c
-  I(0x5139, 1); L = A;  // ld l,a
-  I(0x513a, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x513b, 3); goto L_5131; } I(0x513b, 2);  // jr nz,$5131
-  I(0x513d, 2); A = 0x20;  // ld a,$20
-  RST_PUSH(0x513f, 0x5140);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  SET_AF(POP(0x5140));  // pop af
-  I(0x5141, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5142, 3); goto L_512a; } I(0x5142, 2);  // jr nz,$512a
-  SET_DE(POP(0x5144));  // pop de
-  SET_AF(POP(0x5145));  // pop af
-  I(0x5146, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5147, 3); goto L_50f8; } I(0x5147, 2);  // jr nz,$50f8
-  RET(0x5149); return;  // ret
-}
-
-// 3f:5173
-void dmaTextboxMap(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5173, 4); A = mem_rd(gb, 0xcba7);  // ld a,($cba7)
-  I(0x5176, 2); alu_add(gb, 0x03);  // add $03
-  I(0x5178, 1); C = A;  // ld c,a
-  I(0x5179, 3); SET_HL(0xd0d8);  // ld hl,$d0d8
-  I(0x517c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x517d, 1); E = A;  // ld e,a
-  I(0x517e, 2); alu_cp(gb, 0x61);  // cp $61
-  I(0x5180, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5181, 1); D = A;  // ld d,a
-  if ((F & FC)) { I(0x5182, 3); goto L_5187; } I(0x5182, 2);  // jr c,$5187
-  I(0x5184, 1); alu_cp(gb, C);  // cp c
-  if ((F & FZ)) { I(0x5185, 3); goto L_5198; } I(0x5185, 2);  // jr z,$5198
-L_5187:
-  I(0x5187, 2); B = 0x09;  // ld b,$09
-  I(0x5189, 3); SET_HL(0xd000);  // ld hl,$d000
-L_518c:
-  I(0x518c, 2); C = 0x07;  // ld c,$07
-  PUSH(0x518e, HL);  // push hl
-  CALL(0x518f, queueDmaTransfer_hook, 0x058a, 0x5192);  // call $058a
-  SET_HL(POP(0x5192));  // pop hl
-  I(0x5193, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x5194, 1); H = alu_inc8(gb, H);  // inc h
-  I(0x5195, 4); if (hook_enabled_at(0x058a)) { queueDmaTransfer_hook(gb); return; } HANDOFF(0x058a);  // jp $058a
-L_5198:
-  I(0x5198, 1); alu_xor(gb, A);  // xor a
-  I(0x5199, 1); alu_sub(gb, E);  // sub e
-  I(0x519a, 1); C = A;  // ld c,a
-  I(0x519b, 2); A = alu_swap(gb, A);  // swap a
-  I(0x519d, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x519e, 1); B = A;  // ld b,a
-  I(0x519f, 3); SET_HL(0xd000);  // ld hl,$d000
-  PUSH(0x51a2, BC);  // push bc
-  CALL(0x51a3, dmaTextboxMap__func, 0x518c, 0x51a6);  // call $518c
-  SET_BC(POP(0x51a6));  // pop bc
-  I(0x51a7, 4); A = mem_rd(gb, 0xcba7);  // ld a,($cba7)
-  I(0x51aa, 1); D = A;  // ld d,a
-  I(0x51ab, 2); E = 0x00;  // ld e,$00
-  I(0x51ad, 1); L = C;  // ld l,c
-  I(0x51ae, 2); H = 0xd0;  // ld h,$d0
-  I(0x51b0, 2); A = 0xa0;  // ld a,$a0
-  I(0x51b2, 1); alu_sub(gb, C);  // sub c
-  I(0x51b3, 2); A = alu_swap(gb, A);  // swap a
-  I(0x51b5, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x51b6, 1); B = A;  // ld b,a
-  I(0x51b7, 3); goto L_518c;  // jr $518c
-}
-
-// 3f:518c
-void dmaTextboxMap__func(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_518c:
-  I(0x518c, 2); C = 0x07;  // ld c,$07
-  PUSH(0x518e, HL);  // push hl
-  CALL(0x518f, queueDmaTransfer_hook, 0x058a, 0x5192);  // call $058a
-  SET_HL(POP(0x5192));  // pop hl
-  I(0x5193, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x5194, 1); H = alu_inc8(gb, H);  // inc h
-  I(0x5195, 4); if (hook_enabled_at(0x058a)) { queueDmaTransfer_hook(gb); return; } HANDOFF(0x058a);  // jp $058a
-}
-
-// 3f:51b9
-void updateCharacterDisplayTimer(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x51b9, 1); H = D;  // ld h,d
-  I(0x51ba, 2); L = 0xee;  // ld l,$ee
-  I(0x51bc, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x51bd, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x51be, 3); goto L_51c1; } I(0x51be, 2);  // jr z,$51c1
-  I(0x51c0, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-L_51c1:
-  I(0x51c1, 2); L = 0xd7;  // ld l,$d7
-  I(0x51c3, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x51c4, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x51c5, 3); goto L_51ca; } I(0x51c5, 2);  // jr z,$51ca
-  I(0x51c7, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x51c8, 3); goto L_51d1; } I(0x51c8, 2);  // jr nz,$51d1
-L_51ca:
-  I(0x51ca, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x51cd, 2); alu_and(gb, 0x03);  // and $03
-  if (!(F & FZ)) { I(0x51cf, 3); goto L_51d5; } I(0x51cf, 2);  // jr nz,$51d5
-L_51d1:
-  I(0x51d1, 2); L = 0xc6;  // ld l,$c6
-  I(0x51d3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  RET(0x51d4); return;  // ret
-L_51d5:
-  I(0x51d5, 2); L = 0xc1;  // ld l,$c1
-  I(0x51d7, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x51d9, 1); alu_xor(gb, A);  // xor a
-  RET(0x51da); return;  // ret
-}
-
-// 3f:51ca
-void updateCharacterDisplayTimer__checkInput(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_51ca:
-  I(0x51ca, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x51cd, 2); alu_and(gb, 0x03);  // and $03
-  if (!(F & FZ)) { I(0x51cf, 3); goto L_51d5; } I(0x51cf, 2);  // jr nz,$51d5
-L_51d1:
-  I(0x51d1, 2); L = 0xc6;  // ld l,$c6
-  I(0x51d3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  RET(0x51d4); return;  // ret
-L_51d5:
-  I(0x51d5, 2); L = 0xc1;  // ld l,$c1
-  I(0x51d7, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x51d9, 1); alu_xor(gb, A);  // xor a
-  RET(0x51da); return;  // ret
-}
-
-// 3f:51d1
-void updateCharacterDisplayTimer__countdownToNextCharacter(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_51d1:
-  I(0x51d1, 2); L = 0xc6;  // ld l,$c6
-  I(0x51d3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  RET(0x51d4); return;  // ret
-}
-
-// 3f:51d5
-void updateCharacterDisplayTimer__skipToLineEnd(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_51d5:
-  I(0x51d5, 2); L = 0xc1;  // ld l,$c1
-  I(0x51d7, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x51d9, 1); alu_xor(gb, A);  // xor a
-  RET(0x51da); return;  // ret
 }
 
 // 3f:51db
@@ -4960,21 +4329,6 @@ L_527b:
   RET(0x5287); return;  // ret
 }
 
-// 3f:5288
-void getNextCharacterToDisplay(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5288, 2); E = 0xd0;  // ld e,$d0
-  I(0x528a, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x528b, 2); alu_cp(gb, 0x10);  // cp $10
-  if ((F & FZ)) { RET_TAKEN(0x528d); return; } I(0x528d, 2);  // ret z
-  I(0x528e, 2); alu_add(gb, 0x00);  // add $00
-  I(0x5290, 1); L = A;  // ld l,a
-  I(0x5291, 2); H = 0xd4;  // ld h,$d4
-  I(0x5293, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5294, 1); alu_or(gb, A);  // or a
-  RET(0x5295); return;  // ret
-}
-
 // 3f:52c8
 void label_3f_155(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -4998,7 +4352,7 @@ L_52d1:
 // 3f:52e4
 void label_3f_157(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x52e4, updateTextboxArrow, 0x5314, 0x52e7);  // call $5314
+  CALL(0x52e4, updateTextboxArrow_hook, 0x5314, 0x52e7);  // call $5314
   I(0x52e7, 1); alu_or(gb, H);  // or h
   RET(0x52e8); return;  // ret
 }
@@ -5031,285 +4385,6 @@ L_52f1:
   I(0x52f8, 2); alu_and(gb, 0x07);  // and $07
   if (!(F & FZ)) { I(0x52fa, 3); goto L_52f1; } I(0x52fa, 2);  // jr nz,$52f1
   RET(0x52fc); return;  // ret
-}
-
-// 3f:52fd
-void readNextTextByte(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x52fd, 2); L = 0xd5;  // ld l,$d5
-  I(0x52ff, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x5300, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x5301, 1); L = A;  // ld l,a
-  CALL(0x5302, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5305);  // call $56cf
-  getExtraTextIndex(gb); return;  // fallthrough
-}
-
-// 3f:5305
-void getExtraTextIndex(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5305, 3); SET_HL(0x5915);  // ld hl,$5915
-  RST_PUSH(0x5308, 0x5309);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x5309, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x530a, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x530b, 1); L = A;  // ld l,a
-  I(0x530c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x530d, 1); C = A;  // ld c,a
-  I(0x530e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x530f, 1); B = A;  // ld b,a
-  I(0x5310, 2); A = mem_rd(gb, BC);  // ld a,(bc)
-  RST_PUSH(0x5311, 0x5312);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x5312, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  RET(0x5313); return;  // ret
-}
-
-// 3f:5314
-void updateTextboxArrow(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5314, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
-  I(0x5317, 2); alu_and(gb, 0x0f);  // and $0f
-  if (!(F & FZ)) { RET_TAKEN(0x5319); return; } I(0x5319, 2);  // ret nz
-  I(0x531a, 2); E = 0xcc;  // ld e,$cc
-  I(0x531c, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x531d, 2); alu_add(gb, 0x12);  // add $12
-  I(0x531f, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5321, 2); alu_add(gb, 0x80);  // add $80
-  I(0x5323, 1); L = A;  // ld l,a
-  I(0x5324, 2); H = 0xd0;  // ld h,$d0
-  I(0x5326, 2); E = 0xc8;  // ld e,$c8
-  I(0x5328, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5329, 2); alu_cp(gb, 0x03);  // cp $03
-  I(0x532b, 2); A = 0x02;  // ld a,$02
-  if ((F & FZ)) { I(0x532d, 3); goto L_5331; } I(0x532d, 2);  // jr z,$5331
-  I(0x532f, 2); A = 0x03;  // ld a,$03
-L_5331:
-  I(0x5331, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x5332, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5333, 4); A = mem_rd(gb, 0xcba7);  // ld a,($cba7)
-  I(0x5336, 2); alu_add(gb, 0x04);  // add $04
-  I(0x5338, 1); C = A;  // ld c,a
-  I(0x5339, 2); L = 0x80;  // ld l,$80
-  I(0x533b, 2); H = 0xd0;  // ld h,$d0
-  I(0x533d, 2); E = 0xd8;  // ld e,$d8
-  I(0x533f, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5340, 1); alu_add(gb, L);  // add l
-  I(0x5341, 1); B = A;  // ld b,a
-  I(0x5342, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x5343, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5344, 2); alu_adc(gb, 0x00);  // adc $00
-  I(0x5346, 1); alu_cp(gb, C);  // cp c
-  if ((F & FC)) { I(0x5347, 3); goto L_534c; } I(0x5347, 2);  // jr c,$534c
-  I(0x5349, 4); A = mem_rd(gb, 0xcba7);  // ld a,($cba7)
-L_534c:
-  I(0x534c, 1); D = A;  // ld d,a
-  I(0x534d, 1); E = B;  // ld e,b
-  I(0x534e, 3); SET_BC(0x0107);  // ld bc,$0107
-  I(0x5351, 4); if (hook_enabled_at(0x058a)) { queueDmaTransfer_hook(gb); return; } HANDOFF(0x058a);  // jp $058a
-}
-
-// 3f:5354
-void clearTopRowOfTextMap(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5354, 2); H = 0xd0;  // ld h,$d0
-  I(0x5356, 4); A = mem_rd(gb, 0xd0cc);  // ld a,($d0cc)
-  I(0x5359, 2); alu_add(gb, 0x02);  // add $02
-  I(0x535b, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x535d, 1); L = A;  // ld l,a
-  I(0x535e, 1); C = A;  // ld c,a
-  I(0x535f, 2); B = 0x10;  // ld b,$10
-  I(0x5361, 2); A = 0x02;  // ld a,$02
-  PUSH(0x5363, BC);  // push bc
-  CALL(0x5364, clearTopRowOfTextMap__func, 0x536d, 0x5367);  // call $536d
-  SET_BC(POP(0x5367));  // pop bc
-  I(0x5368, 2); H = 0xd1;  // ld h,$d1
-  I(0x536a, 1); L = C;  // ld l,c
-  I(0x536b, 2); A = 0x80;  // ld a,$80
-L_536d:
-  I(0x536d, 1); C = A;  // ld c,a
-  I(0x536e, 1); A = L;  // ld a,l
-  I(0x536f, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x5371, 1); E = A;  // ld e,a
-L_5372:
-  I(0x5372, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x5373, 1); A = L;  // ld a,l
-  I(0x5374, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5375, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5377, 1); alu_or(gb, E);  // or e
-  I(0x5378, 1); L = A;  // ld l,a
-  I(0x5379, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x537a, 3); goto L_5372; } I(0x537a, 2);  // jr nz,$5372
-  RET(0x537c); return;  // ret
-}
-
-// 3f:536d
-void clearTopRowOfTextMap__func(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_536d:
-  I(0x536d, 1); C = A;  // ld c,a
-  I(0x536e, 1); A = L;  // ld a,l
-  I(0x536f, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x5371, 1); E = A;  // ld e,a
-L_5372:
-  I(0x5372, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x5373, 1); A = L;  // ld a,l
-  I(0x5374, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5375, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5377, 1); alu_or(gb, E);  // or e
-  I(0x5378, 1); L = A;  // ld l,a
-  I(0x5379, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x537a, 3); goto L_5372; } I(0x537a, 2);  // jr nz,$5372
-  RET(0x537c); return;  // ret
-}
-
-// 3f:537d
-void shiftTextboxMapUp(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x537d, 2); H = 0xd0;  // ld h,$d0
-  CALL(0x537f, shiftTextboxMapUp__func, 0x5384, 0x5382);  // call $5384
-  I(0x5382, 2); H = 0xd1;  // ld h,$d1
-L_5384:
-  I(0x5384, 1); D = H;  // ld d,h
-  I(0x5385, 4); A = mem_rd(gb, 0xd0cc);  // ld a,($d0cc)
-  I(0x5388, 2); alu_add(gb, 0x02);  // add $02
-  I(0x538a, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x538c, 1); E = A;  // ld e,a
-  I(0x538d, 2); alu_add(gb, 0x20);  // add $20
-  I(0x538f, 1); L = A;  // ld l,a
-  I(0x5390, 1); B = A;  // ld b,a
-  I(0x5391, 2); C = 0x04;  // ld c,$04
-L_5393:
-  PUSH(0x5393, BC);  // push bc
-  I(0x5394, 1); A = E;  // ld a,e
-  I(0x5395, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x5397, 1); C = A;  // ld c,a
-  I(0x5398, 2); B = 0x10;  // ld b,$10
-L_539a:
-  I(0x539a, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x539b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x539c, 1); A = E;  // ld a,e
-  I(0x539d, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x539e, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x53a0, 1); alu_or(gb, C);  // or c
-  I(0x53a1, 1); E = A;  // ld e,a
-  I(0x53a2, 2); alu_add(gb, 0x20);  // add $20
-  I(0x53a4, 1); L = A;  // ld l,a
-  I(0x53a5, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x53a6, 3); goto L_539a; } I(0x53a6, 2);  // jr nz,$539a
-  SET_BC(POP(0x53a8));  // pop bc
-  I(0x53a9, 1); E = B;  // ld e,b
-  I(0x53aa, 1); A = B;  // ld a,b
-  I(0x53ab, 2); alu_add(gb, 0x20);  // add $20
-  I(0x53ad, 1); L = A;  // ld l,a
-  I(0x53ae, 1); B = A;  // ld b,a
-  I(0x53af, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x53b0, 3); goto L_5393; } I(0x53b0, 2);  // jr nz,$5393
-  RET(0x53b2); return;  // ret
-}
-
-// 3f:5384
-void shiftTextboxMapUp__func(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5384:
-  I(0x5384, 1); D = H;  // ld d,h
-  I(0x5385, 4); A = mem_rd(gb, 0xd0cc);  // ld a,($d0cc)
-  I(0x5388, 2); alu_add(gb, 0x02);  // add $02
-  I(0x538a, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x538c, 1); E = A;  // ld e,a
-  I(0x538d, 2); alu_add(gb, 0x20);  // add $20
-  I(0x538f, 1); L = A;  // ld l,a
-  I(0x5390, 1); B = A;  // ld b,a
-  I(0x5391, 2); C = 0x04;  // ld c,$04
-L_5393:
-  PUSH(0x5393, BC);  // push bc
-  I(0x5394, 1); A = E;  // ld a,e
-  I(0x5395, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x5397, 1); C = A;  // ld c,a
-  I(0x5398, 2); B = 0x10;  // ld b,$10
-L_539a:
-  I(0x539a, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x539b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x539c, 1); A = E;  // ld a,e
-  I(0x539d, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x539e, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x53a0, 1); alu_or(gb, C);  // or c
-  I(0x53a1, 1); E = A;  // ld e,a
-  I(0x53a2, 2); alu_add(gb, 0x20);  // add $20
-  I(0x53a4, 1); L = A;  // ld l,a
-  I(0x53a5, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x53a6, 3); goto L_539a; } I(0x53a6, 2);  // jr nz,$539a
-  SET_BC(POP(0x53a8));  // pop bc
-  I(0x53a9, 1); E = B;  // ld e,b
-  I(0x53aa, 1); A = B;  // ld a,b
-  I(0x53ab, 2); alu_add(gb, 0x20);  // add $20
-  I(0x53ad, 1); L = A;  // ld l,a
-  I(0x53ae, 1); B = A;  // ld b,a
-  I(0x53af, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x53b0, 3); goto L_5393; } I(0x53b0, 2);  // jr nz,$5393
-  RET(0x53b2); return;  // ret
-}
-
-// 3f:53b3
-void subFirstRowOfTextMapBy20(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x53b3, 2); H = 0xd0;  // ld h,$d0
-  I(0x53b5, 2); B = 0x00;  // ld b,$00
-  CALL(0x53b7, subFirstRowOfTextMapBy20__func, 0x53bc, 0x53ba);  // call $53bc
-  I(0x53ba, 2); B = 0x20;  // ld b,$20
-L_53bc:
-  I(0x53bc, 4); A = mem_rd(gb, 0xd0cc);  // ld a,($d0cc)
-  I(0x53bf, 2); alu_add(gb, 0x02);  // add $02
-  I(0x53c1, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x53c3, 1); alu_add(gb, B);  // add b
-  I(0x53c4, 1); L = A;  // ld l,a
-  I(0x53c5, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x53c7, 1); C = A;  // ld c,a
-  I(0x53c8, 2); B = 0x10;  // ld b,$10
-L_53ca:
-  I(0x53ca, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x53cb, 2); alu_and(gb, 0x60);  // and $60
-  I(0x53cd, 2); alu_cp(gb, 0x60);  // cp $60
-  if (!(F & FZ)) { I(0x53cf, 3); goto L_53d3; } I(0x53cf, 2);  // jr nz,$53d3
-  I(0x53d1, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 5)));  // res 5,(hl)
-L_53d3:
-  I(0x53d3, 1); A = L;  // ld a,l
-  I(0x53d4, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x53d5, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x53d7, 1); alu_or(gb, C);  // or c
-  I(0x53d8, 1); L = A;  // ld l,a
-  I(0x53d9, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x53da, 3); goto L_53ca; } I(0x53da, 2);  // jr nz,$53ca
-  RET(0x53dc); return;  // ret
-}
-
-// 3f:53bc
-void subFirstRowOfTextMapBy20__func(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_53bc:
-  I(0x53bc, 4); A = mem_rd(gb, 0xd0cc);  // ld a,($d0cc)
-  I(0x53bf, 2); alu_add(gb, 0x02);  // add $02
-  I(0x53c1, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x53c3, 1); alu_add(gb, B);  // add b
-  I(0x53c4, 1); L = A;  // ld l,a
-  I(0x53c5, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x53c7, 1); C = A;  // ld c,a
-  I(0x53c8, 2); B = 0x10;  // ld b,$10
-L_53ca:
-  I(0x53ca, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x53cb, 2); alu_and(gb, 0x60);  // and $60
-  I(0x53cd, 2); alu_cp(gb, 0x60);  // cp $60
-  if (!(F & FZ)) { I(0x53cf, 3); goto L_53d3; } I(0x53cf, 2);  // jr nz,$53d3
-  I(0x53d1, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 5)));  // res 5,(hl)
-L_53d3:
-  I(0x53d3, 1); A = L;  // ld a,l
-  I(0x53d4, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x53d5, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x53d7, 1); alu_or(gb, C);  // or c
-  I(0x53d8, 1); L = A;  // ld l,a
-  I(0x53d9, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x53da, 3); goto L_53ca; } I(0x53da, 2);  // jr nz,$53ca
-  RET(0x53dc); return;  // ret
 }
 
 // 3f:549e
@@ -5902,7 +4977,7 @@ L_5651:
 void updateSelectedTextPositionAndDmaTextboxMap(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x565c, updateSelectedTextPosition, 0x55b4, 0x565f);  // call $55b4
-  I(0x565f, 4); dmaTextboxMap(gb); return;  // jp $5173
+  I(0x565f, 4); if (hook_enabled_at(0x5173)) { dmaTextboxMap_hook(gb); return; } HANDOFF(0x5173);  // jp $5173
 }
 
 // 3f:5662
@@ -10499,7 +9574,7 @@ void func_5296(GB *gb) {
   if (!(F & FZ)) { I(0x52a0, 3); label_3f_155(gb); return; } I(0x52a0, 2);  // jr nz,$52c8
   I(0x52a2, 2); alu_bit(gb, 4, A);  // bit 4,a
   if ((F & FZ)) { RET_TAKEN(0x52a4); return; } I(0x52a4, 2);  // ret z
-  CALL(0x52a5, readNextTextByte, 0x52fd, 0x52a8);  // call $52fd
+  CALL(0x52a5, readNextTextByte_hook, 0x52fd, 0x52a8);  // call $52fd
   I(0x52a8, 2); alu_cp(gb, 0xff);  // cp $ff
   if ((F & FZ)) { I(0x52aa, 3); label_3f_158(gb); return; } I(0x52aa, 2);  // jr z,$52e9
   I(0x52ac, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
@@ -10618,7 +9693,7 @@ L_5428:
   I(0x545c, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x545d, 2); alu_or(gb, 0x20);  // or $20
   I(0x545f, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x5460, dmaTextboxMap, 0x5173, 0x5463);  // call $5173
+  CALL(0x5460, dmaTextboxMap_hook, 0x5173, 0x5463);  // call $5173
   I(0x5463, 1); alu_or(gb, D);  // or d
   RET(0x5464); return;  // ret
 }
@@ -10679,7 +9754,7 @@ L_5428:
   I(0x545c, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x545d, 2); alu_or(gb, 0x20);  // or $20
   I(0x545f, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x5460, dmaTextboxMap, 0x5173, 0x5463);  // call $5173
+  CALL(0x5460, dmaTextboxMap_hook, 0x5173, 0x5463);  // call $5173
   I(0x5463, 1); alu_or(gb, D);  // or d
   RET(0x5464); return;  // ret
 }
@@ -10933,9 +10008,9 @@ void func_53dd(GB *gb) {
   I(0x53dd, 1); H = D;  // ld h,d
   I(0x53de, 2); L = 0xc1;  // ld l,$c1
   I(0x53e0, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 1)));  // res 1,(hl)
-  CALL(0x53e2, saveTilesUnderTextbox, 0x50dd, 0x53e5);  // call $50dd
+  CALL(0x53e2, saveTilesUnderTextbox_hook, 0x50dd, 0x53e5);  // call $50dd
   CALL(0x53e5, initTextboxMapping_hook, 0x514a, 0x53e8);  // call $514a
-  I(0x53e8, 4); dmaTextboxMap(gb); return;  // jp $5173
+  I(0x53e8, 4); if (hook_enabled_at(0x5173)) { dmaTextboxMap_hook(gb); return; } HANDOFF(0x5173);  // jp $5173
 }
 
 // 3f:751f
