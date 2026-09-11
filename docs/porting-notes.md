@@ -432,3 +432,12 @@ desync to discover; keep them when porting routines.
   `updateCharacterDisplayTimer`; cross-review against the report corrected the range to
   `$51b7`&ndash;`$51b9` before integration. Derive every burn endpoint from the opcode length even
   when a nearby routine boundary makes the cycle-count endpoint look plausible.
+- A C label must represent the exact ROM target, not merely a nearby block with similar intent.
+  Batch 44 initially sent `displayNextTextCharacter`'s backward `$522d` jump to the local
+  `$51e7` display block instead of the real `$51db` entry, skipping the character-width setup on
+  every loop. Cross-review of target addresses found it before replay. Give distinct labels to
+  distinct ROM addresses even when both paths rejoin only a few instructions later.
+- Every conditional return needs burns on both paths. Batch 44 modeled the taken `ret z` at
+  `$52a4` but went straight to the `$52a5` call on fallthrough, silently dropping the two-cycle
+  not-taken return. After writing a one-line early return, add the matching ordinary `CYC` before
+  the next instruction just as for a conditional `jr`.

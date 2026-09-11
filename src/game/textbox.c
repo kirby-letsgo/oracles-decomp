@@ -337,6 +337,170 @@ skip_to_line_end:
   CYC(0x51da, 0x51db); ret_effect(gb);
 }
 
+void displayNextTextCharacter_readSubsequentLineBuffers_hook(GB *gb);
+void displayNextTextCharacter_playSound_hook(GB *gb);
+void displayNextTextCharacter_checkCanAdvanceWithAB_hook(GB *gb);
+void label_3f_155_hook(GB *gb);
+void label_3f_157_hook(GB *gb);
+void label_3f_158_hook(GB *gb);
+void label_3f_159_hook(GB *gb);
+void label_3f_160_hook(GB *gb);
+
+void displayNextTextCharacter_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+start:
+  CYC(0x51db, 0x51dd); E = 0xd3;
+  CYC(0x51dd, 0x51de); A = mem_rd(gb, DE);
+  CYC(0x51de, 0x51df); C = A;
+  CYC(0x51df, 0x51e1); alu_cp(gb, 0x40);
+  CYC(0x51e1, 0x51e3); B = 0x00;
+  if (F & FZ) { CYCT(0x51e3, 0x51e5); goto display_character; }
+  CYC(0x51e3, 0x51e5);
+  CYC(0x51e5, 0x51e7); B = 0x40;
+display_character:
+  CYC(0x51e7, 0x51e9); E = 0xd0;
+  CYC(0x51e9, 0x51ea); A = mem_rd(gb, DE);
+  CYC(0x51ea, 0x51eb); L = A;
+  CYC(0x51eb, 0x51ed); E = 0xcc;
+  CYC(0x51ed, 0x51ee); A = mem_rd(gb, DE);
+  CYC(0x51ee, 0x51f0); alu_add(gb, 0x02);
+  CYC(0x51f0, 0x51f1); alu_add(gb, L);
+  CYC(0x51f1, 0x51f3); alu_and(gb, 0x1f);
+  CYC(0x51f3, 0x51f4); alu_add(gb, B);
+  CYC(0x51f4, 0x51f5); E = A;
+  CYC(0x51f5, 0x51f7); H = 0xd4;
+  CYC(0x51f7, 0x51f8); A = mem_rd(gb, HL);
+  CYC(0x51f8, 0x51f9); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x51f9, 0x51fb); goto end_line; }
+  CYC(0x51f9, 0x51fb);
+  CYC(0x51fb, 0x51fd); mem_wr(gb, 0xff8b, A);
+  CYC(0x51fd, 0x51ff); D = 0xd0;
+  CYC(0x51ff, 0x5200); A = L;
+  CYC(0x5200, 0x5201); alu_add(gb, A);
+  CYC(0x5201, 0x5202); alu_add(gb, C);
+  CYC(0x5202, 0x5203); B = A;
+  CYC(0x5203, 0x5204); B = alu_inc8(gb, B);
+  CYC(0x5204, 0x5205); mem_wr(gb, DE, A);
+  CYC(0x5205, 0x5206); A = E;
+  CYC(0x5206, 0x5208); alu_add(gb, 0x20);
+  CYC(0x5208, 0x5209); E = A;
+  CYC(0x5209, 0x520a); A = B;
+  CYC(0x520a, 0x520b); mem_wr(gb, DE, A);
+  CYC(0x520b, 0x520c); D = alu_inc8(gb, D);
+  CYC(0x520c, 0x520d); A = L;
+  CYC(0x520d, 0x520f); alu_add(gb, 0x10);
+  CYC(0x520f, 0x5210); L = A;
+  CYC(0x5210, 0x5211); A = mem_rd(gb, HL);
+  CYC(0x5211, 0x5212); mem_wr(gb, DE, A);
+  CYC(0x5212, 0x5213); A = E;
+  CYC(0x5213, 0x5215); alu_sub(gb, 0x20);
+  CYC(0x5215, 0x5216); E = A;
+  CYC(0x5216, 0x5217); A = mem_rd(gb, HL);
+  CYC(0x5217, 0x5218); mem_wr(gb, DE, A);
+  CYC(0x5218, 0x521a); D = 0xd0;
+  CYC(0x521a, 0x521c); E = 0xd0;
+  CYC(0x521c, 0x521d); A = mem_rd(gb, DE);
+  CYC(0x521d, 0x521e); A = alu_inc8(gb, A);
+  CYC(0x521e, 0x521f); mem_wr(gb, DE, A);
+  CYC(0x521f, 0x5221); alu_cp(gb, 0x10);
+  if (F & FZ) { CYCT(0x5221, 0x5223); goto end_line; }
+  CYC(0x5221, 0x5223);
+  CYC(0x5223, 0x5226); push_effect(gb, 0x5226);
+  displayNextTextCharacter_checkCanAdvanceWithAB_hook(gb);
+  if (!(F & FZ)) { CYCT(0x5226, 0x5228); goto read_subsequent_buffers; }
+  CYC(0x5226, 0x5228);
+  CYC(0x5228, 0x522a); E = 0xc1;
+  CYC(0x522a, 0x522b); A = mem_rd(gb, DE);
+  CYC(0x522b, 0x522d); alu_bit(gb, 0, A);
+  if (!(F & FZ)) { CYCT(0x522d, 0x522f); goto start; }
+  CYC(0x522d, 0x522f);
+read_subsequent_buffers:
+  CYC(0x522f, 0x5232); push_effect(gb, 0x5232);
+  displayNextTextCharacter_readSubsequentLineBuffers_hook(gb);
+  CYC(0x5232, 0x5233); alu_or(gb, D);
+  CYC(0x5233, 0x5234); ret_effect(gb);
+  return;
+end_line:
+  CYC(0x5234, 0x5235); H = D;
+  CYC(0x5235, 0x5237); L = 0xc1;
+  CYC(0x5237, 0x5239); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(0x5239, 0x523a); ret_effect(gb); return; }
+  CYC(0x5239, 0x523a);
+  CYC(0x523a, 0x523c); L = 0xee;
+  CYC(0x523c, 0x523d); A = mem_rd(gb, HL);
+  CYC(0x523d, 0x523e); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x523e, 0x5240); goto clear_a; }
+  CYC(0x523e, 0x5240);
+  CYC(0x5240, 0x5242); mem_wr(gb, HL, 0x04);
+  CYC(0x5242, 0x5244); L = 0xc4;
+  CYC(0x5244, 0x5245); A = mem_rd(gb, HL);
+  CALL_C(0x5245, playSound_b00_hook, 0x0c98, 0x5248);
+clear_a:
+  CYC(0x5248, 0x5249); alu_xor(gb, A);
+  CYC(0x5249, 0x524a); ret_effect(gb);
+}
+
+void displayNextTextCharacter_readSubsequentLineBuffers_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x524a, 0x524b); A = L;
+  CYC(0x524b, 0x524d); alu_add(gb, 0x10);
+  CYC(0x524d, 0x524e); L = A;
+  CYC(0x524e, 0x524f); A = mem_rd(gb, HL);
+  CYC(0x524f, 0x5251); E = 0xc6;
+  CYC(0x5251, 0x5252); mem_wr(gb, DE, A);
+  CYC(0x5252, 0x5253); A = L;
+  CYC(0x5253, 0x5255); alu_add(gb, 0x10);
+  CYC(0x5255, 0x5256); L = A;
+  CYC(0x5256, 0x5257); A = mem_rd(gb, HL);
+  CYC(0x5257, 0x5258); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x5258, 0x525a); goto read_sound_effect; }
+  CYC(0x5258, 0x525a);
+  CYC(0x525a, 0x525b); B = A;
+  CYC(0x525b, 0x525d); A = mem_rd(gb, 0xff8b);
+  CYC(0x525d, 0x525f); alu_cp(gb, 0x20);
+  if (F & FZ) { CYCT(0x525f, 0x5261); goto read_sound_effect; }
+  CYC(0x525f, 0x5261);
+  CYC(0x5261, 0x5263); E = 0xee;
+  CYC(0x5263, 0x5264); A = mem_rd(gb, DE);
+  CYC(0x5264, 0x5265); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x5265, 0x5267); goto read_sound_effect; }
+  CYC(0x5265, 0x5267);
+  CYC(0x5267, 0x5269); A = 0x04;
+  CYC(0x5269, 0x526a); mem_wr(gb, DE, A);
+  CYC(0x526a, 0x526b); A = B;
+  CYC(0x526b, 0x526e); push_effect(gb, 0x526e);
+  displayNextTextCharacter_playSound_hook(gb);
+read_sound_effect:
+  CYC(0x526e, 0x526f); A = L;
+  CYC(0x526f, 0x5271); alu_add(gb, 0x10);
+  CYC(0x5271, 0x5272); L = A;
+  CYC(0x5272, 0x5273); A = mem_rd(gb, HL);
+  CYC(0x5273, 0x5274); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x5274, 0x5275); ret_effect(gb); return; }
+  CYC(0x5274, 0x5275);
+  displayNextTextCharacter_playSound_hook(gb);
+}
+
+void displayNextTextCharacter_playSound_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5275, 0x5276); push_effect(gb, HL);
+  CALL_C(0x5276, playSound_b00_hook, 0x0c98, 0x5279);
+  CYC(0x5279, 0x527a); SET_HL(pop_effect(gb));
+  CYC(0x527a, 0x527b); ret_effect(gb);
+}
+
+void displayNextTextCharacter_checkCanAdvanceWithAB_hook(GB *gb) {
+  CYC(0x527b, 0x527c); push_effect(gb, HL);
+  CYC(0x527c, 0x527e); E = 0xd0;
+  CYC(0x527e, 0x527f); A = mem_rd(gb, DE);
+  CYC(0x527f, 0x5281); alu_add(gb, 0x50);
+  CYC(0x5281, 0x5282); L = A;
+  CYC(0x5282, 0x5284); H = 0xd4;
+  CYC(0x5284, 0x5286); alu_bit(gb, 0, mem_rd(gb, HL));
+  CYC(0x5286, 0x5287); SET_HL(pop_effect(gb));
+  CYC(0x5287, 0x5288); ret_effect(gb);
+}
+
 void getNextCharacterToDisplay_hook(GB *gb) {
   CYC(0x5288, 0x528a); E = 0xd0;
   CYC(0x528a, 0x528b); A = mem_rd(gb, DE);
@@ -349,6 +513,102 @@ void getNextCharacterToDisplay_hook(GB *gb) {
   CYC(0x5293, 0x5294); A = mem_rd(gb, HL);
   CYC(0x5294, 0x5295); alu_or(gb, A);
   CYC(0x5295, 0x5296); ret_effect(gb);
+}
+
+void func_5296_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5296, 0x5297); H = D;
+  CYC(0x5297, 0x5299); L = 0xc1;
+  CYC(0x5299, 0x529a); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x529a, 0x529c); alu_bit(gb, 2, A);
+  if (!(F & FZ)) { CYCT(0x529c, 0x529e); goto choose_option; }
+  CYC(0x529c, 0x529e);
+  CYC(0x529e, 0x52a0); alu_bit(gb, 1, A);
+  if (!(F & FZ)) { CYCT(0x52a0, 0x52a2); label_3f_155_hook(gb); return; }
+  CYC(0x52a0, 0x52a2);
+  CYC(0x52a2, 0x52a4); alu_bit(gb, 4, A);
+  if (F & FZ) { CYCT(0x52a4, 0x52a5); ret_effect(gb); return; }
+  CYC(0x52a4, 0x52a5);
+  CALL_C(0x52a5, readNextTextByte_hook, 0x52fd, 0x52a8);
+  CYC(0x52a8, 0x52aa); alu_cp(gb, 0xff);
+  if (F & FZ) { CYCT(0x52aa, 0x52ac); label_3f_158_hook(gb); return; }
+  CYC(0x52aa, 0x52ac);
+  CYC(0x52ac, 0x52af); mem_wr(gb, 0xcba2, A);
+  CALL_C(0x52af, checkInitialTextCommands, 0x4ff5, 0x52b2);
+  CYC(0x52b2, 0x52b4); E = 0xc1;
+  CYC(0x52b4, 0x52b5); alu_xor(gb, A);
+  CYC(0x52b5, 0x52b6); mem_wr(gb, DE, A);
+  CYC(0x52b6, 0x52b7); E = alu_inc8(gb, E);
+  CYC(0x52b7, 0x52b8); A = alu_inc8(gb, A);
+  CYC(0x52b8, 0x52b9); mem_wr(gb, DE, A);
+  CYC(0x52b9, 0x52ba); ret_effect(gb);
+  return;
+choose_option:
+  CYC(0x52ba, 0x52bc); E = 0xc2;
+  CYC(0x52bc, 0x52bd); A = mem_rd(gb, DE);
+  CYC(0x52bd, 0x52be); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x52be, 0x52c0); label_3f_159_hook(gb); return; }
+  CYC(0x52be, 0x52c0);
+  CYC(0x52c0, 0x52c1); mem_wr(gb, HL, A);
+  CYC(0x52c1, 0x52c3); A = 0x01;
+  CYC(0x52c3, 0x52c6); mem_wr(gb, 0xcba1, A);
+  CYC(0x52c6, 0x52c7); alu_or(gb, H);
+  CYC(0x52c7, 0x52c8); ret_effect(gb);
+}
+
+void label_3f_155_hook(GB *gb) {
+  CYC(0x52c8, 0x52ca); alu_bit(gb, 0, A);
+  if (F & FZ) { CYCT(0x52ca, 0x52cc); goto check_input; }
+  CYC(0x52ca, 0x52cc);
+  CYC(0x52cc, 0x52cd); L = alu_inc8(gb, L);
+  CYC(0x52cd, 0x52cf); mem_wr(gb, HL, mem_rd(gb, HL) & ~0x01);
+  CYC(0x52cf, 0x52d1); label_3f_157_hook(gb);
+  return;
+check_input:
+  CYC(0x52d1, 0x52d4); A = mem_rd(gb, 0xc482);
+  CYC(0x52d4, 0x52d6); alu_and(gb, 0x03);
+  if (F & FZ) { CYCT(0x52d6, 0x52d8); label_3f_157_hook(gb); return; }
+  CYC(0x52d6, 0x52d8);
+  CYC(0x52d8, 0x52da); mem_wr(gb, HL, 0x00);
+  CYC(0x52da, 0x52dc); L = 0xc1;
+  CYC(0x52dc, 0x52de); mem_wr(gb, HL, mem_rd(gb, HL) & ~0x02);
+  CYC(0x52de, 0x52df); SET_HL(pop_effect(gb));
+  CYC(0x52df, 0x52e1); A = 0x89;
+  CYC(0x52e1, 0x52e4); playSound_b00_hook(gb);
+}
+
+void label_3f_157_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x52e4, updateTextboxArrow_hook, 0x5314, 0x52e7);
+  CYC(0x52e7, 0x52e8); alu_or(gb, H);
+  CYC(0x52e8, 0x52e9); ret_effect(gb);
+}
+
+void label_3f_158_hook(GB *gb) {
+  CYC(0x52e9, 0x52ea); alu_xor(gb, A);
+  CYC(0x52ea, 0x52ed); mem_wr(gb, 0x00c2, A);
+  CYC(0x52ed, 0x52ee); ret_effect(gb);
+}
+
+void label_3f_159_hook(GB *gb) {
+  CYC(0x52ee, 0x52f1); SET_HL(0xd0e0);
+  label_3f_160_hook(gb);
+}
+
+void label_3f_160_hook(GB *gb) {
+  for (;;) {
+    CYC(0x52f1, 0x52f2); A = mem_rd(gb, HL);
+    CYC(0x52f2, 0x52f3); alu_or(gb, A);
+    if (F & FZ) { CYCT(0x52f3, 0x52f4); ret_effect(gb); return; }
+    CYC(0x52f3, 0x52f4);
+    CYC(0x52f4, 0x52f6); alu_xor(gb, 0x20);
+    CYC(0x52f6, 0x52f7); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x52f7, 0x52f8); A = L;
+    CYC(0x52f8, 0x52fa); alu_and(gb, 0x07);
+    if (!(F & FZ)) { CYCT(0x52fa, 0x52fc); continue; }
+    CYC(0x52fa, 0x52fc); ret_effect(gb);
+    return;
+  }
 }
 
 void readNextTextByte_hook(GB *gb) {
@@ -552,6 +812,130 @@ void subFirstRowOfTextMapBy20_hook(GB *gb) {
   subFirstRowOfTextMapBy20_func_hook(gb);
   CYC(0x53ba, 0x53bc); B = 0x20;
   subFirstRowOfTextMapBy20_func_hook(gb);
+}
+
+void func_53eb_func_hook(GB *gb);
+void func_53eb_dmaHeartPieceDisplay_hook(GB *gb);
+
+void func_53dd_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x53dd, 0x53de); H = D;
+  CYC(0x53de, 0x53e0); L = 0xc1;
+  CYC(0x53e0, 0x53e2); mem_wr(gb, HL, mem_rd(gb, HL) & ~0x02);
+  CALL_C(0x53e2, saveTilesUnderTextbox_hook, 0x50dd, 0x53e5);
+  CALL_C(0x53e5, initTextboxMapping_hook, 0x514a, 0x53e8);
+  CYC(0x53e8, 0x53eb); dmaTextboxMap_hook(gb);
+}
+
+void func_53eb_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x53eb, 0x53ec); H = D;
+  CYC(0x53ec, 0x53ee); L = 0xc1;
+  CYC(0x53ee, 0x53f0); alu_bit(gb, 5, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(0x53f0, 0x53f2); goto initialize_heart_piece; }
+  CYC(0x53f0, 0x53f2);
+  CYC(0x53f2, 0x53f4); L = 0xea;
+  CYC(0x53f4, 0x53f5); A = mem_rd(gb, HL);
+  CYC(0x53f5, 0x53f6); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x53f6, 0x53f7); ret_effect(gb); return; }
+  CYC(0x53f6, 0x53f7);
+  CYC(0x53f7, 0x53f8); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(0x53f8, 0x53f9); ret_effect(gb); return; }
+  CYC(0x53f8, 0x53f9);
+  CYC(0x53f9, 0x53fb); B = 0x00;
+  CYC(0x53fb, 0x53fe); push_effect(gb, 0x53fe);
+  func_53eb_func_hook(gb);
+  CYC(0x53fe, 0x5400); A = 0x89;
+  CALL_C(0x5400, playSound_b00_hook, 0x0c98, 0x5403);
+  CYC(0x5403, 0x5404); alu_xor(gb, A);
+  CYC(0x5404, 0x5405); ret_effect(gb);
+  return;
+initialize_heart_piece:
+  CYC(0x5405, 0x5407); mem_wr(gb, HL, mem_rd(gb, HL) & ~0x20);
+  CYC(0x5407, 0x5409); L = 0xea;
+  CYC(0x5409, 0x540b); mem_wr(gb, HL, 0x1e);
+  CYC(0x540b, 0x540d); L = 0xef;
+  CYC(0x540d, 0x540f); mem_wr(gb, HL, 0x01);
+  CYC(0x540f, 0x5412); push_effect(gb, 0x5412);
+  func_53eb_dmaHeartPieceDisplay_hook(gb);
+  CYC(0x5412, 0x5414); B = 0xff;
+  func_53eb_func_hook(gb);
+}
+
+void func_53eb_func_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5414, 0x5417); A = mem_rd(gb, 0xc6ac);
+  CYC(0x5417, 0x5418); alu_add(gb, B);
+  CYC(0x5418, 0x5419); alu_add(gb, A);
+  CYC(0x5419, 0x541a); push_effect(gb, AF);
+  CYC(0x541a, 0x541c); alu_sub(gb, 0x08);
+  if (!(F & FZ)) { CYCT(0x541c, 0x541e); goto select_heart_piece; }
+  CYC(0x541c, 0x541e);
+  CYC(0x541e, 0x5421); mem_wr(gb, 0xc6ac, A);
+  CYC(0x5421, 0x5422); A = alu_dec8(gb, A);
+  CYC(0x5422, 0x5425); mem_wr(gb, 0xcbe9, A);
+  CYC(0x5425, 0x5428); mem_wr(gb, 0xd0ef, A);
+select_heart_piece:
+  CYC(0x5428, 0x5429); SET_AF(pop_effect(gb));
+  CYC(0x5429, 0x542c); SET_HL(0x5465);
+  CYC(0x542c, 0x542d); add_double_index_to_hl(gb, 0x542d);
+  CYC(0x542d, 0x542f); D = 0xd0;
+  CYC(0x542f, 0x5432); A = mem_rd(gb, 0xd0cc);
+  CYC(0x5432, 0x5434); alu_add(gb, 0x11);
+  CYC(0x5434, 0x5436); alu_and(gb, 0x1f);
+  CYC(0x5436, 0x5437); C = A;
+  CYC(0x5437, 0x5438); A = alu_dec8(gb, A);
+  CYC(0x5438, 0x543a); alu_and(gb, 0x1f);
+  CYC(0x543a, 0x543b); B = A;
+  CYC(0x543b, 0x543d); alu_add(gb, 0x20);
+  CYC(0x543d, 0x543e); E = A;
+  CYC(0x543e, 0x543f); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x543f, 0x5440); mem_wr(gb, DE, A);
+  CYC(0x5440, 0x5441); A = B;
+  CYC(0x5441, 0x5443); alu_add(gb, 0x40);
+  CYC(0x5443, 0x5444); E = A;
+  CYC(0x5444, 0x5445); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5445, 0x5446); mem_wr(gb, DE, A);
+  CYC(0x5446, 0x5447); A = C;
+  CYC(0x5447, 0x5449); alu_add(gb, 0x20);
+  CYC(0x5449, 0x544a); E = A;
+  CYC(0x544a, 0x544b); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x544b, 0x544c); mem_wr(gb, DE, A);
+  CYC(0x544c, 0x544d); A = C;
+  CYC(0x544d, 0x544f); alu_add(gb, 0x40);
+  CYC(0x544f, 0x5450); E = A;
+  CYC(0x5450, 0x5451); A = mem_rd(gb, HL);
+  CYC(0x5451, 0x5452); mem_wr(gb, DE, A);
+  CYC(0x5452, 0x5454); D = 0xd1;
+  CYC(0x5454, 0x5455); A = mem_rd(gb, DE);
+  CYC(0x5455, 0x5457); alu_or(gb, 0x20);
+  CYC(0x5457, 0x5458); mem_wr(gb, DE, A);
+  CYC(0x5458, 0x5459); A = C;
+  CYC(0x5459, 0x545b); alu_add(gb, 0x20);
+  CYC(0x545b, 0x545c); E = A;
+  CYC(0x545c, 0x545d); A = mem_rd(gb, DE);
+  CYC(0x545d, 0x545f); alu_or(gb, 0x20);
+  CYC(0x545f, 0x5460); mem_wr(gb, DE, A);
+  CALL_C(0x5460, dmaTextboxMap_hook, 0x5173, 0x5463);
+  CYC(0x5463, 0x5464); alu_or(gb, D);
+  CYC(0x5464, 0x5465); ret_effect(gb);
+}
+
+void func_53eb_dmaHeartPieceDisplay_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5479, 0x547c); SET_HL(0x5720);
+  CYC(0x547c, 0x547f); SET_DE(0x95d0);
+  CYC(0x547f, 0x5482); SET_BC(0x001c);
+  CALL_C(0x5482, queueDmaTransfer_hook, 0x058a, 0x5485);
+  CYC(0x5485, 0x5488); SET_HL(0x5730);
+  CYC(0x5488, 0x548a); E = 0xf0;
+  CALL_C(0x548a, queueDmaTransfer_hook, 0x058a, 0x548d);
+  CYC(0x548d, 0x5490); SET_HL(0x5740);
+  CYC(0x5490, 0x5493); SET_DE(0x97c0);
+  CALL_C(0x5493, queueDmaTransfer_hook, 0x058a, 0x5496);
+  CYC(0x5496, 0x5499); SET_HL(0x5750);
+  CYC(0x5499, 0x549b); E = 0xe0;
+  CYC(0x549b, 0x549e); queueDmaTransfer_hook(gb);
 }
 
 void decInvTextScrollTimer_hook(GB *gb) {

@@ -7,7 +7,7 @@ Updated 2026-09-11. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 827 routines rewritten across thirteen code banks;
+  routine against the transliteration. Progress: 856 routines rewritten across thirteen code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -28,7 +28,8 @@ Updated 2026-09-11. Newest entries at the top of each section.
   batch 41 added room-specific leaf handlers and script state/spawn/property commands; batch 42
   added tileset transfer and vine helpers, script arithmetic/text helpers, and textbox/cutscene
   leaf routines; batch 43 added room-GFX post-load handlers, script text/memory commands, and
-  textbox map save/DMA/scroll helpers.
+  textbox map save/DMA/scroll helpers; batch 44 added tile replacements, script flag/jump
+  commands, and the textbox character-display and heart-piece paths.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -133,6 +134,14 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-11: milestone 3 phase 5 batch 44 (29 routines): ten bank-4 room tile replacements,
+  ten bank-C script flag/jump/sound helpers, and nine bank-3F character-display, option-state,
+  and heart-piece textbox routines. Cross-review caught two more cycle-count-as-byte-count ranges,
+  a missing fallthrough burn after `ret z`, a backward jump aimed at the wrong C label, and a
+  smart `(hooked)` call initially written as `CALL_ROM` instead of `CALL_C`. Gates: lint 0, 30k
+  verify 0 mismatches, whole-movie state hash clean (`64bddd0dfe384126`), ctest 8/8 in both
+  normal and quirk builds.
 
 - 2026-09-11: milestone 3 phase 5 batch 43 (30 routines): ten post-load room-GFX handlers in
   bank 2, ten script text/counter/memory helpers in bank C, and ten textbox map-save, DMA,
