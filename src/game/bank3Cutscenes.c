@@ -533,7 +533,7 @@ void runIntro_hook(GB *gb) {
 void intro_gotoTitlescreen_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(0x4d03, clearPaletteFadeVariables_hook, 0x323e, 0x4d06);
-  CALL_C(0x4d06, cutscene_clearObjects, 0x5403, 0x4d09);
+  CALL_C(0x4d06, cutscene_clearObjects_hook, 0x5403, 0x4d09);
   CYC(0x4d09, 0x4d0c); SET_HL(wThreadStateBuffer + 7);
   CYC(0x4d0c, 0x4d0d); alu_xor(gb, A);
   CYC(0x4d0d, 0x4d0e); mem_wr(gb, HL, A); SET_HL(HL - 1);
@@ -1859,4 +1859,45 @@ void clearFadingPalettes2_hook(GB *gb) {
   CYC(0x5444, 0x5446); hram_wr(gb, 0xa8, A);
   CYC(0x5446, 0x5448); hram_wr(gb, 0xa6, A);
   CYC(0x5448, 0x5449); ret_effect(gb);
+}
+
+void cutscene_clearObjects_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x5403, clearDynamicInteractions_hook, 0x35d2, 0x5406);
+  CALL_C(0x5406, clearLinkObject_hook, 0x35ba, 0x5409);
+  CYC(0x5409, 0x540c); refreshObjectGfx_hook(gb);
+}
+
+void endgameCutsceneHandler_body_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5414, 0x5417); SET_HL(wCutsceneState);
+  CYC(0x5417, 0x5419); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (!(F & FZ)) {
+    CYCT(0x5419, 0x541b);
+  } else {
+    CYC(0x5419, 0x541b);
+    CYC(0x541b, 0x541c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+    CYC(0x541c, 0x541f); SET_HL(wTmpcbb3);
+    CYC(0x541f, 0x5421); B = 0x10;
+    CALL_C(0x5421, clearMemory_hook, 0x046f, 0x5424);
+  }
+  CYC(0x5424, 0x5425); A = E;
+  CYC(0x5425, 0x5426); push_effect(gb, 0x5426);
+  switch (intro_jumpTable(gb)) {
+    case 0x5449:
+      endgameCutsceneHandler_09(gb);
+      return;
+    case 0x5e10:
+      endgameCutsceneHandler_0a_hook(gb);
+      return;
+    case 0x5b64:
+      endgameCutsceneHandler_0f(gb);
+      return;
+    case 0x5854:
+      endgameCutsceneHandler_20(gb);
+      return;
+    default:
+      hook_handoff(gb, HL);
+      return;
+  }
 }

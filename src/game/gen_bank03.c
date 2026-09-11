@@ -676,33 +676,6 @@ void introCinematic_preTitlescreen_state3(GB *gb) {
   I(0x53af, 4); if (hook_enabled_at(0x4d03)) { intro_gotoTitlescreen_hook(gb); return; } HANDOFF(0x4d03);  // jp $4d03
 }
 
-// 03:5403
-void cutscene_clearObjects(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5403, clearDynamicInteractions_hook, 0x35d2, 0x5406);  // call $35d2
-  CALL(0x5406, clearLinkObject_hook, 0x35ba, 0x5409);  // call $35ba
-  I(0x5409, 4); if (hook_enabled_at(0x1618)) { refreshObjectGfx_hook(gb); return; } HANDOFF(0x1618);  // jp $1618
-}
-
-// 03:5414
-void endgameCutsceneHandler_body(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5414, 3); SET_HL(0xcc03);  // ld hl,$cc03
-  I(0x5417, 3); alu_bit(gb, 0, mem_rd(gb, HL));  // bit 0,(hl)
-  if (!(F & FZ)) { I(0x5419, 3); goto L_5424; } I(0x5419, 2);  // jr nz,$5424
-  I(0x541b, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x541c, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
-  I(0x541f, 2); B = 0x10;  // ld b,$10
-  CALL(0x5421, clearMemory_hook, 0x046f, 0x5424);  // call $046f
-L_5424:
-  I(0x5424, 1); A = E;  // ld a,e
-  RST_PUSH(0x5425, 0x5426);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
 // 03:6318
 void nayruSingingCutsceneHandler(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

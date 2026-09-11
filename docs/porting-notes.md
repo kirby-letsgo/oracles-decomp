@@ -518,3 +518,9 @@ desync to discover; keep them when porting routines.
   the two skipped bytes; instruction-level cross-review corrected the two-byte opcode's endpoint
   to `$618d`. This is the same byte-count rule as every other branch even when the target is the
   next block the readable control flow enters.
+- Creating a new readable-C source under `src/game/` needs a CMake reconfigure before the normal
+  build, because the source list is collected by a configure-time glob. Batch 63's first build
+  compiled every changed existing source but linked with all nine new bank-4 hooks undefined;
+  `cmake -S . -B build -G Ninja` added `bank4.c`, after which the build linked cleanly. The same
+  batch also exposed `cutscene_clearObjects`, so two older `CALL_C` sites had to change from the
+  removed generated symbol to `cutscene_clearObjects_hook`.

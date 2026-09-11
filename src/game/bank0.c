@@ -11763,7 +11763,7 @@ void vblankRunBank4Function_hook(GB *gb) {
   CYC(0x0aa0, 0x0aa2);
   CYC(0x0aa2, 0x0aa5); mem_wr(gb, MBC_ROM_BANK, A);
   CYC(0x0aa5, 0x0aa8);
-  vblankRunBank4Function_b04(gb);
+  vblankRunBank4Function_b04_hook(gb);
 }
 
 void vblankFunction0aa8_hook(GB *gb) {
