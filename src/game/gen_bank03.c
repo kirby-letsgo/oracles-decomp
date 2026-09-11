@@ -878,129 +878,6 @@ void introCinematic_inTemple(GB *gb) {
   switch (HL) {  default: HANDOFF(HL); }
 }
 
-// 03:51cc
-void introCinematic_inTemple_state6(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x51cc, introCinematic_inTemple_updateWave_hook, 0x51a1, 0x51cf);  // call $51a1
-  I(0x51cf, 3); SET_HL(0xcbb6);  // ld hl,$cbb6
-  I(0x51d2, 2); B = 0x00;  // ld b,$00
-  CALL(0x51d4, flashScreen_body, 0x522e, 0x51d7);  // call $522e
-  if ((F & FZ)) { RET_TAKEN(0x51d7); return; } I(0x51d7, 2);  // ret z
-  CALL(0x51d8, clearPaletteFadeVariablesAndRefreshPalettes_hook, 0x3238, 0x51db);  // call $3238
-  I(0x51db, 2); A = 0x06;  // ld a,$06
-  I(0x51dd, 4); mem_wr(gb, 0xcbb9, A);  // ld ($cbb9),a
-  I(0x51e0, 2); A = 0x91;  // ld a,$91
-  CALL(0x51e2, playSound_b00_hook, 0x0c98, 0x51e5);  // call $0c98
-  I(0x51e5, 4); if (hook_enabled_at(0x4d33)) { intro_incState_hook(gb); return; } HANDOFF(0x4d33);  // jp $4d33
-}
-
-// 03:51e8
-void introCinematic_inTemple_state7(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x51e8, introCinematic_inTemple_updateWave_hook, 0x51a1, 0x51eb);  // call $51a1
-  I(0x51eb, 4); A = mem_rd(gb, 0xcbb9);  // ld a,($cbb9)
-  I(0x51ee, 2); alu_cp(gb, 0x07);  // cp $07
-  if (!(F & FZ)) { RET_TAKEN(0x51f0); return; } I(0x51f0, 2);  // ret nz
-  CALL(0x51f1, clearLinkObject_hook, 0x35ba, 0x51f4);  // call $35ba
-  I(0x51f4, 2); B = 0x08;  // ld b,$08
-  CALL(0x51f6, func_2d48_hook, 0x2d48, 0x51f9);  // call $2d48
-  I(0x51f9, 1); A = B;  // ld a,b
-  I(0x51fa, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
-  I(0x51fd, 4); if (hook_enabled_at(0x4d33)) { intro_incState_hook(gb); return; } HANDOFF(0x4d33);  // jp $4d33
-}
-
-// 03:5200
-void introCinematic_inTemple_state8(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5200, introCinematic_inTemple_updateWave_hook, 0x51a1, 0x5203);  // call $51a1
-  I(0x5203, 3); SET_HL(0xcbb6);  // ld hl,$cbb6
-  I(0x5206, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x5207); return; } I(0x5207, 2);  // ret nz
-  I(0x5208, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x520a, 4); if (hook_enabled_at(0x4d33)) { intro_incState_hook(gb); return; } HANDOFF(0x4d33);  // jp $4d33
-}
-
-// 03:520d
-void introCinematic_inTemple_state9(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x520d, introCinematic_inTemple_updateWave_hook, 0x51a1, 0x5210);  // call $51a1
-  I(0x5210, 3); SET_HL(0xcbb6);  // ld hl,$cbb6
-  I(0x5213, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x5214); return; } I(0x5214, 2);  // ret nz
-  I(0x5215, 2); A = 0xb4;  // ld a,$b4
-  CALL(0x5217, playSound_b00_hook, 0x0c98, 0x521a);  // call $0c98
-  CALL(0x521a, fadeoutToWhite_hook, 0x326c, 0x521d);  // call $326c
-  I(0x521d, 4); if (hook_enabled_at(0x4d33)) { intro_incState_hook(gb); return; } HANDOFF(0x4d33);  // jp $4d33
-}
-
-// 03:5220
-void introCinematic_inTemple_state10(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5220, introCinematic_inTemple_updateWave_hook, 0x51a1, 0x5223);  // call $51a1
-  I(0x5223, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
-  I(0x5226, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x5227); return; } I(0x5227, 2);  // ret nz
-  CALL(0x5228, clearDynamicInteractions_hook, 0x35d2, 0x522b);  // call $35d2
-  I(0x522b, 4); if (hook_enabled_at(0x50ca)) { incIntroCinematicState_hook(gb); return; } HANDOFF(0x50ca);  // jp $50ca
-}
-
-// 03:522e
-void flashScreen_body(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x522e, 1); A = B;  // ld a,b
-  I(0x522f, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x5230, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x5231, 3); SET_HL(0x5276);  // ld hl,$5276
-  RST_PUSH(0x5234, 0x5235);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x5235, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x5236, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x5237, 1); L = A;  // ld l,a
-  I(0x5238, 2); C = 0x00;  // ld c,$00
-L_523a:
-  I(0x523a, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x523b, 2); alu_bit(gb, 7, A);  // bit 7,a
-  if (!(F & FZ)) { RET_TAKEN(0x523d); return; } I(0x523d, 2);  // ret nz
-  I(0x523e, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FC)) { I(0x523f, 3); goto L_5245; } I(0x523f, 2);  // jr nc,$5245
-  I(0x5241, 2); SET_HL(HL + 1);  // inc hl
-  I(0x5242, 1); C = alu_inc8(gb, C);  // inc c
-  I(0x5243, 3); goto L_523a;  // jr $523a
-L_5245:
-  I(0x5245, 1); A = C;  // ld a,c
-  I(0x5246, 2); alu_and(gb, 0x01);  // and $01
-  I(0x5248, 1); C = A;  // ld c,a
-  I(0x5249, 4); A = mem_rd(gb, 0xcbba);  // ld a,($cbba)
-  I(0x524c, 1); alu_cp(gb, C);  // cp c
-  if ((F & FZ)) { RET_TAKEN(0x524d); return; } I(0x524d, 2);  // ret z
-  I(0x524e, 1); A = C;  // ld a,c
-  I(0x524f, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x5252, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x5253, 3); clearFadingPalettes_body(gb); return; } I(0x5253, 2);  // jr z,$525a
-  CALL(0x5255, clearPaletteFadeVariablesAndRefreshPalettes_hook, 0x3238, 0x5258);  // call $3238
-  I(0x5258, 1); alu_xor(gb, A);  // xor a
-  RET(0x5259); return;  // ret
-}
-
-// 03:525a
-void clearFadingPalettes_body(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x525a, 2); A = 0x02;  // ld a,$02
-  I(0x525c, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x525e, 2); B = 0x80;  // ld b,$80
-  I(0x5260, 3); SET_HL(0xdf80);  // ld hl,$df80
-  I(0x5263, 2); A = 0xff;  // ld a,$ff
-  CALL(0x5265, fillMemory_hook, 0x0470, 0x5268);  // call $0470
-  I(0x5268, 2); A = 0xff;  // ld a,$ff
-  I(0x526a, 3); mem_wr(gb, 0xffa9, A);  // ldh ($ffa9),a
-  I(0x526c, 3); mem_wr(gb, 0xffa8, A);  // ldh ($ffa8),a
-  I(0x526e, 3); mem_wr(gb, 0xffa7, A);  // ldh ($ffa7),a
-  I(0x5270, 3); mem_wr(gb, 0xffa6, A);  // ldh ($ffa6),a
-  I(0x5272, 1); alu_xor(gb, A);  // xor a
-  I(0x5273, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  RET(0x5275); return;  // ret
-}
-
 // 03:52b9
 void introCinematic_preTitlescreen(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1100,134 +977,12 @@ L_5301:
   I(0x5314, 4); if (hook_enabled_at(0x4d33)) { intro_incState_hook(gb); return; } HANDOFF(0x4d33);  // jp $4d33
 }
 
-// 03:5317
-void introCinematic_preTitlescreen_state1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5317, introCinematic_preTitlescreen_updateScrollingTree_hook, 0x5092, 0x531a);  // call $5092
-  if (!(F & FZ)) { RET_TAKEN(0x531a); return; } I(0x531a, 2);  // ret nz
-  CALL(0x531b, intro_incState_hook, 0x4d33, 0x531e);  // call $4d33
-  I(0x531e, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
-  I(0x5321, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  I(0x5323, 2); SET_HL(HL + 1);  // inc hl
-  I(0x5324, 1); alu_xor(gb, A);  // xor a
-  I(0x5325, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5326, 3); SET_HL(0xcbb6);  // ld hl,$cbb6
-  I(0x5329, 3); mem_wr(gb, HL, 0x10);  // ld (hl),$10
-  I(0x532b, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x532c, 4); mem_wr(gb, 0xc48a, A);  // ld ($c48a),a
-  I(0x532f, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5330, 4); mem_wr(gb, 0xc490, A);  // ld ($c490),a
-  I(0x5333, 2); A = 0x01;  // ld a,$01
-  I(0x5335, 3); mem_wr(gb, 0xff9d, A);  // ldh ($ff9d),a
-  I(0x5337, 4); A = mem_rd(gb, 0xc486);  // ld a,($c486)
-  I(0x533a, 2); B = 0x90;  // ld b,$90
-  I(0x533c, 3); SET_HL(0xc300);  // ld hl,$c300
-L_533f:
-  I(0x533f, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x5340, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x5341, 3); goto L_533f; } I(0x5341, 2);  // jr nz,$533f
-  I(0x5343, 2); A = 0x01;  // ld a,$01
-  introCinematic_preTitlescreen_updateScrollForTitle(gb); return;  // fallthrough
-}
-
-// 03:5345
-void introCinematic_preTitlescreen_updateScrollForTitle(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5345, 1); B = A;  // ld b,a
-  I(0x5346, 1); alu_xor(gb, A);  // xor a
-  I(0x5347, 1); C = A;  // ld c,a
-L_5348:
-  I(0x5348, 1); C = alu_inc8(gb, C);  // inc c
-  I(0x5349, 1); alu_add(gb, B);  // add b
-  I(0x534a, 2); alu_cp(gb, 0x18);  // cp $18
-  if ((F & FZ)) { I(0x534c, 3); goto L_5351; } I(0x534c, 2);  // jr z,$5351
-  if (!(F & FC)) { RET_TAKEN(0x534e); return; } I(0x534e, 2);  // ret nc
-  I(0x534f, 3); goto L_5348;  // jr $5348
-L_5351:
-  PUSH(0x5351, BC);  // push bc
-  I(0x5352, 2); A = 0x38;  // ld a,$38
-  I(0x5354, 1); alu_sub(gb, B);  // sub b
-  I(0x5355, 2); H = 0xc3;  // ld h,$c3
-  I(0x5357, 1); L = A;  // ld l,a
-  I(0x5358, 1); alu_xor(gb, A);  // xor a
-L_5359:
-  PUSH(0x5359, AF);  // push af
-  I(0x535a, 1); alu_sub(gb, L);  // sub l
-  I(0x535b, 2); alu_add(gb, 0x58);  // add $58
-  I(0x535d, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  SET_AF(POP(0x535e));  // pop af
-  I(0x535f, 1); alu_add(gb, C);  // add c
-  I(0x5360, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x5361, 3); goto L_5359; } I(0x5361, 2);  // jr nz,$5359
-  SET_BC(POP(0x5363));  // pop bc
-  I(0x5364, 2); A = 0x37;  // ld a,$37
-  I(0x5366, 1); alu_add(gb, B);  // add b
-  I(0x5367, 1); L = A;  // ld l,a
-  I(0x5368, 2); A = 0x2f;  // ld a,$2f
-L_536a:
-  PUSH(0x536a, AF);  // push af
-  I(0x536b, 1); alu_sub(gb, L);  // sub l
-  I(0x536c, 2); alu_add(gb, 0x58);  // add $58
-  I(0x536e, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-  SET_AF(POP(0x536f));  // pop af
-  I(0x5370, 1); alu_sub(gb, C);  // sub c
-  I(0x5371, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x5372, 3); goto L_536a; } I(0x5372, 2);  // jr nz,$536a
-  RET(0x5374); return;  // ret
-}
-
-// 03:5375
-void introCinematic_preTitlescreen_state2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5375, 3); SET_HL(0xcbb6);  // ld hl,$cbb6
-  I(0x5378, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5379, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x537a, 3); goto L_5383; } I(0x537a, 2);  // jr z,$5383
-  I(0x537c, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x537d, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x537e, 2); A = 0xab;  // ld a,$ab
-  if ((F & FZ)) { CALL(0x5380, playSound_b00_hook, 0x0c98, 0x5383); } else I(0x5380, 3);  // call z,$0c98
-L_5383:
-  I(0x5383, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x5386, 2); alu_and(gb, 0x01);  // and $01
-  I(0x5388, 3); SET_HL(0xcbb4);  // ld hl,$cbb4
-  if (!(F & FZ)) { RET_TAKEN(0x538b); return; } I(0x538b, 2);  // ret nz
-  I(0x538c, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x538d, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FC)) { I(0x538f, 3); goto L_539b; } I(0x538f, 2);  // jr nc,$539b
-  I(0x5391, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5392, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5393, 3); SET_HL(0x53b2);  // ld hl,$53b2
-  RST_PUSH(0x5396, 0x5397);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x5397, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5398, 4); introCinematic_preTitlescreen_updateScrollForTitle(gb); return;  // jp $5345
-L_539b:
-  I(0x539b, 1); alu_xor(gb, A);  // xor a
-  I(0x539c, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
-  I(0x539f, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x53a0, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x53a3, 4); if (hook_enabled_at(0x4d33)) { intro_incState_hook(gb); return; } HANDOFF(0x4d33);  // jp $4d33
-}
-
-// 03:539b
-void introCinematic_preTitlescreen_state2__titleDone(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_539b:
-  I(0x539b, 1); alu_xor(gb, A);  // xor a
-  I(0x539c, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
-  I(0x539f, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x53a0, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x53a3, 4); if (hook_enabled_at(0x4d33)) { intro_incState_hook(gb); return; } HANDOFF(0x4d33);  // jp $4d33
-}
-
 // 03:53a6
 void introCinematic_preTitlescreen_state3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x53a6, 3); SET_HL(0xcbb6);  // ld hl,$cbb6
   I(0x53a9, 2); B = 0x01;  // ld b,$01
-  CALL(0x53ab, flashScreen_body, 0x522e, 0x53ae);  // call $522e
+  CALL(0x53ab, flashScreen_body_hook, 0x522e, 0x53ae);  // call $522e
   if ((F & FZ)) { RET_TAKEN(0x53ae); return; } I(0x53ae, 2);  // ret z
   I(0x53af, 4); intro_gotoTitlescreen(gb); return;  // jp $4d03
 }
@@ -3957,7 +3712,7 @@ L_548c:
   I(0x54b1, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x54b4, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x54b6, 3); SET_HL(0x60ce);  // ld hl,$60ce
-  CALL(0x54b9, cutscene_replaceListOfTiles, 0x60be, 0x54bc);  // call $60be
+  CALL(0x54b9, cutscene_replaceListOfTiles_hook, 0x60be, 0x54bc);  // call $60be
   CALL(0x54bc, refreshObjectGfx_hook, 0x1618, 0x54bf);  // call $1618
   I(0x54bf, 2); A = 0x02;  // ld a,$02
   CALL(0x54c1, loadGfxRegisterStateIndex_hook, 0x02ea, 0x54c4);  // call $02ea
@@ -4016,7 +3771,7 @@ L_550d:
   I(0x552b, 2); A = 0x10;  // ld a,$10
   CALL(0x552d, setSimulatedInputAddress_hook, 0x2a1d, 0x5530);  // call $2a1d
   I(0x5530, 3); SET_HL(0x60d7);  // ld hl,$60d7
-  I(0x5533, 4); cutscene_replaceListOfTiles(gb); return;  // jp $60be
+  I(0x5533, 4); if (hook_enabled_at(0x60be)) { cutscene_replaceListOfTiles_hook(gb); return; } HANDOFF(0x60be);  // jp $60be
 L_5536:
   CALL(0x5536, endgameCutsceneHandler_09_stage0__updateExplosionSoundsAndScreenShake, 0x54de, 0x5539);  // call $54de
   if (!(F & FZ)) { RET_TAKEN(0x5539); return; } I(0x5539, 2);  // ret nz
@@ -4250,7 +4005,7 @@ L_548c:
   I(0x54b1, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x54b4, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x54b6, 3); SET_HL(0x60ce);  // ld hl,$60ce
-  CALL(0x54b9, cutscene_replaceListOfTiles, 0x60be, 0x54bc);  // call $60be
+  CALL(0x54b9, cutscene_replaceListOfTiles_hook, 0x60be, 0x54bc);  // call $60be
   CALL(0x54bc, refreshObjectGfx_hook, 0x1618, 0x54bf);  // call $1618
   I(0x54bf, 2); A = 0x02;  // ld a,$02
   CALL(0x54c1, loadGfxRegisterStateIndex_hook, 0x02ea, 0x54c4);  // call $02ea
@@ -4350,7 +4105,7 @@ L_550d:
   I(0x552b, 2); A = 0x10;  // ld a,$10
   CALL(0x552d, setSimulatedInputAddress_hook, 0x2a1d, 0x5530);  // call $2a1d
   I(0x5530, 3); SET_HL(0x60d7);  // ld hl,$60d7
-  I(0x5533, 4); cutscene_replaceListOfTiles(gb); return;  // jp $60be
+  I(0x5533, 4); if (hook_enabled_at(0x60be)) { cutscene_replaceListOfTiles_hook(gb); return; } HANDOFF(0x60be);  // jp $60be
 L_5536:
   CALL(0x5536, endgameCutsceneHandler_09_stage0__updateExplosionSoundsAndScreenShake, 0x54de, 0x5539);  // call $54de
   if (!(F & FZ)) { RET_TAKEN(0x5539); return; } I(0x5539, 2);  // ret nz
@@ -6896,7 +6651,7 @@ L_5e23:
 L_5e2e:
   CALL(0x5e2e, cutscene_decCBB3IfNotFadingOut_hook, 0x6070, 0x5e31);  // call $6070
   if (!(F & FZ)) { RET_TAKEN(0x5e31); return; } I(0x5e31, 2);  // ret nz
-  CALL(0x5e32, func_60e0, 0x60e0, 0x5e35);  // call $60e0
+  CALL(0x5e32, func_60e0_hook, 0x60e0, 0x5e35);  // call $60e0
   CALL(0x5e35, incCbc2_hook, 0x3067, 0x5e38);  // call $3067
   CALL(0x5e38, clearOam_hook, 0x049f, 0x5e3b);  // call $049f
   I(0x5e3b, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
@@ -7124,7 +6879,7 @@ L_5e23:
 L_5e2e:
   CALL(0x5e2e, cutscene_decCBB3IfNotFadingOut_hook, 0x6070, 0x5e31);  // call $6070
   if (!(F & FZ)) { RET_TAKEN(0x5e31); return; } I(0x5e31, 2);  // ret nz
-  CALL(0x5e32, func_60e0, 0x60e0, 0x5e35);  // call $60e0
+  CALL(0x5e32, func_60e0_hook, 0x60e0, 0x5e35);  // call $60e0
   CALL(0x5e35, incCbc2_hook, 0x3067, 0x5e38);  // call $3067
   CALL(0x5e38, clearOam_hook, 0x049f, 0x5e3b);  // call $049f
   I(0x5e3b, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
@@ -7173,7 +6928,7 @@ void endgameCutsceneHandler_0a__state0__substate0(GB *gb) {
 L_5e2e:
   CALL(0x5e2e, cutscene_decCBB3IfNotFadingOut_hook, 0x6070, 0x5e31);  // call $6070
   if (!(F & FZ)) { RET_TAKEN(0x5e31); return; } I(0x5e31, 2);  // ret nz
-  CALL(0x5e32, func_60e0, 0x60e0, 0x5e35);  // call $60e0
+  CALL(0x5e32, func_60e0_hook, 0x60e0, 0x5e35);  // call $60e0
   CALL(0x5e35, incCbc2_hook, 0x3067, 0x5e38);  // call $3067
   CALL(0x5e38, clearOam_hook, 0x049f, 0x5e3b);  // call $049f
   I(0x5e3b, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
@@ -7892,71 +7647,6 @@ void cutscene_clearTmpCBB3(GB *gb) {
   I(0x6086, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6089, 2); B = 0x10;  // ld b,$10
   I(0x608b, 4); if (hook_enabled_at(0x046f)) { clearMemory_hook(gb); return; } HANDOFF(0x046f);  // jp $046f
-}
-
-// 03:60be
-void cutscene_replaceListOfTiles(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x60be, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x60bf, 2); SET_HL(HL + 1);  // inc hl
-L_60c0:
-  I(0x60c0, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  I(0x60c1, 2); SET_HL(HL + 1);  // inc hl
-  I(0x60c2, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  PUSH(0x60c3, BC);  // push bc
-  PUSH(0x60c4, HL);  // push hl
-  CALL(0x60c5, setTile_hook, 0x3a9c, 0x60c8);  // call $3a9c
-  SET_HL(POP(0x60c8));  // pop hl
-  SET_BC(POP(0x60c9));  // pop bc
-  I(0x60ca, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x60cb, 3); goto L_60c0; } I(0x60cb, 2);  // jr nz,$60c0
-  RET(0x60cd); return;  // ret
-}
-
-// 03:60c0
-void cutscene_replaceListOfTiles__loop(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_60c0:
-  I(0x60c0, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  I(0x60c1, 2); SET_HL(HL + 1);  // inc hl
-  I(0x60c2, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  PUSH(0x60c3, BC);  // push bc
-  PUSH(0x60c4, HL);  // push hl
-  CALL(0x60c5, setTile_hook, 0x3a9c, 0x60c8);  // call $3a9c
-  SET_HL(POP(0x60c8));  // pop hl
-  SET_BC(POP(0x60c9));  // pop bc
-  I(0x60ca, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x60cb, 3); goto L_60c0; } I(0x60cb, 2);  // jr nz,$60c0
-  RET(0x60cd); return;  // ret
-}
-
-// 03:60e0
-void func_60e0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x60e0, 3); SET_HL(0xc6aa);  // ld hl,$c6aa
-  I(0x60e3, 3); mem_wr(gb, HL, 0x04);  // ld (hl),$04
-  I(0x60e5, 2); L = 0x88;  // ld l,$88
-  I(0x60e7, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x60e8, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x60e9, 3); SET_HL(0xcde3);  // ld hl,$cde3
-  I(0x60ec, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x60ed, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x60ee, 4); if (hook_enabled_at(0x23b7)) { disableActiveRing_hook(gb); return; } HANDOFF(0x23b7);  // jp $23b7
-}
-
-// 03:60f1
-void func_60f1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x60f1, 3); SET_HL(0xc6ab);  // ld hl,$c6ab
-  I(0x60f4, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x60f5, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x60f6, 3); SET_HL(0xcde3);  // ld hl,$cde3
-  I(0x60f9, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x60fa, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x60fb, 3); SET_HL(0xc688);  // ld hl,$c688
-  I(0x60fe, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x60ff, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x6100, 4); if (hook_enabled_at(0x23bf)) { enableActiveRing_hook(gb); return; } HANDOFF(0x23bf);  // jp $23bf
 }
 
 // 03:6103
@@ -14046,7 +13736,7 @@ L_7913:
   I(0x791a, 2); A = 0xaf;  // ld a,$af
   I(0x791c, 4); mem_wr(gb, 0xc4b2, A);  // ld ($c4b2),a
   I(0x791f, 4); mem_wr(gb, 0xc4b4, A);  // ld ($c4b4),a
-  CALL(0x7922, func_7bd0, 0x7bd0, 0x7925);  // call $7bd0
+  CALL(0x7922, func_7bd0_hook, 0x7bd0, 0x7925);  // call $7bd0
   I(0x7925, 2); A = 0x21;  // ld a,$21
   I(0x7927, 4); mem_wr(gb, 0xcc35, A);  // ld ($cc35),a
   CALL(0x792a, playSound_b00_hook, 0x0c98, 0x792d);  // call $0c98
@@ -14210,7 +13900,7 @@ L_7913:
   I(0x791a, 2); A = 0xaf;  // ld a,$af
   I(0x791c, 4); mem_wr(gb, 0xc4b2, A);  // ld ($c4b2),a
   I(0x791f, 4); mem_wr(gb, 0xc4b4, A);  // ld ($c4b4),a
-  CALL(0x7922, func_7bd0, 0x7bd0, 0x7925);  // call $7bd0
+  CALL(0x7922, func_7bd0_hook, 0x7bd0, 0x7925);  // call $7bd0
   I(0x7925, 2); A = 0x21;  // ld a,$21
   I(0x7927, 4); mem_wr(gb, 0xcc35, A);  // ld ($cc35),a
   CALL(0x792a, playSound_b00_hook, 0x0c98, 0x792d);  // call $0c98
@@ -14401,8 +14091,8 @@ L_7a63:
 L_7a6d:
   CALL(0x7a6d, func_03_7b95_hook, 0x7b95, 0x7a70);  // call $7b95
   if (!(F & FZ)) { RET_TAKEN(0x7a70); return; } I(0x7a70, 2);  // ret nz
-  CALL(0x7a71, func_7c1f, 0x7c1f, 0x7a74);  // call $7c1f
-  CALL(0x7a74, func_7beb, 0x7beb, 0x7a77);  // call $7beb
+  CALL(0x7a71, func_7c1f_hook, 0x7c1f, 0x7a74);  // call $7c1f
+  CALL(0x7a74, func_7beb_hook, 0x7beb, 0x7a77);  // call $7beb
   I(0x7a77, 2); A = 0x21;  // ld a,$21
   I(0x7a79, 4); mem_wr(gb, 0xcc35, A);  // ld ($cc35),a
   CALL(0x7a7c, playSound_b00_hook, 0x0c98, 0x7a7f);  // call $0c98
@@ -14457,8 +14147,8 @@ L_7aca:
 L_7adf:
   CALL(0x7adf, func_03_7b95_hook, 0x7b95, 0x7ae2);  // call $7b95
   if (!(F & FZ)) { RET_TAKEN(0x7ae2); return; } I(0x7ae2, 2);  // ret nz
-  CALL(0x7ae3, func_7c1f, 0x7c1f, 0x7ae6);  // call $7c1f
-  CALL(0x7ae6, func_7bf6, 0x7bf6, 0x7ae9);  // call $7bf6
+  CALL(0x7ae3, func_7c1f_hook, 0x7c1f, 0x7ae6);  // call $7c1f
+  CALL(0x7ae6, func_7bf6_hook, 0x7bf6, 0x7ae9);  // call $7bf6
   CALL(0x7ae9, func_7c2f, 0x7c2f, 0x7aec);  // call $7c2f
   I(0x7aec, 2); A = 0x04;  // ld a,$04
   CALL(0x7aee, fadeinFromWhiteWithDelay_hook, 0x3284, 0x7af1);  // call $3284
@@ -14665,8 +14355,8 @@ void zeldaKidnappedState1__substateA(GB *gb) {
 L_7a6d:
   CALL(0x7a6d, func_03_7b95_hook, 0x7b95, 0x7a70);  // call $7b95
   if (!(F & FZ)) { RET_TAKEN(0x7a70); return; } I(0x7a70, 2);  // ret nz
-  CALL(0x7a71, func_7c1f, 0x7c1f, 0x7a74);  // call $7c1f
-  CALL(0x7a74, func_7beb, 0x7beb, 0x7a77);  // call $7beb
+  CALL(0x7a71, func_7c1f_hook, 0x7c1f, 0x7a74);  // call $7c1f
+  CALL(0x7a74, func_7beb_hook, 0x7beb, 0x7a77);  // call $7beb
   I(0x7a77, 2); A = 0x21;  // ld a,$21
   I(0x7a79, 4); mem_wr(gb, 0xcc35, A);  // ld ($cc35),a
   CALL(0x7a7c, playSound_b00_hook, 0x0c98, 0x7a7f);  // call $0c98
@@ -14766,8 +14456,8 @@ void zeldaKidnappedState1__substate11(GB *gb) {
 L_7adf:
   CALL(0x7adf, func_03_7b95_hook, 0x7b95, 0x7ae2);  // call $7b95
   if (!(F & FZ)) { RET_TAKEN(0x7ae2); return; } I(0x7ae2, 2);  // ret nz
-  CALL(0x7ae3, func_7c1f, 0x7c1f, 0x7ae6);  // call $7c1f
-  CALL(0x7ae6, func_7bf6, 0x7bf6, 0x7ae9);  // call $7bf6
+  CALL(0x7ae3, func_7c1f_hook, 0x7c1f, 0x7ae6);  // call $7c1f
+  CALL(0x7ae6, func_7bf6_hook, 0x7bf6, 0x7ae9);  // call $7bf6
   CALL(0x7ae9, func_7c2f, 0x7c2f, 0x7aec);  // call $7c2f
   I(0x7aec, 2); A = 0x04;  // ld a,$04
   CALL(0x7aee, fadeinFromWhiteWithDelay_hook, 0x3284, 0x7af1);  // call $3284
@@ -14933,72 +14623,6 @@ L_7b7e:
   I(0x7b7e, 4); if (hook_enabled_at(0x7ba1)) { func_7ba1_hook(gb); return; } HANDOFF(0x7ba1);  // jp $7ba1
 }
 
-// 03:7bd0
-void func_7bd0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7bd0, 3); SET_BC(0x7be5);  // ld bc,$7be5
-  CALL(0x7bd3, func_7bd9, 0x7bd9, 0x7bd6);  // call $7bd9
-  I(0x7bd6, 3); SET_BC(0x7be8);  // ld bc,$7be8
-  func_7bd9(gb); return;  // fallthrough
-}
-
-// 03:7bd9
-void func_7bd9(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7bd9, getFreeInteractionSlot_hook, 0x3aef, 0x7bdc);  // call $3aef
-  if (!(F & FZ)) { RET_TAKEN(0x7bdc); return; } I(0x7bdc, 2);  // ret nz
-  I(0x7bdd, 3); mem_wr(gb, HL, 0xb0);  // ld (hl),$b0
-  I(0x7bdf, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x7be0, 2); A = mem_rd(gb, BC);  // ld a,(bc)
-  I(0x7be1, 2); SET_BC(BC + 1);  // inc bc
-  I(0x7be2, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x7be3, 3); func_7c09(gb); return;  // jr $7c09
-}
-
-// 03:7beb
-void func_7beb(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7beb, 3); SET_BC(0x7c13);  // ld bc,$7c13
-  CALL(0x7bee, func_7bff, 0x7bff, 0x7bf1);  // call $7bff
-  I(0x7bf1, 3); SET_BC(0x7c16);  // ld bc,$7c16
-  I(0x7bf4, 3); func_7bff(gb); return;  // jr $7bff
-}
-
-// 03:7bf6
-void func_7bf6(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7bf6, 3); SET_BC(0x7c19);  // ld bc,$7c19
-  CALL(0x7bf9, func_7bff, 0x7bff, 0x7bfc);  // call $7bff
-  I(0x7bfc, 3); SET_BC(0x7c1c);  // ld bc,$7c1c
-  func_7bff(gb); return;  // fallthrough
-}
-
-// 03:7bff
-void func_7bff(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7bff, getFreeInteractionSlot_hook, 0x3aef, 0x7c02);  // call $3aef
-  if (!(F & FZ)) { RET_TAKEN(0x7c02); return; } I(0x7c02, 2);  // ret nz
-  I(0x7c03, 3); mem_wr(gb, HL, 0xbc);  // ld (hl),$bc
-  I(0x7c05, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x7c06, 2); A = mem_rd(gb, BC);  // ld a,(bc)
-  I(0x7c07, 2); SET_BC(BC + 1);  // inc bc
-  I(0x7c08, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  func_7c09(gb); return;  // fallthrough
-}
-
-// 03:7c09
-void func_7c09(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7c09, 2); L = 0x4b;  // ld l,$4b
-  I(0x7c0b, 2); A = mem_rd(gb, BC);  // ld a,(bc)
-  I(0x7c0c, 2); SET_BC(BC + 1);  // inc bc
-  I(0x7c0d, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x7c0e, 2); L = 0x4d;  // ld l,$4d
-  I(0x7c10, 2); A = mem_rd(gb, BC);  // ld a,(bc)
-  I(0x7c11, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x7c12); return;  // ret
-}
-
 // 03:7c13
 void table_7c13(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -15006,16 +14630,6 @@ void table_7c13(GB *gb) {
   I(0x7c14, 1);  // nop
   I(0x7c15, 1); B = B;  // ld b,b
   HANDOFF(0x7c16);  // fallthrough to table_7c16
-}
-
-// 03:7c1f
-void func_7c1f(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7c1f, 2); A = 0x01;  // ld a,$01
-  I(0x7c21, 4); mem_wr(gb, 0xcc18, A);  // ld ($cc18),a
-  I(0x7c24, 2); A = 0xbc;  // ld a,$bc
-  I(0x7c26, 4); mem_wr(gb, 0xcc1e, A);  // ld ($cc1e),a
-  RET(0x7c29); return;  // ret
 }
 
 // 03:7c2a
@@ -15093,7 +14707,7 @@ void func_7c83(GB *gb) {
   I(0x7c90, 3); mem_wr(gb, HL, 0x16);  // ld (hl),$16
   I(0x7c92, 2); L = 0x46;  // ld l,$46
   I(0x7c94, 3); mem_wr(gb, HL, 0x78);  // ld (hl),$78
-  I(0x7c96, 4); func_7c09(gb); return;  // jp $7c09
+  I(0x7c96, 4); if (hook_enabled_at(0x7c09)) { func_7c09_hook(gb); return; } HANDOFF(0x7c09);  // jp $7c09
 }
 
 // 03:7c99

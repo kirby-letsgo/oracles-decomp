@@ -112,3 +112,54 @@ void cutscene_resetOamWithData_hook(GB *gb) {
   CYC(0x60bb, 0x60be);
   addSpritesFromBankToOam_withOffset_hook(gb);
 }
+
+void cutscene_replaceListOfTiles_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x60be, 0x60bf); B = mem_rd(gb, HL);
+  CYC(0x60bf, 0x60c0); SET_HL(HL + 1);
+  for (;;) {
+    CYC(0x60c0, 0x60c1); C = mem_rd(gb, HL);
+    CYC(0x60c1, 0x60c2); SET_HL(HL + 1);
+    CYC(0x60c2, 0x60c3); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x60c3, 0x60c4); push_effect(gb, BC);
+    CYC(0x60c4, 0x60c5); push_effect(gb, HL);
+    CALL_C(0x60c5, setTile_hook, 0x3a9c, 0x60c8);
+    CYC(0x60c8, 0x60c9); SET_HL(pop_effect(gb));
+    CYC(0x60c9, 0x60ca); SET_BC(pop_effect(gb));
+    CYC(0x60ca, 0x60cb); B = alu_dec8(gb, B);
+    if (!(F & FZ)) {
+      CYCT(0x60cb, 0x60cd);
+      continue;
+    }
+    CYC(0x60cb, 0x60cd);
+    CYC(0x60cd, 0x60ce); ret_effect(gb);
+    return;
+  }
+}
+
+void func_60e0_hook(GB *gb) {
+  CYC(0x60e0, 0x60e3); SET_HL(wLinkHealth);
+  CYC(0x60e3, 0x60e5); mem_wr(gb, HL, 0x04);
+  CYC(0x60e5, 0x60e7); L = 0x88;
+  CYC(0x60e7, 0x60e8); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x60e8, 0x60e9); B = mem_rd(gb, HL);
+  CYC(0x60e9, 0x60ec); SET_HL(0xcde3);
+  CYC(0x60ec, 0x60ed); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x60ed, 0x60ee); mem_wr(gb, HL, B);
+  CYC(0x60ee, 0x60f1);
+  disableActiveRing_hook(gb);
+}
+
+void func_60f1_hook(GB *gb) {
+  CYC(0x60f1, 0x60f4); SET_HL(wLinkMaxHealth);
+  CYC(0x60f4, 0x60f5); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x60f5, 0x60f6); mem_wr(gb, HL, A);
+  CYC(0x60f6, 0x60f9); SET_HL(0xcde3);
+  CYC(0x60f9, 0x60fa); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x60fa, 0x60fb); B = mem_rd(gb, HL);
+  CYC(0x60fb, 0x60fe); SET_HL(wInventoryB);
+  CYC(0x60fe, 0x60ff); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x60ff, 0x6100); mem_wr(gb, HL, B);
+  CYC(0x6100, 0x6104);
+  enableActiveRing_hook(gb);
+}

@@ -10,6 +10,9 @@ void linkedCutscene_aIntoCBB5_incSubstate_hook(GB *gb);
 void linkedCutscene_incSubstate_hook(GB *gb);
 void func_7ba1_hook(GB *gb);
 static void linkedCutscene_decrementTimer(GB *gb);
+void func_7bd9_hook(GB *gb);
+void func_7bff_hook(GB *gb);
+void func_7c09_hook(GB *gb);
 
 void func_03_7b81_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -83,4 +86,73 @@ void func_7bab_hook(GB *gb) {
   CYC(0x7bc9, 0x7bcb); A = 0x10;
   CYC(0x7bcb, 0x7bcd); hram_wr(gb, 0x9f, A);
   CYC(0x7bcd, 0x7bd0); clearWramBank1_hook(gb);
+}
+
+void func_7bd0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7bd0, 0x7bd3); SET_BC(0x7be5);
+  CALL_C(0x7bd3, func_7bd9_hook, 0x7bd9, 0x7bd6);
+  CYC(0x7bd6, 0x7bd9); SET_BC(0x7be8);
+  func_7bd9_hook(gb);
+}
+
+void func_7bd9_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7bd9, getFreeInteractionSlot_hook, 0x3aef, 0x7bdc);
+  if (!(F & FZ)) { CYCT(0x7bdc, 0x7bdd); ret_effect(gb); return; }
+  CYC(0x7bdc, 0x7bdd);
+  CYC(0x7bdd, 0x7bdf); mem_wr(gb, HL, 0xb0);
+  CYC(0x7bdf, 0x7be0); L = alu_inc8(gb, L);
+  CYC(0x7be0, 0x7be1); A = mem_rd(gb, BC);
+  CYC(0x7be1, 0x7be2); SET_BC(BC + 1);
+  CYC(0x7be2, 0x7be3); mem_wr(gb, HL, A);
+  CYC(0x7be3, 0x7be5); func_7c09_hook(gb);
+}
+
+void func_7beb_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7beb, 0x7bee); SET_BC(0x7c13);
+  CALL_C(0x7bee, func_7bff_hook, 0x7bff, 0x7bf1);
+  CYC(0x7bf1, 0x7bf4); SET_BC(0x7c16);
+  CYC(0x7bf4, 0x7bf6); func_7bff_hook(gb);
+}
+
+void func_7bf6_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7bf6, 0x7bf9); SET_BC(0x7c19);
+  CALL_C(0x7bf9, func_7bff_hook, 0x7bff, 0x7bfc);
+  CYC(0x7bfc, 0x7bff); SET_BC(0x7c1c);
+  func_7bff_hook(gb);
+}
+
+void func_7bff_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7bff, getFreeInteractionSlot_hook, 0x3aef, 0x7c02);
+  if (!(F & FZ)) { CYCT(0x7c02, 0x7c03); ret_effect(gb); return; }
+  CYC(0x7c02, 0x7c03);
+  CYC(0x7c03, 0x7c05); mem_wr(gb, HL, 0xbc);
+  CYC(0x7c05, 0x7c06); L = alu_inc8(gb, L);
+  CYC(0x7c06, 0x7c07); A = mem_rd(gb, BC);
+  CYC(0x7c07, 0x7c08); SET_BC(BC + 1);
+  CYC(0x7c08, 0x7c09); mem_wr(gb, HL, A);
+  func_7c09_hook(gb);
+}
+
+void func_7c09_hook(GB *gb) {
+  CYC(0x7c09, 0x7c0b); L = 0x4b;
+  CYC(0x7c0b, 0x7c0c); A = mem_rd(gb, BC);
+  CYC(0x7c0c, 0x7c0d); SET_BC(BC + 1);
+  CYC(0x7c0d, 0x7c0e); mem_wr(gb, HL, A);
+  CYC(0x7c0e, 0x7c10); L = 0x4d;
+  CYC(0x7c10, 0x7c11); A = mem_rd(gb, BC);
+  CYC(0x7c11, 0x7c12); mem_wr(gb, HL, A);
+  CYC(0x7c12, 0x7c13); ret_effect(gb);
+}
+
+void func_7c1f_hook(GB *gb) {
+  CYC(0x7c1f, 0x7c21); A = 1;
+  CYC(0x7c21, 0x7c24); W8(wLoadedTreeGfxIndex) = A;
+  CYC(0x7c24, 0x7c26); A = 0xbc;
+  CYC(0x7c26, 0x7c29); W8(wInteractionIDToLoadExtraGfx) = A;
+  CYC(0x7c29, 0x7c2a); ret_effect(gb);
 }

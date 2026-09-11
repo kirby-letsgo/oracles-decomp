@@ -464,3 +464,11 @@ desync to discover; keep them when porting routines.
   `rewritten.txt` while the C shims used `__`; regeneration removed the generated entries, then
   lint could not match either spelling. Add the `__` spelling at the same address in `extra.sym`,
   and use that alias consistently in `ported.txt`, `rewritten.txt`, and the `_hook` function.
+- A clean routine verifier does not prove a newly readable nested callee was exercised as C.
+  During verification, `CALL_C` deliberately runs its callee through the interpreter, so batch
+  52's inverted `jr nc` condition inside `flashScreen_body` produced 0 failures in the 30k run
+  while the non-verifying reference replay diverged at frame 21,660. The whole-movie gate and a
+  hook-list bisection isolated the nested helper; comparing its flag condition to the assembly
+  found `if (F & FC)` where the taken no-carry edge required `if (!(F & FC))`. Keep the reference
+  replay mandatory even after a clean hook-verification run, especially for helpers reached only
+  through direct `CALL_C` chains.

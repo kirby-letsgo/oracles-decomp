@@ -7,7 +7,7 @@ Updated 2026-09-11. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 1,051 routines rewritten across fourteen code banks;
+  routine against the transliteration. Progress: 1,071 routines rewritten across fourteen code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -40,7 +40,9 @@ Updated 2026-09-11. Newest entries at the top of each section.
   the small Ages cutscene wrappers, and continued the title/riding-horse intro states; batch 50
   added the safe pirate-ship update path, finished the small cutscene wrappers and `cutscenes2.s`
   leaves, and completed the remaining riding-horse intro states; batch 51 added linked-game and
-  endgame cutscene leaf helpers and continued the temple-intro state path.
+  endgame cutscene leaf helpers and continued the temple-intro state path; batch 52 added the
+  remaining linked-game spawn helpers, endgame tile/inventory helpers, and temple/pre-title
+  cinematic states.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -145,6 +147,14 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-11: milestone 3 phase 5 batch 52 (20 routines): seven bank-3 linked-game
+  interaction-spawn helpers, three bank-3 endgame tile/inventory helpers, and ten bank-3 temple
+  and pre-title cinematic entries. Cross-review updated the older state-5 fallthrough to the new
+  state-6 hook. The first whole-movie run then isolated an inverted carry test in
+  `flashScreen_body`'s `jr nc`; correcting the C condition restored the reference hash. Gates:
+  lint 0, 30k verify 0 mismatches, whole-movie state hash clean (`64bddd0dfe384126`), ctest 8/8
+  in both normal and quirk builds.
 
 - 2026-09-11: milestone 3 phase 5 batch 51 (26 routines): eight bank-3 linked-game
   cutscene helpers, ten bank-3 endgame countdown/OAM helpers, and eight bank-3 scrolling-tree and
