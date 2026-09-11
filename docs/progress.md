@@ -7,7 +7,7 @@ Updated 2026-09-11. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 1,025 routines rewritten across fourteen code banks;
+  routine against the transliteration. Progress: 1,051 routines rewritten across fourteen code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -39,7 +39,8 @@ Updated 2026-09-11. Newest entries at the top of each section.
   paths; batch 49 completed `roomSpecificTileChanges.s`, added underwater-wave maintenance and
   the small Ages cutscene wrappers, and continued the title/riding-horse intro states; batch 50
   added the safe pirate-ship update path, finished the small cutscene wrappers and `cutscenes2.s`
-  leaves, and completed the remaining riding-horse intro states.
+  leaves, and completed the remaining riding-horse intro states; batch 51 added linked-game and
+  endgame cutscene leaf helpers and continued the temple-intro state path.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -144,6 +145,13 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-11: milestone 3 phase 5 batch 51 (26 routines): eight bank-3 linked-game
+  cutscene helpers, ten bank-3 endgame countdown/OAM helpers, and eight bank-3 scrolling-tree and
+  temple-intro state entries. Dynamic state-machine dispatchers and thread-switching helpers were
+  skipped; the two state-0 triforce labels remain internal readable helpers because they have no
+  independent callers. Gates: lint 0, 30k verify 0 mismatches, whole-movie state hash clean
+  (`64bddd0dfe384126`), ctest 8/8 in both normal and quirk builds.
 
 - 2026-09-11: milestone 3 phase 5 batch 50 (23 routines): five bank-1 pirate-ship
   update/load/position/angle helpers, nine bank-1 small-cutscene and `cutscenes2.s` wrappers, and

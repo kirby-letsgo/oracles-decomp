@@ -862,3 +862,247 @@ void introCinematic_ridingHorse_state10_hook(GB *gb) {
   CALL_C(0x508d, clearDynamicInteractions_hook, 0x35d2, 0x5090);
   CYC(0x5090, 0x5092); incIntroCinematicState_hook(gb);
 }
+
+void introCinematic_preTitlescreen_updateScrollingTree_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5092, 0x5095); SET_HL(wTmpcbb6);
+  CYC(0x5095, 0x5096); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(0x5096, 0x5097); ret_effect(gb);
+    return;
+  }
+  CYC(0x5096, 0x5097);
+  CYC(0x5097, 0x509a); A = mem_rd(gb, wTmpcbba);
+  CYC(0x509a, 0x509d); mem_wr(gb, wTmpcbb6, A);
+  CYC(0x509d, 0x50a0); SET_HL(wGfxRegs1_SCY);
+  CYC(0x50a0, 0x50a1); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x50a1, 0x50a2); A = mem_rd(gb, HL);
+  CYC(0x50a2, 0x50a4); alu_cp(gb, 0x88);
+  if (F & FZ) {
+    CYCT(0x50a4, 0x50a5); ret_effect(gb);
+    return;
+  }
+  CYC(0x50a4, 0x50a5);
+  CYC(0x50a5, 0x50a7); alu_cp(gb, 0x10);
+  if (!(F & FZ)) {
+    CYCT(0x50a7, 0x50a9);
+    CYC(0x50be, 0x50c0); alu_cp(gb, 0xb0);
+    if (!(F & FZ)) {
+      CYCT(0x50c0, 0x50c2);
+    } else {
+      CYC(0x50c0, 0x50c2);
+      CYC(0x50c2, 0x50c4); A = 0x2a;
+      CALL_C(0x50c4, loadUncompressedGfxHeader_hook, 0x05da, 0x50c7);
+    }
+    CYC(0x50c7, 0x50c9); alu_or(gb, 0x01);
+    CYC(0x50c9, 0x50ca); ret_effect(gb);
+    return;
+  }
+  CYC(0x50a7, 0x50a9);
+  CYC(0x50a9, 0x50ab); A = 0x0d;
+  CALL_C(0x50ab, loadUncompressedGfxHeader_hook, 0x05da, 0x50ae);
+  CYC(0x50ae, 0x50b0); B = 0x04;
+  for (;;) {
+    CALL_C(0x50b0, getFreeInteractionSlot_hook, 0x3aef, 0x50b3);
+    if (!(F & FZ)) {
+      CYCT(0x50b3, 0x50b5);
+      break;
+    }
+    CYC(0x50b3, 0x50b5);
+    CYC(0x50b5, 0x50b7); mem_wr(gb, HL, 0xd2);
+    CYC(0x50b7, 0x50b8); L = alu_inc8(gb, L);
+    CYC(0x50b8, 0x50b9); B = alu_dec8(gb, B);
+    CYC(0x50b9, 0x50ba); mem_wr(gb, HL, B);
+    if (!(F & FZ)) {
+      CYCT(0x50ba, 0x50bc);
+      continue;
+    }
+    CYC(0x50ba, 0x50bc);
+    CYC(0x50bc, 0x50be);
+    break;
+  }
+  CYC(0x50c7, 0x50c9); alu_or(gb, 0x01);
+  CYC(0x50c9, 0x50ca); ret_effect(gb);
+}
+
+void introCinematic_inTemple_state0__nextTriforce_hook(GB *gb);
+void introCinematic_inTemple_state0__doneSpawningTriforce_hook(GB *gb);
+void introCinematic_inTemple_updateWave_hook(GB *gb);
+
+void introCinematic_inTemple_state0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x50ed, disableLcd_hook, 0x02c1, 0x50f0);
+  CALL_C(0x50f0, clearOam_hook, 0x049f, 0x50f3);
+  CYC(0x50f3, 0x50f5); A = 0x10;
+  CYC(0x50f5, 0x50f7); hram_wr(gb, 0x9f, A);
+  CYC(0x50f7, 0x50f9); A = 0x9e;
+  CALL_C(0x50f9, loadGfxHeader_hook, 0x0626, 0x50fc);
+  CYC(0x50fc, 0x50fe); A = 0x91;
+  CALL_C(0x50fe, loadPaletteHeader_hook, 0x050b, 0x5101);
+  CYC(0x5101, 0x5103); A = 0x09;
+  CALL_C(0x5103, loadGfxRegisterStateIndex_hook, 0x02ea, 0x5106);
+  CYC(0x5106, 0x5109); A = mem_rd(gb, wGfxRegs1_SCY);
+  CYC(0x5109, 0x510b); hram_wr(gb, 0xaa, A);
+  CYC(0x510b, 0x510d); A = 0x10;
+  CYC(0x510d, 0x5110); mem_wr(gb, wTilesetAnimation, A);
+  CALL_C(0x5110, loadAnimationData_hook, 0x3659, 0x5113);
+  CYC(0x5113, 0x5115); A = 0x01;
+  CYC(0x5115, 0x5118); mem_wr(gb, wScrollMode, A);
+  CYC(0x5118, 0x511a); A = 0x08;
+  CALL_C(0x511a, setLinkID_hook, 0x2ad9, 0x511d);
+  CYC(0x511d, 0x511f); L = 0x00;
+  CYC(0x511f, 0x5121); mem_wr(gb, HL, 0x01);
+  CYC(0x5121, 0x5123); L = 0x0b;
+  CYC(0x5123, 0x5126); A = mem_rd(gb, wGfxRegs1_SCY);
+  CYC(0x5126, 0x5128); alu_add(gb, 0x60);
+  CYC(0x5128, 0x5129); mem_wr(gb, HL, A);
+  CYC(0x5129, 0x512b); L = 0x0d;
+  CYC(0x512b, 0x512d); mem_wr(gb, HL, 0x50);
+  CYC(0x512d, 0x5130); SET_HL(0x709a);
+  CYC(0x5130, 0x5132); A = 0x10;
+  CALL_C(0x5132, setSimulatedInputAddress_hook, 0x2a1d, 0x5135);
+  CYC(0x5135, 0x5137); B = 0x03;
+  CYC(0x5137, 0x5139); C = 0x30;
+  introCinematic_inTemple_state0__nextTriforce_hook(gb);
+}
+
+void introCinematic_inTemple_state0__nextTriforce_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  for (;;) {
+    CALL_C(0x5139, getFreeInteractionSlot_hook, 0x3aef, 0x513c);
+    if (!(F & FZ)) {
+      CYCT(0x513c, 0x513e);
+      introCinematic_inTemple_state0__doneSpawningTriforce_hook(gb);
+      return;
+    }
+    CYC(0x513c, 0x513e);
+    CYC(0x513e, 0x5140); mem_wr(gb, HL, 0x4a);
+    CYC(0x5140, 0x5141); L = alu_inc8(gb, L);
+    CYC(0x5141, 0x5142); A = B;
+    CYC(0x5142, 0x5143); A = alu_dec8(gb, A);
+    CYC(0x5143, 0x5144); mem_wr(gb, HL, A);
+    CYC(0x5144, 0x5146); L = 0x4b;
+    CYC(0x5146, 0x5148); mem_wr(gb, HL, 0x19);
+    CYC(0x5148, 0x5149); A = C;
+    CYC(0x5149, 0x514b); L = 0x4d;
+    CYC(0x514b, 0x514c); mem_wr(gb, HL, A);
+    CYC(0x514c, 0x514e); alu_add(gb, 0x20);
+    CYC(0x514e, 0x514f); C = A;
+    CYC(0x514f, 0x5150); A = C;
+    CYC(0x5150, 0x5151); B = alu_dec8(gb, B);
+    if (!(F & FZ)) {
+      CYCT(0x5151, 0x5153);
+      continue;
+    }
+    CYC(0x5151, 0x5153);
+    introCinematic_inTemple_state0__doneSpawningTriforce_hook(gb);
+    return;
+  }
+}
+
+void introCinematic_inTemple_state0__doneSpawningTriforce_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5153, 0x5156); SET_HL(wMenuDisabled);
+  CYC(0x5156, 0x5158); mem_wr(gb, HL, 0x01);
+  CALL_C(0x5158, fadeinFromWhite_hook, 0x3299, 0x515b);
+  CYC(0x515b, 0x515c); alu_xor(gb, A);
+  CYC(0x515c, 0x515f); mem_wr(gb, wIntro_triforceState, A);
+  CYC(0x515f, 0x5162); intro_incState_hook(gb);
+}
+
+void introCinematic_inTemple_state1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5162, 0x5165); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x5165, 0x5166); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x5166, 0x5167); ret_effect(gb);
+    return;
+  }
+  CYC(0x5166, 0x5167);
+  CYC(0x5167, 0x516a); A = mem_rd(gb, wUseSimulatedInput);
+  CYC(0x516a, 0x516b); alu_rlca(gb);
+  if (!(F & FC)) {
+    CYCT(0x516b, 0x516e);
+    introCinematic_inTemple_updateCamera(gb);
+    return;
+  }
+  CYC(0x516b, 0x516e);
+  CYC(0x516e, 0x516f); alu_xor(gb, A);
+  CYC(0x516f, 0x5172); mem_wr(gb, wUseSimulatedInput, A);
+  CALL_C(0x5172, introCinematic_inTemple_updateCamera, 0x53ba, 0x5175);
+  CYC(0x5175, 0x5178); intro_incState_hook(gb);
+}
+
+void introCinematic_inTemple_state2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5178, 0x517b); A = mem_rd(gb, wIntro_triforceState);
+  CYC(0x517b, 0x517d); alu_cp(gb, 0x03);
+  if (!(F & FZ)) {
+    CYCT(0x517d, 0x517e); ret_effect(gb);
+    return;
+  }
+  CYC(0x517d, 0x517e);
+  CALL_C(0x517e, fadeoutToWhite_hook, 0x326c, 0x5181);
+  CYC(0x5181, 0x5184); intro_incState_hook(gb);
+}
+
+void introCinematic_inTemple_state3_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5184, 0x5187); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x5187, 0x5188); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x5188, 0x5189); ret_effect(gb);
+    return;
+  }
+  CYC(0x5188, 0x5189);
+  CYC(0x5189, 0x518b); A = 0x01;
+  CYC(0x518b, 0x518e); mem_wr(gb, wGfxRegs1_LYC, A);
+  CYC(0x518e, 0x518f); A = alu_inc8(gb, A);
+  CYC(0x518f, 0x5192); mem_wr(gb, wGfxRegs2_LYC, A);
+  CYC(0x5192, 0x5194); A = 0x00;
+  CYC(0x5194, 0x5196); hram_wr(gb, 0x9d, A);
+  CYC(0x5196, 0x5198); A = 0x20;
+  CALL_C(0x5198, initWaveScrollValues_hook, 0x1384, 0x519b);
+  CALL_C(0x519b, fadeinFromWhite_hook, 0x3299, 0x519e);
+  CALL_C(0x519e, intro_incState_hook, 0x4d33, 0x51a1);
+  introCinematic_inTemple_updateWave_hook(gb);
+}
+
+void introCinematic_inTemple_updateWave_hook(GB *gb) {
+  CYC(0x51a1, 0x51a4); SET_HL(wFrameCounter);
+  CYC(0x51a4, 0x51a5); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x51a5, 0x51a7); A = 0x02;
+  CYC(0x51a7, 0x51aa); loadBigBufferScrollValues_hook(gb);
+}
+
+void introCinematic_inTemple_state4_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x51aa, introCinematic_inTemple_updateWave_hook, 0x51a1, 0x51ad);
+  CYC(0x51ad, 0x51b0); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x51b0, 0x51b1); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x51b1, 0x51b2); ret_effect(gb);
+    return;
+  }
+  CYC(0x51b1, 0x51b2);
+  CYC(0x51b2, 0x51b5); SET_HL(wTmpcbb6);
+  CYC(0x51b5, 0x51b7); mem_wr(gb, HL, 0x78);
+  CYC(0x51b7, 0x51ba); intro_incState_hook(gb);
+}
+
+void introCinematic_inTemple_state5_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x51ba, introCinematic_inTemple_updateWave_hook, 0x51a1, 0x51bd);
+  CYC(0x51bd, 0x51c0); SET_HL(wTmpcbb6);
+  CYC(0x51c0, 0x51c1); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(0x51c1, 0x51c2); ret_effect(gb);
+    return;
+  }
+  CYC(0x51c1, 0x51c2);
+  CYC(0x51c2, 0x51c5); mem_wr(gb, wTmpcbb6, A);
+  CYC(0x51c5, 0x51c6); A = alu_dec8(gb, A);
+  CYC(0x51c6, 0x51c9); mem_wr(gb, wTmpcbba, A);
+  CALL_C(0x51c9, intro_incState_hook, 0x4d33, 0x51cc);
+  introCinematic_inTemple_state6(gb);
+}
