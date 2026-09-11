@@ -270,7 +270,7 @@
     status: "idle",
     statusDetail: "",
     totalHooks: 13103,
-    rewrittenTotal: 1112,
+    rewrittenTotal: 1138,
     bank0Total: 664,
     bank0Rewritten: 626,
     codeBearingBanks: 23,
@@ -288,6 +288,7 @@
       { n: 6, name: "Sweep", desc: "Everything left in code/, until no routine is still generated.", status: "pending", meta: "remainder" },
     ],
     batches: [
+      { id: "55", delta: 26, tag: "Ph.5", text: "Deeper endgame, Maku/Nayru/pregame, and <b>bank-10 black-tower states</b>; review corrected five overlong JP burns." },
       { id: "54", delta: 23, tag: "Ph.5", text: "Endgame object-GFX and miscellaneous cutscene helpers plus more <b>bank-10 temple states</b>; replay exposed a raw-RAM alias typo." },
       { id: "53", delta: 18, tag: "Ph.5", text: "Finished the safe <b>linked-game cutscene</b> helpers, added temple camera/bar helpers, and opened bank 10's cutscene state machines." },
       { id: "52", delta: 20, tag: "Ph.5", text: "Linked-game spawns, endgame tile/inventory helpers, and <b>temple/pre-title cinematic states</b>; the full replay caught an inverted no-carry branch." },
@@ -332,10 +333,10 @@
   INITIAL.banks.find(b => b.id === "16").rewritten = 2;
   INITIAL.banks.find(b => b.id === "02").rewritten = 34;
   INITIAL.banks.find(b => b.id === "01").rewritten = 27;
-  INITIAL.banks.find(b => b.id === "03").rewritten = 122;
+  INITIAL.banks.find(b => b.id === "03").rewritten = 139;
   INITIAL.banks.find(b => b.id === "04").rewritten = 77;
   INITIAL.banks.find(b => b.id === "0c").rewritten = 94;
-  INITIAL.banks.find(b => b.id === "10").rewritten = 16;
+  INITIAL.banks.find(b => b.id === "10").rewritten = 25;
   INITIAL.banks.find(b => b.id === "3f").rewritten = 49;
 
   function fmt(n) { return n.toLocaleString("en-US"); }

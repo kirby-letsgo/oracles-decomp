@@ -8,6 +8,8 @@
 
 void agesFunc_10_70f6__func_71fd_hook(GB *gb);
 void agesFunc_10_70f6__func_7174_hook(GB *gb);
+void agesFunc_10_7298__substate3_hook(GB *gb);
+void agesFunc_10_7298__func_7407_hook(GB *gb);
 void agesFunc_10_7298__playWaveSoundAtRandomIntervals_body_hook(GB *gb);
 
 void agesFunc_10_70f6__substate4_hook(GB *gb) {
@@ -359,4 +361,179 @@ void agesFunc_10_70f6__substate8_hook(GB *gb) {
   CYC(0x7290, 0x7293); mem_wr(gb, 0xcbc1, A);
   CYC(0x7293, 0x7295); A = 0x04;
   CYC(0x7295, 0x7298); fadeoutToWhiteWithDelay_hook(gb);
+}
+
+void agesFunc_10_7298__substate1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7313, 0x7316); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x7316, 0x7317); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x7317, 0x7318); ret_effect(gb);
+    return;
+  }
+  CYC(0x7317, 0x7318);
+  CALL_C(0x7318, incCbc2_hook, 0x3067, 0x731b);
+  agesFunc_10_7298__func_731b_hook(gb);
+}
+
+void agesFunc_10_7298__substate2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7341, agesFunc_10_7298__func_731b_hook, 0x731b, 0x7344);
+  CALL_C(0x7344, decCbb3_hook, 0x305d, 0x7347);
+  if (!(F & FZ)) {
+    CYCT(0x7347, 0x7348); ret_effect(gb);
+    return;
+  }
+  CYC(0x7347, 0x7348);
+  CALL_C(0x7348, incCbc2_hook, 0x3067, 0x734b);
+  agesFunc_10_7298__substate3_hook(gb);
+}
+
+void agesFunc_10_7298__substate3_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x734b, agesFunc_10_7298__func_731b_hook, 0x731b, 0x734e);
+  CYC(0x734e, 0x7351); SET_HL(wFileIsLinkedGame);
+  CYC(0x7351, 0x7352); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x7352, 0x7353); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x7353, 0x7355); alu_cp(gb, 0x02);
+  if (F & FZ) {
+    CYCT(0x7355, 0x7356); ret_effect(gb);
+    return;
+  }
+  CYC(0x7355, 0x7356);
+  CYC(0x7356, 0x7359); A = mem_rd(gb, wKeysJustPressed);
+  CYC(0x7359, 0x735b); alu_and(gb, 0x0b);
+  if (F & FZ) {
+    CYCT(0x735b, 0x735c); ret_effect(gb);
+    return;
+  }
+  CYC(0x735b, 0x735c);
+  CALL_C(0x735c, incCbc2_hook, 0x3067, 0x735f);
+  CYC(0x735f, 0x7362); fadeoutToWhite_hook(gb);
+}
+
+void agesFunc_10_7298__substate5_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x73c1, fileSelect_redrawDecorations_hook, 0x3099, 0x73c4);
+  CYC(0x73c4, 0x73c7); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x73c7, 0x73c8); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x73c8, 0x73c9); ret_effect(gb);
+    return;
+  }
+  CYC(0x73c8, 0x73c9);
+  CALL_C(0x73c9, decCbb3_hook, 0x305d, 0x73cc);
+  if (!(F & FZ)) {
+    CYCT(0x73cc, 0x73cd); ret_effect(gb);
+    return;
+  }
+  CYC(0x73cc, 0x73cd);
+  CYC(0x73cd, 0x73d0); SET_HL(wTmpcbb3);
+  CYC(0x73d0, 0x73d2); B = 0x3c;
+  CALL_C(0x73d2, checkIsLinkedGame_hook, 0x1992, 0x73d5);
+  if (F & FZ) {
+    CYCT(0x73d5, 0x73d7);
+  } else {
+    CYC(0x73d5, 0x73d7);
+    CYC(0x73d7, 0x73d9); B = 0xb4;
+  }
+  CYC(0x73d9, 0x73da); mem_wr(gb, HL, B);
+  CYC(0x73da, 0x73dd); incCbc2_hook(gb);
+}
+
+void agesFunc_10_7298__substate6_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x73dd, fileSelect_redrawDecorations_hook, 0x3099, 0x73e0);
+  CALL_C(0x73e0, decCbb3_hook, 0x305d, 0x73e3);
+  if (!(F & FZ)) {
+    CYCT(0x73e3, 0x73e4); ret_effect(gb);
+    return;
+  }
+  CYC(0x73e3, 0x73e4);
+  CALL_C(0x73e4, checkIsLinkedGame_hook, 0x1992, 0x73e7);
+  if (!(F & FZ)) {
+    CYCT(0x73e7, 0x73e9);
+  } else {
+    CYC(0x73e7, 0x73e9);
+    CALL_C(0x73e9, getFreeInteractionSlot_hook, 0x3aef, 0x73ec);
+    if (!(F & FZ)) {
+      CYCT(0x73ec, 0x73ee);
+    } else {
+      CYC(0x73ec, 0x73ee);
+      CYC(0x73ee, 0x73f0); mem_wr(gb, HL, 0xd1);
+      CYC(0x73f0, 0x73f1); alu_xor(gb, A);
+      CYC(0x73f1, 0x73f4); mem_wr(gb, 0xcfde, A);
+    }
+  }
+  CYC(0x73f4, 0x73f7); incCbc2_hook(gb);
+}
+
+void agesFunc_10_7298__substate7_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x73f7, fileSelect_redrawDecorations_hook, 0x3099, 0x73fa);
+  CALL_C(0x73fa, checkIsLinkedGame_hook, 0x1992, 0x73fd);
+  if (F & FZ) {
+    CYCT(0x73fd, 0x73ff);
+    agesFunc_10_7298__func_7407_hook(gb);
+    return;
+  }
+  CYC(0x73fd, 0x73ff);
+  CYC(0x73ff, 0x7402); A = mem_rd(gb, wKeysJustPressed);
+  CYC(0x7402, 0x7404); alu_and(gb, 0x01);
+  if (F & FZ) {
+    CYC(0x7404, 0x7406);
+    CYC(0x7406, 0x7407); ret_effect(gb);
+    return;
+  }
+  CYCT(0x7404, 0x7406);
+  CALL_C(0x740c, incCbc2_hook, 0x3067, 0x740f);
+  CYC(0x740f, 0x7411); A = 0xfa;
+  CALL_C(0x7411, playSound_b00_hook, 0x0c98, 0x7414);
+  CYC(0x7414, 0x7417); fadeoutToWhite_hook(gb);
+}
+
+void agesFunc_10_7298__func_7407_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7407, 0x740a); A = mem_rd(gb, 0xcfde);
+  CYC(0x740a, 0x740b); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x740b, 0x740c); ret_effect(gb);
+    return;
+  }
+  CYC(0x740b, 0x740c);
+  CALL_C(0x740c, incCbc2_hook, 0x3067, 0x740f);
+  CYC(0x740f, 0x7411); A = 0xfa;
+  CALL_C(0x7411, playSound_b00_hook, 0x0c98, 0x7414);
+  CYC(0x7414, 0x7417); fadeoutToWhite_hook(gb);
+}
+
+void agesFunc_10_7298__substate9_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7440, agesFunc_10_7298__func_7450_hook, 0x7450, 0x7443);
+  CYC(0x7443, 0x7446); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x7446, 0x7447); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x7447, 0x7448); ret_effect(gb);
+    return;
+  }
+  CYC(0x7447, 0x7448);
+  CYC(0x7448, 0x744b); SET_HL(wTmpcbb3);
+  CYC(0x744b, 0x744d); mem_wr(gb, HL, 0xb4);
+  CYC(0x744d, 0x7450); incCbc2_hook(gb);
+}
+
+void agesFunc_10_7298__substateA_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x745e, agesFunc_10_7298__func_7450_hook, 0x7450, 0x7461);
+  CYC(0x7461, 0x7464); SET_HL(wTmpcbb3);
+  CYC(0x7464, 0x7465); A = mem_rd(gb, HL);
+  CYC(0x7465, 0x7466); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x7466, 0x7468);
+    agesFunc_10_7298__func_746a_hook(gb);
+    return;
+  }
+  CYC(0x7466, 0x7468);
+  CYC(0x7468, 0x7469); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x7469, 0x746a); ret_effect(gb);
 }

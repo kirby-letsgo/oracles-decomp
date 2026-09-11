@@ -6,6 +6,11 @@
 #define CYC(from, to) burn_rom(gb, 0x03, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, 0x03, (from), (to), true)
 
+void nayruWarpToMakuTreeCutsceneHandler__func_6955_hook(GB *gb);
+void nayruWarpToMakuTreeCutsceneHandler__func_6962_hook(GB *gb);
+void func_6f9e_hook(GB *gb);
+void func_6fb0_hook(GB *gb);
+
 void cutscene_incCutsceneState_hook(GB *gb) {
   CYC(0x6f8c, 0x6f8f); SET_HL(wCutsceneState);
   CYC(0x6f8f, 0x6f90); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
@@ -182,4 +187,143 @@ void nayruWarpToMakuTreeCutsceneHandler__func_692b_hook(GB *gb) {
   }
   CYC(0x6945, 0x6948);
   cutscene_incCutsceneState_hook(gb);
+}
+
+void nayruWarpToMakuTreeCutsceneHandler__func_6948_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6948, cutscene_decCBB6_hook, 0x6f91, 0x694b);
+  if (!(F & FZ)) {
+    CYCT(0x694b, 0x694c); ret_effect(gb);
+    return;
+  }
+  CYC(0x694b, 0x694c);
+  CYC(0x694c, 0x694e); L = 0xb7;
+  CYC(0x694e, 0x694f); A = mem_rd(gb, HL);
+  CYC(0x694f, 0x6951); alu_xor(gb, 0x02);
+  CYC(0x6951, 0x6952); mem_wr(gb, HL, A);
+  CALL_C(0x6952, nayruWarpToMakuTreeCutsceneHandler__func_6962_hook, 0x6962, 0x6955);
+  nayruWarpToMakuTreeCutsceneHandler__func_6955_hook(gb);
+}
+
+void nayruWarpToMakuTreeCutsceneHandler__func_6955_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6955, getRandomNumber_noPreserveVars_hook, 0x0453, 0x6958);
+  CYC(0x6958, 0x695a); alu_and(gb, 0x03);
+  CYC(0x695a, 0x695b); alu_add(gb, A);
+  CYC(0x695b, 0x695c); alu_add(gb, A);
+  CYC(0x695c, 0x695e); alu_add(gb, 0x10);
+  CYC(0x695e, 0x6961); mem_wr(gb, wTmpcbb6, A);
+  CYC(0x6961, 0x6962); ret_effect(gb);
+}
+
+void nayruWarpToMakuTreeCutsceneHandler__func_6962_hook(GB *gb) {
+  CYC(0x6962, 0x6965); mem_wr(gb, 0xd008, A);
+  CYC(0x6965, 0x6967); A = 0x08;
+  CYC(0x6967, 0x696a); mem_wr(gb, wLinkForceState, A);
+  CYC(0x696a, 0x696b); ret_effect(gb);
+}
+
+void blackTowerCompleteCutsceneHandler__func_6a2b_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6a2b, clearWramBank1_hook, 0x3597, 0x6a2e);
+  CALL_C(0x6a2e, clearOam_hook, 0x049f, 0x6a31);
+  CYC(0x6a31, 0x6a33); A = 0x05;
+  CYC(0x6a33, 0x6a36); mem_wr(gb, wCutsceneState, A);
+  CYC(0x6a36, 0x6a39); SET_BC(0x8d01);
+  CYC(0x6a39, 0x6a3c);
+  createInteraction_hook(gb);
+}
+
+void twinrovaRevealCutsceneHandler__func_6bc9_hook(GB *gb) {
+  CYC(0x6bc9, 0x6bcc); SET_HL(wTmpcbb3);
+  CYC(0x6bcc, 0x6bcd); alu_xor(gb, A);
+  CYC(0x6bcd, 0x6bce); mem_wr(gb, HL, A);
+  CYC(0x6bce, 0x6bcf); A = alu_dec8(gb, A);
+  CYC(0x6bcf, 0x6bd2); mem_wr(gb, wTmpcbba, A);
+  CYC(0x6bd2, 0x6bd5);
+  cutscene_incCutsceneState_hook(gb);
+}
+
+void twinrovaRevealCutsceneHandler__func_6be8_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6be8, func_6f9e_hook, 0x6f9e, 0x6beb);
+  CYC(0x6beb, 0x6bed); A = 0x01;
+  CYC(0x6bed, 0x6bf0); mem_wr(gb, wDisabledObjects, A);
+  CALL_C(0x6bf0, clearDynamicInteractions_hook, 0x35d2, 0x6bf3);
+  CYC(0x6bf3, 0x6bf6); SET_HL(0x77b2);
+  CALL_C(0x6bf6, checkIsLinkedGame_hook, 0x1992, 0x6bf9);
+  if (!(F & FZ)) {
+    CYCT(0x6bf9, 0x6bfb);
+  } else {
+    CYC(0x6bf9, 0x6bfb);
+    CYC(0x6bfb, 0x6bfe); SET_HL(wCutsceneState);
+    CYC(0x6bfe, 0x6c00); mem_wr(gb, HL, 0x06);
+    CYC(0x6c00, 0x6c03); SET_HL(0x77a5);
+  }
+  CALL_C(0x6c03, parseGivenObjectData_b00_hook, 0x3171, 0x6c06);
+  CYC(0x6c06, 0x6c09);
+  cutscene_incCutsceneState_hook(gb);
+}
+
+void pregameIntroCutsceneHandler__func_6d40_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6d40, 0x6d42); A = 0x01;
+  CYC(0x6d42, 0x6d43); mem_wr(gb, DE, A);
+  CYC(0x6d43, 0x6d46); SET_BC(0x05f1);
+  CALL_C(0x6d46, disableLcdAndLoadRoom_hook, 0x30b0, 0x6d49);
+  CALL_C(0x6d49, resetCamera_hook, 0x12ce, 0x6d4c);
+  CYC(0x6d4c, 0x6d4e); A = 0xac;
+  CALL_C(0x6d4e, loadPaletteHeader_hook, 0x050b, 0x6d51);
+  CYC(0x6d51, 0x6d54); SET_HL(0x77b6);
+  CALL_C(0x6d54, parseGivenObjectData_b00_hook, 0x3171, 0x6d57);
+  CYC(0x6d57, 0x6d59); A = 0x1b;
+  CALL_C(0x6d59, playSound_b00_hook, 0x0c98, 0x6d5c);
+  CYC(0x6d5c, 0x6d5f); SET_HL(wTmpcbb3);
+  CYC(0x6d5f, 0x6d61); mem_wr(gb, HL, 0x3c);
+  CYC(0x6d61, 0x6d63); A = 0x13;
+  CALL_C(0x6d63, loadGfxRegisterStateIndex_hook, 0x02ea, 0x6d66);
+  CYC(0x6d66, 0x6d69); A = mem_rd(gb, wGfxRegs2_SCX);
+  CYC(0x6d69, 0x6d6b); hram_wr(gb, 0xac, A);
+  CYC(0x6d6b, 0x6d6c); alu_xor(gb, A);
+  CYC(0x6d6c, 0x6d6e); hram_wr(gb, 0xaa, A);
+  CYC(0x6d6e, 0x6d70); A = 0x00;
+  CYC(0x6d70, 0x6d73); mem_wr(gb, wScrollMode, A);
+  CYC(0x6d73, 0x6d76);
+  clearFadingPalettes2_hook(gb);
+}
+
+void func_6f9e_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6f9e, 0x6fa0); A = hram_rd(gb, 0x70);
+  CYC(0x6fa0, 0x6fa1); push_effect(gb, AF);
+  CYC(0x6fa1, 0x6fa3); A = 0x02;
+  CYC(0x6fa3, 0x6fa5); hram_wr(gb, 0x70, A);
+  CYC(0x6fa5, 0x6fa8); SET_HL(0xde90);
+  CYC(0x6fa8, 0x6faa); B = 0x30;
+  CALL_C(0x6faa, clearMemory_hook, 0x046f, 0x6fad);
+  CYC(0x6fad, 0x6fae); SET_AF(pop_effect(gb));
+  CYC(0x6fae, 0x6fb0); hram_wr(gb, 0x70, A);
+  func_6fb0_hook(gb);
+}
+
+void func_6fb0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6fb0, 0x6fb2); A = hram_rd(gb, 0x70);
+  CYC(0x6fb2, 0x6fb3); push_effect(gb, AF);
+  CYC(0x6fb3, 0x6fb5); A = 0x02;
+  CYC(0x6fb5, 0x6fb7); hram_wr(gb, 0x70, A);
+  CYC(0x6fb7, 0x6fba); SET_HL(0xdf80);
+  CYC(0x6fba, 0x6fbc); B = 0x80;
+  CALL_C(0x6fbc, clearMemory_hook, 0x046f, 0x6fbf);
+  CYC(0x6fbf, 0x6fc0); SET_AF(pop_effect(gb));
+  CYC(0x6fc0, 0x6fc2); hram_wr(gb, 0x70, A);
+  CALL_C(0x6fc2, hideStatusBar_hook, 0x1aa0, 0x6fc5);
+  CYC(0x6fc5, 0x6fc7); A = 0xfc;
+  CYC(0x6fc7, 0x6fc9); hram_wr(gb, 0xa8, A);
+  CYC(0x6fc9, 0x6fcb); hram_wr(gb, 0xa6, A);
+  CYC(0x6fcb, 0x6fcc); alu_xor(gb, A);
+  CYC(0x6fcc, 0x6fcf); mem_wr(gb, wScrollMode, A);
+  CYC(0x6fcf, 0x6fd2); mem_wr(gb, wGfxRegs1_LYC, A);
+  CYC(0x6fd2, 0x6fd5); mem_wr(gb, wGfxRegs2_SCY, A);
+  CYC(0x6fd5, 0x6fd6); ret_effect(gb);
 }
