@@ -454,3 +454,8 @@ desync to discover; keep them when porting routines.
   `replaceVineTiles`, showing that both `CALL_C` and static C tails need the audit. After
   registering a new rewrite, rebuild the whole target and search compile failures for older calls
   that still name the generated symbol.
+- Conditional calls need conditional-call timing even when the C branch already expresses the
+  condition. Batch 48 initially used ordinary `CALL_C` for `cutscene19_state8`'s `call z` at
+  `$4c87`; cross-review found that the taken edge then burned the ordinary four-cycle call instead
+  of the conditional call's six cycles. Use `CALL_C_CC` on the taken branch and the ordinary
+  three-byte `CYC` on the fallthrough branch.

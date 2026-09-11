@@ -9,6 +9,11 @@
 void tileReplacement_group2Map7e_hook(GB *gb);
 void replaceVineTiles_hook(GB *gb);
 
+static void tileReplacement_group5Mapb9_write_tiles(GB *gb);
+static void tileReplacement_group1Map27_write_tiles(GB *gb);
+static void createInteraction90_local(GB *gb, uint16_t sp0_);
+static void setTileToDoor_local(GB *gb);
+
 static void add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
   burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
@@ -864,6 +869,129 @@ void tileReplacement_group0Map3a_hook(GB *gb) {
   CYC(0x6a2f, 0x6a30); ret_effect(gb);
 }
 
+void tileReplacement_group0Map0b_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6a30, 0x6a33); SET_HL(wGroup0RoomFlags + 0x0a);
+  CYC(0x6a33, 0x6a35); alu_bit(gb, 6, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x6a35, 0x6a36); ret_effect(gb);
+    return;
+  }
+  CYC(0x6a35, 0x6a36);
+  CYC(0x6a36, 0x6a39); SET_HL(wRoomLayout + 0x43);
+  CYC(0x6a39, 0x6a3b); mem_wr(gb, HL, 0xdd);
+  CYC(0x6a3b, 0x6a3c); ret_effect(gb);
+}
+
+void tileReplacement_group5Mapb9_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6a3c, 0x6a3e); A = 0x03;
+  CYC(0x6a3e, 0x6a41); SET_HL(wEssencesObtained);
+  CALL_C(0x6a41, checkFlag_hook, 0x0205, 0x6a44);
+  if (F & FZ) {
+    CYCT(0x6a44, 0x6a45); ret_effect(gb);
+    return;
+  }
+  CYC(0x6a44, 0x6a45);
+  CYC(0x6a45, 0x6a48); SET_BC(0x6a5d);
+  CYC(0x6a48, 0x6a4b); SET_HL(wRoomLayout + 0x41);
+  CYC(0x6a4b, 0x6a4e); push_effect(gb, 0x6a4e);
+  tileReplacement_group5Mapb9_write_tiles(gb);
+  CYC(0x6a4e, 0x6a50); L = 0x51;
+  tileReplacement_group5Mapb9_write_tiles(gb);
+}
+
+static void tileReplacement_group5Mapb9_write_tiles(GB *gb) {
+  CYC(0x6a50, 0x6a52); A = 0x05;
+  for (;;) {
+    CYC(0x6a52, 0x6a54); hram_wr(gb, 0x8d, A);
+    CYC(0x6a54, 0x6a55); A = mem_rd(gb, BC);
+    CYC(0x6a55, 0x6a56); SET_BC(BC + 1);
+    CYC(0x6a56, 0x6a57); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x6a57, 0x6a59); A = hram_rd(gb, 0x8d);
+    CYC(0x6a59, 0x6a5a); A = alu_dec8(gb, A);
+    if (!(F & FZ)) {
+      CYCT(0x6a5a, 0x6a5c);
+      continue;
+    }
+    CYC(0x6a5a, 0x6a5c);
+    break;
+  }
+  CYC(0x6a5c, 0x6a5d); ret_effect(gb);
+}
+
+void tileReplacement_group1Map27_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6a67, getThisRoomFlags_hook, 0x197d, 0x6a6a);
+  CYC(0x6a6a, 0x6a6c); L = 0x15;
+  CYC(0x6a6c, 0x6a6e); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x6a6e, 0x6a70);
+    goto next_flag_17;
+  }
+  CYC(0x6a6e, 0x6a70);
+  CYC(0x6a70, 0x6a73); SET_DE(0x3343);
+  CYC(0x6a73, 0x6a76); push_effect(gb, 0x6a76);
+  tileReplacement_group1Map27_write_tiles(gb);
+next_flag_17:
+  CYC(0x6a76, 0x6a78); L = 0x17;
+  CYC(0x6a78, 0x6a7a); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x6a7a, 0x6a7c);
+    goto next_flag_35;
+  }
+  CYC(0x6a7a, 0x6a7c);
+  CYC(0x6a7c, 0x6a7f); SET_DE(0x3424);
+  CYC(0x6a7f, 0x6a82); push_effect(gb, 0x6a82);
+  tileReplacement_group1Map27_write_tiles(gb);
+next_flag_35:
+  CYC(0x6a82, 0x6a84); L = 0x35;
+  CYC(0x6a84, 0x6a86); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x6a86, 0x6a88);
+    goto next_flag_37;
+  }
+  CYC(0x6a86, 0x6a88);
+  CYC(0x6a88, 0x6a8b); SET_DE(0x3545);
+  CYC(0x6a8b, 0x6a8e); push_effect(gb, 0x6a8e);
+  tileReplacement_group1Map27_write_tiles(gb);
+next_flag_37:
+  CYC(0x6a8e, 0x6a90); L = 0x37;
+  CYC(0x6a90, 0x6a92); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x6a92, 0x6a93); ret_effect(gb);
+    return;
+  }
+  CYC(0x6a92, 0x6a93);
+  CYC(0x6a93, 0x6a96); SET_DE(0x3626);
+  tileReplacement_group1Map27_write_tiles(gb);
+}
+
+static void tileReplacement_group1Map27_write_tiles(GB *gb) {
+  CYC(0x6a96, 0x6a98); B = wRoomLayout >> 8;
+  CYC(0x6a98, 0x6a99); C = D;
+  CYC(0x6a99, 0x6a9b); A = 0x3a;
+  CYC(0x6a9b, 0x6a9c); mem_wr(gb, BC, A);
+  CYC(0x6a9c, 0x6a9d); C = E;
+  CYC(0x6a9d, 0x6a9f); A = 0x02;
+  CYC(0x6a9f, 0x6aa0); mem_wr(gb, BC, A);
+  CYC(0x6aa0, 0x6aa1); ret_effect(gb);
+}
+
+void tileReplacement_group5Mapc2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6aa1, getThisRoomFlags_hook, 0x197d, 0x6aa4);
+  CYC(0x6aa4, 0x6aa6); alu_and(gb, 0x80);
+  if (F & FZ) {
+    CYCT(0x6aa6, 0x6aa7); ret_effect(gb);
+    return;
+  }
+  CYC(0x6aa6, 0x6aa7);
+  CYC(0x6aa7, 0x6aaa); SET_HL(wRoomLayout + 0x56);
+  CYC(0x6aaa, 0x6aac); A = 0x6d;
+  set4Bytes_hook(gb);
+}
+
 void set4Bytes_hook(GB *gb) {
   CYC(0x6aac, 0x6aad); mem_wr(gb, HL, A); SET_HL(HL + 1);
   set3Bytes_hook(gb);
@@ -874,6 +1002,133 @@ void set3Bytes_hook(GB *gb) {
   CYC(0x6aae, 0x6aaf); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(0x6aaf, 0x6ab0); mem_wr(gb, HL, A);
   CYC(0x6ab0, 0x6ab1); ret_effect(gb);
+}
+
+void tileReplacement_group5Mape3_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6ab1, getThisRoomFlags_hook, 0x197d, 0x6ab4);
+  CYC(0x6ab4, 0x6ab6); alu_and(gb, 0x80);
+  if (F & FZ) {
+    CYCT(0x6ab6, 0x6ab7); ret_effect(gb);
+    return;
+  }
+  CYC(0x6ab6, 0x6ab7);
+  CYC(0x6ab7, 0x6aba); SET_HL(wRoomLayout + 0x26);
+  CYC(0x6aba, 0x6abc); A = 0x6d;
+  CYC(0x6abc, 0x6abe); set3Bytes_hook(gb);
+}
+
+void tileReplacement_group2Map90_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6abe, getThisRoomFlags_hook, 0x197d, 0x6ac1);
+  CYC(0x6ac1, 0x6ac3); alu_and(gb, 0x02);
+  if (F & FZ) {
+    CYCT(0x6ac3, 0x6ac4); ret_effect(gb);
+    return;
+  }
+  CYC(0x6ac3, 0x6ac4);
+  CYC(0x6ac4, 0x6ac7); SET_DE(0x6aca);
+  CYC(0x6ac7, 0x6aca); drawRectInRoomLayout_hook(gb);
+}
+
+void tileReplacement_group1Map8c_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6ad9, getThisRoomFlags_hook, 0x197d, 0x6adc);
+  CYC(0x6adc, 0x6ade); alu_and(gb, 0x80);
+  if (F & FZ) {
+    CYCT(0x6ade, 0x6adf); ret_effect(gb);
+    return;
+  }
+  CYC(0x6ade, 0x6adf);
+  CYC(0x6adf, 0x6ae2); SET_HL(wRoomLayout + 0x04);
+  CYC(0x6ae2, 0x6ae4); mem_wr(gb, HL, 0x30);
+  CYC(0x6ae4, 0x6ae5); L = alu_inc8(gb, L);
+  CYC(0x6ae5, 0x6ae7); mem_wr(gb, HL, 0x32);
+  CYC(0x6ae7, 0x6ae9); A = 0x3a;
+  CYC(0x6ae9, 0x6aeb); L = 0x14;
+  CYC(0x6aeb, 0x6aec); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x6aec, 0x6aed); mem_wr(gb, HL, A);
+  CYC(0x6aed, 0x6aef); L = 0x34;
+  CYC(0x6aef, 0x6af1); mem_wr(gb, HL, 0x02);
+  CYC(0x6af1, 0x6af2); L = alu_inc8(gb, L);
+  CYC(0x6af2, 0x6af4); mem_wr(gb, HL, 0x3a);
+  CYC(0x6af4, 0x6af5); ret_effect(gb);
+}
+
+void tileReplacement_group2Map9e_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6af5, 0x6af6); alu_xor(gb, A);
+  CYC(0x6af6, 0x6af9); W8(wToggleBlocksState) = A;
+  CALL_C(0x6af9, getThisRoomFlags_hook, 0x197d, 0x6afc);
+  CYC(0x6afc, 0x6afe); alu_and(gb, 0x40);
+  if (F & FZ) {
+    CYCT(0x6afe, 0x6aff); ret_effect(gb);
+    return;
+  }
+  CYC(0x6afe, 0x6aff);
+  CYC(0x6aff, 0x6b02); SET_HL(wRoomLayout + 0x13);
+  CYC(0x6b02, 0x6b04); A = 0x6d;
+  CALL_C(0x6b04, set3Bytes_hook, 0x6aad, 0x6b07);
+  CYC(0x6b07, 0x6b08); L = alu_inc8(gb, L);
+  CYC(0x6b08, 0x6b0b); set3Bytes_hook(gb);
+}
+
+void tileReplacement_group0Mape0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6b0b, 0x6b0e); A = W8(wEssencesObtained);
+  CYC(0x6b0e, 0x6b10); alu_bit(gb, 4, A);
+  CYC(0x6b10, 0x6b12); L = 0x46;
+  if (!(F & FZ)) {
+    CYCT(0x6b12, 0x6b15); push_effect(gb, 0x6b15);
+    setTileToDoor_local(gb);
+  } else {
+    CYC(0x6b12, 0x6b15);
+  }
+  CYC(0x6b15, 0x6b17); C = 0x1b;
+  createInteraction90_local(gb, sp0_);
+}
+
+static void createInteraction90_local(GB *gb, uint16_t sp0_) {
+  CALL_C(0x6b17, getFreeInteractionSlot_hook, 0x3aef, 0x6b1a);
+  if (!(F & FZ)) {
+    CYCT(0x6b1a, 0x6b1b); ret_effect(gb);
+    return;
+  }
+  CYC(0x6b1a, 0x6b1b);
+  CYC(0x6b1b, 0x6b1d); mem_wr(gb, HL, 0x90);
+  CYC(0x6b1d, 0x6b1e); L = alu_inc8(gb, L);
+  CYC(0x6b1e, 0x6b1f); mem_wr(gb, HL, C);
+  CYC(0x6b1f, 0x6b20); ret_effect(gb);
+}
+
+void tileReplacement_group0Mape1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6b20, 0x6b22); C = 0x1c;
+  CYC(0x6b22, 0x6b25); push_effect(gb, 0x6b25);
+  createInteraction90_local(gb, gb->sp);
+  CYC(0x6b25, 0x6b28); A = W8(wEssencesObtained);
+  CYC(0x6b28, 0x6b29); alu_rrca(gb);
+  CYC(0x6b29, 0x6b2b); L = 0x26;
+  if (F & FC) {
+    CYCT(0x6b2b, 0x6b2e); push_effect(gb, 0x6b2e);
+    setTileToDoor_local(gb);
+  } else {
+    CYC(0x6b2b, 0x6b2e);
+  }
+  CYC(0x6b2e, 0x6b2f); alu_rrca(gb);
+  if (!(F & FC)) {
+    CYCT(0x6b2f, 0x6b30); ret_effect(gb);
+    return;
+  }
+  CYC(0x6b2f, 0x6b30);
+  CYC(0x6b30, 0x6b32); L = 0x53;
+  CYC(0x6b32, 0x6b34); setTileToDoor_local(gb);
+}
+
+static void setTileToDoor_local(GB *gb) {
+  CYC(0x6b41, 0x6b43); H = wRoomLayout >> 8;
+  CYC(0x6b43, 0x6b45); mem_wr(gb, HL, 0xdd);
+  CYC(0x6b45, 0x6b46); ret_effect(gb);
 }
 
 void func_04_6ba8_hook(GB *gb) {
