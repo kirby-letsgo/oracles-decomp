@@ -12490,7 +12490,7 @@ void introThreadStart_hook(GB *gb) {
     CYC(0x2d0b, 0x2d0d);
     CYC(0x2d0d, 0x2d0f); H8(hRomBank) = A;
     CYC(0x2d0f, 0x2d12); mem_wr(gb, MBC_ROM_BANK, A);
-    CALL_C(0x2d12, runIntro, ROM_runIntro, 0x2d15);
+    CALL_C(0x2d12, runIntro_hook, ROM_runIntro, 0x2d15);
     CALL_C(0x2d15, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, 0x2d18);
     CYCT(0x2d18, 0x2d1a);
   }

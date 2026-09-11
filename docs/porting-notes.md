@@ -506,3 +506,10 @@ desync to discover; keep them when porting routines.
   promoted both addresses to real aliases in `extra.sym`, registered them in `ported.txt` and
   `rewritten.txt`, and exposed normal `_hook` shims. This preserves direct hook dispatch and keeps
   the rewritten count aligned with the reportable routine set.
+- Do not combine adjacent instructions into one `burn_rom` range when a register or memory effect
+  belongs between them. Batch 61 initially burned the `rst $00` vector's `$0002 add a,l` and
+  `$0003 ld l,a` together before applying both effects. The total cycles looked right, but an
+  interrupt boundary between those opcodes would observe stale state. Cross-review caught it by
+  comparing the helper instruction-by-instruction; split the burns and apply each effect
+  immediately after its own opcode. The same review found a three-byte `jp` at `$5641` burned
+  through `$5645`, consuming the next routine's first opcode; its correct endpoint is `$5644`.

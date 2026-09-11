@@ -6,6 +6,38 @@
 #define CYC(from, to) burn_rom(gb, 0x01, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, 0x01, (from), (to), true)
 
+static void bank1_add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, false);
+    burn_rom(gb, 0x00, 0x0013, 0x0014, false); H = alu_inc8(gb, H);
+    burn_rom(gb, 0x00, 0x0014, 0x0015, false);
+  } else {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, true);
+  }
+  pop_effect(gb);
+}
+
+static void bank1_jump_table_from_rst(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+}
+
 void func_5d41_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(0x5d41, refreshLoadedTreeGfx_hook, 0x1613, 0x5d44);
@@ -154,4 +186,145 @@ void updateGrassAnimationModifier_hook(GB *gb) {
   CYC(0x5e9e, 0x5ea0); A = 0x00;
   CYC(0x5ea0, 0x5ea3); mem_wr(gb, wGrassAnimationModifier, A);
   CYC(0x5ea3, 0x5ea4); ret_effect(gb);
+}
+
+void loadDeathRespawnBufferPreset_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5ea4, 0x5ea5); push_effect(gb, DE);
+  CYC(0x5ea5, 0x5ea6); A = C;
+  CALL_C(0x5ea6, multiplyABy8_hook, 0x01b7, 0x5ea9);
+  CYC(0x5ea9, 0x5eac); SET_HL(0x5ebd);
+  CYC(0x5eac, 0x5ead); alu_add_hl(gb, BC);
+  CYC(0x5ead, 0x5eb0); SET_DE(wDeathRespawnBuffer - 1);
+  CYC(0x5eb0, 0x5eb1); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5eb1, 0x5eb2); B = A;
+loadDeathRespawnBufferPreset_loop:
+  CYC(0x5eb2, 0x5eb3); SET_DE(DE + 1);
+  CYC(0x5eb3, 0x5eb4); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5eb4, 0x5eb6); B = alu_sla(gb, B);
+  if (!(F & FC)) {
+    CYCT(0x5eb6, 0x5eb8);
+  } else {
+    CYC(0x5eb6, 0x5eb8);
+    CYC(0x5eb8, 0x5eb9); mem_wr(gb, DE, A);
+  }
+  if (!(F & FZ)) {
+    CYCT(0x5eb9, 0x5ebb);
+    goto loadDeathRespawnBufferPreset_loop;
+  }
+  CYC(0x5eb9, 0x5ebb);
+  CYC(0x5ebb, 0x5ebc); SET_DE(pop_effect(gb));
+  CYC(0x5ebc, 0x5ebd); ret_effect(gb);
+}
+
+void checkRoomPack_hook(GB *gb) {
+  CYC(0x5edd, 0x5ee0); A = W8(wActiveGroup);
+  CYC(0x5ee0, 0x5ee2); alu_cp(gb, 0x02);
+  if (F & FC) {
+    CYCT(0x5ee2, 0x5ee4);
+  } else {
+    CYC(0x5ee2, 0x5ee4);
+    CYC(0x5ee4, 0x5ee5); alu_xor(gb, A);
+    CYC(0x5ee5, 0x5ee6); ret_effect(gb);
+    return;
+  }
+  CYC(0x5ee6, 0x5ee9); A = W8(wRoomPack);
+  CYC(0x5ee9, 0x5eeb); alu_and(gb, 0x7f);
+  CYC(0x5eeb, 0x5eec); C = A;
+  CYC(0x5eec, 0x5eef); A = W8(wLoadingRoomPack);
+  CYC(0x5eef, 0x5ef0); B = A;
+  CYC(0x5ef0, 0x5ef2); alu_and(gb, 0x7f);
+  CYC(0x5ef2, 0x5ef3); alu_cp(gb, C);
+  if (F & FZ) {
+    CYCT(0x5ef3, 0x5ef4); ret_effect(gb);
+    return;
+  }
+  CYC(0x5ef3, 0x5ef4);
+  CYC(0x5ef4, 0x5ef7); A = W8(wRoomPack);
+  CYC(0x5ef7, 0x5ef8); C = A;
+  CYC(0x5ef8, 0x5ef9); A = B;
+  CYC(0x5ef9, 0x5efc); W8(wRoomPack) = A;
+  CYC(0x5efc, 0x5efd); alu_or(gb, C);
+  CYC(0x5efd, 0x5eff); alu_bit(gb, 7, A);
+  CYC(0x5eff, 0x5f00); ret_effect(gb);
+}
+
+void calculateRoomEdge_hook(GB *gb) {
+  CYC(0x5f00, 0x5f03); SET_BC(0x80a0);
+  CYC(0x5f03, 0x5f06); A = W8(wRoomIsLarge);
+  CYC(0x5f06, 0x5f07); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x5f07, 0x5f09);
+  } else {
+    CYC(0x5f07, 0x5f09);
+    CYC(0x5f09, 0x5f0c); SET_BC(0xc0f0);
+  }
+  CYC(0x5f0c, 0x5f0f); SET_HL(wRoomEdgeY);
+  CYC(0x5f0f, 0x5f10); mem_wr(gb, HL, B);
+  CYC(0x5f10, 0x5f11); L = alu_inc8(gb, L);
+  CYC(0x5f11, 0x5f12); mem_wr(gb, HL, C);
+  CYC(0x5f12, 0x5f13); ret_effect(gb);
+}
+
+void updateActiveRoom_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5f13, 0x5f16); A = W8(wDungeonIndex);
+  CYC(0x5f16, 0x5f17); A = alu_inc8(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x5f17, 0x5f19);
+    CYC(0x5f26, 0x5f29); A = W8(wScreenTransitionDirection);
+    CYC(0x5f29, 0x5f2c); SET_HL(0x5f41);
+    CYC(0x5f2c, 0x5f2d); bank1_add_a_to_hl_from_rst(gb, 0x5f2d);
+    CYC(0x5f2d, 0x5f30); A = W8(wDungeonMapPosition);
+    CYC(0x5f30, 0x5f31); alu_add(gb, mem_rd(gb, HL));
+    CYC(0x5f31, 0x5f34); W8(wDungeonMapPosition) = A;
+    CALL_C(0x5f34, getActiveRoomFromDungeonMapPosition_hook, 0x2e12, 0x5f37);
+  } else {
+    CYC(0x5f17, 0x5f19);
+    CYC(0x5f19, 0x5f1c); A = W8(wScreenTransitionDirection);
+    CYC(0x5f1c, 0x5f1f); SET_HL(0x5f3d);
+    CYC(0x5f1f, 0x5f20); bank1_add_a_to_hl_from_rst(gb, 0x5f20);
+    CYC(0x5f20, 0x5f23); A = W8(wActiveRoom);
+    CYC(0x5f23, 0x5f24); alu_add(gb, mem_rd(gb, HL));
+    CYC(0x5f24, 0x5f26);
+  }
+  CYC(0x5f37, 0x5f3a); W8(wActiveRoom) = A;
+  CYC(0x5f3a, 0x5f3d); setVisitedRoomFlag_hook(gb);
+}
+
+void getNextActiveRoom_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5f45, 0x5f48); A = W8(wScrollMode);
+  CYC(0x5f48, 0x5f4a); alu_and(gb, 0x04);
+  if (F & FZ) {
+    CYCT(0x5f4a, 0x5f4b); ret_effect(gb);
+    return;
+  }
+  CYC(0x5f4a, 0x5f4b);
+  CYC(0x5f4b, 0x5f4e); A = W8(wActiveRoom);
+  CYC(0x5f4e, 0x5f51); SET_HL(0x5f6f);
+  CALL_C(0x5f51, findRoomSpecificData_hook, 0x1dfe, 0x5f54);
+  if (!(F & FC)) {
+    CYCT(0x5f54, 0x5f56);
+    screenTransitionStandard_hook(gb);
+    return;
+  }
+  CYC(0x5f54, 0x5f56);
+  CYC(0x5f56, 0x5f57); bank1_jump_table_from_rst(gb, 0x5f57);
+  hook_handoff(gb, HL);
+}
+
+void screenTransitionStandard_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x5f5f, clearEyePuzzleVars_hook, 0x5f67, 0x5f62);
+  CALL_C(0x5f62, updateActiveRoom_hook, 0x5f13, 0x5f65);
+  CYC(0x5f65, 0x5f66); alu_scf(gb);
+  CYC(0x5f66, 0x5f67); ret_effect(gb);
+}
+
+void clearEyePuzzleVars_hook(GB *gb) {
+  CYC(0x5f67, 0x5f68); alu_xor(gb, A);
+  CYC(0x5f68, 0x5f6b); W8(wLostWoodsTransitionCounter1) = A;
+  CYC(0x5f6b, 0x5f6e); W8(wLostWoodsTransitionCounter2) = A;
+  CYC(0x5f6e, 0x5f6f); ret_effect(gb);
 }

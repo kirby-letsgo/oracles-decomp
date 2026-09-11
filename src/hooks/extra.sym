@@ -127,3 +127,13 @@
 03:779a func_03_7619__state5
 03:77be func_03_7619__state5__cbb3_03
 03:77d6 func_03_7619__state6
+03:5549 endgameCutsceneHandler_09_stage0__state6
+03:5551 endgameCutsceneHandler_09_stage0__state7
+03:5569 endgameCutsceneHandler_09_stage0__state8
+03:5575 endgameCutsceneHandler_09_stage0__state9
+03:559e endgameCutsceneHandler_09_stage0__stateA
+03:55c3 endgameCutsceneHandler_09_stage0__stateB
+03:55d4 endgameCutsceneHandler_09_stage0__stateC
+03:55e8 endgameCutsceneHandler_09_stage0__stateD
+03:55ff endgameCutsceneHandler_09_stage0__stateE
+03:561e endgameCutsceneHandler_09_stage0__stateF

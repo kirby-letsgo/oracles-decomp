@@ -9,6 +9,26 @@
 void introCinematic_inTemple_updateCamera_hook(GB *gb);
 void introCinematic_moveBlackBarsIn_hook(GB *gb);
 void introCinematic_moveBlackBarsOut_hook(GB *gb);
+void intro_gotoTitlescreen_hook(GB *gb);
+void intro_restart_hook(GB *gb);
+
+static uint16_t intro_jumpTable(GB *gb) {
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (!(F & FC)) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  return HL;
+}
 
 void twinrovaCutsceneCaller_hook(GB *gb) {
   CYC(0x4b0a, 0x4b0b); A = C;
@@ -427,6 +447,87 @@ void cutscene19_state9_hook(GB *gb) {
   CYC(0x4cb3, 0x4cb5); mem_wr(gb, HL, 0x04);
   CYC(0x4cb5, 0x4cb7); A = 0xf0;
   CYC(0x4cb7, 0x4cba); playSound_b00_hook(gb);
+}
+
+void intro_runStage_hook(GB *gb) {
+  CYC(0x4cf5, 0x4cf8); A = mem_rd(gb, wThreadStateBuffer + 6);
+  CYC(0x4cf8, 0x4cf9); push_effect(gb, 0x4cf9);
+  switch (intro_jumpTable(gb)) {
+    case 0x2d1a:
+      intro_cinematic_hook(gb);
+      return;
+    case 0x4d1b:
+      intro_restart_hook(gb);
+      return;
+    default:
+      hook_handoff(gb, HL);
+      return;
+  }
+}
+
+static void runIntro_nextStage(GB *gb) {
+  CYC(0x4ce9, 0x4ceb); A = hram_rd(gb, 0xb9);
+  CYC(0x4ceb, 0x4cec); alu_add(gb, A);
+  if (F & FZ) {
+    CYCT(0x4cec, 0x4cee);
+    intro_runStage_hook(gb);
+    return;
+  }
+  CYC(0x4cec, 0x4cee);
+  CYC(0x4cee, 0x4cf1); A = mem_rd(gb, wThreadStateBuffer + 6);
+  CYC(0x4cf1, 0x4cf3); alu_cp(gb, 0x03);
+  if (!(F & FZ)) {
+    CYCT(0x4cf3, 0x4cf5);
+    intro_gotoTitlescreen_hook(gb);
+    return;
+  }
+  CYC(0x4cf3, 0x4cf5);
+  intro_runStage_hook(gb);
+}
+
+void runIntro_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4cc9, 0x4ccb); A = hram_rd(gb, 0xba);
+  CYC(0x4ccb, 0x4ccc); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x4ccc, 0x4cce);
+    CALL_C(0x4cd8, serialFunc_0c85_hook, 0x0c85, 0x4cdb);
+    CYC(0x4cdb, 0x4cdd); A = 0x03;
+    CYC(0x4cdd, 0x4cdf); hram_wr(gb, 0xbe, A);
+    CYC(0x4cdf, 0x4ce0); alu_xor(gb, A);
+    CYC(0x4ce0, 0x4ce2); hram_wr(gb, 0xbf, A);
+    CYC(0x4ce2, 0x4ce5); A = mem_rd(gb, wKeysJustPressed);
+    CYC(0x4ce5, 0x4ce7); alu_and(gb, 0x08);
+    if (F & FZ) {
+      CYCT(0x4ce7, 0x4ce9);
+      intro_runStage_hook(gb);
+      return;
+    }
+    CYC(0x4ce7, 0x4ce9);
+  } else {
+    CYC(0x4ccc, 0x4cce);
+    CALL_C(0x4cce, serialFunc_0c8d_hook, 0x0c8d, 0x4cd1);
+    CYC(0x4cd1, 0x4cd3); A = 0x09;
+    CYC(0x4cd3, 0x4cd6); mem_wr(gb, wTmpcbb4, A);
+    CYC(0x4cd6, 0x4cd8);
+  }
+  runIntro_nextStage(gb);
+}
+
+void intro_gotoTitlescreen_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4d03, clearPaletteFadeVariables_hook, 0x323e, 0x4d06);
+  CALL_C(0x4d06, cutscene_clearObjects, 0x5403, 0x4d09);
+  CYC(0x4d09, 0x4d0c); SET_HL(wThreadStateBuffer + 7);
+  CYC(0x4d0c, 0x4d0d); alu_xor(gb, A);
+  CYC(0x4d0d, 0x4d0e); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x4d0e, 0x4d10); hram_wr(gb, 0xaa, A);
+  CYC(0x4d10, 0x4d13); mem_wr(gb, wTmpcbb6, A);
+  CYC(0x4d13, 0x4d15); mem_wr(gb, HL, 0x03);
+  CYC(0x4d15, 0x4d16); A = alu_dec8(gb, A);
+  CYC(0x4d16, 0x4d19); mem_wr(gb, wTilesetAnimation, A);
+  CYC(0x4d19, 0x4d1b);
+  intro_runStage_hook(gb);
 }
 
 void intro_restart_hook(GB *gb) {
