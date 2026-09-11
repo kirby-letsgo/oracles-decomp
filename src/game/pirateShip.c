@@ -9,6 +9,7 @@
 void checkLoadPirateShip_hook(GB *gb);
 void updatePirateShipChangedTile_hook(GB *gb);
 void updatePirateShipPosition_hook(GB *gb);
+void updatePirateShipRoom_hook(GB *gb);
 void updatePirateShipAngle_hook(GB *gb);
 
 static void pirateShip_addAToHl(GB *gb, uint16_t return_address) {
@@ -25,6 +26,38 @@ static void pirateShip_addAToHl(GB *gb, uint16_t return_address) {
   pop_effect(gb);
 }
 
+static uint16_t pirate_ship_jump_table(GB *gb) {
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  return HL;
+}
+
+static void update_pirate_ship_room_value(GB *gb) {
+  CYC(0x7e81, 0x7e82); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) {
+    CYCT(0x7e82, 0x7e83); ret_effect(gb);
+    return;
+  }
+  CYC(0x7e82, 0x7e83);
+  CYC(0x7e83, 0x7e84); mem_wr(gb, HL, B);
+  CYC(0x7e84, 0x7e87); A = W8(wPirateShipRoom);
+  CYC(0x7e87, 0x7e88); alu_add(gb, C);
+  CYC(0x7e88, 0x7e8b); W8(wPirateShipRoom) = A;
+  CYC(0x7e8b, 0x7e8c); ret_effect(gb);
+}
+
 void updatePirateShip_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x7dcc, 0x7dce); A = 0x34;
@@ -38,7 +71,7 @@ void updatePirateShip_hook(GB *gb) {
   CALL_C(0x7dd5, updatePirateShipChangedTile_hook, 0x7e1e, 0x7dd8);
   CALL_C(0x7dd8, updatePirateShipAngle_hook, 0x7eaa, 0x7ddb);
   CALL_C(0x7ddb, updatePirateShipPosition_hook, 0x7e40, 0x7dde);
-  CYC(0x7dde, 0x7de1); updatePirateShipRoom(gb);
+  CYC(0x7dde, 0x7de1); updatePirateShipRoom_hook(gb);
 }
 
 void checkLoadPirateShip_hook(GB *gb) {
@@ -173,6 +206,44 @@ void updatePirateShipPosition_hook(GB *gb) {
   CYC(0x7e60, 0x7e61); alu_add(gb, mem_rd(gb, HL));
   CYC(0x7e61, 0x7e62); mem_wr(gb, HL, A);
   CYC(0x7e62, 0x7e63); ret_effect(gb);
+}
+
+void updatePirateShipRoom_hook(GB *gb) {
+  CYC(0x7e6b, 0x7e6e); A = W8(wPirateShipAngle);
+  CYC(0x7e6e, 0x7e70); alu_and(gb, 0x03);
+  CYC(0x7e70, 0x7e71); push_effect(gb, 0x7e71);
+  switch (pirate_ship_jump_table(gb)) {
+    case 0x7e79:
+      CYC(0x7e79, 0x7e7c); SET_HL(wPirateShipY);
+      CYC(0x7e7c, 0x7e7f); SET_BC(0x80f0);
+      CYC(0x7e7f, 0x7e81); A = 0xf8;
+      update_pirate_ship_room_value(gb);
+      return;
+    case 0x7e8c:
+      CYC(0x7e8c, 0x7e8f); SET_HL(wPirateShipX);
+      CYC(0x7e8f, 0x7e92); SET_BC(0x0001);
+      CYC(0x7e92, 0x7e94); A = 0x98;
+      CYC(0x7e94, 0x7e96);
+      update_pirate_ship_room_value(gb);
+      return;
+    case 0x7e96:
+      CYC(0x7e96, 0x7e99); SET_HL(wPirateShipY);
+      CYC(0x7e99, 0x7e9c); SET_BC(0x0010);
+      CYC(0x7e9c, 0x7e9e); A = 0x88;
+      CYC(0x7e9e, 0x7ea0);
+      update_pirate_ship_room_value(gb);
+      return;
+    case 0x7ea0:
+      CYC(0x7ea0, 0x7ea3); SET_HL(wPirateShipX);
+      CYC(0x7ea3, 0x7ea6); SET_BC(0xa0ff);
+      CYC(0x7ea6, 0x7ea8); A = 0xf8;
+      CYC(0x7ea8, 0x7eaa);
+      update_pirate_ship_room_value(gb);
+      return;
+    default:
+      hook_handoff(gb, HL);
+      return;
+  }
 }
 
 void updatePirateShipAngle_hook(GB *gb) {

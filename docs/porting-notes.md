@@ -524,3 +524,8 @@ desync to discover; keep them when porting routines.
   `cmake -S . -B build -G Ninja` added `bank4.c`, after which the build linked cleanly. The same
   batch also exposed `cutscene_clearObjects`, so two older `CALL_C` sites had to change from the
   removed generated symbol to `cutscene_clearObjects_hook`.
+- A file-local helper that uses `CALL_C` needs the enclosing hook's saved `sp0_`; it must not read
+  `gb->sp` for itself. Batch 64 put fresh `gb->sp` snapshots inside the password-screen and VRAM
+  rectangle helpers, and lint rejected the emulated-register access outside `_hook` shims. Pass
+  `sp0_` into the helper from every hook entry instead, so nested-call verification retains the
+  original routine boundary as well as satisfying the shim-only register rule.
