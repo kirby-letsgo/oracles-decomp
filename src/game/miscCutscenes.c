@@ -591,3 +591,192 @@ void cleanSeas_incCBB3_hook(GB *gb) {
   CYC(0x7617, 0x7618); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(0x7618, 0x7619); ret_effect(gb);
 }
+
+void func_03_7493__cbb3_00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x74e6, 0x74e9); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x74e9, 0x74ea); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x74ea, 0x74eb); ret_effect(gb);
+    return;
+  }
+  CYC(0x74ea, 0x74eb);
+  CALL_C(0x74eb, ambiPassageOpen_decCBB4_hook, 0x7483, 0x74ee);
+  if (!(F & FZ)) {
+    CYCT(0x74ee, 0x74ef); ret_effect(gb);
+    return;
+  }
+  CYC(0x74ee, 0x74ef);
+  CYC(0x74ef, 0x74f1); mem_wr(gb, HL, 0x3e);
+  CYC(0x74f1, 0x74f4); A = mem_rd(gb, wTmpcbbd);
+  CYC(0x74f4, 0x74f7); SET_HL(0x7513);
+  CYC(0x74f7, 0x74f8); add_double_index_to_hl(gb, 0x74f8);
+  CYC(0x74f8, 0x74f9); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x74f9, 0x74fa); B = mem_rd(gb, HL);
+  CYC(0x74fa, 0x74fb); C = A;
+  CALL_C(0x74fb, getFreeInteractionSlot_hook, 0x3aef, 0x74fe);
+  if (!(F & FZ)) {
+    CYCT(0x74fe, 0x74ff); ret_effect(gb);
+    return;
+  }
+  CYC(0x74fe, 0x74ff);
+  CYC(0x74ff, 0x7501); mem_wr(gb, HL, 0x14);
+  CYC(0x7501, 0x7503); L = 0x49;
+  CYC(0x7503, 0x7504); mem_wr(gb, HL, B);
+  CYC(0x7504, 0x7506); L = 0x4b;
+  CALL_C(0x7506, setShortPosition_paramC_hook, 0x20b9, 0x7509);
+  CYC(0x7509, 0x750b); L = 0x4b;
+  CYC(0x750b, 0x750c); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x750c, 0x750d); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x750d, 0x750f); L = 0x70;
+  CYC(0x750f, 0x7510); mem_wr(gb, HL, C);
+  CYC(0x7510, 0x7513); ambiPassageOpen_incCBB3_hook(gb);
+}
+
+void func_03_7493__cbb3_01_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x751b, ambiPassageOpen_decCBB4_hook, 0x7483, 0x751e);
+  if (!(F & FZ)) {
+    CYCT(0x751e, 0x751f); ret_effect(gb);
+    return;
+  }
+  CYC(0x751e, 0x751f);
+  CYC(0x751f, 0x7521); mem_wr(gb, HL, 0x1e);
+  CYC(0x7521, 0x7523); A = 0x4d;
+  CALL_C(0x7523, playSound_b00_hook, 0x0c98, 0x7526);
+  CYC(0x7526, 0x7529); ambiPassageOpen_incState_hook(gb);
+}
+
+void func_03_7493__state2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7529, ambiPassageOpen_decCBB4_hook, 0x7483, 0x752c);
+  if (!(F & FZ)) {
+    CYCT(0x752c, 0x752d); ret_effect(gb);
+    return;
+  }
+  CYC(0x752c, 0x752d);
+  CALL_C(0x752d, getThisRoomFlags_hook, 0x197d, 0x7530);
+  CYC(0x7530, 0x7533); A = mem_rd(gb, wTmpcbbb);
+  CYC(0x7533, 0x7536); mem_wr(gb, wWarpDestRoom, A);
+  CYC(0x7536, 0x7537); L = A;
+  CYC(0x7537, 0x7539); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x80));
+  CYC(0x7539, 0x753b); A = 0x81;
+  CYC(0x753b, 0x753e); mem_wr(gb, wWarpDestGroup, A);
+  CYC(0x753e, 0x7541); A = mem_rd(gb, wTmpcbbc);
+  CYC(0x7541, 0x7544); mem_wr(gb, wWarpDestPos, A);
+  CYC(0x7544, 0x7546); A = 0x00;
+  CYC(0x7546, 0x7549); mem_wr(gb, wWarpTransition, A);
+  CYC(0x7549, 0x754b); A = 0x03;
+  CYC(0x754b, 0x754e); mem_wr(gb, 0xc2ef, A);
+  CYC(0x754e, 0x754f); alu_xor(gb, A);
+  CYC(0x754f, 0x7552); mem_wr(gb, wMenuDisabled, A);
+  CYC(0x7552, 0x7555); fadeoutToWhite_hook(gb);
+}
+
+void jabuOpen_loadGfxAndPlaySound_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x75cc, loadGfxHeader_hook, 0x0626, 0x75cf);
+  CALL_C(0x75cf, reloadTileMap_hook, 0x12fc, 0x75d2);
+  CYC(0x75d2, 0x75d4); A = 0x70;
+  CYC(0x75d4, 0x75d7); playSound_b00_hook(gb);
+}
+
+void func_03_7565__state0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x756f, 0x7571); B = 0x10;
+  CYC(0x7571, 0x7574); SET_HL(wTmpcbb3);
+  CALL_C(0x7574, clearMemory_hook, 0x046f, 0x7577);
+  CYC(0x7577, 0x757a); SET_HL(0x62b4);
+  CYC(0x757a, 0x757c); E = 0x01;
+  CALL_C(0x757c, interBankCall_hook, 0x008a, 0x757f);
+  CALL_C(0x757f, getThisRoomFlags_hook, 0x197d, 0x7582);
+  CYC(0x7582, 0x7584); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x02));
+  CYC(0x7584, 0x7586); A = 0x04;
+  CYC(0x7586, 0x7589); mem_wr(gb, wTmpcbb4, A);
+  CYC(0x7589, 0x758a); alu_xor(gb, A);
+  CYC(0x758a, 0x758d); mem_wr(gb, wScrollMode, A);
+  CYC(0x758d, 0x758f); jabuOpen_incState_hook(gb);
+}
+
+void func_03_7565__cbb3_00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x759b, jabuOpen_decCBB4_hook, 0x7555, 0x759e);
+  if (!(F & FZ)) {
+    CYCT(0x759e, 0x759f); ret_effect(gb);
+    return;
+  }
+  CYC(0x759e, 0x759f);
+  CYC(0x759f, 0x75a1); mem_wr(gb, HL, 0x3c);
+  CALL_C(0x75a1, reloadTileMap_hook, 0x12fc, 0x75a4);
+  CYC(0x75a4, 0x75a7); SET_HL(0x626e);
+  CYC(0x75a7, 0x75a9); E = 0x01;
+  CALL_C(0x75a9, interBankCall_hook, 0x008a, 0x75ac);
+  CYC(0x75ac, 0x75ae); jabuOpen_incCBB3_hook(gb);
+}
+
+void func_03_7565__cbb3_01_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x75ae, jabuOpen_decCBB4_hook, 0x7555, 0x75b1);
+  if (!(F & FZ)) {
+    CYCT(0x75b1, 0x75b2); ret_effect(gb);
+    return;
+  }
+  CYC(0x75b1, 0x75b2);
+  CYC(0x75b2, 0x75b4); mem_wr(gb, HL, 0x3c);
+  CYC(0x75b4, 0x75b6); jabuOpen_incCBB3_hook(gb);
+}
+
+void func_03_7565__cbb3_02_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x75b6, 0x75b8); A = 0x3c;
+  CALL_C(0x75b8, setScreenShakeCounter_hook, 0x24bb, 0x75bb);
+  CALL_C(0x75bb, jabuOpen_decCBB4_hook, 0x7555, 0x75be);
+  if (!(F & FZ)) {
+    CYCT(0x75be, 0x75bf); ret_effect(gb);
+    return;
+  }
+  CYC(0x75be, 0x75bf);
+  CYC(0x75bf, 0x75c1); mem_wr(gb, HL, 0x3c);
+  CALL_C(0x75c1, jabuOpen_incCBB3_hook, 0x7560, 0x75c4);
+  CYC(0x75c4, 0x75c7); SET_BC(0x9701);
+  CALL_C(0x75c7, objectCreateInteraction_hook, 0x24c5, 0x75ca);
+  CYC(0x75ca, 0x75cc); A = 0x74;
+  jabuOpen_loadGfxAndPlaySound_hook(gb);
+}
+
+void func_03_7565__cbb3_03_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x75d7, 0x75d9); A = 0x3c;
+  CALL_C(0x75d9, setScreenShakeCounter_hook, 0x24bb, 0x75dc);
+  CALL_C(0x75dc, jabuOpen_decCBB4_hook, 0x7555, 0x75df);
+  if (!(F & FZ)) {
+    CYCT(0x75df, 0x75e0); ret_effect(gb);
+    return;
+  }
+  CYC(0x75df, 0x75e0);
+  CYC(0x75e0, 0x75e2); mem_wr(gb, HL, 0x3c);
+  CALL_C(0x75e2, jabuOpen_incState_hook, 0x755b, 0x75e5);
+  CYC(0x75e5, 0x75e7); A = 0x75;
+  CYC(0x75e7, 0x75e9); jabuOpen_loadGfxAndPlaySound_hook(gb);
+}
+
+void func_03_7565__state2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x75e9, jabuOpen_decCBB4_hook, 0x7555, 0x75ec);
+  if (!(F & FZ)) {
+    CYCT(0x75ec, 0x75ed); ret_effect(gb);
+    return;
+  }
+  CYC(0x75ec, 0x75ed);
+  CYC(0x75ed, 0x75ef); A = 0x4d;
+  CALL_C(0x75ef, playSound_b00_hook, 0x0c98, 0x75f2);
+  CYC(0x75f2, 0x75f4); A = 0x01;
+  CYC(0x75f4, 0x75f7); mem_wr(gb, 0xc2ef, A);
+  CYC(0x75f7, 0x75f9); A = 0x01;
+  CYC(0x75f9, 0x75fc); mem_wr(gb, wScrollMode, A);
+  CYC(0x75fc, 0x75fd); alu_xor(gb, A);
+  CYC(0x75fd, 0x7600); mem_wr(gb, wDisabledObjects, A);
+  CYC(0x7600, 0x7603); mem_wr(gb, wMenuDisabled, A);
+  CALL_C(0x7603, loadTilesetAndRoomLayout_hook, 0x38a5, 0x7606);
+  CYC(0x7606, 0x7609); loadRoomCollisions_hook(gb);
+}

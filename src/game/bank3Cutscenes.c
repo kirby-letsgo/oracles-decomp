@@ -10,6 +10,26 @@ void introCinematic_inTemple_updateCamera_hook(GB *gb);
 void introCinematic_moveBlackBarsIn_hook(GB *gb);
 void introCinematic_moveBlackBarsOut_hook(GB *gb);
 
+void twinrovaCutsceneCaller_hook(GB *gb) {
+  CYC(0x4b0a, 0x4b0b); A = C;
+  CYC(0x4b0b, 0x4b0c); push_effect(gb, 0x4b0c);
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (!(F & FC)) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  hook_handoff(gb, HL);
+}
+
 void incCutsceneState_hook(GB *gb) {
   CYC(0x4b10, 0x4b13); SET_HL(wCutsceneState);
   CYC(0x4b13, 0x4b14); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
@@ -92,6 +112,40 @@ void twinrovaCutscene_state0_hook(GB *gb) {
   CYC(0x4b2c, 0x4b2e); B = 0x10;
   CALL_C(0x4b2e, clearMemory_hook, 0x046f, 0x4b31);
   CYC(0x4b31, 0x4b33); incCutsceneState_hook(gb);
+}
+
+void twinrovaCutscene_state1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4b33, 0x4b36); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x4b36, 0x4b37); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x4b37, 0x4b38); ret_effect(gb);
+    return;
+  }
+  CYC(0x4b37, 0x4b38);
+  CALL_C(0x4b38, incCutsceneState_hook, 0x4b10, 0x4b3b);
+  CYC(0x4b3b, 0x4b3d); A = 0xf1;
+  CYC(0x4b3d, 0x4b40); mem_wr(gb, wActiveRoom, A);
+  CALL_C(0x4b40, twinrovaCutscene_fadeinToRoom_hook, 0x4b6f, 0x4b43);
+  CALL_C(0x4b43, refreshObjectGfx_hook, 0x1618, 0x4b46);
+  CYC(0x4b46, 0x4b49); SET_HL(w1Link_yh);
+  CYC(0x4b49, 0x4b4b); mem_wr(gb, HL, 0x38);
+  CYC(0x4b4b, 0x4b4c); L = alu_inc8(gb, L);
+  CYC(0x4b4c, 0x4b4d); L = alu_inc8(gb, L);
+  CYC(0x4b4d, 0x4b4f); mem_wr(gb, HL, 0x78);
+  CALL_C(0x4b4f, resetCamera_hook, 0x12ce, 0x4b52);
+  CYC(0x4b52, 0x4b55); SET_HL(0x4022);
+  CALL_C(0x4b55, parseGivenObjectData_b00_hook, 0x3171, 0x4b58);
+  CYC(0x4b58, 0x4b5a); A = 0xac;
+  CALL_C(0x4b5a, loadPaletteHeader_hook, 0x050b, 0x4b5d);
+  CYC(0x4b5d, 0x4b5f); A = 0x01;
+  CYC(0x4b5f, 0x4b62); mem_wr(gb, wScrollMode, A);
+  CALL_C(0x4b62, loadCommonGraphics_hook, 0x1a98, 0x4b65);
+  CYC(0x4b65, 0x4b67); A = 0x04;
+  CALL_C(0x4b67, fadeinFromWhiteWithDelay_hook, 0x3284, 0x4b6a);
+  CYC(0x4b6a, 0x4b6c); A = 0x02;
+  CYC(0x4b6c, 0x4b6f);
+  loadGfxRegisterStateIndex_hook(gb);
 }
 
 void twinrovaCutscene_fadeinToRoom_hook(GB *gb) {

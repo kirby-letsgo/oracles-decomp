@@ -494,3 +494,9 @@ desync to discover; keep them when porting routines.
   registered and defined near the top of `bank3Cutscenes.c`, then appended duplicate definitions
   at the bottom; the integrated compiler caught the redefinitions. Treat the hook registry as the
   authoritative completion list and inspect the full destination file before appending.
+- A readable dynamic `rst $00` dispatcher must preserve the vector's real stack traffic before
+  handing off. Batch 58's `twinrovaCutsceneCaller` burns the `rst`, pushes the table address,
+  executes the bank-0 doubling/add-with-carry sequence, pops that address into `HL`, reads the
+  selected word, burns the one-byte `jp hl`, and only then calls `hook_handoff(HL)`. Jumping from
+  the source-level index directly to a known table target would skip vector cycles and the real
+  push/pop effects that dynamic dispatch and thread changes rely on.
