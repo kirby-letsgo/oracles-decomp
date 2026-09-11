@@ -298,3 +298,212 @@ skip:
     CYCT(0x5799, 0x579b);
   }
 }
+
+void objectDataOp0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x561e, 0x5621); A = W8(wRoomStateModifier);
+  CYC(0x5621, 0x5624); SET_HL(bitTable);
+  CYC(0x5624, 0x5625); alu_add(gb, L);
+  CYC(0x5625, 0x5626); L = A;
+  CYC(0x5626, 0x5627); A = mem_rd(gb, HL);
+  CYC(0x5627, 0x5628); B = A;
+  CYC(0x5628, 0x5629); A = mem_rd(gb, DE);
+  CYC(0x5629, 0x562a); SET_DE(DE + 1);
+  CYC(0x562a, 0x562b); alu_and(gb, B);
+  if (!(F & FZ)) { CYCT(0x562b, 0x562e); parseGivenObjectData_b12(gb); return; }
+  CYC(0x562b, 0x562e);
+  CYC(0x562e, 0x5630); B = 0;
+  CYC(0x5630, 0x5632); L = E; H = D;
+  for (;;) {
+    CYC(0x5632, 0x5633); A = mem_rd(gb, HL);
+    CYC(0x5633, 0x5635); alu_cp(gb, 0xf0);
+    if (F & FZ) { CYCT(0x5635, 0x5637); parseGivenObjectData_hl_hook(gb); return; }
+    CYC(0x5635, 0x5637);
+    CYC(0x5637, 0x5639); alu_cp(gb, 0xfe);
+    if (F & FZ) { CYCT(0x5639, 0x563b); parseGivenObjectData_hl_hook(gb); return; }
+    CYC(0x5639, 0x563b);
+    CYC(0x563b, 0x563d); alu_cp(gb, 0xff);
+    if (F & FZ) { CYCT(0x563d, 0x563e); ret_effect(gb); return; }
+    CYC(0x563d, 0x563e);
+    CYC(0x563e, 0x5640); alu_and(gb, 0x0f);
+    CYC(0x5640, 0x5643); SET_DE(0x55fe);
+    CALL_C(0x5643, addDoubleIndexToDe_hook, 0x0072, 0x5646);
+    CYC(0x5646, 0x5647); A = mem_rd(gb, DE);
+    CYC(0x5647, 0x5648); C = A;
+    CYC(0x5648, 0x5649); alu_add_hl(gb, BC);
+    CYC(0x5649, 0x564a); SET_DE(DE + 1);
+    CYC(0x564a, 0x564b); A = mem_rd(gb, DE);
+    CYC(0x564b, 0x564c); C = A;
+    for (;;) {
+      CYC(0x564c, 0x564d); alu_add_hl(gb, BC);
+      CYC(0x564d, 0x564f); alu_bit(gb, 7, mem_rd(gb, HL));
+      if (!(F & FZ)) { CYCT(0x564f, 0x5651); break; }
+      CYCT(0x5651, 0x5653);
+    }
+  }
+}
+
+void objectDataOp6_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x56dd, 0x56df); A = mem_rd(gb, DE); SET_DE(DE + 1);
+  CYC(0x56df, 0x56e0); B = A;
+  CYC(0x56e0, 0x56e2); alu_and(gb, 0x1f);
+  CYC(0x56e2, 0x56e4); H8(hFF8B) = A;
+  CYC(0x56e4, 0x56e5); A = B;
+  CYC(0x56e5, 0x56e7); A = alu_swap(gb, A);
+  CYC(0x56e7, 0x56e8); alu_rrca(gb);
+  CYC(0x56e8, 0x56ea); alu_and(gb, 0x07);
+  CYC(0x56ea, 0x56ec); H8(hFF8C) = A;
+  CYC(0x56ec, 0x56ee); A = mem_rd(gb, DE); SET_DE(DE + 1);
+  CYC(0x56ee, 0x56f0); H8(hFF8F) = A;
+  CYC(0x56f0, 0x56f2); A = mem_rd(gb, DE); SET_DE(DE + 1);
+  CYC(0x56f2, 0x56f4); H8(hFF8E) = A;
+  for (;;) {
+    CYC(0x56f4, 0x56f6); A = 1;
+    CYC(0x56f6, 0x56f8); H8(hFF8D) = A;
+    CYC(0x56f8, 0x56fa); A = H8(hFF8B);
+    CYC(0x56fa, 0x56fc); alu_and(gb, 1);
+    if (!(F & FZ)) { CYCT(0x56fc, 0x56fe); goto allocate; }
+    CYC(0x56fc, 0x56fe);
+    CALL_C(0x56fe, checkEnemyKilled_hook, 0x5852, 0x5701);
+    if (!(F & FC)) { CYCT(0x5701, 0x5703); goto next; }
+    CYC(0x5701, 0x5703);
+allocate:
+    CALL_C(0x5703, getFreeEnemySlot_hook, 0x2e27, 0x5706);
+    if (!(F & FZ)) { CYCT(0x5706, 0x5709); parseGivenObjectData_b12(gb); return; }
+    CYC(0x5706, 0x5709);
+    CALL_C(0x5709, decEnemyCounterIfApplicable_hook, 0x581c, 0x570c);
+    CYC(0x570c, 0x570e); A = H8(hFF8F);
+    CYC(0x570e, 0x570f); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x570f, 0x5711); A = H8(hFF8E);
+    CYC(0x5711, 0x5712); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x5712, 0x5713); A = H;
+    CYC(0x5713, 0x5715); H8(hFF91) = A;
+    CYC(0x5715, 0x5716); push_effect(gb, DE);
+    CALL_C(0x5716, assignRandomPositionToEnemy_hook, 0x583d, 0x5719);
+    CYC(0x5719, 0x571a); SET_DE(pop_effect(gb));
+    CYC(0x571a, 0x571c); A = H8(hFF91);
+    CYC(0x571c, 0x571d); H = A;
+    if (!(F & FC)) { CYCT(0x571d, 0x571f); goto placed; }
+    CYC(0x571d, 0x571f);
+    CYC(0x571f, 0x5721); L = 0x80;
+    CYC(0x5721, 0x5723); mem_wr(gb, HL, 0);
+    CYC(0x5723, 0x5725);
+    goto next;
+placed:
+    CYC(0x5725, 0x5727); L = 0x80;
+    CYC(0x5727, 0x5729); A = H8(hFF8D);
+    CYC(0x5729, 0x572a); mem_wr(gb, HL, A);
+next:
+    CYC(0x572a, 0x572c); A = H8(hFF8C);
+    CYC(0x572c, 0x572d); A = alu_dec8(gb, A);
+    CYC(0x572d, 0x572f); H8(hFF8C) = A;
+    if (!(F & FZ)) { CYCT(0x572f, 0x5731); continue; }
+    CYC(0x572f, 0x5731);
+    CYC(0x5731, 0x5734);
+    parseGivenObjectData_b12(gb);
+    return;
+  }
+}
+
+void objectDataOp7_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5734, 0x5738); A = mem_rd(gb, DE); SET_DE(DE + 1); H8(hFF8B) = A;
+  for (;;) {
+    CYC(0x5738, 0x5739); A = mem_rd(gb, DE);
+    CYC(0x5739, 0x573b); alu_bit(gb, 7, A);
+    if (!(F & FZ)) { CYCT(0x573b, 0x573e); parseGivenObjectData_b12(gb); return; }
+    CYC(0x573b, 0x573e);
+    CYC(0x573e, 0x5740); A = 1;
+    CYC(0x5740, 0x5742); H8(hFF8D) = A;
+    CYC(0x5742, 0x5744); A = H8(hFF8B);
+    CYC(0x5744, 0x5746); alu_and(gb, 1);
+    if (!(F & FZ)) { CYCT(0x5746, 0x5748); goto allocate; }
+    CYC(0x5746, 0x5748);
+    CALL_C(0x5748, checkEnemyKilled_hook, 0x5852, 0x574b);
+    if (F & FC) { CYCT(0x574b, 0x574d); goto allocate; }
+    CYC(0x574b, 0x574d);
+    CYC(0x574d, 0x5751); SET_DE(DE + 4);
+    CYCT(0x5751, 0x5753);
+    continue;
+allocate:
+    CALL_C(0x5753, getFreeEnemySlot_hook, 0x2e27, 0x5756);
+    if (!(F & FZ)) { CYCT(0x5756, 0x5759); skipToOpEnd_4byte_hook(gb); return; }
+    CYC(0x5756, 0x5759);
+    CALL_C(0x5759, decEnemyCounterIfApplicable_hook, 0x581c, 0x575c);
+    CALL_C(0x575c, read2Bytes_hook, 0x580d, 0x575f);
+    CYC(0x575f, 0x5761); L = 0x8b;
+    CALL_C(0x5761, readCoordinates_hook, 0x5814, 0x5764);
+    CYC(0x5764, 0x5765); A = mem_rd(gb, HL); SET_HL(HL - 1);
+    CYC(0x5765, 0x5767); alu_and(gb, 0xf0);
+    CYC(0x5767, 0x5769); A = alu_swap(gb, A);
+    CYC(0x5769, 0x576a); C = A;
+    CYC(0x576a, 0x576b); L = alu_dec8(gb, L);
+    CYC(0x576b, 0x576c); A = mem_rd(gb, HL);
+    CYC(0x576c, 0x576e); alu_and(gb, 0xf0);
+    CYC(0x576e, 0x576f); alu_or(gb, C); C = A;
+    CALL_C(0x5770, addPositionToPlacedEnemyPositions_hook, 0x5829, 0x5773);
+    CYC(0x5773, 0x5775); L = 0x80;
+    CYC(0x5775, 0x5778); A = H8(hFF8D); mem_wr(gb, HL, A);
+    CYCT(0x5778, 0x577a);
+  }
+}
+
+void objectDataOp9_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  for (;;) {
+    CALL_C(0x579b, continueObjectLoopIfOpDone_hook, 0x5805, 0x579e);
+    CALL_ROM(0x579e, 0x57c3);
+    if (!(F & FZ)) { CYCT(0x57a1, 0x57a3); goto allocation_failure; }
+    CYC(0x57a1, 0x57a3);
+    CYC(0x57a3, 0x57a6); SET_DE(DE + 1); A = mem_rd(gb, DE); SET_DE(DE + 1);
+    CYC(0x57a6, 0x57a7); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x57a7, 0x57aa); A = mem_rd(gb, DE); SET_DE(DE + 1); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x57aa, 0x57ad); A = mem_rd(gb, DE); SET_DE(DE + 1); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x57ad, 0x57b3); A = L; alu_and(gb, 0xc0); alu_add(gb, 0x0b); L = A;
+    CYC(0x57b3, 0x57b6); A = mem_rd(gb, DE); SET_DE(DE + 1); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x57b6, 0x57b7); L = alu_inc8(gb, L);
+    CYC(0x57b7, 0x57ba); A = mem_rd(gb, DE); SET_DE(DE + 1); mem_wr(gb, HL, A);
+    CYCT(0x57ba, 0x57bc);
+    continue;
+allocation_failure:
+    CYC(0x57bc, 0x57be); A = 6;
+    CALL_C(0x57be, addAToDe_hook, 0x0068, 0x57c1);
+    CYCT(0x57c1, 0x57c3);
+  }
+}
+
+void objectDataOpA_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x57cb, 0x57cf); A = mem_rd(gb, DE); SET_DE(DE + 1); H8(hFF8B) = A;
+  for (;;) {
+    CYC(0x57cf, 0x57d0); A = mem_rd(gb, DE);
+    CYC(0x57d0, 0x57d2); alu_bit(gb, 7, A);
+    if (!(F & FZ)) { CYCT(0x57d2, 0x57d5); parseGivenObjectData_b12(gb); return; }
+    CYC(0x57d2, 0x57d5);
+    CYC(0x57d5, 0x57d7); A = 1;
+    CYC(0x57d7, 0x57d9); H8(hFF8D) = A;
+    CYC(0x57d9, 0x57db); A = H8(hFF8B);
+    CYC(0x57db, 0x57dd); alu_and(gb, 1);
+    if (!(F & FZ)) { CYCT(0x57dd, 0x57df); goto allocate; }
+    CYC(0x57dd, 0x57df);
+    CALL_C(0x57df, checkEnemyKilled_hook, 0x5852, 0x57e2);
+    if (F & FC) { CYCT(0x57e2, 0x57e4); goto allocate; }
+    CYC(0x57e2, 0x57e4);
+    CYC(0x57e4, 0x57e8); SET_DE(DE + 2);
+    CYCT(0x57e8, 0x57eb);
+    continue;
+allocate:
+    CALL_C(0x57e8, getFreeEnemySlot_uncounted_hook, 0x2e34, 0x57eb);
+    if (!(F & FZ)) { CYCT(0x57eb, 0x57ee); skipToOpEnd_2byte_hook(gb); return; }
+    CYC(0x57eb, 0x57ee);
+    CYC(0x57ee, 0x57f0); mem_wr(gb, HL, 0x59);
+    CYC(0x57f0, 0x57f1); L = alu_inc8(gb, L);
+    CYC(0x57f1, 0x57f4); A = mem_rd(gb, DE); SET_DE(DE + 1); mem_wr(gb, HL, A);
+    CYC(0x57f4, 0x57f8); L = 0x8b; A = mem_rd(gb, DE); SET_DE(DE + 1);
+    CALL_C(0x57f8, setShortPosition_hook, 0x20b8, 0x57fb);
+    CALL_C(0x57fb, addPositionToPlacedEnemyPositions_hook, 0x5829, 0x57fe);
+    CYC(0x57fe, 0x5803); L = 0x80; A = H8(hFF8D); mem_wr(gb, HL, A);
+    CYCT(0x5803, 0x5805);
+  }
+}

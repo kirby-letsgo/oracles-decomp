@@ -270,7 +270,7 @@
     status: "idle",
     statusDetail: "",
     totalHooks: 13103,
-    rewrittenTotal: 656,
+    rewrittenTotal: 661,
     bank0Total: 664,
     bank0Rewritten: 626,
     codeBearingBanks: 23,
@@ -288,6 +288,7 @@
       { n: 6, name: "Sweep", desc: "Everything left in code/, until no routine is still generated.", status: "pending", meta: "remainder" },
     ],
     batches: [
+      { id: "34", delta: 5, tag: "Ph.4", text: "The remaining simple <b>objectLoading.s</b> opcode handlers &mdash; opcodes 0, 6, 7, 9, and A." },
       { id: "33", delta: 15, tag: "Ph.4", text: "Object-data parser flow &mdash; setup, pointer skips, allocation loops, and opcodes 1&ndash;5 and 8 in <b>objectLoading.s</b>." },
       { id: "32", delta: 15, tag: "Ph.4", text: "Object-system foundation &mdash; object-loading helpers, the part dispatcher, and the animation queue/data path across banks 12, 11, and 4." },
       { id: "31", delta: 2, tag: "Ph.3", text: "The RAM-resident code &mdash; <b>hramOamDmaFunction</b> (the OAM DMA routine copied to HRAM) and <b>wMusicReadFunction</b> (copied to $c000). Bank 0 is now fully readable C." },
@@ -303,6 +304,7 @@
       { id: "1&ndash;3", delta: 92, tag: "Ph.0&ndash;1", text: "Memory copy/fill/clear, math, flags, RNG, LCD/VRAM setup." },
     ],
   };
+  INITIAL.banks.find(b => b.id === "12").rewritten = 26;
 
   function fmt(n) { return n.toLocaleString("en-US"); }
 

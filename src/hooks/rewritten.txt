@@ -646,6 +646,11 @@ objectDataOp3
 objectDataOp4
 objectDataOp5
 objectDataOp8
+objectDataOp0
+objectDataOp6
+objectDataOp7
+objectDataOp9
+objectDataOpA
 read2Bytes
 readCoordinates
 decEnemyCounterIfApplicable

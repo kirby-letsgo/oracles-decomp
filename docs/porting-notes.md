@@ -381,3 +381,7 @@ desync to discover; keep them when porting routines.
   `wNumEnemies`, `wTmpcfc0`, and `wScreenTransitionDirection`; an invented `w<address>` name has
   no companion `_BANK` macro and fails `W8(...)` at compile time. Search the generated RAM names
   before writing an access, even when the address looks self-describing.
+- When a compact object-data handler differs only in a pointer register, dump the ROM bytes
+  around the instruction rather than inferring it from the data-flow pattern. `objectDataOp9`
+  at bank 12 `$57b6` uses `inc l`, not an auto-increment memory load; treating it as the latter
+  left `HL` one byte high and the hook verifier first caught the register mismatch at frame 1538.

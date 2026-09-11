@@ -7,7 +7,7 @@ Updated 2026-09-11. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 656 routines rewritten across four code banks;
+  routine against the transliteration. Progress: 661 routines rewritten across four code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -20,7 +20,8 @@ Updated 2026-09-11. Newest entries at the top of each section.
   (`textThreadStart`, `fileSelectThreadStart`, `thread_1b10`, `introThreadStart`,
   `paletteFadeThreadStart`, `mainThreadStart`). Batch 31 finished the RAM-resident code
   (`hramOamDmaFunction`, `wMusicReadFunction`, `wRamFunction`), and batch 32 began phase 4 with
-  object-loading, part-dispatch, and animation-queue routines in banks 12, 11, and 4.
+  object-loading, part-dispatch, and animation-queue routines in banks 12, 11, and 4; batch 34
+  completed the remaining simple object-data opcode handlers.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -125,6 +126,13 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-11: milestone 3 phase 4 batch 34 (5 routines): object-data opcodes 0, 6, 7, 9, and A
+  in `objectLoading.s`. `objectDataOp9` was checked against the ROM bytes after its first draft
+  advanced `HL` one byte too far; the terminal `inc l` is not an auto-increment load. The
+  coupled special-object and post-item dispatchers were deferred after their jump-table paths
+  failed routine verification, rather than retaining an unverified rewrite. Gates: lint 0, 30k
+  verify 0 mismatches, whole-movie state hash clean, ctest 8/8 in both normal and quirk builds.
 
 - 2026-09-11: milestone 3 phase 4 batch 33 (15 routines): the object-data parser's setup and
   pointer/allocation flow in `objectLoading.s`: `parseObjectData`, `func_55f8`,
