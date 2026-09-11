@@ -1,0 +1,408 @@
+<title>Bank Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f3fb;
+    --surface: #ffffff;
+    --surface-2: #ece7f6;
+    --surface-3: #e2dcf0;
+    --ink: #201a30;
+    --muted: #6c6480;
+    --faint: #a49cb8;
+    --accent: #6e3fa3;
+    --accent-ink: #ffffff;
+    --accent-soft: #ece0f7;
+    --gold: #a06e12;
+    --gold-soft: #f3e6c6;
+    --good: #237a54;
+    --good-soft: #d9efe3;
+    --line: #ddd6ec;
+    --shadow: 0 1px 2px rgba(32, 20, 48, 0.06), 0 8px 24px -12px rgba(32, 20, 48, 0.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #150f20;
+      --surface: #1c1529;
+      --surface-2: #241b34;
+      --surface-3: #2c2140;
+      --ink: #eee9fa;
+      --muted: #a89dc2;
+      --faint: #675d80;
+      --accent: #b084e0;
+      --accent-ink: #1a1026;
+      --accent-soft: #2e2245;
+      --gold: #dcb257;
+      --gold-soft: #3a301c;
+      --good: #5fca94;
+      --good-soft: #1c3527;
+      --line: #342a4a;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #150f20;
+    --surface: #1c1529;
+    --surface-2: #241b34;
+    --surface-3: #2c2140;
+    --ink: #eee9fa;
+    --muted: #a89dc2;
+    --faint: #675d80;
+    --accent: #b084e0;
+    --accent-ink: #1a1026;
+    --accent-soft: #2e2245;
+    --gold: #dcb257;
+    --gold-soft: #3a301c;
+    --good: #5fca94;
+    --good-soft: #1c3527;
+    --line: #342a4a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Public Sans", -apple-system, "Segoe UI", sans-serif;
+    padding: 28px 20px 60px;
+    display: flex;
+    justify-content: center;
+  }
+  .mono { font-family: "JetBrains Mono", "SF Mono", Menlo, monospace; }
+  .page { width: 100%; max-width: 1040px; display: flex; flex-direction: column; gap: 22px; }
+
+  /* header */
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .titleblock h1 {
+    font-size: 26px;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .titleblock p { margin: 0; color: var(--muted); font-size: 14px; max-width: 60ch; }
+  .status-wrap { display: flex; align-items: center; gap: 10px; }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 999px; padding: 6px 12px 6px 10px;
+    font-size: 12.5px; color: var(--muted); box-shadow: var(--shadow);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); flex: none; }
+  .dot.live { background: var(--good); animation: pulse 2.2s ease-in-out infinite; }
+  .dot.busy { background: var(--gold); animation: pulse 1.1s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 45%, transparent); } 50% { opacity: .55; } }
+  @media (prefers-reduced-motion: reduce) { .dot.live, .dot.busy { animation: none; } }
+
+  /* hero: bank map */
+  .hero {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 22px 24px 20px;
+    box-shadow: var(--shadow);
+  }
+  .hero-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .hero-head h2 { margin: 0 0 3px; font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+  .hero-head .big { font-size: 15px; color: var(--faint); }
+  .hero-head .big b { color: var(--ink); font-weight: 700; }
+
+  .bankgrid {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 4px;
+  }
+  .bank {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 5px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    cursor: default;
+  }
+  .bank.nocode { background: repeating-linear-gradient(135deg, var(--surface-2), var(--surface-2) 3px, var(--surface) 3px, var(--surface) 6px); opacity: 0.55; }
+  .bank .fill {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 75%, var(--gold)));
+  }
+  .bank .id {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9.5px; font-weight: 600; letter-spacing: 0.02em;
+    color: var(--faint);
+  }
+  .bank.touched .id { color: var(--accent-ink); text-shadow: 0 1px 1px rgba(0,0,0,0.25); }
+  .bank.code:not(.touched) .id { color: var(--muted); }
+  .bank:hover { border-color: var(--accent); z-index: 2; }
+  .bank[title] { }
+
+  .hero-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line);
+    flex-wrap: wrap; gap: 10px;
+  }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .sw-touched { background: var(--accent); }
+  .sw-code { background: var(--surface-2); border: 1px solid var(--line); }
+  .sw-nocode { background: repeating-linear-gradient(135deg, var(--surface-2), var(--surface-2) 2px, var(--surface) 2px, var(--surface) 4px); opacity: 0.6; border: 1px solid var(--line); }
+  .hero-foot .note { font-size: 12px; color: var(--faint); }
+
+  /* stat tiles */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .tile {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px 18px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .tile .label { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+  .tile .value { font-size: 30px; font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+  .tile .value small { font-size: 15px; color: var(--faint); font-weight: 600; }
+  .tile .sub { font-size: 12.5px; color: var(--faint); }
+  .tile .bar { height: 6px; border-radius: 4px; background: var(--surface-2); overflow: hidden; margin-top: 2px; }
+  .tile .bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+  .tile.good .value { color: var(--good); }
+  .tile.good .bar i { background: var(--good); }
+
+  /* phase roadmap */
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px 22px; box-shadow: var(--shadow); }
+  .panel h2 { margin: 0 0 3px; font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+  .panel .panel-sub { margin: 0 0 16px; font-size: 12.5px; color: var(--faint); }
+
+  .phases { display: flex; flex-direction: column; }
+  .phase {
+    display: grid; grid-template-columns: 30px 1fr auto; gap: 12px; align-items: start;
+    padding: 11px 0; border-top: 1px solid var(--line);
+  }
+  .phase:first-child { border-top: none; }
+  .phase .num {
+    width: 26px; height: 26px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    background: var(--surface-2); color: var(--muted);
+  }
+  .phase.done .num { background: var(--good-soft); color: var(--good); }
+  .phase.active .num { background: var(--gold-soft); color: var(--gold); }
+  .phase .name { font-weight: 600; font-size: 14px; }
+  .phase .desc { font-size: 12.5px; color: var(--muted); margin-top: 2px; max-width: 62ch; }
+  .phase .meta { text-align: right; font-size: 11.5px; color: var(--faint); white-space: nowrap; padding-top: 3px; }
+  .badge {
+    display: inline-block; font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.04em; padding: 2px 7px; border-radius: 5px; margin-top: 3px;
+  }
+  .badge.done { background: var(--good-soft); color: var(--good); }
+  .badge.active { background: var(--gold-soft); color: var(--gold); }
+  .badge.pending { background: var(--surface-2); color: var(--faint); }
+
+  /* batch log */
+  .batches { display: flex; flex-direction: column; }
+  .batch {
+    display: grid; grid-template-columns: 78px 1fr 64px; gap: 14px; align-items: baseline;
+    padding: 10px 0; border-top: 1px solid var(--line);
+  }
+  .batch:first-child { border-top: none; }
+  .batch .id { font-weight: 700; font-size: 13px; color: var(--accent); }
+  .batch .text { font-size: 13px; color: var(--ink); line-height: 1.5; }
+  .batch .text .tag { color: var(--muted); }
+  .batch .delta { text-align: right; font-size: 13px; font-weight: 700; color: var(--good); white-space: nowrap; }
+
+  footer { text-align: center; font-size: 11.5px; color: var(--faint); padding-top: 4px; }
+  footer a { color: inherit; }
+</style>
+
+<div class="page">
+  <header>
+    <div class="titleblock">
+      <h1>Oracle of Ages &mdash; bank map</h1>
+      <p>Every routine in the ROM already runs as C. This tracks the second conversion underneath it: turning the machine transliteration into readable, named, idiomatic C, one bank at a time.</p>
+    </div>
+    <div class="status-wrap">
+      <span class="status-pill"><span class="dot" id="snap-dot"></span><span id="snap-text">snapshot</span></span>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-head">
+      <div>
+        <h2>ROM banks, 00&ndash;3F</h2>
+      </div>
+      <div class="big" id="hero-summary"><b>&hellip;</b></div>
+    </div>
+    <div class="bankgrid" id="bankgrid"></div>
+    <div class="hero-foot">
+      <div class="legend">
+        <span><i class="swatch sw-touched"></i>readable C</span>
+        <span><i class="swatch sw-code"></i>code bank, untouched</span>
+        <span><i class="swatch sw-nocode"></i>no labelled code</span>
+      </div>
+      <div class="note">1 MB cartridge &middot; 64 &times; 16 KB banks &middot; hover a cell for its count</div>
+    </div>
+  </section>
+
+  <section class="stats" id="stats"></section>
+
+  <section class="panel">
+    <h2>Milestone 3 roadmap</h2>
+    <p class="panel-sub">The plan's seven phases, in the order they retire the interpreter &mdash; <span class="mono">docs/plans/2026-09-09-m3-readable-engine.md</span></p>
+    <div class="phases" id="phases"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Batch log</h2>
+    <p class="panel-sub">Most recent first &mdash; routines rewritten per working session</p>
+    <div class="batches" id="batches"></div>
+  </section>
+
+  <footer id="footer">last updated &mdash;</footer>
+</div>
+
+<script>
+  const INITIAL = {
+    updatedAt: "2026-09-11T00:00:00Z",
+    status: "idle",
+    statusDetail: "",
+    totalHooks: 13103,
+    rewrittenTotal: 656,
+    bank0Total: 664,
+    bank0Rewritten: 626,
+    codeBearingBanks: 23,
+    banksTouched: 4,
+    targetLines: 55673,
+    bank0Lines: 13946,
+    banks: [{"id": "00", "code": true, "total": 653, "rewritten": 626}, {"id": "01", "code": true, "total": 341, "rewritten": 0}, {"id": "02", "code": true, "total": 705, "rewritten": 0}, {"id": "03", "code": true, "total": 666, "rewritten": 0}, {"id": "04", "code": true, "total": 243, "rewritten": 6}, {"id": "05", "code": true, "total": 698, "rewritten": 0}, {"id": "06", "code": true, "total": 427, "rewritten": 0}, {"id": "07", "code": true, "total": 449, "rewritten": 0}, {"id": "08", "code": true, "total": 898, "rewritten": 0}, {"id": "09", "code": true, "total": 935, "rewritten": 0}, {"id": "0a", "code": true, "total": 928, "rewritten": 0}, {"id": "0b", "code": true, "total": 875, "rewritten": 0}, {"id": "0c", "code": true, "total": 116, "rewritten": 0}, {"id": "0d", "code": true, "total": 675, "rewritten": 0}, {"id": "0e", "code": true, "total": 869, "rewritten": 0}, {"id": "0f", "code": true, "total": 810, "rewritten": 0}, {"id": "10", "code": true, "total": 799, "rewritten": 0}, {"id": "11", "code": true, "total": 803, "rewritten": 3}, {"id": "12", "code": true, "total": 47, "rewritten": 21}, {"id": "13", "code": false, "total": 0, "rewritten": 0}, {"id": "14", "code": false, "total": 0, "rewritten": 0}, {"id": "15", "code": true, "total": 517, "rewritten": 0}, {"id": "16", "code": true, "total": 73, "rewritten": 0}, {"id": "17", "code": false, "total": 0, "rewritten": 0}, {"id": "18", "code": false, "total": 0, "rewritten": 0}, {"id": "19", "code": false, "total": 0, "rewritten": 0}, {"id": "1a", "code": false, "total": 0, "rewritten": 0}, {"id": "1b", "code": false, "total": 0, "rewritten": 0}, {"id": "1c", "code": false, "total": 0, "rewritten": 0}, {"id": "1d", "code": false, "total": 0, "rewritten": 0}, {"id": "1e", "code": false, "total": 0, "rewritten": 0}, {"id": "1f", "code": false, "total": 0, "rewritten": 0}, {"id": "20", "code": false, "total": 0, "rewritten": 0}, {"id": "21", "code": false, "total": 0, "rewritten": 0}, {"id": "22", "code": false, "total": 0, "rewritten": 0}, {"id": "23", "code": false, "total": 0, "rewritten": 0}, {"id": "24", "code": false, "total": 0, "rewritten": 0}, {"id": "25", "code": false, "total": 0, "rewritten": 0}, {"id": "26", "code": false, "total": 0, "rewritten": 0}, {"id": "27", "code": false, "total": 0, "rewritten": 0}, {"id": "28", "code": false, "total": 0, "rewritten": 0}, {"id": "29", "code": false, "total": 0, "rewritten": 0}, {"id": "2a", "code": false, "total": 0, "rewritten": 0}, {"id": "2b", "code": false, "total": 0, "rewritten": 0}, {"id": "2c", "code": false, "total": 0, "rewritten": 0}, {"id": "2d", "code": false, "total": 0, "rewritten": 0}, {"id": "2e", "code": false, "total": 0, "rewritten": 0}, {"id": "2f", "code": false, "total": 0, "rewritten": 0}, {"id": "30", "code": false, "total": 0, "rewritten": 0}, {"id": "31", "code": false, "total": 0, "rewritten": 0}, {"id": "32", "code": false, "total": 0, "rewritten": 0}, {"id": "33", "code": false, "total": 0, "rewritten": 0}, {"id": "34", "code": false, "total": 0, "rewritten": 0}, {"id": "35", "code": false, "total": 0, "rewritten": 0}, {"id": "36", "code": false, "total": 0, "rewritten": 0}, {"id": "37", "code": false, "total": 0, "rewritten": 0}, {"id": "38", "code": false, "total": 0, "rewritten": 0}, {"id": "39", "code": true, "total": 123, "rewritten": 0}, {"id": "3a", "code": false, "total": 0, "rewritten": 0}, {"id": "3b", "code": false, "total": 0, "rewritten": 0}, {"id": "3c", "code": false, "total": 0, "rewritten": 0}, {"id": "3d", "code": false, "total": 0, "rewritten": 0}, {"id": "3e", "code": false, "total": 0, "rewritten": 0}, {"id": "3f", "code": true, "total": 442, "rewritten": 0}],
+    phases: [
+      { n: 0, name: "Tooling", desc: "Shim generator, cycle burns, lint, readiness reports.", status: "done", meta: "~1 day" },
+      { n: 1, name: "Bank 0 utilities & loaders", desc: "Memory ops, math, RNG, decompression, graphics loading.", status: "done", meta: "~2,800 lines" },
+      { n: 2, name: "Game-state helpers", desc: "fileManagement.s, treasureAndDrops.s, collisionEffects.s and five more files.", status: "pending", meta: "~5,700 lines" },
+      { n: 3, name: "Threads & kernel", desc: "Native coroutines for each game thread; VBlank/LCD/timer handlers; the main loop.", status: "done", meta: "~3,000 lines" },
+      { n: 4, name: "Object system", desc: "objectLoading.s, animations.s, specialObjects.s, updateAllObjects and friends.", status: "active", meta: "~9,000 lines" },
+      { n: 5, name: "Rooms, scripting & text", desc: "Room init, tileset data, the scripting engine, textbox and cutscenes.", status: "pending", meta: "~12,000 lines" },
+      { n: 6, name: "Sweep", desc: "Everything left in code/, until no routine is still generated.", status: "pending", meta: "remainder" },
+    ],
+    batches: [
+      { id: "33", delta: 15, tag: "Ph.4", text: "Object-data parser flow &mdash; setup, pointer skips, allocation loops, and opcodes 1&ndash;5 and 8 in <b>objectLoading.s</b>." },
+      { id: "32", delta: 15, tag: "Ph.4", text: "Object-system foundation &mdash; object-loading helpers, the part dispatcher, and the animation queue/data path across banks 12, 11, and 4." },
+      { id: "31", delta: 2, tag: "Ph.3", text: "The RAM-resident code &mdash; <b>hramOamDmaFunction</b> (the OAM DMA routine copied to HRAM) and <b>wMusicReadFunction</b> (copied to $c000). Bank 0 is now fully readable C." },
+      { id: "30", delta: 6, tag: "Ph.3", text: "The six thread entry points &mdash; <b>textThreadStart</b>, <b>fileSelectThreadStart</b>, <b>thread_1b10</b>, <b>introThreadStart</b>, <b>paletteFadeThreadStart</b>, <b>mainThreadStart</b>. Bank 0 done bar the RAM-resident code." },
+      { id: "29", delta: 13, tag: "Ph.3", text: "The boot chain and the main loop itself &mdash; <b>begin</b>, <b>resetGame</b>, <b>startGame</b>, <b>_mainLoop</b>, the four-thread scheduler and its <span class=\"mono\">ld sp</span> hand-offs." },
+      { id: "28", delta: 7, tag: "Ph.3", text: "<b>lcdInterrupt</b> family &mdash; status-bar toggle, the 7-entry <span class=\"mono\">rst $00</span> jump table, ring-menu timing." },
+      { id: "27", delta: 9, tag: "Ph.3", text: "<b>vblankInterrupt</b> and its function queue &mdash; the HDMA handler alone runs 19,567&times; in the movie." },
+      { id: "26", delta: 20, tag: "Ph.3", text: "Thread-state helpers, the serial handlers, <b>timerInterrupt</b>, the four interrupt vectors." },
+      { id: "25", delta: 28, tag: "Ph.1", text: "Bank 0's plain routines finished: angle/z-speed helpers, treasure &amp; file I/O, <b>enemyStandardUpdate</b>." },
+      { id: "24", delta: 23, tag: "Ph.1", text: "playSound, the graphics decompressor, palette headers, the drawAllSprites family." },
+      { id: "20&ndash;23", delta: 103, tag: "Ph.1", text: "Animation frames, OAM sprites, the draw queue, per-frame object update loops." },
+      { id: "4&ndash;19", delta: 323, tag: "Ph.1", text: "Collision, positions, angles, tiles, room flags, camera, treasure creation." },
+      { id: "1&ndash;3", delta: 92, tag: "Ph.0&ndash;1", text: "Memory copy/fill/clear, math, flags, RNG, LCD/VRAM setup." },
+    ],
+  };
+
+  function fmt(n) { return n.toLocaleString("en-US"); }
+
+  function relTime(iso) {
+    const s = Math.max(1, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+    if (s < 60) return s + "s ago";
+    const m = Math.floor(s / 60);
+    if (m < 60) return m + "m ago";
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + "h ago";
+    return Math.floor(h / 24) + "d ago";
+  }
+
+  function renderGrid(banks) {
+    const grid = document.getElementById("bankgrid");
+    grid.innerHTML = "";
+    banks.forEach(b => {
+      const el = document.createElement("div");
+      const pct = b.total ? Math.round((b.rewritten / b.total) * 100) : 0;
+      el.className = "bank " + (b.code ? "code" : "nocode") + (b.rewritten > 0 ? " touched" : "");
+      if (b.code) {
+        el.title = "bank " + b.id + " — " + fmt(b.rewritten) + " / " + fmt(b.total) + " routines readable (" + pct + "%)";
+        const fill = document.createElement("div");
+        fill.className = "fill";
+        fill.style.height = pct + "%";
+        el.appendChild(fill);
+      } else {
+        el.title = "bank " + b.id + " — no labelled code (graphics/data)";
+      }
+      const idEl = document.createElement("div");
+      idEl.className = "id";
+      idEl.textContent = b.id;
+      el.appendChild(idEl);
+      grid.appendChild(el);
+    });
+  }
+
+  function renderStats(d) {
+    const bank0pct = Math.round((d.bank0Rewritten / d.bank0Total) * 1000) / 10;
+    const overallPct = Math.round((d.rewrittenTotal / d.totalHooks) * 1000) / 10;
+    const linesPct = Math.round((d.bank0Lines / d.targetLines) * 1000) / 10;
+    document.getElementById("hero-summary").innerHTML =
+      "<b>" + d.banksTouched + "</b> of <b>" + d.codeBearingBanks + "</b> code-bearing banks touched &middot; <b>" + fmt(d.rewrittenTotal) + "</b> routines readable";
+    document.getElementById("stats").innerHTML = `
+      <div class="tile good">
+        <div class="label">Bank 00 completion</div>
+        <div class="value">${bank0pct}<small>%</small></div>
+        <div class="sub">${fmt(d.bank0Rewritten)} of ${fmt(d.bank0Total)} routines &mdash; every bank 0 routine is readable C, RAM-resident code included</div>
+        <div class="bar"><i style="width:${bank0pct}%"></i></div>
+      </div>
+      <div class="tile">
+        <div class="label">Readable C, whole ROM</div>
+        <div class="value">${overallPct}<small>%</small></div>
+        <div class="sub">${fmt(d.rewrittenTotal)} of ${fmt(d.totalHooks)} hooked routines &mdash; the rest already run as C, just not rewritten yet</div>
+        <div class="bar"><i style="width:${overallPct}%"></i></div>
+      </div>
+      <div class="tile">
+        <div class="label">Target scope covered</div>
+        <div class="value">${linesPct}<small>%</small></div>
+        <div class="sub">${fmt(d.bank0Lines)} of ${fmt(d.targetLines)} disassembly lines &mdash; bank0.s plus every ages/*.s file</div>
+        <div class="bar"><i style="width:${linesPct}%"></i></div>
+      </div>
+    `;
+  }
+
+  function renderPhases(phases) {
+    document.getElementById("phases").innerHTML = phases.map(p => `
+      <div class="phase ${p.status}">
+        <div class="num">${p.n}</div>
+        <div>
+          <div class="name">${p.name}</div>
+          <div class="desc">${p.desc}</div>
+        </div>
+        <div class="meta">
+          <span class="badge ${p.status}">${p.status === "done" ? "done" : p.status === "active" ? "in progress" : "pending"}</span><br>
+          ${p.meta}
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function renderBatches(batches) {
+    document.getElementById("batches").innerHTML = batches.map(b => `
+      <div class="batch">
+        <div class="id mono">#${b.id}</div>
+        <div class="text">${b.text} <span class="tag mono">${b.tag}</span></div>
+        <div class="delta">+${b.delta}</div>
+      </div>
+    `).join("");
+  }
+
+  function render(d) {
+    renderGrid(d.banks);
+    renderStats(d);
+    renderPhases(d.phases);
+    renderBatches(d.batches);
+    document.getElementById("snap-text").textContent = "snapshot · " + relTime(d.updatedAt);
+    document.getElementById("footer").textContent = "generated " + new Date(d.updatedAt).toLocaleString() + " — re-run the export and reload this file to refresh";
+  }
+
+  render(INITIAL);
+  setInterval(() => render(INITIAL), 60000);
+</script>

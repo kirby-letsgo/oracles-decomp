@@ -2,67 +2,6 @@
 #include "game/asm.h"
 #include "game/gen.h"
 
-// 11:5e3a
-void label_11_212(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5e3a, 2); D = 0xd0;  // ld d,$d0
-  I(0x5e3c, 1); A = D;  // ld a,d
-L_5e3d:
-  I(0x5e3d, 3); mem_wr(gb, 0xffaf, A);  // ldh ($ffaf),a
-  I(0x5e3f, 2); E = 0xc0;  // ld e,$c0
-  I(0x5e41, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5e42, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x5e43, 3); goto L_5e51; } I(0x5e43, 2);  // jr z,$5e51
-  I(0x5e45, 1); alu_rlca(gb);  // rlca
-  if ((F & FC)) { I(0x5e46, 3); goto L_5e4e; } I(0x5e46, 2);  // jr c,$5e4e
-  I(0x5e48, 2); E = 0xc4;  // ld e,$c4
-  I(0x5e4a, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5e4b, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x5e4c, 3); goto L_5e51; } I(0x5e4c, 2);  // jr nz,$5e51
-L_5e4e:
-  CALL(0x5e4e, func_11_5e8a, 0x5e8a, 0x5e51);  // call $5e8a
-L_5e51:
-  I(0x5e51, 1); D = alu_inc8(gb, D);  // inc d
-  I(0x5e52, 1); A = D;  // ld a,d
-  I(0x5e53, 2); alu_cp(gb, 0xe0);  // cp $e0
-  if ((F & FC)) { I(0x5e55, 3); goto L_5e3d; } I(0x5e55, 2);  // jr c,$5e3d
-  RET(0x5e57); return;  // ret
-}
-
-// 11:5e58
-void updateParts(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5e58, 2); A = 0xc0;  // ld a,$c0
-  I(0x5e5a, 3); mem_wr(gb, 0xffae, A);  // ldh ($ffae),a
-  I(0x5e5c, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
-  I(0x5e5f, 2); alu_cp(gb, 0x08);  // cp $08
-  if ((F & FZ)) { I(0x5e61, 3); label_11_212(gb); return; } I(0x5e61, 2);  // jr z,$5e3a
-  I(0x5e63, 4); A = mem_rd(gb, 0xcba0);  // ld a,($cba0)
-  I(0x5e66, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x5e67, 3); label_11_212(gb); return; } I(0x5e67, 2);  // jr nz,$5e3a
-  I(0x5e69, 4); A = mem_rd(gb, 0xcc8a);  // ld a,($cc8a)
-  I(0x5e6c, 2); alu_and(gb, 0x88);  // and $88
-  if (!(F & FZ)) { I(0x5e6e, 3); label_11_212(gb); return; } I(0x5e6e, 2);  // jr nz,$5e3a
-  I(0x5e70, 2); D = 0xd0;  // ld d,$d0
-  I(0x5e72, 1); A = D;  // ld a,d
-L_5e73:
-  I(0x5e73, 3); mem_wr(gb, 0xffaf, A);  // ldh ($ffaf),a
-  I(0x5e75, 2); E = 0xc0;  // ld e,$c0
-  I(0x5e77, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5e78, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x5e79, 3); goto L_5e83; } I(0x5e79, 2);  // jr z,$5e83
-  CALL(0x5e7b, func_11_5e8a, 0x5e8a, 0x5e7e);  // call $5e8a
-  I(0x5e7e, 1); H = D;  // ld h,d
-  I(0x5e7f, 2); L = 0xea;  // ld l,$ea
-  I(0x5e81, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
-L_5e83:
-  I(0x5e83, 1); D = alu_inc8(gb, D);  // inc d
-  I(0x5e84, 1); A = D;  // ld a,d
-  I(0x5e85, 2); alu_cp(gb, 0xe0);  // cp $e0
-  if ((F & FC)) { I(0x5e87, 3); goto L_5e73; } I(0x5e87, 2);  // jr c,$5e73
-  RET(0x5e89); return;  // ret
-}
-
 // 11:403b
 void partCommon_standardUpdate(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -157,26 +96,6 @@ void partCommon_standardUpdate__dead(GB *gb) {
 L_406f:
   I(0x406f, 2); C = 0x02;  // ld c,$02
   RET(0x4071); return;  // ret
-}
-
-// 11:5e8a
-void func_11_5e8a(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5e8a, partCommon_standardUpdate, 0x403b, 0x5e8d);  // call $403b
-  I(0x5e8d, 2); E = 0xc1;  // ld e,$c1
-  I(0x5e8f, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5e90, 1); alu_add(gb, A);  // add a
-  I(0x5e91, 2); alu_add(gb, 0x9f);  // add $9f
-  I(0x5e93, 1); L = A;  // ld l,a
-  I(0x5e94, 2); A = 0x00;  // ld a,$00
-  I(0x5e96, 2); alu_adc(gb, 0x5e);  // adc $5e
-  I(0x5e98, 1); H = A;  // ld h,a
-  I(0x5e99, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x5e9a, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x5e9b, 1); L = A;  // ld l,a
-  I(0x5e9c, 1); A = C;  // ld a,c
-  I(0x5e9d, 1); alu_or(gb, A);  // or a
-  I(0x5e9e, 1); HANDOFF(HL);  // jp hl
 }
 
 // 11:5553
