@@ -582,3 +582,283 @@ void introCinematic_ridingHorse_state3_hook(GB *gb) {
   CYC(0x4f3f, 0x4f41); hram_wr(gb, 0x9d, A);
   CYC(0x4f41, 0x4f44); intro_incState_hook(gb);
 }
+
+void introCinematic_ridingHorse_state4__drawLinkOnHorseAndScrollScreen_hook(GB *gb);
+void introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_2_hook(GB *gb);
+void introCinematic_ridingHorse_drawTempleSprites_hook(GB *gb);
+
+void introCinematic_ridingHorse_state4_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4f44, introCinematic_ridingHorse_state4__drawLinkOnHorseAndScrollScreen_hook, 0x4f70, 0x4f47);
+  CYC(0x4f47, 0x4f4a); SET_HL(wTmpcbb3);
+  CALL_C(0x4f4a, decHlRef16WithCap_hook, 0x0237, 0x4f4d);
+  if (!(F & FZ)) {
+    CYCT(0x4f4d, 0x4f4e); ret_effect(gb);
+    return;
+  }
+  CYC(0x4f4d, 0x4f4e);
+  CYC(0x4f4e, 0x4f50); A = 0x36;
+  CALL_C(0x4f50, loadUncompressedGfxHeader_hook, 0x05da, 0x4f53);
+  CYC(0x4f53, 0x4f55); mem_wr(gb, HL, 0x5a);
+  CYC(0x4f55, 0x4f57); A = 0x9b;
+  CALL_C(0x4f57, loadPaletteHeader_hook, 0x050b, 0x4f5a);
+  CALL_C(0x4f5a, clearDynamicInteractions_hook, 0x35d2, 0x4f5d);
+  CALL_C(0x4f5d, clearOam_hook, 0x049f, 0x4f60);
+  CYC(0x4f60, 0x4f62); A = 0x19;
+  CALL_C(0x4f62, loadGfxRegisterStateIndex_hook, 0x02ea, 0x4f65);
+  CYC(0x4f65, 0x4f67); A = 0x48;
+  CYC(0x4f67, 0x4f6a); mem_wr(gb, wGfxRegs1_LYC, A);
+  CYC(0x4f6a, 0x4f6d); mem_wr(gb, wGfxRegs2_WINY, A);
+  CYC(0x4f6d, 0x4f70); intro_incState_hook(gb);
+}
+
+void introCinematic_ridingHorse_state4__drawLinkOnHorseAndScrollScreen_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4f70, 0x4f73); SET_HL(0x5a81);
+  CYC(0x4f73, 0x4f75); E = 0x3f;
+  CALL_C(0x4f75, addSpritesFromBankToOam_hook, 0x30eb, 0x4f78);
+  CYC(0x4f78, 0x4f7b); A = mem_rd(gb, wIntro_frameCounter);
+  CYC(0x4f7b, 0x4f7d); alu_and(gb, 0x1f);
+  if (!(F & FZ)) {
+    CYCT(0x4f7d, 0x4f7f);
+  } else {
+    CYC(0x4f7d, 0x4f7f);
+    CYC(0x4f7f, 0x4f82); SET_HL(wGfxRegs1_SCX);
+    CYC(0x4f82, 0x4f83); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  }
+  CYC(0x4f83, 0x4f86); SET_HL(wTmpcbb6);
+  CYC(0x4f86, 0x4f87); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(0x4f87, 0x4f89);
+  } else {
+    CYC(0x4f87, 0x4f89);
+    CYC(0x4f89, 0x4f8b); mem_wr(gb, HL, 0x0d);
+    CYC(0x4f8b, 0x4f8e); SET_HL(wGfxRegs2_SCX);
+    CYC(0x4f8e, 0x4f8f); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  }
+  CYC(0x4f8f, 0x4f92); SET_HL(wTmpcbbb);
+  CYC(0x4f92, 0x4f93); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(0x4f93, 0x4f94); ret_effect(gb);
+    return;
+  }
+  CYC(0x4f93, 0x4f94);
+  CYC(0x4f94, 0x4f96); mem_wr(gb, HL, 0x3c);
+  CYC(0x4f96, 0x4f97); SET_HL(HL + 1);
+  CYC(0x4f97, 0x4f98); A = mem_rd(gb, HL);
+  CYC(0x4f98, 0x4f9a); alu_cp(gb, 0x03);
+  if (F & FZ) {
+    CYCT(0x4f9a, 0x4f9b); ret_effect(gb);
+    return;
+  }
+  CYC(0x4f9a, 0x4f9b);
+  CYC(0x4f9b, 0x4f9c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x4f9c, 0x4f9f); SET_HL(0x4fa4);
+  CYC(0x4f9f, 0x4fa0); push_effect(gb, 0x4fa0);
+  burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
+  if (!(F & FC)) {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, true); ret_effect(gb);
+  } else {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, false);
+    burn_rom(gb, 0x00, 0x0013, 0x0014, false); H = alu_inc8(gb, H);
+    burn_rom(gb, 0x00, 0x0014, 0x0015, false); ret_effect(gb);
+  }
+  CYC(0x4fa0, 0x4fa1); A = mem_rd(gb, HL);
+  CYC(0x4fa1, 0x4fa4); loadPaletteHeader_hook(gb);
+}
+
+void introCinematic_ridingHorse_state5_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4fa7, introCinematic_moveBlackBarsOut, 0x53eb, 0x4faa);
+  CYC(0x4faa, 0x4fad); SET_HL(wGfxRegs2_SCX);
+  CYC(0x4fad, 0x4fae); A = mem_rd(gb, HL);
+  CYC(0x4fae, 0x4fb0); alu_add(gb, 0x08);
+  CYC(0x4fb0, 0x4fb1); mem_wr(gb, HL, A);
+  CYC(0x4fb1, 0x4fb3); alu_cp(gb, 0x60);
+  if (F & FC) {
+    CYCT(0x4fb3, 0x4fb4); ret_effect(gb);
+    return;
+  }
+  CYC(0x4fb3, 0x4fb4);
+  CYC(0x4fb4, 0x4fb6); mem_wr(gb, HL, 0x60);
+  CALL_C(0x4fb6, intro_incState_hook, 0x4d33, 0x4fb9);
+  CYC(0x4fb9, 0x4fbc); SET_HL(wTmpcbb3);
+  CYC(0x4fbc, 0x4fbe); mem_wr(gb, HL, 0x18);
+  CYC(0x4fbe, 0x4fc1); SET_BC(0x7504);
+  CYC(0x4fc1, 0x4fc4); createInteraction_hook(gb);
+}
+
+void introCinematic_ridingHorse_state6_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4fc4, 0x4fc7); SET_HL(wTmpcbb3);
+  CALL_C(0x4fc7, decHlRef16WithCap_hook, 0x0237, 0x4fca);
+  if (!(F & FZ)) {
+    CYCT(0x4fca, 0x4fcb); ret_effect(gb);
+    return;
+  }
+  CYC(0x4fca, 0x4fcb);
+  CALL_C(0x4fcb, disableLcd_hook, 0x02c1, 0x4fce);
+  CYC(0x4fce, 0x4fd0); A = 0x92;
+  CALL_C(0x4fd0, loadPaletteHeader_hook, 0x050b, 0x4fd3);
+  CYC(0x4fd3, 0x4fd5); A = 0x9c;
+  CALL_C(0x4fd5, loadGfxHeader_hook, 0x0626, 0x4fd8);
+  CALL_C(0x4fd8, clearDynamicInteractions_hook, 0x35d2, 0x4fdb);
+  CYC(0x4fdb, 0x4fdd); A = 0x0a;
+  CALL_C(0x4fdd, loadGfxRegisterStateIndex_hook, 0x02ea, 0x4fe0);
+  CYC(0x4fe0, 0x4fe3); intro_incState_hook(gb);
+}
+
+void introCinematic_ridingHorse_state7_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4fe3, 0x4fe6); SET_HL(wGfxRegs1_SCY);
+  CYC(0x4fe6, 0x4fe7); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(0x4fe7, 0x4fe9);
+    introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_2_hook(gb);
+    return;
+  }
+  CYC(0x4fe7, 0x4fe9);
+  CYC(0x4fe9, 0x4feb); A = 0xcc;
+  CYC(0x4feb, 0x4fee); mem_wr(gb, wTmpcbb6, A);
+  CALL_C(0x4fee, intro_incState_hook, 0x4d33, 0x4ff1);
+  introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_2_hook(gb);
+}
+
+void introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_2_hook(GB *gb) {
+  CYC(0x4ff1, 0x4ff4); A = mem_rd(gb, wGfxRegs1_SCY);
+  CYC(0x4ff4, 0x4ff5); alu_cpl(gb);
+  CYC(0x4ff5, 0x4ff6); A = alu_inc8(gb, A);
+  CYC(0x4ff6, 0x4ff7); B = A;
+  CYC(0x4ff7, 0x4ff8); alu_xor(gb, A);
+  CYC(0x4ff8, 0x4ffa); hram_wr(gb, 0x9f, A);
+  CYC(0x4ffa, 0x4ffb); C = A;
+  CYC(0x4ffb, 0x4ffe); SET_HL(0x59d3);
+  CYC(0x4ffe, 0x5000); E = 0x3f;
+  CYC(0x5000, 0x5003); addSpritesFromBankToOam_withOffset_hook(gb);
+}
+
+void introCinematic_ridingHorse_state8_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5003, 0x5006); SET_HL(wTmpcbb6);
+  CYC(0x5006, 0x5007); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(0x5007, 0x5009);
+    introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_2_hook(gb);
+    return;
+  }
+  CYC(0x5007, 0x5009);
+  CYC(0x5009, 0x500b); A = 0x93;
+  CALL_C(0x500b, loadPaletteHeader_hook, 0x050b, 0x500e);
+  CALL_C(0x500e, disableLcd_hook, 0x02c1, 0x5011);
+  CALL_C(0x5011, clearOam_hook, 0x049f, 0x5014);
+  CYC(0x5014, 0x5016); A = 0x10;
+  CYC(0x5016, 0x5018); hram_wr(gb, 0x9f, A);
+  CYC(0x5018, 0x501a); A = 0x9d;
+  CALL_C(0x501a, loadGfxHeader_hook, 0x0626, 0x501d);
+  CYC(0x501d, 0x501f); A = 0x05;
+  CYC(0x501f, 0x5022); mem_wr(gb, wTmpcbbb, A);
+  CYC(0x5022, 0x5025); SET_HL(wTmpcbb3);
+  CYC(0x5025, 0x5027); mem_wr(gb, HL, 0x90);
+  CYC(0x5027, 0x5028); SET_HL(HL + 1);
+  CYC(0x5028, 0x502a); mem_wr(gb, HL, 0x01);
+  CYC(0x502a, 0x502c); A = 0xb4;
+  CYC(0x502c, 0x502f); mem_wr(gb, wTmpcbb6, A);
+  CALL_C(0x502f, clearPaletteFadeVariablesAndRefreshPalettes_hook, 0x3238, 0x5032);
+  CYC(0x5032, 0x5034); A = 0x0b;
+  CALL_C(0x5034, loadGfxRegisterStateIndex_hook, 0x02ea, 0x5037);
+  CALL_C(0x5037, introCinematic_ridingHorse_drawTempleSprites_hook, 0x5075, 0x503a);
+  CYC(0x503a, 0x503c); B = 0x02;
+  for (;;) {
+    CALL_C(0x503c, getFreeInteractionSlot_hook, 0x3aef, 0x503f);
+    if (!(F & FZ)) {
+      CYCT(0x503f, 0x5041);
+      break;
+    }
+    CYC(0x503f, 0x5041);
+    CYC(0x5041, 0x5043); mem_wr(gb, HL, 0x75);
+    CYC(0x5043, 0x5044); L = alu_inc8(gb, L);
+    CYC(0x5044, 0x5045); mem_wr(gb, HL, B);
+    CYC(0x5045, 0x5046); B = alu_dec8(gb, B);
+    if (!(F & FZ)) {
+      CYCT(0x5046, 0x5048);
+      continue;
+    }
+    CYC(0x5046, 0x5048);
+    break;
+  }
+  CYC(0x5048, 0x504b); intro_incState_hook(gb);
+}
+
+void introCinematic_ridingHorse_state9_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x504b, 0x504e); SET_HL(wTmpcbb3);
+  CALL_C(0x504e, decHlRef16WithCap_hook, 0x0237, 0x5051);
+  if (!(F & FZ)) {
+    CYCT(0x5051, 0x5053);
+  } else {
+    CYC(0x5051, 0x5053);
+    CALL_C(0x5053, fadeoutToWhite_hook, 0x326c, 0x5056);
+    CALL_C(0x5056, intro_incState_hook, 0x4d33, 0x5059);
+    CYC(0x5059, 0x505b);
+    introCinematic_ridingHorse_drawTempleSprites_hook(gb);
+    return;
+  }
+  CYC(0x505b, 0x505e); SET_HL(wTmpcbb6);
+  CYC(0x505e, 0x505f); A = mem_rd(gb, HL);
+  CYC(0x505f, 0x5060); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x5060, 0x5062);
+    introCinematic_ridingHorse_drawTempleSprites_hook(gb);
+    return;
+  }
+  CYC(0x5060, 0x5062);
+  CYC(0x5062, 0x5063); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x5063, 0x5066); A = mem_rd(gb, wGfxRegs1_SCX);
+  CYC(0x5066, 0x5067); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x5067, 0x5069);
+    introCinematic_ridingHorse_drawTempleSprites_hook(gb);
+    return;
+  }
+  CYC(0x5067, 0x5069);
+  CYC(0x5069, 0x506c); SET_HL(wTmpcbbb);
+  CYC(0x506c, 0x506d); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(0x506d, 0x506f);
+    introCinematic_ridingHorse_drawTempleSprites_hook(gb);
+    return;
+  }
+  CYC(0x506d, 0x506f);
+  CYC(0x506f, 0x5071); mem_wr(gb, HL, 0x05);
+  CYC(0x5071, 0x5074); SET_HL(wGfxRegs1_SCX);
+  CYC(0x5074, 0x5075); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  introCinematic_ridingHorse_drawTempleSprites_hook(gb);
+}
+
+void introCinematic_ridingHorse_drawTempleSprites_hook(GB *gb) {
+  CYC(0x5075, 0x5076); alu_xor(gb, A);
+  CYC(0x5076, 0x5078); hram_wr(gb, 0x9f, A);
+  CYC(0x5078, 0x5079); B = A;
+  CYC(0x5079, 0x507c); A = mem_rd(gb, wGfxRegs1_SCX);
+  CYC(0x507c, 0x507d); alu_cpl(gb);
+  CYC(0x507d, 0x507e); A = alu_inc8(gb, A);
+  CYC(0x507e, 0x507f); C = A;
+  CYC(0x507f, 0x5082); SET_HL(0x5a6c);
+  CYC(0x5082, 0x5084); E = 0x3f;
+  CYC(0x5084, 0x5087); addSpritesFromBankToOam_withOffset_hook(gb);
+}
+
+void introCinematic_ridingHorse_state10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5087, 0x508a); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x508a, 0x508b); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x508b, 0x508d);
+    introCinematic_ridingHorse_drawTempleSprites_hook(gb);
+    return;
+  }
+  CYC(0x508b, 0x508d);
+  CALL_C(0x508d, clearDynamicInteractions_hook, 0x35d2, 0x5090);
+  CYC(0x5090, 0x5092); incIntroCinematicState_hook(gb);
+}

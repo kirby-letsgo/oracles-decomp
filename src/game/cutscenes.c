@@ -116,3 +116,23 @@ void cutscene0e_hook(GB *gb) {
   CYC(0x5dbf, 0x5dc2);
   interBankCall_hook(gb);
 }
+
+void cutscene21_hook(GB *gb) {
+  CYC(0x5dc2, 0x5dc5); A = W8(wCutsceneTrigger);
+  CYC(0x5dc5, 0x5dc6); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x5dc6, 0x5dc9);
+    setCutsceneIndexIfCutsceneTriggerSet(gb);
+    return;
+  }
+  CYC(0x5dc6, 0x5dc9);
+  CYC(0x5dc9, 0x5dcb); C = 0x07;
+  CYC(0x5dcb, 0x5dcd);
+  func_5d5d(gb);
+}
+
+void cutscene10_hook(GB *gb) {
+  CYC(0x5dcd, 0x5dcf); C = 0x04;
+  CYC(0x5dcf, 0x5dd1);
+  func_5d5d(gb);
+}
