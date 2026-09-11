@@ -20,7 +20,6 @@ static void add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
   pop_effect(gb);
 }
 
-// 04:69c7
 void setTileToWitheredVine_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x69c7, 0x69c8); L = mem_rd(gb, HL);
@@ -39,7 +38,6 @@ void setTileToWitheredVine_hook(GB *gb) {
   CYC(0x69d4, 0x69d5); ret_effect(gb);
 }
 
-// 04:69d5
 void getVinePosition_hook(GB *gb) {
   CYC(0x69d5, 0x69d6); A = B;
   CYC(0x69d6, 0x69d9); SET_HL(0xc8f0);
@@ -49,7 +47,46 @@ void getVinePosition_hook(GB *gb) {
   CYC(0x69dc, 0x69dd); ret_effect(gb);
 }
 
-// 04:6bb5
+void set3Bytes_hook(GB *gb);
+
+void initializeVinePositions_hook(GB *gb) {
+  CYC(0x69dd, 0x69e0); SET_HL(wGroup1RoomFlags + 0xf0);
+  CYC(0x69e0, 0x69e3); SET_DE(0x69e8);
+  CYC(0x69e3, 0x69e5); B = 0x06;
+  CYC(0x69e5, 0x69e8); copyMemoryReverse_hook(gb);
+}
+
+void set4Bytes_hook(GB *gb) {
+  CYC(0x6aac, 0x6aad); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  set3Bytes_hook(gb);
+}
+
+void set3Bytes_hook(GB *gb) {
+  CYC(0x6aad, 0x6aae); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x6aae, 0x6aaf); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x6aaf, 0x6ab0); mem_wr(gb, HL, A);
+  CYC(0x6ab0, 0x6ab1); ret_effect(gb);
+}
+
+void func_04_6ba8_hook(GB *gb) {
+  CYC(0x6ba8, 0x6baa); D = wRoomLayout >> 8;
+  CYC(0x6baa, 0x6bab); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6bab, 0x6bac); C = A;
+  for (;;) {
+    CYC(0x6bac, 0x6bad); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x6bad, 0x6baf); alu_cp(gb, 0xff);
+    if (F & FZ) {
+      CYCT(0x6baf, 0x6bb0); ret_effect(gb);
+      return;
+    }
+    CYC(0x6baf, 0x6bb0);
+    CYC(0x6bb0, 0x6bb1); E = A;
+    CYC(0x6bb1, 0x6bb2); A = C;
+    CYC(0x6bb2, 0x6bb3); mem_wr(gb, DE, A);
+    CYCT(0x6bb3, 0x6bb5);
+  }
+}
+
 void fillRectInRoomLayout_hook(GB *gb) {
   CYC(0x6bb5, 0x6bb6); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(0x6bb6, 0x6bb7); E = A;
@@ -89,7 +126,6 @@ void fillRectInRoomLayout_hook(GB *gb) {
   CYC(0x6bce, 0x6bcf); ret_effect(gb);
 }
 
-// 04:6bcf
 void drawRectInRoomLayout_hook(GB *gb) {
   CYC(0x6bcf, 0x6bd0); A = mem_rd(gb, DE);
   CYC(0x6bd0, 0x6bd1); SET_DE(DE + 1);

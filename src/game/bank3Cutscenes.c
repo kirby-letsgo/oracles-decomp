@@ -12,6 +12,12 @@ void incCutsceneState_hook(GB *gb) {
   CYC(0x4b14, 0x4b15); ret_effect(gb);
 }
 
+void unused_incTmpcbb3_hook(GB *gb) {
+  CYC(0x4b15, 0x4b18); SET_HL(wTmpcbb3);
+  CYC(0x4b18, 0x4b19); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x4b19, 0x4b1a); ret_effect(gb);
+}
+
 void decTmpcbb4_hook(GB *gb) {
   CYC(0x4b1a, 0x4b1d); SET_HL(wTmpcbb4);
   CYC(0x4b1d, 0x4b1e); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));

@@ -16,6 +16,7 @@ void scriptFunc_setState_hook(GB *gb);
 void scriptFunc_restoreActiveObject_hook(GB *gb);
 void scriptFunc_loadBcAndDe_hook(GB *gb);
 void scriptFunc_initializeObject_hook(GB *gb);
+void scriptFunc_getTextIndex_hook(GB *gb);
 
 // 0c:4103
 void scriptCmd_none_hook(GB *gb) {
@@ -266,4 +267,127 @@ void scriptCmd_setZSpeed_hook(GB *gb) {
   CYC(0x4241, 0x4242); mem_wr(gb, DE, A);
   CYC(0x4242, 0x4243); alu_scf(gb);
   CYC(0x4243, 0x4244); ret_effect(gb);
+}
+
+void scriptCmd_checkCounter2ZeroAndReset_hook(GB *gb) {
+  CYC(0x4244, 0x4245); SET_HL(pop_effect(gb));
+  CYC(0x4245, 0x4247); E = 0x47;
+  CYC(0x4247, 0x4248); A = mem_rd(gb, DE);
+  CYC(0x4248, 0x4249); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x4249, 0x424a); ret_effect(gb); return; }
+  CYC(0x4249, 0x424a);
+  CYC(0x424a, 0x424b); SET_HL(HL + 1);
+  CYC(0x424b, 0x424c); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x424c, 0x424d); mem_wr(gb, DE, A);
+  CYC(0x424d, 0x424e); ret_effect(gb);
+}
+
+void scriptCmd_setCollideRadii_hook(GB *gb) {
+  CYC(0x424e, 0x424f); SET_HL(pop_effect(gb));
+  CYC(0x424f, 0x4250); SET_HL(HL + 1);
+  CYC(0x4250, 0x4251); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4251, 0x4253); E = 0x66;
+  CYC(0x4253, 0x4254); mem_wr(gb, DE, A);
+  CYC(0x4254, 0x4255); E = alu_inc8(gb, E);
+  CYC(0x4255, 0x4256); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4256, 0x4257); mem_wr(gb, DE, A);
+  CYC(0x4257, 0x4258); ret_effect(gb);
+}
+
+void scriptCmd_writeInteractionByte_hook(GB *gb) {
+  CYC(0x4258, 0x4259); SET_HL(pop_effect(gb));
+  CYC(0x4259, 0x425a); SET_HL(HL + 1);
+  CYC(0x425a, 0x425b); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x425b, 0x425c); E = A;
+  CYC(0x425c, 0x425d); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x425d, 0x425e); mem_wr(gb, DE, A);
+  CYC(0x425e, 0x425f); ret_effect(gb);
+}
+
+void scriptCmd_addinteractionByte_hook(GB *gb) {
+  CYC(0x425f, 0x4260); SET_HL(pop_effect(gb));
+  CYC(0x4260, 0x4261); SET_HL(HL + 1);
+  CYC(0x4261, 0x4262); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4262, 0x4263); E = A;
+  CYC(0x4263, 0x4264); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4264, 0x4265); B = A;
+  CYC(0x4265, 0x4266); A = mem_rd(gb, DE);
+  CYC(0x4266, 0x4267); alu_add(gb, B);
+  CYC(0x4267, 0x4268); mem_wr(gb, DE, A);
+  CYC(0x4268, 0x4269); alu_scf(gb);
+  CYC(0x4269, 0x426a); ret_effect(gb);
+}
+
+void scriptCmd_getRandomBits_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x426a, 0x426b); SET_HL(pop_effect(gb));
+  CYC(0x426b, 0x426c); SET_HL(HL + 1);
+  CALL_C(0x426c, getRandomNumber_hook, 0x043e, 0x426f);
+  CYC(0x426f, 0x4270); B = A;
+  CYC(0x4270, 0x4271); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4271, 0x4272); E = A;
+  CYC(0x4272, 0x4273); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4273, 0x4274); alu_and(gb, B);
+  CYC(0x4274, 0x4275); mem_wr(gb, DE, A);
+  CYC(0x4275, 0x4276); ret_effect(gb);
+}
+
+void scriptCmd_turnToFaceLink_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4298, objectGetAngleTowardEnemyTarget_hook, 0x1e94, 0x429b);
+  CYC(0x429b, 0x429d); alu_add(gb, 0x04);
+  CYC(0x429d, 0x429f); alu_and(gb, 0x18);
+  CYC(0x429f, 0x42a1); A = alu_swap(gb, A);
+  CYC(0x42a1, 0x42a2); alu_rlca(gb);
+  CALL_C(0x42a2, interactionSetAnimation_hook, 0x262e, 0x42a5);
+  CYC(0x42a5, 0x42a8); scriptFunc_popHlAndInc_hook(gb);
+}
+
+void scriptCmd_setAngleAndExtra_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x42a8, 0x42a9); SET_HL(pop_effect(gb));
+  CYC(0x42a9, 0x42aa); SET_HL(HL + 1);
+  CYC(0x42aa, 0x42ab); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x42ab, 0x42ad); E = 0x49;
+  CYC(0x42ad, 0x42ae); mem_wr(gb, DE, A);
+  CALL_C(0x42ae, convertAngleDeToDirection_hook, 0x26f8, 0x42b1);
+  CYC(0x42b1, 0x42b2); push_effect(gb, HL);
+  CALL_C(0x42b2, interactionSetAnimation_hook, 0x262e, 0x42b5);
+  CYC(0x42b5, 0x42b6); SET_HL(pop_effect(gb));
+  CYC(0x42b6, 0x42b7); alu_scf(gb);
+  CYC(0x42b7, 0x42b8); ret_effect(gb);
+}
+
+void scriptCmd_runGenericNpc_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x42b8, 0x42b9); SET_HL(pop_effect(gb));
+  CYC(0x42b9, 0x42ba); SET_HL(HL + 1);
+  CALL_C(0x42ba, scriptFunc_getTextIndex_hook, 0x42c8, 0x42bd);
+  CYC(0x42bd, 0x42be); A = C;
+  CYC(0x42be, 0x42c0); E = 0x72;
+  CYC(0x42c0, 0x42c1); mem_wr(gb, DE, A);
+  CYC(0x42c1, 0x42c2); A = B;
+  CYC(0x42c2, 0x42c3); E = alu_inc8(gb, E);
+  CYC(0x42c3, 0x42c4); mem_wr(gb, DE, A);
+  CYC(0x42c4, 0x42c7); SET_HL(0x45f0);
+  CYC(0x42c7, 0x42c8); ret_effect(gb);
+}
+
+void scriptFunc_getTextIndex_hook(GB *gb) {
+  CYC(0x42c8, 0x42ca); E = 0x70;
+  CYC(0x42ca, 0x42cb); A = mem_rd(gb, DE);
+  CYC(0x42cb, 0x42cc); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x42cc, 0x42ce); goto use_script_text_index; }
+  CYC(0x42cc, 0x42ce);
+  CYC(0x42ce, 0x42d0); E = 0x73;
+  CYC(0x42d0, 0x42d1); A = mem_rd(gb, DE);
+  CYC(0x42d1, 0x42d2); B = A;
+  CYC(0x42d2, 0x42d4); goto load_text_index;
+use_script_text_index:
+  CYC(0x42d4, 0x42d5); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x42d5, 0x42d6); B = A;
+load_text_index:
+  CYC(0x42d6, 0x42d7); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x42d7, 0x42d8); C = A;
+  CYC(0x42d8, 0x42d9); ret_effect(gb);
 }

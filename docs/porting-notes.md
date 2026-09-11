@@ -415,3 +415,14 @@ desync to discover; keep them when porting routines.
   an entry-stack capture must use the normal non-static hook-style declaration, as the rectangle
   copy body does; a file-local helper is only suitable when it has no explicit emulated-register
   access that the lint checks.
+- The carry path through the add-A-to-HL `rst $10` vector has three distinct burns after `ld l,a`:
+  the not-taken `ret nc` at `$0012`, `inc h` at `$0013`, and the final `ret` at `$0014`. Batch 42's
+  first rewrite attached `inc h` and `ret` to the wrong byte range and omitted the final return,
+  leaving the path four cycles short; line-by-line review against the ROM report found it before
+  the verifier. Model vector helpers as the actual instruction stream, including both returns,
+  rather than as a register-only arithmetic helper.
+- Extending an existing source-named readable-C file must preserve every earlier hook in that
+  file. In batch 42, replacing `loadTilesetData.c` and `roomSpecificTileChanges.c` with the new
+  address clusters silently deleted five batch-39 definitions; regeneration succeeded, but the
+  integrated link failed with undefined hook symbols. Diff the whole source file against `HEAD`
+  after parallel edits, and merge new routines in address order instead of replacing the file.

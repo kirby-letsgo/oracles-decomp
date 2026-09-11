@@ -143,77 +143,6 @@ void scriptCmd_spawnEnemyHere(GB *gb) {
   I(0x420e, 3); if (hook_enabled_at(0x41ca)) { scriptFunc_restoreActiveObject_hook(gb); return; } HANDOFF(0x41ca);  // jr $41ca
 }
 
-// 0c:4244
-void scriptCmd_checkCounter2ZeroAndReset(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x4244));  // pop hl
-  I(0x4245, 2); E = 0x47;  // ld e,$47
-  I(0x4247, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4248, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4249); return; } I(0x4249, 2);  // ret nz
-  I(0x424a, 2); SET_HL(HL + 1);  // inc hl
-  I(0x424b, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x424c, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x424d); return;  // ret
-}
-
-// 0c:424e
-void scriptCmd_setCollideRadii(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x424e));  // pop hl
-  I(0x424f, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4250, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4251, 2); E = 0x66;  // ld e,$66
-  I(0x4253, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4254, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4255, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4256, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x4257); return;  // ret
-}
-
-// 0c:4258
-void scriptCmd_writeInteractionByte(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x4258));  // pop hl
-  I(0x4259, 2); SET_HL(HL + 1);  // inc hl
-  I(0x425a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x425b, 1); E = A;  // ld e,a
-  I(0x425c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x425d, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x425e); return;  // ret
-}
-
-// 0c:425f
-void scriptCmd_addinteractionByte(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x425f));  // pop hl
-  I(0x4260, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4261, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4262, 1); E = A;  // ld e,a
-  I(0x4263, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4264, 1); B = A;  // ld b,a
-  I(0x4265, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4266, 1); alu_add(gb, B);  // add b
-  I(0x4267, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4268, 1); alu_scf(gb);  // scf
-  RET(0x4269); return;  // ret
-}
-
-// 0c:426a
-void scriptCmd_getRandomBits(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x426a));  // pop hl
-  I(0x426b, 2); SET_HL(HL + 1);  // inc hl
-  CALL(0x426c, getRandomNumber_hook, 0x043e, 0x426f);  // call $043e
-  I(0x426f, 1); B = A;  // ld b,a
-  I(0x4270, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4271, 1); E = A;  // ld e,a
-  I(0x4272, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4273, 1); alu_and(gb, B);  // and b
-  I(0x4274, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x4275); return;  // ret
-}
-
 // 0c:4276
 void scriptCmd_loadSprite(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -241,76 +170,12 @@ L_428b:
   RET(0x4297); return;  // ret
 }
 
-// 0c:4298
-void scriptCmd_turnToFaceLink(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4298, objectGetAngleTowardEnemyTarget_hook, 0x1e94, 0x429b);  // call $1e94
-  I(0x429b, 2); alu_add(gb, 0x04);  // add $04
-  I(0x429d, 2); alu_and(gb, 0x18);  // and $18
-  I(0x429f, 2); A = alu_swap(gb, A);  // swap a
-  I(0x42a1, 1); alu_rlca(gb);  // rlca
-  CALL(0x42a2, interactionSetAnimation_hook, 0x262e, 0x42a5);  // call $262e
-  I(0x42a5, 4); if (hook_enabled_at(0x415a)) { scriptFunc_popHlAndInc_hook(gb); return; } HANDOFF(0x415a);  // jp $415a
-}
-
-// 0c:42a8
-void scriptCmd_setAngleAndExtra(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x42a8));  // pop hl
-  I(0x42a9, 2); SET_HL(HL + 1);  // inc hl
-  I(0x42aa, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x42ab, 2); E = 0x49;  // ld e,$49
-  I(0x42ad, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x42ae, convertAngleDeToDirection_hook, 0x26f8, 0x42b1);  // call $26f8
-  PUSH(0x42b1, HL);  // push hl
-  CALL(0x42b2, interactionSetAnimation_hook, 0x262e, 0x42b5);  // call $262e
-  SET_HL(POP(0x42b5));  // pop hl
-  I(0x42b6, 1); alu_scf(gb);  // scf
-  RET(0x42b7); return;  // ret
-}
-
-// 0c:42b8
-void scriptCmd_runGenericNpc(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x42b8));  // pop hl
-  I(0x42b9, 2); SET_HL(HL + 1);  // inc hl
-  CALL(0x42ba, scriptFunc_getTextIndex, 0x42c8, 0x42bd);  // call $42c8
-  I(0x42bd, 1); A = C;  // ld a,c
-  I(0x42be, 2); E = 0x72;  // ld e,$72
-  I(0x42c0, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x42c1, 1); A = B;  // ld a,b
-  I(0x42c2, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x42c3, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x42c4, 3); SET_HL(0x45f0);  // ld hl,$45f0
-  RET(0x42c7); return;  // ret
-}
-
-// 0c:42c8
-void scriptFunc_getTextIndex(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x42c8, 2); E = 0x70;  // ld e,$70
-  I(0x42ca, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x42cb, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x42cc, 3); goto L_42d4; } I(0x42cc, 2);  // jr z,$42d4
-  I(0x42ce, 2); E = 0x73;  // ld e,$73
-  I(0x42d0, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x42d1, 1); B = A;  // ld b,a
-  I(0x42d2, 3); goto L_42d6;  // jr $42d6
-L_42d4:
-  I(0x42d4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x42d5, 1); B = A;  // ld b,a
-L_42d6:
-  I(0x42d6, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x42d7, 1); C = A;  // ld c,a
-  RET(0x42d8); return;  // ret
-}
-
 // 0c:42d9
 void scriptCmd_showText(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   SET_HL(POP(0x42d9));  // pop hl
   I(0x42da, 2); SET_HL(HL + 1);  // inc hl
-  CALL(0x42db, scriptFunc_getTextIndex, 0x42c8, 0x42de);  // call $42c8
+  CALL(0x42db, scriptFunc_getTextIndex_hook, 0x42c8, 0x42de);  // call $42c8
   PUSH(0x42de, HL);  // push hl
   CALL(0x42df, showText_hook, 0x1872, 0x42e2);  // call $1872
   SET_HL(POP(0x42e2));  // pop hl
@@ -1322,7 +1187,7 @@ void scriptCmd_showTextNonExitable(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   SET_HL(POP(0x42fa));  // pop hl
   I(0x42fb, 2); SET_HL(HL + 1);  // inc hl
-  CALL(0x42fc, scriptFunc_getTextIndex, 0x42c8, 0x42ff);  // call $42c8
+  CALL(0x42fc, scriptFunc_getTextIndex_hook, 0x42c8, 0x42ff);  // call $42c8
   PUSH(0x42ff, HL);  // push hl
   CALL(0x4300, showTextNonExitable_hook, 0x186e, 0x4303);  // call $186e
   SET_HL(POP(0x4303));  // pop hl

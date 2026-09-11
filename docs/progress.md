@@ -7,7 +7,7 @@ Updated 2026-09-11. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 769 routines rewritten across thirteen code banks;
+  routine against the transliteration. Progress: 797 routines rewritten across thirteen code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -25,7 +25,9 @@ Updated 2026-09-11. Newest entries at the top of each section.
   planned object-system source routine is now readable C and verified. Batch 39 opened phase 5
   with room initialization, room-layout drawing, script conditionals, and text-buffer setup;
   batch 40 added the first scripting state/control cluster, textbox mapping, and cutscene helpers;
-  batch 41 added room-specific leaf handlers and script state/spawn/property commands.
+  batch 41 added room-specific leaf handlers and script state/spawn/property commands; batch 42
+  added tileset transfer and vine helpers, script arithmetic/text helpers, and textbox/cutscene
+  leaf routines.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -130,6 +132,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-11: milestone 3 phase 5 batch 42 (28 routines): nine tileset-transfer and
+  room-layout helpers in bank 4, nine script counter/text/angle/NPC helpers in bank C, and ten
+  textbox-selection and cutscene countdown helpers across banks 3F and 3. Review caught a
+  four-cycle omission in the carry path of the local `rst $10` helper: after the vector's
+  not-taken `ret nc`, it must burn `inc h` and the final `ret`. Integration also caught two
+  source files being replaced instead of extended, because five prior bank-4 hook definitions
+  disappeared at link time; the files now preserve both batches. Gates: lint 0, 30k verify 0
+  mismatches, whole-movie state hash clean (`64bddd0dfe384126`), ctest 8/8 in both normal and
+  quirk builds.
 
 - 2026-09-11: milestone 3 phase 5 batch 41 (24 routines): all twelve bank-12
   `roomSpecificCode.s` leaf handlers, including their shared spinner-allocation body, plus twelve
