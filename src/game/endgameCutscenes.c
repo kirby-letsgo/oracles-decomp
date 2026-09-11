@@ -633,3 +633,124 @@ void endgameCutsceneHandler_0f__state0__func_5cb7_hook(GB *gb) {
   CYC(0x5cbb, 0x5cbd); mem_wr(gb, HL, 0x62);
   CYC(0x5cbd, 0x5cbe); ret_effect(gb);
 }
+
+void endgameCutsceneHandler_0f__state0__substate9_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5c58, 0x5c5b); SET_HL(wTmpcbb3);
+  CALL_C(0x5c5b, decHlRef16WithCap_hook, 0x0237, 0x5c5e);
+  if (!(F & FZ)) {
+    CYCT(0x5c5e, 0x5c5f); ret_effect(gb);
+    return;
+  }
+  CYC(0x5c5e, 0x5c5f);
+  CALL_C(0x5c5f, incCbc2_hook, 0x3067, 0x5c62);
+  CYC(0x5c62, 0x5c65); SET_HL(wTmpcbb3);
+  CYC(0x5c65, 0x5c67); mem_wr(gb, HL, 0x3c);
+  CYC(0x5c67, 0x5c6a); SET_BC(0x0563);
+  CYC(0x5c6a, 0x5c6d); showText_hook(gb);
+}
+
+void endgameCutsceneHandler_0f__state0__substateA_hook(GB *gb) {
+  CYC(0x5c6d, 0x5c6f); E = 0x1e;
+  CYC(0x5c6f, 0x5c72); cutscene_incCBC2setCBB3whenCBB3is0_hook(gb);
+}
+
+void endgameCutsceneHandler_0f__state0__substateB_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x5c72, cutscene_setScreenShakeCounterTo4RumbleAt0_hook, 0x6096, 0x5c75);
+  CALL_C(0x5c75, decCbb3_hook, 0x305d, 0x5c78);
+  if (!(F & FZ)) {
+    CYCT(0x5c78, 0x5c79); ret_effect(gb);
+    return;
+  }
+  CYC(0x5c78, 0x5c79);
+  CALL_C(0x5c79, incCbc2_hook, 0x3067, 0x5c7c);
+  CALL_C(0x5c7c, endgameCutsceneHandler_0f__state0__func_5cb0_hook, 0x5cb0, 0x5c7f);
+  CYC(0x5c7f, 0x5c81); A = 0x8c;
+  CYC(0x5c81, 0x5c84); mem_wr(gb, wTmpcbb3, A);
+  CYC(0x5c84, 0x5c86); A = 0xff;
+  CYC(0x5c86, 0x5c89); SET_BC(0x4478);
+  CYC(0x5c89, 0x5c8c); createEnergySwirlGoingOut_hook(gb);
+}
+
+void endgameCutsceneHandler_0f__state0__substateC_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x5c8c, cutscene_setScreenShakeCounterTo4RumbleAt0_hook, 0x6096, 0x5c8f);
+  CALL_C(0x5c8f, decCbb3_hook, 0x305d, 0x5c92);
+  if (!(F & FZ)) {
+    CYCT(0x5c92, 0x5c93); ret_effect(gb);
+    return;
+  }
+  CYC(0x5c92, 0x5c93);
+  CALL_C(0x5c93, incCbc2_hook, 0x3067, 0x5c96);
+  CYC(0x5c96, 0x5c99); SET_HL(wTmpcbb3);
+  CYC(0x5c99, 0x5c9b); mem_wr(gb, HL, 0x3c);
+  CYC(0x5c9b, 0x5c9e); endgameCutsceneHandler_0f__state0__func_5cb0_hook(gb);
+}
+
+void endgameCutsceneHandler_0f__state0__substateD_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x5c9e, cutscene_setScreenShakeCounterTo4RumbleAt0_hook, 0x6096, 0x5ca1);
+  CALL_C(0x5ca1, decCbb3_hook, 0x305d, 0x5ca4);
+  if (!(F & FZ)) {
+    CYCT(0x5ca4, 0x5ca5); ret_effect(gb);
+    return;
+  }
+  CYC(0x5ca4, 0x5ca5);
+  CALL_C(0x5ca5, incCbc1_hook, 0x3062, 0x5ca8);
+  CYC(0x5ca8, 0x5ca9); L = alu_inc8(gb, L);
+  CYC(0x5ca9, 0x5caa); alu_xor(gb, A);
+  CYC(0x5caa, 0x5cac); mem_wr(gb, HL, A);
+  CYC(0x5cac, 0x5cad); A = 0x03;
+  CYC(0x5cad, 0x5cb0); fadeoutToWhiteWithDelay_hook(gb);
+}
+
+void endgameCutsceneHandler_0f__state1__substate1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x5d10, cutscene_decCBB3IfNotFadingOut_hook, 0x6070, 0x5d13);
+  if (!(F & FZ)) {
+    CYCT(0x5d13, 0x5d14); ret_effect(gb);
+    return;
+  }
+  CYC(0x5d13, 0x5d14);
+  CALL_C(0x5d14, incCbc2_hook, 0x3067, 0x5d17);
+  CYC(0x5d17, 0x5d19); A = 0x3c;
+  CYC(0x5d19, 0x5d1c); mem_wr(gb, wTmpcbb3, A);
+  CYC(0x5d1c, 0x5d1e); A = 0x64;
+  CYC(0x5d1e, 0x5d21); SET_BC(0x4850);
+  CYC(0x5d21, 0x5d24); createEnergySwirlGoingIn_hook(gb);
+}
+
+void endgameCutsceneHandler_0f__state1__substate2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x5d24, decCbb3_hook, 0x305d, 0x5d27);
+  if (!(F & FZ)) {
+    CYCT(0x5d27, 0x5d28); ret_effect(gb);
+    return;
+  }
+  CYC(0x5d27, 0x5d28);
+  CYC(0x5d28, 0x5d29); alu_xor(gb, A);
+  CYC(0x5d29, 0x5d2c); mem_wr(gb, wTmpcbb3, A);
+  CYC(0x5d2c, 0x5d2d); A = alu_dec8(gb, A);
+  CYC(0x5d2d, 0x5d30); mem_wr(gb, wTmpcbba, A);
+  CYC(0x5d30, 0x5d33); incCbc2_hook(gb);
+}
+
+void endgameCutsceneHandler_0f__state1__substate3_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5d33, 0x5d36); SET_HL(wTmpcbb3);
+  CYC(0x5d36, 0x5d38); B = 0x01;
+  CALL_C(0x5d38, flashScreen_hook, 0x2d73, 0x5d3b);
+  if (F & FZ) {
+    CYCT(0x5d3b, 0x5d3c); ret_effect(gb);
+    return;
+  }
+  CYC(0x5d3b, 0x5d3c);
+  CALL_C(0x5d3c, incCbc2_hook, 0x3067, 0x5d3f);
+  CYC(0x5d3f, 0x5d42); SET_HL(wTmpcbb3);
+  CYC(0x5d42, 0x5d44); mem_wr(gb, HL, 0x3c);
+  CYC(0x5d44, 0x5d46); A = 0x01;
+  CYC(0x5d46, 0x5d49); mem_wr(gb, 0xcfc0, A);
+  CYC(0x5d49, 0x5d4b); A = 0x03;
+  CYC(0x5d4b, 0x5d4e); fadeinFromWhiteWithDelay_hook(gb);
+}

@@ -484,3 +484,13 @@ desync to discover; keep them when porting routines.
   was generated. Use the verified raw address (`$c2ef` here) or an available generated base plus
   offset. Likewise, `hram_rd` and `hram_wr` take the low-byte offset, not an absolute `$ffxx`
   constant; pass `$8c`, not `hFF8C`, so the address is explicit and does not rely on truncation.
+- A report marking the target of a static `jp` as `SWITCHES THREADS` does not turn the jump itself
+  into a scheduler handoff. Batch 57 review flagged `cutscene11` and `cutscene12` because both jump
+  to thread-capable `func_5d41`, but the original instructions contain no `ld sp,*`; the correct
+  rewrite burns each three-byte jump and calls the known target's C function directly. Reserve
+  `hook_handoff` for the actual emulated stack-pointer switch, wherever that occurs downstream.
+- Candidate scans must check both `rewritten.txt` and the source-named readable-C file before
+  implementation. A batch-57 parallel lane selected three bank-3 labels that were already
+  registered and defined near the top of `bank3Cutscenes.c`, then appended duplicate definitions
+  at the bottom; the integrated compiler caught the redefinitions. Treat the hook registry as the
+  authoritative completion list and inspect the full destination file before appending.

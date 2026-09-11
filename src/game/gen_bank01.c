@@ -6631,23 +6631,6 @@ L_7f42:
   switch (HL) { case 0x53c7: goto L_53c7; default: HANDOFF(HL); }
 }
 
-// 01:5dd1
-void cutscene11(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5dd1, func_3ed0_hook, 0x3ed0, 0x5dd4);  // call $3ed0
-  I(0x5dd4, 4); func_5d41(gb); return;  // jp $5d41
-}
-
-// 01:5dd7
-void cutscene12(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5dd7, 4); A = mem_rd(gb, 0xcc04);  // ld a,($cc04)
-  I(0x5dda, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x5ddb, 4); setCutsceneIndexIfCutsceneTriggerSet(gb); return; } I(0x5ddb, 3);  // jp nz,$5e3d
-  CALL(0x5dde, func_3ee4_hook, 0x3ee4, 0x5de1);  // call $3ee4
-  I(0x5de1, 4); func_5d41(gb); return;  // jp $5d41
-}
-
 // 01:7e6b
 void updatePirateShipRoom(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -7281,17 +7264,6 @@ void func_46ca(GB *gb) {
   SET_AF(POP(0x46fb));  // pop af
   I(0x46fc, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
   RET(0x46fe); return;  // ret
-}
-
-// 01:5d5d
-void func_5d5d(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5d5d, 4); A = mem_rd(gb, 0xcc4b);  // ld a,($cc4b)
-  I(0x5d60, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x5d61, 4); applyWarpTransition2(gb); return; } I(0x5d61, 3);  // jp nz,$5e0e
-  I(0x5d64, 3); SET_HL(0x6306);  // ld hl,$6306
-  I(0x5d67, 2); E = 0x03;  // ld e,$03
-  I(0x5d69, 4); if (hook_enabled_at(0x008a)) { interBankCall_hook(gb); return; } HANDOFF(0x008a);  // jp $008a
 }
 
 // 01:480c

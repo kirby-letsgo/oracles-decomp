@@ -522,3 +522,72 @@ static void func_7460_body(GB *gb) {
   CYC(0x747f, 0x7480); D = A;
   CYC(0x7480, 0x7483); queueDmaTransfer_hook(gb);
 }
+
+void ambiPassageOpen_decCBB4_hook(GB *gb) {
+  CYC(0x7483, 0x7486); SET_HL(wTmpcbb4);
+  CYC(0x7486, 0x7487); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(0x7487, 0x7488); ret_effect(gb);
+    return;
+  }
+  CYC(0x7487, 0x7488);
+  CYC(0x7488, 0x7489); ret_effect(gb);
+}
+
+void ambiPassageOpen_incState_hook(GB *gb) {
+  CYC(0x7489, 0x748c); SET_HL(wCutsceneState);
+  CYC(0x748c, 0x748d); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x748d, 0x748e); ret_effect(gb);
+}
+
+void ambiPassageOpen_incCBB3_hook(GB *gb) {
+  CYC(0x748e, 0x7491); SET_HL(wTmpcbb3);
+  CYC(0x7491, 0x7492); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x7492, 0x7493); ret_effect(gb);
+}
+
+void jabuOpen_decCBB4_hook(GB *gb) {
+  CYC(0x7555, 0x7558); SET_HL(wTmpcbb4);
+  CYC(0x7558, 0x7559); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(0x7559, 0x755a); ret_effect(gb);
+    return;
+  }
+  CYC(0x7559, 0x755a);
+  CYC(0x755a, 0x755b); ret_effect(gb);
+}
+
+void jabuOpen_incState_hook(GB *gb) {
+  CYC(0x755b, 0x755e); SET_HL(wCutsceneState);
+  CYC(0x755e, 0x755f); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x755f, 0x7560); ret_effect(gb);
+}
+
+void jabuOpen_incCBB3_hook(GB *gb) {
+  CYC(0x7560, 0x7563); SET_HL(wTmpcbb3);
+  CYC(0x7563, 0x7564); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x7564, 0x7565); ret_effect(gb);
+}
+
+void cleanSeas_decCBB4_hook(GB *gb) {
+  CYC(0x7609, 0x760c); SET_HL(wTmpcbb4);
+  CYC(0x760c, 0x760d); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(0x760d, 0x760e); ret_effect(gb);
+    return;
+  }
+  CYC(0x760d, 0x760e);
+  CYC(0x760e, 0x760f); ret_effect(gb);
+}
+
+void cleanSeas_incState_hook(GB *gb) {
+  CYC(0x760f, 0x7612); SET_HL(wCutsceneState);
+  CYC(0x7612, 0x7613); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x7613, 0x7614); ret_effect(gb);
+}
+
+void cleanSeas_incCBB3_hook(GB *gb) {
+  CYC(0x7614, 0x7617); SET_HL(wTmpcbb3);
+  CYC(0x7617, 0x7618); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x7618, 0x7619); ret_effect(gb);
+}

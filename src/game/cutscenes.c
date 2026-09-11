@@ -7,6 +7,7 @@
 #define CYCT(from, to) burn_rom(gb, 0x01, (from), (to), true)
 
 void cutscene_endgameTail_hook(GB *gb);
+void func_5d5d_hook(GB *gb);
 
 void cutscene06_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -20,13 +21,28 @@ void cutscene06_hook(GB *gb) {
 
 void cutscene07_hook(GB *gb) {
   CYC(0x5d5b, 0x5d5d); C = 0x01;
-  func_5d5d(gb);
+  func_5d5d_hook(gb);
+}
+
+void func_5d5d_hook(GB *gb) {
+  CYC(0x5d5d, 0x5d60); A = mem_rd(gb, wWarpTransition2);
+  CYC(0x5d60, 0x5d61); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x5d61, 0x5d64);
+    applyWarpTransition2(gb);
+    return;
+  }
+  CYC(0x5d61, 0x5d64);
+  CYC(0x5d64, 0x5d67); SET_HL(0x6306);
+  CYC(0x5d67, 0x5d69); E = 0x03;
+  CYC(0x5d69, 0x5d6c);
+  interBankCall_hook(gb);
 }
 
 void cutscene08_hook(GB *gb) {
   CYC(0x5d6c, 0x5d6e); C = 0x02;
   CYC(0x5d6e, 0x5d70);
-  func_5d5d(gb);
+  func_5d5d_hook(gb);
 }
 
 void cutscene0c_hook(GB *gb) {
@@ -34,7 +50,7 @@ void cutscene0c_hook(GB *gb) {
   CALL_C(0x5d70, refreshLoadedTreeGfx_hook, 0x1613, 0x5d73);
   CYC(0x5d73, 0x5d75); C = 0x03;
   CYC(0x5d75, 0x5d77);
-  func_5d5d(gb);
+  func_5d5d_hook(gb);
 }
 
 void cutscene09_hook(GB *gb) {
@@ -128,11 +144,33 @@ void cutscene21_hook(GB *gb) {
   CYC(0x5dc6, 0x5dc9);
   CYC(0x5dc9, 0x5dcb); C = 0x07;
   CYC(0x5dcb, 0x5dcd);
-  func_5d5d(gb);
+  func_5d5d_hook(gb);
 }
 
 void cutscene10_hook(GB *gb) {
   CYC(0x5dcd, 0x5dcf); C = 0x04;
   CYC(0x5dcf, 0x5dd1);
-  func_5d5d(gb);
+  func_5d5d_hook(gb);
+}
+
+void cutscene11_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x5dd1, func_3ed0_hook, 0x3ed0, 0x5dd4);
+  CYC(0x5dd4, 0x5dd7);
+  func_5d41(gb);
+}
+
+void cutscene12_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5dd7, 0x5dda); A = mem_rd(gb, wCutsceneTrigger);
+  CYC(0x5dda, 0x5ddb); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x5ddb, 0x5dde);
+    setCutsceneIndexIfCutsceneTriggerSet(gb);
+    return;
+  }
+  CYC(0x5ddb, 0x5dde);
+  CALL_C(0x5dde, func_3ee4_hook, 0x3ee4, 0x5de1);
+  CYC(0x5de1, 0x5de4);
+  func_5d41(gb);
 }
