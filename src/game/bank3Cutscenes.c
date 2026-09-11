@@ -158,6 +158,26 @@ void twinrovaCutscene_fadeinToRoom_hook(GB *gb) {
   CYC(0x4b7e, 0x4b81); func_131f_hook(gb);
 }
 
+void cutscene18_body_hook(GB *gb) {
+  CYC(0x4b81, 0x4b84); A = mem_rd(gb, wCutsceneState);
+  CYC(0x4b84, 0x4b85); push_effect(gb, 0x4b85);
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (!(F & FC)) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  hook_handoff(gb, HL);
+}
+
 void twinrovaCutscene_state2_hook(GB *gb) {
   CYC(0x4b91, 0x4b94); A = W8(wPaletteThread_mode);
   CYC(0x4b94, 0x4b95); alu_or(gb, A);
@@ -276,6 +296,26 @@ void twinrovaCutscene_deleteAllInteractionsExceptFlames_hook(GB *gb) {
     CYC(0x4c22, 0x4c23); ret_effect(gb);
     return;
   }
+}
+
+void cutscene19_body_hook(GB *gb) {
+  CYC(0x4c34, 0x4c37); A = mem_rd(gb, wCutsceneState);
+  CYC(0x4c37, 0x4c38); push_effect(gb, 0x4c38);
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (!(F & FC)) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  hook_handoff(gb, HL);
 }
 
 void twinrovaCutscene_loadAngryFlames_hook(GB *gb) {

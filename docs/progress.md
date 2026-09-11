@@ -7,7 +7,7 @@ Updated 2026-09-11. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 1,198 routines rewritten across fifteen code banks;
+  routine against the transliteration. Progress: 1,215 routines rewritten across fifteen code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -48,7 +48,8 @@ Updated 2026-09-11. Newest entries at the top of each section.
   added deeper endgame, Maku/Nayru/intro, and bank-10 black-tower state helpers; batch 56 added
   endgame-state, miscellaneous cutscene, graphics-copy, and final bank-10 cutscene helpers; batch
   57 continued the endgame and three room-change cutscenes and finished `ages/cutscenes.s`; batch
-  58 added deeper endgame/Ambi/Jabu states and the Twinrova dispatcher and room setup.
+  58 added deeper endgame/Ambi/Jabu states and the Twinrova dispatcher and room setup; batch 59
+  added the credits root, clean-seas states, and both Twinrova cutscene-body dispatchers.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -153,6 +154,13 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-11: milestone 3 phase 5 batch 59 (17 routines): the seven-entry credits
+  handler root/state cluster, eight clean-seas state-machine entries, and the two Twinrova
+  cutscene-body jump-table dispatchers. The three dynamic roots model their complete `rst $00`
+  table-vector stack and carry paths before `hook_handoff`; cross-review approved all entries.
+  Gates: lint 0, 30k verify 0 mismatches, whole-movie state hash clean
+  (`64bddd0dfe384126`), ctest 8/8 in both normal and quirk builds.
 
 - 2026-09-11: milestone 3 phase 5 batch 58 (18 routines): seven deeper endgame
   substates, nine Ambi-passage/Jabu state-machine entries, and the Twinrova cutscene dispatcher

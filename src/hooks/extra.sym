@@ -98,3 +98,17 @@
 03:75b6 func_03_7565__cbb3_02
 03:75d7 func_03_7565__cbb3_03
 03:75e9 func_03_7565__state2
+03:5e16 endgameCutsceneHandler_0a__runStates
+03:5e23 endgameCutsceneHandler_0a__state0
+03:5e88 endgameCutsceneHandler_0a__state1
+03:5e97 endgameCutsceneHandler_0a__state1__substate0
+03:5fd5 endgameCutsceneHandler_0a__state2
+03:5fdd endgameCutsceneHandler_0a__state3
+03:764a func_03_7619__func_764a
+03:762b func_03_7619__state0
+03:7688 func_03_7619__state1__cbb3_00
+03:7695 func_03_7619__state1__cbb3_01
+03:76ea func_03_7619__state1__cbb3_03
+03:770e func_03_7619__state2__cbb3_03
+03:7738 func_03_7619__state3__cbb3_03
+03:7769 func_03_7619__state4__cbb3_03
