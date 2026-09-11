@@ -447,3 +447,8 @@ desync to discover; keep them when porting routines.
   and let its original `ret` pop that address before continuing. Calling the helper like an
   ordinary C function would leave the emulated stack one return address short whenever the local
   body returns.
+- Porting a generated callee can invalidate an older handwritten caller even though both use
+  `CALL_C`. Batch 46 rewrote `readByteFromW7ActiveBankAndIncHl`; regeneration removed the plain
+  generated C symbol, so batch 44's existing call no longer linked until its target changed to
+  `readByteFromW7ActiveBankAndIncHl_hook`. After registering a new rewrite, rebuild the whole
+  target and search compile failures for older smart calls that still name the generated symbol.

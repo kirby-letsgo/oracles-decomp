@@ -2410,7 +2410,7 @@ L_4dab:
   if (!(F & FZ)) { RET_TAKEN(0x4dae); return; } I(0x4dae, 2);  // ret nz
   CALL(0x4daf, shiftTextGfxBufferLeft_hook, 0x557f, 0x4db2);  // call $557f
 L_4db2:
-  CALL(0x4db2, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x4db5);  // call $56cf
+  CALL(0x4db2, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x4db5);  // call $56cf
   I(0x4db5, 2); alu_cp(gb, 0x10);  // cp $10
   if (!(F & FC)) { I(0x4db7, 3); goto L_4e02; } I(0x4db7, 2);  // jr nc,$4e02
   I(0x4db9, 2); alu_cp(gb, 0x01);  // cp $01
@@ -2470,7 +2470,7 @@ L_4e15:
   if (!(F & FZ)) { RET_TAKEN(0x4e18); return; } I(0x4e18, 2);  // ret nz
   CALL(0x4e19, shiftTextGfxBufferLeft_hook, 0x557f, 0x4e1c);  // call $557f
 L_4e1c:
-  CALL(0x4e1c, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x4e1f);  // call $56cf
+  CALL(0x4e1c, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x4e1f);  // call $56cf
   I(0x4e1f, 2); alu_cp(gb, 0x10);  // cp $10
   if (!(F & FC)) { I(0x4e21, 3); goto L_4e02; } I(0x4e21, 2);  // jr nc,$4e02
   I(0x4e23, 2); alu_cp(gb, 0x01);  // cp $01
@@ -2806,7 +2806,7 @@ L_4dab:
   if (!(F & FZ)) { RET_TAKEN(0x4dae); return; } I(0x4dae, 2);  // ret nz
   CALL(0x4daf, shiftTextGfxBufferLeft_hook, 0x557f, 0x4db2);  // call $557f
 L_4db2:
-  CALL(0x4db2, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x4db5);  // call $56cf
+  CALL(0x4db2, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x4db5);  // call $56cf
   I(0x4db5, 2); alu_cp(gb, 0x10);  // cp $10
   if (!(F & FC)) { I(0x4db7, 3); goto L_4e02; } I(0x4db7, 2);  // jr nc,$4e02
   I(0x4db9, 2); alu_cp(gb, 0x01);  // cp $01
@@ -2866,7 +2866,7 @@ L_4e15:
   if (!(F & FZ)) { RET_TAKEN(0x4e18); return; } I(0x4e18, 2);  // ret nz
   CALL(0x4e19, shiftTextGfxBufferLeft_hook, 0x557f, 0x4e1c);  // call $557f
 L_4e1c:
-  CALL(0x4e1c, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x4e1f);  // call $56cf
+  CALL(0x4e1c, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x4e1f);  // call $56cf
   I(0x4e1f, 2); alu_cp(gb, 0x10);  // cp $10
   if (!(F & FC)) { I(0x4e21, 3); goto L_4e02; } I(0x4e21, 2);  // jr nc,$4e02
   I(0x4e23, 2); alu_cp(gb, 0x01);  // cp $01
@@ -3464,7 +3464,7 @@ L_4dab:
   if (!(F & FZ)) { RET_TAKEN(0x4dae); return; } I(0x4dae, 2);  // ret nz
   CALL(0x4daf, shiftTextGfxBufferLeft_hook, 0x557f, 0x4db2);  // call $557f
 L_4db2:
-  CALL(0x4db2, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x4db5);  // call $56cf
+  CALL(0x4db2, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x4db5);  // call $56cf
   I(0x4db5, 2); alu_cp(gb, 0x10);  // cp $10
   if (!(F & FC)) { I(0x4db7, 3); goto L_4e02; } I(0x4db7, 2);  // jr nc,$4e02
   I(0x4db9, 2); alu_cp(gb, 0x01);  // cp $01
@@ -3652,7 +3652,7 @@ L_4e15:
   if (!(F & FZ)) { RET_TAKEN(0x4e18); return; } I(0x4e18, 2);  // ret nz
   CALL(0x4e19, shiftTextGfxBufferLeft_hook, 0x557f, 0x4e1c);  // call $557f
 L_4e1c:
-  CALL(0x4e1c, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x4e1f);  // call $56cf
+  CALL(0x4e1c, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x4e1f);  // call $56cf
   I(0x4e1f, 2); alu_cp(gb, 0x10);  // cp $10
   if (!(F & FC)) { I(0x4e21, 3); goto L_4e02; } I(0x4e21, 2);  // jr nc,$4e02
   I(0x4e23, 2); alu_cp(gb, 0x01);  // cp $01
@@ -3776,7 +3776,7 @@ void initTextboxStuff(GB *gb) {
   I(0x4e8b, 3); SET_HL(0xd0c4);  // ld hl,$d0c4
   I(0x4e8e, 3); mem_wr(gb, HL, 0x66);  // ld (hl),$66
   I(0x4e90, 1); L = alu_inc8(gb, L);  // inc l
-  CALL(0x4e91, getCharacterDisplayLength, 0x5856, 0x4e94);  // call $5856
+  CALL(0x4e91, getCharacterDisplayLength_hook, 0x5856, 0x4e94);  // call $5856
   I(0x4e94, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x4e95, 1); L = alu_inc8(gb, L);  // inc l
   I(0x4e96, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
@@ -3986,7 +3986,7 @@ L_4ff5:
 L_5004:
   I(0x5004, 1); D = H;  // ld d,h
   I(0x5005, 1); E = L;  // ld e,l
-  CALL(0x5006, incHlAndUpdateBank, 0x56d2, 0x5009);  // call $56d2
+  CALL(0x5006, incHlAndUpdateBank_hook, 0x56d2, 0x5009);  // call $56d2
   CALL(0x5009, readByteFromW7ActiveBank_hook, 0x1949, 0x500c);  // call $1949
   I(0x500c, 1); B = A;  // ld b,a
   I(0x500d, 2); alu_and(gb, 0xfc);  // and $fc
@@ -4003,7 +4003,7 @@ L_5017:
   I(0x501f, 2); alu_and(gb, 0x07);  // and $07
   I(0x5021, 4); mem_wr(gb, 0xcbac, A);  // ld ($cbac),a
 L_5024:
-  CALL(0x5024, incHlAndUpdateBank, 0x56d2, 0x5027);  // call $56d2
+  CALL(0x5024, incHlAndUpdateBank_hook, 0x56d2, 0x5027);  // call $56d2
 L_5027:
   I(0x5027, 1); A = L;  // ld a,l
   I(0x5028, 4); mem_wr(gb, 0xd0d5, A);  // ld ($d0d5),a
@@ -4012,7 +4012,7 @@ L_5027:
   SET_DE(POP(0x502f));  // pop de
   RET(0x5030); return;  // ret
 L_5031:
-  CALL(0x5031, incHlAndUpdateBank, 0x56d2, 0x5034);  // call $56d2
+  CALL(0x5031, incHlAndUpdateBank_hook, 0x56d2, 0x5034);  // call $56d2
   CALL(0x5034, readByteFromW7ActiveBank_hook, 0x1949, 0x5037);  // call $1949
   CALL(0x5037, getExtraTextIndex_hook, 0x5305, 0x503a);  // call $5305
   I(0x503a, 2); alu_cp(gb, 0xff);  // cp $ff
@@ -4037,7 +4037,7 @@ void checkInitialTextCommands__cmdc(GB *gb) {
 L_5004:
   I(0x5004, 1); D = H;  // ld d,h
   I(0x5005, 1); E = L;  // ld e,l
-  CALL(0x5006, incHlAndUpdateBank, 0x56d2, 0x5009);  // call $56d2
+  CALL(0x5006, incHlAndUpdateBank_hook, 0x56d2, 0x5009);  // call $56d2
   CALL(0x5009, readByteFromW7ActiveBank_hook, 0x1949, 0x500c);  // call $1949
   I(0x500c, 1); B = A;  // ld b,a
   I(0x500d, 2); alu_and(gb, 0xfc);  // and $fc
@@ -4054,7 +4054,7 @@ L_5017:
   I(0x501f, 2); alu_and(gb, 0x07);  // and $07
   I(0x5021, 4); mem_wr(gb, 0xcbac, A);  // ld ($cbac),a
 L_5024:
-  CALL(0x5024, incHlAndUpdateBank, 0x56d2, 0x5027);  // call $56d2
+  CALL(0x5024, incHlAndUpdateBank_hook, 0x56d2, 0x5027);  // call $56d2
 L_5027:
   I(0x5027, 1); A = L;  // ld a,l
   I(0x5028, 4); mem_wr(gb, 0xd0d5, A);  // ld ($d0d5),a
@@ -4080,7 +4080,7 @@ L_5027:
 void checkInitialTextCommands__cmd8(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5031:
-  CALL(0x5031, incHlAndUpdateBank, 0x56d2, 0x5034);  // call $56d2
+  CALL(0x5031, incHlAndUpdateBank_hook, 0x56d2, 0x5034);  // call $56d2
   CALL(0x5034, readByteFromW7ActiveBank_hook, 0x1949, 0x5037);  // call $1949
   CALL(0x5037, getExtraTextIndex_hook, 0x5305, 0x503a);  // call $5305
   I(0x503a, 2); alu_cp(gb, 0xff);  // cp $ff
@@ -4131,7 +4131,7 @@ void drawLineOfText(GB *gb) {
   SET_HL(POP(0x5067));  // pop hl
   I(0x5068, 3); SET_BC(0xd200);  // ld bc,$d200
 L_506b:
-  CALL(0x506b, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x506e);  // call $56cf
+  CALL(0x506b, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x506e);  // call $56cf
   I(0x506e, 2); alu_cp(gb, 0x10);  // cp $10
   if (!(F & FC)) { I(0x5070, 3); goto L_507e; } I(0x5070, 2);  // jr nc,$507e
   CALL(0x5072, handleTextControlCode, 0x56e4, 0x5075);  // call $56e4
@@ -4170,7 +4170,7 @@ void doInventoryTextFirstPass(GB *gb) {
   PUSH(0x54aa, HL);  // push hl
   I(0x54ab, 2); E = 0x00;  // ld e,$00
 L_54ad:
-  CALL(0x54ad, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x54b0);  // call $56cf
+  CALL(0x54ad, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x54b0);  // call $56cf
   I(0x54b0, 2); alu_cp(gb, 0x00);  // cp $00
   if ((F & FZ)) { I(0x54b2, 3); goto L_54c8; } I(0x54b2, 2);  // jr z,$54c8
   I(0x54b4, 2); alu_cp(gb, 0x01);  // cp $01
@@ -4214,7 +4214,7 @@ L_54cf:
   I(0x54f0, 2); B = 0xd2;  // ld b,$d2
   SET_HL(POP(0x54f2));  // pop hl
 L_54f3:
-  CALL(0x54f3, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x54f6);  // call $56cf
+  CALL(0x54f3, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x54f6);  // call $56cf
   I(0x54f6, 2); alu_cp(gb, 0x10);  // cp $10
   if ((F & FC)) { I(0x54f8, 3); goto L_5505; } I(0x54f8, 2);  // jr c,$5505
   CALL(0x54fa, setLineTextBuffers_hook, 0x50a6, 0x54fd);  // call $50a6
@@ -4235,7 +4235,7 @@ void doInventoryTextFirstPass__notControlCode(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_54c1;
 L_54ad:
-  CALL(0x54ad, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x54b0);  // call $56cf
+  CALL(0x54ad, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x54b0);  // call $56cf
   I(0x54b0, 2); alu_cp(gb, 0x00);  // cp $00
   if ((F & FZ)) { I(0x54b2, 3); goto L_54c8; } I(0x54b2, 2);  // jr z,$54c8
   I(0x54b4, 2); alu_cp(gb, 0x01);  // cp $01
@@ -4279,7 +4279,7 @@ L_54cf:
   I(0x54f0, 2); B = 0xd2;  // ld b,$d2
   SET_HL(POP(0x54f2));  // pop hl
 L_54f3:
-  CALL(0x54f3, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x54f6);  // call $56cf
+  CALL(0x54f3, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x54f6);  // call $56cf
   I(0x54f6, 2); alu_cp(gb, 0x10);  // cp $10
   if ((F & FC)) { I(0x54f8, 3); goto L_5505; } I(0x54f8, 2);  // jr c,$5505
   CALL(0x54fa, setLineTextBuffers_hook, 0x50a6, 0x54fd);  // call $50a6
@@ -4300,7 +4300,7 @@ void doInventoryTextFirstPass__nullTerminator(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_54c8;
 L_54ad:
-  CALL(0x54ad, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x54b0);  // call $56cf
+  CALL(0x54ad, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x54b0);  // call $56cf
   I(0x54b0, 2); alu_cp(gb, 0x00);  // cp $00
   if ((F & FZ)) { I(0x54b2, 3); goto L_54c8; } I(0x54b2, 2);  // jr z,$54c8
   I(0x54b4, 2); alu_cp(gb, 0x01);  // cp $01
@@ -4344,7 +4344,7 @@ L_54cf:
   I(0x54f0, 2); B = 0xd2;  // ld b,$d2
   SET_HL(POP(0x54f2));  // pop hl
 L_54f3:
-  CALL(0x54f3, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x54f6);  // call $56cf
+  CALL(0x54f3, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x54f6);  // call $56cf
   I(0x54f6, 2); alu_cp(gb, 0x10);  // cp $10
   if ((F & FC)) { I(0x54f8, 3); goto L_5505; } I(0x54f8, 2);  // jr c,$5505
   CALL(0x54fa, setLineTextBuffers_hook, 0x50a6, 0x54fd);  // call $50a6
@@ -4388,7 +4388,7 @@ L_54cf:
   I(0x54f0, 2); B = 0xd2;  // ld b,$d2
   SET_HL(POP(0x54f2));  // pop hl
 L_54f3:
-  CALL(0x54f3, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x54f6);  // call $56cf
+  CALL(0x54f3, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x54f6);  // call $56cf
   I(0x54f6, 2); alu_cp(gb, 0x10);  // cp $10
   if ((F & FC)) { I(0x54f8, 3); goto L_5505; } I(0x54f8, 2);  // jr c,$5505
   CALL(0x54fa, setLineTextBuffers_hook, 0x50a6, 0x54fd);  // call $50a6
@@ -4408,7 +4408,7 @@ L_5505:
 void doInventoryTextFirstPass__nextCharacter(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_54f3:
-  CALL(0x54f3, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x54f6);  // call $56cf
+  CALL(0x54f3, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x54f6);  // call $56cf
   I(0x54f6, 2); alu_cp(gb, 0x10);  // cp $10
   if ((F & FC)) { I(0x54f8, 3); goto L_5505; } I(0x54f8, 2);  // jr c,$5505
   CALL(0x54fa, setLineTextBuffers_hook, 0x50a6, 0x54fd);  // call $50a6
@@ -4438,7 +4438,7 @@ L_5510:
   switch (HL) { case 0x5531: goto L_5531; case 0x5542: goto L_5542; case 0x5543: goto L_5543; case 0x5547: goto L_5547; case 0x5551: goto L_5551; case 0x5564: goto L_5564; case 0x5566: goto L_5566; default: HANDOFF(HL); }
 L_5531:
   SET_HL(POP(0x5531));  // pop hl
-  CALL(0x5532, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5535);  // call $56cf
+  CALL(0x5532, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5535);  // call $56cf
   I(0x5535, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
   CALL(0x5538, pushToTextStack_hook, 0x567f, 0x553b);  // call $567f
   I(0x553b, 1); A = B;  // ld a,b
@@ -4448,15 +4448,15 @@ L_5542:
   I(0x5542, 1); E = alu_inc8(gb, E);  // inc e
 L_5543:
   SET_HL(POP(0x5543));  // pop hl
-  I(0x5544, 4); incHlAndUpdateBank(gb); return;  // jp $56d2
+  I(0x5544, 4); if (hook_enabled_at(0x56d2)) { incHlAndUpdateBank_hook(gb); return; } HANDOFF(0x56d2);  // jp $56d2
 L_5547:
   SET_HL(POP(0x5547));  // pop hl
-  CALL(0x5548, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x554b);  // call $56cf
+  CALL(0x5548, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x554b);  // call $56cf
   I(0x554b, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
   I(0x554e, 4); checkInitialTextCommands(gb); return;  // jp $4ff5
 L_5551:
   SET_HL(POP(0x5551));  // pop hl
-  CALL(0x5552, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5555);  // call $56cf
+  CALL(0x5552, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5555);  // call $56cf
   PUSH(0x5555, HL);  // push hl
   I(0x5556, 3); SET_HL(0x590d);  // ld hl,$590d
   RST_PUSH(0x5559, 0x555a);  // rst $18 (addDoubleIndexToHl)
@@ -4475,7 +4475,7 @@ L_5564:
   RET(0x5565); return;  // ret
 L_5566:
   SET_HL(POP(0x5566));  // pop hl
-  CALL(0x5567, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x556a);  // call $56cf
+  CALL(0x5567, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x556a);  // call $56cf
   I(0x556a, 2); alu_cp(gb, 0xfc);  // cp $fc
   if ((F & FC)) { I(0x556c, 3); goto L_5576; } I(0x556c, 2);  // jr c,$5576
   PUSH(0x556e, HL);  // push hl
@@ -4497,7 +4497,7 @@ void doInventoryTextFirstPass__dictionary(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5531:
   SET_HL(POP(0x5531));  // pop hl
-  CALL(0x5532, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5535);  // call $56cf
+  CALL(0x5532, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5535);  // call $56cf
   I(0x5535, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
   CALL(0x5538, pushToTextStack_hook, 0x567f, 0x553b);  // call $567f
   I(0x553b, 1); A = B;  // ld a,b
@@ -4512,7 +4512,7 @@ L_5542:
   I(0x5542, 1); E = alu_inc8(gb, E);  // inc e
 L_5543:
   SET_HL(POP(0x5543));  // pop hl
-  I(0x5544, 4); incHlAndUpdateBank(gb); return;  // jp $56d2
+  I(0x5544, 4); if (hook_enabled_at(0x56d2)) { incHlAndUpdateBank_hook(gb); return; } HANDOFF(0x56d2);  // jp $56d2
 }
 
 // 3f:5543
@@ -4520,7 +4520,7 @@ void doInventoryTextFirstPass__controlCodeNil(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5543:
   SET_HL(POP(0x5543));  // pop hl
-  I(0x5544, 4); incHlAndUpdateBank(gb); return;  // jp $56d2
+  I(0x5544, 4); if (hook_enabled_at(0x56d2)) { incHlAndUpdateBank_hook(gb); return; } HANDOFF(0x56d2);  // jp $56d2
 }
 
 // 3f:5547
@@ -4528,7 +4528,7 @@ void doInventoryTextFirstPass__controlCode7(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5547:
   SET_HL(POP(0x5547));  // pop hl
-  CALL(0x5548, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x554b);  // call $56cf
+  CALL(0x5548, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x554b);  // call $56cf
   I(0x554b, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
   I(0x554e, 4); checkInitialTextCommands(gb); return;  // jp $4ff5
 }
@@ -4538,7 +4538,7 @@ void doInventoryTextFirstPass__controlCodeA(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5551:
   SET_HL(POP(0x5551));  // pop hl
-  CALL(0x5552, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5555);  // call $56cf
+  CALL(0x5552, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5555);  // call $56cf
   PUSH(0x5555, HL);  // push hl
   I(0x5556, 3); SET_HL(0x590d);  // ld hl,$590d
   RST_PUSH(0x5559, 0x555a);  // rst $18 (addDoubleIndexToHl)
@@ -4570,7 +4570,7 @@ void doInventoryTextFirstPass__controlCodeF(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5566:
   SET_HL(POP(0x5566));  // pop hl
-  CALL(0x5567, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x556a);  // call $56cf
+  CALL(0x5567, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x556a);  // call $56cf
   I(0x556a, 2); alu_cp(gb, 0xfc);  // cp $fc
   if ((F & FC)) { I(0x556c, 3); goto L_5576; } I(0x556c, 2);  // jr c,$5576
   PUSH(0x556e, HL);  // push hl
@@ -4585,30 +4585,6 @@ L_5576:
   I(0x5576, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
   CALL(0x5579, pushToTextStack_hook, 0x567f, 0x557c);  // call $567f
   I(0x557c, 4); checkInitialTextCommands(gb); return;  // jp $4ff5
-}
-
-// 3f:56cf
-void readByteFromW7ActiveBankAndIncHl(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x56cf, readByteFromW7ActiveBank_hook, 0x1949, 0x56d2);  // call $1949
-  incHlAndUpdateBank(gb); return;  // fallthrough
-}
-
-// 3f:56d2
-void incHlAndUpdateBank(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x56d2, 1); L = alu_inc8(gb, L);  // inc l
-  if (!(F & FZ)) { RET_TAKEN(0x56d3); return; } I(0x56d3, 2);  // ret nz
-  I(0x56d4, 1); H = alu_inc8(gb, H);  // inc h
-  I(0x56d5, 2); alu_bit(gb, 7, H);  // bit 7,h
-  if ((F & FZ)) { RET_TAKEN(0x56d7); return; } I(0x56d7, 2);  // ret z
-  I(0x56d8, 2); H = alu_rrc(gb, H);  // rrc h
-  PUSH(0x56da, AF);  // push af
-  I(0x56db, 4); A = mem_rd(gb, 0xd0d4);  // ld a,($d0d4)
-  I(0x56de, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x56df, 4); mem_wr(gb, 0xd0d4, A);  // ld ($d0d4),a
-  SET_AF(POP(0x56e2));  // pop af
-  RET(0x56e3); return;  // ret
 }
 
 // 3f:56e4
@@ -4638,7 +4614,7 @@ L_5716:
   RET(0x571d); return;  // ret
 L_571e:
   SET_HL(POP(0x571e));  // pop hl
-  CALL(0x571f, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5722);  // call $56cf
+  CALL(0x571f, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5722);  // call $56cf
   I(0x5722, 1); B = A;  // ld b,a
   I(0x5723, 2); alu_cp(gb, 0x80);  // cp $80
   if ((F & FC)) { I(0x5725, 3); goto L_573c; } I(0x5725, 2);  // jr c,$573c
@@ -4678,7 +4654,7 @@ L_5758:
 L_575a:
   I(0x575a, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   SET_HL(POP(0x575c));  // pop hl
-  CALL(0x575d, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5760);  // call $56cf
+  CALL(0x575d, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5760);  // call $56cf
   I(0x5760, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
   CALL(0x5763, pushToTextStack_hook, 0x567f, 0x5766);  // call $567f
   I(0x5766, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
@@ -4687,7 +4663,7 @@ L_575a:
   I(0x576e, 3); goto L_57d3;  // jr $57d3
 L_5770:
   SET_HL(POP(0x5770));  // pop hl
-  CALL(0x5771, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5774);  // call $56cf
+  CALL(0x5771, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5774);  // call $56cf
   I(0x5774, 2); alu_cp(gb, 0xfc);  // cp $fc
   if ((F & FC)) { I(0x5776, 3); goto L_5780; } I(0x5776, 2);  // jr c,$5780
   PUSH(0x5778, HL);  // push hl
@@ -4707,7 +4683,7 @@ L_5780:
   I(0x578f, 3); goto L_57d3;  // jr $57d3
 L_5791:
   SET_HL(POP(0x5791));  // pop hl
-  CALL(0x5792, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5795);  // call $56cf
+  CALL(0x5792, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5795);  // call $56cf
   I(0x5795, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
   CALL(0x5798, checkInitialTextCommands, 0x4ff5, 0x579b);  // call $4ff5
   I(0x579b, 3); goto L_57d3;  // jr $57d3
@@ -4724,7 +4700,7 @@ L_57ac:
   I(0x57ad, 4); A = mem_rd(gb, 0xcbae);  // ld a,($cbae)
   I(0x57b0, 1); alu_rrca(gb);  // rrca
   if ((F & FC)) { I(0x57b1, 3); goto L_57d0; } I(0x57b1, 2);  // jr c,$57d0
-  CALL(0x57b3, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x57b6);  // call $56cf
+  CALL(0x57b3, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x57b6);  // call $56cf
   I(0x57b6, 2); alu_bit(gb, 7, A);  // bit 7,a
   if (!(F & FZ)) { I(0x57b8, 3); goto L_57cb; } I(0x57b8, 2);  // jr nz,$57cb
   I(0x57ba, 3); SET_BC(0x57d5);  // ld bc,$57d5
@@ -4740,14 +4716,14 @@ L_57cb:
   I(0x57cb, 4); mem_wr(gb, 0xd0c7, A);  // ld ($d0c7),a
   I(0x57ce, 3); goto L_57d3;  // jr $57d3
 L_57d0:
-  CALL(0x57d0, incHlAndUpdateBank, 0x56d2, 0x57d3);  // call $56d2
+  CALL(0x57d0, incHlAndUpdateBank_hook, 0x56d2, 0x57d3);  // call $56d2
 L_57d3:
   SET_BC(POP(0x57d3));  // pop bc
   RET(0x57d4); return;  // ret
 L_57df:
   SET_HL(POP(0x57df));  // pop hl
   SET_BC(POP(0x57e0));  // pop bc
-  CALL(0x57e1, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x57e4);  // call $56cf
+  CALL(0x57e1, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x57e4);  // call $56cf
   PUSH(0x57e4, HL);  // push hl
   I(0x57e5, 3); SET_HL(0x590d);  // ld hl,$590d
   RST_PUSH(0x57e8, 0x57e9);  // rst $18 (addDoubleIndexToHl)
@@ -4767,22 +4743,22 @@ L_57f8:
   RET(0x57f9); return;  // ret
 L_57fa:
   SET_HL(POP(0x57fa));  // pop hl
-  CALL(0x57fb, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x57fe);  // call $56cf
+  CALL(0x57fb, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x57fe);  // call $56cf
   I(0x57fe, 4); mem_wr(gb, 0xd0c3, A);  // ld ($d0c3),a
   I(0x5801, 3); goto L_57d3;  // jr $57d3
 L_5824:
   SET_HL(POP(0x5824));  // pop hl
-  CALL(0x5825, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5828);  // call $56cf
+  CALL(0x5825, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5828);  // call $56cf
   I(0x5828, 4); mem_wr(gb, 0xd0c4, A);  // ld ($d0c4),a
   I(0x582b, 3); goto L_57d3;  // jr $57d3
 L_582d:
   SET_HL(POP(0x582d));  // pop hl
-  CALL(0x582e, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5831);  // call $56cf
+  CALL(0x582e, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5831);  // call $56cf
   I(0x5831, 4); mem_wr(gb, 0xd0eb, A);  // ld ($d0eb),a
   I(0x5834, 3); goto L_57d3;  // jr $57d3
 L_5836:
   SET_HL(POP(0x5836));  // pop hl
-  CALL(0x5837, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x583a);  // call $56cf
+  CALL(0x5837, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x583a);  // call $56cf
   PUSH(0x583a, HL);  // push hl
   I(0x583b, 1); B = A;  // ld b,a
   I(0x583c, 2); alu_and(gb, 0x03);  // and $03
@@ -4837,7 +4813,7 @@ void handleTextControlCode__controlCode6(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_571e:
   SET_HL(POP(0x571e));  // pop hl
-  CALL(0x571f, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5722);  // call $56cf
+  CALL(0x571f, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5722);  // call $56cf
   I(0x5722, 1); B = A;  // ld b,a
   I(0x5723, 2); alu_cp(gb, 0x80);  // cp $80
   if ((F & FC)) { I(0x5725, 3); goto L_573c; } I(0x5725, 2);  // jr c,$573c
@@ -4912,7 +4888,7 @@ L_574d:
 L_575a:
   I(0x575a, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   SET_HL(POP(0x575c));  // pop hl
-  CALL(0x575d, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5760);  // call $56cf
+  CALL(0x575d, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5760);  // call $56cf
   I(0x5760, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
   CALL(0x5763, pushToTextStack_hook, 0x567f, 0x5766);  // call $567f
   I(0x5766, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
@@ -4933,7 +4909,7 @@ L_5750:
 L_575a:
   I(0x575a, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   SET_HL(POP(0x575c));  // pop hl
-  CALL(0x575d, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5760);  // call $56cf
+  CALL(0x575d, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5760);  // call $56cf
   I(0x5760, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
   CALL(0x5763, pushToTextStack_hook, 0x567f, 0x5766);  // call $567f
   I(0x5766, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
@@ -4954,7 +4930,7 @@ L_5754:
 L_575a:
   I(0x575a, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   SET_HL(POP(0x575c));  // pop hl
-  CALL(0x575d, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5760);  // call $56cf
+  CALL(0x575d, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5760);  // call $56cf
   I(0x5760, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
   CALL(0x5763, pushToTextStack_hook, 0x567f, 0x5766);  // call $567f
   I(0x5766, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
@@ -4973,7 +4949,7 @@ L_5758:
   I(0x5758, 2); A = 0x03;  // ld a,$03
   I(0x575a, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
   SET_HL(POP(0x575c));  // pop hl
-  CALL(0x575d, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5760);  // call $56cf
+  CALL(0x575d, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5760);  // call $56cf
   I(0x5760, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
   CALL(0x5763, pushToTextStack_hook, 0x567f, 0x5766);  // call $567f
   I(0x5766, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
@@ -4990,7 +4966,7 @@ void handleTextControlCode__controlCodeF(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5770:
   SET_HL(POP(0x5770));  // pop hl
-  CALL(0x5771, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5774);  // call $56cf
+  CALL(0x5771, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5774);  // call $56cf
   I(0x5774, 2); alu_cp(gb, 0xfc);  // cp $fc
   if ((F & FC)) { I(0x5776, 3); goto L_5780; } I(0x5776, 2);  // jr c,$5780
   PUSH(0x5778, HL);  // push hl
@@ -5018,7 +4994,7 @@ void handleTextControlCode__controlCode7(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5791:
   SET_HL(POP(0x5791));  // pop hl
-  CALL(0x5792, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5795);  // call $56cf
+  CALL(0x5792, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5795);  // call $56cf
   I(0x5795, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
   CALL(0x5798, checkInitialTextCommands, 0x4ff5, 0x579b);  // call $4ff5
   I(0x579b, 3); goto L_57d3;  // jr $57d3
@@ -5051,7 +5027,7 @@ L_57ac:
   I(0x57ad, 4); A = mem_rd(gb, 0xcbae);  // ld a,($cbae)
   I(0x57b0, 1); alu_rrca(gb);  // rrca
   if ((F & FC)) { I(0x57b1, 3); goto L_57d0; } I(0x57b1, 2);  // jr c,$57d0
-  CALL(0x57b3, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x57b6);  // call $56cf
+  CALL(0x57b3, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x57b6);  // call $56cf
   I(0x57b6, 2); alu_bit(gb, 7, A);  // bit 7,a
   if (!(F & FZ)) { I(0x57b8, 3); goto L_57cb; } I(0x57b8, 2);  // jr nz,$57cb
   I(0x57ba, 3); SET_BC(0x57d5);  // ld bc,$57d5
@@ -5067,7 +5043,7 @@ L_57cb:
   I(0x57cb, 4); mem_wr(gb, 0xd0c7, A);  // ld ($d0c7),a
   I(0x57ce, 3); goto L_57d3;  // jr $57d3
 L_57d0:
-  CALL(0x57d0, incHlAndUpdateBank, 0x56d2, 0x57d3);  // call $56d2
+  CALL(0x57d0, incHlAndUpdateBank_hook, 0x56d2, 0x57d3);  // call $56d2
 L_57d3:
   SET_BC(POP(0x57d3));  // pop bc
   RET(0x57d4); return;  // ret
@@ -5077,7 +5053,7 @@ L_57d3:
 void handleTextControlCode__controlCode9__noColors(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_57d0:
-  CALL(0x57d0, incHlAndUpdateBank, 0x56d2, 0x57d3);  // call $56d2
+  CALL(0x57d0, incHlAndUpdateBank_hook, 0x56d2, 0x57d3);  // call $56d2
 L_57d3:
   SET_BC(POP(0x57d3));  // pop bc
   RET(0x57d4); return;  // ret
@@ -5104,7 +5080,7 @@ L_57d5:
 L_57df:
   SET_HL(POP(0x57df));  // pop hl
   SET_BC(POP(0x57e0));  // pop bc
-  CALL(0x57e1, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x57e4);  // call $56cf
+  CALL(0x57e1, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x57e4);  // call $56cf
   PUSH(0x57e4, HL);  // push hl
   I(0x57e5, 3); SET_HL(0x590d);  // ld hl,$590d
   RST_PUSH(0x57e8, 0x57e9);  // rst $18 (addDoubleIndexToHl)
@@ -5130,7 +5106,7 @@ void handleTextControlCode__controlCodeA(GB *gb) {
 L_57df:
   SET_HL(POP(0x57df));  // pop hl
   SET_BC(POP(0x57e0));  // pop bc
-  CALL(0x57e1, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x57e4);  // call $56cf
+  CALL(0x57e1, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x57e4);  // call $56cf
   PUSH(0x57e4, HL);  // push hl
   I(0x57e5, 3); SET_HL(0x590d);  // ld hl,$590d
   RST_PUSH(0x57e8, 0x57e9);  // rst $18 (addDoubleIndexToHl)
@@ -5159,7 +5135,7 @@ L_57d3:
   RET(0x57d4); return;  // ret
 L_57fa:
   SET_HL(POP(0x57fa));  // pop hl
-  CALL(0x57fb, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x57fe);  // call $56cf
+  CALL(0x57fb, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x57fe);  // call $56cf
   I(0x57fe, 4); mem_wr(gb, 0xd0c3, A);  // ld ($d0c3),a
   I(0x5801, 3); goto L_57d3;  // jr $57d3
 }
@@ -5202,7 +5178,7 @@ L_57d3:
   RET(0x57d4); return;  // ret
 L_5824:
   SET_HL(POP(0x5824));  // pop hl
-  CALL(0x5825, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5828);  // call $56cf
+  CALL(0x5825, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5828);  // call $56cf
   I(0x5828, 4); mem_wr(gb, 0xd0c4, A);  // ld ($d0c4),a
   I(0x582b, 3); goto L_57d3;  // jr $57d3
 }
@@ -5216,7 +5192,7 @@ L_57d3:
   RET(0x57d4); return;  // ret
 L_582d:
   SET_HL(POP(0x582d));  // pop hl
-  CALL(0x582e, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5831);  // call $56cf
+  CALL(0x582e, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5831);  // call $56cf
   I(0x5831, 4); mem_wr(gb, 0xd0eb, A);  // ld ($d0eb),a
   I(0x5834, 3); goto L_57d3;  // jr $57d3
 }
@@ -5226,7 +5202,7 @@ void handleTextControlCode__controlCodeC(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5836:
   SET_HL(POP(0x5836));  // pop hl
-  CALL(0x5837, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x583a);  // call $56cf
+  CALL(0x5837, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x583a);  // call $56cf
   PUSH(0x583a, HL);  // push hl
   I(0x583b, 1); B = A;  // ld b,a
   I(0x583c, 2); alu_and(gb, 0x03);  // and $03
@@ -5240,117 +5216,6 @@ L_5836:
   if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) {  default: HANDOFF(HL); }
-}
-
-// 3f:5856
-void getCharacterDisplayLength(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x5856, HL);  // push hl
-  I(0x5857, 4); A = mem_rd(gb, 0xc629);  // ld a,($c629)
-  I(0x585a, 2); A = alu_swap(gb, A);  // swap a
-  I(0x585c, 1); alu_rrca(gb);  // rrca
-  I(0x585d, 3); SET_HL(0x5877);  // ld hl,$5877
-  RST_PUSH(0x5860, 0x5861);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x5861, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  SET_HL(POP(0x5862));  // pop hl
-  RET(0x5863); return;  // ret
-}
-
-// 3f:5864
-void textControlCodeC_0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5864, 4); A = mem_rd(gb, 0xc629);  // ld a,($c629)
-  I(0x5867, 2); A = alu_swap(gb, A);  // swap a
-  I(0x5869, 1); alu_rrca(gb);  // rrca
-  I(0x586a, 1); alu_add(gb, C);  // add c
-  I(0x586b, 3); SET_HL(0x5875);  // ld hl,$5875
-  RST_PUSH(0x586e, 0x586f);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x586f, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5870, 4); mem_wr(gb, 0xd0c5, A);  // ld ($d0c5),a
-  I(0x5873, 3); textControlCodeC_ret(gb); return;  // jr $58ae
-}
-
-// 3f:589d
-void textControlCodeC_7(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x589d, 2); A = 0x78;  // ld a,$78
-  I(0x589f, 4); mem_wr(gb, 0xd0d7, A);  // ld ($d0d7),a
-  I(0x58a2, 3); textControlCodeC_ret(gb); return;  // jr $58ae
-}
-
-// 3f:58a4
-void textControlCodeC_5(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x58a4, 3); SET_HL(0xd0c1);  // ld hl,$d0c1
-  I(0x58a7, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 5)));  // set 5,(hl)
-  textControlCodeC_3(gb); return;  // fallthrough
-}
-
-// 3f:58a9
-void textControlCodeC_3(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x58a9, 3); SET_HL(0xd0c1);  // ld hl,$d0c1
-  I(0x58ac, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1)));  // set 1,(hl)
-  textControlCodeC_ret(gb); return;  // fallthrough
-}
-
-// 3f:58ae
-void textControlCodeC_ret(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x58ae));  // pop hl
-  SET_BC(POP(0x58af));  // pop bc
-  RET(0x58b0); return;  // ret
-}
-
-// 3f:58b1
-void textControlCodeC_6(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x58b1, 4); A = mem_rd(gb, 0xcbab);  // ld a,($cbab)
-  I(0x58b4, 4); mem_wr(gb, 0xcba9, A);  // ld ($cba9),a
-  I(0x58b7, 4); A = mem_rd(gb, 0xcbaa);  // ld a,($cbaa)
-  I(0x58ba, 4); mem_wr(gb, 0xcba8, A);  // ld ($cba8),a
-  textControlCodeC_1(gb); return;  // fallthrough
-}
-
-// 3f:58bd
-void textControlCodeC_1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x58bd));  // pop hl
-  SET_BC(POP(0x58be));  // pop bc
-  I(0x58bf, 4); A = mem_rd(gb, 0xcba9);  // ld a,($cba9)
-  I(0x58c2, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x58c3, 3); goto L_58cf; } I(0x58c3, 2);  // jr z,$58cf
-  CALL(0x58c5, textControlCodeC_1__drawDigit, 0x58e0, 0x58c8);  // call $58e0
-  I(0x58c8, 4); A = mem_rd(gb, 0xcba8);  // ld a,($cba8)
-  I(0x58cb, 2); alu_and(gb, 0xf0);  // and $f0
-  I(0x58cd, 3); goto L_58d6;  // jr $58d6
-L_58cf:
-  I(0x58cf, 4); A = mem_rd(gb, 0xcba8);  // ld a,($cba8)
-  I(0x58d2, 2); alu_and(gb, 0xf0);  // and $f0
-  if ((F & FZ)) { I(0x58d4, 3); goto L_58db; } I(0x58d4, 2);  // jr z,$58db
-L_58d6:
-  I(0x58d6, 2); A = alu_swap(gb, A);  // swap a
-  CALL(0x58d8, textControlCodeC_1__drawDigit, 0x58e0, 0x58db);  // call $58e0
-L_58db:
-  I(0x58db, 4); A = mem_rd(gb, 0xcba8);  // ld a,($cba8)
-  I(0x58de, 2); alu_and(gb, 0x0f);  // and $0f
-L_58e0:
-  I(0x58e0, 2); alu_add(gb, 0x30);  // add $30
-  CALL(0x58e2, setLineTextBuffers_hook, 0x50a6, 0x58e5);  // call $50a6
-  I(0x58e5, 4); if (hook_enabled_at(0x18cd)) { retrieveTextCharacter_hook(gb); return; } HANDOFF(0x18cd);  // jp $18cd
-}
-
-// 3f:58e0
-void textControlCodeC_1__drawDigit(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_58e0:
-  I(0x58e0, 2); alu_add(gb, 0x30);  // add $30
-  CALL(0x58e2, setLineTextBuffers_hook, 0x50a6, 0x58e5);  // call $50a6
-  I(0x58e5, 4); if (hook_enabled_at(0x18cd)) { retrieveTextCharacter_hook(gb); return; } HANDOFF(0x18cd);  // jp $18cd
 }
 
 // 3f:58e8

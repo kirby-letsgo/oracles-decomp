@@ -617,7 +617,7 @@ void readNextTextByte_hook(GB *gb) {
   CYC(0x52ff, 0x5300); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(0x5300, 0x5301); H = mem_rd(gb, HL);
   CYC(0x5301, 0x5302); L = A;
-  CALL_C(0x5302, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5305);
+  CALL_C(0x5302, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x5305);
   getExtraTextIndex_hook(gb);
 }
 
@@ -1261,4 +1261,125 @@ void popFromTextStack_hook(GB *gb) {
   CYC(0x56cc, 0x56cd); SET_BC(pop_effect(gb));
   CYC(0x56cd, 0x56ce); SET_DE(pop_effect(gb));
   CYC(0x56ce, 0x56cf); ret_effect(gb);
+}
+
+void incHlAndUpdateBank_hook(GB *gb);
+void textControlCodeC_ret_hook(GB *gb);
+void textControlCodeC_3_hook(GB *gb);
+void textControlCodeC_1_hook(GB *gb);
+void textControlCodeC_1_drawDigit_hook(GB *gb);
+
+void readByteFromW7ActiveBankAndIncHl_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x56cf, readByteFromW7ActiveBank_hook, 0x1949, 0x56d2);
+  incHlAndUpdateBank_hook(gb);
+}
+
+void incHlAndUpdateBank_hook(GB *gb) {
+  CYC(0x56d2, 0x56d3); L = alu_inc8(gb, L);
+  if (!(F & FZ)) { CYCT(0x56d3, 0x56d4); ret_effect(gb); return; }
+  CYC(0x56d3, 0x56d4);
+  CYC(0x56d4, 0x56d5); H = alu_inc8(gb, H);
+  CYC(0x56d5, 0x56d7); alu_bit(gb, 7, H);
+  if (F & FZ) { CYCT(0x56d7, 0x56d8); ret_effect(gb); return; }
+  CYC(0x56d7, 0x56d8);
+  CYC(0x56d8, 0x56da); H = alu_rrc(gb, H);
+  CYC(0x56da, 0x56db); push_effect(gb, AF);
+  CYC(0x56db, 0x56de); A = mem_rd(gb, 0xd0d4);
+  CYC(0x56de, 0x56df); A = alu_inc8(gb, A);
+  CYC(0x56df, 0x56e2); mem_wr(gb, 0xd0d4, A);
+  CYC(0x56e2, 0x56e3); SET_AF(pop_effect(gb));
+  CYC(0x56e3, 0x56e4); ret_effect(gb);
+}
+
+void getCharacterDisplayLength_hook(GB *gb) {
+  CYC(0x5856, 0x5857); push_effect(gb, HL);
+  CYC(0x5857, 0x585a); A = mem_rd(gb, 0xc629);
+  CYC(0x585a, 0x585c); A = alu_swap(gb, A);
+  CYC(0x585c, 0x585d); alu_rrca(gb);
+  CYC(0x585d, 0x5860); SET_HL(0x5877);
+  CYC(0x5860, 0x5861); push_effect(gb, 0x5861);
+  add_a_to_hl(gb);
+  CYC(0x5861, 0x5862); A = mem_rd(gb, HL);
+  CYC(0x5862, 0x5863); SET_HL(pop_effect(gb));
+  CYC(0x5863, 0x5864); ret_effect(gb);
+}
+
+void textControlCodeC_0_hook(GB *gb) {
+  CYC(0x5864, 0x5867); A = mem_rd(gb, 0xc629);
+  CYC(0x5867, 0x5869); A = alu_swap(gb, A);
+  CYC(0x5869, 0x586a); alu_rrca(gb);
+  CYC(0x586a, 0x586b); alu_add(gb, C);
+  CYC(0x586b, 0x586e); SET_HL(0x5875);
+  CYC(0x586e, 0x586f); push_effect(gb, 0x586f);
+  add_a_to_hl(gb);
+  CYC(0x586f, 0x5870); A = mem_rd(gb, HL);
+  CYC(0x5870, 0x5873); mem_wr(gb, 0xd0c5, A);
+  CYC(0x5873, 0x5875); textControlCodeC_ret_hook(gb);
+}
+
+void textControlCodeC_7_hook(GB *gb) {
+  CYC(0x589d, 0x589f); A = 0x78;
+  CYC(0x589f, 0x58a2); mem_wr(gb, 0xd0d7, A);
+  CYC(0x58a2, 0x58a4); textControlCodeC_ret_hook(gb);
+}
+
+void textControlCodeC_5_hook(GB *gb) {
+  CYC(0x58a4, 0x58a7); SET_HL(0xd0c1);
+  CYC(0x58a7, 0x58a9); mem_wr(gb, HL, mem_rd(gb, HL) | 0x20);
+  textControlCodeC_3_hook(gb);
+}
+
+void textControlCodeC_3_hook(GB *gb) {
+  CYC(0x58a9, 0x58ac); SET_HL(0xd0c1);
+  CYC(0x58ac, 0x58ae); mem_wr(gb, HL, mem_rd(gb, HL) | 0x02);
+  textControlCodeC_ret_hook(gb);
+}
+
+void textControlCodeC_ret_hook(GB *gb) {
+  CYC(0x58ae, 0x58af); SET_HL(pop_effect(gb));
+  CYC(0x58af, 0x58b0); SET_BC(pop_effect(gb));
+  CYC(0x58b0, 0x58b1); ret_effect(gb);
+}
+
+void textControlCodeC_6_hook(GB *gb) {
+  CYC(0x58b1, 0x58b4); A = mem_rd(gb, 0xcbab);
+  CYC(0x58b4, 0x58b7); mem_wr(gb, 0xcba9, A);
+  CYC(0x58b7, 0x58ba); A = mem_rd(gb, 0xcbaa);
+  CYC(0x58ba, 0x58bd); mem_wr(gb, 0xcba8, A);
+  textControlCodeC_1_hook(gb);
+}
+
+void textControlCodeC_1_hook(GB *gb) {
+  CYC(0x58bd, 0x58be); SET_HL(pop_effect(gb));
+  CYC(0x58be, 0x58bf); SET_BC(pop_effect(gb));
+  CYC(0x58bf, 0x58c2); A = mem_rd(gb, 0xcba9);
+  CYC(0x58c2, 0x58c3); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x58c3, 0x58c5); goto no_hundreds; }
+  CYC(0x58c3, 0x58c5);
+  CYC(0x58c5, 0x58c8); push_effect(gb, 0x58c8);
+  textControlCodeC_1_drawDigit_hook(gb);
+  CYC(0x58c8, 0x58cb); A = mem_rd(gb, 0xcba8);
+  CYC(0x58cb, 0x58cd); alu_and(gb, 0xf0);
+  CYC(0x58cd, 0x58cf); goto draw_tens;
+no_hundreds:
+  CYC(0x58cf, 0x58d2); A = mem_rd(gb, 0xcba8);
+  CYC(0x58d2, 0x58d4); alu_and(gb, 0xf0);
+  if (F & FZ) { CYCT(0x58d4, 0x58d6); goto draw_ones; }
+  CYC(0x58d4, 0x58d6);
+draw_tens:
+  CYC(0x58d6, 0x58d8); A = alu_swap(gb, A);
+  CYC(0x58d8, 0x58db); push_effect(gb, 0x58db);
+  textControlCodeC_1_drawDigit_hook(gb);
+draw_ones:
+  CYC(0x58db, 0x58de); A = mem_rd(gb, 0xcba8);
+  CYC(0x58de, 0x58e0); alu_and(gb, 0x0f);
+  textControlCodeC_1_drawDigit_hook(gb);
+}
+
+void textControlCodeC_1_drawDigit_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x58e0, 0x58e2); alu_add(gb, 0x30);
+  CALL_C(0x58e2, setLineTextBuffers_hook, 0x50a6, 0x58e5);
+  CYC(0x58e5, 0x58e8); retrieveTextCharacter_hook(gb);
 }
