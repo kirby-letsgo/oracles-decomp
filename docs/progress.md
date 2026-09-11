@@ -7,7 +7,7 @@ Updated 2026-09-11. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 694 routines rewritten across ten code banks;
+  routine against the transliteration. Progress: 724 routines rewritten across twelve code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -22,8 +22,8 @@ Updated 2026-09-11. Newest entries at the top of each section.
   (`hramOamDmaFunction`, `wMusicReadFunction`, `wRamFunction`), and batch 32 began phase 4 with
   object-loading, part-dispatch, and animation-queue routines in banks 12, 11, and 4; batch 34
   completed the remaining simple object-data opcode handlers. Batch 38 completed phase 4: every
-  planned object-system source routine is now readable C and verified; phase 5 (rooms, scripting,
-  and text) is next.
+  planned object-system source routine is now readable C and verified. Batch 39 opened phase 5
+  with room initialization, room-layout drawing, script conditionals, and text-buffer setup.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -128,6 +128,14 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-11: milestone 3 phase 5 batch 39 (30 routines): room initialization and random enemy
+  placement in bank 2; room-layout rectangle and vine helpers across banks 2 and 4; the first
+  script stop/room-flag commands in bank C; and text-buffer clearing/setup in bank 3F. The two
+  `rst $10` table advances in `createSeaEffectsPartIfApplicable` exposed a missing taken branch
+  inside the shared add-A-to-HL vector: registers matched, but the first 30k verifier reported the
+  routine eight cycles short. Gates: lint 0, 30k verify 0 mismatches, whole-movie state hash clean
+  (`64bddd0dfe384126`), ctest 8/8 in both normal and quirk builds.
 
 - 2026-09-11: milestone 3 phase 4 batch 38 (7 routines), completing the phase after the bank-2
   audit: `functionCaller_b02`, the enemy-kill list routines, random-buffer generation, random

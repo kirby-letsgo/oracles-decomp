@@ -400,3 +400,8 @@ desync to discover; keep them when porting routines.
   `linkApplyDamage_b00_hook` compiled only until its bank-5 bridge became native, then the
   missing capture was diagnosed by the compiler. Add `uint16_t sp0_ = gb->sp; (void)sp0_;` before
   introducing any `CALL_C` or `CALL_C_CC` into an older hook.
+- A local implementation of `rst $10` (add A to HL) must burn the vector's conditional return at
+  bank 0 `$0012`, not just reproduce its register result. Batch 39's
+  `createSeaEffectsPartIfApplicable` calls the vector twice on its no-carry path; omitting the
+  taken `ret nc` burn left the hook eight cycles short with otherwise identical state. The 30k
+  routine verifier caught it at frame 1286.

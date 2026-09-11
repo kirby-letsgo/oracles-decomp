@@ -4126,8 +4126,8 @@ void drawLineOfText(GB *gb) {
   I(0x505e, 2); H = mem_rd(gb, HL);  // ld h,(hl)
   I(0x505f, 1); L = A;  // ld l,a
   PUSH(0x5060, HL);  // push hl
-  CALL(0x5061, clearTextGfxBuffer, 0x5091, 0x5064);  // call $5091
-  CALL(0x5064, clearLineTextBuffer, 0x509c, 0x5067);  // call $509c
+  CALL(0x5061, clearTextGfxBuffer_hook, 0x5091, 0x5064);  // call $5091
+  CALL(0x5064, clearLineTextBuffer_hook, 0x509c, 0x5067);  // call $509c
   SET_HL(POP(0x5067));  // pop hl
   I(0x5068, 3); SET_BC(0xd200);  // ld bc,$d200
 L_506b:
@@ -4140,7 +4140,7 @@ L_506b:
   if (!(F & FC)) { I(0x507a, 3); goto L_506b; } I(0x507a, 2);  // jr nc,$506b
   I(0x507c, 3); goto L_5086;  // jr $5086
 L_507e:
-  CALL(0x507e, setLineTextBuffers, 0x50a6, 0x5081);  // call $50a6
+  CALL(0x507e, setLineTextBuffers_hook, 0x50a6, 0x5081);  // call $50a6
   CALL(0x5081, retrieveTextCharacter_hook, 0x18cd, 0x5084);  // call $18cd
   I(0x5084, 3); goto L_506b;  // jr $506b
 L_5086:
@@ -4154,61 +4154,6 @@ L_5086:
   I(0x508e, 1); alu_xor(gb, A);  // xor a
   I(0x508f, 2); mem_wr(gb, DE, A);  // ld (de),a
   RET(0x5090); return;  // ret
-}
-
-// 3f:5091
-void clearTextGfxBuffer(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5091, 3); SET_HL(0xd200);  // ld hl,$d200
-  I(0x5094, 3); SET_BC(0x0200);  // ld bc,$0200
-  I(0x5097, 2); A = 0xff;  // ld a,$ff
-  I(0x5099, 4); if (hook_enabled_at(0x0476)) { fillMemoryBc_hook(gb); return; } HANDOFF(0x0476);  // jp $0476
-}
-
-// 3f:509c
-void clearLineTextBuffer(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x509c, 3); SET_HL(0xd400);  // ld hl,$d400
-  I(0x509f, 1); D = H;  // ld d,h
-  I(0x50a0, 1); E = L;  // ld e,l
-  I(0x50a1, 2); B = 0x10;  // ld b,$10
-  I(0x50a3, 4); if (hook_enabled_at(0x046f)) { clearMemory_hook(gb); return; } HANDOFF(0x046f);  // jp $046f
-}
-
-// 3f:50a6
-void setLineTextBuffers(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x50a6, 2); mem_wr(gb, DE, A);  // ld (de),a
-  PUSH(0x50a7, DE);  // push de
-  PUSH(0x50a8, HL);  // push hl
-  I(0x50a9, 3); SET_HL(0xd0c7);  // ld hl,$d0c7
-  I(0x50ac, 1); A = E;  // ld a,e
-  I(0x50ad, 2); alu_add(gb, 0x10);  // add $10
-  I(0x50af, 1); E = A;  // ld e,a
-  I(0x50b0, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x50b1, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x50b2, 1); A = E;  // ld a,e
-  I(0x50b3, 2); alu_add(gb, 0x10);  // add $10
-  I(0x50b5, 1); E = A;  // ld e,a
-  I(0x50b6, 1); L = alu_dec8(gb, L);  // dec l
-  I(0x50b7, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x50b8, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x50b9, 1); A = E;  // ld a,e
-  I(0x50ba, 2); alu_add(gb, 0x10);  // add $10
-  I(0x50bc, 1); E = A;  // ld e,a
-  I(0x50bd, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x50be, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x50bf, 1); A = E;  // ld a,e
-  I(0x50c0, 2); alu_add(gb, 0x10);  // add $10
-  I(0x50c2, 1); E = A;  // ld e,a
-  I(0x50c3, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x50c4, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x50c5, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  SET_HL(POP(0x50c7));  // pop hl
-  SET_DE(POP(0x50c8));  // pop de
-  I(0x50c9, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x50ca, 1); E = alu_inc8(gb, E);  // inc e
-  RET(0x50cb); return;  // ret
 }
 
 // 3f:50cc
@@ -5418,7 +5363,7 @@ L_53d3:
 // 3f:549e
 void doInventoryTextFirstPass(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x549e, clearTextGfxBuffer, 0x5091, 0x54a1);  // call $5091
+  CALL(0x549e, clearTextGfxBuffer_hook, 0x5091, 0x54a1);  // call $5091
   I(0x54a1, 1); H = D;  // ld h,d
   I(0x54a2, 2); L = 0xd4;  // ld l,$d4
   I(0x54a4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
@@ -5469,14 +5414,14 @@ L_54cf:
   I(0x54e8, 2); A = alu_swap(gb, A);  // swap a
   I(0x54ea, 2); alu_add(gb, 0x00);  // add $00
   I(0x54ec, 1); C = A;  // ld c,a
-  CALL(0x54ed, clearLineTextBuffer, 0x509c, 0x54f0);  // call $509c
+  CALL(0x54ed, clearLineTextBuffer_hook, 0x509c, 0x54f0);  // call $509c
   I(0x54f0, 2); B = 0xd2;  // ld b,$d2
   SET_HL(POP(0x54f2));  // pop hl
 L_54f3:
   CALL(0x54f3, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x54f6);  // call $56cf
   I(0x54f6, 2); alu_cp(gb, 0x10);  // cp $10
   if ((F & FC)) { I(0x54f8, 3); goto L_5505; } I(0x54f8, 2);  // jr c,$5505
-  CALL(0x54fa, setLineTextBuffers, 0x50a6, 0x54fd);  // call $50a6
+  CALL(0x54fa, setLineTextBuffers_hook, 0x50a6, 0x54fd);  // call $50a6
   CALL(0x54fd, retrieveTextCharacter_hook, 0x18cd, 0x5500);  // call $18cd
   I(0x5500, 2); alu_bit(gb, 4, E);  // bit 4,e
   if ((F & FZ)) { I(0x5502, 3); goto L_54f3; } I(0x5502, 2);  // jr z,$54f3
@@ -5534,14 +5479,14 @@ L_54cf:
   I(0x54e8, 2); A = alu_swap(gb, A);  // swap a
   I(0x54ea, 2); alu_add(gb, 0x00);  // add $00
   I(0x54ec, 1); C = A;  // ld c,a
-  CALL(0x54ed, clearLineTextBuffer, 0x509c, 0x54f0);  // call $509c
+  CALL(0x54ed, clearLineTextBuffer_hook, 0x509c, 0x54f0);  // call $509c
   I(0x54f0, 2); B = 0xd2;  // ld b,$d2
   SET_HL(POP(0x54f2));  // pop hl
 L_54f3:
   CALL(0x54f3, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x54f6);  // call $56cf
   I(0x54f6, 2); alu_cp(gb, 0x10);  // cp $10
   if ((F & FC)) { I(0x54f8, 3); goto L_5505; } I(0x54f8, 2);  // jr c,$5505
-  CALL(0x54fa, setLineTextBuffers, 0x50a6, 0x54fd);  // call $50a6
+  CALL(0x54fa, setLineTextBuffers_hook, 0x50a6, 0x54fd);  // call $50a6
   CALL(0x54fd, retrieveTextCharacter_hook, 0x18cd, 0x5500);  // call $18cd
   I(0x5500, 2); alu_bit(gb, 4, E);  // bit 4,e
   if ((F & FZ)) { I(0x5502, 3); goto L_54f3; } I(0x5502, 2);  // jr z,$54f3
@@ -5599,14 +5544,14 @@ L_54cf:
   I(0x54e8, 2); A = alu_swap(gb, A);  // swap a
   I(0x54ea, 2); alu_add(gb, 0x00);  // add $00
   I(0x54ec, 1); C = A;  // ld c,a
-  CALL(0x54ed, clearLineTextBuffer, 0x509c, 0x54f0);  // call $509c
+  CALL(0x54ed, clearLineTextBuffer_hook, 0x509c, 0x54f0);  // call $509c
   I(0x54f0, 2); B = 0xd2;  // ld b,$d2
   SET_HL(POP(0x54f2));  // pop hl
 L_54f3:
   CALL(0x54f3, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x54f6);  // call $56cf
   I(0x54f6, 2); alu_cp(gb, 0x10);  // cp $10
   if ((F & FC)) { I(0x54f8, 3); goto L_5505; } I(0x54f8, 2);  // jr c,$5505
-  CALL(0x54fa, setLineTextBuffers, 0x50a6, 0x54fd);  // call $50a6
+  CALL(0x54fa, setLineTextBuffers_hook, 0x50a6, 0x54fd);  // call $50a6
   CALL(0x54fd, retrieveTextCharacter_hook, 0x18cd, 0x5500);  // call $18cd
   I(0x5500, 2); alu_bit(gb, 4, E);  // bit 4,e
   if ((F & FZ)) { I(0x5502, 3); goto L_54f3; } I(0x5502, 2);  // jr z,$54f3
@@ -5643,14 +5588,14 @@ L_54cf:
   I(0x54e8, 2); A = alu_swap(gb, A);  // swap a
   I(0x54ea, 2); alu_add(gb, 0x00);  // add $00
   I(0x54ec, 1); C = A;  // ld c,a
-  CALL(0x54ed, clearLineTextBuffer, 0x509c, 0x54f0);  // call $509c
+  CALL(0x54ed, clearLineTextBuffer_hook, 0x509c, 0x54f0);  // call $509c
   I(0x54f0, 2); B = 0xd2;  // ld b,$d2
   SET_HL(POP(0x54f2));  // pop hl
 L_54f3:
   CALL(0x54f3, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x54f6);  // call $56cf
   I(0x54f6, 2); alu_cp(gb, 0x10);  // cp $10
   if ((F & FC)) { I(0x54f8, 3); goto L_5505; } I(0x54f8, 2);  // jr c,$5505
-  CALL(0x54fa, setLineTextBuffers, 0x50a6, 0x54fd);  // call $50a6
+  CALL(0x54fa, setLineTextBuffers_hook, 0x50a6, 0x54fd);  // call $50a6
   CALL(0x54fd, retrieveTextCharacter_hook, 0x18cd, 0x5500);  // call $18cd
   I(0x5500, 2); alu_bit(gb, 4, E);  // bit 4,e
   if ((F & FZ)) { I(0x5502, 3); goto L_54f3; } I(0x5502, 2);  // jr z,$54f3
@@ -5670,7 +5615,7 @@ L_54f3:
   CALL(0x54f3, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x54f6);  // call $56cf
   I(0x54f6, 2); alu_cp(gb, 0x10);  // cp $10
   if ((F & FC)) { I(0x54f8, 3); goto L_5505; } I(0x54f8, 2);  // jr c,$5505
-  CALL(0x54fa, setLineTextBuffers, 0x50a6, 0x54fd);  // call $50a6
+  CALL(0x54fa, setLineTextBuffers_hook, 0x50a6, 0x54fd);  // call $50a6
   CALL(0x54fd, retrieveTextCharacter_hook, 0x18cd, 0x5500);  // call $18cd
   I(0x5500, 2); alu_bit(gb, 4, E);  // bit 4,e
   if ((F & FZ)) { I(0x5502, 3); goto L_54f3; } I(0x5502, 2);  // jr z,$54f3
@@ -6250,7 +6195,7 @@ L_5742:
   SET_BC(POP(0x5742));  // pop bc
   PUSH(0x5743, AF);  // push af
   I(0x5744, 2); A = 0x06;  // ld a,$06
-  CALL(0x5746, setLineTextBuffers, 0x50a6, 0x5749);  // call $50a6
+  CALL(0x5746, setLineTextBuffers_hook, 0x50a6, 0x5749);  // call $50a6
   SET_AF(POP(0x5749));  // pop af
   I(0x574a, 4); if (hook_enabled_at(0x18cd)) { retrieveTextCharacter_hook(gb); return; } HANDOFF(0x18cd);  // jp $18cd
 L_574d:
@@ -6348,7 +6293,7 @@ L_57ec:
   I(0x57ec, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x57ed, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x57ee, 3); goto L_57f8; } I(0x57ee, 2);  // jr z,$57f8
-  CALL(0x57f0, setLineTextBuffers, 0x50a6, 0x57f3);  // call $50a6
+  CALL(0x57f0, setLineTextBuffers_hook, 0x50a6, 0x57f3);  // call $50a6
   CALL(0x57f3, retrieveTextCharacter_hook, 0x18cd, 0x57f6);  // call $18cd
   I(0x57f6, 3); goto L_57ec;  // jr $57ec
 L_57f8:
@@ -6449,7 +6394,7 @@ L_5742:
   SET_BC(POP(0x5742));  // pop bc
   PUSH(0x5743, AF);  // push af
   I(0x5744, 2); A = 0x06;  // ld a,$06
-  CALL(0x5746, setLineTextBuffers, 0x50a6, 0x5749);  // call $50a6
+  CALL(0x5746, setLineTextBuffers_hook, 0x50a6, 0x5749);  // call $50a6
   SET_AF(POP(0x5749));  // pop af
   I(0x574a, 4); if (hook_enabled_at(0x18cd)) { retrieveTextCharacter_hook(gb); return; } HANDOFF(0x18cd);  // jp $18cd
 }
@@ -6472,7 +6417,7 @@ L_5742:
   SET_BC(POP(0x5742));  // pop bc
   PUSH(0x5743, AF);  // push af
   I(0x5744, 2); A = 0x06;  // ld a,$06
-  CALL(0x5746, setLineTextBuffers, 0x50a6, 0x5749);  // call $50a6
+  CALL(0x5746, setLineTextBuffers_hook, 0x50a6, 0x5749);  // call $50a6
   SET_AF(POP(0x5749));  // pop af
   I(0x574a, 4); if (hook_enabled_at(0x18cd)) { retrieveTextCharacter_hook(gb); return; } HANDOFF(0x18cd);  // jp $18cd
 }
@@ -6487,7 +6432,7 @@ L_573c:
   SET_BC(POP(0x5742));  // pop bc
   PUSH(0x5743, AF);  // push af
   I(0x5744, 2); A = 0x06;  // ld a,$06
-  CALL(0x5746, setLineTextBuffers, 0x50a6, 0x5749);  // call $50a6
+  CALL(0x5746, setLineTextBuffers_hook, 0x50a6, 0x5749);  // call $50a6
   SET_AF(POP(0x5749));  // pop af
   I(0x574a, 4); if (hook_enabled_at(0x18cd)) { retrieveTextCharacter_hook(gb); return; } HANDOFF(0x18cd);  // jp $18cd
 }
@@ -6705,7 +6650,7 @@ L_57ec:
   I(0x57ec, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x57ed, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x57ee, 3); goto L_57f8; } I(0x57ee, 2);  // jr z,$57f8
-  CALL(0x57f0, setLineTextBuffers, 0x50a6, 0x57f3);  // call $50a6
+  CALL(0x57f0, setLineTextBuffers_hook, 0x50a6, 0x57f3);  // call $50a6
   CALL(0x57f3, retrieveTextCharacter_hook, 0x18cd, 0x57f6);  // call $18cd
   I(0x57f6, 3); goto L_57ec;  // jr $57ec
 L_57f8:
@@ -6731,7 +6676,7 @@ L_57ec:
   I(0x57ec, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x57ed, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x57ee, 3); goto L_57f8; } I(0x57ee, 2);  // jr z,$57f8
-  CALL(0x57f0, setLineTextBuffers, 0x50a6, 0x57f3);  // call $50a6
+  CALL(0x57f0, setLineTextBuffers_hook, 0x50a6, 0x57f3);  // call $50a6
   CALL(0x57f3, retrieveTextCharacter_hook, 0x18cd, 0x57f6);  // call $18cd
   I(0x57f6, 3); goto L_57ec;  // jr $57ec
 L_57f8:
@@ -6929,7 +6874,7 @@ L_58db:
   I(0x58de, 2); alu_and(gb, 0x0f);  // and $0f
 L_58e0:
   I(0x58e0, 2); alu_add(gb, 0x30);  // add $30
-  CALL(0x58e2, setLineTextBuffers, 0x50a6, 0x58e5);  // call $50a6
+  CALL(0x58e2, setLineTextBuffers_hook, 0x50a6, 0x58e5);  // call $50a6
   I(0x58e5, 4); if (hook_enabled_at(0x18cd)) { retrieveTextCharacter_hook(gb); return; } HANDOFF(0x18cd);  // jp $18cd
 }
 
@@ -6938,7 +6883,7 @@ void textControlCodeC_1__drawDigit(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_58e0:
   I(0x58e0, 2); alu_add(gb, 0x30);  // add $30
-  CALL(0x58e2, setLineTextBuffers, 0x50a6, 0x58e5);  // call $50a6
+  CALL(0x58e2, setLineTextBuffers_hook, 0x50a6, 0x58e5);  // call $50a6
   I(0x58e5, 4); if (hook_enabled_at(0x18cd)) { retrieveTextCharacter_hook(gb); return; } HANDOFF(0x18cd);  // jp $18cd
 }
 
@@ -6958,7 +6903,7 @@ void textControlCodeC_2(GB *gb) {
   SET_HL(POP(0x58fa));  // pop hl
   SET_BC(POP(0x58fb));  // pop bc
   I(0x58fc, 2); A = 0x20;  // ld a,$20
-  CALL(0x58fe, setLineTextBuffers, 0x50a6, 0x5901);  // call $50a6
+  CALL(0x58fe, setLineTextBuffers_hook, 0x50a6, 0x5901);  // call $50a6
   I(0x5901, 4); if (hook_enabled_at(0x18cd)) { retrieveTextCharacter_hook(gb); return; } HANDOFF(0x18cd);  // jp $18cd
 }
 

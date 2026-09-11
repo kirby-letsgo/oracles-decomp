@@ -16,46 +16,6 @@ void runScriptCommand(GB *gb) {
   switch (HL) {  default: HANDOFF(HL); }
 }
 
-// 0c:4103
-void scriptCmd_none(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x4103));  // pop hl
-  RET(0x4104); return;  // ret
-}
-
-// 0c:4105
-void scriptCmd_stopIfItemFlagSet(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4105, 2); B = 0x20;  // ld b,$20
-  I(0x4107, 3); scriptFunc_checkRoomFlag(gb); return;  // jr $410f
-}
-
-// 0c:4109
-void scriptCmd_stopIfRoomFlag40Set(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4109, 2); B = 0x40;  // ld b,$40
-  I(0x410b, 3); scriptFunc_checkRoomFlag(gb); return;  // jr $410f
-}
-
-// 0c:410d
-void scriptCmd_stopIfRoomFlag80Set(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x410d, 2); B = 0x80;  // ld b,$80
-  scriptFunc_checkRoomFlag(gb); return;  // fallthrough
-}
-
-// 0c:410f
-void scriptFunc_checkRoomFlag(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x410f, getThisRoomFlags_hook, 0x197d, 0x4112);  // call $197d
-  I(0x4112, 1); alu_and(gb, B);  // and b
-  if ((F & FZ)) { I(0x4113, 4); scriptFunc_popHlAndInc(gb); return; } I(0x4113, 3);  // jp z,$415a
-  SET_HL(POP(0x4116));  // pop hl
-  I(0x4117, 3); SET_HL(0x45ef);  // ld hl,$45ef
-  I(0x411a, 1); alu_scf(gb);  // scf
-  RET(0x411b); return;  // ret
-}
-
 // 0c:411c
 void scriptCmd_showPasswordScreen(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

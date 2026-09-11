@@ -2,22 +2,6 @@
 #include "game/asm.h"
 #include "game/gen.h"
 
-// 04:6dd6
-void getAdjustedRoomGroup(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6dd6, 4); A = mem_rd(gb, 0xcc2d);  // ld a,($cc2d)
-  I(0x6dd9, 1); B = A;  // ld b,a
-  I(0x6dda, 2); alu_cp(gb, 0x02);  // cp $02
-  if (!(F & FC)) { RET_TAKEN(0x6ddc); return; } I(0x6ddc, 2);  // ret nc
-  CALL(0x6ddd, getThisRoomFlags_hook, 0x197d, 0x6de0);  // call $197d
-  I(0x6de0, 1); alu_rrca(gb);  // rrca
-  if (!(F & FC)) { I(0x6de1, 3); goto L_6de5; } I(0x6de1, 2);  // jr nc,$6de5
-  I(0x6de3, 2); B = (uint8_t)(B | (1 << 1));  // set 1,b
-L_6de5:
-  I(0x6de5, 1); A = B;  // ld a,b
-  RET(0x6de6); return;  // ret
-}
-
 // 04:6de7
 void checkTilesetOverride(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -268,7 +252,7 @@ void tileReplacement_group5Mapf5(GB *gb) {
   I(0x654b, 1); alu_xor(gb, A);  // xor a
   I(0x654c, 4); mem_wr(gb, 0xcca9, A);  // ld ($cca9),a
   I(0x654f, 3); SET_HL(0x6555);  // ld hl,$6555
-  I(0x6552, 4); fillRectInRoomLayout(gb); return;  // jp $6bb5
+  I(0x6552, 4); if (hook_enabled_at(0x6bb5)) { fillRectInRoomLayout_hook(gb); return; } HANDOFF(0x6bb5);  // jp $6bb5
 L_6559:
   I(0x6559, 4); mem_wr(gb, 0xcca9, A);  // ld ($cca9),a
   I(0x655c, 2); A = 0xb9;  // ld a,$b9
@@ -276,7 +260,7 @@ L_6559:
 L_6561:
   I(0x6561, 4); mem_wr(gb, 0xcca9, A);  // ld ($cca9),a
   I(0x6564, 3); SET_HL(0x656a);  // ld hl,$656a
-  I(0x6567, 4); fillRectInRoomLayout(gb); return;  // jp $6bb5
+  I(0x6567, 4); if (hook_enabled_at(0x6bb5)) { fillRectInRoomLayout_hook(gb); return; } HANDOFF(0x6bb5);  // jp $6bb5
 L_656e:
   I(0x656e, 4); mem_wr(gb, 0xcca9, A);  // ld ($cca9),a
   I(0x6571, 2); A = 0xb8;  // ld a,$b8
@@ -312,7 +296,7 @@ void tileReplacement_group5Mapf5__fillWithIce(GB *gb) {
 L_6561:
   I(0x6561, 4); mem_wr(gb, 0xcca9, A);  // ld ($cca9),a
   I(0x6564, 3); SET_HL(0x656a);  // ld hl,$656a
-  I(0x6567, 4); fillRectInRoomLayout(gb); return;  // jp $6bb5
+  I(0x6567, 4); if (hook_enabled_at(0x6bb5)) { fillRectInRoomLayout_hook(gb); return; } HANDOFF(0x6bb5);  // jp $6bb5
 }
 
 // 04:656a
@@ -358,7 +342,7 @@ void tileReplacement_group2Map7e(GB *gb) {
   I(0x6589, 2); alu_cp(gb, 0x0f);  // cp $0f
   if (!(F & FZ)) { RET_TAKEN(0x658b); return; } I(0x658b, 2);  // ret nz
   I(0x658c, 3); SET_HL(0x65a0);  // ld hl,$65a0
-  CALL(0x658f, fillRectInRoomLayout, 0x6bb5, 0x6592);  // call $6bb5
+  CALL(0x658f, fillRectInRoomLayout_hook, 0x6bb5, 0x6592);  // call $6bb5
   I(0x6592, 2); A = 0xf1;  // ld a,$f1
   I(0x6594, 3); SET_HL(0xcf25);  // ld hl,$cf25
   I(0x6597, 2); mem_wr(gb, HL, A);  // ld (hl),a
@@ -474,7 +458,7 @@ L_6617:
   CALL(0x661c, checkGlobalFlag_hook, 0x31f3, 0x661f);  // call $31f3
   if ((F & FZ)) { RET_TAKEN(0x661f); return; } I(0x661f, 2);  // ret z
   I(0x6620, 3); SET_HL(0x6645);  // ld hl,$6645
-  CALL(0x6623, fillRectInRoomLayout, 0x6bb5, 0x6626);  // call $6bb5
+  CALL(0x6623, fillRectInRoomLayout_hook, 0x6bb5, 0x6626);  // call $6bb5
   CALL(0x6626, getThisRoomFlags_hook, 0x197d, 0x6629);  // call $197d
   I(0x6629, 2); alu_and(gb, 0x20);  // and $20
   I(0x662b, 2); A = 0xf0;  // ld a,$f0
@@ -501,7 +485,7 @@ void tileReplacement_group4Map60(GB *gb) {
   CALL(0x661c, checkGlobalFlag_hook, 0x31f3, 0x661f);  // call $31f3
   if ((F & FZ)) { RET_TAKEN(0x661f); return; } I(0x661f, 2);  // ret z
   I(0x6620, 3); SET_HL(0x6645);  // ld hl,$6645
-  CALL(0x6623, fillRectInRoomLayout, 0x6bb5, 0x6626);  // call $6bb5
+  CALL(0x6623, fillRectInRoomLayout_hook, 0x6bb5, 0x6626);  // call $6bb5
   CALL(0x6626, getThisRoomFlags_hook, 0x197d, 0x6629);  // call $197d
   I(0x6629, 2); alu_and(gb, 0x20);  // and $20
   I(0x662b, 2); A = 0xf0;  // ld a,$f0
@@ -606,13 +590,13 @@ void tileReplacement_group5Map25(GB *gb) {
   I(0x669a, 2); alu_and(gb, 0x40);  // and $40
   if (!(F & FZ)) { RET_TAKEN(0x669c); return; } I(0x669c, 2);  // ret nz
   I(0x669d, 3); SET_HL(0x66a5);  // ld hl,$66a5
-  CALL(0x66a0, fillRectInRoomLayout, 0x6bb5, 0x66a3);  // call $6bb5
+  CALL(0x66a0, fillRectInRoomLayout_hook, 0x6bb5, 0x66a3);  // call $6bb5
   I(0x66a3, 3); goto L_66ba;  // jr $66ba
 L_66ba:
   I(0x66ba, 3); SET_HL(0x66c6);  // ld hl,$66c6
-  CALL(0x66bd, fillRectInRoomLayout, 0x6bb5, 0x66c0);  // call $6bb5
+  CALL(0x66bd, fillRectInRoomLayout_hook, 0x6bb5, 0x66c0);  // call $6bb5
   I(0x66c0, 3); SET_HL(0x66ca);  // ld hl,$66ca
-  I(0x66c3, 4); fillRectInRoomLayout(gb); return;  // jp $6bb5
+  I(0x66c3, 4); if (hook_enabled_at(0x6bb5)) { fillRectInRoomLayout_hook(gb); return; } HANDOFF(0x6bb5);  // jp $6bb5
 }
 
 // 04:66a5
@@ -642,11 +626,11 @@ void tileReplacement_group5Map43(GB *gb) {
   I(0x66b0, 2); alu_and(gb, 0x40);  // and $40
   if (!(F & FZ)) { I(0x66b2, 3); goto L_66ce; } I(0x66b2, 2);  // jr nz,$66ce
   I(0x66b4, 3); SET_HL(0x66a9);  // ld hl,$66a9
-  CALL(0x66b7, fillRectInRoomLayout, 0x6bb5, 0x66ba);  // call $6bb5
+  CALL(0x66b7, fillRectInRoomLayout_hook, 0x6bb5, 0x66ba);  // call $6bb5
   I(0x66ba, 3); SET_HL(0x66c6);  // ld hl,$66c6
-  CALL(0x66bd, fillRectInRoomLayout, 0x6bb5, 0x66c0);  // call $6bb5
+  CALL(0x66bd, fillRectInRoomLayout_hook, 0x6bb5, 0x66c0);  // call $6bb5
   I(0x66c0, 3); SET_HL(0x66ca);  // ld hl,$66ca
-  I(0x66c3, 4); fillRectInRoomLayout(gb); return;  // jp $6bb5
+  I(0x66c3, 4); if (hook_enabled_at(0x6bb5)) { fillRectInRoomLayout_hook(gb); return; } HANDOFF(0x6bb5);  // jp $6bb5
 L_66ce:
   I(0x66ce, 3); SET_DE(0x66d4);  // ld de,$66d4
   I(0x66d1, 4); replaceTiles(gb); return;  // jp $6096
@@ -676,9 +660,9 @@ L_66d4:
   I(0x66e2, 1); L = alu_inc8(gb, L);  // inc l
   I(0x66e3, 3); mem_wr(gb, HL, 0xb2);  // ld (hl),$b2
   I(0x66e5, 3); SET_HL(0x66f1);  // ld hl,$66f1
-  CALL(0x66e8, fillRectInRoomLayout, 0x6bb5, 0x66eb);  // call $6bb5
+  CALL(0x66e8, fillRectInRoomLayout_hook, 0x6bb5, 0x66eb);  // call $6bb5
   I(0x66eb, 3); SET_HL(0x66f5);  // ld hl,$66f5
-  I(0x66ee, 4); fillRectInRoomLayout(gb); return;  // jp $6bb5
+  I(0x66ee, 4); if (hook_enabled_at(0x6bb5)) { fillRectInRoomLayout_hook(gb); return; } HANDOFF(0x6bb5);  // jp $6bb5
 }
 
 // 04:66ca
@@ -702,9 +686,9 @@ L_66d4:
   I(0x66e2, 1); L = alu_inc8(gb, L);  // inc l
   I(0x66e3, 3); mem_wr(gb, HL, 0xb2);  // ld (hl),$b2
   I(0x66e5, 3); SET_HL(0x66f1);  // ld hl,$66f1
-  CALL(0x66e8, fillRectInRoomLayout, 0x6bb5, 0x66eb);  // call $6bb5
+  CALL(0x66e8, fillRectInRoomLayout_hook, 0x6bb5, 0x66eb);  // call $6bb5
   I(0x66eb, 3); SET_HL(0x66f5);  // ld hl,$66f5
-  I(0x66ee, 4); fillRectInRoomLayout(gb); return;  // jp $6bb5
+  I(0x66ee, 4); if (hook_enabled_at(0x6bb5)) { fillRectInRoomLayout_hook(gb); return; } HANDOFF(0x6bb5);  // jp $6bb5
 }
 
 // 04:66ce
@@ -730,9 +714,9 @@ L_66d4:
   I(0x66e2, 1); L = alu_inc8(gb, L);  // inc l
   I(0x66e3, 3); mem_wr(gb, HL, 0xb2);  // ld (hl),$b2
   I(0x66e5, 3); SET_HL(0x66f1);  // ld hl,$66f1
-  CALL(0x66e8, fillRectInRoomLayout, 0x6bb5, 0x66eb);  // call $6bb5
+  CALL(0x66e8, fillRectInRoomLayout_hook, 0x6bb5, 0x66eb);  // call $6bb5
   I(0x66eb, 3); SET_HL(0x66f5);  // ld hl,$66f5
-  I(0x66ee, 4); fillRectInRoomLayout(gb); return;  // jp $6bb5
+  I(0x66ee, 4); if (hook_enabled_at(0x6bb5)) { fillRectInRoomLayout_hook(gb); return; } HANDOFF(0x6bb5);  // jp $6bb5
 }
 
 // 04:66d7
@@ -746,9 +730,9 @@ void tileReplacement_group5Map95(GB *gb) {
   I(0x66e2, 1); L = alu_inc8(gb, L);  // inc l
   I(0x66e3, 3); mem_wr(gb, HL, 0xb2);  // ld (hl),$b2
   I(0x66e5, 3); SET_HL(0x66f1);  // ld hl,$66f1
-  CALL(0x66e8, fillRectInRoomLayout, 0x6bb5, 0x66eb);  // call $6bb5
+  CALL(0x66e8, fillRectInRoomLayout_hook, 0x6bb5, 0x66eb);  // call $6bb5
   I(0x66eb, 3); SET_HL(0x66f5);  // ld hl,$66f5
-  I(0x66ee, 4); fillRectInRoomLayout(gb); return;  // jp $6bb5
+  I(0x66ee, 4); if (hook_enabled_at(0x6bb5)) { fillRectInRoomLayout_hook(gb); return; } HANDOFF(0x6bb5);  // jp $6bb5
 }
 
 // 04:66f1
@@ -1039,7 +1023,7 @@ void tileReplacement_group5Map4c(GB *gb) {
   I(0x67c8, 2); alu_and(gb, 0x07);  // and $07
   if ((F & FZ)) { RET_TAKEN(0x67ca); return; } I(0x67ca, 2);  // ret z
   I(0x67cb, 3); SET_HL(0x67d6);  // ld hl,$67d6
-  CALL(0x67ce, fillRectInRoomLayout, 0x6bb5, 0x67d1);  // call $6bb5
+  CALL(0x67ce, fillRectInRoomLayout_hook, 0x6bb5, 0x67d1);  // call $6bb5
   I(0x67d1, 2); L = 0x57;  // ld l,$57
   I(0x67d3, 3); mem_wr(gb, HL, 0x45);  // ld (hl),$45
   RET(0x67d5); return;  // ret
@@ -1063,7 +1047,7 @@ void tileReplacement_group5Map4d(GB *gb) {
   I(0x67dd, 2); alu_and(gb, 0x07);  // and $07
   if ((F & FZ)) { RET_TAKEN(0x67df); return; } I(0x67df, 2);  // ret z
   I(0x67e0, 3); SET_HL(0x67e6);  // ld hl,$67e6
-  I(0x67e3, 4); fillRectInRoomLayout(gb); return;  // jp $6bb5
+  I(0x67e3, 4); if (hook_enabled_at(0x6bb5)) { fillRectInRoomLayout_hook(gb); return; } HANDOFF(0x6bb5);  // jp $6bb5
 }
 
 // 04:67e6
@@ -1087,7 +1071,7 @@ void tileReplacement_group5Map5c(GB *gb) {
   I(0x67f3, 1); alu_cp(gb, B);  // cp b
   if (!(F & FZ)) { RET_TAKEN(0x67f4); return; } I(0x67f4, 2);  // ret nz
   I(0x67f5, 3); SET_DE(0x67fb);  // ld de,$67fb
-  I(0x67f8, 4); drawRectInRoomLayout(gb); return;  // jp $6bcf
+  I(0x67f8, 4); if (hook_enabled_at(0x6bcf)) { drawRectInRoomLayout_hook(gb); return; } HANDOFF(0x6bcf);  // jp $6bcf
 }
 
 // 04:67fb
@@ -1111,7 +1095,7 @@ void tileReplacement_group5Map5d(GB *gb) {
   I(0x6820, 1); alu_cp(gb, B);  // cp b
   if (!(F & FZ)) { RET_TAKEN(0x6821); return; } I(0x6821, 2);  // ret nz
   I(0x6822, 3); SET_DE(0x6828);  // ld de,$6828
-  I(0x6825, 4); drawRectInRoomLayout(gb); return;  // jp $6bcf
+  I(0x6825, 4); if (hook_enabled_at(0x6bcf)) { drawRectInRoomLayout_hook(gb); return; } HANDOFF(0x6bcf);  // jp $6bcf
 }
 
 // 04:6828
@@ -1132,7 +1116,7 @@ void tileReplacement_group7Map4a(GB *gb) {
   I(0x6847, 2); alu_and(gb, 0x80);  // and $80
   if ((F & FZ)) { RET_TAKEN(0x6849); return; } I(0x6849, 2);  // ret z
   I(0x684a, 3); SET_HL(0x6850);  // ld hl,$6850
-  I(0x684d, 4); fillRectInRoomLayout(gb); return;  // jp $6bb5
+  I(0x684d, 4); if (hook_enabled_at(0x6bb5)) { fillRectInRoomLayout_hook(gb); return; } HANDOFF(0x6bb5);  // jp $6bb5
 }
 
 // 04:6850
@@ -1205,8 +1189,8 @@ void tileReplacement_group0Mapac(GB *gb) {
 void tileReplacement_group0Map2c(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x688f, 3); SET_BC(0x0017);  // ld bc,$0017
-  CALL(0x6892, getVinePosition, 0x69d5, 0x6895);  // call $69d5
-  if (!(F & FZ)) { I(0x6895, 4); setTileToWitheredVine(gb); return; } I(0x6895, 3);  // jp nz,$69c7
+  CALL(0x6892, getVinePosition_hook, 0x69d5, 0x6895);  // call $69d5
+  if (!(F & FZ)) { I(0x6895, 4); if (hook_enabled_at(0x69c7)) { setTileToWitheredVine_hook(gb); return; } HANDOFF(0x69c7); } I(0x6895, 3);  // jp nz,$69c7
   I(0x6898, 2); L = 0x06;  // ld l,$06
   I(0x689a, 3); SET_DE(0x68a0);  // ld de,$68a0
   I(0x689d, 4); replaceVineTiles(gb); return;  // jp $699b
@@ -1226,7 +1210,7 @@ L_68a0:
 void tileReplacement_group0Map1c(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x68a3, 3); SET_BC(0x0017);  // ld bc,$0017
-  CALL(0x68a6, getVinePosition, 0x69d5, 0x68a9);  // call $69d5
+  CALL(0x68a6, getVinePosition_hook, 0x69d5, 0x68a9);  // call $69d5
   if (!(F & FZ)) { RET_TAKEN(0x68a9); return; } I(0x68a9, 2);  // ret nz
   I(0x68aa, 2); L = 0x66;  // ld l,$66
   I(0x68ac, 3); SET_DE(0x68b2);  // ld de,$68b2
@@ -1249,8 +1233,8 @@ L_68b2:
 void tileReplacement_group0Mapba(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x68b7, 3); SET_BC(0x0218);  // ld bc,$0218
-  CALL(0x68ba, getVinePosition, 0x69d5, 0x68bd);  // call $69d5
-  if (!(F & FZ)) { I(0x68bd, 4); setTileToWitheredVine(gb); return; } I(0x68bd, 3);  // jp nz,$69c7
+  CALL(0x68ba, getVinePosition_hook, 0x69d5, 0x68bd);  // call $69d5
+  if (!(F & FZ)) { I(0x68bd, 4); if (hook_enabled_at(0x69c7)) { setTileToWitheredVine_hook(gb); return; } HANDOFF(0x69c7); } I(0x68bd, 3);  // jp nz,$69c7
   I(0x68c0, 2); L = 0x07;  // ld l,$07
   I(0x68c2, 3); SET_DE(0x68ce);  // ld de,$68ce
   CALL(0x68c5, replaceVineTiles, 0x699b, 0x68c8);  // call $699b
@@ -1273,7 +1257,7 @@ L_68ce:
 void tileReplacement_group0Mapaa(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x68d1, 3); SET_BC(0x0218);  // ld bc,$0218
-  CALL(0x68d4, getVinePosition, 0x69d5, 0x68d7);  // call $69d5
+  CALL(0x68d4, getVinePosition_hook, 0x69d5, 0x68d7);  // call $69d5
   if (!(F & FZ)) { RET_TAKEN(0x68d7); return; } I(0x68d7, 2);  // ret nz
   I(0x68d8, 2); L = 0x77;  // ld l,$77
   I(0x68da, 3); SET_DE(0x68e0);  // ld de,$68e0
@@ -1294,8 +1278,8 @@ L_68e0:
 void tileReplacement_group0Mapcc(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x68e3, 3); SET_BC(0x0311);  // ld bc,$0311
-  CALL(0x68e6, getVinePosition, 0x69d5, 0x68e9);  // call $69d5
-  if (!(F & FZ)) { I(0x68e9, 4); setTileToWitheredVine(gb); return; } I(0x68e9, 3);  // jp nz,$69c7
+  CALL(0x68e6, getVinePosition_hook, 0x69d5, 0x68e9);  // call $69d5
+  if (!(F & FZ)) { I(0x68e9, 4); if (hook_enabled_at(0x69c7)) { setTileToWitheredVine_hook(gb); return; } HANDOFF(0x69c7); } I(0x68e9, 3);  // jp nz,$69c7
   I(0x68ec, 2); L = 0x00;  // ld l,$00
   I(0x68ee, 3); SET_DE(0x68f4);  // ld de,$68f4
   I(0x68f1, 4); replaceVineTiles(gb); return;  // jp $699b
@@ -1315,7 +1299,7 @@ L_68f4:
 void tileReplacement_group0Mapbc(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x68f7, 3); SET_BC(0x0311);  // ld bc,$0311
-  CALL(0x68fa, getVinePosition, 0x69d5, 0x68fd);  // call $69d5
+  CALL(0x68fa, getVinePosition_hook, 0x69d5, 0x68fd);  // call $69d5
   if (!(F & FZ)) { RET_TAKEN(0x68fd); return; } I(0x68fd, 2);  // ret nz
   I(0x68fe, 2); L = 0x70;  // ld l,$70
   I(0x6900, 3); SET_DE(0x6906);  // ld de,$6906
@@ -1336,8 +1320,8 @@ L_6906:
 void tileReplacement_group0Mapda(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x6909, 3); SET_BC(0x0418);  // ld bc,$0418
-  CALL(0x690c, getVinePosition, 0x69d5, 0x690f);  // call $69d5
-  if (!(F & FZ)) { I(0x690f, 4); setTileToWitheredVine(gb); return; } I(0x690f, 3);  // jp nz,$69c7
+  CALL(0x690c, getVinePosition_hook, 0x69d5, 0x690f);  // call $69d5
+  if (!(F & FZ)) { I(0x690f, 4); if (hook_enabled_at(0x69c7)) { setTileToWitheredVine_hook(gb); return; } HANDOFF(0x69c7); } I(0x690f, 3);  // jp nz,$69c7
   I(0x6912, 2); L = 0x07;  // ld l,$07
   I(0x6914, 3); SET_DE(0x691a);  // ld de,$691a
   I(0x6917, 4); replaceVineTiles(gb); return;  // jp $699b
@@ -1357,7 +1341,7 @@ L_691a:
 void tileReplacement_group0Mapca(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x691d, 3); SET_BC(0x0418);  // ld bc,$0418
-  CALL(0x6920, getVinePosition, 0x69d5, 0x6923);  // call $69d5
+  CALL(0x6920, getVinePosition_hook, 0x69d5, 0x6923);  // call $69d5
   if (!(F & FZ)) { RET_TAKEN(0x6923); return; } I(0x6923, 2);  // ret nz
   I(0x6924, 2); L = 0x77;  // ld l,$77
   I(0x6926, 3); SET_DE(0x692c);  // ld de,$692c
@@ -1378,11 +1362,11 @@ L_692c:
 void tileReplacement_group0Map61(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x692f, 3); SET_BC(0x0122);  // ld bc,$0122
-  CALL(0x6932, getVinePosition, 0x69d5, 0x6935);  // call $69d5
+  CALL(0x6932, getVinePosition_hook, 0x69d5, 0x6935);  // call $69d5
   if ((F & FZ)) { I(0x6935, 3); goto L_695a; } I(0x6935, 2);  // jr z,$695a
   I(0x6937, 3); SET_BC(0x0127);  // ld bc,$0127
-  CALL(0x693a, getVinePosition, 0x69d5, 0x693d);  // call $69d5
-  if (!(F & FZ)) { I(0x693d, 4); setTileToWitheredVine(gb); return; } I(0x693d, 3);  // jp nz,$69c7
+  CALL(0x693a, getVinePosition_hook, 0x69d5, 0x693d);  // call $69d5
+  if (!(F & FZ)) { I(0x693d, 4); if (hook_enabled_at(0x69c7)) { setTileToWitheredVine_hook(gb); return; } HANDOFF(0x69c7); } I(0x693d, 3);  // jp nz,$69c7
 L_6940:
   I(0x6940, 3); SET_HL(0xcf06);  // ld hl,$cf06
   I(0x6943, 3); mem_wr(gb, HL, 0x4d);  // ld (hl),$4d
@@ -1463,10 +1447,10 @@ L_695a:
 void tileReplacement_group0Map51(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x6974, 3); SET_BC(0x0122);  // ld bc,$0122
-  CALL(0x6977, getVinePosition, 0x69d5, 0x697a);  // call $69d5
+  CALL(0x6977, getVinePosition_hook, 0x69d5, 0x697a);  // call $69d5
   if ((F & FZ)) { I(0x697a, 3); goto L_698f; } I(0x697a, 2);  // jr z,$698f
   I(0x697c, 3); SET_BC(0x0127);  // ld bc,$0127
-  CALL(0x697f, getVinePosition, 0x69d5, 0x6982);  // call $69d5
+  CALL(0x697f, getVinePosition_hook, 0x69d5, 0x6982);  // call $69d5
   if (!(F & FZ)) { RET_TAKEN(0x6982); return; } I(0x6982, 2);  // ret nz
 L_6983:
   I(0x6983, 3); SET_HL(0xcf76);  // ld hl,$cf76
@@ -1553,35 +1537,7 @@ L_69c0:
   I(0x69c3, 2); alu_adc(gb, mem_rd(gb, HL));  // adc (hl)
   I(0x69c4, 2); alu_sub(gb, 0x8f);  // sub $8f
   I(0x69c6, 1);  // nop
-  setTileToWitheredVine(gb); return;  // fallthrough
-}
-
-// 04:69c7
-void setTileToWitheredVine(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x69c7, 2); L = mem_rd(gb, HL);  // ld l,(hl)
-  I(0x69c8, 2); H = 0xcf;  // ld h,$cf
-  I(0x69ca, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  PUSH(0x69cb, HL);  // push hl
-  CALL(0x69cc, retrieveTileCollisionValue_hook, 0x156e, 0x69cf);  // call $156e
-  SET_HL(POP(0x69cf));  // pop hl
-  I(0x69d0, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x69d1); return; } I(0x69d1, 2);  // ret nz
-  I(0x69d2, 3); mem_wr(gb, HL, 0x8c);  // ld (hl),$8c
-  RET(0x69d4); return;  // ret
-}
-
-// 04:69d5
-void getVinePosition(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x69d5, 1); A = B;  // ld a,b
-  I(0x69d6, 3); SET_HL(0xc8f0);  // ld hl,$c8f0
-  RST_PUSH(0x69d9, 0x69da);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x69da, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x69db, 1); alu_cp(gb, C);  // cp c
-  RET(0x69dc); return;  // ret
+  if (hook_enabled_at(0x69c7)) { setTileToWitheredVine_hook(gb); return; } HANDOFF(0x69c7);  // fallthrough
 }
 
 // 04:69dd
@@ -1838,7 +1794,7 @@ void tileReplacement_group2Map90(GB *gb) {
   I(0x6ac1, 2); alu_and(gb, 0x02);  // and $02
   if ((F & FZ)) { RET_TAKEN(0x6ac3); return; } I(0x6ac3, 2);  // ret z
   I(0x6ac4, 3); SET_DE(0x6aca);  // ld de,$6aca
-  I(0x6ac7, 4); drawRectInRoomLayout(gb); return;  // jp $6bcf
+  I(0x6ac7, 4); if (hook_enabled_at(0x6bcf)) { drawRectInRoomLayout_hook(gb); return; } HANDOFF(0x6bcf);  // jp $6bcf
 }
 
 // 04:6ad9
@@ -2009,67 +1965,6 @@ void tileReplacement_group0Mapa5(GB *gb) {
   I(0x6ba4, 1); L = alu_inc8(gb, L);  // inc l
   I(0x6ba5, 3); mem_wr(gb, HL, 0xef);  // ld (hl),$ef
   RET(0x6ba7); return;  // ret
-}
-
-// 04:6bb5
-void fillRectInRoomLayout(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6bb5, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6bb6, 1); E = A;  // ld e,a
-  I(0x6bb7, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6bb8, 1); B = A;  // ld b,a
-  I(0x6bb9, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6bba, 1); C = A;  // ld c,a
-  I(0x6bbb, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6bbc, 1); D = A;  // ld d,a
-  I(0x6bbd, 2); H = 0xcf;  // ld h,$cf
-L_6bbf:
-  I(0x6bbf, 1); A = D;  // ld a,d
-  I(0x6bc0, 1); L = E;  // ld l,e
-  PUSH(0x6bc1, BC);  // push bc
-L_6bc2:
-  I(0x6bc2, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6bc3, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x6bc4, 3); goto L_6bc2; } I(0x6bc4, 2);  // jr nz,$6bc2
-  I(0x6bc6, 1); A = E;  // ld a,e
-  I(0x6bc7, 2); alu_add(gb, 0x10);  // add $10
-  I(0x6bc9, 1); E = A;  // ld e,a
-  SET_BC(POP(0x6bca));  // pop bc
-  I(0x6bcb, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x6bcc, 3); goto L_6bbf; } I(0x6bcc, 2);  // jr nz,$6bbf
-  RET(0x6bce); return;  // ret
-}
-
-// 04:6bcf
-void drawRectInRoomLayout(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6bcf, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x6bd0, 2); SET_DE(DE + 1);  // inc de
-  I(0x6bd1, 2); H = 0xcf;  // ld h,$cf
-  I(0x6bd3, 1); L = A;  // ld l,a
-  I(0x6bd4, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  I(0x6bd6, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x6bd7, 2); SET_DE(DE + 1);  // inc de
-  I(0x6bd8, 1); C = A;  // ld c,a
-  I(0x6bd9, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x6bda, 2); SET_DE(DE + 1);  // inc de
-  I(0x6bdb, 3); mem_wr(gb, 0xff8d, A);  // ldh ($ff8d),a
-L_6bdd:
-  I(0x6bdd, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
-  I(0x6bdf, 1); B = A;  // ld b,a
-L_6be0:
-  I(0x6be0, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x6be1, 2); SET_DE(DE + 1);  // inc de
-  I(0x6be2, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6be3, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x6be4, 3); goto L_6be0; } I(0x6be4, 2);  // jr nz,$6be0
-  I(0x6be6, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
-  I(0x6be8, 2); alu_add(gb, 0x10);  // add $10
-  I(0x6bea, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  I(0x6bec, 1); L = A;  // ld l,a
-  I(0x6bed, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x6bee, 3); goto L_6bdd; } I(0x6bee, 2);  // jr nz,$6bdd
-  RET(0x6bf0); return;  // ret
 }
 
 // 04:5fef
@@ -4458,7 +4353,7 @@ void vblankRunBank4Function_b04(GB *gb) {
 // 04:6d7a
 void loadTilesetData_body(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6d7a, getAdjustedRoomGroup, 0x6dd6, 0x6d7d);  // call $6dd6
+  CALL(0x6d7a, getAdjustedRoomGroup_hook, 0x6dd6, 0x6d7d);  // call $6dd6
   I(0x6d7d, 3); SET_HL(0x52d4);  // ld hl,$52d4
   RST_PUSH(0x6d80, 0x6d81);  // rst $18 (addDoubleIndexToHl)
   PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);

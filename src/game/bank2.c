@@ -6,6 +6,37 @@
 #define CYC(from, to) burn_rom(gb, 0x02, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, 0x02, (from), (to), true)
 
+static void add_double_index_to_hl(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0018, 0x0019, false); push_effect(gb, BC);
+  burn_rom(gb, 0x00, 0x0019, 0x001a, false); C = A;
+  burn_rom(gb, 0x00, 0x001a, 0x001c, false); B = 0;
+  burn_rom(gb, 0x00, 0x001c, 0x001d, false); alu_add_hl(gb, BC);
+  burn_rom(gb, 0x00, 0x001d, 0x001e, false); alu_add_hl(gb, BC);
+  burn_rom(gb, 0x00, 0x001e, 0x001f, false); SET_BC(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
+}
+
+static void add_a_to_hl(GB *gb) {
+  burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L); L = A;
+  burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
+  if (!(F & FC)) { burn_rom(gb, 0x00, 0x0012, 0x0013, true); ret_effect(gb); return; }
+  burn_rom(gb, 0x00, 0x0012, 0x0013, false); H = alu_inc8(gb, H);
+  burn_rom(gb, 0x00, 0x0013, 0x0014, false); ret_effect(gb);
+}
+
+void loadRememberedCompanion_hook(GB *gb);
+void checkAndSpawnMaple_hook(GB *gb);
+void stub_02_77f4_hook(GB *gb);
+void checkTileValidForEnemySpawn_hook(GB *gb);
+void checkPositionValidForEnemySpawn_hook(GB *gb);
+void getNextValueFromRandomBuffer_hook(GB *gb);
+void getCandidatePositionForEnemy_hook(GB *gb);
+void checkEnemyPlacedAtPosition_hook(GB *gb);
+void calculateRoomStateModifier_hook(GB *gb);
+void createSeaEffectsPartIfApplicable_hook(GB *gb);
+void func_02_7a3a_hook(GB *gb);
+
 static uint16_t function_caller_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
   burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
@@ -155,17 +186,17 @@ void getRandomPositionForEnemy_b02_hook(GB *gb) {
     CYC(0x7864, 0x7865); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
     if (F & FZ) { CYCT(0x7865, 0x7867); CYC(0x7880, 0x7881); alu_scf(gb); CYC(0x7881, 0x7882); ret_effect(gb); return; }
     CYC(0x7865, 0x7867);
-    CALL_C(0x7867, getCandidatePositionForEnemy, 0x796b, 0x786a);
+    CALL_C(0x7867, getCandidatePositionForEnemy_hook, 0x796b, 0x786a);
     CYC(0x786a, 0x786d); mem_wr(gb, 0xcec2, A);
     CYC(0x786d, 0x786e); C = A;
-    CALL_C(0x786e, checkPositionValidForEnemySpawn, 0x7894, 0x7871);
+    CALL_C(0x786e, checkPositionValidForEnemySpawn_hook, 0x7894, 0x7871);
     if (F & FC) { CYCT(0x7871, 0x7873); continue; }
     CYC(0x7871, 0x7873);
     CYC(0x7873, 0x7875); A = mem_rd(gb, 0xff8b);
     CYC(0x7875, 0x7877); alu_and(gb, 0x04);
     if (F & FZ) {
       CYC(0x7877, 0x7879);
-      CALL_C(0x7879, checkTileValidForEnemySpawn, 0x7882, 0x787c);
+      CALL_C(0x7879, checkTileValidForEnemySpawn_hook, 0x7882, 0x787c);
       if (F & FC) { CYCT(0x787c, 0x787e); continue; }
       CYC(0x787c, 0x787e);
     } else CYCT(0x7877, 0x7879);
@@ -199,4 +230,384 @@ void checkSpawnTimeportalInteraction_b02_hook(GB *gb) {
   CYC(0x79da, 0x79dd); mem_wr(gb, 0xcddd, A);
   CYC(0x79dd, 0x79df); L = 0x4b;
   CYC(0x79df, 0x79e2); setShortPosition_paramC_hook(gb);
+}
+
+void loadRememberedCompanion_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x768a, 0x768d); SET_HL(wRememberedCompanionId);
+  CYC(0x768d, 0x768e); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x768e, 0x768f); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x768f, 0x7690); ret_effect(gb); return; }
+  CYC(0x768f, 0x7690);
+  CYC(0x7690, 0x7691); C = A;
+  CYC(0x7691, 0x7694); A = W8(wActiveGroup);
+  CYC(0x7694, 0x7695); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(0x7695, 0x7696); ret_effect(gb); return; }
+  CYC(0x7695, 0x7696);
+  CYC(0x7696, 0x7697); L = alu_inc8(gb, L);
+  CYC(0x7697, 0x769a); A = W8(wActiveRoom);
+  CYC(0x769a, 0x769b); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(0x769b, 0x769c); ret_effect(gb); return; }
+  CYC(0x769b, 0x769c);
+  CYC(0x769c, 0x769f); A = W8(w1Companion_enabled);
+  CYC(0x769f, 0x76a0); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x76a0, 0x76a1); ret_effect(gb); return; }
+  CYC(0x76a0, 0x76a1);
+  CYC(0x76a1, 0x76a2); A = C;
+  CYC(0x76a2, 0x76a4); alu_cp(gb, 0x13);
+  if (F & FZ) { CYCT(0x76a4, 0x76a6); goto raft; }
+  CYC(0x76a4, 0x76a6);
+  CYC(0x76a6, 0x76a9); W8(w1Companion_id) = A;
+  CYC(0x76a9, 0x76ab); A = 1;
+  CYC(0x76ab, 0x76ae); W8(w1Companion_enabled) = A;
+  CYC(0x76ae, 0x76af); L = alu_inc8(gb, L);
+  CYC(0x76af, 0x76b0); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x76b0, 0x76b3); W8(w1Companion_yh) = A;
+  CYC(0x76b3, 0x76b4); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x76b4, 0x76b7); W8(w1Companion_xh) = A;
+  CYC(0x76b7, 0x76b8); ret_effect(gb);
+  return;
+raft:
+  CYC(0x76b8, 0x76bb); A = W8(wTilesetFlags);
+  CYC(0x76bb, 0x76bd); alu_and(gb, 0x80);
+  if (F & FZ) { CYCT(0x76bd, 0x76be); ret_effect(gb); return; }
+  CYC(0x76bd, 0x76be);
+  CALL_C(0x76be, getFreeInteractionSlot_hook, ROM_getFreeInteractionSlot, 0x76c1);
+  if (!(F & FZ)) { CYCT(0x76c1, 0x76c2); ret_effect(gb); return; }
+  CYC(0x76c1, 0x76c2);
+  CYC(0x76c2, 0x76c4); mem_wr(gb, HL, 0xe6);
+  CYC(0x76c4, 0x76c5); L = alu_inc8(gb, L);
+  CYC(0x76c5, 0x76c7); mem_wr(gb, HL, 2);
+  CYC(0x76c7, 0x76ca); A = W8(wRememberedCompanionY);
+  CYC(0x76ca, 0x76cc); L = 0x4b;
+  CYC(0x76cc, 0x76cd); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x76cd, 0x76ce); L = alu_inc8(gb, L);
+  CYC(0x76ce, 0x76d1); A = W8(wRememberedCompanionX);
+  CYC(0x76d1, 0x76d2); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x76d2, 0x76d3); ret_effect(gb);
+}
+
+void checkAndSpawnMaple_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x76d3, 0x76d4); alu_xor(gb, A);
+  CYC(0x76d4, 0x76d7); W8(wIsMaplePresent) = A;
+  CYC(0x76d7, 0x76da); A = W8(wcc85);
+  CYC(0x76da, 0x76db); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x76db, 0x76dc); ret_effect(gb); return; }
+  CYC(0x76db, 0x76dc);
+  CYC(0x76dc, 0x76df); A = W8(wActiveGroup);
+  CYC(0x76df, 0x76e2); SET_HL(0x7792);
+  CYC(0x76e2, 0x76e3); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(0x76e3, 0x76e5); goto start_check; }
+  CYC(0x76e3, 0x76e5);
+  CYC(0x76e5, 0x76e6); A = alu_inc8(gb, A);
+  if (!(F & FZ)) { CYCT(0x76e6, 0x76e7); ret_effect(gb); return; }
+  CYC(0x76e6, 0x76e7);
+  CYC(0x76e7, 0x76ea); A = W8(w1Companion_enabled);
+  CYC(0x76ea, 0x76eb); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x76eb, 0x76ec); ret_effect(gb); return; }
+  CYC(0x76eb, 0x76ec);
+  CYC(0x76ec, 0x76ef); A = W8(wAnimalCompanion);
+  CYC(0x76ef, 0x76f0); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x76f0, 0x76f2); goto maple_table; }
+  CYC(0x76f0, 0x76f2);
+  CYC(0x76f2, 0x76f4); alu_sub(gb, 0x0b);
+maple_table:
+  CYC(0x76f4, 0x76f7); SET_HL(0x772c);
+  CYC(0x76f7, 0x76f8); add_double_index_to_hl(gb, 0x76f8);
+  CYC(0x76f8, 0x76f9); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x76f9, 0x76fa); H = mem_rd(gb, HL);
+  CYC(0x76fa, 0x76fb); L = A;
+start_check:
+  CYC(0x76fb, 0x76fe); A = W8(wActiveRoom);
+  CALL_C(0x76fe, checkFlag_hook, 0x0205, 0x7701);
+  if (!(F & FZ)) { CYCT(0x7701, 0x7702); ret_effect(gb); return; }
+  CYC(0x7701, 0x7702);
+  CYC(0x7702, 0x7704); A = 0x0f;
+  CALL_C(0x7704, cpActiveRing_hook, 0x23b0, 0x7707);
+  CYC(0x7707, 0x7709); E = 0x1e;
+  if (!(F & FZ)) CYCT(0x7709, 0x770b);
+  else { CYC(0x7709, 0x770b); CYC(0x770b, 0x770d); E = alu_srl(gb, E); }
+  CYC(0x770d, 0x7710); SET_HL(wMapleKillCounter);
+  CYC(0x7710, 0x7711); A = mem_rd(gb, HL);
+  CYC(0x7711, 0x7712); alu_cp(gb, E);
+  if (F & FC) { CYCT(0x7712, 0x7713); ret_effect(gb); return; }
+  CYC(0x7712, 0x7713); CYC(0x7713, 0x7715); mem_wr(gb, HL, 0);
+  CYC(0x7715, 0x7718); SET_HL(w1Companion);
+  CYC(0x7718, 0x771a); A = 1;
+  CYC(0x771a, 0x771d); W8(wcc85) = A;
+  CYC(0x771d, 0x7720); W8(wIsMaplePresent) = A;
+  CYC(0x7720, 0x7721); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x7721, 0x7723); mem_wr(gb, HL, 0x0e);
+  CYC(0x7723, 0x7725); L = 0x0b;
+  CYC(0x7725, 0x7727); mem_wr(gb, HL, 0x18);
+  CYC(0x7727, 0x7729); L = 0x0d;
+  CYC(0x7729, 0x772b); mem_wr(gb, HL, 0xb8);
+  CYC(0x772b, 0x772c); ret_effect(gb);
+}
+
+void stub_02_77f4_hook(GB *gb) {
+  CYC(0x77f4, 0x77f5); ret_effect(gb);
+}
+
+static void get_absolute_value(GB *gb) {
+  CYC(0x7919, 0x791b); alu_bit(gb, 7, A);
+  if (F & FZ) { CYCT(0x791b, 0x791c); ret_effect(gb); return; }
+  CYC(0x791b, 0x791c); CYC(0x791c, 0x791d); alu_cpl(gb);
+  CYC(0x791d, 0x791e); A = alu_inc8(gb, A);
+  CYC(0x791e, 0x791f); ret_effect(gb);
+}
+
+void checkTileValidForEnemySpawn_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7882, 0x7884); B = 0xce;
+  CYC(0x7884, 0x7885); A = mem_rd(gb, BC);
+  CYC(0x7885, 0x7886); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x7886, 0x7888); goto invalid; }
+  CYC(0x7886, 0x7888);
+  CYC(0x7888, 0x788a); B = 0xcf;
+  CYC(0x788a, 0x788b); A = mem_rd(gb, BC);
+  CYC(0x788b, 0x788e); SET_HL(0x791f);
+  CALL_C(0x788e, lookupCollisionTable_hook, 0x1e1f, 0x7891);
+  if (!(F & FC)) { CYCT(0x7891, 0x7892); ret_effect(gb); return; }
+  CYC(0x7891, 0x7892);
+invalid:
+  CYC(0x7892, 0x7893); alu_scf(gb);
+  CYC(0x7893, 0x7894); ret_effect(gb);
+}
+
+static void check_enemy_position_bounds(GB *gb) {
+  CYC(0x789b, 0x789e); A = W8(wActiveGroup);
+  CYC(0x789e, 0x78a0); alu_and(gb, 4);
+  CYC(0x78a0, 0x78a3); SET_HL(0x78c8);
+  if (F & FZ) CYCT(0x78a3, 0x78a5);
+  else { CYC(0x78a3, 0x78a5); CYC(0x78a5, 0x78a8); SET_HL(0x78d8); }
+  CYC(0x78a8, 0x78ab); A = W8(wScreenTransitionDirection);
+  CYC(0x78ab, 0x78ac); alu_add(gb, A);
+  CYC(0x78ac, 0x78ad); add_double_index_to_hl(gb, 0x78ad);
+  CYC(0x78ad, 0x78ae); A = C;
+  CYC(0x78ae, 0x78b0); alu_and(gb, 0xf0);
+  CYC(0x78b0, 0x78b2); A = alu_swap(gb, A);
+  CYC(0x78b2, 0x78b3); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) { CYCT(0x78b3, 0x78b5); goto invalid; }
+  CYC(0x78b3, 0x78b5); CYC(0x78b5, 0x78b6); SET_HL(HL + 1);
+  CYC(0x78b6, 0x78b7); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(0x78b7, 0x78b9); goto invalid; }
+  CYC(0x78b7, 0x78b9); A = C;
+  CYC(0x78b9, 0x78ba); alu_and(gb, 0x0f);
+  CYC(0x78ba, 0x78bc); SET_HL(HL + 1);
+  CYC(0x78bc, 0x78be); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) { CYCT(0x78be, 0x78c0); goto invalid; }
+  CYC(0x78be, 0x78c0); CYC(0x78c0, 0x78c1); SET_HL(HL + 1);
+  CYC(0x78c1, 0x78c2); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(0x78c2, 0x78c4); goto invalid; }
+  CYC(0x78c2, 0x78c4); CYC(0x78c4, 0x78c5); alu_xor(gb, A);
+  CYC(0x78c5, 0x78c6); ret_effect(gb);
+  return;
+invalid:
+  CYC(0x78c6, 0x78c7); alu_scf(gb);
+  CYC(0x78c7, 0x78c8); ret_effect(gb);
+}
+
+void checkPositionValidForEnemySpawn_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7894, 0x7897); A = W8(wScreenVariables);
+  CYC(0x7897, 0x7899); alu_and(gb, 8);
+  if (!(F & FZ)) { CYC(0x7899, 0x789b); check_enemy_position_bounds(gb); return; }
+  CYCT(0x7899, 0x789b); CYC(0x78e8, 0x78e9); alu_xor(gb, A);
+  CYC(0x78e9, 0x78ec); W8(wScreenTransitionDirection) = A;
+  CYC(0x78ec, 0x78ef); A = W8(wWarpDestPos);
+  CYC(0x78ef, 0x78f0); B = A;
+  CYC(0x78f0, 0x78f2); alu_cp(gb, 0xf0);
+  if (!(F & FC)) { CYCT(0x78f2, 0x78f4); check_enemy_position_bounds(gb); return; }
+  CYC(0x78f2, 0x78f4); CYC(0x78f4, 0x78f6); alu_and(gb, 0xf0);
+  CYC(0x78f6, 0x78f8); A = alu_swap(gb, A);
+  CYC(0x78f8, 0x78f9); H = A;
+  CYC(0x78f9, 0x78fa); A = C;
+  CYC(0x78fa, 0x78fc); alu_and(gb, 0xf0);
+  CYC(0x78fc, 0x78fe); A = alu_swap(gb, A);
+  CYC(0x78fe, 0x78ff); alu_sub(gb, H);
+  CYC(0x78ff, 0x7902); push_effect(gb, 0x7902); get_absolute_value(gb);
+  CYC(0x7902, 0x7904); alu_cp(gb, 3);
+  if (F & FC) { CYCT(0x7904, 0x7906); goto check_x; }
+  CYC(0x7904, 0x7906); goto valid;
+check_x:
+  CYC(0x7908, 0x7909); A = B;
+  CYC(0x7909, 0x790b); alu_and(gb, 0x0f);
+  CYC(0x790b, 0x790c); H = A;
+  CYC(0x790c, 0x790d); A = C;
+  CYC(0x790d, 0x790f); alu_and(gb, 0x0f);
+  CYC(0x790f, 0x7910); alu_sub(gb, H);
+  CYC(0x7910, 0x7913); push_effect(gb, 0x7913); get_absolute_value(gb);
+  CYC(0x7913, 0x7915); alu_cp(gb, 3);
+  if (!(F & FC)) { CYCT(0x7915, 0x7917); goto valid; }
+  CYC(0x7915, 0x7917); CYC(0x7917, 0x7918); alu_scf(gb);
+  CYC(0x7918, 0x7919); ret_effect(gb);
+  return;
+valid:
+  CYC(0x7906, 0x7907); alu_xor(gb, A);
+  CYC(0x7907, 0x7908); ret_effect(gb);
+}
+
+void getNextValueFromRandomBuffer_hook(GB *gb) {
+  CYC(0x7959, 0x795c); SET_HL(wEnemyPlacement_randomBufferIndex);
+  CYC(0x795c, 0x795d); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x795d, 0x795f); A = 4;
+  CYC(0x795f, 0x7961); mem_wr(gb, IO_SVBK, A);
+  CYC(0x7961, 0x7962); L = mem_rd(gb, HL);
+  CYC(0x7962, 0x7964); H = 0xd0;
+  CYC(0x7964, 0x7965); H = mem_rd(gb, HL);
+  CYC(0x7965, 0x7967); A = 1;
+  CYC(0x7967, 0x7969); mem_wr(gb, IO_SVBK, A);
+  CYC(0x7969, 0x796a); A = H;
+  CYC(0x796a, 0x796b); ret_effect(gb);
+}
+
+void checkEnemyPlacedAtPosition_hook(GB *gb) {
+  CYC(0x79a7, 0x79aa); A = W8(wEnemyPlacement_numEnemies);
+  CYC(0x79aa, 0x79ab); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x79ab, 0x79ac); ret_effect(gb); return; }
+  CYC(0x79ab, 0x79ac); CYC(0x79ac, 0x79ad); push_effect(gb, BC);
+  CYC(0x79ad, 0x79ae); C = A;
+  CYC(0x79ae, 0x79b1); SET_HL(wEnemyPlacement_placedEnemyPositions);
+  for (;;) {
+    CYC(0x79b1, 0x79b2); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x79b2, 0x79b3); alu_cp(gb, B);
+    if (F & FZ) { CYCT(0x79b3, 0x79b5); break; }
+    CYC(0x79b3, 0x79b5); CYC(0x79b5, 0x79b6); C = alu_dec8(gb, C);
+    if (!(F & FZ)) { CYCT(0x79b6, 0x79b8); continue; }
+    CYC(0x79b6, 0x79b8);
+    CYC(0x79b8, 0x79b9); SET_BC(pop_effect(gb));
+    CYC(0x79b9, 0x79ba); alu_xor(gb, A);
+    CYC(0x79ba, 0x79bb); ret_effect(gb);
+    return;
+  }
+  CYC(0x79bb, 0x79bc); SET_BC(pop_effect(gb));
+  CYC(0x79bc, 0x79bd); alu_scf(gb);
+  CYC(0x79bd, 0x79be); ret_effect(gb);
+}
+
+void getCandidatePositionForEnemy_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x796b, 0x796e); A = W8(wActiveGroup);
+  CYC(0x796e, 0x7970); alu_and(gb, 4);
+  if (!(F & FZ)) { CYCT(0x7970, 0x7972); goto dungeon; }
+  CYC(0x7970, 0x7972);
+overworld:
+  CALL_C(0x7972, getNextValueFromRandomBuffer_hook, 0x7959, 0x7975);
+  CYC(0x7975, 0x7977); alu_cp(gb, 0x80);
+  if (!(F & FC)) { CYCT(0x7977, 0x7979); goto overworld; }
+  CYC(0x7977, 0x7979);
+  CYC(0x7979, 0x797a); B = A;
+  CYC(0x797a, 0x797c); alu_and(gb, 0x0f);
+  CYC(0x797c, 0x797e); alu_cp(gb, 0x0a);
+  if (!(F & FC)) { CYCT(0x797e, 0x7980); goto overworld; }
+  CYC(0x797e, 0x7980);
+  CALL_C(0x7980, checkEnemyPlacedAtPosition_hook, 0x79a7, 0x7983);
+  if (F & FC) { CYCT(0x7983, 0x7985); goto overworld; }
+  CYC(0x7983, 0x7985); CYC(0x7985, 0x7986); A = B;
+  CYC(0x7986, 0x7987); ret_effect(gb);
+  return;
+dungeon:
+  CALL_C(0x7987, getNextValueFromRandomBuffer_hook, 0x7959, 0x798a);
+  CYC(0x798a, 0x798c); alu_cp(gb, 0xb0);
+  if (!(F & FC)) { CYCT(0x798c, 0x798e); goto dungeon; }
+  CYC(0x798c, 0x798e);
+  CYC(0x798e, 0x798f); B = A;
+  CYC(0x798f, 0x7991); alu_and(gb, 0xf0);
+  if (F & FZ) { CYCT(0x7991, 0x7993); goto dungeon; }
+  CYC(0x7991, 0x7993);
+  CYC(0x7993, 0x7995); alu_cp(gb, 0xa0);
+  if (F & FZ) { CYCT(0x7995, 0x7997); goto dungeon; }
+  CYC(0x7995, 0x7997);
+  CYC(0x7997, 0x7998); A = B;
+  CYC(0x7998, 0x799a); alu_and(gb, 0x0f);
+  if (F & FZ) { CYCT(0x799a, 0x799c); goto dungeon; }
+  CYC(0x799a, 0x799c);
+  CYC(0x799c, 0x799e); alu_cp(gb, 0x0e);
+  if (!(F & FC)) { CYCT(0x799e, 0x79a0); goto dungeon; }
+  CYC(0x799e, 0x79a0);
+  CALL_C(0x79a0, checkEnemyPlacedAtPosition_hook, 0x79a7, 0x79a3);
+  if (F & FC) { CYCT(0x79a3, 0x79a5); goto dungeon; }
+  CYC(0x79a3, 0x79a5); CYC(0x79a5, 0x79a6); A = B;
+  CYC(0x79a6, 0x79a7); ret_effect(gb);
+}
+
+void calculateRoomStateModifier_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x79e2, 0x79e5); A = W8(wActiveGroup);
+  CYC(0x79e5, 0x79e6); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x79e6, 0x79e8); goto standard; }
+  CYC(0x79e6, 0x79e8);
+  CYC(0x79e8, 0x79eb); A = W8(wRoomPack);
+  CYC(0x79eb, 0x79ed); alu_cp(gb, 0x7f);
+  if (F & FZ) { CYCT(0x79ed, 0x79ef); goto companion_region; }
+  CYC(0x79ed, 0x79ef);
+standard:
+  CYC(0x79ef, 0x79f2); A = W8(wTilesetFlags);
+  CYC(0x79f2, 0x79f4); alu_and(gb, 0x40);
+  CYC(0x79f4, 0x79f6); B = 0;
+  if (F & FZ) CYCT(0x79f6, 0x79f8);
+  else { CYC(0x79f6, 0x79f8); CYC(0x79f8, 0x79f9); B = alu_inc8(gb, B); }
+  CALL_C(0x79f9, getThisRoomFlags_hook, 0x197d, 0x79fc);
+  CYC(0x79fc, 0x79fe); alu_and(gb, 1);
+  if (F & FZ) CYCT(0x79fe, 0x7a00);
+  else { CYC(0x79fe, 0x7a00); CYC(0x7a00, 0x7a01); B = alu_inc8(gb, B); }
+  CYC(0x7a01, 0x7a02); A = B;
+  CYC(0x7a02, 0x7a05); W8(wRoomStateModifier) = A;
+  CYC(0x7a05, 0x7a06); ret_effect(gb);
+  return;
+companion_region:
+  CYC(0x7a06, 0x7a09); A = W8(wAnimalCompanion);
+  CYC(0x7a09, 0x7a0a); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x7a0a, 0x7a0c); goto standard; }
+  CYC(0x7a0a, 0x7a0c);
+  CYC(0x7a0c, 0x7a0e); alu_sub(gb, 0x0b);
+  CYC(0x7a0e, 0x7a11); W8(wRoomStateModifier) = A;
+  CYC(0x7a11, 0x7a12); ret_effect(gb);
+}
+
+void createSeaEffectsPartIfApplicable_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7a12, 0x7a15); A = W8(wActiveCollisions);
+  CYC(0x7a15, 0x7a18); SET_HL(0x7a2c);
+  CYC(0x7a18, 0x7a19); push_effect(gb, 0x7a19); add_a_to_hl(gb);
+  CYC(0x7a19, 0x7a1a); A = mem_rd(gb, HL);
+  CYC(0x7a1a, 0x7a1b); push_effect(gb, 0x7a1b); add_a_to_hl(gb);
+  for (;;) {
+    CYC(0x7a1b, 0x7a1c); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x7a1c, 0x7a1d); alu_or(gb, A);
+    if (F & FZ) { CYCT(0x7a1d, 0x7a1e); ret_effect(gb); return; }
+    CYC(0x7a1d, 0x7a1e); CYC(0x7a1e, 0x7a1f); push_effect(gb, HL);
+    CALL_C(0x7a1f, findTileInRoom_hook, 0x15cc, 0x7a22);
+    CYC(0x7a22, 0x7a23); SET_HL(pop_effect(gb));
+    if (!(F & FZ)) { CYCT(0x7a23, 0x7a25); continue; }
+    CYC(0x7a23, 0x7a25);
+    CALL_C(0x7a25, getFreePartSlot_hook, ROM_getFreePartSlot, 0x7a28);
+    if (!(F & FZ)) { CYCT(0x7a28, 0x7a29); ret_effect(gb); return; }
+    CYC(0x7a28, 0x7a29); CYC(0x7a29, 0x7a2b); mem_wr(gb, HL, 0x2e);
+    CYC(0x7a2b, 0x7a2c); ret_effect(gb);
+    return;
+  }
+}
+
+void func_02_7a3a_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7a3a, 0x7a3d); A = W8(wcddd);
+  CYC(0x7a3d, 0x7a3e); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x7a3e, 0x7a3f); ret_effect(gb); return; }
+  CYC(0x7a3e, 0x7a3f);
+  CYC(0x7a3f, 0x7a40); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(0x7a40, 0x7a42); goto spawn; }
+  CYC(0x7a40, 0x7a42);
+  CYC(0x7a42, 0x7a45); W8(wcddd) = A;
+  CYC(0x7a45, 0x7a46); ret_effect(gb);
+  return;
+spawn:
+  CALL_C(0x7a46, getFreeInteractionSlot_hook, ROM_getFreeInteractionSlot, 0x7a49);
+  if (!(F & FZ)) { CYCT(0x7a49, 0x7a4a); ret_effect(gb); return; }
+  CYC(0x7a49, 0x7a4a); CYC(0x7a4a, 0x7a4c); mem_wr(gb, HL, 0xde);
+  CYC(0x7a4c, 0x7a4f); A = W8(wPortalPos);
+  CYC(0x7a4f, 0x7a51); L = 0x4b;
+  CYC(0x7a51, 0x7a54); setShortPosition_hook(gb);
 }
