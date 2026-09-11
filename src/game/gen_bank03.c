@@ -545,35 +545,12 @@ void twinrovaCutsceneCaller(GB *gb) {
   switch (HL) {  default: HANDOFF(HL); }
 }
 
-// 03:4b10
-void incCutsceneState(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4b10, 3); SET_HL(0xcc03);  // ld hl,$cc03
-  I(0x4b13, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  RET(0x4b14); return;  // ret
-}
-
 // 03:4b15
 void unused_incTmpcbb3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x4b15, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x4b18, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   RET(0x4b19); return;  // ret
-}
-
-// 03:4b1a
-void decTmpcbb4(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4b1a, 3); SET_HL(0xcbb4);  // ld hl,$cbb4
-  I(0x4b1d, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  RET(0x4b1e); return;  // ret
-}
-
-// 03:4b1f
-void setScreenShakeCounterTo255(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4b1f, 2); A = 0xff;  // ld a,$ff
-  I(0x4b21, 4); if (hook_enabled_at(0x24bb)) { setScreenShakeCounter_hook(gb); return; } HANDOFF(0x24bb);  // jp $24bb
 }
 
 // 03:4b24
@@ -584,7 +561,7 @@ void twinrovaCutscene_state0(GB *gb) {
   I(0x4b29, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x4b2c, 2); B = 0x10;  // ld b,$10
   CALL(0x4b2e, clearMemory_hook, 0x046f, 0x4b31);  // call $046f
-  I(0x4b31, 3); incCutsceneState(gb); return;  // jr $4b10
+  I(0x4b31, 3); if (hook_enabled_at(0x4b10)) { incCutsceneState_hook(gb); return; } HANDOFF(0x4b10);  // jr $4b10
 }
 
 // 03:4b33
@@ -593,7 +570,7 @@ void twinrovaCutscene_state1(GB *gb) {
   I(0x4b33, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x4b36, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x4b37); return; } I(0x4b37, 2);  // ret nz
-  CALL(0x4b38, incCutsceneState, 0x4b10, 0x4b3b);  // call $4b10
+  CALL(0x4b38, incCutsceneState_hook, 0x4b10, 0x4b3b);  // call $4b10
   I(0x4b3b, 2); A = 0xf1;  // ld a,$f1
   I(0x4b3d, 4); mem_wr(gb, 0xcc30, A);  // ld ($cc30),a
   CALL(0x4b40, twinrovaCutscene_fadeinToRoom, 0x4b6f, 0x4b43);  // call $4b6f
@@ -671,43 +648,43 @@ void twinrovaCutscene_state2(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(0x4b95); return; } I(0x4b95, 2);  // ret nz
   I(0x4b96, 2); A = 0x01;  // ld a,$01
   I(0x4b98, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x4b9b, 4); incCutsceneState(gb); return;  // jp $4b10
+  I(0x4b9b, 4); if (hook_enabled_at(0x4b10)) { incCutsceneState_hook(gb); return; } HANDOFF(0x4b10);  // jp $4b10
 }
 
 // 03:4b9e
 void twinrovaCutscene_state3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4b9e, decTmpcbb4, 0x4b1a, 0x4ba1);  // call $4b1a
+  CALL(0x4b9e, decTmpcbb4_hook, 0x4b1a, 0x4ba1);  // call $4b1a
   if (!(F & FZ)) { RET_TAKEN(0x4ba1); return; } I(0x4ba1, 2);  // ret nz
   I(0x4ba2, 3); mem_wr(gb, HL, 0xb4);  // ld (hl),$b4
   CALL(0x4ba4, twinrovaCutscene_deleteAllInteractionsExceptFlames, 0x4c0d, 0x4ba7);  // call $4c0d
   CALL(0x4ba7, twinrovaCutscene_loadAngryFlames, 0x4c29, 0x4baa);  // call $4c29
   I(0x4baa, 2); A = 0xb0;  // ld a,$b0
   CALL(0x4bac, playSound_b00_hook, 0x0c98, 0x4baf);  // call $0c98
-  I(0x4baf, 4); incCutsceneState(gb); return;  // jp $4b10
+  I(0x4baf, 4); if (hook_enabled_at(0x4b10)) { incCutsceneState_hook(gb); return; } HANDOFF(0x4b10);  // jp $4b10
 }
 
 // 03:4bb2
 void cutscene18_state4(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4bb2, setScreenShakeCounterTo255, 0x4b1f, 0x4bb5);  // call $4b1f
+  CALL(0x4bb2, setScreenShakeCounterTo255_hook, 0x4b1f, 0x4bb5);  // call $4b1f
   I(0x4bb5, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x4bb8, 2); alu_and(gb, 0x3f);  // and $3f
   if (!(F & FZ)) { I(0x4bba, 3); goto L_4bc1; } I(0x4bba, 2);  // jr nz,$4bc1
   I(0x4bbc, 2); A = 0xb0;  // ld a,$b0
   CALL(0x4bbe, playSound_b00_hook, 0x0c98, 0x4bc1);  // call $0c98
 L_4bc1:
-  CALL(0x4bc1, decTmpcbb4, 0x4b1a, 0x4bc4);  // call $4b1a
+  CALL(0x4bc1, decTmpcbb4_hook, 0x4b1a, 0x4bc4);  // call $4b1a
   if (!(F & FZ)) { RET_TAKEN(0x4bc4); return; } I(0x4bc4, 2);  // ret nz
   I(0x4bc5, 2); A = 0x04;  // ld a,$04
   CALL(0x4bc7, fadeoutToWhiteWithDelay_hook, 0x3257, 0x4bca);  // call $3257
-  I(0x4bca, 4); incCutsceneState(gb); return;  // jp $4b10
+  I(0x4bca, 4); if (hook_enabled_at(0x4b10)) { incCutsceneState_hook(gb); return; } HANDOFF(0x4b10);  // jp $4b10
 }
 
 // 03:4bcd
 void cutscene18_state5(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4bcd, setScreenShakeCounterTo255, 0x4b1f, 0x4bd0);  // call $4b1f
+  CALL(0x4bcd, setScreenShakeCounterTo255_hook, 0x4b1f, 0x4bd0);  // call $4b1f
   I(0x4bd0, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x4bd3, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x4bd4); return; } I(0x4bd4, 2);  // ret nz
@@ -808,7 +785,7 @@ void cutscene19_body(GB *gb) {
 // 03:4c4c
 void cutscene19_state4(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4c4c, decTmpcbb4, 0x4b1a, 0x4c4f);  // call $4b1a
+  CALL(0x4c4c, decTmpcbb4_hook, 0x4b1a, 0x4c4f);  // call $4b1a
   if (!(F & FZ)) { RET_TAKEN(0x4c4f); return; } I(0x4c4f, 2);  // ret nz
   I(0x4c50, 3); mem_wr(gb, HL, 0x14);  // ld (hl),$14
   I(0x4c52, 3); SET_BC(0x1878);  // ld bc,$1878
@@ -818,14 +795,14 @@ void cutscene19_state4(GB *gb) {
 // 03:4c55
 void cutscene19_strikeFlameWithLightning(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4c55, twinrovaCutscene_createLightningStrike, 0x4cba, 0x4c58);  // call $4cba
-  I(0x4c58, 4); incCutsceneState(gb); return;  // jp $4b10
+  CALL(0x4c55, twinrovaCutscene_createLightningStrike_hook, 0x4cba, 0x4c58);  // call $4cba
+  I(0x4c58, 4); if (hook_enabled_at(0x4b10)) { incCutsceneState_hook(gb); return; } HANDOFF(0x4b10);  // jp $4b10
 }
 
 // 03:4c5b
 void cutscene19_state5(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4c5b, decTmpcbb4, 0x4b1a, 0x4c5e);  // call $4b1a
+  CALL(0x4c5b, decTmpcbb4_hook, 0x4b1a, 0x4c5e);  // call $4b1a
   if (!(F & FZ)) { RET_TAKEN(0x4c5e); return; } I(0x4c5e, 2);  // ret nz
   I(0x4c5f, 3); mem_wr(gb, HL, 0x14);  // ld (hl),$14
   I(0x4c61, 3); SET_BC(0x48a8);  // ld bc,$48a8
@@ -835,7 +812,7 @@ void cutscene19_state5(GB *gb) {
 // 03:4c66
 void cutscene19_state6(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4c66, decTmpcbb4, 0x4b1a, 0x4c69);  // call $4b1a
+  CALL(0x4c66, decTmpcbb4_hook, 0x4b1a, 0x4c69);  // call $4b1a
   if (!(F & FZ)) { RET_TAKEN(0x4c69); return; } I(0x4c69, 2);  // ret nz
   I(0x4c6a, 3); mem_wr(gb, HL, 0x28);  // ld (hl),$28
   I(0x4c6c, 3); SET_BC(0x4848);  // ld bc,$4848
@@ -845,34 +822,34 @@ void cutscene19_state6(GB *gb) {
 // 03:4c71
 void cutscene19_state7(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4c71, decTmpcbb4, 0x4b1a, 0x4c74);  // call $4b1a
+  CALL(0x4c71, decTmpcbb4_hook, 0x4b1a, 0x4c74);  // call $4b1a
   if (!(F & FZ)) { RET_TAKEN(0x4c74); return; } I(0x4c74, 2);  // ret nz
   I(0x4c75, 3); mem_wr(gb, HL, 0x78);  // ld (hl),$78
   I(0x4c77, 2); A = 0x67;  // ld a,$67
   CALL(0x4c79, playSound_b00_hook, 0x0c98, 0x4c7c);  // call $0c98
-  I(0x4c7c, 4); incCutsceneState(gb); return;  // jp $4b10
+  I(0x4c7c, 4); if (hook_enabled_at(0x4b10)) { incCutsceneState_hook(gb); return; } HANDOFF(0x4b10);  // jp $4b10
 }
 
 // 03:4c7f
 void cutscene19_state8(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4c7f, setScreenShakeCounterTo255, 0x4b1f, 0x4c82);  // call $4b1f
+  CALL(0x4c7f, setScreenShakeCounterTo255_hook, 0x4b1f, 0x4c82);  // call $4b1f
   I(0x4c82, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x4c85, 2); alu_and(gb, 0x07);  // and $07
   if ((F & FZ)) { CALL(0x4c87, fastFadeinFromWhite_hook, 0x3290, 0x4c8a); } else I(0x4c87, 3);  // call z,$3290
-  CALL(0x4c8a, decTmpcbb4, 0x4b1a, 0x4c8d);  // call $4b1a
+  CALL(0x4c8a, decTmpcbb4_hook, 0x4b1a, 0x4c8d);  // call $4b1a
   if (!(F & FZ)) { RET_TAKEN(0x4c8d); return; } I(0x4c8d, 2);  // ret nz
   I(0x4c8e, 2); A = 0x04;  // ld a,$04
   CALL(0x4c90, fadeoutToWhiteWithDelay_hook, 0x3257, 0x4c93);  // call $3257
   I(0x4c93, 2); A = 0xb4;  // ld a,$b4
   CALL(0x4c95, playSound_b00_hook, 0x0c98, 0x4c98);  // call $0c98
-  I(0x4c98, 4); incCutsceneState(gb); return;  // jp $4b10
+  I(0x4c98, 4); if (hook_enabled_at(0x4b10)) { incCutsceneState_hook(gb); return; } HANDOFF(0x4b10);  // jp $4b10
 }
 
 // 03:4c9b
 void cutscene19_state9(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4c9b, setScreenShakeCounterTo255, 0x4b1f, 0x4c9e);  // call $4b1f
+  CALL(0x4c9b, setScreenShakeCounterTo255_hook, 0x4b1f, 0x4c9e);  // call $4b1f
   I(0x4c9e, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x4ca1, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x4ca2); return; } I(0x4ca2, 2);  // ret nz
@@ -885,22 +862,6 @@ void cutscene19_state9(GB *gb) {
   I(0x4cb3, 3); mem_wr(gb, HL, 0x04);  // ld (hl),$04
   I(0x4cb5, 2); A = 0xf0;  // ld a,$f0
   I(0x4cb7, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-}
-
-// 03:4cba
-void twinrovaCutscene_createLightningStrike(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4cba, getFreePartSlot_hook, 0x3e8e, 0x4cbd);  // call $3e8e
-  if (!(F & FZ)) { RET_TAKEN(0x4cbd); return; } I(0x4cbd, 2);  // ret nz
-  I(0x4cbe, 3); mem_wr(gb, HL, 0x27);  // ld (hl),$27
-  I(0x4cc0, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x4cc1, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4cc2, 2); L = 0xcb;  // ld l,$cb
-  I(0x4cc4, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x4cc5, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x4cc6, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x4cc7, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  RET(0x4cc8); return;  // ret
 }
 
 // 03:4cc9
@@ -1385,7 +1346,7 @@ void introCinematic_ridingHorse_state3(GB *gb) {
   I(0x4f28, 3); mem_wr(gb, 0xffaa, A);  // ldh ($ffaa),a
   I(0x4f2a, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
   I(0x4f2d, 3); SET_BC(0x7503);  // ld bc,$7503
-  CALL(0x4f30, createInteraction, 0x540c, 0x4f33);  // call $540c
+  CALL(0x4f30, createInteraction_hook, 0x540c, 0x4f33);  // call $540c
   I(0x4f33, 2); A = 0x0d;  // ld a,$0d
   I(0x4f35, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
   I(0x4f38, 2); A = 0x3c;  // ld a,$3c
@@ -1479,7 +1440,7 @@ void introCinematic_ridingHorse_state5(GB *gb) {
   I(0x4fb9, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x4fbc, 3); mem_wr(gb, HL, 0x18);  // ld (hl),$18
   I(0x4fbe, 3); SET_BC(0x7504);  // ld bc,$7504
-  I(0x4fc1, 4); createInteraction(gb); return;  // jp $540c
+  I(0x4fc1, 4); if (hook_enabled_at(0x540c)) { createInteraction_hook(gb); return; } HANDOFF(0x540c);  // jp $540c
 }
 
 // 03:4fc4
@@ -1614,7 +1575,7 @@ void introCinematic_ridingHorse_state10(GB *gb) {
   I(0x508a, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x508b, 3); introCinematic_ridingHorse_drawTempleSprites(gb); return; } I(0x508b, 2);  // jr nz,$5075
   CALL(0x508d, clearDynamicInteractions_hook, 0x35d2, 0x5090);  // call $35d2
-  I(0x5090, 3); incIntroCinematicState(gb); return;  // jr $50ca
+  I(0x5090, 3); if (hook_enabled_at(0x50ca)) { incIntroCinematicState_hook(gb); return; } HANDOFF(0x50ca);  // jr $50ca
 }
 
 // 03:5092
@@ -1673,16 +1634,6 @@ void introCinematic_preTitlescreen_updateScrollingTree__ret(GB *gb) {
 L_50c7:
   I(0x50c7, 2); alu_or(gb, 0x01);  // or $01
   RET(0x50c9); return;  // ret
-}
-
-// 03:50ca
-void incIntroCinematicState(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x50ca, 3); SET_HL(0xcbb5);  // ld hl,$cbb5
-  I(0x50cd, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x50ce, 1); alu_xor(gb, A);  // xor a
-  I(0x50cf, 4); mem_wr(gb, 0xc2e7, A);  // ld ($c2e7),a
-  RET(0x50d2); return;  // ret
 }
 
 // 03:50d3
@@ -1942,7 +1893,7 @@ void introCinematic_inTemple_state10(GB *gb) {
   I(0x5226, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x5227); return; } I(0x5227, 2);  // ret nz
   CALL(0x5228, clearDynamicInteractions_hook, 0x35d2, 0x522b);  // call $35d2
-  I(0x522b, 4); incIntroCinematicState(gb); return;  // jp $50ca
+  I(0x522b, 4); if (hook_enabled_at(0x50ca)) { incIntroCinematicState_hook(gb); return; } HANDOFF(0x50ca);  // jp $50ca
 }
 
 // 03:522e
@@ -2302,17 +2253,6 @@ void cutscene_clearObjects(GB *gb) {
   I(0x5409, 4); if (hook_enabled_at(0x1618)) { refreshObjectGfx_hook(gb); return; } HANDOFF(0x1618);  // jp $1618
 }
 
-// 03:540c
-void createInteraction(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x540c, getFreeInteractionSlot_hook, 0x3aef, 0x540f);  // call $3aef
-  if (!(F & FZ)) { RET_TAKEN(0x540f); return; } I(0x540f, 2);  // ret nz
-  I(0x5410, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x5411, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x5412, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  RET(0x5413); return;  // ret
-}
-
 // 03:5414
 void endgameCutsceneHandler_body(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -2453,7 +2393,7 @@ L_6359:
   I(0x6387, 3); SET_HL(0xcbb6);  // ld hl,$cbb6
   I(0x638a, 3); mem_wr(gb, HL, 0x28);  // ld (hl),$28
   CALL(0x638c, fastFadeinFromWhite_hook, 0x3290, 0x638f);  // call $3290
-  CALL(0x638f, cutscene_incCutsceneState, 0x6f8c, 0x6392);  // call $6f8c
+  CALL(0x638f, cutscene_incCutsceneState_hook, 0x6f8c, 0x6392);  // call $6f8c
   I(0x6392, 3); SET_HL(0xcbb5);  // ld hl,$cbb5
   I(0x6395, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
 L_6397:
@@ -2488,7 +2428,7 @@ L_63aa:
 L_63d0:
   I(0x63d0, 2); A = 0x55;  // ld a,$55
   CALL(0x63d2, playSound_b00_hook, 0x0c98, 0x63d5);  // call $0c98
-  CALL(0x63d5, cutscene_incCutsceneState, 0x6f8c, 0x63d8);  // call $6f8c
+  CALL(0x63d5, cutscene_incCutsceneState_hook, 0x6f8c, 0x63d8);  // call $6f8c
   I(0x63d8, 4); if (hook_enabled_at(0x3263)) { fastFadeoutToWhite_hook(gb); return; } HANDOFF(0x3263);  // jp $3263
 L_63ed:
   I(0x63ed, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
@@ -2501,7 +2441,7 @@ L_63ed:
   I(0x63fc, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   I(0x63fe, 2); A = 0x09;  // ld a,$09
   I(0x6400, 4); mem_wr(gb, 0xcfd0, A);  // ld ($cfd0),a
-  CALL(0x6403, cutscene_incCutsceneState, 0x6f8c, 0x6406);  // call $6f8c
+  CALL(0x6403, cutscene_incCutsceneState_hook, 0x6f8c, 0x6406);  // call $6f8c
   I(0x6406, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6409, 3); mem_wr(gb, HL, 0xaa);  // ld (hl),$aa
   I(0x640b, 4); if (hook_enabled_at(0x1aac)) { reloadGraphicsOnExitMenu_hook(gb); return; } HANDOFF(0x1aac);  // jp $1aac
@@ -2509,7 +2449,7 @@ L_640e:
   I(0x640e, 4); A = mem_rd(gb, 0xcfd0);  // ld a,($cfd0)
   I(0x6411, 2); alu_cp(gb, 0x0f);  // cp $0f
   if (!(F & FZ)) { RET_TAKEN(0x6413); return; } I(0x6413, 2);  // ret nz
-  CALL(0x6414, cutscene_incCutsceneState, 0x6f8c, 0x6417);  // call $6f8c
+  CALL(0x6414, cutscene_incCutsceneState_hook, 0x6f8c, 0x6417);  // call $6f8c
   I(0x6417, 3); SET_HL(0xde90);  // ld hl,$de90
   I(0x641a, 3); SET_BC(0x44a8);  // ld bc,$44a8
   I(0x641d, 4); if (hook_enabled_at(0x13c6)) { func_13c6_hook(gb); return; } HANDOFF(0x13c6);  // jp $13c6
@@ -2521,19 +2461,19 @@ L_6420:
   CALL(0x6427, loadPaletteHeader_hook, 0x050b, 0x642a);  // call $050b
   I(0x642a, 2); A = 0x10;  // ld a,$10
   I(0x642c, 4); mem_wr(gb, 0xcfd0, A);  // ld ($cfd0),a
-  I(0x642f, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x642f, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6432:
   I(0x6432, 4); A = mem_rd(gb, 0xcfd0);  // ld a,($cfd0)
   I(0x6435, 2); alu_cp(gb, 0x14);  // cp $14
   if (!(F & FZ)) { RET_TAKEN(0x6437); return; } I(0x6437, 2);  // ret nz
-  CALL(0x6438, cutscene_incCutsceneState, 0x6f8c, 0x643b);  // call $6f8c
+  CALL(0x6438, cutscene_incCutsceneState_hook, 0x6f8c, 0x643b);  // call $6f8c
   I(0x643b, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x643e, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x6440, 4); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c);  // jp $326c
 L_6443:
   CALL(0x6443, cutscene_decCBB3IfNotFadingOut, 0x6070, 0x6446);  // call $6070
   if (!(F & FZ)) { RET_TAKEN(0x6446); return; } I(0x6446, 2);  // ret nz
-  CALL(0x6447, cutscene_incCutsceneState, 0x6f8c, 0x644a);  // call $6f8c
+  CALL(0x6447, cutscene_incCutsceneState_hook, 0x6f8c, 0x644a);  // call $6f8c
   I(0x644a, 2); A = 0x15;  // ld a,$15
   I(0x644c, 4); mem_wr(gb, 0xcfd0, A);  // ld ($cfd0),a
   I(0x644f, 2); A = 0x03;  // ld a,$03
@@ -2542,7 +2482,7 @@ L_6454:
   I(0x6454, 4); A = mem_rd(gb, 0xcfd0);  // ld a,($cfd0)
   I(0x6457, 2); alu_cp(gb, 0x18);  // cp $18
   if (!(F & FZ)) { RET_TAKEN(0x6459); return; } I(0x6459, 2);  // ret nz
-  CALL(0x645a, cutscene_incCutsceneState, 0x6f8c, 0x645d);  // call $6f8c
+  CALL(0x645a, cutscene_incCutsceneState_hook, 0x6f8c, 0x645d);  // call $6f8c
   I(0x645d, 1); alu_xor(gb, A);  // xor a
   I(0x645e, 4); mem_wr(gb, 0xcfd2, A);  // ld ($cfd2),a
   CALL(0x6461, getFreePartSlot_hook, 0x3e8e, 0x6464);  // call $3e8e
@@ -2561,7 +2501,7 @@ L_6474:
   I(0x6474, 4); A = mem_rd(gb, 0xcfd2);  // ld a,($cfd2)
   I(0x6477, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { RET_TAKEN(0x6478); return; } I(0x6478, 2);  // ret z
-  CALL(0x6479, cutscene_incCutsceneState, 0x6f8c, 0x647c);  // call $6f8c
+  CALL(0x6479, cutscene_incCutsceneState_hook, 0x6f8c, 0x647c);  // call $6f8c
   CALL(0x647c, getThisRoomFlags_hook, 0x197d, 0x647f);  // call $197d
   I(0x647f, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));  // set 6,(hl)
   I(0x6481, 2); C = 0x22;  // ld c,$22
@@ -2573,18 +2513,18 @@ L_6488:
   if (!(F & FZ)) { RET_TAKEN(0x648d); return; } I(0x648d, 2);  // ret nz
   I(0x648e, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6491, 3); mem_wr(gb, HL, 0x78);  // ld (hl),$78
-  I(0x6493, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6493, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6496:
   CALL(0x6496, decCbb3_hook, 0x305d, 0x6499);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6499); return; } I(0x6499, 2);  // ret nz
   I(0x649a, 3); mem_wr(gb, HL, 0x5a);  // ld (hl),$5a
-  CALL(0x649c, cutscene_incCutsceneState, 0x6f8c, 0x649f);  // call $6f8c
+  CALL(0x649c, cutscene_incCutsceneState_hook, 0x6f8c, 0x649f);  // call $6f8c
   I(0x649f, 3); SET_BC(0x5607);  // ld bc,$5607
   I(0x64a2, 4); if (hook_enabled_at(0x1872)) { showText_hook(gb); return; } HANDOFF(0x1872);  // jp $1872
 L_64a5:
   CALL(0x64a5, cutscene_decCBB3IfTextNotActive, 0x6068, 0x64a8);  // call $6068
   if (!(F & FZ)) { RET_TAKEN(0x64a8); return; } I(0x64a8, 2);  // ret nz
-  CALL(0x64a9, cutscene_incCutsceneState, 0x6f8c, 0x64ac);  // call $6f8c
+  CALL(0x64a9, cutscene_incCutsceneState_hook, 0x6f8c, 0x64ac);  // call $6f8c
   I(0x64ac, 1); alu_xor(gb, A);  // xor a
   I(0x64ad, 3); SET_HL(0xcfde);  // ld hl,$cfde
   I(0x64b0, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
@@ -2594,7 +2534,7 @@ L_64b5:
   I(0x64b5, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x64b8, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x64b9); return; } I(0x64b9, 2);  // ret nz
-  CALL(0x64ba, cutscene_incCutsceneState, 0x6f8c, 0x64bd);  // call $6f8c
+  CALL(0x64ba, cutscene_incCutsceneState_hook, 0x6f8c, 0x64bd);  // call $6f8c
   CALL(0x64bd, cutscene_loadRoomObjectSetAndFadein, 0x64c5, 0x64c0);  // call $64c5
   I(0x64c0, 2); A = 0x02;  // ld a,$02
   I(0x64c2, 4); if (hook_enabled_at(0x02ea)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
@@ -2636,7 +2576,7 @@ L_6359:
   I(0x6387, 3); SET_HL(0xcbb6);  // ld hl,$cbb6
   I(0x638a, 3); mem_wr(gb, HL, 0x28);  // ld (hl),$28
   CALL(0x638c, fastFadeinFromWhite_hook, 0x3290, 0x638f);  // call $3290
-  CALL(0x638f, cutscene_incCutsceneState, 0x6f8c, 0x6392);  // call $6f8c
+  CALL(0x638f, cutscene_incCutsceneState_hook, 0x6f8c, 0x6392);  // call $6f8c
   I(0x6392, 3); SET_HL(0xcbb5);  // ld hl,$cbb5
   I(0x6395, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
 L_6397:
@@ -2702,7 +2642,7 @@ L_63aa:
 L_63d0:
   I(0x63d0, 2); A = 0x55;  // ld a,$55
   CALL(0x63d2, playSound_b00_hook, 0x0c98, 0x63d5);  // call $0c98
-  CALL(0x63d5, cutscene_incCutsceneState, 0x6f8c, 0x63d8);  // call $6f8c
+  CALL(0x63d5, cutscene_incCutsceneState_hook, 0x6f8c, 0x63d8);  // call $6f8c
   I(0x63d8, 4); if (hook_enabled_at(0x3263)) { fastFadeoutToWhite_hook(gb); return; } HANDOFF(0x3263);  // jp $3263
 }
 
@@ -2748,7 +2688,7 @@ L_63ed:
   I(0x63fc, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   I(0x63fe, 2); A = 0x09;  // ld a,$09
   I(0x6400, 4); mem_wr(gb, 0xcfd0, A);  // ld ($cfd0),a
-  CALL(0x6403, cutscene_incCutsceneState, 0x6f8c, 0x6406);  // call $6f8c
+  CALL(0x6403, cutscene_incCutsceneState_hook, 0x6f8c, 0x6406);  // call $6f8c
   I(0x6406, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6409, 3); mem_wr(gb, HL, 0xaa);  // ld (hl),$aa
   I(0x640b, 4); if (hook_enabled_at(0x1aac)) { reloadGraphicsOnExitMenu_hook(gb); return; } HANDOFF(0x1aac);  // jp $1aac
@@ -2761,7 +2701,7 @@ L_640e:
   I(0x640e, 4); A = mem_rd(gb, 0xcfd0);  // ld a,($cfd0)
   I(0x6411, 2); alu_cp(gb, 0x0f);  // cp $0f
   if (!(F & FZ)) { RET_TAKEN(0x6413); return; } I(0x6413, 2);  // ret nz
-  CALL(0x6414, cutscene_incCutsceneState, 0x6f8c, 0x6417);  // call $6f8c
+  CALL(0x6414, cutscene_incCutsceneState_hook, 0x6f8c, 0x6417);  // call $6f8c
   I(0x6417, 3); SET_HL(0xde90);  // ld hl,$de90
   I(0x641a, 3); SET_BC(0x44a8);  // ld bc,$44a8
   I(0x641d, 4); if (hook_enabled_at(0x13c6)) { func_13c6_hook(gb); return; } HANDOFF(0x13c6);  // jp $13c6
@@ -2778,7 +2718,7 @@ L_6420:
   CALL(0x6427, loadPaletteHeader_hook, 0x050b, 0x642a);  // call $050b
   I(0x642a, 2); A = 0x10;  // ld a,$10
   I(0x642c, 4); mem_wr(gb, 0xcfd0, A);  // ld ($cfd0),a
-  I(0x642f, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x642f, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6432
@@ -2788,7 +2728,7 @@ L_6432:
   I(0x6432, 4); A = mem_rd(gb, 0xcfd0);  // ld a,($cfd0)
   I(0x6435, 2); alu_cp(gb, 0x14);  // cp $14
   if (!(F & FZ)) { RET_TAKEN(0x6437); return; } I(0x6437, 2);  // ret nz
-  CALL(0x6438, cutscene_incCutsceneState, 0x6f8c, 0x643b);  // call $6f8c
+  CALL(0x6438, cutscene_incCutsceneState_hook, 0x6f8c, 0x643b);  // call $6f8c
   I(0x643b, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x643e, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x6440, 4); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c);  // jp $326c
@@ -2800,7 +2740,7 @@ void nayruSingingCutsceneHandler__state7(GB *gb) {
 L_6443:
   CALL(0x6443, cutscene_decCBB3IfNotFadingOut, 0x6070, 0x6446);  // call $6070
   if (!(F & FZ)) { RET_TAKEN(0x6446); return; } I(0x6446, 2);  // ret nz
-  CALL(0x6447, cutscene_incCutsceneState, 0x6f8c, 0x644a);  // call $6f8c
+  CALL(0x6447, cutscene_incCutsceneState_hook, 0x6f8c, 0x644a);  // call $6f8c
   I(0x644a, 2); A = 0x15;  // ld a,$15
   I(0x644c, 4); mem_wr(gb, 0xcfd0, A);  // ld ($cfd0),a
   I(0x644f, 2); A = 0x03;  // ld a,$03
@@ -2814,7 +2754,7 @@ L_6454:
   I(0x6454, 4); A = mem_rd(gb, 0xcfd0);  // ld a,($cfd0)
   I(0x6457, 2); alu_cp(gb, 0x18);  // cp $18
   if (!(F & FZ)) { RET_TAKEN(0x6459); return; } I(0x6459, 2);  // ret nz
-  CALL(0x645a, cutscene_incCutsceneState, 0x6f8c, 0x645d);  // call $6f8c
+  CALL(0x645a, cutscene_incCutsceneState_hook, 0x6f8c, 0x645d);  // call $6f8c
   I(0x645d, 1); alu_xor(gb, A);  // xor a
   I(0x645e, 4); mem_wr(gb, 0xcfd2, A);  // ld ($cfd2),a
   CALL(0x6461, getFreePartSlot_hook, 0x3e8e, 0x6464);  // call $3e8e
@@ -2838,7 +2778,7 @@ L_6474:
   I(0x6474, 4); A = mem_rd(gb, 0xcfd2);  // ld a,($cfd2)
   I(0x6477, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { RET_TAKEN(0x6478); return; } I(0x6478, 2);  // ret z
-  CALL(0x6479, cutscene_incCutsceneState, 0x6f8c, 0x647c);  // call $6f8c
+  CALL(0x6479, cutscene_incCutsceneState_hook, 0x6f8c, 0x647c);  // call $6f8c
   CALL(0x647c, getThisRoomFlags_hook, 0x197d, 0x647f);  // call $197d
   I(0x647f, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));  // set 6,(hl)
   I(0x6481, 2); C = 0x22;  // ld c,$22
@@ -2855,7 +2795,7 @@ L_6488:
   if (!(F & FZ)) { RET_TAKEN(0x648d); return; } I(0x648d, 2);  // ret nz
   I(0x648e, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6491, 3); mem_wr(gb, HL, 0x78);  // ld (hl),$78
-  I(0x6493, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6493, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6496
@@ -2865,7 +2805,7 @@ L_6496:
   CALL(0x6496, decCbb3_hook, 0x305d, 0x6499);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6499); return; } I(0x6499, 2);  // ret nz
   I(0x649a, 3); mem_wr(gb, HL, 0x5a);  // ld (hl),$5a
-  CALL(0x649c, cutscene_incCutsceneState, 0x6f8c, 0x649f);  // call $6f8c
+  CALL(0x649c, cutscene_incCutsceneState_hook, 0x6f8c, 0x649f);  // call $6f8c
   I(0x649f, 3); SET_BC(0x5607);  // ld bc,$5607
   I(0x64a2, 4); if (hook_enabled_at(0x1872)) { showText_hook(gb); return; } HANDOFF(0x1872);  // jp $1872
 }
@@ -2876,7 +2816,7 @@ void nayruSingingCutsceneHandler__stateC(GB *gb) {
 L_64a5:
   CALL(0x64a5, cutscene_decCBB3IfTextNotActive, 0x6068, 0x64a8);  // call $6068
   if (!(F & FZ)) { RET_TAKEN(0x64a8); return; } I(0x64a8, 2);  // ret nz
-  CALL(0x64a9, cutscene_incCutsceneState, 0x6f8c, 0x64ac);  // call $6f8c
+  CALL(0x64a9, cutscene_incCutsceneState_hook, 0x6f8c, 0x64ac);  // call $6f8c
   I(0x64ac, 1); alu_xor(gb, A);  // xor a
   I(0x64ad, 3); SET_HL(0xcfde);  // ld hl,$cfde
   I(0x64b0, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
@@ -2891,7 +2831,7 @@ L_64b5:
   I(0x64b5, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x64b8, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x64b9); return; } I(0x64b9, 2);  // ret nz
-  CALL(0x64ba, cutscene_incCutsceneState, 0x6f8c, 0x64bd);  // call $6f8c
+  CALL(0x64ba, cutscene_incCutsceneState_hook, 0x6f8c, 0x64bd);  // call $6f8c
   CALL(0x64bd, cutscene_loadRoomObjectSetAndFadein, 0x64c5, 0x64c0);  // call $64c5
   I(0x64c0, 2); A = 0x02;  // ld a,$02
   I(0x64c2, 4); if (hook_enabled_at(0x02ea)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
@@ -3055,7 +2995,7 @@ L_65ff:
   I(0x6603, 1); alu_or(gb, A);  // or a
   I(0x6604, 2); A = 0x21;  // ld a,$21
   if ((F & FZ)) { CALL(0x6606, playSound_b00_hook, 0x0c98, 0x6609); } else I(0x6606, 3);  // call z,$0c98
-  CALL(0x6609, cutscene_incCutsceneState, 0x6f8c, 0x660c);  // call $6f8c
+  CALL(0x6609, cutscene_incCutsceneState_hook, 0x6f8c, 0x660c);  // call $6f8c
   I(0x660c, 1); alu_xor(gb, A);  // xor a
   I(0x660d, 4); mem_wr(gb, 0xcbb9, A);  // ld ($cbb9),a
   CALL(0x6610, fadeinFromWhite_hook, 0x3299, 0x6613);  // call $3299
@@ -3074,7 +3014,7 @@ L_662b:
   if (!(F & FZ)) { RET_TAKEN(0x6635); return; } I(0x6635, 2);  // ret nz
   CALL(0x6636, decCbb3_hook, 0x305d, 0x6639);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6639); return; } I(0x6639, 2);  // ret nz
-  CALL(0x663a, cutscene_incCutsceneState, 0x6f8c, 0x663d);  // call $6f8c
+  CALL(0x663a, cutscene_incCutsceneState_hook, 0x6f8c, 0x663d);  // call $6f8c
   I(0x663d, 3); SET_BC(0x1005);  // ld bc,$1005
   I(0x6640, 4); A = mem_rd(gb, 0xcbb8);  // ld a,($cbb8)
   I(0x6643, 1); alu_or(gb, A);  // or a
@@ -3092,7 +3032,7 @@ L_6651:
   if (!(F & FZ)) { RET_TAKEN(0x665b); return; } I(0x665b, 2);  // ret nz
   I(0x665c, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x665f, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x6661, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6661, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6664:
   I(0x6664, 3); SET_DE(0xcc03);  // ld de,$cc03
   I(0x6667, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -3106,14 +3046,14 @@ L_6679:
   CALL(0x667c, func_6f44, 0x6f44, 0x667f);  // call $6f44
   CALL(0x667f, decCbb3_hook, 0x305d, 0x6682);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6682); return; } I(0x6682, 2);  // ret nz
-  CALL(0x6683, cutscene_incCutsceneState, 0x6f8c, 0x6686);  // call $6f8c
+  CALL(0x6683, cutscene_incCutsceneState_hook, 0x6f8c, 0x6686);  // call $6f8c
   I(0x6686, 4); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c);  // jp $326c
 L_6689:
   CALL(0x6689, func_6f44, 0x6f44, 0x668c);  // call $6f44
   I(0x668c, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x668f, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6690); return; } I(0x6690, 2);  // ret nz
-  CALL(0x6691, cutscene_incCutsceneState, 0x6f8c, 0x6694);  // call $6f8c
+  CALL(0x6691, cutscene_incCutsceneState_hook, 0x6f8c, 0x6694);  // call $6f8c
   CALL(0x6694, clearDynamicInteractions_hook, 0x35d2, 0x6697);  // call $35d2
   I(0x6697, 3); SET_BC(0x00ba);  // ld bc,$00ba
   CALL(0x669a, disableLcdAndLoadRoom_hook, 0x30b0, 0x669d);  // call $30b0
@@ -3181,13 +3121,13 @@ L_66fd:
   if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
   I(0x671b, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x671c, 4); mem_wr(gb, 0xcbb3, A);  // ld ($cbb3),a
-  I(0x671f, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x671f, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6725:
   CALL(0x6725, func_6ef7, 0x6ef7, 0x6728);  // call $6ef7
   CALL(0x6728, func_6f26, 0x6f26, 0x672b);  // call $6f26
   if (!(F & FZ)) { I(0x672b, 4); func_6f44(gb); return; } I(0x672b, 3);  // jp nz,$6f44
   I(0x672e, 3); mem_wr(gb, HL, 0x78);  // ld (hl),$78
-  CALL(0x6730, cutscene_incCutsceneState, 0x6f8c, 0x6733);  // call $6f8c
+  CALL(0x6730, cutscene_incCutsceneState_hook, 0x6f8c, 0x6733);  // call $6f8c
   func_6733(gb); return;  // fallthrough
 }
 
@@ -3209,7 +3149,7 @@ void nayruSingingState10(GB *gb) {
   I(0x653d, 4); A = mem_rd(gb, 0xcfd0);  // ld a,($cfd0)
   I(0x6540, 2); alu_cp(gb, 0x1e);  // cp $1e
   if (!(F & FZ)) { RET_TAKEN(0x6542); return; } I(0x6542, 2);  // ret nz
-  CALL(0x6543, cutscene_incCutsceneState, 0x6f8c, 0x6546);  // call $6f8c
+  CALL(0x6543, cutscene_incCutsceneState_hook, 0x6f8c, 0x6546);  // call $6f8c
   I(0x6546, 3); SET_HL(0xde90);  // ld hl,$de90
   I(0x6549, 3); SET_BC(0x4a30);  // ld bc,$4a30
   I(0x654c, 4); if (hook_enabled_at(0x13c6)) { func_13c6_hook(gb); return; } HANDOFF(0x13c6);  // jp $13c6
@@ -3270,7 +3210,7 @@ L_6d76:
 L_6d78:
   CALL(0x6d78, decCbb3_hook, 0x305d, 0x6d7b);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6d7b); return; } I(0x6d7b, 2);  // ret nz
-  CALL(0x6d7c, cutscene_incCutsceneState, 0x6f8c, 0x6d7f);  // call $6f8c
+  CALL(0x6d7c, cutscene_incCutsceneState_hook, 0x6f8c, 0x6d7f);  // call $6f8c
   I(0x6d7f, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6d82, 2); mem_wr(gb, HL, E);  // ld (hl),e
   RET(0x6d83); return;  // ret
@@ -3280,7 +3220,7 @@ L_6d84:
 L_6d88:
   CALL(0x6d88, decCbb3_hook, 0x305d, 0x6d8b);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6d8b); return; } I(0x6d8b, 2);  // ret nz
-  CALL(0x6d8c, cutscene_incCutsceneState, 0x6f8c, 0x6d8f);  // call $6f8c
+  CALL(0x6d8c, cutscene_incCutsceneState_hook, 0x6f8c, 0x6d8f);  // call $6f8c
   CALL(0x6d8f, fastFadeinFromBlack_hook, 0x32dd, 0x6d92);  // call $32dd
   I(0x6d92, 2); A = 0x40;  // ld a,$40
   I(0x6d94, 4); mem_wr(gb, 0xc4b2, A);  // ld ($c4b2),a
@@ -3294,7 +3234,7 @@ L_6da7:
   I(0x6da7, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x6daa, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6dab); return; } I(0x6dab, 2);  // ret nz
-  CALL(0x6dac, cutscene_incCutsceneState, 0x6f8c, 0x6daf);  // call $6f8c
+  CALL(0x6dac, cutscene_incCutsceneState_hook, 0x6f8c, 0x6daf);  // call $6f8c
   I(0x6daf, 2); A = 0x0e;  // ld a,$0e
   I(0x6db1, 4); mem_wr(gb, 0xcbb3, A);  // ld ($cbb3),a
   CALL(0x6db4, fadeinFromBlack_hook, 0x32e6, 0x6db7);  // call $32e6
@@ -3312,11 +3252,11 @@ L_6dc8:
   I(0x6dcd, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
   I(0x6dd0, 2); A = 0x78;  // ld a,$78
   I(0x6dd2, 4); mem_wr(gb, 0xcbb3, A);  // ld ($cbb3),a
-  I(0x6dd5, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6dd5, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6dd8:
   CALL(0x6dd8, decCbb3_hook, 0x305d, 0x6ddb);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6ddb); return; } I(0x6ddb, 2);  // ret nz
-  CALL(0x6ddc, cutscene_incCutsceneState, 0x6f8c, 0x6ddf);  // call $6f8c
+  CALL(0x6ddc, cutscene_incCutsceneState_hook, 0x6f8c, 0x6ddf);  // call $6f8c
   I(0x6ddf, 2); A = 0x08;  // ld a,$08
   I(0x6de1, 4); mem_wr(gb, 0xcbae, A);  // ld ($cbae),a
   I(0x6de4, 2); A = 0x03;  // ld a,$03
@@ -3325,7 +3265,7 @@ L_6dd8:
   I(0x6dec, 4); if (hook_enabled_at(0x1872)) { showText_hook(gb); return; } HANDOFF(0x1872);  // jp $1872
 L_6def:
   CALL(0x6def, retIfTextIsActive_hook, 0x1859, 0x6df2);  // call $1859
-  CALL(0x6df2, cutscene_incCutsceneState, 0x6f8c, 0x6df5);  // call $6f8c
+  CALL(0x6df2, cutscene_incCutsceneState_hook, 0x6f8c, 0x6df5);  // call $6f8c
   I(0x6df5, 4); mem_wr(gb, 0xcbb3, A);  // ld ($cbb3),a
   I(0x6df8, 1); A = alu_dec8(gb, A);  // dec a
   I(0x6df9, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
@@ -3337,7 +3277,7 @@ L_6e04:
   I(0x6e07, 2); B = 0x03;  // ld b,$03
   CALL(0x6e09, flashScreen_hook, 0x2d73, 0x6e0c);  // call $2d73
   if ((F & FZ)) { RET_TAKEN(0x6e0c); return; } I(0x6e0c, 2);  // ret z
-  CALL(0x6e0d, cutscene_incCutsceneState, 0x6f8c, 0x6e10);  // call $6f8c
+  CALL(0x6e0d, cutscene_incCutsceneState_hook, 0x6f8c, 0x6e10);  // call $6f8c
   I(0x6e10, 2); A = 0x3c;  // ld a,$3c
   I(0x6e12, 4); mem_wr(gb, 0xcbb3, A);  // ld ($cbb3),a
   I(0x6e15, 2); A = 0x02;  // ld a,$02
@@ -3348,7 +3288,7 @@ L_6e1a:
   if (!(F & FZ)) { RET_TAKEN(0x6e1e); return; } I(0x6e1e, 2);  // ret nz
   CALL(0x6e1f, decCbb3_hook, 0x305d, 0x6e22);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6e22); return; } I(0x6e22, 2);  // ret nz
-  I(0x6e23, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6e23, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6e26:
   CALL(0x6e26, disableLcd_hook, 0x02c1, 0x6e29);  // call $02c1
   I(0x6e29, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
@@ -3377,7 +3317,7 @@ L_6e26:
   I(0x6e5e, 3); mem_wr(gb, HL, 0x0b);  // ld (hl),$0b
   I(0x6e60, 2); A = 0x00;  // ld a,$00
   I(0x6e62, 4); mem_wr(gb, 0xcd00, A);  // ld ($cd00),a
-  CALL(0x6e65, cutscene_incCutsceneState, 0x6f8c, 0x6e68);  // call $6f8c
+  CALL(0x6e65, cutscene_incCutsceneState_hook, 0x6f8c, 0x6e68);  // call $6f8c
   CALL(0x6e68, clearPaletteFadeVariablesAndRefreshPalettes_hook, 0x3238, 0x6e6b);  // call $3238
   I(0x6e6b, 1); alu_xor(gb, A);  // xor a
   I(0x6e6c, 3); mem_wr(gb, 0xffaa, A);  // ldh ($ffaa),a
@@ -3391,7 +3331,7 @@ L_6e75:
   CALL(0x6e7b, clearLinkObject_hook, 0x35ba, 0x6e7e);  // call $35ba
   I(0x6e7e, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6e81, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x6e83, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6e83, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6e86:
   CALL(0x6e86, decCbb3_hook, 0x305d, 0x6e89);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6e89); return; } I(0x6e89, 2);  // ret nz
@@ -3468,7 +3408,7 @@ L_6e26:
   I(0x6e5e, 3); mem_wr(gb, HL, 0x0b);  // ld (hl),$0b
   I(0x6e60, 2); A = 0x00;  // ld a,$00
   I(0x6e62, 4); mem_wr(gb, 0xcd00, A);  // ld ($cd00),a
-  CALL(0x6e65, cutscene_incCutsceneState, 0x6f8c, 0x6e68);  // call $6f8c
+  CALL(0x6e65, cutscene_incCutsceneState_hook, 0x6f8c, 0x6e68);  // call $6f8c
   CALL(0x6e68, clearPaletteFadeVariablesAndRefreshPalettes_hook, 0x3238, 0x6e6b);  // call $3238
   I(0x6e6b, 1); alu_xor(gb, A);  // xor a
   I(0x6e6c, 3); mem_wr(gb, 0xffaa, A);  // ldh ($ffaa),a
@@ -3512,7 +3452,7 @@ L_6d76:
   I(0x6d76, 2); E = 0x96;  // ld e,$96
   CALL(0x6d78, decCbb3_hook, 0x305d, 0x6d7b);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6d7b); return; } I(0x6d7b, 2);  // ret nz
-  CALL(0x6d7c, cutscene_incCutsceneState, 0x6f8c, 0x6d7f);  // call $6f8c
+  CALL(0x6d7c, cutscene_incCutsceneState_hook, 0x6f8c, 0x6d7f);  // call $6f8c
   I(0x6d7f, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6d82, 2); mem_wr(gb, HL, E);  // ld (hl),e
   RET(0x6d83); return;  // ret
@@ -3525,7 +3465,7 @@ void pregameIntroCutsceneHandler__state2(GB *gb) {
 L_6d78:
   CALL(0x6d78, decCbb3_hook, 0x305d, 0x6d7b);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6d7b); return; } I(0x6d7b, 2);  // ret nz
-  CALL(0x6d7c, cutscene_incCutsceneState, 0x6f8c, 0x6d7f);  // call $6f8c
+  CALL(0x6d7c, cutscene_incCutsceneState_hook, 0x6f8c, 0x6d7f);  // call $6f8c
   I(0x6d7f, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6d82, 2); mem_wr(gb, HL, E);  // ld (hl),e
   RET(0x6d83); return;  // ret
@@ -3540,7 +3480,7 @@ void pregameIntroCutsceneHandler__state3(GB *gb) {
 L_6d88:
   CALL(0x6d88, decCbb3_hook, 0x305d, 0x6d8b);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6d8b); return; } I(0x6d8b, 2);  // ret nz
-  CALL(0x6d8c, cutscene_incCutsceneState, 0x6f8c, 0x6d8f);  // call $6f8c
+  CALL(0x6d8c, cutscene_incCutsceneState_hook, 0x6f8c, 0x6d8f);  // call $6f8c
   CALL(0x6d8f, fastFadeinFromBlack_hook, 0x32dd, 0x6d92);  // call $32dd
   I(0x6d92, 2); A = 0x40;  // ld a,$40
   I(0x6d94, 4); mem_wr(gb, 0xc4b2, A);  // ld ($c4b2),a
@@ -3559,7 +3499,7 @@ L_6da7:
   I(0x6da7, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x6daa, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6dab); return; } I(0x6dab, 2);  // ret nz
-  CALL(0x6dac, cutscene_incCutsceneState, 0x6f8c, 0x6daf);  // call $6f8c
+  CALL(0x6dac, cutscene_incCutsceneState_hook, 0x6f8c, 0x6daf);  // call $6f8c
   I(0x6daf, 2); A = 0x0e;  // ld a,$0e
   I(0x6db1, 4); mem_wr(gb, 0xcbb3, A);  // ld ($cbb3),a
   CALL(0x6db4, fadeinFromBlack_hook, 0x32e6, 0x6db7);  // call $32e6
@@ -3582,7 +3522,7 @@ L_6dc8:
   I(0x6dcd, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
   I(0x6dd0, 2); A = 0x78;  // ld a,$78
   I(0x6dd2, 4); mem_wr(gb, 0xcbb3, A);  // ld ($cbb3),a
-  I(0x6dd5, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6dd5, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6dd8
@@ -3591,7 +3531,7 @@ void pregameIntroCutsceneHandler__state6(GB *gb) {
 L_6dd8:
   CALL(0x6dd8, decCbb3_hook, 0x305d, 0x6ddb);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6ddb); return; } I(0x6ddb, 2);  // ret nz
-  CALL(0x6ddc, cutscene_incCutsceneState, 0x6f8c, 0x6ddf);  // call $6f8c
+  CALL(0x6ddc, cutscene_incCutsceneState_hook, 0x6f8c, 0x6ddf);  // call $6f8c
   I(0x6ddf, 2); A = 0x08;  // ld a,$08
   I(0x6de1, 4); mem_wr(gb, 0xcbae, A);  // ld ($cbae),a
   I(0x6de4, 2); A = 0x03;  // ld a,$03
@@ -3605,7 +3545,7 @@ void pregameIntroCutsceneHandler__state7(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6def:
   CALL(0x6def, retIfTextIsActive_hook, 0x1859, 0x6df2);  // call $1859
-  CALL(0x6df2, cutscene_incCutsceneState, 0x6f8c, 0x6df5);  // call $6f8c
+  CALL(0x6df2, cutscene_incCutsceneState_hook, 0x6f8c, 0x6df5);  // call $6f8c
   I(0x6df5, 4); mem_wr(gb, 0xcbb3, A);  // ld ($cbb3),a
   I(0x6df8, 1); A = alu_dec8(gb, A);  // dec a
   I(0x6df9, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
@@ -3622,7 +3562,7 @@ L_6e04:
   I(0x6e07, 2); B = 0x03;  // ld b,$03
   CALL(0x6e09, flashScreen_hook, 0x2d73, 0x6e0c);  // call $2d73
   if ((F & FZ)) { RET_TAKEN(0x6e0c); return; } I(0x6e0c, 2);  // ret z
-  CALL(0x6e0d, cutscene_incCutsceneState, 0x6f8c, 0x6e10);  // call $6f8c
+  CALL(0x6e0d, cutscene_incCutsceneState_hook, 0x6f8c, 0x6e10);  // call $6f8c
   I(0x6e10, 2); A = 0x3c;  // ld a,$3c
   I(0x6e12, 4); mem_wr(gb, 0xcbb3, A);  // ld ($cbb3),a
   I(0x6e15, 2); A = 0x02;  // ld a,$02
@@ -3638,7 +3578,7 @@ L_6e1a:
   if (!(F & FZ)) { RET_TAKEN(0x6e1e); return; } I(0x6e1e, 2);  // ret nz
   CALL(0x6e1f, decCbb3_hook, 0x305d, 0x6e22);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6e22); return; } I(0x6e22, 2);  // ret nz
-  I(0x6e23, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6e23, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6e26
@@ -3672,7 +3612,7 @@ L_6e26:
   I(0x6e5e, 3); mem_wr(gb, HL, 0x0b);  // ld (hl),$0b
   I(0x6e60, 2); A = 0x00;  // ld a,$00
   I(0x6e62, 4); mem_wr(gb, 0xcd00, A);  // ld ($cd00),a
-  CALL(0x6e65, cutscene_incCutsceneState, 0x6f8c, 0x6e68);  // call $6f8c
+  CALL(0x6e65, cutscene_incCutsceneState_hook, 0x6f8c, 0x6e68);  // call $6f8c
   CALL(0x6e68, clearPaletteFadeVariablesAndRefreshPalettes_hook, 0x3238, 0x6e6b);  // call $3238
   I(0x6e6b, 1); alu_xor(gb, A);  // xor a
   I(0x6e6c, 3); mem_wr(gb, 0xffaa, A);  // ldh ($ffaa),a
@@ -3691,7 +3631,7 @@ L_6e75:
   CALL(0x6e7b, clearLinkObject_hook, 0x35ba, 0x6e7e);  // call $35ba
   I(0x6e7e, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6e81, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x6e83, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6e83, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6e86
@@ -4435,7 +4375,7 @@ void nayruSingingStateF(GB *gb) {
   I(0x64fe, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x6501, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6502); return; } I(0x6502, 2);  // ret nz
-  CALL(0x6503, cutscene_incCutsceneState, 0x6f8c, 0x6506);  // call $6f8c
+  CALL(0x6503, cutscene_incCutsceneState_hook, 0x6f8c, 0x6506);  // call $6f8c
   CALL(0x6506, cutscene_loadRoomObjectSetAndFadein, 0x64c5, 0x6509);  // call $64c5
 L_6509:
   I(0x6509, 2); A = 0x99;  // ld a,$99
@@ -9948,7 +9888,7 @@ L_65ff:
   I(0x6603, 1); alu_or(gb, A);  // or a
   I(0x6604, 2); A = 0x21;  // ld a,$21
   if ((F & FZ)) { CALL(0x6606, playSound_b00_hook, 0x0c98, 0x6609); } else I(0x6606, 3);  // call z,$0c98
-  CALL(0x6609, cutscene_incCutsceneState, 0x6f8c, 0x660c);  // call $6f8c
+  CALL(0x6609, cutscene_incCutsceneState_hook, 0x6f8c, 0x660c);  // call $6f8c
   I(0x660c, 1); alu_xor(gb, A);  // xor a
   I(0x660d, 4); mem_wr(gb, 0xcbb9, A);  // ld ($cbb9),a
   CALL(0x6610, fadeinFromWhite_hook, 0x3299, 0x6613);  // call $3299
@@ -9967,7 +9907,7 @@ L_662b:
   if (!(F & FZ)) { RET_TAKEN(0x6635); return; } I(0x6635, 2);  // ret nz
   CALL(0x6636, decCbb3_hook, 0x305d, 0x6639);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6639); return; } I(0x6639, 2);  // ret nz
-  CALL(0x663a, cutscene_incCutsceneState, 0x6f8c, 0x663d);  // call $6f8c
+  CALL(0x663a, cutscene_incCutsceneState_hook, 0x6f8c, 0x663d);  // call $6f8c
   I(0x663d, 3); SET_BC(0x1005);  // ld bc,$1005
   I(0x6640, 4); A = mem_rd(gb, 0xcbb8);  // ld a,($cbb8)
   I(0x6643, 1); alu_or(gb, A);  // or a
@@ -9985,7 +9925,7 @@ L_6651:
   if (!(F & FZ)) { RET_TAKEN(0x665b); return; } I(0x665b, 2);  // ret nz
   I(0x665c, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x665f, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x6661, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6661, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6664:
   I(0x6664, 3); SET_DE(0xcc03);  // ld de,$cc03
   I(0x6667, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -9999,14 +9939,14 @@ L_6679:
   CALL(0x667c, func_6f44, 0x6f44, 0x667f);  // call $6f44
   CALL(0x667f, decCbb3_hook, 0x305d, 0x6682);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6682); return; } I(0x6682, 2);  // ret nz
-  CALL(0x6683, cutscene_incCutsceneState, 0x6f8c, 0x6686);  // call $6f8c
+  CALL(0x6683, cutscene_incCutsceneState_hook, 0x6f8c, 0x6686);  // call $6f8c
   I(0x6686, 4); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c);  // jp $326c
 L_6689:
   CALL(0x6689, func_6f44, 0x6f44, 0x668c);  // call $6f44
   I(0x668c, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x668f, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6690); return; } I(0x6690, 2);  // ret nz
-  CALL(0x6691, cutscene_incCutsceneState, 0x6f8c, 0x6694);  // call $6f8c
+  CALL(0x6691, cutscene_incCutsceneState_hook, 0x6f8c, 0x6694);  // call $6f8c
   CALL(0x6694, clearDynamicInteractions_hook, 0x35d2, 0x6697);  // call $35d2
   I(0x6697, 3); SET_BC(0x00ba);  // ld bc,$00ba
   CALL(0x669a, disableLcdAndLoadRoom_hook, 0x30b0, 0x669d);  // call $30b0
@@ -10074,13 +10014,13 @@ L_66fd:
   if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
   I(0x671b, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x671c, 4); mem_wr(gb, 0xcbb3, A);  // ld ($cbb3),a
-  I(0x671f, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x671f, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6725:
   CALL(0x6725, func_6ef7, 0x6ef7, 0x6728);  // call $6ef7
   CALL(0x6728, func_6f26, 0x6f26, 0x672b);  // call $6f26
   if (!(F & FZ)) { I(0x672b, 4); func_6f44(gb); return; } I(0x672b, 3);  // jp nz,$6f44
   I(0x672e, 3); mem_wr(gb, HL, 0x78);  // ld (hl),$78
-  CALL(0x6730, cutscene_incCutsceneState, 0x6f8c, 0x6733);  // call $6f8c
+  CALL(0x6730, cutscene_incCutsceneState_hook, 0x6f8c, 0x6733);  // call $6f8c
   func_6733(gb); return;  // fallthrough
 }
 
@@ -10125,7 +10065,7 @@ L_65ff:
   I(0x6603, 1); alu_or(gb, A);  // or a
   I(0x6604, 2); A = 0x21;  // ld a,$21
   if ((F & FZ)) { CALL(0x6606, playSound_b00_hook, 0x0c98, 0x6609); } else I(0x6606, 3);  // call z,$0c98
-  CALL(0x6609, cutscene_incCutsceneState, 0x6f8c, 0x660c);  // call $6f8c
+  CALL(0x6609, cutscene_incCutsceneState_hook, 0x6f8c, 0x660c);  // call $6f8c
   I(0x660c, 1); alu_xor(gb, A);  // xor a
   I(0x660d, 4); mem_wr(gb, 0xcbb9, A);  // ld ($cbb9),a
   CALL(0x6610, fadeinFromWhite_hook, 0x3299, 0x6613);  // call $3299
@@ -10144,7 +10084,7 @@ L_662b:
   if (!(F & FZ)) { RET_TAKEN(0x6635); return; } I(0x6635, 2);  // ret nz
   CALL(0x6636, decCbb3_hook, 0x305d, 0x6639);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6639); return; } I(0x6639, 2);  // ret nz
-  CALL(0x663a, cutscene_incCutsceneState, 0x6f8c, 0x663d);  // call $6f8c
+  CALL(0x663a, cutscene_incCutsceneState_hook, 0x6f8c, 0x663d);  // call $6f8c
   I(0x663d, 3); SET_BC(0x1005);  // ld bc,$1005
   I(0x6640, 4); A = mem_rd(gb, 0xcbb8);  // ld a,($cbb8)
   I(0x6643, 1); alu_or(gb, A);  // or a
@@ -10162,7 +10102,7 @@ L_6651:
   if (!(F & FZ)) { RET_TAKEN(0x665b); return; } I(0x665b, 2);  // ret nz
   I(0x665c, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x665f, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x6661, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6661, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:65d0
@@ -10198,7 +10138,7 @@ L_65ff:
   I(0x6603, 1); alu_or(gb, A);  // or a
   I(0x6604, 2); A = 0x21;  // ld a,$21
   if ((F & FZ)) { CALL(0x6606, playSound_b00_hook, 0x0c98, 0x6609); } else I(0x6606, 3);  // call z,$0c98
-  CALL(0x6609, cutscene_incCutsceneState, 0x6f8c, 0x660c);  // call $6f8c
+  CALL(0x6609, cutscene_incCutsceneState_hook, 0x6f8c, 0x660c);  // call $6f8c
   I(0x660c, 1); alu_xor(gb, A);  // xor a
   I(0x660d, 4); mem_wr(gb, 0xcbb9, A);  // ld ($cbb9),a
   CALL(0x6610, fadeinFromWhite_hook, 0x3299, 0x6613);  // call $3299
@@ -10228,7 +10168,7 @@ L_6625:
   if (!(F & FZ)) { RET_TAKEN(0x6635); return; } I(0x6635, 2);  // ret nz
   CALL(0x6636, decCbb3_hook, 0x305d, 0x6639);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6639); return; } I(0x6639, 2);  // ret nz
-  CALL(0x663a, cutscene_incCutsceneState, 0x6f8c, 0x663d);  // call $6f8c
+  CALL(0x663a, cutscene_incCutsceneState_hook, 0x6f8c, 0x663d);  // call $6f8c
   I(0x663d, 3); SET_BC(0x1005);  // ld bc,$1005
   I(0x6640, 4); A = mem_rd(gb, 0xcbb8);  // ld a,($cbb8)
   I(0x6643, 1); alu_or(gb, A);  // or a
@@ -10251,7 +10191,7 @@ L_662b:
   if (!(F & FZ)) { RET_TAKEN(0x6635); return; } I(0x6635, 2);  // ret nz
   CALL(0x6636, decCbb3_hook, 0x305d, 0x6639);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6639); return; } I(0x6639, 2);  // ret nz
-  CALL(0x663a, cutscene_incCutsceneState, 0x6f8c, 0x663d);  // call $6f8c
+  CALL(0x663a, cutscene_incCutsceneState_hook, 0x6f8c, 0x663d);  // call $6f8c
   I(0x663d, 3); SET_BC(0x1005);  // ld bc,$1005
   I(0x6640, 4); A = mem_rd(gb, 0xcbb8);  // ld a,($cbb8)
   I(0x6643, 1); alu_or(gb, A);  // or a
@@ -10274,7 +10214,7 @@ L_6651:
   if (!(F & FZ)) { RET_TAKEN(0x665b); return; } I(0x665b, 2);  // ret nz
   I(0x665c, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x665f, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x6661, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6661, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6664
@@ -10311,7 +10251,7 @@ L_65ff:
   I(0x6603, 1); alu_or(gb, A);  // or a
   I(0x6604, 2); A = 0x21;  // ld a,$21
   if ((F & FZ)) { CALL(0x6606, playSound_b00_hook, 0x0c98, 0x6609); } else I(0x6606, 3);  // call z,$0c98
-  CALL(0x6609, cutscene_incCutsceneState, 0x6f8c, 0x660c);  // call $6f8c
+  CALL(0x6609, cutscene_incCutsceneState_hook, 0x6f8c, 0x660c);  // call $6f8c
   I(0x660c, 1); alu_xor(gb, A);  // xor a
   I(0x660d, 4); mem_wr(gb, 0xcbb9, A);  // ld ($cbb9),a
   CALL(0x6610, fadeinFromWhite_hook, 0x3299, 0x6613);  // call $3299
@@ -10330,7 +10270,7 @@ L_662b:
   if (!(F & FZ)) { RET_TAKEN(0x6635); return; } I(0x6635, 2);  // ret nz
   CALL(0x6636, decCbb3_hook, 0x305d, 0x6639);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6639); return; } I(0x6639, 2);  // ret nz
-  CALL(0x663a, cutscene_incCutsceneState, 0x6f8c, 0x663d);  // call $6f8c
+  CALL(0x663a, cutscene_incCutsceneState_hook, 0x6f8c, 0x663d);  // call $6f8c
   I(0x663d, 3); SET_BC(0x1005);  // ld bc,$1005
   I(0x6640, 4); A = mem_rd(gb, 0xcbb8);  // ld a,($cbb8)
   I(0x6643, 1); alu_or(gb, A);  // or a
@@ -10348,7 +10288,7 @@ L_6651:
   if (!(F & FZ)) { RET_TAKEN(0x665b); return; } I(0x665b, 2);  // ret nz
   I(0x665c, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x665f, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x6661, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6661, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6664:
   I(0x6664, 3); SET_DE(0xcc03);  // ld de,$cc03
   I(0x6667, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -10362,14 +10302,14 @@ L_6679:
   CALL(0x667c, func_6f44, 0x6f44, 0x667f);  // call $6f44
   CALL(0x667f, decCbb3_hook, 0x305d, 0x6682);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6682); return; } I(0x6682, 2);  // ret nz
-  CALL(0x6683, cutscene_incCutsceneState, 0x6f8c, 0x6686);  // call $6f8c
+  CALL(0x6683, cutscene_incCutsceneState_hook, 0x6f8c, 0x6686);  // call $6f8c
   I(0x6686, 4); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c);  // jp $326c
 L_6689:
   CALL(0x6689, func_6f44, 0x6f44, 0x668c);  // call $6f44
   I(0x668c, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x668f, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6690); return; } I(0x6690, 2);  // ret nz
-  CALL(0x6691, cutscene_incCutsceneState, 0x6f8c, 0x6694);  // call $6f8c
+  CALL(0x6691, cutscene_incCutsceneState_hook, 0x6f8c, 0x6694);  // call $6f8c
   CALL(0x6694, clearDynamicInteractions_hook, 0x35d2, 0x6697);  // call $35d2
   I(0x6697, 3); SET_BC(0x00ba);  // ld bc,$00ba
   CALL(0x669a, disableLcdAndLoadRoom_hook, 0x30b0, 0x669d);  // call $30b0
@@ -10429,13 +10369,13 @@ L_66fd:
   if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
   I(0x671b, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x671c, 4); mem_wr(gb, 0xcbb3, A);  // ld ($cbb3),a
-  I(0x671f, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x671f, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6725:
   CALL(0x6725, func_6ef7, 0x6ef7, 0x6728);  // call $6ef7
   CALL(0x6728, func_6f26, 0x6f26, 0x672b);  // call $6f26
   if (!(F & FZ)) { I(0x672b, 4); func_6f44(gb); return; } I(0x672b, 3);  // jp nz,$6f44
   I(0x672e, 3); mem_wr(gb, HL, 0x78);  // ld (hl),$78
-  CALL(0x6730, cutscene_incCutsceneState, 0x6f8c, 0x6733);  // call $6f8c
+  CALL(0x6730, cutscene_incCutsceneState_hook, 0x6f8c, 0x6733);  // call $6f8c
   func_6733(gb); return;  // fallthrough
 }
 
@@ -10447,7 +10387,7 @@ L_6679:
   CALL(0x667c, func_6f44, 0x6f44, 0x667f);  // call $6f44
   CALL(0x667f, decCbb3_hook, 0x305d, 0x6682);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6682); return; } I(0x6682, 2);  // ret nz
-  CALL(0x6683, cutscene_incCutsceneState, 0x6f8c, 0x6686);  // call $6f8c
+  CALL(0x6683, cutscene_incCutsceneState_hook, 0x6f8c, 0x6686);  // call $6f8c
   I(0x6686, 4); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c);  // jp $326c
 }
 
@@ -10459,7 +10399,7 @@ L_6689:
   I(0x668c, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x668f, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6690); return; } I(0x6690, 2);  // ret nz
-  CALL(0x6691, cutscene_incCutsceneState, 0x6f8c, 0x6694);  // call $6f8c
+  CALL(0x6691, cutscene_incCutsceneState_hook, 0x6f8c, 0x6694);  // call $6f8c
   CALL(0x6694, clearDynamicInteractions_hook, 0x35d2, 0x6697);  // call $35d2
   I(0x6697, 3); SET_BC(0x00ba);  // ld bc,$00ba
   CALL(0x669a, disableLcdAndLoadRoom_hook, 0x30b0, 0x669d);  // call $30b0
@@ -10542,7 +10482,7 @@ L_65ff:
   I(0x6603, 1); alu_or(gb, A);  // or a
   I(0x6604, 2); A = 0x21;  // ld a,$21
   if ((F & FZ)) { CALL(0x6606, playSound_b00_hook, 0x0c98, 0x6609); } else I(0x6606, 3);  // call z,$0c98
-  CALL(0x6609, cutscene_incCutsceneState, 0x6f8c, 0x660c);  // call $6f8c
+  CALL(0x6609, cutscene_incCutsceneState_hook, 0x6f8c, 0x660c);  // call $6f8c
   I(0x660c, 1); alu_xor(gb, A);  // xor a
   I(0x660d, 4); mem_wr(gb, 0xcbb9, A);  // ld ($cbb9),a
   CALL(0x6610, fadeinFromWhite_hook, 0x3299, 0x6613);  // call $3299
@@ -10579,13 +10519,13 @@ L_66fd:
   if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
   I(0x671b, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x671c, 4); mem_wr(gb, 0xcbb3, A);  // ld ($cbb3),a
-  I(0x671f, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x671f, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6725:
   CALL(0x6725, func_6ef7, 0x6ef7, 0x6728);  // call $6ef7
   CALL(0x6728, func_6f26, 0x6f26, 0x672b);  // call $6f26
   if (!(F & FZ)) { I(0x672b, 4); func_6f44(gb); return; } I(0x672b, 3);  // jp nz,$6f44
   I(0x672e, 3); mem_wr(gb, HL, 0x78);  // ld (hl),$78
-  CALL(0x6730, cutscene_incCutsceneState, 0x6f8c, 0x6733);  // call $6f8c
+  CALL(0x6730, cutscene_incCutsceneState_hook, 0x6f8c, 0x6733);  // call $6f8c
   func_6733(gb); return;  // fallthrough
 }
 
@@ -10610,7 +10550,7 @@ L_66fd:
   if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
   I(0x671b, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x671c, 4); mem_wr(gb, 0xcbb3, A);  // ld ($cbb3),a
-  I(0x671f, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x671f, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6722
@@ -10623,7 +10563,7 @@ L_6725:
   CALL(0x6728, func_6f26, 0x6f26, 0x672b);  // call $6f26
   if (!(F & FZ)) { I(0x672b, 4); func_6f44(gb); return; } I(0x672b, 3);  // jp nz,$6f44
   I(0x672e, 3); mem_wr(gb, HL, 0x78);  // ld (hl),$78
-  CALL(0x6730, cutscene_incCutsceneState, 0x6f8c, 0x6733);  // call $6f8c
+  CALL(0x6730, cutscene_incCutsceneState_hook, 0x6f8c, 0x6733);  // call $6f8c
   func_6733(gb); return;  // fallthrough
 }
 
@@ -10635,7 +10575,7 @@ L_6725:
   CALL(0x6728, func_6f26, 0x6f26, 0x672b);  // call $6f26
   if (!(F & FZ)) { I(0x672b, 4); func_6f44(gb); return; } I(0x672b, 3);  // jp nz,$6f44
   I(0x672e, 3); mem_wr(gb, HL, 0x78);  // ld (hl),$78
-  CALL(0x6730, cutscene_incCutsceneState, 0x6f8c, 0x6733);  // call $6f8c
+  CALL(0x6730, cutscene_incCutsceneState_hook, 0x6f8c, 0x6733);  // call $6f8c
   func_6733(gb); return;  // fallthrough
 }
 
@@ -10760,7 +10700,7 @@ L_67a4:
   I(0x67a4, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x67a7, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x67a8); return; } I(0x67a8, 2);  // ret nz
-  CALL(0x67a9, cutscene_incCutsceneState, 0x6f8c, 0x67ac);  // call $6f8c
+  CALL(0x67a9, cutscene_incCutsceneState_hook, 0x6f8c, 0x67ac);  // call $6f8c
   CALL(0x67ac, clearDynamicInteractions_hook, 0x35d2, 0x67af);  // call $35d2
   I(0x67af, 3); SET_BC(0x0038);  // ld bc,$0038
   CALL(0x67b2, disableLcdAndLoadRoom_hook, 0x30b0, 0x67b5);  // call $30b0
@@ -10795,7 +10735,7 @@ L_67fc:
   CALL(0x67fc, cutscene_decCBB3whenFadeDone, 0x6f96, 0x67ff);  // call $6f96
   if (!(F & FZ)) { RET_TAKEN(0x67ff); return; } I(0x67ff, 2);  // ret nz
   I(0x6800, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  CALL(0x6802, cutscene_incCutsceneState, 0x6f8c, 0x6805);  // call $6f8c
+  CALL(0x6802, cutscene_incCutsceneState_hook, 0x6f8c, 0x6805);  // call $6f8c
   I(0x6805, 2); A = 0x68;  // ld a,$68
   I(0x6807, 3); SET_BC(0x5050);  // ld bc,$5050
   I(0x680a, 4); if (hook_enabled_at(0x29d8)) { createEnergySwirlGoingIn_hook(gb); return; } HANDOFF(0x29d8);  // jp $29d8
@@ -10806,13 +10746,13 @@ L_680d:
   I(0x6812, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x6813, 1); A = alu_dec8(gb, A);  // dec a
   I(0x6814, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x6817, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6817, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_681a:
   I(0x681a, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x681d, 2); B = 0x02;  // ld b,$02
   CALL(0x681f, flashScreen_hook, 0x2d73, 0x6822);  // call $2d73
   if ((F & FZ)) { RET_TAKEN(0x6822); return; } I(0x6822, 2);  // ret z
-  CALL(0x6823, cutscene_incCutsceneState, 0x6f8c, 0x6826);  // call $6f8c
+  CALL(0x6823, cutscene_incCutsceneState_hook, 0x6f8c, 0x6826);  // call $6f8c
   I(0x6826, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6829, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x682b, 2); A = 0x01;  // ld a,$01
@@ -10823,12 +10763,12 @@ L_681a:
 L_684e:
   CALL(0x684e, cutscene_decCBB3whenFadeDone, 0x6f96, 0x6851);  // call $6f96
   if (!(F & FZ)) { RET_TAKEN(0x6851); return; } I(0x6851, 2);  // ret nz
-  I(0x6852, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6852, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6855:
   I(0x6855, 4); A = mem_rd(gb, 0xcfd0);  // ld a,($cfd0)
   I(0x6858, 2); alu_cp(gb, 0x02);  // cp $02
   if (!(F & FZ)) { RET_TAKEN(0x685a); return; } I(0x685a, 2);  // ret nz
-  CALL(0x685b, cutscene_incCutsceneState, 0x6f8c, 0x685e);  // call $6f8c
+  CALL(0x685b, cutscene_incCutsceneState_hook, 0x6f8c, 0x685e);  // call $6f8c
   I(0x685e, 2); A = 0xfa;  // ld a,$fa
   CALL(0x6860, playSound_b00_hook, 0x0c98, 0x6863);  // call $0c98
   I(0x6863, 1); alu_xor(gb, A);  // xor a
@@ -10841,7 +10781,7 @@ L_686f:
   I(0x686f, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x6872, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6873); return; } I(0x6873, 2);  // ret nz
-  CALL(0x6874, cutscene_incCutsceneState, 0x6f8c, 0x6877);  // call $6f8c
+  CALL(0x6874, cutscene_incCutsceneState_hook, 0x6f8c, 0x6877);  // call $6f8c
   CALL(0x6877, cutscene_loadRoomObjectSetAndFadein, 0x64c5, 0x687a);  // call $64c5
   I(0x687a, 2); A = 0x02;  // ld a,$02
   I(0x687c, 4); if (hook_enabled_at(0x02ea)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
@@ -10871,7 +10811,7 @@ L_68a3:
   I(0x68a3, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x68a6, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x68a7); return; } I(0x68a7, 2);  // ret nz
-  CALL(0x68a8, cutscene_incCutsceneState, 0x6f8c, 0x68ab);  // call $6f8c
+  CALL(0x68a8, cutscene_incCutsceneState_hook, 0x6f8c, 0x68ab);  // call $6f8c
   CALL(0x68ab, cutscene_loadRoomObjectSetAndFadein, 0x64c5, 0x68ae);  // call $64c5
   CALL(0x68ae, nayruWarpToMakuTreeCutsceneHandler__func_6838, 0x6838, 0x68b1);  // call $6838
   I(0x68b1, 2); A = 0x01;  // ld a,$01
@@ -10902,7 +10842,7 @@ L_68e8:
   I(0x68e8, 4); A = mem_rd(gb, 0xcfd0);  // ld a,($cfd0)
   I(0x68eb, 2); alu_cp(gb, 0x07);  // cp $07
   if (!(F & FZ)) { RET_TAKEN(0x68ed); return; } I(0x68ed, 2);  // ret nz
-  CALL(0x68ee, cutscene_incCutsceneState, 0x6f8c, 0x68f1);  // call $6f8c
+  CALL(0x68ee, cutscene_incCutsceneState_hook, 0x6f8c, 0x68f1);  // call $6f8c
   I(0x68f1, 2); A = 0xf1;  // ld a,$f1
   CALL(0x68f3, playSound_b00_hook, 0x0c98, 0x68f6);  // call $0c98
   I(0x68f6, 3); SET_BC(0x2800);  // ld bc,$2800
@@ -10915,7 +10855,7 @@ L_6903:
   I(0x6903, 4); A = mem_rd(gb, 0xcba0);  // ld a,($cba0)
   I(0x6906, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6907); return; } I(0x6907, 2);  // ret nz
-  CALL(0x6908, cutscene_incCutsceneState, 0x6f8c, 0x690b);  // call $6f8c
+  CALL(0x6908, cutscene_incCutsceneState_hook, 0x6f8c, 0x690b);  // call $6f8c
   I(0x690b, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x690e, 3); mem_wr(gb, HL, 0xb4);  // ld (hl),$b4
   I(0x6910, 2); A = 0x01;  // ld a,$01
@@ -10947,7 +10887,7 @@ L_693e:
   if (!(F & FZ)) { I(0x6941, 3); goto L_6945; } I(0x6941, 2);  // jr nz,$6945
   I(0x6943, 3); mem_wr(gb, HL, 0x8d);  // ld (hl),$8d
 L_6945:
-  I(0x6945, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6945, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6948:
   CALL(0x6948, cutscene_decCBB6, 0x6f91, 0x694b);  // call $6f91
   if (!(F & FZ)) { RET_TAKEN(0x694b); return; } I(0x694b, 2);  // ret nz
@@ -11013,7 +10953,7 @@ L_67a4:
   I(0x67a4, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x67a7, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x67a8); return; } I(0x67a8, 2);  // ret nz
-  CALL(0x67a9, cutscene_incCutsceneState, 0x6f8c, 0x67ac);  // call $6f8c
+  CALL(0x67a9, cutscene_incCutsceneState_hook, 0x6f8c, 0x67ac);  // call $6f8c
   CALL(0x67ac, clearDynamicInteractions_hook, 0x35d2, 0x67af);  // call $35d2
   I(0x67af, 3); SET_BC(0x0038);  // ld bc,$0038
   CALL(0x67b2, disableLcdAndLoadRoom_hook, 0x30b0, 0x67b5);  // call $30b0
@@ -11053,7 +10993,7 @@ L_67fc:
   CALL(0x67fc, cutscene_decCBB3whenFadeDone, 0x6f96, 0x67ff);  // call $6f96
   if (!(F & FZ)) { RET_TAKEN(0x67ff); return; } I(0x67ff, 2);  // ret nz
   I(0x6800, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  CALL(0x6802, cutscene_incCutsceneState, 0x6f8c, 0x6805);  // call $6f8c
+  CALL(0x6802, cutscene_incCutsceneState_hook, 0x6f8c, 0x6805);  // call $6f8c
   I(0x6805, 2); A = 0x68;  // ld a,$68
   I(0x6807, 3); SET_BC(0x5050);  // ld bc,$5050
   I(0x680a, 4); if (hook_enabled_at(0x29d8)) { createEnergySwirlGoingIn_hook(gb); return; } HANDOFF(0x29d8);  // jp $29d8
@@ -11069,7 +11009,7 @@ L_680d:
   I(0x6812, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x6813, 1); A = alu_dec8(gb, A);  // dec a
   I(0x6814, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x6817, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6817, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:681a
@@ -11080,7 +11020,7 @@ L_681a:
   I(0x681d, 2); B = 0x02;  // ld b,$02
   CALL(0x681f, flashScreen_hook, 0x2d73, 0x6822);  // call $2d73
   if ((F & FZ)) { RET_TAKEN(0x6822); return; } I(0x6822, 2);  // ret z
-  CALL(0x6823, cutscene_incCutsceneState, 0x6f8c, 0x6826);  // call $6f8c
+  CALL(0x6823, cutscene_incCutsceneState_hook, 0x6f8c, 0x6826);  // call $6f8c
   I(0x6826, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6829, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x682b, 2); A = 0x01;  // ld a,$01
@@ -11113,7 +11053,7 @@ void nayruWarpToMakuTreeCutsceneHandler__state4(GB *gb) {
 L_684e:
   CALL(0x684e, cutscene_decCBB3whenFadeDone, 0x6f96, 0x6851);  // call $6f96
   if (!(F & FZ)) { RET_TAKEN(0x6851); return; } I(0x6851, 2);  // ret nz
-  I(0x6852, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6852, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6855
@@ -11123,7 +11063,7 @@ L_6855:
   I(0x6855, 4); A = mem_rd(gb, 0xcfd0);  // ld a,($cfd0)
   I(0x6858, 2); alu_cp(gb, 0x02);  // cp $02
   if (!(F & FZ)) { RET_TAKEN(0x685a); return; } I(0x685a, 2);  // ret nz
-  CALL(0x685b, cutscene_incCutsceneState, 0x6f8c, 0x685e);  // call $6f8c
+  CALL(0x685b, cutscene_incCutsceneState_hook, 0x6f8c, 0x685e);  // call $6f8c
   I(0x685e, 2); A = 0xfa;  // ld a,$fa
   CALL(0x6860, playSound_b00_hook, 0x0c98, 0x6863);  // call $0c98
   I(0x6863, 1); alu_xor(gb, A);  // xor a
@@ -11141,7 +11081,7 @@ L_686f:
   I(0x686f, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x6872, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6873); return; } I(0x6873, 2);  // ret nz
-  CALL(0x6874, cutscene_incCutsceneState, 0x6f8c, 0x6877);  // call $6f8c
+  CALL(0x6874, cutscene_incCutsceneState_hook, 0x6f8c, 0x6877);  // call $6f8c
   CALL(0x6877, cutscene_loadRoomObjectSetAndFadein, 0x64c5, 0x687a);  // call $64c5
   I(0x687a, 2); A = 0x02;  // ld a,$02
   I(0x687c, 4); if (hook_enabled_at(0x02ea)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
@@ -11181,7 +11121,7 @@ L_68a3:
   I(0x68a3, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x68a6, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x68a7); return; } I(0x68a7, 2);  // ret nz
-  CALL(0x68a8, cutscene_incCutsceneState, 0x6f8c, 0x68ab);  // call $6f8c
+  CALL(0x68a8, cutscene_incCutsceneState_hook, 0x6f8c, 0x68ab);  // call $6f8c
   CALL(0x68ab, cutscene_loadRoomObjectSetAndFadein, 0x64c5, 0x68ae);  // call $64c5
   CALL(0x68ae, nayruWarpToMakuTreeCutsceneHandler__func_6838, 0x6838, 0x68b1);  // call $6838
   I(0x68b1, 2); A = 0x01;  // ld a,$01
@@ -11217,7 +11157,7 @@ L_68e8:
   I(0x68e8, 4); A = mem_rd(gb, 0xcfd0);  // ld a,($cfd0)
   I(0x68eb, 2); alu_cp(gb, 0x07);  // cp $07
   if (!(F & FZ)) { RET_TAKEN(0x68ed); return; } I(0x68ed, 2);  // ret nz
-  CALL(0x68ee, cutscene_incCutsceneState, 0x6f8c, 0x68f1);  // call $6f8c
+  CALL(0x68ee, cutscene_incCutsceneState_hook, 0x6f8c, 0x68f1);  // call $6f8c
   I(0x68f1, 2); A = 0xf1;  // ld a,$f1
   CALL(0x68f3, playSound_b00_hook, 0x0c98, 0x68f6);  // call $0c98
   I(0x68f6, 3); SET_BC(0x2800);  // ld bc,$2800
@@ -11235,7 +11175,7 @@ L_6903:
   I(0x6903, 4); A = mem_rd(gb, 0xcba0);  // ld a,($cba0)
   I(0x6906, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6907); return; } I(0x6907, 2);  // ret nz
-  CALL(0x6908, cutscene_incCutsceneState, 0x6f8c, 0x690b);  // call $6f8c
+  CALL(0x6908, cutscene_incCutsceneState_hook, 0x6f8c, 0x690b);  // call $6f8c
   I(0x690b, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x690e, 3); mem_wr(gb, HL, 0xb4);  // ld (hl),$b4
   I(0x6910, 2); A = 0x01;  // ld a,$01
@@ -11280,7 +11220,7 @@ L_693e:
   if (!(F & FZ)) { I(0x6941, 3); goto L_6945; } I(0x6941, 2);  // jr nz,$6945
   I(0x6943, 3); mem_wr(gb, HL, 0x8d);  // ld (hl),$8d
 L_6945:
-  I(0x6945, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6945, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6948:
   CALL(0x6948, cutscene_decCBB6, 0x6f91, 0x694b);  // call $6f91
   if (!(F & FZ)) { RET_TAKEN(0x694b); return; } I(0x694b, 2);  // ret nz
@@ -11319,14 +11259,14 @@ L_693e:
   if (!(F & FZ)) { I(0x6941, 3); goto L_6945; } I(0x6941, 2);  // jr nz,$6945
   I(0x6943, 3); mem_wr(gb, HL, 0x8d);  // ld (hl),$8d
 L_6945:
-  I(0x6945, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6945, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6945
 void nayruWarpToMakuTreeCutsceneHandler__incCutsceneState(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6945:
-  I(0x6945, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6945, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6948
@@ -11458,11 +11398,11 @@ L_69be:
 L_69cf:
   I(0x69cf, 2); A = 0x3c;  // ld a,$3c
   I(0x69d1, 4); mem_wr(gb, 0xcbb3, A);  // ld ($cbb3),a
-  I(0x69d4, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x69d4, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_69d7:
   CALL(0x69d7, decCbb3_hook, 0x305d, 0x69da);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x69da); return; } I(0x69da, 2);  // ret nz
-  CALL(0x69db, cutscene_incCutsceneState, 0x6f8c, 0x69de);  // call $6f8c
+  CALL(0x69db, cutscene_incCutsceneState_hook, 0x6f8c, 0x69de);  // call $6f8c
   I(0x69de, 2); A = 0xfa;  // ld a,$fa
   CALL(0x69e0, playSound_b00_hook, 0x0c98, 0x69e3);  // call $0c98
   I(0x69e3, 4); if (hook_enabled_at(0x32b7)) { fastFadeoutToBlack_hook(gb); return; } HANDOFF(0x32b7);  // jp $32b7
@@ -11493,7 +11433,7 @@ L_69e6:
   I(0x6a1a, 4); mem_wr(gb, 0xcd08, A);  // ld ($cd08),a
   CALL(0x6a1d, checkIsLinkedGame_hook, 0x1992, 0x6a20);  // call $1992
   if ((F & FZ)) { I(0x6a20, 3); goto L_6a2b; } I(0x6a20, 2);  // jr z,$6a2b
-  CALL(0x6a22, cutscene_incCutsceneState, 0x6f8c, 0x6a25);  // call $6f8c
+  CALL(0x6a22, cutscene_incCutsceneState_hook, 0x6f8c, 0x6a25);  // call $6f8c
   I(0x6a25, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6a28, 3); mem_wr(gb, HL, 0x1e);  // ld (hl),$1e
   RET(0x6a2a); return;  // ret
@@ -11503,7 +11443,7 @@ L_6a2b:
   I(0x6a31, 2); A = 0x05;  // ld a,$05
   I(0x6a33, 4); mem_wr(gb, 0xcc03, A);  // ld ($cc03),a
   I(0x6a36, 3); SET_BC(0x8d01);  // ld bc,$8d01
-  I(0x6a39, 4); createInteraction(gb); return;  // jp $540c
+  I(0x6a39, 4); if (hook_enabled_at(0x540c)) { createInteraction_hook(gb); return; } HANDOFF(0x540c);  // jp $540c
 L_6a3c:
   CALL(0x6a3c, decCbb3_hook, 0x305d, 0x6a3f);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x6a3f); return; } I(0x6a3f, 2);  // ret nz
@@ -11515,13 +11455,13 @@ L_6a3c:
   I(0x6a4a, 1); A = alu_dec8(gb, A);  // dec a
   I(0x6a4b, 3); SET_HL(0xcbba);  // ld hl,$cbba
   I(0x6a4e, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x6a4f, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6a4f, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6a52:
   I(0x6a52, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6a55, 2); B = 0x02;  // ld b,$02
   CALL(0x6a57, flashScreen_hook, 0x2d73, 0x6a5a);  // call $2d73
   if ((F & FZ)) { RET_TAKEN(0x6a5a); return; } I(0x6a5a, 2);  // ret z
-  CALL(0x6a5b, cutscene_incCutsceneState, 0x6f8c, 0x6a5e);  // call $6f8c
+  CALL(0x6a5b, cutscene_incCutsceneState_hook, 0x6f8c, 0x6a5e);  // call $6f8c
   I(0x6a5e, 2); A = 0x10;  // ld a,$10
   I(0x6a60, 4); mem_wr(gb, 0xcfde, A);  // ld ($cfde),a
   I(0x6a63, 3); SET_HL(0x64c5);  // ld hl,$64c5
@@ -11551,7 +11491,7 @@ void blackTowerCompleteCutsceneHandler__state0(GB *gb) {
 L_69cf:
   I(0x69cf, 2); A = 0x3c;  // ld a,$3c
   I(0x69d1, 4); mem_wr(gb, 0xcbb3, A);  // ld ($cbb3),a
-  I(0x69d4, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x69d4, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:69d7
@@ -11560,7 +11500,7 @@ void blackTowerCompleteCutsceneHandler__state1(GB *gb) {
 L_69d7:
   CALL(0x69d7, decCbb3_hook, 0x305d, 0x69da);  // call $305d
   if (!(F & FZ)) { RET_TAKEN(0x69da); return; } I(0x69da, 2);  // ret nz
-  CALL(0x69db, cutscene_incCutsceneState, 0x6f8c, 0x69de);  // call $6f8c
+  CALL(0x69db, cutscene_incCutsceneState_hook, 0x6f8c, 0x69de);  // call $6f8c
   I(0x69de, 2); A = 0xfa;  // ld a,$fa
   CALL(0x69e0, playSound_b00_hook, 0x0c98, 0x69e3);  // call $0c98
   I(0x69e3, 4); if (hook_enabled_at(0x32b7)) { fastFadeoutToBlack_hook(gb); return; } HANDOFF(0x32b7);  // jp $32b7
@@ -11596,7 +11536,7 @@ L_69e6:
   I(0x6a1a, 4); mem_wr(gb, 0xcd08, A);  // ld ($cd08),a
   CALL(0x6a1d, checkIsLinkedGame_hook, 0x1992, 0x6a20);  // call $1992
   if ((F & FZ)) { I(0x6a20, 3); goto L_6a2b; } I(0x6a20, 2);  // jr z,$6a2b
-  CALL(0x6a22, cutscene_incCutsceneState, 0x6f8c, 0x6a25);  // call $6f8c
+  CALL(0x6a22, cutscene_incCutsceneState_hook, 0x6f8c, 0x6a25);  // call $6f8c
   I(0x6a25, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6a28, 3); mem_wr(gb, HL, 0x1e);  // ld (hl),$1e
   RET(0x6a2a); return;  // ret
@@ -11606,7 +11546,7 @@ L_6a2b:
   I(0x6a31, 2); A = 0x05;  // ld a,$05
   I(0x6a33, 4); mem_wr(gb, 0xcc03, A);  // ld ($cc03),a
   I(0x6a36, 3); SET_BC(0x8d01);  // ld bc,$8d01
-  I(0x6a39, 4); createInteraction(gb); return;  // jp $540c
+  I(0x6a39, 4); if (hook_enabled_at(0x540c)) { createInteraction_hook(gb); return; } HANDOFF(0x540c);  // jp $540c
 }
 
 // 03:6a2b
@@ -11618,7 +11558,7 @@ L_6a2b:
   I(0x6a31, 2); A = 0x05;  // ld a,$05
   I(0x6a33, 4); mem_wr(gb, 0xcc03, A);  // ld ($cc03),a
   I(0x6a36, 3); SET_BC(0x8d01);  // ld bc,$8d01
-  I(0x6a39, 4); createInteraction(gb); return;  // jp $540c
+  I(0x6a39, 4); if (hook_enabled_at(0x540c)) { createInteraction_hook(gb); return; } HANDOFF(0x540c);  // jp $540c
 }
 
 // 03:6a3c
@@ -11635,7 +11575,7 @@ L_6a3c:
   I(0x6a4a, 1); A = alu_dec8(gb, A);  // dec a
   I(0x6a4b, 3); SET_HL(0xcbba);  // ld hl,$cbba
   I(0x6a4e, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x6a4f, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6a4f, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6a52
@@ -11646,7 +11586,7 @@ L_6a52:
   I(0x6a55, 2); B = 0x02;  // ld b,$02
   CALL(0x6a57, flashScreen_hook, 0x2d73, 0x6a5a);  // call $2d73
   if ((F & FZ)) { RET_TAKEN(0x6a5a); return; } I(0x6a5a, 2);  // ret z
-  CALL(0x6a5b, cutscene_incCutsceneState, 0x6f8c, 0x6a5e);  // call $6f8c
+  CALL(0x6a5b, cutscene_incCutsceneState_hook, 0x6f8c, 0x6a5e);  // call $6f8c
   I(0x6a5e, 2); A = 0x10;  // ld a,$10
   I(0x6a60, 4); mem_wr(gb, 0xcfde, A);  // ld ($cfde),a
   I(0x6a63, 3); SET_HL(0x64c5);  // ld hl,$64c5
@@ -11706,7 +11646,7 @@ L_6a97:
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x6aaa: goto L_6aaa; case 0x6ac3: goto L_6ac3; case 0x6ad3: goto L_6ad3; case 0x6af2: goto L_6af2; case 0x6b16: goto L_6b16; case 0x6b22: goto L_6b22; case 0x6b66: goto L_6b66; default: HANDOFF(HL); }
 L_6aaa:
-  CALL(0x6aaa, cutscene_incCutsceneState, 0x6f8c, 0x6aad);  // call $6f8c
+  CALL(0x6aaa, cutscene_incCutsceneState_hook, 0x6f8c, 0x6aad);  // call $6f8c
   I(0x6aad, 2); B = 0x20;  // ld b,$20
   I(0x6aaf, 3); SET_HL(0xcfc0);  // ld hl,$cfc0
   CALL(0x6ab2, clearMemory_hook, 0x046f, 0x6ab5);  // call $046f
@@ -11720,7 +11660,7 @@ L_6ac3:
   I(0x6ac3, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x6ac6, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6ac7); return; } I(0x6ac7, 2);  // ret nz
-  CALL(0x6ac8, cutscene_incCutsceneState, 0x6f8c, 0x6acb);  // call $6f8c
+  CALL(0x6ac8, cutscene_incCutsceneState_hook, 0x6f8c, 0x6acb);  // call $6f8c
   CALL(0x6acb, cutscene_loadRoomObjectSetAndFadein, 0x64c5, 0x6ace);  // call $64c5
   I(0x6ace, 2); A = 0x02;  // ld a,$02
   I(0x6ad0, 4); if (hook_enabled_at(0x02ea)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
@@ -11768,13 +11708,13 @@ L_6b16:
   I(0x6b16, 4); A = mem_rd(gb, 0xcfc0);  // ld a,($cfc0)
   I(0x6b19, 2); alu_cp(gb, 0x03);  // cp $03
   if (!(F & FZ)) { RET_TAKEN(0x6b1b); return; } I(0x6b1b, 2);  // ret nz
-  CALL(0x6b1c, cutscene_incCutsceneState, 0x6f8c, 0x6b1f);  // call $6f8c
+  CALL(0x6b1c, cutscene_incCutsceneState_hook, 0x6f8c, 0x6b1f);  // call $6f8c
   I(0x6b1f, 4); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c);  // jp $326c
 L_6b22:
   I(0x6b22, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x6b25, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6b26); return; } I(0x6b26, 2);  // ret nz
-  CALL(0x6b27, cutscene_incCutsceneState, 0x6f8c, 0x6b2a);  // call $6f8c
+  CALL(0x6b27, cutscene_incCutsceneState_hook, 0x6f8c, 0x6b2a);  // call $6f8c
   CALL(0x6b2a, clearDynamicInteractions_hook, 0x35d2, 0x6b2d);  // call $35d2
   I(0x6b2d, 3); SET_BC(0x0290);  // ld bc,$0290
   CALL(0x6b30, disableLcdAndLoadRoom_hook, 0x30b0, 0x6b33);  // call $30b0
@@ -11813,7 +11753,7 @@ L_6b66:
 void turnToStoneCutsceneHandler__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6aaa:
-  CALL(0x6aaa, cutscene_incCutsceneState, 0x6f8c, 0x6aad);  // call $6f8c
+  CALL(0x6aaa, cutscene_incCutsceneState_hook, 0x6f8c, 0x6aad);  // call $6f8c
   I(0x6aad, 2); B = 0x20;  // ld b,$20
   I(0x6aaf, 3); SET_HL(0xcfc0);  // ld hl,$cfc0
   CALL(0x6ab2, clearMemory_hook, 0x046f, 0x6ab5);  // call $046f
@@ -11832,7 +11772,7 @@ L_6ac3:
   I(0x6ac3, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x6ac6, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6ac7); return; } I(0x6ac7, 2);  // ret nz
-  CALL(0x6ac8, cutscene_incCutsceneState, 0x6f8c, 0x6acb);  // call $6f8c
+  CALL(0x6ac8, cutscene_incCutsceneState_hook, 0x6f8c, 0x6acb);  // call $6f8c
   CALL(0x6acb, cutscene_loadRoomObjectSetAndFadein, 0x64c5, 0x6ace);  // call $64c5
   I(0x6ace, 2); A = 0x02;  // ld a,$02
   I(0x6ad0, 4); if (hook_enabled_at(0x02ea)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
@@ -11895,7 +11835,7 @@ L_6b16:
   I(0x6b16, 4); A = mem_rd(gb, 0xcfc0);  // ld a,($cfc0)
   I(0x6b19, 2); alu_cp(gb, 0x03);  // cp $03
   if (!(F & FZ)) { RET_TAKEN(0x6b1b); return; } I(0x6b1b, 2);  // ret nz
-  CALL(0x6b1c, cutscene_incCutsceneState, 0x6f8c, 0x6b1f);  // call $6f8c
+  CALL(0x6b1c, cutscene_incCutsceneState_hook, 0x6f8c, 0x6b1f);  // call $6f8c
   I(0x6b1f, 4); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c);  // jp $326c
 }
 
@@ -11906,7 +11846,7 @@ L_6b22:
   I(0x6b22, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x6b25, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6b26); return; } I(0x6b26, 2);  // ret nz
-  CALL(0x6b27, cutscene_incCutsceneState, 0x6f8c, 0x6b2a);  // call $6f8c
+  CALL(0x6b27, cutscene_incCutsceneState_hook, 0x6f8c, 0x6b2a);  // call $6f8c
   CALL(0x6b2a, clearDynamicInteractions_hook, 0x35d2, 0x6b2d);  // call $35d2
   I(0x6b2d, 3); SET_BC(0x0290);  // ld bc,$0290
   CALL(0x6b30, disableLcdAndLoadRoom_hook, 0x30b0, 0x6b33);  // call $30b0
@@ -11975,7 +11915,7 @@ L_6b80:
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x6b99: goto L_6b99; case 0x6bc0: goto L_6bc0; case 0x6bd5: goto L_6bd5; case 0x6c09: goto L_6c09; case 0x6c1c: goto L_6c1c; case 0x6c40: goto L_6c40; case 0x6c54: goto L_6c54; case 0x6c9d: goto L_6c9d; case 0x6cbe: goto L_6cbe; case 0x6cfc: goto L_6cfc; default: HANDOFF(HL); }
 L_6b99:
-  CALL(0x6b99, cutscene_incCutsceneState, 0x6f8c, 0x6b9c);  // call $6f8c
+  CALL(0x6b99, cutscene_incCutsceneState_hook, 0x6f8c, 0x6b9c);  // call $6f8c
   I(0x6b9c, 2); B = 0x20;  // ld b,$20
   I(0x6b9e, 3); SET_HL(0xcfc0);  // ld hl,$cfc0
   CALL(0x6ba1, clearMemory_hook, 0x046f, 0x6ba4);  // call $046f
@@ -12002,7 +11942,7 @@ L_6bc9:
   I(0x6bcd, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x6bce, 1); A = alu_dec8(gb, A);  // dec a
   I(0x6bcf, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x6bd2, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6bd2, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6bd5:
   I(0x6bd5, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x6bd8, 2); B = 0x01;  // ld b,$01
@@ -12026,7 +11966,7 @@ L_6beb:
   I(0x6c00, 3); SET_HL(0x77a5);  // ld hl,$77a5
 L_6c03:
   CALL(0x6c03, parseGivenObjectData_b00_hook, 0x3171, 0x6c06);  // call $3171
-  I(0x6c06, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6c06, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6c09:
   I(0x6c09, 4); A = mem_rd(gb, 0xcfc0);  // ld a,($cfc0)
   I(0x6c0c, 2); alu_cp(gb, 0x03);  // cp $03
@@ -12045,7 +11985,7 @@ L_6c1c:
   I(0x6c27, 4); mem_wr(gb, 0xcfde, A);  // ld ($cfde),a
   CALL(0x6c2a, cutscene_loadRoomObjectSetAndFadein, 0x64c5, 0x6c2d);  // call $64c5
   CALL(0x6c2d, showStatusBar_hook, 0x1aa4, 0x6c30);  // call $1aa4
-  CALL(0x6c30, cutscene_incCutsceneState, 0x6f8c, 0x6c33);  // call $6f8c
+  CALL(0x6c30, cutscene_incCutsceneState_hook, 0x6f8c, 0x6c33);  // call $6f8c
   I(0x6c33, 2); A = 0x38;  // ld a,$38
   CALL(0x6c35, playSound_b00_hook, 0x0c98, 0x6c38);  // call $0c98
   I(0x6c38, 2); A = 0x02;  // ld a,$02
@@ -12080,7 +12020,7 @@ L_6c54:
   I(0x6c75, 2); A = 0x2c;  // ld a,$2c
   I(0x6c77, 2); B = 0x03;  // ld b,$03
   CALL(0x6c79, cutscene_loadAObjectGfxBTimes, 0x603a, 0x6c7c);  // call $603a
-  CALL(0x6c7c, cutscene_incCutsceneState, 0x6f8c, 0x6c7f);  // call $6f8c
+  CALL(0x6c7c, cutscene_incCutsceneState_hook, 0x6f8c, 0x6c7f);  // call $6f8c
   I(0x6c7f, 1); alu_xor(gb, A);  // xor a
   I(0x6c80, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
   I(0x6c83, 3); mem_wr(gb, 0xffa5, A);  // ldh ($ffa5),a
@@ -12106,12 +12046,12 @@ L_6c9d:
   I(0x6cb3, 2); A = 0x03;  // ld a,$03
   I(0x6cb5, 4); mem_wr(gb, 0xc4b3, A);  // ld ($c4b3),a
   I(0x6cb8, 4); mem_wr(gb, 0xc4b1, A);  // ld ($c4b1),a
-  I(0x6cbb, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6cbb, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6cbe:
   I(0x6cbe, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x6cc1, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6cc2); return; } I(0x6cc2, 2);  // ret nz
-  CALL(0x6cc3, cutscene_incCutsceneState, 0x6f8c, 0x6cc6);  // call $6f8c
+  CALL(0x6cc3, cutscene_incCutsceneState_hook, 0x6f8c, 0x6cc6);  // call $6f8c
   CALL(0x6cc6, showStatusBar_hook, 0x1aa4, 0x6cc9);  // call $1aa4
   I(0x6cc9, 2); A = 0x35;  // ld a,$35
   CALL(0x6ccb, setGlobalFlag_hook, 0x31f9, 0x6cce);  // call $31f9
@@ -12126,7 +12066,7 @@ L_6cbe:
   I(0x6ce1, 4); mem_wr(gb, 0xc48c, A);  // ld ($c48c),a
   CALL(0x6ce4, fadeinFromBlack_hook, 0x32e6, 0x6ce7);  // call $32e6
   I(0x6ce7, 3); SET_BC(0x8706);  // ld bc,$8706
-  CALL(0x6cea, createInteraction, 0x540c, 0x6ced);  // call $540c
+  CALL(0x6cea, createInteraction_hook, 0x540c, 0x6ced);  // call $540c
   I(0x6ced, 3); SET_BC(0x4050);  // ld bc,$4050
   CALL(0x6cf0, interactionHSetPosition_hook, 0x2774, 0x6cf3);  // call $2774
   I(0x6cf3, 4); A = mem_rd(gb, 0xcc46);  // ld a,($cc46)
@@ -12146,7 +12086,7 @@ L_6cfc:
 void twinrovaRevealCutsceneHandler__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6b99:
-  CALL(0x6b99, cutscene_incCutsceneState, 0x6f8c, 0x6b9c);  // call $6f8c
+  CALL(0x6b99, cutscene_incCutsceneState_hook, 0x6f8c, 0x6b9c);  // call $6f8c
   I(0x6b9c, 2); B = 0x20;  // ld b,$20
   I(0x6b9e, 3); SET_HL(0xcfc0);  // ld hl,$cfc0
   CALL(0x6ba1, clearMemory_hook, 0x046f, 0x6ba4);  // call $046f
@@ -12178,7 +12118,7 @@ L_6bc9:
   I(0x6bcd, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x6bce, 1); A = alu_dec8(gb, A);  // dec a
   I(0x6bcf, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x6bd2, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6bd2, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6bc9
@@ -12190,7 +12130,7 @@ L_6bc9:
   I(0x6bcd, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x6bce, 1); A = alu_dec8(gb, A);  // dec a
   I(0x6bcf, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x6bd2, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6bd2, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6bd5
@@ -12219,7 +12159,7 @@ L_6beb:
   I(0x6c00, 3); SET_HL(0x77a5);  // ld hl,$77a5
 L_6c03:
   CALL(0x6c03, parseGivenObjectData_b00_hook, 0x3171, 0x6c06);  // call $3171
-  I(0x6c06, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6c06, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6be8
@@ -12238,7 +12178,7 @@ L_6be8:
   I(0x6c00, 3); SET_HL(0x77a5);  // ld hl,$77a5
 L_6c03:
   CALL(0x6c03, parseGivenObjectData_b00_hook, 0x3171, 0x6c06);  // call $3171
-  I(0x6c06, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6c06, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6c09
@@ -12251,7 +12191,7 @@ L_6bc9:
   I(0x6bcd, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x6bce, 1); A = alu_dec8(gb, A);  // dec a
   I(0x6bcf, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x6bd2, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6bd2, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6c09:
   I(0x6c09, 4); A = mem_rd(gb, 0xcfc0);  // ld a,($cfc0)
   I(0x6c0c, 2); alu_cp(gb, 0x03);  // cp $03
@@ -12275,7 +12215,7 @@ L_6c1c:
   I(0x6c27, 4); mem_wr(gb, 0xcfde, A);  // ld ($cfde),a
   CALL(0x6c2a, cutscene_loadRoomObjectSetAndFadein, 0x64c5, 0x6c2d);  // call $64c5
   CALL(0x6c2d, showStatusBar_hook, 0x1aa4, 0x6c30);  // call $1aa4
-  CALL(0x6c30, cutscene_incCutsceneState, 0x6f8c, 0x6c33);  // call $6f8c
+  CALL(0x6c30, cutscene_incCutsceneState_hook, 0x6f8c, 0x6c33);  // call $6f8c
   I(0x6c33, 2); A = 0x38;  // ld a,$38
   CALL(0x6c35, playSound_b00_hook, 0x0c98, 0x6c38);  // call $0c98
   I(0x6c38, 2); A = 0x02;  // ld a,$02
@@ -12293,7 +12233,7 @@ L_6bc9:
   I(0x6bcd, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x6bce, 1); A = alu_dec8(gb, A);  // dec a
   I(0x6bcf, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x6bd2, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6bd2, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 L_6c40:
   I(0x6c40, 3); SET_HL(0xcfdf);  // ld hl,$cfdf
   I(0x6c43, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -12328,7 +12268,7 @@ L_6c54:
   I(0x6c75, 2); A = 0x2c;  // ld a,$2c
   I(0x6c77, 2); B = 0x03;  // ld b,$03
   CALL(0x6c79, cutscene_loadAObjectGfxBTimes, 0x603a, 0x6c7c);  // call $603a
-  CALL(0x6c7c, cutscene_incCutsceneState, 0x6f8c, 0x6c7f);  // call $6f8c
+  CALL(0x6c7c, cutscene_incCutsceneState_hook, 0x6f8c, 0x6c7f);  // call $6f8c
   I(0x6c7f, 1); alu_xor(gb, A);  // xor a
   I(0x6c80, 4); mem_wr(gb, 0xc4ab, A);  // ld ($c4ab),a
   I(0x6c83, 3); mem_wr(gb, 0xffa5, A);  // ldh ($ffa5),a
@@ -12359,7 +12299,7 @@ L_6c9d:
   I(0x6cb3, 2); A = 0x03;  // ld a,$03
   I(0x6cb5, 4); mem_wr(gb, 0xc4b3, A);  // ld ($c4b3),a
   I(0x6cb8, 4); mem_wr(gb, 0xc4b1, A);  // ld ($c4b1),a
-  I(0x6cbb, 4); cutscene_incCutsceneState(gb); return;  // jp $6f8c
+  I(0x6cbb, 4); if (hook_enabled_at(0x6f8c)) { cutscene_incCutsceneState_hook(gb); return; } HANDOFF(0x6f8c);  // jp $6f8c
 }
 
 // 03:6cbe
@@ -12369,7 +12309,7 @@ L_6cbe:
   I(0x6cbe, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x6cc1, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x6cc2); return; } I(0x6cc2, 2);  // ret nz
-  CALL(0x6cc3, cutscene_incCutsceneState, 0x6f8c, 0x6cc6);  // call $6f8c
+  CALL(0x6cc3, cutscene_incCutsceneState_hook, 0x6f8c, 0x6cc6);  // call $6f8c
   CALL(0x6cc6, showStatusBar_hook, 0x1aa4, 0x6cc9);  // call $1aa4
   I(0x6cc9, 2); A = 0x35;  // ld a,$35
   CALL(0x6ccb, setGlobalFlag_hook, 0x31f9, 0x6cce);  // call $31f9
@@ -12384,7 +12324,7 @@ L_6cbe:
   I(0x6ce1, 4); mem_wr(gb, 0xc48c, A);  // ld ($c48c),a
   CALL(0x6ce4, fadeinFromBlack_hook, 0x32e6, 0x6ce7);  // call $32e6
   I(0x6ce7, 3); SET_BC(0x8706);  // ld bc,$8706
-  CALL(0x6cea, createInteraction, 0x540c, 0x6ced);  // call $540c
+  CALL(0x6cea, createInteraction_hook, 0x540c, 0x6ced);  // call $540c
   I(0x6ced, 3); SET_BC(0x4050);  // ld bc,$4050
   CALL(0x6cf0, interactionHSetPosition_hook, 0x2774, 0x6cf3);  // call $2774
   I(0x6cf3, 4); A = mem_rd(gb, 0xcc46);  // ld a,($cc46)
@@ -12595,14 +12535,6 @@ L_6f89:
   I(0x6f89, 4); if (hook_enabled_at(0x30d8)) { addSpritesFromBankToOam_withOffset_hook(gb); return; } HANDOFF(0x30d8);  // jp $30d8
 }
 
-// 03:6f8c
-void cutscene_incCutsceneState(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6f8c, 3); SET_HL(0xcc03);  // ld hl,$cc03
-  I(0x6f8f, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  RET(0x6f90); return;  // ret
-}
-
 // 03:6f91
 void cutscene_decCBB6(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -12727,7 +12659,7 @@ L_702f:
   I(0x704a, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
   I(0x704d, 1); alu_xor(gb, A);  // xor a
   I(0x704e, 4); mem_wr(gb, 0xcd00, A);  // ld ($cd00),a
-  I(0x7051, 3); cutscene_incState(gb); return;  // jr $7013
+  I(0x7051, 3); if (hook_enabled_at(0x7013)) { cutscene_incState_hook(gb); return; } HANDOFF(0x7013);  // jr $7013
 }
 
 // 03:700b
@@ -12738,22 +12670,6 @@ void cutscene_tickDownCBB4ThenSetTo30(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(0x700f); return; } I(0x700f, 2);  // ret nz
   I(0x7010, 3); mem_wr(gb, HL, 0x1e);  // ld (hl),$1e
   RET(0x7012); return;  // ret
-}
-
-// 03:7013
-void cutscene_incState(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7013, 3); SET_HL(0xcc03);  // ld hl,$cc03
-  I(0x7016, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  RET(0x7017); return;  // ret
-}
-
-// 03:7018
-void cutscene_incCBB3(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7018, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
-  I(0x701b, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  RET(0x701c); return;  // ret
 }
 
 // 03:701d
@@ -12784,7 +12700,7 @@ L_702f:
   I(0x704a, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
   I(0x704d, 1); alu_xor(gb, A);  // xor a
   I(0x704e, 4); mem_wr(gb, 0xcd00, A);  // ld ($cd00),a
-  I(0x7051, 3); cutscene_incState(gb); return;  // jr $7013
+  I(0x7051, 3); if (hook_enabled_at(0x7013)) { cutscene_incState_hook(gb); return; } HANDOFF(0x7013);  // jr $7013
 L_7053:
   I(0x7053, 4); A = mem_rd(gb, 0xcbb3);  // ld a,($cbb3)
   RST_PUSH(0x7056, 0x7057);  // rst $00 (jump table)
@@ -12796,7 +12712,7 @@ L_705b:
   CALL(0x705b, cutscene_tickDownCBB4ThenSetTo30, 0x700b, 0x705e);  // call $700b
   if (!(F & FZ)) { RET_TAKEN(0x705e); return; } I(0x705e, 2);  // ret nz
   I(0x705f, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x7061, 3); cutscene_incCBB3(gb); return;  // jr $7018
+  I(0x7061, 3); if (hook_enabled_at(0x7018)) { cutscene_incCBB3_hook(gb); return; } HANDOFF(0x7018);  // jr $7018
 L_7063:
   I(0x7063, 2); A = 0x3c;  // ld a,$3c
   CALL(0x7065, setScreenShakeCounter_hook, 0x24bb, 0x7068);  // call $24bb
@@ -12843,7 +12759,7 @@ L_702f:
   I(0x704a, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
   I(0x704d, 1); alu_xor(gb, A);  // xor a
   I(0x704e, 4); mem_wr(gb, 0xcd00, A);  // ld ($cd00),a
-  I(0x7051, 3); cutscene_incState(gb); return;  // jr $7013
+  I(0x7051, 3); if (hook_enabled_at(0x7013)) { cutscene_incState_hook(gb); return; } HANDOFF(0x7013);  // jr $7013
 }
 
 // 03:702f
@@ -12863,7 +12779,7 @@ L_702f:
   I(0x704a, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
   I(0x704d, 1); alu_xor(gb, A);  // xor a
   I(0x704e, 4); mem_wr(gb, 0xcd00, A);  // ld ($cd00),a
-  I(0x7051, 3); cutscene_incState(gb); return;  // jr $7013
+  I(0x7051, 3); if (hook_enabled_at(0x7013)) { cutscene_incState_hook(gb); return; } HANDOFF(0x7013);  // jr $7013
 }
 
 // 03:7053
@@ -12880,7 +12796,7 @@ L_705b:
   CALL(0x705b, cutscene_tickDownCBB4ThenSetTo30, 0x700b, 0x705e);  // call $700b
   if (!(F & FZ)) { RET_TAKEN(0x705e); return; } I(0x705e, 2);  // ret nz
   I(0x705f, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x7061, 3); cutscene_incCBB3(gb); return;  // jr $7018
+  I(0x7061, 3); if (hook_enabled_at(0x7018)) { cutscene_incCBB3_hook(gb); return; } HANDOFF(0x7018);  // jr $7018
 L_7063:
   I(0x7063, 2); A = 0x3c;  // ld a,$3c
   CALL(0x7065, setScreenShakeCounter_hook, 0x24bb, 0x7068);  // call $24bb
@@ -12915,7 +12831,7 @@ L_705b:
   CALL(0x705b, cutscene_tickDownCBB4ThenSetTo30, 0x700b, 0x705e);  // call $700b
   if (!(F & FZ)) { RET_TAKEN(0x705e); return; } I(0x705e, 2);  // ret nz
   I(0x705f, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x7061, 3); cutscene_incCBB3(gb); return;  // jr $7018
+  I(0x7061, 3); if (hook_enabled_at(0x7018)) { cutscene_incCBB3_hook(gb); return; } HANDOFF(0x7018);  // jr $7018
 }
 
 // 03:7063
@@ -12982,12 +12898,12 @@ L_702f:
   I(0x704a, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
   I(0x704d, 1); alu_xor(gb, A);  // xor a
   I(0x704e, 4); mem_wr(gb, 0xcd00, A);  // ld ($cd00),a
-  I(0x7051, 3); cutscene_incState(gb); return;  // jr $7013
+  I(0x7051, 3); if (hook_enabled_at(0x7013)) { cutscene_incState_hook(gb); return; } HANDOFF(0x7013);  // jr $7013
 L_705b:
   CALL(0x705b, cutscene_tickDownCBB4ThenSetTo30, 0x700b, 0x705e);  // call $700b
   if (!(F & FZ)) { RET_TAKEN(0x705e); return; } I(0x705e, 2);  // ret nz
   I(0x705f, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x7061, 3); cutscene_incCBB3(gb); return;  // jr $7018
+  I(0x7061, 3); if (hook_enabled_at(0x7018)) { cutscene_incCBB3_hook(gb); return; } HANDOFF(0x7018);  // jr $7018
 L_70b4:
   I(0x70b4, 4); A = mem_rd(gb, 0xcc03);  // ld a,($cc03)
   RST_PUSH(0x70b7, 0x70b8);  // rst $00 (jump table)
@@ -13047,7 +12963,7 @@ L_702f:
   I(0x704a, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
   I(0x704d, 1); alu_xor(gb, A);  // xor a
   I(0x704e, 4); mem_wr(gb, 0xcd00, A);  // ld ($cd00),a
-  I(0x7051, 3); cutscene_incState(gb); return;  // jr $7013
+  I(0x7051, 3); if (hook_enabled_at(0x7013)) { cutscene_incState_hook(gb); return; } HANDOFF(0x7013);  // jr $7013
 L_70bc:
   I(0x70bc, 2); A = 0x73;  // ld a,$73
   I(0x70be, 4); goto L_702f;  // jp $702f
@@ -13061,7 +12977,7 @@ L_705b:
   CALL(0x705b, cutscene_tickDownCBB4ThenSetTo30, 0x700b, 0x705e);  // call $700b
   if (!(F & FZ)) { RET_TAKEN(0x705e); return; } I(0x705e, 2);  // ret nz
   I(0x705f, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x7061, 3); cutscene_incCBB3(gb); return;  // jr $7018
+  I(0x7061, 3); if (hook_enabled_at(0x7018)) { cutscene_incCBB3_hook(gb); return; } HANDOFF(0x7018);  // jr $7018
 L_70c1:
   I(0x70c1, 4); A = mem_rd(gb, 0xcbb3);  // ld a,($cbb3)
   RST_PUSH(0x70c4, 0x70c5);  // rst $00 (jump table)

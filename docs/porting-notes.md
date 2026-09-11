@@ -405,3 +405,7 @@ desync to discover; keep them when porting routines.
   `createSeaEffectsPartIfApplicable` calls the vector twice on its no-carry path; omitting the
   taken `ret nc` burn left the hook eight cycles short with otherwise identical state. The 30k
   routine verifier caught it at frame 1286.
+- The readable C filename follows the disassembly source's leaf basename, including nested source
+  directories. Batch 40 initially placed routines from `ages/cutscenes/miscCutscenes.s` in
+  `cutscenes.c`; code review caught the collision in meaning with the separate
+  `ages/cutscenes.s`. The correct file is `miscCutscenes.c`.

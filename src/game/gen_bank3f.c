@@ -2170,7 +2170,7 @@ L_4b98:
   I(0x4b98, 2); A = 0x01;  // ld a,$01
   I(0x4b9a, 2); mem_wr(gb, DE, A);  // ld (de),a
   CALL(0x4b9b, saveTilesUnderTextbox, 0x50dd, 0x4b9e);  // call $50dd
-  CALL(0x4b9e, initTextboxMapping, 0x514a, 0x4ba1);  // call $514a
+  CALL(0x4b9e, initTextboxMapping_hook, 0x514a, 0x4ba1);  // call $514a
   I(0x4ba1, 4); dmaTextboxMap(gb); return;  // jp $5173
 L_4ba4:
   I(0x4ba4, 1); H = D;  // ld h,d
@@ -2182,7 +2182,7 @@ L_4ba4:
   I(0x4bae, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x4baf, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x4bb0, drawLineOfText, 0x5055, 0x4bb3);  // call $5055
-  I(0x4bb3, 4); dmaTextGfxBuffer(gb); return;  // jp $50cc
+  I(0x4bb3, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 L_4bb6:
   CALL(0x4bb6, getNextCharacterToDisplay, 0x5288, 0x4bb9);  // call $5288
   if ((F & FZ)) { I(0x4bb9, 3); goto L_4bcb; } I(0x4bb9, 2);  // jr z,$4bcb
@@ -2218,7 +2218,7 @@ L_4be7:
   if (!(F & FZ)) { RET_TAKEN(0x4bea); return; } I(0x4bea, 2);  // ret nz
   CALL(0x4beb, drawLineOfText, 0x5055, 0x4bee);  // call $5055
   I(0x4bee, 2); A = 0x02;  // ld a,$02
-  CALL(0x4bf0, dmaTextGfxBuffer, 0x50cc, 0x4bf3);  // call $50cc
+  CALL(0x4bf0, dmaTextGfxBuffer_hook, 0x50cc, 0x4bf3);  // call $50cc
   I(0x4bf3, 3); SET_HL(0xd0c0);  // ld hl,$d0c0
   I(0x4bf6, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x4bf7, 2); L = 0xd3;  // ld l,$d3
@@ -2257,7 +2257,7 @@ L_4c23:
   I(0x4c29, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x4c2a, dmaTextboxMap, 0x5173, 0x4c2d);  // call $5173
   I(0x4c2d, 1); alu_xor(gb, A);  // xor a
-  I(0x4c2e, 4); dmaTextGfxBuffer(gb); return;  // jp $50cc
+  I(0x4c2e, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 L_4c31:
   I(0x4c31, 1); H = D;  // ld h,d
   I(0x4c32, 1); L = E;  // ld l,e
@@ -2281,7 +2281,7 @@ L_4c48:
   I(0x4c4f, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x4c50, dmaTextboxMap, 0x5173, 0x4c53);  // call $5173
   I(0x4c53, 1); alu_xor(gb, A);  // xor a
-  I(0x4c54, 4); dmaTextGfxBuffer(gb); return;  // jp $50cc
+  I(0x4c54, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 L_4c57:
   I(0x4c57, 1); H = D;  // ld h,d
   I(0x4c58, 2); L = 0xef;  // ld l,$ef
@@ -2395,7 +2395,7 @@ L_4d3c:
   I(0x4d52, 2); B = 0x0a;  // ld b,$0a
   CALL(0x4d54, clearMemory_hook, 0x046f, 0x4d57);  // call $046f
   CALL(0x4d57, drawLineOfText, 0x5055, 0x4d5a);  // call $5055
-  I(0x4d5a, 4); dmaTextGfxBuffer(gb); return;  // jp $50cc
+  I(0x4d5a, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 L_4d9e:
   CALL(0x4d9e, decInvTextScrollTimer, 0x5597, 0x4da1);  // call $5597
   if (!(F & FZ)) { RET_TAKEN(0x4da1); return; } I(0x4da1, 2);  // ret nz
@@ -2542,7 +2542,7 @@ L_4b98:
   I(0x4b98, 2); A = 0x01;  // ld a,$01
   I(0x4b9a, 2); mem_wr(gb, DE, A);  // ld (de),a
   CALL(0x4b9b, saveTilesUnderTextbox, 0x50dd, 0x4b9e);  // call $50dd
-  CALL(0x4b9e, initTextboxMapping, 0x514a, 0x4ba1);  // call $514a
+  CALL(0x4b9e, initTextboxMapping_hook, 0x514a, 0x4ba1);  // call $514a
   I(0x4ba1, 4); dmaTextboxMap(gb); return;  // jp $5173
 L_4ba4:
   I(0x4ba4, 1); H = D;  // ld h,d
@@ -2554,7 +2554,7 @@ L_4ba4:
   I(0x4bae, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x4baf, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x4bb0, drawLineOfText, 0x5055, 0x4bb3);  // call $5055
-  I(0x4bb3, 4); dmaTextGfxBuffer(gb); return;  // jp $50cc
+  I(0x4bb3, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 L_4bb6:
   CALL(0x4bb6, getNextCharacterToDisplay, 0x5288, 0x4bb9);  // call $5288
   if ((F & FZ)) { I(0x4bb9, 3); goto L_4bcb; } I(0x4bb9, 2);  // jr z,$4bcb
@@ -2590,7 +2590,7 @@ L_4be7:
   if (!(F & FZ)) { RET_TAKEN(0x4bea); return; } I(0x4bea, 2);  // ret nz
   CALL(0x4beb, drawLineOfText, 0x5055, 0x4bee);  // call $5055
   I(0x4bee, 2); A = 0x02;  // ld a,$02
-  CALL(0x4bf0, dmaTextGfxBuffer, 0x50cc, 0x4bf3);  // call $50cc
+  CALL(0x4bf0, dmaTextGfxBuffer_hook, 0x50cc, 0x4bf3);  // call $50cc
   I(0x4bf3, 3); SET_HL(0xd0c0);  // ld hl,$d0c0
   I(0x4bf6, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x4bf7, 2); L = 0xd3;  // ld l,$d3
@@ -2629,7 +2629,7 @@ L_4c23:
   I(0x4c29, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x4c2a, dmaTextboxMap, 0x5173, 0x4c2d);  // call $5173
   I(0x4c2d, 1); alu_xor(gb, A);  // xor a
-  I(0x4c2e, 4); dmaTextGfxBuffer(gb); return;  // jp $50cc
+  I(0x4c2e, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 L_4c31:
   I(0x4c31, 1); H = D;  // ld h,d
   I(0x4c32, 1); L = E;  // ld l,e
@@ -2653,7 +2653,7 @@ L_4c48:
   I(0x4c4f, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x4c50, dmaTextboxMap, 0x5173, 0x4c53);  // call $5173
   I(0x4c53, 1); alu_xor(gb, A);  // xor a
-  I(0x4c54, 4); dmaTextGfxBuffer(gb); return;  // jp $50cc
+  I(0x4c54, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 L_4c57:
   I(0x4c57, 1); H = D;  // ld h,d
   I(0x4c58, 2); L = 0xef;  // ld l,$ef
@@ -2779,7 +2779,7 @@ L_4d3c:
   I(0x4d52, 2); B = 0x0a;  // ld b,$0a
   CALL(0x4d54, clearMemory_hook, 0x046f, 0x4d57);  // call $046f
   CALL(0x4d57, drawLineOfText, 0x5055, 0x4d5a);  // call $5055
-  I(0x4d5a, 4); dmaTextGfxBuffer(gb); return;  // jp $50cc
+  I(0x4d5a, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 }
 
 // 3f:4b86
@@ -2931,7 +2931,7 @@ L_4b98:
   I(0x4b98, 2); A = 0x01;  // ld a,$01
   I(0x4b9a, 2); mem_wr(gb, DE, A);  // ld (de),a
   CALL(0x4b9b, saveTilesUnderTextbox, 0x50dd, 0x4b9e);  // call $50dd
-  CALL(0x4b9e, initTextboxMapping, 0x514a, 0x4ba1);  // call $514a
+  CALL(0x4b9e, initTextboxMapping_hook, 0x514a, 0x4ba1);  // call $514a
   I(0x4ba1, 4); dmaTextboxMap(gb); return;  // jp $5173
 }
 
@@ -2948,7 +2948,7 @@ L_4ba4:
   I(0x4bae, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x4baf, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x4bb0, drawLineOfText, 0x5055, 0x4bb3);  // call $5055
-  I(0x4bb3, 4); dmaTextGfxBuffer(gb); return;  // jp $50cc
+  I(0x4bb3, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 }
 
 // 3f:4bb6
@@ -3002,7 +3002,7 @@ L_4be7:
   if (!(F & FZ)) { RET_TAKEN(0x4bea); return; } I(0x4bea, 2);  // ret nz
   CALL(0x4beb, drawLineOfText, 0x5055, 0x4bee);  // call $5055
   I(0x4bee, 2); A = 0x02;  // ld a,$02
-  CALL(0x4bf0, dmaTextGfxBuffer, 0x50cc, 0x4bf3);  // call $50cc
+  CALL(0x4bf0, dmaTextGfxBuffer_hook, 0x50cc, 0x4bf3);  // call $50cc
   I(0x4bf3, 3); SET_HL(0xd0c0);  // ld hl,$d0c0
   I(0x4bf6, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x4bf7, 2); L = 0xd3;  // ld l,$d3
@@ -3075,7 +3075,7 @@ L_4c23:
   I(0x4c29, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x4c2a, dmaTextboxMap, 0x5173, 0x4c2d);  // call $5173
   I(0x4c2d, 1); alu_xor(gb, A);  // xor a
-  I(0x4c2e, 4); dmaTextGfxBuffer(gb); return;  // jp $50cc
+  I(0x4c2e, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 }
 
 // 3f:4c31
@@ -3109,7 +3109,7 @@ L_4c48:
   I(0x4c4f, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x4c50, dmaTextboxMap, 0x5173, 0x4c53);  // call $5173
   I(0x4c53, 1); alu_xor(gb, A);  // xor a
-  I(0x4c54, 4); dmaTextGfxBuffer(gb); return;  // jp $50cc
+  I(0x4c54, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 }
 
 // 3f:4c57
@@ -3371,7 +3371,7 @@ L_4d3c:
   I(0x4d52, 2); B = 0x0a;  // ld b,$0a
   CALL(0x4d54, clearMemory_hook, 0x046f, 0x4d57);  // call $046f
   CALL(0x4d57, drawLineOfText, 0x5055, 0x4d5a);  // call $5055
-  I(0x4d5a, 4); dmaTextGfxBuffer(gb); return;  // jp $50cc
+  I(0x4d5a, 4); if (hook_enabled_at(0x50cc)) { dmaTextGfxBuffer_hook(gb); return; } HANDOFF(0x50cc);  // jp $50cc
 }
 
 // 3f:4d5d
@@ -4156,20 +4156,6 @@ L_5086:
   RET(0x5090); return;  // ret
 }
 
-// 3f:50cc
-void dmaTextGfxBuffer(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x50cc, 2); alu_add(gb, 0x94);  // add $94
-  I(0x50ce, 1); D = A;  // ld d,a
-  I(0x50cf, 2); E = 0x00;  // ld e,$00
-  I(0x50d1, 3); SET_HL(0xd200);  // ld hl,$d200
-  I(0x50d4, 3); SET_BC(0x1f07);  // ld bc,$1f07
-  PUSH(0x50d7, HL);  // push hl
-  CALL(0x50d8, queueDmaTransfer_hook, 0x058a, 0x50db);  // call $058a
-  SET_HL(POP(0x50db));  // pop hl
-  RET(0x50dc); return;  // ret
-}
-
 // 3f:50dd
 void saveTilesUnderTextbox(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -4668,40 +4654,6 @@ L_5131:
   I(0x5146, 1); A = alu_dec8(gb, A);  // dec a
   if (!(F & FZ)) { I(0x5147, 3); goto L_50f8; } I(0x5147, 2);  // jr nz,$50f8
   RET(0x5149); return;  // ret
-}
-
-// 3f:514a
-void initTextboxMapping(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x514a, 4); A = mem_rd(gb, 0xd0cc);  // ld a,($d0cc)
-  I(0x514d, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x514e, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5150, 1); L = A;  // ld l,a
-  I(0x5151, 2); E = 0x05;  // ld e,$05
-L_5153:
-  I(0x5153, 2); B = 0x12;  // ld b,$12
-  I(0x5155, 1); A = L;  // ld a,l
-  I(0x5156, 1); D = A;  // ld d,a
-  I(0x5157, 2); alu_and(gb, 0xe0);  // and $e0
-  I(0x5159, 1); C = A;  // ld c,a
-L_515a:
-  I(0x515a, 2); H = 0xd0;  // ld h,$d0
-  I(0x515c, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  I(0x515e, 2); H = 0xd1;  // ld h,$d1
-  I(0x5160, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
-  I(0x5162, 1); A = L;  // ld a,l
-  I(0x5163, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5164, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5166, 1); alu_or(gb, C);  // or c
-  I(0x5167, 1); L = A;  // ld l,a
-  I(0x5168, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x5169, 3); goto L_515a; } I(0x5169, 2);  // jr nz,$515a
-  I(0x516b, 1); A = D;  // ld a,d
-  I(0x516c, 2); alu_add(gb, 0x20);  // add $20
-  I(0x516e, 1); L = A;  // ld l,a
-  I(0x516f, 1); E = alu_dec8(gb, E);  // dec e
-  if (!(F & FZ)) { I(0x5170, 3); goto L_5153; } I(0x5170, 2);  // jr nz,$5153
-  RET(0x5172); return;  // ret
 }
 
 // 3f:5173
@@ -11055,7 +11007,7 @@ void func_53dd(GB *gb) {
   I(0x53de, 2); L = 0xc1;  // ld l,$c1
   I(0x53e0, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 1)));  // res 1,(hl)
   CALL(0x53e2, saveTilesUnderTextbox, 0x50dd, 0x53e5);  // call $50dd
-  CALL(0x53e5, initTextboxMapping, 0x514a, 0x53e8);  // call $514a
+  CALL(0x53e5, initTextboxMapping_hook, 0x514a, 0x53e8);  // call $514a
   I(0x53e8, 4); dmaTextboxMap(gb); return;  // jp $5173
 }
 

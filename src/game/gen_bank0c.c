@@ -90,80 +90,6 @@ L_413a:
   RET(0x4146); return;  // ret
 }
 
-// 0c:4147
-void scriptCmd_disableInput(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4147, 2); A = 0x81;  // ld a,$81
-  I(0x4149, 4); mem_wr(gb, 0xcc8a, A);  // ld ($cc8a),a
-  scriptCmd_disableMenu(gb); return;  // fallthrough
-}
-
-// 0c:414c
-void scriptCmd_disableMenu(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x414c, 2); A = 0x80;  // ld a,$80
-  I(0x414e, 4); mem_wr(gb, 0xcc02, A);  // ld ($cc02),a
-  CALL(0x4151, clearAllParentItems_hook, 0x2c10, 0x4154);  // call $2c10
-  CALL(0x4154, dropLinkHeldItem_hook, 0x2c43, 0x4157);  // call $2c43
-  CALL(0x4157, func_0c_4177, 0x4177, 0x415a);  // call $4177
-  scriptFunc_popHlAndInc(gb); return;  // fallthrough
-}
-
-// 0c:415a
-void scriptFunc_popHlAndInc(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x415a));  // pop hl
-  I(0x415b, 2); SET_HL(HL + 1);  // inc hl
-  I(0x415c, 1); alu_scf(gb);  // scf
-  RET(0x415d); return;  // ret
-}
-
-// 0c:415e
-void scriptCmd_enableInput(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x415e, 1); alu_xor(gb, A);  // xor a
-  I(0x415f, 4); mem_wr(gb, 0xcc8a, A);  // ld ($cc8a),a
-  scriptCmd_enableMenu(gb); return;  // fallthrough
-}
-
-// 0c:4162
-void scriptCmd_enableMenu(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4162, 1); alu_xor(gb, A);  // xor a
-  I(0x4163, 4); mem_wr(gb, 0xcc02, A);  // ld ($cc02),a
-  I(0x4166, 3); scriptFunc_popHlAndInc(gb); return;  // jr $415a
-}
-
-// 0c:4168
-void scriptCmd_setLinkCantMoveTo91(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4168, 2); A = 0x91;  // ld a,$91
-  scriptFunc_setLinkCantMove(gb); return;  // fallthrough
-}
-
-// 0c:416a
-void scriptFunc_setLinkCantMove(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x416a, 4); mem_wr(gb, 0xcc8a, A);  // ld ($cc8a),a
-  SET_HL(POP(0x416d));  // pop hl
-  I(0x416e, 2); SET_HL(HL + 1);  // inc hl
-  RET(0x416f); return;  // ret
-}
-
-// 0c:4170
-void scriptCmd_setLinkCantMoveTo00(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4170, 1); alu_xor(gb, A);  // xor a
-  I(0x4171, 3); scriptFunc_setLinkCantMove(gb); return;  // jr $416a
-}
-
-// 0c:4173
-void scriptCmd_setLinkCantMoveTo11(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4173, 2); A = 0x11;  // ld a,$11
-  I(0x4175, 3); scriptFunc_setLinkCantMove(gb); return;  // jr $416a
-}
-
 // 0c:4186
 void scriptCmd_setState(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -481,7 +407,7 @@ void scriptCmd_turnToFaceLink(GB *gb) {
   I(0x429f, 2); A = alu_swap(gb, A);  // swap a
   I(0x42a1, 1); alu_rlca(gb);  // rlca
   CALL(0x42a2, interactionSetAnimation_hook, 0x262e, 0x42a5);  // call $262e
-  I(0x42a5, 4); scriptFunc_popHlAndInc(gb); return;  // jp $415a
+  I(0x42a5, 4); if (hook_enabled_at(0x415a)) { scriptFunc_popHlAndInc_hook(gb); return; } HANDOFF(0x415a);  // jp $415a
 }
 
 // 0c:42a8
@@ -1177,7 +1103,7 @@ void scriptCmd_checkCollidedWithLink_ignoreZ(GB *gb) {
   if (!(F & FC)) { RET_TAKEN(0x44e8); return; } I(0x44e8, 2);  // ret nc
   I(0x44e9, 3); goto L_44f0;  // jr $44f0
 L_44f0:
-  CALL(0x44f0, func_0c_4177, 0x4177, 0x44f3);  // call $4177
+  CALL(0x44f0, func_0c_4177_hook, 0x4177, 0x44f3);  // call $4177
   I(0x44f3, 2); SET_HL(HL + 1);  // inc hl
   RET(0x44f4); return;  // ret
 }
@@ -1188,7 +1114,7 @@ void scriptCmd_checkCollidedWithLink_onGround(GB *gb) {
   CALL(0x44eb, objectCheckCollidedWithLink_onGround_hook, 0x1c35, 0x44ee);  // call $1c35
   SET_HL(POP(0x44ee));  // pop hl
   if (!(F & FC)) { RET_TAKEN(0x44ef); return; } I(0x44ef, 2);  // ret nc
-  CALL(0x44f0, func_0c_4177, 0x4177, 0x44f3);  // call $4177
+  CALL(0x44f0, func_0c_4177_hook, 0x4177, 0x44f3);  // call $4177
   I(0x44f3, 2); SET_HL(HL + 1);  // inc hl
   RET(0x44f4); return;  // ret
 }
@@ -1203,7 +1129,7 @@ void scriptCmd_checkAButton(GB *gb) {
   if ((F & FZ)) { RET_TAKEN(0x44fa); return; } I(0x44fa, 2);  // ret z
   I(0x44fb, 1); alu_xor(gb, A);  // xor a
   I(0x44fc, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x44fd, func_0c_4177, 0x4177, 0x4500);  // call $4177
+  CALL(0x44fd, func_0c_4177_hook, 0x4177, 0x4500);  // call $4177
   I(0x4500, 2); SET_HL(HL + 1);  // inc hl
   I(0x4501, 1); alu_scf(gb);  // scf
   RET(0x4502); return;  // ret
@@ -1310,7 +1236,7 @@ void scriptCmd_checkRupeeDisplayUpdated(GB *gb) {
   I(0x4558, 1); L = alu_inc8(gb, L);  // inc l
   I(0x4559, 4); A = mem_rd(gb, 0xcbe6);  // ld a,($cbe6)
   I(0x455c, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if ((F & FZ)) { I(0x455d, 4); scriptFunc_popHlAndInc(gb); return; } I(0x455d, 3);  // jp z,$415a
+  if ((F & FZ)) { I(0x455d, 4); if (hook_enabled_at(0x415a)) { scriptFunc_popHlAndInc_hook(gb); return; } HANDOFF(0x415a); } I(0x455d, 3);  // jp z,$415a
 L_4560:
   SET_HL(POP(0x4560));  // pop hl
   I(0x4561, 1); alu_xor(gb, A);  // xor a
@@ -1531,20 +1457,6 @@ L_45e2:
   I(0x45ed, 1); alu_or(gb, H);  // or h
   I(0x45ee, 3); A = mem_rd(gb, 0xff00);  // ldh a,($ff00)
   HANDOFF(0x45f0);  // fallthrough to genericNpcScript
-}
-
-// 0c:4177
-void func_0c_4177(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x4177, HL);  // push hl
-  I(0x4178, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
-  I(0x417b, 1); H = A;  // ld h,a
-  I(0x417c, 2); L = 0x2b;  // ld l,$2b
-  I(0x417e, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
-  I(0x4180, 2); L = 0x2d;  // ld l,$2d
-  I(0x4182, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  SET_HL(POP(0x4184));  // pop hl
-  RET(0x4185); return;  // ret
 }
 
 // 0c:4210
