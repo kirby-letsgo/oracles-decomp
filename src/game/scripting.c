@@ -690,3 +690,193 @@ void scriptCmd_jumpIfRoomFlagSet_hook(GB *gb) {
   CYC(0x43cd, 0x43ce); alu_scf(gb);
   CYC(0x43ce, 0x43cf); ret_effect(gb);
 }
+
+void scriptCmd_orRoomFlags_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x43d3, 0x43d4); SET_HL(pop_effect(gb));
+  CYC(0x43d4, 0x43d5); SET_HL(HL + 1);
+  CYC(0x43d5, 0x43d6); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x43d6, 0x43d7); B = A;
+  CYC(0x43d7, 0x43d8); push_effect(gb, HL);
+  CALL_C(0x43d8, getThisRoomFlags_hook, 0x197d, 0x43db);
+  CYC(0x43db, 0x43dc); alu_or(gb, B);
+  CYC(0x43dc, 0x43dd); mem_wr(gb, HL, A);
+  CYC(0x43dd, 0x43de); SET_HL(pop_effect(gb));
+  CYC(0x43de, 0x43df); ret_effect(gb);
+}
+
+void scriptCmd_checkSomething_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x43df, 0x43e1); E = 0x71;
+  CALL_C(0x43e1, objectAddToAButtonSensitiveObjectList_hook, 0x1b2c, 0x43e4);
+  CYC(0x43e4, 0x43e5); SET_HL(pop_effect(gb));
+  if (!(F & FC)) {
+    CYCT(0x43e5, 0x43e7);
+    CYC(0x43e8, 0x43e9); ret_effect(gb);
+    return;
+  }
+  CYC(0x43e5, 0x43e7);
+  CYC(0x43e7, 0x43e8); SET_HL(HL + 1);
+  CYC(0x43e8, 0x43e9); ret_effect(gb);
+}
+
+void scriptCmd_showLoadedText_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x43e9, 0x43eb); E = 0x72;
+  CYC(0x43eb, 0x43ec); A = mem_rd(gb, DE);
+  CYC(0x43ec, 0x43ed); C = A;
+  CYC(0x43ed, 0x43ee); E = alu_inc8(gb, E);
+  CYC(0x43ee, 0x43ef); A = mem_rd(gb, DE);
+  CYC(0x43ef, 0x43f0); B = A;
+  CALL_C(0x43f0, showText_hook, 0x1872, 0x43f3);
+  CYC(0x43f3, 0x43f4); SET_HL(pop_effect(gb));
+  CYC(0x43f4, 0x43f5); SET_HL(HL + 1);
+  CYC(0x43f5, 0x43f6); ret_effect(gb);
+}
+
+void scriptCmd_setTextID_hook(GB *gb) {
+  CYC(0x43f6, 0x43f7); SET_HL(pop_effect(gb));
+  CYC(0x43f7, 0x43f8); SET_HL(HL + 1);
+  CYC(0x43f8, 0x43f9); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x43f9, 0x43fb); E = 0x72;
+  CYC(0x43fb, 0x43fc); mem_wr(gb, DE, A);
+  CYC(0x43fc, 0x43fd); E = alu_inc8(gb, E);
+  CYC(0x43fd, 0x43fe); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x43fe, 0x43ff); mem_wr(gb, DE, A);
+  CYC(0x43ff, 0x4400); alu_scf(gb);
+  CYC(0x4400, 0x4401); ret_effect(gb);
+}
+
+void scriptCmd_setMusic_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4401, 0x4402); SET_HL(pop_effect(gb));
+  CYC(0x4402, 0x4403); SET_HL(HL + 1);
+  CYC(0x4403, 0x4404); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4404, 0x4406); alu_cp(gb, 0xff);
+  if (!(F & FZ)) {
+    CYCT(0x4406, 0x4408);
+    goto set_music;
+  }
+  CYC(0x4406, 0x4408);
+  CYC(0x4408, 0x440b); A = W8(wActiveMusic2);
+set_music:
+  CYC(0x440b, 0x440e); W8(wActiveMusic) = A;
+  CYC(0x440e, 0x440f); push_effect(gb, HL);
+  CALL_C(0x440f, playSound_b00_hook, 0x0c98, 0x4412);
+  CYC(0x4412, 0x4413); SET_HL(pop_effect(gb));
+  CYC(0x4413, 0x4414); ret_effect(gb);
+}
+
+void scriptCmd_orMemory_hook(GB *gb) {
+  CYC(0x4414, 0x4415); SET_HL(pop_effect(gb));
+  CYC(0x4415, 0x4416); SET_HL(HL + 1);
+  CYC(0x4416, 0x4417); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4417, 0x4418); C = A;
+  CYC(0x4418, 0x4419); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4419, 0x441a); B = A;
+  CYC(0x441a, 0x441b); A = mem_rd(gb, BC);
+  CYC(0x441b, 0x441c); alu_or(gb, mem_rd(gb, HL));
+  CYC(0x441c, 0x441d); mem_wr(gb, BC, A);
+  CYC(0x441d, 0x441e); SET_HL(HL + 1);
+  CYC(0x441e, 0x441f); alu_scf(gb);
+  CYC(0x441f, 0x4420); ret_effect(gb);
+}
+
+void scriptCmd_spawnItem_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4420, 0x4421); SET_HL(pop_effect(gb));
+  CYC(0x4421, 0x4422); E = mem_rd(gb, HL);
+  CYC(0x4422, 0x4423); SET_HL(HL + 1);
+  CYC(0x4423, 0x4424); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4424, 0x4425); B = A;
+  CYC(0x4425, 0x4426); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4426, 0x4427); C = A;
+  CYC(0x4427, 0x4428); push_effect(gb, HL);
+  CALL_C(0x4428, getFreeInteractionSlot_hook, 0x3aef, 0x442b);
+  if (!(F & FZ)) {
+    CYCT(0x442b, 0x442e);
+    scriptFunc_restoreActiveObject_hook(gb);
+    return;
+  }
+  CYC(0x442b, 0x442e);
+  CYC(0x442e, 0x4430); mem_wr(gb, HL, 0x60);
+  CYC(0x4430, 0x4431); L = alu_inc8(gb, L);
+  CYC(0x4431, 0x4432); mem_wr(gb, HL, B);
+  CYC(0x4432, 0x4433); L = alu_inc8(gb, L);
+  CYC(0x4433, 0x4434); mem_wr(gb, HL, C);
+  CYC(0x4434, 0x4435); A = E;
+  CYC(0x4435, 0x4437); alu_cp(gb, 0xde);
+  if (F & FZ) {
+    CYCT(0x4437, 0x4439);
+    goto create_link_item;
+  }
+  CYC(0x4437, 0x4439);
+  CALL_C(0x4439, objectCopyPosition_hook, 0x2242, 0x443c);
+  CYC(0x443c, 0x443f); scriptFunc_restoreActiveObject_hook(gb);
+  return;
+create_link_item:
+  CYC(0x443f, 0x4441); E = 0x46;
+  CYC(0x4441, 0x4443); A = 0x03;
+  CYC(0x4443, 0x4444); mem_wr(gb, DE, A);
+  CYC(0x4444, 0x4447); SET_DE(w1Link_yh);
+  CALL_C(0x4447, objectCopyPosition_rawAddress_hook, 0x2247, 0x444a);
+  CYC(0x444a, 0x444d); scriptFunc_restoreActiveObject_hook(gb);
+}
+
+void scriptCmd_df_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x444d, 0x444e); SET_HL(pop_effect(gb));
+  CYC(0x444e, 0x444f); SET_HL(HL + 1);
+  CYC(0x444f, 0x4450); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CALL_C(0x4450, checkTreasureObtained_hook, 0x1748, 0x4453);
+  CYC(0x4453, 0x4456); mem_wr(gb, 0xcfc1, A);
+  if (!(F & FC)) {
+    CYCT(0x4456, 0x4458);
+    goto skip_jump;
+  }
+  CYC(0x4456, 0x4458);
+  CYC(0x4458, 0x445b); scriptFunc_jump_hook(gb);
+  return;
+skip_jump:
+  CYC(0x445b, 0x445c); SET_HL(HL + 1);
+  CYC(0x445c, 0x445d); SET_HL(HL + 1);
+  CYC(0x445d, 0x445e); ret_effect(gb);
+}
+
+void scriptCmd_jumpIfSomething_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x445e, 0x445f); SET_HL(pop_effect(gb));
+  CYC(0x445f, 0x4460); SET_HL(HL + 1);
+  CYC(0x4460, 0x4462); A = 0x41;
+  CALL_C(0x4462, checkTreasureObtained_hook, 0x1748, 0x4465);
+  if (!(F & FC)) {
+    CYCT(0x4465, 0x4467);
+    goto skip_first_argument;
+  }
+  CYC(0x4465, 0x4467);
+  CYC(0x4467, 0x4468); B = A;
+  CYC(0x4468, 0x4469); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4469, 0x446a); A = alu_dec8(gb, A);
+  CYC(0x446a, 0x446b); alu_cp(gb, B);
+  if (!(F & FZ)) {
+    CYCT(0x446b, 0x446d);
+    goto skip_remaining_arguments;
+  }
+  CYC(0x446b, 0x446d);
+  CYC(0x446d, 0x4470); scriptFunc_jump_hook(gb);
+  return;
+skip_first_argument:
+  CYC(0x4470, 0x4471); SET_HL(HL + 1);
+skip_remaining_arguments:
+  CYC(0x4471, 0x4472); SET_HL(HL + 1);
+  CYC(0x4472, 0x4473); SET_HL(HL + 1);
+  CYC(0x4473, 0x4474); ret_effect(gb);
+}
+
+void scriptCmd_setLinkCantMove_hook(GB *gb) {
+  CYC(0x4474, 0x4475); SET_HL(pop_effect(gb));
+  CYC(0x4475, 0x4476); SET_HL(HL + 1);
+  CYC(0x4476, 0x4477); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4477, 0x447a); W8(wDisabledObjects) = A;
+  CYC(0x447a, 0x447b); ret_effect(gb);
+}

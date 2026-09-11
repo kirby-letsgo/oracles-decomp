@@ -938,6 +938,28 @@ void func_53eb_dmaHeartPieceDisplay_hook(GB *gb) {
   CYC(0x549b, 0x549e); queueDmaTransfer_hook(gb);
 }
 
+void shiftTextGfxBufferLeft_hook(GB *gb) {
+  CYC(0x557f, 0x5582); SET_HL(0xd200);
+  CYC(0x5582, 0x5585); SET_DE(0xd220);
+  CYC(0x5585, 0x5588); SET_BC(0x01e0);
+  for (;;) {
+    CYC(0x5588, 0x5589); A = mem_rd(gb, DE);
+    CYC(0x5589, 0x558a); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x558a, 0x558b); SET_DE(DE + 1);
+    CYC(0x558b, 0x558c); SET_BC(BC - 1);
+    CYC(0x558c, 0x558d); A = C;
+    CYC(0x558d, 0x558e); alu_or(gb, B);
+    if (!(F & FZ)) { CYCT(0x558e, 0x5590); continue; }
+    CYC(0x558e, 0x5590);
+    break;
+  }
+  CYC(0x5590, 0x5593); SET_HL(0xd0d5);
+  CYC(0x5593, 0x5594); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5594, 0x5595); H = mem_rd(gb, HL);
+  CYC(0x5595, 0x5596); L = A;
+  CYC(0x5596, 0x5597); ret_effect(gb);
+}
+
 void decInvTextScrollTimer_hook(GB *gb) {
   CYC(0x5597, 0x5598); H = D;
   CYC(0x5598, 0x559a); L = 0xde;
@@ -950,6 +972,40 @@ void decInvTextScrollTimer_hook(GB *gb) {
   CYC(0x559c, 0x559e); mem_wr(gb, HL, 0x08);
   CYC(0x559e, 0x559f); alu_xor(gb, A);
   CYC(0x559f, 0x55a0); ret_effect(gb);
+}
+
+void handleTextControlCodeWithSpecialCase_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x55a0, 0x55a2); alu_cp(gb, 0x06);
+  if (F & FZ) { CYCT(0x55a2, 0x55a4); goto cmd6; }
+  CYC(0x55a2, 0x55a4);
+  CALL_C(0x55a4, handleTextControlCode, 0x56e4, 0x55a7);
+  CYC(0x55a7, 0x55a8); alu_or(gb, D);
+  CYC(0x55a8, 0x55a9); ret_effect(gb);
+  return;
+cmd6:
+  CYC(0x55a9, 0x55ac); SET_BC(0xd3e0);
+  CYC(0x55ac, 0x55af); SET_DE(0xd5e0);
+  CALL_C(0x55af, handleTextControlCode, 0x56e4, 0x55b2);
+  CYC(0x55b2, 0x55b3); alu_xor(gb, A);
+  CYC(0x55b3, 0x55b4); ret_effect(gb);
+}
+
+void updateSelectedTextPosition_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x55b4, getSelectedTextOptionAddress_hook, 0x55c8, 0x55b7);
+  CYC(0x55b7, 0x55b9); alu_bit(gb, 5, mem_rd(gb, HL));
+  CYC(0x55b9, 0x55bb); B = 0x60;
+  if (!(F & FZ)) { CYCT(0x55bb, 0x55bd); goto set_position; }
+  CYC(0x55bb, 0x55bd);
+  CYC(0x55bd, 0x55bf); B = 0x20;
+set_position:
+  CYC(0x55bf, 0x55c0); A = mem_rd(gb, HL);
+  CYC(0x55c0, 0x55c1); E = alu_inc8(gb, E);
+  CYC(0x55c1, 0x55c2); mem_wr(gb, DE, A);
+  CALL_C(0x55c2, getAddressInTextboxMap_hook, 0x55d0, 0x55c5);
+  CYC(0x55c5, 0x55c7); mem_wr(gb, HL, 0x04);
+  CYC(0x55c7, 0x55c8); ret_effect(gb);
 }
 
 void getSelectedTextOptionAddress_hook(GB *gb) {
@@ -1012,4 +1068,197 @@ void moveSelectedTextOptionRight_hook(GB *gb) {
   CYC(0x55ff, 0x5600); alu_xor(gb, A);
   CYC(0x5600, 0x5601); mem_wr(gb, DE, A);
   CYC(0x5601, 0x5602); ret_effect(gb);
+}
+
+void textOptionCode_checkDirectionButtons_updateSelectedTextOption_hook(GB *gb);
+void updateSelectedTextPositionAndDmaTextboxMap_hook(GB *gb);
+
+void moveSelectedTextOptionLeft_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  for (;;) {
+    CYC(0x5602, 0x5604); E = 0xe8;
+    CYC(0x5604, 0x5605); A = mem_rd(gb, DE);
+    CYC(0x5605, 0x5606); A = alu_dec8(gb, A);
+    CYC(0x5606, 0x5608); alu_and(gb, 0x07);
+    CYC(0x5608, 0x5609); mem_wr(gb, DE, A);
+    CALL_C(0x5609, getSelectedTextOptionAddress_hook, 0x55c8, 0x560c);
+    CYC(0x560c, 0x560d); A = mem_rd(gb, HL);
+    CYC(0x560d, 0x560e); alu_or(gb, A);
+    if (!(F & FZ)) { CYCT(0x560e, 0x560f); ret_effect(gb); return; }
+    CYC(0x560e, 0x560f);
+    CYCT(0x560f, 0x5611);
+  }
+}
+
+void textOptionCode_checkDirectionButtons_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5611, 0x5614); A = mem_rd(gb, 0xc482);
+  CYC(0x5614, 0x5616); alu_and(gb, 0xf0);
+  if (F & FZ) { CYCT(0x5616, 0x5617); ret_effect(gb); return; }
+  CYC(0x5616, 0x5617);
+  CYC(0x5617, 0x5619); A = 0x84;
+  CALL_C(0x5619, playSound_b00_hook, 0x0c98, 0x561c);
+  CALL_C(0x561c, removeCursorFromSelectedTextPosition_hook, 0x55e1, 0x561f);
+  CYC(0x561f, 0x5622); push_effect(gb, 0x5622);
+  textOptionCode_checkDirectionButtons_updateSelectedTextOption_hook(gb);
+  CYC(0x5622, 0x5624); updateSelectedTextPositionAndDmaTextboxMap_hook(gb);
+}
+
+void textOptionCode_checkDirectionButtons_updateSelectedTextOption_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5624, 0x5627); A = mem_rd(gb, 0xc482);
+  CALL_C(0x5627, getHighestSetBit_hook, 0x01ea, 0x562a);
+  CYC(0x562a, 0x562c); alu_sub(gb, 0x04);
+  if (F & FZ) { CYCT(0x562c, 0x562e); moveSelectedTextOptionRight_hook(gb); return; }
+  CYC(0x562c, 0x562e);
+  CYC(0x562e, 0x562f); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(0x562f, 0x5631); moveSelectedTextOptionLeft_hook(gb); return; }
+  CYC(0x562f, 0x5631);
+  CALL_C(0x5631, getSelectedTextOptionAddress_hook, 0x55c8, 0x5634);
+  CYC(0x5634, 0x5635); B = mem_rd(gb, HL);
+  CYC(0x5635, 0x5637); C = 0xff;
+  CYC(0x5637, 0x5639); L = 0xe0;
+  CYC(0x5639, 0x563a); E = L;
+  for (;;) {
+    CYC(0x563a, 0x563b); A = mem_rd(gb, HL);
+    CYC(0x563b, 0x563c); alu_or(gb, A);
+    if (F & FZ) { CYCT(0x563c, 0x563e); goto update_end; }
+    CYC(0x563c, 0x563e);
+    CYC(0x563e, 0x563f); alu_sub(gb, B);
+    if (!(F & FC)) { CYCT(0x563f, 0x5641); goto compare_row; }
+    CYC(0x563f, 0x5641);
+    CYC(0x5641, 0x5642); alu_cpl(gb);
+    CYC(0x5642, 0x5643); A = alu_inc8(gb, A);
+compare_row:
+    CYC(0x5643, 0x5645); alu_sub(gb, 0x20);
+    if (!(F & FC)) { CYCT(0x5645, 0x5647); goto compare_distance; }
+    CYC(0x5645, 0x5647);
+    CYC(0x5647, 0x5648); alu_cpl(gb);
+    CYC(0x5648, 0x5649); A = alu_inc8(gb, A);
+compare_distance:
+    CYC(0x5649, 0x564a); alu_cp(gb, C);
+    if (!(F & FC)) { CYCT(0x564a, 0x564c); goto next_option; }
+    CYC(0x564a, 0x564c);
+    CYC(0x564c, 0x564d); C = A;
+    CYC(0x564d, 0x564e); E = L;
+next_option:
+    CYC(0x564e, 0x564f); L = alu_inc8(gb, L);
+    CYCT(0x564f, 0x5651);
+  }
+update_end:
+  CYC(0x5651, 0x5652); A = C;
+  CYC(0x5652, 0x5654); alu_cp(gb, 0x10);
+  if (!(F & FC)) { CYCT(0x5654, 0x5655); ret_effect(gb); return; }
+  CYC(0x5654, 0x5655);
+  CYC(0x5655, 0x5656); A = E;
+  CYC(0x5656, 0x5658); alu_sub(gb, 0xe0);
+  CYC(0x5658, 0x565a); E = 0xe8;
+  CYC(0x565a, 0x565b); mem_wr(gb, DE, A);
+  CYC(0x565b, 0x565c); ret_effect(gb);
+}
+
+void updateSelectedTextPositionAndDmaTextboxMap_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x565c, updateSelectedTextPosition_hook, 0x55b4, 0x565f);
+  CYC(0x565f, 0x5662); dmaTextboxMap_hook(gb);
+}
+
+void textOptionCode_checkBButton_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5662, 0x5664); alu_and(gb, 0x02);
+  if (F & FZ) { CYCT(0x5664, 0x5665); ret_effect(gb); return; }
+  CYC(0x5664, 0x5665);
+  CYC(0x5665, 0x5666); H = D;
+  CYC(0x5666, 0x5668); L = 0xe0;
+  for (;;) {
+    CYC(0x5668, 0x5669); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x5669, 0x566a); alu_or(gb, A);
+    if (!(F & FZ)) { CYCT(0x566a, 0x566c); continue; }
+    CYC(0x566a, 0x566c);
+    break;
+  }
+  CYC(0x566c, 0x566d); A = L;
+  CYC(0x566d, 0x566f); alu_sub(gb, 0xe2);
+  CYC(0x566f, 0x5671); L = 0xe8;
+  CYC(0x5671, 0x5672); mem_wr(gb, HL, A);
+  CYC(0x5672, 0x5674); A = 0x84;
+  CALL_C(0x5674, playSound_b00_hook, 0x0c98, 0x5677);
+  CALL_C(0x5677, removeCursorFromSelectedTextPosition_hook, 0x55e1, 0x567a);
+  CALL_C(0x567a, updateSelectedTextPositionAndDmaTextboxMap_hook, 0x565c, 0x567d);
+  CYC(0x567d, 0x567e); alu_or(gb, D);
+  CYC(0x567e, 0x567f); ret_effect(gb);
+}
+
+void pushToTextStack_hook(GB *gb) {
+  CYC(0x567f, 0x5680); push_effect(gb, DE);
+  CYC(0x5680, 0x5681); push_effect(gb, BC);
+  CYC(0x5681, 0x5682); push_effect(gb, HL);
+  CYC(0x5682, 0x5685); SET_HL(0xd1db);
+  CYC(0x5685, 0x5688); SET_DE(0xd1df);
+  CYC(0x5688, 0x568a); B = 0x1c;
+  for (;;) {
+    CYC(0x568a, 0x568b); A = mem_rd(gb, HL); SET_HL(HL - 1);
+    CYC(0x568b, 0x568c); mem_wr(gb, DE, A);
+    CYC(0x568c, 0x568d); E = alu_dec8(gb, E);
+    CYC(0x568d, 0x568e); B = alu_dec8(gb, B);
+    if (!(F & FZ)) { CYCT(0x568e, 0x5690); continue; }
+    CYC(0x568e, 0x5690);
+    break;
+  }
+  CYC(0x5690, 0x5691); L = alu_inc8(gb, L);
+  CYC(0x5691, 0x5694); SET_DE(0xd0d4);
+  CYC(0x5694, 0x5695); A = mem_rd(gb, DE);
+  CYC(0x5695, 0x5696); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5696, 0x5697); SET_DE(pop_effect(gb));
+  CYC(0x5697, 0x5698); mem_wr(gb, HL, E);
+  CYC(0x5698, 0x5699); L = alu_inc8(gb, L);
+  CYC(0x5699, 0x569a); mem_wr(gb, HL, D);
+  CYC(0x569a, 0x569b); L = alu_inc8(gb, L);
+  CYC(0x569b, 0x569e); A = mem_rd(gb, 0xcba3);
+  CYC(0x569e, 0x569f); mem_wr(gb, HL, A);
+  CYC(0x569f, 0x56a0); H = D;
+  CYC(0x56a0, 0x56a1); L = E;
+  CYC(0x56a1, 0x56a2); SET_BC(pop_effect(gb));
+  CYC(0x56a2, 0x56a3); SET_DE(pop_effect(gb));
+  CYC(0x56a3, 0x56a4); ret_effect(gb);
+}
+
+void popFromTextStack_hook(GB *gb) {
+  CYC(0x56a4, 0x56a5); push_effect(gb, DE);
+  CYC(0x56a5, 0x56a6); push_effect(gb, BC);
+  CYC(0x56a6, 0x56a9); SET_HL(0xd1c3);
+  CYC(0x56a9, 0x56aa); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x56aa, 0x56ad); mem_wr(gb, 0xcba3, A);
+  CYC(0x56ad, 0x56ae); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x56ae, 0x56b1); SET_DE(0xd0d6);
+  CYC(0x56b1, 0x56b2); mem_wr(gb, DE, A);
+  CYC(0x56b2, 0x56b3); B = A;
+  CYC(0x56b3, 0x56b4); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x56b4, 0x56b5); E = alu_dec8(gb, E);
+  CYC(0x56b5, 0x56b6); mem_wr(gb, DE, A);
+  CYC(0x56b6, 0x56b7); C = A;
+  CYC(0x56b7, 0x56b8); A = mem_rd(gb, HL);
+  CYC(0x56b8, 0x56b9); E = alu_dec8(gb, E);
+  CYC(0x56b9, 0x56ba); mem_wr(gb, DE, A);
+  CYC(0x56ba, 0x56bb); push_effect(gb, BC);
+  CYC(0x56bb, 0x56be); SET_DE(0xd1c4);
+  CYC(0x56be, 0x56c0); B = 0x1c;
+  for (;;) {
+    CYC(0x56c0, 0x56c1); A = mem_rd(gb, DE);
+    CYC(0x56c1, 0x56c2); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x56c2, 0x56c3); E = alu_inc8(gb, E);
+    CYC(0x56c3, 0x56c4); B = alu_dec8(gb, B);
+    if (!(F & FZ)) { CYCT(0x56c4, 0x56c6); continue; }
+    CYC(0x56c4, 0x56c6);
+    break;
+  }
+  CYC(0x56c6, 0x56c7); alu_xor(gb, A);
+  CYC(0x56c7, 0x56c8); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x56c8, 0x56c9); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x56c9, 0x56ca); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x56ca, 0x56cb); mem_wr(gb, HL, A);
+  CYC(0x56cb, 0x56cc); SET_HL(pop_effect(gb));
+  CYC(0x56cc, 0x56cd); SET_BC(pop_effect(gb));
+  CYC(0x56cd, 0x56ce); SET_DE(pop_effect(gb));
+  CYC(0x56ce, 0x56cf); ret_effect(gb);
 }

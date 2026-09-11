@@ -2332,12 +2332,12 @@ L_4cdc:
   if (!(F & FZ)) { RET_TAKEN(0x4ce0); return; } I(0x4ce0, 2);  // ret nz
   I(0x4ce1, 1); L = E;  // ld l,e
   I(0x4ce2, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4ce3, 4); updateSelectedTextPositionAndDmaTextboxMap(gb); return;  // jp $565c
+  I(0x4ce3, 4); if (hook_enabled_at(0x565c)) { updateSelectedTextPositionAndDmaTextboxMap_hook(gb); return; } HANDOFF(0x565c);  // jp $565c
 L_4ce6:
   I(0x4ce6, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x4ce9, 2); alu_and(gb, 0x03);  // and $03
-  if ((F & FZ)) { I(0x4ceb, 4); textOptionCode_checkDirectionButtons(gb); return; } I(0x4ceb, 3);  // jp z,$5611
-  CALL(0x4cee, textOptionCode_checkBButton, 0x5662, 0x4cf1);  // call $5662
+  if ((F & FZ)) { I(0x4ceb, 4); if (hook_enabled_at(0x5611)) { textOptionCode_checkDirectionButtons_hook(gb); return; } HANDOFF(0x5611); } I(0x4ceb, 3);  // jp z,$5611
+  CALL(0x4cee, textOptionCode_checkBButton_hook, 0x5662, 0x4cf1);  // call $5662
   if (!(F & FZ)) { RET_TAKEN(0x4cf1); return; } I(0x4cf1, 2);  // ret nz
   I(0x4cf2, 2); A = 0x56;  // ld a,$56
   CALL(0x4cf4, playSound_b00_hook, 0x0c98, 0x4cf7);  // call $0c98
@@ -2408,14 +2408,14 @@ L_4d9e:
 L_4dab:
   CALL(0x4dab, decInvTextScrollTimer_hook, 0x5597, 0x4dae);  // call $5597
   if (!(F & FZ)) { RET_TAKEN(0x4dae); return; } I(0x4dae, 2);  // ret nz
-  CALL(0x4daf, shiftTextGfxBufferLeft, 0x557f, 0x4db2);  // call $557f
+  CALL(0x4daf, shiftTextGfxBufferLeft_hook, 0x557f, 0x4db2);  // call $557f
 L_4db2:
   CALL(0x4db2, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x4db5);  // call $56cf
   I(0x4db5, 2); alu_cp(gb, 0x10);  // cp $10
   if (!(F & FC)) { I(0x4db7, 3); goto L_4e02; } I(0x4db7, 2);  // jr nc,$4e02
   I(0x4db9, 2); alu_cp(gb, 0x01);  // cp $01
   if ((F & FZ)) { I(0x4dbb, 3); goto L_4e00; } I(0x4dbb, 2);  // jr z,$4e00
-  CALL(0x4dbd, handleTextControlCodeWithSpecialCase, 0x55a0, 0x4dc0);  // call $55a0
+  CALL(0x4dbd, handleTextControlCodeWithSpecialCase_hook, 0x55a0, 0x4dc0);  // call $55a0
   if ((F & FZ)) { I(0x4dc0, 3); goto L_4e08; } I(0x4dc0, 2);  // jr z,$4e08
   I(0x4dc2, 4); A = mem_rd(gb, 0xd0c2);  // ld a,($d0c2)
   I(0x4dc5, 1); alu_or(gb, A);  // or a
@@ -2451,7 +2451,7 @@ L_4de4:
   I(0x4df7, 4); mem_wr(gb, 0xcba3, A);  // ld ($cba3),a
   CALL(0x4dfa, checkInitialTextCommands, 0x4ff5, 0x4dfd);  // call $4ff5
 L_4dfd:
-  CALL(0x4dfd, shiftTextGfxBufferLeft, 0x557f, 0x4e00);  // call $557f
+  CALL(0x4dfd, shiftTextGfxBufferLeft_hook, 0x557f, 0x4e00);  // call $557f
 L_4e00:
   I(0x4e00, 2); A = 0x20;  // ld a,$20
 L_4e02:
@@ -2468,7 +2468,7 @@ L_4e10:
 L_4e15:
   CALL(0x4e15, decInvTextScrollTimer_hook, 0x5597, 0x4e18);  // call $5597
   if (!(F & FZ)) { RET_TAKEN(0x4e18); return; } I(0x4e18, 2);  // ret nz
-  CALL(0x4e19, shiftTextGfxBufferLeft, 0x557f, 0x4e1c);  // call $557f
+  CALL(0x4e19, shiftTextGfxBufferLeft_hook, 0x557f, 0x4e1c);  // call $557f
 L_4e1c:
   CALL(0x4e1c, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x4e1f);  // call $56cf
   I(0x4e1f, 2); alu_cp(gb, 0x10);  // cp $10
@@ -2492,7 +2492,7 @@ L_4e1c:
   I(0x4e3c, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   RET(0x4e3d); return;  // ret
 L_4e3e:
-  CALL(0x4e3e, handleTextControlCodeWithSpecialCase, 0x55a0, 0x4e41);  // call $55a0
+  CALL(0x4e3e, handleTextControlCodeWithSpecialCase_hook, 0x55a0, 0x4e41);  // call $55a0
   if ((F & FZ)) { I(0x4e41, 3); goto L_4e08; } I(0x4e41, 2);  // jr z,$4e08
   I(0x4e43, 3); goto L_4e1c;  // jr $4e1c
 L_4e45:
@@ -2716,12 +2716,12 @@ L_4cdc:
   if (!(F & FZ)) { RET_TAKEN(0x4ce0); return; } I(0x4ce0, 2);  // ret nz
   I(0x4ce1, 1); L = E;  // ld l,e
   I(0x4ce2, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4ce3, 4); updateSelectedTextPositionAndDmaTextboxMap(gb); return;  // jp $565c
+  I(0x4ce3, 4); if (hook_enabled_at(0x565c)) { updateSelectedTextPositionAndDmaTextboxMap_hook(gb); return; } HANDOFF(0x565c);  // jp $565c
 L_4ce6:
   I(0x4ce6, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x4ce9, 2); alu_and(gb, 0x03);  // and $03
-  if ((F & FZ)) { I(0x4ceb, 4); textOptionCode_checkDirectionButtons(gb); return; } I(0x4ceb, 3);  // jp z,$5611
-  CALL(0x4cee, textOptionCode_checkBButton, 0x5662, 0x4cf1);  // call $5662
+  if ((F & FZ)) { I(0x4ceb, 4); if (hook_enabled_at(0x5611)) { textOptionCode_checkDirectionButtons_hook(gb); return; } HANDOFF(0x5611); } I(0x4ceb, 3);  // jp z,$5611
+  CALL(0x4cee, textOptionCode_checkBButton_hook, 0x5662, 0x4cf1);  // call $5662
   if (!(F & FZ)) { RET_TAKEN(0x4cf1); return; } I(0x4cf1, 2);  // ret nz
   I(0x4cf2, 2); A = 0x56;  // ld a,$56
   CALL(0x4cf4, playSound_b00_hook, 0x0c98, 0x4cf7);  // call $0c98
@@ -2804,14 +2804,14 @@ L_4d9e:
 L_4dab:
   CALL(0x4dab, decInvTextScrollTimer_hook, 0x5597, 0x4dae);  // call $5597
   if (!(F & FZ)) { RET_TAKEN(0x4dae); return; } I(0x4dae, 2);  // ret nz
-  CALL(0x4daf, shiftTextGfxBufferLeft, 0x557f, 0x4db2);  // call $557f
+  CALL(0x4daf, shiftTextGfxBufferLeft_hook, 0x557f, 0x4db2);  // call $557f
 L_4db2:
   CALL(0x4db2, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x4db5);  // call $56cf
   I(0x4db5, 2); alu_cp(gb, 0x10);  // cp $10
   if (!(F & FC)) { I(0x4db7, 3); goto L_4e02; } I(0x4db7, 2);  // jr nc,$4e02
   I(0x4db9, 2); alu_cp(gb, 0x01);  // cp $01
   if ((F & FZ)) { I(0x4dbb, 3); goto L_4e00; } I(0x4dbb, 2);  // jr z,$4e00
-  CALL(0x4dbd, handleTextControlCodeWithSpecialCase, 0x55a0, 0x4dc0);  // call $55a0
+  CALL(0x4dbd, handleTextControlCodeWithSpecialCase_hook, 0x55a0, 0x4dc0);  // call $55a0
   if ((F & FZ)) { I(0x4dc0, 3); goto L_4e08; } I(0x4dc0, 2);  // jr z,$4e08
   I(0x4dc2, 4); A = mem_rd(gb, 0xd0c2);  // ld a,($d0c2)
   I(0x4dc5, 1); alu_or(gb, A);  // or a
@@ -2847,7 +2847,7 @@ L_4de4:
   I(0x4df7, 4); mem_wr(gb, 0xcba3, A);  // ld ($cba3),a
   CALL(0x4dfa, checkInitialTextCommands, 0x4ff5, 0x4dfd);  // call $4ff5
 L_4dfd:
-  CALL(0x4dfd, shiftTextGfxBufferLeft, 0x557f, 0x4e00);  // call $557f
+  CALL(0x4dfd, shiftTextGfxBufferLeft_hook, 0x557f, 0x4e00);  // call $557f
 L_4e00:
   I(0x4e00, 2); A = 0x20;  // ld a,$20
 L_4e02:
@@ -2864,7 +2864,7 @@ L_4e10:
 L_4e15:
   CALL(0x4e15, decInvTextScrollTimer_hook, 0x5597, 0x4e18);  // call $5597
   if (!(F & FZ)) { RET_TAKEN(0x4e18); return; } I(0x4e18, 2);  // ret nz
-  CALL(0x4e19, shiftTextGfxBufferLeft, 0x557f, 0x4e1c);  // call $557f
+  CALL(0x4e19, shiftTextGfxBufferLeft_hook, 0x557f, 0x4e1c);  // call $557f
 L_4e1c:
   CALL(0x4e1c, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x4e1f);  // call $56cf
   I(0x4e1f, 2); alu_cp(gb, 0x10);  // cp $10
@@ -2888,7 +2888,7 @@ L_4e1c:
   I(0x4e3c, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   RET(0x4e3d); return;  // ret
 L_4e3e:
-  CALL(0x4e3e, handleTextControlCodeWithSpecialCase, 0x55a0, 0x4e41);  // call $55a0
+  CALL(0x4e3e, handleTextControlCodeWithSpecialCase_hook, 0x55a0, 0x4e41);  // call $55a0
   if ((F & FZ)) { I(0x4e41, 3); goto L_4e08; } I(0x4e41, 2);  // jr z,$4e08
   I(0x4e43, 3); goto L_4e1c;  // jr $4e1c
 L_4e45:
@@ -3293,7 +3293,7 @@ L_4cdc:
   if (!(F & FZ)) { RET_TAKEN(0x4ce0); return; } I(0x4ce0, 2);  // ret nz
   I(0x4ce1, 1); L = E;  // ld l,e
   I(0x4ce2, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4ce3, 4); updateSelectedTextPositionAndDmaTextboxMap(gb); return;  // jp $565c
+  I(0x4ce3, 4); if (hook_enabled_at(0x565c)) { updateSelectedTextPositionAndDmaTextboxMap_hook(gb); return; } HANDOFF(0x565c);  // jp $565c
 }
 
 // 3f:4ce6
@@ -3302,8 +3302,8 @@ void textOptionCode__state02(GB *gb) {
 L_4ce6:
   I(0x4ce6, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x4ce9, 2); alu_and(gb, 0x03);  // and $03
-  if ((F & FZ)) { I(0x4ceb, 4); textOptionCode_checkDirectionButtons(gb); return; } I(0x4ceb, 3);  // jp z,$5611
-  CALL(0x4cee, textOptionCode_checkBButton, 0x5662, 0x4cf1);  // call $5662
+  if ((F & FZ)) { I(0x4ceb, 4); if (hook_enabled_at(0x5611)) { textOptionCode_checkDirectionButtons_hook(gb); return; } HANDOFF(0x5611); } I(0x4ceb, 3);  // jp z,$5611
+  CALL(0x4cee, textOptionCode_checkBButton_hook, 0x5662, 0x4cf1);  // call $5662
   if (!(F & FZ)) { RET_TAKEN(0x4cf1); return; } I(0x4cf1, 2);  // ret nz
   I(0x4cf2, 2); A = 0x56;  // ld a,$56
   CALL(0x4cf4, playSound_b00_hook, 0x0c98, 0x4cf7);  // call $0c98
@@ -3462,14 +3462,14 @@ void inventoryTextCode__state02(GB *gb) {
 L_4dab:
   CALL(0x4dab, decInvTextScrollTimer_hook, 0x5597, 0x4dae);  // call $5597
   if (!(F & FZ)) { RET_TAKEN(0x4dae); return; } I(0x4dae, 2);  // ret nz
-  CALL(0x4daf, shiftTextGfxBufferLeft, 0x557f, 0x4db2);  // call $557f
+  CALL(0x4daf, shiftTextGfxBufferLeft_hook, 0x557f, 0x4db2);  // call $557f
 L_4db2:
   CALL(0x4db2, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x4db5);  // call $56cf
   I(0x4db5, 2); alu_cp(gb, 0x10);  // cp $10
   if (!(F & FC)) { I(0x4db7, 3); goto L_4e02; } I(0x4db7, 2);  // jr nc,$4e02
   I(0x4db9, 2); alu_cp(gb, 0x01);  // cp $01
   if ((F & FZ)) { I(0x4dbb, 3); goto L_4e00; } I(0x4dbb, 2);  // jr z,$4e00
-  CALL(0x4dbd, handleTextControlCodeWithSpecialCase, 0x55a0, 0x4dc0);  // call $55a0
+  CALL(0x4dbd, handleTextControlCodeWithSpecialCase_hook, 0x55a0, 0x4dc0);  // call $55a0
   if ((F & FZ)) { I(0x4dc0, 3); goto L_4e08; } I(0x4dc0, 2);  // jr z,$4e08
   I(0x4dc2, 4); A = mem_rd(gb, 0xd0c2);  // ld a,($d0c2)
   I(0x4dc5, 1); alu_or(gb, A);  // or a
@@ -3536,7 +3536,7 @@ L_4de4:
   I(0x4df7, 4); mem_wr(gb, 0xcba3, A);  // ld ($cba3),a
   CALL(0x4dfa, checkInitialTextCommands, 0x4ff5, 0x4dfd);  // call $4ff5
 L_4dfd:
-  CALL(0x4dfd, shiftTextGfxBufferLeft, 0x557f, 0x4e00);  // call $557f
+  CALL(0x4dfd, shiftTextGfxBufferLeft_hook, 0x557f, 0x4e00);  // call $557f
 L_4e00:
   I(0x4e00, 2); A = 0x20;  // ld a,$20
 L_4e02:
@@ -3556,7 +3556,7 @@ L_4e10:
 void inventoryTextCode__insertSpace(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4dfd:
-  CALL(0x4dfd, shiftTextGfxBufferLeft, 0x557f, 0x4e00);  // call $557f
+  CALL(0x4dfd, shiftTextGfxBufferLeft_hook, 0x557f, 0x4e00);  // call $557f
 L_4e00:
   I(0x4e00, 2); A = 0x20;  // ld a,$20
 L_4e02:
@@ -3650,7 +3650,7 @@ L_4e10:
 L_4e15:
   CALL(0x4e15, decInvTextScrollTimer_hook, 0x5597, 0x4e18);  // call $5597
   if (!(F & FZ)) { RET_TAKEN(0x4e18); return; } I(0x4e18, 2);  // ret nz
-  CALL(0x4e19, shiftTextGfxBufferLeft, 0x557f, 0x4e1c);  // call $557f
+  CALL(0x4e19, shiftTextGfxBufferLeft_hook, 0x557f, 0x4e1c);  // call $557f
 L_4e1c:
   CALL(0x4e1c, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x4e1f);  // call $56cf
   I(0x4e1f, 2); alu_cp(gb, 0x10);  // cp $10
@@ -3674,7 +3674,7 @@ L_4e1c:
   I(0x4e3c, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   RET(0x4e3d); return;  // ret
 L_4e3e:
-  CALL(0x4e3e, handleTextControlCodeWithSpecialCase, 0x55a0, 0x4e41);  // call $55a0
+  CALL(0x4e3e, handleTextControlCodeWithSpecialCase_hook, 0x55a0, 0x4e41);  // call $55a0
   if ((F & FZ)) { I(0x4e41, 3); goto L_4e08; } I(0x4e41, 2);  // jr z,$4e08
   I(0x4e43, 3); goto L_4e1c;  // jr $4e1c
 }
@@ -3684,7 +3684,7 @@ void inventoryTextCode__state05(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_4e45;
 L_4dfd:
-  CALL(0x4dfd, shiftTextGfxBufferLeft, 0x557f, 0x4e00);  // call $557f
+  CALL(0x4dfd, shiftTextGfxBufferLeft_hook, 0x557f, 0x4e00);  // call $557f
 L_4e00:
   I(0x4e00, 2); A = 0x20;  // ld a,$20
 L_4e02:
@@ -4185,12 +4185,12 @@ L_54c1:
   if ((F & FZ)) { I(0x54c4, 3); goto L_54ad; } I(0x54c4, 2);  // jr z,$54ad
   I(0x54c6, 3); goto L_54cf;  // jr $54cf
 L_54c8:
-  CALL(0x54c8, popFromTextStack, 0x56a4, 0x54cb);  // call $56a4
+  CALL(0x54c8, popFromTextStack_hook, 0x56a4, 0x54cb);  // call $56a4
   I(0x54cb, 1); A = H;  // ld a,h
   I(0x54cc, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x54cd, 3); goto L_54ad; } I(0x54cd, 2);  // jr nz,$54ad
 L_54cf:
-  CALL(0x54cf, popFromTextStack, 0x56a4, 0x54d2);  // call $56a4
+  CALL(0x54cf, popFromTextStack_hook, 0x56a4, 0x54d2);  // call $56a4
   SET_BC(POP(0x54d2));  // pop bc
   I(0x54d3, 3); SET_HL(0xd0d4);  // ld hl,$d0d4
   I(0x54d6, 3); A = mem_rd(gb, 0xff8a);  // ldh a,($ff8a)
@@ -4250,12 +4250,12 @@ L_54c1:
   if ((F & FZ)) { I(0x54c4, 3); goto L_54ad; } I(0x54c4, 2);  // jr z,$54ad
   I(0x54c6, 3); goto L_54cf;  // jr $54cf
 L_54c8:
-  CALL(0x54c8, popFromTextStack, 0x56a4, 0x54cb);  // call $56a4
+  CALL(0x54c8, popFromTextStack_hook, 0x56a4, 0x54cb);  // call $56a4
   I(0x54cb, 1); A = H;  // ld a,h
   I(0x54cc, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x54cd, 3); goto L_54ad; } I(0x54cd, 2);  // jr nz,$54ad
 L_54cf:
-  CALL(0x54cf, popFromTextStack, 0x56a4, 0x54d2);  // call $56a4
+  CALL(0x54cf, popFromTextStack_hook, 0x56a4, 0x54d2);  // call $56a4
   SET_BC(POP(0x54d2));  // pop bc
   I(0x54d3, 3); SET_HL(0xd0d4);  // ld hl,$d0d4
   I(0x54d6, 3); A = mem_rd(gb, 0xff8a);  // ldh a,($ff8a)
@@ -4315,12 +4315,12 @@ L_54c1:
   if ((F & FZ)) { I(0x54c4, 3); goto L_54ad; } I(0x54c4, 2);  // jr z,$54ad
   I(0x54c6, 3); goto L_54cf;  // jr $54cf
 L_54c8:
-  CALL(0x54c8, popFromTextStack, 0x56a4, 0x54cb);  // call $56a4
+  CALL(0x54c8, popFromTextStack_hook, 0x56a4, 0x54cb);  // call $56a4
   I(0x54cb, 1); A = H;  // ld a,h
   I(0x54cc, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x54cd, 3); goto L_54ad; } I(0x54cd, 2);  // jr nz,$54ad
 L_54cf:
-  CALL(0x54cf, popFromTextStack, 0x56a4, 0x54d2);  // call $56a4
+  CALL(0x54cf, popFromTextStack_hook, 0x56a4, 0x54d2);  // call $56a4
   SET_BC(POP(0x54d2));  // pop bc
   I(0x54d3, 3); SET_HL(0xd0d4);  // ld hl,$d0d4
   I(0x54d6, 3); A = mem_rd(gb, 0xff8a);  // ldh a,($ff8a)
@@ -4364,7 +4364,7 @@ L_5505:
 void doInventoryTextFirstPass__lineEnd(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_54cf:
-  CALL(0x54cf, popFromTextStack, 0x56a4, 0x54d2);  // call $56a4
+  CALL(0x54cf, popFromTextStack_hook, 0x56a4, 0x54d2);  // call $56a4
   SET_BC(POP(0x54d2));  // pop bc
   I(0x54d3, 3); SET_HL(0xd0d4);  // ld hl,$d0d4
   I(0x54d6, 3); A = mem_rd(gb, 0xff8a);  // ldh a,($ff8a)
@@ -4440,7 +4440,7 @@ L_5531:
   SET_HL(POP(0x5531));  // pop hl
   CALL(0x5532, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5535);  // call $56cf
   I(0x5535, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
-  CALL(0x5538, pushToTextStack, 0x567f, 0x553b);  // call $567f
+  CALL(0x5538, pushToTextStack_hook, 0x567f, 0x553b);  // call $567f
   I(0x553b, 1); A = B;  // ld a,b
   I(0x553c, 4); mem_wr(gb, 0xcba3, A);  // ld ($cba3),a
   I(0x553f, 4); getTextAddress(gb); return;  // jp $4f59
@@ -4488,7 +4488,7 @@ L_5566:
   SET_HL(POP(0x5575));  // pop hl
 L_5576:
   I(0x5576, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
-  CALL(0x5579, pushToTextStack, 0x567f, 0x557c);  // call $567f
+  CALL(0x5579, pushToTextStack_hook, 0x567f, 0x557c);  // call $567f
   I(0x557c, 4); checkInitialTextCommands(gb); return;  // jp $4ff5
 }
 
@@ -4499,7 +4499,7 @@ L_5531:
   SET_HL(POP(0x5531));  // pop hl
   CALL(0x5532, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5535);  // call $56cf
   I(0x5535, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
-  CALL(0x5538, pushToTextStack, 0x567f, 0x553b);  // call $567f
+  CALL(0x5538, pushToTextStack_hook, 0x567f, 0x553b);  // call $567f
   I(0x553b, 1); A = B;  // ld a,b
   I(0x553c, 4); mem_wr(gb, 0xcba3, A);  // ld ($cba3),a
   I(0x553f, 4); getTextAddress(gb); return;  // jp $4f59
@@ -4583,265 +4583,8 @@ L_5566:
   SET_HL(POP(0x5575));  // pop hl
 L_5576:
   I(0x5576, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
-  CALL(0x5579, pushToTextStack, 0x567f, 0x557c);  // call $567f
+  CALL(0x5579, pushToTextStack_hook, 0x567f, 0x557c);  // call $567f
   I(0x557c, 4); checkInitialTextCommands(gb); return;  // jp $4ff5
-}
-
-// 3f:557f
-void shiftTextGfxBufferLeft(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x557f, 3); SET_HL(0xd200);  // ld hl,$d200
-  I(0x5582, 3); SET_DE(0xd220);  // ld de,$d220
-  I(0x5585, 3); SET_BC(0x01e0);  // ld bc,$01e0
-L_5588:
-  I(0x5588, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5589, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x558a, 2); SET_DE(DE + 1);  // inc de
-  I(0x558b, 2); SET_BC(BC - 1);  // dec bc
-  I(0x558c, 1); A = C;  // ld a,c
-  I(0x558d, 1); alu_or(gb, B);  // or b
-  if (!(F & FZ)) { I(0x558e, 3); goto L_5588; } I(0x558e, 2);  // jr nz,$5588
-  I(0x5590, 3); SET_HL(0xd0d5);  // ld hl,$d0d5
-  I(0x5593, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x5594, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x5595, 1); L = A;  // ld l,a
-  RET(0x5596); return;  // ret
-}
-
-// 3f:55a0
-void handleTextControlCodeWithSpecialCase(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x55a0, 2); alu_cp(gb, 0x06);  // cp $06
-  if ((F & FZ)) { I(0x55a2, 3); goto L_55a9; } I(0x55a2, 2);  // jr z,$55a9
-  CALL(0x55a4, handleTextControlCode, 0x56e4, 0x55a7);  // call $56e4
-  I(0x55a7, 1); alu_or(gb, D);  // or d
-  RET(0x55a8); return;  // ret
-L_55a9:
-  I(0x55a9, 3); SET_BC(0xd3e0);  // ld bc,$d3e0
-  I(0x55ac, 3); SET_DE(0xd5e0);  // ld de,$d5e0
-  CALL(0x55af, handleTextControlCode, 0x56e4, 0x55b2);  // call $56e4
-  I(0x55b2, 1); alu_xor(gb, A);  // xor a
-  RET(0x55b3); return;  // ret
-}
-
-// 3f:55a9
-void handleTextControlCodeWithSpecialCase__cmd6(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_55a9:
-  I(0x55a9, 3); SET_BC(0xd3e0);  // ld bc,$d3e0
-  I(0x55ac, 3); SET_DE(0xd5e0);  // ld de,$d5e0
-  CALL(0x55af, handleTextControlCode, 0x56e4, 0x55b2);  // call $56e4
-  I(0x55b2, 1); alu_xor(gb, A);  // xor a
-  RET(0x55b3); return;  // ret
-}
-
-// 3f:55b4
-void updateSelectedTextPosition(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x55b4, getSelectedTextOptionAddress_hook, 0x55c8, 0x55b7);  // call $55c8
-  I(0x55b7, 3); alu_bit(gb, 5, mem_rd(gb, HL));  // bit 5,(hl)
-  I(0x55b9, 2); B = 0x60;  // ld b,$60
-  if (!(F & FZ)) { I(0x55bb, 3); goto L_55bf; } I(0x55bb, 2);  // jr nz,$55bf
-  I(0x55bd, 2); B = 0x20;  // ld b,$20
-L_55bf:
-  I(0x55bf, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x55c0, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x55c1, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x55c2, getAddressInTextboxMap_hook, 0x55d0, 0x55c5);  // call $55d0
-  I(0x55c5, 3); mem_wr(gb, HL, 0x04);  // ld (hl),$04
-  RET(0x55c7); return;  // ret
-}
-
-// 3f:5602
-void moveSelectedTextOptionLeft(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5602:
-  I(0x5602, 2); E = 0xe8;  // ld e,$e8
-  I(0x5604, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5605, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x5606, 2); alu_and(gb, 0x07);  // and $07
-  I(0x5608, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x5609, getSelectedTextOptionAddress_hook, 0x55c8, 0x560c);  // call $55c8
-  I(0x560c, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x560d, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x560e); return; } I(0x560e, 2);  // ret nz
-  I(0x560f, 3); goto L_5602;  // jr $5602
-}
-
-// 3f:5611
-void textOptionCode_checkDirectionButtons(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5611, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x5614, 2); alu_and(gb, 0xf0);  // and $f0
-  if ((F & FZ)) { RET_TAKEN(0x5616); return; } I(0x5616, 2);  // ret z
-  I(0x5617, 2); A = 0x84;  // ld a,$84
-  CALL(0x5619, playSound_b00_hook, 0x0c98, 0x561c);  // call $0c98
-  CALL(0x561c, removeCursorFromSelectedTextPosition_hook, 0x55e1, 0x561f);  // call $55e1
-  CALL(0x561f, textOptionCode_checkDirectionButtons__updateSelectedTextOption, 0x5624, 0x5622);  // call $5624
-  I(0x5622, 3); updateSelectedTextPositionAndDmaTextboxMap(gb); return;  // jr $565c
-}
-
-// 3f:5624
-void textOptionCode_checkDirectionButtons__updateSelectedTextOption(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5624:
-  I(0x5624, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  CALL(0x5627, getHighestSetBit_hook, 0x01ea, 0x562a);  // call $01ea
-  I(0x562a, 2); alu_sub(gb, 0x04);  // sub $04
-  if ((F & FZ)) { I(0x562c, 3); if (hook_enabled_at(0x55f2)) { moveSelectedTextOptionRight_hook(gb); return; } HANDOFF(0x55f2); } I(0x562c, 2);  // jr z,$55f2
-  I(0x562e, 1); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { I(0x562f, 3); moveSelectedTextOptionLeft(gb); return; } I(0x562f, 2);  // jr z,$5602
-  CALL(0x5631, getSelectedTextOptionAddress_hook, 0x55c8, 0x5634);  // call $55c8
-  I(0x5634, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x5635, 2); C = 0xff;  // ld c,$ff
-  I(0x5637, 2); L = 0xe0;  // ld l,$e0
-  I(0x5639, 1); E = L;  // ld e,l
-L_563a:
-  I(0x563a, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x563b, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x563c, 3); goto L_5651; } I(0x563c, 2);  // jr z,$5651
-  I(0x563e, 1); alu_sub(gb, B);  // sub b
-  if (!(F & FC)) { I(0x563f, 3); goto L_5643; } I(0x563f, 2);  // jr nc,$5643
-  I(0x5641, 1); alu_cpl(gb);  // cpl
-  I(0x5642, 1); A = alu_inc8(gb, A);  // inc a
-L_5643:
-  I(0x5643, 2); alu_sub(gb, 0x20);  // sub $20
-  if (!(F & FC)) { I(0x5645, 3); goto L_5649; } I(0x5645, 2);  // jr nc,$5649
-  I(0x5647, 1); alu_cpl(gb);  // cpl
-  I(0x5648, 1); A = alu_inc8(gb, A);  // inc a
-L_5649:
-  I(0x5649, 1); alu_cp(gb, C);  // cp c
-  if (!(F & FC)) { I(0x564a, 3); goto L_564e; } I(0x564a, 2);  // jr nc,$564e
-  I(0x564c, 1); C = A;  // ld c,a
-  I(0x564d, 1); E = L;  // ld e,l
-L_564e:
-  I(0x564e, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x564f, 3); goto L_563a;  // jr $563a
-L_5651:
-  I(0x5651, 1); A = C;  // ld a,c
-  I(0x5652, 2); alu_cp(gb, 0x10);  // cp $10
-  if (!(F & FC)) { RET_TAKEN(0x5654); return; } I(0x5654, 2);  // ret nc
-  I(0x5655, 1); A = E;  // ld a,e
-  I(0x5656, 2); alu_sub(gb, 0xe0);  // sub $e0
-  I(0x5658, 2); E = 0xe8;  // ld e,$e8
-  I(0x565a, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x565b); return;  // ret
-}
-
-// 3f:5651
-void textOptionCode_checkDirectionButtons__end(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5651:
-  I(0x5651, 1); A = C;  // ld a,c
-  I(0x5652, 2); alu_cp(gb, 0x10);  // cp $10
-  if (!(F & FC)) { RET_TAKEN(0x5654); return; } I(0x5654, 2);  // ret nc
-  I(0x5655, 1); A = E;  // ld a,e
-  I(0x5656, 2); alu_sub(gb, 0xe0);  // sub $e0
-  I(0x5658, 2); E = 0xe8;  // ld e,$e8
-  I(0x565a, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x565b); return;  // ret
-}
-
-// 3f:565c
-void updateSelectedTextPositionAndDmaTextboxMap(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x565c, updateSelectedTextPosition, 0x55b4, 0x565f);  // call $55b4
-  I(0x565f, 4); if (hook_enabled_at(0x5173)) { dmaTextboxMap_hook(gb); return; } HANDOFF(0x5173);  // jp $5173
-}
-
-// 3f:5662
-void textOptionCode_checkBButton(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5662, 2); alu_and(gb, 0x02);  // and $02
-  if ((F & FZ)) { RET_TAKEN(0x5664); return; } I(0x5664, 2);  // ret z
-  I(0x5665, 1); H = D;  // ld h,d
-  I(0x5666, 2); L = 0xe0;  // ld l,$e0
-L_5668:
-  I(0x5668, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x5669, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x566a, 3); goto L_5668; } I(0x566a, 2);  // jr nz,$5668
-  I(0x566c, 1); A = L;  // ld a,l
-  I(0x566d, 2); alu_sub(gb, 0xe2);  // sub $e2
-  I(0x566f, 2); L = 0xe8;  // ld l,$e8
-  I(0x5671, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5672, 2); A = 0x84;  // ld a,$84
-  CALL(0x5674, playSound_b00_hook, 0x0c98, 0x5677);  // call $0c98
-  CALL(0x5677, removeCursorFromSelectedTextPosition_hook, 0x55e1, 0x567a);  // call $55e1
-  CALL(0x567a, updateSelectedTextPositionAndDmaTextboxMap, 0x565c, 0x567d);  // call $565c
-  I(0x567d, 1); alu_or(gb, D);  // or d
-  RET(0x567e); return;  // ret
-}
-
-// 3f:567f
-void pushToTextStack(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x567f, DE);  // push de
-  PUSH(0x5680, BC);  // push bc
-  PUSH(0x5681, HL);  // push hl
-  I(0x5682, 3); SET_HL(0xd1db);  // ld hl,$d1db
-  I(0x5685, 3); SET_DE(0xd1df);  // ld de,$d1df
-  I(0x5688, 2); B = 0x1c;  // ld b,$1c
-L_568a:
-  I(0x568a, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x568b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x568c, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x568d, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x568e, 3); goto L_568a; } I(0x568e, 2);  // jr nz,$568a
-  I(0x5690, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x5691, 3); SET_DE(0xd0d4);  // ld de,$d0d4
-  I(0x5694, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5695, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  SET_DE(POP(0x5696));  // pop de
-  I(0x5697, 2); mem_wr(gb, HL, E);  // ld (hl),e
-  I(0x5698, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x5699, 2); mem_wr(gb, HL, D);  // ld (hl),d
-  I(0x569a, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x569b, 4); A = mem_rd(gb, 0xcba3);  // ld a,($cba3)
-  I(0x569e, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x569f, 1); H = D;  // ld h,d
-  I(0x56a0, 1); L = E;  // ld l,e
-  SET_BC(POP(0x56a1));  // pop bc
-  SET_DE(POP(0x56a2));  // pop de
-  RET(0x56a3); return;  // ret
-}
-
-// 3f:56a4
-void popFromTextStack(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x56a4, DE);  // push de
-  PUSH(0x56a5, BC);  // push bc
-  I(0x56a6, 3); SET_HL(0xd1c3);  // ld hl,$d1c3
-  I(0x56a9, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x56aa, 4); mem_wr(gb, 0xcba3, A);  // ld ($cba3),a
-  I(0x56ad, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x56ae, 3); SET_DE(0xd0d6);  // ld de,$d0d6
-  I(0x56b1, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x56b2, 1); B = A;  // ld b,a
-  I(0x56b3, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x56b4, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x56b5, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x56b6, 1); C = A;  // ld c,a
-  I(0x56b7, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x56b8, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x56b9, 2); mem_wr(gb, DE, A);  // ld (de),a
-  PUSH(0x56ba, BC);  // push bc
-  I(0x56bb, 3); SET_DE(0xd1c4);  // ld de,$d1c4
-  I(0x56be, 2); B = 0x1c;  // ld b,$1c
-L_56c0:
-  I(0x56c0, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x56c1, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x56c2, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x56c3, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x56c4, 3); goto L_56c0; } I(0x56c4, 2);  // jr nz,$56c0
-  I(0x56c6, 1); alu_xor(gb, A);  // xor a
-  I(0x56c7, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x56c8, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x56c9, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x56ca, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  SET_HL(POP(0x56cb));  // pop hl
-  SET_BC(POP(0x56cc));  // pop bc
-  SET_DE(POP(0x56cd));  // pop de
-  RET(0x56ce); return;  // ret
 }
 
 // 3f:56cf
@@ -4881,7 +4624,7 @@ void handleTextControlCode(GB *gb) {
 L_570a:
   SET_HL(POP(0x570a));  // pop hl
   SET_BC(POP(0x570b));  // pop bc
-  CALL(0x570c, popFromTextStack, 0x56a4, 0x570f);  // call $56a4
+  CALL(0x570c, popFromTextStack_hook, 0x56a4, 0x570f);  // call $56a4
   I(0x570f, 1); A = H;  // ld a,h
   I(0x5710, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x5711); return; } I(0x5711, 2);  // ret nz
@@ -4937,7 +4680,7 @@ L_575a:
   SET_HL(POP(0x575c));  // pop hl
   CALL(0x575d, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5760);  // call $56cf
   I(0x5760, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
-  CALL(0x5763, pushToTextStack, 0x567f, 0x5766);  // call $567f
+  CALL(0x5763, pushToTextStack_hook, 0x567f, 0x5766);  // call $567f
   I(0x5766, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x5768, 4); mem_wr(gb, 0xcba3, A);  // ld ($cba3),a
   CALL(0x576b, getTextAddress, 0x4f59, 0x576e);  // call $4f59
@@ -4959,7 +4702,7 @@ L_5780:
   I(0x5780, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
   I(0x5783, 4); A = mem_rd(gb, 0xcba4);  // ld a,($cba4)
   I(0x5786, 4); mem_wr(gb, 0xcba3, A);  // ld ($cba3),a
-  CALL(0x5789, pushToTextStack, 0x567f, 0x578c);  // call $567f
+  CALL(0x5789, pushToTextStack_hook, 0x567f, 0x578c);  // call $567f
   CALL(0x578c, checkInitialTextCommands, 0x4ff5, 0x578f);  // call $4ff5
   I(0x578f, 3); goto L_57d3;  // jr $57d3
 L_5791:
@@ -5070,7 +4813,7 @@ void handleTextControlCode__controlCode0(GB *gb) {
 L_570a:
   SET_HL(POP(0x570a));  // pop hl
   SET_BC(POP(0x570b));  // pop bc
-  CALL(0x570c, popFromTextStack, 0x56a4, 0x570f);  // call $56a4
+  CALL(0x570c, popFromTextStack_hook, 0x56a4, 0x570f);  // call $56a4
   I(0x570f, 1); A = H;  // ld a,h
   I(0x5710, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x5711); return; } I(0x5711, 2);  // ret nz
@@ -5171,7 +4914,7 @@ L_575a:
   SET_HL(POP(0x575c));  // pop hl
   CALL(0x575d, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5760);  // call $56cf
   I(0x5760, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
-  CALL(0x5763, pushToTextStack, 0x567f, 0x5766);  // call $567f
+  CALL(0x5763, pushToTextStack_hook, 0x567f, 0x5766);  // call $567f
   I(0x5766, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x5768, 4); mem_wr(gb, 0xcba3, A);  // ld ($cba3),a
   CALL(0x576b, getTextAddress, 0x4f59, 0x576e);  // call $4f59
@@ -5192,7 +4935,7 @@ L_575a:
   SET_HL(POP(0x575c));  // pop hl
   CALL(0x575d, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5760);  // call $56cf
   I(0x5760, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
-  CALL(0x5763, pushToTextStack, 0x567f, 0x5766);  // call $567f
+  CALL(0x5763, pushToTextStack_hook, 0x567f, 0x5766);  // call $567f
   I(0x5766, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x5768, 4); mem_wr(gb, 0xcba3, A);  // ld ($cba3),a
   CALL(0x576b, getTextAddress, 0x4f59, 0x576e);  // call $4f59
@@ -5213,7 +4956,7 @@ L_575a:
   SET_HL(POP(0x575c));  // pop hl
   CALL(0x575d, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5760);  // call $56cf
   I(0x5760, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
-  CALL(0x5763, pushToTextStack, 0x567f, 0x5766);  // call $567f
+  CALL(0x5763, pushToTextStack_hook, 0x567f, 0x5766);  // call $567f
   I(0x5766, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x5768, 4); mem_wr(gb, 0xcba3, A);  // ld ($cba3),a
   CALL(0x576b, getTextAddress, 0x4f59, 0x576e);  // call $4f59
@@ -5232,7 +4975,7 @@ L_5758:
   SET_HL(POP(0x575c));  // pop hl
   CALL(0x575d, readByteFromW7ActiveBankAndIncHl, 0x56cf, 0x5760);  // call $56cf
   I(0x5760, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
-  CALL(0x5763, pushToTextStack, 0x567f, 0x5766);  // call $567f
+  CALL(0x5763, pushToTextStack_hook, 0x567f, 0x5766);  // call $567f
   I(0x5766, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x5768, 4); mem_wr(gb, 0xcba3, A);  // ld ($cba3),a
   CALL(0x576b, getTextAddress, 0x4f59, 0x576e);  // call $4f59
@@ -5262,7 +5005,7 @@ L_5780:
   I(0x5780, 4); mem_wr(gb, 0xcba2, A);  // ld ($cba2),a
   I(0x5783, 4); A = mem_rd(gb, 0xcba4);  // ld a,($cba4)
   I(0x5786, 4); mem_wr(gb, 0xcba3, A);  // ld ($cba3),a
-  CALL(0x5789, pushToTextStack, 0x567f, 0x578c);  // call $567f
+  CALL(0x5789, pushToTextStack_hook, 0x567f, 0x578c);  // call $567f
   CALL(0x578c, checkInitialTextCommands, 0x4ff5, 0x578f);  // call $4ff5
   I(0x578f, 3); goto L_57d3;  // jr $57d3
 L_57d3:

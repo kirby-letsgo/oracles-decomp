@@ -441,3 +441,9 @@ desync to discover; keep them when porting routines.
   `$52a4` but went straight to the `$52a5` call on fallthrough, silently dropping the two-cycle
   not-taken return. After writing a one-line early return, add the matching ordinary `CYC` before
   the next instruction just as for a conditional `jr`.
+- A static `call` to a local body still performs a real emulated-stack operation even when both
+  sides become readable C. Batch 45's textbox direction handler calls its `$5624` local body from
+  `$561f`; burn the three-byte call, `push_effect` the `$5622` return address, invoke the helper,
+  and let its original `ret` pop that address before continuing. Calling the helper like an
+  ordinary C function would leave the emulated stack one return address short whenever the local
+  body returns.
