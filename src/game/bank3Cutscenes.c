@@ -11,6 +11,13 @@ void introCinematic_moveBlackBarsIn_hook(GB *gb);
 void introCinematic_moveBlackBarsOut_hook(GB *gb);
 void intro_gotoTitlescreen_hook(GB *gb);
 void intro_restart_hook(GB *gb);
+void intro_japaneseOnlyScreen_hook(GB *gb);
+void intro_capcomScreen_hook(GB *gb);
+void intro_titlescreen_hook(GB *gb);
+void intro_titlescreen_state0_hook(GB *gb);
+void intro_titlescreen_state1_hook(GB *gb);
+void intro_titlescreen_state2_hook(GB *gb);
+void intro_titlescreen_state3_hook(GB *gb);
 
 static uint16_t intro_jumpTable(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -453,8 +460,17 @@ void intro_runStage_hook(GB *gb) {
   CYC(0x4cf5, 0x4cf8); A = mem_rd(gb, wThreadStateBuffer + 6);
   CYC(0x4cf8, 0x4cf9); push_effect(gb, 0x4cf9);
   switch (intro_jumpTable(gb)) {
+    case 0x4d38:
+      intro_japaneseOnlyScreen_hook(gb);
+      return;
+    case 0x4d3c:
+      intro_capcomScreen_hook(gb);
+      return;
     case 0x2d1a:
       intro_cinematic_hook(gb);
+      return;
+    case 0x4d88:
+      intro_titlescreen_hook(gb);
       return;
     case 0x4d1b:
       intro_restart_hook(gb);
@@ -554,6 +570,121 @@ void intro_incState_hook(GB *gb) {
   CYC(0x4d37, 0x4d38); ret_effect(gb);
 }
 
+void intro_capcomScreen__state0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4d46, restartSound_hook, 0x0cb2, 0x4d49);
+  CALL_C(0x4d49, clearVram_hook, 0x04af, 0x4d4c);
+  CYC(0x4d4c, 0x4d4e); A = 0x01;
+  CALL_C(0x4d4e, loadGfxHeader_hook, 0x0626, 0x4d51);
+  CYC(0x4d51, 0x4d53); A = 0x01;
+  CALL_C(0x4d53, loadPaletteHeader_hook, 0x050b, 0x4d56);
+  CYC(0x4d56, 0x4d59); SET_HL(wTmpcbb3);
+  CYC(0x4d59, 0x4d5b); mem_wr(gb, HL, 0xd0);
+  CYC(0x4d5b, 0x4d5c); SET_HL(HL + 1);
+  CYC(0x4d5c, 0x4d5e); mem_wr(gb, HL, 0x00);
+  CALL_C(0x4d5e, intro_incState_hook, 0x4d33, 0x4d61);
+  CALL_C(0x4d61, fadeinFromWhite_hook, 0x3299, 0x4d64);
+  CYC(0x4d64, 0x4d65); alu_xor(gb, A);
+  CYC(0x4d65, 0x4d68); loadGfxRegisterStateIndex_hook(gb);
+}
+
+void intro_capcomScreen__state1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4d68, 0x4d6b); SET_HL(wTmpcbb3);
+  CALL_C(0x4d6b, decHlRef16WithCap_hook, 0x0237, 0x4d6e);
+  if (!(F & FZ)) {
+    CYCT(0x4d6e, 0x4d6f); ret_effect(gb);
+    return;
+  }
+  CYC(0x4d6e, 0x4d6f);
+  CALL_C(0x4d6f, intro_incState_hook, 0x4d33, 0x4d72);
+  CYC(0x4d72, 0x4d75); fadeoutToWhite_hook(gb);
+}
+
+void intro_capcomScreen__state2_hook(GB *gb) {
+  CYC(0x4d75, 0x4d78); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x4d78, 0x4d79); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x4d79, 0x4d7a); ret_effect(gb);
+    return;
+  }
+  CYC(0x4d79, 0x4d7a);
+  CYC(0x4d7a, 0x4d7b); alu_xor(gb, A);
+  CYC(0x4d7b, 0x4d7e); SET_HL(wThreadStateBuffer + 6);
+  CYC(0x4d7e, 0x4d80); mem_wr(gb, HL, 0x02);
+  CYC(0x4d80, 0x4d81); L = alu_inc8(gb, L);
+  CYC(0x4d81, 0x4d82); mem_wr(gb, HL, A);
+  CYC(0x4d82, 0x4d85); mem_wr(gb, wIntro_cinematicState, A);
+  CYC(0x4d85, 0x4d88); enableIntroInputs_hook(gb);
+}
+
+void intro_capcomScreen_hook(GB *gb) {
+  CYC(0x4d3c, 0x4d3f); A = mem_rd(gb, wThreadStateBuffer + 7);
+  CYC(0x4d3f, 0x4d40); push_effect(gb, 0x4d40);
+  switch (intro_jumpTable(gb)) {
+    case 0x4d46:
+      intro_capcomScreen__state0_hook(gb);
+      return;
+    case 0x4d68:
+      intro_capcomScreen__state1_hook(gb);
+      return;
+    case 0x4d75:
+      intro_capcomScreen__state2_hook(gb);
+      return;
+    default:
+      hook_handoff(gb, HL);
+      return;
+  }
+}
+
+void intro_japaneseOnlyScreen_hook(GB *gb) {
+  CYC(0x4d38, 0x4d3b); SET_HL(wThreadStateBuffer + 6);
+  CYC(0x4d3b, 0x4d3c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  intro_capcomScreen_hook(gb);
+}
+
+void intro_titlescreen__runState_hook(GB *gb) {
+  CYC(0x4da7, 0x4daa); A = mem_rd(gb, wThreadStateBuffer + 7);
+  CYC(0x4daa, 0x4dab); push_effect(gb, 0x4dab);
+  switch (intro_jumpTable(gb)) {
+    case 0x4db3:
+      intro_titlescreen_state0_hook(gb);
+      return;
+    case 0x4de1:
+      intro_titlescreen_state1_hook(gb);
+      return;
+    case 0x4e08:
+      intro_titlescreen_state2_hook(gb);
+      return;
+    case 0x4e10:
+      intro_titlescreen_state3_hook(gb);
+      return;
+    default:
+      hook_handoff(gb, HL);
+      return;
+  }
+}
+
+void intro_titlescreen_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4d88, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4d8b);
+  CALL_C(0x4d8b, intro_titlescreen__runState_hook, 0x4da7, 0x4d8e);
+  CALL_C(0x4d8e, clearOam_hook, 0x049f, 0x4d91);
+  CYC(0x4d91, 0x4d94); SET_HL(0x595d);
+  CYC(0x4d94, 0x4d96); E = 0x3f;
+  CALL_C(0x4d96, addSpritesFromBankToOam_hook, 0x30eb, 0x4d99);
+  CYC(0x4d99, 0x4d9c); A = mem_rd(gb, wTmpcbb3);
+  CYC(0x4d9c, 0x4d9e); alu_and(gb, 0x20);
+  if (!(F & FZ)) {
+    CYCT(0x4d9e, 0x4d9f); ret_effect(gb);
+    return;
+  }
+  CYC(0x4d9e, 0x4d9f);
+  CYC(0x4d9f, 0x4da2); SET_HL(0x59aa);
+  CYC(0x4da2, 0x4da4); E = 0x3f;
+  CYC(0x4da4, 0x4da7); addSpritesFromBankToOam_hook(gb);
+}
+
 void intro_titlescreen_state0_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(0x4db3, restartSound_hook, 0x0cb2, 0x4db6);
@@ -625,6 +756,21 @@ void intro_titlescreen_state2_hook(GB *gb) {
   }
   CYC(0x4e0c, 0x4e0d);
   CYC(0x4e0d, 0x4e10); intro_gotoNextStage_hook(gb);
+}
+
+void intro_titlescreen_state3_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4e10, 0x4e13); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x4e13, 0x4e14); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x4e14, 0x4e15); ret_effect(gb);
+    return;
+  }
+  CYC(0x4e14, 0x4e15);
+  CYC(0x4e15, 0x4e17); A = 0xe8;
+  CYC(0x4e17, 0x4e1a); SET_BC(0x1a17);
+  CALL_C(0x4e1a, threadRestart_hook, 0x08a3, 0x4e1d);
+  CYC(0x4e1d, 0x4e20); stubThreadStart_hook(gb);
 }
 
 void introCinematic_ridingHorse_state0_hook(GB *gb) {

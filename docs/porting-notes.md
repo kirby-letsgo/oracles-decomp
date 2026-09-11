@@ -513,3 +513,8 @@ desync to discover; keep them when porting routines.
   comparing the helper instruction-by-instruction; split the burns and apply each effect
   immediately after its own opcode. The same review found a three-byte `jp` at `$5641` burned
   through `$5645`, consuming the next routine's first opcode; its correct endpoint is `$5644`.
+- An unconditional branch burn ends at the instruction boundary, never at the branch target.
+  Batch 62 initially burned the `jr` at `$618b` through its target `$618f`, silently consuming
+  the two skipped bytes; instruction-level cross-review corrected the two-byte opcode's endpoint
+  to `$618d`. This is the same byte-count rule as every other branch even when the target is the
+  next block the readable control flow enters.
