@@ -452,3 +452,9 @@
 3f:4e45 inventoryTextCode__state05
 3f:4e54 inventoryTextCode__state06
 3f:4e5d inventoryTextCode__state07
+01:45d0 addFunctionsToVBlankQueue__locFunc
+01:4751 copyTileRowToVramBuffer__copyFunc
+01:4882 checkSymmetryCityPaletteTransition__ok
+01:4884 checkSymmetryCityPaletteTransition__notOk
+01:4910 makeActiveObjectFollowLink_b01
+01:4959 checkUpdateFollowingLinkObject__update
