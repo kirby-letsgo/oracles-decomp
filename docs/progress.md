@@ -1,13 +1,13 @@
 # Progress
 
-Updated 2026-09-12. Newest entries at the top of each section.
+Updated 2026-09-13. Newest entries at the top of each section.
 
 ## Where things stand
 
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,419 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,434 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -138,6 +138,8 @@ Updated 2026-09-12. Newest entries at the top of each section.
   and the file-select error/input wait tails.
   Batch 114 added the bank-1 palette roots and safe cutscene-15 dispatchers plus bank-2 text-copy
   and file-select bootstrap paths.
+  Batch 115 completed bank 2's remaining normal DMG guard, status-bar, menu-exit, and save-reset
+  roots; only the deliberately corrupted garbage tail remains generated in that bank.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -243,6 +245,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 5 batch 115 (15 routines): completed bank 2's normal executable
+  roots with the DMG-mode guard and VBlank loop, indoor alternate-world tileset update, bank-2
+  trampoline, menu fade-out/reload and save-reset flow, rectangle helper, and status-bar body.
+  Five embedded dungeon-map and rectangle data rows left the executable registry, and six local
+  entries received stable aliases. Review and integration corrected IO-register access through
+  `mem_wr`, an offset RAM read that cannot use the token-pasting `W8` macro, stack-context
+  propagation through newly direct callers, and static dispatch through the readable bank-call
+  trampoline. Two independent instruction-level reviews approved the corrected code. Gates:
+  lint 0, 30k verify 0 mismatches across 4,753,457 calls, full replay 0 failures across
+  13,807,186 calls with state `64bddd0dfe384126`, normal and quirk suites 8/8.
 - 2026-09-12: milestone 3 phase 5 batch 114 (15 routines): added bank 1's palette-fade root,
   shared fading update, locked-color dispatcher and leaves, and the two safe cutscene-15 dispatcher
   entries, plus bank 2's text-character copy chain and file-select root, initialization, and main

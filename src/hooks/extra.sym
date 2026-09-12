@@ -511,6 +511,10 @@
 01:4884 checkSymmetryCityPaletteTransition__notOk
 01:4910 makeActiveObjectFollowLink_b01
 01:4959 checkUpdateFollowingLinkObject__update
+02:496f func_02_494a__end
+02:51d8 updateStatusBar_body__updateRupeeDisplay
+02:5220 updateStatusBar_body__updateHeartDisplay
+02:52b0 updateStatusBar_body__biggoronSword
 02:447f fileSelectUpdateInput__upOrDown
 02:4825 drawNameInputCursors__upperOptions
 02:4838 drawNameInputCursors__lowerOptions
@@ -615,6 +619,8 @@
 02:425a fileSelectMode1__textSpeedMenu_addCursorToOam
 02:41a4 fileSelectMode1__afterCall
 02:41aa fileSelectMode1__subModes
+02:50ca menuStateFadeOutOfMenu__afterCall
+02:510d reloadGraphicsOnExitMenu_body__afterCall
 02:4283 fileSelectMode5__mode5States
 02:428b fileSelectMode5__state0
 02:42a7 fileSelectMode5__state1
@@ -764,3 +770,4 @@
 02:4541 fileSelectMode6__mode2
 01:5926 checkLockBG7Color3ToBlack__thing1
 01:592d checkLockBG7Color3ToBlack__thing0
+02:401a checkDisplayDmgModeScreen__vblankLoop

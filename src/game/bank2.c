@@ -21,6 +21,12 @@ void fileSelectMode0_hook(GB *gb);
 void fileSelectMode1_hook(GB *gb);
 void fileSelectMode1__afterCall_hook(GB *gb);
 void fileSelectMode1__subModes_hook(GB *gb);
+void runBank2Function_hook(GB *gb);
+void menuStateFadeOutOfMenu_hook(GB *gb);
+void menuStateFadeOutOfMenu__afterCall_hook(GB *gb);
+void reloadGraphicsOnExitMenu_body_hook(GB *gb);
+void reloadGraphicsOnExitMenu_body__afterCall_hook(GB *gb);
+void saveQuitMenu_state2_hook(GB *gb);
 
 static void add_double_index_to_hl(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -60,6 +66,12 @@ void loadItemIconGfx_hook(GB *gb);
 void loadItemIconGfx__func_hook(GB *gb);
 void loadItemIconGfx__clear_hook(GB *gb);
 void loadStatusBarMap_hook(GB *gb);
+void func_02_494a_hook(GB *gb);
+void updateStatusBar_body_hook(GB *gb);
+void updateStatusBar_body__updateRupeeDisplay_hook(GB *gb);
+void updateStatusBar_body__updateHeartDisplay_hook(GB *gb);
+void updateStatusBar_body__biggoronSword_hook(GB *gb);
+void func_02_494a__end_hook(GB *gb);
 void getRingTiles_hook(GB *gb);
 void getRingTiles__drawTile_hook(GB *gb);
 void func_02_4149_hook(GB *gb);
@@ -280,6 +292,8 @@ void runTextInput__upOrDown_hook(GB *gb);
 void runTextInput__startButton_hook(GB *gb);
 void fileSelect_printError_hook(GB *gb);
 void textInput_waitForInput_hook(GB *gb);
+void checkDisplayDmgModeScreen__vblankLoop_hook(GB *gb);
+void updateTilesetFlagsForIndoorRoomInAltWorld_hook(GB *gb);
 void fileSelectMode4_hook(GB *gb);
 void fileSelectMode4__mode4Update_hook(GB *gb);
 void fileSelectMode4__mode0_hook(GB *gb);
@@ -4278,6 +4292,46 @@ void closeMenu_hook(GB *gb) {
   CYC(0x4fcc, 0x4fcf); fastFadeoutToWhite_hook(gb);
 }
 
+void func_02_494a_hook(GB *gb) {
+  CYC(0x494a, 0x494b); push_effect(gb, HL);
+  CYC(0x494b, 0x494e); SET_HL(0x499a);
+  CYC(0x494e, 0x4950); alu_bit(gb, 0, E);
+  if (!(F & FZ)) { CYCT(0x4950, 0x4952); goto have_table; }
+  CYC(0x4950, 0x4952);
+  CYC(0x4952, 0x4955); SET_HL(0x4971);
+have_table:
+  CYC(0x4955, 0x4957); alu_cp(gb, 0x60);
+  CYC(0x4957, 0x4958); alu_ccf(gb);
+  if (!(F & FC)) { CYCT(0x4958, 0x495a); func_02_494a__end_hook(gb); return; }
+  CYC(0x4958, 0x495a);
+  CYC(0x495a, 0x495c); B = 0x00;
+  CYC(0x495c, 0x495e); alu_cp(gb, 0xb0);
+  if (F & FC) { CYCT(0x495e, 0x4960); goto set_comparator; }
+  CYC(0x495e, 0x4960);
+  CYC(0x4960, 0x4962); B = 0x50;
+  CYC(0x4962, 0x4963); alu_sub(gb, B);
+set_comparator:
+  CYC(0x4963, 0x4964); C = A;
+next_table_entry:
+  CYC(0x4964, 0x4965); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4965, 0x4966); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x4966, 0x4968); func_02_494a__end_hook(gb); return; }
+  CYC(0x4966, 0x4968);
+  CYC(0x4968, 0x4969); alu_cp(gb, C);
+  CYC(0x4969, 0x496a); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  if (!(F & FZ)) { CYCT(0x496a, 0x496c); goto next_table_entry; }
+  CYC(0x496a, 0x496c);
+  CYC(0x496c, 0x496d); alu_add(gb, B);
+  CYC(0x496d, 0x496e); C = A;
+  CYC(0x496e, 0x496f); alu_scf(gb);
+  func_02_494a__end_hook(gb);
+}
+
+void func_02_494a__end_hook(GB *gb) {
+  CYC(0x496f, 0x4970); SET_HL(pop_effect(gb));
+  CYC(0x4970, 0x4971); ret_effect(gb);
+}
+
 void playHeartBeepAtInterval_hook(GB *gb) {
   CYC(0x5142, 0x5145); A = W8(w1Link_id);
   CYC(0x5145, 0x5146); A = alu_dec8(gb, A);
@@ -4310,7 +4364,7 @@ void loadCommonGraphics_body_hook(GB *gb) {
   CALL_C(0x5166, loadGfxHeader_hook, 0x0626, 0x5169);
   CYC(0x5169, 0x516a); alu_xor(gb, A);
   CYC(0x516a, 0x516d); W8(wcbe8) = A;
-  CALL_C(0x516d, updateStatusBar_body, 0x518d, 0x5170);
+  CALL_C(0x516d, updateStatusBar_body_hook, 0x518d, 0x5170);
   CYC(0x5170, 0x5173); A = W8(wActiveGroup);
   CYC(0x5173, 0x5175); alu_sub(gb, 0x02);
   CYC(0x5175, 0x5177); alu_cp(gb, 0x02);
@@ -4326,6 +4380,212 @@ void loadCommonGraphics_body_hook(GB *gb) {
   CALL_C(0x5187, loadPaletteHeader_hook, 0x050b, 0x518a);
 done:
   CYC(0x518a, 0x518d); checkReloadStatusBarGraphics_hook(gb);
+}
+
+void updateStatusBar_body_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x518d, 0x5190); A = W8(wDontUpdateStatusBar);
+  CYC(0x5190, 0x5191); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x5191, 0x5192); ret_effect(gb); return; }
+  CYC(0x5191, 0x5192);
+  CYC(0x5192, 0x5194); A = 0x04;
+  CYC(0x5194, 0x5196); hram_wr(gb, R_SVBK, A);
+  CALL_C(0x5196, loadStatusBarMap_hook, 0x54df, 0x5199);
+  CYC(0x5199, 0x519c); A = W8(wStatusBarNeedsRefresh);
+  CYC(0x519c, 0x519e); alu_bit(gb, 0, A);
+  if (F & FZ) { CYCT(0x519e, 0x51a0); goto item_count_refresh; }
+  CYC(0x519e, 0x51a0);
+  CALL_C(0x51a0, loadEquippedItemGfx_hook, 0x52d2, 0x51a3);
+  CALL_C(0x51a3, drawItemTilesOnStatusBar_hook, 0x5358, 0x51a6);
+  CYC(0x51a6, 0x51a8);
+  goto update_rupees;
+item_count_refresh:
+  CYC(0x51a8, 0x51aa); alu_bit(gb, 1, A);
+  if (!(F & FZ)) CALL_C_CC(0x51aa, drawItemTilesOnStatusBar_hook, 0x5358, 0x51ad);
+  else CYC(0x51aa, 0x51ad);
+update_rupees:
+  CYC(0x51ad, 0x51b0); SET_HL(wNumRupees);
+  CYC(0x51b0, 0x51b1); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x51b1, 0x51b2); B = mem_rd(gb, HL);
+  CYC(0x51b2, 0x51b3); C = A;
+  CYC(0x51b3, 0x51b6); SET_HL(wDisplayedRupees);
+  CYC(0x51b6, 0x51b7); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x51b7, 0x51b8); H = mem_rd(gb, HL);
+  CYC(0x51b8, 0x51b9); L = A;
+  CALL_C(0x51b9, compareHlToBc_hook, 0x01d6, 0x51bc);
+  if (F & FZ) { CYCT(0x51bc, 0x51be); updateStatusBar_body__updateRupeeDisplay_hook(gb); return; }
+  CYC(0x51bc, 0x51be);
+  CYC(0x51be, 0x51c1); SET_HL(wStatusBarNeedsRefresh);
+  CYC(0x51c1, 0x51c3); mem_wr(gb, HL, mem_rd(gb, HL) | 0x08);
+  CYC(0x51c3, 0x51c6); SET_BC(0x0001);
+  CYC(0x51c6, 0x51c8); L = (uint8_t)wDisplayedRupees;
+  CYC(0x51c8, 0x51c9); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(0x51c9, 0x51cb); goto subtract_rupee; }
+  CYC(0x51c9, 0x51cb);
+  CALL_C(0x51cb, addDecimalToHlRef_hook, 0x0181, 0x51ce);
+  CYC(0x51ce, 0x51d0);
+  goto play_rupee_sound;
+subtract_rupee:
+  CALL_C(0x51d0, subDecimalFromHlRef_hook, 0x018f, 0x51d3);
+play_rupee_sound:
+  CYC(0x51d3, 0x51d5); A = 0x61;
+  CALL_C(0x51d5, playSound_b00_hook, 0x0c98, 0x51d8);
+  updateStatusBar_body__updateRupeeDisplay_hook(gb);
+}
+
+void updateStatusBar_body__updateRupeeDisplay_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x51d8, 0x51db); A = W8(wStatusBarNeedsRefresh);
+  CYC(0x51db, 0x51dd); alu_bit(gb, 3, A);
+  if (F & FZ) { CYCT(0x51dd, 0x51df); goto update_hearts; }
+  CYC(0x51dd, 0x51df);
+  CYC(0x51df, 0x51e2); SET_HL(w4StatusBarTileMap + 0x2c);
+  CALL_C(0x51e2, correctAddressForExtraHeart_hook, 0x52cb, 0x51e5);
+  CYC(0x51e5, 0x51e7); C = 0x10;
+  CYC(0x51e7, 0x51ea); A = W8(wDisplayedRupees);
+  CYC(0x51ea, 0x51eb); B = A;
+  CYC(0x51eb, 0x51ed); alu_and(gb, 0x0f);
+  CYC(0x51ed, 0x51ee); alu_add(gb, C);
+  CYC(0x51ee, 0x51ef); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x51ef, 0x51f0); A = B;
+  CYC(0x51f0, 0x51f2); A = alu_swap(gb, A);
+  CYC(0x51f2, 0x51f4); alu_and(gb, 0x0f);
+  CYC(0x51f4, 0x51f5); alu_add(gb, C);
+  CYC(0x51f5, 0x51f6); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x51f6, 0x51f9); A = mem_rd(gb, wDisplayedRupees + 1);
+  CYC(0x51f9, 0x51fb); alu_and(gb, 0x0f);
+  CYC(0x51fb, 0x51fc); alu_add(gb, C);
+  CYC(0x51fc, 0x51fd); mem_wr(gb, HL, A); SET_HL(HL - 1);
+update_hearts:
+  CYC(0x51fd, 0x5200); SET_HL(wDisplayedHearts);
+  CYC(0x5200, 0x5203); A = W8(wLinkHealth);
+  CYC(0x5203, 0x5204); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(0x5204, 0x5206); updateStatusBar_body__updateHeartDisplay_hook(gb); return; }
+  CYC(0x5204, 0x5206);
+  if (F & FC) { CYCT(0x5206, 0x5208); goto decrement_hearts; }
+  CYC(0x5206, 0x5208);
+  CYC(0x5208, 0x520b); A = W8(wFrameCounter);
+  CYC(0x520b, 0x520d); alu_and(gb, 0x03);
+  if (!(F & FZ)) { CYCT(0x520d, 0x520f); updateStatusBar_body__updateHeartDisplay_hook(gb); return; }
+  CYC(0x520d, 0x520f);
+  CYC(0x520f, 0x5210); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x5210, 0x5211); A = mem_rd(gb, HL);
+  CYC(0x5211, 0x5213); alu_and(gb, 0x03);
+  CYC(0x5213, 0x5215); A = 0x57;
+  if (F & FZ) CALL_C_CC(0x5215, playSound_b00_hook, 0x0c98, 0x5218);
+  else CYC(0x5215, 0x5218);
+  CYC(0x5218, 0x521a);
+  goto mark_heart_refresh;
+decrement_hearts:
+  CYC(0x521a, 0x521b); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+mark_heart_refresh:
+  CYC(0x521b, 0x521e); SET_HL(wStatusBarNeedsRefresh);
+  CYC(0x521e, 0x5220); mem_wr(gb, HL, mem_rd(gb, HL) | 0x04);
+  updateStatusBar_body__updateHeartDisplay_hook(gb);
+}
+
+void updateStatusBar_body__updateHeartDisplay_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5220, 0x5223); A = W8(wStatusBarNeedsRefresh);
+  CYC(0x5223, 0x5225); alu_bit(gb, 2, A);
+  if (!(F & FZ)) CALL_C_CC(0x5225, inGameDrawHeartDisplay_hook, 0x543c, 0x5228);
+  else CYC(0x5225, 0x5228);
+  CYC(0x5228, 0x522b); SET_HL(w4StatusBarTileMap + 0x0a);
+  CALL_C(0x522b, correctAddressForExtraHeart_hook, 0x52cb, 0x522e);
+  CYC(0x522e, 0x5230); mem_wr(gb, HL, 0x09);
+  CYC(0x5230, 0x5233); A = W8(wTilesetFlags);
+  CYC(0x5233, 0x5235); alu_bit(gb, 4, A);
+  if (!(F & FZ)) { CYCT(0x5235, 0x5237); goto sprites; }
+  CYC(0x5235, 0x5237);
+  CYC(0x5237, 0x5239); alu_bit(gb, 3, A);
+  if (F & FZ) { CYCT(0x5239, 0x523b); goto sprites; }
+  CYC(0x5239, 0x523b);
+  CYC(0x523b, 0x523c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x523c, 0x523d); L = alu_inc8(gb, L);
+  CYC(0x523d, 0x523f); mem_wr(gb, HL, 0x1b);
+  CYC(0x523f, 0x5242); A = W8(wStatusBarNeedsRefresh);
+  CYC(0x5242, 0x5244); alu_bit(gb, 4, A);
+  if (F & FZ) { CYCT(0x5244, 0x5246); goto sprites; }
+  CYC(0x5244, 0x5246);
+  CYC(0x5246, 0x5247); L = alu_inc8(gb, L);
+  CYC(0x5247, 0x524a); A = W8(wDungeonIndex);
+  CYC(0x524a, 0x524d); SET_BC(wDungeonSmallKeys);
+  CALL_C(0x524d, addAToBc_hook, 0x006d, 0x5250);
+  CYC(0x5250, 0x5251); A = mem_rd(gb, BC);
+  CYC(0x5251, 0x5253); alu_add(gb, 0x10);
+  CYC(0x5253, 0x5254); mem_wr(gb, HL, A);
+sprites:
+  CYC(0x5254, 0x5255); alu_xor(gb, A);
+  CYC(0x5255, 0x5257); hram_wr(gb, R_SVBK, A);
+  CYC(0x5257, 0x525a); A = W8(wcbe8);
+  CYC(0x525a, 0x525c); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(0x525c, 0x525e); updateStatusBar_body__biggoronSword_hook(gb); return; }
+  CYC(0x525c, 0x525e);
+  CYC(0x525e, 0x5260); E = 0x10;
+  CYC(0x5260, 0x5263); SET_BC(0x1038);
+  CYC(0x5263, 0x5264); alu_rrca(gb);
+  if (!(F & FC)) { CYCT(0x5264, 0x5266); goto positions; }
+  CYC(0x5264, 0x5266);
+  CYC(0x5266, 0x5268); C = 0x30;
+positions:
+  CYC(0x5268, 0x526b); SET_HL(wInventoryB);
+  CYC(0x526b, 0x526d); A = 0x11;
+  CYC(0x526d, 0x526e); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(0x526e, 0x5270); goto second_item; }
+  CYC(0x526e, 0x5270);
+  CYC(0x5270, 0x5272); E |= 0x08;
+second_item:
+  CYC(0x5272, 0x5273); L = alu_inc8(gb, L);
+  CYC(0x5273, 0x5274); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(0x5274, 0x5276); goto write_sprites; }
+  CYC(0x5274, 0x5276);
+  CYC(0x5276, 0x5277); A = C;
+  CYC(0x5277, 0x5279); alu_add(gb, 0x08);
+  CYC(0x5279, 0x527a); C = A;
+write_sprites:
+  CYC(0x527a, 0x527d); SET_HL(wOam);
+  CYC(0x527d, 0x527e); A = B;
+  CYC(0x527e, 0x527f); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x527f, 0x5280); A = E;
+  CYC(0x5280, 0x5281); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5281, 0x5283); A = 0x78;
+  CYC(0x5283, 0x5284); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5284, 0x5287); A = W8(wBItemSpriteAttribute1);
+  CYC(0x5287, 0x5288); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5288, 0x5289); A = B;
+  CYC(0x5289, 0x528a); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x528a, 0x528d); A = W8(wBItemSpriteXOffset);
+  CYC(0x528d, 0x528e); alu_add(gb, E);
+  CYC(0x528e, 0x528f); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x528f, 0x5291); A = 0x7a;
+  CYC(0x5291, 0x5292); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5292, 0x5295); A = W8(wBItemSpriteAttribute2);
+  CYC(0x5295, 0x5296); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5296, 0x5297); A = B;
+  CYC(0x5297, 0x5298); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5298, 0x5299); A = C;
+  CYC(0x5299, 0x529a); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x529a, 0x529c); A = 0x7c;
+  CYC(0x529c, 0x529d); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x529d, 0x52a0); A = W8(wAItemSpriteAttribute1);
+  CYC(0x52a0, 0x52a1); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x52a1, 0x52a2); A = B;
+  CYC(0x52a2, 0x52a3); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x52a3, 0x52a6); A = W8(wAItemSpriteXOffset);
+  CYC(0x52a6, 0x52a7); alu_add(gb, C);
+  CYC(0x52a7, 0x52a8); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x52a8, 0x52aa); A = 0x7e;
+  CYC(0x52aa, 0x52ab); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x52ab, 0x52ae); A = W8(wAItemSpriteAttribute2);
+  CYC(0x52ae, 0x52af); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x52af, 0x52b0); ret_effect(gb);
+}
+
+void updateStatusBar_body__biggoronSword_hook(GB *gb) {
+  CYC(0x52b0, 0x52b3); SET_HL(wOam);
+  CYC(0x52b3, 0x52b6); SET_DE(0x52bb);
+  CYC(0x52b6, 0x52b8); B = 0x10;
+  CYC(0x52b8, 0x52bb); copyMemoryReverse_hook(gb);
 }
 
 void correctAddressForExtraHeart_hook(GB *gb) {
@@ -6738,7 +6998,7 @@ void runSaveAndQuitMenu__runState_hook(GB *gb) {
   switch (function_caller_jump_table(gb)) {
     case 0x7394: saveQuitMenu_state0_hook(gb); return;
     case 0x73f1: saveQuitMenu_state1_hook(gb); return;
-    case 0x7437: hook_handoff(gb, HL); return;
+    case 0x7437: saveQuitMenu_state2_hook(gb); return;
     default: hook_handoff(gb, HL); return;
   }
 }
@@ -9198,7 +9458,7 @@ void b2_updateMenus__updateMenu_hook(GB *gb) {
   switch (function_caller_jump_table(gb)) {
     case 0x5044: menuStateFadeIntoMenu_hook(gb); return;
     case 0x502a: menuSpecificCode_hook(gb); return;
-    case 0x50c2: hook_handoff(gb, HL); return;
+    case 0x50c2: menuStateFadeOutOfMenu_hook(gb); return;
     case 0x5131: menuStateFadeIntoGame_hook(gb); return;
     default: hook_handoff(gb, HL); return;
   }
@@ -9420,6 +9680,109 @@ void fileSelectMode1__subModes_hook(GB *gb) {
   }
 }
 
+void runBank2Function_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4f17, 0x4f18); C = L;
+  CYC(0x4f18, 0x4f19); A = H;
+  CYC(0x4f19, 0x4f1a); push_effect(gb, 0x4f1a);
+  switch (function_caller_jump_table(gb)) {
+    case 0x515c: loadCommonGraphics_body_hook(gb); return;
+    case 0x518d: updateStatusBar_body_hook(gb); return;
+    case 0x4f2c: hideStatusBar_body_hook(gb); return;
+    case 0x4f64: showStatusBar_body_hook(gb); return;
+    case 0x5077: saveGraphicsOnEnterMenu_body_hook(gb); return;
+    case 0x50d1: reloadGraphicsOnExitMenu_body_hook(gb); return;
+    case 0x4f6d: openMenu_body_hook(gb); return;
+    case 0x4f7c: copyW2TilesetBgPalettesToW4PaletteData_body_hook(gb); return;
+    case 0x4f9b: copyW4PaletteDataToW2TilesetBgPalettes_body_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void menuStateFadeOutOfMenu_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x50c2, 0x50c5); A = W8(wPaletteThread_mode);
+  CYC(0x50c5, 0x50c6); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x50c6, 0x50c7); ret_effect(gb); return; }
+  CYC(0x50c6, 0x50c7);
+  CALL_C(0x50c7, reloadGraphicsOnExitMenu_body_hook, 0x50d1, 0x50ca);
+  menuStateFadeOutOfMenu__afterCall_hook(gb);
+}
+
+void menuStateFadeOutOfMenu__afterCall_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x50ca, 0x50cd); SET_HL(wMenuLoadState);
+  CYC(0x50cd, 0x50ce); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x50ce, 0x50d1); updateParentItemButtonAssignment_hook(gb);
+}
+
+void reloadGraphicsOnExitMenu_body_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x50d1, 0x50d4); SET_HL(wcbe1);
+  CYC(0x50d4, 0x50d5); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x50d5, 0x50d7); H8(hCameraY) = A;
+  CYC(0x50d7, 0x50d8); A = mem_rd(gb, HL);
+  CYC(0x50d8, 0x50da); H8(hCameraX) = A;
+  CYC(0x50da, 0x50db); push_effect(gb, DE);
+  CALL_C(0x50db, disableLcd_hook, 0x02c1, 0x50de);
+  CYC(0x50de, 0x50e0); A = 0x04;
+  CYC(0x50e0, 0x50e2); mem_wr(gb, IO_SVBK, A);
+  CYC(0x50e2, 0x50e5); SET_DE(0x8601);
+  CYC(0x50e5, 0x50e8); SET_BC(0x1704);
+  CYC(0x50e8, 0x50eb); SET_HL(w4SavedVramTiles);
+  CALL_C(0x50eb, queueDmaTransfer_hook, 0x058a, 0x50ee);
+  CYC(0x50ee, 0x50f1); SET_HL(w4SavedOam);
+  CYC(0x50f1, 0x50f4); SET_DE(wOam);
+  CYC(0x50f4, 0x50f6); B = 0xa0;
+  CALL_C(0x50f6, copyMemory_hook, 0x0486, 0x50f9);
+  CALL_C(0x50f9, copyW4PaletteDataToW2TilesetBgPalettes_body_hook, 0x4f9b, 0x50fc);
+  CYC(0x50fc, 0x50ff); SET_HL(wGfxRegs4);
+  CYC(0x50ff, 0x5102); SET_DE(wGfxRegs1);
+  CYC(0x5102, 0x5104); B = 0x0c;
+  CALL_C(0x5104, copyMemory_hook, 0x0486, 0x5107);
+  CALL_C(0x5107, loadCommonGraphics_body_hook, 0x515c, 0x510a);
+  CALL_C(0x510a, reloadObjectGfx_b00_hook, 0x1630, 0x510d);
+  reloadGraphicsOnExitMenu_body__afterCall_hook(gb);
+}
+
+void reloadGraphicsOnExitMenu_body__afterCall_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x510d, loadTilesetData_hook, 0x3889, 0x5110);
+  CALL_C(0x5110, loadTilesetGraphics_hook, 0x3796, 0x5113);
+  CALL_C(0x5113, reloadTileMap_hook, 0x12fc, 0x5116);
+  CALL_C(0x5116, fastFadeinFromWhiteToRoom_hook, 0x335d, 0x5119);
+  CYC(0x5119, 0x511c); A = W8(wExtraBgPaletteHeader);
+  CYC(0x511c, 0x511d); alu_or(gb, A);
+  if (!(F & FZ)) CALL_C_CC(0x511d, loadPaletteHeader_hook, 0x050b, 0x5120);
+  else CYC(0x511d, 0x5120);
+  CYC(0x5120, 0x5123); A = W8(wGfxRegs1_LCDC);
+  CYC(0x5123, 0x5126); W8(wGfxRegsFinal_LCDC) = A;
+  CYC(0x5126, 0x5128); mem_wr(gb, IO_LCDC, A);
+  CYC(0x5128, 0x5129); SET_DE(pop_effect(gb));
+  CYC(0x5129, 0x512c); SET_HL(0x626e);
+  CYC(0x512c, 0x512e); E = 0x01;
+  CYC(0x512e, 0x5131); interBankCall_hook(gb);
+}
+
+void saveQuitMenu_state2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7437, 0x743a); SET_HL(wSaveQuitMenu_delayCounter);
+  CYC(0x743a, 0x743b); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(0x743b, 0x743c); ret_effect(gb); return; }
+  CYC(0x743b, 0x743c);
+  CYC(0x743c, 0x743f); A = W8(wSaveQuitMenu_cursorIndex);
+  CYC(0x743f, 0x7441); alu_cp(gb, 2);
+  if (F & FZ) { CYCT(0x7441, 0x7444); hook_handoff(gb, 0x0169); return; }
+  CYC(0x7441, 0x7444);
+  CALL_C(0x7444, saveQuitMenu_checkIsGameOver_hook, 0x737b, 0x7447);
+  if (F & FZ) { CYCT(0x7447, 0x744a); closeMenu_hook(gb); return; }
+  CYC(0x7447, 0x744a);
+  CYC(0x744a, 0x744c); A = 0xe8;
+  CYC(0x744c, 0x744f); SET_BC(0x33a1);
+  CALL_C(0x744f, threadRestart_hook, 0x08a3, 0x7452);
+  CYC(0x7452, 0x7455); hook_handoff(gb, 0x08e2);
+}
+
 void fileSelect_printError_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x45f0, 0x45f2); A = 0x5a;
@@ -9456,4 +9819,90 @@ void textInput_waitForInput_hook(GB *gb) {
   CYC(0x4617, 0x4619); A = 0x01;
   CYC(0x4619, 0x461c); W8(wFileSelect_mode2) = A;
   func_02_461c_hook(gb);
+}
+
+void checkDisplayDmgModeScreen_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4000, 0x4002); A = H8(hGameboyType);
+  CYC(0x4002, 0x4003); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x4003, 0x4004); ret_effect(gb);
+    return;
+  }
+  CYC(0x4003, 0x4004);
+  CALL_C(0x4004, disableLcd_hook, 0x02c1, 0x4007);
+  CYC(0x4007, 0x4008); alu_xor(gb, A);
+  CALL_C(0x4008, loadGfxHeader_hook, 0x0626, 0x400b);
+  CYC(0x400b, 0x400c); alu_xor(gb, A);
+  CALL_C(0x400c, loadGfxRegisterStateIndex_hook, 0x02ea, 0x400f);
+  CYC(0x400f, 0x4012); SET_HL(wGfxRegs1);
+  CYC(0x4012, 0x4015); SET_DE(wGfxRegsFinal);
+  CYC(0x4015, 0x4017); B = 0x06;
+  CALL_C(0x4017, copyMemory_hook, 0x0486, 0x401a);
+  checkDisplayDmgModeScreen__vblankLoop_hook(gb);
+}
+
+void checkDisplayDmgModeScreen__vblankLoop_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  for (;;) {
+    CYC(0x401a, 0x401c); A = 0xff;
+    CYC(0x401c, 0x401f); W8(wVBlankChecker) = A;
+    int halt_r;
+    do {
+      CYC(0x401f, 0x4020); halt_r = hook_halt(gb, 0x4020);
+    } while (halt_r == 1);
+    if (halt_r < 0) {
+      hook_handoff(gb, 0x4020);
+      return;
+    }
+    CYC(0x4020, 0x4021);
+    CYC(0x4021, 0x4024); A = W8(wVBlankChecker);
+    CYC(0x4024, 0x4026); alu_bit(gb, 7, A);
+    if (!(F & FZ)) {
+      CYCT(0x4026, 0x4028);
+      continue;
+    }
+    CYC(0x4026, 0x4028);
+    CYC(0x4028, 0x402a); A = H8(hSerialInterruptBehaviour);
+    CYC(0x402a, 0x402b); alu_or(gb, A);
+    if (F & FZ) {
+      CYCT(0x402b, 0x402d);
+      CALL_C(0x4032, serialFunc_0c85_hook, 0x0c85, 0x4035);
+      CYC(0x4035, 0x4037); A = 0x03;
+      CYC(0x4037, 0x4039); H8(hFFBE) = A;
+      CYC(0x4039, 0x403a); alu_xor(gb, A);
+      CYC(0x403a, 0x403c); H8(hSerialLinkState) = A;
+      CYC(0x403c, 0x403e);
+      continue;
+    }
+    CYC(0x402b, 0x402d);
+    CALL_C(0x402d, serialFunc_0c8d_hook, 0x0c8d, 0x4030);
+    CYC(0x4030, 0x4032);
+  }
+}
+
+void updateTilesetFlagsForIndoorRoomInAltWorld_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x403e, 0x4041); A = W8(wActiveGroup);
+  CYC(0x4041, 0x4042); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x4042, 0x4043); ret_effect(gb);
+    return;
+  }
+  CYC(0x4042, 0x4043);
+  CYC(0x4043, 0x4046); SET_HL(0x4057);
+  CYC(0x4046, 0x4047); add_double_index_to_hl(gb, 0x4047);
+  CYC(0x4047, 0x4048); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4048, 0x4049); H = mem_rd(gb, HL);
+  CYC(0x4049, 0x404a); L = A;
+  CYC(0x404a, 0x404d); A = W8(wActiveRoom);
+  CALL_C(0x404d, checkFlag_hook, 0x0205, 0x4050);
+  if (F & FZ) {
+    CYCT(0x4050, 0x4051); ret_effect(gb);
+    return;
+  }
+  CYC(0x4050, 0x4051);
+  CYC(0x4051, 0x4054); SET_HL(wTilesetFlags);
+  CYC(0x4054, 0x4056); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
+  CYC(0x4056, 0x4057); ret_effect(gb);
 }

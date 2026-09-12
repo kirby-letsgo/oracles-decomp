@@ -641,6 +641,9 @@ showStatusBar_body
 playHeartBeepAtInterval
 loadCommonGraphics_body
 updateStatusBar_body
+updateStatusBar_body__updateRupeeDisplay
+updateStatusBar_body__updateHeartDisplay
+updateStatusBar_body__biggoronSword
 correctAddressForExtraHeart
 loadEquippedItemGfx
 drawItemTilesOnStatusBar
@@ -704,9 +707,6 @@ dungeonMap_getTileForRoom
 dungeonMap_checkCanViewFloor
 dungeonMap_checkCompassTile
 dungeonMap_getFloorAddress
-dungeonMapFloorNameTiles
-dungeonMapFloorListStartPositions
-dungeonMapSymbolPositions
 getRingTiles
 runFakeReset
 init
@@ -1957,6 +1957,7 @@ textInput_lowerOption_updateFileSelectCursorPos
 textInput_lowerOption_updateFileSelectCursorPos2
 textInput_mapUpperXToLowerX
 func_02_494a
+func_02_494a__end
 textInput_loadCharacterGfx
 textInput_updateEntryCursor
 textInput_getOutputAddress
@@ -1971,7 +1972,9 @@ menuStateFadeIntoMenu
 menuStateFadeIntoMenu__openMenu
 saveGraphicsOnEnterMenu_body
 menuStateFadeOutOfMenu
+menuStateFadeOutOfMenu__afterCall
 reloadGraphicsOnExitMenu_body
+reloadGraphicsOnExitMenu_body__afterCall
 menuStateFadeIntoGame
 fileSelectDrawHeartDisplay
 runInventoryMenu
@@ -6292,3 +6295,4 @@ fileSelectMode6__mode0
 fileSelectMode6__mode2
 checkLockBG7Color3ToBlack__thing1
 checkLockBG7Color3ToBlack__thing0
+checkDisplayDmgModeScreen__vblankLoop

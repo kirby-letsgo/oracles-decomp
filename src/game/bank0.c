@@ -5,6 +5,7 @@ void loadDungeonLayout_b01_hook(GB *gb);
 void paletteFadeHandler_hook(GB *gb);
 void checkLockBG7Color3ToBlack_hook(GB *gb);
 void b2_fileSelectScreen_hook(GB *gb);
+void runBank2Function_hook(GB *gb);
 
 // Rewrites of code/bank0.s. Cycles are burned from the ROM's own instruction stream (CYC/CYCT),
 // which keeps interrupt dispatch on instruction boundaries; every memory access follows the burn
@@ -7824,7 +7825,7 @@ void secretFunctionCaller_hook(GB *gb) {
   ret_effect(gb);
 }
 
-static void open_menu_tail(GB *gb) {
+static void open_menu_tail(GB *gb, uint16_t sp0_) {
   L = A;
   CYC(0x1aba, 0x1abd); C = mem_rd(gb, IO_SVBK);
   CYC(0x1abd, 0x1ac0); B = H8(hRomBank);
@@ -7832,7 +7833,7 @@ static void open_menu_tail(GB *gb) {
   A = 0x02;
   CYC(0x1ac2, 0x1ac6); H8(hRomBank) = A;
   CYC(0x1ac6, 0x1ac9); mem_wr(gb, MBC_ROM_BANK, A);
-  CALL_ROM(0x1ac9, ROM_b02_runBank2Function);
+  CALL_C(0x1ac9, runBank2Function_hook, ROM_b02_runBank2Function, 0x1acc);
   CYC(0x1acc, 0x1acd); SET_BC(pop_effect(gb));
   A = B;
   CYC(0x1acd, 0x1ad0); H8(hRomBank) = A;
@@ -7845,7 +7846,7 @@ static void open_menu_tail(GB *gb) {
 void openMenu_hook(GB *gb) {
   H = 0x06;
   CYC(0x1ab0, 0x1ab4);
-  open_menu_tail(gb);
+  open_menu_tail(gb, gb->sp);
   ret_effect(gb);
 }
 
@@ -7857,7 +7858,7 @@ void openSecretInputMenu_hook(GB *gb) {
   CYC(0x1a4c, 0x1a51);
   H = 0x06;
   CYC(0x1ab0, 0x1ab4);
-  open_menu_tail(gb);
+  open_menu_tail(gb, gb->sp);
   ret_effect(gb);
 }
 
@@ -8431,25 +8432,25 @@ void checkReloadStatusBarGraphics_hook(GB *gb) {
   ret_effect(gb);
 }
 
-static void bank2_menu_function(GB *gb, uint16_t a, uint8_t h) {
+static void bank2_menu_function(GB *gb, uint16_t a, uint8_t h, uint16_t sp0_) {
   H = h;
   CYC(a, a + 4);
-  open_menu_tail(gb);
+  open_menu_tail(gb, sp0_);
   ret_effect(gb);
 }
 
-void loadCommonGraphics_hook(GB *gb) { bank2_menu_function(gb, 0x1a98, 0x00); }
-void updateStatusBar_hook(GB *gb) { bank2_menu_function(gb, 0x1a9c, 0x01); }
-void hideStatusBar_hook(GB *gb) { bank2_menu_function(gb, 0x1aa0, 0x02); }
-void showStatusBar_hook(GB *gb) { bank2_menu_function(gb, 0x1aa4, 0x03); }
-void saveGraphicsOnEnterMenu_hook(GB *gb) { bank2_menu_function(gb, 0x1aa8, 0x04); }
-void reloadGraphicsOnExitMenu_hook(GB *gb) { bank2_menu_function(gb, 0x1aac, 0x05); }
-void copyW2TilesetBgPalettesToW4PaletteData_hook(GB *gb) { bank2_menu_function(gb, 0x1ab4, 0x07); }
+void loadCommonGraphics_hook(GB *gb) { bank2_menu_function(gb, 0x1a98, 0x00, gb->sp); }
+void updateStatusBar_hook(GB *gb) { bank2_menu_function(gb, 0x1a9c, 0x01, gb->sp); }
+void hideStatusBar_hook(GB *gb) { bank2_menu_function(gb, 0x1aa0, 0x02, gb->sp); }
+void showStatusBar_hook(GB *gb) { bank2_menu_function(gb, 0x1aa4, 0x03, gb->sp); }
+void saveGraphicsOnEnterMenu_hook(GB *gb) { bank2_menu_function(gb, 0x1aa8, 0x04, gb->sp); }
+void reloadGraphicsOnExitMenu_hook(GB *gb) { bank2_menu_function(gb, 0x1aac, 0x05, gb->sp); }
+void copyW2TilesetBgPalettesToW4PaletteData_hook(GB *gb) { bank2_menu_function(gb, 0x1ab4, 0x07, gb->sp); }
 
 void copyW4PaletteDataToW2TilesetBgPalettes_hook(GB *gb) {
   H = 0x08;
   CYC(0x1ab8, 0x1aba);
-  open_menu_tail(gb);
+  open_menu_tail(gb, gb->sp);
   ret_effect(gb);
 }
 

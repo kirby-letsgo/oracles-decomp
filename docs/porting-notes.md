@@ -726,3 +726,14 @@ desync to discover; keep them when porting routines.
   `runGameLinkMenu`, nearby in-game wrappers at `$4571` and `$4b22`; the actual table targets are
   `fileSelectMode6` at `$4526` and `fileSelectMode7` at `$4b29`. Read the table words from the ROM
   report and map each address directly before choosing the readable callee.
+- The `H8` helpers only address the HRAM array beginning at `$ff80`; IO registers below that base
+  must use `mem_rd`/`mem_wr`. Batch 115 initially used `H8(IO_SVBK)` and `H8(IO_LCDC)` for `$ff70`
+  and `$ff40`, silently indexing before the HRAM array without a compiler diagnostic. The named
+  `W8` helpers likewise token-paste a symbol's `_BANK` definition and therefore accept only a bare
+  RAM symbol; use `mem_rd`/`mem_wr` for expressions such as `wDisplayedRupees + 1`.
+- A static jump to a known trampoline is still a direct C call even when the trampoline ultimately
+  performs a dynamic `jp hl`. Batch 115 initially handed off the static `$512e` jump to
+  `interBankCall`; that needlessly switched execution engines. Call the readable trampoline
+  directly and let its internal dynamic jump remain interpreted. When a newly readable dispatcher
+  replaces a generated target, retarget all known static cases and propagate the caller's real
+  stack context through every wrapper.
