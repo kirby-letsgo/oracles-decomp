@@ -23,6 +23,68 @@ static void bank4_add_double_index_to_hl(GB *gb, uint16_t return_address) {
   burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
 }
 
+static void b4_vblank_function(GB *gb, uint16_t base, uint8_t column) {
+  CYC(base, base + 1); H = B;
+  CYC(base + 1, base + 2); L = E;
+  CYC(base + 2, base + 4); B = 0x04;
+  for (;;) {
+    for (uint8_t row = 0; row < 8; row++) {
+      uint16_t pc = (uint16_t)(base + 4 + row * 4);
+      CYC(pc, pc + 2); E = (uint8_t)(column + row * 0x20);
+      CYC(pc + 2, pc + 3); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(pc + 3, pc + 4); mem_wr(gb, DE, A);
+    }
+    CYC(base + 0x24, base + 0x25); D = alu_inc8(gb, D);
+    CYC(base + 0x25, base + 0x26); B = alu_dec8(gb, B);
+    if (!(F & FZ)) { CYCT(base + 0x26, base + 0x28); continue; }
+    CYC(base + 0x26, base + 0x28);
+    break;
+  }
+  CYC(base + 0x28, base + 0x29); L = C;
+  CYC(base + 0x29, base + 0x2b); H = 0xc4;
+  CYC(base + 0x2b, base + 0x2e); vblankFunctionRet_hook(gb);
+}
+
+void b4VBlankFunction0_hook(GB *gb) {
+  b4_vblank_function(gb, 0x4000, 0x00);
+}
+
+void b4VBlankFunction1_hook(GB *gb) {
+  b4_vblank_function(gb, 0x402e, 0x01);
+}
+
+void b4VBlankFunction2_hook(GB *gb) {
+  b4_vblank_function(gb, 0x405c, 0x02);
+}
+
+void b4VBlankFunction3_hook(GB *gb) {
+  b4_vblank_function(gb, 0x408a, 0x03);
+}
+
+void b4VBlankFunction4_hook(GB *gb) {
+  b4_vblank_function(gb, 0x40b8, 0x04);
+}
+
+void b4VBlankFunction5_hook(GB *gb) {
+  b4_vblank_function(gb, 0x40e6, 0x05);
+}
+
+void b4VBlankFunction6_hook(GB *gb) {
+  b4_vblank_function(gb, 0x4114, 0x06);
+}
+
+void b4VBlankFunction7_hook(GB *gb) {
+  b4_vblank_function(gb, 0x4142, 0x07);
+}
+
+void b4VBlankFunction8_hook(GB *gb) {
+  b4_vblank_function(gb, 0x4170, 0x08);
+}
+
+void b4VBlankFunction9_hook(GB *gb) {
+  b4_vblank_function(gb, 0x419e, 0x09);
+}
+
 static void applyWarpDest_finish(GB *gb) {
   CYC(0x45f5, 0x45f7); A = 0x0a;
   CYC(0x45f7, 0x45fa); W8(wLinkForceState) = A;

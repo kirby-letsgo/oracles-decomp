@@ -212,3 +212,6 @@
 03:495c unpackSecret__readBits__end
 03:4a29 loadSecretBufferFromText__textCharacterToByte
 03:4a3a loadSecretBufferFromText__end
+03:496c loadUnpackedSecretData__type0
+03:498c loadUnpackedSecretData__type3
+03:498d loadUnpackedSecretData__type2

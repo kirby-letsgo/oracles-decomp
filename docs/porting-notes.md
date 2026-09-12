@@ -558,3 +558,9 @@ desync to discover; keep them when porting routines.
   were promoted to C-safe aliases and `_hook` shims. Treat reportability—not the current caller
   count—as the boundary rule; dynamic dispatch and the final no-generated-routines sweep both
   depend on every such address remaining hookable.
+- Calling a readable RST-vector helper still requires the RST instruction's real return-address
+  push. Batch 69 initially burned `rst $00` at `$4963` and called the shared jump-table helper
+  directly, but that helper begins with the vector's `pop hl`; without
+  `push_effect(gb, 0x4964)`, it consumed the routine caller's return address and corrupted SP.
+  Cross-review caught the imbalance before the gate. Burn the one-byte RST, push its physical
+  next-PC, then enter the vector body, even when both sides are ordinary readable C helpers.

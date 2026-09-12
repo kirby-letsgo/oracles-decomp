@@ -5744,3 +5744,6 @@ unpackSecret__readBits
 unpackSecret__readBits__end
 loadSecretBufferFromText__textCharacterToByte
 loadSecretBufferFromText__end
+loadUnpackedSecretData__type0
+loadUnpackedSecretData__type3
+loadUnpackedSecretData__type2

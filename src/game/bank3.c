@@ -12,6 +12,12 @@ void generateSecret_hook(GB *gb);
 void insertBitsIntoSecretGenerationBuffer_hook(GB *gb);
 void unpackSecret_hook(GB *gb);
 void verifyUnpackedSecretGameID_hook(GB *gb);
+void loadUnpackedSecretData_hook(GB *gb);
+void loadUnpackedSecretData__type0_hook(GB *gb);
+void loadUnpackedSecretData__type1_hook(GB *gb);
+void loadUnpackedSecretData__type3_hook(GB *gb);
+void loadUnpackedSecretData__type2_hook(GB *gb);
+void generateGameIDIfNeeded_hook(GB *gb);
 void generateSecret__determineXorCipher_hook(GB *gb);
 void generateSecret__ret_hook(GB *gb);
 void encodeSecretData_paramC_hook(GB *gb);
@@ -29,6 +35,8 @@ void loadSecretBufferFromText__end_hook(GB *gb);
 void runXorCipherOnSecretBuffer_hook(GB *gb);
 void getSecretBufferChecksum_hook(GB *gb);
 void shiftSecretBufferContentsToFront_hook(GB *gb);
+void andCWith3_hook(GB *gb);
+void getNumCharactersForSecretType_hook(GB *gb);
 
 static uint16_t secret_function_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -123,8 +131,8 @@ void secretFunctionCaller_body_hook(GB *gb) {
     case 0x4852: generateSecret_hook(gb); break;
     case 0x48e5: unpackSecret_hook(gb); break;
     case 0x49a4: verifyUnpackedSecretGameID_hook(gb); break;
-    case 0x49be: generateGameIDIfNeeded(gb); break;
-    case 0x4960: loadUnpackedSecretData(gb); break;
+    case 0x49be: generateGameIDIfNeeded_hook(gb); break;
+    case 0x4960: loadUnpackedSecretData_hook(gb); break;
     default: hook_handoff(gb, HL); return;
   }
   CYC(0x4841, 0x4842); SET_AF(pop_effect(gb));
@@ -138,8 +146,8 @@ void generateSecret_hook(GB *gb) {
   CYC(0x4852, 0x4855); SET_HL(w7SecretText1);
   CYC(0x4855, 0x4857); B = 0x40;
   CALL_C(0x4857, clearMemory_hook, 0x046f, 0x485a);
-  CALL_C(0x485a, andCWith3, 0x4a7d, 0x485d);
-  CALL_C(0x485d, generateGameIDIfNeeded, 0x49be, 0x4860);
+  CALL_C(0x485a, andCWith3_hook, 0x4a7d, 0x485d);
+  CALL_C(0x485d, generateGameIDIfNeeded_hook, 0x49be, 0x4860);
   CALL_C(0x4860, generateSecret__determineXorCipher_hook, 0x4887, 0x4863);
   CYC(0x4863, 0x4866); SET_HL(wSecretXorCipherIndex);
   CYC(0x4866, 0x4867); mem_wr(gb, HL, A); SET_HL(HL + 1);
@@ -271,7 +279,7 @@ void unpackSecret_hook(GB *gb) {
   CYC(0x48e5, 0x48e8); SET_HL(w7SecretText1);
   CYC(0x48e8, 0x48ea); B = 0x40;
   CALL_C(0x48ea, clearMemory_hook, 0x046f, 0x48ed);
-  CALL_C(0x48ed, andCWith3, 0x4a7d, 0x48f0);
+  CALL_C(0x48ed, andCWith3_hook, 0x4a7d, 0x48f0);
   CALL_C(0x48f0, loadSecretBufferFromText_hook, 0x4a15, 0x48f3);
   if (F & FC) {
     CYCT(0x48f3, 0x48f5);
@@ -280,7 +288,7 @@ void unpackSecret_hook(GB *gb) {
   }
   CYC(0x48f3, 0x48f5);
   CALL_C(0x48f5, runXorCipherOnSecretBuffer_hook, 0x4a3e, 0x48f8);
-  CALL_C(0x48f8, getNumCharactersForSecretType, 0x4ace, 0x48fb);
+  CALL_C(0x48f8, getNumCharactersForSecretType_hook, 0x4ace, 0x48fb);
   CYC(0x48fb, 0x48fe); SET_HL(w7SecretGenerationBuffer - 1);
   CYC(0x48fe, 0x48ff); add_a_to_hl_from_rst(gb, 0x48ff);
   CYC(0x48ff, 0x4900); A = mem_rd(gb, HL);
@@ -399,6 +407,77 @@ void unpackSecret__readBits__end_hook(GB *gb) {
   CYC(0x495f, 0x4960); ret_effect(gb);
 }
 
+void loadUnpackedSecretData_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4960, andCWith3_hook, 0x4a7d, 0x4963);
+  CYC(0x4963, 0x4964); push_effect(gb, 0x4964); secret_function_jump_table(gb);
+  switch (HL) {
+    case 0x496c: loadUnpackedSecretData__type0_hook(gb); return;
+    case 0x498c: loadUnpackedSecretData__type3_hook(gb); return;
+    case 0x498d: loadUnpackedSecretData__type2_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void loadUnpackedSecretData__type0_hook(GB *gb) {
+  CYC(0x496c, 0x496f); SET_HL(0x4a95);
+  CYC(0x496f, 0x4970); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4970, 0x4971); B = A;
+  CYC(0x4971, 0x4974); SET_DE(wTmpcec0 + 4);
+  for (;;) {
+    CYC(0x4974, 0x4975); A = mem_rd(gb, DE);
+    CYC(0x4975, 0x4976); push_effect(gb, DE);
+    CYC(0x4976, 0x4977); E = mem_rd(gb, HL);
+    CYC(0x4977, 0x4979); D = 0xc6;
+    CYC(0x4979, 0x497a); mem_wr(gb, DE, A);
+    CYC(0x497a, 0x497b); SET_DE(pop_effect(gb));
+    CYC(0x497b, 0x497c); SET_DE(DE + 1);
+    CYC(0x497c, 0x497d); SET_HL(HL + 1);
+    CYC(0x497d, 0x497e); SET_HL(HL + 1);
+    CYC(0x497e, 0x497f); B = alu_dec8(gb, B);
+    if (!(F & FZ)) { CYCT(0x497f, 0x4981); continue; }
+    CYC(0x497f, 0x4981);
+    break;
+  }
+  CYC(0x4981, 0x4984); SET_HL(wGameID);
+  CYC(0x4984, 0x4987); A = mem_rd(gb, wTmpcec0 + 2);
+  CYC(0x4987, 0x4988); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4988, 0x498b); A = mem_rd(gb, wTmpcec0 + 3);
+  CYC(0x498b, 0x498c); mem_wr(gb, HL, A);
+  loadUnpackedSecretData__type3_hook(gb);
+}
+
+void loadUnpackedSecretData__type1_hook(GB *gb) {
+  loadUnpackedSecretData__type0_hook(gb);
+}
+
+void loadUnpackedSecretData__type3_hook(GB *gb) {
+  CYC(0x498c, 0x498d); ret_effect(gb);
+}
+
+void loadUnpackedSecretData__type2_hook(GB *gb) {
+  CYC(0x498d, 0x4990); SET_HL(0x4ab9);
+  CYC(0x4990, 0x4992); B = 0x08;
+  CYC(0x4992, 0x4995); SET_DE(wTmpcec0 + 4);
+  for (;;) {
+    CYC(0x4995, 0x4996); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x4996, 0x4997); push_effect(gb, HL);
+    CYC(0x4997, 0x4998); L = A;
+    CYC(0x4998, 0x499a); H = 0xc6;
+    CYC(0x499a, 0x499b); A = mem_rd(gb, DE);
+    CYC(0x499b, 0x499c); alu_or(gb, mem_rd(gb, HL));
+    CYC(0x499c, 0x499d); mem_wr(gb, HL, A);
+    CYC(0x499d, 0x499e); SET_HL(pop_effect(gb));
+    CYC(0x499e, 0x499f); SET_DE(DE + 1);
+    CYC(0x499f, 0x49a0); SET_HL(HL + 1);
+    CYC(0x49a0, 0x49a1); B = alu_dec8(gb, B);
+    if (!(F & FZ)) { CYCT(0x49a1, 0x49a3); continue; }
+    CYC(0x49a1, 0x49a3);
+    break;
+  }
+  CYC(0x49a3, 0x49a4); ret_effect(gb);
+}
+
 void verifyUnpackedSecretGameID_hook(GB *gb) {
   CYC(0x49a4, 0x49a7); SET_HL(wTmpcec0 + 2);
   CYC(0x49a7, 0x49a8); A = mem_rd(gb, HL); SET_HL(HL + 1);
@@ -429,6 +508,41 @@ void verifyUnpackedSecretGameID_hook(GB *gb) {
   }
   CYC(0x49b6, 0x49b8);
   verifyUnpackedSecretGameID_fail(gb);
+}
+
+void generateGameIDIfNeeded_hook(GB *gb) {
+  CYC(0x49be, 0x49c1); SET_HL(wGameID);
+  CYC(0x49c1, 0x49c2); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x49c2, 0x49c3); alu_or(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) {
+    CYCT(0x49c3, 0x49c4); ret_effect(gb);
+    return;
+  }
+  CYC(0x49c3, 0x49c4);
+  CYC(0x49c4, 0x49c6); L = 0x23;
+  CYC(0x49c6, 0x49c7); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x49c7, 0x49c9); alu_and(gb, 0x7f);
+  CYC(0x49c9, 0x49ca); B = A;
+  CYC(0x49ca, 0x49cb); A = mem_rd(gb, HL);
+  if (!(F & FZ)) {
+    CYCT(0x49cb, 0x49cd);
+  } else {
+    CYC(0x49cb, 0x49cd);
+    for (;;) {
+      CYC(0x49cd, 0x49ce); alu_or(gb, A);
+      if (!(F & FZ)) {
+        CYCT(0x49ce, 0x49d0);
+        break;
+      }
+      CYC(0x49ce, 0x49d0);
+      CYC(0x49d0, 0x49d2); A = hram_rd(gb, 0x04);
+      CYC(0x49d2, 0x49d4);
+    }
+  }
+  CYC(0x49d4, 0x49d6); L = 0x00;
+  CYC(0x49d6, 0x49d7); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x49d7, 0x49d8); mem_wr(gb, HL, B);
+  CYC(0x49d8, 0x49d9); ret_effect(gb);
 }
 
 void convertSecretBufferToText_hook(GB *gb) {
@@ -475,7 +589,7 @@ void convertSecretBufferToText_hook(GB *gb) {
 
 void loadSecretBufferFromText_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x4a15, getNumCharactersForSecretType, 0x4ace, 0x4a18);
+  CALL_C(0x4a15, getNumCharactersForSecretType_hook, 0x4ace, 0x4a18);
   CYC(0x4a18, 0x4a1b); SET_HL(wTmpcec0);
   CYC(0x4a1b, 0x4a1e); SET_DE(w7SecretGenerationBuffer);
   for (;;) {
@@ -529,7 +643,7 @@ void loadSecretBufferFromText__end_hook(GB *gb) {
 
 void runXorCipherOnSecretBuffer_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x4a3e, getNumCharactersForSecretType, 0x4ace, 0x4a41);
+  CALL_C(0x4a3e, getNumCharactersForSecretType_hook, 0x4ace, 0x4a41);
   CYC(0x4a41, 0x4a44); A = mem_rd(gb, w7SecretGenerationBuffer);
   CYC(0x4a44, 0x4a46); alu_and(gb, 0x38);
   CYC(0x4a46, 0x4a47); alu_rrca(gb);
@@ -569,7 +683,7 @@ void getSecretBufferChecksum_hook(GB *gb) {
 
 void shiftSecretBufferContentsToFront_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x4a69, getNumCharactersForSecretType, 0x4ace, 0x4a6c);
+  CALL_C(0x4a69, getNumCharactersForSecretType_hook, 0x4ace, 0x4a6c);
   CYC(0x4a6c, 0x4a6e); A = 0x14;
   CYC(0x4a6e, 0x4a6f); alu_sub(gb, B);
   if (F & FZ) {
@@ -591,4 +705,20 @@ void shiftSecretBufferContentsToFront_hook(GB *gb) {
     break;
   }
   CYC(0x4a7c, 0x4a7d); ret_effect(gb);
+}
+
+void andCWith3_hook(GB *gb) {
+  CYC(0x4a7d, 0x4a7e); A = C;
+  CYC(0x4a7e, 0x4a80); alu_and(gb, 0x03);
+  CYC(0x4a80, 0x4a81); C = A;
+  CYC(0x4a81, 0x4a82); ret_effect(gb);
+}
+
+void getNumCharactersForSecretType_hook(GB *gb) {
+  CYC(0x4ace, 0x4acf); A = C;
+  CYC(0x4acf, 0x4ad2); SET_HL(0x4ad6);
+  CYC(0x4ad2, 0x4ad3); add_a_to_hl_from_rst(gb, 0x4ad3);
+  CYC(0x4ad3, 0x4ad4); A = mem_rd(gb, HL);
+  CYC(0x4ad4, 0x4ad5); B = A;
+  CYC(0x4ad5, 0x4ad6); ret_effect(gb);
 }
