@@ -640,3 +640,9 @@ desync to discover; keep them when porting routines.
   bare `alu_srl(gb, H)`. Self-review against the generated body caught that H never received the
   shift result. Write `H = alu_srl(gb, H)` (and likewise for B/C/D/E/H/L/A targets); memory-targeted
   shifts instead read, transform, and write the addressed byte explicitly.
+- A symbol can produce the right numeric address while describing the wrong banked object. Batch
+  95 initially loaded `w4StatusBarTileMap` (`$d200`) before the ROM's following `ld l,$40`, so HL
+  ended at the intended `$d240` interaction-slot base by accident. The code runs with WRAM bank 1
+  selected and is scanning interactions, so the correct expression is `SET_HL(wInteractionSlots)`
+  followed by the still-real `ld l,$40` effect. Review symbols semantically as well as numerically,
+  especially when a later instruction replaces one byte of a 16-bit address.

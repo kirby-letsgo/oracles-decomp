@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,000 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,016 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -96,6 +96,8 @@ Updated 2026-09-12. Newest entries at the top of each section.
   Link-position, follower-reset, and transition-finalization helpers.
   Batch 94 completed the remaining vertical-scroll path and added object-category clearing,
   compass-sound selection, and shocked-Link animation handling.
+  Batch 95 added the fall-through-floor warp, cutscene 17, wave-scroll initialization, and the
+  safe leaves around cutscene 15's generated thread-switching core.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -200,6 +202,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-12: milestone 3 phase 5 batch 95 (16 routines): bank 1's fall-through-floor warp,
+  cutscene-17 dispatcher and states, alternate-line wave-scroll initialization, and eight safe
+  cutscene-15 leaves around its generated thread-switching state. Thirteen local entries received
+  stable aliases and the cutscene-17 warp destination left the routine registry as data. Quality
+  review corrected a `call nz` to use `CALL_C_CC` and replaced a numerically convenient status-bar
+  alias with the canonical interaction-slot base; re-review approved both fixes. Gates: lint 0,
+  30k verify 0 mismatches (4,688,896 calls), whole-movie state hash clean (`64bddd0dfe384126`),
+  ctest 8/8 in both normal and quirk builds.
 
 - 2026-09-12: milestone 3 phase 5 batch 94 (21 routines): bank 1's remaining vertical scrolling
   substate and row update, object-category clearing helpers, compass-sound selection, and shocked-
