@@ -243,6 +243,25 @@ void runSecretEntryMenu__mode2_hook(GB *gb);
 void runSecretEntryMenu__invalidSecret_hook(GB *gb);
 void runSecretEntryMenu__setTextInputResult_hook(GB *gb);
 void runSecretEntryMenu__loadRingSecretData_hook(GB *gb);
+void runTextInput__aButton_hook(GB *gb);
+void runTextInput__gotCharacter_hook(GB *gb);
+void runTextInput__selectionRight_hook(GB *gb);
+void runTextInput__updateEntryCursor_hook(GB *gb);
+void runTextInput__lowerOptions_hook(GB *gb);
+void runTextInput__nameTable_hook(GB *gb);
+void runTextInput__secretTable_hook(GB *gb);
+void runTextInput__bButton_hook(GB *gb);
+void runTextInput__selectionLeft_hook(GB *gb);
+void runTextInput__selectButton_hook(GB *gb);
+void runTextInput__back_hook(GB *gb);
+void runTextInput__rightButton_hook(GB *gb);
+void runTextInput__leftButton_hook(GB *gb);
+void runTextInput__leftOrRight_hook(GB *gb);
+void runTextInput__leftOrRight__lowerOptions_hook(GB *gb);
+void runTextInput__upButton_hook(GB *gb);
+void runTextInput__downButton_hook(GB *gb);
+void runTextInput__upOrDown_hook(GB *gb);
+void runTextInput__startButton_hook(GB *gb);
 void fileSelectMode4_hook(GB *gb);
 void fileSelectMode4__mode4Update_hook(GB *gb);
 void fileSelectMode4__mode0_hook(GB *gb);
@@ -3462,6 +3481,270 @@ void label_02_038__end_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(0x46d0, textInput_updateEntryCursor_hook, 0x4a22, 0x46d3);
   CYC(0x46d3, 0x46d6); loadGfxRegisterState5AndIncFileSelectMode2_hook(gb);
+}
+
+void runTextInput_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x46d6, 0x46d8); A = 0x01;
+  CYC(0x46d8, 0x46db); W8(wTextInputResult) = A;
+  CALL_C(0x46db, getInputWithAutofire_hook, 0x0294, 0x46de);
+  CYC(0x46de, 0x46df); B = A;
+  CALL_C(0x46df, getHighestSetBit_hook, 0x01ea, 0x46e2);
+  if (!(F & FC)) { CYCT(0x46e2, 0x46e3); ret_effect(gb); return; }
+  CYC(0x46e2, 0x46e3);
+  CYC(0x46e3, 0x46e4); B = A;
+  CYC(0x46e4, 0x46e7); SET_HL(0x46fe);
+  CYC(0x46e7, 0x46e8); push_effect(gb, 0x46e8); add_a_to_hl(gb);
+  CYC(0x46e8, 0x46e9); A = mem_rd(gb, HL);
+  CALL_C(0x46e9, playSound_b00_hook, 0x0c98, 0x46ec);
+  CYC(0x46ec, 0x46ed); A = B;
+  CYC(0x46ed, 0x46ee); push_effect(gb, 0x46ee);
+  switch (function_caller_jump_table(gb)) {
+    case 0x4706: runTextInput__aButton_hook(gb); return;
+    case 0x4764: runTextInput__bButton_hook(gb); return;
+    case 0x4775: runTextInput__selectButton_hook(gb); return;
+    case 0x47e5: runTextInput__startButton_hook(gb); return;
+    case 0x4790: runTextInput__rightButton_hook(gb); return;
+    case 0x4794: runTextInput__leftButton_hook(gb); return;
+    case 0x47c6: runTextInput__upButton_hook(gb); return;
+    case 0x47ca: runTextInput__downButton_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void runTextInput__aButton_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4706, 0x4709); SET_HL(wFileSelect_cursorPos);
+  CYC(0x4709, 0x470a); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x470a, 0x470c); alu_cp(gb, 0x50);
+  if (!(F & FC)) { CYCT(0x470c, 0x470e); runTextInput__lowerOptions_hook(gb); return; }
+  CYC(0x470c, 0x470e);
+  CALL_C(0x470e, textInput_getCursorPosition_hook, 0x47fb, 0x4711);
+  CYC(0x4711, 0x4713); alu_and(gb, 0x0f);
+  CYC(0x4713, 0x4716); SET_HL(w4TileMap + 0xa3);
+  CYC(0x4716, 0x4717); push_effect(gb, 0x4717); add_a_to_hl(gb);
+  CYC(0x4717, 0x4718); A = B;
+  CYC(0x4718, 0x471a); A = alu_swap(gb, A);
+  CYC(0x471a, 0x471b); alu_add(gb, A);
+  CYC(0x471b, 0x471c); alu_add(gb, A);
+  CALL_C(0x471c, multiplyABy16_hook, 0x01ac, 0x471f);
+  CYC(0x471f, 0x4720); alu_add_hl(gb, BC);
+  CYC(0x4720, 0x4722); C = 0x20;
+  CYC(0x4722, 0x4723); A = mem_rd(gb, HL);
+  CYC(0x4723, 0x4725); alu_cp(gb, 0x02);
+  if (F & FZ) { CYCT(0x4725, 0x4727); runTextInput__gotCharacter_hook(gb); return; }
+  CYC(0x4725, 0x4727);
+  CYC(0x4727, 0x4728); alu_rrca(gb);
+  CYC(0x4728, 0x472a); alu_and(gb, 0x3f);
+  CYC(0x472a, 0x472c); alu_add(gb, 0x40);
+  CYC(0x472c, 0x472d); C = A;
+  CYC(0x472d, 0x4730); A = W8(wFileSelect_textInputMode);
+  CYC(0x4730, 0x4731); alu_rlca(gb);
+  if (!(F & FC)) { CYCT(0x4731, 0x4733); runTextInput__gotCharacter_hook(gb); return; }
+  CYC(0x4731, 0x4733);
+  CYC(0x4733, 0x4734); A = C;
+  CYC(0x4734, 0x4737); SET_HL(0x0061);
+  CYC(0x4737, 0x4738); push_effect(gb, 0x4738); add_a_to_hl(gb);
+  CYC(0x4738, 0x4739); C = mem_rd(gb, HL);
+  runTextInput__gotCharacter_hook(gb);
+}
+
+void runTextInput__gotCharacter_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4739, textInput_getOutputAddress_hook, 0x4a37, 0x473c);
+  CYC(0x473c, 0x473d); mem_wr(gb, HL, C);
+  runTextInput__selectionRight_hook(gb);
+}
+
+void runTextInput__selectionRight_hook(GB *gb) {
+  CYC(0x473d, 0x4740); SET_HL(wFileSelect_textInputCursorPos);
+  CYC(0x4740, 0x4741); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x4741, 0x4744); A = W8(wFileSelect_textInputMaxCursorPos);
+  CYC(0x4744, 0x4745); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(0x4745, 0x4747); runTextInput__updateEntryCursor_hook(gb); return; }
+  CYC(0x4745, 0x4747);
+  CYC(0x4747, 0x4748); mem_wr(gb, HL, A);
+  runTextInput__updateEntryCursor_hook(gb);
+}
+
+void runTextInput__updateEntryCursor_hook(GB *gb) {
+  CYC(0x4748, 0x474b); textInput_updateEntryCursor_hook(gb);
+}
+
+void runTextInput__lowerOptions_hook(GB *gb) {
+  CYC(0x474b, 0x474e); A = W8(wFileSelect_textInputMode);
+  CYC(0x474e, 0x474f); alu_rlca(gb);
+  CYC(0x474f, 0x4752); A = W8(wFileSelect_cursorPos2);
+  if (F & FC) { CYCT(0x4752, 0x4754); runTextInput__secretTable_hook(gb); return; }
+  CYC(0x4752, 0x4754);
+  runTextInput__nameTable_hook(gb);
+}
+
+void runTextInput__nameTable_hook(GB *gb) {
+  CYC(0x4754, 0x4755); push_effect(gb, 0x4755);
+  switch (function_caller_jump_table(gb)) {
+    case 0x4769: runTextInput__selectionLeft_hook(gb); return;
+    case 0x473d: runTextInput__selectionRight_hook(gb); return;
+    case 0x47e5: runTextInput__startButton_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void runTextInput__secretTable_hook(GB *gb) {
+  CYC(0x475b, 0x475c); push_effect(gb, 0x475c);
+  switch (function_caller_jump_table(gb)) {
+    case 0x4769: runTextInput__selectionLeft_hook(gb); return;
+    case 0x473d: runTextInput__selectionRight_hook(gb); return;
+    case 0x4776: runTextInput__back_hook(gb); return;
+    case 0x47e5: runTextInput__startButton_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void runTextInput__bButton_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4764, textInput_getOutputAddress_hook, 0x4a37, 0x4767);
+  CYC(0x4767, 0x4769); mem_wr(gb, HL, 0x20);
+  runTextInput__selectionLeft_hook(gb);
+}
+
+void runTextInput__selectionLeft_hook(GB *gb) {
+  CYC(0x4769, 0x476c); SET_HL(wFileSelect_textInputCursorPos);
+  CYC(0x476c, 0x476d); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x476d, 0x476f); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(0x476f, 0x4771); runTextInput__updateEntryCursor_hook(gb); return; }
+  CYC(0x476f, 0x4771);
+  CYC(0x4771, 0x4773); mem_wr(gb, HL, 0x00);
+  CYC(0x4773, 0x4775); runTextInput__updateEntryCursor_hook(gb);
+}
+
+void runTextInput__selectButton_hook(GB *gb) {
+  CYC(0x4775, 0x4776); ret_effect(gb);
+}
+
+void runTextInput__back_hook(GB *gb) {
+  CYC(0x4776, 0x4779); A = W8(wFileSelect_textInputMode);
+  CYC(0x4779, 0x477a); alu_rlca(gb);
+  if (!(F & FC)) { CYCT(0x477a, 0x477b); ret_effect(gb); return; }
+  CYC(0x477a, 0x477b);
+  CYC(0x477b, 0x477c); alu_xor(gb, A);
+  CYC(0x477c, 0x477f); W8(wTmpcbb9) = A;
+  CYC(0x477f, 0x4782); SET_HL(wFileSelect_cursorPos);
+  CYC(0x4782, 0x4784); A = 0x57;
+  CYC(0x4784, 0x4785); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4785, 0x4787); A = 0x02;
+  CYC(0x4787, 0x4788); alu_cp(gb, mem_rd(gb, HL));
+  CYC(0x4788, 0x4789); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  if (!(F & FZ)) { CYCT(0x4789, 0x478a); ret_effect(gb); return; }
+  CYC(0x4789, 0x478a);
+  CYC(0x478a, 0x478c); A = 0x03;
+  CYC(0x478c, 0x478f); W8(wFileSelect_mode2) = A;
+  CYC(0x478f, 0x4790); ret_effect(gb);
+}
+
+void runTextInput__rightButton_hook(GB *gb) {
+  CYC(0x4790, 0x4792); C = 0x01;
+  CYC(0x4792, 0x4794); runTextInput__leftOrRight_hook(gb);
+}
+
+void runTextInput__leftButton_hook(GB *gb) {
+  CYC(0x4794, 0x4796); C = 0xff;
+  runTextInput__leftOrRight_hook(gb);
+}
+
+void runTextInput__leftOrRight_hook(GB *gb) {
+  CYC(0x4796, 0x4799); SET_DE(0x040d);
+  CYC(0x4799, 0x479c); A = W8(wFileSelect_textInputMode);
+  CYC(0x479c, 0x479d); alu_rlca(gb);
+  if (F & FC) { CYCT(0x479d, 0x479f); goto check_upper_options; }
+  CYC(0x479d, 0x479f);
+  CYC(0x479f, 0x47a2); SET_DE(0x030c);
+check_upper_options:
+  CYC(0x47a2, 0x47a5); SET_HL(wFileSelect_cursorPos);
+  CYC(0x47a5, 0x47a6); A = mem_rd(gb, HL);
+  CYC(0x47a6, 0x47a8); alu_cp(gb, 0x50);
+  if (!(F & FC)) { CYCT(0x47a8, 0x47aa); runTextInput__leftOrRight__lowerOptions_hook(gb); return; }
+  CYC(0x47a8, 0x47aa);
+  for (;;) {
+    CYC(0x47aa, 0x47ab); alu_add(gb, C);
+    CYC(0x47ab, 0x47ad); alu_and(gb, 0x0f);
+    CYC(0x47ad, 0x47ae); alu_cp(gb, E);
+    if (!(F & FC)) { CYCT(0x47ae, 0x47b0); continue; }
+    CYC(0x47ae, 0x47b0);
+    break;
+  }
+  CYC(0x47b0, 0x47b1); C = A;
+  CYC(0x47b1, 0x47b2); A = mem_rd(gb, HL);
+  CYC(0x47b2, 0x47b4); alu_and(gb, 0xf0);
+  CYC(0x47b4, 0x47b5); alu_add(gb, C);
+  CYC(0x47b5, 0x47b6); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x47b6, 0x47b8); mem_wr(gb, HL, 0x80);
+  CYC(0x47b8, 0x47b9); ret_effect(gb);
+}
+
+void runTextInput__leftOrRight__lowerOptions_hook(GB *gb) {
+  CYC(0x47b9, 0x47ba); L = alu_inc8(gb, L);
+  CYC(0x47ba, 0x47bb); B = D;
+  CYC(0x47bb, 0x47bc); A = mem_rd(gb, HL);
+  for (;;) {
+    CYC(0x47bc, 0x47bd); alu_add(gb, C);
+    CYC(0x47bd, 0x47bf); alu_and(gb, 0x0f);
+    CYC(0x47bf, 0x47c0); alu_cp(gb, B);
+    if (!(F & FC)) { CYCT(0x47c0, 0x47c2); continue; }
+    CYC(0x47c0, 0x47c2);
+    break;
+  }
+  CYC(0x47c2, 0x47c3); mem_wr(gb, HL, A);
+  CYC(0x47c3, 0x47c6); textInput_lowerOption_updateFileSelectCursorPos_hook(gb);
+}
+
+void runTextInput__upButton_hook(GB *gb) {
+  CYC(0x47c6, 0x47c8); C = 0xf0;
+  CYC(0x47c8, 0x47ca); runTextInput__upOrDown_hook(gb);
+}
+
+void runTextInput__downButton_hook(GB *gb) {
+  CYC(0x47ca, 0x47cc); C = 0x10;
+  runTextInput__upOrDown_hook(gb);
+}
+
+void runTextInput__upOrDown_hook(GB *gb) {
+  CYC(0x47cc, 0x47cf); SET_HL(wFileSelect_cursorPos);
+  CYC(0x47cf, 0x47d0); A = mem_rd(gb, HL);
+  for (;;) {
+    CYC(0x47d0, 0x47d1); alu_add(gb, C);
+    CYC(0x47d1, 0x47d3); alu_and(gb, 0x70);
+    CYC(0x47d3, 0x47d5); alu_cp(gb, 0x60);
+    if (!(F & FC)) { CYCT(0x47d5, 0x47d7); continue; }
+    CYC(0x47d5, 0x47d7);
+    break;
+  }
+  CYC(0x47d7, 0x47d8); C = A;
+  CYC(0x47d8, 0x47d9); A = mem_rd(gb, HL);
+  CYC(0x47d9, 0x47db); alu_and(gb, 0x0f);
+  CYC(0x47db, 0x47dc); alu_add(gb, C);
+  CYC(0x47dc, 0x47dd); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x47dd, 0x47df); mem_wr(gb, HL, 0x80);
+  CYC(0x47df, 0x47e1); alu_cp(gb, 0x50);
+  if (F & FC) { CYCT(0x47e1, 0x47e2); ret_effect(gb); return; }
+  CYC(0x47e1, 0x47e2);
+  CYC(0x47e2, 0x47e5); textInput_lowerOption_updateFileSelectCursorPos2_hook(gb);
+}
+
+void runTextInput__startButton_hook(GB *gb) {
+  CYC(0x47e5, 0x47e8); SET_HL(wFileSelect_cursorPos);
+  CYC(0x47e8, 0x47ea); A = 0x5a;
+  CYC(0x47ea, 0x47eb); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x47eb, 0x47ee); A = W8(wFileSelect_textInputMode);
+  CYC(0x47ee, 0x47ef); alu_rlca(gb);
+  CYC(0x47ef, 0x47f1); A = 0x02;
+  if (!(F & FC)) CYCT(0x47f1, 0x47f3);
+  else { CYC(0x47f1, 0x47f3); CYC(0x47f3, 0x47f5); A = 0x03; }
+  CYC(0x47f5, 0x47f6); alu_cp(gb, mem_rd(gb, HL));
+  CYC(0x47f6, 0x47f7); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  if (!(F & FZ)) { CYCT(0x47f7, 0x47f8); ret_effect(gb); return; }
+  CYC(0x47f7, 0x47f8);
+  CYC(0x47f8, 0x47fb); incFileSelectMode2_hook(gb);
 }
 
 void textInput_getCursorPosition_hook(GB *gb) {

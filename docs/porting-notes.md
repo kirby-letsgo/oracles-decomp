@@ -703,3 +703,8 @@ desync to discover; keep them when porting routines.
   `ld a,(wActiveMusic2)`, left the wrong value in A, and lost four cycles. Give the branch target
   its own C label at the exact ROM address; keep the later hook entry distinct even when only one
   instruction separates them.
+- A named address inside a routine can be table data even when the transliterator emitted a
+  generated function for it. In batch 112, `runTextInput@soundEffects` at `$46fe` was the eight
+  bytes read by the root's input index, not an entry point. Porting it as an alias would invent
+  executable semantics for sound IDs. Check the disassembly's data directives and actual inbound
+  control flow for every apparent local entry; remove confirmed data from `ported.txt` instead.
