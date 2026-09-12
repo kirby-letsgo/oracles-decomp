@@ -657,3 +657,8 @@ desync to discover; keep them when porting routines.
   the full replay diverged at frame 32,040. `HOOK_SKIP` showed that forcing the helper back through
   the interpreter preserved the pending-interrupt opportunity, so the call at `$5520` deliberately
   remains `CALL_ROM(0x5520, 0x552c)` even though the target is readable.
+- A helper that returns past its caller with `pop af; ret` must reproduce both effects, not treat
+  the first pop as merely discarding a return address. Batch 97's
+  `ringMenu_retIfCounterNotFinished` loads the skipped caller return into AF (including flags), then
+  returns to the grand-caller; `CALL_C` observes the changed PC/SP and unwinds the abandoned C
+  caller. Independent stack review confirmed this path before the gate.

@@ -7494,404 +7494,6 @@ L_5ea8:
   if (hook_enabled_at(0x5ef3)) { mapMenu_performTileSubstitutions_hook(gb); return; } HANDOFF(0x5ef3);  // fallthrough
 }
 
-// 02:6d36
-void runRingMenu(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6d36, clearOam_hook, 0x049f, 0x6d39);  // call $049f
-  I(0x6d39, 2); A = 0x10;  // ld a,$10
-  I(0x6d3b, 3); mem_wr(gb, 0xff9f, A);  // ldh ($ff9f),a
-  I(0x6d3d, 3); SET_HL(0xcbae);  // ld hl,$cbae
-  I(0x6d40, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x6d42, 2); A = 0x04;  // ld a,$04
-  I(0x6d44, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  CALL(0x6d46, runRingMenu__runStateCode, 0x6d51, 0x6d49);  // call $6d51
-  I(0x6d49, 4); A = mem_rd(gb, 0xcbd3);  // ld a,($cbd3)
-  I(0x6d4c, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x6d4d); return; } I(0x6d4d, 2);  // ret nz
-  I(0x6d4e, 4); if (hook_enabled_at(0x1a9c)) { updateStatusBar_hook(gb); return; } HANDOFF(0x1a9c);  // jp $1a9c
-}
-
-// 02:6d51
-void runRingMenu__runStateCode(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6d51:
-  I(0x6d51, 4); A = mem_rd(gb, 0xcbcd);  // ld a,($cbcd)
-  RST_PUSH(0x6d54, 0x6d55);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
-// 02:6d5b
-void ringMenu_state0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6d5b, loadCommonGraphics_hook, 0x1a98, 0x6d5e);  // call $1a98
-  I(0x6d5e, 1); alu_xor(gb, A);  // xor a
-  I(0x6d5f, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x6d62, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x6d63, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  I(0x6d66, 2); A = 0x80;  // ld a,$80
-  I(0x6d68, 4); mem_wr(gb, 0xcbbe, A);  // ld ($cbbe),a
-  I(0x6d6b, 4); A = mem_rd(gb, 0xcbd3);  // ld a,($cbd3)
-  I(0x6d6e, 2); alu_add(gb, 0x3a);  // add $3a
-  CALL(0x6d70, loadGfxHeader_hook, 0x0626, 0x6d73);  // call $0626
-  I(0x6d73, 2); A = 0x0a;  // ld a,$0a
-  CALL(0x6d75, loadPaletteHeader_hook, 0x050b, 0x6d78);  // call $050b
-  I(0x6d78, 3); SET_HL(0x466f);  // ld hl,$466f
-  I(0x6d7b, 2); E = 0x3f;  // ld e,$3f
-  CALL(0x6d7d, interBankCall_hook, 0x008a, 0x6d80);  // call $008a
-  CALL(0x6d80, ringMenu_calculateNumPagesForUnappraisedRings, 0x7223, 0x6d83);  // call $7223
-  CALL(0x6d83, ringMenu_redrawRingListOrUnappraisedRings, 0x6da8, 0x6d86);  // call $6da8
-  I(0x6d86, 3); SET_HL(0xcbcd);  // ld hl,$cbcd
-  I(0x6d89, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x6d8a, fastFadeinFromWhite_hook, 0x3290, 0x6d8d);  // call $3290
-  I(0x6d8d, 2); A = 0x05;  // ld a,$05
-  I(0x6d8f, 3); mem_wr(gb, 0xff9d, A);  // ldh ($ff9d),a
-  I(0x6d91, 4); A = mem_rd(gb, 0xcbd3);  // ld a,($cbd3)
-  I(0x6d94, 2); alu_add(gb, 0x0f);  // add $0f
-  I(0x6d96, 4); if (hook_enabled_at(0x02ea)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
-}
-
-// 02:6d99
-void ringMenu_copyTilemapToVram(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6d99, 3); SET_HL(0xcbd3);  // ld hl,$cbd3
-  I(0x6d9c, 4); A = mem_rd(gb, 0xcbba);  // ld a,($cbba)
-  I(0x6d9f, 2); alu_and(gb, 0x01);  // and $01
-  I(0x6da1, 1); alu_add(gb, A);  // add a
-  I(0x6da2, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  I(0x6da3, 2); alu_add(gb, 0x12);  // add $12
-  I(0x6da5, 4); if (hook_enabled_at(0x05da)) { loadUncompressedGfxHeader_hook(gb); return; } HANDOFF(0x05da);  // jp $05da
-}
-
-// 02:6da8
-void ringMenu_redrawRingListOrUnappraisedRings(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6da8, 1); alu_xor(gb, A);  // xor a
-  CALL(0x6da9, showItemText2_hook, 0x553d, 0x6dac);  // call $553d
-  I(0x6dac, 3); SET_HL(0x6d99);  // ld hl,$6d99
-  PUSH(0x6daf, HL);  // push hl
-  I(0x6db0, 4); A = mem_rd(gb, 0xcbd3);  // ld a,($cbd3)
-  RST_PUSH(0x6db3, 0x6db4);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
-// 02:6db8
-void ringMenu_drawRingBox(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6db8, 4); A = mem_rd(gb, 0xcbcd);  // ld a,($cbcd)
-  I(0x6dbb, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x6dbc, 3); goto L_6dcd; } I(0x6dbc, 2);  // jr nz,$6dcd
-  I(0x6dbe, 4); A = mem_rd(gb, 0xc6cc);  // ld a,($c6cc)
-  I(0x6dc1, 1); A = alu_inc8(gb, A);  // inc a
-  CALL(0x6dc2, mapMenu_performTileSubstitutions_hook, 0x5ef3, 0x6dc5);  // call $5ef3
-  I(0x6dc5, 3); SET_DE(0xd201);  // ld de,$d201
-  I(0x6dc8, 2); A = 0xfe;  // ld a,$fe
-  CALL(0x6dca, getRingTiles, 0x72fe, 0x6dcd);  // call $72fe
-L_6dcd:
-  CALL(0x6dcd, ringMenu_drawRingBoxContents, 0x7297, 0x6dd0);  // call $7297
-  I(0x6dd0, 2); A = 0x04;  // ld a,$04
-  I(0x6dd2, 4); mem_wr(gb, 0xcbb5, A);  // ld ($cbb5),a
-  I(0x6dd5, 2); A = 0xfe;  // ld a,$fe
-  I(0x6dd7, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x6dda, 4); ringMenu_drawRingList(gb); return;  // jp $726d
-}
-
-// 02:6ddd
-void ringMenu_state1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6ddd, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
-  I(0x6de0, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x6de1); return; } I(0x6de1, 2);  // ret nz
-  I(0x6de2, 4); A = mem_rd(gb, 0xcbd3);  // ld a,($cbd3)
-  RST_PUSH(0x6de5, 0x6de6);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
-// 02:6dea
-void ringMenu_state1_unappraisedRings(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6dea, ringMenu_drawSprites, 0x7175, 0x6ded);  // call $7175
-  I(0x6ded, 4); A = mem_rd(gb, 0xcbce);  // ld a,($cbce)
-  RST_PUSH(0x6df0, 0x6df1);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
-// 02:6dfd
-void ringMenu_unappraisedRings_state0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6dfd, 4); A = mem_rd(gb, 0xcba0);  // ld a,($cba0)
-  I(0x6e00, 1); alu_or(gb, A);  // or a
-  I(0x6e01, 2); A = 0x04;  // ld a,$04
-  if ((F & FZ)) { CALL(0x6e03, ringMenu_setDisplayedText, 0x735d, 0x6e06); } else I(0x6e03, 3);  // call z,$735d
-  I(0x6e06, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x6e09, 2); alu_bit(gb, 1, A);  // bit 1,a
-  if (!(F & FZ)) { I(0x6e0b, 3); goto L_6e19; } I(0x6e0b, 2);  // jr nz,$6e19
-  I(0x6e0d, 2); alu_bit(gb, 0, A);  // bit 0,a
-  if (!(F & FZ)) { I(0x6e0f, 3); goto L_6e24; } I(0x6e0f, 2);  // jr nz,$6e24
-  I(0x6e11, 2); alu_bit(gb, 2, A);  // bit 2,a
-  if (!(F & FZ)) { I(0x6e13, 4); ringMenu_initiateScrollRight(gb); return; } I(0x6e13, 3);  // jp nz,$706a
-  I(0x6e16, 4); ringMenu_checkRingListCursorMoved(gb); return;  // jp $711e
-L_6e19:
-  CALL(0x6e19, ringMenu_checkObtainedRingBox, 0x6f29, 0x6e1c);  // call $6f29
-  I(0x6e1c, 2); A = 0x12;  // ld a,$12
-  if ((F & FZ)) { I(0x6e1e, 4); ringMenu_setDisplayedText(gb); return; } I(0x6e1e, 3);  // jp z,$735d
-  I(0x6e21, 4); if (hook_enabled_at(0x4fba)) { closeMenu_hook(gb); return; } HANDOFF(0x4fba);  // jp $4fba
-L_6e24:
-  CALL(0x6e24, ringMenu_updateSelectedRingFromList, 0x723b, 0x6e27);  // call $723b
-  CALL(0x6e27, ringMenu_getUnappraisedRingIndex, 0x6f2e, 0x6e2a);  // call $6f2e
-  I(0x6e2a, 1); alu_rlca(gb);  // rlca
-  if ((F & FC)) { RET_TAKEN(0x6e2b); return; } I(0x6e2b, 2);  // ret c
-  I(0x6e2c, 2); A = 0x01;  // ld a,$01
-  I(0x6e2e, 4); mem_wr(gb, 0xcbce, A);  // ld ($cbce),a
-  CALL(0x6e31, ringMenu_checkObtainedRingBox, 0x6f29, 0x6e34);  // call $6f29
-  I(0x6e34, 2); A = 0x11;  // ld a,$11
-  if ((F & FZ)) { I(0x6e36, 3); goto L_6e3a; } I(0x6e36, 2);  // jr z,$6e3a
-  I(0x6e38, 2); A = 0x05;  // ld a,$05
-L_6e3a:
-  I(0x6e3a, 4); ringMenu_setDisplayedText(gb); return;  // jp $735d
-}
-
-// 02:6e19
-void ringMenu_unappraisedRings_state0__bPressed(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6e19:
-  CALL(0x6e19, ringMenu_checkObtainedRingBox, 0x6f29, 0x6e1c);  // call $6f29
-  I(0x6e1c, 2); A = 0x12;  // ld a,$12
-  if ((F & FZ)) { I(0x6e1e, 4); ringMenu_setDisplayedText(gb); return; } I(0x6e1e, 3);  // jp z,$735d
-  I(0x6e21, 4); if (hook_enabled_at(0x4fba)) { closeMenu_hook(gb); return; } HANDOFF(0x4fba);  // jp $4fba
-}
-
-// 02:6e24
-void ringMenu_unappraisedRings_state0__aPressed(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6e24:
-  CALL(0x6e24, ringMenu_updateSelectedRingFromList, 0x723b, 0x6e27);  // call $723b
-  CALL(0x6e27, ringMenu_getUnappraisedRingIndex, 0x6f2e, 0x6e2a);  // call $6f2e
-  I(0x6e2a, 1); alu_rlca(gb);  // rlca
-  if ((F & FC)) { RET_TAKEN(0x6e2b); return; } I(0x6e2b, 2);  // ret c
-  I(0x6e2c, 2); A = 0x01;  // ld a,$01
-  I(0x6e2e, 4); mem_wr(gb, 0xcbce, A);  // ld ($cbce),a
-  CALL(0x6e31, ringMenu_checkObtainedRingBox, 0x6f29, 0x6e34);  // call $6f29
-  I(0x6e34, 2); A = 0x11;  // ld a,$11
-  if ((F & FZ)) { I(0x6e36, 3); goto L_6e3a; } I(0x6e36, 2);  // jr z,$6e3a
-  I(0x6e38, 2); A = 0x05;  // ld a,$05
-L_6e3a:
-  I(0x6e3a, 4); ringMenu_setDisplayedText(gb); return;  // jp $735d
-}
-
-// 02:6e3d
-void ringMenu_unappraisedRings_state1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6e3d, ringMenu_retIfTextIsPrinting, 0x7373, 0x6e40);  // call $7373
-  I(0x6e40, 4); A = mem_rd(gb, 0xcba5);  // ld a,($cba5)
-  I(0x6e43, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x6e44, 3); ringMenu_state1_restart(gb); return; } I(0x6e44, 2);  // jr nz,$6e7f
-  CALL(0x6e46, ringMenu_checkObtainedRingBox, 0x6f29, 0x6e49);  // call $6f29
-  if ((F & FZ)) { I(0x6e49, 3); goto L_6e5a; } I(0x6e49, 2);  // jr z,$6e5a
-  I(0x6e4b, 2); A = 0x05;  // ld a,$05
-  CALL(0x6e4d, cpRupeeValue_hook, 0x1765, 0x6e50);  // call $1765
-  I(0x6e50, 2); B = 0x06;  // ld b,$06
-  if (!(F & FZ)) { I(0x6e52, 4); ringMenu_unappraisedRings_gotoState5(gb); return; } I(0x6e52, 3);  // jp nz,$6f05
-  I(0x6e55, 2); A = 0x05;  // ld a,$05
-  CALL(0x6e57, removeRupeeValue_hook, 0x1778, 0x6e5a);  // call $1778
-L_6e5a:
-  I(0x6e5a, 3); SET_HL(0xc6ce);  // ld hl,$c6ce
-  CALL(0x6e5d, incHlRefWithCap_hook, 0x0245, 0x6e60);  // call $0245
-  CALL(0x6e60, ringMenu_getUnappraisedRingIndex, 0x6f2e, 0x6e63);  // call $6f2e
-  I(0x6e63, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 6)));  // res 6,(hl)
-  I(0x6e65, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6e66, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x6e69, 2); alu_add(gb, 0x40);  // add $40
-  I(0x6e6b, 4); mem_wr(gb, 0xcbb1, A);  // ld ($cbb1),a
-  I(0x6e6e, 3); SET_BC(0x301c);  // ld bc,$301c
-  CALL(0x6e71, ringMenu_showExitableText, 0x6f13, 0x6e74);  // call $6f13
-  I(0x6e74, 2); A = 0x02;  // ld a,$02
-  I(0x6e76, 4); mem_wr(gb, 0xcbce, A);  // ld ($cbce),a
-  CALL(0x6e79, ringMenu_drawUnappraisedRings, 0x7255, 0x6e7c);  // call $7255
-  I(0x6e7c, 4); ringMenu_copyTilemapToVram(gb); return;  // jp $6d99
-}
-
-// 02:6e7f
-void ringMenu_state1_restart(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6e7f, 1); alu_xor(gb, A);  // xor a
-  I(0x6e80, 4); mem_wr(gb, 0xcbce, A);  // ld ($cbce),a
-  I(0x6e83, 4); mem_wr(gb, 0xcba0, A);  // ld ($cba0),a
-  RET(0x6e86); return;  // ret
-}
-
-// 02:6e87
-void ringMenu_unappraisedRings_state2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6e87, ringMenu_retIfTextIsPrinting, 0x7373, 0x6e8a);  // call $7373
-  I(0x6e8a, 2); A = 0x03;  // ld a,$03
-  I(0x6e8c, 4); mem_wr(gb, 0xcbce, A);  // ld ($cbce),a
-  CALL(0x6e8f, ringMenu_getUnappraisedRingIndex, 0x6f2e, 0x6e92);  // call $6f2e
-  I(0x6e92, 2); alu_add(gb, 0x80);  // add $80
-  I(0x6e94, 1); C = A;  // ld c,a
-  I(0x6e95, 2); B = 0x30;  // ld b,$30
-  I(0x6e97, 3); ringMenu_showExitableText(gb); return;  // jr $6f13
-}
-
-// 02:6e99
-void ringMenu_unappraisedRings_state3(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6e99, ringMenu_retIfTextIsPrinting, 0x7373, 0x6e9c);  // call $7373
-  CALL(0x6e9c, ringMenu_getUnappraisedRingIndex, 0x6f2e, 0x6e9f);  // call $6f2e
-  I(0x6e9f, 1); C = A;  // ld c,a
-  I(0x6ea0, 3); mem_wr(gb, HL, 0xff);  // ld (hl),$ff
-  I(0x6ea2, 3); SET_HL(0xc616);  // ld hl,$c616
-  CALL(0x6ea5, checkFlag_hook, 0x0205, 0x6ea8);  // call $0205
-  if (!(F & FZ)) { I(0x6ea8, 3); goto L_6eb3; } I(0x6ea8, 2);  // jr nz,$6eb3
-  I(0x6eaa, 1); A = C;  // ld a,c
-  CALL(0x6eab, setFlag_hook, 0x020e, 0x6eae);  // call $020e
-  I(0x6eae, 1); alu_xor(gb, A);  // xor a
-  I(0x6eaf, 2); B = 0x17;  // ld b,$17
-  I(0x6eb1, 3); goto L_6eb7;  // jr $6eb7
-L_6eb3:
-  I(0x6eb3, 2); A = 0x07;  // ld a,$07
-  I(0x6eb5, 2); B = 0x07;  // ld b,$07
-L_6eb7:
-  I(0x6eb7, 4); mem_wr(gb, 0xcbb9, A);  // ld ($cbb9),a
-  CALL(0x6eba, ringMenu_checkObtainedRingBox, 0x6f29, 0x6ebd);  // call $6f29
-  if ((F & FZ)) { I(0x6ebd, 4); if (hook_enabled_at(0x4fba)) { closeMenu_hook(gb); return; } HANDOFF(0x4fba); } I(0x6ebd, 3);  // jp z,$4fba
-  I(0x6ec0, 2); A = 0x28;  // ld a,$28
-  I(0x6ec2, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x6ec5, 2); A = 0x04;  // ld a,$04
-  I(0x6ec7, 4); mem_wr(gb, 0xcbce, A);  // ld ($cbce),a
-  I(0x6eca, 1); A = B;  // ld a,b
-  I(0x6ecb, 4); ringMenu_setDisplayedText(gb); return;  // jp $735d
-}
-
-// 02:6eb3
-void ringMenu_unappraisedRings_state3__refund(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6eb3:
-  I(0x6eb3, 2); A = 0x07;  // ld a,$07
-  I(0x6eb5, 2); B = 0x07;  // ld b,$07
-  I(0x6eb7, 4); mem_wr(gb, 0xcbb9, A);  // ld ($cbb9),a
-  CALL(0x6eba, ringMenu_checkObtainedRingBox, 0x6f29, 0x6ebd);  // call $6f29
-  if ((F & FZ)) { I(0x6ebd, 4); if (hook_enabled_at(0x4fba)) { closeMenu_hook(gb); return; } HANDOFF(0x4fba); } I(0x6ebd, 3);  // jp z,$4fba
-  I(0x6ec0, 2); A = 0x28;  // ld a,$28
-  I(0x6ec2, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x6ec5, 2); A = 0x04;  // ld a,$04
-  I(0x6ec7, 4); mem_wr(gb, 0xcbce, A);  // ld ($cbce),a
-  I(0x6eca, 1); A = B;  // ld a,b
-  I(0x6ecb, 4); ringMenu_setDisplayedText(gb); return;  // jp $735d
-}
-
-// 02:6ece
-void ringMenu_unappraisedRings_state4(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6ece, ringMenu_retIfTextIsPrinting, 0x7373, 0x6ed1);  // call $7373
-  CALL(0x6ed1, ringMenu_retIfCounterNotFinished, 0x6f37, 0x6ed4);  // call $6f37
-  I(0x6ed4, 4); A = mem_rd(gb, 0xcbb9);  // ld a,($cbb9)
-  I(0x6ed7, 1); alu_or(gb, A);  // or a
-  I(0x6ed8, 1); C = A;  // ld c,a
-  I(0x6ed9, 2); A = 0x28;  // ld a,$28
-  if (!(F & FZ)) { CALL(0x6edb, giveTreasure_hook, 0x171c, 0x6ede); } else I(0x6edb, 3);  // call nz,$171c
-  I(0x6ede, 3); SET_HL(0x4697);  // ld hl,$4697
-  I(0x6ee1, 2); E = 0x3f;  // ld e,$3f
-  CALL(0x6ee3, interBankCall_hook, 0x008a, 0x6ee6);  // call $008a
-  CALL(0x6ee6, ringMenu_drawUnappraisedRings, 0x7255, 0x6ee9);  // call $7255
-  CALL(0x6ee9, ringMenu_copyTilemapToVram, 0x6d99, 0x6eec);  // call $6d99
-  I(0x6eec, 4); A = mem_rd(gb, 0xc6ce);  // ld a,($c6ce)
-  I(0x6eef, 2); alu_cp(gb, 0x64);  // cp $64
-  if (!(F & FZ)) { I(0x6ef1, 3); goto L_6efc; } I(0x6ef1, 2);  // jr nz,$6efc
-  I(0x6ef3, 2); A = 0x09;  // ld a,$09
-  CALL(0x6ef5, setGlobalFlag_hook, 0x31f9, 0x6ef8);  // call $31f9
-  I(0x6ef8, 2); B = 0x3c;  // ld b,$3c
-  I(0x6efa, 3); ringMenu_unappraisedRings_gotoState5(gb); return;  // jr $6f05
-L_6efc:
-  I(0x6efc, 4); A = mem_rd(gb, 0xc6cd);  // ld a,($c6cd)
-  I(0x6eff, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x6f00, 4); ringMenu_state1_restart(gb); return; } I(0x6f00, 3);  // jp nz,$6e7f
-  I(0x6f03, 2); B = 0x02;  // ld b,$02
-  ringMenu_unappraisedRings_gotoState5(gb); return;  // fallthrough
-}
-
-// 02:6efc
-void ringMenu_unappraisedRings_state4__not100th(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6efc:
-  I(0x6efc, 4); A = mem_rd(gb, 0xc6cd);  // ld a,($c6cd)
-  I(0x6eff, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x6f00, 4); ringMenu_state1_restart(gb); return; } I(0x6f00, 3);  // jp nz,$6e7f
-  I(0x6f03, 2); B = 0x02;  // ld b,$02
-  ringMenu_unappraisedRings_gotoState5(gb); return;  // fallthrough
-}
-
-// 02:6f05
-void ringMenu_unappraisedRings_gotoState5(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6f05, 2); A = 0x05;  // ld a,$05
-  I(0x6f07, 4); mem_wr(gb, 0xcbce, A);  // ld ($cbce),a
-  I(0x6f0a, 2); A = 0x3c;  // ld a,$3c
-  I(0x6f0c, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x6f0f, 1); A = B;  // ld a,b
-  I(0x6f10, 4); ringMenu_setDisplayedText(gb); return;  // jp $735d
-}
-
-// 02:6f13
-void ringMenu_showExitableText(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6f13, 2); A = 0x02;  // ld a,$02
-  I(0x6f15, 4); mem_wr(gb, 0xcbac, A);  // ld ($cbac),a
-  I(0x6f18, 2); A = 0x09;  // ld a,$09
-  I(0x6f1a, 4); mem_wr(gb, 0xcbae, A);  // ld ($cbae),a
-  I(0x6f1d, 4); if (hook_enabled_at(0x1872)) { showText_hook(gb); return; } HANDOFF(0x1872);  // jp $1872
-}
-
-// 02:6f20
-void ringMenu_unappraisedRings_state5(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6f20, ringMenu_retIfTextIsPrinting, 0x7373, 0x6f23);  // call $7373
-  CALL(0x6f23, ringMenu_retIfCounterNotFinished, 0x6f37, 0x6f26);  // call $6f37
-  I(0x6f26, 4); if (hook_enabled_at(0x4fba)) { closeMenu_hook(gb); return; } HANDOFF(0x4fba);  // jp $4fba
-}
-
-// 02:6f29
-void ringMenu_checkObtainedRingBox(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6f29, 2); A = 0x08;  // ld a,$08
-  I(0x6f2b, 4); if (hook_enabled_at(0x31f3)) { checkGlobalFlag_hook(gb); return; } HANDOFF(0x31f3);  // jp $31f3
-}
-
-// 02:6f2e
-void ringMenu_getUnappraisedRingIndex(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6f2e, 4); A = mem_rd(gb, 0xcbb3);  // ld a,($cbb3)
-  I(0x6f31, 3); SET_HL(0xc5c0);  // ld hl,$c5c0
-  RST_PUSH(0x6f34, 0x6f35);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x6f35, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  RET(0x6f36); return;  // ret
-}
-
-// 02:6f37
-void ringMenu_retIfCounterNotFinished(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6f37, 3); SET_HL(0xcbc2);  // ld hl,$cbc2
-  I(0x6f3a, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6f3b, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x6f3c); return; } I(0x6f3c, 2);  // ret z
-  I(0x6f3d, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  SET_AF(POP(0x6f3e));  // pop af
-  RET(0x6f3f); return;  // ret
-}
-
 // 02:6f40
 void ringMenu_state1_ringList(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -8034,7 +7636,7 @@ void ringMenu_ringList_substate1(GB *gb) {
   CALL(0x6fbc, ringMenu_updateSelectedRingFromList, 0x723b, 0x6fbf);  // call $723b
   CALL(0x6fbf, ringMenu_updateDisplayedRingNumber, 0x733a, 0x6fc2);  // call $733a
   CALL(0x6fc2, ringMenu_drawSprites, 0x7175, 0x6fc5);  // call $7175
-  CALL(0x6fc5, ringMenu_retIfCounterNotFinished, 0x6f37, 0x6fc8);  // call $6f37
+  CALL(0x6fc5, ringMenu_retIfCounterNotFinished_hook, 0x6f37, 0x6fc8);  // call $6f37
   ringMenu_updateRingText(gb); return;  // fallthrough
 }
 
@@ -8142,7 +7744,7 @@ void ringMenu_moveCursorToRingBox(GB *gb) {
   I(0x704a, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
   I(0x704d, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
   CALL(0x7050, ringMenu_drawRingBoxContents, 0x7297, 0x7053);  // call $7297
-  I(0x7053, 4); ringMenu_copyTilemapToVram(gb); return;  // jp $6d99
+  I(0x7053, 4); if (hook_enabled_at(0x6d99)) { ringMenu_copyTilemapToVram_hook(gb); return; } HANDOFF(0x6d99);  // jp $6d99
 }
 
 // 02:7056
@@ -8258,7 +7860,7 @@ L_70ad:
   I(0x70b0, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x70b1, 2); alu_xor(gb, 0x01);  // xor $01
   I(0x70b3, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x70b4, ringMenu_redrawRingListOrUnappraisedRings, 0x6da8, 0x70b7);  // call $6da8
+  CALL(0x70b4, ringMenu_redrawRingListOrUnappraisedRings_hook, 0x6da8, 0x70b7);  // call $6da8
   I(0x70b7, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
   I(0x70ba, 2); alu_bit(gb, 7, A);  // bit 7,a
   I(0x70bc, 2); A = 0x9f;  // ld a,$9f
@@ -8330,7 +7932,7 @@ L_70ad:
   I(0x70b0, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x70b1, 2); alu_xor(gb, 0x01);  // xor $01
   I(0x70b3, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x70b4, ringMenu_redrawRingListOrUnappraisedRings, 0x6da8, 0x70b7);  // call $6da8
+  CALL(0x70b4, ringMenu_redrawRingListOrUnappraisedRings_hook, 0x6da8, 0x70b7);  // call $6da8
   I(0x70b7, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
   I(0x70ba, 2); alu_bit(gb, 7, A);  // bit 7,a
   I(0x70bc, 2); A = 0x9f;  // ld a,$9f
@@ -9078,7 +8680,7 @@ L_7355:
   I(0x7355, 3); SET_HL(0xd105);  // ld hl,$d105
   I(0x7358, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
   I(0x7359, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x735a, 4); ringMenu_copyTilemapToVram(gb); return;  // jp $6d99
+  I(0x735a, 4); if (hook_enabled_at(0x6d99)) { ringMenu_copyTilemapToVram_hook(gb); return; } HANDOFF(0x6d99);  // jp $6d99
 }
 
 // 02:7352
@@ -9091,7 +8693,7 @@ L_7355:
   I(0x7355, 3); SET_HL(0xd105);  // ld hl,$d105
   I(0x7358, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
   I(0x7359, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x735a, 4); ringMenu_copyTilemapToVram(gb); return;  // jp $6d99
+  I(0x735a, 4); if (hook_enabled_at(0x6d99)) { ringMenu_copyTilemapToVram_hook(gb); return; } HANDOFF(0x6d99);  // jp $6d99
 }
 
 // 02:7355
@@ -9101,7 +8703,7 @@ L_7355:
   I(0x7355, 3); SET_HL(0xd105);  // ld hl,$d105
   I(0x7358, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
   I(0x7359, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x735a, 4); ringMenu_copyTilemapToVram(gb); return;  // jp $6d99
+  I(0x735a, 4); if (hook_enabled_at(0x6d99)) { ringMenu_copyTilemapToVram_hook(gb); return; } HANDOFF(0x6d99);  // jp $6d99
 }
 
 // 02:735d
