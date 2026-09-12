@@ -9,6 +9,14 @@
 00:c4b7 wRamFunction extern
 00:2cb7 linkState07__substate0
 00:2cce linkState07__substate2
+02:5f3d runGaleSeedMenu__runState
+02:6127 mapMenu_state1__checkInput
+02:61d7 mapGetRoomText__specialCode0
+02:61f4 mapGetRoomText__specialCode1
+02:6208 mapGetRoomText__specialCode2
+02:6210 mapGetRoomText__specialCode3
+02:6219 mapGetRoomText__specialCode4
+02:6221 mapGetRoomText__checkDungeonEntered
 03:4071 setCpuToDoubleSpeed extern
 00:016c resetGame__afterSp016c
 00:091a _nextThread__afterSp091a

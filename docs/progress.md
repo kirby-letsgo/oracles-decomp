@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 1,638 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 1,662 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -76,7 +76,9 @@ Updated 2026-09-12. Newest entries at the top of each section.
   remaining safe palette-thread handlers and the full fading/color-mixing loops; batch 75 added
   the bank-2 minimap popup-selection and dungeon-map scrolling/menu-rendering cluster; batch 76
   added the safe forest-fairy and completed-fairy dispatcher/state paths; batch 77 added all safe
-  Nayru-singing state entries while retaining the two room-loading states in generated C.
+  Nayru-singing state entries while retaining the two room-loading states in generated C; batch
+  79 added the bank-2 gale-seed menu, map-menu state flow, minimap room selection, dungeon key and
+  floor bookkeeping, and room-text resolver cluster.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -181,6 +183,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-12: milestone 3 phase 5 batch 79 (24 routines): the bank-2 gale-seed menu root and all
+  four states, the map-menu root/state/input flow, minimap display-room selection, dungeon small-key
+  and visited-floor bookkeeping, and the complete map room-text resolver/special-code cluster.
+  Eight local state and special-code labels received real hook aliases. Regeneration removed the
+  old unsuffixed `mapGetRoomText`, so its existing readable cave-popup caller was retargeted to the
+  new hook. Review corrected two inverted no-carry cursor-wrap branches and a shared RST `$10`
+  helper that wrote `L` during `add a,l`, one instruction before the real `ld l,a`. Gates: lint 0,
+  30k verify 0 mismatches (4,714,516 calls), whole-movie state hash clean
+  (`64bddd0dfe384126`), ctest 8/8 in both normal and quirk builds.
 
 - 2026-09-12: milestone 3 phase 5 batch 78 (25 routines): closed bank 0 by rewriting
   `linkState07` and its two substate entries, nineteen independently reportable decompressor

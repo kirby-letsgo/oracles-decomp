@@ -1944,6 +1944,7 @@ inventoryMenuDrawHarpSprites
 createBlankSpritesForItemSubmenu
 mapMenu_performTileSubstitutions
 runGaleSeedMenu
+runGaleSeedMenu__runState
 galeSeedMenu_state0
 galeSeedMenu_state1
 galeSeedMenu_state2
@@ -1953,8 +1954,15 @@ galeSeedMenu_addOffsetToWarpIndex
 runMapMenu
 mapMenu_state0
 mapMenu_state1
+mapMenu_state1__checkInput
 mapGetRoomTextOrReturn
 mapGetRoomText
+mapGetRoomText__specialCode0
+mapGetRoomText__specialCode1
+mapGetRoomText__specialCode2
+mapGetRoomText__specialCode3
+mapGetRoomText__specialCode4
+mapGetRoomText__checkDungeonEntered
 mapMenu_loadPopupData
 maupMenu_drawPopup
 mapMenu_copyTilemapToVram
