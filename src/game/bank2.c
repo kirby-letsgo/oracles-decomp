@@ -46,6 +46,20 @@ void dungeonMap_drawBossSymbolForFloor_hook(GB *gb);
 void dungeonMap_drawLinkIcons_hook(GB *gb);
 void dungeonMap_updateCursorFlickerCounter_hook(GB *gb);
 void dungeonMap_drawCursor_hook(GB *gb);
+void dungeonMap_drawArrows_hook(GB *gb);
+void mapGetRoomIndexWithoutUnusedColumns_hook(GB *gb);
+void mapMenu_checkCursorRoomVisited_hook(GB *gb);
+void mapMenu_checkRoomVisited_hook(GB *gb);
+void mapMenu_drawArrow_hook(GB *gb);
+void mapMenu_drawCursor_hook(GB *gb);
+void mapMenu_drawSpriteAtRoomIndex_hook(GB *gb);
+void mapMenu_drawWarpSites_hook(GB *gb);
+void mapMenu_drawWarpSites__drawWarpDest_hook(GB *gb);
+void mapMenu_drawWarpSites__nextTree_hook(GB *gb);
+void getTreeWarpDataIndex_hook(GB *gb);
+void getTreeWarpDataForRoom_hook(GB *gb);
+void getWarpTreeData_hook(GB *gb);
+void getWarpTreeData__ret_hook(GB *gb);
 
 static uint16_t function_caller_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -777,4 +791,189 @@ void dungeonMap_drawCursor_hook(GB *gb) {
   CYC(0x65ed, 0x65ee); C = A;
   CYC(0x65ee, 0x65f1); SET_HL(0x65f4);
   CYC(0x65f1, 0x65f4); addSpritesToOam_withOffset_hook(gb);
+}
+
+void dungeonMap_drawArrows_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x65fd, 0x6600); A = W8(wSubmenuState);
+  CYC(0x6600, 0x6601); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x6601, 0x6602); ret_effect(gb); return; }
+  CYC(0x6601, 0x6602);
+  CALL_C(0x6602, dungeonMap_checkCanScrollUp, 0x6454, 0x6605);
+  if (F & FZ) { CYCT(0x6605, 0x6607); goto down_arrow; }
+  CYC(0x6605, 0x6607);
+  CYC(0x6607, 0x660a); SET_HL(0x6617);
+  CALL_C(0x660a, addSpritesToOam_hook, 0x0d5e, 0x660d);
+down_arrow:
+  CALL_C(0x660d, dungeonMap_checkCanScrollDown, 0x641b, 0x6610);
+  if (F & FZ) { CYCT(0x6610, 0x6611); ret_effect(gb); return; }
+  CYC(0x6610, 0x6611);
+  CYC(0x6611, 0x6614); SET_HL(0x661c);
+  CYC(0x6614, 0x6617); addSpritesToOam_hook(gb);
+}
+
+void mapGetRoomIndexWithoutUnusedColumns_hook(GB *gb) {
+  CYC(0x6621, 0x6622); push_effect(gb, BC);
+  CYC(0x6622, 0x6625); A = W8(wMapMenu_cursorIndex);
+  CYC(0x6625, 0x6626); B = A;
+  CYC(0x6626, 0x6628); alu_and(gb, 0xf0);
+  CYC(0x6628, 0x662a); A = alu_swap(gb, A);
+  CYC(0x662a, 0x662b); alu_add(gb, A);
+  CYC(0x662b, 0x662c); C = A;
+  CYC(0x662c, 0x662d); A = B;
+  CYC(0x662d, 0x662e); alu_sub(gb, C);
+  CYC(0x662e, 0x662f); B = A;
+  CYC(0x662f, 0x6632); A = W8(wTilesetFlags);
+  CYC(0x6632, 0x6633); alu_rlca(gb);
+  CYC(0x6633, 0x6634); A = B;
+  CYC(0x6634, 0x6635); SET_BC(pop_effect(gb));
+  CYC(0x6635, 0x6636); ret_effect(gb);
+}
+
+void mapMenu_checkCursorRoomVisited_hook(GB *gb) {
+  CYC(0x6636, 0x6639); A = W8(wMapMenu_cursorIndex);
+  mapMenu_checkRoomVisited_hook(gb);
+}
+
+void mapMenu_checkRoomVisited_hook(GB *gb) {
+  CYC(0x6639, 0x663a); push_effect(gb, HL);
+  CYC(0x663a, 0x663b); H = A;
+  CYC(0x663b, 0x663e); A = W8(wMapMenu_mode);
+  CYC(0x663e, 0x663f); alu_rrca(gb);
+  CYC(0x663f, 0x6640); A = H;
+  CYC(0x6640, 0x6643); SET_HL(0xc800);
+  if (F & FC) CYCT(0x6643, 0x6645);
+  else { CYC(0x6643, 0x6645); CYC(0x6645, 0x6648); SET_HL(0xc700); }
+  CYC(0x6648, 0x6649); push_effect(gb, 0x6649); add_a_to_hl(gb);
+  CYC(0x6649, 0x664a); A = mem_rd(gb, HL);
+  CYC(0x664a, 0x664c); alu_bit(gb, 4, A);
+  CYC(0x664c, 0x664d); SET_HL(pop_effect(gb));
+  CYC(0x664d, 0x664e); ret_effect(gb);
+}
+
+void mapMenu_drawArrow_hook(GB *gb) {
+  CYC(0x664e, 0x6651); A = W8(wFrameCounter);
+  CYC(0x6651, 0x6653); alu_and(gb, 0x20);
+  if (!(F & FZ)) { CYCT(0x6653, 0x6654); ret_effect(gb); return; }
+  CYC(0x6653, 0x6654);
+  CYC(0x6654, 0x6657); SET_HL(0x665c);
+  CYC(0x6657, 0x665a); A = W8(wMapMenu_currentRoom);
+  CYC(0x665a, 0x665c); mapMenu_drawSpriteAtRoomIndex_hook(gb);
+}
+
+void mapMenu_drawCursor_hook(GB *gb) {
+  CYC(0x6661, 0x6664); SET_HL(0x6669);
+  CYC(0x6664, 0x6667); A = W8(wMapMenu_cursorIndex);
+  CYC(0x6667, 0x6669); mapMenu_drawSpriteAtRoomIndex_hook(gb);
+}
+
+void mapMenu_drawSpriteAtRoomIndex_hook(GB *gb) {
+  CYC(0x6672, 0x6673); C = A;
+  CYC(0x6673, 0x6676); SET_DE(0x1018);
+  CYC(0x6676, 0x6677); A = C;
+  CYC(0x6677, 0x6679); alu_and(gb, 0xf0);
+  CYC(0x6679, 0x667b); A = alu_srl(gb, A);
+  CYC(0x667b, 0x667c); alu_add(gb, D);
+  CYC(0x667c, 0x667d); B = A;
+  CYC(0x667d, 0x667e); A = C;
+  CYC(0x667e, 0x6680); alu_and(gb, 0x0f);
+  CYC(0x6680, 0x6681); alu_add(gb, A);
+  CYC(0x6681, 0x6682); alu_add(gb, A);
+  CYC(0x6682, 0x6683); alu_add(gb, A);
+  CYC(0x6683, 0x6684); alu_add(gb, E);
+  CYC(0x6684, 0x6685); C = A;
+  CYC(0x6685, 0x6688); addSpritesToOam_withOffset_hook(gb);
+}
+
+void mapMenu_drawWarpSites_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6688, 0x668b); SET_DE(0x66b9);
+  CYC(0x668b, 0x668e); SET_HL(wTmpcec0);
+  CYC(0x668e, 0x6690); B = 5;
+  CALL_C(0x6690, copyMemoryReverse_hook, 0x047f, 0x6693);
+  CYC(0x6693, 0x6696); A = W8(wFrameCounter);
+  CYC(0x6696, 0x6698); alu_and(gb, 0x18);
+  CYC(0x6698, 0x6699); alu_rrca(gb);
+  CYC(0x6699, 0x669a); alu_rrca(gb);
+  CYC(0x669a, 0x669c); L = 0xc3;
+  CYC(0x669c, 0x669d); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x669d, 0x669e); mem_wr(gb, HL, A);
+  CYC(0x669e, 0x66a0); C = 0;
+  mapMenu_drawWarpSites__drawWarpDest_hook(gb);
+}
+
+void mapMenu_drawWarpSites__drawWarpDest_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x66a0, 0x66a1); A = C;
+  CALL_C(0x66a1, getTreeWarpDataIndex_hook, 0x66be, 0x66a4);
+  CYC(0x66a4, 0x66a5); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x66a5, 0x66a6); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x66a6, 0x66a7); ret_effect(gb); return; }
+  CYC(0x66a6, 0x66a7);
+  CYC(0x66a7, 0x66a8); push_effect(gb, BC);
+  CYC(0x66a8, 0x66a9); C = A;
+  CALL_C(0x66a9, mapMenu_checkRoomVisited_hook, 0x6639, 0x66ac);
+  if (F & FZ) { CYCT(0x66ac, 0x66ae); mapMenu_drawWarpSites__nextTree_hook(gb); return; }
+  CYC(0x66ac, 0x66ae);
+  CYC(0x66ae, 0x66af); A = C;
+  CYC(0x66af, 0x66b2); SET_HL(wTmpcec0);
+  CALL_C(0x66b2, mapMenu_drawSpriteAtRoomIndex_hook, 0x6672, 0x66b5);
+  mapMenu_drawWarpSites__nextTree_hook(gb);
+}
+
+void mapMenu_drawWarpSites__nextTree_hook(GB *gb) {
+  CYC(0x66b5, 0x66b6); SET_BC(pop_effect(gb));
+  CYC(0x66b6, 0x66b7); C = alu_inc8(gb, C);
+  CYC(0x66b7, 0x66b9); mapMenu_drawWarpSites__drawWarpDest_hook(gb);
+}
+
+void getTreeWarpDataIndex_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x66be, 0x66bf); C = A;
+  CALL_C(0x66bf, getWarpTreeData_hook, 0x66d4, 0x66c2);
+  CYC(0x66c2, 0x66c3); alu_add(gb, A);
+  CYC(0x66c3, 0x66c4); alu_add(gb, C);
+  CYC(0x66c4, 0x66c5); push_effect(gb, 0x66c5); add_a_to_hl(gb);
+  CYC(0x66c5, 0x66c6); ret_effect(gb);
+}
+
+void getTreeWarpDataForRoom_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x66c6, 0x66c7); C = A;
+  CALL_C(0x66c7, getWarpTreeData_hook, 0x66d4, 0x66ca);
+  for (;;) {
+    CYC(0x66ca, 0x66cb); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x66cb, 0x66cc); alu_or(gb, A);
+    CYC(0x66cc, 0x66cd); alu_scf(gb);
+    if (F & FZ) { CYCT(0x66cd, 0x66ce); ret_effect(gb); return; }
+    CYC(0x66cd, 0x66ce);
+    CYC(0x66ce, 0x66cf); alu_cp(gb, C);
+    if (F & FZ) { CYCT(0x66cf, 0x66d0); ret_effect(gb); return; }
+    CYC(0x66cf, 0x66d0);
+    CYC(0x66d0, 0x66d1); SET_HL(HL + 1);
+    CYC(0x66d1, 0x66d2); SET_HL(HL + 1);
+    CYC(0x66d2, 0x66d4);
+  }
+}
+
+void getWarpTreeData_hook(GB *gb) {
+  CYC(0x66d4, 0x66d5); push_effect(gb, AF);
+  CYC(0x66d5, 0x66d8); SET_HL(0x6d1e);
+  CYC(0x66d8, 0x66db); A = W8(wTilesetFlags);
+  CYC(0x66db, 0x66dc); alu_rlca(gb);
+  if (F & FC) { CYCT(0x66dc, 0x66de); getWarpTreeData__ret_hook(gb); return; }
+  CYC(0x66dc, 0x66de);
+  CYC(0x66de, 0x66e1); SET_HL(0x6d03);
+  CYC(0x66e1, 0x66e4); A = mem_rd(gb, 0xc7ac);
+  CYC(0x66e4, 0x66e5); alu_rlca(gb);
+  if (F & FC) { CYCT(0x66e5, 0x66e7); getWarpTreeData__ret_hook(gb); return; }
+  CYC(0x66e5, 0x66e7);
+  CYC(0x66e7, 0x66e9); A = 3;
+  CYC(0x66e9, 0x66ea); push_effect(gb, 0x66ea); add_a_to_hl(gb);
+  getWarpTreeData__ret_hook(gb);
+}
+
+void getWarpTreeData__ret_hook(GB *gb) {
+  CYC(0x66ea, 0x66eb); SET_AF(pop_effect(gb));
+  CYC(0x66eb, 0x66ec); ret_effect(gb);
 }

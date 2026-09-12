@@ -125,6 +125,46 @@ void b4VBlankFunction19_hook(GB *gb) {
   b4_vblank_function(gb, 0x436a, 0x13);
 }
 
+void b4VBlankFunction20_hook(GB *gb) {
+  b4_vblank_function(gb, 0x4398, 0x14);
+}
+
+void b4VBlankFunction21_hook(GB *gb) {
+  b4_vblank_function(gb, 0x43c6, 0x15);
+}
+
+void b4VBlankFunction22_hook(GB *gb) {
+  b4_vblank_function(gb, 0x43f4, 0x16);
+}
+
+void b4VBlankFunction23_hook(GB *gb) {
+  b4_vblank_function(gb, 0x4422, 0x17);
+}
+
+void b4VBlankFunction24_hook(GB *gb) {
+  b4_vblank_function(gb, 0x4450, 0x18);
+}
+
+void b4VBlankFunction25_hook(GB *gb) {
+  b4_vblank_function(gb, 0x447e, 0x19);
+}
+
+void b4VBlankFunction26_hook(GB *gb) {
+  b4_vblank_function(gb, 0x44ac, 0x1a);
+}
+
+void b4VBlankFunction27_hook(GB *gb) {
+  b4_vblank_function(gb, 0x44da, 0x1b);
+}
+
+void b4VBlankFunction28_hook(GB *gb) {
+  b4_vblank_function(gb, 0x4508, 0x1c);
+}
+
+void b4VBlankFunction29_hook(GB *gb) {
+  b4_vblank_function(gb, 0x4536, 0x1d);
+}
+
 static void applyWarpDest_finish(GB *gb) {
   CYC(0x45f5, 0x45f7); A = 0x0a;
   CYC(0x45f7, 0x45fa); W8(wLinkForceState) = A;

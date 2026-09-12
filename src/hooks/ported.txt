@@ -711,6 +711,17 @@ andCWith3
 getNumCharactersForSecretType
 endgameCutsceneHandler_09_stage0__runStates
 endgameCutsceneHandler_09_stage1__runStates
+mapMenu_drawWarpSites__drawWarpDest
+mapMenu_drawWarpSites__nextTree
+getWarpTreeData__ret
+cutscene02__func_7c86
+cutscene02__func_7c8e
+cutscene02__handleRaisingFloorsCutscene
+cutscene02__state0
+cutscene02__state1
+cutscene02__state2
+cutscene02__func_7ced
+cutscene02__loopEnd
 secretXorCipher
 # remaining code/ files batch 6 (generated)
 cutscene06

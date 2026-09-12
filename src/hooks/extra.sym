@@ -217,3 +217,14 @@
 03:498d loadUnpackedSecretData__type2
 03:545b endgameCutsceneHandler_09_stage0__runStates
 03:56e6 endgameCutsceneHandler_09_stage1__runStates
+02:66a0 mapMenu_drawWarpSites__drawWarpDest
+02:66b5 mapMenu_drawWarpSites__nextTree
+02:66ea getWarpTreeData__ret
+01:7c86 cutscene02__func_7c86
+01:7c8e cutscene02__func_7c8e
+01:7c93 cutscene02__handleRaisingFloorsCutscene
+01:7c9d cutscene02__state0
+01:7cbd cutscene02__state1
+01:7cc9 cutscene02__state2
+01:7ced cutscene02__func_7ced
+01:7d2d cutscene02__loopEnd

@@ -569,3 +569,8 @@ desync to discover; keep them when porting routines.
   failed the build because `endgameCutsceneHandler_body_hook` still called the vanished
   `endgameCutsceneHandler_09`. When a root becomes readable, search existing hand-written C for
   direct unsuffixed calls to that symbol and retarget static jumps to its `_hook` entry.
+- A successful readiness report does not mean the routine is still waiting to be rewritten.
+  Batch 71's source-order scout selected `cutscene0b` because its report was clean, but that
+  routine was already present in `rewritten.txt` and `cutscenes2.c`. Check `rewritten.txt` while
+  assembling every batch, especially when moving between source files or resuming an older lane;
+  the report deliberately remains available for already-readable routines.
