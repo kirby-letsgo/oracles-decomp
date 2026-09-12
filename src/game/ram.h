@@ -4,6 +4,8 @@
 #define WP(n) (&gb->wram[n##_BANK][(n) & 0xfff])
 #define H8(n) (gb->hram[(n) - 0xff80])
 #define HP(n) (&gb->hram[(n) - 0xff80])
+#define wMusicReadFunction 0xc000
+#define wMusicReadFunction_BANK 0
 #define wSoundFadeCounter 0xc014
 #define wSoundFadeCounter_BANK 0
 #define wSoundFadeDirection 0xc015

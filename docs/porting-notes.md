@@ -621,3 +621,11 @@ desync to discover; keep them when porting routines.
   generic-cutscene field names. Code-quality review found them before the gate. Check `ram.h` for
   every WRAM address even when lint is green, and use the named field unless the address is
   genuinely an unnamed byte or pointer adjustment.
+- Conditional calls need their taken timing macro, and RST wrapper ownership must be checked before
+  adding a push. Batch 90 initially used `CALL_C` for `call nz`/`call z`, undercounting each taken
+  call, and explicitly pushed `$4a9e` before a shared RST `$18` helper that already owned the same
+  push/pop. Review replaced the calls with `CALL_C_CC` and removed the duplicate push. The same
+  batch then passed static review but failed verification at frame 523 because the taken `jr nc`
+  at `$4817` also executed the skipped `ld c,$00`; the extra instruction added two cycles and
+  changed A. For every conditional branch, audit not only `CYC` versus `CYCT` but which physical
+  instructions live on each side of the branch.

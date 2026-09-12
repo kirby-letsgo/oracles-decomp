@@ -458,3 +458,11 @@
 01:4884 checkSymmetryCityPaletteTransition__notOk
 01:4910 makeActiveObjectFollowLink_b01
 01:4959 checkUpdateFollowingLinkObject__update
+02:447f fileSelectUpdateInput__upOrDown
+02:4825 drawNameInputCursors__upperOptions
+02:4838 drawNameInputCursors__lowerOptions
+02:4885 drawSecretInputCursors__upperOptions
+02:4898 drawSecretInputCursors__lowerOptions
+02:4907 textInput_mapUpperXToLowerX__label
+02:49de loadFileDisplayVariables__nextFile
+02:4abe fileSelectDrawAcornCursor__func

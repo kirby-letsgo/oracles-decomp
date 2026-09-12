@@ -143,77 +143,13 @@ void decFileSelectMode2(GB *gb) {
   RET(0x4179); return;  // ret
 }
 
-// 02:417a
-void getFileDisplayVariableAddress(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x417a, 1); E = A;  // ld e,a
-  getFileDisplayVariableAddress_paramE(gb); return;  // fallthrough
-}
-
-// 02:417b
-void getFileDisplayVariableAddress_paramE(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x417b, 1); A = E;  // ld a,e
-  I(0x417c, 2); A = alu_swap(gb, A);  // swap a
-  I(0x417e, 1); alu_rrca(gb);  // rrca
-  I(0x417f, 1); alu_add(gb, D);  // add d
-  I(0x4180, 3); SET_HL(0xd780);  // ld hl,$d780
-  RST_PUSH(0x4183, 0x4184);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  RET(0x4184); return;  // ret
-}
-
-// 02:4626
-void getNameBufferLength(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4626, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  I(0x4629, 2); B = 0x05;  // ld b,$05
-  I(0x462b, 1); alu_xor(gb, A);  // xor a
-L_462c:
-  I(0x462c, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if (!(F & FZ)) { I(0x462d, 3); goto L_4631; } I(0x462d, 2);  // jr nz,$4631
-  I(0x462f, 3); mem_wr(gb, HL, 0x20);  // ld (hl),$20
-L_4631:
-  I(0x4631, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x4632, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x4633, 3); goto L_462c; } I(0x4633, 2);  // jr nz,$462c
-  I(0x4635, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-  I(0x4636, 2); B = 0x05;  // ld b,$05
-L_4638:
-  I(0x4638, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4639, 2); alu_sub(gb, 0x20);  // sub $20
-  if (!(F & FZ)) { RET_TAKEN(0x463b); return; } I(0x463b, 2);  // ret nz
-  I(0x463c, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-  I(0x463d, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x463e, 3); goto L_4638; } I(0x463e, 2);  // jr nz,$4638
-  RET(0x4640); return;  // ret
-}
-
-// 02:4641
-void copyNameToW4NameBuffer(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4641, 4); mem_wr(gb, 0xcbb7, A);  // ld ($cbb7),a
-  I(0x4644, 3); SET_DE(0xc602);  // ld de,$c602
-  I(0x4647, 2); alu_cp(gb, 0x01);  // cp $01
-  if (!(F & FZ)) { I(0x4649, 3); goto L_464d; } I(0x4649, 2);  // jr nz,$464d
-  I(0x464b, 2); E = 0x09;  // ld e,$09
-L_464d:
-  I(0x464d, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  I(0x4650, 2); B = 0x06;  // ld b,$06
-  CALL(0x4652, copyMemoryReverse_hook, 0x047f, 0x4655);  // call $047f
-  I(0x4655, 2); A = 0x04;  // ld a,$04
-  I(0x4657, 4); mem_wr(gb, 0xcbb8, A);  // ld ($cbb8),a
-  I(0x465a, 3); label_02_038(gb); return;  // jr $467f
-}
-
 // 02:467f
 void label_02_038(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x467f, 3); SET_HL(0xcbb9);  // ld hl,$cbb9
   I(0x4682, 2); B = 0x0a;  // ld b,$0a
   CALL(0x4684, clearMemory_hook, 0x046f, 0x4687);  // call $046f
-  CALL(0x4687, textInput_loadCharacterGfx, 0x49a5, 0x468a);  // call $49a5
+  CALL(0x4687, textInput_loadCharacterGfx_hook, 0x49a5, 0x468a);  // call $49a5
   CALL(0x468a, disableLcd_hook, 0x02c1, 0x468d);  // call $02c1
   I(0x468d, 2); A = 0x0b;  // ld a,$0b
   CALL(0x468f, loadUncompressedGfxHeader_hook, 0x05da, 0x4692);  // call $05da
@@ -247,7 +183,7 @@ L_46b6:
   CALL(0x46ca, loadGfxHeader_hook, 0x0626, 0x46cd);  // call $0626
   CALL(0x46cd, func_02_461c, 0x461c, 0x46d0);  // call $461c
 L_46d0:
-  CALL(0x46d0, textInput_updateEntryCursor, 0x4a22, 0x46d3);  // call $4a22
+  CALL(0x46d0, textInput_updateEntryCursor_hook, 0x4a22, 0x46d3);  // call $4a22
   I(0x46d3, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
 }
 
@@ -267,7 +203,7 @@ L_46b6:
   CALL(0x46ca, loadGfxHeader_hook, 0x0626, 0x46cd);  // call $0626
   CALL(0x46cd, func_02_461c, 0x461c, 0x46d0);  // call $461c
 L_46d0:
-  CALL(0x46d0, textInput_updateEntryCursor, 0x4a22, 0x46d3);  // call $4a22
+  CALL(0x46d0, textInput_updateEntryCursor_hook, 0x4a22, 0x46d3);  // call $4a22
   I(0x46d3, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
 }
 
@@ -275,526 +211,8 @@ L_46d0:
 void label_02_038__end(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_46d0:
-  CALL(0x46d0, textInput_updateEntryCursor, 0x4a22, 0x46d3);  // call $4a22
+  CALL(0x46d0, textInput_updateEntryCursor_hook, 0x4a22, 0x46d3);  // call $4a22
   I(0x46d3, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-}
-
-// 02:481e
-void drawNameInputCursors(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x481e, textInput_getCursorPosition, 0x47fb, 0x4821);  // call $47fb
-  I(0x4821, 2); alu_cp(gb, 0x50);  // cp $50
-  if (!(F & FC)) { I(0x4823, 3); goto L_4838; } I(0x4823, 2);  // jr nc,$4838
-L_4825:
-  I(0x4825, 1); B = A;  // ld b,a
-  I(0x4826, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x4828, 1); alu_add(gb, A);  // add a
-  I(0x4829, 1); alu_add(gb, A);  // add a
-  I(0x482a, 1); alu_add(gb, A);  // add a
-  I(0x482b, 1); C = A;  // ld c,a
-  I(0x482c, 1); A = B;  // ld a,b
-  I(0x482d, 2); alu_and(gb, 0xf0);  // and $f0
-  I(0x482f, 1); B = A;  // ld b,a
-  I(0x4830, 3); SET_HL(0x4860);  // ld hl,$4860
-  CALL(0x4833, addSpritesToOam_withOffset_hook, 0x0d61, 0x4836);  // call $0d61
-  I(0x4836, 3); goto L_4851;  // jr $4851
-L_4838:
-  I(0x4838, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x483b, 1); alu_rlca(gb);  // rlca
-  I(0x483c, 3); SET_HL(0x486c);  // ld hl,$486c
-  if ((F & FC)) { I(0x483f, 3); goto L_4844; } I(0x483f, 2);  // jr c,$4844
-  I(0x4841, 3); SET_HL(0x4869);  // ld hl,$4869
-L_4844:
-  I(0x4844, 4); A = mem_rd(gb, 0xcbbd);  // ld a,($cbbd)
-  RST_PUSH(0x4847, 0x4848);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x4848, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  I(0x4849, 2); B = 0x00;  // ld b,$00
-  I(0x484b, 3); SET_HL(0x4870);  // ld hl,$4870
-  CALL(0x484e, addSpritesToOam_withOffset_hook, 0x0d61, 0x4851);  // call $0d61
-L_4851:
-  I(0x4851, 4); A = mem_rd(gb, 0xcbbe);  // ld a,($cbbe)
-  I(0x4854, 1); alu_add(gb, A);  // add a
-  I(0x4855, 1); alu_add(gb, A);  // add a
-  I(0x4856, 1); alu_add(gb, A);  // add a
-  I(0x4857, 1); C = A;  // ld c,a
-  I(0x4858, 2); B = 0x00;  // ld b,$00
-  I(0x485a, 3); SET_HL(0x4879);  // ld hl,$4879
-  I(0x485d, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:4825
-void drawNameInputCursors__upperOptions(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4825:
-  I(0x4825, 1); B = A;  // ld b,a
-  I(0x4826, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x4828, 1); alu_add(gb, A);  // add a
-  I(0x4829, 1); alu_add(gb, A);  // add a
-  I(0x482a, 1); alu_add(gb, A);  // add a
-  I(0x482b, 1); C = A;  // ld c,a
-  I(0x482c, 1); A = B;  // ld a,b
-  I(0x482d, 2); alu_and(gb, 0xf0);  // and $f0
-  I(0x482f, 1); B = A;  // ld b,a
-  I(0x4830, 3); SET_HL(0x4860);  // ld hl,$4860
-  CALL(0x4833, addSpritesToOam_withOffset_hook, 0x0d61, 0x4836);  // call $0d61
-  I(0x4836, 3); goto L_4851;  // jr $4851
-L_4851:
-  I(0x4851, 4); A = mem_rd(gb, 0xcbbe);  // ld a,($cbbe)
-  I(0x4854, 1); alu_add(gb, A);  // add a
-  I(0x4855, 1); alu_add(gb, A);  // add a
-  I(0x4856, 1); alu_add(gb, A);  // add a
-  I(0x4857, 1); C = A;  // ld c,a
-  I(0x4858, 2); B = 0x00;  // ld b,$00
-  I(0x485a, 3); SET_HL(0x4879);  // ld hl,$4879
-  I(0x485d, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:4838
-void drawNameInputCursors__lowerOptions(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4838:
-  I(0x4838, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x483b, 1); alu_rlca(gb);  // rlca
-  I(0x483c, 3); SET_HL(0x486c);  // ld hl,$486c
-  if ((F & FC)) { I(0x483f, 3); goto L_4844; } I(0x483f, 2);  // jr c,$4844
-  I(0x4841, 3); SET_HL(0x4869);  // ld hl,$4869
-L_4844:
-  I(0x4844, 4); A = mem_rd(gb, 0xcbbd);  // ld a,($cbbd)
-  RST_PUSH(0x4847, 0x4848);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x4848, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  I(0x4849, 2); B = 0x00;  // ld b,$00
-  I(0x484b, 3); SET_HL(0x4870);  // ld hl,$4870
-  CALL(0x484e, addSpritesToOam_withOffset_hook, 0x0d61, 0x4851);  // call $0d61
-  I(0x4851, 4); A = mem_rd(gb, 0xcbbe);  // ld a,($cbbe)
-  I(0x4854, 1); alu_add(gb, A);  // add a
-  I(0x4855, 1); alu_add(gb, A);  // add a
-  I(0x4856, 1); alu_add(gb, A);  // add a
-  I(0x4857, 1); C = A;  // ld c,a
-  I(0x4858, 2); B = 0x00;  // ld b,$00
-  I(0x485a, 3); SET_HL(0x4879);  // ld hl,$4879
-  I(0x485d, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:4860
-void drawNameInputCursors__cursorOnCharacterSprites(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4860:
-  I(0x4860, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x4861, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  if (!(F & FZ)) { I(0x4862, 3); goto L_4890; } I(0x4862, 2);  // jr nz,$4890
-  I(0x4864, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  if ((F & FC)) { I(0x4865, 3); goto L_4887; } I(0x4865, 2);  // jr c,$4887
-  I(0x4867, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4868, 1); alu_add(gb, C);  // add c
-L_4869:
-  I(0x4869, 3); goto L_489b;  // jr $489b
-L_4887:
-  I(0x4887, 1); alu_rrca(gb);  // rrca
-  I(0x4888, 1); alu_add(gb, A);  // add a
-  I(0x4889, 1); alu_add(gb, A);  // add a
-  I(0x488a, 1); alu_add(gb, A);  // add a
-  I(0x488b, 1); C = A;  // ld c,a
-  I(0x488c, 1); A = B;  // ld a,b
-  I(0x488d, 2); alu_and(gb, 0xf0);  // and $f0
-  I(0x488f, 1); B = A;  // ld b,a
-L_4890:
-  I(0x4890, 3); SET_HL(0x48c4);  // ld hl,$48c4
-  CALL(0x4893, addSpritesToOam_withOffset_hook, 0x0d61, 0x4896);  // call $0d61
-  I(0x4896, 3); goto L_48a8;  // jr $48a8
-L_489b:
-  I(0x489b, 3); SET_HL(0x48cd);  // ld hl,$48cd
-  RST_PUSH(0x489e, 0x489f);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x489f, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  I(0x48a0, 2); B = 0x00;  // ld b,$00
-  I(0x48a2, 3); SET_HL(0x48d1);  // ld hl,$48d1
-  CALL(0x48a5, addSpritesToOam_withOffset_hook, 0x0d61, 0x48a8);  // call $0d61
-L_48a8:
-  I(0x48a8, 2); C = 0x0a;  // ld c,$0a
-  I(0x48aa, 4); A = mem_rd(gb, 0xcbbe);  // ld a,($cbbe)
-  I(0x48ad, 1); alu_cp(gb, C);  // cp c
-  I(0x48ae, 2); B = 0x00;  // ld b,$00
-  if ((F & FC)) { I(0x48b0, 3); goto L_48b5; } I(0x48b0, 2);  // jr c,$48b5
-  I(0x48b2, 2); B = 0x10;  // ld b,$10
-  I(0x48b4, 1); alu_sub(gb, C);  // sub c
-L_48b5:
-  I(0x48b5, 2); alu_cp(gb, 0x05);  // cp $05
-  if ((F & FC)) { I(0x48b7, 3); goto L_48ba; } I(0x48b7, 2);  // jr c,$48ba
-  I(0x48b9, 1); A = alu_inc8(gb, A);  // inc a
-L_48ba:
-  I(0x48ba, 1); alu_add(gb, A);  // add a
-  I(0x48bb, 1); alu_add(gb, A);  // add a
-  I(0x48bc, 1); alu_add(gb, A);  // add a
-  I(0x48bd, 1); C = A;  // ld c,a
-  I(0x48be, 3); SET_HL(0x48da);  // ld hl,$48da
-  I(0x48c1, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:4869
-void drawNameInputCursors__nameInputOffsets(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4869:
-  I(0x4869, 3); goto L_489b;  // jr $489b
-L_489b:
-  I(0x489b, 3); SET_HL(0x48cd);  // ld hl,$48cd
-  RST_PUSH(0x489e, 0x489f);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x489f, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  I(0x48a0, 2); B = 0x00;  // ld b,$00
-  I(0x48a2, 3); SET_HL(0x48d1);  // ld hl,$48d1
-  CALL(0x48a5, addSpritesToOam_withOffset_hook, 0x0d61, 0x48a8);  // call $0d61
-  I(0x48a8, 2); C = 0x0a;  // ld c,$0a
-  I(0x48aa, 4); A = mem_rd(gb, 0xcbbe);  // ld a,($cbbe)
-  I(0x48ad, 1); alu_cp(gb, C);  // cp c
-  I(0x48ae, 2); B = 0x00;  // ld b,$00
-  if ((F & FC)) { I(0x48b0, 3); goto L_48b5; } I(0x48b0, 2);  // jr c,$48b5
-  I(0x48b2, 2); B = 0x10;  // ld b,$10
-  I(0x48b4, 1); alu_sub(gb, C);  // sub c
-L_48b5:
-  I(0x48b5, 2); alu_cp(gb, 0x05);  // cp $05
-  if ((F & FC)) { I(0x48b7, 3); goto L_48ba; } I(0x48b7, 2);  // jr c,$48ba
-  I(0x48b9, 1); A = alu_inc8(gb, A);  // inc a
-L_48ba:
-  I(0x48ba, 1); alu_add(gb, A);  // add a
-  I(0x48bb, 1); alu_add(gb, A);  // add a
-  I(0x48bc, 1); alu_add(gb, A);  // add a
-  I(0x48bd, 1); C = A;  // ld c,a
-  I(0x48be, 3); SET_HL(0x48da);  // ld hl,$48da
-  I(0x48c1, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:486c
-void drawNameInputCursors__secretInputOffsets(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_486c:
-  I(0x486c, 3); goto L_489e;  // jr $489e
-L_489e:
-  RST_PUSH(0x489e, 0x489f);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x489f, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  I(0x48a0, 2); B = 0x00;  // ld b,$00
-  I(0x48a2, 3); SET_HL(0x48d1);  // ld hl,$48d1
-  CALL(0x48a5, addSpritesToOam_withOffset_hook, 0x0d61, 0x48a8);  // call $0d61
-  I(0x48a8, 2); C = 0x0a;  // ld c,$0a
-  I(0x48aa, 4); A = mem_rd(gb, 0xcbbe);  // ld a,($cbbe)
-  I(0x48ad, 1); alu_cp(gb, C);  // cp c
-  I(0x48ae, 2); B = 0x00;  // ld b,$00
-  if ((F & FC)) { I(0x48b0, 3); goto L_48b5; } I(0x48b0, 2);  // jr c,$48b5
-  I(0x48b2, 2); B = 0x10;  // ld b,$10
-  I(0x48b4, 1); alu_sub(gb, C);  // sub c
-L_48b5:
-  I(0x48b5, 2); alu_cp(gb, 0x05);  // cp $05
-  if ((F & FC)) { I(0x48b7, 3); goto L_48ba; } I(0x48b7, 2);  // jr c,$48ba
-  I(0x48b9, 1); A = alu_inc8(gb, A);  // inc a
-L_48ba:
-  I(0x48ba, 1); alu_add(gb, A);  // add a
-  I(0x48bb, 1); alu_add(gb, A);  // add a
-  I(0x48bc, 1); alu_add(gb, A);  // add a
-  I(0x48bd, 1); C = A;  // ld c,a
-  I(0x48be, 3); SET_HL(0x48da);  // ld hl,$48da
-  I(0x48c1, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:4879
-void drawNameInputCursors__textInputCursorSprite(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4879:
-  I(0x4879, 3); SET_BC(0x581a);  // ld bc,$581a
-  I(0x487c, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x487d, 1); alu_add(gb, D);  // add d
-  drawSecretInputCursors(gb); return;  // fallthrough
-}
-
-// 02:487e
-void drawSecretInputCursors(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x487e, textInput_getCursorPosition, 0x47fb, 0x4881);  // call $47fb
-  I(0x4881, 2); alu_cp(gb, 0x50);  // cp $50
-  if (!(F & FC)) { I(0x4883, 3); goto L_4898; } I(0x4883, 2);  // jr nc,$4898
-L_4885:
-  I(0x4885, 1); B = A;  // ld b,a
-  I(0x4886, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x4888, 1); alu_add(gb, A);  // add a
-  I(0x4889, 1); alu_add(gb, A);  // add a
-  I(0x488a, 1); alu_add(gb, A);  // add a
-  I(0x488b, 1); C = A;  // ld c,a
-  I(0x488c, 1); A = B;  // ld a,b
-  I(0x488d, 2); alu_and(gb, 0xf0);  // and $f0
-  I(0x488f, 1); B = A;  // ld b,a
-  I(0x4890, 3); SET_HL(0x48c4);  // ld hl,$48c4
-  CALL(0x4893, addSpritesToOam_withOffset_hook, 0x0d61, 0x4896);  // call $0d61
-  I(0x4896, 3); goto L_48a8;  // jr $48a8
-L_4898:
-  I(0x4898, 4); A = mem_rd(gb, 0xcbbd);  // ld a,($cbbd)
-  I(0x489b, 3); SET_HL(0x48cd);  // ld hl,$48cd
-  RST_PUSH(0x489e, 0x489f);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x489f, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  I(0x48a0, 2); B = 0x00;  // ld b,$00
-  I(0x48a2, 3); SET_HL(0x48d1);  // ld hl,$48d1
-  CALL(0x48a5, addSpritesToOam_withOffset_hook, 0x0d61, 0x48a8);  // call $0d61
-L_48a8:
-  I(0x48a8, 2); C = 0x0a;  // ld c,$0a
-  I(0x48aa, 4); A = mem_rd(gb, 0xcbbe);  // ld a,($cbbe)
-  I(0x48ad, 1); alu_cp(gb, C);  // cp c
-  I(0x48ae, 2); B = 0x00;  // ld b,$00
-  if ((F & FC)) { I(0x48b0, 3); goto L_48b5; } I(0x48b0, 2);  // jr c,$48b5
-  I(0x48b2, 2); B = 0x10;  // ld b,$10
-  I(0x48b4, 1); alu_sub(gb, C);  // sub c
-L_48b5:
-  I(0x48b5, 2); alu_cp(gb, 0x05);  // cp $05
-  if ((F & FC)) { I(0x48b7, 3); goto L_48ba; } I(0x48b7, 2);  // jr c,$48ba
-  I(0x48b9, 1); A = alu_inc8(gb, A);  // inc a
-L_48ba:
-  I(0x48ba, 1); alu_add(gb, A);  // add a
-  I(0x48bb, 1); alu_add(gb, A);  // add a
-  I(0x48bc, 1); alu_add(gb, A);  // add a
-  I(0x48bd, 1); C = A;  // ld c,a
-  I(0x48be, 3); SET_HL(0x48da);  // ld hl,$48da
-  I(0x48c1, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:4885
-void drawSecretInputCursors__upperOptions(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4885:
-  I(0x4885, 1); B = A;  // ld b,a
-  I(0x4886, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x4888, 1); alu_add(gb, A);  // add a
-  I(0x4889, 1); alu_add(gb, A);  // add a
-  I(0x488a, 1); alu_add(gb, A);  // add a
-  I(0x488b, 1); C = A;  // ld c,a
-  I(0x488c, 1); A = B;  // ld a,b
-  I(0x488d, 2); alu_and(gb, 0xf0);  // and $f0
-  I(0x488f, 1); B = A;  // ld b,a
-  I(0x4890, 3); SET_HL(0x48c4);  // ld hl,$48c4
-  CALL(0x4893, addSpritesToOam_withOffset_hook, 0x0d61, 0x4896);  // call $0d61
-  I(0x4896, 3); goto L_48a8;  // jr $48a8
-L_48a8:
-  I(0x48a8, 2); C = 0x0a;  // ld c,$0a
-  I(0x48aa, 4); A = mem_rd(gb, 0xcbbe);  // ld a,($cbbe)
-  I(0x48ad, 1); alu_cp(gb, C);  // cp c
-  I(0x48ae, 2); B = 0x00;  // ld b,$00
-  if ((F & FC)) { I(0x48b0, 3); goto L_48b5; } I(0x48b0, 2);  // jr c,$48b5
-  I(0x48b2, 2); B = 0x10;  // ld b,$10
-  I(0x48b4, 1); alu_sub(gb, C);  // sub c
-L_48b5:
-  I(0x48b5, 2); alu_cp(gb, 0x05);  // cp $05
-  if ((F & FC)) { I(0x48b7, 3); goto L_48ba; } I(0x48b7, 2);  // jr c,$48ba
-  I(0x48b9, 1); A = alu_inc8(gb, A);  // inc a
-L_48ba:
-  I(0x48ba, 1); alu_add(gb, A);  // add a
-  I(0x48bb, 1); alu_add(gb, A);  // add a
-  I(0x48bc, 1); alu_add(gb, A);  // add a
-  I(0x48bd, 1); C = A;  // ld c,a
-  I(0x48be, 3); SET_HL(0x48da);  // ld hl,$48da
-  I(0x48c1, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:4898
-void drawSecretInputCursors__lowerOptions(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4898:
-  I(0x4898, 4); A = mem_rd(gb, 0xcbbd);  // ld a,($cbbd)
-  I(0x489b, 3); SET_HL(0x48cd);  // ld hl,$48cd
-  RST_PUSH(0x489e, 0x489f);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x489f, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  I(0x48a0, 2); B = 0x00;  // ld b,$00
-  I(0x48a2, 3); SET_HL(0x48d1);  // ld hl,$48d1
-  CALL(0x48a5, addSpritesToOam_withOffset_hook, 0x0d61, 0x48a8);  // call $0d61
-  I(0x48a8, 2); C = 0x0a;  // ld c,$0a
-  I(0x48aa, 4); A = mem_rd(gb, 0xcbbe);  // ld a,($cbbe)
-  I(0x48ad, 1); alu_cp(gb, C);  // cp c
-  I(0x48ae, 2); B = 0x00;  // ld b,$00
-  if ((F & FC)) { I(0x48b0, 3); goto L_48b5; } I(0x48b0, 2);  // jr c,$48b5
-  I(0x48b2, 2); B = 0x10;  // ld b,$10
-  I(0x48b4, 1); alu_sub(gb, C);  // sub c
-L_48b5:
-  I(0x48b5, 2); alu_cp(gb, 0x05);  // cp $05
-  if ((F & FC)) { I(0x48b7, 3); goto L_48ba; } I(0x48b7, 2);  // jr c,$48ba
-  I(0x48b9, 1); A = alu_inc8(gb, A);  // inc a
-L_48ba:
-  I(0x48ba, 1); alu_add(gb, A);  // add a
-  I(0x48bb, 1); alu_add(gb, A);  // add a
-  I(0x48bc, 1); alu_add(gb, A);  // add a
-  I(0x48bd, 1); C = A;  // ld c,a
-  I(0x48be, 3); SET_HL(0x48da);  // ld hl,$48da
-  I(0x48c1, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:48c4
-void drawSecretInputCursors__cursorOnCharacterSprites(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_48c4:
-  I(0x48c4, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x48c5, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  if (!(F & FZ)) { I(0x48c6, 3); goto L_48f4; } I(0x48c6, 2);  // jr nz,$48f4
-  I(0x48c8, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  if ((F & FC)) { I(0x48c9, 3); goto L_48eb; } I(0x48c9, 2);  // jr c,$48eb
-  I(0x48cb, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x48cc, 1); alu_add(gb, C);  // add c
-L_48cd:
-  I(0x48cd, 3); goto L_48ff;  // jr $48ff
-L_48eb:
-  I(0x48eb, 2); C = (uint8_t)(C | (1 << 1));  // set 1,c
-  textInput_lowerOption_updateFileSelectCursorPos2(gb); return;  // fallthrough
-L_48f4:
-  I(0x48f4, 1); gb->ime_delay = true; gb->ime_writes++;  // ei
-  I(0x48f5, 1); C = B;  // ld c,b
-  I(0x48f6, 1); A = C;  // ld a,c
-  I(0x48f7, 4); mem_wr(gb, 0xcbbd, A);  // ld ($cbbd),a
-  RET(0x48fa); return;  // ret
-L_48ff:
-  I(0x48ff, 3); SET_HL(0x4912);  // ld hl,$4912
-  if (!(F & FC)) { I(0x4902, 3); goto L_4907; } I(0x4902, 2);  // jr nc,$4907
-  I(0x4904, 3); SET_HL(0x492e);  // ld hl,$492e
-L_4907:
-  I(0x4907, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4908, 1); B = A;  // ld b,a
-  I(0x4909, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x490a, 1); C = A;  // ld c,a
-  I(0x490b, 1); alu_cp(gb, E);  // cp e
-  if ((F & FZ)) { RET_TAKEN(0x490c); return; } I(0x490c, 2);  // ret z
-  I(0x490d, 1); A = B;  // ld a,b
-  I(0x490e, 1); alu_cp(gb, D);  // cp d
-  if (!(F & FZ)) { I(0x490f, 3); goto L_4907; } I(0x490f, 2);  // jr nz,$4907
-  RET(0x4911); return;  // ret
-}
-
-// 02:48cd
-void drawSecretInputCursors__lowerOptionsOffsets(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_48cd:
-  I(0x48cd, 3); goto L_48ff;  // jr $48ff
-L_48ff:
-  I(0x48ff, 3); SET_HL(0x4912);  // ld hl,$4912
-  if (!(F & FC)) { I(0x4902, 3); goto L_4907; } I(0x4902, 2);  // jr nc,$4907
-  I(0x4904, 3); SET_HL(0x492e);  // ld hl,$492e
-L_4907:
-  I(0x4907, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4908, 1); B = A;  // ld b,a
-  I(0x4909, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x490a, 1); C = A;  // ld c,a
-  I(0x490b, 1); alu_cp(gb, E);  // cp e
-  if ((F & FZ)) { RET_TAKEN(0x490c); return; } I(0x490c, 2);  // ret z
-  I(0x490d, 1); A = B;  // ld a,b
-  I(0x490e, 1); alu_cp(gb, D);  // cp d
-  if (!(F & FZ)) { I(0x490f, 3); goto L_4907; } I(0x490f, 2);  // jr nz,$4907
-  RET(0x4911); return;  // ret
-}
-
-// 02:48da
-void drawSecretInputCursors__textInputCursorSprite(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_48da:
-  I(0x48da, 3); SET_BC(0x3812);  // ld bc,$3812
-  I(0x48dd, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x48de, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  textInput_lowerOption_updateFileSelectCursorPos(gb); return;  // fallthrough
-}
-
-// 02:49da
-void loadFileDisplayVariables(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x49da, 2); A = 0x02;  // ld a,$02
-  I(0x49dc, 3); mem_wr(gb, 0xff9a, A);  // ldh ($ff9a),a
-L_49de:
-  CALL(0x49de, loadFile_b00_hook, 0x09dc, 0x49e1);  // call $09dc
-  I(0x49e1, 3); A = mem_rd(gb, 0xff9a);  // ldh a,($ff9a)
-  I(0x49e3, 2); D = 0x00;  // ld d,$00
-  CALL(0x49e5, getFileDisplayVariableAddress, 0x417a, 0x49e8);  // call $417a
-  I(0x49e8, 1); A = C;  // ld a,c
-  I(0x49e9, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x49ea, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x49eb, 4); A = mem_rd(gb, 0xc6ab);  // ld a,($c6ab)
-  I(0x49ee, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x49ef, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x49f0, 4); A = mem_rd(gb, 0xc61e);  // ld a,($c61e)
-  I(0x49f3, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x49f4, 4); A = mem_rd(gb, 0xc61f);  // ld a,($c61f)
-  I(0x49f7, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x49f8, 4); A = mem_rd(gb, 0xc612);  // ld a,($c612)
-  I(0x49fb, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x49fc, 4); A = mem_rd(gb, 0xc613);  // ld a,($c613)
-  I(0x49ff, 1); alu_add(gb, A);  // add a
-  I(0x4a00, 1); E = A;  // ld e,a
-  I(0x4a01, 4); A = mem_rd(gb, 0xc614);  // ld a,($c614)
-  I(0x4a04, 1); alu_or(gb, E);  // or e
-  I(0x4a05, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4a06, 3); A = mem_rd(gb, 0xff9a);  // ldh a,($ff9a)
-  I(0x4a08, 1); alu_add(gb, A);  // add a
-  I(0x4a09, 1); E = A;  // ld e,a
-  I(0x4a0a, 1); alu_add(gb, A);  // add a
-  I(0x4a0b, 1); alu_add(gb, E);  // add e
-  I(0x4a0c, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  RST_PUSH(0x4a0f, 0x4a10);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x4a10, 3); SET_DE(0xc602);  // ld de,$c602
-  I(0x4a13, 2); B = 0x06;  // ld b,$06
-  CALL(0x4a15, copyMemoryReverse_hook, 0x047f, 0x4a18);  // call $047f
-  I(0x4a18, 3); SET_HL(0xff9a);  // ld hl,$ff9a
-  I(0x4a1b, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  I(0x4a1c, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4a1e, 3); goto L_49de; } I(0x4a1e, 2);  // jr z,$49de
-  I(0x4a20, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  RET(0x4a21); return;  // ret
-}
-
-// 02:49de
-void loadFileDisplayVariables__nextFile(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_49de:
-  CALL(0x49de, loadFile_b00_hook, 0x09dc, 0x49e1);  // call $09dc
-  I(0x49e1, 3); A = mem_rd(gb, 0xff9a);  // ldh a,($ff9a)
-  I(0x49e3, 2); D = 0x00;  // ld d,$00
-  CALL(0x49e5, getFileDisplayVariableAddress, 0x417a, 0x49e8);  // call $417a
-  I(0x49e8, 1); A = C;  // ld a,c
-  I(0x49e9, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x49ea, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x49eb, 4); A = mem_rd(gb, 0xc6ab);  // ld a,($c6ab)
-  I(0x49ee, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x49ef, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x49f0, 4); A = mem_rd(gb, 0xc61e);  // ld a,($c61e)
-  I(0x49f3, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x49f4, 4); A = mem_rd(gb, 0xc61f);  // ld a,($c61f)
-  I(0x49f7, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x49f8, 4); A = mem_rd(gb, 0xc612);  // ld a,($c612)
-  I(0x49fb, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x49fc, 4); A = mem_rd(gb, 0xc613);  // ld a,($c613)
-  I(0x49ff, 1); alu_add(gb, A);  // add a
-  I(0x4a00, 1); E = A;  // ld e,a
-  I(0x4a01, 4); A = mem_rd(gb, 0xc614);  // ld a,($c614)
-  I(0x4a04, 1); alu_or(gb, E);  // or e
-  I(0x4a05, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4a06, 3); A = mem_rd(gb, 0xff9a);  // ldh a,($ff9a)
-  I(0x4a08, 1); alu_add(gb, A);  // add a
-  I(0x4a09, 1); E = A;  // ld e,a
-  I(0x4a0a, 1); alu_add(gb, A);  // add a
-  I(0x4a0b, 1); alu_add(gb, E);  // add e
-  I(0x4a0c, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  RST_PUSH(0x4a0f, 0x4a10);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x4a10, 3); SET_DE(0xc602);  // ld de,$c602
-  I(0x4a13, 2); B = 0x06;  // ld b,$06
-  CALL(0x4a15, copyMemoryReverse_hook, 0x047f, 0x4a18);  // call $047f
-  I(0x4a18, 3); SET_HL(0xff9a);  // ld hl,$ff9a
-  I(0x4a1b, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  I(0x4a1c, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4a1e, 3); goto L_49de; } I(0x4a1e, 2);  // jr z,$49de
-  I(0x4a20, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  RET(0x4a21); return;  // ret
 }
 
 // 02:4f17
@@ -3871,3409 +3289,6 @@ L_5353:
   RET(0x5357); return;  // ret
 }
 
-// 02:4a97
-void fileSelectDrawAcornCursor(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4a97, 4); A = mem_rd(gb, 0xcbbb);  // ld a,($cbbb)
-  I(0x4a9a, 3); SET_HL(0x4ace);  // ld hl,$4ace
-  RST_PUSH(0x4a9d, 0x4a9e);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x4a9e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4a9f, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x4aa0, 1); L = A;  // ld l,a
-  I(0x4aa1, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4aa2, 1); E = A;  // ld e,a
-  I(0x4aa3, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4aa4, 1); D = A;  // ld d,a
-  I(0x4aa5, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4aa6, 1); C = A;  // ld c,a
-  I(0x4aa7, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  PUSH(0x4aa8, BC);  // push bc
-  I(0x4aa9, 3); SET_HL(0x4ac9);  // ld hl,$4ac9
-  I(0x4aac, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4aaf, 2); alu_bit(gb, 7, A);  // bit 7,a
-  if ((F & FZ)) { CALL(0x4ab1, fileSelectDrawAcornCursor__func, 0x4abe, 0x4ab4); } else I(0x4ab1, 3);  // call z,$4abe
-  SET_DE(POP(0x4ab4));  // pop de
-  I(0x4ab5, 3); SET_HL(0x4ac9);  // ld hl,$4ac9
-  I(0x4ab8, 4); A = mem_rd(gb, 0xcbbd);  // ld a,($cbbd)
-  I(0x4abb, 2); alu_bit(gb, 7, A);  // bit 7,a
-  if (!(F & FZ)) { RET_TAKEN(0x4abd); return; } I(0x4abd, 2);  // ret nz
-L_4abe:
-  CALL(0x4abe, addDoubleIndexToDe_hook, 0x0072, 0x4ac1);  // call $0072
-  I(0x4ac1, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4ac2, 1); B = A;  // ld b,a
-  I(0x4ac3, 2); SET_DE(DE + 1);  // inc de
-  I(0x4ac4, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4ac5, 1); C = A;  // ld c,a
-  I(0x4ac6, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:4abe
-void fileSelectDrawAcornCursor__func(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4abe:
-  CALL(0x4abe, addDoubleIndexToDe_hook, 0x0072, 0x4ac1);  // call $0072
-  I(0x4ac1, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4ac2, 1); B = A;  // ld b,a
-  I(0x4ac3, 2); SET_DE(DE + 1);  // inc de
-  I(0x4ac4, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4ac5, 1); C = A;  // ld c,a
-  I(0x4ac6, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:4adc
-void fileSelectDrawAcornCursor__table1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4adc:
-  I(0x4adc, 3); mem_wr(gb, 0xff4a, A);  // ldh ($ff4a),a
-  I(0x4ade, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4ae0:
-  I(0x4ae0, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4ae1, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4ae4, 1); H = H;  // ld h,h
-  I(0x4ae5, 4); mem_wr(gb, 0xe0e0, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0xe0e1, gb->sp >> 8);  // ld ($e0e0),sp
-L_4ae8:
-  I(0x4ae8, 1); A = D;  // ld a,d
-  I(0x4ae9, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4aea, 1); A = D;  // ld a,d
-  I(0x4aeb, 1); E = D;  // ld e,d
-L_4aec:
-  I(0x4aec, 2); alu_xor(gb, 0x4a);  // xor $4a
-L_4aee:
-  I(0x4aee, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4aef, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4af2, 1); H = H;  // ld h,h
-  I(0x4af3, 4); mem_wr(gb, 0x207a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x207b, gb->sp >> 8);  // ld ($207a),sp
-L_4af6:
-  I(0x4af6, 4); A = mem_rd(gb, 0xe84a);  // ld a,($e84a)
-  I(0x4af9, 1); C = D;  // ld c,d
-L_4afa:
-  I(0x4afa, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4afb, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4afe, 1); H = H;  // ld h,h
-  I(0x4aff, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b02:
-  I(0x4b02, 2); B = 0x4b;  // ld b,$4b
-  I(0x4b04, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b06:
-  I(0x4b06, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b07, 1); D = B;  // ld d,b
-  I(0x4b08, 1); C = H;  // ld c,h
-  I(0x4b09, 1); D = B;  // ld d,b
-  I(0x4b0a, 1); H = H;  // ld h,h
-  I(0x4b0b, 1); D = B;  // ld d,b
-  I(0x4b0c, 1); A = D;  // ld a,d
-  I(0x4b0d, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-L_4b0e:
-  I(0x4b0e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4b0f, 1); C = E;  // ld c,e
-  I(0x4b10, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b12:
-  I(0x4b12, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b13, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4b16, 1); H = H;  // ld h,h
-  I(0x4b17, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b1a:
-  I(0x4b1a, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4b1b, 1); C = E;  // ld c,e
-L_4b1c:
-  if ((F & FC)) { I(0x4b1c, 3); goto L_4b3e; } I(0x4b1c, 2);  // jr c,$4b3e
-  I(0x4b1e, 1); D = B;  // ld d,b
-  if (!(F & FZ)) { I(0x4b1f, 3); goto L_4b89; } I(0x4b1f, 2);  // jr nz,$4b89
-  if (!(F & FZ)) { I(0x4b21, 3); goto L_4b44; } I(0x4b21, 2);  // jr nz,$4b44
-  I(0x4b23, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  I(0x4b24, 2); H = alu_swap(gb, H);  // swap h
-  CALL(0x4b26, fileSelect_redrawDecorationsAndSetWramBank4, 0x4cd7, 0x4b29);  // call $4cd7
-  fileSelectMode7(gb); return;  // fallthrough
-L_4b3e:
-  RST_PUSH(0x4b3e, 0x4b3f);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4b4d: goto L_4b4d; case 0x4b88: goto L_4b88; case 0x4be2: goto L_4be2; case 0x4c04: goto L_4c04; case 0x4c74: goto L_4c74; case 0x4caa: goto L_4caa; case 0x4cbe: goto L_4cbe; default: HANDOFF(HL); }
-L_4b44:
-  I(0x4b44, 1); C = E;  // ld c,e
-  I(0x4b45, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x4b46, 1); C = H;  // ld c,h
-  I(0x4b47, 2); mem_wr(gb, HL, H);  // ld (hl),h
-  I(0x4b48, 1); C = H;  // ld c,h
-  I(0x4b49, 1); alu_xor(gb, D);  // xor d
-  I(0x4b4a, 1); C = H;  // ld c,h
-  I(0x4b4b, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  I(0x4b4c, 1); C = H;  // ld c,h
-L_4b4d:
-  CALL(0x4b4d, disableLcd_hook, 0x02c1, 0x4b50);  // call $02c1
-  I(0x4b50, 2); A = 0xa0;  // ld a,$a0
-  CALL(0x4b52, loadGfxHeader_hook, 0x0626, 0x4b55);  // call $0626
-  I(0x4b55, 2); A = 0xae;  // ld a,$ae
-  CALL(0x4b57, loadGfxHeader_hook, 0x0626, 0x4b5a);  // call $0626
-  I(0x4b5a, 2); A = 0x05;  // ld a,$05
-  CALL(0x4b5c, loadPaletteHeader_hook, 0x050b, 0x4b5f);  // call $050b
-  I(0x4b5f, 2); A = 0x08;  // ld a,$08
-  CALL(0x4b61, loadUncompressedGfxHeader_hook, 0x05da, 0x4b64);  // call $05da
-  I(0x4b64, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  I(0x4b67, 2); B = 0x20;  // ld b,$20
-  CALL(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);  // call $046f
-  CALL(0x4b6c, textInput_updateEntryCursor, 0x4a22, 0x4b6f);  // call $4a22
-  CALL(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);  // call $0c85
-  I(0x4b72, 2); A = 0x04;  // ld a,$04
-  I(0x4b74, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
-  I(0x4b76, 1); alu_xor(gb, A);  // xor a
-  I(0x4b77, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4b79, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4b7c, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b7f, 2); A = 0xf0;  // ld a,$f0
-  I(0x4b81, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4b82, 2); A = 0x1e;  // ld a,$1e
-  I(0x4b84, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4b85, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4b88:
-  I(0x4b88, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-L_4b89:
-  I(0x4b89, 1); alu_cp(gb, D);  // cp d
-  I(0x4b8a, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b8b, 3); goto L_4ba3; } I(0x4b8b, 2);  // jr nz,$4ba3
-  I(0x4b8d, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4b8f, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b90, 4); goto L_4c55; } I(0x4b90, 3);  // jp nz,$4c55
-  I(0x4b93, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b96, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x4b97, 3); goto L_4ba0; } I(0x4b97, 2);  // jr nz,$4ba0
-  I(0x4b99, 2); A = 0x80;  // ld a,$80
-  I(0x4b9b, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4b9d, 4); goto L_4c55;  // jp $4c55
-L_4ba0:
-  I(0x4ba0, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73);  // jp $0c73
-L_4ba3:
-  I(0x4ba3, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4ba6, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4ba7, 3); goto L_4bae; } I(0x4ba7, 2);  // jr z,$4bae
-  I(0x4ba9, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4baa, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4bad); return;  // ret
-L_4bae:
-  CALL(0x4bae, serialFunc_0c8d_hook, 0x0c8d, 0x4bb1);  // call $0c8d
-  I(0x4bb1, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4bb3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4bb4, 3); goto L_4bbd; } I(0x4bb4, 2);  // jr z,$4bbd
-  I(0x4bb6, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x4bb8, 3); goto L_4bbd; } I(0x4bb8, 2);  // jr z,$4bbd
-  if (!(F & FZ)) { I(0x4bba, 4); goto L_4c55; } I(0x4bba, 3);  // jp nz,$4c55
-L_4bbd:
-  I(0x4bbd, 3); A = mem_rd(gb, 0xffbf);  // ldh a,($ffbf)
-  I(0x4bbf, 2); alu_cp(gb, 0x07);  // cp $07
-  if (!(F & FZ)) { RET_TAKEN(0x4bc1); return; } I(0x4bc1, 2);  // ret nz
-  I(0x4bc2, 2); E = 0x03;  // ld e,$03
-L_4bc4:
-  I(0x4bc4, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4bc5, 2); D = 0x00;  // ld d,$00
-  CALL(0x4bc7, getFileDisplayVariableAddress_paramE, 0x417b, 0x4bca);  // call $417b
-  I(0x4bca, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4bcc, 3); goto L_4bdf; } I(0x4bcc, 2);  // jr z,$4bdf
-  I(0x4bce, 1); A = E;  // ld a,e
-  I(0x4bcf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4bd0, 3); goto L_4bc4; } I(0x4bd0, 2);  // jr nz,$4bc4
-  I(0x4bd2, 2); A = 0x85;  // ld a,$85
-  I(0x4bd4, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4bd7, 2); A = 0xff;  // ld a,$ff
-  I(0x4bd9, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4bdc, 4); goto L_4c4b;  // jp $4c4b
-L_4bdf:
-  I(0x4bdf, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4be2:
-  CALL(0x4be2, serialFunc_0c8d_hook, 0x0c8d, 0x4be5);  // call $0c8d
-  I(0x4be5, 2); A = 0x06;  // ld a,$06
-  I(0x4be7, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  I(0x4bea, 1); alu_xor(gb, A);  // xor a
-  CALL(0x4beb, func_02_4149, 0x4149, 0x4bee);  // call $4149
-  CALL(0x4bee, disableLcd_hook, 0x02c1, 0x4bf1);  // call $02c1
-  I(0x4bf1, 2); A = 0xa1;  // ld a,$a1
-  CALL(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);  // call $0626
-  I(0x4bf6, 2); A = 0xaf;  // ld a,$af
-  CALL(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);  // call $0626
-  CALL(0x4bfb, textInput_updateEntryCursor, 0x4a22, 0x4bfe);  // call $4a22
-  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x4c01);  // call $4a4a
-  I(0x4c01, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c04:
-  CALL(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);  // call $0c8d
-  CALL(0x4c07, fileSelectUpdateInput, 0x4467, 0x4c0a);  // call $4467
-  if (!(F & FZ)) { I(0x4c0a, 3); goto L_4c1e; } I(0x4c0a, 2);  // jr nz,$4c1e
-  I(0x4c0c, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4c0f, 2); alu_bit(gb, 1, A);  // bit 1,a
-  if ((F & FZ)) { RET_TAKEN(0x4c11); return; } I(0x4c11, 2);  // ret z
-L_4c12:
-  I(0x4c12, 2); A = 0x03;  // ld a,$03
-  I(0x4c14, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4c17, 2); A = 0x8f;  // ld a,$8f
-  I(0x4c19, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4c1c, 3); goto L_4c4b;  // jr $4c4b
-L_4c1e:
-  I(0x4c1e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
-  I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
-  I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
-  I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
-  I(0x4c30, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-L_4c33:
-  I(0x4c33, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4c36, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FZ)) { I(0x4c38, 3); goto L_4c44; } I(0x4c38, 2);  // jr nz,$4c44
-  I(0x4c3a, 2); A = 0x0c;  // ld a,$0c
-  I(0x4c3c, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c3e, 2); A = 0x05;  // ld a,$05
-  I(0x4c40, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c43); return;  // ret
-L_4c44:
-  I(0x4c44, 2); A = 0x08;  // ld a,$08
-  I(0x4c46, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c48, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c4b:
-  I(0x4c4b, 2); A = 0x08;  // ld a,$08
-  I(0x4c4d, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c4f, 2); A = 0x05;  // ld a,$05
-  I(0x4c51, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c54); return;  // ret
-L_4c55:
-  CALL(0x4c55, disableLcd_hook, 0x02c1, 0x4c58);  // call $02c1
-  I(0x4c58, 2); A = 0x07;  // ld a,$07
-  CALL(0x4c5a, loadGfxHeader_hook, 0x0626, 0x4c5d);  // call $0626
-  CALL(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2, 0x4165, 0x4c60);  // call $4165
-  I(0x4c60, 2); A = 0x08;  // ld a,$08
-  I(0x4c62, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c64, 2); A = 0x06;  // ld a,$06
-  I(0x4c66, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x4c69, 2); A = 0xb4;  // ld a,$b4
-  I(0x4c6b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x4c6e, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4c70, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4c73); return;  // ret
-L_4c74:
-  CALL(0x4c74, serialFunc_0c8d_hook, 0x0c8d, 0x4c77);  // call $0c8d
-  I(0x4c77, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4c79, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4c7a); return; } I(0x4c7a, 2);  // ret nz
-  CALL(0x4c7b, loadFile_b00_hook, 0x09dc, 0x4c7e);  // call $09dc
-  I(0x4c7e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c81, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4c82, 3); SET_HL(0xd98d);  // ld hl,$d98d
-  I(0x4c85, 3); SET_BC(0x0016);  // ld bc,$0016
-L_4c88:
-  I(0x4c88, 1); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { I(0x4c89, 3); goto L_4c8e; } I(0x4c89, 2);  // jr z,$4c8e
-  I(0x4c8b, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x4c8c, 3); goto L_4c88;  // jr $4c88
-L_4c8e:
-  I(0x4c8e, 2); B = 0x16;  // ld b,$16
-  I(0x4c90, 3); SET_DE(0xc600);  // ld de,$c600
-  CALL(0x4c93, copyMemory_hook, 0x0486, 0x4c96);  // call $0486
-  I(0x4c96, 3); SET_HL(0xc612);  // ld hl,$c612
-  I(0x4c99, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x4c9b, 2); L = 0x14;  // ld l,$14
-  I(0x4c9d, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x4c9f, initializeFile_b00_hook, 0x09d4, 0x4ca2);  // call $09d4
-  I(0x4ca2, 2); A = 0x56;  // ld a,$56
-  CALL(0x4ca4, playSound_b00_hook, 0x0c98, 0x4ca7);  // call $0c98
-  I(0x4ca7, 4); setFileSelectModeTo1(gb); return;  // jp $4159
-L_4caa:
-  CALL(0x4caa, serialFunc_0c8d_hook, 0x0c8d, 0x4cad);  // call $0c8d
-  I(0x4cad, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4caf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cb0); return; } I(0x4cb0, 2);  // ret nz
-L_4cb1:
-  I(0x4cb1, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4cb4, 2); alu_cp(gb, 0x08);  // cp $08
-  if ((F & FZ)) { I(0x4cb6, 4); closeMenu(gb); return; } I(0x4cb6, 3);  // jp z,$4fba
-  I(0x4cb9, 2); A = 0x00;  // ld a,$00
-  I(0x4cbb, 4); setFileSelectMode(gb); return;  // jp $415b
-L_4cbe:
-  CALL(0x4cbe, serialFunc_0c8d_hook, 0x0c8d, 0x4cc1);  // call $0c8d
-  I(0x4cc1, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4cc3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cc4); return; } I(0x4cc4, 2);  // ret nz
-  I(0x4cc5, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4cc8, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4cca, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4ccd, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4cce, 3); goto L_4cb1; } I(0x4cce, 2);  // jr nz,$4cb1
-  I(0x4cd0, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4cd3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x4cd4); return; } I(0x4cd4, 2);  // ret nz
-  I(0x4cd5, 3); goto L_4cb1;  // jr $4cb1
-}
-
-// 02:4ae0
-void fileSelectDrawAcornCursor__data11(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4ae0:
-  I(0x4ae0, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4ae1, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4ae4, 1); H = H;  // ld h,h
-  I(0x4ae5, 4); mem_wr(gb, 0xe0e0, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0xe0e1, gb->sp >> 8);  // ld ($e0e0),sp
-L_4ae8:
-  I(0x4ae8, 1); A = D;  // ld a,d
-  I(0x4ae9, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4aea, 1); A = D;  // ld a,d
-  I(0x4aeb, 1); E = D;  // ld e,d
-L_4aec:
-  I(0x4aec, 2); alu_xor(gb, 0x4a);  // xor $4a
-L_4aee:
-  I(0x4aee, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4aef, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4af2, 1); H = H;  // ld h,h
-  I(0x4af3, 4); mem_wr(gb, 0x207a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x207b, gb->sp >> 8);  // ld ($207a),sp
-L_4af6:
-  I(0x4af6, 4); A = mem_rd(gb, 0xe84a);  // ld a,($e84a)
-  I(0x4af9, 1); C = D;  // ld c,d
-L_4afa:
-  I(0x4afa, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4afb, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4afe, 1); H = H;  // ld h,h
-  I(0x4aff, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b02:
-  I(0x4b02, 2); B = 0x4b;  // ld b,$4b
-  I(0x4b04, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b06:
-  I(0x4b06, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b07, 1); D = B;  // ld d,b
-  I(0x4b08, 1); C = H;  // ld c,h
-  I(0x4b09, 1); D = B;  // ld d,b
-  I(0x4b0a, 1); H = H;  // ld h,h
-  I(0x4b0b, 1); D = B;  // ld d,b
-  I(0x4b0c, 1); A = D;  // ld a,d
-  I(0x4b0d, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-L_4b0e:
-  I(0x4b0e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4b0f, 1); C = E;  // ld c,e
-  I(0x4b10, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b12:
-  I(0x4b12, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b13, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4b16, 1); H = H;  // ld h,h
-  I(0x4b17, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b1a:
-  I(0x4b1a, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4b1b, 1); C = E;  // ld c,e
-L_4b1c:
-  if ((F & FC)) { I(0x4b1c, 3); goto L_4b3e; } I(0x4b1c, 2);  // jr c,$4b3e
-  I(0x4b1e, 1); D = B;  // ld d,b
-  if (!(F & FZ)) { I(0x4b1f, 3); goto L_4b89; } I(0x4b1f, 2);  // jr nz,$4b89
-  if (!(F & FZ)) { I(0x4b21, 3); goto L_4b44; } I(0x4b21, 2);  // jr nz,$4b44
-  I(0x4b23, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  I(0x4b24, 2); H = alu_swap(gb, H);  // swap h
-  CALL(0x4b26, fileSelect_redrawDecorationsAndSetWramBank4, 0x4cd7, 0x4b29);  // call $4cd7
-  fileSelectMode7(gb); return;  // fallthrough
-L_4b3e:
-  RST_PUSH(0x4b3e, 0x4b3f);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4b4d: goto L_4b4d; case 0x4b88: goto L_4b88; case 0x4be2: goto L_4be2; case 0x4c04: goto L_4c04; case 0x4c74: goto L_4c74; case 0x4caa: goto L_4caa; case 0x4cbe: goto L_4cbe; default: HANDOFF(HL); }
-L_4b44:
-  I(0x4b44, 1); C = E;  // ld c,e
-  I(0x4b45, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x4b46, 1); C = H;  // ld c,h
-  I(0x4b47, 2); mem_wr(gb, HL, H);  // ld (hl),h
-  I(0x4b48, 1); C = H;  // ld c,h
-  I(0x4b49, 1); alu_xor(gb, D);  // xor d
-  I(0x4b4a, 1); C = H;  // ld c,h
-  I(0x4b4b, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  I(0x4b4c, 1); C = H;  // ld c,h
-L_4b4d:
-  CALL(0x4b4d, disableLcd_hook, 0x02c1, 0x4b50);  // call $02c1
-  I(0x4b50, 2); A = 0xa0;  // ld a,$a0
-  CALL(0x4b52, loadGfxHeader_hook, 0x0626, 0x4b55);  // call $0626
-  I(0x4b55, 2); A = 0xae;  // ld a,$ae
-  CALL(0x4b57, loadGfxHeader_hook, 0x0626, 0x4b5a);  // call $0626
-  I(0x4b5a, 2); A = 0x05;  // ld a,$05
-  CALL(0x4b5c, loadPaletteHeader_hook, 0x050b, 0x4b5f);  // call $050b
-  I(0x4b5f, 2); A = 0x08;  // ld a,$08
-  CALL(0x4b61, loadUncompressedGfxHeader_hook, 0x05da, 0x4b64);  // call $05da
-  I(0x4b64, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  I(0x4b67, 2); B = 0x20;  // ld b,$20
-  CALL(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);  // call $046f
-  CALL(0x4b6c, textInput_updateEntryCursor, 0x4a22, 0x4b6f);  // call $4a22
-  CALL(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);  // call $0c85
-  I(0x4b72, 2); A = 0x04;  // ld a,$04
-  I(0x4b74, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
-  I(0x4b76, 1); alu_xor(gb, A);  // xor a
-  I(0x4b77, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4b79, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4b7c, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b7f, 2); A = 0xf0;  // ld a,$f0
-  I(0x4b81, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4b82, 2); A = 0x1e;  // ld a,$1e
-  I(0x4b84, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4b85, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4b88:
-  I(0x4b88, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-L_4b89:
-  I(0x4b89, 1); alu_cp(gb, D);  // cp d
-  I(0x4b8a, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b8b, 3); goto L_4ba3; } I(0x4b8b, 2);  // jr nz,$4ba3
-  I(0x4b8d, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4b8f, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b90, 4); goto L_4c55; } I(0x4b90, 3);  // jp nz,$4c55
-  I(0x4b93, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b96, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x4b97, 3); goto L_4ba0; } I(0x4b97, 2);  // jr nz,$4ba0
-  I(0x4b99, 2); A = 0x80;  // ld a,$80
-  I(0x4b9b, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4b9d, 4); goto L_4c55;  // jp $4c55
-L_4ba0:
-  I(0x4ba0, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73);  // jp $0c73
-L_4ba3:
-  I(0x4ba3, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4ba6, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4ba7, 3); goto L_4bae; } I(0x4ba7, 2);  // jr z,$4bae
-  I(0x4ba9, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4baa, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4bad); return;  // ret
-L_4bae:
-  CALL(0x4bae, serialFunc_0c8d_hook, 0x0c8d, 0x4bb1);  // call $0c8d
-  I(0x4bb1, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4bb3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4bb4, 3); goto L_4bbd; } I(0x4bb4, 2);  // jr z,$4bbd
-  I(0x4bb6, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x4bb8, 3); goto L_4bbd; } I(0x4bb8, 2);  // jr z,$4bbd
-  if (!(F & FZ)) { I(0x4bba, 4); goto L_4c55; } I(0x4bba, 3);  // jp nz,$4c55
-L_4bbd:
-  I(0x4bbd, 3); A = mem_rd(gb, 0xffbf);  // ldh a,($ffbf)
-  I(0x4bbf, 2); alu_cp(gb, 0x07);  // cp $07
-  if (!(F & FZ)) { RET_TAKEN(0x4bc1); return; } I(0x4bc1, 2);  // ret nz
-  I(0x4bc2, 2); E = 0x03;  // ld e,$03
-L_4bc4:
-  I(0x4bc4, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4bc5, 2); D = 0x00;  // ld d,$00
-  CALL(0x4bc7, getFileDisplayVariableAddress_paramE, 0x417b, 0x4bca);  // call $417b
-  I(0x4bca, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4bcc, 3); goto L_4bdf; } I(0x4bcc, 2);  // jr z,$4bdf
-  I(0x4bce, 1); A = E;  // ld a,e
-  I(0x4bcf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4bd0, 3); goto L_4bc4; } I(0x4bd0, 2);  // jr nz,$4bc4
-  I(0x4bd2, 2); A = 0x85;  // ld a,$85
-  I(0x4bd4, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4bd7, 2); A = 0xff;  // ld a,$ff
-  I(0x4bd9, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4bdc, 4); goto L_4c4b;  // jp $4c4b
-L_4bdf:
-  I(0x4bdf, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4be2:
-  CALL(0x4be2, serialFunc_0c8d_hook, 0x0c8d, 0x4be5);  // call $0c8d
-  I(0x4be5, 2); A = 0x06;  // ld a,$06
-  I(0x4be7, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  I(0x4bea, 1); alu_xor(gb, A);  // xor a
-  CALL(0x4beb, func_02_4149, 0x4149, 0x4bee);  // call $4149
-  CALL(0x4bee, disableLcd_hook, 0x02c1, 0x4bf1);  // call $02c1
-  I(0x4bf1, 2); A = 0xa1;  // ld a,$a1
-  CALL(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);  // call $0626
-  I(0x4bf6, 2); A = 0xaf;  // ld a,$af
-  CALL(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);  // call $0626
-  CALL(0x4bfb, textInput_updateEntryCursor, 0x4a22, 0x4bfe);  // call $4a22
-  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x4c01);  // call $4a4a
-  I(0x4c01, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c04:
-  CALL(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);  // call $0c8d
-  CALL(0x4c07, fileSelectUpdateInput, 0x4467, 0x4c0a);  // call $4467
-  if (!(F & FZ)) { I(0x4c0a, 3); goto L_4c1e; } I(0x4c0a, 2);  // jr nz,$4c1e
-  I(0x4c0c, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4c0f, 2); alu_bit(gb, 1, A);  // bit 1,a
-  if ((F & FZ)) { RET_TAKEN(0x4c11); return; } I(0x4c11, 2);  // ret z
-L_4c12:
-  I(0x4c12, 2); A = 0x03;  // ld a,$03
-  I(0x4c14, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4c17, 2); A = 0x8f;  // ld a,$8f
-  I(0x4c19, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4c1c, 3); goto L_4c4b;  // jr $4c4b
-L_4c1e:
-  I(0x4c1e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
-  I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
-  I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
-  I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
-  I(0x4c30, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-L_4c33:
-  I(0x4c33, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4c36, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FZ)) { I(0x4c38, 3); goto L_4c44; } I(0x4c38, 2);  // jr nz,$4c44
-  I(0x4c3a, 2); A = 0x0c;  // ld a,$0c
-  I(0x4c3c, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c3e, 2); A = 0x05;  // ld a,$05
-  I(0x4c40, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c43); return;  // ret
-L_4c44:
-  I(0x4c44, 2); A = 0x08;  // ld a,$08
-  I(0x4c46, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c48, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c4b:
-  I(0x4c4b, 2); A = 0x08;  // ld a,$08
-  I(0x4c4d, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c4f, 2); A = 0x05;  // ld a,$05
-  I(0x4c51, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c54); return;  // ret
-L_4c55:
-  CALL(0x4c55, disableLcd_hook, 0x02c1, 0x4c58);  // call $02c1
-  I(0x4c58, 2); A = 0x07;  // ld a,$07
-  CALL(0x4c5a, loadGfxHeader_hook, 0x0626, 0x4c5d);  // call $0626
-  CALL(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2, 0x4165, 0x4c60);  // call $4165
-  I(0x4c60, 2); A = 0x08;  // ld a,$08
-  I(0x4c62, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c64, 2); A = 0x06;  // ld a,$06
-  I(0x4c66, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x4c69, 2); A = 0xb4;  // ld a,$b4
-  I(0x4c6b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x4c6e, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4c70, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4c73); return;  // ret
-L_4c74:
-  CALL(0x4c74, serialFunc_0c8d_hook, 0x0c8d, 0x4c77);  // call $0c8d
-  I(0x4c77, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4c79, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4c7a); return; } I(0x4c7a, 2);  // ret nz
-  CALL(0x4c7b, loadFile_b00_hook, 0x09dc, 0x4c7e);  // call $09dc
-  I(0x4c7e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c81, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4c82, 3); SET_HL(0xd98d);  // ld hl,$d98d
-  I(0x4c85, 3); SET_BC(0x0016);  // ld bc,$0016
-L_4c88:
-  I(0x4c88, 1); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { I(0x4c89, 3); goto L_4c8e; } I(0x4c89, 2);  // jr z,$4c8e
-  I(0x4c8b, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x4c8c, 3); goto L_4c88;  // jr $4c88
-L_4c8e:
-  I(0x4c8e, 2); B = 0x16;  // ld b,$16
-  I(0x4c90, 3); SET_DE(0xc600);  // ld de,$c600
-  CALL(0x4c93, copyMemory_hook, 0x0486, 0x4c96);  // call $0486
-  I(0x4c96, 3); SET_HL(0xc612);  // ld hl,$c612
-  I(0x4c99, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x4c9b, 2); L = 0x14;  // ld l,$14
-  I(0x4c9d, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x4c9f, initializeFile_b00_hook, 0x09d4, 0x4ca2);  // call $09d4
-  I(0x4ca2, 2); A = 0x56;  // ld a,$56
-  CALL(0x4ca4, playSound_b00_hook, 0x0c98, 0x4ca7);  // call $0c98
-  I(0x4ca7, 4); setFileSelectModeTo1(gb); return;  // jp $4159
-L_4caa:
-  CALL(0x4caa, serialFunc_0c8d_hook, 0x0c8d, 0x4cad);  // call $0c8d
-  I(0x4cad, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4caf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cb0); return; } I(0x4cb0, 2);  // ret nz
-L_4cb1:
-  I(0x4cb1, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4cb4, 2); alu_cp(gb, 0x08);  // cp $08
-  if ((F & FZ)) { I(0x4cb6, 4); closeMenu(gb); return; } I(0x4cb6, 3);  // jp z,$4fba
-  I(0x4cb9, 2); A = 0x00;  // ld a,$00
-  I(0x4cbb, 4); setFileSelectMode(gb); return;  // jp $415b
-L_4cbe:
-  CALL(0x4cbe, serialFunc_0c8d_hook, 0x0c8d, 0x4cc1);  // call $0c8d
-  I(0x4cc1, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4cc3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cc4); return; } I(0x4cc4, 2);  // ret nz
-  I(0x4cc5, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4cc8, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4cca, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4ccd, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4cce, 3); goto L_4cb1; } I(0x4cce, 2);  // jr nz,$4cb1
-  I(0x4cd0, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4cd3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x4cd4); return; } I(0x4cd4, 2);  // ret nz
-  I(0x4cd5, 3); goto L_4cb1;  // jr $4cb1
-}
-
-// 02:4ae8
-void fileSelectDrawAcornCursor__data12(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4ae8:
-  I(0x4ae8, 1); A = D;  // ld a,d
-  I(0x4ae9, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4aea, 1); A = D;  // ld a,d
-  I(0x4aeb, 1); E = D;  // ld e,d
-L_4aec:
-  I(0x4aec, 2); alu_xor(gb, 0x4a);  // xor $4a
-L_4aee:
-  I(0x4aee, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4aef, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4af2, 1); H = H;  // ld h,h
-  I(0x4af3, 4); mem_wr(gb, 0x207a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x207b, gb->sp >> 8);  // ld ($207a),sp
-L_4af6:
-  I(0x4af6, 4); A = mem_rd(gb, 0xe84a);  // ld a,($e84a)
-  I(0x4af9, 1); C = D;  // ld c,d
-L_4afa:
-  I(0x4afa, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4afb, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4afe, 1); H = H;  // ld h,h
-  I(0x4aff, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b02:
-  I(0x4b02, 2); B = 0x4b;  // ld b,$4b
-  I(0x4b04, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b06:
-  I(0x4b06, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b07, 1); D = B;  // ld d,b
-  I(0x4b08, 1); C = H;  // ld c,h
-  I(0x4b09, 1); D = B;  // ld d,b
-  I(0x4b0a, 1); H = H;  // ld h,h
-  I(0x4b0b, 1); D = B;  // ld d,b
-  I(0x4b0c, 1); A = D;  // ld a,d
-  I(0x4b0d, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-L_4b0e:
-  I(0x4b0e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4b0f, 1); C = E;  // ld c,e
-  I(0x4b10, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b12:
-  I(0x4b12, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b13, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4b16, 1); H = H;  // ld h,h
-  I(0x4b17, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b1a:
-  I(0x4b1a, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4b1b, 1); C = E;  // ld c,e
-L_4b1c:
-  if ((F & FC)) { I(0x4b1c, 3); goto L_4b3e; } I(0x4b1c, 2);  // jr c,$4b3e
-  I(0x4b1e, 1); D = B;  // ld d,b
-  if (!(F & FZ)) { I(0x4b1f, 3); goto L_4b89; } I(0x4b1f, 2);  // jr nz,$4b89
-  if (!(F & FZ)) { I(0x4b21, 3); goto L_4b44; } I(0x4b21, 2);  // jr nz,$4b44
-  I(0x4b23, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  I(0x4b24, 2); H = alu_swap(gb, H);  // swap h
-  CALL(0x4b26, fileSelect_redrawDecorationsAndSetWramBank4, 0x4cd7, 0x4b29);  // call $4cd7
-  fileSelectMode7(gb); return;  // fallthrough
-L_4b3e:
-  RST_PUSH(0x4b3e, 0x4b3f);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4b4d: goto L_4b4d; case 0x4b88: goto L_4b88; case 0x4be2: goto L_4be2; case 0x4c04: goto L_4c04; case 0x4c74: goto L_4c74; case 0x4caa: goto L_4caa; case 0x4cbe: goto L_4cbe; default: HANDOFF(HL); }
-L_4b44:
-  I(0x4b44, 1); C = E;  // ld c,e
-  I(0x4b45, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x4b46, 1); C = H;  // ld c,h
-  I(0x4b47, 2); mem_wr(gb, HL, H);  // ld (hl),h
-  I(0x4b48, 1); C = H;  // ld c,h
-  I(0x4b49, 1); alu_xor(gb, D);  // xor d
-  I(0x4b4a, 1); C = H;  // ld c,h
-  I(0x4b4b, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  I(0x4b4c, 1); C = H;  // ld c,h
-L_4b4d:
-  CALL(0x4b4d, disableLcd_hook, 0x02c1, 0x4b50);  // call $02c1
-  I(0x4b50, 2); A = 0xa0;  // ld a,$a0
-  CALL(0x4b52, loadGfxHeader_hook, 0x0626, 0x4b55);  // call $0626
-  I(0x4b55, 2); A = 0xae;  // ld a,$ae
-  CALL(0x4b57, loadGfxHeader_hook, 0x0626, 0x4b5a);  // call $0626
-  I(0x4b5a, 2); A = 0x05;  // ld a,$05
-  CALL(0x4b5c, loadPaletteHeader_hook, 0x050b, 0x4b5f);  // call $050b
-  I(0x4b5f, 2); A = 0x08;  // ld a,$08
-  CALL(0x4b61, loadUncompressedGfxHeader_hook, 0x05da, 0x4b64);  // call $05da
-  I(0x4b64, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  I(0x4b67, 2); B = 0x20;  // ld b,$20
-  CALL(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);  // call $046f
-  CALL(0x4b6c, textInput_updateEntryCursor, 0x4a22, 0x4b6f);  // call $4a22
-  CALL(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);  // call $0c85
-  I(0x4b72, 2); A = 0x04;  // ld a,$04
-  I(0x4b74, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
-  I(0x4b76, 1); alu_xor(gb, A);  // xor a
-  I(0x4b77, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4b79, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4b7c, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b7f, 2); A = 0xf0;  // ld a,$f0
-  I(0x4b81, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4b82, 2); A = 0x1e;  // ld a,$1e
-  I(0x4b84, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4b85, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4b88:
-  I(0x4b88, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-L_4b89:
-  I(0x4b89, 1); alu_cp(gb, D);  // cp d
-  I(0x4b8a, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b8b, 3); goto L_4ba3; } I(0x4b8b, 2);  // jr nz,$4ba3
-  I(0x4b8d, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4b8f, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b90, 4); goto L_4c55; } I(0x4b90, 3);  // jp nz,$4c55
-  I(0x4b93, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b96, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x4b97, 3); goto L_4ba0; } I(0x4b97, 2);  // jr nz,$4ba0
-  I(0x4b99, 2); A = 0x80;  // ld a,$80
-  I(0x4b9b, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4b9d, 4); goto L_4c55;  // jp $4c55
-L_4ba0:
-  I(0x4ba0, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73);  // jp $0c73
-L_4ba3:
-  I(0x4ba3, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4ba6, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4ba7, 3); goto L_4bae; } I(0x4ba7, 2);  // jr z,$4bae
-  I(0x4ba9, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4baa, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4bad); return;  // ret
-L_4bae:
-  CALL(0x4bae, serialFunc_0c8d_hook, 0x0c8d, 0x4bb1);  // call $0c8d
-  I(0x4bb1, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4bb3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4bb4, 3); goto L_4bbd; } I(0x4bb4, 2);  // jr z,$4bbd
-  I(0x4bb6, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x4bb8, 3); goto L_4bbd; } I(0x4bb8, 2);  // jr z,$4bbd
-  if (!(F & FZ)) { I(0x4bba, 4); goto L_4c55; } I(0x4bba, 3);  // jp nz,$4c55
-L_4bbd:
-  I(0x4bbd, 3); A = mem_rd(gb, 0xffbf);  // ldh a,($ffbf)
-  I(0x4bbf, 2); alu_cp(gb, 0x07);  // cp $07
-  if (!(F & FZ)) { RET_TAKEN(0x4bc1); return; } I(0x4bc1, 2);  // ret nz
-  I(0x4bc2, 2); E = 0x03;  // ld e,$03
-L_4bc4:
-  I(0x4bc4, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4bc5, 2); D = 0x00;  // ld d,$00
-  CALL(0x4bc7, getFileDisplayVariableAddress_paramE, 0x417b, 0x4bca);  // call $417b
-  I(0x4bca, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4bcc, 3); goto L_4bdf; } I(0x4bcc, 2);  // jr z,$4bdf
-  I(0x4bce, 1); A = E;  // ld a,e
-  I(0x4bcf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4bd0, 3); goto L_4bc4; } I(0x4bd0, 2);  // jr nz,$4bc4
-  I(0x4bd2, 2); A = 0x85;  // ld a,$85
-  I(0x4bd4, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4bd7, 2); A = 0xff;  // ld a,$ff
-  I(0x4bd9, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4bdc, 4); goto L_4c4b;  // jp $4c4b
-L_4bdf:
-  I(0x4bdf, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4be2:
-  CALL(0x4be2, serialFunc_0c8d_hook, 0x0c8d, 0x4be5);  // call $0c8d
-  I(0x4be5, 2); A = 0x06;  // ld a,$06
-  I(0x4be7, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  I(0x4bea, 1); alu_xor(gb, A);  // xor a
-  CALL(0x4beb, func_02_4149, 0x4149, 0x4bee);  // call $4149
-  CALL(0x4bee, disableLcd_hook, 0x02c1, 0x4bf1);  // call $02c1
-  I(0x4bf1, 2); A = 0xa1;  // ld a,$a1
-  CALL(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);  // call $0626
-  I(0x4bf6, 2); A = 0xaf;  // ld a,$af
-  CALL(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);  // call $0626
-  CALL(0x4bfb, textInput_updateEntryCursor, 0x4a22, 0x4bfe);  // call $4a22
-  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x4c01);  // call $4a4a
-  I(0x4c01, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c04:
-  CALL(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);  // call $0c8d
-  CALL(0x4c07, fileSelectUpdateInput, 0x4467, 0x4c0a);  // call $4467
-  if (!(F & FZ)) { I(0x4c0a, 3); goto L_4c1e; } I(0x4c0a, 2);  // jr nz,$4c1e
-  I(0x4c0c, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4c0f, 2); alu_bit(gb, 1, A);  // bit 1,a
-  if ((F & FZ)) { RET_TAKEN(0x4c11); return; } I(0x4c11, 2);  // ret z
-L_4c12:
-  I(0x4c12, 2); A = 0x03;  // ld a,$03
-  I(0x4c14, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4c17, 2); A = 0x8f;  // ld a,$8f
-  I(0x4c19, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4c1c, 3); goto L_4c4b;  // jr $4c4b
-L_4c1e:
-  I(0x4c1e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
-  I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
-  I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
-  I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
-  I(0x4c30, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-L_4c33:
-  I(0x4c33, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4c36, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FZ)) { I(0x4c38, 3); goto L_4c44; } I(0x4c38, 2);  // jr nz,$4c44
-  I(0x4c3a, 2); A = 0x0c;  // ld a,$0c
-  I(0x4c3c, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c3e, 2); A = 0x05;  // ld a,$05
-  I(0x4c40, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c43); return;  // ret
-L_4c44:
-  I(0x4c44, 2); A = 0x08;  // ld a,$08
-  I(0x4c46, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c48, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c4b:
-  I(0x4c4b, 2); A = 0x08;  // ld a,$08
-  I(0x4c4d, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c4f, 2); A = 0x05;  // ld a,$05
-  I(0x4c51, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c54); return;  // ret
-L_4c55:
-  CALL(0x4c55, disableLcd_hook, 0x02c1, 0x4c58);  // call $02c1
-  I(0x4c58, 2); A = 0x07;  // ld a,$07
-  CALL(0x4c5a, loadGfxHeader_hook, 0x0626, 0x4c5d);  // call $0626
-  CALL(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2, 0x4165, 0x4c60);  // call $4165
-  I(0x4c60, 2); A = 0x08;  // ld a,$08
-  I(0x4c62, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c64, 2); A = 0x06;  // ld a,$06
-  I(0x4c66, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x4c69, 2); A = 0xb4;  // ld a,$b4
-  I(0x4c6b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x4c6e, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4c70, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4c73); return;  // ret
-L_4c74:
-  CALL(0x4c74, serialFunc_0c8d_hook, 0x0c8d, 0x4c77);  // call $0c8d
-  I(0x4c77, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4c79, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4c7a); return; } I(0x4c7a, 2);  // ret nz
-  CALL(0x4c7b, loadFile_b00_hook, 0x09dc, 0x4c7e);  // call $09dc
-  I(0x4c7e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c81, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4c82, 3); SET_HL(0xd98d);  // ld hl,$d98d
-  I(0x4c85, 3); SET_BC(0x0016);  // ld bc,$0016
-L_4c88:
-  I(0x4c88, 1); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { I(0x4c89, 3); goto L_4c8e; } I(0x4c89, 2);  // jr z,$4c8e
-  I(0x4c8b, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x4c8c, 3); goto L_4c88;  // jr $4c88
-L_4c8e:
-  I(0x4c8e, 2); B = 0x16;  // ld b,$16
-  I(0x4c90, 3); SET_DE(0xc600);  // ld de,$c600
-  CALL(0x4c93, copyMemory_hook, 0x0486, 0x4c96);  // call $0486
-  I(0x4c96, 3); SET_HL(0xc612);  // ld hl,$c612
-  I(0x4c99, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x4c9b, 2); L = 0x14;  // ld l,$14
-  I(0x4c9d, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x4c9f, initializeFile_b00_hook, 0x09d4, 0x4ca2);  // call $09d4
-  I(0x4ca2, 2); A = 0x56;  // ld a,$56
-  CALL(0x4ca4, playSound_b00_hook, 0x0c98, 0x4ca7);  // call $0c98
-  I(0x4ca7, 4); setFileSelectModeTo1(gb); return;  // jp $4159
-L_4caa:
-  CALL(0x4caa, serialFunc_0c8d_hook, 0x0c8d, 0x4cad);  // call $0c8d
-  I(0x4cad, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4caf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cb0); return; } I(0x4cb0, 2);  // ret nz
-L_4cb1:
-  I(0x4cb1, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4cb4, 2); alu_cp(gb, 0x08);  // cp $08
-  if ((F & FZ)) { I(0x4cb6, 4); closeMenu(gb); return; } I(0x4cb6, 3);  // jp z,$4fba
-  I(0x4cb9, 2); A = 0x00;  // ld a,$00
-  I(0x4cbb, 4); setFileSelectMode(gb); return;  // jp $415b
-L_4cbe:
-  CALL(0x4cbe, serialFunc_0c8d_hook, 0x0c8d, 0x4cc1);  // call $0c8d
-  I(0x4cc1, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4cc3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cc4); return; } I(0x4cc4, 2);  // ret nz
-  I(0x4cc5, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4cc8, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4cca, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4ccd, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4cce, 3); goto L_4cb1; } I(0x4cce, 2);  // jr nz,$4cb1
-  I(0x4cd0, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4cd3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x4cd4); return; } I(0x4cd4, 2);  // ret nz
-  I(0x4cd5, 3); goto L_4cb1;  // jr $4cb1
-}
-
-// 02:4aec
-void fileSelectDrawAcornCursor__table3(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4aec:
-  I(0x4aec, 2); alu_xor(gb, 0x4a);  // xor $4a
-L_4aee:
-  I(0x4aee, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4aef, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4af2, 1); H = H;  // ld h,h
-  I(0x4af3, 4); mem_wr(gb, 0x207a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x207b, gb->sp >> 8);  // ld ($207a),sp
-L_4af6:
-  I(0x4af6, 4); A = mem_rd(gb, 0xe84a);  // ld a,($e84a)
-  I(0x4af9, 1); C = D;  // ld c,d
-L_4afa:
-  I(0x4afa, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4afb, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4afe, 1); H = H;  // ld h,h
-  I(0x4aff, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b02:
-  I(0x4b02, 2); B = 0x4b;  // ld b,$4b
-  I(0x4b04, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b06:
-  I(0x4b06, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b07, 1); D = B;  // ld d,b
-  I(0x4b08, 1); C = H;  // ld c,h
-  I(0x4b09, 1); D = B;  // ld d,b
-  I(0x4b0a, 1); H = H;  // ld h,h
-  I(0x4b0b, 1); D = B;  // ld d,b
-  I(0x4b0c, 1); A = D;  // ld a,d
-  I(0x4b0d, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-L_4b0e:
-  I(0x4b0e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4b0f, 1); C = E;  // ld c,e
-  I(0x4b10, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b12:
-  I(0x4b12, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b13, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4b16, 1); H = H;  // ld h,h
-  I(0x4b17, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b1a:
-  I(0x4b1a, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4b1b, 1); C = E;  // ld c,e
-L_4b1c:
-  if ((F & FC)) { I(0x4b1c, 3); goto L_4b3e; } I(0x4b1c, 2);  // jr c,$4b3e
-  I(0x4b1e, 1); D = B;  // ld d,b
-  if (!(F & FZ)) { I(0x4b1f, 3); goto L_4b89; } I(0x4b1f, 2);  // jr nz,$4b89
-  if (!(F & FZ)) { I(0x4b21, 3); goto L_4b44; } I(0x4b21, 2);  // jr nz,$4b44
-  I(0x4b23, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  I(0x4b24, 2); H = alu_swap(gb, H);  // swap h
-  CALL(0x4b26, fileSelect_redrawDecorationsAndSetWramBank4, 0x4cd7, 0x4b29);  // call $4cd7
-  fileSelectMode7(gb); return;  // fallthrough
-L_4b3e:
-  RST_PUSH(0x4b3e, 0x4b3f);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4b4d: goto L_4b4d; case 0x4b88: goto L_4b88; case 0x4be2: goto L_4be2; case 0x4c04: goto L_4c04; case 0x4c74: goto L_4c74; case 0x4caa: goto L_4caa; case 0x4cbe: goto L_4cbe; default: HANDOFF(HL); }
-L_4b44:
-  I(0x4b44, 1); C = E;  // ld c,e
-  I(0x4b45, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x4b46, 1); C = H;  // ld c,h
-  I(0x4b47, 2); mem_wr(gb, HL, H);  // ld (hl),h
-  I(0x4b48, 1); C = H;  // ld c,h
-  I(0x4b49, 1); alu_xor(gb, D);  // xor d
-  I(0x4b4a, 1); C = H;  // ld c,h
-  I(0x4b4b, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  I(0x4b4c, 1); C = H;  // ld c,h
-L_4b4d:
-  CALL(0x4b4d, disableLcd_hook, 0x02c1, 0x4b50);  // call $02c1
-  I(0x4b50, 2); A = 0xa0;  // ld a,$a0
-  CALL(0x4b52, loadGfxHeader_hook, 0x0626, 0x4b55);  // call $0626
-  I(0x4b55, 2); A = 0xae;  // ld a,$ae
-  CALL(0x4b57, loadGfxHeader_hook, 0x0626, 0x4b5a);  // call $0626
-  I(0x4b5a, 2); A = 0x05;  // ld a,$05
-  CALL(0x4b5c, loadPaletteHeader_hook, 0x050b, 0x4b5f);  // call $050b
-  I(0x4b5f, 2); A = 0x08;  // ld a,$08
-  CALL(0x4b61, loadUncompressedGfxHeader_hook, 0x05da, 0x4b64);  // call $05da
-  I(0x4b64, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  I(0x4b67, 2); B = 0x20;  // ld b,$20
-  CALL(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);  // call $046f
-  CALL(0x4b6c, textInput_updateEntryCursor, 0x4a22, 0x4b6f);  // call $4a22
-  CALL(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);  // call $0c85
-  I(0x4b72, 2); A = 0x04;  // ld a,$04
-  I(0x4b74, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
-  I(0x4b76, 1); alu_xor(gb, A);  // xor a
-  I(0x4b77, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4b79, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4b7c, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b7f, 2); A = 0xf0;  // ld a,$f0
-  I(0x4b81, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4b82, 2); A = 0x1e;  // ld a,$1e
-  I(0x4b84, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4b85, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4b88:
-  I(0x4b88, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-L_4b89:
-  I(0x4b89, 1); alu_cp(gb, D);  // cp d
-  I(0x4b8a, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b8b, 3); goto L_4ba3; } I(0x4b8b, 2);  // jr nz,$4ba3
-  I(0x4b8d, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4b8f, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b90, 4); goto L_4c55; } I(0x4b90, 3);  // jp nz,$4c55
-  I(0x4b93, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b96, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x4b97, 3); goto L_4ba0; } I(0x4b97, 2);  // jr nz,$4ba0
-  I(0x4b99, 2); A = 0x80;  // ld a,$80
-  I(0x4b9b, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4b9d, 4); goto L_4c55;  // jp $4c55
-L_4ba0:
-  I(0x4ba0, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73);  // jp $0c73
-L_4ba3:
-  I(0x4ba3, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4ba6, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4ba7, 3); goto L_4bae; } I(0x4ba7, 2);  // jr z,$4bae
-  I(0x4ba9, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4baa, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4bad); return;  // ret
-L_4bae:
-  CALL(0x4bae, serialFunc_0c8d_hook, 0x0c8d, 0x4bb1);  // call $0c8d
-  I(0x4bb1, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4bb3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4bb4, 3); goto L_4bbd; } I(0x4bb4, 2);  // jr z,$4bbd
-  I(0x4bb6, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x4bb8, 3); goto L_4bbd; } I(0x4bb8, 2);  // jr z,$4bbd
-  if (!(F & FZ)) { I(0x4bba, 4); goto L_4c55; } I(0x4bba, 3);  // jp nz,$4c55
-L_4bbd:
-  I(0x4bbd, 3); A = mem_rd(gb, 0xffbf);  // ldh a,($ffbf)
-  I(0x4bbf, 2); alu_cp(gb, 0x07);  // cp $07
-  if (!(F & FZ)) { RET_TAKEN(0x4bc1); return; } I(0x4bc1, 2);  // ret nz
-  I(0x4bc2, 2); E = 0x03;  // ld e,$03
-L_4bc4:
-  I(0x4bc4, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4bc5, 2); D = 0x00;  // ld d,$00
-  CALL(0x4bc7, getFileDisplayVariableAddress_paramE, 0x417b, 0x4bca);  // call $417b
-  I(0x4bca, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4bcc, 3); goto L_4bdf; } I(0x4bcc, 2);  // jr z,$4bdf
-  I(0x4bce, 1); A = E;  // ld a,e
-  I(0x4bcf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4bd0, 3); goto L_4bc4; } I(0x4bd0, 2);  // jr nz,$4bc4
-  I(0x4bd2, 2); A = 0x85;  // ld a,$85
-  I(0x4bd4, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4bd7, 2); A = 0xff;  // ld a,$ff
-  I(0x4bd9, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4bdc, 4); goto L_4c4b;  // jp $4c4b
-L_4bdf:
-  I(0x4bdf, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4be2:
-  CALL(0x4be2, serialFunc_0c8d_hook, 0x0c8d, 0x4be5);  // call $0c8d
-  I(0x4be5, 2); A = 0x06;  // ld a,$06
-  I(0x4be7, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  I(0x4bea, 1); alu_xor(gb, A);  // xor a
-  CALL(0x4beb, func_02_4149, 0x4149, 0x4bee);  // call $4149
-  CALL(0x4bee, disableLcd_hook, 0x02c1, 0x4bf1);  // call $02c1
-  I(0x4bf1, 2); A = 0xa1;  // ld a,$a1
-  CALL(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);  // call $0626
-  I(0x4bf6, 2); A = 0xaf;  // ld a,$af
-  CALL(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);  // call $0626
-  CALL(0x4bfb, textInput_updateEntryCursor, 0x4a22, 0x4bfe);  // call $4a22
-  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x4c01);  // call $4a4a
-  I(0x4c01, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c04:
-  CALL(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);  // call $0c8d
-  CALL(0x4c07, fileSelectUpdateInput, 0x4467, 0x4c0a);  // call $4467
-  if (!(F & FZ)) { I(0x4c0a, 3); goto L_4c1e; } I(0x4c0a, 2);  // jr nz,$4c1e
-  I(0x4c0c, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4c0f, 2); alu_bit(gb, 1, A);  // bit 1,a
-  if ((F & FZ)) { RET_TAKEN(0x4c11); return; } I(0x4c11, 2);  // ret z
-L_4c12:
-  I(0x4c12, 2); A = 0x03;  // ld a,$03
-  I(0x4c14, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4c17, 2); A = 0x8f;  // ld a,$8f
-  I(0x4c19, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4c1c, 3); goto L_4c4b;  // jr $4c4b
-L_4c1e:
-  I(0x4c1e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
-  I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
-  I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
-  I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
-  I(0x4c30, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-L_4c33:
-  I(0x4c33, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4c36, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FZ)) { I(0x4c38, 3); goto L_4c44; } I(0x4c38, 2);  // jr nz,$4c44
-  I(0x4c3a, 2); A = 0x0c;  // ld a,$0c
-  I(0x4c3c, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c3e, 2); A = 0x05;  // ld a,$05
-  I(0x4c40, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c43); return;  // ret
-L_4c44:
-  I(0x4c44, 2); A = 0x08;  // ld a,$08
-  I(0x4c46, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c48, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c4b:
-  I(0x4c4b, 2); A = 0x08;  // ld a,$08
-  I(0x4c4d, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c4f, 2); A = 0x05;  // ld a,$05
-  I(0x4c51, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c54); return;  // ret
-L_4c55:
-  CALL(0x4c55, disableLcd_hook, 0x02c1, 0x4c58);  // call $02c1
-  I(0x4c58, 2); A = 0x07;  // ld a,$07
-  CALL(0x4c5a, loadGfxHeader_hook, 0x0626, 0x4c5d);  // call $0626
-  CALL(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2, 0x4165, 0x4c60);  // call $4165
-  I(0x4c60, 2); A = 0x08;  // ld a,$08
-  I(0x4c62, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c64, 2); A = 0x06;  // ld a,$06
-  I(0x4c66, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x4c69, 2); A = 0xb4;  // ld a,$b4
-  I(0x4c6b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x4c6e, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4c70, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4c73); return;  // ret
-L_4c74:
-  CALL(0x4c74, serialFunc_0c8d_hook, 0x0c8d, 0x4c77);  // call $0c8d
-  I(0x4c77, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4c79, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4c7a); return; } I(0x4c7a, 2);  // ret nz
-  CALL(0x4c7b, loadFile_b00_hook, 0x09dc, 0x4c7e);  // call $09dc
-  I(0x4c7e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c81, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4c82, 3); SET_HL(0xd98d);  // ld hl,$d98d
-  I(0x4c85, 3); SET_BC(0x0016);  // ld bc,$0016
-L_4c88:
-  I(0x4c88, 1); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { I(0x4c89, 3); goto L_4c8e; } I(0x4c89, 2);  // jr z,$4c8e
-  I(0x4c8b, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x4c8c, 3); goto L_4c88;  // jr $4c88
-L_4c8e:
-  I(0x4c8e, 2); B = 0x16;  // ld b,$16
-  I(0x4c90, 3); SET_DE(0xc600);  // ld de,$c600
-  CALL(0x4c93, copyMemory_hook, 0x0486, 0x4c96);  // call $0486
-  I(0x4c96, 3); SET_HL(0xc612);  // ld hl,$c612
-  I(0x4c99, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x4c9b, 2); L = 0x14;  // ld l,$14
-  I(0x4c9d, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x4c9f, initializeFile_b00_hook, 0x09d4, 0x4ca2);  // call $09d4
-  I(0x4ca2, 2); A = 0x56;  // ld a,$56
-  CALL(0x4ca4, playSound_b00_hook, 0x0c98, 0x4ca7);  // call $0c98
-  I(0x4ca7, 4); setFileSelectModeTo1(gb); return;  // jp $4159
-L_4caa:
-  CALL(0x4caa, serialFunc_0c8d_hook, 0x0c8d, 0x4cad);  // call $0c8d
-  I(0x4cad, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4caf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cb0); return; } I(0x4cb0, 2);  // ret nz
-L_4cb1:
-  I(0x4cb1, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4cb4, 2); alu_cp(gb, 0x08);  // cp $08
-  if ((F & FZ)) { I(0x4cb6, 4); closeMenu(gb); return; } I(0x4cb6, 3);  // jp z,$4fba
-  I(0x4cb9, 2); A = 0x00;  // ld a,$00
-  I(0x4cbb, 4); setFileSelectMode(gb); return;  // jp $415b
-L_4cbe:
-  CALL(0x4cbe, serialFunc_0c8d_hook, 0x0c8d, 0x4cc1);  // call $0c8d
-  I(0x4cc1, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4cc3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cc4); return; } I(0x4cc4, 2);  // ret nz
-  I(0x4cc5, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4cc8, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4cca, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4ccd, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4cce, 3); goto L_4cb1; } I(0x4cce, 2);  // jr nz,$4cb1
-  I(0x4cd0, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4cd3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x4cd4); return; } I(0x4cd4, 2);  // ret nz
-  I(0x4cd5, 3); goto L_4cb1;  // jr $4cb1
-}
-
-// 02:4aee
-void fileSelectDrawAcornCursor__data31(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4aee:
-  I(0x4aee, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4aef, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4af2, 1); H = H;  // ld h,h
-  I(0x4af3, 4); mem_wr(gb, 0x207a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x207b, gb->sp >> 8);  // ld ($207a),sp
-L_4af6:
-  I(0x4af6, 4); A = mem_rd(gb, 0xe84a);  // ld a,($e84a)
-  I(0x4af9, 1); C = D;  // ld c,d
-L_4afa:
-  I(0x4afa, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4afb, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4afe, 1); H = H;  // ld h,h
-  I(0x4aff, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b02:
-  I(0x4b02, 2); B = 0x4b;  // ld b,$4b
-  I(0x4b04, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b06:
-  I(0x4b06, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b07, 1); D = B;  // ld d,b
-  I(0x4b08, 1); C = H;  // ld c,h
-  I(0x4b09, 1); D = B;  // ld d,b
-  I(0x4b0a, 1); H = H;  // ld h,h
-  I(0x4b0b, 1); D = B;  // ld d,b
-  I(0x4b0c, 1); A = D;  // ld a,d
-  I(0x4b0d, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-L_4b0e:
-  I(0x4b0e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4b0f, 1); C = E;  // ld c,e
-  I(0x4b10, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b12:
-  I(0x4b12, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b13, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4b16, 1); H = H;  // ld h,h
-  I(0x4b17, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b1a:
-  I(0x4b1a, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4b1b, 1); C = E;  // ld c,e
-L_4b1c:
-  if ((F & FC)) { I(0x4b1c, 3); goto L_4b3e; } I(0x4b1c, 2);  // jr c,$4b3e
-  I(0x4b1e, 1); D = B;  // ld d,b
-  if (!(F & FZ)) { I(0x4b1f, 3); goto L_4b89; } I(0x4b1f, 2);  // jr nz,$4b89
-  if (!(F & FZ)) { I(0x4b21, 3); goto L_4b44; } I(0x4b21, 2);  // jr nz,$4b44
-  I(0x4b23, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  I(0x4b24, 2); H = alu_swap(gb, H);  // swap h
-  CALL(0x4b26, fileSelect_redrawDecorationsAndSetWramBank4, 0x4cd7, 0x4b29);  // call $4cd7
-  fileSelectMode7(gb); return;  // fallthrough
-L_4b3e:
-  RST_PUSH(0x4b3e, 0x4b3f);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4b4d: goto L_4b4d; case 0x4b88: goto L_4b88; case 0x4be2: goto L_4be2; case 0x4c04: goto L_4c04; case 0x4c74: goto L_4c74; case 0x4caa: goto L_4caa; case 0x4cbe: goto L_4cbe; default: HANDOFF(HL); }
-L_4b44:
-  I(0x4b44, 1); C = E;  // ld c,e
-  I(0x4b45, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x4b46, 1); C = H;  // ld c,h
-  I(0x4b47, 2); mem_wr(gb, HL, H);  // ld (hl),h
-  I(0x4b48, 1); C = H;  // ld c,h
-  I(0x4b49, 1); alu_xor(gb, D);  // xor d
-  I(0x4b4a, 1); C = H;  // ld c,h
-  I(0x4b4b, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  I(0x4b4c, 1); C = H;  // ld c,h
-L_4b4d:
-  CALL(0x4b4d, disableLcd_hook, 0x02c1, 0x4b50);  // call $02c1
-  I(0x4b50, 2); A = 0xa0;  // ld a,$a0
-  CALL(0x4b52, loadGfxHeader_hook, 0x0626, 0x4b55);  // call $0626
-  I(0x4b55, 2); A = 0xae;  // ld a,$ae
-  CALL(0x4b57, loadGfxHeader_hook, 0x0626, 0x4b5a);  // call $0626
-  I(0x4b5a, 2); A = 0x05;  // ld a,$05
-  CALL(0x4b5c, loadPaletteHeader_hook, 0x050b, 0x4b5f);  // call $050b
-  I(0x4b5f, 2); A = 0x08;  // ld a,$08
-  CALL(0x4b61, loadUncompressedGfxHeader_hook, 0x05da, 0x4b64);  // call $05da
-  I(0x4b64, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  I(0x4b67, 2); B = 0x20;  // ld b,$20
-  CALL(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);  // call $046f
-  CALL(0x4b6c, textInput_updateEntryCursor, 0x4a22, 0x4b6f);  // call $4a22
-  CALL(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);  // call $0c85
-  I(0x4b72, 2); A = 0x04;  // ld a,$04
-  I(0x4b74, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
-  I(0x4b76, 1); alu_xor(gb, A);  // xor a
-  I(0x4b77, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4b79, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4b7c, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b7f, 2); A = 0xf0;  // ld a,$f0
-  I(0x4b81, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4b82, 2); A = 0x1e;  // ld a,$1e
-  I(0x4b84, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4b85, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4b88:
-  I(0x4b88, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-L_4b89:
-  I(0x4b89, 1); alu_cp(gb, D);  // cp d
-  I(0x4b8a, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b8b, 3); goto L_4ba3; } I(0x4b8b, 2);  // jr nz,$4ba3
-  I(0x4b8d, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4b8f, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b90, 4); goto L_4c55; } I(0x4b90, 3);  // jp nz,$4c55
-  I(0x4b93, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b96, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x4b97, 3); goto L_4ba0; } I(0x4b97, 2);  // jr nz,$4ba0
-  I(0x4b99, 2); A = 0x80;  // ld a,$80
-  I(0x4b9b, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4b9d, 4); goto L_4c55;  // jp $4c55
-L_4ba0:
-  I(0x4ba0, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73);  // jp $0c73
-L_4ba3:
-  I(0x4ba3, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4ba6, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4ba7, 3); goto L_4bae; } I(0x4ba7, 2);  // jr z,$4bae
-  I(0x4ba9, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4baa, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4bad); return;  // ret
-L_4bae:
-  CALL(0x4bae, serialFunc_0c8d_hook, 0x0c8d, 0x4bb1);  // call $0c8d
-  I(0x4bb1, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4bb3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4bb4, 3); goto L_4bbd; } I(0x4bb4, 2);  // jr z,$4bbd
-  I(0x4bb6, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x4bb8, 3); goto L_4bbd; } I(0x4bb8, 2);  // jr z,$4bbd
-  if (!(F & FZ)) { I(0x4bba, 4); goto L_4c55; } I(0x4bba, 3);  // jp nz,$4c55
-L_4bbd:
-  I(0x4bbd, 3); A = mem_rd(gb, 0xffbf);  // ldh a,($ffbf)
-  I(0x4bbf, 2); alu_cp(gb, 0x07);  // cp $07
-  if (!(F & FZ)) { RET_TAKEN(0x4bc1); return; } I(0x4bc1, 2);  // ret nz
-  I(0x4bc2, 2); E = 0x03;  // ld e,$03
-L_4bc4:
-  I(0x4bc4, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4bc5, 2); D = 0x00;  // ld d,$00
-  CALL(0x4bc7, getFileDisplayVariableAddress_paramE, 0x417b, 0x4bca);  // call $417b
-  I(0x4bca, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4bcc, 3); goto L_4bdf; } I(0x4bcc, 2);  // jr z,$4bdf
-  I(0x4bce, 1); A = E;  // ld a,e
-  I(0x4bcf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4bd0, 3); goto L_4bc4; } I(0x4bd0, 2);  // jr nz,$4bc4
-  I(0x4bd2, 2); A = 0x85;  // ld a,$85
-  I(0x4bd4, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4bd7, 2); A = 0xff;  // ld a,$ff
-  I(0x4bd9, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4bdc, 4); goto L_4c4b;  // jp $4c4b
-L_4bdf:
-  I(0x4bdf, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4be2:
-  CALL(0x4be2, serialFunc_0c8d_hook, 0x0c8d, 0x4be5);  // call $0c8d
-  I(0x4be5, 2); A = 0x06;  // ld a,$06
-  I(0x4be7, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  I(0x4bea, 1); alu_xor(gb, A);  // xor a
-  CALL(0x4beb, func_02_4149, 0x4149, 0x4bee);  // call $4149
-  CALL(0x4bee, disableLcd_hook, 0x02c1, 0x4bf1);  // call $02c1
-  I(0x4bf1, 2); A = 0xa1;  // ld a,$a1
-  CALL(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);  // call $0626
-  I(0x4bf6, 2); A = 0xaf;  // ld a,$af
-  CALL(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);  // call $0626
-  CALL(0x4bfb, textInput_updateEntryCursor, 0x4a22, 0x4bfe);  // call $4a22
-  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x4c01);  // call $4a4a
-  I(0x4c01, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c04:
-  CALL(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);  // call $0c8d
-  CALL(0x4c07, fileSelectUpdateInput, 0x4467, 0x4c0a);  // call $4467
-  if (!(F & FZ)) { I(0x4c0a, 3); goto L_4c1e; } I(0x4c0a, 2);  // jr nz,$4c1e
-  I(0x4c0c, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4c0f, 2); alu_bit(gb, 1, A);  // bit 1,a
-  if ((F & FZ)) { RET_TAKEN(0x4c11); return; } I(0x4c11, 2);  // ret z
-L_4c12:
-  I(0x4c12, 2); A = 0x03;  // ld a,$03
-  I(0x4c14, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4c17, 2); A = 0x8f;  // ld a,$8f
-  I(0x4c19, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4c1c, 3); goto L_4c4b;  // jr $4c4b
-L_4c1e:
-  I(0x4c1e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
-  I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
-  I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
-  I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
-  I(0x4c30, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-L_4c33:
-  I(0x4c33, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4c36, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FZ)) { I(0x4c38, 3); goto L_4c44; } I(0x4c38, 2);  // jr nz,$4c44
-  I(0x4c3a, 2); A = 0x0c;  // ld a,$0c
-  I(0x4c3c, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c3e, 2); A = 0x05;  // ld a,$05
-  I(0x4c40, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c43); return;  // ret
-L_4c44:
-  I(0x4c44, 2); A = 0x08;  // ld a,$08
-  I(0x4c46, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c48, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c4b:
-  I(0x4c4b, 2); A = 0x08;  // ld a,$08
-  I(0x4c4d, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c4f, 2); A = 0x05;  // ld a,$05
-  I(0x4c51, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c54); return;  // ret
-L_4c55:
-  CALL(0x4c55, disableLcd_hook, 0x02c1, 0x4c58);  // call $02c1
-  I(0x4c58, 2); A = 0x07;  // ld a,$07
-  CALL(0x4c5a, loadGfxHeader_hook, 0x0626, 0x4c5d);  // call $0626
-  CALL(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2, 0x4165, 0x4c60);  // call $4165
-  I(0x4c60, 2); A = 0x08;  // ld a,$08
-  I(0x4c62, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c64, 2); A = 0x06;  // ld a,$06
-  I(0x4c66, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x4c69, 2); A = 0xb4;  // ld a,$b4
-  I(0x4c6b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x4c6e, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4c70, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4c73); return;  // ret
-L_4c74:
-  CALL(0x4c74, serialFunc_0c8d_hook, 0x0c8d, 0x4c77);  // call $0c8d
-  I(0x4c77, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4c79, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4c7a); return; } I(0x4c7a, 2);  // ret nz
-  CALL(0x4c7b, loadFile_b00_hook, 0x09dc, 0x4c7e);  // call $09dc
-  I(0x4c7e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c81, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4c82, 3); SET_HL(0xd98d);  // ld hl,$d98d
-  I(0x4c85, 3); SET_BC(0x0016);  // ld bc,$0016
-L_4c88:
-  I(0x4c88, 1); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { I(0x4c89, 3); goto L_4c8e; } I(0x4c89, 2);  // jr z,$4c8e
-  I(0x4c8b, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x4c8c, 3); goto L_4c88;  // jr $4c88
-L_4c8e:
-  I(0x4c8e, 2); B = 0x16;  // ld b,$16
-  I(0x4c90, 3); SET_DE(0xc600);  // ld de,$c600
-  CALL(0x4c93, copyMemory_hook, 0x0486, 0x4c96);  // call $0486
-  I(0x4c96, 3); SET_HL(0xc612);  // ld hl,$c612
-  I(0x4c99, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x4c9b, 2); L = 0x14;  // ld l,$14
-  I(0x4c9d, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x4c9f, initializeFile_b00_hook, 0x09d4, 0x4ca2);  // call $09d4
-  I(0x4ca2, 2); A = 0x56;  // ld a,$56
-  CALL(0x4ca4, playSound_b00_hook, 0x0c98, 0x4ca7);  // call $0c98
-  I(0x4ca7, 4); setFileSelectModeTo1(gb); return;  // jp $4159
-L_4caa:
-  CALL(0x4caa, serialFunc_0c8d_hook, 0x0c8d, 0x4cad);  // call $0c8d
-  I(0x4cad, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4caf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cb0); return; } I(0x4cb0, 2);  // ret nz
-L_4cb1:
-  I(0x4cb1, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4cb4, 2); alu_cp(gb, 0x08);  // cp $08
-  if ((F & FZ)) { I(0x4cb6, 4); closeMenu(gb); return; } I(0x4cb6, 3);  // jp z,$4fba
-  I(0x4cb9, 2); A = 0x00;  // ld a,$00
-  I(0x4cbb, 4); setFileSelectMode(gb); return;  // jp $415b
-L_4cbe:
-  CALL(0x4cbe, serialFunc_0c8d_hook, 0x0c8d, 0x4cc1);  // call $0c8d
-  I(0x4cc1, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4cc3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cc4); return; } I(0x4cc4, 2);  // ret nz
-  I(0x4cc5, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4cc8, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4cca, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4ccd, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4cce, 3); goto L_4cb1; } I(0x4cce, 2);  // jr nz,$4cb1
-  I(0x4cd0, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4cd3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x4cd4); return; } I(0x4cd4, 2);  // ret nz
-  I(0x4cd5, 3); goto L_4cb1;  // jr $4cb1
-}
-
-// 02:4af6
-void fileSelectDrawAcornCursor__table4(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4af6:
-  I(0x4af6, 4); A = mem_rd(gb, 0xe84a);  // ld a,($e84a)
-  I(0x4af9, 1); C = D;  // ld c,d
-L_4afa:
-  I(0x4afa, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4afb, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4afe, 1); H = H;  // ld h,h
-  I(0x4aff, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b02:
-  I(0x4b02, 2); B = 0x4b;  // ld b,$4b
-  I(0x4b04, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b06:
-  I(0x4b06, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b07, 1); D = B;  // ld d,b
-  I(0x4b08, 1); C = H;  // ld c,h
-  I(0x4b09, 1); D = B;  // ld d,b
-  I(0x4b0a, 1); H = H;  // ld h,h
-  I(0x4b0b, 1); D = B;  // ld d,b
-  I(0x4b0c, 1); A = D;  // ld a,d
-  I(0x4b0d, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-L_4b0e:
-  I(0x4b0e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4b0f, 1); C = E;  // ld c,e
-  I(0x4b10, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b12:
-  I(0x4b12, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b13, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4b16, 1); H = H;  // ld h,h
-  I(0x4b17, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b1a:
-  I(0x4b1a, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4b1b, 1); C = E;  // ld c,e
-L_4b1c:
-  if ((F & FC)) { I(0x4b1c, 3); goto L_4b3e; } I(0x4b1c, 2);  // jr c,$4b3e
-  I(0x4b1e, 1); D = B;  // ld d,b
-  if (!(F & FZ)) { I(0x4b1f, 3); goto L_4b89; } I(0x4b1f, 2);  // jr nz,$4b89
-  if (!(F & FZ)) { I(0x4b21, 3); goto L_4b44; } I(0x4b21, 2);  // jr nz,$4b44
-  I(0x4b23, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  I(0x4b24, 2); H = alu_swap(gb, H);  // swap h
-  CALL(0x4b26, fileSelect_redrawDecorationsAndSetWramBank4, 0x4cd7, 0x4b29);  // call $4cd7
-  fileSelectMode7(gb); return;  // fallthrough
-L_4b3e:
-  RST_PUSH(0x4b3e, 0x4b3f);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4b4d: goto L_4b4d; case 0x4b88: goto L_4b88; case 0x4be2: goto L_4be2; case 0x4c04: goto L_4c04; case 0x4c74: goto L_4c74; case 0x4caa: goto L_4caa; case 0x4cbe: goto L_4cbe; default: HANDOFF(HL); }
-L_4b44:
-  I(0x4b44, 1); C = E;  // ld c,e
-  I(0x4b45, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x4b46, 1); C = H;  // ld c,h
-  I(0x4b47, 2); mem_wr(gb, HL, H);  // ld (hl),h
-  I(0x4b48, 1); C = H;  // ld c,h
-  I(0x4b49, 1); alu_xor(gb, D);  // xor d
-  I(0x4b4a, 1); C = H;  // ld c,h
-  I(0x4b4b, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  I(0x4b4c, 1); C = H;  // ld c,h
-L_4b4d:
-  CALL(0x4b4d, disableLcd_hook, 0x02c1, 0x4b50);  // call $02c1
-  I(0x4b50, 2); A = 0xa0;  // ld a,$a0
-  CALL(0x4b52, loadGfxHeader_hook, 0x0626, 0x4b55);  // call $0626
-  I(0x4b55, 2); A = 0xae;  // ld a,$ae
-  CALL(0x4b57, loadGfxHeader_hook, 0x0626, 0x4b5a);  // call $0626
-  I(0x4b5a, 2); A = 0x05;  // ld a,$05
-  CALL(0x4b5c, loadPaletteHeader_hook, 0x050b, 0x4b5f);  // call $050b
-  I(0x4b5f, 2); A = 0x08;  // ld a,$08
-  CALL(0x4b61, loadUncompressedGfxHeader_hook, 0x05da, 0x4b64);  // call $05da
-  I(0x4b64, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  I(0x4b67, 2); B = 0x20;  // ld b,$20
-  CALL(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);  // call $046f
-  CALL(0x4b6c, textInput_updateEntryCursor, 0x4a22, 0x4b6f);  // call $4a22
-  CALL(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);  // call $0c85
-  I(0x4b72, 2); A = 0x04;  // ld a,$04
-  I(0x4b74, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
-  I(0x4b76, 1); alu_xor(gb, A);  // xor a
-  I(0x4b77, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4b79, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4b7c, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b7f, 2); A = 0xf0;  // ld a,$f0
-  I(0x4b81, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4b82, 2); A = 0x1e;  // ld a,$1e
-  I(0x4b84, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4b85, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4b88:
-  I(0x4b88, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-L_4b89:
-  I(0x4b89, 1); alu_cp(gb, D);  // cp d
-  I(0x4b8a, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b8b, 3); goto L_4ba3; } I(0x4b8b, 2);  // jr nz,$4ba3
-  I(0x4b8d, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4b8f, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b90, 4); goto L_4c55; } I(0x4b90, 3);  // jp nz,$4c55
-  I(0x4b93, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b96, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x4b97, 3); goto L_4ba0; } I(0x4b97, 2);  // jr nz,$4ba0
-  I(0x4b99, 2); A = 0x80;  // ld a,$80
-  I(0x4b9b, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4b9d, 4); goto L_4c55;  // jp $4c55
-L_4ba0:
-  I(0x4ba0, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73);  // jp $0c73
-L_4ba3:
-  I(0x4ba3, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4ba6, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4ba7, 3); goto L_4bae; } I(0x4ba7, 2);  // jr z,$4bae
-  I(0x4ba9, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4baa, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4bad); return;  // ret
-L_4bae:
-  CALL(0x4bae, serialFunc_0c8d_hook, 0x0c8d, 0x4bb1);  // call $0c8d
-  I(0x4bb1, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4bb3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4bb4, 3); goto L_4bbd; } I(0x4bb4, 2);  // jr z,$4bbd
-  I(0x4bb6, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x4bb8, 3); goto L_4bbd; } I(0x4bb8, 2);  // jr z,$4bbd
-  if (!(F & FZ)) { I(0x4bba, 4); goto L_4c55; } I(0x4bba, 3);  // jp nz,$4c55
-L_4bbd:
-  I(0x4bbd, 3); A = mem_rd(gb, 0xffbf);  // ldh a,($ffbf)
-  I(0x4bbf, 2); alu_cp(gb, 0x07);  // cp $07
-  if (!(F & FZ)) { RET_TAKEN(0x4bc1); return; } I(0x4bc1, 2);  // ret nz
-  I(0x4bc2, 2); E = 0x03;  // ld e,$03
-L_4bc4:
-  I(0x4bc4, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4bc5, 2); D = 0x00;  // ld d,$00
-  CALL(0x4bc7, getFileDisplayVariableAddress_paramE, 0x417b, 0x4bca);  // call $417b
-  I(0x4bca, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4bcc, 3); goto L_4bdf; } I(0x4bcc, 2);  // jr z,$4bdf
-  I(0x4bce, 1); A = E;  // ld a,e
-  I(0x4bcf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4bd0, 3); goto L_4bc4; } I(0x4bd0, 2);  // jr nz,$4bc4
-  I(0x4bd2, 2); A = 0x85;  // ld a,$85
-  I(0x4bd4, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4bd7, 2); A = 0xff;  // ld a,$ff
-  I(0x4bd9, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4bdc, 4); goto L_4c4b;  // jp $4c4b
-L_4bdf:
-  I(0x4bdf, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4be2:
-  CALL(0x4be2, serialFunc_0c8d_hook, 0x0c8d, 0x4be5);  // call $0c8d
-  I(0x4be5, 2); A = 0x06;  // ld a,$06
-  I(0x4be7, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  I(0x4bea, 1); alu_xor(gb, A);  // xor a
-  CALL(0x4beb, func_02_4149, 0x4149, 0x4bee);  // call $4149
-  CALL(0x4bee, disableLcd_hook, 0x02c1, 0x4bf1);  // call $02c1
-  I(0x4bf1, 2); A = 0xa1;  // ld a,$a1
-  CALL(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);  // call $0626
-  I(0x4bf6, 2); A = 0xaf;  // ld a,$af
-  CALL(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);  // call $0626
-  CALL(0x4bfb, textInput_updateEntryCursor, 0x4a22, 0x4bfe);  // call $4a22
-  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x4c01);  // call $4a4a
-  I(0x4c01, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c04:
-  CALL(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);  // call $0c8d
-  CALL(0x4c07, fileSelectUpdateInput, 0x4467, 0x4c0a);  // call $4467
-  if (!(F & FZ)) { I(0x4c0a, 3); goto L_4c1e; } I(0x4c0a, 2);  // jr nz,$4c1e
-  I(0x4c0c, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4c0f, 2); alu_bit(gb, 1, A);  // bit 1,a
-  if ((F & FZ)) { RET_TAKEN(0x4c11); return; } I(0x4c11, 2);  // ret z
-L_4c12:
-  I(0x4c12, 2); A = 0x03;  // ld a,$03
-  I(0x4c14, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4c17, 2); A = 0x8f;  // ld a,$8f
-  I(0x4c19, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4c1c, 3); goto L_4c4b;  // jr $4c4b
-L_4c1e:
-  I(0x4c1e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
-  I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
-  I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
-  I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
-  I(0x4c30, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-L_4c33:
-  I(0x4c33, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4c36, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FZ)) { I(0x4c38, 3); goto L_4c44; } I(0x4c38, 2);  // jr nz,$4c44
-  I(0x4c3a, 2); A = 0x0c;  // ld a,$0c
-  I(0x4c3c, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c3e, 2); A = 0x05;  // ld a,$05
-  I(0x4c40, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c43); return;  // ret
-L_4c44:
-  I(0x4c44, 2); A = 0x08;  // ld a,$08
-  I(0x4c46, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c48, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c4b:
-  I(0x4c4b, 2); A = 0x08;  // ld a,$08
-  I(0x4c4d, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c4f, 2); A = 0x05;  // ld a,$05
-  I(0x4c51, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c54); return;  // ret
-L_4c55:
-  CALL(0x4c55, disableLcd_hook, 0x02c1, 0x4c58);  // call $02c1
-  I(0x4c58, 2); A = 0x07;  // ld a,$07
-  CALL(0x4c5a, loadGfxHeader_hook, 0x0626, 0x4c5d);  // call $0626
-  CALL(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2, 0x4165, 0x4c60);  // call $4165
-  I(0x4c60, 2); A = 0x08;  // ld a,$08
-  I(0x4c62, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c64, 2); A = 0x06;  // ld a,$06
-  I(0x4c66, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x4c69, 2); A = 0xb4;  // ld a,$b4
-  I(0x4c6b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x4c6e, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4c70, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4c73); return;  // ret
-L_4c74:
-  CALL(0x4c74, serialFunc_0c8d_hook, 0x0c8d, 0x4c77);  // call $0c8d
-  I(0x4c77, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4c79, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4c7a); return; } I(0x4c7a, 2);  // ret nz
-  CALL(0x4c7b, loadFile_b00_hook, 0x09dc, 0x4c7e);  // call $09dc
-  I(0x4c7e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c81, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4c82, 3); SET_HL(0xd98d);  // ld hl,$d98d
-  I(0x4c85, 3); SET_BC(0x0016);  // ld bc,$0016
-L_4c88:
-  I(0x4c88, 1); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { I(0x4c89, 3); goto L_4c8e; } I(0x4c89, 2);  // jr z,$4c8e
-  I(0x4c8b, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x4c8c, 3); goto L_4c88;  // jr $4c88
-L_4c8e:
-  I(0x4c8e, 2); B = 0x16;  // ld b,$16
-  I(0x4c90, 3); SET_DE(0xc600);  // ld de,$c600
-  CALL(0x4c93, copyMemory_hook, 0x0486, 0x4c96);  // call $0486
-  I(0x4c96, 3); SET_HL(0xc612);  // ld hl,$c612
-  I(0x4c99, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x4c9b, 2); L = 0x14;  // ld l,$14
-  I(0x4c9d, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x4c9f, initializeFile_b00_hook, 0x09d4, 0x4ca2);  // call $09d4
-  I(0x4ca2, 2); A = 0x56;  // ld a,$56
-  CALL(0x4ca4, playSound_b00_hook, 0x0c98, 0x4ca7);  // call $0c98
-  I(0x4ca7, 4); setFileSelectModeTo1(gb); return;  // jp $4159
-L_4caa:
-  CALL(0x4caa, serialFunc_0c8d_hook, 0x0c8d, 0x4cad);  // call $0c8d
-  I(0x4cad, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4caf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cb0); return; } I(0x4cb0, 2);  // ret nz
-L_4cb1:
-  I(0x4cb1, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4cb4, 2); alu_cp(gb, 0x08);  // cp $08
-  if ((F & FZ)) { I(0x4cb6, 4); closeMenu(gb); return; } I(0x4cb6, 3);  // jp z,$4fba
-  I(0x4cb9, 2); A = 0x00;  // ld a,$00
-  I(0x4cbb, 4); setFileSelectMode(gb); return;  // jp $415b
-L_4cbe:
-  CALL(0x4cbe, serialFunc_0c8d_hook, 0x0c8d, 0x4cc1);  // call $0c8d
-  I(0x4cc1, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4cc3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cc4); return; } I(0x4cc4, 2);  // ret nz
-  I(0x4cc5, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4cc8, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4cca, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4ccd, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4cce, 3); goto L_4cb1; } I(0x4cce, 2);  // jr nz,$4cb1
-  I(0x4cd0, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4cd3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x4cd4); return; } I(0x4cd4, 2);  // ret nz
-  I(0x4cd5, 3); goto L_4cb1;  // jr $4cb1
-}
-
-// 02:4afa
-void fileSelectDrawAcornCursor__data41(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4afa:
-  I(0x4afa, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4afb, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4afe, 1); H = H;  // ld h,h
-  I(0x4aff, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b02:
-  I(0x4b02, 2); B = 0x4b;  // ld b,$4b
-  I(0x4b04, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b06:
-  I(0x4b06, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b07, 1); D = B;  // ld d,b
-  I(0x4b08, 1); C = H;  // ld c,h
-  I(0x4b09, 1); D = B;  // ld d,b
-  I(0x4b0a, 1); H = H;  // ld h,h
-  I(0x4b0b, 1); D = B;  // ld d,b
-  I(0x4b0c, 1); A = D;  // ld a,d
-  I(0x4b0d, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-L_4b0e:
-  I(0x4b0e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4b0f, 1); C = E;  // ld c,e
-  I(0x4b10, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b12:
-  I(0x4b12, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b13, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4b16, 1); H = H;  // ld h,h
-  I(0x4b17, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b1a:
-  I(0x4b1a, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4b1b, 1); C = E;  // ld c,e
-L_4b1c:
-  if ((F & FC)) { I(0x4b1c, 3); goto L_4b3e; } I(0x4b1c, 2);  // jr c,$4b3e
-  I(0x4b1e, 1); D = B;  // ld d,b
-  if (!(F & FZ)) { I(0x4b1f, 3); goto L_4b89; } I(0x4b1f, 2);  // jr nz,$4b89
-  if (!(F & FZ)) { I(0x4b21, 3); goto L_4b44; } I(0x4b21, 2);  // jr nz,$4b44
-  I(0x4b23, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  I(0x4b24, 2); H = alu_swap(gb, H);  // swap h
-  CALL(0x4b26, fileSelect_redrawDecorationsAndSetWramBank4, 0x4cd7, 0x4b29);  // call $4cd7
-  fileSelectMode7(gb); return;  // fallthrough
-L_4b3e:
-  RST_PUSH(0x4b3e, 0x4b3f);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4b4d: goto L_4b4d; case 0x4b88: goto L_4b88; case 0x4be2: goto L_4be2; case 0x4c04: goto L_4c04; case 0x4c74: goto L_4c74; case 0x4caa: goto L_4caa; case 0x4cbe: goto L_4cbe; default: HANDOFF(HL); }
-L_4b44:
-  I(0x4b44, 1); C = E;  // ld c,e
-  I(0x4b45, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x4b46, 1); C = H;  // ld c,h
-  I(0x4b47, 2); mem_wr(gb, HL, H);  // ld (hl),h
-  I(0x4b48, 1); C = H;  // ld c,h
-  I(0x4b49, 1); alu_xor(gb, D);  // xor d
-  I(0x4b4a, 1); C = H;  // ld c,h
-  I(0x4b4b, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  I(0x4b4c, 1); C = H;  // ld c,h
-L_4b4d:
-  CALL(0x4b4d, disableLcd_hook, 0x02c1, 0x4b50);  // call $02c1
-  I(0x4b50, 2); A = 0xa0;  // ld a,$a0
-  CALL(0x4b52, loadGfxHeader_hook, 0x0626, 0x4b55);  // call $0626
-  I(0x4b55, 2); A = 0xae;  // ld a,$ae
-  CALL(0x4b57, loadGfxHeader_hook, 0x0626, 0x4b5a);  // call $0626
-  I(0x4b5a, 2); A = 0x05;  // ld a,$05
-  CALL(0x4b5c, loadPaletteHeader_hook, 0x050b, 0x4b5f);  // call $050b
-  I(0x4b5f, 2); A = 0x08;  // ld a,$08
-  CALL(0x4b61, loadUncompressedGfxHeader_hook, 0x05da, 0x4b64);  // call $05da
-  I(0x4b64, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  I(0x4b67, 2); B = 0x20;  // ld b,$20
-  CALL(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);  // call $046f
-  CALL(0x4b6c, textInput_updateEntryCursor, 0x4a22, 0x4b6f);  // call $4a22
-  CALL(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);  // call $0c85
-  I(0x4b72, 2); A = 0x04;  // ld a,$04
-  I(0x4b74, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
-  I(0x4b76, 1); alu_xor(gb, A);  // xor a
-  I(0x4b77, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4b79, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4b7c, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b7f, 2); A = 0xf0;  // ld a,$f0
-  I(0x4b81, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4b82, 2); A = 0x1e;  // ld a,$1e
-  I(0x4b84, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4b85, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4b88:
-  I(0x4b88, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-L_4b89:
-  I(0x4b89, 1); alu_cp(gb, D);  // cp d
-  I(0x4b8a, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b8b, 3); goto L_4ba3; } I(0x4b8b, 2);  // jr nz,$4ba3
-  I(0x4b8d, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4b8f, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b90, 4); goto L_4c55; } I(0x4b90, 3);  // jp nz,$4c55
-  I(0x4b93, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b96, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x4b97, 3); goto L_4ba0; } I(0x4b97, 2);  // jr nz,$4ba0
-  I(0x4b99, 2); A = 0x80;  // ld a,$80
-  I(0x4b9b, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4b9d, 4); goto L_4c55;  // jp $4c55
-L_4ba0:
-  I(0x4ba0, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73);  // jp $0c73
-L_4ba3:
-  I(0x4ba3, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4ba6, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4ba7, 3); goto L_4bae; } I(0x4ba7, 2);  // jr z,$4bae
-  I(0x4ba9, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4baa, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4bad); return;  // ret
-L_4bae:
-  CALL(0x4bae, serialFunc_0c8d_hook, 0x0c8d, 0x4bb1);  // call $0c8d
-  I(0x4bb1, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4bb3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4bb4, 3); goto L_4bbd; } I(0x4bb4, 2);  // jr z,$4bbd
-  I(0x4bb6, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x4bb8, 3); goto L_4bbd; } I(0x4bb8, 2);  // jr z,$4bbd
-  if (!(F & FZ)) { I(0x4bba, 4); goto L_4c55; } I(0x4bba, 3);  // jp nz,$4c55
-L_4bbd:
-  I(0x4bbd, 3); A = mem_rd(gb, 0xffbf);  // ldh a,($ffbf)
-  I(0x4bbf, 2); alu_cp(gb, 0x07);  // cp $07
-  if (!(F & FZ)) { RET_TAKEN(0x4bc1); return; } I(0x4bc1, 2);  // ret nz
-  I(0x4bc2, 2); E = 0x03;  // ld e,$03
-L_4bc4:
-  I(0x4bc4, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4bc5, 2); D = 0x00;  // ld d,$00
-  CALL(0x4bc7, getFileDisplayVariableAddress_paramE, 0x417b, 0x4bca);  // call $417b
-  I(0x4bca, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4bcc, 3); goto L_4bdf; } I(0x4bcc, 2);  // jr z,$4bdf
-  I(0x4bce, 1); A = E;  // ld a,e
-  I(0x4bcf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4bd0, 3); goto L_4bc4; } I(0x4bd0, 2);  // jr nz,$4bc4
-  I(0x4bd2, 2); A = 0x85;  // ld a,$85
-  I(0x4bd4, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4bd7, 2); A = 0xff;  // ld a,$ff
-  I(0x4bd9, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4bdc, 4); goto L_4c4b;  // jp $4c4b
-L_4bdf:
-  I(0x4bdf, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4be2:
-  CALL(0x4be2, serialFunc_0c8d_hook, 0x0c8d, 0x4be5);  // call $0c8d
-  I(0x4be5, 2); A = 0x06;  // ld a,$06
-  I(0x4be7, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  I(0x4bea, 1); alu_xor(gb, A);  // xor a
-  CALL(0x4beb, func_02_4149, 0x4149, 0x4bee);  // call $4149
-  CALL(0x4bee, disableLcd_hook, 0x02c1, 0x4bf1);  // call $02c1
-  I(0x4bf1, 2); A = 0xa1;  // ld a,$a1
-  CALL(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);  // call $0626
-  I(0x4bf6, 2); A = 0xaf;  // ld a,$af
-  CALL(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);  // call $0626
-  CALL(0x4bfb, textInput_updateEntryCursor, 0x4a22, 0x4bfe);  // call $4a22
-  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x4c01);  // call $4a4a
-  I(0x4c01, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c04:
-  CALL(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);  // call $0c8d
-  CALL(0x4c07, fileSelectUpdateInput, 0x4467, 0x4c0a);  // call $4467
-  if (!(F & FZ)) { I(0x4c0a, 3); goto L_4c1e; } I(0x4c0a, 2);  // jr nz,$4c1e
-  I(0x4c0c, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4c0f, 2); alu_bit(gb, 1, A);  // bit 1,a
-  if ((F & FZ)) { RET_TAKEN(0x4c11); return; } I(0x4c11, 2);  // ret z
-L_4c12:
-  I(0x4c12, 2); A = 0x03;  // ld a,$03
-  I(0x4c14, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4c17, 2); A = 0x8f;  // ld a,$8f
-  I(0x4c19, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4c1c, 3); goto L_4c4b;  // jr $4c4b
-L_4c1e:
-  I(0x4c1e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
-  I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
-  I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
-  I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
-  I(0x4c30, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-L_4c33:
-  I(0x4c33, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4c36, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FZ)) { I(0x4c38, 3); goto L_4c44; } I(0x4c38, 2);  // jr nz,$4c44
-  I(0x4c3a, 2); A = 0x0c;  // ld a,$0c
-  I(0x4c3c, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c3e, 2); A = 0x05;  // ld a,$05
-  I(0x4c40, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c43); return;  // ret
-L_4c44:
-  I(0x4c44, 2); A = 0x08;  // ld a,$08
-  I(0x4c46, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c48, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c4b:
-  I(0x4c4b, 2); A = 0x08;  // ld a,$08
-  I(0x4c4d, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c4f, 2); A = 0x05;  // ld a,$05
-  I(0x4c51, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c54); return;  // ret
-L_4c55:
-  CALL(0x4c55, disableLcd_hook, 0x02c1, 0x4c58);  // call $02c1
-  I(0x4c58, 2); A = 0x07;  // ld a,$07
-  CALL(0x4c5a, loadGfxHeader_hook, 0x0626, 0x4c5d);  // call $0626
-  CALL(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2, 0x4165, 0x4c60);  // call $4165
-  I(0x4c60, 2); A = 0x08;  // ld a,$08
-  I(0x4c62, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c64, 2); A = 0x06;  // ld a,$06
-  I(0x4c66, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x4c69, 2); A = 0xb4;  // ld a,$b4
-  I(0x4c6b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x4c6e, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4c70, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4c73); return;  // ret
-L_4c74:
-  CALL(0x4c74, serialFunc_0c8d_hook, 0x0c8d, 0x4c77);  // call $0c8d
-  I(0x4c77, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4c79, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4c7a); return; } I(0x4c7a, 2);  // ret nz
-  CALL(0x4c7b, loadFile_b00_hook, 0x09dc, 0x4c7e);  // call $09dc
-  I(0x4c7e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c81, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4c82, 3); SET_HL(0xd98d);  // ld hl,$d98d
-  I(0x4c85, 3); SET_BC(0x0016);  // ld bc,$0016
-L_4c88:
-  I(0x4c88, 1); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { I(0x4c89, 3); goto L_4c8e; } I(0x4c89, 2);  // jr z,$4c8e
-  I(0x4c8b, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x4c8c, 3); goto L_4c88;  // jr $4c88
-L_4c8e:
-  I(0x4c8e, 2); B = 0x16;  // ld b,$16
-  I(0x4c90, 3); SET_DE(0xc600);  // ld de,$c600
-  CALL(0x4c93, copyMemory_hook, 0x0486, 0x4c96);  // call $0486
-  I(0x4c96, 3); SET_HL(0xc612);  // ld hl,$c612
-  I(0x4c99, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x4c9b, 2); L = 0x14;  // ld l,$14
-  I(0x4c9d, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x4c9f, initializeFile_b00_hook, 0x09d4, 0x4ca2);  // call $09d4
-  I(0x4ca2, 2); A = 0x56;  // ld a,$56
-  CALL(0x4ca4, playSound_b00_hook, 0x0c98, 0x4ca7);  // call $0c98
-  I(0x4ca7, 4); setFileSelectModeTo1(gb); return;  // jp $4159
-L_4caa:
-  CALL(0x4caa, serialFunc_0c8d_hook, 0x0c8d, 0x4cad);  // call $0c8d
-  I(0x4cad, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4caf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cb0); return; } I(0x4cb0, 2);  // ret nz
-L_4cb1:
-  I(0x4cb1, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4cb4, 2); alu_cp(gb, 0x08);  // cp $08
-  if ((F & FZ)) { I(0x4cb6, 4); closeMenu(gb); return; } I(0x4cb6, 3);  // jp z,$4fba
-  I(0x4cb9, 2); A = 0x00;  // ld a,$00
-  I(0x4cbb, 4); setFileSelectMode(gb); return;  // jp $415b
-L_4cbe:
-  CALL(0x4cbe, serialFunc_0c8d_hook, 0x0c8d, 0x4cc1);  // call $0c8d
-  I(0x4cc1, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4cc3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cc4); return; } I(0x4cc4, 2);  // ret nz
-  I(0x4cc5, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4cc8, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4cca, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4ccd, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4cce, 3); goto L_4cb1; } I(0x4cce, 2);  // jr nz,$4cb1
-  I(0x4cd0, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4cd3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x4cd4); return; } I(0x4cd4, 2);  // ret nz
-  I(0x4cd5, 3); goto L_4cb1;  // jr $4cb1
-}
-
-// 02:4b02
-void fileSelectDrawAcornCursor__table2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4b02:
-  I(0x4b02, 2); B = 0x4b;  // ld b,$4b
-  I(0x4b04, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b06:
-  I(0x4b06, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b07, 1); D = B;  // ld d,b
-  I(0x4b08, 1); C = H;  // ld c,h
-  I(0x4b09, 1); D = B;  // ld d,b
-  I(0x4b0a, 1); H = H;  // ld h,h
-  I(0x4b0b, 1); D = B;  // ld d,b
-  I(0x4b0c, 1); A = D;  // ld a,d
-  I(0x4b0d, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-L_4b0e:
-  I(0x4b0e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4b0f, 1); C = E;  // ld c,e
-  I(0x4b10, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b12:
-  I(0x4b12, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b13, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4b16, 1); H = H;  // ld h,h
-  I(0x4b17, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b1a:
-  I(0x4b1a, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4b1b, 1); C = E;  // ld c,e
-L_4b1c:
-  if ((F & FC)) { I(0x4b1c, 3); goto L_4b3e; } I(0x4b1c, 2);  // jr c,$4b3e
-  I(0x4b1e, 1); D = B;  // ld d,b
-  if (!(F & FZ)) { I(0x4b1f, 3); goto L_4b89; } I(0x4b1f, 2);  // jr nz,$4b89
-  if (!(F & FZ)) { I(0x4b21, 3); goto L_4b44; } I(0x4b21, 2);  // jr nz,$4b44
-  I(0x4b23, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  I(0x4b24, 2); H = alu_swap(gb, H);  // swap h
-  CALL(0x4b26, fileSelect_redrawDecorationsAndSetWramBank4, 0x4cd7, 0x4b29);  // call $4cd7
-  fileSelectMode7(gb); return;  // fallthrough
-L_4b3e:
-  RST_PUSH(0x4b3e, 0x4b3f);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4b4d: goto L_4b4d; case 0x4b88: goto L_4b88; case 0x4be2: goto L_4be2; case 0x4c04: goto L_4c04; case 0x4c74: goto L_4c74; case 0x4caa: goto L_4caa; case 0x4cbe: goto L_4cbe; default: HANDOFF(HL); }
-L_4b44:
-  I(0x4b44, 1); C = E;  // ld c,e
-  I(0x4b45, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x4b46, 1); C = H;  // ld c,h
-  I(0x4b47, 2); mem_wr(gb, HL, H);  // ld (hl),h
-  I(0x4b48, 1); C = H;  // ld c,h
-  I(0x4b49, 1); alu_xor(gb, D);  // xor d
-  I(0x4b4a, 1); C = H;  // ld c,h
-  I(0x4b4b, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  I(0x4b4c, 1); C = H;  // ld c,h
-L_4b4d:
-  CALL(0x4b4d, disableLcd_hook, 0x02c1, 0x4b50);  // call $02c1
-  I(0x4b50, 2); A = 0xa0;  // ld a,$a0
-  CALL(0x4b52, loadGfxHeader_hook, 0x0626, 0x4b55);  // call $0626
-  I(0x4b55, 2); A = 0xae;  // ld a,$ae
-  CALL(0x4b57, loadGfxHeader_hook, 0x0626, 0x4b5a);  // call $0626
-  I(0x4b5a, 2); A = 0x05;  // ld a,$05
-  CALL(0x4b5c, loadPaletteHeader_hook, 0x050b, 0x4b5f);  // call $050b
-  I(0x4b5f, 2); A = 0x08;  // ld a,$08
-  CALL(0x4b61, loadUncompressedGfxHeader_hook, 0x05da, 0x4b64);  // call $05da
-  I(0x4b64, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  I(0x4b67, 2); B = 0x20;  // ld b,$20
-  CALL(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);  // call $046f
-  CALL(0x4b6c, textInput_updateEntryCursor, 0x4a22, 0x4b6f);  // call $4a22
-  CALL(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);  // call $0c85
-  I(0x4b72, 2); A = 0x04;  // ld a,$04
-  I(0x4b74, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
-  I(0x4b76, 1); alu_xor(gb, A);  // xor a
-  I(0x4b77, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4b79, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4b7c, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b7f, 2); A = 0xf0;  // ld a,$f0
-  I(0x4b81, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4b82, 2); A = 0x1e;  // ld a,$1e
-  I(0x4b84, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4b85, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4b88:
-  I(0x4b88, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-L_4b89:
-  I(0x4b89, 1); alu_cp(gb, D);  // cp d
-  I(0x4b8a, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b8b, 3); goto L_4ba3; } I(0x4b8b, 2);  // jr nz,$4ba3
-  I(0x4b8d, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4b8f, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b90, 4); goto L_4c55; } I(0x4b90, 3);  // jp nz,$4c55
-  I(0x4b93, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b96, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x4b97, 3); goto L_4ba0; } I(0x4b97, 2);  // jr nz,$4ba0
-  I(0x4b99, 2); A = 0x80;  // ld a,$80
-  I(0x4b9b, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4b9d, 4); goto L_4c55;  // jp $4c55
-L_4ba0:
-  I(0x4ba0, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73);  // jp $0c73
-L_4ba3:
-  I(0x4ba3, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4ba6, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4ba7, 3); goto L_4bae; } I(0x4ba7, 2);  // jr z,$4bae
-  I(0x4ba9, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4baa, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4bad); return;  // ret
-L_4bae:
-  CALL(0x4bae, serialFunc_0c8d_hook, 0x0c8d, 0x4bb1);  // call $0c8d
-  I(0x4bb1, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4bb3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4bb4, 3); goto L_4bbd; } I(0x4bb4, 2);  // jr z,$4bbd
-  I(0x4bb6, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x4bb8, 3); goto L_4bbd; } I(0x4bb8, 2);  // jr z,$4bbd
-  if (!(F & FZ)) { I(0x4bba, 4); goto L_4c55; } I(0x4bba, 3);  // jp nz,$4c55
-L_4bbd:
-  I(0x4bbd, 3); A = mem_rd(gb, 0xffbf);  // ldh a,($ffbf)
-  I(0x4bbf, 2); alu_cp(gb, 0x07);  // cp $07
-  if (!(F & FZ)) { RET_TAKEN(0x4bc1); return; } I(0x4bc1, 2);  // ret nz
-  I(0x4bc2, 2); E = 0x03;  // ld e,$03
-L_4bc4:
-  I(0x4bc4, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4bc5, 2); D = 0x00;  // ld d,$00
-  CALL(0x4bc7, getFileDisplayVariableAddress_paramE, 0x417b, 0x4bca);  // call $417b
-  I(0x4bca, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4bcc, 3); goto L_4bdf; } I(0x4bcc, 2);  // jr z,$4bdf
-  I(0x4bce, 1); A = E;  // ld a,e
-  I(0x4bcf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4bd0, 3); goto L_4bc4; } I(0x4bd0, 2);  // jr nz,$4bc4
-  I(0x4bd2, 2); A = 0x85;  // ld a,$85
-  I(0x4bd4, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4bd7, 2); A = 0xff;  // ld a,$ff
-  I(0x4bd9, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4bdc, 4); goto L_4c4b;  // jp $4c4b
-L_4bdf:
-  I(0x4bdf, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4be2:
-  CALL(0x4be2, serialFunc_0c8d_hook, 0x0c8d, 0x4be5);  // call $0c8d
-  I(0x4be5, 2); A = 0x06;  // ld a,$06
-  I(0x4be7, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  I(0x4bea, 1); alu_xor(gb, A);  // xor a
-  CALL(0x4beb, func_02_4149, 0x4149, 0x4bee);  // call $4149
-  CALL(0x4bee, disableLcd_hook, 0x02c1, 0x4bf1);  // call $02c1
-  I(0x4bf1, 2); A = 0xa1;  // ld a,$a1
-  CALL(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);  // call $0626
-  I(0x4bf6, 2); A = 0xaf;  // ld a,$af
-  CALL(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);  // call $0626
-  CALL(0x4bfb, textInput_updateEntryCursor, 0x4a22, 0x4bfe);  // call $4a22
-  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x4c01);  // call $4a4a
-  I(0x4c01, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c04:
-  CALL(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);  // call $0c8d
-  CALL(0x4c07, fileSelectUpdateInput, 0x4467, 0x4c0a);  // call $4467
-  if (!(F & FZ)) { I(0x4c0a, 3); goto L_4c1e; } I(0x4c0a, 2);  // jr nz,$4c1e
-  I(0x4c0c, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4c0f, 2); alu_bit(gb, 1, A);  // bit 1,a
-  if ((F & FZ)) { RET_TAKEN(0x4c11); return; } I(0x4c11, 2);  // ret z
-L_4c12:
-  I(0x4c12, 2); A = 0x03;  // ld a,$03
-  I(0x4c14, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4c17, 2); A = 0x8f;  // ld a,$8f
-  I(0x4c19, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4c1c, 3); goto L_4c4b;  // jr $4c4b
-L_4c1e:
-  I(0x4c1e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
-  I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
-  I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
-  I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
-  I(0x4c30, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-L_4c33:
-  I(0x4c33, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4c36, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FZ)) { I(0x4c38, 3); goto L_4c44; } I(0x4c38, 2);  // jr nz,$4c44
-  I(0x4c3a, 2); A = 0x0c;  // ld a,$0c
-  I(0x4c3c, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c3e, 2); A = 0x05;  // ld a,$05
-  I(0x4c40, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c43); return;  // ret
-L_4c44:
-  I(0x4c44, 2); A = 0x08;  // ld a,$08
-  I(0x4c46, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c48, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c4b:
-  I(0x4c4b, 2); A = 0x08;  // ld a,$08
-  I(0x4c4d, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c4f, 2); A = 0x05;  // ld a,$05
-  I(0x4c51, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c54); return;  // ret
-L_4c55:
-  CALL(0x4c55, disableLcd_hook, 0x02c1, 0x4c58);  // call $02c1
-  I(0x4c58, 2); A = 0x07;  // ld a,$07
-  CALL(0x4c5a, loadGfxHeader_hook, 0x0626, 0x4c5d);  // call $0626
-  CALL(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2, 0x4165, 0x4c60);  // call $4165
-  I(0x4c60, 2); A = 0x08;  // ld a,$08
-  I(0x4c62, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c64, 2); A = 0x06;  // ld a,$06
-  I(0x4c66, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x4c69, 2); A = 0xb4;  // ld a,$b4
-  I(0x4c6b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x4c6e, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4c70, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4c73); return;  // ret
-L_4c74:
-  CALL(0x4c74, serialFunc_0c8d_hook, 0x0c8d, 0x4c77);  // call $0c8d
-  I(0x4c77, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4c79, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4c7a); return; } I(0x4c7a, 2);  // ret nz
-  CALL(0x4c7b, loadFile_b00_hook, 0x09dc, 0x4c7e);  // call $09dc
-  I(0x4c7e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c81, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4c82, 3); SET_HL(0xd98d);  // ld hl,$d98d
-  I(0x4c85, 3); SET_BC(0x0016);  // ld bc,$0016
-L_4c88:
-  I(0x4c88, 1); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { I(0x4c89, 3); goto L_4c8e; } I(0x4c89, 2);  // jr z,$4c8e
-  I(0x4c8b, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x4c8c, 3); goto L_4c88;  // jr $4c88
-L_4c8e:
-  I(0x4c8e, 2); B = 0x16;  // ld b,$16
-  I(0x4c90, 3); SET_DE(0xc600);  // ld de,$c600
-  CALL(0x4c93, copyMemory_hook, 0x0486, 0x4c96);  // call $0486
-  I(0x4c96, 3); SET_HL(0xc612);  // ld hl,$c612
-  I(0x4c99, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x4c9b, 2); L = 0x14;  // ld l,$14
-  I(0x4c9d, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x4c9f, initializeFile_b00_hook, 0x09d4, 0x4ca2);  // call $09d4
-  I(0x4ca2, 2); A = 0x56;  // ld a,$56
-  CALL(0x4ca4, playSound_b00_hook, 0x0c98, 0x4ca7);  // call $0c98
-  I(0x4ca7, 4); setFileSelectModeTo1(gb); return;  // jp $4159
-L_4caa:
-  CALL(0x4caa, serialFunc_0c8d_hook, 0x0c8d, 0x4cad);  // call $0c8d
-  I(0x4cad, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4caf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cb0); return; } I(0x4cb0, 2);  // ret nz
-L_4cb1:
-  I(0x4cb1, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4cb4, 2); alu_cp(gb, 0x08);  // cp $08
-  if ((F & FZ)) { I(0x4cb6, 4); closeMenu(gb); return; } I(0x4cb6, 3);  // jp z,$4fba
-  I(0x4cb9, 2); A = 0x00;  // ld a,$00
-  I(0x4cbb, 4); setFileSelectMode(gb); return;  // jp $415b
-L_4cbe:
-  CALL(0x4cbe, serialFunc_0c8d_hook, 0x0c8d, 0x4cc1);  // call $0c8d
-  I(0x4cc1, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4cc3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cc4); return; } I(0x4cc4, 2);  // ret nz
-  I(0x4cc5, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4cc8, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4cca, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4ccd, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4cce, 3); goto L_4cb1; } I(0x4cce, 2);  // jr nz,$4cb1
-  I(0x4cd0, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4cd3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x4cd4); return; } I(0x4cd4, 2);  // ret nz
-  I(0x4cd5, 3); goto L_4cb1;  // jr $4cb1
-}
-
-// 02:4b06
-void fileSelectDrawAcornCursor__data21(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4b06:
-  I(0x4b06, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b07, 1); D = B;  // ld d,b
-  I(0x4b08, 1); C = H;  // ld c,h
-  I(0x4b09, 1); D = B;  // ld d,b
-  I(0x4b0a, 1); H = H;  // ld h,h
-  I(0x4b0b, 1); D = B;  // ld d,b
-  I(0x4b0c, 1); A = D;  // ld a,d
-  I(0x4b0d, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-L_4b0e:
-  I(0x4b0e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4b0f, 1); C = E;  // ld c,e
-  I(0x4b10, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b12:
-  I(0x4b12, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b13, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4b16, 1); H = H;  // ld h,h
-  I(0x4b17, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b1a:
-  I(0x4b1a, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4b1b, 1); C = E;  // ld c,e
-L_4b1c:
-  if ((F & FC)) { I(0x4b1c, 3); goto L_4b3e; } I(0x4b1c, 2);  // jr c,$4b3e
-  I(0x4b1e, 1); D = B;  // ld d,b
-  if (!(F & FZ)) { I(0x4b1f, 3); goto L_4b89; } I(0x4b1f, 2);  // jr nz,$4b89
-  if (!(F & FZ)) { I(0x4b21, 3); goto L_4b44; } I(0x4b21, 2);  // jr nz,$4b44
-  I(0x4b23, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  I(0x4b24, 2); H = alu_swap(gb, H);  // swap h
-  CALL(0x4b26, fileSelect_redrawDecorationsAndSetWramBank4, 0x4cd7, 0x4b29);  // call $4cd7
-  fileSelectMode7(gb); return;  // fallthrough
-L_4b3e:
-  RST_PUSH(0x4b3e, 0x4b3f);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4b4d: goto L_4b4d; case 0x4b88: goto L_4b88; case 0x4be2: goto L_4be2; case 0x4c04: goto L_4c04; case 0x4c74: goto L_4c74; case 0x4caa: goto L_4caa; case 0x4cbe: goto L_4cbe; default: HANDOFF(HL); }
-L_4b44:
-  I(0x4b44, 1); C = E;  // ld c,e
-  I(0x4b45, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x4b46, 1); C = H;  // ld c,h
-  I(0x4b47, 2); mem_wr(gb, HL, H);  // ld (hl),h
-  I(0x4b48, 1); C = H;  // ld c,h
-  I(0x4b49, 1); alu_xor(gb, D);  // xor d
-  I(0x4b4a, 1); C = H;  // ld c,h
-  I(0x4b4b, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  I(0x4b4c, 1); C = H;  // ld c,h
-L_4b4d:
-  CALL(0x4b4d, disableLcd_hook, 0x02c1, 0x4b50);  // call $02c1
-  I(0x4b50, 2); A = 0xa0;  // ld a,$a0
-  CALL(0x4b52, loadGfxHeader_hook, 0x0626, 0x4b55);  // call $0626
-  I(0x4b55, 2); A = 0xae;  // ld a,$ae
-  CALL(0x4b57, loadGfxHeader_hook, 0x0626, 0x4b5a);  // call $0626
-  I(0x4b5a, 2); A = 0x05;  // ld a,$05
-  CALL(0x4b5c, loadPaletteHeader_hook, 0x050b, 0x4b5f);  // call $050b
-  I(0x4b5f, 2); A = 0x08;  // ld a,$08
-  CALL(0x4b61, loadUncompressedGfxHeader_hook, 0x05da, 0x4b64);  // call $05da
-  I(0x4b64, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  I(0x4b67, 2); B = 0x20;  // ld b,$20
-  CALL(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);  // call $046f
-  CALL(0x4b6c, textInput_updateEntryCursor, 0x4a22, 0x4b6f);  // call $4a22
-  CALL(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);  // call $0c85
-  I(0x4b72, 2); A = 0x04;  // ld a,$04
-  I(0x4b74, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
-  I(0x4b76, 1); alu_xor(gb, A);  // xor a
-  I(0x4b77, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4b79, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4b7c, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b7f, 2); A = 0xf0;  // ld a,$f0
-  I(0x4b81, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4b82, 2); A = 0x1e;  // ld a,$1e
-  I(0x4b84, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4b85, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4b88:
-  I(0x4b88, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-L_4b89:
-  I(0x4b89, 1); alu_cp(gb, D);  // cp d
-  I(0x4b8a, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b8b, 3); goto L_4ba3; } I(0x4b8b, 2);  // jr nz,$4ba3
-  I(0x4b8d, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4b8f, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b90, 4); goto L_4c55; } I(0x4b90, 3);  // jp nz,$4c55
-  I(0x4b93, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b96, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x4b97, 3); goto L_4ba0; } I(0x4b97, 2);  // jr nz,$4ba0
-  I(0x4b99, 2); A = 0x80;  // ld a,$80
-  I(0x4b9b, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4b9d, 4); goto L_4c55;  // jp $4c55
-L_4ba0:
-  I(0x4ba0, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73);  // jp $0c73
-L_4ba3:
-  I(0x4ba3, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4ba6, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4ba7, 3); goto L_4bae; } I(0x4ba7, 2);  // jr z,$4bae
-  I(0x4ba9, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4baa, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4bad); return;  // ret
-L_4bae:
-  CALL(0x4bae, serialFunc_0c8d_hook, 0x0c8d, 0x4bb1);  // call $0c8d
-  I(0x4bb1, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4bb3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4bb4, 3); goto L_4bbd; } I(0x4bb4, 2);  // jr z,$4bbd
-  I(0x4bb6, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x4bb8, 3); goto L_4bbd; } I(0x4bb8, 2);  // jr z,$4bbd
-  if (!(F & FZ)) { I(0x4bba, 4); goto L_4c55; } I(0x4bba, 3);  // jp nz,$4c55
-L_4bbd:
-  I(0x4bbd, 3); A = mem_rd(gb, 0xffbf);  // ldh a,($ffbf)
-  I(0x4bbf, 2); alu_cp(gb, 0x07);  // cp $07
-  if (!(F & FZ)) { RET_TAKEN(0x4bc1); return; } I(0x4bc1, 2);  // ret nz
-  I(0x4bc2, 2); E = 0x03;  // ld e,$03
-L_4bc4:
-  I(0x4bc4, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4bc5, 2); D = 0x00;  // ld d,$00
-  CALL(0x4bc7, getFileDisplayVariableAddress_paramE, 0x417b, 0x4bca);  // call $417b
-  I(0x4bca, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4bcc, 3); goto L_4bdf; } I(0x4bcc, 2);  // jr z,$4bdf
-  I(0x4bce, 1); A = E;  // ld a,e
-  I(0x4bcf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4bd0, 3); goto L_4bc4; } I(0x4bd0, 2);  // jr nz,$4bc4
-  I(0x4bd2, 2); A = 0x85;  // ld a,$85
-  I(0x4bd4, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4bd7, 2); A = 0xff;  // ld a,$ff
-  I(0x4bd9, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4bdc, 4); goto L_4c4b;  // jp $4c4b
-L_4bdf:
-  I(0x4bdf, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4be2:
-  CALL(0x4be2, serialFunc_0c8d_hook, 0x0c8d, 0x4be5);  // call $0c8d
-  I(0x4be5, 2); A = 0x06;  // ld a,$06
-  I(0x4be7, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  I(0x4bea, 1); alu_xor(gb, A);  // xor a
-  CALL(0x4beb, func_02_4149, 0x4149, 0x4bee);  // call $4149
-  CALL(0x4bee, disableLcd_hook, 0x02c1, 0x4bf1);  // call $02c1
-  I(0x4bf1, 2); A = 0xa1;  // ld a,$a1
-  CALL(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);  // call $0626
-  I(0x4bf6, 2); A = 0xaf;  // ld a,$af
-  CALL(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);  // call $0626
-  CALL(0x4bfb, textInput_updateEntryCursor, 0x4a22, 0x4bfe);  // call $4a22
-  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x4c01);  // call $4a4a
-  I(0x4c01, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c04:
-  CALL(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);  // call $0c8d
-  CALL(0x4c07, fileSelectUpdateInput, 0x4467, 0x4c0a);  // call $4467
-  if (!(F & FZ)) { I(0x4c0a, 3); goto L_4c1e; } I(0x4c0a, 2);  // jr nz,$4c1e
-  I(0x4c0c, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4c0f, 2); alu_bit(gb, 1, A);  // bit 1,a
-  if ((F & FZ)) { RET_TAKEN(0x4c11); return; } I(0x4c11, 2);  // ret z
-L_4c12:
-  I(0x4c12, 2); A = 0x03;  // ld a,$03
-  I(0x4c14, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4c17, 2); A = 0x8f;  // ld a,$8f
-  I(0x4c19, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4c1c, 3); goto L_4c4b;  // jr $4c4b
-L_4c1e:
-  I(0x4c1e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
-  I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
-  I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
-  I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
-  I(0x4c30, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-L_4c33:
-  I(0x4c33, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4c36, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FZ)) { I(0x4c38, 3); goto L_4c44; } I(0x4c38, 2);  // jr nz,$4c44
-  I(0x4c3a, 2); A = 0x0c;  // ld a,$0c
-  I(0x4c3c, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c3e, 2); A = 0x05;  // ld a,$05
-  I(0x4c40, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c43); return;  // ret
-L_4c44:
-  I(0x4c44, 2); A = 0x08;  // ld a,$08
-  I(0x4c46, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c48, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c4b:
-  I(0x4c4b, 2); A = 0x08;  // ld a,$08
-  I(0x4c4d, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c4f, 2); A = 0x05;  // ld a,$05
-  I(0x4c51, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c54); return;  // ret
-L_4c55:
-  CALL(0x4c55, disableLcd_hook, 0x02c1, 0x4c58);  // call $02c1
-  I(0x4c58, 2); A = 0x07;  // ld a,$07
-  CALL(0x4c5a, loadGfxHeader_hook, 0x0626, 0x4c5d);  // call $0626
-  CALL(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2, 0x4165, 0x4c60);  // call $4165
-  I(0x4c60, 2); A = 0x08;  // ld a,$08
-  I(0x4c62, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c64, 2); A = 0x06;  // ld a,$06
-  I(0x4c66, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x4c69, 2); A = 0xb4;  // ld a,$b4
-  I(0x4c6b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x4c6e, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4c70, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4c73); return;  // ret
-L_4c74:
-  CALL(0x4c74, serialFunc_0c8d_hook, 0x0c8d, 0x4c77);  // call $0c8d
-  I(0x4c77, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4c79, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4c7a); return; } I(0x4c7a, 2);  // ret nz
-  CALL(0x4c7b, loadFile_b00_hook, 0x09dc, 0x4c7e);  // call $09dc
-  I(0x4c7e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c81, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4c82, 3); SET_HL(0xd98d);  // ld hl,$d98d
-  I(0x4c85, 3); SET_BC(0x0016);  // ld bc,$0016
-L_4c88:
-  I(0x4c88, 1); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { I(0x4c89, 3); goto L_4c8e; } I(0x4c89, 2);  // jr z,$4c8e
-  I(0x4c8b, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x4c8c, 3); goto L_4c88;  // jr $4c88
-L_4c8e:
-  I(0x4c8e, 2); B = 0x16;  // ld b,$16
-  I(0x4c90, 3); SET_DE(0xc600);  // ld de,$c600
-  CALL(0x4c93, copyMemory_hook, 0x0486, 0x4c96);  // call $0486
-  I(0x4c96, 3); SET_HL(0xc612);  // ld hl,$c612
-  I(0x4c99, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x4c9b, 2); L = 0x14;  // ld l,$14
-  I(0x4c9d, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x4c9f, initializeFile_b00_hook, 0x09d4, 0x4ca2);  // call $09d4
-  I(0x4ca2, 2); A = 0x56;  // ld a,$56
-  CALL(0x4ca4, playSound_b00_hook, 0x0c98, 0x4ca7);  // call $0c98
-  I(0x4ca7, 4); setFileSelectModeTo1(gb); return;  // jp $4159
-L_4caa:
-  CALL(0x4caa, serialFunc_0c8d_hook, 0x0c8d, 0x4cad);  // call $0c8d
-  I(0x4cad, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4caf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cb0); return; } I(0x4cb0, 2);  // ret nz
-L_4cb1:
-  I(0x4cb1, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4cb4, 2); alu_cp(gb, 0x08);  // cp $08
-  if ((F & FZ)) { I(0x4cb6, 4); closeMenu(gb); return; } I(0x4cb6, 3);  // jp z,$4fba
-  I(0x4cb9, 2); A = 0x00;  // ld a,$00
-  I(0x4cbb, 4); setFileSelectMode(gb); return;  // jp $415b
-L_4cbe:
-  CALL(0x4cbe, serialFunc_0c8d_hook, 0x0c8d, 0x4cc1);  // call $0c8d
-  I(0x4cc1, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4cc3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cc4); return; } I(0x4cc4, 2);  // ret nz
-  I(0x4cc5, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4cc8, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4cca, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4ccd, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4cce, 3); goto L_4cb1; } I(0x4cce, 2);  // jr nz,$4cb1
-  I(0x4cd0, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4cd3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x4cd4); return; } I(0x4cd4, 2);  // ret nz
-  I(0x4cd5, 3); goto L_4cb1;  // jr $4cb1
-}
-
-// 02:4b0e
-void fileSelectDrawAcornCursor__table5(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4b0e:
-  I(0x4b0e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4b0f, 1); C = E;  // ld c,e
-  I(0x4b10, 4); alu_add_sp(gb, 0x4a);  // add sp,$4a
-L_4b12:
-  I(0x4b12, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b13, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4b16, 1); H = H;  // ld h,h
-  I(0x4b17, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b1a:
-  I(0x4b1a, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4b1b, 1); C = E;  // ld c,e
-L_4b1c:
-  if ((F & FC)) { I(0x4b1c, 3); goto L_4b3e; } I(0x4b1c, 2);  // jr c,$4b3e
-  I(0x4b1e, 1); D = B;  // ld d,b
-  if (!(F & FZ)) { I(0x4b1f, 3); goto L_4b89; } I(0x4b1f, 2);  // jr nz,$4b89
-  if (!(F & FZ)) { I(0x4b21, 3); goto L_4b44; } I(0x4b21, 2);  // jr nz,$4b44
-  I(0x4b23, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  I(0x4b24, 2); H = alu_swap(gb, H);  // swap h
-  CALL(0x4b26, fileSelect_redrawDecorationsAndSetWramBank4, 0x4cd7, 0x4b29);  // call $4cd7
-  fileSelectMode7(gb); return;  // fallthrough
-L_4b3e:
-  RST_PUSH(0x4b3e, 0x4b3f);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4b4d: goto L_4b4d; case 0x4b88: goto L_4b88; case 0x4be2: goto L_4be2; case 0x4c04: goto L_4c04; case 0x4c74: goto L_4c74; case 0x4caa: goto L_4caa; case 0x4cbe: goto L_4cbe; default: HANDOFF(HL); }
-L_4b44:
-  I(0x4b44, 1); C = E;  // ld c,e
-  I(0x4b45, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x4b46, 1); C = H;  // ld c,h
-  I(0x4b47, 2); mem_wr(gb, HL, H);  // ld (hl),h
-  I(0x4b48, 1); C = H;  // ld c,h
-  I(0x4b49, 1); alu_xor(gb, D);  // xor d
-  I(0x4b4a, 1); C = H;  // ld c,h
-  I(0x4b4b, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  I(0x4b4c, 1); C = H;  // ld c,h
-L_4b4d:
-  CALL(0x4b4d, disableLcd_hook, 0x02c1, 0x4b50);  // call $02c1
-  I(0x4b50, 2); A = 0xa0;  // ld a,$a0
-  CALL(0x4b52, loadGfxHeader_hook, 0x0626, 0x4b55);  // call $0626
-  I(0x4b55, 2); A = 0xae;  // ld a,$ae
-  CALL(0x4b57, loadGfxHeader_hook, 0x0626, 0x4b5a);  // call $0626
-  I(0x4b5a, 2); A = 0x05;  // ld a,$05
-  CALL(0x4b5c, loadPaletteHeader_hook, 0x050b, 0x4b5f);  // call $050b
-  I(0x4b5f, 2); A = 0x08;  // ld a,$08
-  CALL(0x4b61, loadUncompressedGfxHeader_hook, 0x05da, 0x4b64);  // call $05da
-  I(0x4b64, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  I(0x4b67, 2); B = 0x20;  // ld b,$20
-  CALL(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);  // call $046f
-  CALL(0x4b6c, textInput_updateEntryCursor, 0x4a22, 0x4b6f);  // call $4a22
-  CALL(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);  // call $0c85
-  I(0x4b72, 2); A = 0x04;  // ld a,$04
-  I(0x4b74, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
-  I(0x4b76, 1); alu_xor(gb, A);  // xor a
-  I(0x4b77, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4b79, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4b7c, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b7f, 2); A = 0xf0;  // ld a,$f0
-  I(0x4b81, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4b82, 2); A = 0x1e;  // ld a,$1e
-  I(0x4b84, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4b85, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4b88:
-  I(0x4b88, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-L_4b89:
-  I(0x4b89, 1); alu_cp(gb, D);  // cp d
-  I(0x4b8a, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b8b, 3); goto L_4ba3; } I(0x4b8b, 2);  // jr nz,$4ba3
-  I(0x4b8d, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4b8f, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b90, 4); goto L_4c55; } I(0x4b90, 3);  // jp nz,$4c55
-  I(0x4b93, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b96, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x4b97, 3); goto L_4ba0; } I(0x4b97, 2);  // jr nz,$4ba0
-  I(0x4b99, 2); A = 0x80;  // ld a,$80
-  I(0x4b9b, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4b9d, 4); goto L_4c55;  // jp $4c55
-L_4ba0:
-  I(0x4ba0, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73);  // jp $0c73
-L_4ba3:
-  I(0x4ba3, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4ba6, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4ba7, 3); goto L_4bae; } I(0x4ba7, 2);  // jr z,$4bae
-  I(0x4ba9, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4baa, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4bad); return;  // ret
-L_4bae:
-  CALL(0x4bae, serialFunc_0c8d_hook, 0x0c8d, 0x4bb1);  // call $0c8d
-  I(0x4bb1, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4bb3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4bb4, 3); goto L_4bbd; } I(0x4bb4, 2);  // jr z,$4bbd
-  I(0x4bb6, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x4bb8, 3); goto L_4bbd; } I(0x4bb8, 2);  // jr z,$4bbd
-  if (!(F & FZ)) { I(0x4bba, 4); goto L_4c55; } I(0x4bba, 3);  // jp nz,$4c55
-L_4bbd:
-  I(0x4bbd, 3); A = mem_rd(gb, 0xffbf);  // ldh a,($ffbf)
-  I(0x4bbf, 2); alu_cp(gb, 0x07);  // cp $07
-  if (!(F & FZ)) { RET_TAKEN(0x4bc1); return; } I(0x4bc1, 2);  // ret nz
-  I(0x4bc2, 2); E = 0x03;  // ld e,$03
-L_4bc4:
-  I(0x4bc4, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4bc5, 2); D = 0x00;  // ld d,$00
-  CALL(0x4bc7, getFileDisplayVariableAddress_paramE, 0x417b, 0x4bca);  // call $417b
-  I(0x4bca, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4bcc, 3); goto L_4bdf; } I(0x4bcc, 2);  // jr z,$4bdf
-  I(0x4bce, 1); A = E;  // ld a,e
-  I(0x4bcf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4bd0, 3); goto L_4bc4; } I(0x4bd0, 2);  // jr nz,$4bc4
-  I(0x4bd2, 2); A = 0x85;  // ld a,$85
-  I(0x4bd4, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4bd7, 2); A = 0xff;  // ld a,$ff
-  I(0x4bd9, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4bdc, 4); goto L_4c4b;  // jp $4c4b
-L_4bdf:
-  I(0x4bdf, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4be2:
-  CALL(0x4be2, serialFunc_0c8d_hook, 0x0c8d, 0x4be5);  // call $0c8d
-  I(0x4be5, 2); A = 0x06;  // ld a,$06
-  I(0x4be7, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  I(0x4bea, 1); alu_xor(gb, A);  // xor a
-  CALL(0x4beb, func_02_4149, 0x4149, 0x4bee);  // call $4149
-  CALL(0x4bee, disableLcd_hook, 0x02c1, 0x4bf1);  // call $02c1
-  I(0x4bf1, 2); A = 0xa1;  // ld a,$a1
-  CALL(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);  // call $0626
-  I(0x4bf6, 2); A = 0xaf;  // ld a,$af
-  CALL(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);  // call $0626
-  CALL(0x4bfb, textInput_updateEntryCursor, 0x4a22, 0x4bfe);  // call $4a22
-  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x4c01);  // call $4a4a
-  I(0x4c01, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c04:
-  CALL(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);  // call $0c8d
-  CALL(0x4c07, fileSelectUpdateInput, 0x4467, 0x4c0a);  // call $4467
-  if (!(F & FZ)) { I(0x4c0a, 3); goto L_4c1e; } I(0x4c0a, 2);  // jr nz,$4c1e
-  I(0x4c0c, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4c0f, 2); alu_bit(gb, 1, A);  // bit 1,a
-  if ((F & FZ)) { RET_TAKEN(0x4c11); return; } I(0x4c11, 2);  // ret z
-L_4c12:
-  I(0x4c12, 2); A = 0x03;  // ld a,$03
-  I(0x4c14, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4c17, 2); A = 0x8f;  // ld a,$8f
-  I(0x4c19, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4c1c, 3); goto L_4c4b;  // jr $4c4b
-L_4c1e:
-  I(0x4c1e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
-  I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
-  I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
-  I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
-  I(0x4c30, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-L_4c33:
-  I(0x4c33, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4c36, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FZ)) { I(0x4c38, 3); goto L_4c44; } I(0x4c38, 2);  // jr nz,$4c44
-  I(0x4c3a, 2); A = 0x0c;  // ld a,$0c
-  I(0x4c3c, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c3e, 2); A = 0x05;  // ld a,$05
-  I(0x4c40, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c43); return;  // ret
-L_4c44:
-  I(0x4c44, 2); A = 0x08;  // ld a,$08
-  I(0x4c46, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c48, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c4b:
-  I(0x4c4b, 2); A = 0x08;  // ld a,$08
-  I(0x4c4d, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c4f, 2); A = 0x05;  // ld a,$05
-  I(0x4c51, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c54); return;  // ret
-L_4c55:
-  CALL(0x4c55, disableLcd_hook, 0x02c1, 0x4c58);  // call $02c1
-  I(0x4c58, 2); A = 0x07;  // ld a,$07
-  CALL(0x4c5a, loadGfxHeader_hook, 0x0626, 0x4c5d);  // call $0626
-  CALL(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2, 0x4165, 0x4c60);  // call $4165
-  I(0x4c60, 2); A = 0x08;  // ld a,$08
-  I(0x4c62, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c64, 2); A = 0x06;  // ld a,$06
-  I(0x4c66, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x4c69, 2); A = 0xb4;  // ld a,$b4
-  I(0x4c6b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x4c6e, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4c70, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4c73); return;  // ret
-L_4c74:
-  CALL(0x4c74, serialFunc_0c8d_hook, 0x0c8d, 0x4c77);  // call $0c8d
-  I(0x4c77, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4c79, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4c7a); return; } I(0x4c7a, 2);  // ret nz
-  CALL(0x4c7b, loadFile_b00_hook, 0x09dc, 0x4c7e);  // call $09dc
-  I(0x4c7e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c81, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4c82, 3); SET_HL(0xd98d);  // ld hl,$d98d
-  I(0x4c85, 3); SET_BC(0x0016);  // ld bc,$0016
-L_4c88:
-  I(0x4c88, 1); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { I(0x4c89, 3); goto L_4c8e; } I(0x4c89, 2);  // jr z,$4c8e
-  I(0x4c8b, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x4c8c, 3); goto L_4c88;  // jr $4c88
-L_4c8e:
-  I(0x4c8e, 2); B = 0x16;  // ld b,$16
-  I(0x4c90, 3); SET_DE(0xc600);  // ld de,$c600
-  CALL(0x4c93, copyMemory_hook, 0x0486, 0x4c96);  // call $0486
-  I(0x4c96, 3); SET_HL(0xc612);  // ld hl,$c612
-  I(0x4c99, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x4c9b, 2); L = 0x14;  // ld l,$14
-  I(0x4c9d, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x4c9f, initializeFile_b00_hook, 0x09d4, 0x4ca2);  // call $09d4
-  I(0x4ca2, 2); A = 0x56;  // ld a,$56
-  CALL(0x4ca4, playSound_b00_hook, 0x0c98, 0x4ca7);  // call $0c98
-  I(0x4ca7, 4); setFileSelectModeTo1(gb); return;  // jp $4159
-L_4caa:
-  CALL(0x4caa, serialFunc_0c8d_hook, 0x0c8d, 0x4cad);  // call $0c8d
-  I(0x4cad, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4caf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cb0); return; } I(0x4cb0, 2);  // ret nz
-L_4cb1:
-  I(0x4cb1, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4cb4, 2); alu_cp(gb, 0x08);  // cp $08
-  if ((F & FZ)) { I(0x4cb6, 4); closeMenu(gb); return; } I(0x4cb6, 3);  // jp z,$4fba
-  I(0x4cb9, 2); A = 0x00;  // ld a,$00
-  I(0x4cbb, 4); setFileSelectMode(gb); return;  // jp $415b
-L_4cbe:
-  CALL(0x4cbe, serialFunc_0c8d_hook, 0x0c8d, 0x4cc1);  // call $0c8d
-  I(0x4cc1, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4cc3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cc4); return; } I(0x4cc4, 2);  // ret nz
-  I(0x4cc5, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4cc8, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4cca, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4ccd, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4cce, 3); goto L_4cb1; } I(0x4cce, 2);  // jr nz,$4cb1
-  I(0x4cd0, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4cd3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x4cd4); return; } I(0x4cd4, 2);  // ret nz
-  I(0x4cd5, 3); goto L_4cb1;  // jr $4cb1
-}
-
-// 02:4b12
-void fileSelectDrawAcornCursor__data51(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4b12:
-  I(0x4b12, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4b13, 4); mem_wr(gb, 0x084c, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x084d, gb->sp >> 8);  // ld ($084c),sp
-  I(0x4b16, 1); H = H;  // ld h,h
-  I(0x4b17, 4); mem_wr(gb, 0x227a, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x227b, gb->sp >> 8);  // ld ($227a),sp
-L_4b1a:
-  I(0x4b1a, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4b1b, 1); C = E;  // ld c,e
-L_4b1c:
-  if ((F & FC)) { I(0x4b1c, 3); goto L_4b3e; } I(0x4b1c, 2);  // jr c,$4b3e
-  I(0x4b1e, 1); D = B;  // ld d,b
-  if (!(F & FZ)) { I(0x4b1f, 3); goto L_4b89; } I(0x4b1f, 2);  // jr nz,$4b89
-  if (!(F & FZ)) { I(0x4b21, 3); goto L_4b44; } I(0x4b21, 2);  // jr nz,$4b44
-  I(0x4b23, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  I(0x4b24, 2); H = alu_swap(gb, H);  // swap h
-  CALL(0x4b26, fileSelect_redrawDecorationsAndSetWramBank4, 0x4cd7, 0x4b29);  // call $4cd7
-  fileSelectMode7(gb); return;  // fallthrough
-L_4b3e:
-  RST_PUSH(0x4b3e, 0x4b3f);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4b4d: goto L_4b4d; case 0x4b88: goto L_4b88; case 0x4be2: goto L_4be2; case 0x4c04: goto L_4c04; case 0x4c74: goto L_4c74; case 0x4caa: goto L_4caa; case 0x4cbe: goto L_4cbe; default: HANDOFF(HL); }
-L_4b44:
-  I(0x4b44, 1); C = E;  // ld c,e
-  I(0x4b45, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x4b46, 1); C = H;  // ld c,h
-  I(0x4b47, 2); mem_wr(gb, HL, H);  // ld (hl),h
-  I(0x4b48, 1); C = H;  // ld c,h
-  I(0x4b49, 1); alu_xor(gb, D);  // xor d
-  I(0x4b4a, 1); C = H;  // ld c,h
-  I(0x4b4b, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  I(0x4b4c, 1); C = H;  // ld c,h
-L_4b4d:
-  CALL(0x4b4d, disableLcd_hook, 0x02c1, 0x4b50);  // call $02c1
-  I(0x4b50, 2); A = 0xa0;  // ld a,$a0
-  CALL(0x4b52, loadGfxHeader_hook, 0x0626, 0x4b55);  // call $0626
-  I(0x4b55, 2); A = 0xae;  // ld a,$ae
-  CALL(0x4b57, loadGfxHeader_hook, 0x0626, 0x4b5a);  // call $0626
-  I(0x4b5a, 2); A = 0x05;  // ld a,$05
-  CALL(0x4b5c, loadPaletteHeader_hook, 0x050b, 0x4b5f);  // call $050b
-  I(0x4b5f, 2); A = 0x08;  // ld a,$08
-  CALL(0x4b61, loadUncompressedGfxHeader_hook, 0x05da, 0x4b64);  // call $05da
-  I(0x4b64, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  I(0x4b67, 2); B = 0x20;  // ld b,$20
-  CALL(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);  // call $046f
-  CALL(0x4b6c, textInput_updateEntryCursor, 0x4a22, 0x4b6f);  // call $4a22
-  CALL(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);  // call $0c85
-  I(0x4b72, 2); A = 0x04;  // ld a,$04
-  I(0x4b74, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
-  I(0x4b76, 1); alu_xor(gb, A);  // xor a
-  I(0x4b77, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4b79, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4b7c, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b7f, 2); A = 0xf0;  // ld a,$f0
-  I(0x4b81, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4b82, 2); A = 0x1e;  // ld a,$1e
-  I(0x4b84, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4b85, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4b88:
-  I(0x4b88, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-L_4b89:
-  I(0x4b89, 1); alu_cp(gb, D);  // cp d
-  I(0x4b8a, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b8b, 3); goto L_4ba3; } I(0x4b8b, 2);  // jr nz,$4ba3
-  I(0x4b8d, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4b8f, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b90, 4); goto L_4c55; } I(0x4b90, 3);  // jp nz,$4c55
-  I(0x4b93, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b96, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x4b97, 3); goto L_4ba0; } I(0x4b97, 2);  // jr nz,$4ba0
-  I(0x4b99, 2); A = 0x80;  // ld a,$80
-  I(0x4b9b, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4b9d, 4); goto L_4c55;  // jp $4c55
-L_4ba0:
-  I(0x4ba0, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73);  // jp $0c73
-L_4ba3:
-  I(0x4ba3, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4ba6, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4ba7, 3); goto L_4bae; } I(0x4ba7, 2);  // jr z,$4bae
-  I(0x4ba9, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4baa, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4bad); return;  // ret
-L_4bae:
-  CALL(0x4bae, serialFunc_0c8d_hook, 0x0c8d, 0x4bb1);  // call $0c8d
-  I(0x4bb1, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4bb3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4bb4, 3); goto L_4bbd; } I(0x4bb4, 2);  // jr z,$4bbd
-  I(0x4bb6, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x4bb8, 3); goto L_4bbd; } I(0x4bb8, 2);  // jr z,$4bbd
-  if (!(F & FZ)) { I(0x4bba, 4); goto L_4c55; } I(0x4bba, 3);  // jp nz,$4c55
-L_4bbd:
-  I(0x4bbd, 3); A = mem_rd(gb, 0xffbf);  // ldh a,($ffbf)
-  I(0x4bbf, 2); alu_cp(gb, 0x07);  // cp $07
-  if (!(F & FZ)) { RET_TAKEN(0x4bc1); return; } I(0x4bc1, 2);  // ret nz
-  I(0x4bc2, 2); E = 0x03;  // ld e,$03
-L_4bc4:
-  I(0x4bc4, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4bc5, 2); D = 0x00;  // ld d,$00
-  CALL(0x4bc7, getFileDisplayVariableAddress_paramE, 0x417b, 0x4bca);  // call $417b
-  I(0x4bca, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4bcc, 3); goto L_4bdf; } I(0x4bcc, 2);  // jr z,$4bdf
-  I(0x4bce, 1); A = E;  // ld a,e
-  I(0x4bcf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4bd0, 3); goto L_4bc4; } I(0x4bd0, 2);  // jr nz,$4bc4
-  I(0x4bd2, 2); A = 0x85;  // ld a,$85
-  I(0x4bd4, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4bd7, 2); A = 0xff;  // ld a,$ff
-  I(0x4bd9, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4bdc, 4); goto L_4c4b;  // jp $4c4b
-L_4bdf:
-  I(0x4bdf, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4be2:
-  CALL(0x4be2, serialFunc_0c8d_hook, 0x0c8d, 0x4be5);  // call $0c8d
-  I(0x4be5, 2); A = 0x06;  // ld a,$06
-  I(0x4be7, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  I(0x4bea, 1); alu_xor(gb, A);  // xor a
-  CALL(0x4beb, func_02_4149, 0x4149, 0x4bee);  // call $4149
-  CALL(0x4bee, disableLcd_hook, 0x02c1, 0x4bf1);  // call $02c1
-  I(0x4bf1, 2); A = 0xa1;  // ld a,$a1
-  CALL(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);  // call $0626
-  I(0x4bf6, 2); A = 0xaf;  // ld a,$af
-  CALL(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);  // call $0626
-  CALL(0x4bfb, textInput_updateEntryCursor, 0x4a22, 0x4bfe);  // call $4a22
-  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x4c01);  // call $4a4a
-  I(0x4c01, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c04:
-  CALL(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);  // call $0c8d
-  CALL(0x4c07, fileSelectUpdateInput, 0x4467, 0x4c0a);  // call $4467
-  if (!(F & FZ)) { I(0x4c0a, 3); goto L_4c1e; } I(0x4c0a, 2);  // jr nz,$4c1e
-  I(0x4c0c, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4c0f, 2); alu_bit(gb, 1, A);  // bit 1,a
-  if ((F & FZ)) { RET_TAKEN(0x4c11); return; } I(0x4c11, 2);  // ret z
-L_4c12:
-  I(0x4c12, 2); A = 0x03;  // ld a,$03
-  I(0x4c14, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4c17, 2); A = 0x8f;  // ld a,$8f
-  I(0x4c19, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4c1c, 3); goto L_4c4b;  // jr $4c4b
-L_4c1e:
-  I(0x4c1e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
-  I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
-  I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
-  I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
-  I(0x4c30, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-L_4c33:
-  I(0x4c33, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4c36, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FZ)) { I(0x4c38, 3); goto L_4c44; } I(0x4c38, 2);  // jr nz,$4c44
-  I(0x4c3a, 2); A = 0x0c;  // ld a,$0c
-  I(0x4c3c, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c3e, 2); A = 0x05;  // ld a,$05
-  I(0x4c40, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c43); return;  // ret
-L_4c44:
-  I(0x4c44, 2); A = 0x08;  // ld a,$08
-  I(0x4c46, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c48, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c4b:
-  I(0x4c4b, 2); A = 0x08;  // ld a,$08
-  I(0x4c4d, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c4f, 2); A = 0x05;  // ld a,$05
-  I(0x4c51, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c54); return;  // ret
-L_4c55:
-  CALL(0x4c55, disableLcd_hook, 0x02c1, 0x4c58);  // call $02c1
-  I(0x4c58, 2); A = 0x07;  // ld a,$07
-  CALL(0x4c5a, loadGfxHeader_hook, 0x0626, 0x4c5d);  // call $0626
-  CALL(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2, 0x4165, 0x4c60);  // call $4165
-  I(0x4c60, 2); A = 0x08;  // ld a,$08
-  I(0x4c62, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c64, 2); A = 0x06;  // ld a,$06
-  I(0x4c66, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x4c69, 2); A = 0xb4;  // ld a,$b4
-  I(0x4c6b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x4c6e, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4c70, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4c73); return;  // ret
-L_4c74:
-  CALL(0x4c74, serialFunc_0c8d_hook, 0x0c8d, 0x4c77);  // call $0c8d
-  I(0x4c77, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4c79, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4c7a); return; } I(0x4c7a, 2);  // ret nz
-  CALL(0x4c7b, loadFile_b00_hook, 0x09dc, 0x4c7e);  // call $09dc
-  I(0x4c7e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c81, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4c82, 3); SET_HL(0xd98d);  // ld hl,$d98d
-  I(0x4c85, 3); SET_BC(0x0016);  // ld bc,$0016
-L_4c88:
-  I(0x4c88, 1); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { I(0x4c89, 3); goto L_4c8e; } I(0x4c89, 2);  // jr z,$4c8e
-  I(0x4c8b, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x4c8c, 3); goto L_4c88;  // jr $4c88
-L_4c8e:
-  I(0x4c8e, 2); B = 0x16;  // ld b,$16
-  I(0x4c90, 3); SET_DE(0xc600);  // ld de,$c600
-  CALL(0x4c93, copyMemory_hook, 0x0486, 0x4c96);  // call $0486
-  I(0x4c96, 3); SET_HL(0xc612);  // ld hl,$c612
-  I(0x4c99, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x4c9b, 2); L = 0x14;  // ld l,$14
-  I(0x4c9d, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x4c9f, initializeFile_b00_hook, 0x09d4, 0x4ca2);  // call $09d4
-  I(0x4ca2, 2); A = 0x56;  // ld a,$56
-  CALL(0x4ca4, playSound_b00_hook, 0x0c98, 0x4ca7);  // call $0c98
-  I(0x4ca7, 4); setFileSelectModeTo1(gb); return;  // jp $4159
-L_4caa:
-  CALL(0x4caa, serialFunc_0c8d_hook, 0x0c8d, 0x4cad);  // call $0c8d
-  I(0x4cad, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4caf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cb0); return; } I(0x4cb0, 2);  // ret nz
-L_4cb1:
-  I(0x4cb1, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4cb4, 2); alu_cp(gb, 0x08);  // cp $08
-  if ((F & FZ)) { I(0x4cb6, 4); closeMenu(gb); return; } I(0x4cb6, 3);  // jp z,$4fba
-  I(0x4cb9, 2); A = 0x00;  // ld a,$00
-  I(0x4cbb, 4); setFileSelectMode(gb); return;  // jp $415b
-L_4cbe:
-  CALL(0x4cbe, serialFunc_0c8d_hook, 0x0c8d, 0x4cc1);  // call $0c8d
-  I(0x4cc1, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4cc3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cc4); return; } I(0x4cc4, 2);  // ret nz
-  I(0x4cc5, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4cc8, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4cca, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4ccd, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4cce, 3); goto L_4cb1; } I(0x4cce, 2);  // jr nz,$4cb1
-  I(0x4cd0, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4cd3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x4cd4); return; } I(0x4cd4, 2);  // ret nz
-  I(0x4cd5, 3); goto L_4cb1;  // jr $4cb1
-}
-
-// 02:4b1a
-void fileSelectDrawAcornCursor__table6(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4b1a:
-  I(0x4b1a, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4b1b, 1); C = E;  // ld c,e
-L_4b1c:
-  if ((F & FC)) { I(0x4b1c, 3); goto L_4b3e; } I(0x4b1c, 2);  // jr c,$4b3e
-  I(0x4b1e, 1); D = B;  // ld d,b
-  if (!(F & FZ)) { I(0x4b1f, 3); goto L_4b89; } I(0x4b1f, 2);  // jr nz,$4b89
-  if (!(F & FZ)) { I(0x4b21, 3); goto L_4b44; } I(0x4b21, 2);  // jr nz,$4b44
-  I(0x4b23, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  I(0x4b24, 2); H = alu_swap(gb, H);  // swap h
-  CALL(0x4b26, fileSelect_redrawDecorationsAndSetWramBank4, 0x4cd7, 0x4b29);  // call $4cd7
-  fileSelectMode7(gb); return;  // fallthrough
-L_4b3e:
-  RST_PUSH(0x4b3e, 0x4b3f);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4b4d: goto L_4b4d; case 0x4b88: goto L_4b88; case 0x4be2: goto L_4be2; case 0x4c04: goto L_4c04; case 0x4c74: goto L_4c74; case 0x4caa: goto L_4caa; case 0x4cbe: goto L_4cbe; default: HANDOFF(HL); }
-L_4b44:
-  I(0x4b44, 1); C = E;  // ld c,e
-  I(0x4b45, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x4b46, 1); C = H;  // ld c,h
-  I(0x4b47, 2); mem_wr(gb, HL, H);  // ld (hl),h
-  I(0x4b48, 1); C = H;  // ld c,h
-  I(0x4b49, 1); alu_xor(gb, D);  // xor d
-  I(0x4b4a, 1); C = H;  // ld c,h
-  I(0x4b4b, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  I(0x4b4c, 1); C = H;  // ld c,h
-L_4b4d:
-  CALL(0x4b4d, disableLcd_hook, 0x02c1, 0x4b50);  // call $02c1
-  I(0x4b50, 2); A = 0xa0;  // ld a,$a0
-  CALL(0x4b52, loadGfxHeader_hook, 0x0626, 0x4b55);  // call $0626
-  I(0x4b55, 2); A = 0xae;  // ld a,$ae
-  CALL(0x4b57, loadGfxHeader_hook, 0x0626, 0x4b5a);  // call $0626
-  I(0x4b5a, 2); A = 0x05;  // ld a,$05
-  CALL(0x4b5c, loadPaletteHeader_hook, 0x050b, 0x4b5f);  // call $050b
-  I(0x4b5f, 2); A = 0x08;  // ld a,$08
-  CALL(0x4b61, loadUncompressedGfxHeader_hook, 0x05da, 0x4b64);  // call $05da
-  I(0x4b64, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  I(0x4b67, 2); B = 0x20;  // ld b,$20
-  CALL(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);  // call $046f
-  CALL(0x4b6c, textInput_updateEntryCursor, 0x4a22, 0x4b6f);  // call $4a22
-  CALL(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);  // call $0c85
-  I(0x4b72, 2); A = 0x04;  // ld a,$04
-  I(0x4b74, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
-  I(0x4b76, 1); alu_xor(gb, A);  // xor a
-  I(0x4b77, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4b79, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4b7c, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b7f, 2); A = 0xf0;  // ld a,$f0
-  I(0x4b81, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4b82, 2); A = 0x1e;  // ld a,$1e
-  I(0x4b84, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4b85, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4b88:
-  I(0x4b88, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-L_4b89:
-  I(0x4b89, 1); alu_cp(gb, D);  // cp d
-  I(0x4b8a, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b8b, 3); goto L_4ba3; } I(0x4b8b, 2);  // jr nz,$4ba3
-  I(0x4b8d, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4b8f, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b90, 4); goto L_4c55; } I(0x4b90, 3);  // jp nz,$4c55
-  I(0x4b93, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b96, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x4b97, 3); goto L_4ba0; } I(0x4b97, 2);  // jr nz,$4ba0
-  I(0x4b99, 2); A = 0x80;  // ld a,$80
-  I(0x4b9b, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4b9d, 4); goto L_4c55;  // jp $4c55
-L_4ba0:
-  I(0x4ba0, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73);  // jp $0c73
-L_4ba3:
-  I(0x4ba3, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4ba6, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4ba7, 3); goto L_4bae; } I(0x4ba7, 2);  // jr z,$4bae
-  I(0x4ba9, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4baa, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4bad); return;  // ret
-L_4bae:
-  CALL(0x4bae, serialFunc_0c8d_hook, 0x0c8d, 0x4bb1);  // call $0c8d
-  I(0x4bb1, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4bb3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4bb4, 3); goto L_4bbd; } I(0x4bb4, 2);  // jr z,$4bbd
-  I(0x4bb6, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x4bb8, 3); goto L_4bbd; } I(0x4bb8, 2);  // jr z,$4bbd
-  if (!(F & FZ)) { I(0x4bba, 4); goto L_4c55; } I(0x4bba, 3);  // jp nz,$4c55
-L_4bbd:
-  I(0x4bbd, 3); A = mem_rd(gb, 0xffbf);  // ldh a,($ffbf)
-  I(0x4bbf, 2); alu_cp(gb, 0x07);  // cp $07
-  if (!(F & FZ)) { RET_TAKEN(0x4bc1); return; } I(0x4bc1, 2);  // ret nz
-  I(0x4bc2, 2); E = 0x03;  // ld e,$03
-L_4bc4:
-  I(0x4bc4, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4bc5, 2); D = 0x00;  // ld d,$00
-  CALL(0x4bc7, getFileDisplayVariableAddress_paramE, 0x417b, 0x4bca);  // call $417b
-  I(0x4bca, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4bcc, 3); goto L_4bdf; } I(0x4bcc, 2);  // jr z,$4bdf
-  I(0x4bce, 1); A = E;  // ld a,e
-  I(0x4bcf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4bd0, 3); goto L_4bc4; } I(0x4bd0, 2);  // jr nz,$4bc4
-  I(0x4bd2, 2); A = 0x85;  // ld a,$85
-  I(0x4bd4, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4bd7, 2); A = 0xff;  // ld a,$ff
-  I(0x4bd9, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4bdc, 4); goto L_4c4b;  // jp $4c4b
-L_4bdf:
-  I(0x4bdf, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4be2:
-  CALL(0x4be2, serialFunc_0c8d_hook, 0x0c8d, 0x4be5);  // call $0c8d
-  I(0x4be5, 2); A = 0x06;  // ld a,$06
-  I(0x4be7, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  I(0x4bea, 1); alu_xor(gb, A);  // xor a
-  CALL(0x4beb, func_02_4149, 0x4149, 0x4bee);  // call $4149
-  CALL(0x4bee, disableLcd_hook, 0x02c1, 0x4bf1);  // call $02c1
-  I(0x4bf1, 2); A = 0xa1;  // ld a,$a1
-  CALL(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);  // call $0626
-  I(0x4bf6, 2); A = 0xaf;  // ld a,$af
-  CALL(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);  // call $0626
-  CALL(0x4bfb, textInput_updateEntryCursor, 0x4a22, 0x4bfe);  // call $4a22
-  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x4c01);  // call $4a4a
-  I(0x4c01, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c04:
-  CALL(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);  // call $0c8d
-  CALL(0x4c07, fileSelectUpdateInput, 0x4467, 0x4c0a);  // call $4467
-  if (!(F & FZ)) { I(0x4c0a, 3); goto L_4c1e; } I(0x4c0a, 2);  // jr nz,$4c1e
-  I(0x4c0c, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4c0f, 2); alu_bit(gb, 1, A);  // bit 1,a
-  if ((F & FZ)) { RET_TAKEN(0x4c11); return; } I(0x4c11, 2);  // ret z
-L_4c12:
-  I(0x4c12, 2); A = 0x03;  // ld a,$03
-  I(0x4c14, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4c17, 2); A = 0x8f;  // ld a,$8f
-  I(0x4c19, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4c1c, 3); goto L_4c4b;  // jr $4c4b
-L_4c1e:
-  I(0x4c1e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
-  I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
-  I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
-  I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
-  I(0x4c30, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-L_4c33:
-  I(0x4c33, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4c36, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FZ)) { I(0x4c38, 3); goto L_4c44; } I(0x4c38, 2);  // jr nz,$4c44
-  I(0x4c3a, 2); A = 0x0c;  // ld a,$0c
-  I(0x4c3c, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c3e, 2); A = 0x05;  // ld a,$05
-  I(0x4c40, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c43); return;  // ret
-L_4c44:
-  I(0x4c44, 2); A = 0x08;  // ld a,$08
-  I(0x4c46, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c48, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c4b:
-  I(0x4c4b, 2); A = 0x08;  // ld a,$08
-  I(0x4c4d, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c4f, 2); A = 0x05;  // ld a,$05
-  I(0x4c51, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c54); return;  // ret
-L_4c55:
-  CALL(0x4c55, disableLcd_hook, 0x02c1, 0x4c58);  // call $02c1
-  I(0x4c58, 2); A = 0x07;  // ld a,$07
-  CALL(0x4c5a, loadGfxHeader_hook, 0x0626, 0x4c5d);  // call $0626
-  CALL(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2, 0x4165, 0x4c60);  // call $4165
-  I(0x4c60, 2); A = 0x08;  // ld a,$08
-  I(0x4c62, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c64, 2); A = 0x06;  // ld a,$06
-  I(0x4c66, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x4c69, 2); A = 0xb4;  // ld a,$b4
-  I(0x4c6b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x4c6e, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4c70, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4c73); return;  // ret
-L_4c74:
-  CALL(0x4c74, serialFunc_0c8d_hook, 0x0c8d, 0x4c77);  // call $0c8d
-  I(0x4c77, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4c79, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4c7a); return; } I(0x4c7a, 2);  // ret nz
-  CALL(0x4c7b, loadFile_b00_hook, 0x09dc, 0x4c7e);  // call $09dc
-  I(0x4c7e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c81, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4c82, 3); SET_HL(0xd98d);  // ld hl,$d98d
-  I(0x4c85, 3); SET_BC(0x0016);  // ld bc,$0016
-L_4c88:
-  I(0x4c88, 1); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { I(0x4c89, 3); goto L_4c8e; } I(0x4c89, 2);  // jr z,$4c8e
-  I(0x4c8b, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x4c8c, 3); goto L_4c88;  // jr $4c88
-L_4c8e:
-  I(0x4c8e, 2); B = 0x16;  // ld b,$16
-  I(0x4c90, 3); SET_DE(0xc600);  // ld de,$c600
-  CALL(0x4c93, copyMemory_hook, 0x0486, 0x4c96);  // call $0486
-  I(0x4c96, 3); SET_HL(0xc612);  // ld hl,$c612
-  I(0x4c99, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x4c9b, 2); L = 0x14;  // ld l,$14
-  I(0x4c9d, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x4c9f, initializeFile_b00_hook, 0x09d4, 0x4ca2);  // call $09d4
-  I(0x4ca2, 2); A = 0x56;  // ld a,$56
-  CALL(0x4ca4, playSound_b00_hook, 0x0c98, 0x4ca7);  // call $0c98
-  I(0x4ca7, 4); setFileSelectModeTo1(gb); return;  // jp $4159
-L_4caa:
-  CALL(0x4caa, serialFunc_0c8d_hook, 0x0c8d, 0x4cad);  // call $0c8d
-  I(0x4cad, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4caf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cb0); return; } I(0x4cb0, 2);  // ret nz
-L_4cb1:
-  I(0x4cb1, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4cb4, 2); alu_cp(gb, 0x08);  // cp $08
-  if ((F & FZ)) { I(0x4cb6, 4); closeMenu(gb); return; } I(0x4cb6, 3);  // jp z,$4fba
-  I(0x4cb9, 2); A = 0x00;  // ld a,$00
-  I(0x4cbb, 4); setFileSelectMode(gb); return;  // jp $415b
-L_4cbe:
-  CALL(0x4cbe, serialFunc_0c8d_hook, 0x0c8d, 0x4cc1);  // call $0c8d
-  I(0x4cc1, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4cc3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cc4); return; } I(0x4cc4, 2);  // ret nz
-  I(0x4cc5, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4cc8, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4cca, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4ccd, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4cce, 3); goto L_4cb1; } I(0x4cce, 2);  // jr nz,$4cb1
-  I(0x4cd0, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4cd3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x4cd4); return; } I(0x4cd4, 2);  // ret nz
-  I(0x4cd5, 3); goto L_4cb1;  // jr $4cb1
-}
-
-// 02:4b1c
-void fileSelectDrawAcornCursor__data61(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4b1c:
-  if ((F & FC)) { I(0x4b1c, 3); goto L_4b3e; } I(0x4b1c, 2);  // jr c,$4b3e
-  I(0x4b1e, 1); D = B;  // ld d,b
-  if (!(F & FZ)) { I(0x4b1f, 3); goto L_4b89; } I(0x4b1f, 2);  // jr nz,$4b89
-  if (!(F & FZ)) { I(0x4b21, 3); goto L_4b44; } I(0x4b21, 2);  // jr nz,$4b44
-  I(0x4b23, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  I(0x4b24, 2); H = alu_swap(gb, H);  // swap h
-  CALL(0x4b26, fileSelect_redrawDecorationsAndSetWramBank4, 0x4cd7, 0x4b29);  // call $4cd7
-  fileSelectMode7(gb); return;  // fallthrough
-L_4b3e:
-  RST_PUSH(0x4b3e, 0x4b3f);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4b4d: goto L_4b4d; case 0x4b88: goto L_4b88; case 0x4be2: goto L_4be2; case 0x4c04: goto L_4c04; case 0x4c74: goto L_4c74; case 0x4caa: goto L_4caa; case 0x4cbe: goto L_4cbe; default: HANDOFF(HL); }
-L_4b44:
-  I(0x4b44, 1); C = E;  // ld c,e
-  I(0x4b45, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x4b46, 1); C = H;  // ld c,h
-  I(0x4b47, 2); mem_wr(gb, HL, H);  // ld (hl),h
-  I(0x4b48, 1); C = H;  // ld c,h
-  I(0x4b49, 1); alu_xor(gb, D);  // xor d
-  I(0x4b4a, 1); C = H;  // ld c,h
-  I(0x4b4b, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  I(0x4b4c, 1); C = H;  // ld c,h
-L_4b4d:
-  CALL(0x4b4d, disableLcd_hook, 0x02c1, 0x4b50);  // call $02c1
-  I(0x4b50, 2); A = 0xa0;  // ld a,$a0
-  CALL(0x4b52, loadGfxHeader_hook, 0x0626, 0x4b55);  // call $0626
-  I(0x4b55, 2); A = 0xae;  // ld a,$ae
-  CALL(0x4b57, loadGfxHeader_hook, 0x0626, 0x4b5a);  // call $0626
-  I(0x4b5a, 2); A = 0x05;  // ld a,$05
-  CALL(0x4b5c, loadPaletteHeader_hook, 0x050b, 0x4b5f);  // call $050b
-  I(0x4b5f, 2); A = 0x08;  // ld a,$08
-  CALL(0x4b61, loadUncompressedGfxHeader_hook, 0x05da, 0x4b64);  // call $05da
-  I(0x4b64, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  I(0x4b67, 2); B = 0x20;  // ld b,$20
-  CALL(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);  // call $046f
-  CALL(0x4b6c, textInput_updateEntryCursor, 0x4a22, 0x4b6f);  // call $4a22
-  CALL(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);  // call $0c85
-  I(0x4b72, 2); A = 0x04;  // ld a,$04
-  I(0x4b74, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
-  I(0x4b76, 1); alu_xor(gb, A);  // xor a
-  I(0x4b77, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4b79, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4b7c, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b7f, 2); A = 0xf0;  // ld a,$f0
-  I(0x4b81, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4b82, 2); A = 0x1e;  // ld a,$1e
-  I(0x4b84, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4b85, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4b88:
-  I(0x4b88, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-L_4b89:
-  I(0x4b89, 1); alu_cp(gb, D);  // cp d
-  I(0x4b8a, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b8b, 3); goto L_4ba3; } I(0x4b8b, 2);  // jr nz,$4ba3
-  I(0x4b8d, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4b8f, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4b90, 4); goto L_4c55; } I(0x4b90, 3);  // jp nz,$4c55
-  I(0x4b93, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4b96, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x4b97, 3); goto L_4ba0; } I(0x4b97, 2);  // jr nz,$4ba0
-  I(0x4b99, 2); A = 0x80;  // ld a,$80
-  I(0x4b9b, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4b9d, 4); goto L_4c55;  // jp $4c55
-L_4ba0:
-  I(0x4ba0, 4); if (hook_enabled_at(0x0c73)) { serialFunc_0c73_hook(gb); return; } HANDOFF(0x0c73);  // jp $0c73
-L_4ba3:
-  I(0x4ba3, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4ba6, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4ba7, 3); goto L_4bae; } I(0x4ba7, 2);  // jr z,$4bae
-  I(0x4ba9, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4baa, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4bad); return;  // ret
-L_4bae:
-  CALL(0x4bae, serialFunc_0c8d_hook, 0x0c8d, 0x4bb1);  // call $0c8d
-  I(0x4bb1, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4bb3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4bb4, 3); goto L_4bbd; } I(0x4bb4, 2);  // jr z,$4bbd
-  I(0x4bb6, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x4bb8, 3); goto L_4bbd; } I(0x4bb8, 2);  // jr z,$4bbd
-  if (!(F & FZ)) { I(0x4bba, 4); goto L_4c55; } I(0x4bba, 3);  // jp nz,$4c55
-L_4bbd:
-  I(0x4bbd, 3); A = mem_rd(gb, 0xffbf);  // ldh a,($ffbf)
-  I(0x4bbf, 2); alu_cp(gb, 0x07);  // cp $07
-  if (!(F & FZ)) { RET_TAKEN(0x4bc1); return; } I(0x4bc1, 2);  // ret nz
-  I(0x4bc2, 2); E = 0x03;  // ld e,$03
-L_4bc4:
-  I(0x4bc4, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4bc5, 2); D = 0x00;  // ld d,$00
-  CALL(0x4bc7, getFileDisplayVariableAddress_paramE, 0x417b, 0x4bca);  // call $417b
-  I(0x4bca, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4bcc, 3); goto L_4bdf; } I(0x4bcc, 2);  // jr z,$4bdf
-  I(0x4bce, 1); A = E;  // ld a,e
-  I(0x4bcf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4bd0, 3); goto L_4bc4; } I(0x4bd0, 2);  // jr nz,$4bc4
-  I(0x4bd2, 2); A = 0x85;  // ld a,$85
-  I(0x4bd4, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4bd7, 2); A = 0xff;  // ld a,$ff
-  I(0x4bd9, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4bdc, 4); goto L_4c4b;  // jp $4c4b
-L_4bdf:
-  I(0x4bdf, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4be2:
-  CALL(0x4be2, serialFunc_0c8d_hook, 0x0c8d, 0x4be5);  // call $0c8d
-  I(0x4be5, 2); A = 0x06;  // ld a,$06
-  I(0x4be7, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  I(0x4bea, 1); alu_xor(gb, A);  // xor a
-  CALL(0x4beb, func_02_4149, 0x4149, 0x4bee);  // call $4149
-  CALL(0x4bee, disableLcd_hook, 0x02c1, 0x4bf1);  // call $02c1
-  I(0x4bf1, 2); A = 0xa1;  // ld a,$a1
-  CALL(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);  // call $0626
-  I(0x4bf6, 2); A = 0xaf;  // ld a,$af
-  CALL(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);  // call $0626
-  CALL(0x4bfb, textInput_updateEntryCursor, 0x4a22, 0x4bfe);  // call $4a22
-  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x4c01);  // call $4a4a
-  I(0x4c01, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c04:
-  CALL(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);  // call $0c8d
-  CALL(0x4c07, fileSelectUpdateInput, 0x4467, 0x4c0a);  // call $4467
-  if (!(F & FZ)) { I(0x4c0a, 3); goto L_4c1e; } I(0x4c0a, 2);  // jr nz,$4c1e
-  I(0x4c0c, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4c0f, 2); alu_bit(gb, 1, A);  // bit 1,a
-  if ((F & FZ)) { RET_TAKEN(0x4c11); return; } I(0x4c11, 2);  // ret z
-L_4c12:
-  I(0x4c12, 2); A = 0x03;  // ld a,$03
-  I(0x4c14, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  I(0x4c17, 2); A = 0x8f;  // ld a,$8f
-  I(0x4c19, 4); mem_wr(gb, 0xcbc2, A);  // ld ($cbc2),a
-  I(0x4c1c, 3); goto L_4c4b;  // jr $4c4b
-L_4c1e:
-  I(0x4c1e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
-  I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
-  I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
-  I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
-  I(0x4c30, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-L_4c33:
-  I(0x4c33, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4c36, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FZ)) { I(0x4c38, 3); goto L_4c44; } I(0x4c38, 2);  // jr nz,$4c44
-  I(0x4c3a, 2); A = 0x0c;  // ld a,$0c
-  I(0x4c3c, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c3e, 2); A = 0x05;  // ld a,$05
-  I(0x4c40, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c43); return;  // ret
-L_4c44:
-  I(0x4c44, 2); A = 0x08;  // ld a,$08
-  I(0x4c46, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c48, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
-L_4c4b:
-  I(0x4c4b, 2); A = 0x08;  // ld a,$08
-  I(0x4c4d, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c4f, 2); A = 0x05;  // ld a,$05
-  I(0x4c51, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  RET(0x4c54); return;  // ret
-L_4c55:
-  CALL(0x4c55, disableLcd_hook, 0x02c1, 0x4c58);  // call $02c1
-  I(0x4c58, 2); A = 0x07;  // ld a,$07
-  CALL(0x4c5a, loadGfxHeader_hook, 0x0626, 0x4c5d);  // call $0626
-  CALL(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2, 0x4165, 0x4c60);  // call $4165
-  I(0x4c60, 2); A = 0x08;  // ld a,$08
-  I(0x4c62, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4c64, 2); A = 0x06;  // ld a,$06
-  I(0x4c66, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x4c69, 2); A = 0xb4;  // ld a,$b4
-  I(0x4c6b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x4c6e, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
-  I(0x4c70, 4); mem_wr(gb, 0xcbc0, A);  // ld ($cbc0),a
-  RET(0x4c73); return;  // ret
-L_4c74:
-  CALL(0x4c74, serialFunc_0c8d_hook, 0x0c8d, 0x4c77);  // call $0c8d
-  I(0x4c77, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4c79, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4c7a); return; } I(0x4c7a, 2);  // ret nz
-  CALL(0x4c7b, loadFile_b00_hook, 0x09dc, 0x4c7e);  // call $09dc
-  I(0x4c7e, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4c81, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4c82, 3); SET_HL(0xd98d);  // ld hl,$d98d
-  I(0x4c85, 3); SET_BC(0x0016);  // ld bc,$0016
-L_4c88:
-  I(0x4c88, 1); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { I(0x4c89, 3); goto L_4c8e; } I(0x4c89, 2);  // jr z,$4c8e
-  I(0x4c8b, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x4c8c, 3); goto L_4c88;  // jr $4c88
-L_4c8e:
-  I(0x4c8e, 2); B = 0x16;  // ld b,$16
-  I(0x4c90, 3); SET_DE(0xc600);  // ld de,$c600
-  CALL(0x4c93, copyMemory_hook, 0x0486, 0x4c96);  // call $0486
-  I(0x4c96, 3); SET_HL(0xc612);  // ld hl,$c612
-  I(0x4c99, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x4c9b, 2); L = 0x14;  // ld l,$14
-  I(0x4c9d, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x4c9f, initializeFile_b00_hook, 0x09d4, 0x4ca2);  // call $09d4
-  I(0x4ca2, 2); A = 0x56;  // ld a,$56
-  CALL(0x4ca4, playSound_b00_hook, 0x0c98, 0x4ca7);  // call $0c98
-  I(0x4ca7, 4); setFileSelectModeTo1(gb); return;  // jp $4159
-L_4caa:
-  CALL(0x4caa, serialFunc_0c8d_hook, 0x0c8d, 0x4cad);  // call $0c8d
-  I(0x4cad, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4caf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cb0); return; } I(0x4cb0, 2);  // ret nz
-L_4cb1:
-  I(0x4cb1, 4); A = mem_rd(gb, 0xcbcb);  // ld a,($cbcb)
-  I(0x4cb4, 2); alu_cp(gb, 0x08);  // cp $08
-  if ((F & FZ)) { I(0x4cb6, 4); closeMenu(gb); return; } I(0x4cb6, 3);  // jp z,$4fba
-  I(0x4cb9, 2); A = 0x00;  // ld a,$00
-  I(0x4cbb, 4); setFileSelectMode(gb); return;  // jp $415b
-L_4cbe:
-  CALL(0x4cbe, serialFunc_0c8d_hook, 0x0c8d, 0x4cc1);  // call $0c8d
-  I(0x4cc1, 3); A = mem_rd(gb, 0xffba);  // ldh a,($ffba)
-  I(0x4cc3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4cc4); return; } I(0x4cc4, 2);  // ret nz
-  I(0x4cc5, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x4cc8, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4cca, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4ccd, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4cce, 3); goto L_4cb1; } I(0x4cce, 2);  // jr nz,$4cb1
-  I(0x4cd0, 3); SET_HL(0xcbbf);  // ld hl,$cbbf
-  I(0x4cd3, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x4cd4); return; } I(0x4cd4, 2);  // ret nz
-  I(0x4cd5, 3); goto L_4cb1;  // jr $4cb1
-}
-
 // 02:4110
 void copyTextCharactersFromHl(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -7305,7 +3320,7 @@ void fileSelectMode1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x41a1, fileSelectMode1__mode1SubModes, 0x41aa, 0x41a4);  // call $41aa
 L_41a4:
-  CALL(0x41a4, fileSelectDrawAcornCursor, 0x4a97, 0x41a7);  // call $4a97
+  CALL(0x41a4, fileSelectDrawAcornCursor_hook, 0x4a97, 0x41a7);  // call $4a97
   I(0x41a7, 4); fileSelectDrawLink(gb); return;  // jp $4d29
 }
 
@@ -7313,7 +3328,7 @@ L_41a4:
 void fileSelectMode1__afterCall41a4(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_41a4:
-  CALL(0x41a4, fileSelectDrawAcornCursor, 0x4a97, 0x41a7);  // call $4a97
+  CALL(0x41a4, fileSelectDrawAcornCursor_hook, 0x4a97, 0x41a7);  // call $4a97
   I(0x41a7, 4); fileSelectDrawLink(gb); return;  // jp $4d29
 }
 
@@ -7336,19 +3351,19 @@ L_41b6:
   CALL(0x41c2, loadGfxHeader_hook, 0x0626, 0x41c5);  // call $0626
   I(0x41c5, 2); A = 0x05;  // ld a,$05
   CALL(0x41c7, loadPaletteHeader_hook, 0x050b, 0x41ca);  // call $050b
-  CALL(0x41ca, loadFileDisplayVariables, 0x49da, 0x41cd);  // call $49da
-  CALL(0x41cd, textInput_updateEntryCursor, 0x4a22, 0x41d0);  // call $4a22
-  CALL(0x41d0, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x41d3);  // call $4a4a
+  CALL(0x41ca, loadFileDisplayVariables_hook, 0x49da, 0x41cd);  // call $49da
+  CALL(0x41cd, textInput_updateEntryCursor_hook, 0x4a22, 0x41d0);  // call $4a22
+  CALL(0x41d0, fileSelectDrawHeartsAndDeathCounter_hook, 0x4a4a, 0x41d3);  // call $4a4a
   I(0x41d3, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
 L_41d6:
-  CALL(0x41d6, fileSelectUpdateInput, 0x4467, 0x41d9);  // call $4467
+  CALL(0x41d6, fileSelectUpdateInput_hook, 0x4467, 0x41d9);  // call $4467
   if (!(F & FZ)) { I(0x41d9, 3); goto L_41e8; } I(0x41d9, 2);  // jr nz,$41e8
   I(0x41db, 3); SET_HL(0xcbbc);  // ld hl,$cbbc
   I(0x41de, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x41df, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   I(0x41e1, 2); alu_cp(gb, 0x03);  // cp $03
   if (!(F & FZ)) { RET_TAKEN(0x41e3); return; } I(0x41e3, 2);  // ret nz
-  CALL(0x41e4, func_02_448d, 0x448d, 0x41e7);  // call $448d
+  CALL(0x41e4, func_02_448d_hook, 0x448d, 0x41e7);  // call $448d
   if ((F & FZ)) { RET_TAKEN(0x41e7); return; } I(0x41e7, 2);  // ret z
 L_41e8:
   I(0x41e8, 2); A = 0x56;  // ld a,$56
@@ -7391,9 +3406,9 @@ L_41b6:
   CALL(0x41c2, loadGfxHeader_hook, 0x0626, 0x41c5);  // call $0626
   I(0x41c5, 2); A = 0x05;  // ld a,$05
   CALL(0x41c7, loadPaletteHeader_hook, 0x050b, 0x41ca);  // call $050b
-  CALL(0x41ca, loadFileDisplayVariables, 0x49da, 0x41cd);  // call $49da
-  CALL(0x41cd, textInput_updateEntryCursor, 0x4a22, 0x41d0);  // call $4a22
-  CALL(0x41d0, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x41d3);  // call $4a4a
+  CALL(0x41ca, loadFileDisplayVariables_hook, 0x49da, 0x41cd);  // call $49da
+  CALL(0x41cd, textInput_updateEntryCursor_hook, 0x4a22, 0x41d0);  // call $4a22
+  CALL(0x41d0, fileSelectDrawHeartsAndDeathCounter_hook, 0x4a4a, 0x41d3);  // call $4a4a
   I(0x41d3, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
 }
 
@@ -7401,14 +3416,14 @@ L_41b6:
 void fileSelectMode1__state1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_41d6:
-  CALL(0x41d6, fileSelectUpdateInput, 0x4467, 0x41d9);  // call $4467
+  CALL(0x41d6, fileSelectUpdateInput_hook, 0x4467, 0x41d9);  // call $4467
   if (!(F & FZ)) { I(0x41d9, 3); goto L_41e8; } I(0x41d9, 2);  // jr nz,$41e8
   I(0x41db, 3); SET_HL(0xcbbc);  // ld hl,$cbbc
   I(0x41de, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x41df, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   I(0x41e1, 2); alu_cp(gb, 0x03);  // cp $03
   if (!(F & FZ)) { RET_TAKEN(0x41e3); return; } I(0x41e3, 2);  // ret nz
-  CALL(0x41e4, func_02_448d, 0x448d, 0x41e7);  // call $448d
+  CALL(0x41e4, func_02_448d_hook, 0x448d, 0x41e7);  // call $448d
   if ((F & FZ)) { RET_TAKEN(0x41e7); return; } I(0x41e7, 2);  // ret z
 L_41e8:
   I(0x41e8, 2); A = 0x56;  // ld a,$56
@@ -7430,7 +3445,7 @@ L_41fe:
   if ((F & FZ)) { I(0x4203, 3); goto L_4213; } I(0x4203, 2);  // jr z,$4213
   I(0x4205, 3); mem_wr(gb, 0xff9a, A);  // ldh ($ff9a),a
   I(0x4207, 2); D = 0x00;  // ld d,$00
-  CALL(0x4209, getFileDisplayVariableAddress, 0x417a, 0x420c);  // call $417a
+  CALL(0x4209, getFileDisplayVariableAddress_hook, 0x417a, 0x420c);  // call $417a
   I(0x420c, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
   I(0x420e, 2); A = 0x05;  // ld a,$05
   if (!(F & FZ)) { RET_TAKEN(0x4210); return; } I(0x4210, 2);  // ret nz
@@ -7574,21 +3589,6 @@ L_426d:
   I(0x427a, 4); if (hook_enabled_at(0x08c3)) { restartThisThread_hook(gb); return; } HANDOFF(0x08c3);  // jp $08c3
 }
 
-// 02:49cd
-void copyTextCharacters(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_49cd:
-  PUSH(0x49cd, BC);  // push bc
-  I(0x49ce, 1); A = C;  // ld a,c
-  I(0x49cf, 2); C = 0x00;  // ld c,$00
-  CALL(0x49d1, copyTextCharacterGfx_hook, 0x19df, 0x49d4);  // call $19df
-  SET_BC(POP(0x49d4));  // pop bc
-  I(0x49d5, 1); C = alu_inc8(gb, C);  // inc c
-  I(0x49d6, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x49d7, 3); goto L_49cd; } I(0x49d7, 2);  // jr nz,$49cd
-  RET(0x49d9); return;  // ret
-}
-
 // 02:52f6
 void func_02_52f6(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -7671,35 +3671,6 @@ void fileSelect_redrawDecorationsAndSetWramBank4(GB *gb) {
   I(0x4ce1, 4); if (hook_enabled_at(0x0d5e)) { addSpritesToOam_hook(gb); return; } HANDOFF(0x0d5e);  // jp $0d5e
 }
 
-// 02:47fb
-void textInput_getCursorPosition(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x47fb, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x47fe, 1); C = A;  // ld c,a
-  I(0x47ff, 2); alu_and(gb, 0xf0);  // and $f0
-  I(0x4801, 1); B = A;  // ld b,a
-  I(0x4802, 1); A = C;  // ld a,c
-  I(0x4803, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x4805, 1); C = A;  // ld c,a
-  PUSH(0x4806, DE);  // push de
-  I(0x4807, 3); SET_DE(0x0801);  // ld de,$0801
-  I(0x480a, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x480d, 1); alu_rlca(gb);  // rlca
-  if ((F & FC)) { I(0x480e, 3); goto L_4813; } I(0x480e, 2);  // jr c,$4813
-  I(0x4810, 3); SET_DE(0x0602);  // ld de,$0602
-L_4813:
-  I(0x4813, 1); A = C;  // ld a,c
-  I(0x4814, 1); alu_cp(gb, D);  // cp d
-  I(0x4815, 1); C = E;  // ld c,e
-  SET_DE(POP(0x4816));  // pop de
-  if (!(F & FC)) { I(0x4817, 3); goto L_481b; } I(0x4817, 2);  // jr nc,$481b
-  I(0x4819, 2); C = 0x00;  // ld c,$00
-L_481b:
-  I(0x481b, 1); alu_add(gb, C);  // add c
-  I(0x481c, 1); alu_add(gb, B);  // add b
-  RET(0x481d); return;  // ret
-}
-
 // 02:4d29
 void fileSelectDrawLink(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -7708,14 +3679,14 @@ void fileSelectDrawLink(GB *gb) {
   I(0x4d2e, 2); alu_cp(gb, 0x03);  // cp $03
   if (!(F & FC)) { RET_TAKEN(0x4d30); return; } I(0x4d30, 2);  // ret nc
   I(0x4d31, 2); D = 0x00;  // ld d,$00
-  CALL(0x4d33, getFileDisplayVariableAddress, 0x417a, 0x4d36);  // call $417a
+  CALL(0x4d33, getFileDisplayVariableAddress_hook, 0x417a, 0x4d36);  // call $417a
   I(0x4d36, 2); C = 0x00;  // ld c,$00
   I(0x4d38, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
   if (!(F & FZ)) { I(0x4d3a, 3); goto L_4d5d; } I(0x4d3a, 2);  // jr nz,$4d5d
   PUSH(0x4d3c, BC);  // push bc
   PUSH(0x4d3d, DE);  // push de
   I(0x4d3e, 2); D = 0x07;  // ld d,$07
-  CALL(0x4d40, getFileDisplayVariableAddress_paramE, 0x417b, 0x4d43);  // call $417b
+  CALL(0x4d40, getFileDisplayVariableAddress_paramE_hook, 0x417b, 0x4d43);  // call $417b
   I(0x4d43, 1); alu_xor(gb, A);  // xor a
   I(0x4d44, 2); B = 0x10;  // ld b,$10
   I(0x4d46, 3); alu_bit(gb, 1, mem_rd(gb, HL));  // bit 1,(hl)
@@ -7723,7 +3694,7 @@ void fileSelectDrawLink(GB *gb) {
   SET_DE(POP(0x4d4b));  // pop de
   SET_BC(POP(0x4d4c));  // pop bc
   I(0x4d4d, 2); D = 0x06;  // ld d,$06
-  CALL(0x4d4f, getFileDisplayVariableAddress_paramE, 0x417b, 0x4d52);  // call $417b
+  CALL(0x4d4f, getFileDisplayVariableAddress_paramE_hook, 0x417b, 0x4d52);  // call $417b
   I(0x4d52, 1); C = alu_inc8(gb, C);  // inc c
   I(0x4d53, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x4d54, 1); alu_rrca(gb);  // rrca
@@ -7818,7 +3789,7 @@ void fileSelectMode0(GB *gb) {
 void fileSelectMode5(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x427d, fileSelectMode5__mode5States, 0x4283, 0x4280);  // call $4283
-  I(0x4280, 4); fileSelectDrawAcornCursor(gb); return;  // jp $4a97
+  I(0x4280, 4); if (hook_enabled_at(0x4a97)) { fileSelectDrawAcornCursor_hook(gb); return; } HANDOFF(0x4a97);  // jp $4a97
 }
 
 // 02:4283
@@ -7974,7 +3945,7 @@ L_42d7:
 void fileSelectMode3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x42e4, fileSelectMode3__mode3Update, 0x42ea, 0x42e7);  // call $42ea
-  I(0x42e7, 4); fileSelectDrawAcornCursor(gb); return;  // jp $4a97
+  I(0x42e7, 4); if (hook_enabled_at(0x4a97)) { fileSelectDrawAcornCursor_hook(gb); return; } HANDOFF(0x4a97);  // jp $4a97
 }
 
 // 02:42ea
@@ -7994,13 +3965,13 @@ L_42f6:
   CALL(0x42fe, disableLcd_hook, 0x02c1, 0x4301);  // call $02c1
   I(0x4301, 2); A = 0xa3;  // ld a,$a3
   CALL(0x4303, loadGfxHeader_hook, 0x0626, 0x4306);  // call $0626
-  CALL(0x4306, loadFileDisplayVariables, 0x49da, 0x4309);  // call $49da
-  CALL(0x4309, textInput_updateEntryCursor, 0x4a22, 0x430c);  // call $4a22
+  CALL(0x4306, loadFileDisplayVariables_hook, 0x49da, 0x4309);  // call $49da
+  CALL(0x4309, textInput_updateEntryCursor_hook, 0x4a22, 0x430c);  // call $4a22
   I(0x430c, 2); A = 0x08;  // ld a,$08
   CALL(0x430e, loadUncompressedGfxHeader_hook, 0x05da, 0x4311);  // call $05da
   I(0x4311, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
 L_4314:
-  CALL(0x4314, fileSelectUpdateInput, 0x4467, 0x4317);  // call $4467
+  CALL(0x4314, fileSelectUpdateInput_hook, 0x4467, 0x4317);  // call $4467
   if ((F & FZ)) { RET_TAKEN(0x4317); return; } I(0x4317, 2);  // ret z
   I(0x4318, 2); A = 0x56;  // ld a,$56
   CALL(0x431a, playSound_b00_hook, 0x0c98, 0x431d);  // call $0c98
@@ -8009,7 +3980,7 @@ L_4314:
   if ((F & FZ)) { I(0x4322, 4); setFileSelectModeTo1(gb); return; } I(0x4322, 3);  // jp z,$4159
   I(0x4325, 3); mem_wr(gb, 0xff9a, A);  // ldh ($ff9a),a
   I(0x4327, 2); D = 0x00;  // ld d,$00
-  CALL(0x4329, getFileDisplayVariableAddress, 0x417a, 0x432c);  // call $417a
+  CALL(0x4329, getFileDisplayVariableAddress_hook, 0x417a, 0x432c);  // call $417a
   I(0x432c, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
   if ((F & FZ)) { I(0x432e, 3); goto L_4335; } I(0x432e, 2);  // jr z,$4335
   I(0x4330, 2); A = 0x5a;  // ld a,$5a
@@ -8038,7 +4009,7 @@ L_4352:
   CALL(0x4352, fileSelectMode3__func_02_4397, 0x4397, 0x4355);  // call $4397
   CALL(0x4355, decFileSelectMode2IfBPressed, 0x416f, 0x4358);  // call $416f
   if (!(F & FZ)) { I(0x4358, 3); goto L_43c2; } I(0x4358, 2);  // jr nz,$43c2
-  CALL(0x435a, fileSelectUpdateInput, 0x4467, 0x435d);  // call $4467
+  CALL(0x435a, fileSelectUpdateInput_hook, 0x4467, 0x435d);  // call $4467
   if ((F & FZ)) { I(0x435d, 3); goto L_4341; } I(0x435d, 2);  // jr z,$4341
   I(0x435f, 2); A = 0x56;  // ld a,$56
   CALL(0x4361, playSound_b00_hook, 0x0c98, 0x4364);  // call $0c98
@@ -8051,7 +4022,7 @@ L_4371:
   CALL(0x4371, fileSelectMode3__func_02_4397, 0x4397, 0x4374);  // call $4397
   CALL(0x4374, decFileSelectMode2IfBPressed, 0x416f, 0x4377);  // call $416f
   if (!(F & FZ)) { I(0x4377, 3); goto L_43c2; } I(0x4377, 2);  // jr nz,$43c2
-  CALL(0x4379, func_02_448d, 0x448d, 0x437c);  // call $448d
+  CALL(0x4379, func_02_448d_hook, 0x448d, 0x437c);  // call $448d
   if ((F & FZ)) { RET_TAKEN(0x437c); return; } I(0x437c, 2);  // ret z
   I(0x437d, 2); A = 0x56;  // ld a,$56
   CALL(0x437f, playSound_b00_hook, 0x0c98, 0x4382);  // call $0c98
@@ -8086,8 +4057,8 @@ L_42f6:
   CALL(0x42fe, disableLcd_hook, 0x02c1, 0x4301);  // call $02c1
   I(0x4301, 2); A = 0xa3;  // ld a,$a3
   CALL(0x4303, loadGfxHeader_hook, 0x0626, 0x4306);  // call $0626
-  CALL(0x4306, loadFileDisplayVariables, 0x49da, 0x4309);  // call $49da
-  CALL(0x4309, textInput_updateEntryCursor, 0x4a22, 0x430c);  // call $4a22
+  CALL(0x4306, loadFileDisplayVariables_hook, 0x49da, 0x4309);  // call $49da
+  CALL(0x4309, textInput_updateEntryCursor_hook, 0x4a22, 0x430c);  // call $4a22
   I(0x430c, 2); A = 0x08;  // ld a,$08
   CALL(0x430e, loadUncompressedGfxHeader_hook, 0x05da, 0x4311);  // call $05da
   I(0x4311, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
@@ -8097,7 +4068,7 @@ L_42f6:
 void fileSelectMode3__mode1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4314:
-  CALL(0x4314, fileSelectUpdateInput, 0x4467, 0x4317);  // call $4467
+  CALL(0x4314, fileSelectUpdateInput_hook, 0x4467, 0x4317);  // call $4467
   if ((F & FZ)) { RET_TAKEN(0x4317); return; } I(0x4317, 2);  // ret z
   I(0x4318, 2); A = 0x56;  // ld a,$56
   CALL(0x431a, playSound_b00_hook, 0x0c98, 0x431d);  // call $0c98
@@ -8106,7 +4077,7 @@ L_4314:
   if ((F & FZ)) { I(0x4322, 4); setFileSelectModeTo1(gb); return; } I(0x4322, 3);  // jp z,$4159
   I(0x4325, 3); mem_wr(gb, 0xff9a, A);  // ldh ($ff9a),a
   I(0x4327, 2); D = 0x00;  // ld d,$00
-  CALL(0x4329, getFileDisplayVariableAddress, 0x417a, 0x432c);  // call $417a
+  CALL(0x4329, getFileDisplayVariableAddress_hook, 0x417a, 0x432c);  // call $417a
   I(0x432c, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
   if ((F & FZ)) { I(0x432e, 3); goto L_4335; } I(0x432e, 2);  // jr z,$4335
   I(0x4330, 2); A = 0x5a;  // ld a,$5a
@@ -8154,7 +4125,7 @@ L_4352:
   CALL(0x4352, fileSelectMode3__func_02_4397, 0x4397, 0x4355);  // call $4397
   CALL(0x4355, decFileSelectMode2IfBPressed, 0x416f, 0x4358);  // call $416f
   if (!(F & FZ)) { I(0x4358, 3); goto L_43c2; } I(0x4358, 2);  // jr nz,$43c2
-  CALL(0x435a, fileSelectUpdateInput, 0x4467, 0x435d);  // call $4467
+  CALL(0x435a, fileSelectUpdateInput_hook, 0x4467, 0x435d);  // call $4467
   if ((F & FZ)) { I(0x435d, 3); goto L_4341; } I(0x435d, 2);  // jr z,$4341
   I(0x435f, 2); A = 0x56;  // ld a,$56
   CALL(0x4361, playSound_b00_hook, 0x0c98, 0x4364);  // call $0c98
@@ -8183,7 +4154,7 @@ L_4371:
   CALL(0x4371, fileSelectMode3__func_02_4397, 0x4397, 0x4374);  // call $4397
   CALL(0x4374, decFileSelectMode2IfBPressed, 0x416f, 0x4377);  // call $416f
   if (!(F & FZ)) { I(0x4377, 3); goto L_43c2; } I(0x4377, 2);  // jr nz,$43c2
-  CALL(0x4379, func_02_448d, 0x448d, 0x437c);  // call $448d
+  CALL(0x4379, func_02_448d_hook, 0x448d, 0x437c);  // call $448d
   if ((F & FZ)) { RET_TAKEN(0x437c); return; } I(0x437c, 2);  // ret z
   I(0x437d, 2); A = 0x56;  // ld a,$56
   CALL(0x437f, playSound_b00_hook, 0x0c98, 0x4382);  // call $0c98
@@ -8245,9 +4216,9 @@ L_43f0:
   CALL(0x43fb, loadGfxHeader_hook, 0x0626, 0x43fe);  // call $0626
   I(0x43fe, 2); A = 0x06;  // ld a,$06
   CALL(0x4400, loadPaletteHeader_hook, 0x050b, 0x4403);  // call $050b
-  CALL(0x4403, loadFileDisplayVariables, 0x49da, 0x4406);  // call $49da
-  CALL(0x4406, textInput_updateEntryCursor, 0x4a22, 0x4409);  // call $4a22
-  CALL(0x4409, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x440c);  // call $4a4a
+  CALL(0x4403, loadFileDisplayVariables_hook, 0x49da, 0x4406);  // call $49da
+  CALL(0x4406, textInput_updateEntryCursor_hook, 0x4a22, 0x4409);  // call $4a22
+  CALL(0x4409, fileSelectDrawHeartsAndDeathCounter_hook, 0x4a4a, 0x440c);  // call $4a4a
   I(0x440c, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
 }
 
@@ -8283,7 +4254,7 @@ L_43d6:
 void fileSelectMode4(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x43d9, fileSelectMode4__mode4Update, 0x43e2, 0x43dc);  // call $43e2
-  CALL(0x43dc, fileSelectDrawAcornCursor, 0x4a97, 0x43df);  // call $4a97
+  CALL(0x43dc, fileSelectDrawAcornCursor_hook, 0x4a97, 0x43df);  // call $4a97
   I(0x43df, 4); fileSelectDrawLink(gb); return;  // jp $4d29
 }
 
@@ -8306,12 +4277,12 @@ L_43ee:
   CALL(0x43fb, loadGfxHeader_hook, 0x0626, 0x43fe);  // call $0626
   I(0x43fe, 2); A = 0x06;  // ld a,$06
   CALL(0x4400, loadPaletteHeader_hook, 0x050b, 0x4403);  // call $050b
-  CALL(0x4403, loadFileDisplayVariables, 0x49da, 0x4406);  // call $49da
-  CALL(0x4406, textInput_updateEntryCursor, 0x4a22, 0x4409);  // call $4a22
-  CALL(0x4409, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x440c);  // call $4a4a
+  CALL(0x4403, loadFileDisplayVariables_hook, 0x49da, 0x4406);  // call $49da
+  CALL(0x4406, textInput_updateEntryCursor_hook, 0x4a22, 0x4409);  // call $4a22
+  CALL(0x4409, fileSelectDrawHeartsAndDeathCounter_hook, 0x4a4a, 0x440c);  // call $4a4a
   I(0x440c, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
 L_440f:
-  CALL(0x440f, fileSelectUpdateInput, 0x4467, 0x4412);  // call $4467
+  CALL(0x440f, fileSelectUpdateInput_hook, 0x4467, 0x4412);  // call $4467
   if ((F & FZ)) { RET_TAKEN(0x4412); return; } I(0x4412, 2);  // ret z
   I(0x4413, 2); A = 0x56;  // ld a,$56
   CALL(0x4415, playSound_b00_hook, 0x0c98, 0x4418);  // call $0c98
@@ -8323,7 +4294,7 @@ L_440f:
 L_4425:
   CALL(0x4425, decFileSelectMode2IfBPressed, 0x416f, 0x4428);  // call $416f
   if (!(F & FZ)) { I(0x4428, 3); goto L_4438; } I(0x4428, 2);  // jr nz,$4438
-  CALL(0x442a, func_02_448d, 0x448d, 0x442d);  // call $448d
+  CALL(0x442a, func_02_448d_hook, 0x448d, 0x442d);  // call $448d
   if ((F & FZ)) { RET_TAKEN(0x442d); return; } I(0x442d, 2);  // ret z
   I(0x442e, 4); A = mem_rd(gb, 0xcbbd);  // ld a,($cbbd)
   I(0x4431, 1); alu_or(gb, A);  // or a
@@ -8341,7 +4312,7 @@ L_4443:
   if (!(F & FZ)) { RET_TAKEN(0x4449); return; } I(0x4449, 2);  // ret nz
   I(0x444a, 3); A = mem_rd(gb, 0xff9a);  // ldh a,($ff9a)
   I(0x444c, 2); D = 0x02;  // ld d,$02
-  CALL(0x444e, getFileDisplayVariableAddress, 0x417a, 0x4451);  // call $417a
+  CALL(0x444e, getFileDisplayVariableAddress_hook, 0x417a, 0x4451);  // call $417a
   I(0x4451, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x4452, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x4453, 3); goto L_4461; } I(0x4453, 2);  // jr z,$4461
@@ -8350,7 +4321,7 @@ L_4443:
   I(0x4457, 2); alu_and(gb, 0x03);  // and $03
   I(0x4459, 2); A = 0x57;  // ld a,$57
   if ((F & FZ)) { CALL(0x445b, playSound_b00_hook, 0x0c98, 0x445e); } else I(0x445b, 3);  // call z,$0c98
-  I(0x445e, 4); fileSelectDrawHeartsAndDeathCounter(gb); return;  // jp $4a4a
+  I(0x445e, 4); if (hook_enabled_at(0x4a4a)) { fileSelectDrawHeartsAndDeathCounter_hook(gb); return; } HANDOFF(0x4a4a);  // jp $4a4a
 L_4461:
   CALL(0x4461, eraseFile_b00_hook, 0x09e0, 0x4464);  // call $09e0
   I(0x4464, 4); setFileSelectModeTo1(gb); return;  // jp $4159
@@ -8368,9 +4339,9 @@ L_43ee:
   CALL(0x43fb, loadGfxHeader_hook, 0x0626, 0x43fe);  // call $0626
   I(0x43fe, 2); A = 0x06;  // ld a,$06
   CALL(0x4400, loadPaletteHeader_hook, 0x050b, 0x4403);  // call $050b
-  CALL(0x4403, loadFileDisplayVariables, 0x49da, 0x4406);  // call $49da
-  CALL(0x4406, textInput_updateEntryCursor, 0x4a22, 0x4409);  // call $4a22
-  CALL(0x4409, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x440c);  // call $4a4a
+  CALL(0x4403, loadFileDisplayVariables_hook, 0x49da, 0x4406);  // call $49da
+  CALL(0x4406, textInput_updateEntryCursor_hook, 0x4a22, 0x4409);  // call $4a22
+  CALL(0x4409, fileSelectDrawHeartsAndDeathCounter_hook, 0x4a4a, 0x440c);  // call $4a4a
   I(0x440c, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
 }
 
@@ -8378,7 +4349,7 @@ L_43ee:
 void fileSelectMode4__mode1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_440f:
-  CALL(0x440f, fileSelectUpdateInput, 0x4467, 0x4412);  // call $4467
+  CALL(0x440f, fileSelectUpdateInput_hook, 0x4467, 0x4412);  // call $4467
   if ((F & FZ)) { RET_TAKEN(0x4412); return; } I(0x4412, 2);  // ret z
   I(0x4413, 2); A = 0x56;  // ld a,$56
   CALL(0x4415, playSound_b00_hook, 0x0c98, 0x4418);  // call $0c98
@@ -8395,7 +4366,7 @@ void fileSelectMode4__mode2(GB *gb) {
 L_4425:
   CALL(0x4425, decFileSelectMode2IfBPressed, 0x416f, 0x4428);  // call $416f
   if (!(F & FZ)) { I(0x4428, 3); goto L_4438; } I(0x4428, 2);  // jr nz,$4438
-  CALL(0x442a, func_02_448d, 0x448d, 0x442d);  // call $448d
+  CALL(0x442a, func_02_448d_hook, 0x448d, 0x442d);  // call $448d
   if ((F & FZ)) { RET_TAKEN(0x442d); return; } I(0x442d, 2);  // ret z
   I(0x442e, 4); A = mem_rd(gb, 0xcbbd);  // ld a,($cbbd)
   I(0x4431, 1); alu_or(gb, A);  // or a
@@ -8418,7 +4389,7 @@ L_4443:
   if (!(F & FZ)) { RET_TAKEN(0x4449); return; } I(0x4449, 2);  // ret nz
   I(0x444a, 3); A = mem_rd(gb, 0xff9a);  // ldh a,($ff9a)
   I(0x444c, 2); D = 0x02;  // ld d,$02
-  CALL(0x444e, getFileDisplayVariableAddress, 0x417a, 0x4451);  // call $417a
+  CALL(0x444e, getFileDisplayVariableAddress_hook, 0x417a, 0x4451);  // call $417a
   I(0x4451, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x4452, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x4453, 3); goto L_4461; } I(0x4453, 2);  // jr z,$4461
@@ -8427,91 +4398,17 @@ L_4443:
   I(0x4457, 2); alu_and(gb, 0x03);  // and $03
   I(0x4459, 2); A = 0x57;  // ld a,$57
   if ((F & FZ)) { CALL(0x445b, playSound_b00_hook, 0x0c98, 0x445e); } else I(0x445b, 3);  // call z,$0c98
-  I(0x445e, 4); fileSelectDrawHeartsAndDeathCounter(gb); return;  // jp $4a4a
+  I(0x445e, 4); if (hook_enabled_at(0x4a4a)) { fileSelectDrawHeartsAndDeathCounter_hook(gb); return; } HANDOFF(0x4a4a);  // jp $4a4a
 L_4461:
   CALL(0x4461, eraseFile_b00_hook, 0x09e0, 0x4464);  // call $09e0
   I(0x4464, 4); setFileSelectModeTo1(gb); return;  // jp $4159
-}
-
-// 02:4467
-void fileSelectUpdateInput(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4467, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x446a, 1); C = A;  // ld c,a
-  I(0x446b, 3); SET_HL(0xcbbc);  // ld hl,$cbbc
-  I(0x446e, 2); A = 0xff;  // ld a,$ff
-  I(0x4470, 2); alu_bit(gb, 6, C);  // bit 6,c
-  if (!(F & FZ)) { I(0x4472, 3); goto L_447f; } I(0x4472, 2);  // jr nz,$447f
-  I(0x4474, 2); A = 0x01;  // ld a,$01
-  I(0x4476, 2); alu_bit(gb, 7, C);  // bit 7,c
-  if (!(F & FZ)) { I(0x4478, 3); goto L_447f; } I(0x4478, 2);  // jr nz,$447f
-  I(0x447a, 1); A = C;  // ld a,c
-  I(0x447b, 2); alu_and(gb, 0x09);  // and $09
-  I(0x447d, 1); B = A;  // ld b,a
-  RET(0x447e); return;  // ret
-L_447f:
-  I(0x447f, 1); B = A;  // ld b,a
-  PUSH(0x4480, BC);  // push bc
-  I(0x4481, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  I(0x4482, 2); alu_and(gb, 0x03);  // and $03
-  CALL(0x4484, fileSelectSetCursor, 0x44aa, 0x4487);  // call $44aa
-  CALL(0x4487, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x448a);  // call $4a4a
-  SET_BC(POP(0x448a));  // pop bc
-  I(0x448b, 1); alu_xor(gb, A);  // xor a
-  RET(0x448c); return;  // ret
-}
-
-// 02:447f
-void fileSelectUpdateInput__upOrDown(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_447f:
-  I(0x447f, 1); B = A;  // ld b,a
-  PUSH(0x4480, BC);  // push bc
-  I(0x4481, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  I(0x4482, 2); alu_and(gb, 0x03);  // and $03
-  CALL(0x4484, fileSelectSetCursor, 0x44aa, 0x4487);  // call $44aa
-  CALL(0x4487, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x448a);  // call $4a4a
-  SET_BC(POP(0x448a));  // pop bc
-  I(0x448b, 1); alu_xor(gb, A);  // xor a
-  RET(0x448c); return;  // ret
-}
-
-// 02:448d
-void func_02_448d(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x448d, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x4490, 1); C = A;  // ld c,a
-  I(0x4491, 3); SET_HL(0xcbbd);  // ld hl,$cbbd
-  I(0x4494, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
-  I(0x4496, 1); alu_xor(gb, A);  // xor a
-  I(0x4497, 2); alu_bit(gb, 5, C);  // bit 5,c
-  if (!(F & FZ)) { I(0x4499, 3); goto L_44a4; } I(0x4499, 2);  // jr nz,$44a4
-  I(0x449b, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x449c, 2); alu_bit(gb, 4, C);  // bit 4,c
-  if (!(F & FZ)) { I(0x449e, 3); goto L_44a4; } I(0x449e, 2);  // jr nz,$44a4
-  I(0x44a0, 1); A = C;  // ld a,c
-  I(0x44a1, 2); alu_and(gb, 0x09);  // and $09
-  RET(0x44a3); return;  // ret
-L_44a4:
-  I(0x44a4, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if (!(F & FZ)) { CALL(0x44a5, fileSelectSetCursor, 0x44aa, 0x44a8); } else I(0x44a5, 3);  // call nz,$44aa
-  I(0x44a8, 1); alu_xor(gb, A);  // xor a
-  RET(0x44a9); return;  // ret
-}
-
-// 02:44aa
-void fileSelectSetCursor(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x44aa, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x44ab, 2); A = 0x84;  // ld a,$84
-  I(0x44ad, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
 }
 
 // 02:44b0
 void fileSelectMode2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x44b0, fileSelectMode2__func, 0x44b6, 0x44b3);  // call $44b6
-  I(0x44b3, 4); drawNameInputCursors(gb); return;  // jp $481e
+  I(0x44b3, 4); if (hook_enabled_at(0x481e)) { drawNameInputCursors_hook(gb); return; } HANDOFF(0x481e);  // jp $481e
 }
 
 // 02:44b6
@@ -8528,9 +4425,9 @@ L_44c0:
   CALL(0x44c0, eraseFile_b00_hook, 0x09e0, 0x44c3);  // call $09e0
   CALL(0x44c3, loadFile_b00_hook, 0x09dc, 0x44c6);  // call $09dc
   I(0x44c6, 1); alu_xor(gb, A);  // xor a
-  I(0x44c7, 4); copyNameToW4NameBuffer(gb); return;  // jp $4641
+  I(0x44c7, 4); if (hook_enabled_at(0x4641)) { copyNameToW4NameBuffer_hook(gb); return; } HANDOFF(0x4641);  // jp $4641
 L_44ca:
-  CALL(0x44ca, getNameBufferLength, 0x4626, 0x44cd);  // call $4626
+  CALL(0x44ca, getNameBufferLength_hook, 0x4626, 0x44cd);  // call $4626
   if ((F & FZ)) { I(0x44cd, 3); goto L_44dd; } I(0x44cd, 2);  // jr z,$44dd
   I(0x44cf, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
   I(0x44d2, 3); SET_DE(0xc602);  // ld de,$c602
@@ -8548,14 +4445,14 @@ L_44c0:
   CALL(0x44c0, eraseFile_b00_hook, 0x09e0, 0x44c3);  // call $09e0
   CALL(0x44c3, loadFile_b00_hook, 0x09dc, 0x44c6);  // call $09dc
   I(0x44c6, 1); alu_xor(gb, A);  // xor a
-  I(0x44c7, 4); copyNameToW4NameBuffer(gb); return;  // jp $4641
+  I(0x44c7, 4); if (hook_enabled_at(0x4641)) { copyNameToW4NameBuffer_hook(gb); return; } HANDOFF(0x4641);  // jp $4641
 }
 
 // 02:44ca
 void fileSelectMode2__mode2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_44ca:
-  CALL(0x44ca, getNameBufferLength, 0x4626, 0x44cd);  // call $4626
+  CALL(0x44ca, getNameBufferLength_hook, 0x4626, 0x44cd);  // call $4626
   if ((F & FZ)) { I(0x44cd, 3); goto L_44dd; } I(0x44cd, 2);  // jr z,$44dd
   I(0x44cf, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
   I(0x44d2, 3); SET_DE(0xc602);  // ld de,$c602
@@ -8571,7 +4468,7 @@ void runKidNameEntryMenu(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x44e0, fileSelect_redrawDecorationsAndSetWramBank4, 0x4cd7, 0x44e3);  // call $4cd7
   CALL(0x44e3, runKidNameEntryMenu__func, 0x44e9, 0x44e6);  // call $44e9
-  I(0x44e6, 4); drawNameInputCursors(gb); return;  // jp $481e
+  I(0x44e6, 4); if (hook_enabled_at(0x481e)) { drawNameInputCursors_hook(gb); return; } HANDOFF(0x481e);  // jp $481e
 }
 
 // 02:44e9
@@ -8588,7 +4485,7 @@ L_44f3:
   I(0x44f3, 2); A = 0xa0;  // ld a,$a0
   CALL(0x44f5, loadGfxHeader_hook, 0x0626, 0x44f8);  // call $0626
   I(0x44f8, 2); A = 0x01;  // ld a,$01
-  CALL(0x44fa, copyNameToW4NameBuffer, 0x4641, 0x44fd);  // call $4641
+  CALL(0x44fa, copyNameToW4NameBuffer_hook, 0x4641, 0x44fd);  // call $4641
   I(0x44fd, 4); if (hook_enabled_at(0x3299)) { fadeinFromWhite_hook(gb); return; } HANDOFF(0x3299);  // jp $3299
 L_4500:
   I(0x4500, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
@@ -8596,7 +4493,7 @@ L_4500:
   if (!(F & FZ)) { RET_TAKEN(0x4504); return; } I(0x4504, 2);  // ret nz
   I(0x4505, 4); runTextInput(gb); return;  // jp $46d6
 L_4508:
-  CALL(0x4508, getNameBufferLength, 0x4626, 0x450b);  // call $4626
+  CALL(0x4508, getNameBufferLength_hook, 0x4626, 0x450b);  // call $4626
   I(0x450b, 2); A = 0x01;  // ld a,$01
   if ((F & FZ)) { I(0x450d, 3); goto L_4520; } I(0x450d, 2);  // jr z,$4520
   I(0x450f, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
@@ -8618,7 +4515,7 @@ L_44f3:
   I(0x44f3, 2); A = 0xa0;  // ld a,$a0
   CALL(0x44f5, loadGfxHeader_hook, 0x0626, 0x44f8);  // call $0626
   I(0x44f8, 2); A = 0x01;  // ld a,$01
-  CALL(0x44fa, copyNameToW4NameBuffer, 0x4641, 0x44fd);  // call $4641
+  CALL(0x44fa, copyNameToW4NameBuffer_hook, 0x4641, 0x44fd);  // call $4641
   I(0x44fd, 4); if (hook_enabled_at(0x3299)) { fadeinFromWhite_hook(gb); return; } HANDOFF(0x3299);  // jp $3299
 }
 
@@ -8636,7 +4533,7 @@ L_4500:
 void runKidNameEntryMenu__mode2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4508:
-  CALL(0x4508, getNameBufferLength, 0x4626, 0x450b);  // call $4626
+  CALL(0x4508, getNameBufferLength_hook, 0x4626, 0x450b);  // call $4626
   I(0x450b, 2); A = 0x01;  // ld a,$01
   if ((F & FZ)) { I(0x450d, 3); goto L_4520; } I(0x450d, 2);  // jr z,$4520
   I(0x450f, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
@@ -8655,7 +4552,7 @@ L_4520:
 void fileSelectMode6(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x4526, fileSelectMode6__updateMode6, 0x452c, 0x4529);  // call $452c
-  I(0x4529, 4); drawSecretInputCursors(gb); return;  // jp $487e
+  I(0x4529, 4); if (hook_enabled_at(0x487e)) { drawSecretInputCursors_hook(gb); return; } HANDOFF(0x487e);  // jp $487e
 }
 
 // 02:452c
@@ -8733,7 +4630,7 @@ void runSecretEntryMenu(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x4571, fileSelect_redrawDecorationsAndSetWramBank4, 0x4cd7, 0x4574);  // call $4cd7
   CALL(0x4574, runSecretEntryMenu__func, 0x457a, 0x4577);  // call $457a
-  I(0x4577, 4); drawSecretInputCursors(gb); return;  // jp $487e
+  I(0x4577, 4); if (hook_enabled_at(0x487e)) { drawSecretInputCursors_hook(gb); return; } HANDOFF(0x487e);  // jp $487e
 }
 
 // 02:457a
@@ -9004,7 +4901,7 @@ L_4706:
   I(0x4709, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x470a, 2); alu_cp(gb, 0x50);  // cp $50
   if (!(F & FC)) { I(0x470c, 3); goto L_474b; } I(0x470c, 2);  // jr nc,$474b
-  CALL(0x470e, textInput_getCursorPosition, 0x47fb, 0x4711);  // call $47fb
+  CALL(0x470e, textInput_getCursorPosition_hook, 0x47fb, 0x4711);  // call $47fb
   I(0x4711, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x4713, 3); SET_HL(0xd0a3);  // ld hl,$d0a3
   RST_PUSH(0x4716, 0x4717);  // rst $10 (addAToHl)
@@ -9034,7 +4931,7 @@ L_4706:
   if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
   I(0x4738, 2); C = mem_rd(gb, HL);  // ld c,(hl)
 L_4739:
-  CALL(0x4739, textInput_getOutputAddress, 0x4a37, 0x473c);  // call $4a37
+  CALL(0x4739, textInput_getOutputAddress_hook, 0x4a37, 0x473c);  // call $4a37
   I(0x473c, 2); mem_wr(gb, HL, C);  // ld (hl),c
 L_473d:
   I(0x473d, 3); SET_HL(0xcbbe);  // ld hl,$cbbe
@@ -9044,7 +4941,7 @@ L_473d:
   if (!(F & FC)) { I(0x4745, 3); goto L_4748; } I(0x4745, 2);  // jr nc,$4748
   I(0x4747, 2); mem_wr(gb, HL, A);  // ld (hl),a
 L_4748:
-  I(0x4748, 4); textInput_updateEntryCursor(gb); return;  // jp $4a22
+  I(0x4748, 4); if (hook_enabled_at(0x4a22)) { textInput_updateEntryCursor_hook(gb); return; } HANDOFF(0x4a22);  // jp $4a22
 L_474b:
   I(0x474b, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
   I(0x474e, 1); alu_rlca(gb);  // rlca
@@ -9063,7 +4960,7 @@ L_475b:
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x473d: goto L_473d; case 0x4769: goto L_4769; case 0x4776: goto L_4776; case 0x47e5: goto L_47e5; default: HANDOFF(HL); }
 L_4764:
-  CALL(0x4764, textInput_getOutputAddress, 0x4a37, 0x4767);  // call $4a37
+  CALL(0x4764, textInput_getOutputAddress_hook, 0x4a37, 0x4767);  // call $4a37
   I(0x4767, 3); mem_wr(gb, HL, 0x20);  // ld (hl),$20
 L_4769:
   I(0x4769, 3); SET_HL(0xcbbe);  // ld hl,$cbbe
@@ -9128,7 +5025,7 @@ L_47bc:
   I(0x47bf, 1); alu_cp(gb, B);  // cp b
   if (!(F & FC)) { I(0x47c0, 3); goto L_47bc; } I(0x47c0, 2);  // jr nc,$47bc
   I(0x47c2, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x47c3, 4); textInput_lowerOption_updateFileSelectCursorPos(gb); return;  // jp $48df
+  I(0x47c3, 4); if (hook_enabled_at(0x48df)) { textInput_lowerOption_updateFileSelectCursorPos_hook(gb); return; } HANDOFF(0x48df);  // jp $48df
 L_47c6:
   I(0x47c6, 2); C = 0xf0;  // ld c,$f0
   I(0x47c8, 3); goto L_47cc;  // jr $47cc
@@ -9150,7 +5047,7 @@ L_47d0:
   I(0x47dd, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
   I(0x47df, 2); alu_cp(gb, 0x50);  // cp $50
   if ((F & FC)) { RET_TAKEN(0x47e1); return; } I(0x47e1, 2);  // ret c
-  I(0x47e2, 4); textInput_lowerOption_updateFileSelectCursorPos2(gb); return;  // jp $48ed
+  I(0x47e2, 4); if (hook_enabled_at(0x48ed)) { textInput_lowerOption_updateFileSelectCursorPos2_hook(gb); return; } HANDOFF(0x48ed);  // jp $48ed
 L_47e5:
   I(0x47e5, 3); SET_HL(0xcbbc);  // ld hl,$cbbc
   I(0x47e8, 2); A = 0x5a;  // ld a,$5a
@@ -9184,7 +5081,7 @@ L_4706:
   I(0x4709, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x470a, 2); alu_cp(gb, 0x50);  // cp $50
   if (!(F & FC)) { I(0x470c, 3); goto L_474b; } I(0x470c, 2);  // jr nc,$474b
-  CALL(0x470e, textInput_getCursorPosition, 0x47fb, 0x4711);  // call $47fb
+  CALL(0x470e, textInput_getCursorPosition_hook, 0x47fb, 0x4711);  // call $47fb
   I(0x4711, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x4713, 3); SET_HL(0xd0a3);  // ld hl,$d0a3
   RST_PUSH(0x4716, 0x4717);  // rst $10 (addAToHl)
@@ -9214,7 +5111,7 @@ L_4706:
   if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
   I(0x4738, 2); C = mem_rd(gb, HL);  // ld c,(hl)
 L_4739:
-  CALL(0x4739, textInput_getOutputAddress, 0x4a37, 0x473c);  // call $4a37
+  CALL(0x4739, textInput_getOutputAddress_hook, 0x4a37, 0x473c);  // call $4a37
   I(0x473c, 2); mem_wr(gb, HL, C);  // ld (hl),c
 L_473d:
   I(0x473d, 3); SET_HL(0xcbbe);  // ld hl,$cbbe
@@ -9224,7 +5121,7 @@ L_473d:
   if (!(F & FC)) { I(0x4745, 3); goto L_4748; } I(0x4745, 2);  // jr nc,$4748
   I(0x4747, 2); mem_wr(gb, HL, A);  // ld (hl),a
 L_4748:
-  I(0x4748, 4); textInput_updateEntryCursor(gb); return;  // jp $4a22
+  I(0x4748, 4); if (hook_enabled_at(0x4a22)) { textInput_updateEntryCursor_hook(gb); return; } HANDOFF(0x4a22);  // jp $4a22
 L_474b:
   I(0x474b, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
   I(0x474e, 1); alu_rlca(gb);  // rlca
@@ -9289,7 +5186,7 @@ L_4706:
   I(0x4709, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x470a, 2); alu_cp(gb, 0x50);  // cp $50
   if (!(F & FC)) { I(0x470c, 3); goto L_474b; } I(0x470c, 2);  // jr nc,$474b
-  CALL(0x470e, textInput_getCursorPosition, 0x47fb, 0x4711);  // call $47fb
+  CALL(0x470e, textInput_getCursorPosition_hook, 0x47fb, 0x4711);  // call $47fb
   I(0x4711, 2); alu_and(gb, 0x0f);  // and $0f
   I(0x4713, 3); SET_HL(0xd0a3);  // ld hl,$d0a3
   RST_PUSH(0x4716, 0x4717);  // rst $10 (addAToHl)
@@ -9319,7 +5216,7 @@ L_4706:
   if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
   I(0x4738, 2); C = mem_rd(gb, HL);  // ld c,(hl)
 L_4739:
-  CALL(0x4739, textInput_getOutputAddress, 0x4a37, 0x473c);  // call $4a37
+  CALL(0x4739, textInput_getOutputAddress_hook, 0x4a37, 0x473c);  // call $4a37
   I(0x473c, 2); mem_wr(gb, HL, C);  // ld (hl),c
 L_473d:
   I(0x473d, 3); SET_HL(0xcbbe);  // ld hl,$cbbe
@@ -9329,7 +5226,7 @@ L_473d:
   if (!(F & FC)) { I(0x4745, 3); goto L_4748; } I(0x4745, 2);  // jr nc,$4748
   I(0x4747, 2); mem_wr(gb, HL, A);  // ld (hl),a
 L_4748:
-  I(0x4748, 4); textInput_updateEntryCursor(gb); return;  // jp $4a22
+  I(0x4748, 4); if (hook_enabled_at(0x4a22)) { textInput_updateEntryCursor_hook(gb); return; } HANDOFF(0x4a22);  // jp $4a22
 L_474b:
   I(0x474b, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
   I(0x474e, 1); alu_rlca(gb);  // rlca
@@ -9390,7 +5287,7 @@ L_47f5:
 void runTextInput__gotCharacter(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4739:
-  CALL(0x4739, textInput_getOutputAddress, 0x4a37, 0x473c);  // call $4a37
+  CALL(0x4739, textInput_getOutputAddress_hook, 0x4a37, 0x473c);  // call $4a37
   I(0x473c, 2); mem_wr(gb, HL, C);  // ld (hl),c
 L_473d:
   I(0x473d, 3); SET_HL(0xcbbe);  // ld hl,$cbbe
@@ -9400,7 +5297,7 @@ L_473d:
   if (!(F & FC)) { I(0x4745, 3); goto L_4748; } I(0x4745, 2);  // jr nc,$4748
   I(0x4747, 2); mem_wr(gb, HL, A);  // ld (hl),a
 L_4748:
-  I(0x4748, 4); textInput_updateEntryCursor(gb); return;  // jp $4a22
+  I(0x4748, 4); if (hook_enabled_at(0x4a22)) { textInput_updateEntryCursor_hook(gb); return; } HANDOFF(0x4a22);  // jp $4a22
 }
 
 // 02:473d
@@ -9414,14 +5311,14 @@ L_473d:
   if (!(F & FC)) { I(0x4745, 3); goto L_4748; } I(0x4745, 2);  // jr nc,$4748
   I(0x4747, 2); mem_wr(gb, HL, A);  // ld (hl),a
 L_4748:
-  I(0x4748, 4); textInput_updateEntryCursor(gb); return;  // jp $4a22
+  I(0x4748, 4); if (hook_enabled_at(0x4a22)) { textInput_updateEntryCursor_hook(gb); return; } HANDOFF(0x4a22);  // jp $4a22
 }
 
 // 02:4748
 void runTextInput__updateEntryCursor(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4748:
-  I(0x4748, 4); textInput_updateEntryCursor(gb); return;  // jp $4a22
+  I(0x4748, 4); if (hook_enabled_at(0x4a22)) { textInput_updateEntryCursor_hook(gb); return; } HANDOFF(0x4a22);  // jp $4a22
 }
 
 // 02:474b
@@ -9436,7 +5333,7 @@ L_473d:
   if (!(F & FC)) { I(0x4745, 3); goto L_4748; } I(0x4745, 2);  // jr nc,$4748
   I(0x4747, 2); mem_wr(gb, HL, A);  // ld (hl),a
 L_4748:
-  I(0x4748, 4); textInput_updateEntryCursor(gb); return;  // jp $4a22
+  I(0x4748, 4); if (hook_enabled_at(0x4a22)) { textInput_updateEntryCursor_hook(gb); return; } HANDOFF(0x4a22);  // jp $4a22
 L_474b:
   I(0x474b, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
   I(0x474e, 1); alu_rlca(gb);  // rlca
@@ -9505,7 +5402,7 @@ L_473d:
   if (!(F & FC)) { I(0x4745, 3); goto L_4748; } I(0x4745, 2);  // jr nc,$4748
   I(0x4747, 2); mem_wr(gb, HL, A);  // ld (hl),a
 L_4748:
-  I(0x4748, 4); textInput_updateEntryCursor(gb); return;  // jp $4a22
+  I(0x4748, 4); if (hook_enabled_at(0x4a22)) { textInput_updateEntryCursor_hook(gb); return; } HANDOFF(0x4a22);  // jp $4a22
 L_4754:
   RST_PUSH(0x4754, 0x4755);  // rst $00 (jump table)
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
@@ -9547,7 +5444,7 @@ L_473d:
   if (!(F & FC)) { I(0x4745, 3); goto L_4748; } I(0x4745, 2);  // jr nc,$4748
   I(0x4747, 2); mem_wr(gb, HL, A);  // ld (hl),a
 L_4748:
-  I(0x4748, 4); textInput_updateEntryCursor(gb); return;  // jp $4a22
+  I(0x4748, 4); if (hook_enabled_at(0x4a22)) { textInput_updateEntryCursor_hook(gb); return; } HANDOFF(0x4a22);  // jp $4a22
 L_475b:
   RST_PUSH(0x475b, 0x475c);  // rst $00 (jump table)
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
@@ -9598,9 +5495,9 @@ void runTextInput__bButton(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_4764;
 L_4748:
-  I(0x4748, 4); textInput_updateEntryCursor(gb); return;  // jp $4a22
+  I(0x4748, 4); if (hook_enabled_at(0x4a22)) { textInput_updateEntryCursor_hook(gb); return; } HANDOFF(0x4a22);  // jp $4a22
 L_4764:
-  CALL(0x4764, textInput_getOutputAddress, 0x4a37, 0x4767);  // call $4a37
+  CALL(0x4764, textInput_getOutputAddress_hook, 0x4a37, 0x4767);  // call $4a37
   I(0x4767, 3); mem_wr(gb, HL, 0x20);  // ld (hl),$20
 L_4769:
   I(0x4769, 3); SET_HL(0xcbbe);  // ld hl,$cbbe
@@ -9616,7 +5513,7 @@ void runTextInput__selectionLeft(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_4769;
 L_4748:
-  I(0x4748, 4); textInput_updateEntryCursor(gb); return;  // jp $4a22
+  I(0x4748, 4); if (hook_enabled_at(0x4a22)) { textInput_updateEntryCursor_hook(gb); return; } HANDOFF(0x4a22);  // jp $4a22
 L_4769:
   I(0x4769, 3); SET_HL(0xcbbe);  // ld hl,$cbbe
   I(0x476c, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
@@ -9693,7 +5590,7 @@ L_47bc:
   I(0x47bf, 1); alu_cp(gb, B);  // cp b
   if (!(F & FC)) { I(0x47c0, 3); goto L_47bc; } I(0x47c0, 2);  // jr nc,$47bc
   I(0x47c2, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x47c3, 4); textInput_lowerOption_updateFileSelectCursorPos(gb); return;  // jp $48df
+  I(0x47c3, 4); if (hook_enabled_at(0x48df)) { textInput_lowerOption_updateFileSelectCursorPos_hook(gb); return; } HANDOFF(0x48df);  // jp $48df
 }
 
 // 02:4794
@@ -9734,7 +5631,7 @@ L_47bc:
   I(0x47bf, 1); alu_cp(gb, B);  // cp b
   if (!(F & FC)) { I(0x47c0, 3); goto L_47bc; } I(0x47c0, 2);  // jr nc,$47bc
   I(0x47c2, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x47c3, 4); textInput_lowerOption_updateFileSelectCursorPos(gb); return;  // jp $48df
+  I(0x47c3, 4); if (hook_enabled_at(0x48df)) { textInput_lowerOption_updateFileSelectCursorPos_hook(gb); return; } HANDOFF(0x48df);  // jp $48df
 }
 
 // 02:4796
@@ -9773,7 +5670,7 @@ L_47bc:
   I(0x47bf, 1); alu_cp(gb, B);  // cp b
   if (!(F & FC)) { I(0x47c0, 3); goto L_47bc; } I(0x47c0, 2);  // jr nc,$47bc
   I(0x47c2, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x47c3, 4); textInput_lowerOption_updateFileSelectCursorPos(gb); return;  // jp $48df
+  I(0x47c3, 4); if (hook_enabled_at(0x48df)) { textInput_lowerOption_updateFileSelectCursorPos_hook(gb); return; } HANDOFF(0x48df);  // jp $48df
 }
 
 // 02:47b9
@@ -9789,7 +5686,7 @@ L_47bc:
   I(0x47bf, 1); alu_cp(gb, B);  // cp b
   if (!(F & FC)) { I(0x47c0, 3); goto L_47bc; } I(0x47c0, 2);  // jr nc,$47bc
   I(0x47c2, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x47c3, 4); textInput_lowerOption_updateFileSelectCursorPos(gb); return;  // jp $48df
+  I(0x47c3, 4); if (hook_enabled_at(0x48df)) { textInput_lowerOption_updateFileSelectCursorPos_hook(gb); return; } HANDOFF(0x48df);  // jp $48df
 }
 
 // 02:47c6
@@ -9814,7 +5711,7 @@ L_47d0:
   I(0x47dd, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
   I(0x47df, 2); alu_cp(gb, 0x50);  // cp $50
   if ((F & FC)) { RET_TAKEN(0x47e1); return; } I(0x47e1, 2);  // ret c
-  I(0x47e2, 4); textInput_lowerOption_updateFileSelectCursorPos2(gb); return;  // jp $48ed
+  I(0x47e2, 4); if (hook_enabled_at(0x48ed)) { textInput_lowerOption_updateFileSelectCursorPos2_hook(gb); return; } HANDOFF(0x48ed);  // jp $48ed
 }
 
 // 02:47ca
@@ -9838,7 +5735,7 @@ L_47d0:
   I(0x47dd, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
   I(0x47df, 2); alu_cp(gb, 0x50);  // cp $50
   if ((F & FC)) { RET_TAKEN(0x47e1); return; } I(0x47e1, 2);  // ret c
-  I(0x47e2, 4); textInput_lowerOption_updateFileSelectCursorPos2(gb); return;  // jp $48ed
+  I(0x47e2, 4); if (hook_enabled_at(0x48ed)) { textInput_lowerOption_updateFileSelectCursorPos2_hook(gb); return; } HANDOFF(0x48ed);  // jp $48ed
 }
 
 // 02:47cc
@@ -9860,7 +5757,7 @@ L_47d0:
   I(0x47dd, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
   I(0x47df, 2); alu_cp(gb, 0x50);  // cp $50
   if ((F & FC)) { RET_TAKEN(0x47e1); return; } I(0x47e1, 2);  // ret c
-  I(0x47e2, 4); textInput_lowerOption_updateFileSelectCursorPos2(gb); return;  // jp $48ed
+  I(0x47e2, 4); if (hook_enabled_at(0x48ed)) { textInput_lowerOption_updateFileSelectCursorPos2_hook(gb); return; } HANDOFF(0x48ed);  // jp $48ed
 }
 
 // 02:47e5
@@ -9880,158 +5777,6 @@ L_47f5:
   I(0x47f6, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
   if (!(F & FZ)) { RET_TAKEN(0x47f7); return; } I(0x47f7, 2);  // ret nz
   I(0x47f8, 4); incFileSelectMode2(gb); return;  // jp $416a
-}
-
-// 02:48df
-void textInput_lowerOption_updateFileSelectCursorPos(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x48df, 4); A = mem_rd(gb, 0xcbbd);  // ld a,($cbbd)
-  I(0x48e2, 1); E = A;  // ld e,a
-  I(0x48e3, 2); D = 0xff;  // ld d,$ff
-  CALL(0x48e5, textInput_mapUpperXToLowerX, 0x48fb, 0x48e8);  // call $48fb
-  I(0x48e8, 1); A = B;  // ld a,b
-  I(0x48e9, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  RET(0x48ec); return;  // ret
-}
-
-// 02:48ed
-void textInput_lowerOption_updateFileSelectCursorPos2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x48ed, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x48f0, 1); D = A;  // ld d,a
-  I(0x48f1, 2); E = 0xff;  // ld e,$ff
-  CALL(0x48f3, textInput_mapUpperXToLowerX, 0x48fb, 0x48f6);  // call $48fb
-  I(0x48f6, 1); A = C;  // ld a,c
-  I(0x48f7, 4); mem_wr(gb, 0xcbbd, A);  // ld ($cbbd),a
-  RET(0x48fa); return;  // ret
-}
-
-// 02:48fb
-void textInput_mapUpperXToLowerX(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x48fb, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x48fe, 1); alu_rlca(gb);  // rlca
-  I(0x48ff, 3); SET_HL(0x4912);  // ld hl,$4912
-  if (!(F & FC)) { I(0x4902, 3); goto L_4907; } I(0x4902, 2);  // jr nc,$4907
-  I(0x4904, 3); SET_HL(0x492e);  // ld hl,$492e
-L_4907:
-  I(0x4907, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4908, 1); B = A;  // ld b,a
-  I(0x4909, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x490a, 1); C = A;  // ld c,a
-  I(0x490b, 1); alu_cp(gb, E);  // cp e
-  if ((F & FZ)) { RET_TAKEN(0x490c); return; } I(0x490c, 2);  // ret z
-  I(0x490d, 1); A = B;  // ld a,b
-  I(0x490e, 1); alu_cp(gb, D);  // cp d
-  if (!(F & FZ)) { I(0x490f, 3); goto L_4907; } I(0x490f, 2);  // jr nz,$4907
-  RET(0x4911); return;  // ret
-}
-
-// 02:4907
-void textInput_mapUpperXToLowerX__label(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4907:
-  I(0x4907, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4908, 1); B = A;  // ld b,a
-  I(0x4909, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x490a, 1); C = A;  // ld c,a
-  I(0x490b, 1); alu_cp(gb, E);  // cp e
-  if ((F & FZ)) { RET_TAKEN(0x490c); return; } I(0x490c, 2);  // ret z
-  I(0x490d, 1); A = B;  // ld a,b
-  I(0x490e, 1); alu_cp(gb, D);  // cp d
-  if (!(F & FZ)) { I(0x490f, 3); goto L_4907; } I(0x490f, 2);  // jr nz,$4907
-  RET(0x4911); return;  // ret
-}
-
-// 02:4912
-void textInput_mapUpperXToLowerX__nameTable(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4912:
-  I(0x4912, 1); D = B;  // ld d,b
-  I(0x4913, 1);  // nop
-  I(0x4914, 1); D = C;  // ld d,c
-  I(0x4915, 1);  // nop
-  I(0x4916, 1); D = D;  // ld d,d
-  I(0x4917, 1);  // nop
-  I(0x4918, 1); D = E;  // ld d,e
-  I(0x4919, 3); SET_BC(0x0154);  // ld bc,$0154
-  I(0x491c, 1); D = L;  // ld d,l
-  I(0x491d, 3); SET_BC(0x0256);  // ld bc,$0256
-  I(0x4920, 1); D = A;  // ld d,a
-  I(0x4921, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x4922, 1); E = B;  // ld e,b
-  I(0x4923, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x4924, 1); E = C;  // ld e,c
-  I(0x4925, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x4926, 1); E = D;  // ld e,d
-  I(0x4927, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x4928, 1); E = E;  // ld e,e
-  I(0x4929, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x492a, 1); E = H;  // ld e,h
-  I(0x492b, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  CALL_ASM_RST(0x492c, 0x0038, 0x492d);  // rst $38
-  CALL_ASM_RST(0x492d, 0x0038, 0x492e);  // rst $38
-L_492e:
-  I(0x492e, 1); D = B;  // ld d,b
-  I(0x492f, 1);  // nop
-  I(0x4930, 1); D = C;  // ld d,c
-  I(0x4931, 1);  // nop
-  I(0x4932, 1); D = D;  // ld d,d
-  I(0x4933, 1);  // nop
-  I(0x4934, 1); D = E;  // ld d,e
-  I(0x4935, 3); SET_BC(0x0154);  // ld bc,$0154
-  I(0x4938, 1); D = L;  // ld d,l
-  I(0x4939, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x493a, 2); D = mem_rd(gb, HL);  // ld d,(hl)
-  I(0x493b, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x493c, 1); D = A;  // ld d,a
-  I(0x493d, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x493e, 1); E = B;  // ld e,b
-  I(0x493f, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x4940, 1); E = C;  // ld e,c
-  I(0x4941, 2); SET_BC(BC + 1);  // inc bc
-  I(0x4942, 1); E = D;  // ld e,d
-  I(0x4943, 2); SET_BC(BC + 1);  // inc bc
-  I(0x4944, 1); E = E;  // ld e,e
-  I(0x4945, 2); SET_BC(BC + 1);  // inc bc
-  I(0x4946, 1); E = H;  // ld e,h
-  I(0x4947, 2); SET_BC(BC + 1);  // inc bc
-  CALL_ASM_RST(0x4948, 0x0038, 0x4949);  // rst $38
-  CALL_ASM_RST(0x4949, 0x0038, 0x494a);  // rst $38
-  func_02_494a(gb); return;  // fallthrough
-}
-
-// 02:492e
-void textInput_mapUpperXToLowerX__secretTable(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_492e:
-  I(0x492e, 1); D = B;  // ld d,b
-  I(0x492f, 1);  // nop
-  I(0x4930, 1); D = C;  // ld d,c
-  I(0x4931, 1);  // nop
-  I(0x4932, 1); D = D;  // ld d,d
-  I(0x4933, 1);  // nop
-  I(0x4934, 1); D = E;  // ld d,e
-  I(0x4935, 3); SET_BC(0x0154);  // ld bc,$0154
-  I(0x4938, 1); D = L;  // ld d,l
-  I(0x4939, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x493a, 2); D = mem_rd(gb, HL);  // ld d,(hl)
-  I(0x493b, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x493c, 1); D = A;  // ld d,a
-  I(0x493d, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x493e, 1); E = B;  // ld e,b
-  I(0x493f, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x4940, 1); E = C;  // ld e,c
-  I(0x4941, 2); SET_BC(BC + 1);  // inc bc
-  I(0x4942, 1); E = D;  // ld e,d
-  I(0x4943, 2); SET_BC(BC + 1);  // inc bc
-  I(0x4944, 1); E = E;  // ld e,e
-  I(0x4945, 2); SET_BC(BC + 1);  // inc bc
-  I(0x4946, 1); E = H;  // ld e,h
-  I(0x4947, 2); SET_BC(BC + 1);  // inc bc
-  CALL_ASM_RST(0x4948, 0x0038, 0x4949);  // rst $38
-  CALL_ASM_RST(0x4949, 0x0038, 0x494a);  // rst $38
-  func_02_494a(gb); return;  // fallthrough
 }
 
 // 02:494a
@@ -10133,7 +5878,7 @@ L_499a:
   I(0x49a2, 1); A = L;  // ld a,l
   I(0x49a3, 1); alu_xor(gb, A);  // xor a
   I(0x49a4, 1);  // nop
-  textInput_loadCharacterGfx(gb); return;  // fallthrough
+  if (hook_enabled_at(0x49a5)) { textInput_loadCharacterGfx_hook(gb); return; } HANDOFF(0x49a5);  // fallthrough
 }
 
 // 02:499a
@@ -10151,118 +5896,7 @@ L_499a:
   I(0x49a2, 1); A = L;  // ld a,l
   I(0x49a3, 1); alu_xor(gb, A);  // xor a
   I(0x49a4, 1);  // nop
-  textInput_loadCharacterGfx(gb); return;  // fallthrough
-}
-
-// 02:49a5
-void textInput_loadCharacterGfx(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x49a5, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
-  PUSH(0x49a7, AF);  // push af
-  I(0x49a8, 2); A = 0x05;  // ld a,$05
-  I(0x49aa, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x49ac, 1); alu_xor(gb, A);  // xor a
-  I(0x49ad, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x49b0, 3); SET_DE(0xd000);  // ld de,$d000
-  I(0x49b3, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x49b6, 1); alu_rlca(gb);  // rlca
-  if ((F & FC)) { I(0x49b7, 3); goto L_49c1; } I(0x49b7, 2);  // jr c,$49c1
-  I(0x49b9, 3); SET_BC(0x3b40);  // ld bc,$3b40
-  CALL(0x49bc, copyTextCharacters, 0x49cd, 0x49bf);  // call $49cd
-  I(0x49bf, 3); goto L_49c9;  // jr $49c9
-L_49c1:
-  I(0x49c1, 3); SET_HL(0x00a1);  // ld hl,$00a1
-  I(0x49c4, 2); B = 0x40;  // ld b,$40
-  CALL(0x49c6, copyTextCharactersFromHlUntilNull, 0x410e, 0x49c9);  // call $410e
-L_49c9:
-  SET_AF(POP(0x49c9));  // pop af
-  I(0x49ca, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  RET(0x49cc); return;  // ret
-}
-
-// 02:4a22
-void textInput_updateEntryCursor(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4a22, 1); alu_xor(gb, A);  // xor a
-  CALL(0x4a23, textInput_getOutputAddressOffset, 0x4a3a, 0x4a26);  // call $4a3a
-  I(0x4a26, 3); SET_DE(0xdc00);  // ld de,$dc00
-  I(0x4a29, 2); B = 0x18;  // ld b,$18
-  CALL(0x4a2b, copyTextCharactersFromHl, 0x4110, 0x4a2e);  // call $4110
-  I(0x4a2e, 1); alu_xor(gb, A);  // xor a
-  I(0x4a2f, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x4a32, 2); A = 0x07;  // ld a,$07
-  I(0x4a34, 4); if (hook_enabled_at(0x05da)) { loadUncompressedGfxHeader_hook(gb); return; } HANDOFF(0x05da);  // jp $05da
-}
-
-// 02:4a37
-void textInput_getOutputAddress(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4a37, 4); A = mem_rd(gb, 0xcbbe);  // ld a,($cbbe)
-  textInput_getOutputAddressOffset(gb); return;  // fallthrough
-}
-
-// 02:4a3a
-void textInput_getOutputAddressOffset(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4a3a, 1); L = A;  // ld l,a
-  I(0x4a3b, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x4a3e, 1); alu_rlca(gb);  // rlca
-  I(0x4a3f, 1); A = L;  // ld a,l
-  I(0x4a40, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
-  if (!(F & FC)) { I(0x4a43, 3); goto L_4a48; } I(0x4a43, 2);  // jr nc,$4a48
-  I(0x4a45, 3); SET_HL(0xd7c0);  // ld hl,$d7c0
-L_4a48:
-  RST_PUSH(0x4a48, 0x4a49);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  RET(0x4a49); return;  // ret
-}
-
-// 02:4a4a
-void fileSelectDrawHeartsAndDeathCounter(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4a4a, 4); A = mem_rd(gb, 0xcbb3);  // ld a,($cbb3)
-  I(0x4a4d, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FZ)) { RET_TAKEN(0x4a4f); return; } I(0x4a4f, 2);  // ret z
-  I(0x4a50, 2); A = 0xa2;  // ld a,$a2
-  CALL(0x4a52, loadGfxHeader_hook, 0x0626, 0x4a55);  // call $0626
-  I(0x4a55, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4a58, 2); alu_cp(gb, 0x03);  // cp $03
-  if (!(F & FC)) { I(0x4a5a, 3); goto L_4a92; } I(0x4a5a, 2);  // jr nc,$4a92
-  I(0x4a5c, 2); D = 0x00;  // ld d,$00
-  CALL(0x4a5e, getFileDisplayVariableAddress, 0x417a, 0x4a61);  // call $417a
-  I(0x4a61, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if (!(F & FZ)) { I(0x4a63, 3); goto L_4a92; } I(0x4a63, 2);  // jr nz,$4a92
-  I(0x4a65, 2); D = 0x04;  // ld d,$04
-  CALL(0x4a67, getFileDisplayVariableAddress_paramE, 0x417b, 0x4a6a);  // call $417b
-  I(0x4a6a, 1); E = L;  // ld e,l
-  I(0x4a6b, 1); D = H;  // ld d,h
-  I(0x4a6c, 3); SET_HL(0xd130);  // ld hl,$d130
-  I(0x4a6f, 2); B = 0x10;  // ld b,$10
-  I(0x4a71, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4a72, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x4a74, 1); alu_add(gb, B);  // add b
-  I(0x4a75, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-  I(0x4a76, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4a77, 2); alu_and(gb, 0xf0);  // and $f0
-  I(0x4a79, 2); A = alu_swap(gb, A);  // swap a
-  I(0x4a7b, 1); alu_add(gb, B);  // add b
-  I(0x4a7c, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-  I(0x4a7d, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4a7e, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4a7f, 1); alu_add(gb, B);  // add b
-  I(0x4a80, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-  I(0x4a81, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x4a84, 2); D = 0x02;  // ld d,$02
-  CALL(0x4a86, getFileDisplayVariableAddress, 0x417a, 0x4a89);  // call $417a
-  I(0x4a89, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4a8a, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x4a8b, 1); C = A;  // ld c,a
-  I(0x4a8c, 3); SET_HL(0xd14a);  // ld hl,$d14a
-  CALL(0x4a8f, fileSelectDrawHeartDisplay, 0x5435, 0x4a92);  // call $5435
-L_4a92:
-  I(0x4a92, 2); A = 0x08;  // ld a,$08
-  I(0x4a94, 4); if (hook_enabled_at(0x05da)) { loadUncompressedGfxHeader_hook(gb); return; } HANDOFF(0x05da);  // jp $05da
+  if (hook_enabled_at(0x49a5)) { textInput_loadCharacterGfx_hook(gb); return; } HANDOFF(0x49a5);  // fallthrough
 }
 
 // 02:4b22
@@ -10283,7 +5917,7 @@ void fileSelectMode7(GB *gb) {
   if ((F & FZ)) { RET_TAKEN(0x4b31); return; } I(0x4b31, 2);  // ret z
   I(0x4b32, 2); alu_cp(gb, 0x03);  // cp $03
   if ((F & FC)) { RET_TAKEN(0x4b34); return; } I(0x4b34, 2);  // ret c
-  CALL(0x4b35, fileSelectDrawAcornCursor, 0x4a97, 0x4b38);  // call $4a97
+  CALL(0x4b35, fileSelectDrawAcornCursor_hook, 0x4a97, 0x4b38);  // call $4a97
   I(0x4b38, 4); fileSelectDrawLinkInOtherGame(gb); return;  // jp $4d25
 }
 
@@ -10310,7 +5944,7 @@ L_4b4d:
   I(0x4b64, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
   I(0x4b67, 2); B = 0x20;  // ld b,$20
   CALL(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);  // call $046f
-  CALL(0x4b6c, textInput_updateEntryCursor, 0x4a22, 0x4b6f);  // call $4a22
+  CALL(0x4b6c, textInput_updateEntryCursor_hook, 0x4a22, 0x4b6f);  // call $4a22
   CALL(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);  // call $0c85
   I(0x4b72, 2); A = 0x04;  // ld a,$04
   I(0x4b74, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
@@ -10361,7 +5995,7 @@ L_4bbd:
 L_4bc4:
   I(0x4bc4, 1); E = alu_dec8(gb, E);  // dec e
   I(0x4bc5, 2); D = 0x00;  // ld d,$00
-  CALL(0x4bc7, getFileDisplayVariableAddress_paramE, 0x417b, 0x4bca);  // call $417b
+  CALL(0x4bc7, getFileDisplayVariableAddress_paramE_hook, 0x417b, 0x4bca);  // call $417b
   I(0x4bca, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
   if ((F & FZ)) { I(0x4bcc, 3); goto L_4bdf; } I(0x4bcc, 2);  // jr z,$4bdf
   I(0x4bce, 1); A = E;  // ld a,e
@@ -10385,12 +6019,12 @@ L_4be2:
   CALL(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);  // call $0626
   I(0x4bf6, 2); A = 0xaf;  // ld a,$af
   CALL(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);  // call $0626
-  CALL(0x4bfb, textInput_updateEntryCursor, 0x4a22, 0x4bfe);  // call $4a22
-  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x4c01);  // call $4a4a
+  CALL(0x4bfb, textInput_updateEntryCursor_hook, 0x4a22, 0x4bfe);  // call $4a22
+  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter_hook, 0x4a4a, 0x4c01);  // call $4a4a
   I(0x4c01, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
 L_4c04:
   CALL(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);  // call $0c8d
-  CALL(0x4c07, fileSelectUpdateInput, 0x4467, 0x4c0a);  // call $4467
+  CALL(0x4c07, fileSelectUpdateInput_hook, 0x4467, 0x4c0a);  // call $4467
   if (!(F & FZ)) { I(0x4c0a, 3); goto L_4c1e; } I(0x4c0a, 2);  // jr nz,$4c1e
   I(0x4c0c, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x4c0f, 2); alu_bit(gb, 1, A);  // bit 1,a
@@ -10406,7 +6040,7 @@ L_4c1e:
   I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
   if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
   I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
+  CALL(0x4c27, getFileDisplayVariableAddress_hook, 0x417a, 0x4c2a);  // call $417a
   I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
   if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
   I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
@@ -10514,7 +6148,7 @@ L_4b4d:
   I(0x4b64, 3); SET_HL(0xd7a0);  // ld hl,$d7a0
   I(0x4b67, 2); B = 0x20;  // ld b,$20
   CALL(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);  // call $046f
-  CALL(0x4b6c, textInput_updateEntryCursor, 0x4a22, 0x4b6f);  // call $4a22
+  CALL(0x4b6c, textInput_updateEntryCursor_hook, 0x4a22, 0x4b6f);  // call $4a22
   CALL(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);  // call $0c85
   I(0x4b72, 2); A = 0x04;  // ld a,$04
   I(0x4b74, 3); mem_wr(gb, 0xffbe, A);  // ldh ($ffbe),a
@@ -10570,7 +6204,7 @@ L_4bbd:
 L_4bc4:
   I(0x4bc4, 1); E = alu_dec8(gb, E);  // dec e
   I(0x4bc5, 2); D = 0x00;  // ld d,$00
-  CALL(0x4bc7, getFileDisplayVariableAddress_paramE, 0x417b, 0x4bca);  // call $417b
+  CALL(0x4bc7, getFileDisplayVariableAddress_paramE_hook, 0x417b, 0x4bca);  // call $417b
   I(0x4bca, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
   if ((F & FZ)) { I(0x4bcc, 3); goto L_4bdf; } I(0x4bcc, 2);  // jr z,$4bdf
   I(0x4bce, 1); A = E;  // ld a,e
@@ -10619,8 +6253,8 @@ L_4be2:
   CALL(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);  // call $0626
   I(0x4bf6, 2); A = 0xaf;  // ld a,$af
   CALL(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);  // call $0626
-  CALL(0x4bfb, textInput_updateEntryCursor, 0x4a22, 0x4bfe);  // call $4a22
-  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter, 0x4a4a, 0x4c01);  // call $4a4a
+  CALL(0x4bfb, textInput_updateEntryCursor_hook, 0x4a22, 0x4bfe);  // call $4a22
+  CALL(0x4bfe, fileSelectDrawHeartsAndDeathCounter_hook, 0x4a4a, 0x4c01);  // call $4a4a
   I(0x4c01, 4); loadGfxRegisterState5AndIncFileSelectMode2(gb); return;  // jp $4165
 }
 
@@ -10629,7 +6263,7 @@ void fileSelectMode7__state3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4c04:
   CALL(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);  // call $0c8d
-  CALL(0x4c07, fileSelectUpdateInput, 0x4467, 0x4c0a);  // call $4467
+  CALL(0x4c07, fileSelectUpdateInput_hook, 0x4467, 0x4c0a);  // call $4467
   if (!(F & FZ)) { I(0x4c0a, 3); goto L_4c1e; } I(0x4c0a, 2);  // jr nz,$4c1e
   I(0x4c0c, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x4c0f, 2); alu_bit(gb, 1, A);  // bit 1,a
@@ -10645,7 +6279,7 @@ L_4c1e:
   I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
   if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
   I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
+  CALL(0x4c27, getFileDisplayVariableAddress_hook, 0x417a, 0x4c2a);  // call $417a
   I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
   if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
   I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
@@ -10703,7 +6337,7 @@ L_4c1e:
   I(0x4c21, 2); alu_cp(gb, 0x03);  // cp $03
   if ((F & FZ)) { I(0x4c23, 3); goto L_4c12; } I(0x4c23, 2);  // jr z,$4c12
   I(0x4c25, 2); D = 0x00;  // ld d,$00
-  CALL(0x4c27, getFileDisplayVariableAddress, 0x417a, 0x4c2a);  // call $417a
+  CALL(0x4c27, getFileDisplayVariableAddress_hook, 0x417a, 0x4c2a);  // call $417a
   I(0x4c2a, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
   if ((F & FZ)) { I(0x4c2c, 3); goto L_4c33; } I(0x4c2c, 2);  // jr z,$4c33
   I(0x4c2e, 2); A = 0x5a;  // ld a,$5a
@@ -16045,14 +11679,14 @@ L_4d2b:
   I(0x4d2e, 2); alu_cp(gb, 0x03);  // cp $03
   if (!(F & FC)) { RET_TAKEN(0x4d30); return; } I(0x4d30, 2);  // ret nc
   I(0x4d31, 2); D = 0x00;  // ld d,$00
-  CALL(0x4d33, getFileDisplayVariableAddress, 0x417a, 0x4d36);  // call $417a
+  CALL(0x4d33, getFileDisplayVariableAddress_hook, 0x417a, 0x4d36);  // call $417a
   I(0x4d36, 2); C = 0x00;  // ld c,$00
   I(0x4d38, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
   if (!(F & FZ)) { I(0x4d3a, 3); goto L_4d5d; } I(0x4d3a, 2);  // jr nz,$4d5d
   PUSH(0x4d3c, BC);  // push bc
   PUSH(0x4d3d, DE);  // push de
   I(0x4d3e, 2); D = 0x07;  // ld d,$07
-  CALL(0x4d40, getFileDisplayVariableAddress_paramE, 0x417b, 0x4d43);  // call $417b
+  CALL(0x4d40, getFileDisplayVariableAddress_paramE_hook, 0x417b, 0x4d43);  // call $417b
   I(0x4d43, 1); alu_xor(gb, A);  // xor a
   I(0x4d44, 2); B = 0x10;  // ld b,$10
   I(0x4d46, 3); alu_bit(gb, 1, mem_rd(gb, HL));  // bit 1,(hl)
@@ -16060,7 +11694,7 @@ L_4d2b:
   SET_DE(POP(0x4d4b));  // pop de
   SET_BC(POP(0x4d4c));  // pop bc
   I(0x4d4d, 2); D = 0x06;  // ld d,$06
-  CALL(0x4d4f, getFileDisplayVariableAddress_paramE, 0x417b, 0x4d52);  // call $417b
+  CALL(0x4d4f, getFileDisplayVariableAddress_paramE_hook, 0x417b, 0x4d52);  // call $417b
   I(0x4d52, 1); C = alu_inc8(gb, C);  // inc c
   I(0x4d53, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x4d54, 1); alu_rrca(gb);  // rrca

@@ -127,6 +127,35 @@ void mapGetRoomText__specialCode2_hook(GB *gb);
 void mapGetRoomText__specialCode3_hook(GB *gb);
 void mapGetRoomText__specialCode4_hook(GB *gb);
 void mapGetRoomText__checkDungeonEntered_hook(GB *gb);
+void getFileDisplayVariableAddress_hook(GB *gb);
+void getFileDisplayVariableAddress_paramE_hook(GB *gb);
+void fileSelectUpdateInput_hook(GB *gb);
+void fileSelectUpdateInput__upOrDown_hook(GB *gb);
+void func_02_448d_hook(GB *gb);
+void fileSelectSetCursor_hook(GB *gb);
+void getNameBufferLength_hook(GB *gb);
+void copyNameToW4NameBuffer_hook(GB *gb);
+void textInput_getCursorPosition_hook(GB *gb);
+void drawNameInputCursors_hook(GB *gb);
+void drawNameInputCursors__upperOptions_hook(GB *gb);
+void drawNameInputCursors__lowerOptions_hook(GB *gb);
+void drawSecretInputCursors_hook(GB *gb);
+void drawSecretInputCursors__upperOptions_hook(GB *gb);
+void drawSecretInputCursors__lowerOptions_hook(GB *gb);
+void textInput_lowerOption_updateFileSelectCursorPos_hook(GB *gb);
+void textInput_lowerOption_updateFileSelectCursorPos2_hook(GB *gb);
+void textInput_mapUpperXToLowerX_hook(GB *gb);
+void textInput_mapUpperXToLowerX__label_hook(GB *gb);
+void textInput_loadCharacterGfx_hook(GB *gb);
+void copyTextCharacters_hook(GB *gb);
+void loadFileDisplayVariables_hook(GB *gb);
+void loadFileDisplayVariables__nextFile_hook(GB *gb);
+void textInput_updateEntryCursor_hook(GB *gb);
+void textInput_getOutputAddress_hook(GB *gb);
+void textInput_getOutputAddressOffset_hook(GB *gb);
+void fileSelectDrawHeartsAndDeathCounter_hook(GB *gb);
+void fileSelectDrawAcornCursor_hook(GB *gb);
+void fileSelectDrawAcornCursor__func_hook(GB *gb);
 
 static uint16_t function_caller_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -2650,4 +2679,520 @@ void mapGetRoomText__checkDungeonEntered_hook(GB *gb) {
   CYC(0x6230, 0x6232); alu_bit(gb, 4, A);
   CYC(0x6232, 0x6233); SET_DE(pop_effect(gb));
   CYC(0x6233, 0x6234); ret_effect(gb);
+}
+
+void getFileDisplayVariableAddress_hook(GB *gb) {
+  CYC(0x417a, 0x417b); E = A;
+  getFileDisplayVariableAddress_paramE_hook(gb);
+}
+
+void getFileDisplayVariableAddress_paramE_hook(GB *gb) {
+  CYC(0x417b, 0x417c); A = E;
+  CYC(0x417c, 0x417e); A = alu_swap(gb, A);
+  CYC(0x417e, 0x417f); alu_rrca(gb);
+  CYC(0x417f, 0x4180); alu_add(gb, D);
+  CYC(0x4180, 0x4183); SET_HL(0xd780);
+  CYC(0x4183, 0x4184); push_effect(gb, 0x4184); add_a_to_hl(gb);
+  CYC(0x4184, 0x4185); ret_effect(gb);
+}
+
+void fileSelectUpdateInput_hook(GB *gb) {
+  CYC(0x4467, 0x446a); A = mem_rd(gb, 0xc482);
+  CYC(0x446a, 0x446b); C = A;
+  CYC(0x446b, 0x446e); SET_HL(0xcbbc);
+  CYC(0x446e, 0x4470); A = 0xff;
+  CYC(0x4470, 0x4472); alu_bit(gb, 6, C);
+  if (!(F & FZ)) { CYCT(0x4472, 0x4474); fileSelectUpdateInput__upOrDown_hook(gb); return; }
+  CYC(0x4472, 0x4474);
+  CYC(0x4474, 0x4476); A = 0x01;
+  CYC(0x4476, 0x4478); alu_bit(gb, 7, C);
+  if (!(F & FZ)) { CYCT(0x4478, 0x447a); fileSelectUpdateInput__upOrDown_hook(gb); return; }
+  CYC(0x4478, 0x447a);
+  CYC(0x447a, 0x447b); A = C;
+  CYC(0x447b, 0x447d); alu_and(gb, 0x09);
+  CYC(0x447d, 0x447e); B = A;
+  CYC(0x447e, 0x447f); ret_effect(gb);
+}
+
+void fileSelectUpdateInput__upOrDown_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x447f, 0x4480); B = A;
+  CYC(0x4480, 0x4481); push_effect(gb, BC);
+  CYC(0x4481, 0x4482); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x4482, 0x4484); alu_and(gb, 0x03);
+  CALL_C(0x4484, fileSelectSetCursor_hook, 0x44aa, 0x4487);
+  CALL_C(0x4487, fileSelectDrawHeartsAndDeathCounter_hook, 0x4a4a, 0x448a);
+  CYC(0x448a, 0x448b); SET_BC(pop_effect(gb));
+  CYC(0x448b, 0x448c); alu_xor(gb, A);
+  CYC(0x448c, 0x448d); ret_effect(gb);
+}
+
+void func_02_448d_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x448d, 0x4490); A = mem_rd(gb, 0xc482);
+  CYC(0x4490, 0x4491); C = A;
+  CYC(0x4491, 0x4494); SET_HL(0xcbbd);
+  CYC(0x4494, 0x4496); mem_wr(gb, HL, mem_rd(gb, HL) & 0x7f);
+  CYC(0x4496, 0x4497); alu_xor(gb, A);
+  CYC(0x4497, 0x4499); alu_bit(gb, 5, C);
+  if (!(F & FZ)) { CYCT(0x4499, 0x449b); goto moved; }
+  CYC(0x4499, 0x449b);
+  CYC(0x449b, 0x449c); A = alu_inc8(gb, A);
+  CYC(0x449c, 0x449e); alu_bit(gb, 4, C);
+  if (!(F & FZ)) { CYCT(0x449e, 0x44a0); goto moved; }
+  CYC(0x449e, 0x44a0);
+  CYC(0x44a0, 0x44a1); A = C;
+  CYC(0x44a1, 0x44a3); alu_and(gb, 0x09);
+  CYC(0x44a3, 0x44a4); ret_effect(gb);
+  return;
+moved:
+  CYC(0x44a4, 0x44a5); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) CALL_C_CC(0x44a5, fileSelectSetCursor_hook, 0x44aa, 0x44a8);
+  else CYC(0x44a5, 0x44a8);
+  CYC(0x44a8, 0x44a9); alu_xor(gb, A);
+  CYC(0x44a9, 0x44aa); ret_effect(gb);
+}
+
+void fileSelectSetCursor_hook(GB *gb) {
+  CYC(0x44aa, 0x44ab); mem_wr(gb, HL, A);
+  CYC(0x44ab, 0x44ad); A = 0x84;
+  CYC(0x44ad, 0x44b0); playSound_b00_hook(gb);
+}
+
+void getNameBufferLength_hook(GB *gb) {
+  CYC(0x4626, 0x4629); SET_HL(0xd7a0);
+  CYC(0x4629, 0x462b); B = 0x05;
+  CYC(0x462b, 0x462c); alu_xor(gb, A);
+  do {
+    CYC(0x462c, 0x462d); alu_cp(gb, mem_rd(gb, HL));
+    if (!(F & FZ)) CYCT(0x462d, 0x462f);
+    else { CYC(0x462d, 0x462f); CYC(0x462f, 0x4631); mem_wr(gb, HL, 0x20); }
+    CYC(0x4631, 0x4632); L = alu_inc8(gb, L);
+    CYC(0x4632, 0x4633); B = alu_dec8(gb, B);
+    if (!(F & FZ)) CYCT(0x4633, 0x4635); else CYC(0x4633, 0x4635);
+  } while (!(F & FZ));
+  CYC(0x4635, 0x4636); mem_wr(gb, HL, A); L = alu_dec8(gb, L);
+  CYC(0x4636, 0x4638); B = 0x05;
+  for (;;) {
+    CYC(0x4638, 0x4639); A = mem_rd(gb, HL);
+    CYC(0x4639, 0x463b); alu_sub(gb, 0x20);
+    if (!(F & FZ)) { CYCT(0x463b, 0x463c); ret_effect(gb); return; }
+    CYC(0x463b, 0x463c);
+    CYC(0x463c, 0x463d); mem_wr(gb, HL, A); L = alu_dec8(gb, L);
+    CYC(0x463d, 0x463e); B = alu_dec8(gb, B);
+    if (!(F & FZ)) { CYCT(0x463e, 0x4640); continue; }
+    CYC(0x463e, 0x4640); ret_effect(gb); return;
+  }
+}
+
+void copyNameToW4NameBuffer_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4641, 0x4644); mem_wr(gb, 0xcbb7, A);
+  CYC(0x4644, 0x4647); SET_DE(0xc602);
+  CYC(0x4647, 0x4649); alu_cp(gb, 0x01);
+  if (!(F & FZ)) CYCT(0x4649, 0x464b);
+  else { CYC(0x4649, 0x464b); CYC(0x464b, 0x464d); E = 0x09; }
+  CYC(0x464d, 0x4650); SET_HL(0xd7a0);
+  CYC(0x4650, 0x4652); B = 0x06;
+  CALL_C(0x4652, copyMemoryReverse_hook, 0x047f, 0x4655);
+  CYC(0x4655, 0x4657); A = 0x04;
+  CYC(0x4657, 0x465a); mem_wr(gb, 0xcbb8, A);
+  CYC(0x465a, 0x465c); label_02_038(gb);
+}
+
+void textInput_getCursorPosition_hook(GB *gb) {
+  CYC(0x47fb, 0x47fe); A = mem_rd(gb, 0xcbbc);
+  CYC(0x47fe, 0x47ff); C = A;
+  CYC(0x47ff, 0x4801); alu_and(gb, 0xf0);
+  CYC(0x4801, 0x4802); B = A;
+  CYC(0x4802, 0x4803); A = C;
+  CYC(0x4803, 0x4805); alu_and(gb, 0x0f);
+  CYC(0x4805, 0x4806); C = A;
+  CYC(0x4806, 0x4807); push_effect(gb, DE);
+  CYC(0x4807, 0x480a); SET_DE(0x0801);
+  CYC(0x480a, 0x480d); A = mem_rd(gb, 0xcbb7);
+  CYC(0x480d, 0x480e); alu_rlca(gb);
+  if (F & FC) CYCT(0x480e, 0x4810);
+  else { CYC(0x480e, 0x4810); CYC(0x4810, 0x4813); SET_DE(0x0602); }
+  CYC(0x4813, 0x4814); A = C;
+  CYC(0x4814, 0x4815); alu_cp(gb, D);
+  CYC(0x4815, 0x4816); C = E;
+  CYC(0x4816, 0x4817); SET_DE(pop_effect(gb));
+  if (!(F & FC)) CYCT(0x4817, 0x4819);
+  else { CYC(0x4817, 0x4819); CYC(0x4819, 0x481b); C = 0; }
+  CYC(0x481b, 0x481c); alu_add(gb, C);
+  CYC(0x481c, 0x481d); alu_add(gb, B);
+  CYC(0x481d, 0x481e); ret_effect(gb);
+}
+
+static void draw_name_input_cursors_tail(GB *gb) {
+  CYC(0x4851, 0x4854); A = W8(wFileSelect_textInputCursorPos);
+  CYC(0x4854, 0x4855); alu_add(gb, A);
+  CYC(0x4855, 0x4856); alu_add(gb, A);
+  CYC(0x4856, 0x4857); alu_add(gb, A);
+  CYC(0x4857, 0x4858); C = A;
+  CYC(0x4858, 0x485a); B = 0;
+  CYC(0x485a, 0x485d); SET_HL(0x4879);
+  CYC(0x485d, 0x4860); addSpritesToOam_withOffset_hook(gb);
+}
+
+void drawNameInputCursors_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x481e, textInput_getCursorPosition_hook, 0x47fb, 0x4821);
+  CYC(0x4821, 0x4823); alu_cp(gb, 0x50);
+  if (!(F & FC)) { CYCT(0x4823, 0x4825); drawNameInputCursors__lowerOptions_hook(gb); return; }
+  CYC(0x4823, 0x4825); drawNameInputCursors__upperOptions_hook(gb);
+}
+
+void drawNameInputCursors__upperOptions_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4825, 0x4826); B = A;
+  CYC(0x4826, 0x4828); alu_and(gb, 0x0f);
+  CYC(0x4828, 0x4829); alu_add(gb, A);
+  CYC(0x4829, 0x482a); alu_add(gb, A);
+  CYC(0x482a, 0x482b); alu_add(gb, A);
+  CYC(0x482b, 0x482c); C = A;
+  CYC(0x482c, 0x482d); A = B;
+  CYC(0x482d, 0x482f); alu_and(gb, 0xf0);
+  CYC(0x482f, 0x4830); B = A;
+  CYC(0x4830, 0x4833); SET_HL(0x4860);
+  CALL_C(0x4833, addSpritesToOam_withOffset_hook, 0x0d61, 0x4836);
+  CYC(0x4836, 0x4838); draw_name_input_cursors_tail(gb);
+}
+
+void drawNameInputCursors__lowerOptions_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4838, 0x483b); A = mem_rd(gb, 0xcbb7);
+  CYC(0x483b, 0x483c); alu_rlca(gb);
+  CYC(0x483c, 0x483f); SET_HL(0x486c);
+  if (F & FC) CYCT(0x483f, 0x4841);
+  else { CYC(0x483f, 0x4841); CYC(0x4841, 0x4844); SET_HL(0x4869); }
+  CYC(0x4844, 0x4847); A = mem_rd(gb, 0xcbbd);
+  CYC(0x4847, 0x4848); push_effect(gb, 0x4848); add_a_to_hl(gb);
+  CYC(0x4848, 0x4849); C = mem_rd(gb, HL);
+  CYC(0x4849, 0x484b); B = 0;
+  CYC(0x484b, 0x484e); SET_HL(0x4870);
+  CALL_C(0x484e, addSpritesToOam_withOffset_hook, 0x0d61, 0x4851);
+  draw_name_input_cursors_tail(gb);
+}
+
+static void draw_secret_input_cursors_tail(GB *gb) {
+  CYC(0x48a8, 0x48aa); C = 0x0a;
+  CYC(0x48aa, 0x48ad); A = W8(wFileSelect_textInputCursorPos);
+  CYC(0x48ad, 0x48ae); alu_cp(gb, C);
+  CYC(0x48ae, 0x48b0); B = 0;
+  if (F & FC) CYCT(0x48b0, 0x48b2);
+  else {
+    CYC(0x48b0, 0x48b2);
+    CYC(0x48b2, 0x48b4); B = 0x10;
+    CYC(0x48b4, 0x48b5); alu_sub(gb, C);
+  }
+  CYC(0x48b5, 0x48b7); alu_cp(gb, 0x05);
+  if (F & FC) CYCT(0x48b7, 0x48b9);
+  else { CYC(0x48b7, 0x48b9); CYC(0x48b9, 0x48ba); A = alu_inc8(gb, A); }
+  CYC(0x48ba, 0x48bb); alu_add(gb, A);
+  CYC(0x48bb, 0x48bc); alu_add(gb, A);
+  CYC(0x48bc, 0x48bd); alu_add(gb, A);
+  CYC(0x48bd, 0x48be); C = A;
+  CYC(0x48be, 0x48c1); SET_HL(0x48da);
+  CYC(0x48c1, 0x48c4); addSpritesToOam_withOffset_hook(gb);
+}
+
+void drawSecretInputCursors_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x487e, textInput_getCursorPosition_hook, 0x47fb, 0x4881);
+  CYC(0x4881, 0x4883); alu_cp(gb, 0x50);
+  if (!(F & FC)) { CYCT(0x4883, 0x4885); drawSecretInputCursors__lowerOptions_hook(gb); return; }
+  CYC(0x4883, 0x4885); drawSecretInputCursors__upperOptions_hook(gb);
+}
+
+void drawSecretInputCursors__upperOptions_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4885, 0x4886); B = A;
+  CYC(0x4886, 0x4888); alu_and(gb, 0x0f);
+  CYC(0x4888, 0x4889); alu_add(gb, A);
+  CYC(0x4889, 0x488a); alu_add(gb, A);
+  CYC(0x488a, 0x488b); alu_add(gb, A);
+  CYC(0x488b, 0x488c); C = A;
+  CYC(0x488c, 0x488d); A = B;
+  CYC(0x488d, 0x488f); alu_and(gb, 0xf0);
+  CYC(0x488f, 0x4890); B = A;
+  CYC(0x4890, 0x4893); SET_HL(0x48c4);
+  CALL_C(0x4893, addSpritesToOam_withOffset_hook, 0x0d61, 0x4896);
+  CYC(0x4896, 0x4898); draw_secret_input_cursors_tail(gb);
+}
+
+void drawSecretInputCursors__lowerOptions_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4898, 0x489b); A = mem_rd(gb, 0xcbbd);
+  CYC(0x489b, 0x489e); SET_HL(0x48cd);
+  CYC(0x489e, 0x489f); push_effect(gb, 0x489f); add_a_to_hl(gb);
+  CYC(0x489f, 0x48a0); C = mem_rd(gb, HL);
+  CYC(0x48a0, 0x48a2); B = 0;
+  CYC(0x48a2, 0x48a5); SET_HL(0x48d1);
+  CALL_C(0x48a5, addSpritesToOam_withOffset_hook, 0x0d61, 0x48a8);
+  draw_secret_input_cursors_tail(gb);
+}
+
+void textInput_lowerOption_updateFileSelectCursorPos_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x48df, 0x48e2); A = mem_rd(gb, 0xcbbd);
+  CYC(0x48e2, 0x48e3); E = A;
+  CYC(0x48e3, 0x48e5); D = 0xff;
+  CALL_C(0x48e5, textInput_mapUpperXToLowerX_hook, 0x48fb, 0x48e8);
+  CYC(0x48e8, 0x48e9); A = B;
+  CYC(0x48e9, 0x48ec); mem_wr(gb, 0xcbbc, A);
+  CYC(0x48ec, 0x48ed); ret_effect(gb);
+}
+
+void textInput_lowerOption_updateFileSelectCursorPos2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x48ed, 0x48f0); A = mem_rd(gb, 0xcbbc);
+  CYC(0x48f0, 0x48f1); D = A;
+  CYC(0x48f1, 0x48f3); E = 0xff;
+  CALL_C(0x48f3, textInput_mapUpperXToLowerX_hook, 0x48fb, 0x48f6);
+  CYC(0x48f6, 0x48f7); A = C;
+  CYC(0x48f7, 0x48fa); mem_wr(gb, 0xcbbd, A);
+  CYC(0x48fa, 0x48fb); ret_effect(gb);
+}
+
+void textInput_mapUpperXToLowerX_hook(GB *gb) {
+  CYC(0x48fb, 0x48fe); A = mem_rd(gb, 0xcbb7);
+  CYC(0x48fe, 0x48ff); alu_rlca(gb);
+  CYC(0x48ff, 0x4902); SET_HL(0x4912);
+  if (!(F & FC)) { CYCT(0x4902, 0x4904); textInput_mapUpperXToLowerX__label_hook(gb); return; }
+  CYC(0x4902, 0x4904);
+  CYC(0x4904, 0x4907); SET_HL(0x492e);
+  textInput_mapUpperXToLowerX__label_hook(gb);
+}
+
+void textInput_mapUpperXToLowerX__label_hook(GB *gb) {
+  for (;;) {
+    CYC(0x4907, 0x4908); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x4908, 0x4909); B = A;
+    CYC(0x4909, 0x490a); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x490a, 0x490b); C = A;
+    CYC(0x490b, 0x490c); alu_cp(gb, E);
+    if (F & FZ) { CYCT(0x490c, 0x490d); ret_effect(gb); return; }
+    CYC(0x490c, 0x490d);
+    CYC(0x490d, 0x490e); A = B;
+    CYC(0x490e, 0x490f); alu_cp(gb, D);
+    if (!(F & FZ)) { CYCT(0x490f, 0x4911); continue; }
+    CYC(0x490f, 0x4911);
+    CYC(0x4911, 0x4912); ret_effect(gb);
+    return;
+  }
+}
+
+void textInput_loadCharacterGfx_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x49a5, 0x49a7); A = hram_rd(gb, 0x70);
+  CYC(0x49a7, 0x49a8); push_effect(gb, AF);
+  CYC(0x49a8, 0x49aa); A = 0x05;
+  CYC(0x49aa, 0x49ac); hram_wr(gb, 0x70, A);
+  CYC(0x49ac, 0x49ad); alu_xor(gb, A);
+  CYC(0x49ad, 0x49b0); mem_wr(gb, 0xcbba, A);
+  CYC(0x49b0, 0x49b3); SET_DE(0xd000);
+  CYC(0x49b3, 0x49b6); A = mem_rd(gb, 0xcbb7);
+  CYC(0x49b6, 0x49b7); alu_rlca(gb);
+  if (F & FC) { CYCT(0x49b7, 0x49b9); goto secret; }
+  CYC(0x49b7, 0x49b9);
+  CYC(0x49b9, 0x49bc); SET_BC(0x3b40);
+  CALL_C(0x49bc, copyTextCharacters_hook, 0x49cd, 0x49bf);
+  CYC(0x49bf, 0x49c1);
+  goto done;
+secret:
+  CYC(0x49c1, 0x49c4); SET_HL(0x00a1);
+  CYC(0x49c4, 0x49c6); B = 0x40;
+  CALL_C(0x49c6, copyTextCharactersFromHlUntilNull, 0x410e, 0x49c9);
+done:
+  CYC(0x49c9, 0x49ca); SET_AF(pop_effect(gb));
+  CYC(0x49ca, 0x49cc); hram_wr(gb, 0x70, A);
+  CYC(0x49cc, 0x49cd); ret_effect(gb);
+}
+
+void copyTextCharacters_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  do {
+    CYC(0x49cd, 0x49ce); push_effect(gb, BC);
+    CYC(0x49ce, 0x49cf); A = C;
+    CYC(0x49cf, 0x49d1); C = 0;
+    CALL_C(0x49d1, copyTextCharacterGfx_hook, 0x19df, 0x49d4);
+    CYC(0x49d4, 0x49d5); SET_BC(pop_effect(gb));
+    CYC(0x49d5, 0x49d6); C = alu_inc8(gb, C);
+    CYC(0x49d6, 0x49d7); B = alu_dec8(gb, B);
+    if (!(F & FZ)) CYCT(0x49d7, 0x49d9); else CYC(0x49d7, 0x49d9);
+  } while (!(F & FZ));
+  CYC(0x49d9, 0x49da); ret_effect(gb);
+}
+
+void loadFileDisplayVariables_hook(GB *gb) {
+  CYC(0x49da, 0x49dc); A = 0x02;
+  CYC(0x49dc, 0x49de); hram_wr(gb, 0x9a, A);
+  loadFileDisplayVariables__nextFile_hook(gb);
+}
+
+void loadFileDisplayVariables__nextFile_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  for (;;) {
+    CALL_C(0x49de, loadFile_b00_hook, 0x09dc, 0x49e1);
+    CYC(0x49e1, 0x49e3); A = hram_rd(gb, 0x9a);
+    CYC(0x49e3, 0x49e5); D = 0;
+    CALL_C(0x49e5, getFileDisplayVariableAddress_hook, 0x417a, 0x49e8);
+    CYC(0x49e8, 0x49e9); A = C;
+    CYC(0x49e9, 0x49ea); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x49ea, 0x49eb); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x49eb, 0x49ee); A = mem_rd(gb, 0xc6ab);
+    CYC(0x49ee, 0x49ef); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x49ef, 0x49f0); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x49f0, 0x49f3); A = mem_rd(gb, 0xc61e);
+    CYC(0x49f3, 0x49f4); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x49f4, 0x49f7); A = mem_rd(gb, 0xc61f);
+    CYC(0x49f7, 0x49f8); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x49f8, 0x49fb); A = mem_rd(gb, 0xc612);
+    CYC(0x49fb, 0x49fc); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x49fc, 0x49ff); A = mem_rd(gb, 0xc613);
+    CYC(0x49ff, 0x4a00); alu_add(gb, A);
+    CYC(0x4a00, 0x4a01); E = A;
+    CYC(0x4a01, 0x4a04); A = mem_rd(gb, 0xc614);
+    CYC(0x4a04, 0x4a05); alu_or(gb, E);
+    CYC(0x4a05, 0x4a06); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x4a06, 0x4a08); A = hram_rd(gb, 0x9a);
+    CYC(0x4a08, 0x4a09); alu_add(gb, A);
+    CYC(0x4a09, 0x4a0a); E = A;
+    CYC(0x4a0a, 0x4a0b); alu_add(gb, E);
+    CYC(0x4a0b, 0x4a0c); alu_add(gb, E);
+    CYC(0x4a0c, 0x4a0f); SET_HL(0xd7a0);
+    CYC(0x4a0f, 0x4a10); push_effect(gb, 0x4a10); add_a_to_hl(gb);
+    CYC(0x4a10, 0x4a13); SET_DE(0xc602);
+    CYC(0x4a13, 0x4a15); B = 0x06;
+    CALL_C(0x4a15, copyMemoryReverse_hook, 0x047f, 0x4a18);
+    CYC(0x4a18, 0x4a1b); SET_HL(0xff9a);
+    CYC(0x4a1b, 0x4a1c); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+    CYC(0x4a1c, 0x4a1e); alu_bit(gb, 7, mem_rd(gb, HL));
+    if (F & FZ) { CYCT(0x4a1e, 0x4a20); continue; }
+    CYC(0x4a1e, 0x4a20);
+    CYC(0x4a20, 0x4a21); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+    CYC(0x4a21, 0x4a22); ret_effect(gb);
+    return;
+  }
+}
+
+void textInput_updateEntryCursor_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4a22, 0x4a23); alu_xor(gb, A);
+  CALL_C(0x4a23, textInput_getOutputAddressOffset_hook, 0x4a3a, 0x4a26);
+  CYC(0x4a26, 0x4a29); SET_DE(0xdc00);
+  CYC(0x4a29, 0x4a2b); B = 0x18;
+  CALL_C(0x4a2b, copyTextCharactersFromHl, 0x4110, 0x4a2e);
+  CYC(0x4a2e, 0x4a2f); alu_xor(gb, A);
+  CYC(0x4a2f, 0x4a32); mem_wr(gb, 0xcbba, A);
+  CYC(0x4a32, 0x4a34); A = 0x07;
+  CYC(0x4a34, 0x4a37); loadUncompressedGfxHeader_hook(gb);
+}
+
+void textInput_getOutputAddress_hook(GB *gb) {
+  CYC(0x4a37, 0x4a3a); A = mem_rd(gb, 0xcbbe);
+  textInput_getOutputAddressOffset_hook(gb);
+}
+
+void textInput_getOutputAddressOffset_hook(GB *gb) {
+  CYC(0x4a3a, 0x4a3b); L = A;
+  CYC(0x4a3b, 0x4a3e); A = mem_rd(gb, 0xcbb7);
+  CYC(0x4a3e, 0x4a3f); alu_rlca(gb);
+  CYC(0x4a3f, 0x4a40); A = L;
+  CYC(0x4a40, 0x4a43); SET_HL(0xd7a0);
+  if (!(F & FC)) CYCT(0x4a43, 0x4a45);
+  else { CYC(0x4a43, 0x4a45); CYC(0x4a45, 0x4a48); SET_HL(0xd7c0); }
+  CYC(0x4a48, 0x4a49); push_effect(gb, 0x4a49); add_a_to_hl(gb);
+  CYC(0x4a49, 0x4a4a); ret_effect(gb);
+}
+
+void fileSelectDrawHeartsAndDeathCounter_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4a4a, 0x4a4d); A = mem_rd(gb, 0xcbb3);
+  CYC(0x4a4d, 0x4a4f); alu_cp(gb, 0x03);
+  if (F & FZ) { CYCT(0x4a4f, 0x4a50); ret_effect(gb); return; }
+  CYC(0x4a4f, 0x4a50);
+  CYC(0x4a50, 0x4a52); A = 0xa2;
+  CALL_C(0x4a52, loadGfxHeader_hook, 0x0626, 0x4a55);
+  CYC(0x4a55, 0x4a58); A = mem_rd(gb, 0xcbbc);
+  CYC(0x4a58, 0x4a5a); alu_cp(gb, 0x03);
+  if (!(F & FC)) { CYCT(0x4a5a, 0x4a5c); goto done; }
+  CYC(0x4a5a, 0x4a5c);
+  CYC(0x4a5c, 0x4a5e); D = 0;
+  CALL_C(0x4a5e, getFileDisplayVariableAddress_hook, 0x417a, 0x4a61);
+  CYC(0x4a61, 0x4a63); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(0x4a63, 0x4a65); goto done; }
+  CYC(0x4a63, 0x4a65);
+  CYC(0x4a65, 0x4a67); D = 0x04;
+  CALL_C(0x4a67, getFileDisplayVariableAddress_paramE_hook, 0x417b, 0x4a6a);
+  CYC(0x4a6a, 0x4a6b); E = L;
+  CYC(0x4a6b, 0x4a6c); D = H;
+  CYC(0x4a6c, 0x4a6f); SET_HL(0xd130);
+  CYC(0x4a6f, 0x4a71); B = 0x10;
+  CYC(0x4a71, 0x4a72); A = mem_rd(gb, DE);
+  CYC(0x4a72, 0x4a74); alu_and(gb, 0x0f);
+  CYC(0x4a74, 0x4a75); alu_add(gb, B);
+  CYC(0x4a75, 0x4a76); mem_wr(gb, HL, A); L = alu_dec8(gb, L);
+  CYC(0x4a76, 0x4a77); A = mem_rd(gb, DE);
+  CYC(0x4a77, 0x4a79); alu_and(gb, 0xf0);
+  CYC(0x4a79, 0x4a7b); A = alu_swap(gb, A);
+  CYC(0x4a7b, 0x4a7c); alu_add(gb, B);
+  CYC(0x4a7c, 0x4a7d); mem_wr(gb, HL, A); L = alu_dec8(gb, L);
+  CYC(0x4a7d, 0x4a7e); E = alu_inc8(gb, E);
+  CYC(0x4a7e, 0x4a7f); A = mem_rd(gb, DE);
+  CYC(0x4a7f, 0x4a80); alu_add(gb, B);
+  CYC(0x4a80, 0x4a81); mem_wr(gb, HL, A); L = alu_dec8(gb, L);
+  CYC(0x4a81, 0x4a84); A = mem_rd(gb, 0xcbbc);
+  CYC(0x4a84, 0x4a86); D = 0x02;
+  CALL_C(0x4a86, getFileDisplayVariableAddress_hook, 0x417a, 0x4a89);
+  CYC(0x4a89, 0x4a8a); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4a8a, 0x4a8b); B = mem_rd(gb, HL);
+  CYC(0x4a8b, 0x4a8c); C = A;
+  CYC(0x4a8c, 0x4a8f); SET_HL(0xd14a);
+  CALL_C(0x4a8f, fileSelectDrawHeartDisplay, 0x5435, 0x4a92);
+done:
+  CYC(0x4a92, 0x4a94); A = 0x08;
+  CYC(0x4a94, 0x4a97); loadUncompressedGfxHeader_hook(gb);
+}
+
+void fileSelectDrawAcornCursor_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4a97, 0x4a9a); A = mem_rd(gb, 0xcbbb);
+  CYC(0x4a9a, 0x4a9d); SET_HL(0x4ace);
+  CYC(0x4a9d, 0x4a9e); add_double_index_to_hl(gb, 0x4a9e);
+  CYC(0x4a9e, 0x4a9f); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4a9f, 0x4aa0); H = mem_rd(gb, HL);
+  CYC(0x4aa0, 0x4aa1); L = A;
+  CYC(0x4aa1, 0x4aa2); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4aa2, 0x4aa3); E = A;
+  CYC(0x4aa3, 0x4aa4); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4aa4, 0x4aa5); D = A;
+  CYC(0x4aa5, 0x4aa6); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4aa6, 0x4aa7); C = A;
+  CYC(0x4aa7, 0x4aa8); B = mem_rd(gb, HL);
+  CYC(0x4aa8, 0x4aa9); push_effect(gb, BC);
+  CYC(0x4aa9, 0x4aac); SET_HL(0x4ac9);
+  CYC(0x4aac, 0x4aaf); A = mem_rd(gb, 0xcbbc);
+  CYC(0x4aaf, 0x4ab1); alu_bit(gb, 7, A);
+  if (F & FZ) CALL_C_CC(0x4ab1, fileSelectDrawAcornCursor__func_hook, 0x4abe, 0x4ab4);
+  else CYC(0x4ab1, 0x4ab4);
+  CYC(0x4ab4, 0x4ab5); SET_DE(pop_effect(gb));
+  CYC(0x4ab5, 0x4ab8); SET_HL(0x4ac9);
+  CYC(0x4ab8, 0x4abb); A = mem_rd(gb, 0xcbbd);
+  CYC(0x4abb, 0x4abd); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(0x4abd, 0x4abe); ret_effect(gb); return; }
+  CYC(0x4abd, 0x4abe); fileSelectDrawAcornCursor__func_hook(gb);
+}
+
+void fileSelectDrawAcornCursor__func_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4abe, addDoubleIndexToDe_hook, 0x0072, 0x4ac1);
+  CYC(0x4ac1, 0x4ac2); A = mem_rd(gb, DE);
+  CYC(0x4ac2, 0x4ac3); B = A;
+  CYC(0x4ac3, 0x4ac4); E = alu_inc8(gb, E);
+  CYC(0x4ac4, 0x4ac5); A = mem_rd(gb, DE);
+  CYC(0x4ac5, 0x4ac6); C = A;
+  CYC(0x4ac6, 0x4ac9); addSpritesToOam_withOffset_hook(gb);
 }
