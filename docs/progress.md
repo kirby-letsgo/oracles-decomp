@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,287 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,310 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -120,6 +120,9 @@ Updated 2026-09-12. Newest entries at the top of each section.
   Batch 107 added the remaining file-select mode helpers, blank submenu sprites, the dungeon-map
   tilemap and compass paths, and textbox initialization; five adjacent data rows left the
   executable routine registry.
+  Batch 108 added bank-2 item/status/ring rendering helpers and bank-4 tile-write, changed-tile,
+  interleaved-tile, and VBlank queue paths; the adjacent VRAM-address table left the executable
+  routine registry.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -225,6 +228,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-12: milestone 3 phase 5 batch 108 (23 routines): added bank 2's equipped-item,
+  item-icon, status-bar map, extra-heart address, and ring-tile rendering helpers, plus bank 4's
+  changed-tile queue, VRAM write, subtile-address, interleaved-tile, and VBlank tile-write queue
+  paths. Twelve local entries received stable aliases and the adjacent VRAM-address table left the
+  executable registry. The translation preserves real AF/BC/DE/HL stacks, exact RST `$10`/`$18`
+  return addresses, banked WRAM restoration, and cross-bank readable-call routing. Integration
+  threaded the public hooks' entry SP through static bank-0 helpers after `CALL_C` made their
+  nonlocal path reachable. Two independent instruction-level reviews approved the corrected code.
+  Gates: lint 0, 30k verify 0 mismatches across 4,802,987 calls, full replay state
+  `64bddd0dfe384126`, normal and quirk suites 8/8.
 - 2026-09-12: milestone 3 phase 5 batch 107 (19 routines): added bank 2's remaining
   file-select mode helpers, blank item-submenu sprites, dungeon-map scrollable-tilemap generator,
   compass tile selector, and floor-address calculation, plus bank `$3f` textbox initialization.

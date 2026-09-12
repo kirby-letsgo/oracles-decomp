@@ -11,6 +11,18 @@ void label_04_033_hook(GB *gb);
 void setWarpDestDefault_hook(GB *gb);
 void func_04_4732_hook(GB *gb);
 void getLinkWarpQuadrant_hook(GB *gb);
+void updateChangedTileQueue_hook(GB *gb);
+void updateChangedTileQueue__handleSingleEntry6c46_hook(GB *gb);
+void write4BytesToVramLayout_hook(GB *gb);
+void getVramSubtileAddressOfTile_hook(GB *gb);
+void setInterleavedTile_body_hook(GB *gb);
+void setInterleavedTile_body__copy2Bytes6cf3_hook(GB *gb);
+void setInterleavedTile_body__interleaveDiagonally6cfa_hook(GB *gb);
+void setInterleavedTile_body__copy2BytesSeparated6d0f_hook(GB *gb);
+void setInterleavedTile_body__queueWrite6d18_hook(GB *gb);
+void queueTileWriteAtVBlank_hook(GB *gb);
+void queueTileWriteAtVBlank__copy2Bytes6d4d_hook(GB *gb);
+void queueTileWriteAtVBlank__getTilePositionInVram6d54_hook(GB *gb);
 
 static void bank4_add_double_index_to_hl(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -21,6 +33,20 @@ static void bank4_add_double_index_to_hl(GB *gb, uint16_t return_address) {
   burn_rom(gb, 0x00, 0x001d, 0x001e, false); alu_add_hl(gb, BC);
   burn_rom(gb, 0x00, 0x001e, 0x001f, false); SET_BC(pop_effect(gb));
   burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
+}
+
+static void bank4_add_a_to_hl(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, false);
+    burn_rom(gb, 0x00, 0x0013, 0x0014, false); H = alu_inc8(gb, H);
+    burn_rom(gb, 0x00, 0x0014, 0x0015, false);
+  } else {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, true);
+  }
+  pop_effect(gb);
 }
 
 static void b4_vblank_function(GB *gb, uint16_t base, uint8_t column) {
@@ -867,3 +893,287 @@ void applySingleTileChanges__notMatch630e_hook(GB *gb) { uint16_t sp0_ = gb->sp;
 void applySingleTileChanges__unlinkedOnly6316_hook(GB *gb) { uint16_t sp0_ = gb->sp; apply_single_tile_changes(gb, 0x6316, sp0_); }
 void applySingleTileChanges__linkedOnly631d_hook(GB *gb) { uint16_t sp0_ = gb->sp; apply_single_tile_changes(gb, 0x631d, sp0_); }
 void applySingleTileChanges__finishedGameOnly6324_hook(GB *gb) { uint16_t sp0_ = gb->sp; apply_single_tile_changes(gb, 0x6324, sp0_); }
+
+static void update_changed_tile_queue(GB *gb, uint16_t entry, uint16_t sp0_) {
+  if (entry == 0x6c32) {
+    CYC(0x6c32, 0x6c35); A = W8(wScrollMode);
+    CYC(0x6c35, 0x6c37); alu_and(gb, 0x0e);
+    if (!(F & FZ)) { CYCT(0x6c37, 0x6c38); ret_effect(gb); return; }
+    CYC(0x6c37, 0x6c38);
+    CYC(0x6c38, 0x6c3a); B = 0x04;
+    for (;;) {
+      CYC(0x6c3a, 0x6c3b); push_effect(gb, BC);
+      CALL_C(0x6c3b, updateChangedTileQueue__handleSingleEntry6c46_hook, 0x6c46, 0x6c3e);
+      CYC(0x6c3e, 0x6c3f); SET_BC(pop_effect(gb));
+      CYC(0x6c3f, 0x6c40); B = alu_dec8(gb, B);
+      if (!(F & FZ)) { CYCT(0x6c40, 0x6c42); continue; }
+      CYC(0x6c40, 0x6c42);
+      break;
+    }
+    CYC(0x6c42, 0x6c43); alu_xor(gb, A);
+    CYC(0x6c43, 0x6c45); mem_wr(gb, IO_SVBK, A);
+    CYC(0x6c45, 0x6c46); ret_effect(gb);
+    return;
+  }
+
+  CYC(0x6c46, 0x6c49); A = W8(wChangedTileQueueHead);
+  CYC(0x6c49, 0x6c4a); B = A;
+  CYC(0x6c4a, 0x6c4d); A = W8(wChangedTileQueueTail);
+  CYC(0x6c4d, 0x6c4e); alu_cp(gb, B);
+  if (F & FZ) { CYCT(0x6c4e, 0x6c4f); ret_effect(gb); return; }
+  CYC(0x6c4e, 0x6c4f);
+  CYC(0x6c4f, 0x6c50); B = alu_inc8(gb, B);
+  CYC(0x6c50, 0x6c51); A = B;
+  CYC(0x6c51, 0x6c53); alu_and(gb, 0x1f);
+  CYC(0x6c53, 0x6c56); W8(wChangedTileQueueHead) = A;
+  CYC(0x6c56, 0x6c59); SET_HL(w2ChangedTileQueue);
+  CYC(0x6c59, 0x6c5a); bank4_add_double_index_to_hl(gb, 0x6c5a);
+  CYC(0x6c5a, 0x6c5c); A = 0x02;
+  CYC(0x6c5c, 0x6c5e); mem_wr(gb, IO_SVBK, A);
+  CYC(0x6c5e, 0x6c5f); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6c5f, 0x6c60); C = mem_rd(gb, HL);
+  CYC(0x6c60, 0x6c61); B = A;
+  CYC(0x6c61, 0x6c62); A = C;
+  CYC(0x6c62, 0x6c64); H8(hFF8C) = A;
+  CYC(0x6c64, 0x6c66); A = mem_rd(gb, IO_SVBK);
+  CYC(0x6c66, 0x6c67); push_effect(gb, AF);
+  CYC(0x6c67, 0x6c69); A = 0x03;
+  CYC(0x6c69, 0x6c6b); mem_wr(gb, IO_SVBK, A);
+  CALL_C(0x6c6b, getVramSubtileAddressOfTile_hook, 0x6c89, 0x6c6e);
+  CYC(0x6c6e, 0x6c6f); A = B;
+  CALL_C(0x6c6f, setHlToTileMappingDataPlusATimes8_hook, 0x3a94, 0x6c72);
+  CYC(0x6c72, 0x6c73); push_effect(gb, HL);
+  CYC(0x6c73, 0x6c74); push_effect(gb, DE);
+  CALL_C(0x6c74, write4BytesToVramLayout_hook, 0x6c23, 0x6c77);
+  CYC(0x6c77, 0x6c78); SET_DE(pop_effect(gb));
+  CYC(0x6c78, 0x6c7a); A = 0x04;
+  CYC(0x6c7a, 0x6c7b); alu_add(gb, D);
+  CYC(0x6c7b, 0x6c7c); D = A;
+  CALL_C(0x6c7c, write4BytesToVramLayout_hook, 0x6c23, 0x6c7f);
+  CYC(0x6c7f, 0x6c81); A = H8(hFF8C);
+  CYC(0x6c81, 0x6c82); SET_HL(pop_effect(gb));
+  CALL_C(0x6c82, queueTileWriteAtVBlank_hook, 0x6d24, 0x6c85);
+  CYC(0x6c85, 0x6c86); SET_AF(pop_effect(gb));
+  CYC(0x6c86, 0x6c88); mem_wr(gb, IO_SVBK, A);
+  CYC(0x6c88, 0x6c89); ret_effect(gb);
+}
+
+void updateChangedTileQueue_hook(GB *gb) { uint16_t sp0_ = gb->sp; update_changed_tile_queue(gb, 0x6c32, sp0_); }
+void updateChangedTileQueue__handleSingleEntry6c46_hook(GB *gb) { uint16_t sp0_ = gb->sp; update_changed_tile_queue(gb, 0x6c46, sp0_); }
+
+void write4BytesToVramLayout_hook(GB *gb) {
+  CYC(0x6c23, 0x6c24); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6c24, 0x6c25); mem_wr(gb, DE, A);
+  CYC(0x6c25, 0x6c26); E = alu_inc8(gb, E);
+  CYC(0x6c26, 0x6c27); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6c27, 0x6c28); mem_wr(gb, DE, A);
+  CYC(0x6c28, 0x6c2a); A = 0x1f;
+  CYC(0x6c2a, 0x6c2b); alu_add(gb, E);
+  CYC(0x6c2b, 0x6c2c); E = A;
+  CYC(0x6c2c, 0x6c2d); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6c2d, 0x6c2e); mem_wr(gb, DE, A);
+  CYC(0x6c2e, 0x6c2f); E = alu_inc8(gb, E);
+  CYC(0x6c2f, 0x6c30); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6c30, 0x6c31); mem_wr(gb, DE, A);
+  CYC(0x6c31, 0x6c32); ret_effect(gb);
+}
+
+void getVramSubtileAddressOfTile_hook(GB *gb) {
+  CYC(0x6c89, 0x6c8a); A = C;
+  CYC(0x6c8a, 0x6c8c); A = alu_swap(gb, A);
+  CYC(0x6c8c, 0x6c8e); alu_and(gb, 0x0f);
+  CYC(0x6c8e, 0x6c91); SET_HL(0x6c9d);
+  CYC(0x6c91, 0x6c92); bank4_add_double_index_to_hl(gb, 0x6c92);
+  CYC(0x6c92, 0x6c93); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6c93, 0x6c94); H = mem_rd(gb, HL);
+  CYC(0x6c94, 0x6c95); L = A;
+  CYC(0x6c95, 0x6c96); A = C;
+  CYC(0x6c96, 0x6c98); alu_and(gb, 0x0f);
+  CYC(0x6c98, 0x6c99); alu_add(gb, A);
+  CYC(0x6c99, 0x6c9a); bank4_add_a_to_hl(gb, 0x6c9a);
+  CYC(0x6c9a, 0x6c9b); E = L;
+  CYC(0x6c9b, 0x6c9c); D = H;
+  CYC(0x6c9c, 0x6c9d); ret_effect(gb);
+}
+
+static void set_interleaved_tile_body(GB *gb, uint16_t entry, uint16_t sp0_) {
+  if (entry == 0x6cf3) goto copy_2_bytes;
+  if (entry == 0x6cfa) goto interleave_diagonally;
+  if (entry == 0x6d0f) goto copy_2_bytes_separated;
+  if (entry == 0x6d18) goto queue_write;
+
+  CYC(0x6cb3, 0x6cb5); H8(hFF8B) = A;
+  CYC(0x6cb5, 0x6cb7); A = mem_rd(gb, IO_SVBK);
+  CYC(0x6cb7, 0x6cb8); push_effect(gb, AF);
+  CYC(0x6cb8, 0x6cba); A = 0x03;
+  CYC(0x6cba, 0x6cbc); mem_wr(gb, IO_SVBK, A);
+  CYC(0x6cbc, 0x6cbe); A = H8(hFF8F);
+  CALL_C(0x6cbe, setHlToTileMappingDataPlusATimes8_hook, 0x3a94, 0x6cc1);
+  CYC(0x6cc1, 0x6cc4); SET_DE(wEnemyPlacement_cec8);
+  CYC(0x6cc4, 0x6cc6); B = 0x08;
+  for (;;) {
+    CYC(0x6cc6, 0x6cc7); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x6cc7, 0x6cc8); mem_wr(gb, DE, A);
+    CYC(0x6cc8, 0x6cc9); SET_DE(DE + 1);
+    CYC(0x6cc9, 0x6cca); B = alu_dec8(gb, B);
+    if (!(F & FZ)) { CYCT(0x6cca, 0x6ccc); continue; }
+    CYC(0x6cca, 0x6ccc);
+    break;
+  }
+  CYC(0x6ccc, 0x6cce); A = H8(hFF8E);
+  CALL_C(0x6cce, setHlToTileMappingDataPlusATimes8_hook, 0x3a94, 0x6cd1);
+  CYC(0x6cd1, 0x6cd4); SET_DE(wEnemyPlacement_cec8);
+  CYC(0x6cd4, 0x6cd6); A = H8(hFF8B);
+  CYC(0x6cd6, 0x6cd8); alu_bit(gb, 0, A);
+  if (!(F & FZ)) { CYCT(0x6cd8, 0x6cda); goto interleave_diagonally; }
+  CYC(0x6cd8, 0x6cda);
+  CYC(0x6cda, 0x6cdc); alu_bit(gb, 1, A);
+  if (!(F & FZ)) { CYCT(0x6cdc, 0x6cde); goto copy_second_pair; }
+  CYC(0x6cdc, 0x6cde);
+  CYC(0x6cde, 0x6cdf); SET_HL(HL + 1);
+  CYC(0x6cdf, 0x6ce0); SET_HL(HL + 1);
+  CALL_C(0x6ce0, setInterleavedTile_body__copy2Bytes6cf3_hook, 0x6cf3, 0x6ce3);
+  CYC(0x6ce3, 0x6ce5); goto copy_final_pair;
+copy_second_pair:
+  CYC(0x6ce5, 0x6ce6); SET_DE(DE + 1);
+  CYC(0x6ce6, 0x6ce7); SET_DE(DE + 1);
+  CALL_C(0x6ce7, setInterleavedTile_body__copy2Bytes6cf3_hook, 0x6cf3, 0x6cea);
+copy_final_pair:
+  CYC(0x6cea, 0x6ceb); SET_HL(HL + 1);
+  CYC(0x6ceb, 0x6cec); SET_HL(HL + 1);
+  CYC(0x6cec, 0x6ced); SET_DE(DE + 1);
+  CYC(0x6ced, 0x6cee); SET_DE(DE + 1);
+  CALL_C(0x6cee, setInterleavedTile_body__copy2Bytes6cf3_hook, 0x6cf3, 0x6cf1);
+  CYC(0x6cf1, 0x6cf3); goto queue_write;
+
+copy_2_bytes:
+  CYC(0x6cf3, 0x6cf4); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6cf4, 0x6cf5); mem_wr(gb, DE, A);
+  CYC(0x6cf5, 0x6cf6); SET_DE(DE + 1);
+  CYC(0x6cf6, 0x6cf7); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6cf7, 0x6cf8); mem_wr(gb, DE, A);
+  CYC(0x6cf8, 0x6cf9); SET_DE(DE + 1);
+  CYC(0x6cf9, 0x6cfa); ret_effect(gb);
+  return;
+
+interleave_diagonally:
+  CYC(0x6cfa, 0x6cfc); alu_bit(gb, 1, A);
+  if (!(F & FZ)) { CYCT(0x6cfc, 0x6cfe); goto diagonal_second_pair; }
+  CYC(0x6cfc, 0x6cfe);
+  CYC(0x6cfe, 0x6cff); SET_DE(DE + 1);
+  CALL_C(0x6cff, setInterleavedTile_body__copy2BytesSeparated6d0f_hook, 0x6d0f, 0x6d02);
+  CYC(0x6d02, 0x6d04); goto diagonal_final_pair;
+diagonal_second_pair:
+  CYC(0x6d04, 0x6d05); SET_HL(HL + 1);
+  CALL_C(0x6d05, setInterleavedTile_body__copy2BytesSeparated6d0f_hook, 0x6d0f, 0x6d08);
+diagonal_final_pair:
+  CYC(0x6d08, 0x6d09); SET_HL(HL + 1);
+  CYC(0x6d09, 0x6d0a); SET_DE(DE + 1);
+  CALL_C(0x6d0a, setInterleavedTile_body__copy2BytesSeparated6d0f_hook, 0x6d0f, 0x6d0d);
+  CYC(0x6d0d, 0x6d0f); goto queue_write;
+
+copy_2_bytes_separated:
+  CYC(0x6d0f, 0x6d10); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6d10, 0x6d11); mem_wr(gb, DE, A);
+  CYC(0x6d11, 0x6d12); SET_DE(DE + 1);
+  CYC(0x6d12, 0x6d13); SET_HL(HL + 1);
+  CYC(0x6d13, 0x6d14); SET_DE(DE + 1);
+  CYC(0x6d14, 0x6d15); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6d15, 0x6d16); mem_wr(gb, DE, A);
+  CYC(0x6d16, 0x6d17); SET_DE(DE + 1);
+  CYC(0x6d17, 0x6d18); ret_effect(gb);
+  return;
+
+queue_write:
+  CYC(0x6d18, 0x6d1a); A = H8(hFF8C);
+  CYC(0x6d1a, 0x6d1d); SET_HL(wEnemyPlacement_cec8);
+  CALL_C(0x6d1d, queueTileWriteAtVBlank_hook, 0x6d24, 0x6d20);
+  CYC(0x6d20, 0x6d21); SET_AF(pop_effect(gb));
+  CYC(0x6d21, 0x6d23); mem_wr(gb, IO_SVBK, A);
+  CYC(0x6d23, 0x6d24); ret_effect(gb);
+}
+
+void setInterleavedTile_body_hook(GB *gb) { uint16_t sp0_ = gb->sp; set_interleaved_tile_body(gb, 0x6cb3, sp0_); }
+void setInterleavedTile_body__copy2Bytes6cf3_hook(GB *gb) { uint16_t sp0_ = gb->sp; set_interleaved_tile_body(gb, 0x6cf3, sp0_); }
+void setInterleavedTile_body__interleaveDiagonally6cfa_hook(GB *gb) { uint16_t sp0_ = gb->sp; set_interleaved_tile_body(gb, 0x6cfa, sp0_); }
+void setInterleavedTile_body__copy2BytesSeparated6d0f_hook(GB *gb) { uint16_t sp0_ = gb->sp; set_interleaved_tile_body(gb, 0x6d0f, sp0_); }
+void setInterleavedTile_body__queueWrite6d18_hook(GB *gb) { uint16_t sp0_ = gb->sp; set_interleaved_tile_body(gb, 0x6d18, sp0_); }
+
+static void queue_tile_write_at_vblank(GB *gb, uint16_t entry, uint16_t sp0_) {
+  if (entry == 0x6d4d) goto copy_2_bytes;
+  if (entry == 0x6d54) goto get_tile_position_in_vram;
+
+  CYC(0x6d24, 0x6d25); push_effect(gb, HL);
+  CALL_C(0x6d25, queueTileWriteAtVBlank__getTilePositionInVram6d54_hook, 0x6d54, 0x6d28);
+  CYC(0x6d28, 0x6d2a); alu_add(gb, 0x20);
+  CYC(0x6d2a, 0x6d2b); C = A;
+  CYC(0x6d2b, 0x6d2d); A = H8(hVBlankFunctionQueueTail);
+  CYC(0x6d2d, 0x6d2e); L = A;
+  CYC(0x6d2e, 0x6d30); H = 0xc4;
+  CYC(0x6d30, 0x6d33); A = mem_rd(gb, 0x0a89);
+  CYC(0x6d33, 0x6d34); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x6d34, 0x6d35); mem_wr(gb, HL, E);
+  CYC(0x6d35, 0x6d36); L = alu_inc8(gb, L);
+  CYC(0x6d36, 0x6d37); mem_wr(gb, HL, D);
+  CYC(0x6d37, 0x6d38); L = alu_inc8(gb, L);
+  CYC(0x6d38, 0x6d39); E = L;
+  CYC(0x6d39, 0x6d3a); D = H;
+  CYC(0x6d3a, 0x6d3b); SET_HL(pop_effect(gb));
+  CYC(0x6d3b, 0x6d3d); B = 0x02;
+  for (;;) {
+    CALL_C(0x6d3d, queueTileWriteAtVBlank__copy2Bytes6d4d_hook, 0x6d4d, 0x6d40);
+    CYC(0x6d40, 0x6d41); A = C;
+    CYC(0x6d41, 0x6d42); mem_wr(gb, DE, A);
+    CYC(0x6d42, 0x6d43); E = alu_inc8(gb, E);
+    CALL_C(0x6d43, queueTileWriteAtVBlank__copy2Bytes6d4d_hook, 0x6d4d, 0x6d46);
+    CYC(0x6d46, 0x6d47); B = alu_dec8(gb, B);
+    if (!(F & FZ)) { CYCT(0x6d47, 0x6d49); continue; }
+    CYC(0x6d47, 0x6d49);
+    break;
+  }
+  CYC(0x6d49, 0x6d4a); A = E;
+  CYC(0x6d4a, 0x6d4c); H8(hVBlankFunctionQueueTail) = A;
+  CYC(0x6d4c, 0x6d4d); ret_effect(gb);
+  return;
+
+copy_2_bytes:
+  CYC(0x6d4d, 0x6d4e); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6d4e, 0x6d4f); mem_wr(gb, DE, A);
+  CYC(0x6d4f, 0x6d50); E = alu_inc8(gb, E);
+  CYC(0x6d50, 0x6d51); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6d51, 0x6d52); mem_wr(gb, DE, A);
+  CYC(0x6d52, 0x6d53); E = alu_inc8(gb, E);
+  CYC(0x6d53, 0x6d54); ret_effect(gb);
+  return;
+
+get_tile_position_in_vram:
+  CYC(0x6d54, 0x6d55); E = A;
+  CYC(0x6d55, 0x6d57); alu_and(gb, 0xf0);
+  CYC(0x6d57, 0x6d59); A = alu_swap(gb, A);
+  CYC(0x6d59, 0x6d5a); D = A;
+  CYC(0x6d5a, 0x6d5b); A = E;
+  CYC(0x6d5b, 0x6d5d); alu_and(gb, 0x0f);
+  CYC(0x6d5d, 0x6d5e); alu_add(gb, A);
+  CYC(0x6d5e, 0x6d5f); E = A;
+  CYC(0x6d5f, 0x6d62); A = W8(wScreenOffsetX);
+  CYC(0x6d62, 0x6d64); A = alu_swap(gb, A);
+  CYC(0x6d64, 0x6d65); alu_add(gb, A);
+  CYC(0x6d65, 0x6d66); alu_add(gb, E);
+  CYC(0x6d66, 0x6d68); alu_and(gb, 0x1f);
+  CYC(0x6d68, 0x6d69); E = A;
+  CYC(0x6d69, 0x6d6c); A = W8(wScreenOffsetY);
+  CYC(0x6d6c, 0x6d6e); A = alu_swap(gb, A);
+  CYC(0x6d6e, 0x6d6f); alu_add(gb, D);
+  CYC(0x6d6f, 0x6d71); alu_and(gb, 0x0f);
+  CYC(0x6d71, 0x6d74); SET_HL(0x36d6);
+  CYC(0x6d74, 0x6d75); bank4_add_double_index_to_hl(gb, 0x6d75);
+  CYC(0x6d75, 0x6d76); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6d76, 0x6d77); alu_add(gb, E);
+  CYC(0x6d77, 0x6d78); E = A;
+  CYC(0x6d78, 0x6d79); D = mem_rd(gb, HL);
+  CYC(0x6d79, 0x6d7a); ret_effect(gb);
+}
+
+void queueTileWriteAtVBlank_hook(GB *gb) { uint16_t sp0_ = gb->sp; queue_tile_write_at_vblank(gb, 0x6d24, sp0_); }
+void queueTileWriteAtVBlank__copy2Bytes6d4d_hook(GB *gb) { uint16_t sp0_ = gb->sp; queue_tile_write_at_vblank(gb, 0x6d4d, sp0_); }
+void queueTileWriteAtVBlank__getTilePositionInVram6d54_hook(GB *gb) { uint16_t sp0_ = gb->sp; queue_tile_write_at_vblank(gb, 0x6d54, sp0_); }

@@ -6157,7 +6157,7 @@ void setTileInAllBuffers_hook(GB *gb) {
   ret_effect(gb);
 }
 
-static void set_interleaved_tile(GB *gb) {
+static void set_interleaved_tile(GB *gb, uint16_t sp0_) {
   uint16_t de = DE;
   E = A;
   CYC(0x3acf, 0x3ad3); C = mem_rd(gb, IO_SVBK);
@@ -6167,7 +6167,7 @@ static void set_interleaved_tile(GB *gb) {
   CYC(0x3adc, 0x3adf); mem_wr(gb, MBC_ROM_BANK, 0x04);
   A = E;
   CYC(0x3adf, 0x3ae0);
-  CALL_ROM(0x3ae0, ROM_b04_setInterleavedTile_body);
+  CALL_C(0x3ae0, setInterleavedTile_body_hook, 0x6cb3, 0x3ae3);
   SET_BC(bc);
   A = B;
   CYC(0x3ae3, 0x3ae7); H8(hRomBank) = A;
@@ -6179,7 +6179,8 @@ static void set_interleaved_tile(GB *gb) {
 }
 
 void setInterleavedTile_hook(GB *gb) {
-  set_interleaved_tile(gb);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  set_interleaved_tile(gb, sp0_);
   ret_effect(gb);
 }
 
@@ -6696,7 +6697,7 @@ void generateVramTilesWithRoomChanges_hook(GB *gb) {
 
 // simple scripts (bank $0c): commands 0 to 4 through the rst $00 jump table at $3dd7
 
-static void simple_script_run_command(GB *gb) {
+static void simple_script_run_command(GB *gb, uint16_t sp0_) {
   CYC(0x3dd4, 0x3dd5); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(0x3dd5, 0x3dd6); push_effect(gb, HL);
   CYC(0x3dd6, 0x3dd7); push_effect(gb, simpleScriptCommandTable);
@@ -6756,7 +6757,7 @@ static void simple_script_run_command(GB *gb) {
     CYC(0x3e07, 0x3e08); A = mem_rd(gb, HL); SET_HL(HL + 1);
     uint16_t hl = HL;
     CYC(0x3e08, 0x3e0c);
-    set_interleaved_tile(gb);
+    set_interleaved_tile(gb, sp0_);
     SET_HL(hl);
     alu_scf(gb);
     CYC(0x3e0c, 0x3e0f);
@@ -6766,6 +6767,7 @@ static void simple_script_run_command(GB *gb) {
 }
 
 void interactionRunSimpleScript_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   bank_push(gb, 0x3da8, 0x0c);
   H = D;
   L = 0x58;
@@ -6785,7 +6787,7 @@ void interactionRunSimpleScript_hook(GB *gb) {
     }
     CYC(0x3db9, 0x3dbc);
     CYC(0x3dbc, 0x3dbf);
-    simple_script_run_command(gb);
+    simple_script_run_command(gb, sp0_);
     if (F & FC) { CYCT(0x3dbf, 0x3dc1); continue; }
     CYC(0x3dbf, 0x3dc1);
     CYC(0x3dc1, 0x3dc4);
@@ -9131,7 +9133,7 @@ void updateAllObjects_hook(GB *gb) {
   switch_bank(gb, 0x34d0, 0x00);
   CALL_ROM(0x34d7, ROM_updateCamera);
   switch_bank(gb, 0x34da, 0x04);
-  CALL_ROM(0x34e1, ROM_b04_updateChangedTileQueue);
+  CALL_C(0x34e1, updateChangedTileQueue_hook, 0x6c32, 0x34e4);
   switch_bank(gb, 0x34e4, 0x04);
   CALL_ROM(0x34eb, ROM_b04_updateAnimations);
   alu_xor(gb, A);

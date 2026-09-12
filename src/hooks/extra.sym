@@ -687,3 +687,15 @@
 02:68e3 dungeonMap_checkCompassTile__treasure68e3
 02:68ea dungeonMap_checkCompassTile__nothing68ea
 02:68ec dungeonMap_checkCompassTile__ret68ec
+04:6c46 updateChangedTileQueue__handleSingleEntry6c46
+04:6cf3 setInterleavedTile_body__copy2Bytes6cf3
+04:6cfa setInterleavedTile_body__interleaveDiagonally6cfa
+04:6d0f setInterleavedTile_body__copy2BytesSeparated6d0f
+04:6d18 setInterleavedTile_body__queueWrite6d18
+04:6d4d queueTileWriteAtVBlank__copy2Bytes6d4d
+04:6d54 queueTileWriteAtVBlank__getTilePositionInVram6d54
+02:5313 func_02_52f6__func1
+02:5318 func_02_52f6__func2
+02:54c0 loadItemIconGfx__func
+02:54d6 loadItemIconGfx__clear
+02:732f getRingTiles__drawTile
