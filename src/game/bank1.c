@@ -41,6 +41,10 @@ static void bank1_jump_table_from_rst(GB *gb, uint16_t return_address) {
 void initiateScreenEdgeWarp_hook(GB *gb);
 void initiateWarp_hook(GB *gb);
 void warpInitiated_hook(GB *gb);
+void noWarpInitiated_hook(GB *gb);
+void checkTileWarps_hook(GB *gb);
+void checkScreenEdgeWarps_hook(GB *gb);
+void checkTileIsWarpTile_hook(GB *gb);
 
 static void screenTransitionEyePuzzle_up(GB *gb);
 static void screenTransitionEyePuzzle_rightOrLeft(GB *gb);
@@ -465,7 +469,7 @@ void func_60cd_hook(GB *gb) {
     return;
   }
   CYC(0x60e2, 0x60e3);
-  CALL_C(0x60e3, checkScreenEdgeWarps, 0x621a, 0x60e6);
+  CALL_C(0x60e3, checkScreenEdgeWarps_hook, 0x621a, 0x60e6);
   if (!(F & FC)) {
     CYCT(0x60e6, 0x60e7); ret_effect(gb);
     return;
@@ -477,13 +481,13 @@ void func_60cd_hook(GB *gb) {
 
 void checkWarpsTopDown_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6143, checkTileWarps, 0x61a1, 0x6146);
+  CALL_C(0x6143, checkTileWarps_hook, 0x61a1, 0x6146);
   if (F & FC) {
     CYCT(0x6146, 0x6147); ret_effect(gb);
     return;
   }
   CYC(0x6146, 0x6147);
-  CALL_C(0x6147, checkScreenEdgeWarps, 0x621a, 0x614a);
+  CALL_C(0x6147, checkScreenEdgeWarps_hook, 0x621a, 0x614a);
   if (!(F & FC)) {
     CYCT(0x614a, 0x614b); ret_effect(gb);
     return;
@@ -495,7 +499,7 @@ void checkWarpsTopDown_hook(GB *gb) {
 
 void checkWarpsSidescrolling_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x614d, checkScreenEdgeWarps, 0x621a, 0x6150);
+  CALL_C(0x614d, checkScreenEdgeWarps_hook, 0x621a, 0x6150);
   if (!(F & FC)) {
     CYCT(0x6150, 0x6151); ret_effect(gb);
     return;
@@ -573,4 +577,161 @@ void warpInitiated_hook(GB *gb) {
   CYC(0x619a, 0x619d); W8(wDisableLinkCollisionsAndMenu) = A;
   CYC(0x619d, 0x619e); alu_scf(gb);
   CYC(0x619e, 0x619f); ret_effect(gb);
+}
+
+void noWarpInitiated_hook(GB *gb) {
+  CYC(0x619f, 0x61a0); alu_xor(gb, A);
+  CYC(0x61a0, 0x61a1); ret_effect(gb);
+}
+
+static void check_tile_warps_initiate(GB *gb, uint16_t sp0_) {
+  CYC(0x61c7, 0x61ca); SET_HL(0x4629);
+  CYC(0x61ca, 0x61cc); E = 0x04;
+  CALL_C(0x61cc, interBankCall_hook, 0x008a, 0x61cf);
+  CYC(0x61cf, 0x61d2); initiateWarp_hook(gb);
+}
+
+static void check_tile_warps_multi_tile_door(GB *gb, uint16_t sp0_) {
+  CYC(0x61e2, 0x61e4); A = hram_rd(gb, 0x8d);
+  CYC(0x61e4, 0x61e5); C = A;
+  CYC(0x61e5, 0x61e7); B = 0xce;
+  CYC(0x61e7, 0x61e8); A = mem_rd(gb, BC);
+  CYC(0x61e8, 0x61e9); alu_or(gb, A);
+  CYC(0x61e9, 0x61eb); B = 0x02;
+  if (!(F & FZ)) {
+    CYCT(0x61eb, 0x61ed);
+  } else {
+    CYC(0x61eb, 0x61ed);
+    CYC(0x61ed, 0x61ef); B = 0x04;
+  }
+  CYC(0x61ef, 0x61f2); SET_HL(w1Link_yh);
+  CYC(0x61f2, 0x61f3); A = mem_rd(gb, HL);
+  CYC(0x61f3, 0x61f4); alu_add(gb, B);
+  CYC(0x61f4, 0x61f6); alu_and(gb, 0x0f);
+  CYC(0x61f6, 0x61f8); alu_sub(gb, 0x04);
+  CYC(0x61f8, 0x61fa); alu_cp(gb, 0x0a);
+  if (!(F & FC)) {
+    CYCT(0x61fa, 0x61fb); ret_effect(gb);
+    return;
+  }
+  CYC(0x61fa, 0x61fb);
+  CYC(0x61fb, 0x61fd);
+  check_tile_warps_initiate(gb, sp0_);
+}
+
+void checkTileWarps_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x61a1, 0x61a4); A = W8(wLinkObjectIndex);
+  CYC(0x61a4, 0x61a5); H = A;
+  CYC(0x61a5, 0x61a7); L = 0x0f;
+  CYC(0x61a7, 0x61a8); A = mem_rd(gb, HL);
+  CYC(0x61a8, 0x61a9); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x61a9, 0x61aa); ret_effect(gb);
+    return;
+  }
+  CYC(0x61a9, 0x61aa);
+  CYC(0x61aa, 0x61ad); A = W8(wMenuDisabled);
+  CYC(0x61ad, 0x61ae); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x61ae, 0x61b0);
+    noWarpInitiated_hook(gb);
+    return;
+  }
+  CYC(0x61ae, 0x61b0);
+  CYC(0x61b0, 0x61b2); A = hram_rd(gb, 0x8c);
+  CALL_C(0x61b2, checkTileIsWarpTile_hook, 0x6232, 0x61b5);
+  if (!(F & FC)) {
+    CYCT(0x61b5, 0x61b7);
+    noWarpInitiated_hook(gb);
+    return;
+  }
+  CYC(0x61b5, 0x61b7);
+  CYC(0x61b7, 0x61ba); A = W8(wLinkGrabState);
+  CYC(0x61ba, 0x61bb); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x61bb, 0x61bd);
+    noWarpInitiated_hook(gb);
+    return;
+  }
+  CYC(0x61bb, 0x61bd);
+  CALL_ROM(0x61bd, 0x61d2);
+  if (F & FC) {
+    CYCT(0x61c0, 0x61c2);
+    check_tile_warps_multi_tile_door(gb, sp0_);
+    return;
+  }
+  CYC(0x61c0, 0x61c2);
+  CALL_C(0x61c2, checkLinkCloseEnoughToWarpTileCenter_hook, 0x6174, 0x61c5);
+  if (!(F & FC)) {
+    CYCT(0x61c5, 0x61c7);
+    noWarpInitiated_hook(gb);
+    return;
+  }
+  CYC(0x61c5, 0x61c7);
+  check_tile_warps_initiate(gb, sp0_);
+}
+
+void checkStandingOnDeactivatedWarpTile_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x61fd, 0x61fe); alu_scf(gb);
+  CYC(0x61fe, 0x6201); A = W8(wEnteredWarpPosition);
+  CYC(0x6201, 0x6202); A = alu_inc8(gb, A);
+  if (F & FZ) {
+    CYCT(0x6202, 0x6203); ret_effect(gb);
+    return;
+  }
+  CYC(0x6202, 0x6203);
+  CYC(0x6203, 0x6206); A = W8(wEnteredWarpPosition);
+  CYC(0x6206, 0x6207); B = A;
+  CYC(0x6207, 0x6209); A = hram_rd(gb, 0x8d);
+  CYC(0x6209, 0x620a); alu_cp(gb, B);
+  if (F & FZ) {
+    CYCT(0x620a, 0x620b); ret_effect(gb);
+    return;
+  }
+  CYC(0x620a, 0x620b);
+  CYC(0x620b, 0x620c); B = alu_dec8(gb, B);
+  CYC(0x620c, 0x620d); alu_cp(gb, B);
+  if (!(F & FZ)) {
+    CYC(0x620d, 0x620f);
+    CYC(0x620f, 0x6210); alu_scf(gb);
+    CYC(0x6210, 0x6211); ret_effect(gb);
+    return;
+  }
+  CYCT(0x620d, 0x620f);
+  CYC(0x6211, 0x6213); A = hram_rd(gb, 0x8c);
+  CALL_C(0x6213, checkTileIsWarpTile_hook, 0x6232, 0x6216);
+  if (!(F & FC)) {
+    CYCT(0x6216, 0x6218);
+    CYC(0x620f, 0x6210); alu_scf(gb);
+    CYC(0x6210, 0x6211); ret_effect(gb);
+    return;
+  }
+  CYC(0x6216, 0x6218);
+  CYC(0x6218, 0x6219); alu_xor(gb, A);
+  CYC(0x6219, 0x621a); ret_effect(gb);
+}
+
+void checkScreenEdgeWarps_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x621a, 0x621c); A = 0xff;
+  CYC(0x621c, 0x621f); W8(wTmpcec0) = A;
+  CYC(0x621f, 0x6222); SET_HL(0x46c8);
+  CYC(0x6222, 0x6224); E = 0x04;
+  CALL_C(0x6224, interBankCall_hook, 0x008a, 0x6227);
+  CYC(0x6227, 0x622a); A = W8(wTmpcec0);
+  CYC(0x622a, 0x622c); alu_cp(gb, 0xff);
+  if (F & FZ) {
+    CYCT(0x622c, 0x622f);
+    noWarpInitiated_hook(gb);
+    return;
+  }
+  CYC(0x622c, 0x622f);
+  CYC(0x622f, 0x6232); warpInitiated_hook(gb);
+}
+
+void checkTileIsWarpTile_hook(GB *gb) {
+  CYC(0x6232, 0x6235); SET_HL(0x6238);
+  CYC(0x6235, 0x6238); lookupCollisionTable_hook(gb);
 }

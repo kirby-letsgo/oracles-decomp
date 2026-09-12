@@ -266,11 +266,11 @@
 
 <script>
   const INITIAL = {
-    updatedAt: "2026-09-11T00:00:00Z",
+    updatedAt: "2026-09-12T00:00:00Z",
     status: "idle",
     statusDetail: "",
     totalHooks: 13103,
-    rewrittenTotal: 1344,
+    rewrittenTotal: 1359,
     bank0Total: 664,
     bank0Rewritten: 626,
     codeBearingBanks: 23,
@@ -288,6 +288,7 @@
       { n: 6, name: "Sweep", desc: "Everything left in code/, until no routine is still generated.", status: "pending", meta: "remainder" },
     ],
     batches: [
+      { id: "66", delta: 15, tag: "Ph.5", text: "More <b>endgame-20</b> states, the inventory-text first pass, and bank-1 warp/timewarp-solidity routines; replay caught a symbolic RAM-address offset." },
       { id: "65", delta: 17, tag: "Ph.5", text: "Core <b>room/tileset dispatchers</b>, five safe textbox roots, and seven endgame-20 entries; integration corrected banked-RAM offset syntax." },
       { id: "64", delta: 24, tag: "Ph.5", text: "Finished the remaining <b>scripting roots</b>, added room-GFX/pirate-room dispatchers, and continued endgame stage-1/20 states; review split RST instruction burns." },
       { id: "63", delta: 20, tag: "Ph.5", text: "The final top-level <b>bank-3 cutscene</b> routines, nine endgame stage-1 entries, and bank-4 VBlank/<b>warp resolver</b> paths." },
@@ -342,12 +343,12 @@
   INITIAL.banks.find(b => b.id === "07").rewritten = 4;
   INITIAL.banks.find(b => b.id === "16").rewritten = 2;
   INITIAL.banks.find(b => b.id === "02").rewritten = 42;
-  INITIAL.banks.find(b => b.id === "01").rewritten = 54;
-  INITIAL.banks.find(b => b.id === "03").rewritten = 281;
+  INITIAL.banks.find(b => b.id === "01").rewritten = 62;
+  INITIAL.banks.find(b => b.id === "03").rewritten = 287;
   INITIAL.banks.find(b => b.id === "04").rewritten = 89;
   INITIAL.banks.find(b => b.id === "0c").rewritten = 101;
   INITIAL.banks.find(b => b.id === "10").rewritten = 28;
-  INITIAL.banks.find(b => b.id === "3f").rewritten = 54;
+  INITIAL.banks.find(b => b.id === "3f").rewritten = 55;
 
   function fmt(n) { return n.toLocaleString("en-US"); }
 

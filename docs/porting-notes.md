@@ -534,3 +534,13 @@ desync to discover; keep them when porting routines.
   `1_BANK` during the integrated build. For an adjacent byte in the same named bank, use the
   pointer form (`WP(w7TextTableAddr)[1]`); this preserves the symbol's generated bank selection
   while making the offset ordinary C arithmetic.
+- A nearby RAM symbol is not interchangeable with the raw address in the instruction stream.
+  Batch 66 translated `ld hl,$d0d4` as `SET_HL(w7TextAddress)`, but that symbol is `$d0d5`; cycles
+  and all memory writes looked plausible while the whole-movie replay diverged at frame 32,040.
+  The 40k verifier identified `doInventoryTextFirstPass` with `L` one byte high. Check the numeric
+  definition and write the real relationship (`w7TextAddress - 1` here) whenever assembly names
+  an address adjacent to a field.
+- An unconditional `ret` after a conditional loop exit still needs its own one-byte burn. Batch
+  66 initially called `ret_effect` immediately after the not-taken `jr` burns at `$5502` and
+  `$550d`, omitting the actual returns at `$5504` and `$550f`. Cross-review found both before the
+  first build; burn each `ret` separately immediately before `ret_effect`.

@@ -467,6 +467,92 @@ no_extra:
   CYC(0x5054, 0x5055); ret_effect(gb);
 }
 
+void doInventoryTextFirstPass_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x549e, clearTextGfxBuffer_hook, 0x5091, 0x54a1);
+  CYC(0x54a1, 0x54a2); H = D;
+  CYC(0x54a2, 0x54a4); L = 0xd4;
+  CYC(0x54a4, 0x54a5); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x54a5, 0x54a7); hram_wr(gb, 0x8a, A);
+  CYC(0x54a7, 0x54a8); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x54a8, 0x54a9); H = mem_rd(gb, HL);
+  CYC(0x54a9, 0x54aa); L = A;
+  CYC(0x54aa, 0x54ab); push_effect(gb, HL);
+  CYC(0x54ab, 0x54ad); E = 0;
+  for (;;) {
+    CALL_C(0x54ad, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x54b0);
+    CYC(0x54b0, 0x54b2); alu_cp(gb, 0);
+    if (F & FZ) { CYCT(0x54b2, 0x54b4); goto null_terminator; }
+    CYC(0x54b2, 0x54b4);
+    CYC(0x54b4, 0x54b6); alu_cp(gb, 1);
+    if (F & FZ) { CYCT(0x54b6, 0x54b8); goto line_end; }
+    CYC(0x54b6, 0x54b8);
+    CYC(0x54b8, 0x54ba); alu_cp(gb, 0x10);
+    if (!(F & FC)) { CYCT(0x54ba, 0x54bc); goto not_control; }
+    CYC(0x54ba, 0x54bc);
+    CALL_ROM(0x54bc, 0x5510);
+    CYC(0x54bf, 0x54c1);
+    continue;
+null_terminator:
+    CALL_C(0x54c8, popFromTextStack_hook, 0x56a4, 0x54cb);
+    CYC(0x54cb, 0x54cc); A = H;
+    CYC(0x54cc, 0x54cd); alu_or(gb, A);
+    if (!(F & FZ)) { CYCT(0x54cd, 0x54cf); continue; }
+    CYC(0x54cd, 0x54cf);
+    goto line_end;
+not_control:
+    CYC(0x54c1, 0x54c2); E = alu_inc8(gb, E);
+    CYC(0x54c2, 0x54c4); alu_bit(gb, 4, E);
+    if (F & FZ) { CYCT(0x54c4, 0x54c6); continue; }
+    CYC(0x54c4, 0x54c6);
+    CYC(0x54c6, 0x54c8);
+line_end:
+    CALL_C(0x54cf, popFromTextStack_hook, 0x56a4, 0x54d2);
+    CYC(0x54d2, 0x54d3); SET_BC(pop_effect(gb));
+    CYC(0x54d3, 0x54d6); SET_HL(w7TextAddress - 1);
+    CYC(0x54d6, 0x54d8); A = hram_rd(gb, 0x8a);
+    CYC(0x54d8, 0x54d9); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x54d9, 0x54da); mem_wr(gb, HL, C);
+    CYC(0x54da, 0x54db); L = alu_inc8(gb, L);
+    CYC(0x54db, 0x54dc); mem_wr(gb, HL, B);
+    CYC(0x54dc, 0x54dd); A = E;
+    CYC(0x54dd, 0x54de); alu_or(gb, A);
+    if (F & FZ) { CYCT(0x54de, 0x54df); ret_effect(gb); return; }
+    CYC(0x54de, 0x54df);
+    CYC(0x54df, 0x54e0); push_effect(gb, BC);
+    CYC(0x54e0, 0x54e2); alu_sub(gb, 0x11);
+    CYC(0x54e2, 0x54e3); A = (uint8_t)~A;
+    CYC(0x54e3, 0x54e5); L = 0xed;
+    CYC(0x54e5, 0x54e6); mem_wr(gb, HL, A);
+    CYC(0x54e6, 0x54e8); alu_and(gb, 0x0e);
+    CYC(0x54e8, 0x54ea); A = alu_swap(gb, A);
+    CYC(0x54ea, 0x54ec); alu_add(gb, 0);
+    CYC(0x54ec, 0x54ed); C = A;
+    CALL_C(0x54ed, clearLineTextBuffer_hook, 0x509c, 0x54f0);
+    CYC(0x54f0, 0x54f2); B = 0xd2;
+    CYC(0x54f2, 0x54f3); SET_HL(pop_effect(gb));
+    for (;;) {
+      CALL_C(0x54f3, readByteFromW7ActiveBankAndIncHl_hook, 0x56cf, 0x54f6);
+      CYC(0x54f6, 0x54f8); alu_cp(gb, 0x10);
+      if (F & FC) { CYCT(0x54f8, 0x54fa); goto control; }
+      CYC(0x54f8, 0x54fa);
+      CALL_C(0x54fa, setLineTextBuffers_hook, 0x50a6, 0x54fd);
+      CALL_C(0x54fd, retrieveTextCharacter_hook, 0x18cd, 0x5500);
+      CYC(0x5500, 0x5502); alu_bit(gb, 4, E);
+      if (F & FZ) { CYCT(0x5502, 0x5504); continue; }
+      CYC(0x5502, 0x5504);
+      CYC(0x5504, 0x5505); ret_effect(gb); return;
+control:
+      CALL_C(0x5505, handleTextControlCode_hook, 0x56e4, 0x5508);
+      CYC(0x5508, 0x550b); A = W8(w7TextStatus);
+      CYC(0x550b, 0x550d); alu_cp(gb, 2);
+      if (!(F & FC)) { CYCT(0x550d, 0x550f); continue; }
+      CYC(0x550d, 0x550f);
+      CYC(0x550f, 0x5510); ret_effect(gb); return;
+    }
+  }
+}
+
 void dmaTextboxMap_func_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x518c, 0x518e); C = 0x07;
