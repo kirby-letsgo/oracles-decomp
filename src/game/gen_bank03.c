@@ -2098,51 +2098,6 @@ L_6533:
   I(0x6535, 4); if (hook_enabled_at(0x02ea)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
 }
 
-// 03:5449
-void endgameCutsceneHandler_09(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5449, 3); SET_DE(0xcbc1);  // ld de,$cbc1
-  I(0x544c, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x544d, 0x544e);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
-// 03:5452
-void endgameCutsceneHandler_09_stage0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5452, updateStatusBar_hook, 0x1a9c, 0x5455);  // call $1a9c
-  CALL(0x5455, endgameCutsceneHandler_09_stage0__runStates, 0x545b, 0x5458);  // call $545b
-  I(0x5458, 4); if (hook_enabled_at(0x345b)) { updateAllObjects_hook(gb); return; } HANDOFF(0x345b);  // jp $345b
-}
-
-// 03:545b
-void endgameCutsceneHandler_09_stage0__runStates(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_545b:
-  I(0x545b, 3); SET_DE(0xcbc2);  // ld de,$cbc2
-  I(0x545e, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x545f, 0x5460);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
-// 03:5655
-void endgameCutsceneHandler_09_stage0__state10__linked(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5655:
-  I(0x5655, 4); A = mem_rd(gb, 0xcfd0);  // ld a,($cfd0)
-  I(0x5658, 2); alu_cp(gb, 0x12);  // cp $12
-  if (!(F & FZ)) { RET_TAKEN(0x565a); return; } I(0x565a, 2);  // ret nz
-  I(0x565b, 3); SET_HL(0xcbc2);  // ld hl,$cbc2
-  I(0x565e, 3); mem_wr(gb, HL, 0x14);  // ld (hl),$14
-  RET(0x5660); return;  // ret
-}
-
 // 03:5854
 void endgameCutsceneHandler_20(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

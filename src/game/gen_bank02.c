@@ -3241,7 +3241,7 @@ L_60d3:
 // 02:60dc
 void dungeonMap_drawSmallKeyCount(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x60dc, getNumSmallKeys, 0x651f, 0x60df);  // call $651f
+  CALL(0x60dc, getNumSmallKeys_hook, 0x651f, 0x60df);  // call $651f
   if ((F & FZ)) { RET_TAKEN(0x60df); return; } I(0x60df, 2);  // ret z
   I(0x60e0, 3); SET_HL(0xd226);  // ld hl,$d226
   I(0x60e3, 2); alu_add(gb, 0x90);  // add $90
@@ -3260,7 +3260,7 @@ void dungeonMap_calculateVisitedFloorsAndLinkPosition(GB *gb) {
   I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
   if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
   I(0x60f1, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  CALL(0x60f2, checkLinkHasCompass, 0x6532, 0x60f5);  // call $6532
+  CALL(0x60f2, checkLinkHasCompass_hook, 0x6532, 0x60f5);  // call $6532
   I(0x60f5, 1); A = B;  // ld a,b
   if ((F & FZ)) { I(0x60f6, 3); goto L_60fc; } I(0x60f6, 2);  // jr z,$60fc
   I(0x60f8, 4); A = mem_rd(gb, 0xcc42);  // ld a,($cc42)
@@ -3517,7 +3517,7 @@ void dungeonMap_checkCanScrollDown(GB *gb) {
   I(0x6421, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
   I(0x6424, 1); alu_cp(gb, B);  // cp b
   if ((F & FZ)) { I(0x6425, 3); goto L_644e; } I(0x6425, 2);  // jr z,$644e
-  CALL(0x6427, checkLinkHasMap, 0x653e, 0x642a);  // call $653e
+  CALL(0x6427, checkLinkHasMap_hook, 0x653e, 0x642a);  // call $653e
   I(0x642a, 2); A = 0x01;  // ld a,$01
   if (!(F & FZ)) { I(0x642c, 3); goto L_644f; } I(0x642c, 2);  // jr nz,$644f
   I(0x642e, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
@@ -3580,7 +3580,7 @@ void dungeonMap_checkCanScrollUp(GB *gb) {
   I(0x6455, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
   I(0x6458, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x6459, 3); goto L_6482; } I(0x6459, 2);  // jr z,$6482
-  CALL(0x645b, checkLinkHasMap, 0x653e, 0x645e);  // call $653e
+  CALL(0x645b, checkLinkHasMap_hook, 0x653e, 0x645e);  // call $653e
   I(0x645e, 2); A = 0x01;  // ld a,$01
   if (!(F & FZ)) { I(0x6460, 3); goto L_6483; } I(0x6460, 2);  // jr nz,$6483
   I(0x6462, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
@@ -3657,243 +3657,6 @@ L_649d:
   I(0x64a1, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x64a2, dungeonMap_updateScroll, 0x682c, 0x64a5);  // call $682c
   mapMenu_copyTilemapToVram(gb); return;  // fallthrough
-}
-
-// 02:64da
-void dungeonMap_drawItemSprites(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x64da, getNumSmallKeys, 0x651f, 0x64dd);  // call $651f
-  I(0x64dd, 3); SET_HL(0x651a);  // ld hl,$651a
-  if (!(F & FZ)) { CALL(0x64e0, addSpritesToOam_hook, 0x0d5e, 0x64e3); } else I(0x64e0, 3);  // call nz,$0d5e
-  CALL(0x64e3, checkLinkHasBossKey, 0x6529, 0x64e6);  // call $6529
-  I(0x64e6, 3); SET_HL(0x6511);  // ld hl,$6511
-  if (!(F & FZ)) { CALL(0x64e9, addSpritesToOam_hook, 0x0d5e, 0x64ec); } else I(0x64e9, 3);  // call nz,$0d5e
-  CALL(0x64ec, checkLinkHasCompass, 0x6532, 0x64ef);  // call $6532
-  I(0x64ef, 3); SET_HL(0x6508);  // ld hl,$6508
-  if (!(F & FZ)) { CALL(0x64f2, addSpritesToOam_hook, 0x0d5e, 0x64f5); } else I(0x64f2, 3);  // call nz,$0d5e
-  CALL(0x64f5, checkLinkHasMap, 0x653e, 0x64f8);  // call $653e
-  I(0x64f8, 3); SET_HL(0x64ff);  // ld hl,$64ff
-  if (!(F & FZ)) { CALL(0x64fb, addSpritesToOam_hook, 0x0d5e, 0x64fe); } else I(0x64fb, 3);  // call nz,$0d5e
-  RET(0x64fe); return;  // ret
-}
-
-// 02:651a
-void dungeonMap_drawItemSprites__smallKeySprite(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_651a:
-  I(0x651a, 3); SET_BC(0x2890);  // ld bc,$2890
-  I(0x651d, 1); C = alu_inc8(gb, C);  // inc c
-  I(0x651e, 1); B = alu_dec8(gb, B);  // dec b
-  getNumSmallKeys(gb); return;  // fallthrough
-}
-
-// 02:651f
-void getNumSmallKeys(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x651f, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
-  I(0x6522, 3); SET_HL(0xc672);  // ld hl,$c672
-  RST_PUSH(0x6525, 0x6526);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x6526, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6527, 1); alu_or(gb, A);  // or a
-  RET(0x6528); return;  // ret
-}
-
-// 02:6529
-void checkLinkHasBossKey(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6529, 3); SET_HL(0xc682);  // ld hl,$c682
-  I(0x652c, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
-  I(0x652f, 4); if (hook_enabled_at(0x0205)) { checkFlag_hook(gb); return; } HANDOFF(0x0205);  // jp $0205
-}
-
-// 02:6532
-void checkLinkHasCompass(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x6532, HL);  // push hl
-  I(0x6533, 3); SET_HL(0xc684);  // ld hl,$c684
-  I(0x6536, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
-  CALL(0x6539, checkFlag_hook, 0x0205, 0x653c);  // call $0205
-  SET_HL(POP(0x653c));  // pop hl
-  RET(0x653d); return;  // ret
-}
-
-// 02:653e
-void checkLinkHasMap(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x653e, HL);  // push hl
-  I(0x653f, 3); SET_HL(0xc686);  // ld hl,$c686
-  I(0x6542, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
-  CALL(0x6545, checkFlag_hook, 0x0205, 0x6548);  // call $0205
-  SET_HL(POP(0x6548));  // pop hl
-  RET(0x6549); return;  // ret
-}
-
-// 02:654a
-void dungeonMap_drawFloorCursor(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x654a, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
-  I(0x654d, 3); SET_HL(0x691e);  // ld hl,$691e
-  RST_PUSH(0x6550, 0x6551);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x6551, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x6554, 2); A = alu_swap(gb, A);  // swap a
-  I(0x6556, 1); alu_rrca(gb);  // rrca
-  I(0x6557, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  I(0x6558, 1); B = A;  // ld b,a
-  I(0x6559, 2); C = 0x00;  // ld c,$00
-  I(0x655b, 3); SET_HL(0x6561);  // ld hl,$6561
-  I(0x655e, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:6561
-void dungeonMap_drawFloorCursor__cursorOamData(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6561:
-  I(0x6561, 3); SET_BC(0x1e00);  // ld bc,$1e00
-  I(0x6564, 1); alu_add(gb, H);  // add h
-  I(0x6565, 1); B = alu_inc8(gb, B);  // inc b
-  dungeonMap_drawBossSymbolForFloor(gb); return;  // fallthrough
-}
-
-// 02:6566
-void dungeonMap_drawBossSymbolForFloor(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6566, checkLinkHasCompass, 0x6532, 0x6569);  // call $6532
-  if ((F & FZ)) { RET_TAKEN(0x6569); return; } I(0x6569, 2);  // ret z
-  I(0x656a, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
-  I(0x656d, 3); SET_HL(0x691f);  // ld hl,$691f
-  RST_PUSH(0x6570, 0x6571);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x6571, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x6572, 2); C = 0x00;  // ld c,$00
-  I(0x6574, 3); SET_HL(0x657a);  // ld hl,$657a
-  I(0x6577, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:657a
-void dungeonMap_drawBossSymbolForFloor__bossSymbolOamData(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_657a:
-  I(0x657a, 3); SET_BC(0x3800);  // ld bc,$3800
-  I(0x657d, 1); alu_add(gb, D);  // add d
-  I(0x657e, 1); B = alu_dec8(gb, B);  // dec b
-  dungeonMap_drawLinkIcons(gb); return;  // fallthrough
-}
-
-// 02:657f
-void dungeonMap_drawLinkIcons(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x657f, 4); A = mem_rd(gb, 0xcbb9);  // ld a,($cbb9)
-  I(0x6582, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x6583, 3); goto L_65a0; } I(0x6583, 2);  // jr z,$65a0
-  CALL(0x6585, dungeonMap_getLinkIconPosition, 0x6756, 0x6588);  // call $6756
-  I(0x6588, 3); SET_HL(0xcbb8);  // ld hl,$cbb8
-  I(0x658b, 1); A = B;  // ld a,b
-  I(0x658c, 2); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
-  I(0x658d, 2); alu_cp(gb, 0x12);  // cp $12
-  if (!(F & FC)) { I(0x658f, 3); goto L_65a0; } I(0x658f, 2);  // jr nc,$65a0
-  I(0x6591, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x6592, 2); A = alu_swap(gb, A);  // swap a
-  I(0x6594, 1); alu_rrca(gb);  // rrca
-  I(0x6595, 1); B = A;  // ld b,a
-  I(0x6596, 2); C = alu_swap(gb, C);  // swap c
-  I(0x6598, 2); C = alu_rrc(gb, C);  // rrc c
-  I(0x659a, 3); SET_HL(0x65bd);  // ld hl,$65bd
-  CALL(0x659d, addSpritesToOam_withOffset_hook, 0x0d61, 0x65a0);  // call $0d61
-L_65a0:
-  I(0x65a0, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
-  I(0x65a3, 3); SET_HL(0x691e);  // ld hl,$691e
-  RST_PUSH(0x65a6, 0x65a7);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x65a7, 4); A = mem_rd(gb, 0xcbbc);  // ld a,($cbbc)
-  I(0x65aa, 1); C = A;  // ld c,a
-  I(0x65ab, 4); A = mem_rd(gb, 0xcc40);  // ld a,($cc40)
-  I(0x65ae, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x65af, 1); alu_sub(gb, C);  // sub c
-  I(0x65b0, 2); A = alu_swap(gb, A);  // swap a
-  I(0x65b2, 1); alu_rrca(gb);  // rrca
-  I(0x65b3, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  I(0x65b4, 1); B = A;  // ld b,a
-  I(0x65b5, 2); C = 0x00;  // ld c,$00
-  I(0x65b7, 3); SET_HL(0x65c2);  // ld hl,$65c2
-  I(0x65ba, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:65bd
-void dungeonMap_drawLinkIcons__linkOnMapOamData(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_65bd:
-  I(0x65bd, 3); SET_BC(0x5800);  // ld bc,$5800
-  I(0x65c0, 1); alu_add(gb, B);  // add b
-  I(0x65c1, 1);  // nop
-L_65c2:
-  I(0x65c2, 3); SET_BC(0x2c00);  // ld bc,$2c00
-  I(0x65c5, 1); alu_add(gb, B);  // add b
-  I(0x65c6, 1);  // nop
-  dungeonMap_updateCursorFlickerCounter(gb); return;  // fallthrough
-}
-
-// 02:65c2
-void dungeonMap_drawLinkIcons__linkOnFloorListOamData(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_65c2:
-  I(0x65c2, 3); SET_BC(0x2c00);  // ld bc,$2c00
-  I(0x65c5, 1); alu_add(gb, B);  // add b
-  I(0x65c6, 1);  // nop
-  dungeonMap_updateCursorFlickerCounter(gb); return;  // fallthrough
-}
-
-// 02:65c7
-void dungeonMap_updateCursorFlickerCounter(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x65c7, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
-  I(0x65ca, 2); alu_and(gb, 0x1f);  // and $1f
-  if (!(F & FZ)) { RET_TAKEN(0x65cc); return; } I(0x65cc, 2);  // ret nz
-  I(0x65cd, 3); SET_HL(0xcbb9);  // ld hl,$cbb9
-  I(0x65d0, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x65d1, 2); alu_xor(gb, 0x01);  // xor $01
-  I(0x65d3, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x65d4); return;  // ret
-}
-
-// 02:65d5
-void dungeonMap_drawCursor(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x65d5, 4); A = mem_rd(gb, 0xcbce);  // ld a,($cbce)
-  I(0x65d8, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x65d9); return; } I(0x65d9, 2);  // ret nz
-  I(0x65da, 4); A = mem_rd(gb, 0xcbb9);  // ld a,($cbb9)
-  I(0x65dd, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x65de); return; } I(0x65de, 2);  // ret nz
-  I(0x65df, 4); A = mem_rd(gb, 0xcbbb);  // ld a,($cbbb)
-  I(0x65e2, 2); alu_and(gb, 0xf8);  // and $f8
-  I(0x65e4, 1); B = A;  // ld b,a
-  I(0x65e5, 4); A = mem_rd(gb, 0xcbbb);  // ld a,($cbbb)
-  I(0x65e8, 2); alu_and(gb, 0x07);  // and $07
-  I(0x65ea, 1); alu_add(gb, A);  // add a
-  I(0x65eb, 1); alu_add(gb, A);  // add a
-  I(0x65ec, 1); alu_add(gb, A);  // add a
-  I(0x65ed, 1); C = A;  // ld c,a
-  I(0x65ee, 3); SET_HL(0x65f4);  // ld hl,$65f4
-  I(0x65f1, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:65f4
-void dungeonMap_drawCursor__cursorSprites(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_65f4:
-  I(0x65f4, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  I(0x65f5, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x65f6, 1); D = H;  // ld d,h
-  I(0x65f7, 1); alu_adc(gb, B);  // adc b
-  I(0x65f8, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x65f9, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x65fa, 1); E = H;  // ld e,h
-  I(0x65fb, 1); alu_adc(gb, B);  // adc b
-  I(0x65fc, 1); H = alu_inc8(gb, H);  // inc h
-  dungeonMap_drawArrows(gb); return;  // fallthrough
 }
 
 // 02:65fd
@@ -4018,7 +3781,7 @@ void dungeonMap_drawFloorList(GB *gb) {
   I(0x6791, 1); A = alu_dec8(gb, A);  // dec a
   I(0x6792, 1); C = A;  // ld c,a
 L_6793:
-  CALL(0x6793, checkLinkHasMap, 0x653e, 0x6796);  // call $653e
+  CALL(0x6793, checkLinkHasMap_hook, 0x653e, 0x6796);  // call $653e
   if (!(F & FZ)) { I(0x6796, 3); goto L_67a6; } I(0x6796, 2);  // jr nz,$67a6
   I(0x6798, 1); A = C;  // ld a,c
   I(0x6799, 3); SET_HL(0x00f8);  // ld hl,$00f8
@@ -4061,7 +3824,7 @@ L_67cc:
 void dungeonMap_drawFloorList__loop(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6793:
-  CALL(0x6793, checkLinkHasMap, 0x653e, 0x6796);  // call $653e
+  CALL(0x6793, checkLinkHasMap_hook, 0x653e, 0x6796);  // call $653e
   if (!(F & FZ)) { I(0x6796, 3); goto L_67a6; } I(0x6796, 2);  // jr nz,$67a6
   I(0x6798, 1); A = C;  // ld a,c
   I(0x6799, 3); SET_HL(0x00f8);  // ld hl,$00f8
@@ -4105,7 +3868,7 @@ void dungeonMap_drawFloorList__nextFloor(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_67cc;
 L_6793:
-  CALL(0x6793, checkLinkHasMap, 0x653e, 0x6796);  // call $653e
+  CALL(0x6793, checkLinkHasMap_hook, 0x653e, 0x6796);  // call $653e
   if (!(F & FZ)) { I(0x6796, 3); goto L_67a6; } I(0x6796, 2);  // jr nz,$67a6
   I(0x6798, 1); A = C;  // ld a,c
   I(0x6799, 3); SET_HL(0x00f8);  // ld hl,$00f8
@@ -4517,7 +4280,7 @@ void dungeonMap_getTileForRoom(GB *gb) {
   if (!(F & FZ)) { I(0x6892, 3); goto L_68ad; } I(0x6892, 2);  // jr nz,$68ad
   CALL(0x6894, dungeonMap_checkCompassTile, 0x68ce, 0x6897);  // call $68ce
   if (!(F & FZ)) { I(0x6897, 3); goto L_68b8; } I(0x6897, 2);  // jr nz,$68b8
-  CALL(0x6899, checkLinkHasMap, 0x653e, 0x689c);  // call $653e
+  CALL(0x6899, checkLinkHasMap_hook, 0x653e, 0x689c);  // call $653e
   I(0x689c, 2); A = 0xaf;  // ld a,$af
   if (!(F & FZ)) { I(0x689e, 3); goto L_68b8; } I(0x689e, 2);  // jr nz,$68b8
 L_68a0:
@@ -4576,7 +4339,7 @@ L_68b8:
 // 02:68bb
 void dungeonMap_checkCanViewFloor(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x68bb, checkLinkHasMap, 0x653e, 0x68be);  // call $653e
+  CALL(0x68bb, checkLinkHasMap_hook, 0x653e, 0x68be);  // call $653e
   if (!(F & FZ)) { RET_TAKEN(0x68be); return; } I(0x68be, 2);  // ret nz
   PUSH(0x68bf, HL);  // push hl
   I(0x68c0, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
@@ -4593,7 +4356,7 @@ void dungeonMap_checkCanViewFloor(GB *gb) {
 // 02:68ce
 void dungeonMap_checkCompassTile(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x68ce, checkLinkHasCompass, 0x6532, 0x68d1);  // call $6532
+  CALL(0x68ce, checkLinkHasCompass_hook, 0x6532, 0x68d1);  // call $6532
   if ((F & FZ)) { RET_TAKEN(0x68d1); return; } I(0x68d1, 2);  // ret z
   I(0x68d2, 1); A = E;  // ld a,e
   I(0x68d3, 2); C = 0x83;  // ld c,$83
@@ -15220,7 +14983,7 @@ L_612e:
   I(0x612e, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x6131, 2); alu_and(gb, 0x06);  // and $06
   if (!(F & FZ)) { I(0x6133, 4); closeMenu(gb); return; } I(0x6133, 3);  // jp nz,$4fba
-  CALL(0x6136, dungeonMap_updateCursorFlickerCounter, 0x65c7, 0x6139);  // call $65c7
+  CALL(0x6136, dungeonMap_updateCursorFlickerCounter_hook, 0x65c7, 0x6139);  // call $65c7
   I(0x6139, 4); dungeonMap_checkDirectionButtons(gb); return;  // jp $63d2
 L_613c:
   I(0x613c, 4); A = mem_rd(gb, 0xcbb4);  // ld a,($cbb4)
@@ -15289,7 +15052,7 @@ L_612e:
   I(0x612e, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x6131, 2); alu_and(gb, 0x06);  // and $06
   if (!(F & FZ)) { I(0x6133, 4); closeMenu(gb); return; } I(0x6133, 3);  // jp nz,$4fba
-  CALL(0x6136, dungeonMap_updateCursorFlickerCounter, 0x65c7, 0x6139);  // call $65c7
+  CALL(0x6136, dungeonMap_updateCursorFlickerCounter_hook, 0x65c7, 0x6139);  // call $65c7
   I(0x6139, 4); dungeonMap_checkDirectionButtons(gb); return;  // jp $63d2
 }
 
@@ -16326,12 +16089,12 @@ void mapMenu_drawSprites(GB *gb) {
   I(0x64b1, 2); alu_cp(gb, 0x02);  // cp $02
   if (!(F & FZ)) { I(0x64b3, 3); goto L_64c7; } I(0x64b3, 2);  // jr nz,$64c7
 L_64b5:
-  CALL(0x64b5, dungeonMap_drawItemSprites, 0x64da, 0x64b8);  // call $64da
-  CALL(0x64b8, dungeonMap_drawLinkIcons, 0x657f, 0x64bb);  // call $657f
-  CALL(0x64bb, dungeonMap_drawCursor, 0x65d5, 0x64be);  // call $65d5
+  CALL(0x64b5, dungeonMap_drawItemSprites_hook, 0x64da, 0x64b8);  // call $64da
+  CALL(0x64b8, dungeonMap_drawLinkIcons_hook, 0x657f, 0x64bb);  // call $657f
+  CALL(0x64bb, dungeonMap_drawCursor_hook, 0x65d5, 0x64be);  // call $65d5
   CALL(0x64be, dungeonMap_drawArrows, 0x65fd, 0x64c1);  // call $65fd
-  CALL(0x64c1, dungeonMap_drawBossSymbolForFloor, 0x6566, 0x64c4);  // call $6566
-  I(0x64c4, 4); dungeonMap_drawFloorCursor(gb); return;  // jp $654a
+  CALL(0x64c1, dungeonMap_drawBossSymbolForFloor_hook, 0x6566, 0x64c4);  // call $6566
+  I(0x64c4, 4); if (hook_enabled_at(0x654a)) { dungeonMap_drawFloorCursor_hook(gb); return; } HANDOFF(0x654a);  // jp $654a
 L_64c7:
   CALL(0x64c7, maupMenu_drawPopup, 0x632d, 0x64ca);  // call $632d
   CALL(0x64ca, mapMenu_drawArrow, 0x664e, 0x64cd);  // call $664e
@@ -16346,12 +16109,12 @@ L_64c7:
 void mapMenu_drawSprites__dungeon(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_64b5:
-  CALL(0x64b5, dungeonMap_drawItemSprites, 0x64da, 0x64b8);  // call $64da
-  CALL(0x64b8, dungeonMap_drawLinkIcons, 0x657f, 0x64bb);  // call $657f
-  CALL(0x64bb, dungeonMap_drawCursor, 0x65d5, 0x64be);  // call $65d5
+  CALL(0x64b5, dungeonMap_drawItemSprites_hook, 0x64da, 0x64b8);  // call $64da
+  CALL(0x64b8, dungeonMap_drawLinkIcons_hook, 0x657f, 0x64bb);  // call $657f
+  CALL(0x64bb, dungeonMap_drawCursor_hook, 0x65d5, 0x64be);  // call $65d5
   CALL(0x64be, dungeonMap_drawArrows, 0x65fd, 0x64c1);  // call $65fd
-  CALL(0x64c1, dungeonMap_drawBossSymbolForFloor, 0x6566, 0x64c4);  // call $6566
-  I(0x64c4, 4); dungeonMap_drawFloorCursor(gb); return;  // jp $654a
+  CALL(0x64c1, dungeonMap_drawBossSymbolForFloor_hook, 0x6566, 0x64c4);  // call $6566
+  I(0x64c4, 4); if (hook_enabled_at(0x654a)) { dungeonMap_drawFloorCursor_hook(gb); return; } HANDOFF(0x654a);  // jp $654a
 }
 
 // 02:64c7

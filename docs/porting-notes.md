@@ -564,3 +564,8 @@ desync to discover; keep them when porting routines.
   `push_effect(gb, 0x4964)`, it consumed the routine caller's return address and corrupted SP.
   Cross-review caught the imbalance before the gate. Burn the one-byte RST, push its physical
   next-PC, then enter the vector body, even when both sides are ordinary readable C helpers.
+- Rewriting a routine removes its generated unsuffixed C function, including calls to it from
+  older readable dispatchers. Batch 70 promoted `endgameCutsceneHandler_09`; regeneration then
+  failed the build because `endgameCutsceneHandler_body_hook` still called the vanished
+  `endgameCutsceneHandler_09`. When a root becomes readable, search existing hand-written C for
+  direct unsuffixed calls to that symbol and retarget static jumps to its `_hook` entry.

@@ -36,6 +36,16 @@ void checkEnemyPlacedAtPosition_hook(GB *gb);
 void calculateRoomStateModifier_hook(GB *gb);
 void createSeaEffectsPartIfApplicable_hook(GB *gb);
 void func_02_7a3a_hook(GB *gb);
+void dungeonMap_drawItemSprites_hook(GB *gb);
+void getNumSmallKeys_hook(GB *gb);
+void checkLinkHasBossKey_hook(GB *gb);
+void checkLinkHasCompass_hook(GB *gb);
+void checkLinkHasMap_hook(GB *gb);
+void dungeonMap_drawFloorCursor_hook(GB *gb);
+void dungeonMap_drawBossSymbolForFloor_hook(GB *gb);
+void dungeonMap_drawLinkIcons_hook(GB *gb);
+void dungeonMap_updateCursorFlickerCounter_hook(GB *gb);
+void dungeonMap_drawCursor_hook(GB *gb);
 
 static uint16_t function_caller_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -610,4 +620,161 @@ spawn:
   CYC(0x7a4c, 0x7a4f); A = W8(wPortalPos);
   CYC(0x7a4f, 0x7a51); L = 0x4b;
   CYC(0x7a51, 0x7a54); setShortPosition_hook(gb);
+}
+
+void dungeonMap_drawItemSprites_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x64da, getNumSmallKeys_hook, 0x651f, 0x64dd);
+  CYC(0x64dd, 0x64e0); SET_HL(0x651a);
+  if (!(F & FZ)) CALL_C_CC(0x64e0, addSpritesToOam_hook, 0x0d5e, 0x64e3);
+  else CYC(0x64e0, 0x64e3);
+  CALL_C(0x64e3, checkLinkHasBossKey_hook, 0x6529, 0x64e6);
+  CYC(0x64e6, 0x64e9); SET_HL(0x6511);
+  if (!(F & FZ)) CALL_C_CC(0x64e9, addSpritesToOam_hook, 0x0d5e, 0x64ec);
+  else CYC(0x64e9, 0x64ec);
+  CALL_C(0x64ec, checkLinkHasCompass_hook, 0x6532, 0x64ef);
+  CYC(0x64ef, 0x64f2); SET_HL(0x6508);
+  if (!(F & FZ)) CALL_C_CC(0x64f2, addSpritesToOam_hook, 0x0d5e, 0x64f5);
+  else CYC(0x64f2, 0x64f5);
+  CALL_C(0x64f5, checkLinkHasMap_hook, 0x653e, 0x64f8);
+  CYC(0x64f8, 0x64fb); SET_HL(0x64ff);
+  if (!(F & FZ)) CALL_C_CC(0x64fb, addSpritesToOam_hook, 0x0d5e, 0x64fe);
+  else CYC(0x64fb, 0x64fe);
+  CYC(0x64fe, 0x64ff); ret_effect(gb);
+}
+
+void getNumSmallKeys_hook(GB *gb) {
+  CYC(0x651f, 0x6522); A = W8(wDungeonIndex);
+  CYC(0x6522, 0x6525); SET_HL(wDungeonSmallKeys);
+  CYC(0x6525, 0x6526); push_effect(gb, 0x6526); add_a_to_hl(gb);
+  CYC(0x6526, 0x6527); A = mem_rd(gb, HL);
+  CYC(0x6527, 0x6528); alu_or(gb, A);
+  CYC(0x6528, 0x6529); ret_effect(gb);
+}
+
+void checkLinkHasBossKey_hook(GB *gb) {
+  CYC(0x6529, 0x652c); SET_HL(wDungeonBossKeys);
+  CYC(0x652c, 0x652f); A = W8(wDungeonIndex);
+  CYC(0x652f, 0x6532); checkFlag_hook(gb);
+}
+
+void checkLinkHasCompass_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6532, 0x6533); push_effect(gb, HL);
+  CYC(0x6533, 0x6536); SET_HL(wDungeonCompasses);
+  CYC(0x6536, 0x6539); A = W8(wDungeonIndex);
+  CALL_C(0x6539, checkFlag_hook, 0x0205, 0x653c);
+  CYC(0x653c, 0x653d); SET_HL(pop_effect(gb));
+  CYC(0x653d, 0x653e); ret_effect(gb);
+}
+
+void checkLinkHasMap_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x653e, 0x653f); push_effect(gb, HL);
+  CYC(0x653f, 0x6542); SET_HL(wDungeonMaps);
+  CYC(0x6542, 0x6545); A = W8(wDungeonIndex);
+  CALL_C(0x6545, checkFlag_hook, 0x0205, 0x6548);
+  CYC(0x6548, 0x6549); SET_HL(pop_effect(gb));
+  CYC(0x6549, 0x654a); ret_effect(gb);
+}
+
+void dungeonMap_drawFloorCursor_hook(GB *gb) {
+  CYC(0x654a, 0x654d); A = W8(wDungeonIndex);
+  CYC(0x654d, 0x6550); SET_HL(0x691e);
+  CYC(0x6550, 0x6551); add_double_index_to_hl(gb, 0x6551);
+  CYC(0x6551, 0x6554); A = W8(wMapMenu_floorIndex);
+  CYC(0x6554, 0x6556); A = alu_swap(gb, A);
+  CYC(0x6556, 0x6557); alu_rrca(gb);
+  CYC(0x6557, 0x6558); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x6558, 0x6559); B = A;
+  CYC(0x6559, 0x655b); C = 0;
+  CYC(0x655b, 0x655e); SET_HL(0x6561);
+  CYC(0x655e, 0x6561); addSpritesToOam_withOffset_hook(gb);
+}
+
+void dungeonMap_drawBossSymbolForFloor_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6566, checkLinkHasCompass_hook, 0x6532, 0x6569);
+  if (F & FZ) { CYCT(0x6569, 0x656a); ret_effect(gb); return; }
+  CYC(0x6569, 0x656a);
+  CYC(0x656a, 0x656d); A = W8(wDungeonIndex);
+  CYC(0x656d, 0x6570); SET_HL(0x691f);
+  CYC(0x6570, 0x6571); add_double_index_to_hl(gb, 0x6571);
+  CYC(0x6571, 0x6572); B = mem_rd(gb, HL);
+  CYC(0x6572, 0x6574); C = 0;
+  CYC(0x6574, 0x6577); SET_HL(0x657a);
+  CYC(0x6577, 0x657a); addSpritesToOam_withOffset_hook(gb);
+}
+
+void dungeonMap_drawLinkIcons_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x657f, 0x6582); A = W8(wMapMenu_dungeonCursorFlicker);
+  CYC(0x6582, 0x6583); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x6583, 0x6585); goto floor_list; }
+  CYC(0x6583, 0x6585);
+  CALL_C(0x6585, dungeonMap_getLinkIconPosition, 0x6756, 0x6588);
+  CYC(0x6588, 0x658b); SET_HL(wMapMenu_dungeonScrollY);
+  CYC(0x658b, 0x658c); A = B;
+  CYC(0x658c, 0x658d); alu_sub(gb, mem_rd(gb, HL));
+  CYC(0x658d, 0x658f); alu_cp(gb, 0x12);
+  if (!(F & FC)) { CYCT(0x658f, 0x6591); goto floor_list; }
+  CYC(0x658f, 0x6591);
+  CYC(0x6591, 0x6592); A = alu_inc8(gb, A);
+  CYC(0x6592, 0x6594); A = alu_swap(gb, A);
+  CYC(0x6594, 0x6595); alu_rrca(gb);
+  CYC(0x6595, 0x6596); B = A;
+  CYC(0x6596, 0x6598); C = alu_swap(gb, C);
+  CYC(0x6598, 0x659a); C = alu_rrc(gb, C);
+  CYC(0x659a, 0x659d); SET_HL(0x65bd);
+  CALL_C(0x659d, addSpritesToOam_withOffset_hook, 0x0d61, 0x65a0);
+floor_list:
+  CYC(0x65a0, 0x65a3); A = W8(wDungeonIndex);
+  CYC(0x65a3, 0x65a6); SET_HL(0x691e);
+  CYC(0x65a6, 0x65a7); add_double_index_to_hl(gb, 0x65a7);
+  CYC(0x65a7, 0x65aa); A = W8(wMapMenu_linkFloor);
+  CYC(0x65aa, 0x65ab); C = A;
+  CYC(0x65ab, 0x65ae); A = W8(wDungeonNumFloors);
+  CYC(0x65ae, 0x65af); A = alu_dec8(gb, A);
+  CYC(0x65af, 0x65b0); alu_sub(gb, C);
+  CYC(0x65b0, 0x65b2); A = alu_swap(gb, A);
+  CYC(0x65b2, 0x65b3); alu_rrca(gb);
+  CYC(0x65b3, 0x65b4); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x65b4, 0x65b5); B = A;
+  CYC(0x65b5, 0x65b7); C = 0;
+  CYC(0x65b7, 0x65ba); SET_HL(0x65c2);
+  CYC(0x65ba, 0x65bd); addSpritesToOam_withOffset_hook(gb);
+}
+
+void dungeonMap_updateCursorFlickerCounter_hook(GB *gb) {
+  CYC(0x65c7, 0x65ca); A = W8(wFrameCounter);
+  CYC(0x65ca, 0x65cc); alu_and(gb, 0x1f);
+  if (!(F & FZ)) { CYCT(0x65cc, 0x65cd); ret_effect(gb); return; }
+  CYC(0x65cc, 0x65cd);
+  CYC(0x65cd, 0x65d0); SET_HL(wMapMenu_dungeonCursorFlicker);
+  CYC(0x65d0, 0x65d1); A = mem_rd(gb, HL);
+  CYC(0x65d1, 0x65d3); alu_xor(gb, 1);
+  CYC(0x65d3, 0x65d4); mem_wr(gb, HL, A);
+  CYC(0x65d4, 0x65d5); ret_effect(gb);
+}
+
+void dungeonMap_drawCursor_hook(GB *gb) {
+  CYC(0x65d5, 0x65d8); A = W8(wSubmenuState);
+  CYC(0x65d8, 0x65d9); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x65d9, 0x65da); ret_effect(gb); return; }
+  CYC(0x65d9, 0x65da);
+  CYC(0x65da, 0x65dd); A = W8(wMapMenu_dungeonCursorFlicker);
+  CYC(0x65dd, 0x65de); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x65de, 0x65df); ret_effect(gb); return; }
+  CYC(0x65de, 0x65df);
+  CYC(0x65df, 0x65e2); A = W8(wMapMenu_dungeonCursorIndex);
+  CYC(0x65e2, 0x65e4); alu_and(gb, 0xf8);
+  CYC(0x65e4, 0x65e5); B = A;
+  CYC(0x65e5, 0x65e8); A = W8(wMapMenu_dungeonCursorIndex);
+  CYC(0x65e8, 0x65ea); alu_and(gb, 7);
+  CYC(0x65ea, 0x65eb); alu_add(gb, A);
+  CYC(0x65eb, 0x65ec); alu_add(gb, A);
+  CYC(0x65ec, 0x65ed); alu_add(gb, A);
+  CYC(0x65ed, 0x65ee); C = A;
+  CYC(0x65ee, 0x65f1); SET_HL(0x65f4);
+  CYC(0x65f1, 0x65f4); addSpritesToOam_withOffset_hook(gb);
 }

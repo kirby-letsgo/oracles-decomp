@@ -41,6 +41,9 @@ void endgameCutsceneHandler_0f__state0__substate0_hook(GB *gb);
 void endgameCutsceneHandler_0f__state1_hook(GB *gb);
 void endgameCutsceneHandler_0f__state1__runSubstates_hook(GB *gb);
 void endgameCutsceneHandler_0f__state1__substate0_hook(GB *gb);
+void endgameCutsceneHandler_09_stage0_hook(GB *gb);
+void endgameCutsceneHandler_09_stage0__runStates_hook(GB *gb);
+void endgameCutsceneHandler_09_stage1__runStates_hook(GB *gb);
 
 static void add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -1569,7 +1572,8 @@ void endgameCutsceneHandler_09_stage0__state15_hook(GB *gb) {
 }
 
 void endgameCutsceneHandler_09_stage1_hook(GB *gb) {
-  CALL_ROM(0x56e0, 0x56e6);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x56e0, endgameCutsceneHandler_09_stage1__runStates_hook, 0x56e6, 0x56e3);
   CYC(0x56e3, 0x56e6); updateAllObjects_hook(gb);
 }
 
@@ -2319,4 +2323,72 @@ void endgameCutsceneHandler_0f__state1__substate0_hook(GB *gb) {
   CYC(0x5d09, 0x5d0b); mem_wr(gb, HL, 0x3c);
   CYC(0x5d0b, 0x5d0d); A = 0x02;
   CYC(0x5d0d, 0x5d10); loadGfxRegisterStateIndex_hook(gb);
+}
+
+void endgameCutsceneHandler_09_hook(GB *gb) {
+  CYC(0x5449, 0x544c); SET_DE(0xcbc1);
+  CYC(0x544c, 0x544d); A = mem_rd(gb, DE);
+  CYC(0x544d, 0x544e); push_effect(gb, 0x544e);
+  switch (endgame_jump_table(gb)) {
+    case 0x5452: endgameCutsceneHandler_09_stage0_hook(gb); return;
+    case 0x56e0: endgameCutsceneHandler_09_stage1_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void endgameCutsceneHandler_09_stage0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x5452, updateStatusBar_hook, 0x1a9c, 0x5455);
+  CALL_C(0x5455, endgameCutsceneHandler_09_stage0__runStates_hook, 0x545b, 0x5458);
+  CYC(0x5458, 0x545b); updateAllObjects_hook(gb);
+}
+
+void endgameCutsceneHandler_09_stage0__runStates_hook(GB *gb) {
+  CYC(0x545b, 0x545e); SET_DE(0xcbc2);
+  CYC(0x545e, 0x545f); A = mem_rd(gb, DE);
+  CYC(0x545f, 0x5460); push_effect(gb, 0x5460);
+  switch (endgame_jump_table(gb)) {
+    case 0x548c: endgameCutsceneHandler_09_stage0__state0_hook(gb); return;
+    case 0x54c7: endgameCutsceneHandler_09_stage0__state1_hook(gb); return;
+    case 0x54d4: endgameCutsceneHandler_09_stage0__state2_hook(gb); return;
+    case 0x54f1: endgameCutsceneHandler_09_stage0__state3_hook(gb); return;
+    case 0x5500: endgameCutsceneHandler_09_stage0__state4_hook(gb); return;
+    case 0x550d: endgameCutsceneHandler_09_stage0__state5_hook(gb); return;
+    case 0x5549: endgameCutsceneHandler_09_stage0__state6_hook(gb); return;
+    case 0x5551: endgameCutsceneHandler_09_stage0__state7_hook(gb); return;
+    case 0x5569: endgameCutsceneHandler_09_stage0__state8_hook(gb); return;
+    case 0x5575: endgameCutsceneHandler_09_stage0__state9_hook(gb); return;
+    case 0x559e: endgameCutsceneHandler_09_stage0__stateA_hook(gb); return;
+    case 0x55c3: endgameCutsceneHandler_09_stage0__stateB_hook(gb); return;
+    case 0x55d4: endgameCutsceneHandler_09_stage0__stateC_hook(gb); return;
+    case 0x55e8: endgameCutsceneHandler_09_stage0__stateD_hook(gb); return;
+    case 0x55ff: endgameCutsceneHandler_09_stage0__stateE_hook(gb); return;
+    case 0x561e: endgameCutsceneHandler_09_stage0__stateF_hook(gb); return;
+    case 0x5644: endgameCutsceneHandler_09_stage0__state10_hook(gb); return;
+    case 0x5661: endgameCutsceneHandler_09_stage0__state11_hook(gb); return;
+    case 0x568e: endgameCutsceneHandler_09_stage0__state12_hook(gb); return;
+    case 0x56ad: endgameCutsceneHandler_09_stage0__state13_hook(gb); return;
+    case 0x56bf: endgameCutsceneHandler_09_stage0__state14_hook(gb); return;
+    case 0x56d1: endgameCutsceneHandler_09_stage0__state15_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void endgameCutsceneHandler_09_stage1__runStates_hook(GB *gb) {
+  CYC(0x56e6, 0x56e9); SET_DE(0xcbc2);
+  CYC(0x56e9, 0x56ea); A = mem_rd(gb, DE);
+  CYC(0x56ea, 0x56eb); push_effect(gb, 0x56eb);
+  switch (endgame_jump_table(gb)) {
+    case 0x56ff: endgameCutsceneHandler_09_stage1__state0_hook(gb); return;
+    case 0x572c: endgameCutsceneHandler_09_stage1__state1_hook(gb); return;
+    case 0x5744: endgameCutsceneHandler_09_stage1__state2_hook(gb); return;
+    case 0x5761: endgameCutsceneHandler_09_stage1__state3_hook(gb); return;
+    case 0x5777: endgameCutsceneHandler_09_stage1__state4_hook(gb); return;
+    case 0x578a: endgameCutsceneHandler_09_stage1__state5_hook(gb); return;
+    case 0x57a6: endgameCutsceneHandler_09_stage1__state6_hook(gb); return;
+    case 0x57bb: endgameCutsceneHandler_09_stage1__state7_hook(gb); return;
+    case 0x57d2: endgameCutsceneHandler_09_stage1__state8_hook(gb); return;
+    case 0x5828: endgameCutsceneHandler_09_stage1__state9_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
 }

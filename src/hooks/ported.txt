@@ -709,6 +709,8 @@ getSecretBufferChecksum
 shiftSecretBufferContentsToFront
 andCWith3
 getNumCharactersForSecretType
+endgameCutsceneHandler_09_stage0__runStates
+endgameCutsceneHandler_09_stage1__runStates
 secretXorCipher
 # remaining code/ files batch 6 (generated)
 cutscene06

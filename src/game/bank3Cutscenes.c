@@ -1886,7 +1886,7 @@ void endgameCutsceneHandler_body_hook(GB *gb) {
   CYC(0x5425, 0x5426); push_effect(gb, 0x5426);
   switch (intro_jumpTable(gb)) {
     case 0x5449:
-      endgameCutsceneHandler_09(gb);
+      endgameCutsceneHandler_09_hook(gb);
       return;
     case 0x5e10:
       endgameCutsceneHandler_0a_hook(gb);

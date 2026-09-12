@@ -215,3 +215,5 @@
 03:496c loadUnpackedSecretData__type0
 03:498c loadUnpackedSecretData__type3
 03:498d loadUnpackedSecretData__type2
+03:545b endgameCutsceneHandler_09_stage0__runStates
+03:56e6 endgameCutsceneHandler_09_stage1__runStates
