@@ -22,6 +22,20 @@ void func_03_7619__state4_hook(GB *gb);
 void func_03_7619__state5_hook(GB *gb);
 void func_03_7619__state5__cbb3_03_hook(GB *gb);
 void func_03_7619__state6_hook(GB *gb);
+void fairyCutscene_cfd1is07_hook(GB *gb);
+void func_03_6103__state0_hook(GB *gb);
+void func_03_6103__state2_hook(GB *gb);
+void func_03_6103__spawnForestFairy_hook(GB *gb);
+void func_03_6103__state3_hook(GB *gb);
+void func_03_6103__state5_hook(GB *gb);
+void func_03_6103__state8_hook(GB *gb);
+void func_03_6103__stateB_hook(GB *gb);
+void fairyCutscene_cfd1is07__state0_hook(GB *gb);
+void fairyCutscene_cfd1is07__state1_hook(GB *gb);
+void fairyCutscene_cfd1is07__state2_hook(GB *gb);
+void fairyCutscene_cfd1is07__state3_hook(GB *gb);
+void fairyCutscene_cfd1is07__state4_hook(GB *gb);
+void fairyCutscene_cfd1is07__state5_hook(GB *gb);
 
 static void add_double_index_to_hl(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -301,6 +315,239 @@ void fairyCutscene_incState_hook(GB *gb) {
   CYC(0x6270, 0x6273); SET_HL(wCutsceneState);
   CYC(0x6273, 0x6274); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(0x6274, 0x6275); ret_effect(gb);
+}
+
+void func_03_6103_hook(GB *gb) {
+  CYC(0x6103, 0x6106); A = mem_rd(gb, wTmpcfc0_fairyHideAndSeek_foundFairiesBitset);
+  CYC(0x6106, 0x6108); alu_cp(gb, 0x07);
+  if (F & FZ) {
+    CYCT(0x6108, 0x610b);
+    fairyCutscene_cfd1is07_hook(gb);
+    return;
+  }
+  CYC(0x6108, 0x610b);
+  CYC(0x610b, 0x610e); A = mem_rd(gb, wCutsceneState);
+  CYC(0x610e, 0x610f); push_effect(gb, 0x610f);
+  switch (misc_cutscene_jump_table(gb)) {
+    case 0x6127: func_03_6103__state0_hook(gb); return;
+    case 0x6175: func_03_6103__state2_hook(gb); return;
+    case 0x6188: func_03_6103__state3_hook(gb); return;
+    case 0x619f: func_03_6103__state5_hook(gb); return;
+    case 0x61b1: func_03_6103__state8_hook(gb); return;
+    case 0x61dc: func_03_6103__stateB_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void func_03_6103__state0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6127, 0x612a); SET_HL(wTmpcbb3);
+  CYC(0x612a, 0x612d); A = mem_rd(gb, w1Link_yh);
+  CYC(0x612d, 0x612e); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x612e, 0x6131); A = mem_rd(gb, w1Link_xh);
+  CYC(0x6131, 0x6132); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x6132, 0x6135); A = mem_rd(gb, w1Link_direction);
+  CYC(0x6135, 0x6136); mem_wr(gb, HL, A);
+  CALL_C(0x6136, fadeoutToWhite_hook, 0x326c, 0x6139);
+  CYC(0x6139, 0x613c); fairyCutscene_incState_hook(gb);
+}
+
+void func_03_6103__state2_hook(GB *gb) {
+  CYC(0x6175, 0x6178); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x6178, 0x6179); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x6179, 0x617a); ret_effect(gb);
+    return;
+  }
+  CYC(0x6179, 0x617a);
+  CYC(0x617a, 0x617c); B = 0x0c;
+  func_03_6103__spawnForestFairy_hook(gb);
+}
+
+void func_03_6103__spawnForestFairy_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x617c, getFreeInteractionSlot_hook, 0x3aef, 0x617f);
+  if (!(F & FZ)) {
+    CYCT(0x617f, 0x6180); ret_effect(gb);
+    return;
+  }
+  CYC(0x617f, 0x6180);
+  CYC(0x6180, 0x6182); mem_wr(gb, HL, 0x49);
+  CYC(0x6182, 0x6184); L = 0x43;
+  CYC(0x6184, 0x6185); mem_wr(gb, HL, B);
+  CYC(0x6185, 0x6188); fairyCutscene_incState_hook(gb);
+}
+
+void func_03_6103__state3_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6188, 0x618b); SET_HL(wTmpcfc0_fairyHideAndSeek_cfd2);
+  CYC(0x618b, 0x618c); A = mem_rd(gb, HL);
+  CYC(0x618c, 0x618d); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x618d, 0x618e); ret_effect(gb);
+    return;
+  }
+  CYC(0x618d, 0x618e);
+  CYC(0x618e, 0x6190); mem_wr(gb, HL, 0x00);
+  CALL_C(0x6190, fairyCutscene_incState_hook, 0x6270, 0x6193);
+  CYC(0x6193, 0x6196); fadeoutToWhite_hook(gb);
+}
+
+void func_03_6103__state5_hook(GB *gb) {
+  CYC(0x619f, 0x61a2); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x61a2, 0x61a3); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x61a3, 0x61a4); ret_effect(gb);
+    return;
+  }
+  CYC(0x61a3, 0x61a4);
+  CYC(0x61a4, 0x61a6); B = 0x0d;
+  CYC(0x61a6, 0x61a8); func_03_6103__spawnForestFairy_hook(gb);
+}
+
+void func_03_6103__state8_hook(GB *gb) {
+  CYC(0x61b1, 0x61b4); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x61b4, 0x61b5); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x61b5, 0x61b6); ret_effect(gb);
+    return;
+  }
+  CYC(0x61b5, 0x61b6);
+  CYC(0x61b6, 0x61b8); B = 0x0e;
+  CYC(0x61b8, 0x61bb); func_03_6103__spawnForestFairy_hook(gb);
+}
+
+void func_03_6103__stateB_hook(GB *gb) {
+  CYC(0x61dc, 0x61df); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x61df, 0x61e0); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x61e0, 0x61e1); ret_effect(gb);
+    return;
+  }
+  CYC(0x61e0, 0x61e1);
+  CYC(0x61e1, 0x61e2); alu_xor(gb, A);
+  CYC(0x61e2, 0x61e5); mem_wr(gb, wDisabledObjects, A);
+  CYC(0x61e5, 0x61e8); mem_wr(gb, wMenuDisabled, A);
+  CYC(0x61e8, 0x61e9); A = alu_inc8(gb, A);
+  CYC(0x61e9, 0x61ec); mem_wr(gb, 0xc2ef, A);
+  CYC(0x61ec, 0x61ef); SET_BC(0x1104);
+  CYC(0x61ef, 0x61f2); showText_hook(gb);
+}
+
+void fairyCutscene_cfd1is07_hook(GB *gb) {
+  CYC(0x61f2, 0x61f5); A = mem_rd(gb, wCutsceneState);
+  CYC(0x61f5, 0x61f6); push_effect(gb, 0x61f6);
+  switch (misc_cutscene_jump_table(gb)) {
+    case 0x6202: fairyCutscene_cfd1is07__state0_hook(gb); return;
+    case 0x6210: fairyCutscene_cfd1is07__state1_hook(gb); return;
+    case 0x6225: fairyCutscene_cfd1is07__state2_hook(gb); return;
+    case 0x6231: fairyCutscene_cfd1is07__state3_hook(gb); return;
+    case 0x624c: fairyCutscene_cfd1is07__state4_hook(gb); return;
+    case 0x625a: fairyCutscene_cfd1is07__state5_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void fairyCutscene_cfd1is07__state0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6202, 0x6205); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x6205, 0x6206); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x6206, 0x6207); ret_effect(gb);
+    return;
+  }
+  CYC(0x6206, 0x6207);
+  CYC(0x6207, 0x620a); SET_BC(0x110a);
+  CALL_C(0x620a, showText_hook, 0x1872, 0x620d);
+  CYC(0x620d, 0x6210); fairyCutscene_incState_hook(gb);
+}
+
+void fairyCutscene_cfd1is07__state1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6210, 0x6213); A = mem_rd(gb, wTextIsActive);
+  CYC(0x6213, 0x6214); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x6214, 0x6215); ret_effect(gb);
+    return;
+  }
+  CYC(0x6214, 0x6215);
+  CALL_C(0x6215, fairyCutscene_incState_hook, 0x6270, 0x6218);
+  CYC(0x6218, 0x621a); A = 0x0c;
+  CYC(0x621a, 0x621d); mem_wr(gb, wTmpcbb6, A);
+  CYC(0x621d, 0x621f); A = 0x7b;
+  CALL_C(0x621f, playSound_b00_hook, 0x0c98, 0x6222);
+  CYC(0x6222, 0x6225); fastFadeinFromWhite_hook(gb);
+}
+
+void fairyCutscene_cfd1is07__state2_hook(GB *gb) {
+  CYC(0x6225, 0x6228); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x6228, 0x6229); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x6229, 0x622a); ret_effect(gb);
+    return;
+  }
+  CYC(0x6229, 0x622a);
+  CYC(0x622a, 0x622d); SET_HL(wTmpcbb6);
+  CYC(0x622d, 0x622e); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(0x622e, 0x622f); ret_effect(gb);
+    return;
+  }
+  CYC(0x622e, 0x622f);
+  CYC(0x622f, 0x6231); fairyCutscene_cfd1is07__state1_hook(gb);
+}
+
+void fairyCutscene_cfd1is07__state3_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6231, 0x6234); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x6234, 0x6235); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x6235, 0x6236); ret_effect(gb);
+    return;
+  }
+  CYC(0x6235, 0x6236);
+  CYC(0x6236, 0x6239); SET_HL(wTmpcbb6);
+  CYC(0x6239, 0x623a); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(0x623a, 0x623b); ret_effect(gb);
+    return;
+  }
+  CYC(0x623a, 0x623b);
+  CALL_C(0x623b, fairyCutscene_incState_hook, 0x6270, 0x623e);
+  CYC(0x623e, 0x623f); alu_xor(gb, A);
+  CYC(0x623f, 0x6242); mem_wr(gb, wTmpcfc0_fairyHideAndSeek_active, A);
+  CYC(0x6242, 0x6244); A = 0x7b;
+  CALL_C(0x6244, playSound_b00_hook, 0x0c98, 0x6247);
+  CYC(0x6247, 0x6249); A = 0x08;
+  CYC(0x6249, 0x624c); fadeinFromWhiteWithDelay_hook(gb);
+}
+
+void fairyCutscene_cfd1is07__state4_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x624c, 0x624f); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x624f, 0x6250); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x6250, 0x6251); ret_effect(gb);
+    return;
+  }
+  CYC(0x6250, 0x6251);
+  CALL_C(0x6251, fairyCutscene_incState_hook, 0x6270, 0x6254);
+  CYC(0x6254, 0x6257); SET_BC(0x110b);
+  CYC(0x6257, 0x625a); showText_hook(gb);
+}
+
+void fairyCutscene_cfd1is07__state5_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x625a, 0x625c); A = 0x0e;
+  CALL_C(0x625c, setGlobalFlag_hook, 0x31f9, 0x625f);
+  CYC(0x625f, 0x6261); A = 0x2b;
+  CALL_C(0x6261, setGlobalFlag_hook, 0x31f9, 0x6264);
+  CYC(0x6264, 0x6265); alu_xor(gb, A);
+  CYC(0x6265, 0x6268); mem_wr(gb, wMenuDisabled, A);
+  CYC(0x6268, 0x626b); mem_wr(gb, wDisabledObjects, A);
+  CYC(0x626b, 0x626c); A = alu_inc8(gb, A);
+  CYC(0x626c, 0x626f); mem_wr(gb, 0xc2ef, A);
+  CYC(0x626f, 0x6270); ret_effect(gb);
 }
 
 void func_03_6275__bootedFromPalace_incState_hook(GB *gb) {

@@ -595,3 +595,9 @@ desync to discover; keep them when porting routines.
   registers and ordinary cycle totals looked plausible, but an interrupt can observe each opcode
   boundary. Instruction-by-instruction cross-review found it; split the burns and attach each
   register effect to the instruction that performs it.
+- Rewriting a dispatcher deletes all of its generated local entries, including locals deliberately
+  left in the interpreter because they cross a thread-switch boundary. Batch 76's forest-fairy
+  root kept unsafe state targets behind `hook_handoff`, but regeneration silently removed those
+  targets and the synthetic return PCs after `refreshObjectGfx`. Give every deferred state and
+  post-switch continuation a real alias in `extra.sym` and `ported.txt`, but leave it out of
+  `rewritten.txt`; regeneration then keeps the mixed-mode entry while the parent becomes readable.
