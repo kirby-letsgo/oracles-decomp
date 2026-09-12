@@ -736,6 +736,12 @@ dungeonMap_getTileForRoom__ret
 func_6f44__cbb8_00
 func_6f44__cbb8_01
 func_6f44__cbb8_02
+paletteFadeHandler08__seasonsFunc_01_5816
+paletteFadeHandler08__stop
+paletteThread_calculateFadingPalettes__nextColor
+paletteThread_mixBG567Palettes__nextColor
+paletteThread_mixBG567Palettes__mixColors
+paletteThread_mixBG567Palettes__writeToFadingBgPalettes
 secretXorCipher
 # remaining code/ files batch 6 (generated)
 cutscene06

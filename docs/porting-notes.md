@@ -584,3 +584,8 @@ desync to discover; keep them when porting routines.
   `dungeonMap_getTileForRoom__hidden` initially burned the unconditional `jr` at `$68a2` through
   `$68a5`; the two-byte instruction ends at `$68a4`, and `$68a4` is the first byte of an
   unreachable `call`. Instruction-by-instruction review caught the extra byte before regeneration.
+- For `jr nc`, no carry is the taken path. Batch 74's two palette-mixer multiply loops initially
+  skipped the conditional add correctly in C but assigned `CYC` to that no-carry branch and
+  `CYCT` to the carry fallthrough. The control result looked right while the cycle timing was
+  reversed. The branch that skips the add must use `CYCT`; the carry path that executes it uses
+  `CYC`.

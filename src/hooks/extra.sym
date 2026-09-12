@@ -242,3 +242,9 @@
 03:6f58 func_6f44__cbb8_00
 03:6f60 func_6f44__cbb8_01
 03:6f70 func_6f44__cbb8_02
+01:5815 paletteFadeHandler08__seasonsFunc_01_5816
+01:5838 paletteFadeHandler08__stop
+01:5840 paletteThread_calculateFadingPalettes__nextColor
+01:589a paletteThread_mixBG567Palettes__nextColor
+01:58d8 paletteThread_mixBG567Palettes__mixColors
+01:5902 paletteThread_mixBG567Palettes__writeToFadingBgPalettes
