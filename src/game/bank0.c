@@ -7859,13 +7859,14 @@ void openSecretInputMenu_hook(GB *gb) {
 }
 
 void updateMenus_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x1a51, 0x1a53); C = mem_rd(gb, IO_SVBK);
   CYC(0x1a53, 0x1a56); B = H8(hRomBank);
   CYC(0x1a56, 0x1a58); push_effect(gb, BC);
   A = 0x02;
   CYC(0x1a58, 0x1a5c); H8(hRomBank) = A;
   CYC(0x1a5c, 0x1a5f); mem_wr(gb, MBC_ROM_BANK, A);
-  CALL_ROM(0x1a5f, ROM_b02_updateMenus);
+  CALL_C(0x1a5f, b2_updateMenus_hook, ROM_b02_updateMenus, 0x1a62);
   CYC(0x1a62, 0x1a63); SET_BC(pop_effect(gb));
   A = B;
   CYC(0x1a63, 0x1a66); H8(hRomBank) = A;
@@ -12797,7 +12798,7 @@ void thread_1b10_hook(GB *gb) {
     CYC(0x1b1d, 0x1b1f);
     CYC(0x1b1f, 0x1b21); H8(hRomBank) = A;
     CYC(0x1b21, 0x1b24); mem_wr(gb, MBC_ROM_BANK, A);
-    CALL_C(0x1b24, runSaveAndQuitMenu, ROM_runSaveAndQuitMenu, 0x1b27);
+    CALL_C(0x1b24, runSaveAndQuitMenu_hook, ROM_runSaveAndQuitMenu, 0x1b27);
     CALL_C(0x1b27, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, 0x1b2a);
     CYCT(0x1b2a, 0x1b2c);
   }

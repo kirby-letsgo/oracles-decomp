@@ -708,3 +708,9 @@ desync to discover; keep them when porting routines.
   bytes read by the root's input index, not an entry point. Porting it as an alias would invent
   executable semantics for sound IDs. Check the disassembly's data directives and actual inbound
   control flow for every apparent local entry; remove confirmed data from `ported.txt` instead.
+- Same-size operand substitutions can survive every structural gate while changing game behavior.
+  Batch 113 initially read menu load state at adjacent `$cbcc` instead of opened-menu type at
+  `$cbcb`; `openMenu` also compared against 1 instead of 3 and requested sound `$56` instead of
+  `$54`. All instruction lengths and cycle burns remained valid, so lint and compilation could not
+  detect them. Compare every RAM address and immediate literal directly against the ROM report in
+  instruction-level review, even when the surrounding control flow is exact.

@@ -1587,6 +1587,7 @@ paletteThread_mixBG567Palettes
 doNextChannelCommand
 updateSquareChannelVolume
 b2_updateMenus
+b2_updateMenus__updateMenu
 multiplyHlByA
 interactionCodee1
 func_46ff
@@ -1963,6 +1964,7 @@ openMenu_body
 closeMenu
 menuSpecificCode
 menuStateFadeIntoMenu
+menuStateFadeIntoMenu__openMenu
 saveGraphicsOnEnterMenu_body
 menuStateFadeOutOfMenu
 reloadGraphicsOnExitMenu_body
@@ -6269,6 +6271,11 @@ runTextInput__upButton
 runTextInput__downButton
 runTextInput__upOrDown
 runTextInput__startButton
+runSaveAndQuitMenu__runState
+saveQuitMenu_state0__gameOver
+saveQuitMenu_state0__notGameOver
+runSecretListMenu__runState
+secretListMenu_state0__clearVramBank
 loadDungeonLayout_b01__nextFloor
 loadDungeonLayout_b01__nextByte
 loadDungeonLayout_b01__end

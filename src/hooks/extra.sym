@@ -708,6 +708,8 @@
 02:4508 runKidNameEntryMenu__mode2
 02:46b6 label_02_038__secretEntry
 02:46d0 label_02_038__end
+02:5019 b2_updateMenus__updateMenu
+02:5068 menuStateFadeIntoMenu__openMenu
 02:457a runSecretEntryMenu__func
 02:4588 runSecretEntryMenu__mode0
 02:4593 runSecretEntryMenu__mode1
@@ -734,6 +736,11 @@
 02:47ca runTextInput__downButton
 02:47cc runTextInput__upOrDown
 02:47e5 runTextInput__startButton
+02:738a runSaveAndQuitMenu__runState
+02:73ae saveQuitMenu_state0__gameOver
+02:73d6 saveQuitMenu_state0__notGameOver
+02:7481 runSecretListMenu__runState
+02:74b7 secretListMenu_state0__clearVramBank
 01:5678 loadDungeonLayout_b01__nextFloor
 01:567a loadDungeonLayout_b01__nextByte
 01:569d loadDungeonLayout_b01__end

@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,386 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,404 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -134,6 +134,8 @@ Updated 2026-09-12. Newest entries at the top of each section.
   and state paths, preserving their RST jump-table frames and deferred-input handoffs.
   Batch 112 completed bank 2's text-input navigation and selection state machine; its adjacent
   sound-effects table was removed from the executable registry.
+  Batch 113 added the bank-2 menu transition/load dispatcher, save-and-quit and secret-list roots,
+  and the file-select error/input wait tails.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -239,6 +241,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-12: milestone 3 phase 5 batch 113 (18 routines): added bank 2's menu update,
+  menu-specific dispatch, fade-in/fade-out, graphics-save, save-and-quit, and secret-list roots and
+  state paths, plus the file-select error and input-wait tails. Nine local entries received stable
+  aliases, bank-0 thread callers were retargeted to the readable roots, and thread-switching paths
+  retain explicit handoff. Independent review caught an adjacent-but-wrong menu RAM field
+  (`$cbcc` instead of `$cbcb`) and two same-size literal mistakes in `openMenu` (comparison 1 and
+  sound `$56` instead of 3 and `$54`); exact ROM operands were restored before runtime testing.
+  Two independent instruction-level reviews approved the corrected code. Gates: lint 0, 30k
+  verify 0 mismatches across 4,802,991 calls, full replay state `64bddd0dfe384126`, normal and
+  quirk suites 8/8.
 - 2026-09-12: milestone 3 phase 5 batch 112 (20 routines): completed bank 2's text-input root,
   character selection, name/secret lower-option tables, delete/back/start behavior, horizontal and
   vertical cursor movement, wraparound loops, output writes, and cursor-update tails. Nineteen

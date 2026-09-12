@@ -2332,6 +2332,8 @@ runSecretEntryMenu__mode2
 runSecretEntryMenu__invalidSecret
 runSecretEntryMenu__setTextInputResult
 runSecretEntryMenu__loadRingSecretData
+fileSelect_printError
+textInput_waitForInput
 runTextInput
 runTextInput__aButton
 runTextInput__gotCharacter
@@ -2352,6 +2354,15 @@ runTextInput__upButton
 runTextInput__downButton
 runTextInput__upOrDown
 runTextInput__startButton
+runSaveAndQuitMenu
+runSaveAndQuitMenu__runState
+saveQuitMenu_state0
+saveQuitMenu_state0__gameOver
+saveQuitMenu_state0__notGameOver
+runSecretListMenu
+runSecretListMenu__runState
+secretListMenu_state0
+secretListMenu_state0__clearVramBank
 loadDungeonLayout_b01
 loadDungeonLayout_b01__nextFloor
 loadDungeonLayout_b01__nextByte
@@ -2385,3 +2396,10 @@ fileSelectMode6
 fileSelectMode6__updateMode6
 fileSelectMode6__mode0
 fileSelectMode6__mode2
+b2_updateMenus
+b2_updateMenus__updateMenu
+menuSpecificCode
+menuStateFadeIntoMenu
+menuStateFadeIntoMenu__openMenu
+saveGraphicsOnEnterMenu_body
+menuStateFadeIntoGame
