@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,132 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,159 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -106,6 +106,8 @@ Updated 2026-09-12. Newest entries at the top of each section.
   and secret-data lookup paths while retaining the thread-starting initialization in generated C.
   Batch 99 added the bank-2 ring-list selection, ring text, ring-box insertion/search, page-scroll,
   and cursor-movement state machine through its direction-offset table.
+  Batch 100 completed the ring-menu rendering and selection helpers. Batch 101 added the Game Link
+  menu state machine, Link/file rendering, save/quit input and sprite helpers, and fake-reset states.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -211,6 +213,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-12: milestone 3 phase 5 batch 101 (27 routines): added bank 2's Game Link menu
+  dispatcher and seven states, Link/file sprite rendering, save/quit input and sprite helpers, and
+  the fake-reset dispatcher and states. Eighteen local entries received stable aliases and one
+  sprite-table label left the executable registry. Review corrected the Link animation source from
+  `$cbbd` to the ROM's `$cbb6`, then shortened the `$4d27` unconditional-JR burn to its physical
+  two-byte endpoint at `$4d29` instead of its `$4d2b` target. Two independent final reviews
+  approved the corrected timing, calls, stacks, dispatchers, and registry integration. Gates: lint
+  0, 30k verify 0 mismatches across 4,688,896 calls, full replay state `64bddd0dfe384126`, normal
+  and quirk suites 8/8.
 - 2026-09-12: milestone 3 phase 5 batch 100 (26 routines): completed bank 2's ring-menu
   rendering and selection helpers, including cursor sprites, equipped-ring markers, ring-box and
   list drawing, page counters, displayed text, and all eight independently hookable local paths.

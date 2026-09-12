@@ -156,6 +156,25 @@ void textInput_getOutputAddressOffset_hook(GB *gb);
 void fileSelectDrawHeartsAndDeathCounter_hook(GB *gb);
 void fileSelectDrawAcornCursor_hook(GB *gb);
 void fileSelectDrawAcornCursor__func_hook(GB *gb);
+void runGameLinkMenu_hook(GB *gb);
+void fileSelectMode7_hook(GB *gb);
+void fileSelectMode7__mode7States_hook(GB *gb);
+void fileSelectMode7__state0_hook(GB *gb);
+void fileSelectMode7__state1_hook(GB *gb);
+void fileSelectMode7__state2_hook(GB *gb);
+void fileSelectMode7__state3_hook(GB *gb);
+void fileSelectMode7__moveCursorToQuit_hook(GB *gb);
+void fileSelectMode7__selectedSomething_hook(GB *gb);
+void fileSelectMode7__func_02_4c4b_hook(GB *gb);
+void fileSelectMode7__func_02_4c55_hook(GB *gb);
+void fileSelectMode7__state4_hook(GB *gb);
+void fileSelectMode7__state5_hook(GB *gb);
+void fileSelectMode7__cancelLink_hook(GB *gb);
+void fileSelectMode7__state6_hook(GB *gb);
+void fileSelect_redrawDecorationsAndSetWramBank4_hook(GB *gb);
+void fileSelectDrawLinkInOtherGame_hook(GB *gb);
+void fileSelectDrawLink_hook(GB *gb);
+void fileSelectDrawLink__draw_hook(GB *gb);
 void runInventoryMenu_hook(GB *gb);
 void runInventoryMenu__inventoryMenuStates_hook(GB *gb);
 void showItemText1_hook(GB *gb);
@@ -272,6 +291,11 @@ void ringMenu_updateDisplayedRingNumberWithGivenComparator__noRing_hook(GB *gb);
 void ringMenu_updateDisplayedRingNumberWithGivenComparator__drawNumber_hook(GB *gb);
 void ringMenu_setDisplayedText_hook(GB *gb);
 void ringMenu_retIfTextIsPrinting_hook(GB *gb);
+void saveQuitMenu_checkIsGameOver_hook(GB *gb);
+void saveQuitMenu_state1_hook(GB *gb);
+void saveQuitMenu_state1__upOrDown_hook(GB *gb);
+void saveQuitMenu_state1__bPressed_hook(GB *gb);
+void saveQuitMenu_drawSprites_hook(GB *gb);
 
 static uint16_t function_caller_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -5622,4 +5646,478 @@ void ringMenu_retIfTextIsPrinting_hook(GB *gb) {
   CYC(0x7378, 0x7379);
   CYC(0x7379, 0x737a); SET_AF(pop_effect(gb));
   CYC(0x737a, 0x737b); ret_effect(gb);
+}
+
+void saveQuitMenu_checkIsGameOver_hook(GB *gb) {
+  CYC(0x737b, 0x737e); A = W8(wSaveQuitMenu_gameOver);
+  CYC(0x737e, 0x737f); alu_or(gb, A);
+  CYC(0x737f, 0x7380); ret_effect(gb);
+}
+
+void saveQuitMenu_state1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x73f1, 0x73f4); A = W8(wPaletteThread_mode);
+  CYC(0x73f4, 0x73f5); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x73f5, 0x73f6); ret_effect(gb); return; }
+  CYC(0x73f5, 0x73f6);
+  CYC(0x73f6, 0x73f9); A = W8(wKeysJustPressed);
+  CYC(0x73f9, 0x73fb); C = 0xff;
+  CYC(0x73fb, 0x73fd); alu_bit(gb, 6, A);
+  if (!(F & FZ)) { CYCT(0x73fd, 0x73ff); saveQuitMenu_state1__upOrDown_hook(gb); return; }
+  CYC(0x73fd, 0x73ff);
+  CYC(0x73ff, 0x7401); C = 1;
+  CYC(0x7401, 0x7403); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(0x7403, 0x7405); saveQuitMenu_state1__upOrDown_hook(gb); return; }
+  CYC(0x7403, 0x7405);
+  CYC(0x7405, 0x7407); alu_bit(gb, 1, A);
+  if (!(F & FZ)) { CYCT(0x7407, 0x7409); saveQuitMenu_state1__bPressed_hook(gb); return; }
+  CYC(0x7407, 0x7409);
+  CYC(0x7409, 0x740b); alu_and(gb, 0x09);
+  if (F & FZ) { CYCT(0x740b, 0x740c); ret_effect(gb); return; }
+  CYC(0x740b, 0x740c);
+  CYC(0x740c, 0x740f); A = W8(wSaveQuitMenu_cursorIndex);
+  CYC(0x740f, 0x7410); alu_or(gb, A);
+  if (!(F & FZ)) CALL_C_CC(0x7410, saveFile_b00_hook, 0x09d8, 0x7413); else CYC(0x7410, 0x7413);
+  CYC(0x7413, 0x7415); A = 2;
+  CYC(0x7415, 0x7418); W8(wSaveQuitMenu_state) = A;
+  CYC(0x7418, 0x741a); A = 0x1e;
+  CYC(0x741a, 0x741d); W8(wSaveQuitMenu_delayCounter) = A;
+  CYC(0x741d, 0x741f); A = 0x56;
+  CYC(0x741f, 0x7422); playSound_b00_hook(gb);
+}
+
+void saveQuitMenu_state1__upOrDown_hook(GB *gb) {
+  CYC(0x7422, 0x7425); SET_HL(wSaveQuitMenu_cursorIndex);
+  CYC(0x7425, 0x7426); A = mem_rd(gb, HL);
+  CYC(0x7426, 0x7427); alu_add(gb, C);
+  CYC(0x7427, 0x7429); alu_cp(gb, 3);
+  if (!(F & FC)) { CYCT(0x7429, 0x742a); ret_effect(gb); return; }
+  CYC(0x7429, 0x742a);
+  CYC(0x742a, 0x742b); mem_wr(gb, HL, A);
+  CYC(0x742b, 0x742d); A = 0x84;
+  CYC(0x742d, 0x7430); playSound_b00_hook(gb);
+}
+
+void saveQuitMenu_state1__bPressed_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7430, saveQuitMenu_checkIsGameOver_hook, 0x737b, 0x7433);
+  if (!(F & FZ)) { CYCT(0x7433, 0x7434); ret_effect(gb); return; }
+  CYC(0x7433, 0x7434); CYC(0x7434, 0x7437); closeMenu_hook(gb);
+}
+
+void saveQuitMenu_drawSprites_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7455, fileSelect_redrawDecorationsAndSetWramBank4_hook, 0x4cd7, 0x7458);
+  CYC(0x7458, 0x745b); A = W8(wSaveQuitMenu_delayCounter);
+  CYC(0x745b, 0x745d); alu_and(gb, 4);
+  if (!(F & FZ)) { CYCT(0x745d, 0x745e); ret_effect(gb); return; }
+  CYC(0x745d, 0x745e);
+  CYC(0x745e, 0x745f); C = A;
+  CYC(0x745f, 0x7462); A = W8(wSaveQuitMenu_cursorIndex);
+  CYC(0x7462, 0x7463); B = A;
+  CYC(0x7463, 0x7464); alu_add(gb, A);
+  CYC(0x7464, 0x7465); alu_add(gb, B);
+  CYC(0x7465, 0x7467); A = alu_swap(gb, A);
+  CYC(0x7467, 0x7468); alu_rrca(gb);
+  CYC(0x7468, 0x7469); B = A;
+  CYC(0x7469, 0x746c); SET_HL(0x746f);
+  CYC(0x746c, 0x746f); addSpritesToOam_withOffset_hook(gb);
+}
+
+void fileSelect_redrawDecorationsAndSetWramBank4_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4cd7, clearOam_hook, 0x049f, 0x4cda);
+  CYC(0x4cda, 0x4cdc); A = 4;
+  CYC(0x4cdc, 0x4cde); hram_wr(gb, R_SVBK, A);
+  CYC(0x4cde, 0x4ce1); SET_HL(0x4ce4);
+  CYC(0x4ce1, 0x4ce4); addSpritesToOam_hook(gb);
+}
+
+void fileSelectDrawLink_body_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4d2b, 0x4d2e); A = W8(wFileSelect_cursorPos);
+  CYC(0x4d2e, 0x4d30); alu_cp(gb, 3);
+  if (!(F & FC)) { CYCT(0x4d30, 0x4d31); ret_effect(gb); return; }
+  CYC(0x4d30, 0x4d31);
+  CYC(0x4d31, 0x4d33); D = 0;
+  CALL_C(0x4d33, getFileDisplayVariableAddress_hook, 0x417a, 0x4d36);
+  CYC(0x4d36, 0x4d38); C = 0;
+  CYC(0x4d38, 0x4d3a); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(0x4d3a, 0x4d3c); goto draw; }
+  CYC(0x4d3a, 0x4d3c); CYC(0x4d3c, 0x4d3d); push_effect(gb, BC);
+  CYC(0x4d3d, 0x4d3e); push_effect(gb, DE); CYC(0x4d3e, 0x4d40); D = 7;
+  CALL_C(0x4d40, getFileDisplayVariableAddress_paramE_hook, 0x417b, 0x4d43);
+  CYC(0x4d43, 0x4d44); alu_xor(gb, A); CYC(0x4d44, 0x4d46); B = 0x10;
+  CYC(0x4d46, 0x4d48); alu_bit(gb, 1, mem_rd(gb, HL));
+  if (!(F & FZ)) CALL_C_CC(0x4d48, fileSelectDrawLink__draw_hook, 0x4d67, 0x4d4b); else CYC(0x4d48, 0x4d4b);
+  CYC(0x4d4b, 0x4d4c); SET_DE(pop_effect(gb)); CYC(0x4d4c, 0x4d4d); SET_BC(pop_effect(gb));
+  CYC(0x4d4d, 0x4d4f); D = 6; CALL_C(0x4d4f, getFileDisplayVariableAddress_paramE_hook, 0x417b, 0x4d52);
+  CYC(0x4d52, 0x4d53); C = alu_inc8(gb, C); CYC(0x4d53, 0x4d54); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4d54, 0x4d55); alu_rrca(gb); if (F & FC) { CYCT(0x4d55,0x4d57); goto draw; }
+  CYC(0x4d55,0x4d57); CYC(0x4d57,0x4d58); C = alu_inc8(gb,C); CYC(0x4d58,0x4d5a); alu_bit(gb,0,mem_rd(gb,HL));
+  if (!(F & FZ)) { CYCT(0x4d5a,0x4d5c); goto draw; } CYC(0x4d5a,0x4d5c); CYC(0x4d5c,0x4d5d); C=alu_inc8(gb,C);
+draw:
+  CYC(0x4d5d,0x4d60); A=W8(wFileSelect_cbb6); CYC(0x4d60,0x4d62); alu_and(gb,0x10); CYC(0x4d62,0x4d63); A=C;
+  if (F & FZ) { CYCT(0x4d63,0x4d65); fileSelectDrawLink__draw_hook(gb); return; }
+  CYC(0x4d63,0x4d65); CYC(0x4d65,0x4d67); alu_add(gb,8); fileSelectDrawLink__draw_hook(gb);
+}
+void fileSelectDrawLinkInOtherGame_hook(GB *gb) {
+  CYC(0x4d25, 0x4d27); B = 0;
+  CYC(0x4d27, 0x4d29);
+  fileSelectDrawLink_body_hook(gb);
+}
+
+void fileSelectDrawLink_hook(GB *gb) {
+  CYC(0x4d29, 0x4d2b); B = 4;
+  fileSelectDrawLink_body_hook(gb);
+}
+void fileSelectDrawLink__draw_hook(GB *gb) {
+  CYC(0x4d67,0x4d68); alu_add(gb,B); CYC(0x4d68,0x4d6b); SET_HL(0x4d71);
+  CYC(0x4d6b,0x4d6c); push_effect(gb,0x4d6c); add_a_to_hl(gb);
+  CYC(0x4d6c,0x4d6d); A=mem_rd(gb,HL);
+  CYC(0x4d6d,0x4d6e); push_effect(gb,0x4d6e); add_a_to_hl(gb);
+  CYC(0x4d6e,0x4d71); addSpritesToOam_hook(gb);
+}
+
+void runGameLinkMenu_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4b22, 0x4b25); SET_HL(wFileSelect_cbb6);
+  CYC(0x4b25, 0x4b26); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CALL_C(0x4b26, fileSelect_redrawDecorationsAndSetWramBank4_hook, 0x4cd7, 0x4b29);
+  fileSelectMode7_hook(gb);
+}
+
+void fileSelectMode7_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4b29, fileSelectMode7__mode7States_hook, 0x4b3b, 0x4b2c);
+  CYC(0x4b2c, 0x4b2f); A = W8(wFileSelect_mode2);
+  CYC(0x4b2f, 0x4b31); alu_cp(gb, 6);
+  if (F & FZ) { CYCT(0x4b31, 0x4b32); ret_effect(gb); return; }
+  CYC(0x4b31, 0x4b32);
+  CYC(0x4b32, 0x4b34); alu_cp(gb, 3);
+  if (F & FC) { CYCT(0x4b34, 0x4b35); ret_effect(gb); return; }
+  CYC(0x4b34, 0x4b35);
+  CALL_C(0x4b35, fileSelectDrawAcornCursor_hook, 0x4a97, 0x4b38);
+  CYC(0x4b38, 0x4b3b); fileSelectDrawLinkInOtherGame_hook(gb);
+}
+
+void fileSelectMode7__mode7States_hook(GB *gb) {
+  CYC(0x4b3b, 0x4b3e); A = W8(wFileSelect_mode2);
+  CYC(0x4b3e, 0x4b3f); push_effect(gb, 0x4b3f);
+  switch (function_caller_jump_table(gb)) {
+    case 0x4b4d: fileSelectMode7__state0_hook(gb); return;
+    case 0x4b88: fileSelectMode7__state1_hook(gb); return;
+    case 0x4be2: fileSelectMode7__state2_hook(gb); return;
+    case 0x4c04: fileSelectMode7__state3_hook(gb); return;
+    case 0x4c74: fileSelectMode7__state4_hook(gb); return;
+    case 0x4caa: fileSelectMode7__state5_hook(gb); return;
+    case 0x4cbe: fileSelectMode7__state6_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void fileSelectMode7__state0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4b4d, disableLcd_hook, 0x02c1, 0x4b50);
+  CYC(0x4b50, 0x4b52); A = 0xa0;
+  CALL_C(0x4b52, loadGfxHeader_hook, 0x0626, 0x4b55);
+  CYC(0x4b55, 0x4b57); A = 0xae;
+  CALL_C(0x4b57, loadGfxHeader_hook, 0x0626, 0x4b5a);
+  CYC(0x4b5a, 0x4b5c); A = 5;
+  CALL_C(0x4b5c, loadPaletteHeader_hook, 0x050b, 0x4b5f);
+  CYC(0x4b5f, 0x4b61); A = 8;
+  CALL_C(0x4b61, loadUncompressedGfxHeader_hook, 0x05da, 0x4b64);
+  CYC(0x4b64, 0x4b67); SET_HL(w4NameBuffer);
+  CYC(0x4b67, 0x4b69); B = 0x20;
+  CALL_C(0x4b69, clearMemory_hook, 0x046f, 0x4b6c);
+  CALL_C(0x4b6c, textInput_updateEntryCursor_hook, 0x4a22, 0x4b6f);
+  CALL_C(0x4b6f, serialFunc_0c85_hook, 0x0c85, 0x4b72);
+  CYC(0x4b72, 0x4b74); A = 4;
+  CYC(0x4b74, 0x4b76); H8(hFFBE) = A;
+  CYC(0x4b76, 0x4b77); alu_xor(gb, A);
+  CYC(0x4b77, 0x4b79); H8(hSerialLinkState) = A;
+  CYC(0x4b79, 0x4b7c); mem_wr(gb, wFileSelect_cbc0 + 2, A);
+  CYC(0x4b7c, 0x4b7f); SET_HL(wFileSelect_linkTimer);
+  CYC(0x4b7f, 0x4b81); A = 0xf0;
+  CYC(0x4b81, 0x4b82); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4b82, 0x4b84); A = 0x1e;
+  CYC(0x4b84, 0x4b85); mem_wr(gb, HL, A);
+  CYC(0x4b85, 0x4b88); loadGfxRegisterState5AndIncFileSelectMode2(gb);
+}
+
+void fileSelectMode7__state1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4b88, 0x4b8a); A = H8(hSerialInterruptBehaviour);
+  CYC(0x4b8a, 0x4b8b); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x4b8b, 0x4b8d); goto serial_interrupt; }
+  CYC(0x4b8b, 0x4b8d);
+  CYC(0x4b8d, 0x4b8f); A = H8(hFFBD);
+  CYC(0x4b8f, 0x4b90); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x4b90, 0x4b93); fileSelectMode7__func_02_4c55_hook(gb); return; }
+  CYC(0x4b90, 0x4b93);
+  CYC(0x4b93, 0x4b96); SET_HL(wFileSelect_linkTimer);
+  CYC(0x4b96, 0x4b97); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(0x4b97, 0x4b99); CYC(0x4ba0, 0x4ba3); serialFunc_0c73_hook(gb); return; }
+  CYC(0x4b97, 0x4b99);
+  CYC(0x4b99, 0x4b9b); A = 0x80;
+  CYC(0x4b9b, 0x4b9d); H8(hFFBD) = A;
+  CYC(0x4b9d, 0x4ba0); fileSelectMode7__func_02_4c55_hook(gb);
+  return;
+serial_interrupt:
+  CYC(0x4ba3, 0x4ba6); A = W8(wFileSelect_cbc0);
+  CYC(0x4ba6, 0x4ba7); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x4ba7, 0x4ba9); goto transfer; }
+  CYC(0x4ba7, 0x4ba9);
+  CYC(0x4ba9, 0x4baa); A = alu_dec8(gb, A);
+  CYC(0x4baa, 0x4bad); W8(wFileSelect_cbc0) = A;
+  CYC(0x4bad, 0x4bae); ret_effect(gb);
+  return;
+transfer:
+  CALL_C(0x4bae, serialFunc_0c8d_hook, 0x0c8d, 0x4bb1);
+  CYC(0x4bb1, 0x4bb3); A = H8(hFFBD);
+  CYC(0x4bb3, 0x4bb4); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x4bb4, 0x4bb6); goto check_link; }
+  CYC(0x4bb4, 0x4bb6);
+  CYC(0x4bb6, 0x4bb8); alu_cp(gb, 0x83);
+  if (F & FZ) { CYCT(0x4bb8, 0x4bba); goto check_link; }
+  CYC(0x4bb8, 0x4bba);
+  if (!(F & FZ)) { CYCT(0x4bba, 0x4bbd); fileSelectMode7__func_02_4c55_hook(gb); return; }
+  CYC(0x4bba, 0x4bbd);
+check_link:
+  CYC(0x4bbd, 0x4bbf); A = H8(hSerialLinkState);
+  CYC(0x4bbf, 0x4bc1); alu_cp(gb, 7);
+  if (!(F & FZ)) { CYCT(0x4bc1, 0x4bc2); ret_effect(gb); return; }
+  CYC(0x4bc1, 0x4bc2);
+  CYC(0x4bc2, 0x4bc4); E = 3;
+find_file:
+  CYC(0x4bc4, 0x4bc5); E = alu_dec8(gb, E);
+  CYC(0x4bc5, 0x4bc7); D = 0;
+  CALL_C(0x4bc7, getFileDisplayVariableAddress_paramE_hook, 0x417b, 0x4bca);
+  CYC(0x4bca, 0x4bcc); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(0x4bcc, 0x4bce); CYC(0x4bdf, 0x4be2); loadGfxRegisterState5AndIncFileSelectMode2(gb); return; }
+  CYC(0x4bcc, 0x4bce);
+  CYC(0x4bce, 0x4bcf); A = E;
+  CYC(0x4bcf, 0x4bd0); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x4bd0, 0x4bd2); goto find_file; }
+  CYC(0x4bd0, 0x4bd2);
+  CYC(0x4bd2, 0x4bd4); A = 0x85;
+  CYC(0x4bd4, 0x4bd7); mem_wr(gb, wFileSelect_cbc0 + 2, A);
+  CYC(0x4bd7, 0x4bd9); A = 0xff;
+  CYC(0x4bd9, 0x4bdc); W8(wFileSelect_cursorPos) = A;
+  CYC(0x4bdc, 0x4bdf); fileSelectMode7__func_02_4c4b_hook(gb);
+}
+
+void fileSelectMode7__state2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4be2, serialFunc_0c8d_hook, 0x0c8d, 0x4be5);
+  CYC(0x4be5, 0x4be7); A = 6;
+  CYC(0x4be7, 0x4bea); W8(wFileSelect_cursorOffset) = A;
+  CYC(0x4bea, 0x4beb); alu_xor(gb, A);
+  CALL_C(0x4beb, func_02_4149, 0x4149, 0x4bee);
+  CALL_C(0x4bee, disableLcd_hook, 0x02c1, 0x4bf1);
+  CYC(0x4bf1, 0x4bf3); A = 0xa1;
+  CALL_C(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);
+  CYC(0x4bf6, 0x4bf8); A = 0xaf;
+  CALL_C(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);
+  CALL_C(0x4bfb, textInput_updateEntryCursor_hook, 0x4a22, 0x4bfe);
+  CALL_C(0x4bfe, fileSelectDrawHeartsAndDeathCounter_hook, 0x4a4a, 0x4c01);
+  CYC(0x4c01, 0x4c04); loadGfxRegisterState5AndIncFileSelectMode2(gb);
+}
+
+void fileSelectMode7__state3_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4c04, serialFunc_0c8d_hook, 0x0c8d, 0x4c07);
+  CALL_C(0x4c07, fileSelectUpdateInput_hook, 0x4467, 0x4c0a);
+  if (!(F & FZ)) { CYCT(0x4c0a, 0x4c0c); fileSelectMode7__selectedSomething_hook(gb); return; }
+  CYC(0x4c0a, 0x4c0c);
+  CYC(0x4c0c, 0x4c0f); A = W8(wKeysJustPressed);
+  CYC(0x4c0f, 0x4c11); alu_bit(gb, 1, A);
+  if (F & FZ) { CYCT(0x4c11, 0x4c12); ret_effect(gb); return; }
+  CYC(0x4c11, 0x4c12);
+  fileSelectMode7__moveCursorToQuit_hook(gb);
+}
+
+void fileSelectMode7__moveCursorToQuit_hook(GB *gb) {
+  CYC(0x4c12, 0x4c14); A = 3;
+  CYC(0x4c14, 0x4c17); W8(wFileSelect_cursorPos) = A;
+  CYC(0x4c17, 0x4c19); A = 0x8f;
+  CYC(0x4c19, 0x4c1c); mem_wr(gb, wFileSelect_cbc0 + 2, A);
+  CYC(0x4c1c, 0x4c1e); fileSelectMode7__func_02_4c4b_hook(gb);
+}
+
+void fileSelectMode7__selectedSomething_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4c1e, 0x4c21); A = W8(wFileSelect_cursorPos);
+  CYC(0x4c21, 0x4c23); alu_cp(gb, 3);
+  if (F & FZ) { CYCT(0x4c23, 0x4c25); fileSelectMode7__moveCursorToQuit_hook(gb); return; }
+  CYC(0x4c23, 0x4c25);
+  CYC(0x4c25, 0x4c27); D = 0;
+  CALL_C(0x4c27, getFileDisplayVariableAddress_hook, 0x417a, 0x4c2a);
+  CYC(0x4c2a, 0x4c2c); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(0x4c2c, 0x4c2e); goto valid_file; }
+  CYC(0x4c2c, 0x4c2e);
+  CYC(0x4c2e, 0x4c30); A = 0x5a;
+  CYC(0x4c30, 0x4c33); playSound_b00_hook(gb);
+  return;
+valid_file:
+  CYC(0x4c33, 0x4c36); A = W8(wOpenedMenuType);
+  CYC(0x4c36, 0x4c38); alu_cp(gb, 8);
+  if (!(F & FZ)) { CYCT(0x4c38, 0x4c3a); goto file_select; }
+  CYC(0x4c38, 0x4c3a);
+  CYC(0x4c3a, 0x4c3c); A = 0x0c;
+  CYC(0x4c3c, 0x4c3e); H8(hSerialLinkState) = A;
+  CYC(0x4c3e, 0x4c40); A = 5;
+  CYC(0x4c40, 0x4c43); W8(wFileSelect_mode2) = A;
+  CYC(0x4c43, 0x4c44); ret_effect(gb);
+  return;
+file_select:
+  CYC(0x4c44, 0x4c46); A = 8;
+  CYC(0x4c46, 0x4c48); H8(hSerialLinkState) = A;
+  CYC(0x4c48, 0x4c4b); loadGfxRegisterState5AndIncFileSelectMode2(gb);
+}
+
+void fileSelectMode7__func_02_4c4b_hook(GB *gb) {
+  CYC(0x4c4b, 0x4c4d); A = 8;
+  CYC(0x4c4d, 0x4c4f); H8(hSerialLinkState) = A;
+  CYC(0x4c4f, 0x4c51); A = 5;
+  CYC(0x4c51, 0x4c54); W8(wFileSelect_mode2) = A;
+  CYC(0x4c54, 0x4c55); ret_effect(gb);
+}
+
+void fileSelectMode7__func_02_4c55_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4c55, disableLcd_hook, 0x02c1, 0x4c58);
+  CYC(0x4c58, 0x4c5a); A = 7;
+  CALL_C(0x4c5a, loadGfxHeader_hook, 0x0626, 0x4c5d);
+  CALL_C(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2, 0x4165, 0x4c60);
+  CYC(0x4c60, 0x4c62); A = 8;
+  CYC(0x4c62, 0x4c64); H8(hSerialLinkState) = A;
+  CYC(0x4c64, 0x4c66); A = 6;
+  CYC(0x4c66, 0x4c69); W8(wFileSelect_mode2) = A;
+  CYC(0x4c69, 0x4c6b); A = 0xb4;
+  CYC(0x4c6b, 0x4c6e); W8(wFileSelect_linkTimer) = A;
+  CYC(0x4c6e, 0x4c70); A = H8(hFFBD);
+  CYC(0x4c70, 0x4c73); W8(wFileSelect_cbc0) = A;
+  CYC(0x4c73, 0x4c74); ret_effect(gb);
+}
+
+void fileSelectMode7__state4_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4c74, serialFunc_0c8d_hook, 0x0c8d, 0x4c77);
+  CYC(0x4c77, 0x4c79); A = H8(hSerialInterruptBehaviour);
+  CYC(0x4c79, 0x4c7a); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x4c7a, 0x4c7b); ret_effect(gb); return; }
+  CYC(0x4c7a, 0x4c7b);
+  CALL_C(0x4c7b, loadFile_b00_hook, 0x09dc, 0x4c7e);
+  CYC(0x4c7e, 0x4c81); A = W8(wFileSelect_cursorPos);
+  CYC(0x4c81, 0x4c82); A = alu_inc8(gb, A);
+  CYC(0x4c82, 0x4c85); SET_HL(w4RingFortuneStuff);
+  CYC(0x4c85, 0x4c88); SET_BC(0x16);
+offset_loop:
+  CYC(0x4c88, 0x4c89); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(0x4c89, 0x4c8b); goto copy_file; }
+  CYC(0x4c89, 0x4c8b);
+  CYC(0x4c8b, 0x4c8c); alu_add_hl(gb, BC);
+  CYC(0x4c8c, 0x4c8e);
+  goto offset_loop;
+copy_file:
+  CYC(0x4c8e, 0x4c90); B = 0x16;
+  CYC(0x4c90, 0x4c93); SET_DE(wc600Block);
+  CALL_C(0x4c93, copyMemory_hook, 0x0486, 0x4c96);
+  CYC(0x4c96, 0x4c99); SET_HL(wFileIsLinkedGame);
+  CYC(0x4c99, 0x4c9b); mem_wr(gb, HL, mem_rd(gb, HL) | 1);
+  CYC(0x4c9b, 0x4c9d); L = (uint8_t)wFileIsCompleted;
+  CYC(0x4c9d, 0x4c9f); mem_wr(gb, HL, 0);
+  CALL_C(0x4c9f, initializeFile_b00_hook, 0x09d4, 0x4ca2);
+  CYC(0x4ca2, 0x4ca4); A = 0x56;
+  CALL_C(0x4ca4, playSound_b00_hook, 0x0c98, 0x4ca7);
+  CYC(0x4ca7, 0x4caa); setFileSelectModeTo1(gb);
+}
+
+void fileSelectMode7__state5_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4caa, serialFunc_0c8d_hook, 0x0c8d, 0x4cad);
+  CYC(0x4cad, 0x4caf); A = H8(hSerialInterruptBehaviour);
+  CYC(0x4caf, 0x4cb0); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x4cb0, 0x4cb1); ret_effect(gb); return; }
+  CYC(0x4cb0, 0x4cb1);
+  fileSelectMode7__cancelLink_hook(gb);
+}
+
+void fileSelectMode7__cancelLink_hook(GB *gb) {
+  CYC(0x4cb1, 0x4cb4); A = W8(wOpenedMenuType);
+  CYC(0x4cb4, 0x4cb6); alu_cp(gb, 8);
+  if (F & FZ) { CYCT(0x4cb6, 0x4cb9); closeMenu_hook(gb); return; }
+  CYC(0x4cb6, 0x4cb9);
+  CYC(0x4cb9, 0x4cbb); A = 0;
+  CYC(0x4cbb, 0x4cbe); setFileSelectMode(gb);
+}
+
+void fileSelectMode7__state6_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4cbe, serialFunc_0c8d_hook, 0x0c8d, 0x4cc1);
+  CYC(0x4cc1, 0x4cc3); A = H8(hSerialInterruptBehaviour);
+  CYC(0x4cc3, 0x4cc4); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x4cc4, 0x4cc5); ret_effect(gb); return; }
+  CYC(0x4cc4, 0x4cc5);
+  CYC(0x4cc5, 0x4cc8); A = W8(wFileSelect_cbc0);
+  CYC(0x4cc8, 0x4cca); H8(hFFBD) = A;
+  CYC(0x4cca, 0x4ccd); A = W8(wKeysJustPressed);
+  CYC(0x4ccd, 0x4cce); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x4cce, 0x4cd0); fileSelectMode7__cancelLink_hook(gb); return; }
+  CYC(0x4cce, 0x4cd0);
+  CYC(0x4cd0, 0x4cd3); SET_HL(wFileSelect_linkTimer);
+  CYC(0x4cd3, 0x4cd4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(0x4cd4, 0x4cd5); ret_effect(gb); return; }
+  CYC(0x4cd4, 0x4cd5);
+  CYC(0x4cd5, 0x4cd7);
+  fileSelectMode7__cancelLink_hook(gb);
+}
+
+void runFakeReset_hook(GB *gb) {
+  CYC(0x7641, 0x7644); A = W8(wFakeResetMenu_state);
+  CYC(0x7644, 0x7645); push_effect(gb, 0x7645);
+  switch (function_caller_jump_table(gb)) {
+    case 0x7649: runFakeReset__state0_hook(gb); return;
+    case 0x7674: runFakeReset__state1_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void runFakeReset__state0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7649, disableLcd_hook, 0x02c1, 0x764c);
+  CALL_C(0x764c, clearOam_hook, 0x049f, 0x764f);
+  CALL_C(0x764f, clearVram_hook, 0x04af, 0x7652);
+  CALL_C(0x7652, initializeVramMaps_hook, 0x04cd, 0x7655);
+  CYC(0x7655, 0x7657); A = 0xf5;
+  CALL_C(0x7657, playSound_b00_hook, 0x0c98, 0x765a);
+  CYC(0x765a, 0x765c); A = 1;
+  CALL_C(0x765c, loadGfxHeader_hook, 0x0626, 0x765f);
+  CYC(0x765f, 0x7661); A = 1;
+  CALL_C(0x7661, loadPaletteHeader_hook, 0x050b, 0x7664);
+  CYC(0x7664, 0x7666); A = 0x78;
+  CYC(0x7666, 0x7669); W8(wFakeResetMenu_delayCounter) = A;
+  CYC(0x7669, 0x766c); SET_HL(wFakeResetMenu_state);
+  CYC(0x766c, 0x766d); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CALL_C(0x766d, fadeinFromWhite_hook, 0x3299, 0x7670);
+  CYC(0x7670, 0x7671); alu_xor(gb, A);
+  CYC(0x7671, 0x7674); loadGfxRegisterStateIndex_hook(gb);
+}
+
+void runFakeReset__state1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7674, 0x7677); A = W8(wPaletteThread_mode);
+  CYC(0x7677, 0x7678); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x7678, 0x7679); ret_effect(gb); return; }
+  CYC(0x7678, 0x7679);
+  CYC(0x7679, 0x767c); SET_HL(wFakeResetMenu_delayCounter);
+  CYC(0x767c, 0x767d); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(0x767d, 0x767e); ret_effect(gb); return; }
+  CYC(0x767d, 0x767e);
+  CYC(0x767e, 0x7680); A = 0xf6;
+  CALL_C(0x7680, playSound_b00_hook, 0x0c98, 0x7683);
+  CYC(0x7683, 0x7686); SET_HL(wMenuLoadState);
+  CYC(0x7686, 0x7687); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x7687, 0x768a); fadeoutToWhite_hook(gb);
 }

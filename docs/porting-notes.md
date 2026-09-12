@@ -679,3 +679,9 @@ desync to discover; keep them when porting routines.
   though the value's control purpose is to abandon a frame. Independent stack review caught this
   before the gate. Translate the instruction as `SET_AF(pop_effect(gb))`, then execute the real
   `ret_effect`; never discard a popped register pair just because it also happens to be an address.
+- Similar-looking union fields are not interchangeable. Batch 101's Link sprite renderer initially
+  read `wFileSelect_cursorPos2` at `$cbbd` for the ROM's `ld a,($cbb6)`; the correct named field is
+  `wFileSelect_cbb6`. Instruction-level review caught the wrong animation selector before replay.
+  The same review found an unconditional `jr` at `$4d27` burned through its `$4d2b` target, which
+  silently included the skipped `$4d29` instruction. A jump burn ends at the opcode's physical
+  fallthrough address (`$4d29` here), never at its destination.
