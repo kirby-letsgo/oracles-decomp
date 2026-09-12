@@ -28,9 +28,9 @@ static void tile_substitutions_add_double_index(GB *gb, uint16_t return_address)
 void applyAllTileSubstitutions_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(0x5fef, replacePollutionWithWaterIfPollutionFixed_hook, 0x6078, 0x5ff2);
-  CALL_C(0x5ff2, applySingleTileChanges, 0x62de, 0x5ff5);
+  CALL_C(0x5ff2, applySingleTileChanges_hook, 0x62de, 0x5ff5);
   CALL_C(0x5ff5, applyStandardTileSubstitutions_hook, 0x60b7, 0x5ff8);
-  CALL_C(0x5ff8, replaceOpenedChest, 0x626f, 0x5ffb);
+  CALL_C(0x5ff8, replaceOpenedChest_hook, 0x626f, 0x5ffb);
   CYC(0x5ffb, 0x5ffe); A = W8(wActiveGroup);
   CYC(0x5ffe, 0x6000); alu_and(gb, 0x06);
   CYC(0x6000, 0x6002); alu_cp(gb, 0x04);
@@ -38,10 +38,10 @@ void applyAllTileSubstitutions_hook(GB *gb) {
     CYCT(0x6002, 0x6004);
   } else {
     CYC(0x6002, 0x6004);
-    CALL_C(0x6004, replaceShutterForLinkEntering, 0x61d8, 0x6007);
-    CALL_C(0x6007, replaceSwitchTiles, 0x627e, 0x600a);
-    CALL_C(0x600a, replaceToggleBlocks, 0x617c, 0x600d);
-    CALL_C(0x600d, replaceJabuTilesIfUnderwater, 0x61a1, 0x6010);
+    CALL_C(0x6004, replaceShutterForLinkEntering_hook, 0x61d8, 0x6007);
+    CALL_C(0x6007, replaceSwitchTiles_hook, 0x627e, 0x600a);
+    CALL_C(0x600a, replaceToggleBlocks_hook, 0x617c, 0x600d);
+    CALL_C(0x600d, replaceJabuTilesIfUnderwater_hook, 0x61a1, 0x6010);
   }
   CALL_C(0x6010, applyRoomSpecificTileChanges_hook, 0x642c, 0x6013);
   CYC(0x6013, 0x6016); A = W8(wActiveGroup);
