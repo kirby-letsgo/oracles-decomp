@@ -3282,383 +3282,6 @@ L_60fc:
   RET(0x611c); return;  // ret
 }
 
-// 02:6298
-void getMinimapPopupType(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6298, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x629a, 1); E = A;  // ld e,a
-  RST_PUSH(0x629b, 0x629c);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
-// 02:62bc
-void minimapPopupType_normal(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x62bc, 1); A = E;  // ld a,e
-  RET(0x62bd); return;  // ret
-}
-
-// 02:62be
-void minimapPopupType_advanceShop(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x62be, checkAdvanceShopVisited_hook, 0x6750, 0x62c1);  // call $6750
-  if ((F & FZ)) { RET_TAKEN(0x62c1); return; } I(0x62c1, 2);  // ret z
-  I(0x62c2, 2); A = 0x0e;  // ld a,$0e
-  RET(0x62c4); return;  // ret
-}
-
-// 02:62c5
-void minimapPopupType_cave(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x62c5, 4); A = mem_rd(gb, 0xcbb6);  // ld a,($cbb6)
-  CALL(0x62c8, mapGetRoomText, 0x61b7, 0x62cb);  // call $61b7
-  I(0x62cb, 2); A = 0x02;  // ld a,$02
-  I(0x62cd, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FZ)) { I(0x62ce, 3); minimapNoPopup(gb); return; } I(0x62ce, 2);  // jr nz,$6306
-  I(0x62d0, 1); A = E;  // ld a,e
-  RET(0x62d1); return;  // ret
-}
-
-// 02:62d2
-void minimapPopupType_gashaSpot(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x62d2, 4); A = mem_rd(gb, 0xcbb6);  // ld a,($cbb6)
-  CALL(0x62d5, getIndexOfGashaSpotInRoom_hook, 0x36a8, 0x62d8);  // call $36a8
-  I(0x62d8, 2); alu_bit(gb, 7, C);  // bit 7,c
-  if (!(F & FZ)) { I(0x62da, 3); minimapNoPopup(gb); return; } I(0x62da, 2);  // jr nz,$6306
-  I(0x62dc, 1); A = E;  // ld a,e
-  RET(0x62dd); return;  // ret
-}
-
-// 02:62de
-void minimapPopupType_portalSpot(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x62de, 3); SET_HL(0xc700);  // ld hl,$c700
-  I(0x62e1, 4); A = mem_rd(gb, 0xcbb3);  // ld a,($cbb3)
-  I(0x62e4, 1); alu_rrca(gb);  // rrca
-  if (!(F & FC)) { I(0x62e5, 3); goto L_62ea; } I(0x62e5, 2);  // jr nc,$62ea
-  I(0x62e7, 3); SET_HL(0xc800);  // ld hl,$c800
-L_62ea:
-  I(0x62ea, 4); A = mem_rd(gb, 0xcbb6);  // ld a,($cbb6)
-  RST_PUSH(0x62ed, 0x62ee);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x62ee, 3); alu_bit(gb, 3, mem_rd(gb, HL));  // bit 3,(hl)
-  if ((F & FZ)) { I(0x62f0, 3); minimapNoPopup(gb); return; } I(0x62f0, 2);  // jr z,$6306
-  I(0x62f2, 1); A = E;  // ld a,e
-  RET(0x62f3); return;  // ret
-}
-
-// 02:62f4
-void minimapPopupType_seedTree(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x62f4, 4); A = mem_rd(gb, 0xcbb6);  // ld a,($cbb6)
-  CALL(0x62f7, getTreeWarpDataForRoom_hook, 0x66c6, 0x62fa);  // call $66c6
-  if ((F & FC)) { RET_TAKEN(0x62fa); return; } I(0x62fa, 2);  // ret c
-  I(0x62fb, 2); SET_HL(HL + 1);  // inc hl
-  I(0x62fc, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  RET(0x62fd); return;  // ret
-}
-
-// 02:62fe
-void minimapPopupType_moblinsKeep(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x62fe, checkMoblinsKeepDestroyed_hook, 0x674b, 0x6301);  // call $674b
-  I(0x6301, 2); A = 0x0f;  // ld a,$0f
-  if ((F & FZ)) { RET_TAKEN(0x6303); return; } I(0x6303, 2);  // ret z
-  I(0x6304, 1); A = alu_inc8(gb, A);  // inc a
-  RET(0x6305); return;  // ret
-}
-
-// 02:6306
-void minimapNoPopup(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6306, 1); alu_xor(gb, A);  // xor a
-  RET(0x6307); return;  // ret
-}
-
-// 02:6308
-void minimapPopupType_shop(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6308, 2); A = 0x0e;  // ld a,$0e
-  RET(0x630a); return;  // ret
-}
-
-// 02:630b
-void minimapPopupType_vasuOrSyrup(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x630b, 4); A = mem_rd(gb, 0xcbb6);  // ld a,($cbb6)
-  I(0x630e, 2); alu_cp(gb, 0x5d);  // cp $5d
-  I(0x6310, 2); A = 0x0c;  // ld a,$0c
-  if ((F & FZ)) { RET_TAKEN(0x6312); return; } I(0x6312, 2);  // ret z
-  I(0x6313, 1); A = alu_inc8(gb, A);  // inc a
-  RET(0x6314); return;  // ret
-}
-
-// 02:6315
-void minimapPopupType_blackTower(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6315, getBlackTowerProgress_hook, 0x36c0, 0x6318);  // call $36c0
-  I(0x6318, 2); alu_add(gb, 0x11);  // add $11
-  RET(0x631a); return;  // ret
-}
-
-// 02:631b
-void minimapPopupType_makuTree(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x631b, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
-  I(0x631e, 1); alu_rlca(gb);  // rlca
-  I(0x631f, 2); A = 0x0b;  // ld a,$0b
-  if ((F & FC)) { RET_TAKEN(0x6321); return; } I(0x6321, 2);  // ret c
-  I(0x6322, 3); SET_HL(0xc738);  // ld hl,$c738
-  I(0x6325, 3); alu_bit(gb, 0, mem_rd(gb, HL));  // bit 0,(hl)
-  I(0x6327, 2); A = 0x04;  // ld a,$04
-  if ((F & FZ)) { RET_TAKEN(0x6329); return; } I(0x6329, 2);  // ret z
-  I(0x632a, 2); A = 0x07;  // ld a,$07
-  RET(0x632c); return;  // ret
-}
-
-// 02:63d2
-void dungeonMap_checkDirectionButtons(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x63d2, 4); A = mem_rd(gb, 0xcbce);  // ld a,($cbce)
-  RST_PUSH(0x63d5, 0x63d6);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
-// 02:63da
-void dungeonMap_scrollingState0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x63da, getInputWithAutofire_hook, 0x0294, 0x63dd);  // call $0294
-  I(0x63dd, 2); alu_bit(gb, 7, A);  // bit 7,a
-  if ((F & FZ)) { I(0x63df, 3); goto L_63e7; } I(0x63df, 2);  // jr z,$63e7
-  CALL(0x63e1, dungeonMap_checkCanScrollDown, 0x641b, 0x63e4);  // call $641b
-  if (!(F & FZ)) { I(0x63e4, 3); goto L_63ee; } I(0x63e4, 2);  // jr nz,$63ee
-  RET(0x63e6); return;  // ret
-L_63e7:
-  I(0x63e7, 2); alu_bit(gb, 6, A);  // bit 6,a
-  if ((F & FZ)) { RET_TAKEN(0x63e9); return; } I(0x63e9, 2);  // ret z
-  CALL(0x63ea, dungeonMap_checkCanScrollUp, 0x6454, 0x63ed);  // call $6454
-  if ((F & FZ)) { RET_TAKEN(0x63ed); return; } I(0x63ed, 2);  // ret z
-L_63ee:
-  I(0x63ee, 1); C = A;  // ld c,a
-  I(0x63ef, 1); A = B;  // ld a,b
-  I(0x63f0, 4); mem_wr(gb, 0xcbb5, A);  // ld ($cbb5),a
-  I(0x63f3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x63f4, 3); goto L_63ff; } I(0x63f4, 2);  // jr z,$63ff
-  I(0x63f6, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x63f9, 1); alu_add(gb, C);  // add c
-  I(0x63fa, 4); mem_wr(gb, 0xcbb7, A);  // ld ($cbb7),a
-  I(0x63fd, 3); goto L_6406;  // jr $6406
-L_63ff:
-  I(0x63ff, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x6402, 1); alu_sub(gb, C);  // sub c
-  I(0x6403, 4); mem_wr(gb, 0xcbb7, A);  // ld ($cbb7),a
-L_6406:
-  I(0x6406, 1); A = C;  // ld a,c
-  I(0x6407, 1); D = A;  // ld d,a
-  CALL(0x6408, multiplyABy8_hook, 0x01b7, 0x640b);  // call $01b7
-  I(0x640b, 1); A = D;  // ld a,d
-  I(0x640c, 1); alu_add(gb, A);  // add a
-  I(0x640d, 1); alu_add(gb, C);  // add c
-  I(0x640e, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x640f, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x6412, 3); SET_HL(0xcbce);  // ld hl,$cbce
-  I(0x6415, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x6416, 2); A = 0x84;  // ld a,$84
-  I(0x6418, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-}
-
-// 02:63ee
-void dungeonMap_scrollingState0__moveUpOrDown(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_63ee:
-  I(0x63ee, 1); C = A;  // ld c,a
-  I(0x63ef, 1); A = B;  // ld a,b
-  I(0x63f0, 4); mem_wr(gb, 0xcbb5, A);  // ld ($cbb5),a
-  I(0x63f3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x63f4, 3); goto L_63ff; } I(0x63f4, 2);  // jr z,$63ff
-  I(0x63f6, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x63f9, 1); alu_add(gb, C);  // add c
-  I(0x63fa, 4); mem_wr(gb, 0xcbb7, A);  // ld ($cbb7),a
-  I(0x63fd, 3); goto L_6406;  // jr $6406
-L_63ff:
-  I(0x63ff, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x6402, 1); alu_sub(gb, C);  // sub c
-  I(0x6403, 4); mem_wr(gb, 0xcbb7, A);  // ld ($cbb7),a
-L_6406:
-  I(0x6406, 1); A = C;  // ld a,c
-  I(0x6407, 1); D = A;  // ld d,a
-  CALL(0x6408, multiplyABy8_hook, 0x01b7, 0x640b);  // call $01b7
-  I(0x640b, 1); A = D;  // ld a,d
-  I(0x640c, 1); alu_add(gb, A);  // add a
-  I(0x640d, 1); alu_add(gb, C);  // add c
-  I(0x640e, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x640f, 4); mem_wr(gb, 0xcbb4, A);  // ld ($cbb4),a
-  I(0x6412, 3); SET_HL(0xcbce);  // ld hl,$cbce
-  I(0x6415, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x6416, 2); A = 0x84;  // ld a,$84
-  I(0x6418, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-}
-
-// 02:641b
-void dungeonMap_checkCanScrollDown(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x641b, DE);  // push de
-  I(0x641c, 4); A = mem_rd(gb, 0xcc40);  // ld a,($cc40)
-  I(0x641f, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x6420, 1); B = A;  // ld b,a
-  I(0x6421, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x6424, 1); alu_cp(gb, B);  // cp b
-  if ((F & FZ)) { I(0x6425, 3); goto L_644e; } I(0x6425, 2);  // jr z,$644e
-  CALL(0x6427, checkLinkHasMap_hook, 0x653e, 0x642a);  // call $653e
-  I(0x642a, 2); A = 0x01;  // ld a,$01
-  if (!(F & FZ)) { I(0x642c, 3); goto L_644f; } I(0x642c, 2);  // jr nz,$644f
-  I(0x642e, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x6431, 1); C = A;  // ld c,a
-  I(0x6432, 4); A = mem_rd(gb, 0xcc40);  // ld a,($cc40)
-  I(0x6435, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x6436, 1); alu_sub(gb, C);  // sub c
-  I(0x6437, 1); C = A;  // ld c,a
-  I(0x6438, 1); E = A;  // ld e,a
-  I(0x6439, 2); D = 0x00;  // ld d,$00
-L_643b:
-  I(0x643b, 1); D = alu_inc8(gb, D);  // inc d
-  I(0x643c, 1); A = E;  // ld a,e
-  I(0x643d, 1); alu_sub(gb, D);  // sub d
-  I(0x643e, 3); SET_HL(0x00f8);  // ld hl,$00f8
-  I(0x6441, 1); alu_add(gb, L);  // add l
-  I(0x6442, 1); L = A;  // ld l,a
-  I(0x6443, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x6444, 4); A = mem_rd(gb, 0xcbba);  // ld a,($cbba)
-  I(0x6447, 1); alu_and(gb, B);  // and b
-  I(0x6448, 1); A = D;  // ld a,d
-  if (!(F & FZ)) { I(0x6449, 3); goto L_644f; } I(0x6449, 2);  // jr nz,$644f
-  I(0x644b, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x644c, 3); goto L_643b; } I(0x644c, 2);  // jr nz,$643b
-L_644e:
-  I(0x644e, 1); alu_xor(gb, A);  // xor a
-L_644f:
-  I(0x644f, 2); B = 0x01;  // ld b,$01
-  I(0x6451, 1); alu_or(gb, A);  // or a
-  SET_DE(POP(0x6452));  // pop de
-  RET(0x6453); return;  // ret
-}
-
-// 02:644e
-void dungeonMap_checkCanScrollDown__failure(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_644e:
-  I(0x644e, 1); alu_xor(gb, A);  // xor a
-L_644f:
-  I(0x644f, 2); B = 0x01;  // ld b,$01
-  I(0x6451, 1); alu_or(gb, A);  // or a
-  SET_DE(POP(0x6452));  // pop de
-  RET(0x6453); return;  // ret
-}
-
-// 02:644f
-void dungeonMap_checkCanScrollDown__ret(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_644f:
-  I(0x644f, 2); B = 0x01;  // ld b,$01
-  I(0x6451, 1); alu_or(gb, A);  // or a
-  SET_DE(POP(0x6452));  // pop de
-  RET(0x6453); return;  // ret
-}
-
-// 02:6454
-void dungeonMap_checkCanScrollUp(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x6454, DE);  // push de
-  I(0x6455, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x6458, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x6459, 3); goto L_6482; } I(0x6459, 2);  // jr z,$6482
-  CALL(0x645b, checkLinkHasMap_hook, 0x653e, 0x645e);  // call $653e
-  I(0x645e, 2); A = 0x01;  // ld a,$01
-  if (!(F & FZ)) { I(0x6460, 3); goto L_6483; } I(0x6460, 2);  // jr nz,$6483
-  I(0x6462, 4); A = mem_rd(gb, 0xcbb7);  // ld a,($cbb7)
-  I(0x6465, 1); E = A;  // ld e,a
-  I(0x6466, 4); A = mem_rd(gb, 0xcc40);  // ld a,($cc40)
-  I(0x6469, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x646a, 1); alu_sub(gb, E);  // sub e
-  I(0x646b, 1); C = E;  // ld c,e
-  I(0x646c, 1); E = A;  // ld e,a
-  I(0x646d, 2); D = 0x00;  // ld d,$00
-L_646f:
-  I(0x646f, 1); D = alu_inc8(gb, D);  // inc d
-  I(0x6470, 1); A = E;  // ld a,e
-  I(0x6471, 1); alu_add(gb, D);  // add d
-  I(0x6472, 3); SET_HL(0x00f8);  // ld hl,$00f8
-  I(0x6475, 1); alu_add(gb, L);  // add l
-  I(0x6476, 1); L = A;  // ld l,a
-  I(0x6477, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x6478, 4); A = mem_rd(gb, 0xcbba);  // ld a,($cbba)
-  I(0x647b, 1); alu_and(gb, B);  // and b
-  I(0x647c, 1); A = D;  // ld a,d
-  if (!(F & FZ)) { I(0x647d, 3); goto L_6483; } I(0x647d, 2);  // jr nz,$6483
-  I(0x647f, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x6480, 3); goto L_646f; } I(0x6480, 2);  // jr nz,$646f
-L_6482:
-  I(0x6482, 1); alu_xor(gb, A);  // xor a
-L_6483:
-  I(0x6483, 2); B = 0x00;  // ld b,$00
-  I(0x6485, 1); alu_or(gb, A);  // or a
-  SET_DE(POP(0x6486));  // pop de
-  RET(0x6487); return;  // ret
-}
-
-// 02:6482
-void dungeonMap_checkCanScrollUp__failure(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6482:
-  I(0x6482, 1); alu_xor(gb, A);  // xor a
-L_6483:
-  I(0x6483, 2); B = 0x00;  // ld b,$00
-  I(0x6485, 1); alu_or(gb, A);  // or a
-  SET_DE(POP(0x6486));  // pop de
-  RET(0x6487); return;  // ret
-}
-
-// 02:6483
-void dungeonMap_checkCanScrollUp__ret(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6483:
-  I(0x6483, 2); B = 0x00;  // ld b,$00
-  I(0x6485, 1); alu_or(gb, A);  // or a
-  SET_DE(POP(0x6486));  // pop de
-  RET(0x6487); return;  // ret
-}
-
-// 02:6488
-void dungeonMap_scrollingState1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6488, 3); SET_HL(0xcbb4);  // ld hl,$cbb4
-  I(0x648b, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x648c, 3); goto L_6493; } I(0x648c, 2);  // jr nz,$6493
-  I(0x648e, 1); alu_xor(gb, A);  // xor a
-  I(0x648f, 4); mem_wr(gb, 0xcbce, A);  // ld ($cbce),a
-  RET(0x6492); return;  // ret
-L_6493:
-  I(0x6493, 4); A = mem_rd(gb, 0xcbb5);  // ld a,($cbb5)
-  I(0x6496, 1); alu_or(gb, A);  // or a
-  I(0x6497, 2); A = 0xff;  // ld a,$ff
-  if ((F & FZ)) { I(0x6499, 3); goto L_649d; } I(0x6499, 2);  // jr z,$649d
-  I(0x649b, 2); A = 0x01;  // ld a,$01
-L_649d:
-  I(0x649d, 3); SET_HL(0xcbb8);  // ld hl,$cbb8
-  I(0x64a0, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  I(0x64a1, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x64a2, dungeonMap_updateScroll_hook, 0x682c, 0x64a5);  // call $682c
-  mapMenu_copyTilemapToVram(gb); return;  // fallthrough
-}
-
 // 02:67de
 void dungeonMap_generateScrollableTilemap(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -14072,7 +13695,7 @@ void runGaleSeedMenu(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x5f34, clearOam_hook, 0x049f, 0x5f37);  // call $049f
   CALL(0x5f37, runGaleSeedMenu__runState, 0x5f3d, 0x5f3a);  // call $5f3d
-  I(0x5f3a, 4); mapMenu_drawSprites(gb); return;  // jp $64ae
+  I(0x5f3a, 4); if (hook_enabled_at(0x64ae)) { mapMenu_drawSprites_hook(gb); return; } HANDOFF(0x64ae);  // jp $64ae
 }
 
 // 02:5f3d
@@ -14116,7 +13739,7 @@ void galeSeedMenu_state1(GB *gb) {
   I(0x5f75, 2); A = 0x84;  // ld a,$84
   if (!(F & FZ)) { CALL(0x5f77, playSound_b00_hook, 0x0c98, 0x5f7a); } else I(0x5f77, 3);  // call nz,$0c98
 L_5f7a:
-  I(0x5f7a, 4); mapMenu_loadPopupData(gb); return;  // jp $6234
+  I(0x5f7a, 4); if (hook_enabled_at(0x6234)) { mapMenu_loadPopupData_hook(gb); return; } HANDOFF(0x6234);  // jp $6234
 L_5f7d:
   CALL(0x5f7d, mapGetRoomTextOrReturn, 0x619d, 0x5f80);  // call $619d
   I(0x5f80, 2); A = 0x03;  // ld a,$03
@@ -14138,7 +13761,7 @@ L_5f91:
 void galeSeedMenu_state1__end(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5f7a:
-  I(0x5f7a, 4); mapMenu_loadPopupData(gb); return;  // jp $6234
+  I(0x5f7a, 4); if (hook_enabled_at(0x6234)) { mapMenu_loadPopupData_hook(gb); return; } HANDOFF(0x6234);  // jp $6234
 }
 
 // 02:5f7d
@@ -14307,7 +13930,7 @@ L_6046:
   CALL(0x604f, mapMenu_clearUnvisitedTiles_hook, 0x671c, 0x6052);  // call $671c
   I(0x6052, 4); A = mem_rd(gb, 0xcbb5);  // ld a,($cbb5)
   I(0x6055, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
-  CALL(0x6058, mapMenu_loadPopupData, 0x6234, 0x605b);  // call $6234
+  CALL(0x6058, mapMenu_loadPopupData_hook, 0x6234, 0x605b);  // call $6234
   I(0x605b, 3); goto L_6095;  // jr $6095
 L_605d:
   I(0x605d, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
@@ -14337,7 +13960,7 @@ L_606a:
 L_6095:
   I(0x6095, 1); alu_xor(gb, A);  // xor a
   I(0x6096, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  CALL(0x6098, mapMenu_drawSprites, 0x64ae, 0x609b);  // call $64ae
+  CALL(0x6098, mapMenu_drawSprites_hook, 0x64ae, 0x609b);  // call $64ae
   I(0x609b, 1); alu_xor(gb, A);  // xor a
   I(0x609c, 3); mem_wr(gb, 0xffac, A);  // ldh ($ffac),a
   I(0x609e, 3); mem_wr(gb, 0xffaa, A);  // ldh ($ffaa),a
@@ -14345,7 +13968,7 @@ L_6095:
   I(0x60a3, 4); mem_wr(gb, 0xcd08, A);  // ld ($cd08),a
   I(0x60a6, 3); SET_HL(0xcbcd);  // ld hl,$cbcd
   I(0x60a9, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x60aa, mapMenu_copyTilemapToVram, 0x64a5, 0x60ad);  // call $64a5
+  CALL(0x60aa, mapMenu_copyTilemapToVram_hook, 0x64a5, 0x60ad);  // call $64a5
   CALL(0x60ad, fastFadeinFromWhite_hook, 0x3290, 0x60b0);  // call $3290
   I(0x60b0, 2); A = 0x07;  // ld a,$07
   I(0x60b2, 4); if (hook_enabled_at(0x02ea)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
@@ -14370,12 +13993,12 @@ L_6046:
   CALL(0x604f, mapMenu_clearUnvisitedTiles_hook, 0x671c, 0x6052);  // call $671c
   I(0x6052, 4); A = mem_rd(gb, 0xcbb5);  // ld a,($cbb5)
   I(0x6055, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
-  CALL(0x6058, mapMenu_loadPopupData, 0x6234, 0x605b);  // call $6234
+  CALL(0x6058, mapMenu_loadPopupData_hook, 0x6234, 0x605b);  // call $6234
   I(0x605b, 3); goto L_6095;  // jr $6095
 L_6095:
   I(0x6095, 1); alu_xor(gb, A);  // xor a
   I(0x6096, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  CALL(0x6098, mapMenu_drawSprites, 0x64ae, 0x609b);  // call $64ae
+  CALL(0x6098, mapMenu_drawSprites_hook, 0x64ae, 0x609b);  // call $64ae
   I(0x609b, 1); alu_xor(gb, A);  // xor a
   I(0x609c, 3); mem_wr(gb, 0xffac, A);  // ldh ($ffac),a
   I(0x609e, 3); mem_wr(gb, 0xffaa, A);  // ldh ($ffaa),a
@@ -14383,7 +14006,7 @@ L_6095:
   I(0x60a3, 4); mem_wr(gb, 0xcd08, A);  // ld ($cd08),a
   I(0x60a6, 3); SET_HL(0xcbcd);  // ld hl,$cbcd
   I(0x60a9, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x60aa, mapMenu_copyTilemapToVram, 0x64a5, 0x60ad);  // call $64a5
+  CALL(0x60aa, mapMenu_copyTilemapToVram_hook, 0x64a5, 0x60ad);  // call $64a5
   CALL(0x60ad, fastFadeinFromWhite_hook, 0x3290, 0x60b0);  // call $3290
   I(0x60b0, 2); A = 0x07;  // ld a,$07
   I(0x60b2, 4); if (hook_enabled_at(0x02ea)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
@@ -14400,12 +14023,12 @@ L_6046:
   CALL(0x604f, mapMenu_clearUnvisitedTiles_hook, 0x671c, 0x6052);  // call $671c
   I(0x6052, 4); A = mem_rd(gb, 0xcbb5);  // ld a,($cbb5)
   I(0x6055, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
-  CALL(0x6058, mapMenu_loadPopupData, 0x6234, 0x605b);  // call $6234
+  CALL(0x6058, mapMenu_loadPopupData_hook, 0x6234, 0x605b);  // call $6234
   I(0x605b, 3); goto L_6095;  // jr $6095
 L_6095:
   I(0x6095, 1); alu_xor(gb, A);  // xor a
   I(0x6096, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  CALL(0x6098, mapMenu_drawSprites, 0x64ae, 0x609b);  // call $64ae
+  CALL(0x6098, mapMenu_drawSprites_hook, 0x64ae, 0x609b);  // call $64ae
   I(0x609b, 1); alu_xor(gb, A);  // xor a
   I(0x609c, 3); mem_wr(gb, 0xffac, A);  // ldh ($ffac),a
   I(0x609e, 3); mem_wr(gb, 0xffaa, A);  // ldh ($ffaa),a
@@ -14413,7 +14036,7 @@ L_6095:
   I(0x60a3, 4); mem_wr(gb, 0xcd08, A);  // ld ($cd08),a
   I(0x60a6, 3); SET_HL(0xcbcd);  // ld hl,$cbcd
   I(0x60a9, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x60aa, mapMenu_copyTilemapToVram, 0x64a5, 0x60ad);  // call $64a5
+  CALL(0x60aa, mapMenu_copyTilemapToVram_hook, 0x64a5, 0x60ad);  // call $64a5
   CALL(0x60ad, fastFadeinFromWhite_hook, 0x3290, 0x60b0);  // call $3290
   I(0x60b0, 2); A = 0x07;  // ld a,$07
   I(0x60b2, 4); if (hook_enabled_at(0x02ea)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
@@ -14450,7 +14073,7 @@ L_606a:
 L_6095:
   I(0x6095, 1); alu_xor(gb, A);  // xor a
   I(0x6096, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  CALL(0x6098, mapMenu_drawSprites, 0x64ae, 0x609b);  // call $64ae
+  CALL(0x6098, mapMenu_drawSprites_hook, 0x64ae, 0x609b);  // call $64ae
   I(0x609b, 1); alu_xor(gb, A);  // xor a
   I(0x609c, 3); mem_wr(gb, 0xffac, A);  // ldh ($ffac),a
   I(0x609e, 3); mem_wr(gb, 0xffaa, A);  // ldh ($ffaa),a
@@ -14458,7 +14081,7 @@ L_6095:
   I(0x60a3, 4); mem_wr(gb, 0xcd08, A);  // ld ($cd08),a
   I(0x60a6, 3); SET_HL(0xcbcd);  // ld hl,$cbcd
   I(0x60a9, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x60aa, mapMenu_copyTilemapToVram, 0x64a5, 0x60ad);  // call $64a5
+  CALL(0x60aa, mapMenu_copyTilemapToVram_hook, 0x64a5, 0x60ad);  // call $64a5
   CALL(0x60ad, fastFadeinFromWhite_hook, 0x3290, 0x60b0);  // call $3290
   I(0x60b0, 2); A = 0x07;  // ld a,$07
   I(0x60b2, 4); if (hook_enabled_at(0x02ea)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
@@ -14470,7 +14093,7 @@ void mapMenu_state0__commonCode(GB *gb) {
 L_6095:
   I(0x6095, 1); alu_xor(gb, A);  // xor a
   I(0x6096, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  CALL(0x6098, mapMenu_drawSprites, 0x64ae, 0x609b);  // call $64ae
+  CALL(0x6098, mapMenu_drawSprites_hook, 0x64ae, 0x609b);  // call $64ae
   I(0x609b, 1); alu_xor(gb, A);  // xor a
   I(0x609c, 3); mem_wr(gb, 0xffac, A);  // ldh ($ffac),a
   I(0x609e, 3); mem_wr(gb, 0xffaa, A);  // ldh ($ffaa),a
@@ -14478,7 +14101,7 @@ L_6095:
   I(0x60a3, 4); mem_wr(gb, 0xcd08, A);  // ld ($cd08),a
   I(0x60a6, 3); SET_HL(0xcbcd);  // ld hl,$cbcd
   I(0x60a9, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x60aa, mapMenu_copyTilemapToVram, 0x64a5, 0x60ad);  // call $64a5
+  CALL(0x60aa, mapMenu_copyTilemapToVram_hook, 0x64a5, 0x60ad);  // call $64a5
   CALL(0x60ad, fastFadeinFromWhite_hook, 0x3290, 0x60b0);  // call $3290
   I(0x60b0, 2); A = 0x07;  // ld a,$07
   I(0x60b2, 4); if (hook_enabled_at(0x02ea)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
@@ -14490,7 +14113,7 @@ void mapMenu_state1(GB *gb) {
   I(0x611d, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x6120, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { CALL(0x6121, mapMenu_state1__checkInput, 0x6127, 0x6124); } else I(0x6121, 3);  // call z,$6127
-  I(0x6124, 4); mapMenu_drawSprites(gb); return;  // jp $64ae
+  I(0x6124, 4); if (hook_enabled_at(0x64ae)) { mapMenu_drawSprites_hook(gb); return; } HANDOFF(0x64ae);  // jp $64ae
 }
 
 // 02:6127
@@ -14505,7 +14128,7 @@ L_612e:
   I(0x6131, 2); alu_and(gb, 0x06);  // and $06
   if (!(F & FZ)) { I(0x6133, 4); closeMenu(gb); return; } I(0x6133, 3);  // jp nz,$4fba
   CALL(0x6136, dungeonMap_updateCursorFlickerCounter_hook, 0x65c7, 0x6139);  // call $65c7
-  I(0x6139, 4); dungeonMap_checkDirectionButtons(gb); return;  // jp $63d2
+  I(0x6139, 4); if (hook_enabled_at(0x63d2)) { dungeonMap_checkDirectionButtons_hook(gb); return; } HANDOFF(0x63d2);  // jp $63d2
 L_613c:
   I(0x613c, 4); A = mem_rd(gb, 0xcbb4);  // ld a,($cbb4)
   I(0x613f, 1); alu_or(gb, A);  // or a
@@ -14551,7 +14174,7 @@ L_6175:
   I(0x6177, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
   I(0x617a, 2); A = 0x84;  // ld a,$84
   CALL(0x617c, playSound_b00_hook, 0x0c98, 0x617f);  // call $0c98
-  I(0x617f, 4); mapMenu_loadPopupData(gb); return;  // jp $6234
+  I(0x617f, 4); if (hook_enabled_at(0x6234)) { mapMenu_loadPopupData_hook(gb); return; } HANDOFF(0x6234);  // jp $6234
 L_6182:
   I(0x6182, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x6185, 2); alu_bit(gb, 0, A);  // bit 0,a
@@ -14574,7 +14197,7 @@ L_612e:
   I(0x6131, 2); alu_and(gb, 0x06);  // and $06
   if (!(F & FZ)) { I(0x6133, 4); closeMenu(gb); return; } I(0x6133, 3);  // jp nz,$4fba
   CALL(0x6136, dungeonMap_updateCursorFlickerCounter_hook, 0x65c7, 0x6139);  // call $65c7
-  I(0x6139, 4); dungeonMap_checkDirectionButtons(gb); return;  // jp $63d2
+  I(0x6139, 4); if (hook_enabled_at(0x63d2)) { dungeonMap_checkDirectionButtons_hook(gb); return; } HANDOFF(0x63d2);  // jp $63d2
 }
 
 // 02:613c
@@ -14625,7 +14248,7 @@ L_6175:
   I(0x6177, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
   I(0x617a, 2); A = 0x84;  // ld a,$84
   CALL(0x617c, playSound_b00_hook, 0x0c98, 0x617f);  // call $0c98
-  I(0x617f, 4); mapMenu_loadPopupData(gb); return;  // jp $6234
+  I(0x617f, 4); if (hook_enabled_at(0x6234)) { mapMenu_loadPopupData_hook(gb); return; } HANDOFF(0x6234);  // jp $6234
 L_6182:
   I(0x6182, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x6185, 2); alu_bit(gb, 0, A);  // bit 0,a
@@ -14658,7 +14281,7 @@ L_6175:
   I(0x6177, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
   I(0x617a, 2); A = 0x84;  // ld a,$84
   CALL(0x617c, playSound_b00_hook, 0x0c98, 0x617f);  // call $0c98
-  I(0x617f, 4); mapMenu_loadPopupData(gb); return;  // jp $6234
+  I(0x617f, 4); if (hook_enabled_at(0x6234)) { mapMenu_loadPopupData_hook(gb); return; } HANDOFF(0x6234);  // jp $6234
 }
 
 // 02:6164
@@ -14677,7 +14300,7 @@ L_6175:
   I(0x6177, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
   I(0x617a, 2); A = 0x84;  // ld a,$84
   CALL(0x617c, playSound_b00_hook, 0x0c98, 0x617f);  // call $0c98
-  I(0x617f, 4); mapMenu_loadPopupData(gb); return;  // jp $6234
+  I(0x617f, 4); if (hook_enabled_at(0x6234)) { mapMenu_loadPopupData_hook(gb); return; } HANDOFF(0x6234);  // jp $6234
 }
 
 // 02:616d
@@ -14697,7 +14320,7 @@ L_6175:
   I(0x6177, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
   I(0x617a, 2); A = 0x84;  // ld a,$84
   CALL(0x617c, playSound_b00_hook, 0x0c98, 0x617f);  // call $0c98
-  I(0x617f, 4); mapMenu_loadPopupData(gb); return;  // jp $6234
+  I(0x617f, 4); if (hook_enabled_at(0x6234)) { mapMenu_loadPopupData_hook(gb); return; } HANDOFF(0x6234);  // jp $6234
 }
 
 // 02:616e
@@ -14715,7 +14338,7 @@ L_6175:
   I(0x6177, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
   I(0x617a, 2); A = 0x84;  // ld a,$84
   CALL(0x617c, playSound_b00_hook, 0x0c98, 0x617f);  // call $0c98
-  I(0x617f, 4); mapMenu_loadPopupData(gb); return;  // jp $6234
+  I(0x617f, 4); if (hook_enabled_at(0x6234)) { mapMenu_loadPopupData_hook(gb); return; } HANDOFF(0x6234);  // jp $6234
 }
 
 // 02:6175
@@ -14727,7 +14350,7 @@ L_6175:
   I(0x6177, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
   I(0x617a, 2); A = 0x84;  // ld a,$84
   CALL(0x617c, playSound_b00_hook, 0x0c98, 0x617f);  // call $0c98
-  I(0x617f, 4); mapMenu_loadPopupData(gb); return;  // jp $6234
+  I(0x617f, 4); if (hook_enabled_at(0x6234)) { mapMenu_loadPopupData_hook(gb); return; } HANDOFF(0x6234);  // jp $6234
 }
 
 // 02:6182
@@ -14996,659 +14619,6 @@ L_622f:
   I(0x6230, 2); alu_bit(gb, 4, A);  // bit 4,a
   SET_DE(POP(0x6232));  // pop de
   RET(0x6233); return;  // ret
-}
-
-// 02:6234
-void mapMenu_loadPopupData(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6234, mapMenu_checkCursorRoomVisited_hook, 0x6636, 0x6237);  // call $6636
-  if ((F & FZ)) { I(0x6237, 3); goto L_6254; } I(0x6237, 2);  // jr z,$6254
-  I(0x6239, 3); SET_HL(0x6c37);  // ld hl,$6c37
-  I(0x623c, 4); A = mem_rd(gb, 0xcbb3);  // ld a,($cbb3)
-  I(0x623f, 1); alu_rrca(gb);  // rrca
-  if (!(F & FC)) { I(0x6240, 3); goto L_6245; } I(0x6240, 2);  // jr nc,$6245
-  I(0x6242, 3); SET_HL(0x6c94);  // ld hl,$6c94
-L_6245:
-  I(0x6245, 4); A = mem_rd(gb, 0xcbb6);  // ld a,($cbb6)
-  I(0x6248, 1); C = A;  // ld c,a
-L_6249:
-  I(0x6249, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x624a, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { I(0x624c, 3); goto L_6254; } I(0x624c, 2);  // jr z,$6254
-  I(0x624e, 1); alu_cp(gb, C);  // cp c
-  I(0x624f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  if (!(F & FZ)) { I(0x6250, 3); goto L_6249; } I(0x6250, 2);  // jr nz,$6249
-  I(0x6252, 3); goto L_6255;  // jr $6255
-L_6254:
-  I(0x6254, 1); alu_xor(gb, A);  // xor a
-L_6255:
-  I(0x6255, 1); D = A;  // ld d,a
-  I(0x6256, 2); A = alu_swap(gb, A);  // swap a
-  CALL(0x6258, getMinimapPopupType, 0x6298, 0x625b);  // call $6298
-  I(0x625b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x625e, 1); A = D;  // ld a,d
-  CALL(0x625f, getMinimapPopupType, 0x6298, 0x6262);  // call $6298
-  I(0x6262, 3); SET_HL(0xcbbe);  // ld hl,$cbbe
-  I(0x6265, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6266, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x6267, 3); goto L_626b; } I(0x6267, 2);  // jr nz,$626b
-  I(0x6269, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x626a, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-L_626b:
-  I(0x626b, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x626c, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x626d, 3); goto L_6271; } I(0x626d, 2);  // jr nz,$6271
-  I(0x626f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6270, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-L_6271:
-  I(0x6271, 3); SET_DE(0x8008);  // ld de,$8008
-  I(0x6274, 3); SET_BC(0x2080);  // ld bc,$2080
-  I(0x6277, 4); A = mem_rd(gb, 0xcbb6);  // ld a,($cbb6)
-  I(0x627a, 1); alu_cp(gb, D);  // cp d
-  if ((F & FC)) { I(0x627b, 3); goto L_627f; } I(0x627b, 2);  // jr c,$627f
-  I(0x627d, 2); B = 0x70;  // ld b,$70
-L_627f:
-  I(0x627f, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x6281, 1); alu_cp(gb, E);  // cp e
-  if ((F & FC)) { I(0x6282, 3); goto L_6286; } I(0x6282, 2);  // jr c,$6286
-  I(0x6284, 2); C = 0x20;  // ld c,$20
-L_6286:
-  I(0x6286, 3); SET_HL(0xcbbb);  // ld hl,$cbbb
-  I(0x6289, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x628a, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x628b, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x628c, 1); alu_sub(gb, B);  // sub b
-  I(0x628d, 1); B = A;  // ld b,a
-  I(0x628e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x628f, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x6290, 1); alu_sub(gb, C);  // sub c
-  I(0x6291, 1); alu_or(gb, B);  // or b
-  if ((F & FZ)) { RET_TAKEN(0x6292); return; } I(0x6292, 2);  // ret z
-  I(0x6293, 2); L = 0xb9;  // ld l,$b9
-  I(0x6295, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  RET(0x6297); return;  // ret
-}
-
-// 02:6249
-void mapMenu_loadPopupData__loop(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6249:
-  I(0x6249, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x624a, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { I(0x624c, 3); goto L_6254; } I(0x624c, 2);  // jr z,$6254
-  I(0x624e, 1); alu_cp(gb, C);  // cp c
-  I(0x624f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  if (!(F & FZ)) { I(0x6250, 3); goto L_6249; } I(0x6250, 2);  // jr nz,$6249
-  I(0x6252, 3); goto L_6255;  // jr $6255
-L_6254:
-  I(0x6254, 1); alu_xor(gb, A);  // xor a
-L_6255:
-  I(0x6255, 1); D = A;  // ld d,a
-  I(0x6256, 2); A = alu_swap(gb, A);  // swap a
-  CALL(0x6258, getMinimapPopupType, 0x6298, 0x625b);  // call $6298
-  I(0x625b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x625e, 1); A = D;  // ld a,d
-  CALL(0x625f, getMinimapPopupType, 0x6298, 0x6262);  // call $6298
-  I(0x6262, 3); SET_HL(0xcbbe);  // ld hl,$cbbe
-  I(0x6265, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6266, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x6267, 3); goto L_626b; } I(0x6267, 2);  // jr nz,$626b
-  I(0x6269, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x626a, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-L_626b:
-  I(0x626b, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x626c, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x626d, 3); goto L_6271; } I(0x626d, 2);  // jr nz,$6271
-  I(0x626f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6270, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-L_6271:
-  I(0x6271, 3); SET_DE(0x8008);  // ld de,$8008
-  I(0x6274, 3); SET_BC(0x2080);  // ld bc,$2080
-  I(0x6277, 4); A = mem_rd(gb, 0xcbb6);  // ld a,($cbb6)
-  I(0x627a, 1); alu_cp(gb, D);  // cp d
-  if ((F & FC)) { I(0x627b, 3); goto L_627f; } I(0x627b, 2);  // jr c,$627f
-  I(0x627d, 2); B = 0x70;  // ld b,$70
-L_627f:
-  I(0x627f, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x6281, 1); alu_cp(gb, E);  // cp e
-  if ((F & FC)) { I(0x6282, 3); goto L_6286; } I(0x6282, 2);  // jr c,$6286
-  I(0x6284, 2); C = 0x20;  // ld c,$20
-L_6286:
-  I(0x6286, 3); SET_HL(0xcbbb);  // ld hl,$cbbb
-  I(0x6289, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x628a, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x628b, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x628c, 1); alu_sub(gb, B);  // sub b
-  I(0x628d, 1); B = A;  // ld b,a
-  I(0x628e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x628f, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x6290, 1); alu_sub(gb, C);  // sub c
-  I(0x6291, 1); alu_or(gb, B);  // or b
-  if ((F & FZ)) { RET_TAKEN(0x6292); return; } I(0x6292, 2);  // ret z
-  I(0x6293, 2); L = 0xb9;  // ld l,$b9
-  I(0x6295, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  RET(0x6297); return;  // ret
-}
-
-// 02:6254
-void mapMenu_loadPopupData__noIcon(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6254:
-  I(0x6254, 1); alu_xor(gb, A);  // xor a
-L_6255:
-  I(0x6255, 1); D = A;  // ld d,a
-  I(0x6256, 2); A = alu_swap(gb, A);  // swap a
-  CALL(0x6258, getMinimapPopupType, 0x6298, 0x625b);  // call $6298
-  I(0x625b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x625e, 1); A = D;  // ld a,d
-  CALL(0x625f, getMinimapPopupType, 0x6298, 0x6262);  // call $6298
-  I(0x6262, 3); SET_HL(0xcbbe);  // ld hl,$cbbe
-  I(0x6265, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6266, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x6267, 3); goto L_626b; } I(0x6267, 2);  // jr nz,$626b
-  I(0x6269, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x626a, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-L_626b:
-  I(0x626b, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x626c, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x626d, 3); goto L_6271; } I(0x626d, 2);  // jr nz,$6271
-  I(0x626f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6270, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-L_6271:
-  I(0x6271, 3); SET_DE(0x8008);  // ld de,$8008
-  I(0x6274, 3); SET_BC(0x2080);  // ld bc,$2080
-  I(0x6277, 4); A = mem_rd(gb, 0xcbb6);  // ld a,($cbb6)
-  I(0x627a, 1); alu_cp(gb, D);  // cp d
-  if ((F & FC)) { I(0x627b, 3); goto L_627f; } I(0x627b, 2);  // jr c,$627f
-  I(0x627d, 2); B = 0x70;  // ld b,$70
-L_627f:
-  I(0x627f, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x6281, 1); alu_cp(gb, E);  // cp e
-  if ((F & FC)) { I(0x6282, 3); goto L_6286; } I(0x6282, 2);  // jr c,$6286
-  I(0x6284, 2); C = 0x20;  // ld c,$20
-L_6286:
-  I(0x6286, 3); SET_HL(0xcbbb);  // ld hl,$cbbb
-  I(0x6289, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x628a, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x628b, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x628c, 1); alu_sub(gb, B);  // sub b
-  I(0x628d, 1); B = A;  // ld b,a
-  I(0x628e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x628f, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x6290, 1); alu_sub(gb, C);  // sub c
-  I(0x6291, 1); alu_or(gb, B);  // or b
-  if ((F & FZ)) { RET_TAKEN(0x6292); return; } I(0x6292, 2);  // ret z
-  I(0x6293, 2); L = 0xb9;  // ld l,$b9
-  I(0x6295, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  RET(0x6297); return;  // ret
-}
-
-// 02:6255
-void mapMenu_loadPopupData__gotIcon(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6255:
-  I(0x6255, 1); D = A;  // ld d,a
-  I(0x6256, 2); A = alu_swap(gb, A);  // swap a
-  CALL(0x6258, getMinimapPopupType, 0x6298, 0x625b);  // call $6298
-  I(0x625b, 4); mem_wr(gb, 0xcbbf, A);  // ld ($cbbf),a
-  I(0x625e, 1); A = D;  // ld a,d
-  CALL(0x625f, getMinimapPopupType, 0x6298, 0x6262);  // call $6298
-  I(0x6262, 3); SET_HL(0xcbbe);  // ld hl,$cbbe
-  I(0x6265, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6266, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x6267, 3); goto L_626b; } I(0x6267, 2);  // jr nz,$626b
-  I(0x6269, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x626a, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-L_626b:
-  I(0x626b, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x626c, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x626d, 3); goto L_6271; } I(0x626d, 2);  // jr nz,$6271
-  I(0x626f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6270, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-L_6271:
-  I(0x6271, 3); SET_DE(0x8008);  // ld de,$8008
-  I(0x6274, 3); SET_BC(0x2080);  // ld bc,$2080
-  I(0x6277, 4); A = mem_rd(gb, 0xcbb6);  // ld a,($cbb6)
-  I(0x627a, 1); alu_cp(gb, D);  // cp d
-  if ((F & FC)) { I(0x627b, 3); goto L_627f; } I(0x627b, 2);  // jr c,$627f
-  I(0x627d, 2); B = 0x70;  // ld b,$70
-L_627f:
-  I(0x627f, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x6281, 1); alu_cp(gb, E);  // cp e
-  if ((F & FC)) { I(0x6282, 3); goto L_6286; } I(0x6282, 2);  // jr c,$6286
-  I(0x6284, 2); C = 0x20;  // ld c,$20
-L_6286:
-  I(0x6286, 3); SET_HL(0xcbbb);  // ld hl,$cbbb
-  I(0x6289, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x628a, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x628b, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x628c, 1); alu_sub(gb, B);  // sub b
-  I(0x628d, 1); B = A;  // ld b,a
-  I(0x628e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x628f, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x6290, 1); alu_sub(gb, C);  // sub c
-  I(0x6291, 1); alu_or(gb, B);  // or b
-  if ((F & FZ)) { RET_TAKEN(0x6292); return; } I(0x6292, 2);  // ret z
-  I(0x6293, 2); L = 0xb9;  // ld l,$b9
-  I(0x6295, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  RET(0x6297); return;  // ret
-}
-
-// 02:632d
-void maupMenu_drawPopup(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x632d, maupMenu_drawPopup__updatePopupVariables, 0x635e, 0x6330);  // call $635e
-  I(0x6330, 3); SET_HL(0xcbbb);  // ld hl,$cbbb
-  I(0x6333, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6334, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  I(0x6335, 1); B = A;  // ld b,a
-  I(0x6336, 4); A = mem_rd(gb, 0xcbbd);  // ld a,($cbbd)
-  I(0x6339, 2); alu_cp(gb, 0x04);  // cp $04
-  if (!(F & FZ)) { I(0x633b, 3); goto L_6352; } I(0x633b, 2);  // jr nz,$6352
-  PUSH(0x633d, BC);  // push bc
-  I(0x633e, 4); A = mem_rd(gb, 0xcbc0);  // ld a,($cbc0)
-  I(0x6341, 2); alu_and(gb, 0x01);  // and $01
-  I(0x6343, 3); SET_HL(0xcbbe);  // ld hl,$cbbe
-  RST_PUSH(0x6346, 0x6347);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x6347, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6348, 3); SET_HL(0x6990);  // ld hl,$6990
-  RST_PUSH(0x634b, 0x634c);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x634c, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  RST_PUSH(0x634d, 0x634e);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  CALL(0x634e, addSpritesToOam_withOffset_hook, 0x0d61, 0x6351);  // call $0d61
-  SET_BC(POP(0x6351));  // pop bc
-L_6352:
-  I(0x6352, 4); A = mem_rd(gb, 0xcbbd);  // ld a,($cbbd)
-  I(0x6355, 3); SET_HL(0x693a);  // ld hl,$693a
-  RST_PUSH(0x6358, 0x6359);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x6359, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  RST_PUSH(0x635a, 0x635b);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x635b, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:6352
-void maupMenu_drawPopup__drawBorder(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6352:
-  I(0x6352, 4); A = mem_rd(gb, 0xcbbd);  // ld a,($cbbd)
-  I(0x6355, 3); SET_HL(0x693a);  // ld hl,$693a
-  RST_PUSH(0x6358, 0x6359);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x6359, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  RST_PUSH(0x635a, 0x635b);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x635b, 4); if (hook_enabled_at(0x0d61)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d61);  // jp $0d61
-}
-
-// 02:635e
-void maupMenu_drawPopup__updatePopupVariables(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_635e:
-  I(0x635e, 3); SET_DE(0xcbb9);  // ld de,$cbb9
-  I(0x6361, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x6362, 0x6363);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x636b: goto L_636b; case 0x6388: goto L_6388; case 0x63a2: goto L_63a2; case 0x63bd: goto L_63bd; default: HANDOFF(HL); }
-L_636b:
-  CALL(0x636b, maupMenu_drawPopup__checkPopupExists, 0x63cc, 0x636e);  // call $63cc
-  if ((F & FZ)) { I(0x636e, 3); goto L_637b; } I(0x636e, 2);  // jr z,$637b
-  I(0x6370, 2); A = 0x01;  // ld a,$01
-  I(0x6372, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x6373, 2); E = 0xbd;  // ld e,$bd
-  I(0x6375, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x6376, 2); E = 0xba;  // ld e,$ba
-  I(0x6378, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x6379, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x637a); return;  // ret
-L_637b:
-  I(0x637b, 1); alu_xor(gb, A);  // xor a
-  I(0x637c, 3); SET_HL(0xcbb9);  // ld hl,$cbb9
-  I(0x637f, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6380, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6381, 2); L = 0xbd;  // ld l,$bd
-  I(0x6383, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x6384, 2); L = 0xc0;  // ld l,$c0
-  I(0x6386, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x6387); return;  // ret
-L_6388:
-  CALL(0x6388, maupMenu_drawPopup__checkPopupExists, 0x63cc, 0x638b);  // call $63cc
-  if ((F & FZ)) { I(0x638b, 3); goto L_63b4; } I(0x638b, 2);  // jr z,$63b4
-  I(0x638d, 2); L = 0xba;  // ld l,$ba
-  I(0x638f, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x6390); return; } I(0x6390, 2);  // ret nz
-  I(0x6391, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  I(0x6393, 2); L = 0xbd;  // ld l,$bd
-  I(0x6395, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x6396, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6397, 2); alu_cp(gb, 0x04);  // cp $04
-  if ((F & FC)) { RET_TAKEN(0x6399); return; } I(0x6399, 2);  // ret c
-  I(0x639a, 2); L = 0xba;  // ld l,$ba
-  I(0x639c, 3); mem_wr(gb, HL, 0x18);  // ld (hl),$18
-  I(0x639e, 2); L = 0xb9;  // ld l,$b9
-  I(0x63a0, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-L_63a2:
-  CALL(0x63a2, maupMenu_drawPopup__checkPopupExists, 0x63cc, 0x63a5);  // call $63cc
-  if ((F & FZ)) { I(0x63a5, 3); goto L_63b4; } I(0x63a5, 2);  // jr z,$63b4
-  I(0x63a7, 2); L = 0xba;  // ld l,$ba
-  I(0x63a9, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x63aa); return; } I(0x63aa, 2);  // ret nz
-  I(0x63ab, 3); mem_wr(gb, HL, 0x18);  // ld (hl),$18
-  I(0x63ad, 2); L = 0xc0;  // ld l,$c0
-  I(0x63af, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x63b0, 2); alu_xor(gb, 0x01);  // xor $01
-  I(0x63b2, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x63b3); return;  // ret
-L_63b4:
-  I(0x63b4, 1); H = D;  // ld h,d
-  I(0x63b5, 2); L = 0xb9;  // ld l,$b9
-  I(0x63b7, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
-  I(0x63b9, 2); L = 0xba;  // ld l,$ba
-  I(0x63bb, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-L_63bd:
-  I(0x63bd, 1); H = D;  // ld h,d
-  I(0x63be, 2); L = 0xba;  // ld l,$ba
-  I(0x63c0, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x63c1); return; } I(0x63c1, 2);  // ret nz
-  I(0x63c2, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  I(0x63c4, 2); L = 0xbd;  // ld l,$bd
-  I(0x63c6, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x63c7, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x63c8, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  if (!(F & FZ)) { RET_TAKEN(0x63c9); return; } I(0x63c9, 2);  // ret nz
-  I(0x63ca, 3); goto L_637b;  // jr $637b
-}
-
-// 02:636b
-void maupMenu_drawPopup__state0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_636b:
-  CALL(0x636b, maupMenu_drawPopup__checkPopupExists, 0x63cc, 0x636e);  // call $63cc
-  if ((F & FZ)) { I(0x636e, 3); goto L_637b; } I(0x636e, 2);  // jr z,$637b
-  I(0x6370, 2); A = 0x01;  // ld a,$01
-  I(0x6372, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x6373, 2); E = 0xbd;  // ld e,$bd
-  I(0x6375, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x6376, 2); E = 0xba;  // ld e,$ba
-  I(0x6378, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x6379, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x637a); return;  // ret
-L_637b:
-  I(0x637b, 1); alu_xor(gb, A);  // xor a
-  I(0x637c, 3); SET_HL(0xcbb9);  // ld hl,$cbb9
-  I(0x637f, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6380, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6381, 2); L = 0xbd;  // ld l,$bd
-  I(0x6383, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x6384, 2); L = 0xc0;  // ld l,$c0
-  I(0x6386, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x6387); return;  // ret
-}
-
-// 02:637b
-void maupMenu_drawPopup__resetPopup(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_637b:
-  I(0x637b, 1); alu_xor(gb, A);  // xor a
-  I(0x637c, 3); SET_HL(0xcbb9);  // ld hl,$cbb9
-  I(0x637f, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6380, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6381, 2); L = 0xbd;  // ld l,$bd
-  I(0x6383, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x6384, 2); L = 0xc0;  // ld l,$c0
-  I(0x6386, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x6387); return;  // ret
-}
-
-// 02:6388
-void maupMenu_drawPopup__state1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_6388;
-L_637b:
-  I(0x637b, 1); alu_xor(gb, A);  // xor a
-  I(0x637c, 3); SET_HL(0xcbb9);  // ld hl,$cbb9
-  I(0x637f, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6380, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6381, 2); L = 0xbd;  // ld l,$bd
-  I(0x6383, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x6384, 2); L = 0xc0;  // ld l,$c0
-  I(0x6386, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x6387); return;  // ret
-L_6388:
-  CALL(0x6388, maupMenu_drawPopup__checkPopupExists, 0x63cc, 0x638b);  // call $63cc
-  if ((F & FZ)) { I(0x638b, 3); goto L_63b4; } I(0x638b, 2);  // jr z,$63b4
-  I(0x638d, 2); L = 0xba;  // ld l,$ba
-  I(0x638f, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x6390); return; } I(0x6390, 2);  // ret nz
-  I(0x6391, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  I(0x6393, 2); L = 0xbd;  // ld l,$bd
-  I(0x6395, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x6396, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6397, 2); alu_cp(gb, 0x04);  // cp $04
-  if ((F & FC)) { RET_TAKEN(0x6399); return; } I(0x6399, 2);  // ret c
-  I(0x639a, 2); L = 0xba;  // ld l,$ba
-  I(0x639c, 3); mem_wr(gb, HL, 0x18);  // ld (hl),$18
-  I(0x639e, 2); L = 0xb9;  // ld l,$b9
-  I(0x63a0, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-L_63a2:
-  CALL(0x63a2, maupMenu_drawPopup__checkPopupExists, 0x63cc, 0x63a5);  // call $63cc
-  if ((F & FZ)) { I(0x63a5, 3); goto L_63b4; } I(0x63a5, 2);  // jr z,$63b4
-  I(0x63a7, 2); L = 0xba;  // ld l,$ba
-  I(0x63a9, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x63aa); return; } I(0x63aa, 2);  // ret nz
-  I(0x63ab, 3); mem_wr(gb, HL, 0x18);  // ld (hl),$18
-  I(0x63ad, 2); L = 0xc0;  // ld l,$c0
-  I(0x63af, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x63b0, 2); alu_xor(gb, 0x01);  // xor $01
-  I(0x63b2, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x63b3); return;  // ret
-L_63b4:
-  I(0x63b4, 1); H = D;  // ld h,d
-  I(0x63b5, 2); L = 0xb9;  // ld l,$b9
-  I(0x63b7, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
-  I(0x63b9, 2); L = 0xba;  // ld l,$ba
-  I(0x63bb, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-L_63bd:
-  I(0x63bd, 1); H = D;  // ld h,d
-  I(0x63be, 2); L = 0xba;  // ld l,$ba
-  I(0x63c0, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x63c1); return; } I(0x63c1, 2);  // ret nz
-  I(0x63c2, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  I(0x63c4, 2); L = 0xbd;  // ld l,$bd
-  I(0x63c6, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x63c7, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x63c8, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  if (!(F & FZ)) { RET_TAKEN(0x63c9); return; } I(0x63c9, 2);  // ret nz
-  I(0x63ca, 3); goto L_637b;  // jr $637b
-}
-
-// 02:63a2
-void maupMenu_drawPopup__state2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_63a2;
-L_637b:
-  I(0x637b, 1); alu_xor(gb, A);  // xor a
-  I(0x637c, 3); SET_HL(0xcbb9);  // ld hl,$cbb9
-  I(0x637f, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6380, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6381, 2); L = 0xbd;  // ld l,$bd
-  I(0x6383, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x6384, 2); L = 0xc0;  // ld l,$c0
-  I(0x6386, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x6387); return;  // ret
-L_63a2:
-  CALL(0x63a2, maupMenu_drawPopup__checkPopupExists, 0x63cc, 0x63a5);  // call $63cc
-  if ((F & FZ)) { I(0x63a5, 3); goto L_63b4; } I(0x63a5, 2);  // jr z,$63b4
-  I(0x63a7, 2); L = 0xba;  // ld l,$ba
-  I(0x63a9, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x63aa); return; } I(0x63aa, 2);  // ret nz
-  I(0x63ab, 3); mem_wr(gb, HL, 0x18);  // ld (hl),$18
-  I(0x63ad, 2); L = 0xc0;  // ld l,$c0
-  I(0x63af, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x63b0, 2); alu_xor(gb, 0x01);  // xor $01
-  I(0x63b2, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x63b3); return;  // ret
-L_63b4:
-  I(0x63b4, 1); H = D;  // ld h,d
-  I(0x63b5, 2); L = 0xb9;  // ld l,$b9
-  I(0x63b7, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
-  I(0x63b9, 2); L = 0xba;  // ld l,$ba
-  I(0x63bb, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-L_63bd:
-  I(0x63bd, 1); H = D;  // ld h,d
-  I(0x63be, 2); L = 0xba;  // ld l,$ba
-  I(0x63c0, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x63c1); return; } I(0x63c1, 2);  // ret nz
-  I(0x63c2, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  I(0x63c4, 2); L = 0xbd;  // ld l,$bd
-  I(0x63c6, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x63c7, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x63c8, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  if (!(F & FZ)) { RET_TAKEN(0x63c9); return; } I(0x63c9, 2);  // ret nz
-  I(0x63ca, 3); goto L_637b;  // jr $637b
-}
-
-// 02:63b4
-void maupMenu_drawPopup__gotoState3(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_63b4;
-L_637b:
-  I(0x637b, 1); alu_xor(gb, A);  // xor a
-  I(0x637c, 3); SET_HL(0xcbb9);  // ld hl,$cbb9
-  I(0x637f, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6380, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6381, 2); L = 0xbd;  // ld l,$bd
-  I(0x6383, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x6384, 2); L = 0xc0;  // ld l,$c0
-  I(0x6386, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x6387); return;  // ret
-L_63b4:
-  I(0x63b4, 1); H = D;  // ld h,d
-  I(0x63b5, 2); L = 0xb9;  // ld l,$b9
-  I(0x63b7, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
-  I(0x63b9, 2); L = 0xba;  // ld l,$ba
-  I(0x63bb, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-L_63bd:
-  I(0x63bd, 1); H = D;  // ld h,d
-  I(0x63be, 2); L = 0xba;  // ld l,$ba
-  I(0x63c0, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x63c1); return; } I(0x63c1, 2);  // ret nz
-  I(0x63c2, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  I(0x63c4, 2); L = 0xbd;  // ld l,$bd
-  I(0x63c6, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x63c7, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x63c8, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  if (!(F & FZ)) { RET_TAKEN(0x63c9); return; } I(0x63c9, 2);  // ret nz
-  I(0x63ca, 3); goto L_637b;  // jr $637b
-}
-
-// 02:63bd
-void maupMenu_drawPopup__state3(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_63bd;
-L_637b:
-  I(0x637b, 1); alu_xor(gb, A);  // xor a
-  I(0x637c, 3); SET_HL(0xcbb9);  // ld hl,$cbb9
-  I(0x637f, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6380, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x6381, 2); L = 0xbd;  // ld l,$bd
-  I(0x6383, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x6384, 2); L = 0xc0;  // ld l,$c0
-  I(0x6386, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x6387); return;  // ret
-L_63bd:
-  I(0x63bd, 1); H = D;  // ld h,d
-  I(0x63be, 2); L = 0xba;  // ld l,$ba
-  I(0x63c0, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x63c1); return; } I(0x63c1, 2);  // ret nz
-  I(0x63c2, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  I(0x63c4, 2); L = 0xbd;  // ld l,$bd
-  I(0x63c6, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x63c7, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x63c8, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  if (!(F & FZ)) { RET_TAKEN(0x63c9); return; } I(0x63c9, 2);  // ret nz
-  I(0x63ca, 3); goto L_637b;  // jr $637b
-}
-
-// 02:63cc
-void maupMenu_drawPopup__checkPopupExists(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_63cc:
-  I(0x63cc, 1); H = D;  // ld h,d
-  I(0x63cd, 2); L = 0xbe;  // ld l,$be
-  I(0x63cf, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x63d0, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  RET(0x63d1); return;  // ret
-}
-
-// 02:64a5
-void mapMenu_copyTilemapToVram(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x64a5, 1); alu_xor(gb, A);  // xor a
-  I(0x64a6, 4); mem_wr(gb, 0xcbe9, A);  // ld ($cbe9),a
-  I(0x64a9, 2); A = 0x0a;  // ld a,$0a
-  I(0x64ab, 4); if (hook_enabled_at(0x05da)) { loadUncompressedGfxHeader_hook(gb); return; } HANDOFF(0x05da);  // jp $05da
-}
-
-// 02:64ae
-void mapMenu_drawSprites(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x64ae, 4); A = mem_rd(gb, 0xcbb3);  // ld a,($cbb3)
-  I(0x64b1, 2); alu_cp(gb, 0x02);  // cp $02
-  if (!(F & FZ)) { I(0x64b3, 3); goto L_64c7; } I(0x64b3, 2);  // jr nz,$64c7
-L_64b5:
-  CALL(0x64b5, dungeonMap_drawItemSprites_hook, 0x64da, 0x64b8);  // call $64da
-  CALL(0x64b8, dungeonMap_drawLinkIcons_hook, 0x657f, 0x64bb);  // call $657f
-  CALL(0x64bb, dungeonMap_drawCursor_hook, 0x65d5, 0x64be);  // call $65d5
-  CALL(0x64be, dungeonMap_drawArrows_hook, 0x65fd, 0x64c1);  // call $65fd
-  CALL(0x64c1, dungeonMap_drawBossSymbolForFloor_hook, 0x6566, 0x64c4);  // call $6566
-  I(0x64c4, 4); if (hook_enabled_at(0x654a)) { dungeonMap_drawFloorCursor_hook(gb); return; } HANDOFF(0x654a);  // jp $654a
-L_64c7:
-  CALL(0x64c7, maupMenu_drawPopup, 0x632d, 0x64ca);  // call $632d
-  CALL(0x64ca, mapMenu_drawArrow_hook, 0x664e, 0x64cd);  // call $664e
-  CALL(0x64cd, mapMenu_drawCursor_hook, 0x6661, 0x64d0);  // call $6661
-  I(0x64d0, 4); A = mem_rd(gb, 0xcbc1);  // ld a,($cbc1)
-  I(0x64d3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x64d4, 4); if (hook_enabled_at(0x6688)) { mapMenu_drawWarpSites_hook(gb); return; } HANDOFF(0x6688); } I(0x64d4, 3);  // jp nz,$6688
-  I(0x64d7, 4); if (hook_enabled_at(0x66ec)) { mapMenu_drawTimePortal_hook(gb); return; } HANDOFF(0x66ec);  // jp $66ec
-}
-
-// 02:64b5
-void mapMenu_drawSprites__dungeon(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_64b5:
-  CALL(0x64b5, dungeonMap_drawItemSprites_hook, 0x64da, 0x64b8);  // call $64da
-  CALL(0x64b8, dungeonMap_drawLinkIcons_hook, 0x657f, 0x64bb);  // call $657f
-  CALL(0x64bb, dungeonMap_drawCursor_hook, 0x65d5, 0x64be);  // call $65d5
-  CALL(0x64be, dungeonMap_drawArrows_hook, 0x65fd, 0x64c1);  // call $65fd
-  CALL(0x64c1, dungeonMap_drawBossSymbolForFloor_hook, 0x6566, 0x64c4);  // call $6566
-  I(0x64c4, 4); if (hook_enabled_at(0x654a)) { dungeonMap_drawFloorCursor_hook(gb); return; } HANDOFF(0x654a);  // jp $654a
-}
-
-// 02:64c7
-void mapMenu_drawSprites__overworld(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_64c7:
-  CALL(0x64c7, maupMenu_drawPopup, 0x632d, 0x64ca);  // call $632d
-  CALL(0x64ca, mapMenu_drawArrow_hook, 0x664e, 0x64cd);  // call $664e
-  CALL(0x64cd, mapMenu_drawCursor_hook, 0x6661, 0x64d0);  // call $6661
-  I(0x64d0, 4); A = mem_rd(gb, 0xcbc1);  // ld a,($cbc1)
-  I(0x64d3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x64d4, 4); if (hook_enabled_at(0x6688)) { mapMenu_drawWarpSites_hook(gb); return; } HANDOFF(0x6688); } I(0x64d4, 3);  // jp nz,$6688
-  I(0x64d7, 4); if (hook_enabled_at(0x66ec)) { mapMenu_drawTimePortal_hook(gb); return; } HANDOFF(0x66ec);  // jp $66ec
 }
 
 // 02:6d36

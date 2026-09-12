@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 1,560 routines rewritten across fifteen code banks;
+  routine against the transliteration. Progress: 1,582 routines rewritten across fifteen code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -72,7 +72,8 @@ Updated 2026-09-12. Newest entries at the top of each section.
   72 completed the bank-4 VBlank copy list, added tile substitutions, palette-fade handlers, and
   more bank-2 map helpers; batch 73 added the dungeon floor-list, scroll renderer, room-tile
   selector, and a late miscellaneous-cutscene graphics/effects cluster; batch 74 added the
-  remaining safe palette-thread handlers and the full fading/color-mixing loops.
+  remaining safe palette-thread handlers and the full fading/color-mixing loops; batch 75 added
+  the bank-2 minimap popup-selection and dungeon-map scrolling/menu-rendering cluster.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -177,6 +178,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-12: milestone 3 phase 5 batch 75 (22 routines): the bank-2 minimap popup-data loader,
+  popup-type dispatcher and all twelve selected popup handlers, dungeon-map direction and
+  scrolling states, and the map-menu tilemap/sprite rendering tails. Existing readable arrow
+  drawing now calls the new scroll checks directly. Cross-review found that the shared RST `$00`
+  helper combined `add l` with `ld l,a`, the untaken `jr nc` with `inc h`, and `ld l,a` with
+  `jp hl`; splitting every effect back onto its physical opcode restored exact interrupt-visible
+  boundaries. Gates: lint 0, 30k verify 0 mismatches (4,709,005 calls), whole-movie state hash
+  clean (`64bddd0dfe384126`), ctest 8/8 in both normal and quirk builds.
 
 - 2026-09-12: milestone 3 phase 5 batch 74 (18 routines): the bank-1 palette-thread stop and
   refresh paths, remaining safe fade handlers, fading-palette calculation, BG palette mixing,

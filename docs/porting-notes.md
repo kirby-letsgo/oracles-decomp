@@ -589,3 +589,9 @@ desync to discover; keep them when porting routines.
   `CYCT` to the carry fallthrough. The control result looked right while the cycle timing was
   reversed. The branch that skips the add must use `CYCT`; the carry path that executes it uses
   `CYC`.
+- Shared RST helpers need one burn per physical opcode even when adjacent effects are convenient
+  to express together. Batch 75's bank-2 RST `$00` helper combined `add l` with `ld l,a`, folded
+  `inc h` into the untaken `jr nc` burn, and combined the final `ld l,a` with `jp hl`. The final
+  registers and ordinary cycle totals looked plausible, but an interrupt can observe each opcode
+  boundary. Instruction-by-instruction cross-review found it; split the burns and attach each
+  register effect to the instruction that performs it.
