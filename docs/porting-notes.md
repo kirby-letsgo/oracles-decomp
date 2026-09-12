@@ -690,3 +690,10 @@ desync to discover; keep them when porting routines.
   `ld a,b; or a; ret z` and adding four cycles per retry; the ROM jumps to `$4344`, while only the
   separate `$435d` branch enters at `$4341`. Give both ROM addresses distinct C labels even when
   they share the remainder of the block.
+- Calling a shared RST helper does not replace the RST opcode's own burn. Batch 103 pushed the
+  correct `$588f` return and ran the add-A-to-HL helper, but omitted `CYC($588e,$588f)`, leaving
+  every accepted direction input four cycles short. The same review found the following
+  `$58b1` register loads attached to the preceding conditional-return burn, shifting a call to
+  `$58b3` with return `$58b6` instead of the ROM's `$58b4`/`$58b7`. Burn the conditional
+  instruction first with no following effect, then begin the fallthrough instruction at its own
+  address.
