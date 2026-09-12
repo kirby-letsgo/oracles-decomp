@@ -662,3 +662,8 @@ desync to discover; keep them when porting routines.
   `ringMenu_retIfCounterNotFinished` loads the skipped caller return into AF (including flags), then
   returns to the grand-caller; `CALL_C` observes the changed PC/SP and unwinds the abandoned C
   caller. Independent stack review confirmed this path before the gate.
+- A low-byte register load should name the intended RAM field even though it changes only half of
+  the pointer. Batch 98 initially translated `ld l,<wSecretListMenu.state` and
+  `ld l,<wSecretListMenu.scroll` as raw `$b3`/`$b7`; the values were right, but hid both the union
+  ownership and the fact that H must stay untouched. Use `L = (uint8_t)symbol` for these operands,
+  and use the active subsystem's field name when several union aliases share the same address.

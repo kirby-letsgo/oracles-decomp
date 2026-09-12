@@ -553,3 +553,15 @@
 02:6e24 ringMenu_unappraisedRings_state0__aPressed
 02:6eb3 ringMenu_unappraisedRings_state3__refund
 02:6efc ringMenu_unappraisedRings_state4__not100th
+02:74e6 secretListMenu_state1__upOrDown
+02:74f4 secretListMenu_state1__scrollDown
+02:74fe secretListMenu_state1__scrollUp
+02:750a secretListMenu_state1__playSound
+02:750f secretListMenu_state1__end
+02:7584 secretListMenu_printSecret__end
+02:7589 secretListMenu_printSecret__getSecretText
+02:7593 secretListMenu_printSecret__val0
+02:759b secretListMenu_printSecret__val2
+02:75a1 secretListMenu_printSecret__val3
+02:75b3 secretListMenu_loadAllSecretNames__nextSecret
+02:75e7 secretListMenu_loadAllSecretNames__end
