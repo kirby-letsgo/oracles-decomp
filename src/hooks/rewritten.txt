@@ -2324,6 +2324,14 @@ func_02_465c
 label_02_038
 label_02_038__secretEntry
 label_02_038__end
+runSecretEntryMenu
+runSecretEntryMenu__func
+runSecretEntryMenu__mode0
+runSecretEntryMenu__mode1
+runSecretEntryMenu__mode2
+runSecretEntryMenu__invalidSecret
+runSecretEntryMenu__setTextInputResult
+runSecretEntryMenu__loadRingSecretData
 loadDungeonLayout_b01
 loadDungeonLayout_b01__nextFloor
 loadDungeonLayout_b01__nextByte
@@ -2339,6 +2347,12 @@ tileReplacement_group5Mapc3
 tileReplacement_group5Mapc3__locFunc
 tileReplacement_group5Mapc3__func_04_672e
 tileReplacement_group2Mapf7
+fileSelectMode4
+fileSelectMode4__mode4Update
+fileSelectMode4__mode0
+fileSelectMode4__mode1
+fileSelectMode4__mode2
+fileSelectMode4__mode3
 checkBrightenRoom
 checkPlayRoomMusic
 checkPlayRoomMusic__setMusic
@@ -2347,3 +2361,7 @@ func_5cfe
 func_5cfe__clearCompanion
 func_5cfe__end
 setEnteredWarpPosition
+fileSelectMode6
+fileSelectMode6__updateMode6
+fileSelectMode6__mode0
+fileSelectMode6__mode2

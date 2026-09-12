@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,348 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,366 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -130,6 +130,8 @@ Updated 2026-09-12. Newest entries at the top of each section.
   bank-2 text-input graphics setup, and bank-4 room-tile generation and replacement paths;
   removing the remaining embedded data rows made bank 4 fully readable and deleted its generated
   C file.
+  Batch 111 added the bank-2 erase-file, file-select secret, and in-game secret-entry dispatchers
+  and state paths, preserving their RST jump-table frames and deferred-input handoffs.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -235,6 +237,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-12: milestone 3 phase 5 batch 111 (18 routines): added bank 2's complete erase-file
+  dispatcher and four-state flow, file-select secret-entry dispatcher and validation path, and the
+  in-game secret-entry dispatcher, verification, ring-secret load, success, and error paths.
+  Fifteen local entries received stable aliases. All three RST `$00` tables preserve their outer
+  caller frames, while deferred text-input continuations use explicit handoff; the secret decoder's
+  `$cec0` scratch reads use the shared temporary-buffer name rather than unrelated enemy-placement
+  union aliases. Two independent instruction-level reviews approved the code. Gates: lint 0, 30k
+  verify 0 mismatches across 4,802,991 calls, full replay state `64bddd0dfe384126`, normal and quirk
+  suites 8/8.
 - 2026-09-12: milestone 3 phase 5 batch 110 (19 routines): added bank 1's room-brightening,
   room-music, common-graphics, entered-warp-position, and companion cleanup paths; bank 2's
   file-select graphics-state and text-input graphics/bootstrap paths; and bank 4's complete room

@@ -1931,6 +1931,11 @@ fileSelectMode0
 fileSelectMode5
 fileSelectMode3
 fileSelectMode4
+fileSelectMode4__mode4Update
+fileSelectMode4__mode0
+fileSelectMode4__mode1
+fileSelectMode4__mode2
+fileSelectMode4__mode3
 fileSelectUpdateInput
 func_02_448d
 fileSelectSetCursor
@@ -6238,6 +6243,13 @@ runKidNameEntryMenu__mode1
 runKidNameEntryMenu__mode2
 label_02_038__secretEntry
 label_02_038__end
+runSecretEntryMenu__func
+runSecretEntryMenu__mode0
+runSecretEntryMenu__mode1
+runSecretEntryMenu__mode2
+runSecretEntryMenu__invalidSecret
+runSecretEntryMenu__setTextInputResult
+runSecretEntryMenu__loadRingSecretData
 loadDungeonLayout_b01__nextFloor
 loadDungeonLayout_b01__nextByte
 loadDungeonLayout_b01__end
@@ -6245,3 +6257,6 @@ checkUpdateDungeonMinimap__setMinimapRoom
 checkPlayRoomMusic__setMusic
 func_5cfe__clearCompanion
 func_5cfe__end
+fileSelectMode6__updateMode6
+fileSelectMode6__mode0
+fileSelectMode6__mode2
