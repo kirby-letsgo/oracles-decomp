@@ -241,183 +241,6 @@ L_67b1:
   if (hook_enabled_at(0x67c5)) { tileReplacement_group5Map4c_hook(gb); return; } HANDOFF(0x67c5);  // fallthrough
 }
 
-// 04:5fef
-void applyAllTileSubstitutions(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5fef, replacePollutionWithWaterIfPollutionFixed, 0x6078, 0x5ff2);  // call $6078
-  CALL(0x5ff2, applySingleTileChanges, 0x62de, 0x5ff5);  // call $62de
-  CALL(0x5ff5, applyStandardTileSubstitutions, 0x60b7, 0x5ff8);  // call $60b7
-  CALL(0x5ff8, replaceOpenedChest, 0x626f, 0x5ffb);  // call $626f
-  I(0x5ffb, 4); A = mem_rd(gb, 0xcc2d);  // ld a,($cc2d)
-  I(0x5ffe, 2); alu_and(gb, 0x06);  // and $06
-  I(0x6000, 2); alu_cp(gb, 0x04);  // cp $04
-  if (!(F & FZ)) { I(0x6002, 3); goto L_6010; } I(0x6002, 2);  // jr nz,$6010
-  CALL(0x6004, replaceShutterForLinkEntering, 0x61d8, 0x6007);  // call $61d8
-  CALL(0x6007, replaceSwitchTiles, 0x627e, 0x600a);  // call $627e
-  CALL(0x600a, replaceToggleBlocks, 0x617c, 0x600d);  // call $617c
-  CALL(0x600d, replaceJabuTilesIfUnderwater, 0x61a1, 0x6010);  // call $61a1
-L_6010:
-  CALL(0x6010, applyRoomSpecificTileChanges_hook, 0x642c, 0x6013);  // call $642c
-  I(0x6013, 4); A = mem_rd(gb, 0xcc2d);  // ld a,($cc2d)
-  I(0x6016, 2); alu_cp(gb, 0x02);  // cp $02
-  if (!(F & FC)) { RET_TAKEN(0x6018); return; } I(0x6018, 2);  // ret nc
-  CALL(0x6019, replaceBreakableTileOverPortal, 0x6046, 0x601c);  // call $6046
-  CALL(0x601c, replaceBreakableTileOverLinkTimeWarpingIn, 0x606a, 0x601f);  // call $606a
-  I(0x601f, 4); A = mem_rd(gb, 0xcddc);  // ld a,($cddc)
-  I(0x6022, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x6023); return; } I(0x6023, 2);  // ret z
-  I(0x6024, 1); C = A;  // ld c,a
-  I(0x6025, 1); C = alu_dec8(gb, C);  // dec c
-  I(0x6026, 2); B = 0xcf;  // ld b,$cf
-  I(0x6028, 2); A = mem_rd(gb, BC);  // ld a,(bc)
-  I(0x6029, 1); E = A;  // ld e,a
-  I(0x602a, 3); SET_HL(0x6033);  // ld hl,$6033
-  CALL(0x602d, lookupKey_hook, 0x1e06, 0x6030);  // call $1e06
-  if (!(F & FC)) { RET_TAKEN(0x6030); return; } I(0x6030, 2);  // ret nc
-  I(0x6031, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  RET(0x6032); return;  // ret
-}
-
-// 04:6046
-void replaceBreakableTileOverPortal(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6046, 3); SET_HL(0xc63e);  // ld hl,$c63e
-  I(0x6049, 4); A = mem_rd(gb, 0xcc2d);  // ld a,($cc2d)
-  I(0x604c, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x604d); return; } I(0x604d, 2);  // ret nz
-  I(0x604e, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x604f, 4); A = mem_rd(gb, 0xcc30);  // ld a,($cc30)
-  I(0x6052, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x6053); return; } I(0x6053, 2);  // ret nz
-  I(0x6054, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x6055, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  removeBreakableTileForTimeWarp(gb); return;  // fallthrough
-}
-
-// 04:6056
-void removeBreakableTileForTimeWarp(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6056, 2); B = 0xcf;  // ld b,$cf
-  I(0x6058, 2); A = mem_rd(gb, BC);  // ld a,(bc)
-  I(0x6059, 1); E = A;  // ld e,a
-  I(0x605a, 3); SET_HL(0x6063);  // ld hl,$6063
-  CALL(0x605d, lookupKey_hook, 0x1e06, 0x6060);  // call $1e06
-  if (!(F & FC)) { RET_TAKEN(0x6060); return; } I(0x6060, 2);  // ret nc
-  I(0x6061, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  RET(0x6062); return;  // ret
-}
-
-// 04:606a
-void replaceBreakableTileOverLinkTimeWarpingIn(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x606a, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
-  I(0x606d, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x606f, 2); alu_cp(gb, 0x06);  // cp $06
-  if (!(F & FZ)) { RET_TAKEN(0x6071); return; } I(0x6071, 2);  // ret nz
-  I(0x6072, 4); A = mem_rd(gb, 0xcc4a);  // ld a,($cc4a)
-  I(0x6075, 1); C = A;  // ld c,a
-  I(0x6076, 3); removeBreakableTileForTimeWarp(gb); return;  // jr $6056
-}
-
-// 04:6078
-void replacePollutionWithWaterIfPollutionFixed(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6078, 2); A = 0x30;  // ld a,$30
-  CALL(0x607a, checkGlobalFlag_hook, 0x31f3, 0x607d);  // call $31f3
-  if ((F & FZ)) { RET_TAKEN(0x607d); return; } I(0x607d, 2);  // ret z
-  I(0x607e, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
-  I(0x6081, 2); alu_bit(gb, 0, A);  // bit 0,a
-  if ((F & FZ)) { RET_TAKEN(0x6083); return; } I(0x6083, 2);  // ret z
-  I(0x6084, 3); SET_DE(0x6090);  // ld de,$6090
-  I(0x6087, 2); alu_and(gb, 0x40);  // and $40
-  if ((F & FZ)) { I(0x6089, 3); goto L_608e; } I(0x6089, 2);  // jr z,$608e
-  I(0x608b, 3); SET_DE(0x6093);  // ld de,$6093
-L_608e:
-  I(0x608e, 3); replaceTiles(gb); return;  // jr $6096
-}
-
-// 04:6096
-void replaceTiles(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6096:
-  I(0x6096, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x6097, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x6098); return; } I(0x6098, 2);  // ret z
-  I(0x6099, 1); B = A;  // ld b,a
-  I(0x609a, 2); SET_DE(DE + 1);  // inc de
-  I(0x609b, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x609c, 2); SET_DE(DE + 1);  // inc de
-  CALL(0x609d, findTileInRoom_hook, 0x15cc, 0x60a0);  // call $15cc
-  if (!(F & FZ)) { I(0x60a0, 3); goto L_6096; } I(0x60a0, 2);  // jr nz,$6096
-  I(0x60a2, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x60a3, 1); C = A;  // ld c,a
-  I(0x60a4, 1); A = L;  // ld a,l
-  I(0x60a5, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x60a6, 3); goto L_6096; } I(0x60a6, 2);  // jr z,$6096
-L_60a8:
-  I(0x60a8, 1); L = alu_dec8(gb, L);  // dec l
-  I(0x60a9, 1); A = C;  // ld a,c
-  CALL(0x60aa, backwardsSearch_hook, 0x15d0, 0x60ad);  // call $15d0
-  if (!(F & FZ)) { I(0x60ad, 3); goto L_6096; } I(0x60ad, 2);  // jr nz,$6096
-  I(0x60af, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x60b0, 1); C = A;  // ld c,a
-  I(0x60b1, 1); A = L;  // ld a,l
-  I(0x60b2, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x60b3, 3); goto L_6096; } I(0x60b3, 2);  // jr z,$6096
-  I(0x60b5, 3); goto L_60a8;  // jr $60a8
-}
-
-// 04:60b7
-void applyStandardTileSubstitutions(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x60b7, getThisRoomFlags_hook, 0x197d, 0x60ba);  // call $197d
-  I(0x60ba, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  I(0x60bc, 3); SET_HL(0x60f5);  // ld hl,$60f5
-  I(0x60bf, 2); alu_bit(gb, 0, A);  // bit 0,a
-  if (!(F & FZ)) { CALL(0x60c1, applyStandardTileSubstitutions__locFunc, 0x60ea, 0x60c4); } else I(0x60c1, 3);  // call nz,$60ea
-  I(0x60c4, 3); SET_HL(0x6101);  // ld hl,$6101
-  I(0x60c7, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
-  I(0x60c9, 2); alu_bit(gb, 1, A);  // bit 1,a
-  if (!(F & FZ)) { CALL(0x60cb, applyStandardTileSubstitutions__locFunc, 0x60ea, 0x60ce); } else I(0x60cb, 3);  // call nz,$60ea
-  I(0x60ce, 3); SET_HL(0x610d);  // ld hl,$610d
-  I(0x60d1, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
-  I(0x60d3, 2); alu_bit(gb, 2, A);  // bit 2,a
-  if (!(F & FZ)) { CALL(0x60d5, applyStandardTileSubstitutions__locFunc, 0x60ea, 0x60d8); } else I(0x60d5, 3);  // call nz,$60ea
-  I(0x60d8, 3); SET_HL(0x6119);  // ld hl,$6119
-  I(0x60db, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
-  I(0x60dd, 2); alu_bit(gb, 3, A);  // bit 3,a
-  if (!(F & FZ)) { CALL(0x60df, applyStandardTileSubstitutions__locFunc, 0x60ea, 0x60e2); } else I(0x60df, 3);  // call nz,$60ea
-  I(0x60e2, 3); SET_HL(0x6125);  // ld hl,$6125
-  I(0x60e5, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
-  I(0x60e7, 2); alu_bit(gb, 7, A);  // bit 7,a
-  if ((F & FZ)) { RET_TAKEN(0x60e9); return; } I(0x60e9, 2);  // ret z
-L_60ea:
-  I(0x60ea, 4); A = mem_rd(gb, 0xcc33);  // ld a,($cc33)
-  RST_PUSH(0x60ed, 0x60ee);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x60ee, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x60ef, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x60f0, 1); L = A;  // ld l,a
-  I(0x60f1, 1); E = L;  // ld e,l
-  I(0x60f2, 1); D = H;  // ld d,h
-  I(0x60f3, 3); replaceTiles(gb); return;  // jr $6096
-}
-
-// 04:60ea
-void applyStandardTileSubstitutions__locFunc(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_60ea:
-  I(0x60ea, 4); A = mem_rd(gb, 0xcc33);  // ld a,($cc33)
-  RST_PUSH(0x60ed, 0x60ee);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x60ee, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x60ef, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x60f0, 1); L = A;  // ld l,a
-  I(0x60f1, 1); E = L;  // ld e,l
-  I(0x60f2, 1); D = H;  // ld d,h
-  I(0x60f3, 3); replaceTiles(gb); return;  // jr $6096
-}
-
 // 04:617c
 void replaceToggleBlocks(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -432,7 +255,7 @@ void replaceToggleBlocks(GB *gb) {
   if (!(F & FZ)) { I(0x618f, 3); goto L_6194; } I(0x618f, 2);  // jr nz,$6194
   I(0x6191, 3); SET_DE(0x619c);  // ld de,$619c
 L_6194:
-  I(0x6194, 4); replaceTiles(gb); return;  // jp $6096
+  I(0x6194, 4); if (hook_enabled_at(0x6096)) { replaceTiles_hook(gb); return; } HANDOFF(0x6096);  // jp $6096
 }
 
 // 04:6197
@@ -459,9 +282,9 @@ L_61a9:
   I(0x61b6, 1); alu_cp(gb, B);  // cp b
   if (!(F & FZ)) { RET_TAKEN(0x61b7); return; } I(0x61b7, 2);  // ret nz
   I(0x61b8, 3); SET_DE(0x61c4);  // ld de,$61c4
-  CALL(0x61bb, replaceTiles, 0x6096, 0x61be);  // call $6096
+  CALL(0x61bb, replaceTiles_hook, 0x6096, 0x61be);  // call $6096
   I(0x61be, 3); SET_DE(0x61cf);  // ld de,$61cf
-  I(0x61c1, 4); replaceTiles(gb); return;  // jp $6096
+  I(0x61c1, 4); if (hook_enabled_at(0x6096)) { replaceTiles_hook(gb); return; } HANDOFF(0x6096);  // jp $6096
 }
 
 // 04:619c
@@ -491,9 +314,9 @@ void replaceJabuTilesIfUnderwater(GB *gb) {
   I(0x61b6, 1); alu_cp(gb, B);  // cp b
   if (!(F & FZ)) { RET_TAKEN(0x61b7); return; } I(0x61b7, 2);  // ret nz
   I(0x61b8, 3); SET_DE(0x61c4);  // ld de,$61c4
-  CALL(0x61bb, replaceTiles, 0x6096, 0x61be);  // call $6096
+  CALL(0x61bb, replaceTiles_hook, 0x6096, 0x61be);  // call $6096
   I(0x61be, 3); SET_DE(0x61cf);  // ld de,$61cf
-  I(0x61c1, 4); replaceTiles(gb); return;  // jp $6096
+  I(0x61c1, 4); if (hook_enabled_at(0x6096)) { replaceTiles_hook(gb); return; } HANDOFF(0x6096);  // jp $6096
 }
 
 // 04:61d8
@@ -1790,84 +1613,6 @@ L_6d54:
   I(0x6d77, 1); E = A;  // ld e,a
   I(0x6d78, 2); D = mem_rd(gb, HL);  // ld d,(hl)
   RET(0x6d79); return;  // ret
-}
-
-// 04:4564
-void b4VBlankFunction30(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4564, 1); H = B;  // ld h,b
-  I(0x4565, 1); L = E;  // ld l,e
-  I(0x4566, 2); B = 0x04;  // ld b,$04
-L_4568:
-  I(0x4568, 2); E = 0x1e;  // ld e,$1e
-  I(0x456a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x456b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x456c, 2); E = 0x3e;  // ld e,$3e
-  I(0x456e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x456f, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4570, 2); E = 0x5e;  // ld e,$5e
-  I(0x4572, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4573, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4574, 2); E = 0x7e;  // ld e,$7e
-  I(0x4576, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4577, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4578, 2); E = 0x9e;  // ld e,$9e
-  I(0x457a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x457b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x457c, 2); E = 0xbe;  // ld e,$be
-  I(0x457e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x457f, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4580, 2); E = 0xde;  // ld e,$de
-  I(0x4582, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4583, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4584, 2); E = 0xfe;  // ld e,$fe
-  I(0x4586, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4587, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4588, 1); D = alu_inc8(gb, D);  // inc d
-  I(0x4589, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x458a, 3); goto L_4568; } I(0x458a, 2);  // jr nz,$4568
-  I(0x458c, 1); L = C;  // ld l,c
-  I(0x458d, 2); H = 0xc4;  // ld h,$c4
-  I(0x458f, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
-}
-
-// 04:4592
-void b4VBlankFunction31(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4592, 1); H = B;  // ld h,b
-  I(0x4593, 1); L = E;  // ld l,e
-  I(0x4594, 2); B = 0x04;  // ld b,$04
-L_4596:
-  I(0x4596, 2); E = 0x1f;  // ld e,$1f
-  I(0x4598, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4599, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x459a, 2); E = 0x3f;  // ld e,$3f
-  I(0x459c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x459d, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x459e, 2); E = 0x5f;  // ld e,$5f
-  I(0x45a0, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x45a1, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x45a2, 2); E = 0x7f;  // ld e,$7f
-  I(0x45a4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x45a5, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x45a6, 2); E = 0x9f;  // ld e,$9f
-  I(0x45a8, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x45a9, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x45aa, 2); E = 0xbf;  // ld e,$bf
-  I(0x45ac, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x45ad, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x45ae, 2); E = 0xdf;  // ld e,$df
-  I(0x45b0, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x45b1, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x45b2, 2); E = 0xff;  // ld e,$ff
-  I(0x45b4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x45b5, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x45b6, 1); D = alu_inc8(gb, D);  // inc d
-  I(0x45b7, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x45b8, 3); goto L_4596; } I(0x45b8, 2);  // jr nz,$4596
-  I(0x45ba, 1); L = C;  // ld l,c
-  I(0x45bb, 2); H = 0xc4;  // ld h,$c4
-  I(0x45bd, 4); if (hook_enabled_at(0x0a7e)) { vblankFunctionRet_hook(gb); return; } HANDOFF(0x0a7e);  // jp $0a7e
 }
 
 // 04:6170

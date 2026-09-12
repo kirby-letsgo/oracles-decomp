@@ -13,6 +13,7 @@ static void tileReplacement_group5Mapb9_write_tiles(GB *gb);
 static void tileReplacement_group1Map27_write_tiles(GB *gb);
 void createInteraction90_hook(GB *gb);
 void setTileToDoor_hook(GB *gb);
+void replaceTiles_hook(GB *gb);
 
 static uint16_t room_tile_changes_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -255,7 +256,7 @@ void tileReplacement_group4Map59_hook(GB *gb) {
   }
   CYC(0x6610, 0x6611);
   CYC(0x6611, 0x6614); SET_DE(0x6617);
-  CYC(0x6614, 0x6617); replaceTiles(gb);
+  CYC(0x6614, 0x6617); replaceTiles_hook(gb);
 }
 
 void tileReplacement_group4Map60_hook(GB *gb) {
@@ -405,7 +406,7 @@ void tileReplacement_group5Map43_hook(GB *gb) {
   if (!(F & FZ)) {
     CYCT(0x66b2, 0x66b4);
     CYC(0x66ce, 0x66d1); SET_DE(0x66d4);
-    CYC(0x66d1, 0x66d4); replaceTiles(gb);
+    CYC(0x66d1, 0x66d4); replaceTiles_hook(gb);
     return;
   }
   CYC(0x66b2, 0x66b4);
@@ -788,7 +789,7 @@ void replaceVineTiles_hook(GB *gb) {
     CYC(0x69ab, 0x69ad);
   }
   CYC(0x69ad, 0x69b0); SET_DE(0x69c0);
-  CALL_C(0x69b0, replaceTiles, 0x6096, 0x69b3);
+  CALL_C(0x69b0, replaceTiles_hook, 0x6096, 0x69b3);
   CYC(0x69b3, 0x69b5); A = 0xd6;
   CALL_C(0x69b5, findTileInRoom_hook, 0x15cc, 0x69b8);
   if (!(F & FZ)) {

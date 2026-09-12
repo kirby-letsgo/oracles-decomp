@@ -3819,30 +3819,6 @@ void paletteFadeHandler(GB *gb) {
   switch (HL) {  default: HANDOFF(HL); }
 }
 
-// 01:5705
-void paletteFadeHandler09(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5705, paletteThread_decCounter, 0x592e, 0x5708);  // call $592e
-  if (!(F & FZ)) { RET_TAKEN(0x5708); return; } I(0x5708, 2);  // ret nz
-  paletteFadeHandler01(gb); return;  // fallthrough
-}
-
-// 01:5709
-void paletteFadeHandler01(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5709, 2); A = 0x1f;  // ld a,$1f
-  I(0x570b, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  I(0x570d, 4); A = mem_rd(gb, 0xc4ac);  // ld a,($c4ac)
-  I(0x5710, 1); C = A;  // ld c,a
-  I(0x5711, 4); A = mem_rd(gb, 0xc2ff);  // ld a,($c2ff)
-  I(0x5714, 1); alu_add(gb, C);  // add c
-  I(0x5715, 2); alu_cp(gb, 0x20);  // cp $20
-  if (!(F & FC)) { I(0x5717, 4); paletteThread_stop(gb); return; } I(0x5717, 3);  // jp nc,$5786
-  I(0x571a, 4); mem_wr(gb, 0xc2ff, A);  // ld ($c2ff),a
-  I(0x571d, 1); C = A;  // ld c,a
-  updateFadingPalettes(gb); return;  // fallthrough
-}
-
 // 01:571e
 void updateFadingPalettes(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -3860,83 +3836,7 @@ void updateFadingPalettes(GB *gb) {
   I(0x5731, 3); mem_wr(gb, 0xffa8, A);  // ldh ($ffa8),a
   I(0x5733, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x5734, 3); mem_wr(gb, 0xffa9, A);  // ldh ($ffa9),a
-  paletteFadeHandler00(gb); return;  // fallthrough
-}
-
-// 01:5736
-void paletteFadeHandler00(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  RET(0x5736); return;  // ret
-}
-
-// 01:5737
-void paletteFadeHandler0a(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5737, paletteThread_decCounter, 0x592e, 0x573a);  // call $592e
-  if (!(F & FZ)) { RET_TAKEN(0x573a); return; } I(0x573a, 2);  // ret nz
-  paletteFadeHandler02(gb); return;  // fallthrough
-}
-
-// 01:573b
-void paletteFadeHandler02(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x573b, 2); A = 0x1f;  // ld a,$1f
-  I(0x573d, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  I(0x573f, 4); A = mem_rd(gb, 0xc4ac);  // ld a,($c4ac)
-  I(0x5742, 1); C = A;  // ld c,a
-  I(0x5743, 4); A = mem_rd(gb, 0xc2ff);  // ld a,($c2ff)
-  I(0x5746, 1); alu_sub(gb, C);  // sub c
-  if ((F & FC)) { I(0x5747, 3); paletteThread_stop(gb); return; } I(0x5747, 2);  // jr c,$5786
-  I(0x5749, 4); mem_wr(gb, 0xc2ff, A);  // ld ($c2ff),a
-  I(0x574c, 1); C = A;  // ld c,a
-  I(0x574d, 3); updateFadingPalettes(gb); return;  // jr $571e
-}
-
-// 01:574f
-void paletteFadeHandler0b(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x574f, paletteThread_decCounter, 0x592e, 0x5752);  // call $592e
-  if (!(F & FZ)) { RET_TAKEN(0x5752); return; } I(0x5752, 2);  // ret nz
-  paletteFadeHandler03(gb); return;  // fallthrough
-}
-
-// 01:5753
-void paletteFadeHandler03(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5753, 1); alu_xor(gb, A);  // xor a
-  I(0x5754, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  I(0x5756, 4); A = mem_rd(gb, 0xc4ac);  // ld a,($c4ac)
-  I(0x5759, 1); C = A;  // ld c,a
-  I(0x575a, 4); A = mem_rd(gb, 0xc2ff);  // ld a,($c2ff)
-  I(0x575d, 1); alu_sub(gb, C);  // sub c
-  I(0x575e, 2); alu_cp(gb, 0xe0);  // cp $e0
-  if ((F & FC)) { I(0x5760, 3); paletteThread_stop(gb); return; } I(0x5760, 2);  // jr c,$5786
-  I(0x5762, 4); mem_wr(gb, 0xc2ff, A);  // ld ($c2ff),a
-  I(0x5765, 1); C = A;  // ld c,a
-  I(0x5766, 3); updateFadingPalettes(gb); return;  // jr $571e
-}
-
-// 01:5768
-void paletteFadeHandler0c(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5768, paletteThread_decCounter, 0x592e, 0x576b);  // call $592e
-  if (!(F & FZ)) { RET_TAKEN(0x576b); return; } I(0x576b, 2);  // ret nz
-  paletteFadeHandler04(gb); return;  // fallthrough
-}
-
-// 01:576c
-void paletteFadeHandler04(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x576c, 1); alu_xor(gb, A);  // xor a
-  I(0x576d, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  I(0x576f, 4); A = mem_rd(gb, 0xc4ac);  // ld a,($c4ac)
-  I(0x5772, 1); C = A;  // ld c,a
-  I(0x5773, 4); A = mem_rd(gb, 0xc2ff);  // ld a,($c2ff)
-  I(0x5776, 1); alu_add(gb, C);  // add c
-  if ((F & FC)) { I(0x5777, 3); paletteThread_stop(gb); return; } I(0x5777, 2);  // jr c,$5786
-  I(0x5779, 4); mem_wr(gb, 0xc2ff, A);  // ld ($c2ff),a
-  I(0x577c, 1); C = A;  // ld c,a
-  I(0x577d, 4); updateFadingPalettes(gb); return;  // jp $571e
+  if (hook_enabled_at(0x5736)) { paletteFadeHandler00_hook(gb); return; } HANDOFF(0x5736);  // fallthrough
 }
 
 // 01:579a
@@ -3990,7 +3890,7 @@ void paletteFadeHandler06(GB *gb) {
   I(0x57d0, 1); alu_add(gb, C);  // add c
   I(0x57d1, 1); alu_cp(gb, B);  // cp b
   if ((F & FZ)) { I(0x57d2, 3); paletteThread_stop(gb); return; } I(0x57d2, 2);  // jr z,$5786
-  if (!(F & FC)) { I(0x57d4, 4); paletteThread_setFadeOffsetAndStop(gb); return; } I(0x57d4, 3);  // jp nc,$5780
+  if (!(F & FC)) { I(0x57d4, 4); if (hook_enabled_at(0x5780)) { paletteThread_setFadeOffsetAndStop_hook(gb); return; } HANDOFF(0x5780); } I(0x57d4, 3);  // jp nc,$5780
   I(0x57d7, 2); alu_sub(gb, 0x1f);  // sub $1f
   I(0x57d9, 4); mem_wr(gb, 0xc2ff, A);  // ld ($c2ff),a
   I(0x57dc, 1); C = A;  // ld c,a
@@ -5503,15 +5403,6 @@ void applyPaletteFadeTransitionData(GB *gb) {
   I(0x485a, 2); A = 0xff;  // ld a,$ff
   I(0x485c, 4); mem_wr(gb, 0xcd29, A);  // ld ($cd29),a
   I(0x485f, 4); if (hook_enabled_at(0x3370)) { startFadeBetweenTwoPalettes_hook(gb); return; } HANDOFF(0x3370);  // jp $3370
-}
-
-// 01:5780
-void paletteThread_setFadeOffsetAndStop(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5780, 1); A = B;  // ld a,b
-  I(0x5781, 2); alu_sub(gb, 0x1f);  // sub $1f
-  I(0x5783, 4); mem_wr(gb, 0xc2ff, A);  // ld ($c2ff),a
-  paletteThread_stop(gb); return;  // fallthrough
 }
 
 // 01:5790

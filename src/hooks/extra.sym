@@ -228,3 +228,7 @@
 01:7cc9 cutscene02__state2
 01:7ced cutscene02__func_7ced
 01:7d2d cutscene02__loopEnd
+02:6728 mapMenu_clearUnvisitedTiles__rowLoop
+02:672b mapMenu_clearUnvisitedTiles__columnLoop
+02:673c mapMenu_clearUnvisitedTiles__nextTile
+04:60ea applyStandardTileSubstitutions__locFunc

@@ -165,6 +165,14 @@ void b4VBlankFunction29_hook(GB *gb) {
   b4_vblank_function(gb, 0x4536, 0x1d);
 }
 
+void b4VBlankFunction30_hook(GB *gb) {
+  b4_vblank_function(gb, 0x4564, 0x1e);
+}
+
+void b4VBlankFunction31_hook(GB *gb) {
+  b4_vblank_function(gb, 0x4592, 0x1f);
+}
+
 static void applyWarpDest_finish(GB *gb) {
   CYC(0x45f5, 0x45f7); A = 0x0a;
   CYC(0x45f7, 0x45fa); W8(wLinkForceState) = A;

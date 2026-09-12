@@ -574,3 +574,9 @@ desync to discover; keep them when porting routines.
   routine was already present in `rewritten.txt` and `cutscenes2.c`. Check `rewritten.txt` while
   assembling every batch, especially when moving between source files or resuming an older lane;
   the report deliberately remains available for already-readable routines.
+- Instruction effects in shared RST helpers must stay attached to their own opcode, not merely
+  preserve the final register values. Batch 72's bank-2 `add_a_to_hl` helper burned the carry-path
+  `ret nc` while applying the following `inc h`, then burned `inc h` while returning and omitted
+  the real final `ret` at `$0014`. Short verification never took that late map-menu path; the
+  whole-movie reference first diverged at frame 286,260. Burn the untaken conditional return with
+  no effect, apply `inc h` after `$0013`, and burn the final return at `$0014` separately.
