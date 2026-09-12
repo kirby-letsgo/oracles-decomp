@@ -37,6 +37,24 @@ void checkEnemyPlacedAtPosition_hook(GB *gb);
 void calculateRoomStateModifier_hook(GB *gb);
 void createSeaEffectsPartIfApplicable_hook(GB *gb);
 void func_02_7a3a_hook(GB *gb);
+void func_02_4149_hook(GB *gb);
+void setFileSelectCursorOffsetToFileSelectMode_hook(GB *gb);
+void setFileSelectModeTo1_hook(GB *gb);
+void setFileSelectMode_hook(GB *gb);
+void incFileSelectMode2_hook(GB *gb);
+void decFileSelectMode2IfBPressed_hook(GB *gb);
+void decFileSelectMode2_hook(GB *gb);
+void createBlankSpritesForItemSubmenu_hook(GB *gb);
+void dungeonMap_generateScrollableTilemap_hook(GB *gb);
+void dungeonMap_generateScrollableTilemap__nextFloor67eb_hook(GB *gb);
+void dungeonMap_generateScrollableTilemap__nextTile67fc_hook(GB *gb);
+void dungeonMap_generateScrollableTilemap__doneThisFloor6815_hook(GB *gb);
+void dungeonMap_generateScrollableTilemap__fillTileMapWithBlank6821_hook(GB *gb);
+void dungeonMap_checkCompassTile_hook(GB *gb);
+void dungeonMap_checkCompassTile__treasure68e3_hook(GB *gb);
+void dungeonMap_checkCompassTile__nothing68ea_hook(GB *gb);
+void dungeonMap_checkCompassTile__ret68ec_hook(GB *gb);
+void dungeonMap_getFloorAddress_hook(GB *gb);
 void dungeonMap_drawItemSprites_hook(GB *gb);
 void getNumSmallKeys_hook(GB *gb);
 void checkLinkHasBossKey_hook(GB *gb);
@@ -1621,7 +1639,7 @@ void dungeonMap_getTileForRoom_hook(GB *gb) {
     return;
   }
   CYC(0x6892, 0x6894);
-  CALL_C(0x6894, dungeonMap_checkCompassTile, 0x68ce, 0x6897);
+  CALL_C(0x6894, dungeonMap_checkCompassTile_hook, 0x68ce, 0x6897);
   if (!(F & FZ)) {
     CYCT(0x6897, 0x6899);
     dungeonMap_getTileForRoom__ret_hook(gb);
@@ -1646,7 +1664,7 @@ void dungeonMap_getTileForRoom__hidden_hook(GB *gb) {
 
 void dungeonMap_getTileForRoom__visited_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x68ad, dungeonMap_checkCompassTile, 0x68ce, 0x68b0);
+  CALL_C(0x68ad, dungeonMap_checkCompassTile_hook, 0x68ce, 0x68b0);
   if (!(F & FZ)) {
     CYCT(0x68b0, 0x68b2);
     dungeonMap_getTileForRoom__ret_hook(gb);
@@ -2555,7 +2573,7 @@ dungeon:
   CYC(0x6084, 0x6086); alu_add(gb, 0x10);
   CALL_C(0x6086, loadGfxHeader_hook, 0x0626, 0x6089);
   CALL_C(0x6089, dungeonMap_drawSmallKeyCount_hook, 0x60dc, 0x608c);
-  CALL_C(0x608c, dungeonMap_generateScrollableTilemap, 0x67de, 0x608f);
+  CALL_C(0x608c, dungeonMap_generateScrollableTilemap_hook, 0x67de, 0x608f);
   CALL_C(0x608f, dungeonMap_drawFloorList_hook, 0x677c, 0x6092);
   CALL_C(0x6092, dungeonMap_updateScroll_hook, 0x682c, 0x6095);
 common:
@@ -5999,7 +6017,7 @@ void fileSelectMode7__state2_hook(GB *gb) {
   CYC(0x4be5, 0x4be7); A = 6;
   CYC(0x4be7, 0x4bea); W8(wFileSelect_cursorOffset) = A;
   CYC(0x4bea, 0x4beb); alu_xor(gb, A);
-  CALL_C(0x4beb, func_02_4149, 0x4149, 0x4bee);
+  CALL_C(0x4beb, func_02_4149_hook, 0x4149, 0x4bee);
   CALL_C(0x4bee, disableLcd_hook, 0x02c1, 0x4bf1);
   CYC(0x4bf1, 0x4bf3); A = 0xa1;
   CALL_C(0x4bf3, loadGfxHeader_hook, 0x0626, 0x4bf6);
@@ -6117,7 +6135,7 @@ copy_file:
   CALL_C(0x4c9f, initializeFile_b00_hook, 0x09d4, 0x4ca2);
   CYC(0x4ca2, 0x4ca4); A = 0x56;
   CALL_C(0x4ca4, playSound_b00_hook, 0x0c98, 0x4ca7);
-  CYC(0x4ca7, 0x4caa); setFileSelectModeTo1(gb);
+  CYC(0x4ca7, 0x4caa); setFileSelectModeTo1_hook(gb);
 }
 
 void fileSelectMode7__state5_hook(GB *gb) {
@@ -6136,7 +6154,7 @@ void fileSelectMode7__cancelLink_hook(GB *gb) {
   if (F & FZ) { CYCT(0x4cb6, 0x4cb9); closeMenu_hook(gb); return; }
   CYC(0x4cb6, 0x4cb9);
   CYC(0x4cb9, 0x4cbb); A = 0;
-  CYC(0x4cbb, 0x4cbe); setFileSelectMode(gb);
+  CYC(0x4cbb, 0x4cbe); setFileSelectMode_hook(gb);
 }
 
 void fileSelectMode7__state6_hook(GB *gb) {
@@ -6210,9 +6228,9 @@ void runFakeReset__state1_hook(GB *gb) {
 
 void fileSelectMode1__state0_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x41b6, setFileSelectCursorOffsetToFileSelectMode, 0x4152, 0x41b9);
+  CALL_C(0x41b6, setFileSelectCursorOffsetToFileSelectMode_hook, 0x4152, 0x41b9);
   CYC(0x41b9, 0x41ba); alu_xor(gb, A);
-  CALL_C(0x41ba, func_02_4149, 0x4149, 0x41bd);
+  CALL_C(0x41ba, func_02_4149_hook, 0x4149, 0x41bd);
   CALL_C(0x41bd, disableLcd_hook, 0x02c1, 0x41c0);
   CYC(0x41c0, 0x41c2); A = 0xba;
   CALL_C(0x41c2, loadGfxHeader_hook, 0x0626, 0x41c5);
@@ -6242,9 +6260,9 @@ selected:
   CYC(0x41e8, 0x41ea); A = 0x56;
   CALL_C(0x41ea, playSound_b00_hook, 0x0c98, 0x41ed);
   CALL_C(0x41ed, fileSelectMode1__getNextFileSelectMode_hook, 0x41fe, 0x41f0);
-  if (!(F & FZ)) { CYCT(0x41f0, 0x41f3); setFileSelectMode(gb); return; }
+  if (!(F & FZ)) { CYCT(0x41f0, 0x41f3); setFileSelectMode_hook(gb); return; }
   CYC(0x41f0, 0x41f3);
-  CALL_C(0x41f3, incFileSelectMode2, 0x416a, 0x41f6);
+  CALL_C(0x41f3, incFileSelectMode2_hook, 0x416a, 0x41f6);
   CALL_C(0x41f6, loadFile_b00_hook, 0x09dc, 0x41f9);
   CYC(0x41f9, 0x41fb); A = 0x16;
   CYC(0x41fb, 0x41fe); loadUncompressedGfxHeader_hook(gb);
@@ -6296,7 +6314,7 @@ void fileSelectMode1__textSpeedMenu_checkInput_hook(GB *gb) {
   if (F & FZ) { CYCT(0x4235, 0x4236); ret_effect(gb); return; }
   CYC(0x4235, 0x4236); CYC(0x4236, 0x4238); A = 0x56;
   CALL_C(0x4238, playSound_b00_hook, 0x0c98, 0x423b);
-  CALL_C(0x423b, incFileSelectMode2, 0x416a, 0x423e);
+  CALL_C(0x423b, incFileSelectMode2_hook, 0x416a, 0x423e);
   CALL_C(0x423e, saveFile_b00_hook, 0x09d8, 0x4241);
   CYC(0x4241, 0x4244); fadeoutToWhite_hook(gb);
 }
@@ -6305,7 +6323,7 @@ void fileSelectMode1__back_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x4244, 0x4246); A = 8;
   CALL_C(0x4246, loadUncompressedGfxHeader_hook, 0x05da, 0x4249);
-  CYC(0x4249, 0x424c); decFileSelectMode2(gb);
+  CYC(0x4249, 0x424c); decFileSelectMode2_hook(gb);
 }
 
 void fileSelectMode1__leftOrRight_hook(GB *gb) {
@@ -6354,9 +6372,9 @@ void fileSelectMode5__state0_hook(GB *gb) {
   CALL_C(0x4295, loadGfxHeader_hook, 0x0626, 0x4298);
   CYC(0x4298, 0x429a); A = 8;
   CALL_C(0x429a, loadUncompressedGfxHeader_hook, 0x05da, 0x429d);
-  CALL_C(0x429d, setFileSelectCursorOffsetToFileSelectMode, 0x4152, 0x42a0);
+  CALL_C(0x429d, setFileSelectCursorOffsetToFileSelectMode_hook, 0x4152, 0x42a0);
   CYC(0x42a0, 0x42a1); alu_xor(gb, A);
-  CALL_C(0x42a1, func_02_4149, 0x4149, 0x42a4);
+  CALL_C(0x42a1, func_02_4149_hook, 0x4149, 0x42a4);
   CYC(0x42a4, 0x42a7); loadGfxRegisterState5AndIncFileSelectMode2(gb);
 }
 
@@ -6371,7 +6389,7 @@ void fileSelectMode5__state1_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(0x42b4, 0x42b6); fileSelectMode5__upOrDown_hook(gb); return; }
   CYC(0x42b4, 0x42b6); CYC(0x42b6, 0x42b7); C = A;
   CYC(0x42b7, 0x42b9); alu_and(gb, 6);
-  if (!(F & FZ)) { CYCT(0x42b9, 0x42bc); setFileSelectModeTo1(gb); return; }
+  if (!(F & FZ)) { CYCT(0x42b9, 0x42bc); setFileSelectModeTo1_hook(gb); return; }
   CYC(0x42b9, 0x42bc); CYC(0x42bc, 0x42bd); A = C;
   CYC(0x42bd, 0x42bf); alu_and(gb, 9);
   if (F & FZ) { CYCT(0x42bf, 0x42c0); ret_effect(gb); return; }
@@ -6379,7 +6397,7 @@ void fileSelectMode5__state1_hook(GB *gb) {
   CYC(0x42c3, 0x42c6); SET_HL(0x42d0);
   CYC(0x42c6, 0x42c7); push_effect(gb, 0x42c7); add_a_to_hl(gb);
   CYC(0x42c7, 0x42c8); A = mem_rd(gb, HL);
-  CALL_C(0x42c8, setFileSelectMode, 0x415b, 0x42cb);
+  CALL_C(0x42c8, setFileSelectMode_hook, 0x415b, 0x42cb);
   CYC(0x42cb, 0x42cd); A = 0x56;
   CYC(0x42cd, 0x42d0); playSound_b00_hook(gb);
 }
@@ -6420,9 +6438,9 @@ void fileSelectMode3__mode3Update_hook(GB *gb) {
 
 void fileSelectMode3__mode0_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x42f6, setFileSelectCursorOffsetToFileSelectMode, 0x4152, 0x42f9);
+  CALL_C(0x42f6, setFileSelectCursorOffsetToFileSelectMode_hook, 0x4152, 0x42f9);
   CYC(0x42f9, 0x42fb); A = 3;
-  CALL_C(0x42fb, func_02_4149, 0x4149, 0x42fe);
+  CALL_C(0x42fb, func_02_4149_hook, 0x4149, 0x42fe);
   CALL_C(0x42fe, disableLcd_hook, 0x02c1, 0x4301);
   CYC(0x4301, 0x4303); A = 0xa3;
   CALL_C(0x4303, loadGfxHeader_hook, 0x0626, 0x4306);
@@ -6441,7 +6459,7 @@ void fileSelectMode3__mode1_hook(GB *gb) {
   CALL_C(0x431a, playSound_b00_hook, 0x0c98, 0x431d);
   CYC(0x431d, 0x4320); A = W8(wFileSelect_cursorPos);
   CYC(0x4320, 0x4322); alu_cp(gb, 3);
-  if (F & FZ) { CYCT(0x4322, 0x4325); setFileSelectModeTo1(gb); return; }
+  if (F & FZ) { CYCT(0x4322, 0x4325); setFileSelectModeTo1_hook(gb); return; }
   CYC(0x4322, 0x4325); CYC(0x4325, 0x4327); H8(hActiveFileSlot) = A;
   CYC(0x4327, 0x4329); D = 0;
   CALL_C(0x4329, getFileDisplayVariableAddress_hook, 0x417a, 0x432c);
@@ -6453,8 +6471,8 @@ void fileSelectMode3__mode1_hook(GB *gb) {
 copy_selected:
   CYC(0x4335, 0x4336); alu_xor(gb, A);
   CYC(0x4336, 0x4339); W8(wFileSelect_cursorOffset) = A;
-  CALL_C(0x4339, func_02_4149, 0x4149, 0x433c);
-  CALL_C(0x433c, incFileSelectMode2, 0x416a, 0x433f);
+  CALL_C(0x4339, func_02_4149_hook, 0x4149, 0x433c);
+  CALL_C(0x433c, incFileSelectMode2_hook, 0x416a, 0x433f);
   CYC(0x433f, 0x4341); B = 1;
   CYC(0x4341, 0x4342); A = B;
   CYC(0x4342, 0x4343); alu_or(gb, A);
@@ -6476,7 +6494,7 @@ collision_check:
 void fileSelectMode3__mode2_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(0x4352, fileSelectMode3__func_02_4397_hook, 0x4397, 0x4355);
-  CALL_C(0x4355, decFileSelectMode2IfBPressed, 0x416f, 0x4358);
+  CALL_C(0x4355, decFileSelectMode2IfBPressed_hook, 0x416f, 0x4358);
   if (!(F & FZ)) { CYCT(0x4358, 0x435a); fileSelectMode3__label_02_015_hook(gb); return; }
   CYC(0x4358, 0x435a);
   CALL_C(0x435a, fileSelectUpdateInput_hook, 0x4467, 0x435d);
@@ -6485,9 +6503,9 @@ void fileSelectMode3__mode2_hook(GB *gb) {
   CALL_C(0x4361, playSound_b00_hook, 0x0c98, 0x4364);
   CYC(0x4364, 0x4367); A = W8(wFileSelect_cursorPos);
   CYC(0x4367, 0x4369); alu_cp(gb, 3);
-  if (!(F & FZ)) { CYCT(0x4369, 0x436c); incFileSelectMode2(gb); return; }
+  if (!(F & FZ)) { CYCT(0x4369, 0x436c); incFileSelectMode2_hook(gb); return; }
   CYC(0x4369, 0x436c);
-  CALL_C(0x436c, decFileSelectMode2, 0x4175, 0x436f);
+  CALL_C(0x436c, decFileSelectMode2_hook, 0x4175, 0x436f);
   CYC(0x436f, 0x4371);
   fileSelectMode3__label_02_015_hook(gb);
   return;
@@ -6510,7 +6528,7 @@ collision_check:
 void fileSelectMode3__mode3_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(0x4371, fileSelectMode3__func_02_4397_hook, 0x4397, 0x4374);
-  CALL_C(0x4374, decFileSelectMode2IfBPressed, 0x416f, 0x4377);
+  CALL_C(0x4374, decFileSelectMode2IfBPressed_hook, 0x416f, 0x4377);
   if (!(F & FZ)) { CYCT(0x4377, 0x4379); fileSelectMode3__label_02_015_hook(gb); return; }
   CYC(0x4377, 0x4379);
   CALL_C(0x4379, func_02_448d_hook, 0x448d, 0x437c);
@@ -6519,13 +6537,13 @@ void fileSelectMode3__mode3_hook(GB *gb) {
   CALL_C(0x437f, playSound_b00_hook, 0x0c98, 0x4382);
   CYC(0x4382, 0x4385); A = W8(wFileSelect_cursorPos2);
   CYC(0x4385, 0x4386); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x4386, 0x4389); setFileSelectModeTo1(gb); return; }
+  if (F & FZ) { CYCT(0x4386, 0x4389); setFileSelectModeTo1_hook(gb); return; }
   CYC(0x4386, 0x4389);
   CALL_C(0x4389, loadFile_b00_hook, 0x09dc, 0x438c);
   CYC(0x438c, 0x438f); A = W8(wFileSelect_cursorPos);
   CYC(0x438f, 0x4391); H8(hActiveFileSlot) = A;
   CALL_C(0x4391, saveFile_b00_hook, 0x09d8, 0x4394);
-  CYC(0x4394, 0x4397); setFileSelectModeTo1(gb);
+  CYC(0x4394, 0x4397); setFileSelectModeTo1_hook(gb);
 }
 
 void fileSelectMode3__func_02_4397_hook(GB *gb) {
@@ -6547,16 +6565,16 @@ void fileSelectMode3__label_02_015_hook(GB *gb) {
   CYC(0x43cc, 0x43cf); A = W8(wFileSelect_cursorPos);
   if (!(F & FZ)) { CYCT(0x43cf, 0x43d1); goto update_cursor; }
   CYC(0x43cf, 0x43d1);
-  CALL_C(0x43d1, setFileSelectCursorOffsetToFileSelectMode, 0x4152, 0x43d4);
+  CALL_C(0x43d1, setFileSelectCursorOffsetToFileSelectMode_hook, 0x4152, 0x43d4);
   CYC(0x43d4, 0x43d6); A = H8(hActiveFileSlot);
 update_cursor:
-  CYC(0x43d6, 0x43d9); func_02_4149(gb);
+  CYC(0x43d6, 0x43d9); func_02_4149_hook(gb);
 }
 
 void inventoryMenuState2_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(0x5735, inventoryMenuState2__subStates_hook, 0x573b, 0x5738);
-  CYC(0x5738, 0x573b); createBlankSpritesForItemSubmenu(gb);
+  CYC(0x5738, 0x573b); createBlankSpritesForItemSubmenu_hook(gb);
 }
 
 void inventoryMenuState2__subStates_hook(GB *gb) {
@@ -7786,4 +7804,220 @@ void inventoryMenuDrawHarpSprites__drawSprite_hook(GB *gb) {
   CYC(0x5e15, 0x5e16); A = mem_rd(gb, HL);
   CYC(0x5e16, 0x5e17); push_effect(gb, 0x5e17); add_a_to_hl(gb);
   CYC(0x5e17, 0x5e1a); addSpritesToOam_withOffset_hook(gb);
+}
+
+void func_02_4149_hook(GB *gb) {
+  CYC(0x4149, 0x414c); SET_HL(wFileSelect_cursorPos);
+  CYC(0x414c, 0x414d); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x414d, 0x414f); A = 0x80;
+  CYC(0x414f, 0x4150); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4150, 0x4151); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x4151, 0x4152); ret_effect(gb);
+}
+
+void setFileSelectCursorOffsetToFileSelectMode_hook(GB *gb) {
+  CYC(0x4152, 0x4155); A = W8(wFileSelect_mode);
+  CYC(0x4155, 0x4158); W8(wFileSelect_cursorOffset) = A;
+  CYC(0x4158, 0x4159); ret_effect(gb);
+}
+
+void setFileSelectMode_hook(GB *gb) {
+  CYC(0x415b, 0x415e); SET_HL(wFileSelect_mode);
+  CYC(0x415e, 0x415f); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x415f, 0x4160); alu_xor(gb, A);
+  CYC(0x4160, 0x4161); mem_wr(gb, HL, A);
+  CYC(0x4161, 0x4164); W8(wFileSelect_textInputMode) = A;
+  CYC(0x4164, 0x4165); ret_effect(gb);
+}
+
+void setFileSelectModeTo1_hook(GB *gb) {
+  CYC(0x4159, 0x415b); A = 0x01;
+  setFileSelectMode_hook(gb);
+}
+
+void incFileSelectMode2_hook(GB *gb) {
+  CYC(0x416a, 0x416d); SET_HL(wFileSelect_mode2);
+  CYC(0x416d, 0x416e); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x416e, 0x416f); ret_effect(gb);
+}
+
+void decFileSelectMode2_hook(GB *gb) {
+  CYC(0x4175, 0x4178); SET_HL(wFileSelect_mode2);
+  CYC(0x4178, 0x4179); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x4179, 0x417a); ret_effect(gb);
+}
+
+void decFileSelectMode2IfBPressed_hook(GB *gb) {
+  CYC(0x416f, 0x4172); A = W8(wKeysJustPressed);
+  CYC(0x4172, 0x4174); alu_and(gb, 0x02);
+  if (F & FZ) { CYCT(0x4174, 0x4175); ret_effect(gb); return; }
+  CYC(0x4174, 0x4175);
+  decFileSelectMode2_hook(gb);
+}
+
+void createBlankSpritesForItemSubmenu_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5e1a, 0x5e1d); SET_HL(wInventory_cbc1);
+  CYC(0x5e1d, 0x5e1e); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5e1e, 0x5e20); alu_cp(gb, 0x04);
+  if (!(F & FZ)) { CYCT(0x5e20, 0x5e21); ret_effect(gb); return; }
+  CYC(0x5e20, 0x5e21);
+  CYC(0x5e21, 0x5e24); SET_BC(0x2800);
+  CYC(0x5e24, 0x5e25); A = mem_rd(gb, HL);
+  CYC(0x5e25, 0x5e27); alu_cp(gb, 0x20);
+  if (F & FC) { CYCT(0x5e27, 0x5e29); goto select_sprites; }
+  CYC(0x5e27, 0x5e29);
+  CYC(0x5e29, 0x5e2b); B = 0x50;
+select_sprites:
+  CYC(0x5e2b, 0x5e2d); E = 0x03;
+  CYC(0x5e2d, 0x5e30); A = W8(wInventory_cbb8);
+  CYC(0x5e30, 0x5e32); alu_cp(gb, 0x04);
+  if (!(F & FC)) { CYCT(0x5e32, 0x5e34); goto start_loop; }
+  CYC(0x5e32, 0x5e34);
+  CYC(0x5e34, 0x5e35); E = alu_dec8(gb, E);
+  CYC(0x5e35, 0x5e37); alu_cp(gb, 0x03);
+  if (!(F & FC)) { CYCT(0x5e37, 0x5e39); goto start_loop; }
+  CYC(0x5e37, 0x5e39);
+  CYC(0x5e39, 0x5e3a); E = alu_dec8(gb, E);
+start_loop:
+  CYC(0x5e3a, 0x5e3b); A = E;
+  for (;;) {
+    CYC(0x5e3b, 0x5e3c); A = alu_dec8(gb, A);
+    CYC(0x5e3c, 0x5e3d); push_effect(gb, AF);
+    CYC(0x5e3d, 0x5e3e); push_effect(gb, BC);
+    CYC(0x5e3e, 0x5e41); SET_HL(0x5e4c);
+    CYC(0x5e41, 0x5e42); push_effect(gb, 0x5e42); add_a_to_hl(gb);
+    CYC(0x5e42, 0x5e43); A = mem_rd(gb, HL);
+    CYC(0x5e43, 0x5e44); push_effect(gb, 0x5e44); add_a_to_hl(gb);
+    CALL_C(0x5e44, addSpritesToOam_withOffset_hook, 0x0d61, 0x5e47);
+    CYC(0x5e47, 0x5e48); SET_BC(pop_effect(gb));
+    CYC(0x5e48, 0x5e49); SET_AF(pop_effect(gb));
+    if (!(F & FZ)) { CYCT(0x5e49, 0x5e4b); continue; }
+    CYC(0x5e49, 0x5e4b);
+    CYC(0x5e4b, 0x5e4c); ret_effect(gb);
+    return;
+  }
+}
+
+static void dungeon_map_generate_scrollable_tilemap(GB *gb, uint16_t entry, uint16_t sp0_) {
+  if (entry == 0x67de) {
+    CYC(0x67de, 0x67e1); SET_DE(w4GfxBuf1);
+    CYC(0x67e1, 0x67e3); A = 0x28;
+    CALL_C(0x67e3, dungeonMap_generateScrollableTilemap__fillTileMapWithBlank6821_hook, 0x6821, 0x67e6);
+    CYC(0x67e6, 0x67e9); A = W8(wDungeonNumFloors);
+    CYC(0x67e9, 0x67eb); H8(hFF8D) = A;
+  } else if (entry == 0x67fc) {
+    goto next_tile;
+  } else if (entry == 0x6815) {
+    goto done_this_floor;
+  } else if (entry == 0x6821) {
+    goto fill_tilemap_with_blank;
+  }
+next_floor:
+  CYC(0x67eb, 0x67ed); A = H8(hFF8D);
+  CYC(0x67ed, 0x67ee); A = alu_dec8(gb, A);
+  CALL_C(0x67ee, dungeonMap_getFloorAddress_hook, 0x68ef, 0x67f1);
+  CALL_C(0x67f1, dungeonMap_checkCanViewFloor_hook, 0x68bb, 0x67f4);
+  CYC(0x67f4, 0x67f6); A = 0x50;
+  if (F & FZ) { CYCT(0x67f6, 0x67f8); goto done_this_floor; }
+  CYC(0x67f6, 0x67f8);
+  CYC(0x67f8, 0x67fa); A = 0x40;
+  CYC(0x67fa, 0x67fc); H8(hFF8C) = A;
+next_tile:
+  CYC(0x67fc, 0x67fe); A = 0x02;
+  CYC(0x67fe, 0x6800); mem_wr(gb, IO_SVBK, A);
+  CYC(0x6800, 0x6801); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6801, 0x6802); C = A;
+  CYC(0x6802, 0x6804); A = 0x04;
+  CYC(0x6804, 0x6806); mem_wr(gb, IO_SVBK, A);
+  CYC(0x6806, 0x6807); A = C;
+  CALL_C(0x6807, dungeonMap_getTileForRoom_hook, 0x6875, 0x680a);
+  CYC(0x680a, 0x680b); mem_wr(gb, DE, A);
+  CYC(0x680b, 0x680c); SET_DE(DE + 1);
+  CYC(0x680c, 0x680e); A = H8(hFF8C);
+  CYC(0x680e, 0x680f); A = alu_dec8(gb, A);
+  CYC(0x680f, 0x6811); H8(hFF8C) = A;
+  if (!(F & FZ)) { CYCT(0x6811, 0x6813); goto next_tile; }
+  CYC(0x6811, 0x6813);
+  CYC(0x6813, 0x6815); A = 0x10;
+done_this_floor:
+  CALL_C(0x6815, dungeonMap_generateScrollableTilemap__fillTileMapWithBlank6821_hook, 0x6821, 0x6818);
+  CYC(0x6818, 0x681a); A = H8(hFF8D);
+  CYC(0x681a, 0x681b); A = alu_dec8(gb, A);
+  CYC(0x681b, 0x681d); H8(hFF8D) = A;
+  if (!(F & FZ)) { CYCT(0x681d, 0x681f); goto next_floor; }
+  CYC(0x681d, 0x681f);
+  CYC(0x681f, 0x6821); A = 0x18;
+fill_tilemap_with_blank:
+  CYC(0x6821, 0x6822); push_effect(gb, BC);
+  CYC(0x6822, 0x6823); C = A;
+  CYC(0x6823, 0x6825); A = 0xad;
+  for (;;) {
+    CYC(0x6825, 0x6826); mem_wr(gb, DE, A);
+    CYC(0x6826, 0x6827); SET_DE(DE + 1);
+    CYC(0x6827, 0x6828); C = alu_dec8(gb, C);
+    if (!(F & FZ)) { CYCT(0x6828, 0x682a); continue; }
+    CYC(0x6828, 0x682a);
+    CYC(0x682a, 0x682b); SET_BC(pop_effect(gb));
+    CYC(0x682b, 0x682c); ret_effect(gb);
+    return;
+  }
+}
+
+void dungeonMap_generateScrollableTilemap_hook(GB *gb) { uint16_t sp0_ = gb->sp; dungeon_map_generate_scrollable_tilemap(gb, 0x67de, sp0_); }
+void dungeonMap_generateScrollableTilemap__nextFloor67eb_hook(GB *gb) { uint16_t sp0_ = gb->sp; dungeon_map_generate_scrollable_tilemap(gb, 0x67eb, sp0_); }
+void dungeonMap_generateScrollableTilemap__nextTile67fc_hook(GB *gb) { uint16_t sp0_ = gb->sp; dungeon_map_generate_scrollable_tilemap(gb, 0x67fc, sp0_); }
+void dungeonMap_generateScrollableTilemap__doneThisFloor6815_hook(GB *gb) { uint16_t sp0_ = gb->sp; dungeon_map_generate_scrollable_tilemap(gb, 0x6815, sp0_); }
+void dungeonMap_generateScrollableTilemap__fillTileMapWithBlank6821_hook(GB *gb) { uint16_t sp0_ = gb->sp; dungeon_map_generate_scrollable_tilemap(gb, 0x6821, sp0_); }
+
+static void dungeon_map_check_compass_tile(GB *gb, uint16_t entry, uint16_t sp0_) {
+  if (entry == 0x68ce) {
+    CALL_C(0x68ce, checkLinkHasCompass_hook, 0x6532, 0x68d1);
+    if (F & FZ) { CYCT(0x68d1, 0x68d2); ret_effect(gb); return; }
+    CYC(0x68d1, 0x68d2);
+    CYC(0x68d2, 0x68d3); A = E;
+    CYC(0x68d3, 0x68d5); C = 0x83;
+    CYC(0x68d5, 0x68d7); alu_and(gb, 0x70);
+    CYC(0x68d7, 0x68d9); alu_cp(gb, 0x40);
+    if (F & FZ) { CYCT(0x68d9, 0x68db); goto ret; }
+    CYC(0x68d9, 0x68db);
+    CYC(0x68db, 0x68dd); alu_cp(gb, 0x20);
+    if (F & FZ) { CYCT(0x68dd, 0x68df); goto treasure; }
+    CYC(0x68dd, 0x68df);
+    CYC(0x68df, 0x68e1); alu_cp(gb, 0x30);
+    if (!(F & FZ)) { CYCT(0x68e1, 0x68e3); goto nothing; }
+    CYC(0x68e1, 0x68e3);
+  } else if (entry == 0x68ea) {
+    goto nothing;
+  } else if (entry == 0x68ec) {
+    goto ret;
+  }
+treasure:
+  CYC(0x68e3, 0x68e5); C = 0xae;
+  CYC(0x68e5, 0x68e6); A = D;
+  CYC(0x68e6, 0x68e8); alu_and(gb, 0x20);
+  if (F & FZ) { CYCT(0x68e8, 0x68ea); goto ret; }
+  CYC(0x68e8, 0x68ea);
+nothing:
+  CYC(0x68ea, 0x68ec); C = 0;
+ret:
+  CYC(0x68ec, 0x68ed); A = C;
+  CYC(0x68ed, 0x68ee); alu_or(gb, A);
+  CYC(0x68ee, 0x68ef); ret_effect(gb);
+}
+
+void dungeonMap_checkCompassTile_hook(GB *gb) { uint16_t sp0_ = gb->sp; dungeon_map_check_compass_tile(gb, 0x68ce, sp0_); }
+void dungeonMap_checkCompassTile__treasure68e3_hook(GB *gb) { uint16_t sp0_ = gb->sp; dungeon_map_check_compass_tile(gb, 0x68e3, sp0_); }
+void dungeonMap_checkCompassTile__nothing68ea_hook(GB *gb) { uint16_t sp0_ = gb->sp; dungeon_map_check_compass_tile(gb, 0x68ea, sp0_); }
+void dungeonMap_checkCompassTile__ret68ec_hook(GB *gb) { uint16_t sp0_ = gb->sp; dungeon_map_check_compass_tile(gb, 0x68ec, sp0_); }
+
+void dungeonMap_getFloorAddress_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x68ef, multiplyABy16_hook, 0x01ac, 0x68f2);
+  CYC(0x68f2, 0x68f5); SET_HL(w2DungeonLayout);
+  CYC(0x68f5, 0x68f6); alu_add_hl(gb, BC);
+  CYC(0x68f6, 0x68f7); alu_add_hl(gb, BC);
+  CYC(0x68f7, 0x68f8); alu_add_hl(gb, BC);
+  CYC(0x68f8, 0x68f9); alu_add_hl(gb, BC);
+  CYC(0x68f9, 0x68fa); ret_effect(gb);
 }

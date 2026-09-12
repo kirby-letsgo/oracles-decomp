@@ -47,6 +47,8 @@ void inventoryTextCode__state04_hook(GB *gb);
 void inventoryTextCode__state05_hook(GB *gb);
 void inventoryTextCode__state06_hook(GB *gb);
 void inventoryTextCode__state07_hook(GB *gb);
+void initTextboxStuff_hook(GB *gb);
+static void add_double_index_to_hl(GB *gb, uint16_t return_address);
 static void add_a_to_hl(GB *gb);
 
 static uint16_t textbox_jump_table(GB *gb) {
@@ -797,7 +799,150 @@ clear_textbox_wram:
   CYC(0x4b13, 0x4b16); SET_HL(0xd000);
   CYC(0x4b16, 0x4b19); SET_BC(0x0460);
   CALL_C(0x4b19, clearMemoryBc_hook, 0x0475, 0x4b1c);
-  CYC(0x4b1c, 0x4b1f); initTextboxStuff(gb);
+  CYC(0x4b1c, 0x4b1f); initTextboxStuff_hook(gb);
+}
+
+void initTextboxStuff_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4e72, 0x4e75); A = W8(wActiveLanguage);
+  CYC(0x4e75, 0x4e76); B = A;
+  CYC(0x4e76, 0x4e77); alu_add(gb, A);
+  CYC(0x4e77, 0x4e78); alu_add(gb, B);
+  CYC(0x4e78, 0x4e7b); SET_HL(0x4fe3);
+  CYC(0x4e7b, 0x4e7c); push_effect(gb, 0x4e7c); add_a_to_hl(gb);
+  CYC(0x4e7c, 0x4e7d); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4e7d, 0x4e80); W8(w7TextTableAddr) = A;
+  CYC(0x4e80, 0x4e81); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4e81, 0x4e84); WP(w7TextTableAddr)[1] = A;
+  CYC(0x4e84, 0x4e85); A = mem_rd(gb, HL);
+  CYC(0x4e85, 0x4e88); W8(w7TextTableBank) = A;
+  CALL_C(0x4e88, checkInitialTextCommands_hook, 0x4ff5, 0x4e8b);
+  CYC(0x4e8b, 0x4e8e); SET_HL(w7TextSound);
+  CYC(0x4e8e, 0x4e90); mem_wr(gb, HL, 0x66);
+  CYC(0x4e90, 0x4e91); L = alu_inc8(gb, L);
+  CALL_C(0x4e91, getCharacterDisplayLength_hook, 0x5856, 0x4e94);
+  CYC(0x4e94, 0x4e95); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4e95, 0x4e96); L = alu_inc8(gb, L);
+  CYC(0x4e96, 0x4e98); mem_wr(gb, HL, 0x80);
+  CYC(0x4e98, 0x4e99); L = alu_inc8(gb, L);
+  CYC(0x4e99, 0x4e9b); mem_wr(gb, HL, 0x03);
+  CYC(0x4e9b, 0x4e9c); L = alu_inc8(gb, L);
+  CYC(0x4e9c, 0x4e9f); SET_DE(w3VramTiles);
+  CYC(0x4e9f, 0x4ea1); mem_wr(gb, HL, w3VramTiles_BANK);
+  CYC(0x4ea1, 0x4ea4); A = W8(wOpenedMenuType);
+  CYC(0x4ea4, 0x4ea5); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x4ea5, 0x4ea7); goto set_textbox_position; }
+  CYC(0x4ea5, 0x4ea7);
+  CYC(0x4ea7, 0x4eaa); SET_DE(w4TileMap);
+  CYC(0x4eaa, 0x4eac); mem_wr(gb, HL, w4TileMap_BANK);
+set_textbox_position:
+  CYC(0x4eac, 0x4eaf); A = W8(wTextboxPosition);
+  CYC(0x4eaf, 0x4eb2); SET_HL(0x4f4b);
+  CYC(0x4eb2, 0x4eb3); add_double_index_to_hl(gb, 0x4eb3);
+  CYC(0x4eb3, 0x4eb4); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4eb4, 0x4eb5); H = mem_rd(gb, HL);
+  CYC(0x4eb5, 0x4eb6); L = A;
+  CYC(0x4eb6, 0x4eb7); push_effect(gb, HL);
+  CYC(0x4eb7, 0x4eb8); alu_add(gb, E);
+  CYC(0x4eb8, 0x4eb9); L = A;
+  CYC(0x4eb9, 0x4eba); A = D;
+  CYC(0x4eba, 0x4ebb); alu_adc(gb, H);
+  CYC(0x4ebb, 0x4ebc); H = A;
+  CYC(0x4ebc, 0x4ebf); SET_DE(0x0020);
+  CYC(0x4ebf, 0x4ec1); A = H8(hCameraY);
+  CYC(0x4ec1, 0x4ec3); alu_add(gb, 0x04);
+  CYC(0x4ec3, 0x4ec5); alu_and(gb, 0xf8);
+  if (F & FZ) { CYCT(0x4ec5, 0x4ec7); goto adjust_x; }
+  CYC(0x4ec5, 0x4ec7);
+  CYC(0x4ec7, 0x4ec9); A = alu_swap(gb, A);
+  CYC(0x4ec9, 0x4eca); alu_rlca(gb);
+  do {
+    CYC(0x4eca, 0x4ecb); alu_add_hl(gb, DE);
+    CYC(0x4ecb, 0x4ecc); A = alu_dec8(gb, A);
+    if (!(F & FZ)) { CYCT(0x4ecc, 0x4ece); continue; }
+    CYC(0x4ecc, 0x4ece);
+    break;
+  } while (true);
+adjust_x:
+  CYC(0x4ece, 0x4ed0); A = H8(hCameraX);
+  CYC(0x4ed0, 0x4ed2); alu_add(gb, 0x04);
+  CYC(0x4ed2, 0x4ed4); alu_and(gb, 0xf8);
+  CYC(0x4ed4, 0x4ed6); A = alu_swap(gb, A);
+  CYC(0x4ed6, 0x4ed7); alu_rlca(gb);
+  CYC(0x4ed7, 0x4ed8); alu_add(gb, L);
+  CYC(0x4ed8, 0x4edb); W8(w7TextboxPos) = A;
+  CYC(0x4edb, 0x4edc); A = H;
+  CYC(0x4edc, 0x4edf); WP(w7TextboxPos)[1] = A;
+  CYC(0x4edf, 0x4ee0); SET_HL(pop_effect(gb));
+  CYC(0x4ee0, 0x4ee2); A = H8(hCameraY);
+  CYC(0x4ee2, 0x4ee3); B = A;
+  CYC(0x4ee3, 0x4ee6); A = W8(wScreenOffsetY);
+  CYC(0x4ee6, 0x4ee7); alu_add(gb, B);
+  CYC(0x4ee7, 0x4ee9); alu_add(gb, 0x04);
+  CYC(0x4ee9, 0x4eeb); alu_and(gb, 0xf8);
+  if (F & FZ) { CYCT(0x4eeb, 0x4eed); goto calculate_vram_position; }
+  CYC(0x4eeb, 0x4eed);
+  CYC(0x4eed, 0x4eef); A = alu_swap(gb, A);
+  CYC(0x4eef, 0x4ef0); alu_rlca(gb);
+  do {
+    CYC(0x4ef0, 0x4ef1); alu_add_hl(gb, DE);
+    CYC(0x4ef1, 0x4ef2); A = alu_dec8(gb, A);
+    if (!(F & FZ)) { CYCT(0x4ef2, 0x4ef4); continue; }
+    CYC(0x4ef2, 0x4ef4);
+    break;
+  } while (true);
+calculate_vram_position:
+  CYC(0x4ef4, 0x4ef5); A = H;
+  CYC(0x4ef5, 0x4ef7); alu_and(gb, 0x03);
+  CYC(0x4ef7, 0x4ef8); H = A;
+  CYC(0x4ef8, 0x4efb); A = W8(wTextMapAddress);
+  CYC(0x4efb, 0x4efc); B = A;
+  CYC(0x4efc, 0x4efe); C = 0x00;
+  CYC(0x4efe, 0x4eff); alu_add_hl(gb, BC);
+  CYC(0x4eff, 0x4f00); A = L;
+  CYC(0x4f00, 0x4f03); W8(w7TextboxVramPos) = A;
+  CYC(0x4f03, 0x4f04); A = H;
+  CYC(0x4f04, 0x4f07); WP(w7TextboxVramPos)[1] = A;
+  CYC(0x4f07, 0x4f0a); A = W8(wScreenOffsetX);
+  CYC(0x4f0a, 0x4f0b); B = A;
+  CYC(0x4f0b, 0x4f0d); A = H8(hCameraX);
+  CYC(0x4f0d, 0x4f0f); alu_add(gb, 0x04);
+  CYC(0x4f0f, 0x4f10); alu_add(gb, B);
+  CYC(0x4f10, 0x4f12); alu_and(gb, 0xf8);
+  CYC(0x4f12, 0x4f14); A = alu_swap(gb, A);
+  CYC(0x4f14, 0x4f15); alu_rlca(gb);
+  CYC(0x4f15, 0x4f18); W8(w7d0cc) = A;
+  CYC(0x4f18, 0x4f1a); alu_sub(gb, 0x20);
+  CYC(0x4f1a, 0x4f1b); alu_cpl(gb);
+  CYC(0x4f1b, 0x4f1c); A = alu_dec8(gb, A);
+  CYC(0x4f1c, 0x4f1e); alu_cp(gb, 0x10);
+  if (F & FC) { CYCT(0x4f1e, 0x4f20); goto set_textbox_width; }
+  CYC(0x4f1e, 0x4f20);
+  CYC(0x4f20, 0x4f22); A = 0x10;
+set_textbox_width:
+  CYC(0x4f22, 0x4f25); W8(w7d0cd) = A;
+  CYC(0x4f25, 0x4f26); B = A;
+  CYC(0x4f26, 0x4f28); A = 0x10;
+  CYC(0x4f28, 0x4f29); alu_sub(gb, B);
+  CYC(0x4f29, 0x4f2c); W8(w7d0ce) = A;
+  CYC(0x4f2c, 0x4f2f); A = W8(wTextboxFlags);
+  CYC(0x4f2f, 0x4f31); alu_bit(gb, 0, A);
+  if (!(F & FZ)) { CYCT(0x4f31, 0x4f32); ret_effect(gb); return; }
+  CYC(0x4f31, 0x4f32);
+  CYC(0x4f32, 0x4f34); alu_and(gb, 0x14);
+  CYC(0x4f34, 0x4f36); A = 0x0e;
+  if (F & FZ) { CYCT(0x4f36, 0x4f38); goto load_palette; }
+  CYC(0x4f36, 0x4f38);
+  CYC(0x4f38, 0x4f3b); A = W8(wTextboxFlags);
+  CYC(0x4f3b, 0x4f3d); alu_and(gb, 0x10);
+  CYC(0x4f3d, 0x4f3f); A = 0xbd;
+  if (!(F & FZ)) { CYCT(0x4f3f, 0x4f41); goto load_palette; }
+  CYC(0x4f3f, 0x4f41);
+  CYC(0x4f41, 0x4f43); A = 0x81;
+  CYC(0x4f43, 0x4f46); W8(w7TextAttribute) = A;
+  CYC(0x4f46, 0x4f48); A = 0x0d;
+load_palette:
+  CYC(0x4f48, 0x4f4b); loadPaletteHeader_hook(gb);
 }
 
 void handleTextControlCode_hook(GB *gb) {
