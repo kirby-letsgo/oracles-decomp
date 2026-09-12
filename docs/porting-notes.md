@@ -616,3 +616,8 @@ desync to discover; keep them when porting routines.
   deleted sources in an old build graph. Accumulate bodies first, remove stale two-digit
   `gen_bankXX.c` outputs with none, and use `CONFIGURE_DEPENDS` on the game-source glob so the
   generated bank file can be deleted permanently.
+- `lint_game.py` does not reject every raw numeric WRAM operand. Batch 86 passed lint while its
+  Zelda-kidnapped states still used fourteen literal `$cfc0`/`$cfc6` accesses, hiding the existing
+  generic-cutscene field names. Code-quality review found them before the gate. Check `ram.h` for
+  every WRAM address even when lint is green, and use the named field unless the address is
+  genuinely an unnamed byte or pointer adjustment.

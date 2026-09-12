@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 1,779 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 1,805 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -185,6 +185,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-12: milestone 3 phase 5 batch 86 (26 routines): the Zelda-kidnapped dispatcher,
+  state runner, and twenty-three safe substates/helpers. Twenty-four local entries received stable
+  aliases. State F preserves its real call returning to the still-generated state 10 at `$7aca`,
+  then hands off with the live stack; the `$7b48` mini-dispatch also remains generated. Quality
+  review found fourteen raw generic-cutscene WRAM operands and replaced them with their existing
+  `ram.h` names; lint did not flag the readability regression. Gates: lint 0, 30k verify 0
+  mismatches (4,715,002 calls), whole-movie state hash clean (`64bddd0dfe384126`), ctest 8/8 in
+  both normal and quirk builds.
 
 - 2026-09-12: milestone 3 phase 5 batch 85 (17 routines): `func_782a` plus the Flame of Sorrow
   dispatcher, initialization, all twelve substates, and its local sound helper. Thirteen local
