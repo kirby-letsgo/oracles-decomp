@@ -18,6 +18,7 @@ void intro_titlescreen_state0_hook(GB *gb);
 void intro_titlescreen_state1_hook(GB *gb);
 void intro_titlescreen_state2_hook(GB *gb);
 void intro_titlescreen_state3_hook(GB *gb);
+void endgameCutsceneHandler_0f_hook(GB *gb);
 
 static uint16_t intro_jumpTable(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -1891,7 +1892,7 @@ void endgameCutsceneHandler_body_hook(GB *gb) {
       endgameCutsceneHandler_0a_hook(gb);
       return;
     case 0x5b64:
-      endgameCutsceneHandler_0f(gb);
+      endgameCutsceneHandler_0f_hook(gb);
       return;
     case 0x5854:
       endgameCutsceneHandler_20(gb);

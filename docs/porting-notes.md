@@ -551,3 +551,10 @@ desync to discover; keep them when porting routines.
   and register the generator's chosen name in `rewritten.txt`. Likewise, named state/substate
   bodies remain real hook boundaries: give disassembly-local addresses C-safe aliases in
   `extra.sym` and register their `_hook` shims instead of hiding them as file-local helpers.
+- A readiness report showing `callers: 0` does not make a named local block private. Batch 68's
+  seed-tree exit blocks and secret encoder/decoder loop and return blocks initially lived behind
+  file-local helpers because their only visible edges were fallthroughs or branches inside an
+  already rewritten parent. They still had symbol-table entries and independent reports, so they
+  were promoted to C-safe aliases and `_hook` shims. Treat reportability—not the current caller
+  count—as the boundary rule; dynamic dispatch and the final no-generated-routines sweep both
+  depend on every such address remaining hookable.
