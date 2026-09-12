@@ -2222,7 +2222,7 @@ void galeSeedMenu_state3_hook(GB *gb) {
   CYC(0x5fe0, 0x5fe2); A = 0xff;
   CYC(0x5fe2, 0x5fe5); W8(wWarpTransition2) = A;
   CYC(0x5fe5, 0x5fe8);
-  closeMenu(gb);
+  closeMenu_hook(gb);
 }
 
 void galeSeedMenu_addOffsetToWarpIndex_hook(GB *gb) {
@@ -2445,7 +2445,7 @@ void mapMenu_state1__checkInput_hook(GB *gb) {
   CYC(0x6131, 0x6133); alu_and(gb, 0x06);
   if (!(F & FZ)) {
     CYCT(0x6133, 0x6136);
-    closeMenu(gb);
+    closeMenu_hook(gb);
     return;
   }
   CYC(0x6133, 0x6136);
@@ -2519,7 +2519,7 @@ no_direction:
   CYC(0x6189, 0x618b); alu_and(gb, 0x06);
   if (!(F & FZ)) {
     CYCT(0x618b, 0x618e);
-    closeMenu(gb);
+    closeMenu_hook(gb);
     return;
   }
   CYC(0x618b, 0x618e);
@@ -3151,7 +3151,7 @@ void fileSelectDrawHeartsAndDeathCounter_hook(GB *gb) {
   CYC(0x4a8a, 0x4a8b); B = mem_rd(gb, HL);
   CYC(0x4a8b, 0x4a8c); C = A;
   CYC(0x4a8c, 0x4a8f); SET_HL(0xd14a);
-  CALL_C(0x4a8f, fileSelectDrawHeartDisplay, 0x5435, 0x4a92);
+  CALL_C(0x4a8f, fileSelectDrawHeartDisplay_hook, 0x5435, 0x4a92);
 done:
   CYC(0x4a92, 0x4a94); A = 0x08;
   CYC(0x4a94, 0x4a97); loadUncompressedGfxHeader_hook(gb);
@@ -3195,4 +3195,530 @@ void fileSelectDrawAcornCursor__func_hook(GB *gb) {
   CYC(0x4ac4, 0x4ac5); A = mem_rd(gb, DE);
   CYC(0x4ac5, 0x4ac6); C = A;
   CYC(0x4ac6, 0x4ac9); addSpritesToOam_withOffset_hook(gb);
+}
+
+void hideStatusBar_body_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4f2c, 0x4f2e); A = 0x04;
+  CYC(0x4f2e, 0x4f30); hram_wr(gb, 0x70, A);
+  CYC(0x4f30, 0x4f33); SET_HL(wDontUpdateStatusBar);
+  CYC(0x4f33, 0x4f34); A = mem_rd(gb, HL);
+  CYC(0x4f34, 0x4f36); mem_wr(gb, HL, 0xff);
+  CYC(0x4f36, 0x4f38); alu_cp(gb, 0x77);
+  CYC(0x4f38, 0x4f3a); A = 0x80;
+  if (!(F & FZ)) CYCT(0x4f3a, 0x4f3c);
+  else { CYC(0x4f3a, 0x4f3c); CYC(0x4f3c, 0x4f3d); alu_xor(gb, A); }
+  CYC(0x4f3d, 0x4f40); SET_HL(w4StatusBarAttributeMap);
+  CYC(0x4f40, 0x4f42); B = 0x40;
+  CALL_C(0x4f42, fillMemory_hook, 0x0470, 0x4f45);
+  CYC(0x4f45, 0x4f48); SET_HL(w4StatusBarTileMap);
+  CYC(0x4f48, 0x4f4a); B = 0x40;
+  CALL_C(0x4f4a, clearMemory_hook, 0x046f, 0x4f4d);
+  CYC(0x4f4d, 0x4f4e); alu_xor(gb, A);
+  CYC(0x4f4e, 0x4f51); W8(wStatusBarNeedsRefresh) = A;
+  CYC(0x4f51, 0x4f53); A = 0x03;
+  CALL_C(0x4f53, loadUncompressedGfxHeader_hook, 0x05da, 0x4f56);
+  CYC(0x4f56, 0x4f58); B = 0x10;
+  CYC(0x4f58, 0x4f5a); A = hram_rd(gb, 0x9f);
+  CYC(0x4f5a, 0x4f5b); alu_cp(gb, B);
+  if (!(F & FZ)) { CYCT(0x4f5b, 0x4f5c); ret_effect(gb); return; }
+  CYC(0x4f5b, 0x4f5c);
+  CYC(0x4f5c, 0x4f5e); A = 0xe0;
+  CYC(0x4f5e, 0x4f61); SET_HL(wOam);
+  CYC(0x4f61, 0x4f64); fillMemory_hook(gb);
+}
+
+void showStatusBar_body_hook(GB *gb) {
+  CYC(0x4f64, 0x4f65); alu_xor(gb, A);
+  CYC(0x4f65, 0x4f68); W8(wDontUpdateStatusBar) = A;
+  CYC(0x4f68, 0x4f69); A = alu_dec8(gb, A);
+  CYC(0x4f69, 0x4f6c); W8(wStatusBarNeedsRefresh) = A;
+  CYC(0x4f6c, 0x4f6d); ret_effect(gb);
+}
+
+void openMenu_body_hook(GB *gb) {
+  CYC(0x4f6d, 0x4f6e); A = C;
+  CYC(0x4f6e, 0x4f71); SET_HL(wOpenedMenuType);
+  CYC(0x4f71, 0x4f72); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4f72, 0x4f73); alu_xor(gb, A);
+  CYC(0x4f73, 0x4f74); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4f74, 0x4f75); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4f75, 0x4f76); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4f76, 0x4f79); W8(wTextIsActive) = A;
+  CYC(0x4f79, 0x4f7c); fastFadeoutToWhite_hook(gb);
+}
+
+void copyW2TilesetBgPalettesToW4PaletteData_body_hook(GB *gb) {
+  CYC(0x4f7c, 0x4f7f); SET_HL(w2TilesetBgPalettes);
+  CYC(0x4f7f, 0x4f82); SET_DE(w4PaletteData);
+  CYC(0x4f82, 0x4f84); B = 0x80;
+  do {
+    CYC(0x4f84, 0x4f86); A = 0x02;
+    CYC(0x4f86, 0x4f88); hram_wr(gb, 0x70, A);
+    CYC(0x4f88, 0x4f89); C = mem_rd(gb, HL);
+    CYC(0x4f89, 0x4f8a); L = alu_inc8(gb, L);
+    CYC(0x4f8a, 0x4f8c); A = 0x04;
+    CYC(0x4f8c, 0x4f8e); hram_wr(gb, 0x70, A);
+    CYC(0x4f8e, 0x4f8f); A = C;
+    CYC(0x4f8f, 0x4f90); mem_wr(gb, DE, A);
+    CYC(0x4f90, 0x4f91); SET_DE(DE + 1);
+    CYC(0x4f91, 0x4f92); B = alu_dec8(gb, B);
+    if (!(F & FZ)) CYCT(0x4f92, 0x4f94); else CYC(0x4f92, 0x4f94);
+  } while (!(F & FZ));
+  CYC(0x4f94, 0x4f96); A = 0xff;
+  CYC(0x4f96, 0x4f98); hram_wr(gb, 0xa6, A);
+  CYC(0x4f98, 0x4f9a); hram_wr(gb, 0xa7, A);
+  CYC(0x4f9a, 0x4f9b); ret_effect(gb);
+}
+
+void copyW4PaletteDataToW2TilesetBgPalettes_body_hook(GB *gb) {
+  CYC(0x4f9b, 0x4f9e); SET_HL(w4PaletteData);
+  CYC(0x4f9e, 0x4fa1); SET_DE(w2TilesetBgPalettes);
+  CYC(0x4fa1, 0x4fa3); B = 0x80;
+  do {
+    CYC(0x4fa3, 0x4fa5); A = 0x04;
+    CYC(0x4fa5, 0x4fa7); hram_wr(gb, 0x70, A);
+    CYC(0x4fa7, 0x4fa8); C = mem_rd(gb, HL);
+    CYC(0x4fa8, 0x4fa9); L = alu_inc8(gb, L);
+    CYC(0x4fa9, 0x4fab); A = 0x02;
+    CYC(0x4fab, 0x4fad); hram_wr(gb, 0x70, A);
+    CYC(0x4fad, 0x4fae); A = C;
+    CYC(0x4fae, 0x4faf); mem_wr(gb, DE, A);
+    CYC(0x4faf, 0x4fb0); SET_DE(DE + 1);
+    CYC(0x4fb0, 0x4fb1); B = alu_dec8(gb, B);
+    if (!(F & FZ)) CYCT(0x4fb1, 0x4fb3); else CYC(0x4fb1, 0x4fb3);
+  } while (!(F & FZ));
+  CYC(0x4fb3, 0x4fb5); A = 0xff;
+  CYC(0x4fb5, 0x4fb7); hram_wr(gb, 0xa6, A);
+  CYC(0x4fb7, 0x4fb9); hram_wr(gb, 0xa7, A);
+  CYC(0x4fb9, 0x4fba); ret_effect(gb);
+}
+
+void closeMenu_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4fba, 0x4fbd); SET_HL(wMenuLoadState);
+  CYC(0x4fbd, 0x4fbe); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x4fbe, 0x4fc1); A = W8(wOpenedMenuType);
+  CYC(0x4fc1, 0x4fc3); alu_cp(gb, 0x03);
+  CYC(0x4fc3, 0x4fc5); A = 0x55;
+  if (!(F & FZ)) CALL_C_CC(0x4fc5, playSound_b00_hook, 0x0c98, 0x4fc8);
+  else CYC(0x4fc5, 0x4fc8);
+  CYC(0x4fc8, 0x4fc9); alu_xor(gb, A);
+  CYC(0x4fc9, 0x4fcc); W8(wTextIsActive) = A;
+  CYC(0x4fcc, 0x4fcf); fastFadeoutToWhite_hook(gb);
+}
+
+void playHeartBeepAtInterval_hook(GB *gb) {
+  CYC(0x5142, 0x5145); A = W8(w1Link_id);
+  CYC(0x5145, 0x5146); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(0x5146, 0x5147); ret_effect(gb); return; }
+  CYC(0x5146, 0x5147);
+  CYC(0x5147, 0x514a); A = W8(wFrameCounter);
+  CYC(0x514a, 0x514c); alu_and(gb, 0x3f);
+  if (!(F & FZ)) { CYCT(0x514c, 0x514d); ret_effect(gb); return; }
+  CYC(0x514c, 0x514d);
+  CYC(0x514d, 0x5150); SET_HL(wLinkHealth);
+  CYC(0x5150, 0x5151); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5151, 0x5152); A = alu_dec8(gb, A);
+  CYC(0x5152, 0x5153); alu_add(gb, A);
+  if (F & FC) { CYCT(0x5153, 0x5154); ret_effect(gb); return; }
+  CYC(0x5153, 0x5154);
+  CYC(0x5154, 0x5155); alu_add(gb, A);
+  CYC(0x5155, 0x5156); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(0x5156, 0x5157); ret_effect(gb); return; }
+  CYC(0x5156, 0x5157);
+  CYC(0x5157, 0x5159); A = 0x60;
+  CYC(0x5159, 0x515c); playSound_b00_hook(gb);
+}
+
+void loadCommonGraphics_body_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x515c, disableLcd_hook, 0x02c1, 0x515f);
+  CYC(0x515f, 0x5161); A = 0x20;
+  CALL_C(0x5161, loadGfxHeader_hook, 0x0626, 0x5164);
+  CYC(0x5164, 0x5166); A = 0x83;
+  CALL_C(0x5166, loadGfxHeader_hook, 0x0626, 0x5169);
+  CYC(0x5169, 0x516a); alu_xor(gb, A);
+  CYC(0x516a, 0x516d); W8(wcbe8) = A;
+  CALL_C(0x516d, updateStatusBar_body, 0x518d, 0x5170);
+  CYC(0x5170, 0x5173); A = W8(wActiveGroup);
+  CYC(0x5173, 0x5175); alu_sub(gb, 0x02);
+  CYC(0x5175, 0x5177); alu_cp(gb, 0x02);
+  if (!(F & FC)) { CYCT(0x5177, 0x5179); goto done; }
+  CYC(0x5177, 0x5179);
+  CYC(0x5179, 0x517c); A = W8(wTilesetFlags);
+  CYC(0x517c, 0x517e); alu_and(gb, 0x40);
+  if (F & FZ) { CYCT(0x517e, 0x5180); goto done; }
+  CYC(0x517e, 0x5180);
+  CYC(0x5180, 0x5182); A = 0x44;
+  CALL_C(0x5182, loadGfxHeader_hook, 0x0626, 0x5185);
+  CYC(0x5185, 0x5187); A = 0x34;
+  CALL_C(0x5187, loadPaletteHeader_hook, 0x050b, 0x518a);
+done:
+  CYC(0x518a, 0x518d); checkReloadStatusBarGraphics_hook(gb);
+}
+
+void loadEquippedItemSpriteData_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x531e, loadTreasureDisplayData_b00_hook, 0x16d6, 0x5321);
+  CYC(0x5321, 0x5322); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5322, 0x5323); mem_wr(gb, DE, A);
+  CYC(0x5323, 0x5324); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5324, 0x5325); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x5325, 0x5327); loadEquippedItemSpriteData__clearItem_hook(gb); return; }
+  CYC(0x5325, 0x5327);
+  CYC(0x5327, 0x5328); E = alu_inc8(gb, E);
+  CYC(0x5328, 0x5329); B = A;
+  CYC(0x5329, 0x532b); alu_cp(gb, 0x84);
+  CYC(0x532b, 0x532c); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  if (!(F & FC)) { CYCT(0x532c, 0x532e); goto attr1; }
+  CYC(0x532c, 0x532e);
+  CYC(0x532e, 0x5330); alu_sub(gb, 0x03);
+  CYC(0x5330, 0x5332); alu_or(gb, 0x01);
+attr1:
+  CYC(0x5332, 0x5334); A |= 0x08;
+  CYC(0x5334, 0x5335); mem_wr(gb, DE, A);
+  CYC(0x5335, 0x5336); E = alu_inc8(gb, E);
+  CYC(0x5336, 0x5337); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5337, 0x5338); alu_or(gb, A);
+  CYC(0x5338, 0x5339); C = A;
+  if (F & FZ) { CYCT(0x5339, 0x533b); goto attr2; }
+  CYC(0x5339, 0x533b);
+  CYC(0x533b, 0x533c); alu_scf(gb);
+  CYC(0x533c, 0x533d); A = mem_rd(gb, HL);
+attr2:
+  CYC(0x533d, 0x533e); L = alu_inc8(gb, L);
+  CYC(0x533e, 0x5340); A |= 0x08;
+  CYC(0x5340, 0x5341); mem_wr(gb, DE, A);
+  CYC(0x5341, 0x5342); E = alu_inc8(gb, E);
+  CYC(0x5342, 0x5344); A = 0x08;
+  if (F & FC) CYCT(0x5344, 0x5346);
+  else { CYC(0x5344, 0x5346); CYC(0x5346, 0x5347); alu_xor(gb, A); }
+  CYC(0x5347, 0x5348); mem_wr(gb, DE, A);
+  CYC(0x5348, 0x5349); E = alu_inc8(gb, E);
+  CYC(0x5349, 0x534a); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x534a, 0x534b); mem_wr(gb, DE, A);
+  CYC(0x534b, 0x534c); alu_scf(gb);
+  CYC(0x534c, 0x534d); ret_effect(gb);
+}
+
+void loadEquippedItemSpriteData__clearItem_hook(GB *gb) {
+  CYC(0x534d, 0x534e); L = E;
+  CYC(0x534e, 0x534f); H = D;
+  CYC(0x534f, 0x5351); B = 0x05;
+  CYC(0x5351, 0x5353); A = 0xff;
+  do {
+    CYC(0x5353, 0x5354); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x5354, 0x5355); B = alu_dec8(gb, B);
+    if (!(F & FZ)) CYCT(0x5355, 0x5357); else CYC(0x5355, 0x5357);
+  } while (!(F & FZ));
+  CYC(0x5357, 0x5358); ret_effect(gb);
+}
+
+void drawItemTilesOnStatusBar_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5358, 0x535b); A = W8(wcbe8);
+  CYC(0x535b, 0x535d); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(0x535d, 0x535e); ret_effect(gb); return; }
+  CYC(0x535d, 0x535e);
+  CYC(0x535e, 0x5360); A = 0x04;
+  CYC(0x5360, 0x5362); hram_wr(gb, 0x70, A);
+  CYC(0x5362, 0x5365); A = W8(wInventoryB);
+  CYC(0x5365, 0x5368); SET_DE(wBItemTreasure);
+  CALL_C(0x5368, loadEquippedItemSpriteData_hook, 0x531e, 0x536b);
+  CYC(0x536b, 0x536e); A = W8(wInventoryA);
+  CYC(0x536e, 0x5371); SET_DE(wAItemTreasure);
+  CALL_C(0x5371, loadEquippedItemSpriteData_hook, 0x531e, 0x5374);
+  CALL_C(0x5374, func_02_52f6, 0x52f6, 0x5377);
+  CYC(0x5377, 0x537a); A = W8(wcbe8);
+  CYC(0x537a, 0x537b); alu_rrca(gb);
+  CYC(0x537b, 0x537e); SET_DE(w4StatusBarTileMap + 0x27);
+  if (!(F & FC)) CYCT(0x537e, 0x5380);
+  else { CYC(0x537e, 0x5380); CYC(0x5380, 0x5381); E = alu_dec8(gb, E); }
+  CYC(0x5381, 0x5384); A = W8(wAItemTreasure);
+  CYC(0x5384, 0x5385); B = A;
+  CYC(0x5385, 0x5388); A = W8(wAItemDisplayMode);
+  CALL_C(0x5388, drawItemTilesOnStatusBar__drawItem_hook, 0x5395, 0x538b);
+  CYC(0x538b, 0x538e); SET_DE(w4StatusBarTileMap + 0x22);
+  CYC(0x538e, 0x5391); A = W8(wBItemTreasure);
+  CYC(0x5391, 0x5392); B = A;
+  CYC(0x5392, 0x5395); A = W8(wBItemDisplayMode);
+  drawItemTilesOnStatusBar__drawItem_hook(gb);
+}
+
+void drawItemTilesOnStatusBar__drawItem_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5395, 0x5396); C = A;
+  CYC(0x5396, 0x5397); alu_rlca(gb);
+  if (F & FC) { CYCT(0x5397, 0x5398); ret_effect(gb); return; }
+  CYC(0x5397, 0x5398);
+  CYC(0x5398, 0x5399); A = B;
+  CALL_C(0x5399, checkTreasureObtained_hook, 0x1748, 0x539c);
+  CYC(0x539c, 0x539d); B = A;
+  CYC(0x539d, 0x539e); A = C;
+  CYC(0x539e, 0x53a0); C = 0x80;
+  drawTreasureExtraTiles_hook(gb);
+}
+
+void drawTreasureExtraTiles_hook(GB *gb) {
+  CYC(0x53a0, 0x53a2); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(0x53a2, 0x53a3); ret_effect(gb); return; }
+  CYC(0x53a2, 0x53a3);
+  CYC(0x53a3, 0x53a4); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(0x53a4, 0x53a6); drawTreasureExtraTiles__val01_hook(gb); return; }
+  CYC(0x53a4, 0x53a6);
+  CYC(0x53a6, 0x53a7); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(0x53a7, 0x53a9); drawTreasureExtraTiles__val02_hook(gb); return; }
+  CYC(0x53a7, 0x53a9);
+  CYC(0x53a9, 0x53aa); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(0x53aa, 0x53ac); drawTreasureExtraTiles__val03_hook(gb); return; }
+  CYC(0x53aa, 0x53ac);
+  CYC(0x53ac, 0x53ad); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(0x53ad, 0x53af); drawTreasureExtraTiles__val04_hook(gb); return; }
+  CYC(0x53ad, 0x53af);
+  CYC(0x53af, 0x53b1); drawTreasureExtraTiles__val00_hook(gb);
+}
+
+void drawTreasureExtraTiles__val04_hook(GB *gb) {
+  CYC(0x53b1, 0x53b2); E = alu_inc8(gb, E);
+  CYC(0x53b2, 0x53b3); A = B;
+  CYC(0x53b3, 0x53b5); alu_and(gb, 0x0f);
+  CYC(0x53b5, 0x53b7); alu_add(gb, 0x10);
+  CYC(0x53b7, 0x53b8); mem_wr(gb, DE, A);
+  CYC(0x53b8, 0x53ba); D |= 0x04;
+  CYC(0x53ba, 0x53bb); A = C;
+  CYC(0x53bb, 0x53bc); mem_wr(gb, DE, A);
+  CYC(0x53bc, 0x53bd); E = alu_dec8(gb, E);
+  CYC(0x53bd, 0x53be); mem_wr(gb, DE, A);
+  CYC(0x53be, 0x53c0); D &= ~0x04;
+  CYC(0x53c0, 0x53c2); A = 0x1b;
+  CYC(0x53c2, 0x53c3); mem_wr(gb, DE, A);
+  CYC(0x53c3, 0x53c4); ret_effect(gb);
+}
+
+void drawTreasureExtraTiles__val01_hook(GB *gb) {
+  CYC(0x53c4, 0x53c5); E = alu_inc8(gb, E);
+  CYC(0x53c5, 0x53c6); A = B;
+  CYC(0x53c6, 0x53c8); alu_and(gb, 0x0f);
+  CYC(0x53c8, 0x53ca); alu_add(gb, 0x10);
+  CYC(0x53ca, 0x53cb); mem_wr(gb, DE, A);
+  CYC(0x53cb, 0x53cd); D |= 0x04;
+  CYC(0x53cd, 0x53ce); A = C;
+  CYC(0x53ce, 0x53cf); mem_wr(gb, DE, A);
+  CYC(0x53cf, 0x53d0); E = alu_dec8(gb, E);
+  CYC(0x53d0, 0x53d1); mem_wr(gb, DE, A);
+  CYC(0x53d1, 0x53d3); D &= ~0x04;
+  CYC(0x53d3, 0x53d4); A = B;
+  CYC(0x53d4, 0x53d6); A = alu_swap(gb, A);
+  CYC(0x53d6, 0x53d8); alu_and(gb, 0x0f);
+  CYC(0x53d8, 0x53da); alu_add(gb, 0x10);
+  CYC(0x53da, 0x53db); mem_wr(gb, DE, A);
+  CYC(0x53db, 0x53dc); ret_effect(gb);
+}
+
+void drawTreasureExtraTiles__val00_hook(GB *gb) {
+  CYC(0x53dc, 0x53dd); E = alu_inc8(gb, E);
+  CYC(0x53dd, 0x53de); A = B;
+  CYC(0x53de, 0x53e0); alu_and(gb, 0x0f);
+  CYC(0x53e0, 0x53e2); alu_add(gb, 0x10);
+  CYC(0x53e2, 0x53e3); mem_wr(gb, DE, A);
+  CYC(0x53e3, 0x53e5); D |= 0x04;
+  CYC(0x53e5, 0x53e6); A = C;
+  CYC(0x53e6, 0x53e7); mem_wr(gb, DE, A);
+  CYC(0x53e7, 0x53e8); E = alu_dec8(gb, E);
+  CYC(0x53e8, 0x53e9); mem_wr(gb, DE, A);
+  CYC(0x53e9, 0x53eb); D &= ~0x04;
+  CYC(0x53eb, 0x53ed); A = 0x1a;
+  CYC(0x53ed, 0x53ee); mem_wr(gb, DE, A);
+  CYC(0x53ee, 0x53ef); ret_effect(gb);
+}
+
+void drawTreasureExtraTiles__val03_hook(GB *gb) {
+  CYC(0x53ef, 0x53f0); ret_effect(gb);
+}
+
+void drawTreasureExtraTiles__val02_hook(GB *gb) {
+  CYC(0x53f0, 0x53f1); H = D;
+  CYC(0x53f1, 0x53f2); L = E;
+  CYC(0x53f2, 0x53f3); A = C;
+  CYC(0x53f3, 0x53f5); alu_cp(gb, 0x07);
+  if (F & FZ) { CYCT(0x53f5, 0x53f7); drawTreasureExtraTiles__val02__drawOnInventory_hook(gb); return; }
+  CYC(0x53f5, 0x53f7);
+  CYC(0x53f7, 0x53f9); A = 0x1f;
+  CYC(0x53f9, 0x53fa); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x53fa, 0x53fc); mem_wr(gb, HL, 0x1d);
+  CYC(0x53fc, 0x53fe); H |= 0x04;
+  CYC(0x53fe, 0x5400); A = 0x80;
+  CYC(0x5400, 0x5401); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5401, 0x5402); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5402, 0x5404); mem_wr(gb, HL, 0x00);
+  CYC(0x5404, 0x5407); SET_BC(0xffe0);
+  CYC(0x5407, 0x5408); alu_add_hl(gb, BC);
+  CYC(0x5408, 0x540a); mem_wr(gb, HL, 0x00);
+  CYC(0x540a, 0x540b); L = alu_dec8(gb, L);
+  CYC(0x540b, 0x540c); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x540c, 0x540d); mem_wr(gb, HL, A);
+  CYC(0x540d, 0x540f); H &= ~0x04;
+  CYC(0x540f, 0x5411); A = 0x1c;
+  CYC(0x5411, 0x5412); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5412, 0x5414); mem_wr(gb, HL, 0x1e);
+  CYC(0x5414, 0x5415); ret_effect(gb);
+}
+
+void drawTreasureExtraTiles__val02__drawOnInventory_hook(GB *gb) {
+  CYC(0x5415, 0x5417); A = 0x1f;
+  CYC(0x5417, 0x5418); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x5418, 0x541a); mem_wr(gb, HL, 0x1d);
+  CYC(0x541a, 0x541c); H |= 0x04;
+  CYC(0x541c, 0x541e); A = 0x84;
+  CYC(0x541e, 0x541f); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x541f, 0x5420); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x5420, 0x5423); SET_BC(0xffe0);
+  CYC(0x5423, 0x5424); alu_add_hl(gb, BC);
+  CYC(0x5424, 0x5425); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5425, 0x5426); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x5426, 0x5428); H &= ~0x04;
+  CYC(0x5428, 0x542a); A = 0x1c;
+  CYC(0x542a, 0x542b); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x542b, 0x542d); mem_wr(gb, HL, 0x1e);
+  CYC(0x542d, 0x542e); ret_effect(gb);
+}
+
+void drawTreasureExtraTiles__drawTile_hook(GB *gb) {
+  CYC(0x542e, 0x542f); mem_wr(gb, HL, B);
+  CYC(0x542f, 0x5431); H |= 0x04;
+  CYC(0x5431, 0x5432); mem_wr(gb, HL, C);
+  CYC(0x5432, 0x5434); H &= ~0x04;
+  CYC(0x5434, 0x5435); ret_effect(gb);
+}
+
+void fileSelectDrawHeartDisplay_hook(GB *gb) {
+  CYC(0x5435, 0x5437); A = 0x01;
+  CYC(0x5437, 0x5439); hram_wr(gb, 0x8b, A);
+  CYC(0x5439, 0x543a); A = B;
+  CYC(0x543a, 0x543c); drawHeartDisplay_hook(gb);
+}
+
+void inGameDrawHeartDisplay_hook(GB *gb) {
+  CYC(0x543c, 0x543f); SET_HL(w4StatusBarTileMap + 0x0d);
+  CYC(0x543f, 0x5440); alu_xor(gb, A);
+  CYC(0x5440, 0x5442); hram_wr(gb, 0x8b, A);
+  CYC(0x5442, 0x5445); A = W8(wDisplayedHearts);
+  CYC(0x5445, 0x5446); C = A;
+  CYC(0x5446, 0x5449); A = W8(wLinkMaxHealth);
+  drawHeartDisplay_hook(gb);
+}
+
+void drawHeartDisplay_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5449, 0x544b); E = 0x07;
+  CYC(0x544b, 0x544d); alu_cp(gb, 0x39);
+  if (F & FC) CYCT(0x544d, 0x544f);
+  else { CYC(0x544d, 0x544f); CYC(0x544f, 0x5450); E = alu_inc8(gb, E); }
+  CYC(0x5450, 0x5452); A = alu_srl(gb, A);
+  CYC(0x5452, 0x5454); A = alu_srl(gb, A);
+  CYC(0x5454, 0x5455); B = A;
+  CYC(0x5455, 0x5456); A = C;
+  CYC(0x5456, 0x5458); alu_and(gb, 0x03);
+  CYC(0x5458, 0x5459); D = A;
+  CYC(0x5459, 0x545a); A = C;
+  CYC(0x545a, 0x545c); A = alu_srl(gb, A);
+  CYC(0x545c, 0x545e); A = alu_srl(gb, A);
+  CYC(0x545e, 0x545f); C = A;
+  CYC(0x545f, 0x5460); push_effect(gb, BC);
+  CYC(0x5460, 0x5461); alu_cp(gb, E);
+  if (F & FC) CYCT(0x5461, 0x5463);
+  else { CYC(0x5461, 0x5463); CYC(0x5463, 0x5464); C = E; }
+  CYC(0x5464, 0x5465); A = B;
+  CYC(0x5465, 0x5466); alu_cp(gb, E);
+  if (F & FC) CYCT(0x5466, 0x5468);
+  else { CYC(0x5466, 0x5468); CYC(0x5468, 0x5469); A = E; }
+  CYC(0x5469, 0x546a); alu_sub(gb, C);
+  CYC(0x546a, 0x546b); B = A;
+  CYC(0x546b, 0x546d); A = hram_rd(gb, 0x8b);
+  CYC(0x546d, 0x546e); alu_or(gb, E);
+  CYC(0x546e, 0x546f); alu_rrca(gb);
+  if (F & FC) CYCT(0x546f, 0x5471);
+  else { CYC(0x546f, 0x5471); CYC(0x5471, 0x5472); L = alu_dec8(gb, L); }
+  CYC(0x5472, 0x5473); push_effect(gb, HL);
+  CALL_C(0x5473, drawHeartDisplay__drawHeartDisplayRow_hook, 0x548a, 0x5476);
+  CYC(0x5476, 0x5477); SET_HL(pop_effect(gb));
+  CYC(0x5477, 0x5479); A = 0x20;
+  CYC(0x5479, 0x547a); push_effect(gb, 0x547a); add_a_to_hl(gb);
+  CYC(0x547a, 0x547b); SET_BC(pop_effect(gb));
+  CYC(0x547b, 0x547c); A = C;
+  CYC(0x547c, 0x547d); alu_sub(gb, E);
+  if (!(F & FC)) CYCT(0x547d, 0x547f);
+  else { CYC(0x547d, 0x547f); CYC(0x547f, 0x5480); alu_xor(gb, A); }
+  CYC(0x5480, 0x5481); C = A;
+  CYC(0x5481, 0x5482); A = B;
+  CYC(0x5482, 0x5483); alu_sub(gb, E);
+  CYC(0x5483, 0x5484); alu_sub(gb, C);
+  CYC(0x5484, 0x5486); alu_bit(gb, 7, A);
+  if (F & FZ) CYCT(0x5486, 0x5488);
+  else { CYC(0x5486, 0x5488); CYC(0x5488, 0x5489); alu_xor(gb, A); }
+  CYC(0x5489, 0x548a); B = A;
+  drawHeartDisplay__drawHeartDisplayRow_hook(gb);
+}
+
+void drawHeartDisplay__drawHeartDisplayRow_hook(GB *gb) {
+  CYC(0x548a, 0x548b); A = C;
+  CYC(0x548b, 0x548c); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x548c, 0x548e); drawHeartDisplay__partiallyFilledHeart_hook(gb); return; }
+  CYC(0x548c, 0x548e);
+  drawHeartDisplay__filledHearts_hook(gb);
+}
+
+void drawHeartDisplay__filledHearts_hook(GB *gb) {
+  CYC(0x548e, 0x5490); A = 0x0f;
+  do {
+    CYC(0x5490, 0x5491); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x5491, 0x5492); C = alu_dec8(gb, C);
+    if (!(F & FZ)) CYCT(0x5492, 0x5494); else CYC(0x5492, 0x5494);
+  } while (!(F & FZ));
+  drawHeartDisplay__partiallyFilledHeart_hook(gb);
+}
+
+void drawHeartDisplay__partiallyFilledHeart_hook(GB *gb) {
+  CYC(0x5494, 0x5495); A = B;
+  CYC(0x5495, 0x5496); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x5496, 0x5498); drawHeartDisplay__fillBlankSpace_hook(gb); return; }
+  CYC(0x5496, 0x5498);
+  CYC(0x5498, 0x5499); A = D;
+  CYC(0x5499, 0x549a); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x549a, 0x549c); drawHeartDisplay__unfilledHearts_hook(gb); return; }
+  CYC(0x549a, 0x549c);
+  CYC(0x549c, 0x549e); alu_add(gb, 0x0b);
+  CYC(0x549e, 0x549f); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x549f, 0x54a1); D = 0;
+  CYC(0x54a1, 0x54a2); B = alu_dec8(gb, B);
+  drawHeartDisplay__unfilledHearts_hook(gb);
+}
+
+void drawHeartDisplay__unfilledHearts_hook(GB *gb) {
+  CYC(0x54a2, 0x54a3); A = B;
+  CYC(0x54a3, 0x54a4); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x54a4, 0x54a6); drawHeartDisplay__fillBlankSpace_hook(gb); return; }
+  CYC(0x54a4, 0x54a6);
+  CYC(0x54a6, 0x54a8); A = 0x0b;
+  do {
+    CYC(0x54a8, 0x54a9); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x54a9, 0x54aa); B = alu_dec8(gb, B);
+    if (!(F & FZ)) CYCT(0x54aa, 0x54ac); else CYC(0x54aa, 0x54ac);
+  } while (!(F & FZ));
+  drawHeartDisplay__fillBlankSpace_hook(gb);
+}
+
+void drawHeartDisplay__fillBlankSpace_hook(GB *gb) {
+  CYC(0x54ac, 0x54ae); A = hram_rd(gb, 0x8b);
+  CYC(0x54ae, 0x54af); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x54af, 0x54b0); ret_effect(gb); return; }
+  CYC(0x54af, 0x54b0);
+  CYC(0x54b0, 0x54b2); C = 0x08;
+  do {
+    CYC(0x54b2, 0x54b3); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x54b3, 0x54b4); C = alu_dec8(gb, C);
+    if (!(F & FZ)) CYCT(0x54b4, 0x54b6); else CYC(0x54b4, 0x54b6);
+  } while (!(F & FZ));
+  CYC(0x54b6, 0x54b7); ret_effect(gb);
 }

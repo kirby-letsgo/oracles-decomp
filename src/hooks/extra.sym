@@ -466,3 +466,17 @@
 02:4907 textInput_mapUpperXToLowerX__label
 02:49de loadFileDisplayVariables__nextFile
 02:4abe fileSelectDrawAcornCursor__func
+02:534d loadEquippedItemSpriteData__clearItem
+02:5395 drawItemTilesOnStatusBar__drawItem
+02:53b1 drawTreasureExtraTiles__val04
+02:53c4 drawTreasureExtraTiles__val01
+02:53dc drawTreasureExtraTiles__val00
+02:53ef drawTreasureExtraTiles__val03
+02:53f0 drawTreasureExtraTiles__val02
+02:5415 drawTreasureExtraTiles__val02__drawOnInventory
+02:542e drawTreasureExtraTiles__drawTile
+02:548a drawHeartDisplay__drawHeartDisplayRow
+02:548e drawHeartDisplay__filledHearts
+02:5494 drawHeartDisplay__partiallyFilledHeart
+02:54a2 drawHeartDisplay__unfilledHearts
+02:54ac drawHeartDisplay__fillBlankSpace
