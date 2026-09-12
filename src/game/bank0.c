@@ -9122,7 +9122,7 @@ void updateAllObjects_hook(GB *gb) {
   switch_bank(gb, 0x3489, 0x00);
   CALL_ROM(0x3490, ROM_updateInteractions);
   switch_bank(gb, 0x3493, 0x01);
-  CALL_ROM(0x349a, ROM_b01_func_4000);
+  CALL_C(0x349a, func_4000_b01_hook, ROM_b01_func_4000, 0x349d);
   switch_bank(gb, 0x349d, 0x05);
   CYC(0x34a4, 0x34a7); A = W8(wLinkObjectIndex);
   alu_rrca(gb);
@@ -12891,7 +12891,7 @@ void mainThreadStart_hook(GB *gb) {
     CYC(0x33ba, 0x33bc);
     CYC(0x33bc, 0x33be); H8(hRomBank) = A;
     CYC(0x33be, 0x33c1); mem_wr(gb, MBC_ROM_BANK, A);
-    CALL_C(0x33c1, runGameLogic, ROM_runGameLogic, 0x33c4);
+    CALL_C(0x33c1, runGameLogic_hook, ROM_runGameLogic, 0x33c4);
     CALL_C(0x33c4, drawAllSprites_hook, ROM_drawAllSprites, 0x33c7);
     CALL_C(0x33c7, checkReloadStatusBarGraphics_hook, ROM_checkReloadStatusBarGraphics, 0x33ca);
     CALL_C(0x33ca, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, 0x33cd);

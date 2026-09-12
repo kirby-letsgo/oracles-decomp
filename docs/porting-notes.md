@@ -743,3 +743,10 @@ desync to discover; keep them when porting routines.
   byte at bank-0 `$05df`, so after burning the jump it uses `hook_continue(gb, 0x05df, sp0_)`.
   `hook_handoff` would incorrectly turn an ordinary static jump into a thread switch, while calling
   the nearby graphics-loader hook would silently repair behavior that exists in the actual ROM.
+- A source symbol can collide across banks even when the generated hook names are disambiguated.
+  Batch 117 initially put `func_4000` in `rewritten.txt`; regeneration consequently tried to rewrite
+  both bank 1 and the unrelated bank 16 routine at `$4000`, then required a nonexistent bank-16 C
+  hook. Register the generator's canonical `func_4000_b01` name when only that bank is readable.
+  The same batch promoted `func_5c6b` to readable C, exposing its caller's thread-capable return at
+  `$4ca4`; add a real post-call alias whenever promoting a callee removes the generated continuation
+  that previously handled a possible thread switch.

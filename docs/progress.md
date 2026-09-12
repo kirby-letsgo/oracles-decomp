@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,446 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,477 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -142,6 +142,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   roots; only the deliberately corrupted garbage tail remains generated in that bank.
   Batch 116 reproduced that twelve-entry corrupted tail literally, making bank 2 fully readable
   and deleting its generated C file.
+  Batch 117 added bank 1's game-logic and initialization roots, standard-game-state dispatcher,
+  room-loading continuations, and the remaining room-transition cutscene roots; bank 1 now has
+  289 of 297 entries readable.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -247,6 +250,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 5 batch 117 (31 routines): added bank 1's game-logic and
+  initialization roots, loading-room flow, standard-game-state dispatcher, cutscenes 00/01/03/04/05,
+  and the remaining cutscene 15/18/19 room-loading paths. Ten thread-resumption entries received
+  stable aliases, including the newly required continuation at `$4ca4`, and the two bank-0 callers
+  now dispatch directly to readable C. Registration uses the canonical `func_4000_b01` name so the
+  unrelated bank-16 `$4000` collision remains generated. Two independent instruction-level reviews
+  approved every cycle range, branch, stack effect, and continuation. Gates: lint 0, 30k verify 0
+  failures across 4,753,465 calls, full replay 0 failures across 13,627,189 calls with state
+  `64bddd0dfe384126`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 5 batch 116 (12 routines): reproduced the deliberately corrupted
   bank-2 rectangle-copy tail in readable C, including three stable row-loop aliases, the call into
   data at `$7de3`, and the final jump into the middle of a bank-0 instruction at `$05df`. The first

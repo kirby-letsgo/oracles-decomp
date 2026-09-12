@@ -4478,3 +4478,624 @@ void checkLockBG7Color3ToBlack__thing1_hook(GB *gb) {
 void checkLockBG7Color3ToBlack__thing0_hook(GB *gb) {
   CYC(0x592d, 0x592e); ret_effect(gb);
 }
+
+void func_4000_b01_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4000, 0x4003); A = W8(wScrollMode);
+  CYC(0x4003, 0x4004); alu_or(gb, A);
+  if (!(F & FZ)) CALL_C_CC(0x4004, func_400b_hook, 0x400b, 0x4007);
+  else CYC(0x4004, 0x4007);
+  CYC(0x4007, 0x4008); alu_xor(gb, A);
+  CYC(0x4008, 0x400a); mem_wr(gb, IO_SVBK, A);
+  CYC(0x400a, 0x400b); ret_effect(gb);
+}
+
+void runGameLogic_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x596a, 0x596d); A = mem_rd(gb, wThreadStateBuffer + 0x0e);
+  CYC(0x596d, 0x596e); bank1_jump_table_from_rst(gb, 0x596e);
+  hook_continue(gb, HL, sp0_);
+}
+
+static void initialize_game(GB *gb, uint16_t entry, uint16_t sp0_) {
+  if (entry == 0x598f) goto not_gba_mode;
+  if (entry == 0x59ac) goto fix_respawn;
+  if (entry == 0x5a00) goto reset_health;
+  if (entry == 0x5a45) goto summon_link;
+
+  CYC(0x5976, 0x5979); SET_HL(wOamEnd);
+  CYC(0x5979, 0x597c); SET_BC(0x0460);
+  CALL_C(0x597c, clearMemoryBc_hook, 0x0475, 0x597f);
+  CALL_C(0x597f, clearScreenVariablesAndWramBank1_hook, 0x35a3, 0x5982);
+  CALL_C(0x5982, initializeSeedTreeRefillData_hook, 0x60b5, 0x5985);
+  CYC(0x5985, 0x5987); A = 0x0f;
+  CALL_C(0x5987, loadPaletteHeader_hook, 0x050b, 0x598a);
+  CYC(0x598a, 0x598c); A = H8(hGameboyType);
+  CYC(0x598c, 0x598d); alu_rlca(gb);
+  if (F & FC) { CYCT(0x598d, 0x598f); goto load_respawn; }
+  CYC(0x598d, 0x598f);
+
+not_gba_mode:
+  CYC(0x598f, 0x5992); SET_HL(wDeathRespawnBuffer);
+  CYC(0x5992, 0x5993); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5993, 0x5994); L = mem_rd(gb, HL);
+  CYC(0x5994, 0x5995); H = A;
+  CYC(0x5995, 0x5998); SET_BC(0x03fe);
+  CALL_C(0x5998, compareHlToBc_hook, 0x01d6, 0x599b);
+  if (F & FZ) { CYCT(0x599b, 0x599d); goto fix_respawn; }
+  CYC(0x599b, 0x599d);
+  CYC(0x599d, 0x59a0); SET_BC(0x0158);
+  CALL_C(0x59a0, compareHlToBc_hook, 0x01d6, 0x59a3);
+  if (!(F & FZ)) { CYCT(0x59a3, 0x59a5); goto load_respawn; }
+  CYC(0x59a3, 0x59a5);
+  CYC(0x59a5, 0x59a8); A = W8(wDeathRespawnBuffer_x);
+  CYC(0x59a8, 0x59aa); alu_cp(gb, 0x40);
+  if (F & FC) { CYCT(0x59aa, 0x59ac); goto load_respawn; }
+  CYC(0x59aa, 0x59ac);
+
+fix_respawn:
+  CYC(0x59ac, 0x59ae); C = 0x03;
+  CALL_C(0x59ae, loadDeathRespawnBufferPreset_hook, 0x5ea4, 0x59b1);
+
+load_respawn:
+  CYC(0x59b1, 0x59b4); A = W8(wFileIsLinkedGame);
+  CYC(0x59b4, 0x59b7); W8(wIsLinkedGame) = A;
+  CYC(0x59b7, 0x59ba); SET_HL(wDeathRespawnBuffer);
+  CYC(0x59ba, 0x59bb); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x59bb, 0x59be); W8(wActiveGroup) = A;
+  CYC(0x59be, 0x59bf); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x59bf, 0x59c2); W8(wActiveRoom) = A;
+  CYC(0x59c2, 0x59c3); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x59c3, 0x59c6); W8(wRoomStateModifier) = A;
+  CYC(0x59c6, 0x59c8); A = 0x03;
+  CYC(0x59c8, 0x59cb); mem_wr(gb, w1Link_enabled, A);
+  CYC(0x59cb, 0x59cc); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x59cc, 0x59cf); mem_wr(gb, w1Link_direction, A);
+  CYC(0x59cf, 0x59d2); W8(wLinkLocalRespawnDir) = A;
+  CYC(0x59d2, 0x59d3); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x59d3, 0x59d6); mem_wr(gb, w1Link_yh, A);
+  CYC(0x59d6, 0x59d9); W8(wLinkLocalRespawnY) = A;
+  CYC(0x59d9, 0x59da); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x59da, 0x59dd); mem_wr(gb, w1Link_xh, A);
+  CYC(0x59dd, 0x59e0); W8(wLinkLocalRespawnX) = A;
+  CYC(0x59e0, 0x59e1); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x59e1, 0x59e4); W8(wRememberedCompanionId) = A;
+  CYC(0x59e4, 0x59e5); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x59e5, 0x59e8); W8(wRememberedCompanionGroup) = A;
+  CYC(0x59e8, 0x59e9); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x59e9, 0x59ec); W8(wRememberedCompanionRoom) = A;
+  CYC(0x59ec, 0x59ed); L = alu_inc8(gb, L);
+  CYC(0x59ed, 0x59ee); L = alu_inc8(gb, L);
+  CYC(0x59ee, 0x59ef); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x59ef, 0x59f2); W8(wRememberedCompanionY) = A;
+  CYC(0x59f2, 0x59f3); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x59f3, 0x59f6); W8(wRememberedCompanionX) = A;
+  CYC(0x59f6, 0x59f8); L = 0xaa;
+  CYC(0x59f8, 0x59f9); A = mem_rd(gb, HL);
+  CYC(0x59f9, 0x59fa); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x59fa, 0x59fc); goto reset_health; }
+  CYC(0x59fa, 0x59fc);
+  CYC(0x59fc, 0x59fe); alu_bit(gb, 7, A);
+  if (F & FZ) { CYCT(0x59fe, 0x5a00); goto health_ready; }
+  CYC(0x59fe, 0x5a00);
+
+reset_health:
+  CYC(0x5a00, 0x5a01); L = alu_inc8(gb, L);
+  CYC(0x5a01, 0x5a02); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x5a02, 0x5a04); A = alu_srl(gb, A);
+  CYC(0x5a04, 0x5a06); alu_and(gb, 0xfc);
+  CYC(0x5a06, 0x5a08); alu_cp(gb, 0x0c);
+  if (!(F & FC)) { CYCT(0x5a08, 0x5a0a); goto health_ready; }
+  CYC(0x5a08, 0x5a0a);
+  CYC(0x5a0a, 0x5a0c); A = 0x0c;
+
+health_ready:
+  CYC(0x5a0c, 0x5a0d); mem_wr(gb, HL, A);
+  CYC(0x5a0d, 0x5a10); W8(wDisplayedHearts) = A;
+  CYC(0x5a10, 0x5a12); A = 0x88;
+  CYC(0x5a12, 0x5a15); mem_wr(gb, w1Link_invincibilityCounter, A);
+  CYC(0x5a15, 0x5a17); L = 0xad;
+  CYC(0x5a17, 0x5a18); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5a18, 0x5a1b); W8(wDisplayedRupees) = A;
+  CYC(0x5a1b, 0x5a1c); A = mem_rd(gb, HL);
+  CYC(0x5a1c, 0x5a1f); mem_wr(gb, wDisplayedRupees + 1, A);
+  CALL_C(0x5a1f, loadScreenMusicAndSetRoomPack_hook, 0x341a, 0x5a22);
+  CYC(0x5a22, 0x5a24); A = 0xff;
+  CYC(0x5a24, 0x5a27); W8(wActiveMusic) = A;
+  CYC(0x5a27, 0x5a2a); W8(wcc05) = A;
+  CYC(0x5a2a, 0x5a2c); A = 0x21;
+  CALL_C(0x5a2c, checkGlobalFlag_hook, 0x31f3, 0x5a2f);
+  if (!(F & FZ)) {
+    CYCT(0x5a2f, 0x5a31);
+    func_5a60_hook(gb);
+    return;
+  }
+  CYC(0x5a2f, 0x5a31);
+  CYC(0x5a31, 0x5a33); A = 0x3d;
+  CALL_C(0x5a33, checkGlobalFlag_hook, 0x31f3, 0x5a36);
+  if (!(F & FZ)) { CYCT(0x5a36, 0x5a38); goto summon_link; }
+  CYC(0x5a36, 0x5a38);
+  CYC(0x5a38, 0x5a3a); A = 0x02;
+  CYC(0x5a3a, 0x5a3d); mem_wr(gb, wThreadStateBuffer + 0x0e, A);
+  CYC(0x5a3d, 0x5a3f); A = 0x0d;
+  CYC(0x5a3f, 0x5a42); mem_wr(gb, wThreadStateBuffer + 0x0f, A);
+  CYC(0x5a42, 0x5a45); cutscene0d_hook(gb); return;
+
+summon_link:
+  CYC(0x5a45, 0x5a47); A = 0x03;
+  CYC(0x5a47, 0x5a4a); mem_wr(gb, wThreadStateBuffer + 0x0e, A);
+  CYC(0x5a4a, 0x5a4b); alu_xor(gb, A);
+  CYC(0x5a4b, 0x5a4e); mem_wr(gb, w1Link_enabled, A);
+  CYC(0x5a4e, 0x5a4f); ret_effect(gb);
+}
+
+void initializeGame_hook(GB *gb) { initialize_game(gb, 0x5976, gb->sp); }
+void initializeGame__notGbaMode_hook(GB *gb) { initialize_game(gb, 0x598f, gb->sp); }
+void initializeGame__fixRespawnForGbc_hook(GB *gb) { initialize_game(gb, 0x59ac, gb->sp); }
+void initializeGame__resetHealth_hook(GB *gb) { initialize_game(gb, 0x5a00, gb->sp); }
+void initializeGame__summonLinkCutscene_hook(GB *gb) { initialize_game(gb, 0x5a45, gb->sp); }
+
+static void func_5a60_after_initialize_room(GB *gb, uint16_t sp0_) {
+  CALL_C(0x5aad, checkDisplayEraOrSeasonInfo_hook, 0x5e7d, 0x5ab0);
+  CALL_C(0x5ab0, updateGrassAnimationModifier_hook, 0x5e9e, 0x5ab3);
+  CALL_C(0x5ab3, checkPlayRoomMusic_hook, 0x5e4d, 0x5ab6);
+  CALL_C(0x5ab6, checkUpdateDungeonMinimap_hook, 0x5945, 0x5ab9);
+  CYC(0x5ab9, 0x5abc); func_593a_hook(gb);
+}
+
+void func_5a60_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x5a60, clearOam_hook, 0x049f, 0x5a63);
+  CALL_C(0x5a63, initializeVramMaps_hook, 0x04cd, 0x5a66);
+  CALL_C(0x5a66, clearMemoryOnScreenReload_hook, 0x49af, 0x5a69);
+  CALL_C(0x5a69, clearScreenVariables_hook, 0x35a6, 0x5a6c);
+  CALL_C(0x5a6c, clearEnemiesKilledList_b00_hook, 0x3205, 0x5a6f);
+  CALL_C(0x5a6f, clearAllParentItems_hook, 0x2c10, 0x5a72);
+  CALL_C(0x5a72, dropLinkHeldItem_hook, 0x2c43, 0x5a75);
+  CALL_C(0x5a75, loadScreenMusicAndSetRoomPack_hook, 0x341a, 0x5a78);
+  CALL_C(0x5a78, loadTilesetData_hook, 0x3889, 0x5a7b);
+  CALL_C(0x5a7b, loadTilesetGraphics_hook, 0x3796, 0x5a7e);
+  CYC(0x5a7e, 0x5a81); A = W8(wLoadingRoomPack);
+  CYC(0x5a81, 0x5a84); W8(wRoomPack) = A;
+  CALL_C(0x5a84, loadDungeonLayout_hook, 0x2daa, 0x5a87);
+  CYC(0x5a87, 0x5a89); A = 0x02;
+  CYC(0x5a89, 0x5a8c); mem_wr(gb, wThreadStateBuffer + 0x0e, A);
+  CYC(0x5a8c, 0x5a8d); alu_xor(gb, A);
+  CYC(0x5a8d, 0x5a90); mem_wr(gb, wThreadStateBuffer + 0x0f, A);
+  CYC(0x5a90, 0x5a93); W8(wWarpTransition2) = A;
+  CYC(0x5a93, 0x5a96); W8(wSwitchState) = A;
+  CYC(0x5a96, 0x5a99); W8(wToggleBlocksState) = A;
+  CYC(0x5a99, 0x5a9b); A = 0x02;
+  CYC(0x5a9b, 0x5a9e); W8(wScrollMode) = A;
+  CALL_C(0x5a9e, loadTilesetAndRoomLayout_hook, 0x38a5, 0x5aa1);
+  CALL_C(0x5aa1, loadRoomCollisions_hook, 0x157b, 0x5aa4);
+  CALL_C(0x5aa4, generateVramTilesWithRoomChanges_hook, 0x3a4e, 0x5aa7);
+  CALL_C(0x5aa7, setEnteredWarpPosition_hook, 0x5c82, 0x5aaa);
+  CALL_C(0x5aaa, initializeRoom_hook, 0x30fe, 0x5aad);
+  func_5a60_after_initialize_room(gb, sp0_);
+}
+
+void func_5a60__afterCall5aad_hook(GB *gb) {
+  func_5a60_after_initialize_room(gb, gb->sp);
+}
+
+void loadingRoom_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x5a4f, clearScreenVariablesAndWramBank1_hook, 0x35a3, 0x5a52);
+  CALL_C(0x5a52, clearStaticObjects_hook, 0x319f, 0x5a55);
+  CALL_C(0x5a55, stopTextThread_hook, 0x184d, 0x5a58);
+  CYC(0x5a58, 0x5a5a); A = 0xff;
+  CYC(0x5a5a, 0x5a5d); W8(wActiveMusic) = A;
+  CALL_C(0x5a5d, applyWarpDest_hook, 0x3406, 0x5a60);
+  func_5a60_hook(gb);
+}
+
+void standardGameState_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x5abc, 0x5abf); A = W8(wLinkDeathTrigger);
+  CYC(0x5abf, 0x5ac1); alu_cp(gb, 0xff);
+  if (!(F & FZ)) CYCT(0x5ac1, 0x5ac3);
+  else {
+    CYC(0x5ac1, 0x5ac3);
+    CYC(0x5ac3, 0x5ac5); A = 0xfc;
+    CALL_C(0x5ac5, playSound_b00_hook, 0x0c98, 0x5ac8);
+    CYC(0x5ac8, 0x5aca); A = 0xe7;
+    CYC(0x5aca, 0x5acd); W8(wLinkDeathTrigger) = A;
+  }
+  CYC(0x5acd, 0x5ad0); A = W8(wGameOverScreenTrigger);
+  CYC(0x5ad0, 0x5ad1); alu_or(gb, A);
+  if (F & FZ) CYCT(0x5ad1, 0x5ad3);
+  else {
+    CYC(0x5ad1, 0x5ad3);
+    CYC(0x5ad3, 0x5ad5); A = 0xe0;
+    CYC(0x5ad5, 0x5ad8); SET_BC(0x1b10);
+    CALL_C(0x5ad8, threadRestart_hook, 0x08a3, 0x5adb);
+    CYC(0x5adb, 0x5ade); stubThreadStart_hook(gb);
+    return;
+  }
+  CYC(0x5ade, 0x5ae1); A = mem_rd(gb, wThreadStateBuffer + 0x0f);
+  CYC(0x5ae1, 0x5ae2); bank1_jump_table_from_rst(gb, 0x5ae2);
+  hook_continue(gb, HL, sp0_);
+}
+
+static void cutscene00_after_object_gfx(GB *gb, uint16_t sp0_) {
+  CALL_C(0x5b4e, setVisitedRoomFlag_hook, 0x2dd1, 0x5b51);
+  CALL_C(0x5b51, checkUpdateDungeonMinimap_hook, 0x5945, 0x5b54);
+  CYC(0x5b54, 0x5b56); A = 0x01;
+  CYC(0x5b56, 0x5b59); mem_wr(gb, wThreadStateBuffer + 0x0f, A);
+  CALL_C(0x5b59, playCompassSoundIfKeyInRoom_hook, 0x4a58, 0x5b5c);
+  CALL_C(0x5b5c, updateLastToggleBlocksState_hook, 0x7c65, 0x5b5f);
+  CALL_C(0x5b5f, checkInitUnderwaterWaves_hook, 0x626e, 0x5b62);
+  CYC(0x5b62, 0x5b65); updateGrassAnimationModifier_hook(gb);
+}
+
+static void cutscene00_after_tree_gfx(GB *gb, uint16_t sp0_) {
+  CYC(0x5b2f, 0x5b32); A = W8(wScrollMode);
+  CYC(0x5b32, 0x5b34); alu_cp(gb, 0x01);
+  if (!(F & FZ)) { CYCT(0x5b34, 0x5b35); ret_effect(gb); return; }
+  CYC(0x5b34, 0x5b35);
+  CALL_C(0x5b35, setInstrumentsDisabledCounterAndScrollMode_hook, 0x19a2, 0x5b38);
+  CYC(0x5b38, 0x5b39); alu_xor(gb, A);
+  CYC(0x5b39, 0x5b3c); W8(wDisableLinkCollisionsAndMenu) = A;
+  CYC(0x5b3c, 0x5b3f); A = W8(wcc05);
+  CYC(0x5b3f, 0x5b41); alu_bit(gb, 7, A);
+  if (F & FZ) CYCT(0x5b41, 0x5b43);
+  else {
+    CYC(0x5b41, 0x5b43);
+    CYC(0x5b43, 0x5b45); A = 0xff;
+    CYC(0x5b45, 0x5b48); W8(wcc05) = A;
+  }
+  CALL_C(0x5b48, clearObjectsWithEnabled2_hook, 0x4a17, 0x5b4b);
+  CALL_C(0x5b4b, refreshObjectGfx_hook, 0x1618, 0x5b4e);
+  cutscene00_after_object_gfx(gb, sp0_);
+}
+
+void cutscene00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x5b26, updateStatusBar_hook, 0x1a9c, 0x5b29);
+  CALL_C(0x5b29, updateAllObjects_hook, 0x345b, 0x5b2c);
+  CALL_C(0x5b2c, refreshLoadedTreeGfx_hook, 0x1613, 0x5b2f);
+  cutscene00_after_tree_gfx(gb, sp0_);
+}
+
+void cutscene00__afterCall5b2f_hook(GB *gb) { cutscene00_after_tree_gfx(gb, gb->sp); }
+void cutscene00__afterCall5b4e_hook(GB *gb) { cutscene00_after_object_gfx(gb, gb->sp); }
+
+static void cutscene01_after_initialize_room(GB *gb, uint16_t sp0_) {
+  (void)sp0_;
+  CYC(0x5bd5, 0x5bd8); checkPlayRoomMusic_hook(gb);
+}
+
+static void cutscene01_after_tree_gfx(GB *gb, uint16_t sp0_) {
+  CALL_C(0x5b68, updateLinkBeingShocked_hook, 0x4a81, 0x5b6b);
+  CALL_C(0x5b6b, updateMenus_hook, 0x1a51, 0x5b6e);
+  if (!(F & FZ)) { CYCT(0x5b6e, 0x5b6f); ret_effect(gb); return; }
+  CYC(0x5b6e, 0x5b6f);
+  CALL_C(0x5b6f, updatePirateShip_hook, 0x7dcc, 0x5b72);
+  CALL_C(0x5b72, updateAllObjects_hook, 0x345b, 0x5b75);
+  CALL_C(0x5b75, checkUpdateUnderwaterWaves_hook, 0x6282, 0x5b78);
+  CYC(0x5b78, 0x5b7b); SET_HL(0x7a3a);
+  CYC(0x5b7b, 0x5b7d); E = 0x02;
+  CALL_C(0x5b7d, interBankCall_hook, 0x008a, 0x5b80);
+  CALL_C(0x5b80, updateStatusBar_hook, 0x1a9c, 0x5b83);
+  CALL_C(0x5b83, checkUpdateToggleBlocks_hook, 0x7c6c, 0x5b86);
+  CYC(0x5b86, 0x5b89); A = W8(wCutsceneTrigger);
+  CYC(0x5b89, 0x5b8a); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x5b8a, 0x5b8d);
+    setCutsceneIndexIfCutsceneTriggerSet_hook(gb);
+    return;
+  }
+  CYC(0x5b8a, 0x5b8d);
+  CALL_C(0x5b8d, func_60e9_hook, 0x60e9, 0x5b90);
+  CYC(0x5b90, 0x5b93); A = W8(wWarpTransition2);
+  CYC(0x5b93, 0x5b94); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x5b94, 0x5b97);
+    applyWarpTransition2_hook(gb);
+    return;
+  }
+  CYC(0x5b94, 0x5b97);
+  CALL_C(0x5b97, getNextActiveRoom_hook, 0x5f45, 0x5b9a);
+  if (!(F & FC)) {
+    CYCT(0x5b9a, 0x5b9d);
+    checkEnemyAndPartCollisionsIfTextInactive_hook(gb);
+    return;
+  }
+  CYC(0x5b9a, 0x5b9d);
+  CALL_C(0x5b9d, checkDisableUnderwaterWaves_hook, 0x62b4, 0x5ba0);
+  CALL_C(0x5ba0, updateSeedTreeRefillData_hook, 0x6016, 0x5ba3);
+  CYC(0x5ba3, 0x5ba5); A = 0x05;
+  CALL_C(0x5ba5, addToGashaMaturity_hook, 0x1821, 0x5ba8);
+  CALL_C(0x5ba8, func_49c9_hook, 0x49c9, 0x5bab);
+  CALL_C(0x5bab, setObjectsEnabledTo2_hook, 0x49d7, 0x5bae);
+  CALL_C(0x5bae, loadScreenMusic_hook, 0x33cf, 0x5bb1);
+  CALL_C(0x5bb1, loadTilesetData_hook, 0x3889, 0x5bb4);
+  CALL_C(0x5bb4, checkRoomPack_hook, 0x5edd, 0x5bb7);
+  if (!(F & FZ)) {
+    CYCT(0x5bb7, 0x5bba);
+    triggerFadeoutTransition_hook(gb);
+    return;
+  }
+  CYC(0x5bb7, 0x5bba);
+  CYC(0x5bba, 0x5bbd); A = W8(wActiveRoom);
+  CYC(0x5bbd, 0x5bc0); W8(wLoadingRoom) = A;
+  CYC(0x5bc0, 0x5bc2); A = 0x08;
+  CYC(0x5bc2, 0x5bc5); W8(wScrollMode) = A;
+  CYC(0x5bc5, 0x5bc6); alu_xor(gb, A);
+  CYC(0x5bc6, 0x5bc9); mem_wr(gb, wThreadStateBuffer + 0x0f, A);
+  CALL_C(0x5bc9, loadTilesetAndRoomLayout_hook, 0x38a5, 0x5bcc);
+  CALL_C(0x5bcc, loadRoomCollisions_hook, 0x157b, 0x5bcf);
+  CALL_C(0x5bcf, generateVramTilesWithRoomChanges_hook, 0x3a4e, 0x5bd2);
+  CALL_C(0x5bd2, initializeRoom_hook, 0x30fe, 0x5bd5);
+  cutscene01_after_initialize_room(gb, sp0_);
+}
+
+void cutscene01_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x5b65, refreshLoadedTreeGfx_hook, 0x1613, 0x5b68);
+  cutscene01_after_tree_gfx(gb, sp0_);
+}
+
+void cutscene01__afterCall5b68_hook(GB *gb) { cutscene01_after_tree_gfx(gb, gb->sp); }
+void cutscene01__afterCall5bd5_hook(GB *gb) { cutscene01_after_initialize_room(gb, gb->sp); }
+
+static void func_5c18_after_initialize_room(GB *gb, uint16_t sp0_) {
+  CALL_C(0x5c52, checkDisplayEraOrSeasonInfo_hook, 0x5e7d, 0x5c55);
+  CALL_C(0x5c55, checkDarkenRoomAndClearPaletteFadeState_hook, 0x430d, 0x5c58);
+  CALL_C(0x5c58, fadeinFromWhiteToRoom_hook, 0x336b, 0x5c5b);
+  CALL_C(0x5c5b, checkPlayRoomMusic_hook, 0x5e4d, 0x5c5e);
+  CYC(0x5c5e, 0x5c5f); alu_xor(gb, A);
+  CYC(0x5c5f, 0x5c62); mem_wr(gb, wThreadStateBuffer + 0x0f, A);
+  CYC(0x5c62, 0x5c65); W8(wDontUpdateStatusBar) = A;
+  CALL_C(0x5c65, func_593a_hook, 0x593a, 0x5c68);
+  CYC(0x5c68, 0x5c6b); resetCamera_hook(gb);
+}
+
+void func_5c18_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x5c18, checkUpdateDungeonMinimap_hook, 0x5945, 0x5c1b);
+  CYC(0x5c1b, 0x5c1e); SET_HL(w1Companion_id);
+  CYC(0x5c1e, 0x5c1f); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x5c1f, 0x5c21); alu_cp(gb, 0x13);
+  if (!(F & FZ)) CYCT(0x5c21, 0x5c23);
+  else {
+    CYC(0x5c21, 0x5c23);
+    CYC(0x5c23, 0x5c25); alu_bit(gb, 1, mem_rd(gb, HL));
+    if (!(F & FZ)) CYCT(0x5c25, 0x5c27);
+    else {
+      CYC(0x5c25, 0x5c27);
+      CYC(0x5c27, 0x5c29); B = 0x40;
+      CALL_C(0x5c29, clearMemory_hook, 0x046f, 0x5c2c);
+      CYC(0x5c2c, 0x5c2e); A = 0xd0;
+      CYC(0x5c2e, 0x5c31); W8(wLinkObjectIndex) = A;
+    }
+  }
+  CYC(0x5c31, 0x5c34); A = W8(wLinkGrabState2);
+  CYC(0x5c34, 0x5c36); alu_and(gb, 0xf0);
+  CYC(0x5c36, 0x5c38); alu_cp(gb, 0x40);
+  if (F & FZ) CYCT(0x5c38, 0x5c3a);
+  else {
+    CYC(0x5c38, 0x5c3a);
+    CALL_C(0x5c3a, dropLinkHeldItem_hook, 0x2c43, 0x5c3d);
+    CALL_C(0x5c3d, clearAllParentItems_hook, 0x2c10, 0x5c40);
+  }
+  CYC(0x5c40, 0x5c43); A = W8(wLoadingRoomPack);
+  CYC(0x5c43, 0x5c46); W8(wRoomPack) = A;
+  CALL_C(0x5c46, setInstrumentsDisabledCounterAndScrollMode_hook, 0x19a2, 0x5c49);
+  CALL_C(0x5c49, setEnteredWarpPosition_hook, 0x5c82, 0x5c4c);
+  CALL_C(0x5c4c, calculateRoomEdge_hook, 0x5f00, 0x5c4f);
+  CALL_C(0x5c4f, initializeRoom_hook, 0x30fe, 0x5c52);
+  func_5c18_after_initialize_room(gb, sp0_);
+}
+
+void func_5c18__afterCall5c52_hook(GB *gb) { func_5c18_after_initialize_room(gb, gb->sp); }
+
+static void cutscene03_after_object_gfx(GB *gb, uint16_t sp0_) {
+  CYC(0x5c03, 0x5c05); A = 0x0a;
+  CYC(0x5c05, 0x5c08); W8(wLinkForceState) = A;
+  CYC(0x5c08, 0x5c0b); A = mem_rd(gb, wWarpTransition);
+  CYC(0x5c0b, 0x5c0d); alu_or(gb, 0x80);
+  CYC(0x5c0d, 0x5c10); mem_wr(gb, wWarpTransition, A);
+  CYC(0x5c10, 0x5c13); A = W8(wDungeonIndex);
+  CYC(0x5c13, 0x5c15); alu_cp(gb, 0xff);
+  if (F & FZ) CALL_C_CC(0x5c15, clearEnemiesKilledList_b00_hook, 0x3205, 0x5c18);
+  else CYC(0x5c15, 0x5c18);
+  func_5c18_hook(gb);
+}
+
+void cutscene03_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x5bd8, 0x5bdb); A = W8(wPaletteThread_mode);
+  CYC(0x5bdb, 0x5bdc); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x5bdc, 0x5bdd); ret_effect(gb); return; }
+  CYC(0x5bdc, 0x5bdd);
+  CALL_C(0x5bdd, disableLcd_hook, 0x02c1, 0x5be0);
+  CALL_C(0x5be0, clearOam_hook, 0x049f, 0x5be3);
+  CALL_C(0x5be3, clearScreenVariablesAndWramBank1_hook, 0x35a3, 0x5be6);
+  CALL_C(0x5be6, clearMemoryOnScreenReload_hook, 0x49af, 0x5be9);
+  CALL_C(0x5be9, stopTextThread_hook, 0x184d, 0x5bec);
+  CYC(0x5bec, 0x5bee); A = 0x0f;
+  CALL_C(0x5bee, loadPaletteHeader_hook, 0x050b, 0x5bf1);
+  CALL_C(0x5bf1, applyWarpDest_hook, 0x3406, 0x5bf4);
+  CALL_C(0x5bf4, loadTilesetData_hook, 0x3889, 0x5bf7);
+  CALL_C(0x5bf7, loadTilesetGraphics_hook, 0x3796, 0x5bfa);
+  CALL_C(0x5bfa, loadDungeonLayout_hook, 0x2daa, 0x5bfd);
+  CALL_C(0x5bfd, func_131f_hook, 0x131f, 0x5c00);
+  CALL_C(0x5c00, reloadObjectGfx_b00_hook, 0x1630, 0x5c03);
+  cutscene03_after_object_gfx(gb, sp0_);
+}
+
+void cutscene03__afterCall5c03_hook(GB *gb) { cutscene03_after_object_gfx(gb, gb->sp); }
+
+static void func_5c6b_after_initialize_room(GB *gb, uint16_t sp0_) {
+  CALL_C(0x5c74, checkDisplayEraOrSeasonInfo_hook, 0x5e7d, 0x5c77);
+  CALL_C(0x5c77, checkDarkenRoomAndClearPaletteFadeState_hook, 0x430d, 0x5c7a);
+  CYC(0x5c7a, 0x5c7c); A = 0x02;
+  CALL_C(0x5c7c, fadeinFromWhiteWithDelay_hook, 0x3284, 0x5c7f);
+  CYC(0x5c7f, 0x5c82); resetCamera_hook(gb);
+}
+
+void func_5c6b_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x5c6b, setEnteredWarpPosition_hook, 0x5c82, 0x5c6e);
+  CALL_C(0x5c6e, calculateRoomEdge_hook, 0x5f00, 0x5c71);
+  CALL_C(0x5c71, initializeRoom_hook, 0x30fe, 0x5c74);
+  func_5c6b_after_initialize_room(gb, sp0_);
+}
+
+void func_5c6b__afterCall5c74_hook(GB *gb) { func_5c6b_after_initialize_room(gb, gb->sp); }
+
+static void cutscene04_05_common(GB *gb, uint16_t sp0_) {
+  CALL_C(0x5cc4, setInteractionsEnabledTo2_hook, 0x49f1, 0x5cc7);
+  CALL_C(0x5cc7, clearObjectsWithEnabled2_hook, 0x4a17, 0x5cca);
+  CALL_C(0x5cca, clearItems_hook, 0x35e3, 0x5ccd);
+  CALL_C(0x5ccd, clearEnemies_hook, 0x35f4, 0x5cd0);
+  CALL_C(0x5cd0, clearParts_hook, 0x3605, 0x5cd3);
+  CALL_C(0x5cd3, clearReservedInteraction0_hook, 0x35c2, 0x5cd6);
+  CYC(0x5cd6, 0x5cd9); A = W8(wScreenTransitionDirection);
+  CYC(0x5cd9, 0x5cdb); H8(hFF92) = A;
+  CALL_C(0x5cdb, clearScreenVariables_hook, 0x35a6, 0x5cde);
+  CYC(0x5cde, 0x5ce0); A = H8(hFF92);
+  CYC(0x5ce0, 0x5ce3); W8(wScreenTransitionDirection) = A;
+  CALL_C(0x5ce3, clearMemoryOnScreenReload_hook, 0x49af, 0x5ce6);
+  CALL_C(0x5ce6, loadScreenMusicAndSetRoomPack_hook, 0x341a, 0x5ce9);
+  CALL_C(0x5ce9, loadTilesetData_hook, 0x3889, 0x5cec);
+  CALL_C(0x5cec, loadTilesetGraphics_hook, 0x3796, 0x5cef);
+  CALL_C(0x5cef, func_131f_hook, 0x131f, 0x5cf2);
+  CYC(0x5cf2, 0x5cf5); SET_DE(w1Link_yh);
+  CALL_C(0x5cf5, getShortPositionFromDE_hook, 0x209b, 0x5cf8);
+  CYC(0x5cf8, 0x5cfb); W8(wWarpDestPos) = A;
+  CYC(0x5cfb, 0x5cfe); func_5c18_hook(gb);
+}
+
+void cutscene04_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x5c8c, 0x5c8f); A = W8(wPaletteThread_mode);
+  CYC(0x5c8f, 0x5c90); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x5c90, 0x5c91); ret_effect(gb); return; }
+  CYC(0x5c90, 0x5c91);
+  CALL_C(0x5c91, disableLcd_hook, 0x02c1, 0x5c94);
+  CYC(0x5c94, 0x5c97); A = W8(wWarpDestGroup);
+  CYC(0x5c97, 0x5c99); alu_and(gb, 0x07);
+  CYC(0x5c99, 0x5c9c); W8(wActiveGroup) = A;
+  CYC(0x5c9c, 0x5c9f); A = W8(wWarpDestRoom);
+  CYC(0x5c9f, 0x5ca2); W8(wActiveRoom) = A;
+  CYC(0x5ca2, 0x5ca5); A = W8(wLinkObjectIndex);
+  CYC(0x5ca5, 0x5ca6); H = A;
+  CYC(0x5ca6, 0x5ca8); L = 0x0b;
+  CYC(0x5ca8, 0x5cab); A = W8(wWarpDestPos);
+  CALL_C(0x5cab, setShortPosition_hook, 0x20b8, 0x5cae);
+  CALL_C(0x5cae, disableLcd_hook, 0x02c1, 0x5cb1);
+  CALL_C(0x5cb1, clearOam_hook, 0x049f, 0x5cb4);
+  CYC(0x5cb4, 0x5cb6);
+  cutscene04_05_common(gb, sp0_);
+}
+
+void cutscene05_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x5cb6, 0x5cb9); A = W8(wPaletteThread_mode);
+  CYC(0x5cb9, 0x5cba); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x5cba, 0x5cbb); ret_effect(gb); return; }
+  CYC(0x5cba, 0x5cbb);
+  CALL_C(0x5cbb, disableLcd_hook, 0x02c1, 0x5cbe);
+  CALL_C(0x5cbe, clearOam_hook, 0x049f, 0x5cc1);
+  CALL_C(0x5cc1, func_5cfe_hook, 0x5cfe, 0x5cc4);
+  cutscene04_05_common(gb, sp0_);
+}
+
+void cutscene15_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4bf0, cutscene15__update_hook, 0x4bf9, 0x4bf3);
+  CALL_C(0x4bf3, updateStatusBar_hook, 0x1a9c, 0x4bf6);
+  CYC(0x4bf6, 0x4bf9); updateSpecialObjectsAndInteractions_hook(gb);
+}
+
+static void cutscene15_substate2_after_room(GB *gb, uint16_t sp0_) {
+  CYC(0x4ca4, 0x4ca7); A = W8(wActiveGroup);
+  CYC(0x4ca7, 0x4ca9); alu_cp(gb, 0x03);
+  if (!(F & FZ)) CYCT(0x4ca9, 0x4cab);
+  else {
+    CYC(0x4ca9, 0x4cab);
+    CYC(0x4cab, 0x4cac); alu_xor(gb, A);
+    CYC(0x4cac, 0x4caf); W8(wMinimapGroup) = A;
+    CYC(0x4caf, 0x4cb2); A = W8(wActiveRoom);
+    CYC(0x4cb2, 0x4cb4); alu_cp(gb, 0xab);
+    CYC(0x4cb4, 0x4cb6); A = 0xf7;
+    if (F & FZ) CYCT(0x4cb6, 0x4cb8);
+    else {
+      CYC(0x4cb6, 0x4cb8);
+      CYC(0x4cb8, 0x4cba); A = 0x04;
+    }
+    CYC(0x4cba, 0x4cbd); W8(wMinimapRoom) = A;
+  }
+  CALL_C(0x4cbd, loadCommonGraphics_hook, 0x1a98, 0x4cc0);
+  CYC(0x4cc0, 0x4cc3); SET_HL(0x3b36);
+  CYC(0x4cc3, 0x4cc5); E = 0x00;
+  CALL_C(0x4cc5, interBankCall_hook, 0x008a, 0x4cc8);
+  CYC(0x4cc8, 0x4cca); A = 0x02;
+  CALL_C(0x4cca, loadGfxRegisterStateIndex_hook, 0x02ea, 0x4ccd);
+  CYC(0x4ccd, 0x4ccf); A = 0x10;
+  CYC(0x4ccf, 0x4cd2); W8(wGfxRegs2_LYC) = A;
+  CYC(0x4cd2, 0x4cd4); A = 0xf0;
+  CYC(0x4cd4, 0x4cd7); W8(wGfxRegs2_SCY) = A;
+  CYC(0x4cd7, 0x4cd9); A = 0x02;
+  CYC(0x4cd9, 0x4cdb); H8(hNextLcdInterruptBehaviour) = A;
+  CYC(0x4cdb, 0x4cde); SET_HL(wCutsceneState);
+  CYC(0x4cde, 0x4cdf); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x4cdf, 0x4ce0); alu_xor(gb, A);
+  CYC(0x4ce0, 0x4ce3); W8(wGenericCutscene_cbb3) = A;
+  CYC(0x4ce3, 0x4ce6); W8(wLinkForceState) = A;
+  CYC(0x4ce6, 0x4ce8); A = 0x08;
+  CYC(0x4ce8, 0x4ceb); mem_wr(gb, wWarpTransition, A);
+  CYC(0x4ceb, 0x4ced); A = 0x81;
+  CYC(0x4ced, 0x4cf0); W8(wDisabledObjects) = A;
+  CYC(0x4cf0, 0x4cf1); ret_effect(gb);
+}
+
+void cutscene15__state1__substate2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x4c74, disableLcd_hook, 0x02c1, 0x4c77);
+  CALL_C(0x4c77, clearOam_hook, 0x049f, 0x4c7a);
+  CYC(0x4c7a, 0x4c7b); alu_xor(gb, A);
+  CYC(0x4c7b, 0x4c7d); mem_wr(gb, IO_SVBK, A);
+  CYC(0x4c7d, 0x4c80); SET_HL(0xd040);
+  CYC(0x4c80, 0x4c83); SET_BC(0x0fc0);
+  CALL_C(0x4c83, clearMemoryBc_hook, 0x0475, 0x4c86);
+  CALL_C(0x4c86, clearScreenVariables_hook, 0x35a6, 0x4c89);
+  CALL_C(0x4c89, clearMemoryOnScreenReload_hook, 0x49af, 0x4c8c);
+  CALL_C(0x4c8c, stopTextThread_hook, 0x184d, 0x4c8f);
+  CALL_C(0x4c8f, applyWarpDest_hook, 0x3406, 0x4c92);
+  CALL_C(0x4c92, loadTilesetData_hook, 0x3889, 0x4c95);
+  CALL_C(0x4c95, loadTilesetGraphics_hook, 0x3796, 0x4c98);
+  CALL_C(0x4c98, loadDungeonLayout_hook, 0x2daa, 0x4c9b);
+  CALL_C(0x4c9b, func_131f_hook, 0x131f, 0x4c9e);
+  CALL_C(0x4c9e, clearEnemiesKilledList_b00_hook, 0x3205, 0x4ca1);
+  CALL_C(0x4ca1, func_5c6b_hook, 0x5c6b, 0x4ca4);
+  cutscene15_substate2_after_room(gb, sp0_);
+}
+
+void cutscene15__state1__substate2__afterCall4ca4_hook(GB *gb) {
+  cutscene15_substate2_after_room(gb, gb->sp);
+}
+
+static void cutscene18_19(GB *gb, uint16_t entry, uint16_t sp0_) {
+  if (entry == 0x4d16) {
+    CYC(0x4d16, 0x4d18); C = 0x00;
+    CYC(0x4d18, 0x4d1a);
+  } else {
+    CYC(0x4d1a, 0x4d1c); C = 0x01;
+  }
+  CYC(0x4d1c, 0x4d1f); SET_HL(0x4b0a);
+  CYC(0x4d1f, 0x4d21); E = 0x03;
+  CALL_C(0x4d21, interBankCall_hook, 0x008a, 0x4d24);
+  CALL_C(0x4d24, refreshLoadedTreeGfx_hook, 0x1613, 0x4d27);
+  CYC(0x4d27, 0x4d2a); updateAllObjects_hook(gb);
+}
+
+void cutscene18_hook(GB *gb) { cutscene18_19(gb, 0x4d16, gb->sp); }
+void cutscene19_hook(GB *gb) { cutscene18_19(gb, 0x4d1a, gb->sp); }
+
+void cutscene18__afterCall4d27_hook(GB *gb) {
+  CYC(0x4d27, 0x4d2a); updateAllObjects_hook(gb);
+}
