@@ -103,8 +103,33 @@ void twinrovaRevealCutsceneHandler__state3_hook(GB *gb);
 void twinrovaRevealCutsceneHandler__state5_hook(GB *gb);
 void twinrovaRevealCutsceneHandler__state7_hook(GB *gb);
 void twinrovaRevealCutsceneHandler__state8_hook(GB *gb);
+void func_701d_hook(GB *gb);
+void func_701d__state0_hook(GB *gb);
+void func_701d__func_702f_hook(GB *gb);
+void func_701d__state1_hook(GB *gb);
+void func_701d__cbb3_00_hook(GB *gb);
+void func_701d__cbb3_01_hook(GB *gb);
+void wallRetraction_dungeon8_hook(GB *gb);
+void wallRetraction_dungeon8__state0_hook(GB *gb);
+void wallRetraction_dungeon8__state1_hook(GB *gb);
+void wallRetraction_dungeon8__cbb3_01_hook(GB *gb);
+void d2Collapse_incState_hook(GB *gb);
+void d2Collapse_incCBB3_hook(GB *gb);
+void func_7168_hook(GB *gb);
+void func_7168__state0_hook(GB *gb);
+void func_7168__state1_hook(GB *gb);
+void func_7168__state2_hook(GB *gb);
+void func_7168__cbb3_00_hook(GB *gb);
+void func_7168__func_71d0_hook(GB *gb);
+void func_7168__cbb3_01_hook(GB *gb);
+void func_7168__cbb3_02_hook(GB *gb);
+void func_7168__cbb3_03_hook(GB *gb);
+void func_7168__state3_hook(GB *gb);
+void func_7168__state4_hook(GB *gb);
+void func_stub_hook(GB *gb);
 
 static void maku_tree_disappearing_body(GB *gb, uint16_t sp0_);
+static void func_7168_cbb3_01_02_body(GB *gb, uint16_t sp0_);
 
 static void add_a_to_hl(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -1826,6 +1851,322 @@ void cutscene_decCBB3whenFadeDone_hook(GB *gb) {
   }
   CYC(0x6f9a, 0x6f9b);
   CYC(0x6f9b, 0x6f9e); decCbb3_hook(gb);
+}
+
+void func_701d_hook(GB *gb) {
+  CYC(0x701d, 0x7020); A = mem_rd(gb, wDungeonIndex);
+  CYC(0x7020, 0x7022); alu_cp(gb, 0x08);
+  if (F & FZ) {
+    CYCT(0x7022, 0x7025);
+    wallRetraction_dungeon8_hook(gb);
+    return;
+  }
+  CYC(0x7022, 0x7025);
+  CYC(0x7025, 0x7028); A = mem_rd(gb, wCutsceneState);
+  CYC(0x7028, 0x7029); push_effect(gb, 0x7029);
+  switch (misc_cutscene_jump_table(gb)) {
+    case 0x702d: func_701d__state0_hook(gb); return;
+    case 0x7053: func_701d__state1_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void func_701d__state0_hook(GB *gb) {
+  CYC(0x702d, 0x702f); A = 0x72;
+  func_701d__func_702f_hook(gb);
+}
+
+void func_701d__func_702f_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x702f, loadGfxHeader_hook, 0x0626, 0x7032);
+  CYC(0x7032, 0x7034); B = 0x10;
+  CYC(0x7034, 0x7037); SET_HL(wTmpcbb3);
+  CALL_C(0x7037, clearMemory_hook, 0x046f, 0x703a);
+  CALL_C(0x703a, reloadTileMap_hook, 0x12fc, 0x703d);
+  CALL_C(0x703d, resetCamera_hook, 0x12ce, 0x7040);
+  CALL_C(0x7040, getThisRoomFlags_hook, 0x197d, 0x7043);
+  CYC(0x7043, 0x7045); mem_wr(gb, HL, mem_rd(gb, HL) | 0x40);
+  CALL_C(0x7045, loadTilesetAndRoomLayout_hook, 0x38a5, 0x7048);
+  CYC(0x7048, 0x704a); A = 0x3c;
+  CYC(0x704a, 0x704d); mem_wr(gb, wTmpcbb4, A);
+  CYC(0x704d, 0x704e); alu_xor(gb, A);
+  CYC(0x704e, 0x7051); mem_wr(gb, wScrollMode, A);
+  CYC(0x7051, 0x7053);
+  cutscene_incState_hook(gb);
+}
+
+void func_701d__state1_hook(GB *gb) {
+  CYC(0x7053, 0x7056); A = mem_rd(gb, wTmpcbb3);
+  CYC(0x7056, 0x7057); push_effect(gb, 0x7057);
+  switch (misc_cutscene_jump_table(gb)) {
+    case 0x705b: func_701d__cbb3_00_hook(gb); return;
+    case 0x7063: func_701d__cbb3_01_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void func_701d__cbb3_00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x705b, cutscene_tickDownCBB4ThenSetTo30_hook, 0x700b, 0x705e);
+  if (!(F & FZ)) { CYCT(0x705e, 0x705f); ret_effect(gb); return; }
+  CYC(0x705e, 0x705f);
+  CYC(0x705f, 0x7061); mem_wr(gb, HL, 0x3c);
+  CYC(0x7061, 0x7063);
+  cutscene_incCBB3_hook(gb);
+}
+
+void func_701d__cbb3_01_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7063, 0x7065); A = 0x3c;
+  CALL_C(0x7065, setScreenShakeCounter_hook, 0x24bb, 0x7068);
+  CALL_C(0x7068, cutscene_tickDownCBB4ThenSetTo30_hook, 0x700b, 0x706b);
+  if (!(F & FZ)) { CYCT(0x706b, 0x706c); ret_effect(gb); return; }
+  CYC(0x706b, 0x706c);
+  CYC(0x706c, 0x706e); mem_wr(gb, HL, 0x19);
+  CYC(0x706e, 0x7071); SET_HL(0x6bf1);
+  CYC(0x7071, 0x7073); E = 0x04;
+  CALL_C(0x7073, interBankCall_hook, 0x008a, 0x7076);
+  CYC(0x7076, 0x7079); SET_BC(0x260c);
+  CALL_C(0x7079, func_70f7_hook, 0x70f7, 0x707c);
+  CYC(0x707c, 0x707d); alu_xor(gb, A);
+  CYC(0x707d, 0x707f); hram_wr(gb, 0x70, A);
+  CALL_C(0x707f, reloadTileMap_hook, 0x12fc, 0x7082);
+  CYC(0x7082, 0x7084); A = 0x70;
+  CALL_C(0x7084, playSound_b00_hook, 0x0c98, 0x7087);
+  CYC(0x7087, 0x708a); SET_HL(wTmpcbb7);
+  CYC(0x708a, 0x708b); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x708b, 0x708c); A = mem_rd(gb, HL);
+  CYC(0x708c, 0x708e); alu_cp(gb, 0x0f);
+  if (F & FC) { CYCT(0x708e, 0x708f); ret_effect(gb); return; }
+  CYC(0x708e, 0x708f);
+  CALL_C(0x708f, func_7098_hook, 0x7098, 0x7092);
+  CYC(0x7092, 0x7094); A = 0x0f;
+  CYC(0x7094, 0x7097); mem_wr(gb, 0xce5d, A);
+  CYC(0x7097, 0x7098); ret_effect(gb);
+}
+
+void wallRetraction_dungeon8_hook(GB *gb) {
+  CYC(0x70b4, 0x70b7); A = mem_rd(gb, wCutsceneState);
+  CYC(0x70b7, 0x70b8); push_effect(gb, 0x70b8);
+  switch (misc_cutscene_jump_table(gb)) {
+    case 0x70bc: wallRetraction_dungeon8__state0_hook(gb); return;
+    case 0x70c1: wallRetraction_dungeon8__state1_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void wallRetraction_dungeon8__state0_hook(GB *gb) {
+  CYC(0x70bc, 0x70be); A = 0x73;
+  CYC(0x70be, 0x70c1);
+  func_701d__func_702f_hook(gb);
+}
+
+void wallRetraction_dungeon8__state1_hook(GB *gb) {
+  CYC(0x70c1, 0x70c4); A = mem_rd(gb, wTmpcbb3);
+  CYC(0x70c4, 0x70c5); push_effect(gb, 0x70c5);
+  switch (misc_cutscene_jump_table(gb)) {
+    case 0x705b: func_701d__cbb3_00_hook(gb); return;
+    case 0x70c9: wallRetraction_dungeon8__cbb3_01_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void wallRetraction_dungeon8__cbb3_01_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x70c9, 0x70cb); A = 0x3c;
+  CALL_C(0x70cb, setScreenShakeCounter_hook, 0x24bb, 0x70ce);
+  CALL_C(0x70ce, cutscene_tickDownCBB4ThenSetTo30_hook, 0x700b, 0x70d1);
+  if (!(F & FZ)) { CYCT(0x70d1, 0x70d2); ret_effect(gb); return; }
+  CYC(0x70d1, 0x70d2);
+  CYC(0x70d2, 0x70d4); mem_wr(gb, HL, 0x19);
+  CYC(0x70d4, 0x70d7); SET_HL(0x6bf1);
+  CYC(0x70d7, 0x70d9); E = 0x04;
+  CALL_C(0x70d9, interBankCall_hook, 0x008a, 0x70dc);
+  CYC(0x70dc, 0x70df); SET_BC(0x4d04);
+  CALL_C(0x70df, func_70f7_hook, 0x70f7, 0x70e2);
+  CYC(0x70e2, 0x70e3); alu_xor(gb, A);
+  CYC(0x70e3, 0x70e5); hram_wr(gb, 0x70, A);
+  CALL_C(0x70e5, reloadTileMap_hook, 0x12fc, 0x70e8);
+  CYC(0x70e8, 0x70ea); A = 0x70;
+  CALL_C(0x70ea, playSound_b00_hook, 0x0c98, 0x70ed);
+  CYC(0x70ed, 0x70f0); SET_HL(wTmpcbb7);
+  CYC(0x70f0, 0x70f1); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x70f1, 0x70f2); A = mem_rd(gb, HL);
+  CYC(0x70f2, 0x70f4); alu_cp(gb, 0x0b);
+  if (F & FC) { CYCT(0x70f4, 0x70f5); ret_effect(gb); return; }
+  CYC(0x70f4, 0x70f5);
+  CYC(0x70f5, 0x70f7);
+  func_7098_hook(gb);
+}
+
+void d2Collapse_incState_hook(GB *gb) {
+  CYC(0x715e, 0x7161); SET_HL(wCutsceneState);
+  CYC(0x7161, 0x7162); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x7162, 0x7163); ret_effect(gb);
+}
+
+void d2Collapse_incCBB3_hook(GB *gb) {
+  CYC(0x7163, 0x7166); SET_HL(wTmpcbb3);
+  CYC(0x7166, 0x7167); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x7167, 0x7168); ret_effect(gb);
+}
+
+void func_7168_hook(GB *gb) {
+  CYC(0x7168, 0x716b); A = mem_rd(gb, wCutsceneState);
+  CYC(0x716b, 0x716c); push_effect(gb, 0x716c);
+  switch (misc_cutscene_jump_table(gb)) {
+    case 0x7176: func_7168__state0_hook(gb); return;
+    case 0x7196: func_7168__state1_hook(gb); return;
+    case 0x71b1: func_7168__state2_hook(gb); return;
+    case 0x720b: func_7168__state3_hook(gb); return;
+    case 0x7212: func_7168__state4_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void func_7168__state0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7176, 0x7178); B = 0x10;
+  CYC(0x7178, 0x717b); SET_HL(wTmpcbb3);
+  CALL_C(0x717b, clearMemory_hook, 0x046f, 0x717e);
+  CALL_C(0x717e, getThisRoomFlags_hook, 0x197d, 0x7181);
+  CYC(0x7181, 0x7183); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
+  CYC(0x7183, 0x7185); L = 0x73;
+  CYC(0x7185, 0x7187); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
+  CYC(0x7187, 0x7188); alu_xor(gb, A);
+  CYC(0x7188, 0x718b); mem_wr(gb, wScrollMode, A);
+  CYC(0x718b, 0x718d); A = 0x3c;
+  CYC(0x718d, 0x7190); mem_wr(gb, wTmpcbb4, A);
+  CALL_C(0x7190, d2Collapse_incState_hook, 0x715e, 0x7193);
+  CYC(0x7193, 0x7196);
+  reloadTileMap_hook(gb);
+}
+
+void func_7168__state1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7196, d2Collapse_decCBB4_hook, 0x7158, 0x7199);
+  if (!(F & FZ)) { CYCT(0x7199, 0x719a); ret_effect(gb); return; }
+  CYC(0x7199, 0x719a);
+  CALL_C(0x719a, d2Collapse_incState_hook, 0x715e, 0x719d);
+  CALL_C(0x719d, getFreeInteractionSlot_hook, 0x3aef, 0x71a0);
+  if (!(F & FZ)) {
+    CYCT(0x71a0, 0x71a2);
+  } else {
+    CYC(0x71a0, 0x71a2);
+    CYC(0x71a2, 0x71a4); mem_wr(gb, HL, 0x97);
+    CYC(0x71a4, 0x71a6); L = 0x4b;
+    CYC(0x71a6, 0x71a8); mem_wr(gb, HL, 0x2c);
+    CYC(0x71a8, 0x71aa); L = 0x4d;
+    CYC(0x71aa, 0x71ac); mem_wr(gb, HL, 0x58);
+  }
+  CYC(0x71ac, 0x71ae); A = 0x50;
+  CYC(0x71ae, 0x71b1);
+  loadGfxHeader_hook(gb);
+}
+
+void func_7168__state2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x71b1, 0x71b3); A = 0x0f;
+  CALL_C(0x71b3, setScreenShakeCounter_hook, 0x24bb, 0x71b6);
+  CALL_C(0x71b6, func_stub_hook, 0x722f, 0x71b9);
+  CYC(0x71b9, 0x71bc); A = mem_rd(gb, wTmpcbb3);
+  CYC(0x71bc, 0x71bd); push_effect(gb, 0x71bd);
+  switch (misc_cutscene_jump_table(gb)) {
+    case 0x71c5: func_7168__cbb3_00_hook(gb); return;
+    case 0x71e2: func_7168__cbb3_01_hook(gb); return;
+    case 0x71f0: func_7168__cbb3_02_hook(gb); return;
+    case 0x71f4: func_7168__cbb3_03_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void func_7168__cbb3_00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x71c5, 0x71c8); SET_BC(0x7de1);
+  CYC(0x71c8, 0x71cb); SET_HL(0x7d6c);
+  CYC(0x71cb, 0x71cd); E = 0x02;
+  CALL_C(0x71cd, interBankCall_hook, 0x008a, 0x71d0);
+  func_7168__func_71d0_hook(gb);
+}
+
+void func_7168__func_71d0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x71d0, 0x71d2); A = 0x3c;
+  CALL_C(0x71d2, loadUncompressedGfxHeader_hook, 0x05da, 0x71d5);
+  CYC(0x71d5, 0x71d7); A = 0x70;
+  CALL_C(0x71d7, playSound_b00_hook, 0x0c98, 0x71da);
+  CYC(0x71da, 0x71dc); A = 0x1e;
+  CYC(0x71dc, 0x71df); mem_wr(gb, wTmpcbb4, A);
+  CYC(0x71df, 0x71e2);
+  d2Collapse_incCBB3_hook(gb);
+}
+
+static void func_7168_cbb3_01_02_body(GB *gb, uint16_t sp0_) {
+  CALL_C(0x71e4, d2Collapse_decCBB4_hook, 0x7158, 0x71e7);
+  if (!(F & FZ)) { CYCT(0x71e7, 0x71e8); ret_effect(gb); return; }
+  CYC(0x71e7, 0x71e8);
+  CYC(0x71e8, 0x71ea); mem_wr(gb, HL, 0x1e);
+  CYC(0x71ea, 0x71eb); A = B;
+  CALL_C(0x71eb, loadGfxHeader_hook, 0x0626, 0x71ee);
+  CYC(0x71ee, 0x71f0);
+  func_7168__cbb3_00_hook(gb);
+}
+
+void func_7168__cbb3_01_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x71e2, 0x71e4); B = 0x51;
+  func_7168_cbb3_01_02_body(gb, sp0_);
+}
+
+void func_7168__cbb3_02_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x71f0, 0x71f2); B = 0x52;
+  CYC(0x71f2, 0x71f4);
+  func_7168_cbb3_01_02_body(gb, sp0_);
+}
+
+void func_7168__cbb3_03_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x71f4, d2Collapse_decCBB4_hook, 0x7158, 0x71f7);
+  if (!(F & FZ)) { CYCT(0x71f7, 0x71f8); ret_effect(gb); return; }
+  CYC(0x71f7, 0x71f8);
+  CYC(0x71f8, 0x71fb); SET_HL(0x7c02);
+  CYC(0x71fb, 0x71fd); E = 0x02;
+  CALL_C(0x71fd, interBankCall_hook, 0x008a, 0x7200);
+  CALL_C(0x7200, func_7168__func_71d0_hook, 0x71d0, 0x7203);
+  CYC(0x7203, 0x7205); A = 0x3c;
+  CYC(0x7205, 0x7208); mem_wr(gb, wTmpcbb4, A);
+  CYC(0x7208, 0x720b);
+  d2Collapse_incState_hook(gb);
+}
+
+void func_7168__state3_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x720b, d2Collapse_decCBB4_hook, 0x7158, 0x720e);
+  if (!(F & FZ)) { CYCT(0x720e, 0x720f); ret_effect(gb); return; }
+  CYC(0x720e, 0x720f);
+  CYC(0x720f, 0x7212);
+  d2Collapse_incState_hook(gb);
+}
+
+void func_7168__state4_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7212, 0x7214); A = 0x01;
+  CYC(0x7214, 0x7217); mem_wr(gb, 0xc2ef, A);
+  CYC(0x7217, 0x7219); A = 0x01;
+  CYC(0x7219, 0x721c); mem_wr(gb, wScrollMode, A);
+  CYC(0x721c, 0x721f); SET_HL(0x7e69);
+  CALL_C(0x721f, parseGivenObjectData_b00_hook, 0x3171, 0x7222);
+  CYC(0x7222, 0x7223); alu_xor(gb, A);
+  CYC(0x7223, 0x7226); mem_wr(gb, wDisabledObjects, A);
+  CYC(0x7226, 0x7229); mem_wr(gb, wMenuDisabled, A);
+  CYC(0x7229, 0x722c); A = mem_rd(gb, wActiveMusic);
+  CYC(0x722c, 0x722f);
+  playSound_b00_hook(gb);
+}
+
+void func_stub_hook(GB *gb) {
+  CYC(0x722f, 0x7230); ret_effect(gb);
 }
 
 void func_7098_hook(GB *gb) {

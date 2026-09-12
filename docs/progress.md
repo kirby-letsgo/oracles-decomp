@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 1,713 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 1,737 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -185,6 +185,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-12: milestone 3 phase 5 batch 83 (24 routines): the `func_701d` cutscene dispatcher
+  and states, the dungeon-8 wall-retraction dispatcher and states, two dungeon-2 collapse helpers,
+  and the complete safe `func_7168` state cluster through its physical stub return. Eighteen local
+  entries received stable aliases. The shared `$71e4` continuation preserves `B = $51` from one
+  entry and `B = $52` from the other, while the separate `$71f4` path keeps its real call frame.
+  Independent spec and quality reviews approved all RST stack effects, direct tails, shared
+  fallthroughs, and cycle boundaries. Gates: lint 0, 30k verify 0 mismatches (4,715,002 calls),
+  whole-movie state hash clean (`64bddd0dfe384126`), ctest 8/8 in both normal and quirk builds.
 
 - 2026-09-12: milestone 3 phase 5 batch 82 (21 routines): the Maku Tree disappearing handler,
   nine safe Nayru-warp states, four safe turn-to-stone states, and seven safe Twinrova-reveal
