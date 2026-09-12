@@ -45,6 +45,10 @@ void noWarpInitiated_hook(GB *gb);
 void checkTileWarps_hook(GB *gb);
 void checkScreenEdgeWarps_hook(GB *gb);
 void checkTileIsWarpTile_hook(GB *gb);
+void func_7b93_hook(GB *gb);
+void func_7b93__state0_hook(GB *gb);
+void func_7b93__state1_hook(GB *gb);
+void func_7b93__state2_hook(GB *gb);
 
 static void screenTransitionEyePuzzle_up(GB *gb);
 static void screenTransitionEyePuzzle_rightOrLeft(GB *gb);
@@ -734,4 +738,175 @@ void checkScreenEdgeWarps_hook(GB *gb) {
 void checkTileIsWarpTile_hook(GB *gb) {
   CYC(0x6232, 0x6235); SET_HL(0x6238);
   CYC(0x6235, 0x6238); lookupCollisionTable_hook(gb);
+}
+
+void cutscene13_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7b6e, 0x7b71); SET_HL(0x6103);
+  CYC(0x7b71, 0x7b73); E = 0x03;
+  CALL_C(0x7b73, interBankCall_hook, 0x008a, 0x7b76);
+  CALL_C(0x7b76, refreshLoadedTreeGfx_hook, 0x1613, 0x7b79);
+  CYC(0x7b79, 0x7b7c); updateAllObjects_hook(gb);
+}
+
+void tilesetLayoutGroup33_hook(GB *gb) {
+  cutscene13_hook(gb);
+}
+
+void cutscene14_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7b7c, 0x7b7f); SET_HL(0x6275);
+  CYC(0x7b7f, 0x7b81); E = 0x03;
+  CALL_C(0x7b81, interBankCall_hook, 0x008a, 0x7b84);
+  CALL_C(0x7b84, refreshLoadedTreeGfx_hook, 0x1613, 0x7b87);
+  CALL_C(0x7b87, updateAllObjects_hook, 0x345b, 0x7b8a);
+  CYC(0x7b8a, 0x7b8d); updateStatusBar_hook(gb);
+}
+
+void linkSummonedCutscene_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7b8d, func_7b93_hook, 0x7b93, 0x7b90);
+  CYC(0x7b90, 0x7b93); updateAllObjects_hook(gb);
+}
+
+void func_7b93_hook(GB *gb) {
+  CYC(0x7b93, 0x7b96); A = mem_rd(gb, 0xc2ef);
+  CYC(0x7b96, 0x7b97); bank1_jump_table_from_rst(gb, 0x7b97);
+  switch (HL) {
+    case 0x7b9d: func_7b93__state0_hook(gb); return;
+    case 0x7be4: func_7b93__state1_hook(gb); return;
+    case 0x7c01: func_7b93__state2_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void func_7b93__state0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7b9d, 0x7ba0); SET_HL(0xc2ef);
+  CYC(0x7ba0, 0x7ba1); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CALL_C(0x7ba1, disableLcd_hook, 0x02c1, 0x7ba4);
+  CALL_C(0x7ba4, clearOam_hook, 0x049f, 0x7ba7);
+  CALL_C(0x7ba7, clearMemoryOnScreenReload, 0x49af, 0x7baa);
+  CALL_C(0x7baa, loadScreenMusicAndSetRoomPack_hook, 0x341a, 0x7bad);
+  CALL_C(0x7bad, loadTilesetData_hook, 0x3889, 0x7bb0);
+  CALL_C(0x7bb0, loadTilesetGraphics_hook, 0x3796, 0x7bb3);
+  CALL_C(0x7bb3, func_131f_hook, 0x131f, 0x7bb6);
+  CALL_C(0x7bb6, loadDungeonLayout_hook, 0x2daa, 0x7bb9);
+  CYC(0x7bb9, 0x7bbb); A = 0x01;
+  CYC(0x7bbb, 0x7bbe); W8(wScrollMode) = A;
+  CALL_C(0x7bbe, calculateRoomEdge_hook, 0x5f00, 0x7bc1);
+  CALL_C(0x7bc1, updateLinkLocalRespawnPosition_hook, 0x113a, 0x7bc4);
+  CALL_C(0x7bc4, loadCommonGraphics_hook, 0x1a98, 0x7bc7);
+  CYC(0x7bc7, 0x7bc9); A = 0x02;
+  CALL_C(0x7bc9, fadeinFromWhiteWithDelay_hook, 0x3284, 0x7bcc);
+  CYC(0x7bcc, 0x7bce); A = 0x02;
+  CALL_C(0x7bce, loadGfxRegisterStateIndex_hook, 0x02ea, 0x7bd1);
+  CYC(0x7bd1, 0x7bd3); A = 0x10;
+  CYC(0x7bd3, 0x7bd6); W8(wGfxRegs2_LYC) = A;
+  CYC(0x7bd6, 0x7bd8); A = 0x02;
+  CYC(0x7bd8, 0x7bda); H8(hNextLcdInterruptBehaviour) = A;
+  CYC(0x7bda, 0x7bdc); A = 0x95;
+  CALL_C(0x7bdc, playSound_b00_hook, 0x0c98, 0x7bdf);
+  CYC(0x7bdf, 0x7be1); A = 0xff;
+  CYC(0x7be1, 0x7be4); initWaveScrollValues_hook(gb);
+}
+
+void func_7b93__state1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7be4, 0x7be6); A = 0x01;
+  CALL_C(0x7be6, loadBigBufferScrollValues_hook, 0x13a5, 0x7be9);
+  CYC(0x7be9, 0x7bec); A = W8(wPaletteThread_mode);
+  CYC(0x7bec, 0x7bed); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x7bed, 0x7bee); ret_effect(gb);
+    return;
+  }
+  CYC(0x7bed, 0x7bee);
+  CYC(0x7bee, 0x7bf1); SET_HL(0xc2ef);
+  CYC(0x7bf1, 0x7bf2); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x7bf2, 0x7bf4); A = 0x81;
+  CYC(0x7bf4, 0x7bf7); W8(wDisabledObjects) = A;
+  CYC(0x7bf7, 0x7bf9); A = 0xff;
+  CYC(0x7bf9, 0x7bfc); W8(wGenericCutscene_cbb4) = A;
+  CYC(0x7bfc, 0x7bfd); alu_xor(gb, A);
+  CYC(0x7bfd, 0x7c00); W8(wGenericCutscene_cbb3) = A;
+  CYC(0x7c00, 0x7c01); ret_effect(gb);
+}
+
+void func_7b93__substate0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7c0b, 0x7c0d); A = 0x01;
+  CALL_C(0x7c0d, loadBigBufferScrollValues_hook, 0x13a5, 0x7c10);
+  CYC(0x7c10, 0x7c13); SET_HL(wGenericCutscene_cbb4);
+  CYC(0x7c13, 0x7c14); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x7c14, 0x7c15); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x7c15, 0x7c16); A = mem_rd(gb, HL);
+  CALL_C(0x7c16, initWaveScrollValues_hook, 0x1384, 0x7c19);
+  CYC(0x7c19, 0x7c1c); A = W8(wGenericCutscene_cbb4);
+  CYC(0x7c1c, 0x7c1e); alu_cp(gb, 0x80);
+  if (!(F & FC)) {
+    CYCT(0x7c1e, 0x7c1f); ret_effect(gb);
+    return;
+  }
+  CYC(0x7c1e, 0x7c1f);
+  CYC(0x7c1f, 0x7c22); SET_HL(wGenericCutscene_cbb3);
+  CYC(0x7c22, 0x7c23); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x7c23, 0x7c25); A = 0x03;
+  CYC(0x7c25, 0x7c28); mem_wr(gb, 0xd000, A);
+  CYC(0x7c28, 0x7c2a); A = 0x0a;
+  CYC(0x7c2a, 0x7c2d); W8(wLinkForceState) = A;
+  CYC(0x7c2d, 0x7c2f); A = 0x0b;
+  CYC(0x7c2f, 0x7c32); W8(wWarpTransition) = A;
+  CYC(0x7c32, 0x7c33); ret_effect(gb);
+}
+
+void func_7b93__substate1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7c33, 0x7c35); A = 0x01;
+  CALL_C(0x7c35, loadBigBufferScrollValues_hook, 0x13a5, 0x7c38);
+  CYC(0x7c38, 0x7c3b); SET_HL(wGenericCutscene_cbb4);
+  CYC(0x7c3b, 0x7c3c); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (F & FZ) {
+    CYCT(0x7c3c, 0x7c3e);
+  } else {
+    CYC(0x7c3c, 0x7c3e);
+    CYC(0x7c3e, 0x7c3f); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  }
+  CYC(0x7c3f, 0x7c40); A = mem_rd(gb, HL);
+  CALL_C(0x7c40, initWaveScrollValues_hook, 0x1384, 0x7c43);
+  CYC(0x7c43, 0x7c46); A = W8(wGenericCutscene_cbb4);
+  CYC(0x7c46, 0x7c47); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x7c47, 0x7c48); ret_effect(gb);
+    return;
+  }
+  CYC(0x7c47, 0x7c48);
+  CYC(0x7c48, 0x7c4b); SET_HL(wGenericCutscene_cbb3);
+  CYC(0x7c4b, 0x7c4c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x7c4c, 0x7c4e); A = 0x03;
+  CYC(0x7c4e, 0x7c50); H8(hNextLcdInterruptBehaviour) = A;
+  CYC(0x7c50, 0x7c51); ret_effect(gb);
+}
+
+void func_7b93__substate2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7c51, 0x7c53); A = 0x02;
+  CYC(0x7c53, 0x7c56); mem_wr(gb, 0xc2ee, A);
+  CYC(0x7c56, 0x7c57); alu_xor(gb, A);
+  CYC(0x7c57, 0x7c5a); mem_wr(gb, 0xc2ef, A);
+  CYC(0x7c5a, 0x7c5d); W8(wDisabledObjects) = A;
+  CYC(0x7c5d, 0x7c5f); A = 0x21;
+  CALL_C(0x7c5f, setGlobalFlag_hook, 0x31f9, 0x7c62);
+  CYC(0x7c62, 0x7c65); initializeRoom_hook(gb);
+}
+
+void func_7b93__state2_hook(GB *gb) {
+  CYC(0x7c01, 0x7c04); A = W8(wGenericCutscene_cbb3);
+  CYC(0x7c04, 0x7c05); bank1_jump_table_from_rst(gb, 0x7c05);
+  switch (HL) {
+    case 0x7c0b: func_7b93__substate0_hook(gb); return;
+    case 0x7c33: func_7b93__substate1_hook(gb); return;
+    case 0x7c51: func_7b93__substate2_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
 }

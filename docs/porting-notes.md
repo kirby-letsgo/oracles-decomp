@@ -544,3 +544,10 @@ desync to discover; keep them when porting routines.
   66 initially called `ret_effect` immediately after the not-taken `jr` burns at `$5502` and
   `$550d`, omitting the actual returns at `$5504` and `$550f`. Cross-review found both before the
   first build; burn each `ret` separately immediately before `ret_effect`.
+- Same-address symbols can have a different canonical hook name than the source routine selected
+  for translation. Batch 67 rewrote `cutscene13` at `01:7b6e`, but regeneration canonicalized that
+  address as `tilesetLayoutGroup33_hook`; listing only `cutscene13` left lint without a matching
+  table entry and the linker without the canonical shim. Expose a thin canonical `_hook` wrapper
+  and register the generator's chosen name in `rewritten.txt`. Likewise, named state/substate
+  bodies remain real hook boundaries: give disassembly-local addresses C-safe aliases in
+  `extra.sym` and register their `_hook` shims instead of hiding them as file-local helpers.

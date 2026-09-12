@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 1,359 routines rewritten across fifteen code banks;
+  routine against the transliteration. Progress: 1,386 routines rewritten across fifteen code banks;
   bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -60,7 +60,8 @@ Updated 2026-09-12. Newest entries at the top of each section.
   dispatchers, and continued the stage-1/endgame-20 states; batch 65 added the remaining core
   room/tileset dispatchers, five safe textbox roots, and seven more endgame-20 entries; batch 66
   added the next six endgame-20 entries, the inventory-text first pass, and eight bank-1 warp and
-  timewarp-solidity routines.
+  timewarp-solidity routines; batch 67 added nine late endgame-20 entries, ten bank-1 cutscene
+  dispatcher/state entries, and eight bank-3 game-secret generation and validation routines.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -165,6 +166,14 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-12: milestone 3 phase 5 batch 67 (27 routines): nine late endgame-20 state/helper
+  entries, the bank-1 summoned-Link/cutscene dispatcher and its reportable states/substates, and
+  eight bank-3 game-secret generation, packing, cipher, checksum, and validation routines. The
+  bank-1 integration promoted named substates to real hook entries and handled the same-address
+  `cutscene13`/`tilesetLayoutGroup33` symbol using the generator's canonical alias. Gates: lint 0,
+  30k verify 0 mismatches (4,723,535 calls), whole-movie state hash clean
+  (`64bddd0dfe384126`), ctest 8/8 in both normal and quirk builds.
 
 - 2026-09-12: milestone 3 phase 5 batch 66 (15 routines): six more endgame-20 state/helper
   entries, `doInventoryTextFirstPass`, and eight bank-1 warp/timewarp-solidity routines. Review
