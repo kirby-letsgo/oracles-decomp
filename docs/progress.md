@@ -7,13 +7,14 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 1,613 routines rewritten across fifteen code banks;
-  bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
+  routine against the transliteration. Progress: 1,638 routine hooks rewritten across fifteen code
+  banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
-  rewritten; what is left there is the thread kernel, the interrupt handlers, the thread entry
-  points and the routines copied to RAM (phase 3), plus `linkState07` (a jump table with no
-  callers) and `pushDirectionData` (data). Phase 3 has started: batch 26 did the thread state
+  rewritten. Batch 78 closed the last reporting gaps: 25 executable entry points became readable
+  hooks, `pushDirectionData` was removed from the routine registry because it is data, and the only
+  remaining non-hook row is the already-handwritten RAM routine `wRamFunction`. Regeneration now
+  deletes the empty `gen_bank00.c`. Phase 3 started with batch 26 doing the thread state
   helpers, the serial handlers, the timer interrupt and the four interrupt vectors, batch 27 the
   VBlank handler and its function queue, batch 28 the LCD interrupt family, batch 29 the boot
   chain and the main loop/thread switcher itself, batch 30 the six thread entry points
@@ -180,6 +181,18 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-12: milestone 3 phase 5 batch 78 (25 routines): closed bank 0 by rewriting
+  `linkState07` and its two substate entries, nineteen independently reportable decompressor
+  fragments, and the three remaining local draw/text tails. `pushDirectionData` was removed from
+  the routine registry because its 64 bytes are data, while the existing handwritten
+  `wRamFunction` remains the bank's sole external entry. The transliterator now removes stale
+  bodyless generated-bank files and CMake tracks the source glob, so `gen_bank00.c` is genuinely
+  gone and stays gone. Shared decompressor helpers propagate `CALL_C` nonlocal continuations back
+  through the public hook with its original stack baseline. Bank 0 is 652/652 readable entries:
+  651 hooks plus one handwritten RAM external. Gates: lint 0, 30k verify 0 mismatches (4,714,516
+  calls), whole-movie state hash clean (`64bddd0dfe384126`), ctest 8/8 in both normal and quirk
+  builds.
 
 - 2026-09-12: milestone 3 phase 5 batch 77 (16 routines): all thirteen safe local states of the
   Nayru-singing cutscene plus the three safe global late states. The dynamic root, state D, state

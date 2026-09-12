@@ -7,6 +7,8 @@
 00:ff80 hramOamDmaFunction = 03:4091
 00:c000 wMusicReadFunction = 39:404b
 00:c4b7 wRamFunction extern
+00:2cb7 linkState07__substate0
+00:2cce linkState07__substate2
 03:4071 setCpuToDoubleSpeed extern
 00:016c resetGame__afterSp016c
 00:091a _nextThread__afterSp091a

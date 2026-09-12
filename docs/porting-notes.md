@@ -605,3 +605,14 @@ desync to discover; keep them when porting routines.
   helpers. Batch 77 initially tried to call such helpers and failed to compile. Implement the
   effect as `mem_wr(gb, addr, mem_rd(gb, addr) | mask)` or `& ~mask` after the instruction's
   burn so A and F both remain unchanged.
+- A file-local fragment containing `CALL_C` cannot use the macro unchanged: its nonlocal path
+  returns only from the helper, after which the public wrapper would incorrectly execute its own
+  `ret`. Batch 78's decompressor fragments exposed this first as a missing lexical `sp0_` build
+  error. Pass the public hook's entry SP through the fragment graph and propagate a boolean after
+  `hook_continue`, so every caller returns without applying another stack effect.
+- A bank with no generated bodies should have no generated C file. Before batch 78 the
+  transliterator opened every bank output before discovering that all its entries were rewritten
+  hooks or externals, leaving an empty `gen_bank00.c`; CMake's configure-time glob could also keep
+  deleted sources in an old build graph. Accumulate bodies first, remove stale two-digit
+  `gen_bankXX.c` outputs with none, and use `CONFIGURE_DEPENDS` on the game-source glob so the
+  generated bank file can be deleted permanently.

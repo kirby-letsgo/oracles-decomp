@@ -181,7 +181,6 @@ retIfTextIsActive
 getScaledPositionOffsetForVelocity
 objectSetComponentSpeedByScaledVelocity
 objectSetPositionInCircleArc
-pushDirectionData
 objectMakeTileSolid
 setTileWithoutGfxReload
 setTileInRoomLayoutBuffer
@@ -360,6 +359,8 @@ clearVar3fForParentItems
 linkCreateSplash
 clearVariousLinkVariables
 linkState07
+linkState07__substate0
+linkState07__substate2
 itemDelete
 itemUpdateAngle
 getFreeItemSlot
