@@ -18,523 +18,6 @@ void checkBrightenRoom(GB *gb) {
   I(0x4337, 4); if (hook_enabled_at(0x3350)) { brightenRoom_hook(gb); return; } HANDOFF(0x3350);  // jp $3350
 }
 
-// 01:45ed
-void screenTransitionState5Substate1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x45ed, 4); A = mem_rd(gb, 0xcd06);  // ld a,($cd06)
-  RST_PUSH(0x45f0, 0x45f1);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x45fd: goto L_45fd; case 0x4613: goto L_4613; case 0x461b: goto L_461b; case 0x4639: goto L_4639; case 0x464c: goto L_464c; case 0x465a: goto L_465a; default: HANDOFF(HL); }
-L_45fd:
-  I(0x45fd, 4); A = mem_rd(gb, 0xcd08);  // ld a,($cd08)
-  I(0x4600, 2); A = alu_swap(gb, A);  // swap a
-  I(0x4602, 1); alu_rlca(gb);  // rlca
-  I(0x4603, 1); B = A;  // ld b,a
-  I(0x4604, 4); A = mem_rd(gb, 0xcd11);  // ld a,($cd11)
-  I(0x4607, 1); alu_add(gb, B);  // add b
-  I(0x4608, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x460a, 4); mem_wr(gb, 0xcd11, A);  // ld ($cd11),a
-  I(0x460d, 2); A = 0x01;  // ld a,$01
-  I(0x460f, 4); mem_wr(gb, 0xcd06, A);  // ld ($cd06),a
-  RET(0x4612); return;  // ret
-L_4613:
-  I(0x4613, 2); A = 0x02;  // ld a,$02
-  I(0x4615, 4); mem_wr(gb, 0xcd06, A);  // ld ($cd06),a
-  I(0x4618, 4); goto L_4694;  // jp $4694
-L_461b:
-  I(0x461b, 1); alu_xor(gb, A);  // xor a
-  CALL(0x461c, transitionUpdateScrollAndLinkPosition_hook, 0x43d8, 0x461f);  // call $43d8
-  I(0x461f, 4); A = mem_rd(gb, 0xc48c);  // ld a,($c48c)
-  I(0x4622, 2); alu_and(gb, 0x07);  // and $07
-  if (!(F & FZ)) { RET_TAKEN(0x4624); return; } I(0x4624, 2);  // ret nz
-  I(0x4625, 4); A = mem_rd(gb, 0xcd13);  // ld a,($cd13)
-  I(0x4628, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4629, 3); goto L_4694; } I(0x4629, 2);  // jr nz,$4694
-  I(0x462b, 3); SET_HL(0xcd06);  // ld hl,$cd06
-  I(0x462e, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x462f, 4); A = mem_rd(gb, 0xcd0f);  // ld a,($cd0f)
-  I(0x4632, 2); A = alu_swap(gb, A);  // swap a
-  I(0x4634, 1); alu_rlca(gb);  // rlca
-  I(0x4635, 4); mem_wr(gb, 0xcd13, A);  // ld ($cd13),a
-  RET(0x4638); return;  // ret
-L_4639:
-  I(0x4639, 4); A = mem_rd(gb, 0xcd13);  // ld a,($cd13)
-  I(0x463c, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x463d, 3); goto L_4694; } I(0x463d, 2);  // jr nz,$4694
-  I(0x463f, 3); SET_HL(0xcd06);  // ld hl,$cd06
-  I(0x4642, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4643, 4); A = mem_rd(gb, 0xcd20);  // ld a,($cd20)
-  I(0x4646, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4647, 4); if (hook_enabled_at(0x3775)) { loadUniqueGfxHeader_hook(gb); return; } HANDOFF(0x3775); } I(0x4647, 3);  // jp nz,$3775
-  I(0x464a, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  RET(0x464b); return;  // ret
-L_464c:
-  CALL(0x464c, updateTilesetUniqueGfx_hook, 0x37db, 0x464f);  // call $37db
-  if ((F & FC)) { RET_TAKEN(0x464f); return; } I(0x464f, 2);  // ret c
-  I(0x4650, 4); A = mem_rd(gb, 0xcd20);  // ld a,($cd20)
-  I(0x4653, 4); mem_wr(gb, 0xcd28, A);  // ld ($cd28),a
-  I(0x4656, 1); alu_xor(gb, A);  // xor a
-  I(0x4657, 4); mem_wr(gb, 0xcd20, A);  // ld ($cd20),a
-L_465a:
-  CALL(0x465a, checkBrightenRoom, 0x4323, 0x465d);  // call $4323
-  CALL(0x465d, updateTilesetPalette_hook, 0x4762, 0x4660);  // call $4762
-  CALL(0x4660, setInstrumentsDisabledCounterAndScrollMode_hook, 0x19a2, 0x4663);  // call $19a2
-  I(0x4663, 1); alu_xor(gb, A);  // xor a
-  I(0x4664, 4); mem_wr(gb, 0xcd05, A);  // ld ($cd05),a
-  I(0x4667, 4); mem_wr(gb, 0xcd06, A);  // ld ($cd06),a
-  I(0x466a, 2); A = 0x02;  // ld a,$02
-  I(0x466c, 4); mem_wr(gb, 0xcd04, A);  // ld ($cd04),a
-  I(0x466f, 4); A = mem_rd(gb, 0xcd01);  // ld a,($cd01)
-  I(0x4672, 1); alu_add(gb, A);  // add a
-  I(0x4673, 1); alu_add(gb, A);  // add a
-  I(0x4674, 1); L = A;  // ld l,a
-  I(0x4675, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x4678, 1); alu_add(gb, L);  // add l
-  I(0x4679, 3); SET_HL(0x468c);  // ld hl,$468c
-  RST_PUSH(0x467c, 0x467d);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x467d, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x467e, 3); mem_wr(gb, 0xffaa, A);  // ldh ($ffaa),a
-  I(0x4680, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4681, 1); B = A;  // ld b,a
-  I(0x4682, 4); A = mem_rd(gb, 0xcd08);  // ld a,($cd08)
-  I(0x4685, 1); alu_add(gb, B);  // add b
-  I(0x4686, 4); mem_wr(gb, 0xcd08, A);  // ld ($cd08),a
-  I(0x4689, 4); if (hook_enabled_at(0x442a)) { finishScrollingTransition_hook(gb); return; } HANDOFF(0x442a);  // jp $442a
-L_4694:
-  I(0x4694, 4); A = mem_rd(gb, 0xcd10);  // ld a,($cd10)
-  I(0x4697, 1); E = A;  // ld e,a
-  CALL(0x4698, copyTileRowToVramBuffer_hook, 0x4712, 0x469b);  // call $4712
-  I(0x469b, 2); C = 0x01;  // ld c,$01
-  CALL(0x469d, screenTransitionState5Substate1__queueRowDmaTransfer, 0x46a8, 0x46a0);  // call $46a8
-  I(0x46a0, 2); C = 0x00;  // ld c,$00
-  CALL(0x46a2, screenTransitionState5Substate1__queueRowDmaTransfer, 0x46a8, 0x46a5);  // call $46a8
-  I(0x46a5, 4); if (hook_enabled_at(0x45a5)) { incrementScreenScrollRowVars_hook(gb); return; } HANDOFF(0x45a5);  // jp $45a5
-}
-
-// 01:45fd
-void screenTransitionState5Substate1__state0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_45fd:
-  I(0x45fd, 4); A = mem_rd(gb, 0xcd08);  // ld a,($cd08)
-  I(0x4600, 2); A = alu_swap(gb, A);  // swap a
-  I(0x4602, 1); alu_rlca(gb);  // rlca
-  I(0x4603, 1); B = A;  // ld b,a
-  I(0x4604, 4); A = mem_rd(gb, 0xcd11);  // ld a,($cd11)
-  I(0x4607, 1); alu_add(gb, B);  // add b
-  I(0x4608, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x460a, 4); mem_wr(gb, 0xcd11, A);  // ld ($cd11),a
-  I(0x460d, 2); A = 0x01;  // ld a,$01
-  I(0x460f, 4); mem_wr(gb, 0xcd06, A);  // ld ($cd06),a
-  RET(0x4612); return;  // ret
-}
-
-// 01:4613
-void screenTransitionState5Substate1__state1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4613:
-  I(0x4613, 2); A = 0x02;  // ld a,$02
-  I(0x4615, 4); mem_wr(gb, 0xcd06, A);  // ld ($cd06),a
-  I(0x4618, 4); goto L_4694;  // jp $4694
-L_4694:
-  I(0x4694, 4); A = mem_rd(gb, 0xcd10);  // ld a,($cd10)
-  I(0x4697, 1); E = A;  // ld e,a
-  CALL(0x4698, copyTileRowToVramBuffer_hook, 0x4712, 0x469b);  // call $4712
-  I(0x469b, 2); C = 0x01;  // ld c,$01
-  CALL(0x469d, screenTransitionState5Substate1__queueRowDmaTransfer, 0x46a8, 0x46a0);  // call $46a8
-  I(0x46a0, 2); C = 0x00;  // ld c,$00
-  CALL(0x46a2, screenTransitionState5Substate1__queueRowDmaTransfer, 0x46a8, 0x46a5);  // call $46a8
-  I(0x46a5, 4); if (hook_enabled_at(0x45a5)) { incrementScreenScrollRowVars_hook(gb); return; } HANDOFF(0x45a5);  // jp $45a5
-}
-
-// 01:461b
-void screenTransitionState5Substate1__state2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_461b:
-  I(0x461b, 1); alu_xor(gb, A);  // xor a
-  CALL(0x461c, transitionUpdateScrollAndLinkPosition_hook, 0x43d8, 0x461f);  // call $43d8
-  I(0x461f, 4); A = mem_rd(gb, 0xc48c);  // ld a,($c48c)
-  I(0x4622, 2); alu_and(gb, 0x07);  // and $07
-  if (!(F & FZ)) { RET_TAKEN(0x4624); return; } I(0x4624, 2);  // ret nz
-  I(0x4625, 4); A = mem_rd(gb, 0xcd13);  // ld a,($cd13)
-  I(0x4628, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4629, 3); goto L_4694; } I(0x4629, 2);  // jr nz,$4694
-  I(0x462b, 3); SET_HL(0xcd06);  // ld hl,$cd06
-  I(0x462e, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x462f, 4); A = mem_rd(gb, 0xcd0f);  // ld a,($cd0f)
-  I(0x4632, 2); A = alu_swap(gb, A);  // swap a
-  I(0x4634, 1); alu_rlca(gb);  // rlca
-  I(0x4635, 4); mem_wr(gb, 0xcd13, A);  // ld ($cd13),a
-  RET(0x4638); return;  // ret
-L_4694:
-  I(0x4694, 4); A = mem_rd(gb, 0xcd10);  // ld a,($cd10)
-  I(0x4697, 1); E = A;  // ld e,a
-  CALL(0x4698, copyTileRowToVramBuffer_hook, 0x4712, 0x469b);  // call $4712
-  I(0x469b, 2); C = 0x01;  // ld c,$01
-  CALL(0x469d, screenTransitionState5Substate1__queueRowDmaTransfer, 0x46a8, 0x46a0);  // call $46a8
-  I(0x46a0, 2); C = 0x00;  // ld c,$00
-  CALL(0x46a2, screenTransitionState5Substate1__queueRowDmaTransfer, 0x46a8, 0x46a5);  // call $46a8
-  I(0x46a5, 4); if (hook_enabled_at(0x45a5)) { incrementScreenScrollRowVars_hook(gb); return; } HANDOFF(0x45a5);  // jp $45a5
-}
-
-// 01:4639
-void screenTransitionState5Substate1__state3(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4639:
-  I(0x4639, 4); A = mem_rd(gb, 0xcd13);  // ld a,($cd13)
-  I(0x463c, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x463d, 3); goto L_4694; } I(0x463d, 2);  // jr nz,$4694
-  I(0x463f, 3); SET_HL(0xcd06);  // ld hl,$cd06
-  I(0x4642, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4643, 4); A = mem_rd(gb, 0xcd20);  // ld a,($cd20)
-  I(0x4646, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4647, 4); if (hook_enabled_at(0x3775)) { loadUniqueGfxHeader_hook(gb); return; } HANDOFF(0x3775); } I(0x4647, 3);  // jp nz,$3775
-  I(0x464a, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  RET(0x464b); return;  // ret
-L_4694:
-  I(0x4694, 4); A = mem_rd(gb, 0xcd10);  // ld a,($cd10)
-  I(0x4697, 1); E = A;  // ld e,a
-  CALL(0x4698, copyTileRowToVramBuffer_hook, 0x4712, 0x469b);  // call $4712
-  I(0x469b, 2); C = 0x01;  // ld c,$01
-  CALL(0x469d, screenTransitionState5Substate1__queueRowDmaTransfer, 0x46a8, 0x46a0);  // call $46a8
-  I(0x46a0, 2); C = 0x00;  // ld c,$00
-  CALL(0x46a2, screenTransitionState5Substate1__queueRowDmaTransfer, 0x46a8, 0x46a5);  // call $46a8
-  I(0x46a5, 4); if (hook_enabled_at(0x45a5)) { incrementScreenScrollRowVars_hook(gb); return; } HANDOFF(0x45a5);  // jp $45a5
-}
-
-// 01:464c
-void screenTransitionState5Substate1__state4(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_464c:
-  CALL(0x464c, updateTilesetUniqueGfx_hook, 0x37db, 0x464f);  // call $37db
-  if ((F & FC)) { RET_TAKEN(0x464f); return; } I(0x464f, 2);  // ret c
-  I(0x4650, 4); A = mem_rd(gb, 0xcd20);  // ld a,($cd20)
-  I(0x4653, 4); mem_wr(gb, 0xcd28, A);  // ld ($cd28),a
-  I(0x4656, 1); alu_xor(gb, A);  // xor a
-  I(0x4657, 4); mem_wr(gb, 0xcd20, A);  // ld ($cd20),a
-L_465a:
-  CALL(0x465a, checkBrightenRoom, 0x4323, 0x465d);  // call $4323
-  CALL(0x465d, updateTilesetPalette_hook, 0x4762, 0x4660);  // call $4762
-  CALL(0x4660, setInstrumentsDisabledCounterAndScrollMode_hook, 0x19a2, 0x4663);  // call $19a2
-  I(0x4663, 1); alu_xor(gb, A);  // xor a
-  I(0x4664, 4); mem_wr(gb, 0xcd05, A);  // ld ($cd05),a
-  I(0x4667, 4); mem_wr(gb, 0xcd06, A);  // ld ($cd06),a
-  I(0x466a, 2); A = 0x02;  // ld a,$02
-  I(0x466c, 4); mem_wr(gb, 0xcd04, A);  // ld ($cd04),a
-  I(0x466f, 4); A = mem_rd(gb, 0xcd01);  // ld a,($cd01)
-  I(0x4672, 1); alu_add(gb, A);  // add a
-  I(0x4673, 1); alu_add(gb, A);  // add a
-  I(0x4674, 1); L = A;  // ld l,a
-  I(0x4675, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x4678, 1); alu_add(gb, L);  // add l
-  I(0x4679, 3); SET_HL(0x468c);  // ld hl,$468c
-  RST_PUSH(0x467c, 0x467d);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x467d, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x467e, 3); mem_wr(gb, 0xffaa, A);  // ldh ($ffaa),a
-  I(0x4680, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4681, 1); B = A;  // ld b,a
-  I(0x4682, 4); A = mem_rd(gb, 0xcd08);  // ld a,($cd08)
-  I(0x4685, 1); alu_add(gb, B);  // add b
-  I(0x4686, 4); mem_wr(gb, 0xcd08, A);  // ld ($cd08),a
-  I(0x4689, 4); if (hook_enabled_at(0x442a)) { finishScrollingTransition_hook(gb); return; } HANDOFF(0x442a);  // jp $442a
-}
-
-// 01:465a
-void screenTransitionState5Substate1__state5(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_465a:
-  CALL(0x465a, checkBrightenRoom, 0x4323, 0x465d);  // call $4323
-  CALL(0x465d, updateTilesetPalette_hook, 0x4762, 0x4660);  // call $4762
-  CALL(0x4660, setInstrumentsDisabledCounterAndScrollMode_hook, 0x19a2, 0x4663);  // call $19a2
-  I(0x4663, 1); alu_xor(gb, A);  // xor a
-  I(0x4664, 4); mem_wr(gb, 0xcd05, A);  // ld ($cd05),a
-  I(0x4667, 4); mem_wr(gb, 0xcd06, A);  // ld ($cd06),a
-  I(0x466a, 2); A = 0x02;  // ld a,$02
-  I(0x466c, 4); mem_wr(gb, 0xcd04, A);  // ld ($cd04),a
-  I(0x466f, 4); A = mem_rd(gb, 0xcd01);  // ld a,($cd01)
-  I(0x4672, 1); alu_add(gb, A);  // add a
-  I(0x4673, 1); alu_add(gb, A);  // add a
-  I(0x4674, 1); L = A;  // ld l,a
-  I(0x4675, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x4678, 1); alu_add(gb, L);  // add l
-  I(0x4679, 3); SET_HL(0x468c);  // ld hl,$468c
-  RST_PUSH(0x467c, 0x467d);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x467d, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x467e, 3); mem_wr(gb, 0xffaa, A);  // ldh ($ffaa),a
-  I(0x4680, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4681, 1); B = A;  // ld b,a
-  I(0x4682, 4); A = mem_rd(gb, 0xcd08);  // ld a,($cd08)
-  I(0x4685, 1); alu_add(gb, B);  // add b
-  I(0x4686, 4); mem_wr(gb, 0xcd08, A);  // ld ($cd08),a
-  I(0x4689, 4); if (hook_enabled_at(0x442a)) { finishScrollingTransition_hook(gb); return; } HANDOFF(0x442a);  // jp $442a
-}
-
-// 01:468c
-void screenTransitionState5Substate1__offsetVariables(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_468c:
-  if (!(F & FC)) { I(0x468c, 3); goto L_46de; } I(0x468c, 2);  // jr nc,$46de
-  I(0x468e, 1);  // nop
-  I(0x468f, 1); alu_or(gb, B);  // or b
-  I(0x4690, 1);  // nop
-  I(0x4691, 1); alu_add(gb, B);  // add b
-  I(0x4692, 1);  // nop
-  I(0x4693, 1); alu_add(gb, B);  // add b
-L_4694:
-  I(0x4694, 4); A = mem_rd(gb, 0xcd10);  // ld a,($cd10)
-  I(0x4697, 1); E = A;  // ld e,a
-  CALL(0x4698, copyTileRowToVramBuffer_hook, 0x4712, 0x469b);  // call $4712
-  I(0x469b, 2); C = 0x01;  // ld c,$01
-  CALL(0x469d, screenTransitionState5Substate1__queueRowDmaTransfer, 0x46a8, 0x46a0);  // call $46a8
-  I(0x46a0, 2); C = 0x00;  // ld c,$00
-  CALL(0x46a2, screenTransitionState5Substate1__queueRowDmaTransfer, 0x46a8, 0x46a5);  // call $46a8
-  I(0x46a5, 4); if (hook_enabled_at(0x45a5)) { incrementScreenScrollRowVars_hook(gb); return; } HANDOFF(0x45a5);  // jp $45a5
-L_46de:
-  I(0x46de, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  PUSH(0x46df, AF);  // push af
-  I(0x46e0, 2); A = 0x03;  // ld a,$03
-  I(0x46e2, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  PUSH(0x46e4, DE);  // push de
-  I(0x46e5, 3); SET_HL(0xcd40);  // ld hl,$cd40
-  I(0x46e8, 2); B = 0x20;  // ld b,$20
-  I(0x46ea, 2); C = 0xdc;  // ld c,$dc
-  CALL(0x46ec, func_46ff_hook, 0x46ff, 0x46ef);  // call $46ff
-  SET_DE(POP(0x46ef));  // pop de
-  I(0x46f0, 2); A = 0x04;  // ld a,$04
-  I(0x46f2, 1); alu_add(gb, D);  // add d
-  I(0x46f3, 1); D = A;  // ld d,a
-  I(0x46f4, 2); B = 0x20;  // ld b,$20
-  I(0x46f6, 2); C = 0xe0;  // ld c,$e0
-  CALL(0x46f8, func_46ff_hook, 0x46ff, 0x46fb);  // call $46ff
-  SET_AF(POP(0x46fb));  // pop af
-  I(0x46fc, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  RET(0x46fe); return;  // ret
-}
-
-// 01:4694
-void screenTransitionState5Substate1__drawNextRow(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4694:
-  I(0x4694, 4); A = mem_rd(gb, 0xcd10);  // ld a,($cd10)
-  I(0x4697, 1); E = A;  // ld e,a
-  CALL(0x4698, copyTileRowToVramBuffer_hook, 0x4712, 0x469b);  // call $4712
-  I(0x469b, 2); C = 0x01;  // ld c,$01
-  CALL(0x469d, screenTransitionState5Substate1__queueRowDmaTransfer, 0x46a8, 0x46a0);  // call $46a8
-  I(0x46a0, 2); C = 0x00;  // ld c,$00
-  CALL(0x46a2, screenTransitionState5Substate1__queueRowDmaTransfer, 0x46a8, 0x46a5);  // call $46a8
-  I(0x46a5, 4); if (hook_enabled_at(0x45a5)) { incrementScreenScrollRowVars_hook(gb); return; } HANDOFF(0x45a5);  // jp $45a5
-}
-
-// 01:46a8
-void screenTransitionState5Substate1__queueRowDmaTransfer(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_46a8:
-  I(0x46a8, 4); A = mem_rd(gb, 0xcd11);  // ld a,($cd11)
-  I(0x46ab, 1); B = A;  // ld b,a
-  I(0x46ac, 2); alu_and(gb, 0x18);  // and $18
-  I(0x46ae, 1); alu_rlca(gb);  // rlca
-  I(0x46af, 2); A = alu_swap(gb, A);  // swap a
-  I(0x46b1, 2); alu_add(gb, 0x98);  // add $98
-  I(0x46b3, 1); D = A;  // ld d,a
-  I(0x46b4, 1); A = B;  // ld a,b
-  I(0x46b5, 2); alu_and(gb, 0x07);  // and $07
-  I(0x46b7, 2); A = alu_swap(gb, A);  // swap a
-  I(0x46b9, 1); alu_rlca(gb);  // rlca
-  I(0x46ba, 1); alu_or(gb, C);  // or c
-  I(0x46bb, 1); E = A;  // ld e,a
-  I(0x46bc, 3); SET_HL(0xcd40);  // ld hl,$cd40
-  I(0x46bf, 2); C = alu_srl(gb, C);  // srl c
-  if (!(F & FC)) { I(0x46c1, 3); goto L_46c5; } I(0x46c1, 2);  // jr nc,$46c5
-  I(0x46c3, 2); L = 0x60;  // ld l,$60
-L_46c5:
-  I(0x46c5, 2); B = 0x01;  // ld b,$01
-  I(0x46c7, 4); if (hook_enabled_at(0x058a)) { queueDmaTransfer_hook(gb); return; } HANDOFF(0x058a);  // jp $058a
-}
-
-// 01:4a17
-void clearObjectsWithEnabled2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4a17, clearInteractionsWithEnabled2, 0x4a31, 0x4a1a);  // call $4a31
-  CALL(0x4a1a, clearEnemiesWithEnabled2, 0x4a38, 0x4a1d);  // call $4a38
-  CALL(0x4a1d, clearPartsWithEnabled2, 0x4a3f, 0x4a20);  // call $4a3f
-  CALL(0x4a20, clearItemsWithEnabled2, 0x4a2a, 0x4a23);  // call $4a2a
-  I(0x4a23, 3); SET_HL(0xd000);  // ld hl,$d000
-  I(0x4a26, 2); C = 0xd2;  // ld c,$d2
-  I(0x4a28, 3); clearObjectsWithEnabled2_hlpr(gb); return;  // jr $4a44
-}
-
-// 01:4a2a
-void clearItemsWithEnabled2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4a2a, 3); SET_HL(0xd600);  // ld hl,$d600
-  I(0x4a2d, 2); C = 0xe0;  // ld c,$e0
-  I(0x4a2f, 3); clearObjectsWithEnabled2_hlpr(gb); return;  // jr $4a44
-}
-
-// 01:4a31
-void clearInteractionsWithEnabled2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4a31, 3); SET_HL(0xd040);  // ld hl,$d040
-  I(0x4a34, 2); C = 0xe0;  // ld c,$e0
-  I(0x4a36, 3); clearObjectsWithEnabled2_hlpr(gb); return;  // jr $4a44
-}
-
-// 01:4a38
-void clearEnemiesWithEnabled2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4a38, 3); SET_HL(0xd080);  // ld hl,$d080
-  I(0x4a3b, 2); C = 0xe0;  // ld c,$e0
-  I(0x4a3d, 3); clearObjectsWithEnabled2_hlpr(gb); return;  // jr $4a44
-}
-
-// 01:4a3f
-void clearPartsWithEnabled2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4a3f, 3); SET_HL(0xd0c0);  // ld hl,$d0c0
-  I(0x4a42, 2); C = 0xe0;  // ld c,$e0
-  clearObjectsWithEnabled2_hlpr(gb); return;  // fallthrough
-}
-
-// 01:4a44
-void clearObjectsWithEnabled2_hlpr(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4a44:
-  I(0x4a44, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4a45, 2); alu_and(gb, 0x03);  // and $03
-  I(0x4a47, 2); alu_cp(gb, 0x02);  // cp $02
-  if (!(F & FZ)) { I(0x4a49, 3); goto L_4a52; } I(0x4a49, 2);  // jr nz,$4a52
-  PUSH(0x4a4b, HL);  // push hl
-  I(0x4a4c, 2); B = 0x40;  // ld b,$40
-  CALL(0x4a4e, clearMemory_hook, 0x046f, 0x4a51);  // call $046f
-  SET_HL(POP(0x4a51));  // pop hl
-L_4a52:
-  I(0x4a52, 1); H = alu_inc8(gb, H);  // inc h
-  I(0x4a53, 1); A = H;  // ld a,h
-  I(0x4a54, 1); alu_cp(gb, C);  // cp c
-  if ((F & FC)) { I(0x4a55, 3); goto L_4a44; } I(0x4a55, 2);  // jr c,$4a44
-  RET(0x4a57); return;  // ret
-}
-
-// 01:4a81
-void updateLinkBeingShocked(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4a81, 3); SET_DE(0xccdb);  // ld de,$ccdb
-  I(0x4a84, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x4a85, 0x4a86);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4a8c: goto L_4a8c; case 0x4a8d: goto L_4a8d; case 0x4aa7: goto L_4aa7; default: HANDOFF(HL); }
-L_4a8c:
-  RET(0x4a8c); return;  // ret
-L_4a8d:
-  I(0x4a8d, 1); H = D;  // ld h,d
-  I(0x4a8e, 1); L = E;  // ld l,e
-  I(0x4a8f, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4a90, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x4a91, 3); mem_wr(gb, HL, 0x2d);  // ld (hl),$2d
-  I(0x4a93, 2); A = 0xac;  // ld a,$ac
-  CALL(0x4a95, playSound_b00_hook, 0x0c98, 0x4a98);  // call $0c98
-  I(0x4a98, 3); SET_HL(0xcc8a);  // ld hl,$cc8a
-  I(0x4a9b, 2); A = 0x21;  // ld a,$21
-  I(0x4a9d, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  I(0x4a9e, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4a9f, 3); SET_HL(0xcbca);  // ld hl,$cbca
-  I(0x4aa2, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x4aa4, 4); if (hook_enabled_at(0x1ab4)) { copyW2TilesetBgPalettesToW4PaletteData_hook(gb); return; } HANDOFF(0x1ab4);  // jp $1ab4
-L_4aa7:
-  I(0x4aa7, 1); H = D;  // ld h,d
-  I(0x4aa8, 1); L = E;  // ld l,e
-  I(0x4aa9, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x4aaa, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if ((F & FZ)) { I(0x4aab, 3); goto L_4ac0; } I(0x4aab, 2);  // jr z,$4ac0
-  I(0x4aad, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4aae, 2); alu_and(gb, 0x07);  // and $07
-  if (!(F & FZ)) { RET_TAKEN(0x4ab0); return; } I(0x4ab0, 2);  // ret nz
-  I(0x4ab1, 3); alu_bit(gb, 3, mem_rd(gb, HL));  // bit 3,(hl)
-  if ((F & FZ)) { I(0x4ab3, 4); if (hook_enabled_at(0x1ab8)) { copyW4PaletteDataToW2TilesetBgPalettes_hook(gb); return; } HANDOFF(0x1ab8); } I(0x4ab3, 3);  // jp z,$1ab8
-  I(0x4ab6, 2); A = 0x08;  // ld a,$08
-  CALL(0x4ab8, setScreenShakeCounter_hook, 0x24bb, 0x4abb);  // call $24bb
-  I(0x4abb, 2); A = 0x0c;  // ld a,$0c
-  I(0x4abd, 4); if (hook_enabled_at(0x050b)) { loadPaletteHeader_hook(gb); return; } HANDOFF(0x050b);  // jp $050b
-L_4ac0:
-  I(0x4ac0, 1); alu_xor(gb, A);  // xor a
-  I(0x4ac1, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-  I(0x4ac2, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4ac3, 3); SET_HL(0xcc8a);  // ld hl,$cc8a
-  I(0x4ac6, 2); A = 0xde;  // ld a,$de
-  I(0x4ac8, 2); alu_and(gb, mem_rd(gb, HL));  // and (hl)
-  I(0x4ac9, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4aca, 3); SET_HL(0xcbca);  // ld hl,$cbca
-  I(0x4acd, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 0)));  // res 0,(hl)
-  I(0x4acf, 4); if (hook_enabled_at(0x1ab8)) { copyW4PaletteDataToW2TilesetBgPalettes_hook(gb); return; } HANDOFF(0x1ab8);  // jp $1ab8
-}
-
-// 01:4a8c
-void updateLinkBeingShocked__val00(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4a8c:
-  RET(0x4a8c); return;  // ret
-}
-
-// 01:4a8d
-void updateLinkBeingShocked__val01(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4a8d:
-  I(0x4a8d, 1); H = D;  // ld h,d
-  I(0x4a8e, 1); L = E;  // ld l,e
-  I(0x4a8f, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4a90, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x4a91, 3); mem_wr(gb, HL, 0x2d);  // ld (hl),$2d
-  I(0x4a93, 2); A = 0xac;  // ld a,$ac
-  CALL(0x4a95, playSound_b00_hook, 0x0c98, 0x4a98);  // call $0c98
-  I(0x4a98, 3); SET_HL(0xcc8a);  // ld hl,$cc8a
-  I(0x4a9b, 2); A = 0x21;  // ld a,$21
-  I(0x4a9d, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  I(0x4a9e, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4a9f, 3); SET_HL(0xcbca);  // ld hl,$cbca
-  I(0x4aa2, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  I(0x4aa4, 4); if (hook_enabled_at(0x1ab4)) { copyW2TilesetBgPalettesToW4PaletteData_hook(gb); return; } HANDOFF(0x1ab4);  // jp $1ab4
-}
-
-// 01:4aa7
-void updateLinkBeingShocked__val02(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4aa7:
-  I(0x4aa7, 1); H = D;  // ld h,d
-  I(0x4aa8, 1); L = E;  // ld l,e
-  I(0x4aa9, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x4aaa, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if ((F & FZ)) { I(0x4aab, 3); goto L_4ac0; } I(0x4aab, 2);  // jr z,$4ac0
-  I(0x4aad, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4aae, 2); alu_and(gb, 0x07);  // and $07
-  if (!(F & FZ)) { RET_TAKEN(0x4ab0); return; } I(0x4ab0, 2);  // ret nz
-  I(0x4ab1, 3); alu_bit(gb, 3, mem_rd(gb, HL));  // bit 3,(hl)
-  if ((F & FZ)) { I(0x4ab3, 4); if (hook_enabled_at(0x1ab8)) { copyW4PaletteDataToW2TilesetBgPalettes_hook(gb); return; } HANDOFF(0x1ab8); } I(0x4ab3, 3);  // jp z,$1ab8
-  I(0x4ab6, 2); A = 0x08;  // ld a,$08
-  CALL(0x4ab8, setScreenShakeCounter_hook, 0x24bb, 0x4abb);  // call $24bb
-  I(0x4abb, 2); A = 0x0c;  // ld a,$0c
-  I(0x4abd, 4); if (hook_enabled_at(0x050b)) { loadPaletteHeader_hook(gb); return; } HANDOFF(0x050b);  // jp $050b
-L_4ac0:
-  I(0x4ac0, 1); alu_xor(gb, A);  // xor a
-  I(0x4ac1, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-  I(0x4ac2, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4ac3, 3); SET_HL(0xcc8a);  // ld hl,$cc8a
-  I(0x4ac6, 2); A = 0xde;  // ld a,$de
-  I(0x4ac8, 2); alu_and(gb, mem_rd(gb, HL));  // and (hl)
-  I(0x4ac9, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4aca, 3); SET_HL(0xcbca);  // ld hl,$cbca
-  I(0x4acd, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 0)));  // res 0,(hl)
-  I(0x4acf, 4); if (hook_enabled_at(0x1ab8)) { copyW4PaletteDataToW2TilesetBgPalettes_hook(gb); return; } HANDOFF(0x1ab8);  // jp $1ab8
-}
-
 // 01:4ad2
 void initiateFallDownHoleWarp(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -2039,14 +1522,14 @@ L_5b2f:
   I(0x5b43, 2); A = 0xff;  // ld a,$ff
   I(0x5b45, 4); mem_wr(gb, 0xcc05, A);  // ld ($cc05),a
 L_5b48:
-  CALL(0x5b48, clearObjectsWithEnabled2, 0x4a17, 0x5b4b);  // call $4a17
+  CALL(0x5b48, clearObjectsWithEnabled2_hook, 0x4a17, 0x5b4b);  // call $4a17
   CALL(0x5b4b, refreshObjectGfx_hook, 0x1618, 0x5b4e);  // call $1618
 L_5b4e:
   CALL(0x5b4e, setVisitedRoomFlag_hook, 0x2dd1, 0x5b51);  // call $2dd1
   CALL(0x5b51, checkUpdateDungeonMinimap, 0x5945, 0x5b54);  // call $5945
   I(0x5b54, 2); A = 0x01;  // ld a,$01
   I(0x5b56, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
-  CALL(0x5b59, playCompassSoundIfKeyInRoom, 0x4a58, 0x5b5c);  // call $4a58
+  CALL(0x5b59, playCompassSoundIfKeyInRoom_hook, 0x4a58, 0x5b5c);  // call $4a58
   CALL(0x5b5c, updateLastToggleBlocksState_hook, 0x7c65, 0x5b5f);  // call $7c65
   CALL(0x5b5f, checkInitUnderwaterWaves_hook, 0x626e, 0x5b62);  // call $626e
   I(0x5b62, 4); if (hook_enabled_at(0x5e9e)) { updateGrassAnimationModifier_hook(gb); return; } HANDOFF(0x5e9e);  // jp $5e9e
@@ -2068,14 +1551,14 @@ L_5b2f:
   I(0x5b43, 2); A = 0xff;  // ld a,$ff
   I(0x5b45, 4); mem_wr(gb, 0xcc05, A);  // ld ($cc05),a
 L_5b48:
-  CALL(0x5b48, clearObjectsWithEnabled2, 0x4a17, 0x5b4b);  // call $4a17
+  CALL(0x5b48, clearObjectsWithEnabled2_hook, 0x4a17, 0x5b4b);  // call $4a17
   CALL(0x5b4b, refreshObjectGfx_hook, 0x1618, 0x5b4e);  // call $1618
 L_5b4e:
   CALL(0x5b4e, setVisitedRoomFlag_hook, 0x2dd1, 0x5b51);  // call $2dd1
   CALL(0x5b51, checkUpdateDungeonMinimap, 0x5945, 0x5b54);  // call $5945
   I(0x5b54, 2); A = 0x01;  // ld a,$01
   I(0x5b56, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
-  CALL(0x5b59, playCompassSoundIfKeyInRoom, 0x4a58, 0x5b5c);  // call $4a58
+  CALL(0x5b59, playCompassSoundIfKeyInRoom_hook, 0x4a58, 0x5b5c);  // call $4a58
   CALL(0x5b5c, updateLastToggleBlocksState_hook, 0x7c65, 0x5b5f);  // call $7c65
   CALL(0x5b5f, checkInitUnderwaterWaves_hook, 0x626e, 0x5b62);  // call $626e
   I(0x5b62, 4); if (hook_enabled_at(0x5e9e)) { updateGrassAnimationModifier_hook(gb); return; } HANDOFF(0x5e9e);  // jp $5e9e
@@ -2089,7 +1572,7 @@ L_5b4e:
   CALL(0x5b51, checkUpdateDungeonMinimap, 0x5945, 0x5b54);  // call $5945
   I(0x5b54, 2); A = 0x01;  // ld a,$01
   I(0x5b56, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
-  CALL(0x5b59, playCompassSoundIfKeyInRoom, 0x4a58, 0x5b5c);  // call $4a58
+  CALL(0x5b59, playCompassSoundIfKeyInRoom_hook, 0x4a58, 0x5b5c);  // call $4a58
   CALL(0x5b5c, updateLastToggleBlocksState_hook, 0x7c65, 0x5b5f);  // call $7c65
   CALL(0x5b5f, checkInitUnderwaterWaves_hook, 0x626e, 0x5b62);  // call $626e
   I(0x5b62, 4); if (hook_enabled_at(0x5e9e)) { updateGrassAnimationModifier_hook(gb); return; } HANDOFF(0x5e9e);  // jp $5e9e
@@ -2100,7 +1583,7 @@ void cutscene01(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x5b65, refreshLoadedTreeGfx_hook, 0x1613, 0x5b68);  // call $1613
 L_5b68:
-  CALL(0x5b68, updateLinkBeingShocked, 0x4a81, 0x5b6b);  // call $4a81
+  CALL(0x5b68, updateLinkBeingShocked_hook, 0x4a81, 0x5b6b);  // call $4a81
   CALL(0x5b6b, updateMenus_hook, 0x1a51, 0x5b6e);  // call $1a51
   if (!(F & FZ)) { RET_TAKEN(0x5b6e); return; } I(0x5b6e, 2);  // ret nz
   CALL(0x5b6f, updatePirateShip_hook, 0x7dcc, 0x5b72);  // call $7dcc
@@ -2148,7 +1631,7 @@ L_5bd5:
 void cutscene01__afterCall5b68(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5b68:
-  CALL(0x5b68, updateLinkBeingShocked, 0x4a81, 0x5b6b);  // call $4a81
+  CALL(0x5b68, updateLinkBeingShocked_hook, 0x4a81, 0x5b6b);  // call $4a81
   CALL(0x5b6b, updateMenus_hook, 0x1a51, 0x5b6e);  // call $1a51
   if (!(F & FZ)) { RET_TAKEN(0x5b6e); return; } I(0x5b6e, 2);  // ret nz
   CALL(0x5b6f, updatePirateShip_hook, 0x7dcc, 0x5b72);  // call $7dcc
@@ -2276,7 +1759,7 @@ void cutscene04(GB *gb) {
   I(0x5cb4, 3); goto L_5cc4;  // jr $5cc4
 L_5cc4:
   CALL(0x5cc4, setInteractionsEnabledTo2_hook, 0x49f1, 0x5cc7);  // call $49f1
-  CALL(0x5cc7, clearObjectsWithEnabled2, 0x4a17, 0x5cca);  // call $4a17
+  CALL(0x5cc7, clearObjectsWithEnabled2_hook, 0x4a17, 0x5cca);  // call $4a17
   CALL(0x5cca, clearItems_hook, 0x35e3, 0x5ccd);  // call $35e3
   CALL(0x5ccd, clearEnemies_hook, 0x35f4, 0x5cd0);  // call $35f4
   CALL(0x5cd0, clearParts_hook, 0x3605, 0x5cd3);  // call $3605
@@ -2307,7 +1790,7 @@ void cutscene05(GB *gb) {
   CALL(0x5cbe, clearOam_hook, 0x049f, 0x5cc1);  // call $049f
   CALL(0x5cc1, func_5cfe, 0x5cfe, 0x5cc4);  // call $5cfe
   CALL(0x5cc4, setInteractionsEnabledTo2_hook, 0x49f1, 0x5cc7);  // call $49f1
-  CALL(0x5cc7, clearObjectsWithEnabled2, 0x4a17, 0x5cca);  // call $4a17
+  CALL(0x5cc7, clearObjectsWithEnabled2_hook, 0x4a17, 0x5cca);  // call $4a17
   CALL(0x5cca, clearItems_hook, 0x35e3, 0x5ccd);  // call $35e3
   CALL(0x5ccd, clearEnemies_hook, 0x35f4, 0x5cd0);  // call $35f4
   CALL(0x5cd0, clearParts_hook, 0x3605, 0x5cd3);  // call $3605
@@ -2378,40 +1861,6 @@ L_5e74:
   if ((F & FZ)) { RET_TAKEN(0x5e78); return; } I(0x5e78, 2);  // ret z
   I(0x5e79, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x5e7a, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-}
-
-// 01:4a58
-void playCompassSoundIfKeyInRoom(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4a58, 4); A = mem_rd(gb, 0xcc02);  // ld a,($cc02)
-  I(0x4a5b, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4a5c); return; } I(0x4a5c, 2);  // ret nz
-  I(0x4a5d, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
-  I(0x4a60, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { RET_TAKEN(0x4a62); return; } I(0x4a62, 2);  // ret z
-  I(0x4a63, 3); SET_HL(0xc684);  // ld hl,$c684
-  CALL(0x4a66, checkFlag_hook, 0x0205, 0x4a69);  // call $0205
-  if ((F & FZ)) { RET_TAKEN(0x4a69); return; } I(0x4a69, 2);  // ret z
-  CALL(0x4a6a, getThisRoomFlags_hook, 0x197d, 0x4a6d);  // call $197d
-  I(0x4a6d, 2); alu_and(gb, 0x20);  // and $20
-  if (!(F & FZ)) { RET_TAKEN(0x4a6f); return; } I(0x4a6f, 2);  // ret nz
-  I(0x4a70, 4); A = mem_rd(gb, 0xcc3c);  // ld a,($cc3c)
-  I(0x4a73, 2); alu_and(gb, 0x70);  // and $70
-  I(0x4a75, 2); alu_cp(gb, 0x30);  // cp $30
-  if ((F & FZ)) { I(0x4a77, 3); goto L_4a7c; } I(0x4a77, 2);  // jr z,$4a7c
-  I(0x4a79, 2); alu_cp(gb, 0x10);  // cp $10
-  if (!(F & FZ)) { RET_TAKEN(0x4a7b); return; } I(0x4a7b, 2);  // ret nz
-L_4a7c:
-  I(0x4a7c, 2); A = 0xa2;  // ld a,$a2
-  I(0x4a7e, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-}
-
-// 01:4a7c
-void playCompassSoundIfKeyInRoom__playSound(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4a7c:
-  I(0x4a7c, 2); A = 0xa2;  // ld a,$a2
-  I(0x4a7e, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
 }
 
 // 01:593a
