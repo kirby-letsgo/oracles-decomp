@@ -601,3 +601,7 @@ desync to discover; keep them when porting routines.
   targets and the synthetic return PCs after `refreshObjectGfx`. Give every deferred state and
   post-switch continuation a real alias in `extra.sym` and `ported.txt`, but leave it out of
   `rewritten.txt`; regeneration then keeps the mixed-mode entry while the parent becomes readable.
+- SM83 `set` and `res` instructions do not update flags, and there are no `alu_set`/`alu_res`
+  helpers. Batch 77 initially tried to call such helpers and failed to compile. Implement the
+  effect as `mem_wr(gb, addr, mem_rd(gb, addr) | mask)` or `& ~mask` after the instruction's
+  burn so A and F both remain unchanged.
