@@ -63,6 +63,16 @@ void func_7b93__state2_hook(GB *gb);
 void checkSeedTreeRefillIndex_hook(GB *gb);
 void checkSeedTreeRefillIndex__addRoom_hook(GB *gb);
 void checkSeedTreeRefillIndex__treeScreen_hook(GB *gb);
+void loadDungeonLayout_b01_hook(GB *gb);
+void loadDungeonLayout_b01__nextFloor_hook(GB *gb);
+void loadDungeonLayout_b01__nextByte_hook(GB *gb);
+void loadDungeonLayout_b01__end_hook(GB *gb);
+void clearDungeonLayout_hook(GB *gb);
+void findActiveRoomInDungeonLayoutWithPointlessBankSwitch_hook(GB *gb);
+void findActiveRoomInDungeonLayout_hook(GB *gb);
+void getFirstDungeonLayoutAddress_hook(GB *gb);
+void checkUpdateDungeonMinimap_hook(GB *gb);
+void checkUpdateDungeonMinimap__setMinimapRoom_hook(GB *gb);
 void paletteFadeHandler09_hook(GB *gb);
 void paletteFadeHandler01_hook(GB *gb);
 void paletteFadeHandler00_hook(GB *gb);
@@ -4096,3 +4106,159 @@ void cutscene15__state2__substate1_hook(GB *gb) {
   CYC(0x4d11, 0x4d13); A = 0xf1;
   CYC(0x4d13, 0x4d16); playSound_b00_hook(gb);
 }
+
+static void load_dungeon_layout_b01(GB *gb, uint16_t entry, uint16_t sp0_) {
+  if (entry == 0x5678) goto next_floor;
+  if (entry == 0x567a) goto next_byte;
+  if (entry == 0x569d) goto end;
+
+  CYC(0x564e, 0x5650); A = 0x02;
+  CYC(0x5650, 0x5652); mem_wr(gb, IO_SVBK, A);
+  CALL_C(0x5652, clearDungeonLayout_hook, 0x56a3, 0x5655);
+  CYC(0x5655, 0x5658); A = W8(wDungeonIndex);
+  CYC(0x5658, 0x565b); SET_HL(0x4d2a);
+  CYC(0x565b, 0x565c); bank1_add_double_index_to_hl_from_rst(gb, 0x565c);
+  CYC(0x565c, 0x565d); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x565d, 0x565e); H = mem_rd(gb, HL);
+  CYC(0x565e, 0x565f); L = A;
+  CYC(0x565f, 0x5661); B = 0x08;
+  CYC(0x5661, 0x5664); SET_DE(wDungeonMapData);
+  do {
+    CYC(0x5664, 0x5665); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x5665, 0x5666); mem_wr(gb, DE, A);
+    CYC(0x5666, 0x5667); SET_DE(DE + 1);
+    CYC(0x5667, 0x5668); B = alu_dec8(gb, B);
+    if (!(F & FZ)) CYCT(0x5668, 0x566a); else CYC(0x5668, 0x566a);
+  } while (!(F & FZ));
+  CALL_C(0x566a, findActiveRoomInDungeonLayout_hook, 0x56b3, 0x566d);
+  CYC(0x566d, 0x566e); alu_xor(gb, A);
+  CALL_C(0x566e, getFirstDungeonLayoutAddress_hook, 0x56d3, 0x5671);
+  CYC(0x5671, 0x5674); SET_DE(w2DungeonLayout);
+  CYC(0x5674, 0x5677); A = W8(wDungeonNumFloors);
+  CYC(0x5677, 0x5678); C = A;
+
+next_floor:
+  CYC(0x5678, 0x567a); B = 0x40;
+next_byte:
+  do {
+    CYC(0x567a, 0x567b); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x567b, 0x567c); mem_wr(gb, DE, A);
+    CYC(0x567c, 0x567d); SET_DE(DE + 1);
+    CYC(0x567d, 0x567e); B = alu_dec8(gb, B);
+    if (!(F & FZ)) CYCT(0x567e, 0x5680); else CYC(0x567e, 0x5680);
+  } while (!(F & FZ));
+  CYC(0x5680, 0x5681); C = alu_dec8(gb, C);
+  if (!(F & FZ)) { CYCT(0x5681, 0x5683); goto next_floor; }
+  CYC(0x5681, 0x5683);
+  CYC(0x5683, 0x5686); A = W8(wTilesetFlags);
+  CYC(0x5686, 0x5688); alu_bit(gb, 5, A);
+  if (!(F & FZ)) { CYCT(0x5688, 0x568a); goto end; }
+  CYC(0x5688, 0x568a);
+  CYC(0x568a, 0x568d); A = W8(wDungeonFloor);
+  CYC(0x568d, 0x5690); SET_HL(0x00f8);
+  CYC(0x5690, 0x5691); alu_add(gb, L);
+  CYC(0x5691, 0x5692); L = A;
+  CYC(0x5692, 0x5693); B = mem_rd(gb, HL);
+  CYC(0x5693, 0x5696); A = W8(wDungeonIndex);
+  CYC(0x5696, 0x5699); SET_HL(wDungeonVisitedFloors);
+  CYC(0x5699, 0x569a); bank1_add_a_to_hl_from_rst(gb, 0x569a);
+  CYC(0x569a, 0x569b); A = mem_rd(gb, HL);
+  CYC(0x569b, 0x569c); alu_or(gb, B);
+  CYC(0x569c, 0x569d); mem_wr(gb, HL, A);
+end:
+  CYC(0x569d, 0x569e); alu_xor(gb, A);
+  CYC(0x569e, 0x56a0); mem_wr(gb, IO_SVBK, A);
+  CYC(0x56a0, 0x56a3); setVisitedRoomFlag_hook(gb);
+}
+
+void loadDungeonLayout_b01_hook(GB *gb) { uint16_t sp0_ = gb->sp; load_dungeon_layout_b01(gb, 0x564e, sp0_); }
+void loadDungeonLayout_b01__nextFloor_hook(GB *gb) { uint16_t sp0_ = gb->sp; load_dungeon_layout_b01(gb, 0x5678, sp0_); }
+void loadDungeonLayout_b01__nextByte_hook(GB *gb) { uint16_t sp0_ = gb->sp; load_dungeon_layout_b01(gb, 0x567a, sp0_); }
+void loadDungeonLayout_b01__end_hook(GB *gb) { uint16_t sp0_ = gb->sp; load_dungeon_layout_b01(gb, 0x569d, sp0_); }
+
+void clearDungeonLayout_hook(GB *gb) {
+  CYC(0x56a3, 0x56a6); SET_HL(w2DungeonLayout);
+  CYC(0x56a6, 0x56a9); SET_BC(0x0200);
+  CYC(0x56a9, 0x56ac); clearMemoryBc_hook(gb);
+}
+
+static void find_active_room_in_dungeon_layout(GB *gb, uint16_t entry, uint16_t sp0_) {
+  if (entry == 0x56ac) {
+    CYC(0x56ac, 0x56ae); A = 0x01;
+    CYC(0x56ae, 0x56b0); H8(hRomBank) = A;
+    CYC(0x56b0, 0x56b3); mem_wr(gb, MBC_ROM_BANK, A);
+  }
+  CYC(0x56b3, 0x56b4); alu_xor(gb, A);
+  CALL_C(0x56b4, getFirstDungeonLayoutAddress_hook, 0x56d3, 0x56b7);
+  CYC(0x56b7, 0x56ba); A = W8(wActiveRoom);
+  CYC(0x56ba, 0x56bc); C = 0x00;
+next_floor:
+  CYC(0x56bc, 0x56be); B = 0x40;
+next_room:
+  CYC(0x56be, 0x56bf); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(0x56bf, 0x56c1); goto found; }
+  CYC(0x56bf, 0x56c1);
+  CYC(0x56c1, 0x56c2); SET_HL(HL + 1);
+  CYC(0x56c2, 0x56c3); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x56c3, 0x56c5); goto next_room; }
+  CYC(0x56c3, 0x56c5);
+  CYC(0x56c5, 0x56c6); C = alu_inc8(gb, C);
+  CYC(0x56c6, 0x56c8); goto next_floor;
+found:
+  CYC(0x56c8, 0x56c9); A = C;
+  CYC(0x56c9, 0x56cc); W8(wDungeonFloor) = A;
+  CYC(0x56cc, 0x56ce); A = 0x40;
+  CYC(0x56ce, 0x56cf); alu_sub(gb, B);
+  CYC(0x56cf, 0x56d2); W8(wDungeonMapPosition) = A;
+  CYC(0x56d2, 0x56d3); ret_effect(gb);
+}
+
+void findActiveRoomInDungeonLayoutWithPointlessBankSwitch_hook(GB *gb) { uint16_t sp0_ = gb->sp; find_active_room_in_dungeon_layout(gb, 0x56ac, sp0_); }
+void findActiveRoomInDungeonLayout_hook(GB *gb) { uint16_t sp0_ = gb->sp; find_active_room_in_dungeon_layout(gb, 0x56b3, sp0_); }
+
+void getFirstDungeonLayoutAddress_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x56d3, 0x56d4); C = A;
+  CYC(0x56d4, 0x56d7); A = W8(wDungeonFirstLayout);
+  CYC(0x56d7, 0x56d8); alu_add(gb, C);
+  CALL_C(0x56d8, multiplyABy16_hook, 0x01ac, 0x56db);
+  CYC(0x56db, 0x56de); SET_HL(0x4fce);
+  CYC(0x56de, 0x56df); alu_add_hl(gb, BC);
+  CYC(0x56df, 0x56e0); alu_add_hl(gb, BC);
+  CYC(0x56e0, 0x56e1); alu_add_hl(gb, BC);
+  CYC(0x56e1, 0x56e2); alu_add_hl(gb, BC);
+  CYC(0x56e2, 0x56e3); ret_effect(gb);
+}
+
+static void check_update_dungeon_minimap(GB *gb, uint16_t entry) {
+  if (entry == 0x5945) {
+    CYC(0x5945, 0x5948); A = W8(wTilesetFlags);
+    CYC(0x5948, 0x594a); alu_bit(gb, 4, A);
+    if (!(F & FZ)) { CYCT(0x594a, 0x594b); ret_effect(gb); return; }
+    CYC(0x594a, 0x594b);
+    CYC(0x594b, 0x594d); alu_bit(gb, 5, A);
+    if (!(F & FZ)) { CYCT(0x594d, 0x594e); ret_effect(gb); return; }
+    CYC(0x594d, 0x594e);
+    CYC(0x594e, 0x5950); alu_bit(gb, 0, A);
+    if (!(F & FZ)) { CYCT(0x5950, 0x5952); goto set_minimap_room; }
+    CYC(0x5950, 0x5952);
+    CYC(0x5952, 0x5954); alu_bit(gb, 3, A);
+    if (F & FZ) { CYCT(0x5954, 0x5955); ret_effect(gb); return; }
+    CYC(0x5954, 0x5955);
+  }
+set_minimap_room:
+  CYC(0x5955, 0x5958); SET_HL(wMinimapDungeonFloor);
+  CYC(0x5958, 0x595b); A = W8(wDungeonFloor);
+  CYC(0x595b, 0x595c); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x595c, 0x595f); A = W8(wDungeonMapPosition);
+  CYC(0x595f, 0x5960); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x5960, 0x5963); A = W8(wActiveRoom);
+  CYC(0x5963, 0x5964); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x5964, 0x5967); A = W8(wActiveGroup);
+  CYC(0x5967, 0x5968); C = mem_rd(gb, HL);
+  CYC(0x5968, 0x5969); mem_wr(gb, HL, A);
+  CYC(0x5969, 0x596a); ret_effect(gb);
+}
+
+void checkUpdateDungeonMinimap_hook(GB *gb) { check_update_dungeon_minimap(gb, 0x5945); }
+void checkUpdateDungeonMinimap__setMinimapRoom_hook(GB *gb) { check_update_dungeon_minimap(gb, 0x5955); }

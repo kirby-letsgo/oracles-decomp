@@ -699,3 +699,14 @@
 02:54c0 loadItemIconGfx__func
 02:54d6 loadItemIconGfx__clear
 02:732f getRingTiles__drawTile
+02:44b6 fileSelectMode2__func
+02:44c0 fileSelectMode2__mode0
+02:44ca fileSelectMode2__mode2
+02:44e9 runKidNameEntryMenu__func
+02:44f3 runKidNameEntryMenu__mode0
+02:4500 runKidNameEntryMenu__mode1
+02:4508 runKidNameEntryMenu__mode2
+01:5678 loadDungeonLayout_b01__nextFloor
+01:567a loadDungeonLayout_b01__nextByte
+01:569d loadDungeonLayout_b01__end
+01:5955 checkUpdateDungeonMinimap__setMinimapRoom

@@ -1,6 +1,8 @@
 #include "game/game.h"
 #include "game/gen.h"
 
+void loadDungeonLayout_b01_hook(GB *gb);
+
 // Rewrites of code/bank0.s. Cycles are burned from the ROM's own instruction stream (CYC/CYCT),
 // which keeps interrupt dispatch on instruction boundaries; every memory access follows the burn
 // of the instruction that performs it, as the transliteration does.
@@ -5450,12 +5452,13 @@ void flashScreen_hook(GB *gb) {
 }
 
 void loadDungeonLayout_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x2daa, 0x2dad); A = W8(wTilesetFlags);
   alu_and(gb, 0x08);
   if (F & FZ) { CYCT(0x2dad, 0x2db0); ret_effect(gb); return; }
   CYC(0x2dad, 0x2db0);
   bank_push(gb, 0x2db0, 0x01);
-  CALL_ROM(0x2dba, ROM_b01_loadDungeonLayout_b01);
+  CALL_C(0x2dba, loadDungeonLayout_b01_hook, 0x564e, 0x2dbd);
   bank_pop(gb, 0x2dbd);
   CYC(0x2dc3, 0x2dc4);
   ret_effect(gb);

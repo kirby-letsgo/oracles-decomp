@@ -263,203 +263,6 @@ L_4d27:
   I(0x4d27, 4); if (hook_enabled_at(0x345b)) { updateAllObjects_hook(gb); return; } HANDOFF(0x345b);  // jp $345b
 }
 
-// 01:564e
-void loadDungeonLayout_b01(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x564e, 2); A = 0x02;  // ld a,$02
-  I(0x5650, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  CALL(0x5652, clearDungeonLayout, 0x56a3, 0x5655);  // call $56a3
-  I(0x5655, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
-  I(0x5658, 3); SET_HL(0x4d2a);  // ld hl,$4d2a
-  RST_PUSH(0x565b, 0x565c);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x565c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x565d, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x565e, 1); L = A;  // ld l,a
-  I(0x565f, 2); B = 0x08;  // ld b,$08
-  I(0x5661, 3); SET_DE(0xcc3d);  // ld de,$cc3d
-L_5664:
-  I(0x5664, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x5665, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x5666, 2); SET_DE(DE + 1);  // inc de
-  I(0x5667, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x5668, 3); goto L_5664; } I(0x5668, 2);  // jr nz,$5664
-  CALL(0x566a, findActiveRoomInDungeonLayout, 0x56b3, 0x566d);  // call $56b3
-  I(0x566d, 1); alu_xor(gb, A);  // xor a
-  CALL(0x566e, getFirstDungeonLayoutAddress, 0x56d3, 0x5671);  // call $56d3
-  I(0x5671, 3); SET_DE(0xdc00);  // ld de,$dc00
-  I(0x5674, 4); A = mem_rd(gb, 0xcc40);  // ld a,($cc40)
-  I(0x5677, 1); C = A;  // ld c,a
-L_5678:
-  I(0x5678, 2); B = 0x40;  // ld b,$40
-L_567a:
-  I(0x567a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x567b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x567c, 2); SET_DE(DE + 1);  // inc de
-  I(0x567d, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x567e, 3); goto L_567a; } I(0x567e, 2);  // jr nz,$567a
-  I(0x5680, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x5681, 3); goto L_5678; } I(0x5681, 2);  // jr nz,$5678
-  I(0x5683, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
-  I(0x5686, 2); alu_bit(gb, 5, A);  // bit 5,a
-  if (!(F & FZ)) { I(0x5688, 3); goto L_569d; } I(0x5688, 2);  // jr nz,$569d
-  I(0x568a, 4); A = mem_rd(gb, 0xcc3b);  // ld a,($cc3b)
-  I(0x568d, 3); SET_HL(0x00f8);  // ld hl,$00f8
-  I(0x5690, 1); alu_add(gb, L);  // add l
-  I(0x5691, 1); L = A;  // ld l,a
-  I(0x5692, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x5693, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
-  I(0x5696, 3); SET_HL(0xc662);  // ld hl,$c662
-  RST_PUSH(0x5699, 0x569a);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x569a, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x569b, 1); alu_or(gb, B);  // or b
-  I(0x569c, 2); mem_wr(gb, HL, A);  // ld (hl),a
-L_569d:
-  I(0x569d, 1); alu_xor(gb, A);  // xor a
-  I(0x569e, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x56a0, 4); if (hook_enabled_at(0x2dd1)) { setVisitedRoomFlag_hook(gb); return; } HANDOFF(0x2dd1);  // jp $2dd1
-}
-
-// 01:5678
-void loadDungeonLayout_b01__nextFloor(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5678:
-  I(0x5678, 2); B = 0x40;  // ld b,$40
-L_567a:
-  I(0x567a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x567b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x567c, 2); SET_DE(DE + 1);  // inc de
-  I(0x567d, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x567e, 3); goto L_567a; } I(0x567e, 2);  // jr nz,$567a
-  I(0x5680, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x5681, 3); goto L_5678; } I(0x5681, 2);  // jr nz,$5678
-  I(0x5683, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
-  I(0x5686, 2); alu_bit(gb, 5, A);  // bit 5,a
-  if (!(F & FZ)) { I(0x5688, 3); goto L_569d; } I(0x5688, 2);  // jr nz,$569d
-  I(0x568a, 4); A = mem_rd(gb, 0xcc3b);  // ld a,($cc3b)
-  I(0x568d, 3); SET_HL(0x00f8);  // ld hl,$00f8
-  I(0x5690, 1); alu_add(gb, L);  // add l
-  I(0x5691, 1); L = A;  // ld l,a
-  I(0x5692, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x5693, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
-  I(0x5696, 3); SET_HL(0xc662);  // ld hl,$c662
-  RST_PUSH(0x5699, 0x569a);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x569a, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x569b, 1); alu_or(gb, B);  // or b
-  I(0x569c, 2); mem_wr(gb, HL, A);  // ld (hl),a
-L_569d:
-  I(0x569d, 1); alu_xor(gb, A);  // xor a
-  I(0x569e, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x56a0, 4); if (hook_enabled_at(0x2dd1)) { setVisitedRoomFlag_hook(gb); return; } HANDOFF(0x2dd1);  // jp $2dd1
-}
-
-// 01:567a
-void loadDungeonLayout_b01__nextByte(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_567a;
-L_5678:
-  I(0x5678, 2); B = 0x40;  // ld b,$40
-L_567a:
-  I(0x567a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x567b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x567c, 2); SET_DE(DE + 1);  // inc de
-  I(0x567d, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x567e, 3); goto L_567a; } I(0x567e, 2);  // jr nz,$567a
-  I(0x5680, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x5681, 3); goto L_5678; } I(0x5681, 2);  // jr nz,$5678
-  I(0x5683, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
-  I(0x5686, 2); alu_bit(gb, 5, A);  // bit 5,a
-  if (!(F & FZ)) { I(0x5688, 3); goto L_569d; } I(0x5688, 2);  // jr nz,$569d
-  I(0x568a, 4); A = mem_rd(gb, 0xcc3b);  // ld a,($cc3b)
-  I(0x568d, 3); SET_HL(0x00f8);  // ld hl,$00f8
-  I(0x5690, 1); alu_add(gb, L);  // add l
-  I(0x5691, 1); L = A;  // ld l,a
-  I(0x5692, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x5693, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
-  I(0x5696, 3); SET_HL(0xc662);  // ld hl,$c662
-  RST_PUSH(0x5699, 0x569a);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x569a, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x569b, 1); alu_or(gb, B);  // or b
-  I(0x569c, 2); mem_wr(gb, HL, A);  // ld (hl),a
-L_569d:
-  I(0x569d, 1); alu_xor(gb, A);  // xor a
-  I(0x569e, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x56a0, 4); if (hook_enabled_at(0x2dd1)) { setVisitedRoomFlag_hook(gb); return; } HANDOFF(0x2dd1);  // jp $2dd1
-}
-
-// 01:569d
-void loadDungeonLayout_b01__end(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_569d:
-  I(0x569d, 1); alu_xor(gb, A);  // xor a
-  I(0x569e, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x56a0, 4); if (hook_enabled_at(0x2dd1)) { setVisitedRoomFlag_hook(gb); return; } HANDOFF(0x2dd1);  // jp $2dd1
-}
-
-// 01:56a3
-void clearDungeonLayout(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x56a3, 3); SET_HL(0xdc00);  // ld hl,$dc00
-  I(0x56a6, 3); SET_BC(0x0200);  // ld bc,$0200
-  I(0x56a9, 4); if (hook_enabled_at(0x0475)) { clearMemoryBc_hook(gb); return; } HANDOFF(0x0475);  // jp $0475
-}
-
-// 01:56ac
-void findActiveRoomInDungeonLayoutWithPointlessBankSwitch(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x56ac, 2); A = 0x01;  // ld a,$01
-  I(0x56ae, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x56b0, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  findActiveRoomInDungeonLayout(gb); return;  // fallthrough
-}
-
-// 01:56b3
-void findActiveRoomInDungeonLayout(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x56b3, 1); alu_xor(gb, A);  // xor a
-  CALL(0x56b4, getFirstDungeonLayoutAddress, 0x56d3, 0x56b7);  // call $56d3
-  I(0x56b7, 4); A = mem_rd(gb, 0xcc30);  // ld a,($cc30)
-  I(0x56ba, 2); C = 0x00;  // ld c,$00
-L_56bc:
-  I(0x56bc, 2); B = 0x40;  // ld b,$40
-L_56be:
-  I(0x56be, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if ((F & FZ)) { I(0x56bf, 3); goto L_56c8; } I(0x56bf, 2);  // jr z,$56c8
-  I(0x56c1, 2); SET_HL(HL + 1);  // inc hl
-  I(0x56c2, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x56c3, 3); goto L_56be; } I(0x56c3, 2);  // jr nz,$56be
-  I(0x56c5, 1); C = alu_inc8(gb, C);  // inc c
-  I(0x56c6, 3); goto L_56bc;  // jr $56bc
-L_56c8:
-  I(0x56c8, 1); A = C;  // ld a,c
-  I(0x56c9, 4); mem_wr(gb, 0xcc3b, A);  // ld ($cc3b),a
-  I(0x56cc, 2); A = 0x40;  // ld a,$40
-  I(0x56ce, 1); alu_sub(gb, B);  // sub b
-  I(0x56cf, 4); mem_wr(gb, 0xcc3a, A);  // ld ($cc3a),a
-  RET(0x56d2); return;  // ret
-}
-
-// 01:56d3
-void getFirstDungeonLayoutAddress(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x56d3, 1); C = A;  // ld c,a
-  I(0x56d4, 4); A = mem_rd(gb, 0xcc3f);  // ld a,($cc3f)
-  I(0x56d7, 1); alu_add(gb, C);  // add c
-  CALL(0x56d8, multiplyABy16_hook, 0x01ac, 0x56db);  // call $01ac
-  I(0x56db, 3); SET_HL(0x4fce);  // ld hl,$4fce
-  I(0x56de, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x56df, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x56e0, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x56e1, 2); alu_add_hl(gb, BC);  // add hl,bc
-  RET(0x56e2); return;  // ret
-}
-
 // 01:56e3
 void paletteFadeHandler(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -524,49 +327,6 @@ void checkLockBG7Color3ToBlack__thing0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_592d:
   RET(0x592d); return;  // ret
-}
-
-// 01:5945
-void checkUpdateDungeonMinimap(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5945, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
-  I(0x5948, 2); alu_bit(gb, 4, A);  // bit 4,a
-  if (!(F & FZ)) { RET_TAKEN(0x594a); return; } I(0x594a, 2);  // ret nz
-  I(0x594b, 2); alu_bit(gb, 5, A);  // bit 5,a
-  if (!(F & FZ)) { RET_TAKEN(0x594d); return; } I(0x594d, 2);  // ret nz
-  I(0x594e, 2); alu_bit(gb, 0, A);  // bit 0,a
-  if (!(F & FZ)) { I(0x5950, 3); goto L_5955; } I(0x5950, 2);  // jr nz,$5955
-  I(0x5952, 2); alu_bit(gb, 3, A);  // bit 3,a
-  if ((F & FZ)) { RET_TAKEN(0x5954); return; } I(0x5954, 2);  // ret z
-L_5955:
-  I(0x5955, 3); SET_HL(0xc63d);  // ld hl,$c63d
-  I(0x5958, 4); A = mem_rd(gb, 0xcc3b);  // ld a,($cc3b)
-  I(0x595b, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-  I(0x595c, 4); A = mem_rd(gb, 0xcc3a);  // ld a,($cc3a)
-  I(0x595f, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-  I(0x5960, 4); A = mem_rd(gb, 0xcc30);  // ld a,($cc30)
-  I(0x5963, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-  I(0x5964, 4); A = mem_rd(gb, 0xcc2d);  // ld a,($cc2d)
-  I(0x5967, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  I(0x5968, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x5969); return;  // ret
-}
-
-// 01:5955
-void checkUpdateDungeonMinimap__setMinimapRoom(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5955:
-  I(0x5955, 3); SET_HL(0xc63d);  // ld hl,$c63d
-  I(0x5958, 4); A = mem_rd(gb, 0xcc3b);  // ld a,($cc3b)
-  I(0x595b, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-  I(0x595c, 4); A = mem_rd(gb, 0xcc3a);  // ld a,($cc3a)
-  I(0x595f, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-  I(0x5960, 4); A = mem_rd(gb, 0xcc30);  // ld a,($cc30)
-  I(0x5963, 2); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ld (hl-),a
-  I(0x5964, 4); A = mem_rd(gb, 0xcc2d);  // ld a,($cc2d)
-  I(0x5967, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  I(0x5968, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x5969); return;  // ret
 }
 
 // 01:596a
@@ -992,7 +752,7 @@ L_5b48:
   CALL(0x5b4b, refreshObjectGfx_hook, 0x1618, 0x5b4e);  // call $1618
 L_5b4e:
   CALL(0x5b4e, setVisitedRoomFlag_hook, 0x2dd1, 0x5b51);  // call $2dd1
-  CALL(0x5b51, checkUpdateDungeonMinimap, 0x5945, 0x5b54);  // call $5945
+  CALL(0x5b51, checkUpdateDungeonMinimap_hook, 0x5945, 0x5b54);  // call $5945
   I(0x5b54, 2); A = 0x01;  // ld a,$01
   I(0x5b56, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
   CALL(0x5b59, playCompassSoundIfKeyInRoom_hook, 0x4a58, 0x5b5c);  // call $4a58
@@ -1021,7 +781,7 @@ L_5b48:
   CALL(0x5b4b, refreshObjectGfx_hook, 0x1618, 0x5b4e);  // call $1618
 L_5b4e:
   CALL(0x5b4e, setVisitedRoomFlag_hook, 0x2dd1, 0x5b51);  // call $2dd1
-  CALL(0x5b51, checkUpdateDungeonMinimap, 0x5945, 0x5b54);  // call $5945
+  CALL(0x5b51, checkUpdateDungeonMinimap_hook, 0x5945, 0x5b54);  // call $5945
   I(0x5b54, 2); A = 0x01;  // ld a,$01
   I(0x5b56, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
   CALL(0x5b59, playCompassSoundIfKeyInRoom_hook, 0x4a58, 0x5b5c);  // call $4a58
@@ -1035,7 +795,7 @@ void cutscene00__afterCall5b4e(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5b4e:
   CALL(0x5b4e, setVisitedRoomFlag_hook, 0x2dd1, 0x5b51);  // call $2dd1
-  CALL(0x5b51, checkUpdateDungeonMinimap, 0x5945, 0x5b54);  // call $5945
+  CALL(0x5b51, checkUpdateDungeonMinimap_hook, 0x5945, 0x5b54);  // call $5945
   I(0x5b54, 2); A = 0x01;  // ld a,$01
   I(0x5b56, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
   CALL(0x5b59, playCompassSoundIfKeyInRoom_hook, 0x4a58, 0x5b5c);  // call $4a58
@@ -1372,7 +1132,7 @@ L_5aad:
   CALL(0x5aad, checkDisplayEraOrSeasonInfo_hook, 0x5e7d, 0x5ab0);  // call $5e7d
   CALL(0x5ab0, updateGrassAnimationModifier_hook, 0x5e9e, 0x5ab3);  // call $5e9e
   CALL(0x5ab3, checkPlayRoomMusic, 0x5e4d, 0x5ab6);  // call $5e4d
-  CALL(0x5ab6, checkUpdateDungeonMinimap, 0x5945, 0x5ab9);  // call $5945
+  CALL(0x5ab6, checkUpdateDungeonMinimap_hook, 0x5945, 0x5ab9);  // call $5945
   I(0x5ab9, 4); func_593a(gb); return;  // jp $593a
 }
 
@@ -1383,7 +1143,7 @@ L_5aad:
   CALL(0x5aad, checkDisplayEraOrSeasonInfo_hook, 0x5e7d, 0x5ab0);  // call $5e7d
   CALL(0x5ab0, updateGrassAnimationModifier_hook, 0x5e9e, 0x5ab3);  // call $5e9e
   CALL(0x5ab3, checkPlayRoomMusic, 0x5e4d, 0x5ab6);  // call $5e4d
-  CALL(0x5ab6, checkUpdateDungeonMinimap, 0x5945, 0x5ab9);  // call $5945
+  CALL(0x5ab6, checkUpdateDungeonMinimap_hook, 0x5945, 0x5ab9);  // call $5945
   I(0x5ab9, 4); func_593a(gb); return;  // jp $593a
 }
 
@@ -1603,7 +1363,7 @@ void func_7fb5(GB *gb) {
 // 01:5c18
 void func_5c18(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5c18, checkUpdateDungeonMinimap, 0x5945, 0x5c1b);  // call $5945
+  CALL(0x5c18, checkUpdateDungeonMinimap_hook, 0x5945, 0x5c1b);  // call $5945
   I(0x5c1b, 3); SET_HL(0xd101);  // ld hl,$d101
   I(0x5c1e, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
   I(0x5c1f, 2); alu_cp(gb, 0x13);  // cp $13

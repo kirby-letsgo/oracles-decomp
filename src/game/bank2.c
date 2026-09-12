@@ -223,6 +223,13 @@ void fileSelectMode3__mode2_hook(GB *gb);
 void fileSelectMode3__mode3_hook(GB *gb);
 void fileSelectMode3__func_02_4397_hook(GB *gb);
 void fileSelectMode3__label_02_015_hook(GB *gb);
+void fileSelectMode2__func_hook(GB *gb);
+void fileSelectMode2__mode0_hook(GB *gb);
+void fileSelectMode2__mode2_hook(GB *gb);
+void runKidNameEntryMenu__func_hook(GB *gb);
+void runKidNameEntryMenu__mode0_hook(GB *gb);
+void runKidNameEntryMenu__mode1_hook(GB *gb);
+void runKidNameEntryMenu__mode2_hook(GB *gb);
 void inventoryMenuState2_hook(GB *gb);
 void inventoryMenuState2__subStates_hook(GB *gb);
 void inventoryMenuState2__subState0_hook(GB *gb);
@@ -3010,6 +3017,100 @@ void fileSelectSetCursor_hook(GB *gb) {
   CYC(0x44aa, 0x44ab); mem_wr(gb, HL, A);
   CYC(0x44ab, 0x44ad); A = 0x84;
   CYC(0x44ad, 0x44b0); playSound_b00_hook(gb);
+}
+
+void fileSelectMode2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x44b0, fileSelectMode2__func_hook, 0x44b6, 0x44b3);
+  CYC(0x44b3, 0x44b6); drawNameInputCursors_hook(gb);
+}
+
+void fileSelectMode2__func_hook(GB *gb) {
+  CYC(0x44b6, 0x44b9); A = W8(wFileSelect_mode2);
+  CYC(0x44b9, 0x44ba); push_effect(gb, 0x44ba);
+  switch (function_caller_jump_table(gb)) {
+    case 0x44c0: fileSelectMode2__mode0_hook(gb); return;
+    case 0x44ca: fileSelectMode2__mode2_hook(gb); return;
+    case 0x46d6: hook_handoff(gb, HL); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void fileSelectMode2__mode0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x44c0, eraseFile_b00_hook, 0x09e0, 0x44c3);
+  CALL_C(0x44c3, loadFile_b00_hook, 0x09dc, 0x44c6);
+  CYC(0x44c6, 0x44c7); alu_xor(gb, A);
+  CYC(0x44c7, 0x44ca); copyNameToW4NameBuffer_hook(gb);
+}
+
+void fileSelectMode2__mode2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x44ca, getNameBufferLength_hook, 0x4626, 0x44cd);
+  if (F & FZ) CYCT(0x44cd, 0x44cf);
+  else {
+    CYC(0x44cd, 0x44cf);
+    CYC(0x44cf, 0x44d2); SET_HL(w4NameBuffer);
+    CYC(0x44d2, 0x44d5); SET_DE(wLinkName);
+    CYC(0x44d5, 0x44d7); B = 0x06;
+    CALL_C(0x44d7, copyMemory_hook, 0x0486, 0x44da);
+    CALL_C(0x44da, initializeFile_b00_hook, 0x09d4, 0x44dd);
+  }
+  CYC(0x44dd, 0x44e0); setFileSelectModeTo1_hook(gb);
+}
+
+void runKidNameEntryMenu_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x44e0, fileSelect_redrawDecorationsAndSetWramBank4_hook, 0x4cd7, 0x44e3);
+  CALL_C(0x44e3, runKidNameEntryMenu__func_hook, 0x44e9, 0x44e6);
+  CYC(0x44e6, 0x44e9); drawNameInputCursors_hook(gb);
+}
+
+void runKidNameEntryMenu__func_hook(GB *gb) {
+  CYC(0x44e9, 0x44ec); A = W8(wFileSelect_mode2);
+  CYC(0x44ec, 0x44ed); push_effect(gb, 0x44ed);
+  switch (function_caller_jump_table(gb)) {
+    case 0x44f3: runKidNameEntryMenu__mode0_hook(gb); return;
+    case 0x4500: runKidNameEntryMenu__mode1_hook(gb); return;
+    case 0x4508: runKidNameEntryMenu__mode2_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void runKidNameEntryMenu__mode0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x44f3, 0x44f5); A = 0xa0;
+  CALL_C(0x44f5, loadGfxHeader_hook, 0x0626, 0x44f8);
+  CYC(0x44f8, 0x44fa); A = 0x01;
+  CALL_C(0x44fa, copyNameToW4NameBuffer_hook, 0x4641, 0x44fd);
+  CYC(0x44fd, 0x4500); fadeinFromWhite_hook(gb);
+}
+
+void runKidNameEntryMenu__mode1_hook(GB *gb) {
+  CYC(0x4500, 0x4503); A = W8(wPaletteThread_mode);
+  CYC(0x4503, 0x4504); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x4504, 0x4505); ret_effect(gb); return; }
+  CYC(0x4504, 0x4505);
+  CYC(0x4505, 0x4508); hook_handoff(gb, 0x46d6);
+}
+
+void runKidNameEntryMenu__mode2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4508, getNameBufferLength_hook, 0x4626, 0x450b);
+  CYC(0x450b, 0x450d); A = 0x01;
+  if (F & FZ) CYCT(0x450d, 0x450f);
+  else {
+    CYC(0x450d, 0x450f);
+    CYC(0x450f, 0x4512); SET_HL(w4NameBuffer);
+    CYC(0x4512, 0x4515); SET_DE(wKidName);
+    CYC(0x4515, 0x4517); B = 0x06;
+    CALL_C(0x4517, copyMemory_hook, 0x0486, 0x451a);
+    CYC(0x451a, 0x451c); A = 0x56;
+    CALL_C(0x451c, playSound_b00_hook, 0x0c98, 0x451f);
+    CYC(0x451f, 0x4520); alu_xor(gb, A);
+  }
+  CYC(0x4520, 0x4523); W8(wTextInputResult) = A;
+  CYC(0x4523, 0x4526); closeMenu_hook(gb);
 }
 
 void getNameBufferLength_hook(GB *gb) {
