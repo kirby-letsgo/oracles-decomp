@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 1,823 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 1,844 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -83,7 +83,9 @@ Updated 2026-09-12. Newest entries at the top of each section.
   completion states plus their shared graphics dispatcher; batch 82 began the final late-cutscene
   pass, and batches 83–86 completed the safe dungeon, timewarp, Black Tower, Flame of Sorrow, and
   Zelda-kidnapped state clusters. Batch 87 added the eighteen independently hookable standard-text
-  states and exits; the thread-starting textbox root remains generated.
+  states and exits; the thread-starting textbox root remains generated. Batch 88 completed the
+  text-option and inventory-text state machines and removed their cursor-delay data label from the
+  executable routine registry.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -188,6 +190,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-12: milestone 3 phase 5 batch 88 (21 routines): the complete text-option and
+  inventory-text state machines, including nineteen newly aliased local entries and the full
+  character/space/address/DMA fallthrough chain. The textbox cursor-delay table left the routine
+  registry because it is data. Self-review corrected a taken branch that must skip the status
+  update at `$4d8a` and restored taken timing on the `$4e25` control-code branch; independent
+  review approved the final instruction boundaries, real RST stack, and direct tails. Gates:
+  lint 0, 30k verify 0 mismatches (4,716,239 calls), whole-movie state hash clean
+  (`64bddd0dfe384126`), ctest 8/8 in both normal and quirk builds.
 
 - 2026-09-12: milestone 3 phase 5 batch 87 (18 routines): the standard-text textbox state
   machine, including every independently hookable state, its shared finish/exit paths, and the
