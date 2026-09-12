@@ -151,6 +151,24 @@ void updateGfxRegs2Scroll_hook(GB *gb);
 void screenTransitionState3_hook(GB *gb);
 void checkDarkenRoomAndClearPaletteFadeState_hook(GB *gb);
 void checkDarkenRoom_hook(GB *gb);
+void screenTransitionState4_hook(GB *gb);
+void screenTransitionState5_hook(GB *gb);
+void screenTransitionState5Substate0_hook(GB *gb);
+void screenTransitionState5Substate0__horizontal_hook(GB *gb);
+void screenTransitionState5Substate0__vertical_hook(GB *gb);
+void transitionUpdateScrollAndLinkPosition_hook(GB *gb);
+void finishScrollingTransition_hook(GB *gb);
+void label_01_037_hook(GB *gb);
+void func_4493_hook(GB *gb);
+void resetFollowingLinkObjectPosition_hook(GB *gb);
+void screenTransitionState5Substate2_hook(GB *gb);
+void screenTransitionState5Substate2__state0_hook(GB *gb);
+void screenTransitionState5Substate2__state1_hook(GB *gb);
+void screenTransitionState5Substate2__state2_hook(GB *gb);
+void screenTransitionState5Substate2__state3_hook(GB *gb);
+void screenTransitionState5Substate2__state4_hook(GB *gb);
+void screenTransitionState5Substate2__state5_hook(GB *gb);
+void screenTransitionState5Substate2__drawNextRow_hook(GB *gb);
 
 static void screenTransitionEyePuzzle_up(GB *gb);
 static void screenTransitionEyePuzzle_rightOrLeft(GB *gb);
@@ -2485,8 +2503,8 @@ void func_400b_hook(GB *gb) {
     case 0x4075: screenTransitionState1_hook(gb); return;
     case 0x4105: screenTransitionState2_hook(gb); return;
     case 0x42e2: screenTransitionState3_hook(gb); return;
-    case 0x433a: screenTransitionState4(gb); return;
-    case 0x435a: screenTransitionState5(gb); return;
+    case 0x433a: screenTransitionState4_hook(gb); return;
+    case 0x435a: screenTransitionState5_hook(gb); return;
     default: hook_handoff(gb, HL); return;
   }
 }
@@ -3055,4 +3073,384 @@ void checkDarkenRoom_hook(GB *gb) {
   if (F & FZ) { CYCT(0x431f, 0x4320); ret_effect(gb); return; }
   CYC(0x431f, 0x4320);
   CYC(0x4320, 0x4323); darkenRoom_hook(gb);
+}
+
+void screenTransitionState4_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x433a, updateTilesetUniqueGfx_hook, 0x37db, 0x433d);
+  if (F & FC) { CYCT(0x433d, 0x433e); ret_effect(gb); return; }
+  CYC(0x433d, 0x433e);
+  CYC(0x433e, 0x4341); A = mem_rd(gb, wTilesetUniqueGfx);
+  CYC(0x4341, 0x4344); mem_wr(gb, wLoadedTilesetUniqueGfx, A);
+  CYC(0x4344, 0x4345); alu_xor(gb, A);
+  CYC(0x4345, 0x4348); mem_wr(gb, wTilesetUniqueGfx, A);
+  CALL_C(0x4348, func_47fc_hook, 0x47fc, 0x434b);
+  if (!(F & FC)) CALL_C_CC(0x434b, updateTilesetPalette_hook, 0x4762, 0x434e);
+  else CYC(0x434b, 0x434e);
+  CYC(0x434e, 0x4351); SET_HL(wScreenTransitionState);
+  CYC(0x4351, 0x4353); A = 0x05;
+  CYC(0x4353, 0x4354); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4354, 0x4355); alu_xor(gb, A);
+  CYC(0x4355, 0x4356); mem_wr(gb, HL, A);
+  CYC(0x4356, 0x4359); mem_wr(gb, wScreenTransitionState3, A);
+  CYC(0x4359, 0x435a); ret_effect(gb);
+}
+
+void screenTransitionState5_hook(GB *gb) {
+  CYC(0x435a, 0x435d); A = mem_rd(gb, wScreenTransitionState2);
+  CYC(0x435d, 0x435e); bank1_jump_table_from_rst(gb, 0x435e);
+  switch (HL) {
+    case 0x4364: screenTransitionState5Substate0_hook(gb); return;
+    case 0x45ed: screenTransitionState5Substate1(gb); return;
+    case 0x44fa: screenTransitionState5Substate2_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void screenTransitionState5Substate0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4364, 0x4367); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x4367, 0x4368); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x4368, 0x4369); ret_effect(gb); return; }
+  CYC(0x4368, 0x4369);
+  CYC(0x4369, 0x436c); A = mem_rd(gb, wTilesetFlags);
+  CYC(0x436c, 0x436e); alu_and(gb, 0x01);
+  if (!(F & FZ)) CALL_C_CC(0x436e, checkAndApplyPaletteFadeTransition_hook, 0x4805, 0x4371);
+  else CYC(0x436e, 0x4371);
+  CYC(0x4371, 0x4374); A = mem_rd(gb, wcd01);
+  CYC(0x4374, 0x4376); A = alu_swap(gb, A);
+  CYC(0x4376, 0x4377); L = A;
+  CYC(0x4377, 0x437a); A = mem_rd(gb, wScreenTransitionDirection);
+  CYC(0x437a, 0x437b); alu_add(gb, A);
+  CYC(0x437b, 0x437c); alu_add(gb, A);
+  CYC(0x437c, 0x437d); alu_add(gb, L);
+  CYC(0x437d, 0x4380); SET_HL(0x43b8);
+  CYC(0x4380, 0x4381); bank1_add_a_to_hl_from_rst(gb, 0x4381);
+  CYC(0x4381, 0x4382); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4382, 0x4385); mem_wr(gb, wScreenScrollRow, A);
+  CYC(0x4385, 0x4386); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4386, 0x4389); mem_wr(gb, wScreenScrollVramRow, A);
+  CYC(0x4389, 0x438a); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x438a, 0x438d); mem_wr(gb, wScreenScrollDirection, A);
+  CYC(0x438d, 0x438e); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x438e, 0x4391); mem_wr(gb, wcd14, A);
+  CALL_C(0x4391, resetCamera_hook, 0x12ce, 0x4394);
+  CYC(0x4394, 0x4395); alu_xor(gb, A);
+  CYC(0x4395, 0x4398); mem_wr(gb, wScreenTransitionState3, A);
+  CALL_C(0x4398, setScreenShakeCounter_hook, 0x24bb, 0x439b);
+  CYC(0x439b, 0x439e); A = mem_rd(gb, wScreenTransitionDirection);
+  CYC(0x439e, 0x43a0); alu_and(gb, 0x01);
+  if (F & FZ) { CYCT(0x43a0, 0x43a2); screenTransitionState5Substate0__vertical_hook(gb); return; }
+  CYC(0x43a0, 0x43a2); screenTransitionState5Substate0__horizontal_hook(gb);
+}
+
+void screenTransitionState5Substate0__horizontal_hook(GB *gb) {
+  CYC(0x43a2, 0x43a4); A = 0x14;
+  CYC(0x43a4, 0x43a7); mem_wr(gb, wScreenScrollCounter, A);
+  CYC(0x43a7, 0x43a9); A = 0x02;
+  CYC(0x43a9, 0x43ac); mem_wr(gb, wScreenTransitionState2, A);
+  CYC(0x43ac, 0x43ad); ret_effect(gb);
+}
+
+void screenTransitionState5Substate0__vertical_hook(GB *gb) {
+  CYC(0x43ad, 0x43af); A = 0x10;
+  CYC(0x43af, 0x43b2); mem_wr(gb, wScreenScrollCounter, A);
+  CYC(0x43b2, 0x43b4); A = 0x01;
+  CYC(0x43b4, 0x43b7); mem_wr(gb, wScreenTransitionState2, A);
+  CYC(0x43b7, 0x43b8); ret_effect(gb);
+}
+
+void transitionUpdateScrollAndLinkPosition_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x43d8, 0x43db); SET_DE(wGfxRegs2_SCY);
+  CYC(0x43db, 0x43de); SET_HL(hCameraY);
+  if (!(F & FC)) CYCT(0x43de, 0x43e0);
+  else {
+    CYC(0x43de, 0x43e0);
+    CYC(0x43e0, 0x43e1); E = alu_inc8(gb, E);
+    CYC(0x43e1, 0x43e2); L = alu_inc8(gb, L);
+    CYC(0x43e2, 0x43e3); L = alu_inc8(gb, L);
+  }
+  CYC(0x43e3, 0x43e5); B = 0x00;
+  CYC(0x43e5, 0x43e8); A = mem_rd(gb, wcd14);
+  CYC(0x43e8, 0x43e9); C = A;
+  CYC(0x43e9, 0x43ea); alu_rlca(gb);
+  if (!(F & FC)) CYCT(0x43ea, 0x43ec);
+  else { CYC(0x43ea, 0x43ec); CYC(0x43ec, 0x43ed); B = alu_dec8(gb, B); }
+  CYC(0x43ed, 0x43ee); A = mem_rd(gb, DE);
+  CYC(0x43ee, 0x43ef); alu_add(gb, C);
+  CYC(0x43ef, 0x43f0); mem_wr(gb, DE, A);
+  CYC(0x43f0, 0x43f1); A = mem_rd(gb, HL);
+  CYC(0x43f1, 0x43f2); alu_add(gb, C);
+  CYC(0x43f2, 0x43f3); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x43f3, 0x43f4); A = mem_rd(gb, HL);
+  CYC(0x43f4, 0x43f5); alu_adc(gb, B);
+  CYC(0x43f5, 0x43f6); mem_wr(gb, HL, A);
+  CALL_C(0x43f6, cpLinkState0e_hook, 0x4771, 0x43f9);
+  if (F & FZ) { CYCT(0x43f9, 0x43fa); ret_effect(gb); return; }
+  CYC(0x43f9, 0x43fa);
+  CYC(0x43fa, 0x43fd); A = mem_rd(gb, wScreenTransitionDirection);
+  CYC(0x43fd, 0x43fe); alu_add(gb, A);
+  CYC(0x43fe, 0x4401); SET_DE(0x441a);
+  CALL_C(0x4401, addDoubleIndexToDe_hook, 0x0072, 0x4404);
+  CYC(0x4404, 0x4407); A = mem_rd(gb, wLinkObjectIndex);
+  CYC(0x4407, 0x4408); H = A;
+  CYC(0x4408, 0x440a); L = 0x0a;
+  CYC(0x440a, 0x440b); A = mem_rd(gb, DE);
+  CYC(0x440b, 0x440c); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x440c, 0x440d); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x440d, 0x440e); SET_DE(DE + 1);
+  CYC(0x440e, 0x440f); A = mem_rd(gb, DE);
+  CYC(0x440f, 0x4410); alu_adc(gb, mem_rd(gb, HL));
+  CYC(0x4410, 0x4411); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4411, 0x4412); SET_DE(DE + 1);
+  CYC(0x4412, 0x4413); A = mem_rd(gb, DE);
+  CYC(0x4413, 0x4414); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x4414, 0x4415); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4415, 0x4416); SET_DE(DE + 1);
+  CYC(0x4416, 0x4417); A = mem_rd(gb, DE);
+  CYC(0x4417, 0x4418); alu_adc(gb, mem_rd(gb, HL));
+  CYC(0x4418, 0x4419); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4419, 0x441a); ret_effect(gb);
+}
+
+void finishScrollingTransition_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x442a, cpLinkState0e_hook, 0x4771, 0x442d);
+  if (F & FZ) { CYCT(0x442d, 0x442e); ret_effect(gb); return; }
+  CYC(0x442d, 0x442e);
+  CYC(0x442e, 0x4431); A = mem_rd(gb, wcd01);
+  CYC(0x4431, 0x4433); A = alu_swap(gb, A);
+  CYC(0x4433, 0x4434); alu_rrca(gb);
+  CYC(0x4434, 0x4435); E = A;
+  CYC(0x4435, 0x4438); A = mem_rd(gb, wScreenTransitionDirection);
+  CYC(0x4438, 0x4439); alu_add(gb, A);
+  CYC(0x4439, 0x443a); alu_add(gb, E);
+  CYC(0x443a, 0x443d); SET_DE(0x4483);
+  CALL_C(0x443d, addAToDe_hook, 0x0068, 0x4440);
+  label_01_037_hook(gb);
+}
+
+void label_01_037_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4440, 0x4443); A = mem_rd(gb, wLinkObjectIndex);
+  CYC(0x4443, 0x4444); H = A;
+  CYC(0x4444, 0x4446); L = 0x0b;
+  CYC(0x4446, 0x4447); A = mem_rd(gb, DE);
+  CYC(0x4447, 0x4448); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x4448, 0x4449); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4449, 0x444c); mem_wr(gb, wLinkLocalRespawnY, A);
+  CYC(0x444c, 0x444d); SET_DE(DE + 1);
+  CYC(0x444d, 0x444e); L = alu_inc8(gb, L);
+  CYC(0x444e, 0x444f); A = mem_rd(gb, DE);
+  CYC(0x444f, 0x4450); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x4450, 0x4451); mem_wr(gb, HL, A);
+  CYC(0x4451, 0x4454); mem_wr(gb, wLinkLocalRespawnX, A);
+  CYC(0x4454, 0x4456); L = 0x08;
+  CYC(0x4456, 0x4457); A = mem_rd(gb, HL);
+  CYC(0x4457, 0x445a); mem_wr(gb, wLinkLocalRespawnDir, A);
+  CYC(0x445a, 0x445c); H = alu_srl(gb, H);
+  if (!(F & FC)) CYCT(0x445c, 0x445e);
+  else {
+    CYC(0x445c, 0x445e);
+    CYC(0x445e, 0x4461); SET_HL(wLastAnimalMountPointY);
+    CYC(0x4461, 0x4464); A = mem_rd(gb, wLinkLocalRespawnY);
+    CYC(0x4464, 0x4465); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(0x4465, 0x4468); A = mem_rd(gb, wLinkLocalRespawnX);
+    CYC(0x4468, 0x4469); mem_wr(gb, HL, A);
+  }
+  CYC(0x4469, 0x446a); alu_xor(gb, A);
+  CYC(0x446a, 0x446c); hram_wr(gb, hCameraY & 0xff, A);
+  CYC(0x446c, 0x446e); hram_wr(gb, hCameraX & 0xff, A);
+  CYC(0x446e, 0x4470); hram_wr(gb, (hCameraY + 1) & 0xff, A);
+  CYC(0x4470, 0x4472); hram_wr(gb, (hCameraX + 1) & 0xff, A);
+  CALL_C(0x4472, resetFollowingLinkObjectPosition_hook, 0x44a6, 0x4475);
+  CALL_C(0x4475, clearObjectsWithEnabled2, 0x4a17, 0x4478);
+  CYC(0x4478, 0x447a); A = 0x01;
+  CYC(0x447a, 0x447d); mem_wr(gb, wLoadedTreeGfxIndex, A);
+  CALL_C(0x447d, calculateCameraPosition_hook, 0x4256, 0x4480);
+  CYC(0x4480, 0x4483); updateGfxRegs2Scroll_hook(gb);
+}
+
+void func_4493_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4493, 0x4496); A = mem_rd(gb, wScreenTransitionDirection);
+  CYC(0x4496, 0x4499); SET_DE(0x449e);
+  CALL_C(0x4499, addDoubleIndexToDe_hook, 0x0072, 0x449c);
+  CYC(0x449c, 0x449e); label_01_037_hook(gb);
+}
+
+void resetFollowingLinkObjectPosition_hook(GB *gb) {
+  CYC(0x44a6, 0x44a9); A = mem_rd(gb, wFollowingLinkObject);
+  CYC(0x44a9, 0x44aa); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x44aa, 0x44ab); ret_effect(gb); return; }
+  CYC(0x44aa, 0x44ab);
+  CYC(0x44ab, 0x44ae); A = mem_rd(gb, w1Link_yh);
+  CYC(0x44ae, 0x44af); D = A;
+  CYC(0x44af, 0x44b2); A = mem_rd(gb, w1Link_xh);
+  CYC(0x44b2, 0x44b3); E = A;
+  CYC(0x44b3, 0x44b6); A = mem_rd(gb, wScreenTransitionDirection);
+  CYC(0x44b6, 0x44b8); alu_and(gb, 0x03);
+  CYC(0x44b8, 0x44b9); C = A;
+  CYC(0x44b9, 0x44bc); SET_HL(0x44f2);
+  CYC(0x44bc, 0x44bd); bank1_add_double_index_to_hl_from_rst(gb, 0x44bd);
+  CYC(0x44bd, 0x44be); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x44be, 0x44c0); hram_wr(gb, hFF8D & 0xff, A);
+  CYC(0x44c0, 0x44c1); A = mem_rd(gb, HL);
+  CYC(0x44c1, 0x44c3); hram_wr(gb, hFF8C & 0xff, A);
+  CYC(0x44c3, 0x44c5); A = 0x02;
+  CYC(0x44c5, 0x44c7); mem_wr(gb, IO_SVBK, A);
+  CYC(0x44c7, 0x44ca); SET_HL(w2LinkWalkPath + 0x2f);
+  CYC(0x44ca, 0x44cc); B = 0x10;
+  do {
+    CYC(0x44cc, 0x44ce); A = hram_rd(gb, hFF8C & 0xff);
+    CYC(0x44ce, 0x44cf); alu_add(gb, E);
+    CYC(0x44cf, 0x44d0); E = A;
+    CYC(0x44d0, 0x44d1); mem_wr(gb, HL, A); SET_HL(HL - 1);
+    CYC(0x44d1, 0x44d3); A = hram_rd(gb, hFF8D & 0xff);
+    CYC(0x44d3, 0x44d4); alu_add(gb, D);
+    CYC(0x44d4, 0x44d5); D = A;
+    CYC(0x44d5, 0x44d6); mem_wr(gb, HL, A); SET_HL(HL - 1);
+    CYC(0x44d6, 0x44d7); A = C;
+    CYC(0x44d7, 0x44d8); mem_wr(gb, HL, A); SET_HL(HL - 1);
+    CYC(0x44d8, 0x44d9); B = alu_dec8(gb, B);
+    if (!(F & FZ)) CYCT(0x44d9, 0x44db); else CYC(0x44d9, 0x44db);
+  } while (!(F & FZ));
+  CYC(0x44db, 0x44dc); alu_xor(gb, A);
+  CYC(0x44dc, 0x44de); mem_wr(gb, IO_SVBK, A);
+  CYC(0x44de, 0x44e1); A = mem_rd(gb, wFollowingLinkObjectType);
+  CYC(0x44e1, 0x44e3); alu_add(gb, 0x0b);
+  CYC(0x44e3, 0x44e4); L = A;
+  CYC(0x44e4, 0x44e7); A = mem_rd(gb, wFollowingLinkObject);
+  CYC(0x44e7, 0x44e8); H = A;
+  CYC(0x44e8, 0x44e9); mem_wr(gb, HL, D);
+  CYC(0x44e9, 0x44ea); L = alu_inc8(gb, L);
+  CYC(0x44ea, 0x44eb); L = alu_inc8(gb, L);
+  CYC(0x44eb, 0x44ec); mem_wr(gb, HL, E);
+  CYC(0x44ec, 0x44ee); A = 0x0f;
+  CYC(0x44ee, 0x44f1); mem_wr(gb, wLinkPathIndex, A);
+  CYC(0x44f1, 0x44f2); ret_effect(gb);
+}
+
+void screenTransitionState5Substate2_hook(GB *gb) {
+  CYC(0x44fa, 0x44fd); A = mem_rd(gb, wScreenTransitionState3);
+  CYC(0x44fd, 0x44fe); bank1_jump_table_from_rst(gb, 0x44fe);
+  switch (HL) {
+    case 0x450a: screenTransitionState5Substate2__state0_hook(gb); return;
+    case 0x4520: screenTransitionState5Substate2__state1_hook(gb); return;
+    case 0x4528: screenTransitionState5Substate2__state2_hook(gb); return;
+    case 0x4546: screenTransitionState5Substate2__state3_hook(gb); return;
+    case 0x4559: screenTransitionState5Substate2__state4_hook(gb); return;
+    case 0x4567: screenTransitionState5Substate2__state5_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void screenTransitionState5Substate2__state0_hook(GB *gb) {
+  CYC(0x450a, 0x450d); A = mem_rd(gb, wScreenOffsetX);
+  CYC(0x450d, 0x450f); A = alu_swap(gb, A);
+  CYC(0x450f, 0x4510); alu_rlca(gb);
+  CYC(0x4510, 0x4511); B = A;
+  CYC(0x4511, 0x4514); A = mem_rd(gb, wScreenScrollVramRow);
+  CYC(0x4514, 0x4515); alu_add(gb, B);
+  CYC(0x4515, 0x4517); alu_and(gb, 0x1f);
+  CYC(0x4517, 0x451a); mem_wr(gb, wScreenScrollVramRow, A);
+  CYC(0x451a, 0x451c); A = 0x01;
+  CYC(0x451c, 0x451f); mem_wr(gb, wScreenTransitionState3, A);
+  CYC(0x451f, 0x4520); ret_effect(gb);
+}
+
+void screenTransitionState5Substate2__state1_hook(GB *gb) {
+  CYC(0x4520, 0x4522); A = 0x02;
+  CYC(0x4522, 0x4525); mem_wr(gb, wScreenTransitionState3, A);
+  CYC(0x4525, 0x4528); screenTransitionState5Substate2__drawNextRow_hook(gb);
+}
+
+void screenTransitionState5Substate2__state2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4528, 0x4529); alu_scf(gb);
+  CALL_C(0x4529, transitionUpdateScrollAndLinkPosition_hook, 0x43d8, 0x452c);
+  CYC(0x452c, 0x452f); A = mem_rd(gb, wGfxRegs2_SCX);
+  CYC(0x452f, 0x4531); alu_and(gb, 0x07);
+  if (!(F & FZ)) { CYCT(0x4531, 0x4532); ret_effect(gb); return; }
+  CYC(0x4531, 0x4532);
+  CYC(0x4532, 0x4535); A = mem_rd(gb, wScreenScrollCounter);
+  CYC(0x4535, 0x4536); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x4536, 0x4538); screenTransitionState5Substate2__drawNextRow_hook(gb); return; }
+  CYC(0x4536, 0x4538);
+  CYC(0x4538, 0x453b); SET_HL(wScreenTransitionState3);
+  CYC(0x453b, 0x453c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x453c, 0x453f); A = mem_rd(gb, wMaxCameraY);
+  CYC(0x453f, 0x4541); A = alu_swap(gb, A);
+  CYC(0x4541, 0x4542); alu_rlca(gb);
+  CYC(0x4542, 0x4545); mem_wr(gb, wScreenScrollCounter, A);
+  CYC(0x4545, 0x4546); ret_effect(gb);
+}
+
+void screenTransitionState5Substate2__state3_hook(GB *gb) {
+  CYC(0x4546, 0x4549); A = mem_rd(gb, wScreenScrollCounter);
+  CYC(0x4549, 0x454a); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x454a, 0x454c); screenTransitionState5Substate2__drawNextRow_hook(gb); return; }
+  CYC(0x454a, 0x454c);
+  CYC(0x454c, 0x454f); SET_HL(wScreenTransitionState3);
+  CYC(0x454f, 0x4550); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x4550, 0x4553); A = mem_rd(gb, wTilesetUniqueGfx);
+  CYC(0x4553, 0x4554); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x4554, 0x4557); loadUniqueGfxHeader_hook(gb); return; }
+  CYC(0x4554, 0x4557);
+  CYC(0x4557, 0x4558); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x4558, 0x4559); ret_effect(gb);
+}
+
+void screenTransitionState5Substate2__state4_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4559, updateTilesetUniqueGfx_hook, 0x37db, 0x455c);
+  if (F & FC) { CYCT(0x455c, 0x455d); ret_effect(gb); return; }
+  CYC(0x455c, 0x455d);
+  CYC(0x455d, 0x4560); A = mem_rd(gb, wTilesetUniqueGfx);
+  CYC(0x4560, 0x4563); mem_wr(gb, wLoadedTilesetUniqueGfx, A);
+  CYC(0x4563, 0x4564); alu_xor(gb, A);
+  CYC(0x4564, 0x4567); mem_wr(gb, wTilesetUniqueGfx, A);
+  screenTransitionState5Substate2__state5_hook(gb);
+}
+
+void screenTransitionState5Substate2__state5_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4567, checkBrightenRoom, 0x4323, 0x456a);
+  CALL_C(0x456a, updateTilesetPalette_hook, 0x4762, 0x456d);
+  CALL_C(0x456d, setInstrumentsDisabledCounterAndScrollMode_hook, 0x19a2, 0x4570);
+  CYC(0x4570, 0x4571); alu_xor(gb, A);
+  CYC(0x4571, 0x4574); mem_wr(gb, wScreenTransitionState2, A);
+  CYC(0x4574, 0x4577); mem_wr(gb, wScreenTransitionState3, A);
+  CYC(0x4577, 0x4579); A = 0x02;
+  CYC(0x4579, 0x457c); mem_wr(gb, wScreenTransitionState, A);
+  CYC(0x457c, 0x457f); A = mem_rd(gb, wRoomWidth);
+  CYC(0x457f, 0x4580); alu_add(gb, A);
+  CYC(0x4580, 0x4581); alu_add(gb, A);
+  CYC(0x4581, 0x4582); alu_add(gb, A);
+  CYC(0x4582, 0x4583); B = A;
+  CYC(0x4583, 0x4586); A = mem_rd(gb, wScreenTransitionDirection);
+  CYC(0x4586, 0x4588); alu_and(gb, 0x02);
+  if (F & FZ) CYCT(0x4588, 0x458a);
+  else {
+    CYC(0x4588, 0x458a);
+    CYC(0x458a, 0x458b); A = B;
+    CYC(0x458b, 0x458c); alu_cpl(gb);
+    CYC(0x458c, 0x458d); A = alu_inc8(gb, A);
+    CYC(0x458d, 0x458e); B = A;
+  }
+  CYC(0x458e, 0x4591); A = mem_rd(gb, wScreenOffsetX);
+  CYC(0x4591, 0x4592); alu_add(gb, B);
+  CYC(0x4592, 0x4595); mem_wr(gb, wScreenOffsetX, A);
+  CYC(0x4595, 0x4598); finishScrollingTransition_hook(gb);
+}
+
+void screenTransitionState5Substate2__drawNextRow_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4598, 0x459b); A = mem_rd(gb, wScreenScrollRow);
+  CYC(0x459b, 0x459c); E = A;
+  CALL_C(0x459c, func_46ca_hook, 0x46ca, 0x459f);
+  CYC(0x459f, 0x45a2); A = mem_rd(gb, wScreenScrollVramRow);
+  CALL_C(0x45a2, addFunctionsToVBlankQueue_hook, 0x45c4, 0x45a5);
+  incrementScreenScrollRowVars_hook(gb);
 }

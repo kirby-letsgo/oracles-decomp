@@ -635,3 +635,8 @@ desync to discover; keep them when porting routines.
   59 C cycles versus 60 interpreter cycles on every frame of the transition. Whichever C path
   follows the jump target must burn `CYCT`; the path that executes the following instruction must
   burn `CYC`, even when the surrounding C condition is written in the inverse form.
+- Register-targeted ALU helpers return the new value; calling one without assigning its result
+  silently leaves the register unchanged. Batch 93 initially translated `srl h` at `$445a` as a
+  bare `alu_srl(gb, H)`. Self-review against the generated body caught that H never received the
+  shift result. Write `H = alu_srl(gb, H)` (and likewise for B/C/D/E/H/L/A targets); memory-targeted
+  shifts instead read, transform, and write the addressed byte explicitly.
