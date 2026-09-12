@@ -223,6 +223,24 @@ void func_02_5938_hook(GB *gb);
 void inventorySubscreen0_drawCursor_hook(GB *gb);
 void inventorySubmenu1_drawCursor_hook(GB *gb);
 void inventorySubmenu2_drawCursor_hook(GB *gb);
+void func_02_5a35_hook(GB *gb);
+void func_02_5a35__next_hook(GB *gb);
+void func_02_5a35__seedOnlyCodeDone_hook(GB *gb);
+void func_02_5a35__dontHaveSubItem_hook(GB *gb);
+void cpInventorySelectedItemToHarp_hook(GB *gb);
+void func_02_5afc_hook(GB *gb);
+void getSeedTypeInventoryIndex_hook(GB *gb);
+void drawEquippedSpriteForActiveRing_hook(GB *gb);
+void drawEquippedSpriteForActiveRing__foundRing_hook(GB *gb);
+void inventorySubscreen0_drawStoredItems_hook(GB *gb);
+void inventorySubscreen1_drawTreasures_hook(GB *gb);
+void inventorySubscreen1_drawTreasures__drawTreasure_hook(GB *gb);
+void inventorySubscreen1_drawTreasures__nextTreasure_hook(GB *gb);
+void inventorySubscreen1_drawTreasures__undrawRingBox_hook(GB *gb);
+void inventorySubscreen1_drawTreasures__drawRings_hook(GB *gb);
+void inventorySubscreen1_drawTreasures__drawRing_hook(GB *gb);
+void inventorySubscreen1_drawTreasures__nextRing_hook(GB *gb);
+void inventorySubscreen1_drawTreasures__getAddressToDrawTreasureAt_hook(GB *gb);
 void runInventoryMenu_hook(GB *gb);
 void runInventoryMenu__inventoryMenuStates_hook(GB *gb);
 void showItemText1_hook(GB *gb);
@@ -4034,14 +4052,14 @@ void func_02_55b2__subScreen0_hook(GB *gb) {
   CYC(0x55ce, 0x55d1); W8(wStatusBarNeedsRefresh) = A;
   CYC(0x55d1, 0x55d3); A = 0x09;
   CALL_C(0x55d3, loadGfxHeader_hook, 0x0626, 0x55d6);
-  CYC(0x55d6, 0x55d9); inventorySubscreen0_drawStoredItems(gb);
+  CYC(0x55d6, 0x55d9); inventorySubscreen0_drawStoredItems_hook(gb);
 }
 
 void func_02_55b2__subScreen1_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x55d9, 0x55db); A = 0x0a;
   CALL_C(0x55db, loadGfxHeader_hook, 0x0626, 0x55de);
-  CYC(0x55de, 0x55e1); inventorySubscreen1_drawTreasures(gb);
+  CYC(0x55de, 0x55e1); inventorySubscreen1_drawTreasures_hook(gb);
 }
 
 void func_02_55b2__subScreen2_hook(GB *gb) {
@@ -4143,7 +4161,7 @@ void inventoryMenuState1__hasSubmenu_hook(GB *gb) {
 void inventoryMenuState1__finalizeEquip_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(0x5663, inventoryMenuState1__equipItem_hook, 0x5679, 0x5666);
-  CALL_C(0x5666, inventorySubscreen0_drawStoredItems, 0x5b5a, 0x5669);
+  CALL_C(0x5666, inventorySubscreen0_drawStoredItems_hook, 0x5b5a, 0x5669);
   CALL_C(0x5669, inventorySubscreen0_drawCursor_hook, 0x595e, 0x566c);
   CYC(0x566c, 0x566e); A = 0x56;
   CALL_C(0x566e, playSound_b00_hook, 0x0c98, 0x5671);
@@ -4239,7 +4257,7 @@ void inventoryMenuState1__subscreen1_hook(GB *gb) {
   CALL_C(0x56d1, inventorySubmenu1_drawCursor_hook, 0x5982, 0x56d4);
   CYC(0x56d4, 0x56d7); A = W8(wInventorySubmenu1CursorPos);
   CALL_C(0x56d7, showItemText1_hook, 0x5538, 0x56da);
-  CYC(0x56da, 0x56dd); drawEquippedSpriteForActiveRing(gb);
+  CYC(0x56da, 0x56dd); drawEquippedSpriteForActiveRing_hook(gb);
 }
 
 void inventoryMenuState1__checkEquipRing_hook(GB *gb) {
@@ -6538,7 +6556,7 @@ void inventoryMenuState2__subState0_hook(GB *gb) {
   CYC(0x5748, 0x5749); D = mem_rd(gb, HL);
   CYC(0x5749, 0x574a); D = alu_dec8(gb, D);
   CYC(0x574a, 0x574c); L = (uint8_t)wSatchelSelectedSeeds;
-  CALL_C(0x574c, cpInventorySelectedItemToHarp, 0x5af6, 0x574f);
+  CALL_C(0x574c, cpInventorySelectedItemToHarp_hook, 0x5af6, 0x574f);
   if (F & FZ) { CYCT(0x574f, 0x5751); goto found; }
   CYC(0x574f, 0x5751); CYC(0x5751, 0x5753); alu_cp(gb, 0x19);
   if (F & FZ) { CYCT(0x5753, 0x5755); goto selected; }
@@ -6548,7 +6566,7 @@ selected:
   CYC(0x5757, 0x5759); D = 0;
   do {
     CYC(0x5759, 0x575a); A = D;
-    CALL_C(0x575a, getSeedTypeInventoryIndex, 0x5b19, 0x575d);
+    CALL_C(0x575a, getSeedTypeInventoryIndex_hook, 0x5b19, 0x575d);
     CYC(0x575d, 0x575e); alu_cp(gb, E);
     if (F & FZ) { CYCT(0x575e, 0x5760); break; }
     CYC(0x575e, 0x5760); CYC(0x5760, 0x5761); D = alu_inc8(gb, D);
@@ -6588,7 +6606,7 @@ void inventoryMenuState2__subState1_hook(GB *gb) {
   CYC(0x578e, 0x578f); CYC(0x578f, 0x5791); mem_wr(gb, HL, 2);
   CALL_C(0x5791, inventoryMenuState2__func_02_57f3_hook, 0x57f3, 0x5794);
   if (F & FC) { CYCT(0x5794, 0x5796); goto done; }
-  CYC(0x5794, 0x5796); CALL_C(0x5796, func_02_5a35, 0x5a35, 0x5799);
+  CYC(0x5794, 0x5796); CALL_C(0x5796, func_02_5a35_hook, 0x5a35, 0x5799);
   CYC(0x5799, 0x579c); SET_HL(wSubmenuState);
   CYC(0x579c, 0x579d); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
 done:
@@ -6601,12 +6619,12 @@ void inventoryMenuState2__subState2_hook(GB *gb) {
   CYC(0x57a3, 0x57a5); alu_and(gb, 0x0b);
   if (!(F & FZ)) { CYCT(0x57a5, 0x57a7); inventoryMenuState2__buttonPressed_hook(gb); return; }
   CYC(0x57a5, 0x57a7); CALL_C(0x57a7, func_02_5938_hook, 0x5938, 0x57aa);
-  CALL_C(0x57aa, cpInventorySelectedItemToHarp, 0x5af6, 0x57ad);
+  CALL_C(0x57aa, cpInventorySelectedItemToHarp_hook, 0x5af6, 0x57ad);
   CYC(0x57ad, 0x57b0); A = W8(wInventory_itemSubmenuIndex);
   if (!(F & FZ)) { CYCT(0x57b0, 0x57b2); goto seed; }
   CYC(0x57b0, 0x57b2); CYC(0x57b2, 0x57b4); alu_add(gb, 0x25); CYC(0x57b4, 0x57b6); goto display;
 seed:
-  CALL_C(0x57b6, getSeedTypeInventoryIndex, 0x5b19, 0x57b9);
+  CALL_C(0x57b6, getSeedTypeInventoryIndex_hook, 0x5b19, 0x57b9);
   CYC(0x57b9, 0x57bb); alu_add(gb, 0x20);
 display:
   CALL_C(0x57bb, loadTreasureDisplayData_b00_hook, 0x16d6, 0x57be);
@@ -6620,12 +6638,12 @@ display:
 text:
   CYC(0x57cc, 0x57cd); alu_add(gb, mem_rd(gb, HL));
   CALL_C(0x57cd, showItemText2_hook, 0x553d, 0x57d0);
-  CYC(0x57d0, 0x57d3); func_02_5a35(gb);
+  CYC(0x57d0, 0x57d3); func_02_5a35_hook(gb);
 }
 
 void inventoryMenuState2__buttonPressed_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x57d3, cpInventorySelectedItemToHarp, 0x5af6, 0x57d6);
+  CALL_C(0x57d3, cpInventorySelectedItemToHarp_hook, 0x5af6, 0x57d6);
   if (!(F & FZ)) { CYCT(0x57d6, 0x57d8); goto seed; }
   CYC(0x57d6, 0x57d8); CYC(0x57d8, 0x57da); E = (uint8_t)wSelectedHarpSong;
   CYC(0x57da, 0x57dd); A = W8(wInventory_itemSubmenuIndex);
@@ -6637,7 +6655,7 @@ seed:
   CYC(0x57e4, 0x57e6); CYC(0x57e6, 0x57e7); E = alu_inc8(gb, E);
 index:
   CYC(0x57e7, 0x57ea); A = W8(wInventory_itemSubmenuIndex);
-  CALL_C(0x57ea, getSeedTypeInventoryIndex, 0x5b19, 0x57ed);
+  CALL_C(0x57ea, getSeedTypeInventoryIndex_hook, 0x5b19, 0x57ed);
 set:
   CYC(0x57ed, 0x57ef); D = (uint8_t)(wSatchelSelectedSeeds >> 8);
   CYC(0x57ef, 0x57f0); mem_wr(gb, DE, A);
@@ -7009,4 +7027,367 @@ position:
   CYC(0x5a05, 0x5a07); CYC(0x5a07, 0x5a0a); SET_HL(0x5a2c);
 draw:
   CYC(0x5a0a, 0x5a0d); addSpritesToOam_withOffset_hook(gb);
+}
+
+void func_02_5a35_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5a35, 0x5a38); SET_DE(0x0500);
+  CALL_C(0x5a38, cpInventorySelectedItemToHarp_hook, 0x5af6, 0x5a3b);
+  if (!(F & FZ)) { CYCT(0x5a3b, 0x5a3d); goto selected; }
+  CYC(0x5a3b, 0x5a3d);
+  CYC(0x5a3d, 0x5a40); SET_DE(0x0305);
+selected:
+  CYC(0x5a40, 0x5a41); B = D;
+  CYC(0x5a41, 0x5a43); D = 0;
+  func_02_5a35__next_hook(gb);
+}
+
+void func_02_5a35__next_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5a43, 0x5a44); push_effect(gb, BC);
+  CYC(0x5a44, 0x5a45); A = E;
+  CYC(0x5a45, 0x5a48); SET_HL(wObtainedTreasureFlags + 4);
+  CALL_C(0x5a48, checkFlag_hook, 0x0205, 0x5a4b);
+  if (F & FZ) {
+    CYCT(0x5a4b, 0x5a4d);
+    func_02_5a35__dontHaveSubItem_hook(gb);
+    return;
+  }
+  CYC(0x5a4b, 0x5a4d);
+  CYC(0x5a4d, 0x5a4e); push_effect(gb, DE);
+  CYC(0x5a4e, 0x5a4f); A = D;
+  CALL_C(0x5a4f, func_02_5afc_hook, 0x5afc, 0x5a52);
+  CYC(0x5a52, 0x5a53); A = E;
+  CYC(0x5a53, 0x5a56); SET_HL(0x5aa9);
+  CYC(0x5a56, 0x5a57); push_effect(gb, 0x5a57); add_a_to_hl(gb);
+  CYC(0x5a57, 0x5a58); A = mem_rd(gb, HL);
+  CYC(0x5a58, 0x5a59); push_effect(gb, 0x5a59); add_a_to_hl(gb);
+  CALL_C(0x5a59, addSpritesToOam_withOffset_hook, 0x0d61, 0x5a5c);
+  CYC(0x5a5c, 0x5a5d); SET_DE(pop_effect(gb));
+  CYC(0x5a5d, 0x5a5e); A = E;
+  CYC(0x5a5e, 0x5a60); alu_cp(gb, 0x05);
+  if (!(F & FC)) {
+    CYCT(0x5a60, 0x5a62);
+    func_02_5a35__seedOnlyCodeDone_hook(gb);
+    return;
+  }
+  CYC(0x5a60, 0x5a62);
+  CYC(0x5a62, 0x5a63); A = E;
+  CYC(0x5a63, 0x5a66); SET_HL(wNumEmberSeeds);
+  CYC(0x5a66, 0x5a67); push_effect(gb, 0x5a67); add_a_to_hl(gb);
+  CYC(0x5a67, 0x5a68); B = mem_rd(gb, HL);
+  CYC(0x5a68, 0x5a6b); A = W8(wInventory_cbb8);
+  CYC(0x5a6b, 0x5a6e); SET_HL(0x5ae1);
+  CYC(0x5a6e, 0x5a6f); add_double_index_to_hl(gb, 0x5a6f);
+  CYC(0x5a6f, 0x5a70); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5a70, 0x5a71); H = mem_rd(gb, HL);
+  CYC(0x5a71, 0x5a72); L = A;
+  CYC(0x5a72, 0x5a73); A = D;
+  CYC(0x5a73, 0x5a74); push_effect(gb, 0x5a74); add_a_to_hl(gb);
+  CYC(0x5a74, 0x5a75); C = mem_rd(gb, HL);
+  CYC(0x5a75, 0x5a78); SET_HL(w4TileMap + 0xc0);
+  CYC(0x5a78, 0x5a7b); A = W8(wInventorySubmenu0CursorPos);
+  CYC(0x5a7b, 0x5a7d); alu_cp(gb, 0x08);
+  if (!(F & FC)) CYCT(0x5a7d, 0x5a7f);
+  else {
+    CYC(0x5a7d, 0x5a7f);
+    CYC(0x5a7f, 0x5a82); SET_HL(w4TileMap + 0x160);
+  }
+  CYC(0x5a82, 0x5a83); A = C;
+  CYC(0x5a83, 0x5a84); push_effect(gb, 0x5a84); add_a_to_hl(gb);
+  CYC(0x5a84, 0x5a85); A = B;
+  CYC(0x5a85, 0x5a87); alu_and(gb, 0xf0);
+  CYC(0x5a87, 0x5a89); A = alu_swap(gb, A);
+  CYC(0x5a89, 0x5a8b); alu_add(gb, 0x20);
+  CYC(0x5a8b, 0x5a8c); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5a8c, 0x5a8d); A = B;
+  CYC(0x5a8d, 0x5a8f); alu_and(gb, 0x0f);
+  CYC(0x5a8f, 0x5a91); alu_add(gb, 0x20);
+  CYC(0x5a91, 0x5a92); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  func_02_5a35__seedOnlyCodeDone_hook(gb);
+}
+
+void func_02_5a35__seedOnlyCodeDone_hook(GB *gb) {
+  CYC(0x5a92, 0x5a93); D = alu_inc8(gb, D);
+  func_02_5a35__dontHaveSubItem_hook(gb);
+}
+
+void func_02_5a35__dontHaveSubItem_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5a93, 0x5a94); E = alu_inc8(gb, E);
+  CYC(0x5a94, 0x5a95); SET_BC(pop_effect(gb));
+  CYC(0x5a95, 0x5a96); B = alu_dec8(gb, B);
+  if (!(F & FZ)) {
+    CYCT(0x5a96, 0x5a98);
+    func_02_5a35__next_hook(gb);
+    return;
+  }
+  CYC(0x5a96, 0x5a98);
+  CYC(0x5a98, 0x5a9b); A = W8(wTmpcbb5);
+  CALL_C(0x5a9b, func_02_5afc_hook, 0x5afc, 0x5a9e);
+  CYC(0x5a9e, 0x5aa1); SET_HL(0x5aa4);
+  CYC(0x5aa1, 0x5aa4); addSpritesToOam_withOffset_hook(gb);
+}
+
+void cpInventorySelectedItemToHarp_hook(GB *gb) {
+  CYC(0x5af6, 0x5af9); A = W8(wInventory_selectedItem);
+  CYC(0x5af9, 0x5afb); alu_cp(gb, 0x11);
+  CYC(0x5afb, 0x5afc); ret_effect(gb);
+}
+
+void func_02_5afc_hook(GB *gb) {
+  CYC(0x5afc, 0x5afd); C = A;
+  CYC(0x5afd, 0x5b00); A = W8(wInventory_cbb8);
+  CYC(0x5b00, 0x5b03); SET_HL(0x5ae1);
+  CYC(0x5b03, 0x5b04); add_double_index_to_hl(gb, 0x5b04);
+  CYC(0x5b04, 0x5b05); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5b05, 0x5b06); H = mem_rd(gb, HL);
+  CYC(0x5b06, 0x5b07); L = A;
+  CYC(0x5b07, 0x5b08); A = C;
+  CYC(0x5b08, 0x5b09); push_effect(gb, 0x5b09); add_a_to_hl(gb);
+  CYC(0x5b09, 0x5b0a); A = mem_rd(gb, HL);
+  CYC(0x5b0a, 0x5b0c); A = alu_swap(gb, A);
+  CYC(0x5b0c, 0x5b0d); alu_rrca(gb);
+  CYC(0x5b0d, 0x5b0e); C = A;
+  CYC(0x5b0e, 0x5b10); B = 0x20;
+  CYC(0x5b10, 0x5b13); A = W8(wInventorySubmenu0CursorPos);
+  CYC(0x5b13, 0x5b15); alu_cp(gb, 0x08);
+  if (!(F & FC)) { CYCT(0x5b15, 0x5b16); ret_effect(gb); return; }
+  CYC(0x5b15, 0x5b16);
+  CYC(0x5b16, 0x5b18); B = 0x48;
+  CYC(0x5b18, 0x5b19); ret_effect(gb);
+}
+
+void getSeedTypeInventoryIndex_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5b19, 0x5b1a); C = A;
+  CYC(0x5b1a, 0x5b1b); C = alu_inc8(gb, C);
+  CYC(0x5b1b, 0x5b1e); SET_HL(wObtainedTreasureFlags + 4);
+  CYC(0x5b1e, 0x5b1f); alu_xor(gb, A);
+  for (;;) {
+    CYC(0x5b1f, 0x5b20); B = A;
+    CALL_C(0x5b20, checkFlag_hook, 0x0205, 0x5b23);
+    if (F & FZ) CYCT(0x5b23, 0x5b25);
+    else {
+      CYC(0x5b23, 0x5b25);
+      CYC(0x5b25, 0x5b26); C = alu_dec8(gb, C);
+      if (F & FZ) {
+        CYCT(0x5b26, 0x5b28);
+        CYC(0x5b2c, 0x5b2d); A = B;
+        CYC(0x5b2d, 0x5b2e); ret_effect(gb);
+        return;
+      }
+      CYC(0x5b26, 0x5b28);
+    }
+    CYC(0x5b28, 0x5b29); A = B;
+    CYC(0x5b29, 0x5b2a); A = alu_inc8(gb, A);
+    CYC(0x5b2a, 0x5b2c);
+  }
+}
+
+void drawEquippedSpriteForActiveRing_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x5b2e, getRingBoxCapacity, 0x5cf5, 0x5b31);
+  if (F & FZ) { CYCT(0x5b31, 0x5b32); ret_effect(gb); return; }
+  CYC(0x5b31, 0x5b32);
+  CYC(0x5b32, 0x5b33); B = A;
+  CYC(0x5b33, 0x5b36); A = W8(wActiveRing);
+  CYC(0x5b36, 0x5b38); alu_cp(gb, 0xff);
+  if (F & FZ) { CYCT(0x5b38, 0x5b39); ret_effect(gb); return; }
+  CYC(0x5b38, 0x5b39);
+  CYC(0x5b39, 0x5b3c); SET_HL(wRingBoxContents);
+  CYC(0x5b3c, 0x5b3e); C = 0;
+  do {
+    CYC(0x5b3e, 0x5b3f); alu_cp(gb, mem_rd(gb, HL));
+    if (F & FZ) {
+      CYCT(0x5b3f, 0x5b41);
+      drawEquippedSpriteForActiveRing__foundRing_hook(gb);
+      return;
+    }
+    CYC(0x5b3f, 0x5b41);
+    CYC(0x5b41, 0x5b42); SET_HL(HL + 1);
+    CYC(0x5b42, 0x5b43); C = alu_inc8(gb, C);
+    CYC(0x5b43, 0x5b44); B = alu_dec8(gb, B);
+    if (!(F & FZ)) CYCT(0x5b44, 0x5b46); else CYC(0x5b44, 0x5b46);
+  } while (!(F & FZ));
+  CYC(0x5b46, 0x5b47); ret_effect(gb);
+}
+
+void drawEquippedSpriteForActiveRing__foundRing_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5b47, 0x5b49); A = 0x18;
+  CALL_C(0x5b49, multiplyAByC_hook, 0x019d, 0x5b4c);
+  CYC(0x5b4c, 0x5b4d); C = L;
+  CYC(0x5b4d, 0x5b4f); B = 0;
+  CYC(0x5b4f, 0x5b52); SET_HL(0x5b55);
+  CYC(0x5b52, 0x5b55); addSpritesToOam_withOffset_hook(gb);
+}
+
+void inventorySubscreen0_drawStoredItems_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5b5a, 0x5b5c); A = 0x10;
+  do {
+    CYC(0x5b5c, 0x5b5e); H8(hFF8D) = A;
+    CYC(0x5b5e, 0x5b61); SET_HL(wInventoryStorage - 1);
+    CYC(0x5b61, 0x5b62); push_effect(gb, 0x5b62); add_a_to_hl(gb);
+    CYC(0x5b62, 0x5b63); A = mem_rd(gb, HL);
+    CALL_C(0x5b63, loadTreasureDisplayData_b00_hook, 0x16d6, 0x5b66);
+    CYC(0x5b66, 0x5b67); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CALL_C(0x5b67, checkTreasureObtained_hook, 0x1748, 0x5b6a);
+    CYC(0x5b6a, 0x5b6c); H8(hFF8B) = A;
+    CYC(0x5b6c, 0x5b6e); A = H8(hFF8D);
+    CYC(0x5b6e, 0x5b71); SET_BC(0x5b80);
+    CALL_C(0x5b71, addDoubleIndexToBc_hook, 0x007e, 0x5b74);
+    CYC(0x5b74, 0x5b75); A = mem_rd(gb, BC);
+    CYC(0x5b75, 0x5b76); E = A;
+    CYC(0x5b76, 0x5b77); SET_BC(BC + 1);
+    CYC(0x5b77, 0x5b78); A = mem_rd(gb, BC);
+    CYC(0x5b78, 0x5b79); D = A;
+    CALL_C(0x5b79, drawTreasureDisplayDataToBg, 0x5d1c, 0x5b7c);
+    CYC(0x5b7c, 0x5b7e); A = H8(hFF8D);
+    CYC(0x5b7e, 0x5b7f); A = alu_dec8(gb, A);
+    if (!(F & FZ)) CYCT(0x5b7f, 0x5b81); else CYC(0x5b7f, 0x5b81);
+  } while (!(F & FZ));
+  CYC(0x5b81, 0x5b82); ret_effect(gb);
+}
+
+void inventorySubscreen1_drawTreasures_hook(GB *gb) {
+  CYC(0x5ba2, 0x5ba5); SET_HL(0x5e92);
+  inventorySubscreen1_drawTreasures__drawTreasure_hook(gb);
+}
+
+void inventorySubscreen1_drawTreasures__drawTreasure_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5ba5, 0x5ba6); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5ba6, 0x5ba7); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x5ba7, 0x5ba9);
+    inventorySubscreen1_drawTreasures__undrawRingBox_hook(gb);
+    return;
+  }
+  CYC(0x5ba7, 0x5ba9);
+  CYC(0x5ba9, 0x5bab); H8(hFF8C) = A;
+  CALL_C(0x5bab, checkTreasureObtained_hook, 0x1748, 0x5bae);
+  if (!(F & FC)) {
+    CYCT(0x5bae, 0x5bb0);
+    inventorySubscreen1_drawTreasures__nextTreasure_hook(gb);
+    return;
+  }
+  CYC(0x5bae, 0x5bb0);
+  CYC(0x5bb0, 0x5bb2); H8(hFF8B) = A;
+  CYC(0x5bb2, 0x5bb3); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CALL_C(0x5bb3, inventorySubscreen1_drawTreasures__getAddressToDrawTreasureAt_hook, 0x5c1e, 0x5bb6);
+  CYC(0x5bb6, 0x5bb7); push_effect(gb, HL);
+  CYC(0x5bb7, 0x5bb9); A = H8(hFF8C);
+  CALL_C(0x5bb9, loadTreasureDisplayData_b00_hook, 0x16d6, 0x5bbc);
+  CYC(0x5bbc, 0x5bbd); SET_HL(HL + 1);
+  CALL_C(0x5bbd, drawTreasureDisplayDataToBg, 0x5d1c, 0x5bc0);
+  CYC(0x5bc0, 0x5bc1); C = mem_rd(gb, HL);
+  CYC(0x5bc1, 0x5bc2); SET_HL(pop_effect(gb));
+  CYC(0x5bc2, 0x5bc3); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x5bc3, 0x5bc6); SET_DE(w4SubscreenTextIndices);
+  CALL_C(0x5bc6, addAToDe_hook, 0x0068, 0x5bc9);
+  CYC(0x5bc9, 0x5bca); A = C;
+  CYC(0x5bca, 0x5bcb); mem_wr(gb, DE, A);
+  inventorySubscreen1_drawTreasures__nextTreasure_hook(gb);
+}
+
+void inventorySubscreen1_drawTreasures__nextTreasure_hook(GB *gb) {
+  CYC(0x5bcb, 0x5bcc); SET_HL(HL + 1);
+  CYC(0x5bcc, 0x5bcd); SET_HL(HL + 1);
+  CYC(0x5bcd, 0x5bcf);
+  inventorySubscreen1_drawTreasures__drawTreasure_hook(gb);
+}
+
+void inventorySubscreen1_drawTreasures__undrawRingBox_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5bcf, 0x5bd2); A = W8(wRingBoxLevel);
+  CYC(0x5bd2, 0x5bd4); alu_cp(gb, 0x03);
+  if (F & FZ) {
+    CYCT(0x5bd4, 0x5bd6);
+    inventorySubscreen1_drawTreasures__drawRings_hook(gb);
+    return;
+  }
+  CYC(0x5bd4, 0x5bd6);
+  CYC(0x5bd6, 0x5bd9); SET_HL(0x5c37);
+  CYC(0x5bd9, 0x5bda); add_double_index_to_hl(gb, 0x5bda);
+  CYC(0x5bda, 0x5bdb); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5bdb, 0x5bdc); C = mem_rd(gb, HL);
+  CYC(0x5bdc, 0x5bde); B = 0x03;
+  CYC(0x5bde, 0x5bdf); L = A;
+  CYC(0x5bdf, 0x5be1); H = (uint8_t)((w4TileMap + 0x100) >> 8);
+  CALL_C(0x5be1, fillRectangleInTileMapWithMenuBlock, 0x5d05, 0x5be4);
+  inventorySubscreen1_drawTreasures__drawRings_hook(gb);
+}
+
+void inventorySubscreen1_drawTreasures__drawRings_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x5be4, getRingBoxCapacity, 0x5cf5, 0x5be7);
+  if (F & FZ) { CYCT(0x5be7, 0x5be8); ret_effect(gb); return; }
+  CYC(0x5be7, 0x5be8);
+  CYC(0x5be8, 0x5be9); B = A;
+  inventorySubscreen1_drawTreasures__drawRing_hook(gb);
+}
+
+void inventorySubscreen1_drawTreasures__drawRing_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5be9, 0x5bea); A = B;
+  CYC(0x5bea, 0x5bed); SET_HL(0x5c31);
+  CYC(0x5bed, 0x5bee); push_effect(gb, 0x5bee); add_a_to_hl(gb);
+  CYC(0x5bee, 0x5bef); E = mem_rd(gb, HL);
+  CYC(0x5bef, 0x5bf1); D = (uint8_t)((w4TileMap + 0x100) >> 8);
+  CYC(0x5bf1, 0x5bf2); A = B;
+  CYC(0x5bf2, 0x5bf5); SET_HL(wRingBoxContents - 1);
+  CYC(0x5bf5, 0x5bf6); push_effect(gb, 0x5bf6); add_a_to_hl(gb);
+  CYC(0x5bf6, 0x5bf7); A = mem_rd(gb, HL);
+  CYC(0x5bf7, 0x5bf9); alu_cp(gb, 0xff);
+  if (F & FZ) {
+    CYCT(0x5bf9, 0x5bfb);
+    inventorySubscreen1_drawTreasures__nextRing_hook(gb);
+    return;
+  }
+  CYC(0x5bf9, 0x5bfb);
+  CYC(0x5bfb, 0x5bfc); push_effect(gb, BC);
+  CYC(0x5bfc, 0x5bfd); C = A;
+  CYC(0x5bfd, 0x5bfe); A = B;
+  CYC(0x5bfe, 0x5c01); SET_HL(w4SubscreenTextIndices + 0x0f);
+  CYC(0x5c01, 0x5c02); push_effect(gb, 0x5c02); add_a_to_hl(gb);
+  CYC(0x5c02, 0x5c03); A = C;
+  CYC(0x5c03, 0x5c05); alu_or(gb, 0xc0);
+  CYC(0x5c05, 0x5c06); mem_wr(gb, HL, A);
+  CYC(0x5c06, 0x5c07); A = C;
+  CALL_C(0x5c07, getRingTiles, 0x72fe, 0x5c0a);
+  CYC(0x5c0a, 0x5c0b); SET_BC(pop_effect(gb));
+  inventorySubscreen1_drawTreasures__nextRing_hook(gb);
+}
+
+void inventorySubscreen1_drawTreasures__nextRing_hook(GB *gb) {
+  CYC(0x5c0b, 0x5c0c); B = alu_dec8(gb, B);
+  if (!(F & FZ)) {
+    CYCT(0x5c0c, 0x5c0e);
+    inventorySubscreen1_drawTreasures__drawRing_hook(gb);
+    return;
+  }
+  CYC(0x5c0c, 0x5c0e);
+  CYC(0x5c0e, 0x5c11); A = W8(wRingBoxLevel);
+  CYC(0x5c11, 0x5c13); alu_add(gb, 0x1c);
+  CYC(0x5c13, 0x5c16); mem_wr(gb, w4SubscreenTextIndices + 0x0f, A);
+  CYC(0x5c16, 0x5c19); SET_DE(w4TileMap + 0x182);
+  CYC(0x5c19, 0x5c1b); A = 0xfe;
+  CYC(0x5c1b, 0x5c1e); getRingTiles(gb);
+}
+
+void inventorySubscreen1_drawTreasures__getAddressToDrawTreasureAt_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5c1e, 0x5c1f); D = A;
+  CYC(0x5c1f, 0x5c21); alu_and(gb, 0xf0);
+  CYC(0x5c21, 0x5c23); A = alu_swap(gb, A);
+  CYC(0x5c23, 0x5c24); alu_add(gb, A);
+  CALL_C(0x5c24, multiplyABy16_hook, 0x01ac, 0x5c27);
+  CYC(0x5c27, 0x5c28); A = D;
+  CYC(0x5c28, 0x5c2a); alu_and(gb, 0x0f);
+  CYC(0x5c2a, 0x5c2b); alu_add(gb, C);
+  CYC(0x5c2b, 0x5c2e); SET_DE(w4TileMap + 0x62);
+  CALL_C(0x5c2e, addAToDe_hook, 0x0068, 0x5c31);
+  CYC(0x5c31, 0x5c32); ret_effect(gb);
 }

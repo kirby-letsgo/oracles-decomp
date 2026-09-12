@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,207 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,225 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -110,7 +110,9 @@ Updated 2026-09-12. Newest entries at the top of each section.
   menu state machine, Link/file rendering, save/quit input and sprite helpers, and fake-reset states.
   Batch 102 added the remaining safe file-select mode 1/3/5 state and text-speed menu paths.
   Batch 103 added inventory state dispatchers, directional input, ring-box traversal, and submenu
-  cursor rendering.
+  cursor rendering. Batch 104 added the seed-and-harp submenu renderer, equipped-ring marker,
+  stored-item grid, and subscreen-1 treasure/ring drawing paths; four adjacent sprite/position
+  tables were removed from the executable routine registry.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -216,6 +218,14 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-12: milestone 3 phase 5 batch 104 (18 routines): added bank 2's seed-and-harp
+  submenu renderer, seed-index and placement helpers, equipped-ring marker, stored-item grid, and
+  subscreen-1 treasure, ring-box, and ring drawing paths. Eleven local entries received stable
+  aliases and four adjacent sprite/position tables left the executable registry. The translation
+  preserves the real BC, DE, and HL stacks, all RST `$10`/`$18` return addresses, and the direct
+  sprite/ring-renderer tails. Two independent instruction-level reviews found no defects. Gates:
+  lint 0, 30k verify 0 mismatches across 4,688,901 calls, full replay state
+  `64bddd0dfe384126`, normal and quirk suites 8/8.
 - 2026-09-12: milestone 3 phase 5 batch 103 (27 routines): added bank 2's inventory state-2
   and state-3 dispatchers and states, directional-input helpers, ring-box cursor traversal, submenu
   item selection, and all three cursor renderers. Seventeen local entries received stable aliases
