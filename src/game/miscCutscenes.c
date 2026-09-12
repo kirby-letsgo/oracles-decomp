@@ -3813,3 +3813,23 @@ void func_7e40_hook(GB *gb) {
   CYC(0x7e50, 0x7e53);
   CYC(0x7e53, 0x7e54); ret_effect(gb);
 }
+
+void func_782a_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x782a, 0x782c); A = 0xeb;
+  CALL_C(0x782c, findTileInRoom_hook, 0x15cc, 0x782f);
+  if (!(F & FZ)) { CYCT(0x782f, 0x7830); ret_effect(gb); return; }
+  CYC(0x782f, 0x7830);
+  CYC(0x7830, 0x7831); C = L;
+  CYC(0x7831, 0x7834); A = mem_rd(gb, wTilesetFlags);
+  CYC(0x7834, 0x7836); alu_and(gb, 0x40);
+  CYC(0x7836, 0x7838); A = 0xfc;
+  if (F & FZ) CYCT(0x7838, 0x783a);
+  else {
+    CYC(0x7838, 0x783a);
+    CYC(0x783a, 0x783c); A = 0x3a;
+  }
+  CALL_C(0x783c, setTile_hook, 0x3a9c, 0x783f);
+  CYC(0x783f, 0x7840); alu_xor(gb, A);
+  CYC(0x7840, 0x7841); ret_effect(gb);
+}

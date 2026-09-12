@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 1,762 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 1,779 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -185,6 +185,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-12: milestone 3 phase 5 batch 85 (17 routines): `func_782a` plus the Flame of Sorrow
+  dispatcher, initialization, all twelve substates, and its local sound helper. Thirteen local
+  entries received stable aliases. The state-1 path preserves a real call at `$78b5` followed by
+  physical fallthrough into substate 2, while the adjacent Zelda-kidnapped root remains generated.
+  Regeneration removed the `$7978` warp destination from the routine registry because it is data.
+  Independent reviews approved both RST stacks, conditional returns, call frames, and static tails.
+  Gates: lint 0, 30k verify 0 mismatches (4,715,002 calls), whole-movie state hash clean
+  (`64bddd0dfe384126`), ctest 8/8 in both normal and quirk builds.
 
 - 2026-09-12: milestone 3 phase 5 batch 84 (25 routines): twelve safe timewarp states and
   dispatch bodies plus thirteen safe Black Tower escape states and helpers. Twenty-one local
