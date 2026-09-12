@@ -714,3 +714,15 @@ desync to discover; keep them when porting routines.
   `$54`. All instruction lengths and cycle burns remained valid, so lint and compilation could not
   detect them. Compare every RAM address and immediate literal directly against the ROM report in
   instruction-level review, even when the surrounding control flow is exact.
+- RST jump-table wrappers need two distinct effects at the call site: burn the one-byte RST and
+  push its physical fallthrough address before emulating the helper. Batch 114 initially combined
+  `$41aa`'s three-byte load and `$41ad`'s RST into one burn through `$41ae`, then called the helper
+  without pushing `$41ae`; the helper would have popped the enclosing C call's return instead.
+  Split the instructions and preserve the RST frame even when the dispatcher immediately becomes
+  a C `switch`. The same review caught a taken two-byte `jr nz` incorrectly burned through its
+  `$4123` destination instead of its `$4121` fallthrough endpoint.
+- Jump-table entries must be matched by their encoded target addresses, not by similar subsystem
+  names. Batch 114 initially mapped file-select modes 6 and 7 to `runSecretEntryMenu` and
+  `runGameLinkMenu`, nearby in-game wrappers at `$4571` and `$4b22`; the actual table targets are
+  `fileSelectMode6` at `$4526` and `fileSelectMode7` at `$4b29`. Read the table words from the ROM
+  report and map each address directly before choosing the readable callee.

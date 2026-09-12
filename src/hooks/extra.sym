@@ -495,9 +495,11 @@
 01:4b53 cutscene17__state2
 01:4b88 cutscene17__state3
 01:4ba5 cutscene17__state4
+01:4bf9 cutscene15__update
 01:4c03 cutscene15__func_4c03
 01:4c0b cutscene15__incTmpcbb3
 01:4c10 cutscene15__state0
+01:4c26 cutscene15__state1
 01:4c30 cutscene15__state1__substate0
 01:4c48 cutscene15__state1__initWaveScrollValuesInverted
 01:4c60 cutscene15__state1__substate1
@@ -611,6 +613,8 @@
 02:4244 fileSelectMode1__back
 02:424c fileSelectMode1__leftOrRight
 02:425a fileSelectMode1__textSpeedMenu_addCursorToOam
+02:41a4 fileSelectMode1__afterCall
+02:41aa fileSelectMode1__subModes
 02:4283 fileSelectMode5__mode5States
 02:428b fileSelectMode5__state0
 02:42a7 fileSelectMode5__state1
@@ -758,3 +762,5 @@
 02:452c fileSelectMode6__updateMode6
 02:453a fileSelectMode6__mode0
 02:4541 fileSelectMode6__mode2
+01:5926 checkLockBG7Color3ToBlack__thing1
+01:592d checkLockBG7Color3ToBlack__thing0

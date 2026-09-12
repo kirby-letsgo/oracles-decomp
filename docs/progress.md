@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,404 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,419 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -136,6 +136,8 @@ Updated 2026-09-12. Newest entries at the top of each section.
   sound-effects table was removed from the executable registry.
   Batch 113 added the bank-2 menu transition/load dispatcher, save-and-quit and secret-list roots,
   and the file-select error/input wait tails.
+  Batch 114 added the bank-1 palette roots and safe cutscene-15 dispatchers plus bank-2 text-copy
+  and file-select bootstrap paths.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -241,6 +243,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-12: milestone 3 phase 5 batch 114 (15 routines): added bank 1's palette-fade root,
+  shared fading update, locked-color dispatcher and leaves, and the two safe cutscene-15 dispatcher
+  entries, plus bank 2's text-character copy chain and file-select root, initialization, and main
+  mode dispatch. Six local entries received stable aliases; an embedded sprite-data row, a folded
+  state-3 entry, and an obsolete synthetic cutscene continuation left the registry. Review caught
+  a taken `jr nz` burning through its target rather than the branch's two-byte endpoint, a missing
+  RST `$00` return frame, and file-select modes 6/7 targeting adjacent in-game wrappers instead of
+  `$4526`/`$4b29`. Two independent instruction-level reviews approved the corrected code. Gates:
+  lint 0, 30k verify 0 mismatches across 4,773,224 calls, full replay state
+  `64bddd0dfe384126`, normal and quirk suites 8/8.
 - 2026-09-12: milestone 3 phase 5 batch 113 (18 routines): added bank 2's menu update,
   menu-specific dispatch, fade-in/fade-out, graphics-save, save-and-quit, and secret-list roots and
   state paths, plus the file-select error and input-wait tails. Nine local entries received stable

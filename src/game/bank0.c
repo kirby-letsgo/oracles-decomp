@@ -2,6 +2,9 @@
 #include "game/gen.h"
 
 void loadDungeonLayout_b01_hook(GB *gb);
+void paletteFadeHandler_hook(GB *gb);
+void checkLockBG7Color3ToBlack_hook(GB *gb);
+void b2_fileSelectScreen_hook(GB *gb);
 
 // Rewrites of code/bank0.s. Cycles are burned from the ROM's own instruction stream (CYC/CYCT),
 // which keeps interrupt dispatch on instruction boundaries; every memory access follows the burn
@@ -12777,7 +12780,7 @@ void fileSelectThreadStart_hook(GB *gb) {
     CYC(0x1a1f, 0x1a21);
     CYC(0x1a21, 0x1a23); H8(hRomBank) = A;
     CYC(0x1a23, 0x1a26); mem_wr(gb, MBC_ROM_BANK, A);
-    CALL_C(0x1a26, b2_fileSelectScreen, ROM_b2_fileSelectScreen, 0x1a29);
+    CALL_C(0x1a26, b2_fileSelectScreen_hook, ROM_b2_fileSelectScreen, 0x1a29);
     CALL_C(0x1a29, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, 0x1a2c);
     CYCT(0x1a2c, 0x1a2e);
   }
@@ -12830,8 +12833,8 @@ void paletteFadeThreadStart_hook(GB *gb) {
     CYC(0x3388, 0x338a);
     CYC(0x338a, 0x338c); H8(hRomBank) = A;
     CYC(0x338c, 0x338f); mem_wr(gb, MBC_ROM_BANK, A);
-    CALL_C(0x338f, paletteFadeHandler, ROM_paletteFadeHandler, 0x3392);
-    CALL_ROM(0x3392, ROM_checkLockBG7Color3ToBlack);
+    CALL_C(0x338f, paletteFadeHandler_hook, ROM_paletteFadeHandler, 0x3392);
+    CALL_C(0x3392, checkLockBG7Color3ToBlack_hook, ROM_checkLockBG7Color3ToBlack, 0x3395);
     A = mem_rd(gb, wPaletteThread_updateRate);
     CYC(0x3395, 0x3398);
     alu_or(gb, A);

@@ -538,9 +538,11 @@ cutscene17__state1
 cutscene17__state2
 cutscene17__state3
 cutscene17__state4
+cutscene15__update
 cutscene15__func_4c03
 cutscene15__incTmpcbb3
 cutscene15__state0
+cutscene15__state1
 cutscene15__state1__substate0
 cutscene15__state1__initWaveScrollValuesInverted
 cutscene15__state1__substate1
@@ -1927,6 +1929,8 @@ func_7f90
 func_7fb5
 copyTextCharactersFromSecretTextTable
 copyTextCharactersFromHlUntilNull
+fileSelectMode1__afterCall
+fileSelectMode1__subModes
 func_02_4149
 fileSelectMode0
 fileSelectMode5
@@ -6286,3 +6290,5 @@ func_5cfe__end
 fileSelectMode6__updateMode6
 fileSelectMode6__mode0
 fileSelectMode6__mode2
+checkLockBG7Color3ToBlack__thing1
+checkLockBG7Color3ToBlack__thing0

@@ -81,6 +81,11 @@ void func_5cfe_hook(GB *gb);
 void func_5cfe__clearCompanion_hook(GB *gb);
 void func_5cfe__end_hook(GB *gb);
 void setEnteredWarpPosition_hook(GB *gb);
+void paletteFadeHandler_hook(GB *gb);
+void updateFadingPalettes_hook(GB *gb);
+void checkLockBG7Color3ToBlack_hook(GB *gb);
+void checkLockBG7Color3ToBlack__thing1_hook(GB *gb);
+void checkLockBG7Color3ToBlack__thing0_hook(GB *gb);
 void paletteFadeHandler09_hook(GB *gb);
 void paletteFadeHandler01_hook(GB *gb);
 void paletteFadeHandler00_hook(GB *gb);
@@ -219,6 +224,8 @@ void initWaveScrollValuesForEverySecondLine_hook(GB *gb);
 void cutscene15__func_4c03_hook(GB *gb);
 void cutscene15__incTmpcbb3_hook(GB *gb);
 void cutscene15__state0_hook(GB *gb);
+void cutscene15__update_hook(GB *gb);
+void cutscene15__state1_hook(GB *gb);
 void cutscene15__state1__substate0_hook(GB *gb);
 void cutscene15__state1__initWaveScrollValuesInverted_hook(GB *gb);
 void cutscene15__state1__substate1_hook(GB *gb);
@@ -1398,7 +1405,7 @@ void paletteFadeHandler01_hook(GB *gb) {
   CYC(0x5717, 0x571a);
   CYC(0x571a, 0x571d); mem_wr(gb, 0xc2ff, A);
   CYC(0x571d, 0x571e); C = A;
-  updateFadingPalettes(gb);
+  updateFadingPalettes_hook(gb);
 }
 
 void paletteFadeHandler00_hook(GB *gb) {
@@ -1432,7 +1439,7 @@ void paletteFadeHandler02_hook(GB *gb) {
   CYC(0x5749, 0x574c); mem_wr(gb, 0xc2ff, A);
   CYC(0x574c, 0x574d); C = A;
   CYC(0x574d, 0x574f);
-  updateFadingPalettes(gb);
+  updateFadingPalettes_hook(gb);
 }
 
 void paletteFadeHandler0b_hook(GB *gb) {
@@ -1463,7 +1470,7 @@ void paletteFadeHandler03_hook(GB *gb) {
   CYC(0x5762, 0x5765); mem_wr(gb, 0xc2ff, A);
   CYC(0x5765, 0x5766); C = A;
   CYC(0x5766, 0x5768);
-  updateFadingPalettes(gb);
+  updateFadingPalettes_hook(gb);
 }
 
 void paletteFadeHandler0c_hook(GB *gb) {
@@ -1493,7 +1500,7 @@ void paletteFadeHandler04_hook(GB *gb) {
   CYC(0x5779, 0x577c); mem_wr(gb, 0xc2ff, A);
   CYC(0x577c, 0x577d); C = A;
   CYC(0x577d, 0x5780);
-  updateFadingPalettes(gb);
+  updateFadingPalettes_hook(gb);
 }
 
 void paletteThread_setFadeOffsetAndStop_hook(GB *gb) {
@@ -1553,7 +1560,7 @@ void paletteFadeHandler05_hook(GB *gb) {
   CYC(0x57b1, 0x57b3);
   CYC(0x57b3, 0x57b6); mem_wr(gb, 0xc2ff, A);
   CYC(0x57b6, 0x57b7); C = A;
-  CYC(0x57b7, 0x57ba); updateFadingPalettes(gb);
+  CYC(0x57b7, 0x57ba); updateFadingPalettes_hook(gb);
 }
 
 void paletteFadeHandler0e_hook(GB *gb) {
@@ -1594,7 +1601,7 @@ void paletteFadeHandler06_hook(GB *gb) {
   CYC(0x57d7, 0x57d9); alu_sub(gb, 0x1f);
   CYC(0x57d9, 0x57dc); mem_wr(gb, 0xc2ff, A);
   CYC(0x57dc, 0x57dd); C = A;
-  CYC(0x57dd, 0x57e0); updateFadingPalettes(gb);
+  CYC(0x57dd, 0x57e0); updateFadingPalettes_hook(gb);
 }
 
 void paletteFadeHandler07_hook(GB *gb) {
@@ -1608,7 +1615,7 @@ void paletteFadeHandler07_hook(GB *gb) {
     CYC(0x57ec, 0x57ee);
     CYC(0x57ee, 0x57f1); mem_wr(gb, 0xc2ff, A);
     CYC(0x57f1, 0x57f2); C = A;
-    CYC(0x57f2, 0x57f5); updateFadingPalettes(gb);
+    CYC(0x57f2, 0x57f5); updateFadingPalettes_hook(gb);
     return;
   }
   CYCT(0x57ec, 0x57ee);
@@ -4009,6 +4016,17 @@ void initWaveScrollValuesForEverySecondLine_hook(GB *gb) {
   CYC(0x4bef, 0x4bf0); ret_effect(gb);
 }
 
+void cutscene15__update_hook(GB *gb) {
+  CYC(0x4bf9, 0x4bfc); A = mem_rd(gb, wCutsceneState);
+  CYC(0x4bfc, 0x4bfd); bank1_jump_table_from_rst(gb, 0x4bfd);
+  switch (HL) {
+    case 0x4c10: cutscene15__state0_hook(gb); return;
+    case 0x4c26: cutscene15__state1_hook(gb); return;
+    case 0x4cf1: cutscene15__state2_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
 void cutscene15__func_4c03_hook(GB *gb) {
   CYC(0x4c03, 0x4c06); SET_HL(wGenericCutscene_cbb4);
   CYC(0x4c06, 0x4c07); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
@@ -4035,6 +4053,17 @@ void cutscene15__state0_hook(GB *gb) {
   CYC(0x4c1f, 0x4c22); mem_wr(gb, wGenericCutscene_cbb5, A);
   CYC(0x4c22, 0x4c25); mem_wr(gb, wGenericCutscene_cbb6, A);
   CYC(0x4c25, 0x4c26); ret_effect(gb);
+}
+
+void cutscene15__state1_hook(GB *gb) {
+  CYC(0x4c26, 0x4c29); A = mem_rd(gb, wGenericCutscene_cbb3);
+  CYC(0x4c29, 0x4c2a); bank1_jump_table_from_rst(gb, 0x4c2a);
+  switch (HL) {
+    case 0x4c30: cutscene15__state1__substate0_hook(gb); return;
+    case 0x4c60: cutscene15__state1__substate1_hook(gb); return;
+    case 0x4c74: hook_handoff(gb, HL); return;
+    default: hook_handoff(gb, HL); return;
+  }
 }
 
 void cutscene15__state1__substate0_hook(GB *gb) {
@@ -4385,4 +4414,67 @@ void setEnteredWarpPosition_hook(GB *gb) {
   CALL_C(0x5c85, getShortPositionFromDE_hook, 0x209b, 0x5c88);
   CYC(0x5c88, 0x5c8b); W8(wEnteredWarpPosition) = A;
   CYC(0x5c8b, 0x5c8c); ret_effect(gb);
+}
+
+void paletteFadeHandler_hook(GB *gb) {
+  CYC(0x56e3, 0x56e6); A = W8(wPaletteThread_mode);
+  CYC(0x56e6, 0x56e7); bank1_jump_table_from_rst(gb, 0x56e7);
+  switch (HL) {
+    case 0x5705: paletteFadeHandler09_hook(gb); return;
+    case 0x5709: paletteFadeHandler01_hook(gb); return;
+    case 0x5736: paletteFadeHandler00_hook(gb); return;
+    case 0x5737: paletteFadeHandler0a_hook(gb); return;
+    case 0x573b: paletteFadeHandler02_hook(gb); return;
+    case 0x574f: paletteFadeHandler0b_hook(gb); return;
+    case 0x5753: paletteFadeHandler03_hook(gb); return;
+    case 0x5768: paletteFadeHandler0c_hook(gb); return;
+    case 0x576c: paletteFadeHandler04_hook(gb); return;
+    case 0x579a: paletteFadeHandler0d_hook(gb); return;
+    case 0x579e: paletteFadeHandler05_hook(gb); return;
+    case 0x57ba: paletteFadeHandler0e_hook(gb); return;
+    case 0x57be: paletteFadeHandler06_hook(gb); return;
+    case 0x57e0: paletteFadeHandler07_hook(gb); return;
+    case 0x580f: paletteFadeHandler08_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void updateFadingPalettes_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x571e, paletteThread_calculateFadingPalettes_hook, 0x583b, 0x5721);
+  CYC(0x5721, 0x5724); SET_HL(wDirtyFadeBgPalettes);
+  CYC(0x5724, 0x5726); A = H8(hDirtyBgPalettes);
+  CYC(0x5726, 0x5727); alu_or(gb, mem_rd(gb, HL));
+  CYC(0x5727, 0x5729); H8(hDirtyBgPalettes) = A;
+  CYC(0x5729, 0x572a); SET_HL(HL + 1);
+  CYC(0x572a, 0x572c); A = H8(hDirtySprPalettes);
+  CYC(0x572c, 0x572d); alu_or(gb, mem_rd(gb, HL));
+  CYC(0x572d, 0x572f); H8(hDirtySprPalettes) = A;
+  CYC(0x572f, 0x5730); SET_HL(HL + 1);
+  CYC(0x5730, 0x5731); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5731, 0x5733); H8(hBgPaletteSources) = A;
+  CYC(0x5733, 0x5734); A = mem_rd(gb, HL);
+  CYC(0x5734, 0x5736); H8(hSprPaletteSources) = A;
+  paletteFadeHandler00_hook(gb);
+}
+
+void checkLockBG7Color3ToBlack_hook(GB *gb) {
+  CYC(0x591e, 0x5921); A = W8(wLockBG7Color3ToBlack);
+  CYC(0x5921, 0x5922); bank1_jump_table_from_rst(gb, 0x5922);
+  switch (HL) {
+    case 0x5926: checkLockBG7Color3ToBlack__thing1_hook(gb); return;
+    case 0x592d: checkLockBG7Color3ToBlack__thing0_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void checkLockBG7Color3ToBlack__thing1_hook(GB *gb) {
+  CYC(0x5926, 0x5927); alu_xor(gb, A);
+  CYC(0x5927, 0x592a); mem_wr(gb, w2FadingBgPalettes + 0x3e, A);
+  CYC(0x592a, 0x592d); mem_wr(gb, w2FadingBgPalettes + 0x3f, A);
+  checkLockBG7Color3ToBlack__thing0_hook(gb);
+}
+
+void checkLockBG7Color3ToBlack__thing0_hook(GB *gb) {
+  CYC(0x592d, 0x592e); ret_effect(gb);
 }
