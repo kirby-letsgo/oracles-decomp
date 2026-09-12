@@ -667,3 +667,9 @@ desync to discover; keep them when porting routines.
   `ld l,<wSecretListMenu.scroll` as raw `$b3`/`$b7`; the values were right, but hid both the union
   ownership and the fact that H must stay untouched. Use `L = (uint8_t)symbol` for these operands,
   and use the active subsystem's field name when several union aliases share the same address.
+- `CALL_ROM` for a promoted-local interrupt boundary and `CALL_C` for a caller-escaping helper are
+  separate rules. Batch 99 initially sent `ringMenu_retIfCounterNotFinished` through the
+  interpreter because its nonzero path does `pop af; ret`; that loses `CALL_C_`'s PC/SP check,
+  which is what notices the grand-caller return and unwinds the abandoned C caller. Keep this call
+  as `CALL_C`; reserve the deliberate `CALL_ROM` exception for the former local boundaries whose
+  interrupt visibility was proven by replay.

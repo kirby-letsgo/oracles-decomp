@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,082 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,106 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -104,6 +104,8 @@ Updated 2026-09-12. Newest entries at the top of each section.
   payment, appraisal, refund, redraw, and delayed-exit paths.
   Batch 98 added the safe bank-2 secret-list input, scrolling, cursor, text-selection, bulk-name,
   and secret-data lookup paths while retaining the thread-starting initialization in generated C.
+  Batch 99 added the bank-2 ring-list selection, ring text, ring-box insertion/search, page-scroll,
+  and cursor-movement state machine through its direction-offset table.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -208,6 +210,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-12: milestone 3 phase 5 batch 99 (24 routines): bank 2's ring-list selection and
+  scrolling core, including ring text and descriptions, ring-box insertion/search, page changes,
+  both scroll directions, and list-cursor movement. Twelve local entries received stable aliases;
+  the direction-offset table left the executable registry. Review corrected the appraisal delay
+  helper call to `CALL_C` so its deliberate double-pop return unwinds the caller, and restored two
+  new cases in the already-readable ring-menu dispatchers. Two independent final reviews approved
+  the exact stack, timing, RAM naming, and generated integration. Gates: lint 0, 30k verify 0
+  mismatches (4,688,896 calls), whole-movie state hash clean (`64bddd0dfe384126`), ctest 8/8 in
+  both normal and quirk builds.
 
 - 2026-09-12: milestone 3 phase 5 batch 98 (18 routines): bank 2's safe secret-list state,
   scrolling, cursor, text-selection, bulk-name loading, and secret-data lookup paths. Twelve local

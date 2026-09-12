@@ -565,3 +565,15 @@
 02:75a1 secretListMenu_printSecret__val3
 02:75b3 secretListMenu_loadAllSecretNames__nextSecret
 02:75e7 secretListMenu_loadAllSecretNames__end
+02:6f72 ringMenu_ringList_substate0__checkInput
+02:6f7e ringMenu_ringList_substate0__aPressed
+02:6f91 ringMenu_ringList_substate0__bPressed
+02:6ffe ringMenu_updateRingText__printDescription
+02:705c ringMenu_checkRingIsInBox__nextRing
+02:7066 ringMenu_checkRingIsInBox__foundRing
+02:70ad ringMenu_state2__substate0
+02:70da ringMenu_state2__substate1
+02:70ea ringMenu_state2__scrollLeft
+02:70f9 ringMenu_state2__scrollRight
+02:7110 ringMenu_state2__doneScrolling
+02:714e ringMenu_checkRingListCursorMoved__playSound
