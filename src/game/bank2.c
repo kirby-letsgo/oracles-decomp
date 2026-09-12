@@ -69,6 +69,18 @@ void mapMenu_clearUnvisitedTiles__nextTile_hook(GB *gb);
 void checkMoblinsKeepDestroyed_hook(GB *gb);
 void checkAdvanceShopVisited_hook(GB *gb);
 void dungeonMap_getLinkIconPosition_hook(GB *gb);
+void dungeonMap_drawFloorList_hook(GB *gb);
+void dungeonMap_drawFloorList__loop_hook(GB *gb);
+void dungeonMap_drawFloorList__nextFloor_hook(GB *gb);
+void drawTileABtoDE_hook(GB *gb);
+void dungeonMap_updateScroll_hook(GB *gb);
+void dungeonMap_updateScroll__nextRow_hook(GB *gb);
+void dungeonMap_updateScroll__nextColumn_hook(GB *gb);
+void dungeonMap_getTileForRoom_hook(GB *gb);
+void dungeonMap_getTileForRoom__hidden_hook(GB *gb);
+void dungeonMap_getTileForRoom__visited_hook(GB *gb);
+void dungeonMap_getTileForRoom__ret_hook(GB *gb);
+void dungeonMap_checkCanViewFloor_hook(GB *gb);
 
 static uint16_t function_caller_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -1098,4 +1110,273 @@ void dungeonMap_getLinkIconPosition_hook(GB *gb) {
   CYC(0x6778, 0x677a); alu_and(gb, 7);
   CYC(0x677a, 0x677b); C = A;
   CYC(0x677b, 0x677c); ret_effect(gb);
+}
+
+void dungeonMap_drawFloorList_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x677c, 0x677e); A = 0x04;
+  CYC(0x677e, 0x6780); hram_wr(gb, 0x70, A);
+  CYC(0x6780, 0x6783); A = W8(wDungeonIndex);
+  CYC(0x6783, 0x6786); SET_HL(0x6910);
+  CYC(0x6786, 0x6787); push_effect(gb, 0x6787); add_a_to_hl(gb);
+  CYC(0x6787, 0x6788); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6788, 0x678b); SET_DE(0xd0a0);
+  CALL_C(0x678b, addAToDe_hook, 0x0068, 0x678e);
+  CYC(0x678e, 0x6791); A = W8(wDungeonNumFloors);
+  CYC(0x6791, 0x6792); A = alu_dec8(gb, A);
+  CYC(0x6792, 0x6793); C = A;
+  dungeonMap_drawFloorList__loop_hook(gb);
+}
+
+void dungeonMap_drawFloorList__loop_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6793, checkLinkHasMap_hook, 0x653e, 0x6796);
+  if (!(F & FZ)) {
+    CYCT(0x6796, 0x6798);
+  } else {
+    CYC(0x6796, 0x6798);
+    CYC(0x6798, 0x6799); A = C;
+    CYC(0x6799, 0x679c); SET_HL(0x00f8);
+    CYC(0x679c, 0x679d); alu_add(gb, L);
+    CYC(0x679d, 0x679e); L = A;
+    CYC(0x679e, 0x67a1); A = W8(wMapMenu_visitedFloors);
+    CYC(0x67a1, 0x67a2); alu_and(gb, mem_rd(gb, HL));
+    CYC(0x67a2, 0x67a4); A = 0x20;
+    if (F & FZ) {
+      CYCT(0x67a4, 0x67a6);
+      dungeonMap_drawFloorList__nextFloor_hook(gb);
+      return;
+    }
+    CYC(0x67a4, 0x67a6);
+  }
+  CYC(0x67a6, 0x67a9); A = W8(wDungeonMapBaseFloor);
+  CYC(0x67a9, 0x67aa); alu_add(gb, C);
+  CYC(0x67aa, 0x67ad); SET_HL(0x68fa);
+  CYC(0x67ad, 0x67ae); add_double_index_to_hl(gb, 0x67ae);
+  CYC(0x67ae, 0x67b0); B = 0x02;
+  CYC(0x67b0, 0x67b1); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CALL_C(0x67b1, drawTileABtoDE_hook, 0x67d5, 0x67b4);
+  CYC(0x67b4, 0x67b5); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CALL_C(0x67b5, drawTileABtoDE_hook, 0x67d5, 0x67b8);
+  CYC(0x67b8, 0x67ba); A = 0x9c;
+  CALL_C(0x67ba, drawTileABtoDE_hook, 0x67d5, 0x67bd);
+  CYC(0x67bd, 0x67be); E = alu_inc8(gb, E);
+  CYC(0x67be, 0x67c0); B = 0x04;
+  CYC(0x67c0, 0x67c2); A = 0xaa;
+  CALL_C(0x67c2, drawTileABtoDE_hook, 0x67d5, 0x67c5);
+  CYC(0x67c5, 0x67c7); A = 0xab;
+  CALL_C(0x67c7, drawTileABtoDE_hook, 0x67d5, 0x67ca);
+  CYC(0x67ca, 0x67cc); A = 0x1a;
+  dungeonMap_drawFloorList__nextFloor_hook(gb);
+}
+
+void dungeonMap_drawFloorList__nextFloor_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x67cc, addAToDe_hook, 0x0068, 0x67cf);
+  CYC(0x67cf, 0x67d0); A = C;
+  CYC(0x67d0, 0x67d1); C = alu_dec8(gb, C);
+  CYC(0x67d1, 0x67d2); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x67d2, 0x67d4);
+    dungeonMap_drawFloorList__loop_hook(gb);
+    return;
+  }
+  CYC(0x67d2, 0x67d4);
+  CYC(0x67d4, 0x67d5); ret_effect(gb);
+}
+
+void drawTileABtoDE_hook(GB *gb) {
+  CYC(0x67d5, 0x67d6); mem_wr(gb, DE, A);
+  CYC(0x67d6, 0x67d8); D |= 0x04;
+  CYC(0x67d8, 0x67d9); A = B;
+  CYC(0x67d9, 0x67da); mem_wr(gb, DE, A);
+  CYC(0x67da, 0x67dc); D &= (uint8_t)~0x04;
+  CYC(0x67dc, 0x67dd); SET_DE(DE + 1);
+  CYC(0x67dd, 0x67de); ret_effect(gb);
+}
+
+void dungeonMap_updateScroll_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x682c, 0x682e); A = hram_rd(gb, 0x70);
+  CYC(0x682e, 0x682f); push_effect(gb, AF);
+  CYC(0x682f, 0x6832); A = W8(wMapMenu_dungeonScrollY);
+  CALL_C(0x6832, multiplyABy8_hook, 0x01b7, 0x6835);
+  CYC(0x6835, 0x6838); SET_HL(0xdc00);
+  CYC(0x6838, 0x6839); alu_add_hl(gb, BC);
+  CYC(0x6839, 0x683c); SET_DE(0xd00a);
+  CYC(0x683c, 0x683e); A = 0x12;
+  CYC(0x683e, 0x6840); hram_wr(gb, 0x8d, A);
+  dungeonMap_updateScroll__nextRow_hook(gb);
+}
+
+void dungeonMap_updateScroll__nextRow_hook(GB *gb) {
+  CYC(0x6840, 0x6842); C = 0x08;
+  dungeonMap_updateScroll__nextColumn_hook(gb);
+}
+
+void dungeonMap_updateScroll__nextColumn_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  for (;;) {
+    CYC(0x6842, 0x6844); A = 0x04;
+    CYC(0x6844, 0x6846); hram_wr(gb, 0x70, A);
+    CYC(0x6846, 0x6847); A = mem_rd(gb, HL);
+    CYC(0x6847, 0x6849); B = 0x00;
+    CYC(0x6849, 0x684b); alu_cp(gb, 0x83);
+    if (F & FZ) {
+      CYCT(0x684b, 0x684d);
+    } else {
+      CYC(0x684b, 0x684d);
+      CYC(0x684d, 0x684f); alu_cp(gb, 0xad);
+      if (F & FZ) {
+        CYCT(0x684f, 0x6851);
+      } else {
+        CYC(0x684f, 0x6851);
+        CYC(0x6851, 0x6853); B = 0x02;
+        CYC(0x6853, 0x6855); alu_cp(gb, 0xae);
+        if (F & FZ) {
+          CYCT(0x6855, 0x6857);
+        } else {
+          CYC(0x6855, 0x6857);
+          CYC(0x6857, 0x6859); B = 0x04;
+          CYC(0x6859, 0x685b); alu_cp(gb, 0xaf);
+          if (F & FZ) {
+            CYCT(0x685b, 0x685d);
+          } else {
+            CYC(0x685b, 0x685d);
+            CYC(0x685d, 0x685f); B = 0x05;
+          }
+        }
+      }
+    }
+    CALL_C(0x685f, drawTileABtoDE_hook, 0x67d5, 0x6862);
+    CYC(0x6862, 0x6863); SET_HL(HL + 1);
+    CYC(0x6863, 0x6864); C = alu_dec8(gb, C);
+    if (!(F & FZ)) {
+      CYCT(0x6864, 0x6866);
+      continue;
+    }
+    CYC(0x6864, 0x6866);
+    break;
+  }
+  CYC(0x6866, 0x6868); A = 0x18;
+  CALL_C(0x6868, addAToDe_hook, 0x0068, 0x686b);
+  CYC(0x686b, 0x686d); A = hram_rd(gb, 0x8d);
+  CYC(0x686d, 0x686e); A = alu_dec8(gb, A);
+  CYC(0x686e, 0x6870); hram_wr(gb, 0x8d, A);
+  if (!(F & FZ)) {
+    CYCT(0x6870, 0x6872);
+    dungeonMap_updateScroll__nextRow_hook(gb);
+    return;
+  }
+  CYC(0x6870, 0x6872);
+  CYC(0x6872, 0x6873); SET_AF(pop_effect(gb));
+  CYC(0x6873, 0x6875); hram_wr(gb, 0x70, A);
+  dungeonMap_getTileForRoom_hook(gb);
+}
+
+void dungeonMap_getTileForRoom_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6875, 0x6876); push_effect(gb, BC);
+  CYC(0x6876, 0x6877); push_effect(gb, DE);
+  CYC(0x6877, 0x6878); B = A;
+  CYC(0x6878, 0x6879); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x6879, 0x687b);
+    dungeonMap_getTileForRoom__hidden_hook(gb);
+    return;
+  }
+  CYC(0x6879, 0x687b);
+  CYC(0x687b, 0x687c); push_effect(gb, HL);
+  CYC(0x687c, 0x687d); L = B;
+  CYC(0x687d, 0x6880); A = W8(wDungeonFlagsAddressH);
+  CYC(0x6880, 0x6881); H = A;
+  CYC(0x6881, 0x6882); D = mem_rd(gb, HL);
+  CALL_C(0x6882, getRoomDungeonProperties_hook, 0x1ad7, 0x6885);
+  CYC(0x6885, 0x6886); E = B;
+  CYC(0x6886, 0x6887); SET_HL(pop_effect(gb));
+  CYC(0x6887, 0x6888); A = E;
+  CYC(0x6888, 0x688a); alu_cp(gb, 0x60);
+  if (F & FZ) {
+    CYCT(0x688a, 0x688c);
+    dungeonMap_getTileForRoom__hidden_hook(gb);
+    return;
+  }
+  CYC(0x688a, 0x688c);
+  CYC(0x688c, 0x688e); alu_cp(gb, 0x70);
+  if (F & FZ) {
+    CYCT(0x688e, 0x6890);
+    dungeonMap_getTileForRoom__hidden_hook(gb);
+    return;
+  }
+  CYC(0x688e, 0x6890);
+  CYC(0x6890, 0x6892); alu_bit(gb, 4, D);
+  if (!(F & FZ)) {
+    CYCT(0x6892, 0x6894);
+    dungeonMap_getTileForRoom__visited_hook(gb);
+    return;
+  }
+  CYC(0x6892, 0x6894);
+  CALL_C(0x6894, dungeonMap_checkCompassTile, 0x68ce, 0x6897);
+  if (!(F & FZ)) {
+    CYCT(0x6897, 0x6899);
+    dungeonMap_getTileForRoom__ret_hook(gb);
+    return;
+  }
+  CYC(0x6897, 0x6899);
+  CALL_C(0x6899, checkLinkHasMap_hook, 0x653e, 0x689c);
+  CYC(0x689c, 0x689e); A = 0xaf;
+  if (!(F & FZ)) {
+    CYCT(0x689e, 0x68a0);
+    dungeonMap_getTileForRoom__ret_hook(gb);
+    return;
+  }
+  CYC(0x689e, 0x68a0);
+  dungeonMap_getTileForRoom__hidden_hook(gb);
+}
+
+void dungeonMap_getTileForRoom__hidden_hook(GB *gb) {
+  CYC(0x68a0, 0x68a2); A = 0xac;
+  CYC(0x68a2, 0x68a4); dungeonMap_getTileForRoom__ret_hook(gb);
+}
+
+void dungeonMap_getTileForRoom__visited_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x68ad, dungeonMap_checkCompassTile, 0x68ce, 0x68b0);
+  if (!(F & FZ)) {
+    CYCT(0x68b0, 0x68b2);
+    dungeonMap_getTileForRoom__ret_hook(gb);
+    return;
+  }
+  CYC(0x68b0, 0x68b2);
+  CYC(0x68b2, 0x68b3); A = D;
+  CYC(0x68b3, 0x68b4); alu_or(gb, E);
+  CYC(0x68b4, 0x68b6); alu_and(gb, 0x0f);
+  CYC(0x68b6, 0x68b8); alu_add(gb, 0xb0);
+  dungeonMap_getTileForRoom__ret_hook(gb);
+}
+
+void dungeonMap_getTileForRoom__ret_hook(GB *gb) {
+  CYC(0x68b8, 0x68b9); SET_DE(pop_effect(gb));
+  CYC(0x68b9, 0x68ba); SET_BC(pop_effect(gb));
+  CYC(0x68ba, 0x68bb); ret_effect(gb);
+}
+
+void dungeonMap_checkCanViewFloor_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x68bb, checkLinkHasMap_hook, 0x653e, 0x68be);
+  if (!(F & FZ)) {
+    CYCT(0x68be, 0x68bf); ret_effect(gb);
+    return;
+  }
+  CYC(0x68be, 0x68bf);
+  CYC(0x68bf, 0x68c0); push_effect(gb, HL);
+  CYC(0x68c0, 0x68c2); A = hram_rd(gb, 0x8d);
+  CYC(0x68c2, 0x68c3); A = alu_dec8(gb, A);
+  CYC(0x68c3, 0x68c6); SET_HL(0x00f8);
+  CYC(0x68c6, 0x68c7); alu_add(gb, L);
+  CYC(0x68c7, 0x68c8); L = A;
+  CYC(0x68c8, 0x68cb); A = W8(wMapMenu_visitedFloors);
+  CYC(0x68cb, 0x68cc); alu_and(gb, mem_rd(gb, HL));
+  CYC(0x68cc, 0x68cd); SET_HL(pop_effect(gb));
+  CYC(0x68cd, 0x68ce); ret_effect(gb);
 }

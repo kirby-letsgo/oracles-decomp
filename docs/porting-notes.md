@@ -580,3 +580,7 @@ desync to discover; keep them when porting routines.
   the real final `ret` at `$0014`. Short verification never took that late map-menu path; the
   whole-movie reference first diverged at frame 286,260. Burn the untaken conditional return with
   no effect, apply `inc h` after `$0013`, and burn the final return at `$0014` separately.
+- Unreachable bytes after a static jump are still not part of that jump's burn. Batch 73's
+  `dungeonMap_getTileForRoom__hidden` initially burned the unconditional `jr` at `$68a2` through
+  `$68a5`; the two-byte instruction ends at `$68a4`, and `$68a4` is the first byte of an
+  unreachable `call`. Instruction-by-instruction review caught the extra byte before regeneration.

@@ -3655,163 +3655,8 @@ L_649d:
   I(0x649d, 3); SET_HL(0xcbb8);  // ld hl,$cbb8
   I(0x64a0, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
   I(0x64a1, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL(0x64a2, dungeonMap_updateScroll, 0x682c, 0x64a5);  // call $682c
+  CALL(0x64a2, dungeonMap_updateScroll_hook, 0x682c, 0x64a5);  // call $682c
   mapMenu_copyTilemapToVram(gb); return;  // fallthrough
-}
-
-// 02:677c
-void dungeonMap_drawFloorList(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x677c, 2); A = 0x04;  // ld a,$04
-  I(0x677e, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x6780, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
-  I(0x6783, 3); SET_HL(0x6910);  // ld hl,$6910
-  RST_PUSH(0x6786, 0x6787);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x6787, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6788, 3); SET_DE(0xd0a0);  // ld de,$d0a0
-  CALL(0x678b, addAToDe_hook, 0x0068, 0x678e);  // call $0068
-  I(0x678e, 4); A = mem_rd(gb, 0xcc40);  // ld a,($cc40)
-  I(0x6791, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x6792, 1); C = A;  // ld c,a
-L_6793:
-  CALL(0x6793, checkLinkHasMap_hook, 0x653e, 0x6796);  // call $653e
-  if (!(F & FZ)) { I(0x6796, 3); goto L_67a6; } I(0x6796, 2);  // jr nz,$67a6
-  I(0x6798, 1); A = C;  // ld a,c
-  I(0x6799, 3); SET_HL(0x00f8);  // ld hl,$00f8
-  I(0x679c, 1); alu_add(gb, L);  // add l
-  I(0x679d, 1); L = A;  // ld l,a
-  I(0x679e, 4); A = mem_rd(gb, 0xcbba);  // ld a,($cbba)
-  I(0x67a1, 2); alu_and(gb, mem_rd(gb, HL));  // and (hl)
-  I(0x67a2, 2); A = 0x20;  // ld a,$20
-  if ((F & FZ)) { I(0x67a4, 3); goto L_67cc; } I(0x67a4, 2);  // jr z,$67cc
-L_67a6:
-  I(0x67a6, 4); A = mem_rd(gb, 0xcc41);  // ld a,($cc41)
-  I(0x67a9, 1); alu_add(gb, C);  // add c
-  I(0x67aa, 3); SET_HL(0x68fa);  // ld hl,$68fa
-  RST_PUSH(0x67ad, 0x67ae);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x67ae, 2); B = 0x02;  // ld b,$02
-  I(0x67b0, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  CALL(0x67b1, drawTileABtoDE, 0x67d5, 0x67b4);  // call $67d5
-  I(0x67b4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  CALL(0x67b5, drawTileABtoDE, 0x67d5, 0x67b8);  // call $67d5
-  I(0x67b8, 2); A = 0x9c;  // ld a,$9c
-  CALL(0x67ba, drawTileABtoDE, 0x67d5, 0x67bd);  // call $67d5
-  I(0x67bd, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x67be, 2); B = 0x04;  // ld b,$04
-  I(0x67c0, 2); A = 0xaa;  // ld a,$aa
-  CALL(0x67c2, drawTileABtoDE, 0x67d5, 0x67c5);  // call $67d5
-  I(0x67c5, 2); A = 0xab;  // ld a,$ab
-  CALL(0x67c7, drawTileABtoDE, 0x67d5, 0x67ca);  // call $67d5
-  I(0x67ca, 2); A = 0x1a;  // ld a,$1a
-L_67cc:
-  CALL(0x67cc, addAToDe_hook, 0x0068, 0x67cf);  // call $0068
-  I(0x67cf, 1); A = C;  // ld a,c
-  I(0x67d0, 1); C = alu_dec8(gb, C);  // dec c
-  I(0x67d1, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x67d2, 3); goto L_6793; } I(0x67d2, 2);  // jr nz,$6793
-  RET(0x67d4); return;  // ret
-}
-
-// 02:6793
-void dungeonMap_drawFloorList__loop(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6793:
-  CALL(0x6793, checkLinkHasMap_hook, 0x653e, 0x6796);  // call $653e
-  if (!(F & FZ)) { I(0x6796, 3); goto L_67a6; } I(0x6796, 2);  // jr nz,$67a6
-  I(0x6798, 1); A = C;  // ld a,c
-  I(0x6799, 3); SET_HL(0x00f8);  // ld hl,$00f8
-  I(0x679c, 1); alu_add(gb, L);  // add l
-  I(0x679d, 1); L = A;  // ld l,a
-  I(0x679e, 4); A = mem_rd(gb, 0xcbba);  // ld a,($cbba)
-  I(0x67a1, 2); alu_and(gb, mem_rd(gb, HL));  // and (hl)
-  I(0x67a2, 2); A = 0x20;  // ld a,$20
-  if ((F & FZ)) { I(0x67a4, 3); goto L_67cc; } I(0x67a4, 2);  // jr z,$67cc
-L_67a6:
-  I(0x67a6, 4); A = mem_rd(gb, 0xcc41);  // ld a,($cc41)
-  I(0x67a9, 1); alu_add(gb, C);  // add c
-  I(0x67aa, 3); SET_HL(0x68fa);  // ld hl,$68fa
-  RST_PUSH(0x67ad, 0x67ae);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x67ae, 2); B = 0x02;  // ld b,$02
-  I(0x67b0, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  CALL(0x67b1, drawTileABtoDE, 0x67d5, 0x67b4);  // call $67d5
-  I(0x67b4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  CALL(0x67b5, drawTileABtoDE, 0x67d5, 0x67b8);  // call $67d5
-  I(0x67b8, 2); A = 0x9c;  // ld a,$9c
-  CALL(0x67ba, drawTileABtoDE, 0x67d5, 0x67bd);  // call $67d5
-  I(0x67bd, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x67be, 2); B = 0x04;  // ld b,$04
-  I(0x67c0, 2); A = 0xaa;  // ld a,$aa
-  CALL(0x67c2, drawTileABtoDE, 0x67d5, 0x67c5);  // call $67d5
-  I(0x67c5, 2); A = 0xab;  // ld a,$ab
-  CALL(0x67c7, drawTileABtoDE, 0x67d5, 0x67ca);  // call $67d5
-  I(0x67ca, 2); A = 0x1a;  // ld a,$1a
-L_67cc:
-  CALL(0x67cc, addAToDe_hook, 0x0068, 0x67cf);  // call $0068
-  I(0x67cf, 1); A = C;  // ld a,c
-  I(0x67d0, 1); C = alu_dec8(gb, C);  // dec c
-  I(0x67d1, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x67d2, 3); goto L_6793; } I(0x67d2, 2);  // jr nz,$6793
-  RET(0x67d4); return;  // ret
-}
-
-// 02:67cc
-void dungeonMap_drawFloorList__nextFloor(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_67cc;
-L_6793:
-  CALL(0x6793, checkLinkHasMap_hook, 0x653e, 0x6796);  // call $653e
-  if (!(F & FZ)) { I(0x6796, 3); goto L_67a6; } I(0x6796, 2);  // jr nz,$67a6
-  I(0x6798, 1); A = C;  // ld a,c
-  I(0x6799, 3); SET_HL(0x00f8);  // ld hl,$00f8
-  I(0x679c, 1); alu_add(gb, L);  // add l
-  I(0x679d, 1); L = A;  // ld l,a
-  I(0x679e, 4); A = mem_rd(gb, 0xcbba);  // ld a,($cbba)
-  I(0x67a1, 2); alu_and(gb, mem_rd(gb, HL));  // and (hl)
-  I(0x67a2, 2); A = 0x20;  // ld a,$20
-  if ((F & FZ)) { I(0x67a4, 3); goto L_67cc; } I(0x67a4, 2);  // jr z,$67cc
-L_67a6:
-  I(0x67a6, 4); A = mem_rd(gb, 0xcc41);  // ld a,($cc41)
-  I(0x67a9, 1); alu_add(gb, C);  // add c
-  I(0x67aa, 3); SET_HL(0x68fa);  // ld hl,$68fa
-  RST_PUSH(0x67ad, 0x67ae);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x67ae, 2); B = 0x02;  // ld b,$02
-  I(0x67b0, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  CALL(0x67b1, drawTileABtoDE, 0x67d5, 0x67b4);  // call $67d5
-  I(0x67b4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  CALL(0x67b5, drawTileABtoDE, 0x67d5, 0x67b8);  // call $67d5
-  I(0x67b8, 2); A = 0x9c;  // ld a,$9c
-  CALL(0x67ba, drawTileABtoDE, 0x67d5, 0x67bd);  // call $67d5
-  I(0x67bd, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x67be, 2); B = 0x04;  // ld b,$04
-  I(0x67c0, 2); A = 0xaa;  // ld a,$aa
-  CALL(0x67c2, drawTileABtoDE, 0x67d5, 0x67c5);  // call $67d5
-  I(0x67c5, 2); A = 0xab;  // ld a,$ab
-  CALL(0x67c7, drawTileABtoDE, 0x67d5, 0x67ca);  // call $67d5
-  I(0x67ca, 2); A = 0x1a;  // ld a,$1a
-L_67cc:
-  CALL(0x67cc, addAToDe_hook, 0x0068, 0x67cf);  // call $0068
-  I(0x67cf, 1); A = C;  // ld a,c
-  I(0x67d0, 1); C = alu_dec8(gb, C);  // dec c
-  I(0x67d1, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x67d2, 3); goto L_6793; } I(0x67d2, 2);  // jr nz,$6793
-  RET(0x67d4); return;  // ret
-}
-
-// 02:67d5
-void drawTileABtoDE(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x67d5, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x67d6, 2); D = (uint8_t)(D | (1 << 2));  // set 2,d
-  I(0x67d8, 1); A = B;  // ld a,b
-  I(0x67d9, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x67da, 2); D = (uint8_t)(D & ~(1 << 2));  // res 2,d
-  I(0x67dc, 2); SET_DE(DE + 1);  // inc de
-  RET(0x67dd); return;  // ret
 }
 
 // 02:67de
@@ -3826,7 +3671,7 @@ L_67eb:
   I(0x67eb, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
   I(0x67ed, 1); A = alu_dec8(gb, A);  // dec a
   CALL(0x67ee, dungeonMap_getFloorAddress, 0x68ef, 0x67f1);  // call $68ef
-  CALL(0x67f1, dungeonMap_checkCanViewFloor, 0x68bb, 0x67f4);  // call $68bb
+  CALL(0x67f1, dungeonMap_checkCanViewFloor_hook, 0x68bb, 0x67f4);  // call $68bb
   I(0x67f4, 2); A = 0x50;  // ld a,$50
   if ((F & FZ)) { I(0x67f6, 3); goto L_6815; } I(0x67f6, 2);  // jr z,$6815
   I(0x67f8, 2); A = 0x40;  // ld a,$40
@@ -3839,7 +3684,7 @@ L_67fc:
   I(0x6802, 2); A = 0x04;  // ld a,$04
   I(0x6804, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
   I(0x6806, 1); A = C;  // ld a,c
-  CALL(0x6807, dungeonMap_getTileForRoom, 0x6875, 0x680a);  // call $6875
+  CALL(0x6807, dungeonMap_getTileForRoom_hook, 0x6875, 0x680a);  // call $6875
   I(0x680a, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x680b, 2); SET_DE(DE + 1);  // inc de
   I(0x680c, 3); A = mem_rd(gb, 0xff8c);  // ldh a,($ff8c)
@@ -3874,7 +3719,7 @@ L_67eb:
   I(0x67eb, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
   I(0x67ed, 1); A = alu_dec8(gb, A);  // dec a
   CALL(0x67ee, dungeonMap_getFloorAddress, 0x68ef, 0x67f1);  // call $68ef
-  CALL(0x67f1, dungeonMap_checkCanViewFloor, 0x68bb, 0x67f4);  // call $68bb
+  CALL(0x67f1, dungeonMap_checkCanViewFloor_hook, 0x68bb, 0x67f4);  // call $68bb
   I(0x67f4, 2); A = 0x50;  // ld a,$50
   if ((F & FZ)) { I(0x67f6, 3); goto L_6815; } I(0x67f6, 2);  // jr z,$6815
   I(0x67f8, 2); A = 0x40;  // ld a,$40
@@ -3887,7 +3732,7 @@ L_67fc:
   I(0x6802, 2); A = 0x04;  // ld a,$04
   I(0x6804, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
   I(0x6806, 1); A = C;  // ld a,c
-  CALL(0x6807, dungeonMap_getTileForRoom, 0x6875, 0x680a);  // call $6875
+  CALL(0x6807, dungeonMap_getTileForRoom_hook, 0x6875, 0x680a);  // call $6875
   I(0x680a, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x680b, 2); SET_DE(DE + 1);  // inc de
   I(0x680c, 3); A = mem_rd(gb, 0xff8c);  // ldh a,($ff8c)
@@ -3923,7 +3768,7 @@ L_67eb:
   I(0x67eb, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
   I(0x67ed, 1); A = alu_dec8(gb, A);  // dec a
   CALL(0x67ee, dungeonMap_getFloorAddress, 0x68ef, 0x67f1);  // call $68ef
-  CALL(0x67f1, dungeonMap_checkCanViewFloor, 0x68bb, 0x67f4);  // call $68bb
+  CALL(0x67f1, dungeonMap_checkCanViewFloor_hook, 0x68bb, 0x67f4);  // call $68bb
   I(0x67f4, 2); A = 0x50;  // ld a,$50
   if ((F & FZ)) { I(0x67f6, 3); goto L_6815; } I(0x67f6, 2);  // jr z,$6815
   I(0x67f8, 2); A = 0x40;  // ld a,$40
@@ -3936,7 +3781,7 @@ L_67fc:
   I(0x6802, 2); A = 0x04;  // ld a,$04
   I(0x6804, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
   I(0x6806, 1); A = C;  // ld a,c
-  CALL(0x6807, dungeonMap_getTileForRoom, 0x6875, 0x680a);  // call $6875
+  CALL(0x6807, dungeonMap_getTileForRoom_hook, 0x6875, 0x680a);  // call $6875
   I(0x680a, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x680b, 2); SET_DE(DE + 1);  // inc de
   I(0x680c, 3); A = mem_rd(gb, 0xff8c);  // ldh a,($ff8c)
@@ -3972,7 +3817,7 @@ L_67eb:
   I(0x67eb, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
   I(0x67ed, 1); A = alu_dec8(gb, A);  // dec a
   CALL(0x67ee, dungeonMap_getFloorAddress, 0x68ef, 0x67f1);  // call $68ef
-  CALL(0x67f1, dungeonMap_checkCanViewFloor, 0x68bb, 0x67f4);  // call $68bb
+  CALL(0x67f1, dungeonMap_checkCanViewFloor_hook, 0x68bb, 0x67f4);  // call $68bb
   I(0x67f4, 2); A = 0x50;  // ld a,$50
   if ((F & FZ)) { I(0x67f6, 3); goto L_6815; } I(0x67f6, 2);  // jr z,$6815
   I(0x67f8, 2); A = 0x40;  // ld a,$40
@@ -3985,7 +3830,7 @@ L_67fc:
   I(0x6802, 2); A = 0x04;  // ld a,$04
   I(0x6804, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
   I(0x6806, 1); A = C;  // ld a,c
-  CALL(0x6807, dungeonMap_getTileForRoom, 0x6875, 0x680a);  // call $6875
+  CALL(0x6807, dungeonMap_getTileForRoom_hook, 0x6875, 0x680a);  // call $6875
   I(0x680a, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x680b, 2); SET_DE(DE + 1);  // inc de
   I(0x680c, 3); A = mem_rd(gb, 0xff8c);  // ldh a,($ff8c)
@@ -4027,225 +3872,6 @@ L_6825:
   if (!(F & FZ)) { I(0x6828, 3); goto L_6825; } I(0x6828, 2);  // jr nz,$6825
   SET_BC(POP(0x682a));  // pop bc
   RET(0x682b); return;  // ret
-}
-
-// 02:682c
-void dungeonMap_updateScroll(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x682c, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
-  PUSH(0x682e, AF);  // push af
-  I(0x682f, 4); A = mem_rd(gb, 0xcbb8);  // ld a,($cbb8)
-  CALL(0x6832, multiplyABy8_hook, 0x01b7, 0x6835);  // call $01b7
-  I(0x6835, 3); SET_HL(0xdc00);  // ld hl,$dc00
-  I(0x6838, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x6839, 3); SET_DE(0xd00a);  // ld de,$d00a
-  I(0x683c, 2); A = 0x12;  // ld a,$12
-  I(0x683e, 3); mem_wr(gb, 0xff8d, A);  // ldh ($ff8d),a
-L_6840:
-  I(0x6840, 2); C = 0x08;  // ld c,$08
-L_6842:
-  I(0x6842, 2); A = 0x04;  // ld a,$04
-  I(0x6844, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x6846, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6847, 2); B = 0x00;  // ld b,$00
-  I(0x6849, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x684b, 3); goto L_685f; } I(0x684b, 2);  // jr z,$685f
-  I(0x684d, 2); alu_cp(gb, 0xad);  // cp $ad
-  if ((F & FZ)) { I(0x684f, 3); goto L_685f; } I(0x684f, 2);  // jr z,$685f
-  I(0x6851, 2); B = 0x02;  // ld b,$02
-  I(0x6853, 2); alu_cp(gb, 0xae);  // cp $ae
-  if ((F & FZ)) { I(0x6855, 3); goto L_685f; } I(0x6855, 2);  // jr z,$685f
-  I(0x6857, 2); B = 0x04;  // ld b,$04
-  I(0x6859, 2); alu_cp(gb, 0xaf);  // cp $af
-  if ((F & FZ)) { I(0x685b, 3); goto L_685f; } I(0x685b, 2);  // jr z,$685f
-  I(0x685d, 2); B = 0x05;  // ld b,$05
-L_685f:
-  CALL(0x685f, drawTileABtoDE, 0x67d5, 0x6862);  // call $67d5
-  I(0x6862, 2); SET_HL(HL + 1);  // inc hl
-  I(0x6863, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x6864, 3); goto L_6842; } I(0x6864, 2);  // jr nz,$6842
-  I(0x6866, 2); A = 0x18;  // ld a,$18
-  CALL(0x6868, addAToDe_hook, 0x0068, 0x686b);  // call $0068
-  I(0x686b, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
-  I(0x686d, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x686e, 3); mem_wr(gb, 0xff8d, A);  // ldh ($ff8d),a
-  if (!(F & FZ)) { I(0x6870, 3); goto L_6840; } I(0x6870, 2);  // jr nz,$6840
-  SET_AF(POP(0x6872));  // pop af
-  I(0x6873, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  dungeonMap_getTileForRoom(gb); return;  // fallthrough
-}
-
-// 02:6840
-void dungeonMap_updateScroll__nextRow(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6840:
-  I(0x6840, 2); C = 0x08;  // ld c,$08
-L_6842:
-  I(0x6842, 2); A = 0x04;  // ld a,$04
-  I(0x6844, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x6846, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6847, 2); B = 0x00;  // ld b,$00
-  I(0x6849, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x684b, 3); goto L_685f; } I(0x684b, 2);  // jr z,$685f
-  I(0x684d, 2); alu_cp(gb, 0xad);  // cp $ad
-  if ((F & FZ)) { I(0x684f, 3); goto L_685f; } I(0x684f, 2);  // jr z,$685f
-  I(0x6851, 2); B = 0x02;  // ld b,$02
-  I(0x6853, 2); alu_cp(gb, 0xae);  // cp $ae
-  if ((F & FZ)) { I(0x6855, 3); goto L_685f; } I(0x6855, 2);  // jr z,$685f
-  I(0x6857, 2); B = 0x04;  // ld b,$04
-  I(0x6859, 2); alu_cp(gb, 0xaf);  // cp $af
-  if ((F & FZ)) { I(0x685b, 3); goto L_685f; } I(0x685b, 2);  // jr z,$685f
-  I(0x685d, 2); B = 0x05;  // ld b,$05
-L_685f:
-  CALL(0x685f, drawTileABtoDE, 0x67d5, 0x6862);  // call $67d5
-  I(0x6862, 2); SET_HL(HL + 1);  // inc hl
-  I(0x6863, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x6864, 3); goto L_6842; } I(0x6864, 2);  // jr nz,$6842
-  I(0x6866, 2); A = 0x18;  // ld a,$18
-  CALL(0x6868, addAToDe_hook, 0x0068, 0x686b);  // call $0068
-  I(0x686b, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
-  I(0x686d, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x686e, 3); mem_wr(gb, 0xff8d, A);  // ldh ($ff8d),a
-  if (!(F & FZ)) { I(0x6870, 3); goto L_6840; } I(0x6870, 2);  // jr nz,$6840
-  SET_AF(POP(0x6872));  // pop af
-  I(0x6873, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  dungeonMap_getTileForRoom(gb); return;  // fallthrough
-}
-
-// 02:6842
-void dungeonMap_updateScroll__nextColumn(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_6842;
-L_6840:
-  I(0x6840, 2); C = 0x08;  // ld c,$08
-L_6842:
-  I(0x6842, 2); A = 0x04;  // ld a,$04
-  I(0x6844, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x6846, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6847, 2); B = 0x00;  // ld b,$00
-  I(0x6849, 2); alu_cp(gb, 0x83);  // cp $83
-  if ((F & FZ)) { I(0x684b, 3); goto L_685f; } I(0x684b, 2);  // jr z,$685f
-  I(0x684d, 2); alu_cp(gb, 0xad);  // cp $ad
-  if ((F & FZ)) { I(0x684f, 3); goto L_685f; } I(0x684f, 2);  // jr z,$685f
-  I(0x6851, 2); B = 0x02;  // ld b,$02
-  I(0x6853, 2); alu_cp(gb, 0xae);  // cp $ae
-  if ((F & FZ)) { I(0x6855, 3); goto L_685f; } I(0x6855, 2);  // jr z,$685f
-  I(0x6857, 2); B = 0x04;  // ld b,$04
-  I(0x6859, 2); alu_cp(gb, 0xaf);  // cp $af
-  if ((F & FZ)) { I(0x685b, 3); goto L_685f; } I(0x685b, 2);  // jr z,$685f
-  I(0x685d, 2); B = 0x05;  // ld b,$05
-L_685f:
-  CALL(0x685f, drawTileABtoDE, 0x67d5, 0x6862);  // call $67d5
-  I(0x6862, 2); SET_HL(HL + 1);  // inc hl
-  I(0x6863, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x6864, 3); goto L_6842; } I(0x6864, 2);  // jr nz,$6842
-  I(0x6866, 2); A = 0x18;  // ld a,$18
-  CALL(0x6868, addAToDe_hook, 0x0068, 0x686b);  // call $0068
-  I(0x686b, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
-  I(0x686d, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x686e, 3); mem_wr(gb, 0xff8d, A);  // ldh ($ff8d),a
-  if (!(F & FZ)) { I(0x6870, 3); goto L_6840; } I(0x6870, 2);  // jr nz,$6840
-  SET_AF(POP(0x6872));  // pop af
-  I(0x6873, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  dungeonMap_getTileForRoom(gb); return;  // fallthrough
-}
-
-// 02:6875
-void dungeonMap_getTileForRoom(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x6875, BC);  // push bc
-  PUSH(0x6876, DE);  // push de
-  I(0x6877, 1); B = A;  // ld b,a
-  I(0x6878, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x6879, 3); goto L_68a0; } I(0x6879, 2);  // jr z,$68a0
-  PUSH(0x687b, HL);  // push hl
-  I(0x687c, 1); L = B;  // ld l,b
-  I(0x687d, 4); A = mem_rd(gb, 0xcc3d);  // ld a,($cc3d)
-  I(0x6880, 1); H = A;  // ld h,a
-  I(0x6881, 2); D = mem_rd(gb, HL);  // ld d,(hl)
-  CALL(0x6882, getRoomDungeonProperties_hook, 0x1ad7, 0x6885);  // call $1ad7
-  I(0x6885, 1); E = B;  // ld e,b
-  SET_HL(POP(0x6886));  // pop hl
-  I(0x6887, 1); A = E;  // ld a,e
-  I(0x6888, 2); alu_cp(gb, 0x60);  // cp $60
-  if ((F & FZ)) { I(0x688a, 3); goto L_68a0; } I(0x688a, 2);  // jr z,$68a0
-  I(0x688c, 2); alu_cp(gb, 0x70);  // cp $70
-  if ((F & FZ)) { I(0x688e, 3); goto L_68a0; } I(0x688e, 2);  // jr z,$68a0
-  I(0x6890, 2); alu_bit(gb, 4, D);  // bit 4,d
-  if (!(F & FZ)) { I(0x6892, 3); goto L_68ad; } I(0x6892, 2);  // jr nz,$68ad
-  CALL(0x6894, dungeonMap_checkCompassTile, 0x68ce, 0x6897);  // call $68ce
-  if (!(F & FZ)) { I(0x6897, 3); goto L_68b8; } I(0x6897, 2);  // jr nz,$68b8
-  CALL(0x6899, checkLinkHasMap_hook, 0x653e, 0x689c);  // call $653e
-  I(0x689c, 2); A = 0xaf;  // ld a,$af
-  if (!(F & FZ)) { I(0x689e, 3); goto L_68b8; } I(0x689e, 2);  // jr nz,$68b8
-L_68a0:
-  I(0x68a0, 2); A = 0xac;  // ld a,$ac
-  I(0x68a2, 3); goto L_68b8;  // jr $68b8
-L_68ad:
-  CALL(0x68ad, dungeonMap_checkCompassTile, 0x68ce, 0x68b0);  // call $68ce
-  if (!(F & FZ)) { I(0x68b0, 3); goto L_68b8; } I(0x68b0, 2);  // jr nz,$68b8
-  I(0x68b2, 1); A = D;  // ld a,d
-  I(0x68b3, 1); alu_or(gb, E);  // or e
-  I(0x68b4, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x68b6, 2); alu_add(gb, 0xb0);  // add $b0
-L_68b8:
-  SET_DE(POP(0x68b8));  // pop de
-  SET_BC(POP(0x68b9));  // pop bc
-  RET(0x68ba); return;  // ret
-}
-
-// 02:68a0
-void dungeonMap_getTileForRoom__hidden(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_68a0:
-  I(0x68a0, 2); A = 0xac;  // ld a,$ac
-  I(0x68a2, 3); goto L_68b8;  // jr $68b8
-L_68b8:
-  SET_DE(POP(0x68b8));  // pop de
-  SET_BC(POP(0x68b9));  // pop bc
-  RET(0x68ba); return;  // ret
-}
-
-// 02:68ad
-void dungeonMap_getTileForRoom__visited(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_68ad:
-  CALL(0x68ad, dungeonMap_checkCompassTile, 0x68ce, 0x68b0);  // call $68ce
-  if (!(F & FZ)) { I(0x68b0, 3); goto L_68b8; } I(0x68b0, 2);  // jr nz,$68b8
-  I(0x68b2, 1); A = D;  // ld a,d
-  I(0x68b3, 1); alu_or(gb, E);  // or e
-  I(0x68b4, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x68b6, 2); alu_add(gb, 0xb0);  // add $b0
-L_68b8:
-  SET_DE(POP(0x68b8));  // pop de
-  SET_BC(POP(0x68b9));  // pop bc
-  RET(0x68ba); return;  // ret
-}
-
-// 02:68b8
-void dungeonMap_getTileForRoom__ret(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_68b8:
-  SET_DE(POP(0x68b8));  // pop de
-  SET_BC(POP(0x68b9));  // pop bc
-  RET(0x68ba); return;  // ret
-}
-
-// 02:68bb
-void dungeonMap_checkCanViewFloor(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x68bb, checkLinkHasMap_hook, 0x653e, 0x68be);  // call $653e
-  if (!(F & FZ)) { RET_TAKEN(0x68be); return; } I(0x68be, 2);  // ret nz
-  PUSH(0x68bf, HL);  // push hl
-  I(0x68c0, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
-  I(0x68c2, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x68c3, 3); SET_HL(0x00f8);  // ld hl,$00f8
-  I(0x68c6, 1); alu_add(gb, L);  // add l
-  I(0x68c7, 1); L = A;  // ld l,a
-  I(0x68c8, 4); A = mem_rd(gb, 0xcbba);  // ld a,($cbba)
-  I(0x68cb, 2); alu_and(gb, mem_rd(gb, HL));  // and (hl)
-  SET_HL(POP(0x68cc));  // pop hl
-  RET(0x68cd); return;  // ret
 }
 
 // 02:68ce
@@ -14706,8 +14332,8 @@ L_606a:
   CALL(0x6086, loadGfxHeader_hook, 0x0626, 0x6089);  // call $0626
   CALL(0x6089, dungeonMap_drawSmallKeyCount, 0x60dc, 0x608c);  // call $60dc
   CALL(0x608c, dungeonMap_generateScrollableTilemap, 0x67de, 0x608f);  // call $67de
-  CALL(0x608f, dungeonMap_drawFloorList, 0x677c, 0x6092);  // call $677c
-  CALL(0x6092, dungeonMap_updateScroll, 0x682c, 0x6095);  // call $682c
+  CALL(0x608f, dungeonMap_drawFloorList_hook, 0x677c, 0x6092);  // call $677c
+  CALL(0x6092, dungeonMap_updateScroll_hook, 0x682c, 0x6095);  // call $682c
 L_6095:
   I(0x6095, 1); alu_xor(gb, A);  // xor a
   I(0x6096, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
@@ -14819,8 +14445,8 @@ L_606a:
   CALL(0x6086, loadGfxHeader_hook, 0x0626, 0x6089);  // call $0626
   CALL(0x6089, dungeonMap_drawSmallKeyCount, 0x60dc, 0x608c);  // call $60dc
   CALL(0x608c, dungeonMap_generateScrollableTilemap, 0x67de, 0x608f);  // call $67de
-  CALL(0x608f, dungeonMap_drawFloorList, 0x677c, 0x6092);  // call $677c
-  CALL(0x6092, dungeonMap_updateScroll, 0x682c, 0x6095);  // call $682c
+  CALL(0x608f, dungeonMap_drawFloorList_hook, 0x677c, 0x6092);  // call $677c
+  CALL(0x6092, dungeonMap_updateScroll_hook, 0x682c, 0x6095);  // call $682c
 L_6095:
   I(0x6095, 1); alu_xor(gb, A);  // xor a
   I(0x6096, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a

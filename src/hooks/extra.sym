@@ -232,3 +232,13 @@
 02:672b mapMenu_clearUnvisitedTiles__columnLoop
 02:673c mapMenu_clearUnvisitedTiles__nextTile
 04:60ea applyStandardTileSubstitutions__locFunc
+02:6793 dungeonMap_drawFloorList__loop
+02:67cc dungeonMap_drawFloorList__nextFloor
+02:6840 dungeonMap_updateScroll__nextRow
+02:6842 dungeonMap_updateScroll__nextColumn
+02:68a0 dungeonMap_getTileForRoom__hidden
+02:68ad dungeonMap_getTileForRoom__visited
+02:68b8 dungeonMap_getTileForRoom__ret
+03:6f58 func_6f44__cbb8_00
+03:6f60 func_6f44__cbb8_01
+03:6f70 func_6f44__cbb8_02
