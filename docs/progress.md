@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,159 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,180 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -108,6 +108,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
   and cursor-movement state machine through its direction-offset table.
   Batch 100 completed the ring-menu rendering and selection helpers. Batch 101 added the Game Link
   menu state machine, Link/file rendering, save/quit input and sprite helpers, and fake-reset states.
+  Batch 102 added the remaining safe file-select mode 1/3/5 state and text-speed menu paths.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -213,6 +214,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-12: milestone 3 phase 5 batch 102 (21 routines): added bank 2's safe file-select
+  mode 1, mode 3, and mode 5 state paths, text-speed menu input and cursor rendering, and nineteen
+  independently hookable local entries; the mode-1 state that restarts the current thread remains
+  generated. Three table/data labels left the executable registry. Review changed unconditional
+  jump burns to `CYC` and split the shared cursor-adjust loop so `$4350` returns to the exact
+  `$4344` collision block without repeating the `$4341` zero precheck. Two independent final
+  reviews approved the corrected timing, dispatchers, RST stacks, and integration. Gates: lint 0,
+  30k verify 0 mismatches across 4,688,901 calls, full replay state `64bddd0dfe384126`, normal and
+  quirk suites 8/8.
 - 2026-09-12: milestone 3 phase 5 batch 101 (27 routines): added bank 2's Game Link menu
   dispatcher and seven states, Link/file sprite rendering, save/quit input and sprite helpers, and
   the fake-reset dispatcher and states. Eighteen local entries received stable aliases and one

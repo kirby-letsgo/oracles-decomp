@@ -685,3 +685,8 @@ desync to discover; keep them when porting routines.
   The same review found an unconditional `jr` at `$4d27` burned through its `$4d2b` target, which
   silently included the skipped `$4d29` instruction. A jump burn ends at the opcode's physical
   fallthrough address (`$4d29` here), never at its destination.
+- A backward jump may re-enter a shared block after its setup rather than at the nearest convenient
+  C label. Batch 102 initially sent the `$4350` cursor-collision retry to `$4341`, repeating
+  `ld a,b; or a; ret z` and adding four cycles per retry; the ROM jumps to `$4344`, while only the
+  separate `$435d` branch enters at `$4341`. Give both ROM addresses distinct C labels even when
+  they share the remainder of the block.
