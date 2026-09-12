@@ -737,3 +737,9 @@ desync to discover; keep them when porting routines.
   directly and let its internal dynamic jump remain interpreted. When a newly readable dispatcher
   replaces a generated target, retarget all known static cases and propagate the caller's real
   stack context through every wrapper.
+- Corrupted duplicate code can intentionally call or jump into bytes that are data or operands,
+  and those targets must not be rounded to the nearest healthy symbol. Batch 116's `$7dfc` call
+  enters rectangle data at `$7de3`, so it remains `CALL_ROM`; its `$7e8c` tail enters the operand
+  byte at bank-0 `$05df`, so after burning the jump it uses `hook_continue(gb, 0x05df, sp0_)`.
+  `hook_handoff` would incorrectly turn an ordinary static jump into a thread switch, while calling
+  the nearby graphics-loader hook would silently repair behavior that exists in the actual ROM.

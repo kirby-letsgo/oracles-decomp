@@ -771,3 +771,6 @@
 01:5926 checkLockBG7Color3ToBlack__thing1
 01:592d checkLockBG7Color3ToBlack__thing0
 02:401a checkDisplayDmgModeScreen__vblankLoop
+02:7dff fake_drawRectangleToVramTiles__nextRow
+02:7e2a fake_copyRectangleFromVramTilesToAddress__nextRow
+02:7e55 fake_copyRectangleToRoomLayoutAndCollisions_paramDe__nextRow
