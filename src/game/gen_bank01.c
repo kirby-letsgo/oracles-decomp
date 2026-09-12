@@ -2,22 +2,6 @@
 #include "game/asm.h"
 #include "game/gen.h"
 
-// 01:4323
-void checkBrightenRoom(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4323, 4); A = mem_rd(gb, 0xcc39);  // ld a,($cc39)
-  I(0x4326, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { RET_TAKEN(0x4328); return; } I(0x4328, 2);  // ret z
-  CALL(0x4329, getThisRoomDungeonProperties_hook, 0x2dd7, 0x432c);  // call $2dd7
-  I(0x432c, 4); A = mem_rd(gb, 0xcc3c);  // ld a,($cc3c)
-  I(0x432f, 2); alu_bit(gb, 7, A);  // bit 7,a
-  if (!(F & FZ)) { RET_TAKEN(0x4331); return; } I(0x4331, 2);  // ret nz
-  I(0x4332, 4); A = mem_rd(gb, 0xc4ae);  // ld a,($c4ae)
-  I(0x4335, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x4336); return; } I(0x4336, 2);  // ret z
-  I(0x4337, 4); if (hook_enabled_at(0x3350)) { brightenRoom_hook(gb); return; } HANDOFF(0x3350);  // jp $3350
-}
-
 // 01:4bf0
 void cutscene15(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -850,7 +834,7 @@ L_5b68:
   CALL(0x5bcf, generateVramTilesWithRoomChanges_hook, 0x3a4e, 0x5bd2);  // call $3a4e
   CALL(0x5bd2, initializeRoom_hook, 0x30fe, 0x5bd5);  // call $30fe
 L_5bd5:
-  I(0x5bd5, 4); checkPlayRoomMusic(gb); return;  // jp $5e4d
+  I(0x5bd5, 4); if (hook_enabled_at(0x5e4d)) { checkPlayRoomMusic_hook(gb); return; } HANDOFF(0x5e4d);  // jp $5e4d
 }
 
 // 01:5b68
@@ -898,14 +882,14 @@ L_5b68:
   CALL(0x5bcf, generateVramTilesWithRoomChanges_hook, 0x3a4e, 0x5bd2);  // call $3a4e
   CALL(0x5bd2, initializeRoom_hook, 0x30fe, 0x5bd5);  // call $30fe
 L_5bd5:
-  I(0x5bd5, 4); checkPlayRoomMusic(gb); return;  // jp $5e4d
+  I(0x5bd5, 4); if (hook_enabled_at(0x5e4d)) { checkPlayRoomMusic_hook(gb); return; } HANDOFF(0x5e4d);  // jp $5e4d
 }
 
 // 01:5bd5
 void cutscene01__afterCall5bd5(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5bd5:
-  I(0x5bd5, 4); checkPlayRoomMusic(gb); return;  // jp $5e4d
+  I(0x5bd5, 4); if (hook_enabled_at(0x5e4d)) { checkPlayRoomMusic_hook(gb); return; } HANDOFF(0x5e4d);  // jp $5e4d
 }
 
 // 01:5bd8
@@ -952,15 +936,6 @@ L_5c03:
   I(0x5c13, 2); alu_cp(gb, 0xff);  // cp $ff
   if ((F & FZ)) { CALL(0x5c15, clearEnemiesKilledList_b00_hook, 0x3205, 0x5c18); } else I(0x5c15, 3);  // call z,$3205
   func_5c18(gb); return;  // fallthrough
-}
-
-// 01:5c82
-void setEnteredWarpPosition(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5c82, 3); SET_DE(0xd00b);  // ld de,$d00b
-  CALL(0x5c85, getShortPositionFromDE_hook, 0x209b, 0x5c88);  // call $209b
-  I(0x5c88, 4); mem_wr(gb, 0xcc8e, A);  // ld ($cc8e),a
-  RET(0x5c8b); return;  // ret
 }
 
 // 01:5c8c
@@ -1014,7 +989,7 @@ void cutscene05(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(0x5cba); return; } I(0x5cba, 2);  // ret nz
   CALL(0x5cbb, disableLcd_hook, 0x02c1, 0x5cbe);  // call $02c1
   CALL(0x5cbe, clearOam_hook, 0x049f, 0x5cc1);  // call $049f
-  CALL(0x5cc1, func_5cfe, 0x5cfe, 0x5cc4);  // call $5cfe
+  CALL(0x5cc1, func_5cfe_hook, 0x5cfe, 0x5cc4);  // call $5cfe
   CALL(0x5cc4, setInteractionsEnabledTo2_hook, 0x49f1, 0x5cc7);  // call $49f1
   CALL(0x5cc7, clearObjectsWithEnabled2_hook, 0x4a17, 0x5cca);  // call $4a17
   CALL(0x5cca, clearItems_hook, 0x35e3, 0x5ccd);  // call $35e3
@@ -1048,56 +1023,6 @@ void func_4000_b01(GB *gb) {
   RET(0x400a); return;  // ret
 }
 
-// 01:5e4d
-void checkPlayRoomMusic(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5e4d, 2); A = 0x0a;  // ld a,$0a
-  CALL(0x5e4f, checkGlobalFlag_hook, 0x31f3, 0x5e52);  // call $31f3
-  if ((F & FZ)) { RET_TAKEN(0x5e52); return; } I(0x5e52, 2);  // ret z
-  I(0x5e53, 4); A = mem_rd(gb, 0xcc35);  // ld a,($cc35)
-  I(0x5e56, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x5e57); return; } I(0x5e57, 2);  // ret z
-  I(0x5e58, 4); A = mem_rd(gb, 0xcc46);  // ld a,($cc46)
-  I(0x5e5b, 2); alu_cp(gb, 0x24);  // cp $24
-  if (!(F & FZ)) { I(0x5e5d, 3); goto L_5e71; } I(0x5e5d, 2);  // jr nz,$5e71
-  I(0x5e5f, 4); A = mem_rd(gb, 0xcc2d);  // ld a,($cc2d)
-  I(0x5e62, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x5e63, 3); goto L_5e71; } I(0x5e63, 2);  // jr nz,$5e71
-  I(0x5e65, 4); A = mem_rd(gb, 0xc703);  // ld a,($c703)
-  I(0x5e68, 2); alu_bit(gb, 0, A);  // bit 0,a
-  if (!(F & FZ)) { I(0x5e6a, 3); goto L_5e71; } I(0x5e6a, 2);  // jr nz,$5e71
-  I(0x5e6c, 2); A = 0x1f;  // ld a,$1f
-  I(0x5e6e, 4); mem_wr(gb, 0xcc46, A);  // ld ($cc46),a
-L_5e71:
-  I(0x5e71, 4); A = mem_rd(gb, 0xcc46);  // ld a,($cc46)
-L_5e74:
-  I(0x5e74, 3); SET_HL(0xcc35);  // ld hl,$cc35
-  I(0x5e77, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if ((F & FZ)) { RET_TAKEN(0x5e78); return; } I(0x5e78, 2);  // ret z
-  I(0x5e79, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5e7a, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-}
-
-// 01:5e74
-void checkPlayRoomMusic__setMusic(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5e74:
-  I(0x5e74, 3); SET_HL(0xcc35);  // ld hl,$cc35
-  I(0x5e77, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if ((F & FZ)) { RET_TAKEN(0x5e78); return; } I(0x5e78, 2);  // ret z
-  I(0x5e79, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5e7a, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-}
-
-// 01:593a
-void func_593a(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x593a, updateLinkLocalRespawnPosition_hook, 0x113a, 0x593d);  // call $113a
-  CALL(0x593d, loadCommonGraphics_hook, 0x1a98, 0x5940);  // call $1a98
-  I(0x5940, 2); A = 0x02;  // ld a,$02
-  I(0x5942, 4); if (hook_enabled_at(0x02ea)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
-}
-
 // 01:5a60
 void func_5a60(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1126,14 +1051,14 @@ void func_5a60(GB *gb) {
   CALL(0x5a9e, loadTilesetAndRoomLayout_hook, 0x38a5, 0x5aa1);  // call $38a5
   CALL(0x5aa1, loadRoomCollisions_hook, 0x157b, 0x5aa4);  // call $157b
   CALL(0x5aa4, generateVramTilesWithRoomChanges_hook, 0x3a4e, 0x5aa7);  // call $3a4e
-  CALL(0x5aa7, setEnteredWarpPosition, 0x5c82, 0x5aaa);  // call $5c82
+  CALL(0x5aa7, setEnteredWarpPosition_hook, 0x5c82, 0x5aaa);  // call $5c82
   CALL(0x5aaa, initializeRoom_hook, 0x30fe, 0x5aad);  // call $30fe
 L_5aad:
   CALL(0x5aad, checkDisplayEraOrSeasonInfo_hook, 0x5e7d, 0x5ab0);  // call $5e7d
   CALL(0x5ab0, updateGrassAnimationModifier_hook, 0x5e9e, 0x5ab3);  // call $5e9e
-  CALL(0x5ab3, checkPlayRoomMusic, 0x5e4d, 0x5ab6);  // call $5e4d
+  CALL(0x5ab3, checkPlayRoomMusic_hook, 0x5e4d, 0x5ab6);  // call $5e4d
   CALL(0x5ab6, checkUpdateDungeonMinimap_hook, 0x5945, 0x5ab9);  // call $5945
-  I(0x5ab9, 4); func_593a(gb); return;  // jp $593a
+  I(0x5ab9, 4); if (hook_enabled_at(0x593a)) { func_593a_hook(gb); return; } HANDOFF(0x593a);  // jp $593a
 }
 
 // 01:5aad
@@ -1142,15 +1067,15 @@ void func_5a60__afterCall5aad(GB *gb) {
 L_5aad:
   CALL(0x5aad, checkDisplayEraOrSeasonInfo_hook, 0x5e7d, 0x5ab0);  // call $5e7d
   CALL(0x5ab0, updateGrassAnimationModifier_hook, 0x5e9e, 0x5ab3);  // call $5e9e
-  CALL(0x5ab3, checkPlayRoomMusic, 0x5e4d, 0x5ab6);  // call $5e4d
+  CALL(0x5ab3, checkPlayRoomMusic_hook, 0x5e4d, 0x5ab6);  // call $5e4d
   CALL(0x5ab6, checkUpdateDungeonMinimap_hook, 0x5945, 0x5ab9);  // call $5945
-  I(0x5ab9, 4); func_593a(gb); return;  // jp $593a
+  I(0x5ab9, 4); if (hook_enabled_at(0x593a)) { func_593a_hook(gb); return; } HANDOFF(0x593a);  // jp $593a
 }
 
 // 01:5c6b
 void func_5c6b(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5c6b, setEnteredWarpPosition, 0x5c82, 0x5c6e);  // call $5c82
+  CALL(0x5c6b, setEnteredWarpPosition_hook, 0x5c82, 0x5c6e);  // call $5c82
   CALL(0x5c6e, calculateRoomEdge_hook, 0x5f00, 0x5c71);  // call $5f00
   CALL(0x5c71, initializeRoom_hook, 0x30fe, 0x5c74);  // call $30fe
 L_5c74:
@@ -1170,59 +1095,6 @@ L_5c74:
   I(0x5c7a, 2); A = 0x02;  // ld a,$02
   CALL(0x5c7c, fadeinFromWhiteWithDelay_hook, 0x3284, 0x5c7f);  // call $3284
   I(0x5c7f, 4); if (hook_enabled_at(0x12ce)) { resetCamera_hook(gb); return; } HANDOFF(0x12ce);  // jp $12ce
-}
-
-// 01:5cfe
-void func_5cfe(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5cfe, 4); A = mem_rd(gb, 0xcc4c);  // ld a,($cc4c)
-  I(0x5d01, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x5d02, 3); goto L_5d15; } I(0x5d02, 2);  // jr z,$5d15
-  I(0x5d04, 4); A = mem_rd(gb, 0xd100);  // ld a,($d100)
-  I(0x5d07, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x5d08, 3); goto L_5d28; } I(0x5d08, 2);  // jr z,$5d28
-  I(0x5d0a, 4); A = mem_rd(gb, 0xd101);  // ld a,($d101)
-  I(0x5d0d, 2); alu_cp(gb, 0x0a);  // cp $0a
-  if ((F & FZ)) { I(0x5d0f, 3); goto L_5d28; } I(0x5d0f, 2);  // jr z,$5d28
-  I(0x5d11, 2); alu_cp(gb, 0x0e);  // cp $0e
-  if ((F & FZ)) { I(0x5d13, 3); goto L_5d28; } I(0x5d13, 2);  // jr z,$5d28
-L_5d15:
-  CALL(0x5d15, func_4493_hook, 0x4493, 0x5d18);  // call $4493
-  I(0x5d18, 4); A = mem_rd(gb, 0xcc5b);  // ld a,($cc5b)
-  I(0x5d1b, 2); alu_and(gb, 0xf0);  // and $f0
-  I(0x5d1d, 2); alu_cp(gb, 0x40);  // cp $40
-  if ((F & FZ)) { I(0x5d1f, 3); goto L_5d2c; } I(0x5d1f, 2);  // jr z,$5d2c
-  I(0x5d21, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
-  I(0x5d24, 2); alu_bit(gb, 0, A);  // bit 0,a
-  if (!(F & FZ)) { I(0x5d26, 3); goto L_5d2c; } I(0x5d26, 2);  // jr nz,$5d2c
-L_5d28:
-  I(0x5d28, 1); alu_xor(gb, A);  // xor a
-  I(0x5d29, 4); mem_wr(gb, 0xcc24, A);  // ld ($cc24),a
-L_5d2c:
-  I(0x5d2c, 1); alu_xor(gb, A);  // xor a
-  I(0x5d2d, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  RET(0x5d30); return;  // ret
-}
-
-// 01:5d28
-void func_5cfe__clearCompanion(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5d28:
-  I(0x5d28, 1); alu_xor(gb, A);  // xor a
-  I(0x5d29, 4); mem_wr(gb, 0xcc24, A);  // ld ($cc24),a
-L_5d2c:
-  I(0x5d2c, 1); alu_xor(gb, A);  // xor a
-  I(0x5d2d, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  RET(0x5d30); return;  // ret
-}
-
-// 01:5d2c
-void func_5cfe__end(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5d2c:
-  I(0x5d2c, 1); alu_xor(gb, A);  // xor a
-  I(0x5d2d, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  RET(0x5d30); return;  // ret
 }
 
 // 01:5d31
@@ -1385,18 +1257,18 @@ L_5c40:
   I(0x5c40, 4); A = mem_rd(gb, 0xcc45);  // ld a,($cc45)
   I(0x5c43, 4); mem_wr(gb, 0xcc31, A);  // ld ($cc31),a
   CALL(0x5c46, setInstrumentsDisabledCounterAndScrollMode_hook, 0x19a2, 0x5c49);  // call $19a2
-  CALL(0x5c49, setEnteredWarpPosition, 0x5c82, 0x5c4c);  // call $5c82
+  CALL(0x5c49, setEnteredWarpPosition_hook, 0x5c82, 0x5c4c);  // call $5c82
   CALL(0x5c4c, calculateRoomEdge_hook, 0x5f00, 0x5c4f);  // call $5f00
   CALL(0x5c4f, initializeRoom_hook, 0x30fe, 0x5c52);  // call $30fe
 L_5c52:
   CALL(0x5c52, checkDisplayEraOrSeasonInfo_hook, 0x5e7d, 0x5c55);  // call $5e7d
   CALL(0x5c55, checkDarkenRoomAndClearPaletteFadeState_hook, 0x430d, 0x5c58);  // call $430d
   CALL(0x5c58, fadeinFromWhiteToRoom_hook, 0x336b, 0x5c5b);  // call $336b
-  CALL(0x5c5b, checkPlayRoomMusic, 0x5e4d, 0x5c5e);  // call $5e4d
+  CALL(0x5c5b, checkPlayRoomMusic_hook, 0x5e4d, 0x5c5e);  // call $5e4d
   I(0x5c5e, 1); alu_xor(gb, A);  // xor a
   I(0x5c5f, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
   I(0x5c62, 4); mem_wr(gb, 0xcbe7, A);  // ld ($cbe7),a
-  CALL(0x5c65, func_593a, 0x593a, 0x5c68);  // call $593a
+  CALL(0x5c65, func_593a_hook, 0x593a, 0x5c68);  // call $593a
   I(0x5c68, 4); if (hook_enabled_at(0x12ce)) { resetCamera_hook(gb); return; } HANDOFF(0x12ce);  // jp $12ce
 }
 
@@ -1407,11 +1279,11 @@ L_5c52:
   CALL(0x5c52, checkDisplayEraOrSeasonInfo_hook, 0x5e7d, 0x5c55);  // call $5e7d
   CALL(0x5c55, checkDarkenRoomAndClearPaletteFadeState_hook, 0x430d, 0x5c58);  // call $430d
   CALL(0x5c58, fadeinFromWhiteToRoom_hook, 0x336b, 0x5c5b);  // call $336b
-  CALL(0x5c5b, checkPlayRoomMusic, 0x5e4d, 0x5c5e);  // call $5e4d
+  CALL(0x5c5b, checkPlayRoomMusic_hook, 0x5e4d, 0x5c5e);  // call $5e4d
   I(0x5c5e, 1); alu_xor(gb, A);  // xor a
   I(0x5c5f, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
   I(0x5c62, 4); mem_wr(gb, 0xcbe7, A);  // ld ($cbe7),a
-  CALL(0x5c65, func_593a, 0x593a, 0x5c68);  // call $593a
+  CALL(0x5c65, func_593a_hook, 0x593a, 0x5c68);  // call $593a
   I(0x5c68, 4); if (hook_enabled_at(0x12ce)) { resetCamera_hook(gb); return; } HANDOFF(0x12ce);  // jp $12ce
 }
 

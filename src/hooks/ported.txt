@@ -842,11 +842,11 @@ tileReplacement_group1Map38
 tileReplacement_group0Map48
 tileReplacement_group5Map38
 tileReplacement_group5Map25
-d6RetractingWallRectPresent
-d6RetractingWallRectPast
 tileReplacement_group5Map43
 tileReplacement_group5Map95
 tileReplacement_group5Mapc3
+tileReplacement_group5Mapc3__locFunc
+tileReplacement_group5Mapc3__func_04_672e
 tileReplacement_group2Mapf7
 tileReplacement_group5Map4c
 tileReplacement_group5Map4d
@@ -2460,7 +2460,6 @@ func_7e54
 func_7e88
 func_7ea4
 func_04_4732
-standardTileSubstitutions
 func_04_6ba8
 func_04_6ed1
 func_04_6f31
@@ -6237,7 +6236,12 @@ runKidNameEntryMenu__func
 runKidNameEntryMenu__mode0
 runKidNameEntryMenu__mode1
 runKidNameEntryMenu__mode2
+label_02_038__secretEntry
+label_02_038__end
 loadDungeonLayout_b01__nextFloor
 loadDungeonLayout_b01__nextByte
 loadDungeonLayout_b01__end
 checkUpdateDungeonMinimap__setMinimapRoom
+checkPlayRoomMusic__setMusic
+func_5cfe__clearCompanion
+func_5cfe__end

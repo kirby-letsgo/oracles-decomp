@@ -6275,7 +6275,7 @@ void interactionSetSimpleScript_hook(GB *gb) {
   ret_effect(gb);
 }
 
-static void generate_vram_tiles_with_room_changes(GB *gb);
+static void generate_vram_tiles_with_room_changes(GB *gb, uint16_t sp0_);
 
 // screen music and room packs (bank 4 tables)
 
@@ -6525,6 +6525,7 @@ void loadAnimationData_hook(GB *gb) {
 }
 
 void forceLoadRoom_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   alu_and(gb, 0x03);
   CYC(0x36f6, 0x36fb); W8(wRoomStateModifier) = A;
   A = B;
@@ -6537,7 +6538,7 @@ void forceLoadRoom_hook(GB *gb) {
   CALL_ROM(0x3709, ROM_loadTilesetGraphics);
   CALL_ROM(0x370c, ROM_loadTilesetAndRoomLayout);
   CYC(0x370f, 0x3712);
-  generate_vram_tiles_with_room_changes(gb);
+  generate_vram_tiles_with_room_changes(gb, sp0_);
   ret_effect(gb);
 }
 
@@ -6673,13 +6674,13 @@ void uniqueGfxFunc_380b_hook(GB *gb) {
   ret_effect(gb);
 }
 
-static void generate_vram_tiles_with_room_changes(GB *gb) {
+static void generate_vram_tiles_with_room_changes(GB *gb, uint16_t sp0_) {
   CYC(0x3a4e, 0x3a50); C = mem_rd(gb, IO_SVBK);
   CYC(0x3a50, 0x3a53); B = H8(hRomBank);
   uint16_t bc = BC;
   CYC(0x3a53, 0x3a59); H8(hRomBank) = 0x04;
   CYC(0x3a59, 0x3a5c); mem_wr(gb, MBC_ROM_BANK, 0x04);
-  CALL_ROM(0x3a5c, ROM_b04_generateW3VramTilesAndAttributes);
+  CALL_C(0x3a5c, generateW3VramTilesAndAttributes_hook, 0x6bf1, 0x3a5f);
   SET_HL(ROM_b02_applyRoomSpecificTileChangesAfterGfxLoad);
   E = 0x02;
   CYC(0x3a5f, 0x3a64);
@@ -6694,7 +6695,8 @@ static void generate_vram_tiles_with_room_changes(GB *gb) {
 }
 
 void generateVramTilesWithRoomChanges_hook(GB *gb) {
-  generate_vram_tiles_with_room_changes(gb);
+  uint16_t sp0_ = gb->sp;
+  generate_vram_tiles_with_room_changes(gb, sp0_);
   ret_effect(gb);
 }
 
@@ -7694,6 +7696,7 @@ void func_1135_hook(GB *gb) {
 }
 
 void func_131f_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   alu_xor(gb, A);
   CYC(0x131f, 0x1323); W8(wScreenOffsetY) = A;
   CYC(0x1323, 0x1326); W8(wScreenOffsetX) = A;
@@ -7708,7 +7711,7 @@ void func_131f_hook(GB *gb) {
     CYC(0x1356, 0x1359);
     load_room_collisions(gb);
     CYC(0x1359, 0x135c);
-    generate_vram_tiles_with_room_changes(gb);
+    generate_vram_tiles_with_room_changes(gb, sp0_);
     A = 0x10;
     CYC(0x135c, 0x1361);
     load_gfx_header(gb, 0x05da, uncmpGfxHeaderTable_bank01, false);

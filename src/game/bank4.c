@@ -23,6 +23,7 @@ void setInterleavedTile_body__queueWrite6d18_hook(GB *gb);
 void queueTileWriteAtVBlank_hook(GB *gb);
 void queueTileWriteAtVBlank__copy2Bytes6d4d_hook(GB *gb);
 void queueTileWriteAtVBlank__getTilePositionInVram6d54_hook(GB *gb);
+void generateW3VramTilesAndAttributes_hook(GB *gb);
 
 static void bank4_add_double_index_to_hl(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -1177,3 +1178,43 @@ get_tile_position_in_vram:
 void queueTileWriteAtVBlank_hook(GB *gb) { uint16_t sp0_ = gb->sp; queue_tile_write_at_vblank(gb, 0x6d24, sp0_); }
 void queueTileWriteAtVBlank__copy2Bytes6d4d_hook(GB *gb) { uint16_t sp0_ = gb->sp; queue_tile_write_at_vblank(gb, 0x6d4d, sp0_); }
 void queueTileWriteAtVBlank__getTilePositionInVram6d54_hook(GB *gb) { uint16_t sp0_ = gb->sp; queue_tile_write_at_vblank(gb, 0x6d54, sp0_); }
+
+void generateW3VramTilesAndAttributes_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6bf1, 0x6bf3); A = 0x03;
+  CYC(0x6bf3, 0x6bf5); mem_wr(gb, IO_SVBK, A);
+  CYC(0x6bf5, 0x6bf8); SET_HL(wRoomLayout);
+  CYC(0x6bf8, 0x6bfb); SET_DE(w3VramTiles);
+  CYC(0x6bfb, 0x6bfd); C = 0x0b;
+  for (;;) {
+    CYC(0x6bfd, 0x6bff); B = 0x10;
+    for (;;) {
+      CYC(0x6bff, 0x6c00); push_effect(gb, BC);
+      CYC(0x6c00, 0x6c01); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(0x6c01, 0x6c02); push_effect(gb, HL);
+      CALL_C(0x6c02, setHlToTileMappingDataPlusATimes8_hook, 0x3a94, 0x6c05);
+      CYC(0x6c05, 0x6c06); push_effect(gb, DE);
+      CALL_C(0x6c06, write4BytesToVramLayout_hook, 0x6c23, 0x6c09);
+      CYC(0x6c09, 0x6c0a); SET_DE(pop_effect(gb));
+      CYC(0x6c0a, 0x6c0c); D = (uint8_t)(D | 0x04);
+      CALL_C(0x6c0c, write4BytesToVramLayout_hook, 0x6c23, 0x6c0f);
+      CYC(0x6c0f, 0x6c11); D = (uint8_t)(D & ~0x04);
+      CYC(0x6c11, 0x6c12); A = E;
+      CYC(0x6c12, 0x6c14); alu_sub(gb, 0x1f);
+      CYC(0x6c14, 0x6c15); E = A;
+      CYC(0x6c15, 0x6c16); SET_HL(pop_effect(gb));
+      CYC(0x6c16, 0x6c17); SET_BC(pop_effect(gb));
+      CYC(0x6c17, 0x6c18); B = alu_dec8(gb, B);
+      if (!(F & FZ)) { CYCT(0x6c18, 0x6c1a); continue; }
+      CYC(0x6c18, 0x6c1a);
+      break;
+    }
+    CYC(0x6c1a, 0x6c1c); A = 0x20;
+    CALL_C(0x6c1c, addAToDe_hook, 0x0068, 0x6c1f);
+    CYC(0x6c1f, 0x6c20); C = alu_dec8(gb, C);
+    if (!(F & FZ)) { CYCT(0x6c20, 0x6c22); continue; }
+    CYC(0x6c20, 0x6c22);
+    break;
+  }
+  CYC(0x6c22, 0x6c23); ret_effect(gb);
+}

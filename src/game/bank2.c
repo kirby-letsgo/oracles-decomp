@@ -50,6 +50,7 @@ void func_02_4149_hook(GB *gb);
 void setFileSelectCursorOffsetToFileSelectMode_hook(GB *gb);
 void setFileSelectModeTo1_hook(GB *gb);
 void setFileSelectMode_hook(GB *gb);
+void loadGfxRegisterState5AndIncFileSelectMode2_hook(GB *gb);
 void incFileSelectMode2_hook(GB *gb);
 void decFileSelectMode2IfBPressed_hook(GB *gb);
 void decFileSelectMode2_hook(GB *gb);
@@ -160,8 +161,13 @@ void fileSelectUpdateInput_hook(GB *gb);
 void fileSelectUpdateInput__upOrDown_hook(GB *gb);
 void func_02_448d_hook(GB *gb);
 void fileSelectSetCursor_hook(GB *gb);
+void func_02_461c_hook(GB *gb);
 void getNameBufferLength_hook(GB *gb);
 void copyNameToW4NameBuffer_hook(GB *gb);
+void func_02_465c_hook(GB *gb);
+void label_02_038_hook(GB *gb);
+void label_02_038__secretEntry_hook(GB *gb);
+void label_02_038__end_hook(GB *gb);
 void textInput_getCursorPosition_hook(GB *gb);
 void drawNameInputCursors_hook(GB *gb);
 void drawNameInputCursors__upperOptions_hook(GB *gb);
@@ -3113,6 +3119,14 @@ void runKidNameEntryMenu__mode2_hook(GB *gb) {
   CYC(0x4523, 0x4526); closeMenu_hook(gb);
 }
 
+void func_02_461c_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x461c, 0x461e); A = 0xac;
+  CALL_C(0x461e, loadGfxHeader_hook, 0x0626, 0x4621);
+  CYC(0x4621, 0x4623); A = 0x08;
+  CYC(0x4623, 0x4626); loadUncompressedGfxHeader_hook(gb);
+}
+
 void getNameBufferLength_hook(GB *gb) {
   CYC(0x4626, 0x4629); SET_HL(0xd7a0);
   CYC(0x4629, 0x462b); B = 0x05;
@@ -3151,7 +3165,86 @@ void copyNameToW4NameBuffer_hook(GB *gb) {
   CALL_C(0x4652, copyMemoryReverse_hook, 0x047f, 0x4655);
   CYC(0x4655, 0x4657); A = 0x04;
   CYC(0x4657, 0x465a); mem_wr(gb, 0xcbb8, A);
-  CYC(0x465a, 0x465c); label_02_038(gb);
+  CYC(0x465a, 0x465c); label_02_038_hook(gb);
+}
+
+void func_02_465c_hook(GB *gb) {
+  CYC(0x465c, 0x465f); A = W8(wSecretInputType);
+  CYC(0x465f, 0x4661); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(0x4661, 0x4663); goto secret_input; }
+  CYC(0x4661, 0x4663);
+  CYC(0x4663, 0x4666); SET_BC(0x0e81);
+  CYC(0x4666, 0x4668); alu_cp(gb, 0x02);
+  if (F & FZ) { CYCT(0x4668, 0x466a); goto set_input_mode; }
+  CYC(0x4668, 0x466a);
+  CYC(0x466a, 0x466d); SET_BC(0x1382);
+  CYC(0x466d, 0x466f);
+  goto set_input_mode;
+secret_input:
+  CYC(0x466f, 0x4671); A = 0xff;
+  CYC(0x4671, 0x4674); W8(wLastSecretInputLength) = A;
+  CYC(0x4674, 0x4677); SET_BC(0x0480);
+set_input_mode:
+  CYC(0x4677, 0x4678); A = B;
+  CYC(0x4678, 0x467b); W8(wFileSelect_textInputMaxCursorPos) = A;
+  CYC(0x467b, 0x467c); A = C;
+  CYC(0x467c, 0x467f); W8(wFileSelect_textInputMode) = A;
+  label_02_038_hook(gb);
+}
+
+void label_02_038_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x467f, 0x4682); SET_HL(wTmpcbb9);
+  CYC(0x4682, 0x4684); B = 0x0a;
+  CALL_C(0x4684, clearMemory_hook, 0x046f, 0x4687);
+  CALL_C(0x4687, textInput_loadCharacterGfx_hook, 0x49a5, 0x468a);
+  CALL_C(0x468a, disableLcd_hook, 0x02c1, 0x468d);
+  CYC(0x468d, 0x468f); A = 0x0b;
+  CALL_C(0x468f, loadUncompressedGfxHeader_hook, 0x05da, 0x4692);
+  CYC(0x4692, 0x4694); A = 0x05;
+  CALL_C(0x4694, loadPaletteHeader_hook, 0x050b, 0x4697);
+  CYC(0x4697, 0x469a); A = W8(wFileSelect_textInputMode);
+  CYC(0x469a, 0x469b); alu_rlca(gb);
+  if (F & FC) { CYCT(0x469b, 0x469d); label_02_038__secretEntry_hook(gb); return; }
+  CYC(0x469b, 0x469d);
+  CYC(0x469d, 0x469f); A = 0xa5;
+  CALL_C(0x469f, loadGfxHeader_hook, 0x0626, 0x46a2);
+  CYC(0x46a2, 0x46a5); A = W8(wFileSelect_textInputMode);
+  CYC(0x46a5, 0x46a6); alu_rrca(gb);
+  if (F & FC) CYCT(0x46a6, 0x46a8);
+  else {
+    CYC(0x46a6, 0x46a8);
+    CYC(0x46a8, 0x46aa); A = H8(hActiveFileSlot);
+    CYC(0x46aa, 0x46ac); alu_add(gb, 0x20);
+    CYC(0x46ac, 0x46af); mem_wr(gb, w4TileMap + 0x49, A);
+  }
+  CYC(0x46af, 0x46b1); A = 0x08;
+  CALL_C(0x46b1, loadUncompressedGfxHeader_hook, 0x05da, 0x46b4);
+  CYC(0x46b4, 0x46b6);
+  label_02_038__end_hook(gb);
+}
+
+void label_02_038__secretEntry_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x46b6, 0x46b9); A = W8(wFileSelect_textInputMaxCursorPos);
+  CYC(0x46b9, 0x46bc); SET_HL(wLastSecretInputLength);
+  CYC(0x46bc, 0x46bd); alu_cp(gb, mem_rd(gb, HL));
+  CYC(0x46bd, 0x46be); mem_wr(gb, HL, A);
+  CYC(0x46be, 0x46c1); SET_HL(w4SecretBuffer);
+  CYC(0x46c1, 0x46c3); B = 0x20;
+  CYC(0x46c3, 0x46c5); A = 0x20;
+  if (!(F & FZ)) CALL_C_CC(0x46c5, fillMemory_hook, 0x0470, 0x46c8);
+  else CYC(0x46c5, 0x46c8);
+  CYC(0x46c8, 0x46ca); A = 0xaa;
+  CALL_C(0x46ca, loadGfxHeader_hook, 0x0626, 0x46cd);
+  CALL_C(0x46cd, func_02_461c_hook, 0x461c, 0x46d0);
+  label_02_038__end_hook(gb);
+}
+
+void label_02_038__end_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x46d0, textInput_updateEntryCursor_hook, 0x4a22, 0x46d3);
+  CYC(0x46d3, 0x46d6); loadGfxRegisterState5AndIncFileSelectMode2_hook(gb);
 }
 
 void textInput_getCursorPosition_hook(GB *gb) {
@@ -6247,7 +6340,7 @@ void fileSelectMode7__state0_hook(GB *gb) {
   CYC(0x4b81, 0x4b82); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(0x4b82, 0x4b84); A = 0x1e;
   CYC(0x4b84, 0x4b85); mem_wr(gb, HL, A);
-  CYC(0x4b85, 0x4b88); loadGfxRegisterState5AndIncFileSelectMode2(gb);
+  CYC(0x4b85, 0x4b88); loadGfxRegisterState5AndIncFileSelectMode2_hook(gb);
 }
 
 void fileSelectMode7__state1_hook(GB *gb) {
@@ -6299,7 +6392,7 @@ find_file:
   CYC(0x4bc5, 0x4bc7); D = 0;
   CALL_C(0x4bc7, getFileDisplayVariableAddress_paramE_hook, 0x417b, 0x4bca);
   CYC(0x4bca, 0x4bcc); alu_bit(gb, 7, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(0x4bcc, 0x4bce); CYC(0x4bdf, 0x4be2); loadGfxRegisterState5AndIncFileSelectMode2(gb); return; }
+  if (F & FZ) { CYCT(0x4bcc, 0x4bce); CYC(0x4bdf, 0x4be2); loadGfxRegisterState5AndIncFileSelectMode2_hook(gb); return; }
   CYC(0x4bcc, 0x4bce);
   CYC(0x4bce, 0x4bcf); A = E;
   CYC(0x4bcf, 0x4bd0); alu_or(gb, A);
@@ -6326,7 +6419,7 @@ void fileSelectMode7__state2_hook(GB *gb) {
   CALL_C(0x4bf8, loadGfxHeader_hook, 0x0626, 0x4bfb);
   CALL_C(0x4bfb, textInput_updateEntryCursor_hook, 0x4a22, 0x4bfe);
   CALL_C(0x4bfe, fileSelectDrawHeartsAndDeathCounter_hook, 0x4a4a, 0x4c01);
-  CYC(0x4c01, 0x4c04); loadGfxRegisterState5AndIncFileSelectMode2(gb);
+  CYC(0x4c01, 0x4c04); loadGfxRegisterState5AndIncFileSelectMode2_hook(gb);
 }
 
 void fileSelectMode7__state3_hook(GB *gb) {
@@ -6378,7 +6471,7 @@ valid_file:
 file_select:
   CYC(0x4c44, 0x4c46); A = 8;
   CYC(0x4c46, 0x4c48); H8(hSerialLinkState) = A;
-  CYC(0x4c48, 0x4c4b); loadGfxRegisterState5AndIncFileSelectMode2(gb);
+  CYC(0x4c48, 0x4c4b); loadGfxRegisterState5AndIncFileSelectMode2_hook(gb);
 }
 
 void fileSelectMode7__func_02_4c4b_hook(GB *gb) {
@@ -6394,7 +6487,7 @@ void fileSelectMode7__func_02_4c55_hook(GB *gb) {
   CALL_C(0x4c55, disableLcd_hook, 0x02c1, 0x4c58);
   CYC(0x4c58, 0x4c5a); A = 7;
   CALL_C(0x4c5a, loadGfxHeader_hook, 0x0626, 0x4c5d);
-  CALL_C(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2, 0x4165, 0x4c60);
+  CALL_C(0x4c5d, loadGfxRegisterState5AndIncFileSelectMode2_hook, 0x4165, 0x4c60);
   CYC(0x4c60, 0x4c62); A = 8;
   CYC(0x4c62, 0x4c64); H8(hSerialLinkState) = A;
   CYC(0x4c64, 0x4c66); A = 6;
@@ -6540,7 +6633,7 @@ void fileSelectMode1__state0_hook(GB *gb) {
   CALL_C(0x41ca, loadFileDisplayVariables_hook, 0x49da, 0x41cd);
   CALL_C(0x41cd, textInput_updateEntryCursor_hook, 0x4a22, 0x41d0);
   CALL_C(0x41d0, fileSelectDrawHeartsAndDeathCounter_hook, 0x4a4a, 0x41d3);
-  CYC(0x41d3, 0x41d6); loadGfxRegisterState5AndIncFileSelectMode2(gb);
+  CYC(0x41d3, 0x41d6); loadGfxRegisterState5AndIncFileSelectMode2_hook(gb);
 }
 
 void fileSelectMode1__state1_hook(GB *gb) {
@@ -6676,7 +6769,7 @@ void fileSelectMode5__state0_hook(GB *gb) {
   CALL_C(0x429d, setFileSelectCursorOffsetToFileSelectMode_hook, 0x4152, 0x42a0);
   CYC(0x42a0, 0x42a1); alu_xor(gb, A);
   CALL_C(0x42a1, func_02_4149_hook, 0x4149, 0x42a4);
-  CYC(0x42a4, 0x42a7); loadGfxRegisterState5AndIncFileSelectMode2(gb);
+  CYC(0x42a4, 0x42a7); loadGfxRegisterState5AndIncFileSelectMode2_hook(gb);
 }
 
 void fileSelectMode5__state1_hook(GB *gb) {
@@ -6749,7 +6842,7 @@ void fileSelectMode3__mode0_hook(GB *gb) {
   CALL_C(0x4309, textInput_updateEntryCursor_hook, 0x4a22, 0x430c);
   CYC(0x430c, 0x430e); A = 8;
   CALL_C(0x430e, loadUncompressedGfxHeader_hook, 0x05da, 0x4311);
-  CYC(0x4311, 0x4314); loadGfxRegisterState5AndIncFileSelectMode2(gb);
+  CYC(0x4311, 0x4314); loadGfxRegisterState5AndIncFileSelectMode2_hook(gb);
 }
 
 void fileSelectMode3__mode1_hook(GB *gb) {
@@ -8134,6 +8227,13 @@ void setFileSelectMode_hook(GB *gb) {
 void setFileSelectModeTo1_hook(GB *gb) {
   CYC(0x4159, 0x415b); A = 0x01;
   setFileSelectMode_hook(gb);
+}
+
+void loadGfxRegisterState5AndIncFileSelectMode2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4165, 0x4167); A = 0x05;
+  CALL_C(0x4167, loadGfxRegisterStateIndex_hook, 0x02ea, 0x416a);
+  incFileSelectMode2_hook(gb);
 }
 
 void incFileSelectMode2_hook(GB *gb) {

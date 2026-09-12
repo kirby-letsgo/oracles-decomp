@@ -706,7 +706,14 @@
 02:44f3 runKidNameEntryMenu__mode0
 02:4500 runKidNameEntryMenu__mode1
 02:4508 runKidNameEntryMenu__mode2
+02:46b6 label_02_038__secretEntry
+02:46d0 label_02_038__end
 01:5678 loadDungeonLayout_b01__nextFloor
 01:567a loadDungeonLayout_b01__nextByte
 01:569d loadDungeonLayout_b01__end
 01:5955 checkUpdateDungeonMinimap__setMinimapRoom
+04:6712 tileReplacement_group5Mapc3__locFunc
+04:672e tileReplacement_group5Mapc3__func_04_672e
+01:5e74 checkPlayRoomMusic__setMusic
+01:5d28 func_5cfe__clearCompanion
+01:5d2c func_5cfe__end

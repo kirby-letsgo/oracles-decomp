@@ -697,3 +697,9 @@ desync to discover; keep them when porting routines.
   `$58b3` with return `$58b6` instead of the ROM's `$58b4`/`$58b7`. Burn the conditional
   instruction first with no following effect, then begin the fallthrough instruction at its own
   address.
+- Several conditional branches can share a target that performs required setup immediately before
+  a separately hookable local entry. Batch 110 initially routed three `jr nz,$5e71` paths to the
+  `$5e74` music-setting entry because both paths soon reached the same comparison. That skipped
+  `ld a,(wActiveMusic2)`, left the wrong value in A, and lost four cycles. Give the branch target
+  its own C label at the exact ROM address; keep the later hook entry distinct even when only one
+  instruction separates them.

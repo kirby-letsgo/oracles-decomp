@@ -73,6 +73,14 @@ void findActiveRoomInDungeonLayout_hook(GB *gb);
 void getFirstDungeonLayoutAddress_hook(GB *gb);
 void checkUpdateDungeonMinimap_hook(GB *gb);
 void checkUpdateDungeonMinimap__setMinimapRoom_hook(GB *gb);
+void checkBrightenRoom_hook(GB *gb);
+void checkPlayRoomMusic_hook(GB *gb);
+void checkPlayRoomMusic__setMusic_hook(GB *gb);
+void func_593a_hook(GB *gb);
+void func_5cfe_hook(GB *gb);
+void func_5cfe__clearCompanion_hook(GB *gb);
+void func_5cfe__end_hook(GB *gb);
+void setEnteredWarpPosition_hook(GB *gb);
 void paletteFadeHandler09_hook(GB *gb);
 void paletteFadeHandler01_hook(GB *gb);
 void paletteFadeHandler00_hook(GB *gb);
@@ -3463,7 +3471,7 @@ void screenTransitionState5Substate2__state4_hook(GB *gb) {
 
 void screenTransitionState5Substate2__state5_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x4567, checkBrightenRoom, 0x4323, 0x456a);
+  CALL_C(0x4567, checkBrightenRoom_hook, 0x4323, 0x456a);
   CALL_C(0x456a, updateTilesetPalette_hook, 0x4762, 0x456d);
   CALL_C(0x456d, setInstrumentsDisabledCounterAndScrollMode_hook, 0x19a2, 0x4570);
   CYC(0x4570, 0x4571); alu_xor(gb, A);
@@ -3586,7 +3594,7 @@ void screenTransitionState5Substate1__state4_hook(GB *gb) {
 
 void screenTransitionState5Substate1__state5_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x465a, checkBrightenRoom, 0x4323, 0x465d);
+  CALL_C(0x465a, checkBrightenRoom_hook, 0x4323, 0x465d);
   CALL_C(0x465d, updateTilesetPalette_hook, 0x4762, 0x4660);
   CALL_C(0x4660, setInstrumentsDisabledCounterAndScrollMode_hook, 0x19a2, 0x4663);
   CYC(0x4663, 0x4664); alu_xor(gb, A);
@@ -4262,3 +4270,119 @@ set_minimap_room:
 
 void checkUpdateDungeonMinimap_hook(GB *gb) { check_update_dungeon_minimap(gb, 0x5945); }
 void checkUpdateDungeonMinimap__setMinimapRoom_hook(GB *gb) { check_update_dungeon_minimap(gb, 0x5955); }
+
+void checkBrightenRoom_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4323, 0x4326); A = W8(wDungeonIndex);
+  CYC(0x4326, 0x4328); alu_cp(gb, 0xff);
+  if (F & FZ) { CYCT(0x4328, 0x4329); ret_effect(gb); return; }
+  CYC(0x4328, 0x4329);
+  CALL_C(0x4329, getThisRoomDungeonProperties_hook, 0x2dd7, 0x432c);
+  CYC(0x432c, 0x432f); A = W8(wDungeonRoomProperties);
+  CYC(0x432f, 0x4331); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(0x4331, 0x4332); ret_effect(gb); return; }
+  CYC(0x4331, 0x4332);
+  CYC(0x4332, 0x4335); A = W8(wPaletteThread_parameter);
+  CYC(0x4335, 0x4336); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x4336, 0x4337); ret_effect(gb); return; }
+  CYC(0x4336, 0x4337);
+  CYC(0x4337, 0x433a); brightenRoom_hook(gb);
+}
+
+static void check_play_room_music(GB *gb, uint16_t entry, uint16_t sp0_) {
+  if (entry == 0x5e4d) {
+    CYC(0x5e4d, 0x5e4f); A = 0x0a;
+    CALL_C(0x5e4f, checkGlobalFlag_hook, 0x31f3, 0x5e52);
+    if (F & FZ) { CYCT(0x5e52, 0x5e53); ret_effect(gb); return; }
+    CYC(0x5e52, 0x5e53);
+    CYC(0x5e53, 0x5e56); A = W8(wActiveMusic);
+    CYC(0x5e56, 0x5e57); alu_or(gb, A);
+    if (F & FZ) { CYCT(0x5e57, 0x5e58); ret_effect(gb); return; }
+    CYC(0x5e57, 0x5e58);
+    CYC(0x5e58, 0x5e5b); A = W8(wActiveMusic2);
+    CYC(0x5e5b, 0x5e5d); alu_cp(gb, 0x24);
+    if (!(F & FZ)) { CYCT(0x5e5d, 0x5e5f); goto load_music; }
+    CYC(0x5e5d, 0x5e5f);
+    CYC(0x5e5f, 0x5e62); A = W8(wActiveGroup);
+    CYC(0x5e62, 0x5e63); alu_or(gb, A);
+    if (!(F & FZ)) { CYCT(0x5e63, 0x5e65); goto load_music; }
+    CYC(0x5e63, 0x5e65);
+    CYC(0x5e65, 0x5e68); A = mem_rd(gb, wGroup0RoomFlags + 3);
+    CYC(0x5e68, 0x5e6a); alu_bit(gb, 0, A);
+    if (!(F & FZ)) { CYCT(0x5e6a, 0x5e6c); goto load_music; }
+    CYC(0x5e6a, 0x5e6c);
+    CYC(0x5e6c, 0x5e6e); A = 0x1f;
+    CYC(0x5e6e, 0x5e71); W8(wActiveMusic2) = A;
+load_music:
+    CYC(0x5e71, 0x5e74); A = W8(wActiveMusic2);
+  }
+  CYC(0x5e74, 0x5e77); SET_HL(wActiveMusic);
+  CYC(0x5e77, 0x5e78); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(0x5e78, 0x5e79); ret_effect(gb); return; }
+  CYC(0x5e78, 0x5e79);
+  CYC(0x5e79, 0x5e7a); mem_wr(gb, HL, A);
+  CYC(0x5e7a, 0x5e7d); playSound_b00_hook(gb);
+}
+
+void checkPlayRoomMusic_hook(GB *gb) { uint16_t sp0_ = gb->sp; check_play_room_music(gb, 0x5e4d, sp0_); }
+void checkPlayRoomMusic__setMusic_hook(GB *gb) { uint16_t sp0_ = gb->sp; check_play_room_music(gb, 0x5e74, sp0_); }
+
+void func_593a_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x593a, updateLinkLocalRespawnPosition_hook, 0x113a, 0x593d);
+  CALL_C(0x593d, loadCommonGraphics_hook, 0x1a98, 0x5940);
+  CYC(0x5940, 0x5942); A = 0x02;
+  CYC(0x5942, 0x5945); loadGfxRegisterStateIndex_hook(gb);
+}
+
+static void func_5cfe(GB *gb, uint16_t entry, uint16_t sp0_) {
+  if (entry == 0x5d28) goto clear_companion;
+  if (entry == 0x5d2c) goto end;
+  if (entry == 0x5cfe) {
+    CYC(0x5cfe, 0x5d01); A = W8(wcc4c);
+    CYC(0x5d01, 0x5d02); alu_or(gb, A);
+    if (F & FZ) { CYCT(0x5d02, 0x5d04); goto body; }
+    CYC(0x5d02, 0x5d04);
+    CYC(0x5d04, 0x5d07); A = mem_rd(gb, w1Companion_enabled);
+    CYC(0x5d07, 0x5d08); alu_or(gb, A);
+    if (F & FZ) { CYCT(0x5d08, 0x5d0a); goto clear_companion; }
+    CYC(0x5d08, 0x5d0a);
+    CYC(0x5d0a, 0x5d0d); A = mem_rd(gb, w1Companion_id);
+    CYC(0x5d0d, 0x5d0f); alu_cp(gb, 0x0a);
+    if (F & FZ) { CYCT(0x5d0f, 0x5d11); goto clear_companion; }
+    CYC(0x5d0f, 0x5d11);
+    CYC(0x5d11, 0x5d13); alu_cp(gb, 0x0e);
+    if (F & FZ) { CYCT(0x5d13, 0x5d15); goto clear_companion; }
+    CYC(0x5d13, 0x5d15);
+  }
+body:
+  CALL_C(0x5d15, func_4493_hook, 0x4493, 0x5d18);
+  CYC(0x5d18, 0x5d1b); A = W8(wLinkGrabState2);
+  CYC(0x5d1b, 0x5d1d); alu_and(gb, 0xf0);
+  CYC(0x5d1d, 0x5d1f); alu_cp(gb, 0x40);
+  if (F & FZ) { CYCT(0x5d1f, 0x5d21); goto end; }
+  CYC(0x5d1f, 0x5d21);
+  CYC(0x5d21, 0x5d24); A = W8(wLinkObjectIndex);
+  CYC(0x5d24, 0x5d26); alu_bit(gb, 0, A);
+  if (!(F & FZ)) { CYCT(0x5d26, 0x5d28); goto end; }
+  CYC(0x5d26, 0x5d28);
+clear_companion:
+  CYC(0x5d28, 0x5d29); alu_xor(gb, A);
+  CYC(0x5d29, 0x5d2c); W8(wRememberedCompanionId) = A;
+end:
+  CYC(0x5d2c, 0x5d2d); alu_xor(gb, A);
+  CYC(0x5d2d, 0x5d30); W8(wcc4c) = A;
+  CYC(0x5d30, 0x5d31); ret_effect(gb);
+}
+
+void func_5cfe_hook(GB *gb) { uint16_t sp0_ = gb->sp; func_5cfe(gb, 0x5cfe, sp0_); }
+void func_5cfe__clearCompanion_hook(GB *gb) { uint16_t sp0_ = gb->sp; func_5cfe(gb, 0x5d28, sp0_); }
+void func_5cfe__end_hook(GB *gb) { uint16_t sp0_ = gb->sp; func_5cfe(gb, 0x5d2c, sp0_); }
+
+void setEnteredWarpPosition_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5c82, 0x5c85); SET_DE(w1Link_yh);
+  CALL_C(0x5c85, getShortPositionFromDE_hook, 0x209b, 0x5c88);
+  CYC(0x5c88, 0x5c8b); W8(wEnteredWarpPosition) = A;
+  CYC(0x5c8b, 0x5c8c); ret_effect(gb);
+}
