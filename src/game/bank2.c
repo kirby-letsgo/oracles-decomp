@@ -156,6 +156,30 @@ void textInput_getOutputAddressOffset_hook(GB *gb);
 void fileSelectDrawHeartsAndDeathCounter_hook(GB *gb);
 void fileSelectDrawAcornCursor_hook(GB *gb);
 void fileSelectDrawAcornCursor__func_hook(GB *gb);
+void runInventoryMenu_hook(GB *gb);
+void runInventoryMenu__inventoryMenuStates_hook(GB *gb);
+void showItemText1_hook(GB *gb);
+void showItemText2_hook(GB *gb);
+void inventoryMenuState0_hook(GB *gb);
+void func_02_55a8_hook(GB *gb);
+void func_02_55b2_hook(GB *gb);
+void func_02_55b2__subScreen0_hook(GB *gb);
+void func_02_55b2__subScreen1_hook(GB *gb);
+void func_02_55b2__subScreen2_hook(GB *gb);
+void inventoryMenuState1_hook(GB *gb);
+void inventoryMenuState1__func_02_5606_hook(GB *gb);
+void inventoryMenuState1__subscreen0_hook(GB *gb);
+void inventoryMenuState1__aOrB_hook(GB *gb);
+void inventoryMenuState1__hasSubmenu_hook(GB *gb);
+void inventoryMenuState1__finalizeEquip_hook(GB *gb);
+void inventoryMenuState1__equipItem_hook(GB *gb);
+void inventoryMenuState1__equipItem__unequipBiggoron_hook(GB *gb);
+void inventoryMenuState1__equipItem__swapItems_hook(GB *gb);
+void inventoryMenuState1__equipItem__equipBiggoron_hook(GB *gb);
+void inventoryMenuState1__equipItem__putItemInFirstBlankSlot_hook(GB *gb);
+void inventoryMenuState1__subscreen1_hook(GB *gb);
+void inventoryMenuState1__checkEquipRing_hook(GB *gb);
+void inventoryMenuState1__subscreen2_hook(GB *gb);
 
 static uint16_t function_caller_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -3721,4 +3745,394 @@ void drawHeartDisplay__fillBlankSpace_hook(GB *gb) {
     if (!(F & FZ)) CYCT(0x54b4, 0x54b6); else CYC(0x54b4, 0x54b6);
   } while (!(F & FZ));
   CYC(0x54b6, 0x54b7); ret_effect(gb);
+}
+
+void runInventoryMenu_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x5515, clearOam_hook, 0x049f, 0x5518);
+  CYC(0x5518, 0x551a); A = 0x10;
+  CYC(0x551a, 0x551c); H8(hOamTail) = A;
+  CYC(0x551c, 0x551e); A = 0x04;
+  CYC(0x551e, 0x5520); hram_wr(gb, R_SVBK, A);
+  CALL_ROM(0x5520, 0x552c);
+  CALL_C(0x5523, inventoryMenuDrawSprites, 0x5d73, 0x5526);
+  CYC(0x5526, 0x5527); alu_xor(gb, A);
+  CYC(0x5527, 0x5529); hram_wr(gb, R_SVBK, A);
+  CYC(0x5529, 0x552c); updateStatusBar_hook(gb);
+}
+
+void runInventoryMenu__inventoryMenuStates_hook(GB *gb) {
+  CYC(0x552c, 0x552f); A = W8(wMenuActiveState);
+  CYC(0x552f, 0x5530); push_effect(gb, 0x5530);
+  switch (function_caller_jump_table(gb)) {
+    case 0x5566: inventoryMenuState0_hook(gb); return;
+    case 0x55e9: inventoryMenuState1_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void showItemText1_hook(GB *gb) {
+  CYC(0x5538, 0x553b); SET_HL(w4SubscreenTextIndices);
+  CYC(0x553b, 0x553c); push_effect(gb, 0x553c); add_a_to_hl(gb);
+  CYC(0x553c, 0x553d); A = mem_rd(gb, HL);
+  showItemText2_hook(gb);
+}
+
+void showItemText2_hook(GB *gb) {
+  CYC(0x553d, 0x5540); SET_HL(wInventory_activeText);
+  CYC(0x5540, 0x5541); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(0x5541, 0x5542); ret_effect(gb); return; }
+  CYC(0x5541, 0x5542);
+  CYC(0x5542, 0x5543); mem_wr(gb, HL, A);
+  CYC(0x5543, 0x5544); C = A;
+  CYC(0x5544, 0x5546); B = 0x09;
+  CYC(0x5546, 0x5548); alu_bit(gb, 7, C);
+  if (F & FZ) { CYCT(0x5548, 0x554a); goto show_text; }
+  CYC(0x5548, 0x554a);
+  CYC(0x554a, 0x554c); B = 0x30;
+  CYC(0x554c, 0x554e); C = 0xc0;
+  CYC(0x554e, 0x5550); alu_and(gb, 0x3f);
+  CYC(0x5550, 0x5551); L = A;
+  CYC(0x5551, 0x5553); alu_add(gb, 0x40);
+  CYC(0x5553, 0x5555); alu_bit(gb, 6, C);
+  CYC(0x5555, 0x5556); C = A;
+  if (F & FZ) { CYCT(0x5556, 0x5558); goto show_text; }
+  CYC(0x5556, 0x5558);
+  CYC(0x5558, 0x555b); mem_wr(gb, wTextSubstitutions + 2, A);
+  CYC(0x555b, 0x555c); A = L;
+  CYC(0x555c, 0x555e); alu_add(gb, 0x80);
+  CYC(0x555e, 0x5561); mem_wr(gb, wTextSubstitutions + 3, A);
+  CYC(0x5561, 0x5563); C = 0xc1;
+show_text:
+  CYC(0x5563, 0x5566); showTextOnInventoryMenu_hook(gb);
+}
+
+void inventoryMenuState0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5566, 0x5569); SET_HL(wInventorySubmenu2CursorPos);
+  CYC(0x5569, 0x556a); A = mem_rd(gb, HL);
+  CYC(0x556a, 0x556c); alu_cp(gb, 0x08);
+  if (!(F & FC)) CYCT(0x556c, 0x556e);
+  else { CYC(0x556c, 0x556e); CYC(0x556e, 0x5570); mem_wr(gb, HL, 0); }
+  CYC(0x5570, 0x5571); alu_xor(gb, A);
+  CYC(0x5571, 0x5574); W8(wInventorySubmenu) = A;
+  CYC(0x5574, 0x5577); W8(wInventory_cbba) = A;
+  CYC(0x5577, 0x557a); W8(wInventory_submenu2CursorPos2) = A;
+  CYC(0x557a, 0x557b); A = alu_dec8(gb, A);
+  CYC(0x557b, 0x557e); W8(wInventory_activeText) = A;
+  CALL_C(0x557e, loadCommonGraphics_hook, 0x1a98, 0x5581);
+  CYC(0x5581, 0x5583); A = 0x08;
+  CALL_C(0x5583, loadGfxHeader_hook, 0x0626, 0x5586);
+  CYC(0x5586, 0x5588); A = 0x06;
+  CALL_C(0x5588, loadUncompressedGfxHeader_hook, 0x05da, 0x558b);
+  CYC(0x558b, 0x558d); A = 0x0a;
+  CALL_C(0x558d, loadPaletteHeader_hook, 0x050b, 0x5590);
+  CYC(0x5590, 0x5593); SET_HL(0x4697);
+  CYC(0x5593, 0x5595); E = 0x3f;
+  CALL_C(0x5595, interBankCall_hook, 0x008a, 0x5598);
+  CALL_C(0x5598, func_02_55b2_hook, 0x55b2, 0x559b);
+  CYC(0x559b, 0x559d); A = 0x01;
+  CYC(0x559d, 0x55a0); W8(wMenuActiveState) = A;
+  CALL_C(0x55a0, fastFadeinFromWhite_hook, 0x3290, 0x55a3);
+  CYC(0x55a3, 0x55a5); A = 0x03;
+  CYC(0x55a5, 0x55a8); loadGfxRegisterStateIndex_hook(gb);
+}
+
+void func_02_55a8_hook(GB *gb) {
+  CYC(0x55a8, 0x55ab); A = W8(wInventory_cbba);
+  CYC(0x55ab, 0x55ad); alu_and(gb, 0x01);
+  CYC(0x55ad, 0x55af); alu_add(gb, 0x04);
+  CYC(0x55af, 0x55b2); loadUncompressedGfxHeader_hook(gb);
+}
+
+void func_02_55b2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x55b2, 0x55b5); SET_HL(w4SubscreenTextIndices);
+  CYC(0x55b5, 0x55b7); B = 0x20;
+  CALL_C(0x55b7, clearMemory_hook, 0x046f, 0x55ba);
+  CYC(0x55ba, 0x55bb); alu_xor(gb, A);
+  CALL_C(0x55bb, showItemText2_hook, 0x553d, 0x55be);
+  CYC(0x55be, 0x55c1); SET_HL(0x55a8);
+  CYC(0x55c1, 0x55c2); push_effect(gb, HL);
+  CYC(0x55c2, 0x55c5); A = W8(wInventorySubmenu);
+  CYC(0x55c5, 0x55c6); push_effect(gb, 0x55c6);
+  switch (function_caller_jump_table(gb)) {
+    case 0x55cc: func_02_55b2__subScreen0_hook(gb); func_02_55a8_hook(gb); return;
+    case 0x55d9: func_02_55b2__subScreen1_hook(gb); func_02_55a8_hook(gb); return;
+    case 0x55e1: func_02_55b2__subScreen2_hook(gb); func_02_55a8_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void func_02_55b2__subScreen0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x55cc, 0x55ce); A = 0xff;
+  CYC(0x55ce, 0x55d1); W8(wStatusBarNeedsRefresh) = A;
+  CYC(0x55d1, 0x55d3); A = 0x09;
+  CALL_C(0x55d3, loadGfxHeader_hook, 0x0626, 0x55d6);
+  CYC(0x55d6, 0x55d9); inventorySubscreen0_drawStoredItems(gb);
+}
+
+void func_02_55b2__subScreen1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x55d9, 0x55db); A = 0x0a;
+  CALL_C(0x55db, loadGfxHeader_hook, 0x0626, 0x55de);
+  CYC(0x55de, 0x55e1); inventorySubscreen1_drawTreasures(gb);
+}
+
+void func_02_55b2__subScreen2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x55e1, 0x55e3); A = 0x0b;
+  CALL_C(0x55e3, loadGfxHeader_hook, 0x0626, 0x55e6);
+  CYC(0x55e6, 0x55e9); inventorySubscreen2_drawTreasures(gb);
+}
+
+void inventoryMenuState1_hook(GB *gb) {
+  CYC(0x55e9, 0x55ec); A = W8(wPaletteThread_mode);
+  CYC(0x55ec, 0x55ed); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x55ed, 0x55ee); ret_effect(gb); return; }
+  CYC(0x55ed, 0x55ee);
+  CYC(0x55ee, 0x55f1); A = W8(wKeysJustPressed);
+  CYC(0x55f1, 0x55f3); alu_bit(gb, 3, A);
+  if (!(F & FZ)) { CYCT(0x55f3, 0x55f6); closeMenu_hook(gb); return; }
+  CYC(0x55f3, 0x55f6);
+  CYC(0x55f6, 0x55f8); alu_bit(gb, 2, A);
+  CYC(0x55f8, 0x55fa); A = 0x03;
+  if (!(F & FZ)) { CYCT(0x55fa, 0x55fc); inventoryMenuState1__func_02_5606_hook(gb); return; }
+  CYC(0x55fa, 0x55fc);
+  CYC(0x55fc, 0x55ff); A = W8(wInventorySubmenu);
+  CYC(0x55ff, 0x5600); push_effect(gb, 0x5600);
+  switch (function_caller_jump_table(gb)) {
+    case 0x560d: inventoryMenuState1__subscreen0_hook(gb); return;
+    case 0x56c2: inventoryMenuState1__subscreen1_hook(gb); return;
+    case 0x56fb: inventoryMenuState1__subscreen2_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void inventoryMenuState1__func_02_5606_hook(GB *gb) {
+  CYC(0x5606, 0x5609); SET_HL(wMenuActiveState);
+  CYC(0x5609, 0x560a); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x560a, 0x560c); mem_wr(gb, HL, 0);
+  CYC(0x560c, 0x560d); ret_effect(gb);
+}
+
+void inventoryMenuState1__subscreen0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x560d, 0x5610); A = W8(wKeysJustPressed);
+  CYC(0x5610, 0x5611); C = A;
+  CYC(0x5611, 0x5613); A = (uint8_t)wInventoryB;
+  CYC(0x5613, 0x5615); alu_bit(gb, 1, C);
+  if (!(F & FZ)) { CYCT(0x5615, 0x5617); inventoryMenuState1__aOrB_hook(gb); return; }
+  CYC(0x5615, 0x5617);
+  CYC(0x5617, 0x5618); A = alu_inc8(gb, A);
+  CYC(0x5618, 0x561a); alu_bit(gb, 0, C);
+  if (!(F & FZ)) { CYCT(0x561a, 0x561c); inventoryMenuState1__aOrB_hook(gb); return; }
+  CYC(0x561a, 0x561c);
+  CALL_C(0x561c, inventorySubscreen0CheckDirectionButtons, 0x5893, 0x561f);
+  CYC(0x561f, 0x5622); A = W8(wInventorySubmenu0CursorPos);
+  CYC(0x5622, 0x5625); SET_HL(wInventoryStorage);
+  CYC(0x5625, 0x5626); push_effect(gb, 0x5626); add_a_to_hl(gb);
+  CYC(0x5626, 0x5627); A = mem_rd(gb, HL);
+  CALL_C(0x5627, loadTreasureDisplayData_b00_hook, 0x16d6, 0x562a);
+  CYC(0x562a, 0x562c); A = 0x06;
+  CYC(0x562c, 0x562d); push_effect(gb, 0x562d); add_a_to_hl(gb);
+  CYC(0x562d, 0x562e); A = mem_rd(gb, HL);
+  CALL_C(0x562e, showItemText2_hook, 0x553d, 0x5631);
+  CYC(0x5631, 0x5634); inventorySubscreen0_drawCursor(gb);
+}
+
+void inventoryMenuState1__aOrB_hook(GB *gb) {
+  CYC(0x5634, 0x5637); W8(wInventory_cbb6) = A;
+  CYC(0x5637, 0x563a); A = W8(wInventorySubmenu0CursorPos);
+  CYC(0x563a, 0x563d); SET_HL(wInventoryStorage);
+  CYC(0x563d, 0x563e); push_effect(gb, 0x563e); add_a_to_hl(gb);
+  CYC(0x563e, 0x563f); A = mem_rd(gb, HL);
+  CYC(0x563f, 0x5642); W8(wInventory_selectedItem) = A;
+  CYC(0x5642, 0x5644); C = 0x1f;
+  CYC(0x5644, 0x5646); alu_cp(gb, 0x19);
+  if (F & FZ) { CYCT(0x5646, 0x5648); inventoryMenuState1__hasSubmenu_hook(gb); return; }
+  CYC(0x5646, 0x5648);
+  CYC(0x5648, 0x564a); alu_cp(gb, 0x0f);
+  if (F & FZ) { CYCT(0x564a, 0x564c); inventoryMenuState1__hasSubmenu_hook(gb); return; }
+  CYC(0x564a, 0x564c);
+  CYC(0x564c, 0x564e); alu_cp(gb, 0x11);
+  if (!(F & FZ)) { CYCT(0x564e, 0x5650); inventoryMenuState1__finalizeEquip_hook(gb); return; }
+  CYC(0x564e, 0x5650);
+  CYC(0x5650, 0x5652); C = 0xe0;
+  inventoryMenuState1__hasSubmenu_hook(gb);
+}
+
+void inventoryMenuState1__hasSubmenu_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x5652, 0x5655); A = mem_rd(gb, wObtainedTreasureFlags + 4);
+  CYC(0x5655, 0x5656); alu_and(gb, C);
+  CALL_C(0x5656, getNumSetBits_hook, 0x0176, 0x5659);
+  CYC(0x5659, 0x565c); W8(wInventory_cbb8) = A;
+  CYC(0x565c, 0x565e); alu_cp(gb, 0x02);
+  CYC(0x565e, 0x5660); A = 0x02;
+  if (!(F & FC)) { CYCT(0x5660, 0x5663); inventoryMenuState1__func_02_5606_hook(gb); return; }
+  CYC(0x5660, 0x5663);
+  inventoryMenuState1__finalizeEquip_hook(gb);
+}
+
+void inventoryMenuState1__finalizeEquip_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x5663, inventoryMenuState1__equipItem_hook, 0x5679, 0x5666);
+  CALL_C(0x5666, inventorySubscreen0_drawStoredItems, 0x5b5a, 0x5669);
+  CALL_C(0x5669, inventorySubscreen0_drawCursor, 0x595e, 0x566c);
+  CYC(0x566c, 0x566e); A = 0x56;
+  CALL_C(0x566e, playSound_b00_hook, 0x0c98, 0x5671);
+  CYC(0x5671, 0x5673); A = 0x01;
+  CALL_C(0x5673, inventoryMenuState1__func_02_5606_hook, 0x5606, 0x5676);
+  CYC(0x5676, 0x5679); func_02_55b2_hook(gb);
+}
+
+void inventoryMenuState1__equipItem_hook(GB *gb) {
+  CYC(0x5679, 0x567b); D = (uint8_t)(wInventoryStorage >> 8);
+  CYC(0x567b, 0x567c); H = D;
+  CYC(0x567c, 0x567f); A = W8(wInventory_cbb6);
+  CYC(0x567f, 0x5680); E = A;
+  CYC(0x5680, 0x5683); A = W8(wInventorySubmenu0CursorPos);
+  CYC(0x5683, 0x5685); alu_add(gb, (uint8_t)wInventoryStorage);
+  CYC(0x5685, 0x5686); L = A;
+  CYC(0x5686, 0x5688); B = 0x0c;
+  CYC(0x5688, 0x5689); A = mem_rd(gb, HL);
+  CYC(0x5689, 0x568a); alu_cp(gb, B);
+  if (F & FZ) { CYCT(0x568a, 0x568c); inventoryMenuState1__equipItem__equipBiggoron_hook(gb); return; }
+  CYC(0x568a, 0x568c);
+  CYC(0x568c, 0x568d); A = mem_rd(gb, DE);
+  CYC(0x568d, 0x568e); alu_cp(gb, B);
+  if (!(F & FZ)) { CYCT(0x568e, 0x5690); inventoryMenuState1__equipItem__swapItems_hook(gb); return; }
+  CYC(0x568e, 0x5690);
+  inventoryMenuState1__equipItem__unequipBiggoron_hook(gb);
+}
+
+void inventoryMenuState1__equipItem__unequipBiggoron_hook(GB *gb) {
+  CYC(0x5690, 0x5691); C = L;
+  CYC(0x5691, 0x5693); L = (uint8_t)wInventoryB;
+  CYC(0x5693, 0x5694); alu_xor(gb, A);
+  CYC(0x5694, 0x5695); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5695, 0x5696); mem_wr(gb, HL, A);
+  CYC(0x5696, 0x5697); L = C;
+  CYC(0x5697, 0x5698); A = B;
+  CYC(0x5698, 0x5699); mem_wr(gb, DE, A);
+  inventoryMenuState1__equipItem__swapItems_hook(gb);
+}
+
+void inventoryMenuState1__equipItem__swapItems_hook(GB *gb) {
+  CYC(0x5699, 0x569a); A = mem_rd(gb, DE);
+  CYC(0x569a, 0x569b); C = A;
+  CYC(0x569b, 0x569c); A = mem_rd(gb, HL);
+  CYC(0x569c, 0x569d); mem_wr(gb, DE, A);
+  CYC(0x569d, 0x569e); mem_wr(gb, HL, C);
+  CYC(0x569e, 0x569f); ret_effect(gb);
+}
+
+void inventoryMenuState1__equipItem__equipBiggoron_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x569f, 0x56a1); mem_wr(gb, HL, 0);
+  CALL_C(0x56a1, inventoryMenuState1__equipItem__swapItems_hook, 0x5699, 0x56a4);
+  CYC(0x56a4, 0x56a7); A = W8(wInventoryB);
+  CALL_C(0x56a7, inventoryMenuState1__equipItem__putItemInFirstBlankSlot_hook, 0x56b6, 0x56aa);
+  CYC(0x56aa, 0x56ad); A = W8(wInventoryA);
+  CALL_C(0x56ad, inventoryMenuState1__equipItem__putItemInFirstBlankSlot_hook, 0x56b6, 0x56b0);
+  CYC(0x56b0, 0x56b2); L = (uint8_t)wInventoryB;
+  CYC(0x56b2, 0x56b3); mem_wr(gb, HL, B);
+  CYC(0x56b3, 0x56b4); L = alu_inc8(gb, L);
+  CYC(0x56b4, 0x56b5); mem_wr(gb, HL, B);
+  CYC(0x56b5, 0x56b6); ret_effect(gb);
+}
+
+void inventoryMenuState1__equipItem__putItemInFirstBlankSlot_hook(GB *gb) {
+  CYC(0x56b6, 0x56b7); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x56b7, 0x56b8); ret_effect(gb); return; }
+  CYC(0x56b7, 0x56b8);
+  CYC(0x56b8, 0x56b9); C = A;
+  CYC(0x56b9, 0x56bb); L = (uint8_t)wInventoryStorage;
+  do {
+    CYC(0x56bb, 0x56bc); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x56bc, 0x56bd); alu_or(gb, A);
+    if (!(F & FZ)) CYCT(0x56bd, 0x56bf); else CYC(0x56bd, 0x56bf);
+  } while (!(F & FZ));
+  CYC(0x56bf, 0x56c0); L = alu_dec8(gb, L);
+  CYC(0x56c0, 0x56c1); mem_wr(gb, HL, C);
+  CYC(0x56c1, 0x56c2); ret_effect(gb);
+}
+
+void inventoryMenuState1__subscreen1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x56c2, 0x56c5); A = W8(wKeysJustPressed);
+  CYC(0x56c5, 0x56c7); alu_bit(gb, 0, A);
+  if (!(F & FZ)) {
+    CYCT(0x56c7, 0x56c9);
+    CALL_C(0x56ce, inventoryMenuState1__checkEquipRing_hook, 0x56dd, 0x56d1);
+  } else {
+    CYC(0x56c7, 0x56c9);
+    CALL_C(0x56c9, inventorySubmenu1CheckDirectionButtons, 0x58aa, 0x56cc);
+    CYC(0x56cc, 0x56ce);
+  }
+  CALL_C(0x56d1, inventorySubmenu1_drawCursor, 0x5982, 0x56d4);
+  CYC(0x56d4, 0x56d7); A = W8(wInventorySubmenu1CursorPos);
+  CALL_C(0x56d7, showItemText1_hook, 0x5538, 0x56da);
+  CYC(0x56da, 0x56dd); drawEquippedSpriteForActiveRing(gb);
+}
+
+void inventoryMenuState1__checkEquipRing_hook(GB *gb) {
+  CYC(0x56dd, 0x56e0); A = W8(wInventorySubmenu1CursorPos);
+  CYC(0x56e0, 0x56e2); alu_sub(gb, 0x10);
+  if (F & FC) { CYCT(0x56e2, 0x56e3); ret_effect(gb); return; }
+  CYC(0x56e2, 0x56e3);
+  CYC(0x56e3, 0x56e6); SET_HL(wActiveRing);
+  CYC(0x56e6, 0x56e7); C = mem_rd(gb, HL);
+  CYC(0x56e7, 0x56e9); L = (uint8_t)wRingBoxContents;
+  CYC(0x56e9, 0x56ea); push_effect(gb, 0x56ea); add_a_to_hl(gb);
+  CYC(0x56ea, 0x56eb); A = mem_rd(gb, HL);
+  CYC(0x56eb, 0x56ec); alu_cp(gb, C);
+  if (!(F & FZ)) { CYCT(0x56ec, 0x56ee); goto set_ring; }
+  CYC(0x56ec, 0x56ee);
+  CYC(0x56ee, 0x56f0); alu_cp(gb, 0xff);
+  if (F & FZ) { CYCT(0x56f0, 0x56f1); ret_effect(gb); return; }
+  CYC(0x56f0, 0x56f1);
+  CYC(0x56f1, 0x56f3); A = 0xff;
+set_ring:
+  CYC(0x56f3, 0x56f6); W8(wActiveRing) = A;
+  CYC(0x56f6, 0x56f8); A = 0x56;
+  CYC(0x56f8, 0x56fb); playSound_b00_hook(gb);
+}
+
+void inventoryMenuState1__subscreen2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x56fb, 0x56fe); A = W8(wKeysJustPressed);
+  CYC(0x56fe, 0x5700); alu_and(gb, 0x01);
+  if (F & FZ) { CYCT(0x5700, 0x5702); goto check_direction; }
+  CYC(0x5700, 0x5702);
+  CYC(0x5702, 0x5705); A = W8(wInventorySubmenu2CursorPos);
+  CYC(0x5705, 0x5706); alu_rlca(gb);
+  if (!(F & FC)) { CYCT(0x5706, 0x5708); goto check_direction; }
+  CYC(0x5706, 0x5708);
+  CYC(0x5708, 0x570b); A = W8(wInventory_submenu2CursorPos2);
+  CYC(0x570b, 0x570d); alu_cp(gb, 0x02);
+  if (!(F & FZ)) { CYCT(0x570d, 0x570f); goto check_direction; }
+  CYC(0x570d, 0x570f);
+  CYC(0x570f, 0x5710); A = alu_inc8(gb, A);
+  CYC(0x5710, 0x5713); W8(wOpenedMenuType) = A;
+  CYC(0x5713, 0x5715); A = 0x56;
+  CALL_C(0x5715, playSound_b00_hook, 0x0c98, 0x5718);
+  CYC(0x5718, 0x571b); SET_HL(wInventory);
+  CYC(0x571b, 0x571d); B = 0x10;
+  CYC(0x571d, 0x5720); clearMemory_hook(gb);
+  return;
+check_direction:
+  CALL_C(0x5720, inventorySubmenu2CheckDirectionButtons, 0x5908, 0x5723);
+  CYC(0x5723, 0x5726); A = W8(wInventorySubmenu2CursorPos);
+  CYC(0x5726, 0x5728); alu_bit(gb, 7, A);
+  if (F & FZ) CYCT(0x5728, 0x572a);
+  else {
+    CYC(0x5728, 0x572a);
+    CYC(0x572a, 0x572d); A = W8(wInventory_submenu2CursorPos2);
+    CYC(0x572d, 0x572f); alu_add(gb, 0x08);
+  }
+  CALL_C(0x572f, showItemText1_hook, 0x5538, 0x5732);
+  CYC(0x5732, 0x5735); inventorySubmenu2_drawCursor(gb);
 }

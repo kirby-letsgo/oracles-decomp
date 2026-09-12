@@ -5868,664 +5868,9 @@ void menuStateFadeIntoGame(GB *gb) {
   I(0x513f, 4); if (hook_enabled_at(0x0cad)) { setMusicVolume_hook(gb); return; } HANDOFF(0x0cad);  // jp $0cad
 }
 
-// 02:5515
-void runInventoryMenu(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5515, clearOam_hook, 0x049f, 0x5518);  // call $049f
-  I(0x5518, 2); A = 0x10;  // ld a,$10
-  I(0x551a, 3); mem_wr(gb, 0xff9f, A);  // ldh ($ff9f),a
-  I(0x551c, 2); A = 0x04;  // ld a,$04
-  I(0x551e, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  CALL(0x5520, runInventoryMenu__inventoryMenuStates, 0x552c, 0x5523);  // call $552c
-  CALL(0x5523, inventoryMenuDrawSprites, 0x5d73, 0x5526);  // call $5d73
-  I(0x5526, 1); alu_xor(gb, A);  // xor a
-  I(0x5527, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x5529, 4); if (hook_enabled_at(0x1a9c)) { updateStatusBar_hook(gb); return; } HANDOFF(0x1a9c);  // jp $1a9c
-}
-
-// 02:552c
-void runInventoryMenu__inventoryMenuStates(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_552c:
-  I(0x552c, 4); A = mem_rd(gb, 0xcbcd);  // ld a,($cbcd)
-  RST_PUSH(0x552f, 0x5530);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
-// 02:5538
-void showItemText1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5538, 3); SET_HL(0xd3e0);  // ld hl,$d3e0
-  RST_PUSH(0x553b, 0x553c);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x553c, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  showItemText2(gb); return;  // fallthrough
-}
-
-// 02:553d
-void showItemText2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x553d, 3); SET_HL(0xcbbb);  // ld hl,$cbbb
-  I(0x5540, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if ((F & FZ)) { RET_TAKEN(0x5541); return; } I(0x5541, 2);  // ret z
-  I(0x5542, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5543, 1); C = A;  // ld c,a
-  I(0x5544, 2); B = 0x09;  // ld b,$09
-  I(0x5546, 2); alu_bit(gb, 7, C);  // bit 7,c
-  if ((F & FZ)) { I(0x5548, 3); goto L_5563; } I(0x5548, 2);  // jr z,$5563
-  I(0x554a, 2); B = 0x30;  // ld b,$30
-  I(0x554c, 2); C = 0xc0;  // ld c,$c0
-  I(0x554e, 2); alu_and(gb, 0x3f);  // and $3f
-  I(0x5550, 1); L = A;  // ld l,a
-  I(0x5551, 2); alu_add(gb, 0x40);  // add $40
-  I(0x5553, 2); alu_bit(gb, 6, C);  // bit 6,c
-  I(0x5555, 1); C = A;  // ld c,a
-  if ((F & FZ)) { I(0x5556, 3); goto L_5563; } I(0x5556, 2);  // jr z,$5563
-  I(0x5558, 4); mem_wr(gb, 0xcbb1, A);  // ld ($cbb1),a
-  I(0x555b, 1); A = L;  // ld a,l
-  I(0x555c, 2); alu_add(gb, 0x80);  // add $80
-  I(0x555e, 4); mem_wr(gb, 0xcbb2, A);  // ld ($cbb2),a
-  I(0x5561, 2); C = 0xc1;  // ld c,$c1
-L_5563:
-  I(0x5563, 4); if (hook_enabled_at(0x1860)) { showTextOnInventoryMenu_hook(gb); return; } HANDOFF(0x1860);  // jp $1860
-}
-
-// 02:5566
-void inventoryMenuState0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5566, 3); SET_HL(0xcbd2);  // ld hl,$cbd2
-  I(0x5569, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x556a, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FC)) { I(0x556c, 3); goto L_5570; } I(0x556c, 2);  // jr nc,$5570
-  I(0x556e, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-L_5570:
-  I(0x5570, 1); alu_xor(gb, A);  // xor a
-  I(0x5571, 4); mem_wr(gb, 0xcbcf, A);  // ld ($cbcf),a
-  I(0x5574, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x5577, 4); mem_wr(gb, 0xcbb9, A);  // ld ($cbb9),a
-  I(0x557a, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x557b, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  CALL(0x557e, loadCommonGraphics_hook, 0x1a98, 0x5581);  // call $1a98
-  I(0x5581, 2); A = 0x08;  // ld a,$08
-  CALL(0x5583, loadGfxHeader_hook, 0x0626, 0x5586);  // call $0626
-  I(0x5586, 2); A = 0x06;  // ld a,$06
-  CALL(0x5588, loadUncompressedGfxHeader_hook, 0x05da, 0x558b);  // call $05da
-  I(0x558b, 2); A = 0x0a;  // ld a,$0a
-  CALL(0x558d, loadPaletteHeader_hook, 0x050b, 0x5590);  // call $050b
-  I(0x5590, 3); SET_HL(0x4697);  // ld hl,$4697
-  I(0x5593, 2); E = 0x3f;  // ld e,$3f
-  CALL(0x5595, interBankCall_hook, 0x008a, 0x5598);  // call $008a
-  CALL(0x5598, func_02_55b2, 0x55b2, 0x559b);  // call $55b2
-  I(0x559b, 2); A = 0x01;  // ld a,$01
-  I(0x559d, 4); mem_wr(gb, 0xcbcd, A);  // ld ($cbcd),a
-  CALL(0x55a0, fastFadeinFromWhite_hook, 0x3290, 0x55a3);  // call $3290
-  I(0x55a3, 2); A = 0x03;  // ld a,$03
-  I(0x55a5, 4); if (hook_enabled_at(0x02ea)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
-}
-
-// 02:55a8
-void func_02_55a8(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x55a8, 4); A = mem_rd(gb, 0xcbba);  // ld a,($cbba)
-  I(0x55ab, 2); alu_and(gb, 0x01);  // and $01
-  I(0x55ad, 2); alu_add(gb, 0x04);  // add $04
-  I(0x55af, 4); if (hook_enabled_at(0x05da)) { loadUncompressedGfxHeader_hook(gb); return; } HANDOFF(0x05da);  // jp $05da
-}
-
-// 02:55b2
-void func_02_55b2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x55b2, 3); SET_HL(0xd3e0);  // ld hl,$d3e0
-  I(0x55b5, 2); B = 0x20;  // ld b,$20
-  CALL(0x55b7, clearMemory_hook, 0x046f, 0x55ba);  // call $046f
-  I(0x55ba, 1); alu_xor(gb, A);  // xor a
-  CALL(0x55bb, showItemText2, 0x553d, 0x55be);  // call $553d
-  I(0x55be, 3); SET_HL(0x55a8);  // ld hl,$55a8
-  PUSH(0x55c1, HL);  // push hl
-  I(0x55c2, 4); A = mem_rd(gb, 0xcbcf);  // ld a,($cbcf)
-  RST_PUSH(0x55c5, 0x55c6);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x55cc: goto L_55cc; case 0x55d9: goto L_55d9; case 0x55e1: goto L_55e1; default: HANDOFF(HL); }
-L_55cc:
-  I(0x55cc, 2); A = 0xff;  // ld a,$ff
-  I(0x55ce, 4); mem_wr(gb, 0xcbe9, A);  // ld ($cbe9),a
-  I(0x55d1, 2); A = 0x09;  // ld a,$09
-  CALL(0x55d3, loadGfxHeader_hook, 0x0626, 0x55d6);  // call $0626
-  I(0x55d6, 4); inventorySubscreen0_drawStoredItems(gb); return;  // jp $5b5a
-L_55d9:
-  I(0x55d9, 2); A = 0x0a;  // ld a,$0a
-  CALL(0x55db, loadGfxHeader_hook, 0x0626, 0x55de);  // call $0626
-  I(0x55de, 4); inventorySubscreen1_drawTreasures(gb); return;  // jp $5ba2
-L_55e1:
-  I(0x55e1, 2); A = 0x0b;  // ld a,$0b
-  CALL(0x55e3, loadGfxHeader_hook, 0x0626, 0x55e6);  // call $0626
-  I(0x55e6, 4); inventorySubscreen2_drawTreasures(gb); return;  // jp $5c3d
-}
-
-// 02:55cc
-void func_02_55b2__subScreen0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_55cc:
-  I(0x55cc, 2); A = 0xff;  // ld a,$ff
-  I(0x55ce, 4); mem_wr(gb, 0xcbe9, A);  // ld ($cbe9),a
-  I(0x55d1, 2); A = 0x09;  // ld a,$09
-  CALL(0x55d3, loadGfxHeader_hook, 0x0626, 0x55d6);  // call $0626
-  I(0x55d6, 4); inventorySubscreen0_drawStoredItems(gb); return;  // jp $5b5a
-}
-
-// 02:55d9
-void func_02_55b2__subScreen1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_55d9:
-  I(0x55d9, 2); A = 0x0a;  // ld a,$0a
-  CALL(0x55db, loadGfxHeader_hook, 0x0626, 0x55de);  // call $0626
-  I(0x55de, 4); inventorySubscreen1_drawTreasures(gb); return;  // jp $5ba2
-}
-
-// 02:55e1
-void func_02_55b2__subScreen2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_55e1:
-  I(0x55e1, 2); A = 0x0b;  // ld a,$0b
-  CALL(0x55e3, loadGfxHeader_hook, 0x0626, 0x55e6);  // call $0626
-  I(0x55e6, 4); inventorySubscreen2_drawTreasures(gb); return;  // jp $5c3d
-}
-
-// 02:55e9
-void inventoryMenuState1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x55e9, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
-  I(0x55ec, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x55ed); return; } I(0x55ed, 2);  // ret nz
-  I(0x55ee, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x55f1, 2); alu_bit(gb, 3, A);  // bit 3,a
-  if (!(F & FZ)) { I(0x55f3, 4); if (hook_enabled_at(0x4fba)) { closeMenu_hook(gb); return; } HANDOFF(0x4fba); } I(0x55f3, 3);  // jp nz,$4fba
-  I(0x55f6, 2); alu_bit(gb, 2, A);  // bit 2,a
-  I(0x55f8, 2); A = 0x03;  // ld a,$03
-  if (!(F & FZ)) { I(0x55fa, 3); goto L_5606; } I(0x55fa, 2);  // jr nz,$5606
-  I(0x55fc, 4); A = mem_rd(gb, 0xcbcf);  // ld a,($cbcf)
-  RST_PUSH(0x55ff, 0x5600);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x560d: goto L_560d; case 0x56c2: goto L_56c2; case 0x56fb: goto L_56fb; default: HANDOFF(HL); }
-L_5606:
-  I(0x5606, 3); SET_HL(0xcbcd);  // ld hl,$cbcd
-  I(0x5609, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x560a, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  RET(0x560c); return;  // ret
-L_560d:
-  I(0x560d, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x5610, 1); C = A;  // ld c,a
-  I(0x5611, 2); A = 0x88;  // ld a,$88
-  I(0x5613, 2); alu_bit(gb, 1, C);  // bit 1,c
-  if (!(F & FZ)) { I(0x5615, 3); goto L_5634; } I(0x5615, 2);  // jr nz,$5634
-  I(0x5617, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5618, 2); alu_bit(gb, 0, C);  // bit 0,c
-  if (!(F & FZ)) { I(0x561a, 3); goto L_5634; } I(0x561a, 2);  // jr nz,$5634
-  CALL(0x561c, inventorySubscreen0CheckDirectionButtons, 0x5893, 0x561f);  // call $5893
-  I(0x561f, 4); A = mem_rd(gb, 0xcbd0);  // ld a,($cbd0)
-  I(0x5622, 3); SET_HL(0xc68a);  // ld hl,$c68a
-  RST_PUSH(0x5625, 0x5626);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x5626, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  CALL(0x5627, loadTreasureDisplayData_b00_hook, 0x16d6, 0x562a);  // call $16d6
-  I(0x562a, 2); A = 0x06;  // ld a,$06
-  RST_PUSH(0x562c, 0x562d);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x562d, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  CALL(0x562e, showItemText2, 0x553d, 0x5631);  // call $553d
-  I(0x5631, 4); inventorySubscreen0_drawCursor(gb); return;  // jp $595e
-L_5634:
-  I(0x5634, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
-  I(0x5637, 4); A = mem_rd(gb, 0xcbd0);  // ld a,($cbd0)
-  I(0x563a, 3); SET_HL(0xc68a);  // ld hl,$c68a
-  RST_PUSH(0x563d, 0x563e);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x563e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x563f, 4); mem_wr(gb, 0xcbb7, A);  // ld ($cbb7),a
-  I(0x5642, 2); C = 0x1f;  // ld c,$1f
-  I(0x5644, 2); alu_cp(gb, 0x19);  // cp $19
-  if ((F & FZ)) { I(0x5646, 3); goto L_5652; } I(0x5646, 2);  // jr z,$5652
-  I(0x5648, 2); alu_cp(gb, 0x0f);  // cp $0f
-  if ((F & FZ)) { I(0x564a, 3); goto L_5652; } I(0x564a, 2);  // jr z,$5652
-  I(0x564c, 2); alu_cp(gb, 0x11);  // cp $11
-  if (!(F & FZ)) { I(0x564e, 3); goto L_5663; } I(0x564e, 2);  // jr nz,$5663
-  I(0x5650, 2); C = 0xe0;  // ld c,$e0
-L_5652:
-  I(0x5652, 4); A = mem_rd(gb, 0xc69e);  // ld a,($c69e)
-  I(0x5655, 1); alu_and(gb, C);  // and c
-  CALL(0x5656, getNumSetBits_hook, 0x0176, 0x5659);  // call $0176
-  I(0x5659, 4); mem_wr(gb, 0xcbb8, A);  // ld ($cbb8),a
-  I(0x565c, 2); alu_cp(gb, 0x02);  // cp $02
-  I(0x565e, 2); A = 0x02;  // ld a,$02
-  if (!(F & FC)) { I(0x5660, 4); goto L_5606; } I(0x5660, 3);  // jp nc,$5606
-L_5663:
-  CALL(0x5663, inventoryMenuState1__equipItem, 0x5679, 0x5666);  // call $5679
-  CALL(0x5666, inventorySubscreen0_drawStoredItems, 0x5b5a, 0x5669);  // call $5b5a
-  CALL(0x5669, inventorySubscreen0_drawCursor, 0x595e, 0x566c);  // call $595e
-  I(0x566c, 2); A = 0x56;  // ld a,$56
-  CALL(0x566e, playSound_b00_hook, 0x0c98, 0x5671);  // call $0c98
-  I(0x5671, 2); A = 0x01;  // ld a,$01
-  CALL(0x5673, inventoryMenuState1__func_02_5606, 0x5606, 0x5676);  // call $5606
-  I(0x5676, 4); func_02_55b2(gb); return;  // jp $55b2
-L_56c2:
-  I(0x56c2, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x56c5, 2); alu_bit(gb, 0, A);  // bit 0,a
-  if (!(F & FZ)) { I(0x56c7, 3); goto L_56ce; } I(0x56c7, 2);  // jr nz,$56ce
-  CALL(0x56c9, inventorySubmenu1CheckDirectionButtons, 0x58aa, 0x56cc);  // call $58aa
-  I(0x56cc, 3); goto L_56d1;  // jr $56d1
-L_56ce:
-  CALL(0x56ce, inventoryMenuState1__checkEquipRing, 0x56dd, 0x56d1);  // call $56dd
-L_56d1:
-  CALL(0x56d1, inventorySubmenu1_drawCursor, 0x5982, 0x56d4);  // call $5982
-  I(0x56d4, 4); A = mem_rd(gb, 0xcbd1);  // ld a,($cbd1)
-  CALL(0x56d7, showItemText1, 0x5538, 0x56da);  // call $5538
-  I(0x56da, 4); drawEquippedSpriteForActiveRing(gb); return;  // jp $5b2e
-L_56fb:
-  I(0x56fb, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x56fe, 2); alu_and(gb, 0x01);  // and $01
-  if ((F & FZ)) { I(0x5700, 3); goto L_5720; } I(0x5700, 2);  // jr z,$5720
-  I(0x5702, 4); A = mem_rd(gb, 0xcbd2);  // ld a,($cbd2)
-  I(0x5705, 1); alu_rlca(gb);  // rlca
-  if (!(F & FC)) { I(0x5706, 3); goto L_5720; } I(0x5706, 2);  // jr nc,$5720
-  I(0x5708, 4); A = mem_rd(gb, 0xcbb9);  // ld a,($cbb9)
-  I(0x570b, 2); alu_cp(gb, 0x02);  // cp $02
-  if (!(F & FZ)) { I(0x570d, 3); goto L_5720; } I(0x570d, 2);  // jr nz,$5720
-  I(0x570f, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5710, 4); mem_wr(gb, 0xcbcb, A);  // ld ($cbcb),a
-  I(0x5713, 2); A = 0x56;  // ld a,$56
-  CALL(0x5715, playSound_b00_hook, 0x0c98, 0x5718);  // call $0c98
-  I(0x5718, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
-  I(0x571b, 2); B = 0x10;  // ld b,$10
-  I(0x571d, 4); if (hook_enabled_at(0x046f)) { clearMemory_hook(gb); return; } HANDOFF(0x046f);  // jp $046f
-L_5720:
-  CALL(0x5720, inventorySubmenu2CheckDirectionButtons, 0x5908, 0x5723);  // call $5908
-  I(0x5723, 4); A = mem_rd(gb, 0xcbd2);  // ld a,($cbd2)
-  I(0x5726, 2); alu_bit(gb, 7, A);  // bit 7,a
-  if ((F & FZ)) { I(0x5728, 3); goto L_572f; } I(0x5728, 2);  // jr z,$572f
-  I(0x572a, 4); A = mem_rd(gb, 0xcbb9);  // ld a,($cbb9)
-  I(0x572d, 2); alu_add(gb, 0x08);  // add $08
-L_572f:
-  CALL(0x572f, showItemText1, 0x5538, 0x5732);  // call $5538
-  I(0x5732, 4); inventorySubmenu2_drawCursor(gb); return;  // jp $59eb
-}
-
-// 02:5606
-void inventoryMenuState1__func_02_5606(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5606:
-  I(0x5606, 3); SET_HL(0xcbcd);  // ld hl,$cbcd
-  I(0x5609, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x560a, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  RET(0x560c); return;  // ret
-}
-
-// 02:560d
-void inventoryMenuState1__subscreen0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_560d;
-L_5606:
-  I(0x5606, 3); SET_HL(0xcbcd);  // ld hl,$cbcd
-  I(0x5609, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x560a, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  RET(0x560c); return;  // ret
-L_560d:
-  I(0x560d, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x5610, 1); C = A;  // ld c,a
-  I(0x5611, 2); A = 0x88;  // ld a,$88
-  I(0x5613, 2); alu_bit(gb, 1, C);  // bit 1,c
-  if (!(F & FZ)) { I(0x5615, 3); goto L_5634; } I(0x5615, 2);  // jr nz,$5634
-  I(0x5617, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5618, 2); alu_bit(gb, 0, C);  // bit 0,c
-  if (!(F & FZ)) { I(0x561a, 3); goto L_5634; } I(0x561a, 2);  // jr nz,$5634
-  CALL(0x561c, inventorySubscreen0CheckDirectionButtons, 0x5893, 0x561f);  // call $5893
-  I(0x561f, 4); A = mem_rd(gb, 0xcbd0);  // ld a,($cbd0)
-  I(0x5622, 3); SET_HL(0xc68a);  // ld hl,$c68a
-  RST_PUSH(0x5625, 0x5626);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x5626, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  CALL(0x5627, loadTreasureDisplayData_b00_hook, 0x16d6, 0x562a);  // call $16d6
-  I(0x562a, 2); A = 0x06;  // ld a,$06
-  RST_PUSH(0x562c, 0x562d);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x562d, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  CALL(0x562e, showItemText2, 0x553d, 0x5631);  // call $553d
-  I(0x5631, 4); inventorySubscreen0_drawCursor(gb); return;  // jp $595e
-L_5634:
-  I(0x5634, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
-  I(0x5637, 4); A = mem_rd(gb, 0xcbd0);  // ld a,($cbd0)
-  I(0x563a, 3); SET_HL(0xc68a);  // ld hl,$c68a
-  RST_PUSH(0x563d, 0x563e);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x563e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x563f, 4); mem_wr(gb, 0xcbb7, A);  // ld ($cbb7),a
-  I(0x5642, 2); C = 0x1f;  // ld c,$1f
-  I(0x5644, 2); alu_cp(gb, 0x19);  // cp $19
-  if ((F & FZ)) { I(0x5646, 3); goto L_5652; } I(0x5646, 2);  // jr z,$5652
-  I(0x5648, 2); alu_cp(gb, 0x0f);  // cp $0f
-  if ((F & FZ)) { I(0x564a, 3); goto L_5652; } I(0x564a, 2);  // jr z,$5652
-  I(0x564c, 2); alu_cp(gb, 0x11);  // cp $11
-  if (!(F & FZ)) { I(0x564e, 3); goto L_5663; } I(0x564e, 2);  // jr nz,$5663
-  I(0x5650, 2); C = 0xe0;  // ld c,$e0
-L_5652:
-  I(0x5652, 4); A = mem_rd(gb, 0xc69e);  // ld a,($c69e)
-  I(0x5655, 1); alu_and(gb, C);  // and c
-  CALL(0x5656, getNumSetBits_hook, 0x0176, 0x5659);  // call $0176
-  I(0x5659, 4); mem_wr(gb, 0xcbb8, A);  // ld ($cbb8),a
-  I(0x565c, 2); alu_cp(gb, 0x02);  // cp $02
-  I(0x565e, 2); A = 0x02;  // ld a,$02
-  if (!(F & FC)) { I(0x5660, 4); goto L_5606; } I(0x5660, 3);  // jp nc,$5606
-L_5663:
-  CALL(0x5663, inventoryMenuState1__equipItem, 0x5679, 0x5666);  // call $5679
-  CALL(0x5666, inventorySubscreen0_drawStoredItems, 0x5b5a, 0x5669);  // call $5b5a
-  CALL(0x5669, inventorySubscreen0_drawCursor, 0x595e, 0x566c);  // call $595e
-  I(0x566c, 2); A = 0x56;  // ld a,$56
-  CALL(0x566e, playSound_b00_hook, 0x0c98, 0x5671);  // call $0c98
-  I(0x5671, 2); A = 0x01;  // ld a,$01
-  CALL(0x5673, inventoryMenuState1__func_02_5606, 0x5606, 0x5676);  // call $5606
-  I(0x5676, 4); func_02_55b2(gb); return;  // jp $55b2
-}
-
-// 02:5634
-void inventoryMenuState1__aOrB(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_5634;
-L_5606:
-  I(0x5606, 3); SET_HL(0xcbcd);  // ld hl,$cbcd
-  I(0x5609, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x560a, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  RET(0x560c); return;  // ret
-L_5634:
-  I(0x5634, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
-  I(0x5637, 4); A = mem_rd(gb, 0xcbd0);  // ld a,($cbd0)
-  I(0x563a, 3); SET_HL(0xc68a);  // ld hl,$c68a
-  RST_PUSH(0x563d, 0x563e);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x563e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x563f, 4); mem_wr(gb, 0xcbb7, A);  // ld ($cbb7),a
-  I(0x5642, 2); C = 0x1f;  // ld c,$1f
-  I(0x5644, 2); alu_cp(gb, 0x19);  // cp $19
-  if ((F & FZ)) { I(0x5646, 3); goto L_5652; } I(0x5646, 2);  // jr z,$5652
-  I(0x5648, 2); alu_cp(gb, 0x0f);  // cp $0f
-  if ((F & FZ)) { I(0x564a, 3); goto L_5652; } I(0x564a, 2);  // jr z,$5652
-  I(0x564c, 2); alu_cp(gb, 0x11);  // cp $11
-  if (!(F & FZ)) { I(0x564e, 3); goto L_5663; } I(0x564e, 2);  // jr nz,$5663
-  I(0x5650, 2); C = 0xe0;  // ld c,$e0
-L_5652:
-  I(0x5652, 4); A = mem_rd(gb, 0xc69e);  // ld a,($c69e)
-  I(0x5655, 1); alu_and(gb, C);  // and c
-  CALL(0x5656, getNumSetBits_hook, 0x0176, 0x5659);  // call $0176
-  I(0x5659, 4); mem_wr(gb, 0xcbb8, A);  // ld ($cbb8),a
-  I(0x565c, 2); alu_cp(gb, 0x02);  // cp $02
-  I(0x565e, 2); A = 0x02;  // ld a,$02
-  if (!(F & FC)) { I(0x5660, 4); goto L_5606; } I(0x5660, 3);  // jp nc,$5606
-L_5663:
-  CALL(0x5663, inventoryMenuState1__equipItem, 0x5679, 0x5666);  // call $5679
-  CALL(0x5666, inventorySubscreen0_drawStoredItems, 0x5b5a, 0x5669);  // call $5b5a
-  CALL(0x5669, inventorySubscreen0_drawCursor, 0x595e, 0x566c);  // call $595e
-  I(0x566c, 2); A = 0x56;  // ld a,$56
-  CALL(0x566e, playSound_b00_hook, 0x0c98, 0x5671);  // call $0c98
-  I(0x5671, 2); A = 0x01;  // ld a,$01
-  CALL(0x5673, inventoryMenuState1__func_02_5606, 0x5606, 0x5676);  // call $5606
-  I(0x5676, 4); func_02_55b2(gb); return;  // jp $55b2
-}
-
-// 02:5652
-void inventoryMenuState1__hasSubmenu(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_5652;
-L_5606:
-  I(0x5606, 3); SET_HL(0xcbcd);  // ld hl,$cbcd
-  I(0x5609, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x560a, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  RET(0x560c); return;  // ret
-L_5652:
-  I(0x5652, 4); A = mem_rd(gb, 0xc69e);  // ld a,($c69e)
-  I(0x5655, 1); alu_and(gb, C);  // and c
-  CALL(0x5656, getNumSetBits_hook, 0x0176, 0x5659);  // call $0176
-  I(0x5659, 4); mem_wr(gb, 0xcbb8, A);  // ld ($cbb8),a
-  I(0x565c, 2); alu_cp(gb, 0x02);  // cp $02
-  I(0x565e, 2); A = 0x02;  // ld a,$02
-  if (!(F & FC)) { I(0x5660, 4); goto L_5606; } I(0x5660, 3);  // jp nc,$5606
-L_5663:
-  CALL(0x5663, inventoryMenuState1__equipItem, 0x5679, 0x5666);  // call $5679
-  CALL(0x5666, inventorySubscreen0_drawStoredItems, 0x5b5a, 0x5669);  // call $5b5a
-  CALL(0x5669, inventorySubscreen0_drawCursor, 0x595e, 0x566c);  // call $595e
-  I(0x566c, 2); A = 0x56;  // ld a,$56
-  CALL(0x566e, playSound_b00_hook, 0x0c98, 0x5671);  // call $0c98
-  I(0x5671, 2); A = 0x01;  // ld a,$01
-  CALL(0x5673, inventoryMenuState1__func_02_5606, 0x5606, 0x5676);  // call $5606
-  I(0x5676, 4); func_02_55b2(gb); return;  // jp $55b2
-}
-
-// 02:5663
-void inventoryMenuState1__finalizeEquip(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5663:
-  CALL(0x5663, inventoryMenuState1__equipItem, 0x5679, 0x5666);  // call $5679
-  CALL(0x5666, inventorySubscreen0_drawStoredItems, 0x5b5a, 0x5669);  // call $5b5a
-  CALL(0x5669, inventorySubscreen0_drawCursor, 0x595e, 0x566c);  // call $595e
-  I(0x566c, 2); A = 0x56;  // ld a,$56
-  CALL(0x566e, playSound_b00_hook, 0x0c98, 0x5671);  // call $0c98
-  I(0x5671, 2); A = 0x01;  // ld a,$01
-  CALL(0x5673, inventoryMenuState1__func_02_5606, 0x5606, 0x5676);  // call $5606
-  I(0x5676, 4); func_02_55b2(gb); return;  // jp $55b2
-}
-
-// 02:5679
-void inventoryMenuState1__equipItem(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5679:
-  I(0x5679, 2); D = 0xc6;  // ld d,$c6
-  I(0x567b, 1); H = D;  // ld h,d
-  I(0x567c, 4); A = mem_rd(gb, 0xcbb6);  // ld a,($cbb6)
-  I(0x567f, 1); E = A;  // ld e,a
-  I(0x5680, 4); A = mem_rd(gb, 0xcbd0);  // ld a,($cbd0)
-  I(0x5683, 2); alu_add(gb, 0x8a);  // add $8a
-  I(0x5685, 1); L = A;  // ld l,a
-  I(0x5686, 2); B = 0x0c;  // ld b,$0c
-  I(0x5688, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5689, 1); alu_cp(gb, B);  // cp b
-  if ((F & FZ)) { I(0x568a, 3); goto L_569f; } I(0x568a, 2);  // jr z,$569f
-  I(0x568c, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x568d, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FZ)) { I(0x568e, 3); goto L_5699; } I(0x568e, 2);  // jr nz,$5699
-L_5690:
-  I(0x5690, 1); C = L;  // ld c,l
-  I(0x5691, 2); L = 0x88;  // ld l,$88
-  I(0x5693, 1); alu_xor(gb, A);  // xor a
-  I(0x5694, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x5695, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5696, 1); L = C;  // ld l,c
-  I(0x5697, 1); A = B;  // ld a,b
-  I(0x5698, 2); mem_wr(gb, DE, A);  // ld (de),a
-L_5699:
-  I(0x5699, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x569a, 1); C = A;  // ld c,a
-  I(0x569b, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x569c, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x569d, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  RET(0x569e); return;  // ret
-L_569f:
-  I(0x569f, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x56a1, inventoryMenuState1__equipItem__swapItems, 0x5699, 0x56a4);  // call $5699
-  I(0x56a4, 4); A = mem_rd(gb, 0xc688);  // ld a,($c688)
-  CALL(0x56a7, inventoryMenuState1__equipItem__putItemInFirstBlankSlot, 0x56b6, 0x56aa);  // call $56b6
-  I(0x56aa, 4); A = mem_rd(gb, 0xc689);  // ld a,($c689)
-  CALL(0x56ad, inventoryMenuState1__equipItem__putItemInFirstBlankSlot, 0x56b6, 0x56b0);  // call $56b6
-  I(0x56b0, 2); L = 0x88;  // ld l,$88
-  I(0x56b2, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x56b3, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x56b4, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  RET(0x56b5); return;  // ret
-}
-
-// 02:5690
-void inventoryMenuState1__equipItem__unequipBiggoron(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5690:
-  I(0x5690, 1); C = L;  // ld c,l
-  I(0x5691, 2); L = 0x88;  // ld l,$88
-  I(0x5693, 1); alu_xor(gb, A);  // xor a
-  I(0x5694, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x5695, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5696, 1); L = C;  // ld l,c
-  I(0x5697, 1); A = B;  // ld a,b
-  I(0x5698, 2); mem_wr(gb, DE, A);  // ld (de),a
-L_5699:
-  I(0x5699, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x569a, 1); C = A;  // ld c,a
-  I(0x569b, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x569c, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x569d, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  RET(0x569e); return;  // ret
-}
-
-// 02:5699
-void inventoryMenuState1__equipItem__swapItems(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5699:
-  I(0x5699, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x569a, 1); C = A;  // ld c,a
-  I(0x569b, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x569c, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x569d, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  RET(0x569e); return;  // ret
-}
-
-// 02:569f
-void inventoryMenuState1__equipItem__equipBiggoron(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_569f:
-  I(0x569f, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL(0x56a1, inventoryMenuState1__equipItem__swapItems, 0x5699, 0x56a4);  // call $5699
-  I(0x56a4, 4); A = mem_rd(gb, 0xc688);  // ld a,($c688)
-  CALL(0x56a7, inventoryMenuState1__equipItem__putItemInFirstBlankSlot, 0x56b6, 0x56aa);  // call $56b6
-  I(0x56aa, 4); A = mem_rd(gb, 0xc689);  // ld a,($c689)
-  CALL(0x56ad, inventoryMenuState1__equipItem__putItemInFirstBlankSlot, 0x56b6, 0x56b0);  // call $56b6
-  I(0x56b0, 2); L = 0x88;  // ld l,$88
-  I(0x56b2, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x56b3, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x56b4, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  RET(0x56b5); return;  // ret
-}
-
-// 02:56b6
-void inventoryMenuState1__equipItem__putItemInFirstBlankSlot(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_56b6:
-  I(0x56b6, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x56b7); return; } I(0x56b7, 2);  // ret z
-  I(0x56b8, 1); C = A;  // ld c,a
-  I(0x56b9, 2); L = 0x8a;  // ld l,$8a
-L_56bb:
-  I(0x56bb, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x56bc, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x56bd, 3); goto L_56bb; } I(0x56bd, 2);  // jr nz,$56bb
-  I(0x56bf, 1); L = alu_dec8(gb, L);  // dec l
-  I(0x56c0, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  RET(0x56c1); return;  // ret
-}
-
-// 02:56c2
-void inventoryMenuState1__subscreen1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_56c2:
-  I(0x56c2, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x56c5, 2); alu_bit(gb, 0, A);  // bit 0,a
-  if (!(F & FZ)) { I(0x56c7, 3); goto L_56ce; } I(0x56c7, 2);  // jr nz,$56ce
-  CALL(0x56c9, inventorySubmenu1CheckDirectionButtons, 0x58aa, 0x56cc);  // call $58aa
-  I(0x56cc, 3); goto L_56d1;  // jr $56d1
-L_56ce:
-  CALL(0x56ce, inventoryMenuState1__checkEquipRing, 0x56dd, 0x56d1);  // call $56dd
-L_56d1:
-  CALL(0x56d1, inventorySubmenu1_drawCursor, 0x5982, 0x56d4);  // call $5982
-  I(0x56d4, 4); A = mem_rd(gb, 0xcbd1);  // ld a,($cbd1)
-  CALL(0x56d7, showItemText1, 0x5538, 0x56da);  // call $5538
-  I(0x56da, 4); drawEquippedSpriteForActiveRing(gb); return;  // jp $5b2e
-}
-
-// 02:56dd
-void inventoryMenuState1__checkEquipRing(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_56dd:
-  I(0x56dd, 4); A = mem_rd(gb, 0xcbd1);  // ld a,($cbd1)
-  I(0x56e0, 2); alu_sub(gb, 0x10);  // sub $10
-  if ((F & FC)) { RET_TAKEN(0x56e2); return; } I(0x56e2, 2);  // ret c
-  I(0x56e3, 3); SET_HL(0xc6cb);  // ld hl,$c6cb
-  I(0x56e6, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  I(0x56e7, 2); L = 0xc6;  // ld l,$c6
-  RST_PUSH(0x56e9, 0x56ea);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x56ea, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x56eb, 1); alu_cp(gb, C);  // cp c
-  if (!(F & FZ)) { I(0x56ec, 3); goto L_56f3; } I(0x56ec, 2);  // jr nz,$56f3
-  I(0x56ee, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { RET_TAKEN(0x56f0); return; } I(0x56f0, 2);  // ret z
-  I(0x56f1, 2); A = 0xff;  // ld a,$ff
-L_56f3:
-  I(0x56f3, 4); mem_wr(gb, 0xc6cb, A);  // ld ($c6cb),a
-  I(0x56f6, 2); A = 0x56;  // ld a,$56
-  I(0x56f8, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
-}
-
-// 02:56fb
-void inventoryMenuState1__subscreen2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_56fb:
-  I(0x56fb, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
-  I(0x56fe, 2); alu_and(gb, 0x01);  // and $01
-  if ((F & FZ)) { I(0x5700, 3); goto L_5720; } I(0x5700, 2);  // jr z,$5720
-  I(0x5702, 4); A = mem_rd(gb, 0xcbd2);  // ld a,($cbd2)
-  I(0x5705, 1); alu_rlca(gb);  // rlca
-  if (!(F & FC)) { I(0x5706, 3); goto L_5720; } I(0x5706, 2);  // jr nc,$5720
-  I(0x5708, 4); A = mem_rd(gb, 0xcbb9);  // ld a,($cbb9)
-  I(0x570b, 2); alu_cp(gb, 0x02);  // cp $02
-  if (!(F & FZ)) { I(0x570d, 3); goto L_5720; } I(0x570d, 2);  // jr nz,$5720
-  I(0x570f, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5710, 4); mem_wr(gb, 0xcbcb, A);  // ld ($cbcb),a
-  I(0x5713, 2); A = 0x56;  // ld a,$56
-  CALL(0x5715, playSound_b00_hook, 0x0c98, 0x5718);  // call $0c98
-  I(0x5718, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
-  I(0x571b, 2); B = 0x10;  // ld b,$10
-  I(0x571d, 4); if (hook_enabled_at(0x046f)) { clearMemory_hook(gb); return; } HANDOFF(0x046f);  // jp $046f
-L_5720:
-  CALL(0x5720, inventorySubmenu2CheckDirectionButtons, 0x5908, 0x5723);  // call $5908
-  I(0x5723, 4); A = mem_rd(gb, 0xcbd2);  // ld a,($cbd2)
-  I(0x5726, 2); alu_bit(gb, 7, A);  // bit 7,a
-  if ((F & FZ)) { I(0x5728, 3); goto L_572f; } I(0x5728, 2);  // jr z,$572f
-  I(0x572a, 4); A = mem_rd(gb, 0xcbb9);  // ld a,($cbb9)
-  I(0x572d, 2); alu_add(gb, 0x08);  // add $08
-L_572f:
-  CALL(0x572f, showItemText1, 0x5538, 0x5732);  // call $5538
-  I(0x5732, 4); inventorySubmenu2_drawCursor(gb); return;  // jp $59eb
-}
-
 // 02:5827
 void inventoryMenuState3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_5827;
-L_5606:
-  I(0x5606, 3); SET_HL(0xcbcd);  // ld hl,$cbcd
-  I(0x5609, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x560a, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  RET(0x560c); return;  // ret
-L_5827:
   I(0x5827, 4); A = mem_rd(gb, 0xcbce);  // ld a,($cbce)
   RST_PUSH(0x582a, 0x582b);  // rst $00 (jump table)
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
@@ -6544,7 +5889,7 @@ L_583b:
   I(0x583c, 4); A = mem_rd(gb, 0xcbba);  // ld a,($cbba)
   I(0x583f, 2); alu_xor(gb, 0x01);  // xor $01
   I(0x5841, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  CALL(0x5844, func_02_55b2, 0x55b2, 0x5847);  // call $55b2
+  CALL(0x5844, func_02_55b2_hook, 0x55b2, 0x5847);  // call $55b2
   I(0x5847, 2); A = 0x9f;  // ld a,$9f
   I(0x5849, 4); mem_wr(gb, 0xc48f, A);  // ld ($c48f),a
   I(0x584c, 3); SET_HL(0xcbce);  // ld hl,$cbce
@@ -6574,18 +5919,12 @@ L_586d:
   I(0x5879, 2); alu_xor(gb, 0x48);  // xor $48
   I(0x587b, 4); mem_wr(gb, 0xc48b, A);  // ld ($c48b),a
   I(0x587e, 2); A = 0x01;  // ld a,$01
-  I(0x5880, 4); goto L_5606;  // jp $5606
+  I(0x5880, 4); if (hook_enabled_at(0x5606)) { inventoryMenuState1__func_02_5606_hook(gb); return; } HANDOFF(0x5606);  // jp $5606
 }
 
 // 02:5831
 void inventoryMenuState3__subState0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_5831;
-L_5606:
-  I(0x5606, 3); SET_HL(0xcbcd);  // ld hl,$cbcd
-  I(0x5609, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x560a, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  RET(0x560c); return;  // ret
 L_5831:
   I(0x5831, 3); SET_HL(0xcbcf);  // ld hl,$cbcf
   I(0x5834, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -6598,7 +5937,7 @@ L_583b:
   I(0x583c, 4); A = mem_rd(gb, 0xcbba);  // ld a,($cbba)
   I(0x583f, 2); alu_xor(gb, 0x01);  // xor $01
   I(0x5841, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  CALL(0x5844, func_02_55b2, 0x55b2, 0x5847);  // call $55b2
+  CALL(0x5844, func_02_55b2_hook, 0x55b2, 0x5847);  // call $55b2
   I(0x5847, 2); A = 0x9f;  // ld a,$9f
   I(0x5849, 4); mem_wr(gb, 0xc48f, A);  // ld ($c48f),a
   I(0x584c, 3); SET_HL(0xcbce);  // ld hl,$cbce
@@ -6628,18 +5967,12 @@ L_586d:
   I(0x5879, 2); alu_xor(gb, 0x48);  // xor $48
   I(0x587b, 4); mem_wr(gb, 0xc48b, A);  // ld ($c48b),a
   I(0x587e, 2); A = 0x01;  // ld a,$01
-  I(0x5880, 4); goto L_5606;  // jp $5606
+  I(0x5880, 4); if (hook_enabled_at(0x5606)) { inventoryMenuState1__func_02_5606_hook(gb); return; } HANDOFF(0x5606);  // jp $5606
 }
 
 // 02:5855
 void inventoryMenuState3__subState1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_5855;
-L_5606:
-  I(0x5606, 3); SET_HL(0xcbcd);  // ld hl,$cbcd
-  I(0x5609, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x560a, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  RET(0x560c); return;  // ret
 L_5855:
   I(0x5855, 3); SET_BC(0x070c);  // ld bc,$070c
   I(0x5858, 4); A = mem_rd(gb, 0xc48f);  // ld a,($c48f)
@@ -6663,18 +5996,12 @@ L_586d:
   I(0x5879, 2); alu_xor(gb, 0x48);  // xor $48
   I(0x587b, 4); mem_wr(gb, 0xc48b, A);  // ld ($c48b),a
   I(0x587e, 2); A = 0x01;  // ld a,$01
-  I(0x5880, 4); goto L_5606;  // jp $5606
+  I(0x5880, 4); if (hook_enabled_at(0x5606)) { inventoryMenuState1__func_02_5606_hook(gb); return; } HANDOFF(0x5606);  // jp $5606
 }
 
 // 02:586d
 void inventoryMenuState3__subState2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_586d;
-L_5606:
-  I(0x5606, 3); SET_HL(0xcbcd);  // ld hl,$cbcd
-  I(0x5609, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x560a, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  RET(0x560c); return;  // ret
 L_586d:
   I(0x586d, 2); A = 0xc7;  // ld a,$c7
   I(0x586f, 4); mem_wr(gb, 0xc48f, A);  // ld ($c48f),a
@@ -6684,7 +6011,7 @@ L_586d:
   I(0x5879, 2); alu_xor(gb, 0x48);  // xor $48
   I(0x587b, 4); mem_wr(gb, 0xc48b, A);  // ld ($c48b),a
   I(0x587e, 2); A = 0x01;  // ld a,$01
-  I(0x5880, 4); goto L_5606;  // jp $5606
+  I(0x5880, 4); if (hook_enabled_at(0x5606)) { inventoryMenuState1__func_02_5606_hook(gb); return; } HANDOFF(0x5606);  // jp $5606
 }
 
 // 02:58aa
@@ -8242,7 +7569,7 @@ void ringMenu_copyTilemapToVram(GB *gb) {
 void ringMenu_redrawRingListOrUnappraisedRings(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x6da8, 1); alu_xor(gb, A);  // xor a
-  CALL(0x6da9, showItemText2, 0x553d, 0x6dac);  // call $553d
+  CALL(0x6da9, showItemText2_hook, 0x553d, 0x6dac);  // call $553d
   I(0x6dac, 3); SET_HL(0x6d99);  // ld hl,$6d99
   PUSH(0x6daf, HL);  // push hl
   I(0x6db0, 4); A = mem_rd(gb, 0xcbd3);  // ld a,($cbd3)
@@ -8725,7 +8052,7 @@ L_6fd7:
   I(0x6fd7, 3); SET_HL(0xcbbb);  // ld hl,$cbbb
   I(0x6fda, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
   if ((F & FZ)) { I(0x6fdb, 3); goto L_6fe6; } I(0x6fdb, 2);  // jr z,$6fe6
-  CALL(0x6fdd, showItemText2, 0x553d, 0x6fe0);  // call $553d
+  CALL(0x6fdd, showItemText2_hook, 0x553d, 0x6fe0);  // call $553d
   I(0x6fe0, 2); A = 0x01;  // ld a,$01
   I(0x6fe2, 4); mem_wr(gb, 0xcbc1, A);  // ld ($cbc1),a
   RET(0x6fe5); return;  // ret
@@ -10904,16 +10231,6 @@ void inventoryMenuState2(GB *gb) {
 // 02:573b
 void inventoryMenuState2__subStates(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_573b;
-L_5663:
-  CALL(0x5663, inventoryMenuState1__equipItem, 0x5679, 0x5666);  // call $5679
-  CALL(0x5666, inventorySubscreen0_drawStoredItems, 0x5b5a, 0x5669);  // call $5b5a
-  CALL(0x5669, inventorySubscreen0_drawCursor, 0x595e, 0x566c);  // call $595e
-  I(0x566c, 2); A = 0x56;  // ld a,$56
-  CALL(0x566e, playSound_b00_hook, 0x0c98, 0x5671);  // call $0c98
-  I(0x5671, 2); A = 0x01;  // ld a,$01
-  CALL(0x5673, inventoryMenuState1__func_02_5606, 0x5606, 0x5676);  // call $5606
-  I(0x5676, 4); func_02_55b2(gb); return;  // jp $55b2
 L_573b:
   I(0x573b, 4); A = mem_rd(gb, 0xcbce);  // ld a,($cbce)
   RST_PUSH(0x573e, 0x573f);  // rst $00 (jump table)
@@ -10977,7 +10294,7 @@ L_578a:
   I(0x5799, 3); SET_HL(0xcbce);  // ld hl,$cbce
   I(0x579c, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
 L_579d:
-  I(0x579d, 4); func_02_55a8(gb); return;  // jp $55a8
+  I(0x579d, 4); if (hook_enabled_at(0x55a8)) { func_02_55a8_hook(gb); return; } HANDOFF(0x55a8);  // jp $55a8
 L_57a0:
   I(0x57a0, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x57a3, 2); alu_and(gb, 0x0b);  // and $0b
@@ -11004,7 +10321,7 @@ L_57bb:
   I(0x57ca, 2); A = 0x05;  // ld a,$05
 L_57cc:
   I(0x57cc, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  CALL(0x57cd, showItemText2, 0x553d, 0x57d0);  // call $553d
+  CALL(0x57cd, showItemText2_hook, 0x553d, 0x57d0);  // call $553d
   I(0x57d0, 4); func_02_5a35(gb); return;  // jp $5a35
 L_57d3:
   CALL(0x57d3, cpInventorySelectedItemToHarp, 0x5af6, 0x57d6);  // call $5af6
@@ -11024,7 +10341,7 @@ L_57e7:
 L_57ed:
   I(0x57ed, 2); D = 0xc6;  // ld d,$c6
   I(0x57ef, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x57f0, 4); goto L_5663;  // jp $5663
+  I(0x57f0, 4); if (hook_enabled_at(0x5663)) { inventoryMenuState1__finalizeEquip_hook(gb); return; } HANDOFF(0x5663);  // jp $5663
 }
 
 // 02:5745
@@ -11086,7 +10403,7 @@ L_578a:
   I(0x5799, 3); SET_HL(0xcbce);  // ld hl,$cbce
   I(0x579c, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
 L_579d:
-  I(0x579d, 4); func_02_55a8(gb); return;  // jp $55a8
+  I(0x579d, 4); if (hook_enabled_at(0x55a8)) { func_02_55a8_hook(gb); return; } HANDOFF(0x55a8);  // jp $55a8
 }
 
 // 02:578a
@@ -11103,22 +10420,12 @@ L_578a:
   I(0x5799, 3); SET_HL(0xcbce);  // ld hl,$cbce
   I(0x579c, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
 L_579d:
-  I(0x579d, 4); func_02_55a8(gb); return;  // jp $55a8
+  I(0x579d, 4); if (hook_enabled_at(0x55a8)) { func_02_55a8_hook(gb); return; } HANDOFF(0x55a8);  // jp $55a8
 }
 
 // 02:57a0
 void inventoryMenuState2__subState2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_57a0;
-L_5663:
-  CALL(0x5663, inventoryMenuState1__equipItem, 0x5679, 0x5666);  // call $5679
-  CALL(0x5666, inventorySubscreen0_drawStoredItems, 0x5b5a, 0x5669);  // call $5b5a
-  CALL(0x5669, inventorySubscreen0_drawCursor, 0x595e, 0x566c);  // call $595e
-  I(0x566c, 2); A = 0x56;  // ld a,$56
-  CALL(0x566e, playSound_b00_hook, 0x0c98, 0x5671);  // call $0c98
-  I(0x5671, 2); A = 0x01;  // ld a,$01
-  CALL(0x5673, inventoryMenuState1__func_02_5606, 0x5606, 0x5676);  // call $5606
-  I(0x5676, 4); func_02_55b2(gb); return;  // jp $55b2
 L_57a0:
   I(0x57a0, 4); A = mem_rd(gb, 0xc482);  // ld a,($c482)
   I(0x57a3, 2); alu_and(gb, 0x0b);  // and $0b
@@ -11145,7 +10452,7 @@ L_57bb:
   I(0x57ca, 2); A = 0x05;  // ld a,$05
 L_57cc:
   I(0x57cc, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  CALL(0x57cd, showItemText2, 0x553d, 0x57d0);  // call $553d
+  CALL(0x57cd, showItemText2_hook, 0x553d, 0x57d0);  // call $553d
   I(0x57d0, 4); func_02_5a35(gb); return;  // jp $5a35
 L_57d3:
   CALL(0x57d3, cpInventorySelectedItemToHarp, 0x5af6, 0x57d6);  // call $5af6
@@ -11165,22 +10472,12 @@ L_57e7:
 L_57ed:
   I(0x57ed, 2); D = 0xc6;  // ld d,$c6
   I(0x57ef, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x57f0, 4); goto L_5663;  // jp $5663
+  I(0x57f0, 4); if (hook_enabled_at(0x5663)) { inventoryMenuState1__finalizeEquip_hook(gb); return; } HANDOFF(0x5663);  // jp $5663
 }
 
 // 02:57d3
 void inventoryMenuState2__buttonPressed(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_57d3;
-L_5663:
-  CALL(0x5663, inventoryMenuState1__equipItem, 0x5679, 0x5666);  // call $5679
-  CALL(0x5666, inventorySubscreen0_drawStoredItems, 0x5b5a, 0x5669);  // call $5b5a
-  CALL(0x5669, inventorySubscreen0_drawCursor, 0x595e, 0x566c);  // call $595e
-  I(0x566c, 2); A = 0x56;  // ld a,$56
-  CALL(0x566e, playSound_b00_hook, 0x0c98, 0x5671);  // call $0c98
-  I(0x5671, 2); A = 0x01;  // ld a,$01
-  CALL(0x5673, inventoryMenuState1__func_02_5606, 0x5606, 0x5676);  // call $5606
-  I(0x5676, 4); func_02_55b2(gb); return;  // jp $55b2
 L_57d3:
   CALL(0x57d3, cpInventorySelectedItemToHarp, 0x5af6, 0x57d6);  // call $5af6
   if (!(F & FZ)) { I(0x57d6, 3); goto L_57e0; } I(0x57d6, 2);  // jr nz,$57e0
@@ -11199,7 +10496,7 @@ L_57e7:
 L_57ed:
   I(0x57ed, 2); D = 0xc6;  // ld d,$c6
   I(0x57ef, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x57f0, 4); goto L_5663;  // jp $5663
+  I(0x57f0, 4); if (hook_enabled_at(0x5663)) { inventoryMenuState1__finalizeEquip_hook(gb); return; } HANDOFF(0x5663);  // jp $5663
 }
 
 // 02:57f3

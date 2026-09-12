@@ -646,3 +646,14 @@ desync to discover; keep them when porting routines.
   selected and is scanning interactions, so the correct expression is `SET_HL(wInteractionSlots)`
   followed by the still-real `ld l,$40` effect. Review symbols semantically as well as numerically,
   especially when a later instruction replaces one byte of a 16-bit address.
+- A branch to a shared static tail must still execute every physical instruction at that tail.
+  Batch 96's two taken branches in `showItemText2` called `showTextOnInventoryMenu_hook` directly,
+  skipping the real `jp $1860` at `$5563`; registers matched but verification reported the C path
+  four cycles short. Route every predecessor through one shared C label that burns the tail's
+  `CYC(0x5563, 0x5566)` before entering the known target.
+- Promoting a former local call target to a global hook can remove an interpreter boundary that
+  matters to interrupt timing. Batch 96's `runInventoryMenu` used `CALL_C` after `$552c` became a
+  global readable entry; routine verification stayed clean because it suppresses interrupts, but
+  the full replay diverged at frame 32,040. `HOOK_SKIP` showed that forcing the helper back through
+  the interpreter preserved the pending-interrupt opportunity, so the call at `$5520` deliberately
+  remains `CALL_ROM(0x5520, 0x552c)` even though the target is readable.
