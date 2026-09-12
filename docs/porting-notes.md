@@ -673,3 +673,9 @@ desync to discover; keep them when porting routines.
   which is what notices the grand-caller return and unwinds the abandoned C caller. Keep this call
   as `CALL_C`; reserve the deliberate `CALL_ROM` exception for the former local boundaries whose
   interrupt visibility was proven by replay.
+- A caller-escaping `pop af; ret` changes registers as well as control flow. Batch 100 initially
+  called `pop_effect` only to discard the immediate caller's return address before returning to
+  the grand-caller. The ROM actually loads that word into AF, so A and every flag must change even
+  though the value's control purpose is to abandon a frame. Independent stack review caught this
+  before the gate. Translate the instruction as `SET_AF(pop_effect(gb))`, then execute the real
+  `ret_effect`; never discard a popped register pair just because it also happens to be an address.

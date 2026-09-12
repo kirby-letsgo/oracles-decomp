@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,106 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,132 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -211,6 +211,14 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-12: milestone 3 phase 5 batch 100 (26 routines): completed bank 2's ring-menu
+  rendering and selection helpers, including cursor sprites, equipped-ring markers, ring-box and
+  list drawing, page counters, displayed text, and all eight independently hookable local paths.
+  Six sprite/table labels left the executable registry. Review removed a duplicate RST `$18`
+  return push and restored AF on the text helper's deliberate caller escape. Two independent
+  final reviews approved the corrected stack, timing, data boundaries, and caller retargets.
+  Gates: lint 0, 30k verify 0 mismatches across 4,688,896 calls, full replay state
+  `64bddd0dfe384126`, normal and quirk suites 8/8.
 - 2026-09-12: milestone 3 phase 5 batch 99 (24 routines): bank 2's ring-list selection and
   scrolling core, including ring text and descriptions, ring-box insertion/search, page changes,
   both scroll directions, and list-cursor movement. Twelve local entries received stable aliases;

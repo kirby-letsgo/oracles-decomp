@@ -246,6 +246,32 @@ void ringMenu_state2__scrollRight_hook(GB *gb);
 void ringMenu_state2__doneScrolling_hook(GB *gb);
 void ringMenu_checkRingListCursorMoved_hook(GB *gb);
 void ringMenu_checkRingListCursorMoved__playSound_hook(GB *gb);
+void ringMenu_checkRingBoxCursorMoved_hook(GB *gb);
+void ringMenu_drawSprites_hook(GB *gb);
+void ringMenu_drawEquippedRingSprite_hook(GB *gb);
+void ringMenu_getSpriteOffsetForRingBoxPosition_hook(GB *gb);
+void ringMenu_drawRingBoxCursor_hook(GB *gb);
+void ringMenu_drawSpritesForRingsInBox_hook(GB *gb);
+void ringMenu_drawSpritesForRingsInBox__loop_hook(GB *gb);
+void ringMenu_drawSpritesForRingsInBox__nextRing_hook(GB *gb);
+void ringMenu_calculateNumPagesForUnappraisedRings_hook(GB *gb);
+void ringMenu_updateSelectedRingFromList_hook(GB *gb);
+void ringMenu_clearRingSelectionArea_hook(GB *gb);
+void ringMenu_drawUnappraisedRings_hook(GB *gb);
+void ringMenu_drawUnappraisedRings__nextRing_hook(GB *gb);
+void ringMenu_drawRingList_hook(GB *gb);
+void ringMenu_drawRingList__nextRing_hook(GB *gb);
+void ringMenu_drawPageCounter_hook(GB *gb);
+void ringMenu_drawRingBoxContents_hook(GB *gb);
+void ringMenu_drawRingBoxContents__nextRing_hook(GB *gb);
+void ringMenu_drawRingBoxContents__drawRing_hook(GB *gb);
+void ringMenu_drawRing_hook(GB *gb);
+void ringMenu_updateDisplayedRingNumber_hook(GB *gb);
+void ringMenu_updateDisplayedRingNumberWithGivenComparator_hook(GB *gb);
+void ringMenu_updateDisplayedRingNumberWithGivenComparator__noRing_hook(GB *gb);
+void ringMenu_updateDisplayedRingNumberWithGivenComparator__drawNumber_hook(GB *gb);
+void ringMenu_setDisplayedText_hook(GB *gb);
+void ringMenu_retIfTextIsPrinting_hook(GB *gb);
 
 static uint16_t function_caller_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -4248,7 +4274,7 @@ void ringMenu_state0_hook(GB *gb) {
   CYC(0x6d78, 0x6d7b); SET_HL(0x466f);
   CYC(0x6d7b, 0x6d7d); E = 0x3f;
   CALL_C(0x6d7d, interBankCall_hook, 0x008a, 0x6d80);
-  CALL_C(0x6d80, ringMenu_calculateNumPagesForUnappraisedRings, 0x7223, 0x6d83);
+  CALL_C(0x6d80, ringMenu_calculateNumPagesForUnappraisedRings_hook, 0x7223, 0x6d83);
   CALL_C(0x6d83, ringMenu_redrawRingListOrUnappraisedRings_hook, 0x6da8, 0x6d86);
   CYC(0x6d86, 0x6d89); SET_HL(wMenuActiveState);
   CYC(0x6d89, 0x6d8a); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
@@ -4299,12 +4325,12 @@ void ringMenu_drawRingBox_hook(GB *gb) {
   } else {
     CYCT(0x6dbc, 0x6dbe);
   }
-  CALL_C(0x6dcd, ringMenu_drawRingBoxContents, 0x7297, 0x6dd0);
+  CALL_C(0x6dcd, ringMenu_drawRingBoxContents_hook, 0x7297, 0x6dd0);
   CYC(0x6dd0, 0x6dd2); A = 0x04;
   CYC(0x6dd2, 0x6dd5); W8(wRingMenu_numPages) = A;
   CYC(0x6dd5, 0x6dd7); A = 0xfe;
   CYC(0x6dd7, 0x6dda); W8(wRingMenu_displayedRingNumberComparator) = A;
-  CYC(0x6dda, 0x6ddd); ringMenu_drawRingList(gb);
+  CYC(0x6dda, 0x6ddd); ringMenu_drawRingList_hook(gb);
 }
 
 void ringMenu_state1_hook(GB *gb) {
@@ -4323,7 +4349,7 @@ void ringMenu_state1_hook(GB *gb) {
 
 void ringMenu_state1_unappraisedRings_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6dea, ringMenu_drawSprites, 0x7175, 0x6ded);
+  CALL_C(0x6dea, ringMenu_drawSprites_hook, 0x7175, 0x6ded);
   CYC(0x6ded, 0x6df0); A = W8(wSubmenuState);
   CYC(0x6df0, 0x6df1); push_effect(gb, 0x6df1);
   switch (function_caller_jump_table(gb)) {
@@ -4342,7 +4368,7 @@ void ringMenu_unappraisedRings_state0_hook(GB *gb) {
   CYC(0x6dfd, 0x6e00); A = W8(wTextIsActive);
   CYC(0x6e00, 0x6e01); alu_or(gb, A);
   CYC(0x6e01, 0x6e03); A = 0x04;
-  if (F & FZ) CALL_C_CC(0x6e03, ringMenu_setDisplayedText, 0x735d, 0x6e06);
+  if (F & FZ) CALL_C_CC(0x6e03, ringMenu_setDisplayedText_hook, 0x735d, 0x6e06);
   else CYC(0x6e03, 0x6e06);
   CYC(0x6e06, 0x6e09); A = W8(wKeysJustPressed);
   CYC(0x6e09, 0x6e0b); alu_bit(gb, 1, A);
@@ -4361,14 +4387,14 @@ void ringMenu_unappraisedRings_state0__bPressed_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(0x6e19, ringMenu_checkObtainedRingBox_hook, 0x6f29, 0x6e1c);
   CYC(0x6e1c, 0x6e1e); A = 0x12;
-  if (F & FZ) { CYCT(0x6e1e, 0x6e21); ringMenu_setDisplayedText(gb); return; }
+  if (F & FZ) { CYCT(0x6e1e, 0x6e21); ringMenu_setDisplayedText_hook(gb); return; }
   CYC(0x6e1e, 0x6e21);
   CYC(0x6e21, 0x6e24); closeMenu_hook(gb);
 }
 
 void ringMenu_unappraisedRings_state0__aPressed_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6e24, ringMenu_updateSelectedRingFromList, 0x723b, 0x6e27);
+  CALL_C(0x6e24, ringMenu_updateSelectedRingFromList_hook, 0x723b, 0x6e27);
   CALL_C(0x6e27, ringMenu_getUnappraisedRingIndex_hook, 0x6f2e, 0x6e2a);
   CYC(0x6e2a, 0x6e2b); alu_rlca(gb);
   if (F & FC) { CYCT(0x6e2b, 0x6e2c); ret_effect(gb); return; }
@@ -4379,12 +4405,12 @@ void ringMenu_unappraisedRings_state0__aPressed_hook(GB *gb) {
   CYC(0x6e34, 0x6e36); A = 0x11;
   if (F & FZ) CYCT(0x6e36, 0x6e38);
   else { CYC(0x6e36, 0x6e38); CYC(0x6e38, 0x6e3a); A = 0x05; }
-  CYC(0x6e3a, 0x6e3d); ringMenu_setDisplayedText(gb);
+  CYC(0x6e3a, 0x6e3d); ringMenu_setDisplayedText_hook(gb);
 }
 
 void ringMenu_unappraisedRings_state1_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6e3d, ringMenu_retIfTextIsPrinting, 0x7373, 0x6e40);
+  CALL_C(0x6e3d, ringMenu_retIfTextIsPrinting_hook, 0x7373, 0x6e40);
   CYC(0x6e40, 0x6e43); A = W8(wSelectedTextOption);
   CYC(0x6e43, 0x6e44); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(0x6e44, 0x6e46); ringMenu_state1_restart_hook(gb); return; }
@@ -4413,7 +4439,7 @@ void ringMenu_unappraisedRings_state1_hook(GB *gb) {
   CALL_C(0x6e71, ringMenu_showExitableText_hook, 0x6f13, 0x6e74);
   CYC(0x6e74, 0x6e76); A = 0x02;
   CYC(0x6e76, 0x6e79); W8(wSubmenuState) = A;
-  CALL_C(0x6e79, ringMenu_drawUnappraisedRings, 0x7255, 0x6e7c);
+  CALL_C(0x6e79, ringMenu_drawUnappraisedRings_hook, 0x7255, 0x6e7c);
   CYC(0x6e7c, 0x6e7f); ringMenu_copyTilemapToVram_hook(gb);
 }
 
@@ -4426,7 +4452,7 @@ void ringMenu_state1_restart_hook(GB *gb) {
 
 void ringMenu_unappraisedRings_state2_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6e87, ringMenu_retIfTextIsPrinting, 0x7373, 0x6e8a);
+  CALL_C(0x6e87, ringMenu_retIfTextIsPrinting_hook, 0x7373, 0x6e8a);
   CYC(0x6e8a, 0x6e8c); A = 0x03;
   CYC(0x6e8c, 0x6e8f); W8(wSubmenuState) = A;
   CALL_C(0x6e8f, ringMenu_getUnappraisedRingIndex_hook, 0x6f2e, 0x6e92);
@@ -4438,7 +4464,7 @@ void ringMenu_unappraisedRings_state2_hook(GB *gb) {
 
 void ringMenu_unappraisedRings_state3_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6e99, ringMenu_retIfTextIsPrinting, 0x7373, 0x6e9c);
+  CALL_C(0x6e99, ringMenu_retIfTextIsPrinting_hook, 0x7373, 0x6e9c);
   CALL_C(0x6e9c, ringMenu_getUnappraisedRingIndex_hook, 0x6f2e, 0x6e9f);
   CYC(0x6e9f, 0x6ea0); C = A;
   CYC(0x6ea0, 0x6ea2); mem_wr(gb, HL, 0xff);
@@ -4462,7 +4488,7 @@ finish:
   CYC(0x6ec5, 0x6ec7); A = 0x04;
   CYC(0x6ec7, 0x6eca); W8(wSubmenuState) = A;
   CYC(0x6eca, 0x6ecb); A = B;
-  CYC(0x6ecb, 0x6ece); ringMenu_setDisplayedText(gb);
+  CYC(0x6ecb, 0x6ece); ringMenu_setDisplayedText_hook(gb);
 }
 
 void ringMenu_unappraisedRings_state3__refund_hook(GB *gb) {
@@ -4478,12 +4504,12 @@ void ringMenu_unappraisedRings_state3__refund_hook(GB *gb) {
   CYC(0x6ec5, 0x6ec7); A = 0x04;
   CYC(0x6ec7, 0x6eca); W8(wSubmenuState) = A;
   CYC(0x6eca, 0x6ecb); A = B;
-  CYC(0x6ecb, 0x6ece); ringMenu_setDisplayedText(gb);
+  CYC(0x6ecb, 0x6ece); ringMenu_setDisplayedText_hook(gb);
 }
 
 void ringMenu_unappraisedRings_state4_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6ece, ringMenu_retIfTextIsPrinting, 0x7373, 0x6ed1);
+  CALL_C(0x6ece, ringMenu_retIfTextIsPrinting_hook, 0x7373, 0x6ed1);
   CALL_C(0x6ed1, ringMenu_retIfCounterNotFinished_hook, 0x6f37, 0x6ed4);
   CYC(0x6ed4, 0x6ed7); A = W8(wRingMenu_rupeeRefundValue);
   CYC(0x6ed7, 0x6ed8); alu_or(gb, A);
@@ -4494,7 +4520,7 @@ void ringMenu_unappraisedRings_state4_hook(GB *gb) {
   CYC(0x6ede, 0x6ee1); SET_HL(0x4697);
   CYC(0x6ee1, 0x6ee3); E = 0x3f;
   CALL_C(0x6ee3, interBankCall_hook, 0x008a, 0x6ee6);
-  CALL_C(0x6ee6, ringMenu_drawUnappraisedRings, 0x7255, 0x6ee9);
+  CALL_C(0x6ee6, ringMenu_drawUnappraisedRings_hook, 0x7255, 0x6ee9);
   CALL_C(0x6ee9, ringMenu_copyTilemapToVram_hook, 0x6d99, 0x6eec);
   CYC(0x6eec, 0x6eef); A = W8(wNumRingsAppraised);
   CYC(0x6eef, 0x6ef1); alu_cp(gb, 100);
@@ -4521,7 +4547,7 @@ void ringMenu_unappraisedRings_gotoState5_hook(GB *gb) {
   CYC(0x6f0a, 0x6f0c); A = 0x3c;
   CYC(0x6f0c, 0x6f0f); W8(wRingMenu_textDelayCounter2) = A;
   CYC(0x6f0f, 0x6f10); A = B;
-  CYC(0x6f10, 0x6f13); ringMenu_setDisplayedText(gb);
+  CYC(0x6f10, 0x6f13); ringMenu_setDisplayedText_hook(gb);
 }
 
 void ringMenu_showExitableText_hook(GB *gb) {
@@ -4534,7 +4560,7 @@ void ringMenu_showExitableText_hook(GB *gb) {
 
 void ringMenu_unappraisedRings_state5_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6f20, ringMenu_retIfTextIsPrinting, 0x7373, 0x6f23);
+  CALL_C(0x6f20, ringMenu_retIfTextIsPrinting_hook, 0x7373, 0x6f23);
   CALL_C(0x6f23, ringMenu_retIfCounterNotFinished_hook, 0x6f37, 0x6f26);
   CYC(0x6f26, 0x6f29); closeMenu_hook(gb);
 }
@@ -4828,9 +4854,9 @@ void secretListMenu_getSecretData_hook(GB *gb) {
 
 void ringMenu_state1_ringList_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6f40, ringMenu_drawRingBoxCursor, 0x71d1, 0x6f43);
-  CALL_C(0x6f43, ringMenu_drawEquippedRingSprite, 0x71ac, 0x6f46);
-  CALL_C(0x6f46, ringMenu_drawSpritesForRingsInBox, 0x71ef, 0x6f49);
+  CALL_C(0x6f40, ringMenu_drawRingBoxCursor_hook, 0x71d1, 0x6f43);
+  CALL_C(0x6f43, ringMenu_drawEquippedRingSprite_hook, 0x71ac, 0x6f46);
+  CALL_C(0x6f46, ringMenu_drawSpritesForRingsInBox_hook, 0x71ef, 0x6f49);
   CYC(0x6f49, 0x6f4c); A = W8(wSubmenuState);
   CYC(0x6f4c, 0x6f4d); push_effect(gb, 0x6f4d);
   switch (function_caller_jump_table(gb)) {
@@ -4860,7 +4886,7 @@ display_ring_text:
   CYC(0x6f67, 0x6f68); push_effect(gb, 0x6f68); add_a_to_hl(gb);
   CYC(0x6f68, 0x6f69); A = mem_rd(gb, HL);
   CYC(0x6f69, 0x6f6c); W8(wRingMenu_selectedRing) = A;
-  CALL_C(0x6f6c, ringMenu_updateDisplayedRingNumberWithGivenComparator, 0x733d, 0x6f6f);
+  CALL_C(0x6f6c, ringMenu_updateDisplayedRingNumberWithGivenComparator_hook, 0x733d, 0x6f6f);
   CALL_C(0x6f6f, ringMenu_updateRingText_hook, 0x6fc8, 0x6f72);
   ringMenu_ringList_substate0__checkInput_hook(gb);
 }
@@ -4871,7 +4897,7 @@ void ringMenu_ringList_substate0__checkInput_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(0x6f77, 0x6f79); ringMenu_ringList_substate0__bPressed_hook(gb); return; }
   CYC(0x6f77, 0x6f79);
   CYC(0x6f79, 0x6f7b); alu_bit(gb, 0, A);
-  if (F & FZ) { CYCT(0x6f7b, 0x6f7e); ringMenu_checkRingBoxCursorMoved(gb); return; }
+  if (F & FZ) { CYCT(0x6f7b, 0x6f7e); ringMenu_checkRingBoxCursorMoved_hook(gb); return; }
   CYC(0x6f7b, 0x6f7e);
   ringMenu_ringList_substate0__aPressed_hook(gb);
 }
@@ -4916,9 +4942,9 @@ void ringMenu_ringList_substate1_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(0x6fb6, 0x6fb9); ringMenu_initiateScrollRight_hook(gb); return; }
   CYC(0x6fb6, 0x6fb9);
   CALL_C(0x6fb9, ringMenu_checkRingListCursorMoved_hook, 0x711e, 0x6fbc);
-  CALL_C(0x6fbc, ringMenu_updateSelectedRingFromList, 0x723b, 0x6fbf);
-  CALL_C(0x6fbf, ringMenu_updateDisplayedRingNumber, 0x733a, 0x6fc2);
-  CALL_C(0x6fc2, ringMenu_drawSprites, 0x7175, 0x6fc5);
+  CALL_C(0x6fbc, ringMenu_updateSelectedRingFromList_hook, 0x723b, 0x6fbf);
+  CALL_C(0x6fbf, ringMenu_updateDisplayedRingNumber_hook, 0x733a, 0x6fc2);
+  CALL_C(0x6fc2, ringMenu_drawSprites_hook, 0x7175, 0x6fc5);
   CALL_C(0x6fc5, ringMenu_retIfCounterNotFinished_hook, 0x6f37, 0x6fc8);
   ringMenu_updateRingText_hook(gb);
 }
@@ -4980,7 +5006,7 @@ void ringMenu_selectedRingFromList_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x7014, 0x7016); A = 0x56;
   CALL_C(0x7016, playSound_b00_hook, 0x0c98, 0x7019);
-  CALL_C(0x7019, ringMenu_updateSelectedRingFromList, 0x723b, 0x701c);
+  CALL_C(0x7019, ringMenu_updateSelectedRingFromList_hook, 0x723b, 0x701c);
   CYC(0x701c, 0x701d); C = A;
   CYC(0x701d, 0x7020); SET_HL(wRingsObtained);
   CALL_C(0x7020, checkFlag_hook, 0x0205, 0x7023);
@@ -5016,7 +5042,7 @@ void ringMenu_moveCursorToRingBox_hook(GB *gb) {
   CYC(0x7047, 0x704a); W8(wTextIsActive) = A;
   CYC(0x704a, 0x704d); W8(wRingMenu_ringNameTextIndex) = A;
   CYC(0x704d, 0x7050); W8(wRingMenu_descriptionTextIndex) = A;
-  CALL_C(0x7050, ringMenu_drawRingBoxContents, 0x7297, 0x7053);
+  CALL_C(0x7050, ringMenu_drawRingBoxContents_hook, 0x7297, 0x7053);
   CYC(0x7053, 0x7056); ringMenu_copyTilemapToVram_hook(gb);
 }
 
@@ -5094,8 +5120,8 @@ void ringMenu_state2_hook(GB *gb) {
   CYC(0x709c, 0x709d); alu_or(gb, A);
   if (F & FZ) { CYCT(0x709d, 0x709f); goto dispatch; }
   CYC(0x709d, 0x709f);
-  CALL_C(0x709f, ringMenu_drawRingBoxCursor, 0x71d1, 0x70a2);
-  CALL_C(0x70a2, ringMenu_drawEquippedRingSprite, 0x71ac, 0x70a5);
+  CALL_C(0x709f, ringMenu_drawRingBoxCursor_hook, 0x71d1, 0x70a2);
+  CALL_C(0x70a2, ringMenu_drawEquippedRingSprite_hook, 0x71ac, 0x70a5);
 dispatch:
   CYC(0x70a5, 0x70a8); A = W8(wSubmenuState);
   CYC(0x70a8, 0x70a9); push_effect(gb, 0x70a9);
@@ -5234,4 +5260,366 @@ void ringMenu_checkRingListCursorMoved__playSound_hook(GB *gb) {
   CALL_C(0x7150, playSound_b00_hook, 0x0c98, 0x7153);
   CYC(0x7153, 0x7154); alu_scf(gb);
   CYC(0x7154, 0x7155); ret_effect(gb);
+}
+
+void ringMenu_checkRingBoxCursorMoved_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7159, getRingBoxCapacity, 0x5cf5, 0x715c);
+  CYC(0x715c, 0x715d); E = A;
+  CYC(0x715d, 0x7160); SET_HL(0x7171);
+  CALL_C(0x7160, getDirectionButtonOffsetFromHl, 0x5883, 0x7163);
+  if (!(F & FC)) { CYCT(0x7163, 0x7164); ret_effect(gb); return; }
+  CYC(0x7163, 0x7164);
+  if (F & FZ) { CYCT(0x7164, 0x7165); ret_effect(gb); return; }
+  CYC(0x7164, 0x7165);
+  CYC(0x7165, 0x7168); SET_HL(wRingMenu_ringBoxCursorIndex);
+  CYC(0x7168, 0x7169); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x7169, 0x716a); alu_cp(gb, E);
+  if (!(F & FC)) { CYCT(0x716a, 0x716b); ret_effect(gb); return; }
+  CYC(0x716a, 0x716b);
+  CYC(0x716b, 0x716c); mem_wr(gb, HL, A);
+  CYC(0x716c, 0x716e); A = 0x84;
+  CYC(0x716e, 0x7171); playSound_b00_hook(gb);
+}
+
+void ringMenu_drawSprites_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7175, 0x7178); A = W8(wRingMenu_numPages);
+  CYC(0x7178, 0x7179); A = alu_dec8(gb, A);
+  CYC(0x7179, 0x717c); SET_HL(0x71a3);
+  if (!(F & FZ)) CALL_C_CC(0x717c, addSpritesToOam_hook, 0x0d5e, 0x717f);
+  else CYC(0x717c, 0x717f);
+  CYC(0x717f, 0x7182); SET_HL(wRingMenu_listCursorFlickerCounter);
+  CYC(0x7182, 0x7183); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x7183, 0x7185); alu_bit(gb, 3, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(0x7185, 0x7186); ret_effect(gb); return; }
+  CYC(0x7185, 0x7186);
+  CYC(0x7186, 0x7189); SET_BC(0x3e20);
+  CYC(0x7189, 0x718c); A = W8(wRingMenu_ringListCursorIndex);
+  CYC(0x718c, 0x718e); alu_cp(gb, 0x08);
+  if (F & FC) { CYCT(0x718e, 0x7190); goto position_cursor; }
+  CYC(0x718e, 0x7190);
+  CYC(0x7190, 0x7192); B = 0x56;
+position_cursor:
+  CYC(0x7192, 0x7194); alu_and(gb, 0x07);
+  CYC(0x7194, 0x7196); A = alu_swap(gb, A);
+  CYC(0x7196, 0x7197); alu_add(gb, C);
+  CYC(0x7197, 0x7198); C = A;
+  CYC(0x7198, 0x719b); SET_HL(0x719e);
+  CYC(0x719b, 0x719e); addSpritesToOam_withOffset_hook(gb);
+}
+
+void ringMenu_drawEquippedRingSprite_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x71ac, 0x71af); A = W8(wActiveRing);
+  CYC(0x71af, 0x71b1); alu_cp(gb, 0xff);
+  if (F & FZ) { CYCT(0x71b1, 0x71b2); ret_effect(gb); return; }
+  CYC(0x71b1, 0x71b2);
+  CALL_C(0x71b2, ringMenu_checkRingIsInBox_hook, 0x7056, 0x71b5);
+  if (F & FC) { CYCT(0x71b5, 0x71b6); ret_effect(gb); return; }
+  CYC(0x71b5, 0x71b6);
+  CALL_C(0x71b6, ringMenu_getSpriteOffsetForRingBoxPosition_hook, 0x71c4, 0x71b9);
+  CYC(0x71b9, 0x71bc); SET_HL(0x71bf);
+  CYC(0x71bc, 0x71bf); addSpritesToOam_withOffset_hook(gb);
+}
+
+void ringMenu_getSpriteOffsetForRingBoxPosition_hook(GB *gb) {
+  CYC(0x71c4, 0x71c7); SET_HL(0x71cc);
+  CYC(0x71c7, 0x71c8); push_effect(gb, 0x71c8); add_a_to_hl(gb);
+  CYC(0x71c8, 0x71c9); C = mem_rd(gb, HL);
+  CYC(0x71c9, 0x71cb); B = 0;
+  CYC(0x71cb, 0x71cc); ret_effect(gb);
+}
+
+void ringMenu_drawRingBoxCursor_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x71d1, 0x71d4); SET_HL(wRingMenu_boxCursorFlickerCounter);
+  CYC(0x71d4, 0x71d6); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(0x71d6, 0x71d8); goto draw_cursor; }
+  CYC(0x71d6, 0x71d8);
+  CYC(0x71d8, 0x71d9); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x71d9, 0x71db); mem_wr(gb, HL, mem_rd(gb, HL) & ~0x10);
+  CYC(0x71db, 0x71dd); alu_bit(gb, 3, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(0x71dd, 0x71de); ret_effect(gb); return; }
+  CYC(0x71dd, 0x71de);
+draw_cursor:
+  CYC(0x71de, 0x71e1); A = W8(wRingMenu_ringBoxCursorIndex);
+  CALL_C(0x71e1, ringMenu_getSpriteOffsetForRingBoxPosition_hook, 0x71c4, 0x71e4);
+  CYC(0x71e4, 0x71e7); SET_HL(0x71ea);
+  CYC(0x71e7, 0x71ea); addSpritesToOam_withOffset_hook(gb);
+}
+
+void ringMenu_drawSpritesForRingsInBox_hook(GB *gb) {
+  CYC(0x71ef, 0x71f1); A = 0x05;
+  ringMenu_drawSpritesForRingsInBox__loop_hook(gb);
+}
+
+void ringMenu_drawSpritesForRingsInBox__loop_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  for (;;) {
+    CYC(0x71f1, 0x71f2); push_effect(gb, AF);
+    CYC(0x71f2, 0x71f5); SET_HL(wRingBoxContents - 1);
+    CYC(0x71f5, 0x71f6); push_effect(gb, 0x71f6); add_a_to_hl(gb);
+    CYC(0x71f6, 0x71f9); A = W8(wRingMenu_page);
+    CYC(0x71f9, 0x71fb); A = alu_swap(gb, A);
+    CYC(0x71fb, 0x71fc); C = A;
+    CYC(0x71fc, 0x71fd); A = mem_rd(gb, HL);
+    CYC(0x71fd, 0x71ff); alu_cp(gb, 0xff);
+    if (F & FZ) { CYCT(0x71ff, 0x7201); ringMenu_drawSpritesForRingsInBox__nextRing_hook(gb); return; }
+    CYC(0x71ff, 0x7201);
+    CYC(0x7201, 0x7202); alu_sub(gb, C);
+    CYC(0x7202, 0x7204); alu_cp(gb, 0x10);
+    if (!(F & FC)) { CYCT(0x7204, 0x7206); ringMenu_drawSpritesForRingsInBox__nextRing_hook(gb); return; }
+    CYC(0x7204, 0x7206);
+    CYC(0x7206, 0x7208); B = 0x30;
+    CYC(0x7208, 0x720a); alu_bit(gb, 3, A);
+    if (F & FZ) { CYCT(0x720a, 0x720c); goto draw_sprite; }
+    CYC(0x720a, 0x720c);
+    CYC(0x720c, 0x720e); B = 0x48;
+draw_sprite:
+    CYC(0x720e, 0x7210); alu_and(gb, 0x07);
+    CYC(0x7210, 0x7212); A = alu_swap(gb, A);
+    CYC(0x7212, 0x7213); C = A;
+    CYC(0x7213, 0x7216); SET_HL(0x721e);
+    CALL_C(0x7216, addSpritesToOam_withOffset_hook, 0x0d61, 0x7219);
+    CYC(0x7219, 0x721a); SET_AF(pop_effect(gb));
+    CYC(0x721a, 0x721b); A = alu_dec8(gb, A);
+    if (!(F & FZ)) { CYCT(0x721b, 0x721d); continue; }
+    CYC(0x721b, 0x721d);
+    CYC(0x721d, 0x721e); ret_effect(gb);
+    return;
+  }
+}
+
+void ringMenu_drawSpritesForRingsInBox__nextRing_hook(GB *gb) {
+  CYC(0x7219, 0x721a); SET_AF(pop_effect(gb));
+  CYC(0x721a, 0x721b); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(0x721b, 0x721d); ringMenu_drawSpritesForRingsInBox__loop_hook(gb); return; }
+  CYC(0x721b, 0x721d);
+  CYC(0x721d, 0x721e); ret_effect(gb);
+}
+
+void ringMenu_calculateNumPagesForUnappraisedRings_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7223, 0x7226); SET_HL(0x4697);
+  CYC(0x7226, 0x7228); E = 0x3f;
+  CALL_C(0x7228, interBankCall_hook, 0x008a, 0x722b);
+  CYC(0x722b, 0x722e); A = W8(wNumUnappraisedRingsBcd);
+  CYC(0x722e, 0x722f); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x722f, 0x7230); ret_effect(gb); return; }
+  CYC(0x722f, 0x7230);
+  CYC(0x7230, 0x7231); A = B;
+  CYC(0x7231, 0x7232); A = alu_dec8(gb, A);
+  CYC(0x7232, 0x7234); A = alu_swap(gb, A);
+  CYC(0x7234, 0x7236); alu_and(gb, 0x0f);
+  CYC(0x7236, 0x7237); A = alu_inc8(gb, A);
+  CYC(0x7237, 0x723a); W8(wRingMenu_numPages) = A;
+  CYC(0x723a, 0x723b); ret_effect(gb);
+}
+
+void ringMenu_updateSelectedRingFromList_hook(GB *gb) {
+  CYC(0x723b, 0x723e); A = W8(wRingMenu_page);
+  CYC(0x723e, 0x7240); A = alu_swap(gb, A);
+  CYC(0x7240, 0x7241); C = A;
+  CYC(0x7241, 0x7244); A = W8(wRingMenu_ringListCursorIndex);
+  CYC(0x7244, 0x7245); alu_add(gb, C);
+  CYC(0x7245, 0x7248); W8(wRingMenu_selectedRing) = A;
+  CYC(0x7248, 0x7249); ret_effect(gb);
+}
+
+void ringMenu_clearRingSelectionArea_hook(GB *gb) {
+  CYC(0x7249, 0x724c); SET_HL(w4TileMap + 0x040);
+  CYC(0x724c, 0x724f); SET_BC(0x0514);
+  CYC(0x724f, 0x7252); SET_DE(0x0007);
+  CYC(0x7252, 0x7255); fillRectangleInTilemap(gb);
+}
+
+void ringMenu_drawUnappraisedRings_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7255, ringMenu_clearRingSelectionArea_hook, 0x7249, 0x7258);
+  CYC(0x7258, 0x725a); B = 0x10;
+  CYC(0x725a, 0x725d); A = W8(wRingMenu_page);
+  CYC(0x725d, 0x725f); A = alu_swap(gb, A);
+  CYC(0x725f, 0x7262); SET_HL(wUnappraisedRings);
+  CYC(0x7262, 0x7263); push_effect(gb, 0x7263); add_a_to_hl(gb);
+  ringMenu_drawUnappraisedRings__nextRing_hook(gb);
+}
+
+void ringMenu_drawUnappraisedRings__nextRing_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  for (;;) {
+    CYC(0x7263, 0x7264); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x7264, 0x7265); C = A;
+    CALL_C(0x7265, ringMenu_drawRing_hook, 0x72c3, 0x7268);
+    CYC(0x7268, 0x7269); B = alu_dec8(gb, B);
+    if (!(F & FZ)) { CYCT(0x7269, 0x726b); continue; }
+    CYC(0x7269, 0x726b);
+    CYC(0x726b, 0x726d); ringMenu_drawPageCounter_hook(gb);
+    return;
+  }
+}
+
+void ringMenu_drawRingList_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x726d, ringMenu_clearRingSelectionArea_hook, 0x7249, 0x7270);
+  CYC(0x7270, 0x7272); B = 0x10;
+  CYC(0x7272, 0x7275); A = W8(wRingMenu_page);
+  CYC(0x7275, 0x7277); A = alu_swap(gb, A);
+  CYC(0x7277, 0x7278); C = A;
+  ringMenu_drawRingList__nextRing_hook(gb);
+}
+
+void ringMenu_drawRingList__nextRing_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  for (;;) {
+    CYC(0x7278, 0x7279); A = C;
+    CYC(0x7279, 0x727c); SET_HL(wRingsObtained);
+    CALL_C(0x727c, checkFlag_hook, 0x0205, 0x727f);
+    if (!(F & FZ)) CALL_C_CC(0x727f, ringMenu_drawRing_hook, 0x72c3, 0x7282);
+    else CYC(0x727f, 0x7282);
+    CYC(0x7282, 0x7283); C = alu_inc8(gb, C);
+    CYC(0x7283, 0x7284); B = alu_dec8(gb, B);
+    if (!(F & FZ)) { CYCT(0x7284, 0x7286); continue; }
+    CYC(0x7284, 0x7286);
+    ringMenu_drawPageCounter_hook(gb);
+    return;
+  }
+}
+
+void ringMenu_drawPageCounter_hook(GB *gb) {
+  CYC(0x7286, 0x7289); SET_HL(w4TileMap + 0x10f);
+  CYC(0x7289, 0x728c); A = W8(wRingMenu_page);
+  CYC(0x728c, 0x728e); alu_add(gb, 0x11);
+  CYC(0x728e, 0x728f); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x728f, 0x7290); L = alu_inc8(gb, L);
+  CYC(0x7290, 0x7293); A = W8(wRingMenu_numPages);
+  CYC(0x7293, 0x7295); alu_add(gb, 0x10);
+  CYC(0x7295, 0x7296); mem_wr(gb, HL, A);
+  CYC(0x7296, 0x7297); ret_effect(gb);
+}
+
+void ringMenu_drawRingBoxContents_hook(GB *gb) {
+  CYC(0x7297, 0x729a); SET_HL(wRingBoxContents);
+  CYC(0x729a, 0x729c); B = 0x11;
+  ringMenu_drawRingBoxContents__nextRing_hook(gb);
+}
+
+void ringMenu_drawRingBoxContents__nextRing_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  for (;;) {
+    CYC(0x729c, 0x729d); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x729d, 0x729f); alu_cp(gb, 0xff);
+    if (!(F & FZ)) { CYCT(0x729f, 0x72a1); ringMenu_drawRingBoxContents__drawRing_hook(gb); return; }
+    CYC(0x729f, 0x72a1);
+    CYC(0x72a1, 0x72a2); push_effect(gb, HL);
+    CYC(0x72a2, 0x72a3); push_effect(gb, BC);
+    CYC(0x72a3, 0x72a4); A = B;
+    CYC(0x72a4, 0x72a7); SET_HL(0x72d2);
+    CYC(0x72a7, 0x72a8); add_double_index_to_hl(gb, 0x72a8);
+    CYC(0x72a8, 0x72a9); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x72a9, 0x72aa); H = mem_rd(gb, HL);
+    CYC(0x72aa, 0x72ab); L = A;
+    CYC(0x72ab, 0x72ae); SET_BC(0x0202);
+    CYC(0x72ae, 0x72b1); SET_DE(0x0007);
+    CALL_C(0x72b1, fillRectangleInTilemap, 0x5d08, 0x72b4);
+    CYC(0x72b4, 0x72b5); SET_BC(pop_effect(gb));
+    CYC(0x72b5, 0x72b6); SET_HL(pop_effect(gb));
+    CYC(0x72b6, 0x72b8);
+    CYC(0x72bc, 0x72bd); B = alu_inc8(gb, B);
+    CYC(0x72bd, 0x72be); A = L;
+    CYC(0x72be, 0x72c0); alu_cp(gb, (uint8_t)(wRingBoxContents + 5));
+    if (F & FC) { CYCT(0x72c0, 0x72c2); continue; }
+    CYC(0x72c0, 0x72c2);
+    CYC(0x72c2, 0x72c3); ret_effect(gb);
+    return;
+  }
+}
+
+void ringMenu_drawRingBoxContents__drawRing_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x72b8, 0x72b9); C = A;
+  CALL_C(0x72b9, ringMenu_drawRing_hook, 0x72c3, 0x72bc);
+  CYC(0x72bc, 0x72bd); B = alu_inc8(gb, B);
+  CYC(0x72bd, 0x72be); A = L;
+  CYC(0x72be, 0x72c0); alu_cp(gb, (uint8_t)(wRingBoxContents + 5));
+  if (F & FC) { CYCT(0x72c0, 0x72c2); ringMenu_drawRingBoxContents__nextRing_hook(gb); return; }
+  CYC(0x72c0, 0x72c2);
+  CYC(0x72c2, 0x72c3); ret_effect(gb);
+}
+
+void ringMenu_drawRing_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x72c3, 0x72c4); push_effect(gb, BC);
+  CYC(0x72c4, 0x72c5); push_effect(gb, HL);
+  CYC(0x72c5, 0x72c6); A = B;
+  CYC(0x72c6, 0x72c9); SET_HL(0x72d2);
+  CYC(0x72c9, 0x72ca); add_double_index_to_hl(gb, 0x72ca);
+  CYC(0x72ca, 0x72cb); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x72cb, 0x72cc); D = mem_rd(gb, HL);
+  CYC(0x72cc, 0x72cd); E = A;
+  CYC(0x72cd, 0x72ce); A = C;
+  CALL_C(0x72ce, getRingTiles, 0x72fe, 0x72d1);
+  CYC(0x72d1, 0x72d2); SET_HL(pop_effect(gb));
+  CYC(0x72d2, 0x72d3); SET_BC(pop_effect(gb));
+  CYC(0x72d3, 0x72d4); ret_effect(gb);
+}
+
+void ringMenu_updateDisplayedRingNumber_hook(GB *gb) {
+  CYC(0x733a, 0x733d); A = W8(wRingMenu_ringListCursorIndex);
+  ringMenu_updateDisplayedRingNumberWithGivenComparator_hook(gb);
+}
+
+void ringMenu_updateDisplayedRingNumberWithGivenComparator_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x733d, 0x7340); SET_HL(wRingMenu_displayedRingNumberComparator);
+  CYC(0x7340, 0x7341); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(0x7341, 0x7342); ret_effect(gb); return; }
+  CYC(0x7341, 0x7342);
+  CYC(0x7342, 0x7343); mem_wr(gb, HL, A);
+  CYC(0x7343, 0x7346); A = W8(wRingMenu_selectedRing);
+  CYC(0x7346, 0x7347); A = alu_inc8(gb, A);
+  if (F & FZ) { CYCT(0x7347, 0x7349); ringMenu_updateDisplayedRingNumberWithGivenComparator__noRing_hook(gb); return; }
+  CYC(0x7347, 0x7349);
+  CALL_C(0x7349, hexToDec_hook, 0x0259, 0x734c);
+  CYC(0x734c, 0x734e); A |= 0x10;
+  CYC(0x734e, 0x7350); C |= 0x10;
+  CYC(0x7350, 0x7352);
+  ringMenu_updateDisplayedRingNumberWithGivenComparator__drawNumber_hook(gb);
+}
+
+void ringMenu_updateDisplayedRingNumberWithGivenComparator__noRing_hook(GB *gb) {
+  CYC(0x7352, 0x7354); A = 0xe8;
+  CYC(0x7354, 0x7355); C = A;
+  ringMenu_updateDisplayedRingNumberWithGivenComparator__drawNumber_hook(gb);
+}
+
+void ringMenu_updateDisplayedRingNumberWithGivenComparator__drawNumber_hook(GB *gb) {
+  CYC(0x7355, 0x7358); SET_HL(w4TileMap + 0x105);
+  CYC(0x7358, 0x7359); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x7359, 0x735a); mem_wr(gb, HL, C);
+  CYC(0x735a, 0x735d); ringMenu_copyTilemapToVram_hook(gb);
+}
+
+void ringMenu_setDisplayedText_hook(GB *gb) {
+  CYC(0x735d, 0x7360); SET_HL(wRingMenu_descriptionTextIndex);
+  CYC(0x7360, 0x7361); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(0x7361, 0x7362); ret_effect(gb); return; }
+  CYC(0x7361, 0x7362);
+  CYC(0x7362, 0x7363); mem_wr(gb, HL, A);
+  CYC(0x7363, 0x7364); C = A;
+  CYC(0x7364, 0x7366); B = 0x30;
+  CYC(0x7366, 0x7368); A = 0x02;
+  CYC(0x7368, 0x736b); W8(wTextboxPosition) = A;
+  CYC(0x736b, 0x736d); A = 0x09;
+  CYC(0x736d, 0x7370); W8(wTextboxFlags) = A;
+  CYC(0x7370, 0x7373); showTextNonExitable_hook(gb);
+}
+
+void ringMenu_retIfTextIsPrinting_hook(GB *gb) {
+  CYC(0x7373, 0x7376); A = W8(wTextIsActive);
+  CYC(0x7376, 0x7378); alu_and(gb, 0x7f);
+  if (F & FZ) { CYCT(0x7378, 0x7379); ret_effect(gb); return; }
+  CYC(0x7378, 0x7379);
+  CYC(0x7379, 0x737a); SET_AF(pop_effect(gb));
+  CYC(0x737a, 0x737b); ret_effect(gb);
 }
