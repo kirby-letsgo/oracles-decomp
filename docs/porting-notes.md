@@ -629,3 +629,9 @@ desync to discover; keep them when porting routines.
   at `$4817` also executed the skipped `ld c,$00`; the extra instruction added two cycles and
   changed A. For every conditional branch, audit not only `CYC` versus `CYCT` but which physical
   instructions live on each side of the branch.
+- A conditional branch can preserve every register and still desynchronize the machine by one
+  cycle. Batch 92's `jr z` at `$4117` routed both paths correctly, but assigned `CYC` to the taken
+  zero path and `CYCT` to the fallthrough. The routine-level verifier reported equal registers and
+  59 C cycles versus 60 interpreter cycles on every frame of the transition. Whichever C path
+  follows the jump target must burn `CYCT`; the path that executes the following instruction must
+  burn `CYC`, even when the surrounding C condition is written in the inverse form.

@@ -20,6 +20,17 @@ static void bank1_add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
   pop_effect(gb);
 }
 
+static void bank1_add_double_index_to_hl_from_rst(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0018, 0x0019, false); push_effect(gb, BC);
+  burn_rom(gb, 0x00, 0x0019, 0x001a, false); C = A;
+  burn_rom(gb, 0x00, 0x001a, 0x001c, false); B = 0x00;
+  burn_rom(gb, 0x00, 0x001c, 0x001d, false); alu_add_hl(gb, BC);
+  burn_rom(gb, 0x00, 0x001d, 0x001e, false); alu_add_hl(gb, BC);
+  burn_rom(gb, 0x00, 0x001e, 0x001f, false); SET_BC(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
+}
+
 static void bank1_jump_table_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -110,6 +121,36 @@ void setInteractionsEnabledTo2_hook(GB *gb);
 void setEnemiesEnabledTo2_hook(GB *gb);
 void setPartsEnabledTo2_hook(GB *gb);
 void setObjectsEnabledTo2_hlpr_hook(GB *gb);
+void func_400b_hook(GB *gb);
+void screenTransitionState0_hook(GB *gb);
+void initializeRoomBoundaryAndLoadAnimations_hook(GB *gb);
+void screenTransitionState1_hook(GB *gb);
+void screenTransitionState1__substate0_hook(GB *gb);
+void screenTransitionState1__substate1_hook(GB *gb);
+void screenTransitionState1__substate2_hook(GB *gb);
+void setScreenTransitionState02_hook(GB *gb);
+void screenTransitionState2_hook(GB *gb);
+void screenTransitionState2__transitionUp_hook(GB *gb);
+void screenTransitionState2__transitionDown_hook(GB *gb);
+void screenTransitionState2__transitionLeft_hook(GB *gb);
+void screenTransitionState2__transitionRight_hook(GB *gb);
+void screenTransitionState2__transition_hook(GB *gb);
+void screenTransitionState2__doneBoundaryChecks_hook(GB *gb);
+void screenTransitionState2__startTransition_hook(GB *gb);
+void screenTransitionState2__checkCanTransitionOverWater_hook(GB *gb);
+void screenTransitionState2__fail_hook(GB *gb);
+void updateCameraPosition_hook(GB *gb);
+void updateCameraPosition__smallRoom_hook(GB *gb);
+void updateCameraPosition__largeRoom_hook(GB *gb);
+void updateCameraPosition__updateComponent_hook(GB *gb);
+void updateCameraPosition__smBit7_hook(GB *gb);
+void calculateCameraPosition_hook(GB *gb);
+void updateScreenShake_hook(GB *gb);
+void updateScreenShake__getShakeAmount_hook(GB *gb);
+void updateGfxRegs2Scroll_hook(GB *gb);
+void screenTransitionState3_hook(GB *gb);
+void checkDarkenRoomAndClearPaletteFadeState_hook(GB *gb);
+void checkDarkenRoom_hook(GB *gb);
 
 static void screenTransitionEyePuzzle_up(GB *gb);
 static void screenTransitionEyePuzzle_rightOrLeft(GB *gb);
@@ -2434,4 +2475,584 @@ void setObjectsEnabledTo2_hlpr_hook(GB *gb) {
     CYC(0x4a16, 0x4a17); ret_effect(gb);
     return;
   }
+}
+
+void func_400b_hook(GB *gb) {
+  CYC(0x400b, 0x400e); A = mem_rd(gb, wScreenTransitionState);
+  CYC(0x400e, 0x400f); bank1_jump_table_from_rst(gb, 0x400f);
+  switch (HL) {
+    case 0x401b: screenTransitionState0_hook(gb); return;
+    case 0x4075: screenTransitionState1_hook(gb); return;
+    case 0x4105: screenTransitionState2_hook(gb); return;
+    case 0x42e2: screenTransitionState3_hook(gb); return;
+    case 0x433a: screenTransitionState4(gb); return;
+    case 0x435a: screenTransitionState5(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void screenTransitionState0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x401b, 0x401c); alu_xor(gb, A);
+  CYC(0x401c, 0x401f); mem_wr(gb, wPaletteThread_parameter, A);
+  CALL_C(0x401f, checkDarkenRoom_hook, 0x4311, 0x4022);
+  CYC(0x4022, 0x4024); A = 0x01;
+  CYC(0x4024, 0x4027); mem_wr(gb, wScreenTransitionState, A);
+  initializeRoomBoundaryAndLoadAnimations_hook(gb);
+}
+
+void initializeRoomBoundaryAndLoadAnimations_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4027, setCameraFocusedObjectToLink_hook, 0x12f0, 0x402a);
+  CYC(0x402a, 0x402c); B = 0x01;
+  CYC(0x402c, 0x402f); A = mem_rd(gb, wActiveGroup);
+  CYC(0x402f, 0x4031); alu_and(gb, 0x04);
+  if (F & FZ) CYCT(0x4031, 0x4033);
+  else { CYC(0x4031, 0x4033); CYC(0x4033, 0x4035); B = 0x00; }
+  CYC(0x4035, 0x4036); A = B;
+  CYC(0x4036, 0x4039); mem_wr(gb, wcd01, A);
+  CYC(0x4039, 0x403b); alu_xor(gb, 0x01);
+  CYC(0x403b, 0x403e); mem_wr(gb, wRoomIsLarge, A);
+  CYC(0x403e, 0x4041); A = mem_rd(gb, wcd01);
+  CYC(0x4041, 0x4042); alu_add(gb, A);
+  CYC(0x4042, 0x4045); SET_HL(0x406d);
+  CYC(0x4045, 0x4046); bank1_add_double_index_to_hl_from_rst(gb, 0x4046);
+  CYC(0x4046, 0x4049); SET_DE(wRoomWidth);
+  CYC(0x4049, 0x404b); B = 0x04;
+  do {
+    CYC(0x404b, 0x404c); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x404c, 0x404d); mem_wr(gb, DE, A);
+    CYC(0x404d, 0x404e); SET_DE(DE + 1);
+    CYC(0x404e, 0x404f); B = alu_dec8(gb, B);
+    if (!(F & FZ)) CYCT(0x404f, 0x4051); else CYC(0x404f, 0x4051);
+  } while (!(F & FZ));
+  CYC(0x4051, 0x4054); A = mem_rd(gb, wRoomWidth);
+  CYC(0x4054, 0x4056); alu_sub(gb, 0x14);
+  CYC(0x4056, 0x4057); alu_add(gb, A);
+  CYC(0x4057, 0x4058); alu_add(gb, A);
+  CYC(0x4058, 0x4059); alu_add(gb, A);
+  CYC(0x4059, 0x405c); mem_wr(gb, wMaxCameraY, A);
+  CYC(0x405c, 0x405f); A = mem_rd(gb, wRoomHeight);
+  CYC(0x405f, 0x4061); alu_sub(gb, 0x10);
+  CYC(0x4061, 0x4062); alu_add(gb, A);
+  CYC(0x4062, 0x4063); alu_add(gb, A);
+  CYC(0x4063, 0x4064); alu_add(gb, A);
+  CYC(0x4064, 0x4067); mem_wr(gb, wMaxCameraX, A);
+  CALL_C(0x4067, calculateRoomEdge_hook, 0x5f00, 0x406a);
+  CYC(0x406a, 0x406d); loadTilesetAnimation_hook(gb);
+}
+
+void screen_transition_state1_body_hook(GB *gb) {
+  uint16_t entry = gb->hook_pc;
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  if (entry == 0x4075) {
+    CYC(0x4075, 0x4078); A = mem_rd(gb, wcd03);
+    CYC(0x4078, 0x4079); A = alu_inc8(gb, A);
+    CYC(0x4079, 0x407c); mem_wr(gb, wcd03, A);
+    CYC(0x407c, 0x407f); A = mem_rd(gb, wScreenTransitionState2);
+    CYC(0x407f, 0x4080); bank1_jump_table_from_rst(gb, 0x4080);
+    switch (HL) {
+      case 0x4088: entry = 0x4088; break;
+      case 0x40a1: entry = 0x40a1; break;
+      case 0x40c1: entry = 0x40c1; break;
+      case 0x40f5: setScreenTransitionState02_hook(gb); return;
+      default: hook_handoff(gb, HL); return;
+    }
+  }
+  if (entry == 0x4088) {
+    CYC(0x4088, 0x408b); A = mem_rd(gb, wPaletteThread_mode);
+    CYC(0x408b, 0x408c); alu_or(gb, A);
+    if (!(F & FZ)) { CYCT(0x408c, 0x408d); ret_effect(gb); return; }
+    CYC(0x408c, 0x408d);
+    CYC(0x408d, 0x408f); A = 0x02;
+    CYC(0x408f, 0x4092); mem_wr(gb, wScrollMode, A);
+    CYC(0x4092, 0x4094); A = 0x01;
+    CYC(0x4094, 0x4097); mem_wr(gb, wScreenTransitionState2, A);
+    CYC(0x4097, 0x4098); alu_xor(gb, A);
+    CYC(0x4098, 0x409b); mem_wr(gb, wScreenTransitionState3, A);
+    CYC(0x409b, 0x409e); mem_wr(gb, wcd03, A);
+    CYC(0x409e, 0x40a1); resetCamera_hook(gb); return;
+  }
+  if (entry == 0x40a1) {
+    CYC(0x40a1, 0x40a4); A = mem_rd(gb, wScreenOffsetX);
+    CYC(0x40a4, 0x40a5); B = A;
+    CYC(0x40a5, 0x40a7); A = hram_rd(gb, hCameraX & 0xff);
+    CYC(0x40a7, 0x40a8); alu_add(gb, B);
+    CYC(0x40a8, 0x40aa); alu_add(gb, 0x50);
+    CYC(0x40aa, 0x40ab); alu_rrca(gb);
+    CYC(0x40ab, 0x40ac); alu_rrca(gb);
+    CYC(0x40ac, 0x40ad); alu_rrca(gb);
+    CYC(0x40ad, 0x40ae); A = alu_dec8(gb, A);
+    CYC(0x40ae, 0x40b0); alu_and(gb, 0x1f);
+    CYC(0x40b0, 0x40b3); mem_wr(gb, wScreenScrollRow, A);
+    CYC(0x40b3, 0x40b4); A = alu_inc8(gb, A);
+    CYC(0x40b4, 0x40b7); mem_wr(gb, wScreenScrollDirection, A);
+    CYC(0x40b7, 0x40b8); alu_xor(gb, A);
+    CYC(0x40b8, 0x40bb); mem_wr(gb, wScreenScrollCounter, A);
+    CYC(0x40bb, 0x40bd); A = 0x02;
+    CYC(0x40bd, 0x40c0); mem_wr(gb, wScreenTransitionState2, A);
+    CYC(0x40c0, 0x40c1); ret_effect(gb); return;
+  }
+  CYC(0x40c1, 0x40c4); A = mem_rd(gb, wScreenScrollCounter);
+  CYC(0x40c4, 0x40c6); alu_cp(gb, 0x20);
+  if (F & FZ) { CYCT(0x40c6, 0x40c8); setScreenTransitionState02_hook(gb); return; }
+  CYC(0x40c6, 0x40c8);
+  CYC(0x40c8, 0x40c9); A = alu_inc8(gb, A);
+  CYC(0x40c9, 0x40cc); mem_wr(gb, wScreenScrollCounter, A);
+  CYC(0x40cc, 0x40cf); A = mem_rd(gb, wcd03);
+  CYC(0x40cf, 0x40d0); alu_rrca(gb);
+  if (F & FC) { CYCT(0x40d0, 0x40d2); goto increment_direction; }
+  CYC(0x40d0, 0x40d2);
+  CYC(0x40d2, 0x40d5); A = mem_rd(gb, wScreenScrollRow);
+  CYC(0x40d5, 0x40d7); hram_wr(gb, hFF8B & 0xff, A);
+  CYC(0x40d7, 0x40d8); B = A;
+  CYC(0x40d8, 0x40d9); A = alu_dec8(gb, A);
+  CYC(0x40d9, 0x40db); alu_and(gb, 0x1f);
+  CYC(0x40db, 0x40de); mem_wr(gb, wScreenScrollRow, A);
+  CYC(0x40de, 0x40e0); goto queue_row;
+increment_direction:
+  CYC(0x40e0, 0x40e3); A = mem_rd(gb, wScreenScrollDirection);
+  CYC(0x40e3, 0x40e5); hram_wr(gb, hFF8B & 0xff, A);
+  CYC(0x40e5, 0x40e6); B = A;
+  CYC(0x40e6, 0x40e7); A = alu_inc8(gb, A);
+  CYC(0x40e7, 0x40e9); alu_and(gb, 0x1f);
+  CYC(0x40e9, 0x40ec); mem_wr(gb, wScreenScrollDirection, A);
+queue_row:
+  CYC(0x40ec, 0x40ed); E = B;
+  CALL_C(0x40ed, func_46ca_hook, 0x46ca, 0x40f0);
+  CYC(0x40f0, 0x40f2); A = hram_rd(gb, hFF8B & 0xff);
+  CYC(0x40f2, 0x40f5); addFunctionsToVBlankQueue_hook(gb);
+}
+
+void screenTransitionState1_hook(GB *gb) { gb->hook_pc = 0x4075; screen_transition_state1_body_hook(gb); }
+void screenTransitionState1__substate0_hook(GB *gb) { gb->hook_pc = 0x4088; screen_transition_state1_body_hook(gb); }
+void screenTransitionState1__substate1_hook(GB *gb) { gb->hook_pc = 0x40a1; screen_transition_state1_body_hook(gb); }
+void screenTransitionState1__substate2_hook(GB *gb) { gb->hook_pc = 0x40c1; screen_transition_state1_body_hook(gb); }
+
+void setScreenTransitionState02_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x40f5, setInstrumentsDisabledCounterAndScrollMode_hook, 0x19a2, 0x40f8);
+  CYC(0x40f8, 0x40fa); A = 0x02;
+  CYC(0x40fa, 0x40fd); mem_wr(gb, wScreenTransitionState, A);
+  CYC(0x40fd, 0x40fe); alu_xor(gb, A);
+  CYC(0x40fe, 0x4101); mem_wr(gb, wScreenTransitionState2, A);
+  CYC(0x4101, 0x4104); mem_wr(gb, wScreenTransitionState3, A);
+  CYC(0x4104, 0x4105); ret_effect(gb);
+}
+
+void screen_transition_state2_body_hook(GB *gb) {
+  uint16_t entry = gb->hook_pc;
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  switch (entry) {
+    case 0x413e: goto transition_up;
+    case 0x4149: goto transition_down;
+    case 0x4153: goto transition_left;
+    case 0x415b: goto transition_right;
+    case 0x4160: goto transition;
+    case 0x41be: goto done_boundary_checks;
+    case 0x41d6: goto start_transition;
+  }
+  if (entry == 0x4105) {
+    CYC(0x4105, 0x4108); A = mem_rd(gb, wLinkInAir);
+    CYC(0x4108, 0x4109); alu_add(gb, A);
+    if (F & FC) { CYCT(0x4109, 0x410b); goto check_direction; }
+    CYC(0x4109, 0x410b);
+    if (F & FZ) { CYCT(0x410b, 0x410d); goto check_direction; }
+    CYC(0x410b, 0x410d);
+    CYC(0x410d, 0x410f); A = 0x04;
+    CYC(0x410f, 0x4112); mem_wr(gb, wScreenTransitionDelay, A);
+  }
+check_direction:
+  if (entry == 0x4105) {
+    CYC(0x4112, 0x4115); A = mem_rd(gb, wScreenTransitionDirection);
+    CYC(0x4115, 0x4117); alu_bit(gb, 7, A);
+    if (!(F & FZ)) {
+      CYC(0x4117, 0x4119);
+      CYC(0x4119, 0x411b); alu_and(gb, 0x7f);
+      CYC(0x411b, 0x411c); C = A;
+      CYC(0x411c, 0x411f); goto start_transition;
+    }
+    CYCT(0x4117, 0x4119);
+    CYC(0x411f, 0x4122); A = mem_rd(gb, wLinkObjectIndex);
+    CYC(0x4122, 0x4123); H = A;
+    CYC(0x4123, 0x4125); L = 0x0b;
+    CYC(0x4125, 0x4127); A = 0x05;
+    CYC(0x4127, 0x4128); alu_cp(gb, mem_rd(gb, HL));
+    if (!(F & FC)) { CYCT(0x4128, 0x412a); entry = 0x413e; goto transition_up; }
+    CYC(0x4128, 0x412a);
+    CYC(0x412a, 0x412d); A = mem_rd(gb, wScreenTransitionBoundaryY);
+    CYC(0x412d, 0x412e); alu_cp(gb, mem_rd(gb, HL));
+    if (F & FC) { CYCT(0x412e, 0x4130); entry = 0x4149; goto transition_down; }
+    CYC(0x412e, 0x4130);
+  }
+check_horizontal:
+  CYC(0x4130, 0x4132); L = 0x0d;
+  CYC(0x4132, 0x4134); A = 0x05;
+  CYC(0x4134, 0x4135); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(0x4135, 0x4137); entry = 0x4153; goto transition_left; }
+  CYC(0x4135, 0x4137);
+  CYC(0x4137, 0x413a); A = mem_rd(gb, wScreenTransitionBoundaryX);
+  CYC(0x413a, 0x413b); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) { CYCT(0x413b, 0x413d); entry = 0x415b; goto transition_right; }
+  CYC(0x413b, 0x413d);
+  CYC(0x413d, 0x413e); ret_effect(gb); return;
+transition_up:
+  CYC(0x413e, 0x413f); A = alu_inc8(gb, A);
+  CYC(0x413f, 0x4140); mem_wr(gb, HL, A);
+  CYC(0x4140, 0x4142); B = 0x40;
+  CYC(0x4142, 0x4144); C = 0x00;
+  CALL_C(0x4144, screenTransitionState2__transition_hook, 0x4160, 0x4147);
+  CYC(0x4147, 0x4149); goto check_horizontal;
+transition_down:
+  CYC(0x4149, 0x414a); mem_wr(gb, HL, A);
+  CYC(0x414a, 0x414c); B = 0x80;
+  CYC(0x414c, 0x414e); C = 0x02;
+  CALL_C(0x414e, screenTransitionState2__transition_hook, 0x4160, 0x4151);
+  CYC(0x4151, 0x4153); goto check_horizontal;
+transition_left:
+  CYC(0x4153, 0x4154); A = alu_inc8(gb, A);
+  CYC(0x4154, 0x4155); mem_wr(gb, HL, A);
+  CYC(0x4155, 0x4157); B = 0x20;
+  CYC(0x4157, 0x4159); C = 0x03;
+  CYC(0x4159, 0x415b); goto transition;
+transition_right:
+  CYC(0x415b, 0x415c); mem_wr(gb, HL, A);
+  CYC(0x415c, 0x415e); B = 0x10;
+  CYC(0x415e, 0x4160); C = 0x01;
+transition:
+  CYC(0x4160, 0x4163); A = mem_rd(gb, w1Link_enabled);
+  CYC(0x4163, 0x4164); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x4164, 0x4165); ret_effect(gb); return; }
+  CYC(0x4164, 0x4165);
+  CYC(0x4165, 0x4168); A = mem_rd(gb, wDisableScreenTransitions);
+  CYC(0x4168, 0x4169); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x4169, 0x416a); ret_effect(gb); return; }
+  CYC(0x4169, 0x416a);
+  CYC(0x416a, 0x416d); A = mem_rd(gb, wScreenTransitionDelay);
+  CYC(0x416d, 0x416e); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x416e, 0x4170); goto ready_to_transition; }
+  CYC(0x416e, 0x4170);
+  CYC(0x4170, 0x4171); A = alu_dec8(gb, A);
+  CYC(0x4171, 0x4174); mem_wr(gb, wScreenTransitionDelay, A);
+  CYC(0x4174, 0x4175); ret_effect(gb); return;
+ready_to_transition:
+  CYC(0x4175, 0x4178); A = mem_rd(gb, w1Companion_id);
+  CYC(0x4178, 0x417a); alu_cp(gb, 0x0a);
+  if (F & FZ) { CYCT(0x417a, 0x417c); goto start_transition; }
+  CYC(0x417a, 0x417c);
+  CYC(0x417c, 0x417f); A = mem_rd(gb, wcc92);
+  CYC(0x417f, 0x4180); alu_add(gb, A);
+  if (F & FC) { CYCT(0x4180, 0x4181); ret_effect(gb); return; }
+  CYC(0x4180, 0x4181);
+  CYC(0x4181, 0x4184); A = mem_rd(gb, wLinkInAir);
+  CYC(0x4184, 0x4185); alu_add(gb, A);
+  if (F & FC) { CYCT(0x4185, 0x4187); goto start_transition; }
+  CYC(0x4185, 0x4187);
+  CYC(0x4187, 0x418a); A = mem_rd(gb, w1Link_knockbackCounter);
+  CYC(0x418a, 0x418b); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x418b, 0x418c); ret_effect(gb); return; }
+  CYC(0x418b, 0x418c);
+  CYC(0x418c, 0x418f); A = mem_rd(gb, wcc92);
+  CYC(0x418f, 0x4190); alu_add(gb, A);
+  if (!(F & FZ)) { CYCT(0x4190, 0x4192); goto boundary_checks; }
+  CYC(0x4190, 0x4192);
+  CALL_C(0x4192, convertLinkAngleToDirectionButtons_hook, 0x2a02, 0x4195);
+  CYC(0x4195, 0x4196); alu_and(gb, B);
+  if (F & FZ) { CYCT(0x4196, 0x4197); ret_effect(gb); return; }
+  CYC(0x4196, 0x4197);
+boundary_checks:
+  CYC(0x4197, 0x419a); A = mem_rd(gb, wTilesetFlags);
+  CYC(0x419a, 0x419c); alu_and(gb, 0x01);
+  if (F & FZ) { CYCT(0x419c, 0x419e); goto done_boundary_checks; }
+  CYC(0x419c, 0x419e);
+  CYC(0x419e, 0x41a1); A = mem_rd(gb, wActiveRoom);
+  CYC(0x41a1, 0x41a2); E = A;
+  CYC(0x41a2, 0x41a4); alu_and(gb, 0x0f);
+  CYC(0x41a4, 0x41a6); alu_cp(gb, 0x0d);
+  if (!(F & FZ)) { CYCT(0x41a6, 0x41a8); goto right_boundary; }
+  CYC(0x41a6, 0x41a8);
+  CYC(0x41a8, 0x41a9); A = C;
+  CYC(0x41a9, 0x41ab); alu_cp(gb, 0x01);
+  if (F & FZ) { CYCT(0x41ab, 0x41ac); ret_effect(gb); return; }
+  CYC(0x41ab, 0x41ac);
+right_boundary:
+  CYC(0x41ac, 0x41ad); A = E;
+  CYC(0x41ad, 0x41af); alu_cp(gb, 0xd0);
+  if (F & FC) { CYCT(0x41af, 0x41b1); goto left_boundary; }
+  CYC(0x41af, 0x41b1);
+  CYC(0x41b1, 0x41b2); A = C;
+  CYC(0x41b2, 0x41b4); alu_cp(gb, 0x02);
+  if (F & FZ) { CYCT(0x41b4, 0x41b5); ret_effect(gb); return; }
+  CYC(0x41b4, 0x41b5);
+left_boundary:
+  CYC(0x41b5, 0x41b6); A = E;
+  CYC(0x41b6, 0x41b8); alu_and(gb, 0x0f);
+  if (!(F & FZ)) { CYCT(0x41b8, 0x41ba); goto done_boundary_checks; }
+  CYC(0x41b8, 0x41ba);
+  CYC(0x41ba, 0x41bb); A = C;
+  CYC(0x41bb, 0x41bd); alu_cp(gb, 0x03);
+  if (F & FZ) { CYCT(0x41bd, 0x41be); ret_effect(gb); return; }
+  CYC(0x41bd, 0x41be);
+done_boundary_checks:
+  CYC(0x41be, 0x41c1); A = mem_rd(gb, wTilesetFlags);
+  CYC(0x41c1, 0x41c3); alu_and(gb, 0x40);
+  if (!(F & FZ)) { CYCT(0x41c3, 0x41c5); goto start_transition; }
+  CYC(0x41c3, 0x41c5);
+  CYC(0x41c5, 0x41c8); A = mem_rd(gb, wcc92);
+  CYC(0x41c8, 0x41ca); alu_and(gb, 0x08);
+  if (!(F & FZ)) { CYCT(0x41ca, 0x41cc); goto start_transition; }
+  CYC(0x41ca, 0x41cc);
+  CALL_C(0x41cc, checkLinkIsOverHazard_hook, 0x21f6, 0x41cf);
+  CYC(0x41cf, 0x41d0); alu_rrca(gb);
+  if (F & FC) CALL_C_CC(0x41d0, screenTransitionState2__checkCanTransitionOverWater_hook, 0x41e5, 0x41d3);
+  else CYC(0x41d0, 0x41d3);
+  CYC(0x41d3, 0x41d5); alu_and(gb, 0x03);
+  if (!(F & FZ)) { CYCT(0x41d5, 0x41d6); ret_effect(gb); return; }
+  CYC(0x41d5, 0x41d6);
+start_transition:
+  CYC(0x41d6, 0x41d8); A = 0x04;
+  CYC(0x41d8, 0x41db); mem_wr(gb, wScrollMode, A);
+  CYC(0x41db, 0x41dd); A = 0x03;
+  CYC(0x41dd, 0x41e0); mem_wr(gb, wScreenTransitionState, A);
+  CYC(0x41e0, 0x41e1); A = C;
+  CYC(0x41e1, 0x41e4); mem_wr(gb, wScreenTransitionDirection, A);
+  CYC(0x41e4, 0x41e5); ret_effect(gb); return;
+}
+
+void screenTransitionState2_hook(GB *gb) { gb->hook_pc = 0x4105; screen_transition_state2_body_hook(gb); }
+void screenTransitionState2__transitionUp_hook(GB *gb) { gb->hook_pc = 0x413e; screen_transition_state2_body_hook(gb); }
+void screenTransitionState2__transitionDown_hook(GB *gb) { gb->hook_pc = 0x4149; screen_transition_state2_body_hook(gb); }
+void screenTransitionState2__transitionLeft_hook(GB *gb) { gb->hook_pc = 0x4153; screen_transition_state2_body_hook(gb); }
+void screenTransitionState2__transitionRight_hook(GB *gb) { gb->hook_pc = 0x415b; screen_transition_state2_body_hook(gb); }
+void screenTransitionState2__transition_hook(GB *gb) { gb->hook_pc = 0x4160; screen_transition_state2_body_hook(gb); }
+void screenTransitionState2__doneBoundaryChecks_hook(GB *gb) { gb->hook_pc = 0x41be; screen_transition_state2_body_hook(gb); }
+void screenTransitionState2__startTransition_hook(GB *gb) { gb->hook_pc = 0x41d6; screen_transition_state2_body_hook(gb); }
+
+void screenTransitionState2__checkCanTransitionOverWater_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x41e5, 0x41e8); A = mem_rd(gb, wLinkObjectIndex);
+  CYC(0x41e8, 0x41e9); alu_rrca(gb);
+  if (F & FC) { CYCT(0x41e9, 0x41eb); screenTransitionState2__fail_hook(gb); return; }
+  CYC(0x41e9, 0x41eb);
+  CYC(0x41eb, 0x41ed); A = 0x4a;
+  CALL_C(0x41ed, checkTreasureObtained_hook, 0x1748, 0x41f0);
+  if (F & FC) { CYCT(0x41f0, 0x41f1); ret_effect(gb); return; }
+  CYC(0x41f0, 0x41f1);
+  CYC(0x41f1, 0x41f4); A = mem_rd(gb, wObjectTileIndex);
+  CYC(0x41f4, 0x41f6); alu_cp(gb, 0xfc);
+  if (F & FZ) { CYCT(0x41f6, 0x41f8); screenTransitionState2__fail_hook(gb); return; }
+  CYC(0x41f6, 0x41f8);
+  CYC(0x41f8, 0x41fa); A = 0x2e;
+  CALL_C(0x41fa, checkTreasureObtained_hook, 0x1748, 0x41fd);
+  if (F & FC) { CYCT(0x41fd, 0x41fe); ret_effect(gb); return; }
+  CYC(0x41fd, 0x41fe);
+  screenTransitionState2__fail_hook(gb);
+}
+
+void screenTransitionState2__fail_hook(GB *gb) {
+  CYC(0x41fe, 0x4200); A = 0xff;
+  CYC(0x4200, 0x4201); ret_effect(gb);
+}
+
+void update_camera_position_body_hook(GB *gb) {
+  uint16_t entry = gb->hook_pc;
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  if (entry == 0x4201) {
+    CYC(0x4201, 0x4204); SET_HL(wScrollMode);
+    CYC(0x4204, 0x4206); mem_wr(gb, HL, mem_rd(gb, HL) & 0x7f);
+    CYC(0x4206, 0x4209); A = mem_rd(gb, wActiveGroup);
+    CYC(0x4209, 0x420b); alu_cp(gb, 0x04);
+    if (!(F & FC)) { CYCT(0x420b, 0x420d); entry = 0x4213; } else { CYC(0x420b, 0x420d); entry = 0x420d; }
+  }
+  if (entry == 0x420d) {
+    CYC(0x420d, 0x420e); alu_xor(gb, A);
+    CYC(0x420e, 0x4210); hram_wr(gb, hCameraY & 0xff, A);
+    CYC(0x4210, 0x4212); hram_wr(gb, hCameraX & 0xff, A);
+    CYC(0x4212, 0x4213); ret_effect(gb); return;
+  }
+  CYC(0x4213, 0x4216); A = mem_rd(gb, wCameraFocusedObject);
+  CYC(0x4216, 0x4217); D = A;
+  CYC(0x4217, 0x421a); A = mem_rd(gb, wCameraFocusedObjectType);
+  CYC(0x421a, 0x421c); alu_add(gb, 0x0b);
+  CYC(0x421c, 0x421d); E = A;
+  CYC(0x421d, 0x4220); SET_HL(hCameraY);
+  CYC(0x4220, 0x4221); A = mem_rd(gb, DE);
+  CYC(0x4221, 0x4223); alu_sub(gb, 0x40);
+  if (!(F & FC)) CYCT(0x4223, 0x4225); else { CYC(0x4223, 0x4225); CYC(0x4225, 0x4226); alu_xor(gb, A); }
+  CYC(0x4226, 0x4228); alu_cp(gb, 0x30);
+  if (F & FC) CYCT(0x4228, 0x422a); else { CYC(0x4228, 0x422a); CYC(0x422a, 0x422c); A = 0x30; }
+  CALL_C(0x422c, updateCameraPosition__updateComponent_hook, 0x4240, 0x422f);
+  CYC(0x422f, 0x4232); SET_HL(hCameraX);
+  CYC(0x4232, 0x4233); SET_DE(DE + 1);
+  CYC(0x4233, 0x4234); SET_DE(DE + 1);
+  CYC(0x4234, 0x4235); A = mem_rd(gb, DE);
+  CYC(0x4235, 0x4237); alu_sub(gb, 0x50);
+  if (!(F & FC)) CYCT(0x4237, 0x4239); else { CYC(0x4237, 0x4239); CYC(0x4239, 0x423a); alu_xor(gb, A); }
+  CYC(0x423a, 0x423c); alu_cp(gb, 0x50);
+  if (F & FC) { CYCT(0x423c, 0x423e); updateCameraPosition__updateComponent_hook(gb); return; }
+  CYC(0x423c, 0x423e);
+  CYC(0x423e, 0x4240); A = 0x50;
+  updateCameraPosition__updateComponent_hook(gb);
+}
+
+void updateCameraPosition_hook(GB *gb) { gb->hook_pc = 0x4201; update_camera_position_body_hook(gb); }
+void updateCameraPosition__smallRoom_hook(GB *gb) { gb->hook_pc = 0x420d; update_camera_position_body_hook(gb); }
+void updateCameraPosition__largeRoom_hook(GB *gb) { gb->hook_pc = 0x4213; update_camera_position_body_hook(gb); }
+
+void updateCameraPosition__updateComponent_hook(GB *gb) {
+  CYC(0x4240, 0x4241); B = A;
+  CYC(0x4241, 0x4244); A = mem_rd(gb, wTextIsActive);
+  CYC(0x4244, 0x4245); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x4245, 0x4247); updateCameraPosition__smBit7_hook(gb); return; }
+  CYC(0x4245, 0x4247);
+  CYC(0x4247, 0x4248); A = mem_rd(gb, HL);
+  CYC(0x4248, 0x4249); alu_cp(gb, B);
+  if (F & FZ) { CYCT(0x4249, 0x424a); ret_effect(gb); return; }
+  CYC(0x4249, 0x424a);
+  if (F & FC) { CYCT(0x424a, 0x424c); CYC(0x424f, 0x4250); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); updateCameraPosition__smBit7_hook(gb); return; }
+  CYC(0x424a, 0x424c);
+  CYC(0x424c, 0x424d); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x424d, 0x424f); updateCameraPosition__smBit7_hook(gb);
+}
+
+void updateCameraPosition__smBit7_hook(GB *gb) {
+  CYC(0x4250, 0x4253); SET_HL(wScrollMode);
+  CYC(0x4253, 0x4255); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
+  CYC(0x4255, 0x4256); ret_effect(gb);
+}
+
+void calculateCameraPosition_hook(GB *gb) {
+  CYC(0x4256, 0x4259); A = mem_rd(gb, wLinkObjectIndex);
+  CYC(0x4259, 0x425a); D = A;
+  CYC(0x425a, 0x425c); E = 0x0b;
+  CYC(0x425c, 0x425d); A = mem_rd(gb, DE);
+  CYC(0x425d, 0x425f); alu_sub(gb, 0x40);
+  if (!(F & FC)) CYCT(0x425f, 0x4261); else { CYC(0x425f, 0x4261); CYC(0x4261, 0x4262); alu_xor(gb, A); }
+  CYC(0x4262, 0x4265); SET_HL(wMaxCameraX);
+  CYC(0x4265, 0x4266); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) CYCT(0x4266, 0x4268); else { CYC(0x4266, 0x4268); CYC(0x4268, 0x4269); A = mem_rd(gb, HL); }
+  CYC(0x4269, 0x426b); hram_wr(gb, hCameraY & 0xff, A);
+  CYC(0x426b, 0x426d); E = 0x0d;
+  CYC(0x426d, 0x426e); A = mem_rd(gb, DE);
+  CYC(0x426e, 0x4270); alu_sub(gb, 0x50);
+  if (!(F & FC)) CYCT(0x4270, 0x4272); else { CYC(0x4270, 0x4272); CYC(0x4272, 0x4273); alu_xor(gb, A); }
+  CYC(0x4273, 0x4276); SET_HL(wMaxCameraY);
+  CYC(0x4276, 0x4277); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) CYCT(0x4277, 0x4279); else { CYC(0x4277, 0x4279); CYC(0x4279, 0x427a); A = mem_rd(gb, HL); }
+  CYC(0x427a, 0x427c); hram_wr(gb, hCameraX & 0xff, A);
+  CYC(0x427c, 0x427d); ret_effect(gb);
+}
+
+void updateScreenShake_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x427d, 0x4280); A = mem_rd(gb, wMenuDisabled);
+  CYC(0x4280, 0x4281); alu_or(gb, A);
+  if (!(F & FZ)) CYCT(0x4281, 0x4283); else {
+    CYC(0x4281, 0x4283);
+    CYC(0x4283, 0x4286); A = mem_rd(gb, wLinkPlayingInstrument);
+    CYC(0x4286, 0x4287); alu_or(gb, A);
+    if (!(F & FZ)) { CYCT(0x4287, 0x4288); ret_effect(gb); return; }
+    CYC(0x4287, 0x4288);
+  }
+  CYC(0x4288, 0x428b); A = mem_rd(gb, wScreenShakeCounterY);
+  CYC(0x428b, 0x428c); alu_or(gb, A);
+  if (F & FZ) CYCT(0x428c, 0x428e); else {
+    CYC(0x428c, 0x428e);
+    CALL_C(0x428e, updateScreenShake__getShakeAmount_hook, 0x42b0, 0x4291);
+    CYC(0x4291, 0x4294); A = mem_rd(gb, wGfxRegs2_SCY);
+    CYC(0x4294, 0x4295); alu_add(gb, mem_rd(gb, HL));
+    CYC(0x4295, 0x4298); mem_wr(gb, wGfxRegs2_SCY, A);
+    CYC(0x4298, 0x429b); SET_HL(wScreenShakeCounterY);
+    CYC(0x429b, 0x429c); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  }
+  CYC(0x429c, 0x429f); A = mem_rd(gb, wScreenShakeCounterX);
+  CYC(0x429f, 0x42a0); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x42a0, 0x42a1); ret_effect(gb); return; }
+  CYC(0x42a0, 0x42a1);
+  CALL_C(0x42a1, updateScreenShake__getShakeAmount_hook, 0x42b0, 0x42a4);
+  CYC(0x42a4, 0x42a7); A = mem_rd(gb, wGfxRegs2_SCX);
+  CYC(0x42a7, 0x42a8); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x42a8, 0x42ab); mem_wr(gb, wGfxRegs2_SCX, A);
+  CYC(0x42ab, 0x42ae); SET_HL(wScreenShakeCounterX);
+  CYC(0x42ae, 0x42af); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x42af, 0x42b0); ret_effect(gb);
+}
+
+void updateScreenShake__getShakeAmount_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x42b0, 0x42b3); A = mem_rd(gb, wScreenShakeMagnitude);
+  CYC(0x42b3, 0x42b4); alu_add(gb, A);
+  CYC(0x42b4, 0x42b7); SET_HL(0x42bf);
+  CYC(0x42b7, 0x42b8); bank1_add_double_index_to_hl_from_rst(gb, 0x42b8);
+  CALL_C(0x42b8, getRandomNumber_hook, 0x043e, 0x42bb);
+  CYC(0x42bb, 0x42bd); alu_and(gb, 0x03);
+  CYC(0x42bd, 0x42be); bank1_add_a_to_hl_from_rst(gb, 0x42be);
+  CYC(0x42be, 0x42bf); ret_effect(gb);
+}
+
+void updateGfxRegs2Scroll_hook(GB *gb) {
+  CYC(0x42cb, 0x42cd); A = hram_rd(gb, hCameraY & 0xff);
+  CYC(0x42cd, 0x42ce); B = A;
+  CYC(0x42ce, 0x42d1); A = mem_rd(gb, wScreenOffsetY);
+  CYC(0x42d1, 0x42d2); alu_add(gb, B);
+  CYC(0x42d2, 0x42d4); alu_sub(gb, 0x10);
+  CYC(0x42d4, 0x42d7); mem_wr(gb, wGfxRegs2_SCY, A);
+  CYC(0x42d7, 0x42d9); A = hram_rd(gb, hCameraX & 0xff);
+  CYC(0x42d9, 0x42da); B = A;
+  CYC(0x42da, 0x42dd); A = mem_rd(gb, wScreenOffsetX);
+  CYC(0x42dd, 0x42de); alu_add(gb, B);
+  CYC(0x42de, 0x42e1); mem_wr(gb, wGfxRegs2_SCX, A);
+  CYC(0x42e1, 0x42e2); ret_effect(gb);
+}
+
+void screenTransitionState3_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x42e2, 0x42e5); A = mem_rd(gb, wScrollMode);
+  CYC(0x42e5, 0x42e7); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(0x42e7, 0x42e8); ret_effect(gb); return; }
+  CYC(0x42e7, 0x42e8);
+  CYC(0x42e8, 0x42ea); alu_cp(gb, 0x08);
+  if (!(F & FZ)) { CYCT(0x42ea, 0x42eb); ret_effect(gb); return; }
+  CYC(0x42ea, 0x42eb);
+  CALL_C(0x42eb, loadTilesetAnimation_hook, 0x1374, 0x42ee);
+  CALL_C(0x42ee, checkDarkenRoom_hook, 0x4311, 0x42f1);
+  CYC(0x42f1, 0x42f3); B = 0x05;
+  CYC(0x42f3, 0x42f6); A = mem_rd(gb, wTilesetUniqueGfx);
+  CYC(0x42f6, 0x42f8); alu_bit(gb, 7, A);
+  if (!(F & FZ)) CYCT(0x42f8, 0x42fa); else {
+    CYC(0x42f8, 0x42fa);
+    CYC(0x42fa, 0x42fb); alu_or(gb, A);
+    if (F & FZ) CYCT(0x42fb, 0x42fd); else {
+      CYC(0x42fb, 0x42fd);
+      CALL_C(0x42fd, loadUniqueGfxHeader_hook, 0x3775, 0x4300);
+      CYC(0x4300, 0x4302); B = 0x04;
+    }
+  }
+  CYC(0x4302, 0x4305); SET_HL(wScreenTransitionState);
+  CYC(0x4305, 0x4306); A = B;
+  CYC(0x4306, 0x4307); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4307, 0x4308); alu_xor(gb, A);
+  CYC(0x4308, 0x4309); mem_wr(gb, HL, A);
+  CYC(0x4309, 0x430c); mem_wr(gb, wScreenTransitionState3, A);
+  CYC(0x430c, 0x430d); ret_effect(gb);
+}
+
+void checkDarkenRoomAndClearPaletteFadeState_hook(GB *gb) {
+  CYC(0x430d, 0x430e); alu_xor(gb, A);
+  CYC(0x430e, 0x4311); mem_wr(gb, wPaletteThread_parameter, A);
+  checkDarkenRoom_hook(gb);
+}
+
+void checkDarkenRoom_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4311, 0x4314); A = mem_rd(gb, wDungeonIndex);
+  CYC(0x4314, 0x4316); alu_cp(gb, 0xff);
+  if (F & FZ) { CYCT(0x4316, 0x4317); ret_effect(gb); return; }
+  CYC(0x4316, 0x4317);
+  CALL_C(0x4317, getThisRoomDungeonProperties_hook, 0x2dd7, 0x431a);
+  CYC(0x431a, 0x431d); A = mem_rd(gb, wDungeonRoomProperties);
+  CYC(0x431d, 0x431f); alu_bit(gb, 7, A);
+  if (F & FZ) { CYCT(0x431f, 0x4320); ret_effect(gb); return; }
+  CYC(0x431f, 0x4320);
+  CYC(0x4320, 0x4323); darkenRoom_hook(gb);
 }

@@ -7,7 +7,7 @@ Updated 2026-09-12. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 1,931 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 1,961 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -90,6 +90,8 @@ Updated 2026-09-12. Newest entries at the top of each section.
   and text-input rendering/input cluster and removed twenty-two associated sprite/table data rows
   from the executable routine registry. Batch 91 added the bank 2 status/menu bodies, common-GFX
   loader, equipped-item and treasure-tile renderers, and the complete heart-display path.
+  Batch 92 added bank 1's room-transition state machine, camera-position calculation, screen
+  shake, scroll-register update, and room-darkening paths.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -194,6 +196,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-12: milestone 3 phase 5 batch 92 (30 routines): bank 1's room-transition states 0–3,
+  boundary and animation initialization, transition-direction and water checks, camera-position
+  calculation, screen shake, scroll-register updates, and room-darkening checks. Seventeen local
+  entries received stable aliases. Independent review corrected RST `$18` selection, shared-state
+  entry routing, three no-carry branches, and the `$420d` fallthrough; the first gate then exposed
+  the taken `jr z` at `$4117` using fallthrough timing, producing identical registers but a
+  one-cycle verifier deficit. Gates after the fix: lint 0, 30k verify 0 mismatches (4,689,284
+  calls), whole-movie state hash clean (`64bddd0dfe384126`), ctest 8/8 in both normal and quirk
+  builds.
 
 - 2026-09-12: milestone 3 phase 5 batch 91 (28 routines): bank 2 status-bar hide/show and
   menu/palette-copy bodies, heart-beep timing, common graphics loading, equipped-item and treasure
