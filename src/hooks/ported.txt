@@ -1124,11 +1124,6 @@ calculateFileChecksum
 getFileAddress1
 getFileAddress2
 initializeFileVariables
-initialFileVariables
-initialFileVariables_standardGame
-initialFileVariables_heroGame
-initialFileVariables_linkedGame
-saveVerificationString
 nextToChestTile
 nextToSignTile
 checkFacingBottomOfTileAndPressedA

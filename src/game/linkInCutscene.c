@@ -1414,3 +1414,26 @@ state0:
   CYC(0x7717, 0x771a);
   specialObjectSetAnimation_hook(gb);
 }
+
+void specialObjectCode_linkInCutscene_b06_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x70a0, 0x70a2); E = 0x02;
+  CYC(0x70a2, 0x70a3); A = mem_rd(gb, DE);
+  CYC(0x70a3, 0x70a4); push_effect(gb, 0x70a4);
+  switch (link_cutscene_jump_table(gb)) {
+    case 0x70be: linkCutscene0(gb); return;
+    case 0x71cb: linkCutscene1_hook(gb); return;
+    case 0x7251: linkCutscene2_hook(gb); return;
+    case 0x7322: linkCutscene3_hook(gb); return;
+    case 0x7405: linkCutscene4_hook(gb); return;
+    case 0x74a7: linkCutscene5_hook(gb); return;
+    case 0x74ce: linkCutscene6_hook(gb); return;
+    case 0x7513: linkCutscene7_hook(gb); return;
+    case 0x753f: linkCutscene8_hook(gb); return;
+    case 0x7576: linkCutscene9_hook(gb); return;
+    case 0x75e0: linkCutsceneA_hook(gb); return;
+    case 0x7668: linkCutsceneB_hook(gb); return;
+    case 0x76fe: linkCutsceneC_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}

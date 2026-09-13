@@ -6,6 +6,11 @@
 #define CYC(from, to) burn_rom(gb, 0x06, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, 0x06, (from), (to), true)
 
+#define specialObjectAnimationData_bank06 0x4479
+
+void specialObjectSetAnimation_data_hook(GB *gb);
+void label_06_032_hook(GB *gb);
+
 void linkApplyDamage_b06_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x46bb, 0x46bc); H = D;
@@ -105,13 +110,13 @@ static void add_a_to_hl(GB *gb, uint16_t return_address) {
   burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
   if (!(F & FC)) {
     burn_rom(gb, 0x00, 0x0012, 0x0013, true);
-    pop_effect(gb);
+    ret_effect(gb);
     return;
   }
   burn_rom(gb, 0x00, 0x0012, 0x0013, false);
   burn_rom(gb, 0x00, 0x0013, 0x0014, false); H = alu_inc8(gb, H);
   burn_rom(gb, 0x00, 0x0014, 0x0015, false);
-  pop_effect(gb);
+  ret_effect(gb);
 }
 
 static void add_double_index_to_hl(GB *gb, uint16_t return_address) {
@@ -123,7 +128,7 @@ static void add_double_index_to_hl(GB *gb, uint16_t return_address) {
   burn_rom(gb, 0x00, 0x001d, 0x001e, false); alu_add_hl(gb, BC);
   burn_rom(gb, 0x00, 0x001e, 0x001f, false); SET_BC(pop_effect(gb));
   burn_rom(gb, 0x00, 0x001f, 0x0020, false);
-  pop_effect(gb);
+  ret_effect(gb);
 }
 
 void load_animation_frame_hook(GB *gb) {
@@ -243,7 +248,7 @@ void specialObjectSetAnimationWithLinkData_hook(GB *gb) {
   CYC(0x4417, 0x4419); B = 0;
   CYC(0x4419, 0x441c); A = mem_rd(gb, 0xd001);
   CYC(0x441c, 0x441e);
-  label_06_032(gb);
+  label_06_032_hook(gb);
 }
 
 void specialObjectLoadAnimationFrameToBuffer_hook(GB *gb) {
@@ -299,13 +304,17 @@ write:
 }
 
 void specialObjectSetAnimation_data_hook(GB *gb) {
-  CYC(0x442a, 0x442d); SET_HL(0x4479);
+  CYC(0x442a, 0x442d); SET_HL(specialObjectAnimationData_bank06);
   CYC(0x442d, 0x442e); add_double_index_to_hl(gb, 0x442e);
   CYC(0x442e, 0x442f); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(0x442f, 0x4430); H = mem_rd(gb, HL);
   CYC(0x4430, 0x4431); L = A;
   CYC(0x4431, 0x4432); alu_add_hl(gb, BC);
   specialObjectNextAnimationFrame_hook(gb);
+}
+
+void label_06_032_hook(GB *gb) {
+  specialObjectSetAnimation_data_hook(gb);
 }
 
 void specialObjectSetAnimation_body_hook(GB *gb) {

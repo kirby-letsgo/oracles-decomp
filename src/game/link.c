@@ -29,6 +29,16 @@ void linkState0f_hook(GB *gb);
 void linkState0b_hook(GB *gb);
 void setLinkStateToDead_hook(GB *gb);
 void linkState03_hook(GB *gb);
+void specialObjectCode_link_hook(GB *gb);
+void linkState02_hook(GB *gb);
+void linkState0c_hook(GB *gb);
+void linkState13_hook(GB *gb);
+void linkState14_hook(GB *gb);
+void linkState0d_hook(GB *gb);
+void linkState05_hook(GB *gb);
+void linkState06_hook(GB *gb);
+void linkState09_hook(GB *gb);
+void linkState11_hook(GB *gb);
 
 static uint16_t link_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -1602,4 +1612,785 @@ update_direction_if_not_using_item:
 update_direction:
   CYC(0x5629, 0x562c);
   updateLinkDirectionFromAngle_hook(gb);
+}
+
+void specialObjectCode_link_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x49b6, 0x49b8); E = 0x04;
+  CYC(0x49b8, 0x49b9); A = mem_rd(gb, DE);
+  CYC(0x49b9, 0x49ba); push_effect(gb, 0x49ba);
+  switch (link_jump_table(gb)) {
+    case 0x49e4: linkState00_hook(gb); return;
+    case 0x54dd: linkState01_hook(gb); return;
+    case 0x507b: linkState02_hook(gb); return;
+    case 0x5033: linkState03_hook(gb); return;
+    case 0x4ff6: linkState04_hook(gb); return;
+    case 0x52fb: linkState05_hook(gb); return;
+    case 0x5377: linkState06_hook(gb); return;
+    case 0x2cad: linkState07_hook(gb); return;
+    case 0x4f0c: linkState08_hook(gb); return;
+    case 0x53ea: linkState09_hook(gb); return;
+    case 0x4a00: linkState0a_hook(gb); return;
+    case 0x4fc7: linkState0b_hook(gb); return;
+    case 0x51ec: linkState0c_hook(gb); return;
+    case 0x529e: linkState0d_hook(gb); return;
+    case 0x4f4f: linkState0e_hook(gb); return;
+    case 0x4f80: linkState0f_hook(gb); return;
+    case 0x5467: linkState11_hook(gb); return;
+    case 0x60a5: linkState12(gb); return;
+    case 0x5227: linkState13_hook(gb); return;
+    case 0x527f: linkState14_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+void linkState02_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x507b, 0x507d); A = 0xff;
+  CYC(0x507d, 0x5080); W8(wGameKeysPressed) = A;
+  CYC(0x5080, 0x5082); A = 0x80;
+  CYC(0x5082, 0x5085); W8(wForceLinkPushAnimation) = A;
+  CYC(0x5085, 0x5087); E = 0x05;
+  CYC(0x5087, 0x5088); A = mem_rd(gb, DE);
+  CYC(0x5088, 0x5089); push_effect(gb, 0x5089);
+  switch (link_jump_table(gb)) {
+    case 0x5095: goto substate0;
+    case 0x50cc: goto substate1;
+    case 0x510f: goto substate2;
+    case 0x514a: goto substate3;
+    case 0x5155: goto substate4;
+    case 0x5163: goto substate5;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+substate0:
+  CALL_C(0x5095, linkCancelAllItemUsage_hook, 0x4f49, 0x5098);
+  CYC(0x5098, 0x509b); A = W8(wLinkStateParameter);
+  CYC(0x509b, 0x509c); push_effect(gb, 0x509c);
+  switch (link_jump_table(gb)) {
+    case 0x50b0: goto parameter_fall_down_hole;
+    case 0x50b3: goto parameter_fall_without_centering;
+    case 0x50f9: goto respawn;
+    case 0x50b8: goto parameter_3;
+    case 0x50a6: goto parameter_drown;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+parameter_drown:
+  CYC(0x50a6, 0x50a8); E = 0x05;
+  CYC(0x50a8, 0x50aa); A = 0x05;
+  CYC(0x50aa, 0x50ab); mem_wr(gb, DE, A);
+  CYC(0x50ab, 0x50ad); A = 0x0a;
+  CYC(0x50ad, 0x50b0);
+  specialObjectSetAnimation_hook(gb);
+  return;
+
+parameter_fall_down_hole:
+  CALL_C(0x50b0, objectCenterOnTile_hook, 0x20db, 0x50b3);
+
+parameter_fall_without_centering:
+  CALL_C(0x50b3, itemIncSubstate_hook, 0x23ef, 0x50b6);
+  CYC(0x50b6, 0x50b8);
+  goto start_falling;
+
+parameter_3:
+  CYC(0x50b8, 0x50ba); E = 0x05;
+  CYC(0x50ba, 0x50bc); A = 0x04;
+  CYC(0x50bc, 0x50bd); mem_wr(gb, DE, A);
+
+start_falling:
+  CYC(0x50bd, 0x50be); H = D;
+  CYC(0x50be, 0x50c0); L = 0x24;
+  CYC(0x50c0, 0x50c2); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
+  CYC(0x50c2, 0x50c4); A = 0x0d;
+  CALL_C(0x50c4, specialObjectSetAnimation_hook, 0x2b0a, 0x50c7);
+  CYC(0x50c7, 0x50c9); A = 0x65;
+  CYC(0x50c9, 0x50cc);
+  playSound_b00_hook(gb);
+  return;
+
+substate1:
+  CYC(0x50cc, 0x50cd); H = D;
+  CYC(0x50cd, 0x50cf); L = 0x21;
+  CYC(0x50cf, 0x50d1); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x50d1, 0x50d4);
+    specialObjectAnimate_hook(gb);
+    return;
+  }
+  CYC(0x50d1, 0x50d4);
+  CYC(0x50d4, 0x50d7); A = W8(wActiveTileType);
+  CYC(0x50d7, 0x50d9); alu_cp(gb, 0x02);
+  if (!(F & FZ)) { CYCT(0x50d9, 0x50db); goto respawn; }
+  CYC(0x50d9, 0x50db);
+  CYC(0x50db, 0x50de); A = W8(wActiveGroup);
+  CYC(0x50de, 0x50e0); alu_cp(gb, 0x02);
+  if (!(F & FZ)) { CYCT(0x50e0, 0x50e2); goto ordinary_hole_warp; }
+  CYC(0x50e0, 0x50e2);
+  CYC(0x50e2, 0x50e5); A = W8(wActiveRoom);
+  CYC(0x50e5, 0x50e7); alu_cp(gb, 0x9f);
+  if (!(F & FZ)) { CYCT(0x50e7, 0x50e9); goto ordinary_hole_warp; }
+  CYC(0x50e7, 0x50e9);
+  CYC(0x50e9, 0x50ec); SET_HL(0x7d92);
+  CYC(0x50ec, 0x50ee); E = 0x01;
+  CYC(0x50ee, 0x50f1);
+  interBankCall_hook(gb);
+  return;
+
+ordinary_hole_warp:
+  CYC(0x50f1, 0x50f4); SET_HL(0x4ad2);
+  CYC(0x50f4, 0x50f6); E = 0x01;
+  CYC(0x50f6, 0x50f9);
+  interBankCall_hook(gb);
+  return;
+
+respawn:
+  CALL_C(0x50f9, specialObjectSetCoordinatesToRespawnYX_hook, 0x2b8a, 0x50fc);
+  CYC(0x50fc, 0x50fe); L = 0x05;
+  CYC(0x50fe, 0x5100); A = 0x02;
+  CYC(0x5100, 0x5101); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5101, 0x5102); mem_wr(gb, HL, A);
+  CALL_C(0x5102, specialObjectTryToBreakTile_source05_hook, 0x49a8, 0x5105);
+  CALL_C(0x5105, objectGetTileAtPosition_hook, 0x1444, 0x5108);
+  CYC(0x5108, 0x5109); A = L;
+  CYC(0x5109, 0x510c); W8(wEnteredWarpPosition) = A;
+  CYC(0x510c, 0x510f);
+  objectSetInvisible_hook(gb);
+  return;
+
+substate2:
+  CYC(0x510f, 0x5110); H = D;
+  CYC(0x5110, 0x5112); L = 0x06;
+  CYC(0x5112, 0x5115); A = W8(wScrollMode);
+  CYC(0x5115, 0x5117); alu_and(gb, 0x80);
+  if (!(F & FZ)) {
+    CYC(0x5117, 0x5119);
+    CYC(0x5119, 0x511b); mem_wr(gb, HL, 0x04);
+    CYC(0x511b, 0x511c); ret_effect(gb);
+    return;
+  }
+  CYCT(0x5117, 0x5119);
+  CYC(0x511c, 0x511d); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(0x511d, 0x511e); ret_effect(gb); return; }
+  CYC(0x511d, 0x511e);
+  CYC(0x511e, 0x511f); alu_xor(gb, A);
+  CYC(0x511f, 0x5122); W8(wLinkInAir) = A;
+  CYC(0x5122, 0x5125); W8(wLinkSwimmingState) = A;
+  CYC(0x5125, 0x5127); A = 0x1c;
+  CALL_C(0x5127, cpActiveRing_hook, 0x23b0, 0x512a);
+  CYC(0x512a, 0x512c); A = 0xfc;
+  if (!(F & FZ)) {
+    CYCT(0x512c, 0x512e);
+  } else {
+    CYC(0x512c, 0x512e);
+    CYC(0x512e, 0x5130); A = alu_sra(gb, A);
+  }
+  CALL_C(0x5130, itemIncSubstate_hook, 0x23ef, 0x5133);
+  CYC(0x5133, 0x5135); L = 0x25;
+  CYC(0x5135, 0x5136); mem_wr(gb, HL, A);
+  CYC(0x5136, 0x5138); L = 0x2b;
+  CYC(0x5138, 0x513a); mem_wr(gb, HL, 0x3c);
+  CYC(0x513a, 0x513c); L = 0x06;
+  CYC(0x513c, 0x513e); mem_wr(gb, HL, 0x10);
+  CALL_C(0x513e, linkApplyDamage_b00_hook, 0x2ab7, 0x5141);
+  CALL_C(0x5141, objectSetVisiblec1_hook, 0x1e3c, 0x5144);
+  CALL_C(0x5144, specialObjectUpdateAdjacentWallsBitset, 0x5e62, 0x5147);
+  CYC(0x5147, 0x514a);
+  animateLinkStanding(gb);
+  return;
+
+substate3:
+  CALL_C(0x514a, itemDecCounter1_hook, 0x23d6, 0x514d);
+  if (!(F & FZ)) { CYCT(0x514d, 0x514e); ret_effect(gb); return; }
+  CYC(0x514d, 0x514e);
+  CYC(0x514e, 0x5150); L = 0x24;
+  CYC(0x5150, 0x5152); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
+  CYC(0x5152, 0x5155);
+  initLinkStateAndAnimateStanding(gb);
+  return;
+
+substate4:
+  CYC(0x5155, 0x5156); H = D;
+  CYC(0x5156, 0x5158); L = 0x21;
+  CYC(0x5158, 0x515a); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x515a, 0x515d);
+    specialObjectAnimate_hook(gb);
+    return;
+  }
+  CYC(0x515a, 0x515d);
+  CALL_C(0x515d, objectSetInvisible_hook, 0x1e7b, 0x5160);
+  CYC(0x5160, 0x5163);
+  checkLinkForceState(gb);
+  return;
+
+substate5:
+  CYC(0x5163, 0x5165); E = 0x21;
+  CYC(0x5165, 0x5166); A = mem_rd(gb, DE);
+  CYC(0x5166, 0x5167); alu_rlca(gb);
+  if (!(F & FC)) {
+    CYCT(0x5167, 0x516a);
+    specialObjectAnimate_hook(gb);
+    return;
+  }
+  CYC(0x5167, 0x516a);
+  CYC(0x516a, 0x516c);
+  goto respawn;
+}
+
+void linkState0c_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x51ec, 0x51ee); E = 0x05;
+  CYC(0x51ee, 0x51ef); A = mem_rd(gb, DE);
+  CYC(0x51ef, 0x51f0); push_effect(gb, 0x51f0);
+  switch (link_jump_table(gb)) {
+    case 0x51f6: goto substate0;
+    case 0x5226: goto done;
+    case 0x520d: goto substate2;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+substate0:
+  CYC(0x51f6, 0x51f8); A = 0x01;
+  CYC(0x51f8, 0x51f9); mem_wr(gb, DE, A);
+  CYC(0x51f9, 0x51fc); W8(wWarpsDisabled) = A;
+  CYC(0x51fc, 0x51fd); alu_xor(gb, A);
+  CYC(0x51fd, 0x51ff); E = 0x24;
+  CYC(0x51ff, 0x5200); mem_wr(gb, DE, A);
+  CYC(0x5200, 0x5202); A = 0x00;
+  CYC(0x5202, 0x5205); W8(wScrollMode) = A;
+  CALL_C(0x5205, linkCancelAllItemUsage_hook, 0x4f49, 0x5208);
+  CYC(0x5208, 0x520a); A = 0x67;
+  CYC(0x520a, 0x520d);
+  playSound_b00_hook(gb);
+  return;
+
+substate2:
+  CYC(0x520d, 0x520e); alu_xor(gb, A);
+  CYC(0x520e, 0x5211); W8(wWarpsDisabled) = A;
+  CYC(0x5211, 0x5214); SET_HL(wWarpDestGroup);
+  CYC(0x5214, 0x5217); A = W8(wActiveGroup);
+  CYC(0x5217, 0x5219); alu_or(gb, 0x80);
+  CYC(0x5219, 0x521a); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x521a, 0x521d); A = W8(wDungeonWallmasterDestRoom);
+  CYC(0x521d, 0x521e); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x521e, 0x5220); A = 0x05;
+  CYC(0x5220, 0x5221); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5221, 0x5223); A = 0x87;
+  CYC(0x5223, 0x5224); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5224, 0x5226); mem_wr(gb, HL, 0x03);
+
+done:
+  CYC(0x5226, 0x5227); ret_effect(gb);
+}
+
+static void link_state13_substate1(GB *gb, uint16_t sp0_) {
+  CYC(0x524a, 0x524c); C = 0x40;
+  CALL_C(0x524c, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x524f);
+  CYC(0x524f, 0x5252); A = W8(wcc50);
+  CYC(0x5252, 0x5253); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x5253, 0x5255);
+    goto update_counter;
+  }
+  CYC(0x5253, 0x5255);
+  CALL_C(0x5255, updateLinkDirectionFromAngle_hook, 0x2b64, 0x5258);
+  CYC(0x5258, 0x525a); L = 0x2a;
+  CYC(0x525a, 0x525b); A = mem_rd(gb, HL);
+  CYC(0x525b, 0x525c); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x525c, 0x525e); goto restore; }
+  CYC(0x525c, 0x525e);
+
+update_counter:
+  CYC(0x525e, 0x5260); C = 0x01;
+  CYC(0x5260, 0x5263); A = W8(wGameKeysJustPressed);
+  CYC(0x5263, 0x5264); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x5264, 0x5266);
+  } else {
+    CYC(0x5264, 0x5266);
+    CYC(0x5266, 0x5268); C = 0x04;
+  }
+  CYC(0x5268, 0x526a); L = 0x06;
+  CYC(0x526a, 0x526b); A = mem_rd(gb, HL);
+  CYC(0x526b, 0x526c); alu_sub(gb, C);
+  CYC(0x526c, 0x526d); mem_wr(gb, HL, A);
+  if (!(F & FC)) { CYCT(0x526d, 0x526e); ret_effect(gb); return; }
+  CYC(0x526d, 0x526e);
+
+restore:
+  CYC(0x526e, 0x5270); L = 0x1b;
+  CYC(0x5270, 0x5272); A = 0x08;
+  CYC(0x5272, 0x5273); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5273, 0x5274); mem_wr(gb, HL, A);
+  CYC(0x5274, 0x5276); L = 0x2d;
+  CYC(0x5276, 0x5278); mem_wr(gb, HL, 0x00);
+  CYC(0x5278, 0x5279); alu_xor(gb, A);
+  CYC(0x5279, 0x527c); W8(wLinkForceState) = A;
+  CYC(0x527c, 0x527f);
+  initLinkStateAndAnimateStanding(gb);
+}
+
+void linkState13_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x5227, 0x5229); A = 0x80;
+  CYC(0x5229, 0x522c); W8(wForceLinkPushAnimation) = A;
+  CYC(0x522c, 0x522e); E = 0x05;
+  CYC(0x522e, 0x522f); A = mem_rd(gb, DE);
+  CYC(0x522f, 0x5230); push_effect(gb, 0x5230);
+  switch (link_jump_table(gb)) {
+    case 0x5234: break;
+    case 0x524a: link_state13_substate1(gb, sp0_); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+  CALL_C(0x5234, itemIncSubstate_hook, 0x23ef, 0x5237);
+  CYC(0x5237, 0x5238); L = alu_inc8(gb, L);
+  CYC(0x5238, 0x523a); mem_wr(gb, HL, 0xb4);
+  CYC(0x523a, 0x523c); L = 0x1b;
+  CYC(0x523c, 0x523e); A = 0x0f;
+  CYC(0x523e, 0x523f); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x523f, 0x5240); mem_wr(gb, HL, A);
+  CYC(0x5240, 0x5242); A = 0x7f;
+  CALL_C(0x5242, loadPaletteHeader_hook, 0x050b, 0x5245);
+  CYC(0x5245, 0x5246); alu_xor(gb, A);
+  CYC(0x5246, 0x5249); W8(wcc50) = A;
+  CYC(0x5249, 0x524a); ret_effect(gb);
+}
+
+void linkState14_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x527f, 0x5281); E = 0x05;
+  CYC(0x5281, 0x5282); A = mem_rd(gb, DE);
+  CYC(0x5282, 0x5283); push_effect(gb, 0x5283);
+  switch (link_jump_table(gb)) {
+    case 0x5287: break;
+    case 0x524a: link_state13_substate1(gb, sp0_); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+  CALL_C(0x5287, itemIncSubstate_hook, 0x23ef, 0x528a);
+  CYC(0x528a, 0x528c); L = 0x06;
+  CYC(0x528c, 0x528e); mem_wr(gb, HL, 0xf0);
+  CALL_C(0x528e, linkCancelAllItemUsage_hook, 0x4f49, 0x5291);
+  CYC(0x5291, 0x5294); A = W8(wcc50);
+  CYC(0x5294, 0x5295); alu_or(gb, A);
+  CYC(0x5295, 0x5297); A = 0x02;
+  if (F & FZ) {
+    CYCT(0x5297, 0x5299);
+  } else {
+    CYC(0x5297, 0x5299);
+    CYC(0x5299, 0x529b); A = 0x10;
+  }
+  CYC(0x529b, 0x529e);
+  specialObjectSetAnimation_hook(gb);
+}
+
+void linkState0d_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x529e, 0x52a0); A = 0x80;
+  CYC(0x52a0, 0x52a3); W8(wcc92) = A;
+  CYC(0x52a3, 0x52a5); E = 0x05;
+  CYC(0x52a5, 0x52a6); A = mem_rd(gb, DE);
+  CYC(0x52a6, 0x52a7); push_effect(gb, 0x52a7);
+  switch (link_jump_table(gb)) {
+    case 0x52b1: goto substate0;
+    case 0x4268: updateLinkDamageTaken_hook(gb); return;
+    case 0x52be: goto substate2;
+    case 0x52dc: goto substate3;
+    case 0x52ef: goto substate4;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+substate0:
+  CYC(0x52b1, 0x52b3); A = 0x01;
+  CYC(0x52b3, 0x52b4); mem_wr(gb, DE, A);
+  CYC(0x52b4, 0x52b7); W8(wWarpsDisabled) = A;
+  CYC(0x52b7, 0x52b9); E = 0x30;
+  CYC(0x52b9, 0x52ba); alu_xor(gb, A);
+  CYC(0x52ba, 0x52bb); mem_wr(gb, DE, A);
+  CYC(0x52bb, 0x52be);
+  linkCancelAllItemUsage_hook(gb);
+  return;
+
+substate2:
+  CYC(0x52be, 0x52c0); A = 0x03;
+  CYC(0x52c0, 0x52c1); mem_wr(gb, DE, A);
+  CYC(0x52c1, 0x52c2); H = D;
+  CYC(0x52c2, 0x52c4); L = 0x06;
+  CYC(0x52c4, 0x52c6); mem_wr(gb, HL, 0x1e);
+  CYC(0x52c6, 0x52c8); L = 0x14;
+  CYC(0x52c8, 0x52ca); A = 0x20;
+  CYC(0x52ca, 0x52cb); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x52cb, 0x52cd); mem_wr(gb, HL, 0xfe);
+  CYC(0x52cd, 0x52cf); L = 0x08;
+  CYC(0x52cf, 0x52d0); alu_xor(gb, A);
+  CYC(0x52d0, 0x52d1); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x52d1, 0x52d3); mem_wr(gb, HL, 0x10);
+  CYC(0x52d3, 0x52d5); L = 0x10;
+  CYC(0x52d5, 0x52d7); mem_wr(gb, HL, 0x3c);
+  CYC(0x52d7, 0x52d9); A = 0x03;
+  CYC(0x52d9, 0x52dc);
+  specialObjectSetAnimation_hook(gb);
+  return;
+
+substate3:
+  CALL_C(0x52dc, itemDecCounter1_hook, 0x23d6, 0x52df);
+  if (F & FZ) { CYCT(0x52df, 0x52e1); goto restore_normal; }
+  CYC(0x52df, 0x52e1);
+  CYC(0x52e1, 0x52e3); C = 0x20;
+  CALL_C(0x52e3, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x52e6);
+  CALL_C(0x52e6, specialObjectUpdateAdjacentWallsBitset, 0x5e62, 0x52e9);
+  CALL_C(0x52e9, specialObjectUpdatePosition, 0x5d97, 0x52ec);
+  CYC(0x52ec, 0x52ef);
+  specialObjectAnimate_hook(gb);
+  return;
+
+substate4:
+  CYC(0x52ef, 0x52f0); H = D;
+  CYC(0x52f0, 0x52f2); L = 0x2b;
+  CYC(0x52f2, 0x52f4); mem_wr(gb, HL, 0x94);
+
+restore_normal:
+  CYC(0x52f4, 0x52f5); alu_xor(gb, A);
+  CYC(0x52f5, 0x52f8); W8(wWarpsDisabled) = A;
+  CYC(0x52f8, 0x52fb);
+  initLinkStateAndAnimateStanding(gb);
+}
+
+void linkState05_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x52fb, 0x52fd); E = 0x05;
+  CYC(0x52fd, 0x52fe); A = mem_rd(gb, DE);
+  CYC(0x52fe, 0x52ff); push_effect(gb, 0x52ff);
+  switch (link_jump_table(gb)) {
+    case 0x5305: goto substate0;
+    case 0x5323: goto substate1;
+    case 0x5338: goto substate2;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+substate0:
+  CALL_C(0x5305, itemIncSubstate_hook, 0x23ef, 0x5308);
+  CYC(0x5308, 0x530a); L = 0x10;
+  CYC(0x530a, 0x530c); mem_wr(gb, HL, 0x14);
+  CYC(0x530c, 0x530e); L = 0x18;
+  CYC(0x530e, 0x5310); A = 0x02;
+  CALL_C(0x5310, specialObjectSetVar37AndVar38, 0x5fed, 0x5313);
+  CYC(0x5313, 0x5316); SET_BC(0xfe80);
+  CALL_C(0x5316, objectSetSpeedZ_hook, 0x239d, 0x5319);
+  CYC(0x5319, 0x531b); A = 0x81;
+  CYC(0x531b, 0x531e); W8(wLinkInAir) = A;
+  CYC(0x531e, 0x5320); A = 0x2f;
+  CYC(0x5320, 0x5323);
+  specialObjectSetAnimation_hook(gb);
+  return;
+
+substate1:
+  CALL_C(0x5323, specialObjectAnimate_hook, 0x2aef, 0x5326);
+  CALL_C(0x5326, specialObjectSetAngleRelativeToVar38, 0x5ff3, 0x5329);
+  CALL_C(0x5329, objectApplySpeed_hook, 0x201d, 0x532c);
+  CYC(0x532c, 0x532e); C = 0x20;
+  CALL_C(0x532e, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x5331);
+  if (!(F & FZ)) { CYCT(0x5331, 0x5332); ret_effect(gb); return; }
+  CYC(0x5331, 0x5332);
+  CALL_C(0x5332, itemIncSubstate_hook, 0x23ef, 0x5335);
+  CYC(0x5335, 0x5338);
+  specialObjectSetPositionToVar38IfSet(gb);
+  return;
+
+substate2:
+  CALL_C(0x5338, specialObjectAnimate_hook, 0x2aef, 0x533b);
+  CYC(0x533b, 0x533c); H = D;
+  CYC(0x533c, 0x533e); L = 0x21;
+  CYC(0x533e, 0x533f); A = mem_rd(gb, HL);
+  CYC(0x533f, 0x5341); mem_wr(gb, HL, 0x00);
+  CYC(0x5341, 0x5342); push_effect(gb, 0x5342);
+  switch (link_jump_table(gb)) {
+    case 0x534c: goto anim_parameter1;
+    case 0x5355: goto anim_parameter2;
+    case 0x535a: goto anim_parameter0;
+    case 0x535b: goto anim_parameter3;
+    case 0x535e: goto anim_parameter4;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+anim_parameter1:
+  CALL_C(0x534c, darkenRoomLightly_hook, 0x32f8, 0x534f);
+  CYC(0x534f, 0x5351); A = 0x06;
+  CYC(0x5351, 0x5354); W8(wPaletteThread_updateRate) = A;
+  CYC(0x5354, 0x5355); ret_effect(gb);
+  return;
+
+anim_parameter2:
+  CYC(0x5355, 0x5358); SET_HL(wLinkMaxHealth);
+  CYC(0x5358, 0x5359); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x5359, 0x535a); mem_wr(gb, HL, A);
+
+anim_parameter0:
+  CYC(0x535a, 0x535b); ret_effect(gb);
+  return;
+
+anim_parameter3:
+  CYC(0x535b, 0x535e);
+  brightenRoom_hook(gb);
+  return;
+
+anim_parameter4:
+  CYC(0x535e, 0x5361); SET_BC(0xfe80);
+  CALL_C(0x5361, objectSetSpeedZ_hook, 0x239d, 0x5364);
+  CYC(0x5364, 0x5366); L = 0x08;
+  CYC(0x5366, 0x5368); mem_wr(gb, HL, 0x03);
+  CYC(0x5368, 0x5369); L = alu_inc8(gb, L);
+  CYC(0x5369, 0x536b); mem_wr(gb, HL, 0x18);
+  CYC(0x536b, 0x536d); L = 0x10;
+  CYC(0x536d, 0x536f); mem_wr(gb, HL, 0x14);
+  CYC(0x536f, 0x5371); A = 0x81;
+  CYC(0x5371, 0x5374); W8(wLinkInAir) = A;
+  CYC(0x5374, 0x5377);
+  initLinkStateAndAnimateStanding(gb);
+}
+
+void linkState06_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x5377, 0x5379); E = 0x05;
+  CYC(0x5379, 0x537a); A = mem_rd(gb, DE);
+  CYC(0x537a, 0x537b); push_effect(gb, 0x537b);
+  switch (link_jump_table(gb)) {
+    case 0x5383: goto substate0;
+    case 0x539d: goto substate1;
+    case 0x53b0: goto substate2;
+    case 0x53d1: goto substate3;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+substate0:
+  CYC(0x5383, 0x5385); A = 0x01;
+  CYC(0x5385, 0x5386); mem_wr(gb, DE, A);
+  CYC(0x5386, 0x5387); H = D;
+  CYC(0x5387, 0x5389); L = 0x06;
+  CYC(0x5389, 0x538b); mem_wr(gb, HL, 0x08);
+  CYC(0x538b, 0x538d); L = 0x10;
+  CYC(0x538d, 0x538f); mem_wr(gb, HL, 0x50);
+  CYC(0x538f, 0x5391); L = 0x09;
+  CYC(0x5391, 0x5393); mem_wr(gb, HL, 0x00);
+  CYC(0x5393, 0x5395); A = 0x81;
+  CYC(0x5395, 0x5398); W8(wLinkInAir) = A;
+  CYC(0x5398, 0x539a); A = 0x53;
+  CALL_C(0x539a, playSound_b00_hook, 0x0c98, 0x539d);
+
+substate1:
+  CALL_C(0x539d, specialObjectUpdatePositionWithoutTileEdgeAdjust, 0x5d8e, 0x53a0);
+  CALL_C(0x53a0, itemDecCounter1_hook, 0x23d6, 0x53a3);
+  if (!(F & FZ)) { CYCT(0x53a3, 0x53a4); ret_effect(gb); return; }
+  CYC(0x53a3, 0x53a4);
+  CYC(0x53a4, 0x53a6); L = 0x05;
+  CYC(0x53a6, 0x53a7); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x53a7, 0x53a9); L = 0x08;
+  CYC(0x53a9, 0x53ab); mem_wr(gb, HL, 0x00);
+  CYC(0x53ab, 0x53ad); A = 0x04;
+  CALL_C(0x53ad, specialObjectSetAnimation_hook, 0x2b0a, 0x53b0);
+
+substate2:
+  CALL_C(0x53b0, specialObjectAnimate_hook, 0x2aef, 0x53b3);
+  CYC(0x53b3, 0x53b6); A = W8(wScrollMode);
+  CYC(0x53b6, 0x53b8); alu_and(gb, 0x01);
+  if (F & FZ) { CYCT(0x53b8, 0x53b9); ret_effect(gb); return; }
+  CYC(0x53b8, 0x53b9);
+  CALL_C(0x53b9, objectCheckTileCollision_allowHoles_hook, 0x14c7, 0x53bc);
+  if (F & FC) {
+    CYCT(0x53bc, 0x53bf);
+    specialObjectUpdatePositionWithoutTileEdgeAdjust(gb);
+    return;
+  }
+  CYC(0x53bc, 0x53bf);
+  CYC(0x53bf, 0x53c2); SET_BC(0xfe00);
+  CALL_C(0x53c2, objectSetSpeedZ_hook, 0x239d, 0x53c5);
+  CYC(0x53c5, 0x53c7); L = 0x05;
+  CYC(0x53c7, 0x53c8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x53c8, 0x53ca); L = 0x10;
+  CYC(0x53ca, 0x53cc); mem_wr(gb, HL, 0x0a);
+  CYC(0x53cc, 0x53ce); A = 0x18;
+  CALL_C(0x53ce, specialObjectSetAnimation_hook, 0x2b0a, 0x53d1);
+
+substate3:
+  CALL_C(0x53d1, specialObjectAnimate_hook, 0x2aef, 0x53d4);
+  CALL_C(0x53d4, specialObjectUpdateAdjacentWallsBitset, 0x5e62, 0x53d7);
+  CALL_C(0x53d7, specialObjectUpdatePosition, 0x5d97, 0x53da);
+  CYC(0x53da, 0x53dc); C = 0x18;
+  CALL_C(0x53dc, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x53df);
+  if (!(F & FZ)) { CYCT(0x53df, 0x53e0); ret_effect(gb); return; }
+  CYC(0x53df, 0x53e0);
+  CYC(0x53e0, 0x53e1); alu_xor(gb, A);
+  CYC(0x53e1, 0x53e4); W8(wLinkInAir) = A;
+  CYC(0x53e4, 0x53e7); W8(wWarpsDisabled) = A;
+  CYC(0x53e7, 0x53ea);
+  initLinkStateAndAnimateStanding(gb);
+}
+
+void linkState09_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x53ea, 0x53ec); E = 0x05;
+  CYC(0x53ec, 0x53ed); A = mem_rd(gb, DE);
+  CYC(0x53ed, 0x53ee); push_effect(gb, 0x53ee);
+  switch (link_jump_table(gb)) {
+    case 0x53fa: goto substate0;
+    case 0x540c: goto substate1;
+    case 0x5419: goto substate2;
+    case 0x5426: goto substate3;
+    case 0x543e: goto substate4;
+    case 0x5454: goto substate5;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+substate0:
+  CALL_C(0x53fa, itemIncSubstate_hook, 0x23ef, 0x53fd);
+  CYC(0x53fd, 0x53ff); L = 0x10;
+  CYC(0x53ff, 0x5401); mem_wr(gb, HL, 0x28);
+  CYC(0x5401, 0x5403); L = 0x08;
+  CYC(0x5403, 0x5405); mem_wr(gb, HL, 0x03);
+  CYC(0x5405, 0x5406); L = alu_inc8(gb, L);
+  CYC(0x5406, 0x5408); mem_wr(gb, HL, 0x08);
+  CYC(0x5408, 0x540a); L = 0x06;
+  CYC(0x540a, 0x540c); mem_wr(gb, HL, 0x0c);
+
+substate1:
+  CALL_C(0x540c, itemDecCounter1_hook, 0x23d6, 0x540f);
+  if (!(F & FZ)) { CYCT(0x540f, 0x5411); goto animate; }
+  CYC(0x540f, 0x5411);
+  CYC(0x5411, 0x5413); mem_wr(gb, HL, 0x0c);
+  CYC(0x5413, 0x5414); L = E;
+  CYC(0x5414, 0x5415); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x5415, 0x5417); L = 0x09;
+  CYC(0x5417, 0x5419); mem_wr(gb, HL, 0x18);
+
+substate2:
+  CALL_C(0x5419, itemDecCounter1_hook, 0x23d6, 0x541c);
+  if (!(F & FZ)) { CYCT(0x541c, 0x541e); goto animate; }
+  CYC(0x541c, 0x541e);
+  CYC(0x541e, 0x5420); mem_wr(gb, HL, 0x32);
+  CYC(0x5420, 0x5421); L = E;
+  CYC(0x5421, 0x5422); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x5422, 0x5424); L = 0x08;
+  CYC(0x5424, 0x5426); mem_wr(gb, HL, 0x02);
+
+substate3:
+  CALL_C(0x5426, itemDecCounter1_hook, 0x23d6, 0x5429);
+  if (!(F & FZ)) { CYCT(0x5429, 0x542a); ret_effect(gb); return; }
+  CYC(0x5429, 0x542a);
+  CYC(0x542a, 0x542b); L = E;
+  CYC(0x542b, 0x542c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x542c, 0x542e); L = 0x08;
+  CYC(0x542e, 0x5430); mem_wr(gb, HL, 0x00);
+  CYC(0x5430, 0x5431); L = alu_inc8(gb, L);
+  CYC(0x5431, 0x5433); mem_wr(gb, HL, 0x10);
+  CYC(0x5433, 0x5435); L = 0x06;
+  CYC(0x5435, 0x5437); A = 0x1e;
+  CYC(0x5437, 0x5438); mem_wr(gb, HL, A);
+  CYC(0x5438, 0x543b); SET_BC(0xf4f8);
+  CYC(0x543b, 0x543e);
+  objectCreateExclamationMark_hook(gb);
+  return;
+
+substate4:
+  CALL_C(0x543e, itemDecCounter1_hook, 0x23d6, 0x5441);
+  if (!(F & FZ)) { CYCT(0x5441, 0x5442); ret_effect(gb); return; }
+  CYC(0x5441, 0x5442);
+  CYC(0x5442, 0x5443); L = E;
+  CYC(0x5443, 0x5444); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x5444, 0x5447); SET_BC(0xfe80);
+  CALL_C(0x5447, objectSetSpeedZ_hook, 0x239d, 0x544a);
+  CYC(0x544a, 0x544c); A = 0x18;
+  CALL_C(0x544c, specialObjectSetAnimation_hook, 0x2b0a, 0x544f);
+  CYC(0x544f, 0x5451); A = 0x53;
+  CYC(0x5451, 0x5454);
+  playSound_b00_hook(gb);
+  return;
+
+substate5:
+  CYC(0x5454, 0x5456); C = 0x18;
+  CALL_C(0x5456, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x5459);
+  if (!(F & FZ)) { CYCT(0x5459, 0x545b); goto animate; }
+  CYC(0x5459, 0x545b);
+  CYC(0x545b, 0x545d); L = 0x05;
+  CYC(0x545d, 0x545e); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x545e, 0x5460); mem_wr(gb, HL, 0x08);
+  CYC(0x5460, 0x5461); ret_effect(gb);
+  return;
+
+animate:
+  CALL_C(0x5461, specialObjectAnimate_hook, 0x2aef, 0x5464);
+  CYC(0x5464, 0x5467);
+  specialObjectUpdatePositionWithoutTileEdgeAdjust(gb);
+}
+
+void linkState11_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x5467, 0x5469); E = 0x05;
+  CYC(0x5469, 0x546a); A = mem_rd(gb, DE);
+  CYC(0x546a, 0x546b); push_effect(gb, 0x546b);
+  switch (link_jump_table(gb)) {
+    case 0x5471: goto substate0;
+    case 0x548d: goto substate1;
+    case 0x549c: goto substate2;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+substate0:
+  CYC(0x5471, 0x5473); A = 0x01;
+  CYC(0x5473, 0x5474); mem_wr(gb, DE, A);
+  CALL_C(0x5474, linkCancelAllItemUsage_hook, 0x4f49, 0x5477);
+  CYC(0x5477, 0x5478); alu_xor(gb, A);
+  CYC(0x5478, 0x547a); E = 0x24;
+  CYC(0x547a, 0x547b); mem_wr(gb, DE, A);
+  CYC(0x547b, 0x547d); A = 0x4e;
+  CALL_C(0x547d, playSound_b00_hook, 0x0c98, 0x5480);
+  CYC(0x5480, 0x5483); A = W8(wcc50);
+  CYC(0x5483, 0x5485); alu_and(gb, 0x7f);
+  CYC(0x5485, 0x5487); A = 0x06;
+  if (F & FZ) {
+    CYCT(0x5487, 0x5489);
+  } else {
+    CYC(0x5487, 0x5489);
+    CYC(0x5489, 0x548a); A = alu_inc8(gb, A);
+  }
+  CALL_C(0x548a, specialObjectSetAnimation_hook, 0x2b0a, 0x548d);
+
+substate1:
+  CALL_C(0x548d, specialObjectAnimate_hook, 0x2aef, 0x5490);
+  CYC(0x5490, 0x5492); E = 0x21;
+  CYC(0x5492, 0x5493); A = mem_rd(gb, DE);
+  CYC(0x5493, 0x5494); A = alu_inc8(gb, A);
+  if (!(F & FZ)) { CYCT(0x5494, 0x5495); ret_effect(gb); return; }
+  CYC(0x5494, 0x5495);
+  CALL_C(0x5495, itemIncSubstate_hook, 0x23ef, 0x5498);
+  CYC(0x5498, 0x549a); L = 0x06;
+  CYC(0x549a, 0x549c); mem_wr(gb, HL, 0x14);
+
+substate2:
+  CALL_C(0x549c, specialObjectAnimate_hook, 0x2aef, 0x549f);
+  CYC(0x549f, 0x54a2); A = W8(wFrameCounter);
+  CYC(0x54a2, 0x54a3); alu_rrca(gb);
+  if (F & FC) {
+    CYCT(0x54a3, 0x54a6);
+    objectSetInvisible_hook(gb);
+    return;
+  }
+  CYC(0x54a3, 0x54a6);
+  CALL_C(0x54a6, objectSetVisible_hook, 0x1e84, 0x54a9);
+  CALL_C(0x54a9, itemDecCounter1_hook, 0x23d6, 0x54ac);
+  if (!(F & FZ)) { CYCT(0x54ac, 0x54ad); ret_effect(gb); return; }
+  CYC(0x54ac, 0x54ad);
+  CYC(0x54ad, 0x54b0); A = W8(wcc50);
+  CYC(0x54b0, 0x54b2); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(0x54b2, 0x54b4); goto force_state; }
+  CYC(0x54b2, 0x54b4);
+  CALL_C(0x54b4, respawnLink_hook, 0x2ae3, 0x54b7);
+  CYC(0x54b7, 0x54b9);
+  checkLinkForceState(gb);
+  return;
+
+force_state:
+  CYC(0x54b9, 0x54bb); A = 0x03;
+  CYC(0x54bb, 0x54be); W8(wLinkForceState) = A;
+  CYC(0x54be, 0x54c0);
+  checkLinkForceState(gb);
 }

@@ -927,3 +927,23 @@ desync to discover; keep them when porting routines.
   Known RST-table destinations still call their actual C functions directly: use the generated
   `warpTransition3`/`warpTransition6` names until those roots receive readable `_hook` shims, and
   reserve `hook_continue` for the genuinely unknown fallback.
+- Dispatcher cases must come from the table's encoded words, not nearby source-label order.
+  Batch 147's first `specialObjectCode_link` mapping sent state 7 to bank-5 `$516c` instead of
+  fixed-bank `$2cad`, and state 12 to `$51df` instead of `$60a5`. Both destinations looked like
+  plausible adjacent Link states and compiled cleanly. Decode every table word from the ROM and
+  resolve its bank before assigning a C case, including aliases and fixed-bank targets.
+- `CYCT` describes a taken conditional instruction, not every jump that changes source position.
+  Batch 147 marked the unconditional `jr` instructions at bank-7 `$4249` and `$4352` with `CYCT`;
+  instruction review found the incorrect annotations even though both paths always jumped. Burn
+  unconditional `jr`/`jp` instructions with ordinary `CYC` and reserve `CYCT` for the taken arm of
+  `jr cc`/`jp cc`/`call cc`/`ret cc`.
+- A shared-address alias does not own a second copy of the ROM instructions. Batch 147's
+  `label_06_032` and `specialObjectSetAnimation_data` both name bank-6 `$442a`; the alias wrapper
+  therefore burns nothing and calls the existing owner, which performs the six instructions once.
+  Duplicating the burns in both shims would silently double timing whenever the alias is used.
+- Promoting a banked body requires auditing the fixed-bank wrapper and its real bank-stack frame.
+  Batch 147 made `specialObjectCode_companionCutscene_b06` readable, but the old bank-0 wrapper
+  still used `CALL_ROM`. Replace the whole banked-call idiom with `bank_push`, `CALL_C`, and
+  `bank_pop`, pass the wrapper's entry `sp0_`, and keep each surrounding instruction's physical
+  burn in source order. The same review caught two local RST helpers that used `pop_effect` after
+  their final `ret` burn; callable helpers must use `ret_effect` so both SP and emulated PC return.

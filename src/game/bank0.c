@@ -12,6 +12,8 @@ void updateTextbox_hook(GB *gb);
 void reloadObjectGfx_b3f_hook(GB *gb);
 void refreshObjectGfx_body_hook(GB *gb);
 void loadObjectGfxHeaderToSlot4_body_hook(GB *gb);
+void checkEnemyAndPartCollisions_hook(GB *gb);
+void specialObjectCode_companionCutscene_b06_hook(GB *gb);
 
 // Rewrites of code/bank0.s. Cycles are burned from the ROM's own instruction stream (CYC/CYCT),
 // which keeps interrupt dispatch on instruction boundaries; every memory access follows the burn
@@ -3881,13 +3883,15 @@ void objectRemoveFromAButtonSensitiveObjectList_hook(GB *gb) {
 }
 
 void checkEnemyAndPartCollisionsIfTextInactive_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   CYC(0x1de7, 0x1dea);
   CYC(0x1859, 0x185c); A = W8(wTextIsActive);
   alu_or(gb, A);
   if (!(F & FZ)) { CYC(0x185c, 0x185e); SET_AF(0x1dea); CYC(0x185e, 0x1860); ret_effect(gb); return; }
   CYCT(0x185c, 0x185e);
   bank_push(gb, 0x1dea, 0x07);
-  CALL_ROM(0x1df4, ROM_b07_checkEnemyAndPartCollisions);
+  CALL_C(0x1df4, checkEnemyAndPartCollisions_hook,
+         ROM_b07_checkEnemyAndPartCollisions, 0x1df7);
   bank_pop(gb, 0x1df7);
   CYC(0x1dfd, 0x1dfe);
   ret_effect(gb);
@@ -5674,29 +5678,32 @@ void objectAddToGrabbableObjectBuffer_hook(GB *gb) {
 
 // breakable tiles (bank 6 body); the carry comes back through bit 0 of e across the bank pop
 
-static void try_to_break_tile(GB *gb) {
+void tryToBreakTile_body_hook(GB *gb);
+
+static void try_to_break_tile(GB *gb, uint16_t sp0_) {
   CYC(0x2bf6, 0x2bf8); H8(hFF8F) = A;
   bank_push(gb, 0x2bf8, 0x06);
-  CALL_ROM(0x2c02, ROM_b06_tryToBreakTile_body);
-  E = alu_rl(gb, E);
-  CYC(0x2c05, 0x2c07);
+  CALL_C(0x2c02, tryToBreakTile_body_hook, ROM_b06_tryToBreakTile_body, 0x2c05);
+  CYC(0x2c05, 0x2c07); E = alu_rl(gb, E);
   bank_pop(gb, 0x2c07);
-  E = alu_rr(gb, E);
-  CYC(0x2c0d, 0x2c10);
+  CYC(0x2c0d, 0x2c0f); E = alu_rr(gb, E);
+  CYC(0x2c0f, 0x2c10);
 }
 
 void tryToBreakTile_hook(GB *gb) {
-  try_to_break_tile(gb);
+  uint16_t sp0_ = gb->sp;
+  try_to_break_tile(gb, sp0_);
   ret_effect(gb);
 }
 
 void itemTryToBreakTile_hook(GB *gb) {
-  H = D;
-  L = OBJ_YH;
-  CYC(0x2bef, 0x2bf3); B = mem_rd(gb, HL);
-  L = OBJ_XH;
-  CYC(0x2bf3, 0x2bf6); C = mem_rd(gb, HL);
-  try_to_break_tile(gb);
+  uint16_t sp0_ = gb->sp;
+  CYC(0x2bef, 0x2bf0); H = D;
+  CYC(0x2bf0, 0x2bf2); L = OBJ_YH;
+  CYC(0x2bf2, 0x2bf3); B = mem_rd(gb, HL);
+  CYC(0x2bf3, 0x2bf5); L = OBJ_XH;
+  CYC(0x2bf5, 0x2bf6); C = mem_rd(gb, HL);
+  try_to_break_tile(gb, sp0_);
   ret_effect(gb);
 }
 
@@ -11479,7 +11486,15 @@ void checkTreasureObtained_hook(GB *gb) {
 }
 
 void makeActiveObjectFollowLink_b00_hook(GB *gb) { banked_body_call(gb, 0x1832, 0x01, ROM_b01_makeActiveObjectFollowLink); }
-void specialObjectCode_companionCutscene_b00_hook(GB *gb) { banked_body_call(gb, 0x2d8e, 0x06, ROM_b06_specialObjectCode_companionCutscene); }
+void specialObjectCode_companionCutscene_b00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  bank_push(gb, 0x2d8e, 0x06);
+  CALL_C(0x2d98, specialObjectCode_companionCutscene_b06_hook,
+         ROM_b06_specialObjectCode_companionCutscene, 0x2d9b);
+  bank_pop(gb, 0x2d9b);
+  CYC(0x2da1, 0x2da2);
+  ret_effect(gb);
+}
 
 void specialObjectCode_linkInCutscene_b00_hook(GB *gb) {
   SET_HL(ROM_b06_specialObjectCode_linkInCutscene);

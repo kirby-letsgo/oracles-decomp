@@ -6,6 +6,8 @@
 #define CYC(from, to) burn_rom(gb, 0x07, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, 0x07, (from), (to), true)
 
+#define swingableItemAnimationData_bank07 0x600e
+
 void itemSetPositionInSwordArc_hook(GB *gb);
 
 static void post_update_add_double_index(GB *gb, uint16_t return_address) {
@@ -19,20 +21,63 @@ static void post_update_add_double_index(GB *gb, uint16_t return_address) {
   burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
 }
 
+static void post_update_add_a_to_hl(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
+  if (!(F & FC)) burn_rom(gb, 0x00, 0x0012, 0x0013, true);
+  else {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, false);
+    burn_rom(gb, 0x00, 0x0013, 0x0014, false); H = alu_inc8(gb, H);
+    burn_rom(gb, 0x00, 0x0014, 0x0015, false);
+  }
+  ret_effect(gb);
+}
+
+void label_07_227_hook(GB *gb) {
+  CYC(0x5fe8, 0x5fea); C = 0x10;
+  CYC(0x5fea, 0x5feb); A = mem_rd(gb, HL);
+  CYC(0x5feb, 0x5fed); alu_and(gb, 0x1f);
+  CYC(0x5fed, 0x5fee); alu_cp(gb, C);
+  if (!(F & FC)) {
+    CYCT(0x5fee, 0x5ff0);
+  } else {
+    CYC(0x5fee, 0x5ff0);
+    CYC(0x5ff0, 0x5ff2); A = alu_srl(gb, A);
+    CYC(0x5ff2, 0x5ff3); C = A;
+    CYC(0x5ff3, 0x5ff6); A = W8(w1Link_direction);
+    CYC(0x5ff6, 0x5ff7); alu_add(gb, A);
+    CYC(0x5ff7, 0x5ff8); alu_add(gb, A);
+    CYC(0x5ff8, 0x5ff9); alu_add(gb, C);
+    CYC(0x5ff9, 0x5ffb); C = 0x00;
+  }
+  CYC(0x5ffb, 0x5ffe); SET_HL(swingableItemAnimationData_bank07);
+  CYC(0x5ffe, 0x5fff); post_update_add_a_to_hl(gb, 0x5fff);
+  CYC(0x5fff, 0x6000); A = mem_rd(gb, HL);
+  CYC(0x6000, 0x6002); alu_and(gb, 0xf0);
+  CYC(0x6002, 0x6004); A = alu_swap(gb, A);
+  CYC(0x6004, 0x6005); alu_add(gb, C);
+  CYC(0x6005, 0x6007); E = 0x30;
+  CYC(0x6007, 0x6008); mem_wr(gb, DE, A);
+  CYC(0x6008, 0x6009); A = mem_rd(gb, HL);
+  CYC(0x6009, 0x600b); alu_and(gb, 0x07);
+  CYC(0x600b, 0x600e); itemSetAnimation_hook(gb);
+}
+
 void updateSwingableItemAnimation_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(0x5fca, 0x5fcc); L = 0x21;
   CYC(0x5fcc, 0x5fce); alu_cp(gb, 0x04);
   if (F & FZ) {
     CYCT(0x5fce, 0x5fd0);
-    label_07_227(gb);
+    label_07_227_hook(gb);
     return;
   }
   CYC(0x5fce, 0x5fd0);
   CYC(0x5fd0, 0x5fd2); alu_bit(gb, 6, mem_rd(gb, HL));
   if (F & FZ) {
     CYCT(0x5fd2, 0x5fd4);
-    label_07_227(gb);
+    label_07_227_hook(gb);
     return;
   }
   CYC(0x5fd2, 0x5fd4);
@@ -51,7 +96,7 @@ void updateSwingableItemAnimation_hook(GB *gb) {
   CYC(0x5fe3, 0x5fe4); push_effect(gb, HL);
   CALL_C(0x5fe4, tryBreakTileWithSword_calculateLevel_hook, 0x6193, 0x5fe7);
   CYC(0x5fe7, 0x5fe8); SET_HL(pop_effect(gb));
-  label_07_227(gb);
+  label_07_227_hook(gb);
 }
 
 void updateBiggoronSwordAnimation_hook(GB *gb) {
