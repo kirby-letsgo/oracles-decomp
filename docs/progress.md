@@ -265,6 +265,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   Batch 152 completed the remaining Maple and Ricky generated helpers and opened the Moosh state
   machine. Twenty-eight parent-owned local rows disappeared; the project now has 3,312 readable
   hooks out of 11,722.
+  Batch 153 completed Moosh, opened Dimitri through its held/movement substates, and made transformed
+  Link readable. Forty parent-owned local rows disappeared; the project now has 3,340 readable
+  hooks out of 11,682.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -370,6 +373,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 153 (29 routines): completed the remaining eighteen Moosh
+  state/substate and NPC-update roots, added Dimitri's root, durable state dispatcher, initialization,
+  held-object substates, and landing helper, and rewrote the complete transformed-Link state machine.
+  Forty parent-owned local rows were absorbed. Two independent instruction reviews per routine
+  verified 727 unique physical instructions, six RST dispatch tables and their real stack effects,
+  the shared Moosh cutscene tail, Dimitri's clamp/hazard paths, transformed Link's conditional calls,
+  every smart-call classification, and all inline-data exclusions with no defects. The project now
+  has 3,340 readable hooks out of 11,682. Gates: lint 0, 30k verify 0 failures across 4,584,109 calls
+  with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches across 11,707,471 calls
+  with state `a62ae98192befee8`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 152 (30 routines): completed the remaining five Maple
   target-selection/meeting helpers and twelve Ricky jump, cliff, substate, and speed helpers, then
   opened Moosh with its root, durable state dispatcher, and eleven movement/hazard states and
