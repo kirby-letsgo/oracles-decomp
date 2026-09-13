@@ -778,3 +778,9 @@ desync to discover; keep them when porting routines.
   which would abandon the root's pending `$69b8` continuation; instruction review caught it before
   replay. Capture the dispatcher's entry SP and use `hook_continue(gb, HL, sp0_)` so interpreted
   fallback code runs only until that dispatcher frame returns and the enclosing C caller resumes.
+- A smart `CALL_C` needs both the correct readable hook and the callee's exact ROM address. Batch
+  122's Timewarp cleanup initially paired five correct hook names with addresses of similarly named
+  routines elsewhere (`$3be0` and neighbors instead of `$35e3` and neighbors). Native execution
+  looked plausible, but verify mode uses the numeric operand for its interpreter side and would run
+  unrelated bytes. Compare every `CALL_C` target operand with the readiness report even when the
+  function name, call site, and return address are already correct.

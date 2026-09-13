@@ -8,6 +8,12 @@
 
 void linkedCutscene_aIntoCBB5_incSubstate_hook(GB *gb);
 void linkedCutscene_incSubstate_hook(GB *gb);
+void func_7b48_hook(GB *gb);
+void func_7b48__cbb4_00_hook(GB *gb);
+void func_7b48__cbb4_01_hook(GB *gb);
+void func_7b48__cbb4_03_hook(GB *gb);
+void func_7b48__cbb4_04_hook(GB *gb);
+void func_7b48__cbb4_05_hook(GB *gb);
 void func_7ba1_hook(GB *gb);
 static void linkedCutscene_decrementTimer(GB *gb);
 void func_7bd9_hook(GB *gb);
@@ -652,6 +658,71 @@ void zeldaKidnappedState1__substate16_hook(GB *gb) {
   CYC(0x7b42, 0x7b44); A = 0x20;
   CYC(0x7b44, 0x7b47); mem_wr(gb, wCutsceneTrigger, A);
   CYC(0x7b47, 0x7b48); ret_effect(gb);
+}
+
+static void linked_cutscene_clear_and_advance(GB *gb, uint16_t sp0_) {
+  CYC(0x7b5a, 0x7b5d); mem_wr(gb, wTmpcbb5, A);
+  CALL_C(0x7b5d, clearFadingPalettes_hook, 0x2d5f, 0x7b60);
+  CYC(0x7b60, 0x7b63);
+  func_03_7b90_hook(gb);
+}
+
+static void linked_cutscene_white_and_advance(GB *gb, uint16_t sp0_) {
+  CYC(0x7b69, 0x7b6c); mem_wr(gb, wTmpcbb5, A);
+  CALL_C(0x7b6c, fastFadeoutToWhite_hook, 0x3263, 0x7b6f);
+  CYC(0x7b6f, 0x7b72);
+  func_03_7b90_hook(gb);
+}
+
+void func_7b48_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x7b48, 0x7b4b); A = mem_rd(gb, wTmpcbb4);
+  CYC(0x7b4b, 0x7b4c); push_effect(gb, 0x7b4c);
+  switch (linked_cutscene_jump_table(gb)) {
+    case 0x7b58: func_7b48__cbb4_00_hook(gb); return;
+    case 0x7b63: func_7b48__cbb4_01_hook(gb); return;
+    case 0x7b72: func_7b48__cbb4_03_hook(gb); return;
+    case 0x7b76: func_7b48__cbb4_04_hook(gb); return;
+    case 0x7b7e: func_7b48__cbb4_05_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+void func_7b48__cbb4_00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x7b58, 0x7b5a); A = 0x0a;
+  linked_cutscene_clear_and_advance(gb, sp0_);
+}
+
+void func_7b48__cbb4_01_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7b63, func_03_7b95_hook, 0x7b95, 0x7b66);
+  if (!(F & FZ)) { CYCT(0x7b66, 0x7b67); ret_effect(gb); return; }
+  CYC(0x7b66, 0x7b67);
+  CYC(0x7b67, 0x7b69); A = 0x0a;
+  linked_cutscene_white_and_advance(gb, sp0_);
+}
+
+void func_7b48__cbb4_03_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x7b72, 0x7b74); A = 0x14;
+  CYC(0x7b74, 0x7b76);
+  linked_cutscene_clear_and_advance(gb, sp0_);
+}
+
+void func_7b48__cbb4_04_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7b76, func_03_7b95_hook, 0x7b95, 0x7b79);
+  if (!(F & FZ)) { CYCT(0x7b79, 0x7b7a); ret_effect(gb); return; }
+  CYC(0x7b79, 0x7b7a);
+  CYC(0x7b7a, 0x7b7c); A = 0x1e;
+  CYC(0x7b7c, 0x7b7e);
+  linked_cutscene_white_and_advance(gb, sp0_);
+}
+
+void func_7b48__cbb4_05_hook(GB *gb) {
+  CYC(0x7b7e, 0x7b81);
+  func_7ba1_hook(gb);
 }
 
 void func_03_7b81_hook(GB *gb) {

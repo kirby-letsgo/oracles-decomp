@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,557 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,580 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -158,6 +158,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   roots and state dispatchers, promoting eleven hidden thread-resumption points; bank 3 is now
   594/640. Review also established that a callable RST dispatcher must use `hook_continue` for
   its dynamic fallback so the enclosing C caller resumes after the interpreted state returns.
+  Batch 122 completed the Timewarp, Ambi's Passage, Jabu-Jabu opening, linked-game, and Black
+  Tower escape roots, promoted three thread-resumption points, and removed one data table plus
+  three corrupted garbage labels from the executable registry; bank 3 is now 616/636.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -263,6 +266,24 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 5 batch 122 (23 routines): completed the bank-3 Timewarp,
+  Ambi's Passage, Jabu-Jabu opening, linked-game, and Black Tower escape roots and their nested
+  dispatchers. Three stable post-call entries preserve returns from thread-capable graphics and
+  room-loading paths. The `$7c13` object table and deliberately corrupted `$7e54`/`$7e88`/`$7ea4`
+  garbage labels left the executable registry; the `$7e3b` warp payload disappeared with its
+  parent. Review caught five incorrect `CALL_C` target operands in the Timewarp cleanup path;
+  restoring `$35e3`/`$35f4`/`$3605`/`$35c2`/`$35d2` ensures verify mode interprets the intended
+  callees. Bank 3 is now 616/636 and the project has 2,580 readable hooks out of 12,647. Three
+  independent instruction-level reviews approved the corrected code. Gates: lint 0, 30k verify
+  0 failures across 4,744,137 calls with state `3e450c2620a3f6a3`, full replay 0 failures across
+  13,601,537 calls with state `64bddd0dfe384126`, normal and quirk suites 8/8.
+- 2026-09-13: milestone 3 phase 5 batch 121 (24 routines): completed the Black Tower completion,
+  turn-to-stone, and Twinrova-reveal roots and nested state dispatchers, with eleven stable
+  thread-resumption points. Review established that callable RST dispatchers must preserve their
+  entry stack with `hook_continue` on an unrecognized dynamic target. Bank 3 reached 594/640 and
+  the project reached 2,557 readable hooks out of 12,650. Gates: lint 0, 30k verify 0 failures
+  across 4,744,137 calls with state `3e450c2620a3f6a3`, full replay 0 failures across 13,602,015
+  calls with state `64bddd0dfe384126`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 5 batch 120 (32 routines): completed bank 3's miscellaneous
   cutscene dispatcher plus the Nayru-singing, Black Tower explanation, and Nayru-to-Maku-Tree
   roots and nested state dispatchers. Thirteen stable post-call entries preserve returns from

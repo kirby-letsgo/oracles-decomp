@@ -1369,13 +1369,23 @@ void checkUpdateToggleBlocks_hook(GB *gb) {
   CYC(0x7c7f, 0x7c80); ret_effect(gb);
 }
 
+static void cutscene1f_after_call_7f1d_body(GB *gb, uint16_t sp0_) {
+  CALL_C(0x7f1d, updateStatusBar_hook, 0x1a9c, 0x7f20);
+  CYC(0x7f20, 0x7f23);
+  updateAllObjects_hook(gb);
+}
+
 void cutscene1f_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x7f15, 0x7f18); SET_HL(0x7cb7);
   CYC(0x7f18, 0x7f1a); E = 0x03;
   CALL_C(0x7f1a, interBankCall_hook, 0x008a, 0x7f1d);
-  CALL_C(0x7f1d, updateStatusBar_hook, 0x1a9c, 0x7f20);
-  CYC(0x7f20, 0x7f23); updateAllObjects_hook(gb);
+  cutscene1f_after_call_7f1d_body(gb, sp0_);
+}
+
+void cutscene1f__afterCall7f1d_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  cutscene1f_after_call_7f1d_body(gb, sp0_);
 }
 
 void paletteFadeHandler09_hook(GB *gb) {
