@@ -867,3 +867,9 @@ desync to discover; keep them when porting routines.
   continuations at bank-3F `$43d3`, `$440e`, and `$442c`; the four graphics roots and their two
   bank-0 wrappers are NOVERIFY, while the independently returning continuation hooks remain fully
   verifiable.
+- Dynamic-dispatch ownership must be checked at the public caller, not inferred from a banked
+  body's final RST jump table. Batch 131's `interactWithTileBeforeLink_b06` initially used
+  `hook_handoff` for its unknown target because the body ended in dynamic dispatch; a later source
+  audit found bank 0 enters the body with `call $4000`. The body therefore owns a live return frame
+  and must use `hook_continue(gb, HL, sp0_)`; reserve `hook_handoff` for an actual `ld sp,*` thread
+  switch.

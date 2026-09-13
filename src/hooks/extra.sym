@@ -915,3 +915,6 @@
 3f:43d3 partLoadGraphicsAndProperties__afterCall43d3
 3f:440e interactionLoadGraphics__afterCall440e
 3f:442c itemLoadGraphics__afterCall442c
+3f:4143 agesFunc_3f_4133__afterCall4143
+3f:4252 updateTileIndexBaseForAllObjects__afterCall4252
+3f:4372 enemyLoadGraphicsAndProperties__afterCall4372

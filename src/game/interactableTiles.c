@@ -841,5 +841,5 @@ void interactWithTileBeforeLink_b06_hook(GB *gb) {
     case 0x4299: nextToSubrosiaKeydoor_hook(gb); return;
     case 0x429b: nextToGhiniSpawner_hook(gb); return;
   }
-  hook_handoff(gb, HL);
+  hook_continue(gb, HL, sp0_);
 }

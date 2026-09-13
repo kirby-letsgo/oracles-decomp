@@ -5529,24 +5529,26 @@ void objectDeleteRelatedObj1AsStaticObject_hook(GB *gb) {
 
 // parent items (bank 6 bodies)
 
-static void bank6_function_caller(GB *gb) {
+static void bank6_function_caller(GB *gb, uint16_t sp0_) {
   bank_push(gb, 0x2c1a, 0x06);
-  CALL_ROM(0x2c24, ROM_b06_functionCaller);
+  CALL_C(0x2c24, functionCaller_b06_hook, 0x4870, 0x2c27);
   bank_pop(gb, 0x2c27);
   CYC(0x2c2d, 0x2c2e);
 }
 
 void clearAllParentItems_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   C = 0x00;
   CYC(0x2c10, 0x2c14);
-  bank6_function_caller(gb);
+  bank6_function_caller(gb, sp0_);
   ret_effect(gb);
 }
 
 void updateParentItemButtonAssignment_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   C = 0x01;
   CYC(0x2c14, 0x2c18);
-  bank6_function_caller(gb);
+  bank6_function_caller(gb, sp0_);
   ret_effect(gb);
 }
 
@@ -11494,9 +11496,10 @@ void linkApplyDamage_b00_hook(GB *gb) {
 }
 
 void checkUseItems_b00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   C = 0x02;
   CYC(0x2c18, 0x2c1a);
-  bank6_function_caller(gb);
+  bank6_function_caller(gb, sp0_);
   ret_effect(gb);
 }
 

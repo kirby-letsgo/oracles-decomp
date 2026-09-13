@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,777 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,802 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -192,6 +192,10 @@ Updated 2026-09-13. Newest entries at the top of each section.
   routines left, added twelve more collision effects, and opened the frame-resuming bank-3F
   graphics roots with three stable continuations. The project now has 2,777 readable hooks out of
   12,587.
+  Batch 132 completed `collisionEffects.s`'s numbered handlers and `parentItemUsage.s`, and added
+  the next three bank-3F graphics roots with their frame-resume continuations. Eighteen
+  parent-owned item locals, four graphics locals, and one collision data row left the registry;
+  the project now has 2,802 readable hooks out of 12,564.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -297,6 +301,19 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 132 (25 routines): completed every remaining numbered
+  collision-effect handler in bank 7 and all remaining `parentItemUsage.s` roots in bank 6,
+  absorbing eighteen parent-owned item locals; added the bank-3F loaded-object scan, all-object
+  tile-index refresh, and enemy graphics/property loader with three durable frame-resume
+  continuations. Four graphics roots are NOVERIFY because their direct-call chains reach the
+  halt-wait scheduler, and bank 0's three parent-item wrappers now use `CALL_C` for the readable
+  bank-6 dispatcher. A source audit corrected Batch 131's `interactWithTileBeforeLink_b06`
+  unknown jump-table fallback from scheduler-only `hook_handoff` to callable `hook_continue`:
+  the bank-0 wrapper reaches that body with `call $4000`, so its return frame must survive dynamic
+  dispatch. Both independent instruction reviews found no further defects. The project now has
+  2,802 readable hooks out of 12,564. Gates: lint 0, 30k verify 0 failures across 4,670,926 calls
+  with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches across 11,833,890
+  calls with state `a62ae98192befee8`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 131 (20 routines): completed the final bank-6
   `interactWithTileBeforeLink` dispatcher, making `interactableTiles.s` fully readable; added twelve
   more collision effects and seven bank-3F tree/part/interaction/item graphics roots and
