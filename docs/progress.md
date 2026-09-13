@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 3,481 routine hooks rewritten across seventeen code
+  routine against the transliteration. Progress: 3,511 routine hooks rewritten across seventeen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -286,6 +286,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   opened bank 9 with bear, bird, ghost-Veran, NPC game-progress, and worker helpers. One hundred
   twelve generated local/data rows disappeared; the project now has 3,481 readable hooks out of
   11,264.
+  Batch 160 continued bank 9 with shopkeeper, intro-sprite, sword, rabbit, explosion, and
+  Z-oscillation helpers. Forty generated local rows disappeared; the project now has 3,511
+  readable hooks out of 11,224.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -390,6 +393,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 160 (30 routines): continued bank 9 with the complete
+  shopkeeper state/price/script path, intro-sprite and Triforce subid state machine, sword/rabbit/
+  explosion interactions, and the Z-oscillation helper. Two independent reviews per source caught
+  and corrected bank-0 RST vector burns/returns, a double-timed RST push, and a dynamic dispatcher
+  continuation that needed to retain its local return frame. Forty generated local rows disappeared;
+  bank 9 is now 49/783 and the project 3,511/11,224 across seventeen banks. Gates: lint 0, 30k
+  verify 0 failures across 4,552,724 calls with state `3e450c2620a3f6a3`, full reference replay
+  0 state-hash mismatches across 11,496,353 calls with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
 
 - 2026-09-13: milestone 3 phase 6 batch 159 (19 routines): opened bank 9 with the bear state
   dispatcher, bird movement/hop handlers, ghost-Veran states, NPC game-progress checks, and

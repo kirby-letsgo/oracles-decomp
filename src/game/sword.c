@@ -147,3 +147,83 @@ set_damage:
     default: hook_continue(gb, HL, sp0_); return;
   }
 }
+
+#undef CYC
+#undef CYCT
+#define CYC(from, to) burn_rom(gb, 0x09, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, 0x09, (from), (to), true)
+
+static uint16_t bank09_jump_table_sword(GB *gb) {
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  return HL;
+}
+
+void interactionCode5e_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6e55, 0x6e57); E = 0x44;
+  CYC(0x6e57, 0x6e58); A = mem_rd(gb, DE);
+  CYC(0x6e58, 0x6e59); push_effect(gb, 0x6e59);
+  SET_HL(bank09_jump_table_sword(gb));
+  switch (HL) {
+    case 0x6e5d: goto L_6e5d;
+    case 0x6e68: goto L_6e68;
+    default: HANDOFF(HL);
+  }
+L_6e5d:
+  CYC(0x6e5d, 0x6e5f); A = 0x01;
+  CYC(0x6e5f, 0x6e60); mem_wr(gb, DE, A);
+  CYC(0x6e60, 0x6e62); A = 0xff;
+  CYC(0x6e62, 0x6e64); E = 0x77;
+  CYC(0x6e64, 0x6e65); mem_wr(gb, DE, A);
+  CALL_C(0x6e65, interactionInitGraphics_hook, 0x15fb, 0x6e68);
+L_6e68:
+  CALL_C(0x6e68, objectSetInvisible_hook, 0x1e7b, 0x6e6b);
+  CYC(0x6e6b, 0x6e6d); A = 0x00;
+  CALL_C(0x6e6d, objectGetRelatedObject1Var_hook, 0x2160, 0x6e70);
+  CYC(0x6e70, 0x6e72); L = 0x7f;
+  CYC(0x6e72, 0x6e73); A = mem_rd(gb, HL);
+  CYC(0x6e73, 0x6e74); A = alu_inc8(gb, A);
+  CYC(0x6e74, 0x6e76); L = 0x40;
+  CYC(0x6e76, 0x6e77); alu_and(gb, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x6e77, 0x6e7a); interactionDelete_hook(gb); return;
+  }
+  CYC(0x6e77, 0x6e7a);
+  CYC(0x6e7a, 0x6e7c); L = 0x61;
+  CYC(0x6e7c, 0x6e7d); A = mem_rd(gb, HL);
+  CYC(0x6e7d, 0x6e7e); B = A;
+  CYC(0x6e7e, 0x6e80); alu_and(gb, 0x80);
+  if (F & FZ) {
+    CYCT(0x6e80, 0x6e81); ret_effect(gb); return;
+  }
+  CYC(0x6e80, 0x6e81);
+  CYC(0x6e81, 0x6e82); A = B;
+  CYC(0x6e82, 0x6e84); alu_and(gb, 0x7f);
+  PUSH(0x6e84, HL);
+  CYC(0x6e85, 0x6e86); H = D;
+  CYC(0x6e86, 0x6e88); L = 0x77;
+  CYC(0x6e88, 0x6e89); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x6e89, 0x6e8b); goto L_6e8f;
+  }
+  CYC(0x6e89, 0x6e8b);
+  CYC(0x6e8b, 0x6e8c); mem_wr(gb, HL, A);
+  CALL_C(0x6e8c, interactionSetAnimation_hook, 0x262e, 0x6e8f);
+L_6e8f:
+  SET_HL(POP(0x6e8f));
+  CALL_C(0x6e90, objectTakePosition_hook, 0x2274, 0x6e93);
+  CYC(0x6e93, 0x6e96); objectSetVisible83_hook(gb); return;
+}
