@@ -462,7 +462,7 @@ L_47a2:
 L_47cd:
   I(0x47cd, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
   I(0x47cf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { CALL(0x47d0, decideItemDropForBrokenTile, 0x483d, 0x47d3); } else I(0x47d0, 3);  // call nz,$483d
+  if (!(F & FZ)) { CALL(0x47d0, decideItemDropForBrokenTile_hook, 0x483d, 0x47d3); } else I(0x47d0, 3);  // call nz,$483d
 L_47d3:
   I(0x47d3, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
   I(0x47d5, 1); alu_or(gb, A);  // or a
@@ -534,7 +534,7 @@ L_47a2:
 L_47cd:
   I(0x47cd, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
   I(0x47cf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { CALL(0x47d0, decideItemDropForBrokenTile, 0x483d, 0x47d3); } else I(0x47d0, 3);  // call nz,$483d
+  if (!(F & FZ)) { CALL(0x47d0, decideItemDropForBrokenTile_hook, 0x483d, 0x47d3); } else I(0x47d0, 3);  // call nz,$483d
 L_47d3:
   I(0x47d3, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
   I(0x47d5, 1); alu_or(gb, A);  // or a
@@ -602,7 +602,7 @@ L_47a2:
 L_47cd:
   I(0x47cd, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
   I(0x47cf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { CALL(0x47d0, decideItemDropForBrokenTile, 0x483d, 0x47d3); } else I(0x47d0, 3);  // call nz,$483d
+  if (!(F & FZ)) { CALL(0x47d0, decideItemDropForBrokenTile_hook, 0x483d, 0x47d3); } else I(0x47d0, 3);  // call nz,$483d
 L_47d3:
   I(0x47d3, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
   I(0x47d5, 1); alu_or(gb, A);  // or a
@@ -664,7 +664,7 @@ L_47a2:
 L_47cd:
   I(0x47cd, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
   I(0x47cf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { CALL(0x47d0, decideItemDropForBrokenTile, 0x483d, 0x47d3); } else I(0x47d0, 3);  // call nz,$483d
+  if (!(F & FZ)) { CALL(0x47d0, decideItemDropForBrokenTile_hook, 0x483d, 0x47d3); } else I(0x47d0, 3);  // call nz,$483d
 L_47d3:
   I(0x47d3, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
   I(0x47d5, 1); alu_or(gb, A);  // or a
@@ -720,7 +720,7 @@ L_47a2:
 L_47cd:
   I(0x47cd, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
   I(0x47cf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { CALL(0x47d0, decideItemDropForBrokenTile, 0x483d, 0x47d3); } else I(0x47d0, 3);  // call nz,$483d
+  if (!(F & FZ)) { CALL(0x47d0, decideItemDropForBrokenTile_hook, 0x483d, 0x47d3); } else I(0x47d0, 3);  // call nz,$483d
 L_47d3:
   I(0x47d3, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
   I(0x47d5, 1); alu_or(gb, A);  // or a
@@ -774,7 +774,7 @@ L_47a2:
 L_47cd:
   I(0x47cd, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
   I(0x47cf, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { CALL(0x47d0, decideItemDropForBrokenTile, 0x483d, 0x47d3); } else I(0x47d0, 3);  // call nz,$483d
+  if (!(F & FZ)) { CALL(0x47d0, decideItemDropForBrokenTile_hook, 0x483d, 0x47d3); } else I(0x47d0, 3);  // call nz,$483d
 L_47d3:
   I(0x47d3, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
   I(0x47d5, 1); alu_or(gb, A);  // or a
@@ -840,51 +840,6 @@ L_47fe:
   I(0x4804, 2); L = 0x2f;  // ld l,$2f
   I(0x4806, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 5)));  // set 5,(hl)
   RET(0x4808); return;  // ret
-}
-
-// 06:483d
-void decideItemDropForBrokenTile(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x483d, HL);  // push hl
-  CALL(0x483e, decideItemDrop_hook, 0x16eb, 0x4841);  // call $16eb
-  if ((F & FZ)) { I(0x4841, 3); goto L_486e; } I(0x4841, 2);  // jr z,$486e
-  CALL(0x4843, getFreePartSlot_hook, 0x3e8e, 0x4846);  // call $3e8e
-  if (!(F & FZ)) { I(0x4846, 3); goto L_486e; } I(0x4846, 2);  // jr nz,$486e
-  I(0x4848, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  I(0x484a, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x484b, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x484c, 2); L = 0xcb;  // ld l,$cb
-  I(0x484e, 3); A = mem_rd(gb, 0xff90);  // ldh a,($ff90)
-  I(0x4850, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4851, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x4852, 3); A = mem_rd(gb, 0xff91);  // ldh a,($ff91)
-  I(0x4854, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4855, 4); A = mem_rd(gb, 0xd008);  // ld a,($d008)
-  I(0x4858, 2); A = alu_swap(gb, A);  // swap a
-  I(0x485a, 1); alu_rrca(gb);  // rrca
-  I(0x485b, 2); L = 0xc9;  // ld l,$c9
-  I(0x485d, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x485e, 2); L = 0xc3;  // ld l,$c3
-  I(0x4860, 1); A = C;  // ld a,c
-  I(0x4861, 2); alu_cp(gb, 0x0f);  // cp $0f
-  if (!(F & FZ)) { I(0x4863, 3); goto L_4867; } I(0x4863, 2);  // jr nz,$4867
-  I(0x4865, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-L_4867:
-  I(0x4867, 3); A = mem_rd(gb, 0xff8f);  // ldh a,($ff8f)
-  I(0x4869, 2); alu_cp(gb, 0x06);  // cp $06
-  if (!(F & FZ)) { I(0x486b, 3); goto L_486e; } I(0x486b, 2);  // jr nz,$486e
-  I(0x486d, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-L_486e:
-  SET_HL(POP(0x486e));  // pop hl
-  RET(0x486f); return;  // ret
-}
-
-// 06:486e
-void decideItemDropForBrokenTile__done(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_486e:
-  SET_HL(POP(0x486e));  // pop hl
-  RET(0x486f); return;  // ret
 }
 
 // 06:402d

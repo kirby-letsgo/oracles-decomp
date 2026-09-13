@@ -12,6 +12,12 @@ void getObjectGfxIndexForEnemy_hook(GB *gb);
 void insertIndexIntoLoadedObjectGfx_hook(GB *gb);
 void interactionGetData_hook(GB *gb);
 void getDataForInteraction_hook(GB *gb);
+static void refresh_dirty_palettes_refresh(GB *gb);
+static void refresh_dirty_palettes_gba_mode(GB *gb);
+static void refresh_dirty_palettes_gbc_mode(GB *gb);
+static void refresh_dirty_palettes_next_palette(GB *gb);
+static void refresh_dirty_palettes_gba_brighten_palette(GB *gb);
+static void add_a_to_hl_from_rst(GB *gb, uint16_t return_address);
 
 void initGbaModePaletteData_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -26,6 +32,146 @@ void initGbaModePaletteData_hook(GB *gb) {
   CYC(0x4012, 0x4013); SET_AF(pop_effect(gb));
   CYC(0x4013, 0x4015); mem_wr(gb, IO_SVBK, A);
   CYC(0x4015, 0x4016); ret_effect(gb);
+}
+
+void refreshDirtyPalettes_hook(GB *gb) {
+  CYC(0x4016, 0x4018); A = 0x02;
+  CYC(0x4018, 0x401a); mem_wr(gb, IO_SVBK, A);
+  CYC(0x401a, 0x401c); A = H8(hDirtyBgPalettes);
+  CYC(0x401c, 0x401d); D = A;
+  CYC(0x401d, 0x401f); A = H8(hBgPaletteSources);
+  CYC(0x401f, 0x4020); E = A;
+  CYC(0x4020, 0x4022); L = (uint8_t)w2TilesetBgPalettes;
+  CYC(0x4022, 0x4025); push_effect(gb, 0x4025);
+  refresh_dirty_palettes_refresh(gb);
+  CYC(0x4025, 0x4027); A = H8(hDirtySprPalettes);
+  CYC(0x4027, 0x4028); D = A;
+  CYC(0x4028, 0x402a); A = H8(hSprPaletteSources);
+  CYC(0x402a, 0x402b); E = A;
+  CYC(0x402b, 0x402d); L = (uint8_t)w2TilesetSprPalettes;
+  refresh_dirty_palettes_refresh(gb);
+}
+
+static void refresh_dirty_palettes_refresh(GB *gb) {
+  CYC(0x402d, 0x402e); A = D;
+  CYC(0x402e, 0x402f); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x402f, 0x4030);
+    ret_effect(gb);
+    return;
+  }
+  CYC(0x402f, 0x4030);
+  CYC(0x4030, 0x4032); D = alu_srl(gb, D);
+  if (!(F & FC)) {
+    CYCT(0x4032, 0x4034);
+    refresh_dirty_palettes_next_palette(gb);
+    return;
+  }
+  CYC(0x4032, 0x4034);
+  CYC(0x4034, 0x4036); H = (uint8_t)(w2TilesetBgPalettes >> 8);
+  CYC(0x4036, 0x4038); E = alu_srl(gb, E);
+  if (!(F & FC)) {
+    CYCT(0x4038, 0x403a);
+  } else {
+    CYC(0x4038, 0x403a);
+    CYC(0x403a, 0x403b); H = alu_inc8(gb, H);
+  }
+  CYC(0x403b, 0x403d); A = H8(hGameboyType);
+  CYC(0x403d, 0x403e); A = alu_inc8(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x403e, 0x4040);
+    refresh_dirty_palettes_gbc_mode(gb);
+    return;
+  }
+  CYC(0x403e, 0x4040);
+  refresh_dirty_palettes_gba_mode(gb);
+}
+
+static void refresh_dirty_palettes_gba_mode(GB *gb) {
+  CYC(0x4040, 0x4043); push_effect(gb, 0x4043);
+  refresh_dirty_palettes_gba_brighten_palette(gb);
+  CYC(0x4043, 0x4046); push_effect(gb, 0x4046);
+  refresh_dirty_palettes_gba_brighten_palette(gb);
+  CYC(0x4046, 0x4049); push_effect(gb, 0x4049);
+  refresh_dirty_palettes_gba_brighten_palette(gb);
+  CYC(0x4049, 0x404c); push_effect(gb, 0x404c);
+  refresh_dirty_palettes_gba_brighten_palette(gb);
+  CYC(0x404c, 0x404e);
+  refresh_dirty_palettes_refresh(gb);
+}
+
+static void refresh_dirty_palettes_gbc_mode(GB *gb) {
+  CYC(0x404e, 0x404f); push_effect(gb, DE);
+  CYC(0x404f, 0x4051); B = (uint8_t)(w2BgPalettesBuffer >> 8);
+  CYC(0x4051, 0x4052); C = L;
+  CYC(0x4052, 0x4054); C = (uint8_t)(C & ~(1 << 7));
+  CYC(0x4054, 0x4056); E = 0x08;
+  for (;;) {
+    CYC(0x4056, 0x4057); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x4057, 0x4058); mem_wr(gb, BC, A);
+    CYC(0x4058, 0x4059); C = alu_inc8(gb, C);
+    CYC(0x4059, 0x405a); E = alu_dec8(gb, E);
+    if (F & FZ) {
+      CYC(0x405a, 0x405c);
+      break;
+    }
+    CYCT(0x405a, 0x405c);
+  }
+  CYC(0x405c, 0x405d); SET_DE(pop_effect(gb));
+  CYC(0x405d, 0x405f);
+  refresh_dirty_palettes_refresh(gb);
+}
+
+static void refresh_dirty_palettes_next_palette(GB *gb) {
+  CYC(0x405f, 0x4060); A = L;
+  CYC(0x4060, 0x4062); alu_add(gb, 0x08);
+  CYC(0x4062, 0x4063); L = A;
+  CYC(0x4063, 0x4065); E = alu_srl(gb, E);
+  CYC(0x4065, 0x4067);
+  refresh_dirty_palettes_refresh(gb);
+}
+
+static void refresh_dirty_palettes_gba_brighten_palette(GB *gb) {
+  CYC(0x4067, 0x4068); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4068, 0x4069); C = A;
+  CYC(0x4069, 0x406b); alu_and(gb, 0xe0);
+  CYC(0x406b, 0x406c); B = A;
+  CYC(0x406c, 0x406d); A = mem_rd(gb, HL);
+  CYC(0x406d, 0x406f); alu_and(gb, 0x03);
+  CYC(0x406f, 0x4070); alu_or(gb, B);
+  CYC(0x4070, 0x4072); A = alu_swap(gb, A);
+  CYC(0x4072, 0x4073); B = A;
+  CYC(0x4073, 0x4074); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x4074, 0x4076); alu_and(gb, 0x7c);
+  CYC(0x4076, 0x4077); alu_rrca(gb);
+  CYC(0x4077, 0x4078); alu_rrca(gb);
+  CYC(0x4078, 0x4079); push_effect(gb, HL);
+  CYC(0x4079, 0x407c); SET_HL(w2GbaModePaletteData + 0x60);
+  CYC(0x407c, 0x407d); add_a_to_hl_from_rst(gb, 0x407d);
+  CYC(0x407d, 0x407e); A = B;
+  CYC(0x407e, 0x407f); B = mem_rd(gb, HL);
+  CYC(0x407f, 0x4082); SET_HL(w2GbaModePaletteData + 0x21);
+  CYC(0x4082, 0x4083); add_a_to_hl_from_rst(gb, 0x4083);
+  CYC(0x4083, 0x4084); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x4084, 0x4085); alu_or(gb, B);
+  CYC(0x4085, 0x4086); B = A;
+  CYC(0x4086, 0x4087); A = C;
+  CYC(0x4087, 0x4089); alu_and(gb, 0x1f);
+  CYC(0x4089, 0x408a); C = mem_rd(gb, HL);
+  CYC(0x408a, 0x408d); SET_HL(w2GbaModePaletteData);
+  CYC(0x408d, 0x408e); add_a_to_hl_from_rst(gb, 0x408e);
+  CYC(0x408e, 0x408f); A = mem_rd(gb, HL);
+  CYC(0x408f, 0x4090); alu_or(gb, C);
+  CYC(0x4090, 0x4091); SET_HL(pop_effect(gb));
+  CYC(0x4091, 0x4092); C = H;
+  CYC(0x4092, 0x4094); L = (uint8_t)(L & ~(1 << 7));
+  CYC(0x4094, 0x4096); H = (uint8_t)(w2BgPalettesBuffer >> 8);
+  CYC(0x4096, 0x4097); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4097, 0x4098); A = B;
+  CYC(0x4098, 0x4099); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4099, 0x409b); L = (uint8_t)(L | (1 << 7));
+  CYC(0x409b, 0x409c); H = C;
+  CYC(0x409c, 0x409d); ret_effect(gb);
 }
 
 static void add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
@@ -92,6 +238,45 @@ void findIndexInLoadedObjectGfx_hook(GB *gb) {
   CYC(0x428a, 0x428c); A = alu_swap(gb, A);
   CYC(0x428c, 0x428d); C = A;
   CYC(0x428d, 0x428e); ret_effect(gb);
+}
+
+void updateTileIndexBaseForAllObjects__updateTileIndexBase_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4256, 0x4257); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x4257, 0x4258);
+    ret_effect(gb);
+    return;
+  }
+  CYC(0x4257, 0x4258);
+  CALL_C(0x4258, findIndexInLoadedObjectGfx_hook, 0x4270, 0x425b);
+  CYC(0x425b, 0x425d); A = H8(hActiveObjectType);
+  CYC(0x425d, 0x425e); E = A;
+  CYC(0x425e, 0x425f); A = mem_rd(gb, DE);
+  CYC(0x425f, 0x4260); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x4260, 0x4261);
+    ret_effect(gb);
+    return;
+  }
+  CYC(0x4260, 0x4261);
+  CYC(0x4261, 0x4262); A = E;
+  CYC(0x4262, 0x4264); alu_add(gb, 0x1c);
+  CYC(0x4264, 0x4265); E = A;
+  CYC(0x4265, 0x4266); A = mem_rd(gb, DE);
+  CYC(0x4266, 0x4268); alu_bit(gb, 3, A);
+  if (!(F & FZ)) {
+    CYCT(0x4268, 0x4269);
+    ret_effect(gb);
+    return;
+  }
+  CYC(0x4268, 0x4269);
+  CYC(0x4269, 0x426a); E = alu_inc8(gb, E);
+  CYC(0x426a, 0x426b); A = mem_rd(gb, DE);
+  CYC(0x426b, 0x426d); alu_and(gb, 0x1f);
+  CYC(0x426d, 0x426e); alu_add(gb, C);
+  CYC(0x426e, 0x426f); mem_wr(gb, DE, A);
+  CYC(0x426f, 0x4270); ret_effect(gb);
 }
 
 void findUnusedIndexInLoadedObjectGfx_hook(GB *gb) {
@@ -443,4 +628,29 @@ void getDataForInteraction_hook(GB *gb) {
     CYCT(0x4458, 0x445a);
   }
   CYC(0x445a, 0x445b); ret_effect(gb);
+}
+
+void loadWeaponGfx_b3f_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x445b, 0x445e); SET_HL(wLoadedItemGraphic1);
+  CYC(0x445e, 0x445f); A = E;
+  CYC(0x445f, 0x4461); alu_cp(gb, 0x1a);
+  if (!(F & FC)) {
+    CYCT(0x4461, 0x4463);
+  } else {
+    CYC(0x4461, 0x4463);
+    CYC(0x4463, 0x4464); L = alu_inc8(gb, L);
+  }
+  CYC(0x4464, 0x4465); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x4465, 0x4466);
+    ret_effect(gb);
+    return;
+  }
+  CYC(0x4465, 0x4466);
+  CYC(0x4466, 0x4467); mem_wr(gb, HL, A);
+  CYC(0x4467, 0x4468); push_effect(gb, DE);
+  CALL_C(0x4468, loadUncompressedGfxHeader_hook, 0x05da, 0x446b);
+  CYC(0x446b, 0x446c); SET_DE(pop_effect(gb));
+  CYC(0x446c, 0x446d); ret_effect(gb);
 }

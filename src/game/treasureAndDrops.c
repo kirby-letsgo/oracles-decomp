@@ -10,6 +10,20 @@ void loseTreasure_helper_hook(GB *gb);
 void realignUnappraisedRings__findNextFilledSlot_hook(GB *gb);
 void addTreasureToInventory__addToInventory_hook(GB *gb);
 void loadTreasureDisplayData__getTableIndices_b3f_hook(GB *gb);
+void checkItemDropAvailable_body_hook(GB *gb);
+
+static void treasure_add_index_to_hl_from_rst(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
+  if (!(F & FC)) {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, true); ret_effect(gb);
+    return;
+  }
+  burn_rom(gb, 0x00, 0x0012, 0x0013, false);
+  burn_rom(gb, 0x00, 0x0013, 0x0014, false); H = alu_inc8(gb, H);
+  burn_rom(gb, 0x00, 0x0014, 0x0015, false); ret_effect(gb);
+}
 
 static void treasure_add_double_index_to_hl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -365,6 +379,85 @@ void loadTreasureDisplayData__getTableIndices_b3f_hook(GB *gb) {
     CYC(0x4742, 0x4743); D = mem_rd(gb, HL);
   }
   CYC(0x4743, 0x4744); ret_effect(gb);
+}
+
+void decideItemDrop_body_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x4744, 0x4745); A = C;
+  CYC(0x4745, 0x4746); alu_or(gb, A);
+  CYC(0x4746, 0x4748); A |= 0x80;
+  if (!(F & FZ)) {
+    CYCT(0x4748, 0x474a);
+  } else {
+    CYC(0x4748, 0x474a);
+    CYC(0x474a, 0x474c); A = H8(hActiveObjectType);
+    CYC(0x474c, 0x474e); alu_add(gb, 0x02);
+    CYC(0x474e, 0x474f); E = A;
+    CYC(0x474f, 0x4750); A = mem_rd(gb, DE);
+  }
+  CYC(0x4750, 0x4753); SET_HL(0x4a46);
+  CYC(0x4753, 0x4754); treasure_add_index_to_hl_from_rst(gb, 0x4754);
+  CYC(0x4754, 0x4755); A = mem_rd(gb, HL);
+  CYC(0x4755, 0x4756); C = A;
+  CYC(0x4756, 0x4758); alu_cp(gb, 0xff);
+  if (F & FZ) {
+    CYCT(0x4758, 0x475a);
+    goto unavailable;
+  }
+  CYC(0x4758, 0x475a);
+  CYC(0x475a, 0x475c); A = alu_swap(gb, A);
+  CYC(0x475c, 0x475d); alu_rrca(gb);
+  CYC(0x475d, 0x475f); alu_and(gb, 0x07);
+  CYC(0x475f, 0x4762); SET_HL(0x47fe);
+  CYC(0x4762, 0x4763); treasure_add_double_index_to_hl_from_rst(gb, 0x4763);
+  CYC(0x4763, 0x4764); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4764, 0x4765); H = mem_rd(gb, HL);
+  CYC(0x4765, 0x4766); L = A;
+  CALL_C(0x4766, getRandomNumber_hook, 0x043e, 0x4769);
+  CYC(0x4769, 0x476b); alu_and(gb, 0x3f);
+  CALL_C(0x476b, checkFlag_hook, 0x0205, 0x476e);
+  if (F & FZ) {
+    CYCT(0x476e, 0x4770);
+    goto unavailable;
+  }
+  CYC(0x476e, 0x4770);
+  CYC(0x4770, 0x4771); A = C;
+  CYC(0x4771, 0x4773); alu_and(gb, 0x1f);
+  CYC(0x4773, 0x4776); SET_HL(0x47be);
+  CYC(0x4776, 0x4777); treasure_add_double_index_to_hl_from_rst(gb, 0x4777);
+  CYC(0x4777, 0x4778); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4778, 0x4779); H = mem_rd(gb, HL);
+  CYC(0x4779, 0x477a); L = A;
+  CALL_C(0x477a, getRandomNumber_hook, 0x043e, 0x477d);
+  CYC(0x477d, 0x477f); alu_and(gb, 0x1f);
+  CYC(0x477f, 0x4780); treasure_add_index_to_hl_from_rst(gb, 0x4780);
+  CYC(0x4780, 0x4781); A = mem_rd(gb, HL);
+  CYC(0x4781, 0x4782); C = A;
+  checkItemDropAvailable_body_hook(gb);
+  return;
+
+unavailable:
+  CYC(0x478f, 0x4791); C = 0xff;
+  CYC(0x4791, 0x4792); ret_effect(gb);
+}
+
+void checkItemDropAvailable_body_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x4782, 0x4783); A = C;
+  CYC(0x4783, 0x4786); SET_HL(0x47de);
+  CYC(0x4786, 0x4787); treasure_add_double_index_to_hl_from_rst(gb, 0x4787);
+  CYC(0x4787, 0x4788); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4788, 0x4789); B = mem_rd(gb, HL);
+  CYC(0x4789, 0x478a); L = A;
+  CYC(0x478a, 0x478c); H = 0xc6;
+  CYC(0x478c, 0x478d); A = mem_rd(gb, HL);
+  CYC(0x478d, 0x478e); alu_and(gb, B);
+  if (!(F & FZ)) {
+    CYCT(0x478e, 0x478f); ret_effect(gb); return;
+  }
+  CYC(0x478e, 0x478f);
+  CYC(0x478f, 0x4791); C = 0xff;
+  CYC(0x4791, 0x4792); ret_effect(gb);
 }
 
 void checkIncreaseGashaMaturityForGettingTreasure_hook(GB *gb) {

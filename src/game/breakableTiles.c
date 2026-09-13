@@ -57,3 +57,54 @@ void makeInteractionForBreakableTile_hook(GB *gb) {
   CYC(0x483b, 0x483c); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(0x483c, 0x483d); ret_effect(gb);
 }
+
+void decideItemDropForBrokenTile_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x483d, 0x483e); push_effect(gb, HL);
+  CALL_C(0x483e, decideItemDrop_hook, 0x16eb, 0x4841);
+  if (F & FZ) {
+    CYCT(0x4841, 0x4843);
+    goto done;
+  }
+  CYC(0x4841, 0x4843);
+  CALL_C(0x4843, getFreePartSlot_hook, 0x3e8e, 0x4846);
+  if (!(F & FZ)) {
+    CYCT(0x4846, 0x4848);
+    goto done;
+  }
+  CYC(0x4846, 0x4848);
+  CYC(0x4848, 0x484a); mem_wr(gb, HL, 0x01);
+  CYC(0x484a, 0x484b); L = alu_inc8(gb, L);
+  CYC(0x484b, 0x484c); mem_wr(gb, HL, C);
+  CYC(0x484c, 0x484e); L = 0xcb;
+  CYC(0x484e, 0x4850); A = H8(hFF90);
+  CYC(0x4850, 0x4851); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4851, 0x4852); L = alu_inc8(gb, L);
+  CYC(0x4852, 0x4854); A = H8(hFF91);
+  CYC(0x4854, 0x4855); mem_wr(gb, HL, A);
+  CYC(0x4855, 0x4858); A = W8(w1Link_direction);
+  CYC(0x4858, 0x485a); A = alu_swap(gb, A);
+  CYC(0x485a, 0x485b); alu_rrca(gb);
+  CYC(0x485b, 0x485d); L = 0xc9;
+  CYC(0x485d, 0x485e); mem_wr(gb, HL, A);
+  CYC(0x485e, 0x4860); L = 0xc3;
+  CYC(0x4860, 0x4861); A = C;
+  CYC(0x4861, 0x4863); alu_cp(gb, 0x0f);
+  if (!(F & FZ)) {
+    CYCT(0x4863, 0x4865);
+  } else {
+    CYC(0x4863, 0x4865);
+    CYC(0x4865, 0x4867); mem_wr(gb, HL, 0x02);
+  }
+  CYC(0x4867, 0x4869); A = H8(hFF8F);
+  CYC(0x4869, 0x486b); alu_cp(gb, 0x06);
+  if (!(F & FZ)) {
+    CYCT(0x486b, 0x486d);
+  } else {
+    CYC(0x486b, 0x486d);
+    CYC(0x486d, 0x486e); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  }
+done:
+  CYC(0x486e, 0x486f); SET_HL(pop_effect(gb));
+  CYC(0x486f, 0x4870); ret_effect(gb);
+}

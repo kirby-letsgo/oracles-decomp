@@ -1356,18 +1356,18 @@ void collisionEffect3c(GB *gb) {
 L_43fd:
   I(0x43fd, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x43fe, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x43ff, 3); collisionEffect02(gb); return; } I(0x43ff, 2);  // jr z,$442a
+  if ((F & FZ)) { I(0x43ff, 3); if (hook_enabled_at(0x442a)) { collisionEffect02_hook(gb); return; } HANDOFF(0x442a); } I(0x43ff, 2);  // jr z,$442a
   I(0x4401, 1); alu_cp(gb, C);  // cp c
   I(0x4402, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   if (!(F & FZ)) { I(0x4403, 3); goto L_43fd; } I(0x4403, 2);  // jr nz,$43fd
   I(0x4405, 1); C = A;  // ld c,a
   I(0x4406, 2); alu_and(gb, 0x7f);  // and $7f
   CALL(0x4408, cpActiveRing_hook, 0x23b0, 0x440b);  // call $23b0
-  if (!(F & FZ)) { I(0x440b, 3); collisionEffect02(gb); return; } I(0x440b, 2);  // jr nz,$442a
+  if (!(F & FZ)) { I(0x440b, 3); if (hook_enabled_at(0x442a)) { collisionEffect02_hook(gb); return; } HANDOFF(0x442a); } I(0x440b, 2);  // jr nz,$442a
   I(0x440d, 2); alu_bit(gb, 7, C);  // bit 7,c
   I(0x440f, 2); A = 0x40;  // ld a,$40
   if ((F & FZ)) { I(0x4411, 4); applyDamageToEnemyOrPart(gb); return; } I(0x4411, 3);  // jp z,$4707
-  CALL(0x4414, collisionEffect02, 0x442a, 0x4417);  // call $442a
+  CALL(0x4414, collisionEffect02_hook, 0x442a, 0x4417);  // call $442a
   I(0x4417, 1); H = B;  // ld h,b
   I(0x4418, 2); L = 0x25;  // ld l,$25
   I(0x441a, 4); mem_wr(gb, HL, alu_sra(gb, mem_rd(gb, HL)));  // sra (hl)
@@ -1385,48 +1385,6 @@ L_4441:
   I(0x4442, 3); if (hook_enabled_at(0x4452)) { label_07_027_hook(gb); return; } HANDOFF(0x4452);  // jr $4452
 }
 
-// 07:4426
-void collisionEffect01(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4426, 2); E = 0x00;  // ld e,$00
-  I(0x4428, 3); goto L_4434;  // jr $4434
-L_4434:
-  CALL(0x4434, applyDamageToLink_paramE, 0x47df, 0x4437);  // call $47df
-  I(0x4437, 2); A = 0x1c;  // ld a,$1c
-  I(0x4439, 4); applyDamageToEnemyOrPart(gb); return;  // jp $4707
-}
-
-// 07:442a
-void collisionEffect02(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x442a, 2); E = 0x04;  // ld e,$04
-  I(0x442c, 3); goto L_4434;  // jr $4434
-L_4434:
-  CALL(0x4434, applyDamageToLink_paramE, 0x47df, 0x4437);  // call $47df
-  I(0x4437, 2); A = 0x1c;  // ld a,$1c
-  I(0x4439, 4); applyDamageToEnemyOrPart(gb); return;  // jp $4707
-}
-
-// 07:442e
-void collisionEffect03(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x442e, 2); E = 0x08;  // ld e,$08
-  I(0x4430, 3); goto L_4434;  // jr $4434
-L_4434:
-  CALL(0x4434, applyDamageToLink_paramE, 0x47df, 0x4437);  // call $47df
-  I(0x4437, 2); A = 0x1c;  // ld a,$1c
-  I(0x4439, 4); applyDamageToEnemyOrPart(gb); return;  // jp $4707
-}
-
-// 07:4432
-void collisionEffect04(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4432, 2); E = 0x0c;  // ld e,$0c
-  CALL(0x4434, applyDamageToLink_paramE, 0x47df, 0x4437);  // call $47df
-  I(0x4437, 2); A = 0x1c;  // ld a,$1c
-  I(0x4439, 4); applyDamageToEnemyOrPart(gb); return;  // jp $4707
-}
-
 // 07:4448
 void collisionEffect0b(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1441,48 +1399,6 @@ void collisionEffect21(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x4450, 2); E = 0x30;  // ld e,$30
   if (hook_enabled_at(0x4452)) { label_07_027_hook(gb); return; } HANDOFF(0x4452);  // fallthrough
-}
-
-// 07:4461
-void collisionEffect12(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4461, createClinkInteraction, 0x46e7, 0x4464);  // call $46e7
-  collisionEffect0c(gb); return;  // fallthrough
-}
-
-// 07:4464
-void collisionEffect0c(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4464, 2); E = 0x10;  // ld e,$10
-  I(0x4466, 3); label_07_028(gb); return;  // jr $4474
-}
-
-// 07:4468
-void collisionEffect13(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4468, createClinkInteraction, 0x46e7, 0x446b);  // call $46e7
-  collisionEffect0d(gb); return;  // fallthrough
-}
-
-// 07:446b
-void collisionEffect0d(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x446b, 2); E = 0x14;  // ld e,$14
-  I(0x446d, 3); label_07_028(gb); return;  // jr $4474
-}
-
-// 07:446f
-void collisionEffect14(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x446f, createClinkInteraction, 0x46e7, 0x4472);  // call $46e7
-  collisionEffect0e(gb); return;  // fallthrough
-}
-
-// 07:4472
-void collisionEffect0e(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4472, 2); E = 0x18;  // ld e,$18
-  label_07_028(gb); return;  // fallthrough
 }
 
 // 07:4474

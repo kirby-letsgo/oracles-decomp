@@ -825,3 +825,14 @@ desync to discover; keep them when porting routines.
   callers of every newly readable cross-bank target, capture `sp0_`, and replace the interpreter
   call with `CALL_C` so normal execution reaches the callee's readable hook while verify mode still
   compares against the exact ROM address.
+- A generated caller can retain a parent-local function name after that local is rewritten alone.
+  Batch 128 promoted bank-3F `$4256` as
+  `updateTileIndexBaseForAllObjects__updateTileIndexBase`; regeneration removed its generated body,
+  but the still-generated parent called the now-undefined non-hook name and compilation failed.
+  Give a separately promoted local a durable `extra.sym` plus `ported.txt` alias even when it is
+  already visible in `generated.txt`; the generated caller can then resolve it through the hook
+  table until its own parent becomes readable.
+- Re-auditing callers is required even for new callees in bank 0 itself. Batch 128's independent
+  reviews found four old bank-0 wrappers still using `CALL_ROM` after their drop-decision,
+  availability, palette-refresh, and weapon-GFX callees became readable. Exact call-site reports
+  supplied the four physical return addresses before each edge was upgraded to `CALL_C`.

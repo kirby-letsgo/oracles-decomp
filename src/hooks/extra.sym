@@ -892,3 +892,4 @@
 3f:4687 realignUnappraisedRings__findNextFilledSlot
 3f:46dc addTreasureToInventory__addToInventory
 3f:472b loadTreasureDisplayData__getTableIndices_b3f
+3f:4256 updateTileIndexBaseForAllObjects__updateTileIndexBase

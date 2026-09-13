@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,680 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,696 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -178,6 +178,10 @@ Updated 2026-09-13. Newest entries at the top of each section.
   Batch 127 added the bank-6 parent-item, interactable-tile, and breakable-tile helpers, the first
   bank-7 collision effects, and the bank-3F ring inventory, treasure-display, and gasha-maturity
   paths. Three internal/data rows disappeared, leaving 2,680 readable hooks out of 12,634.
+  Batch 128 completed the item-drop decision paths, added ten more bank-7 collision effects, and
+  added palette refresh, weapon graphics, and the per-object tile-index-base helper. Sixteen
+  item-drop table rows and seven internal labels left the executable registry, leaving 2,696
+  readable hooks out of 12,611.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -283,6 +287,17 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 128 (16 routines): completed the broken-tile and general
+  item-drop decision paths, added ten more collision-effect entries in bank 7, and made palette
+  refresh, bank-3F weapon graphics loading, and the per-object tile-index-base helper readable.
+  Sixteen `.db` item-drop sets and seven parent-owned internal labels correctly left the executable
+  registry. Promoting the tile-index helper required a durable alias at bank 3F `$4256`; without
+  it, its generated caller retained the vanished non-hook local name and failed compilation. Two
+  independent instruction reviews found and fixed four stale bank-0 `CALL_ROM` edges to the newly
+  readable drop, availability, palette-refresh, and weapon-GFX targets. The project now has 2,696
+  readable hooks out of 12,611. Gates: lint 0, 30k verify 0 failures across 4,685,537 calls with
+  state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches across 12,569,439 calls
+  with state `a62ae98192befee8`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 127 (27 routines): added parent-item initialization,
   shop input, parent clearing, pushing counters, tile-offset checks, and breakable-tile interaction
   creation in bank 6; the first nine collision-effect entries and shared damage tails in bank 7;

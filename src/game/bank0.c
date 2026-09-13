@@ -3334,10 +3334,11 @@ void loadRoomCollisions_hook(GB *gb) {
 // treasure and item drops (bank $3f bodies)
 
 void decideItemDrop_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   C = A;
   CYC(0x16eb, 0x16ec);
   bank_push(gb, 0x16ec, 0x3f);
-  CALL_ROM(0x16f6, ROM_b3f_decideItemDrop_body);
+  CALL_C(0x16f6, decideItemDrop_body_hook, ROM_b3f_decideItemDrop_body, 0x16f9);
   bank_pop(gb, 0x16f9);
   A = C;
   alu_cp(gb, 0xff);
@@ -3346,12 +3347,14 @@ void decideItemDrop_hook(GB *gb) {
 }
 
 void checkItemDropAvailable_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   C = A;
   CYC(0x1703, 0x1704);
   bank_push(gb, 0x1704, 0x3f);
   A = C;
   CYC(0x170e, 0x170f);
-  CALL_ROM(0x170f, ROM_b3f_checkItemDropAvailable_body);
+  CALL_C(0x170f, checkItemDropAvailable_body_hook,
+      ROM_b3f_checkItemDropAvailable_body, 0x1712);
   bank_pop(gb, 0x1712);
   A = C;
   alu_cp(gb, 0xff);
@@ -11413,10 +11416,11 @@ void reloadObjectGfx_b00_hook(GB *gb) {
 }
 
 void loadWeaponGfx_b00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   E = A;
   CYC(0x166d, 0x166e);
   bank3f_push(gb, 0x166e);
-  CALL_ROM(0x1678, ROM_b3f_loadWeaponGfx);
+  CALL_C(0x1678, loadWeaponGfx_b3f_hook, ROM_b3f_loadWeaponGfx, 0x167b);
   bank_pop_af(gb, 0x167b);
   CYC(0x1681, 0x1682);
   ret_effect(gb);
@@ -12650,7 +12654,7 @@ void _mainLoop_nextThread_hook(GB *gb) {
   CYC(0x095f, 0x0961);
   CYC(0x0961, 0x0963); H8(hRomBank) = A;
   CYC(0x0963, 0x0966); mem_wr(gb, MBC_ROM_BANK, A);
-  CALL_ROM(0x0966, ROM_refreshDirtyPalettes);
+  CALL_C(0x0966, refreshDirtyPalettes_hook, ROM_refreshDirtyPalettes, 0x0969);
   alu_xor(gb, A);
   CYC(0x0969, 0x096a);
   CYC(0x096a, 0x096c); mem_wr(gb, IO_SVBK, A);
