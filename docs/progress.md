@@ -268,6 +268,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   Batch 153 completed Moosh, opened Dimitri through its held/movement substates, and made transformed
   Link readable. Forty parent-owned local rows disappeared; the project now has 3,340 readable
   hooks out of 11,682.
+  Batch 154 completed every remaining Dimitri state/helper and the link-riding-animal state machine.
+  Eighteen parent-owned local rows disappeared; the project now has 3,365 readable hooks out of
+  11,664.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -373,6 +376,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 154 (25 routines): completed all twenty-four remaining
+  Dimitri states, substates, movement, collision, waterfall, and grabbable-object helpers, plus the
+  link-riding-animal state machine. Eighteen parent-owned local rows were absorbed. Two independent
+  instruction reviews per routine verified 407 unique physical instructions, five RST `$00`
+  dispatchers, Dimitri's real local-call/RST `$18` stack path and shared hazard tail, both conditional
+  smart calls, and the riding form's dual call/fallthrough return ownership with no defects. The
+  project now has 3,365 readable hooks out of 11,664. Gates: lint 0, 30k verify 0 failures across
+  4,584,109 calls with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches across
+  11,707,471 calls with state `a62ae98192befee8`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 153 (29 routines): completed the remaining eighteen Moosh
   state/substate and NPC-update roots, added Dimitri's root, durable state dispatcher, initialization,
   held-object substates, and landing helper, and rewrote the complete transformed-Link state machine.

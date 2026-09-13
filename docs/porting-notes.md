@@ -990,3 +990,8 @@ desync to discover; keep them when porting routines.
   canonical C name in `rewritten.txt`; the code compiled, but regeneration omitted the hook and lint
   reported the missing rewrite. Promote such an entry explicitly with its canonical name/address in
   `src/hooks/extra.sym` and the same canonical name in both `ported.txt` and `rewritten.txt`.
+- A shared local body can own different return frames depending on how execution reaches it. In
+  Batch 154, link-riding-animal state 0 calls `$635a`, so the rewrite must explicitly push `$6335`
+  before the shared body's `ret_effect`; state 1 physically falls through to the same `$635a` body,
+  so it must not manufacture a call frame and that same `ret_effect` consumes the root caller's
+  return. Turning both entries into an ordinary C helper call preserves control flow but corrupts SP.
