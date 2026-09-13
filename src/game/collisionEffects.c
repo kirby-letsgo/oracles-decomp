@@ -15,6 +15,8 @@ void collisionEffect0f_hook(GB *gb);
 void collisionEffect10_hook(GB *gb);
 void collisionEffect11_hook(GB *gb);
 void collisionEffect3d_hook(GB *gb);
+void label_07_033_hook(GB *gb);
+void killEnemyOrPart_hook(GB *gb);
 
 static void collisionEffectDamageLinkTail_hook(GB *gb, uint16_t sp0_) {
   CALL_C(0x4434, applyDamageToLink_paramE, 0x47df, 0x4437);
@@ -307,6 +309,130 @@ void collisionEffect30_hook(GB *gb) {
 void collisionEffect1c_hook(GB *gb) {
   CYC(0x454c, 0x454f); SET_HL(0x1c1c);
   CYC(0x454f, 0x4551); applyDamageToBothObjects_hook(gb);
+}
+
+void collisionEffect23_hook(GB *gb) {
+  CYC(0x4584, 0x4586); A = H8(hActiveObjectType);
+  CYC(0x4586, 0x4588); alu_add(gb, 0x29);
+  CYC(0x4588, 0x4589); L = A;
+  CYC(0x4589, 0x458a); H = D;
+  CYC(0x458a, 0x458c); mem_wr(gb, HL, 0x00);
+  CYC(0x458c, 0x458d); ret_effect(gb);
+}
+
+void collisionEffect24_hook(GB *gb) {
+  CYC(0x458d, 0x458f); A = H8(hActiveObjectType);
+  CYC(0x458f, 0x4591); alu_add(gb, 0x2a);
+  CYC(0x4591, 0x4592); E = A;
+  CYC(0x4592, 0x4594); A = H8(hFF90);
+  CYC(0x4594, 0x4596); alu_or(gb, 0x80);
+  CYC(0x4596, 0x4597); mem_wr(gb, DE, A);
+  CYC(0x4597, 0x4598); A = E;
+  CYC(0x4598, 0x459a); alu_add(gb, 0xec);
+  CYC(0x459a, 0x459b); L = A;
+  CYC(0x459b, 0x459c); H = D;
+  CYC(0x459c, 0x459d); mem_wr(gb, HL, C);
+  CYC(0x459d, 0x459e); L = alu_inc8(gb, L);
+  CYC(0x459e, 0x459f); mem_wr(gb, HL, B);
+  CYC(0x459f, 0x45a1); C = 0x2a;
+  CYC(0x45a1, 0x45a3); A = 0x01;
+  CYC(0x45a3, 0x45a4); mem_wr(gb, BC, A);
+  CYC(0x45a4, 0x45a5); ret_effect(gb);
+}
+
+void collisionEffect25_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+
+  CALL_C(0x45a5, killEnemyOrPart_hook, 0x4649, 0x45a8);
+  CYC(0x45a8, 0x45a9); A = L;
+  CYC(0x45a9, 0x45ab); alu_add(gb, 0x1b);
+  CYC(0x45ab, 0x45ac); L = A;
+  CYC(0x45ac, 0x45ae); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
+  CYC(0x45ae, 0x45b0); C = 0x2a;
+  CYC(0x45b0, 0x45b2); A = 0x02;
+  CYC(0x45b2, 0x45b3); mem_wr(gb, BC, A);
+  CYC(0x45b3, 0x45b4); ret_effect(gb);
+}
+
+void collisionEffect2a_hook(GB *gb) {
+  CYC(0x4604, 0x4605); H = B;
+  CYC(0x4605, 0x4607); L = 0x2d;
+  CYC(0x4607, 0x4608); A = D;
+  CYC(0x4608, 0x4609); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(0x4609, 0x460a); ret_effect(gb); return; }
+  CYC(0x4609, 0x460a);
+  CYC(0x460a, 0x460b); mem_wr(gb, HL, A); L--;
+  CYC(0x460b, 0x460d); E = 0xe1;
+  CYC(0x460d, 0x460e); A = mem_rd(gb, DE);
+  CYC(0x460e, 0x460f); mem_wr(gb, HL, A); L--;
+  CYC(0x460f, 0x4610); L = alu_dec8(gb, L);
+  CYC(0x4610, 0x4612); mem_wr(gb, HL, mem_rd(gb, HL) | 0x10);
+  CYC(0x4612, 0x4614); E = 0xea;
+  CYC(0x4614, 0x4616); A = H8(hFF90);
+  CYC(0x4616, 0x4618); alu_or(gb, 0x80);
+  CYC(0x4618, 0x4619); mem_wr(gb, DE, A);
+  CYC(0x4619, 0x461a); ret_effect(gb);
+}
+
+void collisionEffect2d_hook(GB *gb) {
+  CYC(0x461a, 0x461b); H = B;
+  CYC(0x461b, 0x461d); L = 0x2f;
+  CYC(0x461d, 0x461f); mem_wr(gb, HL, mem_rd(gb, HL) | 0x20);
+  CYC(0x461f, 0x4620); ret_effect(gb);
+}
+
+void collisionEffect31_hook(GB *gb) {
+  CYC(0x4620, 0x4622); A = 0x34;
+  CYC(0x4622, 0x4625); applyDamageToEnemyOrPart(gb);
+}
+
+void collisionEffect32_hook(GB *gb) {
+  CYC(0x4625, 0x4628); SET_HL(0x3448);
+  CYC(0x4628, 0x462a); label_07_033_hook(gb);
+}
+
+void collisionEffect33_hook(GB *gb) {
+  CYC(0x462a, 0x462d); SET_HL(0x384c);
+  label_07_033_hook(gb);
+}
+
+void label_07_033_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+
+  CALL_C(0x462d, applyDamageToBothObjects_hook, 0x44f1, 0x4630);
+  CYC(0x4630, 0x4633); createClinkInteraction(gb);
+}
+
+void collisionEffect34_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+
+  CALL_C(0x4633, createFlamePart, 0x46da, 0x4636);
+  CYC(0x4636, 0x4637); H = B;
+  CYC(0x4637, 0x4639); L = 0x24;
+  CYC(0x4639, 0x463b); mem_wr(gb, HL, mem_rd(gb, HL) & 0x7f);
+  CYC(0x463b, 0x463e); SET_HL(0x1c2c);
+  CALL_C(0x463e, applyDamageToBothObjects_hook, 0x44f1, 0x4641);
+  CYC(0x4641, 0x4643); killEnemyOrPart_hook(gb);
+}
+
+void collisionEffect35_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+
+  CYC(0x4643, 0x4646); SET_HL(0x1c1c);
+  CALL_C(0x4646, applyDamageToBothObjects_hook, 0x44f1, 0x4649);
+  killEnemyOrPart_hook(gb);
+}
+
+void killEnemyOrPart_hook(GB *gb) {
+  CYC(0x4649, 0x464a); H = D;
+  CYC(0x464a, 0x464c); A = H8(hActiveObjectType);
+  CYC(0x464c, 0x464e); alu_add(gb, 0x29);
+  CYC(0x464e, 0x464f); L = A;
+  CYC(0x464f, 0x4651); mem_wr(gb, HL, 0x00);
+  CYC(0x4651, 0x4653); alu_add(gb, 0xfb);
+  CYC(0x4653, 0x4654); L = A;
+  CYC(0x4654, 0x4656); mem_wr(gb, HL, mem_rd(gb, HL) & 0x7f);
+  CYC(0x4656, 0x4657); ret_effect(gb);
 }
 
 void applyDamageToBothObjects_hook(GB *gb) {

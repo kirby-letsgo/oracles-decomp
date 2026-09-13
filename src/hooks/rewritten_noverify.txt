@@ -9,3 +9,9 @@ startGame__afterSp0925
 checkDisplayDmgModeScreen
 checkDisplayDmgModeScreen__vblankLoop
 introThreadStart
+loadTreeGfx_body
+partLoadGraphicsAndProperties
+interactionLoadGraphics
+itemLoadGraphics
+interactionInitGraphics
+loadTreeGfx

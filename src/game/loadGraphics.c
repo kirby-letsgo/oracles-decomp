@@ -573,6 +573,133 @@ void itemGetObjectGfxIndex_hook(GB *gb) {
   CYC(0x4367, 0x4368); ret_effect(gb);
 }
 
+void loadTreeGfx_body_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x41f5, 0x41f8); SET_HL(wLoadedTreeGfxActive);
+  CYC(0x41f8, 0x41f9); A = E;
+  CYC(0x41f9, 0x41fa); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x41fa, 0x41fb); ret_effect(gb); return;
+  }
+  CYC(0x41fa, 0x41fb);
+  CALL_C(0x41fb, insertIndexIntoLoadedObjectGfx_hook, 0x42cf, 0x41fe);
+  CYC(0x41fe, 0x4201); resumeThreadNextFrameIfLcdIsOn(gb);
+}
+
+void partLoadGraphicsAndProperties__afterCall43d3_hook(GB *gb) {
+  CYC(0x43d3, 0x43d5); E = 0xc1;
+  CYC(0x43d5, 0x43d6); A = mem_rd(gb, DE);
+  CYC(0x43d6, 0x43d8); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x43d8, 0x43da);
+  } else {
+    CYC(0x43d8, 0x43da);
+    CYC(0x43da, 0x43dc); A |= 0x80;
+  }
+  CYC(0x43dc, 0x43de); E = 0xe4;
+  CYC(0x43de, 0x43df); mem_wr(gb, DE, A);
+  CYC(0x43df, 0x43e0); E = alu_inc8(gb, E);
+  CYC(0x43e0, 0x43e1); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x43e1, 0x43e3); alu_and(gb, 0x7f);
+  CYC(0x43e3, 0x43e4); mem_wr(gb, DE, A);
+  CYC(0x43e4, 0x43e5); E = alu_inc8(gb, E);
+  CYC(0x43e5, 0x43e6); A = mem_rd(gb, HL);
+  CYC(0x43e6, 0x43e8); A = alu_swap(gb, A);
+  CYC(0x43e8, 0x43ea); alu_and(gb, 0x0f);
+  CYC(0x43ea, 0x43eb); mem_wr(gb, DE, A);
+  CYC(0x43eb, 0x43ec); E = alu_inc8(gb, E);
+  CYC(0x43ec, 0x43ed); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x43ed, 0x43ef); alu_and(gb, 0x0f);
+  CYC(0x43ef, 0x43f0); mem_wr(gb, DE, A);
+  CYC(0x43f0, 0x43f1); E = alu_inc8(gb, E);
+  CYC(0x43f1, 0x43f2); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x43f2, 0x43f3); mem_wr(gb, DE, A);
+  CYC(0x43f3, 0x43f4); E = alu_inc8(gb, E);
+  CYC(0x43f4, 0x43f5); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x43f5, 0x43f6); mem_wr(gb, DE, A);
+  CYC(0x43f6, 0x43f8); E = 0xdd;
+  CYC(0x43f8, 0x43f9); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x43f9, 0x43fa); alu_add(gb, C);
+  CYC(0x43fa, 0x43fb); mem_wr(gb, DE, A);
+  CYC(0x43fb, 0x43fc); E = alu_dec8(gb, E);
+  CYC(0x43fc, 0x43fd); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x43fd, 0x43fe); mem_wr(gb, DE, A);
+  CYC(0x43fe, 0x43ff); E = alu_dec8(gb, E);
+  CYC(0x43ff, 0x4400); mem_wr(gb, DE, A);
+  CYC(0x4400, 0x4401); alu_xor(gb, A);
+  CYC(0x4401, 0x4404); partSetAnimation_hook(gb);
+}
+
+void partLoadGraphicsAndProperties_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x43c9, partGetObjectGfxIndex_hook, 0x4347, 0x43cc);
+  CALL_C(0x43cc, addIndexToLoadedObjectGfx_hook, 0x42bb, 0x43cf);
+  CYC(0x43cf, 0x43d0); C = A;
+  if (F & FC) {
+    CALL_C_CC(0x43d0, resumeThreadNextFrameIfLcdIsOn, 0x411d, 0x43d3);
+  } else {
+    CYC(0x43d0, 0x43d3);
+  }
+  partLoadGraphicsAndProperties__afterCall43d3_hook(gb);
+}
+
+void interactionLoadGraphics__afterCall440e_hook(GB *gb) {
+  CYC(0x440e, 0x440f); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x440f, 0x4411); alu_and(gb, 0x7f);
+  CYC(0x4411, 0x4412); alu_add(gb, C);
+  CYC(0x4412, 0x4414); E = 0x5d;
+  CYC(0x4414, 0x4415); mem_wr(gb, DE, A);
+  CYC(0x4415, 0x4416); A = mem_rd(gb, HL);
+  CYC(0x4416, 0x4418); A = alu_swap(gb, A);
+  CYC(0x4418, 0x441a); alu_and(gb, 0x0f);
+  CYC(0x441a, 0x441b); E = alu_dec8(gb, E);
+  CYC(0x441b, 0x441c); mem_wr(gb, DE, A);
+  CYC(0x441c, 0x441d); E = alu_dec8(gb, E);
+  CYC(0x441d, 0x441e); mem_wr(gb, DE, A);
+  CYC(0x441e, 0x441f); A = mem_rd(gb, HL);
+  CYC(0x441f, 0x4421); alu_and(gb, 0x0f);
+  CYC(0x4421, 0x4422); ret_effect(gb);
+}
+
+void interactionLoadGraphics_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x4404, interactionGetObjectGfxIndex_hook, 0x4355, 0x4407);
+  CALL_C(0x4407, addIndexToLoadedObjectGfx_hook, 0x42bb, 0x440a);
+  CYC(0x440a, 0x440b); C = A;
+  if (F & FC) {
+    CALL_C_CC(0x440b, resumeThreadNextFrameIfLcdIsOn, 0x411d, 0x440e);
+  } else {
+    CYC(0x440b, 0x440e);
+  }
+  interactionLoadGraphics__afterCall440e_hook(gb);
+}
+
+void itemLoadGraphics__afterCall442c_hook(GB *gb) {
+  CYC(0x442c, 0x442d); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x442d, 0x442e); alu_add(gb, C);
+  CYC(0x442e, 0x4430); E = 0x1d;
+  CYC(0x4430, 0x4431); mem_wr(gb, DE, A);
+  CYC(0x4431, 0x4432); A = mem_rd(gb, HL);
+  CYC(0x4432, 0x4433); E = alu_dec8(gb, E);
+  CYC(0x4433, 0x4434); mem_wr(gb, DE, A);
+  CYC(0x4434, 0x4435); E = alu_dec8(gb, E);
+  CYC(0x4435, 0x4436); mem_wr(gb, DE, A);
+  CYC(0x4436, 0x4437); ret_effect(gb);
+}
+
+void itemLoadGraphics_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x4422, itemGetObjectGfxIndex_hook, 0x435c, 0x4425);
+  CALL_C(0x4425, addIndexToLoadedObjectGfx_hook, 0x42bb, 0x4428);
+  CYC(0x4428, 0x4429); C = A;
+  if (F & FC) {
+    CALL_C_CC(0x4429, resumeThreadNextFrameIfLcdIsOn, 0x411d, 0x442c);
+  } else {
+    CYC(0x4429, 0x442c);
+  }
+  itemLoadGraphics__afterCall442c_hook(gb);
+}
+
 void interactionGetData_hook(GB *gb) {
   CYC(0x4437, 0x4438); H = D;
   CYC(0x4438, 0x443a); L = 0x41;

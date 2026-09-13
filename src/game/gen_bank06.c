@@ -2,29 +2,6 @@
 #include "game/asm.h"
 #include "game/gen.h"
 
-// 06:4000
-void interactWithTileBeforeLink_b06(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4000, 4); A = mem_rd(gb, 0xcc5a);  // ld a,($cc5a)
-  I(0x4003, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4004); return; } I(0x4004, 2);  // ret nz
-  CALL(0x4005, specialObjectGetTileInFront_hook, 0x4373, 0x4008);  // call $4373
-  I(0x4008, 1); E = A;  // ld e,a
-  I(0x4009, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  I(0x400b, 1); A = C;  // ld a,c
-  I(0x400c, 3); mem_wr(gb, 0xff8d, A);  // ldh ($ff8d),a
-  I(0x400e, 3); SET_HL(0x43b2);  // ld hl,$43b2
-  CALL(0x4011, lookupCollisionTable_paramE_hook, 0x1e20, 0x4014);  // call $1e20
-  if (!(F & FC)) { I(0x4014, 4); if (hook_enabled_at(0x420c)) { resetPushingAgainstTileCounter_hook(gb); return; } HANDOFF(0x420c); } I(0x4014, 3);  // jp nc,$420c
-  I(0x4017, 1); B = A;  // ld b,a
-  I(0x4018, 2); alu_and(gb, 0x0f);  // and $0f
-  RST_PUSH(0x401a, 0x401b);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
 // 06:48b3
 void checkUseItems_b06(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

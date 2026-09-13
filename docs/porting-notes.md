@@ -858,3 +858,12 @@ desync to discover; keep them when porting routines.
   emulated-register access only in `_hook` shims. Batch 130's bank-0 `give_treasure` integration
   first failed lint for that reason. Capture `sp0_` in each enclosing hook and pass it into the
   helper, including loop callers such as `refillSeedSatchel`.
+- Similar named RAM fields can differ by one byte while preserving every instruction range and
+  cycle. Batch 131's `loadTreeGfx_body` decoded `ld hl,$cc19` but initially used
+  `wLoadedTreeGfxIndex` at `$cc18`; both independent reviews found the mismatch and changed it to
+  `wLoadedTreeGfxActive`. Check the symbol's resolved numeric address, not only its plausible name.
+- A graphics routine that calls `resumeThreadNextFrameIfLcdIsOn` needs both a durable post-call
+  continuation and NOVERIFY propagation through every direct caller. Batch 131 promoted exact
+  continuations at bank-3F `$43d3`, `$440e`, and `$442c`; the four graphics roots and their two
+  bank-0 wrappers are NOVERIFY, while the independently returning continuation hooks remain fully
+  verifiable.

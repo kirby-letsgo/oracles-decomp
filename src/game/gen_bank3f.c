@@ -157,7 +157,7 @@ L_4143:
   I(0x414b, 3); SET_HL(0xcc19);  // ld hl,$cc19
   I(0x414e, 2); E = mem_rd(gb, HL);  // ld e,(hl)
   I(0x414f, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x4151, 4); loadTreeGfx_body(gb); return;  // jp $41f5
+  I(0x4151, 4); if (hook_enabled_at(0x41f5)) { loadTreeGfx_body_hook(gb); return; } HANDOFF(0x41f5);  // jp $41f5
 }
 
 // 3f:4143
@@ -183,7 +183,7 @@ L_4143:
   I(0x414b, 3); SET_HL(0xcc19);  // ld hl,$cc19
   I(0x414e, 2); E = mem_rd(gb, HL);  // ld e,(hl)
   I(0x414f, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x4151, 4); loadTreeGfx_body(gb); return;  // jp $41f5
+  I(0x4151, 4); if (hook_enabled_at(0x41f5)) { loadTreeGfx_body_hook(gb); return; } HANDOFF(0x41f5);  // jp $41f5
 }
 
 // 3f:4154
@@ -830,17 +830,6 @@ L_41f0:
   I(0x41f3, 3); goto L_41b6;  // jr $41b6
 }
 
-// 3f:41f5
-void loadTreeGfx_body(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x41f5, 3); SET_HL(0xcc19);  // ld hl,$cc19
-  I(0x41f8, 1); A = E;  // ld a,e
-  I(0x41f9, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if ((F & FZ)) { RET_TAKEN(0x41fa); return; } I(0x41fa, 2);  // ret z
-  CALL(0x41fb, insertIndexIntoLoadedObjectGfx_hook, 0x42cf, 0x41fe);  // call $42cf
-  I(0x41fe, 4); resumeThreadNextFrameIfLcdIsOn(gb); return;  // jp $411d
-}
-
 // 3f:4201
 void updateTileIndexBaseForAllObjects(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1190,180 +1179,6 @@ L_439f:
   I(0x43c4, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x43c5, 1); alu_xor(gb, A);  // xor a
   I(0x43c6, 4); if (hook_enabled_at(0x282b)) { enemySetAnimation_hook(gb); return; } HANDOFF(0x282b);  // jp $282b
-}
-
-// 3f:43c9
-void partLoadGraphicsAndProperties(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x43c9, partGetObjectGfxIndex_hook, 0x4347, 0x43cc);  // call $4347
-  CALL(0x43cc, addIndexToLoadedObjectGfx_hook, 0x42bb, 0x43cf);  // call $42bb
-  I(0x43cf, 1); C = A;  // ld c,a
-  if ((F & FC)) { CALL(0x43d0, resumeThreadNextFrameIfLcdIsOn, 0x411d, 0x43d3); } else I(0x43d0, 3);  // call c,$411d
-L_43d3:
-  I(0x43d3, 2); E = 0xc1;  // ld e,$c1
-  I(0x43d5, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x43d6, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x43d8, 3); goto L_43dc; } I(0x43d8, 2);  // jr z,$43dc
-  I(0x43da, 2); A = (uint8_t)(A | (1 << 7));  // set 7,a
-L_43dc:
-  I(0x43dc, 2); E = 0xe4;  // ld e,$e4
-  I(0x43de, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43df, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x43e0, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x43e1, 2); alu_and(gb, 0x7f);  // and $7f
-  I(0x43e3, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43e4, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x43e5, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x43e6, 2); A = alu_swap(gb, A);  // swap a
-  I(0x43e8, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x43ea, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43eb, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x43ec, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x43ed, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x43ef, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43f0, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x43f1, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x43f2, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43f3, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x43f4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x43f5, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43f6, 2); E = 0xdd;  // ld e,$dd
-  I(0x43f8, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x43f9, 1); alu_add(gb, C);  // add c
-  I(0x43fa, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43fb, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x43fc, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x43fd, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43fe, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x43ff, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4400, 1); alu_xor(gb, A);  // xor a
-  I(0x4401, 4); if (hook_enabled_at(0x2988)) { partSetAnimation_hook(gb); return; } HANDOFF(0x2988);  // jp $2988
-}
-
-// 3f:43d3
-void partLoadGraphicsAndProperties__afterCall43d3(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_43d3:
-  I(0x43d3, 2); E = 0xc1;  // ld e,$c1
-  I(0x43d5, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x43d6, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x43d8, 3); goto L_43dc; } I(0x43d8, 2);  // jr z,$43dc
-  I(0x43da, 2); A = (uint8_t)(A | (1 << 7));  // set 7,a
-L_43dc:
-  I(0x43dc, 2); E = 0xe4;  // ld e,$e4
-  I(0x43de, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43df, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x43e0, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x43e1, 2); alu_and(gb, 0x7f);  // and $7f
-  I(0x43e3, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43e4, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x43e5, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x43e6, 2); A = alu_swap(gb, A);  // swap a
-  I(0x43e8, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x43ea, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43eb, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x43ec, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x43ed, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x43ef, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43f0, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x43f1, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x43f2, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43f3, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x43f4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x43f5, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43f6, 2); E = 0xdd;  // ld e,$dd
-  I(0x43f8, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x43f9, 1); alu_add(gb, C);  // add c
-  I(0x43fa, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43fb, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x43fc, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x43fd, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x43fe, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x43ff, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4400, 1); alu_xor(gb, A);  // xor a
-  I(0x4401, 4); if (hook_enabled_at(0x2988)) { partSetAnimation_hook(gb); return; } HANDOFF(0x2988);  // jp $2988
-}
-
-// 3f:4404
-void interactionLoadGraphics(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4404, interactionGetObjectGfxIndex_hook, 0x4355, 0x4407);  // call $4355
-  CALL(0x4407, addIndexToLoadedObjectGfx_hook, 0x42bb, 0x440a);  // call $42bb
-  I(0x440a, 1); C = A;  // ld c,a
-  if ((F & FC)) { CALL(0x440b, resumeThreadNextFrameIfLcdIsOn, 0x411d, 0x440e); } else I(0x440b, 3);  // call c,$411d
-L_440e:
-  I(0x440e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x440f, 2); alu_and(gb, 0x7f);  // and $7f
-  I(0x4411, 1); alu_add(gb, C);  // add c
-  I(0x4412, 2); E = 0x5d;  // ld e,$5d
-  I(0x4414, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4415, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4416, 2); A = alu_swap(gb, A);  // swap a
-  I(0x4418, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x441a, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x441b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x441c, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x441d, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x441e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x441f, 2); alu_and(gb, 0x0f);  // and $0f
-  RET(0x4421); return;  // ret
-}
-
-// 3f:440e
-void interactionLoadGraphics__afterCall440e(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_440e:
-  I(0x440e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x440f, 2); alu_and(gb, 0x7f);  // and $7f
-  I(0x4411, 1); alu_add(gb, C);  // add c
-  I(0x4412, 2); E = 0x5d;  // ld e,$5d
-  I(0x4414, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4415, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4416, 2); A = alu_swap(gb, A);  // swap a
-  I(0x4418, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x441a, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x441b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x441c, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x441d, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x441e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x441f, 2); alu_and(gb, 0x0f);  // and $0f
-  RET(0x4421); return;  // ret
-}
-
-// 3f:4422
-void itemLoadGraphics(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4422, itemGetObjectGfxIndex_hook, 0x435c, 0x4425);  // call $435c
-  CALL(0x4425, addIndexToLoadedObjectGfx_hook, 0x42bb, 0x4428);  // call $42bb
-  I(0x4428, 1); C = A;  // ld c,a
-  if ((F & FC)) { CALL(0x4429, resumeThreadNextFrameIfLcdIsOn, 0x411d, 0x442c); } else I(0x4429, 3);  // call c,$411d
-L_442c:
-  I(0x442c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x442d, 1); alu_add(gb, C);  // add c
-  I(0x442e, 2); E = 0x1d;  // ld e,$1d
-  I(0x4430, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4431, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4432, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4433, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4434, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4435, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x4436); return;  // ret
-}
-
-// 3f:442c
-void itemLoadGraphics__afterCall442c(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_442c:
-  I(0x442c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x442d, 1); alu_add(gb, C);  // add c
-  I(0x442e, 2); E = 0x1d;  // ld e,$1d
-  I(0x4430, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4431, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4432, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4433, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4434, 1); E = alu_dec8(gb, E);  // dec e
-  I(0x4435, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x4436); return;  // ret
 }
 
 // 3f:7cf8

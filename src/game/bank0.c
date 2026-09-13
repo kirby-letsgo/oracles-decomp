@@ -3381,10 +3381,11 @@ void giveTreasure_hook(GB *gb) {
 }
 
 void loseTreasure_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   B = A;
   CYC(0x1733, 0x1734);
   bank_push(gb, 0x1734, 0x3f);
-  CALL_ROM(0x173e, ROM_b3f_loseTreasure_body);
+  CALL_C(0x173e, loseTreasure_body_hook, ROM_b3f_loseTreasure_body, 0x1741);
   bank_pop(gb, 0x1741);
   CYC(0x1747, 0x1748);
   ret_effect(gb);
@@ -3433,7 +3434,7 @@ void refillSeedSatchel_hook(GB *gb) {
   for (;;) {
     A = E;
     CYC(0x180e, 0x180f);
-    CALL_ROM(0x180f, ROM_checkTreasureObtained);
+    CALL_C(0x180f, checkTreasureObtained_hook, 0x1748, 0x1812);
     if (!(F & FC)) CYCT(0x1812, 0x1814);
     else {
       CYC(0x1812, 0x1814);
@@ -7910,8 +7911,10 @@ static void bank_pop_af(GB *gb, uint16_t a) {
 }
 
 void interactionInitGraphics_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   bank3f_push(gb, 0x15fb);
-  CALL_ROM(0x1605, ROM_b3f_interactionLoadGraphics);
+  CALL_C(0x1605, interactionLoadGraphics_hook,
+      ROM_b3f_interactionLoadGraphics, 0x1608);
   C = A;
   CYC(0x1608, 0x1609);
   bank_pop_af(gb, 0x1609);
@@ -7953,10 +7956,11 @@ void loadObjectGfxHeaderToSlot4_hook(GB *gb) {
 }
 
 void loadTreeGfx_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   E = A;
   CYC(0x1658, 0x1659);
   bank3f_push(gb, 0x1659);
-  CALL_ROM(0x1663, ROM_b3f_loadTreeGfx_body);
+  CALL_C(0x1663, loadTreeGfx_body_hook, ROM_b3f_loadTreeGfx_body, 0x1666);
   bank_pop_af(gb, 0x1666);
   CYC(0x166c, 0x166d);
   ret_effect(gb);
@@ -11400,8 +11404,9 @@ void objectUpdateSpeedZ_sidescroll_givenYOffset_hook(GB *gb) {
 // bank-switched wrappers: treasure display, object gfx, damage, files, cutscene objects
 
 void interactWithTileBeforeLink_b00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   bank_push(gb, 0x1280, 0x06);
-  CALL_ROM(0x128a, ROM_b06_interactWithTileBeforeLink);
+  CALL_C(0x128a, interactWithTileBeforeLink_b06_hook, 0x4000, 0x128d);
   C = alu_rl(gb, C);
   CYC(0x128d, 0x128f);
   bank_pop(gb, 0x128f);
@@ -11441,6 +11446,7 @@ void loadTreasureDisplayData_b00_hook(GB *gb) {
 }
 
 void checkTreasureObtained_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   CYC(0x1748, 0x1749); push_effect(gb, HL);
   CYC(0x1749, 0x174a);
   L = A;
@@ -11449,7 +11455,8 @@ void checkTreasureObtained_hook(GB *gb) {
   else {
     CYC(0x174a, 0x174d);
     bank_push(gb, 0x174d, 0x3f);
-    CALL_ROM(0x1757, ROM_b3f_checkTreasureObtained_body);
+    CALL_C(0x1757, checkTreasureObtained_body_hook,
+        ROM_b3f_checkTreasureObtained_body, 0x175a);
     bank_pop(gb, 0x175a);
     A = L;
     H = alu_srl(gb, H);

@@ -912,3 +912,6 @@
 3f:45fe giveTreasure_body__modef
 3f:4614 giveTreasure_body__mode9
 3f:4629 giveTreasure_body__removeOneDuplicateRing
+3f:43d3 partLoadGraphicsAndProperties__afterCall43d3
+3f:440e interactionLoadGraphics__afterCall440e
+3f:442c itemLoadGraphics__afterCall442c

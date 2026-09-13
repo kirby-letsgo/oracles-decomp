@@ -807,3 +807,39 @@ void nextToOverworldKeyhole_hook(GB *gb) {
   CYC(0x4265, 0x4266); alu_scf(gb);
   CYC(0x4266, 0x4267); ret_effect(gb);
 }
+
+void interactWithTileBeforeLink_b06_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x4000, 0x4003); A = W8(wLinkGrabState);
+  CYC(0x4003, 0x4004); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x4004, 0x4005); ret_effect(gb); return;
+  }
+  CYC(0x4004, 0x4005);
+  CALL_C(0x4005, specialObjectGetTileInFront_hook, 0x4373, 0x4008);
+  CYC(0x4008, 0x4009); E = A;
+  CYC(0x4009, 0x400b); H8(hFF8B) = A;
+  CYC(0x400b, 0x400c); A = C;
+  CYC(0x400c, 0x400e); H8(hFF8D) = A;
+  CYC(0x400e, 0x4011); SET_HL(0x43b2);
+  CALL_C(0x4011, lookupCollisionTable_paramE_hook, 0x1e20, 0x4014);
+  if (!(F & FC)) {
+    CYCT(0x4014, 0x4017); resetPushingAgainstTileCounter_hook(gb); return;
+  }
+  CYC(0x4014, 0x4017);
+  CYC(0x4017, 0x4018); B = A;
+  CYC(0x4018, 0x401a); alu_and(gb, 0x0f);
+  CYC(0x401a, 0x401b); interactable_tiles_jump_table_from_rst(gb, 0x401b);
+  switch (HL) {
+    case 0x410e: nextToPushableBlock_hook(gb); return;
+    case 0x4191: nextToKeyBlock_hook(gb); return;
+    case 0x41c6: nextToKeyDoor_hook(gb); return;
+    case 0x42c3: nextToTileWithInfoText_hook(gb); return;
+    case 0x402d: nextToChestTile_hook(gb); return;
+    case 0x40b4: nextToSignTile_hook(gb); return;
+    case 0x4217: nextToOverworldKeyhole_hook(gb); return;
+    case 0x4299: nextToSubrosiaKeydoor_hook(gb); return;
+    case 0x429b: nextToGhiniSpawner_hook(gb); return;
+  }
+  hook_handoff(gb, HL);
+}
