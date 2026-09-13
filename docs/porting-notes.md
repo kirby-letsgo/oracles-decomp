@@ -985,3 +985,8 @@ desync to discover; keep them when porting routines.
   generated bank metadata, so Batch 151's first `W8(symbol + offset)` expressions expanded into
   invalid identifiers and failed compilation. Use an exact adjacent RAM symbol when one exists;
   otherwise use `mem_rd`/`mem_wr` with the computed address for indexed or offset accesses.
+- A callable synthetic local may exist in `ages.sym` as `parent@local` without belonging to the
+  ported hook registry. Batch 152 implemented Moosh's `$7871` run-state continuation and listed its
+  canonical C name in `rewritten.txt`; the code compiled, but regeneration omitted the hook and lint
+  reported the missing rewrite. Promote such an entry explicitly with its canonical name/address in
+  `src/hooks/extra.sym` and the same canonical name in both `ported.txt` and `rewritten.txt`.

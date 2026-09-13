@@ -262,6 +262,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   Batch 151 completed all remaining bank-16 serial/game-link roots and the changing-floor pattern
   loader. Three parent-owned local rows disappeared; bank 16 is now fully readable and its
   generated C file is deleted. The project now has 3,282 readable hooks out of 11,750.
+  Batch 152 completed the remaining Maple and Ricky generated helpers and opened the Moosh state
+  machine. Twenty-eight parent-owned local rows disappeared; the project now has 3,312 readable
+  hooks out of 11,722.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -367,6 +370,17 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 152 (30 routines): completed the remaining five Maple
+  target-selection/meeting helpers and twelve Ricky jump, cliff, substate, and speed helpers, then
+  opened Moosh with its root, durable state dispatcher, and eleven movement/hazard states and
+  helpers. Twenty-eight parent-owned local rows were absorbed. Two independent instruction reviews
+  per routine verified all 510/510 physical instructions, RST dispatch frames, static tails, smart
+  calls, and branch timing. Regeneration exposed that Moosh's callable `$7871` synthetic local
+  needed a canonical `extra.sym` and ported-registry entry before its readable implementation could
+  become a real hook; the registry was repaired before the gate. The project now has 3,312 readable
+  hooks out of 11,722. Gates: lint 0, 30k verify 0 failures across 4,584,109 calls with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches across 11,707,471 calls with
+  state `a62ae98192befee8`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 151 (31 routines): completed the final thirty bank-16
   serial/game-link packet, state, retry, file-transfer, and comparison roots plus the final
   non-serial changing-floor pattern loader. Three parent-owned local rows were absorbed; bank 16
