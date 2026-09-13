@@ -11546,9 +11546,10 @@ void parseGivenObjectData_b00_hook(GB *gb) {
 }
 
 void checkObjectIsCloseToPosition_b00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x3d59, 0x3d5b); H8(hFF8B) = A;
   bank_push(gb, 0x3d5b, 0x08);
-  CALL_ROM(0x3d65, ROM_b08_checkObjectIsCloseToPosition);
+  CALL_C(0x3d65, checkObjectIsCloseToPosition_b08_hook, ROM_b08_checkObjectIsCloseToPosition, 0x3d68);
   B = 0x00;
   if (!(F & FC)) CYCT(0x3d68, 0x3d6c);
   else { CYC(0x3d68, 0x3d6d); B = alu_inc8(gb, B); }

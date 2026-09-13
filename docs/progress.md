@@ -287,6 +287,11 @@ Updated 2026-09-13. Newest entries at the top of each section.
   fake octoroks, the smog boss, and the triforce stone. One hundred twenty-four parent-owned
   local/data rows disappeared; the project now has 3,453 readable hooks out of 11,340, and bank
   08 is 88/574.
+  Batch 158 added Impa's cutscene NPC (twenty-five roots), the child NPC family (fifteen), the
+  past girl, the monkey's cross-bank thunk, the female villager, Nayru (twenty-four roots, with
+  her Ambi-called init promoted to a durable hook), and the old lady. One hundred ninety-three
+  parent-owned local/data rows disappeared; the project now has 3,521 readable hooks out of
+  11,147, and bank 08 is 156/381.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -392,6 +397,21 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-14: milestone 3 phase 6 batch 158 (68 hook entries, 87 readable functions): added the
+  bank-08 Impa cutscene NPC (twenty-five roots, including the bank-8 half of
+  `checkObjectIsCloseToPosition`, whose bank-0 wrapper now uses `CALL_C`), the child NPC family
+  (fifteen roots), the past girl, the monkey's `jpab` thunk into bank 3F, the female villager,
+  Nayru (twenty-four roots; `nayruState0__init0e` kept as a durable hook because Ambi calls it
+  cross-bank), and the old lady. One hundred ninety-three parent-owned local/data rows were
+  absorbed. Lint caught raw `$cfd0`/`$cfd1`/`$cfdf` cutscene temporaries, now `wTmpcfc0 + n`.
+  Two independent instruction reviews per routine verified all thirty rst tables, every local-call
+  frame, and every RAM operand with no defects; review also established that a caller-escaping
+  callee may be `CALL_C`ed from a static helper only as the hook's tail. Six hooks run in the
+  movie directly (Impa 9,649 verified calls, monkey thunk 5,039, Nayru 4,949, female villager
+  1,925, old lady 702, past girl 399 in replay). The project now has 3,521 readable hooks out of
+  11,147; bank 08 is 156/381. Gates: lint 0, 30k verify 0 failures across 4,549,464 calls with
+  state `3e450c2620a3f6a3`, whole-movie verify 0 failures across 44,165,702 calls, full reference
+  replay 0 state-hash mismatches with state `a62ae98192befee8`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 157 (58 hook entries, 72 readable functions): added the
   bank-08 dungeon-events dispatcher (26-entry table, twenty-five subids, thirteen tile/switch/
   chest/puff/key helpers, one caller-escaping `pop hl` helper), the Veran cutscene wallmaster and
