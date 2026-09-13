@@ -479,6 +479,28 @@ void rabbitSubid2SetRandomSpawnDelay_hook(GB *gb) {
   CYC(0x7b26, 0x7b27); ret_effect(gb);
 }
 
+void spawnNextRabbitThatTurnsToStone_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x7b27, 0x7b28); L = alu_inc8(gb, L);
+  CYC(0x7b28, 0x7b29); A = mem_rd(gb, HL);
+  CYC(0x7b29, 0x7b2a); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x7b2a, 0x7b2b); B = A;
+  CYC(0x7b2b, 0x7b2c); alu_add(gb, A);
+  CYC(0x7b2c, 0x7b2d); alu_add(gb, B);
+  CYC(0x7b2d, 0x7b30); SET_HL(0x7b40);
+  CYC(0x7b30, 0x7b31); rabbit_add_a_to_hl_from_rst(gb, 0x7b31);
+  CYC(0x7b31, 0x7b32); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x7b32, 0x7b34); E = 0x46;
+  CYC(0x7b34, 0x7b35); mem_wr(gb, DE, A);
+  CYC(0x7b35, 0x7b36); B = mem_rd(gb, HL);
+  CYC(0x7b36, 0x7b37); SET_HL(HL + 1);
+  CYC(0x7b37, 0x7b38); C = mem_rd(gb, HL);
+  CALL_ROM(0x7b38, 0x7b49);
+  CYC(0x7b3b, 0x7b3d); L = 0x46;
+  CYC(0x7b3d, 0x7b3f); mem_wr(gb, HL, 0x5f);
+  CYC(0x7b3f, 0x7b40); ret_effect(gb);
+}
+
 void rabbitSubid2_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(0x79dd, 0x79de); H = D;
@@ -491,7 +513,7 @@ void rabbitSubid2_hook(GB *gb) {
     CYC(0x79e2, 0x79e4);
     CYC(0x79e4, 0x79e5); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
     if (F & FZ) {
-      CALL_C_CC(0x79e5, spawnNextRabbitThatTurnsToStone, 0x7b27, 0x79e8);
+      CALL_C_CC(0x79e5, spawnNextRabbitThatTurnsToStone_hook, 0x7b27, 0x79e8);
     } else {
       CYC(0x79e5, 0x79e8);
     }

@@ -15,6 +15,8 @@ void bombInitializeIfNeeded_hook(GB *gb);
 void bombResetAnimationAndSetVisiblec1_hook(GB *gb);
 void explosionCheckAndApplyLinkCollision_hook(GB *gb);
 void explosionTryToBreakNextTile_hook(GB *gb);
+void bombUpdateThrowingLaterally_hook(GB *gb);
+void itemBounce_hook(GB *gb);
 
 static void bomb_add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -157,7 +159,7 @@ held_state1:
 held_state2:
   CYC(0x5506, 0x5508); A = 0x03;
   CYC(0x5508, 0x5509); mem_wr(gb, DE, A);
-  CALL_C(0x5509, bombUpdateThrowingLaterally, 0x639c, 0x550c);
+  CALL_C(0x5509, bombUpdateThrowingLaterally_hook, 0x639c, 0x550c);
   CYC(0x550c, 0x550e); E = 0x39;
   CYC(0x550e, 0x550f); A = mem_rd(gb, DE);
   CYC(0x550f, 0x5510); C = A;
@@ -171,7 +173,7 @@ held_state2:
     goto update_animation;
   }
   CYC(0x5514, 0x5516);
-  CALL_C(0x5516, itemBounce, 0x6482, 0x5519);
+  CALL_C(0x5516, itemBounce_hook, 0x6482, 0x5519);
   if (F & FC) {
     CYCT(0x5519, 0x551b);
     goto stopped_bouncing;
@@ -534,4 +536,24 @@ calculate_position:
   CYC(0x567d, 0x567f); A = 0x04;
   CYC(0x567f, 0x5682);
   tryToBreakTile_hook(gb);
+}
+
+void bombUpdateThrowingLaterally_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x639c, 0x639d); H = D;
+  CYC(0x639d, 0x639f); L = 0x3b;
+  CYC(0x639f, 0x63a1); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x63a1, 0x63a3);
+  } else {
+    CYC(0x63a1, 0x63a3);
+    CYC(0x63a3, 0x63a5); L = 0x10;
+    CYC(0x63a5, 0x63a7); mem_wr(gb, HL, 0x00);
+  }
+  CYC(0x63a7, 0x63a9); L = 0x37;
+  CYC(0x63a9, 0x63ab); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (F & FZ) CALL_C_CC(0x63ab, itemBeginThrow, 0x63b1, 0x63ae);
+  else CYC(0x63ab, 0x63ae);
+  CYC(0x63ae, 0x63b1);
+  itemUpdateThrowingLaterally(gb);
 }

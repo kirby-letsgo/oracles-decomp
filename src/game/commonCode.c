@@ -7,6 +7,11 @@
 #define CYCT(from, to) burn_rom(gb, 0x05, (from), (to), true)
 
 void linkAdjustGivenAngleInSidescrollingArea_hook(GB *gb);
+void companionTryToBreakTileFromMoving_hook(GB *gb);
+void companionCalculateAdjacentWallsBitset_hook(GB *gb);
+void checkCollisionForCompanion_hook(GB *gb);
+void specialObjectGetRelativeTileFromHl_hook(GB *gb);
+void specialObjectCheckFacingWall_hook(GB *gb);
 
 static void common_code_add_a_to_hl(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -522,4 +527,271 @@ void companionPreventLinkFromPassing_noExtraChecks_hook(GB *gb) {
   CYC(0x4465, 0x4468); SET_HL(w1Link);
   CYC(0x4468, 0x446b);
   preventObjectHFromPassingObjectD_hook(gb);
+}
+
+void companionUpdateMovement_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x446b, companionCalculateAdjacentWallsBitset_hook, 0x4486, 0x446e);
+  CALL_C(0x446e, specialObjectUpdatePosition, 0x5d97, 0x4471);
+  CYC(0x4471, 0x4472); H = D;
+  CYC(0x4472, 0x4474); L = 0x0f;
+  CYC(0x4474, 0x4475); A = mem_rd(gb, HL);
+  CYC(0x4475, 0x4476); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x4476, 0x4477); ret_effect(gb); return;
+  }
+  CYC(0x4476, 0x4477);
+  companionTryToBreakTileFromMoving_hook(gb);
+}
+
+void companionTryToBreakTileFromMoving_hook(GB *gb) {
+  CYC(0x4477, 0x4478); H = D;
+  CYC(0x4478, 0x447a); L = 0x0b;
+  CYC(0x447a, 0x447b); A = mem_rd(gb, HL);
+  CYC(0x447b, 0x447d); alu_add(gb, 0x05);
+  CYC(0x447d, 0x447e); B = A;
+  CYC(0x447e, 0x4480); L = 0x0d;
+  CYC(0x4480, 0x4481); C = mem_rd(gb, HL);
+  CYC(0x4481, 0x4483); A = 0x13;
+  CYC(0x4483, 0x4486);
+  tryToBreakTile_hook(gb);
+}
+
+void companionCalculateAdjacentWallsBitset_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x4486, 0x4488); E = 0x33;
+  CYC(0x4488, 0x4489); alu_xor(gb, A);
+  CYC(0x4489, 0x448a); mem_wr(gb, DE, A);
+  CYC(0x448a, 0x448b); H = D;
+  CYC(0x448b, 0x448d); L = 0x0b;
+  CYC(0x448d, 0x448e); B = mem_rd(gb, HL);
+  CYC(0x448e, 0x4490); L = 0x0d;
+  CYC(0x4490, 0x4491); C = mem_rd(gb, HL);
+  CYC(0x4491, 0x4493); A = 0x01;
+  CYC(0x4493, 0x4495); H8(hFF8B) = A;
+  CYC(0x4495, 0x4498); SET_HL(0x44ae);
+
+  do {
+    CYC(0x4498, 0x4499); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x4499, 0x449a); alu_add(gb, B);
+    CYC(0x449a, 0x449b); B = A;
+    CYC(0x449b, 0x449c); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x449c, 0x449d); alu_add(gb, C);
+    CYC(0x449d, 0x449e); C = A;
+    CYC(0x449e, 0x449f); push_effect(gb, HL);
+    CALL_C(0x449f, checkCollisionForCompanion_hook, 0x44be, 0x44a2);
+    CYC(0x44a2, 0x44a3); SET_HL(pop_effect(gb));
+    CYC(0x44a3, 0x44a5); A = H8(hFF8B);
+    CYC(0x44a5, 0x44a6); alu_rla(gb);
+    CYC(0x44a6, 0x44a8); H8(hFF8B) = A;
+    if (!(F & FC)) CYCT(0x44a8, 0x44aa);
+    else CYC(0x44a8, 0x44aa);
+  } while (!(F & FC));
+
+  CYC(0x44aa, 0x44ac); E = 0x33;
+  CYC(0x44ac, 0x44ad); mem_wr(gb, DE, A);
+  CYC(0x44ad, 0x44ae); ret_effect(gb);
+}
+
+void checkCollisionForCompanion_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x44be, getTileAtPosition_hook, 0x1447, 0x44c1);
+  CYC(0x44c1, 0x44c2); A = mem_rd(gb, HL);
+  CYC(0x44c2, 0x44c4); alu_cp(gb, 0xd6);
+  if (F & FZ) {
+    CYCT(0x44c4, 0x44c6);
+    goto set_collision;
+  }
+  CYC(0x44c4, 0x44c6);
+  CYC(0x44c6, 0x44c8); alu_cp(gb, 0xd5);
+  if (F & FZ) {
+    CYCT(0x44c8, 0x44ca);
+    goto set_collision;
+  }
+  CYC(0x44c8, 0x44ca);
+  CYC(0x44ca, 0x44cc); alu_cp(gb, 0xd4);
+  CYC(0x44cc, 0x44ce); A = 0x03;
+  if (F & FZ) {
+    CYCT(0x44ce, 0x44d1);
+    checkGivenCollision_allowHoles_hook(gb);
+    return;
+  }
+  CYC(0x44ce, 0x44d1);
+  CYC(0x44d1, 0x44d3); E = 0x01;
+  CYC(0x44d3, 0x44d4); A = mem_rd(gb, DE);
+  CYC(0x44d4, 0x44d6); alu_cp(gb, 0x0b);
+  if (!(F & FZ)) {
+    CYCT(0x44d6, 0x44d8);
+    goto not_ricky;
+  }
+  CYC(0x44d6, 0x44d8);
+  CYC(0x44d8, 0x44da); E = 0x0f;
+  CYC(0x44da, 0x44db); A = mem_rd(gb, DE);
+  CYC(0x44db, 0x44dd); alu_bit(gb, 7, A);
+  if (F & FZ) {
+    CYCT(0x44dd, 0x44df);
+    goto check_collision;
+  }
+  CYC(0x44dd, 0x44df);
+  CYC(0x44df, 0x44e0); A = mem_rd(gb, HL);
+  CYC(0x44e0, 0x44e2);
+  goto check_collision;
+
+not_ricky:
+  CYC(0x44e2, 0x44e4); alu_cp(gb, 0x0c);
+  if (!(F & FZ)) {
+    CYCT(0x44e4, 0x44e6);
+    goto check_collision;
+  }
+  CYC(0x44e4, 0x44e6);
+  CYC(0x44e6, 0x44e7); A = mem_rd(gb, HL);
+  CYC(0x44e7, 0x44e9); alu_cp(gb, 0xfe);
+  if (!(F & FC)) {
+    CYCT(0x44e9, 0x44ea); ret_effect(gb); return;
+  }
+  CYC(0x44e9, 0x44ea);
+  CYC(0x44ea, 0x44ec);
+  goto check_collision;
+
+set_collision:
+  CYC(0x44ec, 0x44ed); alu_scf(gb);
+  CYC(0x44ed, 0x44ee); ret_effect(gb);
+  return;
+
+check_collision:
+  CYC(0x44ee, 0x44f1);
+  checkCollisionPosition_disallowSmallBridges_hook(gb);
+}
+
+void specialObjectGetRelativeTileWithDirectionTable_hook(GB *gb) {
+  CYC(0x44f1, 0x44f3); E = 0x08;
+  CYC(0x44f3, 0x44f4); A = mem_rd(gb, DE);
+  CYC(0x44f4, 0x44f5); common_code_add_double_index(gb, 0x44f5);
+  specialObjectGetRelativeTileFromHl_hook(gb);
+}
+
+void specialObjectGetRelativeTileFromHl_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x44f5, 0x44f6); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x44f6, 0x44f7); B = A;
+  CYC(0x44f7, 0x44f8); C = mem_rd(gb, HL);
+  CALL_C(0x44f8, objectGetRelativeTile_hook, 0x1435, 0x44fb);
+  CYC(0x44fb, 0x44fc); B = A;
+  CYC(0x44fc, 0x44fe); H = wRoomCollisions >> 8;
+  CYC(0x44fe, 0x44ff); A = mem_rd(gb, HL);
+  CYC(0x44ff, 0x4500); ret_effect(gb);
+}
+
+void specialObjectCheckMovingAwayFromWall_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x4500, 0x4501); H = D;
+  CYC(0x4501, 0x4503); L = 0x09;
+  CYC(0x4503, 0x4504); A = mem_rd(gb, HL);
+  CYC(0x4504, 0x4506); alu_cp(gb, 0xff);
+  if (F & FZ) {
+    CYCT(0x4506, 0x4507); ret_effect(gb); return;
+  }
+  CYC(0x4506, 0x4507);
+  CYC(0x4507, 0x4509); alu_add(gb, 0x10);
+  CYC(0x4509, 0x450b); alu_and(gb, 0x1f);
+  CYC(0x450b, 0x450c); mem_wr(gb, HL, A);
+  CALL_C(0x450c, specialObjectCheckFacingWall_hook, 0x4522, 0x450f);
+  CYC(0x450f, 0x4510); C = A;
+  CYC(0x4510, 0x4512); L = 0x09;
+  CYC(0x4512, 0x4513); A = mem_rd(gb, HL);
+  CYC(0x4513, 0x4515); alu_add(gb, 0x10);
+  CYC(0x4515, 0x4517); alu_and(gb, 0x1f);
+  CYC(0x4517, 0x4518); mem_wr(gb, HL, A);
+  CYC(0x4518, 0x4519); A = C;
+  CYC(0x4519, 0x451a); alu_or(gb, A);
+  CYC(0x451a, 0x451b); ret_effect(gb);
+}
+
+void specialObjectCheckMovingTowardWall_hook(GB *gb) {
+  CYC(0x451b, 0x451c); H = D;
+  CYC(0x451c, 0x451e); L = 0x09;
+  CYC(0x451e, 0x451f); A = mem_rd(gb, HL);
+  CYC(0x451f, 0x4521); alu_cp(gb, 0xff);
+  if (F & FZ) {
+    CYCT(0x4521, 0x4522); ret_effect(gb); return;
+  }
+  CYC(0x4521, 0x4522);
+  specialObjectCheckFacingWall_hook(gb);
+}
+
+void specialObjectCheckFacingWall_hook(GB *gb) {
+  CYC(0x4522, 0x4525); SET_BC(0x0000);
+  CYC(0x4525, 0x4527); alu_cp(gb, 0x08);
+  if (F & FZ) {
+    CYCT(0x4527, 0x4529);
+    goto check_vertical;
+  }
+  CYC(0x4527, 0x4529);
+  CYC(0x4529, 0x452b); alu_cp(gb, 0x18);
+  if (F & FZ) {
+    CYCT(0x452b, 0x452d);
+    goto check_vertical;
+  }
+  CYC(0x452b, 0x452d);
+  CYC(0x452d, 0x452f); L = 0x33;
+  CYC(0x452f, 0x4530); B = mem_rd(gb, HL);
+  CYC(0x4530, 0x4531); alu_add(gb, A);
+  CYC(0x4531, 0x4533); A = alu_swap(gb, A);
+  CYC(0x4533, 0x4535); alu_and(gb, 0x03);
+  CYC(0x4535, 0x4537); A = 0x30;
+  if (!(F & FZ)) {
+    CYCT(0x4537, 0x4539);
+  } else {
+    CYC(0x4537, 0x4539);
+    CYC(0x4539, 0x453b); A = 0xc0;
+  }
+  CYC(0x453b, 0x453c); alu_and(gb, B);
+  CYC(0x453c, 0x453d); B = A;
+
+check_vertical:
+  CYC(0x453d, 0x453f); L = 0x09;
+  CYC(0x453f, 0x4540); A = mem_rd(gb, HL);
+  CYC(0x4540, 0x4542); alu_and(gb, 0x0f);
+  if (F & FZ) {
+    CYCT(0x4542, 0x4544);
+    goto done;
+  }
+  CYC(0x4542, 0x4544);
+  CYC(0x4544, 0x4545); A = mem_rd(gb, HL);
+  CYC(0x4545, 0x4547); L = 0x33;
+  CYC(0x4547, 0x4548); C = mem_rd(gb, HL);
+  CYC(0x4548, 0x454a); alu_bit(gb, 4, A);
+  CYC(0x454a, 0x454c); A = 0x03;
+  if (F & FZ) {
+    CYCT(0x454c, 0x454e);
+  } else {
+    CYC(0x454c, 0x454e);
+    CYC(0x454e, 0x4550); A = 0x0c;
+  }
+  CYC(0x4550, 0x4551); alu_and(gb, C);
+  CYC(0x4551, 0x4552); C = A;
+
+done:
+  CYC(0x4552, 0x4553); A = B;
+  CYC(0x4553, 0x4554); alu_or(gb, C);
+  CYC(0x4554, 0x4555); ret_effect(gb);
+}
+
+void companionCreateItem_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x4555, getFreeItemSlot_hook, 0x2cf9, 0x4558);
+  if (!(F & FZ)) {
+    CYCT(0x4558, 0x4559); ret_effect(gb); return;
+  }
+  CYC(0x4558, 0x4559);
+  CYC(0x4559, 0x455b);
+  CYC(0x4561, 0x4562); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x4562, 0x4563); L = alu_inc8(gb, L);
+  CYC(0x4563, 0x4564); mem_wr(gb, HL, B);
+  CYC(0x4564, 0x4565); L = alu_inc8(gb, L);
+  CYC(0x4565, 0x4566); mem_wr(gb, HL, C);
+  CYC(0x4566, 0x4568); L = 0x28;
+  CYC(0x4568, 0x456a); mem_wr(gb, HL, 0xf9);
+  CYC(0x456a, 0x456b); alu_xor(gb, A);
+  CYC(0x456b, 0x456c); ret_effect(gb);
 }
