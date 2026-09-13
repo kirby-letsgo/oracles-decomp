@@ -2599,3 +2599,9 @@ endgameCutsceneHandler_20__stateD__afterCall5a64
 init
 disableLcdAndLoadRoom_body
 cutscene_disableLcdLoadRoomResetCamera
+updateTextbox
+updateTextbox__updateText
+updateTextbox__textOption
+updateTextbox__inventoryText
+agesFunc_10_70f6
+agesFunc_10_7298

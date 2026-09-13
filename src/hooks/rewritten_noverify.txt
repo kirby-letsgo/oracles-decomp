@@ -8,3 +8,4 @@ _nextThread__afterSp091a
 startGame__afterSp0925
 checkDisplayDmgModeScreen
 checkDisplayDmgModeScreen__vblankLoop
+introThreadStart

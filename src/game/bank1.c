@@ -4504,7 +4504,13 @@ void runGameLogic_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(0x596a, 0x596d); A = mem_rd(gb, wThreadStateBuffer + 0x0e);
   CYC(0x596d, 0x596e); bank1_jump_table_from_rst(gb, 0x596e);
-  hook_continue(gb, HL, sp0_);
+  switch (HL) {
+    case 0x5976: initializeGame_hook(gb); return;
+    case 0x5a4f: loadingRoom_hook(gb); return;
+    case 0x5abc: standardGameState_hook(gb); return;
+    case 0x7b8d: linkSummonedCutscene_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
 }
 
 static void initialize_game(GB *gb, uint16_t entry, uint16_t sp0_) {
@@ -4725,7 +4731,43 @@ void standardGameState_hook(GB *gb) {
   }
   CYC(0x5ade, 0x5ae1); A = mem_rd(gb, wThreadStateBuffer + 0x0f);
   CYC(0x5ae1, 0x5ae2); bank1_jump_table_from_rst(gb, 0x5ae2);
-  hook_continue(gb, HL, sp0_);
+  switch (HL) {
+    case 0x5b26: cutscene00_hook(gb); return;
+    case 0x5b65: cutscene01_hook(gb); return;
+    case 0x7c80: cutscene02_hook(gb); return;
+    case 0x5bd8: cutscene03_hook(gb); return;
+    case 0x5c8c: cutscene04_hook(gb); return;
+    case 0x5cb6: cutscene05_hook(gb); return;
+    case 0x5d4e: cutscene06_hook(gb); return;
+    case 0x5d5b: cutscene07_hook(gb); return;
+    case 0x5d6c: cutscene08_hook(gb); return;
+    case 0x5d77: cutscene09_hook(gb); return;
+    case 0x5d96: cutscene0a_hook(gb); return;
+    case 0x7d6b: cutscene0b_hook(gb); return;
+    case 0x5d70: cutscene0c_hook(gb); return;
+    case 0x5da2: cutscene0d_hook(gb); return;
+    case 0x5daf: cutscene0e_hook(gb); return;
+    case 0x5d8e: cutscene0f_hook(gb); return;
+    case 0x5dcd: cutscene10_hook(gb); return;
+    case 0x5dd1: cutscene11_hook(gb); return;
+    case 0x5dd7: cutscene12_hook(gb); return;
+    case 0x7b6e: cutscene13_hook(gb); return;
+    case 0x7b7c: cutscene14_hook(gb); return;
+    case 0x4bf0: cutscene15_hook(gb); return;
+    case 0x5de4: cutscene16_hook(gb); return;
+    case 0x4af8: cutscene17_hook(gb); return;
+    case 0x4d16: cutscene18_hook(gb); return;
+    case 0x4d1a: cutscene19_hook(gb); return;
+    case 0x7d76: cutscene1a_hook(gb); return;
+    case 0x7d81: cutscene1b_hook(gb); return;
+    case 0x7d9d: cutscene1c_hook(gb); return;
+    case 0x7dab: cutscene1d_hook(gb); return;
+    case 0x7dbe: cutscene1e_hook(gb); return;
+    case 0x7f15: cutscene1f_hook(gb); return;
+    case 0x5d9b: cutscene20_hook(gb); return;
+    case 0x5dc2: cutscene21_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
 }
 
 static void cutscene00_after_object_gfx(GB *gb, uint16_t sp0_) {

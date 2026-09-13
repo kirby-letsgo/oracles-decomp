@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,601 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,607 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -165,6 +165,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   disable-LCD room loader, promoted seven thread-resumption points, and removed the ROM source
   copy of the HRAM OAM-DMA routine from the executable registry. Bank 3 is now fully readable and
   `gen_bank03.c` is deleted.
+  Batch 124 completed the textbox thread dispatcher and the final two Phase-5 bank-10 cutscene
+  roots, removing one text table and three internal-only bank-10 labels from the executable
+  registry. Phase 5 is complete with 2,607 readable hooks out of 12,641.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -270,6 +273,22 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 5 batch 124 (6 routines): completed `updateTextbox` and its
+  standard, option, and inventory dispatch entries, plus the final `agesFunc_10_70f6` and
+  `agesFunc_10_7298` cutscene roots. `extraTextIndices` and its four generated children were
+  confirmed as `.dw`/`.db` data; two bank-10 substates remain readable direct-only helpers rather
+  than invented public hooks. Fixed RST tables now call every known readable target directly and
+  reserve `hook_continue` for unknown dynamic fallbacks. The whole-movie verifier exposed five
+  older instruction-level cycle defects across four routines: both black-bar routines burned
+  taken two-byte jumps through skipped instructions, `checkEnemyKilled` had the same jump error
+  and omitted its final `ret` burn, and `objectDataOp7` applied `ld c,a` without burning it. It
+  also established that the infinite `introThreadStart` needs `HOOK_NOVERIFY` across its real
+  scheduler stack handoff. Two independent reviews approved each
+  late fix. Phase 5 is complete with 2,607 readable hooks out of 12,641. Gates: lint 0, 30k
+  verify 0 failures across 4,685,346 calls with state `3e450c2620a3f6a3`, full reference replay
+  0 state-hash mismatches across 13,033,919 calls with state `a62ae98192befee8`, whole-movie hook
+  verification 0 failures across 44,996,366 calls with state `d2c9e4b3facf784b`, normal and quirk
+  suites 8/8.
 - 2026-09-13: milestone 3 phase 5 batch 123 (21 routines): completed the startup initializer,
   intro-cinematic roots, endgame-20 root and selected room-loading states, and the disable-LCD
   room-loader path. Seven stable post-call entries preserve returns across thread-capable calls.

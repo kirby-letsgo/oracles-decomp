@@ -874,3 +874,6 @@
 03:59d4 endgameCutsceneHandler_20__state9__afterCall59d4
 03:5a51 endgameCutsceneHandler_20__stateD
 03:5a64 endgameCutsceneHandler_20__stateD__afterCall5a64
+3f:4b44 updateTextbox__updateText
+3f:4b7a updateTextbox__textOption
+3f:4b86 updateTextbox__inventoryText

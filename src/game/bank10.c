@@ -11,6 +11,68 @@ void agesFunc_10_70f6__func_7174_hook(GB *gb);
 void agesFunc_10_7298__substate3_hook(GB *gb);
 void agesFunc_10_7298__func_7407_hook(GB *gb);
 void agesFunc_10_7298__playWaveSoundAtRandomIntervals_body_hook(GB *gb);
+void agesFunc_10_7298__substate8_hook(GB *gb);
+void agesFunc_10_7298__substateB_hook(GB *gb);
+
+static uint16_t bank10_jump_table(GB *gb) {
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (!(F & FC)) burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  return HL;
+}
+
+void agesFunc_10_70f6_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x70f6, 0x70f7); alu_xor(gb, A);
+  CYC(0x70f7, 0x70f9); hram_wr(gb, 0x9f, A);
+  CYC(0x70f9, 0x70fc); SET_DE(0xcbc2);
+  CYC(0x70fc, 0x70fd); A = mem_rd(gb, DE);
+  CYC(0x70fd, 0x70fe); push_effect(gb, 0x70fe);
+  switch (bank10_jump_table(gb)) {
+    case 0x7110: agesFunc_10_70f6__substate0_hook(gb); return;
+    case 0x7146: agesFunc_10_70f6__substate1_hook(gb); return;
+    case 0x7156: agesFunc_10_70f6__substate2_hook(gb); return;
+    case 0x719c: agesFunc_10_70f6__substate3_hook(gb); return;
+    case 0x71b8: agesFunc_10_70f6__substate4_hook(gb); return;
+    case 0x71c4: agesFunc_10_70f6__substate5_hook(gb); return;
+    case 0x723d: agesFunc_10_70f6__substate6_hook(gb); return;
+    case 0x7251: agesFunc_10_70f6__substate7_hook(gb); return;
+    case 0x727f: agesFunc_10_70f6__substate8_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+void agesFunc_10_7298_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x7298, 0x729b); SET_DE(0xcbc2);
+  CYC(0x729b, 0x729c); A = mem_rd(gb, DE);
+  CYC(0x729c, 0x729d); push_effect(gb, 0x729d);
+  switch (bank10_jump_table(gb)) {
+    case 0x72b5: agesFunc_10_7298__substate0_hook(gb); return;
+    case 0x7313: agesFunc_10_7298__substate1_hook(gb); return;
+    case 0x7341: agesFunc_10_7298__substate2_hook(gb); return;
+    case 0x734b: agesFunc_10_7298__substate3_hook(gb); return;
+    case 0x7362: agesFunc_10_7298__substate4_hook(gb); return;
+    case 0x73c1: agesFunc_10_7298__substate5_hook(gb); return;
+    case 0x73dd: agesFunc_10_7298__substate6_hook(gb); return;
+    case 0x73f7: agesFunc_10_7298__substate7_hook(gb); return;
+    case 0x7417: agesFunc_10_7298__substate8_hook(gb); return;
+    case 0x7440: agesFunc_10_7298__substate9_hook(gb); return;
+    case 0x745e: agesFunc_10_7298__substateA_hook(gb); return;
+    case 0x7476: agesFunc_10_7298__substateB_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
 
 void agesFunc_10_70f6__substate4_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -536,6 +598,47 @@ void agesFunc_10_7298__substateA_hook(GB *gb) {
   CYC(0x7466, 0x7468);
   CYC(0x7468, 0x7469); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   CYC(0x7469, 0x746a); ret_effect(gb);
+}
+
+void agesFunc_10_7298__substate8_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7417, fileSelect_redrawDecorations_hook, 0x3099, 0x741a);
+  CYC(0x741a, 0x741d); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x741d, 0x741e); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x741e, 0x741f); ret_effect(gb);
+    return;
+  }
+  CYC(0x741e, 0x741f);
+  CALL_C(0x741f, checkIsLinkedGame_hook, 0x1992, 0x7422);
+  if (!(F & FZ)) {
+    CYCT(0x7422, 0x7425); resetGame_hook(gb);
+    return;
+  }
+  CYC(0x7422, 0x7425);
+  CALL_C(0x7425, disableLcd_hook, 0x02c1, 0x7428);
+  CALL_C(0x7428, clearOam_hook, 0x049f, 0x742b);
+  CALL_C(0x742b, incCbc2_hook, 0x3067, 0x742e);
+  CYC(0x742e, 0x7430); A = 0x96;
+  CALL_C(0x7430, loadGfxHeader_hook, 0x0626, 0x7433);
+  CYC(0x7433, 0x7435); A = 0xa7;
+  CALL_C(0x7435, loadPaletteHeader_hook, 0x050b, 0x7438);
+  CALL_C(0x7438, fadeinFromWhite_hook, 0x3299, 0x743b);
+  CYC(0x743b, 0x743d); A = 0x04;
+  CYC(0x743d, 0x7440); loadGfxRegisterStateIndex_hook(gb);
+}
+
+void agesFunc_10_7298__substateB_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x7476, agesFunc_10_7298__func_7450_hook, 0x7450, 0x7479);
+  CYC(0x7479, 0x747c); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x747c, 0x747d); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x747d, 0x747e); ret_effect(gb);
+    return;
+  }
+  CYC(0x747d, 0x747e);
+  CYC(0x747e, 0x7481); resetGame_hook(gb);
 }
 
 void agesFunc_10_70f6__substate0_hook(GB *gb) {

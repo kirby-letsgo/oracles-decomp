@@ -8,6 +8,7 @@ void b2_fileSelectScreen_hook(GB *gb);
 void runBank2Function_hook(GB *gb);
 void runIntroCinematic_hook(GB *gb);
 void intro_cinematic__afterCall2d27_hook(GB *gb);
+void updateTextbox_hook(GB *gb);
 
 // Rewrites of code/bank0.s. Cycles are burned from the ROM's own instruction stream (CYC/CYCT),
 // which keeps interrupt dispatch on instruction boundaries; every memory access follows the burn
@@ -12792,7 +12793,7 @@ void textThreadStart_hook(GB *gb) {
     CYC(0x18be, 0x18c0);
     CYC(0x18c0, 0x18c2); H8(hRomBank) = A;
     CYC(0x18c2, 0x18c5); mem_wr(gb, MBC_ROM_BANK, A);
-    CALL_C(0x18c5, updateTextbox, ROM_updateTextbox, 0x18c8);
+    CALL_C(0x18c5, updateTextbox_hook, ROM_updateTextbox, 0x18c8);
     CALL_C(0x18c8, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, 0x18cb);
     CYCT(0x18cb, 0x18cd);
   }

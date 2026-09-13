@@ -8,6 +8,9 @@
 
 void getExtraTextIndex_hook(GB *gb);
 void handleTextControlCode_hook(GB *gb);
+void updateTextbox__updateText_hook(GB *gb);
+void updateTextbox__textOption_hook(GB *gb);
+void updateTextbox__inventoryText_hook(GB *gb);
 void updateTextbox__standardText_hook(GB *gb);
 void standardTextState0_hook(GB *gb);
 void standardTextState1_hook(GB *gb);
@@ -68,7 +71,90 @@ static uint16_t textbox_jump_table(GB *gb) {
   return HL;
 }
 
+void updateTextbox_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4b1f, 0x4b21); A = 0x07;
+  CYC(0x4b21, 0x4b23); mem_wr(gb, IO_SVBK, A);
+  CYC(0x4b23, 0x4b25); D = 0xd0;
+  CYC(0x4b25, 0x4b28); A = mem_rd(gb, wTextIsActive);
+  CYC(0x4b28, 0x4b29); A = alu_inc8(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x4b29, 0x4b2b);
+  } else {
+    CYC(0x4b29, 0x4b2b);
+    CYC(0x4b2b, 0x4b2e); mem_wr(gb, wTextDisplayMode, A);
+    CYC(0x4b2e, 0x4b2f); H = D;
+    CYC(0x4b2f, 0x4b31); L = 0xc0;
+    CYC(0x4b31, 0x4b33); mem_wr(gb, HL, 0x0f);
+    CYC(0x4b33, 0x4b34); L = alu_inc8(gb, L);
+    CYC(0x4b34, 0x4b36); mem_wr(gb, HL, mem_rd(gb, HL) | 0x08);
+  }
+  CALL_C(0x4b36, updateTextbox__updateText_hook, 0x4b44, 0x4b39);
+  CYC(0x4b39, 0x4b3c); A = mem_rd(gb, wTextIsActive);
+  CYC(0x4b3c, 0x4b3d); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x4b3d, 0x4b3e); ret_effect(gb);
+    return;
+  }
+  CYC(0x4b3d, 0x4b3e);
+  CYC(0x4b3e, 0x4b41); mem_wr(gb, wTextboxFlags, A);
+  CYC(0x4b41, 0x4b44);
+  stubThreadStart_hook(gb);
+}
+
+void updateTextbox__updateText_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x4b44, 0x4b47); A = mem_rd(gb, wTextIsActive);
+  CYC(0x4b47, 0x4b49); alu_cp(gb, 0x80);
+  if (F & FZ) {
+    CYCT(0x4b49, 0x4b4a); ret_effect(gb);
+    return;
+  }
+  CYC(0x4b49, 0x4b4a);
+  CYC(0x4b4a, 0x4b4c); E = 0xc0;
+  CYC(0x4b4c, 0x4b4f); A = mem_rd(gb, wTextDisplayMode);
+  CYC(0x4b4f, 0x4b50); push_effect(gb, 0x4b50);
+  switch (textbox_jump_table(gb)) {
+    case 0x4b56: updateTextbox__standardText_hook(gb); return;
+    case 0x4b7a: updateTextbox__textOption_hook(gb); return;
+    case 0x4b86: updateTextbox__inventoryText_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+void updateTextbox__textOption_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x4b7a, 0x4b7b); A = mem_rd(gb, DE);
+  CYC(0x4b7b, 0x4b7c); push_effect(gb, 0x4b7c);
+  switch (textbox_jump_table(gb)) {
+    case 0x4cc8: textOptionCode_hook(gb); return;
+    case 0x4cdc: textOptionCode__state01_hook(gb); return;
+    case 0x4ce6: textOptionCode__state02_hook(gb); return;
+    case 0x4d12: textOptionCode__state03_hook(gb); return;
+    case 0x4d3c: textOptionCode__state04_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+void updateTextbox__inventoryText_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x4b86, 0x4b87); A = mem_rd(gb, DE);
+  CYC(0x4b87, 0x4b88); push_effect(gb, 0x4b88);
+  switch (textbox_jump_table(gb)) {
+    case 0x4d5d: inventoryTextCode_hook(gb); return;
+    case 0x4d9e: inventoryTextCode__state01_hook(gb); return;
+    case 0x4dab: inventoryTextCode__state02_hook(gb); return;
+    case 0x4de4: inventoryTextCode__state03_hook(gb); return;
+    case 0x4e15: inventoryTextCode__state04_hook(gb); return;
+    case 0x4e45: inventoryTextCode__state05_hook(gb); return;
+    case 0x4e54: inventoryTextCode__state06_hook(gb); return;
+    case 0x4e5d: inventoryTextCode__state07_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
 void updateTextbox__standardText_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   CYC(0x4b56, 0x4b57); A = mem_rd(gb, DE);
   CYC(0x4b57, 0x4b58); push_effect(gb, 0x4b58);
   switch (textbox_jump_table(gb)) {
@@ -84,7 +170,7 @@ void updateTextbox__standardText_hook(GB *gb) {
     case 0x4c48: standardTextStateE_hook(gb); return;
     case 0x4c57: standardTextStateF_hook(gb); return;
     case 0x4cc1: standardTextState10_hook(gb); return;
-    default: hook_handoff(gb, HL); return;
+    default: hook_continue(gb, HL, sp0_); return;
   }
 }
 

@@ -789,3 +789,22 @@ desync to discover; keep them when porting routines.
   function, but startup only copies those ten bytes to `$ff80`; all execution uses the existing
   `hramOamDmaFunction_hook` with explicit `I` timing. Remove the ROM source and end labels from the
   executable registry while retaining the source address for the copy and RAM-hook decoding.
+- Applying two instruction effects beside one `CYC` still burns only the first instruction. Batch
+  124's `objectDataOp7` performed both `$576e or c` and `$576f ld c,a` but only burned
+  `$576e..$576f`; the whole-movie verifier found the resulting one-cycle deficit on two rare enemy
+  placement frames after 121,000. Give every instruction its own burn even when both are one byte
+  and their C effects fit naturally on one line.
+- A routine can have correct branch state and still overburn a taken jump by consuming the skipped
+  fallthrough instruction. The full batch-124 verifier found both intro black-bar helpers two cycles
+  long: their taken two-byte `jr` spans ended after the skipped `ld (hl),n`. `CYCT` always ends at
+  the branch instruction's physical end, while the C control flow determines which later bytes run.
+- A final `ret_effect` does not burn the ROM's `ret` instruction by itself. Batch 124's
+  `checkEnemyKilled` returned with correct registers and flags but was four cycles short because
+  `$5871 ret` had no `CYC($5871,$5872)`; its taken `$5857 jr nc` also ended at the distant target
+  instead of `$5859`. The rare allocation path only exposed both in the whole-movie verifier.
+  Audit the terminal return separately from the stack effect and each branch locally.
+- Infinite thread entry hooks that cross a real scheduler `ld sp` have no stable callable PC/SP
+  endpoint for fixed-budget nested verification. Batch 124's `introThreadStart` matched cycles,
+  registers, and replacement replay but landed at a different scheduler boundary after
+  `runIntro` switched threads. Mark that narrow root `HOOK_NOVERIFY`; keep its independently
+  returning callees verifiable and retain the real post-`ld sp` handoff symbol.

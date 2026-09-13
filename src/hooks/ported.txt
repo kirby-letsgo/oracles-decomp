@@ -1375,7 +1375,6 @@ textControlCodeC_ret
 textControlCodeC_6
 textControlCodeC_1
 textControlCodeC_2
-extraTextIndices
 checkTreasureObtained_body
 loseTreasure_body
 loseTreasure_helper
@@ -6035,6 +6034,9 @@ endgameCutsceneHandler_20__state9
 endgameCutsceneHandler_20__state9__afterCall59d4
 endgameCutsceneHandler_20__stateD
 endgameCutsceneHandler_20__stateD__afterCall5a64
+updateTextbox__updateText
+updateTextbox__textOption
+updateTextbox__inventoryText
 intro_capcomScreen__state0
 intro_capcomScreen__state1
 intro_capcomScreen__state2

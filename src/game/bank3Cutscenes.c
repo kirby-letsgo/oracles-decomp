@@ -1970,7 +1970,7 @@ void introCinematic_moveBlackBarsIn_hook(GB *gb) {
   CYC(0x53d8, 0x53d9); A = mem_rd(gb, HL);
   CYC(0x53d9, 0x53db); alu_cp(gb, 0x17);
   if (F & FC) {
-    CYCT(0x53db, 0x53df);
+    CYCT(0x53db, 0x53dd);
   } else {
     CYC(0x53db, 0x53dd);
     CYC(0x53dd, 0x53df); mem_wr(gb, HL, 0x17);
@@ -1996,7 +1996,7 @@ void introCinematic_moveBlackBarsOut_hook(GB *gb) {
   CYC(0x53f0, 0x53f1); A = mem_rd(gb, HL);
   CYC(0x53f1, 0x53f3); alu_cp(gb, 0x2f);
   if (!(F & FC)) {
-    CYCT(0x53f3, 0x53f7);
+    CYCT(0x53f3, 0x53f5);
   } else {
     CYC(0x53f3, 0x53f5);
     CYC(0x53f5, 0x53f7); mem_wr(gb, HL, 0x2f);

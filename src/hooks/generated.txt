@@ -592,7 +592,7 @@
 00:2647 _interactionNextAnimationFrame_hook -
 00:2844 _enemyNextAnimationFrame_hook -
 00:299e _partNextAnimationFrame_hook -
-00:2d07 introThreadStart_hook -
+00:2d07 introThreadStart_hook H
 00:2d48 func_2d48_hook -
 00:2e82 _updateEnemiesIfStateIsZero_hook -
 00:3211 func_3211_hook -
@@ -1121,10 +1121,7 @@
 3f:4422 itemLoadGraphics -
 3f:442c itemLoadGraphics__afterCall442c L
 3f:4af7 initTextbox_hook -
-3f:4b1f updateTextbox -
-3f:4b44 updateTextbox__updateText L
-3f:4b7a updateTextbox__textOption L
-3f:4b86 updateTextbox__inventoryText L
+3f:4b1f updateTextbox_hook -
 3f:4cc8 textOptionCode_hook -
 3f:4d5d inventoryTextCode_hook -
 3f:4e72 initTextboxStuff_hook -
@@ -1179,11 +1176,6 @@
 3f:58b1 textControlCodeC_6_hook -
 3f:58bd textControlCodeC_1_hook -
 3f:58e8 textControlCodeC_2_hook -
-3f:5915 extraTextIndices -
-3f:5939 extraTextIndices__index0d L
-3f:593f extraTextIndices__index0e L
-3f:5945 extraTextIndices__index0f L
-3f:594b extraTextIndices__index11 L
 3f:446d checkTreasureObtained_body -
 3f:4491 checkTreasureObtained_body__haveItem L
 3f:4494 checkTreasureObtained_body__isUpgrade L
@@ -1400,6 +1392,9 @@
 3f:7cc7 func_7cc7 -
 3f:7cce func_7cc7__afterCall7cce L
 3f:7cd1 func_7cd1 -
+3f:4b44 updateTextbox__updateText_hook -
+3f:4b7a updateTextbox__textOption_hook -
+3f:4b86 updateTextbox__inventoryText_hook -
 3f:4b56 updateTextbox__standardText_hook -
 3f:4b98 standardTextState0_hook -
 3f:4ba4 standardTextState1_hook -
@@ -4661,11 +4656,8 @@
 10:7063 interactionCodee5__runState L
 10:706b interactionCodee5__state0 L
 10:7097 interactionCodee5__state1 L
-10:70f6 agesFunc_10_70f6 -
-10:7298 agesFunc_10_7298 -
-10:72ec agesFunc_10_7298__func_72ec L
-10:7417 agesFunc_10_7298__substate8 L
-10:7476 agesFunc_10_7298__substateB L
+10:70f6 agesFunc_10_70f6_hook -
+10:7298 agesFunc_10_7298_hook -
 10:74b5 interactiondc_subid07 -
 10:74fd interactiondc_subid00 -
 10:7517 interactiondc_subid01 -

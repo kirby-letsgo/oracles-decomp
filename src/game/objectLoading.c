@@ -131,7 +131,7 @@ void assignRandomPositionToEnemy_hook(GB *gb) {
 void checkEnemyKilled_hook(GB *gb) {
   CYC(0x5852, 0x5855); A = W8(wEnemyPlacement_numKillableEnemies);
   CYC(0x5855, 0x5857); alu_cp(gb, 0x07);
-  if (!(F & FC)) { CYCT(0x5857, 0x5870); goto done; }
+  if (!(F & FC)) { CYCT(0x5857, 0x5859); goto done; }
   CYC(0x5857, 0x5859); A = alu_inc8(gb, A);
   CYC(0x5859, 0x585d); W8(wEnemyPlacement_numKillableEnemies) = A;
   CYC(0x585d, 0x5862); SET_HL(bitTable + A);
@@ -143,7 +143,7 @@ void checkEnemyKilled_hook(GB *gb) {
   CYC(0x586c, 0x5870); alu_or(gb, 0x01); H8(hFF8D) = A;
 done:
   CYC(0x5870, 0x5871); alu_scf(gb);
-  ret_effect(gb);
+  CYC(0x5871, 0x5872); ret_effect(gb);
 }
 
 void parseObjectData_hook(GB *gb) {
@@ -486,7 +486,8 @@ allocate:
     CYC(0x576a, 0x576b); L = alu_dec8(gb, L);
     CYC(0x576b, 0x576c); A = mem_rd(gb, HL);
     CYC(0x576c, 0x576e); alu_and(gb, 0xf0);
-    CYC(0x576e, 0x576f); alu_or(gb, C); C = A;
+    CYC(0x576e, 0x576f); alu_or(gb, C);
+    CYC(0x576f, 0x5770); C = A;
     CALL_C(0x5770, addPositionToPlacedEnemyPositions_hook, 0x5829, 0x5773);
     CYC(0x5773, 0x5775); L = 0x80;
     CYC(0x5775, 0x5778); A = H8(hFF8D); mem_wr(gb, HL, A);
