@@ -463,10 +463,14 @@ void func_03_6103_hook(GB *gb) {
   CYC(0x610e, 0x610f); push_effect(gb, 0x610f);
   switch (misc_cutscene_jump_table(gb)) {
     case 0x6127: func_03_6103__state0_hook(gb); return;
+    case 0x613c: func_03_6103__state1_hook(gb); return;
     case 0x6175: func_03_6103__state2_hook(gb); return;
     case 0x6188: func_03_6103__state3_hook(gb); return;
+    case 0x6196: func_03_6103__state4_hook(gb); return;
     case 0x619f: func_03_6103__state5_hook(gb); return;
+    case 0x61a8: func_03_6103__state7_hook(gb); return;
     case 0x61b1: func_03_6103__state8_hook(gb); return;
+    case 0x61bb: func_03_6103__stateA_hook(gb); return;
     case 0x61dc: func_03_6103__stateB_hook(gb); return;
     default: hook_handoff(gb, HL); return;
   }
@@ -483,6 +487,42 @@ void func_03_6103__state0_hook(GB *gb) {
   CYC(0x6135, 0x6136); mem_wr(gb, HL, A);
   CALL_C(0x6136, fadeoutToWhite_hook, 0x326c, 0x6139);
   CYC(0x6139, 0x613c); fairyCutscene_incState_hook(gb);
+}
+
+void func_03_6103__state1_hook(GB *gb) {
+  CYC(0x613c, 0x613f); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x613f, 0x6140); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x6140, 0x6141); ret_effect(gb); return; }
+  CYC(0x6140, 0x6141);
+  CYC(0x6141, 0x6143); A = 0x81;
+  func_03_6103__loadNewFairyRoom_hook(gb);
+}
+
+void func_03_6103__loadNewFairyRoom_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x6143, 0x6146); mem_wr(gb, wActiveRoom, A);
+  CALL_C(0x6146, fairyCutscene_incState_hook, 0x6270, 0x6149);
+  CYC(0x6149, 0x614a); alu_xor(gb, A);
+  CYC(0x614a, 0x614d); mem_wr(gb, wTmpcfc0_fairyHideAndSeek_cfd2, A);
+  CALL_C(0x614d, disableLcd_hook, 0x02c1, 0x6150);
+  CALL_C(0x6150, clearScreenVariablesAndWramBank1_hook, 0x35a3, 0x6153);
+  CALL_C(0x6153, initializeVramMaps_hook, 0x04cd, 0x6156);
+  CALL_C(0x6156, loadScreenMusicAndSetRoomPack_hook, 0x341a, 0x6159);
+  CALL_C(0x6159, loadTilesetData_hook, 0x3889, 0x615c);
+  CALL_C(0x615c, loadTilesetGraphics_hook, 0x3796, 0x615f);
+  CALL_C(0x615f, func_131f_hook, 0x131f, 0x6162);
+  CYC(0x6162, 0x6164); A = 0x01;
+  CYC(0x6164, 0x6167); mem_wr(gb, wScrollMode, A);
+  CALL_C(0x6167, refreshObjectGfx_hook, 0x1618, 0x616a);
+  func_03_6103__afterCall616a_hook(gb);
+}
+
+void func_03_6103__afterCall616a_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x616a, loadCommonGraphics_hook, 0x1a98, 0x616d);
+  CYC(0x616d, 0x616f); A = 0x02;
+  CALL_C(0x616f, loadGfxRegisterStateIndex_hook, 0x02ea, 0x6172);
+  CYC(0x6172, 0x6175); fadeinFromWhite_hook(gb);
 }
 
 void func_03_6103__state2_hook(GB *gb) {
@@ -526,6 +566,15 @@ void func_03_6103__state3_hook(GB *gb) {
   CYC(0x6193, 0x6196); fadeoutToWhite_hook(gb);
 }
 
+void func_03_6103__state4_hook(GB *gb) {
+  CYC(0x6196, 0x6199); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x6199, 0x619a); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x619a, 0x619b); ret_effect(gb); return; }
+  CYC(0x619a, 0x619b);
+  CYC(0x619b, 0x619d); A = 0x80;
+  CYC(0x619d, 0x619f); func_03_6103__loadNewFairyRoom_hook(gb);
+}
+
 void func_03_6103__state5_hook(GB *gb) {
   CYC(0x619f, 0x61a2); A = mem_rd(gb, wPaletteThread_mode);
   CYC(0x61a2, 0x61a3); alu_or(gb, A);
@@ -538,6 +587,15 @@ void func_03_6103__state5_hook(GB *gb) {
   CYC(0x61a6, 0x61a8); func_03_6103__spawnForestFairy_hook(gb);
 }
 
+void func_03_6103__state7_hook(GB *gb) {
+  CYC(0x61a8, 0x61ab); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x61ab, 0x61ac); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x61ac, 0x61ad); ret_effect(gb); return; }
+  CYC(0x61ac, 0x61ad);
+  CYC(0x61ad, 0x61af); A = 0x91;
+  CYC(0x61af, 0x61b1); func_03_6103__loadNewFairyRoom_hook(gb);
+}
+
 void func_03_6103__state8_hook(GB *gb) {
   CYC(0x61b1, 0x61b4); A = mem_rd(gb, wPaletteThread_mode);
   CYC(0x61b4, 0x61b5); alu_or(gb, A);
@@ -548,6 +606,32 @@ void func_03_6103__state8_hook(GB *gb) {
   CYC(0x61b5, 0x61b6);
   CYC(0x61b6, 0x61b8); B = 0x0e;
   CYC(0x61b8, 0x61bb); func_03_6103__spawnForestFairy_hook(gb);
+}
+
+void func_03_6103__stateA_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x61bb, 0x61be); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x61be, 0x61bf); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x61bf, 0x61c0); ret_effect(gb); return; }
+  CYC(0x61bf, 0x61c0);
+  CYC(0x61c0, 0x61c2); A = 0x82;
+  CALL_C(0x61c2, func_03_6103__loadNewFairyRoom_hook, 0x6143, 0x61c5);
+  func_03_6103__afterCall61c5_hook(gb);
+}
+
+void func_03_6103__afterCall61c5_hook(GB *gb) {
+  CYC(0x61c5, 0x61c8); SET_HL(w1Link_enabled);
+  CYC(0x61c8, 0x61ca); mem_wr(gb, HL, 0x03);
+  CYC(0x61ca, 0x61cc); L = w1Link_yh & 0xff;
+  CYC(0x61cc, 0x61cf); A = mem_rd(gb, wTmpcbb3);
+  CYC(0x61cf, 0x61d0); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x61d0, 0x61d1); L = alu_inc8(gb, L);
+  CYC(0x61d1, 0x61d4); A = mem_rd(gb, wTmpcbb4);
+  CYC(0x61d4, 0x61d5); mem_wr(gb, HL, A);
+  CYC(0x61d5, 0x61d8); A = mem_rd(gb, wTmpcbb5);
+  CYC(0x61d8, 0x61da); L = w1Link_direction & 0xff;
+  CYC(0x61da, 0x61db); mem_wr(gb, HL, A);
+  CYC(0x61db, 0x61dc); ret_effect(gb);
 }
 
 void func_03_6103__stateB_hook(GB *gb) {
@@ -687,6 +771,117 @@ void func_03_6275__bootedFromPalace_incState_hook(GB *gb) {
   CYC(0x62c8, 0x62cb); SET_HL(wCutsceneState);
   CYC(0x62cb, 0x62cc); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(0x62cc, 0x62cd); ret_effect(gb);
+}
+
+void func_03_6275_hook(GB *gb) {
+  CYC(0x6275, 0x6278); A = mem_rd(gb, wCutsceneState);
+  CYC(0x6278, 0x6279); push_effect(gb, 0x6279);
+  switch (misc_cutscene_jump_table(gb)) {
+    case 0x6283: func_03_6275__state0_hook(gb); return;
+    case 0x6288: func_03_6275__state1_hook(gb); return;
+    case 0x62cd: func_03_6275__state2_hook(gb); return;
+    case 0x62d9: func_03_6275__state3_hook(gb); return;
+    case 0x62ec: func_03_6275__state4_hook(gb); return;
+    default: hook_handoff(gb, HL); return;
+  }
+}
+
+void func_03_6275__state0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x6283, fadeoutToWhite_hook, 0x326c, 0x6286);
+  CYC(0x6286, 0x6288); func_03_6275__bootedFromPalace_incState_hook(gb);
+}
+
+void func_03_6275__state1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x6288, 0x628b); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x628b, 0x628c); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x628c, 0x628d); ret_effect(gb); return; }
+  CYC(0x628c, 0x628d);
+  CALL_C(0x628d, clearAllParentItems_hook, 0x2c10, 0x6290);
+  CALL_C(0x6290, dropLinkHeldItem_hook, 0x2c43, 0x6293);
+  CYC(0x6293, 0x6295); A = 0x01;
+  CYC(0x6295, 0x6298); mem_wr(gb, wActiveGroup, A);
+  CYC(0x6298, 0x629a); A = 0x46;
+  CYC(0x629a, 0x629d); mem_wr(gb, wActiveRoom, A);
+  CALL_C(0x629d, disableLcd_hook, 0x02c1, 0x62a0);
+  CALL_C(0x62a0, clearOam_hook, 0x049f, 0x62a3);
+  CALL_C(0x62a3, clearScreenVariablesAndWramBank1_hook, 0x35a3, 0x62a6);
+  CALL_C(0x62a6, initializeVramMaps_hook, 0x04cd, 0x62a9);
+  CALL_C(0x62a9, loadScreenMusicAndSetRoomPack_hook, 0x341a, 0x62ac);
+  CALL_C(0x62ac, loadTilesetData_hook, 0x3889, 0x62af);
+  CALL_C(0x62af, loadTilesetGraphics_hook, 0x3796, 0x62b2);
+  CALL_C(0x62b2, func_131f_hook, 0x131f, 0x62b5);
+  CYC(0x62b5, 0x62b7); A = 0x01;
+  CYC(0x62b7, 0x62ba); mem_wr(gb, wScrollMode, A);
+  CALL_C(0x62ba, loadCommonGraphics_hook, 0x1a98, 0x62bd);
+  CALL_C(0x62bd, initializeRoom_hook, 0x30fe, 0x62c0);
+  func_03_6275__afterCall62c0_hook(gb);
+}
+
+void func_03_6275__afterCall62c0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x62c0, fadeinFromWhite_hook, 0x3299, 0x62c3);
+  CYC(0x62c3, 0x62c5); A = 0x02;
+  CALL_C(0x62c5, loadGfxRegisterStateIndex_hook, 0x02ea, 0x62c8);
+  func_03_6275__bootedFromPalace_incState_hook(gb);
+}
+
+void func_03_6275__state2_hook(GB *gb) {
+  CYC(0x62cd, 0x62cf); A = 0x03;
+  CYC(0x62cf, 0x62d2); mem_wr(gb, w1Link_enabled, A);
+  CYC(0x62d2, 0x62d4); A = 0x0f;
+  CYC(0x62d4, 0x62d7); mem_wr(gb, wLinkForceState, A);
+  CYC(0x62d7, 0x62d9); func_03_6275__bootedFromPalace_incState_hook(gb);
+}
+
+void func_03_6275__state3_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x62d9, 0x62dc); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x62dc, 0x62dd); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x62dd, 0x62de); ret_effect(gb); return; }
+  CYC(0x62dd, 0x62de);
+  CYC(0x62de, 0x62e1); A = mem_rd(gb, w1Link_substate);
+  CYC(0x62e1, 0x62e3); alu_cp(gb, 0x02);
+  if (!(F & FZ)) { CYCT(0x62e3, 0x62e4); ret_effect(gb); return; }
+  CYC(0x62e3, 0x62e4);
+  CYC(0x62e4, 0x62e7); SET_BC(0x590a);
+  CALL_C(0x62e7, showText_hook, 0x1872, 0x62ea);
+  CYC(0x62ea, 0x62ec); func_03_6275__bootedFromPalace_incState_hook(gb);
+}
+
+void func_03_6275__state4_hook(GB *gb) {
+  CYC(0x62ec, 0x62ef); A = mem_rd(gb, wTextIsActive);
+  CYC(0x62ef, 0x62f0); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x62f0, 0x62f1); ret_effect(gb); return; }
+  CYC(0x62f0, 0x62f1);
+  CYC(0x62f1, 0x62f4); mem_wr(gb, wMenuDisabled, A);
+  CYC(0x62f4, 0x62f7); mem_wr(gb, wDisabledObjects, A);
+  CYC(0x62f7, 0x62fa); mem_wr(gb, wDisableScreenTransitions, A);
+  CYC(0x62fa, 0x62fd); mem_wr(gb, 0xc2ef, A);
+  CYC(0x62fd, 0x6300); A = mem_rd(gb, wActiveMusic2);
+  CYC(0x6300, 0x6303); mem_wr(gb, wActiveMusic, A);
+  CYC(0x6303, 0x6306); playSound_b00_hook(gb);
+}
+
+void cutscene_loadRoomObjectSetAndFadein_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x64c5, 0x64c8); SET_HL(wTmpcfc0_genericCutscene_cfde);
+  CYC(0x64c8, 0x64c9); A = mem_rd(gb, HL);
+  CYC(0x64c9, 0x64ca); push_effect(gb, AF);
+  CALL_C(0x64ca, cutscene_disableLcdLoadRoomResetCamera, 0x6fd6, 0x64cd);
+  CYC(0x64cd, 0x64ce); SET_AF(pop_effect(gb));
+  CYC(0x64ce, 0x64cf); B = A;
+  CALL_C(0x64cf, getEntryFromObjectTable2_hook, 0x3632, 0x64d2);
+  CALL_C(0x64d2, parseGivenObjectData_b00_hook, 0x3171, 0x64d5);
+  CALL_C(0x64d5, refreshObjectGfx_hook, 0x1618, 0x64d8);
+  cutscene_loadRoomObjectSetAndFadein__afterCall64d8_hook(gb);
+}
+
+void cutscene_loadRoomObjectSetAndFadein__afterCall64d8_hook(GB *gb) {
+  CYC(0x64d8, 0x64d9); alu_xor(gb, A);
+  CYC(0x64d9, 0x64dc); mem_wr(gb, wTmpcfc0_genericCutscene_cfd1, A);
+  CYC(0x64dc, 0x64df); fadeinFromWhite_hook(gb);
 }
 
 void nayruSingingCutsceneHandler__func_6397_hook(GB *gb) {

@@ -42,6 +42,13 @@
 10:7251 agesFunc_10_70f6__substate7
 10:727f agesFunc_10_70f6__substate8
 03:62c8 func_03_6275__bootedFromPalace_incState
+03:6283 func_03_6275__state0
+03:6288 func_03_6275__state1
+03:62c0 func_03_6275__afterCall62c0
+03:62cd func_03_6275__state2
+03:62d9 func_03_6275__state3
+03:62ec func_03_6275__state4
+03:64d8 cutscene_loadRoomObjectSetAndFadein__afterCall64d8
 03:6397 nayruSingingCutsceneHandler__func_6397
 03:63db nayruSingingCutsceneHandler__func_63db
 03:6351 nayruSingingCutsceneHandler__state0

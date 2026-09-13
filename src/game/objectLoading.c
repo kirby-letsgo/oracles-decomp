@@ -6,6 +6,51 @@
 #define CYC(from, to) burn_rom(gb, 0x12, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, 0x12, (from), (to), true)
 
+void parseGivenObjectData_b12_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x55d4, 0x55d5); A = mem_rd(gb, DE);
+  CYC(0x55d5, 0x55d7); alu_cp(gb, 0xfe);
+  if (!(F & FZ)) CYCT(0x55d7, 0x55d9);
+  else {
+    CYC(0x55d7, 0x55d9);
+    CYC(0x55d9, 0x55da); SET_DE(pop_effect(gb));
+  }
+  CYC(0x55da, 0x55db); A = mem_rd(gb, DE);
+  CYC(0x55db, 0x55dd); alu_cp(gb, 0xff);
+  if (F & FZ) { CYCT(0x55dd, 0x55de); ret_effect(gb); return; }
+  CYC(0x55dd, 0x55de);
+  CYC(0x55de, 0x55df); SET_DE(DE + 1);
+  CYC(0x55df, 0x55e1); alu_and(gb, 0x0f);
+  CYC(0x55e1, 0x55e2); push_effect(gb, 0x55e2);
+  burn_rom(gb, 0, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0, 0x0003, 0x0004, false); L = A;
+  if (!(F & FC)) burn_rom(gb, 0, 0x0004, 0x0006, true);
+  else {
+    burn_rom(gb, 0, 0x0004, 0x0006, false);
+    burn_rom(gb, 0, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  }
+  burn_rom(gb, 0, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0, 0x000a, 0x000b, false);
+  switch (HL) {
+    case 0x561e: objectDataOp0_hook(gb); return;
+    case 0x5653: objectDataOp1_hook(gb); return;
+    case 0x566b: objectDataOp2_hook(gb); return;
+    case 0x56ba: objectDataOp3_hook(gb); return;
+    case 0x56c1: objectDataOp4_hook(gb); return;
+    case 0x56cf: objectDataOp5_hook(gb); return;
+    case 0x56dd: objectDataOp6_hook(gb); return;
+    case 0x5734: objectDataOp7_hook(gb); return;
+    case 0x577a: objectDataOp8_hook(gb); return;
+    case 0x579b: objectDataOp9_hook(gb); return;
+    case 0x57cb: objectDataOpA_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
 static void read2_bytes(GB *gb, uint16_t dst, uint16_t src) {
   CYC(0x580d, 0x580f); uint8_t value = mem_rd(gb, src);
   CYC(0x580f, 0x5810); mem_wr(gb, dst, value);
@@ -114,19 +159,19 @@ void parseObjectData_hook(GB *gb) {
   CYC(0x55cc, 0x55cf); SET_HL(0x4315);
   CYC(0x55cf, 0x55d1); E = 0x15;
   CALL_C(0x55d1, interBankCall_hook, 0x008a, 0x55d4);
-  parseGivenObjectData_b12(gb);
+  parseGivenObjectData_b12_hook(gb);
 }
 
 void func_55f8_hook(GB *gb) {
-  CYC(0x55f8, 0x55fb);
-  parseGivenObjectData_b12(gb);
+  CYC(0x55f8, 0x55fa);
+  parseGivenObjectData_b12_hook(gb);
 }
 
 void parseGivenObjectData_hl_hook(GB *gb) {
   CYC(0x55fa, 0x55fb); E = L;
   CYC(0x55fb, 0x55fc); D = H;
   CYC(0x55fc, 0x55ff);
-  parseGivenObjectData_b12(gb);
+  parseGivenObjectData_b12_hook(gb);
 }
 
 void skipToOpEnd_2byte_hook(GB *gb) {
@@ -137,7 +182,7 @@ void skipToOpEnd_2byte_hook(GB *gb) {
     if (F & FC) { CYCT(0x5665, 0x5668); continue; }
     CYC(0x5665, 0x5668);
     CYC(0x5668, 0x566b);
-    parseGivenObjectData_b12(gb);
+    parseGivenObjectData_b12_hook(gb);
     return;
   }
 }
@@ -150,7 +195,7 @@ void skipToOpEnd_4byte_hook(GB *gb) {
     if (F & FC) { CYCT(0x5684, 0x5687); continue; }
     CYC(0x5684, 0x5687);
     CYC(0x5687, 0x568a);
-    parseGivenObjectData_b12(gb);
+    parseGivenObjectData_b12_hook(gb);
     return;
   }
 }
@@ -189,7 +234,7 @@ done:
 void skipPointer_hook(GB *gb) {
   CYC(0x56aa, 0x56ac); SET_DE(DE + 2);
   CYC(0x56ac, 0x56af);
-  parseGivenObjectData_b12(gb);
+  parseGivenObjectData_b12_hook(gb);
 }
 
 void parsePointer_hook(GB *gb) {
@@ -200,7 +245,7 @@ void parsePointer_hook(GB *gb) {
   CYC(0x56b5, 0x56b6); D = mem_rd(gb, HL);
   CYC(0x56b6, 0x56b7); E = A;
   CYC(0x56b7, 0x56ba);
-  parseGivenObjectData_b12(gb);
+  parseGivenObjectData_b12_hook(gb);
 }
 
 void continueObjectLoopIfOpDone_hook(GB *gb) {
@@ -210,7 +255,7 @@ void continueObjectLoopIfOpDone_hook(GB *gb) {
   CYC(0x5808, 0x5809);
   CYC(0x5809, 0x580a); SET_BC(pop_effect(gb));
   CYC(0x580a, 0x580d);
-  parseGivenObjectData_b12(gb);
+  parseGivenObjectData_b12_hook(gb);
 }
 
 void objectDataOp1_hook(GB *gb) {
@@ -279,7 +324,7 @@ void objectDataOp8_hook(GB *gb) {
   for (;;) {
     CYC(0x577a, 0x577b); A = mem_rd(gb, DE);
     CYC(0x577b, 0x577d); alu_bit(gb, 7, A);
-    if (!(F & FZ)) { CYCT(0x577d, 0x5780); parseGivenObjectData_b12(gb); return; }
+    if (!(F & FZ)) { CYCT(0x577d, 0x5780); parseGivenObjectData_b12_hook(gb); return; }
     CYC(0x577d, 0x5780);
     CALL_C(0x5780, getFreePartSlot_hook, 0x3e8e, 0x5783);
     if (!(F & FZ)) { CYCT(0x5783, 0x5786); goto skip; }
@@ -310,7 +355,7 @@ void objectDataOp0_hook(GB *gb) {
   CYC(0x5628, 0x5629); A = mem_rd(gb, DE);
   CYC(0x5629, 0x562a); SET_DE(DE + 1);
   CYC(0x562a, 0x562b); alu_and(gb, B);
-  if (!(F & FZ)) { CYCT(0x562b, 0x562e); parseGivenObjectData_b12(gb); return; }
+  if (!(F & FZ)) { CYCT(0x562b, 0x562e); parseGivenObjectData_b12_hook(gb); return; }
   CYC(0x562b, 0x562e);
   CYC(0x562e, 0x5630); B = 0;
   CYC(0x5630, 0x5632); L = E; H = D;
@@ -370,7 +415,7 @@ void objectDataOp6_hook(GB *gb) {
     CYC(0x5701, 0x5703);
 allocate:
     CALL_C(0x5703, getFreeEnemySlot_hook, 0x2e27, 0x5706);
-    if (!(F & FZ)) { CYCT(0x5706, 0x5709); parseGivenObjectData_b12(gb); return; }
+    if (!(F & FZ)) { CYCT(0x5706, 0x5709); parseGivenObjectData_b12_hook(gb); return; }
     CYC(0x5706, 0x5709);
     CALL_C(0x5709, decEnemyCounterIfApplicable_hook, 0x581c, 0x570c);
     CYC(0x570c, 0x570e); A = H8(hFF8F);
@@ -401,7 +446,7 @@ next:
     if (!(F & FZ)) { CYCT(0x572f, 0x5731); continue; }
     CYC(0x572f, 0x5731);
     CYC(0x5731, 0x5734);
-    parseGivenObjectData_b12(gb);
+    parseGivenObjectData_b12_hook(gb);
     return;
   }
 }
@@ -412,7 +457,7 @@ void objectDataOp7_hook(GB *gb) {
   for (;;) {
     CYC(0x5738, 0x5739); A = mem_rd(gb, DE);
     CYC(0x5739, 0x573b); alu_bit(gb, 7, A);
-    if (!(F & FZ)) { CYCT(0x573b, 0x573e); parseGivenObjectData_b12(gb); return; }
+    if (!(F & FZ)) { CYCT(0x573b, 0x573e); parseGivenObjectData_b12_hook(gb); return; }
     CYC(0x573b, 0x573e);
     CYC(0x573e, 0x5740); A = 1;
     CYC(0x5740, 0x5742); H8(hFF8D) = A;
@@ -479,7 +524,7 @@ void objectDataOpA_hook(GB *gb) {
   for (;;) {
     CYC(0x57cf, 0x57d0); A = mem_rd(gb, DE);
     CYC(0x57d0, 0x57d2); alu_bit(gb, 7, A);
-    if (!(F & FZ)) { CYCT(0x57d2, 0x57d5); parseGivenObjectData_b12(gb); return; }
+    if (!(F & FZ)) { CYCT(0x57d2, 0x57d5); parseGivenObjectData_b12_hook(gb); return; }
     CYC(0x57d2, 0x57d5);
     CYC(0x57d5, 0x57d7); A = 1;
     CYC(0x57d7, 0x57d9); H8(hFF8D) = A;

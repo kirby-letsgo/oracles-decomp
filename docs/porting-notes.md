@@ -757,3 +757,13 @@ desync to discover; keep them when porting routines.
   factor the destination routine at the boundary, and call it directly. The sibling garbage jumps
   to `$048b` and `$34c7` really enter operand bytes, so those must remain exact interpreter
   continuations rather than being rounded to the surrounding readable routine.
+- Script-VM labels are data even when their bytes happen to decode as plausible SM83 instructions.
+  Batch 119's `companionScript_subid00Script` began with script opcode `$c7`, which the routine
+  scanner reported as an `rst $00`; its four local script targets produced more bogus CPU entries.
+  The only external use loaded the root into HL for `interactionSetScript`, and every internal edge
+  was a script command operand, so all five rows left `ported.txt` instead of becoming C hooks.
+- Closing a generated root can expose an old byte-count defect in an already-readable caller.
+  While promoting Bank 12's `parseGivenObjectData`, review found that `func_55f8` burned its
+  unconditional two-byte `jr` from `$55f8` through `$55fb`, consuming the first byte of the nearby
+  `$55fa` entry. The correct physical endpoint is `$55fa`; recheck existing direct-call and jump
+  tails whenever removing their last generated boundary, even when lint and replay were green.

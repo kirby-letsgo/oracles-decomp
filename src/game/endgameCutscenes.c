@@ -1369,7 +1369,7 @@ void endgameCutsceneHandler_09_stage0__stateD_hook(GB *gb) {
   }
   CYC(0x55ec, 0x55ed);
   CALL_C(0x55ed, incCbc2_hook, 0x3067, 0x55f0);
-  CALL_C(0x55f0, cutscene_loadRoomObjectSetAndFadein, 0x64c5, 0x55f3);
+  CALL_C(0x55f0, cutscene_loadRoomObjectSetAndFadein_hook, 0x64c5, 0x55f3);
   CYC(0x55f3, 0x55f4); alu_xor(gb, A);
   CYC(0x55f4, 0x55f7); mem_wr(gb, wTmpcfc0_genericCutscene_cfd1, A);
   CYC(0x55f7, 0x55fa); mem_wr(gb, wTmpcfc0_genericCutscene_cfdf, A);
@@ -1421,7 +1421,7 @@ void endgameCutsceneHandler_09_stage0__stateF_hook(GB *gb) {
   }
   CYC(0x5622, 0x5623);
   CALL_C(0x5623, incCbc2_hook, 0x3067, 0x5626);
-  CALL_C(0x5626, cutscene_loadRoomObjectSetAndFadein, 0x64c5, 0x5629);
+  CALL_C(0x5626, cutscene_loadRoomObjectSetAndFadein_hook, 0x64c5, 0x5629);
   CYC(0x5629, 0x562c); SET_HL(w1Link);
   CYC(0x562c, 0x562e); mem_wr(gb, HL, 0x03);
   CYC(0x562e, 0x5630); L = 0x0b;
@@ -2311,7 +2311,7 @@ void endgameCutsceneHandler_0f__state1__substate0_hook(GB *gb) {
   CALL_C(0x5cea, incCbc2_hook, 0x3067, 0x5ced);
   CYC(0x5ced, 0x5cef); A = 0x11;
   CYC(0x5cef, 0x5cf2); mem_wr(gb, 0xcfde, A);
-  CALL_C(0x5cf2, cutscene_loadRoomObjectSetAndFadein, 0x64c5, 0x5cf5);
+  CALL_C(0x5cf2, cutscene_loadRoomObjectSetAndFadein_hook, 0x64c5, 0x5cf5);
   CYC(0x5cf5, 0x5cf7); A = 0x04;
   CYC(0x5cf7, 0x5cf9); B = 0x02;
   CALL_C(0x5cf9, cutscene_loadAObjectGfxBTimes_andReload_hook, 0x6056, 0x5cfc);

@@ -659,6 +659,7 @@ loadAnimationGfxIndex
 parseObjectData
 func_55f8
 parseGivenObjectData_hl
+parseGivenObjectData_b12
 skipToOpEnd_2byte
 skipToOpEnd_4byte
 checkSkipPointer
@@ -2482,3 +2483,19 @@ func_7f55
 func_7f90
 func_7fb5
 updateAllObjects__jump34ad
+func_03_6103__state1
+func_03_6103__loadNewFairyRoom
+func_03_6103__afterCall616a
+func_03_6103__state4
+func_03_6103__state7
+func_03_6103__stateA
+func_03_6103__afterCall61c5
+func_03_6275
+func_03_6275__state0
+func_03_6275__state1
+func_03_6275__afterCall62c0
+func_03_6275__state2
+func_03_6275__state3
+func_03_6275__state4
+cutscene_loadRoomObjectSetAndFadein
+cutscene_loadRoomObjectSetAndFadein__afterCall64d8

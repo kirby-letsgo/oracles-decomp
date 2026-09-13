@@ -11477,12 +11477,13 @@ void checkUseItems_b00_hook(GB *gb) {
 }
 
 void parseGivenObjectData_b00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   bank_push(gb, 0x3171, 0x12);
   CYC(0x317b, 0x317c); push_effect(gb, DE);
   D = H;
   E = L;
   CYC(0x317c, 0x317e);
-  CALL_ROM(0x317e, ROM_b12_parseGivenObjectData);
+  CALL_C(0x317e, parseGivenObjectData_b12_hook, ROM_b12_parseGivenObjectData, 0x3181);
   CYC(0x3181, 0x3182); SET_DE(pop_effect(gb));
   bank_pop(gb, 0x3182);
   CYC(0x3188, 0x3189);
