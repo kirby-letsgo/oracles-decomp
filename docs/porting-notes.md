@@ -915,3 +915,15 @@ desync to discover; keep them when porting routines.
   valid, but the extra register mutation changed which six bytes were copied. Independent review
   found it by checking each disassembly instruction exactly once; audit compact loops in source
   order and flag duplicate address ranges even when their byte spans themselves are valid.
+- Table pointers must resolve to the label's first byte, not a visually adjacent payload byte.
+  Batch 145's first Dimitri-mouth rewrite used `$518a` instead of the ROM's `$518c`, and the
+  Ricky/Moosh break-tile helper used `$5c04/$5c0d` instead of `$5c03/$5c0c`. Every surrounding
+  instruction range and table-walk operation was correct, so cold replay did not expose the
+  shifted inputs. Check each immediate pointer against both the operand bytes and the symbol's
+  numeric address; an off-by-one table base can otherwise survive all structural checks.
+- A readable dispatcher can target generated C when a known static destination is not readable
+  yet. Batch 145's `linkState0a` initially named nonexistent `warpTransition3_hook` and
+  `warpTransition6_hook` shims after its implementation lane stopped early, causing link failure.
+  Known RST-table destinations still call their actual C functions directly: use the generated
+  `warpTransition3`/`warpTransition6` names until those roots receive readable `_hook` shims, and
+  reserve `hook_continue` for the genuinely unknown fallback.
