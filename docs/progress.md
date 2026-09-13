@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 3,113 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 3,140 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -242,6 +242,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   Batch 145 added seven bank-5 Link-state and warp roots, eight bank-6 Link cutscene helpers, and
   four bank-7 companion-attack item roots. Forty-eight parent-owned local rows disappeared; the
   project now has 3,113 readable hooks out of 12,124.
+  Batch 146 added ten bank-5 Link-state and warp roots, ten bank-6 Link cutscene state machines,
+  and the final seven bank-7 item roots. One hundred forty-nine parent-owned local/data rows
+  disappeared; the project now has 3,140 readable hooks out of 11,975.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -347,6 +350,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 146 (27 routines): added ten bank-5 Link-state, item-cancel,
+  death, and warp roots; ten bank-6 Link cutscene state machines; and the final seven bank-7 seed,
+  Bombchu, switch-hook, and Cane of Somaria item roots. One hundred forty-nine parent-owned
+  local/data rows were absorbed, including the canonical `itemCode20` aliases for item codes
+  21–24. Lane audit corrected a reversed `jr nc` arm in `warpTransition3`; two independent
+  instruction reviews per routine found no further defects. The project now has 3,140 readable
+  hooks out of 11,975. Gates: lint 0, 30k verify 0 failures across 4,610,406 calls with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches across 11,812,463 calls with
+  state `a62ae98192befee8`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 145 (19 routines): added seven bank-5 Link-state and warp
   roots, eight bank-6 Link cutscene helpers, and four bank-7 Dimitri, Ricky/Moosh, tornado, and
   minecart-collision item roots. Forty-eight parent-owned local rows were absorbed. After the

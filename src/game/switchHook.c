@@ -684,3 +684,59 @@ delete:
   CYC(0x5a91, 0x5a94);
   itemDelete_hook(gb);
 }
+
+void itemCode09_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x5ac0, 0x5ac1); H = D;
+  CYC(0x5ac1, 0x5ac3); L = 0x2f;
+  CYC(0x5ac3, 0x5ac5); alu_bit(gb, 5, mem_rd(gb, HL));
+  if (!(F & FZ)) {
+    CYCT(0x5ac5, 0x5ac7);
+    goto state2;
+  }
+  CYC(0x5ac5, 0x5ac7);
+  CYC(0x5ac7, 0x5ac9); E = 0x04;
+  CYC(0x5ac9, 0x5aca); A = mem_rd(gb, DE);
+  CYC(0x5aca, 0x5acb); push_effect(gb, 0x5acb);
+  switch (switch_hook_jump_table(gb)) {
+    case 0x5ad1: break;
+    case 0x5ae9: goto state1;
+    case 0x5aef: goto state2;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+  CALL_C(0x5ad1, itemIncState_hook, 0x23ea, 0x5ad4);
+  CYC(0x5ad4, 0x5ad5); H = D;
+  CYC(0x5ad5, 0x5ad7); L = 0x0a;
+  CYC(0x5ad7, 0x5ad9); E = 0x30;
+  CYC(0x5ad9, 0x5adb); B = 0x06;
+  CALL_C(0x5adb, copyMemory_hook, 0x0486, 0x5ade);
+  CYC(0x5ade, 0x5ae1); SET_HL(w1Link_y);
+  CYC(0x5ae1, 0x5ae3); B = 0x06;
+  CALL_C(0x5ae3, copyMemory_hook, 0x0486, 0x5ae6);
+  CYC(0x5ae6, 0x5ae9); setCameraFocusedObject_hook(gb);
+  return;
+
+state1:
+  CYC(0x5ae9, 0x5aec); A = W8(w1WeaponItem_id);
+  CYC(0x5aec, 0x5aee); alu_cp(gb, 0x0a);
+  if (F & FZ) {
+    CYCT(0x5aee, 0x5aef); ret_effect(gb); return;
+  }
+  CYC(0x5aee, 0x5aef);
+
+state2:
+  CALL_C(0x5aef, setCameraFocusedObjectToLink_hook, 0x12f0, 0x5af2);
+  CYC(0x5af2, 0x5af5); itemDelete_hook(gb);
+}
+
+void func_5af5_hook(GB *gb) {
+  CYC(0x5af5, 0x5af8); SET_HL(w1ReservedItemE);
+  CYC(0x5af8, 0x5afa); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x5afa, 0x5afb); ret_effect(gb); return;
+  }
+  CYC(0x5afa, 0x5afb);
+  CYC(0x5afb, 0x5afd); L = 0x2f;
+  CYC(0x5afd, 0x5aff); mem_wr(gb, HL, mem_rd(gb, HL) | 0x20);
+  CYC(0x5aff, 0x5b00); ret_effect(gb);
+}

@@ -646,3 +646,353 @@ void seedItemClearKnockback_hook(GB *gb) {
   CYC(0x5112, 0x5113); mem_wr(gb, DE, A);
   CYC(0x5113, 0x5114); ret_effect(gb);
 }
+
+static void seed_add_double_index_from_rst(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0018, 0x0019, false); push_effect(gb, BC);
+  burn_rom(gb, 0x00, 0x0019, 0x001a, false); C = A;
+  burn_rom(gb, 0x00, 0x001a, 0x001c, false); B = 0x00;
+  burn_rom(gb, 0x00, 0x001c, 0x001d, false); alu_add_hl(gb, BC);
+  burn_rom(gb, 0x00, 0x001d, 0x001e, false); alu_add_hl(gb, BC);
+  burn_rom(gb, 0x00, 0x001e, 0x001f, false); SET_BC(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
+}
+
+static void seed_state1_load_gfx_vars(GB *gb) {
+  CYC(0x4e8a, 0x4e8b); alu_add(gb, A);
+  CYC(0x4e8b, 0x4e8e); SET_HL(0x4e20);
+  CYC(0x4e8e, 0x4e8f); seed_add_double_index_from_rst(gb, 0x4e8f);
+  CYC(0x4e8f, 0x4e91); E = 0x1b;
+  CYC(0x4e91, 0x4e92); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4e92, 0x4e93); mem_wr(gb, DE, A);
+  CYC(0x4e93, 0x4e94); E = alu_inc8(gb, E);
+  CYC(0x4e94, 0x4e95); mem_wr(gb, DE, A);
+  CYC(0x4e95, 0x4e96); E = alu_inc8(gb, E);
+  CYC(0x4e96, 0x4e97); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4e97, 0x4e98); mem_wr(gb, DE, A);
+  CYC(0x4e98, 0x4e99); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4e99, 0x4e9b); E = 0x06;
+  CYC(0x4e9b, 0x4e9c); mem_wr(gb, DE, A);
+  CYC(0x4e9c, 0x4e9d); A = mem_rd(gb, HL);
+  CYC(0x4e9d, 0x4ea0); playSound_b00_hook(gb);
+}
+
+static void seed_state1_init_state3(GB *gb) {
+  CYC(0x4e82, 0x4e84); E = 0x04;
+  CYC(0x4e84, 0x4e86); A = 0x03;
+  CYC(0x4e86, 0x4e87); mem_wr(gb, DE, A);
+  CYC(0x4e87, 0x4e89); E = 0x01;
+  CYC(0x4e89, 0x4e8a); A = mem_rd(gb, DE);
+  seed_state1_load_gfx_vars(gb);
+}
+
+static void seed_state1_break_tile_with_gale_seed(GB *gb) {
+  CYC(0x4e45, 0x4e47); A = 0x0d;
+  CYC(0x4e47, 0x4e4a); itemTryToBreakTile_hook(gb);
+}
+
+void seedItemState1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x4d85, itemUpdateDamageToApply_hook, 0x49c8, 0x4d88);
+  if (F & FZ) {
+    CYCT(0x4d88, 0x4d8a);
+    goto no_collision;
+  }
+  CYC(0x4d88, 0x4d8a);
+  CYC(0x4d8a, 0x4d8c); alu_bit(gb, 4, A);
+  if (F & FZ) {
+    CYCT(0x4d8c, 0x4d8e);
+    goto collided_with_enemy;
+  }
+  CYC(0x4d8c, 0x4d8e);
+  CYC(0x4d8e, 0x4d90); mem_wr(gb, HL, 0x00);
+  CALL_C(0x4d90, func_50f4_hook, 0x50f4, 0x4d93);
+  if (F & FZ) {
+    CYCT(0x4d93, 0x4d95);
+    goto update_position;
+  }
+  CYC(0x4d93, 0x4d95);
+  CYC(0x4d95, 0x4d97);
+  goto collided_with_wall;
+
+no_collision:
+  CYC(0x4d97, 0x4d99); E = 0x02;
+  CYC(0x4d99, 0x4d9a); A = mem_rd(gb, DE);
+  CYC(0x4d9a, 0x4d9b); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x4d9b, 0x4d9d);
+    goto satchel_update;
+  }
+  CYC(0x4d9b, 0x4d9d);
+  CALL_C(0x4d9d, seedItemUpdateBouncing_hook, 0x5035, 0x4da0);
+  if (!(F & FZ)) {
+    CYCT(0x4da0, 0x4da2);
+    goto collided_with_wall;
+  }
+  CYC(0x4da0, 0x4da2);
+
+update_position:
+  CALL_C(0x4da2, objectCheckWithinRoomBoundary_hook, 0x219f, 0x4da5);
+  if (F & FC) {
+    CYCT(0x4da5, 0x4da8);
+    objectApplySpeed_hook(gb);
+    return;
+  }
+  CYC(0x4da5, 0x4da8);
+  CYC(0x4da8, 0x4dab); seedItemDelete_hook(gb);
+  return;
+
+satchel_update:
+  CYC(0x4dab, 0x4dac); H = D;
+  CYC(0x4dac, 0x4dae); L = 0x3b;
+  CYC(0x4dae, 0x4db0); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x4db0, 0x4db2);
+  } else {
+    CYC(0x4db0, 0x4db2);
+    CYC(0x4db2, 0x4db4); L = 0x10;
+    CYC(0x4db4, 0x4db6); mem_wr(gb, HL, 0x00);
+  }
+  CALL_C(0x4db6, objectCheckWithinRoomBoundary_hook, 0x219f, 0x4db9);
+  if (!(F & FC)) {
+    CYCT(0x4db9, 0x4dbc);
+    seedItemDelete_hook(gb);
+    return;
+  }
+  CYC(0x4db9, 0x4dbc);
+  CALL_C(0x4dbc, objectApplySpeed_hook, 0x201d, 0x4dbf);
+  CYC(0x4dbf, 0x4dc1); C = 0x1c;
+  CALL_C(0x4dc1, itemUpdateThrowingVerticallyAndCheckHazards_hook, 0x4b3c, 0x4dc4);
+  if (F & FC) {
+    CYCT(0x4dc4, 0x4dc7);
+    seedItemDelete_hook(gb);
+    return;
+  }
+  CYC(0x4dc4, 0x4dc7);
+  if (F & FZ) {
+    CYCT(0x4dc7, 0x4dc8); ret_effect(gb); return;
+  }
+  CYC(0x4dc7, 0x4dc8);
+  CYC(0x4dc8, 0x4dca); A = 0x52;
+  CALL_C(0x4dca, playSound_b00_hook, 0x0c98, 0x4dcd);
+  CALL_C(0x4dcd, itemAnimate_hook, 0x49d9, 0x4dd0);
+  CYC(0x4dd0, 0x4dd2); E = 0x01;
+  CYC(0x4dd2, 0x4dd3); A = mem_rd(gb, DE);
+  CYC(0x4dd3, 0x4dd5); alu_sub(gb, 0x20);
+  CYC(0x4dd5, 0x4dd6); push_effect(gb, 0x4dd6);
+  switch (seed_jump_table(gb)) {
+    case 0x4e0a: goto ember_standard;
+    case 0x4e10: goto scent_landed;
+    case 0x4ec0: seedItemDelete_hook(gb); return;
+    case 0x4e2c: goto gale_landed;
+    case 0x4e7b: goto mystery_standard;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+collided_with_wall:
+  CALL_C(0x4de0, itemAnimate_hook, 0x49d9, 0x4de3);
+  CYC(0x4de3, 0x4de5); E = 0x01;
+  CYC(0x4de5, 0x4de6); A = mem_rd(gb, DE);
+  CYC(0x4de6, 0x4de8); alu_sub(gb, 0x20);
+  CYC(0x4de8, 0x4de9); push_effect(gb, 0x4de9);
+  switch (seed_jump_table(gb)) {
+    case 0x4e0a: goto ember_standard;
+    case 0x4e26: goto scent_or_pegasus_collided;
+    case 0x4e4a: goto gale_collided_with_wall;
+    case 0x4e7b: goto mystery_standard;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+collided_with_enemy:
+  CALL_C(0x4df3, itemAnimate_hook, 0x49d9, 0x4df6);
+  CYC(0x4df6, 0x4df8); E = 0x24;
+  CYC(0x4df8, 0x4df9); alu_xor(gb, A);
+  CYC(0x4df9, 0x4dfa); mem_wr(gb, DE, A);
+  CYC(0x4dfa, 0x4dfc); E = 0x01;
+  CYC(0x4dfc, 0x4dfd); A = mem_rd(gb, DE);
+  CYC(0x4dfd, 0x4dff); alu_sub(gb, 0x20);
+  CYC(0x4dff, 0x4e00); push_effect(gb, 0x4e00);
+  switch (seed_jump_table(gb)) {
+    case 0x4e0a: goto ember_standard;
+    case 0x4e26: goto scent_or_pegasus_collided;
+    case 0x4ec0: seedItemDelete_hook(gb); return;
+    case 0x4e5e: goto mystery_collided_with_enemy;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+ember_standard:
+  CYC(0x4e0a, 0x4e0d); push_effect(gb, 0x4e0d); seed_state1_init_state3(gb);
+  CYC(0x4e0d, 0x4e10); objectSetVisible82_hook(gb);
+  return;
+
+scent_landed:
+  CYC(0x4e10, 0x4e12); A = 0x27;
+  CYC(0x4e12, 0x4e15); push_effect(gb, 0x4e15); seed_state1_load_gfx_vars(gb);
+  CYC(0x4e15, 0x4e17); A = 0x02;
+  CALL_C(0x4e17, itemSetState_hook, 0x2a7e, 0x4e1a);
+  CYC(0x4e1a, 0x4e1c); L = 0x24;
+  CYC(0x4e1c, 0x4e1e); mem_wr(gb, HL, mem_rd(gb, HL) & (uint8_t)~0x80);
+  CYC(0x4e1e, 0x4e20); A = 0x01;
+  CALL_C(0x4e20, itemSetAnimation_hook, 0x49e2, 0x4e23);
+  CYC(0x4e23, 0x4e26); objectSetVisible83_hook(gb);
+  return;
+
+scent_or_pegasus_collided:
+  CYC(0x4e26, 0x4e28); E = 0x24;
+  CYC(0x4e28, 0x4e29); alu_xor(gb, A);
+  CYC(0x4e29, 0x4e2a); mem_wr(gb, DE, A);
+  CYC(0x4e2a, 0x4e2c);
+  goto init_state3;
+
+gale_landed:
+  CYC(0x4e2c, 0x4e2f); push_effect(gb, 0x4e2f); seed_state1_break_tile_with_gale_seed(gb);
+  CYC(0x4e2f, 0x4e31); A = 0x25;
+  CYC(0x4e31, 0x4e34); push_effect(gb, 0x4e34); seed_state1_load_gfx_vars(gb);
+  CYC(0x4e34, 0x4e36); A = 0x02;
+  CALL_C(0x4e36, itemSetState_hook, 0x2a7e, 0x4e39);
+  CYC(0x4e39, 0x4e3b); L = 0x24;
+  CYC(0x4e3b, 0x4e3c); alu_xor(gb, A);
+  CYC(0x4e3c, 0x4e3d); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4e3d, 0x4e3e); L = alu_inc8(gb, L);
+  CYC(0x4e3e, 0x4e40); A = 0x02;
+  CYC(0x4e40, 0x4e41); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4e41, 0x4e42); mem_wr(gb, HL, A);
+  CYC(0x4e42, 0x4e45); objectSetVisible82_hook(gb);
+  return;
+
+gale_collided_with_wall:
+  CYC(0x4e4a, 0x4e4d); push_effect(gb, 0x4e4d); seed_state1_break_tile_with_gale_seed(gb);
+  CYC(0x4e4d, 0x4e4f); A = 0x26;
+  CYC(0x4e4f, 0x4e52); push_effect(gb, 0x4e52); seed_state1_load_gfx_vars(gb);
+  CYC(0x4e52, 0x4e54); A = 0x03;
+  CALL_C(0x4e54, itemSetState_hook, 0x2a7e, 0x4e57);
+  CYC(0x4e57, 0x4e59); L = 0x24;
+  CYC(0x4e59, 0x4e5b); mem_wr(gb, HL, mem_rd(gb, HL) & (uint8_t)~0x80);
+  CYC(0x4e5b, 0x4e5e); objectSetVisible82_hook(gb);
+  return;
+
+mystery_collided_with_enemy:
+  CYC(0x4e5e, 0x4e5f); H = D;
+  CYC(0x4e5f, 0x4e61); L = 0x2a;
+  CYC(0x4e61, 0x4e63); alu_bit(gb, 6, mem_rd(gb, HL));
+  if (!(F & FZ)) {
+    CYCT(0x4e63, 0x4e65);
+    goto mystery_standard;
+  }
+  CYC(0x4e63, 0x4e65);
+  CYC(0x4e65, 0x4e67); L = 0x03;
+  CYC(0x4e67, 0x4e68); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x4e68, 0x4e6a); alu_add(gb, 0x20);
+  CYC(0x4e6a, 0x4e6b); L = alu_dec8(gb, L);
+  CYC(0x4e6b, 0x4e6c); mem_wr(gb, HL, A);
+  CALL_C(0x4e6c, itemLoadAttributesAndGraphics_hook, 0x4993, 0x4e6f);
+  CYC(0x4e6f, 0x4e70); alu_xor(gb, A);
+  CALL_C(0x4e70, itemSetAnimation_hook, 0x49e2, 0x4e73);
+  CYC(0x4e73, 0x4e75); E = 0x29;
+  CYC(0x4e75, 0x4e77); A = 0xff;
+  CYC(0x4e77, 0x4e78); mem_wr(gb, DE, A);
+  CYC(0x4e78, 0x4e7b);
+  goto collided_with_enemy;
+
+mystery_standard:
+  CYC(0x4e7b, 0x4e7d); E = 0x24;
+  CYC(0x4e7d, 0x4e7e); alu_xor(gb, A);
+  CYC(0x4e7e, 0x4e7f); mem_wr(gb, DE, A);
+  CALL_C(0x4e7f, objectSetVisible82_hook, 0x1e69, 0x4e82);
+
+init_state3:
+  seed_state1_init_state3(gb);
+}
+
+void itemCode20_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x4ced, 0x4cef); E = 0x04;
+  CYC(0x4cef, 0x4cf0); A = mem_rd(gb, DE);
+  CYC(0x4cf0, 0x4cf1); push_effect(gb, 0x4cf1);
+  switch (seed_jump_table(gb)) {
+    case 0x4cf9: break;
+    case 0x4d85: seedItemState1_hook(gb); return;
+    case 0x4f23: seedItemState2_hook(gb); return;
+    case 0x4ed1: seedItemState3_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+  CALL_C(0x4cf9, itemLoadAttributesAndGraphics_hook, 0x4993, 0x4cfc);
+  CYC(0x4cfc, 0x4cfd); alu_xor(gb, A);
+  CALL_C(0x4cfd, itemSetAnimation_hook, 0x49e2, 0x4d00);
+  CALL_C(0x4d00, objectSetVisiblec1_hook, 0x1e3c, 0x4d03);
+  CALL_C(0x4d03, itemIncState_hook, 0x23ea, 0x4d06);
+  CYC(0x4d06, 0x4d09); SET_BC(0xffe0);
+  CALL_C(0x4d09, objectSetSpeedZ_hook, 0x239d, 0x4d0c);
+  CYC(0x4d0c, 0x4d0e); L = 0x02;
+  CYC(0x4d0e, 0x4d0f); A = mem_rd(gb, HL);
+  CYC(0x4d0f, 0x4d10); alu_or(gb, A);
+  if (F & FZ) CALL_C_CC(0x4d10, itemUpdateAngle_hook, 0x2cf0, 0x4d13);
+  else CYC(0x4d10, 0x4d13);
+  CYC(0x4d13, 0x4d15); L = 0x34;
+  CYC(0x4d15, 0x4d17); mem_wr(gb, HL, 0x03);
+  CYC(0x4d17, 0x4d19); L = 0x02;
+  CYC(0x4d19, 0x4d1a); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x4d1a, 0x4d1b); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x4d1b, 0x4d1d);
+    goto shooter;
+  }
+  CYC(0x4d1b, 0x4d1d);
+  CYC(0x4d1d, 0x4d1e); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4d1e, 0x4d20); alu_cp(gb, 0x23);
+  if (!(F & FZ)) {
+    CYCT(0x4d20, 0x4d22);
+    CYC(0x4d2d, 0x4d30); SET_HL(0x4d69);
+    CALL_C(0x4d30, applyOffsetTableHL_hook, 0x4a36, 0x4d33);
+    CYC(0x4d33, 0x4d35); A = 0x1e;
+    CYC(0x4d35, 0x4d37);
+    goto set_speed;
+  }
+  CYC(0x4d20, 0x4d22);
+  CYC(0x4d22, 0x4d24); L = 0x0f;
+  CYC(0x4d24, 0x4d25); A = mem_rd(gb, HL);
+  CYC(0x4d25, 0x4d27); alu_add(gb, 0xf8);
+  CYC(0x4d27, 0x4d28); mem_wr(gb, HL, A);
+  CYC(0x4d28, 0x4d2a); L = 0x09;
+  CYC(0x4d2a, 0x4d2c); mem_wr(gb, HL, 0xff);
+  CYC(0x4d2c, 0x4d2d); ret_effect(gb);
+  return;
+
+shooter:
+  CYC(0x4d37, 0x4d39); E = 0x09;
+  CYC(0x4d39, 0x4d3a); A = mem_rd(gb, DE);
+  CYC(0x4d3a, 0x4d3b); alu_rrca(gb);
+  CYC(0x4d3b, 0x4d3e); SET_HL(0x4d75);
+  CYC(0x4d3e, 0x4d3f); seed_add_a_to_hl_from_rst(gb, 0x4d3f);
+  CYC(0x4d3f, 0x4d40); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4d40, 0x4d41); C = mem_rd(gb, HL);
+  CYC(0x4d41, 0x4d42); B = A;
+  CYC(0x4d42, 0x4d43); H = D;
+  CYC(0x4d43, 0x4d45); L = 0x0f;
+  CYC(0x4d45, 0x4d46); A = mem_rd(gb, HL);
+  CYC(0x4d46, 0x4d48); alu_add(gb, 0xfe);
+  CYC(0x4d48, 0x4d49); mem_wr(gb, HL, A);
+  CALL_C(0x4d49, objectCopyPositionWithOffset_hook, 0x225a, 0x4d4c);
+  CYC(0x4d4c, 0x4d4f); SET_HL(wIsSeedShooterInUse);
+  CYC(0x4d4f, 0x4d50); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x4d50, 0x4d52); A = 0x78;
+
+set_speed:
+  CYC(0x4d52, 0x4d54); E = 0x10;
+  CYC(0x4d54, 0x4d55); mem_wr(gb, DE, A);
+  CYC(0x4d55, 0x4d57); E = 0x01;
+  CYC(0x4d57, 0x4d58); A = mem_rd(gb, DE);
+  CYC(0x4d58, 0x4d5a); alu_cp(gb, 0x24);
+  if (!(F & FZ)) {
+    CYCT(0x4d5a, 0x4d5b); ret_effect(gb); return;
+  }
+  CYC(0x4d5a, 0x4d5b);
+  CALL_C(0x4d5b, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4d5e);
+  CYC(0x4d5e, 0x4d60); alu_and(gb, 0x03);
+  CYC(0x4d60, 0x4d62); E = 0x03;
+  CYC(0x4d62, 0x4d63); mem_wr(gb, DE, A);
+  CYC(0x4d63, 0x4d65); alu_add(gb, 0x9b);
+  CYC(0x4d65, 0x4d67); E = 0x24;
+  CYC(0x4d67, 0x4d68); mem_wr(gb, DE, A);
+  CYC(0x4d68, 0x4d69); ret_effect(gb);
+}

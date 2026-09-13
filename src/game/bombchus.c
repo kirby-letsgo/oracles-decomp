@@ -14,6 +14,24 @@ void bombchuSetAnimationFromAngle_hook(GB *gb);
 void bombchuUpdateAngle_sidescrolling_hook(GB *gb);
 void bombchuClearCounter2AndInitializeExplosion_hook(GB *gb);
 
+static uint16_t bombchu_jump_table(GB *gb) {
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  return HL;
+}
+
 static void bombchu_add_a_to_hl(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
   burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
@@ -535,4 +553,198 @@ next_target:
   CYC(0x547e, 0x547f); mem_wr(gb, DE, A);
   CYC(0x547f, 0x5480); alu_or(gb, D);
   CYC(0x5480, 0x5481); ret_effect(gb);
+}
+
+static void bombchu_initialize(GB *gb, uint16_t sp0_) {
+  CALL_C(0x51dc, itemLoadAttributesAndGraphics_hook, 0x4993, 0x51df);
+  CALL_C(0x51df, decNumBombchus_hook, 0x17c3, 0x51e2);
+  CYC(0x51e2, 0x51e3); H = D;
+  CYC(0x51e3, 0x51e5); L = 0x04;
+  CYC(0x51e5, 0x51e6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x51e6, 0x51e8); L = 0x30;
+  CYC(0x51e8, 0x51ea); mem_wr(gb, HL, 0xd0);
+  CYC(0x51ea, 0x51ec); L = 0x11;
+  CYC(0x51ec, 0x51ee); mem_wr(gb, HL, 0x14);
+  CYC(0x51ee, 0x51f0); L = 0x06;
+  CYC(0x51f0, 0x51f2); mem_wr(gb, HL, 0x10);
+  CYC(0x51f2, 0x51f3); L = alu_inc8(gb, L);
+  CYC(0x51f3, 0x51f5); mem_wr(gb, HL, 0xb4);
+  CYC(0x51f5, 0x51f7); L = 0x26;
+  CYC(0x51f7, 0x51f9); A = 0x18;
+  CYC(0x51f9, 0x51fa); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x51fa, 0x51fb); mem_wr(gb, HL, A);
+  CYC(0x51fb, 0x51fd); L = 0x31;
+  CYC(0x51fd, 0x51ff); mem_wr(gb, HL, 0x08);
+  CYC(0x51ff, 0x5201); L = 0x09;
+  CYC(0x5201, 0x5204); A = W8(w1Link_direction);
+  CYC(0x5204, 0x5206); A = alu_swap(gb, A);
+  CYC(0x5206, 0x5207); alu_rrca(gb);
+  CYC(0x5207, 0x5208); mem_wr(gb, HL, A);
+  CYC(0x5208, 0x520a); L = 0x08;
+  CYC(0x520a, 0x520c); mem_wr(gb, HL, 0xff);
+  CALL_C(0x520c, bombchuSetAnimationFromAngle_hook, 0x5383, 0x520f);
+  CYC(0x520f, 0x5212); bombchuSetPositionInFrontOfLink_hook(gb);
+}
+
+void itemCode0d_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x5194, bombchuCountdownToExplosion_hook, 0x540f, 0x5197);
+  CYC(0x5197, 0x5199); E = 0x04;
+  CYC(0x5199, 0x519a); A = mem_rd(gb, DE);
+  CYC(0x519a, 0x519c); alu_cp(gb, 0xff);
+  if (!(F & FC)) {
+    CYCT(0x519c, 0x519f); itemUpdateExplosion_hook(gb); return;
+  }
+  CYC(0x519c, 0x519f);
+  CALL_C(0x519f, objectCheckWithinRoomBoundary_hook, 0x219f, 0x51a2);
+  if (!(F & FC)) {
+    CYCT(0x51a2, 0x51a5); itemDelete_hook(gb); return;
+  }
+  CYC(0x51a2, 0x51a5);
+  CALL_C(0x51a5, objectSetPriorityRelativeToLink_withTerrainEffects_hook, 0x22e0, 0x51a8);
+  CYC(0x51a8, 0x51ab); A = W8(wTilesetFlags);
+  CYC(0x51ab, 0x51ad); alu_and(gb, 0x20);
+  if (!(F & FZ)) {
+    CYCT(0x51ad, 0x51af);
+    goto sidescroll;
+  }
+  CYC(0x51ad, 0x51af);
+  CYC(0x51af, 0x51b1); C = 0x20;
+  CALL_C(0x51b1, itemUpdateSpeedZAndCheckHazards_hook, 0x4a62, 0x51b4);
+  CYC(0x51b4, 0x51b6); E = 0x04;
+  CYC(0x51b6, 0x51b7); A = mem_rd(gb, DE);
+  CYC(0x51b7, 0x51b8); push_effect(gb, 0x51b8);
+  switch (bombchu_jump_table(gb)) {
+    case 0x51dc: bombchu_initialize(gb, sp0_); return;
+    case 0x5212: goto td_state1;
+    case 0x521b: goto td_state2;
+    case 0x5228: goto td_state3;
+    case 0x5233: goto td_state4;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+sidescroll:
+  CYC(0x51c2, 0x51c4); E = 0x32;
+  CYC(0x51c4, 0x51c5); A = mem_rd(gb, DE);
+  CYC(0x51c5, 0x51c6); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x51c6, 0x51c8);
+  } else {
+    CYC(0x51c6, 0x51c8);
+    CYC(0x51c8, 0x51ca); C = 0x18;
+    CALL_C(0x51ca, itemUpdateThrowingVerticallyAndCheckHazards_hook, 0x4b3c, 0x51cd);
+    if (F & FC) {
+      CYCT(0x51cd, 0x51d0); itemDelete_hook(gb); return;
+    }
+    CYC(0x51cd, 0x51d0);
+  }
+  CYC(0x51d0, 0x51d2); E = 0x04;
+  CYC(0x51d2, 0x51d3); A = mem_rd(gb, DE);
+  CYC(0x51d3, 0x51d4); push_effect(gb, 0x51d4);
+  switch (bombchu_jump_table(gb)) {
+    case 0x5241: goto ss_state0;
+    case 0x5250: goto ss_state1;
+    case 0x525f: goto ss_state2;
+    case 0x5267: goto ss_state3;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+td_state1:
+  CYC(0x5212, 0x5213); H = D;
+  CYC(0x5213, 0x5215); L = 0x0f;
+  CYC(0x5215, 0x5217); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (!(F & FZ)) {
+    CYCT(0x5217, 0x5219);
+    goto update_top_down;
+  }
+  CYC(0x5217, 0x5219);
+  CYC(0x5219, 0x521a); L = E;
+  CYC(0x521a, 0x521b); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+
+td_state2:
+  CALL_C(0x521b, bombchuCheckForEnemyTarget_hook, 0x5426, 0x521e);
+  if (F & FZ) {
+    CYCT(0x521e, 0x521f); ret_effect(gb); return;
+  }
+  CYC(0x521e, 0x521f);
+
+update_top_down:
+  CALL_C(0x521f, bombchuUpdateSpeed_hook, 0x527a, 0x5222);
+  CALL_C(0x5222, itemUpdateConveyorBelt_hook, 0x4bf7, 0x5225);
+
+animate_top_down:
+  CYC(0x5225, 0x5228); itemAnimate_hook(gb);
+  return;
+
+td_state3:
+  CYC(0x5228, 0x5229); H = D;
+  CYC(0x5229, 0x522b); L = 0x06;
+  CYC(0x522b, 0x522c); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(0x522c, 0x522f); itemUpdateConveyorBelt_hook(gb); return;
+  }
+  CYC(0x522c, 0x522f);
+  CYC(0x522f, 0x5231); mem_wr(gb, HL, 0x0a);
+  CYC(0x5231, 0x5232); L = E;
+  CYC(0x5232, 0x5233); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+
+td_state4:
+  CALL_C(0x5233, bombchuCheckCollidedWithTarget_hook, 0x541a, 0x5236);
+  if (F & FC) {
+    CYCT(0x5236, 0x5239); bombchuClearCounter2AndInitializeExplosion_hook(gb); return;
+  }
+  CYC(0x5236, 0x5239);
+  CALL_C(0x5239, bombchuUpdateVelocity_hook, 0x5272, 0x523c);
+  CALL_C(0x523c, itemUpdateConveyorBelt_hook, 0x4bf7, 0x523f);
+  CYC(0x523f, 0x5241);
+  goto animate_top_down;
+
+ss_state0:
+  CYC(0x5241, 0x5244); push_effect(gb, 0x5244); bombchu_initialize(gb, sp0_);
+  CYC(0x5244, 0x5246); E = 0x09;
+  CYC(0x5246, 0x5247); A = mem_rd(gb, DE);
+  CYC(0x5247, 0x5249); alu_bit(gb, 3, A);
+  if (!(F & FZ)) {
+    CYCT(0x5249, 0x524a); ret_effect(gb); return;
+  }
+  CYC(0x5249, 0x524a);
+  CYC(0x524a, 0x524c); alu_add(gb, 0x08);
+  CYC(0x524c, 0x524d); mem_wr(gb, DE, A);
+  CYC(0x524d, 0x5250); bombchuSetAnimationFromAngle_hook(gb);
+  return;
+
+ss_state1:
+  CYC(0x5250, 0x5252); E = 0x10;
+  CYC(0x5252, 0x5254); A = 0x14;
+  CYC(0x5254, 0x5255); mem_wr(gb, DE, A);
+  CALL_C(0x5255, bombchuCheckForEnemyTarget_hook, 0x5426, 0x5258);
+  if (F & FZ) {
+    CYCT(0x5258, 0x5259); ret_effect(gb); return;
+  }
+  CYC(0x5258, 0x5259);
+  CALL_C(0x5259, bombchuCheckWallsAndApplySpeed_hook, 0x52e4, 0x525c);
+
+animate_sidescroll:
+  CYC(0x525c, 0x525f); itemAnimate_hook(gb);
+  return;
+
+ss_state2:
+  CALL_C(0x525f, itemDecCounter1_hook, 0x23d6, 0x5262);
+  if (!(F & FZ)) {
+    CYCT(0x5262, 0x5263); ret_effect(gb); return;
+  }
+  CYC(0x5262, 0x5263);
+  CYC(0x5263, 0x5265); mem_wr(gb, HL, 0x0a);
+  CYC(0x5265, 0x5266); L = E;
+  CYC(0x5266, 0x5267); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+
+ss_state3:
+  CALL_C(0x5267, bombchuCheckCollidedWithTarget_hook, 0x541a, 0x526a);
+  if (F & FC) {
+    CYCT(0x526a, 0x526d); bombchuClearCounter2AndInitializeExplosion_hook(gb); return;
+  }
+  CYC(0x526a, 0x526d);
+  CALL_C(0x526d, bombchuUpdateVelocityAndClimbing_sidescroll_hook, 0x52dc, 0x5270);
+  CYC(0x5270, 0x5272);
+  goto animate_sidescroll;
 }
