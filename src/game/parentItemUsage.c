@@ -6,6 +6,11 @@
 #define CYC(from, to) burn_rom(gb, 0x06, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, 0x06, (from), (to), true)
 
+void clearLinkUsingItem1_hook(GB *gb);
+void itemEnableLinkMovement_hook(GB *gb);
+void itemEnableLinkTurning_hook(GB *gb);
+void itemIndexToBit_hook(GB *gb);
+
 static void parent_item_add_double_index_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
   burn_rom(gb, 0x00, 0x0018, 0x0019, false); push_effect(gb, BC);
@@ -75,9 +80,9 @@ void checkShopInput_hook(GB *gb) {
 
 void clearParentItem_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4a42, clearLinkUsingItem1, 0x5450, 0x4a45);
-  CALL_C(0x4a45, itemEnableLinkTurning, 0x5479, 0x4a48);
-  CALL_C(0x4a48, itemEnableLinkMovement, 0x5466, 0x4a4b);
+  CALL_C(0x4a42, clearLinkUsingItem1_hook, 0x5450, 0x4a45);
+  CALL_C(0x4a45, itemEnableLinkTurning_hook, 0x5479, 0x4a48);
+  CALL_C(0x4a48, itemEnableLinkMovement_hook, 0x5466, 0x4a4b);
   CYC(0x4a4b, 0x4a4d); E = 0x00;
   CYC(0x4a4d, 0x4a50); objectDelete_de_hook(gb);
 }
@@ -251,7 +256,7 @@ void parentItemUpdate_hook(GB *gb) {
   CYC(0x49f0, 0x49f2); H8(hActiveObjectType) = A;
   CYC(0x49f2, 0x49f3); A = D;
   CYC(0x49f3, 0x49f5); H8(hActiveObject) = A;
-  CALL_C(0x49f5, itemIndexToBit, 0x548c, 0x49f8);
+  CALL_C(0x49f5, itemIndexToBit_hook, 0x548c, 0x49f8);
   CYC(0x49f8, 0x49fb); SET_HL(wcc95);
   CYC(0x49fb, 0x49fc); alu_cpl(gb);
   CYC(0x49fc, 0x49fd); alu_and(gb, mem_rd(gb, HL));

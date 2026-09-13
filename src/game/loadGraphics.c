@@ -18,6 +18,8 @@ static void refresh_dirty_palettes_gbc_mode(GB *gb);
 static void refresh_dirty_palettes_next_palette(GB *gb);
 static void refresh_dirty_palettes_gba_brighten_palette(GB *gb);
 static void add_a_to_hl_from_rst(GB *gb, uint16_t return_address);
+static void refresh_object_gfx_next_extra(GB *gb, uint16_t sp0_);
+void refreshObjectGfx_body__afterCall41d2_hook(GB *gb);
 
 void initGbaModePaletteData_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -573,6 +575,41 @@ void itemGetObjectGfxIndex_hook(GB *gb) {
   CYC(0x4367, 0x4368); ret_effect(gb);
 }
 
+void resumeThreadNextFrameIfLcdIsOn__afterCall4124_hook(GB *gb) {
+  CYC(0x4124, 0x4125); ret_effect(gb);
+}
+
+void resumeThreadNextFrameIfLcdIsOn_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x411d, 0x411f); A = mem_rd(gb, IO_LCDC);
+  CYC(0x411f, 0x4120); alu_rlca(gb);
+  if (!(F & FC)) {
+    CYCT(0x4120, 0x4121); ret_effect(gb); return;
+  }
+  CYC(0x4120, 0x4121);
+  CALL_C(0x4121, resumeThreadNextFrameAndSaveBank_hook, 0x08eb, 0x4124);
+  resumeThreadNextFrameIfLcdIsOn__afterCall4124_hook(gb);
+}
+
+void reloadObjectGfx_b3f_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x4125, 0x4128); A = W8(wLoadedItemGraphic1);
+  CYC(0x4128, 0x4129); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CALL_C_CC(0x4129, loadUncompressedGfxHeader_hook, 0x05da, 0x412c);
+  } else {
+    CYC(0x4129, 0x412c);
+  }
+  CYC(0x412c, 0x412f); A = W8(wLoadedItemGraphic2);
+  CYC(0x412f, 0x4130); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CALL_C_CC(0x4130, loadUncompressedGfxHeader_hook, 0x05da, 0x4133);
+  } else {
+    CYC(0x4130, 0x4133);
+  }
+  agesFunc_3f_4133_hook(gb);
+}
+
 void agesFunc_3f_4133__afterCall4143_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   for (;;) {
@@ -597,7 +634,7 @@ void agesFunc_3f_4133__afterCall4143_hook(GB *gb) {
     }
     CYC(0x413b, 0x413d);
     CALL_C(0x413d, insertIndexIntoLoadedObjectGfx_hook, 0x42cf, 0x4140);
-    CALL_C(0x4140, resumeThreadNextFrameIfLcdIsOn, 0x411d, 0x4143);
+    CALL_C(0x4140, resumeThreadNextFrameIfLcdIsOn_hook, 0x411d, 0x4143);
   }
   CYC(0x414b, 0x414e); SET_HL(wLoadedTreeGfxIndex + 1);
   CYC(0x414e, 0x414f); E = mem_rd(gb, HL);
@@ -618,9 +655,145 @@ void agesFunc_3f_4133_hook(GB *gb) {
   } else {
     CYC(0x413b, 0x413d);
     CALL_C(0x413d, insertIndexIntoLoadedObjectGfx_hook, 0x42cf, 0x4140);
-    CALL_C(0x4140, resumeThreadNextFrameIfLcdIsOn, 0x411d, 0x4143);
+    CALL_C(0x4140, resumeThreadNextFrameIfLcdIsOn_hook, 0x411d, 0x4143);
   }
   agesFunc_3f_4133__afterCall4143_hook(gb);
+}
+
+static void refresh_object_gfx_next_extra(GB *gb, uint16_t sp0_) {
+  CYC(0x41b6, 0x41b7); A = alu_inc8(gb, A);
+  CYC(0x41b7, 0x41b9); alu_and(gb, 0x07);
+  CYC(0x41b9, 0x41ba); B = A;
+  CYC(0x41ba, 0x41bd); SET_HL(wLoadedObjectGfx + 1);
+  CYC(0x41bd, 0x41be); add_double_index_to_hl_from_rst(gb, 0x41be);
+  CYC(0x41be, 0x41bf); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x41bf, 0x41c0); D = A;
+  CYC(0x41c0, 0x41c1); C = mem_rd(gb, HL);
+  CYC(0x41c1, 0x41c2); E = alu_inc8(gb, E);
+  CALL_C(0x41c2, insertIndexIntoLoadedObjectGfx_hook, 0x42cf, 0x41c5);
+  CYC(0x41c5, 0x41c6); A = D;
+  CYC(0x41c6, 0x41c7); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x41c7, 0x41c9);
+  } else {
+    CYC(0x41c7, 0x41c9);
+    CYC(0x41c9, 0x41ca); A = C;
+    CYC(0x41ca, 0x41cb); push_effect(gb, DE);
+    CALL_C(0x41cb, addIndexToLoadedObjectGfx_hook, 0x42bb, 0x41ce);
+    CYC(0x41ce, 0x41cf); SET_DE(pop_effect(gb));
+  }
+  CALL_C(0x41cf, updateTileIndexBaseForAllObjects_hook, 0x4201, 0x41d2);
+  refreshObjectGfx_body__afterCall41d2_hook(gb);
+}
+
+void refreshObjectGfx_body__afterCall41d2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x41d2, 0x41d4); D = 0x00;
+  CYC(0x41d4, 0x41d7); SET_HL(0x5a8b);
+  CYC(0x41d7, 0x41d8); alu_add_hl(gb, DE);
+  CYC(0x41d8, 0x41d9); alu_add_hl(gb, DE);
+  CYC(0x41d9, 0x41da); alu_add_hl(gb, DE);
+  CYC(0x41da, 0x41dc); alu_bit(gb, 7, mem_rd(gb, HL));
+  CYC(0x41dc, 0x41dd); A = B;
+  if (F & FZ) {
+    CYCT(0x41dd, 0x41df);
+    refresh_object_gfx_next_extra(gb, sp0_);
+    return;
+  }
+  CYC(0x41dd, 0x41df);
+  CYC(0x41df, 0x41e2); W8(wLoadedObjectGfxIndex) = A;
+  CYC(0x41e2, 0x41e3); alu_xor(gb, A);
+  CYC(0x41e3, 0x41e6); W8(wEnemyIDToLoadExtraGfx) = A;
+  CYC(0x41e6, 0x41e9); W8(wInteractionIDToLoadExtraGfx) = A;
+  CYC(0x41e9, 0x41ec); incLoadedObjectGfxIndex_hook(gb);
+}
+
+void refreshObjectGfx_body__afterCall41ad_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x41ad, 0x41ae); A = E;
+  CALL_C(0x41ae, findIndexInLoadedObjectGfx_hook, 0x4270, 0x41b1);
+  CYC(0x41b1, 0x41b2); A = L;
+  CYC(0x41b2, 0x41b4); alu_sub(gb, 0x08);
+  CYC(0x41b4, 0x41b6); A = alu_srl(gb, A);
+  refresh_object_gfx_next_extra(gb, sp0_);
+}
+
+void refreshObjectGfx_body_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x4154, markAllLoadedObjectGfxUnused_hook, 0x4327, 0x4157);
+  CYC(0x4157, 0x4159); D = 0xd0;
+  do {
+    CALL_C(0x4159, enemyGetObjectGfxIndex_hook, 0x4337, 0x415c);
+    CALL_C(0x415c, markLoadedObjectGfxUsed_hook, 0x430e, 0x415f);
+    CYC(0x415f, 0x4160); D = alu_inc8(gb, D);
+    CYC(0x4160, 0x4161); A = D;
+    CYC(0x4161, 0x4163); alu_cp(gb, 0xe0);
+    if (F & FC) CYCT(0x4163, 0x4165); else CYC(0x4163, 0x4165);
+  } while (F & FC);
+  CYC(0x4165, 0x4167); D = 0xd0;
+  do {
+    CALL_C(0x4167, partGetObjectGfxIndex_hook, 0x4347, 0x416a);
+    CALL_C(0x416a, markLoadedObjectGfxUsed_hook, 0x430e, 0x416d);
+    CYC(0x416d, 0x416e); D = alu_inc8(gb, D);
+    CYC(0x416e, 0x416f); A = D;
+    CYC(0x416f, 0x4171); alu_cp(gb, 0xe0);
+    if (F & FC) CYCT(0x4171, 0x4173); else CYC(0x4171, 0x4173);
+  } while (F & FC);
+  CYC(0x4173, 0x4175); D = 0xd0;
+  do {
+    CALL_C(0x4175, interactionGetObjectGfxIndex_hook, 0x4355, 0x4178);
+    CALL_C(0x4178, markLoadedObjectGfxUsed_hook, 0x430e, 0x417b);
+    CYC(0x417b, 0x417c); D = alu_inc8(gb, D);
+    CYC(0x417c, 0x417d); A = D;
+    CYC(0x417d, 0x417f); alu_cp(gb, 0xe0);
+    if (F & FC) CYCT(0x417f, 0x4181); else CYC(0x417f, 0x4181);
+  } while (F & FC);
+  CYC(0x4181, 0x4183); D = 0xd6;
+  do {
+    CALL_C(0x4183, itemGetObjectGfxIndex_hook, 0x435c, 0x4186);
+    CALL_C(0x4186, markLoadedObjectGfxUsed_hook, 0x430e, 0x4189);
+    CYC(0x4189, 0x418a); D = alu_inc8(gb, D);
+    CYC(0x418a, 0x418b); A = D;
+    CYC(0x418b, 0x418d); alu_cp(gb, 0xe0);
+    if (F & FC) CYCT(0x418d, 0x418f); else CYC(0x418d, 0x418f);
+  } while (F & FC);
+  CYC(0x418f, 0x4192); A = W8(wEnemyIDToLoadExtraGfx);
+  CYC(0x4192, 0x4193); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYC(0x4193, 0x4195);
+    CALL_C(0x4195, getObjectGfxIndexForEnemy_hook, 0x433a, 0x4198);
+    CYC(0x4198, 0x419a);
+  } else {
+    CYCT(0x4193, 0x4195);
+    CYC(0x419a, 0x419d); SET_HL(wInteractionIDToLoadExtraGfx);
+    CYC(0x419d, 0x419e); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x419e, 0x419f); alu_or(gb, A);
+    if (F & FZ) {
+      CYCT(0x419f, 0x41a0); ret_effect(gb); return;
+    }
+    CYC(0x419f, 0x41a0);
+    CYC(0x41a0, 0x41a1); E = mem_rd(gb, HL);
+    CYC(0x41a1, 0x41a3); mem_wr(gb, HL, 0x00);
+    CALL_C(0x41a3, getDataForInteraction_hook, 0x443c, 0x41a6);
+    CYC(0x41a6, 0x41a7); A = mem_rd(gb, HL);
+  }
+  CALL_C(0x41a7, addIndexToLoadedObjectGfx_hook, 0x42bb, 0x41aa);
+  CALL_C(0x41aa, resumeThreadNextFrameIfLcdIsOn_hook, 0x411d, 0x41ad);
+  refreshObjectGfx_body__afterCall41ad_hook(gb);
+}
+
+void loadObjectGfxHeaderToSlot4_body__afterCall41f0_hook(GB *gb) {
+  CYC(0x41f0, 0x41f1); SET_DE(pop_effect(gb));
+  CYC(0x41f1, 0x41f3); A = 0x03;
+  CYC(0x41f3, 0x41f5);
+  refresh_object_gfx_next_extra(gb, gb->sp);
+}
+
+void loadObjectGfxHeaderToSlot4_body_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x41ec, 0x41ed); push_effect(gb, DE);
+  CALL_C(0x41ed, refreshObjectGfx_body_hook, 0x4154, 0x41f0);
+  loadObjectGfxHeaderToSlot4_body__afterCall41f0_hook(gb);
 }
 
 void loadTreeGfx_body_hook(GB *gb) {
@@ -633,7 +806,7 @@ void loadTreeGfx_body_hook(GB *gb) {
   }
   CYC(0x41fa, 0x41fb);
   CALL_C(0x41fb, insertIndexIntoLoadedObjectGfx_hook, 0x42cf, 0x41fe);
-  CYC(0x41fe, 0x4201); resumeThreadNextFrameIfLcdIsOn(gb);
+  CYC(0x41fe, 0x4201); resumeThreadNextFrameIfLcdIsOn_hook(gb);
 }
 
 void updateTileIndexBaseForAllObjects__afterCall4252_hook(GB *gb) {
@@ -697,7 +870,7 @@ void updateTileIndexBaseForAllObjects_hook(GB *gb) {
     else CYC(0x424a, 0x424c);
   } while (F & FC);
   CALL_C(0x424c, drawAllSpritesUnconditionally_hook, 0x0da2, 0x424f);
-  CALL_C(0x424f, resumeThreadNextFrameIfLcdIsOn, 0x411d, 0x4252);
+  CALL_C(0x424f, resumeThreadNextFrameIfLcdIsOn_hook, 0x411d, 0x4252);
   updateTileIndexBaseForAllObjects__afterCall4252_hook(gb);
 }
 
@@ -791,7 +964,7 @@ void enemyLoadGraphicsAndProperties_hook(GB *gb) {
   CALL_C(0x436b, addIndexToLoadedObjectGfx_hook, 0x42bb, 0x436e);
   CYC(0x436e, 0x436f); C = A;
   if (F & FC) {
-    CALL_C_CC(0x436f, resumeThreadNextFrameIfLcdIsOn, 0x411d, 0x4372);
+    CALL_C_CC(0x436f, resumeThreadNextFrameIfLcdIsOn_hook, 0x411d, 0x4372);
   } else {
     CYC(0x436f, 0x4372);
   }
@@ -848,7 +1021,7 @@ void partLoadGraphicsAndProperties_hook(GB *gb) {
   CALL_C(0x43cc, addIndexToLoadedObjectGfx_hook, 0x42bb, 0x43cf);
   CYC(0x43cf, 0x43d0); C = A;
   if (F & FC) {
-    CALL_C_CC(0x43d0, resumeThreadNextFrameIfLcdIsOn, 0x411d, 0x43d3);
+    CALL_C_CC(0x43d0, resumeThreadNextFrameIfLcdIsOn_hook, 0x411d, 0x43d3);
   } else {
     CYC(0x43d0, 0x43d3);
   }
@@ -879,7 +1052,7 @@ void interactionLoadGraphics_hook(GB *gb) {
   CALL_C(0x4407, addIndexToLoadedObjectGfx_hook, 0x42bb, 0x440a);
   CYC(0x440a, 0x440b); C = A;
   if (F & FC) {
-    CALL_C_CC(0x440b, resumeThreadNextFrameIfLcdIsOn, 0x411d, 0x440e);
+    CALL_C_CC(0x440b, resumeThreadNextFrameIfLcdIsOn_hook, 0x411d, 0x440e);
   } else {
     CYC(0x440b, 0x440e);
   }
@@ -905,7 +1078,7 @@ void itemLoadGraphics_hook(GB *gb) {
   CALL_C(0x4425, addIndexToLoadedObjectGfx_hook, 0x42bb, 0x4428);
   CYC(0x4428, 0x4429); C = A;
   if (F & FC) {
-    CALL_C_CC(0x4429, resumeThreadNextFrameIfLcdIsOn, 0x411d, 0x442c);
+    CALL_C_CC(0x4429, resumeThreadNextFrameIfLcdIsOn_hook, 0x411d, 0x442c);
   } else {
     CYC(0x4429, 0x442c);
   }

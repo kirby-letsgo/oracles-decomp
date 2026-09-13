@@ -918,3 +918,7 @@
 3f:4143 agesFunc_3f_4133__afterCall4143
 3f:4252 updateTileIndexBaseForAllObjects__afterCall4252
 3f:4372 enemyLoadGraphicsAndProperties__afterCall4372
+3f:4124 resumeThreadNextFrameIfLcdIsOn__afterCall4124
+3f:41ad refreshObjectGfx_body__afterCall41ad
+3f:41d2 refreshObjectGfx_body__afterCall41d2
+3f:41f0 loadObjectGfxHeaderToSlot4_body__afterCall41f0

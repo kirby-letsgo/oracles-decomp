@@ -873,3 +873,8 @@ desync to discover; keep them when porting routines.
   audit found bank 0 enters the body with `call $4000`. The body therefore owns a live return frame
   and must use `hook_continue(gb, HL, sp0_)`; reserve `hook_handoff` for an actual `ld sp,*` thread
   switch.
+- Burning an emulated RST helper's final `ret` is not enough if the C effect only calls
+  `pop_effect`. Batch 133's first `collision_add_a_to_hl_from_rst` restored SP but left PC at the
+  helper instead of its synthetic return address; main review caught the mismatch by comparing it
+  to the already-correct bank-3F helper. Finish the helper with `ret_effect` after the RET burn so
+  both PC and SP transition exactly as the ROM does.

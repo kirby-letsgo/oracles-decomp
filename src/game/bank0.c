@@ -9,6 +9,9 @@ void runBank2Function_hook(GB *gb);
 void runIntroCinematic_hook(GB *gb);
 void intro_cinematic__afterCall2d27_hook(GB *gb);
 void updateTextbox_hook(GB *gb);
+void reloadObjectGfx_b3f_hook(GB *gb);
+void refreshObjectGfx_body_hook(GB *gb);
+void loadObjectGfxHeaderToSlot4_body_hook(GB *gb);
 
 // Rewrites of code/bank0.s. Cycles are burned from the ROM's own instruction stream (CYC/CYCT),
 // which keeps interrupt dispatch on instruction boundaries; every memory access follows the burn
@@ -7926,9 +7929,9 @@ void interactionInitGraphics_hook(GB *gb) {
   ret_effect(gb);
 }
 
-static void refresh_object_gfx(GB *gb) {
+static void refresh_object_gfx(GB *gb, uint16_t sp0_) {
   bank3f_push(gb, 0x1618);
-  CALL_ROM(0x1622, ROM_b3f_refreshObjectGfx_body);
+  CALL_C(0x1622, refreshObjectGfx_body_hook, ROM_b3f_refreshObjectGfx_body, 0x1625);
   alu_xor(gb, A);
   CYC(0x1625, 0x1629); W8(wLoadedTreeGfxIndex) = A;
   bank_pop_af(gb, 0x1629);
@@ -7936,22 +7939,26 @@ static void refresh_object_gfx(GB *gb) {
 }
 
 void refreshObjectGfx_hook(GB *gb) {
-  refresh_object_gfx(gb);
+  uint16_t sp0_ = gb->sp;
+  refresh_object_gfx(gb, sp0_);
   ret_effect(gb);
 }
 
 void refreshLoadedTreeGfx_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   CYC(0x1613, 0x1616); A = W8(wLoadedTreeGfxIndex);
   alu_or(gb, A);
   if (F & FZ) { CYCT(0x1616, 0x1618); ret_effect(gb); return; }
   CYC(0x1616, 0x1618);
-  refresh_object_gfx(gb);
+  refresh_object_gfx(gb, sp0_);
   ret_effect(gb);
 }
 
 void loadObjectGfxHeaderToSlot4_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   bank3f_push(gb, 0x1644);
-  CALL_ROM(0x164e, ROM_b3f_loadObjectGfxHeaderToSlot4_body);
+  CALL_C(0x164e, loadObjectGfxHeaderToSlot4_body_hook,
+      ROM_b3f_loadObjectGfxHeaderToSlot4_body, 0x1651);
   bank_pop_af(gb, 0x1651);
   CYC(0x1657, 0x1658);
   ret_effect(gb);
@@ -11418,8 +11425,9 @@ void interactWithTileBeforeLink_b00_hook(GB *gb) {
 }
 
 void reloadObjectGfx_b00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   bank3f_push(gb, 0x1630);
-  CALL_ROM(0x163a, ROM_b3f_reloadObjectGfx);
+  CALL_C(0x163a, reloadObjectGfx_b3f_hook, ROM_b3f_reloadObjectGfx, 0x163d);
   bank_pop_af(gb, 0x163d);
   CYC(0x1643, 0x1644);
   ret_effect(gb);
