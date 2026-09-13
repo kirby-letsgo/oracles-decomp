@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,580 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,601 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -161,6 +161,10 @@ Updated 2026-09-13. Newest entries at the top of each section.
   Batch 122 completed the Timewarp, Ambi's Passage, Jabu-Jabu opening, linked-game, and Black
   Tower escape roots, promoted three thread-resumption points, and removed one data table plus
   three corrupted garbage labels from the executable registry; bank 3 is now 616/636.
+  Batch 123 completed the startup initializer, intro-cinematic and endgame-20 roots, and the
+  disable-LCD room loader, promoted seven thread-resumption points, and removed the ROM source
+  copy of the HRAM OAM-DMA routine from the executable registry. Bank 3 is now fully readable and
+  `gen_bank03.c` is deleted.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -266,6 +270,17 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 5 batch 123 (21 routines): completed the startup initializer,
+  intro-cinematic roots, endgame-20 root and selected room-loading states, and the disable-LCD
+  room-loader path. Seven stable post-call entries preserve returns across thread-capable calls.
+  The `$4091` OAM-DMA bytes remain ROM source data copied into HRAM, while execution continues
+  through the existing `$ff80` RAM hook; the `$59ab` jitter table and `$6fe3` room table also stay
+  data-only. Review caught five callable RST dispatchers using `hook_handoff` for their unknown
+  targets; restoring `hook_continue` with each entry SP preserves the pending caller return. Bank
+  3 is now 636/636, `gen_bank03.c` is deleted, and the project has 2,601 readable hooks out of
+  12,649. Two independent instruction-level reviews approved the corrected code. Gates: lint 0,
+  30k verify 0 failures across 4,744,137 calls with state `3e450c2620a3f6a3`, full replay 0
+  failures across 13,576,120 calls with state `64bddd0dfe384126`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 5 batch 122 (23 routines): completed the bank-3 Timewarp,
   Ambi's Passage, Jabu-Jabu opening, linked-game, and Black Tower escape roots and their nested
   dispatchers. Three stable post-call entries preserve returns from thread-capable graphics and

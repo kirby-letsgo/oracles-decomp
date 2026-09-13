@@ -784,3 +784,8 @@ desync to discover; keep them when porting routines.
   looked plausible, but verify mode uses the numeric operand for its interpreter side and would run
   unrelated bytes. Compare every `CALL_C` target operand with the readiness report even when the
   function name, call site, and return address are already correct.
+- The ROM source bytes for RAM-resident code are data at runtime, not a second executable routine.
+  Closing bank 3 in batch 123 left `oamDmaFunction` at `$4091` looking like the final generated
+  function, but startup only copies those ten bytes to `$ff80`; all execution uses the existing
+  `hramOamDmaFunction_hook` with explicit `I` timing. Remove the ROM source and end labels from the
+  executable registry while retaining the source address for the copy and RAM-hook decoding.

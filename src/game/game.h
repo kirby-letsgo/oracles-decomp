@@ -15,8 +15,12 @@
 #define IO_HDMA5 0xff55
 #define IO_LY 0xff44
 #define IO_DMA 0xff46
+#define IO_BGP 0xff47
+#define IO_OBP0 0xff48
+#define IO_OBP1 0xff49
 #define IO_STAT 0xff41
 #define IO_VBK 0xff4f
+#define IO_RP 0xff56
 #define IO_SVBK 0xff70
 #define IO_IE 0xffff
 #define MBC_ROM_BANK 0x2222

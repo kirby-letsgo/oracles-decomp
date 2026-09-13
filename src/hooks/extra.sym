@@ -863,3 +863,14 @@
 03:7cc9 func_03_7cb7__state0
 03:7ce0 func_03_7cb7__afterCall7ce0
 01:7f1d cutscene1f__afterCall7f1d
+03:4d09 intro_gotoTitlescreen__afterCall4d09
+03:52da introCinematic_preTitlescreen_state0__afterCall52da
+00:2d27 intro_cinematic__afterCall2d27
+03:5857 endgameCutsceneHandler_20__afterCall5857
+03:585a endgameCutsceneHandler_20__runStates
+03:588d endgameCutsceneHandler_20__state0
+03:5895 endgameCutsceneHandler_20__state0__afterCall5895
+03:59c1 endgameCutsceneHandler_20__state9
+03:59d4 endgameCutsceneHandler_20__state9__afterCall59d4
+03:5a51 endgameCutsceneHandler_20__stateD
+03:5a64 endgameCutsceneHandler_20__stateD__afterCall5a64

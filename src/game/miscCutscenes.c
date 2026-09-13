@@ -25,6 +25,7 @@ void nayruWarpToMakuTreeCutsceneHandler__func_699a__afterCall69af_hook(GB *gb);
 void func_6f9e_hook(GB *gb);
 void func_6fb0_hook(GB *gb);
 void func_6f0b_hook(GB *gb);
+void cutscene_disableLcdLoadRoomResetCamera_hook(GB *gb);
 void func_6f44__cbb8_00_hook(GB *gb);
 void func_6f44__cbb8_01_hook(GB *gb);
 void func_6f44__cbb8_02_hook(GB *gb);
@@ -929,7 +930,7 @@ void cutscene_loadRoomObjectSetAndFadein_hook(GB *gb) {
   CYC(0x64c5, 0x64c8); SET_HL(wTmpcfc0_genericCutscene_cfde);
   CYC(0x64c8, 0x64c9); A = mem_rd(gb, HL);
   CYC(0x64c9, 0x64ca); push_effect(gb, AF);
-  CALL_C(0x64ca, cutscene_disableLcdLoadRoomResetCamera, 0x6fd6, 0x64cd);
+  CALL_C(0x64ca, cutscene_disableLcdLoadRoomResetCamera_hook, 0x6fd6, 0x64cd);
   CYC(0x64cd, 0x64ce); SET_AF(pop_effect(gb));
   CYC(0x64ce, 0x64cf); B = A;
   CALL_C(0x64cf, getEntryFromObjectTable2_hook, 0x3632, 0x64d2);
@@ -2777,6 +2778,18 @@ void pregameIntroCutsceneHandler__stateC_hook(GB *gb) {
   CYC(0x6e95, 0x6e97); A = 0x3d;
   CYC(0x6e97, 0x6e9a);
   setGlobalFlag_hook(gb);
+}
+
+void cutscene_disableLcdLoadRoomResetCamera_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6fd6, 0x6fd9); SET_HL(0x6fe3);
+  CYC(0x6fd9, 0x6fda); add_double_index_to_hl(gb, 0x6fda);
+  CYC(0x6fda, 0x6fdb); B = mem_rd(gb, HL);
+  CYC(0x6fdb, 0x6fdc); SET_HL(HL + 1);
+  CYC(0x6fdc, 0x6fdd); C = mem_rd(gb, HL);
+  CALL_C(0x6fdd, disableLcdAndLoadRoom_hook, 0x30b0, 0x6fe0);
+  CYC(0x6fe0, 0x6fe3);
+  resetCamera_hook(gb);
 }
 
 void func_6f9e_hook(GB *gb) {

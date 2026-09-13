@@ -80,6 +80,66 @@ static void add_double_index_to_hl_from_rst(GB *gb, uint16_t return_address) {
   burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
 }
 
+void init_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4000, 0x4001); gb->ime = false; gb->ime_delay = false; gb->ime_writes++;
+  CYC(0x4001, 0x4002); alu_xor(gb, A);
+  CYC(0x4002, 0x4004); mem_wr(gb, IO_IF, A);
+  CYC(0x4004, 0x4006); mem_wr(gb, IO_IE, A);
+  CYC(0x4006, 0x4008); mem_wr(gb, IO_STAT, A);
+  CYC(0x4008, 0x400a); mem_wr(gb, IO_TAC, A);
+  CYC(0x400a, 0x400c); mem_wr(gb, IO_SC, A);
+  CYC(0x400c, 0x400d); alu_xor(gb, A);
+  CYC(0x400d, 0x4010); mem_wr(gb, 0x1111, A);
+  CALL_C(0x4010, disableLcd_hook, 0x02c1, 0x4013);
+  CYC(0x4013, 0x4015); A = H8(hGameboyType);
+  CYC(0x4015, 0x4016); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x4016, 0x4018);
+  } else {
+    CYC(0x4016, 0x4018);
+    CYC(0x4018, 0x4019); alu_xor(gb, A);
+    CYC(0x4019, 0x401b); mem_wr(gb, IO_RP, A);
+    CYC(0x401b, 0x401d); mem_wr(gb, IO_SVBK, A);
+    CYC(0x401d, 0x401f); mem_wr(gb, IO_VBK, A);
+    CALL_C(0x401f, setCpuToDoubleSpeed, 0x4071, 0x4022);
+  }
+  CYC(0x4022, 0x4025); SET_HL(hActiveFileSlot);
+  CYC(0x4025, 0x4027); B = 0x26;
+  CALL_C(0x4027, clearMemory_hook, 0x046f, 0x402a);
+  CYC(0x402a, 0x402d); SET_HL(wThread3StackTop);
+  CYC(0x402d, 0x4030); SET_BC(0x1d3f);
+  CALL_C(0x4030, clearMemoryBc_hook, 0x0475, 0x4033);
+  CALL_C(0x4033, clearVram_hook, 0x04af, 0x4036);
+  CYC(0x4036, 0x4039); SET_HL(0x4091);
+  CYC(0x4039, 0x403c); SET_DE(hOamFunc);
+  CYC(0x403c, 0x403e); B = 0x0a;
+  CALL_C(0x403e, copyMemory_hook, 0x0486, 0x4041);
+  CYC(0x4041, 0x4043); A = 0xe4;
+  CYC(0x4043, 0x4045); mem_wr(gb, IO_BGP, A);
+  CYC(0x4045, 0x4047); mem_wr(gb, IO_OBP0, A);
+  CYC(0x4047, 0x4049); A = 0x6c;
+  CYC(0x4049, 0x404b); mem_wr(gb, IO_OBP1, A);
+  CALL_C(0x404b, initSound_b00_hook, 0x0cb7, 0x404e);
+  CYC(0x404e, 0x4050); A = 0xc7;
+  CYC(0x4050, 0x4052); mem_wr(gb, IO_LYC, A);
+  CYC(0x4052, 0x4054); A = 0x40;
+  CYC(0x4054, 0x4056); mem_wr(gb, IO_STAT, A);
+  CYC(0x4056, 0x4057); alu_xor(gb, A);
+  CYC(0x4057, 0x4059); mem_wr(gb, IO_IF, A);
+  CYC(0x4059, 0x405b); A = 0x0f;
+  CYC(0x405b, 0x405d); mem_wr(gb, IO_IE, A);
+  CYC(0x405d, 0x4060); SET_HL(0x4000);
+  CYC(0x4060, 0x4062); E = 0x3f;
+  CALL_C(0x4062, interBankCall_hook, 0x008a, 0x4065);
+  CYC(0x4065, 0x4066); gb->ime_delay = true; gb->ime_writes++;
+  CYC(0x4066, 0x4069); SET_HL(0x4000);
+  CYC(0x4069, 0x406b); E = 0x02;
+  CALL_C(0x406b, interBankCall_hook, 0x008a, 0x406e);
+  CYC(0x406e, 0x4071);
+  startGame_hook(gb);
+}
+
 void unpackSecret__fail_hook(GB *gb) {
   CYC(0x4917, 0x4919); B = 0x01;
   CYC(0x4919, 0x491a); ret_effect(gb);

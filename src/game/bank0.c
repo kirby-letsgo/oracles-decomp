@@ -6,6 +6,8 @@ void paletteFadeHandler_hook(GB *gb);
 void checkLockBG7Color3ToBlack_hook(GB *gb);
 void b2_fileSelectScreen_hook(GB *gb);
 void runBank2Function_hook(GB *gb);
+void runIntroCinematic_hook(GB *gb);
+void intro_cinematic__afterCall2d27_hook(GB *gb);
 
 // Rewrites of code/bank0.s. Cycles are burned from the ROM's own instruction stream (CYC/CYCT),
 // which keeps interrupt dispatch on instruction boundaries; every memory access follows the burn
@@ -9485,7 +9487,13 @@ static void banked_body_call(GB *gb, uint16_t a, uint8_t bank, uint16_t target) 
   ret_effect(gb);
 }
 
-void disableLcdAndLoadRoom_hook(GB *gb) { banked_body_call(gb, 0x30b0, 0x03, ROM_b03_disableLcdAndLoadRoom_body); }
+void disableLcdAndLoadRoom_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  bank_push(gb, 0x30b0, 0x03);
+  CALL_C(0x30ba, disableLcdAndLoadRoom_body_hook, 0x5fe5, 0x30bd);
+  bank_pop(gb, 0x30bd);
+  CYC(0x30c3, 0x30c4); ret_effect(gb);
+}
 void playWaveSoundAtRandomIntervals_hook(GB *gb) { banked_body_call(gb, 0x30c4, 0x10, ROM_b10_playWaveSoundAtRandomIntervals_body); }
 void func_3ed0_hook(GB *gb) { banked_body_call(gb, 0x3ed0, 0x03, ROM_b03_func_03_7841); }
 void func_3ee4_hook(GB *gb) { banked_body_call(gb, 0x3ee4, 0x03, ROM_b03_func_03_7849); }
@@ -11533,20 +11541,28 @@ void initSound_b00_hook(GB *gb) {
   ret_effect(gb);
 }
 
-void intro_cinematic_hook(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  bank_push(gb, 0x2d1a, 0x03);
-  CALL_ROM(0x2d24, ROM_b03_runIntroCinematic);
+static void intro_cinematic_after_call(GB *gb, uint16_t sp0_) {
   switch_bank(gb, 0x2d27, 0x05);
   CALL_C(0x2d2e, updateSpecialObjects_hook, 0x4000, 0x2d31);
-  CYC(0x2d31, 0x2d34);
-  load_link_and_companion_animation_frame_hook(gb);
+  CALL_C(0x2d31, loadLinkAndCompanionAnimationFrame_hook, 0x2b25, 0x2d34);
   switch_bank(gb, 0x2d34, 0x04);
-  CALL_ROM(0x2d3b, ROM_b04_updateAnimations);
-  CALL_ROM(0x2d3e, ROM_updateInteractionsAndDrawAllSprites);
+  CALL_C(0x2d3b, updateAnimations_hook, 0x5906, 0x2d3e);
+  CALL_C(0x2d3e, updateInteractionsAndDrawAllSprites_hook, 0x351e, 0x2d41);
   bank_pop(gb, 0x2d41);
   CYC(0x2d47, 0x2d48);
   ret_effect(gb);
+}
+
+void intro_cinematic_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  bank_push(gb, 0x2d1a, 0x03);
+  CALL_C(0x2d24, runIntroCinematic_hook, 0x4e20, 0x2d27);
+  intro_cinematic_after_call(gb, sp0_);
+}
+
+void intro_cinematic__afterCall2d27_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  intro_cinematic_after_call(gb, sp0_);
 }
 
 // the enemy state machine's common prologue: returns the case index in c
@@ -12511,7 +12527,7 @@ void resetGame__afterSp016c_hook(GB *gb) {
   CYC(0x016e, 0x0170); H8(hRomBank) = A;
   CYC(0x0170, 0x0173); mem_wr(gb, MBC_ROM_BANK, A);
   CYCT(0x0173, 0x0176);
-  init(gb);
+  init_hook(gb);
 }
 
 void resetGame_hook(GB *gb) {
