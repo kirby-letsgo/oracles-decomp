@@ -1018,3 +1018,8 @@ desync to discover; keep them when porting routines.
   that object: eight of batch 155's fifteen hooks (fall-down-hole, Farore, her chest, the minecart
   trigger, Farore's memory) run zero times in the whole movie. They rest on the two instruction-level
   reviews alone, so the reviews must cover every path, not just the hot ones.
+- The transliterator can emit generated functions, even `HOOK_NOVERIFY` ones, for script-pointer
+  tables: `dungeonScript@dungeon3..@dungeonc` at bank-08 `$4c66-$4c94` are words the root loads into
+  HL through `rst $18`, never executed. Batch 156 left them out of the readable file and let the rows
+  disappear with their parent. A raw `$cfc1`/`$cfc2` in the disassembly with no `ram.h` name is
+  written as `wTmpcfc0 + 1`/`+ 2`; lint rejects the bare literal.

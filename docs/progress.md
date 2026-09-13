@@ -276,6 +276,11 @@ Updated 2026-09-13. Newest entries at the top of each section.
   pushblock, the minecart trigger, both key sprites, Farore's memory, and the door controller.
   Ninety-seven parent-owned local/data rows disappeared; the project now has 3,380 readable hooks
   out of 11,567, and bank 08 is 15/801.
+  Batch 156 added the first fourteen Ages-only interaction files: toggle floor and its Link
+  tile-position helper, colored cube and flame, minecart gate, special warp, dungeon script, floor
+  color changer, extendable bridge, trigger translator, tile filler, Bipin, Adlar, the librarian,
+  and Blossom. One hundred three parent-owned local/data rows disappeared; the project now has
+  3,395 readable hooks out of 11,464, and bank 08 is 30/698.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -381,6 +386,19 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 156 (15 hook entries, 78 readable functions): added the
+  first fourteen Ages-only bank-08 interaction files: toggle floor with its cross-bank
+  `getLinkTilePosition` helper, colored cube and colored-cube flame, minecart gate, special warp,
+  dungeon script, floor color changer, extendable bridge, trigger translator, tile filler, Bipin,
+  Adlar, the librarian, and Blossom. One hundred three parent-owned local/data rows were absorbed,
+  including the dungeon-script pointer table the generator had emitted as eight NOVERIFY
+  functions. Lint caught two raw `$cfc1`/`$cfc2` operands, now `wTmpcfc0 + n`. Two independent
+  instruction reviews per routine verified every jump-table word, RST helper, local-call frame, and
+  RAM operand with no defects. Four of the fifteen hooks run in the movie (colored cube and flame,
+  dungeon script, Bipin). The project now has 3,395 readable hooks out of 11,464; bank 08 is 30/698.
+  Gates: lint 0, 30k verify 0 failures across 4,584,096 calls with state `3e450c2620a3f6a3`,
+  whole-movie verify 0 failures across 44,200,370 calls, full reference replay 0 state-hash
+  mismatches with state `a62ae98192befee8`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 155 (15 hook entries, 45 readable functions): opened bank 08
   with the whole common-interactions group in twelve new source-named files: break-tile debris
   (`interactionCode00`, thirteen aliases), fall-down-hole and its event-buffer clear, Farore and her
