@@ -981,3 +981,7 @@ desync to discover; keep them when porting routines.
   both bank-1 and bank-16 blocks, while the generated registry calls the latter `func_4000_b16`.
   Isolate the requested bank/address in the report, implement the canonical registry name, and add
   only that canonical name to `rewritten.txt`; otherwise the wrong physical routine can disappear.
+- `W8(...)` accepts a RAM symbol token, not address arithmetic. It token-pastes the symbol to its
+  generated bank metadata, so Batch 151's first `W8(symbol + offset)` expressions expanded into
+  invalid identifiers and failed compilation. Use an exact adjacent RAM symbol when one exists;
+  otherwise use `mem_rd`/`mem_wr` with the computed address for indexed or offset accesses.
