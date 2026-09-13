@@ -682,6 +682,7 @@ objectRunMovementScript_body
 getTransformedLinkID
 func_4553
 specialObjectCode_minecart_b05
+specialObjectCode_minecart_b06
 specialObjectCode_raft_b05
 loadLinkAndCompanionAnimationFrame_body
 getSpecialObjectGraphicsFrame
@@ -2892,3 +2893,16 @@ monkeyAnimateAndRunScript
 monkeySubid5State1_monkey9
 minecartCheckCollisions
 minecartCreateCollisionItem
+galeSeedTryToWarpLink
+seedItemUpdateBouncing
+seedItemCheckDiagonalCollision
+func_50f4
+seedItemClearKnockback
+rabbitSubid0
+rabbitSubid1
+rabbitSubid3
+rabbitSubid4
+rabbitJump
+rabbitSubid4Substate2
+rabbitSubid7
+rabbitSubid2SetRandomSpawnDelay

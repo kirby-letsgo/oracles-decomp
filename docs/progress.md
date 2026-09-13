@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,894 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,908 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -209,6 +209,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   Batch 136 added both bounded minecart collision helpers, eight seed state/animation helpers, and
   six more monkey dispatcher/state roots. Twenty-five parent-owned locals disappeared; the project
   now has 2,894 readable hooks out of 12,487.
+  Batch 137 added the complete bank-6 minecart state body, completed the remaining Ages seed
+  movement and gale-warp helpers, and added eight bank-3F rabbit dispatcher/state roots. Thirty-five
+  parent-owned local rows disappeared; the project now has 2,908 readable hooks out of 12,452.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -314,6 +317,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 137 (14 routines): added the complete bank-6 minecart
+  state body behind its bank-5 cross-bank thunk, completed the remaining Ages seed movement,
+  diagonal-collision, knockback, and gale-warp helpers, and added eight bank-3F rabbit
+  dispatcher/state roots. Thirty-five parent-owned local rows were absorbed into structured C.
+  The rabbit roots preserve real RST `$00` frames and use `hook_continue` for unknown callable
+  targets while mirroring shared blocks still owned by generated parents. Two independent
+  instruction reviews per routine found no defects on the final tree. The project now has 2,908
+  readable hooks out of 12,452. Gates: lint 0, 30k verify 0 failures across 4,632,069 calls with
+  state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches across 11,822,424 calls
+  with state `a62ae98192befee8`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 136 (16 routines): added the two bounded bank-6 minecart
   collision and collision-item helpers, eight bank-7 seed deletion/state/burning/animation/scent
   helpers, and six bank-3F monkey state and script dispatch roots. Twenty-five parent-owned local

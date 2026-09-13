@@ -38,6 +38,165 @@ static uint16_t minecart_jump_table(GB *gb) {
   return HL;
 }
 
+void specialObjectCode_minecart_b06_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x563e, minecartCreateCollisionItem_hook, 0x57dd, 0x5641);
+  CYC(0x5641, 0x5643); E = 0x04;
+  CYC(0x5643, 0x5644); A = mem_rd(gb, DE);
+  CYC(0x5644, 0x5645); push_effect(gb, 0x5645);
+  switch (minecart_jump_table(gb)) {
+    case 0x5649:
+      break;
+    case 0x5675:
+      goto state1;
+    default:
+      hook_continue(gb, HL, sp0_);
+      return;
+  }
+
+  CYC(0x5649, 0x564b); A = 0x01;
+  CYC(0x564b, 0x564c); mem_wr(gb, DE, A);
+  CYC(0x564c, 0x564f); SET_HL(0x41f7);
+  CYC(0x564f, 0x5651); E = 0x05;
+  CALL_C(0x5651, interBankCall_hook, 0x008a, 0x5654);
+  CYC(0x5654, 0x5655); H = D;
+  CYC(0x5655, 0x5657); L = 0x10;
+  CYC(0x5657, 0x5659); mem_wr(gb, HL, 0x28);
+  CYC(0x5659, 0x565b); L = 0x08;
+  CYC(0x565b, 0x565c); A = mem_rd(gb, HL);
+  CALL_C(0x565c, specialObjectSetAnimation_hook, 0x2b0a, 0x565f);
+  CYC(0x565f, 0x5660); A = D;
+  CYC(0x5660, 0x5663); W8(wLinkObjectIndex) = A;
+  CALL_C(0x5663, setCameraFocusedObjectToLink_hook, 0x12f0, 0x5666);
+  CALL_C(0x5666, clearVar3fForParentItems_hook, 0x2c72, 0x5669);
+  CALL_C(0x5669, clearPegasusSeedCounter_hook, 0x2a85, 0x566c);
+  CYC(0x566c, 0x566f); SET_HL(w1Link_z);
+  CYC(0x566f, 0x5670); alu_xor(gb, A);
+  CYC(0x5670, 0x5671); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5671, 0x5672); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5672, 0x5675);
+  objectSetVisiblec2_hook(gb);
+  return;
+
+state1:
+  CYC(0x5675, 0x5678); A = W8(wPaletteThread_mode);
+  CYC(0x5678, 0x5679); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x5679, 0x567a); ret_effect(gb); return;
+  }
+  CYC(0x5679, 0x567a);
+  CALL_C(0x567a, retIfTextIsActive_hook, 0x1859, 0x567d);
+  CYC(0x567d, 0x5680); A = W8(wScrollMode);
+  CYC(0x5680, 0x5682); alu_and(gb, 0x0e);
+  if (!(F & FZ)) {
+    CYCT(0x5682, 0x5683); ret_effect(gb); return;
+  }
+  CYC(0x5682, 0x5683);
+  CYC(0x5683, 0x5686); A = W8(wDisabledObjects);
+  CYC(0x5686, 0x5688); alu_and(gb, 0x81);
+  if (!(F & FZ)) {
+    CYCT(0x5688, 0x5689); ret_effect(gb); return;
+  }
+  CYC(0x5688, 0x5689);
+  CYC(0x5689, 0x568c); SET_HL(w1Link_collisionType);
+  CYC(0x568c, 0x568e); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
+  CYC(0x568e, 0x568f); alu_xor(gb, A);
+  CYC(0x568f, 0x5691); L = 0x2d;
+  CYC(0x5691, 0x5692); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5692, 0x5693); H = D;
+  CYC(0x5693, 0x5695); L = 0x0b;
+  CYC(0x5695, 0x5696); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x5696, 0x5697); B = A;
+  CYC(0x5697, 0x5699); alu_and(gb, 0x0f);
+  CYC(0x5699, 0x569b); alu_cp(gb, 0x08);
+  if (!(F & FZ)) {
+    CYCT(0x569b, 0x569d);
+    goto animate;
+  }
+  CYC(0x569b, 0x569d);
+  CYC(0x569d, 0x569e); L = alu_inc8(gb, L);
+  CYC(0x569e, 0x569f); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x569f, 0x56a0); C = A;
+  CYC(0x56a0, 0x56a2); alu_and(gb, 0x0f);
+  CYC(0x56a2, 0x56a4); alu_cp(gb, 0x08);
+  if (!(F & FZ)) {
+    CYCT(0x56a4, 0x56a6);
+    goto animate;
+  }
+  CYC(0x56a4, 0x56a6);
+  CALL_C(0x56a6, minecartCheckCollisions_hook, 0x570c, 0x56a9);
+  if (F & FC) {
+    CYCT(0x56a9, 0x56ab);
+    goto minecart_stopped;
+  }
+  CYC(0x56a9, 0x56ab);
+  CYC(0x56ab, 0x56ac); H = D;
+  CYC(0x56ac, 0x56ae); L = 0x08;
+  CYC(0x56ae, 0x56af); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x56af, 0x56b1); A = alu_swap(gb, A);
+  CYC(0x56b1, 0x56b2); alu_rrca(gb);
+  CYC(0x56b2, 0x56b3); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x56b3, 0x56b5);
+    goto animate;
+  }
+  CYC(0x56b3, 0x56b5);
+  CYC(0x56b5, 0x56b6); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x56b6, 0x56b7); A = mem_rd(gb, HL);
+  CALL_C(0x56b7, specialObjectSetAnimation_hook, 0x2b0a, 0x56ba);
+
+animate:
+  CYC(0x56ba, 0x56bb); H = D;
+  CYC(0x56bb, 0x56bd); L = 0x35;
+  CYC(0x56bd, 0x56be); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x56be, 0x56c0); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (!(F & FZ)) {
+    CYC(0x56c0, 0x56c2);
+    CYC(0x56c2, 0x56c4); mem_wr(gb, HL, 0x1a);
+    CYC(0x56c4, 0x56c6); A = 0x80;
+    CALL_C(0x56c6, playSound_b00_hook, 0x0c98, 0x56c9);
+  } else {
+    CYCT(0x56c0, 0x56c2);
+  }
+  CALL_C(0x56c9, objectApplySpeed_hook, 0x201d, 0x56cc);
+  CYC(0x56cc, 0x56cf);
+  specialObjectAnimate_hook(gb);
+  return;
+
+minecart_stopped:
+  CYC(0x56cf, 0x56d1); E = 0x04;
+  CYC(0x56d1, 0x56d3); A = 0x02;
+  CYC(0x56d3, 0x56d4); mem_wr(gb, DE, A);
+  CALL_C(0x56d4, clearVar3fForParentItems_hook, 0x2c72, 0x56d7);
+  CYC(0x56d7, 0x56d9); A = 0x81;
+  CYC(0x56d9, 0x56dc); W8(wLinkInAir) = A;
+  CYC(0x56dc, 0x56df); SET_HL(w1Link_angle);
+  CYC(0x56df, 0x56e1); E = 0x09;
+  CYC(0x56e1, 0x56e2); A = mem_rd(gb, DE);
+  CYC(0x56e2, 0x56e3); mem_wr(gb, HL, A);
+  CYC(0x56e3, 0x56e5); L = 0x0b;
+  CYC(0x56e5, 0x56e6); A = mem_rd(gb, HL);
+  CYC(0x56e6, 0x56e8); alu_add(gb, 0x06);
+  CYC(0x56e8, 0x56e9); mem_wr(gb, HL, A);
+  CYC(0x56e9, 0x56eb); L = 0x0f;
+  CYC(0x56eb, 0x56ed); mem_wr(gb, HL, 0xfa);
+  CYC(0x56ed, 0x56ef); L = 0x10;
+  CYC(0x56ef, 0x56f1); mem_wr(gb, HL, 0x14);
+  CYC(0x56f1, 0x56f3); L = 0x14;
+  CYC(0x56f3, 0x56f5); mem_wr(gb, HL, 0x40);
+  CYC(0x56f5, 0x56f6); L = alu_inc8(gb, L);
+  CYC(0x56f6, 0x56f8); mem_wr(gb, HL, 0xfe);
+  CYC(0x56f8, 0x56fa); L = 0x1a;
+  CYC(0x56fa, 0x56fc); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));
+  CYC(0x56fc, 0x56fe); A = 0xd0;
+  CYC(0x56fe, 0x5701); W8(wLinkObjectIndex) = A;
+  CALL_C(0x5701, setCameraFocusedObjectToLink_hook, 0x12f0, 0x5704);
+  CYC(0x5704, 0x5706); B = 0x16;
+  CALL_C(0x5706, objectCreateInteractionWithSubid00_hook, 0x24c3, 0x5709);
+  CYC(0x5709, 0x570c);
+  objectDelete_useActiveObjectType_hook(gb);
+}
+
 static void minecart_check_door(GB *gb, uint16_t sp0_) {
   CYC(0x57c3, 0x57c4); A = C;
   CYC(0x57c4, 0x57c6); alu_sub(gb, 0x7c);
