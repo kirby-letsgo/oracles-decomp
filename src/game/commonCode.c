@@ -18,6 +18,12 @@ void setLinkMountingSpeed_hook(GB *gb);
 void companionGotoHazardHandlingState_hook(GB *gb);
 void companionDismount_hook(GB *gb);
 void saveLinkLocalRespawnAndCompanionPosition_hook(GB *gb);
+void companionRetIfInactiveWithoutStateCheck_hook(GB *gb);
+
+static void companion_ret_if_inactive_return_from_caller(GB *gb) {
+  CYC(0x48a1, 0x48a2); SET_AF(pop_effect(gb));
+  CYC(0x48a2, 0x48a3); ret_effect(gb);
+}
 
 static void common_code_add_a_to_hl(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -1523,9 +1529,215 @@ void companionRetIfInactive_hook(GB *gb) {
   CYC(0x488b, 0x488c); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(0x488c, 0x488e);
-    companionRetIfInactiveWithoutStateCheck__ret(gb);
+    companion_ret_if_inactive_return_from_caller(gb);
     return;
   }
   CYC(0x488c, 0x488e);
-  companionRetIfInactiveWithoutStateCheck(gb);
+  companionRetIfInactiveWithoutStateCheck_hook(gb);
+}
+
+void companionRetIfInactiveWithoutStateCheck_hook(GB *gb) {
+  CYC(0x488e, 0x4891); A = W8(wScrollMode);
+  CYC(0x4891, 0x4893); alu_and(gb, 0x0e);
+  if (!(F & FZ)) {
+    CYCT(0x4893, 0x4895);
+    companion_ret_if_inactive_return_from_caller(gb);
+    return;
+  }
+  CYC(0x4893, 0x4895);
+  CYC(0x4895, 0x4898); A = W8(wPaletteThread_mode);
+  CYC(0x4898, 0x4899); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x4899, 0x489b);
+    companion_ret_if_inactive_return_from_caller(gb);
+    return;
+  }
+  CYC(0x4899, 0x489b);
+  CYC(0x489b, 0x489e); A = W8(wDisabledObjects);
+  CYC(0x489e, 0x48a0); alu_and(gb, 0xa0);
+  if (F & FZ) {
+    CYCT(0x48a0, 0x48a1); ret_effect(gb); return;
+  }
+  CYC(0x48a0, 0x48a1);
+  companion_ret_if_inactive_return_from_caller(gb);
+}
+
+void companionSetAnimationToVar3f_hook(GB *gb) {
+  CYC(0x48a3, 0x48a4); H = D;
+  CYC(0x48a4, 0x48a6); L = 0x3f;
+  CYC(0x48a6, 0x48a7); A = mem_rd(gb, HL);
+  CYC(0x48a7, 0x48a9); L = 0x30;
+  CYC(0x48a9, 0x48aa); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) {
+    CYCT(0x48aa, 0x48ad);
+    specialObjectSetAnimation_hook(gb);
+    return;
+  }
+  CYC(0x48aa, 0x48ad);
+  CYC(0x48ad, 0x48ae); ret_effect(gb);
+}
+
+void companionFlashFromChargingAnimation_hook(GB *gb) {
+  CYC(0x48ae, 0x48b1); SET_HL(w1Link_oamFlagsBackup);
+  CYC(0x48b1, 0x48b4); A = W8(wFrameCounter);
+  CYC(0x48b4, 0x48b6); alu_bit(gb, 2, A);
+  if (!(F & FZ)) {
+    CYCT(0x48b6, 0x48b8);
+    CYC(0x48be, 0x48bf); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x48bf, 0x48c0); mem_wr(gb, HL, A);
+    CYC(0x48c0, 0x48c1); ret_effect(gb);
+    return;
+  }
+  CYC(0x48b6, 0x48b8);
+  CYC(0x48b8, 0x48b9); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x48b9, 0x48bb); alu_and(gb, 0xf8);
+  CYC(0x48bb, 0x48bc); alu_or(gb, C);
+  CYC(0x48bc, 0x48bd); mem_wr(gb, HL, A);
+  CYC(0x48bd, 0x48be); ret_effect(gb);
+}
+
+void companionCheckEnableTerrainEffects_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x490a, 0x490b); H = D;
+  CYC(0x490b, 0x490d); L = 0x00;
+  CYC(0x490d, 0x490e); A = mem_rd(gb, HL);
+  CYC(0x490e, 0x490f); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x490f, 0x4910); ret_effect(gb); return;
+  }
+  CYC(0x490f, 0x4910);
+  CYC(0x4910, 0x4912); L = 0x3c;
+  CYC(0x4912, 0x4913); A = mem_rd(gb, HL);
+  CYC(0x4913, 0x4916); W8(wWarpsDisabled) = A;
+  CYC(0x4916, 0x4918); L = 0x0f;
+  CYC(0x4918, 0x4919); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4919, 0x491b); alu_bit(gb, 7, A);
+  if (!(F & FZ)) {
+    CYCT(0x491b, 0x491d);
+    goto enable_terrain_effects;
+  }
+  CYC(0x491b, 0x491d);
+  CYC(0x491d, 0x4920); SET_BC(0x0500);
+  CALL_C(0x4920, objectGetRelativeTile_hook, 0x1435, 0x4923);
+  CYC(0x4923, 0x4924); H = D;
+  CYC(0x4924, 0x4926); alu_cp(gb, 0xf9);
+  if (!(F & FZ)) {
+    CYCT(0x4926, 0x4928);
+    CYC(0x492d, 0x492f); L = 0x0f;
+    CYC(0x492f, 0x4931); mem_wr(gb, HL, 0x00);
+    goto enable_terrain_effects;
+  }
+  CYC(0x4926, 0x4928);
+  CYC(0x4928, 0x492a); L = 0x1a;
+  CYC(0x492a, 0x492c); mem_wr(gb, HL, mem_rd(gb, HL) & 0xbf);
+  CYC(0x492c, 0x492d); ret_effect(gb);
+  return;
+
+enable_terrain_effects:
+  CYC(0x4931, 0x4933); L = 0x1a;
+  CYC(0x4933, 0x4935); mem_wr(gb, HL, mem_rd(gb, HL) | 0x40);
+  CYC(0x4935, 0x4936); ret_effect(gb);
+}
+
+void companionSetPriorityRelativeToLink_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x4936, objectSetPriorityRelativeToLink_withTerrainEffects_hook, 0x22e0, 0x4939);
+  CYC(0x4939, 0x493a); B = alu_dec8(gb, B);
+  CYC(0x493a, 0x493c); alu_and(gb, 0xc0);
+  CYC(0x493c, 0x493d); alu_or(gb, B);
+  CYC(0x493d, 0x493e); mem_wr(gb, DE, A);
+  CYC(0x493e, 0x493f); ret_effect(gb);
+}
+
+void companionDecCounter1ToJumpDownCliff_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x493f, 0x4941); E = 0x06;
+  CYC(0x4941, 0x4942); A = mem_rd(gb, DE);
+  CYC(0x4942, 0x4943); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x4943, 0x4945);
+    goto animate;
+  }
+  CYC(0x4943, 0x4945);
+  CYC(0x4945, 0x4946); A = alu_dec8(gb, A);
+  CYC(0x4946, 0x4947); mem_wr(gb, DE, A);
+  CYC(0x4947, 0x4949); A = 0x53;
+  CYC(0x4949, 0x494a); alu_scf(gb);
+  if (!(F & FZ)) {
+    CYCT(0x494a, 0x494b); ret_effect(gb); return;
+  }
+  CYC(0x494a, 0x494b);
+  CALL_C(0x494b, playSound_b00_hook, 0x0c98, 0x494e);
+  CYC(0x494e, 0x494f); alu_xor(gb, A);
+  CYC(0x494f, 0x4950); alu_scf(gb);
+  CYC(0x4950, 0x4951); ret_effect(gb);
+  return;
+
+animate:
+  CALL_C(0x4951, specialObjectAnimate_hook, 0x2aef, 0x4954);
+  CALL_C(0x4954, objectApplySpeed_hook, 0x201d, 0x4957);
+  CYC(0x4957, 0x4959); C = 0x40;
+  CALL_C(0x4959, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x495c);
+  CYC(0x495c, 0x495d); alu_or(gb, D);
+  CYC(0x495d, 0x495e); ret_effect(gb);
+}
+
+void companionDecCounter1IfNonzero_hook(GB *gb) {
+  CYC(0x495e, 0x495f); H = D;
+  CYC(0x495f, 0x4961); L = 0x06;
+  CYC(0x4961, 0x4962); A = mem_rd(gb, HL);
+  CYC(0x4962, 0x4963); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x4963, 0x4964); ret_effect(gb); return;
+  }
+  CYC(0x4963, 0x4964);
+  CYC(0x4964, 0x4965); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x4965, 0x4966); ret_effect(gb);
+}
+
+void companionAnimateDrowningOrFallingThenRespawn_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x4966, specialObjectAnimate_hook, 0x2aef, 0x4969);
+  CYC(0x4969, 0x496b); E = 0x21;
+  CYC(0x496b, 0x496c); A = mem_rd(gb, DE);
+  CYC(0x496c, 0x496d); alu_rlca(gb);
+  if (!(F & FC)) {
+    CYCT(0x496d, 0x496e); ret_effect(gb); return;
+  }
+  CYC(0x496d, 0x496e);
+  CALL_C(0x496e, companionRespawn_hook, 0x46e6, 0x4971);
+  CYC(0x4971, 0x4972); alu_scf(gb);
+  CYC(0x4972, 0x4973); ret_effect(gb);
+}
+
+void companionInitializeOnEnteringScreen_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x4973, companionCheckCanSpawn_hook, 0x4822, 0x4976);
+  CYC(0x4976, 0x4978); L = 0x04;
+  CYC(0x4978, 0x497a); mem_wr(gb, HL, 0x0c);
+  CYC(0x497a, 0x497c); L = 0x03;
+  CYC(0x497c, 0x497d); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x497d, 0x497f); L = 0x07;
+  CYC(0x497f, 0x4982);
+  objectSetVisiblec1_hook(gb);
+}
+
+void companionRetIfNotFinishedWalkingIn_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x4982, specialObjectGetRelativeTileWithDirectionTable_hook, 0x44f1, 0x4985);
+  CYC(0x4985, 0x4986); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x4986, 0x4987); ret_effect(gb); return;
+  }
+  CYC(0x4986, 0x4987);
+  CYC(0x4987, 0x4989); E = 0x07;
+  CYC(0x4989, 0x498a); A = mem_rd(gb, DE);
+  CYC(0x498a, 0x498b); A = alu_dec8(gb, A);
+  CYC(0x498b, 0x498c); mem_wr(gb, DE, A);
+  if (F & FZ) {
+    CYCT(0x498c, 0x498d); ret_effect(gb); return;
+  }
+  CYC(0x498c, 0x498d);
+  CYC(0x498d, 0x498e); SET_AF(pop_effect(gb));
+  CYC(0x498e, 0x498f); ret_effect(gb);
 }

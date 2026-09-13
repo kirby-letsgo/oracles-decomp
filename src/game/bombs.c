@@ -17,6 +17,8 @@ void explosionCheckAndApplyLinkCollision_hook(GB *gb);
 void explosionTryToBreakNextTile_hook(GB *gb);
 void bombUpdateThrowingLaterally_hook(GB *gb);
 void itemBounce_hook(GB *gb);
+void itemBeginThrow_hook(GB *gb);
+void itemUpdateThrowingLaterally_hook(GB *gb);
 
 static void bomb_add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -552,8 +554,8 @@ void bombUpdateThrowingLaterally_hook(GB *gb) {
   }
   CYC(0x63a7, 0x63a9); L = 0x37;
   CYC(0x63a9, 0x63ab); alu_bit(gb, 0, mem_rd(gb, HL));
-  if (F & FZ) CALL_C_CC(0x63ab, itemBeginThrow, 0x63b1, 0x63ae);
+  if (F & FZ) CALL_C_CC(0x63ab, itemBeginThrow_hook, 0x63b1, 0x63ae);
   else CYC(0x63ab, 0x63ae);
   CYC(0x63ae, 0x63b1);
-  itemUpdateThrowingLaterally(gb);
+  itemUpdateThrowingLaterally_hook(gb);
 }

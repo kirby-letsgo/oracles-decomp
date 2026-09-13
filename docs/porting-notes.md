@@ -895,3 +895,12 @@ desync to discover; keep them when porting routines.
   caller's restored SP, but integration lint rejected the helper's direct `gb->pc` and `gb->sp`
   reads. Split the helper at the local-call boundary and perform the same guard in each public
   entry hook before invoking the shared post-call block.
+- An unhooked local that discards its own call return cannot remain behind `CALL_ROM`. Batch 142's
+  sword-poke helper is called at `$4c52` and `$4c84`, but its poke path does `pop hl` at `$4d1e`
+  and returns from the parent-item caller instead. `asm_call` would keep waiting for `$4c55` or
+  `$4c87` after that frame was deliberately removed and could interpret past the enclosing C
+  routine. Absorb the local into readable C with a real pushed return and propagate three outcomes:
+  normal local return, deliberate caller escape, and abnormal nested-`CALL_C` continuation. A
+  boolean is insufficient because `CALL_C`'s nonlocal arm returns only from the static helper;
+  initialize a tri-state to abort, set normal only after the local `ret`, and set escape only after
+  the deliberate `pop`.

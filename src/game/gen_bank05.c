@@ -2668,214 +2668,6 @@ L_6076:
   RET(0x6090); return;  // ret
 }
 
-// 05:488e
-void companionRetIfInactiveWithoutStateCheck(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x488e, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
-  I(0x4891, 2); alu_and(gb, 0x0e);  // and $0e
-  if (!(F & FZ)) { I(0x4893, 3); goto L_48a1; } I(0x4893, 2);  // jr nz,$48a1
-  I(0x4895, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
-  I(0x4898, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4899, 3); goto L_48a1; } I(0x4899, 2);  // jr nz,$48a1
-  I(0x489b, 4); A = mem_rd(gb, 0xcc8a);  // ld a,($cc8a)
-  I(0x489e, 2); alu_and(gb, 0xa0);  // and $a0
-  if ((F & FZ)) { RET_TAKEN(0x48a0); return; } I(0x48a0, 2);  // ret z
-L_48a1:
-  SET_AF(POP(0x48a1));  // pop af
-  RET(0x48a2); return;  // ret
-}
-
-// 05:48a1
-void companionRetIfInactiveWithoutStateCheck__ret(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_48a1:
-  SET_AF(POP(0x48a1));  // pop af
-  RET(0x48a2); return;  // ret
-}
-
-// 05:48a3
-void companionSetAnimationToVar3f(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x48a3, 1); H = D;  // ld h,d
-  I(0x48a4, 2); L = 0x3f;  // ld l,$3f
-  I(0x48a6, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x48a7, 2); L = 0x30;  // ld l,$30
-  I(0x48a9, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if (!(F & FZ)) { I(0x48aa, 4); if (hook_enabled_at(0x2b0a)) { specialObjectSetAnimation_hook(gb); return; } HANDOFF(0x2b0a); } I(0x48aa, 3);  // jp nz,$2b0a
-  RET(0x48ad); return;  // ret
-}
-
-// 05:48ae
-void companionFlashFromChargingAnimation(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x48ae, 3); SET_HL(0xd01b);  // ld hl,$d01b
-  I(0x48b1, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
-  I(0x48b4, 2); alu_bit(gb, 2, A);  // bit 2,a
-  if (!(F & FZ)) { I(0x48b6, 3); goto L_48be; } I(0x48b6, 2);  // jr nz,$48be
-  I(0x48b8, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x48b9, 2); alu_and(gb, 0xf8);  // and $f8
-  I(0x48bb, 1); alu_or(gb, C);  // or c
-  I(0x48bc, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x48bd); return;  // ret
-L_48be:
-  I(0x48be, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x48bf, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x48c0); return;  // ret
-}
-
-// 05:490a
-void companionCheckEnableTerrainEffects(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x490a, 1); H = D;  // ld h,d
-  I(0x490b, 2); L = 0x00;  // ld l,$00
-  I(0x490d, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x490e, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x490f); return; } I(0x490f, 2);  // ret z
-  I(0x4910, 2); L = 0x3c;  // ld l,$3c
-  I(0x4912, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4913, 4); mem_wr(gb, 0xcc6e, A);  // ld ($cc6e),a
-  I(0x4916, 2); L = 0x0f;  // ld l,$0f
-  I(0x4918, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4919, 2); alu_bit(gb, 7, A);  // bit 7,a
-  if (!(F & FZ)) { I(0x491b, 3); goto L_4931; } I(0x491b, 2);  // jr nz,$4931
-  I(0x491d, 3); SET_BC(0x0500);  // ld bc,$0500
-  CALL(0x4920, objectGetRelativeTile_hook, 0x1435, 0x4923);  // call $1435
-  I(0x4923, 1); H = D;  // ld h,d
-  I(0x4924, 2); alu_cp(gb, 0xf9);  // cp $f9
-  if (!(F & FZ)) { I(0x4926, 3); goto L_492d; } I(0x4926, 2);  // jr nz,$492d
-  I(0x4928, 2); L = 0x1a;  // ld l,$1a
-  I(0x492a, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 6)));  // res 6,(hl)
-  RET(0x492c); return;  // ret
-L_492d:
-  I(0x492d, 2); L = 0x0f;  // ld l,$0f
-  I(0x492f, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-L_4931:
-  I(0x4931, 2); L = 0x1a;  // ld l,$1a
-  I(0x4933, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));  // set 6,(hl)
-  RET(0x4935); return;  // ret
-}
-
-// 05:492d
-void companionCheckEnableTerrainEffects__label_05_067(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_492d:
-  I(0x492d, 2); L = 0x0f;  // ld l,$0f
-  I(0x492f, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-L_4931:
-  I(0x4931, 2); L = 0x1a;  // ld l,$1a
-  I(0x4933, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));  // set 6,(hl)
-  RET(0x4935); return;  // ret
-}
-
-// 05:4931
-void companionCheckEnableTerrainEffects__enableTerrainEffects(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4931:
-  I(0x4931, 2); L = 0x1a;  // ld l,$1a
-  I(0x4933, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));  // set 6,(hl)
-  RET(0x4935); return;  // ret
-}
-
-// 05:4936
-void companionSetPriorityRelativeToLink(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4936, objectSetPriorityRelativeToLink_withTerrainEffects_hook, 0x22e0, 0x4939);  // call $22e0
-  I(0x4939, 1); B = alu_dec8(gb, B);  // dec b
-  I(0x493a, 2); alu_and(gb, 0xc0);  // and $c0
-  I(0x493c, 1); alu_or(gb, B);  // or b
-  I(0x493d, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x493e); return;  // ret
-}
-
-// 05:493f
-void companionDecCounter1ToJumpDownCliff(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x493f, 2); E = 0x06;  // ld e,$06
-  I(0x4941, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4942, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4943, 3); goto L_4951; } I(0x4943, 2);  // jr z,$4951
-  I(0x4945, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4946, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4947, 2); A = 0x53;  // ld a,$53
-  I(0x4949, 1); alu_scf(gb);  // scf
-  if (!(F & FZ)) { RET_TAKEN(0x494a); return; } I(0x494a, 2);  // ret nz
-  CALL(0x494b, playSound_b00_hook, 0x0c98, 0x494e);  // call $0c98
-  I(0x494e, 1); alu_xor(gb, A);  // xor a
-  I(0x494f, 1); alu_scf(gb);  // scf
-  RET(0x4950); return;  // ret
-L_4951:
-  CALL(0x4951, specialObjectAnimate_hook, 0x2aef, 0x4954);  // call $2aef
-  CALL(0x4954, objectApplySpeed_hook, 0x201d, 0x4957);  // call $201d
-  I(0x4957, 2); C = 0x40;  // ld c,$40
-  CALL(0x4959, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x495c);  // call $1f46
-  I(0x495c, 1); alu_or(gb, D);  // or d
-  RET(0x495d); return;  // ret
-}
-
-// 05:4951
-void companionDecCounter1ToJumpDownCliff__animate(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4951:
-  CALL(0x4951, specialObjectAnimate_hook, 0x2aef, 0x4954);  // call $2aef
-  CALL(0x4954, objectApplySpeed_hook, 0x201d, 0x4957);  // call $201d
-  I(0x4957, 2); C = 0x40;  // ld c,$40
-  CALL(0x4959, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x495c);  // call $1f46
-  I(0x495c, 1); alu_or(gb, D);  // or d
-  RET(0x495d); return;  // ret
-}
-
-// 05:495e
-void companionDecCounter1IfNonzero(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x495e, 1); H = D;  // ld h,d
-  I(0x495f, 2); L = 0x06;  // ld l,$06
-  I(0x4961, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4962, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x4963); return; } I(0x4963, 2);  // ret z
-  I(0x4964, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  RET(0x4965); return;  // ret
-}
-
-// 05:4966
-void companionAnimateDrowningOrFallingThenRespawn(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4966, specialObjectAnimate_hook, 0x2aef, 0x4969);  // call $2aef
-  I(0x4969, 2); E = 0x21;  // ld e,$21
-  I(0x496b, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x496c, 1); alu_rlca(gb);  // rlca
-  if (!(F & FC)) { RET_TAKEN(0x496d); return; } I(0x496d, 2);  // ret nc
-  CALL(0x496e, companionRespawn_hook, 0x46e6, 0x4971);  // call $46e6
-  I(0x4971, 1); alu_scf(gb);  // scf
-  RET(0x4972); return;  // ret
-}
-
-// 05:4973
-void companionInitializeOnEnteringScreen(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4973, companionCheckCanSpawn_hook, 0x4822, 0x4976);  // call $4822
-  I(0x4976, 2); L = 0x04;  // ld l,$04
-  I(0x4978, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
-  I(0x497a, 2); L = 0x03;  // ld l,$03
-  I(0x497c, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x497d, 2); L = 0x07;  // ld l,$07
-  I(0x497f, 4); if (hook_enabled_at(0x1e3c)) { objectSetVisiblec1_hook(gb); return; } HANDOFF(0x1e3c);  // jp $1e3c
-}
-
-// 05:4982
-void companionRetIfNotFinishedWalkingIn(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4982, specialObjectGetRelativeTileWithDirectionTable_hook, 0x44f1, 0x4985);  // call $44f1
-  I(0x4985, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4986); return; } I(0x4986, 2);  // ret nz
-  I(0x4987, 2); E = 0x07;  // ld e,$07
-  I(0x4989, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x498a, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x498b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  if ((F & FZ)) { RET_TAKEN(0x498c); return; } I(0x498c, 2);  // ret z
-  SET_AF(POP(0x498d));  // pop af
-  RET(0x498e); return;  // ret
-}
-
 // 05:498f
 void companionForceMount(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -9607,7 +9399,7 @@ L_635a:
 // 05:636c
 void specialObjectCode_maple(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x636c, companionRetIfInactiveWithoutStateCheck, 0x488e, 0x636f);  // call $488e
+  CALL(0x636c, companionRetIfInactiveWithoutStateCheck_hook, 0x488e, 0x636f);  // call $488e
   I(0x636f, 2); E = 0x04;  // ld e,$04
   I(0x6371, 2); A = mem_rd(gb, DE);  // ld a,(de)
   RST_PUSH(0x6372, 0x6373);  // rst $00 (jump table)
@@ -13409,7 +13201,7 @@ void specialObjectCode_ricky(GB *gb) {
   CALL(0x6d1e, companionRetIfInactive_hook, 0x4883, 0x6d21);  // call $4883
   CALL(0x6d21, companionFunc_47d8_hook, 0x47d8, 0x6d24);  // call $47d8
   CALL(0x6d24, specialObjectCode_ricky__runState, 0x6d2a, 0x6d27);  // call $6d2a
-  I(0x6d27, 4); companionCheckEnableTerrainEffects(gb); return;  // jp $490a
+  I(0x6d27, 4); if (hook_enabled_at(0x490a)) { companionCheckEnableTerrainEffects_hook(gb); return; } HANDOFF(0x490a);  // jp $490a
 }
 
 // 05:6d2a
@@ -13497,7 +13289,7 @@ L_6d7b:
 void rickyState1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x6d81, specialObjectAnimate_hook, 0x2aef, 0x6d84);  // call $2aef
-  CALL(0x6d84, companionSetPriorityRelativeToLink, 0x4936, 0x6d87);  // call $4936
+  CALL(0x6d84, companionSetPriorityRelativeToLink_hook, 0x4936, 0x6d87);  // call $4936
   I(0x6d87, 2); C = 0x09;  // ld c,$09
   CALL(0x6d89, objectCheckLinkWithinDistance_hook, 0x1fa2, 0x6d8c);  // call $1fa2
   if (!(F & FC)) { I(0x6d8c, 3); goto L_6d92; } I(0x6d8c, 2);  // jr nc,$6d92
@@ -13614,7 +13406,7 @@ L_6dfb:
   I(0x6e0e, 2); A = 0x65;  // ld a,$65
   I(0x6e10, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
 L_6e13:
-  CALL(0x6e13, companionAnimateDrowningOrFallingThenRespawn, 0x4966, 0x6e16);  // call $4966
+  CALL(0x6e13, companionAnimateDrowningOrFallingThenRespawn_hook, 0x4966, 0x6e16);  // call $4966
   if (!(F & FC)) { RET_TAKEN(0x6e16); return; } I(0x6e16, 2);  // ret nc
   I(0x6e17, 2); C = 0x01;  // ld c,$01
   I(0x6e19, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
@@ -13629,7 +13421,7 @@ L_6e21:
 void rickyState4__animate(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6e13:
-  CALL(0x6e13, companionAnimateDrowningOrFallingThenRespawn, 0x4966, 0x6e16);  // call $4966
+  CALL(0x6e13, companionAnimateDrowningOrFallingThenRespawn_hook, 0x4966, 0x6e16);  // call $4966
   if (!(F & FC)) { RET_TAKEN(0x6e16); return; } I(0x6e16, 2);  // ret nc
   I(0x6e17, 2); C = 0x01;  // ld c,$01
   I(0x6e19, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
@@ -13982,7 +13774,7 @@ L_6f5e:
   I(0x6f5e, 4); if (hook_enabled_at(0x446b)) { companionUpdateMovement_hook(gb); return; } HANDOFF(0x446b);  // jp $446b
 L_6f61:
   CALL(0x6f61, specialObjectAnimate_hook, 0x2aef, 0x6f64);  // call $2aef
-  CALL(0x6f64, companionDecCounter1IfNonzero, 0x495e, 0x6f67);  // call $495e
+  CALL(0x6f64, companionDecCounter1IfNonzero_hook, 0x495e, 0x6f67);  // call $495e
   if (!(F & FZ)) { RET_TAKEN(0x6f67); return; } I(0x6f67, 2);  // ret nz
   I(0x6f68, 4); rickyStopUntilLandedOnGround(gb); return;  // jp $70a3
 }
@@ -14012,7 +13804,7 @@ L_6f5e:
   I(0x6f5e, 4); if (hook_enabled_at(0x446b)) { companionUpdateMovement_hook(gb); return; } HANDOFF(0x446b);  // jp $446b
 L_6f61:
   CALL(0x6f61, specialObjectAnimate_hook, 0x2aef, 0x6f64);  // call $2aef
-  CALL(0x6f64, companionDecCounter1IfNonzero, 0x495e, 0x6f67);  // call $495e
+  CALL(0x6f64, companionDecCounter1IfNonzero_hook, 0x495e, 0x6f67);  // call $495e
   if (!(F & FZ)) { RET_TAKEN(0x6f67); return; } I(0x6f67, 2);  // ret nz
   I(0x6f68, 4); rickyStopUntilLandedOnGround(gb); return;  // jp $70a3
 }
@@ -14029,7 +13821,7 @@ void rickyState5Substate1__landed(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6f61:
   CALL(0x6f61, specialObjectAnimate_hook, 0x2aef, 0x6f64);  // call $2aef
-  CALL(0x6f64, companionDecCounter1IfNonzero, 0x495e, 0x6f67);  // call $495e
+  CALL(0x6f64, companionDecCounter1IfNonzero_hook, 0x495e, 0x6f67);  // call $495e
   if (!(F & FZ)) { RET_TAKEN(0x6f67); return; } I(0x6f67, 2);  // ret nz
   I(0x6f68, 4); rickyStopUntilLandedOnGround(gb); return;  // jp $70a3
 }
@@ -14131,7 +13923,7 @@ L_6ff4:
   CALL(0x7005, companionTryToBreakTileFromMoving_hook, 0x4477, 0x7008);  // call $4477
   CALL(0x7008, rickyCheckHazards, 0x6da5, 0x700b);  // call $6da5
   I(0x700b, 2); C = 0x04;  // ld c,$04
-  I(0x700d, 4); companionFlashFromChargingAnimation(gb); return;  // jp $48ae
+  I(0x700d, 4); if (hook_enabled_at(0x48ae)) { companionFlashFromChargingAnimation_hook(gb); return; } HANDOFF(0x48ae);  // jp $48ae
 L_7010:
   I(0x7010, 1); A = alu_inc8(gb, A);  // inc a
   I(0x7011, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -14271,7 +14063,7 @@ L_6ff4:
   CALL(0x7005, companionTryToBreakTileFromMoving_hook, 0x4477, 0x7008);  // call $4477
   CALL(0x7008, rickyCheckHazards, 0x6da5, 0x700b);  // call $6da5
   I(0x700b, 2); C = 0x04;  // ld c,$04
-  I(0x700d, 4); companionFlashFromChargingAnimation(gb); return;  // jp $48ae
+  I(0x700d, 4); if (hook_enabled_at(0x48ae)) { companionFlashFromChargingAnimation_hook(gb); return; } HANDOFF(0x48ae);  // jp $48ae
 L_7010:
   I(0x7010, 1); A = alu_inc8(gb, A);  // inc a
   I(0x7011, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -14387,7 +14179,7 @@ L_7075:
   if (!(F & FZ)) { RET_TAKEN(0x7079); return; } I(0x7079, 2);  // ret nz
   I(0x707a, 4); if (hook_enabled_at(0x23ef)) { itemIncSubstate_hook(gb); return; } HANDOFF(0x23ef);  // jp $23ef
 L_707d:
-  CALL(0x707d, companionSetPriorityRelativeToLink, 0x4936, 0x7080);  // call $4936
+  CALL(0x707d, companionSetPriorityRelativeToLink_hook, 0x4936, 0x7080);  // call $4936
   I(0x7080, 2); C = 0x09;  // ld c,$09
   CALL(0x7082, objectCheckLinkWithinDistance_hook, 0x1fa2, 0x7085);  // call $1fa2
   if ((F & FC)) { I(0x7085, 4); rickyCheckHazards(gb); return; } I(0x7085, 3);  // jp c,$6da5
@@ -14427,7 +14219,7 @@ L_7075:
 void rickyState6__substate2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_707d:
-  CALL(0x707d, companionSetPriorityRelativeToLink, 0x4936, 0x7080);  // call $4936
+  CALL(0x707d, companionSetPriorityRelativeToLink_hook, 0x4936, 0x7080);  // call $4936
   I(0x7080, 2); C = 0x09;  // ld c,$09
   CALL(0x7082, objectCheckLinkWithinDistance_hook, 0x1fa2, 0x7085);  // call $1fa2
   if ((F & FC)) { I(0x7085, 4); rickyCheckHazards(gb); return; } I(0x7085, 3);  // jp c,$6da5
@@ -14443,7 +14235,7 @@ L_707d:
 // 05:7090
 void rickyState7(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7090, companionDecCounter1ToJumpDownCliff, 0x493f, 0x7093);  // call $493f
+  CALL(0x7090, companionDecCounter1ToJumpDownCliff_hook, 0x493f, 0x7093);  // call $493f
   if ((F & FC)) { RET_TAKEN(0x7093); return; } I(0x7093, 2);  // ret c
   CALL(0x7094, companionCalculateAdjacentWallsBitset_hook, 0x4486, 0x7097);  // call $4486
   CALL(0x7097, specialObjectCheckMovingAwayFromWall_hook, 0x4500, 0x709a);  // call $4500
@@ -14523,7 +14315,7 @@ void rickyStateA(GB *gb) {
 void rickyStateASubstate0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x70f1, companionPreventLinkFromPassing_noExtraChecks_hook, 0x4465, 0x70f4);  // call $4465
-  CALL(0x70f4, companionSetPriorityRelativeToLink, 0x4936, 0x70f7);  // call $4936
+  CALL(0x70f4, companionSetPriorityRelativeToLink_hook, 0x4936, 0x70f7);  // call $4936
   CALL(0x70f7, specialObjectAnimate_hook, 0x2aef, 0x70fa);  // call $2aef
   I(0x70fa, 2); E = 0x21;  // ld e,$21
   I(0x70fc, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -14646,7 +14438,7 @@ void rickyStateASubstate5(GB *gb) {
 // 05:71a0
 void rickyStateASubstate4(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x71a0, companionSetAnimationToVar3f, 0x48a3, 0x71a3);  // call $48a3
+  CALL(0x71a0, companionSetAnimationToVar3f_hook, 0x48a3, 0x71a3);  // call $48a3
   CALL(0x71a3, rickyWaitUntilJumpDone, 0x7259, 0x71a6);  // call $7259
   if (!(F & FZ)) { RET_TAKEN(0x71a6); return; } I(0x71a6, 2);  // ret nz
   I(0x71a7, 2); A = 0x18;  // ld a,$18
@@ -14827,7 +14619,7 @@ void rickyWaitUntilJumpDone(GB *gb) {
 L_7265:
   I(0x7265, 2); C = 0x05;  // ld c,$05
   CALL(0x7267, companionSetAnimation_hook, 0x458e, 0x726a);  // call $458e
-  I(0x726a, 4); companionDecCounter1IfNonzero(gb); return;  // jp $495e
+  I(0x726a, 4); if (hook_enabled_at(0x495e)) { companionDecCounter1IfNonzero_hook(gb); return; } HANDOFF(0x495e);  // jp $495e
 }
 
 // 05:7265
@@ -14836,7 +14628,7 @@ void rickyWaitUntilJumpDone__onGround(GB *gb) {
 L_7265:
   I(0x7265, 2); C = 0x05;  // ld c,$05
   CALL(0x7267, companionSetAnimation_hook, 0x458e, 0x726a);  // call $458e
-  I(0x726a, 4); companionDecCounter1IfNonzero(gb); return;  // jp $495e
+  I(0x726a, 4); if (hook_enabled_at(0x495e)) { companionDecCounter1IfNonzero_hook(gb); return; } HANDOFF(0x495e);  // jp $495e
 }
 
 // 05:726d
@@ -14850,7 +14642,7 @@ void rickyStateC(GB *gb) {
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x7275: goto L_7275; case 0x7287: goto L_7287; default: HANDOFF(HL); }
 L_7275:
-  CALL(0x7275, companionInitializeOnEnteringScreen, 0x4973, 0x7278);  // call $4973
+  CALL(0x7275, companionInitializeOnEnteringScreen_hook, 0x4973, 0x7278);  // call $4973
   I(0x7278, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
   CALL(0x727a, rickySetJumpSpeedForCutscene, 0x7146, 0x727d);  // call $7146
   I(0x727d, 2); A = 0xc3;  // ld a,$c3
@@ -14890,7 +14682,7 @@ L_72b1:
 void rickyStateC__parameter0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7275:
-  CALL(0x7275, companionInitializeOnEnteringScreen, 0x4973, 0x7278);  // call $4973
+  CALL(0x7275, companionInitializeOnEnteringScreen_hook, 0x4973, 0x7278);  // call $4973
   I(0x7278, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
   CALL(0x727a, rickySetJumpSpeedForCutscene, 0x7146, 0x727d);  // call $7146
   I(0x727d, 2); A = 0xc3;  // ld a,$c3
@@ -15268,7 +15060,7 @@ void specialObjectCode_dimitri(GB *gb) {
   CALL(0x7388, specialObjectCode_dimitri__runState, 0x7392, 0x738b);  // call $7392
   I(0x738b, 1); alu_xor(gb, A);  // xor a
   I(0x738c, 4); mem_wr(gb, 0xcdd8, A);  // ld ($cdd8),a
-  I(0x738f, 4); companionCheckEnableTerrainEffects(gb); return;  // jp $490a
+  I(0x738f, 4); if (hook_enabled_at(0x490a)) { companionCheckEnableTerrainEffects_hook(gb); return; } HANDOFF(0x490a);  // jp $490a
 }
 
 // 05:7392
@@ -15345,7 +15137,7 @@ L_73f3:
 // 05:73f6
 void dimitriState1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x73f6, companionSetPriorityRelativeToLink, 0x4936, 0x73f9);  // call $4936
+  CALL(0x73f6, companionSetPriorityRelativeToLink_hook, 0x4936, 0x73f9);  // call $4936
   I(0x73f9, 2); C = 0x40;  // ld c,$40
   CALL(0x73fb, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x73fe);  // call $1f46
   if (!(F & FZ)) { RET_TAKEN(0x73fe); return; } I(0x73fe, 2);  // ret nz
@@ -16192,7 +15984,7 @@ void dimitriState4(GB *gb) {
   I(0x7598, 2); A = 0x25;  // ld a,$25
   I(0x759a, 4); if (hook_enabled_at(0x2b0a)) { specialObjectSetAnimation_hook(gb); return; } HANDOFF(0x2b0a);  // jp $2b0a
 L_759d:
-  CALL(0x759d, companionAnimateDrowningOrFallingThenRespawn, 0x4966, 0x75a0);  // call $4966
+  CALL(0x759d, companionAnimateDrowningOrFallingThenRespawn_hook, 0x4966, 0x75a0);  // call $4966
   if (!(F & FC)) { RET_TAKEN(0x75a0); return; } I(0x75a0, 2);  // ret nc
   I(0x75a1, 2); C = 0x00;  // ld c,$00
   I(0x75a3, 4); if (hook_enabled_at(0x4584)) { companionUpdateDirectionAndSetAnimation_hook(gb); return; } HANDOFF(0x4584);  // jp $4584
@@ -16202,7 +15994,7 @@ L_759d:
 void dimitriState4__animate(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_759d:
-  CALL(0x759d, companionAnimateDrowningOrFallingThenRespawn, 0x4966, 0x75a0);  // call $4966
+  CALL(0x759d, companionAnimateDrowningOrFallingThenRespawn_hook, 0x4966, 0x75a0);  // call $4966
   if (!(F & FC)) { RET_TAKEN(0x75a0); return; } I(0x75a0, 2);  // ret nc
   I(0x75a1, 2); C = 0x00;  // ld c,$00
   I(0x75a3, 4); if (hook_enabled_at(0x4584)) { companionUpdateDirectionAndSetAnimation_hook(gb); return; } HANDOFF(0x4584);  // jp $4584
@@ -16491,7 +16283,7 @@ void dimitriGotoState1(GB *gb) {
 // 05:767d
 void dimitriState7(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x767d, companionDecCounter1ToJumpDownCliff, 0x493f, 0x7680);  // call $493f
+  CALL(0x767d, companionDecCounter1ToJumpDownCliff_hook, 0x493f, 0x7680);  // call $493f
   if ((F & FC)) { RET_TAKEN(0x7680); return; } I(0x7680, 2);  // ret c
   CALL(0x7681, companionCalculateAdjacentWallsBitset_hook, 0x4486, 0x7684);  // call $4486
   CALL(0x7684, specialObjectCheckMovingAwayFromWall_hook, 0x4500, 0x7687);  // call $4500
@@ -16537,7 +16329,7 @@ L_769d:
 L_76bd:
   CALL(0x76bd, specialObjectAnimate_hook, 0x2aef, 0x76c0);  // call $2aef
   CALL(0x76c0, objectApplySpeed_hook, 0x201d, 0x76c3);  // call $201d
-  CALL(0x76c3, companionDecCounter1IfNonzero, 0x495e, 0x76c6);  // call $495e
+  CALL(0x76c3, companionDecCounter1IfNonzero_hook, 0x495e, 0x76c6);  // call $495e
   if (!(F & FZ)) { RET_TAKEN(0x76c6); return; } I(0x76c6, 2);  // ret nz
   I(0x76c7, 3); mem_wr(gb, HL, 0x14);  // ld (hl),$14
   I(0x76c9, 2); L = 0x08;  // ld l,$08
@@ -16554,7 +16346,7 @@ L_76bd:
   I(0x76dc, 4); if (hook_enabled_at(0x458e)) { companionSetAnimation_hook(gb); return; } HANDOFF(0x458e);  // jp $458e
 L_76df:
   CALL(0x76df, specialObjectAnimate_hook, 0x2aef, 0x76e2);  // call $2aef
-  CALL(0x76e2, companionDecCounter1IfNonzero, 0x495e, 0x76e5);  // call $495e
+  CALL(0x76e2, companionDecCounter1IfNonzero_hook, 0x495e, 0x76e5);  // call $495e
   if (!(F & FZ)) { RET_TAKEN(0x76e5); return; } I(0x76e5, 2);  // ret nz
   I(0x76e6, 3); dimitriLandOnGroundAndGotoState5(gb); return;  // jr $7744
 }
@@ -16588,7 +16380,7 @@ void dimitriState8__substate1(GB *gb) {
 L_76bd:
   CALL(0x76bd, specialObjectAnimate_hook, 0x2aef, 0x76c0);  // call $2aef
   CALL(0x76c0, objectApplySpeed_hook, 0x201d, 0x76c3);  // call $201d
-  CALL(0x76c3, companionDecCounter1IfNonzero, 0x495e, 0x76c6);  // call $495e
+  CALL(0x76c3, companionDecCounter1IfNonzero_hook, 0x495e, 0x76c6);  // call $495e
   if (!(F & FZ)) { RET_TAKEN(0x76c6); return; } I(0x76c6, 2);  // ret nz
   I(0x76c7, 3); mem_wr(gb, HL, 0x14);  // ld (hl),$14
   I(0x76c9, 2); L = 0x08;  // ld l,$08
@@ -16610,7 +16402,7 @@ void dimitriState8__substate2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_76df:
   CALL(0x76df, specialObjectAnimate_hook, 0x2aef, 0x76e2);  // call $2aef
-  CALL(0x76e2, companionDecCounter1IfNonzero, 0x495e, 0x76e5);  // call $495e
+  CALL(0x76e2, companionDecCounter1IfNonzero_hook, 0x495e, 0x76e5);  // call $495e
   if (!(F & FZ)) { RET_TAKEN(0x76e5); return; } I(0x76e5, 2);  // ret nz
   I(0x76e6, 3); dimitriLandOnGroundAndGotoState5(gb); return;  // jr $7744
 }
@@ -16644,7 +16436,7 @@ void dimitriStateC(GB *gb) {
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x7706: goto L_7706; case 0x7715: goto L_7715; default: HANDOFF(HL); }
 L_7706:
-  CALL(0x7706, companionInitializeOnEnteringScreen, 0x4973, 0x7709);  // call $4973
+  CALL(0x7706, companionInitializeOnEnteringScreen_hook, 0x4973, 0x7709);  // call $4973
   I(0x7709, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x770b, 2); A = 0xc4;  // ld a,$c4
   CALL(0x770d, playSound_b00_hook, 0x0c98, 0x7710);  // call $0c98
@@ -16656,7 +16448,7 @@ L_7715:
   I(0x771a, 2); A = 0x0c;  // ld a,$0c
   I(0x771c, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x771d, 3); SET_HL(0x785d);  // ld hl,$785d
-  CALL(0x7720, companionRetIfNotFinishedWalkingIn, 0x4982, 0x7723);  // call $4982
+  CALL(0x7720, companionRetIfNotFinishedWalkingIn_hook, 0x4982, 0x7723);  // call $4982
   I(0x7723, 2); E = 0x03;  // ld e,$03
   I(0x7725, 1); alu_xor(gb, A);  // xor a
   I(0x7726, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -16667,7 +16459,7 @@ L_7715:
 void dimitriStateC__parameter0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7706:
-  CALL(0x7706, companionInitializeOnEnteringScreen, 0x4973, 0x7709);  // call $4973
+  CALL(0x7706, companionInitializeOnEnteringScreen_hook, 0x4973, 0x7709);  // call $4973
   I(0x7709, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x770b, 2); A = 0xc4;  // ld a,$c4
   CALL(0x770d, playSound_b00_hook, 0x0c98, 0x7710);  // call $0c98
@@ -16684,7 +16476,7 @@ L_7715:
   I(0x771a, 2); A = 0x0c;  // ld a,$0c
   I(0x771c, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x771d, 3); SET_HL(0x785d);  // ld hl,$785d
-  CALL(0x7720, companionRetIfNotFinishedWalkingIn, 0x4982, 0x7723);  // call $4982
+  CALL(0x7720, companionRetIfNotFinishedWalkingIn_hook, 0x4982, 0x7723);  // call $4982
   I(0x7723, 2); E = 0x03;  // ld e,$03
   I(0x7725, 1); alu_xor(gb, A);  // xor a
   I(0x7726, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -16743,7 +16535,7 @@ void dimitriStateASubstate0(GB *gb) {
   I(0x7761, 2); A = 0x81;  // ld a,$81
   I(0x7763, 4); mem_wr(gb, 0xcc8a, A);  // ld ($cc8a),a
 L_7766:
-  CALL(0x7766, companionSetAnimationToVar3f, 0x48a3, 0x7769);  // call $48a3
+  CALL(0x7766, companionSetAnimationToVar3f_hook, 0x48a3, 0x7769);  // call $48a3
   CALL(0x7769, companionPreventLinkFromPassing_noExtraChecks_hook, 0x4465, 0x776c);  // call $4465
   CALL(0x776c, specialObjectAnimate_hook, 0x2aef, 0x776f);  // call $2aef
   I(0x776f, 2); E = 0x1a;  // ld e,$1a
@@ -16993,7 +16785,7 @@ void specialObjectCode_moosh(GB *gb) {
   CALL(0x7865, companionRetIfInactive_hook, 0x4883, 0x7868);  // call $4883
   CALL(0x7868, companionFunc_47d8_hook, 0x47d8, 0x786b);  // call $47d8
   CALL(0x786b, specialObjectCode_moosh__runState, 0x7871, 0x786e);  // call $7871
-  I(0x786e, 4); companionCheckEnableTerrainEffects(gb); return;  // jp $490a
+  I(0x786e, 4); if (hook_enabled_at(0x490a)) { companionCheckEnableTerrainEffects_hook(gb); return; } HANDOFF(0x490a);  // jp $490a
 }
 
 // 05:7871
@@ -17071,7 +16863,7 @@ L_78cc:
 // 05:78d4
 void mooshState1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x78d4, companionSetPriorityRelativeToLink, 0x4936, 0x78d7);  // call $4936
+  CALL(0x78d4, companionSetPriorityRelativeToLink_hook, 0x4936, 0x78d7);  // call $4936
   CALL(0x78d7, specialObjectAnimate_hook, 0x2aef, 0x78da);  // call $2aef
   I(0x78da, 2); C = 0x09;  // ld c,$09
   CALL(0x78dc, objectCheckLinkWithinDistance_hook, 0x1fa2, 0x78df);  // call $1fa2
@@ -17125,7 +16917,7 @@ L_7907:
   I(0x791a, 2); A = 0x65;  // ld a,$65
   I(0x791c, 4); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp $0c98
 L_791f:
-  CALL(0x791f, companionAnimateDrowningOrFallingThenRespawn, 0x4966, 0x7922);  // call $4966
+  CALL(0x791f, companionAnimateDrowningOrFallingThenRespawn_hook, 0x4966, 0x7922);  // call $4966
   if (!(F & FC)) { RET_TAKEN(0x7922); return; } I(0x7922, 2);  // ret nc
   I(0x7923, 2); C = 0x13;  // ld c,$13
   I(0x7925, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
@@ -17140,7 +16932,7 @@ L_792d:
 void mooshState4__animate(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_791f:
-  CALL(0x791f, companionAnimateDrowningOrFallingThenRespawn, 0x4966, 0x7922);  // call $4966
+  CALL(0x791f, companionAnimateDrowningOrFallingThenRespawn_hook, 0x4966, 0x7922);  // call $4966
   if (!(F & FC)) { RET_TAKEN(0x7922); return; } I(0x7922, 2);  // ret nc
   I(0x7923, 2); C = 0x13;  // ld c,$13
   I(0x7925, 4); A = mem_rd(gb, 0xcc2c);  // ld a,($cc2c)
@@ -17503,7 +17295,7 @@ void mooshState8Substate2(GB *gb) {
   I(0x7a68, 2); alu_cp(gb, 0x28);  // cp $28
   if ((F & FC)) { I(0x7a6a, 3); goto L_7a71; } I(0x7a6a, 2);  // jr c,$7a71
   I(0x7a6c, 2); C = 0x02;  // ld c,$02
-  CALL(0x7a6e, companionFlashFromChargingAnimation, 0x48ae, 0x7a71);  // call $48ae
+  CALL(0x7a6e, companionFlashFromChargingAnimation_hook, 0x48ae, 0x7a71);  // call $48ae
 L_7a71:
   I(0x7a71, 2); E = 0x3b;  // ld e,$3b
   I(0x7a73, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -17597,7 +17389,7 @@ void mooshState8Substate4(GB *gb) {
 // 05:7aeb
 void mooshState8Substate5(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7aeb, companionDecCounter1IfNonzero, 0x495e, 0x7aee);  // call $495e
+  CALL(0x7aeb, companionDecCounter1IfNonzero_hook, 0x495e, 0x7aee);  // call $495e
   if ((F & FZ)) { I(0x7aee, 3); goto L_7af3; } I(0x7aee, 2);  // jr z,$7af3
   I(0x7af0, 4); if (hook_enabled_at(0x2aef)) { specialObjectAnimate_hook(gb); return; } HANDOFF(0x2aef);  // jp $2aef
 L_7af3:
@@ -17682,7 +17474,7 @@ L_7b1c:
 // 05:7b2d
 void mooshState7(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7b2d, companionDecCounter1ToJumpDownCliff, 0x493f, 0x7b30);  // call $493f
+  CALL(0x7b2d, companionDecCounter1ToJumpDownCliff_hook, 0x493f, 0x7b30);  // call $493f
   if (!(F & FC)) { I(0x7b30, 3); goto L_7b38; } I(0x7b30, 2);  // jr nc,$7b38
   if (!(F & FZ)) { RET_TAKEN(0x7b32); return; } I(0x7b32, 2);  // ret nz
   I(0x7b33, 2); C = 0x09;  // ld c,$09
@@ -17712,7 +17504,7 @@ void mooshStateC(GB *gb) {
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x7b52: goto L_7b52; case 0x7b61: goto L_7b61; default: HANDOFF(HL); }
 L_7b52:
-  CALL(0x7b52, companionInitializeOnEnteringScreen, 0x4973, 0x7b55);  // call $4973
+  CALL(0x7b52, companionInitializeOnEnteringScreen_hook, 0x4973, 0x7b55);  // call $4973
   I(0x7b55, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x7b57, 2); A = 0xc5;  // ld a,$c5
   CALL(0x7b59, playSound_b00_hook, 0x0c98, 0x7b5c);  // call $0c98
@@ -17725,7 +17517,7 @@ L_7b61:
   I(0x7b68, 2); mem_wr(gb, DE, A);  // ld (de),a
   CALL(0x7b69, companionUpdateMovement_hook, 0x446b, 0x7b6c);  // call $446b
   I(0x7b6c, 3); SET_HL(0x7b79);  // ld hl,$7b79
-  CALL(0x7b6f, companionRetIfNotFinishedWalkingIn, 0x4982, 0x7b72);  // call $4982
+  CALL(0x7b6f, companionRetIfNotFinishedWalkingIn_hook, 0x4982, 0x7b72);  // call $4982
   I(0x7b72, 2); E = 0x03;  // ld e,$03
   I(0x7b74, 1); alu_xor(gb, A);  // xor a
   I(0x7b75, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -17736,7 +17528,7 @@ L_7b61:
 void mooshStateC__substate0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7b52:
-  CALL(0x7b52, companionInitializeOnEnteringScreen, 0x4973, 0x7b55);  // call $4973
+  CALL(0x7b52, companionInitializeOnEnteringScreen_hook, 0x4973, 0x7b55);  // call $4973
   I(0x7b55, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
   I(0x7b57, 2); A = 0xc5;  // ld a,$c5
   CALL(0x7b59, playSound_b00_hook, 0x0c98, 0x7b5c);  // call $0c98
@@ -17754,7 +17546,7 @@ L_7b61:
   I(0x7b68, 2); mem_wr(gb, DE, A);  // ld (de),a
   CALL(0x7b69, companionUpdateMovement_hook, 0x446b, 0x7b6c);  // call $446b
   I(0x7b6c, 3); SET_HL(0x7b79);  // ld hl,$7b79
-  CALL(0x7b6f, companionRetIfNotFinishedWalkingIn, 0x4982, 0x7b72);  // call $4982
+  CALL(0x7b6f, companionRetIfNotFinishedWalkingIn_hook, 0x4982, 0x7b72);  // call $4982
   I(0x7b72, 2); E = 0x03;  // ld e,$03
   I(0x7b74, 1); alu_xor(gb, A);  // xor a
   I(0x7b75, 2); mem_wr(gb, DE, A);  // ld (de),a
@@ -17963,7 +17755,7 @@ void mooshStateASubstate1(GB *gb) {
   I(0x7bda, 4); mem_wr(gb, 0xcc8a, A);  // ld ($cc8a),a
   I(0x7bdd, 4); mem_wr(gb, 0xcc02, A);  // ld ($cc02),a
 L_7be0:
-  CALL(0x7be0, companionSetAnimationToVar3f, 0x48a3, 0x7be3);  // call $48a3
+  CALL(0x7be0, companionSetAnimationToVar3f_hook, 0x48a3, 0x7be3);  // call $48a3
   CALL(0x7be3, mooshUpdateAsNpc, 0x7c57, 0x7be6);  // call $7c57
   I(0x7be6, 4); A = mem_rd(gb, 0xc648);  // ld a,($c648)
   I(0x7be9, 2); alu_and(gb, 0x80);  // and $80
@@ -17982,7 +17774,7 @@ L_7bff:
 // 05:7bee
 void mooshStateASubstate3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7bee, companionSetAnimationToVar3f, 0x48a3, 0x7bf1);  // call $48a3
+  CALL(0x7bee, companionSetAnimationToVar3f_hook, 0x48a3, 0x7bf1);  // call $48a3
   CALL(0x7bf1, mooshUpdateAsNpc, 0x7c57, 0x7bf4);  // call $7c57
   I(0x7bf4, 4); A = mem_rd(gb, 0xc648);  // ld a,($c648)
   I(0x7bf7, 2); alu_and(gb, 0x20);  // and $20
@@ -18049,7 +17841,7 @@ void mooshUpdateAsNpc(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x7c57, companionPreventLinkFromPassing_noExtraChecks_hook, 0x4465, 0x7c5a);  // call $4465
   CALL(0x7c5a, specialObjectAnimate_hook, 0x2aef, 0x7c5d);  // call $2aef
-  I(0x7c5d, 4); companionSetPriorityRelativeToLink(gb); return;  // jp $4936
+  I(0x7c5d, 4); if (hook_enabled_at(0x4936)) { companionSetPriorityRelativeToLink_hook(gb); return; } HANDOFF(0x4936);  // jp $4936
 }
 
 // 05:7c60

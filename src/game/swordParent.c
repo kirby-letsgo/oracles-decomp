@@ -22,29 +22,34 @@ static uint16_t sword_parent_jump_table(GB *gb) {
   return HL;
 }
 
-static bool sword_parent_check_and_ret_for_poke(GB *gb, uint16_t sp0_) {
+enum sword_poke_result {
+  SWORD_POKE_ABORT,
+  SWORD_POKE_NORMAL,
+  SWORD_POKE_TRIGGER,
+};
+
+static void sword_parent_check_and_ret_for_poke(GB *gb, uint16_t sp0_, enum sword_poke_result *result) {
+  *result = SWORD_POKE_ABORT;
   CYC(0x4d07, 0x4d08); alu_xor(gb, A);
   CYC(0x4d08, 0x4d0a); E = 0x02;
   CYC(0x4d0a, 0x4d0b); mem_wr(gb, DE, A);
   CYC(0x4d0b, 0x4d0e); A = W8(w1WeaponItem_var2a);
   CYC(0x4d0e, 0x4d10); alu_cp(gb, 0x04);
-  if (F & FZ) CYCT(0x4d10, 0x4d12);
-  else {
-    CYC(0x4d10, 0x4d12);
-    CYC(0x4d12, 0x4d13); alu_or(gb, A);
-    if (!(F & FZ)) CYCT(0x4d13, 0x4d15);
-    else {
-      CYC(0x4d13, 0x4d15);
-      CALL_C(0x4d15, checkLinkPushingAgainstWall_hook, 0x2b39, 0x4d18);
-      if (!(F & FC)) {
-        CYCT(0x4d18, 0x4d19);
-        ret_effect(gb);
-        return false;
-      }
-      CYC(0x4d18, 0x4d19);
-    }
-    if (!(F & FZ)) goto escape;
+  if (F & FZ) { CYCT(0x4d10, 0x4d12); goto set_subid; }
+  CYC(0x4d10, 0x4d12);
+  CYC(0x4d12, 0x4d13); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x4d13, 0x4d15); goto escape; }
+  CYC(0x4d13, 0x4d15);
+  CALL_C(0x4d15, checkLinkPushingAgainstWall_hook, 0x2b39, 0x4d18);
+  if (!(F & FC)) {
+    CYCT(0x4d18, 0x4d19);
+    ret_effect(gb);
+    *result = SWORD_POKE_NORMAL;
+    return;
   }
+  CYC(0x4d18, 0x4d19);
+
+set_subid:
   CYC(0x4d19, 0x4d1b); E = 0x02;
   CYC(0x4d1b, 0x4d1d); A = 0x01;
   CYC(0x4d1d, 0x4d1e); mem_wr(gb, DE, A);
@@ -53,7 +58,7 @@ escape:
   CYC(0x4d1e, 0x4d1f); SET_HL(pop_effect(gb));
   CYC(0x4d1f, 0x4d20); alu_xor(gb, A);
   CYC(0x4d20, 0x4d23); W8(w1WeaponItem_collisionType) = A;
-  return true;
+  *result = SWORD_POKE_TRIGGER;
 }
 
 static void sword_parent_create_beam(GB *gb, uint16_t sp0_) {
@@ -223,7 +228,10 @@ state2:
   if (F & FZ) { CYCT(0x4c4f, 0x4c52); goto delete_self; }
   CYC(0x4c4f, 0x4c52);
   CYC(0x4c52, 0x4c55); push_effect(gb, 0x4c55);
-  if (sword_parent_check_and_ret_for_poke(gb, sp0_)) goto trigger_poke;
+  enum sword_poke_result poke_result;
+  sword_parent_check_and_ret_for_poke(gb, sp0_, &poke_result);
+  if (poke_result == SWORD_POKE_ABORT) return;
+  if (poke_result == SWORD_POKE_TRIGGER) goto trigger_poke;
   CYC(0x4c55, 0x4c57); A = 0x16;
   CALL_C(0x4c57, cpActiveRing_hook, 0x23b0, 0x4c5a);
   CYC(0x4c5a, 0x4c5c); C = 0x01;
@@ -254,7 +262,9 @@ charge_without_beam:
 
 state3:
   CYC(0x4c84, 0x4c87); push_effect(gb, 0x4c87);
-  if (sword_parent_check_and_ret_for_poke(gb, sp0_)) goto trigger_poke;
+  sword_parent_check_and_ret_for_poke(gb, sp0_, &poke_result);
+  if (poke_result == SWORD_POKE_ABORT) return;
+  if (poke_result == SWORD_POKE_TRIGGER) goto trigger_poke;
   CALL_C(0x4c87, parentItemCheckButtonPressed_hook, 0x5496, 0x4c8a);
   if (!(F & FZ)) { CYCT(0x4c8a, 0x4c8b); ret_effect(gb); return; }
   CYC(0x4c8a, 0x4c8b);
