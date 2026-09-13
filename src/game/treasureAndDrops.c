@@ -460,6 +460,137 @@ void checkItemDropAvailable_body_hook(GB *gb) {
   CYC(0x4791, 0x4792); ret_effect(gb);
 }
 
+void giveTreasure_body__modeb_hook(GB *gb) {
+  CYC(0x4569, 0x456a); A = C;
+  CYC(0x456a, 0x456d); SET_HL(wUpgradesObtained);
+  CYC(0x456d, 0x4570); setFlag_hook(gb);
+}
+
+void giveTreasure_body__mode8_hook(GB *gb) {
+  CYC(0x4570, 0x4571); A = mem_rd(gb, DE);
+  CYC(0x4571, 0x4572); alu_cp(gb, C);
+  if (!(F & FC)) {
+    CYCT(0x4572, 0x4573); ret_effect(gb); return;
+  }
+  CYC(0x4572, 0x4573);
+  CYC(0x4573, 0x4574); A = C;
+  CYC(0x4574, 0x4575); mem_wr(gb, DE, A);
+  CYC(0x4575, 0x4578); SET_HL(wStatusBarNeedsRefresh);
+  CYC(0x4578, 0x457a); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
+  CYC(0x457a, 0x457b); ret_effect(gb);
+}
+
+void giveTreasure_body__mode5_hook(GB *gb) {
+  CYC(0x457b, 0x457c); A = C;
+  CYC(0x457c, 0x457d); mem_wr(gb, DE, A);
+  CYC(0x457d, 0x457e); ret_effect(gb);
+}
+
+void giveTreasure_body__mode1_hook(GB *gb) {
+  CYC(0x4582, 0x4583); A = C;
+  CYC(0x4583, 0x4584); H = D;
+  CYC(0x4584, 0x4585); L = E;
+  CYC(0x4585, 0x4588); setFlag_hook(gb);
+}
+
+void giveTreasure_body__mode6_hook(GB *gb) {
+  CYC(0x457e, 0x4581); A = W8(wDungeonIndex);
+  CYC(0x4581, 0x4582); C = A;
+  giveTreasure_body__mode1_hook(gb);
+}
+
+void giveTreasure_body__mode2_hook(GB *gb) {
+  CYC(0x4588, 0x4589); A = mem_rd(gb, DE);
+  CYC(0x4589, 0x458a); A = alu_inc8(gb, A);
+  CYC(0x458a, 0x458b); mem_wr(gb, DE, A);
+  CYC(0x458b, 0x458c); ret_effect(gb);
+}
+
+void giveTreasure_body__mode4_hook(GB *gb) {
+  CYC(0x458e, 0x458f); A = mem_rd(gb, DE);
+  CYC(0x458f, 0x4590); alu_add(gb, C);
+  CYC(0x4590, 0x4591); alu_daa(gb);
+  if (!(F & FC)) {
+    CYCT(0x4591, 0x4593);
+  } else {
+    CYC(0x4591, 0x4593);
+    CYC(0x4593, 0x4595); A = 0x99;
+  }
+  CYC(0x4595, 0x4596); mem_wr(gb, DE, A);
+  CYC(0x4596, 0x4597); ret_effect(gb);
+}
+
+void giveTreasure_body__mode3_hook(GB *gb) {
+  CYC(0x458c, 0x458e); C = 0x01;
+  giveTreasure_body__mode4_hook(gb);
+}
+
+void giveTreasure_body__mode7_hook(GB *gb) {
+  CYC(0x4597, 0x459a); A = W8(wDungeonIndex);
+  CYC(0x459a, 0x459b); alu_add(gb, E);
+  CYC(0x459b, 0x459c); L = A;
+  CYC(0x459c, 0x459d); H = D;
+  CYC(0x459d, 0x459e); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x459e, 0x45a1); SET_HL(wStatusBarNeedsRefresh);
+  CYC(0x45a1, 0x45a3); mem_wr(gb, HL, mem_rd(gb, HL) | 0x10);
+  CYC(0x45a3, 0x45a4); ret_effect(gb);
+}
+
+void giveTreasure_body__modea_hook(GB *gb) {
+  CYC(0x45a4, 0x45a5); A = mem_rd(gb, DE);
+  CYC(0x45a5, 0x45a6); alu_add(gb, C);
+  CYC(0x45a6, 0x45a7); mem_wr(gb, DE, A);
+  CYC(0x45a7, 0x45a8); ret_effect(gb);
+}
+
+void giveTreasure_body__modec_hook(GB *gb) {
+  CYC(0x45a8, 0x45a9); H = D;
+  CYC(0x45a9, 0x45aa); L = E;
+  CYC(0x45aa, 0x45ac); A = (uint8_t)wLinkHealth;
+  CYC(0x45ac, 0x45ad); alu_cp(gb, E);
+  CYC(0x45ad, 0x45ae); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  if (!(F & FZ)) {
+    CYCT(0x45ae, 0x45b0);
+  } else {
+    CYC(0x45ae, 0x45b0);
+    CYC(0x45b0, 0x45b1); alu_cp(gb, mem_rd(gb, HL));
+    if (F & FZ) {
+      CYC(0x45b1, 0x45b3);
+      CYC(0x45b3, 0x45b5); A = 0x57;
+      CYC(0x45b5, 0x45b8); playSound_b00_hook(gb);
+      return;
+    }
+    CYCT(0x45b1, 0x45b3);
+  }
+  CYC(0x45b8, 0x45b9); alu_add(gb, C);
+  CYC(0x45b9, 0x45ba); mem_wr(gb, DE, A);
+  CYC(0x45ba, 0x45bc);
+  CYC(0x45c2, 0x45c3); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) {
+    CYCT(0x45c3, 0x45c4); ret_effect(gb); return;
+  }
+  CYC(0x45c3, 0x45c4);
+  CYC(0x45c4, 0x45c5); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x45c5, 0x45c6); mem_wr(gb, HL, A);
+  CYC(0x45c6, 0x45c7); ret_effect(gb);
+}
+
+void giveTreasure_body__moded_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x45bc, giveTreasure_body__mode4_hook, 0x458e, 0x45bf);
+  CYC(0x45bf, 0x45c0); H = D;
+  CYC(0x45c0, 0x45c1); L = E;
+  CYC(0x45c1, 0x45c2); L = alu_inc8(gb, L);
+  CYC(0x45c2, 0x45c3); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) {
+    CYCT(0x45c3, 0x45c4); ret_effect(gb); return;
+  }
+  CYC(0x45c3, 0x45c4);
+  CYC(0x45c4, 0x45c5); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x45c5, 0x45c6); mem_wr(gb, HL, A);
+  CYC(0x45c6, 0x45c7); ret_effect(gb);
+}
+
 void checkIncreaseGashaMaturityForGettingTreasure_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(0x4ad6, 0x4ad7); push_effect(gb, BC);

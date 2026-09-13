@@ -11,6 +11,9 @@ void applyDamageToBothObjects_hook(GB *gb);
 void collisionEffect0c_hook(GB *gb);
 void collisionEffect0d_hook(GB *gb);
 void collisionEffect0e_hook(GB *gb);
+void collisionEffect0f_hook(GB *gb);
+void collisionEffect10_hook(GB *gb);
+void collisionEffect11_hook(GB *gb);
 
 static void collisionEffectDamageLinkTail_hook(GB *gb, uint16_t sp0_) {
   CALL_C(0x4434, applyDamageToLink_paramE, 0x47df, 0x4437);
@@ -120,6 +123,82 @@ void collisionEffect06_hook(GB *gb) {
 void collisionEffect07_hook(GB *gb) {
   CYC(0x448d, 0x4490); SET_HL(0x181c);
   CYC(0x4490, 0x4492); applyDamageToBothObjects_hook(gb);
+}
+
+void collisionEffect18_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x4492, createClinkInteraction, 0x46e7, 0x4495);
+  collisionEffect0f_hook(gb);
+}
+
+void collisionEffect0f_hook(GB *gb) {
+  CYC(0x4495, 0x4498); SET_HL(0x1010);
+  CYC(0x4498, 0x449a); applyDamageToBothObjects_hook(gb);
+}
+
+void collisionEffect19_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x449a, createClinkInteraction, 0x46e7, 0x449d);
+  collisionEffect10_hook(gb);
+}
+
+void collisionEffect10_hook(GB *gb) {
+  CYC(0x449d, 0x44a0); SET_HL(0x1414);
+  CYC(0x44a0, 0x44a2); applyDamageToBothObjects_hook(gb);
+}
+
+void collisionEffect15_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x44a2, createClinkInteraction, 0x46e7, 0x44a5);
+  CYC(0x44a5, 0x44a8); SET_HL(0x1034);
+  CYC(0x44a8, 0x44aa); applyDamageToBothObjects_hook(gb);
+}
+
+void collisionEffect16_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x44aa, createClinkInteraction, 0x46e7, 0x44ad);
+  CYC(0x44ad, 0x44b0); SET_HL(0x1434);
+  CYC(0x44b0, 0x44b2); applyDamageToBothObjects_hook(gb);
+}
+
+void collisionEffect17_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x44b2, createClinkInteraction, 0x46e7, 0x44b5);
+  CYC(0x44b5, 0x44b8); SET_HL(0x1834);
+  CYC(0x44b8, 0x44ba); applyDamageToBothObjects_hook(gb);
+}
+
+void collisionEffect1a_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x44ba, createClinkInteraction, 0x46e7, 0x44bd);
+  collisionEffect11_hook(gb);
+}
+
+void collisionEffect11_hook(GB *gb) {
+  CYC(0x44bd, 0x44c0); SET_HL(0x1818);
+  CYC(0x44c0, 0x44c2); applyDamageToBothObjects_hook(gb);
+}
+
+void collisionEffect1b_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x44c2, createClinkInteraction, 0x46e7, 0x44c5);
+  CYC(0x44c5, 0x44c8); SET_HL(0x1c28);
+  CYC(0x44c8, 0x44ca); applyDamageToBothObjects_hook(gb);
+}
+
+void collisionEffect1d_hook(GB *gb) {
+  CYC(0x44ca, 0x44cd); SET_HL(0x0c04);
+  CYC(0x44cd, 0x44cf); applyDamageToBothObjects_hook(gb);
+}
+
+void collisionEffect1e_hook(GB *gb) {
+  CYC(0x44cf, 0x44d2); SET_HL(0x2834);
+  CYC(0x44d2, 0x44d4); applyDamageToBothObjects_hook(gb);
+}
+
+void collisionEffect1f_hook(GB *gb) {
+  CYC(0x44d4, 0x44d7); SET_HL(0x2034);
+  CYC(0x44d7, 0x44d9); applyDamageToBothObjects_hook(gb);
 }
 
 void applyDamageToBothObjects_hook(GB *gb) {

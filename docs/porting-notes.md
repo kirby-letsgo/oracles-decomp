@@ -836,3 +836,13 @@ desync to discover; keep them when porting routines.
   reviews found four old bank-0 wrappers still using `CALL_ROM` after their drop-decision,
   availability, palette-refresh, and weapon-GFX callees became readable. Exact call-site reports
   supplied the four physical return addresses before each edge was upgraded to `CALL_C`.
+- Local jump-table targets need durable roots when they are rewritten before their parent. Batch
+  129 initially planned to alias only `giveTreasure_body__mode4`, the one mode called statically by
+  generated mode F. That would still let the generated parent's RST table execute inline generated
+  copies of the other eleven modes. Alias every promoted mode in `extra.sym` and `ported.txt` so
+  regeneration stops traversal at each target and dispatches all twelve through their C hooks.
+- An unknown dynamic jump target does not imply a scheduler handoff. Batch 129's first
+  `nextToTileWithInfoText` rewrite used `hook_handoff` after its callable RST jump table; independent
+  review caught that the routine's pending return frame would be abandoned. Use
+  `hook_continue(gb, HL, sp0_)` for callable dispatch fallback, reserving `hook_handoff` for a real
+  `ld sp,*` thread switch.

@@ -3146,10 +3146,11 @@ void checkAndUpdateLinkOnChest_hook(GB *gb) {
 }
 
 void showInfoTextForRoller_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   bank_push(gb, 0x1298, 0x06);
   A = 0x09;
   CYC(0x12a2, 0x12a4);
-  CALL_ROM(0x12a4, ROM_b06_showInfoTextForTile);
+  CALL_C(0x12a4, showInfoTextForTile_hook, 0x42fb, 0x12a7);
   bank_pop(gb, 0x12a7);
   CYC(0x12ad, 0x12ae);
   ret_effect(gb);
