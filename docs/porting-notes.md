@@ -967,10 +967,17 @@ desync to discover; keep them when porting routines.
 - A readiness report target marked `(hooked)` can still be a smart generated-C call. Batch 149's
   first Ricky and serial rewrites treated three `playSound` calls, four `waitForSerialByte` calls,
   and two `returnIfPacketNotComplete` calls as interpreter-only because the report did not say
-  `(rewritten)`. The original generated bodies used `CALL(...)`, so the readable form must use
-  `CALL_C(...)`; reserve `CALL_ROM` for report sites emitted as `CALL_ASM /* unported */`.
+  `(rewritten)`. Batch 150 repeated the trap in Maple and Ricky helpers, and one review even changed
+  two correct sound calls in the wrong direction. The original generated body's macro is decisive:
+  `CALL(...)` becomes `CALL_C(...)`; reserve `CALL_ROM` for sites emitted as
+  `CALL_ASM /* unported */`.
 - Stack-skipping callees make the smart-call boundary semantically necessary, even before they are
   readable. `waitForSerialByte` and `returnIfPacketNotComplete` can consume their immediate return
   address and escape through the caller's frame. Batch 149's serial hooks therefore capture their
   own entry `sp0_` and use `CALL_C`, whose PC/SP guard detects that nonlocal return and continues
   from the enclosing hook boundary. A direct generated-C call would keep executing stale code.
+- A multiply instantiated source label may require a bank-qualified canonical hook even though the
+  report command accepts only the unsuffixed source name. Batch 150's `func_4000` report contains
+  both bank-1 and bank-16 blocks, while the generated registry calls the latter `func_4000_b16`.
+  Isolate the requested bank/address in the report, implement the canonical registry name, and add
+  only that canonical name to `rewritten.txt`; otherwise the wrong physical routine can disappear.

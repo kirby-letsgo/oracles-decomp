@@ -25,6 +25,16 @@ void rickyStopUntilLandedOnGround_hook(GB *gb);
 void rickyCheckHazards2_hook(GB *gb);
 void rickyBreakTilesOnLanding_hook(GB *gb);
 void rickyCheckAtScreenEdge_hook(GB *gb);
+void rickyState6_hook(GB *gb);
+void rickyState7_hook(GB *gb);
+void rickyFunc_70cc_hook(GB *gb);
+void rickyStateA_hook(GB *gb);
+void rickyStateASubstate0_hook(GB *gb);
+void rickyStateASubstate1_hook(GB *gb);
+void rickyStateASubstate2_hook(GB *gb);
+void rickySetJumpSpeedForCutsceneAndSetAngle_hook(GB *gb);
+void rickySetJumpSpeedForCutscene_hook(GB *gb);
+void rickyStateASubstate6_hook(GB *gb);
 
 static uint16_t ricky_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -66,11 +76,11 @@ static void ricky_run_state(GB *gb, uint16_t sp0_) {
     case 0x6dd7: rickyState3_hook(gb); return;
     case 0x6ded: rickyState4_hook(gb); return;
     case 0x6e24: rickyState5_hook(gb); return;
-    case 0x705a: rickyState6(gb); return;
-    case 0x7090: rickyState7(gb); return;
+    case 0x705a: rickyState6_hook(gb); return;
+    case 0x7090: rickyState7_hook(gb); return;
     case 0x6f9c: rickyState8_hook(gb); return;
     case 0x6dab: rickyState9_hook(gb); return;
-    case 0x70dd: rickyStateA(gb); return;
+    case 0x70dd: rickyStateA_hook(gb); return;
     case 0x726d: rickyStateC(gb); return;
     default: hook_continue(gb, HL, sp0_); return;
   }
@@ -171,7 +181,7 @@ void rickyCheckHazards_hook(GB *gb) {
   CALL_C(0x6da5, companionCheckHazards_hook, 0x45ec, 0x6da8);
   if (F & FC) {
     CYCT(0x6da8, 0x6dab);
-    rickyFunc_70cc(gb); return;
+    rickyFunc_70cc_hook(gb); return;
   }
   CYC(0x6da8, 0x6dab);
   rickyState9_hook(gb);
@@ -664,7 +674,7 @@ startTornadoCharge:
   CALL_C(0x6fdc, companionCheckHazards_hook, 0x45ec, 0x6fdf);
   if (!(F & FC)) { CYCT(0x6fdf, 0x6fe0); ret_effect(gb); return; }
   CYC(0x6fdf, 0x6fe0);
-  CYC(0x6fe0, 0x6fe3); rickyFunc_70cc(gb); return;
+  CYC(0x6fe0, 0x6fe3); rickyFunc_70cc_hook(gb); return;
 substate1:
   CYC(0x6fe3, 0x6fe6); A = W8(wLinkAngle);
   CYC(0x6fe6, 0x6fe8); alu_bit(gb, 7, A);
@@ -754,6 +764,73 @@ void rickyStartPunch_hook(GB *gb) {
   CYC(0x7057, 0x705a); playSound_b00_hook(gb);
 }
 
+void rickyState6_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x705a, 0x705c); E = 0x05;
+  CYC(0x705c, 0x705d); A = mem_rd(gb, DE);
+  CYC(0x705d, 0x705e); push_effect(gb, 0x705e);
+  switch (ricky_jump_table(gb)) {
+    case 0x7064: goto substate0;
+    case 0x7075: goto substate1;
+    case 0x707d: goto substate2;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+substate0:
+  CYC(0x7064, 0x7066); C = 0x40;
+  CALL_C(0x7066, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x7069);
+  if (!(F & FZ)) { CYCT(0x7069, 0x706a); ret_effect(gb); return; }
+  CYC(0x7069, 0x706a);
+  CALL_C(0x706a, itemIncSubstate_hook, 0x23ef, 0x706d);
+  CALL_C(0x706d, companionDismountAndSavePosition_hook, 0x460c, 0x7070);
+  CYC(0x7070, 0x7072); A = 0x17;
+  CYC(0x7072, 0x7075); specialObjectSetAnimation_hook(gb); return;
+substate1:
+  CYC(0x7075, 0x7078); A = W8(wLinkInAir);
+  CYC(0x7078, 0x7079); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x7079, 0x707a); ret_effect(gb); return; }
+  CYC(0x7079, 0x707a);
+  CYC(0x707a, 0x707d); itemIncSubstate_hook(gb); return;
+substate2:
+  CALL_C(0x707d, companionSetPriorityRelativeToLink_hook, 0x4936, 0x7080);
+  CYC(0x7080, 0x7082); C = 0x09;
+  CALL_C(0x7082, objectCheckLinkWithinDistance_hook, 0x1fa2, 0x7085);
+  if (F & FC) {
+    CYCT(0x7085, 0x7088);
+    rickyCheckHazards_hook(gb); return;
+  }
+  CYC(0x7085, 0x7088);
+  CYC(0x7088, 0x708a); E = 0x05;
+  CYC(0x708a, 0x708b); alu_xor(gb, A);
+  CYC(0x708b, 0x708c); mem_wr(gb, DE, A);
+  CYC(0x708c, 0x708d); E = alu_dec8(gb, E);
+  CYC(0x708d, 0x708e); A = alu_inc8(gb, A);
+  CYC(0x708e, 0x708f); mem_wr(gb, DE, A);
+  CYC(0x708f, 0x7090); ret_effect(gb);
+}
+
+void rickyState7_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x7090, companionDecCounter1ToJumpDownCliff_hook, 0x493f, 0x7093);
+  if (F & FC) { CYCT(0x7093, 0x7094); ret_effect(gb); return; }
+  CYC(0x7093, 0x7094);
+  CALL_C(0x7094, companionCalculateAdjacentWallsBitset_hook, 0x4486, 0x7097);
+  CALL_C(0x7097, specialObjectCheckMovingAwayFromWall_hook, 0x4500, 0x709a);
+  CYC(0x709a, 0x709c); E = 0x07;
+  if (F & FZ) {
+    CYCT(0x709c, 0x709e);
+    goto noWalls;
+  }
+  CYC(0x709c, 0x709e);
+  CYC(0x709e, 0x709f); mem_wr(gb, DE, A);
+  CYC(0x709f, 0x70a0); ret_effect(gb); return;
+noWalls:
+  CYC(0x70a0, 0x70a1); A = mem_rd(gb, DE);
+  CYC(0x70a1, 0x70a2); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x70a2, 0x70a3); ret_effect(gb); return; }
+  CYC(0x70a2, 0x70a3);
+  rickyStopUntilLandedOnGround_hook(gb);
+}
+
 void rickyStopUntilLandedOnGround_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(0x70a3, 0x70a6); A = W8(wLinkObjectIndex);
@@ -794,7 +871,146 @@ void rickyCheckHazards2_hook(GB *gb) {
     companionSetAnimation_hook(gb); return;
   }
   CYC(0x70c9, 0x70cc);
-  rickyFunc_70cc(gb);
+  rickyFunc_70cc_hook(gb);
+}
+
+void rickyFunc_70cc_hook(GB *gb) {
+  CYC(0x70cc, 0x70ce); C = 0x0e;
+  CYC(0x70ce, 0x70d0); alu_cp(gb, 0x01);
+  if (F & FZ) {
+    CYCT(0x70d0, 0x70d2);
+    goto setHazard;
+  }
+  CYC(0x70d0, 0x70d2);
+  CYC(0x70d2, 0x70d4); C = 0x0d;
+setHazard:
+  CYC(0x70d4, 0x70d5); H = D;
+  CYC(0x70d5, 0x70d7); L = 0x37;
+  CYC(0x70d7, 0x70d8); mem_wr(gb, HL, C);
+  CYC(0x70d8, 0x70da); L = 0x06;
+  CYC(0x70da, 0x70dc); mem_wr(gb, HL, 0x00);
+  CYC(0x70dc, 0x70dd); ret_effect(gb);
+}
+
+void rickyStateA_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x70dd, 0x70df); E = 0x03;
+  CYC(0x70df, 0x70e0); A = mem_rd(gb, DE);
+  CYC(0x70e0, 0x70e1); push_effect(gb, 0x70e1);
+  switch (ricky_jump_table(gb)) {
+    case 0x70f1: rickyStateASubstate0_hook(gb); return;
+    case 0x7109: rickyStateASubstate1_hook(gb); return;
+    case 0x7111: rickyStateASubstate2_hook(gb); return;
+    case 0x7178: rickyStateASubstate3(gb); return;
+    case 0x71a0: rickyStateASubstate4(gb); return;
+    case 0x718c: rickyStateASubstate5(gb); return;
+    case 0x7159: rickyStateASubstate6_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+void rickyStateASubstate0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x70f1, companionPreventLinkFromPassing_noExtraChecks_hook, 0x4465, 0x70f4);
+  CALL_C(0x70f4, companionSetPriorityRelativeToLink_hook, 0x4936, 0x70f7);
+  CALL_C(0x70f7, specialObjectAnimate_hook, 0x2aef, 0x70fa);
+  CYC(0x70fa, 0x70fc); E = 0x21;
+  CYC(0x70fc, 0x70fd); A = mem_rd(gb, DE);
+  CYC(0x70fd, 0x70fe); alu_rlca(gb);
+  CYC(0x70fe, 0x7100); C = 0x40;
+  if (!(F & FC)) {
+    CYCT(0x7100, 0x7103);
+    objectUpdateSpeedZ_paramC_hook(gb); return;
+  }
+  CYC(0x7100, 0x7103);
+  CYC(0x7103, 0x7106); SET_BC(0xff00);
+  CYC(0x7106, 0x7109); objectSetSpeedZ_hook(gb);
+}
+
+void rickyStateASubstate1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x7109, 0x710b); E = 0x3d;
+  CALL_C(0x710b, objectRemoveFromAButtonSensitiveObjectList_hook, 0x1b41, 0x710e);
+  CYC(0x710e, 0x7111); companionForceMount_hook(gb);
+}
+
+void rickyStateASubstate2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x7111, 0x7113); C = 0x40;
+  CALL_C(0x7113, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x7116);
+  if (!(F & FZ)) { CYCT(0x7116, 0x7117); ret_effect(gb); return; }
+  CYC(0x7116, 0x7117);
+  CYC(0x7117, 0x711a); SET_BC(0x2006);
+  CALL_C(0x711a, showText_hook, 0x1872, 0x711d);
+  CYC(0x711d, 0x7120); SET_HL(w1Link_yh);
+  CYC(0x7120, 0x7122); E = 0x0b;
+  CYC(0x7122, 0x7123); A = mem_rd(gb, DE);
+  CYC(0x7123, 0x7124); alu_cp(gb, mem_rd(gb, HL));
+  CYC(0x7124, 0x7126); A = 0x02;
+  if (F & FC) {
+    CYCT(0x7126, 0x7128);
+    goto setDirection;
+  }
+  CYC(0x7126, 0x7128);
+  CYC(0x7128, 0x712a); A = 0x00;
+setDirection:
+  CYC(0x712a, 0x712c); E = 0x08;
+  CYC(0x712c, 0x712d); mem_wr(gb, DE, A);
+  CYC(0x712d, 0x712f); A = 0x03;
+  CYC(0x712f, 0x7131); E = 0x3f;
+  CYC(0x7131, 0x7132); mem_wr(gb, DE, A);
+  CALL_C(0x7132, specialObjectSetAnimation_hook, 0x2b0a, 0x7135);
+  CALL_C(0x7135, rickyIncVar03, 0x71f1, 0x7138);
+  CYC(0x7138, 0x713a); rickySetJumpSpeedForCutscene_hook(gb);
+}
+
+void rickySetJumpSpeedForCutsceneAndSetAngle_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x713a, 0x713c); B = 0x30;
+  CYC(0x713c, 0x713e); C = 0x58;
+  CALL_C(0x713e, objectGetRelativeAngle_hook, 0x1ea4, 0x7141);
+  CYC(0x7141, 0x7143); alu_and(gb, 0x1c);
+  CYC(0x7143, 0x7145); E = 0x09;
+  CYC(0x7145, 0x7146); mem_wr(gb, DE, A);
+  rickySetJumpSpeedForCutscene_hook(gb);
+}
+
+void rickySetJumpSpeedForCutscene_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x7146, 0x7149); SET_BC(0xfe80);
+  CALL_C(0x7149, objectSetSpeedZ_hook, 0x239d, 0x714c);
+  CYC(0x714c, 0x714e); L = 0x05;
+  CYC(0x714e, 0x7150); mem_wr(gb, HL, 0x01);
+  CYC(0x7150, 0x7152); L = 0x10;
+  CYC(0x7152, 0x7154); mem_wr(gb, HL, 0x50);
+  CYC(0x7154, 0x7156); L = 0x06;
+  CYC(0x7156, 0x7158); mem_wr(gb, HL, 0x08);
+  CYC(0x7158, 0x7159); ret_effect(gb);
+}
+
+void rickyStateASubstate6_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x7159, specialObjectAnimate_hook, 0x2aef, 0x715c);
+  CYC(0x715c, 0x715e); E = 0x21;
+  CYC(0x715e, 0x715f); A = mem_rd(gb, DE);
+  CYC(0x715f, 0x7160); alu_or(gb, A);
+  CYC(0x7160, 0x7162); A = 0xc3;
+  if (F & FZ) {
+    CYCT(0x7162, 0x7165);
+    playSound_b00_hook(gb); return;
+  }
+  CYC(0x7162, 0x7165);
+  CYC(0x7165, 0x7166); A = mem_rd(gb, DE);
+  CYC(0x7166, 0x7167); alu_rlca(gb);
+  if (!(F & FC)) { CYCT(0x7167, 0x7168); ret_effect(gb); return; }
+  CYC(0x7167, 0x7168);
+  CALL_C(0x7168, rickySetJumpSpeedForCutsceneAndSetAngle_hook, 0x713a, 0x716b);
+  CYC(0x716b, 0x716d); E = 0x09;
+  CYC(0x716d, 0x716f); A = 0x10;
+  CYC(0x716f, 0x7170); mem_wr(gb, DE, A);
+  CYC(0x7170, 0x7172); C = 0x05;
+  CALL_C(0x7172, companionSetAnimation_hook, 0x458e, 0x7175);
+  CYC(0x7175, 0x7178); rickyIncVar03(gb);
 }
 
 void rickyBreakTilesOnLanding_hook(GB *gb) {

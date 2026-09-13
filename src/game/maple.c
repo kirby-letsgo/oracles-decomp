@@ -17,6 +17,8 @@
 #define mapleItemDropDistributionTable_bank05 0x6a38
 #define mapleLinkItemDropDistribution_bank05 0x6a58
 #define mapleItemDropTreasureIndices_bank05 0x6a75
+#define mapleItemValues_bank05 0x6a66
+#define mapleState9TextIndices_bank05 0x6897
 
 void specialObjectCode_maple_hook(GB *gb);
 void mapleState0_hook(GB *gb);
@@ -25,6 +27,15 @@ void mapleState2_hook(GB *gb);
 void mapleState3_hook(GB *gb);
 void mapleState4_hook(GB *gb);
 void mapleState5_hook(GB *gb);
+void mapleState6_hook(GB *gb);
+void mapleState7_hook(GB *gb);
+void mapleStateA_hook(GB *gb);
+void mapleState8_hook(GB *gb);
+void mapleState9_hook(GB *gb);
+void mapleEndEncounter_hook(GB *gb);
+void mapleDeleteSelf_hook(GB *gb);
+void mapleStateB_hook(GB *gb);
+void mapleStateC_hook(GB *gb);
 void mapleDecideNextAngle_hook(GB *gb);
 void mapleCollideWithLink_hook(GB *gb);
 void mapleUpdateOscillation_hook(GB *gb);
@@ -38,6 +49,7 @@ void mapleInitZPositionAndSpeed_hook(GB *gb);
 void mapleGetCardinalAngleTowardLink_hook(GB *gb);
 void mapleFindUnexplodedBomb_hook(GB *gb);
 void mapleFindNextUnexplodedBomb_hook(GB *gb);
+void mapleSpawnItemDrop_variant_hook(GB *gb);
 
 static uint16_t maple_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -95,13 +107,13 @@ void specialObjectCode_maple_hook(GB *gb) {
     case 0x652a: mapleState3_hook(gb); return;
     case 0x641a: mapleState4_hook(gb); return;
     case 0x6597: mapleState5_hook(gb); return;
-    case 0x6699: mapleState6(gb); return;
-    case 0x66f5: mapleState7(gb); return;
-    case 0x67fb: mapleState8(gb); return;
-    case 0x6851: mapleState9(gb); return;
-    case 0x67e5: mapleStateA(gb); return;
-    case 0x68f0: mapleStateB(gb); return;
-    case 0x6941: mapleStateC(gb); return;
+    case 0x6699: mapleState6_hook(gb); return;
+    case 0x66f5: mapleState7_hook(gb); return;
+    case 0x67fb: mapleState8_hook(gb); return;
+    case 0x6851: mapleState9_hook(gb); return;
+    case 0x67e5: mapleStateA_hook(gb); return;
+    case 0x68f0: mapleStateB_hook(gb); return;
+    case 0x6941: mapleStateC_hook(gb); return;
     default: hook_continue(gb, HL, sp0_); return;
   }
 }
@@ -219,7 +231,7 @@ void mapleState1_hook(GB *gb) {
   CYC(0x640b, 0x640e); A = W8(wMenuDisabled);
   CYC(0x640e, 0x640f); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x640f, 0x6412); mapleDeleteSelf(gb); return;
+    CYCT(0x640f, 0x6412); mapleDeleteSelf_hook(gb); return;
   }
   CYC(0x640f, 0x6412);
   CYC(0x6412, 0x6414); A = 0x2b;
@@ -316,7 +328,7 @@ choose_path:
   CYC(0x6463, 0x6464); A = mem_rd(gb, HL);
   CYC(0x6464, 0x6465); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x6465, 0x6468); mapleDeleteSelf(gb); return;
+    CYCT(0x6465, 0x6468); mapleDeleteSelf_hook(gb); return;
   }
   CYC(0x6465, 0x6468);
   CYC(0x6468, 0x6469); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
@@ -780,6 +792,652 @@ done:
   CYC(0x6698, 0x6699); ret_effect(gb);
 }
 
+void mapleState6_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x6699, mapleUpdateOscillation_hook, 0x6648, 0x669c);
+  CALL_C(0x669c, specialObjectAnimate_hook, 0x2aef, 0x669f);
+  CALL_C(0x669f, retIfTextIsActive_hook, 0x1859, 0x66a2);
+  CYC(0x66a2, 0x66a5); A = W8(wActiveMusic);
+  CYC(0x66a5, 0x66a7); alu_cp(gb, 0x2c);
+  if (F & FZ) {
+    CYCT(0x66a7, 0x66a9);
+    goto update_angle;
+  }
+  CYC(0x66a7, 0x66a9);
+  CYC(0x66a9, 0x66ab); A = 0x2c;
+  CYC(0x66ab, 0x66ae); W8(wActiveMusic) = A;
+  CALL_C(0x66ae, playSound_b00_hook, 0x0c98, 0x66b1);
+
+update_angle:
+  CYC(0x66b1, 0x66b3); L = 0x3d;
+  CYC(0x66b3, 0x66b4); A = mem_rd(gb, HL);
+  CYC(0x66b4, 0x66b6); L = 0x09;
+  CYC(0x66b6, 0x66b7); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) {
+    CALL_C_CC(0x66b7, mapleUpdateAngle_hook, 0x6667, 0x66ba);
+  } else {
+    CYC(0x66b7, 0x66ba);
+  }
+  CALL_C(0x66ba, mapleDecideItemToCollectAndUpdateTargetAngle, 0x6b84, 0x66bd);
+  CALL_C(0x66bd, objectApplySpeed_hook, 0x201d, 0x66c0);
+  CYC(0x66c0, 0x66c2); E = 0x18;
+  CYC(0x66c2, 0x66c3); A = mem_rd(gb, DE);
+  CYC(0x66c3, 0x66c4); H = A;
+  CYC(0x66c4, 0x66c5); E = alu_inc8(gb, E);
+  CYC(0x66c5, 0x66c6); A = mem_rd(gb, DE);
+  CYC(0x66c6, 0x66c7); L = A;
+  CALL_C(0x66c7, checkObjectsCollided_hook, 0x1d5a, 0x66ca);
+  if (!(F & FC)) {
+    CYCT(0x66ca, 0x66cd);
+    mapleKeepInBounds_hook(gb);
+    return;
+  }
+  CYC(0x66ca, 0x66cd);
+  CYC(0x66cd, 0x66cf); E = 0x18;
+  CYC(0x66cf, 0x66d0); A = mem_rd(gb, DE);
+  CYC(0x66d0, 0x66d1); H = A;
+  CYC(0x66d1, 0x66d2); E = alu_inc8(gb, E);
+  CYC(0x66d2, 0x66d3); A = mem_rd(gb, DE);
+  CYC(0x66d3, 0x66d5); alu_or(gb, 0x04);
+  CYC(0x66d5, 0x66d6); L = A;
+  CYC(0x66d6, 0x66d8); mem_wr(gb, HL, 0x04);
+  CYC(0x66d8, 0x66d9); L = alu_inc8(gb, L);
+  CYC(0x66d9, 0x66db); mem_wr(gb, HL, 0x00);
+  CYC(0x66db, 0x66dc); A = mem_rd(gb, DE);
+  CYC(0x66dc, 0x66de); alu_or(gb, 0x03);
+  CYC(0x66de, 0x66df); L = A;
+  CYC(0x66df, 0x66e0); A = mem_rd(gb, HL);
+  CYC(0x66e0, 0x66e2); E = 0x2e;
+  CYC(0x66e2, 0x66e3); mem_wr(gb, DE, A);
+  CYC(0x66e3, 0x66e5); E = 0x04;
+  CYC(0x66e5, 0x66e7); A = 0x07;
+  CYC(0x66e7, 0x66e8); mem_wr(gb, DE, A);
+  CYC(0x66e8, 0x66ea); E = 0x28;
+  CYC(0x66ea, 0x66eb); A = mem_rd(gb, DE);
+  CYC(0x66eb, 0x66ec); alu_or(gb, A);
+  if (F & FZ) {
+    CALL_C_CC(0x66ec, mapleFunc_6c27, 0x6c27, 0x66ef);
+  } else {
+    CYC(0x66ec, 0x66ef);
+  }
+  if (F & FZ) {
+    CYCT(0x66ef, 0x66f0); ret_effect(gb); return;
+  }
+  CYC(0x66ef, 0x66f0);
+  CYC(0x66f0, 0x66f2); alu_add(gb, 0x16);
+  CYC(0x66f2, 0x66f5); specialObjectSetAnimation_hook(gb);
+}
+
+void mapleState7_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x66f5, specialObjectAnimate_hook, 0x2aef, 0x66f8);
+  CYC(0x66f8, 0x66fa); E = 0x28;
+  CYC(0x66fa, 0x66fb); A = mem_rd(gb, DE);
+  CYC(0x66fb, 0x66fd); alu_cp(gb, 0x01);
+  if (!(F & FZ)) {
+    CYCT(0x66fd, 0x6700);
+    goto any_vehicle;
+  }
+  CYC(0x66fd, 0x6700);
+  CYC(0x6700, 0x6702); E = 0x26;
+  CYC(0x6702, 0x6704); A = 0x08;
+  CYC(0x6704, 0x6705); mem_wr(gb, DE, A);
+  CYC(0x6705, 0x6706); E = alu_inc8(gb, E);
+  CYC(0x6706, 0x6708); A = 0x0a;
+  CYC(0x6708, 0x6709); mem_wr(gb, DE, A);
+  CALL_C(0x6709, mapleFindUnexplodedBomb_hook, 0x6b40, 0x670c);
+  if (!(F & FZ)) {
+    CYCT(0x670c, 0x670e);
+    goto find_next_bomb;
+  }
+  CYC(0x670c, 0x670e);
+  CALL_C(0x670e, checkObjectsCollided_hook, 0x1d5a, 0x6711);
+  if (F & FC) {
+    CYCT(0x6711, 0x6713);
+    goto explosive_bomb_near_maple;
+  }
+  CYC(0x6711, 0x6713);
+
+find_next_bomb:
+  CALL_C(0x6713, mapleFindNextUnexplodedBomb_hook, 0x6b4e, 0x6716);
+  if (!(F & FZ)) {
+    CYCT(0x6716, 0x6718);
+    goto update_item_being_collected;
+  }
+  CYC(0x6716, 0x6718);
+  CALL_C(0x6718, checkObjectsCollided_hook, 0x1d5a, 0x671b);
+  if (F & FC) {
+    CYCT(0x671b, 0x671d);
+    goto explosive_bomb_near_maple;
+  }
+  CYC(0x671b, 0x671d);
+  CYC(0x671d, 0x671f); E = 0x16;
+  CYC(0x671f, 0x6720); alu_xor(gb, A);
+  CYC(0x6720, 0x6721); mem_wr(gb, DE, A);
+  CYC(0x6721, 0x6722); E = alu_inc8(gb, E);
+  CYC(0x6722, 0x6723); mem_wr(gb, DE, A);
+  CYC(0x6723, 0x6725);
+  goto update_item_being_collected;
+
+explosive_bomb_near_maple:
+  CYC(0x6725, 0x6727); L = 0x2f;
+  CYC(0x6727, 0x6729); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x80));
+  CYC(0x6729, 0x672b); B = 0x00;
+  CYC(0x672b, 0x672d); L = 0x0b;
+  CYC(0x672d, 0x672e); E = L;
+  CYC(0x672e, 0x672f); A = mem_rd(gb, DE);
+  CYC(0x672f, 0x6730); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x6730, 0x6732);
+    goto update_bomb_x;
+  }
+  CYC(0x6730, 0x6732);
+  CYC(0x6732, 0x6733); B = alu_inc8(gb, B);
+  if (F & FC) {
+    CYCT(0x6733, 0x6735);
+    goto decrement_bomb_y;
+  }
+  CYC(0x6733, 0x6735);
+  CYC(0x6735, 0x6736); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x6736, 0x6738);
+  goto update_bomb_x;
+
+decrement_bomb_y:
+  CYC(0x6738, 0x6739); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+
+update_bomb_x:
+  CYC(0x6739, 0x673b); L = 0x0d;
+  CYC(0x673b, 0x673c); E = L;
+  CYC(0x673c, 0x673d); A = mem_rd(gb, DE);
+  CYC(0x673d, 0x673e); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x673e, 0x6740);
+    goto check_bomb_position;
+  }
+  CYC(0x673e, 0x6740);
+  CYC(0x6740, 0x6741); B = alu_inc8(gb, B);
+  if (F & FC) {
+    CYCT(0x6741, 0x6743);
+    goto decrement_bomb_x;
+  }
+  CYC(0x6741, 0x6743);
+  CYC(0x6743, 0x6744); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x6744, 0x6746);
+  goto check_bomb_position;
+
+decrement_bomb_x:
+  CYC(0x6746, 0x6747); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+
+check_bomb_position:
+  CYC(0x6747, 0x6748); A = B;
+  CYC(0x6748, 0x6749); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x6749, 0x674b);
+    goto update_item_being_collected;
+  }
+  CYC(0x6749, 0x674b);
+  CYC(0x674b, 0x674d); L = 0x0e;
+  CYC(0x674d, 0x674e); A = mem_rd(gb, HL);
+  CYC(0x674e, 0x6750); alu_sub(gb, 0x40);
+  CYC(0x6750, 0x6751); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x6751, 0x6752); A = mem_rd(gb, HL);
+  CYC(0x6752, 0x6754); alu_sbc(gb, 0x00);
+  CYC(0x6754, 0x6755); mem_wr(gb, HL, A);
+  CYC(0x6755, 0x6757); alu_cp(gb, 0xf8);
+  if (!(F & FZ)) {
+    CYCT(0x6757, 0x6759);
+    goto update_item_being_collected;
+  }
+  CYC(0x6757, 0x6759);
+  CYC(0x6759, 0x675b); L = 0x2f;
+  CYC(0x675b, 0x675d); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x20));
+  CYC(0x675d, 0x675f); A = 0x1a;
+  CALL_C(0x675f, specialObjectSetAnimation_hook, 0x2b0a, 0x6762);
+  CYC(0x6762, 0x6763); H = D;
+  CYC(0x6763, 0x6765); L = 0x04;
+  CYC(0x6765, 0x6767); mem_wr(gb, HL, 0x08);
+  CYC(0x6767, 0x6768); L = alu_inc8(gb, L);
+  CYC(0x6768, 0x676a); mem_wr(gb, HL, 0x00);
+  CYC(0x676a, 0x676c); L = 0x07;
+  CYC(0x676c, 0x676e); mem_wr(gb, HL, 0x20);
+  CYC(0x676e, 0x6770); E = 0x18;
+  CYC(0x6770, 0x6771); A = mem_rd(gb, DE);
+  CYC(0x6771, 0x6772); H = A;
+  CYC(0x6772, 0x6773); E = alu_inc8(gb, E);
+  CYC(0x6773, 0x6774); A = mem_rd(gb, DE);
+  CYC(0x6774, 0x6775); L = A;
+  CYC(0x6775, 0x6776); A = mem_rd(gb, HL);
+  CYC(0x6776, 0x6777); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x6777, 0x6779);
+    goto update_item_being_collected;
+  }
+  CYC(0x6777, 0x6779);
+  CYC(0x6779, 0x677a); A = mem_rd(gb, DE);
+  CYC(0x677a, 0x677c); alu_add(gb, 0x04);
+  CYC(0x677c, 0x677d); L = A;
+  CYC(0x677d, 0x677f); mem_wr(gb, HL, 0x01);
+  CYC(0x677f, 0x6781); alu_add(gb, 0x05);
+  CYC(0x6781, 0x6782); L = A;
+  CYC(0x6782, 0x6784); mem_wr(gb, HL, 0x80);
+  CYC(0x6784, 0x6785); alu_xor(gb, A);
+  CYC(0x6785, 0x6787); E = 0x18;
+  CYC(0x6787, 0x6788); mem_wr(gb, DE, A);
+
+update_item_being_collected:
+  CYC(0x6788, 0x678a); E = 0x26;
+  CYC(0x678a, 0x678c); A = 0x02;
+  CYC(0x678c, 0x678d); mem_wr(gb, DE, A);
+  CYC(0x678d, 0x678e); E = alu_inc8(gb, E);
+  CYC(0x678e, 0x6790); A = 0x02;
+  CYC(0x6790, 0x6791); mem_wr(gb, DE, A);
+
+any_vehicle:
+  CYC(0x6791, 0x6793); E = 0x18;
+  CYC(0x6793, 0x6794); A = mem_rd(gb, DE);
+  CYC(0x6794, 0x6795); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x6795, 0x6796); ret_effect(gb); return;
+  }
+  CYC(0x6795, 0x6796);
+  CYC(0x6796, 0x6797); H = A;
+  CYC(0x6797, 0x6798); E = alu_inc8(gb, E);
+  CYC(0x6798, 0x6799); A = mem_rd(gb, DE);
+  CYC(0x6799, 0x679a); L = A;
+  CYC(0x679a, 0x679b); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x679b, 0x679c); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x679c, 0x679e);
+    goto item_collected;
+  }
+  CYC(0x679c, 0x679e);
+  CYC(0x679e, 0x679f); L = alu_inc8(gb, L);
+  CYC(0x679f, 0x67a1); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (!(F & FZ)) {
+    CYCT(0x67a1, 0x67a3);
+    goto item_collected;
+  }
+  CYC(0x67a1, 0x67a3);
+  CYC(0x67a3, 0x67a5); E = 0x25;
+  CYC(0x67a5, 0x67a6); A = mem_rd(gb, DE);
+  CYC(0x67a6, 0x67a7); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x67a7, 0x67a8); ret_effect(gb); return;
+  }
+  CYC(0x67a7, 0x67a8);
+  CYC(0x67a8, 0x67aa); E = 0x18;
+  CYC(0x67aa, 0x67ab); A = mem_rd(gb, DE);
+  CYC(0x67ab, 0x67ac); H = A;
+  CYC(0x67ac, 0x67ae); L = 0xc3;
+  CYC(0x67ae, 0x67b0); A = 0x80;
+  CYC(0x67b0, 0x67b1); mem_wr(gb, HL, A);
+  CYC(0x67b1, 0x67b2); alu_xor(gb, A);
+  CYC(0x67b2, 0x67b4); L = 0xeb;
+  CYC(0x67b4, 0x67b5); mem_wr(gb, HL, A);
+  CYC(0x67b5, 0x67b7); L = 0xe4;
+  CYC(0x67b7, 0x67b8); mem_wr(gb, HL, A);
+  CYC(0x67b8, 0x67ba); E = 0x2e;
+  CYC(0x67ba, 0x67bb); A = mem_rd(gb, DE);
+  CYC(0x67bb, 0x67be); SET_HL(mapleItemValues_bank05);
+  CYC(0x67be, 0x67bf); maple_add_a_to_hl(gb, 0x67bf);
+  CYC(0x67bf, 0x67c1); A = 0x0e;
+  CYC(0x67c1, 0x67c2); mem_wr(gb, DE, A);
+  CYC(0x67c2, 0x67c4); E = 0x29;
+  CYC(0x67c4, 0x67c5); A = mem_rd(gb, DE);
+  CYC(0x67c5, 0x67c6); B = A;
+  CYC(0x67c6, 0x67c7); A = mem_rd(gb, HL);
+  CYC(0x67c7, 0x67c8); alu_add(gb, B);
+  CYC(0x67c8, 0x67c9); mem_wr(gb, DE, A);
+  CYC(0x67c9, 0x67cb); E = 0x28;
+  CYC(0x67cb, 0x67cc); A = mem_rd(gb, DE);
+  CYC(0x67cc, 0x67cd); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x67cd, 0x67cf);
+    goto item_collected;
+  }
+  CYC(0x67cd, 0x67cf);
+  CYC(0x67cf, 0x67d1); A = 0x0a;
+  CYC(0x67d1, 0x67d3);
+  goto set_state;
+
+item_collected:
+  CYC(0x67d3, 0x67d4); H = D;
+  CYC(0x67d4, 0x67d6); L = 0x16;
+  CYC(0x67d6, 0x67d7); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x67d7, 0x67d8); alu_or(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) {
+    CYCT(0x67d8, 0x67d9); ret_effect(gb); return;
+  }
+  CYC(0x67d8, 0x67d9);
+  CYC(0x67d9, 0x67db); A = 0x06;
+
+set_state:
+  CYC(0x67db, 0x67dd); E = 0x04;
+  CYC(0x67dd, 0x67de); mem_wr(gb, DE, A);
+  CYC(0x67de, 0x67e0); E = 0x3d;
+  CYC(0x67e0, 0x67e1); A = mem_rd(gb, DE);
+  CYC(0x67e1, 0x67e3); E = 0x09;
+  CYC(0x67e3, 0x67e4); mem_wr(gb, DE, A);
+  CYC(0x67e4, 0x67e5); ret_effect(gb);
+}
+
+void mapleStateA_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x67e5, specialObjectAnimate_hook, 0x2aef, 0x67e8);
+  CALL_C(0x67e8, itemDecCounter2_hook, 0x23db, 0x67eb);
+  if (!(F & FZ)) {
+    CYCT(0x67eb, 0x67ec); ret_effect(gb); return;
+  }
+  CYC(0x67eb, 0x67ec);
+  CYC(0x67ec, 0x67ee); L = 0x04;
+  CYC(0x67ee, 0x67f0); mem_wr(gb, HL, 0x06);
+  CYC(0x67f0, 0x67f2); L = 0x08;
+  CYC(0x67f2, 0x67f3); A = mem_rd(gb, HL);
+  CYC(0x67f3, 0x67f5); L = 0x0f;
+  CYC(0x67f5, 0x67f6); mem_wr(gb, HL, A);
+  CYC(0x67f6, 0x67f8); A = 0x04;
+  CYC(0x67f8, 0x67fb); specialObjectSetAnimation_hook(gb);
+}
+
+void mapleState8_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x67fb, specialObjectAnimate_hook, 0x2aef, 0x67fe);
+  CYC(0x67fe, 0x6800); E = 0x05;
+  CYC(0x6800, 0x6801); A = mem_rd(gb, DE);
+  CYC(0x6801, 0x6802); push_effect(gb, 0x6802);
+  switch (maple_jump_table(gb)) {
+    case 0x680a: goto substate0;
+    case 0x681c: goto substate1;
+    case 0x682b: goto substate2;
+    case 0x6838: goto substate3;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+substate0:
+  CALL_C(0x680a, itemDecCounter2_hook, 0x23db, 0x680d);
+  if (!(F & FZ)) {
+    CYCT(0x680d, 0x680e); ret_effect(gb); return;
+  }
+  CYC(0x680d, 0x680e);
+  CYC(0x680e, 0x6810); L = 0x05;
+  CYC(0x6810, 0x6812); mem_wr(gb, HL, 0x01);
+  CYC(0x6812, 0x6814); L = 0x14;
+  CYC(0x6814, 0x6815); alu_xor(gb, A);
+  CYC(0x6815, 0x6816); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x6816, 0x6817); mem_wr(gb, HL, A);
+  CYC(0x6817, 0x6819); A = 0x13;
+  CYC(0x6819, 0x681c); specialObjectSetAnimation_hook(gb);
+  return;
+
+substate1:
+  CYC(0x681c, 0x681e); C = 0x40;
+  CALL_C(0x681e, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x6821);
+  if (!(F & FZ)) {
+    CYCT(0x6821, 0x6822); ret_effect(gb); return;
+  }
+  CYC(0x6821, 0x6822);
+  CYC(0x6822, 0x6824); L = 0x05;
+  CYC(0x6824, 0x6826); mem_wr(gb, HL, 0x02);
+  CYC(0x6826, 0x6828); L = 0x07;
+  CYC(0x6828, 0x682a); mem_wr(gb, HL, 0x40);
+  CYC(0x682a, 0x682b); ret_effect(gb); return;
+
+substate2:
+  CALL_C(0x682b, itemDecCounter2_hook, 0x23db, 0x682e);
+  if (!(F & FZ)) {
+    CYCT(0x682e, 0x682f); ret_effect(gb); return;
+  }
+  CYC(0x682e, 0x682f);
+  CYC(0x682f, 0x6831); L = 0x05;
+  CYC(0x6831, 0x6833); mem_wr(gb, HL, 0x03);
+  CYC(0x6833, 0x6835); A = 0x08;
+  CYC(0x6835, 0x6838); specialObjectSetAnimation_hook(gb);
+  return;
+
+substate3:
+  CYC(0x6838, 0x6839); H = D;
+  CYC(0x6839, 0x683b); L = 0x0f;
+  CYC(0x683b, 0x683c); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x683c, 0x683d); A = mem_rd(gb, HL);
+  CYC(0x683d, 0x683f); alu_cp(gb, 0xe9);
+  if (!(F & FC)) {
+    CYCT(0x683f, 0x6840); ret_effect(gb); return;
+  }
+  CYC(0x683f, 0x6840);
+  CYC(0x6840, 0x6842); L = 0x04;
+  CYC(0x6842, 0x6844); mem_wr(gb, HL, 0x06);
+  CYC(0x6844, 0x6846); L = 0x29;
+  CYC(0x6846, 0x6847); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x6847, 0x6849); L = 0x14;
+  CYC(0x6849, 0x684b); A = 0x40;
+  CYC(0x684b, 0x684c); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x684c, 0x684e); mem_wr(gb, HL, 0x00);
+  CYC(0x684e, 0x6851); mapleDecideItemToCollectAndUpdateTargetAngle(gb);
+}
+
+void mapleState9_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x6851, specialObjectAnimate_hook, 0x2aef, 0x6854);
+  CYC(0x6854, 0x6856); E = 0x05;
+  CYC(0x6856, 0x6857); A = mem_rd(gb, DE);
+  CYC(0x6857, 0x6858); push_effect(gb, 0x6858);
+  switch (maple_jump_table(gb)) {
+    case 0x685e: goto substate0;
+    case 0x689f: goto substate1;
+    case 0x68c5: goto substate2;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+
+substate0:
+  CALL_C(0x685e, retIfTextIsActive_hook, 0x1859, 0x6861);
+  CYC(0x6861, 0x6863); A = 0x3c;
+  CYC(0x6863, 0x6866); W8(wInstrumentsDisabledCounter) = A;
+  CYC(0x6866, 0x6868); A = 0x01;
+  CYC(0x6868, 0x6869); mem_wr(gb, DE, A);
+  CYC(0x6869, 0x686a); H = D;
+  CYC(0x686a, 0x686c); L = 0x29;
+  CYC(0x686c, 0x686d); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x686d, 0x686e); B = A;
+  CYC(0x686e, 0x686f); alu_or(gb, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x686f, 0x6871);
+    goto show_text;
+  }
+  CYC(0x686f, 0x6871);
+  CYC(0x6871, 0x6872); A = mem_rd(gb, HL);
+  CYC(0x6872, 0x6873); alu_cp(gb, B);
+  CYC(0x6873, 0x6875); A = 0x01;
+  if (F & FZ) {
+    CYCT(0x6875, 0x6877);
+    goto show_text;
+  }
+  CYC(0x6875, 0x6877);
+  CYC(0x6877, 0x6878); A = alu_inc8(gb, A);
+  if (F & FC) {
+    CYCT(0x6878, 0x687a);
+    goto show_text;
+  }
+  CYC(0x6878, 0x687a);
+  CYC(0x687a, 0x687b); A = alu_inc8(gb, A);
+
+show_text:
+  CYC(0x687b, 0x687e); SET_HL(mapleState9TextIndices_bank05);
+  CYC(0x687e, 0x687f); maple_add_double_index(gb, 0x687f);
+  CYC(0x687f, 0x6880); C = mem_rd(gb, HL);
+  CYC(0x6880, 0x6881); SET_HL(HL + 1);
+  CYC(0x6881, 0x6882); B = mem_rd(gb, HL);
+  CALL_C(0x6882, showText_hook, 0x1872, 0x6885);
+  CALL_C(0x6885, mapleGetCardinalAngleTowardLink_hook, 0x6b7e, 0x6888);
+  CALL_C(0x6888, convertAngleToDirection_hook, 0x26f9, 0x688b);
+  CYC(0x688b, 0x688d); alu_add(gb, 0x04);
+  CYC(0x688d, 0x688e); B = A;
+  CYC(0x688e, 0x6890); E = 0x28;
+  CYC(0x6890, 0x6891); A = mem_rd(gb, DE);
+  CYC(0x6891, 0x6892); alu_add(gb, A);
+  CYC(0x6892, 0x6893); alu_add(gb, A);
+  CYC(0x6893, 0x6894); alu_add(gb, B);
+  CYC(0x6894, 0x6897); specialObjectSetAnimation_hook(gb);
+  return;
+
+substate1:
+  CALL_C(0x689f, mapleUpdateOscillation_hook, 0x6648, 0x68a2);
+  CALL_C(0x68a2, retIfTextIsActive_hook, 0x1859, 0x68a5);
+  CYC(0x68a5, 0x68a7); A = 0x80;
+  CYC(0x68a7, 0x68aa); W8(wTextIsActive) = A;
+  CYC(0x68aa, 0x68ac); A = 0x1f;
+  CYC(0x68ac, 0x68af); W8(wDisabledObjects) = A;
+  CYC(0x68af, 0x68b1); L = 0x09;
+  CYC(0x68b1, 0x68b3); mem_wr(gb, HL, 0x18);
+  CYC(0x68b3, 0x68b5); L = 0x10;
+  CYC(0x68b5, 0x68b7); mem_wr(gb, HL, 0x78);
+  CYC(0x68b7, 0x68b9); L = 0x05;
+  CYC(0x68b9, 0x68bb); mem_wr(gb, HL, 0x02);
+  CYC(0x68bb, 0x68bd); E = 0x28;
+  CYC(0x68bd, 0x68be); A = mem_rd(gb, DE);
+  CYC(0x68be, 0x68bf); alu_add(gb, A);
+  CYC(0x68bf, 0x68c0); alu_add(gb, A);
+  CYC(0x68c0, 0x68c2); alu_add(gb, 0x07);
+  CYC(0x68c2, 0x68c5); specialObjectSetAnimation_hook(gb);
+  return;
+
+substate2:
+  CALL_C(0x68c5, mapleUpdateOscillation_hook, 0x6648, 0x68c8);
+  CALL_C(0x68c8, objectApplySpeed_hook, 0x201d, 0x68cb);
+  CALL_C(0x68cb, objectCheckWithinScreenBoundary_hook, 0x2184, 0x68ce);
+  if (F & FC) {
+    CYCT(0x68ce, 0x68cf); ret_effect(gb); return;
+  }
+  CYC(0x68ce, 0x68cf);
+  mapleEndEncounter_hook(gb);
+}
+
+void mapleEndEncounter_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x68cf, 0x68d0); alu_xor(gb, A);
+  CYC(0x68d0, 0x68d3); W8(wTextIsActive) = A;
+  CYC(0x68d3, 0x68d6); W8(wDisabledObjects) = A;
+  CYC(0x68d6, 0x68d9); W8(wMenuDisabled) = A;
+  CYC(0x68d9, 0x68dc); W8(wDisableScreenTransitions) = A;
+  CALL_C(0x68dc, mapleIncrementMeetingCounter, 0x6c42, 0x68df);
+  mapleDeleteSelf_hook(gb);
+}
+
+void mapleDeleteSelf_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x68df, 0x68e2); A = W8(wActiveMusic2);
+  CYC(0x68e2, 0x68e5); W8(wActiveMusic) = A;
+  CALL_C(0x68e5, playSound_b00_hook, 0x0c98, 0x68e8);
+  CYC(0x68e8, 0x68e9); SET_AF(pop_effect(gb));
+  CYC(0x68e9, 0x68ea); alu_xor(gb, A);
+  CYC(0x68ea, 0x68ed); W8(wIsMaplePresent) = A;
+  CYC(0x68ed, 0x68f0); itemDelete_hook(gb);
+}
+
+void mapleStateB_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x68f0, 0x68f1); E = alu_inc8(gb, E);
+  CYC(0x68f1, 0x68f2); A = mem_rd(gb, DE);
+  CYC(0x68f2, 0x68f3); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x68f3, 0x68f5);
+    goto substate1;
+  }
+  CYC(0x68f3, 0x68f5);
+  CALL_C(0x68f5, mapleUpdateOscillation_hook, 0x6648, 0x68f8);
+  CYC(0x68f8, 0x68fa); E = 0x08;
+  CYC(0x68fa, 0x68fb); A = mem_rd(gb, DE);
+  CYC(0x68fb, 0x68fd); alu_bit(gb, 7, A);
+  if (F & FZ) {
+    CYCT(0x68fd, 0x68ff);
+    goto face_link;
+  }
+  CYC(0x68fd, 0x68ff);
+  CYC(0x68ff, 0x6901); alu_and(gb, 0x03);
+  CYC(0x6901, 0x6903);
+  goto determine_animation;
+
+face_link:
+  CALL_C(0x6903, objectGetAngleTowardLink_hook, 0x1e9c, 0x6906);
+  CALL_C(0x6906, convertAngleToDirection_hook, 0x26f9, 0x6909);
+  CYC(0x6909, 0x690a); H = D;
+  CYC(0x690a, 0x690c); L = 0x08;
+  CYC(0x690c, 0x690d); alu_cp(gb, mem_rd(gb, HL));
+  CYC(0x690d, 0x690e); mem_wr(gb, HL, A);
+  if (F & FZ) {
+    CYCT(0x690e, 0x6910);
+    goto wait_for_text;
+  }
+  CYC(0x690e, 0x6910);
+
+determine_animation:
+  CYC(0x6910, 0x6912); alu_add(gb, 0x04);
+  CYC(0x6912, 0x6913); B = A;
+  CYC(0x6913, 0x6915); E = 0x28;
+  CYC(0x6915, 0x6916); A = mem_rd(gb, DE);
+  CYC(0x6916, 0x6917); alu_add(gb, A);
+  CYC(0x6917, 0x6918); alu_add(gb, A);
+  CYC(0x6918, 0x6919); alu_add(gb, B);
+  CALL_C(0x6919, specialObjectSetAnimation_hook, 0x2b0a, 0x691c);
+
+wait_for_text:
+  CALL_C(0x691c, retIfTextIsActive_hook, 0x1859, 0x691f);
+  CYC(0x691f, 0x6922); SET_HL(wMapleState);
+  CYC(0x6922, 0x6924); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x20));
+  CYC(0x6924, 0x6926); E = 0x09;
+  CYC(0x6926, 0x6927); A = mem_rd(gb, DE);
+  CYC(0x6927, 0x6928); alu_rlca(gb);
+  if (!(F & FC)) {
+    CYCT(0x6928, 0x692b);
+    objectApplySpeed_hook(gb);
+    return;
+  }
+  CYC(0x6928, 0x692b);
+  CYC(0x692b, 0x692c); ret_effect(gb); return;
+
+substate1:
+  CYC(0x692c, 0x692d); A = alu_dec8(gb, A);
+  CYC(0x692d, 0x692e); mem_wr(gb, DE, A);
+  if (!(F & FZ)) {
+    CYCT(0x692e, 0x692f); ret_effect(gb); return;
+  }
+  CYC(0x692e, 0x692f);
+  CYC(0x692f, 0x6932); SET_BC(0x0711);
+  CALL_C(0x6932, showText_hook, 0x1872, 0x6935);
+  CYC(0x6935, 0x6937); E = 0x09;
+  CYC(0x6937, 0x6939); A = 0x18;
+  CYC(0x6939, 0x693a); mem_wr(gb, DE, A);
+  CALL_C(0x693a, itemIncState_hook, 0x23ea, 0x693d);
+  CYC(0x693d, 0x693f); L = 0x10;
+  CYC(0x693f, 0x6941); mem_wr(gb, HL, 0x78);
+  mapleStateC_hook(gb);
+}
+
+void mapleStateC_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x6941, mapleUpdateOscillation_hook, 0x6648, 0x6944);
+  CALL_C(0x6944, retIfTextIsActive_hook, 0x1859, 0x6947);
+  CALL_C(0x6947, objectApplySpeed_hook, 0x201d, 0x694a);
+  CYC(0x694a, 0x694c); E = 0x28;
+  CYC(0x694c, 0x694d); A = mem_rd(gb, DE);
+  CYC(0x694d, 0x694e); alu_add(gb, A);
+  CYC(0x694e, 0x694f); alu_add(gb, A);
+  CYC(0x694f, 0x6951); alu_add(gb, 0x07);
+  CYC(0x6951, 0x6954); SET_HL(wMapleState);
+  CYC(0x6954, 0x6956); alu_bit(gb, 4, mem_rd(gb, HL));
+  CYC(0x6956, 0x6958); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~0x10));
+  if (!(F & FZ)) {
+    CALL_C_CC(0x6958, specialObjectSetAnimation_hook, 0x2b0a, 0x695b);
+  } else {
+    CYC(0x6958, 0x695b);
+  }
+  CALL_C(0x695b, objectCheckWithinScreenBoundary_hook, 0x2184, 0x695e);
+  if (F & FC) {
+    CYCT(0x695e, 0x695f); ret_effect(gb); return;
+  }
+  CYC(0x695e, 0x695f);
+  CYC(0x695f, 0x6962); mapleEndEncounter_hook(gb);
+}
+
 void mapleKeepInBounds_hook(GB *gb) {
   CYC(0x6962, 0x6964); E = 0x0b;
   CYC(0x6964, 0x6965); A = mem_rd(gb, DE);
@@ -910,7 +1568,7 @@ not_heart_piece:
   CYC(0x6a31, 0x6a32); mem_wr(gb, DE, A);
 
 spawn_item:
-  CYC(0x6a32, 0x6a34); mapleSpawnItemDrop_variant(gb);
+  CYC(0x6a32, 0x6a34); mapleSpawnItemDrop_variant_hook(gb);
 }
 
 void mapleSpawnItemDrops_hook(GB *gb) {
@@ -1040,6 +1698,24 @@ void mapleSpawnItemDrop_hook(GB *gb) {
   CYC(0x6a94, 0x6a95); mem_wr(gb, HL, A);
   CYC(0x6a95, 0x6a96); alu_xor(gb, A);
   CYC(0x6a96, 0x6a97); ret_effect(gb);
+}
+
+void mapleSpawnItemDrop_variant_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x6a97, getFreePartSlot_hook, 0x3e8e, 0x6a9a);
+  CYC(0x6a9a, 0x6a9b); alu_scf(gb);
+  if (!(F & FZ)) {
+    CYCT(0x6a9b, 0x6a9c); ret_effect(gb); return;
+  }
+  CYC(0x6a9b, 0x6a9c);
+  CYC(0x6a9c, 0x6a9e); mem_wr(gb, HL, 0x15);
+  CYC(0x6a9e, 0x6aa0); L = 0xc2;
+  CYC(0x6aa0, 0x6aa2); A = H8(hFF8B);
+  CYC(0x6aa2, 0x6aa3); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x6aa3, 0x6aa4); mem_wr(gb, HL, A);
+  CALL_C(0x6aa4, objectCopyPosition_hook, 0x2242, 0x6aa7);
+  CYC(0x6aa7, 0x6aa8); alu_or(gb, A);
+  CYC(0x6aa8, 0x6aa9); ret_effect(gb);
 }
 
 static void maple_find_bomb_finish(GB *gb) {
