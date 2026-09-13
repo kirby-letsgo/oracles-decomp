@@ -890,3 +890,8 @@ desync to discover; keep them when porting routines.
   the repeated mistake before replay. After the RST helper pops its table address, an ordinary
   dynamic `jp hl` still needs `hook_continue(gb, HL, sp0_)`; only an actual `ld sp,*` permits
   `hook_handoff`.
+- A local-call return guard must read emulated PC/SP inside a real `_hook` shim, not a static
+  helper. Batch 138's rabbit initializer correctly checked for normal return at `$782b` with the
+  caller's restored SP, but integration lint rejected the helper's direct `gb->pc` and `gb->sp`
+  reads. Split the helper at the local-call boundary and perform the same guard in each public
+  entry hook before invoking the shared post-call block.

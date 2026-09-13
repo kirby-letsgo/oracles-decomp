@@ -14,6 +14,7 @@ partLoadGraphicsAndProperties
 interactionLoadGraphics
 itemLoadGraphics
 interactionInitGraphics
+interactionCode4b_body
 loadTreeGfx
 agesFunc_3f_4133
 agesFunc_3f_4133__afterCall4143
