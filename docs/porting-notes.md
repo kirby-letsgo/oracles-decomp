@@ -964,3 +964,13 @@ desync to discover; keep them when porting routines.
 - Burn instruction byte length even when the endpoint resembles a cycle total. Batch 148's first
   `linkUpdateMovement` rewrite burned the three-byte `jp` at `$5aec` through `$5af0`; the correct
   exclusive endpoint is `$5aef`. Instruction review caught the one-byte overrun before replay.
+- A readiness report target marked `(hooked)` can still be a smart generated-C call. Batch 149's
+  first Ricky and serial rewrites treated three `playSound` calls, four `waitForSerialByte` calls,
+  and two `returnIfPacketNotComplete` calls as interpreter-only because the report did not say
+  `(rewritten)`. The original generated bodies used `CALL(...)`, so the readable form must use
+  `CALL_C(...)`; reserve `CALL_ROM` for report sites emitted as `CALL_ASM /* unported */`.
+- Stack-skipping callees make the smart-call boundary semantically necessary, even before they are
+  readable. `waitForSerialByte` and `returnIfPacketNotComplete` can consume their immediate return
+  address and escape through the caller's frame. Batch 149's serial hooks therefore capture their
+  own entry `sp0_` and use `CALL_C`, whose PC/SP guard detects that nonlocal return and continues
+  from the enclosing hook boundary. A direct generated-C call would keep executing stale code.

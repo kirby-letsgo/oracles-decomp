@@ -89,301 +89,6 @@ void func_4036(GB *gb) {
   switch (HL) {  default: HANDOFF(HL); }
 }
 
-// 16:4043
-void func_4043(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4043, waitForSerialByte, 0x41dc, 0x4046);  // call $41dc
-  I(0x4046, 2); alu_cp(gb, 0x80);  // cp $80
-  if ((F & FZ)) { RET_TAKEN(0x4048); return; } I(0x4048, 2);  // ret z
-  sendPacketByte(gb); return;  // fallthrough
-}
-
-// 16:4049
-void sendPacketByte(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4049, 4); A = mem_rd(gb, 0xd981);  // ld a,($d981)
-  I(0x404c, 3); SET_HL(0xd9e5);  // ld hl,$d9e5
-  RST_PUSH(0x404f, 0x4050);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x4050, 4); A = mem_rd(gb, 0xd981);  // ld a,($d981)
-  I(0x4053, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4054, 3); goto L_4066; } I(0x4054, 2);  // jr nz,$4066
-  I(0x4056, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4057, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4058, 3); goto L_405f; } I(0x4058, 2);  // jr nz,$405f
-  I(0x405a, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x405b, 4); mem_wr(gb, 0xd98b, A);  // ld ($d98b),a
-  RET(0x405e); return;  // ret
-L_405f:
-  I(0x405f, 4); mem_wr(gb, 0xd987, A);  // ld ($d987),a
-  I(0x4062, 1); alu_xor(gb, A);  // xor a
-  I(0x4063, 4); mem_wr(gb, 0xd982, A);  // ld ($d982),a
-L_4066:
-  I(0x4066, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4067, 4); mem_wr(gb, 0xd981, A);  // ld ($d981),a
-  I(0x406a, 4); A = mem_rd(gb, 0xd987);  // ld a,($d987)
-  I(0x406d, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x406e, 4); mem_wr(gb, 0xd987, A);  // ld ($d987),a
-  I(0x4071, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  if (!(F & FZ)) { I(0x4072, 3); goto L_407b; } I(0x4072, 2);  // jr nz,$407b
-  I(0x4074, 1); alu_xor(gb, A);  // xor a
-  I(0x4075, 4); mem_wr(gb, 0xd988, A);  // ld ($d988),a
-  I(0x4078, 4); A = mem_rd(gb, 0xd982);  // ld a,($d982)
-L_407b:
-  I(0x407b, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  I(0x407d, 3); SET_HL(0xd982);  // ld hl,$d982
-  I(0x4080, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  I(0x4081, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4082, 1); alu_xor(gb, A);  // xor a
-  I(0x4083, 4); mem_wr(gb, 0xd98b, A);  // ld ($d98b),a
-  RET(0x4086); return;  // ret
-}
-
-// 16:405f
-void sendPacketByte__getNumBytes(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_405f:
-  I(0x405f, 4); mem_wr(gb, 0xd987, A);  // ld ($d987),a
-  I(0x4062, 1); alu_xor(gb, A);  // xor a
-  I(0x4063, 4); mem_wr(gb, 0xd982, A);  // ld ($d982),a
-L_4066:
-  I(0x4066, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4067, 4); mem_wr(gb, 0xd981, A);  // ld ($d981),a
-  I(0x406a, 4); A = mem_rd(gb, 0xd987);  // ld a,($d987)
-  I(0x406d, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x406e, 4); mem_wr(gb, 0xd987, A);  // ld ($d987),a
-  I(0x4071, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  if (!(F & FZ)) { I(0x4072, 3); goto L_407b; } I(0x4072, 2);  // jr nz,$407b
-  I(0x4074, 1); alu_xor(gb, A);  // xor a
-  I(0x4075, 4); mem_wr(gb, 0xd988, A);  // ld ($d988),a
-  I(0x4078, 4); A = mem_rd(gb, 0xd982);  // ld a,($d982)
-L_407b:
-  I(0x407b, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  I(0x407d, 3); SET_HL(0xd982);  // ld hl,$d982
-  I(0x4080, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  I(0x4081, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4082, 1); alu_xor(gb, A);  // xor a
-  I(0x4083, 4); mem_wr(gb, 0xd98b, A);  // ld ($d98b),a
-  RET(0x4086); return;  // ret
-}
-
-// 16:4066
-void sendPacketByte__nextByte(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4066:
-  I(0x4066, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4067, 4); mem_wr(gb, 0xd981, A);  // ld ($d981),a
-  I(0x406a, 4); A = mem_rd(gb, 0xd987);  // ld a,($d987)
-  I(0x406d, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x406e, 4); mem_wr(gb, 0xd987, A);  // ld ($d987),a
-  I(0x4071, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  if (!(F & FZ)) { I(0x4072, 3); goto L_407b; } I(0x4072, 2);  // jr nz,$407b
-  I(0x4074, 1); alu_xor(gb, A);  // xor a
-  I(0x4075, 4); mem_wr(gb, 0xd988, A);  // ld ($d988),a
-  I(0x4078, 4); A = mem_rd(gb, 0xd982);  // ld a,($d982)
-L_407b:
-  I(0x407b, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  I(0x407d, 3); SET_HL(0xd982);  // ld hl,$d982
-  I(0x4080, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  I(0x4081, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4082, 1); alu_xor(gb, A);  // xor a
-  I(0x4083, 4); mem_wr(gb, 0xd98b, A);  // ld ($d98b),a
-  RET(0x4086); return;  // ret
-}
-
-// 16:4087
-void func_4087(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4087, 3); A = mem_rd(gb, 0xffbb);  // ldh a,($ffbb)
-  I(0x4089, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x408a); return; } I(0x408a, 2);  // ret z
-  I(0x408b, 2); A = 0x01;  // ld a,$01
-  I(0x408d, 4); mem_wr(gb, 0xd98b, A);  // ld ($d98b),a
-  I(0x4090, 1); alu_xor(gb, A);  // xor a
-  I(0x4091, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  I(0x4093, 3); mem_wr(gb, 0xffbb, A);  // ldh ($ffbb),a
-  RET(0x4095); return;  // ret
-}
-
-// 16:4096
-void func_4096(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4096, waitForSerialByte, 0x41dc, 0x4099);  // call $41dc
-  I(0x4099, 2); alu_cp(gb, 0x80);  // cp $80
-  if ((F & FZ)) { I(0x409b, 4); if (hook_enabled_at(0x0c7e)) { disableSerialPort_hook(gb); return; } HANDOFF(0x0c7e); } I(0x409b, 3);  // jp z,$0c7e
-  I(0x409e, 4); prepareForNextPacket(gb); return;  // jp $4269
-}
-
-// 16:40a1
-void disableSerialIfByteReceived(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x40a1, waitForSerialByte, 0x41dc, 0x40a4);  // call $41dc
-  I(0x40a4, 4); if (hook_enabled_at(0x0c7e)) { disableSerialPort_hook(gb); return; } HANDOFF(0x0c7e);  // jp $0c7e
-}
-
-// 16:40a7
-void receivePacketByte(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x40a7, 1); alu_xor(gb, A);  // xor a
-  I(0x40a8, 4); mem_wr(gb, 0xd98b, A);  // ld ($d98b),a
-  CALL(0x40ab, waitForSerialByte, 0x41dc, 0x40ae);  // call $41dc
-  I(0x40ae, 2); alu_cp(gb, 0x80);  // cp $80
-  if ((F & FZ)) { RET_TAKEN(0x40b0); return; } I(0x40b0, 2);  // ret z
-  I(0x40b1, 4); A = mem_rd(gb, 0xd981);  // ld a,($d981)
-  I(0x40b4, 1); B = A;  // ld b,a
-  I(0x40b5, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x40b6, 3); goto L_40d7; } I(0x40b6, 2);  // jr nz,$40d7
-  I(0x40b8, 3); A = mem_rd(gb, 0xffbc);  // ldh a,($ffbc)
-  I(0x40ba, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { I(0x40bc, 3); goto L_40c1; } I(0x40bc, 2);  // jr z,$40c1
-  I(0x40be, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x40bf, 3); goto L_40d4; } I(0x40bf, 2);  // jr nz,$40d4
-L_40c1:
-  I(0x40c1, 4); A = mem_rd(gb, 0xd985);  // ld a,($d985)
-  I(0x40c4, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x40c5); return; } I(0x40c5, 2);  // ret nz
-  I(0x40c6, 3); SET_HL(0xd984);  // ld hl,$d984
-  I(0x40c9, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x40ca); return; } I(0x40ca, 2);  // ret nz
-  I(0x40cb, 2); A = 0x86;  // ld a,$86
-  I(0x40cd, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x40cf, 1); alu_xor(gb, A);  // xor a
-  I(0x40d0, 4); mem_wr(gb, 0xd988, A);  // ld ($d988),a
-  RET(0x40d3); return;  // ret
-L_40d4:
-  I(0x40d4, 4); mem_wr(gb, 0xd987, A);  // ld ($d987),a
-L_40d7:
-  I(0x40d7, 3); SET_HL(0xd987);  // ld hl,$d987
-  I(0x40da, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x40db, 3); goto L_40f3; } I(0x40db, 2);  // jr nz,$40f3
-  I(0x40dd, 3); A = mem_rd(gb, 0xffbc);  // ldh a,($ffbc)
-  I(0x40df, 3); SET_HL(0xd982);  // ld hl,$d982
-  I(0x40e2, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if ((F & FZ)) { I(0x40e3, 3); goto L_40e9; } I(0x40e3, 2);  // jr z,$40e9
-  I(0x40e5, 2); A = 0x81;  // ld a,$81
-  I(0x40e7, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-L_40e9:
-  I(0x40e9, 1); alu_xor(gb, A);  // xor a
-  I(0x40ea, 4); mem_wr(gb, 0xd988, A);  // ld ($d988),a
-  I(0x40ed, 4); mem_wr(gb, 0xd984, A);  // ld ($d984),a
-  I(0x40f0, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  RET(0x40f2); return;  // ret
-L_40f3:
-  I(0x40f3, 1); A = B;  // ld a,b
-  I(0x40f4, 3); SET_DE(0xd9e5);  // ld de,$d9e5
-  CALL(0x40f7, addAToDe_hook, 0x0068, 0x40fa);  // call $0068
-  I(0x40fa, 1); A = B;  // ld a,b
-  I(0x40fb, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x40fc, 4); mem_wr(gb, 0xd981, A);  // ld ($d981),a
-  I(0x40ff, 3); A = mem_rd(gb, 0xffbc);  // ldh a,($ffbc)
-  I(0x4101, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4102, 3); SET_HL(0xd982);  // ld hl,$d982
-  I(0x4105, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  I(0x4106, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4107, 1); alu_xor(gb, A);  // xor a
-  I(0x4108, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  I(0x410a, 4); mem_wr(gb, 0xd984, A);  // ld ($d984),a
-  RET(0x410d); return;  // ret
-}
-
-// 16:40d4
-void receivePacketByte__gotPacketLength(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_40d4:
-  I(0x40d4, 4); mem_wr(gb, 0xd987, A);  // ld ($d987),a
-L_40d7:
-  I(0x40d7, 3); SET_HL(0xd987);  // ld hl,$d987
-  I(0x40da, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x40db, 3); goto L_40f3; } I(0x40db, 2);  // jr nz,$40f3
-  I(0x40dd, 3); A = mem_rd(gb, 0xffbc);  // ldh a,($ffbc)
-  I(0x40df, 3); SET_HL(0xd982);  // ld hl,$d982
-  I(0x40e2, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if ((F & FZ)) { I(0x40e3, 3); goto L_40e9; } I(0x40e3, 2);  // jr z,$40e9
-  I(0x40e5, 2); A = 0x81;  // ld a,$81
-  I(0x40e7, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-L_40e9:
-  I(0x40e9, 1); alu_xor(gb, A);  // xor a
-  I(0x40ea, 4); mem_wr(gb, 0xd988, A);  // ld ($d988),a
-  I(0x40ed, 4); mem_wr(gb, 0xd984, A);  // ld ($d984),a
-  I(0x40f0, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  RET(0x40f2); return;  // ret
-L_40f3:
-  I(0x40f3, 1); A = B;  // ld a,b
-  I(0x40f4, 3); SET_DE(0xd9e5);  // ld de,$d9e5
-  CALL(0x40f7, addAToDe_hook, 0x0068, 0x40fa);  // call $0068
-  I(0x40fa, 1); A = B;  // ld a,b
-  I(0x40fb, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x40fc, 4); mem_wr(gb, 0xd981, A);  // ld ($d981),a
-  I(0x40ff, 3); A = mem_rd(gb, 0xffbc);  // ldh a,($ffbc)
-  I(0x4101, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4102, 3); SET_HL(0xd982);  // ld hl,$d982
-  I(0x4105, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  I(0x4106, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4107, 1); alu_xor(gb, A);  // xor a
-  I(0x4108, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  I(0x410a, 4); mem_wr(gb, 0xd984, A);  // ld ($d984),a
-  RET(0x410d); return;  // ret
-}
-
-// 16:40d7
-void receivePacketByte__gotPacketByte(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_40d7:
-  I(0x40d7, 3); SET_HL(0xd987);  // ld hl,$d987
-  I(0x40da, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { I(0x40db, 3); goto L_40f3; } I(0x40db, 2);  // jr nz,$40f3
-  I(0x40dd, 3); A = mem_rd(gb, 0xffbc);  // ldh a,($ffbc)
-  I(0x40df, 3); SET_HL(0xd982);  // ld hl,$d982
-  I(0x40e2, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if ((F & FZ)) { I(0x40e3, 3); goto L_40e9; } I(0x40e3, 2);  // jr z,$40e9
-  I(0x40e5, 2); A = 0x81;  // ld a,$81
-  I(0x40e7, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-L_40e9:
-  I(0x40e9, 1); alu_xor(gb, A);  // xor a
-  I(0x40ea, 4); mem_wr(gb, 0xd988, A);  // ld ($d988),a
-  I(0x40ed, 4); mem_wr(gb, 0xd984, A);  // ld ($d984),a
-  I(0x40f0, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  RET(0x40f2); return;  // ret
-L_40f3:
-  I(0x40f3, 1); A = B;  // ld a,b
-  I(0x40f4, 3); SET_DE(0xd9e5);  // ld de,$d9e5
-  CALL(0x40f7, addAToDe_hook, 0x0068, 0x40fa);  // call $0068
-  I(0x40fa, 1); A = B;  // ld a,b
-  I(0x40fb, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x40fc, 4); mem_wr(gb, 0xd981, A);  // ld ($d981),a
-  I(0x40ff, 3); A = mem_rd(gb, 0xffbc);  // ldh a,($ffbc)
-  I(0x4101, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4102, 3); SET_HL(0xd982);  // ld hl,$d982
-  I(0x4105, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  I(0x4106, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4107, 1); alu_xor(gb, A);  // xor a
-  I(0x4108, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  I(0x410a, 4); mem_wr(gb, 0xd984, A);  // ld ($d984),a
-  RET(0x410d); return;  // ret
-}
-
-// 16:40f3
-void receivePacketByte__getNextByte(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_40f3:
-  I(0x40f3, 1); A = B;  // ld a,b
-  I(0x40f4, 3); SET_DE(0xd9e5);  // ld de,$d9e5
-  CALL(0x40f7, addAToDe_hook, 0x0068, 0x40fa);  // call $0068
-  I(0x40fa, 1); A = B;  // ld a,b
-  I(0x40fb, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x40fc, 4); mem_wr(gb, 0xd981, A);  // ld ($d981),a
-  I(0x40ff, 3); A = mem_rd(gb, 0xffbc);  // ldh a,($ffbc)
-  I(0x4101, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4102, 3); SET_HL(0xd982);  // ld hl,$d982
-  I(0x4105, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  I(0x4106, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4107, 1); alu_xor(gb, A);  // xor a
-  I(0x4108, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
-  I(0x410a, 4); mem_wr(gb, 0xd984, A);  // ld ($d984),a
-  RET(0x410d); return;  // ret
-}
-
 // 16:410e
 void FFBE_04(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -443,7 +148,7 @@ void receiveLinkState06(GB *gb) {
 // 16:4186
 void sendFileHeader(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4186, prepareForNextPacket, 0x4269, 0x4189);  // call $4269
+  CALL(0x4186, prepareForNextPacket_hook, 0x4269, 0x4189);  // call $4269
   I(0x4189, 3); SET_HL(0xd9e5);  // ld hl,$d9e5
   I(0x418c, 2); A = 0x21;  // ld a,$21
   I(0x418e, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
@@ -500,7 +205,7 @@ L_41c2:
   I(0x41d3, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x41d4, 2); A = 0x01;  // ld a,$01
   I(0x41d6, 4); mem_wr(gb, 0xd988, A);  // ld ($d988),a
-  I(0x41d9, 4); sendPacketByte(gb); return;  // jp $4049
+  I(0x41d9, 4); if (hook_enabled_at(0x4049)) { sendPacketByte_hook(gb); return; } HANDOFF(0x4049);  // jp $4049
 }
 
 // 16:41dc
@@ -631,54 +336,6 @@ L_4264:
   RET(0x4268); return;  // ret
 }
 
-// 16:4269
-void prepareForNextPacket(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4269, 3); A = mem_rd(gb, 0xffbf);  // ldh a,($ffbf)
-  I(0x426b, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x426c, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  func_426e(gb); return;  // fallthrough
-}
-
-// 16:426e
-void func_426e(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x426e, 1); alu_xor(gb, A);  // xor a
-  I(0x426f, 4); mem_wr(gb, 0xd981, A);  // ld ($d981),a
-  I(0x4272, 3); mem_wr(gb, 0xffbd, A);  // ldh ($ffbd),a
-  I(0x4274, 4); mem_wr(gb, 0xd982, A);  // ld ($d982),a
-  I(0x4277, 4); mem_wr(gb, 0xd984, A);  // ld ($d984),a
-  I(0x427a, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x427b, 4); mem_wr(gb, 0xd988, A);  // ld ($d988),a
-  I(0x427e, 3); setLinkTimerTo180(gb); return;  // jr $4202
-}
-
-// 16:4280
-void waitForNextPacket(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4280, func_4043, 0x4043, 0x4283);  // call $4043
-  CALL(0x4283, returnIfPacketNotComplete, 0x44d7, 0x4286);  // call $44d7
-  I(0x4286, 4); A = mem_rd(gb, 0xd986);  // ld a,($d986)
-  I(0x4289, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x428a, 3); prepareForNextPacket(gb); return; } I(0x428a, 2);  // jr z,$4269
-  I(0x428c, 3); A = mem_rd(gb, 0xffbf);  // ldh a,($ffbf)
-  I(0x428e, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x428f, 3); mem_wr(gb, 0xffbf, A);  // ldh ($ffbf),a
-  I(0x4291, 3); func_426e(gb); return;  // jr $426e
-}
-
-// 16:4293
-void func_4293(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4293, receivePacketByte, 0x40a7, 0x4296);  // call $40a7
-  CALL(0x4296, returnIfPacketNotComplete, 0x44d7, 0x4299);  // call $44d7
-  I(0x4299, 3); SET_HL(0xd98d);  // ld hl,$d98d
-  I(0x429c, 3); SET_DE(0xd9ee);  // ld de,$d9ee
-  I(0x429f, 2); B = 0x07;  // ld b,$07
-  CALL(0x42a1, copyMemoryReverse_hook, 0x047f, 0x42a4);  // call $047f
-  I(0x42a4, 4); sendAckPacket(gb); return;  // jp $43f5
-}
-
 // 16:42a7
 void receiveLinkState0b(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -689,7 +346,7 @@ void receiveLinkState0b(GB *gb) {
   I(0x42af, 1); A = alu_inc8(gb, A);  // inc a
 L_42b0:
   I(0x42b0, 4); mem_wr(gb, 0xd985, A);  // ld ($d985),a
-  CALL(0x42b3, receivePacketByte, 0x40a7, 0x42b6);  // call $40a7
+  CALL(0x42b3, receivePacketByte_hook, 0x40a7, 0x42b6);  // call $40a7
   I(0x42b6, 4); A = mem_rd(gb, 0xd988);  // ld a,($d988)
   I(0x42b9, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x42ba); return; } I(0x42ba, 2);  // ret nz
@@ -717,7 +374,7 @@ void func_42c5(GB *gb) {
 // 16:42de
 void receiveLinkState10(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x42de, prepareForNextPacket, 0x4269, 0x42e1);  // call $4269
+  CALL(0x42de, prepareForNextPacket_hook, 0x4269, 0x42e1);  // call $4269
   I(0x42e1, 3); SET_HL(0xd98d);  // ld hl,$d98d
   I(0x42e4, 3); SET_DE(0xc616);  // ld de,$c616
   I(0x42e7, 2); B = 0x08;  // ld b,$08
@@ -728,7 +385,7 @@ void receiveLinkState10(GB *gb) {
 // 16:42ee
 void gameLinkState08(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x42ee, prepareForNextPacket, 0x4269, 0x42f1);  // call $4269
+  CALL(0x42ee, prepareForNextPacket_hook, 0x4269, 0x42f1);  // call $4269
   I(0x42f1, 3); SET_HL(0xd9e5);  // ld hl,$d9e5
   I(0x42f4, 2); A = 0x03;  // ld a,$03
   I(0x42f6, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
@@ -738,36 +395,36 @@ void gameLinkState08(GB *gb) {
   I(0x42fc, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x42fd, 2); A = 0x01;  // ld a,$01
   I(0x42ff, 4); mem_wr(gb, 0xd988, A);  // ld ($d988),a
-  I(0x4302, 4); sendPacketByte(gb); return;  // jp $4049
+  I(0x4302, 4); if (hook_enabled_at(0x4049)) { sendPacketByte_hook(gb); return; } HANDOFF(0x4049);  // jp $4049
 }
 
 // 16:4305
 void gameLinkState09(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4305, func_4043, 0x4043, 0x4308);  // call $4043
+  CALL(0x4305, func_4043_hook, 0x4043, 0x4308);  // call $4043
   CALL(0x4308, returnIfPacketNotComplete, 0x44d7, 0x430b);  // call $44d7
-  I(0x430b, 4); prepareForNextPacket(gb); return;  // jp $4269
+  I(0x430b, 4); if (hook_enabled_at(0x4269)) { prepareForNextPacket_hook(gb); return; } HANDOFF(0x4269);  // jp $4269
 }
 
 // 16:430e
 void receiveLinkState13(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x430e, receivePacketByte, 0x40a7, 0x4311);  // call $40a7
+  CALL(0x430e, receivePacketByte_hook, 0x40a7, 0x4311);  // call $40a7
   CALL(0x4311, returnIfPacketNotComplete, 0x44d7, 0x4314);  // call $44d7
   I(0x4314, 3); A = mem_rd(gb, 0xffbd);  // ldh a,($ffbd)
   I(0x4316, 2); alu_cp(gb, 0x81);  // cp $81
-  if ((F & FZ)) { I(0x4318, 4); prepareForNextPacket(gb); return; } I(0x4318, 3);  // jp z,$4269
+  if ((F & FZ)) { I(0x4318, 4); if (hook_enabled_at(0x4269)) { prepareForNextPacket_hook(gb); return; } HANDOFF(0x4269); } I(0x4318, 3);  // jp z,$4269
   I(0x431b, 3); SET_HL(0xd98d);  // ld hl,$d98d
   I(0x431e, 3); SET_DE(0xd9e6);  // ld de,$d9e6
   I(0x4321, 2); B = 0x08;  // ld b,$08
   CALL(0x4323, copyMemoryReverse_hook, 0x047f, 0x4326);  // call $047f
-  I(0x4326, 4); prepareForNextPacket(gb); return;  // jp $4269
+  I(0x4326, 4); if (hook_enabled_at(0x4269)) { prepareForNextPacket_hook(gb); return; } HANDOFF(0x4269);  // jp $4269
 }
 
 // 16:4329
 void gameLinkState0f(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4329, receivePacketByte, 0x40a7, 0x432c);  // call $40a7
+  CALL(0x4329, receivePacketByte_hook, 0x40a7, 0x432c);  // call $40a7
   CALL(0x432c, returnIfPacketNotComplete, 0x44d7, 0x432f);  // call $44d7
   I(0x432f, 3); SET_HL(0xc616);  // ld hl,$c616
   I(0x4332, 3); SET_DE(0xd9e6);  // ld de,$d9e6
@@ -790,7 +447,7 @@ L_4337:
 // 16:434d
 void gameLinkState12(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x434d, prepareForNextPacket, 0x4269, 0x4350);  // call $4269
+  CALL(0x434d, prepareForNextPacket_hook, 0x4269, 0x4350);  // call $4269
   func_4350(gb); return;  // fallthrough
 }
 
@@ -815,7 +472,7 @@ L_435e:
   I(0x4367, 2); mem_wr(gb, DE, A);  // ld (de),a
   I(0x4368, 2); A = 0x01;  // ld a,$01
   I(0x436a, 4); mem_wr(gb, 0xd988, A);  // ld ($d988),a
-  I(0x436d, 4); sendPacketByte(gb); return;  // jp $4049
+  I(0x436d, 4); if (hook_enabled_at(0x4049)) { sendPacketByte_hook(gb); return; } HANDOFF(0x4049);  // jp $4049
 }
 
 // 16:4370
@@ -844,14 +501,14 @@ void func_438e(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x438e, func_439a, 0x439a, 0x4391);  // call $439a
   CALL(0x4391, returnIfPacketNotComplete, 0x44d7, 0x4394);  // call $44d7
-  CALL(0x4394, prepareForNextPacket, 0x4269, 0x4397);  // call $4269
+  CALL(0x4394, prepareForNextPacket_hook, 0x4269, 0x4397);  // call $4269
   I(0x4397, 4); func_4036(gb); return;  // jp $4036
 }
 
 // 16:439a
 void func_439a(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x439a, receivePacketByte, 0x40a7, 0x439d);  // call $40a7
+  CALL(0x439a, receivePacketByte_hook, 0x40a7, 0x439d);  // call $40a7
   I(0x439d, 4); A = mem_rd(gb, 0xd988);  // ld a,($d988)
   I(0x43a0, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { RET_TAKEN(0x43a1); return; } I(0x43a1, 2);  // ret nz
@@ -889,7 +546,7 @@ void func_43bd(GB *gb) {
 // 16:43c5
 void gameLinkState0c(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x43c5, prepareForNextPacket, 0x4269, 0x43c8);  // call $4269
+  CALL(0x43c5, prepareForNextPacket_hook, 0x4269, 0x43c8);  // call $4269
   I(0x43c8, 3); SET_HL(0xd9e5);  // ld hl,$d9e5
   I(0x43cb, 2); A = 0x04;  // ld a,$04
   I(0x43cd, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
@@ -901,7 +558,7 @@ void gameLinkState0c(GB *gb) {
   I(0x43d7, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x43d8, 2); A = 0x01;  // ld a,$01
   I(0x43da, 4); mem_wr(gb, 0xd988, A);  // ld ($d988),a
-  I(0x43dd, 4); sendPacketByte(gb); return;  // jp $4049
+  I(0x43dd, 4); if (hook_enabled_at(0x4049)) { sendPacketByte_hook(gb); return; } HANDOFF(0x4049);  // jp $4049
 }
 
 // 16:43e0
@@ -930,7 +587,7 @@ void sendAckPacket(GB *gb) {
 // 16:43fc
 void setPacketBuffer(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x43fc, prepareForNextPacket, 0x4269, 0x43ff);  // call $4269
+  CALL(0x43fc, prepareForNextPacket_hook, 0x4269, 0x43ff);  // call $4269
   I(0x43ff, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x4400, 1); B = A;  // ld b,a
   I(0x4401, 3); SET_DE(0xd9e5);  // ld de,$d9e5
@@ -940,7 +597,7 @@ L_4404:
   I(0x4406, 2); SET_DE(DE + 1);  // inc de
   I(0x4407, 1); B = alu_dec8(gb, B);  // dec b
   if (!(F & FZ)) { I(0x4408, 3); goto L_4404; } I(0x4408, 2);  // jr nz,$4404
-  I(0x440a, 4); sendPacketByte(gb); return;  // jp $4049
+  I(0x440a, 4); if (hook_enabled_at(0x4049)) { sendPacketByte_hook(gb); return; } HANDOFF(0x4049);  // jp $4049
 }
 
 // 16:440d
@@ -950,7 +607,7 @@ void gameLink_getFile1(GB *gb) {
   I(0x440f, 3); goto L_4417;  // jr $4417
 L_4417:
   I(0x4417, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  CALL(0x4419, receivePacketByte, 0x40a7, 0x441c);  // call $40a7
+  CALL(0x4419, receivePacketByte_hook, 0x40a7, 0x441c);  // call $40a7
   CALL(0x441c, returnIfPacketNotComplete, 0x44d7, 0x441f);  // call $44d7
   I(0x441f, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x4421, 3); SET_HL(0xda05);  // ld hl,$da05
@@ -1025,7 +682,7 @@ void gameLink_getFile2(GB *gb) {
   I(0x4413, 3); goto L_4417;  // jr $4417
 L_4417:
   I(0x4417, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  CALL(0x4419, receivePacketByte, 0x40a7, 0x441c);  // call $40a7
+  CALL(0x4419, receivePacketByte_hook, 0x40a7, 0x441c);  // call $40a7
   CALL(0x441c, returnIfPacketNotComplete, 0x44d7, 0x441f);  // call $44d7
   I(0x441f, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x4421, 3); SET_HL(0xda05);  // ld hl,$da05
@@ -1098,7 +755,7 @@ void gameLink_getFile3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x4415, 2); A = 0x02;  // ld a,$02
   I(0x4417, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  CALL(0x4419, receivePacketByte, 0x40a7, 0x441c);  // call $40a7
+  CALL(0x4419, receivePacketByte_hook, 0x40a7, 0x441c);  // call $40a7
   CALL(0x441c, returnIfPacketNotComplete, 0x44d7, 0x441f);  // call $44d7
   I(0x441f, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   I(0x4421, 3); SET_HL(0xda05);  // ld hl,$da05

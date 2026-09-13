@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 3,191 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 3,221 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -253,6 +253,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   cutscene root, and five bank-5 Link movement/wall helpers. Fifteen parent-owned local rows
   disappeared; bank 6 is now fully readable and its generated C file is deleted. The project now
   has 3,191 readable hooks out of 11,813.
+  Batch 149 added ten Maple collection/drop helpers, ten Ricky state-5/state-8 movement and hazard
+  helpers, and ten bank-16 serial packet helpers. Thirty-six parent-owned local/data rows
+  disappeared; the project now has 3,221 readable hooks out of 11,777.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -358,6 +361,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 149 (30 routines): added ten Maple item collection,
+  drop, bounds, animation, and bomb-search helpers; ten Ricky state-5/state-8 movement, punch,
+  landing, hazard, and screen-edge helpers; and ten bank-16 serial packet send/receive helpers.
+  Thirty-six parent-owned local/data rows were absorbed. Two independent instruction reviews per
+  routine fixed three Ricky sound calls and six serial wait/completion calls that had been
+  classified as interpreter calls even though the transliterator emitted smart calls; the latter
+  also required entry-stack captures to preserve their intentional caller-frame escapes. The
+  project now has 3,221 readable hooks out of 11,777. Gates: lint 0, 30k verify 0 failures across
+  4,584,109 calls with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches
+  across 11,707,471 calls with state `a62ae98192befee8`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 148 (26 routines): added ten Maple roots, ten Ricky roots,
   the final bank-6 Link cutscene root, and five bank-5 Link movement and adjacent-wall helpers.
   Fifteen parent-owned local rows were absorbed, including Ricky's internal dispatcher and eight
