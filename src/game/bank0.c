@@ -6370,7 +6370,7 @@ void dismountCompanionAndSetRememberedPositionToScreenCenter_hook(GB *gb) {
   A = D;
   CYC(0x3441, 0x3444); H8(hActiveObject) = A;
   CALL_C(0x3444, companionDismount_hook, 0x4630, 0x3447);
-  CALL_ROM(0x3447, ROM_b05_saveLinkLocalRespawnAndCompanionPosition);
+  CALL_C(0x3447, saveLinkLocalRespawnAndCompanionPosition_hook, 0x467c, 0x344a);
   A = 0x38;
   CYC(0x344a, 0x344f); W8(wRememberedCompanionY) = A;
   A = 0x50;

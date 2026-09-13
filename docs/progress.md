@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,978 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 3,004 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -224,6 +224,10 @@ Updated 2026-09-13. Newest entries at the top of each section.
   bank-7 sword, shovel, punch, sword-beam, dust, ore, and magnet-ball item roots, and the bank-3F
   monkey interaction root with its durable post-graphics continuation. Forty-nine parent-owned
   local rows disappeared; the project now has 2,978 readable hooks out of 12,314.
+  Batch 141 added ten more bank-5 companion position, respawn, cliff, mounting, and spawn helpers,
+  ten bank-7 item post-update and animation helpers, and the final six bank-3F executable entries.
+  Twelve parent-owned helper/data rows disappeared; bank 3F is now fully readable and its generated
+  C file is deleted. The project now has 3,004 readable hooks out of 12,302.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -329,6 +333,17 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 141 (26 routines): added ten bank-5 companion position,
+  respawn, cliff, mounting, and spawn helpers; added ten bank-7 item post-update and animation
+  helpers across switch-hook, seed-shooter, minecart-collision, and shared post-update sources; and
+  completed the final six bank-3F executable entries. Twelve parent-owned helper/data rows were
+  absorbed or removed. `func_7cc7` is NOVERIFY because its `$33a2` call can switch threads, while
+  its durable `$7cce` continuation remains verifiable. Integration upgraded the remaining old
+  bank-0 companion save-position caller to `CALL_C`. Two independent instruction reviews per
+  routine found no defects. Bank 3F is fully readable and `gen_bank3f.c` is deleted; the project
+  now has 3,004 readable hooks out of 12,302. Gates: lint 0, 30k verify 0 failures across 4,610,939
+  calls with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches across
+  11,815,617 calls with state `a62ae98192befee8`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 140 (19 hook entries, 21 named shims): added ten bank-5
   companion weapon, direction, mounting, hazard, and dismount helpers; added nine bank-7 item
   entry shims covering the sword, Biggoron Sword/Fool's Ore alias, shovel, punch alias,
