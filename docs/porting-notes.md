@@ -909,3 +909,9 @@ desync to discover; keep them when porting routines.
   used the default bank-0 `CYCT` macro and burned unrelated ROM bytes. Independent review found the
   missing definition on a cold path that replay did not exercise. Define and `#undef` both macros
   together at every source file's bank boundary, even if the file has only one conditional jump.
+- Repeated loop bodies need a one-to-one instruction inventory, not only matching endpoints.
+  Batch 144's first switch-hook position-copy loop emitted the `$59d4` `inc e` twice with the same
+  `CYC(0x59d4, 0x59d5)` burn. The surrounding loop bounds, final address, and compilation all looked
+  valid, but the extra register mutation changed which six bytes were copied. Independent review
+  found it by checking each disassembly instruction exactly once; audit compact loops in source
+  order and flag duplicate address ranges even when their byte spans themselves are valid.

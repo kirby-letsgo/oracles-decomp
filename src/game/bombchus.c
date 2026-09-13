@@ -12,6 +12,7 @@ void bombchuCheckWallsAndApplySpeed_hook(GB *gb);
 void bombchuUpdateAngle_topDown_hook(GB *gb);
 void bombchuSetAnimationFromAngle_hook(GB *gb);
 void bombchuUpdateAngle_sidescrolling_hook(GB *gb);
+void bombchuClearCounter2AndInitializeExplosion_hook(GB *gb);
 
 static void bombchu_add_a_to_hl(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -422,5 +423,116 @@ void bombchuCountdownToExplosion_hook(GB *gb) {
   CALL_C(0x540f, itemDecCounter2_hook, 0x23db, 0x5412);
   if (!(F & FZ)) { CYCT(0x5412, 0x5413); ret_effect(gb); return; }
   CYC(0x5412, 0x5413);
-  bombchuClearCounter2AndInitializeExplosion(gb);
+  bombchuClearCounter2AndInitializeExplosion_hook(gb);
+}
+
+void bombchuClearCounter2AndInitializeExplosion_hook(GB *gb) {
+  CYC(0x5413, 0x5415); E = 0x07;
+  CYC(0x5415, 0x5416); alu_xor(gb, A);
+  CYC(0x5416, 0x5417); mem_wr(gb, DE, A);
+  CYC(0x5417, 0x541a);
+  itemInitializeBombExplosion_hook(gb);
+}
+
+void bombchuCheckCollidedWithTarget_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x541a, 0x541c); A = 0x29;
+  CALL_C(0x541c, objectGetRelatedObject2Var_hook, 0x2164, 0x541f);
+  CYC(0x541f, 0x5420); A = mem_rd(gb, HL);
+  CYC(0x5420, 0x5421); alu_or(gb, A);
+  CYC(0x5421, 0x5422); alu_scf(gb);
+  if (F & FZ) { CYCT(0x5422, 0x5423); ret_effect(gb); return; }
+  CYC(0x5422, 0x5423);
+  CYC(0x5423, 0x5426);
+  checkObjectsCollided_hook(gb);
+}
+
+static void bombchu_increase_vision_radius(GB *gb) {
+  CYC(0x5481, 0x5483); E = 0x26;
+  CYC(0x5483, 0x5484); A = mem_rd(gb, DE);
+  CYC(0x5484, 0x5486); alu_add(gb, 0x10);
+  CYC(0x5486, 0x5488); alu_cp(gb, 0x60);
+  if (F & FC) {
+    CYCT(0x5488, 0x548a);
+  } else {
+    CYC(0x5488, 0x548a);
+    CYC(0x548a, 0x548c); A = 0x18;
+  }
+  CYC(0x548c, 0x548d); mem_wr(gb, DE, A);
+  CYC(0x548d, 0x548e); E = alu_inc8(gb, E);
+  CYC(0x548e, 0x548f); mem_wr(gb, DE, A);
+  CYC(0x548f, 0x5490); ret_effect(gb);
+}
+
+void bombchuCheckForEnemyTarget_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x5426, 0x5428); E = 0x30;
+  CYC(0x5428, 0x5429); A = mem_rd(gb, DE);
+  CYC(0x5429, 0x542a); H = A;
+  CYC(0x542a, 0x542c); L = 0x80;
+  CYC(0x542c, 0x542d); A = mem_rd(gb, HL);
+  CYC(0x542d, 0x542e); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x542e, 0x5430); goto next_target; }
+  CYC(0x542e, 0x5430);
+  CYC(0x5430, 0x5432); L = 0x9a;
+  CYC(0x5432, 0x5434); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(0x5434, 0x5436); goto next_target; }
+  CYC(0x5434, 0x5436);
+  CYC(0x5436, 0x5438); L = 0x81;
+  CYC(0x5438, 0x5439); A = mem_rd(gb, HL);
+  CYC(0x5439, 0x543a); push_effect(gb, HL);
+  CYC(0x543a, 0x543d); SET_HL(0x5490);
+  CALL_C(0x543d, checkFlag_hook, 0x0205, 0x5440);
+  CYC(0x5440, 0x5441); SET_HL(pop_effect(gb));
+  if (F & FZ) { CYCT(0x5441, 0x5443); goto next_target; }
+  CYC(0x5441, 0x5443);
+  CALL_C(0x5443, checkObjectsCollided_hook, 0x1d5a, 0x5446);
+  if (!(F & FC)) { CYCT(0x5446, 0x5448); goto next_target; }
+  CYC(0x5446, 0x5448);
+  CYC(0x5448, 0x5449); A = H;
+  CYC(0x5449, 0x544a); H = D;
+  CYC(0x544a, 0x544c); L = 0x19;
+  CYC(0x544c, 0x544d); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x544d, 0x544f); mem_wr(gb, HL, 0x80);
+  CYC(0x544f, 0x5451); L = 0x26;
+  CYC(0x5451, 0x5453); A = 0x06;
+  CYC(0x5453, 0x5454); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x5454, 0x5455); mem_wr(gb, HL, A);
+  CYC(0x5455, 0x5457); L = 0x06;
+  CYC(0x5457, 0x5459); mem_wr(gb, HL, 0x0c);
+  CYC(0x5459, 0x545b); L = 0x11;
+  CYC(0x545b, 0x545d); mem_wr(gb, HL, 0x46);
+  CYC(0x545d, 0x545f); L = 0x04;
+  CYC(0x545f, 0x5460); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x5460, 0x5463); A = W8(wTilesetFlags);
+  CYC(0x5463, 0x5465); alu_and(gb, 0x20);
+  if (!(F & FZ)) {
+    CYCT(0x5465, 0x5467);
+    CALL_C(0x546c, bombchuUpdateAngle_sidescrolling_hook, 0x539e, 0x546f);
+    CYC(0x546f, 0x5470); alu_xor(gb, A);
+    CYC(0x5470, 0x5471); ret_effect(gb);
+    return;
+  }
+  CYC(0x5465, 0x5467);
+  CALL_C(0x5467, bombchuUpdateAngle_topDown_hook, 0x5361, 0x546a);
+  CYC(0x546a, 0x546b); alu_xor(gb, A);
+  CYC(0x546b, 0x546c); ret_effect(gb);
+  return;
+
+next_target:
+  CYC(0x5471, 0x5472); H = alu_inc8(gb, H);
+  CYC(0x5472, 0x5473); A = H;
+  CYC(0x5473, 0x5475); alu_cp(gb, 0xe0);
+  if (F & FC) {
+    CYCT(0x5475, 0x5477);
+  } else {
+    CYC(0x5475, 0x5477);
+    CYC(0x5477, 0x547a); push_effect(gb, 0x547a);
+    bombchu_increase_vision_radius(gb);
+    CYC(0x547a, 0x547c); A = 0xd0;
+  }
+  CYC(0x547c, 0x547e); E = 0x30;
+  CYC(0x547e, 0x547f); mem_wr(gb, DE, A);
+  CYC(0x547f, 0x5480); alu_or(gb, D);
+  CYC(0x5480, 0x5481); ret_effect(gb);
 }
