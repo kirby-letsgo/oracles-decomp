@@ -819,3 +819,9 @@ desync to discover; keep them when porting routines.
   checking their readiness reports showed that all four were zero-caller branch targets wholly
   contained in the new structured C. Let those rows disappear. Only locals with independent
   incoming execution or required continuation semantics need `extra.sym` aliases.
+- Promoting a callee can change an already-readable caller's report from an unported call to a
+  smart call. Batch 127 made bank-3F `loadTreasureDisplayData` readable, but its bank-0 wrapper
+  still used `CALL_ROM`; instruction review caught the stale edge before replay. Re-run or audit
+  callers of every newly readable cross-bank target, capture `sp0_`, and replace the interpreter
+  call with `CALL_C` so normal execution reaches the callee's readable hook while verify mode still
+  compares against the exact ROM address.

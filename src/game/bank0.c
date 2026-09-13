@@ -11423,10 +11423,11 @@ void loadWeaponGfx_b00_hook(GB *gb) {
 }
 
 void loadTreasureDisplayData_b00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   L = A;
   CYC(0x16d6, 0x16d7);
   bank3f_push(gb, 0x16d7);
-  CALL_ROM(0x16e1, ROM_b3f_loadTreasureDisplayData);
+  CALL_C(0x16e1, loadTreasureDisplayData_b3f_hook, ROM_b3f_loadTreasureDisplayData, 0x16e4);
   bank_pop_af(gb, 0x16e4);
   CYC(0x16ea, 0x16eb);
   ret_effect(gb);

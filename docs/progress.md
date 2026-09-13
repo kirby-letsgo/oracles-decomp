@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,653 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,680 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -175,6 +175,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   continued bank-3F graphics allocation and interaction-data lookup, and added isolated treasure
   helpers from banks 3F and 16. Four zero-caller internal labels were absorbed into their readable
   parents, leaving 2,653 readable hooks out of 12,637.
+  Batch 127 added the bank-6 parent-item, interactable-tile, and breakable-tile helpers, the first
+  bank-7 collision effects, and the bank-3F ring inventory, treasure-display, and gasha-maturity
+  paths. Three internal/data rows disappeared, leaving 2,680 readable hooks out of 12,634.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -280,6 +283,18 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 127 (27 routines): added parent-item initialization,
+  shop input, parent clearing, pushing counters, tile-offset checks, and breakable-tile interaction
+  creation in bank 6; the first nine collision-effect entries and shared damage tails in bank 7;
+  and ring realignment, inventory insertion, treasure-display lookup, and gasha-maturity handling
+  in bank 3F. Three callable local helpers gained durable aliases, while two internal inventory
+  blocks and one inline data row correctly left the registry. Independent review found and fixed
+  the bank-0 treasure-display wrapper's stale `CALL_ROM`, changing it to the smart `CALL_C` now
+  required for its readable bank-3F target; a second review verified the correction and found no
+  analogous callers. The project now has 2,680 readable hooks out of 12,634. Gates: lint 0, 30k
+  verify 0 failures across 4,685,369 calls with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches across 12,848,391 calls with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 126 (19 routines): completed the bank-7
   `fileManagementFunction` dispatcher and its initialize/save/load/erase paths, the bank-3F object
   graphics insertion and interaction-data lookup paths, and five isolated treasure helpers in

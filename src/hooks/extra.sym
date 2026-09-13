@@ -889,3 +889,6 @@
 07:40a7 eraseFile__clearFile_b07
 3f:42f3 insertIndexIntoLoadedObjectGfx__tree
 3f:42fa insertIndexIntoLoadedObjectGfx__object
+3f:4687 realignUnappraisedRings__findNextFilledSlot
+3f:46dc addTreasureToInventory__addToInventory
+3f:472b loadTreasureDisplayData__getTableIndices_b3f

@@ -32,76 +32,6 @@ L_4464:
   RET(0x446c); return;  // ret
 }
 
-// 3f:46f8
-void loadTreasureDisplayData_b3f(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x46f8, 1); A = L;  // ld a,l
-  PUSH(0x46f9, DE);  // push de
-  CALL(0x46fa, loadTreasureDisplayData__getTableIndices_b3f, 0x472b, 0x46fd);  // call $472b
-  PUSH(0x46fd, BC);  // push bc
-  I(0x46fe, 3); SET_HL(0x0000);  // ld hl,$0000
-  I(0x4701, 1); A = D;  // ld a,d
-  I(0x4702, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4703, 3); goto L_470f; } I(0x4703, 2);  // jr z,$470f
-  I(0x4705, 1); alu_cpl(gb);  // cpl
-  I(0x4706, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4707, 1); L = A;  // ld l,a
-  I(0x4708, 2); H = 0xff;  // ld h,$ff
-  I(0x470a, 1); A = D;  // ld a,d
-  CALL(0x470b, multiplyABy8_hook, 0x01b7, 0x470e);  // call $01b7
-  I(0x470e, 2); alu_add_hl(gb, BC);  // add hl,bc
-L_470f:
-  PUSH(0x470f, HL);  // push hl
-  I(0x4710, 1); A = E;  // ld a,e
-  I(0x4711, 3); SET_HL(0x6d62);  // ld hl,$6d62
-  RST_PUSH(0x4714, 0x4715);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x4715, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4716, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x4717, 1); L = A;  // ld l,a
-  SET_BC(POP(0x4718));  // pop bc
-  I(0x4719, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x471a, 3); SET_DE(0xcec0);  // ld de,$cec0
-  I(0x471d, 2); B = 0x07;  // ld b,$07
-L_471f:
-  I(0x471f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4720, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4721, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4722, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x4723, 3); goto L_471f; } I(0x4723, 2);  // jr nz,$471f
-  I(0x4725, 3); SET_HL(0xcec0);  // ld hl,$cec0
-  SET_BC(POP(0x4728));  // pop bc
-  SET_DE(POP(0x4729));  // pop de
-  RET(0x472a); return;  // ret
-}
-
-// 3f:472b
-void loadTreasureDisplayData__getTableIndices_b3f(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_472b:
-  I(0x472b, 1); D = A;  // ld d,a
-  I(0x472c, 3); SET_HL(0x6d41);  // ld hl,$6d41
-L_472f:
-  I(0x472f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4730, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4731, 3); goto L_473a; } I(0x4731, 2);  // jr z,$473a
-  I(0x4733, 1); alu_cp(gb, D);  // cp d
-  if ((F & FZ)) { I(0x4734, 3); goto L_473a; } I(0x4734, 2);  // jr z,$473a
-  I(0x4736, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4737, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4738, 3); goto L_472f;  // jr $472f
-L_473a:
-  I(0x473a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x473b, 2); E = mem_rd(gb, HL);  // ld e,(hl)
-  I(0x473c, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x473d, 3); goto L_4743; } I(0x473d, 2);  // jr z,$4743
-  I(0x473f, 1); L = A;  // ld l,a
-  I(0x4740, 2); H = 0xc6;  // ld h,$c6
-  I(0x4742, 2); D = mem_rd(gb, HL);  // ld d,(hl)
-L_4743:
-  RET(0x4743); return;  // ret
-}
-
 // 3f:595d
 void titlescreenMakuSeedSprite(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1828,8 +1758,8 @@ void giveTreasure_body__giveTreasure(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4501:
   I(0x4501, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  CALL(0x4503, checkIncreaseGashaMaturityForGettingTreasure, 0x4ad6, 0x4506);  // call $4ad6
-  CALL(0x4506, addTreasureToInventory, 0x46b6, 0x4509);  // call $46b6
+  CALL(0x4503, checkIncreaseGashaMaturityForGettingTreasure_hook, 0x4ad6, 0x4506);  // call $4ad6
+  CALL(0x4506, addTreasureToInventory_hook, 0x46b6, 0x4509);  // call $46b6
   I(0x4509, 3); SET_HL(0xc69a);  // ld hl,$c69a
   I(0x450c, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
   CALL(0x450e, setFlag_hook, 0x020e, 0x4511);  // call $020e
@@ -2040,15 +1970,15 @@ L_45fe:
   RET(0x4610); return;  // ret
 L_4614:
   I(0x4614, 2); C = (uint8_t)(C | (1 << 6));  // set 6,c
-  CALL(0x4616, realignUnappraisedRings, 0x466f, 0x4619);  // call $466f
+  CALL(0x4616, realignUnappraisedRings_hook, 0x466f, 0x4619);  // call $466f
   I(0x4619, 2); alu_cp(gb, 0x64);  // cp $64
   if ((F & FC)) { I(0x461b, 3); goto L_4623; } I(0x461b, 2);  // jr c,$4623
   CALL(0x461d, giveTreasure_body__removeOneDuplicateRing, 0x4629, 0x4620);  // call $4629
-  CALL(0x4620, realignUnappraisedRings, 0x466f, 0x4623);  // call $466f
+  CALL(0x4620, realignUnappraisedRings_hook, 0x466f, 0x4623);  // call $466f
 L_4623:
   I(0x4623, 1); A = C;  // ld a,c
   I(0x4624, 4); mem_wr(gb, 0xc5ff, A);  // ld ($c5ff),a
-  I(0x4627, 3); realignUnappraisedRings(gb); return;  // jr $466f
+  I(0x4627, 3); if (hook_enabled_at(0x466f)) { realignUnappraisedRings_hook(gb); return; } HANDOFF(0x466f);  // jr $466f
 }
 
 // 3f:4547
@@ -2195,15 +2125,15 @@ L_45fe:
   RET(0x4610); return;  // ret
 L_4614:
   I(0x4614, 2); C = (uint8_t)(C | (1 << 6));  // set 6,c
-  CALL(0x4616, realignUnappraisedRings, 0x466f, 0x4619);  // call $466f
+  CALL(0x4616, realignUnappraisedRings_hook, 0x466f, 0x4619);  // call $466f
   I(0x4619, 2); alu_cp(gb, 0x64);  // cp $64
   if ((F & FC)) { I(0x461b, 3); goto L_4623; } I(0x461b, 2);  // jr c,$4623
   CALL(0x461d, giveTreasure_body__removeOneDuplicateRing, 0x4629, 0x4620);  // call $4629
-  CALL(0x4620, realignUnappraisedRings, 0x466f, 0x4623);  // call $466f
+  CALL(0x4620, realignUnappraisedRings_hook, 0x466f, 0x4623);  // call $466f
 L_4623:
   I(0x4623, 1); A = C;  // ld a,c
   I(0x4624, 4); mem_wr(gb, 0xc5ff, A);  // ld ($c5ff),a
-  I(0x4627, 3); realignUnappraisedRings(gb); return;  // jr $466f
+  I(0x4627, 3); if (hook_enabled_at(0x466f)) { realignUnappraisedRings_hook(gb); return; } HANDOFF(0x466f);  // jr $466f
 }
 
 // 3f:4548
@@ -2348,15 +2278,15 @@ L_45fe:
   RET(0x4610); return;  // ret
 L_4614:
   I(0x4614, 2); C = (uint8_t)(C | (1 << 6));  // set 6,c
-  CALL(0x4616, realignUnappraisedRings, 0x466f, 0x4619);  // call $466f
+  CALL(0x4616, realignUnappraisedRings_hook, 0x466f, 0x4619);  // call $466f
   I(0x4619, 2); alu_cp(gb, 0x64);  // cp $64
   if ((F & FC)) { I(0x461b, 3); goto L_4623; } I(0x461b, 2);  // jr c,$4623
   CALL(0x461d, giveTreasure_body__removeOneDuplicateRing, 0x4629, 0x4620);  // call $4629
-  CALL(0x4620, realignUnappraisedRings, 0x466f, 0x4623);  // call $466f
+  CALL(0x4620, realignUnappraisedRings_hook, 0x466f, 0x4623);  // call $466f
 L_4623:
   I(0x4623, 1); A = C;  // ld a,c
   I(0x4624, 4); mem_wr(gb, 0xc5ff, A);  // ld ($c5ff),a
-  I(0x4627, 3); realignUnappraisedRings(gb); return;  // jr $466f
+  I(0x4627, 3); if (hook_enabled_at(0x466f)) { realignUnappraisedRings_hook(gb); return; } HANDOFF(0x466f);  // jr $466f
 }
 
 // 3f:4569
@@ -2584,15 +2514,15 @@ L_4611:
   I(0x4613, 1); alu_sbc(gb, C);  // sbc c
 L_4614:
   I(0x4614, 2); C = (uint8_t)(C | (1 << 6));  // set 6,c
-  CALL(0x4616, realignUnappraisedRings, 0x466f, 0x4619);  // call $466f
+  CALL(0x4616, realignUnappraisedRings_hook, 0x466f, 0x4619);  // call $466f
   I(0x4619, 2); alu_cp(gb, 0x64);  // cp $64
   if ((F & FC)) { I(0x461b, 3); goto L_4623; } I(0x461b, 2);  // jr c,$4623
   CALL(0x461d, giveTreasure_body__removeOneDuplicateRing, 0x4629, 0x4620);  // call $4629
-  CALL(0x4620, realignUnappraisedRings, 0x466f, 0x4623);  // call $466f
+  CALL(0x4620, realignUnappraisedRings_hook, 0x466f, 0x4623);  // call $466f
 L_4623:
   I(0x4623, 1); A = C;  // ld a,c
   I(0x4624, 4); mem_wr(gb, 0xc5ff, A);  // ld ($c5ff),a
-  I(0x4627, 3); realignUnappraisedRings(gb); return;  // jr $466f
+  I(0x4627, 3); if (hook_enabled_at(0x466f)) { realignUnappraisedRings_hook(gb); return; } HANDOFF(0x466f);  // jr $466f
 L_4663:
   I(0x4663, 2); mem_wr(gb, HL, B);  // ld (hl),b
   I(0x4664, 3); SET_HL(0xc5ff);  // ld hl,$c5ff
@@ -2610,15 +2540,15 @@ void giveTreasure_body__mode9(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4614:
   I(0x4614, 2); C = (uint8_t)(C | (1 << 6));  // set 6,c
-  CALL(0x4616, realignUnappraisedRings, 0x466f, 0x4619);  // call $466f
+  CALL(0x4616, realignUnappraisedRings_hook, 0x466f, 0x4619);  // call $466f
   I(0x4619, 2); alu_cp(gb, 0x64);  // cp $64
   if ((F & FC)) { I(0x461b, 3); goto L_4623; } I(0x461b, 2);  // jr c,$4623
   CALL(0x461d, giveTreasure_body__removeOneDuplicateRing, 0x4629, 0x4620);  // call $4629
-  CALL(0x4620, realignUnappraisedRings, 0x466f, 0x4623);  // call $466f
+  CALL(0x4620, realignUnappraisedRings_hook, 0x466f, 0x4623);  // call $466f
 L_4623:
   I(0x4623, 1); A = C;  // ld a,c
   I(0x4624, 4); mem_wr(gb, 0xc5ff, A);  // ld ($c5ff),a
-  I(0x4627, 3); realignUnappraisedRings(gb); return;  // jr $466f
+  I(0x4627, 3); if (hook_enabled_at(0x466f)) { realignUnappraisedRings_hook(gb); return; } HANDOFF(0x466f);  // jr $466f
 }
 
 // 3f:4629
@@ -2672,139 +2602,6 @@ L_4667:
   I(0x466b, 2); SET_HL(HL + 1);  // inc hl
   I(0x466c, 3); mem_wr(gb, HL, 0xff);  // ld (hl),$ff
   RET(0x466e); return;  // ret
-}
-
-// 3f:466f
-void realignUnappraisedRings(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x466f, 3); SET_HL(0xc5c0);  // ld hl,$c5c0
-L_4672:
-  I(0x4672, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4673, 2); alu_cp(gb, 0xff);  // cp $ff
-  if (!(F & FZ)) { I(0x4675, 3); goto L_467f; } I(0x4675, 2);  // jr nz,$467f
-  PUSH(0x4677, HL);  // push hl
-  CALL(0x4678, realignUnappraisedRings__findNextFilledSlot, 0x4687, 0x467b);  // call $4687
-  SET_HL(POP(0x467b));  // pop hl
-  if (!(F & FC)) { I(0x467c, 3); goto L_4685; } I(0x467c, 2);  // jr nc,$4685
-  I(0x467e, 2); mem_wr(gb, HL, A);  // ld (hl),a
-L_467f:
-  I(0x467f, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x4680, 1); A = L;  // ld a,l
-  I(0x4681, 2); alu_cp(gb, 0x00);  // cp $00
-  if (!(F & FZ)) { I(0x4683, 3); goto L_4672; } I(0x4683, 2);  // jr nz,$4672
-L_4685:
-  I(0x4685, 3); if (hook_enabled_at(0x4697)) { getNumUnappraisedRings_hook(gb); return; } HANDOFF(0x4697);  // jr $4697
-}
-
-// 3f:4687
-void realignUnappraisedRings__findNextFilledSlot(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4687:
-  I(0x4687, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4688, 2); alu_cp(gb, 0xff);  // cp $ff
-  if (!(F & FZ)) { I(0x468a, 3); goto L_4692; } I(0x468a, 2);  // jr nz,$4692
-  I(0x468c, 1); A = L;  // ld a,l
-  I(0x468d, 2); alu_cp(gb, 0x00);  // cp $00
-  if (!(F & FZ)) { I(0x468f, 3); goto L_4687; } I(0x468f, 2);  // jr nz,$4687
-  RET(0x4691); return;  // ret
-L_4692:
-  I(0x4692, 2); SET_HL(HL - 1);  // dec hl
-  I(0x4693, 3); mem_wr(gb, HL, 0xff);  // ld (hl),$ff
-  I(0x4695, 1); alu_scf(gb);  // scf
-  RET(0x4696); return;  // ret
-}
-
-// 3f:46b6
-void addTreasureToInventory(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x46b6, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
-  I(0x46b8, 2); alu_cp(gb, 0x20);  // cp $20
-  if (!(F & FC)) { RET_TAKEN(0x46ba); return; } I(0x46ba, 2);  // ret nc
-  PUSH(0x46bb, BC);  // push bc
-  CALL(0x46bc, addTreasureToInventory__addToInventory, 0x46dc, 0x46bf);  // call $46dc
-  SET_BC(POP(0x46bf));  // pop bc
-  if (!(F & FC)) { RET_TAKEN(0x46c0); return; } I(0x46c0, 2);  // ret nc
-  if ((F & FZ)) { I(0x46c1, 4); if (hook_enabled_at(0x17d8)) { setStatusBarNeedsRefreshBit1_hook(gb); return; } HANDOFF(0x17d8); } I(0x46c1, 3);  // jp z,$17d8
-  PUSH(0x46c4, BC);  // push bc
-  I(0x46c5, 1); alu_cpl(gb);  // cpl
-  I(0x46c6, 2); alu_add(gb, 0x88);  // add $88
-  I(0x46c8, 1); L = A;  // ld l,a
-  I(0x46c9, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
-  I(0x46cb, 1); C = A;  // ld c,a
-  I(0x46cc, 2); alu_cp(gb, 0x0c);  // cp $0c
-  if (!(F & FZ)) { I(0x46ce, 3); goto L_46d5; } I(0x46ce, 2);  // jr nz,$46d5
-  I(0x46d0, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x46d1, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  CALL(0x46d2, addTreasureToInventory__addToInventory, 0x46dc, 0x46d5);  // call $46dc
-L_46d5:
-  I(0x46d5, 3); SET_HL(0xcbe9);  // ld hl,$cbe9
-  I(0x46d8, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));  // set 0,(hl)
-  SET_BC(POP(0x46da));  // pop bc
-  RET(0x46db); return;  // ret
-}
-
-// 3f:46dc
-void addTreasureToInventory__addToInventory(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_46dc:
-  I(0x46dc, 1); C = A;  // ld c,a
-  I(0x46dd, 3); SET_HL(0xc688);  // ld hl,$c688
-  I(0x46e0, 2); B = 0x12;  // ld b,$12
-L_46e2:
-  I(0x46e2, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x46e3, 1); alu_cp(gb, C);  // cp c
-  if ((F & FZ)) { I(0x46e4, 3); goto L_46f0; } I(0x46e4, 2);  // jr z,$46f0
-  I(0x46e6, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x46e7, 3); goto L_46e2; } I(0x46e7, 2);  // jr nz,$46e2
-  I(0x46e9, 1); B = alu_dec8(gb, B);  // dec b
-  I(0x46ea, 2); L = 0x88;  // ld l,$88
-L_46ec:
-  I(0x46ec, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x46ed, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x46ee, 3); goto L_46ec; } I(0x46ee, 2);  // jr nz,$46ec
-L_46f0:
-  I(0x46f0, 1); L = alu_dec8(gb, L);  // dec l
-  I(0x46f1, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x46f2, 1); A = L;  // ld a,l
-  I(0x46f3, 2); alu_sub(gb, 0x8a);  // sub $8a
-  I(0x46f5, 2); alu_bit(gb, 7, B);  // bit 7,b
-  RET(0x46f7); return;  // ret
-}
-
-// 3f:46e2
-void addTreasureToInventory__nextItem(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_46e2:
-  I(0x46e2, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x46e3, 1); alu_cp(gb, C);  // cp c
-  if ((F & FZ)) { I(0x46e4, 3); goto L_46f0; } I(0x46e4, 2);  // jr z,$46f0
-  I(0x46e6, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x46e7, 3); goto L_46e2; } I(0x46e7, 2);  // jr nz,$46e2
-  I(0x46e9, 1); B = alu_dec8(gb, B);  // dec b
-  I(0x46ea, 2); L = 0x88;  // ld l,$88
-L_46ec:
-  I(0x46ec, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x46ed, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x46ee, 3); goto L_46ec; } I(0x46ee, 2);  // jr nz,$46ec
-L_46f0:
-  I(0x46f0, 1); L = alu_dec8(gb, L);  // dec l
-  I(0x46f1, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x46f2, 1); A = L;  // ld a,l
-  I(0x46f3, 2); alu_sub(gb, 0x8a);  // sub $8a
-  I(0x46f5, 2); alu_bit(gb, 7, B);  // bit 7,b
-  RET(0x46f7); return;  // ret
-}
-
-// 3f:46f0
-void addTreasureToInventory__assignItem(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_46f0:
-  I(0x46f0, 1); L = alu_dec8(gb, L);  // dec l
-  I(0x46f1, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x46f2, 1); A = L;  // ld a,l
-  I(0x46f3, 2); alu_sub(gb, 0x8a);  // sub $8a
-  I(0x46f5, 2); alu_bit(gb, 7, B);  // bit 7,b
-  RET(0x46f7); return;  // ret
 }
 
 // 3f:4744
@@ -3421,46 +3218,6 @@ void itemDropSetF(GB *gb) {
   I(0x4a44, 1);  // nop
   I(0x4a45, 1);  // nop
   HANDOFF(0x4a46);  // fallthrough to itemDropTables
-}
-
-// 3f:4ad6
-void checkIncreaseGashaMaturityForGettingTreasure(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x4ad6, BC);  // push bc
-  I(0x4ad7, 1); B = A;  // ld b,a
-  I(0x4ad8, 3); SET_HL(0x4aed);  // ld hl,$4aed
-L_4adb:
-  I(0x4adb, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4adc, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4add, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4ade, 3); goto L_4aec; } I(0x4ade, 2);  // jr z,$4aec
-  I(0x4ae0, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FZ)) { I(0x4ae1, 3); goto L_4adb; } I(0x4ae1, 2);  // jr nz,$4adb
-  I(0x4ae3, 2); alu_cp(gb, 0x29);  // cp $29
-  I(0x4ae5, 1); A = C;  // ld a,c
-  if ((F & FZ)) { I(0x4ae6, 3); goto L_4ae9; } I(0x4ae6, 2);  // jr z,$4ae9
-  I(0x4ae8, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-L_4ae9:
-  CALL(0x4ae9, addToGashaMaturity_hook, 0x1821, 0x4aec);  // call $1821
-L_4aec:
-  SET_BC(POP(0x4aec));  // pop bc
-  RET(0x4aed); return;  // ret
-}
-
-// 3f:4aee
-void checkIncreaseGashaMaturityForGettingTreasure__data(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4aee:
-  I(0x4aee, 1); B = B;  // ld b,b
-  I(0x4aef, 2); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
-  I(0x4af0, 2); SET_HL(HL - 1);  // dec hl
-  I(0x4af1, 1); H = alu_inc8(gb, H);  // inc h
-  I(0x4af2, 1); B = C;  // ld b,c
-  I(0x4af3, 1); H = H;  // ld h,h
-  I(0x4af4, 2); alu_add_hl(gb, HL);  // add hl,hl
-  I(0x4af5, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x4af6, 1);  // nop
-  if (hook_enabled_at(0x4af7)) { initTextbox_hook(gb); return; } HANDOFF(0x4af7);  // fallthrough
 }
 
 // 3f:7cf8
