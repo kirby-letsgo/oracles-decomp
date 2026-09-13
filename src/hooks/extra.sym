@@ -886,3 +886,6 @@
 07:4137 verifyFileAtHl__verifyFailed
 3f:4322 markLoadedObjectGfxUsed__found
 3f:4324 markLoadedObjectGfxUsed__end
+07:40a7 eraseFile__clearFile_b07
+3f:42f3 insertIndexIntoLoadedObjectGfx__tree
+3f:42fa insertIndexIntoLoadedObjectGfx__object

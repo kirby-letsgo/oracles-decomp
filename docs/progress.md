@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,634 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,653 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -171,6 +171,10 @@ Updated 2026-09-13. Newest entries at the top of each section.
   Batch 125 opened phase 6 with the complete bank-7 save-file verification helper layer and
   bank-3F object-GFX lookup/bookkeeping helpers, including all nine generated local entry points.
   The project now has 2,634 readable hooks out of 12,641.
+  Batch 126 completed bank 7's file-management dispatcher and save/load/create/erase roots,
+  continued bank-3F graphics allocation and interaction-data lookup, and added isolated treasure
+  helpers from banks 3F and 16. Four zero-caller internal labels were absorbed into their readable
+  parents, leaving 2,653 readable hooks out of 12,637.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -276,6 +280,17 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 126 (19 routines): completed the bank-7
+  `fileManagementFunction` dispatcher and its initialize/save/load/erase paths, the bank-3F object
+  graphics insertion and interaction-data lookup paths, and five isolated treasure helpers in
+  banks 3F and 16. All file variables use named RAM, conditional calls retain taken timing, and
+  the file and graphics local entries preserve their real caller stacks. Rewriting the treasure
+  roots absorbed four zero-caller branch labels (`haveItem`, `isUpgrade`, `dontHaveItem`, and
+  `foundItem`), so the total hook registry correctly fell by four. Two independent instruction
+  reviews found no defects. The project now has 2,653 readable hooks out of 12,637. Gates: lint 0,
+  30k verify 0 failures across 4,685,336 calls with state `3e450c2620a3f6a3`, full reference replay
+  0 state-hash mismatches across 13,033,804 calls with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 125 (27 routines): opened the final sweep with the
   bank-7 save-file verification helpers (`clearFileAtHl`, copy/checksum/address lookup,
   `verifyFileAtHl`, `verifyFileCopies`, and their seven local entries) and bank-3F object-GFX

@@ -814,3 +814,8 @@ desync to discover; keep them when porting routines.
   canonical names were absent from the symbol input, and lint reported nine missing `_hook`
   entries. Give each promoted local its exact bank/address alias in `extra.sym`, then add the same
   canonical name to both `ported.txt` and `rewritten.txt` before regenerating.
+- Do not promote every generated local merely to keep the hook count constant. Batch 126 rewrote
+  two treasure roots and regeneration removed four `parent__local` rows; diffing the registry and
+  checking their readiness reports showed that all four were zero-caller branch targets wholly
+  contained in the new structured C. Let those rows disappear. Only locals with independent
+  incoming execution or required continuation semantics need `extra.sym` aliases.

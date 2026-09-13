@@ -9,6 +9,24 @@
 void getAddressOfLoadedObjectGfxIndex_hook(GB *gb);
 void incLoadedObjectGfxIndex_hook(GB *gb);
 void getObjectGfxIndexForEnemy_hook(GB *gb);
+void insertIndexIntoLoadedObjectGfx_hook(GB *gb);
+void interactionGetData_hook(GB *gb);
+void getDataForInteraction_hook(GB *gb);
+
+void initGbaModePaletteData_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4000, 0x4002); A = mem_rd(gb, IO_SVBK);
+  CYC(0x4002, 0x4003); push_effect(gb, AF);
+  CYC(0x4003, 0x4005); A = 0x02;
+  CYC(0x4005, 0x4007); mem_wr(gb, IO_SVBK, A);
+  CYC(0x4007, 0x400a); SET_HL(0x409d);
+  CYC(0x400a, 0x400d); SET_DE(w2GbaModePaletteData);
+  CYC(0x400d, 0x400f); B = 0x80;
+  CALL_C(0x400f, copyMemory_hook, 0x0486, 0x4012);
+  CYC(0x4012, 0x4013); SET_AF(pop_effect(gb));
+  CYC(0x4013, 0x4015); mem_wr(gb, IO_SVBK, A);
+  CYC(0x4015, 0x4016); ret_effect(gb);
+}
 
 static void add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -124,6 +142,123 @@ void getAddressOfLoadedObjectGfxIndex_hook(GB *gb) {
   CYC(0x42ba, 0x42bb); ret_effect(gb);
 }
 
+void addIndexToLoadedObjectGfx_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x42bb, 0x42bc); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x42bc, 0x42bd);
+    ret_effect(gb);
+    return;
+  }
+  CYC(0x42bc, 0x42bd);
+  CYC(0x42bd, 0x42be); push_effect(gb, HL);
+  CYC(0x42be, 0x42bf); push_effect(gb, BC);
+  CYC(0x42bf, 0x42c0); E = A;
+  CALL_C(0x42c0, findIndexInLoadedObjectGfx_hook, 0x4270, 0x42c3);
+  if (!(F & FC)) {
+    CYCT(0x42c3, 0x42c5);
+  } else {
+    CYC(0x42c3, 0x42c5);
+    CALL_C(0x42c5, findUnusedIndexInLoadedObjectGfx_hook, 0x428e, 0x42c8);
+    if (!(F & FC)) {
+      CALL_C_CC(0x42c8, insertIndexIntoLoadedObjectGfx_hook, 0x42cf, 0x42cb);
+    } else {
+      CYC(0x42c8, 0x42cb);
+    }
+  }
+  CYC(0x42cb, 0x42cc); A = C;
+  CYC(0x42cc, 0x42cd); SET_BC(pop_effect(gb));
+  CYC(0x42cd, 0x42ce); SET_HL(pop_effect(gb));
+  CYC(0x42ce, 0x42cf); ret_effect(gb);
+}
+
+static void insert_index_into_loaded_object_gfx_tail(GB *gb, uint16_t sp0_) {
+  CYC(0x4302, 0x4304); D = 0x00;
+  CYC(0x4304, 0x4305); alu_add_hl(gb, DE);
+  CYC(0x4305, 0x4306); alu_add_hl(gb, DE);
+  CYC(0x4306, 0x4307); alu_add_hl(gb, DE);
+  CALL_C(0x4307, loadObjectGfx_hook, 0x1682, 0x430a);
+  CYC(0x430a, 0x430b); SET_HL(pop_effect(gb));
+  CYC(0x430b, 0x430c); SET_DE(pop_effect(gb));
+  CYC(0x430c, 0x430d); SET_BC(pop_effect(gb));
+  CYC(0x430d, 0x430e); ret_effect(gb);
+}
+
+static void insert_index_into_loaded_object_gfx_tree(GB *gb, uint16_t sp0_) {
+  CYC(0x42f3, 0x42f5); B = 0x92;
+  CYC(0x42f5, 0x42f8); SET_HL(0x5d2a);
+  CYC(0x42f8, 0x42fa);
+  insert_index_into_loaded_object_gfx_tail(gb, sp0_);
+}
+
+static void insert_index_into_loaded_object_gfx_object(GB *gb, uint16_t sp0_) {
+  CYC(0x42fa, 0x42fc); alu_sub(gb, 0x08);
+  CYC(0x42fc, 0x42fe); alu_or(gb, 0x80);
+  CYC(0x42fe, 0x42ff); B = A;
+  CYC(0x42ff, 0x4302); SET_HL(0x5a8a);
+  insert_index_into_loaded_object_gfx_tail(gb, sp0_);
+}
+
+void insertIndexIntoLoadedObjectGfx_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x42cf, 0x42d0); A = L;
+  CYC(0x42d0, 0x42d2); alu_cp(gb, (uint8_t)wLoadedTreeGfxActive);
+  if (F & FC) {
+    CYC(0x42d2, 0x42d4);
+    CYC(0x42d4, 0x42d5); push_effect(gb, HL);
+    CYC(0x42d5, 0x42d8); SET_HL(wLoadedObjectGfx);
+    for (;;) {
+      CYC(0x42d8, 0x42d9); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(0x42d9, 0x42da); alu_cp(gb, E);
+      if (F & FZ) {
+        CYC(0x42da, 0x42dc);
+        CYC(0x42dc, 0x42dd); alu_xor(gb, A);
+        CYC(0x42dd, 0x42de); mem_wr(gb, HL, A); SET_HL(HL - 1);
+        CYC(0x42de, 0x42df); mem_wr(gb, HL, A); SET_HL(HL + 1);
+      } else {
+        CYCT(0x42da, 0x42dc);
+      }
+      CYC(0x42df, 0x42e0); L = alu_inc8(gb, L);
+      CYC(0x42e0, 0x42e1); A = L;
+      CYC(0x42e1, 0x42e3); alu_cp(gb, (uint8_t)wLoadedObjectGfxEnd);
+      if (!(F & FC)) {
+        CYC(0x42e3, 0x42e5);
+        break;
+      }
+      CYCT(0x42e3, 0x42e5);
+    }
+    CYC(0x42e5, 0x42e6); SET_HL(pop_effect(gb));
+  } else {
+    CYCT(0x42d2, 0x42d4);
+  }
+  CYC(0x42e6, 0x42e7); push_effect(gb, BC);
+  CYC(0x42e7, 0x42e8); push_effect(gb, DE);
+  CYC(0x42e8, 0x42e9); push_effect(gb, HL);
+  CYC(0x42e9, 0x42ea); mem_wr(gb, HL, E);
+  CYC(0x42ea, 0x42eb); L = alu_inc8(gb, L);
+  CYC(0x42eb, 0x42ed); mem_wr(gb, HL, 0x01);
+  CYC(0x42ed, 0x42ee); L = alu_dec8(gb, L);
+  CYC(0x42ee, 0x42ef); A = L;
+  CYC(0x42ef, 0x42f1); alu_cp(gb, (uint8_t)wLoadedTreeGfxActive);
+  if (F & FC) {
+    CYCT(0x42f1, 0x42f3);
+    insert_index_into_loaded_object_gfx_object(gb, sp0_);
+  } else {
+    CYC(0x42f1, 0x42f3);
+    insert_index_into_loaded_object_gfx_tree(gb, sp0_);
+  }
+}
+
+void insertIndexIntoLoadedObjectGfx__tree_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  insert_index_into_loaded_object_gfx_tree(gb, sp0_);
+}
+
+void insertIndexIntoLoadedObjectGfx__object_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  insert_index_into_loaded_object_gfx_object(gb, sp0_);
+}
+
 static void mark_loaded_object_gfx_used_end(GB *gb) {
   CYC(0x4324, 0x4325); SET_HL(pop_effect(gb));
   CYC(0x4325, 0x4326); SET_BC(pop_effect(gb));
@@ -232,6 +367,15 @@ void partGetObjectGfxIndex_hook(GB *gb) {
   CYC(0x4354, 0x4355); ret_effect(gb);
 }
 
+void interactionGetObjectGfxIndex_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4355, 0x4356); push_effect(gb, BC);
+  CALL_C(0x4356, interactionGetData_hook, 0x4437, 0x4359);
+  CYC(0x4359, 0x435a); SET_BC(pop_effect(gb));
+  CYC(0x435a, 0x435b); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x435b, 0x435c); ret_effect(gb);
+}
+
 void itemGetObjectGfxIndex_hook(GB *gb) {
   CYC(0x435c, 0x435e); E = 0x01;
   CYC(0x435e, 0x435f); A = mem_rd(gb, DE);
@@ -242,4 +386,61 @@ void itemGetObjectGfxIndex_hook(GB *gb) {
   CYC(0x4365, 0x4366); add_a_to_hl_from_rst(gb, 0x4366);
   CYC(0x4366, 0x4367); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(0x4367, 0x4368); ret_effect(gb);
+}
+
+void interactionGetData_hook(GB *gb) {
+  CYC(0x4437, 0x4438); H = D;
+  CYC(0x4438, 0x443a); L = 0x41;
+  CYC(0x443a, 0x443b); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x443b, 0x443c); E = mem_rd(gb, HL);
+  getDataForInteraction_hook(gb);
+}
+
+void getDataForInteraction_hook(GB *gb) {
+  CYC(0x443c, 0x443d); C = A;
+  CYC(0x443d, 0x443f); B = 0x00;
+  CYC(0x443f, 0x4442); SET_HL(0x6427);
+  CYC(0x4442, 0x4443); alu_add_hl(gb, BC);
+  CYC(0x4443, 0x4444); alu_add_hl(gb, BC);
+  CYC(0x4444, 0x4445); alu_add_hl(gb, BC);
+  CYC(0x4445, 0x4446); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x4446, 0x4447); alu_rlca(gb);
+  if (!(F & FC)) {
+    CYCT(0x4447, 0x4448);
+    ret_effect(gb);
+    return;
+  }
+  CYC(0x4447, 0x4448);
+  CYC(0x4448, 0x4449); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4449, 0x444a); SET_HL(HL + 1);
+  CYC(0x444a, 0x444b); H = mem_rd(gb, HL);
+  CYC(0x444b, 0x444c); L = A;
+  CYC(0x444c, 0x444e); C = 0x03;
+  CYC(0x444e, 0x444f); A = E;
+  CYC(0x444f, 0x4450); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x4450, 0x4451);
+    ret_effect(gb);
+    return;
+  }
+  CYC(0x4450, 0x4451);
+  for (;;) {
+    CYC(0x4451, 0x4452); SET_HL(HL + 1);
+    CYC(0x4452, 0x4454); alu_bit(gb, 7, mem_rd(gb, HL));
+    CYC(0x4454, 0x4455); SET_HL(HL - 1);
+    if (!(F & FZ)) {
+      CYCT(0x4455, 0x4456);
+      ret_effect(gb);
+      return;
+    }
+    CYC(0x4455, 0x4456);
+    CYC(0x4456, 0x4457); alu_add_hl(gb, BC);
+    CYC(0x4457, 0x4458); A = alu_dec8(gb, A);
+    if (F & FZ) {
+      CYC(0x4458, 0x445a);
+      break;
+    }
+    CYCT(0x4458, 0x445a);
+  }
+  CYC(0x445a, 0x445b); ret_effect(gb);
 }

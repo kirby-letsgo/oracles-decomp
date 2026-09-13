@@ -1263,53 +1263,6 @@ L_44f4:
   RET(0x44fc); return;  // ret
 }
 
-// 16:451e
-void interactionLoadTreasureData(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x451e, 2); E = 0x42;  // ld e,$42
-  I(0x4520, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4521, 2); E = 0x70;  // ld e,$70
-  I(0x4523, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4524, 3); SET_HL(0x5332);  // ld hl,$5332
-L_4527:
-  CALL(0x4527, multiplyABy4_hook, 0x01c3, 0x452a);  // call $01c3
-  I(0x452a, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x452b, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x452d, 3); goto L_4538; } I(0x452d, 2);  // jr z,$4538
-  I(0x452f, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4530, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4531, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x4532, 1); L = A;  // ld l,a
-  I(0x4533, 2); E = 0x43;  // ld e,$43
-  I(0x4535, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4536, 3); goto L_4527;  // jr $4527
-L_4538:
-  I(0x4538, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4539, 1); B = A;  // ld b,a
-  I(0x453a, 2); A = alu_swap(gb, A);  // swap a
-  I(0x453c, 2); alu_and(gb, 0x07);  // and $07
-  I(0x453e, 2); E = 0x71;  // ld e,$71
-  I(0x4540, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4541, 1); A = B;  // ld a,b
-  I(0x4542, 2); alu_and(gb, 0x07);  // and $07
-  I(0x4544, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4545, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4546, 1); A = B;  // ld a,b
-  I(0x4547, 2); alu_and(gb, 0x08);  // and $08
-  I(0x4549, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x454a, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x454b, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x454c, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x454d, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x454e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x454f, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x4550, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4551, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4552, 2); E = 0x42;  // ld e,$42
-  I(0x4554, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x4555); return;  // ret
-}
-
 // 16:5766
 void loadD6ChangingFloorPatternToBigBuffer(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

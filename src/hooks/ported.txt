@@ -1110,6 +1110,7 @@ initializeFile
 saveFile
 loadFile
 eraseFile
+eraseFile__clearFile_b07
 clearFileAtHl
 verifyFileCopies
 verifyFileCopies__copy2Invalid
@@ -1164,6 +1165,8 @@ incLoadedObjectGfxIndex
 getAddressOfLoadedObjectGfxIndex
 addIndexToLoadedObjectGfx
 insertIndexIntoLoadedObjectGfx
+insertIndexIntoLoadedObjectGfx__tree
+insertIndexIntoLoadedObjectGfx__object
 markLoadedObjectGfxUsed
 markLoadedObjectGfxUsed__found
 markLoadedObjectGfxUsed__end

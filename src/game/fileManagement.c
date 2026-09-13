@@ -7,6 +7,12 @@
 #define CYCT(from, to) burn_rom(gb, 0x07, (from), (to), true)
 
 void clearFileAtHl_hook(GB *gb);
+void fileManagementFunction_hook(GB *gb);
+void initializeFile_b07_hook(GB *gb);
+void saveFile_b07_hook(GB *gb);
+void loadFile_b07_hook(GB *gb);
+void eraseFile_b07_hook(GB *gb);
+void eraseFile__clearFile_b07_hook(GB *gb);
 void verifyFileCopies_hook(GB *gb);
 void verifyFileCopies__copy2Invalid_hook(GB *gb);
 void verifyFileCopies__bothCopiesValid_hook(GB *gb);
@@ -59,6 +65,133 @@ static void add_double_index_to_hl_from_rst(GB *gb) {
   burn_rom(gb, 0x00, 0x001d, 0x001e, false); alu_add_hl(gb, BC);
   burn_rom(gb, 0x00, 0x001e, 0x001f, false); SET_BC(pop_effect(gb));
   burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
+}
+
+void fileManagementFunction_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x4000, 0x4001); A = C;
+  CYC(0x4001, 0x4002); push_effect(gb, 0x4002);
+  switch (jump_table_from_rst(gb)) {
+    case 0x400a: initializeFile_b07_hook(gb); return;
+    case 0x4059: saveFile_b07_hook(gb); return;
+    case 0x4085: loadFile_b07_hook(gb); return;
+    case 0x409e: eraseFile_b07_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+void initializeFile_b07_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x400a, 0x400d); SET_HL(0x418a);
+  CALL_C(0x400d, initializeFileVariables_hook, 0x4176, 0x4010);
+  CYC(0x4010, 0x4013); SET_HL(wFileIsHeroGame);
+  CYC(0x4013, 0x4014); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x4014, 0x4015); alu_add(gb, A);
+  CYC(0x4015, 0x4016); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x4016, 0x4017); push_effect(gb, AF);
+  CYC(0x4017, 0x401a); SET_HL(0x4182);
+  CYC(0x401a, 0x401b); push_effect(gb, 0x401b);
+  add_double_index_to_hl_from_rst(gb);
+  CYC(0x401b, 0x401c); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x401c, 0x401d); H = mem_rd(gb, HL);
+  CYC(0x401d, 0x401e); L = A;
+  CALL_C(0x401e, initializeFileVariables_hook, 0x4176, 0x4021);
+  CYC(0x4021, 0x4022); SET_AF(pop_effect(gb));
+  CYC(0x4022, 0x4023); C = A;
+  CYC(0x4023, 0x4026); SET_HL(wUnappraisedRings);
+  CYC(0x4026, 0x4028); B = 0x40;
+  CYC(0x4028, 0x402a); A = 0xff;
+  CALL_C(0x402a, fillMemory_hook, 0x0470, 0x402d);
+  CYC(0x402d, 0x4030); SET_HL(wRingBoxContents);
+  CYC(0x4030, 0x4032); B = 0x06;
+  CYC(0x4032, 0x4034); A = 0xff;
+  CALL_C(0x4034, fillMemory_hook, 0x0470, 0x4037);
+  CYC(0x4037, 0x4038); A = C;
+  CYC(0x4038, 0x403a); alu_cp(gb, 0x02);
+  if (!(F & FZ)) {
+    CYCT(0x403a, 0x403c);
+  } else {
+    CYC(0x403a, 0x403c);
+    CYC(0x403c, 0x403f); SET_HL(wObtainedTreasureFlags);
+    CYC(0x403f, 0x4041); A = 0x2d;
+    CALL_C(0x4041, setFlag_hook, 0x020e, 0x4044);
+    CYC(0x4044, 0x4046); A = 0x76;
+    CYC(0x4046, 0x4049); mem_wr(gb, wUnappraisedRings, A);
+  }
+  CYC(0x4049, 0x404c); SET_HL(0x415c);
+  CYC(0x404c, 0x404e); E = 0x0b;
+  CALL_C(0x404e, interBankCall_hook, 0x008a, 0x4051);
+  CYC(0x4051, 0x4054); SET_HL(0x69dd);
+  CYC(0x4054, 0x4056); E = 0x04;
+  CALL_C(0x4056, interBankCall_hook, 0x008a, 0x4059);
+  saveFile_b07_hook(gb);
+}
+
+void saveFile_b07_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x4059, 0x405c); SET_HL(wWhichGame);
+  CYC(0x405c, 0x405e); mem_wr(gb, HL, 0x01);
+  CYC(0x405e, 0x4061); SET_HL(wSavefileString);
+  CYC(0x4061, 0x4064); SET_DE(0x41c9);
+  CYC(0x4064, 0x4066); B = 0x08;
+  CALL_C(0x4066, copyMemoryReverse_hook, 0x047f, 0x4069);
+  CYC(0x4069, 0x406b); L = (uint8_t)wFileStart;
+  CALL_C(0x406b, calculateFileChecksum_hook, 0x4140, 0x406e);
+  CYC(0x406e, 0x406f); mem_wr(gb, HL, E);
+  CYC(0x406f, 0x4070); L = alu_inc8(gb, L);
+  CYC(0x4070, 0x4071); mem_wr(gb, HL, D);
+  CYC(0x4071, 0x4073); L = (uint8_t)wFileStart;
+  CALL_C(0x4073, getFileAddress1_hook, 0x4157, 0x4076);
+  CYC(0x4076, 0x4077); E = C;
+  CYC(0x4077, 0x4078); D = B;
+  CALL_C(0x4078, copyFileFromHlToDe_hook, 0x40fe, 0x407b);
+  CALL_C(0x407b, getFileAddress2_hook, 0x415b, 0x407e);
+  CYC(0x407e, 0x407f); E = C;
+  CYC(0x407f, 0x4080); D = B;
+  CALL_C(0x4080, copyFileFromHlToDe_hook, 0x40fe, 0x4083);
+  CYC(0x4083, 0x4085);
+  verifyFileCopies_hook(gb);
+}
+
+void loadFile_b07_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x4085, verifyFileCopies_hook, 0x40bc, 0x4088);
+  CYC(0x4088, 0x4089); push_effect(gb, AF);
+  CYC(0x4089, 0x408a); alu_or(gb, A);
+  if (F & FZ) {
+    CYC(0x408a, 0x408c);
+    CALL_C(0x408c, getFileAddress1_hook, 0x4157, 0x408f);
+    CYC(0x408f, 0x4091);
+  } else {
+    CYCT(0x408a, 0x408c);
+    CALL_C(0x4091, getFileAddress2_hook, 0x415b, 0x4094);
+  }
+  CYC(0x4094, 0x4095); L = C;
+  CYC(0x4095, 0x4096); H = B;
+  CYC(0x4096, 0x4099); SET_DE(wFileStart);
+  CALL_C(0x4099, copyFileFromHlToDe_hook, 0x40fe, 0x409c);
+  CYC(0x409c, 0x409d); SET_AF(pop_effect(gb));
+  CYC(0x409d, 0x409e); ret_effect(gb);
+}
+
+void eraseFile_b07_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x409e, getFileAddress1_hook, 0x4157, 0x40a1);
+  CALL_C(0x40a1, eraseFile__clearFile_b07_hook, 0x40a7, 0x40a4);
+  CALL_C(0x40a4, getFileAddress2_hook, 0x415b, 0x40a7);
+  eraseFile__clearFile_b07_hook(gb);
+}
+
+void eraseFile__clearFile_b07_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x40a7, 0x40a9); A = 0x0a;
+  CYC(0x40a9, 0x40ac); mem_wr(gb, 0x1111, A);
+  CYC(0x40ac, 0x40ad); L = C;
+  CYC(0x40ad, 0x40ae); H = B;
+  CALL_C(0x40ae, clearFileAtHl_hook, 0x40b6, 0x40b1);
+  CYC(0x40b1, 0x40b2); alu_xor(gb, A);
+  CYC(0x40b2, 0x40b5); mem_wr(gb, 0x1111, A);
+  CYC(0x40b5, 0x40b6); ret_effect(gb);
 }
 
 void clearFileAtHl_hook(GB *gb) {
