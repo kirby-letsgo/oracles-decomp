@@ -2844,6 +2844,14 @@ itemCheckCanPassSolidTileAt
 itemCheckCanPassSolidTile
 checkTileIsPassableFromDirection
 itemUpdateConveyorBelt
+seedItemDelete
+seedItemState3
+emberSeedBurn
+seedUpdateAnimation
+seedItemState2
+scentSeedSmell
+galeSeedUpdateAnimationAndCounter
+galeSeedUpdateAnimation
 itemCreateChildIfDoesntExistAlready
 itemCreateChildAndDeleteOnFailure
 itemCreateChild
@@ -2876,3 +2884,11 @@ monkey9Disappearance
 monkeyCheckChangeAnimation
 monkey8Disappearance
 monkeySubid2State1
+monkeyState1
+monkeySubid0State1
+monkeySubid4State1
+monkeySubid5State1
+monkeyAnimateAndRunScript
+monkeySubid5State1_monkey9
+minecartCheckCollisions
+minecartCreateCollisionItem

@@ -528,3 +528,318 @@ void monkeySubid1State1_hook(GB *gb) {
     default: hook_continue(gb, HL, sp0_); return;
   }
 }
+
+static void monkey_subid0_substate0_hook(GB *gb, uint16_t sp0_) {
+  CYC(0x74e7, 0x74ea); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfd0);
+  CYC(0x74ea, 0x74ec); alu_cp(gb, 0x0e);
+  if (!(F & FZ)) {
+    CYCT(0x74ec, 0x74ef);
+    interactionRunScript_hook(gb);
+    return;
+  }
+  CYC(0x74ec, 0x74ef);
+  CALL_C(0x74ef, interactionIncSubstate_hook, 0x23e5, 0x74f2);
+  CYC(0x74f2, 0x74f4); A = 0x06;
+  CYC(0x74f4, 0x74f7);
+  interactionSetAnimation_hook(gb);
+}
+
+static void monkey_subid0_substate1_hook(GB *gb, uint16_t sp0_) {
+  CYC(0x74f7, 0x74fa); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfd0);
+  CYC(0x74fa, 0x74fc); alu_cp(gb, 0x10);
+  if (!(F & FZ)) {
+    CYCT(0x74fc, 0x74fd); ret_effect(gb);
+    return;
+  }
+  CYC(0x74fc, 0x74fd);
+  CALL_C(0x74fd, interactionIncSubstate_hook, 0x23e5, 0x7500);
+  CYC(0x7500, 0x7502); L = 0x46;
+  CYC(0x7502, 0x7504); mem_wr(gb, HL, 0x32);
+  CYC(0x7504, 0x7506); A = 0x03;
+  CALL_C(0x7506, interactionSetAnimation_hook, 0x262e, 0x7509);
+  CYC(0x7509, 0x750b);
+  monkeyJumpSpeed120_hook(gb);
+}
+
+static void monkey_subid0_substate2_hook(GB *gb, uint16_t sp0_) {
+  CALL_C(0x750b, interactionDecCounter1_hook, 0x23cc, 0x750e);
+  if (!(F & FZ)) {
+    CYCT(0x750e, 0x7510);
+    monkeyUpdateGravityAndHop_hook(gb);
+    return;
+  }
+  CYC(0x750e, 0x7510);
+  CALL_C(0x7510, interactionIncSubstate_hook, 0x23e5, 0x7513);
+  CYC(0x7513, 0x7515); L = 0x49;
+  CYC(0x7515, 0x7517); mem_wr(gb, HL, 0x02);
+  CYC(0x7517, 0x7519); L = 0x4f;
+  CYC(0x7519, 0x751b); mem_wr(gb, HL, 0x00);
+  CYC(0x751b, 0x751d); L = 0x50;
+  CYC(0x751d, 0x751f); mem_wr(gb, HL, 0x3c);
+  monkeySetAnimationAndJump_hook(gb);
+}
+
+void monkeySubid0State1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x74ce, interactionAnimate_hook, 0x261b, 0x74d1);
+  CALL_C(0x74d1, objectSetPriorityRelativeToLink_withTerrainEffects_hook, 0x22e0, 0x74d4);
+  CYC(0x74d4, 0x74d6); E = 0x45;
+  CYC(0x74d6, 0x74d7); A = mem_rd(gb, DE);
+  CYC(0x74d7, 0x74d8); alu_or(gb, A);
+  if (F & FZ) CALL_C_CC(0x74d8, objectPreventLinkFromPassing_hook, 0x2680, 0x74db);
+  else CYC(0x74d8, 0x74db);
+  CYC(0x74db, 0x74dd); E = 0x45;
+  CYC(0x74dd, 0x74de); A = mem_rd(gb, DE);
+  CYC(0x74de, 0x74df); push_effect(gb, 0x74df);
+  switch (monkey_jump_table(gb)) {
+    case 0x74e7: monkey_subid0_substate0_hook(gb, sp0_); return;
+    case 0x74f7: monkey_subid0_substate1_hook(gb, sp0_); return;
+    case 0x750b: monkey_subid0_substate2_hook(gb, sp0_); return;
+    case 0x7528: monkeySubid0State1Substate3_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+static void monkey_subid4_substate0_hook(GB *gb, uint16_t sp0_) {
+  CALL_C(0x773b, interactionDecCounter2_hook, 0x23d1, 0x773e);
+  if (!(F & FZ)) {
+    CYCT(0x773e, 0x773f); ret_effect(gb);
+    return;
+  }
+  CYC(0x773e, 0x773f);
+  CYC(0x773f, 0x7742);
+  interactionIncSubstate_hook(gb);
+}
+
+static void monkey_subid4_substate1_hook(GB *gb, uint16_t sp0_) {
+  CALL_C(0x7742, interactionDecCounter1_hook, 0x23cc, 0x7745);
+  if (!(F & FZ)) {
+    CYCT(0x7745, 0x7746); ret_effect(gb);
+    return;
+  }
+  CYC(0x7745, 0x7746);
+  CYC(0x7746, 0x7748); mem_wr(gb, HL, 0x3c);
+  CYC(0x7748, 0x774a); L = 0x43;
+  CYC(0x774a, 0x774b); A = mem_rd(gb, HL);
+  CYC(0x774b, 0x774d); alu_cp(gb, 0x08);
+  if (F & FZ) {
+    CYC(0x774d, 0x774f);
+    CYC(0x774f, 0x7751); A = 0x00;
+    CALL_C(0x7751, objectGetRelatedObject2Var_hook, 0x2164, 0x7754);
+    CYC(0x7754, 0x7756); L = 0x5c;
+    CYC(0x7756, 0x7758); mem_wr(gb, HL, 0x06);
+  } else {
+    CYCT(0x774d, 0x774f);
+  }
+  CYC(0x7758, 0x775a); A = 0x90;
+  CALL_C(0x775a, playSound_b00_hook, 0x0c98, 0x775d);
+  CYC(0x775d, 0x7760);
+  interactionIncSubstate_hook(gb);
+}
+
+static void monkey_subid4_substate2_hook(GB *gb, uint16_t sp0_) {
+  CALL_C(0x7760, interactionDecCounter1_hook, 0x23cc, 0x7763);
+  if (!(F & FZ)) {
+    CYCT(0x7763, 0x7765);
+    CYC(0x776d, 0x776f); B = 0x01;
+    CYC(0x776f, 0x7772);
+    objectFlickerVisibility_hook(gb);
+    return;
+  }
+  CYC(0x7763, 0x7765);
+  CYC(0x7765, 0x7767); mem_wr(gb, HL, 0x3c);
+  CALL_C(0x7767, objectSetVisible_hook, 0x1e84, 0x776a);
+  CYC(0x776a, 0x776d);
+  interactionIncSubstate_hook(gb);
+}
+
+static void monkey_subid4_finish_substate3_hook(GB *gb) {
+  CYC(0x7794, 0x7796); L = 0x5c;
+  CYC(0x7796, 0x7797); mem_wr(gb, HL, B);
+  CYC(0x7797, 0x779a);
+  interactionIncSubstate_hook(gb);
+}
+
+static void monkey_subid4_substate3_hook(GB *gb, uint16_t sp0_) {
+  CALL_C(0x7772, interactionDecCounter1_hook, 0x23cc, 0x7775);
+  if (!(F & FZ)) {
+    CYCT(0x7775, 0x7776); ret_effect(gb);
+    return;
+  }
+  CYC(0x7775, 0x7776);
+  CYC(0x7776, 0x7778); B = 0x03;
+  CYC(0x7778, 0x777a); L = 0x43;
+  CYC(0x777a, 0x777b); A = mem_rd(gb, HL);
+  CYC(0x777b, 0x777d); alu_cp(gb, 0x05);
+  if (F & FZ) {
+    CYC(0x777d, 0x777f);
+    CYC(0x777f, 0x7780); B = alu_dec8(gb, B);
+    CYC(0x7780, 0x7782);
+    monkey_subid4_finish_substate3_hook(gb);
+    return;
+  }
+  CYCT(0x777d, 0x777f);
+  CYC(0x7782, 0x7784); alu_cp(gb, 0x08);
+  if (F & FZ) {
+    CYC(0x7784, 0x7786);
+    CYC(0x7786, 0x7788); A = 0x00;
+    CALL_C(0x7788, objectGetRelatedObject2Var_hook, 0x2164, 0x778b);
+    CYC(0x778b, 0x778d); L = 0x5c;
+    CYC(0x778d, 0x778f); mem_wr(gb, HL, 0x02);
+    CYC(0x778f, 0x7790); H = D;
+    CYC(0x7790, 0x7792); L = 0x46;
+    CYC(0x7792, 0x7794); mem_wr(gb, HL, 0xb4);
+  } else {
+    CYCT(0x7784, 0x7786);
+  }
+  monkey_subid4_finish_substate3_hook(gb);
+}
+
+static void monkey_subid4_substate4_1_hook(GB *gb, uint16_t sp0_) {
+  CALL_C(0x779d, interactionAnimate_hook, 0x261b, 0x77a0);
+  CYC(0x77a0, 0x77a2); E = 0x43;
+  CYC(0x77a2, 0x77a3); A = mem_rd(gb, DE);
+  CYC(0x77a3, 0x77a5); alu_cp(gb, 0x08);
+  if (!(F & FZ)) {
+    CYCT(0x77a5, 0x77a6); ret_effect(gb);
+    return;
+  }
+  CYC(0x77a5, 0x77a6);
+  CALL_C(0x77a6, interactionDecCounter1_hook, 0x23cc, 0x77a9);
+  if (!(F & FZ)) {
+    CYCT(0x77a9, 0x77aa); ret_effect(gb);
+    return;
+  }
+  CYC(0x77a9, 0x77aa);
+  CYC(0x77aa, 0x77ac); A = 0xff;
+  CYC(0x77ac, 0x77af); mem_wr(gb, wTmpcfc0_genericCutscene_cfdf, A);
+  CYC(0x77af, 0x77b0); ret_effect(gb);
+}
+
+static void monkey_subid4_substate4_0_hook(GB *gb, uint16_t sp0_) {
+  CALL_C(0x779a, monkeyUpdateGravityAndJumpIfLanded_hook, 0x754d, 0x779d);
+  monkey_subid4_substate4_1_hook(gb, sp0_);
+}
+
+static void monkey_subid4_monkey0_hook(GB *gb, uint16_t sp0_) {
+  CYC(0x772d, 0x772f); E = 0x45;
+  CYC(0x772f, 0x7730); A = mem_rd(gb, DE);
+  CYC(0x7730, 0x7731); push_effect(gb, 0x7731);
+  switch (monkey_jump_table(gb)) {
+    case 0x773b: monkey_subid4_substate0_hook(gb, sp0_); return;
+    case 0x7742: monkey_subid4_substate1_hook(gb, sp0_); return;
+    case 0x7760: monkey_subid4_substate2_hook(gb, sp0_); return;
+    case 0x7772: monkey_subid4_substate3_hook(gb, sp0_); return;
+    case 0x779a: monkey_subid4_substate4_0_hook(gb, sp0_); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+static void monkey_subid4_monkey3_hook(GB *gb, uint16_t sp0_) {
+  CYC(0x77b0, 0x77b2); E = 0x45;
+  CYC(0x77b2, 0x77b3); A = mem_rd(gb, DE);
+  CYC(0x77b3, 0x77b4); push_effect(gb, 0x77b4);
+  switch (monkey_jump_table(gb)) {
+    case 0x773b: monkey_subid4_substate0_hook(gb, sp0_); return;
+    case 0x7742: monkey_subid4_substate1_hook(gb, sp0_); return;
+    case 0x7760: monkey_subid4_substate2_hook(gb, sp0_); return;
+    case 0x7772: monkey_subid4_substate3_hook(gb, sp0_); return;
+    case 0x779d: monkey_subid4_substate4_1_hook(gb, sp0_); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+static void monkey_subid4_monkey9_hook(GB *gb, uint16_t sp0_) {
+  CYC(0x77be, 0x77c0); E = 0x45;
+  CYC(0x77c0, 0x77c1); A = mem_rd(gb, DE);
+  CYC(0x77c1, 0x77c3); alu_cp(gb, 0x04);
+  if (!(F & FC)) CALL_C_CC(0x77c3, monkeyCheckChangeAnimation_hook, 0x768d, 0x77c6);
+  else CYC(0x77c3, 0x77c6);
+  CYC(0x77c6, 0x77c8); E = 0x45;
+  CYC(0x77c8, 0x77c9); A = mem_rd(gb, DE);
+  CYC(0x77c9, 0x77ca); push_effect(gb, 0x77ca);
+  switch (monkey_jump_table(gb)) {
+    case 0x773b: monkey_subid4_substate0_hook(gb, sp0_); return;
+    case 0x7742: monkey_subid4_substate1_hook(gb, sp0_); return;
+    case 0x7760: monkey_subid4_substate2_hook(gb, sp0_); return;
+    case 0x7772: monkey_subid4_substate3_hook(gb, sp0_); return;
+    case 0x7635: monkey9_disappearance_substate0_hook(gb, sp0_); return;
+    case 0x7646: monkey9_disappearance_substate1_hook(gb, sp0_); return;
+    case 0x7660: monkey9_disappearance_substate2_hook(gb, sp0_); return;
+    case 0x767f: monkey9_disappearance_substate3_hook(gb, sp0_); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+void monkeySubid4State1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x7715, 0x7717); E = 0x43;
+  CYC(0x7717, 0x7718); A = mem_rd(gb, DE);
+  CYC(0x7718, 0x7719); push_effect(gb, 0x7719);
+  switch (monkey_jump_table(gb)) {
+    case 0x772d: monkey_subid4_monkey0_hook(gb, sp0_); return;
+    case 0x77b0: monkey_subid4_monkey3_hook(gb, sp0_); return;
+    case 0x77be: monkey_subid4_monkey9_hook(gb, sp0_); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+void monkeyAnimateAndRunScript_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x77f5, interactionRunScript_hook, 0x2552, 0x77f8);
+  CYC(0x77f8, 0x77fb);
+  interactionAnimateAsNpc_hook(gb);
+}
+
+void monkeySubid5State1_monkey9_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x77fb, interactionRunScript_hook, 0x2552, 0x77fe);
+  CALL_C(0x77fe, monkeyCheckChangeAnimation_hook, 0x768d, 0x7801);
+  CALL_C(0x7801, objectPushLinkAwayOnCollision_hook, 0x230e, 0x7804);
+  CALL_C(0x7804, objectSetPriorityRelativeToLink_withTerrainEffects_hook, 0x22e0, 0x7807);
+  CYC(0x7807, 0x7809); E = 0x45;
+  CYC(0x7809, 0x780a); A = mem_rd(gb, DE);
+  CYC(0x780a, 0x780b); push_effect(gb, 0x780b);
+  switch (monkey_jump_table(gb)) {
+    case 0x7635: monkey9_disappearance_substate0_hook(gb, sp0_); return;
+    case 0x7646: monkey9_disappearance_substate1_hook(gb, sp0_); return;
+    case 0x7660: monkey9_disappearance_substate2_hook(gb, sp0_); return;
+    case 0x767f: monkey9_disappearance_substate3_hook(gb, sp0_); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+static void monkey_subid5_monkey0_hook(GB *gb, uint16_t sp0_) {
+  CALL_C(0x77f2, monkeyUpdateGravityAndJumpIfLanded_hook, 0x754d, 0x77f5);
+  monkeyAnimateAndRunScript_hook(gb);
+}
+
+void monkeySubid5State1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x77da, 0x77dc); E = 0x43;
+  CYC(0x77dc, 0x77dd); A = mem_rd(gb, DE);
+  CYC(0x77dd, 0x77de); push_effect(gb, 0x77de);
+  switch (monkey_jump_table(gb)) {
+    case 0x77f2: monkey_subid5_monkey0_hook(gb, sp0_); return;
+    case 0x77f5: monkeyAnimateAndRunScript_hook(gb); return;
+    case 0x77fb: monkeySubid5State1_monkey9_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+void monkeyState1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x74ba, 0x74bc); E = 0x42;
+  CYC(0x74bc, 0x74bd); A = mem_rd(gb, DE);
+  CYC(0x74bd, 0x74be); push_effect(gb, 0x74be);
+  switch (monkey_jump_table(gb)) {
+    case 0x74ce: monkeySubid0State1_hook(gb); return;
+    case 0x755d: monkeySubid1State1_hook(gb); return;
+    case 0x770f: monkeySubid2State1_hook(gb); return;
+    case 0x7715: monkeySubid4State1_hook(gb); return;
+    case 0x77da: monkeySubid5State1_hook(gb); return;
+    case 0x261b: interactionAnimate_hook(gb); return;
+    case 0x77f5: monkeyAnimateAndRunScript_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
