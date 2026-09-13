@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,959 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,978 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -220,6 +220,10 @@ Updated 2026-09-13. Newest entries at the top of each section.
   bomb-throw, and shared-bounce helpers, and the bank-3F rabbit-spawn/Tuni Nut state cluster with
   one durable continuation. Twenty-nine parent-owned local rows disappeared; the project now has
   2,959 readable hooks out of 12,363.
+  Batch 140 added the remaining bank-5 companion mounting, hazard, and dismount helpers, the
+  bank-7 sword, shovel, punch, sword-beam, dust, ore, and magnet-ball item roots, and the bank-3F
+  monkey interaction root with its durable post-graphics continuation. Forty-nine parent-owned
+  local rows disappeared; the project now has 2,978 readable hooks out of 12,314.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -325,6 +329,18 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 140 (19 hook entries, 21 named shims): added ten bank-5
+  companion weapon, direction, mounting, hazard, and dismount helpers; added nine bank-7 item
+  entry shims covering the sword, Biggoron Sword/Fool's Ore alias, shovel, punch alias,
+  sword beam, dust, and magnet ball; and completed the bank-3F monkey interaction root with a
+  durable `$72f9` continuation. Forty-nine parent-owned local rows were absorbed into structured
+  C. `interactionCode39_body` is NOVERIFY because its graphics initialization can switch threads,
+  while its continuation remains verifiable. Integration upgraded the old bank-0 companion
+  dismount caller to `CALL_C` and added its required entry-SP capture. Two independent instruction
+  reviews per routine found no defects. The project now has 2,978 readable hooks out of 12,314.
+  Gates: lint 0, 30k verify 0 failures across 4,610,939 calls with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches across 11,815,617 calls with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 139 (26 routines): added ten bank-5 companion movement,
   adjacent-wall, relative-tile, collision, and item-creation helpers; added five bank-7 sword-tile
   and damage helpers plus lateral bomb throwing and the shared bounce routine; and completed the

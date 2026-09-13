@@ -17,6 +17,7 @@ interactionInitGraphics
 interactionCode4b_body
 interactionCodeb1_body
 tuniNut_state0
+interactionCode39_body
 loadTreeGfx
 agesFunc_3f_4133
 agesFunc_3f_4133__afterCall4143

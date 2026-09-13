@@ -6362,13 +6362,14 @@ void loadScreenMusicAndSetRoomPack_hook(GB *gb) {
 }
 
 void dismountCompanionAndSetRememberedPositionToScreenCenter_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   bank_push(gb, 0x3431, 0x05);
   SET_DE(w1Companion);
   A = E;
   CYC(0x343b, 0x3441); H8(hActiveObjectType) = A;
   A = D;
   CYC(0x3441, 0x3444); H8(hActiveObject) = A;
-  CALL_ROM(0x3444, ROM_b05_companionDismount);
+  CALL_C(0x3444, companionDismount_hook, 0x4630, 0x3447);
   CALL_ROM(0x3447, ROM_b05_saveLinkLocalRespawnAndCompanionPosition);
   A = 0x38;
   CYC(0x344a, 0x344f); W8(wRememberedCompanionY) = A;

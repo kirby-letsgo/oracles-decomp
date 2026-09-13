@@ -12,6 +12,11 @@ void companionCalculateAdjacentWallsBitset_hook(GB *gb);
 void checkCollisionForCompanion_hook(GB *gb);
 void specialObjectGetRelativeTileFromHl_hook(GB *gb);
 void specialObjectCheckFacingWall_hook(GB *gb);
+void companionUpdateDirectionAndSetAnimation_hook(GB *gb);
+void companionSetAnimation_hook(GB *gb);
+void setLinkMountingSpeed_hook(GB *gb);
+void companionGotoHazardHandlingState_hook(GB *gb);
+void companionDismount_hook(GB *gb);
 
 static void common_code_add_a_to_hl(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -794,4 +799,261 @@ void companionCreateItem_hook(GB *gb) {
   CYC(0x4568, 0x456a); mem_wr(gb, HL, 0xf9);
   CYC(0x456a, 0x456b); alu_xor(gb, A);
   CYC(0x456b, 0x456c); ret_effect(gb);
+}
+
+void companionCreateWeaponItem_hook(GB *gb) {
+  CYC(0x455b, 0x455e); SET_HL(w1WeaponItem_enabled);
+  CYC(0x455e, 0x455f); A = mem_rd(gb, HL);
+  CYC(0x455f, 0x4560); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x4560, 0x4561); ret_effect(gb); return;
+  }
+  CYC(0x4560, 0x4561);
+  CYC(0x4561, 0x4562); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x4562, 0x4563); L = alu_inc8(gb, L);
+  CYC(0x4563, 0x4564); mem_wr(gb, HL, B);
+  CYC(0x4564, 0x4565); L = alu_inc8(gb, L);
+  CYC(0x4565, 0x4566); mem_wr(gb, HL, C);
+  CYC(0x4566, 0x4568); L = 0x28;
+  CYC(0x4568, 0x456a); mem_wr(gb, HL, 0xf9);
+  CYC(0x456a, 0x456b); alu_xor(gb, A);
+  CYC(0x456b, 0x456c); ret_effect(gb);
+}
+
+void companionUpdateDirectionAndAnimate_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x456c, 0x456e); E = 0x08;
+  CYC(0x456e, 0x456f); A = mem_rd(gb, DE);
+  CYC(0x456f, 0x4572); mem_wr(gb, w1Link_direction, A);
+  CYC(0x4572, 0x4574); E = 0x04;
+  CYC(0x4574, 0x4575); A = mem_rd(gb, DE);
+  CYC(0x4575, 0x4577); alu_cp(gb, 0x0c);
+  if (F & FZ) {
+    CYCT(0x4577, 0x457a); specialObjectAnimate_hook(gb); return;
+  }
+  CYC(0x4577, 0x457a);
+  CALL_C(0x457a, updateLinkDirectionFromAngle_hook, 0x2b64, 0x457d);
+  CYC(0x457d, 0x4580); SET_HL(w1Companion_direction);
+  CYC(0x4580, 0x4581); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x4581, 0x4584); specialObjectAnimate_hook(gb); return;
+  }
+  CYC(0x4581, 0x4584);
+  companionUpdateDirectionAndSetAnimation_hook(gb);
+}
+
+void companionUpdateDirectionAndSetAnimation_hook(GB *gb) {
+  CYC(0x4584, 0x4586); E = 0x09;
+  CYC(0x4586, 0x4587); A = mem_rd(gb, DE);
+  CYC(0x4587, 0x4588); alu_add(gb, A);
+  CYC(0x4588, 0x458a); A = alu_swap(gb, A);
+  CYC(0x458a, 0x458c); alu_and(gb, 0x03);
+  CYC(0x458c, 0x458d); E = alu_dec8(gb, E);
+  CYC(0x458d, 0x458e); mem_wr(gb, DE, A);
+  companionSetAnimation_hook(gb);
+}
+
+void companionSetAnimation_hook(GB *gb) {
+  CYC(0x458e, 0x458f); H = D;
+  CYC(0x458f, 0x4590); A = C;
+  CYC(0x4590, 0x4592); L = 0x08;
+  CYC(0x4592, 0x4593); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x4593, 0x4595); L = 0x38;
+  CYC(0x4595, 0x4596); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x4596, 0x4599);
+  specialObjectSetAnimation_hook(gb);
+}
+
+void companionTryToMount_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x4599, 0x459c); A = W8(wActiveTileType);
+  CYC(0x459c, 0x459e); alu_cp(gb, 0x01);
+  if (F & FZ) {
+    CYCT(0x459e, 0x45a0);
+    goto cant_mount;
+  }
+  CYC(0x459e, 0x45a0);
+  CYC(0x45a0, 0x45a3); A = W8(wDisallowMountingCompanion);
+  CYC(0x45a3, 0x45a4); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x45a4, 0x45a6);
+    goto cant_mount;
+  }
+  CYC(0x45a4, 0x45a6);
+  CALL_C(0x45a6, checkLinkVulnerableAndIDZero_hook, 0x1d20, 0x45a9);
+  if (F & FC) {
+    CYCT(0x45a9, 0x45ab);
+    goto try_mounting;
+  }
+  CYC(0x45a9, 0x45ab);
+
+cant_mount:
+  CYC(0x45ab, 0x45ac); alu_or(gb, D);
+  CYC(0x45ac, 0x45ad); ret_effect(gb);
+  return;
+
+try_mounting:
+  CYC(0x45ad, 0x45b0); A = W8(w1Link_state);
+  CYC(0x45b0, 0x45b2); alu_cp(gb, 0x01);
+  if (!(F & FZ)) {
+    CYCT(0x45b2, 0x45b3); ret_effect(gb); return;
+  }
+  CYC(0x45b2, 0x45b3);
+  CYC(0x45b3, 0x45b6); A = W8(wLinkSwimmingState);
+  CYC(0x45b6, 0x45b7); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x45b7, 0x45b8); ret_effect(gb); return;
+  }
+  CYC(0x45b7, 0x45b8);
+  CYC(0x45b8, 0x45bb); A = W8(wLinkGrabState);
+  CYC(0x45bb, 0x45bc); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x45bc, 0x45bd); ret_effect(gb); return;
+  }
+  CYC(0x45bc, 0x45bd);
+  CYC(0x45bd, 0x45c0); A = W8(wLinkInAir);
+  CYC(0x45c0, 0x45c1); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x45c1, 0x45c2); ret_effect(gb); return;
+  }
+  CYC(0x45c1, 0x45c2);
+  CYC(0x45c2, 0x45c3); A = alu_inc8(gb, A);
+  CYC(0x45c3, 0x45c6); W8(wDisableWarpTiles) = A;
+  CYC(0x45c6, 0x45c9); W8(wWarpsDisabled) = A;
+  CYC(0x45c9, 0x45cb); E = 0x04;
+  CYC(0x45cb, 0x45cd); A = 0x03;
+  CYC(0x45cd, 0x45ce); mem_wr(gb, DE, A);
+  CYC(0x45ce, 0x45d0); A = 0xff;
+  setLinkMountingSpeed_hook(gb);
+}
+
+void setLinkMountingSpeed_hook(GB *gb) {
+  CYC(0x45d0, 0x45d3); W8(wLinkAngle) = A;
+  CYC(0x45d3, 0x45d5); A = 0x81;
+  CYC(0x45d5, 0x45d8); W8(wLinkInAir) = A;
+  CYC(0x45d8, 0x45db); W8(wDisableScreenTransitions) = A;
+  CYC(0x45db, 0x45de); SET_HL(w1Link_angle);
+  CYC(0x45de, 0x45df); mem_wr(gb, HL, A);
+  CYC(0x45df, 0x45e1); L = 0x10;
+  CYC(0x45e1, 0x45e3); mem_wr(gb, HL, 0x14);
+  CYC(0x45e3, 0x45e5); L = 0x14;
+  CYC(0x45e5, 0x45e7); mem_wr(gb, HL, 0x40);
+  CYC(0x45e7, 0x45e8); L = alu_inc8(gb, L);
+  CYC(0x45e8, 0x45ea); mem_wr(gb, HL, 0xfe);
+  CYC(0x45ea, 0x45eb); alu_xor(gb, A);
+  CYC(0x45eb, 0x45ec); ret_effect(gb);
+}
+
+void companionCheckHazards_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x45ec, objectCheckIsOnHazard_hook, 0x220d, 0x45ef);
+  CYC(0x45ef, 0x45f0); H = D;
+  if (!(F & FC)) {
+    CYCT(0x45f0, 0x45f1); ret_effect(gb); return;
+  }
+  CYC(0x45f0, 0x45f1);
+  companionGotoHazardHandlingState_hook(gb);
+}
+
+void companionGotoHazardHandlingState_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x45f1, 0x45f2); push_effect(gb, AF);
+  CYC(0x45f2, 0x45f4); L = 0x04;
+  CYC(0x45f4, 0x45f6); A = 0x04;
+  CYC(0x45f6, 0x45f7); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x45f7, 0x45f8); alu_xor(gb, A);
+  CYC(0x45f8, 0x45f9); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x45f9, 0x45fa); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x45fa, 0x45fc); L = 0x01;
+  CYC(0x45fc, 0x45fd); A = mem_rd(gb, HL);
+  CYC(0x45fd, 0x45ff); alu_cp(gb, 0x0c);
+  if (F & FZ) {
+    CYCT(0x45ff, 0x4601);
+  } else {
+    CYC(0x45ff, 0x4601);
+    CYC(0x4601, 0x4604); W8(wDisableScreenTransitions) = A;
+    CYC(0x4604, 0x4606); A = 0x87;
+    CALL_C(0x4606, playSound_b00_hook, 0x0c98, 0x4609);
+  }
+  CYC(0x4609, 0x460a); SET_AF(pop_effect(gb));
+  CYC(0x460a, 0x460b); alu_scf(gb);
+  CYC(0x460b, 0x460c); ret_effect(gb);
+}
+
+void companionDismountAndSavePosition_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x460c, companionDismount_hook, 0x4630, 0x460f);
+  CYC(0x460f, 0x4611); E = 0x01;
+  CYC(0x4611, 0x4612); A = mem_rd(gb, DE);
+  CYC(0x4612, 0x4615); SET_HL(wAnimalCompanion);
+  CYC(0x4615, 0x4616); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) {
+    CYCT(0x4616, 0x4618);
+    goto normal_dismount;
+  }
+  CYC(0x4616, 0x4618);
+  CYC(0x4618, 0x461a); alu_cp(gb, 0x0b);
+  if (F & FZ) {
+    CYCT(0x461a, 0x461c);
+    CYC(0x4622, 0x4624);
+    goto normal_dismount;
+  }
+  CYC(0x461a, 0x461c);
+  CYC(0x461c, 0x461e); alu_cp(gb, 0x0c);
+  if (F & FZ) {
+    CYCT(0x461e, 0x4620);
+    CYC(0x4624, 0x4626);
+    goto normal_dismount;
+  }
+  CYC(0x461e, 0x4620);
+  CYC(0x4620, 0x4622);
+
+normal_dismount:
+  CYC(0x462e, 0x4630);
+  saveLinkLocalRespawnAndCompanionPosition(gb);
+}
+
+void companionDismount_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x4630, 0x4631); alu_xor(gb, A);
+  CALL_C(0x4631, setLinkID_hook, 0x2ad9, 0x4634);
+  CYC(0x4634, 0x4637); SET_HL(w1Link_oamFlagsBackup);
+  CYC(0x4637, 0x4638); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4638, 0x4639); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(0x4639, 0x463a); H = D;
+  CYC(0x463a, 0x463b); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x463b, 0x463c); mem_wr(gb, HL, A);
+  CYC(0x463c, 0x463d); alu_xor(gb, A);
+  CYC(0x463d, 0x463f); L = 0x25;
+  CYC(0x463f, 0x4640); mem_wr(gb, HL, A);
+  CYC(0x4640, 0x4642); L = 0x2b;
+  CYC(0x4642, 0x4643); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4643, 0x4644); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4644, 0x4645); mem_wr(gb, HL, A);
+  CYC(0x4645, 0x4647); L = 0x3c;
+  CYC(0x4647, 0x4648); mem_wr(gb, HL, A);
+  CYC(0x4648, 0x464b); W8(wLinkForceState) = A;
+  CYC(0x464b, 0x464e); W8(wcc50) = A;
+  CYC(0x464e, 0x4650); L = 0x00;
+  CYC(0x4650, 0x4652); mem_wr(gb, HL, 0x01);
+  CYC(0x4652, 0x4654); L = 0x08;
+  CYC(0x4654, 0x4655); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x4655, 0x4657); A = alu_swap(gb, A);
+  CYC(0x4657, 0x4659); A = alu_srl(gb, A);
+  CYC(0x4659, 0x465a); mem_wr(gb, HL, A);
+  CALL_C(0x465a, setLinkMountingSpeed_hook, 0x45d0, 0x465d);
+  CYC(0x465d, 0x4660); SET_HL(w1Link_angle);
+  CYC(0x4660, 0x4662); mem_wr(gb, HL, 0xff);
+  CALL_C(0x4662, objectCopyPosition_hook, 0x2242, 0x4665);
+  CYC(0x4665, 0x4666); L = alu_dec8(gb, L);
+  CYC(0x4666, 0x4668); mem_wr(gb, HL, 0xf8);
+  CYC(0x4668, 0x4669); A = H;
+  CYC(0x4669, 0x466c); W8(wLinkObjectIndex) = A;
+  CYC(0x466c, 0x466d); alu_xor(gb, A);
+  CYC(0x466d, 0x4670); W8(wDisableWarpTiles) = A;
+  CYC(0x4670, 0x4673); W8(wWarpsDisabled) = A;
+  CYC(0x4673, 0x4676); W8(wForceCompanionDismount) = A;
+  CYC(0x4676, 0x4679); W8(wDisableScreenTransitions) = A;
+  CYC(0x4679, 0x467c);
+  setCameraFocusedObjectToLink_hook(gb);
 }
