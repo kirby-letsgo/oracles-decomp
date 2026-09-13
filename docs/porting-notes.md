@@ -767,3 +767,9 @@ desync to discover; keep them when porting routines.
   unconditional two-byte `jr` from `$55f8` through `$55fb`, consuming the first byte of the nearby
   `$55fa` entry. The correct physical endpoint is `$55fa`; recheck existing direct-call and jump
   tails whenever removing their last generated boundary, even when lint and replay were green.
+- Rewriting a parent removes all of its transliterator-synthesized local rows, including genuine
+  resume points that were never source symbols. Batch 120's nested Nayru and Black Tower states
+  called thread-capable room and graphics loaders, but one `$64c0` return was not synthesized at
+  all and the other post-call rows would vanish with their parents. Audit every nested direct-call
+  chain, add each executable continuation to `extra.sym` and both hook lists, and deliberately
+  leave inline `.db` tables such as `$6625` and `$6722` unaliased so they disappear as code.
