@@ -904,3 +904,8 @@ desync to discover; keep them when porting routines.
   boolean is insufficient because `CALL_C`'s nonlocal arm returns only from the static helper;
   initialize a tri-state to abort, set normal only after the local `ret`, and set escape only after
   the deliberate `pop`.
+- A source-local `CYC` override must always be paired with the matching `CYCT` override. Batch 143's
+  first `caneOfSomariaParent.c` defined only bank-6 `CYC`, so its taken `jp nc` at `$4b7c` silently
+  used the default bank-0 `CYCT` macro and burned unrelated ROM bytes. Independent review found the
+  missing definition on a cold path that replay did not exercise. Define and `#undef` both macros
+  together at every source file's bank boundary, even if the file has only one conditional jump.

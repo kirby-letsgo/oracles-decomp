@@ -1741,3 +1741,37 @@ void companionRetIfNotFinishedWalkingIn_hook(GB *gb) {
   CYC(0x498d, 0x498e); SET_AF(pop_effect(gb));
   CYC(0x498e, 0x498f); ret_effect(gb);
 }
+
+void companionForceMount_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x498f, 0x4992); A = W8(wMenuDisabled);
+  CYC(0x4992, 0x4993); push_effect(gb, AF);
+  CYC(0x4993, 0x4994); alu_xor(gb, A);
+  CYC(0x4994, 0x4997); W8(wMenuDisabled) = A;
+  CYC(0x4997, 0x499a); W8(w1Link_invincibilityCounter) = A;
+  CALL_C(0x499a, companionTryToMount_hook, 0x4599, 0x499d);
+  CYC(0x499d, 0x499e); SET_AF(pop_effect(gb));
+  CYC(0x499e, 0x49a1); W8(wMenuDisabled) = A;
+  CYC(0x49a1, 0x49a2); ret_effect(gb);
+}
+
+void companionDecCounter1_hook(GB *gb) {
+  CYC(0x49a2, 0x49a3); H = D;
+  CYC(0x49a3, 0x49a5); L = 0x06;
+  CYC(0x49a5, 0x49a6); A = mem_rd(gb, HL);
+  CYC(0x49a6, 0x49a7); alu_or(gb, A);
+  CYC(0x49a7, 0x49a8); ret_effect(gb);
+}
+
+void specialObjectTryToBreakTile_source05_hook(GB *gb) {
+  CYC(0x49a8, 0x49a9); H = D;
+  CYC(0x49a9, 0x49ab); L = (uint8_t)w1Link_yh;
+  CYC(0x49ab, 0x49ac); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x49ac, 0x49ad); L = alu_inc8(gb, L);
+  CYC(0x49ad, 0x49ae); C = mem_rd(gb, HL);
+  CYC(0x49ae, 0x49b0); alu_add(gb, 0x05);
+  CYC(0x49b0, 0x49b1); B = A;
+  CYC(0x49b1, 0x49b3); A = 0x05;
+  CYC(0x49b3, 0x49b6);
+  tryToBreakTile_hook(gb);
+}
