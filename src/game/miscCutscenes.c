@@ -98,11 +98,35 @@ void blackTowerExplanationCutsceneHandler__cbb8_02__state2_hook(GB *gb);
 void func_6733_hook(GB *gb);
 void func_6733__cbb8_00_hook(GB *gb);
 void func_6733__cbb8_02_hook(GB *gb);
+void blackTowerCompleteCutsceneHandler_hook(GB *gb);
+void blackTowerCompleteCutsceneHandler__afterCall69b8_hook(GB *gb);
+void blackTowerCompleteCutsceneHandler__runStates_hook(GB *gb);
+void blackTowerCompleteCutsceneHandler__state4_hook(GB *gb);
+void blackTowerCompleteCutsceneHandler__state4__afterCall6a6b_hook(GB *gb);
 void blackTowerCompleteCutsceneHandler__state0_hook(GB *gb);
 void blackTowerCompleteCutsceneHandler__state1_hook(GB *gb);
 void blackTowerCompleteCutsceneHandler__state2_hook(GB *gb);
 void blackTowerCompleteCutsceneHandler__state3_hook(GB *gb);
 void blackTowerCompleteCutsceneHandler__state5_hook(GB *gb);
+void turnToStoneCutsceneHandler_hook(GB *gb);
+void turnToStoneCutsceneHandler__afterCall6a91_hook(GB *gb);
+void turnToStoneCutsceneHandler__runStates_hook(GB *gb);
+void turnToStoneCutsceneHandler__state1_hook(GB *gb);
+void turnToStoneCutsceneHandler__state1__afterCall6ace_hook(GB *gb);
+void turnToStoneCutsceneHandler__state3_hook(GB *gb);
+void turnToStoneCutsceneHandler__state3__afterCall6afa_hook(GB *gb);
+void turnToStoneCutsceneHandler__state5_hook(GB *gb);
+void turnToStoneCutsceneHandler__state5__afterCall6b50_hook(GB *gb);
+void twinrovaRevealCutsceneHandler_hook(GB *gb);
+void twinrovaRevealCutsceneHandler__afterCall6b7a_hook(GB *gb);
+void twinrovaRevealCutsceneHandler__runStates_hook(GB *gb);
+void twinrovaRevealCutsceneHandler__state4_hook(GB *gb);
+void twinrovaRevealCutsceneHandler__state4__afterCall6c2d_hook(GB *gb);
+void twinrovaRevealCutsceneHandler__state6_hook(GB *gb);
+void twinrovaRevealCutsceneHandler__state6__afterCall6c64_hook(GB *gb);
+void twinrovaRevealCutsceneHandler__state6__afterCall6c95_hook(GB *gb);
+void twinrovaRevealCutsceneHandler__state9_hook(GB *gb);
+void twinrovaRevealCutsceneHandler__state9__afterCall6d05_hook(GB *gb);
 void makuTreeDisappearingCutsceneHandler_hook(GB *gb);
 void nayruWarpToMakuTreeCutsceneHandler__state1_hook(GB *gb);
 void nayruWarpToMakuTreeCutsceneHandler__state2_hook(GB *gb);
@@ -1788,6 +1812,78 @@ void nayruWarpToMakuTreeCutsceneHandler__func_6962_hook(GB *gb) {
   CYC(0x696a, 0x696b); ret_effect(gb);
 }
 
+void black_tower_complete_after_states_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x69b8, updateStatusBar_hook, 0x1a9c, 0x69bb);
+  CYC(0x69bb, 0x69be);
+  updateAllObjects_hook(gb);
+}
+
+void blackTowerCompleteCutsceneHandler__afterCall69b8_hook(GB *gb) {
+  black_tower_complete_after_states_hook(gb);
+}
+
+void blackTowerCompleteCutsceneHandler__runStates_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x69be, 0x69c1); SET_DE(wCutsceneState);
+  CYC(0x69c1, 0x69c2); A = mem_rd(gb, DE);
+  CYC(0x69c2, 0x69c3); push_effect(gb, 0x69c3);
+  switch (misc_cutscene_jump_table(gb)) {
+    case 0x69cf: blackTowerCompleteCutsceneHandler__state0_hook(gb); return;
+    case 0x69d7: blackTowerCompleteCutsceneHandler__state1_hook(gb); return;
+    case 0x69e6: blackTowerCompleteCutsceneHandler__state2_hook(gb); return;
+    case 0x6a3c: blackTowerCompleteCutsceneHandler__state3_hook(gb); return;
+    case 0x6a52: blackTowerCompleteCutsceneHandler__state4_hook(gb); return;
+    case 0x6a8d: blackTowerCompleteCutsceneHandler__state5_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+void blackTowerCompleteCutsceneHandler_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x69b5, blackTowerCompleteCutsceneHandler__runStates_hook, 0x69be, 0x69b8);
+  black_tower_complete_after_states_hook(gb);
+}
+
+void black_tower_complete_state4_after_room_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x6a6b, showStatusBar_hook, 0x1aa4, 0x6a6e);
+  CYC(0x6a6e, 0x6a70); A = 0x21;
+  CALL_C(0x6a70, playSound_b00_hook, 0x0c98, 0x6a73);
+  CYC(0x6a73, 0x6a75); A = 0xac;
+  CALL_C(0x6a75, loadPaletteHeader_hook, 0x050b, 0x6a78);
+  CYC(0x6a78, 0x6a7a); A = 0x02;
+  CALL_C(0x6a7a, loadGfxRegisterStateIndex_hook, 0x02ea, 0x6a7d);
+  CYC(0x6a7d, 0x6a7e); alu_xor(gb, A);
+  CYC(0x6a7e, 0x6a81); mem_wr(gb, wScrollMode, A);
+  CYC(0x6a81, 0x6a83); A = 0x28;
+  CYC(0x6a83, 0x6a86); mem_wr(gb, wGfxRegs2_SCX, A);
+  CYC(0x6a86, 0x6a88); hram_wr(gb, (uint8_t)hCameraX, A);
+  CYC(0x6a88, 0x6a8a); A = 0xf0;
+  CYC(0x6a8a, 0x6a8d); mem_wr(gb, wGfxRegs2_SCY, A);
+  blackTowerCompleteCutsceneHandler__state5_hook(gb);
+}
+
+void blackTowerCompleteCutsceneHandler__state4__afterCall6a6b_hook(GB *gb) {
+  black_tower_complete_state4_after_room_hook(gb);
+}
+
+void blackTowerCompleteCutsceneHandler__state4_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x6a52, 0x6a55); SET_HL(wTmpcbb3);
+  CYC(0x6a55, 0x6a57); B = 0x02;
+  CALL_C(0x6a57, flashScreen_hook, 0x2d73, 0x6a5a);
+  if (F & FZ) { CYCT(0x6a5a, 0x6a5b); ret_effect(gb); return; }
+  CYC(0x6a5a, 0x6a5b);
+  CALL_C(0x6a5b, cutscene_incCutsceneState_hook, 0x6f8c, 0x6a5e);
+  CYC(0x6a5e, 0x6a60); A = 0x10;
+  CYC(0x6a60, 0x6a63); mem_wr(gb, wTmpcfc0_genericCutscene_cfde, A);
+  CYC(0x6a63, 0x6a66); SET_HL(0x64c5);
+  CYC(0x6a66, 0x6a68); E = 0x03;
+  CALL_C(0x6a68, interBankCall_hook, 0x008a, 0x6a6b);
+  black_tower_complete_state4_after_room_hook(gb);
+}
+
 void blackTowerCompleteCutsceneHandler__state0_hook(GB *gb) {
   CYC(0x69cf, 0x69d1); A = 0x3c;
   CYC(0x69d1, 0x69d4); mem_wr(gb, wTmpcbb3, A);
@@ -1879,6 +1975,135 @@ void blackTowerCompleteCutsceneHandler__func_6a2b_hook(GB *gb) {
   createInteraction_hook(gb);
 }
 
+void turn_to_stone_after_states_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6a91, updateStatusBar_hook, 0x1a9c, 0x6a94);
+  CYC(0x6a94, 0x6a97);
+  updateAllObjects_hook(gb);
+}
+
+void turnToStoneCutsceneHandler__afterCall6a91_hook(GB *gb) {
+  turn_to_stone_after_states_hook(gb);
+}
+
+void turnToStoneCutsceneHandler__runStates_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x6a97, 0x6a9a); SET_DE(wCutsceneState);
+  CYC(0x6a9a, 0x6a9b); A = mem_rd(gb, DE);
+  CYC(0x6a9b, 0x6a9c); push_effect(gb, 0x6a9c);
+  switch (misc_cutscene_jump_table(gb)) {
+    case 0x6aaa: turnToStoneCutsceneHandler__state0_hook(gb); return;
+    case 0x6ac3: turnToStoneCutsceneHandler__state1_hook(gb); return;
+    case 0x6ad3: turnToStoneCutsceneHandler__state2_hook(gb); return;
+    case 0x6af2: turnToStoneCutsceneHandler__state3_hook(gb); return;
+    case 0x6b16: turnToStoneCutsceneHandler__state4_hook(gb); return;
+    case 0x6b22: turnToStoneCutsceneHandler__state5_hook(gb); return;
+    case 0x6b66: turnToStoneCutsceneHandler__state6_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+void turnToStoneCutsceneHandler_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x6a8e, turnToStoneCutsceneHandler__runStates_hook, 0x6a97, 0x6a91);
+  turn_to_stone_after_states_hook(gb);
+}
+
+void turn_to_stone_state1_after_room_hook(GB *gb) {
+  CYC(0x6ace, 0x6ad0); A = 0x02;
+  CYC(0x6ad0, 0x6ad3);
+  loadGfxRegisterStateIndex_hook(gb);
+}
+
+void turnToStoneCutsceneHandler__state1__afterCall6ace_hook(GB *gb) {
+  turn_to_stone_state1_after_room_hook(gb);
+}
+
+void turnToStoneCutsceneHandler__state1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x6ac3, 0x6ac6); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x6ac6, 0x6ac7); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x6ac7, 0x6ac8); ret_effect(gb); return; }
+  CYC(0x6ac7, 0x6ac8);
+  CALL_C(0x6ac8, cutscene_incCutsceneState_hook, 0x6f8c, 0x6acb);
+  CALL_C(0x6acb, cutscene_loadRoomObjectSetAndFadein_hook, 0x64c5, 0x6ace);
+  turn_to_stone_state1_after_room_hook(gb);
+}
+
+void turn_to_stone_state3_after_state1_hook(GB *gb) {
+  CYC(0x6afa, 0x6afc); A = 0x08;
+  CYC(0x6afc, 0x6afe); B = 0x28;
+  CYC(0x6afe, 0x6b01); SET_HL(hCameraY);
+  CYC(0x6b01, 0x6b02); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x6b02, 0x6b03); L = alu_inc8(gb, L);
+  CYC(0x6b03, 0x6b04); mem_wr(gb, HL, B);
+  CYC(0x6b04, 0x6b06); A = 0xf8;
+  CYC(0x6b06, 0x6b09); SET_HL(wGfxRegs2_SCY);
+  CYC(0x6b09, 0x6b0a); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x6b0a, 0x6b0b); mem_wr(gb, HL, B);
+  CYC(0x6b0b, 0x6b0c); alu_xor(gb, A);
+  CYC(0x6b0c, 0x6b0f); mem_wr(gb, wScrollMode, A);
+  CYC(0x6b0f, 0x6b12); mem_wr(gb, wScreenOffsetY, A);
+  CYC(0x6b12, 0x6b15); mem_wr(gb, wScreenOffsetX, A);
+  CYC(0x6b15, 0x6b16); ret_effect(gb);
+}
+
+void turnToStoneCutsceneHandler__state3__afterCall6afa_hook(GB *gb) {
+  turn_to_stone_state3_after_state1_hook(gb);
+}
+
+void turnToStoneCutsceneHandler__state3_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x6af2, 0x6af5); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x6af5, 0x6af6); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x6af6, 0x6af7); ret_effect(gb); return; }
+  CYC(0x6af6, 0x6af7);
+  CALL_C(0x6af7, turnToStoneCutsceneHandler__state1_hook, 0x6ac3, 0x6afa);
+  turn_to_stone_state3_after_state1_hook(gb);
+}
+
+void turn_to_stone_state5_after_refresh_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x6b50, 0x6b52); A = 0xf0;
+  CALL_C(0x6b52, playSound_b00_hook, 0x0c98, 0x6b55);
+  CALL_C(0x6b55, showStatusBar_hook, 0x1aa4, 0x6b58);
+  CYC(0x6b58, 0x6b5a); A = 0x02;
+  CALL_C(0x6b5a, loadGfxRegisterStateIndex_hook, 0x02ea, 0x6b5d);
+  CYC(0x6b5d, 0x6b60); A = mem_rd(gb, wLoadingRoomPack);
+  CYC(0x6b60, 0x6b63); mem_wr(gb, wRoomPack, A);
+  CYC(0x6b63, 0x6b66);
+  fadeinFromWhiteToRoom_hook(gb);
+}
+
+void turnToStoneCutsceneHandler__state5__afterCall6b50_hook(GB *gb) {
+  turn_to_stone_state5_after_refresh_hook(gb);
+}
+
+void turnToStoneCutsceneHandler__state5_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x6b22, 0x6b25); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(0x6b25, 0x6b26); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x6b26, 0x6b27); ret_effect(gb); return; }
+  CYC(0x6b26, 0x6b27);
+  CALL_C(0x6b27, cutscene_incCutsceneState_hook, 0x6f8c, 0x6b2a);
+  CALL_C(0x6b2a, clearDynamicInteractions_hook, 0x35d2, 0x6b2d);
+  CYC(0x6b2d, 0x6b30); SET_BC(0x0290);
+  CALL_C(0x6b30, disableLcdAndLoadRoom_hook, 0x30b0, 0x6b33);
+  CALL_C(0x6b33, resetCamera_hook, 0x12ce, 0x6b36);
+  CYC(0x6b36, 0x6b39); SET_HL(0x7798);
+  CALL_C(0x6b39, parseGivenObjectData_b00_hook, 0x3171, 0x6b3c);
+  CYC(0x6b3c, 0x6b3f); SET_HL(w1Link_enabled);
+  CYC(0x6b3f, 0x6b41); mem_wr(gb, HL, 0x03);
+  CYC(0x6b41, 0x6b43); L = (uint8_t)w1Link_yh;
+  CYC(0x6b43, 0x6b45); mem_wr(gb, HL, 0x58);
+  CYC(0x6b45, 0x6b47); L = (uint8_t)w1Link_xh;
+  CYC(0x6b47, 0x6b49); mem_wr(gb, HL, 0x50);
+  CYC(0x6b49, 0x6b4b); L = (uint8_t)w1Link_direction;
+  CYC(0x6b4b, 0x6b4d); mem_wr(gb, HL, 0x02);
+  CALL_C(0x6b4d, refreshObjectGfx_hook, 0x1618, 0x6b50);
+  turn_to_stone_state5_after_refresh_hook(gb);
+}
+
 void turnToStoneCutsceneHandler__state0_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(0x6aaa, cutscene_incCutsceneState_hook, 0x6f8c, 0x6aad);
@@ -1945,6 +2170,147 @@ void turnToStoneCutsceneHandler__state6_hook(GB *gb) {
   CYC(0x6b70, 0x6b73); mem_wr(gb, wDisabledObjects, A);
   CYC(0x6b73, 0x6b76); mem_wr(gb, 0xc2ef, A);
   CYC(0x6b76, 0x6b77); ret_effect(gb);
+}
+
+void twinrova_reveal_after_states_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x6b7a, updateStatusBar_hook, 0x1a9c, 0x6b7d);
+  CYC(0x6b7d, 0x6b80);
+  updateAllObjects_hook(gb);
+}
+
+void twinrovaRevealCutsceneHandler__afterCall6b7a_hook(GB *gb) {
+  twinrova_reveal_after_states_hook(gb);
+}
+
+void twinrovaRevealCutsceneHandler__runStates_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x6b80, 0x6b83); SET_DE(wCutsceneState);
+  CYC(0x6b83, 0x6b84); A = mem_rd(gb, DE);
+  CYC(0x6b84, 0x6b85); push_effect(gb, 0x6b85);
+  switch (misc_cutscene_jump_table(gb)) {
+    case 0x6b99: twinrovaRevealCutsceneHandler__state0_hook(gb); return;
+    case 0x6bc0: twinrovaRevealCutsceneHandler__state1_hook(gb); return;
+    case 0x6bd5: twinrovaRevealCutsceneHandler__state2_hook(gb); return;
+    case 0x6c09: twinrovaRevealCutsceneHandler__state3_hook(gb); return;
+    case 0x6c1c: twinrovaRevealCutsceneHandler__state4_hook(gb); return;
+    case 0x6c40: twinrovaRevealCutsceneHandler__state5_hook(gb); return;
+    case 0x6c54: twinrovaRevealCutsceneHandler__state6_hook(gb); return;
+    case 0x6c9d: twinrovaRevealCutsceneHandler__state7_hook(gb); return;
+    case 0x6cbe: twinrovaRevealCutsceneHandler__state8_hook(gb); return;
+    case 0x6cfc: twinrovaRevealCutsceneHandler__state9_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+void twinrovaRevealCutsceneHandler_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x6b77, twinrovaRevealCutsceneHandler__runStates_hook, 0x6b80, 0x6b7a);
+  twinrova_reveal_after_states_hook(gb);
+}
+
+void twinrova_state4_after_room_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x6c2d, showStatusBar_hook, 0x1aa4, 0x6c30);
+  CALL_C(0x6c30, cutscene_incCutsceneState_hook, 0x6f8c, 0x6c33);
+  CYC(0x6c33, 0x6c35); A = 0x38;
+  CALL_C(0x6c35, playSound_b00_hook, 0x0c98, 0x6c38);
+  CYC(0x6c38, 0x6c3a); A = 0x02;
+  CALL_C(0x6c3a, loadGfxRegisterStateIndex_hook, 0x02ea, 0x6c3d);
+  CYC(0x6c3d, 0x6c40);
+  resetCamera_hook(gb);
+}
+
+void twinrovaRevealCutsceneHandler__state4__afterCall6c2d_hook(GB *gb) {
+  twinrova_state4_after_room_hook(gb);
+}
+
+void twinrovaRevealCutsceneHandler__state4_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x6c1c, 0x6c1f); SET_HL(wTmpcbb3);
+  CYC(0x6c1f, 0x6c21); B = 0x04;
+  CALL_C(0x6c21, flashScreen_hook, 0x2d73, 0x6c24);
+  if (F & FZ) { CYCT(0x6c24, 0x6c25); ret_effect(gb); return; }
+  CYC(0x6c24, 0x6c25);
+  CYC(0x6c25, 0x6c27); A = 0x12;
+  CYC(0x6c27, 0x6c2a); mem_wr(gb, wTmpcfc0_genericCutscene_cfde, A);
+  CALL_C(0x6c2a, cutscene_loadRoomObjectSetAndFadein_hook, 0x64c5, 0x6c2d);
+  twinrova_state4_after_room_hook(gb);
+}
+
+void twinrova_state6_after_reload_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x6c95, 0x6c97); A = 0x02;
+  CALL_C(0x6c97, loadGfxRegisterStateIndex_hook, 0x02ea, 0x6c9a);
+  CYC(0x6c9a, 0x6c9d);
+  func_6fb0_hook(gb);
+}
+
+void twinrova_state6_after_room_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x6c64, 0x6c67); SET_HL(w1Link_enabled);
+  CYC(0x6c67, 0x6c69); mem_wr(gb, HL, 0x03);
+  CYC(0x6c69, 0x6c6b); L = (uint8_t)w1Link_yh;
+  CYC(0x6c6b, 0x6c6d); mem_wr(gb, HL, 0x68);
+  CYC(0x6c6d, 0x6c6f); L = (uint8_t)w1Link_xh;
+  CYC(0x6c6f, 0x6c71); mem_wr(gb, HL, 0x50);
+  CYC(0x6c71, 0x6c73); L = (uint8_t)w1Link_direction;
+  CYC(0x6c73, 0x6c75); mem_wr(gb, HL, 0x00);
+  CYC(0x6c75, 0x6c77); A = 0x2c;
+  CYC(0x6c77, 0x6c79); B = 0x03;
+  CALL_C(0x6c79, cutscene_loadAObjectGfxBTimes_hook, 0x603a, 0x6c7c);
+  CALL_C(0x6c7c, cutscene_incCutsceneState_hook, 0x6f8c, 0x6c7f);
+  CYC(0x6c7f, 0x6c80); alu_xor(gb, A);
+  CYC(0x6c80, 0x6c83); mem_wr(gb, wPaletteThread_mode, A);
+  CYC(0x6c83, 0x6c85); hram_wr(gb, (uint8_t)hVBlankFunctionQueueTail, A);
+  CYC(0x6c85, 0x6c86); A = alu_inc8(gb, A);
+  CYC(0x6c86, 0x6c89); mem_wr(gb, wDisabledObjects, A);
+  CYC(0x6c89, 0x6c8c); mem_wr(gb, wMenuDisabled, A);
+  CYC(0x6c8c, 0x6c8f); A = mem_rd(gb, wLoadingRoomPack);
+  CYC(0x6c8f, 0x6c92); mem_wr(gb, wRoomPack, A);
+  CALL_C(0x6c92, reloadObjectGfx_b00_hook, 0x1630, 0x6c95);
+  twinrova_state6_after_reload_hook(gb);
+}
+
+void twinrovaRevealCutsceneHandler__state6__afterCall6c64_hook(GB *gb) {
+  twinrova_state6_after_room_hook(gb);
+}
+
+void twinrovaRevealCutsceneHandler__state6__afterCall6c95_hook(GB *gb) {
+  twinrova_state6_after_reload_hook(gb);
+}
+
+void twinrovaRevealCutsceneHandler__state6_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x6c54, 0x6c57); SET_HL(wTmpcbb3);
+  CYC(0x6c57, 0x6c59); B = 0x01;
+  CALL_C(0x6c59, flashScreen_hook, 0x2d73, 0x6c5c);
+  if (F & FZ) { CYCT(0x6c5c, 0x6c5d); ret_effect(gb); return; }
+  CYC(0x6c5c, 0x6c5d);
+  CYC(0x6c5d, 0x6c60); SET_HL(wTmpcfc0_genericCutscene_cfde);
+  CYC(0x6c60, 0x6c61); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CALL_C(0x6c61, cutscene_loadRoomObjectSetAndFadein_hook, 0x64c5, 0x6c64);
+  twinrova_state6_after_room_hook(gb);
+}
+
+void twinrova_state9_after_refresh_hook(GB *gb) {
+  CYC(0x6d05, 0x6d07); A = 0x01;
+  CYC(0x6d07, 0x6d0a); mem_wr(gb, wThreadStateBuffer + 0x0f, A);
+  CYC(0x6d0a, 0x6d0b); ret_effect(gb);
+}
+
+void twinrovaRevealCutsceneHandler__state9__afterCall6d05_hook(GB *gb) {
+  twinrova_state9_after_refresh_hook(gb);
+}
+
+void twinrovaRevealCutsceneHandler__state9_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x6cfc, 0x6cff); A = mem_rd(gb, wTmpcfc0_genericCutscene_state);
+  CYC(0x6cff, 0x6d01); alu_cp(gb, 0x04);
+  if (!(F & FZ)) { CYCT(0x6d01, 0x6d02); ret_effect(gb); return; }
+  CYC(0x6d01, 0x6d02);
+  CALL_C(0x6d02, refreshObjectGfx_hook, 0x1618, 0x6d05);
+  twinrova_state9_after_refresh_hook(gb);
 }
 
 void twinrovaRevealCutsceneHandler__state0_hook(GB *gb) {
@@ -3925,6 +4291,9 @@ void miscCutsceneHandler_hook(GB *gb) {
     case 0x6564: makuTreeDisappearingCutsceneHandler_hook(gb); return;
     case 0x65b3: blackTowerExplanationCutsceneHandler_hook(gb); return;
     case 0x677c: nayruWarpToMakuTreeCutsceneHandler_hook(gb); return;
+    case 0x69b5: blackTowerCompleteCutsceneHandler_hook(gb); return;
+    case 0x6a8e: turnToStoneCutsceneHandler_hook(gb); return;
+    case 0x6b77: twinrovaRevealCutsceneHandler_hook(gb); return;
     case 0x6d0b: pregameIntroCutsceneHandler_hook(gb); return;
     default: hook_handoff(gb, HL); return;
   }

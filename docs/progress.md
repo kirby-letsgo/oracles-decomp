@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,532 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,557 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -154,6 +154,10 @@ Updated 2026-09-13. Newest entries at the top of each section.
   Batch 120 completed the Nayru-singing, Black Tower explanation, and Nayru-to-Maku-Tree
   cutscene roots, promoted every executable nested dispatcher and thread-resumption point, and
   removed two generated rows that were actually inline data; bank 3 is now 570/631.
+  Batch 121 completed the Black Tower completion, turn-to-stone, and Twinrova-reveal cutscene
+  roots and state dispatchers, promoting eleven hidden thread-resumption points; bank 3 is now
+  594/640. Review also established that a callable RST dispatcher must use `hook_continue` for
+  its dynamic fallback so the enclosing C caller resumes after the interpreted state returns.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).

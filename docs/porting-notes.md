@@ -773,3 +773,8 @@ desync to discover; keep them when porting routines.
   all and the other post-call rows would vanish with their parents. Audit every nested direct-call
   chain, add each executable continuation to `extra.sym` and both hook lists, and deliberately
   leave inline `.db` tables such as `$6625` and `$6722` unaliased so they disappear as code.
+- A callable RST jump-table dispatcher still owns a return frame on an unrecognized dynamic
+  target. Batch 121's first Black Tower rewrite used `hook_handoff` in the `$69be` default arm,
+  which would abandon the root's pending `$69b8` continuation; instruction review caught it before
+  replay. Capture the dispatcher's entry SP and use `hook_continue(gb, HL, sp0_)` so interpreted
+  fallback code runs only until that dispatcher frame returns and the enclosing C caller resumes.
