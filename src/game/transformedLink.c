@@ -180,8 +180,8 @@ apply_tile_types:
 
 update_movement:
   CALL_C(0x6281, specialObjectUpdateAdjacentWallsBitset_hook, 0x5e62, 0x6284);
-  CALL_C(0x6284, linkUpdateKnockback, 0x5d5b, 0x6287);
-  CALL_C(0x6287, updateLinkSpeed_standard, 0x5ce6, 0x628a);
+  CALL_C(0x6284, linkUpdateKnockback_hook, 0x5d5b, 0x6287);
+  CALL_C(0x6287, updateLinkSpeed_standard_hook, 0x5ce6, 0x628a);
   CYC(0x628a, 0x628b); H = D;
   CYC(0x628b, 0x628d); L = 0x01;
   CYC(0x628d, 0x628e); A = mem_rd(gb, HL);
@@ -275,7 +275,7 @@ update_direction:
     goto animate;
   }
   CYC(0x62e3, 0x62e5);
-  CALL_C(0x62e5, specialObjectUpdatePosition, 0x5d97, 0x62e8);
+  CALL_C(0x62e5, specialObjectUpdatePosition_hook, 0x5d97, 0x62e8);
 
 animate:
   CALL_C(0x62e8, checkPegasusSeedCounter_hook, 0x2be8, 0x62eb);

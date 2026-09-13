@@ -10977,7 +10977,7 @@ void linkState07__substate2_hook(GB *gb) {
   CYC(0x2cdc, 0x2cdd); mem_wr(gb, DE, A);
   CYC(0x2cdd, 0x2cdf); A = 0x0a;
   CYC(0x2cdf, 0x2ce2);
-  linkSetState(gb);
+  linkSetState_hook(gb);
 }
 
 void linkState07_hook(GB *gb) {

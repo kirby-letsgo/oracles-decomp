@@ -248,7 +248,7 @@ void rickyState3_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(0x6dd7, 0x6dd9); C = 0x40;
   CALL_C(0x6dd9, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x6ddc);
-  CALL_ROM(0x6ddc, 0x48c1); // companionCheckMountingComplete
+  CALL_C(0x6ddc, companionCheckMountingComplete_hook, 0x48c1, 0x6ddf);
   if (!(F & FZ)) { CYCT(0x6ddf, 0x6de0); ret_effect(gb); return; }
   CYC(0x6ddf, 0x6de0);
   CALL_C(0x6de0, companionFinalizeMounting_hook, 0x479e, 0x6de3);

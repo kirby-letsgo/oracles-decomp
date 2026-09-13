@@ -545,7 +545,7 @@ void companionPreventLinkFromPassing_noExtraChecks_hook(GB *gb) {
 void companionUpdateMovement_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(0x446b, companionCalculateAdjacentWallsBitset_hook, 0x4486, 0x446e);
-  CALL_C(0x446e, specialObjectUpdatePosition, 0x5d97, 0x4471);
+  CALL_C(0x446e, specialObjectUpdatePosition_hook, 0x5d97, 0x4471);
   CYC(0x4471, 0x4472); H = D;
   CYC(0x4472, 0x4474); L = 0x0f;
   CYC(0x4474, 0x4475); A = mem_rd(gb, HL);
@@ -1595,6 +1595,73 @@ void companionFlashFromChargingAnimation_hook(GB *gb) {
   CYC(0x48bb, 0x48bc); alu_or(gb, C);
   CYC(0x48bc, 0x48bd); mem_wr(gb, HL, A);
   CYC(0x48bd, 0x48be); ret_effect(gb);
+}
+
+void companionCheckMountingComplete_hook(GB *gb) {
+  CYC(0x48c1, 0x48c4); A = W8(wDisallowMountingCompanion);
+  CYC(0x48c4, 0x48c5); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x48c5, 0x48c7);
+    goto stop_mounting;
+  }
+  CYC(0x48c5, 0x48c7);
+  CYC(0x48c7, 0x48ca); A = W8(w1Link_state);
+  CYC(0x48ca, 0x48cc); alu_cp(gb, 0x01);
+  if (!(F & FZ)) {
+    CYCT(0x48cc, 0x48ce);
+    goto stop_mounting;
+  }
+  CYC(0x48cc, 0x48ce);
+  CYC(0x48ce, 0x48d1); A = W8(wLinkGrabState);
+  CYC(0x48d1, 0x48d2); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x48d2, 0x48d4);
+    goto continue_mounting;
+  }
+  CYC(0x48d2, 0x48d4);
+
+stop_mounting:
+  CYC(0x48d4, 0x48d5); alu_xor(gb, A);
+  CYC(0x48d5, 0x48d8); W8(wDisableWarpTiles) = A;
+  CYC(0x48d8, 0x48db); W8(wWarpsDisabled) = A;
+  CYC(0x48db, 0x48de); W8(wDisableScreenTransitions) = A;
+  CYC(0x48de, 0x48e0); A = 0x01;
+  CYC(0x48e0, 0x48e2); E = 0x04;
+  CYC(0x48e2, 0x48e3); mem_wr(gb, DE, A);
+  CYC(0x48e3, 0x48e4); alu_or(gb, D);
+  CYC(0x48e4, 0x48e5); ret_effect(gb);
+  return;
+
+continue_mounting:
+  CYC(0x48e5, 0x48e8); SET_HL(w1Link_yh);
+  CYC(0x48e8, 0x48ea); E = 0x0b;
+  CYC(0x48ea, 0x48eb); A = mem_rd(gb, DE);
+  CYC(0x48eb, 0x48ec); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) {
+    CALL_ROM_CC(0x48ec, 0x4904);
+  } else {
+    CYC(0x48ec, 0x48ef);
+  }
+  CYC(0x48ef, 0x48f1); E = 0x0d;
+  CYC(0x48f1, 0x48f2); L = E;
+  CYC(0x48f2, 0x48f3); A = mem_rd(gb, DE);
+  CYC(0x48f3, 0x48f4); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) {
+    CALL_ROM_CC(0x48f4, 0x4904);
+  } else {
+    CYC(0x48f4, 0x48f7);
+  }
+  CYC(0x48f7, 0x48f9); L = 0x15;
+  CYC(0x48f9, 0x48fb); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(0x48fb, 0x48fc); ret_effect(gb); return; }
+  CYC(0x48fb, 0x48fc);
+  CYC(0x48fc, 0x48fe); L = 0x0f;
+  CYC(0x48fe, 0x48ff); A = mem_rd(gb, HL);
+  CYC(0x48ff, 0x4901); alu_cp(gb, 0xfc);
+  if (F & FC) { CYCT(0x4901, 0x4902); ret_effect(gb); return; }
+  CYC(0x4901, 0x4902);
+  CYC(0x4902, 0x4903); alu_xor(gb, A);
+  CYC(0x4903, 0x4904); ret_effect(gb);
 }
 
 void companionCheckEnableTerrainEffects_hook(GB *gb) {

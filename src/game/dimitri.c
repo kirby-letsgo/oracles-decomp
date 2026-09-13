@@ -537,7 +537,7 @@ void dimitriFunc_756d_hook(GB *gb) {
 
 void dimitriState3_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x757d, companionCheckMountingComplete, 0x48c1, 0x7580);
+  CALL_C(0x757d, companionCheckMountingComplete_hook, 0x48c1, 0x7580);
   if (!(F & FZ)) { CYCT(0x7580, 0x7581); ret_effect(gb); return; }
   CYC(0x7580, 0x7581);
   CALL_C(0x7581, companionFinalizeMounting_hook, 0x479e, 0x7584);

@@ -77,6 +77,6 @@ state1:
   CYC(0x6355, 0x6356); alu_rlca(gb);
   if (F & FC) { CYCT(0x6356, 0x6357); ret_effect(gb); return; }
   CYC(0x6356, 0x6357);
-  CALL_C(0x6357, linkUpdateKnockback, 0x5d5b, 0x635a);
+  CALL_C(0x6357, linkUpdateKnockback_hook, 0x5d5b, 0x635a);
   read_companion_anim_parameter(gb);
 }

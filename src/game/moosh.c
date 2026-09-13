@@ -175,7 +175,7 @@ void mooshCheckHazards_hook(GB *gb) {
 
 void mooshState3_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x78e8, companionCheckMountingComplete, 0x48c1, 0x78eb);
+  CALL_C(0x78e8, companionCheckMountingComplete_hook, 0x48c1, 0x78eb);
   if (!(F & FZ)) { CYCT(0x78eb, 0x78ec); ret_effect(gb); return; }
   CYC(0x78eb, 0x78ec);
   CALL_C(0x78ec, companionFinalizeMounting_hook, 0x479e, 0x78ef);

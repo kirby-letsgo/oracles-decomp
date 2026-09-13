@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 3,282 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 3,396 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -271,6 +271,10 @@ Updated 2026-09-13. Newest entries at the top of each section.
   Batch 154 completed every remaining Dimitri state/helper and the link-riding-animal state machine.
   Eighteen parent-owned local rows disappeared; the project now has 3,365 readable hooks out of
   11,664.
+  Batch 155 added Link's overworld swimming, diving, velocity, jumping, animation, speed, state,
+  and position helpers plus the companion mounting-completion helper. The callable mermaid-suit
+  velocity continuation at bank 5 `$58f7` became a durable hook, and thirty-six generated local
+  rows disappeared; the project now has 3,396 readable hooks out of 11,628.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -376,6 +380,17 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 155 (31 routines): rewrote Link's overworld swimming,
+  diving, velocity, jumping, animation, speed, state, and position helpers, plus companion mounting
+  completion, and promoted the callable mermaid-suit velocity continuation at bank 5 `$58f7` to a
+  durable hook. Thirty-six generated local rows were absorbed. Two independent instruction reviews
+  per routine verified 727 unique physical instructions, three RST `$00` dispatchers, the shared
+  underwater/drowning and velocity tails, real DE/AF/HL/RST stack effects, every inline-data
+  exclusion, and all smart-call classifications; review corrected conditional-call timing at
+  `$5675` and `$5b37`. The project now has 3,396 readable hooks out of 11,628. Gates: lint 0, 30k
+  verify 0 failures across 4,584,109 calls with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches across 11,537,208 calls with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 154 (25 routines): completed all twenty-four remaining
   Dimitri states, substates, movement, collision, waterfall, and grabbable-object helpers, plus the
   link-riding-animal state machine. Eighteen parent-owned local rows were absorbed. Two independent
