@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,607 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,634 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -168,6 +168,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   Batch 124 completed the textbox thread dispatcher and the final two Phase-5 bank-10 cutscene
   roots, removing one text table and three internal-only bank-10 labels from the executable
   registry. Phase 5 is complete with 2,607 readable hooks out of 12,641.
+  Batch 125 opened phase 6 with the complete bank-7 save-file verification helper layer and
+  bank-3F object-GFX lookup/bookkeeping helpers, including all nine generated local entry points.
+  The project now has 2,634 readable hooks out of 12,641.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -273,6 +276,18 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 125 (27 routines): opened the final sweep with the
+  bank-7 save-file verification helpers (`clearFileAtHl`, copy/checksum/address lookup,
+  `verifyFileAtHl`, `verifyFileCopies`, and their seven local entries) and bank-3F object-GFX
+  lookup/bookkeeping helpers (find/allocate/index/use tracking plus enemy, part, and item lookup,
+  including two local entries). The callable file-verification RST dispatcher preserves its
+  pending return with `hook_continue`; no thread switch is involved. Promoting generated local
+  labels required stable canonical aliases in `extra.sym` as well as `ported.txt` and
+  `rewritten.txt`, otherwise regeneration removed their generated rows without creating readable
+  hook declarations. Two independent instruction-level reviews found no remaining defects. The
+  project now has 2,634 readable hooks out of 12,641. Gates: lint 0, 30k verify 0 failures across
+  4,685,346 calls with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches
+  across 13,033,919 calls with state `a62ae98192befee8`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 5 batch 124 (6 routines): completed `updateTextbox` and its
   standard, option, and inventory dispatch entries, plus the final `agesFunc_10_70f6` and
   `agesFunc_10_7298` cutscene roots. `extraTextIndices` and its four generated children were

@@ -808,3 +808,9 @@ desync to discover; keep them when porting routines.
   registers, and replacement replay but landed at a different scheduler boundary after
   `runIntro` switched threads. Mark that narrow root `HOOK_NOVERIFY`; keep its independently
   returning callees verifiable and retain the real post-`ld sp` handoff symbol.
+- Transliterator-synthesized local names are not durable hook symbols by themselves. Batch 125
+  initially added nine `parent__local` names only to `rewritten.txt`; regeneration correctly
+  removed the generated bodies, but `gen_hooks.py` could not emit declarations because those
+  canonical names were absent from the symbol input, and lint reported nine missing `_hook`
+  entries. Give each promoted local its exact bank/address alias in `extra.sym`, then add the same
+  canonical name to both `ported.txt` and `rewritten.txt` before regenerating.

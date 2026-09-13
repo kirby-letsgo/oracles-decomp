@@ -2362,7 +2362,7 @@ void fileManagementFunction(GB *gb) {
 void initializeFile_b07(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x400a, 3); SET_HL(0x418a);  // ld hl,$418a
-  CALL(0x400d, initializeFileVariables, 0x4176, 0x4010);  // call $4176
+  CALL(0x400d, initializeFileVariables_hook, 0x4176, 0x4010);  // call $4176
   I(0x4010, 3); SET_HL(0xc613);  // ld hl,$c613
   I(0x4013, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
   I(0x4014, 1); alu_add(gb, A);  // add a
@@ -2374,7 +2374,7 @@ void initializeFile_b07(GB *gb) {
   I(0x401b, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x401c, 2); H = mem_rd(gb, HL);  // ld h,(hl)
   I(0x401d, 1); L = A;  // ld l,a
-  CALL(0x401e, initializeFileVariables, 0x4176, 0x4021);  // call $4176
+  CALL(0x401e, initializeFileVariables_hook, 0x4176, 0x4021);  // call $4176
   SET_AF(POP(0x4021));  // pop af
   I(0x4022, 1); C = A;  // ld c,a
   I(0x4023, 3); SET_HL(0xc5c0);  // ld hl,$c5c0
@@ -2413,38 +2413,38 @@ void saveFile_b07(GB *gb) {
   I(0x4064, 2); B = 0x08;  // ld b,$08
   CALL(0x4066, copyMemoryReverse_hook, 0x047f, 0x4069);  // call $047f
   I(0x4069, 2); L = 0xb0;  // ld l,$b0
-  CALL(0x406b, calculateFileChecksum, 0x4140, 0x406e);  // call $4140
+  CALL(0x406b, calculateFileChecksum_hook, 0x4140, 0x406e);  // call $4140
   I(0x406e, 2); mem_wr(gb, HL, E);  // ld (hl),e
   I(0x406f, 1); L = alu_inc8(gb, L);  // inc l
   I(0x4070, 2); mem_wr(gb, HL, D);  // ld (hl),d
   I(0x4071, 2); L = 0xb0;  // ld l,$b0
-  CALL(0x4073, getFileAddress1, 0x4157, 0x4076);  // call $4157
+  CALL(0x4073, getFileAddress1_hook, 0x4157, 0x4076);  // call $4157
   I(0x4076, 1); E = C;  // ld e,c
   I(0x4077, 1); D = B;  // ld d,b
-  CALL(0x4078, copyFileFromHlToDe, 0x40fe, 0x407b);  // call $40fe
-  CALL(0x407b, getFileAddress2, 0x415b, 0x407e);  // call $415b
+  CALL(0x4078, copyFileFromHlToDe_hook, 0x40fe, 0x407b);  // call $40fe
+  CALL(0x407b, getFileAddress2_hook, 0x415b, 0x407e);  // call $415b
   I(0x407e, 1); E = C;  // ld e,c
   I(0x407f, 1); D = B;  // ld d,b
-  CALL(0x4080, copyFileFromHlToDe, 0x40fe, 0x4083);  // call $40fe
-  I(0x4083, 3); verifyFileCopies(gb); return;  // jr $40bc
+  CALL(0x4080, copyFileFromHlToDe_hook, 0x40fe, 0x4083);  // call $40fe
+  I(0x4083, 3); if (hook_enabled_at(0x40bc)) { verifyFileCopies_hook(gb); return; } HANDOFF(0x40bc);  // jr $40bc
 }
 
 // 07:4085
 void loadFile_b07(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4085, verifyFileCopies, 0x40bc, 0x4088);  // call $40bc
+  CALL(0x4085, verifyFileCopies_hook, 0x40bc, 0x4088);  // call $40bc
   PUSH(0x4088, AF);  // push af
   I(0x4089, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x408a, 3); goto L_4091; } I(0x408a, 2);  // jr nz,$4091
-  CALL(0x408c, getFileAddress1, 0x4157, 0x408f);  // call $4157
+  CALL(0x408c, getFileAddress1_hook, 0x4157, 0x408f);  // call $4157
   I(0x408f, 3); goto L_4094;  // jr $4094
 L_4091:
-  CALL(0x4091, getFileAddress2, 0x415b, 0x4094);  // call $415b
+  CALL(0x4091, getFileAddress2_hook, 0x415b, 0x4094);  // call $415b
 L_4094:
   I(0x4094, 1); L = C;  // ld l,c
   I(0x4095, 1); H = B;  // ld h,b
   I(0x4096, 3); SET_DE(0xc5b0);  // ld de,$c5b0
-  CALL(0x4099, copyFileFromHlToDe, 0x40fe, 0x409c);  // call $40fe
+  CALL(0x4099, copyFileFromHlToDe_hook, 0x40fe, 0x409c);  // call $40fe
   SET_AF(POP(0x409c));  // pop af
   RET(0x409d); return;  // ret
 }
@@ -2452,15 +2452,15 @@ L_4094:
 // 07:409e
 void eraseFile_b07(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x409e, getFileAddress1, 0x4157, 0x40a1);  // call $4157
+  CALL(0x409e, getFileAddress1_hook, 0x4157, 0x40a1);  // call $4157
   CALL(0x40a1, eraseFile__clearFile_b07, 0x40a7, 0x40a4);  // call $40a7
-  CALL(0x40a4, getFileAddress2, 0x415b, 0x40a7);  // call $415b
+  CALL(0x40a4, getFileAddress2_hook, 0x415b, 0x40a7);  // call $415b
 L_40a7:
   I(0x40a7, 2); A = 0x0a;  // ld a,$0a
   I(0x40a9, 4); mem_wr(gb, 0x1111, A);  // ld ($1111),a
   I(0x40ac, 1); L = C;  // ld l,c
   I(0x40ad, 1); H = B;  // ld h,b
-  CALL(0x40ae, clearFileAtHl, 0x40b6, 0x40b1);  // call $40b6
+  CALL(0x40ae, clearFileAtHl_hook, 0x40b6, 0x40b1);  // call $40b6
   I(0x40b1, 1); alu_xor(gb, A);  // xor a
   I(0x40b2, 4); mem_wr(gb, 0x1111, A);  // ld ($1111),a
   RET(0x40b5); return;  // ret
@@ -2474,297 +2474,10 @@ L_40a7:
   I(0x40a9, 4); mem_wr(gb, 0x1111, A);  // ld ($1111),a
   I(0x40ac, 1); L = C;  // ld l,c
   I(0x40ad, 1); H = B;  // ld h,b
-  CALL(0x40ae, clearFileAtHl, 0x40b6, 0x40b1);  // call $40b6
+  CALL(0x40ae, clearFileAtHl_hook, 0x40b6, 0x40b1);  // call $40b6
   I(0x40b1, 1); alu_xor(gb, A);  // xor a
   I(0x40b2, 4); mem_wr(gb, 0x1111, A);  // ld ($1111),a
   RET(0x40b5); return;  // ret
-}
-
-// 07:40b6
-void clearFileAtHl(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x40b6, 3); SET_BC(0x0550);  // ld bc,$0550
-  I(0x40b9, 4); if (hook_enabled_at(0x0475)) { clearMemoryBc_hook(gb); return; } HANDOFF(0x0475);  // jp $0475
-}
-
-// 07:40bc
-void verifyFileCopies(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x40bc, getFileAddress2, 0x415b, 0x40bf);  // call $415b
-  I(0x40bf, 1); L = C;  // ld l,c
-  I(0x40c0, 1); H = B;  // ld h,b
-  CALL(0x40c1, verifyFileAtHl, 0x4110, 0x40c4);  // call $4110
-  I(0x40c4, 2); alu_and(gb, 0x01);  // and $01
-  PUSH(0x40c6, AF);  // push af
-  CALL(0x40c7, getFileAddress1, 0x4157, 0x40ca);  // call $4157
-  I(0x40ca, 1); L = C;  // ld l,c
-  I(0x40cb, 1); H = B;  // ld h,b
-  CALL(0x40cc, verifyFileAtHl, 0x4110, 0x40cf);  // call $4110
-  SET_BC(POP(0x40cf));  // pop bc
-  I(0x40d0, 2); B = alu_rl(gb, B);  // rl b
-  I(0x40d2, 1); A = B;  // ld a,b
-  RST_PUSH(0x40d3, 0x40d4);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x40dc: goto L_40dc; case 0x40e9: goto L_40e9; case 0x40eb: goto L_40eb; case 0x40fb: goto L_40fb; default: HANDOFF(HL); }
-L_40dc:
-  CALL(0x40dc, getFileAddress2, 0x415b, 0x40df);  // call $415b
-  I(0x40df, 1); E = C;  // ld e,c
-  I(0x40e0, 1); D = B;  // ld d,b
-  CALL(0x40e1, getFileAddress1, 0x4157, 0x40e4);  // call $4157
-  I(0x40e4, 1); L = C;  // ld l,c
-  I(0x40e5, 1); H = B;  // ld h,b
-  CALL(0x40e6, copyFileFromHlToDe, 0x40fe, 0x40e9);  // call $40fe
-L_40e9:
-  I(0x40e9, 1); alu_xor(gb, A);  // xor a
-  RET(0x40ea); return;  // ret
-L_40eb:
-  CALL(0x40eb, getFileAddress1, 0x4157, 0x40ee);  // call $4157
-  I(0x40ee, 1); E = C;  // ld e,c
-  I(0x40ef, 1); D = B;  // ld d,b
-  CALL(0x40f0, getFileAddress2, 0x415b, 0x40f3);  // call $415b
-  I(0x40f3, 1); L = C;  // ld l,c
-  I(0x40f4, 1); H = B;  // ld h,b
-  CALL(0x40f5, copyFileFromHlToDe, 0x40fe, 0x40f8);  // call $40fe
-  I(0x40f8, 2); A = 0x01;  // ld a,$01
-  RET(0x40fa); return;  // ret
-L_40fb:
-  I(0x40fb, 2); A = 0xff;  // ld a,$ff
-  RET(0x40fd); return;  // ret
-}
-
-// 07:40dc
-void verifyFileCopies__copy2Invalid(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_40dc:
-  CALL(0x40dc, getFileAddress2, 0x415b, 0x40df);  // call $415b
-  I(0x40df, 1); E = C;  // ld e,c
-  I(0x40e0, 1); D = B;  // ld d,b
-  CALL(0x40e1, getFileAddress1, 0x4157, 0x40e4);  // call $4157
-  I(0x40e4, 1); L = C;  // ld l,c
-  I(0x40e5, 1); H = B;  // ld h,b
-  CALL(0x40e6, copyFileFromHlToDe, 0x40fe, 0x40e9);  // call $40fe
-L_40e9:
-  I(0x40e9, 1); alu_xor(gb, A);  // xor a
-  RET(0x40ea); return;  // ret
-}
-
-// 07:40e9
-void verifyFileCopies__bothCopiesValid(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_40e9:
-  I(0x40e9, 1); alu_xor(gb, A);  // xor a
-  RET(0x40ea); return;  // ret
-}
-
-// 07:40eb
-void verifyFileCopies__copy1Invalid(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_40eb:
-  CALL(0x40eb, getFileAddress1, 0x4157, 0x40ee);  // call $4157
-  I(0x40ee, 1); E = C;  // ld e,c
-  I(0x40ef, 1); D = B;  // ld d,b
-  CALL(0x40f0, getFileAddress2, 0x415b, 0x40f3);  // call $415b
-  I(0x40f3, 1); L = C;  // ld l,c
-  I(0x40f4, 1); H = B;  // ld h,b
-  CALL(0x40f5, copyFileFromHlToDe, 0x40fe, 0x40f8);  // call $40fe
-  I(0x40f8, 2); A = 0x01;  // ld a,$01
-  RET(0x40fa); return;  // ret
-}
-
-// 07:40fb
-void verifyFileCopies__bothCopiesInvalid(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_40fb:
-  I(0x40fb, 2); A = 0xff;  // ld a,$ff
-  RET(0x40fd); return;  // ret
-}
-
-// 07:40fe
-void copyFileFromHlToDe(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x40fe, HL);  // push hl
-  I(0x40ff, 2); A = 0x0a;  // ld a,$0a
-  I(0x4101, 4); mem_wr(gb, 0x1111, A);  // ld ($1111),a
-  I(0x4104, 3); SET_BC(0x0550);  // ld bc,$0550
-  CALL(0x4107, copyMemoryBc_hook, 0x0496, 0x410a);  // call $0496
-  I(0x410a, 1); alu_xor(gb, A);  // xor a
-  I(0x410b, 4); mem_wr(gb, 0x1111, A);  // ld ($1111),a
-  SET_HL(POP(0x410e));  // pop hl
-  RET(0x410f); return;  // ret
-}
-
-// 07:4110
-void verifyFileAtHl(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x4110, HL);  // push hl
-  I(0x4111, 2); A = 0x0a;  // ld a,$0a
-  I(0x4113, 4); mem_wr(gb, 0x1111, A);  // ld ($1111),a
-  CALL(0x4116, calculateFileChecksum, 0x4140, 0x4119);  // call $4140
-  I(0x4119, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x411a, 1); alu_cp(gb, E);  // cp e
-  if (!(F & FZ)) { I(0x411b, 3); goto L_4137; } I(0x411b, 2);  // jr nz,$4137
-  I(0x411d, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x411e, 1); alu_cp(gb, D);  // cp d
-  if (!(F & FZ)) { I(0x411f, 3); goto L_4137; } I(0x411f, 2);  // jr nz,$4137
-  I(0x4121, 3); SET_DE(0x41c9);  // ld de,$41c9
-  I(0x4124, 2); B = 0x08;  // ld b,$08
-L_4126:
-  I(0x4126, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4127, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if (!(F & FZ)) { I(0x4128, 3); goto L_4137; } I(0x4128, 2);  // jr nz,$4137
-  I(0x412a, 2); SET_DE(DE + 1);  // inc de
-  I(0x412b, 2); SET_HL(HL + 1);  // inc hl
-  I(0x412c, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x412d, 3); goto L_4126; } I(0x412d, 2);  // jr nz,$4126
-L_412f:
-  I(0x412f, 1); alu_xor(gb, A);  // xor a
-  I(0x4130, 4); mem_wr(gb, 0x1111, A);  // ld ($1111),a
-  SET_HL(POP(0x4133));  // pop hl
-  I(0x4134, 1); A = B;  // ld a,b
-  I(0x4135, 1); alu_rrca(gb);  // rrca
-  RET(0x4136); return;  // ret
-L_4137:
-  SET_HL(POP(0x4137));  // pop hl
-  PUSH(0x4138, HL);  // push hl
-  CALL(0x4139, clearFileAtHl, 0x40b6, 0x413c);  // call $40b6
-  I(0x413c, 2); B = 0xff;  // ld b,$ff
-  I(0x413e, 3); goto L_412f;  // jr $412f
-}
-
-// 07:4126
-void verifyFileAtHl__nextChar(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4126:
-  I(0x4126, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4127, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if (!(F & FZ)) { I(0x4128, 3); goto L_4137; } I(0x4128, 2);  // jr nz,$4137
-  I(0x412a, 2); SET_DE(DE + 1);  // inc de
-  I(0x412b, 2); SET_HL(HL + 1);  // inc hl
-  I(0x412c, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x412d, 3); goto L_4126; } I(0x412d, 2);  // jr nz,$4126
-L_412f:
-  I(0x412f, 1); alu_xor(gb, A);  // xor a
-  I(0x4130, 4); mem_wr(gb, 0x1111, A);  // ld ($1111),a
-  SET_HL(POP(0x4133));  // pop hl
-  I(0x4134, 1); A = B;  // ld a,b
-  I(0x4135, 1); alu_rrca(gb);  // rrca
-  RET(0x4136); return;  // ret
-L_4137:
-  SET_HL(POP(0x4137));  // pop hl
-  PUSH(0x4138, HL);  // push hl
-  CALL(0x4139, clearFileAtHl, 0x40b6, 0x413c);  // call $40b6
-  I(0x413c, 2); B = 0xff;  // ld b,$ff
-  I(0x413e, 3); goto L_412f;  // jr $412f
-}
-
-// 07:412f
-void verifyFileAtHl__verifyDone(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_412f:
-  I(0x412f, 1); alu_xor(gb, A);  // xor a
-  I(0x4130, 4); mem_wr(gb, 0x1111, A);  // ld ($1111),a
-  SET_HL(POP(0x4133));  // pop hl
-  I(0x4134, 1); A = B;  // ld a,b
-  I(0x4135, 1); alu_rrca(gb);  // rrca
-  RET(0x4136); return;  // ret
-}
-
-// 07:4137
-void verifyFileAtHl__verifyFailed(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_4137;
-L_412f:
-  I(0x412f, 1); alu_xor(gb, A);  // xor a
-  I(0x4130, 4); mem_wr(gb, 0x1111, A);  // ld ($1111),a
-  SET_HL(POP(0x4133));  // pop hl
-  I(0x4134, 1); A = B;  // ld a,b
-  I(0x4135, 1); alu_rrca(gb);  // rrca
-  RET(0x4136); return;  // ret
-L_4137:
-  SET_HL(POP(0x4137));  // pop hl
-  PUSH(0x4138, HL);  // push hl
-  CALL(0x4139, clearFileAtHl, 0x40b6, 0x413c);  // call $40b6
-  I(0x413c, 2); B = 0xff;  // ld b,$ff
-  I(0x413e, 3); goto L_412f;  // jr $412f
-}
-
-// 07:4140
-void calculateFileChecksum(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  PUSH(0x4140, HL);  // push hl
-  I(0x4141, 2); A = 0x02;  // ld a,$02
-  RST_PUSH(0x4143, 0x4144);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x4144, 3); SET_BC(0x02a7);  // ld bc,$02a7
-  I(0x4147, 3); SET_DE(0x0000);  // ld de,$0000
-L_414a:
-  I(0x414a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x414b, 1); alu_add(gb, E);  // add e
-  I(0x414c, 1); E = A;  // ld e,a
-  I(0x414d, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x414e, 1); alu_adc(gb, D);  // adc d
-  I(0x414f, 1); D = A;  // ld d,a
-  I(0x4150, 2); SET_BC(BC - 1);  // dec bc
-  I(0x4151, 1); A = B;  // ld a,b
-  I(0x4152, 1); alu_or(gb, C);  // or c
-  if (!(F & FZ)) { I(0x4153, 3); goto L_414a; } I(0x4153, 2);  // jr nz,$414a
-  SET_HL(POP(0x4155));  // pop hl
-  RET(0x4156); return;  // ret
-}
-
-// 07:4157
-void getFileAddress1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4157, 2); C = 0x00;  // ld c,$00
-  I(0x4159, 3); goto L_415d;  // jr $415d
-L_415d:
-  PUSH(0x415d, HL);  // push hl
-  I(0x415e, 3); A = mem_rd(gb, 0xff9a);  // ldh a,($ff9a)
-  I(0x4160, 1); alu_add(gb, C);  // add c
-  I(0x4161, 3); SET_HL(0x416a);  // ld hl,$416a
-  RST_PUSH(0x4164, 0x4165);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x4165, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4166, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x4167, 1); C = A;  // ld c,a
-  SET_HL(POP(0x4168));  // pop hl
-  RET(0x4169); return;  // ret
-}
-
-// 07:415b
-void getFileAddress2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x415b, 2); C = 0x03;  // ld c,$03
-  PUSH(0x415d, HL);  // push hl
-  I(0x415e, 3); A = mem_rd(gb, 0xff9a);  // ldh a,($ff9a)
-  I(0x4160, 1); alu_add(gb, C);  // add c
-  I(0x4161, 3); SET_HL(0x416a);  // ld hl,$416a
-  RST_PUSH(0x4164, 0x4165);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x4165, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4166, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x4167, 1); C = A;  // ld c,a
-  SET_HL(POP(0x4168));  // pop hl
-  RET(0x4169); return;  // ret
-}
-
-// 07:4176
-void initializeFileVariables(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4176, 2); D = 0xc6;  // ld d,$c6
-L_4178:
-  I(0x4178, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4179, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x417a, 3); goto L_4181; } I(0x417a, 2);  // jr z,$4181
-  I(0x417c, 1); E = A;  // ld e,a
-  I(0x417d, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x417e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x417f, 3); goto L_4178;  // jr $4178
-L_4181:
-  RET(0x4181); return;  // ret
 }
 
 // 07:41b1
