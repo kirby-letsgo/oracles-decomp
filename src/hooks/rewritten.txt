@@ -3364,3 +3364,20 @@ dimitriCheckAddToGrabbableObjectBuffer
 dimitriCheckCanBeHeldInDirection
 dimitriAddWaterfallResistance
 specialObjectCode_linkRidingAnimal
+
+# Phase 6, bank 08
+interactionCode00
+interactionCode0f
+clearFallDownHoleEventBuffer
+interactionCode10
+interactionCode11
+interac11_subid00
+interac11_subid01
+interactionCode12
+interactionCode13
+interactionCode14
+interactionCode16
+interactionCode17
+interactionCode18
+interactionCode1c
+interactionCode1e

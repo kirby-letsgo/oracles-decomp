@@ -995,3 +995,26 @@ desync to discover; keep them when porting routines.
   before the shared body's `ret_effect`; state 1 physically falls through to the same `$635a` body,
   so it must not manufacture a call frame and that same `ret_effect` consumes the root caller's
   return. Turning both entries into an ordinary C helper call preserves control flow but corrupts SP.
+- Interaction struct fields are offsets from `$40`, and the shared `OBJ_*` constants in `game.h` are
+  the raw field offsets, not the interaction addresses. Batch 155's first bank-08 rewrite wrote
+  `E = OBJ_STATE` for `ld e,Interaction.state` (`$44`), which silently read `$04` off the object
+  base; the build, lint and the first 8,900 frames were clean and the routine verifier caught it as a
+  wrong visibility dispatch at frame 8929. Always write `INTERACTION_BASE + OBJ_xxx`, and check the
+  sum against the operand byte in the report.
+- A readable `rst $00` dispatcher's `switch` must use the TARGET words read from the table as case
+  labels (what the vector helper returns in HL), never the addresses of the table entries. Batch 155
+  briefed the writers with the entry addresses; every dispatch then fell to `default: HANDOFF(HL)`,
+  the interpreter ran the right state, and both the routine verifier and the reference replay stayed
+  green while the entire C body was dead code. Only the instruction-level review saw it; dump the
+  table words and compare the case list with the pre-rewrite `switch (HL)` in the generated C.
+- Eight-bit `inc r`/`dec r`/`inc (hl)`/`dec (hl)` set Z, N and H; only the 16-bit pair forms are
+  flag-free. `E = E + 1` for `inc e` leaves stale flags that the next `rrca` happened to overwrite in
+  batch 155, so verify could not see it. Use `alu_inc8`/`alu_dec8` for every 8-bit increment.
+- Two disassembly files can share a leaf basename: `object_code/common/specialObjects/minecart.s`
+  (Link riding the cart, already `minecart.c`) and `object_code/common/interactions/minecart.s` (the
+  cart trigger interaction). The second one is `interactionMinecart.c`; check `src/game/` for the
+  basename before creating a file so an existing rewrite is not appended to or overwritten.
+- Interaction routines called from the object update loop are only exercised when the movie meets
+  that object: eight of batch 155's fifteen hooks (fall-down-hole, Farore, her chest, the minecart
+  trigger, Farore's memory) run zero times in the whole movie. They rest on the two instruction-level
+  reviews alone, so the reviews must cover every path, not just the hot ones.
