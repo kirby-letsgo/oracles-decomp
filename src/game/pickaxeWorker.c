@@ -1,0 +1,1404 @@
+#include "game/game.h"
+#include "game/gen.h"
+
+#undef CYC
+#undef CYCT
+#define CYC(from, to) burn_rom(gb, 0x09, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, 0x09, (from), (to), true)
+
+static uint16_t bank09_jump_table(GB *gb) {
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (F & FC) { burn_rom(gb, 0x00, 0x0004, 0x0006, false); burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H); }
+  else burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false); return HL;
+}
+
+void interactionCode57_hook(GB *gb);
+void interactionCode57__subid00_hook(GB *gb);
+void interactionCode57__subid03__state0_hook(GB *gb);
+void interactionCode57__afterCall693f_hook(GB *gb);
+void interactionCode57__subid03__state1_hook(GB *gb);
+void interactionCode57__subid01_hook(GB *gb);
+void interactionCode57__subid1And2State0_hook(GB *gb);
+void interactionCode57__subid1State1_hook(GB *gb);
+void interactionCode57__subid1And2Substate0_hook(GB *gb);
+void interactionCode57__label_09_221_hook(GB *gb);
+void interactionCode57__nextObject_hook(GB *gb);
+void interactionCode57__doneSpawningObjects_hook(GB *gb);
+void interactionCode57__subid1Substate1_hook(GB *gb);
+void interactionCode57__updateAnimationAndRunScript_hook(GB *gb);
+void interactionCode57__subid1Substate2_hook(GB *gb);
+void interactionCode57__subid1Substate3_hook(GB *gb);
+void interactionCode57__subid02_hook(GB *gb);
+void interactionCode57__subid2Substate1_hook(GB *gb);
+void interactionCode57__subid2Substate2_hook(GB *gb);
+void interactionCode57__unusedFunc_6a80_hook(GB *gb);
+void interactionCode57__loadScriptAndInitGraphics_hook(GB *gb);
+void interactionCode57__createDirtChips_hook(GB *gb);
+void interactionCode57__next_hook(GB *gb);
+
+void interactionCode57_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x692b, 0x692d); E = 0x42;
+  CYC(0x692d, 0x692e); A = mem_rd(gb, DE);
+  CYC(0x692e, 0x692f); push_effect(gb, 0x692f); SET_HL(bank09_jump_table(gb));
+  switch (HL) { case 0x6937: goto L_6937; case 0x6960: goto L_6960; case 0x6a44: goto L_6a44; default: HANDOFF(HL); }
+L_6937:
+  CALL_C(0x6937, checkInteractionState_hook, 0x23fe, 0x693a);
+  if (!(F & FZ)) { CYCT(0x693a, 0x693c); goto L_6942; } CYC(0x693a, 0x693c);
+L_693c:
+  CALL_C(0x693c, interactionCode57__loadScriptAndInitGraphics_hook, 0x6a89, 0x693f);
+L_693f:
+  CALL_C(0x693f, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x6942);
+L_6942:
+  CALL_C(0x6942, interactionRunScript_hook, 0x2552, 0x6945);
+  if ((F & FC)) { CYCT(0x6945, 0x6948); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } CYC(0x6945, 0x6948);
+  CALL_C(0x6948, interactionAnimateAsNpc_hook, 0x26db, 0x694b);
+  CYC(0x694b, 0x694d); E = 0x61;
+  CYC(0x694d, 0x694e); A = mem_rd(gb, DE);
+  CYC(0x694e, 0x694f); alu_or(gb, A);
+  if ((F & FZ)) { CYCT(0x694f, 0x6950); ret_effect(gb); return; } CYC(0x694f, 0x6950);
+  CYC(0x6950, 0x6952); A = 0x50;
+  CALL_C(0x6952, playSound_b00_hook, 0x0c98, 0x6955);
+  CYC(0x6955, 0x6958); A = mem_rd(gb, 0xcd00);
+  CYC(0x6958, 0x695a); alu_and(gb, 0x01);
+  if ((F & FZ)) { CYCT(0x695a, 0x695b); ret_effect(gb); return; } CYC(0x695a, 0x695b);
+  CYC(0x695b, 0x695d); A = 0x03;
+  CYC(0x695d, 0x6960); goto L_6aa4;
+L_6960:
+  CALL_C(0x6960, checkInteractionState_hook, 0x23fe, 0x6963);
+  if (!(F & FZ)) { CYCT(0x6963, 0x6965); goto L_6975; } CYC(0x6963, 0x6965);
+L_6965:
+  CYC(0x6965, 0x6967); E = 0x42;
+  CYC(0x6967, 0x6968); A = mem_rd(gb, DE);
+  CYC(0x6968, 0x6969); A = alu_dec8(gb, A);
+  CYC(0x6969, 0x696b); A = 0x0c;
+  if ((F & FZ)) { CYCT(0x696b, 0x696d); goto L_696f; } CYC(0x696b, 0x696d);
+  CYC(0x696d, 0x696f); A = 0xf4;
+L_696f:
+  CYC(0x696f, 0x6971); E = 0x78;
+  CYC(0x6971, 0x6972); mem_wr(gb, DE, A);
+  CALL_C(0x6972, interactionCode57__loadScriptAndInitGraphics_hook, 0x6a89, 0x6975);
+L_6975:
+  CYC(0x6975, 0x6977); E = 0x45;
+  CYC(0x6977, 0x6978); A = mem_rd(gb, DE);
+  CYC(0x6978, 0x6979); push_effect(gb, 0x6979); SET_HL(bank09_jump_table(gb));
+  switch (HL) { case 0x6983: goto L_6983; case 0x69d6: goto L_69d6; case 0x69e2: goto L_69e2; case 0x69ec: goto L_69ec; case 0x69fc: goto L_69fc; default: HANDOFF(HL); }
+L_6983:
+  CYC(0x6983, 0x6986); A = mem_rd(gb, 0xcfc0);
+  CYC(0x6986, 0x6988); alu_cp(gb, 0x01);
+  if (!(F & FZ)) { CYCT(0x6988, 0x698a); goto L_699b; } CYC(0x6988, 0x698a);
+  CALL_C(0x698a, interactionIncSubstate_hook, 0x23e5, 0x698d);
+  CYC(0x698d, 0x698f); L = 0x42;
+  CYC(0x698f, 0x6990); A = mem_rd(gb, HL);
+  CYC(0x6990, 0x6991); A = alu_dec8(gb, A);
+  CYC(0x6991, 0x6994); SET_HL(0x6ae4);
+  CYC(0x6994, 0x6995); push_effect(gb, 0x6995);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6995, 0x6996); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6996, 0x6997); H = mem_rd(gb, HL);
+  CYC(0x6997, 0x6998); L = A;
+  CYC(0x6998, 0x699b); if (hook_enabled_at(0x2544)) { interactionSetScript_hook(gb); return; } HANDOFF(0x2544);
+L_699b:
+  CALL_C(0x699b, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x699e);
+  CALL_C(0x699e, interactionRunScript_hook, 0x2552, 0x69a1);
+  CYC(0x69a1, 0x69a2); H = D;
+  CYC(0x69a2, 0x69a4); L = 0x61;
+  CYC(0x69a4, 0x69a5); A = mem_rd(gb, HL);
+  CYC(0x69a5, 0x69a6); alu_or(gb, A);
+  if ((F & FZ)) { CYCT(0x69a6, 0x69a8); goto L_69cb; } CYC(0x69a6, 0x69a8);
+  CYC(0x69a8, 0x69aa); mem_wr(gb, HL, 0x00);
+  CYC(0x69aa, 0x69ac); B = 0x04;
+L_69ac:
+  CALL_C(0x69ac, getFreeInteractionSlot_hook, 0x3aef, 0x69af);
+  if (!(F & FZ)) { CYCT(0x69af, 0x69b0); ret_effect(gb); return; } CYC(0x69af, 0x69b0);
+  CYC(0x69b0, 0x69b2); mem_wr(gb, HL, 0x99);
+  CYC(0x69b2, 0x69b3); L = alu_inc8(gb, L);
+  CYC(0x69b3, 0x69b5); mem_wr(gb, HL, 0x02);
+  CYC(0x69b5, 0x69b6); L = alu_inc8(gb, L);
+  CYC(0x69b6, 0x69b7); mem_wr(gb, HL, B);
+  CYC(0x69b7, 0x69b9); E = 0x5a;
+  CYC(0x69b9, 0x69ba); A = mem_rd(gb, DE);
+  CYC(0x69ba, 0x69bc); L = 0x78;
+  CYC(0x69bc, 0x69bd); mem_wr(gb, HL, A);
+  PUSH(0x69bd, BC);
+  CYC(0x69be, 0x69c0); E = 0x78;
+  CYC(0x69c0, 0x69c1); A = mem_rd(gb, DE);
+  CYC(0x69c1, 0x69c3); B = 0x00;
+  CYC(0x69c3, 0x69c4); C = A;
+  CALL_C(0x69c4, objectCopyPositionWithOffset_hook, 0x225a, 0x69c7);
+  SET_BC(POP(0x69c7));
+  CYC(0x69c8, 0x69c9); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x69c9, 0x69cb); goto L_69ac; } CYC(0x69c9, 0x69cb);
+L_69cb:
+  CYC(0x69cb, 0x69cd); L = 0x4b;
+  CYC(0x69cd, 0x69ce); A = mem_rd(gb, HL);
+  CYC(0x69ce, 0x69d0); alu_cp(gb, 0x50);
+  if (!(F & FC)) { CYCT(0x69d0, 0x69d3); if (hook_enabled_at(0x1e3c)) { objectSetVisiblec1_hook(gb); return; } HANDOFF(0x1e3c); } CYC(0x69d0, 0x69d3);
+  CYC(0x69d3, 0x69d6); if (hook_enabled_at(0x1e4e)) { objectSetVisiblec3_hook(gb); return; } HANDOFF(0x1e4e);
+L_69d6:
+  CALL_C(0x69d6, interactionCode57__updateAnimationAndRunScript_hook, 0x69e2, 0x69d9);
+  if (!(F & FC)) { CYCT(0x69d9, 0x69da); ret_effect(gb); return; } CYC(0x69d9, 0x69da);
+  CALL_C(0x69da, interactionIncSubstate_hook, 0x23e5, 0x69dd);
+  CYC(0x69dd, 0x69df); L = 0x46;
+  CYC(0x69df, 0x69e1); mem_wr(gb, HL, 0xd2);
+  CYC(0x69e1, 0x69e2); ret_effect(gb); return;
+L_69e2:
+  CYC(0x69e2, 0x69e4); E = 0x7f;
+  CYC(0x69e4, 0x69e5); A = mem_rd(gb, DE);
+  CYC(0x69e5, 0x69e6); alu_or(gb, A);
+  if ((F & FZ)) { CALL_C_CC(0x69e6, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x69e9); } else CYC(0x69e6, 0x69e9);
+  CYC(0x69e9, 0x69ec); if (hook_enabled_at(0x2552)) { interactionRunScript_hook(gb); return; } HANDOFF(0x2552);
+L_69ec:
+  CALL_C(0x69ec, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x69ef);
+  CALL_C(0x69ef, objectApplySpeed_hook, 0x201d, 0x69f2);
+  CALL_C(0x69f2, interactionDecCounter1_hook, 0x23cc, 0x69f5);
+  if (!(F & FZ)) { CYCT(0x69f5, 0x69f6); ret_effect(gb); return; } CYC(0x69f5, 0x69f6);
+  CALL_C(0x69f6, interactionIncSubstate_hook, 0x23e5, 0x69f9);
+  CYC(0x69f9, 0x69fc); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c);
+L_69fc:
+  CYC(0x69fc, 0x69ff); A = mem_rd(gb, 0xc4ab);
+  CYC(0x69ff, 0x6a00); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x6a00, 0x6a01); ret_effect(gb); return; } CYC(0x6a00, 0x6a01);
+  CALL_C(0x6a01, interactionIncSubstate_hook, 0x23e5, 0x6a04);
+  CYC(0x6a04, 0x6a06); A = 0x06;
+  CYC(0x6a06, 0x6a09); mem_wr(gb, 0xcfc0, A);
+  CALL_C(0x6a09, disableLcd_hook, 0x02c1, 0x6a0c);
+  PUSH(0x6a0c, DE);
+  CYC(0x6a0d, 0x6a10); SET_BC(0x0138);
+  CYC(0x6a10, 0x6a12); A = 0x00;
+  CALL_C(0x6a12, forceLoadRoom_hook, 0x36f6, 0x6a15);
+  CYC(0x6a15, 0x6a17); A = 0x2d;
+  CALL_C(0x6a17, loadUncompressedGfxHeader_hook, 0x05da, 0x6a1a);
+  CYC(0x6a1a, 0x6a1c); A = 0x30;
+  CALL_C(0x6a1c, loadPaletteHeader_hook, 0x050b, 0x6a1f);
+  CYC(0x6a1f, 0x6a21); A = 0x84;
+  CALL_C(0x6a21, loadGfxHeader_hook, 0x0626, 0x6a24);
+  CYC(0x6a24, 0x6a26); A = 0xff;
+  CYC(0x6a26, 0x6a29); mem_wr(gb, 0xcd25, A);
+  CYC(0x6a29, 0x6a2b); A = 0x04;
+  CALL_C(0x6a2b, loadGfxRegisterStateIndex_hook, 0x02ea, 0x6a2e);
+  SET_DE(POP(0x6a2e));
+  CYC(0x6a2f, 0x6a32); SET_BC(0x427e);
+  CALL_C(0x6a32, interactionSetPosition_hook, 0x2773, 0x6a35);
+  CYC(0x6a35, 0x6a37); A = 0x02;
+  CYC(0x6a37, 0x6a3a); SET_HL(0x6ae4);
+  CYC(0x6a3a, 0x6a3b); push_effect(gb, 0x6a3b);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6a3b, 0x6a3c); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6a3c, 0x6a3d); H = mem_rd(gb, HL);
+  CYC(0x6a3d, 0x6a3e); L = A;
+  CALL_C(0x6a3e, interactionSetScript_hook, 0x2544, 0x6a41);
+  CYC(0x6a41, 0x6a44); if (hook_enabled_at(0x3299)) { fadeinFromWhite_hook(gb); return; } HANDOFF(0x3299);
+L_6a44:
+  CALL_C(0x6a44, checkInteractionState_hook, 0x23fe, 0x6a47);
+  if (!(F & FZ)) { CYCT(0x6a47, 0x6a49); goto L_6a4c; } CYC(0x6a47, 0x6a49);
+  CYC(0x6a49, 0x6a4c); goto L_6965;
+L_6a4c:
+  CYC(0x6a4c, 0x6a4e); E = 0x45;
+  CYC(0x6a4e, 0x6a4f); A = mem_rd(gb, DE);
+  CYC(0x6a4f, 0x6a50); push_effect(gb, 0x6a50); SET_HL(bank09_jump_table(gb));
+  switch (HL) { case 0x6983: goto L_6983; case 0x69e2: goto L_69e2; case 0x6a58: goto L_6a58; case 0x6a5f: goto L_6a5f; default: HANDOFF(HL); }
+L_6a58:
+  CALL_C(0x6a58, interactionCode57__updateAnimationAndRunScript_hook, 0x69e2, 0x6a5b);
+  if (!(F & FC)) { CYCT(0x6a5b, 0x6a5c); ret_effect(gb); return; } CYC(0x6a5b, 0x6a5c);
+  CALL_C(0x6a5c, interactionIncSubstate_hook, 0x23e5, 0x6a5f);
+L_6a5f:
+  CALL_C(0x6a5f, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x6a62);
+  CALL_C(0x6a62, objectApplySpeed_hook, 0x201d, 0x6a65);
+  CYC(0x6a65, 0x6a68); A = mem_rd(gb, 0xcfc0);
+  CYC(0x6a68, 0x6a6a); alu_cp(gb, 0x06);
+  if (!(F & FZ)) { CYCT(0x6a6a, 0x6a6b); ret_effect(gb); return; } CYC(0x6a6a, 0x6a6b);
+  CALL_C(0x6a6b, interactionIncSubstate_hook, 0x23e5, 0x6a6e);
+  CYC(0x6a6e, 0x6a71); SET_BC(0x388a);
+  CALL_C(0x6a71, interactionSetPosition_hook, 0x2773, 0x6a74);
+  CYC(0x6a74, 0x6a76); A = 0x03;
+  CYC(0x6a76, 0x6a79); SET_HL(0x6ae4);
+  CYC(0x6a79, 0x6a7a); push_effect(gb, 0x6a7a);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6a7a, 0x6a7b); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6a7b, 0x6a7c); H = mem_rd(gb, HL);
+  CYC(0x6a7c, 0x6a7d); L = A;
+  CYC(0x6a7d, 0x6a80); if (hook_enabled_at(0x2544)) { interactionSetScript_hook(gb); return; } HANDOFF(0x2544);
+L_6aa4:
+  CYC(0x6aa4, 0x6aa5); C = A;
+  CYC(0x6aa5, 0x6aa7); B = 0x02;
+L_6aa7:
+  CALL_C(0x6aa7, getFreeInteractionSlot_hook, 0x3aef, 0x6aaa);
+  if (!(F & FZ)) { CYCT(0x6aaa, 0x6aab); ret_effect(gb); return; } CYC(0x6aaa, 0x6aab);
+  CYC(0x6aab, 0x6aad); mem_wr(gb, HL, 0x92);
+  CYC(0x6aad, 0x6aae); L = alu_inc8(gb, L);
+  CYC(0x6aae, 0x6ab0); mem_wr(gb, HL, 0x06);
+  CYC(0x6ab0, 0x6ab1); L = alu_inc8(gb, L);
+  CYC(0x6ab1, 0x6ab2); mem_wr(gb, HL, C);
+  CYC(0x6ab2, 0x6ab4); E = 0x5a;
+  CYC(0x6ab4, 0x6ab5); A = mem_rd(gb, DE);
+  CYC(0x6ab5, 0x6ab7); alu_and(gb, 0x03);
+  CYC(0x6ab7, 0x6ab9); L = 0x47;
+  CYC(0x6ab9, 0x6aba); mem_wr(gb, HL, A);
+  CYC(0x6aba, 0x6abc); L = 0x49;
+  CYC(0x6abc, 0x6abd); mem_wr(gb, HL, B);
+  CYC(0x6abd, 0x6abe); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  PUSH(0x6abe, BC);
+  CALL_C(0x6abf, objectCopyPosition_hook, 0x2242, 0x6ac2);
+  SET_BC(POP(0x6ac2));
+  CYC(0x6ac3, 0x6ac5); L = 0x4b;
+  CYC(0x6ac5, 0x6ac6); A = mem_rd(gb, HL);
+  CYC(0x6ac6, 0x6ac8); alu_add(gb, 0x04);
+  CYC(0x6ac8, 0x6ac9); mem_wr(gb, HL, A);
+  CYC(0x6ac9, 0x6acb); E = 0x61;
+  CYC(0x6acb, 0x6acc); A = mem_rd(gb, DE);
+  CYC(0x6acc, 0x6ace); alu_cp(gb, 0x01);
+  CYC(0x6ace, 0x6ad0); L = 0x4d;
+  CYC(0x6ad0, 0x6ad1); A = mem_rd(gb, HL);
+  if ((F & FZ)) { CYCT(0x6ad1, 0x6ad3); goto L_6ad5; } CYC(0x6ad1, 0x6ad3);
+  CYC(0x6ad3, 0x6ad5); alu_add(gb, 0x1c);
+L_6ad5:
+  CYC(0x6ad5, 0x6ad7); alu_sub(gb, 0x0e);
+  CYC(0x6ad7, 0x6ad8); mem_wr(gb, HL, A);
+  CYC(0x6ad8, 0x6ad9); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x6ad9, 0x6adb); goto L_6aa7; } CYC(0x6ad9, 0x6adb);
+  CYC(0x6adb, 0x6adc); ret_effect(gb); return;
+}
+
+void interactionCode57__subid00_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_6937:
+  CALL_C(0x6937, checkInteractionState_hook, 0x23fe, 0x693a);
+  if (!(F & FZ)) { CYCT(0x693a, 0x693c); goto L_6942; } CYC(0x693a, 0x693c);
+L_693c:
+  CALL_C(0x693c, interactionCode57__loadScriptAndInitGraphics_hook, 0x6a89, 0x693f);
+L_693f:
+  CALL_C(0x693f, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x6942);
+L_6942:
+  CALL_C(0x6942, interactionRunScript_hook, 0x2552, 0x6945);
+  if ((F & FC)) { CYCT(0x6945, 0x6948); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } CYC(0x6945, 0x6948);
+  CALL_C(0x6948, interactionAnimateAsNpc_hook, 0x26db, 0x694b);
+  CYC(0x694b, 0x694d); E = 0x61;
+  CYC(0x694d, 0x694e); A = mem_rd(gb, DE);
+  CYC(0x694e, 0x694f); alu_or(gb, A);
+  if ((F & FZ)) { CYCT(0x694f, 0x6950); ret_effect(gb); return; } CYC(0x694f, 0x6950);
+  CYC(0x6950, 0x6952); A = 0x50;
+  CALL_C(0x6952, playSound_b00_hook, 0x0c98, 0x6955);
+  CYC(0x6955, 0x6958); A = mem_rd(gb, 0xcd00);
+  CYC(0x6958, 0x695a); alu_and(gb, 0x01);
+  if ((F & FZ)) { CYCT(0x695a, 0x695b); ret_effect(gb); return; } CYC(0x695a, 0x695b);
+  CYC(0x695b, 0x695d); A = 0x03;
+  CYC(0x695d, 0x6960); goto L_6aa4;
+L_6aa4:
+  CYC(0x6aa4, 0x6aa5); C = A;
+  CYC(0x6aa5, 0x6aa7); B = 0x02;
+L_6aa7:
+  CALL_C(0x6aa7, getFreeInteractionSlot_hook, 0x3aef, 0x6aaa);
+  if (!(F & FZ)) { CYCT(0x6aaa, 0x6aab); ret_effect(gb); return; } CYC(0x6aaa, 0x6aab);
+  CYC(0x6aab, 0x6aad); mem_wr(gb, HL, 0x92);
+  CYC(0x6aad, 0x6aae); L = alu_inc8(gb, L);
+  CYC(0x6aae, 0x6ab0); mem_wr(gb, HL, 0x06);
+  CYC(0x6ab0, 0x6ab1); L = alu_inc8(gb, L);
+  CYC(0x6ab1, 0x6ab2); mem_wr(gb, HL, C);
+  CYC(0x6ab2, 0x6ab4); E = 0x5a;
+  CYC(0x6ab4, 0x6ab5); A = mem_rd(gb, DE);
+  CYC(0x6ab5, 0x6ab7); alu_and(gb, 0x03);
+  CYC(0x6ab7, 0x6ab9); L = 0x47;
+  CYC(0x6ab9, 0x6aba); mem_wr(gb, HL, A);
+  CYC(0x6aba, 0x6abc); L = 0x49;
+  CYC(0x6abc, 0x6abd); mem_wr(gb, HL, B);
+  CYC(0x6abd, 0x6abe); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  PUSH(0x6abe, BC);
+  CALL_C(0x6abf, objectCopyPosition_hook, 0x2242, 0x6ac2);
+  SET_BC(POP(0x6ac2));
+  CYC(0x6ac3, 0x6ac5); L = 0x4b;
+  CYC(0x6ac5, 0x6ac6); A = mem_rd(gb, HL);
+  CYC(0x6ac6, 0x6ac8); alu_add(gb, 0x04);
+  CYC(0x6ac8, 0x6ac9); mem_wr(gb, HL, A);
+  CYC(0x6ac9, 0x6acb); E = 0x61;
+  CYC(0x6acb, 0x6acc); A = mem_rd(gb, DE);
+  CYC(0x6acc, 0x6ace); alu_cp(gb, 0x01);
+  CYC(0x6ace, 0x6ad0); L = 0x4d;
+  CYC(0x6ad0, 0x6ad1); A = mem_rd(gb, HL);
+  if ((F & FZ)) { CYCT(0x6ad1, 0x6ad3); goto L_6ad5; } CYC(0x6ad1, 0x6ad3);
+  CYC(0x6ad3, 0x6ad5); alu_add(gb, 0x1c);
+L_6ad5:
+  CYC(0x6ad5, 0x6ad7); alu_sub(gb, 0x0e);
+  CYC(0x6ad7, 0x6ad8); mem_wr(gb, HL, A);
+  CYC(0x6ad8, 0x6ad9); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x6ad9, 0x6adb); goto L_6aa7; } CYC(0x6ad9, 0x6adb);
+  CYC(0x6adb, 0x6adc); ret_effect(gb); return;
+}
+
+void interactionCode57__subid03__state0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_693c:
+  CALL_C(0x693c, interactionCode57__loadScriptAndInitGraphics_hook, 0x6a89, 0x693f);
+L_693f:
+  CALL_C(0x693f, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x6942);
+L_6942:
+  CALL_C(0x6942, interactionRunScript_hook, 0x2552, 0x6945);
+  if ((F & FC)) { CYCT(0x6945, 0x6948); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } CYC(0x6945, 0x6948);
+  CALL_C(0x6948, interactionAnimateAsNpc_hook, 0x26db, 0x694b);
+  CYC(0x694b, 0x694d); E = 0x61;
+  CYC(0x694d, 0x694e); A = mem_rd(gb, DE);
+  CYC(0x694e, 0x694f); alu_or(gb, A);
+  if ((F & FZ)) { CYCT(0x694f, 0x6950); ret_effect(gb); return; } CYC(0x694f, 0x6950);
+  CYC(0x6950, 0x6952); A = 0x50;
+  CALL_C(0x6952, playSound_b00_hook, 0x0c98, 0x6955);
+  CYC(0x6955, 0x6958); A = mem_rd(gb, 0xcd00);
+  CYC(0x6958, 0x695a); alu_and(gb, 0x01);
+  if ((F & FZ)) { CYCT(0x695a, 0x695b); ret_effect(gb); return; } CYC(0x695a, 0x695b);
+  CYC(0x695b, 0x695d); A = 0x03;
+  CYC(0x695d, 0x6960); goto L_6aa4;
+L_6aa4:
+  CYC(0x6aa4, 0x6aa5); C = A;
+  CYC(0x6aa5, 0x6aa7); B = 0x02;
+L_6aa7:
+  CALL_C(0x6aa7, getFreeInteractionSlot_hook, 0x3aef, 0x6aaa);
+  if (!(F & FZ)) { CYCT(0x6aaa, 0x6aab); ret_effect(gb); return; } CYC(0x6aaa, 0x6aab);
+  CYC(0x6aab, 0x6aad); mem_wr(gb, HL, 0x92);
+  CYC(0x6aad, 0x6aae); L = alu_inc8(gb, L);
+  CYC(0x6aae, 0x6ab0); mem_wr(gb, HL, 0x06);
+  CYC(0x6ab0, 0x6ab1); L = alu_inc8(gb, L);
+  CYC(0x6ab1, 0x6ab2); mem_wr(gb, HL, C);
+  CYC(0x6ab2, 0x6ab4); E = 0x5a;
+  CYC(0x6ab4, 0x6ab5); A = mem_rd(gb, DE);
+  CYC(0x6ab5, 0x6ab7); alu_and(gb, 0x03);
+  CYC(0x6ab7, 0x6ab9); L = 0x47;
+  CYC(0x6ab9, 0x6aba); mem_wr(gb, HL, A);
+  CYC(0x6aba, 0x6abc); L = 0x49;
+  CYC(0x6abc, 0x6abd); mem_wr(gb, HL, B);
+  CYC(0x6abd, 0x6abe); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  PUSH(0x6abe, BC);
+  CALL_C(0x6abf, objectCopyPosition_hook, 0x2242, 0x6ac2);
+  SET_BC(POP(0x6ac2));
+  CYC(0x6ac3, 0x6ac5); L = 0x4b;
+  CYC(0x6ac5, 0x6ac6); A = mem_rd(gb, HL);
+  CYC(0x6ac6, 0x6ac8); alu_add(gb, 0x04);
+  CYC(0x6ac8, 0x6ac9); mem_wr(gb, HL, A);
+  CYC(0x6ac9, 0x6acb); E = 0x61;
+  CYC(0x6acb, 0x6acc); A = mem_rd(gb, DE);
+  CYC(0x6acc, 0x6ace); alu_cp(gb, 0x01);
+  CYC(0x6ace, 0x6ad0); L = 0x4d;
+  CYC(0x6ad0, 0x6ad1); A = mem_rd(gb, HL);
+  if ((F & FZ)) { CYCT(0x6ad1, 0x6ad3); goto L_6ad5; } CYC(0x6ad1, 0x6ad3);
+  CYC(0x6ad3, 0x6ad5); alu_add(gb, 0x1c);
+L_6ad5:
+  CYC(0x6ad5, 0x6ad7); alu_sub(gb, 0x0e);
+  CYC(0x6ad7, 0x6ad8); mem_wr(gb, HL, A);
+  CYC(0x6ad8, 0x6ad9); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x6ad9, 0x6adb); goto L_6aa7; } CYC(0x6ad9, 0x6adb);
+  CYC(0x6adb, 0x6adc); ret_effect(gb); return;
+}
+
+void interactionCode57__afterCall693f_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_693f:
+  CALL_C(0x693f, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x6942);
+L_6942:
+  CALL_C(0x6942, interactionRunScript_hook, 0x2552, 0x6945);
+  if ((F & FC)) { CYCT(0x6945, 0x6948); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } CYC(0x6945, 0x6948);
+  CALL_C(0x6948, interactionAnimateAsNpc_hook, 0x26db, 0x694b);
+  CYC(0x694b, 0x694d); E = 0x61;
+  CYC(0x694d, 0x694e); A = mem_rd(gb, DE);
+  CYC(0x694e, 0x694f); alu_or(gb, A);
+  if ((F & FZ)) { CYCT(0x694f, 0x6950); ret_effect(gb); return; } CYC(0x694f, 0x6950);
+  CYC(0x6950, 0x6952); A = 0x50;
+  CALL_C(0x6952, playSound_b00_hook, 0x0c98, 0x6955);
+  CYC(0x6955, 0x6958); A = mem_rd(gb, 0xcd00);
+  CYC(0x6958, 0x695a); alu_and(gb, 0x01);
+  if ((F & FZ)) { CYCT(0x695a, 0x695b); ret_effect(gb); return; } CYC(0x695a, 0x695b);
+  CYC(0x695b, 0x695d); A = 0x03;
+  CYC(0x695d, 0x6960); goto L_6aa4;
+L_6aa4:
+  CYC(0x6aa4, 0x6aa5); C = A;
+  CYC(0x6aa5, 0x6aa7); B = 0x02;
+L_6aa7:
+  CALL_C(0x6aa7, getFreeInteractionSlot_hook, 0x3aef, 0x6aaa);
+  if (!(F & FZ)) { CYCT(0x6aaa, 0x6aab); ret_effect(gb); return; } CYC(0x6aaa, 0x6aab);
+  CYC(0x6aab, 0x6aad); mem_wr(gb, HL, 0x92);
+  CYC(0x6aad, 0x6aae); L = alu_inc8(gb, L);
+  CYC(0x6aae, 0x6ab0); mem_wr(gb, HL, 0x06);
+  CYC(0x6ab0, 0x6ab1); L = alu_inc8(gb, L);
+  CYC(0x6ab1, 0x6ab2); mem_wr(gb, HL, C);
+  CYC(0x6ab2, 0x6ab4); E = 0x5a;
+  CYC(0x6ab4, 0x6ab5); A = mem_rd(gb, DE);
+  CYC(0x6ab5, 0x6ab7); alu_and(gb, 0x03);
+  CYC(0x6ab7, 0x6ab9); L = 0x47;
+  CYC(0x6ab9, 0x6aba); mem_wr(gb, HL, A);
+  CYC(0x6aba, 0x6abc); L = 0x49;
+  CYC(0x6abc, 0x6abd); mem_wr(gb, HL, B);
+  CYC(0x6abd, 0x6abe); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  PUSH(0x6abe, BC);
+  CALL_C(0x6abf, objectCopyPosition_hook, 0x2242, 0x6ac2);
+  SET_BC(POP(0x6ac2));
+  CYC(0x6ac3, 0x6ac5); L = 0x4b;
+  CYC(0x6ac5, 0x6ac6); A = mem_rd(gb, HL);
+  CYC(0x6ac6, 0x6ac8); alu_add(gb, 0x04);
+  CYC(0x6ac8, 0x6ac9); mem_wr(gb, HL, A);
+  CYC(0x6ac9, 0x6acb); E = 0x61;
+  CYC(0x6acb, 0x6acc); A = mem_rd(gb, DE);
+  CYC(0x6acc, 0x6ace); alu_cp(gb, 0x01);
+  CYC(0x6ace, 0x6ad0); L = 0x4d;
+  CYC(0x6ad0, 0x6ad1); A = mem_rd(gb, HL);
+  if ((F & FZ)) { CYCT(0x6ad1, 0x6ad3); goto L_6ad5; } CYC(0x6ad1, 0x6ad3);
+  CYC(0x6ad3, 0x6ad5); alu_add(gb, 0x1c);
+L_6ad5:
+  CYC(0x6ad5, 0x6ad7); alu_sub(gb, 0x0e);
+  CYC(0x6ad7, 0x6ad8); mem_wr(gb, HL, A);
+  CYC(0x6ad8, 0x6ad9); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x6ad9, 0x6adb); goto L_6aa7; } CYC(0x6ad9, 0x6adb);
+  CYC(0x6adb, 0x6adc); ret_effect(gb); return;
+}
+
+void interactionCode57__subid03__state1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_6942:
+  CALL_C(0x6942, interactionRunScript_hook, 0x2552, 0x6945);
+  if ((F & FC)) { CYCT(0x6945, 0x6948); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } CYC(0x6945, 0x6948);
+  CALL_C(0x6948, interactionAnimateAsNpc_hook, 0x26db, 0x694b);
+  CYC(0x694b, 0x694d); E = 0x61;
+  CYC(0x694d, 0x694e); A = mem_rd(gb, DE);
+  CYC(0x694e, 0x694f); alu_or(gb, A);
+  if ((F & FZ)) { CYCT(0x694f, 0x6950); ret_effect(gb); return; } CYC(0x694f, 0x6950);
+  CYC(0x6950, 0x6952); A = 0x50;
+  CALL_C(0x6952, playSound_b00_hook, 0x0c98, 0x6955);
+  CYC(0x6955, 0x6958); A = mem_rd(gb, 0xcd00);
+  CYC(0x6958, 0x695a); alu_and(gb, 0x01);
+  if ((F & FZ)) { CYCT(0x695a, 0x695b); ret_effect(gb); return; } CYC(0x695a, 0x695b);
+  CYC(0x695b, 0x695d); A = 0x03;
+  CYC(0x695d, 0x6960); goto L_6aa4;
+L_6aa4:
+  CYC(0x6aa4, 0x6aa5); C = A;
+  CYC(0x6aa5, 0x6aa7); B = 0x02;
+L_6aa7:
+  CALL_C(0x6aa7, getFreeInteractionSlot_hook, 0x3aef, 0x6aaa);
+  if (!(F & FZ)) { CYCT(0x6aaa, 0x6aab); ret_effect(gb); return; } CYC(0x6aaa, 0x6aab);
+  CYC(0x6aab, 0x6aad); mem_wr(gb, HL, 0x92);
+  CYC(0x6aad, 0x6aae); L = alu_inc8(gb, L);
+  CYC(0x6aae, 0x6ab0); mem_wr(gb, HL, 0x06);
+  CYC(0x6ab0, 0x6ab1); L = alu_inc8(gb, L);
+  CYC(0x6ab1, 0x6ab2); mem_wr(gb, HL, C);
+  CYC(0x6ab2, 0x6ab4); E = 0x5a;
+  CYC(0x6ab4, 0x6ab5); A = mem_rd(gb, DE);
+  CYC(0x6ab5, 0x6ab7); alu_and(gb, 0x03);
+  CYC(0x6ab7, 0x6ab9); L = 0x47;
+  CYC(0x6ab9, 0x6aba); mem_wr(gb, HL, A);
+  CYC(0x6aba, 0x6abc); L = 0x49;
+  CYC(0x6abc, 0x6abd); mem_wr(gb, HL, B);
+  CYC(0x6abd, 0x6abe); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  PUSH(0x6abe, BC);
+  CALL_C(0x6abf, objectCopyPosition_hook, 0x2242, 0x6ac2);
+  SET_BC(POP(0x6ac2));
+  CYC(0x6ac3, 0x6ac5); L = 0x4b;
+  CYC(0x6ac5, 0x6ac6); A = mem_rd(gb, HL);
+  CYC(0x6ac6, 0x6ac8); alu_add(gb, 0x04);
+  CYC(0x6ac8, 0x6ac9); mem_wr(gb, HL, A);
+  CYC(0x6ac9, 0x6acb); E = 0x61;
+  CYC(0x6acb, 0x6acc); A = mem_rd(gb, DE);
+  CYC(0x6acc, 0x6ace); alu_cp(gb, 0x01);
+  CYC(0x6ace, 0x6ad0); L = 0x4d;
+  CYC(0x6ad0, 0x6ad1); A = mem_rd(gb, HL);
+  if ((F & FZ)) { CYCT(0x6ad1, 0x6ad3); goto L_6ad5; } CYC(0x6ad1, 0x6ad3);
+  CYC(0x6ad3, 0x6ad5); alu_add(gb, 0x1c);
+L_6ad5:
+  CYC(0x6ad5, 0x6ad7); alu_sub(gb, 0x0e);
+  CYC(0x6ad7, 0x6ad8); mem_wr(gb, HL, A);
+  CYC(0x6ad8, 0x6ad9); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x6ad9, 0x6adb); goto L_6aa7; } CYC(0x6ad9, 0x6adb);
+  CYC(0x6adb, 0x6adc); ret_effect(gb); return;
+}
+
+void interactionCode57__subid01_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_6960:
+  CALL_C(0x6960, checkInteractionState_hook, 0x23fe, 0x6963);
+  if (!(F & FZ)) { CYCT(0x6963, 0x6965); goto L_6975; } CYC(0x6963, 0x6965);
+L_6965:
+  CYC(0x6965, 0x6967); E = 0x42;
+  CYC(0x6967, 0x6968); A = mem_rd(gb, DE);
+  CYC(0x6968, 0x6969); A = alu_dec8(gb, A);
+  CYC(0x6969, 0x696b); A = 0x0c;
+  if ((F & FZ)) { CYCT(0x696b, 0x696d); goto L_696f; } CYC(0x696b, 0x696d);
+  CYC(0x696d, 0x696f); A = 0xf4;
+L_696f:
+  CYC(0x696f, 0x6971); E = 0x78;
+  CYC(0x6971, 0x6972); mem_wr(gb, DE, A);
+  CALL_C(0x6972, interactionCode57__loadScriptAndInitGraphics_hook, 0x6a89, 0x6975);
+L_6975:
+  CYC(0x6975, 0x6977); E = 0x45;
+  CYC(0x6977, 0x6978); A = mem_rd(gb, DE);
+  CYC(0x6978, 0x6979); push_effect(gb, 0x6979); SET_HL(bank09_jump_table(gb));
+  switch (HL) { case 0x6983: goto L_6983; case 0x69d6: goto L_69d6; case 0x69e2: goto L_69e2; case 0x69ec: goto L_69ec; case 0x69fc: goto L_69fc; default: HANDOFF(HL); }
+L_6983:
+  CYC(0x6983, 0x6986); A = mem_rd(gb, 0xcfc0);
+  CYC(0x6986, 0x6988); alu_cp(gb, 0x01);
+  if (!(F & FZ)) { CYCT(0x6988, 0x698a); goto L_699b; } CYC(0x6988, 0x698a);
+  CALL_C(0x698a, interactionIncSubstate_hook, 0x23e5, 0x698d);
+  CYC(0x698d, 0x698f); L = 0x42;
+  CYC(0x698f, 0x6990); A = mem_rd(gb, HL);
+  CYC(0x6990, 0x6991); A = alu_dec8(gb, A);
+  CYC(0x6991, 0x6994); SET_HL(0x6ae4);
+  CYC(0x6994, 0x6995); push_effect(gb, 0x6995);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6995, 0x6996); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6996, 0x6997); H = mem_rd(gb, HL);
+  CYC(0x6997, 0x6998); L = A;
+  CYC(0x6998, 0x699b); if (hook_enabled_at(0x2544)) { interactionSetScript_hook(gb); return; } HANDOFF(0x2544);
+L_699b:
+  CALL_C(0x699b, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x699e);
+  CALL_C(0x699e, interactionRunScript_hook, 0x2552, 0x69a1);
+  CYC(0x69a1, 0x69a2); H = D;
+  CYC(0x69a2, 0x69a4); L = 0x61;
+  CYC(0x69a4, 0x69a5); A = mem_rd(gb, HL);
+  CYC(0x69a5, 0x69a6); alu_or(gb, A);
+  if ((F & FZ)) { CYCT(0x69a6, 0x69a8); goto L_69cb; } CYC(0x69a6, 0x69a8);
+  CYC(0x69a8, 0x69aa); mem_wr(gb, HL, 0x00);
+  CYC(0x69aa, 0x69ac); B = 0x04;
+L_69ac:
+  CALL_C(0x69ac, getFreeInteractionSlot_hook, 0x3aef, 0x69af);
+  if (!(F & FZ)) { CYCT(0x69af, 0x69b0); ret_effect(gb); return; } CYC(0x69af, 0x69b0);
+  CYC(0x69b0, 0x69b2); mem_wr(gb, HL, 0x99);
+  CYC(0x69b2, 0x69b3); L = alu_inc8(gb, L);
+  CYC(0x69b3, 0x69b5); mem_wr(gb, HL, 0x02);
+  CYC(0x69b5, 0x69b6); L = alu_inc8(gb, L);
+  CYC(0x69b6, 0x69b7); mem_wr(gb, HL, B);
+  CYC(0x69b7, 0x69b9); E = 0x5a;
+  CYC(0x69b9, 0x69ba); A = mem_rd(gb, DE);
+  CYC(0x69ba, 0x69bc); L = 0x78;
+  CYC(0x69bc, 0x69bd); mem_wr(gb, HL, A);
+  PUSH(0x69bd, BC);
+  CYC(0x69be, 0x69c0); E = 0x78;
+  CYC(0x69c0, 0x69c1); A = mem_rd(gb, DE);
+  CYC(0x69c1, 0x69c3); B = 0x00;
+  CYC(0x69c3, 0x69c4); C = A;
+  CALL_C(0x69c4, objectCopyPositionWithOffset_hook, 0x225a, 0x69c7);
+  SET_BC(POP(0x69c7));
+  CYC(0x69c8, 0x69c9); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x69c9, 0x69cb); goto L_69ac; } CYC(0x69c9, 0x69cb);
+L_69cb:
+  CYC(0x69cb, 0x69cd); L = 0x4b;
+  CYC(0x69cd, 0x69ce); A = mem_rd(gb, HL);
+  CYC(0x69ce, 0x69d0); alu_cp(gb, 0x50);
+  if (!(F & FC)) { CYCT(0x69d0, 0x69d3); if (hook_enabled_at(0x1e3c)) { objectSetVisiblec1_hook(gb); return; } HANDOFF(0x1e3c); } CYC(0x69d0, 0x69d3);
+  CYC(0x69d3, 0x69d6); if (hook_enabled_at(0x1e4e)) { objectSetVisiblec3_hook(gb); return; } HANDOFF(0x1e4e);
+L_69d6:
+  CALL_C(0x69d6, interactionCode57__updateAnimationAndRunScript_hook, 0x69e2, 0x69d9);
+  if (!(F & FC)) { CYCT(0x69d9, 0x69da); ret_effect(gb); return; } CYC(0x69d9, 0x69da);
+  CALL_C(0x69da, interactionIncSubstate_hook, 0x23e5, 0x69dd);
+  CYC(0x69dd, 0x69df); L = 0x46;
+  CYC(0x69df, 0x69e1); mem_wr(gb, HL, 0xd2);
+  CYC(0x69e1, 0x69e2); ret_effect(gb); return;
+L_69e2:
+  CYC(0x69e2, 0x69e4); E = 0x7f;
+  CYC(0x69e4, 0x69e5); A = mem_rd(gb, DE);
+  CYC(0x69e5, 0x69e6); alu_or(gb, A);
+  if ((F & FZ)) { CALL_C_CC(0x69e6, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x69e9); } else CYC(0x69e6, 0x69e9);
+  CYC(0x69e9, 0x69ec); if (hook_enabled_at(0x2552)) { interactionRunScript_hook(gb); return; } HANDOFF(0x2552);
+L_69ec:
+  CALL_C(0x69ec, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x69ef);
+  CALL_C(0x69ef, objectApplySpeed_hook, 0x201d, 0x69f2);
+  CALL_C(0x69f2, interactionDecCounter1_hook, 0x23cc, 0x69f5);
+  if (!(F & FZ)) { CYCT(0x69f5, 0x69f6); ret_effect(gb); return; } CYC(0x69f5, 0x69f6);
+  CALL_C(0x69f6, interactionIncSubstate_hook, 0x23e5, 0x69f9);
+  CYC(0x69f9, 0x69fc); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c);
+L_69fc:
+  CYC(0x69fc, 0x69ff); A = mem_rd(gb, 0xc4ab);
+  CYC(0x69ff, 0x6a00); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x6a00, 0x6a01); ret_effect(gb); return; } CYC(0x6a00, 0x6a01);
+  CALL_C(0x6a01, interactionIncSubstate_hook, 0x23e5, 0x6a04);
+  CYC(0x6a04, 0x6a06); A = 0x06;
+  CYC(0x6a06, 0x6a09); mem_wr(gb, 0xcfc0, A);
+  CALL_C(0x6a09, disableLcd_hook, 0x02c1, 0x6a0c);
+  PUSH(0x6a0c, DE);
+  CYC(0x6a0d, 0x6a10); SET_BC(0x0138);
+  CYC(0x6a10, 0x6a12); A = 0x00;
+  CALL_C(0x6a12, forceLoadRoom_hook, 0x36f6, 0x6a15);
+  CYC(0x6a15, 0x6a17); A = 0x2d;
+  CALL_C(0x6a17, loadUncompressedGfxHeader_hook, 0x05da, 0x6a1a);
+  CYC(0x6a1a, 0x6a1c); A = 0x30;
+  CALL_C(0x6a1c, loadPaletteHeader_hook, 0x050b, 0x6a1f);
+  CYC(0x6a1f, 0x6a21); A = 0x84;
+  CALL_C(0x6a21, loadGfxHeader_hook, 0x0626, 0x6a24);
+  CYC(0x6a24, 0x6a26); A = 0xff;
+  CYC(0x6a26, 0x6a29); mem_wr(gb, 0xcd25, A);
+  CYC(0x6a29, 0x6a2b); A = 0x04;
+  CALL_C(0x6a2b, loadGfxRegisterStateIndex_hook, 0x02ea, 0x6a2e);
+  SET_DE(POP(0x6a2e));
+  CYC(0x6a2f, 0x6a32); SET_BC(0x427e);
+  CALL_C(0x6a32, interactionSetPosition_hook, 0x2773, 0x6a35);
+  CYC(0x6a35, 0x6a37); A = 0x02;
+  CYC(0x6a37, 0x6a3a); SET_HL(0x6ae4);
+  CYC(0x6a3a, 0x6a3b); push_effect(gb, 0x6a3b);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6a3b, 0x6a3c); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6a3c, 0x6a3d); H = mem_rd(gb, HL);
+  CYC(0x6a3d, 0x6a3e); L = A;
+  CALL_C(0x6a3e, interactionSetScript_hook, 0x2544, 0x6a41);
+  CYC(0x6a41, 0x6a44); if (hook_enabled_at(0x3299)) { fadeinFromWhite_hook(gb); return; } HANDOFF(0x3299);
+}
+
+void interactionCode57__subid1And2State0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_6965:
+  CYC(0x6965, 0x6967); E = 0x42;
+  CYC(0x6967, 0x6968); A = mem_rd(gb, DE);
+  CYC(0x6968, 0x6969); A = alu_dec8(gb, A);
+  CYC(0x6969, 0x696b); A = 0x0c;
+  if ((F & FZ)) { CYCT(0x696b, 0x696d); goto L_696f; } CYC(0x696b, 0x696d);
+  CYC(0x696d, 0x696f); A = 0xf4;
+L_696f:
+  CYC(0x696f, 0x6971); E = 0x78;
+  CYC(0x6971, 0x6972); mem_wr(gb, DE, A);
+  CALL_C(0x6972, interactionCode57__loadScriptAndInitGraphics_hook, 0x6a89, 0x6975);
+L_6975:
+  CYC(0x6975, 0x6977); E = 0x45;
+  CYC(0x6977, 0x6978); A = mem_rd(gb, DE);
+  CYC(0x6978, 0x6979); push_effect(gb, 0x6979); SET_HL(bank09_jump_table(gb));
+  switch (HL) { case 0x6983: goto L_6983; case 0x69d6: goto L_69d6; case 0x69e2: goto L_69e2; case 0x69ec: goto L_69ec; case 0x69fc: goto L_69fc; default: HANDOFF(HL); }
+L_6983:
+  CYC(0x6983, 0x6986); A = mem_rd(gb, 0xcfc0);
+  CYC(0x6986, 0x6988); alu_cp(gb, 0x01);
+  if (!(F & FZ)) { CYCT(0x6988, 0x698a); goto L_699b; } CYC(0x6988, 0x698a);
+  CALL_C(0x698a, interactionIncSubstate_hook, 0x23e5, 0x698d);
+  CYC(0x698d, 0x698f); L = 0x42;
+  CYC(0x698f, 0x6990); A = mem_rd(gb, HL);
+  CYC(0x6990, 0x6991); A = alu_dec8(gb, A);
+  CYC(0x6991, 0x6994); SET_HL(0x6ae4);
+  CYC(0x6994, 0x6995); push_effect(gb, 0x6995);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6995, 0x6996); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6996, 0x6997); H = mem_rd(gb, HL);
+  CYC(0x6997, 0x6998); L = A;
+  CYC(0x6998, 0x699b); if (hook_enabled_at(0x2544)) { interactionSetScript_hook(gb); return; } HANDOFF(0x2544);
+L_699b:
+  CALL_C(0x699b, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x699e);
+  CALL_C(0x699e, interactionRunScript_hook, 0x2552, 0x69a1);
+  CYC(0x69a1, 0x69a2); H = D;
+  CYC(0x69a2, 0x69a4); L = 0x61;
+  CYC(0x69a4, 0x69a5); A = mem_rd(gb, HL);
+  CYC(0x69a5, 0x69a6); alu_or(gb, A);
+  if ((F & FZ)) { CYCT(0x69a6, 0x69a8); goto L_69cb; } CYC(0x69a6, 0x69a8);
+  CYC(0x69a8, 0x69aa); mem_wr(gb, HL, 0x00);
+  CYC(0x69aa, 0x69ac); B = 0x04;
+L_69ac:
+  CALL_C(0x69ac, getFreeInteractionSlot_hook, 0x3aef, 0x69af);
+  if (!(F & FZ)) { CYCT(0x69af, 0x69b0); ret_effect(gb); return; } CYC(0x69af, 0x69b0);
+  CYC(0x69b0, 0x69b2); mem_wr(gb, HL, 0x99);
+  CYC(0x69b2, 0x69b3); L = alu_inc8(gb, L);
+  CYC(0x69b3, 0x69b5); mem_wr(gb, HL, 0x02);
+  CYC(0x69b5, 0x69b6); L = alu_inc8(gb, L);
+  CYC(0x69b6, 0x69b7); mem_wr(gb, HL, B);
+  CYC(0x69b7, 0x69b9); E = 0x5a;
+  CYC(0x69b9, 0x69ba); A = mem_rd(gb, DE);
+  CYC(0x69ba, 0x69bc); L = 0x78;
+  CYC(0x69bc, 0x69bd); mem_wr(gb, HL, A);
+  PUSH(0x69bd, BC);
+  CYC(0x69be, 0x69c0); E = 0x78;
+  CYC(0x69c0, 0x69c1); A = mem_rd(gb, DE);
+  CYC(0x69c1, 0x69c3); B = 0x00;
+  CYC(0x69c3, 0x69c4); C = A;
+  CALL_C(0x69c4, objectCopyPositionWithOffset_hook, 0x225a, 0x69c7);
+  SET_BC(POP(0x69c7));
+  CYC(0x69c8, 0x69c9); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x69c9, 0x69cb); goto L_69ac; } CYC(0x69c9, 0x69cb);
+L_69cb:
+  CYC(0x69cb, 0x69cd); L = 0x4b;
+  CYC(0x69cd, 0x69ce); A = mem_rd(gb, HL);
+  CYC(0x69ce, 0x69d0); alu_cp(gb, 0x50);
+  if (!(F & FC)) { CYCT(0x69d0, 0x69d3); if (hook_enabled_at(0x1e3c)) { objectSetVisiblec1_hook(gb); return; } HANDOFF(0x1e3c); } CYC(0x69d0, 0x69d3);
+  CYC(0x69d3, 0x69d6); if (hook_enabled_at(0x1e4e)) { objectSetVisiblec3_hook(gb); return; } HANDOFF(0x1e4e);
+L_69d6:
+  CALL_C(0x69d6, interactionCode57__updateAnimationAndRunScript_hook, 0x69e2, 0x69d9);
+  if (!(F & FC)) { CYCT(0x69d9, 0x69da); ret_effect(gb); return; } CYC(0x69d9, 0x69da);
+  CALL_C(0x69da, interactionIncSubstate_hook, 0x23e5, 0x69dd);
+  CYC(0x69dd, 0x69df); L = 0x46;
+  CYC(0x69df, 0x69e1); mem_wr(gb, HL, 0xd2);
+  CYC(0x69e1, 0x69e2); ret_effect(gb); return;
+L_69e2:
+  CYC(0x69e2, 0x69e4); E = 0x7f;
+  CYC(0x69e4, 0x69e5); A = mem_rd(gb, DE);
+  CYC(0x69e5, 0x69e6); alu_or(gb, A);
+  if ((F & FZ)) { CALL_C_CC(0x69e6, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x69e9); } else CYC(0x69e6, 0x69e9);
+  CYC(0x69e9, 0x69ec); if (hook_enabled_at(0x2552)) { interactionRunScript_hook(gb); return; } HANDOFF(0x2552);
+L_69ec:
+  CALL_C(0x69ec, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x69ef);
+  CALL_C(0x69ef, objectApplySpeed_hook, 0x201d, 0x69f2);
+  CALL_C(0x69f2, interactionDecCounter1_hook, 0x23cc, 0x69f5);
+  if (!(F & FZ)) { CYCT(0x69f5, 0x69f6); ret_effect(gb); return; } CYC(0x69f5, 0x69f6);
+  CALL_C(0x69f6, interactionIncSubstate_hook, 0x23e5, 0x69f9);
+  CYC(0x69f9, 0x69fc); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c);
+L_69fc:
+  CYC(0x69fc, 0x69ff); A = mem_rd(gb, 0xc4ab);
+  CYC(0x69ff, 0x6a00); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x6a00, 0x6a01); ret_effect(gb); return; } CYC(0x6a00, 0x6a01);
+  CALL_C(0x6a01, interactionIncSubstate_hook, 0x23e5, 0x6a04);
+  CYC(0x6a04, 0x6a06); A = 0x06;
+  CYC(0x6a06, 0x6a09); mem_wr(gb, 0xcfc0, A);
+  CALL_C(0x6a09, disableLcd_hook, 0x02c1, 0x6a0c);
+  PUSH(0x6a0c, DE);
+  CYC(0x6a0d, 0x6a10); SET_BC(0x0138);
+  CYC(0x6a10, 0x6a12); A = 0x00;
+  CALL_C(0x6a12, forceLoadRoom_hook, 0x36f6, 0x6a15);
+  CYC(0x6a15, 0x6a17); A = 0x2d;
+  CALL_C(0x6a17, loadUncompressedGfxHeader_hook, 0x05da, 0x6a1a);
+  CYC(0x6a1a, 0x6a1c); A = 0x30;
+  CALL_C(0x6a1c, loadPaletteHeader_hook, 0x050b, 0x6a1f);
+  CYC(0x6a1f, 0x6a21); A = 0x84;
+  CALL_C(0x6a21, loadGfxHeader_hook, 0x0626, 0x6a24);
+  CYC(0x6a24, 0x6a26); A = 0xff;
+  CYC(0x6a26, 0x6a29); mem_wr(gb, 0xcd25, A);
+  CYC(0x6a29, 0x6a2b); A = 0x04;
+  CALL_C(0x6a2b, loadGfxRegisterStateIndex_hook, 0x02ea, 0x6a2e);
+  SET_DE(POP(0x6a2e));
+  CYC(0x6a2f, 0x6a32); SET_BC(0x427e);
+  CALL_C(0x6a32, interactionSetPosition_hook, 0x2773, 0x6a35);
+  CYC(0x6a35, 0x6a37); A = 0x02;
+  CYC(0x6a37, 0x6a3a); SET_HL(0x6ae4);
+  CYC(0x6a3a, 0x6a3b); push_effect(gb, 0x6a3b);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6a3b, 0x6a3c); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6a3c, 0x6a3d); H = mem_rd(gb, HL);
+  CYC(0x6a3d, 0x6a3e); L = A;
+  CALL_C(0x6a3e, interactionSetScript_hook, 0x2544, 0x6a41);
+  CYC(0x6a41, 0x6a44); if (hook_enabled_at(0x3299)) { fadeinFromWhite_hook(gb); return; } HANDOFF(0x3299);
+}
+
+void interactionCode57__subid1State1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_6975:
+  CYC(0x6975, 0x6977); E = 0x45;
+  CYC(0x6977, 0x6978); A = mem_rd(gb, DE);
+  CYC(0x6978, 0x6979); push_effect(gb, 0x6979); SET_HL(bank09_jump_table(gb));
+  switch (HL) { case 0x6983: goto L_6983; case 0x69d6: goto L_69d6; case 0x69e2: goto L_69e2; case 0x69ec: goto L_69ec; case 0x69fc: goto L_69fc; default: HANDOFF(HL); }
+L_6983:
+  CYC(0x6983, 0x6986); A = mem_rd(gb, 0xcfc0);
+  CYC(0x6986, 0x6988); alu_cp(gb, 0x01);
+  if (!(F & FZ)) { CYCT(0x6988, 0x698a); goto L_699b; } CYC(0x6988, 0x698a);
+  CALL_C(0x698a, interactionIncSubstate_hook, 0x23e5, 0x698d);
+  CYC(0x698d, 0x698f); L = 0x42;
+  CYC(0x698f, 0x6990); A = mem_rd(gb, HL);
+  CYC(0x6990, 0x6991); A = alu_dec8(gb, A);
+  CYC(0x6991, 0x6994); SET_HL(0x6ae4);
+  CYC(0x6994, 0x6995); push_effect(gb, 0x6995);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6995, 0x6996); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6996, 0x6997); H = mem_rd(gb, HL);
+  CYC(0x6997, 0x6998); L = A;
+  CYC(0x6998, 0x699b); if (hook_enabled_at(0x2544)) { interactionSetScript_hook(gb); return; } HANDOFF(0x2544);
+L_699b:
+  CALL_C(0x699b, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x699e);
+  CALL_C(0x699e, interactionRunScript_hook, 0x2552, 0x69a1);
+  CYC(0x69a1, 0x69a2); H = D;
+  CYC(0x69a2, 0x69a4); L = 0x61;
+  CYC(0x69a4, 0x69a5); A = mem_rd(gb, HL);
+  CYC(0x69a5, 0x69a6); alu_or(gb, A);
+  if ((F & FZ)) { CYCT(0x69a6, 0x69a8); goto L_69cb; } CYC(0x69a6, 0x69a8);
+  CYC(0x69a8, 0x69aa); mem_wr(gb, HL, 0x00);
+  CYC(0x69aa, 0x69ac); B = 0x04;
+L_69ac:
+  CALL_C(0x69ac, getFreeInteractionSlot_hook, 0x3aef, 0x69af);
+  if (!(F & FZ)) { CYCT(0x69af, 0x69b0); ret_effect(gb); return; } CYC(0x69af, 0x69b0);
+  CYC(0x69b0, 0x69b2); mem_wr(gb, HL, 0x99);
+  CYC(0x69b2, 0x69b3); L = alu_inc8(gb, L);
+  CYC(0x69b3, 0x69b5); mem_wr(gb, HL, 0x02);
+  CYC(0x69b5, 0x69b6); L = alu_inc8(gb, L);
+  CYC(0x69b6, 0x69b7); mem_wr(gb, HL, B);
+  CYC(0x69b7, 0x69b9); E = 0x5a;
+  CYC(0x69b9, 0x69ba); A = mem_rd(gb, DE);
+  CYC(0x69ba, 0x69bc); L = 0x78;
+  CYC(0x69bc, 0x69bd); mem_wr(gb, HL, A);
+  PUSH(0x69bd, BC);
+  CYC(0x69be, 0x69c0); E = 0x78;
+  CYC(0x69c0, 0x69c1); A = mem_rd(gb, DE);
+  CYC(0x69c1, 0x69c3); B = 0x00;
+  CYC(0x69c3, 0x69c4); C = A;
+  CALL_C(0x69c4, objectCopyPositionWithOffset_hook, 0x225a, 0x69c7);
+  SET_BC(POP(0x69c7));
+  CYC(0x69c8, 0x69c9); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x69c9, 0x69cb); goto L_69ac; } CYC(0x69c9, 0x69cb);
+L_69cb:
+  CYC(0x69cb, 0x69cd); L = 0x4b;
+  CYC(0x69cd, 0x69ce); A = mem_rd(gb, HL);
+  CYC(0x69ce, 0x69d0); alu_cp(gb, 0x50);
+  if (!(F & FC)) { CYCT(0x69d0, 0x69d3); if (hook_enabled_at(0x1e3c)) { objectSetVisiblec1_hook(gb); return; } HANDOFF(0x1e3c); } CYC(0x69d0, 0x69d3);
+  CYC(0x69d3, 0x69d6); if (hook_enabled_at(0x1e4e)) { objectSetVisiblec3_hook(gb); return; } HANDOFF(0x1e4e);
+L_69d6:
+  CALL_C(0x69d6, interactionCode57__updateAnimationAndRunScript_hook, 0x69e2, 0x69d9);
+  if (!(F & FC)) { CYCT(0x69d9, 0x69da); ret_effect(gb); return; } CYC(0x69d9, 0x69da);
+  CALL_C(0x69da, interactionIncSubstate_hook, 0x23e5, 0x69dd);
+  CYC(0x69dd, 0x69df); L = 0x46;
+  CYC(0x69df, 0x69e1); mem_wr(gb, HL, 0xd2);
+  CYC(0x69e1, 0x69e2); ret_effect(gb); return;
+L_69e2:
+  CYC(0x69e2, 0x69e4); E = 0x7f;
+  CYC(0x69e4, 0x69e5); A = mem_rd(gb, DE);
+  CYC(0x69e5, 0x69e6); alu_or(gb, A);
+  if ((F & FZ)) { CALL_C_CC(0x69e6, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x69e9); } else CYC(0x69e6, 0x69e9);
+  CYC(0x69e9, 0x69ec); if (hook_enabled_at(0x2552)) { interactionRunScript_hook(gb); return; } HANDOFF(0x2552);
+L_69ec:
+  CALL_C(0x69ec, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x69ef);
+  CALL_C(0x69ef, objectApplySpeed_hook, 0x201d, 0x69f2);
+  CALL_C(0x69f2, interactionDecCounter1_hook, 0x23cc, 0x69f5);
+  if (!(F & FZ)) { CYCT(0x69f5, 0x69f6); ret_effect(gb); return; } CYC(0x69f5, 0x69f6);
+  CALL_C(0x69f6, interactionIncSubstate_hook, 0x23e5, 0x69f9);
+  CYC(0x69f9, 0x69fc); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c);
+L_69fc:
+  CYC(0x69fc, 0x69ff); A = mem_rd(gb, 0xc4ab);
+  CYC(0x69ff, 0x6a00); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x6a00, 0x6a01); ret_effect(gb); return; } CYC(0x6a00, 0x6a01);
+  CALL_C(0x6a01, interactionIncSubstate_hook, 0x23e5, 0x6a04);
+  CYC(0x6a04, 0x6a06); A = 0x06;
+  CYC(0x6a06, 0x6a09); mem_wr(gb, 0xcfc0, A);
+  CALL_C(0x6a09, disableLcd_hook, 0x02c1, 0x6a0c);
+  PUSH(0x6a0c, DE);
+  CYC(0x6a0d, 0x6a10); SET_BC(0x0138);
+  CYC(0x6a10, 0x6a12); A = 0x00;
+  CALL_C(0x6a12, forceLoadRoom_hook, 0x36f6, 0x6a15);
+  CYC(0x6a15, 0x6a17); A = 0x2d;
+  CALL_C(0x6a17, loadUncompressedGfxHeader_hook, 0x05da, 0x6a1a);
+  CYC(0x6a1a, 0x6a1c); A = 0x30;
+  CALL_C(0x6a1c, loadPaletteHeader_hook, 0x050b, 0x6a1f);
+  CYC(0x6a1f, 0x6a21); A = 0x84;
+  CALL_C(0x6a21, loadGfxHeader_hook, 0x0626, 0x6a24);
+  CYC(0x6a24, 0x6a26); A = 0xff;
+  CYC(0x6a26, 0x6a29); mem_wr(gb, 0xcd25, A);
+  CYC(0x6a29, 0x6a2b); A = 0x04;
+  CALL_C(0x6a2b, loadGfxRegisterStateIndex_hook, 0x02ea, 0x6a2e);
+  SET_DE(POP(0x6a2e));
+  CYC(0x6a2f, 0x6a32); SET_BC(0x427e);
+  CALL_C(0x6a32, interactionSetPosition_hook, 0x2773, 0x6a35);
+  CYC(0x6a35, 0x6a37); A = 0x02;
+  CYC(0x6a37, 0x6a3a); SET_HL(0x6ae4);
+  CYC(0x6a3a, 0x6a3b); push_effect(gb, 0x6a3b);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6a3b, 0x6a3c); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6a3c, 0x6a3d); H = mem_rd(gb, HL);
+  CYC(0x6a3d, 0x6a3e); L = A;
+  CALL_C(0x6a3e, interactionSetScript_hook, 0x2544, 0x6a41);
+  CYC(0x6a41, 0x6a44); if (hook_enabled_at(0x3299)) { fadeinFromWhite_hook(gb); return; } HANDOFF(0x3299);
+}
+
+void interactionCode57__subid1And2Substate0_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_6983:
+  CYC(0x6983, 0x6986); A = mem_rd(gb, 0xcfc0);
+  CYC(0x6986, 0x6988); alu_cp(gb, 0x01);
+  if (!(F & FZ)) { CYCT(0x6988, 0x698a); goto L_699b; } CYC(0x6988, 0x698a);
+  CALL_C(0x698a, interactionIncSubstate_hook, 0x23e5, 0x698d);
+  CYC(0x698d, 0x698f); L = 0x42;
+  CYC(0x698f, 0x6990); A = mem_rd(gb, HL);
+  CYC(0x6990, 0x6991); A = alu_dec8(gb, A);
+  CYC(0x6991, 0x6994); SET_HL(0x6ae4);
+  CYC(0x6994, 0x6995); push_effect(gb, 0x6995);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6995, 0x6996); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6996, 0x6997); H = mem_rd(gb, HL);
+  CYC(0x6997, 0x6998); L = A;
+  CYC(0x6998, 0x699b); if (hook_enabled_at(0x2544)) { interactionSetScript_hook(gb); return; } HANDOFF(0x2544);
+L_699b:
+  CALL_C(0x699b, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x699e);
+  CALL_C(0x699e, interactionRunScript_hook, 0x2552, 0x69a1);
+  CYC(0x69a1, 0x69a2); H = D;
+  CYC(0x69a2, 0x69a4); L = 0x61;
+  CYC(0x69a4, 0x69a5); A = mem_rd(gb, HL);
+  CYC(0x69a5, 0x69a6); alu_or(gb, A);
+  if ((F & FZ)) { CYCT(0x69a6, 0x69a8); goto L_69cb; } CYC(0x69a6, 0x69a8);
+  CYC(0x69a8, 0x69aa); mem_wr(gb, HL, 0x00);
+  CYC(0x69aa, 0x69ac); B = 0x04;
+L_69ac:
+  CALL_C(0x69ac, getFreeInteractionSlot_hook, 0x3aef, 0x69af);
+  if (!(F & FZ)) { CYCT(0x69af, 0x69b0); ret_effect(gb); return; } CYC(0x69af, 0x69b0);
+  CYC(0x69b0, 0x69b2); mem_wr(gb, HL, 0x99);
+  CYC(0x69b2, 0x69b3); L = alu_inc8(gb, L);
+  CYC(0x69b3, 0x69b5); mem_wr(gb, HL, 0x02);
+  CYC(0x69b5, 0x69b6); L = alu_inc8(gb, L);
+  CYC(0x69b6, 0x69b7); mem_wr(gb, HL, B);
+  CYC(0x69b7, 0x69b9); E = 0x5a;
+  CYC(0x69b9, 0x69ba); A = mem_rd(gb, DE);
+  CYC(0x69ba, 0x69bc); L = 0x78;
+  CYC(0x69bc, 0x69bd); mem_wr(gb, HL, A);
+  PUSH(0x69bd, BC);
+  CYC(0x69be, 0x69c0); E = 0x78;
+  CYC(0x69c0, 0x69c1); A = mem_rd(gb, DE);
+  CYC(0x69c1, 0x69c3); B = 0x00;
+  CYC(0x69c3, 0x69c4); C = A;
+  CALL_C(0x69c4, objectCopyPositionWithOffset_hook, 0x225a, 0x69c7);
+  SET_BC(POP(0x69c7));
+  CYC(0x69c8, 0x69c9); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x69c9, 0x69cb); goto L_69ac; } CYC(0x69c9, 0x69cb);
+L_69cb:
+  CYC(0x69cb, 0x69cd); L = 0x4b;
+  CYC(0x69cd, 0x69ce); A = mem_rd(gb, HL);
+  CYC(0x69ce, 0x69d0); alu_cp(gb, 0x50);
+  if (!(F & FC)) { CYCT(0x69d0, 0x69d3); if (hook_enabled_at(0x1e3c)) { objectSetVisiblec1_hook(gb); return; } HANDOFF(0x1e3c); } CYC(0x69d0, 0x69d3);
+  CYC(0x69d3, 0x69d6); if (hook_enabled_at(0x1e4e)) { objectSetVisiblec3_hook(gb); return; } HANDOFF(0x1e4e);
+}
+
+void interactionCode57__label_09_221_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_699b:
+  CALL_C(0x699b, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x699e);
+  CALL_C(0x699e, interactionRunScript_hook, 0x2552, 0x69a1);
+  CYC(0x69a1, 0x69a2); H = D;
+  CYC(0x69a2, 0x69a4); L = 0x61;
+  CYC(0x69a4, 0x69a5); A = mem_rd(gb, HL);
+  CYC(0x69a5, 0x69a6); alu_or(gb, A);
+  if ((F & FZ)) { CYCT(0x69a6, 0x69a8); goto L_69cb; } CYC(0x69a6, 0x69a8);
+  CYC(0x69a8, 0x69aa); mem_wr(gb, HL, 0x00);
+  CYC(0x69aa, 0x69ac); B = 0x04;
+L_69ac:
+  CALL_C(0x69ac, getFreeInteractionSlot_hook, 0x3aef, 0x69af);
+  if (!(F & FZ)) { CYCT(0x69af, 0x69b0); ret_effect(gb); return; } CYC(0x69af, 0x69b0);
+  CYC(0x69b0, 0x69b2); mem_wr(gb, HL, 0x99);
+  CYC(0x69b2, 0x69b3); L = alu_inc8(gb, L);
+  CYC(0x69b3, 0x69b5); mem_wr(gb, HL, 0x02);
+  CYC(0x69b5, 0x69b6); L = alu_inc8(gb, L);
+  CYC(0x69b6, 0x69b7); mem_wr(gb, HL, B);
+  CYC(0x69b7, 0x69b9); E = 0x5a;
+  CYC(0x69b9, 0x69ba); A = mem_rd(gb, DE);
+  CYC(0x69ba, 0x69bc); L = 0x78;
+  CYC(0x69bc, 0x69bd); mem_wr(gb, HL, A);
+  PUSH(0x69bd, BC);
+  CYC(0x69be, 0x69c0); E = 0x78;
+  CYC(0x69c0, 0x69c1); A = mem_rd(gb, DE);
+  CYC(0x69c1, 0x69c3); B = 0x00;
+  CYC(0x69c3, 0x69c4); C = A;
+  CALL_C(0x69c4, objectCopyPositionWithOffset_hook, 0x225a, 0x69c7);
+  SET_BC(POP(0x69c7));
+  CYC(0x69c8, 0x69c9); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x69c9, 0x69cb); goto L_69ac; } CYC(0x69c9, 0x69cb);
+L_69cb:
+  CYC(0x69cb, 0x69cd); L = 0x4b;
+  CYC(0x69cd, 0x69ce); A = mem_rd(gb, HL);
+  CYC(0x69ce, 0x69d0); alu_cp(gb, 0x50);
+  if (!(F & FC)) { CYCT(0x69d0, 0x69d3); if (hook_enabled_at(0x1e3c)) { objectSetVisiblec1_hook(gb); return; } HANDOFF(0x1e3c); } CYC(0x69d0, 0x69d3);
+  CYC(0x69d3, 0x69d6); if (hook_enabled_at(0x1e4e)) { objectSetVisiblec3_hook(gb); return; } HANDOFF(0x1e4e);
+}
+
+void interactionCode57__nextObject_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_69ac:
+  CALL_C(0x69ac, getFreeInteractionSlot_hook, 0x3aef, 0x69af);
+  if (!(F & FZ)) { CYCT(0x69af, 0x69b0); ret_effect(gb); return; } CYC(0x69af, 0x69b0);
+  CYC(0x69b0, 0x69b2); mem_wr(gb, HL, 0x99);
+  CYC(0x69b2, 0x69b3); L = alu_inc8(gb, L);
+  CYC(0x69b3, 0x69b5); mem_wr(gb, HL, 0x02);
+  CYC(0x69b5, 0x69b6); L = alu_inc8(gb, L);
+  CYC(0x69b6, 0x69b7); mem_wr(gb, HL, B);
+  CYC(0x69b7, 0x69b9); E = 0x5a;
+  CYC(0x69b9, 0x69ba); A = mem_rd(gb, DE);
+  CYC(0x69ba, 0x69bc); L = 0x78;
+  CYC(0x69bc, 0x69bd); mem_wr(gb, HL, A);
+  PUSH(0x69bd, BC);
+  CYC(0x69be, 0x69c0); E = 0x78;
+  CYC(0x69c0, 0x69c1); A = mem_rd(gb, DE);
+  CYC(0x69c1, 0x69c3); B = 0x00;
+  CYC(0x69c3, 0x69c4); C = A;
+  CALL_C(0x69c4, objectCopyPositionWithOffset_hook, 0x225a, 0x69c7);
+  SET_BC(POP(0x69c7));
+  CYC(0x69c8, 0x69c9); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x69c9, 0x69cb); goto L_69ac; } CYC(0x69c9, 0x69cb);
+L_69cb:
+  CYC(0x69cb, 0x69cd); L = 0x4b;
+  CYC(0x69cd, 0x69ce); A = mem_rd(gb, HL);
+  CYC(0x69ce, 0x69d0); alu_cp(gb, 0x50);
+  if (!(F & FC)) { CYCT(0x69d0, 0x69d3); if (hook_enabled_at(0x1e3c)) { objectSetVisiblec1_hook(gb); return; } HANDOFF(0x1e3c); } CYC(0x69d0, 0x69d3);
+  CYC(0x69d3, 0x69d6); if (hook_enabled_at(0x1e4e)) { objectSetVisiblec3_hook(gb); return; } HANDOFF(0x1e4e);
+}
+
+void interactionCode57__doneSpawningObjects_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_69cb:
+  CYC(0x69cb, 0x69cd); L = 0x4b;
+  CYC(0x69cd, 0x69ce); A = mem_rd(gb, HL);
+  CYC(0x69ce, 0x69d0); alu_cp(gb, 0x50);
+  if (!(F & FC)) { CYCT(0x69d0, 0x69d3); if (hook_enabled_at(0x1e3c)) { objectSetVisiblec1_hook(gb); return; } HANDOFF(0x1e3c); } CYC(0x69d0, 0x69d3);
+  CYC(0x69d3, 0x69d6); if (hook_enabled_at(0x1e4e)) { objectSetVisiblec3_hook(gb); return; } HANDOFF(0x1e4e);
+}
+
+void interactionCode57__subid1Substate1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_69d6:
+  CALL_C(0x69d6, interactionCode57__updateAnimationAndRunScript_hook, 0x69e2, 0x69d9);
+  if (!(F & FC)) { CYCT(0x69d9, 0x69da); ret_effect(gb); return; } CYC(0x69d9, 0x69da);
+  CALL_C(0x69da, interactionIncSubstate_hook, 0x23e5, 0x69dd);
+  CYC(0x69dd, 0x69df); L = 0x46;
+  CYC(0x69df, 0x69e1); mem_wr(gb, HL, 0xd2);
+  CYC(0x69e1, 0x69e2); ret_effect(gb); return;
+}
+
+void interactionCode57__updateAnimationAndRunScript_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_69e2:
+  CYC(0x69e2, 0x69e4); E = 0x7f;
+  CYC(0x69e4, 0x69e5); A = mem_rd(gb, DE);
+  CYC(0x69e5, 0x69e6); alu_or(gb, A);
+  if ((F & FZ)) { CALL_C_CC(0x69e6, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x69e9); } else CYC(0x69e6, 0x69e9);
+  CYC(0x69e9, 0x69ec); if (hook_enabled_at(0x2552)) { interactionRunScript_hook(gb); return; } HANDOFF(0x2552);
+}
+
+void interactionCode57__subid1Substate2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_69ec:
+  CALL_C(0x69ec, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x69ef);
+  CALL_C(0x69ef, objectApplySpeed_hook, 0x201d, 0x69f2);
+  CALL_C(0x69f2, interactionDecCounter1_hook, 0x23cc, 0x69f5);
+  if (!(F & FZ)) { CYCT(0x69f5, 0x69f6); ret_effect(gb); return; } CYC(0x69f5, 0x69f6);
+  CALL_C(0x69f6, interactionIncSubstate_hook, 0x23e5, 0x69f9);
+  CYC(0x69f9, 0x69fc); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c);
+}
+
+void interactionCode57__subid1Substate3_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_69fc:
+  CYC(0x69fc, 0x69ff); A = mem_rd(gb, 0xc4ab);
+  CYC(0x69ff, 0x6a00); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x6a00, 0x6a01); ret_effect(gb); return; } CYC(0x6a00, 0x6a01);
+  CALL_C(0x6a01, interactionIncSubstate_hook, 0x23e5, 0x6a04);
+  CYC(0x6a04, 0x6a06); A = 0x06;
+  CYC(0x6a06, 0x6a09); mem_wr(gb, 0xcfc0, A);
+  CALL_C(0x6a09, disableLcd_hook, 0x02c1, 0x6a0c);
+  PUSH(0x6a0c, DE);
+  CYC(0x6a0d, 0x6a10); SET_BC(0x0138);
+  CYC(0x6a10, 0x6a12); A = 0x00;
+  CALL_C(0x6a12, forceLoadRoom_hook, 0x36f6, 0x6a15);
+  CYC(0x6a15, 0x6a17); A = 0x2d;
+  CALL_C(0x6a17, loadUncompressedGfxHeader_hook, 0x05da, 0x6a1a);
+  CYC(0x6a1a, 0x6a1c); A = 0x30;
+  CALL_C(0x6a1c, loadPaletteHeader_hook, 0x050b, 0x6a1f);
+  CYC(0x6a1f, 0x6a21); A = 0x84;
+  CALL_C(0x6a21, loadGfxHeader_hook, 0x0626, 0x6a24);
+  CYC(0x6a24, 0x6a26); A = 0xff;
+  CYC(0x6a26, 0x6a29); mem_wr(gb, 0xcd25, A);
+  CYC(0x6a29, 0x6a2b); A = 0x04;
+  CALL_C(0x6a2b, loadGfxRegisterStateIndex_hook, 0x02ea, 0x6a2e);
+  SET_DE(POP(0x6a2e));
+  CYC(0x6a2f, 0x6a32); SET_BC(0x427e);
+  CALL_C(0x6a32, interactionSetPosition_hook, 0x2773, 0x6a35);
+  CYC(0x6a35, 0x6a37); A = 0x02;
+  CYC(0x6a37, 0x6a3a); SET_HL(0x6ae4);
+  CYC(0x6a3a, 0x6a3b); push_effect(gb, 0x6a3b);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6a3b, 0x6a3c); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6a3c, 0x6a3d); H = mem_rd(gb, HL);
+  CYC(0x6a3d, 0x6a3e); L = A;
+  CALL_C(0x6a3e, interactionSetScript_hook, 0x2544, 0x6a41);
+  CYC(0x6a41, 0x6a44); if (hook_enabled_at(0x3299)) { fadeinFromWhite_hook(gb); return; } HANDOFF(0x3299);
+}
+
+void interactionCode57__subid02_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_6a44;
+L_6965:
+  CYC(0x6965, 0x6967); E = 0x42;
+  CYC(0x6967, 0x6968); A = mem_rd(gb, DE);
+  CYC(0x6968, 0x6969); A = alu_dec8(gb, A);
+  CYC(0x6969, 0x696b); A = 0x0c;
+  if ((F & FZ)) { CYCT(0x696b, 0x696d); goto L_696f; } CYC(0x696b, 0x696d);
+  CYC(0x696d, 0x696f); A = 0xf4;
+L_696f:
+  CYC(0x696f, 0x6971); E = 0x78;
+  CYC(0x6971, 0x6972); mem_wr(gb, DE, A);
+  CALL_C(0x6972, interactionCode57__loadScriptAndInitGraphics_hook, 0x6a89, 0x6975);
+L_6975:
+  CYC(0x6975, 0x6977); E = 0x45;
+  CYC(0x6977, 0x6978); A = mem_rd(gb, DE);
+  CYC(0x6978, 0x6979); push_effect(gb, 0x6979); SET_HL(bank09_jump_table(gb));
+  switch (HL) { case 0x6983: goto L_6983; case 0x69d6: goto L_69d6; case 0x69e2: goto L_69e2; case 0x69ec: goto L_69ec; case 0x69fc: goto L_69fc; default: HANDOFF(HL); }
+L_6983:
+  CYC(0x6983, 0x6986); A = mem_rd(gb, 0xcfc0);
+  CYC(0x6986, 0x6988); alu_cp(gb, 0x01);
+  if (!(F & FZ)) { CYCT(0x6988, 0x698a); goto L_699b; } CYC(0x6988, 0x698a);
+  CALL_C(0x698a, interactionIncSubstate_hook, 0x23e5, 0x698d);
+  CYC(0x698d, 0x698f); L = 0x42;
+  CYC(0x698f, 0x6990); A = mem_rd(gb, HL);
+  CYC(0x6990, 0x6991); A = alu_dec8(gb, A);
+  CYC(0x6991, 0x6994); SET_HL(0x6ae4);
+  CYC(0x6994, 0x6995); push_effect(gb, 0x6995);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6995, 0x6996); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6996, 0x6997); H = mem_rd(gb, HL);
+  CYC(0x6997, 0x6998); L = A;
+  CYC(0x6998, 0x699b); if (hook_enabled_at(0x2544)) { interactionSetScript_hook(gb); return; } HANDOFF(0x2544);
+L_699b:
+  CALL_C(0x699b, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x699e);
+  CALL_C(0x699e, interactionRunScript_hook, 0x2552, 0x69a1);
+  CYC(0x69a1, 0x69a2); H = D;
+  CYC(0x69a2, 0x69a4); L = 0x61;
+  CYC(0x69a4, 0x69a5); A = mem_rd(gb, HL);
+  CYC(0x69a5, 0x69a6); alu_or(gb, A);
+  if ((F & FZ)) { CYCT(0x69a6, 0x69a8); goto L_69cb; } CYC(0x69a6, 0x69a8);
+  CYC(0x69a8, 0x69aa); mem_wr(gb, HL, 0x00);
+  CYC(0x69aa, 0x69ac); B = 0x04;
+L_69ac:
+  CALL_C(0x69ac, getFreeInteractionSlot_hook, 0x3aef, 0x69af);
+  if (!(F & FZ)) { CYCT(0x69af, 0x69b0); ret_effect(gb); return; } CYC(0x69af, 0x69b0);
+  CYC(0x69b0, 0x69b2); mem_wr(gb, HL, 0x99);
+  CYC(0x69b2, 0x69b3); L = alu_inc8(gb, L);
+  CYC(0x69b3, 0x69b5); mem_wr(gb, HL, 0x02);
+  CYC(0x69b5, 0x69b6); L = alu_inc8(gb, L);
+  CYC(0x69b6, 0x69b7); mem_wr(gb, HL, B);
+  CYC(0x69b7, 0x69b9); E = 0x5a;
+  CYC(0x69b9, 0x69ba); A = mem_rd(gb, DE);
+  CYC(0x69ba, 0x69bc); L = 0x78;
+  CYC(0x69bc, 0x69bd); mem_wr(gb, HL, A);
+  PUSH(0x69bd, BC);
+  CYC(0x69be, 0x69c0); E = 0x78;
+  CYC(0x69c0, 0x69c1); A = mem_rd(gb, DE);
+  CYC(0x69c1, 0x69c3); B = 0x00;
+  CYC(0x69c3, 0x69c4); C = A;
+  CALL_C(0x69c4, objectCopyPositionWithOffset_hook, 0x225a, 0x69c7);
+  SET_BC(POP(0x69c7));
+  CYC(0x69c8, 0x69c9); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x69c9, 0x69cb); goto L_69ac; } CYC(0x69c9, 0x69cb);
+L_69cb:
+  CYC(0x69cb, 0x69cd); L = 0x4b;
+  CYC(0x69cd, 0x69ce); A = mem_rd(gb, HL);
+  CYC(0x69ce, 0x69d0); alu_cp(gb, 0x50);
+  if (!(F & FC)) { CYCT(0x69d0, 0x69d3); if (hook_enabled_at(0x1e3c)) { objectSetVisiblec1_hook(gb); return; } HANDOFF(0x1e3c); } CYC(0x69d0, 0x69d3);
+  CYC(0x69d3, 0x69d6); if (hook_enabled_at(0x1e4e)) { objectSetVisiblec3_hook(gb); return; } HANDOFF(0x1e4e);
+L_69d6:
+  CALL_C(0x69d6, interactionCode57__updateAnimationAndRunScript_hook, 0x69e2, 0x69d9);
+  if (!(F & FC)) { CYCT(0x69d9, 0x69da); ret_effect(gb); return; } CYC(0x69d9, 0x69da);
+  CALL_C(0x69da, interactionIncSubstate_hook, 0x23e5, 0x69dd);
+  CYC(0x69dd, 0x69df); L = 0x46;
+  CYC(0x69df, 0x69e1); mem_wr(gb, HL, 0xd2);
+  CYC(0x69e1, 0x69e2); ret_effect(gb); return;
+L_69e2:
+  CYC(0x69e2, 0x69e4); E = 0x7f;
+  CYC(0x69e4, 0x69e5); A = mem_rd(gb, DE);
+  CYC(0x69e5, 0x69e6); alu_or(gb, A);
+  if ((F & FZ)) { CALL_C_CC(0x69e6, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x69e9); } else CYC(0x69e6, 0x69e9);
+  CYC(0x69e9, 0x69ec); if (hook_enabled_at(0x2552)) { interactionRunScript_hook(gb); return; } HANDOFF(0x2552);
+L_69ec:
+  CALL_C(0x69ec, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x69ef);
+  CALL_C(0x69ef, objectApplySpeed_hook, 0x201d, 0x69f2);
+  CALL_C(0x69f2, interactionDecCounter1_hook, 0x23cc, 0x69f5);
+  if (!(F & FZ)) { CYCT(0x69f5, 0x69f6); ret_effect(gb); return; } CYC(0x69f5, 0x69f6);
+  CALL_C(0x69f6, interactionIncSubstate_hook, 0x23e5, 0x69f9);
+  CYC(0x69f9, 0x69fc); if (hook_enabled_at(0x326c)) { fadeoutToWhite_hook(gb); return; } HANDOFF(0x326c);
+L_69fc:
+  CYC(0x69fc, 0x69ff); A = mem_rd(gb, 0xc4ab);
+  CYC(0x69ff, 0x6a00); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x6a00, 0x6a01); ret_effect(gb); return; } CYC(0x6a00, 0x6a01);
+  CALL_C(0x6a01, interactionIncSubstate_hook, 0x23e5, 0x6a04);
+  CYC(0x6a04, 0x6a06); A = 0x06;
+  CYC(0x6a06, 0x6a09); mem_wr(gb, 0xcfc0, A);
+  CALL_C(0x6a09, disableLcd_hook, 0x02c1, 0x6a0c);
+  PUSH(0x6a0c, DE);
+  CYC(0x6a0d, 0x6a10); SET_BC(0x0138);
+  CYC(0x6a10, 0x6a12); A = 0x00;
+  CALL_C(0x6a12, forceLoadRoom_hook, 0x36f6, 0x6a15);
+  CYC(0x6a15, 0x6a17); A = 0x2d;
+  CALL_C(0x6a17, loadUncompressedGfxHeader_hook, 0x05da, 0x6a1a);
+  CYC(0x6a1a, 0x6a1c); A = 0x30;
+  CALL_C(0x6a1c, loadPaletteHeader_hook, 0x050b, 0x6a1f);
+  CYC(0x6a1f, 0x6a21); A = 0x84;
+  CALL_C(0x6a21, loadGfxHeader_hook, 0x0626, 0x6a24);
+  CYC(0x6a24, 0x6a26); A = 0xff;
+  CYC(0x6a26, 0x6a29); mem_wr(gb, 0xcd25, A);
+  CYC(0x6a29, 0x6a2b); A = 0x04;
+  CALL_C(0x6a2b, loadGfxRegisterStateIndex_hook, 0x02ea, 0x6a2e);
+  SET_DE(POP(0x6a2e));
+  CYC(0x6a2f, 0x6a32); SET_BC(0x427e);
+  CALL_C(0x6a32, interactionSetPosition_hook, 0x2773, 0x6a35);
+  CYC(0x6a35, 0x6a37); A = 0x02;
+  CYC(0x6a37, 0x6a3a); SET_HL(0x6ae4);
+  CYC(0x6a3a, 0x6a3b); push_effect(gb, 0x6a3b);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6a3b, 0x6a3c); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6a3c, 0x6a3d); H = mem_rd(gb, HL);
+  CYC(0x6a3d, 0x6a3e); L = A;
+  CALL_C(0x6a3e, interactionSetScript_hook, 0x2544, 0x6a41);
+  CYC(0x6a41, 0x6a44); if (hook_enabled_at(0x3299)) { fadeinFromWhite_hook(gb); return; } HANDOFF(0x3299);
+L_6a44:
+  CALL_C(0x6a44, checkInteractionState_hook, 0x23fe, 0x6a47);
+  if (!(F & FZ)) { CYCT(0x6a47, 0x6a49); goto L_6a4c; } CYC(0x6a47, 0x6a49);
+  CYC(0x6a49, 0x6a4c); goto L_6965;
+L_6a4c:
+  CYC(0x6a4c, 0x6a4e); E = 0x45;
+  CYC(0x6a4e, 0x6a4f); A = mem_rd(gb, DE);
+  CYC(0x6a4f, 0x6a50); push_effect(gb, 0x6a50); SET_HL(bank09_jump_table(gb));
+  switch (HL) { case 0x6983: goto L_6983; case 0x69e2: goto L_69e2; case 0x6a58: goto L_6a58; case 0x6a5f: goto L_6a5f; default: HANDOFF(HL); }
+L_6a58:
+  CALL_C(0x6a58, interactionCode57__updateAnimationAndRunScript_hook, 0x69e2, 0x6a5b);
+  if (!(F & FC)) { CYCT(0x6a5b, 0x6a5c); ret_effect(gb); return; } CYC(0x6a5b, 0x6a5c);
+  CALL_C(0x6a5c, interactionIncSubstate_hook, 0x23e5, 0x6a5f);
+L_6a5f:
+  CALL_C(0x6a5f, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x6a62);
+  CALL_C(0x6a62, objectApplySpeed_hook, 0x201d, 0x6a65);
+  CYC(0x6a65, 0x6a68); A = mem_rd(gb, 0xcfc0);
+  CYC(0x6a68, 0x6a6a); alu_cp(gb, 0x06);
+  if (!(F & FZ)) { CYCT(0x6a6a, 0x6a6b); ret_effect(gb); return; } CYC(0x6a6a, 0x6a6b);
+  CALL_C(0x6a6b, interactionIncSubstate_hook, 0x23e5, 0x6a6e);
+  CYC(0x6a6e, 0x6a71); SET_BC(0x388a);
+  CALL_C(0x6a71, interactionSetPosition_hook, 0x2773, 0x6a74);
+  CYC(0x6a74, 0x6a76); A = 0x03;
+  CYC(0x6a76, 0x6a79); SET_HL(0x6ae4);
+  CYC(0x6a79, 0x6a7a); push_effect(gb, 0x6a7a);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6a7a, 0x6a7b); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6a7b, 0x6a7c); H = mem_rd(gb, HL);
+  CYC(0x6a7c, 0x6a7d); L = A;
+  CYC(0x6a7d, 0x6a80); if (hook_enabled_at(0x2544)) { interactionSetScript_hook(gb); return; } HANDOFF(0x2544);
+}
+
+void interactionCode57__subid2Substate1_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_6a58:
+  CALL_C(0x6a58, interactionCode57__updateAnimationAndRunScript_hook, 0x69e2, 0x6a5b);
+  if (!(F & FC)) { CYCT(0x6a5b, 0x6a5c); ret_effect(gb); return; } CYC(0x6a5b, 0x6a5c);
+  CALL_C(0x6a5c, interactionIncSubstate_hook, 0x23e5, 0x6a5f);
+L_6a5f:
+  CALL_C(0x6a5f, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x6a62);
+  CALL_C(0x6a62, objectApplySpeed_hook, 0x201d, 0x6a65);
+  CYC(0x6a65, 0x6a68); A = mem_rd(gb, 0xcfc0);
+  CYC(0x6a68, 0x6a6a); alu_cp(gb, 0x06);
+  if (!(F & FZ)) { CYCT(0x6a6a, 0x6a6b); ret_effect(gb); return; } CYC(0x6a6a, 0x6a6b);
+  CALL_C(0x6a6b, interactionIncSubstate_hook, 0x23e5, 0x6a6e);
+  CYC(0x6a6e, 0x6a71); SET_BC(0x388a);
+  CALL_C(0x6a71, interactionSetPosition_hook, 0x2773, 0x6a74);
+  CYC(0x6a74, 0x6a76); A = 0x03;
+  CYC(0x6a76, 0x6a79); SET_HL(0x6ae4);
+  CYC(0x6a79, 0x6a7a); push_effect(gb, 0x6a7a);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6a7a, 0x6a7b); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6a7b, 0x6a7c); H = mem_rd(gb, HL);
+  CYC(0x6a7c, 0x6a7d); L = A;
+  CYC(0x6a7d, 0x6a80); if (hook_enabled_at(0x2544)) { interactionSetScript_hook(gb); return; } HANDOFF(0x2544);
+}
+
+void interactionCode57__subid2Substate2_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_6a5f:
+  CALL_C(0x6a5f, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x6a62);
+  CALL_C(0x6a62, objectApplySpeed_hook, 0x201d, 0x6a65);
+  CYC(0x6a65, 0x6a68); A = mem_rd(gb, 0xcfc0);
+  CYC(0x6a68, 0x6a6a); alu_cp(gb, 0x06);
+  if (!(F & FZ)) { CYCT(0x6a6a, 0x6a6b); ret_effect(gb); return; } CYC(0x6a6a, 0x6a6b);
+  CALL_C(0x6a6b, interactionIncSubstate_hook, 0x23e5, 0x6a6e);
+  CYC(0x6a6e, 0x6a71); SET_BC(0x388a);
+  CALL_C(0x6a71, interactionSetPosition_hook, 0x2773, 0x6a74);
+  CYC(0x6a74, 0x6a76); A = 0x03;
+  CYC(0x6a76, 0x6a79); SET_HL(0x6ae4);
+  CYC(0x6a79, 0x6a7a); push_effect(gb, 0x6a7a);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6a7a, 0x6a7b); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6a7b, 0x6a7c); H = mem_rd(gb, HL);
+  CYC(0x6a7c, 0x6a7d); L = A;
+  CYC(0x6a7d, 0x6a80); if (hook_enabled_at(0x2544)) { interactionSetScript_hook(gb); return; } HANDOFF(0x2544);
+}
+
+void interactionCode57__unusedFunc_6a80_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_6a80:
+  CALL_C(0x6a80, interactionInitGraphics_hook, 0x15fb, 0x6a83);
+  CALL_C(0x6a83, objectMarkSolidPosition_hook, 0x24f0, 0x6a86);
+  CYC(0x6a86, 0x6a89); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);
+}
+
+void interactionCode57__loadScriptAndInitGraphics_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_6a89:
+  CALL_C(0x6a89, interactionInitGraphics_hook, 0x15fb, 0x6a8c);
+  CALL_C(0x6a8c, objectMarkSolidPosition_hook, 0x24f0, 0x6a8f);
+  CYC(0x6a8f, 0x6a91); A = 0x1b;
+  CALL_C(0x6a91, interactionSetHighTextIndex_hook, 0x253b, 0x6a94);
+  CYC(0x6a94, 0x6a96); E = 0x42;
+  CYC(0x6a96, 0x6a97); A = mem_rd(gb, DE);
+  CYC(0x6a97, 0x6a9a); SET_HL(0x6adc);
+  CYC(0x6a9a, 0x6a9b); push_effect(gb, 0x6a9b);
+  PUSH(0x0018, BC); CYC(0x0019, 0x001a); C = A; CYC(0x001a, 0x001c); B = 0x00; CYC(0x001c, 0x001d); alu_add_hl(gb, BC); CYC(0x001d, 0x001e); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); CYC(0x001f, 0x0020); pop_effect(gb);
+  CYC(0x6a9b, 0x6a9c); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6a9c, 0x6a9d); H = mem_rd(gb, HL);
+  CYC(0x6a9d, 0x6a9e); L = A;
+  CALL_C(0x6a9e, interactionSetScript_hook, 0x2544, 0x6aa1);
+  CYC(0x6aa1, 0x6aa4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);
+}
+
+void interactionCode57__createDirtChips_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_6aa4:
+  CYC(0x6aa4, 0x6aa5); C = A;
+  CYC(0x6aa5, 0x6aa7); B = 0x02;
+L_6aa7:
+  CALL_C(0x6aa7, getFreeInteractionSlot_hook, 0x3aef, 0x6aaa);
+  if (!(F & FZ)) { CYCT(0x6aaa, 0x6aab); ret_effect(gb); return; } CYC(0x6aaa, 0x6aab);
+  CYC(0x6aab, 0x6aad); mem_wr(gb, HL, 0x92);
+  CYC(0x6aad, 0x6aae); L = alu_inc8(gb, L);
+  CYC(0x6aae, 0x6ab0); mem_wr(gb, HL, 0x06);
+  CYC(0x6ab0, 0x6ab1); L = alu_inc8(gb, L);
+  CYC(0x6ab1, 0x6ab2); mem_wr(gb, HL, C);
+  CYC(0x6ab2, 0x6ab4); E = 0x5a;
+  CYC(0x6ab4, 0x6ab5); A = mem_rd(gb, DE);
+  CYC(0x6ab5, 0x6ab7); alu_and(gb, 0x03);
+  CYC(0x6ab7, 0x6ab9); L = 0x47;
+  CYC(0x6ab9, 0x6aba); mem_wr(gb, HL, A);
+  CYC(0x6aba, 0x6abc); L = 0x49;
+  CYC(0x6abc, 0x6abd); mem_wr(gb, HL, B);
+  CYC(0x6abd, 0x6abe); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  PUSH(0x6abe, BC);
+  CALL_C(0x6abf, objectCopyPosition_hook, 0x2242, 0x6ac2);
+  SET_BC(POP(0x6ac2));
+  CYC(0x6ac3, 0x6ac5); L = 0x4b;
+  CYC(0x6ac5, 0x6ac6); A = mem_rd(gb, HL);
+  CYC(0x6ac6, 0x6ac8); alu_add(gb, 0x04);
+  CYC(0x6ac8, 0x6ac9); mem_wr(gb, HL, A);
+  CYC(0x6ac9, 0x6acb); E = 0x61;
+  CYC(0x6acb, 0x6acc); A = mem_rd(gb, DE);
+  CYC(0x6acc, 0x6ace); alu_cp(gb, 0x01);
+  CYC(0x6ace, 0x6ad0); L = 0x4d;
+  CYC(0x6ad0, 0x6ad1); A = mem_rd(gb, HL);
+  if ((F & FZ)) { CYCT(0x6ad1, 0x6ad3); goto L_6ad5; } CYC(0x6ad1, 0x6ad3);
+  CYC(0x6ad3, 0x6ad5); alu_add(gb, 0x1c);
+L_6ad5:
+  CYC(0x6ad5, 0x6ad7); alu_sub(gb, 0x0e);
+  CYC(0x6ad7, 0x6ad8); mem_wr(gb, HL, A);
+  CYC(0x6ad8, 0x6ad9); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x6ad9, 0x6adb); goto L_6aa7; } CYC(0x6ad9, 0x6adb);
+  CYC(0x6adb, 0x6adc); ret_effect(gb); return;
+}
+
+void interactionCode57__next_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_6aa7:
+  CALL_C(0x6aa7, getFreeInteractionSlot_hook, 0x3aef, 0x6aaa);
+  if (!(F & FZ)) { CYCT(0x6aaa, 0x6aab); ret_effect(gb); return; } CYC(0x6aaa, 0x6aab);
+  CYC(0x6aab, 0x6aad); mem_wr(gb, HL, 0x92);
+  CYC(0x6aad, 0x6aae); L = alu_inc8(gb, L);
+  CYC(0x6aae, 0x6ab0); mem_wr(gb, HL, 0x06);
+  CYC(0x6ab0, 0x6ab1); L = alu_inc8(gb, L);
+  CYC(0x6ab1, 0x6ab2); mem_wr(gb, HL, C);
+  CYC(0x6ab2, 0x6ab4); E = 0x5a;
+  CYC(0x6ab4, 0x6ab5); A = mem_rd(gb, DE);
+  CYC(0x6ab5, 0x6ab7); alu_and(gb, 0x03);
+  CYC(0x6ab7, 0x6ab9); L = 0x47;
+  CYC(0x6ab9, 0x6aba); mem_wr(gb, HL, A);
+  CYC(0x6aba, 0x6abc); L = 0x49;
+  CYC(0x6abc, 0x6abd); mem_wr(gb, HL, B);
+  CYC(0x6abd, 0x6abe); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  PUSH(0x6abe, BC);
+  CALL_C(0x6abf, objectCopyPosition_hook, 0x2242, 0x6ac2);
+  SET_BC(POP(0x6ac2));
+  CYC(0x6ac3, 0x6ac5); L = 0x4b;
+  CYC(0x6ac5, 0x6ac6); A = mem_rd(gb, HL);
+  CYC(0x6ac6, 0x6ac8); alu_add(gb, 0x04);
+  CYC(0x6ac8, 0x6ac9); mem_wr(gb, HL, A);
+  CYC(0x6ac9, 0x6acb); E = 0x61;
+  CYC(0x6acb, 0x6acc); A = mem_rd(gb, DE);
+  CYC(0x6acc, 0x6ace); alu_cp(gb, 0x01);
+  CYC(0x6ace, 0x6ad0); L = 0x4d;
+  CYC(0x6ad0, 0x6ad1); A = mem_rd(gb, HL);
+  if ((F & FZ)) { CYCT(0x6ad1, 0x6ad3); goto L_6ad5; } CYC(0x6ad1, 0x6ad3);
+  CYC(0x6ad3, 0x6ad5); alu_add(gb, 0x1c);
+L_6ad5:
+  CYC(0x6ad5, 0x6ad7); alu_sub(gb, 0x0e);
+  CYC(0x6ad7, 0x6ad8); mem_wr(gb, HL, A);
+  CYC(0x6ad8, 0x6ad9); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(0x6ad9, 0x6adb); goto L_6aa7; } CYC(0x6ad9, 0x6adb);
+  CYC(0x6adb, 0x6adc); ret_effect(gb); return;
+}
