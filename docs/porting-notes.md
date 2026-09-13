@@ -1045,3 +1045,8 @@ desync to discover; keep them when porting routines.
 - Promoting a banked callee retires its bank-0 wrapper's `CALL_ROM`: `checkObjectIsCloseToPosition`'s
   bank-0 half called `ROM_b08_checkObjectIsCloseToPosition` through the interpreter until batch 158
   made the bank-8 body readable; the wrapper now captures `sp0_` and uses `CALL_C`.
+- Closing a bank retires every generated symbol its neighbours still named. Bank 08's last batch
+  made `startJump` and `loadStoneNpcPalette` readable while `nayru.c`, `oldLady.c`, `boy.c` and
+  `villager.c` still called the generated names; the deleted `gen_bank08.c` turned each into a
+  link error. Retarget `CALL_C`/tail sites to the `_hook` in the same integration step, before the
+  first build.

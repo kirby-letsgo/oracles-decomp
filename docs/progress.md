@@ -7,8 +7,8 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 3,282 routine hooks rewritten across fifteen code
-  banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
+  routine against the transliteration. Progress: 3,574 routine hooks rewritten across sixteen code
+  banks; banks 0, 1, 2, 3, 4, 6, 7, 8, 0C, 12, 16 and 3F are fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
   rewritten. Batch 78 closed the last reporting gaps: 25 executable entry points became readable
@@ -292,6 +292,10 @@ Updated 2026-09-13. Newest entries at the top of each section.
   her Ambi-called init promoted to a durable hook), and the old lady. One hundred ninety-three
   parent-owned local/data rows disappeared; the project now has 3,521 readable hooks out of
   11,147, and bank 08 is 156/381.
+  Batch 159 added Ralph (twenty-seven roots, including the shared `startJump`), the male villager,
+  and the boy (twenty-five roots). One hundred seventy-two parent-owned local/data rows
+  disappeared; bank 08 is now fully readable (209/209) and `gen_bank08.c` is deleted. The project
+  now has 3,574 readable hooks out of 10,975.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -397,6 +401,20 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-14: milestone 3 phase 6 batch 159 (53 hook entries, 68 readable functions): added Ralph
+  (twenty-seven roots, including the shared `startJump` that Nayru, the old lady, and the boy
+  call), the male villager (one root with thirteen init subids and eight run subids), and the boy
+  (twenty-five roots, including `loadStoneNpcPalette` that the villager calls). One hundred
+  seventy-two parent-owned local/data rows were absorbed. Integration retargeted the four call
+  sites that still named the generated `startJump`/`loadStoneNpcPalette` symbols. Bank 08 is now
+  fully readable and `gen_bank08.c` is deleted; every interaction routine in banks 00-08 runs as
+  readable C. Two independent instruction reviews per routine verified all twenty-nine rst
+  tables, the shared-helper entries reached both by fallthrough and by `jp`, and every RAM operand
+  with no defects. All three roots run in the movie (villager 9,616 verified calls, Ralph 6,423,
+  boy 2,256). The project now has 3,574 readable hooks out of 10,975. Gates: lint 0, 30k verify
+  0 failures across 4,532,175 calls with state `3e450c2620a3f6a3`, whole-movie verify 0 failures
+  across 44,148,369 calls, full reference replay 0 state-hash mismatches with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
 - 2026-09-14: milestone 3 phase 6 batch 158 (68 hook entries, 87 readable functions): added the
   bank-08 Impa cutscene NPC (twenty-five roots, including the bank-8 half of
   `checkObjectIsCloseToPosition`, whose bank-0 wrapper now uses `CALL_C`), the child NPC family

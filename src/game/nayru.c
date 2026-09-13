@@ -885,7 +885,7 @@ substate0:
     CYCT(0x6c40, 0x6c41); ret_effect(gb); return;
   }
   CYC(0x6c40, 0x6c41);
-  CALL_C(0x6c41, startJump, 0x73db, 0x6c44);
+  CALL_C(0x6c41, startJump_hook, 0x73db, 0x6c44);
   CYC(0x6c44, 0x6c47); interactionIncSubstate_hook(gb);
   return;
 

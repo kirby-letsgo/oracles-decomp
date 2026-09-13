@@ -176,7 +176,7 @@ subid3_substate0:
     CYCT(0x7f22, 0x7f23); ret_effect(gb); return;
   }
   CYC(0x7f22, 0x7f23);
-  CALL_C(0x7f23, startJump, 0x73db, 0x7f26);
+  CALL_C(0x7f23, startJump_hook, 0x73db, 0x7f26);
   CYC(0x7f26, 0x7f29); interactionIncSubstate_hook(gb);
   return;
 
