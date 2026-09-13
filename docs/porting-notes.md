@@ -878,3 +878,9 @@ desync to discover; keep them when porting routines.
   helper instead of its synthetic return address; main review caught the mismatch by comparing it
   to the already-correct bank-3F helper. Finish the helper with `ret_effect` after the RET burn so
   both PC and SP transition exactly as the ROM does.
+- A plausible RAM name is still wrong when its numeric address does not match the operand. Batch
+  134's first `isLinkInHole` rewrite labelled the read at bank-6 `$54d8` as Link's force-state
+  field; exact-address review showed the ROM operand is `$cc9c`, `wActiveTileType`. The instruction
+  ranges and flags were otherwise perfect, so only resolving the named symbol back to its address
+  exposed the bug. Check every named RAM substitution numerically, including single-read leaf
+  routines that look too small to fail.

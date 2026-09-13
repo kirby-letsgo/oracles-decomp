@@ -2,126 +2,6 @@
 #include "game/asm.h"
 #include "game/gen.h"
 
-// 3f:595d
-void titlescreenMakuSeedSprite(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x595d, 2); SET_DE(DE + 1);  // inc de
-  I(0x595e, 1); C = B;  // ld c,b
-  I(0x595f, 1); alu_sub(gb, B);  // sub b
-  I(0x5960, 1); H = D;  // ld h,d
-  I(0x5961, 2); B = 0x42;  // ld b,$42
-  I(0x5963, 2); alu_adc(gb, mem_rd(gb, HL));  // adc (hl)
-  I(0x5964, 1); L = B;  // ld l,b
-  I(0x5965, 2); B = 0x51;  // ld b,$51
-  I(0x5967, 1); A = D;  // ld a,d
-  I(0x5968, 2); D = mem_rd(gb, HL);  // ld d,(hl)
-  I(0x5969, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x596a, 1); D = B;  // ld d,b
-  I(0x596b, 1); alu_add(gb, D);  // add d
-  I(0x596c, 2); mem_wr(gb, HL, H);  // ld (hl),h
-  I(0x596d, 1); B = alu_inc8(gb, B);  // inc b
-  I(0x596e, 1); E = B;  // ld e,b
-  I(0x596f, 1); A = D;  // ld a,d
-  I(0x5970, 1); L = D;  // ld l,d
-  I(0x5971, 1); alu_rlca(gb);  // rlca
-  I(0x5972, 1); E = B;  // ld e,b
-  I(0x5973, 1); alu_add(gb, D);  // add d
-  I(0x5974, 1); L = H;  // ld l,h
-  I(0x5975, 1); alu_rlca(gb);  // rlca
-  I(0x5976, 1); E = B;  // ld e,b
-  I(0x5977, 1); alu_adc(gb, D);  // adc d
-  I(0x5978, 2); L = mem_rd(gb, HL);  // ld l,(hl)
-  I(0x5979, 1); alu_rlca(gb);  // rlca
-  I(0x597a, 1); D = H;  // ld d,h
-  I(0x597b, 1); alu_adc(gb, D);  // adc d
-  I(0x597c, 1); D = H;  // ld d,h
-  I(0x597d, 2); SET_BC(BC + 1);  // inc bc
-  I(0x597e, 1); D = H;  // ld d,h
-  I(0x597f, 1); alu_add(gb, D);  // add d
-  I(0x5980, 1); D = D;  // ld d,d
-  I(0x5981, 2); SET_BC(BC + 1);  // inc bc
-  I(0x5982, 1); D = H;  // ld d,h
-  I(0x5983, 1); A = D;  // ld a,d
-  I(0x5984, 1); D = B;  // ld d,b
-  I(0x5985, 2); SET_BC(BC + 1);  // inc bc
-  I(0x5986, 1); H = H;  // ld h,h
-  I(0x5987, 1); A = D;  // ld a,d
-  I(0x5988, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x5989, 2); SET_BC(BC + 1);  // inc bc
-  I(0x598a, 1); H = H;  // ld h,h
-  I(0x598b, 1); alu_add(gb, D);  // add d
-  I(0x598c, 2); mem_wr(gb, HL, D);  // ld (hl),d
-  I(0x598d, 2); SET_BC(BC + 1);  // inc bc
-  I(0x598e, 1); H = H;  // ld h,h
-  I(0x598f, 1); alu_adc(gb, D);  // adc d
-  I(0x5990, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x5991, 2); SET_HL(HL + 1);  // inc hl
-  I(0x5992, 1); B = B;  // ld b,b
-  I(0x5993, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  I(0x5994, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x5995, 2); B = 0x40;  // ld b,$40
-  I(0x5997, 1); A = A;  // ld a,a
-  I(0x5998, 1); H = H;  // ld h,h
-  I(0x5999, 2); B = 0x41;  // ld b,$41
-  I(0x599b, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x599c, 1); H = B;  // ld h,b
-  I(0x599d, 2); B = 0x55;  // ld b,$55
-  HALT(0x599f);  // halt
-  I(0x59a0, 1); E = D;  // ld e,d
-  I(0x59a1, 2); B = 0x44;  // ld b,$44
-  I(0x59a3, 1); L = B;  // ld l,b
-  I(0x59a4, 2); E = mem_rd(gb, HL);  // ld e,(hl)
-  I(0x59a5, 2); H = 0x74;  // ld h,$74
-  I(0x59a7, 1);  // nop
-  I(0x59a8, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x59a9, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  titlescreenPressStartSprites(gb); return;  // fallthrough
-}
-
-// 3f:59aa
-void titlescreenPressStartSprites(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x59aa, 2); A = mem_rd(gb, BC);  // ld a,(bc)
-  I(0x59ab, 1); alu_add(gb, B);  // add b
-  I(0x59ac, 1); L = alu_inc8(gb, L);  // inc l
-  if ((F & FC)) { I(0x59ad, 3); goto L_59af; } I(0x59ad, 2);  // jr c,$59af
-L_59af:
-  I(0x59af, 1); alu_add(gb, B);  // add b
-  I(0x59b0, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x59b1, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x59b2, 1);  // nop
-  I(0x59b3, 1); alu_add(gb, B);  // add b
-  I(0x59b4, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x59b5, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x59b6, 1);  // nop
-  I(0x59b7, 1); alu_add(gb, B);  // add b
-  I(0x59b8, 1); B = H;  // ld b,h
-  I(0x59b9, 2); A = 0x00;  // ld a,$00
-  I(0x59bb, 1); alu_add(gb, B);  // add b
-  I(0x59bc, 1); C = H;  // ld c,h
-  I(0x59bd, 2); A = 0x00;  // ld a,$00
-  I(0x59bf, 1); alu_add(gb, B);  // add b
-  I(0x59c0, 1); E = H;  // ld e,h
-  I(0x59c1, 2); A = 0x00;  // ld a,$00
-  I(0x59c3, 1); alu_add(gb, B);  // add b
-  I(0x59c4, 1); H = H;  // ld h,h
-  I(0x59c5, 1); B = B;  // ld b,b
-  I(0x59c6, 1);  // nop
-  I(0x59c7, 1); alu_add(gb, B);  // add b
-  I(0x59c8, 1); L = H;  // ld l,h
-  I(0x59c9, 1); B = D;  // ld b,d
-  I(0x59ca, 1);  // nop
-  I(0x59cb, 1); alu_add(gb, B);  // add b
-  I(0x59cc, 2); mem_wr(gb, HL, H);  // ld (hl),h
-  I(0x59cd, 2); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ld a,(hl-)
-  I(0x59ce, 1);  // nop
-  I(0x59cf, 1); alu_add(gb, B);  // add b
-  I(0x59d0, 1); A = H;  // ld a,h
-  I(0x59d1, 1); B = B;  // ld b,b
-  I(0x59d2, 1);  // nop
-  HANDOFF(0x59d3);  // fallthrough to linkOnHorseCloseupSprites_2
-}
-
 // 3f:7cf8
 void func_7cf8(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -169,10 +49,10 @@ L_74f7:
   I(0x7502, 3); mem_wr(gb, HL, 0x32);  // ld (hl),$32
   I(0x7504, 2); A = 0x03;  // ld a,$03
   CALL(0x7506, interactionSetAnimation_hook, 0x262e, 0x7509);  // call $262e
-  I(0x7509, 3); monkeyJumpSpeed120(gb); return;  // jr $7547
+  I(0x7509, 3); if (hook_enabled_at(0x7547)) { monkeyJumpSpeed120_hook(gb); return; } HANDOFF(0x7547);  // jr $7547
 L_750b:
   CALL(0x750b, interactionDecCounter1_hook, 0x23cc, 0x750e);  // call $23cc
-  if (!(F & FZ)) { I(0x750e, 3); monkeyUpdateGravityAndHop(gb); return; } I(0x750e, 2);  // jr nz,$7541
+  if (!(F & FZ)) { I(0x750e, 3); if (hook_enabled_at(0x7541)) { monkeyUpdateGravityAndHop_hook(gb); return; } HANDOFF(0x7541); } I(0x750e, 2);  // jr nz,$7541
   CALL(0x7510, interactionIncSubstate_hook, 0x23e5, 0x7513);  // call $23e5
   I(0x7513, 2); L = 0x49;  // ld l,$49
   I(0x7515, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
@@ -180,7 +60,7 @@ L_750b:
   I(0x7519, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   I(0x751b, 2); L = 0x50;  // ld l,$50
   I(0x751d, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  monkeySetAnimationAndJump(gb); return;  // fallthrough
+  if (hook_enabled_at(0x751f)) { monkeySetAnimationAndJump_hook(gb); return; } HANDOFF(0x751f);  // fallthrough
 }
 
 // 3f:74e7
@@ -207,7 +87,7 @@ L_74f7:
   I(0x7502, 3); mem_wr(gb, HL, 0x32);  // ld (hl),$32
   I(0x7504, 2); A = 0x03;  // ld a,$03
   CALL(0x7506, interactionSetAnimation_hook, 0x262e, 0x7509);  // call $262e
-  I(0x7509, 3); monkeyJumpSpeed120(gb); return;  // jr $7547
+  I(0x7509, 3); if (hook_enabled_at(0x7547)) { monkeyJumpSpeed120_hook(gb); return; } HANDOFF(0x7547);  // jr $7547
 }
 
 // 3f:750b
@@ -215,7 +95,7 @@ void monkeySubid0State1__substate2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_750b:
   CALL(0x750b, interactionDecCounter1_hook, 0x23cc, 0x750e);  // call $23cc
-  if (!(F & FZ)) { I(0x750e, 3); monkeyUpdateGravityAndHop(gb); return; } I(0x750e, 2);  // jr nz,$7541
+  if (!(F & FZ)) { I(0x750e, 3); if (hook_enabled_at(0x7541)) { monkeyUpdateGravityAndHop_hook(gb); return; } HANDOFF(0x7541); } I(0x750e, 2);  // jr nz,$7541
   CALL(0x7510, interactionIncSubstate_hook, 0x23e5, 0x7513);  // call $23e5
   I(0x7513, 2); L = 0x49;  // ld l,$49
   I(0x7515, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
@@ -223,7 +103,7 @@ L_750b:
   I(0x7519, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   I(0x751b, 2); L = 0x50;  // ld l,$50
   I(0x751d, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  monkeySetAnimationAndJump(gb); return;  // fallthrough
+  if (hook_enabled_at(0x751f)) { monkeySetAnimationAndJump_hook(gb); return; } HANDOFF(0x751f);  // fallthrough
 }
 
 // 3f:72e6
@@ -400,7 +280,7 @@ L_737b:
   I(0x73af, 2); SET_BC(BC + 1);  // inc bc
   I(0x73b0, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x73b1, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x73b2, 4); monkeySetJumpSpeed(gb); return;  // jp $7553
+  I(0x73b2, 4); if (hook_enabled_at(0x7553)) { monkeySetJumpSpeed_hook(gb); return; } HANDOFF(0x7553);  // jp $7553
 L_73e5:
   CALL(0x73e5, objectSetInvisible_hook, 0x1e7b, 0x73e8);  // call $1e7b
   CALL(0x73e8, interactionCode39_body__subid1Init, 0x7354, 0x73eb);  // call $7354
@@ -641,7 +521,7 @@ L_737b:
   I(0x73af, 2); SET_BC(BC + 1);  // inc bc
   I(0x73b0, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x73b1, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x73b2, 4); monkeySetJumpSpeed(gb); return;  // jp $7553
+  I(0x73b2, 4); if (hook_enabled_at(0x7553)) { monkeySetJumpSpeed_hook(gb); return; } HANDOFF(0x7553);  // jp $7553
 }
 
 // 3f:736a
@@ -695,7 +575,7 @@ L_737b:
   I(0x73af, 2); SET_BC(BC + 1);  // inc bc
   I(0x73b0, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x73b1, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x73b2, 4); monkeySetJumpSpeed(gb); return;  // jp $7553
+  I(0x73b2, 4); if (hook_enabled_at(0x7553)) { monkeySetJumpSpeed_hook(gb); return; } HANDOFF(0x7553);  // jp $7553
 }
 
 // 3f:737b
@@ -737,7 +617,7 @@ L_737b:
   I(0x73af, 2); SET_BC(BC + 1);  // inc bc
   I(0x73b0, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x73b1, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x73b2, 4); monkeySetJumpSpeed(gb); return;  // jp $7553
+  I(0x73b2, 4); if (hook_enabled_at(0x7553)) { monkeySetJumpSpeed_hook(gb); return; } HANDOFF(0x7553);  // jp $7553
 }
 
 // 3f:73e5
@@ -1455,9 +1335,9 @@ L_7581:
 L_758b:
   CALL(0x758b, interactionDecCounter1_hook, 0x23cc, 0x758e);  // call $23cc
   if (!(F & FZ)) { I(0x758e, 3); goto L_7592; } I(0x758e, 2);  // jr nz,$7592
-  I(0x7590, 3); monkeyBeginDisappearing(gb); return;  // jr $7598
+  I(0x7590, 3); if (hook_enabled_at(0x7598)) { monkeyBeginDisappearing_hook(gb); return; } HANDOFF(0x7598);  // jr $7598
 L_7592:
-  CALL(0x7592, monkeyUpdateGravityAndJumpIfLanded, 0x754d, 0x7595);  // call $754d
+  CALL(0x7592, monkeyUpdateGravityAndJumpIfLanded_hook, 0x754d, 0x7595);  // call $754d
   I(0x7595, 4); if (hook_enabled_at(0x261b)) { interactionAnimate_hook(gb); return; } HANDOFF(0x261b);  // jp $261b
 }
 
@@ -1477,9 +1357,9 @@ void monkey4Disappearance__substate1(GB *gb) {
 L_758b:
   CALL(0x758b, interactionDecCounter1_hook, 0x23cc, 0x758e);  // call $23cc
   if (!(F & FZ)) { I(0x758e, 3); goto L_7592; } I(0x758e, 2);  // jr nz,$7592
-  I(0x7590, 3); monkeyBeginDisappearing(gb); return;  // jr $7598
+  I(0x7590, 3); if (hook_enabled_at(0x7598)) { monkeyBeginDisappearing_hook(gb); return; } HANDOFF(0x7598);  // jr $7598
 L_7592:
-  CALL(0x7592, monkeyUpdateGravityAndJumpIfLanded, 0x754d, 0x7595);  // call $754d
+  CALL(0x7592, monkeyUpdateGravityAndJumpIfLanded_hook, 0x754d, 0x7595);  // call $754d
   I(0x7595, 4); if (hook_enabled_at(0x261b)) { interactionAnimate_hook(gb); return; } HANDOFF(0x261b);  // jp $261b
 }
 
@@ -1514,7 +1394,7 @@ L_76d1:
 L_76da:
   CALL(0x76da, interactionDecCounter1_hook, 0x23cc, 0x76dd);  // call $23cc
   if (!(F & FZ)) { I(0x76dd, 3); goto L_76e2; } I(0x76dd, 2);  // jr nz,$76e2
-  I(0x76df, 4); monkeyBeginDisappearing(gb); return;  // jp $7598
+  I(0x76df, 4); if (hook_enabled_at(0x7598)) { monkeyBeginDisappearing_hook(gb); return; } HANDOFF(0x7598);  // jp $7598
 L_76e2:
   I(0x76e2, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x76e5, 2); alu_and(gb, 0x0f);  // and $0f
@@ -1575,7 +1455,7 @@ void monkey8Disappearance__substate2(GB *gb) {
 L_76da:
   CALL(0x76da, interactionDecCounter1_hook, 0x23cc, 0x76dd);  // call $23cc
   if (!(F & FZ)) { I(0x76dd, 3); goto L_76e2; } I(0x76dd, 2);  // jr nz,$76e2
-  I(0x76df, 4); monkeyBeginDisappearing(gb); return;  // jp $7598
+  I(0x76df, 4); if (hook_enabled_at(0x7598)) { monkeyBeginDisappearing_hook(gb); return; } HANDOFF(0x7598);  // jp $7598
 L_76e2:
   I(0x76e2, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
   I(0x76e5, 2); alu_and(gb, 0x0f);  // and $0f
@@ -1622,7 +1502,7 @@ void monkey9Disappearance(GB *gb) {
   if (!(F & FC)) { I(0x7617, 3); goto L_7625; } I(0x7617, 2);  // jr nc,$7625
   CALL(0x7619, interactionDecCounter1_hook, 0x23cc, 0x761c);  // call $23cc
   if (!(F & FZ)) { I(0x761c, 3); goto L_7625; } I(0x761c, 2);  // jr nz,$7625
-  CALL(0x761e, monkeyBeginDisappearing, 0x7598, 0x7621);  // call $7598
+  CALL(0x761e, monkeyBeginDisappearing_hook, 0x7598, 0x7621);  // call $7598
   I(0x7621, 2); L = 0x45;  // ld l,$45
   I(0x7623, 3); mem_wr(gb, HL, 0x04);  // ld (hl),$04
 L_7625:
@@ -1642,12 +1522,12 @@ L_7635:
   I(0x763c, 2); L = 0x50;  // ld l,$50
   I(0x763e, 3); mem_wr(gb, HL, 0x28);  // ld (hl),$28
   CALL(0x7640, interactionIncSubstate_hook, 0x23e5, 0x7643);  // call $23e5
-  I(0x7643, 4); monkeyJumpSpeed100(gb); return;  // jp $7522
+  I(0x7643, 4); if (hook_enabled_at(0x7522)) { monkeyJumpSpeed100_hook(gb); return; } HANDOFF(0x7522);  // jp $7522
 L_7646:
   I(0x7646, 2); C = 0x20;  // ld c,$20
   CALL(0x7648, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x764b);  // call $1f46
   if (!(F & FZ)) { I(0x764b, 4); if (hook_enabled_at(0x201d)) { objectApplySpeed_hook(gb); return; } HANDOFF(0x201d); } I(0x764b, 3);  // jp nz,$201d
-  CALL(0x764e, monkeyJumpSpeed100, 0x7522, 0x7651);  // call $7522
+  CALL(0x764e, monkeyJumpSpeed100_hook, 0x7522, 0x7651);  // call $7522
   I(0x7651, 2); L = 0x7c;  // ld l,$7c
   I(0x7653, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x7654, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -1676,7 +1556,7 @@ L_7660:
   if (!(F & FZ)) { I(0x7678, 3); goto L_767c; } I(0x7678, 2);  // jr nz,$767c
   I(0x767a, 2); A = 0x08;  // ld a,$08
 L_767c:
-  I(0x767c, 4); monkeySetAnimationAndJump(gb); return;  // jp $751f
+  I(0x767c, 4); if (hook_enabled_at(0x751f)) { monkeySetAnimationAndJump_hook(gb); return; } HANDOFF(0x751f);  // jp $751f
 L_767f:
   I(0x767f, 1); H = D;  // ld h,d
   I(0x7680, 2); L = 0x78;  // ld l,$78
@@ -1702,7 +1582,7 @@ L_7635:
   I(0x763c, 2); L = 0x50;  // ld l,$50
   I(0x763e, 3); mem_wr(gb, HL, 0x28);  // ld (hl),$28
   CALL(0x7640, interactionIncSubstate_hook, 0x23e5, 0x7643);  // call $23e5
-  I(0x7643, 4); monkeyJumpSpeed100(gb); return;  // jp $7522
+  I(0x7643, 4); if (hook_enabled_at(0x7522)) { monkeyJumpSpeed100_hook(gb); return; } HANDOFF(0x7522);  // jp $7522
 }
 
 // 3f:7646
@@ -1712,7 +1592,7 @@ L_7646:
   I(0x7646, 2); C = 0x20;  // ld c,$20
   CALL(0x7648, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x764b);  // call $1f46
   if (!(F & FZ)) { I(0x764b, 4); if (hook_enabled_at(0x201d)) { objectApplySpeed_hook(gb); return; } HANDOFF(0x201d); } I(0x764b, 3);  // jp nz,$201d
-  CALL(0x764e, monkeyJumpSpeed100, 0x7522, 0x7651);  // call $7522
+  CALL(0x764e, monkeyJumpSpeed100_hook, 0x7522, 0x7651);  // call $7522
   I(0x7651, 2); L = 0x7c;  // ld l,$7c
   I(0x7653, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x7654, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -1746,7 +1626,7 @@ L_7660:
   if (!(F & FZ)) { I(0x7678, 3); goto L_767c; } I(0x7678, 2);  // jr nz,$767c
   I(0x767a, 2); A = 0x08;  // ld a,$08
 L_767c:
-  I(0x767c, 4); monkeySetAnimationAndJump(gb); return;  // jp $751f
+  I(0x767c, 4); if (hook_enabled_at(0x751f)) { monkeySetAnimationAndJump_hook(gb); return; } HANDOFF(0x751f);  // jp $751f
 }
 
 // 3f:767f
@@ -1799,7 +1679,7 @@ void monkey3Disappearance(GB *gb) {
 L_75ca:
   CALL(0x75ca, interactionDecCounter1_hook, 0x23cc, 0x75cd);  // call $23cc
   if (!(F & FZ)) { I(0x75cd, 4); if (hook_enabled_at(0x261b)) { interactionAnimate_hook(gb); return; } HANDOFF(0x261b); } I(0x75cd, 3);  // jp nz,$261b
-  I(0x75d0, 3); monkeyBeginDisappearing(gb); return;  // jr $7598
+  I(0x75d0, 3); if (hook_enabled_at(0x7598)) { monkeyBeginDisappearing_hook(gb); return; } HANDOFF(0x7598);  // jr $7598
 }
 
 // 3f:75ca
@@ -1808,27 +1688,7 @@ void monkey7Disappearance__substate0(GB *gb) {
 L_75ca:
   CALL(0x75ca, interactionDecCounter1_hook, 0x23cc, 0x75cd);  // call $23cc
   if (!(F & FZ)) { I(0x75cd, 4); if (hook_enabled_at(0x261b)) { interactionAnimate_hook(gb); return; } HANDOFF(0x261b); } I(0x75cd, 3);  // jp nz,$261b
-  I(0x75d0, 3); monkeyBeginDisappearing(gb); return;  // jr $7598
-}
-
-// 3f:754d
-void monkeyUpdateGravityAndJumpIfLanded(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x754d, 2); C = 0x10;  // ld c,$10
-  CALL(0x754f, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x7552);  // call $1f46
-  if (!(F & FZ)) { RET_TAKEN(0x7552); return; } I(0x7552, 2);  // ret nz
-  monkeySetJumpSpeed(gb); return;  // fallthrough
-}
-
-// 3f:75b3
-void monkeyFlickerUntilDeletion(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x75b3, interactionDecCounter1_hook, 0x23cc, 0x75b6);  // call $23cc
-  if (!(F & FZ)) { I(0x75b6, 3); goto L_75bb; } I(0x75b6, 2);  // jr nz,$75bb
-  I(0x75b8, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05);  // jp $3b05
-L_75bb:
-  I(0x75bb, 2); B = 0x01;  // ld b,$01
-  I(0x75bd, 4); if (hook_enabled_at(0x24e6)) { objectFlickerVisibility_hook(gb); return; } HANDOFF(0x24e6);  // jp $24e6
+  I(0x75d0, 3); if (hook_enabled_at(0x7598)) { monkeyBeginDisappearing_hook(gb); return; } HANDOFF(0x7598);  // jr $7598
 }
 
 // 3f:75d2
@@ -1856,7 +1716,7 @@ L_75e7:
 L_75f8:
   CALL(0x75f8, interactionDecCounter1_hook, 0x23cc, 0x75fb);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x75fb); return; } I(0x75fb, 2);  // ret nz
-  I(0x75fc, 4); monkeyBeginDisappearing(gb); return;  // jp $7598
+  I(0x75fc, 4); if (hook_enabled_at(0x7598)) { monkeyBeginDisappearing_hook(gb); return; } HANDOFF(0x7598);  // jp $7598
 }
 
 // 3f:75e0
@@ -1895,7 +1755,7 @@ void monkey5Disappearance__substate2(GB *gb) {
 L_75f8:
   CALL(0x75f8, interactionDecCounter1_hook, 0x23cc, 0x75fb);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x75fb); return; } I(0x75fb, 2);  // ret nz
-  I(0x75fc, 4); monkeyBeginDisappearing(gb); return;  // jp $7598
+  I(0x75fc, 4); if (hook_enabled_at(0x7598)) { monkeyBeginDisappearing_hook(gb); return; } HANDOFF(0x7598);  // jp $7598
 }
 
 // 3f:7609
@@ -1904,54 +1764,7 @@ void monkey5Disappearance__substate2__substate0(GB *gb) {
 L_7609:
   CALL(0x7609, interactionDecCounter1_hook, 0x23cc, 0x760c);  // call $23cc
   if (!(F & FZ)) { RET_TAKEN(0x760c); return; } I(0x760c, 2);  // ret nz
-  I(0x760d, 3); monkeyBeginDisappearing(gb); return;  // jr $7598
-}
-
-// 3f:75aa
-void monkeyWaitBeforeFlickering(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x75aa, interactionDecCounter1_hook, 0x23cc, 0x75ad);  // call $23cc
-  if (!(F & FZ)) { RET_TAKEN(0x75ad); return; } I(0x75ad, 2);  // ret nz
-  I(0x75ae, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x75b0, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
-}
-
-// 3f:7553
-void monkeySetJumpSpeed(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7553, 2); L = 0x78;  // ld l,$78
-  I(0x7555, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x7556, 2); E = 0x54;  // ld e,$54
-  I(0x7558, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x7559, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x755a, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x755b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x755c); return;  // ret
-}
-
-// 3f:7528
-void monkeySubid0State1Substate3(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7528, objectCheckWithinScreenBoundary_hook, 0x2184, 0x752b);  // call $2184
-  if ((F & FC)) { I(0x752b, 3); goto L_7535; } I(0x752b, 2);  // jr c,$7535
-  I(0x752d, 2); A = 0x01;  // ld a,$01
-  I(0x752f, 4); mem_wr(gb, 0xcc18, A);  // ld ($cc18),a
-  I(0x7532, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05);  // jp $3b05
-L_7535:
-  I(0x7535, 2); C = 0x20;  // ld c,$20
-  CALL(0x7537, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x753a);  // call $1f46
-  if (!(F & FZ)) { I(0x753a, 4); if (hook_enabled_at(0x201d)) { objectApplySpeed_hook(gb); return; } HANDOFF(0x201d); } I(0x753a, 3);  // jp nz,$201d
-  I(0x753d, 2); A = 0x04;  // ld a,$04
-  I(0x753f, 3); monkeySetAnimationAndJump(gb); return;  // jr $751f
-}
-
-// 3f:7541
-void monkeyUpdateGravityAndHop(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7541, 2); C = 0x20;  // ld c,$20
-  CALL(0x7543, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x7546);  // call $1f46
-  if (!(F & FZ)) { RET_TAKEN(0x7546); return; } I(0x7546, 2);  // ret nz
-  monkeyJumpSpeed120(gb); return;  // fallthrough
+  I(0x760d, 3); if (hook_enabled_at(0x7598)) { monkeyBeginDisappearing_hook(gb); return; } HANDOFF(0x7598);  // jr $7598
 }
 
 // 3f:770f
@@ -1959,40 +1772,6 @@ void monkeySubid2State1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x770f, interactionRunScript_hook, 0x2552, 0x7712);  // call $2552
   I(0x7712, 4); if (hook_enabled_at(0x26db)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x26db);  // jp $26db
-}
-
-// 3f:751f
-void monkeySetAnimationAndJump(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x751f, interactionSetAnimation_hook, 0x262e, 0x7522);  // call $262e
-  monkeyJumpSpeed100(gb); return;  // fallthrough
-}
-
-// 3f:7522
-void monkeyJumpSpeed100(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7522, 3); SET_BC(0xff00);  // ld bc,$ff00
-  I(0x7525, 4); if (hook_enabled_at(0x239d)) { objectSetSpeedZ_hook(gb); return; } HANDOFF(0x239d);  // jp $239d
-}
-
-// 3f:7547
-void monkeyJumpSpeed120(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7547, 3); SET_BC(0xfee0);  // ld bc,$fee0
-  I(0x754a, 4); if (hook_enabled_at(0x239d)) { objectSetSpeedZ_hook(gb); return; } HANDOFF(0x239d);  // jp $239d
-}
-
-// 3f:7598
-void monkeyBeginDisappearing(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7598, 3); mem_wr(gb, HL, 0x3c);  // ld (hl),$3c
-  I(0x759a, 2); L = 0x5c;  // ld l,$5c
-  I(0x759c, 3); mem_wr(gb, HL, 0x06);  // ld (hl),$06
-  I(0x759e, 2); L = 0x4f;  // ld l,$4f
-  I(0x75a0, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x75a2, 2); A = 0x50;  // ld a,$50
-  CALL(0x75a4, playSound_b00_hook, 0x0c98, 0x75a7);  // call $0c98
-  I(0x75a7, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 }
 
 // 3f:7715
@@ -2008,12 +1787,12 @@ L_7635:
   I(0x763c, 2); L = 0x50;  // ld l,$50
   I(0x763e, 3); mem_wr(gb, HL, 0x28);  // ld (hl),$28
   CALL(0x7640, interactionIncSubstate_hook, 0x23e5, 0x7643);  // call $23e5
-  I(0x7643, 4); monkeyJumpSpeed100(gb); return;  // jp $7522
+  I(0x7643, 4); if (hook_enabled_at(0x7522)) { monkeyJumpSpeed100_hook(gb); return; } HANDOFF(0x7522);  // jp $7522
 L_7646:
   I(0x7646, 2); C = 0x20;  // ld c,$20
   CALL(0x7648, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x764b);  // call $1f46
   if (!(F & FZ)) { I(0x764b, 4); if (hook_enabled_at(0x201d)) { objectApplySpeed_hook(gb); return; } HANDOFF(0x201d); } I(0x764b, 3);  // jp nz,$201d
-  CALL(0x764e, monkeyJumpSpeed100, 0x7522, 0x7651);  // call $7522
+  CALL(0x764e, monkeyJumpSpeed100_hook, 0x7522, 0x7651);  // call $7522
   I(0x7651, 2); L = 0x7c;  // ld l,$7c
   I(0x7653, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x7654, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -2042,7 +1821,7 @@ L_7660:
   if (!(F & FZ)) { I(0x7678, 3); goto L_767c; } I(0x7678, 2);  // jr nz,$767c
   I(0x767a, 2); A = 0x08;  // ld a,$08
 L_767c:
-  I(0x767c, 4); monkeySetAnimationAndJump(gb); return;  // jp $751f
+  I(0x767c, 4); if (hook_enabled_at(0x751f)) { monkeySetAnimationAndJump_hook(gb); return; } HANDOFF(0x751f);  // jp $751f
 L_767f:
   I(0x767f, 1); H = D;  // ld h,d
   I(0x7680, 2); L = 0x78;  // ld l,$78
@@ -2124,7 +1903,7 @@ L_7794:
   I(0x7796, 2); mem_wr(gb, HL, B);  // ld (hl),b
   I(0x7797, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 L_779a:
-  CALL(0x779a, monkeyUpdateGravityAndJumpIfLanded, 0x754d, 0x779d);  // call $754d
+  CALL(0x779a, monkeyUpdateGravityAndJumpIfLanded_hook, 0x754d, 0x779d);  // call $754d
 L_779d:
   CALL(0x779d, interactionAnimate_hook, 0x261b, 0x77a0);  // call $261b
   I(0x77a0, 2); E = 0x43;  // ld e,$43
@@ -2223,7 +2002,7 @@ L_7794:
   I(0x7796, 2); mem_wr(gb, HL, B);  // ld (hl),b
   I(0x7797, 4); if (hook_enabled_at(0x23e5)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23e5);  // jp $23e5
 L_779a:
-  CALL(0x779a, monkeyUpdateGravityAndJumpIfLanded, 0x754d, 0x779d);  // call $754d
+  CALL(0x779a, monkeyUpdateGravityAndJumpIfLanded_hook, 0x754d, 0x779d);  // call $754d
 L_779d:
   CALL(0x779d, interactionAnimate_hook, 0x261b, 0x77a0);  // call $261b
   I(0x77a0, 2); E = 0x43;  // ld e,$43
@@ -2314,7 +2093,7 @@ L_7794:
 void monkeySubid4State1__substate4_0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_779a:
-  CALL(0x779a, monkeyUpdateGravityAndJumpIfLanded, 0x754d, 0x779d);  // call $754d
+  CALL(0x779a, monkeyUpdateGravityAndJumpIfLanded_hook, 0x754d, 0x779d);  // call $754d
 L_779d:
   CALL(0x779d, interactionAnimate_hook, 0x261b, 0x77a0);  // call $261b
   I(0x77a0, 2); E = 0x43;  // ld e,$43
@@ -2435,12 +2214,12 @@ L_7635:
   I(0x763c, 2); L = 0x50;  // ld l,$50
   I(0x763e, 3); mem_wr(gb, HL, 0x28);  // ld (hl),$28
   CALL(0x7640, interactionIncSubstate_hook, 0x23e5, 0x7643);  // call $23e5
-  I(0x7643, 4); monkeyJumpSpeed100(gb); return;  // jp $7522
+  I(0x7643, 4); if (hook_enabled_at(0x7522)) { monkeyJumpSpeed100_hook(gb); return; } HANDOFF(0x7522);  // jp $7522
 L_7646:
   I(0x7646, 2); C = 0x20;  // ld c,$20
   CALL(0x7648, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x764b);  // call $1f46
   if (!(F & FZ)) { I(0x764b, 4); if (hook_enabled_at(0x201d)) { objectApplySpeed_hook(gb); return; } HANDOFF(0x201d); } I(0x764b, 3);  // jp nz,$201d
-  CALL(0x764e, monkeyJumpSpeed100, 0x7522, 0x7651);  // call $7522
+  CALL(0x764e, monkeyJumpSpeed100_hook, 0x7522, 0x7651);  // call $7522
   I(0x7651, 2); L = 0x7c;  // ld l,$7c
   I(0x7653, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x7654, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -2469,7 +2248,7 @@ L_7660:
   if (!(F & FZ)) { I(0x7678, 3); goto L_767c; } I(0x7678, 2);  // jr nz,$767c
   I(0x767a, 2); A = 0x08;  // ld a,$08
 L_767c:
-  I(0x767c, 4); monkeySetAnimationAndJump(gb); return;  // jp $751f
+  I(0x767c, 4); if (hook_enabled_at(0x751f)) { monkeySetAnimationAndJump_hook(gb); return; } HANDOFF(0x751f);  // jp $751f
 L_767f:
   I(0x767f, 1); H = D;  // ld h,d
   I(0x7680, 2); L = 0x78;  // ld l,$78
@@ -2559,7 +2338,7 @@ void monkeySubid5State1(GB *gb) {
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x77f2: goto L_77f2; default: HANDOFF(HL); }
 L_77f2:
-  CALL(0x77f2, monkeyUpdateGravityAndJumpIfLanded, 0x754d, 0x77f5);  // call $754d
+  CALL(0x77f2, monkeyUpdateGravityAndJumpIfLanded_hook, 0x754d, 0x77f5);  // call $754d
   monkeyAnimateAndRunScript(gb); return;  // fallthrough
 }
 
@@ -2567,7 +2346,7 @@ L_77f2:
 void monkeySubid5State1__monkey0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_77f2:
-  CALL(0x77f2, monkeyUpdateGravityAndJumpIfLanded, 0x754d, 0x77f5);  // call $754d
+  CALL(0x77f2, monkeyUpdateGravityAndJumpIfLanded_hook, 0x754d, 0x77f5);  // call $754d
   monkeyAnimateAndRunScript(gb); return;  // fallthrough
 }
 
@@ -2591,12 +2370,12 @@ L_7635:
   I(0x763c, 2); L = 0x50;  // ld l,$50
   I(0x763e, 3); mem_wr(gb, HL, 0x28);  // ld (hl),$28
   CALL(0x7640, interactionIncSubstate_hook, 0x23e5, 0x7643);  // call $23e5
-  I(0x7643, 4); monkeyJumpSpeed100(gb); return;  // jp $7522
+  I(0x7643, 4); if (hook_enabled_at(0x7522)) { monkeyJumpSpeed100_hook(gb); return; } HANDOFF(0x7522);  // jp $7522
 L_7646:
   I(0x7646, 2); C = 0x20;  // ld c,$20
   CALL(0x7648, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x764b);  // call $1f46
   if (!(F & FZ)) { I(0x764b, 4); if (hook_enabled_at(0x201d)) { objectApplySpeed_hook(gb); return; } HANDOFF(0x201d); } I(0x764b, 3);  // jp nz,$201d
-  CALL(0x764e, monkeyJumpSpeed100, 0x7522, 0x7651);  // call $7522
+  CALL(0x764e, monkeyJumpSpeed100_hook, 0x7522, 0x7651);  // call $7522
   I(0x7651, 2); L = 0x7c;  // ld l,$7c
   I(0x7653, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x7654, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -2625,7 +2404,7 @@ L_7660:
   if (!(F & FZ)) { I(0x7678, 3); goto L_767c; } I(0x7678, 2);  // jr nz,$767c
   I(0x767a, 2); A = 0x08;  // ld a,$08
 L_767c:
-  I(0x767c, 4); monkeySetAnimationAndJump(gb); return;  // jp $751f
+  I(0x767c, 4); if (hook_enabled_at(0x751f)) { monkeySetAnimationAndJump_hook(gb); return; } HANDOFF(0x751f);  // jp $751f
 L_767f:
   I(0x767f, 1); H = D;  // ld h,d
   I(0x7680, 2); L = 0x78;  // ld l,$78

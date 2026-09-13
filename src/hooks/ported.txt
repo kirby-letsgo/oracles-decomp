@@ -951,8 +951,6 @@ intro_titlescreen_state0
 intro_titlescreen_state1
 intro_titlescreen_state2
 intro_titlescreen_state3
-titlescreenMakuSeedSprite
-titlescreenPressStartSprites
 runIntroCinematic
 introCinematic_ridingHorse
 introCinematic_ridingHorse_state0
