@@ -884,3 +884,9 @@ desync to discover; keep them when porting routines.
   ranges and flags were otherwise perfect, so only resolving the named symbol back to its address
   exposed the bug. Check every named RAM substitution numerically, including single-read leaf
   routines that look too small to fail.
+- RST jump-table fallback semantics do not change just because every expected table entry has a
+  direct C case. Batch 135's six monkey dispatchers handled their known targets correctly but sent
+  an unexpected target through `hook_handoff`, abandoning the callable frame. Cross-review found
+  the repeated mistake before replay. After the RST helper pops its table address, an ordinary
+  dynamic `jp hl` still needs `hook_continue(gb, HL, sp0_)`; only an actual `ld sp,*` permits
+  `hook_handoff`.
