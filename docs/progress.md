@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,477 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,483 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -145,6 +145,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   Batch 117 added bank 1's game-logic and initialization roots, standard-game-state dispatcher,
   room-loading continuations, and the remaining room-transition cutscene roots; bank 1 now has
   289 of 297 entries readable.
+  Batch 118 completed bank 1's final real routines, removed three embedded data labels from the
+  executable registry, and promoted the real `$34ad` Bank-0 continuation reached by corrupted
+  code. Banks 0 and 1 are now both fully readable, and `gen_bank01.c` is deleted.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -250,6 +253,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 5 batch 118 (6 routines): completed bank 1 with its final
+  Seasons-only helper, required `$5d34` thread continuation, and three unreachable garbage roots.
+  Their invalid calls and operand-byte jumps remain interpreted, while the genuine `$34ad`
+  instruction boundary inside `updateAllObjects` received a stable Bank-0 continuation and direct
+  C tail. Three embedded data-table labels left the executable registry and regeneration deleted
+  `gen_bank01.c`; bank 0 is 653/653 and bank 1 is 294/294 readable entries. Three independent
+  instruction-level reviews approved the final code. Gates: lint 0, 30k verify 0 failures across
+  4,753,464 calls, full replay 0 failures across 13,621,809 calls with state
+  `64bddd0dfe384126`, normal and quirk suites 8/8.
 - 2026-09-13: milestone 3 phase 5 batch 117 (31 routines): added bank 1's game-logic and
   initialization roots, loading-room flow, standard-game-state dispatcher, cutscenes 00/01/03/04/05,
   and the remaining cutscene 15/18/19 room-loading paths. Ten thread-resumption entries received

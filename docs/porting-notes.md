@@ -750,3 +750,10 @@ desync to discover; keep them when porting routines.
   The same batch promoted `func_5c6b` to readable C, exposing its caller's thread-capable return at
   `$4ca4`; add a real post-call alias whenever promoting a callee removes the generated continuation
   that previously handled a possible thread switch.
+- A corrupted static jump still follows the known-target rule when its destination is a genuine
+  instruction boundary inside readable code. Batch 118's `func_7f90` jumps to `$34ad`, the `ldh`
+  inside `updateAllObjects`; leaving it as `hook_continue` regenerated an explicit
+  "jumps into rewritten" warning. Promote that exact address to a stable readable continuation,
+  factor the destination routine at the boundary, and call it directly. The sibling garbage jumps
+  to `$048b` and `$34c7` really enter operand bytes, so those must remain exact interpreter
+  continuations rather than being rounded to the surrounding readable routine.

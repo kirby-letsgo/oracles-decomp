@@ -5099,3 +5099,67 @@ void cutscene19_hook(GB *gb) { cutscene18_19(gb, 0x4d1a, gb->sp); }
 void cutscene18__afterCall4d27_hook(GB *gb) {
   CYC(0x4d27, 0x4d2a); updateAllObjects_hook(gb);
 }
+
+static void func_5d31_after_tree_gfx(GB *gb, uint16_t sp0_) {
+  CYC(0x5d34, 0x5d37); A = W8(wWarpTransition2);
+  CYC(0x5d37, 0x5d38); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x5d38, 0x5d3b);
+    applyWarpTransition2_hook(gb);
+    return;
+  }
+  CYC(0x5d38, 0x5d3b);
+  CALL_C(0x5d3b, updateStatusBar_hook, 0x1a9c, 0x5d3e);
+  CYC(0x5d3e, 0x5d41); updateAllObjects_hook(gb);
+}
+
+void func_5d31_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x5d31, refreshLoadedTreeGfx_hook, 0x1613, 0x5d34);
+  func_5d31_after_tree_gfx(gb, sp0_);
+}
+
+void func_5d31__afterCall5d34_hook(GB *gb) {
+  func_5d31_after_tree_gfx(gb, gb->sp);
+}
+
+void func_7f55_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x7f55, 0x7f58); A = mem_rd(gb, 0xc6ec);
+  CYC(0x7f58, 0x7f59); E = A;
+  CYC(0x7f59, 0x7f5c); SET_HL(0x7f7b);
+  CALL_ROM(0x7f5c, 0x1e43);
+  if (F & FC) {
+    CYCT(0x7f5f, 0x7f60); ret_effect(gb); return;
+  }
+  CYC(0x7f5f, 0x7f60);
+  CYC(0x7f60, 0x7f63); SET_HL(0x7f73);
+  CALL_ROM(0x7f63, 0x19c0);
+  if (F & FZ) CYCT(0x7f66, 0x7f68);
+  else {
+    CYC(0x7f66, 0x7f68);
+    CYC(0x7f68, 0x7f6a); A = 0x04;
+    CYC(0x7f6a, 0x7f6b); bank1_add_a_to_hl_from_rst(gb, 0x7f6b);
+  }
+  CYC(0x7f6b, 0x7f6d); B = 0x04;
+  CYC(0x7f6d, 0x7f70); SET_DE(0xc6ec);
+  CYC(0x7f70, 0x7f73); hook_continue(gb, 0x048b, sp0_);
+}
+
+void func_7f90_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x7f90, 0x7f93); SET_HL(0x7d20);
+  CYC(0x7f93, 0x7f95); E = 0x03;
+  CALL_C(0x7f95, interBankCall_hook, 0x008a, 0x7f98);
+  CALL_ROM(0x7f98, 0x1aca);
+  CYC(0x7f9b, 0x7f9e); updateAllObjects__jump34ad_hook(gb);
+}
+
+void func_7fb5_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x7fb5, 0x7fb8); SET_HL(0x7d20);
+  CYC(0x7fb8, 0x7fba); E = 0x03;
+  CALL_C(0x7fba, interBankCall_hook, 0x008a, 0x7fbd);
+  CALL_ROM(0x7fbd, 0x1ae4);
+  CYC(0x7fc0, 0x7fc3); hook_continue(gb, 0x34c7, sp0_);
+}

@@ -2476,3 +2476,9 @@ cutscene15__state1__substate2__afterCall4ca4
 cutscene18
 cutscene18__afterCall4d27
 cutscene19
+func_5d31
+func_5d31__afterCall5d34
+func_7f55
+func_7f90
+func_7fb5
+updateAllObjects__jump34ad

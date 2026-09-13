@@ -9106,6 +9106,8 @@ void loadLinkAndCompanionAnimationFrame_hook(GB *gb) {
   ret_effect(gb);
 }
 
+static void update_all_objects_after_bank6_selected(GB *gb, uint16_t sp0_);
+
 void updateAllObjects_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x345b, 0x345d); A = H8(hRomBank);
@@ -9129,7 +9131,13 @@ void updateAllObjects_hook(GB *gb) {
   CYC(0x34a7, 0x34a8);
   if (F & FC) CALL_C_CC(0x34a8, func_410d_hook, 0x410d, 0x34ab);
   else CYC(0x34a8, 0x34ab);
-  switch_bank(gb, 0x34ab, 0x06);
+  CYC(0x34ab, 0x34ad); A = 0x06;
+  update_all_objects_after_bank6_selected(gb, sp0_);
+}
+
+static void update_all_objects_after_bank6_selected(GB *gb, uint16_t sp0_) {
+  CYC(0x34ad, 0x34af); H8(hRomBank) = A;
+  CYC(0x34af, 0x34b2); mem_wr(gb, MBC_ROM_BANK, A);
   CYC(0x34b2, 0x34b5); A = W8(wLinkGrabState);
   alu_rlca(gb);
   CYC(0x34b5, 0x34b6);
@@ -9154,6 +9162,10 @@ void updateAllObjects_hook(GB *gb) {
   CYC(0x34f5, 0x34f8); mem_wr(gb, MBC_ROM_BANK, A);
   CYC(0x34f8, 0x34f9);
   ret_effect(gb);
+}
+
+void updateAllObjects__jump34ad_hook(GB *gb) {
+  update_all_objects_after_bank6_selected(gb, gb->sp);
 }
 
 void updateSpecialObjectsAndInteractions_hook(GB *gb) {

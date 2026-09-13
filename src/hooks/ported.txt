@@ -2254,6 +2254,8 @@ func_5c6b__afterCall5c74
 cutscene15__state1__substate2
 cutscene15__state1__substate2__afterCall4ca4
 cutscene18__afterCall4d27
+func_5d31__afterCall5d34
+updateAllObjects__jump34ad
 encodeSecretData_paramC
 encodeSecretData
 loadUnpackedSecretData

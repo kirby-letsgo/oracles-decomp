@@ -789,3 +789,5 @@
 01:4c74 cutscene15__state1__substate2
 01:4ca4 cutscene15__state1__substate2__afterCall4ca4
 01:4d27 cutscene18__afterCall4d27
+01:5d34 func_5d31__afterCall5d34
+00:34ad updateAllObjects__jump34ad

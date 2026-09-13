@@ -645,6 +645,7 @@
 00:c4b7 wRamFunction -
 00:3034 enemyCodeNil_hook -
 00:3080 getEntryFromObjectTable1_hook -
+00:34ad updateAllObjects__jump34ad_hook -
 00:016c resetGame__afterSp016c_hook -
 00:091a _nextThread__afterSp091a_hook H
 00:0925 startGame__afterSp0925_hook H
@@ -1646,15 +1647,11 @@
 01:5a60 func_5a60_hook -
 01:5c6b func_5c6b_hook -
 01:5cfe func_5cfe_hook -
-01:5d31 func_5d31 -
-01:5d34 func_5d31__afterCall5d34 L
+01:5d31 func_5d31_hook -
 01:5d41 func_5d41_hook -
-01:7f55 func_7f55 -
-01:7f73 func_7f55__data L
-01:7f7b func_7f55__data2 L
-01:7f90 func_7f90 -
-01:7f9e func_7f90__data L
-01:7fb5 func_7fb5 -
+01:7f55 func_7f55_hook -
+01:7f90 func_7f90_hook -
+01:7fb5 func_7fb5_hook -
 01:598f initializeGame__notGbaMode_hook -
 01:59ac initializeGame__fixRespawnForGbc_hook -
 01:5a00 initializeGame__resetHealth_hook -
@@ -1670,6 +1667,7 @@
 01:4c74 cutscene15__state1__substate2_hook -
 01:4ca4 cutscene15__state1__substate2__afterCall4ca4_hook -
 01:4d27 cutscene18__afterCall4d27_hook -
+01:5d34 func_5d31__afterCall5d34_hook -
 01:5c18 func_5c18_hook -
 01:60b5 initializeSeedTreeRefillData_hook -
 01:7b9d func_7b93__state0_hook -
