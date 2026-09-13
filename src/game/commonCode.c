@@ -403,7 +403,7 @@ pull_into_hole:
   CYC(0x437e, 0x4380); A = 0x80;
   CYC(0x4380, 0x4383); W8(wcc92) = A;
   CYC(0x4383, 0x4386);
-  linkPullIntoHole(gb);
+  linkPullIntoHole_hook(gb);
   return;
 
 ice:
