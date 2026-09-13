@@ -281,6 +281,12 @@ Updated 2026-09-13. Newest entries at the top of each section.
   color changer, extendable bridge, trigger translator, tile filler, Bipin, Adlar, the librarian,
   and Blossom. One hundred three parent-owned local/data rows disappeared; the project now has
   3,395 readable hooks out of 11,464, and bank 08 is 30/698.
+  Batch 157 added the dungeon-events dispatcher with all twenty-five subids and its thirteen tile,
+  switch, chest, puff, and key helpers, the Veran cutscene wallmaster and face, the old man with
+  rupees, the Nayru-music trigger, the whole shooting gallery (NPC, game, and nine helpers), the
+  fake octoroks, the smog boss, and the triforce stone. One hundred twenty-four parent-owned
+  local/data rows disappeared; the project now has 3,453 readable hooks out of 11,340, and bank
+  08 is 88/574.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -386,6 +392,21 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 157 (58 hook entries, 72 readable functions): added the
+  bank-08 dungeon-events dispatcher (26-entry table, twenty-five subids, thirteen tile/switch/
+  chest/puff/key helpers, one caller-escaping `pop hl` helper), the Veran cutscene wallmaster and
+  face, the old man with rupees, the Nayru-music trigger, the complete shooting gallery (NPC, game,
+  nine helpers, one cross-bank `_b08` canonical name), the fake octoroks, the smog boss with its
+  enemy-slot scans, and the triforce stone. One hundred twenty-four parent-owned local/data rows
+  were absorbed. `ENEMY_BASE`/`PART_BASE` joined `INTERACTION_BASE` in `game.h`. Two independent
+  instruction reviews per routine verified all forty rst tables, every local-call frame, the
+  SVBK sequence, and every RAM operand with no defects. Four hooks run in the movie directly
+  (triforce stone 1,074 verified calls, fake octorok 750, dungeon events 499 in replay, Nayru
+  music 4), the dungeon-events subids through their root. The project now has 3,453 readable hooks
+  out of 11,340; bank 08 is 88/574. Gates: lint 0, 30k verify 0 failures across 4,583,349 calls
+  with state `3e450c2620a3f6a3`, whole-movie verify 0 failures across 44,199,623 calls, full
+  reference replay 0 state-hash mismatches with state `a62ae98192befee8`, normal and quirk suites
+  8/8.
 - 2026-09-13: milestone 3 phase 6 batch 156 (15 hook entries, 78 readable functions): added the
   first fourteen Ages-only bank-08 interaction files: toggle floor with its cross-bank
   `getLinkTilePosition` helper, colored cube and colored-cube flame, minecart gate, special warp,

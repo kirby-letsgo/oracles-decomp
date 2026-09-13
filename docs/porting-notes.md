@@ -1023,3 +1023,11 @@ desync to discover; keep them when porting routines.
   HL through `rst $18`, never executed. Batch 156 left them out of the readable file and let the rows
   disappear with their parent. A raw `$cfc1`/`$cfc2` in the disassembly with no `ram.h` name is
   written as `wTmpcfc0 + 1`/`+ 2`; lint rejects the bare literal.
+- A readable root that dispatches to sibling hooks by direct C call leaves those siblings' call
+  counters at zero in every report: `interactionCode21_hook` ran 499 times in the batch-157 replay
+  while its twenty-five `interaction21_subidNN_hook` entries all show 0, because `call_hook` only
+  counts interpreter-dispatched entries. Judge coverage by the root's count plus the reference
+  replay, as the porting notes already say for the interrupt vectors.
+- Enemy and part fields follow the same struct layout as interactions at `$80` and `$c0`;
+  `ENEMY_BASE`/`PART_BASE` in `game.h` pair with the same `OBJ_*` offsets (`ENEMY_BASE + OBJ_YH` for
+  `Enemy.yh`). A `ld hl,Part.counter2` with `h` set from a part slot is `L = PART_BASE + OBJ_COUNTER2`.

@@ -357,6 +357,8 @@
 #define OBJ_X 0x0c
 #define OBJ_SCRIPT_PTR 0x18
 #define INTERACTION_BASE 0x40
+#define ENEMY_BASE 0x80
+#define PART_BASE 0xc0
 #define ENEMY_SLOTS 0xd080
 #define PART_SLOTS 0xd0c0
 
