@@ -21,6 +21,20 @@ static void add_double_index_to_hl_from_rst(GB *gb, uint16_t return_address) {
   burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
 }
 
+static void add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, false);
+    burn_rom(gb, 0x00, 0x0013, 0x0014, false); H = alu_inc8(gb, H);
+    burn_rom(gb, 0x00, 0x0014, 0x0015, false);
+  } else {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, true);
+  }
+  ret_effect(gb);
+}
+
 static void interactable_tiles_jump_table_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -309,4 +323,487 @@ void checkAndDecKeyCount_hook(GB *gb) {
   CYC(0x436a, 0x436c); mem_wr(gb, HL, mem_rd(gb, HL) | 0x10);
   CYC(0x436c, 0x436d); alu_or(gb, H);
   CYC(0x436d, 0x436e); ret_effect(gb);
+}
+
+static void facing_bottom_abort(GB *gb) {
+  CYC(0x410b, 0x410c); SET_AF(pop_effect(gb));
+  CYC(0x410c, 0x410d); alu_xor(gb, A);
+  CYC(0x410d, 0x410e); ret_effect(gb);
+}
+
+void checkFacingBottomOfTile_hook(GB *gb) {
+  CYC(0x40f6, 0x40f9); A = mem_rd(gb, w1Link_direction);
+  CYC(0x40f9, 0x40fc); SET_HL(0x4107);
+  CYC(0x40fc, 0x40fd); add_a_to_hl_from_rst(gb, 0x40fd);
+  CYC(0x40fd, 0x4100); A = mem_rd(gb, w1Link_adjacentWallsBitset);
+  CYC(0x4100, 0x4101); alu_and(gb, mem_rd(gb, HL));
+  CYC(0x4101, 0x4102); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) {
+    CYCT(0x4102, 0x4104); facing_bottom_abort(gb); return;
+  }
+  CYC(0x4102, 0x4104);
+  CYC(0x4104, 0x4106); alu_cp(gb, 0xc0);
+  CYC(0x4106, 0x4107); ret_effect(gb);
+}
+
+void checkFacingBottomOfTileAndPressedA_hook(GB *gb) {
+  CYC(0x40ef, 0x40f2); A = W8(wGameKeysJustPressed);
+  CYC(0x40f2, 0x40f4); alu_and(gb, 0x01);
+  if (F & FZ) {
+    CYCT(0x40f4, 0x40f6); facing_bottom_abort(gb); return;
+  }
+  CYC(0x40f4, 0x40f6);
+  checkFacingBottomOfTile_hook(gb);
+}
+
+void nextToChestTile_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x402d, checkFacingBottomOfTileAndPressedA_hook, 0x40ef, 0x4030);
+  if (F & FZ) {
+    CYCT(0x4030, 0x4032);
+  } else {
+    CYC(0x4030, 0x4032);
+    CYC(0x4032, 0x4035); SET_BC(0x510d);
+    CALL_C(0x4035, showText_hook, 0x1872, 0x4038);
+    CYC(0x4038, 0x4039); alu_scf(gb);
+    CYC(0x4039, 0x403a); ret_effect(gb); return;
+  }
+  CYC(0x403a, 0x403d); A = W8(wInShop);
+  CYC(0x403d, 0x403e); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x403e, 0x4040); goto open_chest;
+  }
+  CYC(0x403e, 0x4040);
+  CYC(0x4040, 0x4043); A = W8(wcca1);
+  CYC(0x4043, 0x4044); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x4044, 0x4046); goto open_chest;
+  }
+  CYC(0x4044, 0x4046);
+  CYC(0x4046, 0x4049); A = W8(wcca2);
+  CYC(0x4049, 0x404a); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x404a, 0x404b); ret_effect(gb); return;
+  }
+  CYC(0x404a, 0x404b);
+
+open_chest:
+  CYC(0x404b, 0x404c); A = C;
+  CYC(0x404c, 0x404f); W8(wcca2) = A;
+  CYC(0x404f, 0x4051); A = 0xf0;
+  CALL_C(0x4051, setTile_hook, 0x3a9c, 0x4054);
+  CYC(0x4054, 0x4056); A = 0x6c;
+  CALL_C(0x4056, playSound_b00_hook, 0x0c98, 0x4059);
+  CYC(0x4059, 0x405c); A = W8(wInShop);
+  CYC(0x405c, 0x405d); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x405d, 0x405e); ret_effect(gb); return;
+  }
+  CYC(0x405d, 0x405e);
+  CYC(0x405e, 0x4061); A = W8(wcca1);
+  CYC(0x4061, 0x4062); alu_or(gb, A);
+  CYC(0x4062, 0x4063); alu_scf(gb);
+  if (!(F & FZ)) {
+    CYCT(0x4063, 0x4064); ret_effect(gb); return;
+  }
+  CYC(0x4063, 0x4064);
+  CYC(0x4064, 0x4067); SET_HL(w1ReservedInteraction0);
+  CYC(0x4067, 0x4069); B = 0x40;
+  CALL_C(0x4069, clearMemory_hook, 0x046f, 0x406c);
+  CYC(0x406c, 0x406f); A = W8(wChestContentsOverride);
+  CYC(0x406f, 0x4070); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x4070, 0x4072);
+    CALL_C(0x4079, getChestData_hook, 0x10cc, 0x407c);
+  } else {
+    CYC(0x4070, 0x4072);
+    CYC(0x4072, 0x4073); B = A;
+    CYC(0x4073, 0x4076); A = mem_rd(gb, wChestContentsOverride + 1);
+    CYC(0x4076, 0x4077); C = A;
+    CYC(0x4077, 0x4079);
+  }
+  CYC(0x407c, 0x407d); A = B;
+  CYC(0x407d, 0x407e); alu_or(gb, A);
+  if (F & FZ) {
+    CYCT(0x407e, 0x4080); goto record_opened;
+  }
+  CYC(0x407e, 0x4080);
+  CYC(0x4080, 0x4082); A = 0x83;
+  CYC(0x4082, 0x4085); W8(wDisabledObjects) = A;
+  CYC(0x4085, 0x4088); W8(wDisableLinkCollisionsAndMenu) = A;
+  CYC(0x4088, 0x408b); SET_HL(w1ReservedInteraction0_enabled);
+  CYC(0x408b, 0x408d); A = 0x81;
+  CYC(0x408d, 0x408e); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x408e, 0x4090); mem_wr(gb, HL, 0x60);
+  CYC(0x4090, 0x4091); L = alu_inc8(gb, L);
+  CYC(0x4091, 0x4092); mem_wr(gb, HL, B);
+  CYC(0x4092, 0x4093); L = alu_inc8(gb, L);
+  CYC(0x4093, 0x4094); mem_wr(gb, HL, C);
+  CYC(0x4094, 0x4096); L = 0x4b;
+  CYC(0x4096, 0x4099); A = W8(wcca2);
+  CYC(0x4099, 0x409a); B = A;
+  CYC(0x409a, 0x409c); alu_and(gb, 0xf0);
+  CYC(0x409c, 0x409d); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x409d, 0x409e); L = alu_inc8(gb, L);
+  CYC(0x409e, 0x409f); A = B;
+  CYC(0x409f, 0x40a1); A = alu_swap(gb, A);
+  CYC(0x40a1, 0x40a3); alu_and(gb, 0xf0);
+  CYC(0x40a3, 0x40a5); alu_or(gb, 0x08);
+  CYC(0x40a5, 0x40a6); mem_wr(gb, HL, A);
+
+record_opened:
+  CALL_C(0x40a6, getThisRoomFlags_hook, 0x197d, 0x40a9);
+  CYC(0x40a9, 0x40ab); mem_wr(gb, HL, mem_rd(gb, HL) | 0x20);
+  CYC(0x40ab, 0x40ac); alu_xor(gb, A);
+  CYC(0x40ac, 0x40af); W8(wChestContentsOverride) = A;
+  CYC(0x40af, 0x40b2); mem_wr(gb, wChestContentsOverride + 1, A);
+  CYC(0x40b2, 0x40b3); alu_scf(gb);
+  CYC(0x40b3, 0x40b4); ret_effect(gb);
+}
+
+void nextToSignTile_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x40b4, checkFacingBottomOfTileAndPressedA_hook, 0x40ef, 0x40b7);
+  CYC(0x40b7, 0x40ba); SET_BC(0x510e);
+  if (!(F & FZ)) {
+    CYCT(0x40ba, 0x40bc); goto show_text;
+  }
+  CYC(0x40ba, 0x40bc);
+  CYC(0x40bc, 0x40bf); A = W8(wActiveGroup);
+  CYC(0x40bf, 0x40c2); SET_HL(0x7784);
+  CYC(0x40c2, 0x40c3); add_double_index_to_hl_from_rst(gb, 0x40c3);
+  CYC(0x40c3, 0x40c4); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x40c4, 0x40c5); H = mem_rd(gb, HL);
+  CYC(0x40c5, 0x40c6); L = A;
+  CYC(0x40c6, 0x40c9); A = W8(wActiveRoom);
+  CYC(0x40c9, 0x40ca); B = A;
+  CYC(0x40ca, 0x40cc); A = H8(hFF8D);
+  CYC(0x40cc, 0x40cd); C = A;
+  for (;;) {
+    CYC(0x40cd, 0x40ce); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(0x40ce, 0x40cf); alu_or(gb, A);
+    if (F & FZ) {
+      CYCT(0x40cf, 0x40d1);
+      CYC(0x40e7, 0x40ea); SET_BC(0x0901);
+      goto show_text;
+    }
+    CYC(0x40cf, 0x40d1);
+    CYC(0x40d1, 0x40d2); alu_cp(gb, C);
+    if (F & FZ) {
+      CYCT(0x40d2, 0x40d4);
+      CYC(0x40d8, 0x40d9); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(0x40d9, 0x40da); alu_cp(gb, B);
+      if (F & FZ) {
+        CYCT(0x40da, 0x40dc);
+        CYC(0x40df, 0x40e0); C = mem_rd(gb, HL);
+        CYC(0x40e0, 0x40e2); B = 0x2e;
+        CALL_C(0x40e2, showText_hook, 0x1872, 0x40e5);
+        CYC(0x40e5, 0x40e6); alu_scf(gb);
+        CYC(0x40e6, 0x40e7); ret_effect(gb); return;
+      }
+      CYC(0x40da, 0x40dc);
+      CYC(0x40dc, 0x40dd); SET_HL(HL + 1);
+      CYC(0x40dd, 0x40df);
+    } else {
+      CYC(0x40d2, 0x40d4);
+      CYC(0x40d4, 0x40d5); SET_HL(HL + 1);
+      CYC(0x40d5, 0x40d6); SET_HL(HL + 1);
+      CYC(0x40d6, 0x40d8);
+    }
+  }
+
+show_text:
+  CALL_C(0x40ea, showText_hook, 0x1872, 0x40ed);
+  CYC(0x40ed, 0x40ee); alu_scf(gb);
+  CYC(0x40ee, 0x40ef); ret_effect(gb);
+}
+
+void nextToPushableBlock_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x410e, 0x4111); A = W8(wTilesetFlags);
+  CYC(0x4111, 0x4113); alu_and(gb, 0x40);
+  if (!(F & FZ)) {
+    CYCT(0x4113, 0x4114); ret_effect(gb); return;
+  }
+  CYC(0x4113, 0x4114);
+  CALL_C(0x4114, specialObjectCheckPushingAgainstTile_hook, 0x4329, 0x4117);
+  if (F & FZ) {
+    CYCT(0x4117, 0x411a); resetPushingAgainstTileCounter_hook(gb); return;
+  }
+  CYC(0x4117, 0x411a);
+  CALL_C(0x411a, decPushingAgainstTileCounter_hook, 0x4212, 0x411d);
+  if (!(F & FZ)) {
+    CYCT(0x411d, 0x411e); ret_effect(gb); return;
+  }
+  CYC(0x411d, 0x411e);
+  CYC(0x411e, 0x4120); alu_bit(gb, 6, B);
+  if (F & FZ) {
+    CYCT(0x4120, 0x4122); goto check_direction;
+  }
+  CYC(0x4120, 0x4122);
+  CYC(0x4122, 0x4124); A = 0x16;
+  CALL_C(0x4124, checkTreasureObtained_hook, 0x1748, 0x4127);
+  CYC(0x4127, 0x4129); A = 0x03;
+  if (!(F & FC)) {
+    CYCT(0x4129, 0x412c); showInfoTextForTile_hook(gb); return;
+  }
+  CYC(0x4129, 0x412c);
+
+check_direction:
+  CYC(0x412c, 0x412e); alu_bit(gb, 7, B);
+  if (!(F & FZ)) {
+    CYCT(0x412e, 0x4130); goto check_destination;
+  }
+  CYC(0x412e, 0x4130);
+  CYC(0x4130, 0x4131); A = B;
+  CYC(0x4131, 0x4133); A = alu_swap(gb, A);
+  CYC(0x4133, 0x4135); alu_and(gb, 0x03);
+  CYC(0x4135, 0x4136); L = A;
+  CYC(0x4136, 0x4139); A = W8(wLinkPushingDirection);
+  CYC(0x4139, 0x413a); alu_cp(gb, L);
+  if (!(F & FZ)) {
+    CYCT(0x413a, 0x413c); goto end;
+  }
+  CYC(0x413a, 0x413c);
+
+check_destination:
+  CALL_C(0x413c, checkTileAfterNext_hook, 0x4398, 0x413f);
+  if (!(F & FC)) {
+    CYCT(0x413f, 0x4141); goto end;
+  }
+  CYC(0x413f, 0x4141);
+  CYC(0x4141, 0x4143); A = H8(hFF8B);
+  CYC(0x4143, 0x4145); alu_cp(gb, 0xda);
+  if (F & FZ) {
+    CYCT(0x4145, 0x4147); goto somaria_block;
+  }
+  CYC(0x4145, 0x4147);
+  CYC(0x4147, 0x414a); SET_HL(w1ReservedInteraction1_enabled);
+  CYC(0x414a, 0x414b); A = mem_rd(gb, HL);
+  CYC(0x414b, 0x414c); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x414c, 0x414e); goto end;
+  }
+  CYC(0x414c, 0x414e);
+  CYC(0x414e, 0x4150); mem_wr(gb, HL, 0x01);
+  CYC(0x4150, 0x4151); L = alu_inc8(gb, L);
+  CYC(0x4151, 0x4153); mem_wr(gb, HL, 0x14);
+  CYC(0x4153, 0x4156); A = W8(wLinkPushingDirection);
+  CYC(0x4156, 0x4158); A = alu_swap(gb, A);
+  CYC(0x4158, 0x4159); alu_rrca(gb);
+  CYC(0x4159, 0x415b); L = 0x49;
+  CYC(0x415b, 0x415c); mem_wr(gb, HL, A);
+  CYC(0x415c, 0x415e); A = H8(hFF8D);
+  CYC(0x415e, 0x4160); L = 0x70;
+  CYC(0x4160, 0x4161); mem_wr(gb, HL, A);
+  CYC(0x4161, 0x4163); L = 0x4b;
+  CALL_C(0x4163, setShortPosition_hook, 0x20b8, 0x4166);
+  CYC(0x4166, 0x4168); L = 0x4b;
+  CYC(0x4168, 0x4169); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x4169, 0x416a); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x416a, 0x416c); A = H8(hFF8B);
+  CYC(0x416c, 0x416e); alu_cp(gb, 0xd9);
+  if (!(F & FZ)) {
+    CYCT(0x416e, 0x4170); goto end;
+  }
+  CYC(0x416e, 0x4170);
+  CYC(0x4170, 0x4173); A = W8(wTilesetFlags);
+  CYC(0x4173, 0x4175); alu_and(gb, 0x01);
+  if (F & FZ) {
+    CYCT(0x4175, 0x4177); goto end;
+  }
+  CYC(0x4175, 0x4177);
+  CYC(0x4177, 0x417a); W8(wDisabledObjects) = A;
+  goto end;
+
+somaria_block:
+  CYC(0x417e, 0x4180); C = 0x18;
+  CALL_C(0x4180, findItemWithID_hook, 0x22b9, 0x4183);
+  if (!(F & FZ)) {
+    CYCT(0x4183, 0x4185); goto end;
+  }
+  CYC(0x4183, 0x4185);
+  CYC(0x4185, 0x4187); L = 0x2f;
+  CYC(0x4187, 0x4189); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
+  CYC(0x4189, 0x418c); A = W8(wLinkPushingDirection);
+  CYC(0x418c, 0x418e); L = 0x08;
+  CYC(0x418e, 0x418f); mem_wr(gb, HL, A);
+  CYC(0x418f, 0x4191);
+
+end:
+  CYC(0x417a, 0x417b); alu_xor(gb, A);
+  CYC(0x417b, 0x417e); resetPushingAgainstTileCounter_hook(gb);
+}
+
+void nextToKeyBlock_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x4191, specialObjectCheckPushingAgainstTile_hook, 0x4329, 0x4194);
+  if (F & FZ) {
+    CYCT(0x4194, 0x4197); resetPushingAgainstTileCounter_hook(gb); return;
+  }
+  CYC(0x4194, 0x4197);
+  CALL_C(0x4197, decPushingAgainstTileCounter_hook, 0x4212, 0x419a);
+  if (!(F & FZ)) {
+    CYCT(0x419a, 0x419b); ret_effect(gb); return;
+  }
+  CYC(0x419a, 0x419b);
+  CALL_C(0x419b, checkAndDecKeyCount_hook, 0x4350, 0x419e);
+  CYC(0x419e, 0x41a0); A = 0x02;
+  if (F & FZ) {
+    CYCT(0x41a0, 0x41a3); showInfoTextForTile_hook(gb); return;
+  }
+  CYC(0x41a0, 0x41a3);
+  CALL_C(0x41a3, createKeySpriteInteraction_hook, 0x4288, 0x41a6);
+  CYC(0x41a6, 0x41a8); A = 0xa0;
+  CALL_C(0x41a8, setTile_hook, 0x3a9c, 0x41ab);
+  CYC(0x41ab, 0x41ad); A = 0x6c;
+  CALL_C(0x41ad, playSound_b00_hook, 0x0c98, 0x41b0);
+  CALL_C(0x41b0, getThisRoomFlags_hook, 0x197d, 0x41b3);
+  CYC(0x41b3, 0x41b5); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
+  CALL_C(0x41b5, getFreeInteractionSlot_hook, 0x3aef, 0x41b8);
+  if (!(F & FZ)) {
+    CYCT(0x41b8, 0x41ba); goto finish;
+  }
+  CYC(0x41b8, 0x41ba);
+  CYC(0x41ba, 0x41bc); mem_wr(gb, HL, 0x05);
+  CYC(0x41bc, 0x41be); L = 0x4b;
+  CYC(0x41be, 0x41c0); A = H8(hFF8D);
+  CALL_C(0x41c0, setShortPosition_hook, 0x20b8, 0x41c3);
+
+finish:
+  CYC(0x41c3, 0x41c4); alu_xor(gb, A);
+  CYC(0x41c4, 0x41c6); resetPushingAgainstTileCounter_hook(gb);
+}
+
+void nextToKeyDoor_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x41c6, specialObjectCheckPushingAgainstTile_hook, 0x4329, 0x41c9);
+  if (F & FZ) {
+    CYCT(0x41c9, 0x41cb); resetPushingAgainstTileCounter_hook(gb); return;
+  }
+  CYC(0x41c9, 0x41cb);
+  CALL_C(0x41cb, decPushingAgainstTileCounter_hook, 0x4212, 0x41ce);
+  if (F & FZ) {
+    CYCT(0x41ce, 0x41d0); goto check_key;
+  }
+  CYC(0x41ce, 0x41d0);
+  CYC(0x41d0, 0x41d1); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(0x41d1, 0x41d2); ret_effect(gb); return;
+  }
+  CYC(0x41d1, 0x41d2);
+
+check_key:
+  CALL_C(0x41d2, checkAndDecKeyCount_hook, 0x4350, 0x41d5);
+  if (F & FZ) {
+    CYCT(0x41d5, 0x41d7); goto no_key;
+  }
+  CYC(0x41d5, 0x41d7);
+  CYC(0x41d7, 0x41da); SET_HL(w1ReservedInteraction0_enabled);
+  CYC(0x41da, 0x41db); A = mem_rd(gb, HL);
+  CYC(0x41db, 0x41dc); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYCT(0x41dc, 0x41de); goto finish;
+  }
+  CYC(0x41dc, 0x41de);
+  CALL_C(0x41de, createKeySpriteInteraction_hook, 0x4288, 0x41e1);
+  CYC(0x41e1, 0x41e4); SET_HL(w1ReservedInteraction0_enabled);
+  CYC(0x41e4, 0x41e6); mem_wr(gb, HL, 0x01);
+  CYC(0x41e6, 0x41e7); L = alu_inc8(gb, L);
+  CYC(0x41e7, 0x41e9); mem_wr(gb, HL, 0x1e);
+  CYC(0x41e9, 0x41eb); A = H8(hFF8D);
+  CYC(0x41eb, 0x41ed); L = 0x4b;
+  CYC(0x41ed, 0x41ee); mem_wr(gb, HL, A);
+  CYC(0x41ee, 0x41f0); L = 0x49;
+  CYC(0x41f0, 0x41f1); A = B;
+  CYC(0x41f1, 0x41f3); A = alu_swap(gb, A);
+  CYC(0x41f3, 0x41f5); alu_and(gb, 0x0f);
+  CYC(0x41f5, 0x41f6); alu_add(gb, A);
+  CYC(0x41f6, 0x41f7); mem_wr(gb, HL, A);
+  CYC(0x41f7, 0x41f8); push_effect(gb, DE);
+  CYC(0x41f8, 0x41f9); alu_add(gb, A);
+  CALL_C(0x41f9, setRoomFlagsForUnlockedKeyDoor_hook, 0x11fc, 0x41fc);
+  CYC(0x41fc, 0x41fd); SET_DE(pop_effect(gb));
+
+finish:
+  CYC(0x41fd, 0x41fe); alu_xor(gb, A);
+  CYC(0x41fe, 0x4200); resetPushingAgainstTileCounter_hook(gb);
+  return;
+
+no_key:
+  CYC(0x4200, 0x4201); A = B;
+  CYC(0x4201, 0x4203); alu_cp(gb, 0x40);
+  CYC(0x4203, 0x4205); A = 0x01;
+  if (!(F & FC)) {
+    CYCT(0x4205, 0x4208); showInfoTextForTile_hook(gb); return;
+  }
+  CYC(0x4205, 0x4208);
+  CYC(0x4208, 0x4209); alu_xor(gb, A);
+  CYC(0x4209, 0x420c); showInfoTextForTile_hook(gb);
+}
+
+void nextToOverworldKeyhole_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x4217, getThisRoomFlags_hook, 0x197d, 0x421a);
+  CYC(0x421a, 0x421c); alu_and(gb, 0x80);
+  if (!(F & FZ)) {
+    CYCT(0x421c, 0x421d); ret_effect(gb); return;
+  }
+  CYC(0x421c, 0x421d);
+  CALL_C(0x421d, specialObjectCheckPushingAgainstTile_hook, 0x4329, 0x4220);
+  if (F & FZ) {
+    CYCT(0x4220, 0x4222); resetPushingAgainstTileCounter_hook(gb); return;
+  }
+  CYC(0x4220, 0x4222);
+  CALL_C(0x4222, checkFacingBottomOfTile_hook, 0x40f6, 0x4225);
+  if (F & FZ) {
+    CYCT(0x4225, 0x4227);
+  } else {
+    CYC(0x4225, 0x4227);
+    CYC(0x4227, 0x4228); alu_xor(gb, A);
+    CYC(0x4228, 0x4229); ret_effect(gb); return;
+  }
+  CALL_C(0x4229, decPushingAgainstTileCounter_hook, 0x4212, 0x422c);
+  if (F & FZ) {
+    CYCT(0x422c, 0x422e);
+  } else {
+    CYC(0x422c, 0x422e);
+    CYC(0x422e, 0x422f); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+    if (!(F & FZ)) {
+      CYCT(0x422f, 0x4230); ret_effect(gb); return;
+    }
+    CYC(0x422f, 0x4230);
+  }
+  CYC(0x4230, 0x4233); A = W8(wActiveRoom);
+  CYC(0x4233, 0x4236); SET_HL(0x4267);
+  CALL_C(0x4236, findRoomSpecificData_hook, 0x1dfe, 0x4239);
+  CYC(0x4239, 0x423a); B = A;
+  if (!(F & FC)) {
+    CYCT(0x423a, 0x423c); jumpToShowInfoText_hook(gb); return;
+  }
+  CYC(0x423a, 0x423c);
+  CALL_C(0x423c, checkTreasureObtained_hook, 0x1748, 0x423f);
+  if (!(F & FC)) {
+    CYCT(0x423f, 0x4241); jumpToShowInfoText_hook(gb); return;
+  }
+  CYC(0x423f, 0x4241);
+  CYC(0x4241, 0x4243); A = 0x6c;
+  CALL_C(0x4243, playSound_b00_hook, 0x0c98, 0x4246);
+  CALL_C(0x4246, getThisRoomFlags_hook, 0x197d, 0x4249);
+  CYC(0x4249, 0x424b); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
+  CYC(0x424b, 0x424e); SET_HL(wTmpcfc0);
+  CYC(0x424e, 0x4250); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
+  CALL_C(0x4250, createKeySpriteInteraction_hook, 0x4288, 0x4253);
+  CYC(0x4253, 0x4255); L = 0x41;
+  CYC(0x4255, 0x4256); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x4256, 0x4257); A = B;
+  CYC(0x4257, 0x4259); alu_sub(gb, 0x42);
+  CYC(0x4259, 0x425b); L = 0x42;
+  CYC(0x425b, 0x425c); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x425c, 0x425d); mem_wr(gb, HL, A);
+  CYC(0x425d, 0x425f); A = 0x81;
+  CYC(0x425f, 0x4262); W8(wDisabledObjects) = A;
+  CYC(0x4262, 0x4265); W8(wMenuDisabled) = A;
+  CYC(0x4265, 0x4266); alu_scf(gb);
+  CYC(0x4266, 0x4267); ret_effect(gb);
 }

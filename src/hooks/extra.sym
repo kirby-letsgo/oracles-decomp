@@ -905,3 +905,10 @@
 3f:45a4 giveTreasure_body__modea
 3f:45a8 giveTreasure_body__modec
 3f:45bc giveTreasure_body__moded
+3f:44f0 giveTreasure_body__findItemInTable
+3f:4501 giveTreasure_body__giveTreasure
+3f:4548 giveTreasure_body__applyParameter
+3f:45c7 giveTreasure_body__modee
+3f:45fe giveTreasure_body__modef
+3f:4614 giveTreasure_body__mode9
+3f:4629 giveTreasure_body__removeOneDuplicateRing

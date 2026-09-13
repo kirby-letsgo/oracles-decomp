@@ -1416,122 +1416,6 @@ void label_07_028(GB *gb) {
   I(0x4480, 4); applyDamageToEnemyOrPart(gb); return;  // jp $4707
 }
 
-// 07:44d9
-void collisionEffect20(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x44d9, 1); H = B;  // ld h,b
-  I(0x44da, 2); L = 0x01;  // ld l,$01
-  I(0x44dc, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x44dd, 2); alu_cp(gb, 0x28);  // cp $28
-  if (!(F & FC)) { I(0x44df, 3); goto L_44e5; } I(0x44df, 2);  // jr nc,$44e5
-  I(0x44e1, 2); L = 0x24;  // ld l,$24
-  I(0x44e3, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
-L_44e5:
-  CALL(0x44e5, func_07_47b7, 0x47b7, 0x44e8);  // call $47b7
-  if ((F & FZ)) { RET_TAKEN(0x44e8); return; } I(0x44e8, 2);  // ret z
-  I(0x44e9, 3); SET_HL(0x2444);  // ld hl,$2444
-  I(0x44ec, 3); if (hook_enabled_at(0x44f1)) { applyDamageToBothObjects_hook(gb); return; } HANDOFF(0x44f1);  // jr $44f1
-}
-
-// 07:44ee
-void collisionEffect22(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x44ee, 3); SET_HL(0x1c24);  // ld hl,$1c24
-  if (hook_enabled_at(0x44f1)) { applyDamageToBothObjects_hook(gb); return; } HANDOFF(0x44f1);  // fallthrough
-}
-
-// 07:44fb
-void collisionEffect26(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x44fb, 3); SET_HL(0x1c34);  // ld hl,$1c34
-  I(0x44fe, 3); if (hook_enabled_at(0x44f1)) { applyDamageToBothObjects_hook(gb); return; } HANDOFF(0x44f1);  // jr $44f1
-}
-
-// 07:4500
-void collisionEffect27(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4500, 1); H = B;  // ld h,b
-  I(0x4501, 2); L = 0x24;  // ld l,$24
-  I(0x4503, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
-  CALL(0x4505, func_07_47b7, 0x47b7, 0x4508);  // call $47b7
-  if ((F & FZ)) { RET_TAKEN(0x4508); return; } I(0x4508, 2);  // ret z
-  CALL(0x4509, createFlamePart, 0x46da, 0x450c);  // call $46da
-  I(0x450c, 3); SET_HL(0x1c2c);  // ld hl,$1c2c
-  I(0x450f, 3); if (hook_enabled_at(0x44f1)) { applyDamageToBothObjects_hook(gb); return; } HANDOFF(0x44f1);  // jr $44f1
-}
-
-// 07:4511
-void collisionEffect28(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4511, 1); H = B;  // ld h,b
-  I(0x4512, 2); L = 0x24;  // ld l,$24
-  I(0x4514, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
-  CALL(0x4516, func_07_47b7, 0x47b7, 0x4519);  // call $47b7
-  if ((F & FZ)) { RET_TAKEN(0x4519); return; } I(0x4519, 2);  // ret z
-  I(0x451a, 3); SET_HL(0x1c38);  // ld hl,$1c38
-  I(0x451d, 3); if (hook_enabled_at(0x44f1)) { applyDamageToBothObjects_hook(gb); return; } HANDOFF(0x44f1);  // jr $44f1
-}
-
-// 07:451f
-void collisionEffect3a(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x451f, 2); E = 0xad;  // ld e,$ad
-  I(0x4521, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4522, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4523); return; } I(0x4523, 2);  // ret nz
-  collisionEffect3d(gb); return;  // fallthrough
-}
-
-// 07:4524
-void collisionEffect3d(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4524, 4); A = mem_rd(gb, 0xd001);  // ld a,($d001)
-  I(0x4527, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x4528); return; } I(0x4528, 2);  // ret nz
-  I(0x4529, 4); A = mem_rd(gb, 0xcc6e);  // ld a,($cc6e)
-  I(0x452c, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x452d); return; } I(0x452d, 2);  // ret nz
-  I(0x452e, 2); A = 0x0d;  // ld a,$0d
-  I(0x4530, 4); mem_wr(gb, 0xcc4f, A);  // ld ($cc4f),a
-  I(0x4533, 3); SET_HL(0x2c1c);  // ld hl,$2c1c
-  I(0x4536, 3); if (hook_enabled_at(0x44f1)) { applyDamageToBothObjects_hook(gb); return; } HANDOFF(0x44f1);  // jr $44f1
-}
-
-// 07:4538
-void collisionEffect2b(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4538, 3); SET_HL(0x1c3c);  // ld hl,$1c3c
-  I(0x453b, 3); if (hook_enabled_at(0x44f1)) { applyDamageToBothObjects_hook(gb); return; } HANDOFF(0x44f1);  // jr $44f1
-}
-
-// 07:453d
-void collisionEffect2c(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x453d, 3); SET_HL(0x1430);  // ld hl,$1430
-  I(0x4540, 3); if (hook_enabled_at(0x44f1)) { applyDamageToBothObjects_hook(gb); return; } HANDOFF(0x44f1);  // jr $44f1
-}
-
-// 07:4542
-void collisionEffect2f(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4542, 3); SET_HL(0x3004);  // ld hl,$3004
-  I(0x4545, 3); if (hook_enabled_at(0x44f1)) { applyDamageToBothObjects_hook(gb); return; } HANDOFF(0x44f1);  // jr $44f1
-}
-
-// 07:4547
-void collisionEffect30(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4547, 3); SET_HL(0x1c44);  // ld hl,$1c44
-  I(0x454a, 3); if (hook_enabled_at(0x44f1)) { applyDamageToBothObjects_hook(gb); return; } HANDOFF(0x44f1);  // jr $44f1
-}
-
-// 07:454c
-void collisionEffect1c(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x454c, 3); SET_HL(0x1c1c);  // ld hl,$1c1c
-  I(0x454f, 3); if (hook_enabled_at(0x44f1)) { applyDamageToBothObjects_hook(gb); return; } HANDOFF(0x44f1);  // jr $44f1
-}
-
 // 07:4551
 void collisionEffect2e(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1541,7 +1425,7 @@ void collisionEffect2e(GB *gb) {
   I(0x4556, 1); L = A;  // ld l,a
   I(0x4557, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x4558, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4559, 3); collisionEffect1c(gb); return; } I(0x4559, 2);  // jr z,$454c
+  if ((F & FZ)) { I(0x4559, 3); if (hook_enabled_at(0x454c)) { collisionEffect1c_hook(gb); return; } HANDOFF(0x454c); } I(0x4559, 2);  // jr z,$454c
   I(0x455b, 1); A = L;  // ld a,l
   I(0x455c, 2); alu_add(gb, 0x05);  // add $05
   I(0x455e, 1); L = A;  // ld l,a

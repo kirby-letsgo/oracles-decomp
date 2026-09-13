@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 2,729 routine hooks rewritten across fifteen code
+  routine against the transliteration. Progress: 2,757 routine hooks rewritten across fifteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -185,6 +185,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   Batch 129 added thirteen more collision effects, all twelve simple treasure-parameter modes,
   and eight interactable-tile helpers. Eight parent-owned tile locals disappeared, leaving 2,729
   readable hooks out of 12,603.
+  Batch 130 completed `giveTreasure_body`, added twelve more collision effects and eight more
+  interactable-tile handlers, and removed sixteen parent-owned data/internal rows. The project now
+  has 2,757 readable hooks out of 12,587.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -290,6 +293,18 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-13: milestone 3 phase 6 batch 130 (28 routines): completed `giveTreasure_body` and its
+  remaining lookup, parameter-dispatch, mode, and duplicate-ring helpers; added twelve more bank-7
+  collision effects and eight more bank-6 chest, sign, pushable-block, key-block, key-door, and
+  overworld-keyhole handlers. Rewriting the treasure and tile parents removed sixteen generated
+  internal/data rows. Integration promoted seven durable treasure locals and upgraded bank 0's
+  `giveTreasure` edge to `CALL_C`, threading the enclosing SP through its static helper. Review
+  fixed a three-cycle `jr` that had incorrectly used three bytes, restored the full `ret_effect`
+  for a locally emulated RST helper, and changed the callable treasure-mode jump-table fallback to
+  `hook_continue`. The project now has 2,757 readable hooks out of 12,587. Gates: lint 0, 30k
+  verify 0 failures across 4,685,541 calls with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches across 12,569,417 calls with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
 - 2026-09-13: milestone 3 phase 6 batch 129 (33 routines): added thirteen more bank-7 collision
   effects and shared damage tails, all twelve simple `giveTreasure_body` parameter modes in bank
   3F, and eight bank-6 informative-tile, key-door, Ghini-spawner, pushing, and key-count helpers.

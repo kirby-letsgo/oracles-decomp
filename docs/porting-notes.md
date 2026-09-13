@@ -846,3 +846,15 @@ desync to discover; keep them when porting routines.
   review caught that the routine's pending return frame would be abandoned. Use
   `hook_continue(gb, HL, sp0_)` for callable dispatch fallback, reserving `hook_handoff` for a real
   `ld sp,*` thread switch.
+- A locally emulated RST helper must perform the full return effect after burning its final `ret`.
+  Batch 130's `add_a_to_hl_from_rst` initially used only `pop_effect`, which consumed the synthetic
+  address but did not restore the emulated PC. Independent instruction review caught it; use
+  `ret_effect` so both SP and PC match the ROM helper exactly.
+- Cycle count is never a substitute for instruction length, even at a static tail. Batch 130's
+  `giveTreasure_body__mode9` initially burned its three-cycle `jr` through `$462a`; the instruction
+  at `$4627` is still only two bytes and ends at `$4629`. A byte-range self-review found the
+  overburn before replay.
+- A file-local helper containing `CALL_C` cannot capture `gb->sp` itself because lint permits
+  emulated-register access only in `_hook` shims. Batch 130's bank-0 `give_treasure` integration
+  first failed lint for that reason. Capture `sp0_` in each enclosing hook and pass it into the
+  helper, including loop callers such as `refillSeedSatchel`.

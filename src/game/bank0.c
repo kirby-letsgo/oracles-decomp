@@ -3363,11 +3363,11 @@ void checkItemDropAvailable_hook(GB *gb) {
   ret_effect(gb);
 }
 
-static void give_treasure(GB *gb) {
+static void give_treasure(GB *gb, uint16_t sp0_) {
   B = A;
   CYC(0x171c, 0x171d);
   bank_push(gb, 0x171d, 0x3f);
-  CALL_ROM(0x1727, ROM_b3f_giveTreasure_body);
+  CALL_C(0x1727, giveTreasure_body_hook, ROM_b3f_giveTreasure_body, 0x172a);
   bank_pop(gb, 0x172a);
   A = B;
   alu_or(gb, A);
@@ -3375,7 +3375,8 @@ static void give_treasure(GB *gb) {
 }
 
 void giveTreasure_hook(GB *gb) {
-  give_treasure(gb);
+  uint16_t sp0_ = gb->sp;
+  give_treasure(gb, sp0_);
   ret_effect(gb);
 }
 
@@ -3426,6 +3427,7 @@ void getRandomRingOfGivenTier_hook(GB *gb) {
 }
 
 void refillSeedSatchel_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   E = 0x20;
   CYC(0x180c, 0x180e);
   for (;;) {
@@ -3438,7 +3440,7 @@ void refillSeedSatchel_hook(GB *gb) {
       A = E;
       C = 0x99;
       CYC(0x1814, 0x181a);
-      give_treasure(gb);
+      give_treasure(gb, sp0_);
     }
     E = alu_inc8(gb, E);
     A = E;
