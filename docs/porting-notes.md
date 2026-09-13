@@ -947,3 +947,20 @@ desync to discover; keep them when porting routines.
   `bank_pop`, pass the wrapper's entry `sp0_`, and keep each surrounding instruction's physical
   burn in source order. The same review caught two local RST helpers that used `pop_effect` after
   their final `ret` burn; callable helpers must use `ret_effect` so both SP and emulated PC return.
+- A taken conditional return owns the return; do not continue burning the routine's later return.
+  In the shared `rst $10` add-A-to-HL helper, no carry takes `ret nc` at `$0012`, so that path uses
+  `CYCT(0x0012, 0x0013)` followed immediately by `ret_effect`. Only the carry path falls through
+  `$0013` to the unconditional `ret` at `$0014`. Batch 148 briefly burned `$0014` on both paths;
+  verification reported a four-cycle excess per no-carry call and cascading cycle mismatches.
+- The readiness report's call classification outranks the existence of a generated C symbol.
+  Batch 148's first Maple and Link movement rewrites used `CALL_C` for ten targets that happened to
+  have generated functions, but their reports said `CALL_ASM /* unported */`. Those calls must stay
+  `CALL_ROM` until the targets themselves become readable, or later verification/bisection crosses
+  an unintended generated-C boundary.
+- A callable absorbed label establishes its own real stack boundary. Ricky's internal state
+  dispatcher is entered after a real pushed return address, so its unknown-target fallback must
+  compare against the current `gb->sp`, not the parent root's saved entry SP. Using the outer SP
+  can make the fallback escape the wrong frame when dynamic dispatch takes an uncommon target.
+- Burn instruction byte length even when the endpoint resembles a cycle total. Batch 148's first
+  `linkUpdateMovement` rewrite burned the three-byte `jp` at `$5aec` through `$5af0`; the correct
+  exclusive endpoint is `$5aef`. Instruction review caught the one-byte overrun before replay.

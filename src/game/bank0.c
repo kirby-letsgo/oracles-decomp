@@ -14,6 +14,7 @@ void refreshObjectGfx_body_hook(GB *gb);
 void loadObjectGfxHeaderToSlot4_body_hook(GB *gb);
 void checkEnemyAndPartCollisions_hook(GB *gb);
 void specialObjectCode_companionCutscene_b06_hook(GB *gb);
+void specialObjectUpdatePositionGivenVelocity_hook(GB *gb);
 
 // Rewrites of code/bank0.s. Cycles are burned from the ROM's own instruction stream (CYC/CYCT),
 // which keeps interrupt dispatch on instruction boundaries; every memory access follows the burn
@@ -3968,14 +3969,15 @@ void breakCrackedFloor_hook(GB *gb) {
 
 // Link pushed by moving objects (bank 5 body)
 
-static void update_link_position_given_velocity(GB *gb) {
+static void update_link_position_given_velocity(GB *gb, uint16_t sp0_) {
   bank_push(gb, 0x231e, 0x05);
   uint16_t de = DE;
   CYC(0x2328, 0x232c); A = W8(wLinkObjectIndex);
   D = A;
   E = 0x00;
   CYC(0x232c, 0x232f);
-  CALL_ROM(0x232f, ROM_b05_specialObjectUpdatePositionGivenVelocity);
+  CALL_C(0x232f, specialObjectUpdatePositionGivenVelocity_hook,
+         ROM_b05_specialObjectUpdatePositionGivenVelocity, 0x2332);
   SET_DE(de);
   CYC(0x2332, 0x2333);
   bank_pop(gb, 0x2333);
@@ -3984,11 +3986,13 @@ static void update_link_position_given_velocity(GB *gb) {
 }
 
 void updateLinkPositionGivenVelocity_hook(GB *gb) {
-  update_link_position_given_velocity(gb);
+  uint16_t sp0_ = gb->sp;
+  update_link_position_given_velocity(gb, sp0_);
   ret_effect(gb);
 }
 
 void objectPushLinkAwayOnCollision_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
   CYC(0x230e, 0x2311); A = W8(wLinkObjectIndex);
   H = A;
   L = 0x00;
@@ -4002,7 +4006,7 @@ void objectPushLinkAwayOnCollision_hook(GB *gb) {
   C = A;
   B = 0x28;
   CYC(0x231b, 0x231e);
-  update_link_position_given_velocity(gb);
+  update_link_position_given_velocity(gb, sp0_);
   ret_effect(gb);
 }
 

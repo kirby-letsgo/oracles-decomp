@@ -18,6 +18,7 @@ void setLinkMountingSpeed_hook(GB *gb);
 void companionGotoHazardHandlingState_hook(GB *gb);
 void companionDismount_hook(GB *gb);
 void saveLinkLocalRespawnAndCompanionPosition_hook(GB *gb);
+void specialObjectUpdatePositionGivenVelocity_hook(GB *gb);
 void companionRetIfInactiveWithoutStateCheck_hook(GB *gb);
 
 static void companion_ret_if_inactive_return_from_caller(GB *gb) {
@@ -202,7 +203,7 @@ static void link_apply_tile_types_adjust_conveyor(GB *gb) {
   CYC(0x43f5, 0x43f6); common_code_add_a_to_hl(gb, 0x43f6);
   CYC(0x43f6, 0x43f7); C = mem_rd(gb, HL);
   CYC(0x43f7, 0x43fa);
-  specialObjectUpdatePositionGivenVelocity(gb);
+  specialObjectUpdatePositionGivenVelocity_hook(gb);
 }
 
 void linkApplyTileTypes_hook(GB *gb) {
