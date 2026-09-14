@@ -853,3 +853,301 @@ void ecom_decCounter2_b10_hook(GB *gb) {
   CYC(0x43a9, 0x43aa); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   RET(0x43aa); return;
 }
+
+void ecom_updateCardinalAngleAwayFromTarget_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x43ab, objectGetAngleTowardEnemyTarget_hook, 0x1e94, 0x43ae);
+  CYC(0x43ae, 0x43b0); alu_xor(gb, 0x10);
+  CYC(0x43b0, 0x43b2); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(0x43b2, 0x43b3); mem_wr(gb, DE, A);
+  RET(0x43b3); return;
+}
+
+void ecom_updateCardinalAngleTowardTarget_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x43b4, objectGetAngleTowardEnemyTarget_hook, 0x1e94, 0x43b7);
+  CYC(0x43b7, 0x43b9); alu_add(gb, 0x04);
+  CYC(0x43b9, 0x43bb); alu_and(gb, 0x18);
+  CYC(0x43bb, 0x43bd); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(0x43bd, 0x43be); mem_wr(gb, DE, A);
+  RET(0x43be); return;
+}
+
+void ecom_updateAngleTowardTarget_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x43bf, objectGetAngleTowardEnemyTarget_hook, 0x1e94, 0x43c2);
+  CYC(0x43c2, 0x43c4); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(0x43c4, 0x43c5); mem_wr(gb, DE, A);
+  RET(0x43c5); return;
+}
+
+void ecom_setRandomCardinalAngle_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x43c6, getRandomNumber_noPreserveVars_hook, 0x0453, 0x43c9);
+  CYC(0x43c9, 0x43cb); alu_and(gb, 0x18);
+  CYC(0x43cb, 0x43cd); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(0x43cd, 0x43ce); mem_wr(gb, DE, A);
+  RET(0x43ce); return;
+}
+
+void ecom_setRandomAngle_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x43cf, getRandomNumber_noPreserveVars_hook, 0x0453, 0x43d2);
+  CYC(0x43d2, 0x43d4); alu_and(gb, 0x1f);
+  CYC(0x43d4, 0x43d6); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(0x43d6, 0x43d7); mem_wr(gb, DE, A);
+  RET(0x43d7); return;
+}
+
+// @angleToAnimIndex ($43ff, 32 bytes) is a private lookup table, not code; it is only reached by
+// address arithmetic, so it needs no hook entry of its own.
+void ecom_updateAnimationFromAngle_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x43d8, 0x43d9); H = D;
+  CYC(0x43d9, 0x43db); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(0x43db, 0x43dc); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(0x43dc, 0x43dd); E = A;
+  CYC(0x43dd, 0x43e0); SET_BC(0x43ff);
+  CALL_C(0x43e0, addAToBc_hook, 0x006d, 0x43e3);
+  CYC(0x43e3, 0x43e4); A = mem_rd(gb, BC);
+  CYC(0x43e4, 0x43e6); alu_cp(gb, 0x04);
+  if (F & FC) {
+    CYCT(0x43e6, 0x43e8);
+    goto setAnimation;
+  }
+  CYC(0x43e6, 0x43e8);
+  CYC(0x43e8, 0x43e9); alu_sub(gb, mem_rd(gb, HL));
+  CYC(0x43e9, 0x43eb); alu_cp(gb, 0x07);
+  if (F & FZ) { RET_TAKEN(0x43eb); return; }
+  CYC(0x43eb, 0x43ec);
+  CYC(0x43ec, 0x43ee); alu_sub(gb, 0x03);
+  CYC(0x43ee, 0x43f0); alu_cp(gb, 0x02);
+  if (F & FC) { RET_TAKEN(0x43f0); return; }
+  CYC(0x43f0, 0x43f1);
+  CYC(0x43f1, 0x43f2); A = E;
+  CYC(0x43f2, 0x43f4); alu_add(gb, 0x04);
+  CYC(0x43f4, 0x43f6); alu_and(gb, 0x18);
+  CYC(0x43f6, 0x43f8); A = alu_swap(gb, A);
+  CYC(0x43f8, 0x43f9); alu_rlca(gb);
+setAnimation:
+  CYC(0x43f9, 0x43fb); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { RET_TAKEN(0x43fa); return; }
+  CYC(0x43fa, 0x43fb);
+  CYC(0x43fb, 0x43fc); mem_wr(gb, HL, A);
+  CYC(0x43fc, 0x43ff);
+  enemySetAnimation_hook(gb);
+}
+
+void ecom_flickerVisibility_b10_hook(GB *gb) {
+  CYC(0x441f, 0x4421); E = ENEMY_BASE + OBJ_VISIBLE;
+  CYC(0x4421, 0x4422); A = mem_rd(gb, DE);
+  CYC(0x4422, 0x4424); alu_xor(gb, 0x80);
+  CYC(0x4424, 0x4425); mem_wr(gb, DE, A);
+  RET(0x4425); return;
+}
+
+// @param[out] a State
+// @param[out] b Subid
+// @param[out] cflag c if state < 8
+void ecom_getSubidAndCpStateTo08_b10_hook(GB *gb) {
+  CYC(0x4426, 0x4428); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(0x4428, 0x4429); A = mem_rd(gb, DE); B = A;
+  CYC(0x4429, 0x442a);
+  CYC(0x442a, 0x442c); E = ENEMY_BASE + OBJ_STATE;
+  CYC(0x442c, 0x442d); A = mem_rd(gb, DE);
+  CYC(0x442d, 0x442f); alu_cp(gb, 0x08);
+  RET(0x442f); return;
+}
+
+void ecom_moveTowardPosition_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4430, objectGetRelativeAngleWithTempVars_hook, 0x1eb1, 0x4433);
+  CYC(0x4433, 0x4435); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(0x4435, 0x4436); mem_wr(gb, DE, A);
+  CYC(0x4436, 0x4439);
+  objectApplySpeed_hook(gb);
+}
+
+void ecom_readPositionVars_b10_hook(GB *gb) {
+  CYC(0x4439, 0x443a); B = mem_rd(gb, HL);
+  CYC(0x443a, 0x443b); L = alu_inc8(gb, L);
+  CYC(0x443b, 0x443c); C = mem_rd(gb, HL);
+  CYC(0x443c, 0x443e); L = ENEMY_BASE + OBJ_YH;
+  CYC(0x443e, 0x443f); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x443f, 0x4441); hram_wr(gb, 0x8f, A);
+  CYC(0x4441, 0x4442); L = alu_inc8(gb, L);
+  CYC(0x4442, 0x4443); A = mem_rd(gb, HL);
+  CYC(0x4443, 0x4445); hram_wr(gb, 0x8e, A);
+  RET(0x4445); return;
+}
+
+void ecom_setZAboveScreen_b10_hook(GB *gb) {
+  CYC(0x4446, 0x4447); H = D;
+  CYC(0x4447, 0x4449); L = ENEMY_BASE + OBJ_YH;
+  CYC(0x4449, 0x444a); A = mem_rd(gb, HL);
+  CYC(0x444a, 0x444b); alu_add(gb, C);
+  CYC(0x444b, 0x444c); alu_cpl(gb);
+  CYC(0x444c, 0x444d); A = alu_inc8(gb, A);
+  CYC(0x444d, 0x444e); C = A;
+  CYC(0x444e, 0x4450); A = hram_rd(gb, 0xaa);
+  CYC(0x4450, 0x4451); alu_add(gb, C);
+  if (!(F & FC)) {
+    CYCT(0x4451, 0x4453);
+    goto checkTop;
+  }
+  CYC(0x4451, 0x4453);
+  CYC(0x4453, 0x4454); A = C;
+checkTop:
+  CYC(0x4454, 0x4456); alu_bit(gb, 7, A);
+  if (!(F & FZ)) {
+    CYCT(0x4456, 0x4458);
+    goto storeZ;
+  }
+  CYC(0x4456, 0x4458);
+  CYC(0x4458, 0x445a); A = 0x80;
+storeZ:
+  CYC(0x445a, 0x445c); L = ENEMY_BASE + OBJ_ZH;
+  CYC(0x445c, 0x445d); mem_wr(gb, HL, A);
+  RET(0x445d); return;
+}
+
+void ecom_killObjectH_b10_hook(GB *gb) {
+  CYC(0x445e, 0x445f); A = L;
+  CYC(0x445f, 0x4461); alu_and(gb, 0xc0);
+  CYC(0x4461, 0x4463); alu_or(gb, 0x29);
+  CYC(0x4463, 0x4464); L = A;
+  ecom_killRelatedObj_b10_hook(gb);
+}
+
+void ecom_killRelatedObj_b10_hook(GB *gb) {
+  CYC(0x4464, 0x4466); mem_wr(gb, HL, 0x00);
+  CYC(0x4466, 0x4467); A = L;
+  CYC(0x4467, 0x4469); alu_add(gb, 0xfb);
+  CYC(0x4469, 0x446a); L = A;
+  CYC(0x446a, 0x446c); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
+  RET(0x446c); return;
+}
+
+void ecom_killRelatedObj1_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x446d, 0x446f); A = 0x29;
+  CALL_C(0x446f, objectGetRelatedObject1Var_hook, 0x2160, 0x4472);
+  CYC(0x4472, 0x4474);
+  ecom_killRelatedObj_b10_hook(gb);
+}
+
+void ecom_killRelatedObj2_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4474, 0x4476); A = 0x29;
+  CALL_C(0x4476, objectGetRelatedObject2Var_hook, 0x2164, 0x4479);
+  CYC(0x4479, 0x447b);
+  ecom_killRelatedObj_b10_hook(gb);
+}
+
+// @oscillationX ($44a8) is a private position-offset lookup table, not code; it needs no hook
+// entry of its own.
+void ecom_galeSeedEffect_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x447b, ecom_decCounter2_b10_hook, 0x43a3, 0x447e);
+  if (F & FZ) {
+    CYCT(0x447e, 0x4480);
+    goto zero;
+  }
+  CYC(0x447e, 0x4480);
+  CYC(0x4480, 0x4481); A = mem_rd(gb, HL);
+  CYC(0x4481, 0x4483); alu_and(gb, 0x03);
+  CYC(0x4483, 0x4486); SET_HL(0x44a8);
+  CYC(0x4486, 0x4487);
+  ecom_addAToHl_from_rst_b10(gb, 0x4487);
+  CYC(0x4487, 0x4489); E = ENEMY_BASE + OBJ_XH;
+  CYC(0x4489, 0x448a); A = mem_rd(gb, DE);
+  CYC(0x448a, 0x448b); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x448b, 0x448c); mem_wr(gb, DE, A);
+  CYC(0x448c, 0x448d); alu_scf(gb);
+  RET(0x448d); return;
+zero:
+  CALL_C(0x448e, objectApplySpeed_hook, 0x201d, 0x4491);
+  CYC(0x4491, 0x4493); C = 0x10;
+  CALL_C(0x4493, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x4496);
+  CYC(0x4496, 0x4498); A = hram_rd(gb, 0xaa);
+  CYC(0x4498, 0x4499); B = A;
+  CYC(0x4499, 0x449b); L = ENEMY_BASE + OBJ_ZH;
+  CYC(0x449b, 0x449c); A = mem_rd(gb, HL);
+  CYC(0x449c, 0x449e); alu_cp(gb, 0x80);
+  CYC(0x449e, 0x449f); alu_ccf(gb);
+  if (!(F & FC)) { RET_TAKEN(0x449f); return; }
+  CYC(0x449f, 0x44a0);
+  CYC(0x44a0, 0x44a2); E = ENEMY_BASE + OBJ_YH;
+  CYC(0x44a2, 0x44a3); A = mem_rd(gb, DE);
+  CYC(0x44a3, 0x44a4); alu_add(gb, mem_rd(gb, HL));
+  CYC(0x44a4, 0x44a5); alu_sub(gb, B);
+  CYC(0x44a5, 0x44a7); alu_cp(gb, 0xb0);
+  RET(0x44a7); return;
+}
+
+void ecom_blownByGaleSeedState_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x44ac, ecom_galeSeedEffect_b10_hook, 0x447b, 0x44af);
+  if (F & FC) { RET_TAKEN(0x44af); return; }
+  CYC(0x44af, 0x44b0);
+  CALL_C(0x44b0, decNumEnemies_hook, 0x24b3, 0x44b3);
+  CYC(0x44b3, 0x44b6);
+  enemyDelete_hook(gb);
+}
+
+void ecom_checkScentSeedActive_b10_hook(GB *gb) {
+  CYC(0x44b6, 0x44b9); A = W8(wScentSeedActive);
+  CYC(0x44b9, 0x44ba); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(0x44ba); return; }
+  CYC(0x44ba, 0x44bb);
+  CYC(0x44bb, 0x44bd); E = ENEMY_BASE + OBJ_VAR3F;
+  CYC(0x44bd, 0x44be); A = mem_rd(gb, DE);
+  CYC(0x44be, 0x44c0); alu_bit(gb, 4, A);
+  if (F & FZ) { RET_TAKEN(0x44c0); return; }
+  CYC(0x44c0, 0x44c1);
+  CYC(0x44c1, 0x44c3); E = ENEMY_BASE + OBJ_STATE;
+  CYC(0x44c3, 0x44c4); A = mem_rd(gb, DE);
+  CYC(0x44c4, 0x44c6); alu_and(gb, 0xf8);
+  if (F & FZ) { RET_TAKEN(0x44c6); return; }
+  CYC(0x44c6, 0x44c7);
+  CYC(0x44c7, 0x44c9); A = 0x04;
+  CYC(0x44c9, 0x44ca); mem_wr(gb, DE, A);
+  RET(0x44ca); return;
+}
+
+void ecom_updateAngleToScentSeed_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x44cb, 0x44cc); H = D;
+  CYC(0x44cc, 0x44ce); L = ENEMY_BASE + OBJ_VAR3D;
+  CYC(0x44ce, 0x44cf); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(0x44cf, 0x44d0); A = mem_rd(gb, HL);
+  CYC(0x44d0, 0x44d2); alu_and(gb, 0x0f);
+  if (!(F & FZ)) { RET_TAKEN(0x44d2); return; }
+  CYC(0x44d2, 0x44d3);
+  CYC(0x44d3, 0x44d5); A = hram_rd(gb, 0xb2);
+  CYC(0x44d5, 0x44d6); B = A;
+  CYC(0x44d6, 0x44d8); A = hram_rd(gb, 0xb3);
+  CYC(0x44d8, 0x44d9); C = A;
+  CALL_C(0x44d9, objectGetRelativeAngle_hook, 0x1ea4, 0x44dc);
+  CYC(0x44dc, 0x44de); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(0x44de, 0x44df); mem_wr(gb, DE, A);
+  RET(0x44df); return;
+}
+
+void ecom_fallToGroundAndSetState8_b10_hook(GB *gb) {
+  CYC(0x44e0, 0x44e2); B = 0x08;
+  ecom_fallToGroundAndSetState_b10_hook(gb);
+}
+
+void ecom_fallToGroundAndSetState_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x44e2, 0x44e4); C = 0x20;
+  CALL_C(0x44e4, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x44e7);
+  if (!(F & FZ)) { RET_TAKEN(0x44e7); return; }
+  CYC(0x44e7, 0x44e8);
+  CYC(0x44e8, 0x44ea); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
+  CYC(0x44ea, 0x44ec); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
+  CYC(0x44ec, 0x44ee); L = ENEMY_BASE + OBJ_STATE;
+  CYC(0x44ee, 0x44ef); mem_wr(gb, HL, B);
+  RET(0x44ef); return;
+}

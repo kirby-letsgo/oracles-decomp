@@ -300,7 +300,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   out of 10,714. Batch 163 continued with the velocity/adjacent-walls helper chain (including the
   RST $10 add-A-to-HL vector and the two-check tile-collision local); the project now has 3,714
   readable hooks out of 10,707. Batch 164 finished the bounce/spawn/counter helper cluster; the
-  project now has 3,726 readable hooks out of 10,705.
+  project now has 3,726 readable hooks out of 10,705. Batch 165 finished the remaining `ecom_*`
+  helpers (angle, position, kill, gale-seed, and fall-to-ground), completing the whole
+  `commonCode.s` file for bank 10; the project now has 3,747 readable hooks out of 10,701.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -405,6 +407,24 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 165, bank 10 (21 routines, branch
+  `claude/bank10-phase6`): completed `enemyCommonCode.c` with the remaining angle helpers
+  (`ecom_updateCardinalAngleAwayFromTarget`/`TowardTarget`, `ecom_updateAngleTowardTarget`,
+  `ecom_setRandomCardinalAngle`, `ecom_setRandomAngle`, `ecom_updateAnimationFromAngle`,
+  `ecom_flickerVisibility`), the position/subid helpers (`ecom_getSubidAndCpStateTo08`,
+  `ecom_moveTowardPosition`, `ecom_readPositionVars`, `ecom_setZAboveScreen`), the kill-object
+  chain (`ecom_killObjectH`/`killRelatedObj`/`killRelatedObj1`/`killRelatedObj2`), the gale-seed
+  pair (`ecom_galeSeedEffect`, `ecom_blownByGaleSeedState`), the scent-seed pair
+  (`ecom_checkScentSeedActive`, `ecom_updateAngleToScentSeed`), and the fall-to-ground pair
+  (`ecom_fallToGroundAndSetState8`/`State`) — completing the whole `commonCode.s` source for bank
+  10. `ecom_updateAnimationFromAngle`'s `@angleToAnimIndex` table and `ecom_galeSeedEffect`'s
+  oscillation table are private lookup data the transliterator had mis-decoded as code (see
+  porting-notes); neither needed a hook entry. Independent review caught one inverted `jr nz`
+  branch in `ecom_setZAboveScreen`'s Z-clamp before the gate. Bank 10 is 93/779 and the project
+  3,747/10,701. Gates: lint 0, 30k verify 0 failures across 4,484,031 calls with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 164, bank 10 (12 routines, branch
   `claude/bank10-phase6`): finished `enemyCommonCode.c`'s bounce/spawn/counter cluster —
