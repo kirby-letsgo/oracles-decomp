@@ -299,7 +299,8 @@ Updated 2026-09-13. Newest entries at the top of each section.
   helper) disappeared with their now-readable parents; the project now has 3,699 readable hooks
   out of 10,714. Batch 163 continued with the velocity/adjacent-walls helper chain (including the
   RST $10 add-A-to-HL vector and the two-check tile-collision local); the project now has 3,714
-  readable hooks out of 10,707.
+  readable hooks out of 10,707. Batch 164 finished the bounce/spawn/counter helper cluster; the
+  project now has 3,726 readable hooks out of 10,705.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -404,6 +405,24 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 164, bank 10 (12 routines, branch
+  `claude/bank10-phase6`): finished `enemyCommonCode.c`'s bounce/spawn/counter cluster —
+  `ecom_bounceOffWallsAndHoles`, `ecom_bounceOffWalls`, `ecom_bounceOffScreenBoundary` (a shared
+  common body with a second bank-10 copy of the RST $10 vector, its `getDirectionsHit` local, and
+  its `reverseDirection` local), `ecom_randomBitwiseAndBCE`, `ecom_setSpeedAndState8(AndVisible)`,
+  the `ecom_spawnUncountedEnemyWithSubid01`/`ecom_spawnEnemyWithSubid01` pair with their shared
+  tail, `ecom_spawnProjectile`, and `ecom_decCounter1`/`ecom_dec16BitCounter`/`ecom_decCounter2`.
+  `reverseDirection`'s apparent independent external caller turned out to be a report-formatting
+  artifact (that caller actually calls `ecom_bounceOffWallsAndHoles` itself); once the three bounce
+  roots were rewritten the transliterator no longer discovered either bounce-local address at all,
+  so both became plain internal helpers with no hook-table row rather than promoted locals. Applying
+  the batch-163 lesson, every unconditional `jr` was recomputed at exactly `addr+2` and the local
+  call to `getDirectionsHit` got its `push_effect` from the first draft; two independent instruction
+  reviews against the pre-rewrite transliteration found no further defects. Two more generated rows
+  disappeared; bank 10 is 72/783 and the project 3,726/10,705. Gates: lint 0, 30k verify 0 failures
+  across 4,484,031 calls with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 163, bank 10 (15 routines, branch
   `claude/bank10-phase6`): continued `enemyCommonCode.c` with the velocity/adjacent-walls chain —

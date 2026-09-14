@@ -255,7 +255,7 @@ static void ecom_fallingInHole_checkInCenterOfHole_b10(GB *gb) {
 // Enemy is currently falling down a hole.
 void ecom_fallingInHole_b10_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x40dd, ecom_decCounter1_b10, 0x439a, 0x40e0);
+  CALL_C(0x40dd, ecom_decCounter1_b10_hook, 0x439a, 0x40e0);
   if (F & FZ) {
     CYCT(0x40e0, 0x40e2);
     ecom_fallDownHoleAndDelete_b10_hook(gb);
@@ -660,4 +660,196 @@ void ecom_getAdjacentWallTableOffset_b10_hook(GB *gb) {
   CYC(0x4259, 0x425b); alu_and(gb, 0xf0);
   CYC(0x425b, 0x425d); alu_add(gb, 0x08);
   RET(0x425d); return;
+}
+
+void ecom_bounceOffScreenBoundary__getDirectionsHit_b10_hook(GB *gb) {
+  CYC(0x4310, 0x4312); C = 0x00;
+  CYC(0x4312, 0x4313); B = A;
+  CYC(0x4313, 0x4315); alu_and(gb, 0x03);
+  if (F & FZ) {
+    CYCT(0x4315, 0x4317);
+    goto afterInc;
+  }
+  CYC(0x4315, 0x4317);
+  CYC(0x4317, 0x4318); C = alu_inc8(gb, C);
+afterInc:
+  CYC(0x4318, 0x4319); A = B;
+  CYC(0x4319, 0x431b); alu_and(gb, 0x0c);
+  if (F & FZ) { RET_TAKEN(0x431b); return; }
+  CYC(0x431b, 0x431c);
+  CYC(0x431c, 0x431e); C = (uint8_t)(C | (1 << 2));
+  RET(0x431e); return;
+}
+
+// A local with an independent external caller (veranFinal_spiderForm_updateMovement); kept
+// callable on its own rather than inlined into the bounce common body.
+void ecom_bounceOffScreenBoundary__reverseDirection_b10_hook(GB *gb) {
+  CYC(0x4306, 0x4308); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(0x4308, 0x4309); A = mem_rd(gb, DE);
+  CYC(0x4309, 0x430b); alu_add(gb, 0x10);
+  CYC(0x430b, 0x430d); alu_and(gb, 0x1f);
+  CYC(0x430d, 0x430e); mem_wr(gb, DE, A);
+  CYC(0x430e, 0x430f); alu_or(gb, D);
+  RET(0x430f); return;
+}
+
+void ecom_bounceOffScreenBoundary_common_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x42e7, ecom_getSideviewAdjacentWallsBitset_b10_hook, 0x420b, 0x42ea);
+  CYC(0x42ea, 0x42ed); push_effect(gb, 0x42ed);
+  ecom_bounceOffScreenBoundary__getDirectionsHit_b10_hook(gb);
+  CYC(0x42ed, 0x42ee); A = C;
+  CYC(0x42ee, 0x42ef); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(0x42ef); return; }
+  CYC(0x42ef, 0x42f0);
+  CYC(0x42f0, 0x42f2); alu_cp(gb, 0x05);
+  if (F & FZ) {
+    CYCT(0x42f2, 0x42f4);
+    ecom_bounceOffScreenBoundary__reverseDirection_b10_hook(gb);
+    return;
+  }
+  CYC(0x42f2, 0x42f4);
+  CYC(0x42f4, 0x42f7); SET_HL(0x432f);
+  CYC(0x42f7, 0x42f9); alu_bit(gb, 0, A);
+  if (!(F & FZ)) {
+    CYCT(0x42f9, 0x42fb);
+    goto rotate;
+  }
+  CYC(0x42f9, 0x42fb);
+  CYC(0x42fb, 0x42fe); SET_HL(0x431f);
+rotate:
+  CYC(0x42fe, 0x4300); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(0x4300, 0x4301); A = mem_rd(gb, DE);
+  CYC(0x4301, 0x4302);
+  ecom_addAToHl_from_rst_b10(gb, 0x4302);
+  CYC(0x4302, 0x4303); A = mem_rd(gb, HL);
+  CYC(0x4303, 0x4304); mem_wr(gb, DE, A);
+  CYC(0x4304, 0x4305); alu_or(gb, D);
+  RET(0x4305); return;
+}
+
+void ecom_bounceOffWallsAndHoles_b10_hook(GB *gb) {
+  CYC(0x42de, 0x42e0); A = 0x01;
+  CYC(0x42e0, 0x42e2);
+  ecom_bounceOffScreenBoundary_common_b10_hook(gb);
+}
+
+void ecom_bounceOffWalls_b10_hook(GB *gb) {
+  CYC(0x42e2, 0x42e3); alu_xor(gb, A);
+  CYC(0x42e3, 0x42e5);
+  ecom_bounceOffScreenBoundary_common_b10_hook(gb);
+}
+
+void ecom_bounceOffScreenBoundary_b10_hook(GB *gb) {
+  CYC(0x42e5, 0x42e7); A = 0x02;
+  ecom_bounceOffScreenBoundary_common_b10_hook(gb);
+}
+
+void ecom_randomBitwiseAndBCE_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  PUSH(0x434f, BC);
+  CALL_C(0x4350, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4353);
+  SET_BC(POP(0x4353));
+  CYC(0x4354, 0x4355); alu_and(gb, E); E = A;
+  CYC(0x4355, 0x4356);
+  CYC(0x4356, 0x4357); A = H;
+  CYC(0x4357, 0x4358); alu_and(gb, B); B = A;
+  CYC(0x4358, 0x4359);
+  CYC(0x4359, 0x435a); A = L;
+  CYC(0x435a, 0x435b); alu_and(gb, C); C = A;
+  CYC(0x435b, 0x435c);
+  CYC(0x435c, 0x435d); alu_xor(gb, A);
+  RET(0x435d); return;
+}
+
+void ecom_setSpeedAndState8AndVisible_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x435e, ecom_setSpeedAndState8_b10_hook, 0x4364, 0x4361);
+  CYC(0x4361, 0x4364);
+  objectSetVisiblec2_hook(gb);
+}
+
+void ecom_setSpeedAndState8_b10_hook(GB *gb) {
+  CYC(0x4364, 0x4365); H = D;
+  CYC(0x4365, 0x4367); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(0x4367, 0x4368); mem_wr(gb, HL, A);
+  CYC(0x4368, 0x436a); L = ENEMY_BASE + OBJ_STATE;
+  CYC(0x436a, 0x436c); mem_wr(gb, HL, 0x08);
+  RET(0x436c); return;
+}
+
+static void ecom_spawnEnemyCommon_b10_hook(GB *gb) {
+  CYC(0x4377, 0x4378); mem_wr(gb, HL, B);
+  CYC(0x4378, 0x4379); L = alu_inc8(gb, L);
+  CYC(0x4379, 0x437a); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(0x437a, 0x437b); alu_xor(gb, A);
+  RET(0x437b); return;
+}
+
+void ecom_spawnUncountedEnemyWithSubid01_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x436d, getFreeEnemySlot_uncounted_hook, 0x2e34, 0x4370);
+  if (!(F & FZ)) { RET_TAKEN(0x4370); return; }
+  CYC(0x4370, 0x4371);
+  CYC(0x4371, 0x4373);
+  ecom_spawnEnemyCommon_b10_hook(gb);
+}
+
+void ecom_spawnEnemyWithSubid01_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4373, getFreeEnemySlot_hook, 0x2e27, 0x4376);
+  if (!(F & FZ)) { RET_TAKEN(0x4376); return; }
+  CYC(0x4376, 0x4377);
+  ecom_spawnEnemyCommon_b10_hook(gb);
+}
+
+void ecom_spawnProjectile_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x437c, getFreePartSlot_hook, 0x3e8e, 0x437f);
+  if (!(F & FZ)) { RET_TAKEN(0x437f); return; }
+  CYC(0x437f, 0x4380);
+  CYC(0x4380, 0x4381); mem_wr(gb, HL, B);
+  CALL_C(0x4381, objectCopyPosition_hook, 0x2242, 0x4384);
+  CYC(0x4384, 0x4386); L = PART_BASE + OBJ_RELATED1;
+  CYC(0x4386, 0x4388); A = 0x80;
+  CYC(0x4388, 0x4389); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4389, 0x438a); mem_wr(gb, HL, D);
+  CYC(0x438a, 0x438c); E = ENEMY_BASE + OBJ_VAR18;
+  CYC(0x438c, 0x438e); A = 0xc0;
+  CYC(0x438e, 0x438f); mem_wr(gb, DE, A);
+  CYC(0x438f, 0x4390); E = alu_inc8(gb, E);
+  CYC(0x4390, 0x4391); A = H;
+  CYC(0x4391, 0x4392); mem_wr(gb, DE, A);
+  CYC(0x4392, 0x4394); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(0x4394, 0x4396); L = PART_BASE + OBJ_ANGLE;
+  CYC(0x4396, 0x4397); A = mem_rd(gb, DE);
+  CYC(0x4397, 0x4398); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(0x4398, 0x4399); alu_xor(gb, A);
+  RET(0x4399); return;
+}
+
+void ecom_decCounter1_b10_hook(GB *gb) {
+  CYC(0x439a, 0x439b); H = D;
+  CYC(0x439b, 0x439d); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(0x439d, 0x439e); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  RET(0x439e); return;
+}
+
+void ecom_dec16BitCounter_b10_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x439f, ecom_decCounter1_b10_hook, 0x439a, 0x43a2);
+  if (!(F & FZ)) { RET_TAKEN(0x43a2); return; }
+  CYC(0x43a2, 0x43a3);
+  ecom_decCounter2_b10_hook(gb);
+}
+
+void ecom_decCounter2_b10_hook(GB *gb) {
+  CYC(0x43a3, 0x43a4); H = D;
+  CYC(0x43a4, 0x43a6); L = ENEMY_BASE + OBJ_COUNTER2;
+  CYC(0x43a6, 0x43a7); A = mem_rd(gb, HL);
+  CYC(0x43a7, 0x43a8); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(0x43a8); return; }
+  CYC(0x43a8, 0x43a9);
+  CYC(0x43a9, 0x43aa); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  RET(0x43aa); return;
 }

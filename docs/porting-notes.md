@@ -1076,3 +1076,22 @@ desync to discover; keep them when porting routines.
   outer caller had left on the stack. `push_effect(gb, return_address)` before the call and letting
   the callee's own `ret_effect` consume it is required any time a real ROM `call` targets a plain C
   function instead of `CALL_C`.
+- `--report NAME`'s trailing `callers: N (...)` line is printed once per requested routine, after
+  its last listed internal block, not once per block; a line that visually sits under an inner
+  local's label can actually describe the *root* routine's callers. Bank 10 batch 163's
+  `ecom_bounceOffScreenBoundary@reverseDirection` looked like it had an independent external caller
+  because the `callers: 1 (veranFinal_spiderForm_updateMovement)` line printed directly under its
+  label; that caller actually calls `ecom_bounceOffWallsAndHoles` (confirmed by re-running
+  `--report` on the caller directly), and once the three bounce roots were rewritten the
+  transliterator stopped discovering `reverseDirection`'s address at all, proving it had no
+  independent caller. Re-run `--report` on the *caller* named in a suspicious `callers:` line
+  before promoting a local to its own hook on that evidence alone.
+- Two disassembly labels can decode as plausible SM83 instructions while being pure lookup-table
+  data, the same way script-VM bytecode does. Bank 10's `ecom_updateAnimationFromAngle`'s
+  `@angleToAnimIndex` table and `ecom_galeSeedEffect`'s oscillation table each got a synthesized
+  local entry and a fully "generated" nonsense body (`inc b; inc b; inc b; ld bc,$0101; ...`)
+  because the transliterator's local-discovery walk doesn't distinguish `.db` data from code. Both
+  are only ever reached by address arithmetic (`add a,hl` / table index), never a jump or call, so
+  neither needs a `rewritten.txt` entry: once every routine that made them locally discoverable is
+  itself rewritten, they stop being generated at all. Confirm with a report or the `.s` source
+  before assuming a `flag L` sibling of a routine being rewritten needs its own entry.
