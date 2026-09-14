@@ -3303,6 +3303,7 @@ makuConfetti_updateSpeedYUsingSpeedZ
 makuConfetti_updateSpeedXUsingSpeedZ
 interactionCode63
 interactionCode64
+interactionCode64__afterCall73ec
 interactionCode65
 interactionCode65__afterCall750e
 interactionCode65__loadScriptAndInitGraphics

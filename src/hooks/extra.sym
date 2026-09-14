@@ -25,6 +25,7 @@
 00:09aa _initializeThread__afterSp09aa
 03:4df3 intro_titlescreen_state1__pressedStart
 03:4dfd intro_titlescreen_state1__gotoState
+09:73ec interactionCode64__afterCall73ec
 09:750e interactionCode65__afterCall750e
 09:7531 interactionCode65__loadScriptAndInitGraphics
 10:71aa agesFunc_10_70f6__func_71aa
