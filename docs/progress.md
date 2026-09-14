@@ -7,7 +7,7 @@ Updated 2026-09-14. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 3,854 routine hooks rewritten across seventeen code
+  routine against the transliteration. Progress: 3,886 routine hooks rewritten across seventeen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -327,6 +327,8 @@ Updated 2026-09-14. Newest entries at the top of each section.
   Batch 167 completed the Subrosian and Impa NPC interaction dispatchers, their state/script paths,
   and their private return/lookup tails, bringing the project to 3,854/10,566 with bank 9 at
   154/628.
+  Batch 168 completed the Tokay dispatcher, thief, participant, item/accessory, script, and
+  stink-bag-cutscene paths, bringing the project to 3,886/10,524 with bank 9 at 186/586.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -431,6 +433,13 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 168, bank 9 (32 routines): completed Tokay's dispatcher,
+  thief and participant state paths, held-item/accessory initializers, script loader, and
+  stink-bag cutscene. Bank 9 is 186/586 and the project 3,886/10,524. Gates: lint 0, 30k verify
+  0 failures across 4,484,031 calls with state 3e450c2620a3f6a3, full reference replay 0
+  state-hash mismatches across 11,449,589 calls over 290,174 frames with state a62ae98192befee8,
+  normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 167, bank 9 (23 routines): completed the Subrosian and
   Impa NPC dispatchers, each state/subid/script path, and their private local return/lookup tails.
