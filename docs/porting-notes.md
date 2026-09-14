@@ -1101,3 +1101,20 @@ desync to discover; keep them when porting routines.
   neither needs a `rewritten.txt` entry: once every routine that made them locally discoverable is
   itself rewritten, they stop being generated at all. Confirm with a report or the `.s` source
   before assuming a `flag L` sibling of a routine being rewritten needs its own entry.
+- A struct field with no dedicated high-byte constant (e.g. `relatedObj1 dw $16`, a 2-byte field
+  where `game.h` only names the low byte `OBJ_RELATED1`) needs `ENEMY_BASE + OBJ_RELATED1 + 1` for
+  the high byte, not a second invented constant. Batch 169's `ramrockArms.c` also hit two plain
+  field-confusion bugs the same way as past batches: `OBJ_KNOCKBACK_ANGLE` (`$2c`) and `OBJ_VAR2A`
+  (`$2a`) are two bytes apart and look interchangeable from memory, but the literal dump hex at
+  ROM addresses `$618a` and `$6381` was `$2a` both times. Always check the numeric offset against
+  the dump byte, never the "nearby-looking" named constant.
+- A local routine reachable both from an internal `jr`/`goto` inside its parent AND independently
+  from a dispatch-table `case` must be extracted into its own standalone function called by direct
+  C call from every entry point — never inlined into the first caller and then wrapped by a second
+  function that calls the first. Batch 169's `ramrockArm_subid4_substate3` is dispatched directly
+  from `subid4`'s own RST $00 table but is also reached by three internal branches inside
+  `substate2`; inlining it into `substate2` and then giving `substate3_hook` a body that just
+  called `substate2_hook` would have re-executed `substate2`'s entire preamble on every dispatch-
+  table entry into `substate3`. The fix generalizes: whenever a `--report` shows a local with more
+  than one incoming path of different kinds (goto vs. table case), give it its own function first,
+  before writing either caller.

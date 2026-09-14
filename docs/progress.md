@@ -316,6 +316,12 @@ Updated 2026-09-13. Newest entries at the top of each section.
   add-double-index vector and two private per-subid data tables mis-decoded as code; the project
   now has 3,766 readable hooks out of 10,684. Merging that work with the bank-9 batch gives the
   project 3,783 readable hooks out of 10,659.
+  Batch 169 (new worktree from the merged main) ported the whole
+  `object_code/ages/enemies/ramrockArms.s`: `enemyCode05` plus the full `ramrockArm_state0`/
+  `state8`/`subid0`/`subid2`/`subid4` state-machine tree (32 root routines total, including a
+  local RST $00 dispatcher and RST $10 add-A-to-HL vector). Twelve generated rows disappeared with
+  their now-readable parents; the project now has 3,816 readable hooks out of 10,647, with bank 10
+  at 145/750.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -420,6 +426,30 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 169, bank 10 (32 routines, branch
+  `claude/bank10-phase6`, new worktree from the merged main): ported the whole
+  `object_code/ages/enemies/ramrockArms.s` (`ramrockArms.c`) — `enemyCode05`, `ramrockArm_state0`
+  (with its inlined per-subid init labels), `ramrockArm_state_stub`, `ramrockArm_state8`, the full
+  `subid0` runStates tree (7 substates plus moveBackToRamrock/setAngleTowardRamrock/
+  checkReachedRamrock and the shared checkPositionAtRamrock/setRelativePosition/
+  getRelativePosition/deleteSelf helpers), `subid2` (3 substates plus copyRamrockPosition), and
+  `subid4` (4 substates plus updateXPosition/collisionOccurred), backed by a local RST $00
+  dispatcher and RST $10 add-A-to-HL vector. Several of the `subid0`/`subid2`/`subid4` dispatch
+  tables came back from the transliterator as empty `switch`/`default: HANDOFF` bodies; the real
+  case labels were hand-recovered from the disassembly's `.dw` table entries. Two independent
+  instruction reviews caught and fixed: an `OBJ_VAR31`-style invented constant (should be
+  `OBJ_PRESSED_A_BUTTON`), two separate `OBJ_KNOCKBACK_ANGLE`/`OBJ_VAR2A` field mixups against the
+  literal dump hex, a missing `sp0_` capture before a `CALL_C`, a missing definition for
+  `ramrockArm_subid2_copyRamrockPosition_hook` (caught by the linker), and a structural bug where
+  `ramrockArm_subid4_substate3` — reachable both from `subid4`'s own dispatch table and from three
+  internal branches inside `substate2` — had been inlined into `substate2` and separately given a
+  broken wrapper that would have re-run `substate2`'s preamble; fixed by extracting it into its own
+  standalone function called directly from all four entry points. Twelve generated rows
+  disappeared with their now-readable parents; bank 10 is 145/750 and the project 3,816/10,647.
+  Gates: lint 0, 30k verify 0 failures across 4,484,031 calls with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 162 (17 routines): added the final shop-item purchase
   state plus palace-soldier substates, escort/NPC subids, initialization, and dungeon-six check
