@@ -3822,6 +3822,7 @@ dog_snapToTargetPosition
 dog_getTargetPositionAddress
 dog_setTargetPositionIndex
 interactionCode55
+interactionCode61
 ecom_incState_b10
 ecom_incSubstate_b10
 ecom_updateKnockback_b10
