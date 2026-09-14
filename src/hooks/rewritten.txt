@@ -3810,6 +3810,7 @@ interactionCode51
 interactionCode52
 interactionCode53
 interactionCode54
+interactionCode60
 ecom_incState_b10
 ecom_incSubstate_b10
 ecom_updateKnockback_b10
