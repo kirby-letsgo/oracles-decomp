@@ -266,11 +266,11 @@
 
 <script>
   const INITIAL = {
-    updatedAt: "2026-09-14T17:35:29Z",
+    updatedAt: "2026-09-14T17:47:06Z",
     status: "idle",
     statusDetail: "",
-      totalHooks: 10005,
-      rewrittenTotal: 4265,
+      totalHooks: 9982,
+      rewrittenTotal: 4282,
     bank0Total: 653,
     bank0Rewritten: 653,
     codeBearingBanks: 23,
@@ -288,6 +288,7 @@ banks: [{"id": "00", "code": true, "total": 653, "rewritten": 653}, {"id": "01",
       { n: 6, name: "Sweep", desc: "Everything left in code/, until no routine is still generated.", status: "active", meta: "remainder" },
     ],
     batches: [
+      { id: "181", delta: 17, tag: "Ph.6", text: "Completed bank-9 <b>Goron dance helpers</b> and the fake-Goron jump controller; graphics state roots remain generated." },
       { id: "180", delta: 3, tag: "Ph.6", text: "Completed bank-9 <b>Syrup</b> and its durable run-state/thread-resume hooks." },
       { id: "178", delta: 2, tag: "Ph.6", text: "Completed bank-9 <b>Raftwreck Cutscene Helper</b> and its post-graphics thread-resume hook." },
       { id: "177", delta: 3, tag: "Ph.6", text: "Completed bank-9 <b>Comedian</b> and its script-loader/thread-resume hooks." },
@@ -456,8 +457,8 @@ banks: [{"id": "00", "code": true, "total": 653, "rewritten": 653}, {"id": "01",
       { id: "1&ndash;3", delta: 92, tag: "Ph.0&ndash;1", text: "Memory copy/fill/clear, math, flags, RNG, LCD/VRAM setup." },
     ],
   };
-  INITIAL.banks[9].total = 375;
-  INITIAL.banks[9].rewritten = 223;
+  INITIAL.banks[9].total = 352;
+  INITIAL.banks[9].rewritten = 240;
   function fmt(n) { return n.toLocaleString("en-US"); }
 
   function relTime(iso) {
