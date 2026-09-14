@@ -448,6 +448,25 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-14: milestone 3 phase 6 batch 181, bank 11 (10 root routines): ported
+  `object_code/ages/parts/blueStalfosProjectile.s` (`partCode3d`, `blueStalfosProjectile.c`) — the
+  charge-and-throw fireball part for the Blue Stalfos enemy, its baby-ball explosion fragments, and
+  the reflect-off-sword/hit-Link paths. `blueStalfosProjectile_checkShouldExplode` has a genuine
+  stack-discarding divergence: called via ordinary `call` from two states each expecting a normal
+  return-and-continue, but on its "should explode now" exit it does `pop bc` to discard its own
+  return address before its final `ret`, so real hardware returns two levels up the stack, past
+  its immediate caller entirely. Modeled with nothing more than a literal `SET_BC(pop_effect(gb))`
+  and a plain `CALL_C` at both call sites — `CALL_C`'s own built-in `gb->pc==ra && gb->sp==sp_+2`
+  check already detects this exact divergence (worked through by hand: the extra pop leaves
+  `sp==sp_+2` with `pc` unchanged, then the function's own final `ret` pops again, landing on
+  neither the expected `pc` nor the expected `sp`) and correctly hands off via `hook_continue`
+  without any special-casing needed at the call sites. After the prior batch's unusually high bug
+  count, this one was written with a full manual address-by-address derivation completed and
+  cross-checked *before* first compile rather than after; both self-review and independent review
+  came back clean, with zero bugs found. Bank 11 is 65/700 and the project 4,278/9,950. Gates:
+  lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-14: milestone 3 phase 6 batch 180, bank 11 (1 root routine, 179 instructions):
   ported `object_code/common/parts/itemFromMaple.s` (`itemFromMaple.c`) — `partCode14`/`partCode15`
   are two labels aliasing the exact same address (`PART_ITEM_FROM_MAPLE`/`_2` share identical code),
