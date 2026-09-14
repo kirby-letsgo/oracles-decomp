@@ -347,6 +347,21 @@ Updated 2026-09-13. Newest entries at the top of each section.
   leaf (6 root routines total). Twenty generated rows disappeared, including four mis-decoded
   per-direction data tables; the project now has 3,855 readable hooks out of 10,587, with bank 10
   at 184/690.
+  Batch 173 ported the whole `object_code/ages/interactions/miscellaneous2.s`
+  (`miscellaneous2.c`): `interactionCodedc`'s 24-subid dispatch (subid `$0c`/`$0d` share one body)
+  plus every subid handler (27 root routines), backed by a local RST $00 dispatcher and RST $18
+  add-double-index vector. This was the largest single-file batch since ramrockArms, and review
+  caught seven real defects on the first pass — all the same class as the documented pitfall
+  (an unconditional `jr`'s byte range ending at the jump target instead of the instruction's own
+  end), one instance where a byte range collapsed to zero width, and a run of misaligned addresses
+  in `subid17` where a whole block of instructions was shifted by one step. A scripted whole-file
+  byte-delta scan (now run on every touched file before committing) confirmed no further
+  instances. `subid09`'s `replaceTileList`/`returnToState1` and `subid0E`'s `spawnPuff` and
+  `subid05`'s `setRandomShakeDuration`/`shakeScreen` needed the plain-function-plus-explicit-
+  `push_effect` treatment rather than veranFairy's shared-goto-label trick, because their ROM
+  callers need real continuation after the call returns, not a tail hand-off — see the new
+  porting-notes entry. Fifty-six generated rows disappeared; the project now has 3,882 readable
+  hooks out of 10,531, with bank 10 at 211/634.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -451,6 +466,36 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 173, bank 10 (27 routines, branch
+  `claude/bank10-phase6`): ported the whole `object_code/ages/interactions/miscellaneous2.s`
+  (`miscellaneous2.c`) — `interactionCodedc`'s 24-subid RST $00 dispatch and every subid handler
+  `$00`-`$17` (subid `$0c` and `$0d` are literally the same code and share one root function),
+  backed by a local RST $00 jump-table dispatcher and RST $18 add-double-index vector for
+  `subid15`/`subid16`'s shared chest-contents table. The largest single-file batch since
+  ramrockArms (905 lines, 27 root routines). A whole-file scripted scan of every `CYC`/`CYCT`
+  byte delta — added to the review process after the veranFairy batch caught one such bug by hand
+  — caught seven real defects before the gate: three unconditional `jr`s in `subid09`'s
+  substate1/state3-substate1/state3-substate2 tails burned through to their jump target instead of
+  their own two-byte end (the same documented pitfall as the veranFairy batch); `subid15`'s `dec a`
+  and the preceding `jr nz` were both given the same zero-width address; `subid15And16_setChestContents`'s
+  final `jp interactionDelete` was burned through to the *next* routine's start address instead of
+  its own three-byte end (the four bytes in between are the `@chestContents` data table, needing no
+  hook of their own); and `subid17` had a run of five consecutive instructions all shifted one
+  register-load ahead of their real addresses. `subid09`'s `replaceTileList` (called from four
+  sites across two sibling dispatch functions) and `returnToState1` (dispatched from two
+  independent RST $00 tables), and `subid0E`'s `spawnPuff` (called three times) and `subid05`'s
+  `setRandomShakeDuration`/`shakeScreen` (called from multiple states, each needing to keep running
+  afterward) were all written as plain non-hook-table `_hook`-suffixed functions invoked by a real
+  C call with an explicit `push_effect(gb, return_addr)` immediately before it — the same
+  established pattern as `markSpotDiscovered` in the timeportal batch, not the veranFairy
+  shared-goto-label trick, since these all need genuine continuation in the caller after returning
+  rather than a tail hand-off. The first hook-shim naming attempt (`static void ..._hook`) was
+  rejected by `lint_game.py`'s exact `void \w+_hook(` line-start regex; dropping `static` fixed all
+  eight flagged lines. Fifty-six generated rows disappeared; bank 10 is 211/634 and the project
+  3,882/10,531. Gates: lint 0, 30k verify 0 failures across 4,483,521 calls with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 172, bank 10 (6 routines, branch
   `claude/bank10-phase6`): finished two small `object_code/ages/interactions/` files and closed a

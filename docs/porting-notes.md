@@ -1132,3 +1132,30 @@ desync to discover; keep them when porting routines.
   internal branch reaching the SAME logical start), but keep a shared inline label when one path is
   a genuine ROM `call` into what's otherwise a fallthrough tail — the call's stack push is the only
   thing that needs replicating.
+- The shared-goto-label trick above only works when nothing needs to keep running in the *caller*
+  after the shared code's `ret` fires — a `goto` has no call frame, so control never comes back to
+  the statement after it. When the ROM caller genuinely continues after the call (checks flags,
+  runs more code), the shared routine must be a real separate C function, called with an explicit
+  `push_effect(gb, return_addr)` right before the call so the callee's own `ret`/`RET_TAKEN` pops
+  the correct address and its `return;` hands control straight back to the next line in the caller.
+  Bank 10's `miscellaneous2.s` batch hit this repeatedly: `subid09`'s `replaceTileList` (real `call`
+  from four sites across two sibling state functions) and `returnToState1` (dispatched from two
+  independent RST $00 tables), `subid0E`'s `spawnPuff` (three real calls, each followed by more
+  code), and `subid05`'s `setRandomShakeDuration`/`shakeScreen` (several call sites, each checking
+  flags or writing more state afterward) all needed this treatment — an earlier attempt to give
+  `subid05`'s helpers shared goto-labels and manually resume via a `switch (gb->pc)` after their
+  `ret` was wrong (no such mechanism exists in this codebase) and was replaced with plain functions.
+  These helper functions still don't need `rewritten.txt`/hook-table entries when the transliterator
+  flags them `L` (local) — but they must be declared as plain `void name_hook(GB *gb)`, not
+  `static void name_hook(GB *gb)`: `tools/lint_game.py`'s hook-shim detector matches the exact text
+  `void \w+_hook(` at the start of a line, so a `static` prefix makes every emulated-register access
+  inside the function register as a lint error.
+- Run a scripted whole-file scan for implausible `CYC`/`CYCT` byte deltas (as part of both instruction
+  reviews, not just the second) on every file touched in a batch: `grep -oE
+  "CYCT?\(0x[0-9a-f]+, 0x[0-9a-f]+\)" <file> | sort -u`, then for each match verify `to - from` is
+  between 1 and 3 (or up to 4 for the rare four-byte immediate loads). The `miscellaneous2.s` batch
+  found seven real defects this way in one pass — three unconditional `jr`s burned through to their
+  jump target instead of their own two-byte end, one instruction given a zero-width range, one `jp`
+  burned through to the next *routine's* start instead of its own three-byte end, and a whole
+  five-instruction run shifted one register-load ahead of its real addresses — all invisible to a
+  plain re-read because each individual line still "looked" plausible next to its neighbors.
