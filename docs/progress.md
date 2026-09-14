@@ -448,6 +448,18 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-14: milestone 3 phase 6 batch 183, bank 11 (1 root routine, 247 instructions): ported
+  `object_code/ages/parts/veranSpiderweb.s` (`partCode56`, `veranSpiderweb.c`) — Veran's spiderweb
+  boss-arena part: a 4-subid dispatcher (the web core, its beam-firing/reflecting sub-object with a
+  nested 5-state machine, a damage-tracking piece, and a companion-interaction piece), all as one
+  large function with internal goto labels since only `partCode56` itself has an independent hook
+  row. Both self-review (28 conditionals re-verified against ROM mnemonics one at a time) and
+  independent review (which additionally recomputed every labeled block's own reported cycle total
+  by hand and diffed it against the C file's burn ranges) came back completely clean — zero bugs
+  found on either pass. Bank 11 is 79/674 and the project 4,292/9,924. Gates: lint 0, 30k verify 0
+  failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over
+  290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-14: milestone 3 phase 6 batch 182, bank 11 (13 root routines): ported
   `object_code/ages/parts/kingMoblinBomb.s` (`partCode3f`, `kingMoblinBomb.c`) — the bomb King
   Moblin throws (9-state dispatcher: init, waiting/shared logic, held-by-Link, thrown, waiting to

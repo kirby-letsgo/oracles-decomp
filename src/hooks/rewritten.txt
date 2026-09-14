@@ -4325,3 +4325,4 @@ kingMoblinBomb_state7
 kingMoblinBomb_state8
 kingMoblinBomb_checkCollisionWithLink
 kingMoblinBomb_checkCollisionWithKingMoblin
+partCode56
