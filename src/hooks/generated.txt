@@ -6332,12 +6332,7 @@
 09:687b dog_snapToTargetPosition_hook -
 09:688c dog_getTargetPositionAddress_hook -
 09:689c dog_setTargetPositionIndex_hook -
-09:68f0 interactionCode55 -
-09:68f5 interactionCode55__state0 L
-09:68f8 interactionCode55__state1 L
-09:690b interactionCode55__unusedFunc_690b L
-09:6911 interactionCode55__loadScriptAndInitGraphics L
-09:6929 interactionCode55__scriptTable L
+09:68f0 interactionCode55_hook -
 09:6aec interactionCode58 -
 09:6af8 interactionCode58__subid00 L
 09:6afd interactionCode58__subid00__state0 L

@@ -7,7 +7,7 @@ Updated 2026-09-14. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 3,902 routine hooks rewritten across seventeen code
+  routine against the transliteration. Progress: 3,903 routine hooks rewritten across seventeen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -337,6 +337,10 @@ Updated 2026-09-14. Newest entries at the top of each section.
   paths, bringing the project to 3,892/10,440 with bank 9 at 192/502.
   Batch 172 completed the Mamamu Dog subid state machines and movement/target helpers, bringing
   the project to 3,902/10,415 with bank 9 at 202/477.
+  Batch 173 completed interaction 55's dispatcher and private script/graphics path, bringing the
+  project to 3,903/10,410 with bank 9 at 203/472. Interactions 58–5C remain generated after the
+  combined batch exposed two separate full-replay divergences; interaction 58's first divergence
+  is a stack/control-flow difference during its subid initialization.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -441,6 +445,13 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 173, bank 9 (1 routine): completed interaction 55's
+  dispatcher and private script/graphics path. Interaction 58 and roots 59–5C were conservatively
+  deferred after independent full-replay mismatches. Bank 9 is 203/472 and the project
+  3,903/10,410. Gates: lint 0, 30k verify 0 failures across 4,484,031 calls with state
+  3e450c2620a3f6a3, full reference replay 0 state-hash mismatches across 11,451,027 calls over
+  290,174 frames with state a62ae98192befee8, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 172, bank 9 (10 routines): completed Mamamu Dog's two
   subid state machines, graphics/script initialization, and shared movement/target helpers.
