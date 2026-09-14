@@ -448,6 +448,26 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-14: milestone 3 phase 6 batch 179, bank 11 (16 root routines): ported
+  `object_code/common/parts/spikedBall.s` (`PART_SPIKED_BALL`, `spikedBall.c`) — the ball-and-chain
+  soldier's spiked ball head (6 states: init, slow/fast rotation, throw-alignment wait, released,
+  and retracting-collision) and its decorative chain link, plus five leaf helpers. Three separate
+  registered roots reach each other by pure ROM fallthrough with no jump instruction at all
+  (`spikedBall_head_state0`→`state1`, `state2`→`setDefaultDistanceAway`,
+  `setDefaultDistanceAway`→`updatePosition`) — each ends with a plain tail-call to the next root's
+  `_hook`, with any real `call` before the fallthrough point going through `CALL_C` first and no
+  cycle burn invented for the zero-byte transition itself. `spikedBall_chain`'s entry deliberately
+  reuses the `E` register its caller (`partCode2a`) already loaded, matching the ROM's own
+  `ld a,(de)` with no preceding `ld e,`. Self-review caught a `jr` burned to its jump target instead
+  of its own 2-byte end (in `spikedBall_updateStateFromParent`, both instances of the same
+  duplicated `jr z,+`) before the gate ran; independent review then caught two inverted `jr nc`
+  branches (in `partCode2a`'s sword/shield collision check and `spikedBall_head_state3`'s
+  throw-alignment check) that both self-review and the automated address-coverage check missed,
+  since flag polarity isn't something an address-based check can see at all. Bank 11 is 54/727 and
+  the project 4,267/9,977. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
+
 - 2026-09-14: milestone 3 phase 6 batch 178, bank 11 (16 root routines): ported
   `object_code/ages/parts/bigBangBombSpawner.s` (`PART_BIGBANG_BOMB_SPAWNER`,
   `bigBangBombSpawner.c`) — a 6-state bomb-spawner dispatcher (`partCode49`) plus fifteen small

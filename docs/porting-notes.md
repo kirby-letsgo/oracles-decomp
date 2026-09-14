@@ -1256,3 +1256,12 @@ desync to discover; keep them when porting routines.
   never burned its own `ret`'s 4 cycles at all. When a block is legitimately duplicated for two
   different return semantics, each copy needs its own independent trace through the coverage
   check, not just a shared address appearing once in the combined set.
+- The address-coverage self-check only verifies that every instruction's byte range is burned
+  somewhere; it says nothing about whether a conditional's *polarity* is right, since a flipped
+  `if (F & FC)` vs `if (!(F & FC))` burns the exact same address pairs either way. Bank 11's
+  `spikedBall.s` batch had two inverted `jr nc` branches that passed the coverage check, the build,
+  lint, and even the 30k/full-movie verify (both mismatch-free, since neither branch's condition is
+  exercised in a way the reference movie's route distinguishes) — only an independent re-read of
+  the actual flag semantics against the ROM mnemonic caught them. Byte-range checks and polarity
+  checks are two independent failure modes; passing one says nothing about the other, and both need
+  a dedicated pass.
