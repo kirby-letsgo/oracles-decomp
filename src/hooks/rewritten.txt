@@ -3823,6 +3823,9 @@ dog_getTargetPositionAddress
 dog_setTargetPositionIndex
 interactionCode55
 interactionCode61
+interactionCode5a
+interactionCode5b
+interactionCode5c
 ecom_incState_b10
 ecom_incSubstate_b10
 ecom_updateKnockback_b10
