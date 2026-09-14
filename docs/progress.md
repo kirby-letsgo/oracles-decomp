@@ -322,6 +322,15 @@ Updated 2026-09-13. Newest entries at the top of each section.
   local RST $00 dispatcher and RST $10 add-A-to-HL vector). Twelve generated rows disappeared with
   their now-readable parents; the project now has 3,816 readable hooks out of 10,647, with bank 10
   at 145/750.
+  Batch 170 ported the whole `object_code/ages/enemies/veranFairy.s`: `enemyCode06` plus the full
+  `veranFairy_state0`-`state5` tree, `attack0`/`1`/`2`, and the shared `checkLoopAroundScreen`/
+  `checkWithinBoundary`/`updateVar35BasedOnHealth`/`saveMovementPatternPointer`/`animate` helpers
+  (16 root routines), backed by local RST $00, RST $10, and RST $18 dispatch/index helpers. Two
+  empty jump-table dispatches (`enemyCode06`'s state table and `veranFairy_66ed`'s attack table)
+  needed their case labels hand-recovered from the `.dw` tables in the `.s` source, the same gap
+  seen in the ramrockArms batch. Thirty-three generated rows disappeared with their now-readable
+  parents (thirteen `veranFairy_state1` substates and several mis-decoded lookup tables among
+  them); the project now has 3,832 readable hooks out of 10,614, with bank 10 at 161/717.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -426,6 +435,31 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 170, bank 10 (16 routines, branch
+  `claude/bank10-phase6`): ported the whole `object_code/ages/enemies/veranFairy.s`
+  (`veranFairy.c`) — `enemyCode06`'s no-health/just-hit/normal-status dispatch, the six
+  `veranFairy_state0`-`state5` state handlers (state1 is a 13-substate RST $00 dispatcher sharing
+  a `strikeLightningAfterCountdown`/`strikeLightning` tail reached both by fallthrough from four
+  substates and by a real `call` from a fifth, replicated with a `push_effect` immediately before
+  a `goto` into the shared label so the real emulated stack — not the C control flow — decides
+  where the eventual `ret` lands), `attack0`/`1`/`2`, and the shared `checkWithinBoundary`/
+  `updateVar35BasedOnHealth`/`saveMovementPatternPointer`/`animate` helpers, backed by local RST
+  $00 (jump table), RST $10 (add-A-to-HL), and RST $18 (add-double-index-to-HL) vectors. Two
+  RST $00 dispatches (`enemyCode06`'s own state table and `veranFairy_66ed`'s attack table) came
+  back from the transliterator as empty `switch`/`default` bodies; the real case addresses were
+  hand-recovered from the `.dw` entries in the `.s` source, the same gap hit in the ramrockArms
+  batch. The first instruction review caught a real bug: the four `veranFairy_state1` substates
+  (4-7) that do an unconditional `jr` into the shared `strikeLightningAfterCountdown` label had
+  their `CYC` byte range end at the jump *target* address instead of the `jr` instruction's own
+  two-byte end, the exact documented pitfall — fixed by recomputing each as `addr, addr+2`. The
+  second review, and a whole-file scripted scan of every `CYC`/`CYCT` call's byte delta, found no
+  further defects. `veranFairy_checkLoopAroundScreen`'s two lookup tables and `veranFairy_state1`'s
+  pillar/mimic position tables were confirmed as mis-decoded data needing no hook entries, the
+  same class documented for the batch-165/168 tables. Thirty-three generated rows disappeared;
+  bank 10 is 161/717 and the project 3,832/10,614. Gates: lint 0, 30k verify 0 failures across
+  4,484,031 calls with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches
+  over 290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 169, bank 10 (32 routines, branch
   `claude/bank10-phase6`, new worktree from the merged main): ported the whole

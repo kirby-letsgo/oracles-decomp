@@ -1118,3 +1118,17 @@ desync to discover; keep them when porting routines.
   table entry into `substate3`. The fix generalizes: whenever a `--report` shows a local with more
   than one incoming path of different kinds (goto vs. table case), give it its own function first,
   before writing either caller.
+- A local label reached both by plain fallthrough from a sibling `goto` AND by a genuine ROM
+  `call` instruction does *not* need extraction into its own function — the real emulated stack
+  (`gb->sp`/`push_effect`/`pop_effect`), not the C call stack or control-flow shape, is what decides
+  where an eventual `ret` inside the shared code lands. Bank 10's `veranFairy_state1`'s
+  `strikeLightningAfterCountdown`/`strikeLightning` tail is reached by plain fallthrough from four
+  substates (no extra stack effect) and by a real `call` from a fifth (`substate8`); the fix was to
+  keep it as one shared goto-label inside the parent function, and have `substate8` do an explicit
+  `push_effect(gb, return_address)` immediately before the `goto` — matching the real `call`'s own
+  stack effect exactly, and letting whichever `ret`/`RET_TAKEN` the shared code hits pop the correct
+  address for either caller. This is the opposite lesson from the substate2/substate3 case above:
+  extract into a function when the two paths are structurally independent (dispatch table vs.
+  internal branch reaching the SAME logical start), but keep a shared inline label when one path is
+  a genuine ROM `call` into what's otherwise a fallthrough tail — the call's stack push is the only
+  thing that needs replicating.
