@@ -3736,6 +3736,7 @@ forestFairy_subid0b
 forestFairy_subid0c
 forestFairy_standardUpdate_2
 forestFairy_subid0e
+interactionCode45
 ecom_incState_b10
 ecom_incSubstate_b10
 ecom_updateKnockback_b10

@@ -6279,15 +6279,7 @@
 09:552b getGameProgress_1_hook -
 09:5559 getGameProgress_2_hook -
 09:5598 unusedFunc5598_hook -
-09:5646 interactionCode45 -
-09:564e interactionCode45__subid0 L
-09:565e interactionCode45__subid0__initialized L
-09:5664 interactionCode45__subid1 L
-09:5689 interactionCode45__subid1__initialized L
-09:568f interactionCode45__initGraphicsAndIncState L
-09:5698 interactionCode45__initGraphicsTextAndScript L
-09:56b3 interactionCode45__scriptTable L
-09:56b7 interactionCode45__subid1ScriptTable L
+09:5646 interactionCode45_hook -
 09:56bf interactionCode48 -
 09:56c7 interactionCode48__state0 L
 09:56cd interactionCode48__afterCall56cd L
