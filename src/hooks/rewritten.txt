@@ -3754,3 +3754,5 @@ enemyBoss_initializeRoom_b10
 enemyBoss_initializeRoomWithoutExtraGfx_b10
 enemyBoss_beginMiniboss_b10
 enemyBoss_beginBoss_b10
+interactionCodee0
+interactionCodee5

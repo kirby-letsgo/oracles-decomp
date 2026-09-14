@@ -2935,12 +2935,7 @@
 10:74ce interactiondc_subid08__state1 L
 10:74e6 interactiondc_subid08__state0 L
 10:7481 interactionCodedc -
-10:6f00 interactionCodee0 -
-10:6f0c interactionCodee0__state0 L
-10:6f1b interactionCodee0__afterCall6f1b L
-10:6f29 interactionCodee0__state1 L
-10:6f3a interactionCodee0__state2 L
-10:6f45 interactionCodee0__state3 L
+10:6f00 interactionCodee0_hook -
 10:79fa interactionCodedd -
 10:7a50 timewarp_subid0_state2 -
 10:7a81 timewarp_subid0_state2__counterReached0 L
@@ -3526,12 +3521,7 @@
 10:6df2 blackTower_getMovingFlamesNextTileCoords__topFlame L
 10:6dfd blackTower_getMovingFlamesNextTileCoords__rightFlame L
 10:6e09 blackTower_getMovingFlamesNextTileCoords__bottomFlame L
-10:704d interactionCodee5 -
-10:705d interactionCodee5__doneTextFlagSetup L
-10:7060 interactionCodee5__afterCall7060 L
-10:7063 interactionCodee5__runState L
-10:706b interactionCodee5__state0 L
-10:7097 interactionCodee5__state1 L
+10:704d interactionCodee5_hook -
 10:70f6 agesFunc_10_70f6_hook -
 10:7298 agesFunc_10_7298_hook -
 10:74b5 interactiondc_subid07 -

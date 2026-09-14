@@ -305,7 +305,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   `commonCode.s` file for bank 10; the project now has 3,747 readable hooks out of 10,701.
   Batch 166 opened `commonBossCode.s` with the boss-enemy shared helpers (`enemyBoss_dead`,
   `spawnShadow`, `initializeRoom`/`initializeRoomWithoutExtraGfx`, `beginMiniboss`/`beginBoss`);
-  the project now has 3,753 readable hooks out of 10,700.
+  the project now has 3,753 readable hooks out of 10,700. Batch 167 added the first two
+  `object_code/common/interactions/` files, `eraOrSeasonInfo.c` and `ringHelpBook.c`; the project
+  now has 3,755 readable hooks out of 10,690.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -410,6 +412,19 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 167, bank 10 (2 routines, branch
+  `claude/bank10-phase6`): ported the first two small `object_code/common/interactions/` files —
+  `interactionCodee0` (`eraOrSeasonInfo.c`, a 4-state RST $00 dispatcher) and `interactionCodee5`
+  (`ringHelpBook.c`, whose `runState` local is a second RST $00 dispatcher reached through a real
+  local `call`). Both routines' local dispatch targets disappeared from the transliterator's
+  reachability scan once their sole callers became readable, the same pattern as batch 164's bounce
+  locals; `runState` itself lost its own hook row for the same reason and became a plain internal
+  helper after the first lint pass caught it. Two independent instruction reviews found no further
+  defects. Ten generated local rows disappeared; bank 10 is 101/768 and the project 3,755/10,690.
+  Gates: lint 0, 30k verify 0 failures across 4,484,031 calls with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 166, bank 10 (6 routines, branch
   `claude/bank10-phase6`): opened `object_code/common/enemies/commonBossCode.s` (new file
