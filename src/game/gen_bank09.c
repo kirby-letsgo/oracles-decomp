@@ -647,7 +647,7 @@ void goronSubid00(GB *gb) {
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x7582: goto L_7582; case 0x75c0: goto L_75c0; case 0x75df: goto L_75df; case 0x768a: goto L_768a; case 0x7747: goto L_7747; default: HANDOFF(HL); }
 L_7582:
-  CALL(0x7582, goron_initGraphicsAndIncState, 0x7d72, 0x7585);  // call $7d72
+  CALL(0x7582, goron_initGraphicsAndIncState_hook, 0x7d72, 0x7585);  // call $7d72
 L_7585:
   I(0x7585, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
   I(0x7588, 2); alu_and(gb, 0x80);  // and $80
@@ -892,7 +892,7 @@ L_7762:
 void goronSubid00__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7582:
-  CALL(0x7582, goron_initGraphicsAndIncState, 0x7d72, 0x7585);  // call $7d72
+  CALL(0x7582, goron_initGraphicsAndIncState_hook, 0x7d72, 0x7585);  // call $7d72
 L_7585:
   I(0x7585, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
   I(0x7588, 2); alu_and(gb, 0x80);  // and $80
@@ -2378,7 +2378,7 @@ L_776b:
 L_7775:
   CALL(0x7775, interactionInitGraphics_hook, 0x15fb, 0x7778);  // call $15fb
 L_7778:
-  CALL(0x7778, goron_loadScript, 0x7d88, 0x777b);  // call $7d88
+  CALL(0x7778, goron_loadScript_hook, 0x7d88, 0x777b);  // call $7d88
 L_777b:
   I(0x777b, 2); A = 0x02;  // ld a,$02
   CALL(0x777d, interactionSetAnimation_hook, 0x262e, 0x7780);  // call $262e
@@ -2423,7 +2423,7 @@ L_762a:
 L_7775:
   CALL(0x7775, interactionInitGraphics_hook, 0x15fb, 0x7778);  // call $15fb
 L_7778:
-  CALL(0x7778, goron_loadScript, 0x7d88, 0x777b);  // call $7d88
+  CALL(0x7778, goron_loadScript_hook, 0x7d88, 0x777b);  // call $7d88
 L_777b:
   I(0x777b, 2); A = 0x02;  // ld a,$02
   CALL(0x777d, interactionSetAnimation_hook, 0x262e, 0x7780);  // call $262e
@@ -2457,7 +2457,7 @@ void goronSubid01__afterCall7778(GB *gb) {
 L_762a:
   I(0x762a, 4); if (hook_enabled_at(0x26de)) { interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return; } HANDOFF(0x26de);  // jp $26de
 L_7778:
-  CALL(0x7778, goron_loadScript, 0x7d88, 0x777b);  // call $7d88
+  CALL(0x7778, goron_loadScript_hook, 0x7d88, 0x777b);  // call $7d88
 L_777b:
   I(0x777b, 2); A = 0x02;  // ld a,$02
   CALL(0x777d, interactionSetAnimation_hook, 0x262e, 0x7780);  // call $262e
@@ -2670,9 +2670,8 @@ void goronSubid03(GB *gb) {
   CALL(0x7807, checkInteractionState_hook, 0x23fe, 0x780a);  // call $23fe
   if (!(F & FZ)) { I(0x780a, 3); goto L_7812; } I(0x780a, 2);  // jr nz,$7812
 L_780c:
-  CALL(0x780c, goron_loadScriptAndInitGraphics, 0x7d78, 0x780f);  // call $7d78
-L_780f:
-  CALL(0x780f, interactionRunScript_hook, 0x2552, 0x7812);  // call $2552
+  CALL(0x780c, goron_loadScriptAndInitGraphics_hook, 0x7d78, 0x780f);  // call $7d78
+  if (hook_enabled_at(0x780f)) { goronSubid04__afterCall780f_hook(gb); return; } HANDOFF(0x780f);  // fallthrough
 L_7812:
   CALL(0x7812, interactionRunScript_hook, 0x2552, 0x7815);  // call $2552
   if ((F & FC)) { I(0x7815, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x7815, 3);  // jp c,$3b05
@@ -2683,24 +2682,8 @@ L_7812:
 void goronSubid04__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_780c:
-  CALL(0x780c, goron_loadScriptAndInitGraphics, 0x7d78, 0x780f);  // call $7d78
-L_780f:
-  CALL(0x780f, interactionRunScript_hook, 0x2552, 0x7812);  // call $2552
-L_7812:
-  CALL(0x7812, interactionRunScript_hook, 0x2552, 0x7815);  // call $2552
-  if ((F & FC)) { I(0x7815, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x7815, 3);  // jp c,$3b05
-  I(0x7818, 4); if (hook_enabled_at(0x26db)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x26db);  // jp $26db
-}
-
-// 09:780f
-void goronSubid04__afterCall780f(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_780f:
-  CALL(0x780f, interactionRunScript_hook, 0x2552, 0x7812);  // call $2552
-L_7812:
-  CALL(0x7812, interactionRunScript_hook, 0x2552, 0x7815);  // call $2552
-  if ((F & FC)) { I(0x7815, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x7815, 3);  // jp c,$3b05
-  I(0x7818, 4); if (hook_enabled_at(0x26db)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x26db);  // jp $26db
+  CALL(0x780c, goron_loadScriptAndInitGraphics_hook, 0x7d78, 0x780f);  // call $7d78
+  if (hook_enabled_at(0x780f)) { goronSubid04__afterCall780f_hook(gb); return; } HANDOFF(0x780f);  // fallthrough
 }
 
 // 09:7812
@@ -2710,511 +2693,5 @@ L_7812:
   CALL(0x7812, interactionRunScript_hook, 0x2552, 0x7815);  // call $2552
   if ((F & FC)) { I(0x7815, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x7815, 3);  // jp c,$3b05
   I(0x7818, 4); if (hook_enabled_at(0x26db)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x26db);  // jp $26db
-}
-
-// 09:781b
-void goronSubid05(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x781b, checkInteractionState_hook, 0x23fe, 0x781e);  // call $23fe
-  if (!(F & FZ)) { I(0x781e, 3); goto L_7826; } I(0x781e, 2);  // jr nz,$7826
-L_7820:
-  CALL(0x7820, goron_loadScriptFromTableAndInitGraphics, 0x7d7d, 0x7823);  // call $7d7d
-L_7823:
-  CALL(0x7823, interactionRunScript_hook, 0x2552, 0x7826);  // call $2552
-L_7826:
-  I(0x7826, 3); goron_runScriptAndDeleteWhenFinished(gb); return;  // jr $7857
-}
-
-// 09:7820
-void goronSubid05__state0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7820:
-  CALL(0x7820, goron_loadScriptFromTableAndInitGraphics, 0x7d7d, 0x7823);  // call $7d7d
-L_7823:
-  CALL(0x7823, interactionRunScript_hook, 0x2552, 0x7826);  // call $2552
-L_7826:
-  I(0x7826, 3); goron_runScriptAndDeleteWhenFinished(gb); return;  // jr $7857
-}
-
-// 09:7823
-void goronSubid05__afterCall7823(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7823:
-  CALL(0x7823, interactionRunScript_hook, 0x2552, 0x7826);  // call $2552
-L_7826:
-  I(0x7826, 3); goron_runScriptAndDeleteWhenFinished(gb); return;  // jr $7857
-}
-
-// 09:7826
-void goronSubid05__state1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7826:
-  I(0x7826, 3); goron_runScriptAndDeleteWhenFinished(gb); return;  // jr $7857
-}
-
-// 09:7828
-void goronSubid06(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7828, checkInteractionState_hook, 0x23fe, 0x782b);  // call $23fe
-  if (!(F & FZ)) { I(0x782b, 3); goto L_784a; } I(0x782b, 2);  // jr nz,$784a
-L_782d:
-  CALL(0x782d, goron_loadScriptFromTableAndInitGraphics, 0x7d7d, 0x7830);  // call $7d7d
-L_7830:
-  I(0x7830, 2); L = 0x7e;  // ld l,$7e
-  I(0x7832, 3); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
-  I(0x7834, 2); E = 0x43;  // ld e,$43
-  I(0x7836, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x7837, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x7838, 3); goto L_783f; } I(0x7838, 2);  // jr nz,$783f
-  I(0x783a, 4); mem_wr(gb, 0xcfdd, A);  // ld ($cfdd),a
-  I(0x783d, 3); goto L_7847;  // jr $7847
-L_783f:
-  I(0x783f, 2); B = 0x20;  // ld b,$20
-  I(0x7841, 3); SET_HL(0xcfc0);  // ld hl,$cfc0
-  CALL(0x7844, clearMemory_hook, 0x046f, 0x7847);  // call $046f
-L_7847:
-  CALL(0x7847, interactionRunScript_hook, 0x2552, 0x784a);  // call $2552
-L_784a:
-  I(0x784a, 3); goron_runScriptAndDeleteWhenFinished(gb); return;  // jr $7857
-}
-
-// 09:782d
-void goronSubid06__state0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_782d:
-  CALL(0x782d, goron_loadScriptFromTableAndInitGraphics, 0x7d7d, 0x7830);  // call $7d7d
-L_7830:
-  I(0x7830, 2); L = 0x7e;  // ld l,$7e
-  I(0x7832, 3); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
-  I(0x7834, 2); E = 0x43;  // ld e,$43
-  I(0x7836, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x7837, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x7838, 3); goto L_783f; } I(0x7838, 2);  // jr nz,$783f
-  I(0x783a, 4); mem_wr(gb, 0xcfdd, A);  // ld ($cfdd),a
-  I(0x783d, 3); goto L_7847;  // jr $7847
-L_783f:
-  I(0x783f, 2); B = 0x20;  // ld b,$20
-  I(0x7841, 3); SET_HL(0xcfc0);  // ld hl,$cfc0
-  CALL(0x7844, clearMemory_hook, 0x046f, 0x7847);  // call $046f
-L_7847:
-  CALL(0x7847, interactionRunScript_hook, 0x2552, 0x784a);  // call $2552
-L_784a:
-  I(0x784a, 3); goron_runScriptAndDeleteWhenFinished(gb); return;  // jr $7857
-}
-
-// 09:7830
-void goronSubid06__afterCall7830(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7830:
-  I(0x7830, 2); L = 0x7e;  // ld l,$7e
-  I(0x7832, 3); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
-  I(0x7834, 2); E = 0x43;  // ld e,$43
-  I(0x7836, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x7837, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x7838, 3); goto L_783f; } I(0x7838, 2);  // jr nz,$783f
-  I(0x783a, 4); mem_wr(gb, 0xcfdd, A);  // ld ($cfdd),a
-  I(0x783d, 3); goto L_7847;  // jr $7847
-L_783f:
-  I(0x783f, 2); B = 0x20;  // ld b,$20
-  I(0x7841, 3); SET_HL(0xcfc0);  // ld hl,$cfc0
-  CALL(0x7844, clearMemory_hook, 0x046f, 0x7847);  // call $046f
-L_7847:
-  CALL(0x7847, interactionRunScript_hook, 0x2552, 0x784a);  // call $2552
-L_784a:
-  I(0x784a, 3); goron_runScriptAndDeleteWhenFinished(gb); return;  // jr $7857
-}
-
-// 09:784a
-void goronSubid06__state1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_784a:
-  I(0x784a, 3); goron_runScriptAndDeleteWhenFinished(gb); return;  // jr $7857
-}
-
-// 09:784c
-void goronSubid07(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x784c, checkInteractionState_hook, 0x23fe, 0x784f);  // call $23fe
-  if (!(F & FZ)) { I(0x784f, 3); goron_runScriptAndDeleteWhenFinished(gb); return; } I(0x784f, 2);  // jr nz,$7857
-  CALL(0x7851, goron_loadScriptAndInitGraphics, 0x7d78, 0x7854);  // call $7d78
-L_7854:
-  CALL(0x7854, interactionRunScript_hook, 0x2552, 0x7857);  // call $2552
-  goron_runScriptAndDeleteWhenFinished(gb); return;  // fallthrough
-}
-
-// 09:7854
-void goronSubid10__afterCall7854(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7854:
-  CALL(0x7854, interactionRunScript_hook, 0x2552, 0x7857);  // call $2552
-  goron_runScriptAndDeleteWhenFinished(gb); return;  // fallthrough
-}
-
-// 09:7857
-void goron_runScriptAndDeleteWhenFinished(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7857, interactionRunScript_hook, 0x2552, 0x785a);  // call $2552
-  if ((F & FC)) { I(0x785a, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x785a, 3);  // jp c,$3b05
-  goron_faceLinkAndAnimateIfNotNapping(gb); return;  // fallthrough
-}
-
-// 09:785d
-void goron_faceLinkAndAnimateIfNotNapping(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x785d, 2); E = 0x7f;  // ld e,$7f
-  I(0x785f, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x7860, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x7861, 4); if (hook_enabled_at(0x26a9)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x26a9); } I(0x7861, 3);  // jp z,$26a9
-  I(0x7864, 4); if (hook_enabled_at(0x26db)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x26db);  // jp $26db
-}
-
-// 09:7867
-void goronSubid09(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7867, checkInteractionState_hook, 0x23fe, 0x786a);  // call $23fe
-  if (!(F & FZ)) { I(0x786a, 3); goto L_7898; } I(0x786a, 2);  // jr nz,$7898
-L_786c:
-  I(0x786c, 2); E = 0x43;  // ld e,$43
-  I(0x786e, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x786f, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x7870, 3); goto L_7890; } I(0x7870, 2);  // jr nz,$7890
-L_7872:
-  CALL(0x7872, goron_loadScriptFromTableAndInitGraphics, 0x7d7d, 0x7875);  // call $7d7d
-L_7875:
-  I(0x7875, 1); alu_xor(gb, A);  // xor a
-  I(0x7876, 4); mem_wr(gb, 0xcfdf, A);  // ld ($cfdf),a
-  I(0x7879, 4); mem_wr(gb, 0xcfdb, A);  // ld ($cfdb),a
-  CALL(0x787c, getThisRoomFlags_hook, 0x197d, 0x787f);  // call $197d
-  I(0x787f, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x7881, 3); goto L_788b; } I(0x7881, 2);  // jr z,$788b
-  I(0x7883, 3); SET_HL(0x6851);  // ld hl,$6851
-  I(0x7886, 2); E = 0x15;  // ld e,$15
-  CALL(0x7888, interBankCall_hook, 0x008a, 0x788b);  // call $008a
-L_788b:
-  CALL(0x788b, interactionRunScript_hook, 0x2552, 0x788e);  // call $2552
-  I(0x788e, 3); goto L_7898;  // jr $7898
-L_7890:
-  CALL(0x7890, goron_loadScriptFromTableAndInitGraphics, 0x7d7d, 0x7893);  // call $7d7d
-L_7893:
-  CALL(0x7893, interactionRunScript_hook, 0x2552, 0x7896);  // call $2552
-  I(0x7896, 3); goto L_7898;  // jr $7898
-L_7898:
-  I(0x7898, 3); goron_runScriptAndDeleteWhenFinished(gb); return;  // jr $7857
-}
-
-// 09:786c
-void goronSubid09__state0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_786c:
-  I(0x786c, 2); E = 0x43;  // ld e,$43
-  I(0x786e, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x786f, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x7870, 3); goto L_7890; } I(0x7870, 2);  // jr nz,$7890
-L_7872:
-  CALL(0x7872, goron_loadScriptFromTableAndInitGraphics, 0x7d7d, 0x7875);  // call $7d7d
-L_7875:
-  I(0x7875, 1); alu_xor(gb, A);  // xor a
-  I(0x7876, 4); mem_wr(gb, 0xcfdf, A);  // ld ($cfdf),a
-  I(0x7879, 4); mem_wr(gb, 0xcfdb, A);  // ld ($cfdb),a
-  CALL(0x787c, getThisRoomFlags_hook, 0x197d, 0x787f);  // call $197d
-  I(0x787f, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x7881, 3); goto L_788b; } I(0x7881, 2);  // jr z,$788b
-  I(0x7883, 3); SET_HL(0x6851);  // ld hl,$6851
-  I(0x7886, 2); E = 0x15;  // ld e,$15
-  CALL(0x7888, interBankCall_hook, 0x008a, 0x788b);  // call $008a
-L_788b:
-  CALL(0x788b, interactionRunScript_hook, 0x2552, 0x788e);  // call $2552
-  I(0x788e, 3); goto L_7898;  // jr $7898
-L_7890:
-  CALL(0x7890, goron_loadScriptFromTableAndInitGraphics, 0x7d7d, 0x7893);  // call $7d7d
-L_7893:
-  CALL(0x7893, interactionRunScript_hook, 0x2552, 0x7896);  // call $2552
-  I(0x7896, 3); goto L_7898;  // jr $7898
-L_7898:
-  I(0x7898, 3); goron_runScriptAndDeleteWhenFinished(gb); return;  // jr $7857
-}
-
-// 09:7872
-void goronSubid09__leftGuy(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7872:
-  CALL(0x7872, goron_loadScriptFromTableAndInitGraphics, 0x7d7d, 0x7875);  // call $7d7d
-L_7875:
-  I(0x7875, 1); alu_xor(gb, A);  // xor a
-  I(0x7876, 4); mem_wr(gb, 0xcfdf, A);  // ld ($cfdf),a
-  I(0x7879, 4); mem_wr(gb, 0xcfdb, A);  // ld ($cfdb),a
-  CALL(0x787c, getThisRoomFlags_hook, 0x197d, 0x787f);  // call $197d
-  I(0x787f, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x7881, 3); goto L_788b; } I(0x7881, 2);  // jr z,$788b
-  I(0x7883, 3); SET_HL(0x6851);  // ld hl,$6851
-  I(0x7886, 2); E = 0x15;  // ld e,$15
-  CALL(0x7888, interBankCall_hook, 0x008a, 0x788b);  // call $008a
-L_788b:
-  CALL(0x788b, interactionRunScript_hook, 0x2552, 0x788e);  // call $2552
-  I(0x788e, 3); goto L_7898;  // jr $7898
-L_7898:
-  I(0x7898, 3); goron_runScriptAndDeleteWhenFinished(gb); return;  // jr $7857
-}
-
-// 09:7875
-void goronSubid09__afterCall7875(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7875:
-  I(0x7875, 1); alu_xor(gb, A);  // xor a
-  I(0x7876, 4); mem_wr(gb, 0xcfdf, A);  // ld ($cfdf),a
-  I(0x7879, 4); mem_wr(gb, 0xcfdb, A);  // ld ($cfdb),a
-  CALL(0x787c, getThisRoomFlags_hook, 0x197d, 0x787f);  // call $197d
-  I(0x787f, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { I(0x7881, 3); goto L_788b; } I(0x7881, 2);  // jr z,$788b
-  I(0x7883, 3); SET_HL(0x6851);  // ld hl,$6851
-  I(0x7886, 2); E = 0x15;  // ld e,$15
-  CALL(0x7888, interBankCall_hook, 0x008a, 0x788b);  // call $008a
-L_788b:
-  CALL(0x788b, interactionRunScript_hook, 0x2552, 0x788e);  // call $2552
-  I(0x788e, 3); goto L_7898;  // jr $7898
-L_7898:
-  I(0x7898, 3); goron_runScriptAndDeleteWhenFinished(gb); return;  // jr $7857
-}
-
-// 09:7890
-void goronSubid09__rightGuy(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7890:
-  CALL(0x7890, goron_loadScriptFromTableAndInitGraphics, 0x7d7d, 0x7893);  // call $7d7d
-L_7893:
-  CALL(0x7893, interactionRunScript_hook, 0x2552, 0x7896);  // call $2552
-  I(0x7896, 3); goto L_7898;  // jr $7898
-L_7898:
-  I(0x7898, 3); goron_runScriptAndDeleteWhenFinished(gb); return;  // jr $7857
-}
-
-// 09:7893
-void goronSubid09__afterCall7893(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7893:
-  CALL(0x7893, interactionRunScript_hook, 0x2552, 0x7896);  // call $2552
-  I(0x7896, 3); goto L_7898;  // jr $7898
-L_7898:
-  I(0x7898, 3); goron_runScriptAndDeleteWhenFinished(gb); return;  // jr $7857
-}
-
-// 09:7898
-void goronSubid09__state1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7898:
-  I(0x7898, 3); goron_runScriptAndDeleteWhenFinished(gb); return;  // jr $7857
-}
-
-// 09:789a
-void goronSubid0b(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x789a, checkInteractionState_hook, 0x23fe, 0x789d);  // call $23fe
-  if (!(F & FZ)) { I(0x789d, 3); goto L_78a5; } I(0x789d, 2);  // jr nz,$78a5
-L_789f:
-  CALL(0x789f, goron_loadScriptFromTableAndInitGraphics, 0x7d7d, 0x78a2);  // call $7d7d
-L_78a2:
-  CALL(0x78a2, interactionRunScript_hook, 0x2552, 0x78a5);  // call $2552
-L_78a5:
-  CALL(0x78a5, interactionRunScript_hook, 0x2552, 0x78a8);  // call $2552
-  if ((F & FC)) { I(0x78a8, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x78a8, 3);  // jp c,$3b05
-  I(0x78ab, 2); E = 0x7e;  // ld e,$7e
-  I(0x78ad, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x78ae, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x78af); return; } I(0x78af, 2);  // ret nz
-  I(0x78b0, 3); goron_faceLinkAndAnimateIfNotNapping(gb); return;  // jr $785d
-}
-
-// 09:789f
-void goronSubid0b__state0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_789f:
-  CALL(0x789f, goron_loadScriptFromTableAndInitGraphics, 0x7d7d, 0x78a2);  // call $7d7d
-L_78a2:
-  CALL(0x78a2, interactionRunScript_hook, 0x2552, 0x78a5);  // call $2552
-L_78a5:
-  CALL(0x78a5, interactionRunScript_hook, 0x2552, 0x78a8);  // call $2552
-  if ((F & FC)) { I(0x78a8, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x78a8, 3);  // jp c,$3b05
-  I(0x78ab, 2); E = 0x7e;  // ld e,$7e
-  I(0x78ad, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x78ae, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x78af); return; } I(0x78af, 2);  // ret nz
-  I(0x78b0, 3); goron_faceLinkAndAnimateIfNotNapping(gb); return;  // jr $785d
-}
-
-// 09:78a2
-void goronSubid0b__afterCall78a2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_78a2:
-  CALL(0x78a2, interactionRunScript_hook, 0x2552, 0x78a5);  // call $2552
-L_78a5:
-  CALL(0x78a5, interactionRunScript_hook, 0x2552, 0x78a8);  // call $2552
-  if ((F & FC)) { I(0x78a8, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x78a8, 3);  // jp c,$3b05
-  I(0x78ab, 2); E = 0x7e;  // ld e,$7e
-  I(0x78ad, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x78ae, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x78af); return; } I(0x78af, 2);  // ret nz
-  I(0x78b0, 3); goron_faceLinkAndAnimateIfNotNapping(gb); return;  // jr $785d
-}
-
-// 09:78a5
-void goronSubid0b__state1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_78a5:
-  CALL(0x78a5, interactionRunScript_hook, 0x2552, 0x78a8);  // call $2552
-  if ((F & FC)) { I(0x78a8, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x78a8, 3);  // jp c,$3b05
-  I(0x78ab, 2); E = 0x7e;  // ld e,$7e
-  I(0x78ad, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x78ae, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x78af); return; } I(0x78af, 2);  // ret nz
-  I(0x78b0, 3); goron_faceLinkAndAnimateIfNotNapping(gb); return;  // jr $785d
-}
-
-// 09:78b2
-void goronSubid0f(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x78b2, checkInteractionState_hook, 0x23fe, 0x78b5);  // call $23fe
-  if (!(F & FZ)) { I(0x78b5, 3); goto L_78c7; } I(0x78b5, 2);  // jr nz,$78c7
-L_78b7:
-  CALL(0x78b7, goron_initGraphicsAndIncState, 0x7d72, 0x78ba);  // call $7d72
-L_78ba:
-  I(0x78ba, 2); L = 0x7f;  // ld l,$7f
-  I(0x78bc, 3); mem_wr(gb, HL, 0x08);  // ld (hl),$08
-  I(0x78be, 3); SET_HL(0x7ed9);  // ld hl,$7ed9
-  CALL(0x78c1, interactionSetScript_hook, 0x2544, 0x78c4);  // call $2544
-  CALL(0x78c4, interactionRunScript_hook, 0x2552, 0x78c7);  // call $2552
-L_78c7:
-  CALL(0x78c7, interactionRunScript_hook, 0x2552, 0x78ca);  // call $2552
-  if ((F & FC)) { I(0x78ca, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x78ca, 3);  // jp c,$3b05
-  I(0x78cd, 4); if (hook_enabled_at(0x26a9)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x26a9);  // jp $26a9
-}
-
-// 09:78b7
-void goronSubid0f__state0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_78b7:
-  CALL(0x78b7, goron_initGraphicsAndIncState, 0x7d72, 0x78ba);  // call $7d72
-L_78ba:
-  I(0x78ba, 2); L = 0x7f;  // ld l,$7f
-  I(0x78bc, 3); mem_wr(gb, HL, 0x08);  // ld (hl),$08
-  I(0x78be, 3); SET_HL(0x7ed9);  // ld hl,$7ed9
-  CALL(0x78c1, interactionSetScript_hook, 0x2544, 0x78c4);  // call $2544
-  CALL(0x78c4, interactionRunScript_hook, 0x2552, 0x78c7);  // call $2552
-L_78c7:
-  CALL(0x78c7, interactionRunScript_hook, 0x2552, 0x78ca);  // call $2552
-  if ((F & FC)) { I(0x78ca, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x78ca, 3);  // jp c,$3b05
-  I(0x78cd, 4); if (hook_enabled_at(0x26a9)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x26a9);  // jp $26a9
-}
-
-// 09:78ba
-void goronSubid0f__afterCall78ba(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_78ba:
-  I(0x78ba, 2); L = 0x7f;  // ld l,$7f
-  I(0x78bc, 3); mem_wr(gb, HL, 0x08);  // ld (hl),$08
-  I(0x78be, 3); SET_HL(0x7ed9);  // ld hl,$7ed9
-  CALL(0x78c1, interactionSetScript_hook, 0x2544, 0x78c4);  // call $2544
-  CALL(0x78c4, interactionRunScript_hook, 0x2552, 0x78c7);  // call $2552
-L_78c7:
-  CALL(0x78c7, interactionRunScript_hook, 0x2552, 0x78ca);  // call $2552
-  if ((F & FC)) { I(0x78ca, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x78ca, 3);  // jp c,$3b05
-  I(0x78cd, 4); if (hook_enabled_at(0x26a9)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x26a9);  // jp $26a9
-}
-
-// 09:78c7
-void goronSubid0f__state1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_78c7:
-  CALL(0x78c7, interactionRunScript_hook, 0x2552, 0x78ca);  // call $2552
-  if ((F & FC)) { I(0x78ca, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x78ca, 3);  // jp c,$3b05
-  I(0x78cd, 4); if (hook_enabled_at(0x26a9)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x26a9);  // jp $26a9
-}
-
-// 09:7d72
-void goron_initGraphicsAndIncState(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7d72, goron_initGraphics, 0x7d82, 0x7d75);  // call $7d82
-L_7d75:
-  I(0x7d75, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
-}
-
-// 09:7d75
-void goron_initGraphicsAndIncState__afterCall7d75(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7d75:
-  I(0x7d75, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
-}
-
-// 09:7d78
-void goron_loadScriptAndInitGraphics(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7d78, goron_initGraphics, 0x7d82, 0x7d7b);  // call $7d82
-L_7d7b:
-  I(0x7d7b, 3); goron_loadScript(gb); return;  // jr $7d88
-}
-
-// 09:7d7b
-void goron_loadScriptAndInitGraphics__afterCall7d7b(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7d7b:
-  I(0x7d7b, 3); goron_loadScript(gb); return;  // jr $7d88
-}
-
-// 09:7d7d
-void goron_loadScriptFromTableAndInitGraphics(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7d7d, goron_initGraphics, 0x7d82, 0x7d80);  // call $7d82
-L_7d80:
-  I(0x7d80, 3); goron_loadScriptFromTable(gb); return;  // jr $7d98
-}
-
-// 09:7d80
-void goron_loadScriptFromTableAndInitGraphics__afterCall7d80(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7d80:
-  I(0x7d80, 3); goron_loadScriptFromTable(gb); return;  // jr $7d98
-}
-
-// 09:7d82
-void goron_initGraphics(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7d82, interactionLoadExtraGraphics_hook, 0x2781, 0x7d85);  // call $2781
-  I(0x7d85, 4); if (hook_enabled_at(0x15fb)) { interactionInitGraphics_hook(gb); return; } HANDOFF(0x15fb);  // jp $15fb
-}
-
-// 09:7d88
-void goron_loadScript(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7d88, 2); E = 0x42;  // ld e,$42
-  I(0x7d8a, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x7d8b, 3); SET_HL(0x7dae);  // ld hl,$7dae
-  RST_PUSH(0x7d8e, 0x7d8f);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x7d8f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x7d90, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x7d91, 1); L = A;  // ld l,a
-  CALL(0x7d92, interactionSetScript_hook, 0x2544, 0x7d95);  // call $2544
-  I(0x7d95, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
-}
-
-// 09:7d98
-void goron_loadScriptFromTable(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7d98, 2); E = 0x42;  // ld e,$42
-  I(0x7d9a, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x7d9b, 3); SET_HL(0x7dae);  // ld hl,$7dae
-  RST_PUSH(0x7d9e, 0x7d9f);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x7d9f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x7da0, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x7da1, 1); L = A;  // ld l,a
-  I(0x7da2, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x7da3, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x7da4, 0x7da5);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x7da5, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x7da6, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x7da7, 1); L = A;  // ld l,a
-  CALL(0x7da8, interactionSetScript_hook, 0x2544, 0x7dab);  // call $2544
-  I(0x7dab, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
 }
 

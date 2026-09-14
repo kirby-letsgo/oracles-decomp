@@ -199,6 +199,12 @@ desync to discover; keep them when porting routines.
 
 ## Rewriting (milestone 3)
 
+- A deferred source file under src/game is still an active rewrite. Batch 182 left the known
+  divergent hardhatWorker.c and poe.c experiments uncommitted, but CMake's top-level game-source
+  glob compiled them and regeneration promoted their root symbols to hooks even without
+  rewritten.txt entries; the full replay therefore repeated Hardhat's frame-21,120 mismatch.
+  Keep deferred experiments outside src/game/*.c, regenerate from ported.txt, then regenerate
+  the hook table before treating a replay as a clean baseline.
 - Verify mode proves state and total cycles, not where inside a routine a timing side effect
   lands. `setCpuToDoubleSpeed` hand-written with the right total but the DIV reset one M-cycle
   early passed verify and desynced the replay 400 frames later (timer interrupt phase). Anything
