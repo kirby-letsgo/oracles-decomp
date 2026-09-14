@@ -6049,9 +6049,7 @@
 09:7574 goronSubid00_hook -
 09:776b goronSubid01_hook -
 09:77b5 goronSubid02_hook -
-09:7807 goronSubid03 -
-09:780c goronSubid04__state0 L
-09:7812 goronSubid04__state1 L
+09:7807 goronSubid03_hook -
 09:781b goronSubid05_hook -
 09:7828 goronSubid06_hook -
 09:784c goronSubid07_hook -

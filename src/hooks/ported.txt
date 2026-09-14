@@ -6442,3 +6442,4 @@ interactionCode5e__afterCall6e68
 interactionCode59__loadScriptAndInitGraphics
 interactionCode59__afterCall6c0b
 interactionCode59__afterCall6be7
+goronSubid03
