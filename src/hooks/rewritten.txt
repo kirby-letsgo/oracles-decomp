@@ -3806,6 +3806,10 @@ tokayRunSubid1a
 tokayRunStinkBagCutscene
 tokayLoadScript
 interactionCode3f
+interactionCode51
+interactionCode52
+interactionCode53
+interactionCode54
 ecom_incState_b10
 ecom_incSubstate_b10
 ecom_updateKnockback_b10
