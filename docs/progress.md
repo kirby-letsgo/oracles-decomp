@@ -362,6 +362,19 @@ Updated 2026-09-13. Newest entries at the top of each section.
   callers need real continuation after the call returns, not a tail hand-off — see the new
   porting-notes entry. Fifty-six generated rows disappeared; the project now has 3,882 readable
   hooks out of 10,531, with bank 10 at 211/634.
+  Batch 174 ported the whole `object_code/ages/enemies/ramrock.s`: `enemyCode07`'s 13-state
+  dispatch (states 1-7 share one `state_stub`) plus the sword/bomb/seed/glove boss-fight phases and
+  their nested state/substate machines (41 root routines total, including three orphaned `label_10_*`
+  helpers), backed by a single shared RST $00 dispatcher used five times. The whole-file byte-delta
+  scan introduced in the previous batch caught nine more instances of the same jump-target-instead-
+  of-instruction-end byte-range bug — all in unconditional tail `jr`/`jp` sequences at the end of a
+  substate, several of them backward jumps into an earlier shared label — plus one unrelated defect:
+  two `cp` comparisons used invented symbolic constant expressions
+  (`ITEMCOLLISION_MYSTERY_SEED`/`GALE_SEED`) that don't exist anywhere in the C codebase, instead of
+  the literal byte values (`0x9a`, `0x9f`) the transliterator had already resolved them to — a
+  reminder to always copy the resolved literal from the ground-truth dump rather than reconstructing
+  a comparison from the disassembly's own symbolic source. Twenty generated rows disappeared; the
+  project now has 3,923 readable hooks out of 10,511, with bank 10 at 252/614.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -466,6 +479,30 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 174, bank 10 (41 routines, branch
+  `claude/bank10-phase6`): ported the whole `object_code/ages/enemies/ramrock.s` (`ramrock.c`) —
+  `enemyCode07`'s 13-state RST $00 dispatch (states 1-7 all point at the same one-instruction
+  `ramrock_state_stub`), the pre-fight cutscene (`ramrock_state8` and its 6 substates), and the
+  four boss-fight phases (`swordPhase`, `bombPhase` with 5 substates and its own nested RST $00
+  dispatcher, `seedPhase` with a substantial inline collision-detection preamble — mystery/gale
+  seed vs. other-item collisions, each a goto-labelled block — feeding a 7-substate dispatch, and
+  `glovePhase` with 5 substates), plus three orphaned `label_10_*` helpers reachable only from
+  inside `bombPhase_substate3`/`seedPhase_substate1`. A single shared RST $00 helper serves all
+  five dispatch points in the file. Following up on the previous batch's new byte-delta-scan
+  practice, the scan caught nine more instances of the exact same pitfall documented after the
+  veranFairy batch — an unconditional `jr`/`jp` at the tail of a substate burned through to its
+  jump target (another substate's start, sometimes hundreds of bytes away, sometimes backward)
+  instead of the instruction's own two- or three-byte end. It also caught one new defect: the
+  `seedPhase` collision preamble's two `cp` comparisons were written using symbolic constant
+  expressions (`0x80 | ITEMCOLLISION_MYSTERY_SEED`, `(0x80 | ITEMCOLLISION_GALE_SEED) + 1`) copied
+  from the disassembly's own source syntax, but those macros don't exist anywhere in the C
+  codebase — every prior batch has used the literal byte value the transliterator already resolved
+  them to (`0x9a`, `0x9f` here), not reconstructed the expression by hand. Both defects were caught
+  and fixed before the gate. Twenty generated rows disappeared; bank 10 is 252/614 and the project
+  3,923/10,511. Gates: lint 0, 30k verify 0 failures across 4,483,521 calls with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 173, bank 10 (27 routines, branch
   `claude/bank10-phase6`): ported the whole `object_code/ages/interactions/miscellaneous2.s`

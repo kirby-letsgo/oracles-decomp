@@ -1158,4 +1158,14 @@ desync to discover; keep them when porting routines.
   jump target instead of their own two-byte end, one instruction given a zero-width range, one `jp`
   burned through to the next *routine's* start instead of its own three-byte end, and a whole
   five-instruction run shifted one register-load ahead of its real addresses — all invisible to a
-  plain re-read because each individual line still "looked" plausible next to its neighbors.
+  plain re-read because each individual line still "looked" plausible next to its neighbors. The
+  `ramrock.s` batch found nine more of the same jump-target class this way, several backward jumps
+  into an earlier shared label.
+- Never reconstruct a `cp`/`and`/`or`/etc. immediate from the disassembly's own symbolic constant
+  expression (e.g. `cp $80|ITEMCOLLISION_GALE_SEED+1`) — those constant names don't exist anywhere
+  in the C codebase and won't compile, and hand-evaluating the expression risks getting RGBDS's
+  operator precedence wrong. The transliterator has already resolved every such expression to its
+  literal byte value in the `gen_bankXX.c` ground truth (`alu_cp(gb, 0x9f)` for the example above);
+  always copy that literal, the same way every other immediate in these files is copied verbatim
+  rather than re-derived. Bank 10's `ramrock.s` batch hit this in `ramrock_seedPhase`'s item-seed
+  collision-range check.
