@@ -7,7 +7,7 @@ Updated 2026-09-14. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 3,892 routine hooks rewritten across seventeen code
+  routine against the transliteration. Progress: 3,902 routine hooks rewritten across seventeen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -335,6 +335,8 @@ Updated 2026-09-14. Newest entries at the top of each section.
   paths, bringing the project to 3,891/10,479 with bank 9 at 191/541.
   Batch 171 completed the interaction-60 treasure dispatcher and its private state-machine/helper
   paths, bringing the project to 3,892/10,440 with bank 9 at 192/502.
+  Batch 172 completed the Mamamu Dog subid state machines and movement/target helpers, bringing
+  the project to 3,902/10,415 with bank 9 at 202/477.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -439,6 +441,13 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 172, bank 9 (10 routines): completed Mamamu Dog's two
+  subid state machines, graphics/script initialization, and shared movement/target helpers.
+  Bank 9 is 202/477 and the project 3,902/10,415. Gates: lint 0, 30k verify 0 failures across
+  4,484,031 calls with state 3e450c2620a3f6a3, full reference replay 0 state-hash mismatches
+  across 11,451,027 calls over 290,174 frames with state a62ae98192befee8, normal and quirk
+  suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 171, bank 9 (1 routine): completed interaction 60's
   treasure dispatcher, spawn/grab state machine, and internal visibility/treasure/touch helpers.
