@@ -171,25 +171,8 @@ static uint16_t bank09_jump_table_sword(GB *gb) {
   return HL;
 }
 
-void interactionCode5e_hook(GB *gb) {
+void interactionCode5e__afterCall6e68_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6e55, 0x6e57); E = 0x44;
-  CYC(0x6e57, 0x6e58); A = mem_rd(gb, DE);
-  CYC(0x6e58, 0x6e59); push_effect(gb, 0x6e59);
-  SET_HL(bank09_jump_table_sword(gb));
-  switch (HL) {
-    case 0x6e5d: goto L_6e5d;
-    case 0x6e68: goto L_6e68;
-    default: HANDOFF(HL);
-  }
-L_6e5d:
-  CYC(0x6e5d, 0x6e5f); A = 0x01;
-  CYC(0x6e5f, 0x6e60); mem_wr(gb, DE, A);
-  CYC(0x6e60, 0x6e62); A = 0xff;
-  CYC(0x6e62, 0x6e64); E = 0x77;
-  CYC(0x6e64, 0x6e65); mem_wr(gb, DE, A);
-  CALL_C(0x6e65, interactionInitGraphics_hook, 0x15fb, 0x6e68);
-L_6e68:
   CALL_C(0x6e68, objectSetInvisible_hook, 0x1e7b, 0x6e6b);
   CYC(0x6e6b, 0x6e6d); A = 0x00;
   CALL_C(0x6e6d, objectGetRelatedObject1Var_hook, 0x2160, 0x6e70);
@@ -226,4 +209,28 @@ L_6e8f:
   SET_HL(POP(0x6e8f));
   CALL_C(0x6e90, objectTakePosition_hook, 0x2274, 0x6e93);
   CYC(0x6e93, 0x6e96); objectSetVisible83_hook(gb); return;
+}
+
+void interactionCode5e_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6e55, 0x6e57); E = 0x44;
+  CYC(0x6e57, 0x6e58); A = mem_rd(gb, DE);
+  CYC(0x6e58, 0x6e59); push_effect(gb, 0x6e59);
+  SET_HL(bank09_jump_table_sword(gb));
+  switch (HL) {
+    case 0x6e5d: goto L_6e5d;
+    case 0x6e68: goto L_6e68;
+    default: HANDOFF(HL);
+  }
+L_6e5d:
+  CYC(0x6e5d, 0x6e5f); A = 0x01;
+  CYC(0x6e5f, 0x6e60); mem_wr(gb, DE, A);
+  CYC(0x6e60, 0x6e62); A = 0xff;
+  CYC(0x6e62, 0x6e64); E = 0x77;
+  CYC(0x6e64, 0x6e65); mem_wr(gb, DE, A);
+  CALL_C(0x6e65, interactionInitGraphics_hook, 0x15fb, 0x6e68);
+  interactionCode5e__afterCall6e68_hook(gb);
+  return;
+L_6e68:
+  interactionCode5e__afterCall6e68_hook(gb);
 }

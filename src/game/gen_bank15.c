@@ -3641,63 +3641,6 @@ L_6295:
   I(0x629d, 4); if (hook_enabled_at(0x262e)) { interactionSetAnimation_hook(gb); return; } HANDOFF(0x262e);  // jp $262e
 }
 
-// 15:62ef
-void goronDance_clearVariables(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x62ef, 2); B = 0x20;  // ld b,$20
-  I(0x62f1, 3); SET_HL(0xcfc0);  // ld hl,$cfc0
-  CALL(0x62f4, clearMemory_hook, 0x046f, 0x62f7);  // call $046f
-  I(0x62f7, 2); A = 0x02;  // ld a,$02
-  I(0x62f9, 4); mem_wr(gb, 0xcfd2, A);  // ld ($cfd2),a
-  I(0x62fc, 3); SET_HL(0xd008);  // ld hl,$d008
-  I(0x62ff, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  I(0x6301, 1); H = D;  // ld h,d
-  I(0x6302, 2); L = 0x44;  // ld l,$44
-  I(0x6304, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  I(0x6306, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x6307, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  RET(0x6309); return;  // ret
-}
-
-// 15:630a
-void goronDance_restartGame(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x630a, 1); alu_xor(gb, A);  // xor a
-  I(0x630b, 4); mem_wr(gb, 0xcfda, A);  // ld ($cfda),a
-  I(0x630e, 4); mem_wr(gb, 0xcfdb, A);  // ld ($cfdb),a
-  I(0x6311, 3); SET_HL(0xd008);  // ld hl,$d008
-  I(0x6314, 3); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  I(0x6316, 2); B = 0x0a;  // ld b,$0a
-  I(0x6318, 3); SET_HL(0x5786);  // ld hl,$5786
-  I(0x631b, 2); E = 0x08;  // ld e,$08
-  I(0x631d, 4); if (hook_enabled_at(0x008a)) { interBankCall_hook(gb); return; } HANDOFF(0x008a);  // jp $008a
-}
-
-// 15:6320
-void goron_checkInPresent(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6320, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
-  I(0x6323, 2); alu_and(gb, 0x80);  // and $80
-  I(0x6325, 4); writeFlagsTocddb(gb); return;  // jp $5118
-}
-
-// 15:6328
-void goron_checkInPast(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6328, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
-  I(0x632b, 1); alu_cpl(gb);  // cpl
-  I(0x632c, 2); alu_and(gb, 0x80);  // and $80
-  I(0x632e, 4); writeFlagsTocddb(gb); return;  // jp $5118
-}
-
-// 15:6331
-void goronDance_initLinkPosition(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6331, 2); A = 0x02;  // ld a,$02
-  I(0x6333, 3); SET_BC(0x5c50);  // ld bc,$5c50
-  I(0x6336, 3); goron_setLinkPositionAndDirection(gb); return;  // jr $634b
-}
-
 // 15:6338
 void goron_targetCarts_setLinkPositionToCartPlatform(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -3739,104 +3682,6 @@ void goron_putLinkInState08(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x6355, putLinkOnGround_hook, 0x2a8c, 0x6358);  // call $2a8c
   I(0x6358, 4); if (hook_enabled_at(0x2aad)) { setLinkForceStateToState08_hook(gb); return; } HANDOFF(0x2aad);  // jp $2aad
-}
-
-// 15:635b
-void goronDance_checkNumFailedRounds(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x635b, 4); A = mem_rd(gb, 0xcfdb);  // ld a,($cfdb)
-  I(0x635e, 1); B = A;  // ld b,a
-  I(0x635f, 2); A = 0x08;  // ld a,$08
-  I(0x6361, 1); alu_sub(gb, B);  // sub b
-  I(0x6362, 3); SET_HL(0xcba8);  // ld hl,$cba8
-  I(0x6365, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x6366, 2); SET_HL(HL + 1);  // inc hl
-  I(0x6367, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x6369, 4); A = mem_rd(gb, 0xcfdb);  // ld a,($cfdb)
-  I(0x636c, 1); alu_or(gb, A);  // or a
-  I(0x636d, 4); writeFlagsTocddb(gb); return;  // jp $5118
-}
-
-// 15:6370
-void goronDance_giveRandomRingPrize(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6370, 4); A = mem_rd(gb, 0xcc34);  // ld a,($cc34)
-  I(0x6373, 2); alu_and(gb, 0x80);  // and $80
-  if (!(F & FZ)) { I(0x6375, 3); goto L_637b; } I(0x6375, 2);  // jr nz,$637b
-  I(0x6377, 2); B = 0x02;  // ld b,$02
-  I(0x6379, 3); goto L_6386;  // jr $6386
-L_637b:
-  I(0x637b, 2); B = 0x00;  // ld b,$00
-  I(0x637d, 4); A = mem_rd(gb, 0xcfdd);  // ld a,($cfdd)
-  I(0x6380, 2); alu_cp(gb, 0x00);  // cp $00
-  if ((F & FZ)) { I(0x6382, 3); goto L_6386; } I(0x6382, 2);  // jr z,$6386
-  I(0x6384, 2); B = 0x02;  // ld b,$02
-L_6386:
-  CALL(0x6386, getRandomNumber_hook, 0x043e, 0x6389);  // call $043e
-  I(0x6389, 2); alu_and(gb, 0x01);  // and $01
-  I(0x638b, 1); alu_add(gb, B);  // add b
-  I(0x638c, 3); SET_HL(0x6394);  // ld hl,$6394
-  RST_PUSH(0x638f, 0x6390);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x6390, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6391, 4); giveRingAToLink(gb); return;  // jp $5133
-}
-
-// 15:637b
-void goronDance_giveRandomRingPrize__past(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_637b:
-  I(0x637b, 2); B = 0x00;  // ld b,$00
-  I(0x637d, 4); A = mem_rd(gb, 0xcfdd);  // ld a,($cfdd)
-  I(0x6380, 2); alu_cp(gb, 0x00);  // cp $00
-  if ((F & FZ)) { I(0x6382, 3); goto L_6386; } I(0x6382, 2);  // jr z,$6386
-  I(0x6384, 2); B = 0x02;  // ld b,$02
-L_6386:
-  CALL(0x6386, getRandomNumber_hook, 0x043e, 0x6389);  // call $043e
-  I(0x6389, 2); alu_and(gb, 0x01);  // and $01
-  I(0x638b, 1); alu_add(gb, B);  // add b
-  I(0x638c, 3); SET_HL(0x6394);  // ld hl,$6394
-  RST_PUSH(0x638f, 0x6390);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x6390, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6391, 4); giveRingAToLink(gb); return;  // jp $5133
-}
-
-// 15:6386
-void goronDance_giveRandomRingPrize__giveRingForLevel(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6386:
-  CALL(0x6386, getRandomNumber_hook, 0x043e, 0x6389);  // call $043e
-  I(0x6389, 2); alu_and(gb, 0x01);  // and $01
-  I(0x638b, 1); alu_add(gb, B);  // add b
-  I(0x638c, 3); SET_HL(0x6394);  // ld hl,$6394
-  RST_PUSH(0x638f, 0x6390);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x6390, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6391, 4); giveRingAToLink(gb); return;  // jp $5133
-}
-
-// 15:6394
-void goronDance_giveRandomRingPrize__rings(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6394:
-  I(0x6394, 2); alu_add_hl(gb, DE);  // add hl,de
-  I(0x6395, 1); alu_ccf(gb);  // ccf
-  if (!(F & FC)) { I(0x6396, 3); goto L_63b6; } I(0x6396, 2);  // jr nc,$63b6
-  goron_showText_differentForPresent(gb); return;  // fallthrough
-L_63b6:
-  if ((F & FZ)) { I(0x63b6, 3); goto L_63ba; } I(0x63b6, 2);  // jr z,$63ba
-  I(0x63b8, 3); goto L_63be;  // jr $63be
-L_63ba:
-  I(0x63ba, 1); A = C;  // ld a,c
-  I(0x63bb, 2); alu_add(gb, 0x10);  // add $10
-  I(0x63bd, 1); C = A;  // ld c,a
-L_63be:
-  I(0x63be, 2); B = 0x24;  // ld b,$24
-  I(0x63c0, 4); if (hook_enabled_at(0x1872)) { showText_hook(gb); return; } HANDOFF(0x1872);  // jp $1872
 }
 
 // 15:6398
@@ -4340,26 +4185,6 @@ void goron_setAnimation(GB *gb) {
   I(0x6520, 4); if (hook_enabled_at(0x262e)) { interactionSetAnimation_hook(gb); return; } HANDOFF(0x262e);  // jp $262e
 }
 
-// 15:6523
-void goron_beginWalkingLeft(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6523, 1); H = D;  // ld h,d
-  I(0x6524, 2); L = 0x50;  // ld l,$50
-  I(0x6526, 3); mem_wr(gb, HL, 0x14);  // ld (hl),$14
-  I(0x6528, 2); L = 0x49;  // ld l,$49
-  I(0x652a, 3); mem_wr(gb, HL, 0x18);  // ld (hl),$18
-  I(0x652c, 2); L = 0x7c;  // ld l,$7c
-  I(0x652e, 3); mem_wr(gb, HL, 0x40);  // ld (hl),$40
-  I(0x6530, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x6531, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x6533, 2); L = 0x7f;  // ld l,$7f
-  I(0x6535, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  I(0x6537, 2); A = 0x03;  // ld a,$03
-  I(0x6539, 2); E = 0x7e;  // ld e,$7e
-  I(0x653b, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x653c, 4); if (hook_enabled_at(0x262e)) { interactionSetAnimation_hook(gb); return; } HANDOFF(0x262e);  // jp $262e
-}
-
 // 15:653f
 void goron_reverseWalkingDirection(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -4762,24 +4587,6 @@ void goron_tryTakeEmberSeedsAndBombs__dontGiveItems(GB *gb) {
 L_6685:
   I(0x6685, 1); alu_or(gb, D);  // or d
   I(0x6686, 4); writeFlagsTocddb(gb); return;  // jp $5118
-}
-
-// 15:6689
-void goron_checkEnoughTimePassed(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6689, 4); A = mem_rd(gb, 0xcc4d);  // ld a,($cc4d)
-  I(0x668c, 1); alu_cpl(gb);  // cpl
-  I(0x668d, 2); alu_bit(gb, 0, A);  // bit 0,a
-  CALL(0x668f, writeFlagsTocddb, 0x5118, 0x6692);  // call $5118
-  goron_clearRefillBit(gb); return;  // fallthrough
-}
-
-// 15:6692
-void goron_clearRefillBit(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6692, 3); SET_HL(0xcc4d);  // ld hl,$cc4d
-  I(0x6695, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 0)));  // res 0,(hl)
-  RET(0x6697); return;  // ret
 }
 
 // 15:6698
@@ -5439,14 +5246,6 @@ void goron_checkLinkNotInAir(GB *gb) {
   I(0x67bd, 4); A = mem_rd(gb, 0xcc5c);  // ld a,($cc5c)
   I(0x67c0, 2); alu_bit(gb, 7, A);  // bit 7,a
   I(0x67c2, 4); writeFlagsTocddb(gb); return;  // jp $5118
-}
-
-// 15:67c5
-void goron_checkLinkInAir(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x67c5, 4); A = mem_rd(gb, 0xcc5c);  // ld a,($cc5c)
-  I(0x67c8, 1); alu_or(gb, A);  // or a
-  I(0x67c9, 4); writeFlagsTocddb(gb); return;  // jp $5118
 }
 
 // 15:67cc
@@ -7310,26 +7109,6 @@ void remoteMakuCutscene_checkinitUnderwaterWaves(GB *gb) {
   I(0x7339, 3); SET_HL(0x626e);  // ld hl,$626e
   I(0x733c, 2); E = 0x01;  // ld e,$01
   I(0x733e, 4); if (hook_enabled_at(0x008a)) { interBankCall_hook(gb); return; } HANDOFF(0x008a);  // jp $008a
-}
-
-// 15:7341
-void goronElder_lookingUpAnimation(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7341, 1); H = D;  // ld h,d
-  I(0x7342, 2); L = 0x7f;  // ld l,$7f
-  I(0x7344, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  I(0x7346, 2); A = 0x04;  // ld a,$04
-  I(0x7348, 4); if (hook_enabled_at(0x262e)) { interactionSetAnimation_hook(gb); return; } HANDOFF(0x262e);  // jp $262e
-}
-
-// 15:734b
-void goronElder_normalAnimation(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x734b, 1); H = D;  // ld h,d
-  I(0x734c, 2); L = 0x7f;  // ld l,$7f
-  I(0x734e, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x7350, 2); A = 0x02;  // ld a,$02
-  I(0x7352, 4); if (hook_enabled_at(0x262e)) { interactionSetAnimation_hook(gb); return; } HANDOFF(0x262e);  // jp $262e
 }
 
 // 15:73d5

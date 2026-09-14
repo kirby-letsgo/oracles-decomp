@@ -946,3 +946,5 @@
 09:7d75 goron_initGraphicsAndIncState__afterCall7d75
 09:7d7b goron_loadScriptAndInitGraphics__afterCall7d7b
 09:7d80 goron_loadScriptFromTableAndInitGraphics__afterCall7d80
+09:7778 goronSubid01__afterCall7778
+09:6e68 interactionCode5e__afterCall6e68

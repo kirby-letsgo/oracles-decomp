@@ -5,6 +5,9 @@
 #undef CYCT
 #define CYC(from, to) burn_rom(gb, 0x09, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, 0x09, (from), (to), true)
+#define CYC15(from, to) burn_rom(gb, 0x15, (from), (to), false)
+#define CYCT15(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CALL_C15(a, fn, target, ra) do { CYC15((a), (a) + 3); CALL_C_((a), fn, (target), (ra)); } while (0)
 
 void goronDance_updateFrameCounter_hook(GB *gb);
 void goronDance_initNextRound_hook(GB *gb);
@@ -48,6 +51,21 @@ void goron_loadScriptFromTableAndInitGraphics__afterCall7d80_hook(GB *gb);
 void goron_initGraphics_hook(GB *gb);
 void goron_loadScript_hook(GB *gb);
 void goron_loadScriptFromTable_hook(GB *gb);
+void goronSubid01_hook(GB *gb);
+void goronSubid01__afterCall7778_hook(GB *gb);
+void goronDance_clearVariables_hook(GB *gb);
+void goronDance_restartGame_hook(GB *gb);
+void goronDance_initLinkPosition_hook(GB *gb);
+void goronDance_checkNumFailedRounds_hook(GB *gb);
+void goronDance_giveRandomRingPrize_hook(GB *gb);
+void goronElder_lookingUpAnimation_hook(GB *gb);
+void goronElder_normalAnimation_hook(GB *gb);
+void goron_beginWalkingLeft_hook(GB *gb);
+void goron_checkEnoughTimePassed_hook(GB *gb);
+void goron_clearRefillBit_hook(GB *gb);
+void goron_checkInPast_hook(GB *gb);
+void goron_checkInPresent_hook(GB *gb);
+void goron_checkLinkInAir_hook(GB *gb);
 
 static uint16_t goron_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -98,7 +116,7 @@ void interactionCode66_hook(GB *gb) {
   CYC(0x7551, 0x7552); push_effect(gb, 0x7552);
   switch (goron_jump_table(gb)) {
     case 0x7574: goronSubid00(gb); return;
-    case 0x776b: goronSubid01(gb); return;
+	case 0x776b: goronSubid01_hook(gb); return;
     case 0x77b5: goronSubid02_hook(gb); return;
     case 0x7807: goronSubid03_hook(gb); return;
     case 0x781b: goronSubid05_hook(gb); return;
@@ -774,4 +792,226 @@ void goron_loadScriptFromTable_hook(GB *gb) {
   CYC(0x7da7, 0x7da8); L = A;
   CALL_C(0x7da8, interactionSetScript_hook, 0x2544, 0x7dab);
   CYC(0x7dab, 0x7dae); interactionIncState_hook(gb);
+}
+
+static void goron_subid01_face_down(GB *gb, uint16_t sp0_) {
+  CYC(0x777b, 0x777d); A = 2;
+  CALL_C(0x777d, interactionSetAnimation_hook, 0x262e, 0x7780);
+}
+
+void goronSubid01__afterCall7778_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x7778, goron_loadScript_hook, 0x7d88, 0x777b);
+  goron_subid01_face_down(gb, sp0_);
+}
+
+void goronSubid01_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x776b, 0x776d); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(0x776d, 0x776e); A = mem_rd(gb, DE);
+  CYC(0x776e, 0x776f); push_effect(gb, 0x776f);
+  switch (goron_jump_table(gb)) {
+    case 0x7775: goto state0;
+    case 0x7780: goto state1;
+    case 0x7794: goto state2;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+state0:
+  CALL_C(0x7775, interactionInitGraphics_hook, 0x15fb, 0x7778);
+  goronSubid01__afterCall7778_hook(gb);
+  return;
+state1:
+  CYC(0x7780, 0x7783); A = W8(wTmpcfc0_goronDance_linkStartedDance);
+  CYC(0x7783, 0x7784); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x7784, 0x7786); goto goto_state2; }
+  CYC(0x7784, 0x7786);
+  CALL_C(0x7786, interactionRunScript_hook, 0x2552, 0x7789);
+  if (F & FC) { CYCT(0x7789, 0x778c); interactionDelete_hook(gb); return; }
+  CYC(0x7789, 0x778c); CYC(0x778c, 0x778f); npcFaceLinkAndAnimate_hook(gb); return;
+goto_state2:
+  CALL_C(0x778f, interactionIncState_hook, 0x23e0, 0x7792);
+  CYC(0x7792, 0x7794); goto update_animation;
+state2:
+  CYC(0x7794, 0x7797); A = W8(wTmpcfc0_goronDance_linkStartedDance);
+  CYC(0x7797, 0x7798); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x7798, 0x779a); goto goto_state1; }
+  CYC(0x7798, 0x779a);
+update_animation:
+  CYC(0x779a, 0x779d); SET_HL(w1Link_yh + 3);
+  CYC(0x779d, 0x779f); E = INTERACTION_BASE + OBJ_Z;
+  CYC(0x779f, 0x77a0); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x77a0, 0x77a1); mem_wr(gb, DE, A);
+  CYC(0x77a1, 0x77a2); E = alu_inc8(gb, E);
+  CYC(0x77a2, 0x77a3); A = mem_rd(gb, HL);
+  CYC(0x77a3, 0x77a4); mem_wr(gb, DE, A);
+  CYC(0x77a4, 0x77a7); A = W8(wTmpcfc0_goronDance_danceAnimation);
+  CALL_C(0x77a7, interactionSetAnimation_hook, 0x262e, 0x77aa);
+  CYC(0x77aa, 0x77ad); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return;
+goto_state1:
+  CYC(0x77ad, 0x77ae); H = D;
+  CYC(0x77ae, 0x77b0); L = INTERACTION_BASE + OBJ_STATE;
+  CYC(0x77b0, 0x77b2); mem_wr(gb, HL, 1);
+  CYC(0x77b2, 0x77b5); goron_subid01_face_down(gb, sp0_);
+}
+
+void goronDance_clearVariables_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC15(0x62ef, 0x62f1); B = 0x20;
+  CYC15(0x62f1, 0x62f4); SET_HL(wTmpcfc0_goronDance);
+  CALL_C15(0x62f4, clearMemory_hook, 0x046f, 0x62f7);
+  CYC15(0x62f7, 0x62f9); A = 2;
+  CYC15(0x62f9, 0x62fc); W8(wTmpcfc0_goronDance_danceAnimation) = A;
+  CYC15(0x62fc, 0x62ff); SET_HL(w1Link_yh - 3);
+  CYC15(0x62ff, 0x6301); mem_wr(gb, HL, 2);
+  CYC15(0x6301, 0x6302); H = D;
+  CYC15(0x6302, 0x6304); L = INTERACTION_BASE + OBJ_STATE;
+  CYC15(0x6304, 0x6306); mem_wr(gb, HL, 1);
+  CYC15(0x6306, 0x6307); L = alu_inc8(gb, L);
+  CYC15(0x6307, 0x6309); mem_wr(gb, HL, 0);
+  CYC15(0x6309, 0x630a); ret_effect(gb);
+}
+
+void goronDance_restartGame_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  (void)sp0_;
+  CYC15(0x630a, 0x630b); alu_xor(gb, A);
+  CYC15(0x630b, 0x630e); W8(wTmpcfc0_goronDance_roundIndex) = A;
+  CYC15(0x630e, 0x6311); W8(wTmpcfc0_goronDance_numFailedRounds) = A;
+  CYC15(0x6311, 0x6314); SET_HL(w1Link_yh - 3);
+  CYC15(0x6314, 0x6316); mem_wr(gb, HL, 2);
+  CYC15(0x6316, 0x6318); B = 10;
+  CYC15(0x6318, 0x631b); SET_HL(0x5786);
+  CYC15(0x631b, 0x631d); E = 8;
+  CYC15(0x631d, 0x6320); interBankCall_hook(gb);
+}
+
+void goronDance_initLinkPosition_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  (void)sp0_;
+  CYC15(0x6331, 0x6333); A = 2;
+  CYC15(0x6333, 0x6336); SET_BC(0x5c50);
+  CYC15(0x6336, 0x6338); goron_setLinkPositionAndDirection(gb);
+}
+
+void goronDance_checkNumFailedRounds_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  (void)sp0_;
+  CYC15(0x635b, 0x635e); A = W8(wTmpcfc0_goronDance_numFailedRounds);
+  CYC15(0x635e, 0x635f); B = A;
+  CYC15(0x635f, 0x6361); A = 8;
+  CYC15(0x6361, 0x6362); alu_sub(gb, B);
+  CYC15(0x6362, 0x6365); SET_HL(wTextNumberSubstitution);
+  CYC15(0x6365, 0x6366); mem_wr(gb, HL, A);
+  CYC15(0x6366, 0x6367); SET_HL(HL + 1);
+  CYC15(0x6367, 0x6369); mem_wr(gb, HL, 0);
+  CYC15(0x6369, 0x636c); A = W8(wTmpcfc0_goronDance_numFailedRounds);
+  CYC15(0x636c, 0x636d); alu_or(gb, A);
+  CYC15(0x636d, 0x6370); writeFlagsTocddb(gb);
+}
+
+void goronDance_giveRandomRingPrize_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC15(0x6370, 0x6373); A = W8(wTilesetFlags);
+  CYC15(0x6373, 0x6375); alu_and(gb, 0x80);
+  if (!(F & FZ)) { CYCT15(0x6375, 0x6377); goto past; }
+  CYC15(0x6375, 0x6377);
+  CYC15(0x6377, 0x6379); B = 2;
+  CYC15(0x6379, 0x637b); goto give_ring;
+past:
+  CYC15(0x637b, 0x637d); B = 0;
+  CYC15(0x637d, 0x6380); A = W8(wTmpcfc0_goronDance_danceLevel);
+  CYC15(0x6380, 0x6382); alu_cp(gb, 0);
+  if (F & FZ) { CYCT15(0x6382, 0x6384); goto give_ring; }
+  CYC15(0x6382, 0x6384);
+  CYC15(0x6384, 0x6386); B = 2;
+give_ring:
+  CALL_C15(0x6386, getRandomNumber_hook, 0x043e, 0x6389);
+  CYC15(0x6389, 0x638b); alu_and(gb, 1);
+  CYC15(0x638b, 0x638c); alu_add(gb, B);
+  CYC15(0x638c, 0x638f); SET_HL(0x6394);
+  CYC15(0x638f, 0x6390); goron_add_a_to_hl(gb, 0x6390);
+  CYC15(0x6390, 0x6391); A = mem_rd(gb, HL);
+  CYC15(0x6391, 0x6394); giveRingAToLink(gb);
+}
+
+void goronElder_lookingUpAnimation_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  (void)sp0_;
+  CYC15(0x7341, 0x7342); H = D;
+  CYC15(0x7342, 0x7344); L = INTERACTION_BASE + OBJ_VAR3F;
+  CYC15(0x7344, 0x7346); mem_wr(gb, HL, 1);
+  CYC15(0x7346, 0x7348); A = 4;
+  CYC15(0x7348, 0x734b); interactionSetAnimation_hook(gb);
+}
+
+void goronElder_normalAnimation_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  (void)sp0_;
+  CYC15(0x734b, 0x734c); H = D;
+  CYC15(0x734c, 0x734e); L = INTERACTION_BASE + OBJ_VAR3F;
+  CYC15(0x734e, 0x7350); mem_wr(gb, HL, 0);
+  CYC15(0x7350, 0x7352); A = 2;
+  CYC15(0x7352, 0x7355); interactionSetAnimation_hook(gb);
+}
+
+void goron_beginWalkingLeft_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  (void)sp0_;
+  CYC15(0x6523, 0x6524); H = D;
+  CYC15(0x6524, 0x6526); L = INTERACTION_BASE + OBJ_SPEED;
+  CYC15(0x6526, 0x6528); mem_wr(gb, HL, 0x14);
+  CYC15(0x6528, 0x652a); L = INTERACTION_BASE + OBJ_ANGLE;
+  CYC15(0x652a, 0x652c); mem_wr(gb, HL, 0x18);
+  CYC15(0x652c, 0x652e); L = INTERACTION_BASE + OBJ_COUNTER2;
+  CYC15(0x652e, 0x6530); mem_wr(gb, HL, 0x40);
+  CYC15(0x6530, 0x6531); L = alu_inc8(gb, L);
+  CYC15(0x6531, 0x6533); mem_wr(gb, HL, 0);
+  CYC15(0x6533, 0x6535); L = INTERACTION_BASE + OBJ_VAR3F;
+  CYC15(0x6535, 0x6537); mem_wr(gb, HL, 1);
+  CYC15(0x6537, 0x6539); A = 3;
+  CYC15(0x6539, 0x653b); E = INTERACTION_BASE + OBJ_VAR3E;
+  CYC15(0x653b, 0x653c); mem_wr(gb, DE, A);
+  CYC15(0x653c, 0x653f); interactionSetAnimation_hook(gb);
+}
+
+void goron_checkEnoughTimePassed_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC15(0x6689, 0x668c); A = W8(wSeedTreeRefilledBitset);
+  CYC15(0x668c, 0x668d); A = (uint8_t)~A;
+  CYC15(0x668d, 0x668f); alu_bit(gb, 0, A);
+  CALL_C15(0x668f, writeFlagsTocddb, 0x5118, 0x6692);
+  goron_clearRefillBit_hook(gb);
+}
+
+void goron_clearRefillBit_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  (void)sp0_;
+  CYC15(0x6692, 0x6695); SET_HL(wSeedTreeRefilledBitset);
+  CYC15(0x6695, 0x6697); mem_wr(gb, HL, mem_rd(gb, HL) & 0xfe);
+  CYC15(0x6697, 0x6698); ret_effect(gb);
+}
+
+void goron_checkInPast_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  (void)sp0_;
+  CYC15(0x6328, 0x632b); A = W8(wTilesetFlags);
+  CYC15(0x632b, 0x632c); A = (uint8_t)~A;
+  CYC15(0x632c, 0x632e); alu_and(gb, 0x80);
+  CYC15(0x632e, 0x6331); writeFlagsTocddb(gb);
+}
+
+void goron_checkInPresent_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  (void)sp0_;
+  CYC15(0x6320, 0x6323); A = W8(wTilesetFlags);
+  CYC15(0x6323, 0x6325); alu_and(gb, 0x80);
+  CYC15(0x6325, 0x6328); writeFlagsTocddb(gb);
+}
+
+void goron_checkLinkInAir_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  (void)sp0_;
+  CYC15(0x67c5, 0x67c8); A = W8(wLinkInAir);
+  CYC15(0x67c8, 0x67c9); alu_or(gb, A);
+  CYC15(0x67c9, 0x67cc); writeFlagsTocddb(gb);
 }
