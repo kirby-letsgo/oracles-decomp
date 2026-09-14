@@ -402,6 +402,28 @@ Updated 2026-09-13. Newest entries at the top of each section.
   (`interactionCodedf`, `interactionCodee2`, `interactionCodee3`, `interactionCodee6`) were added.
   Forty-eight generated rows disappeared; the project now has 3,927 readable hooks out of 10,463,
   with bank 10 at 256/566.
+  Batch 176 ported the whole `object_code/common/enemies/twinrova.s` boss (`twinrova.c`, 1240
+  lines, 34 root routines): `enemyCode03`'s state/subid dispatch (through a local `runState`
+  helper reached by a real call and treated with the plain-function-plus-explicit-`push_effect`
+  pattern, since its RST $00 tail-jumps into whichever state/subid handler is selected and that
+  handler's own eventual `ret` needs to pop back through this C call chain to `enemyCode03`'s
+  continuation), the shared `state8`/`state9`/`stateD`/`stateE`/`stateF`/`state10` state machine
+  used by both `subid0` and `subid1` (each subid's own dispatch duplicates the shared states
+  inline, matching how the ground truth itself duplicates them per caller), and the movement/
+  animation/attack helper routines. Two RST vector helpers (`addAToHl`, `addDoubleIndexToHl`)
+  and a shared RST $00 jump-table helper, all private per-file copies per the established
+  convention. Two real defects found and fixed: one more instance of the documented
+  jump-target-instead-of-own-end byte-range bug (a `jr nc` in `enemyCode03__runState`), and —
+  a new bug class — eight instances of a `jp cc,nn` conditional jump using plain `CYC`
+  (not-taken cycle cost) on *both* sides of the branch instead of `CYCT` on the taken side; a
+  `jp cc`'s byte range is identical either way (3 bytes) but its cycle cost differs by
+  taken/not-taken exactly like `jr cc`, so this class is invisible to the byte-delta scan (which
+  only checks range width) and was only caught by a full ground-truth address cross-check, not
+  the diff-based scan alone — see the new porting-notes entry. A 30k-frame verify and the full
+  reference replay both passed clean (the movie's route never reaches the Twinrova fight, so
+  these hooks show 0 calls in both — expected, matching several earlier late-game-boss batches
+  this session). Thirty generated rows disappeared; the project now has 3,961 readable hooks out
+  of 10,433, with bank 10 at 290/536.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -506,6 +528,40 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 176, bank 10 (34 root routines, branch
+  `claude/bank10-phase6`): ported the whole `object_code/common/enemies/twinrova.s` boss
+  (`twinrova.c`, 1240 lines) — `enemyCode03`'s health/state dispatch, a local `runState` helper
+  reached by a real `call` and given the plain-function-plus-`push_effect` treatment (its RST $00
+  dispatch never itself `ret`s, it tail-jumps into whichever state/subid root is selected, and
+  that root's own eventual `ret` pops back through the C call chain to `enemyCode03`'s
+  continuation), the pre-fight cutscene (`state8`), the descent-to-fight sequence (`state9`, five
+  substates), the two nearly-identical `subid0`/`subid1` movement-and-attack state machines
+  (`stateA`-`stateC` each, sharing `state8`/`state9`/`stateD`/`stateE`/`stateF`/`state10` via
+  duplicated inline bodies per subid, matching the ground truth's own per-caller duplication),
+  the merge cutscene (`state10`, eight substates), and the movement/angle/animation/projectile
+  helper routines. Two private RST vector helpers (`addAToHl`, `addDoubleIndexToHl`) plus a
+  shared RST $00 jump-table helper, matching the established per-file-copy convention; four of
+  this file's own RST $00 dispatchers (`enemyCode03__runState`'s two chained tables, `subid0`,
+  `subid1`) came back from the transliterator with empty `switch`/`default` bodies needing
+  manual case-address recovery from the `.dw` tables in the `.s` source. Review found two real
+  defects: one more instance of the documented jump-target-instead-of-own-end byte-range bug
+  (a `jr nc` in `runState`), and a new bug class — eight `jp cc,nn` conditional jumps that used
+  plain `CYC` (the not-taken cycle cost) on both sides of the branch instead of `CYCT` on the
+  taken side. A `jp cc`'s byte range is the same three bytes either way, only the cycle cost
+  differs by taken/not-taken exactly like `jr cc`, so this class is invisible to the byte-delta
+  scan (which only checks range width) and was caught only by a full ground-truth address
+  cross-check against every `CYC`/`CYCT` call in the file, not the scan alone — see the new
+  porting-notes entry, and cross-check the other three batch-175 files the same way going
+  forward. A 30k-frame verify and the full 290,174-frame reference replay both passed clean with
+  the expected state hashes; Twinrova's own hooks show 0 calls in both because this movie's route
+  never reaches that boss fight, matching several earlier late-game-boss batches this session
+  (static review plus a clean gate is the verification bar for content the reference movie
+  doesn't visit). Thirty generated rows disappeared; bank 10 is 290/536 and the project
+  3,961/10,433. Gates: lint 0, 30k verify 16 pre-existing/unrelated `lcdVector_hook` failures
+  (identical state hash `99e1f928f2cab55a` with and without this batch's changes, confirmed via a
+  `git stash` round-trip) across 1,096,355 calls, full reference replay 0 state-hash mismatches
+  over 290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 175, bank 10 (4 root routines, branch
   `claude/bank10-phase6`): ported four small leftover interaction files —

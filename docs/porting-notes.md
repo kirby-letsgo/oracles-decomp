@@ -1181,7 +1181,12 @@ desync to discover; keep them when porting routines.
   (16 pre-existing, unrelated `lcdVector_hook` mismatches were unchanged either way — confirmed by a
   `git stash` round-trip against unmodified HEAD), so treat this class of bug as a correctness fix
   to apply on sight from cross-referencing the ground truth, not something to wait on a verify run to
-  confirm.
+  confirm. Bank 10's `twinrova.s` batch had eight more of these — since it recurred immediately in
+  the very next file after being documented, the fix is now standard practice: for every
+  `jp cc,nn`/`jr cc,n` in a batch, do a full address-by-address cross-check of every `CYC`/`CYCT`
+  call against the ground truth's own `I(addr, cycles)` values (not just the byte-delta scan,
+  which cannot see this bug class at all since the range width never changes) before registering
+  the batch.
 - Before naming a new file after the disassembly source's own basename, check whether another bank
   already owns `src/game/<basename>.c` — file names are not namespaced per bank, and disassembly
   source files can collide across banks (bank 6's `object_code/.../raft.s` for
