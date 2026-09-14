@@ -331,6 +331,12 @@ Updated 2026-09-13. Newest entries at the top of each section.
   seen in the ramrockArms batch. Thirty-three generated rows disappeared with their now-readable
   parents (thirteen `veranFairy_state1` substates and several mis-decoded lookup tables among
   them); the project now has 3,832 readable hooks out of 10,614, with bank 10 at 161/717.
+  Batch 171 ported the whole `object_code/ages/interactions/timewarp.s`: `interactionCodedd`'s
+  five-subid dispatch plus the `timewarp_subid0`-`subid4` state trees and their shared
+  `common_state0`/`spawnChild`/`animateUntilFinished`/`animate` helpers (17 root routines), backed
+  by a local RST $00 dispatcher and RST $10 add-A-to-HL vector. Seven generated rows disappeared
+  with their now-readable parents; the project now has 3,849 readable hooks out of 10,607, with
+  bank 10 at 178/710.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -435,6 +441,27 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 171, bank 10 (17 routines, branch
+  `claude/bank10-phase6`): ported the whole `object_code/ages/interactions/timewarp.s`
+  (`timewarp.c`) — `interactionCodedd`'s five-subid RST $00 dispatch, the `timewarp_subid0`
+  (common/state1/state2/animateUntilFinished), `subid1` (common/state1/animateUntilFinished),
+  `subid2` (three inline states), `subid3` and `subid4` (sharing `itemwarp_subid3Or4_state0`,
+  `timewarp_subid3Or4_state3`, and `timewarp_subid3Or4_state4` across both dispatch tables, plus
+  bank-0's `interactionAnimate` as a direct table target) state trees, and the shared
+  `timewarp_common_state0`/`timewarp_spawnChild`/`timewarp_animateUntilFinished`/`timewarp_animate`
+  helpers (`timewarp_common_state0` and `timewarp_spawnChild` are each dispatched to from two
+  independent subid tables), backed by a local RST $00 jump-table dispatcher and RST $10
+  add-A-to-HL vector for `subid0_state2`'s per-counter data table. All five top-level RST $00
+  dispatchers (`interactionCodedd`, `subid0`, `subid1`, `subid3`, `subid4`) came back from the
+  transliterator as empty `switch`/`default` bodies; every case address was hand-recovered from
+  the `.dw` tables in the `.s` source, the same gap hit in the ramrockArms and veranFairy batches.
+  The first instruction review found no defects; the second review, plus a whole-file scripted
+  scan of every `CYC`/`CYCT` byte delta (the class of bug caught in the previous batch), also
+  found none. Seven generated rows disappeared; bank 10 is 178/710 and the project 3,849/10,607.
+  Gates: lint 0, 30k verify 0 failures across 4,484,031 calls with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 170, bank 10 (16 routines, branch
   `claude/bank10-phase6`): ported the whole `object_code/ages/enemies/veranFairy.s`
