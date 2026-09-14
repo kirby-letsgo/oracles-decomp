@@ -3826,6 +3826,14 @@ interactionCode61
 interactionCode5a
 interactionCode5b
 interactionCode5c
+interactionCode62
+makuConfetti_subid0
+makuConfetti_subid1
+makuConfetti_updateSpeedY
+makuConfetti_updateSpeedX
+makuConfetti_updateSpeedYUsingSpeedZ
+makuConfetti_updateSpeedXUsingSpeedZ
+interactionCode63
 ecom_incState_b10
 ecom_incSubstate_b10
 ecom_updateKnockback_b10
