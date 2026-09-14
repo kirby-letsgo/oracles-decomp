@@ -424,6 +424,26 @@ Updated 2026-09-13. Newest entries at the top of each section.
   these hooks show 0 calls in both — expected, matching several earlier late-game-boss batches
   this session). Thirty generated rows disappeared; the project now has 3,961 readable hooks out
   of 10,433, with bank 10 at 290/536.
+  Batch 177 ported the whole `object_code/common/enemies/mergedTwinrova.s` boss
+  (`mergedTwinrova.c`, 973 lines, 23 root routines): `enemyCode01`'s health/collision dispatch
+  (its `normalStatus` local reached by a real call and given the plain-function-plus-
+  `push_effect` treatment for the same reason as `twinrova.c`'s `runState`), the room-swap
+  cutscene (`stateA`, five substates), the lava-room fight (`lavaRoom_stateD`'s target-position
+  movement feeding `lavaRoom_stateE`'s flame/keese attack dispatch), the ice-room fight
+  (`iceRoom_stateD`'s ice-projectile spawner, `iceRoom_state10`'s snowball attack), and the death
+  cutscene. Three mis-decoded data tables (`@targetPositions`, `@var03Vals`, `@keesePositions`)
+  correctly need no hook. Found and fixed one plain transcription typo (a `CYC` `to` address
+  copied from the wrong line) and, applying the batch-176 lesson immediately rather than waiting
+  for a verify run, eight more `jp cc,nn` taken/not-taken cycle bugs caught during the address
+  cross-check before the gate rather than after — writing the fix in the same pass as the first
+  draft instead of a follow-up correction. A 30k-frame verify and the full 290,174-frame reference
+  replay both passed clean with the expected state hashes; mergedTwinrova's own hooks show 0 calls
+  in both, same as `twinrova.c` — this movie's route never reaches either half of the fight.
+  Thirty-three generated rows disappeared; bank 10 is 313/503 and the project 3,984/10,400. Gates:
+  lint 0, 30k verify 16 pre-existing/unrelated `lcdVector_hook` failures (same state hash as
+  every batch since it was first identified) across 1,096,355 calls, full reference replay 0
+  state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -528,6 +548,35 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 177, bank 10 (23 root routines, branch
+  `claude/bank10-phase6`): ported the whole `object_code/common/enemies/mergedTwinrova.s` boss
+  (`mergedTwinrova.c`, 973 lines) — `enemyCode01`'s health/collision-damage dispatch (its
+  `normalStatus` local reached by a real `call` and given the plain-function-plus-`push_effect`
+  treatment, same reasoning as `twinrova.c`'s `runState`: its RST $00 tail-jumps into whichever
+  state/subid root is selected and that root's own eventual `ret` needs to pop back through this
+  C call chain to `enemyCode01`'s continuation), the room-swap-in cutscene (`stateA`, five
+  substates covering the palette flicker, subid swap, LCD-disable tile-replacement window, and
+  fade-in), the lava-room fight (`lavaRoom_stateD` moves toward a chosen target position then
+  hands off to `lavaRoom_stateE`'s flame-attack/keese-attack dispatch, chosen by `var03`), the
+  ice-room fight (`iceRoom_stateD` spawns ice projectiles from one of two position tables
+  depending on boss health, `iceRoom_state10` does the snowball attack), and the death cutscene
+  (explosion spawner reading position offsets via RST $18). Two private RST vector helpers
+  (`addAToHl`, `addDoubleIndexToHl`) plus a shared RST $00 jump-table helper, matching the
+  established per-file-copy convention; three mis-decoded data tables (`@targetPositions`,
+  `@var03Vals`, `@keesePositions`) correctly need no hook table entry. Review found and fixed one
+  plain transcription typo (a `CYC` `to` address accidentally copied from an unrelated
+  neighboring line instead of the instruction's own end) and eight more `jp cc,nn`
+  taken/not-taken cycle bugs — caught by the full ground-truth address cross-check during the
+  first review pass this time, per the standing-practice change made after batch 176, rather than
+  needing a follow-up correction. A 30k-frame verify and the full 290,174-frame reference replay
+  both passed clean with the expected state hashes; `mergedTwinrova`'s own hooks show 0 calls in
+  both, same as `twinrova.c` in the previous batch — this movie's route never reaches either half
+  of the fight, so static review plus a clean gate remains the verification bar here. Thirty-three
+  generated rows disappeared; bank 10 is 313/503 and the project 3,984/10,400. Gates: lint 0, 30k
+  verify 16 pre-existing/unrelated `lcdVector_hook` failures (unchanged state hash
+  `99e1f928f2cab55a`) across 1,096,355 calls, full reference replay 0 state-hash mismatches over
+  290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 176, bank 10 (34 root routines, branch
   `claude/bank10-phase6`): ported the whole `object_code/common/enemies/twinrova.s` boss
