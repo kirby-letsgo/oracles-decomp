@@ -6072,7 +6072,7 @@
 09:7506 interactionCode65_hook -
 09:750e interactionCode65__afterCall750e_hook -
 09:7531 interactionCode65__loadScriptAndInitGraphics_hook -
-09:754e interactionCode66 -
+09:754e interactionCode66_hook -
 09:7574 goronSubid00_hook -
 09:776b goronSubid01_hook -
 09:77b5 goronSubid02_hook -

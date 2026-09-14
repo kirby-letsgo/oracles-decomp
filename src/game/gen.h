@@ -6075,7 +6075,7 @@ void interactionCode64__afterCall73ec_hook(GB *gb);
 void interactionCode65_hook(GB *gb);
 void interactionCode65__afterCall750e_hook(GB *gb);
 void interactionCode65__loadScriptAndInitGraphics_hook(GB *gb);
-void interactionCode66(GB *gb);
+void interactionCode66_hook(GB *gb);
 void goronSubid00_hook(GB *gb);
 void goronSubid01_hook(GB *gb);
 void goronSubid02_hook(GB *gb);
