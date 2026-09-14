@@ -1050,3 +1050,29 @@ desync to discover; keep them when porting routines.
   `villager.c` still called the generated names; the deleted `gen_bank08.c` turned each into a
   link error. Retarget `CALL_C`/tail sites to the `_hook` in the same integration step, before the
   first build.
+- Restructuring a transliterated `goto`-chain into hand-written `if`/`else` blocks is where control
+  flow itself gets inverted, not just cycle counts. Bank 10 batch 163's first
+  `ecom_applyGivenVelocityGivenAdjacentWalls` draft merged a `jr nz` branch into an `if
+  (!(F & FZ)) { CALL...; goto X; }` shape by eye and put the velocity-apply call on the wrong side,
+  so the taken and fallthrough arms were swapped outright; the same draft's tile-collision local
+  merged two genuinely different dispatch targets (`$4244` and `$424a`, each with its own callee
+  and cycle count) into one `if` whose both arms called the same target. Neither defect changes an
+  address that "looks wrong" in isolation, so the fix was to stop composing `if`/`else` from
+  memory and instead copy the pre-rewrite `gen_bankXX.c` transliteration's own `if (cond) { taken;
+  goto L; } fallthrough;` shape verbatim, renaming registers only, for any block with more than one
+  exit.
+- An unconditional `jr`'s two-byte width is easy to confuse with a `call`'s three-byte width once a
+  routine mixes both, because both instructions commonly burn from the same code style
+  (`CYC(addr, addr+N)`). The same batch 163 draft burned five different unconditional `jr`s through
+  `addr+3` instead of `addr+2` (`ecom_applyVelocityForTopDownEnemy(NoHoles)`,
+  `ecom_applyVelocityForSideviewEnemy`, `ecom_getTopDownAdjacentWallsBitset(GivenAngle)`), each
+  landing one byte into the next routine and each invisible in code review because the target
+  function call right after it was still correct. Recompute every unconditional `jr`'s end as
+  `addr + 2`, never by pattern-matching a neighbouring `call`'s `+3`.
+- A local reached by a real `call` needs its own `push_effect` even when it is written as a plain
+  helper function rather than through `CALL_C`. Batch 163's `ecom_getAdjacentWallsBitset` invoked
+  its per-iteration `checkCollisionAt` local directly, burning the three-byte call but never
+  pushing the return address; `checkCollisionAt`'s own `ret`/`RET_TAKEN` then popped whatever the
+  outer caller had left on the stack. `push_effect(gb, return_address)` before the call and letting
+  the callee's own `ret_effect` consume it is required any time a real ROM `call` targets a plain C
+  function instead of `CALL_C`.

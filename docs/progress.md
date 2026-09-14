@@ -297,7 +297,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   enemy-common knockback, hazard, and hole/delete helpers from `commonCode.s`. Four generated
   local rows (the shared checkHazardsCommon sub-blocks and the fallingInHole center-of-hole
   helper) disappeared with their now-readable parents; the project now has 3,699 readable hooks
-  out of 10,714.
+  out of 10,714. Batch 163 continued with the velocity/adjacent-walls helper chain (including the
+  RST $10 add-A-to-HL vector and the two-check tile-collision local); the project now has 3,714
+  readable hooks out of 10,707.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -402,6 +404,25 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 163, bank 10 (15 routines, branch
+  `claude/bank10-phase6`): continued `enemyCommonCode.c` with the velocity/adjacent-walls chain —
+  `ecom_updateMovingPlatform`, `ecom_applyGivenVelocity`, the four `ecom_applyVelocityFor*`
+  entry points, `ecom_applyVelocityGivenAdjacentWalls`, `ecom_applyGivenVelocityGivenAdjacentWalls`
+  (with its `applySpeedComponent` local), the four `ecom_get*AdjacentWallsBitset*` entry points
+  and `label_025`, `ecom_getAdjacentWallsBitset` (with its `checkCollisionAt` local, and a local
+  bank-10 copy of the shared RST $10 add-A-to-HL vector), and `ecom_getAdjacentWallTableOffset`.
+  The first draft mis-set several unconditional `jr` burns to the call-instruction's 3-byte width
+  instead of `jr`'s own 2 bytes, inverted one `jr nz` branch outright (running the velocity-apply
+  call on the wrong side and skipping it on the other), dropped the second half of a two-check
+  tile-collision dispatch (both taken and fallthrough arms called the same collision variant), and
+  omitted the `push_effect` before a real `call` into the local `checkCollisionAt` helper. All four
+  were caught by a full instruction-by-instruction re-derivation against the pre-rewrite
+  `gen_bank10.c` transliteration (the actual second independent review) before the gate ran. Two
+  more generated local rows (`applySpeedComponent`, `checkCollisionAt`) disappeared with their
+  parents; bank 10 is 60/785 and the project 3,714/10,707. Gates: lint 0, 30k verify 0 failures
+  across 4,484,031 calls with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 162, bank 10 (15 routines, branch
   `claude/bank10-phase6`): opened the bank-10 sweep with `object_code/common/enemies/commonCode.s`'s
