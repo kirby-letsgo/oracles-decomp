@@ -1279,3 +1279,17 @@ desync to discover; keep them when porting routines.
   a single local helper function that never got its own root-level review attention — local helpers
   reached by `call` deserve the identical address-by-address scrutiny as a file's main dispatch, not
   less, precisely because they're easy to treat as an afterthought while writing the file.
+- Self-review's targeted sweep of every `CYCT`/`RET_TAKEN` call (checking flag polarity and byte
+  length) has a blind spot: it never looks at plain unconditional `CYC` calls for a `jp`/`jr`,
+  since those aren't flagged by the "conditional branch" pattern the sweep is built around. Bank
+  11's `vireProjectile.s` batch had exactly this — an unconditional `jp objectSetVisible82` at the
+  end of a 5-part spawn loop was burned to `from+8` (the length of the *entire* remaining
+  instruction plus the following `.db` jump-table bytes) instead of its own real 3-byte end,
+  putting the burn range squarely into never-executed table data. This is precisely the class of
+  bug `burn_rom`'s own hard-abort exists to catch — `exit(4)` the first time that code path
+  actually runs, since the range wasn't fully contained in one instruction — but nothing in the
+  gate (build, lint, 30k verify, full replay) exercises a rarely-hit path like a boss's 5-part
+  explosion loop, so it can ship past every automated check. A self-review pass needs a dedicated
+  step that lists every unconditional `jp`/`jr`'s `to` address and confirms it's exactly `from+3`
+  or `from+2`, the same rigor already given to conditionals, not folded into the conditional sweep
+  where it's easy to skip.

@@ -448,6 +448,28 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 184, bank 11 (5 root routines): ported
+  `object_code/common/parts/vireProjectile.s` (`partCode3a`, `vireProjectile.c`) — the Vire ghost's
+  spinning projectile, its 4-subid dispatch (rising/beam/split-into-five/split-off-baby-ball), and
+  four small already-independently-hooked helpers it calls via `CALL_C`. `func_6d22` is a genuinely
+  local subroutine (`; @param b angle / @param e subid`, no independent hook row) reached two
+  different ways: pure ROM fallthrough from `subid1` (needing no `push_effect`, since whatever
+  return address is already legitimately on the stack from the enclosing hook's own dispatch is
+  exactly correct once the chain eventually reaches `objectCopyPosition_hook`'s real `ret`), and a
+  genuine `call` from `subid2_state2`'s 5-part spawn loop expecting a return-and-continue (needing
+  `push_effect(gb, continuation)` at that call site specifically, per the established pattern-b
+  convention) — caught and fixed during self-review before the gate ran, since the first draft
+  wrongly tried `CALL_C` on this non-hook local. Independent review then found two more real bugs
+  self-review missed: a CRITICAL one (an unconditional `jp` at the end of the spawn loop was burned
+  3 bytes into the immediately-following `.db` jump-table data instead of stopping at its own
+  3-byte end, which would have hit `burn_rom`'s hard-abort — `exit(4)` — the first time this
+  5-part spawn loop ever completed), and eight inverted `jr nc` branches (every "select value by
+  distance/health tier" block in the file had its `cp`/`jr nc` polarity flipped). Both fixed and
+  reverified, plus an extra sweep of every remaining unconditional `jp` and `FC`-flag conditional
+  in the file turned up nothing further. Bank 11 is 84/660 and the project 4,297/9,910. Gates:
+  lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-14: milestone 3 phase 6 batch 183, bank 11 (1 root routine, 247 instructions): ported
   `object_code/ages/parts/veranSpiderweb.s` (`partCode56`, `veranSpiderweb.c`) — Veran's spiderweb
   boss-arena part: a 4-subid dispatcher (the web core, its beam-firing/reflecting sub-object with a

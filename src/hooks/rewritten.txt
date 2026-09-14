@@ -4326,3 +4326,8 @@ kingMoblinBomb_state8
 kingMoblinBomb_checkCollisionWithLink
 kingMoblinBomb_checkCollisionWithKingMoblin
 partCode56
+partCode3a
+func_6e2f
+func_6e4a
+func_6e50
+func_6e5d
