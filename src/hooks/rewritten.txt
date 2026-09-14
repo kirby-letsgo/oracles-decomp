@@ -4345,3 +4345,14 @@ func_6c08
 func_6c0e
 func_6c17
 func_6c27
+partCode11
+volcanoRock_subid0
+volcanoRock_subid1
+volcanoRock_common_substate2
+volcanoRock_common_substate3
+volcanoRock_common_substate4
+volcanoRock_common_substate5
+volcanoRock_subid2
+volcanoRock_setRandomPosition
+volcanoRock_subid0_setSpeedFromAngle
+volcanoRock_setCollisionSize

@@ -448,6 +448,25 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 186, bank 11 (11 root routines): ported
+  `object_code/common/parts/volcanoRock.s` (`partCode11`, `volcanoRock.c`) — the erupting volcano
+  rock projectile's subid0 (launch/reset-and-relaunch), subid1 (drop-and-bounce with a shared
+  4-substate hazard/animation/collision tail), and subid2 (random-respawn variant that falls
+  straight through into `volcanoRock_setRandomPosition`, matching the ROM's own fallthrough with
+  zero invented cycle burn), plus two small locals: `volcanoRock_subid0_setSpeedFromAngle`
+  (angle-tier speed lookup, reached only by tail-jump/fallthrough, no push/ret needed) and
+  `volcanoRock_setCollisionSize` (RST $10 table lookup, reached by genuine `call` via `CALL_C`).
+  Written with the full manual address-by-address derivation done up front (every `CYC`/`CYCT`
+  pair copied directly from the transliterate report's consecutive addresses, in direct response
+  to `ball.c`'s high bug count last batch) — the address-coverage diff still caught one real bug
+  before the gate: both `jr c` branches in `volcanoRock_subid0_setSpeedFromAngle` were burned to
+  their jump target (`0x4c17`) instead of their own 2-byte end (`0x4c0f`/`0x4c15`), fixed and
+  reconfirmed via a full unconditional-jp/jr sweep and polarity re-read of all 12 conditionals in
+  the file. Independent review came back completely clean. Bank 11 is 109/651 and the project
+  4,322/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference
+  replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and
+  quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 185, bank 11 (14 root routines): ported
   `object_code/ages/parts/ball.s` (`partCode38`, `ball.c`) — the shooting gallery's rolling ball, its
   4-state dispatcher (init/rolling/collided/thrown-out), and a scattered handful of tile-collision,
