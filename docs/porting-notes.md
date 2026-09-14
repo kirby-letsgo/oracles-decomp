@@ -1293,3 +1293,20 @@ desync to discover; keep them when porting routines.
   step that lists every unconditional `jp`/`jr`'s `to` address and confirms it's exactly `from+3`
   or `from+2`, the same rigor already given to conditionals, not folded into the conditional sweep
   where it's easy to skip.
+- `ball.s` is this session's worst self-review batch by a wide margin: 12 real bugs caught before
+  the file even compiled, in one ~370-line file. Two of the bug classes were genuinely new (not
+  seen in earlier batches) and both were *systematic* rather than one-off: (1) four separate `jp`
+  tail-jumps to already-registered hooks were written as `CALL_C` instead of a plain tail-call —
+  `CALL_C` is only valid for a genuine `call`/`call cc` where the ROM expects control back; a `jp`
+  never returns, so wrapping it in `CALL_C` doesn't crash or fail any gate (the hook still runs,
+  just via the slower/wrong-shaped mechanism) but is structurally wrong and worth catching, so
+  every `CALL_C` site needs its target mnemonic re-checked against the `.s` source as `call`, not
+  assumed from "there's a callee name here". (2) Six `jr nc` branches across every collision-check
+  block in the file were all inverted (`if (F & FC)` instead of `if (!(F & FC))`) — a single
+  copy-paste-without-adjusting mistake propagated by reusing the same block shape repeatedly while
+  writing the file, rather than six independent mistakes; when one `jr nc`/`jr c` polarity is found
+  wrong, the fix pass should specifically grep every other occurrence of the same mnemonic in the
+  file rather than assume it was a one-off. Both were only caught because self-review re-derived
+  every instruction from the ROM address-by-address rather than skimming the draft for
+  plausibility — skimming a correctly-*shaped* line (a `CALL_C` with a real callee name; an `if`
+  with a real flag) is exactly what lets a structurally-wrong-but-plausible-looking line slip past.

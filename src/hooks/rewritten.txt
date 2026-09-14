@@ -4331,3 +4331,17 @@ func_6e2f
 func_6e4a
 func_6e50
 func_6e5d
+partCode38
+func_6b5f
+func_6b65
+func_6b71
+func_6b77
+func_6b9f
+func_6baf
+func_6bca
+func_6bf6
+func_6c02
+func_6c08
+func_6c0e
+func_6c17
+func_6c27

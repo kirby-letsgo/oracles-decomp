@@ -448,6 +448,26 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 185, bank 11 (14 root routines): ported
+  `object_code/ages/parts/ball.s` (`partCode38`, `ball.c`) — the shooting gallery's rolling ball, its
+  4-state dispatcher (init/rolling/collided/thrown-out), and a scattered handful of tile-collision,
+  target-hit, and falling-rock-interaction helpers. `func_6b00` is a true local reached via genuine
+  `call` from three sites, implementing an unusual `scf`/`push af`/.../`pop af`/`ccf`-or-not idiom
+  to compute a carry-flag result while leaving `A` untouched — modeled with `push_effect`/
+  `pop_effect` on a packed 16-bit A:F value and no call-boundary push/ret_effect, matching the
+  established plain-local-helper precedent. Self-review this batch was this session's worst by a
+  wide margin: 12 real bugs found and fixed before the file even compiled — four places where a
+  plain `jp` tail-jump was wrongly written as `CALL_C`, six systematically inverted `jr nc`
+  branches (a copy-paste error that propagated across every collision-check block in the file), one
+  `jr c` burned to its jump target instead of its own end, and one off-by-one instruction-boundary
+  shift inside `func_6b00` that mislabeled three consecutive byte ranges. All caught by re-deriving
+  every instruction address-by-address against the ROM before compiling, rather than trusting the
+  first draft — both the full address-coverage script and a subsequent maximally-thorough
+  independent review (explicitly told to trust nothing already "fixed") came back completely clean
+  afterward. Bank 11 is 98/651 and the project 4,311/9,901. Gates: lint 0, 30k verify 0 failures
+  with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames
+  with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 184, bank 11 (5 root routines): ported
   `object_code/common/parts/vireProjectile.s` (`partCode3a`, `vireProjectile.c`) — the Vire ghost's
   spinning projectile, its 4-subid dispatch (rising/beam/split-into-five/split-off-baby-ball), and
