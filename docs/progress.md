@@ -1,6 +1,6 @@
 # Progress
 
-Updated 2026-09-13. Newest entries at the top of each section.
+Updated 2026-09-14. Newest entries at the top of each section.
 
 ## Where things stand
 
@@ -317,7 +317,8 @@ Updated 2026-09-13. Newest entries at the top of each section.
   now has 3,766 readable hooks out of 10,684. Merging that work with the bank-9 batch gives the
   project 3,783 readable hooks out of 10,659. Batch 163 continued bank 9 with the forest-fairy
   subid-0 dispatcher/states, two small NPC dispatchers, and the five soldier tail labels; the
-  project is now 3,799/10,639, with bank 9 at 99/701.
+  project is now 3,799/10,639, with bank 9 at 99/701. Batch 164 completed the remaining safe
+  Forest Fairy state and NPC entries, bringing the project to 3,817/10,631 with bank 9 at 117/693.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -422,6 +423,14 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 164, bank 9 (18 routines): completed the remaining
+  Forest Fairy entries: the subid 1 discovery path, the subid 2-4 state dispatch and movement
+  states, generic NPC setup/update, and the post-maze, post-Jabu, secret, postgame, and
+  companion-search NPC paths. Eight private table/local rows left the generated registry. Bank 9
+  is 117/693 and the project 3,817/10,631. Gates: lint 0, 30k verify 0 failures across 4,484,031
+  calls with state 3e450c2620a3f6a3, full reference replay 0 state-hash mismatches across
+  11,449,588 calls over 290,174 frames with state a62ae98192befee8, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 163, bank 9 (16 routines): ported forest-fairy subid 0's
   dispatcher, states 0-3, movement-preset loader, movement, and animation; the misc-man and
