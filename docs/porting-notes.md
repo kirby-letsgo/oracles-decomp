@@ -1107,3 +1107,122 @@ desync to discover; keep them when porting routines.
   neither needs a `rewritten.txt` entry: once every routine that made them locally discoverable is
   itself rewritten, they stop being generated at all. Confirm with a report or the `.s` source
   before assuming a `flag L` sibling of a routine being rewritten needs its own entry.
+- A struct field with no dedicated high-byte constant (e.g. `relatedObj1 dw $16`, a 2-byte field
+  where `game.h` only names the low byte `OBJ_RELATED1`) needs `ENEMY_BASE + OBJ_RELATED1 + 1` for
+  the high byte, not a second invented constant. Batch 169's `ramrockArms.c` also hit two plain
+  field-confusion bugs the same way as past batches: `OBJ_KNOCKBACK_ANGLE` (`$2c`) and `OBJ_VAR2A`
+  (`$2a`) are two bytes apart and look interchangeable from memory, but the literal dump hex at
+  ROM addresses `$618a` and `$6381` was `$2a` both times. Always check the numeric offset against
+  the dump byte, never the "nearby-looking" named constant.
+- A local routine reachable both from an internal `jr`/`goto` inside its parent AND independently
+  from a dispatch-table `case` must be extracted into its own standalone function called by direct
+  C call from every entry point — never inlined into the first caller and then wrapped by a second
+  function that calls the first. Batch 169's `ramrockArm_subid4_substate3` is dispatched directly
+  from `subid4`'s own RST $00 table but is also reached by three internal branches inside
+  `substate2`; inlining it into `substate2` and then giving `substate3_hook` a body that just
+  called `substate2_hook` would have re-executed `substate2`'s entire preamble on every dispatch-
+  table entry into `substate3`. The fix generalizes: whenever a `--report` shows a local with more
+  than one incoming path of different kinds (goto vs. table case), give it its own function first,
+  before writing either caller.
+- A local label reached both by plain fallthrough from a sibling `goto` AND by a genuine ROM
+  `call` instruction does *not* need extraction into its own function — the real emulated stack
+  (`gb->sp`/`push_effect`/`pop_effect`), not the C call stack or control-flow shape, is what decides
+  where an eventual `ret` inside the shared code lands. Bank 10's `veranFairy_state1`'s
+  `strikeLightningAfterCountdown`/`strikeLightning` tail is reached by plain fallthrough from four
+  substates (no extra stack effect) and by a real `call` from a fifth (`substate8`); the fix was to
+  keep it as one shared goto-label inside the parent function, and have `substate8` do an explicit
+  `push_effect(gb, return_address)` immediately before the `goto` — matching the real `call`'s own
+  stack effect exactly, and letting whichever `ret`/`RET_TAKEN` the shared code hits pop the correct
+  address for either caller. This is the opposite lesson from the substate2/substate3 case above:
+  extract into a function when the two paths are structurally independent (dispatch table vs.
+  internal branch reaching the SAME logical start), but keep a shared inline label when one path is
+  a genuine ROM `call` into what's otherwise a fallthrough tail — the call's stack push is the only
+  thing that needs replicating.
+- The shared-goto-label trick above only works when nothing needs to keep running in the *caller*
+  after the shared code's `ret` fires — a `goto` has no call frame, so control never comes back to
+  the statement after it. When the ROM caller genuinely continues after the call (checks flags,
+  runs more code), the shared routine must be a real separate C function, called with an explicit
+  `push_effect(gb, return_addr)` right before the call so the callee's own `ret`/`RET_TAKEN` pops
+  the correct address and its `return;` hands control straight back to the next line in the caller.
+  Bank 10's `miscellaneous2.s` batch hit this repeatedly: `subid09`'s `replaceTileList` (real `call`
+  from four sites across two sibling state functions) and `returnToState1` (dispatched from two
+  independent RST $00 tables), `subid0E`'s `spawnPuff` (three real calls, each followed by more
+  code), and `subid05`'s `setRandomShakeDuration`/`shakeScreen` (several call sites, each checking
+  flags or writing more state afterward) all needed this treatment — an earlier attempt to give
+  `subid05`'s helpers shared goto-labels and manually resume via a `switch (gb->pc)` after their
+  `ret` was wrong (no such mechanism exists in this codebase) and was replaced with plain functions.
+  These helper functions still don't need `rewritten.txt`/hook-table entries when the transliterator
+  flags them `L` (local) — but they must be declared as plain `void name_hook(GB *gb)`, not
+  `static void name_hook(GB *gb)`: `tools/lint_game.py`'s hook-shim detector matches the exact text
+  `void \w+_hook(` at the start of a line, so a `static` prefix makes every emulated-register access
+  inside the function register as a lint error.
+- Run a scripted whole-file scan for implausible `CYC`/`CYCT` byte deltas (as part of both instruction
+  reviews, not just the second) on every file touched in a batch: `grep -oE
+  "CYCT?\(0x[0-9a-f]+, 0x[0-9a-f]+\)" <file> | sort -u`, then for each match verify `to - from` is
+  between 1 and 3 (or up to 4 for the rare four-byte immediate loads). The `miscellaneous2.s` batch
+  found seven real defects this way in one pass — three unconditional `jr`s burned through to their
+  jump target instead of their own two-byte end, one instruction given a zero-width range, one `jp`
+  burned through to the next *routine's* start instead of its own three-byte end, and a whole
+  five-instruction run shifted one register-load ahead of its real addresses — all invisible to a
+  plain re-read because each individual line still "looked" plausible next to its neighbors. The
+  `ramrock.s` batch found nine more of the same jump-target class this way, several backward jumps
+  into an earlier shared label.
+- Never reconstruct a `cp`/`and`/`or`/etc. immediate from the disassembly's own symbolic constant
+  expression (e.g. `cp $80|ITEMCOLLISION_GALE_SEED+1`) — those constant names don't exist anywhere
+  in the C codebase and won't compile, and hand-evaluating the expression risks getting RGBDS's
+  operator precedence wrong. The transliterator has already resolved every such expression to its
+  literal byte value in the `gen_bankXX.c` ground truth (`alu_cp(gb, 0x9f)` for the example above);
+  always copy that literal, the same way every other immediate in these files is copied verbatim
+  rather than re-derived. Bank 10's `ramrock.s` batch hit this in `ramrock_seedPhase`'s item-seed
+  collision-range check.
+- `jp cc,nn` has different taken/not-taken cycle costs on real hardware, exactly like `jr cc,n` —
+  `CYCT` (not plain `CYC`) belongs under the taken branch even though the byte range (`from` to
+  `from+3`) is identical either way, since it is only the byte range that stays fixed, not the
+  cycle count `burn_rom` looks up for that opcode. Because the byte range genuinely doesn't change,
+  this bug is invisible to the byte-delta scan (which only checks range width) and easy to miss on
+  read-through, since the line still "looks right" — only a 30k-frame verify or a diff against the
+  ground truth's own `I(addr, cycles)` value (which does differ, e.g. `I(addr, 4)` taken vs.
+  `I(addr, 3)` not-taken for `jp cc`) catches it. Bank 10's `raft.s` batch had four of these (all
+  `jp z`/`jp nz,interactionDelete` tails); a 30k verify comparison across the fix was inconclusive
+  (16 pre-existing, unrelated `lcdVector_hook` mismatches were unchanged either way — confirmed by a
+  `git stash` round-trip against unmodified HEAD), so treat this class of bug as a correctness fix
+  to apply on sight from cross-referencing the ground truth, not something to wait on a verify run to
+  confirm. Bank 10's `twinrova.s` batch had eight more of these — since it recurred immediately in
+  the very next file after being documented, the fix is now standard practice: for every
+  `jp cc,nn`/`jr cc,n` in a batch, do a full address-by-address cross-check of every `CYC`/`CYCT`
+  call against the ground truth's own `I(addr, cycles)` values (not just the byte-delta scan,
+  which cannot see this bug class at all since the range width never changes) before registering
+  the batch. Bank 10's `ganon.s` batch (76 roots) had 15 more of these, and this time they were
+  missed during the write pass itself — attention was on getting the `CALL_C`-vs-direct-call rule
+  right for this file (see below) and the `jp cc` check got deferred to "after," where it was
+  only caught by a dedicated `grep -n "// jp z\|// jp nz\|// jp c,\|// jp nc,"` over the finished
+  file. Both checks are mandatory on every batch with conditional jumps or genuine calls; neither
+  one earns a pass by being the one you focused on this time. Do both during the write, not just
+  before registering.
+- Before naming a new file after the disassembly source's own basename, check whether another bank
+  already owns `src/game/<basename>.c` — file names are not namespaced per bank, and disassembly
+  source files can collide across banks (bank 6's `object_code/.../raft.s` for
+  `specialObjectCode_raft_b06` and bank 10's `object_code/ages/interactions/raft.s` for
+  `interactionCodee6`, both literally named `raft.s`, both would-be `src/game/raft.c`). Writing over
+  an existing file destroys another bank's already-verified work silently — `Write` and `Edit` don't
+  warn about this since the file already existing and being about to be overwritten is the whole
+  point of `Edit`. Check with `git status --short src/game/<name>.c` and `git log --oneline -1 --
+  src/game/<name>.c` before the first `Write` of a same-named file, and if it collides, pick a
+  distinguishing name (`raftInteraction.c` here) instead of a bank suffix — the routine names inside
+  stay canonical either way, only the file's own basename needs to be unique.
+- A genuine `CALL(...)` to a sibling root must use `CALL_C`, never a plain direct call plus
+  `return;`, whenever the ground truth shows more code after it at the return address (i.e. a
+  label immediately following the `CALL(...)` line, with real instructions under it) — `CALL_C`
+  pushes the return address and, on the callee's normal `ret` (verified by `gb->pc`/`gb->sp`
+  matching), falls straight through to the next C statement, which is exactly what "more code at
+  the return address" requires. A direct call plus `return;` is correct only for a `jp`, `jr`, or
+  literal ROM fallthrough — cases where the ground truth's own comment says so and nothing follows
+  the transfer at that address. Bank 10's `veranFinal.s` batch had exactly one of these: a `call`
+  to `veranFinal_dead` fired when the boss's health reaches zero, written as a direct call
+  (dropping `enemyCode02`'s own follow-up dispatch code entirely) instead of `CALL_C`. Because
+  this boss, like the whole Twinrova family before it, is never reached by the reference movie's
+  route, a bug in this exact shape ships invisibly past every gate a batch runs — the 30k verify
+  and full replay both stay clean since the buggy path is never executed. The only thing that
+  catches it is re-reading whether the ground truth has code after the `CALL(...)` before writing
+  the C for it; treat this as a required check specifically for every genuine `call` (not `jp`,
+  not fallthrough) in any boss/enemy file this movie's route doesn't exercise.

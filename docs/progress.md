@@ -7,7 +7,7 @@ Updated 2026-09-14. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 3,904 routine hooks rewritten across seventeen code
+  routine against the transliteration. Progress: 4,246 routine hooks rewritten across seventeen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -447,6 +447,12 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: merged `claude/bank10-phase6` (batches 162–179): completed every remaining bank-10
+  routine, including Ramrock, Twinrova, merged Twinrova, Veran Final, and Ganon. Bank 10 is now
+  fully readable C at 454/454; the regenerated project registry is 4,246/10,079. Claude's branch
+  passed lint, 30k hook verification, the full reference replay, and normal and quirk suites per
+  batch before this merge.
 
 - 2026-09-14: milestone 3 phase 6 batch 174, bank 9 (1 routine): completed interaction 61's lever
   dispatcher, state/substate machine, and private connection/pull helpers. Bank 9 is 204/449 and
