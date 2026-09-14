@@ -7,7 +7,7 @@ Updated 2026-09-14. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 4,257 routine hooks rewritten across seventeen code
+  routine against the transliteration. Progress: 4,260 routine hooks rewritten across seventeen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -447,6 +447,12 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 177, bank 9 (3 routines): completed the Comedian and its
+  script-loader/thread-resume hooks. Review promoted the ROM's post-call continuation to a durable
+  hook so interactionInitGraphics can safely switch threads. Bank 9 is 218/397 and the project
+  4,260/10,027. Lint, 30k verification, full reference replay, and both normal and quirk suites
+  passed.
 
 - 2026-09-14: milestone 3 phase 6 batch 176, bank 9 (8 routines): completed Maku Confetti's
   subid dispatchers and speed-component helpers plus the Accessory interaction. Bank 9 is 215/401

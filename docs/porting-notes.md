@@ -1226,3 +1226,12 @@ desync to discover; keep them when porting routines.
   catches it is re-reading whether the ground truth has code after the `CALL(...)` before writing
   the C for it; treat this as a required check specifically for every genuine `call` (not `jp`,
   not fallthrough) in any boss/enemy file this movie's route doesn't exercise.
+- When a local helper reached by a real call contains a callee marked SWITCHES THREADS, make both
+  the local helper and the caller's post-call address durable hooks before registering the parent.
+  The first Comedian draft called a static C helper directly: interactionInitGraphics could leave
+  that helper through the hook dispatcher, then the outer C routine continued as though the helper
+  had returned normally. Adding interactionCode65__loadScriptAndInitGraphics at $7531 and
+  interactionCode65__afterCall750e at $750e to extra.sym, ported.txt, and rewritten.txt lets the
+  generated call hand the new thread to the real continuation. The reference movie never enters
+  this NPC path, so the only warning was the readiness report's SWITCHES THREADS tag; treat that
+  tag as a mandatory continuation audit even after all replay gates pass.

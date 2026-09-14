@@ -1073,11 +1073,8 @@ L_7502:
   I(0x7507, 2); alu_cp(gb, 0x23);  // cp $23
   if (!(F & FZ)) { I(0x7509, 3); goto L_7517; } I(0x7509, 2);  // jr nz,$7517
 L_750b:
-  CALL(0x750b, interactionCode65__loadScriptAndInitGraphics, 0x7531, 0x750e);  // call $7531
-L_750e:
-  CALL(0x750e, interactionRunScript_hook, 0x2552, 0x7511);  // call $2552
-  CALL(0x7511, interactionRunScript_hook, 0x2552, 0x7514);  // call $2552
-  I(0x7514, 4); if (hook_enabled_at(0x26db)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x26db);  // jp $26db
+  CALL(0x750b, interactionCode65__loadScriptAndInitGraphics_hook, 0x7531, 0x750e);  // call $7531
+  if (hook_enabled_at(0x750e)) { interactionCode65__afterCall750e_hook(gb); return; } HANDOFF(0x750e);  // fallthrough
 L_7517:
   CALL(0x7517, interactionRunScript_hook, 0x2552, 0x751a);  // call $2552
   if ((F & FC)) { I(0x751a, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x751a, 3);  // jp c,$3b05
@@ -1087,101 +1084,6 @@ L_7517:
 L_7524:
   I(0x7524, 1);  // nop
   I(0x7525, 4); if (hook_enabled_at(0x26db)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x26db);  // jp $26db
-}
-
-// 09:7506
-void interactionCode65(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7506, checkInteractionState_hook, 0x23fe, 0x7509);  // call $23fe
-  if (!(F & FZ)) { I(0x7509, 3); goto L_7517; } I(0x7509, 2);  // jr nz,$7517
-L_750b:
-  CALL(0x750b, interactionCode65__loadScriptAndInitGraphics, 0x7531, 0x750e);  // call $7531
-L_750e:
-  CALL(0x750e, interactionRunScript_hook, 0x2552, 0x7511);  // call $2552
-  CALL(0x7511, interactionRunScript_hook, 0x2552, 0x7514);  // call $2552
-  I(0x7514, 4); if (hook_enabled_at(0x26db)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x26db);  // jp $26db
-L_7517:
-  CALL(0x7517, interactionRunScript_hook, 0x2552, 0x751a);  // call $2552
-  if ((F & FC)) { I(0x751a, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x751a, 3);  // jp c,$3b05
-  I(0x751d, 3); SET_HL(0x6289);  // ld hl,$6289
-  I(0x7520, 2); E = 0x15;  // ld e,$15
-  CALL(0x7522, interBankCall_hook, 0x008a, 0x7525);  // call $008a
-  I(0x7525, 4); if (hook_enabled_at(0x26db)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x26db);  // jp $26db
-}
-
-// 09:750b
-void interactionCode65__state0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_750b:
-  CALL(0x750b, interactionCode65__loadScriptAndInitGraphics, 0x7531, 0x750e);  // call $7531
-L_750e:
-  CALL(0x750e, interactionRunScript_hook, 0x2552, 0x7511);  // call $2552
-  CALL(0x7511, interactionRunScript_hook, 0x2552, 0x7514);  // call $2552
-  I(0x7514, 4); if (hook_enabled_at(0x26db)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x26db);  // jp $26db
-}
-
-// 09:750e
-void interactionCode65__afterCall750e(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_750e:
-  CALL(0x750e, interactionRunScript_hook, 0x2552, 0x7511);  // call $2552
-  CALL(0x7511, interactionRunScript_hook, 0x2552, 0x7514);  // call $2552
-  I(0x7514, 4); if (hook_enabled_at(0x26db)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x26db);  // jp $26db
-}
-
-// 09:7517
-void interactionCode65__state1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7517:
-  CALL(0x7517, interactionRunScript_hook, 0x2552, 0x751a);  // call $2552
-  if ((F & FC)) { I(0x751a, 4); if (hook_enabled_at(0x3b05)) { interactionDelete_hook(gb); return; } HANDOFF(0x3b05); } I(0x751a, 3);  // jp c,$3b05
-  I(0x751d, 3); SET_HL(0x6289);  // ld hl,$6289
-  I(0x7520, 2); E = 0x15;  // ld e,$15
-  CALL(0x7522, interBankCall_hook, 0x008a, 0x7525);  // call $008a
-  I(0x7525, 4); if (hook_enabled_at(0x26db)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x26db);  // jp $26db
-}
-
-// 09:7528
-void interactionCode65__unusedFunc_7528(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7528:
-  CALL(0x7528, interactionInitGraphics_hook, 0x15fb, 0x752b);  // call $15fb
-  CALL(0x752b, objectMarkSolidPosition_hook, 0x24f0, 0x752e);  // call $24f0
-  I(0x752e, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
-}
-
-// 09:7531
-void interactionCode65__loadScriptAndInitGraphics(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7531:
-  CALL(0x7531, interactionInitGraphics_hook, 0x15fb, 0x7534);  // call $15fb
-  CALL(0x7534, objectMarkSolidPosition_hook, 0x24f0, 0x7537);  // call $24f0
-  I(0x7537, 2); A = 0x0b;  // ld a,$0b
-  CALL(0x7539, interactionSetHighTextIndex_hook, 0x253b, 0x753c);  // call $253b
-  I(0x753c, 2); E = 0x42;  // ld e,$42
-  I(0x753e, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x753f, 3); SET_HL(0x754c);  // ld hl,$754c
-  RST_PUSH(0x7542, 0x7543);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x7543, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x7544, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x7545, 1); L = A;  // ld l,a
-  CALL(0x7546, interactionSetScript_hook, 0x2544, 0x7549);  // call $2544
-  I(0x7549, 4); if (hook_enabled_at(0x23e0)) { interactionIncState_hook(gb); return; } HANDOFF(0x23e0);  // jp $23e0
-}
-
-// 09:754c
-void interactionCode65__scriptTable(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_754c:
-  if (!(F & FZ)) { CALL_ASM(0x754c, 0x1e67, 0x754f); /* unported */ } else I(0x754c, 3);  // call nz,$1e67
-  I(0x754f, 1); B = D;  // ld b,d
-  I(0x7550, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x7551, 0x7552);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
 }
 
 // 09:754e

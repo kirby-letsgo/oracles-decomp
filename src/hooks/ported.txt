@@ -3304,6 +3304,8 @@ makuConfetti_updateSpeedXUsingSpeedZ
 interactionCode63
 interactionCode64
 interactionCode65
+interactionCode65__afterCall750e
+interactionCode65__loadScriptAndInitGraphics
 interactionCode66
 goronSubid00
 goronSubid01

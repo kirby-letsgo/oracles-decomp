@@ -6079,13 +6079,9 @@
 09:7433 interactionCode64__runSubid03 L
 09:74c9 interactionCode64__runSubid05 L
 09:74fa interactionCode64__subid5Objects L
-09:7506 interactionCode65 -
-09:750b interactionCode65__state0 L
-09:750e interactionCode65__afterCall750e L
-09:7517 interactionCode65__state1 L
-09:7528 interactionCode65__unusedFunc_7528 L
-09:7531 interactionCode65__loadScriptAndInitGraphics L
-09:754c interactionCode65__scriptTable L
+09:7506 interactionCode65_hook -
+09:750e interactionCode65__afterCall750e_hook -
+09:7531 interactionCode65__loadScriptAndInitGraphics_hook -
 09:754e interactionCode66 -
 09:7574 goronSubid00 -
 09:7582 goronSubid00__state0 L
