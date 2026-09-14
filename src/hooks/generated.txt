@@ -3035,12 +3035,11 @@
 10:44cb ecom_updateAngleToScentSeed_b10_hook -
 10:44e0 ecom_fallToGroundAndSetState8_b10_hook -
 10:44e2 ecom_fallToGroundAndSetState_b10_hook -
-10:44f0 enemyBoss_dead_b10 -
-10:4507 enemyBoss_dead__alreadyPlayedDeathSound_b10 L
-10:4534 enemyBoss_spawnShadow_b10 -
-10:4546 enemyBoss_initializeRoom_b10 -
-10:4580 enemyBoss_beginMiniboss_b10 -
-10:4584 enemyBoss_beginBoss_b10 -
+10:44f0 enemyBoss_dead_b10_hook -
+10:4534 enemyBoss_spawnShadow_b10_hook -
+10:4546 enemyBoss_initializeRoom_b10_hook -
+10:4580 enemyBoss_beginMiniboss_b10_hook -
+10:4584 enemyBoss_beginBoss_b10_hook -
 10:4594 enemyCode01 -
 10:45bd enemyCode01__collisionOccurred L
 10:45f1 enemyCode01__normalStatus L
@@ -3667,7 +3666,7 @@
 10:7e9f interactionCodee6__state1 L
 10:7eba interactionCodee6__mountedRaft L
 10:7ee5 interactionCodee6__checkLinkWithinRange L
-10:4552 enemyBoss_initializeRoomWithoutExtraGfx_b10 -
+10:4552 enemyBoss_initializeRoomWithoutExtraGfx_b10_hook -
 10:6332 ramrockArm_subid4_substate2 -
 10:6354 ramrockArm_subid4_substate2__updateXPosition L
 10:71aa agesFunc_10_70f6__func_71aa_hook -

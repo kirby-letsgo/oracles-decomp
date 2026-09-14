@@ -303,6 +303,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   project now has 3,726 readable hooks out of 10,705. Batch 165 finished the remaining `ecom_*`
   helpers (angle, position, kill, gale-seed, and fall-to-ground), completing the whole
   `commonCode.s` file for bank 10; the project now has 3,747 readable hooks out of 10,701.
+  Batch 166 opened `commonBossCode.s` with the boss-enemy shared helpers (`enemyBoss_dead`,
+  `spawnShadow`, `initializeRoom`/`initializeRoomWithoutExtraGfx`, `beginMiniboss`/`beginBoss`);
+  the project now has 3,753 readable hooks out of 10,700.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -407,6 +410,19 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 166, bank 10 (6 routines, branch
+  `claude/bank10-phase6`): opened `object_code/common/enemies/commonBossCode.s` (new file
+  `enemyCommonBossCode.c`) with `enemyBoss_dead` (absorbing its `alreadyPlayedDeathSound` local),
+  `enemyBoss_spawnShadow`, `enemyBoss_initializeRoom` (with a conditional `call nz` needing
+  `CALL_C_CC`) tail-calling `enemyBoss_initializeRoomWithoutExtraGfx`, and the
+  `enemyBoss_beginMiniboss`/`beginBoss` pair sharing a common tail. Independent review found and
+  fixed a field-offset error: two reads of `$81` (the enemy's own `OBJ_ID`, read via `D:E` before a
+  new part is set up) had been written as `PART_BASE + OBJ_XH` instead of `ENEMY_BASE + OBJ_ID`.
+  One generated local row disappeared; bank 10 is 99/778 and the project 3,753/10,700. Gates:
+  lint 0, 30k verify 0 failures across 4,484,031 calls with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 165, bank 10 (21 routines, branch
   `claude/bank10-phase6`): completed `enemyCommonCode.c` with the remaining angle helpers

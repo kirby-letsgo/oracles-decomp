@@ -50,12 +50,12 @@ alreadyPlayedDeathSound:
   CYC(0x4511, 0x4512);
   CYC(0x4512, 0x4514); mem_wr(gb, HL, 0x04);
   CYC(0x4514, 0x4515); L = alu_inc8(gb, L);
-  CYC(0x4515, 0x4517); E = PART_BASE + OBJ_XH;
+  CYC(0x4515, 0x4517); E = ENEMY_BASE + OBJ_ID;
   CYC(0x4517, 0x4518); A = mem_rd(gb, DE);
   CYC(0x4518, 0x4519); mem_wr(gb, HL, A);
   CALL_C(0x4519, objectCopyPosition_hook, 0x2242, 0x451c);
   CALL_C(0x451c, markEnemyAsKilledInRoom_b00_hook, 0x320d, 0x451f);
-  CYC(0x451f, 0x4521); E = PART_BASE + OBJ_XH;
+  CYC(0x451f, 0x4521); E = ENEMY_BASE + OBJ_ID;
   CYC(0x4521, 0x4522); A = mem_rd(gb, DE);
   CYC(0x4522, 0x4524); alu_sub(gb, 0x08);
   CYC(0x4524, 0x4526); alu_cp(gb, 0x68);
