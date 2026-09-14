@@ -296,6 +296,26 @@ Updated 2026-09-13. Newest entries at the top of each section.
   bank 9 with the shop-item purchase state and the palace-soldier substate/escort helpers; 25
   parent-owned generated rows were absorbed, leaving bank 9 at 83/721 and the project at 3,701/
   10,693.
+  Batch 162 opened the bank-10 sweep (a separate branch/session from banks 8-9) with the shared
+  enemy-common knockback, hazard, and hole/delete helpers from `commonCode.s`. Four generated
+  local rows (the shared checkHazardsCommon sub-blocks and the fallingInHole center-of-hole
+  helper) disappeared with their now-readable parents; the project now has 3,699 readable hooks
+  out of 10,714. Batch 163 continued with the velocity/adjacent-walls helper chain (including the
+  RST $10 add-A-to-HL vector and the two-check tile-collision local); the project now has 3,714
+  readable hooks out of 10,707. Batch 164 finished the bounce/spawn/counter helper cluster; the
+  project now has 3,726 readable hooks out of 10,705. Batch 165 finished the remaining `ecom_*`
+  helpers (angle, position, kill, gale-seed, and fall-to-ground), completing the whole
+  `commonCode.s` file for bank 10; the project now has 3,747 readable hooks out of 10,701.
+  Batch 166 opened `commonBossCode.s` with the boss-enemy shared helpers (`enemyBoss_dead`,
+  `spawnShadow`, `initializeRoom`/`initializeRoomWithoutExtraGfx`, `beginMiniboss`/`beginBoss`);
+  the project now has 3,753 readable hooks out of 10,700. Batch 167 added the first two
+  `object_code/common/interactions/` files, `eraOrSeasonInfo.c` and `ringHelpBook.c`; the project
+  now has 3,755 readable hooks out of 10,690. Batch 168 ported the whole
+  `object_code/ages/enemies/kingMoblinMinionMain.s` (new file `kingMoblinMinionMain.c`), the
+  King Moblin minion's 10 states plus its shared animate tail, including a local RST $18
+  add-double-index vector and two private per-subid data tables mis-decoded as code; the project
+  now has 3,766 readable hooks out of 10,684. Merging that work with the bank-9 batch gives the
+  project 3,783 readable hooks out of 10,659.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -408,6 +428,118 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   bank 9 is 83/721 and the project 3,701/10,693. Gates: lint 0, 30k verify 0 failures across
   4,484,031 calls with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches
   across 11,449,563 calls with state `a62ae98192befee8`, normal and quirk suites 8/8.
+- 2026-09-14: milestone 3 phase 6 batch 168, bank 10 (11 routines, branch
+  `claude/bank10-phase6`): ported the whole `kingMoblinMinionMain.s` — states 0, 2-9, A, and the
+  shared `animate` tail (`kingMoblinMinionMain.c`). State 0 indexes a private 4-byte-per-subid
+  data table via a local RST $18 add-double-index vector; state 7 indexes a private per-subid
+  angle-pair table via RST $10 add-A-to-HL. Both tables had been mis-decoded as fake executable
+  routines by the transliterator (same class as the batch-165/166 lookup tables) and needed no
+  hook entries. Independent review caught a missing one-cycle burn on the RST $10 helper's carry
+  path (the vector's final unconditional `ret` at `$0014` was left unburned) before the gate — the
+  same helper existed correctly in `enemyCommonCode.c` and was miscopied. Six generated local rows
+  (both data tables plus four absorbed jump/tail locals) disappeared; bank 10 is 112/762 and the
+  project 3,766/10,684. Gates: lint 0, 30k verify 0 failures across 4,484,031 calls with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
+- 2026-09-14: milestone 3 phase 6 batch 167, bank 10 (2 routines, branch
+  `claude/bank10-phase6`): ported the first two small `object_code/common/interactions/` files —
+  `interactionCodee0` (`eraOrSeasonInfo.c`, a 4-state RST $00 dispatcher) and `interactionCodee5`
+  (`ringHelpBook.c`, whose `runState` local is a second RST $00 dispatcher reached through a real
+  local `call`). Both routines' local dispatch targets disappeared from the transliterator's
+  reachability scan once their sole callers became readable, the same pattern as batch 164's bounce
+  locals; `runState` itself lost its own hook row for the same reason and became a plain internal
+  helper after the first lint pass caught it. Two independent instruction reviews found no further
+  defects. Ten generated local rows disappeared; bank 10 is 101/768 and the project 3,755/10,690.
+  Gates: lint 0, 30k verify 0 failures across 4,484,031 calls with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
+
+- 2026-09-14: milestone 3 phase 6 batch 166, bank 10 (6 routines, branch
+  `claude/bank10-phase6`): opened `object_code/common/enemies/commonBossCode.s` (new file
+  `enemyCommonBossCode.c`) with `enemyBoss_dead` (absorbing its `alreadyPlayedDeathSound` local),
+  `enemyBoss_spawnShadow`, `enemyBoss_initializeRoom` (with a conditional `call nz` needing
+  `CALL_C_CC`) tail-calling `enemyBoss_initializeRoomWithoutExtraGfx`, and the
+  `enemyBoss_beginMiniboss`/`beginBoss` pair sharing a common tail. Independent review found and
+  fixed a field-offset error: two reads of `$81` (the enemy's own `OBJ_ID`, read via `D:E` before a
+  new part is set up) had been written as `PART_BASE + OBJ_XH` instead of `ENEMY_BASE + OBJ_ID`.
+  One generated local row disappeared; bank 10 is 99/778 and the project 3,753/10,700. Gates:
+  lint 0, 30k verify 0 failures across 4,484,031 calls with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
+
+- 2026-09-14: milestone 3 phase 6 batch 165, bank 10 (21 routines, branch
+  `claude/bank10-phase6`): completed `enemyCommonCode.c` with the remaining angle helpers
+  (`ecom_updateCardinalAngleAwayFromTarget`/`TowardTarget`, `ecom_updateAngleTowardTarget`,
+  `ecom_setRandomCardinalAngle`, `ecom_setRandomAngle`, `ecom_updateAnimationFromAngle`,
+  `ecom_flickerVisibility`), the position/subid helpers (`ecom_getSubidAndCpStateTo08`,
+  `ecom_moveTowardPosition`, `ecom_readPositionVars`, `ecom_setZAboveScreen`), the kill-object
+  chain (`ecom_killObjectH`/`killRelatedObj`/`killRelatedObj1`/`killRelatedObj2`), the gale-seed
+  pair (`ecom_galeSeedEffect`, `ecom_blownByGaleSeedState`), the scent-seed pair
+  (`ecom_checkScentSeedActive`, `ecom_updateAngleToScentSeed`), and the fall-to-ground pair
+  (`ecom_fallToGroundAndSetState8`/`State`) — completing the whole `commonCode.s` source for bank
+  10. `ecom_updateAnimationFromAngle`'s `@angleToAnimIndex` table and `ecom_galeSeedEffect`'s
+  oscillation table are private lookup data the transliterator had mis-decoded as code (see
+  porting-notes); neither needed a hook entry. Independent review caught one inverted `jr nz`
+  branch in `ecom_setZAboveScreen`'s Z-clamp before the gate. Bank 10 is 93/779 and the project
+  3,747/10,701. Gates: lint 0, 30k verify 0 failures across 4,484,031 calls with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
+- 2026-09-14: milestone 3 phase 6 batch 164, bank 10 (12 routines, branch
+  `claude/bank10-phase6`): finished `enemyCommonCode.c`'s bounce/spawn/counter cluster —
+  `ecom_bounceOffWallsAndHoles`, `ecom_bounceOffWalls`, `ecom_bounceOffScreenBoundary` (a shared
+  common body with a second bank-10 copy of the RST $10 vector, its `getDirectionsHit` local, and
+  its `reverseDirection` local), `ecom_randomBitwiseAndBCE`, `ecom_setSpeedAndState8(AndVisible)`,
+  the `ecom_spawnUncountedEnemyWithSubid01`/`ecom_spawnEnemyWithSubid01` pair with their shared
+  tail, `ecom_spawnProjectile`, and `ecom_decCounter1`/`ecom_dec16BitCounter`/`ecom_decCounter2`.
+  `reverseDirection`'s apparent independent external caller turned out to be a report-formatting
+  artifact (that caller actually calls `ecom_bounceOffWallsAndHoles` itself); once the three bounce
+  roots were rewritten the transliterator no longer discovered either bounce-local address at all,
+  so both became plain internal helpers with no hook-table row rather than promoted locals. Applying
+  the batch-163 lesson, every unconditional `jr` was recomputed at exactly `addr+2` and the local
+  call to `getDirectionsHit` got its `push_effect` from the first draft; two independent instruction
+  reviews against the pre-rewrite transliteration found no further defects. Two more generated rows
+  disappeared; bank 10 is 72/783 and the project 3,726/10,705. Gates: lint 0, 30k verify 0 failures
+  across 4,484,031 calls with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
+- 2026-09-14: milestone 3 phase 6 batch 163, bank 10 (15 routines, branch
+  `claude/bank10-phase6`): continued `enemyCommonCode.c` with the velocity/adjacent-walls chain —
+  `ecom_updateMovingPlatform`, `ecom_applyGivenVelocity`, the four `ecom_applyVelocityFor*`
+  entry points, `ecom_applyVelocityGivenAdjacentWalls`, `ecom_applyGivenVelocityGivenAdjacentWalls`
+  (with its `applySpeedComponent` local), the four `ecom_get*AdjacentWallsBitset*` entry points
+  and `label_025`, `ecom_getAdjacentWallsBitset` (with its `checkCollisionAt` local, and a local
+  bank-10 copy of the shared RST $10 add-A-to-HL vector), and `ecom_getAdjacentWallTableOffset`.
+  The first draft mis-set several unconditional `jr` burns to the call-instruction's 3-byte width
+  instead of `jr`'s own 2 bytes, inverted one `jr nz` branch outright (running the velocity-apply
+  call on the wrong side and skipping it on the other), dropped the second half of a two-check
+  tile-collision dispatch (both taken and fallthrough arms called the same collision variant), and
+  omitted the `push_effect` before a real `call` into the local `checkCollisionAt` helper. All four
+  were caught by a full instruction-by-instruction re-derivation against the pre-rewrite
+  `gen_bank10.c` transliteration (the actual second independent review) before the gate ran. Two
+  more generated local rows (`applySpeedComponent`, `checkCollisionAt`) disappeared with their
+  parents; bank 10 is 60/785 and the project 3,714/10,707. Gates: lint 0, 30k verify 0 failures
+  across 4,484,031 calls with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
+- 2026-09-14: milestone 3 phase 6 batch 162, bank 10 (15 routines, branch
+  `claude/bank10-phase6`): opened the bank-10 sweep with `object_code/common/enemies/commonCode.s`'s
+  shared enemy helpers (`enemyCommonCode.c`) — incState/incSubstate, the knockback update chain
+  (with and without solidity), the hazard-check chain including the shared `checkHazardsCommon`
+  body with its caller-escaping hazard-effect tail, and the splash/lava-splash/delete-enemy and
+  fall-in-hole/fall-down-hole chains, including the `checkInCenterOfHole` local as a plain static
+  helper. Two independent instruction-level review passes against the ROM report and the
+  pre-rewrite `gen_bank10.c` transliteration found and fixed three defects before the gate: an
+  unconditional `jr`'s byte-end burned through its jump target twice (`ecom_checkHazardsCommon`'s
+  tail jump to `ecom_makeLavaSplashAndDelete`, and `ecom_fallDownHoleAndDelete`'s jump to
+  `ecom_decNumEnemiesAndDelete`), and a `jr nc` in `ecom_fallingInHole`'s animation-counter clamp
+  had its taken/not-taken `CYC`/`CYCT` reversed. Four generated local rows (three
+  `checkHazardsCommon` sub-block entries and the `fallingInHole` center-of-hole helper) disappeared
+  with their now-readable parents; bank 10 is 45/792 and the project 3,699/10,714. Gates: lint 0,
+  30k verify 0 failures across 4,484,031 calls with state `3e450c2620a3f6a3`, full reference replay
+  0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
+  suites 8/8. Ambiguous/deferred: none this batch.
 
 - 2026-09-14: milestone 3 phase 6 batch 161 (17 routines): added shop-item state/display/grab
   paths, six soldier dispatcher/subid roots, and the seasons-fairy interaction state machine.
