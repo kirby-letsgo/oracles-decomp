@@ -4328,3 +4328,7 @@ goronSubid00
 goronSubid00__afterCall7585
 interactionCode66
 interactionCode58
+interactionCode59
+interactionCode59__loadScriptAndInitGraphics
+interactionCode59__afterCall6c0b
+interactionCode59__afterCall6be7

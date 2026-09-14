@@ -949,3 +949,6 @@
 09:7778 goronSubid01__afterCall7778
 09:7585 goronSubid00__afterCall7585
 09:6e68 interactionCode5e__afterCall6e68
+09:6c08 interactionCode59__loadScriptAndInitGraphics
+09:6c0b interactionCode59__afterCall6c0b
+09:6be7 interactionCode59__afterCall6be7

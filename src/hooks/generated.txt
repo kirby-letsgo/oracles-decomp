@@ -6026,16 +6026,7 @@
 09:689c dog_setTargetPositionIndex_hook -
 09:68f0 interactionCode55_hook -
 09:6aec interactionCode58_hook -
-09:6b9c interactionCode59 -
-09:6ba1 interactionCode59__state0 L
-09:6bab interactionCode59__initSubid00 L
-09:6bbd interactionCode59__initSubid02 L
-09:6bd4 interactionCode59__initSubid01 L
-09:6be4 interactionCode59__init L
-09:6be7 interactionCode59__state1 L
-09:6bff interactionCode59__unusedFunc_6bff L
-09:6c08 interactionCode59__loadScriptAndInitGraphics L
-09:6c1e interactionCode59__scriptTable L
+09:6b9c interactionCode59_hook -
 09:6c20 interactionCode5a_hook -
 09:6c54 interactionCode5b_hook -
 09:6d0e interactionCode5c_hook -
@@ -6108,6 +6099,9 @@
 09:7778 goronSubid01__afterCall7778_hook -
 09:7585 goronSubid00__afterCall7585_hook -
 09:6e68 interactionCode5e__afterCall6e68_hook -
+09:6c08 interactionCode59__loadScriptAndInitGraphics_hook -
+09:6c0b interactionCode59__afterCall6c0b_hook -
+09:6be7 interactionCode59__afterCall6be7_hook -
 0a:6647 interactionCode86 -
 0a:664f interactionCode86__subid0 L
 0a:6654 interactionCode86__subid0State0 L

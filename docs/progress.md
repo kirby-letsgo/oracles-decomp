@@ -7,7 +7,7 @@ Updated 2026-09-14. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 4,327 routine hooks rewritten across seventeen code
+  routine against the transliteration. Progress: 4,331 routine hooks rewritten across seventeen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -447,6 +447,11 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 187, bank 9 (4 routines): completed Poe and its durable
+  graphics/script continuations. Trace comparison found the missing interaction-base offset on its
+  subid field, which left a Poe instance undeleted. Bank 9 is 276/279 and the project 4,331/9,906.
+  Lint, 30k verification, full reference replay, and both normal and quirk suites passed.
 
 - 2026-09-14: milestone 3 phase 6 batch 186, bank 9 (1 routine): completed Hardhat Worker's
   four-subid interaction and corrected its interaction-relative field offsets. Poe remains deferred
