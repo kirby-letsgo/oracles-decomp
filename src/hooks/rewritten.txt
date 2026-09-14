@@ -3850,3 +3850,9 @@ timewarp_subid3Or4_state3
 timewarp_subid3Or4_state4
 timewarp_subid4
 timewarp_animate
+interactionCodede
+interactionBeginTimewarp
+timeportal_updatePalette
+interactionCodee1
+enemyCode56_body
+blackTower_getMovingFlamesNextTileCoords

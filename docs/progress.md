@@ -337,6 +337,16 @@ Updated 2026-09-13. Newest entries at the top of each section.
   by a local RST $00 dispatcher and RST $10 add-A-to-HL vector. Seven generated rows disappeared
   with their now-readable parents; the project now has 3,849 readable hooks out of 10,607, with
   bank 10 at 178/710.
+  Batch 172 ported `object_code/ages/interactions/timeportal.s` (`interactionCodede`,
+  `interactionBeginTimewarp`, `timeportal_updatePalette`), `timeportalSpawner.s`
+  (`interactionCodee1`, whose shared `markSpotDiscovered` tail is reached both by fallthrough from
+  state1 and by a real `call` from state3 — kept as a plain non-hooked C helper called directly
+  with an explicit `push_effect` before the call site, since it is a local with no independent
+  hook-table entry), and closed a real gap left by batch 168: `kingMoblinMinionMain.s`'s own
+  top-level dispatcher (`enemyCode56_body`) and its unrelated `blackTower_getMovingFlamesNextTileCoords`
+  leaf (6 root routines total). Twenty generated rows disappeared, including four mis-decoded
+  per-direction data tables; the project now has 3,855 readable hooks out of 10,587, with bank 10
+  at 184/690.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -441,6 +451,29 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 172, bank 10 (6 routines, branch
+  `claude/bank10-phase6`): finished two small `object_code/ages/interactions/` files and closed a
+  real gap from an earlier batch. `timeportal.c` covers `interactionCodede`'s three-state dispatch,
+  `interactionBeginTimewarp` (also reachable from `INTERAC_TIMEPORTAL_SPAWNER`), and
+  `timeportal_updatePalette`. `timeportalSpawner.c` covers `interactionCodee1`'s four-state
+  dispatch (a nested subid-init dispatch inside state0); its `markSpotDiscovered` tail is reached
+  both by plain fallthrough from state1 and by a genuine `call` from state3, so it was written as
+  a plain (non-hook-table) C helper called directly with an explicit `push_effect(gb, return_addr)`
+  before the call site, matching the established rule for locals reached by a real ROM `call`. The
+  first review found that `kingMoblinMinionMain.s`'s own top-level dispatcher, `enemyCode56_body`
+  (line 8 of the file, dispatching to the `kingMoblinMinion_state0`-`stateA` hooks already written
+  in batch 168), had never actually been registered — batch 168 ported every state but missed the
+  entry point itself — so it and the file's other orphaned leaf, `blackTower_getMovingFlamesNextTileCoords`
+  (a 23-instruction RST $18/RST $10 routine with a private 4-pointer direction table, `callers: 0`
+  since its real caller lives in a different, not-yet-ported cutscene file), were added directly to
+  the existing `kingMoblinMinionMain.c`, along with the RST $00 jump-table helper that file had not
+  needed until now. The second review, plus a whole-file byte-delta scan across all three touched
+  files, found no further defects. Twenty generated rows disappeared, including the four mis-decoded
+  per-direction ("leftFlame"/"topFlame"/"rightFlame"/"bottomFlame") data-table entries; bank 10 is
+  184/690 and the project 3,855/10,587. Gates: lint 0, 30k verify 0 failures across 4,484,031 calls
+  with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames
+  with state `a62ae98192befee8`, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 171, bank 10 (17 routines, branch
   `claude/bank10-phase6`): ported the whole `object_code/ages/interactions/timewarp.s`

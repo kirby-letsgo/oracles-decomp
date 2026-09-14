@@ -33,6 +33,76 @@ static void kingMoblinMinion_addAToHl_from_rst(GB *gb, uint16_t return_address) 
   ret_effect(gb);
 }
 
+static uint16_t kingMoblinMinion_jump_table(GB *gb) {
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (!(F & FC)) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  return HL;
+}
+
+void enemyCode56_body_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6c8e, 0x6c90); E = ENEMY_BASE + OBJ_STATE;
+  CYC(0x6c90, 0x6c91); A = mem_rd(gb, DE);
+  CYC(0x6c91, 0x6c92); push_effect(gb, 0x6c92);
+  switch (kingMoblinMinion_jump_table(gb)) {
+    case 0x6ca8: kingMoblinMinion_state0_hook(gb); return;
+    case 0x2818: enemyAnimate_hook(gb); return;
+    case 0x6cd7: kingMoblinMinion_state2_hook(gb); return;
+    case 0x6ce4: kingMoblinMinion_state3_hook(gb); return;
+    case 0x6cf7: kingMoblinMinion_state4_hook(gb); return;
+    case 0x6d12: kingMoblinMinion_state5_hook(gb); return;
+    case 0x6d33: kingMoblinMinion_state6_hook(gb); return;
+    case 0x6d3f: kingMoblinMinion_state7_hook(gb); return;
+    case 0x6d70: kingMoblinMinion_state8_hook(gb); return;
+    case 0x6d8e: kingMoblinMinion_state9_hook(gb); return;
+    case 0x6da2: kingMoblinMinion_stateA_hook(gb); return;
+    default: hook_continue(gb, HL, sp0_); return;
+  }
+}
+
+// $6ddd is a private table of 4 pointers (left/top/right/bottom flame coordinate data), not code;
+// it is only reached through the RST $18 index below, so it needs no hook entry of its own.
+void blackTower_getMovingFlamesNextTileCoords_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x6dbc, 0x6dbe); E = 0xc2;
+  CYC(0x6dbe, 0x6dbf); A = mem_rd(gb, DE);
+  CYC(0x6dbf, 0x6dc2); SET_HL(0x6ddd);
+  CYC(0x6dc2, 0x6dc3);
+  kingMoblinMinion_addDoubleIndexToHl_from_rst(gb, 0x6dc3);
+  CYC(0x6dc3, 0x6dc4); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x6dc4, 0x6dc5); H = mem_rd(gb, HL);
+  CYC(0x6dc5, 0x6dc6); L = A;
+  CYC(0x6dc6, 0x6dc8); E = 0xc7;
+  CYC(0x6dc8, 0x6dc9); A = mem_rd(gb, DE);
+  CYC(0x6dc9, 0x6dca);
+  kingMoblinMinion_addAToHl_from_rst(gb, 0x6dca);
+  CYC(0x6dca, 0x6dcb); B = mem_rd(gb, HL);
+  CYC(0x6dcb, 0x6dcc); A = B;
+  CYC(0x6dcc, 0x6dce); alu_and(gb, 0xf0);
+  CYC(0x6dce, 0x6dd0); alu_add(gb, 0x08);
+  CYC(0x6dd0, 0x6dd2); E = 0xf0;
+  CYC(0x6dd2, 0x6dd3); mem_wr(gb, DE, A);
+  CYC(0x6dd3, 0x6dd4); E = alu_inc8(gb, E);
+  CYC(0x6dd4, 0x6dd5); A = B;
+  CYC(0x6dd5, 0x6dd7); alu_and(gb, 0x0f);
+  CYC(0x6dd7, 0x6dd9); A = alu_swap(gb, A);
+  CYC(0x6dd9, 0x6ddb); alu_add(gb, 0x08);
+  CYC(0x6ddb, 0x6ddc); mem_wr(gb, DE, A);
+  RET(0x6ddc); return;
+}
+
 // $6ccf is a private 4-byte-per-subid data table (counter1, direction, yh, xh), not code; it is
 // only reached through the RST $18 index below, so it needs no hook entry of its own.
 void kingMoblinMinion_state0_hook(GB *gb) {
