@@ -1186,7 +1186,13 @@ desync to discover; keep them when porting routines.
   `jp cc,nn`/`jr cc,n` in a batch, do a full address-by-address cross-check of every `CYC`/`CYCT`
   call against the ground truth's own `I(addr, cycles)` values (not just the byte-delta scan,
   which cannot see this bug class at all since the range width never changes) before registering
-  the batch.
+  the batch. Bank 10's `ganon.s` batch (76 roots) had 15 more of these, and this time they were
+  missed during the write pass itself — attention was on getting the `CALL_C`-vs-direct-call rule
+  right for this file (see below) and the `jp cc` check got deferred to "after," where it was
+  only caught by a dedicated `grep -n "// jp z\|// jp nz\|// jp c,\|// jp nc,"` over the finished
+  file. Both checks are mandatory on every batch with conditional jumps or genuine calls; neither
+  one earns a pass by being the one you focused on this time. Do both during the write, not just
+  before registering.
 - Before naming a new file after the disassembly source's own basename, check whether another bank
   already owns `src/game/<basename>.c` — file names are not namespaced per bank, and disassembly
   source files can collide across banks (bank 6's `object_code/.../raft.s` for

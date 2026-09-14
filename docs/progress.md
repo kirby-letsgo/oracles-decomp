@@ -1,6 +1,6 @@
 # Progress
 
-Updated 2026-09-13. Newest entries at the top of each section.
+Updated 2026-09-14. Newest entries at the top of each section.
 
 ## Where things stand
 
@@ -580,6 +580,39 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 179, bank 10 (76 root routines, branch
+  `claude/bank10-phase6`): ported the whole `object_code/common/enemies/ganon.s` boss
+  (`ganon.c`) — `enemyCode04`'s health/knockback/death dispatch (its `normalStatus` local reached
+  by a real `call` and given the plain-function-plus-`push_effect` treatment); the full
+  `state1`-`stateE` fight progression with their substates (`state8`/`state9`/`stateA`/`stateB`/
+  `stateC`/`stateD`/`stateE`, several reusing shared substate0-2 handlers and `finishAttack`); the
+  teleport-in/out animation and flicker helpers; `decideNextMove`'s eleven-way RST $00 dispatch
+  covering all eight attack "choice" data blocks; part-spawning, room-boundary, seizure-palette,
+  and tile-replacement-mode helpers. One local, `state9_substate4`'s `spawnProjectile`, is reached
+  by *three* separate genuine `call` instructions plus fallthrough and needed the
+  plain-function-plus-`push_effect` treatment as well. Three private RST vector helpers
+  (`addAToHl`, `addDoubleIndexToHl`, the RST $00 jump table) match the established per-file
+  convention; two mis-decoded data ranges (`stateC_substate6`'s `@counter2Vals` and
+  `decideNextMove`'s `@stateTable`, the latter spanning all eight choice blocks and containing a
+  fake `halt` opcode) needed no hook. Review found and fixed three defects: a byte-range typo in
+  `setTileReplacementMode` (a 3-byte `ld` burned as 4 bytes); a `jp` tail in `stateC_substate6`
+  burned all the way to the start of the next real routine instead of its own 3-byte end (the
+  intervening bytes are the mis-decoded `@counter2Vals` table); and 15 more of the `jp cc`
+  taken/not-taken cycle bugs, this time missed during the initial write (attention was on the
+  `CALL_C`-vs-direct-call rule from batch 178) and caught only by the dedicated post-hoc grep for
+  `// jp z`/`// jp nz`/`// jp c,`/`// jp nc,` comments — reinforcing that the `jp cc` check must
+  run every batch regardless of what else the batch is focused on. A full ground-truth address
+  cross-check (`comm -3` against every `I(addr,...)` in the now-deleted `gen_bank10.c`) confirmed
+  every remaining mine-only/theirs-only diff was a macro-filtering artifact, not a real gap. A
+  30k-frame verify and the full 290,174-frame reference replay both passed clean with the expected
+  state hashes; `ganon.c`'s hooks show 0 calls in both, as expected for a boss this movie's route
+  never reaches. **This completes bank 10**: all 454 of its routines are now readable C hooks,
+  `gen_bank10.c` no longer exists, and `tools/transliterate.py` reports 9 remaining bank files
+  (down from 10) for the whole project. The project is now 4,092/10,351. Gates: lint 0, 30k verify
+  16 pre-existing/unrelated `lcdVector_hook` failures (unchanged state hash `99e1f928f2cab55a`),
+  full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, 0 verify failures across 11,445,590 calls, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 178, bank 10 (65 root routines, branch
   `claude/bank10-phase6`): ported `object_code/common/enemies/none.s` (`enemyCode00`, a bare
