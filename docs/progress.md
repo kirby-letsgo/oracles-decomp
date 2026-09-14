@@ -293,6 +293,11 @@ Updated 2026-09-13. Newest entries at the top of each section.
   generated local rows disappeared; the project now has 3,528 readable hooks out of 11,187.
   The merged completed bank-8 branch makes every remaining bank-8 entry readable and removes its
   generated file; the project now has 3,684 readable hooks out of 10,718.
+  Batch 162 opened the bank-10 sweep (a separate branch/session from banks 8-9) with the shared
+  enemy-common knockback, hazard, and hole/delete helpers from `commonCode.s`. Four generated
+  local rows (the shared checkHazardsCommon sub-blocks and the fallingInHole center-of-hole
+  helper) disappeared with their now-readable parents; the project now has 3,699 readable hooks
+  out of 10,714.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -397,6 +402,24 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 162, bank 10 (15 routines, branch
+  `claude/bank10-phase6`): opened the bank-10 sweep with `object_code/common/enemies/commonCode.s`'s
+  shared enemy helpers (`enemyCommonCode.c`) — incState/incSubstate, the knockback update chain
+  (with and without solidity), the hazard-check chain including the shared `checkHazardsCommon`
+  body with its caller-escaping hazard-effect tail, and the splash/lava-splash/delete-enemy and
+  fall-in-hole/fall-down-hole chains, including the `checkInCenterOfHole` local as a plain static
+  helper. Two independent instruction-level review passes against the ROM report and the
+  pre-rewrite `gen_bank10.c` transliteration found and fixed three defects before the gate: an
+  unconditional `jr`'s byte-end burned through its jump target twice (`ecom_checkHazardsCommon`'s
+  tail jump to `ecom_makeLavaSplashAndDelete`, and `ecom_fallDownHoleAndDelete`'s jump to
+  `ecom_decNumEnemiesAndDelete`), and a `jr nc` in `ecom_fallingInHole`'s animation-counter clamp
+  had its taken/not-taken `CYC`/`CYCT` reversed. Four generated local rows (three
+  `checkHazardsCommon` sub-block entries and the `fallingInHole` center-of-hole helper) disappeared
+  with their now-readable parents; bank 10 is 45/792 and the project 3,699/10,714. Gates: lint 0,
+  30k verify 0 failures across 4,484,031 calls with state `3e450c2620a3f6a3`, full reference replay
+  0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
+  suites 8/8. Ambiguous/deferred: none this batch.
 
 - 2026-09-14: milestone 3 phase 6 batch 161 (17 routines): added shop-item state/display/grab
   paths, six soldier dispatcher/subid roots, and the seasons-fairy interaction state machine.
