@@ -448,6 +448,35 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-14: milestone 3 phase 6 batch 180, bank 11 (1 root routine, 179 instructions):
+  ported `object_code/common/parts/itemFromMaple.s` (`itemFromMaple.c`) — `partCode14`/`partCode15`
+  are two labels aliasing the exact same address (`PART_ITEM_FROM_MAPLE`/`_2` share identical code),
+  so the file's sole registered root is canonically `partCode14_hook` even though the disassembly's
+  own comments call it "partCode15"; it's a 5-state item-from-Maple-the-monkey dispatcher (spawn,
+  falling, waiting-to-be-picked-up, just-hit, being-carried-to-Maple) plus the Link-collected-item
+  exit path with its treasure/ring lookup. Three genuinely local helpers (`setOamData`,
+  `setDroppedItemPosition`, `moveToMaple`) are reached by real `call`s with no independent hook
+  registration; `setOamData` tail-jumps into the already-registered `partSetAnimation_hook` rather
+  than its own `ret`, needing the `push_effect(gb, continuation); helper(gb);` treatment established
+  in `itemDrop.c`, while `setDroppedItemPosition` and `moveToMaple` end in their own real `ret`s and
+  need no such push. This batch had the highest bug density of any batch so far: self-review found
+  and fixed 10 `jr`-target-vs-own-end byte-range bugs, ALL but one concentrated in
+  `setDroppedItemPosition`; a first independent review then found 6 inverted `jr c`/`jr nc`/`ret nc`
+  polarity bugs, five more in that SAME function plus one in `substate2`; a third, from-scratch
+  review pass (triggered by that density rather than trusting the fixes) then found one more real
+  bug the first two passes missed — a plain 4-cycle undercount (a `jp` instruction executed right
+  after a local `call` returned had no `CYC` burn at all) — using a new technique: recomputing each
+  ROM label's own reported total cycle count by hand and diffing it against the sum of the C file's
+  burn ranges for that same address span, which catches a missing/extra burn a pure address-set
+  membership check can miss when nothing else in the file happens to reuse that same range. 17 real
+  bugs in one ~230-line file, this session's worst so far, all in ordinary control flow with nothing
+  structurally unusual about the ROM code — the lesson isn't "this pattern is risky," it's that
+  local helper functions get systematically less scrutiny while being written than the root's own
+  main dispatch, and deserve the same address-by-address rigor. Bank 11 is 55/711 and the project
+  4,268/9,961. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference
+  replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
+
 - 2026-09-14: milestone 3 phase 6 batch 179, bank 11 (16 root routines): ported
   `object_code/common/parts/spikedBall.s` (`PART_SPIKED_BALL`, `spikedBall.c`) — the ball-and-chain
   soldier's spiked ball head (6 states: init, slow/fast rotation, throw-alignment wait, released,

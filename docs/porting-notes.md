@@ -1265,3 +1265,17 @@ desync to discover; keep them when porting routines.
   the actual flag semantics against the ROM mnemonic caught them. Byte-range checks and polarity
   checks are two independent failure modes; passing one says nothing about the other, and both need
   a dedicated pass.
+- A third independent failure mode neither the address-coverage check nor a polarity re-read
+  catches: a *missing* cycle burn for an instruction whose address range is never claimed by
+  anything else in the file (so there's no "extra" pair for a set-diff to flag) and whose omission
+  doesn't flip any branch outcome (so a polarity read finds nothing wrong either) — just a plain
+  undercount. Bank 11's `itemFromMaple.s` batch had exactly this: a `jp objectSetVisiblec3`
+  executed immediately after a local helper's own `call`-chain returned had no `CYC` burn at all,
+  caught only by a third review pass that recomputed each ROM label's own reported total cycle
+  count by hand and diffed it against the sum of the C file's burn ranges for that address span —
+  a technique worth running as its own dedicated pass on any batch, not just as a last resort after
+  other checks come up dry. That same batch is this session's worst for bug density overall: 17 real
+  bugs (10 byte-range, 6 polarity, 1 missing-burn) in one ~230-line file, nearly all concentrated in
+  a single local helper function that never got its own root-level review attention — local helpers
+  reached by `call` deserve the identical address-by-address scrutiny as a file's main dispatch, not
+  less, precisely because they're easy to treat as an afterthought while writing the file.
