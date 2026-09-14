@@ -307,7 +307,11 @@ Updated 2026-09-13. Newest entries at the top of each section.
   `spawnShadow`, `initializeRoom`/`initializeRoomWithoutExtraGfx`, `beginMiniboss`/`beginBoss`);
   the project now has 3,753 readable hooks out of 10,700. Batch 167 added the first two
   `object_code/common/interactions/` files, `eraOrSeasonInfo.c` and `ringHelpBook.c`; the project
-  now has 3,755 readable hooks out of 10,690.
+  now has 3,755 readable hooks out of 10,690. Batch 168 ported the whole
+  `object_code/ages/enemies/kingMoblinMinionMain.s` (new file `kingMoblinMinionMain.c`), the
+  King Moblin minion's 10 states plus its shared animate tail, including a local RST $18
+  add-double-index vector and two private per-subid data tables mis-decoded as code; the project
+  now has 3,766 readable hooks out of 10,684.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -412,6 +416,20 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 168, bank 10 (11 routines, branch
+  `claude/bank10-phase6`): ported the whole `kingMoblinMinionMain.s` — states 0, 2-9, A, and the
+  shared `animate` tail (`kingMoblinMinionMain.c`). State 0 indexes a private 4-byte-per-subid
+  data table via a local RST $18 add-double-index vector; state 7 indexes a private per-subid
+  angle-pair table via RST $10 add-A-to-HL. Both tables had been mis-decoded as fake executable
+  routines by the transliterator (same class as the batch-165/166 lookup tables) and needed no
+  hook entries. Independent review caught a missing one-cycle burn on the RST $10 helper's carry
+  path (the vector's final unconditional `ret` at `$0014` was left unburned) before the gate — the
+  same helper existed correctly in `enemyCommonCode.c` and was miscopied. Six generated local rows
+  (both data tables plus four absorbed jump/tail locals) disappeared; bank 10 is 112/762 and the
+  project 3,766/10,684. Gates: lint 0, 30k verify 0 failures across 4,484,031 calls with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 167, bank 10 (2 routines, branch
   `claude/bank10-phase6`): ported the first two small `object_code/common/interactions/` files —

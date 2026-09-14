@@ -3756,3 +3756,14 @@ enemyBoss_beginMiniboss_b10
 enemyBoss_beginBoss_b10
 interactionCodee0
 interactionCodee5
+kingMoblinMinion_state0
+kingMoblinMinion_state2
+kingMoblinMinion_state3
+kingMoblinMinion_state4
+kingMoblinMinion_animate
+kingMoblinMinion_state5
+kingMoblinMinion_state6
+kingMoblinMinion_state7
+kingMoblinMinion_state8
+kingMoblinMinion_state9
+kingMoblinMinion_stateA
