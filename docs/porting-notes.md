@@ -1050,3 +1050,9 @@ desync to discover; keep them when porting routines.
   `villager.c` still called the generated names; the deleted `gen_bank08.c` turned each into a
   link error. Retarget `CALL_C`/tail sites to the `_hook` in the same integration step, before the
   first build.
+- A static `jp` translated as a direct C target call must immediately return from the current C
+  function when another local label follows. Batch 162's palace-soldier state-0 paths called their
+  visible/position targets and then fell through into state 1 when the target returned, unlike the
+  ROM's terminal jump. The 30k verifier did not exercise those paths; instruction review against
+  the generated labels caught all six. Write `target_hook(gb); return;` for every such terminal
+  jump.

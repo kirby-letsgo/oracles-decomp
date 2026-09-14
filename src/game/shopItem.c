@@ -96,6 +96,7 @@ void shopItemClearRupeeDisplay_hook(GB *gb);
 void shopItemUpdateRupeeDisplay_hook(GB *gb);
 void shopItemGetTilesForRupeeDisplay_hook(GB *gb);
 void shopItemCheckGrabbed_hook(GB *gb);
+void shopItemState3_hook(GB *gb);
 
 void interactionCode47_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -108,7 +109,7 @@ void interactionCode47_hook(GB *gb) {
     case 0x43b4: shopItemState4_hook(gb); return;
     case 0x438d: shopItemState5_hook(gb); return;
     case 0x2c2e: objectAddToGrabbableObjectBuffer_hook(gb); return;
-    case 0x440a: shopItemState3(gb); return;
+    case 0x440a: shopItemState3_hook(gb); return;
     default: HANDOFF(HL);
   }
 }
@@ -246,6 +247,44 @@ L_43b0:
   CALL_C(0x43b0, shopItemCheckGrabbed_hook, 0x44d0, 0x43b3);
   if (!(F & FZ)) { CYCT(0x43b3, 0x43b4); ret_effect(gb); return; } CYC(0x43b3, 0x43b4);
   shopItemState4_hook(gb);
+}
+
+void shopItemState3_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x440a, 0x440c); E = 0x42;
+  CYC(0x440c, 0x440d); A = mem_rd(gb, DE);
+  CYC(0x440d, 0x4410); SET_HL(0x44ba);
+  CYC(0x4410, 0x4411); shopItem_addAToHl(gb, 0x4411);
+  CYC(0x4411, 0x4412); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CALL_C(0x4412, removeRupeeValue_hook, 0x1778, 0x4415);
+  CYC(0x4415, 0x4417); E = 0x42;
+  CYC(0x4417, 0x4418); A = mem_rd(gb, DE);
+  CYC(0x4418, 0x441b); SET_HL(0x44f7);
+  CYC(0x441b, 0x441c); shopItem_addDoubleIndex(gb, 0x441c);
+  CYC(0x441c, 0x441d); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(0x441d, 0x441e); C = mem_rd(gb, HL);
+  CYC(0x441e, 0x4420); alu_cp(gb, 0);
+  if (!(F & FZ)) { CYCT(0x4420, 0x4422); goto L_4425; } CYC(0x4420, 0x4422);
+  CALL_C(0x4422, getRandomRingOfGivenTier_hook, 0x17e0, 0x4425);
+L_4425:
+  CALL_C(0x4425, giveTreasure_hook, 0x171c, 0x4428);
+  CYC(0x4428, 0x442a); E = 0x44;
+  CYC(0x442a, 0x442c); A = 5;
+  CYC(0x442c, 0x442d); mem_wr(gb, DE, A);
+  CYC(0x442d, 0x442f); A = 4;
+  CYC(0x442f, 0x4432); mem_wr(gb, 0xcc4f, A);
+  CYC(0x4432, 0x4434); A = 1;
+  CYC(0x4434, 0x4437); mem_wr(gb, 0xcc50, A);
+  CYC(0x4437, 0x4439); E = 0x42;
+  CYC(0x4439, 0x443a); A = mem_rd(gb, DE);
+  CYC(0x443a, 0x443d); SET_HL(0x457b);
+  CYC(0x443d, 0x443e); shopItem_addAToHl(gb, 0x443e);
+  CYC(0x443e, 0x443f); A = mem_rd(gb, HL);
+  CYC(0x443f, 0x4440); C = A;
+  CYC(0x4440, 0x4441); alu_or(gb, A);
+  CYC(0x4441, 0x4443); B = 0;
+  if (!(F & FZ)) { CYCT(0x4443, 0x4446); showText_hook(gb); return; } CYC(0x4443, 0x4446);
+  CYC(0x4446, 0x4447); ret_effect(gb);
 }
 
 void shopItemState4_hook(GB *gb) {

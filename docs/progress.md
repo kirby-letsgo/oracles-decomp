@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 3,684 routine hooks rewritten across seventeen code
+  routine against the transliteration. Progress: 3,701 routine hooks rewritten across seventeen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -292,7 +292,10 @@ Updated 2026-09-13. Newest entries at the top of each section.
   Batch 161 added shop-item, soldier, and seasons-fairy interaction state helpers. Thirty-seven
   generated local rows disappeared; the project now has 3,528 readable hooks out of 11,187.
   The merged completed bank-8 branch makes every remaining bank-8 entry readable and removes its
-  generated file; the project now has 3,684 readable hooks out of 10,718.
+  generated file; the project now has 3,684 readable hooks out of 10,718. Batch 162 continued
+  bank 9 with the shop-item purchase state and the palace-soldier substate/escort helpers; 25
+  parent-owned generated rows were absorbed, leaving bank 9 at 83/721 and the project at 3,701/
+  10,693.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -397,6 +400,14 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 162 (17 routines): added the final shop-item purchase
+  state plus palace-soldier substates, escort/NPC subids, initialization, and dungeon-six check
+  helpers. The second instruction review caught six static-JP paths falling through to their next
+  C label; each now returns after its direct target. Twenty-five generated local rows disappeared;
+  bank 9 is 83/721 and the project 3,701/10,693. Gates: lint 0, 30k verify 0 failures across
+  4,484,031 calls with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches
+  across 11,449,563 calls with state `a62ae98192befee8`, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 161 (17 routines): added shop-item state/display/grab
   paths, six soldier dispatcher/subid roots, and the seasons-fairy interaction state machine.
