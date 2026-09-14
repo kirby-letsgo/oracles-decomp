@@ -315,7 +315,9 @@ Updated 2026-09-13. Newest entries at the top of each section.
   King Moblin minion's 10 states plus its shared animate tail, including a local RST $18
   add-double-index vector and two private per-subid data tables mis-decoded as code; the project
   now has 3,766 readable hooks out of 10,684. Merging that work with the bank-9 batch gives the
-  project 3,783 readable hooks out of 10,659.
+  project 3,783 readable hooks out of 10,659. Batch 163 continued bank 9 with the forest-fairy
+  subid-0 dispatcher/states, two small NPC dispatchers, and the five soldier tail labels; the
+  project is now 3,799/10,639, with bank 9 at 99/701.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -420,6 +422,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 163, bank 9 (16 routines): ported forest-fairy subid 0's
+  dispatcher, states 0-3, movement-preset loader, movement, and animation; the misc-man and
+  mustache-man dispatchers; and the remaining five readable soldier tails. The private table
+  locals vanished with their sole callers. The build caught private helpers using `CALL_C` without
+  the required caller-owned `sp0_` thread context; passing it before the instruction reviews made
+  the stack-aware call path explicit. Bank 9 is 99/701 and the project 3,799/10,639. Gates: lint
+  0, 30k verify 0 failures across 4,484,031 calls with state `3e450c2620a3f6a3`, full reference
+  replay 0 state-hash mismatches across 11,449,588 calls over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 162 (17 routines): added the final shop-item purchase
   state plus palace-soldier substates, escort/NPC subids, initialization, and dungeon-six check

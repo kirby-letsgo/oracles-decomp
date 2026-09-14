@@ -28,6 +28,11 @@ void soldierSubid0d_hook(GB *gb);
 void soldierInitGraphics_hook(GB *gb);
 void soldierInitGraphicsAndLoadScript_hook(GB *gb);
 void soldierCheckBeatD6_hook(GB *gb);
+void label_09_090_hook(GB *gb);
+void label_09_092_hook(GB *gb);
+void label_09_093_hook(GB *gb);
+void label_09_094_hook(GB *gb);
+void label_09_095_hook(GB *gb);
 
 static uint16_t soldier_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -90,7 +95,7 @@ void soldierSubid00_hook(GB *gb) {
   CALL_C(0x4f90, checkGlobalFlag_hook, 0x31f3, 0x4f93);
   CYC(0x4f93, 0x4f95); E = 0x43;
   CYC(0x4f95, 0x4f96); A = mem_rd(gb, DE);
-  if (!(F & FZ)) { CYCT(0x4f96, 0x4f98); label_09_090(gb); return; }
+  if (!(F & FZ)) { CYCT(0x4f96, 0x4f98); label_09_090_hook(gb); return; }
   CYC(0x4f96, 0x4f98);
   CYC(0x4f98, 0x4f99); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(0x4f99, 0x4f9c); interactionDelete_hook(gb); return; }
@@ -101,29 +106,29 @@ void soldierSubid00_hook(GB *gb) {
 void soldierSubid0c_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(0x4fa2, checkInteractionState_hook, 0x23fe, 0x4fa5);
-  if (!(F & FZ)) { CYCT(0x4fa5, 0x4fa7); label_09_092(gb); return; }
+  if (!(F & FZ)) { CYCT(0x4fa5, 0x4fa7); label_09_092_hook(gb); return; }
   CYC(0x4fa5, 0x4fa7);
   CALL_C(0x4fa7, soldierInitGraphicsAndLoadScript_hook, 0x51d2, 0x4faa);
-  label_09_092(gb);
+  label_09_092_hook(gb);
 }
 
 void soldierSubid02_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(0x4fb3, checkInteractionState_hook, 0x23fe, 0x4fb6);
-  if (!(F & FZ)) { CYCT(0x4fb6, 0x4fb8); label_09_093(gb); return; }
+  if (!(F & FZ)) { CYCT(0x4fb6, 0x4fb8); label_09_093_hook(gb); return; }
   CYC(0x4fb6, 0x4fb8);
   CALL_C(0x4fb8, soldierCheckBeatD6_hook, 0x51f8, 0x4fbb);
   if (!(F & FC)) { CYCT(0x4fbb, 0x4fbe); interactionDelete_hook(gb); return; }
   CYC(0x4fbb, 0x4fbe);
   CALL_C(0x4fbe, soldierInitGraphicsAndLoadScript_hook, 0x51d2, 0x4fc1);
   CALL_C(0x4fc1, objectSetVisible82_hook, 0x1e69, 0x4fc4);
-  label_09_093(gb);
+  label_09_093_hook(gb);
 }
 
 void soldierSubid03_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(0x4fe0, checkInteractionState_hook, 0x23fe, 0x4fe3);
-  if (!(F & FZ)) { CYCT(0x4fe3, 0x4fe5); label_09_095(gb); return; }
+  if (!(F & FZ)) { CYCT(0x4fe3, 0x4fe5); label_09_095_hook(gb); return; }
   CYC(0x4fe3, 0x4fe5);
   CALL_C(0x4fe5, soldierCheckBeatD6_hook, 0x51f8, 0x4fe8);
   if (!(F & FC)) { CYCT(0x4fe8, 0x4feb); interactionDelete_hook(gb); return; }
@@ -424,4 +429,49 @@ void soldierCheckBeatD6_hook(GB *gb) {
 L_5205:
   CYC(0x5205, 0x5206); alu_scf(gb);
   CYC(0x5206, 0x5207); ret_effect(gb);
+}
+
+void label_09_090_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4f9e, 0x4f9f); alu_or(gb, A);
+  if (F & FZ) { CYCT(0x4f9f, 0x4fa2); interactionDelete_hook(gb); return; }
+  CYC(0x4f9f, 0x4fa2);
+  soldierSubid0c_hook(gb);
+}
+
+void label_09_092_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4faa, interactionRunScript_hook, 0x2552, 0x4fad);
+  if (F & FC) { CYCT(0x4fad, 0x4fb0); interactionDelete_hook(gb); return; }
+  CYC(0x4fad, 0x4fb0);
+  CYC(0x4fb0, 0x4fb3); npcFaceLinkAndAnimate_hook(gb);
+}
+
+void label_09_093_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4fc4, objectCheckWithinScreenBoundary_hook, 0x2184, 0x4fc7);
+  if (!(F & FC)) { CYCT(0x4fc7, 0x4fca); interactionDelete_hook(gb); return; }
+  CYC(0x4fc7, 0x4fca);
+  CALL_C(0x4fca, soldierUpdateAnimationAndRunScript_hook, 0x5035, 0x4fcd);
+  CALL_C(0x4fcd, objectSetPriorityRelativeToLink_withTerrainEffects_hook, 0x22e0, 0x4fd0);
+  CYC(0x4fd0, 0x4fd2); A = 0x10;
+  CALL_C(0x4fd2, checkGlobalFlag_hook, 0x31f3, 0x4fd5);
+  if (F & FZ) { CYCT(0x4fd5, 0x4fd7); label_09_094_hook(gb); return; }
+  CYC(0x4fd5, 0x4fd7);
+  CYC(0x4fd7, 0x4fd9); A = 0x0b;
+  CALL_C(0x4fd9, checkGlobalFlag_hook, 0x31f3, 0x4fdc);
+  if (F & FZ) { CYCT(0x4fdc, 0x4fdd); ret_effect(gb); return; }
+  CYC(0x4fdc, 0x4fdd);
+  label_09_094_hook(gb);
+}
+
+void label_09_094_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x4fdd, 0x4fe0); objectPreventLinkFromPassing_hook(gb);
+}
+
+void label_09_095_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(0x4ff1, interactionRunScript_hook, 0x2552, 0x4ff4);
+  CYC(0x4ff4, 0x4ff7); interactionAnimate_hook(gb);
 }

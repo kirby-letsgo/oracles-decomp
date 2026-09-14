@@ -1050,6 +1050,12 @@ desync to discover; keep them when porting routines.
   `villager.c` still called the generated names; the deleted `gen_bank08.c` turned each into a
   link error. Retarget `CALL_C`/tail sites to the `_hook` in the same integration step, before the
   first build.
+- A private C helper that invokes `CALL_C` still needs a `uint16_t sp0_` in scope. Batch 163's
+  `misc_man_init` and `mustache_man_init` helpers were ordinary local functions, so the first
+  compile failed when `CALL_C_` expanded its thread-continuation arm and referenced an undeclared
+  `sp0_`. Pass the owning hook's `sp0_` into every such helper before its first smart call; this
+  keeps a dynamic callee's continuation on the current emulated thread stack rather than making a
+  plain C local out of it.
 - A static `jp` translated as a direct C target call must immediately return from the current C
   function when another local label follows. Batch 162's palace-soldier state-0 paths called their
   visible/position targets and then fell through into state 1 when the target returned, unlike the
