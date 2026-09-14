@@ -444,6 +444,38 @@ Updated 2026-09-13. Newest entries at the top of each section.
   every batch since it was first identified) across 1,096,355 calls, full reference replay 0
   state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
   suites 8/8.
+  Batch 178 ported the trivial one-instruction `object_code/common/enemies/none.s`
+  (`enemyCode00`, a bare `ret`) together with the whole `object_code/ages/enemies/veranFinalForm.s`
+  boss (`veranFinal.c`, 1513 lines, 64 root routines): `enemyCode02`'s health/knockback dispatch,
+  the turtle-form pre-fight and jump-attack state machine (`turtleForm_state0`-`stateA`, 11
+  states), the spider-form movement/attack state machine (`spiderForm_state1`-`state4`, with
+  `rushAttack`/`jumpAttack`/`webAttack` each their own root and `webAttack` alone having eight
+  substates, each independently registered), the bee-form movement/attack state machine
+  (`beeForm_state1`-`stateB`, 12 states sharing a screen-corner-entrance table via RST $18), and
+  the shared health-transform/death/targeting helpers. Two private RST vector helpers
+  (`addAToHl`, `addDoubleIndexToHl`) and a shared RST $00 jump-table helper; four mis-decoded data
+  tables (`@transformProbabilities`, `@counter1Vals`, `@transformSequence`, `@angles`) correctly
+  need no hook, as do three fully-skipped literal tables the transliterator never even attempted
+  to disassemble as code (`@screenCornerEntrances`, `@counter2Vals`, `@targetPositions`). No
+  locals in this file are reached by a genuine ROM `call` from outside their own containing root,
+  so — unlike several earlier boss batches — no plain-function-plus-`push_effect` helpers were
+  needed anywhere; every cross-root transfer is either `CALL_C` to an already-registered sibling
+  or a direct tail call matching a `jp`/`jr`/fallthrough. Review found and fixed two real defects:
+  a genuine `call` to `veranFinal_dead` (health reaches zero in `enemyCode02`) had been written as
+  a plain direct-call-and-return instead of `CALL_C`, which would have discarded the caller's own
+  continuation code entirely the first time a player actually depleted this boss's health — since
+  this boss (like the whole Twinrova family) is never reached by the reference movie, this bug
+  would have shipped invisibly past every gate that batch ever ran; a self-review catch, not a
+  verify-run catch, and now a standing reminder to specifically re-check every genuine `call`
+  target against "does the ground truth show more code right after this at the return address" in
+  bosses this movie doesn't exercise. Also seven more of the already-documented `jp cc`
+  taken/not-taken cycle bugs. A 30k-frame verify and the full 290,174-frame reference replay both
+  passed clean with the expected state hashes; as expected, `veranFinal`'s own hooks show 0 calls
+  in both since this movie's route never reaches this fight either. Thirty-four generated rows
+  disappeared; bank 10 is 378/469 and the project 4,049/10,366. Gates: lint 0, 30k verify 16
+  pre-existing/unrelated `lcdVector_hook` failures (unchanged state hash `99e1f928f2cab55a`)
+  across 1,096,355 calls, full reference replay 0 state-hash mismatches over 290,174 frames with
+  state `a62ae98192befee8`, normal and quirk suites 8/8.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -548,6 +580,51 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 178, bank 10 (65 root routines, branch
+  `claude/bank10-phase6`): ported `object_code/common/enemies/none.s` (`enemyCode00`, a bare
+  `ret` stub, `none.c`) together with the whole `object_code/ages/enemies/veranFinalForm.s` boss
+  (`veranFinal.c`, 1513 lines) — `enemyCode02`'s health/knockback/death dispatch, the turtle-form
+  pre-fight-cutscene-through-death state machine (`turtleForm_state0` loads the boss, `state1`
+  shows text and starts the fight, `state2`-`state4` are the jump-and-crash-down sequence,
+  `state5` decides whether to open its face or jump again from a per-attempt probability table,
+  `state6`-`state9` open the face/take damage/transform, `stateA` is the four-substate death
+  cutscene into `ENEMY_MISC_PUZZLES`), the spider-form movement-and-three-attacks state machine
+  (`spiderForm_state1`-`state4` dispatch into `rushAttack`/`jumpAttack`/`webAttack`, each its own
+  root, `webAttack` alone contributing eight independently-registered substates), the bee-form
+  movement-and-attack state machine (`beeForm_state1`-`stateB`, 12 states sharing a
+  screen-corner-entrance table via RST $18), and the shared health-transform/death/target-position
+  helpers used by all three forms. Two private RST vector helpers (`addAToHl`,
+  `addDoubleIndexToHl`) and a shared RST $00 jump-table helper, matching the established per-file
+  convention; four mis-decoded data tables (`@transformProbabilities`, `@counter1Vals`,
+  `@transformSequence`, `@angles`) needed no hook, as did three tables the transliterator never
+  even attempted to disassemble as fake code at all (`@screenCornerEntrances`, `@counter2Vals`,
+  `@targetPositions`) — read directly via `mem_rd` off the ROM after the RST helper computes the
+  index. No local in this file is reached by a genuine ROM `call` from outside its own containing
+  root, so unlike several earlier boss batches this one needed zero
+  plain-function-plus-`push_effect` helpers — every cross-root transfer is either `CALL_C` to an
+  already-registered sibling or a direct tail call matching a `jp`/`jr`/fallthrough. Review found
+  and fixed two real defects. First, and more serious: the genuine `call` from `enemyCode02` to
+  `veranFinal_dead` (fired when the boss's health reaches zero) had been written as a plain
+  direct-call-and-return instead of `CALL_C`, which would have silently discarded `enemyCode02`'s
+  own continuation code (the final RST $00 form dispatch) the first time a player actually
+  depleted this boss's health on real hardware — caught only by re-reading the ground truth's own
+  `CALL(...)` followed by more code at the return address, not by any verify run, since this boss
+  (like the entire Twinrova family before it this session) is never reached by the reference
+  movie's route and so a bug in this exact call-return shape would ship invisibly past every gate
+  a batch like this one runs. Re-checked `twinrova.c` and `mergedTwinrova.c` for the same mistake
+  and found none — every direct-call-and-return there was already correctly labeled `jp`/`jr`/
+  fallthrough, not a genuine `call`. This is now a standing reminder: for every genuine `call`
+  instruction in an unreachable-by-the-movie boss file, specifically verify the ground truth shows
+  no more code after it at the return address before writing a direct call instead of `CALL_C`.
+  Second, seven more of the already-documented `jp cc` taken/not-taken cycle bugs, caught by the
+  now-standard full address cross-check. A 30k-frame verify and the full 290,174-frame reference
+  replay both passed clean with the expected state hashes; `veranFinal`'s own hooks show 0 calls
+  in both, as expected. Thirty-four generated rows disappeared; bank 10 is 378/469 and the project
+  4,049/10,366. Gates: lint 0, 30k verify 16 pre-existing/unrelated `lcdVector_hook` failures
+  (unchanged state hash `99e1f928f2cab55a`) across 1,096,355 calls, full reference replay 0
+  state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 177, bank 10 (23 root routines, branch
   `claude/bank10-phase6`): ported the whole `object_code/common/enemies/mergedTwinrova.s` boss

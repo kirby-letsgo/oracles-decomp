@@ -1198,3 +1198,19 @@ desync to discover; keep them when porting routines.
   src/game/<name>.c` before the first `Write` of a same-named file, and if it collides, pick a
   distinguishing name (`raftInteraction.c` here) instead of a bank suffix — the routine names inside
   stay canonical either way, only the file's own basename needs to be unique.
+- A genuine `CALL(...)` to a sibling root must use `CALL_C`, never a plain direct call plus
+  `return;`, whenever the ground truth shows more code after it at the return address (i.e. a
+  label immediately following the `CALL(...)` line, with real instructions under it) — `CALL_C`
+  pushes the return address and, on the callee's normal `ret` (verified by `gb->pc`/`gb->sp`
+  matching), falls straight through to the next C statement, which is exactly what "more code at
+  the return address" requires. A direct call plus `return;` is correct only for a `jp`, `jr`, or
+  literal ROM fallthrough — cases where the ground truth's own comment says so and nothing follows
+  the transfer at that address. Bank 10's `veranFinal.s` batch had exactly one of these: a `call`
+  to `veranFinal_dead` fired when the boss's health reaches zero, written as a direct call
+  (dropping `enemyCode02`'s own follow-up dispatch code entirely) instead of `CALL_C`. Because
+  this boss, like the whole Twinrova family before it, is never reached by the reference movie's
+  route, a bug in this exact shape ships invisibly past every gate a batch runs — the 30k verify
+  and full replay both stay clean since the buggy path is never executed. The only thing that
+  catches it is re-reading whether the ground truth has code after the `CALL(...)` before writing
+  the C for it; treat this as a required check specifically for every genuine `call` (not `jp`,
+  not fallthrough) in any boss/enemy file this movie's route doesn't exercise.
