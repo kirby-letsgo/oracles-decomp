@@ -3924,3 +3924,7 @@ ramrock_glovePhase_substate4
 ramrock_updateHorizontalMovement
 ramrock_glovePhase_reverseDirection
 ramrock_glovePhase_updateMovement
+interactionCodedf
+interactionCodee2
+interactionCodee3
+interactionCodee6

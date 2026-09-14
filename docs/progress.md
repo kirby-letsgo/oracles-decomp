@@ -375,6 +375,33 @@ Updated 2026-09-13. Newest entries at the top of each section.
   reminder to always copy the resolved literal from the ground-truth dump rather than reconstructing
   a comparison from the disassembly's own symbolic source. Twenty generated rows disappeared; the
   project now has 3,923 readable hooks out of 10,511, with bank 10 at 252/614.
+  Batch 175 ported four small `object_code/ages/interactions` and `object_code/common/interactions`
+  files sharing a "leftover small interactions" bucket: `nayruRalphCredits.s` (`interactionCodedf`),
+  `statueEyeball.s` (`interactionCodee2`, whose `getDirectionToFace`/`centerOnTileAndGetDirectionToFace`/
+  `spawnChild` locals are each reached by a real ROM `call` needing genuine continuation afterward, so
+  each became its own plain function invoked with an explicit `push_effect` before a direct C call,
+  matching the pattern from batch 172/173; its `lowPositionValues` table is mis-decoded data and needs
+  no hook), `knowItAllBird.s` (`interactionCodee3`, same treatment for `beginJump`/`decVar36`), and
+  `raft.s` (`interactionCodee6`, same treatment for `checkLinkWithinRange`, whose own tail is a `jp`
+  into a registered hook rather than a `ret`, so its own eventual return pops back through the C call
+  chain to the two real-call sites in `state1`). The byte-delta scan and a full ground-truth address
+  cross-check found and fixed: three unconditional-jump-burned-to-target bugs (one in
+  `nayruRalphCredits.c`, one in `statueEyeball.c`, two in `raftInteraction.c`), two instances of a
+  3-byte `ld a,(nn)` merged with the next instruction's byte range in `raftInteraction.c`, and — the
+  most consequential defect — four `jp cc,nn` conditional jumps in `raftInteraction.c` that burned the
+  not-taken cycle count on both sides of the branch instead of `CYCT` on the taken side; a 30k-frame
+  verify comparison was inconclusive (16 pre-existing `lcdVector_hook` mismatches on unmodified HEAD
+  turned out to be unrelated noise, confirmed by a stash-and-rebuild bisection) but the fix was applied
+  as a correctness fix regardless, since a `jp cc` has different taken/not-taken timing on real
+  hardware. The file for `interactionCodee6` had to be renamed from the disassembly's own `raft.c` to
+  `raftInteraction.c` after discovering bank 6 already owns a `src/game/raft.c`
+  (`specialObjectCode_raft_b06`) — the original was restored from `git checkout` before the new file
+  was written under its own name. None of the six "L"-flagged real-call locals across the four files
+  went into `rewritten.txt`: per the existing porting-notes rule, a rewritten routine's own local
+  labels lose their hook table row once the root is registered, so only the four root names
+  (`interactionCodedf`, `interactionCodee2`, `interactionCodee3`, `interactionCodee6`) were added.
+  Forty-eight generated rows disappeared; the project now has 3,927 readable hooks out of 10,463,
+  with bank 10 at 256/566.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -479,6 +506,41 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 175, bank 10 (4 root routines, branch
+  `claude/bank10-phase6`): ported four small leftover interaction files —
+  `object_code/common/interactions/nayruRalphCredits.s` (`interactionCodedf`, one giant function with
+  every local absorbed as an inline goto label), `object_code/common/interactions/statueEyeball.s`
+  (`interactionCodee2`; `getDirectionToFace`, `centerOnTileAndGetDirectionToFace`, and `spawnChild`
+  are each reached by a real ROM `call` needing genuine continuation afterward, so each is its own
+  plain function invoked via an explicit `push_effect` plus a direct C call, matching the pattern
+  from batches 172/173; `lowPositionValues` is mis-decoded data needing no hook),
+  `object_code/ages/interactions/knowItAllBird.s` (`interactionCodee3`, same treatment for
+  `beginJump`/`decVar36`), and `object_code/ages/interactions/raft.s` (`interactionCodee6`, same
+  treatment for `checkLinkWithinRange`, whose own tail is a `jp` into a registered hook rather than a
+  `ret`, so its eventual return pops back through the C call chain to the two real-call sites in
+  `state1`). The byte-delta scan plus a full ground-truth address cross-check (not just the
+  diff-based scan) found and fixed three more instances of the unconditional-jump-burned-to-target
+  bug (one each in `nayruRalphCredits.c` and `statueEyeball.c`, two in the file that became
+  `raftInteraction.c`), two instances of a 3-byte `ld a,(nn)` merged with the following instruction's
+  byte range in the same file, and — the most consequential defect — four `jp cc,nn` conditional
+  jumps there that used plain `CYC` (not-taken cycles) on both sides of the branch instead of `CYCT`
+  on the taken side; `jp cc` has different taken/not-taken timing on real hardware, same as `jr cc`.
+  A 30k-frame verify comparison of before/after the fix was inconclusive (16 `lcdVector_hook`
+  mismatches, unchanged either way, state hash `99e1f928f2cab55a` both times), so a `git stash`
+  round-trip confirmed those 16 are pre-existing baseline noise on unmodified HEAD, unrelated to this
+  batch; the `jp cc` fix was kept regardless as a correctness fix. The file for `interactionCodee6`
+  had to be renamed from the disassembly's own `raft.s` basename to `raftInteraction.c` after
+  discovering bank 6 already owns `src/game/raft.c` (`specialObjectCode_raft_b06`) — that file was
+  first overwritten by mistake, then restored from `git checkout` before the bank 10 code was written
+  under its own name. None of the six "L"-flagged real-call locals across the four files went into
+  `rewritten.txt`: a rewritten routine's own local labels lose their hook table row once the root is
+  registered (existing porting-notes rule), so only the four root names (`interactionCodedf`,
+  `interactionCodee2`, `interactionCodee3`, `interactionCodee6`) were added. Forty-eight generated
+  rows disappeared; bank 10 is 256/566 and the project 3,927/10,463. Gates: lint 0, 30k verify 16
+  pre-existing/unrelated `lcdVector_hook` failures (confirmed identical on unmodified HEAD) across
+  1,096,355 calls with state `99e1f928f2cab55a`, full reference replay 0 state-hash mismatches over
+  290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 174, bank 10 (41 routines, branch
   `claude/bank10-phase6`): ported the whole `object_code/ages/enemies/ramrock.s` (`ramrock.c`) —

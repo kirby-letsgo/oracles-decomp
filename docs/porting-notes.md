@@ -1169,3 +1169,27 @@ desync to discover; keep them when porting routines.
   always copy that literal, the same way every other immediate in these files is copied verbatim
   rather than re-derived. Bank 10's `ramrock.s` batch hit this in `ramrock_seedPhase`'s item-seed
   collision-range check.
+- `jp cc,nn` has different taken/not-taken cycle costs on real hardware, exactly like `jr cc,n` —
+  `CYCT` (not plain `CYC`) belongs under the taken branch even though the byte range (`from` to
+  `from+3`) is identical either way, since it is only the byte range that stays fixed, not the
+  cycle count `burn_rom` looks up for that opcode. Because the byte range genuinely doesn't change,
+  this bug is invisible to the byte-delta scan (which only checks range width) and easy to miss on
+  read-through, since the line still "looks right" — only a 30k-frame verify or a diff against the
+  ground truth's own `I(addr, cycles)` value (which does differ, e.g. `I(addr, 4)` taken vs.
+  `I(addr, 3)` not-taken for `jp cc`) catches it. Bank 10's `raft.s` batch had four of these (all
+  `jp z`/`jp nz,interactionDelete` tails); a 30k verify comparison across the fix was inconclusive
+  (16 pre-existing, unrelated `lcdVector_hook` mismatches were unchanged either way — confirmed by a
+  `git stash` round-trip against unmodified HEAD), so treat this class of bug as a correctness fix
+  to apply on sight from cross-referencing the ground truth, not something to wait on a verify run to
+  confirm.
+- Before naming a new file after the disassembly source's own basename, check whether another bank
+  already owns `src/game/<basename>.c` — file names are not namespaced per bank, and disassembly
+  source files can collide across banks (bank 6's `object_code/.../raft.s` for
+  `specialObjectCode_raft_b06` and bank 10's `object_code/ages/interactions/raft.s` for
+  `interactionCodee6`, both literally named `raft.s`, both would-be `src/game/raft.c`). Writing over
+  an existing file destroys another bank's already-verified work silently — `Write` and `Edit` don't
+  warn about this since the file already existing and being about to be overwritten is the whole
+  point of `Edit`. Check with `git status --short src/game/<name>.c` and `git log --oneline -1 --
+  src/game/<name>.c` before the first `Write` of a same-named file, and if it collides, pick a
+  distinguishing name (`raftInteraction.c` here) instead of a bank suffix — the routine names inside
+  stay canonical either way, only the file's own basename needs to be unique.
