@@ -448,6 +448,30 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-14: milestone 3 phase 6 batch 177, bank 11 (6 root routines): ported
+  `object_code/ages/parts/ramrockGloveFormArm.s` (`PART_RAMROCK_GLOVE_FORM_ARM`,
+  `ramrockGloveFormArm.c`) — the Ramrock boss's detachable glove/arm part, a 7-state jump-table
+  dispatcher (`partCode35`) with a parallel 6-entry "subid bit 7 set" variant table sharing most of
+  its state bodies, plus five small already-independently-hooked helper roots it calls
+  (`func_693b`, `state0func_6956`, `state3func_6970`, `state0func_6992`, `func_69a5`) reached via
+  genuine `call`s needing `CALL_C`. One true local (`state0func_6731`, reached by `call` from two
+  sites, always falls through to a plain `ret`) was implemented as a bare CYC-only helper with no
+  push/ret_effect, since it is never independently hook-dispatched. Another local
+  (`state4func_68d7`) is reachable both by a `call` (needing a continuation) and by a `jr`
+  fallthrough from the "subid bit 7" variant (whose `ret` is the outer routine's real end) — rather
+  than give one block two incompatible return semantics, its five instructions are duplicated: once
+  inlined in `state4` with no `RET`, once as a standalone label ending `RET`. Two RST `$00`
+  jump-table dispatches and one substate table needed the same private per-file helper convention
+  as `updateParts.c`/`itemDrop.c`. Independent review found two real cycle-accounting bugs after a
+  full byte-address self-check (which confirmed every ROM instruction in range was covered, but
+  couldn't tell a *duplicated* code path was missing a cycle burn on only one of its two copies):
+  a `jr nc` inside `func_693b` was burned to its branch target instead of its own 2-byte end, and
+  the inlined copy of `state4func_68d7` was missing the 4-cycle cost of its own `ret` (silently
+  absorbed into the following `call`'s burn range instead of charged separately) — both fixed and
+  reverified. Bank 11 is 22/747 and the project 4,235/9,997. Gates: lint 0, 30k verify 0 failures
+  with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames
+  with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-14: milestone 3 phase 6 batch 176, bank 11 (13 root routines, new branch
   `claude/bank11-phase6` off latest `main`): opened bank 11 — the `object_code/*/parts` tree (item
   projectiles, drops, and effects spawned by enemies/interactions) — with the whole

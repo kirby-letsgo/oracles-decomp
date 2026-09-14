@@ -4263,3 +4263,9 @@ itemDrop_updateFairyMovement
 itemDrop_chooseRandomFairyMovement
 itemDrop_moveTowardPoint
 itemDrop_applySpeed
+partCode35
+func_693b
+state0func_6956
+state3func_6970
+state0func_6992
+func_69a5

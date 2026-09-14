@@ -1243,3 +1243,16 @@ desync to discover; keep them when porting routines.
   first time that code path runs — worse than a mistimed cycle count, since it's a hard abort, not
   a state divergence a `--ref-check` catches on replay. Every unconditional `jr`/`jp` (not just
   conditional ones) needs its own byte range checked against its true 2/3-byte length.
+- A whole-file address-coverage self-check (collecting every `CYC`/`CYCT`/`CALL_C`/`RET` address
+  pair used and diffing against the full set of real instruction addresses from the ground truth)
+  reliably catches *missing* instructions, but it is a set comparison, so it cannot catch a
+  duplicated code block that is missing a cycle burn on only *one* of its two textual copies — if
+  the same address range is correctly burned somewhere else in the file, the pair is already in the
+  set and the gap is invisible. Bank 11's `ramrockGloveFormArm.s` batch had exactly this: a local
+  (`state4func_68d7`) reachable both by a genuine `call` (needing a plain inline copy with no
+  `ret_effect`, since the caller's continuation must resume afterward) and by a `jr` fallthrough
+  from a sibling state (whose `ret` really is the outer routine's end, so that copy correctly used
+  `RET`) — the `RET(addr)` copy's cycle burn masked the fact that the *other*, `call`-reached copy
+  never burned its own `ret`'s 4 cycles at all. When a block is legitimately duplicated for two
+  different return semantics, each copy needs its own independent trace through the coverage
+  check, not just a shared address appearing once in the combined set.
