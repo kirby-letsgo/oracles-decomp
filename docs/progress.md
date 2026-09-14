@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 3,511 routine hooks rewritten across seventeen code
+  routine against the transliteration. Progress: 3,528 routine hooks rewritten across seventeen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -289,6 +289,8 @@ Updated 2026-09-13. Newest entries at the top of each section.
   Batch 160 continued bank 9 with shopkeeper, intro-sprite, sword, rabbit, explosion, and
   Z-oscillation helpers. Forty generated local rows disappeared; the project now has 3,511
   readable hooks out of 11,224.
+  Batch 161 added shop-item, soldier, and seasons-fairy interaction state helpers. Thirty-seven
+  generated local rows disappeared; the project now has 3,528 readable hooks out of 11,187.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).
@@ -393,6 +395,14 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-14: milestone 3 phase 6 batch 161 (17 routines): added shop-item state/display/grab
+  paths, six soldier dispatcher/subid roots, and the seasons-fairy interaction state machine.
+  Independent review repaired two omitted shop-item table targets and the fairy's JR/call timing
+  path. Thirty-seven generated rows disappeared; bank 9 is 66/746 and the project 3,528/11,187.
+  Gates: lint 0, 30k verify 0 failures across 4,525,583 calls with state `3e450c2620a3f6a3`,
+  full reference replay 0 state-hash mismatches across 11,494,902 calls with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
 
 - 2026-09-14: milestone 3 phase 6 batch 160 (30 routines): continued bank 9 with the complete
   shopkeeper state/price/script path, intro-sprite and Triforce subid state machine, sword/rabbit/
