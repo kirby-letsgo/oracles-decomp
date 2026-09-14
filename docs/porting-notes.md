@@ -3,6 +3,13 @@
 Decisions and hardware sensitivities found while building milestone 1.
 Add an entry whenever a TAS sync or verification issue is resolved.
 
+- When multiple logical labels share one address, `gen_hooks.py` installs the first canonical
+  symbol from `ages.sym` in its hook table. For Zora's shared state entries, the logical labels
+  `zora_subid0B`, `zora_subid0D`, `zora_subid0F`, `zora_subid12`, and `zora_subid1B` resolve to
+  canonical entries `zora_subid0A`, `zora_subid0C`, `zora_subid00`, `zora_subid10`, and
+  `zora_subid13`. Put the canonical name in `rewritten.txt` and implement a forwarding wrapper;
+  registering only the logical name leaves no hook-table entry and fails lint.
+
 ## Boot
 
 - The game seeds its RNG with constants (0x37, 0x0d) at `begin` in `code/bank0.s`. It never reads DIV.

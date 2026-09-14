@@ -949,6 +949,14 @@
 09:7778 goronSubid01__afterCall7778
 09:7585 goronSubid00__afterCall7585
 09:6e68 interactionCode5e__afterCall6e68
+0b:60d7 zora_commonInit__afterCall60d7
+0b:611f zora_subid0B__afterCall611f
+0b:6193 zora_subid12__afterCall6193
+0b:6206 zora_subid0E__afterCall6206
+0b:6236 zora_subid1B__afterCall6236
+0b:7966 greatFairy_initialize__afterCall7966
+0b:7866 greatFairy_subid0__afterCall7866
+0b:78b2 greatFairy_subid1__afterCall78b2
 09:6c08 interactionCode59__loadScriptAndInitGraphics
 09:6c0b interactionCode59__afterCall6c0b
 09:6be7 interactionCode59__afterCall6be7
