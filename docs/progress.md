@@ -7,7 +7,7 @@ Updated 2026-09-13. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 3,528 routine hooks rewritten across seventeen code
+  routine against the transliteration. Progress: 3,684 routine hooks rewritten across seventeen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -291,6 +291,8 @@ Updated 2026-09-13. Newest entries at the top of each section.
   readable hooks out of 11,224.
   Batch 161 added shop-item, soldier, and seasons-fairy interaction state helpers. Thirty-seven
   generated local rows disappeared; the project now has 3,528 readable hooks out of 11,187.
+  The merged completed bank-8 branch makes every remaining bank-8 entry readable and removes its
+  generated file; the project now has 3,684 readable hooks out of 10,718.
   Phase 0 done: `tools/gen_ram.py` (1,810 named RAM labels), `src/hooks/rewritten.txt` and
   `<name>_hook` shims in the generator, `--report` readiness reports, `tools/lint_game.py`,
   `setCpuToDoubleSpeed` hand-written (the last interpreter use that was there by design).

@@ -1023,3 +1023,30 @@ desync to discover; keep them when porting routines.
   HL through `rst $18`, never executed. Batch 156 left them out of the readable file and let the rows
   disappear with their parent. A raw `$cfc1`/`$cfc2` in the disassembly with no `ram.h` name is
   written as `wTmpcfc0 + 1`/`+ 2`; lint rejects the bare literal.
+- A readable root that dispatches to sibling hooks by direct C call leaves those siblings' call
+  counters at zero in every report: `interactionCode21_hook` ran 499 times in the batch-157 replay
+  while its twenty-five `interaction21_subidNN_hook` entries all show 0, because `call_hook` only
+  counts interpreter-dispatched entries. Judge coverage by the root's count plus the reference
+  replay, as the porting notes already say for the interrupt vectors.
+- Enemy and part fields follow the same struct layout as interactions at `$80` and `$c0`;
+  `ENEMY_BASE`/`PART_BASE` in `game.h` pair with the same `OBJ_*` offsets (`ENEMY_BASE + OBJ_YH` for
+  `Enemy.yh`). A `ld hl,Part.counter2` with `h` set from a part slot is `L = PART_BASE + OBJ_COUNTER2`.
+- A callee that escapes to the grand-caller (`interactionDeleteAndRetIfEnabled02`,
+  `returnIfScrollMode01Unset`, `interactionDeleteAndRetIfItemFlagSet`: they `pop` their own return
+  address) is safe behind `CALL_C` only in a `_hook` body or in a static helper that is the hook's
+  last statement. `CALL_C_`'s nonlocal arm returns from the helper after `hook_continue` has already
+  run the routine to its end; any C after the helper call would then execute a second time. Batch
+  158's review found the pattern once (`toggleFloor_subid00`, a tail call, so harmless) and the rule
+  is now in the writer brief.
+- A local that another bank reaches through `callab` (`nayruState0@init0e`, called by Ambi) keeps
+  its hook when the parent is rewritten: alias it in `extra.sym` with its canonical `parent__local`
+  name, add that name to `ported.txt` and `rewritten.txt`, and write the `_hook`; regeneration then
+  emits a flag-0 entry instead of dropping the synthetic local with its parent.
+- Promoting a banked callee retires its bank-0 wrapper's `CALL_ROM`: `checkObjectIsCloseToPosition`'s
+  bank-0 half called `ROM_b08_checkObjectIsCloseToPosition` through the interpreter until batch 158
+  made the bank-8 body readable; the wrapper now captures `sp0_` and uses `CALL_C`.
+- Closing a bank retires every generated symbol its neighbours still named. Bank 08's last batch
+  made `startJump` and `loadStoneNpcPalette` readable while `nayru.c`, `oldLady.c`, `boy.c` and
+  `villager.c` still called the generated names; the deleted `gen_bank08.c` turned each into a
+  link error. Retarget `CALL_C`/tail sites to the `_hook` in the same integration step, before the
+  first build.

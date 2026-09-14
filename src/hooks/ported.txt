@@ -276,8 +276,6 @@ scriptCmd_asmCall
 scriptCmd_asmCallWithParam
 scriptFunc_jump_scf
 scriptFunc_jump
-scriptFunc_jump_scf
-scriptFunc_jump
 scriptFunc_add3ToHl_scf
 scriptFunc_add3ToHl
 scriptCmd_loadScript
@@ -418,10 +416,6 @@ darkenRoomWithSpeed
 darkenRoom
 brightenRoomLightly
 brightenRoomWithSpeed
-brightenRoom
-darkenRoomLightly
-darkenRoom
-brightenRoomLightly
 brightenRoom
 fastFadeinFromWhiteToRoom
 fadeinFromWhiteToRoom
@@ -6424,3 +6418,4 @@ loadObjectGfxHeaderToSlot4_body__afterCall41f0
 specialObjectCode_moosh__runState
 specialObjectCode_dimitri__runState
 linkUpdateVelocity_mermaidSuit
+nayruState0__init0e

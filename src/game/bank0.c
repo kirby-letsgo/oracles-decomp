@@ -11546,7 +11546,7 @@ void parseGivenObjectData_b00_hook(GB *gb) {
 }
 
 void checkObjectIsCloseToPosition_b00_hook(GB *gb) {
-  uint16_t sp0_ = gb->sp;
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x3d59, 0x3d5b); H8(hFF8B) = A;
   bank_push(gb, 0x3d5b, 0x08);
   CALL_C(0x3d65, checkObjectIsCloseToPosition_b08_hook, ROM_b08_checkObjectIsCloseToPosition, 0x3d68);
