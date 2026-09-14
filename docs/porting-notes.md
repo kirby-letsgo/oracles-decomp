@@ -1226,3 +1226,20 @@ desync to discover; keep them when porting routines.
   catches it is re-reading whether the ground truth has code after the `CALL(...)` before writing
   the C for it; treat this as a required check specifically for every genuine `call` (not `jp`,
   not fallthrough) in any boss/enemy file this movie's route doesn't exercise.
+- The scripted whole-file byte-delta scan (flagging any `CYC(from,to)`/`CYCT(from,to)` pair whose
+  width falls outside 1-4 bytes) has a blind spot for `jr`/`jp` targets that land close to, but not
+  at, the instruction's own end — a 2-byte `jr` burned as `CYCT(from, from+4)` looks like a normal
+  width to the scan even though the correct range is `from+2`. Bank 11's `itemDrop.s` batch had
+  roughly a dozen of these (an independent review agent caught them; the scan itself reported
+  clean). The scan is still worth running first — it catches the worse "burned to a target ten-plus
+  bytes away" class for free — but it cannot replace checking every conditional branch by its own
+  mnemonic (`jr`=2 bytes, `jp`/`call`=3 bytes) against the ground truth, regardless of how small the
+  observed diff looks.
+- `burn_rom` (`src/game/cyc.c`) walks every instruction from `from` to `to` and aborts the whole
+  process (`exit(4)`) if a non-final instruction in that range is an unconditional control transfer
+  (`jr`, `jp`, `ret`, `reti`, `jp (hl)` — opcodes `0x18`/`0xc3`/`0xc9`/`0xd9`/`0xe9`). An
+  unconditional `jr` burned even one byte too wide (e.g. `CYCT(from, from+3)` for a 2-byte `jr`)
+  silently swallows the next instruction's opcode into the same range and crashes the emulator the
+  first time that code path runs — worse than a mistimed cycle count, since it's a hard abort, not
+  a state divergence a `--ref-check` catches on replay. Every unconditional `jr`/`jp` (not just
+  conditional ones) needs its own byte range checked against its true 2/3-byte length.

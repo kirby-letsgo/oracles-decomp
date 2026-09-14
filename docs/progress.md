@@ -448,6 +448,38 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-14: milestone 3 phase 6 batch 176, bank 11 (13 root routines, new branch
+  `claude/bank11-phase6` off latest `main`): opened bank 11 — the `object_code/*/parts` tree (item
+  projectiles, drops, and effects spawned by enemies/interactions) — with the whole
+  `object_code/common/parts/itemDrop.s` (`PART_ITEM_DROP`, `itemDrop.c`), covering the drop's
+  4-state lifecycle (falling, bouncing, waiting to be picked up, and the just-hit/collected path),
+  its gfx/speed/fairy-movement initializers, and the hazard/sidescroll/ground collision helpers.
+  Two locals reached by genuine `call`s needed the plain-function-plus-`push_effect` treatment:
+  `getRelatedObj1ID` (called once, tail-jumps into a registered hook whose own `ret` naturally
+  continues the caller) and `checkCollidedWithLink` (called once, but its ground truth ends in a
+  `pop hl` that discards the pushed return address and diverts permanently into a sibling
+  `linkCollectedItem` function on one of its three exits) — the latter needed the caller's own
+  continuation split into a fourth function, `afterCollisionCheck`, so the diverting exit could
+  skip it validly. Three private RST vector helpers (add-A-to-HL, add-double-index-to-HL, and the
+  jump table) and three mis-decoded data tables (`@spriteData`, `@itemDropTreasureTable`,
+  `@speedTable`) needed no hook. Review found and fixed a critical bug that would have crashed the
+  emulator on contact (`burn_rom`'s own safety check aborts on an unconditional `jr` whose range
+  doesn't end at its own 2-byte boundary): an unconditional `jr @onWaterSidescrolling` had been
+  burned three bytes wide instead of two, swallowing the first byte of the next label. Also fixed
+  an inverted `ret nc`/`ret c` polarity that would have shown the "about to disappear" flicker
+  during the wrong 60-frame window instead of the last one, and roughly a dozen `jr`/`jp` byte-range
+  bugs missed by the usual width-based scan because their targets happened to fall within 1-4 bytes
+  of the instruction's own end (the scan's normal tolerance) — this batch's real lesson: for a
+  2-byte `jr`, only a target exactly 2 bytes past the start is "normal"; anything else, however
+  small the apparent diff, is a bug, and must be checked by mnemonic, not by diff magnitude. A 30k-
+  frame verify and the full 290,174-frame reference replay both passed clean with the expected
+  state hashes; the movie only ever exercises `partCode01`'s own top-level dispatch (794 calls) and
+  never any of its own callees, so the two independent instruction-level reviews are this batch's
+  only correctness evidence for nearly the whole file. Bank 11 is 16/775 and the project
+  4,229/10,025. Gates: lint 0, 30k verify 16 pre-existing/unrelated `lcdVector_hook` failures
+  (unchanged state hash `99e1f928f2cab55a`), full reference replay 0 state-hash mismatches over
+  290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-14: milestone 3 phase 6 batch 175, bank 9 (3 routines): completed Old Zora, Toilet Hand,
   and Mask Salesman. Independent checkpoint replays found Poe (`interactionCode59`) divergent at
   frame 33,300, so it remains generated alongside the earlier deferred Hardhat Worker. Bank 9 is
