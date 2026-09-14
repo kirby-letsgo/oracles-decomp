@@ -448,6 +448,26 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-14: milestone 3 phase 6 batch 178, bank 11 (16 root routines): ported
+  `object_code/ages/parts/bigBangBombSpawner.s` (`PART_BIGBANG_BOMB_SPAWNER`,
+  `bigBangBombSpawner.c`) — a 6-state bomb-spawner dispatcher (`partCode49`) plus fifteen small
+  leaf helper roots. Two distinct "shared tail across separately-registered roots" shapes: three
+  hazard-check roots (`func_78bd`, `func_78ce`, `func_78d2`) each `jr` into a fourth root's
+  (`func_78dd`) own address range at the byte *after* its `ld a,$03` prologue — rather than let
+  three of the four callers re-execute a sibling root's prologue (which would silently overwrite
+  the A value each had just set), the shared 3-instruction tail was pulled into its own private
+  static helper that all four call. Four direction-lookup roots (`func_79c4/79cb/79d2/79d9`) each
+  reach a single shared `jp add16BitRefs` instruction (one `jr` each, one direct fallthrough) —
+  simple enough that each of the four just duplicates the one-instruction `CYC` burn plus tail-call
+  rather than needing a helper. Two RST `$00` jump tables (6-entry and a 4-entry one with two
+  identical stub-target entries), one RST `$18` (add-double-index) each in two roots, and RST `$10`
+  (add-A-to-HL) in three roots all used the by-now-standard private per-file helper trio. A full
+  address-coverage self-check and an independent review both came back clean — no bugs found, only
+  two purely cosmetic/no-behavioral-impact style notes not applied. Bank 11 is 38/734 and the
+  project 4,251/9,984. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
+
 - 2026-09-14: milestone 3 phase 6 batch 177, bank 11 (6 root routines): ported
   `object_code/ages/parts/ramrockGloveFormArm.s` (`PART_RAMROCK_GLOVE_FORM_ARM`,
   `ramrockGloveFormArm.c`) — the Ramrock boss's detachable glove/arm part, a 7-state jump-table
