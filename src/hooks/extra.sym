@@ -25,6 +25,8 @@
 00:09aa _initializeThread__afterSp09aa
 03:4df3 intro_titlescreen_state1__pressedStart
 03:4dfd intro_titlescreen_state1__gotoState
+09:6ea1 interactionCode5f__afterCall6ea1
+09:6ea4 interactionCode5f__runState
 09:73ec interactionCode64__afterCall73ec
 09:750e interactionCode65__afterCall750e
 09:7531 interactionCode65__loadScriptAndInitGraphics

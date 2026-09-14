@@ -3834,6 +3834,9 @@ makuConfetti_updateSpeedX
 makuConfetti_updateSpeedYUsingSpeedZ
 makuConfetti_updateSpeedXUsingSpeedZ
 interactionCode63
+interactionCode5f
+interactionCode5f__afterCall6ea1
+interactionCode5f__runState
 interactionCode64
 interactionCode64__afterCall73ec
 interactionCode65

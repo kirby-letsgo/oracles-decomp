@@ -5910,6 +5910,8 @@ itemCode13
 itemCode1e
 shopkeeperState3
 interactionCode5f
+interactionCode5f__afterCall6ea1
+interactionCode5f__runState
 interactionCode6f
 enemyCode21
 enemyCode48
