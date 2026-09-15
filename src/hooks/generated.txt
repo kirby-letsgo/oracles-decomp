@@ -4902,9 +4902,7 @@
 11:403b partCommon_standardUpdate_hook -
 11:5e8a func_11_5e8a_hook -
 11:5553 partCode27_hook -
-11:6124 partCode2b -
-11:6131 partCode2b__state1 L
-11:6150 partCode2b__relatedObj1_stateLessThan3 L
+11:6124 partCode2b_hook -
 11:7f3b partCode5a -
 11:4000 partCommon_getTileCollisionInFront_hook -
 11:4003 partCommon_getTileCollisionAtAngle_hook -

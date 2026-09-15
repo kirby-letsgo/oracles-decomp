@@ -448,6 +448,19 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 232, bank 11 (1 root routine): ported
+  `object_code/ages/parts/timewarpAnimation.s` (`partCode2b`, `timewarpAnimation.c`) — the
+  time-warp visual effect: applies its speed and deletes once it drifts far enough down-screen,
+  otherwise deletes if the related object (the thing being warped) has advanced past state 3 with
+  a certain subid bit set, and finally flickers visibility based on a byte read from the RELATED
+  object (not the current Part) using whatever H the last `call` happened to leave behind — a
+  real ROM quirk preserved faithfully rather than "fixed" with an inserted `H = D`. Single root,
+  no locals, no literal `ret`. Zero bugs found by independent review, which specifically traced
+  every write to H through the whole routine to confirm the quirk. Bank 11 is 184/651 and the
+  project 4,397/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 231, bank 11 (1 root routine): ported
   `object_code/ages/parts/sparkle.s` (`partCode26`, `sparkle.c`) — the sparkle particle: on
   spawn, picks a random speed/lifetime quadruple via an RST $10 table lookup; every frame
