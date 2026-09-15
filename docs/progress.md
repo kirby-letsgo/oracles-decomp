@@ -448,6 +448,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 235, bank 11 (1 root routine): ported
+  `object_code/ages/parts/veranFairyProjectile.s` (`partCode2d`, `veranFairyProjectile.c`) —
+  Veran's fairy-form projectile: waits for its related object (the boss) to exist and be alive,
+  fires toward the enemy target with a short lifespan, checks bounds, then animates; deletes
+  with a puff if the related object is gone. Short, single-block routine with three internal
+  labels reached by plain `goto`. No bugs found by self-review or independent review. Bank 11
+  is 191/651 and the project 4,404/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
 - 2026-09-15: milestone 3 phase 6 batch 234, bank 11 (1 root routine): ported
   `object_code/common/parts/twinrovaProjectile.s` (`partCode4b`, `twinrovaProjectile.c`) — the
   red/blue Twinrova projectile shared by both bosses: reflects off Link's L3 shield, checks

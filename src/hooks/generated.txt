@@ -5023,10 +5023,7 @@
 11:6256 func_6256_hook -
 11:6261 func_6261_hook -
 11:6270 func_6270_hook -
-11:62a7 partCode2d -
-11:62c3 partCode2d__state0 L
-11:62d8 partCode2d__noRelatedObj L
-11:62db partCode2d__notNormalStatus L
+11:62a7 partCode2d_hook -
 11:62de partCode2e -
 11:62e9 partCode2e__initialized L
 11:6349 partCode2e__applyCurrentsDirection L
