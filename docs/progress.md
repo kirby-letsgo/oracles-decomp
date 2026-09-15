@@ -448,6 +448,21 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 203, bank 11 (1 root routine): ported
+  `object_code/common/parts/owlStatue.s` (`partCode13`, `owlStatue.c`) — the owl statue hint part:
+  on a specific "just talked" status check, advances to a listening state; a 4-state dispatch then
+  makes the statue solid, waits idle, periodically spawns sparkle-interaction particles at
+  angle-derived offsets (RST $10 table lookup) once talked to, or shows a specific hint text once
+  its animation reaches a particular frame. Self-review caught a real bug: `jp
+  objectCopyPositionWithOffset` was burned to the address of the NEXT VISIBLE LABEL in the
+  disassembly (`@state3`) rather than the `jp`'s own 3-byte end — with a 12-byte, 6-entry data
+  table sitting physically between the two addresses, making the mistake look plausible at a
+  glance. Both RST call sites (jump-table dispatch and single-index lookup) correctly include
+  their own cycle burn on the first attempt. Independent review came back completely clean. Bank 11
+  is 136/651 and the project 4,349/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 202, bank 11 (1 root routine): ported
   `object_code/common/parts/flame.s` (`partCode12`, `flame.c`) — the burning-enemy fire part: tracks
   the enemy it's attached to by ID, keeps applying a bounce/damage-over-time effect and mirroring

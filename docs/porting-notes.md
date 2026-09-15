@@ -1449,3 +1449,14 @@ desync to discover; keep them when porting routines.
   automated gate. The general rule: a shared local's correct call-site treatment is a property of
   each *edge* reaching it (call vs. jr/jp vs. fallthrough), never a property of the local itself —
   don't generalize from one caller's shape to another's.
+- Another shape of the byte-range-vs-target confusion: burning a `jp`/`call` to the address of the
+  *next label visible in the disassembly*, rather than the instruction's own physical byte-end —
+  distinct from burning to the jump's own destination, and easy to miss because it still "looks
+  like a real address in the listing." `owlStatue.s`'s `jp objectCopyPositionWithOffset` (3 bytes)
+  was mistakenly burned to `@state3`'s starting address instead of its own end, because a 12-byte
+  data table (`@owlStatueSparkleOffset`) sits physically between the two, making "the next thing I
+  can see" look like a plausible instruction boundary. The fix is the same discipline as always —
+  derive the end strictly as `from + instruction length` (jr=2, jp/call=3, ret/rst=1), never by
+  eyeballing "what comes next in the source" — but this specific trap (a data table quietly
+  absorbing the gap) is worth watching for whenever a `jp`/`call` is immediately followed by a
+  `.db`-table label rather than another routine.
