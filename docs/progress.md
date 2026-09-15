@@ -448,6 +448,24 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 225, bank 11 (1 root routine): ported
+  `object_code/common/parts/52.s` (`partCode52`, `52.c`) — Ganon's part 52, the most complex file
+  ported this session: a three-level RST $00 dispatch (an outer subid0/subid1/subid2 selector,
+  with each subid running its own inner state0/state1/state2 dispatch), where subid1's and
+  subid2's inner dispatch tables each carry a 4th entry that jumps directly into subid0's own
+  state2 code rather than their own — modeled as a single shared `subid0_state2` label reached
+  via `goto` from all three paths, per the shared-target-label lesson from two batches ago. Also
+  contains a private local (`func_5d31`) invoked once via a genuine `call` and a second time via
+  pure fallthrough immediately afterward — the exact same ROM bytes executed twice with different
+  stack semantics each time (one has a pending call return address to resume, the other doesn't),
+  modeled as two deliberately duplicated inline copies with different exit treatment (`ret_effect`
+  + `goto` back to the caller for the call-reached copy; top-level `RET_TAKEN` for the
+  fallthrough-reached copy). Zero bugs found by independent review, which specifically traced the
+  cross-subid jump-table entries and both `func_5d31` copies in detail. Bank 11 is 173/651 and
+  the project 4,386/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`,
+  full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 224, bank 11 (1 root routine): ported
   `object_code/common/parts/51.s` (`partCode51`, `51.c`) — Ganon's part 51: two nested RST $00
   dispatches (an outer subid0/subid1/subid2 dispatch, and a further inner state0/state1/state2
