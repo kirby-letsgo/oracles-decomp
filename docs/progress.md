@@ -448,6 +448,26 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 214, bank 11 (4 root routines): ported
+  `object_code/common/parts/moblinBoomerang.s` (`partCode21` + `func_53f5` + `func_541a` +
+  `func_542a`, `moblinBoomerang.c`) — the moblin's boomerang projectile. All three locals have
+  their own independent hook-table entries and are each reached via a genuine `call` from
+  `partCode21`, so each uses `CALL_C` at its call site. Self-review caught a `jr nc` polarity
+  inversion (state2's collision-check branch) before the gate ran, plus a wrong field-offset
+  comment (0xea is `Part.var2a`, not `invincibilityCounter`, which is 0xeb). The full-game
+  `--ref-check` then caught a second, more serious bug that survived self-review, independent
+  review, AND a clean 30k-frame `--verify-hooks-continue` pass: the three `CALL_C`-invoked locals
+  used bare `CYC`/`CYCT` + `return;` for their literal `ret` exits instead of `RET`/`RET_TAKEN`,
+  leaking 2 bytes onto the emulated stack per call (`CALL_C_` always `push_effect()`s the return
+  address and expects the callee to pop it via `ret_effect()`) — this caused a real frame-hash
+  mismatch at frame 42864 once enough calls accumulated. Root-caused by comparing against the
+  auto-generated fallback interpreter in `gen_bank11.c` (ground truth, already using
+  `PUSH`/`POP`/`RET`/`RET_TAKEN` for this exact code) and fixed; see the corrected porting-notes.md
+  lesson. The same bug shape, found latent in `dekuScrubProjectile.c` from batch 211, was fixed in
+  a preceding commit. Bank 11 is 156/651 and the project 4,369/9,901. Gates: lint 0, 30k verify 0
+  failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over
+  290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 213, bank 11 (1 root routine): ported
   `object_code/common/parts/fire.s` (`partCode20`, `partCode20.c`) — the fire keese's fire
   projectile: while its state is nonzero, decrements counter1 and deletes when it reaches zero,

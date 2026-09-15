@@ -4399,3 +4399,7 @@ func_5336
 partCode1f
 func_5369
 partCode20
+partCode21
+func_53f5
+func_541a
+func_542a
