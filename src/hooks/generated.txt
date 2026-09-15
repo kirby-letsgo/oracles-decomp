@@ -7399,14 +7399,7 @@
 0b:7421 interactionCodec4__haveEyeball L
 0b:7439 interactionCodec4__state4 L
 0b:7440 interactionCodec4__resetPushCounter L
-0b:7446 interactionCodec5 -
-0b:7458 interactionCodec5__state0 L
-0b:7469 interactionCodec5__state1 L
-0b:7482 interactionCodec5__sounds L
-0b:7485 interactionCodec5__state2 L
-0b:7493 interactionCodec5__stateCommon L
-0b:74a9 interactionCodec5__state3 L
-0b:74ba interactionCodec5__state6 L
+0b:7446 interactionCodec5_hook -
 0b:74c7 interactionCodec6_hook -
 0b:7542 interactionCodec8 -
 0b:7550 interactionCodec8__state0 L

@@ -448,6 +448,8 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 196, bank 0b (1 routine): added the harp-song interaction state machine; all gates passed.
+
 - 2026-09-15: milestone 3 phase 6 batch 195, bank 0b (1 routine): added the Black Tower door-handler state machine; all gates passed.
 
 - 2026-09-15: milestone 3 phase 6 batch 194, bank 0b (11 routines): added banana, pirate-captain,
