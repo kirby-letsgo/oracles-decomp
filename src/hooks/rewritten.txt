@@ -4545,3 +4545,4 @@ interactionCodec7
 interactionCodec7__createObject
 interactionCodec7__ret
 interactionCodec7__spawnObjectType
+interactionCodec6

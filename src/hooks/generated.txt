@@ -7407,12 +7407,7 @@
 0b:7493 interactionCodec5__stateCommon L
 0b:74a9 interactionCodec5__state3 L
 0b:74ba interactionCodec5__state6 L
-0b:74c7 interactionCodec6 -
-0b:74d1 interactionCodec6__state0 L
-0b:74e0 interactionCodec6__cutsceneNotDone L
-0b:7515 interactionCodec6__noMakuSeed L
-0b:7527 interactionCodec6__state1 L
-0b:7536 interactionCodec6__state2 L
+0b:74c7 interactionCodec6_hook -
 0b:7542 interactionCodec8 -
 0b:7550 interactionCodec8__state0 L
 0b:7556 interactionCodec8__afterCall7556 L
