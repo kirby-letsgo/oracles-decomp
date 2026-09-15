@@ -5113,13 +5113,7 @@
 11:79cb func_79cb_hook -
 11:79d2 func_79d2_hook -
 11:79d9 func_79d9_hook -
-11:79e5 partCode4a -
-11:79ef partCode4a__state0 L
-11:7a1e partCode4a__setAnimation L
-11:7a21 partCode4a__state1 L
-11:7a46 partCode4a__beginDestroyAnimation L
-11:7a54 partCode4a__state2 L
-11:7a5c partCode4a__delete L
+11:79e5 partCode4a_hook -
 11:7a5f partCode4f -
 11:7a69 partCode4f__state0 L
 11:7a78 partCode4f__state1 L
