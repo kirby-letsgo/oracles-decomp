@@ -1510,3 +1510,9 @@ desync to discover; keep them when porting routines.
   against a neighboring line. Always double-check a `bit`/`jr` pair against `alu_bit`'s actual
   semantics (`gb->f = ... | ((v & (1<<bit)) ? 0 : FZ)`) rather than against how a nearby `cp`- or
   `or`-based branch in the same block happens to look.
+- **The quirk compiler catches helper-signature mistakes that the normal build can leave latent**:
+  the first Link-ship draft called `alu_swap(gb)` as though it only took a machine state, while
+  this emulator's helper is `alu_swap(gb, value)` and returns the swapped byte. The normal build
+  accepted the call through its permissive warning settings, but the quirk build stopped with
+  three "too few arguments" errors. Fix every such operation as `A = alu_swap(gb, A)` and rerun
+  both configurations; do not treat a clean normal build as proof that helper prototypes match.

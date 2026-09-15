@@ -453,6 +453,10 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   sparkle creator, and unused visibility helper; all gates passed. Bank 0b is 77/819 and the
   project is 4,560/9,528.
 
+- 2026-09-15: milestone 3 phase 6 batch 198, bank 0b (25 routines): added Human Veran, title
+  clouds, intro bird, Link ship, and their shared intro movement helpers; all gates passed. Bank
+  0b is 102/805 and the project is 4,585/9,526.
+
 - 2026-09-15: milestone 3 phase 6 batch 196, bank 0b (1 routine): added the harp-song interaction state machine; all gates passed.
 
 - 2026-09-15: milestone 3 phase 6 batch 195, bank 0b (1 routine): added the Black Tower door-handler state machine; all gates passed.
