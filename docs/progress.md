@@ -448,6 +448,18 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 220, bank 11 (1 root routine): ported
+  `object_code/common/parts/greatFairyHeart.s` (`partCode30`, `greatFairyHeart.c`) — the great
+  fairy's healing heart: on first update sets its counter and becomes visible, then flies in a
+  circular arc toward the enemy target position; once its counter expires it starts a 32-step
+  angle countdown, and once THAT expires, decrements `wLinkMaxHealth` at the related object and
+  deletes itself if the player's displayed hearts already equal max health. Single flat routine,
+  no locals, three top-level `ret nz` exits. Zero bugs found by independent review, including a
+  focused re-check of the file's one `jr nz` for the target-vs-physical-end confusion class.
+  Bank 11 is 167/651 and the project 4,380/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with
+  state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 219, bank 11 (2 root routines): ported
   `object_code/common/parts/beam.s` (`partCode29` + `func_5758`, `beam.c`) — the beam projectile:
   RST $00 dispatch across firing/traveling states, deriving its animation frame from the low

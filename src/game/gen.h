@@ -5005,7 +5005,7 @@ void spikedBall_checkCollisionWithItem_hook(GB *gb);
 void spikedBall_head_updateDistanceFromOrigin_hook(GB *gb);
 void spikedBall_updateStateFromParent_hook(GB *gb);
 void spikedBall_chain_updateDistanceFromOrigin_hook(GB *gb);
-void partCode30(GB *gb);
+void partCode30_hook(GB *gb);
 void partCode4b(GB *gb);
 void partCode4d__normalStatus(GB *gb);
 void partCode4d__state0(GB *gb);

@@ -103,46 +103,6 @@ L_7f52:
   I(0x7f61, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
-// 11:58f3
-void partCode30(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x58f3, 2); E = 0xc4;  // ld e,$c4
-  I(0x58f5, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x58f6, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x58f7, 3); goto L_5903; } I(0x58f7, 2);  // jr nz,$5903
-  I(0x58f9, 1); H = D;  // ld h,d
-  I(0x58fa, 1); L = E;  // ld l,e
-  I(0x58fb, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x58fc, 2); L = 0xc6;  // ld l,$c6
-  I(0x58fe, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
-  CALL(0x5900, objectSetVisible81_hook, 0x1e60, 0x5903);  // call $1e60
-L_5903:
-  I(0x5903, 3); A = mem_rd(gb, 0xffb0);  // ldh a,($ffb0)
-  I(0x5905, 1); B = A;  // ld b,a
-  I(0x5906, 3); A = mem_rd(gb, 0xffb1);  // ldh a,($ffb1)
-  I(0x5908, 1); C = A;  // ld c,a
-  I(0x5909, 2); A = 0x20;  // ld a,$20
-  I(0x590b, 2); E = 0xc9;  // ld e,$c9
-  CALL(0x590d, objectSetPositionInCircleArc_hook, 0x210e, 0x5910);  // call $210e
-  CALL(0x5910, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x5913);  // call $40a7
-  if (!(F & FZ)) { RET_TAKEN(0x5913); return; } I(0x5913, 2);  // ret nz
-  I(0x5914, 3); mem_wr(gb, HL, 0x03);  // ld (hl),$03
-  I(0x5916, 2); L = 0xc9;  // ld l,$c9
-  I(0x5918, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5919, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x591a, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x591c, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  if (!(F & FZ)) { RET_TAKEN(0x591d); return; } I(0x591d, 2);  // ret nz
-  I(0x591e, 3); SET_HL(0xc6ab);  // ld hl,$c6ab
-  I(0x5921, 4); A = mem_rd(gb, 0xcbe4);  // ld a,($cbe4)
-  I(0x5924, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x5925); return; } I(0x5925, 2);  // ret nz
-  I(0x5926, 2); A = 0x31;  // ld a,$31
-  CALL(0x5928, objectGetRelatedObject1Var_hook, 0x2160, 0x592b);  // call $2160
-  I(0x592b, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  I(0x592c, 4); if (hook_enabled_at(0x3ea1)) { partDelete_hook(gb); return; } HANDOFF(0x3ea1);  // jp $3ea1
-}
-
 // 11:592f
 void partCode4b(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
