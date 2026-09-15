@@ -4420,3 +4420,7 @@ partCode50
 func_5b2b
 partCode51
 partCode52
+partCode53
+createEnergySwirlGoingOut_body
+createEnergySwirlGoingIn_body
+func_5e1a

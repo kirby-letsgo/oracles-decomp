@@ -1583,3 +1583,19 @@ desync to discover; keep them when porting routines.
   cycles per frame don't reliably show up as a state-hash mismatch the way a logic/stack bug does).
   When a ROM label is reachable from more than one place, always give it exactly one `goto` target
   and route every incoming edge through that same `goto`, never duplicate-inline its body.
+- **A shared helper function reused by two or more `_hook` routines still needs the exact
+  `void <name>_hook(GB *gb)` signature (no `static`, no other prefix) whenever it touches emulated
+  registers (`A`/`B`/.../`HL`/`gb->sp` etc.) or uses `CALL_C`** — `tools/lint_game.py`'s
+  "emulated register outside a _hook shim" rule matches lines via a literal regex on the function
+  signature (`re.match(r'void \w+_hook\(GB \*gb\)', line)`), so a `static` prefix, or a name not
+  ending in `_hook`, silently fails the match and flags every register access inside. This applies
+  even when the helper has no independent ROM-address hook-table entry of its own — matches the
+  pre-existing `enemySword_func_5273_hook` precedent (a private local given the `_hook` suffix
+  purely to satisfy this rule, not because it's independently registered). Also remember the
+  helper needs its own `uint16_t sp0_ = gb->sp; (void)sp0_;` line if it uses `CALL_C` anywhere
+  internally (a separate, unrelated real build error caught in the same file, `blueEnergyBead.c`,
+  when writing the shared `blueEnergyBead_swirlBody_hook` helper for
+  `createEnergySwirlGoingOut_body`/`In_body`) — declaring a fresh `sp0_` inside the shared helper
+  is safe as long as none of its callers change `gb->sp` between their own entry and the call into
+  the shared helper (true whenever the callers only do straight-line register/immediate work
+  before falling through or tail-jumping into it, as is almost always the case for this pattern).

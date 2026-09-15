@@ -5019,12 +5019,10 @@
 11:5b2b func_5b2b_hook -
 11:5b67 partCode51_hook -
 11:5c5c partCode52_hook -
-11:5d85 partCode53 -
-11:5dcd partCode53__state0 L
-11:5df0 createEnergySwirlGoingOut_body -
-11:5df4 createEnergySwirlGoingIn_body -
-11:5e14 createEnergySwirlGoingIn_body__end L
-11:5e1a func_5e1a -
+11:5d85 partCode53_hook -
+11:5df0 createEnergySwirlGoingOut_body_hook -
+11:5df4 createEnergySwirlGoingIn_body_hook -
+11:5e1a func_5e1a_hook -
 11:5f55 partCodeNil -
 11:5f56 partCode00 -
 11:5f59 partCode16 -

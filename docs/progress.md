@@ -448,6 +448,24 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 226, bank 11 (4 root routines): ported
+  `object_code/common/parts/blueEnergyBead.s` (`partCode53` + `createEnergySwirlGoingOut_body` +
+  `createEnergySwirlGoingIn_body` + `func_5e1a`, `blueEnergyBead.c`) — the blue energy bead
+  projectile plus the two utility routines used elsewhere to spawn a full ring of them. The two
+  swirl routines share almost their entire body (a genuine 8-iteration `push de`-protected loop
+  spawning up to 8 beads around a circle) starting right after their own distinct 1-2 byte
+  preambles; modeled as a shared, non-static `_hook`-suffixed helper function
+  (`blueEnergyBead_swirlBody_hook`, needed because `tools/lint_game.py` requires any function
+  touching emulated registers to match `void ..._hook(GB *gb)` exactly, no `static`, per the
+  established `enemySword_func_5273_hook` precedent) reached via a bare call from both entry
+  points — hit this exact lint failure and a related missing-`sp0_` build failure while authoring,
+  both fixed before the gate ran. Zero further issues found by independent review, which
+  specifically verified the shared body's byte-exact hand-off between the two callers and the
+  genuine value-preserving `push de`/`pop de` pair. Bank 11 is 177/651 and the project 4,390/9,901.
+  Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 225, bank 11 (1 root routine): ported
   `object_code/common/parts/52.s` (`partCode52`, `52.c`) — Ganon's part 52, the most complex file
   ported this session: a three-level RST $00 dispatch (an outer subid0/subid1/subid2 selector,
