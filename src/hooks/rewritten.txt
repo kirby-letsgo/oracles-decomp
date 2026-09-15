@@ -4611,3 +4611,12 @@ interactionCodec7__ret
 interactionCodec7__spawnObjectType
 interactionCodec6
 interactionCodec5
+interactionCodeb8
+vire_subid0
+vire_setScript
+vire_subid1
+vire_setRandomCounter1
+vire_subid2
+vire_disableObjectsIfLinkIsReady
+vire_deleteAndReturnControl
+vire_returnControl

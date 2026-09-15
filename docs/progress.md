@@ -7,7 +7,7 @@ Updated 2026-09-15. Newest entries at the top of each section.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per
-  routine against the transliteration. Progress: 4,613 routine hooks rewritten across eighteen code
+  routine against the transliteration. Progress: 4,619 routine hooks rewritten across eighteen code
   banks; bank 0 is fully readable C, gates green on the whole movie after each batch. Whole-movie
   `--verify-hooks-continue` runs passed on the batch 23 build (49.5M hook calls, 0 failures)
   and the batch 24 build (45.1M calls, 0 failures). Every plain routine in bank 0 is now
@@ -447,6 +447,11 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-15: milestone 3 phase 6 batch 202-B, bank 0b (9 routines): added the Vire interaction
+  dispatcher, all three minigame/entrance state machines, script and counter helpers, and the
+  disable/delete control helpers. Regeneration leaves 770 executable Bank 0b hooks, 139 rewritten;
+  the project is 4,619/9,491. All lint, replay, and normal/quirk test gates passed.
 
 - 2026-09-15: milestone 3 phase 6 batch 201-B, bank 0b (12 routines): added the Tuni Nut,
   Volcano Handler, and Book of Seals podium interaction roots and state handlers. The rewritten
