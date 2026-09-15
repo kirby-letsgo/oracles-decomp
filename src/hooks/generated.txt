@@ -5093,11 +5093,7 @@
 11:74d6 partCode44_hook -
 11:7530 partCode45_hook -
 11:75b7 partCode46_hook -
-11:75e5 partCode47 -
-11:75f1 partCode47__state0 L
-11:7602 partCode47__state1 L
-11:760a partCode47__state2 L
-11:7631 partCode47__state3 L
+11:75e5 partCode47_hook -
 11:7642 partCode48 -
 11:764b partCode48__normalStatus L
 11:7653 octogonDepthCharge_subid1 -
