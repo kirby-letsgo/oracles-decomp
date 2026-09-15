@@ -983,6 +983,16 @@
 0b:4921 interactionCodec7__createObject
 0b:494d interactionCodec7__ret
 0b:4950 interactionCodec7__spawnObjectType
+0b:71c8 interactionCodec1__state0
+0b:71ce interactionCodec1__afterCall71ce
+0b:71e5 interactionCodec1__state1
+0b:71ef interactionCodec1__substate0
+0b:71fd interactionCodec1__substate1
+0b:7209 interactionCodec1__substate2
+0b:721a interactionCodec1__updateMovementAndSparkles
+0b:7223 interactionCodec1__ret
+0b:7224 interactionCodec1__func_7224
+0b:722f interactionCodec1__updateSparkles
 09:6c08 interactionCode59__loadScriptAndInitGraphics
 09:6c0b interactionCode59__afterCall6c0b
 09:6be7 interactionCode59__afterCall6be7

@@ -1,6 +1,6 @@
 # Progress
 
-Updated 2026-09-14. Newest entries at the top of each section.
+Updated 2026-09-15. Newest entries at the top of each section.
 
 ## Where things stand
 
@@ -447,6 +447,11 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-15: milestone 3 phase 6 batch 197, bank 0b (11 routines): added the C1 harp codec
+  interaction dispatcher, its three substates, graphics continuation, counter/movement helper,
+  sparkle creator, and unused visibility helper; all gates passed. Bank 0b is 77/819 and the
+  project is 4,560/9,528.
 
 - 2026-09-15: milestone 3 phase 6 batch 196, bank 0b (1 routine): added the harp-song interaction state machine; all gates passed.
 
