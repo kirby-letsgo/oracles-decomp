@@ -5025,12 +5025,7 @@
 11:5e1a func_5e1a_hook -
 11:5f55 partCodeNil_hook -
 11:5f56 partCode00_hook -
-11:5f59 partCode16 -
-11:5f65 partCode16__state0 L
-11:5fa7 partCode16__table_5fa7 L
-11:5fab partCode16__state1 L
-11:5fbc partCode16__state2 L
-11:5fd4 partCode16__state3 L
+11:5f59 partCode16_hook -
 11:5ff6 partCode24 -
 11:6011 partCode24__normalStatus L
 11:6033 partCode25 -
