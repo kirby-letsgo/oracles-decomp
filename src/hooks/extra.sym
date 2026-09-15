@@ -957,6 +957,8 @@
 0b:7966 greatFairy_initialize__afterCall7966
 0b:7866 greatFairy_subid0__afterCall7866
 0b:78b2 greatFairy_subid1__afterCall78b2
+0b:4b19 interactionCodecf__afterCall4b19
+0b:48b5 interactionCodeb7__afterCall48b5
 09:6c08 interactionCode59__loadScriptAndInitGraphics
 09:6c0b interactionCode59__afterCall6c0b
 09:6be7 interactionCode59__afterCall6be7

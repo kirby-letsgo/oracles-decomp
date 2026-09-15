@@ -4501,3 +4501,8 @@ makuConfetti_updateSpeedX
 makuConfetti_updateSpeedXUsingSpeedZ
 makuConfetti_updateSpeedY
 makuConfetti_updateSpeedYUsingSpeedZ
+interactionCoded1
+interactionCodecf
+interactionCodeb7
+interactionCodecf__afterCall4b19
+interactionCodeb7__afterCall48b5

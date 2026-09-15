@@ -6805,9 +6805,7 @@
 0b:4215 spawnBipinBlossomFamilyObjects__leftHouseInteractions__stage7 L
 0b:421d spawnBipinBlossomFamilyObjects__leftHouseInteractions__stage8 L
 0b:4225 spawnBipinBlossomFamilyObjects__leftHouseInteractions__stage9 L
-0b:48a7 interactionCodeb7 -
-0b:48af interactionCodeb7__state1 L
-0b:48b5 interactionCodeb7__afterCall48b5 L
+0b:48a7 interactionCodeb7_hook -
 0b:48b8 interactionCodec0 -
 0b:48c0 interactionCodec0__state0 L
 0b:48c6 interactionCodec0__afterCall48c6 L
@@ -6837,11 +6835,7 @@
 0b:4ab0 interactionCodece__alreadyHaveTreasure L
 0b:4ab5 interactionCodece__giveTreasure L
 0b:4ac8 interactionCodece__showText L
-0b:4b0b interactionCodecf -
-0b:4b13 interactionCodecf__state0 L
-0b:4b19 interactionCodecf__afterCall4b19 L
-0b:4b2b interactionCodecf__positions L
-0b:4b31 interactionCodecf__state1 L
+0b:4b0b interactionCodecf_hook -
 0b:4b34 interactionCoded0 -
 0b:4b3e interactionCoded0__state0 L
 0b:4b42 interactionCoded0__state1 L
@@ -6860,8 +6854,7 @@
 0b:4bf6 interactionCoded0__checkLinkInXRange L
 0b:4c21 interactionCoded0__tutorialTextToShow L
 0b:4c2d interactionCoded0__flagNumbers L
-0b:4c33 interactionCoded1 -
-0b:4c3b interactionCoded1__state0 L
+0b:4c33 interactionCoded1_hook -
 0b:4c4d interactionCoded2 -
 0b:4c55 interactionCoded2__state0 L
 0b:4c5b interactionCoded2__afterCall4c5b L
@@ -7561,6 +7554,8 @@
 0b:7966 greatFairy_initialize__afterCall7966_hook -
 0b:7866 greatFairy_subid0__afterCall7866_hook -
 0b:78b2 greatFairy_subid1__afterCall78b2_hook -
+0b:4b19 interactionCodecf__afterCall4b19_hook -
+0b:48b5 interactionCodeb7__afterCall48b5_hook -
 15:741c twinrova_writePositionWithXOffsetTocfd5 -
 15:5615 turnToFaceSomethingAtInterval -
 15:5613 turnToFaceSomething -

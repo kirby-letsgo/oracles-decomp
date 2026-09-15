@@ -448,6 +448,12 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 190, bank 0b (5 routines): added the Game Complete
+  dialogue, Kiss Heart, and interaction $CF state/script paths, including durable post-graphics
+  continuations for the call-return boundaries. Bank 0b is 25/836 and the project is
+  4,505/9,557. Lint, 30k verification, full reference replay, and both normal and quirk suites
+  passed.
+
 - 2026-09-15: milestone 3 phase 6 batch 189, bank 0b (20 routines): added the Zora and Great
   Fairy interaction initialization/state paths, their thread-switching call continuations, and
   canonical shared-entry wrappers. Bank 0b is 20/841 and the project is 4,500/9,562 after
