@@ -448,6 +448,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 251, bank 11 (1 root routine): ported
+  `object_code/ages/parts/tingleBalloon.s` (`partCode44`, `tingleBalloon.c`) — Tingle's
+  balloon: a spawn state setting a fixed lifetime and floating speed, an update state that
+  reverses its vertical float direction (via a `cpl`/`inc a` two's-complement negation) once
+  its lifetime counter expires and continues tracking Tingle's own z-position, and a
+  been-hit path that bumps Tingle's own state, spawns an explosion interaction, and deletes.
+  Zero bugs found by self-review or independent review. Bank 11 is 210/651 and the project
+  4,423/9,910. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 289,869 frames with state
+  `dfb98b52a3b12c03`, normal and quirk suites 8/8.
 - 2026-09-15: milestone 3 phase 6 batch 250, bank 11 (1 root routine): ported
   `object_code/ages/parts/plasmarineProjectile.s` (`partCode43`, `plasmarineProjectile.c`) —
   the projectile fired by the Plasmarine boss: the first file this session with zero RST

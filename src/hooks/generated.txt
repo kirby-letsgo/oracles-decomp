@@ -5090,10 +5090,7 @@
 11:7338 partCode41_hook -
 11:73ba partCode42_hook -
 11:7443 partCode43_hook -
-11:74d6 partCode44 -
-11:74de partCode44__state0 L
-11:74f9 partCode44__state1 L
-11:7518 partCode44__beenHit L
+11:74d6 partCode44_hook -
 11:7530 partCode45 -
 11:753a partCode45__state0 L
 11:755e partCode45__initialTimeToAppear L
