@@ -448,6 +448,25 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 199, bank 11 (1 root routine): ported
+  `object_code/common/parts/detectionHelper.s` (`partCode0e`, `detectionHelper.c`) — the guard's
+  detection-projectile helper: a 4-subid dispatcher where subid0 (the "controller") tracks its
+  parent guard's angle/position and periodically spawns forward- and side-detection projectiles
+  (subids 1/2) via a shared spawn helper; subid1 moves toward Link, triggering the guard or
+  deleting itself on collision; subid2 (aliasing subid3, the same ROM address) is a short-lived
+  variant used for close-range detection at angles derived from `var03`, sharing subid1's own
+  movement/collision code via a cross-subid `jr`. `spawnCollisionHelper` is invoked from three
+  places with no push at any of them (two genuine calls each continuing inline afterward, one pure
+  fallthrough with zero bytes between caller and callee) — both of its own exits correctly use bare
+  `CYC`/`CYCT`+`return`, never `RET`/`RET_TAKEN`, since nothing was ever pushed to consume. Two bugs
+  caught by self-review before the gate: an unconditional `jr` miscounted as 3 bytes instead of 2,
+  and an `rst $10` instruction missing its own 1-byte cycle burn before invoking the helper — the
+  same class just found by independent review in the previous batch's `bridgeSpawner.c`, this time
+  caught on the first self-review pass by specifically checking for it. Independent review then
+  came back completely clean. Bank 11 is 132/651 and the project 4,345/9,901. Gates: lint 0, 30k
+  verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches
+  over 290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 198, bank 11 (1 root routine): ported
   `object_code/common/parts/bridgeSpawner.s` (`partCode0c`, `bridgeSpawner.c`) — the growing-bridge
   spawner: every other update, places the next bridge tile (direction-dependent tile pair, RST $18
