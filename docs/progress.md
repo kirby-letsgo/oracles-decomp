@@ -448,6 +448,23 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 210, bank 11 (1 root routine): ported
+  `object_code/common/parts/enemySword.s` (`partCode1d`, `enemySword.c`) — the enemy sword-swing
+  effect: gates on the related enemy's status, updates counters, sets a hit-lock bit and calls a
+  private local (`func_5273`) that checks the related enemy's health/stun/invincibility state
+  (a genuine round-trip call whose push and pop cancel out, so all three of its exits use bare
+  `CYC`/`CYCT` + `return` rather than `RET`/`RET_TAKEN`) before falling into a shared
+  angle/position-table lookup section (reached both by fallthrough and by a `jr` tail-jump from a
+  second entry point, using two RST $10 `rst_addAToHl` table lookups). Self-review caught and
+  fixed two bugs before the gate: both RST $10 sites were missing their own 1-byte cycle burn
+  (the `bridgeSpawner.c` bug class recurring), and a conditional bare-return exit in `func_5273`
+  used `CYC` instead of `CYCT` for its taken branch (the `partCommonCode.c` bug class recurring).
+  Independent review then caught a third, more serious bug: an inverted `jr nz`/`bit 0,(hl)`
+  branch polarity that changed actual game behavior, not just cycle accounting; fixed and the
+  full gate re-verified. Bank 11 is 144/651 and the project 4,357/9,901. Gates: lint 0, 30k
+  verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches
+  over 290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 209, bank 11 (1 root routine): ported
   `object_code/common/parts/stalfosBone.s` (`partCode1c`, `stalfosBone.c`) — the stalfos's thrown
   bone: deletes on a specific status; a 3-state RST $00 dispatch sets up and animates toward the

@@ -1487,3 +1487,19 @@ desync to discover; keep them when porting routines.
   root-level `ret`), and correctly uses `RET`/`RET_TAKEN`. Confirmed in `stalfosBone.c`'s `state2`
   (a `ret c` dispatched three levels deep from the RST $00 table) both by static trace and, per
   independent review, empirically by the TAS ctest's per-call stack-consistency checks.
+- **`bit N,(hl)`/`bit N,a` is a polarity trap distinct from `cp`/`or`/`and`-style comparisons**:
+  Z80's `BIT` instruction sets the Z flag when the TESTED BIT IS 0 (i.e. Z means "bit clear"),
+  the opposite of the usual "Z means equal/zero result" intuition from `cp`/`or`. So a `jr nz`
+  immediately after `bit N,(hl)` is taken when the bit IS SET (`!(F & FZ)`), and `jr z` is taken
+  when the bit is CLEAR (`F & FZ`) — easy to get backwards by pattern-matching against a
+  neighboring `cp`/`or`-based `jr z`/`jr nz` in the same routine instead of reasoning about what
+  `BIT` itself does to the flag. Caught by independent review in `enemySword.c`'s `func_5273`: a
+  `jr nz` following `bit 0,(hl)` was written as `if (F & FZ)` (copied from the NEXT `bit`/`jr`
+  pair's polarity in the same function, which happened to be a `jr z` and was correct) instead of
+  `if (!(F & FZ))`. This changed real game behavior (which enemy states suppress the sword-swing
+  hit), not just cycle accounting, and survived self-review, the coverage-diff script, and both
+  30k/full-game replays undetected — it was caught only by independent review re-deriving each
+  `bit`/`jr` pair's polarity from `BIT`'s actual flag semantics instead of by visual pattern match
+  against a neighboring line. Always double-check a `bit`/`jr` pair against `alu_bit`'s actual
+  semantics (`gb->f = ... | ((v & (1<<bit)) ? 0 : FZ)`) rather than against how a nearby `cp`- or
+  `or`-based branch in the same block happens to look.
