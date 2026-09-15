@@ -355,45 +355,6 @@ L_7f52:
   I(0x7f61, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
-// 11:5353
-void partCode1f(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  if (!(F & FZ)) { I(0x5353, 3); goto L_5366; } I(0x5353, 2);  // jr nz,$5366
-  I(0x5355, 2); E = 0xc4;  // ld e,$c4
-  I(0x5357, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5358, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x5359, 3); func_5369(gb); return; } I(0x5359, 2);  // jr z,$5369
-  CALL(0x535b, objectCheckWithinScreenBoundary_hook, 0x2184, 0x535e);  // call $2184
-  if (!(F & FC)) { I(0x535e, 3); goto L_5366; } I(0x535e, 2);  // jr nc,$5366
-  CALL(0x5360, partCommon_checkTileCollisionOrOutOfBounds_hook, 0x4072, 0x5363);  // call $4072
-  if (!(F & FC)) { I(0x5363, 4); if (hook_enabled_at(0x201d)) { objectApplySpeed_hook(gb); return; } HANDOFF(0x201d); } I(0x5363, 3);  // jp nc,$201d
-L_5366:
-  I(0x5366, 4); if (hook_enabled_at(0x3ea1)) { partDelete_hook(gb); return; } HANDOFF(0x3ea1);  // jp $3ea1
-}
-
-// 11:5366
-void partCode1f__normalStatus(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5366:
-  I(0x5366, 4); if (hook_enabled_at(0x3ea1)) { partDelete_hook(gb); return; } HANDOFF(0x3ea1);  // jp $3ea1
-}
-
-// 11:5369
-void func_5369(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5369, 1); H = D;  // ld h,d
-  I(0x536a, 1); L = E;  // ld l,e
-  I(0x536b, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x536c, 2); L = 0xd0;  // ld l,$d0
-  I(0x536e, 3); mem_wr(gb, HL, 0x50);  // ld (hl),$50
-  I(0x5370, 2); E = 0xc9;  // ld e,$c9
-  I(0x5372, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5373, 2); A = alu_swap(gb, A);  // swap a
-  I(0x5375, 1); alu_rlca(gb);  // rlca
-  CALL(0x5376, partSetAnimation_hook, 0x2988, 0x5379);  // call $2988
-  I(0x5379, 4); if (hook_enabled_at(0x1e60)) { objectSetVisible81_hook(gb); return; } HANDOFF(0x1e60);  // jp $1e60
-}
-
 // 11:537c
 void partCode20(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

@@ -4396,3 +4396,5 @@ func_52f4
 func_52fd
 func_5313
 func_5336
+partCode1f
+func_5369

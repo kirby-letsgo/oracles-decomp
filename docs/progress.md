@@ -448,6 +448,17 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 212, bank 11 (2 root routines): ported
+  `object_code/common/parts/wizzrobeProjectile.s` (`partCode1f` + `func_5369`,
+  `wizzrobeProjectile.c`) — the wizzrobe's teleporting projectile: deletes when out of bounds or
+  colliding with a tile, otherwise applies speed; `func_5369` (independently registered, reached
+  only via a `jr z` tail-jump, never a genuine call) sets up speed/animation and makes it visible.
+  Neither routine contains a literal `ret` at all — every exit is a `jp` tail-call — so there are
+  no RET/RET_TAKEN concerns anywhere in the file. Zero bugs found on both self-review and
+  independent review. Bank 11 is 151/651 and the project 4,364/9,901. Gates: lint 0, 30k verify
+  0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over
+  290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 211, bank 11 (5 root routines): ported
   `object_code/common/parts/dekuScrubProjectile.s` (`partCode1e` + `func_52f4` + `func_52fd` +
   `func_5313` + `func_5336`, `dekuScrubProjectile.c`) — the deku scrub's spat seed projectile.
