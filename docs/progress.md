@@ -448,6 +448,21 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 219, bank 11 (2 root routines): ported
+  `object_code/common/parts/beam.s` (`partCode29` + `func_5758`, `beam.c`) — the beam projectile:
+  RST $00 dispatch across firing/traveling states, deriving its animation frame from the low
+  nibble of its angle via an RST $10 table lookup, and periodically toggling visibility based on
+  the frame counter while checking for tile collision. `func_5758` is reached via TWO different
+  edges from the same file — a `jr nz` tail-jump (state1, bare tail-call) and a genuine `call`
+  (state2, `CALL_C`) — correctly modeled per-edge rather than as a fixed property of the callee;
+  since `func_5758` has no literal `ret` at all (both its exits are tail-calls to already-hooked
+  routines), neither edge has any `RET`/`ret_effect` concern. Zero bugs found by independent
+  review, including a full individual re-check of every `jr`/`jp` end address following the
+  target-vs-physical-end confusion caught in the previous batch. Bank 11 is 166/651 and the
+  project 4,379/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 218, bank 11 (3 root routines): ported
   `object_code/common/parts/smallFairy.s` (`partCode28` + `func_56b6` + `func_56cd`,
   `smallFairy.c`) — the small healing fairy: RST $00 dispatch across spawn/wander/collection

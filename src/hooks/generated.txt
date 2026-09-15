@@ -4984,13 +4984,8 @@
 11:560d partCode28_hook -
 11:56b6 func_56b6_hook -
 11:56cd func_56cd_hook -
-11:5705 partCode29 -
-11:570f partCode29__normalStatus L
-11:5719 partCode29__state0 L
-11:5737 partCode29__table_5737 L
-11:5747 partCode29__state1 L
-11:574e partCode29__state2 L
-11:5758 func_5758 -
+11:5705 partCode29_hook -
+11:5758 func_5758_hook -
 11:5769 partCode2a_hook -
 11:579b spikedBall_head_hook -
 11:57ba spikedBall_head_state0_hook -
