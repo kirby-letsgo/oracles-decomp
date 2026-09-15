@@ -448,6 +448,22 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 223, bank 11 (2 root routines): ported
+  `object_code/common/parts/ganonTrident.s` (`partCode50` + `func_5b2b`, `ganonTrident.c`) —
+  Ganon's trident: deletes if the related Ganon object has already reached a terminal state,
+  otherwise runs an RST $00 dispatch (spawn-in-place / airborne throw-cycle / land-and-check).
+  An unusual case: a genuine `push hl` (a VALUE, not a return address) at the routine's entry is
+  popped by exactly ONE of three different exit paths depending on control flow — `state0`,
+  `state2` (reached either directly or via `state1`'s fallthrough), or `func_5b2b_hook` (an
+  independently-registered local reached via a bare `jr nz` tail-jump from `state1`, popping the
+  SAME value across the C function boundary via the shared emulated stack). Verified the two
+  pushes (the HL value, then the RST dispatch's own self-canceling return-address push) nest
+  correctly in LIFO order with no leak or double-pop on any path. Zero bugs found by independent
+  review, which specifically traced every consumer of the pushed value. Bank 11 is 171/651 and
+  the project 4,384/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`,
+  full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 222, bank 11 (1 root routine): ported
   `object_code/common/parts/twinrovaSnowball.s` (`partCode4e`, `twinrovaSnowball.c`) — Twinrova's
   snowball projectile: destroys itself and spawns snow debris when hit by a sufficiently strong
