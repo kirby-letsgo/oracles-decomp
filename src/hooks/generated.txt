@@ -5088,10 +5088,7 @@
 11:72bb kingMoblinBomb_checkCollisionWithKingMoblin_hook -
 11:72dd partCode40_hook -
 11:7338 partCode41_hook -
-11:73ba partCode42 -
-11:73c7 partCode42__state0 L
-11:742c partCode42__state1 L
-11:7436 partCode42__state2 L
+11:73ba partCode42_hook -
 11:7443 partCode43 -
 11:7455 partCode43__state1 L
 11:7462 partCode43__noCollision L

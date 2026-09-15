@@ -448,6 +448,18 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 249, bank 11 (1 root routine): ported
+  `object_code/ages/parts/pumpkinHeadProjectile.s` (`partCode42`, `pumpkinHeadProjectile.c`) —
+  the projectile fired by the Pumpkin Head enemy: verifies the caller wants a live instance
+  (else deletes), a spawn state computing a spread angle from a per-subid offset table and a
+  loop spawning two additional projectiles at fixed angle deltas from a second table (using
+  `addAToBc` rather than the more common `rst_addAToHl` for the first table lookup), a chase
+  state waiting out a counter before making itself visible, and a movement state applying
+  speed/animation and deleting on tile collision or out-of-bounds. Zero bugs found by
+  self-review or independent review. Bank 11 is 208/651 and the project 4,421/9,908. Gates:
+  lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk
+  suites 8/8.
 - 2026-09-15: milestone 3 phase 6 batch 248, bank 11 (1 root routine): ported
   `object_code/ages/parts/shadowHagShadow.s` (`partCode41`, `shadowHagShadow.c`) — the shadow
   clones chased by/chasing the Shadow Hag: a 4-way RST $00 dispatch whose 4th entry points
