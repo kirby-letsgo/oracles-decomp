@@ -5089,13 +5089,7 @@
 11:72dd partCode40_hook -
 11:7338 partCode41_hook -
 11:73ba partCode42_hook -
-11:7443 partCode43 -
-11:7455 partCode43__state1 L
-11:7462 partCode43__noCollision L
-11:7485 partCode43__updateMovement L
-11:7490 partCode43__collidedWithPlasmarine L
-11:74a6 partCode43__delete L
-11:74a9 partCode43__state0 L
+11:7443 partCode43_hook -
 11:74d6 partCode44 -
 11:74de partCode44__state0 L
 11:74f9 partCode44__state1 L

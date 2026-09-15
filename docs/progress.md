@@ -448,6 +448,19 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 250, bank 11 (1 root routine): ported
+  `object_code/ages/parts/plasmarineProjectile.s` (`partCode43`, `plasmarineProjectile.c`) —
+  the projectile fired by the Plasmarine boss: the first file this session with zero RST
+  jump tables, using pure straight-line `jr`/`jp` control flow instead — a lifetime/collision
+  state checking the projectile's color against the boss's, homing in on Link once its
+  lifetime counter runs low, damaging the boss (and breaking its shell at zero health) on a
+  color-matched collision, and a spawn state whose fire speed depends on the boss's remaining
+  health. Independent review caught a real bug: the "flicker visibility in the last 30 frames"
+  check had inverted `jr nc` polarity, which would have flickered visibility for the entire
+  lifetime EXCEPT the last 30 frames instead of only during them; fixed and the full gate was
+  re-run clean. Bank 11 is 209/651 and the project 4,422/9,909. Gates: lint 0, 30k verify 0
+  failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over
+  289,869 frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
 - 2026-09-15: milestone 3 phase 6 batch 249, bank 11 (1 root routine): ported
   `object_code/ages/parts/pumpkinHeadProjectile.s` (`partCode42`, `pumpkinHeadProjectile.c`) —
   the projectile fired by the Pumpkin Head enemy: verifies the caller wants a live instance
