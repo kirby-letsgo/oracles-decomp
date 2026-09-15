@@ -448,6 +448,22 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 209, bank 11 (1 root routine): ported
+  `object_code/common/parts/stalfosBone.s` (`partCode1c`, `stalfosBone.c`) — the stalfos's thrown
+  bone: deletes on a specific status; a 3-state RST $00 dispatch sets up and animates toward the
+  enemy target, applies speed after tile/screen collision checks (branching three ways off a
+  single `partCommon_checkTileCollisionOrOutOfBounds_hook` call's carry+zero result, shared via a
+  `jr c` into a separate `jr z` label reusing the same flags), or updates a Z-speed component and
+  bounces or continues animating based on a frame-counter bit. The RST dispatch's own push is
+  self-canceling (the shared jump-table helper pops the exact address it just pushed before
+  jumping to the resolved target), so the file's one literal `ret c` — reached from inside the
+  dispatched state2 code — is still a top-level hook exit and correctly uses `RET_TAKEN`, per the
+  `switch.c`/`lynelBeam.c` precedent. Independent review additionally confirmed this empirically
+  via the TAS ctest's stack-consistency checks. Zero bugs found on both self-review and
+  independent review. Bank 11 is 143/651 and the project 4,356/9,901. Gates: lint 0, 30k verify
+  0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over
+  290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 208, bank 11 (1 root routine): ported
   `object_code/common/parts/lynelBeam.s` (`partCode1b`, `lynelBeam.c`) — the lynel's beam
   projectile: deletes on a specific status, otherwise a straight-line setup on `state != 0`

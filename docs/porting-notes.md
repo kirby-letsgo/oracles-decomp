@@ -1475,3 +1475,15 @@ desync to discover; keep them when porting routines.
   bare tail-call, a `goto`, or a plain "call it and continue" — needs its own physical-byte `CYC`
   burn line; `push_effect` (or its absence) is a separate, additional decision layered on top, never
   a substitute for it.
+- **An RST $00 jump-table dispatch's own `push_effect` is self-canceling by the time the dispatched
+  code runs** — the shared jump-table helper (`SET_HL(pop_effect(gb))` as its second statement,
+  identical across `octorokProjectile_jump_table`/`fireProjectiles_jump_table`/
+  `enemyArrow_jump_table`/`stalfosBone_jump_table`, etc.) immediately pops the exact address the
+  dispatch site just pushed, before jumping to the resolved target, and never re-pushes anything.
+  Net effect: zero stack change from the whole dispatch. So a literal `ret`/`ret cc` reached from
+  *inside* a dispatched state's code is NOT consuming the dispatch's own push — it's a top-level
+  hook exit consuming whatever pushed the return address into `partCodeNN_hook` itself (the
+  emulator's own hook-dispatch call, same as the `switch.c`/`lynelBeam.c` precedent for a bare
+  root-level `ret`), and correctly uses `RET`/`RET_TAKEN`. Confirmed in `stalfosBone.c`'s `state2`
+  (a `ret c` dispatched three levels deep from the RST $00 table) both by static trace and, per
+  independent review, empirically by the TAS ctest's per-call stack-consistency checks.
