@@ -5115,11 +5115,10 @@
 11:79d9 func_79d9_hook -
 11:79e5 partCode4a_hook -
 11:7a5f partCode4f_hook -
-11:7ab3 partCode54 -
-11:7ad3 func_7ad3 -
-11:7adb func_7adb -
-11:7b0a func_7b0a -
-11:7b1c func_7b0a__delete L
+11:7ab3 partCode54_hook -
+11:7ad3 func_7ad3_hook -
+11:7adb func_7adb_hook -
+11:7b0a func_7b0a_hook -
 11:7b1f partCode55 -
 11:7b46 partCode55__normalStatus L
 11:7b52 partCode55__state0 L
