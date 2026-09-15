@@ -448,6 +448,10 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 193, bank 0b (5 routines): added the wooden-tunnel
+  dispatcher and its state/solidity paths. Bank 0b is 53/819 and the project is 4,534/9,544.
+  Lint, 30k verification, full reference replay, and both normal and quirk suites passed.
+
 - 2026-09-15: milestone 3 phase 6 batch 192, bank 0b (8 routines): added the exclamation-mark
   and floating-image dispatch/state paths, including durable continuations after their
   thread-switching graphics calls. Bank 0b is 48/824 and the project is 4,529/9,545. Lint, 30k

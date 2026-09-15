@@ -6766,12 +6766,7 @@
 0b:4877 interactionCodeb6__frame6 L
 0b:4887 interactionCodeb6__frame7 L
 0b:4897 interactionCodeb6__gfxHeaderToLoadWhenTreeDisappears L
-0b:4000 interactionCode98 -
-0b:4008 interactionCode98__state0 L
-0b:400e interactionCode98__afterCall400e L
-0b:401e interactionCode98__state1 L
-0b:403e interactionCode98__makeSolid L
-0b:4040 interactionCode98__setSolidity L
+0b:4000 interactionCode98_hook -
 0b:406d objectCreateExclamationMark_body_hook -
 0b:4085 objectCreateFloatingImage_hook -
 0b:40f8 interactionCodeac_hook -
@@ -6787,6 +6782,10 @@
 0b:409d interactionCodea0__state0_hook -
 0b:40a6 interactionCodea0__afterCall40a6_hook -
 0b:40bf interactionCodea0__state1_hook -
+0b:4008 interactionCode98__state0_hook -
+0b:401e interactionCode98__state1_hook -
+0b:403e interactionCode98__makeSolid_hook -
+0b:4040 interactionCode98__setSolidity_hook -
 0b:48a7 interactionCodeb7_hook -
 0b:48b8 interactionCodec0 -
 0b:48c0 interactionCodec0__state0 L

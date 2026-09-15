@@ -3535,6 +3535,11 @@ interactionCodea0
 interactionCodea0__state0
 interactionCodea0__afterCall40a6
 interactionCodea0__state1
+interactionCode98
+interactionCode98__state0
+interactionCode98__state1
+interactionCode98__makeSolid
+interactionCode98__setSolidity
 interactionCodeb7
 interactionCodec0
 interactionCodec7

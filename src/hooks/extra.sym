@@ -971,6 +971,10 @@
 0b:409d interactionCodea0__state0
 0b:40a6 interactionCodea0__afterCall40a6
 0b:40bf interactionCodea0__state1
+0b:4008 interactionCode98__state0
+0b:401e interactionCode98__state1
+0b:403e interactionCode98__makeSolid
+0b:4040 interactionCode98__setSolidity
 09:6c08 interactionCode59__loadScriptAndInitGraphics
 09:6c0b interactionCode59__afterCall6c0b
 09:6be7 interactionCode59__afterCall6be7
