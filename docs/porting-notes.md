@@ -1416,3 +1416,20 @@ desync to discover; keep them when porting routines.
   stack that this exact `ret` is supposed to pop." If yes — even reached indirectly, even in
   duplicated code — use the macro. Bare `CYC`+`return` is correct only for a `ret` that is provably
   never asked to consume a push (a true pattern-b local, entered with no push at its own site).
+- Every RST call site needs its own 1-byte `CYC(addr, addr+1)` burn for the `rst` instruction
+  itself, immediately before invoking the RST helper function — separate from, and in addition to,
+  the helper's own internal `push_effect`/`pop_effect` bookkeeping (which models the RST's *return*
+  behavior, not the cost of the `rst` opcode that dispatched into it). `bridgeSpawner.c`'s
+  `rst $18` (`addDoubleIndexToHl`) call site omitted this burn — `SET_HL(0x48a4);
+  bridgeSpawner_addDoubleIndexToHl_from_rst(gb, 0x486d);` with no `CYC` in between — which silently
+  undercounted the block by 4 cycles even though the RST's control-flow effect (the double-index
+  computation, correctly returning to 0x486d) was otherwise modeled correctly. Every other RST call
+  site written this session (four `rst $00` jump-table dispatches in `lightableTorch.c`, three in
+  `volcanoRock.c`, one each in `ball.c`/`movingOrb.c`) already included this burn correctly, so this
+  was a one-off slip, not a systemic pattern — but it's exactly the kind of gap a coverage-diff can
+  miss if the hand-typed "expected" chain also skips the same address (which is what happened here:
+  self-review's own verification list had the identical omission, so the diff came back clean).
+  Independent review's cycle-total cross-check against the report's own `[addr] block N cycles`
+  annotation is what caught it. Lesson: when writing an RST call site, treat it exactly like a
+  `call`/`jp` for burn purposes — one line for the RST's own bytes — before the line that invokes
+  the helper, never assume the helper's internal push/pop covers it.

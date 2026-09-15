@@ -448,6 +448,21 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 198, bank 11 (1 root routine): ported
+  `object_code/common/parts/bridgeSpawner.s` (`partCode0c`, `bridgeSpawner.c`) — the growing-bridge
+  spawner: every other update, places the next bridge tile (direction-dependent tile pair, RST $18
+  double-indexed off the current angle) into the room layout, plays a door-closing sound, and moves
+  to the next tile position along its angle direction once the bridge segment count hits zero.
+  Independent review caught a real bug: the `rst $18` (`addDoubleIndexToHl`) call site was missing
+  its own 1-byte `CYC` burn for the RST instruction before invoking the helper — separate from the
+  helper's own internal push/pop bookkeeping for the RST's return behavior — silently undercounting
+  the block by 4 cycles even though control flow was otherwise correct. A quick audit confirmed
+  every other RST call site written this session (`lightableTorch.c` x4, `volcanoRock.c` x3,
+  `ball.c`, `movingOrb.c`) already had this burn, so it was a one-off slip. Bank 11 is 131/651 and
+  the project 4,344/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 197, bank 11 (1 root routine): ported
   `object_code/common/parts/movingOrb.s` (`partCode0b`, `movingOrb.c`) — the moving orb puzzle
   piece: on being just hit, toggles a bit in `wToggleBlocksState` and flickers OAM flags; otherwise
