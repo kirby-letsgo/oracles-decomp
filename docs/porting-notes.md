@@ -1624,3 +1624,32 @@ desync to discover; keep them when porting routines.
   "pop instead of ret" needs per-caller special treatment — trace whether the resulting SP state is
   actually caller-independent first (it usually is, if all reachability paths converge on the same
   logical entry SP), and let `CALL_C_`'s own fallback mechanism do its job.
+- **A `HOOK_LOCAL` block reached via genuine `call`s from MULTIPLE different in-file sites needs
+  an explicit multi-way "check `gb->pc`/`gb->sp` after the pop" dispatch at its own shared exit,
+  not just the single-target `ret_effect(gb); goto resume_X;` pattern established earlier for a
+  block with exactly one caller.** Established in `rotatableSeedThing.c` (`partCode33`):
+  `func_6515`/`subid0_state0` (one physical block, joined by fallthrough) is reached three ways —
+  a bare `jr z` from `subid0` (no push, a true top-level entry), a `call` from `subid1_state0`
+  (explicit `push_effect(gb, 0x6551)`), and a `call` from `subid2_state0` (explicit
+  `push_effect(gb, 0x65b5)`) — so its two literal `ret` instructions (`ret nz` and the final `ret`)
+  each do the macro burn (`RET_TAKEN`/`RET`, which internally sets `gb->pc = pop_effect(gb)`) and
+  THEN check `gb->pc` against every known resume address, falling back to a plain `return;` only
+  if none match:
+  ```c
+  RET(0x653d);
+  if (gb->pc == 0x6551 && gb->sp == sp0_) goto func_6551;
+  if (gb->pc == 0x65b5 && gb->sp == sp0_) goto subid2_state0_afterFunc6515;
+  return;
+  ```
+  Checking `gb->sp == sp0_` alongside `gb->pc` (matching the pre-existing idiom in
+  `monkeyMain.c`/`rabbitMain.c`) guards against a coincidental PC match at the wrong stack depth,
+  though in practice every internal call site in a file like this pushes from the SAME sp0_ (no
+  internal call is nested inside another pending internal call in this file), so the two checks
+  agree. The same treatment extends to a HOOK_LOCAL's tail-jump into an ALREADY-EXTERNALLY-HOOKED
+  routine when reached this way (`func_6588`'s `jp partSetAnimation`, called from `func_6515`):
+  `partSetAnimation_hook(gb); if (gb->pc == 0x6520 && gb->sp == sp0_) goto func_6515_afterFunc6588;
+  return;` — the external hook's own internal `ret_effect()` naturally pops whatever return address
+  the internal call site pushed, so no special-casing is needed beyond the same resume-check. This
+  is a straightforward generalization of the earlier single-target pattern, not a new mechanism —
+  recognize it whenever a `grep`/reachability trace shows more than one genuine `call` converging
+  on the same `HOOK_LOCAL` block from within the same file.

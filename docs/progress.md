@@ -448,6 +448,27 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 239, bank 11 (2 root routines): ported
+  `object_code/ages/parts/rotatableSeedThing.s` (`partCode33` + `func_65d5`,
+  `rotatableSeedThing.c`) — the rotatable seed-thing puzzle object: a 4-state RST $00 dispatch
+  handling rotation-direction setup, spawning a companion collision-radius part (RST $18
+  double-index lookup into a per-direction offset table), toggling switch-block/trigger state
+  based on a rotation bitmask, and detecting collisions between the rotation arms. The most
+  structurally complex file this session: ~13 `HOOK_LOCAL` sub-labels inlined into one C
+  function via `goto`, four of which are genuine internal `call`s (not just `jr`/`jp`) between
+  those sub-labels. One shared HOOK_LOCAL block (`func_6515`/`subid0_state0`, joined by
+  fallthrough) is reached via THREE different edges — a bare top-level `jr z` and two separate
+  internal `call` sites — requiring a new generalization of the established "resume after a
+  local `ret`" pattern: check `gb->pc`/`gb->sp` against every known resume address after the
+  `RET`/`RET_TAKEN` macro's internal pop, falling back to a true top-level `return;` only when
+  none match. Documented as a new lesson in `docs/porting-notes.md`. Caught and fixed two real
+  bugs before the gate: `alu_rlc(gb, v)` returns the rotated value and must be assigned back
+  (`C = alu_rlc(gb, C)`, not a bare statement with a nonexistent register-selector constant), and
+  a tail `jp partSetAnimation`'s own 3-byte cycle burn was initially forgotten entirely. Zero
+  further bugs found by a dedicated independent-review pass. Bank 11 is 196/651 and the project
+  4,409/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference
+  replay 0 state-hash mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and
+  quirk suites 8/8.
 - 2026-09-15: milestone 3 phase 6 batch 238, bank 11 (1 root routine): ported
   `object_code/ages/parts/subterrorDirt.s` (`partCode32`, `subterrorDirt.c`) — the dirt-clod
   effect from Subterror's dig attack: a 2-state RST $00 dispatch (state0 plays SND_DIG and falls
