@@ -448,6 +448,21 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 194, bank 11 (1 root routine): ported
+  `object_code/common/parts/shadow.s` (`partCode07`, `shadow.c`) — the parent-following shadow
+  part: deletes itself if its parent object's ID changed, otherwise tracks the parent's position
+  with an offset, hides itself if the parent is on the ground, and otherwise flickers visibility
+  and picks a shrink-with-height animation frame from a lookup table based on how far above the
+  ground the parent is. `shadow_initialize_hook` is a pattern-a local (no independent hook row,
+  reached via a genuine conditional `call z`, never returns via its own `ret`) modeled with
+  `push_effect` and no `return;` at the call site, continuing inline — with the taken/not-taken
+  cycle cost for the conditional call itself burned correctly via `CYCT`/`CYC` around the
+  `push_effect` (a subtly different bug shape from the earlier `CALL_C`/`CALL_C_CC` lesson, since
+  no `CALL_C`-family macro is involved at all here). Zero bugs found on both self-review and
+  independent review. Bank 11 is 127/651 and the project 4,340/9,901. Gates: lint 0, 30k verify 0
+  failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over
+  290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 193, bank 11 (1 root routine): ported
   `object_code/common/parts/lightableTorch.s` (`partCode06`, `lightableTorch.c`) — the lightable
   torch part, the largest single-root file this session (111 instructions, 4 nested RST $00

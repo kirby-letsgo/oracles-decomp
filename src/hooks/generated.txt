@@ -4942,10 +4942,7 @@
 11:44cc partCode04_hook -
 11:4500 partCode05_hook -
 11:4550 partCode06_hook -
-11:4642 partCode07 -
-11:468a partCode07__setAnim L
-11:468e partCode07__animationIndices L
-11:469a partCode07__initialize L
+11:4642 partCode07_hook -
 11:46a8 partCode08 -
 11:46ba partCode08__state1 L
 11:46dc partCode08__spawnLightableTorch L
