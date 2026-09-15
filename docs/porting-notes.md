@@ -1599,3 +1599,28 @@ desync to discover; keep them when porting routines.
   is safe as long as none of its callers change `gb->sp` between their own entry and the call into
   the shared helper (true whenever the callers only do straight-line register/immediate work
   before falling through or tail-jumping into it, as is almost always the case for this pattern).
+- **A literal `pop rr` (not `ret`) inside a genuinely-`CALL_C`-invoked, independently-registered
+  local that then permanently diverts via a tail-call chain (never resuming the logical caller) is
+  modeled as a plain, unconditional `pop_effect()` call — no special-casing needed, even when the
+  SAME local is ALSO reached via other edges (a bare `jr`/`jp` with no push, or other `CALL_C`
+  sites) — because `push_effect`/`pop_effect` operate on the REAL byte-level emulated stack, which
+  correctly reflects whatever each specific invocation actually did, exactly like real hardware.**
+  The resulting `CALL_C_` post-call check (`gb->pc == return_addr && gb->sp == sp_+2`) will
+  legitimately FAIL for the genuinely-called edges, since PC never returns to the logical call
+  site — this is EXPECTED, not a bug, and correctly falls into `CALL_C_`'s own `hook_continue`
+  fallback. As long as every RST $00 dispatch nested in the calling hook is self-canceling (the
+  now-repeatedly-established pattern), `gb->sp` at the point of the diversion equals the calling
+  hook's own top-level entry SP (`sp0_`), so whatever terminal external hook the tail-call chain
+  eventually reaches (here, `partDelete_hook`) will pop EXACTLY that hook's real caller's return
+  address via its own internal `ret_effect()` — meaning `hook_continue`'s while-loop condition is
+  satisfied immediately, running zero iterations of raw CPU stepping; it degenerates to a no-op
+  rather than doing meaningful (and therefore risky) work. Established in `donkeyKongFlame.c`'s
+  `func_6248`, reached via two genuine `CALL_C` sites and one bare conditional `jp`, whose `pop hl`
+  branch discards the current call's return address entirely and exits via
+  `objectCreatePuff`/`partDelete` — confirmed correct both by an exhaustive manual trace through
+  `CALL_C_`/`push_effect`/`pop_effect`/`ret_effect`/`hook_continue` BEFORE writing any code, and
+  independently re-verified by a dedicated review pass and a full 289,943-frame reference replay
+  matching the baseline hash exactly. When this pattern recurs, don't reflexively assume a
+  "pop instead of ret" needs per-caller special treatment — trace whether the resulting SP state is
+  actually caller-independent first (it usually is, if all reachability paths converge on the same
+  logical entry SP), and let `CALL_C_`'s own fallback mechanism do its job.

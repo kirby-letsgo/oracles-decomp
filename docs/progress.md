@@ -448,6 +448,26 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 233, bank 11 (5 root routines): ported
+  `object_code/ages/parts/donkeyKongFlame.s` (`partCode2c` + `func_6248` + `func_6256` +
+  `func_6261` + `func_6270`, `donkeyKongFlame.c`) — the Donkey Kong minigame's flame hazard: a
+  5-state RST $00 dispatch (with a further nested 2-way dispatch inside state3's substates)
+  covering spawn, sidescroll gravity, ground-bounce, and player-collision detection/response.
+  This session's most delicate stack mechanism: `func_6248` (independently registered, reached
+  via two genuine `call`s and one conditional `jp`) contains a literal `pop hl` that, on one
+  branch, discards whatever's on top of the emulated stack and permanently exits via a tail-call
+  chain to `objectCreatePuff`/`partDelete` without ever returning to its logical caller. Verified
+  by direct trace (both independently and via a dedicated independent-review pass) that because
+  every RST $00 dispatch in this file is self-canceling, `gb->sp` equals `partCode2c_hook`'s own
+  entry SP at all three of `func_6248`'s entry points, so the bare `pop_effect()` call correctly
+  balances the stack regardless of which edge was taken, and `CALL_C`'s `hook_continue` fallback
+  (triggered when this path is taken from a genuine call site, since PC never returns to the
+  logical call site) resolves to a zero-iteration no-op rather than papering over a real bug.
+  Full 289,943-frame reference replay matched the baseline hash exactly. Bank 11 is 189/651 and
+  the project 4,402/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`,
+  full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 232, bank 11 (1 root routine): ported
   `object_code/ages/parts/timewarpAnimation.s` (`partCode2b`, `timewarpAnimation.c`) — the
   time-warp visual effect: applies its speed and deletes once it drifts far enough down-screen,
