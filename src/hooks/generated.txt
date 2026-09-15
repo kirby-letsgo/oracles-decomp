@@ -5036,10 +5036,7 @@
 11:6970 state3func_6970_hook -
 11:6992 state0func_6992_hook -
 11:69a5 func_69a5_hook -
-11:69ac partCode36 -
-11:69c2 partCode36__state0 L
-11:69c8 partCode36__state1 L
-11:69d9 partCode36__state2 L
+11:69ac partCode36_hook -
 11:69ed partCode37 -
 11:69f7 veranProjectile_subid0 -
 11:6a0a veranProjectile_subid0__state0 L
