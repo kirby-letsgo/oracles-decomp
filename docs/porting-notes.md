@@ -1567,3 +1567,19 @@ desync to discover; keep them when porting routines.
   a "smoke test to skip past" — it can catch bugs the longer, more expensive replays miss entirely
   if the divergence happens to occur outside their exercised window, and every gate stage genuinely
   catches different bug classes.
+- **A shared target label reached by multiple entry paths must be reached via `goto` from EVERY
+  path, never inlined as a direct call on some paths and `goto`-ed on others** — the label's own
+  `CYC` burn only fires when control actually flows through the `goto`; inlining the label's body
+  (e.g. `some_hook(gb); return;`) on a shortcut path skips that label's own instruction's cycle
+  burn entirely, undercounting cycles whenever that specific path is taken. Found in `51.c`'s
+  `state1`: the `.s` source's `jr nz,@animate` and the natural fallthrough into `@animate` both
+  reach the SAME physical `jp partAnimate` instruction at ROM address 0x5c59, so both paths must
+  `goto animate;`, letting the `animate:` label's own `CYC(0x5c59, 0x5c5c)` burn fire regardless
+  of which path arrived — the first draft instead inlined `partAnimate_hook(gb); return;` directly
+  at the `jr nz` site, skipping that burn on every frame the branch was taken. Caught only by
+  independent review, not by self-review, the coverage-diff script (which doesn't distinguish
+  "reachable via goto" from "reachable via inlined call" — both produce a CYCT/CYC entry, just at
+  different addresses, so nothing looked obviously missing), or either replay (a few skipped
+  cycles per frame don't reliably show up as a state-hash mismatch the way a logic/stack bug does).
+  When a ROM label is reachable from more than one place, always give it exactly one `goto` target
+  and route every incoming edge through that same `goto`, never duplicate-inline its body.

@@ -448,6 +448,23 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 224, bank 11 (1 root routine): ported
+  `object_code/common/parts/51.s` (`partCode51`, `51.c`) — Ganon's part 51: two nested RST $00
+  dispatches (an outer subid0/subid1/subid2 dispatch, and a further inner state0/state1/state2
+  dispatch inside subid1) plus an RST $18 "addDoubleIndex" table lookup for a two-frame
+  animation. The outer jump table's `.dw` declaration order does NOT match physical ROM layout —
+  subid2's code appears before subid1's in the file, but subid1 is index 1 and subid2 is index 2
+  — verified correct against the actual `.dw` order rather than physical address order.
+  Independent review found a real cycle-accounting bug before commit: a `jr nz` shortcut directly
+  to `partAnimate_hook` skipped the shared `animate:` label's own 4-cycle `jp` burn whenever that
+  branch was taken, since nothing else `goto`s that label to trigger it; fixed by changing the
+  inlined call to `goto animate;` so the label's own burn always fires. Also fixed a
+  field-offset comment nit (0xe8 is `Part.damage`, confirmed via real precedent, not left bare).
+  Full gate re-verified clean after both fixes. Bank 11 is 172/651 and the project 4,385/9,901.
+  Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 223, bank 11 (2 root routines): ported
   `object_code/common/parts/ganonTrident.s` (`partCode50` + `func_5b2b`, `ganonTrident.c`) —
   Ganon's trident: deletes if the related Ganon object has already reached a terminal state,

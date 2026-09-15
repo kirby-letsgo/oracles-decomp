@@ -5017,15 +5017,7 @@
 11:5a86 partCode4e_hook -
 11:5ae0 partCode50_hook -
 11:5b2b func_5b2b_hook -
-11:5b67 partCode51 -
-11:5b7e partCode51__subid0 L
-11:5b9e partCode51__subid2 L
-11:5bde partCode51__table_5bde L
-11:5be2 partCode51__subid1 L
-11:5bea partCode51__state0 L
-11:5bff partCode51__state1 L
-11:5c2a partCode51__state2 L
-11:5c59 partCode51__animate L
+11:5b67 partCode51_hook -
 11:5c5c partCode52 -
 11:5c73 partCode52__subid0 L
 11:5c7b partCode52__subid0__state0 L
