@@ -5054,13 +5054,7 @@
 11:6c0e func_6c0e_hook -
 11:6c17 func_6c17_hook -
 11:6c27 func_6c27_hook -
-11:6c2f partCode39 -
-11:6c39 partCode39__state0 L
-11:6c66 partCode39__table_6c66 L
-11:6c6a partCode39__state1 L
-11:6caa partCode39__state2 L
-11:6cbd partCode39__animate L
-11:6cc0 partCode39__table_6cc0 L
+11:6c2f partCode39_hook -
 11:6cca partCode3a_hook -
 11:6e2f func_6e2f_hook -
 11:6e4a func_6e4a_hook -
