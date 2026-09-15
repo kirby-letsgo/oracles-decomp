@@ -5091,12 +5091,7 @@
 11:73ba partCode42_hook -
 11:7443 partCode43_hook -
 11:74d6 partCode44_hook -
-11:7530 partCode45 -
-11:753a partCode45__state0 L
-11:755e partCode45__initialTimeToAppear L
-11:7562 partCode45__state1 L
-11:756c partCode45__bounceRandomlyDownwards L
-11:758b partCode45__state2 L
+11:7530 partCode45_hook -
 11:75b7 partCode46 -
 11:75cc partCode46__normalStatus L
 11:75e2 partCode46__state0 L

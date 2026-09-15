@@ -1666,3 +1666,31 @@ desync to discover; keep them when porting routines.
   `include/macros.s`) compiles to a literal 16-bit immediate `ld hl, (X<<8)|Y` with no runtime
   computation — model it as a plain `SET_HL(0x....)`, not a named-constant lookup, even though it
   looks like two named constants (`FIRST_ENEMY_INDEX, Enemy.id`) were combined at "runtime."
+- **A CONDITIONAL internal call (`call z`/`call nz`/etc.) into a `HOOK_LOCAL` block that never
+  executes its own `ret` — it always terminates via an unconditional tail-jump into an
+  already-hooked external routine — generalizes the existing "HOOK_LOCAL tail-jumps into an
+  external hook" pattern (`rotatableSeedThing.c`'s `func_6588`/`jp partSetAnimation`) to the
+  conditional-call case for the first time.** Established in `fallingBoulderSpawner.c`
+  (`partCode45`): `@state2` does `call z,@bounceRandomlyDownwards`, and `@bounceRandomlyDownwards`
+  (also reached by plain fallthrough from `@state1`, with no push at all) ends with `jp playSound`
+  and no `ret`. Since `@bounceRandomlyDownwards` is `HOOK_LOCAL` (not independently registered),
+  `CALL_C_CC` cannot be used for the conditional call — `hook_enabled_at(target)` would be false
+  for that address and the call would incorrectly fall back to raw ROM interpretation instead of
+  running the ported C. Instead the taken side is hand-inlined exactly like an unconditional
+  internal call, just gated behind the flag check:
+  ```c
+  if (F & FZ) { CYCT(0x7590, 0x7593); push_effect(gb, 0x7593); goto bounceRandomlyDownwards; }
+  CYC(0x7590, 0x7593);
+  ```
+  At the shared block's terminal `playSound_b00_hook(gb);` call, the SAME `gb->pc`/`gb->sp` check
+  used for the unconditional precedent tells the two reachability modes apart: if reached via the
+  conditional call, `playSound_b00_hook`'s own internal `ret_effect()` pops the address just pushed
+  (`0x7593`) and `gb->sp` returns to `sp0_`, so `if (gb->pc == 0x7593 && gb->sp == sp0_) goto
+  state2_afterBounceCall;` resumes the caller; if reached via plain fallthrough (nothing pushed,
+  `gb->sp` already `sp0_` on entry to the block), that same internal `ret_effect()` instead pops
+  whatever the OUTER caller of `partCode45_hook` itself pushed, so the check fails and a bare
+  `return;` correctly unwinds all the way out — exactly mirroring what the real hardware does with
+  the leaked return address on its stack. Confirmed by a dedicated independent review pass devoted
+  entirely to tracing this reachability, plus a clean 30k-frame hook-continue verify and full
+  289,869-frame reference replay (a bug here would very likely have surfaced as a `hook_continue`
+  divergence or an outright crash, neither of which occurred).
