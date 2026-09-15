@@ -4985,13 +4985,9 @@
 11:541a func_541a_hook -
 11:542a func_542a_hook -
 11:5439 partCode22_hook -
-11:54de partCode23 -
-11:54ea partCode23__subid0 L
-11:54f6 partCode23__func_54f6 L
-11:54f9 partCode23__subid1 L
-11:5515 partCode23__subid2 L
-11:5535 func_5535 -
-11:553f func_553f -
+11:54de partCode23_hook -
+11:5535 func_5535_hook -
+11:553f func_553f_hook -
 11:560d partCode28 -
 11:5619 partCode28__normalStatus L
 11:5623 partCode28__state0 L

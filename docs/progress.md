@@ -448,6 +448,21 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 216, bank 11 (3 root routines): ported
+  `object_code/common/parts/fallingFire.s` (`partCode23` + `func_5535` + `func_553f`,
+  `fallingFire.c`) — falling fire from a torch/ceiling: RST $00 dispatch across three subids
+  (spawning, waiting, falling), spawning a new falling-fire part via `getFreePartSlot` when
+  triggered. `func_553f` (an animation-frame-cycling helper with its own RST $10 table lookup) is
+  reached via a genuine `call` and is the first CALL_C-invoked local written since the stack-leak
+  fix — correctly closes its own literal `ret` with `RET`, cross-checked directly against the
+  auto-generated ground truth in `gen_bank11.c` before it was deleted by the regen step.
+  `func_5535` (reached only via a `jr z` tail-jump, no literal `ret` at all) correctly stays a bare
+  tail-call. `partCode23_hook`'s own four top-level `ret`/`ret nz` exits correctly use
+  `RET`/`RET_TAKEN`. Zero bugs found by independent review. Bank 11 is 160/651 and the project
+  4,373/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference
+  replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and
+  quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 215, bank 11 (1 root routine): ported
   `object_code/common/parts/cuccoAttacker.s` (`partCode22`, `cuccoAttacker.c`) — the cucco's
   attacker projectile: 3-state RST $00 dispatch spawning at a random screen edge with a random
