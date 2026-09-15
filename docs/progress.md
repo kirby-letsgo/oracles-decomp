@@ -448,6 +448,19 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 231, bank 11 (1 root routine): ported
+  `object_code/ages/parts/sparkle.s` (`partCode26`, `sparkle.c`) — the sparkle particle: on
+  spawn, picks a random speed/lifetime quadruple via an RST $10 table lookup; every frame
+  afterward, integrates a 16-bit fixed-point position from its speed (two separate `add hl,bc`
+  accumulations), decays that speed toward zero via a two's-complement step once its counter
+  expires, and flickers/deletes based on the accumulated Z depth. Single root, no locals, no
+  literal `ret` anywhere (every exit is a `jp` tail-call). Correctly distinguishes two different
+  negation idioms in the speed-decay step: a fresh `cpl`/`add $01` for the low byte and a
+  carry-propagating `cpl`/`adc $00` for the high byte. Zero bugs found by independent review.
+  Bank 11 is 183/651 and the project 4,396/9,901. Gates: lint 0, 30k verify 0 failures with
+  state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames
+  with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 230, bank 11 (1 root routine): ported
   `object_code/ages/parts/wallArrowShooter.s` (`partCode25`, `wallArrowShooter.c`) — the
   wall-mounted arrow shooter: on first update, derives its firing angle from its own subid;

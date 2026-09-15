@@ -5028,11 +5028,7 @@
 11:5f59 partCode16_hook -
 11:5ff6 partCode24_hook -
 11:6033 partCode25_hook -
-11:6088 partCode26 -
-11:60a2 partCode26__counter1NonZero L
-11:60e1 partCode26__animate L
-11:60e4 partCode26__state0 L
-11:60f5 partCode26__var03_00 L
+11:6088 partCode26_hook -
 11:615a partCode2c -
 11:6177 partCode2c__state0 L
 11:61aa partCode2c__table_61aa L
