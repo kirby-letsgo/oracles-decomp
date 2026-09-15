@@ -4940,11 +4940,7 @@
 11:4441 partCode02_hook -
 11:4486 partCode03_hook -
 11:44cc partCode04_hook -
-11:4500 partCode05 -
-11:4514 partCode05__normalStatus L
-11:4519 partCode05__state0 L
-11:4527 partCode05__updateTile L
-11:453f partCode05__flipOverworldSwitch L
+11:4500 partCode05_hook -
 11:4550 partCode06 -
 11:4562 partCode06__normalStatus L
 11:456c partCode06__subid0 L
