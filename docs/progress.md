@@ -448,6 +448,20 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 205, bank 11 (1 root routine): ported
+  `object_code/common/parts/octorokProjectile.s` (`partCode18`, `octorokProjectile.c`) — the
+  octorok rock projectile: deletes itself on a specific status, or resets to state 2 if idle too
+  long; a 4-entry RST $00 dispatch sets up its speed and appearance, checks screen/tile collision
+  before applying speed (bouncing back or deleting on a wall hit), bounces off collidable
+  surfaces, or — for the 4th jump-table entry — tail-calls straight into
+  `partCommon_updateSpeedAndDeleteWhenCounter1Is0_hook`, an already-independently-registered hook
+  from a different file (`partCommonCode.c`, several batches back), since a jump table entry
+  pointing at another file's routine needs no local `goto` label at all, just the dispatch's own
+  default/else branch. Zero bugs found on both self-review and independent review. Bank 11 is
+  139/651 and the project 4,352/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 204, bank 11 (2 root routines): ported
   `object_code/common/parts/gashaTree.s` (`partCode17` + `func_5010`, `gashaTree.c`) — the gasha
   seed tree: checks a flag and Link's vulnerability before activating, then a 3-state dispatch sets
