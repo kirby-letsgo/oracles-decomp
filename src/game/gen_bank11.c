@@ -497,64 +497,6 @@ L_59e8:
   I(0x59eb, 4); if (hook_enabled_at(0x3ea1)) { partDelete_hook(gb); return; } HANDOFF(0x3ea1);  // jp $3ea1
 }
 
-// 11:6033
-void partCode25(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6033, 2); E = 0xc4;  // ld e,$c4
-  I(0x6035, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x6036, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x6037, 3); goto L_6045; } I(0x6037, 2);  // jr nz,$6045
-  I(0x6039, 1); H = D;  // ld h,d
-  I(0x603a, 1); L = E;  // ld l,e
-  I(0x603b, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x603c, 2); L = 0xc2;  // ld l,$c2
-  I(0x603e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x603f, 2); A = alu_swap(gb, A);  // swap a
-  I(0x6041, 1); alu_rrca(gb);  // rrca
-  I(0x6042, 2); L = 0xc9;  // ld l,$c9
-  I(0x6044, 2); mem_wr(gb, HL, A);  // ld (hl),a
-L_6045:
-  CALL(0x6045, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x6048);  // call $40a7
-  if (!(F & FZ)) { RET_TAKEN(0x6048); return; } I(0x6048, 2);  // ret nz
-  I(0x6049, 2); E = 0xc2;  // ld e,$c2
-  I(0x604b, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x604c, 2); alu_bit(gb, 0, A);  // bit 0,a
-  I(0x604e, 2); E = 0xcd;  // ld e,$cd
-  I(0x6050, 3); A = mem_rd(gb, 0xffb1);  // ldh a,($ffb1)
-  if ((F & FZ)) { I(0x6052, 3); goto L_6058; } I(0x6052, 2);  // jr z,$6058
-  I(0x6054, 2); E = 0xcb;  // ld e,$cb
-  I(0x6056, 3); A = mem_rd(gb, 0xffb0);  // ldh a,($ffb0)
-L_6058:
-  I(0x6058, 1); B = A;  // ld b,a
-  I(0x6059, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x605a, 1); alu_sub(gb, B);  // sub b
-  I(0x605b, 2); alu_add(gb, 0x10);  // add $10
-  I(0x605d, 2); alu_cp(gb, 0x21);  // cp $21
-  if (!(F & FC)) { RET_TAKEN(0x605f); return; } I(0x605f, 2);  // ret nc
-  I(0x6060, 2); E = 0xc6;  // ld e,$c6
-  I(0x6062, 2); A = 0x21;  // ld a,$21
-  I(0x6064, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x6065, 3); SET_HL(0x6080);  // ld hl,$6080
-  I(0x6068, 2); E = 0xc2;  // ld e,$c2
-  I(0x606a, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x606b, 0x606c);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x606c, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x606d, 1); B = A;  // ld b,a
-  I(0x606e, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  CALL(0x606f, getFreePartSlot_hook, 0x3e8e, 0x6072);  // call $3e8e
-  if (!(F & FZ)) { RET_TAKEN(0x6072); return; } I(0x6072, 2);  // ret nz
-  I(0x6073, 3); mem_wr(gb, HL, 0x1a);  // ld (hl),$1a
-  I(0x6075, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x6076, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x6077, objectCopyPositionWithOffset_hook, 0x225a, 0x607a);  // call $225a
-  I(0x607a, 2); L = 0xc9;  // ld l,$c9
-  I(0x607c, 1); E = L;  // ld e,l
-  I(0x607d, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x607e, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x607f); return;  // ret
-}
-
 // 11:6088
 void partCode26(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

@@ -448,6 +448,18 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 230, bank 11 (1 root routine): ported
+  `object_code/ages/parts/wallArrowShooter.s` (`partCode25`, `wallArrowShooter.c`) — the
+  wall-mounted arrow shooter: on first update, derives its firing angle from its own subid;
+  every frame, checks whether the enemy target is roughly aligned on the shooter's fixed axis
+  (X or Y, chosen by a subid bit) and within a threshold distance, and if so, spawns an arrow
+  offset by a direction-indexed table looked up via RST $18 (`addDoubleIndex`). Single root, no
+  locals. Zero bugs found by independent review, including a careful re-derivation of the
+  `bit 0,a` polarity trap governing which axis (X vs Y) the alignment check uses. Bank 11 is
+  182/651 and the project 4,395/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with
+  state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 229, bank 11 (1 root routine): ported
   `object_code/ages/parts/grottoCrystal.s` (`partCode24`, `grottoCrystal.c`) — the grotto crystal
   switch: when triggered, toggles the global switch state via XOR with its own subid, resets its

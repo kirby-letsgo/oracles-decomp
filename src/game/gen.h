@@ -5030,7 +5030,7 @@ void partCodeNil_hook(GB *gb);
 void partCode00_hook(GB *gb);
 void partCode16_hook(GB *gb);
 void partCode24_hook(GB *gb);
-void partCode25(GB *gb);
+void partCode25_hook(GB *gb);
 void partCode26(GB *gb);
 void partCode26__counter1NonZero(GB *gb);
 void partCode26__animate(GB *gb);
