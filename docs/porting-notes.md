@@ -1694,3 +1694,31 @@ desync to discover; keep them when porting routines.
   entirely to tracing this reachability, plus a clean 30k-frame hook-continue verify and full
   289,869-frame reference replay (a bug here would very likely have surfaced as a `hook_continue`
   divergence or an outright crash, neither of which occurred).
+- **A `HOOK_LOCAL` block that is (a) reachable via a genuine internal `call` from a second site
+  AND (b) has BOTH a literal `ret` exit and a tail-jump-into-an-external-hook exit needs the SAME
+  `gb->pc`/`gb->sp` resume check at every exit, not just the tail-jump one.** Established in
+  `veranAcidPool.c` (`partCode57`)'s `func_7db7`: reached by plain fallthrough from `@state2` (no
+  push) and by a genuine `call @func_7db7` from `@state6` (`push_effect(gb, 0x7e19); goto
+  func_7db7;`, NOT `CALL_C`/`CALL_C_CC` — `hook_enabled_at()` would be false for an unregistered
+  local and wrongly fall back to raw interpretation). Its `ret c` exit and its `jp setTile` exit
+  both potentially return control to two different places depending on how the block was entered,
+  so BOTH use the identical check:
+  ```c
+  if (F & FC) { // ret c
+    RET_TAKEN(0x7dc2);
+    if (gb->pc == 0x7e19 && gb->sp == sp0_) goto state6_afterFunc7db7;
+    return;
+  }
+  CYC(0x7dc2, 0x7dc3);
+  CYC(0x7dc3, 0x7dc4); A = L;
+  CYC(0x7dc4, 0x7dc7); setTile_hook(gb); // jp — tail-chain into an external hook
+  if (gb->pc == 0x7e19 && gb->sp == sp0_) goto state6_afterFunc7db7;
+  return;
+  ```
+  This is simply the union of two already-established patterns (`rotatableSeedThing.c`'s
+  multi-way check after a literal `RET`/`RET_TAKEN`, and `fallingBoulderSpawner.c`'s check after a
+  tail-jump into an external hook) rather than a new mechanism — recognize it whenever a
+  `HOOK_LOCAL` reached by a genuine call has more than one way to fall out of it, and apply the
+  identical resume check at every exit point, not just the "obvious" one. Confirmed by a dedicated
+  independent review pass tracing every stack-arithmetic path, plus clean 30k-frame and full
+  289,869-frame replays.

@@ -448,6 +448,20 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-16: milestone 3 phase 6 batch 260, bank 11 (1 root routine): ported
+  `object_code/ages/parts/veranAcidPool.s` (`partCode57`, `veranAcidPool.c`) — the most
+  structurally complex file this batch: a 7-state RST $00 dispatch for Veran's acid pool
+  attack, with a shared "set tiles from a table" helper (`func_7de1`, a 4-iteration inner
+  loop with register-preserving `push`/`pop` around a nested tile-set call) and a shared
+  "check/clear a tile" helper (`func_7db7`) reached both by fallthrough and by a genuine
+  internal `call` from the final state — the first time this session a `HOOK_LOCAL` block
+  needed the same `gb->pc`/`gb->sp` resume check at BOTH a literal `ret` exit and a
+  tail-jump-into-an-external-hook exit, documented as a new porting-notes lesson (a
+  straightforward union of two previously-separate precedents). Zero bugs found by
+  self-review or a dedicated independent review focused entirely on tracing that mechanism.
+  Bank 11 is 224/651 and the project 4,437/9,924. Gates: lint 0, 30k verify 0 failures with
+  state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869
+  frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
 - 2026-09-16: milestone 3 phase 6 batch 259, bank 11 (1 root routine): ported
   `object_code/ages/parts/octogonBubble.s` (`partCode55`, `octogonBubble.c`) — the bubble
   fired by an Octogon enemy: an entry check for a Link collision that, when Link is
