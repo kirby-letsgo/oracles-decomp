@@ -497,18 +497,6 @@ L_59e8:
   I(0x59eb, 4); if (hook_enabled_at(0x3ea1)) { partDelete_hook(gb); return; } HANDOFF(0x3ea1);  // jp $3ea1
 }
 
-// 11:5f55
-void partCodeNil(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  RET(0x5f55); return;  // ret
-}
-
-// 11:5f56
-void partCode00(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5f56, 4); if (hook_enabled_at(0x3ea1)) { partDelete_hook(gb); return; } HANDOFF(0x3ea1);  // jp $3ea1
-}
-
 // 11:5f59
 void partCode16(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

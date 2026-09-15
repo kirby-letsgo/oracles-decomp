@@ -448,6 +448,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 227, bank 11 (2 root routines): ported
+  `partCodeNil` and `partCode00` (`partCodeStubs.c`) — two trivial single-instruction part-code
+  table filler entries with no corresponding `.s` source file (only referenced from
+  `data/partCodeTable.s`'s `.dw` list); verified directly against the transliteration report.
+  `partCodeNil` is a bare `ret` (top-level exit); `partCode00` is an unconditional `jp partDelete`
+  tail-call. Bank 11 is 179/651 and the project 4,392/9,901. Gates: lint 0, 30k verify 0 failures
+  with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174
+  frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 226, bank 11 (4 root routines): ported
   `object_code/common/parts/blueEnergyBead.s` (`partCode53` + `createEnergySwirlGoingOut_body` +
   `createEnergySwirlGoingIn_body` + `func_5e1a`, `blueEnergyBead.c`) — the blue energy bead
