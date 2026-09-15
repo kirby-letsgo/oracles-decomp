@@ -1503,3 +1503,37 @@ desync to discover; keep them when porting routines.
   against a neighboring line. Always double-check a `bit`/`jr` pair against `alu_bit`'s actual
   semantics (`gb->f = ... | ((v & (1<<bit)) ? 0 : FZ)`) rather than against how a nearby `cp`- or
   `or`-based branch in the same block happens to look.
+- **CORRECTION to the "round-trip local" precedent: a local invoked via `CALL_C` MUST call
+  `ret_effect()` (i.e. use `RET`/`RET_TAKEN`, never a bare `return;`) on every one of its own
+  literal `ret`/`ret cc` exits — the earlier "call site has no `push_effect`, so the callee needs no
+  `ret_effect`" reasoning was WRONG for this case.** `CALL_C_`'s actual definition
+  (`src/game/game.h`) unconditionally does `push_effect(gb, ra)` before invoking the hook function,
+  then checks `gb->sp == sp_before + 2` after it returns to detect whether the callee's own `ret`
+  correctly popped that value; if the callee does a bare `return;` instead of calling
+  `ret_effect()`, the pushed return address is never popped, `gb->sp` silently drifts by 2 bytes
+  per call, and the mismatch check falls through to `hook_continue`, which resumes real hardware
+  emulation from the (still-correct) `pc` but with a now-wrong `sp` — a genuine, cumulative stack
+  corruption, not a cosmetic or cycle-accounting issue. The "no push, no pop" round-trip pattern is
+  only valid for a local reached via a **bare C function call with no `CALL_C`** (i.e. the ROM
+  routine is reached only through a `jr`/`jp` tail-jump chain, never a genuine `call`) — there,
+  nothing pushes and nothing needs to pop, matching real hardware's net-zero SP delta for a
+  call+ret pair by using neither side of the pair at all. The two patterns look almost identical in
+  the C (a function whose every exit is bare `CYC`/`CYCT` + `return;`) but have opposite
+  correctness requirements depending purely on how the call site invokes them.
+  Found via a real full-game regression: `moblinBoomerang.c`'s `func_53f5_hook`/`func_541a_hook`/
+  `func_542a_hook` (new file, all three invoked via `CALL_C` from `partCode21_hook`, all originally
+  written with bare `return;` for their literal `ret`/`ret cc` exits per the old, now-corrected
+  understanding) caused a full-game `--ref-check` frame-hash mismatch at frame 42864 — despite zero
+  findings from self-review, independent review, AND a clean 30k-frame `--verify-hooks-continue`
+  pass, because none of those catch a slow stack-pointer drift that only manifests once enough
+  calls accumulate. Root-caused by reading `CALL_C_`'s actual macro body and comparing against the
+  auto-generated (pre-hook) fallback interpreter in `gen_bank11.c`, which had always used
+  `PUSH`/`POP`/`RET`/`RET_TAKEN` for this exact code — the auto-generated version was the ground
+  truth the whole time. A grep audit of every `CALL_C`-invoked bank-11 function for the same bug
+  shape found it already latent (uncaught by the full gate at the time, simply never yet triggered
+  by the TAS replay) in `dekuScrubProjectile.c`'s `func_52fd_hook`, `func_5313_hook`, and
+  `func_5336_hook` from batch 211 — fixed in the same pass. When adding a new `CALL_C`-invoked
+  local, always grep the auto-generated `gen_bank11.c` (or whichever bank's `gen_bankNN.c`) version
+  of the same address *before* it gets deleted by the rewrite, since it mechanically encodes the
+  correct push/pop/ret shape for every instruction and is the fastest way to sanity-check a local's
+  stack-effect treatment against ground truth.
