@@ -448,6 +448,21 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 221, bank 11 (1 root routine): ported
+  `object_code/common/parts/twinrovaFlame.s` (`partCode4c`, `twinrovaFlame.c`) — Twinrova's flame
+  projectile: an RST $00 dispatch across an ignition state (which sets up appearance and plays a
+  sound) and two further sub-states that animate/apply speed and check tile collision, plus a
+  non-RST subid path used for the flame's simpler travel-and-delete behavior. On the terminal
+  tile-collision path it runs a genuine 3-iteration loop (`dec b`/`jr nz`) spawning up to three
+  secondary flame parts at incrementing angles around a circle via `getFreePartSlot`, modeled
+  with two goto labels for the loop top and continuation point. Single root, no independently-
+  registered locals. Zero bugs found by independent review, including a careful re-derivation of
+  every branch's physical byte-end and confirmation that the loop's `getFreePartSlot` success
+  polarity (Z set = success) matches every other caller in the codebase. Bank 11 is 168/651 and
+  the project 4,381/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`,
+  full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 220, bank 11 (1 root routine): ported
   `object_code/common/parts/greatFairyHeart.s` (`partCode30`, `greatFairyHeart.c`) — the great
   fairy's healing heart: on first update sets its counter and becomes visible, then flies in a

@@ -5013,12 +5013,7 @@
 11:59c3 partCode4d__state3 L
 11:59e5 partCode4d__delete L
 11:59e8 partCode4d__deleteWithPoof L
-11:59ee partCode4c -
-11:59f8 partCode4c__normalStatus L
-11:5a31 partCode4c__subid0 L
-11:5a38 partCode4c__state0 L
-11:5a46 partCode4c__state1 L
-11:5a54 partCode4c__state2 L
+11:59ee partCode4c_hook -
 11:5a86 partCode4e -
 11:5a98 partCode4e__normalStatus L
 11:5aa2 partCode4e__state0 L
