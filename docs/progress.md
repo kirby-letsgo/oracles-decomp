@@ -448,6 +448,19 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 244, bank 11 (1 root routine): ported
+  `object_code/ages/parts/3b.s` (`partCode3b`, `partCode3b.c`) — the boulder thrown by the head
+  thwomp (purple face) miniboss: a top-level dispatcher that branches on subid to either the
+  "core" boulder (its own 3-state RST $00 dispatch: spawn with random position offset from the
+  camera, apply gravity until it lands or times out then switches to a break animation/sound,
+  and a third state that swaps its collision radius via a second `rst_addAToHl` table) or a
+  thrown instance (a near-duplicate 3-state dispatch whose third jump-table entry deliberately
+  reuses the core boulder's `state2` code). Every sub-label is `HOOK_LOCAL`, so all of it is
+  goto-inlined into one C function; only `partCode3b` itself is a top-level hook. Zero bugs
+  found by self-review or independent review. Bank 11 is 203/651 and the project 4,416/9,903.
+  Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk
+  suites 8/8.
 - 2026-09-15: milestone 3 phase 6 batch 243, bank 11 (1 root routine): ported
   `object_code/ages/parts/headThwompFireball.s` (`partCode39`, `headThwompFireball.c`) — the
   fireball spat out by the Head Thwomp miniboss: a 3-state RST $00 dispatch that spawns with a
