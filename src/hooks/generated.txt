@@ -4939,10 +4939,7 @@
 11:441e itemDrop_applySpeed_hook -
 11:4441 partCode02_hook -
 11:4486 partCode03_hook -
-11:44cc partCode04 -
-11:44d2 partCode04__state1 L
-11:44ef partCode04__delete L
-11:44f2 partCode04__state0 L
+11:44cc partCode04_hook -
 11:4500 partCode05 -
 11:4514 partCode05__normalStatus L
 11:4519 partCode05__state0 L
