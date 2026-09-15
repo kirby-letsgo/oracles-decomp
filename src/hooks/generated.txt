@@ -4943,10 +4943,7 @@
 11:4500 partCode05_hook -
 11:4550 partCode06_hook -
 11:4642 partCode07_hook -
-11:46a8 partCode08 -
-11:46ba partCode08__state1 L
-11:46dc partCode08__spawnLightableTorch L
-11:4704 partCode08__state0 L
+11:46a8 partCode08_hook -
 11:4724 partCode09 -
 11:472b partCode09__state1 L
 11:476a partCode09__somethingOnButton L

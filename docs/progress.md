@@ -448,6 +448,21 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 195, bank 11 (1 root routine): ported
+  `object_code/common/parts/darkRoomHandler.s` (`partCode08`, `darkRoomHandler.c`) — the dark-room
+  torch-lighting palette handler: brightens or darkens the room's palette (fully or incrementally)
+  based on how many lightable torches are currently lit versus the room's total. Two locals with no
+  independent hook row (`state0`, `spawnLightableTorch`) are each reached via a genuine conditional
+  `call z` from a caller that does NOT push, and each ends via its own literal `ret` with no
+  tail-jump out — modeled with a bare `CYC`+`return` at their own final `ret`, never `RET`/
+  `RET_TAKEN` (whose `ret_effect()` would otherwise pop a stack no one pushed, the exact bug class
+  found and fixed two batches ago in `partCommonCode.c`). `spawnLightableTorch` additionally uses a
+  real `push hl`/`push bc` pair as pure local scratch storage, unrelated to and safely coexisting
+  with that call/return-address reasoning. Zero bugs found on both self-review and independent
+  review. Bank 11 is 128/651 and the project 4,341/9,901. Gates: lint 0, 30k verify 0 failures with
+  state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with
+  state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 194, bank 11 (1 root routine): ported
   `object_code/common/parts/shadow.s` (`partCode07`, `shadow.c`) — the parent-following shadow
   part: deletes itself if its parent object's ID changed, otherwise tracks the parent's position
