@@ -1029,3 +1029,12 @@
 0b:6a75 interactionCodeb5__substate0
 0b:6a8b interactionCodeb5__substate1
 0b:6aad interactionCodeb5__substate2
+0b:677e interactionCodeb2__state1
+0b:67b5 interactionCodeb2__state0
+0b:68c5 interactionCodeb4__state0
+0b:68f9 interactionCodeb4__state1
+0b:6907 interactionCodeb4__activatedBook
+0b:6938 interactionCodeb4__state2
+0b:6951 interactionCodeb4__state3
+0b:6996 interactionCodeb4__state4
+0b:69ce interactionCodeb4__func_69ce

@@ -4557,6 +4557,10 @@ interactionCodebb__state1
 interactionCodeda
 interactionCodeda__state0
 interactionCodeda__state1
+interactionCodeb1
+interactionCodeb2
+interactionCodeb2__state1
+interactionCodeb2__state0
 interactionCodeb3
 interactionCodeb3__state0
 interactionCodeb3__incState
@@ -4564,6 +4568,14 @@ interactionCodeb3__state1
 interactionCodeb3__state2
 interactionCodeb3__state3
 interactionCodeb3__state4
+interactionCodeb4
+interactionCodeb4__state0
+interactionCodeb4__state1
+interactionCodeb4__activatedBook
+interactionCodeb4__state2
+interactionCodeb4__state3
+interactionCodeb4__state4
+interactionCodeb4__func_69ce
 interactionCodeb5
 interactionCodeb5__state0
 interactionCodeb5__state1
