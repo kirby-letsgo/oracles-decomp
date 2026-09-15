@@ -448,6 +448,25 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 201, bank 11 (1 root routine): ported
+  `object_code/common/parts/seedOnTree.s` (`partCode10`, `seedOnTree.c`) — the seed-bearing tree
+  part: on being hit, sets its state to give a seed; five states set up appearance, sit idle, move
+  toward/give itself to Link on collision, and (via a substate dispatcher) either teach the seed
+  type the first time it's obtained or just give it directly, before deleting itself and possibly
+  poking a related object; a "dead" (satchel-check) path either shows a get-the-satchel message or
+  knocks itself off the tree to fall and be picked up. `@giveSeed` (straight-line, no `ret` at all)
+  is reached two genuinely different ways — a plain `jr` tail-hand-off from one state (never
+  returns to that state's own context) and a genuine `call` from another (does expect to resume
+  afterward, traced by hand through `giveTreasure`'s own eventual real `ret`) — caught and fixed a
+  real bug before self-review even began: the first draft treated both reach points identically,
+  which would have made the tail-hand-off path incorrectly execute code real hardware never reaches
+  from there. All four RST call sites (two `rst $00`, one `rst $18`, one `rst $10`) correctly
+  include their own cycle burn on the first attempt, applying the lesson from the previous two
+  batches. Independent review came back completely clean. Bank 11 is 134/651 and the project
+  4,347/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference
+  replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and
+  quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 200, bank 11 (1 root routine): ported
   `object_code/common/parts/respawnableBush.s` (`partCode0f`, `respawnableBush.c`) — the
   respawning cuttable bush: on being cut, sets the "cut" tile, has a 50/50 chance of spawning an

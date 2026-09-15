@@ -1433,3 +1433,19 @@ desync to discover; keep them when porting routines.
   annotation is what caught it. Lesson: when writing an RST call site, treat it exactly like a
   `call`/`jp` for burn purposes — one line for the RST's own bytes — before the line that invokes
   the helper, never assume the helper's internal push/pop covers it.
+- When a tiny shared local is reached BOTH via a plain `jr`/tail-transfer AND via a genuine `call`
+  needing return-continuation, don't default to treating every reach point the same way — trace
+  each ROM instruction that reaches the local individually and ask "does real hardware ever come
+  back to the code right after THIS SPECIFIC transfer." `seedOnTree.s`'s `@giveSeed` (straight-line,
+  ends in `jp giveTreasure`, no `ret` anywhere) is reached two genuinely different ways: `@substate0`
+  tail-jumps into it with `jr @giveSeed` (a one-way hand-off — nothing on real hardware ever comes
+  back to `@substate0`'s own context after this), while `@giveSeedAndSomething` reaches it via a
+  genuine `call $4a8a` and DOES expect execution to resume at `@relatedObj2Something` afterward
+  (traced by hand: `giveTreasure`'s own eventual real `ret` pops whatever this specific `call`
+  pushed). The first draft used the "push + fall through to `@relatedObj2Something`" treatment for
+  BOTH reach points, which would have made `@substate0`'s plain tail-jump path incorrectly execute
+  `@relatedObj2Something`'s code too — code real hardware never reaches from that path at all. Caught
+  by re-reading the `.s` source's own control flow before self-review even began, not by the
+  automated gate. The general rule: a shared local's correct call-site treatment is a property of
+  each *edge* reaching it (call vs. jr/jp vs. fallthrough), never a property of the local itself —
+  don't generalize from one caller's shape to another's.
