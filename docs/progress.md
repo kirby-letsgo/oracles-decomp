@@ -448,6 +448,15 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-16: milestone 3 phase 6 batch 257, bank 11 (1 root routine): ported
+  `object_code/ages/parts/ramrockSeedFormOrb.s` (`partCode4f`, `ramrockSeedFormOrb.c`) —
+  the orb fired by Ramrock's seed-form attack: a spawn state, a tracking state waiting for
+  the related object to reach the right animation frame before aiming and speeding toward
+  Link, and a homing state nudging its angle toward Link every 10 frames while applying
+  speed and deleting once it leaves the screen. Zero bugs found by self-review or
+  independent review. Bank 11 is 218/651 and the project 4,431/9,918. Gates: lint 0, 30k
+  verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
 - 2026-09-16: milestone 3 phase 6 batch 256, bank 11 (1 root routine): ported
   `object_code/ages/parts/smogProjectile.s` (`partCode4a`, `smogProjectile.c`) — the
   projectile fired by a Smog enemy: a spawn state aiming toward Link and, for the large

@@ -5114,12 +5114,7 @@
 11:79d2 func_79d2_hook -
 11:79d9 func_79d9_hook -
 11:79e5 partCode4a_hook -
-11:7a5f partCode4f -
-11:7a69 partCode4f__state0 L
-11:7a78 partCode4f__state1 L
-11:7a99 partCode4f__state2 L
-11:7aa9 partCode4f__func_7aa9 L
-11:7ab0 partCode4f__delete L
+11:7a5f partCode4f_hook -
 11:7ab3 partCode54 -
 11:7ad3 func_7ad3 -
 11:7adb func_7adb -
