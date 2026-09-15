@@ -5119,15 +5119,7 @@
 11:7ad3 func_7ad3_hook -
 11:7adb func_7adb_hook -
 11:7b0a func_7b0a_hook -
-11:7b1f partCode55 -
-11:7b46 partCode55__normalStatus L
-11:7b52 partCode55__state0 L
-11:7b60 partCode55__state1 L
-11:7b78 partCode55__animate L
-11:7b7b partCode55__zPositions L
-11:7b7f partCode55__state2 L
-11:7b8a partCode55__state3 L
-11:7b9d partCode55__gotoState2 L
+11:7b1f partCode55_hook -
 11:7bab partCode56_hook -
 11:7d6c partCode57 -
 11:7d7e partCode57__state0 L

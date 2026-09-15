@@ -448,6 +448,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-16: milestone 3 phase 6 batch 259, bank 11 (1 root routine): ported
+  `object_code/ages/parts/octogonBubble.s` (`partCode55`, `octogonBubble.c`) — the bubble
+  fired by an Octogon enemy: an entry check for a Link collision that, when Link is
+  vulnerable, immobilizes him and switches the bubble to a collided state; a 4-state RST
+  $00 dispatch (spawn, float forward with a 4-entry sine-like z-position table, wait for the
+  destroy animation to finish, then take Link's position while collided and animate once he
+  starts standing back up). Zero bugs found by self-review or independent review. Bank 11 is
+  223/651 and the project 4,436/9,923. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
 - 2026-09-16: milestone 3 phase 6 batch 258, bank 11 (4 root routines): ported
   `object_code/ages/parts/roomOfRitesFallingBoulder.s` (`partCode54` + `func_7ad3` +
   `func_7adb` + `func_7b0a`, `roomOfRitesFallingBoulder.c`) — four independently-registered
