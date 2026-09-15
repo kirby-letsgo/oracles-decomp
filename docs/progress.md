@@ -448,6 +448,40 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 189, bank 11 (1 root routine): ported
+  `object_code/common/parts/enemyDestroyed.s` (`partCode02`, `enemyDestroyed.c`) — the generic
+  enemy-destroyed part (animate, alternate a decoration OAM flag every other frame, wait for a
+  death-animation-parameter signal, then decide and spawn an item drop or delete). Two locals with
+  no independent hook row, each reached via a genuine `call`/`call z` from the root with no further
+  internal dispatch of their own — modeled with the established `push_effect(gb, ra); helper(gb);`
+  pattern (matching `itemDrop.c`'s `getRelatedObj1ID` precedent), continuing inline afterward with
+  no `return;` at the call site. Self-review caught two real bugs before compiling: a 3-byte
+  `ld a,($cc00)` instruction mis-modeled as spanning 4 bytes (absorbing the following `rrca`), which
+  shifted every subsequent address in that block by one and dropped a cycle burn entirely; and a
+  conditional `call c,partSetAnimation` inside the local's own taken-branch that used plain
+  `CALL_C` (always burns not-taken timing) instead of `CALL_C_CC` (burns taken timing via `CYCT`) —
+  caught by independent review, not self-review, since it's a pure cycle-count bug the
+  address-coverage diff can't see (identical byte range either way). Bank 11 is 122/651 and the
+  project 4,335/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6, bank 11 bugfix: found and fixed a real stack-corruption bug in
+  the previous batch's `partCommonCode.c` (`commonCode_checkOutOfBounds_roundAngleToDiagonal`) — a
+  local helper reached via a genuine `call` with no `push_effect` at the call site was incorrectly
+  using `RET`/`RET_TAKEN` (which unconditionally pop the emulated stack) instead of plain
+  `CYC`+bare-`return`. This popped an unrelated outer caller's legitimately-pushed return address
+  every time the code path executed, permanently shifting `gb->sp` by 2 bytes — a bug that survived
+  the original batch's full gate (build, lint, ctest, 30k verify, 290,174-frame full replay,
+  independent review) undetected, since `partCommon_checkOutOfBounds` is apparently never exercised
+  by the recorded TAS movie. Found only while reasoning through why a sibling local in the same file
+  safely uses the same macro. An audit of all 10 files written this session (independent agent)
+  found no other instances. Fixed to match the already-established `ball_func_6b00` precedent (no
+  push at the call site, no `RET`/`RET_TAKEN` inside, just `CYC`/`CYCT` plus bare `return`). Gates
+  re-verified green after the fix: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal
+  and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 187, bank 11 (12 root routines): ported
   `object_code/common/parts/commonCode.s` (`partCommonCode.c`) — the shared "part common" utility
   library used by nearly every other file in this bank: tile-collision-in-front/at-angle checks

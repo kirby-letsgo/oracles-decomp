@@ -1360,3 +1360,18 @@ desync to discover; keep them when porting routines.
   the nearest real `call`/`CALL_C` and confirm it actually pushed a return address meant to survive
   to this exact point — if the immediate call site is a bare, unpushed function call, the helper's
   own returns must be plain `CYC`+`return`, never the macro.
+- `CALL_C(a, fn, target, ra)` always burns via plain `CYC` (`burn_rom(..., false)`, the not-taken
+  cost) — it is only correct for an *unconditional* `call`. When the ROM's `call` is conditional
+  (`call z`/`call c`/etc.) and the surrounding C code is already inside the `if (F & FZ/FC)` taken
+  branch (i.e., only reached when the call actually executes), the call site must use
+  `CALL_C_CC(a, fn, target, ra)` instead, which burns via `CYCT` (the taken cost) — using plain
+  `CALL_C` here silently burns 3 cycles for what's actually a 6-cycle taken conditional call
+  (`enemyDestroyed_initialize_hook`'s `call c,partSetAnimation` had exactly this bug). This is a
+  pure cycle-accuracy bug that neither the address-coverage diff nor a full-game state-hash replay
+  will reliably catch: the byte range is identical either way (`CYC(a,a+3)` vs `CYCT(a,a+3)`, same
+  addresses), only the burned cycle *count* differs, and a hash mismatch only manifests if the
+  extra/missing 3 cycles shift something frame-timing-sensitive within the recorded movie's actual
+  exercised paths. Self-review must check every `CALL_C`/`CALL_C_CC` site against whether the ROM
+  mnemonic was `call` (always `CALL_C`) or `call cc` (branch-dependent: `CALL_C_CC` inside the taken
+  branch, plain `CYC(a,a+3)` — no call at all — on the not-taken path), the same way flag polarity
+  and byte-range get checked, not just "was some CALL_C-family macro used at all."

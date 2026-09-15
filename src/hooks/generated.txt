@@ -4937,9 +4937,7 @@
 11:43cc itemDrop_chooseRandomFairyMovement_hook -
 11:4401 itemDrop_moveTowardPoint_hook -
 11:441e itemDrop_applySpeed_hook -
-11:4441 partCode02 -
-11:4470 partCode02__initialize L
-11:447e partCode02__decCounter2 L
+11:4441 partCode02_hook -
 11:4486 partCode03 -
 11:44a1 partCode03__notJustHit L
 11:44a6 partCode03__state0 L

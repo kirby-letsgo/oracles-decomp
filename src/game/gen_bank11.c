@@ -355,62 +355,6 @@ L_7f52:
   I(0x7f61, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
-// 11:4441
-void partCode02(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4441, 2); E = 0xc4;  // ld e,$c4
-  I(0x4443, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4444, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { CALL(0x4445, partCode02__initialize, 0x4470, 0x4448); } else I(0x4445, 3);  // call z,$4470
-  CALL(0x4448, partAnimate_hook, 0x2978, 0x444b);  // call $2978
-  I(0x444b, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
-  I(0x444e, 1); alu_rrca(gb);  // rrca
-  if ((F & FC)) { I(0x444f, 3); goto L_4457; } I(0x444f, 2);  // jr c,$4457
-  I(0x4451, 2); E = 0xdc;  // ld e,$dc
-  I(0x4453, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4454, 2); alu_xor(gb, 0x01);  // xor $01
-  I(0x4456, 2); mem_wr(gb, DE, A);  // ld (de),a
-L_4457:
-  I(0x4457, 2); E = 0xe1;  // ld e,$e1
-  I(0x4459, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x445a, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x445b); return; } I(0x445b, 2);  // ret z
-  CALL(0x445c, partCode02__decCounter2, 0x447e, 0x445f);  // call $447e
-  I(0x445f, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4460, 1); alu_rlca(gb);  // rlca
-  if ((F & FC)) { I(0x4461, 4); if (hook_enabled_at(0x3ea1)) { partDelete_hook(gb); return; } HANDOFF(0x3ea1); } I(0x4461, 3);  // jp c,$3ea1
-  I(0x4464, 1); alu_xor(gb, A);  // xor a
-  CALL(0x4465, decideItemDrop_hook, 0x16eb, 0x4468);  // call $16eb
-  if ((F & FZ)) { I(0x4468, 4); if (hook_enabled_at(0x3ea1)) { partDelete_hook(gb); return; } HANDOFF(0x3ea1); } I(0x4468, 3);  // jp z,$3ea1
-  I(0x446b, 2); B = 0x01;  // ld b,$01
-  I(0x446d, 4); if (hook_enabled_at(0x21b0)) { objectReplaceWithID_hook(gb); return; } HANDOFF(0x21b0);  // jp $21b0
-}
-
-// 11:4470
-void partCode02__initialize(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4470:
-  I(0x4470, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4471, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4472, 2); E = 0xed;  // ld e,$ed
-  I(0x4474, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4475, 1); alu_rlca(gb);  // rlca
-  I(0x4476, 2); A = 0x01;  // ld a,$01
-  if ((F & FC)) { CALL(0x4478, partSetAnimation_hook, 0x2988, 0x447b); } else I(0x4478, 3);  // call c,$2988
-  I(0x447b, 4); if (hook_enabled_at(0x1e69)) { objectSetVisible82_hook(gb); return; } HANDOFF(0x1e69);  // jp $1e69
-}
-
-// 11:447e
-void partCode02__decCounter2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_447e:
-  I(0x447e, 2); E = 0xc7;  // ld e,$c7
-  I(0x4480, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4481, 1); alu_rrca(gb);  // rrca
-  if (!(F & FC)) { RET_TAKEN(0x4482); return; } I(0x4482, 2);  // ret nc
-  I(0x4483, 4); if (hook_enabled_at(0x24b3)) { decNumEnemies_hook(gb); return; } HANDOFF(0x24b3);  // jp $24b3
-}
-
 // 11:4486
 void partCode03(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
