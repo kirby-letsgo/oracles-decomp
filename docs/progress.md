@@ -448,6 +448,19 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 242, bank 11 (3 root routines): ported
+  `object_code/ages/parts/veranProjectile.s` (`partCode37` + `veranProjectile_subid0` +
+  `veranProjectile_subid1`, `veranProjectile.c`) — Veran's projectile attack: a thin dispatcher
+  (`partCode37`) that tail-jumps to `veranProjectile_subid1` (an individual fired projectile,
+  its own 3-state RST $00 dispatch) or falls straight through into `veranProjectile_subid0`
+  (the "core" spawner, also its own 3-state RST $00 dispatch, firing new projectiles every 8
+  frames at an angle derived from its own counter1). All three routines are independently
+  registered (non-`HOOK_LOCAL`), so this is three separate top-level `_hook` functions in one
+  file, wired together with bare tail-calls (`jp`/fallthrough, no `push_effect` needed) rather
+  than the goto-inlining used for `HOOK_LOCAL` blocks. Zero bugs found by self-review or
+  independent review. Bank 11 is 201/651 and the project 4,414/9,901. Gates: lint 0, 30k verify
+  0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over
+  289,869 frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
 - 2026-09-15: milestone 3 phase 6 batch 241, bank 11 (1 root routine): ported
   `object_code/ages/parts/candleFlame.s` (`partCode36`, `candleFlame.c`) — the flame effect on a
   lit candle enemy: verifies the related object is still a candle (else deletes), a 3-state RST

@@ -4445,3 +4445,6 @@ partCode33
 func_65d5
 partCode34
 partCode36
+partCode37
+veranProjectile_subid0
+veranProjectile_subid1
