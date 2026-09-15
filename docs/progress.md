@@ -448,6 +448,20 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 215, bank 11 (1 root routine): ported
+  `object_code/common/parts/cuccoAttacker.s` (`partCode22`, `cuccoAttacker.c`) — the cucco's
+  attacker projectile: 3-state RST $00 dispatch spawning at a random screen edge with a random
+  speed/angle toward the target (four RST $10 `addAToHl` table lookups into `@speedVals`,
+  `@xOrYVals` used twice, and `@screenEdgePositions`), then counting down and animating until
+  screen-boundary exit deletes it. Single root, no independently-registered locals, no literal
+  `ret` anywhere in the whole routine (every exit is a `jp` tail-call or consumed by the RST $00
+  dispatch's self-canceling push), so the newly-found CALL_C/`ret_effect` bug class does not apply
+  here. Proactively re-derived the `bit 0,b`/`jr nz` polarity from `BIT`'s actual flag semantics
+  rather than pattern-matching. Zero bugs found by independent review. Bank 11 is 157/651 and the
+  project 4,370/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 214, bank 11 (4 root routines): ported
   `object_code/common/parts/moblinBoomerang.s` (`partCode21` + `func_53f5` + `func_541a` +
   `func_542a`, `moblinBoomerang.c`) — the moblin's boomerang projectile. All three locals have

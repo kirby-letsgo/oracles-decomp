@@ -4984,14 +4984,7 @@
 11:53f5 func_53f5_hook -
 11:541a func_541a_hook -
 11:542a func_542a_hook -
-11:5439 partCode22 -
-11:5443 partCode22__state0 L
-11:549c partCode22__state1 L
-11:54a5 partCode22__state2 L
-11:54ab partCode22__applySpeedAndAnimate L
-11:54b1 partCode22__screenEdgePositions L
-11:54b5 partCode22__xOrYVals L
-11:54d5 partCode22__speedVals L
+11:5439 partCode22_hook -
 11:54de partCode23 -
 11:54ea partCode23__subid0 L
 11:54f6 partCode23__func_54f6 L
