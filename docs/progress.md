@@ -448,6 +448,27 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 217, bank 11 (1 root routine): ported
+  `object_code/common/parts/lighting.s` (`partCode27`, `lighting.c`) — the lightning bolt part:
+  spawns aimed at the enemy target when one exists, then either strikes (playing a sound and
+  becoming visible) or animates through its lifetime, running a private helper twice per frame
+  that derives collision/position offsets from its animation-parameter nibbles and can spawn a
+  companion interaction via `getFreeInteractionSlot`. Two private (`HOOK_LOCAL`) sub-labels,
+  `func_55a6` and `func_55e7`, are each reached via a genuine `call`/`call nz` — confirmed (by
+  direct `generated.txt` diffing) that their standalone hook entries are removed once `partCode27`
+  is registered, so they were inlined via `goto` with explicit `push_effect` for each call site.
+  The first draft treated their tail-jumps into already-hooked external routines
+  (`setScreenShakeCounter`, `objectCopyPositionWithOffset`) as terminal exits, which silently
+  dropped `partCode27_hook`'s own remaining logic whenever that path was taken — a real bug caught
+  not by self-review, not by independent review, not by the 30k-frame verify pass, but by the
+  short `test_tas` ctest failing with a state mismatch at frame 10560. Fixed by having the
+  tail-jump call the external hook and then `goto` the correct resume label, since on real
+  hardware the external routine's own `ret` pops the same return address pushed for the original
+  call. Two new porting-notes.md lessons recorded. Bank 11 is 161/651 and the project 4,374/9,901.
+  Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
+  suites 8/8 (including the short TAS ctest that first caught the bug).
+
 - 2026-09-15: milestone 3 phase 6 batch 216, bank 11 (3 root routines): ported
   `object_code/common/parts/fallingFire.s` (`partCode23` + `func_5535` + `func_553f`,
   `fallingFire.c`) — falling fire from a torch/ceiling: RST $00 dispatch across three subids

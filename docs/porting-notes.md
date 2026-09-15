@@ -1537,3 +1537,33 @@ desync to discover; keep them when porting routines.
   of the same address *before* it gets deleted by the rewrite, since it mechanically encodes the
   correct push/pop/ret shape for every instruction and is the fastest way to sanity-check a local's
   stack-effect treatment against ground truth.
+- **A `HOOK_LOCAL` private label reached via a genuine `call` gets its standalone `generated.txt`
+  entry REMOVED once its containing routine is registered in `rewritten.txt`** (confirmed by
+  direct before/after `grep` on `generated.txt`) — meaning `hook_enabled_at()` will return false
+  for that address forever after, so `CALL_C`/`CALL_C_CC` targeting it would silently fall back to
+  raw ROM interpretation (`asm_call`) instead of ever invoking a hand-written C function there. The
+  correct treatment is to fully inline the local's logic into the parent via `goto` labels — but if
+  the label is reached via a genuine `call` (not just `jr`/fallthrough), real hardware DID push a
+  return address for it, and that must be modeled explicitly: `push_effect(gb, <return_addr>)`
+  right before the `goto` into the inlined label. The label's own "return to caller" exit (a
+  literal `ret`/`ret cc`) then does `ret_effect(gb); goto <resume_label>;` — NOT `RET_TAKEN(...);
+  return;`, since a bare `return` would exit the WHOLE containing hook function instead of
+  continuing the caller's remaining inlined code, silently dropping real logic downstream of the
+  original call site.
+- **The inlined label's own tail-jump to an already-hooked EXTERNAL routine is not a terminal exit
+  either, when the label was reached via a genuine `call`** — on real hardware, `jp` doesn't touch
+  the stack, so the external routine's own eventual `ret` pops the SAME return address that was
+  pushed for the original call into the inlined label, meaning execution architecturally resumes
+  back inside the caller, not wherever the external routine's own top-level caller happens to be.
+  So the tail-jump must be modeled as `external_hook(gb); goto <resume_label>;` — plain function
+  call followed by `goto`, never `external_hook(gb); return;`. Both of these lessons were found
+  together in `lighting.c`'s `func_55a6`/`func_55e7` (two `HOOK_LOCAL` labels, each reached via a
+  genuine call, each with one `ret`-exit and one tail-jump-exit): the first draft treated the
+  tail-jump exits as terminal (`return;`), which silently skipped `partCode27_hook`'s own remaining
+  logic (the code right after the original call sites) whenever that path was taken — caught not by
+  self-review, not by independent review, not by the 30k-frame `--verify-hooks-continue` pass, but
+  by the SHORT `test_tas` ctest failing with a real state mismatch at frame 10560, far earlier than
+  any other bug this whole project has surfaced. This is a stark reminder that the fast ctest is not
+  a "smoke test to skip past" — it can catch bugs the longer, more expensive replays miss entirely
+  if the divergence happens to occur outside their exercised window, and every gate stage genuinely
+  catches different bug classes.

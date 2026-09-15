@@ -4901,14 +4901,7 @@
 11:5e58 updateParts_hook -
 11:403b partCommon_standardUpdate_hook -
 11:5e8a func_11_5e8a_hook -
-11:5553 partCode27 -
-11:555d partCode27__state0 L
-11:5580 partCode27__state1 L
-11:558e partCode27__state2 L
-11:55a6 partCode27__func_55a6 L
-11:55da partCode27__table_55da L
-11:55e2 partCode27__table_55e2 L
-11:55e7 partCode27__func_55e7 L
+11:5553 partCode27_hook -
 11:6124 partCode2b -
 11:6131 partCode2b__state1 L
 11:6150 partCode2b__relatedObj1_stateLessThan3 L
