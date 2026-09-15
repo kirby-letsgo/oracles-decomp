@@ -448,6 +448,10 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 194, bank 0b (11 routines): added banana, pirate-captain,
+  and create-object-at-each-tileindex interaction paths. The quirk build caught `alu_add` being
+  treated as a value-returning helper; it mutates A in place. All replay and test gates passed.
+
 - 2026-09-15: milestone 3 phase 6 batch 193, bank 0b (5 routines): added the wooden-tunnel
   dispatcher and its state/solidity paths. Bank 0b is 53/819 and the project is 4,534/9,544.
   Lint, 30k verification, full reference replay, and both normal and quirk suites passed.

@@ -975,6 +975,14 @@
 0b:401e interactionCode98__state1
 0b:403e interactionCode98__makeSolid
 0b:4040 interactionCode98__setSolidity
+0b:48c0 interactionCodec0__state0
+0b:48c6 interactionCodec0__afterCall48c6
+0b:48c9 interactionCodec0__state1
+0b:48f8 interactionCodec0__updatePosition
+0b:7354 interactionCodec3__afterCall7354
+0b:4921 interactionCodec7__createObject
+0b:494d interactionCodec7__ret
+0b:4950 interactionCodec7__spawnObjectType
 09:6c08 interactionCode59__loadScriptAndInitGraphics
 09:6c0b interactionCode59__afterCall6c0b
 09:6be7 interactionCode59__afterCall6be7

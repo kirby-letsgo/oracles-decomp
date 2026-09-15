@@ -3542,6 +3542,10 @@ interactionCode98__makeSolid
 interactionCode98__setSolidity
 interactionCodeb7
 interactionCodec0
+interactionCodec0__state0
+interactionCodec0__afterCall48c6
+interactionCodec0__state1
+interactionCodec0__updatePosition
 interactionCodec7
 interactionCodece
 interactionCodecf
@@ -3633,6 +3637,11 @@ interactionCodebf
 interactionCodec1
 interactionCodec2
 interactionCodec3
+interactionCodec3__afterCall7354
+interactionCodec7
+interactionCodec7__createObject
+interactionCodec7__ret
+interactionCodec7__spawnObjectType
 interactionCodec4
 interactionCodec5
 interactionCodec6
