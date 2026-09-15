@@ -5029,11 +5029,7 @@
 11:64bf partCode32_hook -
 11:64dd partCode33_hook -
 11:65d5 func_65d5_hook -
-11:65e9 partCode34 -
-11:6616 partCode34__state0 L
-11:662c partCode34__state1 L
-11:665c partCode34__state2 L
-11:666f partCode34__state3 L
+11:65e9 partCode34_hook -
 11:6686 partCode35_hook -
 11:693b func_693b_hook -
 11:6956 state0func_6956_hook -
