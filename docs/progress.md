@@ -448,6 +448,18 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 247, bank 11 (1 root routine): ported
+  `object_code/ages/parts/headThwompBombDropper.s` (`partCode40`, `headThwompBombDropper.c`) —
+  the bomb dropped by the Head Thwomp miniboss: verifies the related object is still the
+  thwomp itself (else deletes), applies gravity until it either lands (then falls into
+  `objectApplySpeed`/copies the dropper's position and continues) or times out, and a spawn
+  state that picks a random horizontal speed and vertical velocity pair from two 4-entry
+  tables via `rst_addAToHl`, plus a random horizontal angle offset. Caught and fixed one
+  self-review mistake before building (`alu_swap` misused as a void mutator instead of using
+  its return value). Zero further bugs found by self-review or independent review. Bank 11 is
+  206/651 and the project 4,419/9,906. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
 - 2026-09-15: milestone 3 phase 6 batch 246, bank 11 (1 root routine): ported
   `object_code/ages/parts/3e.s` (`partCode3e`, `partCode3e.c`) — tracks the enemy index of
   every loaded Ambi Guard in `Part.var30-3f`: a 4-state RST $00 dispatch (state0 scans the
