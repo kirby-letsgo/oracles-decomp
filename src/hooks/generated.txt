@@ -5072,11 +5072,7 @@
 11:70a7 blueStalfosProjectile_checkCollidedWithStalfos_hook -
 11:70b9 blueStalfosProjectile_explode_hook -
 11:70e3 blueStalfosProjectile_hitLink_hook -
-11:70ed partCode3e -
-11:70f9 partCode3e__state0 L
-11:7110 partCode3e__state1 L
-11:7129 partCode3e__state2 L
-11:714b partCode3e__state3 L
+11:70ed partCode3e_hook -
 11:7153 partCode3f_hook -
 11:7169 kingMoblinBomb_state0_hook -
 11:719f common_kingMoblinBomb_state1_hook -

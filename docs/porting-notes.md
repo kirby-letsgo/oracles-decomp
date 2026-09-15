@@ -1653,3 +1653,16 @@ desync to discover; keep them when porting routines.
   is a straightforward generalization of the earlier single-target pattern, not a new mechanism —
   recognize it whenever a `grep`/reachability trace shows more than one genuine `call` converging
   on the same `HOOK_LOCAL` block from within the same file.
+- **A genuine backward-branching loop (source-level relative labels `-`/`+` resolving to an
+  EARLIER address, e.g. `jr c,-`) is just a `goto` back to an already-emitted `L_<addr>:` label —
+  no new mechanism needed beyond what forward branches already use.** Established in `partCode3e.c`
+  (`3e.s`), the first file this session with real loops instead of purely straight-line/forward
+  control flow: three `jr c`/`jr nz` sites branch backward to re-enter a scan loop (walking the
+  enemy table by incrementing `H` from `FIRST_ENEMY_INDEX` to `LAST_ENEMY_INDEX`, or scanning
+  `Part.var30-3f`). Each loop-back target was double-checked against the source's own `-`/`+`
+  local-label resolution (the nearest preceding/following anonymous label) rather than assumed from
+  the C label's textual position, since a `goto` compiles either direction with no diagnostic if the
+  wrong `L_<addr>:` is targeted. Also confirmed in this file: `ldhl X, Y` (from
+  `include/macros.s`) compiles to a literal 16-bit immediate `ld hl, (X<<8)|Y` with no runtime
+  computation — model it as a plain `SET_HL(0x....)`, not a named-constant lookup, even though it
+  looks like two named constants (`FIRST_ENEMY_INDEX, Enemy.id`) were combined at "runtime."
