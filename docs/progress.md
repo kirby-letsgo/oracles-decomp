@@ -448,6 +448,22 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 206, bank 11 (1 root routine): ported
+  `object_code/common/parts/fireProjectiles.s` (aliased labels `partCode19`/`partCode31` —
+  PART_ZORA_FIRE / PART_GOPONGA_PROJECTILE at the same ROM address; canonical hook name
+  `partCode19_hook` per `ages.sym` label order, `partCode19` registered in `rewritten.txt`,
+  `fireProjectiles.c`) — a homing projectile: `state0` sets up its counter/speed and makes it
+  visible; `state1` decrements a shared counter and, once it expires, computes its travel angle
+  either toward a stored target position (goponga seed pod, read from `hFFB2`/`hFFB3`) or toward
+  the nearest enemy (zora fire, via `objectGetAngleTowardEnemyTarget_hook`), gated by a bit in
+  `Part.subid`; `state2` flips an OAM flip-flag every 4th frame, applies speed, and deletes itself
+  or animates depending on whether it left the screen boundary. Independent review found one
+  cosmetic nit (raw `0xffb2`/`0xffb3` instead of the named `hFFB2`/`hFFB3` constants already used
+  elsewhere in the project) and no functional bugs; fixed and re-verified. Bank 11 is 140/651 and
+  the project 4,353/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`,
+  full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 205, bank 11 (1 root routine): ported
   `object_code/common/parts/octorokProjectile.s` (`partCode18`, `octorokProjectile.c`) — the
   octorok rock projectile: deletes itself on a specific status, or resets to state 2 if idle too

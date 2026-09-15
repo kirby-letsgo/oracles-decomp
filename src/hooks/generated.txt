@@ -4967,10 +4967,7 @@
 11:4f59 partCode17_hook -
 11:5010 func_5010_hook -
 11:5026 partCode18_hook -
-11:506d partCode19 -
-11:507a partCode31__state0 L
-11:5088 partCode31__state1 L
-11:50a8 partCode31__state2 L
+11:506d partCode19_hook -
 11:50c1 partCode1a -
 11:50cc partCode1a__normalStatus L
 11:50d4 partCode1a__subid0 L
