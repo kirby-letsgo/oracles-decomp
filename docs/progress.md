@@ -448,6 +448,13 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 191, bank 0b (16 routines): added the Bipin/Blossom
+  family-spawner dispatcher, its child-stage/personality table entries, and the shared
+  exclamation-mark/floating-image constructors. The table-local aliases are durable readable
+  hooks so table dispatch cannot resume in generated code. Bank 0b is 40/825 and the project is
+  4,521/9,546. Lint, 30k verification, full reference replay, and both normal and quirk suites
+  passed.
+
 - 2026-09-15: milestone 3 phase 6 batch 190, bank 0b (5 routines): added the Game Complete
   dialogue, Kiss Heart, and interaction $CF state/script paths, including durable post-graphics
   continuations for the call-return boundaries. Bank 0b is 25/836 and the project is

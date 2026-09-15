@@ -266,11 +266,11 @@
 
 <script>
   const INITIAL = {
-    updatedAt: "2026-09-15T06:10:00Z",
+    updatedAt: "2026-09-15T06:30:00Z",
     status: "idle",
     statusDetail: "",
-      totalHooks: 9557,
-      rewrittenTotal: 4505,
+      totalHooks: 9546,
+      rewrittenTotal: 4521,
     bank0Total: 653,
     bank0Rewritten: 653,
     codeBearingBanks: 23,
@@ -288,6 +288,7 @@ banks: [{"id": "00", "code": true, "total": 653, "rewritten": 653}, {"id": "01",
       { n: 6, name: "Sweep", desc: "Everything left in code/, until no routine is still generated.", status: "active", meta: "remainder" },
     ],
     batches: [
+      { id: "191-B", delta: 16, tag: "Ph.6", text: "Bank 0B: <b>Bipin/Blossom family spawning</b>, child stage/personality table paths, and the shared exclamation/floating-image constructors." },
       { id: "190-B", delta: 5, tag: "Ph.6", text: "Bank 0B: <b>Game Complete dialogue, Kiss Heart, and interaction CF</b> script/state paths, with durable post-graphics continuations." },
       { id: "189-B", delta: 20, tag: "Ph.6", text: "Bank 0B <b>Zora and Great Fairy</b> interaction initialization/state paths, durable thread-switching continuations, and shared-entry wrappers." },
       { id: "212", delta: 2, tag: "Ph.6", text: "Bank 11: ported the wizzrobe projectile (<code>wizzrobeProjectile.s</code>, 2 roots, no ret at all). func_5369 is independently registered but reached only via a jr tail-jump, so it's a bare tail-call with no push. Zero bugs found on either review pass." },
@@ -493,8 +494,8 @@ banks: [{"id": "00", "code": true, "total": 653, "rewritten": 653}, {"id": "01",
   };
   INITIAL.banks[9].total = 277;
   INITIAL.banks[9].rewritten = 277;
-  INITIAL.banks[11].total = 836;
-  INITIAL.banks[11].rewritten = 25;
+  INITIAL.banks[11].total = 825;
+  INITIAL.banks[11].rewritten = 40;
   INITIAL.banks[17].total = 495;
   INITIAL.banks[17].rewritten = 151;
   function fmt(n) { return n.toLocaleString("en-US"); }
