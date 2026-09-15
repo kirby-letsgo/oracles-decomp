@@ -448,6 +448,21 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 197, bank 11 (1 root routine): ported
+  `object_code/common/parts/movingOrb.s` (`partCode0b`, `movingOrb.c`) — the moving orb puzzle
+  piece: on being just hit, toggles a bit in `wToggleBlocksState` and flickers OAM flags; otherwise
+  runs a scripted movement (states 0-7, loading the Ages-specific `bank0e.orbMovementScript`) or
+  one of four directional-approach states (8-B, up/right/down/left) checking whether it's reached
+  its destination coordinate before applying speed or continuing the movement script, or a waiting
+  state (C) counting down before resuming the script. Confirmed the assembled ROM bytes reflect the
+  `.ifdef ROM_AGES` branch (not Seasons) by checking the actual `ld hl,$6b22` immediate against the
+  report. Four near-identical directional state blocks each load a different, sometimes
+  role-swapped, pair of field offsets (E/L) before comparing — verified none were copy-paste
+  inverted between siblings. Zero bugs found on both self-review and independent review. Bank 11 is
+  130/651 and the project 4,343/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 196, bank 11 (1 root routine): ported
   `object_code/common/parts/button.s` (`partCode09`, `button.c`) — the pressable floor button,
   this session's most structurally complex single-root file. A `ret nz` early-exit

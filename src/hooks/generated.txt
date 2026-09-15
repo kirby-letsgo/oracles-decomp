@@ -4945,15 +4945,7 @@
 11:4642 partCode07_hook -
 11:46a8 partCode08_hook -
 11:4724 partCode09_hook -
-11:47d3 partCode0b -
-11:47f4 partCode0b__normalStatus L
-11:4806 partCode0b__state0To7 L
-11:4820 partCode0b__state8_up L
-11:482c partCode0b__state9_right L
-11:4838 partCode0b__stateA_down L
-11:4844 partCode0b__stateB_left L
-11:484e partCode0b__runMovementScript L
-11:4853 partCode0b__stateC_waiting L
+11:47d3 partCode0b_hook -
 11:485b partCode0c -
 11:48b0 partCode0c__state0 L
 11:48b8 partCode0e -
