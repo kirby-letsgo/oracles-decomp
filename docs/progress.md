@@ -448,6 +448,18 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 213, bank 11 (1 root routine): ported
+  `object_code/common/parts/fire.s` (`partCode20`, `partCode20.c`) — the fire keese's fire
+  projectile: while its state is nonzero, decrements counter1 and deletes when it reaches zero,
+  otherwise animates; on first update (state 0) it increments its own state, sets counter1 to
+  0xb4, and makes itself visible. Single root, no locals, no RST dispatch. Self-review caught one
+  byte-length bug before the gate ran: the final `jp objectSetVisible82` end address was written
+  as `0x5396` instead of the correct `0x5395` (jp is always 3 bytes), fixed before any build.
+  Independent review confirmed zero further issues. Bank 11 is 152/651 and the project 4,365/9,901.
+  Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 212, bank 11 (2 root routines): ported
   `object_code/common/parts/wizzrobeProjectile.s` (`partCode1f` + `func_5369`,
   `wizzrobeProjectile.c`) — the wizzrobe's teleporting projectile: deletes when out of bounds or
