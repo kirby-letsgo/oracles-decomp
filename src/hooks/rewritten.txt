@@ -4391,3 +4391,8 @@ partCode1a
 partCode1b
 partCode1c
 partCode1d
+partCode1e
+func_52f4
+func_52fd
+func_5313
+func_5336

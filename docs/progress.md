@@ -448,6 +448,26 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 211, bank 11 (5 root routines): ported
+  `object_code/common/parts/dekuScrubProjectile.s` (`partCode1e` + `func_52f4` + `func_52fd` +
+  `func_5313` + `func_5336`, `dekuScrubProjectile.c`) — the deku scrub's spat seed projectile.
+  All four locals turned out to have their own independent hook-table entries (unlike the usual
+  private-local case), so each became its own `_hook` function: the two genuinely `call`-reached
+  ones (`func_52fd`, `func_5336`) use `CALL_C` at their call sites per the `gashaTree.c` `func_5010`
+  precedent, while the two `jr`-reached ones (`func_52f4`, `func_5313`) are bare tail-calls with no
+  push, per the `octorokProjectile.c` cross-file-tail-jump precedent. All four locals are
+  "round-trip" — reached by exactly one call/CALL_C site each — so every one of their `ret` exits
+  (including two conditional ones in `func_5336`) uses bare `CYC`/`CYCT` + `return` rather than
+  `RET`/`RET_TAKEN`, and both conditional bare-return exits were double-checked to use `CYCT` (not
+  `CYC`) on their taken branch given the `enemySword.c` bug class from the previous batch. Two
+  `bit N,(hl)`/`jr`-or-`ret` polarity pairs were re-derived from `BIT`'s actual Z-means-clear
+  semantics rather than pattern-matched, per the lesson from the same previous batch. Also caught
+  before the gate: `playSound` needed the bank-disambiguated canonical name
+  `playSound_b00_hook`, not a plain `playSound_hook`. Zero bugs found by independent review. Bank
+  11 is 149/651 and the project 4,362/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with
+  state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 210, bank 11 (1 root routine): ported
   `object_code/common/parts/enemySword.s` (`partCode1d`, `enemySword.c`) — the enemy sword-swing
   effect: gates on the related enemy's status, updates counters, sets a hit-lock bit and calls a
