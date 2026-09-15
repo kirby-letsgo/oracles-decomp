@@ -5001,16 +5001,7 @@
 11:58a5 spikedBall_updateStateFromParent_hook -
 11:58c5 spikedBall_chain_updateDistanceFromOrigin_hook -
 11:58f3 partCode30_hook -
-11:592f partCode4b -
-11:594e partCode4d__normalStatus L
-11:5965 partCode4d__state0 L
-11:5996 partCode4d__state1 L
-11:59aa partCode4d__fire L
-11:59b8 partCode4d__state2 L
-11:59c0 partCode4d__animate L
-11:59c3 partCode4d__state3 L
-11:59e5 partCode4d__delete L
-11:59e8 partCode4d__deleteWithPoof L
+11:592f partCode4b_hook -
 11:59ee partCode4c_hook -
 11:5a86 partCode4e_hook -
 11:5ae0 partCode50_hook -

@@ -448,6 +448,25 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 234, bank 11 (1 root routine): ported
+  `object_code/common/parts/twinrovaProjectile.s` (`partCode4b`, `twinrovaProjectile.c`) — the
+  red/blue Twinrova projectile shared by both bosses: reflects off Link's L3 shield, checks
+  whether the firing Twinrova is already dead, then runs a 4-state RST $00 dispatch (spawn,
+  charge-up with parent-position tracking, moving, and same-color-versus-opposite-color
+  collision handling that decrements both twinrovas' health and sets a "twinrova defeated"
+  signal bit). All nine internal state labels are `HOOK_LOCAL` (no external caller reaches them
+  directly), so they're inlined as plain `goto` targets with no `push_effect` needed — the RST
+  $00 jump-table helper is the byte-identical pattern established by `donkeyKongFlame.c`. Caught
+  and fixed one self-review bug before building: three unconditional `jp` tail-calls
+  (`partAnimate`/`partDelete`) were accidentally written with `CYCT` instead of plain `CYC` —
+  `CYCT` is reserved for the taken branch of a true conditional, never an unconditional jump;
+  independent review re-verified no other instance slipped through. Also discovered
+  `partCode4d` is a dead duplicate label at the same address as `partCode4b` in the source (never
+  referenced by the object-code table), so only `partCode4b` was registered — registering both
+  names made lint fail with "partCode4d has no partCode4d_hook entry" since only one hook
+  function exists per address. Bank 11 is 190/651 and the project 4,403/9,901. Gates: lint 0,
+  30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
 - 2026-09-15: milestone 3 phase 6 batch 233, bank 11 (5 root routines): ported
   `object_code/ages/parts/donkeyKongFlame.s` (`partCode2c` + `func_6248` + `func_6256` +
   `func_6261` + `func_6270`, `donkeyKongFlame.c`) — the Donkey Kong minigame's flame hazard: a
