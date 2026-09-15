@@ -4521,3 +4521,11 @@ decideFinalChildPersonality
 label_0b_006
 childSetVar38ToNumEssencesObtained
 spawnBipinBlossomFamilyObjects
+interactionCode9f
+interactionCode9f__state0
+interactionCode9f__afterCall405b
+interactionCode9f__state1
+interactionCodea0
+interactionCodea0__state0
+interactionCodea0__afterCall40a6
+interactionCodea0__state1

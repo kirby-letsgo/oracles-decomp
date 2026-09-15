@@ -965,6 +965,12 @@
 0b:414a interactionCodeac__gotoNextState_2
 0b:414c interactionCodeac__need4Essences
 0b:4154 interactionCodeac__need6Essences
+0b:4050 interactionCode9f__state0
+0b:405b interactionCode9f__afterCall405b
+0b:405e interactionCode9f__state1
+0b:409d interactionCodea0__state0
+0b:40a6 interactionCodea0__afterCall40a6
+0b:40bf interactionCodea0__state1
 09:6c08 interactionCode59__loadScriptAndInitGraphics
 09:6c0b interactionCode59__afterCall6c0b
 09:6be7 interactionCode59__afterCall6be7
