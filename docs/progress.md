@@ -448,6 +448,20 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 200, bank 11 (1 root routine): ported
+  `object_code/common/parts/respawnableBush.s` (`partCode0f`, `respawnableBush.c`) — the
+  respawning cuttable bush: on being cut, sets the "cut" tile, has a 50/50 chance of spawning an
+  item drop, and creates grass debris; a 5-state timer then regrows it through
+  regenerating/ready/normal tiles. `setTileHere` is reached three distinct ways with no push at any
+  of them (a genuine call continuing inline afterward, a `jr` tail-call, and a zero-byte pure
+  fallthrough) — safe because its body never contains a real `ret`/`ret_effect` at all, only a
+  self-balanced local `push af`/`pop af` scratch pair and a final tail-jump into `setTile`, so it
+  behaves correctly regardless of which of the three shapes the caller expects. Zero bugs found on
+  both self-review and independent review — the 200th batch of milestone 3 phase 6. Bank 11 is
+  133/651 and the project 4,346/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 199, bank 11 (1 root routine): ported
   `object_code/common/parts/detectionHelper.s` (`partCode0e`, `detectionHelper.c`) — the guard's
   detection-projectile helper: a 4-subid dispatcher where subid0 (the "controller") tracks its

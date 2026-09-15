@@ -4948,15 +4948,7 @@
 11:47d3 partCode0b_hook -
 11:485b partCode0c_hook -
 11:48b8 partCode0e_hook -
-11:4995 partCode0f -
-11:49bc partCode0f__doneItemDropSpawn L
-11:49c1 partCode0f__normalStatus L
-11:49cf partCode0f__state0 L
-11:49d3 partCode0f__state1 L
-11:49d4 partCode0f__state2 L
-11:49e5 partCode0f__state3 L
-11:49ef partCode0f__setTileHere L
-11:49f8 partCode0f__state4 L
+11:4995 partCode0f_hook -
 11:4a04 partCode10 -
 11:4a10 partCode10__normalStatus L
 11:4a1e partCode10__state0 L
