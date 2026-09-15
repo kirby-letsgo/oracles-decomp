@@ -4969,8 +4969,7 @@
 11:5026 partCode18_hook -
 11:506d partCode19_hook -
 11:50c1 partCode1a_hook -
-11:514c partCode1b -
-11:5158 partCode1b__normalStatus L
+11:514c partCode1b_hook -
 11:5190 partCode1c -
 11:519b partCode1c__normalStatus L
 11:51a5 partCode1c__state0 L
