@@ -5014,14 +5014,7 @@
 11:59e5 partCode4d__delete L
 11:59e8 partCode4d__deleteWithPoof L
 11:59ee partCode4c_hook -
-11:5a86 partCode4e -
-11:5a98 partCode4e__normalStatus L
-11:5aa2 partCode4e__state0 L
-11:5ab5 partCode4e__state1 L
-11:5ac6 partCode4e__animate L
-11:5ac9 partCode4e__beginMoving L
-11:5ad1 partCode4e__state2 L
-11:5ad8 partCode4e__destroy L
+11:5a86 partCode4e_hook -
 11:5ae0 partCode50 -
 11:5af6 partCode50__state0 L
 11:5b08 partCode50__state1 L

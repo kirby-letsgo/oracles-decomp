@@ -448,6 +448,18 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 222, bank 11 (1 root routine): ported
+  `object_code/common/parts/twinrovaSnowball.s` (`partCode4e`, `twinrovaSnowball.c`) — Twinrova's
+  snowball projectile: destroys itself and spawns snow debris when hit by a sufficiently strong
+  weapon or already at maximum item-collision level, otherwise runs an RST $00 dispatch that
+  teleports in, waits/animates while flashing, then aims at and moves toward the enemy target
+  until it either leaves the screen or collides with a tile. Single root, no locals. Zero bugs
+  found by independent review, including a fresh re-derivation of the `bit 0,(hl)` polarity trap
+  and all six conditional branches' physical byte-ends. Bank 11 is 169/651 and the project
+  4,382/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference
+  replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and
+  quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 221, bank 11 (1 root routine): ported
   `object_code/common/parts/twinrovaFlame.s` (`partCode4c`, `twinrovaFlame.c`) — Twinrova's flame
   projectile: an RST $00 dispatch across an ignition state (which sets up appearance and plays a
