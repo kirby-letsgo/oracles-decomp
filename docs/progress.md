@@ -448,6 +448,21 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 237, bank 11 (1 root routine): ported
+  `object_code/ages/parts/babyBall.s` (`partCode2f`, `babyBall.c`) — the object that turns Link
+  into a baby: charges up (with a related-enemy-health check gating existence), fires a beam
+  toward the enemy target, then a 3-state RST $00 dispatch handling charge/fire/move-and-collide,
+  with a special case that nudges the angle toward Link when the related enemy (Veran's fairy
+  form) is attacking and mid-beat. Independent review caught a real bug before commit: the
+  unconditional `jr @animate` at ROM 0x6491 had its `CYC` end address copied from the
+  displayed branch target (0x64b6) instead of the instruction's own physical end (0x6493) — the
+  same "target vs physical end" trap documented earlier this session, now recurring even with
+  the explicit warning in the review brief. Also fixed a mislabeled field comment (0x29 is
+  `Object.health`, not `Object.relatedObj1`, matching the source's own `ld a,Object.health`).
+  Full gate re-run clean on the fixed build. Bank 11 is 193/651 and the project 4,406/9,901.
+  Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk
+  suites 8/8.
 - 2026-09-15: milestone 3 phase 6 batch 236, bank 11 (1 root routine): ported
   `object_code/ages/parts/seaEffects.s` (`partCode2e`, `seaEffects.c`) — the whirlpool and
   pollution-tile effect object: waits for Link to be in normal state and not diving underwater,

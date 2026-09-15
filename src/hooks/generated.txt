@@ -5025,14 +5025,7 @@
 11:6270 func_6270_hook -
 11:62a7 partCode2d_hook -
 11:62de partCode2e_hook -
-11:6455 partCode2f -
-11:646c partCode2f__state0 L
-11:647f partCode2f__state1 L
-11:6493 partCode2f__state2 L
-11:64ae partCode2f__applySpeed L
-11:64b6 partCode2f__animate L
-11:64b9 partCode2f__veranFairyBeat L
-11:64bc partCode2f__delete L
+11:6455 partCode2f_hook -
 11:64bf partCode32 -
 11:64c7 partCode32__state0 L
 11:64cf partCode32__state1 L
