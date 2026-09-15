@@ -448,6 +448,22 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 218, bank 11 (3 root routines): ported
+  `object_code/common/parts/smallFairy.s` (`partCode28` + `func_56b6` + `func_56cd`,
+  `smallFairy.c`) — the small healing fairy: RST $00 dispatch across spawn/wander/collection
+  states, picking a random speed/counter/angle when starting to wander, checking collision with
+  Link, and giving a random ring or heart refill treasure when collected. `func_56b6` (reached
+  only via an unconditional `jp` tail-jump, never a call) correctly uses `RET_TAKEN` for its own
+  exits, top-level style; `func_56cd` (reached via a genuine `call`) correctly uses `CALL_C` at
+  its call site and `RET`/`RET_TAKEN` at its own exits, applying the stack-leak lesson from three
+  batches ago. Self-review caught a real bug before the gate ran: a `jr nc` had its `CYC`/`CYCT`
+  end address confused with its branch target (0x56c4) instead of its own physical byte-end
+  (0x56c3) — a recurrence of the byte-range-vs-target confusion class, fixed before any build.
+  Zero further issues found by independent review. Bank 11 is 164/651 and the project 4,377/9,901.
+  Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 217, bank 11 (1 root routine): ported
   `object_code/common/parts/lighting.s` (`partCode27`, `lighting.c`) — the lightning bolt part:
   spawns aimed at the enemy target when one exists, then either strikes (playing a sound and
