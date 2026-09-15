@@ -3582,6 +3582,8 @@ interactiond9_state1
 interactiond9_state2
 interactiond9_markSecretAsTold
 interactionCodeda
+interactionCodeda__state0
+interactionCodeda__state1
 interactionCode99
 interactionCode9a
 interactionCode9b

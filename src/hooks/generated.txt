@@ -6887,9 +6887,9 @@
 0b:4fa8 interactiond9_state2__substate8 L
 0b:4fae interactiond9_state2__createTreasure L
 0b:4fb5 interactiond9_markSecretAsTold -
-0b:4fc2 interactionCodeda -
-0b:4fca interactionCodeda__state0 L
-0b:4fda interactionCodeda__state1 L
+0b:4fc2 interactionCodeda_hook -
+0b:4fca interactionCodeda__state0_hook -
+0b:4fda interactionCodeda__state1_hook -
 0b:501c interactionCode99 -
 0b:5024 interactionCode99__state0 L
 0b:502a interactionCode99__afterCall502a L

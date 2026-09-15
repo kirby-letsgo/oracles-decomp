@@ -1516,3 +1516,9 @@ desync to discover; keep them when porting routines.
   accepted the call through its permissive warning settings, but the quirk build stopped with
   three "too few arguments" errors. Fix every such operation as `A = alu_swap(gb, A)` and rerun
   both configurations; do not treat a clean normal build as proof that helper prototypes match.
+
+- **A conditional jump's burn must start at the jump opcode, not at the comparison before it**:
+  the first `zeldaApproachTrigger.c` draft put the `jr z`/`jr nz` burns on the preceding `or`/
+  `cp` addresses and used the wrong end for the taken path. The ROM walk makes both branches
+  consume exactly the jump's own two bytes (`5008-500a` and `500d-500f`); correcting those ranges
+  before the first replay kept the loop's physical coverage exact.
