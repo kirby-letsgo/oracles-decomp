@@ -1460,3 +1460,18 @@ desync to discover; keep them when porting routines.
   eyeballing "what comes next in the source" — but this specific trap (a data table quietly
   absorbing the gap) is worth watching for whenever a `jp`/`call` is immediately followed by a
   `.db`-table label rather than another routine.
+- **A pattern-b local reached via a genuine `call` with no `push_effect` still needs the `call`
+  instruction's own cycle burn at the call site** — the "no push" rule is about the emulated-stack
+  bookkeeping only, and is completely independent of cycle-timing accounting, which still has to
+  model every byte the real `call` opcode occupies. `gashaTree.c`'s `gashaTree_func_4fb2_hook`
+  (a self-contained local ending in its own literal `ret`, correctly reached with no `push_effect`
+  at either of its two call sites) was first written as a bare `gashaTree_func_4fb2_hook(gb);` with
+  nothing before it — correct for the return-address reasoning, but silently skipping the 3-byte/
+  6-cycle burn for the `call` instruction itself. Caught by the address-coverage diff (the two call
+  sites showed up as real gaps, not explainable as `CALL_C`/RST omissions like every other entry in
+  the missing list). Fixed to `CYC(from, from+3); gashaTree_func_4fb2_hook(gb);` at both sites,
+  matching the established `ball_func_6b00` precedent (`CYC(0x6af2, 0x6af5); ball_func_6b00(gb);`)
+  exactly. The lesson generalizes: EVERY call/jr/jp instruction — whether it becomes `CALL_C`, a
+  bare tail-call, a `goto`, or a plain "call it and continue" — needs its own physical-byte `CYC`
+  burn line; `push_effect` (or its absence) is a separate, additional decision layered on top, never
+  a substitute for it.

@@ -448,6 +448,26 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 204, bank 11 (2 root routines): ported
+  `object_code/common/parts/gashaTree.s` (`partCode17` + `func_5010`, `gashaTree.c`) — the gasha
+  seed tree: checks a flag and Link's vulnerability before activating, then a 3-state dispatch sets
+  up collision/position, waits for the related tree-planting object to change ID (deleting itself
+  if not), or (a further 3-substate dispatch) knocks a seed off, bounces it toward the ground, and
+  checks tile collision before settling. Unusually, `func_5010` is a SEPARATE independently
+  registered root defined at the bottom of the same source file and reached only from within
+  `partCode17`'s own code — since it genuinely has its own hook-table row, its one genuine-call
+  reach site correctly uses `CALL_C` (not the bare push_effect+call pattern used for true
+  unregistered locals elsewhere this session). Two bugs caught by self-review before the gate: the
+  extracted local `func_4fb2` was declared `static` (breaking `lint_game.py`'s exact-match regex,
+  the same mistake made once before in `lightableTorch.c`), and — a genuinely new bug class — both
+  of `func_4fb2`'s bare-call sites were missing the `call` instruction's own cycle burn entirely,
+  since "no push_effect needed" was correctly reasoned but mistakenly taken as license to skip the
+  burn line too; caught by the address-coverage diff surfacing two gaps that weren't explainable by
+  the usual `CALL_C`/RST omissions. Both fixed; independent review came back completely clean. Bank
+  11 is 138/651 and the project 4,351/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 203, bank 11 (1 root routine): ported
   `object_code/common/parts/owlStatue.s` (`partCode13`, `owlStatue.c`) — the owl statue hint part:
   on a specific "just talked" status check, advances to a listening state; a 4-state dispatch then
