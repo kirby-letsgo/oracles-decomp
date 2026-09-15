@@ -5061,9 +5061,7 @@
 11:6e50 func_6e50_hook -
 11:6e5d func_6e5d_hook -
 11:6e76 partCode3b_hook -
-11:6f2c partCode3c -
-11:6f54 partCode3c__counter1NonZero L
-11:6f5a partCode3c__state0 L
+11:6f2c partCode3c_hook -
 11:6f6f partCode3d_hook -
 11:6fa1 blueStalfosProjectile_subid0_hook -
 11:7052 blueStalfosProjectile_subid1_hook -

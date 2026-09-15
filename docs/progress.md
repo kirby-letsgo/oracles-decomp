@@ -448,6 +448,17 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 245, bank 11 (1 root routine): ported
+  `object_code/ages/parts/headThwompCircularProjectile.s` (`partCode3c`,
+  `headThwompCircularProjectile.c`) — the circling projectile fired by the Head Thwomp
+  miniboss: an inverted-sense guard at entry (`jp nz,partDelete` with no preceding compare,
+  relying on flags inherited from the caller), a spawn state setting its initial speed and
+  visibility, and an update state that advances its orbit angle from a toggling direction bit
+  in `var30` before applying speed and animating. Zero bugs found by self-review (after fixing
+  one self-caught mistake before building: a missing `sp0_` local broke `CALL_C` compilation)
+  or independent review. Bank 11 is 204/651 and the project 4,417/9,904. Gates: lint 0, 30k
+  verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
 - 2026-09-15: milestone 3 phase 6 batch 244, bank 11 (1 root routine): ported
   `object_code/ages/parts/3b.s` (`partCode3b`, `partCode3b.c`) — the boulder thrown by the head
   thwomp (purple face) miniboss: a top-level dispatcher that branches on subid to either the

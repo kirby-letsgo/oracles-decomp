@@ -4450,3 +4450,4 @@ veranProjectile_subid0
 veranProjectile_subid1
 partCode39
 partCode3b
+partCode3c
