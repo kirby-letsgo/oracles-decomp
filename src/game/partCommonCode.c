@@ -178,13 +178,13 @@ static void commonCode_checkOutOfBounds_roundAngleToDiagonal(GB *gb) {
   CYC(0x409b, 0x409c); A = mem_rd(gb, HL);
   CYC(0x409c, 0x409d); E = A;
   CYC(0x409d, 0x409f); alu_and(gb, 0x07);
-  if (F & FZ) { RET_TAKEN(0x409f); return; } // ret z
+  if (F & FZ) { CYCT(0x409f, 0x40a0); return; } // ret z
   CYC(0x409f, 0x40a0);
   CYC(0x40a0, 0x40a1); A = E;
   CYC(0x40a1, 0x40a3); alu_and(gb, 0x18);
   CYC(0x40a3, 0x40a5); alu_add(gb, 0x04);
   CYC(0x40a5, 0x40a6); E = A;
-  RET(0x40a6); return; // ret
+  CYC(0x40a6, 0x40a7); return; // ret
 }
 
 void partCommon_decCounter1IfNonzero_hook(GB *gb) {

@@ -1330,3 +1330,33 @@ desync to discover; keep them when porting routines.
   across `src/game/*.c` (excluding `gen_bank*.c`) before registering found every site, and a
   targeted `sed` on the `CALL_C(...)` argument position renamed them safely without touching
   unrelated text.
+- **Critical: `RET`/`RET_TAKEN` are only safe when something upstream actually pushed a matching
+  return address onto the emulated stack.** Both macros call `ret_effect(gb)`, which unconditionally
+  does `gb->pc = pop_effect(gb)` — it pops 2 bytes off the real emulated stack (`gb->sp`/memory),
+  no exceptions, regardless of whether anything was pushed for this specific call. A local helper
+  with no independent hook-table row, reached via a genuine ROM `call` instruction whose call site
+  invokes the helper as a bare C function (no `push_effect`, no `CALL_C`) — this is the correct,
+  established convention for a helper that never dispatches into another hook internally — must
+  model its own `ret`/`ret cc` with plain `CYC`/`CYCT` (burning the 1-byte instruction's cycles) and
+  a bare C `return;`, never `RET`/`RET_TAKEN`. Using the macro here pops whatever the *unrelated*
+  outer caller legitimately pushed for its own purposes, permanently shifting `gb->sp` by 2 bytes
+  with no compensating push — a real, silent stack-corruption bug that neither the address-coverage
+  diff, self-review's flag-polarity sweep, nor a 290,174-frame full-game verify with exact
+  state-hash matching will ever catch unless the specific code path is exercised by the recorded
+  TAS movie (`commonCode_checkOutOfBounds_roundAngleToDiagonal` in `partCommonCode.c` had exactly
+  this bug, committed and passed every gate, only found afterward while reasoning through why an
+  unrelated local elsewhere in the same file didn't need a fix). The precedent this session already
+  established (`ball_func_6b00`) does it correctly: no push at the call site, no `RET`/`RET_TAKEN`
+  inside, just `CYC`/`CYCT` plus bare `return;` — native C call/return stands in for the real
+  push-then-pop, which nets to zero change in `gb->sp`, exactly matching real hardware. By contrast,
+  a helper reached via `jr`/`jp`/fallthrough (not a `call`) *can* safely use `RET`/`RET_TAKEN`
+  internally, provided the emulated stack at that point genuinely holds a return address pushed by
+  a real `call`/`CALL_C` further up the same call chain — `jr`/fallthrough never push on real
+  hardware either, so the helper's own `ret` is the ROM's real, intended return past every
+  jr/fallthrough hop, straight back to whoever made that original outer call
+  (`commonCode_allowHolesTail` in the same file is the correct example: reached by `jr` and by
+  fallthrough, both from within root hooks that are themselves invoked via `CALL_C`). The rule of
+  thumb: before writing `RET`/`RET_TAKEN` inside any non-root helper, trace every call site back to
+  the nearest real `call`/`CALL_C` and confirm it actually pushed a return address meant to survive
+  to this exact point — if the immediate call site is a bare, unpushed function call, the helper's
+  own returns must be plain `CYC`+`return`, never the macro.
