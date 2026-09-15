@@ -448,6 +448,22 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-16: milestone 3 phase 6 batch 255, bank 11 (3 root routines): ported
+  `object_code/ages/parts/octogonDepthCharge.s` (`partCode48` + `octogonDepthCharge_subid1`
+  + `octogonDepthCharge_subid0`, `octogonDepthCharge.c`) — the biggest file this session:
+  three independently-registered top-level routines wired by bare tail-calls. `partCode48`
+  dispatches on subid via `normalStatus`, conditionally tail-jumping into the externally-hooked
+  `octogonDepthCharge_subid0` or bare-falling-through into `octogonDepthCharge_subid1` (a
+  forward-declared sibling function defined later in the file). `subid1` is the small split
+  projectile (spawn then fly-and-delete-on-collision). `subid0` is the large projectile before
+  splitting: a 4-state RST $00 dispatch that spawns either already underwater (random position
+  from a 4-entry table) or shot up first, floats, delays, then splits into four `subid1`
+  children on landing. Caught and fixed two self-review issues before building (a missing
+  `sp0_` local in `octogonDepthCharge_subid1_hook`, and a stray unused `belowWater:` label with
+  no goto reaching it). Zero further bugs found by self-review or a detailed independent review
+  of all three routines. Bank 11 is 216/651 and the project 4,429/9,916. Gates: lint 0, 30k
+  verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
 - 2026-09-15: milestone 3 phase 6 batch 254, bank 11 (1 root routine): ported
   `object_code/ages/parts/bomb.s` (`partCode47`, `bomb.c`) — the standard thrown bomb: a
   4-state RST $00 dispatch (spawn with gravity, wait to be thrown while tracking its
