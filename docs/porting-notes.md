@@ -1375,3 +1375,16 @@ desync to discover; keep them when porting routines.
   mnemonic was `call` (always `CALL_C`) or `call cc` (branch-dependent: `CALL_C_CC` inside the taken
   branch, plain `CYC(a,a+3)` — no call at all — on the not-taken path), the same way flag polarity
   and byte-range get checked, not just "was some CALL_C-family macro used at all."
+- A local helper pulled out into its own C function (rather than inlined as a `goto` label) MUST
+  NOT be declared `static` if it needs register access (`A`, `HL`, `mem_rd`, etc.) — `tools/
+  lint_game.py` only recognizes a function as an allowed register-access context when its
+  definition line matches the regex `void \w+_hook\(GB \*gb\)` starting at the very beginning of
+  the line; a `static void <name>_hook(GB *gb) {` signature fails that match (the line starts with
+  `static`, not `void`) and every register access inside gets flagged as "outside a _hook shim"
+  even though the function is a legitimate, correctly-modeled local. This only bites when a local
+  is extracted as its own function — which happens for any helper called via genuine `call` from
+  more than one point, or one needing `push_effect`+`CALL_C` machinery too large to duplicate
+  inline — as opposed to a `goto` label sharing the parent function's own signature.
+  `lightableTorch_getTileAtRelatedObjPosition_hook` (reached via genuine `call` from three separate
+  points in `lightableTorch.c`) hit this; dropping `static` from both the definition and its forward
+  declaration fixed it immediately, with no change to the function's logic.

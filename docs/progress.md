@@ -448,6 +448,26 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 193, bank 11 (1 root routine): ported
+  `object_code/common/parts/lightableTorch.s` (`partCode06`, `lightableTorch.c`) — the lightable
+  torch part, the largest single-root file this session (111 instructions, 4 nested RST $00
+  dispatches: subid selector, then a separate state selector per subid). Subid 0 stays lit forever
+  once lit; subid 1 stays lit for `[counter2]` frames then extinguishes; subid 2 tracks another
+  object's related tile via `getTileAtRelatedObjPosition` to decide when to light/extinguish.
+  `getTileAtRelatedObjPosition` is a pattern-a local (no independent hook row, never returns via
+  its own `ret`, always tail-jumps into `getTileAtPosition`) called via genuine `call` from three
+  separate points, each correctly guarded with its own `push_effect`. One tail-jump
+  (`gotoState1IfTileAtRelatedObjPositionIsNotLit`, reached only via `jp nz` from within a sibling
+  state) is modeled as a plain `goto` within the same function, needing no push at that transition.
+  Lint caught one structural mistake before the gate: the extracted local was declared `static`,
+  which fails `lint_game.py`'s exact-match regex for recognizing a `_hook`-suffixed register-access
+  context (the regex requires the line to literally start with `void`, not `static void`) — fixed
+  by dropping `static`. Zero address/logic bugs found on either self-review or independent review,
+  despite the file's size and four levels of dispatch. Bank 11 is 126/651 and the project
+  4,339/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference
+  replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and
+  quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 192, bank 11 (1 root routine): ported
   `object_code/common/parts/switch.s` (`partCode05`, `switch.c`) — the floor switch part: on being
   hit, toggles a bit in `wSwitchState` and updates its tile (overworld switches flip and delete
