@@ -4961,10 +4961,7 @@
 11:4be0 volcanoRock_setRandomPosition_hook -
 11:4c09 volcanoRock_subid0_setSpeedFromAngle_hook -
 11:4c1c volcanoRock_setCollisionSize_hook -
-11:4c33 partCode12 -
-11:4c3a partCode12__state1 L
-11:4c73 partCode12__delete L
-11:4c76 partCode12__state0 L
+11:4c33 partCode12_hook -
 11:4c94 partCode13 -
 11:4caa partCode13__normalStatus L
 11:4cb6 partCode13__state0 L

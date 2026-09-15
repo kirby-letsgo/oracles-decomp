@@ -448,6 +448,20 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 202, bank 11 (1 root routine): ported
+  `object_code/common/parts/flame.s` (`partCode12`, `flame.c`) — the burning-enemy fire part: tracks
+  the enemy it's attached to by ID, keeps applying a bounce/damage-over-time effect and mirroring
+  its Z position while burning, and once its counter expires restores the enemy's saved health
+  (disabling collision if it died) and stuns it before deleting itself. `flame_state0_hook` is a
+  pattern-a local (conditional `call z`, ends via tail-jump into `objectSetVisible80`, needs
+  `push_effect` at the call site). Notable only for a plain register-to-register scratch trick
+  (`ld c,h`/`ld h,c`, saving which enemy/object page is being pointed at across an intervening
+  `partCommon_decCounter1IfNonzero` call) modeled as direct `C = H;`/`H = C;` assignment, with no
+  stack involvement at all. Zero bugs found on both self-review and independent review. Bank 11 is
+  135/651 and the project 4,348/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 201, bank 11 (1 root routine): ported
   `object_code/common/parts/seedOnTree.s` (`partCode10`, `seedOnTree.c`) — the seed-bearing tree
   part: on being hit, sets its state to give a seed; five states set up appearance, sit idle, move
