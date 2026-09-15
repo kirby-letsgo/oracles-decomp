@@ -5024,15 +5024,7 @@
 11:6261 func_6261_hook -
 11:6270 func_6270_hook -
 11:62a7 partCode2d_hook -
-11:62de partCode2e -
-11:62e9 partCode2e__initialized L
-11:6349 partCode2e__applyCurrentsDirection L
-11:6361 partCode2e__setCounter1To20 L
-11:6367 partCode2e__collision0 L
-11:6398 partCode2e__collision1 L
-11:63a3 partCode2e__collision2 L
-11:63d6 partCode2e__func_63d6 L
-11:6410 partCode2e__speedValues L
+11:62de partCode2e_hook -
 11:6455 partCode2f -
 11:646c partCode2f__state0 L
 11:647f partCode2f__state1 L
