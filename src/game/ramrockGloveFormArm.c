@@ -185,7 +185,7 @@ state1:
   RET(0x6746); return; // ret
 
 subidBit7SetArm_state1:
-  CALL_C(0x6747, partCommon_decCounter1IfNonzero, 0x40a7, 0x674a);
+  CALL_C(0x6747, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x674a);
   if (!(F & FZ)) { RET_TAKEN(0x674a); return; } // ret nz
   CYC(0x674a, 0x674b);
   CYC(0x674b, 0x674d); C = 0x10;
@@ -408,7 +408,7 @@ state4:
   CYC(0x68de, 0x68e0); L = 0xcd;
   CYC(0x68e0, 0x68e1); mem_wr(gb, HL, C);
   CYC(0x68e1, 0x68e2); // ret (returns to 0x6875, no continuation check needed here)
-  CALL_C(0x6875, partCommon_decCounter1IfNonzero, 0x40a7, 0x6878);
+  CALL_C(0x6875, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x6878);
   if (!(F & FZ)) { RET_TAKEN(0x6878); return; } // ret nz
   CYC(0x6878, 0x6879);
   CALL_C(0x6879, func_69a5_hook, 0x69a5, 0x687c);
@@ -483,11 +483,11 @@ state4func_68d7:
   RET(0x68e1); return; // ret
 
 state5:
-  CALL_C(0x68e2, partCommon_getTileCollisionInFront, 0x4000, 0x68e5);
+  CALL_C(0x68e2, partCommon_getTileCollisionInFront_hook, 0x4000, 0x68e5);
   if (!(F & FZ)) { CYCT(0x68e5, 0x68e7); goto state5func_68fe; } // jr nz
   CYC(0x68e5, 0x68e7);
   CALL_C(0x68e7, objectApplySpeed_hook, 0x201d, 0x68ea);
-  CALL_C(0x68ea, partCommon_decCounter1IfNonzero, 0x40a7, 0x68ed);
+  CALL_C(0x68ea, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x68ed);
   if (!(F & FZ)) { RET_TAKEN(0x68ed); return; } // ret nz
   CYC(0x68ed, 0x68ee);
   CYC(0x68ee, 0x68f0); mem_wr(gb, HL, 0x03);
@@ -533,7 +533,7 @@ L_6918:
   CYC(0x6921, 0x6924); goto func_6762; // jp
 
 state6:
-  CALL_C(0x6924, partCommon_decCounter1IfNonzero, 0x40a7, 0x6927);
+  CALL_C(0x6924, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x6927);
   if (!(F & FZ)) { RET_TAKEN(0x6927); return; } // ret nz
   CYC(0x6927, 0x6928);
   CYC(0x6928, 0x692a); L = 0xe4;

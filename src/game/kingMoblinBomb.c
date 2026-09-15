@@ -113,7 +113,7 @@ void common_kingMoblinBomb_state1_hook(GB *gb) {
   if (F & FC) { RET_TAKEN(0x71a9); return; } // ret c
   CYC(0x71a9, 0x71aa);
 L_71aa:
-  CALL_C(0x71aa, partCommon_decCounter1IfNonzero, 0x40a7, 0x71ad);
+  CALL_C(0x71aa, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x71ad);
   if (!(F & FZ)) { RET_TAKEN(0x71ad); return; } // ret nz
   CYC(0x71ad, 0x71ae);
   CYC(0x71ae, 0x71b0); L = 0xe1; // Part.animParameter
@@ -285,7 +285,7 @@ L_727d:
 
 void kingMoblinBomb_state7_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x7281, partCommon_decCounter1IfNonzero, 0x40a7, 0x7284);
+  CALL_C(0x7281, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x7284);
   if (!(F & FZ)) { RET_TAKEN(0x7284); return; } // ret nz
   CYC(0x7284, 0x7285);
   CYC(0x7285, 0x7286); L = E; // Part.state

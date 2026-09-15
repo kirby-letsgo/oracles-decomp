@@ -168,7 +168,7 @@ substate1:
 
 void volcanoRock_common_substate2_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x4b82, partCommon_decCounter1IfNonzero, 0x40a7, 0x4b85);
+  CALL_C(0x4b82, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x4b85);
   if (!(F & FZ)) { RET_TAKEN(0x4b85); return; } // ret nz
   CYC(0x4b85, 0x4b86);
   CYC(0x4b86, 0x4b88); mem_wr(gb, HL, 0x10); // Part.counter1

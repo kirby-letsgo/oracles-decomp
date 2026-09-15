@@ -448,6 +448,34 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 187, bank 11 (12 root routines): ported
+  `object_code/common/parts/commonCode.s` (`partCommonCode.c`) — the shared "part common" utility
+  library used by nearly every other file in this bank: tile-collision-in-front/at-angle checks
+  (with and without hole-tolerance), the enemy-standard-update analogue (uninitialized/invincible/
+  collision/dead dispatch, including an inter-bank `callab` to bank 0x3f), out-of-bounds and
+  collision-or-out-of-bounds checks, counter1 decrement, collision bounce, speed-update-and-delete,
+  position-offset-and-radius-from-angle, and substate increment. Named `partCommonCode.c` rather
+  than the source's own basename because `src/game/commonCode.c` already exists as an unrelated,
+  previously-committed file for a different bank's identically-named `commonCode.s` (this project
+  has four separate `commonCode.s` files across `common/{specialObjects,itemParents,parts,enemies}`
+  and each needs a disambiguated C filename, matching the established `itemParentCommonCode.c`/
+  `enemyCommonCode.c` precedent) — caught only after a `Write` to the naive filename silently
+  overwrote the existing bank-5 file (never committed, no data lost; recovered via git checkout and
+  moved the new content to the correct name). Two of the twelve routines share a common tail
+  physically embedded inside one of them (`partCommon_getTileCollisionInFront_allowHoles`'s own
+  address range is jumped into by `partCommon_getTileCollisionAtAngle_allowHoles`), extracted into
+  a private helper per the established shared-tail-extraction pattern. Rewriting these
+  previously-bare shared routines required renaming their bare-name `CALL_C` references to the new
+  `_hook` suffix across nine already-committed files (`ball.c`, `blueStalfosProjectile.c`,
+  `itemDrop.c`, `kingMoblinBomb.c`, `ramrockGloveFormArm.c`, `updateParts.c`, `veranSpiderweb.c`,
+  `vireProjectile.c`, `volcanoRock.c`) that already called them — the build fails to link otherwise,
+  since a rewritten routine's canonical hook name always gains the `_hook` suffix everywhere.
+  Self-review caught one real bug: an unconditional `jr` in the enemy-standard-update analogue was
+  burned to its jump target instead of its own 2-byte end. Independent review came back completely
+  clean. Bank 11 is 121/651 and the project 4,334/9,901. Gates: lint 0, 30k verify 0 failures with
+  state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with
+  state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 186, bank 11 (11 root routines): ported
   `object_code/common/parts/volcanoRock.s` (`partCode11`, `volcanoRock.c`) — the erupting volcano
   rock projectile's subid0 (launch/reset-and-relaunch), subid1 (drop-and-bounce with a shared

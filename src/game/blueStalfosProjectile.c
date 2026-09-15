@@ -142,7 +142,7 @@ L_6fe1:
   CYC(0x6fe6, 0x6fea); objectSetVisible81_hook(gb); return; // jp
 
 state1:
-  CALL_C(0x6fea, partCommon_decCounter1IfNonzero, 0x40a7, 0x6fed);
+  CALL_C(0x6fea, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x6fed);
   if (!(F & FZ)) { CYCT(0x6fed, 0x6fef); goto animate; } // jr nz
   CYC(0x6fed, 0x6fef);
   CYC(0x6fef, 0x6ff1); mem_wr(gb, HL, 0x28); // counter1
@@ -225,7 +225,7 @@ void blueStalfosProjectile_subid1_hook(GB *gb) {
 
 void blueStalfosProjectile_applySpeedAndDeleteIfOffScreen_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x7058, partCommon_checkOutOfBounds, 0x407e, 0x705b);
+  CALL_C(0x7058, partCommon_checkOutOfBounds_hook, 0x407e, 0x705b);
   if (F & FZ) { CYCT(0x705b, 0x705e); partDelete_hook(gb); return; } // jp z
   CYC(0x705b, 0x705e);
   blueStalfosProjectile_applySpeed_hook(gb);
@@ -265,7 +265,7 @@ void blueStalfosProjectile_checkShouldExplode_hook(GB *gb) {
   CYC(0x7087, 0x7089); alu_and(gb, 0x07);
   if (!(F & FZ)) { RET_TAKEN(0x7089); return; } // ret nz
   CYC(0x7089, 0x708a);
-  CALL_C(0x708a, partCommon_decCounter1IfNonzero, 0x40a7, 0x708d);
+  CALL_C(0x708a, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x708d);
   if (!(F & FZ)) { RET_TAKEN(0x708d); return; } // ret nz
   CYC(0x708d, 0x708e);
   CYC(0x708e, 0x7090); C = 0x28;

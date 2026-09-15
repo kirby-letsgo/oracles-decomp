@@ -167,7 +167,7 @@ label_11_008:
   CYC(0x4178, 0x417b); partSetAnimation_hook(gb); return; // jp
 
 state1:
-  CALL_C(0x417b, partCommon_getTileCollisionInFront_allowHoles, 0x4030, 0x417e);
+  CALL_C(0x417b, partCommon_getTileCollisionInFront_allowHoles_hook, 0x4030, 0x417e);
   if (!(F & FC)) {
     CALL_C_CC(0x417e, itemDrop_updateSpeed_hook, 0x4302, 0x4181); // call nc
   } else {
@@ -381,7 +381,7 @@ void itemDrop_countdownToDisappear_hook(GB *gb) {
     CYC(0x42d2, 0x42d4); L = 0xe4; // Part.collisionType
     CYC(0x42d4, 0x42d6); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
   }
-  CALL_C(0x42d6, partCommon_decCounter1IfNonzero, 0x40a7, 0x42d9);
+  CALL_C(0x42d6, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x42d9);
   if (F & FZ) { CYCT(0x42d9, 0x42db); goto disappear; } // jr z
   CYC(0x42d9, 0x42db);
   CYC(0x42db, 0x42dc); A = mem_rd(gb, HL);
@@ -592,7 +592,7 @@ void itemDrop_updateFairyMovement_hook(GB *gb) {
   CYC(0x43c2, 0x43c3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (F & FZ) { CYCT(0x43c3, 0x43c5); itemDrop_chooseRandomFairyMovement_hook(gb); return; } // jr z
   CYC(0x43c3, 0x43c5);
-  CALL_C(0x43c5, partCommon_getTileCollisionInFront, 0x4000, 0x43c8);
+  CALL_C(0x43c5, partCommon_getTileCollisionInFront_hook, 0x4000, 0x43c8);
   CYC(0x43c8, 0x43c9); A = alu_inc8(gb, A);
   if (!(F & FZ)) { CYCT(0x43c9, 0x43cc); objectApplySpeed_hook(gb); return; } // jp nz
   CYC(0x43c9, 0x43cc);
@@ -667,7 +667,7 @@ void itemDrop_applySpeed_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x441e, 0x441f); push_effect(gb, BC);
   CYC(0x441f, 0x4420); A = C;
-  CALL_C(0x4420, partCommon_getTileCollisionAtAngle_allowHoles, 0x402a, 0x4423);
+  CALL_C(0x4420, partCommon_getTileCollisionAtAngle_allowHoles_hook, 0x402a, 0x4423);
   CYC(0x4423, 0x4424); SET_BC(pop_effect(gb));
   if (F & FC) { RET_TAKEN(0x4424); return; } // ret c
   CYC(0x4424, 0x4425);

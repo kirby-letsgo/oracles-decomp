@@ -150,7 +150,7 @@ state1:
   CALL_C(0x6ae7, objectCheckWithinScreenBoundary_hook, 0x2184, 0x6aea);
   if (!(F & FC)) { CYCT(0x6aea, 0x6aed); func_6c17_hook(gb); return; } // jp nc
   CYC(0x6aea, 0x6aed);
-  CALL_C(0x6aed, partCommon_checkTileCollisionOrOutOfBounds, 0x4072, 0x6af0);
+  CALL_C(0x6aed, partCommon_checkTileCollisionOrOutOfBounds_hook, 0x4072, 0x6af0);
   if (!(F & FC)) { CYCT(0x6af0, 0x6af2); goto objectApplySpeedTail; } // jr nc
   CYC(0x6af0, 0x6af2);
   CYC(0x6af2, 0x6af5); ball_func_6b00(gb);
@@ -185,7 +185,7 @@ state3:
   CYC(0x6b27, 0x6b2a);
   CYC(0x6b2a, 0x6b2c); B = 0xff;
   CALL_C(0x6b2c, func_6b5f_hook, 0x6b5f, 0x6b2f);
-  CALL_C(0x6b2f, partCommon_checkTileCollisionOrOutOfBounds, 0x4072, 0x6b32);
+  CALL_C(0x6b2f, partCommon_checkTileCollisionOrOutOfBounds_hook, 0x4072, 0x6b32);
   if (!(F & FC)) { CYCT(0x6b32, 0x6b34); goto L_6b3f; } // jr nc
   CYC(0x6b32, 0x6b34);
   CYC(0x6b34, 0x6b37); ball_func_6b00(gb);
@@ -197,7 +197,7 @@ state3:
 L_6b3f:
   CYC(0x6b3f, 0x6b41); B = 0x02;
   CALL_C(0x6b41, func_6b5f_hook, 0x6b5f, 0x6b44);
-  CALL_C(0x6b44, partCommon_checkTileCollisionOrOutOfBounds, 0x4072, 0x6b47);
+  CALL_C(0x6b44, partCommon_checkTileCollisionOrOutOfBounds_hook, 0x4072, 0x6b47);
   if (!(F & FC)) { CYCT(0x6b47, 0x6b49); goto L_6b54; } // jr nc
   CYC(0x6b47, 0x6b49);
   CYC(0x6b49, 0x6b4c); ball_func_6b00(gb);

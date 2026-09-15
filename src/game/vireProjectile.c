@@ -96,7 +96,7 @@ subid0:
   if (F & FZ) { CYCT(0x6ce9, 0x6ceb); goto subid0_state0; } // jr z
   CYC(0x6ce9, 0x6ceb);
 func_6ceb:
-  CALL_C(0x6ceb, partCommon_checkOutOfBounds, 0x407e, 0x6cee);
+  CALL_C(0x6ceb, partCommon_checkOutOfBounds_hook, 0x407e, 0x6cee);
   if (F & FZ) { CYCT(0x6cee, 0x6cf1); partDelete_hook(gb); return; } // jp z
   CYC(0x6cee, 0x6cf1);
   CALL_C(0x6cf1, objectApplySpeed_hook, 0x201d, 0x6cf4);
@@ -267,7 +267,7 @@ subid3:
   CYC(0x6dfe, 0x6dff); alu_or(gb, A);
   if (F & FZ) { CYCT(0x6dff, 0x6e01); goto subid3_state0; } // jr z
   CYC(0x6dff, 0x6e01);
-  CALL_C(0x6e01, partCommon_decCounter1IfNonzero, 0x40a7, 0x6e04);
+  CALL_C(0x6e01, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x6e04);
   if (F & FZ) { CYCT(0x6e04, 0x6e07); func_6e4a_hook(gb); return; } // jp z
   CYC(0x6e04, 0x6e07);
   CYC(0x6e07, 0x6e08); L = alu_inc8(gb, L);

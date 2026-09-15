@@ -1310,3 +1310,23 @@ desync to discover; keep them when porting routines.
   every instruction from the ROM address-by-address rather than skimming the draft for
   plausibility — skimming a correctly-*shaped* line (a `CALL_C` with a real callee name; an `if`
   with a real flag) is exactly what lets a structurally-wrong-but-plausible-looking line slip past.
+- This project has multiple ROM banks whose disassembly directories each contain their own file
+  literally named `commonCode.s` (`object_code/common/{specialObjects,itemParents,parts,enemies}/`)
+  — naively naming the new C file after the source's own basename collided with an already-committed,
+  unrelated `src/game/commonCode.c` (bank 5's specialObjects common code): `Write` silently overwrote
+  it with no warning, since it has no way to know the existing content was meaningful rather than a
+  redundant previous attempt at the same file. No data was lost only because the batch hadn't been
+  committed yet. Before naming any new file, grep `src/game/` for the exact basename the source file
+  would naively map to; this project's own precedent already disambiguates the other three
+  `commonCode.s` collisions (`itemParentCommonCode.c`, `enemyCommonCode.c`), so bank 11's parts
+  version became `partCommonCode.c` to match.
+- Independently rewriting a routine that was previously bare (reached only via the interpreter
+  fallback, referenced by its plain name in other files' `CALL_C` calls) requires renaming every
+  existing bare-name reference across the whole codebase to the new `_hook` suffix in the same
+  batch — `transliterate.py`'s canonical name for a newly-rewritten routine always gains `_hook`,
+  so every already-committed file that calls it via `CALL_C(addr, bare_name, target, ra)` fails to
+  link once the routine moves from `rewritten`-absent to `rewritten`-present. `commonCode.s`'s
+  twelve routines were referenced this way from nine other files; `grep -rl` for each bare name
+  across `src/game/*.c` (excluding `gen_bank*.c`) before registering found every site, and a
+  targeted `sed` on the `CALL_C(...)` argument position renamed them safely without touching
+  unrelated text.

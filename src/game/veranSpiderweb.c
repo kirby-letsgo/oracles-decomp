@@ -74,7 +74,7 @@ subid0:
   CYC(0x7be6, 0x7be7); alu_or(gb, A);
   if (F & FZ) { CYCT(0x7be7, 0x7be9); goto func_7c2e; } // jr z
   CYC(0x7be7, 0x7be9);
-  CALL_C(0x7be9, partCommon_decCounter1IfNonzero, 0x40a7, 0x7bec);
+  CALL_C(0x7be9, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x7bec);
   if (!(F & FZ)) { CYCT(0x7bec, 0x7bee); goto L_7c05; } // jr nz
   CYC(0x7bec, 0x7bee);
   CYC(0x7bee, 0x7bf0); mem_wr(gb, HL, 0x04);
@@ -196,7 +196,7 @@ L_7c89:
   CYC(0x7c90, 0x7c92); goto beamSound; // jr
 
 subid1_state1:
-  CALL_C(0x7c92, partCommon_decCounter1IfNonzero, 0x40a7, 0x7c95);
+  CALL_C(0x7c92, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x7c95);
   if (!(F & FZ)) { CYCT(0x7c95, 0x7c97); goto L_7cb0; } // jr nz
   CYC(0x7c95, 0x7c97);
   CYC(0x7c97, 0x7c99); mem_wr(gb, HL, 0x08); // Part.counter1
@@ -216,7 +216,7 @@ subid1_state1:
   CYC(0x7cac, 0x7cad); mem_wr(gb, HL, D);
   CALL_C(0x7cad, objectCopyPosition_hook, 0x2242, 0x7cb0);
 L_7cb0:
-  CALL_C(0x7cb0, partCommon_checkTileCollisionOrOutOfBounds, 0x4072, 0x7cb3);
+  CALL_C(0x7cb0, partCommon_checkTileCollisionOrOutOfBounds_hook, 0x4072, 0x7cb3);
   if (!(F & FC)) { CYCT(0x7cb3, 0x7cb6); objectApplySpeed_hook(gb); return; } // jp nc
   CYC(0x7cb3, 0x7cb6);
 L_7cb6:
@@ -234,7 +234,7 @@ L_7cb6:
   RET(0x7cc8); return; // ret
 
 subid1_state2:
-  CALL_C(0x7cc9, partCommon_decCounter1IfNonzero, 0x40a7, 0x7ccc);
+  CALL_C(0x7cc9, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x7ccc);
   if (!(F & FZ)) { RET_TAKEN(0x7ccc); return; } // ret nz
   CYC(0x7ccc, 0x7ccd);
   CYC(0x7ccd, 0x7ccf); L = 0xc4; // Part.state
