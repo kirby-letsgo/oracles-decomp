@@ -448,6 +448,19 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 248, bank 11 (1 root routine): ported
+  `object_code/ages/parts/shadowHagShadow.s` (`partCode41`, `shadowHagShadow.c`) — the shadow
+  clones chased by/chasing the Shadow Hag: a 4-way RST $00 dispatch whose 4th entry points
+  directly at the external `partDelete` hook (rather than a local label), spawn state picking
+  a random one of four fixed angles, a chase state nudging its angle toward Link once the hag's
+  own counter1 signals a converge command, and a converge-back state doing a two-axis proximity
+  check against the hag's position before flipping to a self-deleting state. Independent review
+  caught a real bug: both `jr nc` proximity checks had inverted polarity (`F & FC` instead of
+  `!(F & FC)`), which would have made the shadow jump straight to the angle-update path when
+  CLOSE to the hag instead of when far; fixed and the full gate was re-run clean. Bank 11 is
+  207/651 and the project 4,420/9,907. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
 - 2026-09-15: milestone 3 phase 6 batch 247, bank 11 (1 root routine): ported
   `object_code/ages/parts/headThwompBombDropper.s` (`partCode40`, `headThwompBombDropper.c`) —
   the bomb dropped by the Head Thwomp miniboss: verifies the related object is still the

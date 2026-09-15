@@ -5087,12 +5087,7 @@
 11:7293 kingMoblinBomb_checkCollisionWithLink_hook -
 11:72bb kingMoblinBomb_checkCollisionWithKingMoblin_hook -
 11:72dd partCode40_hook -
-11:7338 partCode41 -
-11:7344 partCode41__state0 L
-11:7360 partCode41__angles L
-11:7364 partCode41__state1 L
-11:7382 partCode41__state2 L
-11:73b1 partCode41__updateAngleAndApplySpeed L
+11:7338 partCode41_hook -
 11:73ba partCode42 -
 11:73c7 partCode42__state0 L
 11:742c partCode42__state1 L
