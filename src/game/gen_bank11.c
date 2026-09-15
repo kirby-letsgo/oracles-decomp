@@ -29,65 +29,6 @@ L_7f52:
   I(0x7f61, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
 }
 
-// 11:64bf
-void partCode32(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x64bf, 2); E = 0xc4;  // ld e,$c4
-  I(0x64c1, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x64c2, 0x64c3);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x64c7: goto L_64c7; case 0x64cf: goto L_64cf; default: HANDOFF(HL); }
-L_64c7:
-  I(0x64c7, 2); A = 0x01;  // ld a,$01
-  I(0x64c9, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x64ca, 2); A = 0xa9;  // ld a,$a9
-  CALL(0x64cc, playSound_b00_hook, 0x0c98, 0x64cf);  // call $0c98
-L_64cf:
-  CALL(0x64cf, partAnimate_hook, 0x2978, 0x64d2);  // call $2978
-  I(0x64d2, 2); E = 0xe1;  // ld e,$e1
-  I(0x64d4, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x64d5, 2); E = 0xda;  // ld e,$da
-  I(0x64d7, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x64d8, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x64d9); return; } I(0x64d9, 2);  // ret nz
-  I(0x64da, 4); if (hook_enabled_at(0x3ea1)) { partDelete_hook(gb); return; } HANDOFF(0x3ea1);  // jp $3ea1
-}
-
-// 11:64c7
-void partCode32__state0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_64c7:
-  I(0x64c7, 2); A = 0x01;  // ld a,$01
-  I(0x64c9, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x64ca, 2); A = 0xa9;  // ld a,$a9
-  CALL(0x64cc, playSound_b00_hook, 0x0c98, 0x64cf);  // call $0c98
-L_64cf:
-  CALL(0x64cf, partAnimate_hook, 0x2978, 0x64d2);  // call $2978
-  I(0x64d2, 2); E = 0xe1;  // ld e,$e1
-  I(0x64d4, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x64d5, 2); E = 0xda;  // ld e,$da
-  I(0x64d7, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x64d8, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x64d9); return; } I(0x64d9, 2);  // ret nz
-  I(0x64da, 4); if (hook_enabled_at(0x3ea1)) { partDelete_hook(gb); return; } HANDOFF(0x3ea1);  // jp $3ea1
-}
-
-// 11:64cf
-void partCode32__state1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_64cf:
-  CALL(0x64cf, partAnimate_hook, 0x2978, 0x64d2);  // call $2978
-  I(0x64d2, 2); E = 0xe1;  // ld e,$e1
-  I(0x64d4, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x64d5, 2); E = 0xda;  // ld e,$da
-  I(0x64d7, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x64d8, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x64d9); return; } I(0x64d9, 2);  // ret nz
-  I(0x64da, 4); if (hook_enabled_at(0x3ea1)) { partDelete_hook(gb); return; } HANDOFF(0x3ea1);  // jp $3ea1
-}
-
 // 11:64dd
 void partCode33(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

@@ -5026,9 +5026,7 @@
 11:62a7 partCode2d_hook -
 11:62de partCode2e_hook -
 11:6455 partCode2f_hook -
-11:64bf partCode32 -
-11:64c7 partCode32__state0 L
-11:64cf partCode32__state1 L
+11:64bf partCode32_hook -
 11:64dd partCode33 -
 11:64ee partCode33__subid0 L
 11:64f2 partCode33__func_64f2 L
