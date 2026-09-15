@@ -5026,8 +5026,7 @@
 11:5f55 partCodeNil_hook -
 11:5f56 partCode00_hook -
 11:5f59 partCode16_hook -
-11:5ff6 partCode24 -
-11:6011 partCode24__normalStatus L
+11:5ff6 partCode24_hook -
 11:6033 partCode25 -
 11:6088 partCode26 -
 11:60a2 partCode26__counter1NonZero L

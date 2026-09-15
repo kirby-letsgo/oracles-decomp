@@ -448,6 +448,19 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 229, bank 11 (1 root routine): ported
+  `object_code/ages/parts/grottoCrystal.s` (`partCode24`, `grottoCrystal.c`) — the grotto crystal
+  switch: when triggered, toggles the global switch state via XOR with its own subid, resets its
+  collision visibility, and spawns a sarcophagus interaction; otherwise waits one frame then
+  checks the room's flag byte to decide whether to reset visibility again before making its tile
+  solid and becoming visible. Single root, no locals. Contains two source quirks faithfully
+  preserved rather than "corrected": a garbled `ldbc, INTERAC_SARCOPHAGUS $80` macro invocation
+  that the transliterator resolves to the literal `ld bc,$8280`, and a bare `ld h,$cf` that sets
+  only the high byte of HL, leaving L as whatever the immediately preceding call left there.
+  Zero bugs found by independent review. Bank 11 is 181/651 and the project 4,394/9,901. Gates:
+  lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 228, bank 11 (1 root routine): ported
   `object_code/ages/parts/jabuJabusBubbles.s` (`partCode16`, `jabuJabusBubbles.c`) — Jabu Jabu's
   bubble: a 4-state RST $00 dispatch (rarer 4-entry table for this bank) spawning at a random

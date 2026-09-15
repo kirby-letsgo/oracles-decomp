@@ -497,68 +497,6 @@ L_59e8:
   I(0x59eb, 4); if (hook_enabled_at(0x3ea1)) { partDelete_hook(gb); return; } HANDOFF(0x3ea1);  // jp $3ea1
 }
 
-// 11:5ff6
-void partCode24(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  if ((F & FZ)) { I(0x5ff6, 3); goto L_6011; } I(0x5ff6, 2);  // jr z,$6011
-  I(0x5ff8, 4); A = mem_rd(gb, 0xcdd3);  // ld a,($cdd3)
-  I(0x5ffb, 1); H = D;  // ld h,d
-  I(0x5ffc, 2); L = 0xc2;  // ld l,$c2
-  I(0x5ffe, 2); alu_xor(gb, mem_rd(gb, HL));  // xor (hl)
-  I(0x5fff, 4); mem_wr(gb, 0xcdd3, A);  // ld ($cdd3),a
-  I(0x6002, 2); L = 0xe4;  // ld l,$e4
-  I(0x6004, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
-  I(0x6006, 2); A = 0x01;  // ld a,$01
-  CALL(0x6008, partSetAnimation_hook, 0x2988, 0x600b);  // call $2988
-  I(0x600b, 3); SET_BC(0x8280);  // ld bc,$8280
-  I(0x600e, 4); if (hook_enabled_at(0x24c5)) { objectCreateInteraction_hook(gb); return; } HANDOFF(0x24c5);  // jp $24c5
-L_6011:
-  I(0x6011, 2); E = 0xc4;  // ld e,$c4
-  I(0x6013, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x6014, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x6015); return; } I(0x6015, 2);  // ret nz
-  I(0x6016, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x6017, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x6018, getThisRoomFlags_hook, 0x197d, 0x601b);  // call $197d
-  I(0x601b, 3); alu_bit(gb, 6, mem_rd(gb, HL));  // bit 6,(hl)
-  if ((F & FZ)) { I(0x601d, 3); goto L_6029; } I(0x601d, 2);  // jr z,$6029
-  I(0x601f, 1); H = D;  // ld h,d
-  I(0x6020, 2); L = 0xe4;  // ld l,$e4
-  I(0x6022, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
-  I(0x6024, 2); A = 0x01;  // ld a,$01
-  CALL(0x6026, partSetAnimation_hook, 0x2988, 0x6029);  // call $2988
-L_6029:
-  CALL(0x6029, objectMakeTileSolid_hook, 0x20b2, 0x602c);  // call $20b2
-  I(0x602c, 2); H = 0xcf;  // ld h,$cf
-  I(0x602e, 3); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
-  I(0x6030, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
-}
-
-// 11:6011
-void partCode24__normalStatus(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6011:
-  I(0x6011, 2); E = 0xc4;  // ld e,$c4
-  I(0x6013, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x6014, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x6015); return; } I(0x6015, 2);  // ret nz
-  I(0x6016, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x6017, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x6018, getThisRoomFlags_hook, 0x197d, 0x601b);  // call $197d
-  I(0x601b, 3); alu_bit(gb, 6, mem_rd(gb, HL));  // bit 6,(hl)
-  if ((F & FZ)) { I(0x601d, 3); goto L_6029; } I(0x601d, 2);  // jr z,$6029
-  I(0x601f, 1); H = D;  // ld h,d
-  I(0x6020, 2); L = 0xe4;  // ld l,$e4
-  I(0x6022, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
-  I(0x6024, 2); A = 0x01;  // ld a,$01
-  CALL(0x6026, partSetAnimation_hook, 0x2988, 0x6029);  // call $2988
-L_6029:
-  CALL(0x6029, objectMakeTileSolid_hook, 0x20b2, 0x602c);  // call $20b2
-  I(0x602c, 2); H = 0xcf;  // ld h,$cf
-  I(0x602e, 3); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
-  I(0x6030, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
-}
-
 // 11:6033
 void partCode25(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
