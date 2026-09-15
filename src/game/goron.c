@@ -53,6 +53,7 @@ void goron_loadScript_hook(GB *gb);
 void goron_loadScriptFromTable_hook(GB *gb);
 void goronSubid01_hook(GB *gb);
 void goronSubid01__afterCall7778_hook(GB *gb);
+void goronSubid02_hook(GB *gb);
 void goronSubid00_hook(GB *gb);
 void goronSubid00__afterCall7585_hook(GB *gb);
 void goronDance_clearVariables_hook(GB *gb);

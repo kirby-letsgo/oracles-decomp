@@ -78,7 +78,7 @@ void updateParts_hook(GB *gb) {
 
 void func_11_5e8a_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x5e8a, partCommon_standardUpdate, 0x403b, 0x5e8d);
+  CALL_C(0x5e8a, partCommon_standardUpdate_hook, 0x403b, 0x5e8d);
   CYC(0x5e8d, 0x5e90); E = 0xc1; A = mem_rd(gb, DE);
   CYC(0x5e90, 0x5e93); alu_add(gb, A); alu_add(gb, 0x9f);
   CYC(0x5e93, 0x5e96); L = A; A = 0;

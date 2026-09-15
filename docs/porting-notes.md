@@ -206,12 +206,6 @@ desync to discover; keep them when porting routines.
 
 ## Rewriting (milestone 3)
 
-- A deferred source file under src/game is still an active rewrite. Batch 182 left the known
-  divergent hardhatWorker.c and poe.c experiments uncommitted, but CMake's top-level game-source
-  glob compiled them and regeneration promoted their root symbols to hooks even without
-  rewritten.txt entries; the full replay therefore repeated Hardhat's frame-21,120 mismatch.
-  Keep deferred experiments outside src/game/*.c, regenerate from ported.txt, then regenerate
-  the hook table before treating a replay as a clean baseline.
 - Verify mode proves state and total cycles, not where inside a routine a timing side effect
   lands. `setCpuToDoubleSpeed` hand-written with the right total but the DIV reset one M-cycle
   early passed verify and desynced the replay 400 frames later (timer interrupt phase). Anything
@@ -1239,12 +1233,280 @@ desync to discover; keep them when porting routines.
   catches it is re-reading whether the ground truth has code after the `CALL(...)` before writing
   the C for it; treat this as a required check specifically for every genuine `call` (not `jp`,
   not fallthrough) in any boss/enemy file this movie's route doesn't exercise.
-- When a local helper reached by a real call contains a callee marked SWITCHES THREADS, make both
-  the local helper and the caller's post-call address durable hooks before registering the parent.
-  The first Comedian draft called a static C helper directly: interactionInitGraphics could leave
-  that helper through the hook dispatcher, then the outer C routine continued as though the helper
-  had returned normally. Adding interactionCode65__loadScriptAndInitGraphics at $7531 and
-  interactionCode65__afterCall750e at $750e to extra.sym, ported.txt, and rewritten.txt lets the
-  generated call hand the new thread to the real continuation. The reference movie never enters
-  this NPC path, so the only warning was the readiness report's SWITCHES THREADS tag; treat that
-  tag as a mandatory continuation audit even after all replay gates pass.
+- The scripted whole-file byte-delta scan (flagging any `CYC(from,to)`/`CYCT(from,to)` pair whose
+  width falls outside 1-4 bytes) has a blind spot for `jr`/`jp` targets that land close to, but not
+  at, the instruction's own end — a 2-byte `jr` burned as `CYCT(from, from+4)` looks like a normal
+  width to the scan even though the correct range is `from+2`. Bank 11's `itemDrop.s` batch had
+  roughly a dozen of these (an independent review agent caught them; the scan itself reported
+  clean). The scan is still worth running first — it catches the worse "burned to a target ten-plus
+  bytes away" class for free — but it cannot replace checking every conditional branch by its own
+  mnemonic (`jr`=2 bytes, `jp`/`call`=3 bytes) against the ground truth, regardless of how small the
+  observed diff looks.
+- `burn_rom` (`src/game/cyc.c`) walks every instruction from `from` to `to` and aborts the whole
+  process (`exit(4)`) if a non-final instruction in that range is an unconditional control transfer
+  (`jr`, `jp`, `ret`, `reti`, `jp (hl)` — opcodes `0x18`/`0xc3`/`0xc9`/`0xd9`/`0xe9`). An
+  unconditional `jr` burned even one byte too wide (e.g. `CYCT(from, from+3)` for a 2-byte `jr`)
+  silently swallows the next instruction's opcode into the same range and crashes the emulator the
+  first time that code path runs — worse than a mistimed cycle count, since it's a hard abort, not
+  a state divergence a `--ref-check` catches on replay. Every unconditional `jr`/`jp` (not just
+  conditional ones) needs its own byte range checked against its true 2/3-byte length.
+- A whole-file address-coverage self-check (collecting every `CYC`/`CYCT`/`CALL_C`/`RET` address
+  pair used and diffing against the full set of real instruction addresses from the ground truth)
+  reliably catches *missing* instructions, but it is a set comparison, so it cannot catch a
+  duplicated code block that is missing a cycle burn on only *one* of its two textual copies — if
+  the same address range is correctly burned somewhere else in the file, the pair is already in the
+  set and the gap is invisible. Bank 11's `ramrockGloveFormArm.s` batch had exactly this: a local
+  (`state4func_68d7`) reachable both by a genuine `call` (needing a plain inline copy with no
+  `ret_effect`, since the caller's continuation must resume afterward) and by a `jr` fallthrough
+  from a sibling state (whose `ret` really is the outer routine's end, so that copy correctly used
+  `RET`) — the `RET(addr)` copy's cycle burn masked the fact that the *other*, `call`-reached copy
+  never burned its own `ret`'s 4 cycles at all. When a block is legitimately duplicated for two
+  different return semantics, each copy needs its own independent trace through the coverage
+  check, not just a shared address appearing once in the combined set.
+- The address-coverage self-check only verifies that every instruction's byte range is burned
+  somewhere; it says nothing about whether a conditional's *polarity* is right, since a flipped
+  `if (F & FC)` vs `if (!(F & FC))` burns the exact same address pairs either way. Bank 11's
+  `spikedBall.s` batch had two inverted `jr nc` branches that passed the coverage check, the build,
+  lint, and even the 30k/full-movie verify (both mismatch-free, since neither branch's condition is
+  exercised in a way the reference movie's route distinguishes) — only an independent re-read of
+  the actual flag semantics against the ROM mnemonic caught them. Byte-range checks and polarity
+  checks are two independent failure modes; passing one says nothing about the other, and both need
+  a dedicated pass.
+- A third independent failure mode neither the address-coverage check nor a polarity re-read
+  catches: a *missing* cycle burn for an instruction whose address range is never claimed by
+  anything else in the file (so there's no "extra" pair for a set-diff to flag) and whose omission
+  doesn't flip any branch outcome (so a polarity read finds nothing wrong either) — just a plain
+  undercount. Bank 11's `itemFromMaple.s` batch had exactly this: a `jp objectSetVisiblec3`
+  executed immediately after a local helper's own `call`-chain returned had no `CYC` burn at all,
+  caught only by a third review pass that recomputed each ROM label's own reported total cycle
+  count by hand and diffed it against the sum of the C file's burn ranges for that address span —
+  a technique worth running as its own dedicated pass on any batch, not just as a last resort after
+  other checks come up dry. That same batch is this session's worst for bug density overall: 17 real
+  bugs (10 byte-range, 6 polarity, 1 missing-burn) in one ~230-line file, nearly all concentrated in
+  a single local helper function that never got its own root-level review attention — local helpers
+  reached by `call` deserve the identical address-by-address scrutiny as a file's main dispatch, not
+  less, precisely because they're easy to treat as an afterthought while writing the file.
+- Self-review's targeted sweep of every `CYCT`/`RET_TAKEN` call (checking flag polarity and byte
+  length) has a blind spot: it never looks at plain unconditional `CYC` calls for a `jp`/`jr`,
+  since those aren't flagged by the "conditional branch" pattern the sweep is built around. Bank
+  11's `vireProjectile.s` batch had exactly this — an unconditional `jp objectSetVisible82` at the
+  end of a 5-part spawn loop was burned to `from+8` (the length of the *entire* remaining
+  instruction plus the following `.db` jump-table bytes) instead of its own real 3-byte end,
+  putting the burn range squarely into never-executed table data. This is precisely the class of
+  bug `burn_rom`'s own hard-abort exists to catch — `exit(4)` the first time that code path
+  actually runs, since the range wasn't fully contained in one instruction — but nothing in the
+  gate (build, lint, 30k verify, full replay) exercises a rarely-hit path like a boss's 5-part
+  explosion loop, so it can ship past every automated check. A self-review pass needs a dedicated
+  step that lists every unconditional `jp`/`jr`'s `to` address and confirms it's exactly `from+3`
+  or `from+2`, the same rigor already given to conditionals, not folded into the conditional sweep
+  where it's easy to skip.
+- `ball.s` is this session's worst self-review batch by a wide margin: 12 real bugs caught before
+  the file even compiled, in one ~370-line file. Two of the bug classes were genuinely new (not
+  seen in earlier batches) and both were *systematic* rather than one-off: (1) four separate `jp`
+  tail-jumps to already-registered hooks were written as `CALL_C` instead of a plain tail-call —
+  `CALL_C` is only valid for a genuine `call`/`call cc` where the ROM expects control back; a `jp`
+  never returns, so wrapping it in `CALL_C` doesn't crash or fail any gate (the hook still runs,
+  just via the slower/wrong-shaped mechanism) but is structurally wrong and worth catching, so
+  every `CALL_C` site needs its target mnemonic re-checked against the `.s` source as `call`, not
+  assumed from "there's a callee name here". (2) Six `jr nc` branches across every collision-check
+  block in the file were all inverted (`if (F & FC)` instead of `if (!(F & FC))`) — a single
+  copy-paste-without-adjusting mistake propagated by reusing the same block shape repeatedly while
+  writing the file, rather than six independent mistakes; when one `jr nc`/`jr c` polarity is found
+  wrong, the fix pass should specifically grep every other occurrence of the same mnemonic in the
+  file rather than assume it was a one-off. Both were only caught because self-review re-derived
+  every instruction from the ROM address-by-address rather than skimming the draft for
+  plausibility — skimming a correctly-*shaped* line (a `CALL_C` with a real callee name; an `if`
+  with a real flag) is exactly what lets a structurally-wrong-but-plausible-looking line slip past.
+- This project has multiple ROM banks whose disassembly directories each contain their own file
+  literally named `commonCode.s` (`object_code/common/{specialObjects,itemParents,parts,enemies}/`)
+  — naively naming the new C file after the source's own basename collided with an already-committed,
+  unrelated `src/game/commonCode.c` (bank 5's specialObjects common code): `Write` silently overwrote
+  it with no warning, since it has no way to know the existing content was meaningful rather than a
+  redundant previous attempt at the same file. No data was lost only because the batch hadn't been
+  committed yet. Before naming any new file, grep `src/game/` for the exact basename the source file
+  would naively map to; this project's own precedent already disambiguates the other three
+  `commonCode.s` collisions (`itemParentCommonCode.c`, `enemyCommonCode.c`), so bank 11's parts
+  version became `partCommonCode.c` to match.
+- Independently rewriting a routine that was previously bare (reached only via the interpreter
+  fallback, referenced by its plain name in other files' `CALL_C` calls) requires renaming every
+  existing bare-name reference across the whole codebase to the new `_hook` suffix in the same
+  batch — `transliterate.py`'s canonical name for a newly-rewritten routine always gains `_hook`,
+  so every already-committed file that calls it via `CALL_C(addr, bare_name, target, ra)` fails to
+  link once the routine moves from `rewritten`-absent to `rewritten`-present. `commonCode.s`'s
+  twelve routines were referenced this way from nine other files; `grep -rl` for each bare name
+  across `src/game/*.c` (excluding `gen_bank*.c`) before registering found every site, and a
+  targeted `sed` on the `CALL_C(...)` argument position renamed them safely without touching
+  unrelated text.
+- **Critical: `RET`/`RET_TAKEN` are only safe when something upstream actually pushed a matching
+  return address onto the emulated stack.** Both macros call `ret_effect(gb)`, which unconditionally
+  does `gb->pc = pop_effect(gb)` — it pops 2 bytes off the real emulated stack (`gb->sp`/memory),
+  no exceptions, regardless of whether anything was pushed for this specific call. A local helper
+  with no independent hook-table row, reached via a genuine ROM `call` instruction whose call site
+  invokes the helper as a bare C function (no `push_effect`, no `CALL_C`) — this is the correct,
+  established convention for a helper that never dispatches into another hook internally — must
+  model its own `ret`/`ret cc` with plain `CYC`/`CYCT` (burning the 1-byte instruction's cycles) and
+  a bare C `return;`, never `RET`/`RET_TAKEN`. Using the macro here pops whatever the *unrelated*
+  outer caller legitimately pushed for its own purposes, permanently shifting `gb->sp` by 2 bytes
+  with no compensating push — a real, silent stack-corruption bug that neither the address-coverage
+  diff, self-review's flag-polarity sweep, nor a 290,174-frame full-game verify with exact
+  state-hash matching will ever catch unless the specific code path is exercised by the recorded
+  TAS movie (`commonCode_checkOutOfBounds_roundAngleToDiagonal` in `partCommonCode.c` had exactly
+  this bug, committed and passed every gate, only found afterward while reasoning through why an
+  unrelated local elsewhere in the same file didn't need a fix). The precedent this session already
+  established (`ball_func_6b00`) does it correctly: no push at the call site, no `RET`/`RET_TAKEN`
+  inside, just `CYC`/`CYCT` plus bare `return;` — native C call/return stands in for the real
+  push-then-pop, which nets to zero change in `gb->sp`, exactly matching real hardware. By contrast,
+  a helper reached via `jr`/`jp`/fallthrough (not a `call`) *can* safely use `RET`/`RET_TAKEN`
+  internally, provided the emulated stack at that point genuinely holds a return address pushed by
+  a real `call`/`CALL_C` further up the same call chain — `jr`/fallthrough never push on real
+  hardware either, so the helper's own `ret` is the ROM's real, intended return past every
+  jr/fallthrough hop, straight back to whoever made that original outer call
+  (`commonCode_allowHolesTail` in the same file is the correct example: reached by `jr` and by
+  fallthrough, both from within root hooks that are themselves invoked via `CALL_C`). The rule of
+  thumb: before writing `RET`/`RET_TAKEN` inside any non-root helper, trace every call site back to
+  the nearest real `call`/`CALL_C` and confirm it actually pushed a return address meant to survive
+  to this exact point — if the immediate call site is a bare, unpushed function call, the helper's
+  own returns must be plain `CYC`+`return`, never the macro.
+- `CALL_C(a, fn, target, ra)` always burns via plain `CYC` (`burn_rom(..., false)`, the not-taken
+  cost) — it is only correct for an *unconditional* `call`. When the ROM's `call` is conditional
+  (`call z`/`call c`/etc.) and the surrounding C code is already inside the `if (F & FZ/FC)` taken
+  branch (i.e., only reached when the call actually executes), the call site must use
+  `CALL_C_CC(a, fn, target, ra)` instead, which burns via `CYCT` (the taken cost) — using plain
+  `CALL_C` here silently burns 3 cycles for what's actually a 6-cycle taken conditional call
+  (`enemyDestroyed_initialize_hook`'s `call c,partSetAnimation` had exactly this bug). This is a
+  pure cycle-accuracy bug that neither the address-coverage diff nor a full-game state-hash replay
+  will reliably catch: the byte range is identical either way (`CYC(a,a+3)` vs `CYCT(a,a+3)`, same
+  addresses), only the burned cycle *count* differs, and a hash mismatch only manifests if the
+  extra/missing 3 cycles shift something frame-timing-sensitive within the recorded movie's actual
+  exercised paths. Self-review must check every `CALL_C`/`CALL_C_CC` site against whether the ROM
+  mnemonic was `call` (always `CALL_C`) or `call cc` (branch-dependent: `CALL_C_CC` inside the taken
+  branch, plain `CYC(a,a+3)` — no call at all — on the not-taken path), the same way flag polarity
+  and byte-range get checked, not just "was some CALL_C-family macro used at all."
+- A local helper pulled out into its own C function (rather than inlined as a `goto` label) MUST
+  NOT be declared `static` if it needs register access (`A`, `HL`, `mem_rd`, etc.) — `tools/
+  lint_game.py` only recognizes a function as an allowed register-access context when its
+  definition line matches the regex `void \w+_hook\(GB \*gb\)` starting at the very beginning of
+  the line; a `static void <name>_hook(GB *gb) {` signature fails that match (the line starts with
+  `static`, not `void`) and every register access inside gets flagged as "outside a _hook shim"
+  even though the function is a legitimate, correctly-modeled local. This only bites when a local
+  is extracted as its own function — which happens for any helper called via genuine `call` from
+  more than one point, or one needing `push_effect`+`CALL_C` machinery too large to duplicate
+  inline — as opposed to a `goto` label sharing the parent function's own signature.
+  `lightableTorch_getTileAtRelatedObjPosition_hook` (reached via genuine `call` from three separate
+  points in `lightableTorch.c`) hit this; dropping `static` from both the definition and its forward
+  declaration fixed it immediately, with no change to the function's logic.
+- **A ROM instruction physically shared by two call contexts can need its exit modeled differently
+  in each — and once a local is entered via a pushed call, EVERY genuine `ret`/`ret cc` reachable
+  inside it must consume that push, even in code duplicated from a context that never pushed.**
+  `button.s`'s `@checkButtonPushed` (a `ret nz` early-exit) is reached two ways: (a) pure top-level
+  fallthrough within `partCode09_hook` itself — a genuine exit of the root hook, needs `RET_TAKEN`
+  to satisfy the *outer* `CALL_C`'s own mismatch-detection contract (which inspects `gb->pc`/
+  `gb->sp` after the root hook returns); (b) via `@updateTileBeforeDeletion`, itself reached by a
+  genuine `call` from `@delete` (`call @updateTileBeforeDeletion; jp partDelete`) whose call site
+  does `push_effect(gb, <jp partDelete addr>)`. Both of `@updateTileBeforeDeletion`'s own exit paths
+  (the early `ret nz`, and the fallthrough that tail-jumps into `playSound`) trace, by hand, to
+  eventually popping that *same* pushed address and reaching `jp partDelete` — real hardware's
+  `ret`/eventual-`playSound`-`ret` both just pop whatever's on top, and nothing else touched the
+  stack in between. Because the shared code behaves differently by context, it was duplicated: once
+  inline in `partCode09_hook`'s own flow (case a, `RET_TAKEN`), once inside
+  `button_updateTileBeforeDeletion_hook` (case b). The first attempt at the duplicate copy used a
+  bare `CYC`+`return` for its `ret nz`, reasoning (wrongly) that "no push happened for *this specific
+  transition*" — true, but irrelevant: a push *did* happen three frames up (`@delete`'s own
+  `push_effect`), and this exact `ret` is the one real hardware uses to consume it. A bare `return`
+  gets the *next C statement* right (native call-stack unwinding correctly reaches `@delete`'s own
+  `jp partDelete` either way) but never calls `pop_effect`, so `gb->sp` silently drifts by 2 bytes
+  every time that path fires — caught only by independent review re-deriving the push/pop pairing
+  from the real macros, not by either full-game replay (the path apparently isn't exercised by the
+  recorded movie). The corrected rule: the deciding question for whether a `ret` needs `RET`/
+  `RET_TAKEN` is never "did I duplicate this code" or "was there a push right at this call site" —
+  it's "does *some* call anywhere up the chain currently have a still-unconsumed push on the real
+  stack that this exact `ret` is supposed to pop." If yes — even reached indirectly, even in
+  duplicated code — use the macro. Bare `CYC`+`return` is correct only for a `ret` that is provably
+  never asked to consume a push (a true pattern-b local, entered with no push at its own site).
+- Every RST call site needs its own 1-byte `CYC(addr, addr+1)` burn for the `rst` instruction
+  itself, immediately before invoking the RST helper function — separate from, and in addition to,
+  the helper's own internal `push_effect`/`pop_effect` bookkeeping (which models the RST's *return*
+  behavior, not the cost of the `rst` opcode that dispatched into it). `bridgeSpawner.c`'s
+  `rst $18` (`addDoubleIndexToHl`) call site omitted this burn — `SET_HL(0x48a4);
+  bridgeSpawner_addDoubleIndexToHl_from_rst(gb, 0x486d);` with no `CYC` in between — which silently
+  undercounted the block by 4 cycles even though the RST's control-flow effect (the double-index
+  computation, correctly returning to 0x486d) was otherwise modeled correctly. Every other RST call
+  site written this session (four `rst $00` jump-table dispatches in `lightableTorch.c`, three in
+  `volcanoRock.c`, one each in `ball.c`/`movingOrb.c`) already included this burn correctly, so this
+  was a one-off slip, not a systemic pattern — but it's exactly the kind of gap a coverage-diff can
+  miss if the hand-typed "expected" chain also skips the same address (which is what happened here:
+  self-review's own verification list had the identical omission, so the diff came back clean).
+  Independent review's cycle-total cross-check against the report's own `[addr] block N cycles`
+  annotation is what caught it. Lesson: when writing an RST call site, treat it exactly like a
+  `call`/`jp` for burn purposes — one line for the RST's own bytes — before the line that invokes
+  the helper, never assume the helper's internal push/pop covers it.
+- When a tiny shared local is reached BOTH via a plain `jr`/tail-transfer AND via a genuine `call`
+  needing return-continuation, don't default to treating every reach point the same way — trace
+  each ROM instruction that reaches the local individually and ask "does real hardware ever come
+  back to the code right after THIS SPECIFIC transfer." `seedOnTree.s`'s `@giveSeed` (straight-line,
+  ends in `jp giveTreasure`, no `ret` anywhere) is reached two genuinely different ways: `@substate0`
+  tail-jumps into it with `jr @giveSeed` (a one-way hand-off — nothing on real hardware ever comes
+  back to `@substate0`'s own context after this), while `@giveSeedAndSomething` reaches it via a
+  genuine `call $4a8a` and DOES expect execution to resume at `@relatedObj2Something` afterward
+  (traced by hand: `giveTreasure`'s own eventual real `ret` pops whatever this specific `call`
+  pushed). The first draft used the "push + fall through to `@relatedObj2Something`" treatment for
+  BOTH reach points, which would have made `@substate0`'s plain tail-jump path incorrectly execute
+  `@relatedObj2Something`'s code too — code real hardware never reaches from that path at all. Caught
+  by re-reading the `.s` source's own control flow before self-review even began, not by the
+  automated gate. The general rule: a shared local's correct call-site treatment is a property of
+  each *edge* reaching it (call vs. jr/jp vs. fallthrough), never a property of the local itself —
+  don't generalize from one caller's shape to another's.
+- Another shape of the byte-range-vs-target confusion: burning a `jp`/`call` to the address of the
+  *next label visible in the disassembly*, rather than the instruction's own physical byte-end —
+  distinct from burning to the jump's own destination, and easy to miss because it still "looks
+  like a real address in the listing." `owlStatue.s`'s `jp objectCopyPositionWithOffset` (3 bytes)
+  was mistakenly burned to `@state3`'s starting address instead of its own end, because a 12-byte
+  data table (`@owlStatueSparkleOffset`) sits physically between the two, making "the next thing I
+  can see" look like a plausible instruction boundary. The fix is the same discipline as always —
+  derive the end strictly as `from + instruction length` (jr=2, jp/call=3, ret/rst=1), never by
+  eyeballing "what comes next in the source" — but this specific trap (a data table quietly
+  absorbing the gap) is worth watching for whenever a `jp`/`call` is immediately followed by a
+  `.db`-table label rather than another routine.
+- **A pattern-b local reached via a genuine `call` with no `push_effect` still needs the `call`
+  instruction's own cycle burn at the call site** — the "no push" rule is about the emulated-stack
+  bookkeeping only, and is completely independent of cycle-timing accounting, which still has to
+  model every byte the real `call` opcode occupies. `gashaTree.c`'s `gashaTree_func_4fb2_hook`
+  (a self-contained local ending in its own literal `ret`, correctly reached with no `push_effect`
+  at either of its two call sites) was first written as a bare `gashaTree_func_4fb2_hook(gb);` with
+  nothing before it — correct for the return-address reasoning, but silently skipping the 3-byte/
+  6-cycle burn for the `call` instruction itself. Caught by the address-coverage diff (the two call
+  sites showed up as real gaps, not explainable as `CALL_C`/RST omissions like every other entry in
+  the missing list). Fixed to `CYC(from, from+3); gashaTree_func_4fb2_hook(gb);` at both sites,
+  matching the established `ball_func_6b00` precedent (`CYC(0x6af2, 0x6af5); ball_func_6b00(gb);`)
+  exactly. The lesson generalizes: EVERY call/jr/jp instruction — whether it becomes `CALL_C`, a
+  bare tail-call, a `goto`, or a plain "call it and continue" — needs its own physical-byte `CYC`
+  burn line; `push_effect` (or its absence) is a separate, additional decision layered on top, never
+  a substitute for it.
+- **An RST $00 jump-table dispatch's own `push_effect` is self-canceling by the time the dispatched
+  code runs** — the shared jump-table helper (`SET_HL(pop_effect(gb))` as its second statement,
+  identical across `octorokProjectile_jump_table`/`fireProjectiles_jump_table`/
+  `enemyArrow_jump_table`/`stalfosBone_jump_table`, etc.) immediately pops the exact address the
+  dispatch site just pushed, before jumping to the resolved target, and never re-pushes anything.
+  Net effect: zero stack change from the whole dispatch. So a literal `ret`/`ret cc` reached from
+  *inside* a dispatched state's code is NOT consuming the dispatch's own push — it's a top-level
+  hook exit consuming whatever pushed the return address into `partCodeNN_hook` itself (the
+  emulator's own hook-dispatch call, same as the `switch.c`/`lynelBeam.c` precedent for a bare
+  root-level `ret`), and correctly uses `RET`/`RET_TAKEN`. Confirmed in `stalfosBone.c`'s `state2`
+  (a `ret c` dispatched three levels deep from the RST $00 table) both by static trace and, per
+  independent review, empirically by the TAS ctest's per-call stack-consistency checks.
+- **`bit N,(hl)`/`bit N,a` is a polarity trap distinct from `cp`/`or`/`and`-style comparisons**:
+  Z80's `BIT` instruction sets the Z flag when the TESTED BIT IS 0 (i.e. Z means "bit clear"),
+  the opposite of the usual "Z means equal/zero result" intuition from `cp`/`or`. So a `jr nz`
+  immediately after `bit N,(hl)` is taken when the bit IS SET (`!(F & FZ)`), and `jr z` is taken
+  when the bit is CLEAR (`F & FZ`) — easy to get backwards by pattern-matching against a
+  neighboring `cp`/`or`-based `jr z`/`jr nz` in the same routine instead of reasoning about what
+  `BIT` itself does to the flag. Caught by independent review in `enemySword.c`'s `func_5273`: a
+  `jr nz` following `bit 0,(hl)` was written as `if (F & FZ)` (copied from the NEXT `bit`/`jr`
+  pair's polarity in the same function, which happened to be a `jr z` and was correct) instead of
+  `if (!(F & FZ))`. This changed real game behavior (which enemy states suppress the sword-swing
+  hit), not just cycle accounting, and survived self-review, the coverage-diff script, and both
+  30k/full-game replays undetected — it was caught only by independent review re-deriving each
+  `bit`/`jr` pair's polarity from `BIT`'s actual flag semantics instead of by visual pattern match
+  against a neighboring line. Always double-check a `bit`/`jr` pair against `alu_bit`'s actual
+  semantics (`gb->f = ... | ((v & (1<<bit)) ? 0 : FZ)`) rather than against how a nearby `cp`- or
+  `or`-based branch in the same block happens to look.
