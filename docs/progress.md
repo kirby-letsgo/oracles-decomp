@@ -448,6 +448,27 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-15: milestone 3 phase 6 batch 196, bank 11 (1 root routine): ported
+  `object_code/common/parts/button.s` (`partCode09`, `button.c`) — the pressable floor button,
+  this session's most structurally complex single-root file. A `ret nz` early-exit
+  (`@checkButtonPushed`) is physically reached two different ways — pure top-level fallthrough
+  within `partCode09_hook` itself (a genuine root-hook exit, needs `RET_TAKEN`) and via
+  `@updateTileBeforeDeletion` (itself reached by a genuine `call` from `@delete` whose call site
+  does `push_effect`) — and by hand-tracing real hardware's push/pop, BOTH of
+  `@updateTileBeforeDeletion`'s exit paths (the early `ret`, and a fallthrough tail-jumping into
+  `playSound`) converge on consuming that same pushed address and reaching `@delete`'s own
+  `jp partDelete`. Since the shared code behaves differently by context, it's duplicated once
+  inline in `partCode09_hook` and once inside `button_updateTileBeforeDeletion_hook`. Self-review
+  caught a `jr` byte-length arithmetic slip (miscounted as 3 bytes instead of 2) before the gate;
+  independent review then caught a genuine stack-corruption bug in the duplicate copy — its `ret nz`
+  used a bare `CYC`+`return` on the reasoning that "no push happened for this specific transition,"
+  which gets the next C statement right but never calls `pop_effect`, silently drifting `gb->sp` by
+  2 bytes whenever that path fires, since a push from three frames up (`@delete`'s own) genuinely
+  needed consuming here. Fixed to `RET_TAKEN`; full gate re-verified green. Bank 11 is 129/651 and
+  the project 4,342/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
+
 - 2026-09-15: milestone 3 phase 6 batch 195, bank 11 (1 root routine): ported
   `object_code/common/parts/darkRoomHandler.s` (`partCode08`, `darkRoomHandler.c`) — the dark-room
   torch-lighting palette handler: brightens or darkens the room's palette (fully or incrementally)

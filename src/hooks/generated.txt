@@ -4944,16 +4944,7 @@
 11:4550 partCode06_hook -
 11:4642 partCode07_hook -
 11:46a8 partCode08_hook -
-11:4724 partCode09 -
-11:472b partCode09__state1 L
-11:476a partCode09__somethingOnButton L
-11:4785 partCode09__delete L
-11:478b partCode09__linkTouchedButton L
-11:4790 partCode09__dd00TouchedButton L
-11:4796 partCode09__checkButtonPushed L
-11:47a4 partCode09__setTriggerAndPlaySound L
-11:47b7 partCode09__updateTileBeforeDeletion L
-11:47c9 partCode09__state0 L
+11:4724 partCode09_hook -
 11:47d3 partCode0b -
 11:47f4 partCode0b__normalStatus L
 11:4806 partCode0b__state0To7 L

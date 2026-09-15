@@ -1388,3 +1388,31 @@ desync to discover; keep them when porting routines.
   `lightableTorch_getTileAtRelatedObjPosition_hook` (reached via genuine `call` from three separate
   points in `lightableTorch.c`) hit this; dropping `static` from both the definition and its forward
   declaration fixed it immediately, with no change to the function's logic.
+- **A ROM instruction physically shared by two call contexts can need its exit modeled differently
+  in each — and once a local is entered via a pushed call, EVERY genuine `ret`/`ret cc` reachable
+  inside it must consume that push, even in code duplicated from a context that never pushed.**
+  `button.s`'s `@checkButtonPushed` (a `ret nz` early-exit) is reached two ways: (a) pure top-level
+  fallthrough within `partCode09_hook` itself — a genuine exit of the root hook, needs `RET_TAKEN`
+  to satisfy the *outer* `CALL_C`'s own mismatch-detection contract (which inspects `gb->pc`/
+  `gb->sp` after the root hook returns); (b) via `@updateTileBeforeDeletion`, itself reached by a
+  genuine `call` from `@delete` (`call @updateTileBeforeDeletion; jp partDelete`) whose call site
+  does `push_effect(gb, <jp partDelete addr>)`. Both of `@updateTileBeforeDeletion`'s own exit paths
+  (the early `ret nz`, and the fallthrough that tail-jumps into `playSound`) trace, by hand, to
+  eventually popping that *same* pushed address and reaching `jp partDelete` — real hardware's
+  `ret`/eventual-`playSound`-`ret` both just pop whatever's on top, and nothing else touched the
+  stack in between. Because the shared code behaves differently by context, it was duplicated: once
+  inline in `partCode09_hook`'s own flow (case a, `RET_TAKEN`), once inside
+  `button_updateTileBeforeDeletion_hook` (case b). The first attempt at the duplicate copy used a
+  bare `CYC`+`return` for its `ret nz`, reasoning (wrongly) that "no push happened for *this specific
+  transition*" — true, but irrelevant: a push *did* happen three frames up (`@delete`'s own
+  `push_effect`), and this exact `ret` is the one real hardware uses to consume it. A bare `return`
+  gets the *next C statement* right (native call-stack unwinding correctly reaches `@delete`'s own
+  `jp partDelete` either way) but never calls `pop_effect`, so `gb->sp` silently drifts by 2 bytes
+  every time that path fires — caught only by independent review re-deriving the push/pop pairing
+  from the real macros, not by either full-game replay (the path apparently isn't exercised by the
+  recorded movie). The corrected rule: the deciding question for whether a `ret` needs `RET`/
+  `RET_TAKEN` is never "did I duplicate this code" or "was there a push right at this call site" —
+  it's "does *some* call anywhere up the chain currently have a still-unconsumed push on the real
+  stack that this exact `ret` is supposed to pop." If yes — even reached indirectly, even in
+  duplicated code — use the macro. Bare `CYC`+`return` is correct only for a `ret` that is provably
+  never asked to consume a push (a true pattern-b local, entered with no push at its own site).
