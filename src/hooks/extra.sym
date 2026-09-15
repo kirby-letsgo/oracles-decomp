@@ -1018,3 +1018,14 @@
 09:6c08 interactionCode59__loadScriptAndInitGraphics
 09:6c0b interactionCode59__afterCall6c0b
 09:6be7 interactionCode59__afterCall6be7
+0b:6819 interactionCodeb3__state0
+0b:6847 interactionCodeb3__incState
+0b:684d interactionCodeb3__state1
+0b:6863 interactionCodeb3__state2
+0b:686f interactionCodeb3__state3
+0b:689e interactionCodeb3__state4
+0b:6a4c interactionCodeb5__state0
+0b:6a6b interactionCodeb5__state1
+0b:6a75 interactionCodeb5__substate0
+0b:6a8b interactionCodeb5__substate1
+0b:6aad interactionCodeb5__substate2

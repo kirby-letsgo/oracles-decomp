@@ -1522,3 +1522,10 @@ desync to discover; keep them when porting routines.
   `cp` addresses and used the wrong end for the taken path. The ROM walk makes both branches
   consume exactly the jump's own two bytes (`5008-500a` and `500d-500f`); correcting those ranges
   before the first replay kept the loop's physical coverage exact.
+
+- **Instruction cycle totals are not instruction byte lengths even in a hand-derived block**:
+  the first Harp-of-Ages/Final-Dungeon-Energy draft copied several 3-cycle `ld (hl),imm` and
+  4-cycle `jp` totals into `CYC` end addresses. The disassembly's next opcode addresses exposed
+  the over-burn (for example `6845-6846` and `684a-684d`); replacing every range with the physical
+  byte span preserved the replay hash. Always derive the endpoint from the next instruction, not
+  from the cycle column.
