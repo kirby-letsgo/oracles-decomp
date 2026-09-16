@@ -448,6 +448,17 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-16: milestone 3 phase 6 batch 261, bank 11 (1 root routine): ported
+  `object_code/ages/parts/veranBeeProjectile.s` (`partCode58`, `veranBeeProjectile.c`) — the
+  bee-shaped projectile fired by Veran's boss form: an entry check deleting itself invisibly
+  on a wall collision, a 4-state RST $00 dispatch (spawn with a beam sound, track its
+  carrier until in range then home in and delete once close enough, and a final state that
+  raises a scent-seed-like trigger flag and immobilizes Link if a game key was just pressed
+  while adjacent). One of the densest branch counts this session (eight conditionals). Zero
+  bugs found by self-review or independent review. Bank 11 is 225/651 and the project
+  4,438/9,925. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 289,869 frames with state
+  `dfb98b52a3b12c03`, normal and quirk suites 8/8.
 - 2026-09-16: milestone 3 phase 6 batch 260, bank 11 (1 root routine): ported
   `object_code/ages/parts/veranAcidPool.s` (`partCode57`, `veranAcidPool.c`) — the most
   structurally complex file this batch: a 7-state RST $00 dispatch for Veran's acid pool
