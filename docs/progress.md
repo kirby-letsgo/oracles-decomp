@@ -448,6 +448,19 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-16: milestone 3 phase 6 batch 262, bank 11 (1 root routine): ported
+  `object_code/ages/parts/blackTowerMovingFlames.s` (`partCode59`, `blackTowerMovingFlames.c`)
+  — the moving flame hazard in the Black Tower: a 6-state RST $00 dispatch picking a speed
+  from a 4-entry table (reused twice, indexed by subid and its complement) for two facing
+  directions, a state that makes a genuine cross-bank call into
+  `blackTower_getMovingFlamesNextTileCoords` (bank 0x10) via `interBankCall` — the first
+  `callab` this session, modeled as a plain `CALL_C` to the already-hooked
+  `interBankCall_hook` with no special resume logic needed — and a movement state that
+  homes toward the next tile coordinate once it stops matching the current position. Zero
+  bugs found by self-review or independent review. Bank 11 is 226/651 and the project
+  4,439/9,926. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 289,869 frames with state
+  `dfb98b52a3b12c03`, normal and quirk suites 8/8.
 - 2026-09-16: milestone 3 phase 6 batch 261, bank 11 (1 root routine): ported
   `object_code/ages/parts/veranBeeProjectile.s` (`partCode58`, `veranBeeProjectile.c`) — the
   bee-shaped projectile fired by Veran's boss form: an entry check deleting itself invisibly

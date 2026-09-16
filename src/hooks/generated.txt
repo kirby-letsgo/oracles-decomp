@@ -5123,16 +5123,7 @@
 11:7bab partCode56_hook -
 11:7d6c partCode57_hook -
 11:7e1c partCode58_hook -
-11:7e9a partCode59 -
-11:7eaa partCode59__state0 L
-11:7ebd partCode59__table_7ebd L
-11:7ec1 partCode59__state1 L
-11:7edc partCode59__state2 L
-11:7ee7 partCode59__state3 L
-11:7f03 partCode59__state4 L
-11:7f24 partCode59__moveToBC L
-11:7f2d partCode59__animate L
-11:7f30 partCode59__state5 L
+11:7e9a partCode59_hook -
 11:7f64 func_11_7f64 -
 39:4b50 playSound_b39 -
 39:4b87 playSound__sndf0_b39 L
