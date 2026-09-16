@@ -4906,7 +4906,7 @@ void partCommon_standardUpdate_hook(GB *gb);
 void func_11_5e8a_hook(GB *gb);
 void partCode27_hook(GB *gb);
 void partCode2b_hook(GB *gb);
-void partCode5a(GB *gb);
+void partCode5a_hook(GB *gb);
 void partCommon_getTileCollisionInFront_hook(GB *gb);
 void partCommon_getTileCollisionAtAngle_hook(GB *gb);
 void partCommon_getTileCollisionAtAngle_allowHoles_hook(GB *gb);

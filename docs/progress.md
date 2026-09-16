@@ -448,6 +448,29 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-16: milestone 3 phase 6 batch 263, bank 11 (1 root routine): ported
+  `object_code/ages/parts/triforceStone.s` (`partCode5a`, `partCode5a.c`) — the stone
+  blocking the path to Nayru at the start of the game: a one-shot state that deletes itself
+  if the room was already solved, otherwise picks an X position based on which room-flag
+  bit is set, makes its tile solid, and reloads the room's palette. Named `partCode5a.c`
+  rather than `triforceStone.c` because a DIFFERENT, unrelated bank-08 file already used
+  that name for `interactionCode34_hook` (the pushable-stone puzzle, ported from a
+  same-named but different-directory `.s` source) — caught mid-batch when a build failed on
+  a missing symbol after the new file had silently overwritten the old one; the original was
+  recovered from git history and the new port renamed to avoid the collision. Zero further
+  bugs found by self-review or independent review, which also explicitly re-verified the
+  bank-08 file was restored byte-for-byte and both files build without symbol collisions.
+  **This is the last portable routine in bank 11.** The one remaining unregistered address
+  (`func_11_7f64`, in the disassembly's own `garbage/bank11End.s`) is dead code with zero
+  callers anywhere in the ROM whose final instruction jumps into the middle of the
+  already-ported bank-0 `getRelativeAngle_hook` — exactly the "jumps into rewritten X at
+  offset (interpreted)" situation that has shown up as a harmless, permanently-tolerated
+  regen warning all session; porting it would require exposing a new mid-function label in
+  an unrelated, already-verified bank-0 file for code nothing ever calls, so it is left
+  interpreted. Bank 11 is 227/651 top-level routines registered (functionally complete) and
+  the project is 4,440/9,927. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
 - 2026-09-16: milestone 3 phase 6 batch 262, bank 11 (1 root routine): ported
   `object_code/ages/parts/blackTowerMovingFlames.s` (`partCode59`, `blackTowerMovingFlames.c`)
   — the moving flame hazard in the Black Tower: a 6-state RST $00 dispatch picking a speed

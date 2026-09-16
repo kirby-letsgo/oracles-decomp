@@ -4903,7 +4903,7 @@
 11:5e8a func_11_5e8a_hook -
 11:5553 partCode27_hook -
 11:6124 partCode2b_hook -
-11:7f3b partCode5a -
+11:7f3b partCode5a_hook -
 11:4000 partCommon_getTileCollisionInFront_hook -
 11:4003 partCommon_getTileCollisionAtAngle_hook -
 11:402a partCommon_getTileCollisionAtAngle_allowHoles_hook -

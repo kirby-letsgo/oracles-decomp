@@ -2,33 +2,6 @@
 #include "game/asm.h"
 #include "game/gen.h"
 
-// 11:7f3b
-void partCode5a(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7f3b, 2); E = 0xc4;  // ld e,$c4
-  I(0x7f3d, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x7f3e, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x7f3f); return; } I(0x7f3f, 2);  // ret nz
-  I(0x7f40, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x7f41, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x7f42, getThisRoomFlags_hook, 0x197d, 0x7f45);  // call $197d
-  I(0x7f45, 2); alu_and(gb, 0xc0);  // and $c0
-  if ((F & FZ)) { I(0x7f47, 4); if (hook_enabled_at(0x3ea1)) { partDelete_hook(gb); return; } HANDOFF(0x3ea1); } I(0x7f47, 3);  // jp z,$3ea1
-  I(0x7f4a, 2); alu_and(gb, 0x40);  // and $40
-  I(0x7f4c, 2); A = 0x28;  // ld a,$28
-  if (!(F & FZ)) { I(0x7f4e, 3); goto L_7f52; } I(0x7f4e, 2);  // jr nz,$7f52
-  I(0x7f50, 2); A = 0x48;  // ld a,$48
-L_7f52:
-  I(0x7f52, 2); E = 0xcd;  // ld e,$cd
-  I(0x7f54, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x7f55, objectMakeTileSolid_hook, 0x20b2, 0x7f58);  // call $20b2
-  I(0x7f58, 2); H = 0xcf;  // ld h,$cf
-  I(0x7f5a, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x7f5c, 2); A = 0x98;  // ld a,$98
-  CALL(0x7f5e, loadPaletteHeader_hook, 0x050b, 0x7f61);  // call $050b
-  I(0x7f61, 4); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp $1e72
-}
-
 // 11:7f64
 void func_11_7f64(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
