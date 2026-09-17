@@ -53,9 +53,27 @@ Native reimplementation of The Legend of Zelda: Oracle of Ages and Oracle of Sea
    - Place a US ROM in `roms/` (e.g., `roms/oracle_of_ages.gbc`)
    - Ensure it matches the SHA1 hash in `porting-notes.md`
 
-2. **Launch the game**:
+2. **Interactive play (SDL window)**:
+
+   The default `build/` tree only builds `oracles-run`, a headless CLI used for
+   verification. To get a playable window, configure a separate tree with
+   `-DORACLES_SDL=ON`:
    ```bash
-   ./build/oracles-run --rom roms/oracle_of_ages.gbc
+   cmake -B build-sdl -DORACLES_SDL=ON
+   cmake --build build-sdl -j4 --target oracles
+   ./build-sdl/oracles roms/oracle_of_ages.gbc roms/cgb_boot.bin
+   ````
+   Note: `oracles` takes positional args (`ROM [BOOTROM]`), not `--rom`/`--boot`
+   flags — those flags are only for the headless `oracles-run` tool below.
+   The first configure fetches SDL3 automatically if it isn't found via
+   Homebrew, so it can take a few minutes.
+
+   Controls: arrow keys to move, `X`/`Z` for A/B, Return for Start, Right
+   Shift for Select.
+
+3. **Headless run (no window)**:
+   ```bash
+   ./build/oracles-run --rom roms/oracle_of_ages.gbc --boot roms/cgb_boot.bin
    ````
 
 ## TAS Replay

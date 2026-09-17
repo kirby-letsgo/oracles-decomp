@@ -448,6 +448,710 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-16: milestone 3 phase 6 batch 263, bank 11 (1 root routine): ported
+  `object_code/ages/parts/triforceStone.s` (`partCode5a`, `partCode5a.c`) — the stone
+  blocking the path to Nayru at the start of the game: a one-shot state that deletes itself
+  if the room was already solved, otherwise picks an X position based on which room-flag
+  bit is set, makes its tile solid, and reloads the room's palette. Named `partCode5a.c`
+  rather than `triforceStone.c` because a DIFFERENT, unrelated bank-08 file already used
+  that name for `interactionCode34_hook` (the pushable-stone puzzle, ported from a
+  same-named but different-directory `.s` source) — caught mid-batch when a build failed on
+  a missing symbol after the new file had silently overwritten the old one; the original was
+  recovered from git history and the new port renamed to avoid the collision. Zero further
+  bugs found by self-review or independent review, which also explicitly re-verified the
+  bank-08 file was restored byte-for-byte and both files build without symbol collisions.
+  **This is the last portable routine in bank 11.** The one remaining unregistered address
+  (`func_11_7f64`, in the disassembly's own `garbage/bank11End.s`) is dead code with zero
+  callers anywhere in the ROM whose final instruction jumps into the middle of the
+  already-ported bank-0 `getRelativeAngle_hook` — exactly the "jumps into rewritten X at
+  offset (interpreted)" situation that has shown up as a harmless, permanently-tolerated
+  regen warning all session; porting it would require exposing a new mid-function label in
+  an unrelated, already-verified bank-0 file for code nothing ever calls, so it is left
+  interpreted. Bank 11 is 227/651 top-level routines registered (functionally complete) and
+  the project is 4,440/9,927. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-16: milestone 3 phase 6 batch 262, bank 11 (1 root routine): ported
+  `object_code/ages/parts/blackTowerMovingFlames.s` (`partCode59`, `blackTowerMovingFlames.c`)
+  — the moving flame hazard in the Black Tower: a 6-state RST $00 dispatch picking a speed
+  from a 4-entry table (reused twice, indexed by subid and its complement) for two facing
+  directions, a state that makes a genuine cross-bank call into
+  `blackTower_getMovingFlamesNextTileCoords` (bank 0x10) via `interBankCall` — the first
+  `callab` this session, modeled as a plain `CALL_C` to the already-hooked
+  `interBankCall_hook` with no special resume logic needed — and a movement state that
+  homes toward the next tile coordinate once it stops matching the current position. Zero
+  bugs found by self-review or independent review. Bank 11 is 226/651 and the project
+  4,439/9,926. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 289,869 frames with state
+  `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-16: milestone 3 phase 6 batch 261, bank 11 (1 root routine): ported
+  `object_code/ages/parts/veranBeeProjectile.s` (`partCode58`, `veranBeeProjectile.c`) — the
+  bee-shaped projectile fired by Veran's boss form: an entry check deleting itself invisibly
+  on a wall collision, a 4-state RST $00 dispatch (spawn with a beam sound, track its
+  carrier until in range then home in and delete once close enough, and a final state that
+  raises a scent-seed-like trigger flag and immobilizes Link if a game key was just pressed
+  while adjacent). One of the densest branch counts this session (eight conditionals). Zero
+  bugs found by self-review or independent review. Bank 11 is 225/651 and the project
+  4,438/9,925. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 289,869 frames with state
+  `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-16: milestone 3 phase 6 batch 260, bank 11 (1 root routine): ported
+  `object_code/ages/parts/veranAcidPool.s` (`partCode57`, `veranAcidPool.c`) — the most
+  structurally complex file this batch: a 7-state RST $00 dispatch for Veran's acid pool
+  attack, with a shared "set tiles from a table" helper (`func_7de1`, a 4-iteration inner
+  loop with register-preserving `push`/`pop` around a nested tile-set call) and a shared
+  "check/clear a tile" helper (`func_7db7`) reached both by fallthrough and by a genuine
+  internal `call` from the final state — the first time this session a `HOOK_LOCAL` block
+  needed the same `gb->pc`/`gb->sp` resume check at BOTH a literal `ret` exit and a
+  tail-jump-into-an-external-hook exit, documented as a new porting-notes lesson (a
+  straightforward union of two previously-separate precedents). Zero bugs found by
+  self-review or a dedicated independent review focused entirely on tracing that mechanism.
+  Bank 11 is 224/651 and the project 4,437/9,924. Gates: lint 0, 30k verify 0 failures with
+  state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869
+  frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-16: milestone 3 phase 6 batch 259, bank 11 (1 root routine): ported
+  `object_code/ages/parts/octogonBubble.s` (`partCode55`, `octogonBubble.c`) — the bubble
+  fired by an Octogon enemy: an entry check for a Link collision that, when Link is
+  vulnerable, immobilizes him and switches the bubble to a collided state; a 4-state RST
+  $00 dispatch (spawn, float forward with a 4-entry sine-like z-position table, wait for the
+  destroy animation to finish, then take Link's position while collided and animate once he
+  starts standing back up). Zero bugs found by self-review or independent review. Bank 11 is
+  223/651 and the project 4,436/9,923. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-16: milestone 3 phase 6 batch 258, bank 11 (4 root routines): ported
+  `object_code/ages/parts/roomOfRitesFallingBoulder.s` (`partCode54` + `func_7ad3` +
+  `func_7adb` + `func_7b0a`, `roomOfRitesFallingBoulder.c`) — four independently-registered
+  top-level routines wired by bare tail-calls, forward-declared where called before their
+  definition. `partCode54` dispatches on subid/state to either the "already spawned, waiting
+  to respawn" path (`func_7ad3`) or the "not yet spawned" path (`func_7adb`), which computes
+  a random spawn position from the camera offset and falls into the falling/landing update
+  loop (`func_7b0a`), which spawns rock debris and deletes on hazard contact. Caught and
+  fixed three missing `sp0_` declarations during self-review before building. Zero further
+  bugs found by self-review or a detailed independent review of all four routines. Bank 11
+  is 222/651 and the project 4,435/9,922. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-16: milestone 3 phase 6 batch 257, bank 11 (1 root routine): ported
+  `object_code/ages/parts/ramrockSeedFormOrb.s` (`partCode4f`, `ramrockSeedFormOrb.c`) —
+  the orb fired by Ramrock's seed-form attack: a spawn state, a tracking state waiting for
+  the related object to reach the right animation frame before aiming and speeding toward
+  Link, and a homing state nudging its angle toward Link every 10 frames while applying
+  speed and deleting once it leaves the screen. Zero bugs found by self-review or
+  independent review. Bank 11 is 218/651 and the project 4,431/9,918. Gates: lint 0, 30k
+  verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-16: milestone 3 phase 6 batch 256, bank 11 (1 root routine): ported
+  `object_code/ages/parts/smogProjectile.s` (`partCode4a`, `smogProjectile.c`) — the
+  projectile fired by a Smog enemy: a spawn state aiming toward Link and, for the large
+  smog's variant, boosting its speed/collision mode; a tracking state deleting on boss
+  defeat, screen exit, or a single-remaining-enemy check, then either passing through
+  everything (large-smog subid) or checking for an item/wall collision to trigger a destroy
+  animation; and a final animate-then-delete state. The densest branch count of any file
+  this session (eight conditionals), each verified independently by both self-review and
+  independent review. Zero bugs found. Bank 11 is 217/651 and the project 4,430/9,917. Gates:
+  lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk
+  suites 8/8.
+- 2026-09-16: milestone 3 phase 6 batch 255, bank 11 (3 root routines): ported
+  `object_code/ages/parts/octogonDepthCharge.s` (`partCode48` + `octogonDepthCharge_subid1`
+  + `octogonDepthCharge_subid0`, `octogonDepthCharge.c`) — the biggest file this session:
+  three independently-registered top-level routines wired by bare tail-calls. `partCode48`
+  dispatches on subid via `normalStatus`, conditionally tail-jumping into the externally-hooked
+  `octogonDepthCharge_subid0` or bare-falling-through into `octogonDepthCharge_subid1` (a
+  forward-declared sibling function defined later in the file). `subid1` is the small split
+  projectile (spawn then fly-and-delete-on-collision). `subid0` is the large projectile before
+  splitting: a 4-state RST $00 dispatch that spawns either already underwater (random position
+  from a 4-entry table) or shot up first, floats, delays, then splits into four `subid1`
+  children on landing. Caught and fixed two self-review issues before building (a missing
+  `sp0_` local in `octogonDepthCharge_subid1_hook`, and a stray unused `belowWater:` label with
+  no goto reaching it). Zero further bugs found by self-review or a detailed independent review
+  of all three routines. Bank 11 is 216/651 and the project 4,429/9,916. Gates: lint 0, 30k
+  verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 254, bank 11 (1 root routine): ported
+  `object_code/ages/parts/bomb.s` (`partCode47`, `bomb.c`) — the standard thrown bomb: a
+  4-state RST $00 dispatch (spawn with gravity, wait to be thrown while tracking its
+  carrier, apply speed until it lands and switch to an exploding animation/sound, then
+  shrink and delete once the explosion animation ends). The first `call playSound` this
+  session that is a genuine call-and-return rather than a tail-jump (the source does `call
+  playSound` followed by a separate `jp objectSetVisible83`), modeled as `CALL_C` rather
+  than the usual `playSound_b00_hook(gb); return;` terminal pattern. Zero bugs found by
+  self-review or independent review, which specifically verified that distinction. Bank 11
+  is 213/651 and the project 4,426/9,913. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 253, bank 11 (1 root routine): ported
+  `object_code/ages/parts/seedShooterEyeStatue.s` (`partCode46`, `seedShooterEyeStatue.c`) —
+  the seed-shooter eye statue enemy's tracking part: an inverted-sense entry guard (flags
+  inherited from the caller, like `partCode3c.c`'s) that on first activation sets an active
+  trigger flag and makes the statue's eye visible, then a normal-status path that counts
+  down and clears the trigger/hides the eye once expired. Zero bugs found by self-review or
+  independent review. Bank 11 is 212/651 and the project 4,425/9,912. Gates: lint 0, 30k
+  verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 252, bank 11 (1 root routine): ported
+  `object_code/ages/parts/fallingBoulderSpawner.s` (`partCode45`, `fallingBoulderSpawner.c`)
+  — the falling boulder hazard: a spawn state picking an initial appear delay from a
+  per-subid table, a waiting state that transitions into a shared "bounce" block once its
+  delay expires, and a falling state that conditionally re-enters that same bounce block via
+  a genuine `call z` whenever the boulder's vertical speed update reports it hit the ground.
+  The bounce block never executes its own `ret`; it always terminates by tail-jumping into
+  `playSound`, so the two ways of reaching it are told apart after the call returns by
+  checking `gb->pc`/`gb->sp` against the pushed resume address — generalizing the
+  HOOK_LOCAL-tail-jumps-into-an-external-hook pattern from `rotatableSeedThing.c` to a
+  *conditional* internal call for the first time this session. Zero bugs found by self-review
+  or a dedicated independent review focused entirely on tracing that mechanism. Bank 11 is
+  211/651 and the project 4,424/9,911. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 251, bank 11 (1 root routine): ported
+  `object_code/ages/parts/tingleBalloon.s` (`partCode44`, `tingleBalloon.c`) — Tingle's
+  balloon: a spawn state setting a fixed lifetime and floating speed, an update state that
+  reverses its vertical float direction (via a `cpl`/`inc a` two's-complement negation) once
+  its lifetime counter expires and continues tracking Tingle's own z-position, and a
+  been-hit path that bumps Tingle's own state, spawns an explosion interaction, and deletes.
+  Zero bugs found by self-review or independent review. Bank 11 is 210/651 and the project
+  4,423/9,910. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 289,869 frames with state
+  `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 250, bank 11 (1 root routine): ported
+  `object_code/ages/parts/plasmarineProjectile.s` (`partCode43`, `plasmarineProjectile.c`) —
+  the projectile fired by the Plasmarine boss: the first file this session with zero RST
+  jump tables, using pure straight-line `jr`/`jp` control flow instead — a lifetime/collision
+  state checking the projectile's color against the boss's, homing in on Link once its
+  lifetime counter runs low, damaging the boss (and breaking its shell at zero health) on a
+  color-matched collision, and a spawn state whose fire speed depends on the boss's remaining
+  health. Independent review caught a real bug: the "flicker visibility in the last 30 frames"
+  check had inverted `jr nc` polarity, which would have flickered visibility for the entire
+  lifetime EXCEPT the last 30 frames instead of only during them; fixed and the full gate was
+  re-run clean. Bank 11 is 209/651 and the project 4,422/9,909. Gates: lint 0, 30k verify 0
+  failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over
+  289,869 frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 249, bank 11 (1 root routine): ported
+  `object_code/ages/parts/pumpkinHeadProjectile.s` (`partCode42`, `pumpkinHeadProjectile.c`) —
+  the projectile fired by the Pumpkin Head enemy: verifies the caller wants a live instance
+  (else deletes), a spawn state computing a spread angle from a per-subid offset table and a
+  loop spawning two additional projectiles at fixed angle deltas from a second table (using
+  `addAToBc` rather than the more common `rst_addAToHl` for the first table lookup), a chase
+  state waiting out a counter before making itself visible, and a movement state applying
+  speed/animation and deleting on tile collision or out-of-bounds. Zero bugs found by
+  self-review or independent review. Bank 11 is 208/651 and the project 4,421/9,908. Gates:
+  lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk
+  suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 248, bank 11 (1 root routine): ported
+  `object_code/ages/parts/shadowHagShadow.s` (`partCode41`, `shadowHagShadow.c`) — the shadow
+  clones chased by/chasing the Shadow Hag: a 4-way RST $00 dispatch whose 4th entry points
+  directly at the external `partDelete` hook (rather than a local label), spawn state picking
+  a random one of four fixed angles, a chase state nudging its angle toward Link once the hag's
+  own counter1 signals a converge command, and a converge-back state doing a two-axis proximity
+  check against the hag's position before flipping to a self-deleting state. Independent review
+  caught a real bug: both `jr nc` proximity checks had inverted polarity (`F & FC` instead of
+  `!(F & FC)`), which would have made the shadow jump straight to the angle-update path when
+  CLOSE to the hag instead of when far; fixed and the full gate was re-run clean. Bank 11 is
+  207/651 and the project 4,420/9,907. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 247, bank 11 (1 root routine): ported
+  `object_code/ages/parts/headThwompBombDropper.s` (`partCode40`, `headThwompBombDropper.c`) —
+  the bomb dropped by the Head Thwomp miniboss: verifies the related object is still the
+  thwomp itself (else deletes), applies gravity until it either lands (then falls into
+  `objectApplySpeed`/copies the dropper's position and continues) or times out, and a spawn
+  state that picks a random horizontal speed and vertical velocity pair from two 4-entry
+  tables via `rst_addAToHl`, plus a random horizontal angle offset. Caught and fixed one
+  self-review mistake before building (`alu_swap` misused as a void mutator instead of using
+  its return value). Zero further bugs found by self-review or independent review. Bank 11 is
+  206/651 and the project 4,419/9,906. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 246, bank 11 (1 root routine): ported
+  `object_code/ages/parts/3e.s` (`partCode3e`, `partCode3e.c`) — tracks the enemy index of
+  every loaded Ambi Guard in `Part.var30-3f`: a 4-state RST $00 dispatch (state0 scans the
+  full enemy table recording each Ambi Guard's slot, state1 waits for a related object's
+  collision type to settle before recording it, state2 stamps every tracked Ambi Guard with a
+  shared relatedObj2 pointer, state3 is a simple countdown). The first file this session with
+  real backward-branching loops (`jr c,-` style), modeled as C `goto` back to `L_<addr>:`
+  labels rather than the straight-line/goto-forward style of every prior batch. Zero bugs found
+  by self-review or independent review. Bank 11 is 205/651 and the project 4,418/9,905. Gates:
+  lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk
+  suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 245, bank 11 (1 root routine): ported
+  `object_code/ages/parts/headThwompCircularProjectile.s` (`partCode3c`,
+  `headThwompCircularProjectile.c`) — the circling projectile fired by the Head Thwomp
+  miniboss: an inverted-sense guard at entry (`jp nz,partDelete` with no preceding compare,
+  relying on flags inherited from the caller), a spawn state setting its initial speed and
+  visibility, and an update state that advances its orbit angle from a toggling direction bit
+  in `var30` before applying speed and animating. Zero bugs found by self-review (after fixing
+  one self-caught mistake before building: a missing `sp0_` local broke `CALL_C` compilation)
+  or independent review. Bank 11 is 204/651 and the project 4,417/9,904. Gates: lint 0, 30k
+  verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 244, bank 11 (1 root routine): ported
+  `object_code/ages/parts/3b.s` (`partCode3b`, `partCode3b.c`) — the boulder thrown by the head
+  thwomp (purple face) miniboss: a top-level dispatcher that branches on subid to either the
+  "core" boulder (its own 3-state RST $00 dispatch: spawn with random position offset from the
+  camera, apply gravity until it lands or times out then switches to a break animation/sound,
+  and a third state that swaps its collision radius via a second `rst_addAToHl` table) or a
+  thrown instance (a near-duplicate 3-state dispatch whose third jump-table entry deliberately
+  reuses the core boulder's `state2` code). Every sub-label is `HOOK_LOCAL`, so all of it is
+  goto-inlined into one C function; only `partCode3b` itself is a top-level hook. Zero bugs
+  found by self-review or independent review. Bank 11 is 203/651 and the project 4,416/9,903.
+  Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk
+  suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 243, bank 11 (1 root routine): ported
+  `object_code/ages/parts/headThwompFireball.s` (`partCode39`, `headThwompFireball.c`) — the
+  fireball spat out by the Head Thwomp miniboss: a 3-state RST $00 dispatch that spawns with a
+  random angle/speed pair looked up via `rst_addAToHl`, applies its speed and gravity each frame
+  until it either times out or hits a tile (switching to a "break" animation and sound), and a
+  third state that turns the animation-parameter high bit into a check that swaps its collision
+  radius via a second `rst_addAToHl` table before falling into shared animation. Independent
+  review caught the recurring "unconditional jump end = branch target, not `from+len`" bug on
+  the first `jp playSound_b00` (its `CYC` end had swallowed 4 bytes of the intervening
+  `table_6c66` speed-lookup table); fixed and the full gate was re-run clean. Bank 11 is
+  202/651 and the project 4,415/9,902. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 242, bank 11 (3 root routines): ported
+  `object_code/ages/parts/veranProjectile.s` (`partCode37` + `veranProjectile_subid0` +
+  `veranProjectile_subid1`, `veranProjectile.c`) — Veran's projectile attack: a thin dispatcher
+  (`partCode37`) that tail-jumps to `veranProjectile_subid1` (an individual fired projectile,
+  its own 3-state RST $00 dispatch) or falls straight through into `veranProjectile_subid0`
+  (the "core" spawner, also its own 3-state RST $00 dispatch, firing new projectiles every 8
+  frames at an angle derived from its own counter1). All three routines are independently
+  registered (non-`HOOK_LOCAL`), so this is three separate top-level `_hook` functions in one
+  file, wired together with bare tail-calls (`jp`/fallthrough, no `push_effect` needed) rather
+  than the goto-inlining used for `HOOK_LOCAL` blocks. Zero bugs found by self-review or
+  independent review. Bank 11 is 201/651 and the project 4,414/9,901. Gates: lint 0, 30k verify
+  0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over
+  289,869 frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 241, bank 11 (1 root routine): ported
+  `object_code/ages/parts/candleFlame.s` (`partCode36`, `candleFlame.c`) — the flame effect on a
+  lit candle enemy: verifies the related object is still a candle (else deletes), a 3-state RST
+  $00 dispatch tracking the parent candle's speed to switch animation once it stops moving, then
+  deletes if the parent's collision mode became Podoboo, otherwise syncs position and continues
+  animating. First file this session with a genuine `push bc`/`pop bc` register save-restore
+  across a `call` (not a call/return-address push) — modeled as `push_effect(gb, BC)` /
+  `SET_BC(pop_effect(gb))`, confirmed by independent review to match established precedent in
+  `commonBombAndBraceletCode.c`. Zero bugs found by self-review or independent review. Bank 11
+  is 198/651 and the project 4,411/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 240, bank 11 (1 root routine): ported
+  `object_code/ages/parts/ramrockSeedFormLaser.s` (`partCode34`, `ramrockSeedFormLaser.c`) —
+  Ramrock's seed-form laser attack: tracks Link's x position while charging, pulsates between
+  red and blue every 4 frames, then a 5-way RST $00 dispatch (4 local states plus a direct
+  `partDelete` table entry) handling windup, a chain of self-respawning laser segments (each
+  spawned copy inherits `var03+1`, `relatedObj1` pointing back at its spawner), a related-enemy
+  subid gate, and the final moving/deleting state. Zero bugs found by self-review or independent
+  review. Bank 11 is 197/651 and the project 4,410/9,901. Gates: lint 0, 30k verify 0 failures
+  with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869
+  frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 239, bank 11 (2 root routines): ported
+  `object_code/ages/parts/rotatableSeedThing.s` (`partCode33` + `func_65d5`,
+  `rotatableSeedThing.c`) — the rotatable seed-thing puzzle object: a 4-state RST $00 dispatch
+  handling rotation-direction setup, spawning a companion collision-radius part (RST $18
+  double-index lookup into a per-direction offset table), toggling switch-block/trigger state
+  based on a rotation bitmask, and detecting collisions between the rotation arms. The most
+  structurally complex file this session: ~13 `HOOK_LOCAL` sub-labels inlined into one C
+  function via `goto`, four of which are genuine internal `call`s (not just `jr`/`jp`) between
+  those sub-labels. One shared HOOK_LOCAL block (`func_6515`/`subid0_state0`, joined by
+  fallthrough) is reached via THREE different edges — a bare top-level `jr z` and two separate
+  internal `call` sites — requiring a new generalization of the established "resume after a
+  local `ret`" pattern: check `gb->pc`/`gb->sp` against every known resume address after the
+  `RET`/`RET_TAKEN` macro's internal pop, falling back to a true top-level `return;` only when
+  none match. Documented as a new lesson in `docs/porting-notes.md`. Caught and fixed two real
+  bugs before the gate: `alu_rlc(gb, v)` returns the rotated value and must be assigned back
+  (`C = alu_rlc(gb, C)`, not a bare statement with a nonexistent register-selector constant), and
+  a tail `jp partSetAnimation`'s own 3-byte cycle burn was initially forgotten entirely. Zero
+  further bugs found by a dedicated independent-review pass. Bank 11 is 196/651 and the project
+  4,409/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference
+  replay 0 state-hash mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and
+  quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 238, bank 11 (1 root routine): ported
+  `object_code/ages/parts/subterrorDirt.s` (`partCode32`, `subterrorDirt.c`) — the dirt-clod
+  effect from Subterror's dig attack: a 2-state RST $00 dispatch (state0 plays SND_DIG and falls
+  straight into state1's animate-then-sync-visibility-to-animParameter-then-conditionally-delete
+  logic). Short 15-instruction file. Zero bugs found by self-review or independent review. Bank
+  11 is 194/651 and the project 4,407/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 237, bank 11 (1 root routine): ported
+  `object_code/ages/parts/babyBall.s` (`partCode2f`, `babyBall.c`) — the object that turns Link
+  into a baby: charges up (with a related-enemy-health check gating existence), fires a beam
+  toward the enemy target, then a 3-state RST $00 dispatch handling charge/fire/move-and-collide,
+  with a special case that nudges the angle toward Link when the related enemy (Veran's fairy
+  form) is attacking and mid-beat. Independent review caught a real bug before commit: the
+  unconditional `jr @animate` at ROM 0x6491 had its `CYC` end address copied from the
+  displayed branch target (0x64b6) instead of the instruction's own physical end (0x6493) — the
+  same "target vs physical end" trap documented earlier this session, now recurring even with
+  the explicit warning in the review brief. Also fixed a mislabeled field comment (0x29 is
+  `Object.health`, not `Object.relatedObj1`, matching the source's own `ld a,Object.health`).
+  Full gate re-run clean on the fixed build. Bank 11 is 193/651 and the project 4,406/9,901.
+  Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk
+  suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 236, bank 11 (1 root routine): ported
+  `object_code/ages/parts/seaEffects.s` (`partCode2e`, `seaEffects.c`) — the whirlpool and
+  pollution-tile effect object: waits for Link to be in normal state and not diving underwater,
+  then walks a chain of positions ahead of Link (RST $18 double-index lookup into a table of
+  (dy,dx) offsets) checking a harmful-water-tiles collision table, dispatching via a 3-way
+  RST $00 jump table on hit (electric-water shock damage, raft-only collision, or a
+  push-away-from-hazard response that also handles the currents/pollution tile pull via a
+  separate RST $10 single-index speed-value lookup). The most complex file this session by
+  instruction count (155 instructions, 3 literal `ret`/`ret cc` exits in a genuine top-level
+  hook, 2 different RST helpers). Caught and fixed one real build error before the gate: `A =
+  alu_add(gb, A)` doesn't compile because `alu_add` is `void` and sets `gb->a` internally — every
+  other `alu_add`/`alu_sub`/etc. call in the file was already a bare statement, this was the one
+  place a stray assignment slipped in. Zero bugs found by self-review or independent review.
+  Bank 11 is 192/651 and the project 4,405/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 235, bank 11 (1 root routine): ported
+  `object_code/ages/parts/veranFairyProjectile.s` (`partCode2d`, `veranFairyProjectile.c`) —
+  Veran's fairy-form projectile: waits for its related object (the boss) to exist and be alive,
+  fires toward the enemy target with a short lifespan, checks bounds, then animates; deletes
+  with a puff if the related object is gone. Short, single-block routine with three internal
+  labels reached by plain `goto`. No bugs found by self-review or independent review. Bank 11
+  is 191/651 and the project 4,404/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 289,869 frames with
+  state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 234, bank 11 (1 root routine): ported
+  `object_code/common/parts/twinrovaProjectile.s` (`partCode4b`, `twinrovaProjectile.c`) — the
+  red/blue Twinrova projectile shared by both bosses: reflects off Link's L3 shield, checks
+  whether the firing Twinrova is already dead, then runs a 4-state RST $00 dispatch (spawn,
+  charge-up with parent-position tracking, moving, and same-color-versus-opposite-color
+  collision handling that decrements both twinrovas' health and sets a "twinrova defeated"
+  signal bit). All nine internal state labels are `HOOK_LOCAL` (no external caller reaches them
+  directly), so they're inlined as plain `goto` targets with no `push_effect` needed — the RST
+  $00 jump-table helper is the byte-identical pattern established by `donkeyKongFlame.c`. Caught
+  and fixed one self-review bug before building: three unconditional `jp` tail-calls
+  (`partAnimate`/`partDelete`) were accidentally written with `CYCT` instead of plain `CYC` —
+  `CYCT` is reserved for the taken branch of a true conditional, never an unconditional jump;
+  independent review re-verified no other instance slipped through. Also discovered
+  `partCode4d` is a dead duplicate label at the same address as `partCode4b` in the source (never
+  referenced by the object-code table), so only `partCode4b` was registered — registering both
+  names made lint fail with "partCode4d has no partCode4d_hook entry" since only one hook
+  function exists per address. Bank 11 is 190/651 and the project 4,403/9,901. Gates: lint 0,
+  30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 289,869 frames with state `dfb98b52a3b12c03`, normal and quirk suites 8/8.
+- 2026-09-15: milestone 3 phase 6 batch 233, bank 11 (5 root routines): ported
+  `object_code/ages/parts/donkeyKongFlame.s` (`partCode2c` + `func_6248` + `func_6256` +
+  `func_6261` + `func_6270`, `donkeyKongFlame.c`) — the Donkey Kong minigame's flame hazard: a
+  5-state RST $00 dispatch (with a further nested 2-way dispatch inside state3's substates)
+  covering spawn, sidescroll gravity, ground-bounce, and player-collision detection/response.
+  This session's most delicate stack mechanism: `func_6248` (independently registered, reached
+  via two genuine `call`s and one conditional `jp`) contains a literal `pop hl` that, on one
+  branch, discards whatever's on top of the emulated stack and permanently exits via a tail-call
+  chain to `objectCreatePuff`/`partDelete` without ever returning to its logical caller. Verified
+  by direct trace (both independently and via a dedicated independent-review pass) that because
+  every RST $00 dispatch in this file is self-canceling, `gb->sp` equals `partCode2c_hook`'s own
+  entry SP at all three of `func_6248`'s entry points, so the bare `pop_effect()` call correctly
+  balances the stack regardless of which edge was taken, and `CALL_C`'s `hook_continue` fallback
+  (triggered when this path is taken from a genuine call site, since PC never returns to the
+  logical call site) resolves to a zero-iteration no-op rather than papering over a real bug.
+  Full 289,943-frame reference replay matched the baseline hash exactly. Bank 11 is 189/651 and
+  the project 4,402/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`,
+  full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 232, bank 11 (1 root routine): ported
+  `object_code/ages/parts/timewarpAnimation.s` (`partCode2b`, `timewarpAnimation.c`) — the
+  time-warp visual effect: applies its speed and deletes once it drifts far enough down-screen,
+  otherwise deletes if the related object (the thing being warped) has advanced past state 3 with
+  a certain subid bit set, and finally flickers visibility based on a byte read from the RELATED
+  object (not the current Part) using whatever H the last `call` happened to leave behind — a
+  real ROM quirk preserved faithfully rather than "fixed" with an inserted `H = D`. Single root,
+  no locals, no literal `ret`. Zero bugs found by independent review, which specifically traced
+  every write to H through the whole routine to confirm the quirk. Bank 11 is 184/651 and the
+  project 4,397/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 231, bank 11 (1 root routine): ported
+  `object_code/ages/parts/sparkle.s` (`partCode26`, `sparkle.c`) — the sparkle particle: on
+  spawn, picks a random speed/lifetime quadruple via an RST $10 table lookup; every frame
+  afterward, integrates a 16-bit fixed-point position from its speed (two separate `add hl,bc`
+  accumulations), decays that speed toward zero via a two's-complement step once its counter
+  expires, and flickers/deletes based on the accumulated Z depth. Single root, no locals, no
+  literal `ret` anywhere (every exit is a `jp` tail-call). Correctly distinguishes two different
+  negation idioms in the speed-decay step: a fresh `cpl`/`add $01` for the low byte and a
+  carry-propagating `cpl`/`adc $00` for the high byte. Zero bugs found by independent review.
+  Bank 11 is 183/651 and the project 4,396/9,901. Gates: lint 0, 30k verify 0 failures with
+  state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames
+  with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 230, bank 11 (1 root routine): ported
+  `object_code/ages/parts/wallArrowShooter.s` (`partCode25`, `wallArrowShooter.c`) — the
+  wall-mounted arrow shooter: on first update, derives its firing angle from its own subid;
+  every frame, checks whether the enemy target is roughly aligned on the shooter's fixed axis
+  (X or Y, chosen by a subid bit) and within a threshold distance, and if so, spawns an arrow
+  offset by a direction-indexed table looked up via RST $18 (`addDoubleIndex`). Single root, no
+  locals. Zero bugs found by independent review, including a careful re-derivation of the
+  `bit 0,a` polarity trap governing which axis (X vs Y) the alignment check uses. Bank 11 is
+  182/651 and the project 4,395/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with
+  state `a62ae98192befee8`, normal and quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 229, bank 11 (1 root routine): ported
+  `object_code/ages/parts/grottoCrystal.s` (`partCode24`, `grottoCrystal.c`) — the grotto crystal
+  switch: when triggered, toggles the global switch state via XOR with its own subid, resets its
+  collision visibility, and spawns a sarcophagus interaction; otherwise waits one frame then
+  checks the room's flag byte to decide whether to reset visibility again before making its tile
+  solid and becoming visible. Single root, no locals. Contains two source quirks faithfully
+  preserved rather than "corrected": a garbled `ldbc, INTERAC_SARCOPHAGUS $80` macro invocation
+  that the transliterator resolves to the literal `ld bc,$8280`, and a bare `ld h,$cf` that sets
+  only the high byte of HL, leaving L as whatever the immediately preceding call left there.
+  Zero bugs found by independent review. Bank 11 is 181/651 and the project 4,394/9,901. Gates:
+  lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash
+  mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 228, bank 11 (1 root routine): ported
+  `object_code/ages/parts/jabuJabusBubbles.s` (`partCode16`, `jabuJabusBubbles.c`) — Jabu Jabu's
+  bubble: a 4-state RST $00 dispatch (rarer 4-entry table for this bank) spawning at a random
+  position/speed via an RST $10 table lookup, flickering visibility while idle, tracking its
+  spawn point plus a 16-bit offset via a genuine `add hl,bc`, then applying speed and shrinking
+  until it either leaves a Y bound or its speed decays to nothing. Single root, no locals.
+  Contains a real data-flow trap re-verified independently: `dec (hl)` (decrementing
+  Part.counter2 in memory) is immediately followed by `and $0f`, which operates on the STALE
+  value already in `A` from several instructions earlier (the Part.visible flip), not a fresh
+  read of the just-decremented byte — traced every assignment to `A` through the whole state to
+  confirm no spurious re-read was introduced. Zero bugs found by independent review. Bank 11 is
+  180/651 and the project 4,393/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with
+  state `a62ae98192befee8`, normal and quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 227, bank 11 (2 root routines): ported
+  `partCodeNil` and `partCode00` (`partCodeStubs.c`) — two trivial single-instruction part-code
+  table filler entries with no corresponding `.s` source file (only referenced from
+  `data/partCodeTable.s`'s `.dw` list); verified directly against the transliteration report.
+  `partCodeNil` is a bare `ret` (top-level exit); `partCode00` is an unconditional `jp partDelete`
+  tail-call. Bank 11 is 179/651 and the project 4,392/9,901. Gates: lint 0, 30k verify 0 failures
+  with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174
+  frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 226, bank 11 (4 root routines): ported
+  `object_code/common/parts/blueEnergyBead.s` (`partCode53` + `createEnergySwirlGoingOut_body` +
+  `createEnergySwirlGoingIn_body` + `func_5e1a`, `blueEnergyBead.c`) — the blue energy bead
+  projectile plus the two utility routines used elsewhere to spawn a full ring of them. The two
+  swirl routines share almost their entire body (a genuine 8-iteration `push de`-protected loop
+  spawning up to 8 beads around a circle) starting right after their own distinct 1-2 byte
+  preambles; modeled as a shared, non-static `_hook`-suffixed helper function
+  (`blueEnergyBead_swirlBody_hook`, needed because `tools/lint_game.py` requires any function
+  touching emulated registers to match `void ..._hook(GB *gb)` exactly, no `static`, per the
+  established `enemySword_func_5273_hook` precedent) reached via a bare call from both entry
+  points — hit this exact lint failure and a related missing-`sp0_` build failure while authoring,
+  both fixed before the gate ran. Zero further issues found by independent review, which
+  specifically verified the shared body's byte-exact hand-off between the two callers and the
+  genuine value-preserving `push de`/`pop de` pair. Bank 11 is 177/651 and the project 4,390/9,901.
+  Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 225, bank 11 (1 root routine): ported
+  `object_code/common/parts/52.s` (`partCode52`, `52.c`) — Ganon's part 52, the most complex file
+  ported this session: a three-level RST $00 dispatch (an outer subid0/subid1/subid2 selector,
+  with each subid running its own inner state0/state1/state2 dispatch), where subid1's and
+  subid2's inner dispatch tables each carry a 4th entry that jumps directly into subid0's own
+  state2 code rather than their own — modeled as a single shared `subid0_state2` label reached
+  via `goto` from all three paths, per the shared-target-label lesson from two batches ago. Also
+  contains a private local (`func_5d31`) invoked once via a genuine `call` and a second time via
+  pure fallthrough immediately afterward — the exact same ROM bytes executed twice with different
+  stack semantics each time (one has a pending call return address to resume, the other doesn't),
+  modeled as two deliberately duplicated inline copies with different exit treatment (`ret_effect`
+  + `goto` back to the caller for the call-reached copy; top-level `RET_TAKEN` for the
+  fallthrough-reached copy). Zero bugs found by independent review, which specifically traced the
+  cross-subid jump-table entries and both `func_5d31` copies in detail. Bank 11 is 173/651 and
+  the project 4,386/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`,
+  full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 224, bank 11 (1 root routine): ported
+  `object_code/common/parts/51.s` (`partCode51`, `51.c`) — Ganon's part 51: two nested RST $00
+  dispatches (an outer subid0/subid1/subid2 dispatch, and a further inner state0/state1/state2
+  dispatch inside subid1) plus an RST $18 "addDoubleIndex" table lookup for a two-frame
+  animation. The outer jump table's `.dw` declaration order does NOT match physical ROM layout —
+  subid2's code appears before subid1's in the file, but subid1 is index 1 and subid2 is index 2
+  — verified correct against the actual `.dw` order rather than physical address order.
+  Independent review found a real cycle-accounting bug before commit: a `jr nz` shortcut directly
+  to `partAnimate_hook` skipped the shared `animate:` label's own 4-cycle `jp` burn whenever that
+  branch was taken, since nothing else `goto`s that label to trigger it; fixed by changing the
+  inlined call to `goto animate;` so the label's own burn always fires. Also fixed a
+  field-offset comment nit (0xe8 is `Part.damage`, confirmed via real precedent, not left bare).
+  Full gate re-verified clean after both fixes. Bank 11 is 172/651 and the project 4,385/9,901.
+  Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 223, bank 11 (2 root routines): ported
+  `object_code/common/parts/ganonTrident.s` (`partCode50` + `func_5b2b`, `ganonTrident.c`) —
+  Ganon's trident: deletes if the related Ganon object has already reached a terminal state,
+  otherwise runs an RST $00 dispatch (spawn-in-place / airborne throw-cycle / land-and-check).
+  An unusual case: a genuine `push hl` (a VALUE, not a return address) at the routine's entry is
+  popped by exactly ONE of three different exit paths depending on control flow — `state0`,
+  `state2` (reached either directly or via `state1`'s fallthrough), or `func_5b2b_hook` (an
+  independently-registered local reached via a bare `jr nz` tail-jump from `state1`, popping the
+  SAME value across the C function boundary via the shared emulated stack). Verified the two
+  pushes (the HL value, then the RST dispatch's own self-canceling return-address push) nest
+  correctly in LIFO order with no leak or double-pop on any path. Zero bugs found by independent
+  review, which specifically traced every consumer of the pushed value. Bank 11 is 171/651 and
+  the project 4,384/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`,
+  full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 222, bank 11 (1 root routine): ported
+  `object_code/common/parts/twinrovaSnowball.s` (`partCode4e`, `twinrovaSnowball.c`) — Twinrova's
+  snowball projectile: destroys itself and spawns snow debris when hit by a sufficiently strong
+  weapon or already at maximum item-collision level, otherwise runs an RST $00 dispatch that
+  teleports in, waits/animates while flashing, then aims at and moves toward the enemy target
+  until it either leaves the screen or collides with a tile. Single root, no locals. Zero bugs
+  found by independent review, including a fresh re-derivation of the `bit 0,(hl)` polarity trap
+  and all six conditional branches' physical byte-ends. Bank 11 is 169/651 and the project
+  4,382/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference
+  replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and
+  quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 221, bank 11 (1 root routine): ported
+  `object_code/common/parts/twinrovaFlame.s` (`partCode4c`, `twinrovaFlame.c`) — Twinrova's flame
+  projectile: an RST $00 dispatch across an ignition state (which sets up appearance and plays a
+  sound) and two further sub-states that animate/apply speed and check tile collision, plus a
+  non-RST subid path used for the flame's simpler travel-and-delete behavior. On the terminal
+  tile-collision path it runs a genuine 3-iteration loop (`dec b`/`jr nz`) spawning up to three
+  secondary flame parts at incrementing angles around a circle via `getFreePartSlot`, modeled
+  with two goto labels for the loop top and continuation point. Single root, no independently-
+  registered locals. Zero bugs found by independent review, including a careful re-derivation of
+  every branch's physical byte-end and confirmation that the loop's `getFreePartSlot` success
+  polarity (Z set = success) matches every other caller in the codebase. Bank 11 is 168/651 and
+  the project 4,381/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`,
+  full reference replay 0 state-hash mismatches over 290,174 frames with state
+  `a62ae98192befee8`, normal and quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 220, bank 11 (1 root routine): ported
+  `object_code/common/parts/greatFairyHeart.s` (`partCode30`, `greatFairyHeart.c`) — the great
+  fairy's healing heart: on first update sets its counter and becomes visible, then flies in a
+  circular arc toward the enemy target position; once its counter expires it starts a 32-step
+  angle countdown, and once THAT expires, decrements `wLinkMaxHealth` at the related object and
+  deletes itself if the player's displayed hearts already equal max health. Single flat routine,
+  no locals, three top-level `ret nz` exits. Zero bugs found by independent review, including a
+  focused re-check of the file's one `jr nz` for the target-vs-physical-end confusion class.
+  Bank 11 is 167/651 and the project 4,380/9,901. Gates: lint 0, 30k verify 0 failures with state
+  `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over 290,174 frames with
+  state `a62ae98192befee8`, normal and quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 219, bank 11 (2 root routines): ported
+  `object_code/common/parts/beam.s` (`partCode29` + `func_5758`, `beam.c`) — the beam projectile:
+  RST $00 dispatch across firing/traveling states, deriving its animation frame from the low
+  nibble of its angle via an RST $10 table lookup, and periodically toggling visibility based on
+  the frame counter while checking for tile collision. `func_5758` is reached via TWO different
+  edges from the same file — a `jr nz` tail-jump (state1, bare tail-call) and a genuine `call`
+  (state2, `CALL_C`) — correctly modeled per-edge rather than as a fixed property of the callee;
+  since `func_5758` has no literal `ret` at all (both its exits are tail-calls to already-hooked
+  routines), neither edge has any `RET`/`ret_effect` concern. Zero bugs found by independent
+  review, including a full individual re-check of every `jr`/`jp` end address following the
+  target-vs-physical-end confusion caught in the previous batch. Bank 11 is 166/651 and the
+  project 4,379/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 218, bank 11 (3 root routines): ported
+  `object_code/common/parts/smallFairy.s` (`partCode28` + `func_56b6` + `func_56cd`,
+  `smallFairy.c`) — the small healing fairy: RST $00 dispatch across spawn/wander/collection
+  states, picking a random speed/counter/angle when starting to wander, checking collision with
+  Link, and giving a random ring or heart refill treasure when collected. `func_56b6` (reached
+  only via an unconditional `jp` tail-jump, never a call) correctly uses `RET_TAKEN` for its own
+  exits, top-level style; `func_56cd` (reached via a genuine `call`) correctly uses `CALL_C` at
+  its call site and `RET`/`RET_TAKEN` at its own exits, applying the stack-leak lesson from three
+  batches ago. Self-review caught a real bug before the gate ran: a `jr nc` had its `CYC`/`CYCT`
+  end address confused with its branch target (0x56c4) instead of its own physical byte-end
+  (0x56c3) — a recurrence of the byte-range-vs-target confusion class, fixed before any build.
+  Zero further issues found by independent review. Bank 11 is 164/651 and the project 4,377/9,901.
+  Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 217, bank 11 (1 root routine): ported
+  `object_code/common/parts/lighting.s` (`partCode27`, `lighting.c`) — the lightning bolt part:
+  spawns aimed at the enemy target when one exists, then either strikes (playing a sound and
+  becoming visible) or animates through its lifetime, running a private helper twice per frame
+  that derives collision/position offsets from its animation-parameter nibbles and can spawn a
+  companion interaction via `getFreeInteractionSlot`. Two private (`HOOK_LOCAL`) sub-labels,
+  `func_55a6` and `func_55e7`, are each reached via a genuine `call`/`call nz` — confirmed (by
+  direct `generated.txt` diffing) that their standalone hook entries are removed once `partCode27`
+  is registered, so they were inlined via `goto` with explicit `push_effect` for each call site.
+  The first draft treated their tail-jumps into already-hooked external routines
+  (`setScreenShakeCounter`, `objectCopyPositionWithOffset`) as terminal exits, which silently
+  dropped `partCode27_hook`'s own remaining logic whenever that path was taken — a real bug caught
+  not by self-review, not by independent review, not by the 30k-frame verify pass, but by the
+  short `test_tas` ctest failing with a state mismatch at frame 10560. Fixed by having the
+  tail-jump call the external hook and then `goto` the correct resume label, since on real
+  hardware the external routine's own `ret` pops the same return address pushed for the original
+  call. Two new porting-notes.md lessons recorded. Bank 11 is 161/651 and the project 4,374/9,901.
+  Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
+  suites 8/8 (including the short TAS ctest that first caught the bug).
+
+- 2026-09-15: milestone 3 phase 6 batch 216, bank 11 (3 root routines): ported
+  `object_code/common/parts/fallingFire.s` (`partCode23` + `func_5535` + `func_553f`,
+  `fallingFire.c`) — falling fire from a torch/ceiling: RST $00 dispatch across three subids
+  (spawning, waiting, falling), spawning a new falling-fire part via `getFreePartSlot` when
+  triggered. `func_553f` (an animation-frame-cycling helper with its own RST $10 table lookup) is
+  reached via a genuine `call` and is the first CALL_C-invoked local written since the stack-leak
+  fix — correctly closes its own literal `ret` with `RET`, cross-checked directly against the
+  auto-generated ground truth in `gen_bank11.c` before it was deleted by the regen step.
+  `func_5535` (reached only via a `jr z` tail-jump, no literal `ret` at all) correctly stays a bare
+  tail-call. `partCode23_hook`'s own four top-level `ret`/`ret nz` exits correctly use
+  `RET`/`RET_TAKEN`. Zero bugs found by independent review. Bank 11 is 160/651 and the project
+  4,373/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference
+  replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and
+  quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 215, bank 11 (1 root routine): ported
+  `object_code/common/parts/cuccoAttacker.s` (`partCode22`, `cuccoAttacker.c`) — the cucco's
+  attacker projectile: 3-state RST $00 dispatch spawning at a random screen edge with a random
+  speed/angle toward the target (four RST $10 `addAToHl` table lookups into `@speedVals`,
+  `@xOrYVals` used twice, and `@screenEdgePositions`), then counting down and animating until
+  screen-boundary exit deletes it. Single root, no independently-registered locals, no literal
+  `ret` anywhere in the whole routine (every exit is a `jp` tail-call or consumed by the RST $00
+  dispatch's self-canceling push), so the newly-found CALL_C/`ret_effect` bug class does not apply
+  here. Proactively re-derived the `bit 0,b`/`jr nz` polarity from `BIT`'s actual flag semantics
+  rather than pattern-matching. Zero bugs found by independent review. Bank 11 is 157/651 and the
+  project 4,370/9,901. Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full
+  reference replay 0 state-hash mismatches over 290,174 frames with state `a62ae98192befee8`,
+  normal and quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 214, bank 11 (4 root routines): ported
+  `object_code/common/parts/moblinBoomerang.s` (`partCode21` + `func_53f5` + `func_541a` +
+  `func_542a`, `moblinBoomerang.c`) — the moblin's boomerang projectile. All three locals have
+  their own independent hook-table entries and are each reached via a genuine `call` from
+  `partCode21`, so each uses `CALL_C` at its call site. Self-review caught a `jr nc` polarity
+  inversion (state2's collision-check branch) before the gate ran, plus a wrong field-offset
+  comment (0xea is `Part.var2a`, not `invincibilityCounter`, which is 0xeb). The full-game
+  `--ref-check` then caught a second, more serious bug that survived self-review, independent
+  review, AND a clean 30k-frame `--verify-hooks-continue` pass: the three `CALL_C`-invoked locals
+  used bare `CYC`/`CYCT` + `return;` for their literal `ret` exits instead of `RET`/`RET_TAKEN`,
+  leaking 2 bytes onto the emulated stack per call (`CALL_C_` always `push_effect()`s the return
+  address and expects the callee to pop it via `ret_effect()`) — this caused a real frame-hash
+  mismatch at frame 42864 once enough calls accumulated. Root-caused by comparing against the
+  auto-generated fallback interpreter in `gen_bank11.c` (ground truth, already using
+  `PUSH`/`POP`/`RET`/`RET_TAKEN` for this exact code) and fixed; see the corrected porting-notes.md
+  lesson. The same bug shape, found latent in `dekuScrubProjectile.c` from batch 211, was fixed in
+  a preceding commit. Bank 11 is 156/651 and the project 4,369/9,901. Gates: lint 0, 30k verify 0
+  failures with state `3e450c2620a3f6a3`, full reference replay 0 state-hash mismatches over
+  290,174 frames with state `a62ae98192befee8`, normal and quirk suites 8/8.
+
+- 2026-09-15: milestone 3 phase 6 batch 213, bank 11 (1 root routine): ported
+  `object_code/common/parts/fire.s` (`partCode20`, `partCode20.c`) — the fire keese's fire
+  projectile: while its state is nonzero, decrements counter1 and deletes when it reaches zero,
+  otherwise animates; on first update (state 0) it increments its own state, sets counter1 to
+  0xb4, and makes itself visible. Single root, no locals, no RST dispatch. Self-review caught one
+  byte-length bug before the gate ran: the final `jp objectSetVisible82` end address was written
+  as `0x5396` instead of the correct `0x5395` (jp is always 3 bytes), fixed before any build.
+  Independent review confirmed zero further issues. Bank 11 is 152/651 and the project 4,365/9,901.
+  Gates: lint 0, 30k verify 0 failures with state `3e450c2620a3f6a3`, full reference replay 0
+  state-hash mismatches over 290,174 frames with state `a62ae98192befee8`, normal and quirk
+  suites 8/8.
 - 2026-09-15: milestone 3 phase 6 batch 202-B, bank 0b (9 routines): added the Vire interaction
   dispatcher, all three minigame/entrance state machines, script and counter helpers, and the
   disable/delete control helpers. Regeneration leaves 770 executable Bank 0b hooks, 139 rewritten;

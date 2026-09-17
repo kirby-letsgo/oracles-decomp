@@ -49,7 +49,7 @@ void func_5313_hook(GB *gb) {
   CYC(0x531e, 0x531f); dekuScrubProjectile_addAToHl_from_rst(gb, 0x531f);
   CYC(0x531f, 0x5320); A = mem_rd(gb, HL);
   CYC(0x5320, 0x5321); mem_wr(gb, DE, A);
-  CYC(0x5321, 0x5322); return; // ret
+  RET(0x5321); return; // ret
 }
 
 void func_52f4_hook(GB *gb) {
@@ -77,7 +77,7 @@ void func_52fd_hook(GB *gb) {
   CYC(0x530f, 0x5310); dekuScrubProjectile_addAToHl_from_rst(gb, 0x5310);
   CYC(0x5310, 0x5311); A = mem_rd(gb, HL);
   CYC(0x5311, 0x5312); mem_wr(gb, DE, A);
-  CYC(0x5312, 0x5313); return; // ret
+  RET(0x5312); return; // ret
 }
 
 void func_5336_hook(GB *gb) {
@@ -85,10 +85,10 @@ void func_5336_hook(GB *gb) {
   CYC(0x5336, 0x5338); A = 0x24;
   CALL_C(0x5338, objectGetRelatedObject1Var_hook, 0x2160, 0x533b);
   CYC(0x533b, 0x533d); alu_bit(gb, 7, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(0x533d, 0x533e); return; } // ret z
+  if (F & FZ) { RET_TAKEN(0x533d); return; } // ret z
   CYC(0x533d, 0x533e);
   CALL_C(0x533e, checkObjectsCollided_hook, 0x1d5a, 0x5341);
-  if (!(F & FC)) { CYCT(0x5341, 0x5342); return; } // ret nc
+  if (!(F & FC)) { RET_TAKEN(0x5341); return; } // ret nc
   CYC(0x5341, 0x5342);
   CYC(0x5342, 0x5344); L = 0xaa;
   CYC(0x5344, 0x5346); mem_wr(gb, HL, 0x82);
@@ -99,7 +99,7 @@ void func_5336_hook(GB *gb) {
   CYC(0x534d, 0x534f); E = 0xc4; // Part.state
   CYC(0x534f, 0x5351); A = 0x04;
   CYC(0x5351, 0x5352); mem_wr(gb, DE, A);
-  CYC(0x5352, 0x5353); return; // ret
+  RET(0x5352); return; // ret
 }
 
 void partCode1e_hook(GB *gb) {

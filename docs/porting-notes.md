@@ -1510,6 +1510,225 @@ desync to discover; keep them when porting routines.
   against a neighboring line. Always double-check a `bit`/`jr` pair against `alu_bit`'s actual
   semantics (`gb->f = ... | ((v & (1<<bit)) ? 0 : FZ)`) rather than against how a nearby `cp`- or
   `or`-based branch in the same block happens to look.
+- **CORRECTION to the "round-trip local" precedent: a local invoked via `CALL_C` MUST call
+  `ret_effect()` (i.e. use `RET`/`RET_TAKEN`, never a bare `return;`) on every one of its own
+  literal `ret`/`ret cc` exits — the earlier "call site has no `push_effect`, so the callee needs no
+  `ret_effect`" reasoning was WRONG for this case.** `CALL_C_`'s actual definition
+  (`src/game/game.h`) unconditionally does `push_effect(gb, ra)` before invoking the hook function,
+  then checks `gb->sp == sp_before + 2` after it returns to detect whether the callee's own `ret`
+  correctly popped that value; if the callee does a bare `return;` instead of calling
+  `ret_effect()`, the pushed return address is never popped, `gb->sp` silently drifts by 2 bytes
+  per call, and the mismatch check falls through to `hook_continue`, which resumes real hardware
+  emulation from the (still-correct) `pc` but with a now-wrong `sp` — a genuine, cumulative stack
+  corruption, not a cosmetic or cycle-accounting issue. The "no push, no pop" round-trip pattern is
+  only valid for a local reached via a **bare C function call with no `CALL_C`** (i.e. the ROM
+  routine is reached only through a `jr`/`jp` tail-jump chain, never a genuine `call`) — there,
+  nothing pushes and nothing needs to pop, matching real hardware's net-zero SP delta for a
+  call+ret pair by using neither side of the pair at all. The two patterns look almost identical in
+  the C (a function whose every exit is bare `CYC`/`CYCT` + `return;`) but have opposite
+  correctness requirements depending purely on how the call site invokes them.
+  Found via a real full-game regression: `moblinBoomerang.c`'s `func_53f5_hook`/`func_541a_hook`/
+  `func_542a_hook` (new file, all three invoked via `CALL_C` from `partCode21_hook`, all originally
+  written with bare `return;` for their literal `ret`/`ret cc` exits per the old, now-corrected
+  understanding) caused a full-game `--ref-check` frame-hash mismatch at frame 42864 — despite zero
+  findings from self-review, independent review, AND a clean 30k-frame `--verify-hooks-continue`
+  pass, because none of those catch a slow stack-pointer drift that only manifests once enough
+  calls accumulate. Root-caused by reading `CALL_C_`'s actual macro body and comparing against the
+  auto-generated (pre-hook) fallback interpreter in `gen_bank11.c`, which had always used
+  `PUSH`/`POP`/`RET`/`RET_TAKEN` for this exact code — the auto-generated version was the ground
+  truth the whole time. A grep audit of every `CALL_C`-invoked bank-11 function for the same bug
+  shape found it already latent (uncaught by the full gate at the time, simply never yet triggered
+  by the TAS replay) in `dekuScrubProjectile.c`'s `func_52fd_hook`, `func_5313_hook`, and
+  `func_5336_hook` from batch 211 — fixed in the same pass. When adding a new `CALL_C`-invoked
+  local, always grep the auto-generated `gen_bank11.c` (or whichever bank's `gen_bankNN.c`) version
+  of the same address *before* it gets deleted by the rewrite, since it mechanically encodes the
+  correct push/pop/ret shape for every instruction and is the fastest way to sanity-check a local's
+  stack-effect treatment against ground truth.
+- **A `HOOK_LOCAL` private label reached via a genuine `call` gets its standalone `generated.txt`
+  entry REMOVED once its containing routine is registered in `rewritten.txt`** (confirmed by
+  direct before/after `grep` on `generated.txt`) — meaning `hook_enabled_at()` will return false
+  for that address forever after, so `CALL_C`/`CALL_C_CC` targeting it would silently fall back to
+  raw ROM interpretation (`asm_call`) instead of ever invoking a hand-written C function there. The
+  correct treatment is to fully inline the local's logic into the parent via `goto` labels — but if
+  the label is reached via a genuine `call` (not just `jr`/fallthrough), real hardware DID push a
+  return address for it, and that must be modeled explicitly: `push_effect(gb, <return_addr>)`
+  right before the `goto` into the inlined label. The label's own "return to caller" exit (a
+  literal `ret`/`ret cc`) then does `ret_effect(gb); goto <resume_label>;` — NOT `RET_TAKEN(...);
+  return;`, since a bare `return` would exit the WHOLE containing hook function instead of
+  continuing the caller's remaining inlined code, silently dropping real logic downstream of the
+  original call site.
+- **The inlined label's own tail-jump to an already-hooked EXTERNAL routine is not a terminal exit
+  either, when the label was reached via a genuine `call`** — on real hardware, `jp` doesn't touch
+  the stack, so the external routine's own eventual `ret` pops the SAME return address that was
+  pushed for the original call into the inlined label, meaning execution architecturally resumes
+  back inside the caller, not wherever the external routine's own top-level caller happens to be.
+  So the tail-jump must be modeled as `external_hook(gb); goto <resume_label>;` — plain function
+  call followed by `goto`, never `external_hook(gb); return;`. Both of these lessons were found
+  together in `lighting.c`'s `func_55a6`/`func_55e7` (two `HOOK_LOCAL` labels, each reached via a
+  genuine call, each with one `ret`-exit and one tail-jump-exit): the first draft treated the
+  tail-jump exits as terminal (`return;`), which silently skipped `partCode27_hook`'s own remaining
+  logic (the code right after the original call sites) whenever that path was taken — caught not by
+  self-review, not by independent review, not by the 30k-frame `--verify-hooks-continue` pass, but
+  by the SHORT `test_tas` ctest failing with a real state mismatch at frame 10560, far earlier than
+  any other bug this whole project has surfaced. This is a stark reminder that the fast ctest is not
+  a "smoke test to skip past" — it can catch bugs the longer, more expensive replays miss entirely
+  if the divergence happens to occur outside their exercised window, and every gate stage genuinely
+  catches different bug classes.
+- **A shared target label reached by multiple entry paths must be reached via `goto` from EVERY
+  path, never inlined as a direct call on some paths and `goto`-ed on others** — the label's own
+  `CYC` burn only fires when control actually flows through the `goto`; inlining the label's body
+  (e.g. `some_hook(gb); return;`) on a shortcut path skips that label's own instruction's cycle
+  burn entirely, undercounting cycles whenever that specific path is taken. Found in `51.c`'s
+  `state1`: the `.s` source's `jr nz,@animate` and the natural fallthrough into `@animate` both
+  reach the SAME physical `jp partAnimate` instruction at ROM address 0x5c59, so both paths must
+  `goto animate;`, letting the `animate:` label's own `CYC(0x5c59, 0x5c5c)` burn fire regardless
+  of which path arrived — the first draft instead inlined `partAnimate_hook(gb); return;` directly
+  at the `jr nz` site, skipping that burn on every frame the branch was taken. Caught only by
+  independent review, not by self-review, the coverage-diff script (which doesn't distinguish
+  "reachable via goto" from "reachable via inlined call" — both produce a CYCT/CYC entry, just at
+  different addresses, so nothing looked obviously missing), or either replay (a few skipped
+  cycles per frame don't reliably show up as a state-hash mismatch the way a logic/stack bug does).
+  When a ROM label is reachable from more than one place, always give it exactly one `goto` target
+  and route every incoming edge through that same `goto`, never duplicate-inline its body.
+- **A shared helper function reused by two or more `_hook` routines still needs the exact
+  `void <name>_hook(GB *gb)` signature (no `static`, no other prefix) whenever it touches emulated
+  registers (`A`/`B`/.../`HL`/`gb->sp` etc.) or uses `CALL_C`** — `tools/lint_game.py`'s
+  "emulated register outside a _hook shim" rule matches lines via a literal regex on the function
+  signature (`re.match(r'void \w+_hook\(GB \*gb\)', line)`), so a `static` prefix, or a name not
+  ending in `_hook`, silently fails the match and flags every register access inside. This applies
+  even when the helper has no independent ROM-address hook-table entry of its own — matches the
+  pre-existing `enemySword_func_5273_hook` precedent (a private local given the `_hook` suffix
+  purely to satisfy this rule, not because it's independently registered). Also remember the
+  helper needs its own `uint16_t sp0_ = gb->sp; (void)sp0_;` line if it uses `CALL_C` anywhere
+  internally (a separate, unrelated real build error caught in the same file, `blueEnergyBead.c`,
+  when writing the shared `blueEnergyBead_swirlBody_hook` helper for
+  `createEnergySwirlGoingOut_body`/`In_body`) — declaring a fresh `sp0_` inside the shared helper
+  is safe as long as none of its callers change `gb->sp` between their own entry and the call into
+  the shared helper (true whenever the callers only do straight-line register/immediate work
+  before falling through or tail-jumping into it, as is almost always the case for this pattern).
+- **A literal `pop rr` (not `ret`) inside a genuinely-`CALL_C`-invoked, independently-registered
+  local that then permanently diverts via a tail-call chain (never resuming the logical caller) is
+  modeled as a plain, unconditional `pop_effect()` call — no special-casing needed, even when the
+  SAME local is ALSO reached via other edges (a bare `jr`/`jp` with no push, or other `CALL_C`
+  sites) — because `push_effect`/`pop_effect` operate on the REAL byte-level emulated stack, which
+  correctly reflects whatever each specific invocation actually did, exactly like real hardware.**
+  The resulting `CALL_C_` post-call check (`gb->pc == return_addr && gb->sp == sp_+2`) will
+  legitimately FAIL for the genuinely-called edges, since PC never returns to the logical call
+  site — this is EXPECTED, not a bug, and correctly falls into `CALL_C_`'s own `hook_continue`
+  fallback. As long as every RST $00 dispatch nested in the calling hook is self-canceling (the
+  now-repeatedly-established pattern), `gb->sp` at the point of the diversion equals the calling
+  hook's own top-level entry SP (`sp0_`), so whatever terminal external hook the tail-call chain
+  eventually reaches (here, `partDelete_hook`) will pop EXACTLY that hook's real caller's return
+  address via its own internal `ret_effect()` — meaning `hook_continue`'s while-loop condition is
+  satisfied immediately, running zero iterations of raw CPU stepping; it degenerates to a no-op
+  rather than doing meaningful (and therefore risky) work. Established in `donkeyKongFlame.c`'s
+  `func_6248`, reached via two genuine `CALL_C` sites and one bare conditional `jp`, whose `pop hl`
+  branch discards the current call's return address entirely and exits via
+  `objectCreatePuff`/`partDelete` — confirmed correct both by an exhaustive manual trace through
+  `CALL_C_`/`push_effect`/`pop_effect`/`ret_effect`/`hook_continue` BEFORE writing any code, and
+  independently re-verified by a dedicated review pass and a full 289,943-frame reference replay
+  matching the baseline hash exactly. When this pattern recurs, don't reflexively assume a
+  "pop instead of ret" needs per-caller special treatment — trace whether the resulting SP state is
+  actually caller-independent first (it usually is, if all reachability paths converge on the same
+  logical entry SP), and let `CALL_C_`'s own fallback mechanism do its job.
+- **A `HOOK_LOCAL` block reached via genuine `call`s from MULTIPLE different in-file sites needs
+  an explicit multi-way "check `gb->pc`/`gb->sp` after the pop" dispatch at its own shared exit,
+  not just the single-target `ret_effect(gb); goto resume_X;` pattern established earlier for a
+  block with exactly one caller.** Established in `rotatableSeedThing.c` (`partCode33`):
+  `func_6515`/`subid0_state0` (one physical block, joined by fallthrough) is reached three ways —
+  a bare `jr z` from `subid0` (no push, a true top-level entry), a `call` from `subid1_state0`
+  (explicit `push_effect(gb, 0x6551)`), and a `call` from `subid2_state0` (explicit
+  `push_effect(gb, 0x65b5)`) — so its two literal `ret` instructions (`ret nz` and the final `ret`)
+  each do the macro burn (`RET_TAKEN`/`RET`, which internally sets `gb->pc = pop_effect(gb)`) and
+  THEN check `gb->pc` against every known resume address, falling back to a plain `return;` only
+  if none match:
+  ```c
+  RET(0x653d);
+  if (gb->pc == 0x6551 && gb->sp == sp0_) goto func_6551;
+  if (gb->pc == 0x65b5 && gb->sp == sp0_) goto subid2_state0_afterFunc6515;
+  return;
+  ```
+  Checking `gb->sp == sp0_` alongside `gb->pc` (matching the pre-existing idiom in
+  `monkeyMain.c`/`rabbitMain.c`) guards against a coincidental PC match at the wrong stack depth,
+  though in practice every internal call site in a file like this pushes from the SAME sp0_ (no
+  internal call is nested inside another pending internal call in this file), so the two checks
+  agree. The same treatment extends to a HOOK_LOCAL's tail-jump into an ALREADY-EXTERNALLY-HOOKED
+  routine when reached this way (`func_6588`'s `jp partSetAnimation`, called from `func_6515`):
+  `partSetAnimation_hook(gb); if (gb->pc == 0x6520 && gb->sp == sp0_) goto func_6515_afterFunc6588;
+  return;` — the external hook's own internal `ret_effect()` naturally pops whatever return address
+  the internal call site pushed, so no special-casing is needed beyond the same resume-check. This
+  is a straightforward generalization of the earlier single-target pattern, not a new mechanism —
+  recognize it whenever a `grep`/reachability trace shows more than one genuine `call` converging
+  on the same `HOOK_LOCAL` block from within the same file.
+- **A genuine backward-branching loop (source-level relative labels `-`/`+` resolving to an
+  EARLIER address, e.g. `jr c,-`) is just a `goto` back to an already-emitted `L_<addr>:` label —
+  no new mechanism needed beyond what forward branches already use.** Established in `partCode3e.c`
+  (`3e.s`), the first file this session with real loops instead of purely straight-line/forward
+  control flow: three `jr c`/`jr nz` sites branch backward to re-enter a scan loop (walking the
+  enemy table by incrementing `H` from `FIRST_ENEMY_INDEX` to `LAST_ENEMY_INDEX`, or scanning
+  `Part.var30-3f`). Each loop-back target was double-checked against the source's own `-`/`+`
+  local-label resolution (the nearest preceding/following anonymous label) rather than assumed from
+  the C label's textual position, since a `goto` compiles either direction with no diagnostic if the
+  wrong `L_<addr>:` is targeted. Also confirmed in this file: `ldhl X, Y` (from
+  `include/macros.s`) compiles to a literal 16-bit immediate `ld hl, (X<<8)|Y` with no runtime
+  computation — model it as a plain `SET_HL(0x....)`, not a named-constant lookup, even though it
+  looks like two named constants (`FIRST_ENEMY_INDEX, Enemy.id`) were combined at "runtime."
+- **A CONDITIONAL internal call (`call z`/`call nz`/etc.) into a `HOOK_LOCAL` block that never
+  executes its own `ret` — it always terminates via an unconditional tail-jump into an
+  already-hooked external routine — generalizes the existing "HOOK_LOCAL tail-jumps into an
+  external hook" pattern (`rotatableSeedThing.c`'s `func_6588`/`jp partSetAnimation`) to the
+  conditional-call case for the first time.** Established in `fallingBoulderSpawner.c`
+  (`partCode45`): `@state2` does `call z,@bounceRandomlyDownwards`, and `@bounceRandomlyDownwards`
+  (also reached by plain fallthrough from `@state1`, with no push at all) ends with `jp playSound`
+  and no `ret`. Since `@bounceRandomlyDownwards` is `HOOK_LOCAL` (not independently registered),
+  `CALL_C_CC` cannot be used for the conditional call — `hook_enabled_at(target)` would be false
+  for that address and the call would incorrectly fall back to raw ROM interpretation instead of
+  running the ported C. Instead the taken side is hand-inlined exactly like an unconditional
+  internal call, just gated behind the flag check:
+  ```c
+  if (F & FZ) { CYCT(0x7590, 0x7593); push_effect(gb, 0x7593); goto bounceRandomlyDownwards; }
+  CYC(0x7590, 0x7593);
+  ```
+  At the shared block's terminal `playSound_b00_hook(gb);` call, the SAME `gb->pc`/`gb->sp` check
+  used for the unconditional precedent tells the two reachability modes apart: if reached via the
+  conditional call, `playSound_b00_hook`'s own internal `ret_effect()` pops the address just pushed
+  (`0x7593`) and `gb->sp` returns to `sp0_`, so `if (gb->pc == 0x7593 && gb->sp == sp0_) goto
+  state2_afterBounceCall;` resumes the caller; if reached via plain fallthrough (nothing pushed,
+  `gb->sp` already `sp0_` on entry to the block), that same internal `ret_effect()` instead pops
+  whatever the OUTER caller of `partCode45_hook` itself pushed, so the check fails and a bare
+  `return;` correctly unwinds all the way out — exactly mirroring what the real hardware does with
+  the leaked return address on its stack. Confirmed by a dedicated independent review pass devoted
+  entirely to tracing this reachability, plus a clean 30k-frame hook-continue verify and full
+  289,869-frame reference replay (a bug here would very likely have surfaced as a `hook_continue`
+  divergence or an outright crash, neither of which occurred).
+- **A `HOOK_LOCAL` block that is (a) reachable via a genuine internal `call` from a second site
+  AND (b) has BOTH a literal `ret` exit and a tail-jump-into-an-external-hook exit needs the SAME
+  `gb->pc`/`gb->sp` resume check at every exit, not just the tail-jump one.** Established in
+  `veranAcidPool.c` (`partCode57`)'s `func_7db7`: reached by plain fallthrough from `@state2` (no
+  push) and by a genuine `call @func_7db7` from `@state6` (`push_effect(gb, 0x7e19); goto
+  func_7db7;`, NOT `CALL_C`/`CALL_C_CC` — `hook_enabled_at()` would be false for an unregistered
+  local and wrongly fall back to raw interpretation). Its `ret c` exit and its `jp setTile` exit
+  both potentially return control to two different places depending on how the block was entered,
+  so BOTH use the identical check:
+  ```c
+  if (F & FC) { // ret c
+    RET_TAKEN(0x7dc2);
+    if (gb->pc == 0x7e19 && gb->sp == sp0_) goto state6_afterFunc7db7;
+    return;
+  }
+  CYC(0x7dc2, 0x7dc3);
+  CYC(0x7dc3, 0x7dc4); A = L;
+  CYC(0x7dc4, 0x7dc7); setTile_hook(gb); // jp — tail-chain into an external hook
+  if (gb->pc == 0x7e19 && gb->sp == sp0_) goto state6_afterFunc7db7;
+  return;
+  ```
+  This is simply the union of two already-established patterns (`rotatableSeedThing.c`'s
+  multi-way check after a literal `RET`/`RET_TAKEN`, and `fallingBoulderSpawner.c`'s check after a
+  tail-jump into an external hook) rather than a new mechanism — recognize it whenever a
+  `HOOK_LOCAL` reached by a genuine call has more than one way to fall out of it, and apply the
+  identical resume check at every exit point, not just the "obvious" one. Confirmed by a dedicated
+  independent review pass tracing every stack-arithmetic path, plus clean 30k-frame and full
+  289,869-frame replays.
 - **The quirk compiler catches helper-signature mistakes that the normal build can leave latent**:
   the first Link-ship draft called `alu_swap(gb)` as though it only took a machine state, while
   this emulator's helper is `alu_swap(gb, value)` and returns the swapped byte. The normal build
