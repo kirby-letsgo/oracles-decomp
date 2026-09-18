@@ -448,6 +448,36 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-18: milestone 3 phase 6 batch 311, bank 0a (1 routine, new file
+  `kingMoblinDefeated.c`): added `interactionCode72` (INTERAC_KING_MOBLIN_DEFEATED), fully
+  goto-inlined into one function. Introduces (for the first time in bank 0a) a technique for a
+  local label called via a genuine `call` from MULTIPLE sites within the same hook, ending in a
+  plain `ret`: each call site does `push_effect`+`goto` to a shared resume label, and the local's
+  own `ret`/`RET_TAKEN` checks `gb->pc`/`gb->sp` against every known resume address in turn,
+  falling through to a real C `return` if none match (established precedent from
+  `miscellaneous1.c`, applied here to `spawnSubservientMoblin` and `spawnGoronInstance`, the
+  latter also reached by a plain fallthrough as an implicit third invocation with no
+  `push_effect` at all). Self-review and an independent review both found zero bugs. Lint, both
+  builds, 30k verification, and the full 289,869-frame reference replay all passed clean. Bank 0a
+  is 79/928 and the project is 4,774/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 310, bank 0a (17 routines, new file
+  `companionScripts.c`): added the entire INTERAC_COMPANION_SCRIPTS routine family in one pass —
+  `interactionCode71` (top dispatcher), `companionScript_subid00` through `subid0d` (14
+  handlers), plus shared helpers `genericState0`, `runScript`, `subid00_state1`, `deleteSelf`,
+  `delete`, `cpXToCompanion`/`cpYToCompanion`, and the four `restrictHigherX/LowerX/LowerY/
+  HigherY` routines (which each call one of the cp helpers then jump into a shared tail block
+  physically owned by `restrictHigherY`'s own ROM range, modeled as a plain shared static C
+  helper rather than replicated `goto` targets, since it has a single entry/exit with no
+  resumption expected). Uses two new per-file RST-vector helpers (`rst $00` jump table, `rst $18`
+  add-double-index) plus a `rst $10` add-to-HL helper for `subid09`'s animation table lookup.
+  Split into three independent reviews given the file's size; one found a real bug — the shared
+  restrict-tail helper added `INTERACTION_BASE` to `OBJ_SPEED` when HL was actually still
+  pointing into `w1Companion`'s own struct (left there by `cpXToCompanion`/`cpYToCompanion`), so
+  the raw offset alone was needed — fixed, and the full gate (lint, both builds, both ctest
+  suites, 30k verification, full ref-check) was re-run clean afterward. This closes out
+  `companionScripts.s` entirely. Bank 0a is 78/928 and the project is 4,773/9,646.
+
 - 2026-09-18: milestone 3 phase 6 batch 309, bank 0a (1 routine, new file
   `wildTokayController.c`): added `interactionCode70` (INTERAC_WILD_TOKAY_CONTROLLER), a large
   207-instruction routine fully goto-inlined into a single function (state0/state1 dispatch, 7
