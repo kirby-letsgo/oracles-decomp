@@ -448,6 +448,568 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-18: milestone 3 phase 6 batch 309, bank 0a (1 routine, new file
+  `wildTokayController.c`): added `interactionCode70` (INTERAC_WILD_TOKAY_CONTROLLER), a large
+  207-instruction routine fully goto-inlined into a single function (state0/state1 dispatch, 7
+  substates, plus internal helpers `checkSpawnNextTokay`/`loadTokay`/`decVar3b`/
+  `getRandomVar39Value`). Uses two per-file RST-vector helpers: `wildTokayController_jump_table`
+  (`rst $00`) and `wildTokayController_addAToHl_from_rst` (`rst $10`, distinct from the
+  bank-00 `addDoubleIndexToBc_hook` used elsewhere in the same routine for a different table).
+  Split into two independent reviews given its size; the second found a real bug — a missing
+  fallthrough `CYC(0x5807, 0x5808)` after a `ret nz` at the `l5804`→`l5808` join point (silently
+  dropping 2 cycles when that path was taken) — fixed, and the full gate (lint, both builds, both
+  ctest suites, 30k verification, full ref-check) was re-run clean afterward. Bank 0a is 61/928
+  and the project is 4,756/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 308, bank 0a (1 top-level routine): added
+  `interactionCode6e` (INTERAC_NAYRU_SAVED_CUTSCENE's own top-level dispatcher) to
+  `nayruSavedCutscene.c`, **closing out the entire file** — 6 batches (303-308), 8 routines. A
+  3-instruction E-preload (subid, then state) plus an `rst $00` jump table dispatching to the 5
+  already-hooked subid handlers, structurally identical to `interactionCode6d`'s dispatcher
+  pattern in `possessedNayru.c`. Self-review and an independent review both found zero bugs, and
+  the review's whole-file sanity pass over all 8 functions found no leftover issues. Lint, both
+  builds, 30k verification, and the full 289,869-frame reference replay all passed clean. Bank 0a
+  is 60/928 and the project is 4,755/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 307, bank 0a (1 routine): added
+  `interaction6e_subid04` (guards that run into the room) to `nayruSavedCutscene.c`. This routine's script
+  selection uses `rst $18` (`rst_addDoubleIndex`) to index a 6-entry script pointer table by
+  `Object.var03`; the RST vector is modeled with a new per-file static helper
+  (`nayruSavedCutscene_add_double_index`) built to the exact same established pattern as
+  `bipin_addDoubleIndex` in `bipin.c`. Self-review and an independent review both found zero
+  bugs. Lint, both builds, 30k verification, and the full 289,869-frame reference replay all
+  passed clean. Bank 0a is 59/928 and the project is 4,754/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 306, bank 0a (3 routines, continuing
+  `nayruSavedCutscene.s`): added `interaction6e_subid03`, `interaction6e_runScriptAndAnimate`, and
+  `interaction6e_initRalph` (Ralph) — three bare (non-`@`-local) global labels, each independently
+  hooked as its own top-level function per the established convention, since
+  `runScriptAndAnimate` is also called separately by the not-yet-ported `interaction6e_subid04`.
+  Transitions between the three use plain tail calls (`return;` after calling the next function),
+  not `goto` or `CALL_C`, since the ROM's own control flow here is a bare fallthrough and a
+  push-free `jr z`, never a real `call`. Self-review and an independent review both found zero
+  bugs. Lint, both builds, 30k verification, and the full 289,869-frame reference replay all
+  passed clean. Bank 0a is 58/928 and the project is 4,753/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 305, bank 0a (1 routine, continuing
+  `nayruSavedCutscene.s`): added `interaction6e_subid02` (Ghost Veran) — a 4-way dispatch (3
+  jump-table targets plus fallthrough) with four internal-only join labels reached purely by
+  fallthrough/goto, never by the top-level RST table. Uses the `push af`/`pop af` idiom and two
+  `call z,playSound` conditional calls via `CALL_C_CC`. Self-review and an independent review
+  both found zero bugs. Lint, both builds, 30k verification, and the full 289,869-frame reference
+  replay all passed clean. Bank 0a is 55/928 and the project is 4,750/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 304, bank 0a (1 routine, continuing
+  `nayruSavedCutscene.s`): added `interaction6e_subid01` (Queen Ambi) — the largest routine in
+  the file so far, a 5-state machine (76 instructions) with two shared join points
+  (`animate`/`setAnimation`) reached from multiple states. Self-review and an independent review
+  both found zero bugs. Lint, both builds, 30k verification, and the full 289,869-frame reference
+  replay all passed clean. Bank 0a is 54/928 and the project is 4,749/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 303, bank 0a (1 routine, starting
+  `nayruSavedCutscene.s`): added `interaction6e_subid00` (Nayru waking up after being freed from
+  possession) to new file `nayruSavedCutscene.c`. Straightforward 3-state routine; the empirical
+  HOOK_LOCAL registration test confirmed all three `@state0`/`@state1`/`@state2` locals fully
+  goto-inline once the root name is registered. Self-review and an independent review both found
+  zero bugs. Lint, both builds, 30k verification, and the full 289,869-frame reference replay all
+  passed clean. Bank 0a is 53/928 and the project is 4,748/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 302, bank 0a (1 top-level routine): added
+  `interactionCode6d` (INTERAC_POSSESSED_NAYRU's top-level dispatcher) to `possessedNayru.c`,
+  **closing out the entire file** — 3 batches (300-302), 3 top-level routines. This dispatcher
+  has a genuinely novel structure not seen elsewhere in bank 0a: it reads `Interaction.subid` via
+  E, then OVERWRITES E with `Interaction.state` BEFORE dispatching, so whichever callee the jump
+  table lands on can immediately read state without setting E itself — the exact register-preload
+  dependency already found (and confirmed intentional) in both callees. Order matters critically
+  here (read subid, THEN overwrite E, THEN dispatch); an independent review verified the 3-step
+  sequence matches the ROM exactly and confirmed the jump table's 3-raw-entries-to-2-unique-
+  addresses collapse (subid01 and subid02 both alias to `ghost`) is faithfully represented.
+  Self-review and the independent review both found zero bugs in this final batch. Lint, both
+  builds, 30k verification, and the full 289,869-frame reference replay all passed clean. Bank 0a
+  is 52/928 and the project is 4,747/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 301, bank 0a (1 top-level routine, continuing
+  `possessedNayru.s`): added `possessedNayru_ghost` — like `subid00` before it, relies on E
+  already set by the not-yet-written `interactionCode6d` dispatcher. Self-review and an
+  independent review both found zero bugs. Lint, both builds, 30k verification, and the full
+  289,869-frame reference replay all passed clean. Bank 0a is 51/928 and the project is
+  4,746/9,646. Only the `interactionCode6d` dispatcher remains to close out this file.
+
+- 2026-09-18: milestone 3 phase 6 batch 300, bank 0a (1 top-level routine, first slice of a new
+  file): started `object_code/ages/interactions/possessedNayru.s`
+  (`interactionCode6d`/INTERAC_POSSESSED_NAYRU, `possessedNayru.c`) — 3 top-level routines total
+  (the dispatcher, `subid00`, and `ghost`). This batch: `possessedNayru_subid00`. Structurally
+  novel: this routine relies on register E already holding `INTERACTION_BASE + OBJ_STATE`, set by
+  the not-yet-written `interactionCode6d` dispatcher immediately before its jump-table dispatch —
+  the routine's own code never sets E itself, matching the ROM's own omission of `ld e,...` at
+  its entry point. Verified this is safe in this project's emulation model (Z80 registers are
+  fields on the shared `GB` struct, not per-function C locals, so a value left by one hooked
+  routine is visible to whichever hooked routine runs next). Self-review and an independent
+  review both found zero bugs. Lint, both builds, 30k verification, and the full 289,869-frame
+  reference replay all passed clean. Bank 0a is 50/928 and the project is 4,745/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 299, bank 0a (1 top-level routine): added
+  `interactionCode6c` (INTERAC_FAIRY_HIDING_MINIGAME's top-level dispatcher) to
+  `fairyHidingMinigame.c`, **closing out the entire file** — 4 batches (296-299), 7 top-level
+  routines (the dispatcher, 3 subids, 3 shared helpers). A much simpler capstone than
+  `miscellaneous1.s`'s 23-entry dispatcher: just 3 clean jump-table entries with no aliasing. An
+  independent review independently re-derived the 3-entry address table from `ages.sym` and
+  confirmed it correct. Self-review and the independent review both found zero bugs in this final
+  batch. Lint, both builds, 30k verification, and the full 289,869-frame reference replay all
+  passed clean. Bank 0a is 49/928 and the project is 4,744/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 298, bank 0a (1 top-level routine, continuing
+  `fairyHidingMinigame.s`): added `fairyHidingMinigame_subid02` (checks for Link leaving the
+  hide-and-seek area) — the last subid in this file; only the top-level `interactionCode6c`
+  dispatcher remains. Self-review and an independent review both found zero bugs (the review
+  specifically double-checked the routine's script-address literal against the other two subids'
+  script addresses in the same file, to rule out a copy-paste slip). Lint, both builds, 30k
+  verification, and the full 289,869-frame reference replay all passed clean. Bank 0a is 48/928
+  and the project is 4,743/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 297, bank 0a (2 top-level routines, continuing
+  `fairyHidingMinigame.s`): added `fairyHidingMinigame_subid01` (the hiding spot for a fairy, a
+  4-way jump table using three different bank-0 lookup helpers — `lookupKey`, `checkFlag`,
+  `setFlag`, each with its own A/HL register-passing convention) and the shared helper
+  `fairyHidingMinigame_checkMinigameActive`. A register-juggling sequence in `state2`
+  (`L = Interaction.var03; E = L; A = mem_rd(gb, DE); mem_wr(gb, HL, A)`) copies var03 from the
+  original hiding-spot interaction into the newly-spawned fairy interaction — verified against
+  `getFreeInteractionSlot`'s actual page-allocation behavior to confirm HL and DE genuinely point
+  at two different interaction slots sharing the same field offset, not the same address as
+  initially assumed. Self-review and an independent review both found zero bugs. Lint, both
+  builds, 30k verification, and the full 289,869-frame reference replay all passed clean. Bank 0a
+  is 47/928 and the project is 4,742/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 296, bank 0a (3 top-level routines, first slice of a
+  new file): started `object_code/ages/interactions/fairyHidingMinigame.s`
+  (`interactionCode6c`/INTERAC_FAIRY_HIDING_MINIGAME, `fairyHidingMinigame.c`) — this file has 7
+  top-level routines total (the dispatcher, subid00-02, and 3 shared helpers), ported across
+  multiple batches like `miscellaneous1.s` before it. This batch: `fairyHidingMinigame_subid00`
+  (begins the minigame), `fairyHidingMinigame_spawn3FairiesAndDelete` (a 3-iteration loop calling
+  `getFreeInteractionSlot_hook` independently each pass), and `fairyHidingMinigame_check-
+  BeginCutscene`. Self-caught and fixed a botched loop rewrite (an accidental duplicate/reordered
+  copy of the loop body) before ever building. Self-review and an independent review both found
+  zero bugs in the corrected version. Lint, both builds, 30k verification, and the full
+  289,869-frame reference replay all passed clean. Bank 0a is 45/928 and the project is
+  4,740/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 295, bank 0a (1 top-level routine): added
+  `interactionCode6b` (INTERAC_MISCELLANEOUS_1's top-level dispatcher) to `miscellaneous1.c`,
+  **closing out the entire file** — the largest and most complex file in bank 0a, spanning
+  batches 276 through 295 (20 batches, 24 top-level routines: interactionCode6b itself, 20
+  distinct subid handlers behind 23 dispatch entries after aliasing, and 3 shared helpers). The
+  dispatcher's own correctness rests entirely on a 23-entry jump table collapsing to 19 unique
+  addresses across three alias groups (subid03/12, subid0a/0b/0c, subid13/14); an independent
+  review re-derived the full 23-entry address table directly from `ages.sym` from first
+  principles and confirmed every mapping, alias collapse, and the final fallback case are
+  correct. Along the way this file caught: one missing-fallthrough-`CYC` bug (subid01), three
+  self-caught flag-polarity mistakes (subid07, subid0a, and a rejected draft), a genuinely novel
+  conditional-call-to-goto-inlined-local construct (subid0d), a two-layer `CALL_C` transitivity
+  case (subid0a's call into a fallthrough into a tail-jump), a cross-routine jump into another
+  already-ported routine's inline body (subid05, subid15 — the latter catching a real target-vs-
+  physical-end bug on an *unconditional* `jp` that silently zeroed its cycle burn via unsigned
+  loop wraparound), and one purely stylistic fix. Self-review and an independent review both
+  found zero bugs in this final batch. Lint, both builds, 30k verification, and the full
+  289,869-frame reference replay all passed clean. Bank 0a is 42/928 and the project is
+  4,737/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 294, bank 0a (1 top-level routine, continuing
+  `miscellaneous1.s`): added `interaction6b_subid16` (a flame that appears for `[counter1]`
+  frames) to `miscellaneous1.c` — the LAST of the file's ~23 subid routines. Both unconditional
+  `jp`s were double-checked against the exact bug class just found and fixed in the previous
+  batch (`subid15`) and both correctly use physical-end addresses. Self-review and an
+  independent review both found zero bugs. Lint, both builds, 30k verification, and the full
+  289,869-frame reference replay all passed clean. Bank 0a is 41/928 and the project is
+  4,736/9,646. Every subid handler `interactionCode6b`'s dispatcher needs is now written; only
+  the dispatcher itself remains to close out this file.
+
+- 2026-09-18: milestone 3 phase 6 batch 293, bank 0a (1 top-level routine, continuing
+  `miscellaneous1.s`): added `interaction6b_subid15` (the stone statue of Link as seen in-game)
+  to `miscellaneous1.c`. Both of its exits are tail-jumps into `interaction6b_subid0e`'s own
+  inline body, so that entire body was replicated byte-for-byte inside this function too, the
+  same technique already used for `subid05`'s one-instruction case. Independent review confirmed
+  the duplicated section was identical to the original, but found a real bug in subid15's own
+  unique code: the final unconditional `jp` used its jump target as the `CYC` end address instead
+  of the instruction's own physical end, which (due to the burn_rom loop's forward-only unsigned
+  comparison) silently burned zero cycles for that instruction whenever the branch was reached.
+  Fixed (`CYC(0x5230, 0x50be)` → `CYC(0x5230, 0x5233)`); lint, both builds, 30k verification, and
+  the full 289,869-frame reference replay all re-ran clean. Bank 0a is 40/928 and the project is
+  4,735/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 292, bank 0a (1 top-level routine, continuing
+  `miscellaneous1.s`): added `interaction6b_subid13` (aliased with `interaction6b_subid14`, same
+  bytes at the same address — the Goron bomb statue, left/right) to `miscellaneous1.c`. Self-review
+  and an independent review both found zero bugs. Lint, both builds, 30k verification, and the
+  full 289,869-frame reference replay all passed clean. Bank 0a is 39/928 and the project is
+  4,734/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 291, bank 0a (1 top-level routine, continuing
+  `miscellaneous1.s`): added `interaction6b_subid11` (triggers the cutscene after beating
+  Jabu-Jabu) to `miscellaneous1.c` — unusual for this file in having no `checkInteractionState`
+  dispatch at all; it just runs unconditionally every frame until it deletes itself, with both
+  its conditional branches converging on the same shared tail-jump into `interactionDelete_hook`.
+  Self-review and an independent review both found zero bugs. Lint, both builds, 30k
+  verification, and the full 289,869-frame reference replay all passed clean. Bank 0a is 38/928
+  and the project is 4,733/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 290, bank 0a (1 top-level routine, continuing
+  `miscellaneous1.s`): added `interaction6b_subid10` (the unfinished stone statue of Link in the
+  credits cutscene) to `miscellaneous1.c` — the largest and most complex function in this file so
+  far, 63 instructions with an 8-way substate jump-table dispatch. Two substates rely on `HL`
+  still pointing at `Interaction.counter1` left over from `interactionDecCounter1_hook`'s own
+  internal decrement, with no redundant re-derivation — verified against that hook's actual C
+  implementation to confirm the inherited-register assumption is correct. Self-review and an
+  independent review (which exhaustively checked all ten conditional branches for the missing-
+  fallthrough-CYC bug class) both found zero bugs. Lint, both builds, 30k verification, and the
+  full 289,869-frame reference replay all passed clean. Bank 0a is 37/928 and the project is
+  4,732/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 289, bank 0a (1 top-level routine, continuing
+  `miscellaneous1.s`): added `interaction6b_subid0f` (the switch that opens the path to Nuun
+  Highlands) to `miscellaneous1.c`. A 3-way jump-table dispatch reuses the file's existing
+  generic jump-table helper; `state2`'s `l5136` label re-tests flags from an earlier `or a` after
+  a goto, matching the pattern already established in this file's `subid00`. Self-review and an
+  independent review both found zero bugs. Lint, both builds, 30k verification, and the full
+  289,869-frame reference replay all passed clean. Bank 0a is 36/928 and the project is
+  4,731/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 288, bank 0a (1 top-level routine, continuing
+  `miscellaneous1.s`): added `interaction6b_subid0e` (the stone statue of Link that appears
+  unconditionally) to `miscellaneous1.c`. A straightforward linear/branching call sequence with
+  no tail-jumps at all. Self-review and an independent review (which specifically confirmed the
+  `res 6,(hl)` bit-clear wasn't accidentally inverted to a bit-set) both found zero bugs. Lint,
+  both builds, 30k verification, and the full 289,869-frame reference replay all passed clean.
+  Bank 0a is 35/928 and the project is 4,730/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 287, bank 0a (1 top-level routine, continuing
+  `miscellaneous1.s`): added `interaction6b_subid0d` (blocks that move over when pulling the
+  lever to get flippers) to `miscellaneous1.c`. Introduces a conditional `call nc` to a goto-
+  inlined local (`@checkLinkSquished`), combining `CALL_C_CC`-style branch-conditional cycle
+  accounting with the manual `push_effect`+`goto`+resume-check local-call idiom — the not-taken
+  side does no push at all (matching real `call cc` semantics), and the single resume-check at
+  the local's own `ret` is sufficient since it has exactly one caller. Independent review
+  confirmed the construct correct and noted precedent for it already exists elsewhere in the
+  project (fallingBoulderSpawner.c, lighting.c). Self-review and the independent review both
+  found zero bugs. Lint, both builds, 30k verification, and the full 289,869-frame reference
+  replay all passed clean. Bank 0a is 34/928 and the project is 4,729/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 286, bank 0a (2 top-level routines, continuing
+  `miscellaneous1.s`): added `interaction6b_subid0a` (aliased with `subid0b`/`subid0c` — flippers,
+  cheval rope, and bomb treasures) and the bare-global helper `interaction6b_initGraphicsAndLoad-
+  Script` (falls through, no jump, into the already-hooked `interaction6b_loadScript`) to
+  `miscellaneous1.c`. Self-caught a `jr nc` flag-polarity mistake before building. Traced the
+  two-layer `CALL_C` transitivity through `initGraphicsAndLoadScript`'s fallthrough into
+  `loadScript`'s own tail-jump into `interactionIncState_hook`, confirming subid0a's own pushed
+  return address is what correctly resumes execution, matching the shallower precedent already
+  verified for subid04. Self-review and an independent review (which redid the flag-polarity
+  check and the full transitivity trace) both found zero bugs. Lint, both builds, 30k
+  verification, and the full 289,869-frame reference replay all passed clean. Bank 0a is 33/928
+  and the project is 4,728/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 285, bank 0a (1 top-level routine, continuing
+  `miscellaneous1.s`): added `interaction6b_subid09` (the shovel Rosa gives you in a linked game)
+  to `miscellaneous1.c`. Introduces this session's first CONDITIONAL `call` (`call
+  nz,objectSetVisible83`), modeled with the established `CALL_C_CC` macro inside an `if/else`
+  where the `else` branch's bare `CYC` covers the not-taken cost. Independent review confirmed
+  the polarity, addresses, and cycle accounting are all correct, and found one purely stylistic
+  fix (an existing `OBJ_VAR3E` macro wasn't used in favor of the equivalent raw `0x3e` literal) —
+  applied, with no behavior change. Lint, both builds, 30k verification, and the full 289,869-frame
+  reference replay all passed clean. Bank 0a is 31/928 and the project is 4,726/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 284, bank 0a (1 top-level routine, continuing
+  `miscellaneous1.s`): added `interaction6b_subid08` (part of the cutscene where tokays steal
+  your stuff) to `miscellaneous1.c`. Self-review and an independent review (which scrutinized
+  all four conditional branches for the missing-fallthrough-CYC bug class already found once in
+  this file) both found zero bugs. Lint, both builds, 30k verification, and the full 289,869-frame
+  reference replay all passed clean. Bank 0a is 30/928 and the project is 4,725/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 283, bank 0a (1 top-level routine, continuing
+  `miscellaneous1.s`): added `interaction6b_subid07` (a possibly-unused seed satchel that slowly
+  falls toward Link) to `miscellaneous1.c`. Self-caught a `cp`/`jp nc` flag-polarity mistake
+  before ever building (Z80 `cp` sets carry on a borrow, so `jp nc`'s branch-taken condition is
+  `!(F & FC)`, not `F & FC`) — an inversion here would have silently reversed whether the falling
+  satchel deletes itself past a certain height, undetectable by lint or the build. Independent
+  review re-verified the fix explicitly and found nothing else wrong. Lint, both builds, 30k
+  verification, and the full 289,869-frame reference replay all passed clean. Bank 0a is 29/928
+  and the project is 4,724/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 282, bank 0a (1 top-level routine, continuing
+  `miscellaneous1.s`): added `interaction6b_subid06` (manages the cutscene after beating Dungeon
+  3 — lightning flash, screen fade, room transition to Ambi's palace) to `miscellaneous1.c`. A
+  3-way substate dispatch reuses the file's existing generic jump-table helper. Self-review and
+  an independent review (which scrutinized all 6 conditional branches for the missing-fallthrough-
+  CYC bug class already found once in this file) both found zero bugs. Lint, both builds, 30k
+  verification, and the full 289,869-frame reference replay all passed clean. Bank 0a is 28/928
+  and the project is 4,723/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 281, bank 0a (1 top-level routine, continuing
+  `miscellaneous1.s`): added `interaction6b_subid05` (the intro cutscene where lightning strikes
+  a guy, spawning a `PART_LIGHTNING` part from a raw byte-pair position table via RST $18) to
+  `miscellaneous1.c`. A genuinely novel pattern: its top-level jump table's state-0 entry points
+  at 0x4eb7, a MIDDLE address inside the already-written `interaction6b_subid02_hook`'s own
+  inlined `@loadScript` local, not an independently-hookable entry point. Modeled by replicating
+  that exact instruction's semantics and CYC range inline in subid05_hook too (byte-identical to
+  subid02_hook's own line for the same address), since the same ROM bytes produce the same
+  behavior regardless of which routine's dispatch lands on them, and `burn_rom` is fully stateless
+  so there's no double-counting risk. Self-review and an independent review (which confirmed the
+  `burn_rom` statelessness claim by reading its implementation) both found zero bugs. Lint, both
+  builds, 30k verification, and the full 289,869-frame reference replay all passed clean. Bank 0a
+  is 27/928 and the project is 4,722/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 280, bank 0a (1 top-level routine, continuing
+  `miscellaneous1.s`): added `interaction6b_subid04` (moblins-attack-maku-sapling cutscene
+  script) to `miscellaneous1.c`. Exercises a genuinely novel case for the shared
+  `interaction6b_loadScript` helper: subid04 reaches it via a real `call` (unlike subid02's
+  `jp` tail-jump), so loadScript's own bare, unchecked tail-jump into `interactionIncState_hook`
+  ends up popping subid04's own pushed return address when `interactionIncState_hook`'s `ret`
+  fires — verified via an explicit trace through `CALL_C`'s macro expansion that this resolves
+  correctly with no special-casing needed: the calling side's own `CALL_C` check transparently
+  detects the correct pc/sp and falls through normally, exactly matching the ROM's real behavior.
+  Self-review and an independent review (which redid that exact trace) both found zero bugs.
+  Lint, both builds, 30k verification, and the full 289,869-frame reference replay all passed
+  clean. Bank 0a is 26/928 and the project is 4,721/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 279, bank 0a (2 top-level routines, continuing
+  `miscellaneous1.s`): added `interaction6b_subid03` (aliased with `interaction6b_subid12`, the
+  same bytes at the same address — the Seasons troupe member with a guitar/tambourine) and the
+  shared bare-global helper `interaction6b_initGraphicsAndIncState` (8 callers total; only
+  subid03/12's is written so far) to `miscellaneous1.c`. Confirmed the two alias names resolve to
+  the same ROM address via `ages.sym`, so only one needed registration. Self-review and an
+  independent review both found zero bugs. Lint, both builds, 30k verification, and the full
+  289,869-frame reference replay all passed clean. Bank 0a is 25/928 and the project is
+  4,720/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 278, bank 0a (2 top-level routines, continuing
+  `miscellaneous1.s`): added `interaction6b_subid02` (Ralph/Ambi's-palace cutscene script) and the
+  shared bare-global helper `interaction6b_loadScript` (the RST $18 script-table lookup used by
+  subid02 now and by subid04/subid05 later) to `miscellaneous1.c`. All three of loadScript's
+  callers tail-jump (`jp`, not `call`) at bare `sp0_`, so loadScript's own trailing tail-jump into
+  `interactionIncState_hook` needs no resume-check. Self-review and an independent review (which
+  re-scrutinized every conditional branch for the missing-fallthrough-CYC bug class just found in
+  the previous batch) both found zero bugs. Lint, both builds, 30k verification, and the full
+  289,869-frame reference replay all passed clean. Bank 0a is 23/928 and the project is
+  4,718/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 277, bank 0a (1 top-level routine, continuing
+  `miscellaneous1.s`): added `interaction6b_subid01` (spawns Nayru, Ralph, and the animals in the
+  intro cutscene before Nayru is possessed) to `miscellaneous1.c`. Independent review caught a
+  real bug: the not-taken side of a conditional `jp c,interactionDelete` was missing its `CYC`
+  cycle burn entirely (3 cycles silently dropped whenever the carry flag was clear) — fixed by
+  adding the missing `CYC(0x4ea6, 0x4ea9);` before the final `ret`, matching the established
+  sibling convention used everywhere else in this file and project. Lint, both builds, 30k
+  verification, and the full 289,869-frame reference replay all re-ran clean after the fix. Bank
+  0a is 21/928 and the project is 4,716/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 276, bank 0a (2 top-level routines, first slice of a
+  much larger file): started `object_code/ages/interactions/miscellaneous1.s`
+  (`interactionCode6b`/INTERAC_MISCELLANEOUS_1, `miscellaneous1.c`) — this source file has ~20
+  independently-hookable top-level routines (`interactionCode6b`'s dispatcher plus
+  `interaction6b_subid00` through `subid16`, several shared helpers), by far the largest bank-0a
+  file, so it's being ported across several batches. This batch: `interaction6b_subid00` (shows
+  Impa's "Help" text when Link's about to screen-transition) and its bare-global helper
+  `interaction6b_checkLinkPressedUpAtScreenEdge`. `decCounter1IfTextNotActive`'s two exits (an
+  early `ret nz` and a tail-jump into `interactionDecCounter1_hook`) both resume at the same
+  bare-`sp0_` point in `@substate1`, which then does its OWN separate `ret nz` re-checking
+  whichever flags the resumed exit left behind — verified that `push_effect`/`pop_effect`/
+  `ret_effect` never touch F, so the flag pass-through is sound. Self-review and an independent
+  review (focused specifically on that flag pass-through) both found zero bugs. Lint, both
+  builds, 30k verification, and the full 289,869-frame reference replay all passed clean. Bank
+  0a is 20/928 (interactionCode6b itself still needs the other ~19 subids before its dispatcher
+  can be written) and the project is 4,715/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 275, bank 0a (1 root routine): ported
+  `object_code/ages/interactions/cheval.s` (`interactionCode6a`, `cheval.c`) — Cheval. Has three
+  `rst $00` jump-table dispatch sites, but only the top-level state0/state1 one is genuinely
+  2-way; the two nested subid dispatches (inside state0 and state1) each have exactly one `.dw`
+  entry in the ROM, so they're modeled by still calling the shared jump-table helper for its real
+  cycle cost and side effects, then following an unconditional `goto` without branching on its
+  returned target (there is nowhere else for it to go). No internal `call`s anywhere in the file —
+  every transfer is a jr/jp/jump-table goto — so no push_effect/resume-check machinery was needed.
+  Self-review and an independent review both found zero bugs. Lint, both builds, 30k
+  verification, and the full 289,869-frame reference replay all passed clean. Bank 0a is 18/928
+  and the project is 4,713/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 274, bank 0a (1 root routine): ported
+  `object_code/ages/interactions/rafton.s` (`interactionCode69`, `rafton.c`) — Rafton, the
+  raft-shop NPC. Unusually simple for this bank: every internal transfer (three separate `rst $00`
+  jump-table dispatches, several `jr`/`jp` exits) is a pure goto, never a genuine `call`, so no
+  `push_effect`/resume-check machinery was needed anywhere — `sp0_` is declared only because the
+  `CALL_C` macro itself references it. All three jump-table dispatch sites correctly reuse the
+  same `interactionCode69_jump_table` helper (each with its own `push_effect` of a distinct return
+  address beforehand), matching the established precedent from `essence.c`. Self-review and an
+  independent review (which also read the raw RST $00 handler in the disassembly to confirm it
+  ends in `jp hl` rather than `ret`, justifying the no-resume-check design) both found zero bugs.
+  Lint, both builds, 30k verification, and the full 289,869-frame reference replay all passed
+  clean. Bank 0a is 17/928 and the project is 4,712/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 273, bank 0a (1 root routine): ported
+  `object_code/ages/interactions/rosa.s` (`interactionCode68`, `rosa.c`) — Rosa the Subrosian
+  dancer, with 5 call-reached HOOK_LOCALs all goto-inlined into the one function
+  (`initGraphicsAndLoadScript`, `loadScriptFromTableAndInitGraphics`, `loadScriptAndIncState`,
+  `loadScriptFromTableAndIncState`, `getScript`). The trickiest nesting pattern encountered since
+  the roller.c/vasu.c stack-pointer bugs: `initGraphicsAndLoadScript` and
+  `loadScriptFromTableAndInitGraphics` are each called once from a state handler (bare `sp0_`),
+  then `jr` at that same depth into `loadScriptAndIncState`/`loadScriptFromTableAndIncState`,
+  which each make a further nested call into the shared `getScript` (requiring its two resume
+  checks to compare against `sp0_-2`) before ending with an unconditional `jp interactionIncState`
+  — a tail jump into an already-hooked external routine whose own `ret_effect` is what actually
+  pops the still-outstanding *outer* call and resumes this function, needing the established
+  tail-jump-then-check pattern rather than CALL_C. A genuinely dead "Unused" 3-instruction block
+  in the ROM (`initGraphicsAndIncState`, 0 callers, no fallthrough) was confirmed unreachable and
+  omitted rather than modeled. Self-review and an independent review explicitly primed on this
+  exact bug class both found zero bugs; lint, both builds, 30k verification, and the full
+  289,869-frame reference replay all passed clean. Bank 0a is 16/928 and the project is
+  4,711/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 272, bank 0a (1 root routine): ported
+  `object_code/common/interactions/bubble.s` (`interactionCode91`, `bubble.c`) — the underwater
+  bubble hazard, with two subids (a moving/killable bubble and a stationary bubble spawner) and
+  one HOOK_LOCAL, `@checkDelete`, reached from both subid-00 states at the same top-level stack
+  depth (no nested `push_effect` complexity here, unlike the prior two files). Self-review caught
+  one target-vs-physical-end `CYCT` mistake before build. Independent review then found a real,
+  execution-invisible off-by-one: `subid01_state0`'s closing `ret` at 0x4a38 was marked as
+  `RET(0x4a39)` (one byte past the actual `ret` opcode, into `checkDelete`'s first instruction) —
+  wrong `burn_rom` byte range and wrong PC anchor, though the M-cycle total for the block was
+  unaffected, which is presumably why no timing check could have caught it. Fixed; lint, both
+  builds, 30k verification, and the full 289,869-frame reference replay all re-ran clean. Bank 0a
+  is 15/928 and the project is 4,710/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 271, bank 0a (1 root routine, plus a same-batch fix to
+  the batch-267 `roller.c`): ported `object_code/common/interactions/vasu.s`
+  (`interactionCode89`, `vasu.c`) — Vasu's ring-appraisal shop, its two snake NPCs, and the
+  blue-snake GBC-link ring-transfer minigame (SVBK-bank-switched reads of `w4RingFortuneStuff`
+  via the standard `push af`/switch-to-bank-4/`pop af` idiom). The densest goto-inlined single
+  function so far: `@updateState` (itself one `push_effect` deep from the top level) contains a
+  6-state machine, one of whose states (`@state5`) has its own 5-way substate dispatch, plus two
+  further HOOK_LOCAL callees (`@checkRingBoxAndRingsObtained`, two callers;
+  `@setScriptAndGotoState4`, reached both by fallthrough and by a genuine nested call). Discovered
+  while investigating this file's nesting: a real, subtle bug in the just-committed-to-staging
+  `roller.c` (batch 267) — a resume-check for a doubly-nested `HOOK_LOCAL` compared the stack
+  pointer against the wrong reference (`sp0_` instead of `sp0_-2`), invisible to every prior test
+  and review since it only affects which path resumes in native code vs. the interpreter, never
+  the resulting game state. Fixed that first (independent review confirmed the fix and found no
+  other instance in that file), then wrote `vasu.c` from scratch applying the corrected
+  understanding — and STILL got the analogous case backwards in the new file (captured `sp1_`
+  after its push instead of before, backwards from `roller.c`'s mistake), catching that only via
+  a third, explicitly-arithmetic independent review pass after self-review found 11 *other* real
+  bugs first (a wrong immediate value, `alu_rl` used where `rla`'s different flag behavior was
+  needed, a merged `ldd`+`dec` treated as one instruction, and 8 instances of the recurring
+  target-vs-physical-end `CYCT` mistake). New porting-notes lesson on the nested-stack-pointer
+  pattern, written up in detail given how expensive both mistakes were to find. Lint, both builds,
+  30k verification, and the full 289,869-frame reference replay all passed clean after every fix
+  (this TAS route never exercises Vasu, so only the byte-level checks and reviews could have
+  caught any of this). Bank 0a is 14/928 and the project is 4,709/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 270, bank 0a (4 top-level routines): ported
+  `object_code/common/interactions/essence.s` (`interactionCode7f` + `interaction7f_subid00` +
+  `interaction7f_subid01` + `interaction7f_subid02`, `essence.c`) — the dungeon essence pickup,
+  its pedestal, and its glow effect; the largest and most complex bank-0a file to date.
+  `interaction7f_subid00` alone is an 8-state, 181-instruction machine covering the essence's
+  entire idle/approach/fall/pickup/cutscene/warp-out lifecycle, with three RST $10 lookups
+  (sprite data, float-offset animation, per-essence get-text index) and one RST $18 lookup
+  (per-essence warp destination table), correctly modeling only the ROM_AGES `.ifdef` branches
+  throughout (dungeon-6 override, essence sprite/warp data tables). `interaction7f_subid02` has
+  a `@copyEssencePosition` HOOK_LOCAL reached by one genuine call, ending in a tail-jump into the
+  already-hooked `objectTakePosition`. Extra care taken with `ldi`/`inc hl`/`inc l` distinctions
+  given several of each appear back to back in `@state0` and `@state4`. Zero bugs found by
+  self-review or independent review; lint, both builds, 30k verification, and the full
+  289,869-frame reference replay all passed clean (this TAS route apparently never reaches an
+  essence pickup, so only the static byte-level checks could have caught a bug here). Bank 0a is
+  13/928 (4 root routines added) and the project is 4,708/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 269, bank 0a (1 root routine): ported
+  `object_code/common/interactions/minibossPortal.s` (`interactionCode7e`, `minibossPortal.c`)
+  — the dungeon miniboss-defeat portal and its Hero's Cave warp-point variant, ROM_AGES branch
+  only (Seasons-only `@subid02`/`wc64a` paths correctly omitted). A 14-label internal family, an
+  RST $10 single-index lookup feeding an RST $18 double-index lookup in `@minibossState0`, and
+  `@spinLink` — a HOOK_LOCAL with two genuine callers and both a literal-ret exit and a
+  tail-jump-into-`interactionDecCounter1` exit, needing a two-way resume check at every exit.
+  `@commonState0` is reached two ways (a pure fallthrough from `@minibossState0`, and a genuine
+  `jp @commonState0` from `@herosCaveState0`) with neither needing any resume-check machinery
+  since neither is a `call`. Given the target-vs-physical-end bug just caught in the immediately
+  preceding batch's independent review, this batch's review prompt explicitly flagged that pattern
+  for extra scrutiny at the two similar-looking branches in this file — both were correct.
+  Independent review found zero bugs. Bank 0a is 9/928 and the project is 4,704/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 268, bank 0a (4 top-level routines): ported
+  `object_code/common/interactions/spinner.s` (`interactionCode7d` + `spinner_subid02` +
+  `spinner_updateLinkPosition` + `spinner_setLinkRelativePosition`, `spinner.c`) — the
+  blue/red spinner puzzle and its rotating arrow child object. Four independently-hooked
+  top-level routines in one file: `interactionCode7d` dispatches through a 3-way then a 5-way
+  RST $00 table (one entry tail-calling the already-hooked `spinner_subid02`, another
+  tail-calling the already-hooked `interactionRunScript`); `spinner_updateLinkPosition` ends
+  with a genuine ROM-level fallthrough (no `ret`, no `jp`) straight into
+  `spinner_setLinkRelativePosition`, modeled as a bare tail C call; `spinner_setLinkRelativePosition`
+  has an internal `@func` HOOK_LOCAL called once via a real `call` and fallen into a second time
+  with no call at all, needing a dual-path `ret` exit (goes to an internal label if the resume
+  address matches, otherwise a plain `return` for the fallthrough invocation, whose real return
+  address belongs to the function's own external caller). Independent review caught 3 real
+  bugs — the recurring target-vs-physical-end mistake on three `CYCT` ranges (using the branch's
+  jump target as the burn end instead of the physically-next instruction, corrupting cycle counts
+  on the taken side; already well-documented in this file's own lessons, so no new entry added)
+  plus a style nit (raw hex instead of the existing `OBJ_VAR39`/`OBJ_VAR3A` macros) — fixed and the
+  full gate re-run clean. None of these four routines were exercised by the TAS route in either
+  verify pass, so only the byte-level report cross-check and independent review could have caught
+  them. Bank 0a is 8/928 (4 root routines added) and the project is 4,703/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 267, bank 0a (1 root routine): ported
+  `object_code/common/interactions/roller.s` (`interactionCode7a`, `roller.c`) — the pushable
+  roller puzzle object, the densest bank-0a file yet: a 16-label internal family, a 3-way RST $00
+  dispatch, and three call-reached `HOOK_LOCAL` locals (`@preventLinkFromPassing` with two callers
+  and three exit types, `@checkRollerCanBePushed`/`@nextTile`, and
+  `@updateLinkPositionWhileRollerMoving`/`@squashLink`). Following the `veranAcidPool.c` precedent,
+  every local stayed `goto`-inlined inside the one top-level `_hook` function rather than factored
+  into separate C functions, after discovering mid-batch that `lint_game.py`'s "emulated register
+  outside a _hook shim" rule only recognizes a literal `void NAME_hook(GB *gb)` signature line —
+  a `static` helper touching `gb->pc`/`gb->sp` always trips it. Self-review caught and fixed 4 bugs
+  before the first build (two `alu_add` void-misuses, one `ldi (hl),a` incorrectly using
+  flag-affecting `alu_inc8` instead of `SET_HL`, one broken placeholder line). Independent review
+  then caught 2 further real bugs: `@checkRollerCanBePushed`'s early `ret nz` and all five exits of
+  `@updateLinkPositionWhileRollerMoving`/`@squashLink` were missing their resume check back to the
+  caller, silently falling back to the interpreter on those paths (behaviorally correct, so no
+  test caught it, but defeating the rewrite on those edges) — fixed and the full gate (build×2,
+  ctest×2, 30k verify, full 289,869-frame reference replay) re-run clean. Two new porting-notes
+  lessons recorded (the `HOOK_LOCAL`-must-stay-`goto`-inlined pattern, and a `lint_game.py` false
+  positive from a flush-left comment containing a parenthesis). Bank 0a is 4/928 and the project
+  is 4,699/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 266, bank 0a (1 root routine): ported
+  `object_code/common/interactions/movingPlatform.s` (`interactionCode79`, `movingPlatform.c`) —
+  a script-driven moving platform with a 9-label internal family (2 RST $00 dispatches, an
+  RST $18 double-index collision-size lookup, and `@checkLinkTouching`, a private local reached
+  by two genuine `call`s and ending in a tail-jump into the already-hooked
+  `interactionCheckContainsPoint`). Confirmed via the same test-then-register procedure as batch
+  265 that none of the 9 sub-labels needed `rewritten.txt` entries; `checkLinkTouching`'s two call
+  sites hand-inline `push_effect`/direct-call/`pc==ra && sp==sp0_` instead of `CALL_C`, since it
+  has no independent hook to dispatch through. Self-caught and fixed a byte-range bug in the
+  second RST $00 dispatch (burned the whole opcode+table span instead of the 1-byte opcode) before
+  the first build. Bank 0a is 3/928 and the project is 4,698/9,646. Lint, both builds, 30k
+  verification, and the full 289,869-frame reference replay all passed clean (this routine went
+  unexercised by the TAS route in all three); independent review of the whole file found zero bugs.
+
+- 2026-09-18: milestone 3 phase 6 batch 265, bank 0a (1 root routine): ported
+  `object_code/common/interactions/switchTileToggler.s` (`interactionCode78`, `switchTileToggler.c`)
+  — a crystal-switch-driven floor tile toggle, dispatched through a 2-way RST $00 jump table and
+  an RST $18 double-index lookup into a 24-entry on/off tile-pair table. `@state0`/`@state1` are
+  purely internal (no external callers), so per lint they stay goto-inlined without their own
+  `rewritten.txt` entries — only the top-level `interactionCode78` needed registering; adding the
+  sub-labels caused them to vanish from `generated.txt` entirely and made lint fail with missing
+  `_hook` entries, since the tool only keeps `_hook`-suffixed generated entries for names that are
+  independently reachable. New porting-notes lesson. Bank 0a is 2/928 and the project is
+  4,697/9,646. Lint, both builds, 30k verification, and the full 289,869-frame reference replay
+  all passed clean; independent review found zero bugs.
+
+- 2026-09-18: milestone 3 phase 6 batch 264, bank 0a (1 root routine): ported
+  `object_code/common/interactions/bombFlower.s` (`interactionCode6f`, `bombFlower.c`) — first
+  bank 0a routine. In the ROM_AGES build the entire Seasons-only bomb-flower state machine
+  (`bomb_flower_subid0`/`subid1`) is compiled out by `.ifdef`, leaving a single unconditional
+  `jp interactionDelete`. Confirmed no Ages-side subid labels exist in `ages.sym` before writing
+  the trivial tail-jump. Independent review caught a real convention slip (`CYCT` used for an
+  unconditional `jp`, should be plain `CYC` — no timing effect since `insn_cycles` ignores the
+  taken flag for opcode 0xc3, but fixed for consistency with every other unconditional-jp file).
+  Bank 0a is 1/928 and the project is 4,696/9,646. Lint, both builds, 30k verification, and the
+  full 289,869-frame reference replay all passed clean after the fix.
+
 - 2026-09-16: milestone 3 phase 6 batch 263, bank 11 (1 root routine): ported
   `object_code/ages/parts/triforceStone.s` (`partCode5a`, `partCode5a.c`) — the stone
   blocking the path to Nayru at the start of the game: a one-shot state that deletes itself

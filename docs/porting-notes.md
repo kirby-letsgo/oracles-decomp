@@ -1748,3 +1748,161 @@ desync to discover; keep them when porting routines.
   the over-burn (for example `6845-6846` and `684a-684d`); replacing every range with the physical
   byte span preserved the replay hash. Always derive the endpoint from the next instruction, not
   from the cycle column.
+
+- **Whether a `HOOK_LOCAL` (`@`-named) sub-label needs its own `rewritten.txt` entry can't be
+  determined by inspection — test it empirically before writing the C file.** `interactionCode78`'s
+  `@state0`/`@state1` and `interactionCode79`'s whole 9-label family are only ever reached through
+  their own parent's internal jump table/calls (no other `.s` file references them, same as
+  `endgameCutsceneHandler_0a`'s `@`-local family), yet the two behave differently under
+  `tools/transliterate.py --out`: `endgameCutsceneHandler_0a`'s sub-labels keep a `_hook`-suffixed
+  `-`-flagged `generated.txt` line after being added to `rewritten.txt`, while `interactionCode78`/
+  `interactionCode79`'s vanish from `generated.txt` entirely (neither the bare name nor the `_hook`
+  form) the moment the whole family is registered. Neither "local vs. global label syntax" nor
+  "has an external caller" cleanly predicts which behavior a given family gets — checked both and
+  found counterexamples on each side. `lint_game.py` then fails every vanished name with "has no
+  NAME_hook entry", since it requires every `rewritten.txt` entry to have a matching
+  generated-or-hooked line. The reliable procedure: add the WHOLE candidate family (parent + every
+  `@`-local, including pure-data table labels) to `rewritten.txt`, run
+  `transliterate.py ... --out src/game`, then `grep` `generated.txt` for the family's name. If a
+  sub-label survived with a `_hook`-suffixed line, keep it registered and give it a real
+  `<parent>_<name>_hook` C function reached via the usual `CALL_C`/goto machinery. If it vanished,
+  remove it from `rewritten.txt` again and reach it purely via a C `goto` label with no ROM-facing
+  registration at all, exactly like an anonymous merge point that was never a named ROM symbol.
+  Re-run `lint_game.py` (expect 0 problems) before moving on to writing the actual routine body.
+
+- **A `HOOK_LOCAL` reached via a genuine `call` (not just `jr`/`jp`) must stay `goto`-inlined
+  inside the same top-level `_hook` function, never factored into its own C function — even a
+  `static` one.** First tried in `roller.c`, giving `interactionCode7a@preventLinkFromPassing`,
+  `@checkRollerCanBePushed`, and `@updateLinkPositionWhileRollerMoving` their own `static void`
+  helper functions, each doing its own `push_effect`/direct-call/`gb->pc == ra && gb->sp == sp0_`
+  resume check. `lint_game.py`'s "emulated register outside a _hook shim" rule only recognizes a
+  function whose signature line literally starts with `void NAME_hook(GB *gb)` (checked via
+  `re.match`, so `static void NAME(...)` never matches); any raw `gb->pc`/`gb->sp` read inside a
+  plain `static` helper trips it. Renaming the helper to end in `_hook` and dropping `static`
+  works for the lint rule (matches `beam.c`'s `func_5758_hook`, itself a private local that just
+  happens to also be independently reachable) but is a worse fit here since none of these three are
+  independently reachable at all. The actual established pattern, confirmed against
+  `veranAcidPool.c`'s `func_7db7` (a `HOOK_LOCAL` with both a literal-`ret` exit and a
+  tail-jump-into-external-hook exit, reached by `push_effect(gb, ra); goto func_7db7;` from
+  `state6`), is to keep every such block as a bare `label:` inside the ONE top-level `_hook`
+  function's body, entering it the same way (`push_effect(gb, ra); goto label;`) and re-checking
+  `gb->pc`/`gb->sp` against every caller's `ra` at every one of the label's own exits. When a label
+  has two callers with two different `ra` values (`preventLinkFromPassing` here, called from both
+  `@state1` and `@updateLinkPositionWhileRollerMoving`), EVERY exit needs both `if` checks, one per
+  caller, exactly mirroring the two-way pattern already documented for `veranAcidPool.c`.
+  **Missing this at just one exit is easy and was caught only by independent review, not
+  self-review or either full-game verify pass**: forgetting the check silently falls back to
+  `hook_continue`'s raw-interpreter tail instead of resuming the native caller — behaviorally
+  correct (the interpreter finishes the ROM bytes faithfully) so it produces no state-hash
+  mismatch and no ctest failure, but defeats the entire point of the rewrite for that call
+  reachability edge. Audit every exit of a multi-exit, multi-caller `HOOK_LOCAL` by hand
+  (`ret`/`ret cc`/tail-`jp` alike) rather than trusting that "it built and passed" means every
+  exit carries its check.
+
+- **`lint_game.py`'s in-hook tracker is fooled by a flush-left comment containing a
+  parenthesis.** It treats any line matching `^\S.*\(` (starts with non-whitespace, contains
+  `(`, doesn't start with `}`) as code that ends the current hook shim — including comment
+  lines. A section-header comment like `// ...reached only by one genuine call (from @state2,
+  return address 0x41fb above); never separately hooked.`, written flush-left (no leading
+  indentation) between two labels inside a `_hook` function, permanently flips the tracker's
+  `in_hook` state to `false` for the rest of the file, since nothing re-enters `in_hook` except
+  matching another `void NAME_hook(GB *gb)` signature line. Every subsequent `gb->pc`/`gb->sp`
+  read then gets flagged as "outside a _hook shim", even though it's lexically still inside the
+  same function's braces. Fix: never put a literal `(` in a flush-left (unindented) comment line
+  inside a `_hook` function body; reword the comment (e.g. "from @state2's return address" instead
+  of "(from @state2, return address ...)") rather than indenting it, since indentation on a
+  section-header comment reads oddly against the labels it's documenting. The same rule applies
+  before a `_hook` function's own signature line too, but for a different reason: `in_hook` starts
+  `false` by default, so a doc comment above the function that literally writes `gb->pc`/`gb->sp`
+  as prose (not even inside parens) trips the raw-register-access check directly, regardless of
+  parens. Write "the stack pointer" or "PC" instead of the literal `gb->` form in any comment
+  outside a hook body.
+
+- **When a `HOOK_LOCAL` block (call it B) is itself entered via `push_effect` from ANOTHER
+  already-`push_effect`-entered `HOOK_LOCAL` block (call it A), B's resume-check must compare
+  the stack pointer against A's OWN entry level, never against the top-level `sp0_` directly —
+  and getting the direction of that offset backwards is easy and was caught wrong twice in one
+  session (`roller.c` and then `vasu.c`).** `push_effect`/`pop_effect` (`asm.h`) do real
+  `sp -= 2` / `sp += 2`; a `ret` only undoes the ONE push that matches it, restoring the stack
+  pointer to whatever it was immediately BEFORE that specific push — not necessarily `sp0_`,
+  unless that specific push happened to originate at the function's very top level. In
+  `roller.c`, `@updateLinkPositionWhileRollerMoving` is entered via a push from `@state2` (itself
+  at `sp0_`, no outer push), so `@updateLinkPositionWhileRollerMoving`'s OWN operating level is
+  `sp0_ - 2`; its internal call into `@preventLinkFromPassing` therefore pushes at `sp0_ - 2`, and
+  that callee's resume-check for THIS edge must compare `sp0_ - 2`, not `sp0_` (which is what the
+  first, wrong version compared against `@state1`'s DIFFERENT, un-nested edge with too). In
+  `vasu.c`, the mistake ran the other way: `sp1_` was captured `gb->sp` right AFTER
+  `@updateState`'s own entry push (so `sp1_` is the POST-push, one-level-deeper value, equal to
+  `sp0_ - 2`), and then 19 "return to the top-level caller" checks compared the popped stack
+  pointer against `sp1_` — but popping that SAME push restores the stack pointer to what it was
+  BEFORE the push, i.e. `sp0_` (equivalently `sp1_ + 2`), not `sp1_` itself. Meanwhile calls made
+  FROM WITHIN `@updateState`'s own body (to `@checkRingBoxAndRingsObtained`, and
+  `@setScriptAndGotoState4`'s genuine-call edge from `@setBlueSnakeExitScript`) push FROM the
+  CURRENT `sp1_` value, so THEIR matching pop correctly restores `sp1_` — the exact opposite
+  polarity from the top-level-return checks, in the same file. Neither self-review nor two
+  separate independent-review passes caught either mistake on the first attempt; a third,
+  explicitly-arithmetic-focused independent review pass (computing the expected stack pointer
+  from the actual sequence of pushes rather than pattern-matching the code's shape) is what
+  finally caught the `vasu.c` instance. The reliable method: for every `push_effect(gb, X); goto
+  LABEL;` site, explicitly write down what the stack pointer equals AT THE MOMENT of that
+  specific push (as an expression relative to `sp0_`, counting 2 bytes per still-outstanding
+  outer push), and use exactly that expression — never a variable whose capture point you have
+  not double-checked — in every one of `LABEL`'s resume-checks for that edge. Both the "roller.c"
+  and "vasu.c" instances of this bug were execution-invisible: the popped `gb->pc`/`gb->sp` values
+  were always fully correct, and only the wrong comparison constant made the check silently fail
+  and fall back to the interpreter, so neither a state-hash mismatch nor a ctest failure could
+  ever have caught them.
+
+- **A `jp` (not `call`) to an already-hooked external routine, made while one of your own
+  `push_effect` calls is still outstanding, needs a bare tail-call plus a resume-check, not
+  `CALL_C`.** `rosa.c`'s `interactionCode68`: `initGraphicsAndLoadScript`/`loadScriptFromTable-
+  AndInitGraphics` are each called once (a genuine `call`, at bare `sp0_`) then immediately `jr`
+  into `loadScriptAndIncState`/`loadScriptFromTableAndIncState` at that same nested depth; those
+  end with an unconditional `jp interactionIncState` — a tail jump, not a call. `interactionIncState_hook`
+  (`obj_inc` in `bank0.c`) ends in a genuine `ret_effect`, so when it's reached with an outstanding
+  outer push still on the (simulated) stack, its OWN return is what pops that outer frame and
+  resumes execution back inside your function, at the address physically following the original
+  outer `call`. Model it as `CYC(from, to); external_hook_func(gb); if (gb->pc == OUTER_RETURN_ADDR
+  && gb->sp == OUTER_LEVEL) goto RESUME_LABEL; return;` — never `CALL_C` (which assumes the target
+  returns to the address `CALL_C` itself pushed, not some ancestor's). This is the same family as
+  the nested-stack-pointer bug above but on the "calling out" side rather than the "calling a
+  local" side; get the outer return address and stack depth from the ORIGINAL `push_effect` site,
+  the same way.
+
+- **A `HOOK_LOCAL` sub-label that survives the empirical registration test (i.e. does NOT vanish
+  from `generated.txt`) still might need zero C at all, if it's genuinely dead code.** `rosa.c`'s
+  `interactionCode68@initGraphicsAndIncState` is a 3-instruction block the ROM source itself marks
+  "; Unused" — 0 callers, and nothing in the routine falls through into it (the preceding block
+  ends in an unconditional `jp`). It still vanished from `generated.txt` once the root name was
+  registered (the tool claims the whole contiguous byte range once any part of the family is
+  registered, regardless of internal reachability), so no separate hook or C modeling was needed;
+  it was simply omitted with a one-line comment noting the omission, matching the ROM's own dead
+  code. Before doing this, confirm genuine unreachability by reading the actual disassembly
+  (checking that nothing calls, jumps to, or falls through into the label), not just by trusting
+  the vanish test alone — the vanish test only tells you registration isn't needed, not that the
+  code is unreachable.
+
+- **A conditional `call cc,X` to a goto-inlined local (not an already-hooked external routine)
+  combines the `CALL_C_CC` branch-conditional pattern with the manual `push_effect`+`goto`+
+  resume-check local-call idiom** (precedent: `miscellaneous1.c`'s `interaction6b_subid0d`,
+  calling `@checkLinkSquished` via `call nc`; also present already in `fallingBoulderSpawner.c`
+  and `lighting.c`). Shape: `if (COND) { CYCT(a, a+3); push_effect(gb, a+3); goto LABEL; }
+  CYC(a, a+3);` — both taken and not-taken sides share the SAME end address (`a+3`, a `call`'s
+  fixed length), unlike a conditional jump where taken/not-taken diverge; the push only happens
+  on the taken side, matching real `call cc` semantics (no push at all when the condition is
+  false). `LABEL`'s own `ret` then needs the usual `if (gb->pc == a+3 && gb->sp == <level>) goto
+  RESUME;` resume-check(s) for this edge, same as any other local-call inlining.
+- **The target-vs-physical-end mistake also hits UNCONDITIONAL `jp`/`jr`, not just conditional
+  branches, and when it does the cycle burn doesn't just come out wrong — it silently zeroes.**
+  `miscellaneous1.c`'s `interaction6b_subid15` wrote `CYC(0x5230, 0x50be)` for an unconditional
+  `jp $50be` where `0x50be < 0x5230` (the jump target is a lower address than the jump itself, a
+  cross-routine backward jump). `burn_rom`'s loop is `for (a = from; a < to; ...)`, a forward-only
+  unsigned walk; when `to` is a target address that happens to be *before* `from`, the loop
+  condition is false on the very first check and the instruction burns exactly zero cycles —
+  no crash, no wraparound garbage, just silent underburn, only catchable by comparing against the
+  ground-truth report's per-block cycle totals. Every unconditional `jp`/`jr` still needs
+  `to = from + instruction length` (3 for `jp`, 2 for `jr`), the same rule as the taken side of a
+  conditional branch — there is no exception for "it's unconditional so I can just use the
+  target." This is especially easy to get wrong on a cross-routine replicated tail-jump (see the
+  entry above on replicating another routine's inline body), where the temptation is to write the
+  jump's destination address as if it were just another `goto`'s target.
