@@ -6569,3 +6569,8 @@ enemyCode0c
 enemyCode0e
 bladeTrap_subid01
 bladeTrap_subid03
+ambiGuard_stateC
+enemyCode3d
+enemyCode41
+enemyCode49
+enemyCode4d
