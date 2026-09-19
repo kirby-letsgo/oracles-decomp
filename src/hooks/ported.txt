@@ -6562,3 +6562,10 @@ decideFinalChildPersonality
 label_0b_006
 childSetVar38ToNumEssencesObtained
 spawnBipinBlossomFamilyObjects
+interactionCode67
+interactionCodea9
+interactionCodec9
+enemyCode0c
+enemyCode0e
+bladeTrap_subid01
+bladeTrap_subid03

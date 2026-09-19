@@ -500,3 +500,16 @@ void zora_subid10_hook(GB *gb) {
 void zora_subid13_hook(GB *gb) {
   zora_subid1B_hook(gb);
 }
+
+void interactionCodeab_hook(GB *gb) {
+  CYC(0x6067, 0x6069); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(0x6069, 0x606a); A = mem_rd(gb, DE);
+  CYC(0x606a, 0x606b); push_effect(gb, 0x606b);
+  uint16_t target = zora_jump_table(gb);
+  if (target == 0x60a3) { zora_subid00_hook(gb); return; }
+  if (target == 0x6110) { zora_subid0A_hook(gb); return; }
+  if (target == 0x60e4) { zora_subid0C_hook(gb); return; }
+  if (target == 0x61f8) { zora_subid0E_hook(gb); return; }
+  if (target == 0x6186) { zora_subid10_hook(gb); return; }
+  zora_subid13_hook(gb); return; // target == 0x6228
+}

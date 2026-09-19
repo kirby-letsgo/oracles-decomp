@@ -448,6 +448,500 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-19: milestone 3 phase 6 batch 338, bank 0d: **CLOSED OUT.** Ported the shared `ecom_*`
+  enemy-common-code cluster (62 real routines plus `label_025_b0d`) into `enemyCommonCode.c`,
+  mechanically via `sed 's/_b10/_b0d/g'` on the already-shipped bank-0x10 copy of
+  `common/enemies/commonCode.s` -- confirmed byte-identical addresses/instructions across banks
+  0x0d/0x0e/0x0f/0x10 via `--report` on multiple sample routines.
+
+  Fixed a real translation bug present in both the new b0d copy and the previously-shipped b10
+  copy: `ecom_applyGivenVelocityGivenAdjacentWalls`'s `@updateX` entry point loaded
+  `ENEMY_BASE + OBJ_Y` when the disassembly (`ld e,$8c` at ROM address 0x41a1) requires
+  `OBJ_X` -- dormant in bank 0x10 since its rare late-game bosses (Twinrova/Ganon/Veran's Final
+  Form/Ramrock/King Moblin's minion) never took that branch; bank 0x0d's common overworld
+  enemies hit it almost immediately. Also fixed 397 call sites across 38 already-ported bank-0d
+  files that called the new `ecom_*_b0d` functions without the `_hook` suffix (build-breaking,
+  caught immediately by the compiler).
+
+  After those two fixes the full 289,518-frame TAS replay still diverged at frame 29100 with an
+  identical state-hash mismatch. Bisecting the *entire* game's 5294 rewritten routines (not just
+  bank 0d) by activating exactly one hook at a time (`HOOK_SKIP` set to everything else) and
+  binary-searching, twice independently, both times converged on
+  `ecom_applyGivenVelocityGivenAdjacentWalls_b0d_hook` alone as sufficient to reproduce the
+  divergence -- confirmed the bisection method itself wasn't a generic artifact by checking that
+  an arbitrary unrelated hook (`clearMemory_hook`) does *not* fail the same way in isolation. A
+  manual line-by-line re-check of every `CYC`/branch/register in that function against the ROM
+  disassembly found nothing wrong, and the `--verify-hooks-continue` per-call diff found zero
+  mismatches anywhere in 30k frames -- because the bug wasn't in the function's own instruction
+  translation, it was a missing stack push. Two internal calls to the `applySpeedComponent`
+  helper (a genuine ROM `call $41e1` instruction) were translated as bare C function calls with
+  no matching `push_effect()`, so the helper's own `RET`/`RET_TAKEN` popped a return address it
+  was never given -- 100% deterministic, not a timing artifact, triggered whenever an enemy is
+  wall-adjacent on both axes at once (both the Y-branch and X-branch call sites hit in the same
+  invocation). This is exactly the same failure mode the porting notes already document for
+  manual RST-helper calls; the fix follows the identical pattern: `push_effect(gb, <return
+  address>)` immediately before each of the two calls, applied to both the b0d and b10 copies.
+
+  Full 289,518-frame replay now passes clean. Final bare-symbol audit: 804 `ages.sym` bare
+  symbols for bank 0x0d; 474 are pure animation/OAM-data tables (confirmed via garbage-opcode
+  decode) or the already-known losing `enemyCode20` alias; the remaining 327 distinct hooked
+  addresses in `table.h` are all now hand-written, matching `rewritten.txt`'s count exactly
+  (265 from batch 337 + 62 from this batch). `docs/bank-map.html` bank 0d corrected from
+  265/675 (stale) to 327/327. Project total is 5,187/9,646.
+
+- 2026-09-19: milestone 3 phase 6 batch 337, bank 0d (265 routines, 27 new files + 1 extension):
+  started the "common enemies" sweep with three parallel agents. Audited the raw 804 bare-symbol
+  count for this bank down to ~274 real routines: ~62 entries turned out to be false candidates
+  (see below) and ~468 are pure animation/OAM-data-pointer tables (`enemyNNAnimations`,
+  `enemyAnimationXXXXX(Loop)`, `enemyXXOamDataPointers`) -- the first filtering pass only caught
+  the plain `enemyAnimationXXXXX$` pattern and missed the `Animations$`/`Loop$` suffixed variants,
+  corrected before dispatching agents so none of the three wasted time trying to port garbage.
+
+  Cluster A (17 new files: riverZora, octorok, boomerangMoblin, leever, moblinsAndShroudedStalfos,
+  arrowDarknut, lynel, bladeAndFlameTrap, rope, gibdo, spark, whisp, spikedBeetle, bubbleEnemy,
+  beamos, ghini, buzzblob) also extended the existing bank-0x10 `enemyCommonCode.c` with
+  `label_025_b0d` -- `common/enemies/commonCode.s` assembles identically into 4 different banks
+  (0d/0e/0f/10), and only the bank-0x10 copy of this one small routine existed before. Cluster B
+  (10 files: buzzblob, sandCrab, spinyBeetle, gopongaFlower, armos, fish, polsVoice, likelike,
+  dekuScrubEnemy, wallmaster) and cluster C (12 files: podoboo, giantBladeTrap, cheepCheep,
+  podobooTower, thwimp, thwomp, veranSpider, eyesoarChild, ironMask, veranChildBee,
+  anglerFishBubble, enableSidescrollDownTransition) both wrote `buzzblob.c` independently (my
+  split guessed wrong about where the enemy boundary fell); cluster A's later, more complete
+  rewrite superseded cluster B's partial one on disk, and both were verified byte-for-byte correct
+  before/after, so nothing was lost.
+
+  Verified all three clusters primarily with a small Python script (written this batch, reusable
+  for future large-scale waves): it diffs every `CYC`/`CYCT` "to" address in a C file against the
+  real next-instruction address from a `transliterate.py --report` dump, plus a flag-polarity
+  cross-check against `//` mnemonic comments. Found and fixed 5 real target-vs-physical-end CYC
+  bugs this way that manual reads had missed (2 in `spinyBeetle.c`, 1 in `polsVoice.c`, 2 in
+  `wallmaster.c`); the agents' own self-review caught 2 more mid-flight. The script also throws
+  occasional false positives at jump-table/`rst` boundaries (where the "next listed instruction"
+  in the report isn't physically contiguous) -- every flagged case was individually confirmed
+  against the report before deciding real-bug vs false-positive.
+
+  Two alias groups needed a `ported.txt` correction, not just a `rewritten.txt` one: `enemyCode0c`
+  (first-declared, wins over `enemyCode20`/`enemyCode22`) and `bladeTrap_subid01`/`bladeTrap_subid03`
+  (win over `02`/`04`) were missing from `ported.txt` entirely while their losing siblings were
+  already listed there -- confirmed via `.s` source line numbers and added the correct winners.
+  Two lint failures from helpers that check `gb->pc`/`gb->sp` internally but weren't named with
+  the bare `void name_hook(GB *gb)` signature the linter's hook-detector regex requires (no
+  `static`, no extra parameters) -- `beamos.c` and `bubbleEnemy.c`'s single-caller angle/direction
+  helpers, fixed by dropping `static` and adding the `_hook` suffix.
+
+  **Bank 0d is not yet fully done even after this wave.** After registering all 265 routines,
+  `gen_bank0d.c` shrank from ~19,300 lines to 1,453 but did not disappear: the shared `ecom_*`
+  enemy-common-code cluster (`common/enemies/commonCode.s`, ~76 routines) still needs its own
+  bank-0x0d pass -- only bank 0x10's copy of this cluster was ever rewritten (in the same
+  `enemyCommonCode.c` file, `_b10`-suffixed), and every one of this batch's new enemy files calls
+  into the still-generated `_b0d`-suffixed versions correctly but doesn't replace them. Queued as
+  the immediate next wave, using the existing bank-0x10 implementation as a structural template
+  since it's the identical source re-assembled at different addresses. Full gate passed: both
+  builds clean, both ctest suites 8/8, 30k-frame verify-hooks-continue clean (same final state
+  hash as before the batch), full 289,869-frame TAS reference replay passed. `docs/bank-map.html`
+  bank 0d count updated to 265/675 (675 not yet re-audited, likely still stale given the pattern
+  in every other bank this session). Project total is 5,125/9,646.
+
+- 2026-09-19: milestone 3 phase 6 batch 336, bank 0b: **bank 0b is now fully readable C --
+  `gen_bank0b.c` no longer exists.** Third and final wave of the sweep, two parallel agents, 20
+  new files. Cluster C: `troy.c`, `linkedGameGhini.c`, `plen.c`, `masterDiver.c`, `dekuScrub.c`,
+  `leverLavaFiller.c`, `slateSlot.c`, `syrupCucco.c`, `businessScrub.c`, `companionTutorial.c`.
+  Cluster D: `faroreGiveItem.c` (plus the `interactiond9_*` cluster in the same file),
+  `movingSidescrollPlatform.c` (plus `func_7fa1` and `movingPlatform_stateC`),
+  `movingSidescrollConveyor.c`, `endgameCutsceneBipsomFamily.c`, `creditsTextHorizontal.c`,
+  `creditsTextVertical.c`, `gashaSpot.c`, `horonDogCredits.c`, `zelda.c` (plus `zelda_state0`/
+  `zelda_state1`/`zelda_loadScript`), `makuSeedAndEssences.c`.
+
+  Process note: cluster C's dispatcher agent tried to fan out one fork per cluster item; every
+  fork inherited the full batch and all 10 attempted all 10 items concurrently for the whole
+  ~30-minute run, racing on the same 10 output files. Its own final self-audit claimed a clean
+  result, but rather than trust a self-report from a run with that much concurrent-write risk,
+  all 10 files were independently re-read and re-verified from scratch against
+  `transliterate.py --report`. That paid off: found and fixed a real ordering bug in the shared
+  `rst $18` helper (`SET_BC(pop_effect(gb))` was sequenced before its own cycle burn instead of
+  after, present identically in `troy.c`, `linkedGameGhini.c`, and `plen.c` -- almost certainly a
+  symptom of the race corrupting a shared template) and a real wrong-callee bug in
+  `faroreGiveItem.c` (`bombUpgrade` called `createTreasure` directly instead of the ROM's actual
+  `createTreasureAndIncSubstate`, silently skipping a required substate increment and counter
+  reset -- confirmed against the raw `.s` source's `call @createTreasureAndIncSubstate`).
+
+  A mechanical script (diff every `CYC`/`CYCT` "to" address against the report's real next-
+  instruction address, plus a flag-polarity cross-check against `//` mnemonic comments) was
+  written this batch and run retroactively across every file in both clusters. It caught two more
+  real bugs a manual read of `gashaSpot.c` (414 instructions) had missed: one target-vs-physical-
+  end address bug and, on the very same line, a `jr nc` branch coded with the wrong polarity
+  (`if (F & FC)` instead of `if (!(F & FC))`), which together had silently inverted the gasha
+  spot's maturity-based treasure-spawn logic. All files pass the script clean after fixes.
+
+  Three lint failures surfaced after registering, all in the "manual CALL_C-style" helper
+  functions this batch introduced for cases where a shared local is reached both by tail-goto and
+  by a genuine `call` with more work after: (1) writing the literal phrase "gb->pc"/"gb->sp" in a
+  flush-left explanatory comment trips the linter's raw-text register scan even though it's not
+  code -- reworded to "the resulting pc/sp"; (2) `lint_game.py`'s hook-detector only recognizes a
+  bare `void name_hook(GB *gb)` line (no `static`, no extra parameters) as entering hook-shim
+  scope -- three helpers using their own `gb->pc`/`gb->sp` checks needed the `static` keyword
+  dropped and, in one case, an extra `sp0_` parameter replaced with the helper declaring
+  `uint16_t sp0_ = gb->sp;` itself instead of threading it through.
+
+  Confirmed via the zora/greatFairy precedent (batch 334) that only bare (non-`@`) root names
+  need `rewritten.txt` entries; `interactionCodec9` (syrupCucco) needed a `ported.txt` entry too
+  (never hooked at all, same silent-failure class as `interactionCode67`/`interactionCodea9`).
+
+  After registering and rebuilding, `src/game/gen_bank0b.c` disappeared entirely from `--out`'s
+  output (7 bank files instead of 8). Ran the full bare-symbol-vs-registration audit
+  (`ages.sym`'s 157 bare bank-0b symbols against the union of `ported.txt`+`rewritten.txt`): 5 are
+  pure ROM data tables (`finalChildPersonalityTable`, `initialChildPersonalityTable`,
+  `horizontalCreditsText_65b1`, `horizontalCreditsText_scriptTable`, `zora_textIndices`,
+  confirmed via garbage-instruction decode in their own transliterate reports), and 22 are losing
+  `zora_subid` aliases sharing an address with an already-registered first-declared winner
+  (`zora_subid00`/`0A`/`0C`/`0E`/`10`/`13`), confirmed via direct address-grouping against
+  `ages.sym`. That leaves exactly 130 distinct real routines in bank 0b, all hooked with zero
+  gaps and zero permanently-skipped garbage (unlike bank 11's one item). `docs/bank-map.html`'s
+  long-stale 770 total is corrected to the audited 130/130 -- bank 0b joins banks 00, 03, 0a, 10,
+  and 11 as fully done. Full gate passed: both builds clean, both ctest suites 8/8, 30k-frame
+  verify-hooks-continue clean (same final state hash as before the batch), full 289,869-frame TAS
+  reference replay passed. Project total is 4,860/9,646 (down from 4,895 purely from the 770→130
+  stale-count correction, not from any code being un-rewritten).
+
+- 2026-09-19: milestone 3 phase 6 batch 335, bank 0b (22 routines, 20 new files):
+  second wave of the ~99-routine sweep, two parallel agents. Cluster A: `explosionWithDebris.c`,
+  `carpenter.c`, `raftwreckCutscene.c`, `kingZora.c`, `tokkey.c`, `waterPushblock.c`,
+  `disappearingSidescrollPlatform.c`, `circularSidescrollPlatform.c` (plus the full shared
+  `sidescrollPlatform_*`/`sidescrollingPlatformCommon` helper cluster used by four different
+  interaction codes, only two of which -- `interactionCodea3`/`interactionCodea4` -- are ported
+  so far), `touchingBook.c`, `makuSeed.c`. Cluster B: `a8.c`, `din.c`, `twinrovaInCutscene.c`,
+  `childJabu.c`, `twinrova3.c`, `pushblockSynchronizer.c`, `ambisPalaceButton.c`,
+  `symmetryNpc.c`, `pirate.c`, `tingle.c`. Notable: `waterPushblock.c`'s `swapRoomLayouts`
+  faithfully reproduces a genuine ROM quirk where the 11th of 11 `call`s has a return address
+  that coincidentally equals its own callee's entry point, causing the callee to run a real,
+  ROM-accurate 12th time before actually returning; `circularSidescrollPlatform.c` extracted a
+  shared, physically-overlapping tail (`pushLinkAwayVertical`'s own setup code runs directly into
+  `pushLinkAwayHorizontal`'s body via a `jr`) into one static helper both call into. Found and
+  fixed one real bug during review: `makuSeed.c`'s `createSparkle` wrote `A = 0x00` for a related-
+  object marker byte the ROM report clearly showed as `ld a,$40` -- the same
+  Interaction.start/INTERACTION_BASE (0x40) vs Object.start (0x00) confusion class flagged
+  earlier this session, caught by cross-referencing the report's actual immediate byte rather
+  than trusting the "Interaction.start" comment alone. Registration insight confirmed via the
+  batch-334 zora/greatFairy/pirateShip precedent: registering only a routine's bare (non-`@`)
+  root name in `rewritten.txt` collapses ALL of its `@`-scoped local labels out of
+  `generated.txt` at once, regardless of how many internal call sites reference them or how the
+  C implementation structures them (inline `goto`s vs separate static/public helper functions) --
+  so only the 8 interaction roots plus the 12 genuinely bare `sidescrollPlatform_*`/
+  `sidescrollingPlatformCommon` global helpers needed individual `rewritten.txt` entries (22
+  total), not the dozens of `@`-local sub-labels initially listed. Full gate passed: both builds
+  clean, both ctest suites 8/8, 30k-frame verify-hooks-continue clean, full 289,869-frame TAS
+  reference replay passed. `docs/bank-map.html` bank 0b count corrected from 143 to 165 of 770.
+  Project total is 4,895/9,646.
+
+- 2026-09-19: milestone 3 phase 6 batch 334, bank 0b (4 routines, new files
+  `twinrovaFlameInteraction.c`, `pirateShipInteraction.c`; extended `zora.c`, `greatFairy.c`):
+  first wave of bank 0b's ~99-routine sweep (audited in batch 333's wake, after the bank-11
+  near-miss taught not to trust `gen_bankXX.c` file size alone). Two parallel agents: one
+  extended `zora.c` with `interactionCodeab_hook` and `greatFairy.c` with `interactionCoded5_hook`
+  -- both trivial 3-instruction `rst $00` dispatchers whose targets (`zora_subid00`/`0A`/`0C`/
+  `0E`/`10`/`13` and `greatFairy_subid0`/`1`) turned out to already be fully implemented from an
+  earlier session; my own initial audit had over-counted these as ~18 separate missing routines
+  by not accounting for ROM-address alias grouping. The other created two new files for the
+  session's 5th and 6th filename-collision cases: `twinrovaFlameInteraction.c`
+  (`interactionCodea9`, `object_code/common/interactions/twinrovaFlame.s`, distinct from the
+  bank-0x11 `common/parts/twinrovaFlame.s` already in `twinrovaFlame.c`) and
+  `pirateShipInteraction.c` (`interactionCodec2`, the bank-0x0b portion of
+  `object_code/ages/interactions/pirateShip.s`, whose bank-0x01 portion is already in
+  `pirateShip.c`). `interactionCodea9` was never in `ported.txt` at all (the same silent-failure
+  class discovered with `interactionCode67` in batch 331) and needed adding there too;
+  `interactionCodec2` was already present. `interactionCodec2`'s 16 `@`-local sub-labels
+  (subid0/1/2 each with their own substates, sharing `subid1And2State0Common`/`State1` and a
+  `moveOffScreen` tail) all goto-inline with zero nesting depth, confirmed via `callers: 0` on
+  every sublabel. All four routines verified byte-for-byte against `transliterate.py --report`
+  (addresses, cycles, CALL_C targets); confirmed via `git status`/mtime that the two pre-existing
+  collision files (`twinrovaFlame.c`, `pirateShip.c`) were never touched. Full gate passed: both
+  builds clean, both ctest suites 8/8, 30k-frame verify-hooks-continue clean, full 289,869-frame
+  TAS reference replay passed. `docs/bank-map.html` bank 0b count corrected from 139 to 143 of
+  770 (770 itself likely still a stale overcount, per the same alias-inflation pattern seen in
+  banks 0a/11 -- not yet re-audited). Project total is 4,873/9,646.
+
+- 2026-09-19: milestone 3 phase 6 batch 333, bank 11: no new code -- discovered bank 11 was
+  already essentially complete too. Of 255 bare (non-`@`) symbols in `ages.sym` for bank 11, 24
+  are pure ROM data tables (correctly never registered) and 227 are already hooked and readable.
+  The single remaining entry, `func_11_7f64`, is not real game code at all: its own source is
+  `ref/oracles-disasm/code/ages/garbage/bank11End.s` -- the disassembly project's own bucket for
+  unreachable ROM padding that happens to disassemble into plausible-looking instructions. Its
+  transliterate report confirms `callers: 0` and both of its own call targets are unresolved,
+  matching the same "skip as garbage" category CLAUDE.md already documents for illegal-opcode
+  labels. `docs/bank-map.html`'s tracking count for this bank was badly stale (227/650, likely
+  counting every `@`-local label individually rather than distinct routines needing independent
+  work); corrected to 649/650, with the one point of headroom being the permanently-skipped
+  garbage fragment. Project total is 4,869/9,646 (unchanged, since no code was added).
+
+- 2026-09-19: milestone 3 phase 6 batch 332, banks 00 and 03: no new code -- discovered both
+  banks were already 100% complete. `setCpuToDoubleSpeed` (03:4071, `src/game/kernel.c`) and
+  `wRamFunction` (00:c4b7, `src/game/ram_code.c`) were already hand-written and correctly hooked
+  (both appear in `src/hooks/table.h`), just without the conventional `_hook` naming suffix,
+  which made a naive `generated.txt` grep (checking for names ending in `_hook`) flag them as
+  false-positive gaps. Confirmed genuinely complete via the same signal that closed out bank 0a:
+  no `gen_bank00.c`/`gen_bank03.c` interpreter-fallback file exists for either bank, meaning zero
+  routines in either bank still run through the generic interpreter. `docs/bank-map.html`'s
+  tracking counts for these two banks were stale by one each (653/654, 636/637) from early in the
+  multi-session effort; corrected to 654/654 and 637/637. Project total is 4,869/9,646.
+
+- 2026-09-19: milestone 3 phase 6 batch 331, bank 0a (1 routine, new file `companionSpawner.c`):
+  added `interactionCode67` (spawns the current animal companion via flute call or story
+  cutscene), closing out bank 0a's readable-C conversion. Source is
+  `object_code/common/interactions/companionSpawner.s` (shared disasm code; the specific
+  `interactionCode67` symbol resolves to bank 0x0a for Ages). Notable discovery: this routine had
+  never been hooked at all, unlike every other routine ported in bank 0a this session (which were
+  all already milestone-2 "generated" hooks from an earlier pass, needing only a `rewritten.txt`
+  addition) -- `transliterate.py --out` silently produces no new hook for a name that exists only
+  in `rewritten.txt` but not in `src/hooks/ported.txt`, since `ported.txt` is what defines the
+  full set of routines considered at all. Added `interactionCode67` to `ported.txt` too, which
+  fixed it. Self-review (full instruction-by-instruction cross-check against the transliterate
+  report, including the routine's 4 multi-caller shared locals) found zero bugs; confirmed no
+  nesting depth anywhere in this file, unlike `makuTree.c`/`makuSprout.c`. Lint, both builds, 30k
+  verification, and the full 289,869-frame reference replay all passed clean.
+
+  With this, a thorough cross-reference of every bare (non-`@`) bank-0a symbol in `ages.sym`
+  against `ported.txt`/`rewritten.txt` combined finds only pure ROM data tables and known aliased
+  duplicate addresses left unregistered -- no further bank-0a interaction/subroutine code remains
+  unrewritten. Bank 0a is 172/928 per this doc's own long-running counter, but that "928" figure
+  (set early in the multi-session effort) appears to have overcounted the bank's true routine
+  total; the actual code-routine count is much closer to 172. The project total is 4,867/9,646.
+
+- 2026-09-19: milestone 3 phase 6 batch 330, bank 0a (12 routines, new files `patch.c`,
+  `ballInteraction.c`, `moblin.c`, `97.c`): added `interactionCode94` (INTERAC_PATCH) plus 6
+  bare-global helpers, `interactionCode95` (INTERAC_BALL), `interactionCode96` (INTERAC_MOBLIN),
+  and `interactionCode97` (INTERAC_97) plus 2 bare-global helpers. Found a THIRD instance of the
+  file-basename-collision class: `interactions/ball.s` (bank 0x0a, this batch) and
+  `parts/ball.s` (bank 0x11, already covered by the existing `src/game/ball.c`) share a basename;
+  caught before any file was touched, ported to a new `ballInteraction.c` instead. `patch_subid03`
+  has a 4-real-caller-plus-fallthrough shared local (`@spawnBeetle`) correctly modeled with the
+  standard multi-site resume-label idiom; `interaction97_subid01`'s `@spawnBubble` has a
+  genuinely nested single-caller case interacting with an outer `push bc`/`pop bc` bracket, whose
+  `sp0_ - 2` resume-check depth was independently re-derived and confirmed correct. Also
+  reconfirmed the aliased-bare-global-address convention (whichever ROM label is declared first
+  in the source wins the hook-table slot, not necessarily the one carrying the "real" body) for
+  `patch_subid04`/`05` and `patch_subid06`/`07`. Self-review found zero remaining bugs across all
+  four files. Lint, both builds, 30k verification, and the full 289,869-frame reference replay
+  all passed clean. Bank 0a is 171/928 and the project is 4,866/9,646.
+
+- 2026-09-19: milestone 3 phase 6 batch 329, bank 0a (27 routines, new files `fallingRock.c` and
+  `twinrovaInteraction.c`): added `interactionCode92` (INTERAC_FALLING_ROCK) plus 11 bare-global
+  helpers, and `interactionCode93` (INTERAC_TWINROVA) plus 14 bare-global helpers. Discovered a
+  SECOND instance of the file-basename-collision class first found with `sparkle.s`/`sparkleInteraction.c`:
+  `ref/oracles-disasm/object_code/ages/interactions/twinrova.s` (INTERAC_TWINROVA, bank 0x0a) and
+  `object_code/common/enemies/twinrova.s` (ENEMY_TWINROVA, bank 0x10, already covered by the
+  existing `src/game/twinrova.c`) are two completely unrelated source files that share a basename
+  in different disasm directories. Caught before any file was touched (the porting agent flagged
+  the bank mismatch on its own instead of pasting bank-0x0a code under the existing file's
+  bank-0x10 `CYC`/`CYCT` macros), so the new cluster was written to its own `twinrovaInteraction.c`
+  file instead, following the established naming precedent. Both files' target-vs-physical-end
+  `CYC` ranges were mechanically re-verified end to end; zero bugs found. Lint, both builds, 30k
+  verification, and the full 289,869-frame reference replay all passed clean. Bank 0a is 159/928
+  and the project is 4,854/9,646.
+
+- 2026-09-19: milestone 3 phase 6 batch 328, bank 0a (33 routines, new file `miscPuzzles.c`):
+  closes out `miscPuzzles.s` (1377 lines, the largest single source file in bank 0a so far),
+  adding `interactionCode90` (INTERAC_MISC_PUZZLES, the top-level dispatcher) plus 32 bare-global
+  `miscPuzzles_subidNN`/shared-helper routines spanning D6-D8 puzzles, the Hero's Cave, Jabu-jabu's
+  water level, and several maku-tree gasha-seed spawns. Every bare global is independently
+  registered and dispatched via a long if-chain of tail-calls from `interactionCode90_hook`,
+  matching the established bare-global convention; this is the largest routine cluster ported in
+  one batch this session. Produced by 4 parallel porting agents each handling a contiguous chunk
+  of the file, merged into one file by hand with careful cross-verification. Found and fixed 3
+  bugs during the merge review: two instances of the target-vs-physical-end `CYC` bug in one
+  chunk (an unconditional `jr` whose target lands after a small ROM data table, so the `CYC` end
+  used the jump target instead of the 2-byte physical instruction length — the same bug class
+  documented repeatedly this session), plus one merge error introduced during assembly itself (a
+  cycle-burn line for a not-taken branch was dropped and mistakenly re-inserted in the wrong
+  place), self-caught before building. A genuine single-level nested `@`-local case
+  (`deletePartObject`, called from within `makeTorchesUnlightable`'s own outstanding call) was
+  correctly modeled with the `sp0_ - 2` depth-adjusted resume check. Every `CALL_C` target address
+  and the full 33-entry dispatcher table were mechanically cross-checked against
+  `src/hooks/generated.txt`/`ages.sym`. Lint, both builds, 30k verification, and the full 289,869-
+  frame reference replay all passed clean. Bank 0a is 132/928 and the project is 4,827/9,646.
+
+- 2026-09-19: milestone 3 phase 6 batch 327, bank 0a (2 routines, new files `octogonSplash.c` and
+  `tokayCutsceneEmberSeed.c`): added `interactionCode8e` (INTERAC_OCTOGON_SPLASH) and
+  `interactionCode8f` (INTERAC_TOKAY_CUTSCENE_EMBER_SEED), produced by parallel porting agents.
+  Both are small, flat routines with no local call chains at all. Self-review found zero bugs in
+  either file. Lint, both builds, 30k verification, and the full 289,869-frame reference replay
+  all passed clean. Bank 0a is 99/928 and the project is 4,794/9,646.
+
+- 2026-09-19: milestone 3 phase 6 batch 326, bank 0a (1 routine, new file `cloakedTwinrova.c`):
+  added `interactionCode8d` (INTERAC_CLOAKED_TWINROVA), hand-ported directly. Notable for a
+  same-address-collision-free ROM layout quirk: `@initSubid0` falls straight through into
+  `@initSubid2` (no jump between them), while `@initSubid1`'s jump-table entry points to code
+  physically placed AFTER `@initSubid2`, and its own top-level `@state0`/`@state1` and inner
+  subid1-substate dispatches both use the implicit-fallthrough-for-index-0 convention exhaustively.
+  Self-review found zero bugs. Lint, both builds, 30k verification, and the full 289,869-frame
+  reference replay all passed clean. Bank 0a is 97/928 and the project is 4,792/9,646.
+
+- 2026-09-19: milestone 3 phase 6 batch 325, bank 0a (2 routines, new files `goronElder.c` and
+  `tokayMeat.c`): added `interactionCode8b` (INTERAC_GORON_ELDER) and `interactionCode8c`
+  (INTERAC_TOKAY_MEAT), produced by parallel porting agents. Self-review caught a real bug in
+  `goronElder.c`: the porting agent misapplied `remoteMakuCutscene.c`'s valid "trampoline, no
+  pc/sp check needed" exception to a structurally different case — a `goto`-reached local with a
+  genuine single real caller ending in a tail-jump, which (unlike a plain synchronous C function
+  call from straight-line code) does need the standard resume-check to hand control back to its
+  caller's continuation point instead of silently falling through to a bare `return`. Fixed by
+  adding the missing `if (gb->pc == ... && gb->sp == sp0_) goto ...;` check. `tokayMeat.c` (pure
+  jump-table dispatch, no manual call chains) had zero bugs. Lint, both builds, 30k verification,
+  and the full 289,869-frame reference replay all passed clean. Bank 0a is 96/928 and the project
+  is 4,791/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 324, bank 0a (2 routines, new files `makuSprout.c` and
+  `remoteMakuCutscene.c`): added `interactionCode88` (INTERAC_MAKU_SPROUT) and `interactionCode8a`
+  (INTERAC_REMOTE_MAKU_CUTSCENE), produced by parallel porting agents. `makuSprout.c` has a second
+  instance of the nested-call sp-depth bug class first found in `makuTree.c`, correctly identified
+  and fixed by the porting agent itself (a genuinely dead-code block, `@initGraphics`, was also
+  correctly omitted matching the `rosa.c` precedent). `remoteMakuCutscene.c` has 8 nested calls to
+  a shared local (`@checkEssenceObtained`) that never executes its own `ret` and instead
+  tail-jumps into the already-hooked `checkFlag`; rather than the depth-adjusted sp0_ arithmetic,
+  it's modeled as a small trampoline helper, since `checkFlag_hook`'s own `ret_effect` pops
+  exactly what was pushed regardless of outer nesting depth, needing no pc/sp resume check at all.
+  Self-review (full instruction-by-instruction cross-check against the transliterate reports)
+  found zero bugs in either file. Lint, both builds, 30k verification, and the full 289,869-frame
+  reference replay all passed clean. Bank 0a is 94/928 and the project is 4,789/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 323, bank 0a (1 routine, new file `makuTree.c`): added
+  `interactionCode87` (INTERAC_MAKU_TREE), a 296-instruction, 7-subid routine covering the present
+  and post-Twinrova Maku Tree cutscenes. This is the first bank-0a routine with genuinely NESTED
+  manual call chains (a local pushing a resume address and, before returning, itself pushing
+  ANOTHER resume address into a further local) rather than the strictly sequential single-level
+  calls every prior file used. Self-review caught the naive `sp0_`-comparison idiom silently
+  breaking for the two inner-most resume checks and one intermediate one, since `gb->sp` is offset
+  by however many outer pushes are still outstanding at nesting depth; fixed using the
+  depth-adjusted `(uint16_t)(sp0_ - 2)`/`(sp0_ - 4)` pattern already established in `roller.c` and
+  `rosa.c`. An independent review re-derived the full push/pop depth trace from scratch and
+  confirmed all three fixed checks and every unchanged (true depth-0) check are correct, plus
+  found zero other bugs. Root-only registration confirmed empirically. Lint, both builds, 30k
+  verification, and the full 289,869-frame reference replay all passed clean. Bank 0a is 92/928
+  and the project is 4,787/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 322, bank 0a (1 routine, new file `makuFlower.c`): added
+  `interactionCode86` (INTERAC_MAKU_FLOWER), a 2-subid maku tree flower controller (subid 0 shows
+  the flower and tracks the related object's animation via a small ROM data table; subid 1 counts
+  up `Interaction.zh` from 0xd4 until it wraps, then deletes). Root-only registration confirmed
+  empirically (regenerated `generated.txt` shows no surviving `@`-locals). Independent review
+  found zero bugs (all CYC ranges, flag polarities, and CALL_C targets cross-checked against the
+  transliterate report and raw ROM bytes). Lint, both builds, 30k verification, and the full
+  289,869-frame reference replay all passed clean. Bank 0a is 91/928 and the project is
+  4,786/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 321, bank 0a (1 routine, new file
+  `sparkleInteraction.c`): added `interactionCode84` (INTERAC_SPARKLE), a 16-way subid particle
+  controller with two `rst $00` dispatches. Notable for a filename collision — the natural name
+  `sparkle.c` (derived from `interactions/sparkle.s`) collided with a PRE-EXISTING, unrelated
+  bank-0x11 file of the same name (`partCode26_hook`, ported from `parts/sparkle.s`); the new
+  routine's `Write` silently overwrote the old file, which only surfaced as a linker error
+  ("undefined symbol `partCode26_hook`") at build time. Recovered the original file from git
+  history and moved the new routine to `sparkleInteraction.c`. Self-review (full
+  instruction-by-instruction trace against the report) caught a genuine bug before the linker
+  error was even found — an unconditional backward `jr` had its `CYC` end set to the jump target
+  instead of the physical instruction end (the classic target-vs-physical-end zero-cycle-burn
+  bug class) — fixed, and an independent review confirmed no other instances of the same class
+  remained. Lint, both builds, 30k verification, and the full 289,869-frame reference replay all
+  passed clean. Bank 0a is 90/928 and the project is 4,785/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 320, bank 0a (4 routines, new file
+  `bombUpgradeFairy.c`): added `interactionCode83` (INTERAC_BOMB_UPGRADE_FAIRY, the dispatcher)
+  plus `bombUpgradeFairy_subid00`/`01`/`02` (bare globals, each independently hooked). Notable
+  for `subid00`'s `spawnSubid2Instance` local, reached by one genuine `call` plus one plain
+  fallthrough (the established single-resume-address idiom). An independent review found a real
+  bug — `Interaction.start` (a WLA-DX struct-offset symbol) was ported as the literal `0x00`
+  (the struct field's own offset) instead of `0x40`/`INTERACTION_BASE` (this codebase's actual
+  convention for that idiom, confirmed against the ROM's own `ld a,$40` bytes and matching
+  precedent in `possessedNayru.c`/`twinrova.c`) — fixed at both call sites, and the full gate was
+  re-run clean afterward. Bank 0a is 89/928 and the project is 4,784/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 319, bank 0a (1 routine, new file `sarcophagus.c`):
+  added `interactionCode82` (INTERAC_SARCOPHAGUS), a pushable-block state machine (grab, hold,
+  release, break, destroy-animation). Researched and written by a parallel subagent while this
+  session gated the previous batch. Self-review (full instruction-by-instruction trace against
+  the report, catching zero discrepancies, including correctly identifying a 4th jump-table
+  target that collapses into the sibling `state0` dispatcher's own `break` label) found no bugs.
+  Lint, both builds, 30k verification, and the full 289,869-frame reference replay all passed
+  clean (gated together with batch 318). Bank 0a is 88/928 and the project is 4,783/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 318, bank 0a (1 routine, new file `tokayShopItem.c`):
+  added `interactionCode81` (INTERAC_TOKAY_SHOP_ITEM), notable for a genuinely complex
+  multi-call-site local (`checkTransformItem`, called from both `initializeItem` and `state1`,
+  using two `rst $10` table lookups) that a parallel subagent got exactly right on the first
+  try — verified via a full instruction-by-instruction self-review trace against the report,
+  including manually deriving the routine's own un-reported address range and confirming it
+  landed exactly on the next label, and specifically checking the two resume-check addresses
+  (0x6252, 0x627d) against both `push_effect` call sites — no discrepancies found. Bank 0a is
+  87/928 and the project is 4,782/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 317, bank 0a (1 routine, new file `decoration.c`):
+  added `interactionCode80` (INTERAC_DECORATION), produced by a parallel subagent. Notable for a
+  single-call-site local (`isSymmetryCityRoom`, ending in a tail `jp` rather than `ret`) inlined
+  directly at its own call site since it has no other caller, and for using the codebase's
+  existing `HANDOFF` interpreter-fallback macro as an (unreachable) safety net after exhaustively
+  enumerating both jump tables' unique targets, rather than this session's usual "last target is
+  an implicit fallthrough" convention — a valid stylistic choice already established elsewhere in
+  the codebase (`bipin.c`), not a bug. Self-review (full instruction-by-instruction trace against
+  the report, including manually deriving the one un-reported local block and confirming it lands
+  exactly on the next label) and an independent review both found zero bugs. Lint, both builds,
+  30k verification, and the full 289,869-frame reference replay all passed clean. Bank 0a is
+  86/928 and the project is 4,781/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 316, bank 0a (1 routine, new file
+  `screenDistortion.c`): added `interactionCode7c` (INTERAC_SCREEN_DISTORTION), a tiny
+  two-state routine (arm a mid-frame LCD interrupt for the wavy-screen warp effect, then drive
+  the per-frame scroll buffer). Produced by a parallel subagent; self-review confirmed it matches
+  the report exactly. Lint, both builds, 30k verification, and the full 289,869-frame reference
+  replay all passed clean (gated together with batch 317). Bank 0a is 85/928 and the project is
+  4,780/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 315, bank 0a (1 routine, new file `stonePanel.c`):
+  added `interactionCode7b` (INTERAC_STONE_PANEL), a large state/substate machine (ancient-tomb
+  panel that slides open once a lever is triggered) with a single-call-site resume-label case
+  for `updateSolidityUponOpening`, reached both by fallthrough (from the "already opened on room
+  entry" path) and by one genuine `call` (from substate2). Researched and written by a parallel
+  subagent while this session gated the previous batch. Self-review (cross-checked
+  instruction-by-instruction against the report, catching zero discrepancies) and an
+  independent review both found zero bugs. Lint, both builds, 30k verification, and the full
+  289,869-frame reference replay all passed clean. Bank 0a is 84/928 and the project is
+  4,779/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 314, bank 0a (1 routine, new file
+  `makuGateOpening.c`): added `interactionCode76` (INTERAC_MAKU_GATE_OPENING), the most complex
+  multi-site resume-label case in bank 0a yet — FOUR different local subroutines each called via
+  genuine `call` from multiple sites, two of them (`loadPoofs`, `shakeScreen`) ending in a
+  tail-jump to `playSound_b00_hook` rather than a plain `ret` (verified via the established
+  CALL_C-transitivity-through-a-tail-jump-chain reasoning, not a bare `ret`/`RET_TAKEN`).
+  Independent review found a real bug — `loadPoofs`'s four resume-checks all compared `gb->pc`
+  against the `call` instruction's own address instead of the address actually passed to
+  `push_effect` (3 bytes later, the call's own end address), meaning none of the checks could
+  ever match and every invocation would silently exit the whole hooked routine early instead of
+  continuing — fixed, and the full gate (lint, both builds, both ctest suites, 30k verification,
+  full ref-check) was re-run clean afterward. Bank 0a is 83/928 and the project is 4,778/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 313, bank 0a (2 routines, first batch produced with
+  parallel porting agents): added `interactionCode75` (INTERAC_INTRO_SPRITE, new file
+  `introSprite.c`, a 7-way-subid intro-cutscene sprite controller with three separate `rst $00`
+  dispatch points reusing one jump-table helper) and `interactionCode77`
+  (INTERAC_SMALL_KEY_ON_ENEMY, new file `smallKeyOnEnemy.c`, notable for faithfully reproducing
+  a genuine ROM bug — an enemy-slot scan that only actually works for the first slot due to a
+  `jp c` instead of `jp nc` check). Both were researched and written by parallel subagents
+  (working read-only against `--report`, never touching the shared `rewritten.txt`/generated
+  files) while this session ran the gate for the previous batch; the coordinator then registered,
+  built, and gated both together. Self-review (of `interactionCode77`, cross-checked
+  instruction-by-instruction against the report) and an independent review (of
+  `interactionCode75`) both found zero bugs. Lint, both builds, 30k verification, and the full
+  289,869-frame reference replay all passed clean. Bank 0a is 83/928 and the project is
+  4,778/9,646.
+
+- 2026-09-18: milestone 3 phase 6 batch 312, bank 0a (2 routines): added `interactionCode73`
+  (INTERAC_GHINI_HARASSING_MOOSH, new file `ghiniHarassingMoosh.c`) and `interactionCode74`
+  (INTERAC_RICKYS_GLOVE_SPAWNER, new file `rickysGloveSpawner.c`). Independent review found one
+  real bug in `interactionCode73` — a missing fallthrough cycle burn for an untaken `ret nc` —
+  fixed and re-verified; self-review caught a related but distinct bug in
+  `rickysGloveSpawner.c` before it was ever built (three branches to a shared `@delete` label,
+  whose own body is a bare `jp interactionDelete`, were bypassing that `jp`'s own cycle burn by
+  tail-calling `interactionDelete_hook` directly instead of `goto`-ing to the shared block). Bank
+  0a is 81/928 and the project is 4,776/9,646.
+
 - 2026-09-18: milestone 3 phase 6 batch 311, bank 0a (1 routine, new file
   `kingMoblinDefeated.c`): added `interactionCode72` (INTERAC_KING_MOBLIN_DEFEATED), fully
   goto-inlined into one function. Introduces (for the first time in bank 0a) a technique for a

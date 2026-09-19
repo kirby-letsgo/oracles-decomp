@@ -3,15 +3,27 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, 0x0e, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, 0x0e, (from), (to), true)
 
-void greatFairy_initialize_hook(GB *gb);
-void greatFairy_initialize__afterCall7966_hook(GB *gb);
-void greatFairy_subid0__afterCall7866_hook(GB *gb);
-void greatFairy_subid1__afterCall78b2_hook(GB *gb);
+void greatFairy_state_uninitialized_hook(GB *gb);
+void greatFairy_state1_hook(GB *gb);
+void greatFairy_state2_hook(GB *gb);
+void greatFairy_state3_hook(GB *gb);
+void greatFairy_animate_hook(GB *gb);
+void greatFairy_state4_hook(GB *gb);
+void greatFairy_state5_hook(GB *gb);
+void greatFairy_state6_hook(GB *gb);
+void greatFairy_state7_hook(GB *gb);
+void greatFairy_state8_hook(GB *gb);
+void greatFairy_state9_hook(GB *gb);
+void greatFairy_updateZPosition_hook(GB *gb);
+void greatFairy_checkLinkApproached_hook(GB *gb);
+void greatFairy_spawnCirclingHeart_hook(GB *gb);
+void greatFairy_createPuff_hook(GB *gb);
+void greatFairy_playSoundEvery8Frames_hook(GB *gb);
 
-static uint16_t great_fairy_jump_table(GB *gb) {
+static uint16_t greatFairy_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
   burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
   burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
@@ -29,265 +41,300 @@ static uint16_t great_fairy_jump_table(GB *gb) {
   return HL;
 }
 
-static void great_fairy_add_double_index(GB *gb, uint16_t return_address) {
-  push_effect(gb, return_address);
-  burn_rom(gb, 0x00, 0x0018, 0x0019, false); push_effect(gb, BC);
-  burn_rom(gb, 0x00, 0x0019, 0x001a, false); C = A;
-  burn_rom(gb, 0x00, 0x001a, 0x001c, false); B = 0x00;
-  burn_rom(gb, 0x00, 0x001c, 0x001d, false); alu_add_hl(gb, BC);
-  burn_rom(gb, 0x00, 0x001d, 0x001e, false); alu_add_hl(gb, BC);
-  burn_rom(gb, 0x00, 0x001e, 0x001f, false); SET_BC(pop_effect(gb));
-  burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
-}
-
-static void great_fairy_add_a_to_hl(GB *gb, uint16_t return_address) {
-  push_effect(gb, return_address);
-  burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
-  burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
-  if (!(F & FC)) {
-    burn_rom(gb, 0x00, 0x0012, 0x0013, true); ret_effect(gb);
-    return;
-  }
-  burn_rom(gb, 0x00, 0x0012, 0x0013, false);
-  burn_rom(gb, 0x00, 0x0013, 0x0014, false); H = alu_inc8(gb, H);
-  burn_rom(gb, 0x00, 0x0014, 0x0015, false); ret_effect(gb);
-}
-
-static void great_fairy_initialize_tail(GB *gb, uint16_t sp0_) {
-  CALL_C(0x7966, objectMarkSolidPosition_hook, 0x24f0, 0x7969);
-  CYC(0x7969, 0x796b); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x796b, 0x796c); A = mem_rd(gb, DE);
-  CYC(0x796c, 0x796f); SET_HL(0x7979);
-  CYC(0x796f, 0x7970); great_fairy_add_double_index(gb, 0x7970);
-  CYC(0x7970, 0x7971); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x7971, 0x7972); H = mem_rd(gb, HL);
-  CYC(0x7972, 0x7973); L = A;
-  CALL_C(0x7973, interactionSetScript_hook, 0x2544, 0x7976);
-  CYC(0x7976, 0x7979); interactionIncState_hook(gb);
-}
-
-void greatFairy_initialize__afterCall7966_hook(GB *gb) {
+// ==================================================================================================
+// ENEMY_GREAT_FAIRY
+//
+// Variables:
+//   relatedObj2: Reference to INTERAC_PUFF
+//   var30: Counter used to update Z-position as she floats up and down
+//   var31: Number of hearts spawned (the ones that circle around Link)
+// ==================================================================================================
+void enemyCode38_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
-  great_fairy_initialize_tail(gb, sp0_);
+  CYC(0x5004, 0x5006); E = ENEMY_BASE + OBJ_STATE;
+  CYC(0x5006, 0x5007); A = mem_rd(gb, DE);
+  {
+    CYC(0x5007, 0x5008); push_effect(gb, 0x5008);
+    uint16_t target = greatFairy_jump_table(gb);
+    if (target == 0x501c) { greatFairy_state_uninitialized_hook(gb); return; }
+    if (target == 0x5024) { greatFairy_state1_hook(gb); return; }
+    if (target == 0x5035) { greatFairy_state2_hook(gb); return; }
+    if (target == 0x5040) { greatFairy_state3_hook(gb); return; }
+    if (target == 0x507e) { greatFairy_state4_hook(gb); return; }
+    if (target == 0x5088) { greatFairy_state5_hook(gb); return; }
+    if (target == 0x50a3) { greatFairy_state6_hook(gb); return; }
+    if (target == 0x50b5) { greatFairy_state7_hook(gb); return; }
+    if (target == 0x50c5) { greatFairy_state8_hook(gb); return; }
+    if (target == 0x50da) { greatFairy_state9_hook(gb); return; }
+    HANDOFF(target);
+  }
 }
 
-void greatFairy_initialize_hook(GB *gb) {
+void greatFairy_state_uninitialized_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x501c, 0x501d); H = D;
+  CYC(0x501d, 0x501e); L = E;
+  CYC(0x501e, 0x501f); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [state]
+  CYC(0x501f, 0x5021); L = ENEMY_BASE + OBJ_ZH;
+  CYC(0x5021, 0x5023); mem_wr(gb, HL, 0xf0);
+  RET(0x5023); return; // ret
+}
+
+// Create puff
+void greatFairy_state1_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7963, interactionInitGraphics_hook, 0x15fb, 0x7966);
-  greatFairy_initialize__afterCall7966_hook(gb);
+  CALL_C(0x5024, greatFairy_createPuff_hook, 0x5134, 0x5027);
+  if (!(F & FZ)) { RET_TAKEN(0x5027); return; } // ret nz
+  CYC(0x5027, 0x5028);
+  CYC(0x5028, 0x502a); L = ENEMY_BASE + OBJ_STATE;
+  CYC(0x502a, 0x502b); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
+  CYC(0x502b, 0x502d); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(0x502d, 0x502f); mem_wr(gb, HL, 0x11);
+  CYC(0x502f, 0x5031); A = 0x0f; // MUS_FAIRY_FOUNTAIN
+  CYC(0x5031, 0x5034); mem_wr(gb, wActiveMusic, A);
+  RET(0x5034); return; // ret
 }
 
-static void great_fairy_subid0_state1(GB *gb, uint16_t sp0_) {
-  CALL_C(0x7874, returnIfScrollMode01Unset_hook, 0x26e4, 0x7877);
-  CALL_C(0x7877, interactionRunScript_hook, 0x2552, 0x787a);
-  if (F & FC) {
-    CYCT(0x787a, 0x787d); interactionDeleteAndUnmarkSolidPosition_hook(gb);
-    return;
-  }
-  CYC(0x787a, 0x787d);
-  CYC(0x787d, 0x787f); E = INTERACTION_BASE + OBJ_VAR3E;
-  CYC(0x787f, 0x7880); A = mem_rd(gb, DE);
-  CYC(0x7880, 0x7881); alu_or(gb, A);
-  if (!(F & FZ)) {
-    CYCT(0x7881, 0x7882); ret_effect(gb);
-    return;
-  }
-  CYC(0x7881, 0x7882);
-  CALL_C(0x7882, interactionAnimateAsNpc_hook, 0x26db, 0x7885);
-  CYC(0x7885, 0x7888); A = W8(wFrameCounter);
-  CYC(0x7888, 0x788a); alu_and(gb, 0x07);
-  if (!(F & FZ)) {
-    CYCT(0x788a, 0x788b); ret_effect(gb);
-    return;
-  }
-  CYC(0x788a, 0x788b);
-  CYC(0x788b, 0x788e); A = W8(wFrameCounter);
-  CYC(0x788e, 0x7890); alu_and(gb, 0x38);
-  CYC(0x7890, 0x7892); A = alu_swap(gb, A);
-  CYC(0x7892, 0x7893); alu_rlca(gb);
-  CYC(0x7893, 0x7896); SET_HL(0x789d);
-  CYC(0x7896, 0x7897); great_fairy_add_a_to_hl(gb, 0x7897);
-  CYC(0x7897, 0x7899); E = INTERACTION_BASE + OBJ_ZH;
-  CYC(0x7899, 0x789a); A = mem_rd(gb, DE);
-  CYC(0x789a, 0x789b); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x789b, 0x789c); mem_wr(gb, DE, A);
-  CYC(0x789c, 0x789d); ret_effect(gb);
-}
-
-void greatFairy_subid0__afterCall7866_hook(GB *gb) {
+// Waiting for puff to disappear
+void greatFairy_state2_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7866, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x7869);
-  CYC(0x7869, 0x786b); L = INTERACTION_BASE + OBJ_ZH;
-  CYC(0x786b, 0x786d); mem_wr(gb, HL, 0xf0);
-  CYC(0x786d, 0x786f); L = INTERACTION_BASE + OBJ_VAR3F;
-  CYC(0x786f, 0x7871); mem_wr(gb, HL, 0x06);
-  CALL_C(0x7871, interactionRunScript_hook, 0x2552, 0x7874);
-  great_fairy_subid0_state1(gb, sp0_);
+  CYC(0x5035, 0x5037); A = 0x21; // Object.animParameter
+  CALL_C(0x5037, objectGetRelatedObject2Var_hook, 0x2164, 0x503a);
+  CYC(0x503a, 0x503c); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) { RET_TAKEN(0x503c); return; } // ret z
+  CYC(0x503c, 0x503d);
+  CALL_C(0x503d, ecom_incState_b0e_hook, 0x4000, 0x5040);
+  greatFairy_state3_hook(gb); return; // fallthrough
 }
 
-void greatFairy_subid0_hook(GB *gb) {
+// Waiting for Link to approach
+void greatFairy_state3_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x785e, checkInteractionState_hook, 0x23fe, 0x7861);
-  if (!(F & FZ)) {
-    CYCT(0x7861, 0x7863); great_fairy_subid0_state1(gb, sp0_);
-    return;
-  }
-  CYC(0x7861, 0x7863);
-  CALL_C(0x7863, greatFairy_initialize_hook, 0x7963, 0x7866);
-  greatFairy_subid0__afterCall7866_hook(gb);
+  CALL_C(0x5040, greatFairy_checkLinkApproached_hook, 0x510a, 0x5043);
+  if (!(F & FC)) { CYCT(0x5043, 0x5045); greatFairy_animate_hook(gb); return; } // jr nc
+  CYC(0x5043, 0x5045);
+  CYC(0x5045, 0x5047); A = 0x80;
+  CYC(0x5047, 0x504a); mem_wr(gb, wMenuDisabled, A);
+  CYC(0x504a, 0x504c); A = 0x21; // DISABLE_COMPANION|DISABLE_LINK
+  CYC(0x504c, 0x504f); mem_wr(gb, wDisabledObjects, A);
+  CYC(0x504f, 0x5052); SET_HL(wLinkHealth);
+  CYC(0x5052, 0x5053); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(0x5053, 0x5054); alu_cp(gb, mem_rd(gb, HL));
+  CYC(0x5054, 0x5056); A = 0x04;
+  CYC(0x5056, 0x5059); SET_BC(0x4100); // TX_4100
+  if (!(F & FZ)) { CYCT(0x5059, 0x505b); goto L_5065; } // jr nz
+  CYC(0x5059, 0x505b);
+  CYC(0x505b, 0x505d); E = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(0x505d, 0x505f); A = 30;
+  CYC(0x505f, 0x5060); mem_wr(gb, DE, A);
+  CYC(0x5060, 0x5062); A = 0x08;
+  CYC(0x5062, 0x5065); SET_BC(0x4105); // TX_4105
+
+L_5065:
+  CYC(0x5065, 0x5067); E = ENEMY_BASE + OBJ_STATE;
+  CYC(0x5067, 0x5068); mem_wr(gb, DE, A);
+  CALL_C(0x5068, showText_hook, 0x1872, 0x506b);
+  greatFairy_animate_hook(gb); return; // fallthrough
 }
 
-static void great_fairy_update_sparkles_and_sound(GB *gb, uint16_t sp0_) {
-  CYC(0x7923, 0x7926); A = W8(wFrameCounter);
-  CYC(0x7926, 0x7928); alu_and(gb, 0x07);
-  if (!(F & FZ)) {
-    CYCT(0x7928, 0x7929); ret_effect(gb);
-    return;
-  }
-  CYC(0x7928, 0x7929);
-  CYC(0x7929, 0x792c); SET_BC(0x8402);
-  CALL_C(0x792c, objectCreateInteraction_hook, 0x24c5, 0x792f);
-  CYC(0x792f, 0x7932); A = W8(wFrameCounter);
-  CYC(0x7932, 0x7934); alu_and(gb, 0x1f);
-  CYC(0x7934, 0x7936); A = 0x83;
-  if (F & FZ) CALL_C_CC(0x7936, playSound_b00_hook, 0x0c98, 0x7939);
-  else CYC(0x7936, 0x7939);
-  CYC(0x7939, 0x793a); ret_effect(gb);
-}
-
-static void great_fairy_subid1_state1(GB *gb, uint16_t sp0_) {
-  CALL_C(0x78e3, interactionAnimate_hook, 0x261b, 0x78e6);
-  CYC(0x78e6, 0x78e8); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x78e8, 0x78e9); A = mem_rd(gb, DE);
-  CYC(0x78e9, 0x78ea); push_effect(gb, 0x78ea);
-  switch (great_fairy_jump_table(gb)) {
-    case 0x78f2: goto substate0;
-    case 0x7909: goto substate1;
-    case 0x793a: goto substate2;
-    case 0x794d: goto substate3;
-    default: HANDOFF(HL);
-  }
-
-substate0:
-  CALL_C(0x78f2, interactionDecCounter1_hook, 0x23cc, 0x78f5);
-  if (!(F & FZ)) {
-    CYCT(0x78f5, 0x78f6); ret_effect(gb);
-    return;
-  }
-  CYC(0x78f5, 0x78f6);
-  CYC(0x78f6, 0x78f8); mem_wr(gb, HL, 0x40);
-  CYC(0x78f8, 0x78fa); L = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x78fa, 0x78fc); mem_wr(gb, HL, 0x08);
-  CYC(0x78fc, 0x78fe); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x78fe, 0x7900); mem_wr(gb, HL, 0x78);
-  CYC(0x7900, 0x7903); SET_BC(0x4109);
-  CALL_C(0x7903, showText_hook, 0x1872, 0x7906);
-  CYC(0x7906, 0x7909); interactionIncSubstate_hook(gb);
-  return;
-
-substate1:
-  CALL_C(0x7909, retIfTextIsActive_hook, 0x1859, 0x790c);
-  CALL_C(0x790c, objectApplySpeed_hook, 0x201d, 0x790f);
-  CALL_C(0x790f, interactionDecCounter2_hook, 0x23d1, 0x7912);
-  if (!(F & FZ)) {
-    CYCT(0x7912, 0x7914);
-    goto update_sparkles;
-  }
-  CYC(0x7912, 0x7914);
-  CYC(0x7914, 0x7916); mem_wr(gb, HL, 0x02);
-  CYC(0x7916, 0x7918); L = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x7918, 0x7919); A = mem_rd(gb, HL);
-  CYC(0x7919, 0x791a); A = alu_inc8(gb, A);
-  CYC(0x791a, 0x791c); alu_and(gb, 0x1f);
-  CYC(0x791c, 0x791d); mem_wr(gb, HL, A);
-  CALL_C(0x791d, interactionDecCounter1_hook, 0x23cc, 0x7920);
-  if (F & FZ) {
-    CYCT(0x7920, 0x7923); interactionIncSubstate_hook(gb);
-    return;
-  }
-  CYC(0x7920, 0x7923);
-
-update_sparkles:
-  great_fairy_update_sparkles_and_sound(gb, sp0_);
-  return;
-
-substate2:
-  CYC(0x793a, 0x793d); push_effect(gb, 0x793d);
-  great_fairy_update_sparkles_and_sound(gb, sp0_);
-  CYC(0x793d, 0x793e); H = D;
-  CYC(0x793e, 0x7940); L = INTERACTION_BASE + OBJ_ZH;
-  CYC(0x7940, 0x7941); A = mem_rd(gb, HL);
-  CYC(0x7941, 0x7943); alu_sub(gb, 0x02);
-  CYC(0x7943, 0x7944); mem_wr(gb, HL, A);
-  CYC(0x7944, 0x7946); alu_cp(gb, 0xb0);
-  if (!(F & FC)) {
-    CYCT(0x7946, 0x7947); ret_effect(gb);
-    return;
-  }
-  CYC(0x7946, 0x7947);
-  CALL_C(0x7947, fadeoutToWhite_hook, 0x326c, 0x794a);
-  CYC(0x794a, 0x794d); interactionIncSubstate_hook(gb);
-  return;
-
-substate3:
-  CYC(0x794d, 0x7950); A = W8(wPaletteThread_mode);
-  CYC(0x7950, 0x7951); alu_or(gb, A);
-  if (!(F & FZ)) {
-    CYCT(0x7951, 0x7952); ret_effect(gb);
-    return;
-  }
-  CYC(0x7951, 0x7952);
-  CYC(0x7952, 0x7954); A = 0x1e;
-  CYC(0x7954, 0x7957); W8(wCutsceneTrigger) = A;
-  CYC(0x7957, 0x795a); interactionDelete_hook(gb);
-}
-
-void greatFairy_subid1__afterCall78b2_hook(GB *gb) {
+void greatFairy_animate_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x78b2, objectSetVisiblec1_hook, 0x1e3c, 0x78b5);
-  CALL_C(0x78b5, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x78b8);
-  CYC(0x78b8, 0x78ba); L = INTERACTION_BASE + OBJ_ZH;
-  CYC(0x78ba, 0x78bc); mem_wr(gb, HL, 0xf0);
-  CYC(0x78bc, 0x78be); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x78be, 0x78c0); A = 0xb4;
-  CYC(0x78c0, 0x78c1); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x78c1, 0x78c3); mem_wr(gb, HL, 0x02);
-  CYC(0x78c3, 0x78c6); SET_BC(0x8404);
-  CALL_C(0x78c6, objectCreateInteraction_hook, 0x24c5, 0x78c9);
-  CYC(0x78c9, 0x78cb); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x78cb, 0x78cd); mem_wr(gb, HL, 0x78);
-  CYC(0x78cd, 0x78cf); B = 0x00;
-
-  do {
-    CYC(0x78cf, 0x78d0); push_effect(gb, BC);
-    CYC(0x78d0, 0x78d3); SET_BC(0x840a);
-    CALL_C(0x78d3, objectCreateInteraction_hook, 0x24c5, 0x78d6);
-    CYC(0x78d6, 0x78d7); SET_BC(pop_effect(gb));
-    CYC(0x78d7, 0x78d9); L = INTERACTION_BASE + OBJ_ANGLE;
-    CYC(0x78d9, 0x78da); mem_wr(gb, HL, B);
-    CYC(0x78da, 0x78db); A = B;
-    CYC(0x78db, 0x78dd); alu_add(gb, 0x04);
-    CYC(0x78dd, 0x78de); B = A;
-    CYC(0x78de, 0x78e0); alu_bit(gb, 5, A);
-    if (!(F & FZ)) {
-      CYC(0x78e0, 0x78e2);
-      break;
-    }
-    CYCT(0x78e0, 0x78e2);
-  } while (true);
-  CYC(0x78e2, 0x78e3); ret_effect(gb);
+  CALL_C(0x506b, greatFairy_updateZPosition_hook, 0x50ee, 0x506e);
+  CALL_C(0x506e, enemyAnimate_hook, 0x2818, 0x5071);
+  CYC(0x5071, 0x5073); E = ENEMY_BASE + OBJ_YH;
+  CYC(0x5073, 0x5074); A = mem_rd(gb, DE);
+  CYC(0x5074, 0x5075); B = A;
+  CYC(0x5075, 0x5077); A = hram_rd(gb, 0xb0); // hEnemyTargetY
+  CYC(0x5077, 0x5078); alu_cp(gb, B);
+  if (F & FC) { CYCT(0x5078, 0x507b); objectSetVisiblec1_hook(gb); return; } // jp c
+  CYC(0x5078, 0x507b);
+  CYC(0x507b, 0x507e); objectSetVisiblec2_hook(gb); return; // jp
 }
 
-void greatFairy_subid1_hook(GB *gb) {
+// Begin healing Link
+void greatFairy_state4_hook(GB *gb) {
+  CYC(0x507e, 0x507f); H = D;
+  CYC(0x507f, 0x5080); L = E;
+  CYC(0x5080, 0x5081); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [state]
+  CYC(0x5081, 0x5083); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(0x5083, 0x5085); mem_wr(gb, HL, 0x0c);
+  CYC(0x5085, 0x5086); L = alu_inc8(gb, L);
+  CYC(0x5086, 0x5088); mem_wr(gb, HL, 0x09); // [counter2]
+  greatFairy_state5_hook(gb); return; // fallthrough
+}
+
+// Spawning hearts
+void greatFairy_state5_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x78a5, checkInteractionState_hook, 0x23fe, 0x78a8);
-  if (!(F & FZ)) {
-    CYCT(0x78a8, 0x78aa); great_fairy_subid1_state1(gb, sp0_);
-    return;
-  }
-  CYC(0x78a8, 0x78aa);
-  CYC(0x78aa, 0x78ac); A = 0x8a;
-  CALL_C(0x78ac, playSound_b00_hook, 0x0c98, 0x78af);
-  CALL_C(0x78af, greatFairy_initialize_hook, 0x7963, 0x78b2);
-  greatFairy_subid1__afterCall78b2_hook(gb);
+  CALL_C(0x5088, greatFairy_playSoundEvery8Frames_hook, 0x5144, 0x508b);
+  CALL_C(0x508b, ecom_decCounter1_b0e_hook, 0x439a, 0x508e);
+  if (!(F & FZ)) { CYCT(0x508e, 0x5090); greatFairy_animate_hook(gb); return; } // jr nz
+  CYC(0x508e, 0x5090);
+  CYC(0x5090, 0x5092); mem_wr(gb, HL, 0x0c); // [counter1]
+  CYC(0x5092, 0x5093); L = alu_inc8(gb, L);
+  CYC(0x5093, 0x5094); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl) [counter2]
+  if (F & FZ) { CYCT(0x5094, 0x5096); goto spawnedAllHearts; } // jr z
+  CYC(0x5094, 0x5096);
+  CALL_C(0x5096, greatFairy_spawnCirclingHeart_hook, 0x5123, 0x5099);
+  CYCT(0x5099, 0x509b); greatFairy_animate_hook(gb); return; // jr
+
+spawnedAllHearts:
+  CYC(0x509b, 0x509c); L = alu_dec8(gb, L);
+  CYC(0x509c, 0x509e); mem_wr(gb, HL, 30); // [counter1]
+  CYC(0x509e, 0x50a0); L = ENEMY_BASE + OBJ_STATE;
+  CYC(0x50a0, 0x50a1); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
+  CYCT(0x50a1, 0x50a3); greatFairy_animate_hook(gb); return; // jr
+}
+
+// Hearts have all spawned, are now circling around Link
+void greatFairy_state6_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x50a3, greatFairy_playSoundEvery8Frames_hook, 0x5144, 0x50a6);
+  CALL_C(0x50a6, ecom_decCounter1_b0e_hook, 0x439a, 0x50a9);
+  if (!(F & FZ)) { CYCT(0x50a9, 0x50ab); greatFairy_animate_hook(gb); return; } // jr nz
+  CYC(0x50a9, 0x50ab);
+  CYC(0x50ab, 0x50ad); L = ENEMY_BASE + OBJ_STATE;
+  CYC(0x50ad, 0x50ae); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
+  CYC(0x50ae, 0x50b0); A = 0x29; // TREASURE_HEART_REFILL
+  CYC(0x50b0, 0x50b2); C = 0x40; // MAX_LINK_HEALTH
+  CALL_C(0x50b2, giveTreasure_hook, 0x171c, 0x50b5);
+  greatFairy_state7_hook(gb); return; // fallthrough
+}
+
+// Waiting for all hearts to disappear
+void greatFairy_state7_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x50b5, greatFairy_playSoundEvery8Frames_hook, 0x5144, 0x50b8);
+  CYC(0x50b8, 0x50ba); E = ENEMY_BASE + 0x31; // Enemy.var31
+  CYC(0x50ba, 0x50bb); A = mem_rd(gb, DE);
+  CYC(0x50bb, 0x50bc); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(0x50bc, 0x50be); greatFairy_animate_hook(gb); return; } // jr nz
+  CYC(0x50bc, 0x50be);
+  CALL_C(0x50be, ecom_incState_b0e_hook, 0x4000, 0x50c1);
+  CYC(0x50c1, 0x50c3); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(0x50c3, 0x50c5); mem_wr(gb, HL, 0x1e);
+  greatFairy_state8_hook(gb); return; // fallthrough
+}
+
+// About to disappear; staying in place for 30 frames
+void greatFairy_state8_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x50c5, ecom_decCounter1_b0e_hook, 0x439a, 0x50c8);
+  if (!(F & FZ)) { CYCT(0x50c8, 0x50ca); greatFairy_animate_hook(gb); return; } // jr nz
+  CYC(0x50c8, 0x50ca);
+  CYC(0x50ca, 0x50cc); mem_wr(gb, HL, 0x3c); // [counter1]
+  CYC(0x50cc, 0x50cd); L = E;
+  CYC(0x50cd, 0x50ce); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [state]
+  CYC(0x50ce, 0x50cf); alu_xor(gb, A);
+  CYC(0x50cf, 0x50d2); mem_wr(gb, wDisabledObjects, A);
+  CYC(0x50d2, 0x50d5); mem_wr(gb, wMenuDisabled, A);
+  CYC(0x50d5, 0x50d7); A = 0x91; // SND_FAIRYCUTSCENE
+  CALL_C(0x50d7, playSound_b00_hook, 0x0c98, 0x50da);
+  greatFairy_state9_hook(gb); return; // fallthrough
+}
+
+// Disappearing
+void greatFairy_state9_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x50da, ecom_decCounter1_b0e_hook, 0x439a, 0x50dd);
+  if (F & FZ) { CYCT(0x50dd, 0x50e0); enemyDelete_hook(gb); return; } // jp z
+  CYC(0x50dd, 0x50e0);
+  CALL_C(0x50e0, greatFairy_animate_hook, 0x506b, 0x50e3);
+  CYC(0x50e3, 0x50e4); H = D;
+  CYC(0x50e4, 0x50e6); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(0x50e6, 0x50e8); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (!(F & FZ)) { RET_TAKEN(0x50e8); return; } // ret nz
+  CYC(0x50e8, 0x50e9);
+  CYC(0x50e9, 0x50eb); L = ENEMY_BASE + OBJ_VISIBLE;
+  CYC(0x50eb, 0x50ed); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
+  RET(0x50ed); return; // ret
+}
+
+void greatFairy_updateZPosition_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(0x50ee, 0x50ef); H = D;
+  CYC(0x50ef, 0x50f1); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(0x50f1, 0x50f2); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)
+  CYC(0x50f2, 0x50f3); A = mem_rd(gb, HL);
+  CYC(0x50f3, 0x50f5); alu_and(gb, 0x07);
+  if (!(F & FZ)) { RET_TAKEN(0x50f5); return; } // ret nz
+  CYC(0x50f5, 0x50f6);
+  CYC(0x50f6, 0x50f7); A = mem_rd(gb, HL);
+  CYC(0x50f7, 0x50f9); alu_and(gb, 0x18);
+  CYC(0x50f9, 0x50fb); alu_swap_a(gb);
+  CYC(0x50fb, 0x50fc); alu_rlca(gb);
+  CYC(0x50fc, 0x50fe); alu_sub(gb, 0x02);
+  CYC(0x50fe, 0x5100); alu_bit(gb, 5, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(0x5100, 0x5102); goto L_5104; } // jr nz
+  CYC(0x5100, 0x5102);
+  CYC(0x5102, 0x5103); alu_cpl(gb);
+  CYC(0x5103, 0x5104); A = alu_inc8(gb, A);
+
+L_5104:
+  CYC(0x5104, 0x5106); alu_sub(gb, 0x10);
+  CYC(0x5106, 0x5108); L = ENEMY_BASE + OBJ_ZH;
+  CYC(0x5108, 0x5109); mem_wr(gb, HL, A);
+  RET(0x5109); return; // ret
+}
+
+// @param[out]  cflag  c if Link approached
+void greatFairy_checkLinkApproached_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x510a, checkLinkVulnerable_hook, 0x1d28, 0x510d);
+  if (!(F & FC)) { RET_TAKEN(0x510d); return; } // ret nc
+  CYC(0x510d, 0x510e);
+  CYC(0x510e, 0x510f); H = D;
+  CYC(0x510f, 0x5111); L = ENEMY_BASE + OBJ_YH;
+  CYC(0x5111, 0x5113); A = hram_rd(gb, 0xb0); // hEnemyTargetY
+  CYC(0x5113, 0x5114); alu_sub(gb, mem_rd(gb, HL));
+  CYC(0x5114, 0x5116); alu_sub(gb, 0x10);
+  CYC(0x5116, 0x5118); alu_cp(gb, 0x21);
+  if (!(F & FC)) { RET_TAKEN(0x5118); return; } // ret nc
+  CYC(0x5118, 0x5119);
+  CYC(0x5119, 0x511b); L = ENEMY_BASE + OBJ_XH;
+  CYC(0x511b, 0x511d); A = hram_rd(gb, 0xb1); // hEnemyTargetX
+  CYC(0x511d, 0x511e); alu_sub(gb, mem_rd(gb, HL));
+  CYC(0x511e, 0x5120); alu_add(gb, 0x18);
+  CYC(0x5120, 0x5122); alu_cp(gb, 0x31);
+  RET(0x5122); return; // ret
+}
+
+void greatFairy_spawnCirclingHeart_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CALL_C(0x5123, getFreePartSlot_hook, 0x3e8e, 0x5126);
+  if (!(F & FZ)) { RET_TAKEN(0x5126); return; } // ret nz
+  CYC(0x5126, 0x5127);
+  CYC(0x5127, 0x5129); mem_wr(gb, HL, 0x30); // PART_GREAT_FAIRY_HEART
+  CYC(0x5129, 0x512b); L = PART_BASE + OBJ_RELATED1;
+  CYC(0x512b, 0x512d); A = 0x80; // Enemy.start
+  CYC(0x512d, 0x512e); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(0x512e, 0x512f); mem_wr(gb, HL, D);
+  CYC(0x512f, 0x5130); H = D;
+  CYC(0x5130, 0x5132); L = ENEMY_BASE + 0x31; // Enemy.var31
+  CYC(0x5132, 0x5133); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
+  RET(0x5133); return; // ret
+}
+
+void greatFairy_createPuff_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp;
+  CYC(0x5134, 0x5137); SET_BC(0x0502); // INTERAC_PUFF,$02
+  CALL_C(0x5137, objectCreateInteraction_hook, 0x24c5, 0x513a);
+  if (!(F & FZ)) { RET_TAKEN(0x513a); return; } // ret nz
+  CYC(0x513a, 0x513b);
+  CYC(0x513b, 0x513c); A = H;
+  CYC(0x513c, 0x513d); H = D;
+  CYC(0x513d, 0x513f); L = ENEMY_BASE + OBJ_RELATED2 + 1;
+  CYC(0x513f, 0x5140); mem_wr(gb, HL, A); SET_HL(HL - 1); // ldd (hl),a
+  CYC(0x5140, 0x5142); mem_wr(gb, HL, 0x40); // Interaction.start
+  CYC(0x5142, 0x5143); alu_xor(gb, A);
+  RET(0x5143); return; // ret
+}
+
+void greatFairy_playSoundEvery8Frames_hook(GB *gb) {
+  CYC(0x5144, 0x5147); A = mem_rd(gb, wFrameCounter);
+  CYC(0x5147, 0x5149); alu_and(gb, 0x07);
+  if (!(F & FZ)) { RET_TAKEN(0x5149); return; } // ret nz
+  CYC(0x5149, 0x514a);
+  CYC(0x514a, 0x514c); A = 0x8c; // SND_FAIRY_HEAL
+  CYC(0x514c, 0x514f); playSound_b00_hook(gb); return; // jp
 }
