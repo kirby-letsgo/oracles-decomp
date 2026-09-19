@@ -3,12 +3,14 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x10, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x10, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, 0x0f, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, 0x0f, (from), (to), true)
 
-// object_code/common/enemies/commonBossCode.s, bank $10 instance.
+// object_code/common/enemies/commonBossCode.s, bank $0f instance.
 
-void enemyBoss_beginBoss_common_b10_hook(GB *gb) {
+void enemyBoss_initializeRoomWithoutExtraGfx_b0f_hook(GB *gb);
+
+void enemyBoss_beginBoss_common_b0f_hook(GB *gb) {
   CYC(0x4586, 0x4587); alu_xor(gb, A);
   CYC(0x4587, 0x458a); W8(wDisabledObjects) = A;
   CYC(0x458a, 0x458d); W8(wMenuDisabled) = A;
@@ -18,7 +20,7 @@ void enemyBoss_beginBoss_common_b10_hook(GB *gb) {
   playSound_b00_hook(gb);
 }
 
-void enemyBoss_dead_b10_hook(GB *gb) {
+void enemyBoss_dead_b0f_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x44f0, 0x44f1); H = D;
   CYC(0x44f1, 0x44f3); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
@@ -37,10 +39,10 @@ void enemyBoss_dead_b10_hook(GB *gb) {
   CYC(0x4502, 0x4504); A = 0x67;
   CALL_C(0x4504, playSound_b00_hook, 0x0c98, 0x4507);
 alreadyPlayedDeathSound:
-  CALL_C(0x4507, ecom_decCounter1_b10_hook, 0x439a, 0x450a);
+  CALL_C(0x4507, ecom_decCounter1_b0f_hook, 0x439a, 0x450a);
   if (!(F & FZ)) {
     CYCT(0x450a, 0x450d);
-    ecom_flickerVisibility_b10_hook(gb);
+    ecom_flickerVisibility_b0f_hook(gb);
     return;
   }
   CYC(0x450a, 0x450d);
@@ -72,7 +74,7 @@ finish:
   enemyDelete_hook(gb);
 }
 
-void enemyBoss_spawnShadow_b10_hook(GB *gb) {
+void enemyBoss_spawnShadow_b0f_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(0x4534, getFreePartSlot_hook, 0x3e8e, 0x4537);
   if (!(F & FZ)) { RET_TAKEN(0x4537); return; }
@@ -90,7 +92,7 @@ void enemyBoss_spawnShadow_b10_hook(GB *gb) {
   RET(0x4545); return;
 }
 
-void enemyBoss_initializeRoom_b10_hook(GB *gb) {
+void enemyBoss_initializeRoom_b0f_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x4546, 0x4548); alu_bit(gb, 7, A);
   if (!(F & FZ)) {
@@ -107,10 +109,10 @@ skipScreenVarStore:
   } else {
     CALL_C_CC(0x454f, loadPaletteHeader_hook, 0x050b, 0x4552);
   }
-  enemyBoss_initializeRoomWithoutExtraGfx_b10_hook(gb);
+  enemyBoss_initializeRoomWithoutExtraGfx_b0f_hook(gb);
 }
 
-void enemyBoss_initializeRoomWithoutExtraGfx_b10_hook(GB *gb) {
+void enemyBoss_initializeRoomWithoutExtraGfx_b0f_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x4552, 0x4554); A = 0xf0;
   CALL_C(0x4554, playSound_b00_hook, 0x0c98, 0x4557);
@@ -137,13 +139,13 @@ void enemyBoss_initializeRoomWithoutExtraGfx_b10_hook(GB *gb) {
   RET(0x457f); return;
 }
 
-void enemyBoss_beginMiniboss_b10_hook(GB *gb) {
+void enemyBoss_beginMiniboss_b0f_hook(GB *gb) {
   CYC(0x4580, 0x4582); B = 0x2d;
   CYC(0x4582, 0x4584);
-  enemyBoss_beginBoss_common_b10_hook(gb);
+  enemyBoss_beginBoss_common_b0f_hook(gb);
 }
 
-void enemyBoss_beginBoss_b10_hook(GB *gb) {
+void enemyBoss_beginBoss_b0f_hook(GB *gb) {
   CYC(0x4584, 0x4586); B = 0x2e;
-  enemyBoss_beginBoss_common_b10_hook(gb);
+  enemyBoss_beginBoss_common_b0f_hook(gb);
 }

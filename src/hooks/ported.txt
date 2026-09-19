@@ -6574,3 +6574,6 @@ enemyCode3d
 enemyCode41
 enemyCode49
 enemyCode4d
+octogon_subid0AboveWater_stateA
+octogon_subid0AboveWater_stateB
+smog_state8_subid2

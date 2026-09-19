@@ -448,6 +448,86 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-19: milestone 3 phase 6 batch 341, bank 0f: **CLOSED OUT.** Four parallel agents split
+  bank 0f's ~419 non-`ecom_*` routines by address range and ported 17 new files: cluster A
+  (5 files: the shared `enemyBoss_*` boss-common-code plus giantGhini, swoop, subterror,
+  armosWarrior), cluster B (4 files: smasher, vireEnemy, anglerFish, blueStalfos), cluster C
+  (5 files: pumpkinHead, headThwomp, shadowHag, eyesoar, smog), cluster D (4 files: smogEnemy,
+  octogon, plasmarine, kingMoblin). Then mechanically sed-ported the shared `ecom_*` cluster (63
+  routines) from the already-twice-fixed bank-0x0d copy in `enemyCommonCode.c`.
+
+  Two agents correctly self-disambiguated real filename collisions before writing anything
+  destructive: `vireEnemy.c` (bank 0f's real overworld `vire` enemy, `common/enemies/vire.s`)
+  avoided the pre-existing, unrelated bank-0x0b `vire.c` (`ages/interactions/vire.s`); and
+  `enemyCommonBossCode_b0f.c` avoided the pre-existing bank-0x10 `enemyCommonBossCode.c` (both
+  are instances of the same shared `commonBossCode.s`, exactly analogous to the `ecom_*`
+  cluster). One same-file race still happened despite this -- two clusters both independently
+  targeted `smog.c` -- and was self-detected via the disk-change notification and resolved by
+  renaming to `smogEnemy.c`, the same pattern as batch 337's `buzzblob.c` and batch 339's
+  `pumpkinHead.c` incidents. One routine, `enemyCode74`, fell exactly on the cluster A/B address
+  boundary; both agents correctly noticed it looked like "the other cluster's" and deferred it,
+  so neither ported it -- caught at the build-link stage (`_enemyCode74_hook` undefined) and
+  ported directly by the coordinating session.
+
+  Independent verification beyond each agent's self-review found substantially more than usual:
+  - **61 real CYC-boundary bugs, all from one cluster's agent, across all 4 of its files**: every
+    `jr` instruction (conditional and unconditional) used its jump *target* address as the
+    cycle-burn endpoint instead of the physical `from+2` -- the single most common bug class this
+    whole project has repeatedly flagged, and the agent's own self-review explicitly claimed to
+    have checked and found clean. The naive "next-listed-instruction" checker script produces
+    both false positives (near jump-table boundaries) and false negatives (misclassifying
+    `ld bc,$nnnn` as a 2-byte `ld b,$nn`, and `ld a,(nnnn)` as `ldh`'s 2-byte form) -- rewrote it
+    to compute physical instruction length directly from the disassembled mnemonic text instead
+    of address-diffing, which cleanly separated the 61 real bugs from a handful of script
+    artifacts. All 61 auto-fixed once correctly identified.
+  - A wrong-bank-suffix sweep: cluster D used bare `ecom_*_b0f`/`enemyBoss_*_b0f` (8 call sites)
+    instead of the `_hook`-suffixed form `gen_hooks.py` actually produces once registered --
+    fixed, matching the identical bug class from batch 339.
+  - 5 alias-winner corrections in `rewritten.txt` (`octogon_subid0AboveWater_stateF`/
+    `octogon_subid0_pauseMovement` removed as losing aliases of the already-registered
+    `stateA`/`stateB` winners; `enemyBoss_*` bare names removed and re-registered with the
+    correct `_b0f` bank suffix since they're cross-bank shared, not bank-0f-exclusive).
+
+  **The full TAS replay then failed at frame 42120, and hunting it down exposed a real
+  limitation in the hook-isolation debugging technique itself** (used successfully in batch 338
+  to find the bank-0d `push_effect` bug): `src/hooks/hooks.c`'s `HOOK_SKIP`/`HOOK_ONLY` env-var
+  filtering only controls which hook's table index claims `first_at[addr]` during
+  `hooks_init()`, but `lookup()`'s forward scan still walks *every* bank's entry sharing that
+  raw 16-bit address regardless of an individual entry's own skip status -- it only filters by
+  `bank == gb->rom_bank` at lookup time. Since ROM addresses 0x4000-0x7fff repeat identically
+  across every bank, isolating or skipping a hook by name has **no effect whenever another
+  bank's hook shares its raw address and stays enabled** -- true for roughly 80% of bank 0x0f's
+  476 addresses. This produced two confirmed false leads: `collisionEffect32_hook` (a long
+  pre-existing, untouched bank-0x07 routine that happens to share address 0x4625 with
+  `giantGhini_gotoState9_hook`) and `enemyBoss_initializeRoom_b0f_hook` (later proven, via a
+  full sed-normalized file diff, to be 100% byte-identical to its already-shipped bank-0x10
+  sibling -- not buggy at all, just address-colliding with bank 0x01's
+  `screenTransitionState5Substate2__state3_hook`). A collision-aware re-bisection (computing and
+  also skipping every other-bank hook sharing each candidate's address before testing) correctly
+  localized two real, unrelated wrong-literal bugs:
+  - `enemyBoss_initializeRoom_b0f_hook` wrote the enemy ID into `wScreenVariables` (0xcd00)
+    instead of `wEnemyIDToLoadExtraGfx` (0xcc1d) -- a straightforward wrong-constant slip,
+    corrupting a shared screen-flags byte that a sibling function reads 5 lines later to decide
+    whether to force Link to walk into the room. The identical bug exists verbatim in the
+    already-shipped bank-0x10 copy (`ramrock_state0`'s call path apparently never exercises a
+    visibly different outcome there) -- fixed both, matching batch 338's precedent of fixing a
+    shared dormant bug in both bank copies at once.
+  - `giantGhini_gotoState9_hook` wrote the raw hex digits from a `SPEED_c0` label (0xc0) instead
+    of the label's actual disassembled value (0x1e) -- this project's naming convention labels
+    the *value* 0x1e as `SPEED_c0` (confirmed identical in ~20 other already-shipped files), and
+    the wrong literal set Giant Ghini's charge speed roughly 6x too fast the instant it
+    transitions out of its miniboss-intro sequence.
+
+  Full gate passed after both fixes: both builds clean, both ctest suites 8/8, full 289,518-frame
+  TAS reference replay passed (369s, independently re-verified). Final bare-symbol audit: 496
+  `ages.sym` bare symbols for bank 0x0f; 17 are pure data tables (`*Vals`/`*Offsets`/
+  `*Boundaries`/`*Boxes` naming, confirmed via garbage-opcode decode); 3 were genuine
+  previously-missed real-code gaps (`octogon_subid0AboveWater_stateA`/`stateB`,
+  `smog_state8_subid2`) caught by the pre-wave audit and ported by cluster C/D; the remaining
+  476 distinct hooked addresses in `table.h` match `rewritten.txt` exactly. `docs/bank-map.html`
+  bank 0f corrected from 0/810 (stale) to 476/476. **All 16 banks from 0x00 through 0x0f are now
+  fully readable C.** Project total is 6,232/9,646.
+
 - 2026-09-19: milestone 3 phase 6 batch 340, bank 0a: audit-only correction, no new routines.
   `docs/bank-map.html`'s 928/172 was stale (an earlier session's closure was never re-audited),
   same pattern found and fixed today for banks 0b/0c/0d/0e. `gen_bank0a.c` is already gone,
