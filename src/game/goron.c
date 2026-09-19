@@ -9,6 +9,7 @@
 #define CYCT15(from, to) burn_rom(gb, 0x15, (from), (to), true)
 #define CALL_C15(a, fn, target, ra) do { CYC15((a), (a) + 3); CALL_C_((a), fn, (target), (ra)); } while (0)
 
+void goron_setLinkPositionAndDirection_hook(GB *gb);
 void goronDance_updateFrameCounter_hook(GB *gb);
 void goronDance_initNextRound_hook(GB *gb);
 void goronDance_clearDanceVariables_hook(GB *gb);
@@ -1212,7 +1213,7 @@ void goronDance_initLinkPosition_hook(GB *gb) {
   (void)sp0_;
   CYC15(0x6331, 0x6333); A = 2;
   CYC15(0x6333, 0x6336); SET_BC(0x5c50);
-  CYC15(0x6336, 0x6338); goron_setLinkPositionAndDirection(gb);
+  CYC15(0x6336, 0x6338); goron_setLinkPositionAndDirection_hook(gb);
 }
 
 void goronDance_checkNumFailedRounds_hook(GB *gb) {
@@ -1228,7 +1229,7 @@ void goronDance_checkNumFailedRounds_hook(GB *gb) {
   CYC15(0x6367, 0x6369); mem_wr(gb, HL, 0);
   CYC15(0x6369, 0x636c); A = W8(wTmpcfc0_goronDance_numFailedRounds);
   CYC15(0x636c, 0x636d); alu_or(gb, A);
-  CYC15(0x636d, 0x6370); writeFlagsTocddb(gb);
+  CYC15(0x636d, 0x6370); writeFlagsTocddb_hook(gb);
 }
 
 void goronDance_giveRandomRingPrize_hook(GB *gb) {
@@ -1253,7 +1254,7 @@ give_ring:
   CYC15(0x638c, 0x638f); SET_HL(0x6394);
   CYC15(0x638f, 0x6390); goron_add_a_to_hl(gb, 0x6390);
   CYC15(0x6390, 0x6391); A = mem_rd(gb, HL);
-  CYC15(0x6391, 0x6394); giveRingAToLink(gb);
+  CYC15(0x6391, 0x6394); giveRingAToLink_hook(gb);
 }
 
 void goronElder_lookingUpAnimation_hook(GB *gb) {
@@ -1301,7 +1302,7 @@ void goron_checkEnoughTimePassed_hook(GB *gb) {
   CYC15(0x6689, 0x668c); A = W8(wSeedTreeRefilledBitset);
   CYC15(0x668c, 0x668d); A = (uint8_t)~A;
   CYC15(0x668d, 0x668f); alu_bit(gb, 0, A);
-  CALL_C15(0x668f, writeFlagsTocddb, 0x5118, 0x6692);
+  CALL_C15(0x668f, writeFlagsTocddb_hook, 0x5118, 0x6692);
   goron_clearRefillBit_hook(gb);
 }
 
@@ -1319,7 +1320,7 @@ void goron_checkInPast_hook(GB *gb) {
   CYC15(0x6328, 0x632b); A = W8(wTilesetFlags);
   CYC15(0x632b, 0x632c); A = (uint8_t)~A;
   CYC15(0x632c, 0x632e); alu_and(gb, 0x80);
-  CYC15(0x632e, 0x6331); writeFlagsTocddb(gb);
+  CYC15(0x632e, 0x6331); writeFlagsTocddb_hook(gb);
 }
 
 void goron_checkInPresent_hook(GB *gb) {
@@ -1327,7 +1328,7 @@ void goron_checkInPresent_hook(GB *gb) {
   (void)sp0_;
   CYC15(0x6320, 0x6323); A = W8(wTilesetFlags);
   CYC15(0x6323, 0x6325); alu_and(gb, 0x80);
-  CYC15(0x6325, 0x6328); writeFlagsTocddb(gb);
+  CYC15(0x6325, 0x6328); writeFlagsTocddb_hook(gb);
 }
 
 void goron_checkLinkInAir_hook(GB *gb) {
@@ -1335,5 +1336,5 @@ void goron_checkLinkInAir_hook(GB *gb) {
   (void)sp0_;
   CYC15(0x67c5, 0x67c8); A = W8(wLinkInAir);
   CYC15(0x67c8, 0x67c9); alu_or(gb, A);
-  CYC15(0x67c9, 0x67cc); writeFlagsTocddb(gb);
+  CYC15(0x67c9, 0x67cc); writeFlagsTocddb_hook(gb);
 }

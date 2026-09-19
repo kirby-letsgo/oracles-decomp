@@ -448,6 +448,51 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-20: milestone 3 phase 6 batch 344, bank 15: **CLOSED OUT -- the last remaining large
+  bank.** Four parallel agent clusters (A/B/C/D, ~90 routines each) ported all 360 remaining
+  routines across 60+ new files, every one ending in the literal `15` per a blanket naming rule
+  imposed up front after a spot-check found most NPC names already had files for other banks.
+
+  Fixed a wide sweep of cross-bank collisions this wave: `shootingGallery_removeAllTargets`
+  needed a `_b15` suffix (vs bank 08's copy); `writeFlagsTocddb`/`giveRingAToLink`/
+  `goron_setLinkPositionAndDirection`/`checkEssenceNotObtained` needed `_hook`-suffixed forward
+  declarations added across 12+ files spanning all 4 clusters plus the pre-existing `goron.c`
+  (a bank-09 file with an embedded bank-0x15 section from an earlier batch); two same-file
+  collisions (`oldMan15.c`, `miscPuzzles15.c`) needed manual recovery of routines a merge had
+  silently dropped.
+
+  Registering the full wave regressed the TAS replay twice. Both times, `HOOK_SKIP`-based
+  bisection turned out to be fundamentally unreliable: `hooks_init()`'s skip filtering only
+  controls which entry's index gets written into the scan-start shortcut, not whether that entry
+  stays in the `hooks[]` array -- `lookup()` scans forward past a "skipped" hook to the next
+  bank match regardless, so isolating one candidate by skipping it does nothing whenever any
+  other bank shares its raw address, which is nearly universal in the 0x4000-0x7fff switchable
+  range. Pivoted to **registration-presence bisection** instead (editing `rewritten.txt` directly
+  and regenerating the pipeline, which changes real compiled code paths rather than a runtime
+  lookup table) and found four real bugs this way:
+
+  - `beginJump_hook` (shootingGallery15.c) and `impa_restoreNormalSpriteSheet_hook` (impa15.c)
+    both used bare `OBJ_*` field offsets instead of `INTERACTION_BASE + OBJ_*`. Once this pattern
+    was recognized, a sweep of every bank-15 file for the same mistake turned up 29 more
+    instances across 9 files (`bipin15`, `blossom15`, `child15`, `doorController15`, `farore15`,
+    `movingPlatform15`, `npcFacingHelpers15`, `oldMan15`, `vasu15`) -- one of which
+    (`doorController15.c`) also had a wrong field name, not just a missing offset. All 31 sites
+    confirmed individually against `--report` disasm output before fixing, and fixed in one pass.
+  - `interaction6b_isLinkAtScreenEdge_hook` (interaction6b15.c) had an inverted `jr nc` branch --
+    the classic flag-polarity bug, still the single most common mistake this whole project.
+
+  Full bare-symbol audit: 478 non-alias bare `ages.sym` symbols, 105 are data tables and script
+  bodies (confirmed by name pattern -- `*Script`, `*Script_body`, `*ObjectDataTable`, layout-half
+  tables), 373 real routines -- matching `table.h`'s distinct hooked-address count for bank 0x15
+  exactly (100% rewritten).
+
+  Full gate passed: both builds clean, `lint_game.py` 0 problems, both ctest suites 8/8, full
+  289,518-frame TAS reference replay passed (372s). **`gen_bank15.c` is gone -- zero
+  `gen_bankXX.c` files remain anywhere in the codebase.** Corrected the stale 514/13 to the
+  audited 373/373, and recomputed the top-level totals fresh from the current bank list rather
+  than incrementing them: **totalHooks 6,641, rewrittenTotal 6,641** -- every hooked routine in
+  the entire ROM is now hand-written, readable C.
+
 - 2026-09-19: milestone 3 phase 6 batch 343, bank 11: audit correction plus one real dead-code
   fix. `docs/bank-map.html`'s 650/649 was stale, same pattern as every other bank audited this
   session -- the real total is 227, confirmed two ways: `table.h`'s distinct hooked-address
