@@ -448,6 +448,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-19: milestone 3 phase 6 batch 340, bank 0a: audit-only correction, no new routines.
+  `docs/bank-map.html`'s 928/172 was stale (an earlier session's closure was never re-audited),
+  same pattern found and fixed today for banks 0b/0c/0d/0e. `gen_bank0a.c` is already gone,
+  confirming the bank was in fact fully closed already: of 211 `ages.sym` bare symbols, 9 are
+  unregistered -- 6 are data tables, 2 (`interaction6b_subid0b`/`0c`) are harmless losing aliases
+  of the already-hooked `interaction6b_subid0a`, and one (`companionScript_companionBarrierText`)
+  is real code with `callers: 0` in the `--report` output -- genuinely dead, unreachable code,
+  confirmed not worth porting. 195 distinct hooked addresses in `table.h` match exactly. Corrected
+  928/172 to 195/195. Project total is 5,756/9,646.
+
 - 2026-09-19: milestone 3 phase 6 batch 339, bank 0e: **CLOSED OUT.** Four parallel agents split
   bank 0e's ~506 non-`ecom_*` enemy/dispatcher routines by address range and ported 44 new files:
   cluster A (9 files, 115 routines: tektite, stalfos, keese, babyCucco, zol, floormaster, cucco,
