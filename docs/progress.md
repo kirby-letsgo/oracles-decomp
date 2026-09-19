@@ -448,6 +448,40 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-19: milestone 3 phase 6 batch 343, bank 11: audit correction plus one real dead-code
+  fix. `docs/bank-map.html`'s 650/649 was stale, same pattern as every other bank audited this
+  session -- the real total is 227, confirmed two ways: `table.h`'s distinct hooked-address
+  count for bank 0x11, and a full bare-symbol audit (255 `ages.sym` bare symbols; 24 are data
+  tables -- collision tables, offset tables, generic `table_XXXX` names, confirmed via
+  garbage-opcode decode; 1, `func_11_7f64`, is genuinely dead code).
+
+  `func_11_7f64` lives in `code/ages/garbage/bank11End.s` -- an explicitly-named garbage source
+  file -- and the `--report` output confirms `callers: 0`. This is the exact same fake-padding
+  pattern already confirmed for bank 0E's `fake1`/`fake2` (never added to `ported.txt` there).
+  Unlike those, `func_11_7f64` had been sitting in `ported.txt` since much earlier in the
+  project despite being unreachable garbage -- which is why `gen_bank11.c` never fully
+  disappeared even though every real routine in the bank was already hand-written. Removed it
+  from `ported.txt` (matching the established "never register confirmed dead/data content"
+  precedent) rather than hand-translating fake code that nothing ever calls; `gen_bank11.c`
+  vanished entirely as a result.
+
+  Full gate passed: both builds clean, both ctest suites 8/8, full 289,518-frame TAS reference
+  replay passed (374s). Corrected 650/649 to 227/227.
+
+  **This correction, combined with the identical ones already made this session for banks
+  0A/0D/0E/0F/39, also exposed that the top-level `totalHooks`/`rewrittenTotal` counters in
+  `docs/bank-map.html` had themselves drifted out of sync with the sum of the per-bank figures
+  shown in the grid** -- the running counters were being manually incremented batch-by-batch
+  (`previous + delta`) rather than recomputed from the authoritative per-bank list, so small
+  errors accumulated silently over many edits, the same class of staleness this whole run of
+  corrections has been about. Recomputed both directly from the current 23-bank list rather
+  than trusting the incremental counters: **totalHooks 6,782, rewrittenTotal 6,281** (the
+  previous incrementally-tracked values, 9,646 and 6,281 respectively before this batch's
+  banks-0A-through-39 corrections, undercounted actual progress by hundreds of routines in one
+  direction and overcounted the total in the other). Going forward, these two fields should be
+  recomputed from the bank list after every batch rather than incremented, to prevent the same
+  drift recurring.
+
 - 2026-09-19: milestone 3 phase 6 batch 342, bank 39: **CLOSED OUT.** This is the game's
   sound/music engine (`code/audio.s`, one cohesive source file), a different kind of bank from
   every enemy bank done so far. Of 389 bare `ages.sym` symbols, 340 are pure data -- `snd*`

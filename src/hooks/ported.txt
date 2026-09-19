@@ -5499,7 +5499,6 @@ partCode56
 partCode57
 partCode58
 partCode59
-func_11_7f64
 func_55f8
 parseGivenObjectData_hl
 objectDataOp0

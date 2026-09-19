@@ -4815,7 +4815,6 @@ void partCode56_hook(GB *gb);
 void partCode57_hook(GB *gb);
 void partCode58_hook(GB *gb);
 void partCode59_hook(GB *gb);
-void func_11_7f64(GB *gb);
 void playSound_b39_hook(GB *gb);
 void initSound_b39_hook(GB *gb);
 void updateSoundFrequencyAndPlay_hook(GB *gb);
