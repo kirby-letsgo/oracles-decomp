@@ -448,6 +448,70 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-19: milestone 3 phase 6 batch 339, bank 0e: **CLOSED OUT.** Four parallel agents split
+  bank 0e's ~506 non-`ecom_*` enemy/dispatcher routines by address range and ported 44 new files:
+  cluster A (9 files, 115 routines: tektite, stalfos, keese, babyCucco, zol, floormaster, cucco,
+  butterfly, greatFairy-the-enemy), cluster B (7 files, 132 routines: fireKeese, waterTektite,
+  swordEnemies, peahat, wizzrobe, crows, gel), cluster C (20 files, 130 routines plus correctly
+  identifying `orbMovementScript` as data, not code), cluster D (7 files, 113 routines plus
+  correctly identifying all 15 `movingSidescrollPlatformScript_subid00`-`0e` as data-table byte
+  streams that happen to decode as syntactically-valid-but-meaningless SM83 instructions -- not
+  the "illegal opcode" case transliterate.py auto-skips, confirmed against the human disassembly's
+  own `.db`/movement-script macros). Then mechanically sed-ported the shared `ecom_*` cluster (63
+  routines) from the already-twice-fixed bank-0x0d copy in `enemyCommonCode.c`.
+
+  Independently re-verified every cluster with the CYC-boundary/flag-polarity cross-check script
+  before registering anything, beyond each agent's own self-review (which itself caught ~130+ real
+  bugs across the four clusters, mostly the usual target-vs-physical-end CYC class). Found and
+  fixed 5 more real bugs this pass:
+  - Two double-charged-cycle bugs (`veranPossessionBoss.c`, `vineSprout.c`): a `CYC()` span was
+    written to include a following conditional `ret`'s own byte, so its untaken cost got burned
+    unconditionally by the span *and* its taken cost got burned again by `RET_TAKEN` when the
+    branch was actually taken -- same failure family as bank 0d's missing-push bug (a real ROM
+    instruction's cost silently double-counted or dropped), different mechanism.
+  - A wrong-callee-name bug: two files (from different clusters) called a nonexistent
+    `markEnemyAsKilledInRoom_b0e_hook` instead of the real shared fixed-bank
+    `markEnemyAsKilledInRoom_b00_hook` (confirmed via `gen_bank0e.c`'s own already-generated call
+    and other already-correct files like `candle.c`/`wallmaster.c`).
+  - A cluster-D-wide naming convention bug: 75 call sites used bare `ecom_*_b0e` instead of the
+    `_b0e_hook` suffix that `gen_hooks.py` actually produces once a routine is registered in
+    `rewritten.txt` -- cluster D's agent matched the *pre-registration* generated-name convention
+    instead of anticipating the post-registration one that clusters A/B/C correctly used.
+
+  **Two file-name collisions, one already committed.** Cluster A's `greatFairy.c` (the bank-0e
+  enemy) silently overwrote bank 0b's pre-existing interaction file of the same name from batch
+  332 (`interactionCoded5_hook`, `greatFairy_initialize_hook`, etc.) -- both banks' human
+  disassembly sources are independently named `greatFairy.s` in different directories, so the
+  project's own "name the file after the .s file" convention collided. This had already been
+  captured in a real commit (`bank 9 & 0b`) before it was noticed. Recovered the original content
+  from an earlier `git stash` index commit (the working commit history didn't have it uncommitted
+  at all, since the batch-332 work was staged but never committed) and renamed the enemy file to
+  `greatFairyEnemy.c`. Separately, cluster C's `objectMovementScript.c` re-ported
+  `objectLoadMovementScript_body`/`objectRunMovementScript_body` -- bank 0e's only 2 pre-existing
+  rewritten routines before this batch -- overwriting them with a fresh (also correct) translation;
+  benign since both are valid translations of the same ROM bytes, so the new version was kept.
+
+  Also caught and corrected a self-inflicted registration bug before it reached lint: initially
+  bank-suffixed all 490 non-`ecom_*` routine names in `rewritten.txt` (matching the `ecom_*`
+  cluster's convention), but none of bank 0e's own enemy routines collide with any other bank's
+  bare symbol names, so they needed bare (unsuffixed) registration to match what all four agents
+  actually wrote in their `_hook` function names -- `lint_game.py` caught this immediately (490
+  problems) since `transliterate.py --out` correctly refused to treat the wrongly-suffixed names
+  as satisfied. Separately, 5 of the "490" turned out to be losing aliases
+  (`ambiGuard_stateE`, `enemyCode49`/`4a`/`4c`/`5f`) that leaked into a cluster's assigned list
+  because the original address-sorted split wasn't deduplicated by alias group first -- removed
+  from `rewritten.txt` (their winners `ambiGuard_stateC`/`enemyCode3d`/`enemyCode41`/`enemyCode4d`
+  were correctly registered).
+
+  Full gate passed after all fixes: both builds clean, both ctest suites 8/8, full 289,518-frame
+  TAS reference replay passed (373s). Final bare-symbol audit: 588 `ages.sym` bare symbols for
+  bank 0x0e; 35 are pure data tables, movement-script bytecode, or garbage padding (confirmed via
+  garbage-opcode decode and cross-reference against the human disassembly's data macros); the
+  remaining 548 distinct hooked addresses in `table.h` match `rewritten.txt` exactly (490 enemy
+  routines + 63 ecom_b0e routines - 5 deduped aliases = 548). `docs/bank-map.html` bank 0e
+  corrected from 2/860 (stale) to 548/548. Project total is 5,733/9,646 (7,572 routines total
+  after bank 0e's rewrites removed most of its own generated fallback code).
+
 - 2026-09-19: milestone 3 phase 6 batch 338, bank 0d: **CLOSED OUT.** Ported the shared `ecom_*`
   enemy-common-code cluster (62 real routines plus `label_025_b0d`) into `enemyCommonCode.c`,
   mechanically via `sed 's/_b10/_b0d/g'` on the already-shipped bank-0x10 copy of
