@@ -448,6 +448,51 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-19: milestone 3 phase 6 batch 342, bank 39: **CLOSED OUT.** This is the game's
+  sound/music engine (`code/audio.s`, one cohesive source file), a different kind of bank from
+  every enemy bank done so far. Of 389 bare `ages.sym` symbols, 340 are pure data -- `snd*`
+  sound-effect definitions and `mus*` music-track pointers, bytecode consumed by the engine
+  rather than executed as CPU instructions (confirmed via garbage-opcode decode) -- plus one
+  deliberate crash stub (`nonExistentFunction`, literally commented "Call this if you want your
+  game to crash" in the source). Only 49 bare symbols were real code, and all 49 were already
+  identified and sitting in `ported.txt` from a much earlier pass, just never rewritten (still
+  100% interpreted going into this batch).
+
+  Two parallel agents split the 49 top-level routines (~123 addressable entry points before
+  rewriting, once `@`-local sub-states are counted) into `audioEngine.c` (init/update/stop/
+  silence family, 62 routines) and `audioEnginePlaySound.c` (channel-command dispatch plus the
+  complex `playSound` state machine, 61 routines). Both chose to inline every `@`-local as a
+  `goto` within its parent function rather than mechanically duplicating tails the way the
+  generated interpreter does -- cleaner and matches this project's readable-C style better.
+
+  Both agents' self-review caught an unusually high number of real bugs before handoff, using
+  custom ground-truth address-coverage scripts cross-checked against the mechanically-accurate
+  generated code (`gen_bank39.c`) rather than relying on visual inspection alone: missing
+  untaken-branch cycle charges after several `if (cond) { CYCT(...); ...; return; }` blocks,
+  one structurally-inverted function (`stopSfx_hook` had inverted flag polarity combined with
+  the taken-cost macro on the wrong branch), several target-vs-physical-address CYC bugs,
+  missing cycle charges for unconditional `jp` tail-calls found via a full address-coverage
+  diff, and one genuine internal-call-needs-`push_effect` instance
+  (`getChannelVolume__affectedByMusicVolume`, reached both by fallthrough and by a real `call`
+  from `standardCmdChannel6`). Independent verification found only one false-positive flag per
+  file (a `jp hl` 1-byte instruction the checker script's regex misparsed), zero real bugs
+  missed -- a strong sign the self-review scripts these two agents wrote were unusually
+  effective compared to most prior batches.
+
+  One registration mistake was caught before it reached the build: an initial pass registered
+  all 123 addressable entry points (matching the pre-rewrite generated-code table.h), when only
+  the 49 top-level names needed registering since neither agent created separate hook functions
+  for the `@`-locals -- `lint_game.py` caught it immediately (74, then 21, then 2 problems across
+  three correction passes as prefix-based removal missed some). The last 2 (`initSound`,
+  `playSound`) needed their `_b39` bank suffix restored after an overly-aggressive suffix-strip,
+  since they collide with identically-named routines in other banks.
+
+  Full gate passed: both builds clean, both ctest suites 8/8, full 289,518-frame TAS reference
+  replay passed (379s). `gen_bank39.c` is gone. Final bare-symbol audit: 389 `ages.sym` bare
+  symbols for bank 0x39; 340 are pure data or the one crash stub; the remaining 49 distinct
+  hooked addresses in `table.h` match `rewritten.txt` exactly. `docs/bank-map.html` bank 39
+  corrected from 123/0 (stale) to 49/49. Project total is 6,281/9,646.
+
 - 2026-09-19: milestone 3 phase 6 batch 341, bank 0f: **CLOSED OUT.** Four parallel agents split
   bank 0f's ~419 non-`ecom_*` routines by address range and ported 17 new files: cluster A
   (5 files: the shared `enemyBoss_*` boss-common-code plus giantGhini, swoop, subterror,
