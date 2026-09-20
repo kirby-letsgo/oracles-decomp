@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodec3), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodec3), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void pirate_captain_state0_tail_hook(GB *gb) {
   BASE(interactionCodec3);
@@ -20,7 +20,7 @@ void pirate_captain_state0_tail_hook(GB *gb) {
   }
   CYC(b_+30, b_+33); SET_HL((SYM(interactionCoded8__subid1Script) + 24));
   CALL_C(b_+33, interactionSetScript_hook, SYM(interactionSetScript), b_+36);
-  CYC(b_+36, SYM(interactionCodec4)); interactionIncState_hook(gb);
+  CYC(b_+36, b_+39); interactionIncState_hook(gb);
 }
 
 void interactionCodec3__afterCall7354_hook(GB *gb) {

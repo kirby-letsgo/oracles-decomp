@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode79), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode79), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCode79_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -168,5 +168,5 @@ substate1:
   CYC(b_+169, b_+170); A = mem_rd(gb, DE);
   CYC(b_+170, b_+171); C = A;
   CALL_C(b_+171, updateLinkPositionGivenVelocity_hook, SYM(updateLinkPositionGivenVelocity), b_+174);
-  CYC(b_+174, SYM(interactionCode7a)); goto substate0; // jr
+  CYC(b_+174, b_+176); goto substate0; // jr
 }

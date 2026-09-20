@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(shopItemGetTilesForRupeeDisplay), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(shopItemGetTilesForRupeeDisplay), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t shopItem_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -85,7 +85,7 @@ L_43f4:
   CYC(b_+32, b_+34); mem_wr(gb, IO_SVBK, A);
   CYC(b_+34, b_+37); SET_HL(wInShop);
   CYC(b_+37, b_+39); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 4));
-  CYC(b_+39, SYM(shopItemState3)); ret_effect(gb);
+  CYC(b_+39, b_+40); ret_effect(gb);
 }
 
 void interactionCode47_hook(GB *gb);
@@ -212,7 +212,7 @@ L_4376:
   CYC(b_+154, b_+155); A = mem_rd(gb, DE);
   CYC(b_+155, b_+156); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CALL_C(b_+156, objectSetVisible83_hook, SYM(objectSetVisible83), b_+159);
-  CYC(b_+159, SYM(shopItemState5)); shopItemUpdateRupeeDisplay_hook(gb);
+  CYC(b_+159, b_+161); shopItemUpdateRupeeDisplay_hook(gb);
 }
 
 void shopItemState5_hook(GB *gb) {
@@ -221,7 +221,7 @@ void shopItemState5_hook(GB *gb) {
   CALL_C(b_+0, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+3);
   CYC(b_+3, b_+4); alu_xor(gb, A);
   CYC(b_+4, b_+7); mem_wr(gb, wDisabledObjects, A);
-  CYC(b_+7, SYM(shopItemPopStackAndDeleteSelf)); mem_wr(gb, wMenuDisabled, A);
+  CYC(b_+7, b_+10); mem_wr(gb, wMenuDisabled, A);
   shopItemPopStackAndDeleteSelf_hook(gb);
 }
 
@@ -229,7 +229,7 @@ void shopItemPopStackAndDeleteSelf_hook(GB *gb) {
   BASE(shopItemPopStackAndDeleteSelf);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); SET_AF(pop_effect(gb));
-  CYC(b_+1, SYM(shopItemState2)); interactionDelete_hook(gb);
+  CYC(b_+1, b_+4); interactionDelete_hook(gb);
 }
 
 void shopItemState2_hook(GB *gb) {
@@ -252,7 +252,7 @@ L_43a3:
   CYC(b_+19, b_+21); shopItemClearRupeeDisplay_hook(gb); return;
 L_43b0:
   CALL_C(b_+21, shopItemCheckGrabbed_hook, SYM(shopItemCheckGrabbed), b_+24);
-  if (!(F & FZ)) { CYCT(b_+24, SYM(shopItemState4)); ret_effect(gb); return; } CYC(b_+24, SYM(shopItemState4));
+  if (!(F & FZ)) { CYCT(b_+24, b_+25); ret_effect(gb); return; } CYC(b_+24, b_+25);
   shopItemState4_hook(gb);
 }
 
@@ -292,7 +292,7 @@ L_4425:
   CYC(b_+54, b_+55); alu_or(gb, A);
   CYC(b_+55, b_+57); B = 0;
   if (!(F & FZ)) { CYCT(b_+57, b_+60); showText_hook(gb); return; } CYC(b_+57, b_+60);
-  CYC(b_+60, SYM(shopItemGetTilesForRupeeDisplay)); ret_effect(gb);
+  CYC(b_+60, b_+61); ret_effect(gb);
 }
 
 void shopItemState4_hook(GB *gb) {
@@ -312,7 +312,7 @@ void shopItemState4_hook(GB *gb) {
   CYC(b_+17, b_+19); mem_wr(gb, HL, 1);
   CALL_C(b_+19, shopItemUpdateRupeeDisplay_hook, SYM(shopItemUpdateRupeeDisplay), b_+22);
   CALL_C(b_+22, objectSetVisible83_hook, SYM(objectSetVisible83), b_+25);
-  CYC(b_+25, SYM(shopItemClearRupeeDisplay)); dropLinkHeldItem_hook(gb);
+  CYC(b_+25, b_+28); dropLinkHeldItem_hook(gb);
 }
 
 void shopItemClearRupeeDisplay_hook(GB *gb) {
@@ -330,7 +330,7 @@ void shopItemClearRupeeDisplay_hook(GB *gb) {
   CYC(b_+13, b_+14); L = alu_inc8(gb, L);
   CYC(b_+14, b_+15); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+15, b_+16); SET_HL(pop_effect(gb));
-  CYC(b_+16, SYM(shopItemUpdateRupeeDisplay)); shopItemUpdateRupeeDisplay_tail(gb);
+  CYC(b_+16, b_+18); shopItemUpdateRupeeDisplay_tail(gb);
 }
 
 void shopItemUpdateRupeeDisplay_hook(GB *gb) {
@@ -415,5 +415,5 @@ void shopItemCheckGrabbed_hook(GB *gb) {
   CYC(b_+36, b_+37); ret_effect(gb); return;
 L_44f5:
   CYC(b_+37, b_+38); alu_or(gb, D);
-  CYC(b_+38, SYM(shopItemTreasureToGive)); ret_effect(gb);
+  CYC(b_+38, b_+39); ret_effect(gb);
 }

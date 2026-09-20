@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode17), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode17), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void ghini_updateMovement_hook(GB *gb);
 void ghini_updateAnimationFromAngle_hook(GB *gb);
@@ -166,7 +166,7 @@ void ghini_subid00_hook(GB *gb) {
   }
 
 state8:
-  CYC(b_+8, b_+11); SET_BC((SYM(_label_00_204) + 9));
+  CYC(b_+8, b_+11); SET_BC(0x187f);
   CALL_C(b_+11, ecom_randomBitwiseAndBCE_b0d_hook, SYM(ecom_randomBitwiseAndBCE_b0d), b_+14);
   CYC(b_+14, b_+15); H = D;
   CYC(b_+15, b_+17); L = ENEMY_BASE + OBJ_COUNTER1;
@@ -188,7 +188,7 @@ state9:
   CYC(b_+40, b_+41); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
 
 animate:
-  CYC(b_+41, SYM(ghini_subid01)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+41, b_+44); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0d:54de, bare global; takes a second to spawn in, and killing one of subid 1 makes all
@@ -241,7 +241,7 @@ state9:
   CYC(b_+56, b_+58); alu_cp(gb, 0x08);
   if (!(F & FC)) { CYCT(b_+58, b_+60); goto animate; } // jr nc
   CYC(b_+58, b_+60);
-  CYC(b_+60, b_+63); SET_BC((SYM(pushDirectionData) + 26));
+  CYC(b_+60, b_+63); SET_BC(0x1f1f);
   CALL_C(b_+63, ecom_randomBitwiseAndBCE_b0d_hook, SYM(ecom_randomBitwiseAndBCE_b0d), b_+66);
   CYC(b_+66, b_+67); alu_or(gb, B);
   CYC(b_+67, b_+68); A = C;
@@ -299,7 +299,7 @@ stateC:
   CYC(b_+138, b_+140); alu_and(gb, 0x7f);
   CYC(b_+140, b_+142); alu_add(gb, 0x7f);
   CYC(b_+142, b_+143); mem_wr(gb, DE, A);
-  CYC(b_+143, SYM(ghini_subid02)); goto animate; // jr
+  CYC(b_+143, b_+145); goto animate; // jr
 }
 
 // 0d:556f, bare global.
@@ -432,7 +432,7 @@ void ghini_updateMovement_hook(GB *gb) {
   CALL_C(b_+0, objectApplySpeed_hook, SYM(objectApplySpeed), b_+3);
   CALL_C(b_+3, ecom_bounceOffScreenBoundary_b0d_hook, SYM(ecom_bounceOffScreenBoundary_b0d), b_+6);
   if (F & FZ) { RET_TAKEN(b_+6); return; } // ret z
-  CYC(b_+6, SYM(ghini_updateAnimationFromAngle));
+  CYC(b_+6, b_+7);
   ghini_updateAnimationFromAngle_hook(gb); return; // fallthrough
 }
 
@@ -453,7 +453,7 @@ compare:
   if (F & FZ) { RET_TAKEN(b_+12); return; } // ret z
   CYC(b_+12, b_+13);
   CYC(b_+13, b_+14); mem_wr(gb, HL, A);
-  CYC(b_+14, SYM(ghini_chooseTargetPosition)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+14, b_+17); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0d:5616, bare global; sets var30/var31 to target position for subid 2.

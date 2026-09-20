@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode46), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode46), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // PART_SEED_SHOOTER_EYE_STATUE
 void partCode46_hook(GB *gb) {

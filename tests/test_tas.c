@@ -72,4 +72,28 @@ static void full_tas_matches_reference(void) {
   fclose(ref); free(gb); free(rom); free(boot); tas_free(&t);
 }
 
-int main(void) { RUN(inputs_file_loads); RUN(frame_grid_is_70224_cycles); RUN(full_tas_matches_reference); return 0; }
+static void seasons_demo_matches_reference(void) {
+  const char *rom_path = GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc";
+  size_t n, bn;
+  uint8_t *rom = oracles_read_file(rom_path, &n);
+  if (!rom) SKIP("Seasons ROM not present");
+  uint8_t *boot = oracles_read_file(GAME_ROM_DIR "/cgb_boot.bin", &bn);
+  if (!boot) SKIP("cgb_boot.bin not present");
+  FILE *ref = fopen(TAS_DIR "/seasons-noinput.ref", "r");
+  if (!ref) SKIP("seasons-noinput.ref missing");
+  GB *gb = calloc(1, sizeof *gb);
+  gb_init(gb);
+  ASSERT(gb_load_rom(gb, rom, n));
+  oracles_apply_agb_boot_patch(boot, bn);
+  gb_set_boot_rom(gb, boot, bn);
+  ASSERT(oracles_load_init_ram(gb, TAS_DIR "/gbhawk-wram0.txt"));
+  gb_reset(gb);
+  RefCheck rc = {ref, 0, 0, false, 0};
+  rc.have = fscanf(ref, "%llu %llx", &rc.f, &rc.want) == 2;
+  gb->frame_cb = ref_cb; gb->frame_ctx = &rc;
+  for (uint64_t i = 0; i < 30000 && !rc.mismatch; i++) gb_run_frame(gb);
+  if (rc.mismatch) { fprintf(stderr, "seasons state mismatch at frame %llu\n", rc.mismatch); ASSERT(0); }
+  fclose(ref); free(gb); free(rom); free(boot);
+}
+
+int main(void) { RUN(inputs_file_loads); RUN(frame_grid_is_70224_cycles); RUN(full_tas_matches_reference); RUN(seasons_demo_matches_reference); return 0; }

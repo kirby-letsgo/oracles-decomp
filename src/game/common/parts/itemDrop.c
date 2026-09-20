@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode01), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode01), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/common/parts/itemDrop.s (PART_ITEM_DROP). Part.* fields are read/written through
 // D/E or H/L exactly as the ROM does; D already holds the active part's WRAM page (set by the
@@ -200,7 +200,7 @@ label_11_010:
   CYC(b_+140, b_+141); alu_rlca(gb);
   if (F & FC) { RET_TAKEN(b_+141); return; } // ret c
   CYC(b_+141, b_+142);
-  CYC(b_+142, b_+145); SET_BC((SYM(initializeVramMap1) + 19));
+  CYC(b_+142, b_+145); SET_BC(0x0500);
   CALL_C(b_+145, objectGetRelativeTile_hook, SYM(objectGetRelativeTile), b_+148);
   CYC(b_+148, b_+151); SET_HL(SYM(itemDropConveyorTilesTable)); // itemDropConveyorTilesTable
   CALL_C(b_+151, lookupCollisionTable_hook, SYM(lookupCollisionTable), b_+154);
@@ -403,7 +403,7 @@ void itemDrop_countdownToDisappear_hook(GB *gb) {
 
 disappear:
   CYC(b_+35, b_+36); alu_scf(gb);
-  CYC(b_+36, SYM(itemDrop_initSpeed)); ret_effect(gb); return;
+  CYC(b_+36, b_+37); ret_effect(gb); return;
 }
 
 void itemDrop_initSpeed_hook(GB *gb) {
@@ -428,7 +428,7 @@ fairy:
   CYC(b_+19, b_+21); L = 0xcb; // Part.yh
   CYC(b_+21, b_+22); A = A + mem_rd(gb, HL);
   CYC(b_+22, b_+23); mem_wr(gb, HL, A);
-  CYC(b_+23, SYM(itemDrop_updateSpeed)); itemDrop_chooseRandomFairyMovement_hook(gb); return; // jp
+  CYC(b_+23, b_+26); itemDrop_chooseRandomFairyMovement_hook(gb); return; // jp
 }
 
 void itemDrop_updateSpeed_hook(GB *gb) {
@@ -437,7 +437,7 @@ void itemDrop_updateSpeed_hook(GB *gb) {
   CALL_C(b_+0, objectCheckTileCollision_allowHoles_hook, SYM(objectCheckTileCollision_allowHoles), b_+3);
   if (F & FC) { RET_TAKEN(b_+3); return; } // ret c
   CYC(b_+3, b_+4);
-  CYC(b_+4, SYM(itemDrop_spawnEnemy)); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+4, b_+7); objectApplySpeed_hook(gb); return; // jp
 }
 
 void itemDrop_spawnEnemy_hook(GB *gb) {
@@ -511,7 +511,7 @@ checkY:
   if (F & FC) { RET_TAKEN(b_+46); return; } // ret c
   CYC(b_+46, b_+47);
   CYC(b_+47, b_+48); SET_HL(pop_effect(gb)); // pop hl (discard return address)
-  CYC(b_+48, SYM(itemDrop_checkHitGround)); partDelete_hook(gb); return; // jp
+  CYC(b_+48, b_+51); partDelete_hook(gb); return; // jp
 }
 
 void itemDrop_checkHitGround_hook(GB *gb) {
@@ -542,7 +542,7 @@ fairy:
   CYC(b_+26, b_+28); mem_wr(gb, HL, 0xfa); // [Part.zh]
   CYC(b_+28, b_+30); L = 0xf3; // Part.var33
   CYC(b_+30, b_+32); mem_wr(gb, HL, 0x05);
-  CYC(b_+32, SYM(itemDrop_checkOnHazard)); ret_effect(gb); return;
+  CYC(b_+32, b_+33); ret_effect(gb); return;
 }
 
 void itemDrop_checkOnHazard_hook(GB *gb) {
@@ -595,7 +595,7 @@ onWater:
 
 onWaterSidescrolling:
   CYC(b_+53, b_+54); mem_wr(gb, DE, A);
-  CYC(b_+54, SYM(itemDrop_updateFairyMovement)); objectCreateInteractionWithSubid00_hook(gb); return; // jp
+  CYC(b_+54, b_+57); objectCreateInteractionWithSubid00_hook(gb); return; // jp
 }
 
 void itemDrop_updateFairyMovement_hook(GB *gb) {
@@ -608,8 +608,8 @@ void itemDrop_updateFairyMovement_hook(GB *gb) {
   CYC(b_+4, b_+6);
   CALL_C(b_+6, partCommon_getTileCollisionInFront_hook, SYM(partCommon_getTileCollisionInFront), b_+9);
   CYC(b_+9, b_+10); A = alu_inc8(gb, A);
-  if (!(F & FZ)) { CYCT(b_+10, SYM(itemDrop_chooseRandomFairyMovement)); objectApplySpeed_hook(gb); return; } // jp nz
-  CYC(b_+10, SYM(itemDrop_chooseRandomFairyMovement));
+  if (!(F & FZ)) { CYCT(b_+10, b_+13); objectApplySpeed_hook(gb); return; } // jp nz
+  CYC(b_+10, b_+13);
   itemDrop_chooseRandomFairyMovement_hook(gb); return; // fallthrough
 }
 
@@ -676,7 +676,7 @@ void itemDrop_moveTowardPoint_hook(GB *gb) {
   CYC(b_+22, b_+24); E = 0xc9; // Part.angle
   CALL_C(b_+24, objectApplyGivenSpeed_hook, SYM(objectApplyGivenSpeed), b_+27);
   CYC(b_+27, b_+28); alu_xor(gb, A);
-  CYC(b_+28, SYM(itemDrop_applySpeed)); ret_effect(gb); return;
+  CYC(b_+28, b_+29); ret_effect(gb); return;
 }
 
 void itemDrop_applySpeed_hook(GB *gb) {
@@ -691,5 +691,5 @@ void itemDrop_applySpeed_hook(GB *gb) {
   CYC(b_+7, b_+9); E = 0xc9; // Part.angle
   CALL_C(b_+9, objectApplyGivenSpeed_hook, SYM(objectApplyGivenSpeed), b_+12);
   CYC(b_+12, b_+13); alu_scf(gb);
-  CYC(b_+13, SYM(itemDropConveyorTilesTable)); ret_effect(gb); return;
+  CYC(b_+13, b_+14); ret_effect(gb); return;
 }

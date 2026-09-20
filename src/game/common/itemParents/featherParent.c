@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(parentItemCode_feather), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(parentItemCode_feather), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t feather_parent_jump_table(GB *gb) {
   burn_rom(gb,0,0,1,false);alu_add(gb,A);burn_rom(gb,0,1,2,false);SET_HL(pop_effect(gb));burn_rom(gb,0,2,3,false);alu_add(gb,L);burn_rom(gb,0,3,4,false);L=A;
@@ -40,5 +40,5 @@ clear:
   CYC(b_+95,b_+98);clearParentItem_hook(gb);
   return;
 state1:
-  CYC(b_+98,SYM(parentItemCode_magnetGloves));clearParentItem_hook(gb);
+  CYC(b_+98,b_+101);clearParentItem_hook(gb);
 }

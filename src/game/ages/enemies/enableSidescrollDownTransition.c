@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode2b), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode2b), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ==================================================================================================
 // ENEMY_ENABLE_SIDESCROLL_DOWN_TRANSITION

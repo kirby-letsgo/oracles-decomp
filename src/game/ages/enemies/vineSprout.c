@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode62), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode62), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void enemyCode62_hook(GB *gb);
 void vineSprout_state0_hook(GB *gb);
@@ -112,7 +112,7 @@ nextEnemyCheck:
   CYC(b_+28, b_+30); mem_wr(gb, HL, 0x1e); // SPEED_c0
   CALL_C(b_+30, vineSprout_getPosition_hook, SYM(vineSprout_getPosition), b_+33);
   CALL_C(b_+33, objectSetShortPosition_hook, SYM(objectSetShortPosition), b_+36);
-  CYC(b_+36, SYM(vineSprout_state1)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+36, b_+39); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 // 0e:7bc2, bare global; jump-table target from enemyCode62.
@@ -225,7 +225,7 @@ void vineSprout_linkJumpingDownCliff_hook(GB *gb) {
   CYC(b_+9, b_+10); A = mem_rd(gb, HL);
   CYC(b_+10, b_+12); alu_add(gb, 0x03);
   if (!(F & FC)) { RET_TAKEN(b_+12); return; } // ret nc
-  CYC(b_+12, SYM(vineSprout_destroy));
+  CYC(b_+12, b_+13);
   vineSprout_destroy_hook(gb); return; // fallthrough
 }
 
@@ -242,7 +242,7 @@ void vineSprout_destroy_hook(GB *gb) {
   CYC(b_+10, b_+13); SET_HL((wGroup1RoomFlags + 240)); // wVinePositions
   CYC(b_+13, b_+14); vineSprout_addAToHl_from_rst(gb, b_+14);
   CYC(b_+14, b_+15); mem_wr(gb, HL, B);
-  CYC(b_+15, SYM(vineSprout_state_grabbed)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+15, b_+18); enemyDelete_hook(gb); return; // jp
 }
 
 // 0e:7c7c, bare global; jump-table target from enemyCode62.
@@ -282,7 +282,7 @@ justReleased:
   CYC(b_+33, b_+34);
 
 hitGround:
-  CYC(b_+34, SYM(vineSprout_state_switchHook)); vineSprout_destroy_hook(gb); return; // jr
+  CYC(b_+34, b_+36); vineSprout_destroy_hook(gb); return; // jr
 }
 
 // 0e:7ca0, bare global; jump-table target from enemyCode62.
@@ -314,7 +314,7 @@ released:
   if (!(F & FZ)) { RET_TAKEN(b_+23); return; } // ret nz
   CYC(b_+23, b_+24);
   CALL_C(b_+24, objectCenterOnTile_hook, SYM(objectCenterOnTile), b_+27);
-  CYC(b_+27, SYM(vineSprout_state4)); vineSprout_updateTileAtPosition_hook(gb); return; // jp
+  CYC(b_+27, b_+30); vineSprout_updateTileAtPosition_hook(gb); return; // jp
 }
 
 // 0e:7cbe, bare global; jump-table target from enemyCode62. Being pushed.

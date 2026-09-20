@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode4c), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode4c), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t bank09_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -307,7 +307,7 @@ L_60d3:
   if (!(F & FC)) { CYCT(b_+95, b_+98); if (hook_enabled_at(SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+95, b_+98);
   CYC(b_+98, b_+99); alu_xor(gb, A);
   CALL_C(b_+99, objectUpdateSpeedZ_hook, SYM(objectUpdateSpeedZ), b_+102);
-  CYC(b_+102, SYM(bird_runSubid4)); if (hook_enabled_at(SYM(objectApplySpeed))) { objectApplySpeed_hook(gb); return; } HANDOFF(SYM(objectApplySpeed));
+  CYC(b_+102, b_+105); if (hook_enabled_at(SYM(objectApplySpeed))) { objectApplySpeed_hook(gb); return; } HANDOFF(SYM(objectApplySpeed));
 }
 
 void bird_runSubid4_hook(GB *gb) {
@@ -329,7 +329,7 @@ void bird_runSubid4_hook(GB *gb) {
   if ((F & FZ)) { CYCT(b_+29, b_+30); ret_effect(gb); return; } CYC(b_+29, b_+30);
   CYC(b_+30, b_+31); A = alu_inc8(gb, A);
   CYC(b_+31, b_+32); mem_wr(gb, DE, A);
-  CYC(b_+32, SYM(bird_updateGravityAndHopWhenHitGround)); ret_effect(gb); return;
+  CYC(b_+32, b_+33); ret_effect(gb); return;
 }
 
 void bird_updateGravityAndHopWhenHitGround_hook(GB *gb) {
@@ -339,7 +339,7 @@ void bird_updateGravityAndHopWhenHitGround_hook(GB *gb) {
   CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
   if (F & FZ) {
     CYC(b_+5, b_+6);
-    CYC(b_+6, SYM(bird_hop)); H = D;
+    CYC(b_+6, b_+7); H = D;
     bird_hop_hook(gb);
     return;
   }
@@ -350,5 +350,5 @@ void bird_hop_hook(GB *gb) {
   BASE(bird_hop);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_BC(0xff40);
-  CYC(b_+3, SYM(interactionCode4d)); if (hook_enabled_at(SYM(objectSetSpeedZ))) { objectSetSpeedZ_hook(gb); return; } HANDOFF(SYM(objectSetSpeedZ));
+  CYC(b_+3, b_+6); if (hook_enabled_at(SYM(objectSetSpeedZ))) { objectSetSpeedZ_hook(gb); return; } HANDOFF(SYM(objectSetSpeedZ));
 }

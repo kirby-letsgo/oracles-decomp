@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode53), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode53), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void dragonfly_state0_hook(GB *gb);
 void dragonfly_state1_hook(GB *gb);
@@ -81,7 +81,7 @@ void dragonfly_state0_hook(GB *gb) {
   CYC(b_+9, b_+10); mem_wr(gb, HL, A);
   CYC(b_+10, b_+12); L = ENEMY_BASE + OBJ_Z + 1; // Enemy.zh
   CYC(b_+12, b_+14); mem_wr(gb, HL, 0xf8); // -$08
-  CYC(b_+14, SYM(dragonfly_state1)); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+14, b_+17); objectSetVisiblec1_hook(gb); return; // jp
 }
 
 // 0e:66bf, bare global; jump-table target from enemyCode53. Choosing new direction to move in.
@@ -155,7 +155,7 @@ void dragonfly_state2_hook(GB *gb) {
 nextState:
   CALL_C(b_+10, ecom_incState_b0e_hook, SYM(ecom_incState_b0e), b_+13);
   CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(b_+15, SYM(dragonfly_animate)); mem_wr(gb, HL, 0x0c);
+  CYC(b_+15, b_+17); mem_wr(gb, HL, 0x0c);
   dragonfly_animate_hook(gb); return; // fallthrough
 }
 
@@ -163,7 +163,7 @@ nextState:
 // dragonfly_state3/dragonfly_state4/dragonfly_state5.
 void dragonfly_animate_hook(GB *gb) {
   BASE(dragonfly_animate);
-  CYC(b_+0, SYM(dragonfly_state3)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:6719, bare global; jump-table target from enemyCode53. Slowing down over 12 frames,
@@ -196,7 +196,7 @@ nextState:
   CYC(b_+32, b_+34); alu_add(gb, 0x18);
   CYC(b_+34, b_+36); E = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+36, b_+37); mem_wr(gb, DE, A);
-  CYC(b_+37, SYM(dragonfly_state4)); dragonfly_animate_hook(gb); return; // jr
+  CYC(b_+37, b_+39); dragonfly_animate_hook(gb); return; // jr
 }
 
 // 0e:6740, bare global; jump-table target from enemyCode53. Moving at SPEED_140 for between
@@ -220,7 +220,7 @@ nextState:
   CYC(b_+20, b_+22); E = ENEMY_BASE + OBJ_STATE;
   CYC(b_+22, b_+24); A = 0x05;
   CYC(b_+24, b_+25); mem_wr(gb, DE, A);
-  CYC(b_+25, SYM(dragonfly_state5)); dragonfly_animate_hook(gb); return; // jr
+  CYC(b_+25, b_+27); dragonfly_animate_hook(gb); return; // jr
 }
 
 // 0e:675b, bare global; jump-table target from enemyCode53. Holding still for [counter1]
@@ -233,7 +233,7 @@ void dragonfly_state5_hook(GB *gb) {
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+6); L = E;
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0x01); // [state]
-  CYC(b_+8, SYM(dragonfly_applySpeed)); dragonfly_animate_hook(gb); return; // jr
+  CYC(b_+8, b_+10); dragonfly_animate_hook(gb); return; // jr
 }
 
 // 0e:6765, bare global; called from dragonfly_state2/dragonfly_state3/dragonfly_state4.

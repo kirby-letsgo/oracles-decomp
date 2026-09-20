@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(label_11_212), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(label_11_212), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void func_11_5e8a_hook(GB *gb);
 
@@ -34,7 +34,7 @@ next:
     CYC(b_+25, b_+27); alu_cp(gb, 0xe0);
     if (F & FC) { CYCT(b_+27, b_+29); continue; }
     CYC(b_+27, b_+29);
-    CYC(b_+29, SYM(updateParts));
+    CYC(b_+29, b_+30);
     ret_effect(gb);
     return;
   }
@@ -72,7 +72,7 @@ void updateParts_hook(GB *gb) {
     CYC(b_+45, b_+47); alu_cp(gb, 0xe0);
     if (F & FC) { CYCT(b_+47, b_+49); continue; }
     CYC(b_+47, b_+49);
-    CYC(b_+49, SYM(func_11_5e8a));
+    CYC(b_+49, b_+50);
     ret_effect(gb);
     return;
   }
@@ -89,6 +89,6 @@ void func_11_5e8a_hook(GB *gb) {
   CYC(b_+15, b_+16); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+16, b_+18); H = mem_rd(gb, HL); L = A;
   CYC(b_+18, b_+20); A = C; alu_or(gb, A);
-  CYC(b_+20, SYM(partCodeTable));
+  CYC(b_+20, b_+21);
   hook_continue(gb, HL, sp0_);
 }

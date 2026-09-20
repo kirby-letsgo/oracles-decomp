@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(pickaxeWorker_setRandomDelay), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(pickaxeWorker_setRandomDelay), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/scripts/ages/scriptHelper.s (INTERAC_PICKAXE_WORKER), bank 0x15.
 

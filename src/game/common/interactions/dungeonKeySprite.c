@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode17), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode17), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define keyDoorGraphicTable_bank08 SYM(keyDoorGraphicTable)
 
@@ -78,5 +78,5 @@ state2:
   }
   CYC(b_+60, b_+61);
   CYC(b_+61, b_+63); mem_wr(gb, HL, 0x0f);
-  CYC(b_+63, SYM(keyDoorGraphicTable)); interactionDelete_hook(gb);
+  CYC(b_+63, b_+66); interactionDelete_hook(gb);
 }

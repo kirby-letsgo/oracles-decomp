@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(fairyHidingMinigame_subid00), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(fairyHidingMinigame_subid00), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t fairyHidingMinigame_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -85,7 +85,7 @@ state2:
   CYC(b_+85, b_+86);
   CYC(b_+86, b_+88); A = 0x13; // CUTSCENE_FAIRIES_HIDE
   CYC(b_+88, b_+91); W8(wCutsceneTrigger) = A;
-  CYC(b_+91, SYM(fairyHidingMinigame_subid01)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+91, b_+94); interactionDelete_hook(gb); return; // jp
 }
 
 // fairyHidingMinigame_spawn3FairiesAndDelete: spawns the 3 fairies; they should delete
@@ -107,7 +107,7 @@ spawnFairy:
   CYC(b_+12, b_+13); mem_wr(gb, HL, B); // [var03] = 0,1,2
   if (!(F & FZ)) { CYCT(b_+13, b_+15); goto spawnFairy; } // jr nz
   CYC(b_+13, b_+15);
-  CYC(b_+15, SYM(fairyHidingMinigame_checkBeginCutscene)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+15, b_+18); interactionDelete_hook(gb); return; // jp
 }
 
 // fairyHidingMinigame_checkBeginCutscene: sets cflag if Link is vulnerable (ready to begin
@@ -265,7 +265,7 @@ state0:
   CYC(b_+24, b_+27);
   CALL_C(b_+27, interactionIncState_hook, SYM(interactionIncState), b_+30);
   CYC(b_+30, b_+33); SET_HL((SYM(miscPuzzles_subid19__state4) + 23)); // mainScripts.fairyHidingMinigame_subid02Script
-  CYC(b_+33, SYM(fairyHidingMinigame_spawn3FairiesAndDelete)); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+33, b_+36); interactionSetScript_hook(gb); return; // jp
 }
 
 // INTERAC_FAIRY_HIDING_MINIGAME

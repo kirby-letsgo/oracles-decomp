@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode8c), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode8c), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCode8c_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -45,7 +45,7 @@ void interactionCode8c_hook(GB *gb) {
   CYC(b_+20, b_+22); mem_wr(gb, HL, 0x1e); // 30
   CYC(b_+22, b_+24); A = 0x08;
   CALL_C(b_+24, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+27);
-  CYC(b_+27, b_+30); SET_BC((SYM(loadUniqueGfxHeaderEntry) + 13));
+  CYC(b_+27, b_+30); SET_BC(0x3850);
   CALL_C(b_+30, interactionSetPosition_hook, SYM(interactionSetPosition), b_+33);
   CYC(b_+33, b_+35); L = INTERACTION_BASE + OBJ_ZH;
   CYC(b_+35, b_+37); mem_wr(gb, HL, 0xc0); // -0x40
@@ -135,5 +135,5 @@ state3_stillDisappearing:
   CYC(b_+148, b_+150); alu_and(gb, 0x01);
   if (F & FZ) { CYCT(b_+150, b_+153); objectSetInvisible_hook(gb); return; } // jp z
   CYC(b_+150, b_+153);
-  CYC(b_+153, SYM(interactionCode8d)); objectSetPriorityRelativeToLink_hook(gb); return; // jp
+  CYC(b_+153, b_+156); objectSetPriorityRelativeToLink_hook(gb); return; // jp
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode00), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode00), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t punch_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -62,7 +62,7 @@ static void punch_body(GB *gb, uint16_t sp0_) {
         CYCT(b_+51, b_+54); itemDelete_hook(gb); return;
       }
       CYC(b_+51, b_+54);
-      CYC(b_+54, SYM(itemCode27)); ret_effect(gb); return;
+      CYC(b_+54, b_+55); ret_effect(gb); return;
     }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);

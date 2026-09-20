@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(patch_jump), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(patch_jump), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void patch_setStairTile_hook(GB *gb);
 
@@ -20,14 +20,14 @@ void patch_jump_hook(GB *gb) {
   CYC(b_+13, b_+16); mem_wr(gb, wMenuDisabled, A);
   CYC(b_+16, b_+19); mem_wr(gb, wOamEnd, A);
   CYC(b_+19, b_+21); A = 0x8f;
-  CYC(b_+21, SYM(patch_updateTextSubstitution)); playSound_b00_hook(gb);
+  CYC(b_+21, b_+24); playSound_b00_hook(gb);
 }
 
 void patch_updateTextSubstitution_hook(GB *gb) {
   BASE(patch_updateTextSubstitution);
   CYC(b_+0, b_+3); A = mem_rd(gb, wTmpcfc0_patchMinigame_itemNameText);
   CYC(b_+3, b_+6); mem_wr(gb, wTextSubstitutions, A);
-  CYC(b_+6, SYM(patch_restoreControlAndStairs)); ret_effect(gb);
+  CYC(b_+6, b_+7); ret_effect(gb);
 }
 
 void patch_restoreControlAndStairs_hook(GB *gb) {
@@ -35,7 +35,7 @@ void patch_restoreControlAndStairs_hook(GB *gb) {
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+4); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+4, b_+7); mem_wr(gb, wMenuDisabled, A);
-  CYC(b_+7, SYM(patch_setStairTile)); A = 0x44;
+  CYC(b_+7, b_+9); A = 0x44;
   patch_setStairTile_hook(gb);
 }
 
@@ -52,7 +52,7 @@ void patch_setStairTile_hook(GB *gb) {
   CYC(b_+13, b_+15); mem_wr(gb, HL, 0x48);
   CYC(b_+15, b_+17); L = 0x4d;
   CYC(b_+17, b_+19); mem_wr(gb, HL, 0x98);
-  CYC(b_+19, SYM(patch_moveLinkPositionAtMinigameEnd)); ret_effect(gb);
+  CYC(b_+19, b_+20); ret_effect(gb);
 }
 
 void patch_moveLinkPositionAtMinigameEnd_hook(GB *gb) {
@@ -71,7 +71,7 @@ void patch_moveLinkPositionAtMinigameEnd_hook(GB *gb) {
   CYC(b_+21, b_+22); mem_wr(gb, HL, A);
   CYC(b_+22, b_+23); A = alu_inc8(gb, A);
   CYC(b_+23, b_+26); mem_wr(gb, wTmpcfc0_bigBangGame_prizeIndex, A);
-  CYC(b_+26, SYM(patch_turnToFaceLink)); resetCamera_hook(gb);
+  CYC(b_+26, b_+29); resetCamera_hook(gb);
 }
 
 void patch_turnToFaceLink_hook(GB *gb) {
@@ -84,5 +84,5 @@ void patch_turnToFaceLink_hook(GB *gb) {
   CYC(b_+9, b_+10); alu_rlca(gb);
   CYC(b_+10, b_+12); E = 0x48;
   CYC(b_+12, b_+13); mem_wr(gb, HL, A);
-  CYC(b_+13, SYM(patch_upstairsRepairTuniNutScript_b15)); interactionSetAnimation_hook(gb);
+  CYC(b_+13, b_+16); interactionSetAnimation_hook(gb);
 }

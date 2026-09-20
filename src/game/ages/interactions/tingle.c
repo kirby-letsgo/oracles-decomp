@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodec8), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodec8), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/object_code/ages/interactions/tingle.s (interactionCodec8 /
 // INTERAC_TINGLE), bank 0x0b.
@@ -60,7 +60,7 @@ void interactionCodec8_hook(GB *gb) {
   CALL_C(b_+28, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+31);
   CYC(b_+31, b_+33); A = 0x06;
   CALL_C(b_+33, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+36);
-  CYC(b_+36, b_+39); SET_BC((SYM(objectCheckCenteredWithLink) + 18)); // TREASURE_EMBER_SEEDS, 0
+  CYC(b_+36, b_+39); SET_BC(0x2000); // TREASURE_EMBER_SEEDS, 0
 
 checkNextSeed: // interactionCodec8@checkNextSeed
   CYC(b_+39, b_+40); A = B;
@@ -168,5 +168,5 @@ label_0b_330: // interactionCodec8@label_0b_330
   CYC(b_+193, b_+195); E = INTERACTION_BASE + OBJ_VAR3F;
   CYC(b_+195, b_+196); mem_wr(gb, DE, A);
   CYC(b_+196, b_+198); A = 0x01;
-  CYC(b_+198, SYM(interactionCodec9)); goto setAnimation; // jr
+  CYC(b_+198, b_+200); goto setAnimation; // jr
 }

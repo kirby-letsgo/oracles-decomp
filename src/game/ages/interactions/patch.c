@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode94), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode94), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t patch_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -174,7 +174,7 @@ state2:
   CYC(b_+158, b_+161); W8(wMenuDisabled) = A;
   CYC(b_+161, b_+162); A = alu_inc8(gb, A);
   CYC(b_+162, b_+165); W8(wTmpcfc0_patchMinigame_patchDownstairs) = A;
-  CYC(b_+165, SYM(patch_subid01)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+165, b_+168); interactionDelete_hook(gb); return; // jp
 }
 
 // Patch in his minigame room
@@ -413,7 +413,7 @@ state6:
   CYC(b_+342, b_+344); E = INTERACTION_BASE + OBJ_STATE;
   CYC(b_+344, b_+345); alu_xor(gb, A);
   CYC(b_+345, b_+346); mem_wr(gb, DE, A);
-  CYC(b_+346, SYM(patch_subid02)); goto faceLinkAndAnimate; // jr
+  CYC(b_+346, b_+348); goto faceLinkAndAnimate; // jr
 }
 
 // The minecart in Patch's minigame
@@ -727,7 +727,7 @@ void patch_subid05_hook(GB *gb) {
   CYC(b_+18, b_+20); mem_wr(gb, HL, 0x18);
   CYC(b_+20, b_+22); L = INTERACTION_BASE + OBJ_XH;
   CYC(b_+22, b_+24); mem_wr(gb, HL, 0x78);
-  CYC(b_+24, b_+27); SET_BC((SYM(loadUncompressedGfxHeader) + 44));
+  CYC(b_+24, b_+27); SET_BC(0x0606);
   CALL_C(b_+27, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+30);
   CYC(b_+30, b_+33); objectSetVisible83_hook(gb); return; // jp
 
@@ -760,7 +760,7 @@ state2:
   CYC(b_+75, b_+76); alu_or(gb, A);
   if (F & FZ) { RET_TAKEN(b_+76); return; } // ret z
   CYC(b_+76, b_+77);
-  CYC(b_+77, SYM(patch_subid06)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+77, b_+80); interactionDelete_hook(gb); return; // jp
 }
 
 void patch_subid04_hook(GB *gb) {
@@ -813,7 +813,7 @@ getPosition:
   CALL_C(b_+53, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+56);
   CYC(b_+56, b_+59); SET_BC(0xf2f8);
   CALL_C(b_+59, objectTakePositionWithOffset_hook, SYM(objectTakePositionWithOffset), b_+62);
-  CYC(b_+62, SYM(interactionCode95)); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+62, b_+65); objectSetVisible81_hook(gb); return; // jp
 }
 
 void patch_subid06_hook(GB *gb) {

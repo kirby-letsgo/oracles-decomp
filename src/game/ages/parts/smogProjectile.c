@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode4a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode4a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t smogProjectile_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -117,5 +117,5 @@ state2:
   CYC(b_+118, b_+119);
 
 delete:
-  CYC(b_+119, SYM(partCode4f)); partDelete_hook(gb); return; // jp
+  CYC(b_+119, b_+122); partDelete_hook(gb); return; // jp
 }

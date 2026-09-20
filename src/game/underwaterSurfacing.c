@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(checkLinkCanSurface_isUnderwater), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(checkLinkCanSurface_isUnderwater), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static void underwater_add_double_index_to_hl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -151,5 +151,5 @@ no_room_entry:
 
 done:
   CYC(b_+119, b_+121); C = alu_rl(gb, C);
-  CYC(b_+121, SYM(underWaterSurfaceTable)); ret_effect(gb);
+  CYC(b_+121, b_+122); ret_effect(gb);
 }

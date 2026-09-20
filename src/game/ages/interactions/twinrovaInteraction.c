@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode93), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode93), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/object_code/ages/interactions/twinrova.s (INTERAC_TWINROVA), bank 0x0a.
 // This is a DIFFERENT, unrelated source file from object_code/common/enemies/twinrova.s
@@ -141,7 +141,7 @@ void twinrova_initSubid06_hook(GB *gb) {
   CYC(b_+3, b_+5); mem_wr(gb, HL, 0x00);
   CALL_C(b_+5, twinrova_loadScript_hook, SYM(twinrova_loadScript), b_+8);
   CYC(b_+8, b_+11); SET_BC((SYM(interactionCode7a__updateLinkPositionWhileRollerMoving) + 30));
-  CYC(b_+11, SYM(twinrova_initSubid02)); twinrova_genericInitialize_hook(gb); return; // jr
+  CYC(b_+11, b_+13); twinrova_genericInitialize_hook(gb); return; // jr
 }
 
 void twinrova_initSubid02_hook(GB *gb) {
@@ -153,15 +153,15 @@ void twinrova_initSubid02_hook(GB *gb) {
   CYC(b_+5, b_+7); L = INTERACTION_BASE + OBJ_VAR38;
   CYC(b_+7, b_+9); mem_wr(gb, HL, 0x02);
   CALL_C(b_+9, objectSetInvisible_hook, SYM(objectSetInvisible), b_+12);
-  CYC(b_+12, b_+15); SET_BC((SYM(loadUniqueGfxHeaderEntry) + 13));
-  CYC(b_+15, SYM(twinrova_initSubid04)); twinrova_genericInitialize_hook(gb); return; // jr
+  CYC(b_+12, b_+15); SET_BC(0x3850);
+  CYC(b_+15, b_+17); twinrova_genericInitialize_hook(gb); return; // jr
 }
 
 void twinrova_initSubid04_hook(GB *gb) {
   BASE(twinrova_initSubid04);
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR38;
-  CYC(b_+3, SYM(twinrova_initSubid00)); mem_wr(gb, HL, 0x1e);
+  CYC(b_+3, b_+5); mem_wr(gb, HL, 0x1e);
   twinrova_initSubid00_hook(gb); return; // falls through
 }
 
@@ -170,7 +170,7 @@ void twinrova_initSubid00_hook(GB *gb) {
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR3A;
   CYC(b_+3, b_+5); mem_wr(gb, HL, 0x00);
-  CYC(b_+5, SYM(twinrova_genericInitialize)); SET_BC(0xf888);
+  CYC(b_+5, b_+8); SET_BC(0xf888);
   twinrova_genericInitialize_hook(gb); return; // falls through
 }
 
@@ -208,14 +208,14 @@ afterSpawn:
   CALL_C(b_+44, playSound_b00_hook, SYM(playSound_b00), b_+47);
   CYC(b_+47, b_+50); SET_HL((SYM(interactionCode92) + 8)); // scriptHelp.objectWritePositionTocfd5
   CYC(b_+50, b_+52); E = 0x15; // bank of scriptHelp
-  CYC(b_+52, SYM(twinrova_loadAngleAndCounterPreset)); interBankCall_hook(gb); return; // jp
+  CYC(b_+52, b_+55); interBankCall_hook(gb); return; // jp
 }
 
 void twinrova_loadAngleAndCounterPreset_hook(GB *gb) {
   BASE(twinrova_loadAngleAndCounterPreset);
   CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_VAR3A;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, SYM(loadAngleAndCounterPreset)); B = A;
+  CYC(b_+3, b_+4); B = A;
   loadAngleAndCounterPreset_hook(gb); return; // falls through
 }
 
@@ -262,7 +262,7 @@ void twinrova_updateDirectionFromAngle_hook(GB *gb) {
   if (F & FZ) { RET_TAKEN(b_+10); return; } // ret z
   CYC(b_+10, b_+11);
   CYC(b_+11, b_+12); mem_wr(gb, HL, A);
-  CYC(b_+12, SYM(twinrova_initOtherHalf)); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+12, b_+15); interactionSetAnimation_hook(gb); return; // jp
 }
 
 // Initialize odd subids (the half of twinrova that just follows along)
@@ -316,7 +316,7 @@ setDirection:
   if (F & FZ) { RET_TAKEN(b_+41); return; } // ret z
   CYC(b_+41, b_+42);
   CYC(b_+42, b_+43); mem_wr(gb, HL, A);
-  CYC(b_+43, SYM(presetInteractionAnglesAndCounters)); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+43, b_+46); interactionSetAnimation_hook(gb); return; // jp
 }
 
 // presetInteractionAnglesAndCounters (0a:771d): pure ROM data, not ported as code -- 6

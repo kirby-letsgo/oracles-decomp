@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode4c), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode4c), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t twinrovaFlame_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -134,5 +134,5 @@ L_5a77:
   if (!(F & FZ)) { CYCT(b_+144, b_+146); goto L_5a68; } // jr nz
   CYC(b_+144, b_+146);
   CALL_C(b_+146, objectCreatePuff_hook, SYM(objectCreatePuff), b_+149);
-  CYC(b_+149, SYM(partCode4e)); partDelete_hook(gb); return; // jp
+  CYC(b_+149, b_+152); partDelete_hook(gb); return; // jp
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodecf), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodecf), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t cf_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -66,7 +66,7 @@ void interactionCodecf_hook(GB *gb) {
       return;
     }
     else if (jt_ == b_+38) {
-      CYC(b_+38, SYM(interactionCoded0)); interactionAnimate_hook(gb);
+      CYC(b_+38, b_+41); interactionAnimate_hook(gb);
       return;
     }
     else { hook_continue(gb, HL, sp0_); return; }

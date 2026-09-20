@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode00), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode00), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/common/enemies/none.s (ENEMY_00), bank $10.
 

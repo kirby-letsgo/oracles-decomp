@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode1a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode1a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t enemyCode1a_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -114,7 +114,7 @@ state_stub:
 state8:
   CYC(b_+99, b_+101); A = 0x09;
   CYC(b_+101, b_+102); mem_wr(gb, DE, A); // [state] = 9
-  CYC(b_+102, b_+105); SET_BC((SYM(addToGashaMaturity) + 15));
+  CYC(b_+102, b_+105); SET_BC(0x1830);
   CALL_C(b_+105, ecom_randomBitwiseAndBCE_b0d_hook, SYM(ecom_randomBitwiseAndBCE_b0d), b_+108);
   CYC(b_+108, b_+110); E = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+110, b_+112); A = 0x30;
@@ -148,5 +148,5 @@ state9SetState8:
   CYC(b_+145, b_+146); mem_wr(gb, DE, A);
 
 animate:
-  CYC(b_+146, SYM(enemyCode1b)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+146, b_+149); enemyAnimate_hook(gb); return; // jp
 }

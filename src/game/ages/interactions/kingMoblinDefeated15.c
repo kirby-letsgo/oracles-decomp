@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(kingMoblinDefeated_setGoronDirection), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(kingMoblinDefeated_setGoronDirection), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static void kingMoblinDefeated_add_double_index(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -37,5 +37,5 @@ void kingMoblinDefeated_spawnInteraction8a_hook(GB *gb) {
   CYC(b_+4, b_+6); mem_wr(gb, HL, 0x8a);
   CYC(b_+6, b_+8); L = 0x43;
   CYC(b_+8, b_+10); mem_wr(gb, HL, 0x06);
-  CYC(b_+10, SYM(ghiniHarassingMoosh_beginCircularMovement)); ret_effect(gb);
+  CYC(b_+10, b_+11); ret_effect(gb);
 }

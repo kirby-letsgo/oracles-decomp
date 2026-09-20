@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(func_6261), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(func_6261), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t donkeyKongFlame_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -49,7 +49,7 @@ void func_6261_hook(GB *gb) {
   CYC(b_+8, b_+9); A = mem_rd(gb, DE);
   CYC(b_+9, b_+11); alu_xor(gb, 0x01);
   CYC(b_+11, b_+12); mem_wr(gb, DE, A);
-  CYC(b_+12, SYM(func_6270)); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+12, b_+15); partSetAnimation_hook(gb); return; // jp
 }
 
 void func_6256_hook(GB *gb) {
@@ -59,7 +59,7 @@ void func_6256_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+3, b_+5); func_6261_hook(gb); return; } // jr nz
   CYC(b_+3, b_+5);
   CALL_C(b_+5, objectApplySpeed_hook, SYM(objectApplySpeed), b_+8);
-  CYC(b_+8, SYM(func_6261)); partAnimate_hook(gb); return; // jp
+  CYC(b_+8, b_+11); partAnimate_hook(gb); return; // jp
 }
 
 void func_6248_hook(GB *gb) {
@@ -71,7 +71,7 @@ void func_6248_hook(GB *gb) {
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+8); SET_HL(pop_effect(gb));
   CALL_C(b_+8, objectCreatePuff_hook, SYM(objectCreatePuff), b_+11);
-  CYC(b_+11, SYM(func_6256)); partDelete_hook(gb); return; // jp
+  CYC(b_+11, b_+14); partDelete_hook(gb); return; // jp
 }
 
 void func_6270_hook(GB *gb) {
@@ -94,7 +94,7 @@ L_6280:
   if (!(F & FZ)) { RET_TAKEN(b_+19); return; } // ret nz
   CYC(b_+19, b_+20);
   CYC(b_+20, b_+22); mem_wr(gb, HL, 0x10);
-  CYC(b_+22, b_+25); SET_BC((SYM(_getObjectPositionOnScreen_duringScreenTransition) + 63));
+  CYC(b_+22, b_+25); SET_BC(0x1000);
   CALL_C(b_+25, objectGetRelativeTile_hook, SYM(objectGetRelativeTile), b_+28);
   CYC(b_+28, b_+30); alu_sub(gb, 0x19);
   CYC(b_+30, b_+31); alu_or(gb, A);
@@ -221,7 +221,7 @@ substate0:
   RET(b_+139); return; // ret
 
 substate1:
-  CYC(b_+140, b_+143); SET_BC((SYM(_getObjectPositionOnScreen_duringScreenTransition) + 63));
+  CYC(b_+140, b_+143); SET_BC(0x1000);
   CALL_C(b_+143, objectGetRelativeTile_hook, SYM(objectGetRelativeTile), b_+146);
   CYC(b_+146, b_+148); alu_cp(gb, 0x19);
   if (F & FZ) { CYCT(b_+148, b_+151); func_6248_hook(gb); return; } // jp z
@@ -274,5 +274,5 @@ state4:
   if (F & FZ) { RET_TAKEN(b_+217); return; } // ret z
   CYC(b_+217, b_+218);
   CYC(b_+218, b_+219); mem_wr(gb, HL, A);
-  CYC(b_+219, SYM(table_6238)); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+219, b_+222); partSetAnimation_hook(gb); return; // jp
 }

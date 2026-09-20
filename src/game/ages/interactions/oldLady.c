@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode3d), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode3d), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // oldLadyScriptTable: .dw mainScripts.oldLadySubid{0,1,2,3}Script (bank $0c pointers).
 #define oldLadyScriptTable_bank08 SYM(oldLadyScriptTable)
@@ -217,7 +217,7 @@ runSubid4:
     CYCT(b_+284, b_+287); interactionDelete_hook(gb); return;
   }
   CYC(b_+284, b_+287);
-  CYC(b_+287, SYM(oldLadyScriptTable)); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+287, b_+290); npcFaceLinkAndAnimate_hook(gb);
 }
 
 // interactionCode3d@initSubid: per-subid initialization. Reached only by a static `call`

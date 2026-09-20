@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode05), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode05), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void partCode05_hook(GB *gb);
 void switch_updateTile_hook(GB *gb);
@@ -72,5 +72,5 @@ flipOverworldSwitch:
   CYC(b_+71, b_+72); mem_wr(gb, BC, A);
   CALL_C(b_+72, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+75);
   CYC(b_+75, b_+77); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));
-  CYC(b_+77, SYM(partCode06)); partDelete_hook(gb); return; // jp
+  CYC(b_+77, b_+80); partDelete_hook(gb); return; // jp
 }

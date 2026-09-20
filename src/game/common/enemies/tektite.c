@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode30), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode30), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t tektite_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -182,5 +182,5 @@ gotoState8:
   CYC(b_+204, b_+206); mem_wr(gb, HL, 0x08);
   CYC(b_+206, b_+207); alu_xor(gb, A);
   CALL_C(b_+207, enemySetAnimation_hook, SYM(enemySetAnimation), b_+210);
-  CYC(b_+210, SYM(enemyCode31)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+210, b_+213); objectSetVisiblec2_hook(gb); return; // jp
 }

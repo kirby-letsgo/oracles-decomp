@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode60), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode60), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void label_266_hook(GB *gb);
 void label_267_hook(GB *gb);
@@ -62,8 +62,8 @@ void label_266_hook(GB *gb) {
   CYC(b_+22, b_+23); alu_sub(gb, B);
   CYC(b_+23, b_+25); alu_add(gb, 0x08);
   CYC(b_+25, b_+27); alu_cp(gb, 0x11);
-  if (F & FC) { CYCT(b_+27, SYM(label_267)); enemyDelete_hook(gb); return; } // jp c
-  CYC(b_+27, SYM(label_267));
+  if (F & FC) { CYCT(b_+27, b_+30); enemyDelete_hook(gb); return; } // jp c
+  CYC(b_+27, b_+30);
 
 checkOtherAxis:
   label_267_hook(gb); return; // fallthrough
@@ -82,7 +82,7 @@ void label_267_hook(GB *gb) {
 
 skipNudge:
   CALL_C(b_+13, objectApplySpeed_hook, SYM(objectApplySpeed), b_+16);
-  CYC(b_+16, SYM(ganonRevivalCutscene_controller)); ecom_flickerVisibility_b0e_hook(gb); return; // jp
+  CYC(b_+16, b_+19); ecom_flickerVisibility_b0e_hook(gb); return; // jp
 }
 
 // 0e:6a9d, bare global; called from enemyCode60.
@@ -108,7 +108,7 @@ void ganonRevivalCutscene_controller_hook(GB *gb) {
   CALL_C(b_+22, fadeoutToBlackWithDelay_hook, SYM(fadeoutToBlackWithDelay), b_+27);
   CYC(b_+27, b_+28); alu_xor(gb, A);
   CYC(b_+28, b_+31); mem_wr(gb, wDirtyFadeSprPalettes, A);
-  CYC(b_+31, SYM(label_270)); mem_wr(gb, wFadeSprPaletteSources, A);
+  CYC(b_+31, b_+34); mem_wr(gb, wFadeSprPaletteSources, A);
   label_270_hook(gb); return; // fallthrough
 }
 
@@ -143,7 +143,7 @@ delete:
   CYC(b_+30, b_+32); A = 0x06; // Object.counter1
   CALL_C(b_+32, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+35);
   CYC(b_+35, b_+36); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+36, SYM(ganonRevivalCutscene_spawnShadow)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+36, b_+39); enemyDelete_hook(gb); return; // jp
 }
 
 // 0e:6ae6, bare global; called from label_270.

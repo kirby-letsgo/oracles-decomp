@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(slateSlot_7b21), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(slateSlot_7b21), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static void slateSlot_add_double_index(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -28,7 +28,7 @@ void slateSlot_7b21_hook(GB *gb) {
 store:
   CYC(b_+9, b_+10); A = B;
   CYC(b_+10, b_+13); mem_wr(gb, wTmpcfc0_bigBangGame_filler1, A);
-  CYC(b_+13, SYM(slateSlot_placeSlate)); ret_effect(gb);
+  CYC(b_+13, b_+14); ret_effect(gb);
 }
 
 void slateSlot_placeSlate_hook(GB *gb) {

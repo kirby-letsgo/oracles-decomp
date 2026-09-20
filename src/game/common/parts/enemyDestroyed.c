@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode02), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode02), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void partCode02_hook(GB *gb);
 void enemyDestroyed_initialize_hook(GB *gb);
@@ -78,5 +78,5 @@ static void enemyDestroyed_decCounter2_hook(GB *gb) {
   CYC(b_+64, b_+65); alu_rrca(gb);
   if (!(F & FC)) { RET_TAKEN(b_+65); return; } // ret nc
   CYC(b_+65, b_+66);
-  CYC(b_+66, SYM(partCode03)); decNumEnemies_hook(gb); return; // jp
+  CYC(b_+66, b_+69); decNumEnemies_hook(gb); return; // jp
 }

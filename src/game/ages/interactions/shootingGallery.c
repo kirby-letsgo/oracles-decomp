@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode30), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode30), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // Positions of the 10 target tiles for each gallery (10 bytes each).
 #define shootingGallery_targetPositions_lynna_bank08 SYM(shootingGallery_targetPositions_lynna)
@@ -107,7 +107,7 @@ static void shootingGalleryNpc_setScript(GB *gb) {
   CYC(b_+86, b_+87); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+87, b_+88); H = mem_rd(gb, HL);
   CYC(b_+88, b_+89); L = A;
-  CYC(b_+89, SYM(shootingGalleryGame)); interactionSetScript_hook(gb);
+  CYC(b_+89, b_+92); interactionSetScript_hook(gb);
 }
 
 // shootingGalleryNpc@loadRetryScriptAndGotoState1: reached only by a conditional `call`
@@ -385,7 +385,7 @@ gameOver:
   CYC(b_+250, b_+253); mem_wr(gb, wTmpcfc0_shootingGallery_gameStatus, A);
   CYC(b_+253, b_+254); alu_xor(gb, A);
   CYC(b_+254, b_+257); mem_wr(gb, wTmpcfc0_shootingGallery_disableGoronNpcs, A);
-  CYC(b_+257, SYM(shootingGallery_initializeGameRounds)); interactionDelete_hook(gb);
+  CYC(b_+257, b_+260); interactionDelete_hook(gb);
 }
 
 // Fill wShootingGalleryTileLayoutsToShow with 0..B-1 and set remainingRounds = B.
@@ -403,7 +403,7 @@ fill:
   }
   CYC(b_+7, b_+9);
   CYC(b_+9, b_+12); mem_wr(gb, wTmpcfc0_shootingGallery_remainingRounds, A);
-  CYC(b_+12, SYM(shootingGallery_getNextTargetLayout)); ret_effect(gb);
+  CYC(b_+12, b_+13); ret_effect(gb);
 }
 
 // Randomly pick the next layout from the remaining-rounds buffer, then shift the buffer
@@ -449,7 +449,7 @@ shift:
   CYC(b_+38, b_+40); goto shift;
 shiftDone:
   CYC(b_+40, b_+41); SET_DE(pop_effect(gb));
-  CYC(b_+41, SYM(shootingGallery_removeAllTargets_b08)); ret_effect(gb);
+  CYC(b_+41, b_+42); ret_effect(gb);
 }
 
 // Replace all of this gallery's target tiles with standard floor. Called from bank $15
@@ -478,7 +478,7 @@ subid1:
   return;
 subid2:
   CYC(b_+24, b_+27); SET_BC(shootingGallery_targetPositions_biggoron_bank08);
-  CYC(b_+27, SYM(shootingGallery_setRandomTargetLayout)); shootingGallery_setTiles_hook(gb);
+  CYC(b_+27, b_+29); shootingGallery_setTiles_hook(gb);
 }
 
 // Choose one of the 10 target layouts (never the same one twice) and load its tiles.
@@ -523,7 +523,7 @@ goronGallery:
 biggoronGallery:
   CYC(b_+43, b_+46); SET_HL(shootingGallery_targetTiles_biggoron_bank08);
   CYC(b_+46, b_+47); shootingGallery_addDoubleIndex(gb, b_+47);
-  CYC(b_+47, SYM(shootingGallery_setTiles)); SET_BC(shootingGallery_targetPositions_biggoron_bank08);
+  CYC(b_+47, b_+50); SET_BC(shootingGallery_targetPositions_biggoron_bank08);
   shootingGallery_setTiles_hook(gb);
 }
 
@@ -558,7 +558,7 @@ haveTile:
     CYCT(b_+26, b_+28); goto nextTile;
   }
   CYC(b_+26, b_+28);
-  CYC(b_+28, SYM(shootingGallery_targetPositions_lynna)); ret_effect(gb);
+  CYC(b_+28, b_+29); ret_effect(gb);
 }
 
 // Spawn an INTERAC_PUFF at each of this gallery's 10 target positions.
@@ -605,7 +605,7 @@ nextTile:
     CYCT(b_+44, b_+46); goto nextTile;
   }
   CYC(b_+44, b_+46);
-  CYC(b_+46, SYM(shootingGallery_createBallHere)); ret_effect(gb);
+  CYC(b_+46, b_+47); ret_effect(gb);
 }
 
 // Spawn a PART_BALL at this object's position.
@@ -618,7 +618,7 @@ void shootingGallery_createBallHere_hook(GB *gb) {
   }
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+6); mem_wr(gb, HL, PART_BALL);
-  CYC(b_+6, SYM(shootingGallery_addValueToScore)); objectCopyPosition_hook(gb);
+  CYC(b_+6, b_+9); objectCopyPosition_hook(gb);
 }
 
 // Add (or, when bit 0 of the score entry is set, subtract) the score for hit index A.

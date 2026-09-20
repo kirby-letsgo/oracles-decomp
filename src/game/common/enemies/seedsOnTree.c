@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode5a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode5a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void enemyCode5a_addSeed_hook(GB *gb);
 
@@ -45,7 +45,7 @@ void enemyCode5a_hook(GB *gb) {
   CYC(b_+18, b_+19); H = D;
   CYC(b_+19, b_+21); L = ENEMY_BASE + OBJ_YH;
   CALL_C(b_+21, setShortPosition_paramC_hook, SYM(setShortPosition_paramC), b_+24);
-  CYC(b_+24, b_+27); SET_BC((SYM(loadTilesetHlpr) + 10));
+  CYC(b_+24, b_+27); SET_BC(0x0808);
   CALL_C(b_+27, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+30);
   CYC(b_+30, b_+32); E = ENEMY_BASE + OBJ_SUBID;
   CYC(b_+32, b_+33); A = mem_rd(gb, DE);
@@ -76,7 +76,7 @@ state1:
   CYC(b_+113, b_+115); alu_and(gb, 0x0f);
   CYC(b_+115, b_+118); SET_HL(wSeedTreeRefilledBitset);
   CALL_C(b_+118, unsetFlag_hook, SYM(unsetFlag), b_+121);
-  CYC(b_+121, SYM(enemyCode5d)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+121, b_+124); enemyDelete_hook(gb); return; // jp
 }
 
 // 0e:68d1, bare local (no exported symbol); called twice via genuine call/ret from

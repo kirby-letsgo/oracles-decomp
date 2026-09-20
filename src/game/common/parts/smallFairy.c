@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(func_56b6), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(func_56b6), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t smallFairy_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -60,7 +60,7 @@ L_56c4:
   if (F & FZ) { RET_TAKEN(b_+18); return; } // ret z
   CYC(b_+18, b_+19);
   CYC(b_+19, b_+20); mem_wr(gb, HL, A);
-  CYC(b_+20, SYM(func_56cd)); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+20, b_+23); partSetAnimation_hook(gb); return; // jp
 }
 
 void func_56cd_hook(GB *gb) {
@@ -218,5 +218,5 @@ L_56ac:
 L_56ae:
   CYC(b_+161, b_+163); A = 0x29;
   CALL_C(b_+163, giveTreasure_hook, SYM(giveTreasure), b_+166);
-  CYC(b_+166, SYM(func_56b6)); partDelete_hook(gb); return; // jp
+  CYC(b_+166, b_+169); partDelete_hook(gb); return; // jp
 }

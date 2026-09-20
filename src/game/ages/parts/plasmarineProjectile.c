@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode43), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode43), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // PART_PLASMARINE_PROJECTILE
 void partCode43_hook(GB *gb) {
@@ -119,5 +119,5 @@ L_74b4:
   CALL_C(b_+138, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+141);
   CYC(b_+141, b_+143); E = 0xc9; // Part.angle
   CYC(b_+143, b_+144); mem_wr(gb, DE, A);
-  CYC(b_+144, SYM(partCode44)); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+144, b_+147); objectSetVisible82_hook(gb); return; // jp
 }

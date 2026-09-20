@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode33), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode33), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t rotatableSeedThing_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -272,7 +272,7 @@ void func_65d5_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); A = 0x0b;
   CALL_C(b_+2, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+5);
-  CYC(b_+5, b_+8); SET_BC((SYM(data_0bfd) + 3));
+  CYC(b_+5, b_+8); SET_BC(0x0c00);
   CALL_C(b_+8, objectTakePositionWithOffset_hook, SYM(objectTakePositionWithOffset), b_+11);
   CYC(b_+11, b_+12); H = D;
   CYC(b_+12, b_+14); L = 0xc4; // Part.state

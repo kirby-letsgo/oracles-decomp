@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(introObject_applySpeed), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(introObject_applySpeed), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t titlescreen_clouds_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -63,7 +63,7 @@ void introObject_applySpeed_hook(GB *gb) {
   CYC(b_+29, b_+30); A = mem_rd(gb, DE);
   CYC(b_+30, b_+31); alu_adc(gb, mem_rd(gb, HL));
   CYC(b_+31, b_+32); mem_wr(gb, DE, A);
-  CYC(b_+32, SYM(interactionCoded3)); ret_effect(gb);
+  CYC(b_+32, b_+33); ret_effect(gb);
 }
 
 void interactionCoded2__afterCall4c5b_hook(GB *gb) {
@@ -101,8 +101,8 @@ void interactionCoded2__substate1_hook(GB *gb) {
   BASE(interactionCoded2);
   CYC(b_+78, b_+81); A = mem_rd(gb, wGfxRegs1_SCY);
   CYC(b_+81, b_+83); alu_cp(gb, 0x88);
-  if (F & FZ) { CYCT(b_+83, SYM(introObject_applySpeed)); ret_effect(gb); return; }
-  CYC(b_+83, SYM(introObject_applySpeed));
+  if (F & FZ) { CYCT(b_+83, b_+84); ret_effect(gb); return; }
+  CYC(b_+83, b_+84);
   introObject_applySpeed_hook(gb);
 }
 

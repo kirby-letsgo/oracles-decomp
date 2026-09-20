@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodebc), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodebc), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/object_code/ages/interactions/twinrova3.s (interactionCodebc /
 // INTERAC_TWINROVA_3), bank 0x0b. Distinct from src/game/twinrova.c (bank 0x10) and

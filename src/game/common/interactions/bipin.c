@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode28), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode28), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // Script pointers into bank $0c, indexed by subid.
 #define bipinScriptTable_bank08 SYM(interactionCode28__scriptTable)

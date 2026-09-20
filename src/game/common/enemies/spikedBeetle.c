@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode14), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode14), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t enemyCode14_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -245,7 +245,7 @@ stateC:
   RET(b_+298); return; // ret
 
 setRandomAngleAndCounter1:
-  CYC(b_+299, b_+302); SET_BC((SYM(addToGashaMaturity) + 15));
+  CYC(b_+299, b_+302); SET_BC(0x1830);
   CALL_C(b_+302, ecom_randomBitwiseAndBCE_b0d_hook, SYM(ecom_randomBitwiseAndBCE_b0d), b_+305);
   CYC(b_+305, b_+307); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+307, b_+308); A = B;

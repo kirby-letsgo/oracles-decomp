@@ -11,12 +11,16 @@ int hook_mode = HOOK_MODE_REPLACE;
 uint64_t hook_verify_failures;
 bool hook_verify_abort = true;
 
-static Hook hooks[] = {
 #define HOOK(bank, addr, name, flags) {bank, addr, #name, name, 0, flags},
+static Hook hooks_ages[] = {
 #include "hooks/table.h"
-#undef HOOK
 };
-#define NHOOKS (sizeof hooks / sizeof hooks[0])
+static Hook hooks_seasons[] = {
+#include "hooks/table_seasons.h"
+};
+#undef HOOK
+static Hook *hooks = hooks_ages;
+static size_t NHOOKS = sizeof hooks_ages / sizeof hooks_ages[0];
 static int16_t first_at[65536];
 static int depth;
 static jmp_buf hook_jmp[128];
@@ -52,8 +56,13 @@ static Hook *lookup(const GB *gb, uint16_t pc) {
   if (!gb->hooks_checked) {
     GB *g = (GB *)gb;
     g->hooks_checked = true;
-    g->hooks_ok = gb->rom_size > 0x150 && memcmp(gb->rom + 0x134, "ZELDA NAYRU", 11) == 0;
-    syms_select(gb->rom_size > 0x150 && memcmp(gb->rom + 0x134, "ZELDA DIN", 9) == 0);
+    bool ages = gb->rom_size > 0x150 && memcmp(gb->rom + 0x134, "ZELDA NAYRU", 11) == 0;
+    bool seasons = gb->rom_size > 0x150 && memcmp(gb->rom + 0x134, "ZELDA DIN", 9) == 0;
+    g->hooks_ok = ages || seasons;
+    syms_select(seasons);
+    hooks = seasons ? hooks_seasons : hooks_ages;
+    NHOOKS = seasons ? sizeof hooks_seasons / sizeof hooks_seasons[0] : sizeof hooks_ages / sizeof hooks_ages[0];
+    hooks_init();
   }
   if (!gb->hooks_ok) return NULL;
   int i = first_at[pc];

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(carpenter_buildBridgeColumn), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(carpenter_buildBridgeColumn), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void carpenter_buildBridgeColumn_hook(GB *gb) {
   BASE(carpenter_buildBridgeColumn);
@@ -20,5 +20,5 @@ void carpenter_buildBridgeColumn_hook(GB *gb) {
   CYC(b_+15, b_+18); SET_HL(wTmpcfc0_carpenterSearch_cfd0);
   CYC(b_+18, b_+19); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+19, b_+21); A = 0x70;
-  CYC(b_+21, SYM(carpenter_subid00Script_body)); playSound_b00_hook(gb);
+  CYC(b_+21, b_+24); playSound_b00_hook(gb);
 }

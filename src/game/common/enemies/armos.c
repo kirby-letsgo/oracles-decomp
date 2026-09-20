@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode1d), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode1d), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void armos_uninitialized_hook(GB *gb);
 void armos_state1_hook(GB *gb);
@@ -183,7 +183,7 @@ scanTiles:
   CYC(b_+16, b_+18);
   CALL_C(b_+18, armos_clearKilledArmosBuffer_hook, SYM(armos_clearKilledArmosBuffer), b_+21);
   CALL_C(b_+21, decNumEnemies_hook, SYM(decNumEnemies), b_+24);
-  CYC(b_+24, SYM(armos_state_switchHook)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+24, b_+27); enemyDelete_hook(gb); return; // jp
 }
 
 // 0d:5936, bare global; jump-table target from enemyCode1d.
@@ -203,7 +203,7 @@ void armos_state_switchHook_hook(GB *gb) {
 
 substate3:
   CYC(b_+12, b_+14); B = 0x0b;
-  CYC(b_+14, SYM(armos_state_stub)); ecom_fallToGroundAndSetState_b0d_hook(gb); return; // jp
+  CYC(b_+14, b_+17); ecom_fallToGroundAndSetState_b0d_hook(gb); return; // jp
 }
 
 // 0d:5947, bare global; jump-table target from enemyCode1d.
@@ -257,7 +257,7 @@ void armos_state9_hook(GB *gb) {
   CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_YH;
   CYC(b_+9, b_+10); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+10, b_+11); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+11, SYM(armos_subid00_stateA)); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+11, b_+14); objectSetVisible82_hook(gb); return; // jp
 }
 
 // 0d:596d, bare global; jump-table target from armos_subid00. Flickering until it starts
@@ -268,7 +268,7 @@ void armos_subid00_stateA_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+3);
   if (!(F & FZ)) { CYCT(b_+3, b_+6); ecom_flickerVisibility_b0d_hook(gb); return; } // jp nz
   CYC(b_+3, b_+6);
-  CYC(b_+6, SYM(armos_beginMoving)); A = 0x1e; // ENEMYCOLLISION_ACTIVE_RED_ARMOS
+  CYC(b_+6, b_+8); A = 0x1e; // ENEMYCOLLISION_ACTIVE_RED_ARMOS
   armos_beginMoving_hook(gb); return; // fallthrough
 }
 
@@ -288,7 +288,7 @@ void armos_beginMoving_hook(GB *gb) {
   CYC(b_+10, b_+11); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi
   CYC(b_+11, b_+12); mem_wr(gb, HL, A);
   CALL_C(b_+12, armos_replaceTileUnderSelf_hook, SYM(armos_replaceTileUnderSelf), b_+15);
-  CYC(b_+15, SYM(armos_subid00_stateB)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+15, b_+18); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 // 0d:5987, bare global; jump-table target from armos_subid00. Choose a direction to move;
@@ -319,7 +319,7 @@ void armos_subid00_stateC_hook(GB *gb) {
   CYC(b_+12, b_+13); mem_wr(gb, DE, A);
 
 stillMoving:
-  CYC(b_+13, SYM(armos_subid01)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+13, b_+16); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0d:59a1, bare global; jump-table target from armos_subid00_hook... actually from
@@ -351,7 +351,7 @@ void armos_subid01_state8_hook(GB *gb) {
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+5); H = D;
   CYC(b_+5, b_+7); L = ENEMY_BASE + OBJ_YH;
-  CYC(b_+7, b_+9); A = hram_rd(gb, 0xb0); // hEnemyTargetY
+  CYC(b_+7, b_+9); A = mem_rd(gb, hEnemyTargetY); // hEnemyTargetY
   CYC(b_+9, b_+10); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+10, b_+12); alu_add(gb, 0x18);
   CYC(b_+12, b_+14); alu_cp(gb, 0x31);
@@ -359,7 +359,7 @@ void armos_subid01_state8_hook(GB *gb) {
   CYC(b_+14, b_+15);
   CYC(b_+15, b_+16); B = mem_rd(gb, HL);
   CYC(b_+16, b_+18); L = ENEMY_BASE + OBJ_XH;
-  CYC(b_+18, b_+20); A = hram_rd(gb, 0xb1); // hEnemyTargetX
+  CYC(b_+18, b_+20); A = mem_rd(gb, hEnemyTargetX); // hEnemyTargetX
   CYC(b_+20, b_+21); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+21, b_+23); alu_add(gb, 0x18);
   CYC(b_+23, b_+25); alu_cp(gb, 0x31);
@@ -388,7 +388,7 @@ void armos_subid01_stateA_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+3, b_+6); ecom_flickerVisibility_b0d_hook(gb); return; } // jp nz
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+8); A = 0x54; // ENEMYCOLLISION_ACTIVE_BLUE_ARMOS
-  CYC(b_+8, SYM(armos_subid02_stateB)); armos_beginMoving_hook(gb); return; // jp
+  CYC(b_+8, b_+11); armos_beginMoving_hook(gb); return; // jp
 }
 
 // 0d:59e4, bare global; jump-table target from armos_subid01. Choose random new direction
@@ -398,7 +398,7 @@ void armos_subid02_stateB_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); A = 0x0c;
   CYC(b_+2, b_+3); mem_wr(gb, DE, A); // [state] = $0c
-  CYC(b_+3, b_+6); SET_BC((SYM(loadGfxRegisterStateIndex) + 25));
+  CYC(b_+3, b_+6); SET_BC(0x0303);
   CALL_C(b_+6, ecom_randomBitwiseAndBCE_b0d_hook, SYM(ecom_randomBitwiseAndBCE_b0d), b_+9);
   CYC(b_+9, b_+10); A = B;
   CYC(b_+10, b_+13); SET_HL(b_+26); // @counter1Vals
@@ -492,7 +492,7 @@ findFreeSlot:
   if (!(F & FZ)) { CYCT(b_+17, b_+19); goto findFreeSlot; } // jr nz
   CYC(b_+17, b_+19);
   CYC(b_+19, b_+20); mem_wr(gb, HL, B);
-  CYC(b_+20, SYM(armos_clearKilledArmosBuffer)); enemyDie_hook(gb); return; // jp
+  CYC(b_+20, b_+23); enemyDie_hook(gb); return; // jp
 }
 
 // 0d:5a54, bare global; called from armos_state1.
@@ -523,5 +523,5 @@ void armos_replaceTileUnderSelf_hook(GB *gb) {
   CYC(b_+3, b_+4); C = L;
   CYC(b_+4, b_+6); E = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+6, b_+7); A = mem_rd(gb, DE);
-  CYC(b_+7, SYM(enemyCode1e)); setTile_hook(gb); return; // jp
+  CYC(b_+7, b_+10); setTile_hook(gb); return; // jp
 }

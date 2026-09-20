@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode07), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode07), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void partCode07_hook(GB *gb);
 void shadow_initialize_hook(GB *gb);
@@ -80,5 +80,5 @@ void shadow_initialize_hook(GB *gb) {
   CYC(b_+95, b_+97); E = 0xf0; // Part.var30
   CYC(b_+97, b_+98); A = mem_rd(gb, HL);
   CYC(b_+98, b_+99); mem_wr(gb, DE, A);
-  CYC(b_+99, SYM(partCode08)); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+99, b_+102); objectSetVisible83_hook(gb); return; // jp
 }

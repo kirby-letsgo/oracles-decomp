@@ -21,7 +21,8 @@ ADDR_CALLS = {'CYC', 'CYCT', 'burn_rom', 'CALL_C', 'CALL_C_CC', 'CALL_C_', 'CALL
               'RET_TAKEN', 'RETI', 'I', 'HANDOFF', 'HANDOFF_UP', 'hook_continue', 'asm_call', 'hook_handoff'}
 FIXED_BELOW = 0x0150  # rst/interrupt vectors and the header: identical in both games, never symbolized
 HEX = re.compile(r'0x([0-9a-f]{4})\b')
-FUNC_START = re.compile(r'^(?:static )?(?:void|uint16_t|uint8_t|bool|int|unsigned) \*?\w+\([^)]*\)\s*\{\s*$')
+FUNC_HEAD = re.compile(r'^(?:static )?(?:void|uint16_t|uint8_t|bool|int|unsigned) \*?\w+\([^)]*$')
+FUNC_START = re.compile(r'^(?:static )?(?:void|uint16_t|uint8_t|bool|int|unsigned) \*?\w+\([^)]*\)\s*\{')
 
 
 def label_id(name):
@@ -117,7 +118,9 @@ class Symbolizer:
             if v < FIXED_BELOW or (call == 'burn_rom' and arg == 1): continue
             if call.startswith('CYC'): bank = banks.get(call, default_bank)
             elif call == 'burn_rom' and explicit_bank is not None: bank = explicit_bank
-            else: bank = default_bank
+            else:
+                sm = re.match(r'CALL_(?:C|C_CC|ROM|ROM_CC)([0-9a-f]{2})$', call)
+                bank = banks.get('CYC' + sm.group(1), default_bank) if sm else default_bank
             addr_ctx = call in ADDR_CALLS or call.startswith('CYC') or re.search(r'[=!]= *$', code[:h.start()]) \
                 or (call == '' and re.search(r'\breturn +$', code[:h.start()]))
             r = None
@@ -131,13 +134,20 @@ class Symbolizer:
                         cands = [(b, a) for (b, a) in self.g.instances.get(bm.group(1), []) if a == v and b == int(bm.group(2), 16)]
                     if len(cands) == 1:
                         sid = self.sym_id(*cands[0]); r = (sid, 0, sid, 0)
-            if r is None: r = self.rom_ref(bank, v, nearby_only=not addr_ctx and v < 0x4000)
+            span_end = (call.startswith('CYC') and arg == 1) or (call == 'burn_rom' and arg == 3)
+            if r is None and span_end and v > 0x150:
+                r = self.rom_ref(bank, v - 1, nearby_only=False)
+                if r: r = (r[0], r[1] + 1, r[2], r[3] + 1)
+            if r is None:
+                r = self.rom_ref(bank, v, nearby_only=not addr_ctx and v < 0x4000)
+                if r and not addr_ctx and v < 0x4000 and r[3] != 0 and (call.startswith('SET_') or call.startswith('alu_') or call in ('mem_rd', 'mem_wr', 'W8', 'wr16', 'rd16')): r = None
             if r is None:
                 if addr_ctx: self.report.append(f'{path}:{lineno}: unresolved ROM 0x{v:04x} in {call or "expr"} (bank {bank:02x})')
                 elif 0x0150 <= v < 0x8000 and call not in ('', 'alu_and', 'alu_or', 'alu_xor'):
                     self.report.append(f'{path}:{lineno}: kept value 0x{v:04x} in {call or "expr"}')
                 continue
-            out.append((h.start(), h.end(), 'rom', (r, bool(addr_ctx), call)))
+            is_target = call in ('CALL_C', 'CALL_C_CC', 'CALL_C_') and arg == 2 or call in ('CALL_ROM', 'CALL_ROM_CC') and arg == 1 or call in ('asm_call', 'hook_continue', 'hook_handoff', 'HANDOFF', 'HANDOFF_UP')
+            out.append((h.start(), h.end(), 'rom', (r, bool(addr_ctx) and not is_target, call)))
         return out
 
     DEFINE = re.compile(r'#define (CYCT?[0-9a-f]*)\(\w+, ?\w+\) burn_rom\(gb, ?(?:0x([0-9a-f]{2})|\(\(\w\)<0x4000\?0:(\d+)\)),')
@@ -153,15 +163,30 @@ class Symbolizer:
             m = self.DEFINE.search(line)
             if m:
                 banks[m.group(1)] = int(m.group(2), 16) if m.group(2) else int(m.group(3))
-                default_bank = max(banks.values())
+                default_bank = banks['CYC']
                 define_lines.append((i, m.group(1)))
                 continue
+            if not line.lstrip().startswith('#'):
+                def hram(m):
+                    r = self.ram_ref(0xff00 | int(m.group(2), 16))
+                    return f'mem_{m.group(1)}(gb, {r}' if r else m.group(0)
+                lines[i] = line = re.sub(r'\bhram_(wr|rd)\(gb, 0x([0-9a-f]{2})', hram, line)
             if line.lstrip().startswith('#'):
                 dm = re.match(r'#define (\w+) (0x([0-9a-f]{4}))\b', line)
                 if dm:
                     v = int(dm.group(3), 16)
-                    bm = re.search(r'_bank([0-9a-f]{2})$', dm.group(1))
-                    r = self.rom_ref(int(bm.group(1), 16) if bm else default_bank, v, nearby_only=v < 0x4000) if 0x150 <= v < 0x8000 else None
+                    name = dm.group(1)
+                    bm = re.search(r'_bank([0-9a-f]{2})$', name)
+                    pm = re.match(r'(?:ROM_)?b([0-9a-f]{2})_(.*)$', name)
+                    r = None
+                    if 0x150 <= v < 0x8000 and name != 'MBC_ROM_BANK':
+                        for cand in (name, re.sub(r'^ROM_', '', name), re.sub(r'_bank[0-9a-f]{2}$', '', re.sub(r'^ROM_', '', name)), pm.group(2) if pm else None):
+                            hits = [(b, a) for (b, a) in self.g.instances.get(cand, []) if a == v] if cand else []
+                            if hits:
+                                sid = self.sym_id(*hits[0]); r = (sid, 0, sid, 0); break
+                        if r is None:
+                            bank = int(bm.group(1), 16) if bm else int(pm.group(1), 16) if pm else default_bank
+                            r = self.rom_ref(bank, v, nearby_only=v < 0x4000)
                     if r: classified[i] = [(dm.start(2), dm.end(2), 'rom', (r, True, 'define'))]
                     elif v >= 0x8000: classified[i] = [(dm.start(2), dm.end(2), 'ram', self.ram_ref(v))] if self.ram_ref(v) else None
                     elif 0x150 <= v: self.report.append(f'{path}:{i + 1}: kept define 0x{v:04x}')
@@ -170,10 +195,19 @@ class Symbolizer:
 
         # function extents: [start_line, end_line) with base label chosen by majority of anchored addresses
         funcs = []
-        start = None
+        start, depth, pending = None, 0, None
         for i, line in enumerate(lines):
-            if start is None and FUNC_START.match(line): start = i
-            elif start is not None and line == '}':
+            code = line.split('//')[0]
+            if start is None:
+                if pending is not None:
+                    if '{' in code: start, depth, pending = i, 0, None
+                    elif i - pending > 4: pending = None
+                    else: continue
+                elif FUNC_START.match(code): start, depth = i, 0
+                elif FUNC_HEAD.match(code): pending = i; continue
+                else: continue
+            depth += code.count('{') - code.count('}')
+            if depth <= 0:
                 funcs.append((start, i + 1)); start = None
         base_of_line = {}
         base_decl = {}
@@ -187,6 +221,13 @@ class Symbolizer:
             for i in range(s, e): base_of_line[i] = base
             base_decl[s] = base
 
+        singles = [b for b in base_decl.values() if not re.search(r'_b[0-9a-f]{2}$', b)]
+        fallback = singles[0] if singles else next(iter(base_decl.values()), None)
+        needs_bankof = set()
+        if define_lines and fallback:
+            for (s, e) in funcs:
+                if s in base_decl: continue
+                if re.search(r'(?<![0-9a-f])CYCT?\(', '\n'.join(lines[s + 1:e])): needs_bankof.add(s)
         first_after = {}       # define line index -> anchor id
         out = []
         changed = 0
@@ -209,10 +250,17 @@ class Symbolizer:
                 new.append(line[last:])
                 line = ''.join(new)
             out.append(line)
-            if i in base_decl:
-                out.append(f'  BASE({base_decl[i]});')
-        fallback = next(iter(base_decl.values()), None)
+            decl = f'BASE({base_decl[i]});' if i in base_decl else f'BANKOF({fallback});' if i in needs_bankof else None
+            if decl:
+                code_ = line.split('//')[0]
+                if code_[code_.index('{') + 1:].strip() == '': out.append(f'  {decl}')
+                else:
+                    j = out[-1].index('{') + 1
+                    out[-1] = out[-1][:j] + decl + out[-1][j:]
         for d, mac in define_lines:
+            if mac in ('CYC', 'CYCT'):
+                out[d] = re.sub(r'(burn_rom\(gb, ?)(0x[0-9a-f]{2}|\(\(\w\)<0x4000\?0:\d+\)),', r'\1bk_,', out[d])
+                continue
             anchor = first_after.get(d) or fallback
             if anchor is None:
                 self.report.append(f'{path}:{d + 1}: no anchor label for macro {mac}')
@@ -231,7 +279,7 @@ def main():
     ages = Game(args[0], args[1])
     s = Symbolizer(ages, args[1])
     SKIP = {'kernel.c', 'cyc.c', 'ram_code.c'}
-    files = args[2:] or [f for f in sorted(glob.glob('src/game/**/*.c', recursive=True))
+    files = args[2:] or ['src/game/game.h'] + [f for f in sorted(glob.glob('src/game/**/*.c', recursive=True))
                          if not os.path.basename(f).startswith('gen_') and os.path.basename(f) not in SKIP]
     total = sum(s.rewrite_file(f, apply) for f in files)
     for line in s.report: print(line)

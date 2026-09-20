@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(pirate_openEyeballCave), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(pirate_openEyeballCave), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void pirate_openEyeballCave_hook(GB *gb) {
   BASE(pirate_openEyeballCave);
@@ -20,6 +20,6 @@ void pirate_openEyeballCave_hook(GB *gb) {
   CALL_C(b_+16, setTile_hook, SYM(setTile), b_+19);
   CYC(b_+19, b_+21); A = 0x70;
   CALL_C(b_+21, playSound_b00_hook, SYM(playSound_b00), b_+24);
-  CYC(b_+24, b_+27); SET_BC((SYM(initializeVramMap1) + 19));
-  CYC(b_+27, SYM(tingle_createGlowAroundLink)); objectCreateInteraction_hook(gb);
+  CYC(b_+24, b_+27); SET_BC(0x0500);
+  CYC(b_+27, b_+30); objectCreateInteraction_hook(gb);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(ironMask_chooseRandomAngleAndCounter1), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(ironMask_chooseRandomAngleAndCounter1), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t enemyCode1c_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -117,7 +117,7 @@ void ironMask_state_uninitialized_hook(GB *gb) {
   CYC(b_+19, b_+21); L = ENEMY_BASE + OBJ_INVINCIBILITY_COUNTER;
   CYC(b_+21, b_+23); mem_wr(gb, HL, 0xe8);
   CYC(b_+23, b_+25); A = 0x04;
-  CYC(b_+25, SYM(ironMask_state_switchHook)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+25, b_+28); enemySetAnimation_hook(gb); return; // jp
 }
 
 void ironMask_state_switchHook_hook(GB *gb) {
@@ -241,7 +241,7 @@ stateA:
   CALL_C(b_+40, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+43);
   if (!(F & FZ)) { CYCT(b_+43, b_+46); ecom_flickerVisibility_b0d_hook(gb); return; } // jp nz
   CYC(b_+43, b_+46);
-  CYC(b_+46, SYM(ironMask_subid01)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+46, b_+49); enemyDelete_hook(gb); return; // jp
 }
 
 // Iron mask without mask on
@@ -251,7 +251,7 @@ void ironMask_subid01_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+3);
   if (F & FZ) CALL_C_CC(b_+3, ironMask_chooseRandomAngleAndCounter1_hook, SYM(ironMask_chooseRandomAngleAndCounter1), b_+6); else CYC(b_+3, b_+6); // call z
   CALL_C(b_+6, ecom_applyVelocityForSideviewEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0d), b_+9);
-  CYC(b_+9, SYM(ironMask_updateCollisionsFromLinkRelativeAngle)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+9, b_+12); enemyAnimate_hook(gb); return; // jp
 }
 
 // Modifies this object's enemyCollisionMode based on if Link is directly behind the iron mask

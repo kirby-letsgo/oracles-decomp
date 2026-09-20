@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(greatFairy_initialize), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(greatFairy_initialize), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void greatFairy_initialize_hook(GB *gb);
 void greatFairy_initialize__afterCall7966_hook(GB *gb);

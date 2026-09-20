@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode5f), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode5f), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t syrup_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -172,7 +172,7 @@ goto_state1:
   CYC(b_+201, b_+203); E = INTERACTION_BASE + OBJ_STATE;
   CYC(b_+203, b_+205); A = 1;
   CYC(b_+205, b_+206); mem_wr(gb, DE, A);
-  CYC(b_+206, SYM(interactionCode61)); ret_effect(gb);
+  CYC(b_+206, b_+207); ret_effect(gb);
 }
 
 void interactionCode5f_hook(GB *gb) {

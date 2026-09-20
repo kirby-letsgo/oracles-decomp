@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(parseStaticObjects), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(parseStaticObjects), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t static_object_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -114,7 +114,7 @@ copy_data:
   CYC(b_+107, b_+108); E = A;
   CYC(b_+108, b_+109); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+109, b_+110); mem_wr(gb, HL, D);
-  CYC(b_+110, SYM(loadStaticObjects_body)); goto end;
+  CYC(b_+110, b_+112); goto end;
 }
 
 static void add_double_index_to_hl(GB *gb) {

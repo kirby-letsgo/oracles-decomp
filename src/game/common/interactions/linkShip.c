@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCoded4), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCoded4), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t link_ship_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -95,7 +95,7 @@ void interactionCoded4__seagull_hook(GB *gb) {
   CYC(b_+94, b_+96); E = 0x4f;
   CYC(b_+96, b_+97); A = mem_rd(gb, HL);
   CYC(b_+97, b_+98); mem_wr(gb, DE, A);
-  CYC(b_+98, SYM(interactionCoded9)); ret_effect(gb);
+  CYC(b_+98, b_+99); ret_effect(gb);
 }
 
 void interactionCoded4__state1_hook(GB *gb) {

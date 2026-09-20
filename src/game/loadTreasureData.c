@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionLoadTreasureData), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionLoadTreasureData), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void interactionLoadTreasureData_hook(GB *gb) {
   BASE(interactionLoadTreasureData);
@@ -55,5 +55,5 @@ void interactionLoadTreasureData_hook(GB *gb) {
   CYC(b_+51, b_+52); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+52, b_+54); E = 0x42;
   CYC(b_+54, b_+55); mem_wr(gb, DE, A);
-  CYC(b_+55, SYM(data_4556)); ret_effect(gb);
+  CYC(b_+55, b_+56); ret_effect(gb);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode12), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode12), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void partCode12_hook(GB *gb);
 void flame_state0_hook(GB *gb);
@@ -81,5 +81,5 @@ void flame_state0_hook(GB *gb) {
   CYC(b_+88, b_+89); mem_wr(gb, DE, A);
   CYC(b_+89, b_+91); mem_wr(gb, HL, 0x01);
   CALL_C(b_+91, objectTakePosition_hook, SYM(objectTakePosition), b_+94);
-  CYC(b_+94, SYM(partCode13)); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+94, b_+97); objectSetVisible80_hook(gb); return; // jp
 }

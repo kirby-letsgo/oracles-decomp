@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode0f), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode0f), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // interactionCode0f@specialHoleRooms: lookupKey table (room, group pairs, $00 terminated).
 #define specialHoleRooms_bank08 SYM(interactionCode0f__specialHoleRooms)
@@ -187,5 +187,5 @@ void clearFallDownHoleEventBuffer_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(wTmpcfc0_fallDownHoleEvent_cfd8);
   CYC(b_+3, b_+5); B = 0x08;
   CYC(b_+5, b_+7); A = 0xff;
-  CYC(b_+7, SYM(interactionCode10)); fillMemory_hook(gb);
+  CYC(b_+7, b_+10); fillMemory_hook(gb);
 }

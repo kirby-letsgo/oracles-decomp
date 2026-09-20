@@ -2,8 +2,8 @@
 #include "game/gen.h"
 #undef CYC
 #undef CYCT
-#define CYC(a,b) burn_rom(gb,SYMBANK(interactionCode60),(a),(b),false)
-#define CYCT(a,b) burn_rom(gb,SYMBANK(interactionCode60),(a),(b),true)
+#define CYC(a,b) burn_rom(gb,bk_,(a),(b),false)
+#define CYCT(a,b) burn_rom(gb,bk_,(a),(b),true)
 
 void interactionCode60__giveTreasure_hook(GB *gb);
 void interactionCode60__checkLinkTouched_hook(GB *gb);

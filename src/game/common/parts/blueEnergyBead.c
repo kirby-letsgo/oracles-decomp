@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(func_5e1a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(func_5e1a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void func_5e1a_hook(GB *gb) {
   BASE(func_5e1a);
@@ -68,14 +68,14 @@ L_5dfb:
 swirl_end:
   CYC(b_+32, b_+33); SET_DE(pop_effect(gb));
   CYC(b_+33, b_+35); A = 0x5c; // SND_ENERGYTHING
-  CYC(b_+35, SYM(func_5e1a)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+35, b_+38); playSound_b00_hook(gb); return; // jp
 }
 
 void createEnergySwirlGoingOut_body_hook(GB *gb) {
   BASE(createEnergySwirlGoingOut_body);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); A = 0x01;
-  CYC(b_+2, SYM(createEnergySwirlGoingIn_body)); blueEnergyBead_swirlBody_hook(gb); return; // jr
+  CYC(b_+2, b_+4); blueEnergyBead_swirlBody_hook(gb); return; // jr
 }
 
 void createEnergySwirlGoingIn_body_hook(GB *gb) {

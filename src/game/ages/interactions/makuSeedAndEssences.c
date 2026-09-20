@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactiond7_essence), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactiond7_essence), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactiond7_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -44,7 +44,7 @@ static void interactiond7_addAToHl(GB *gb, uint16_t return_address) {
 static void interactiond7_essence_playCirclingSound(GB *gb) {
   BASE(interactiond7_essence);
   CYC(b_+94, b_+96); A = 0xc9; // SND_CIRCLING
-  CYC(b_+96, SYM(interactiond7_updateSmallSparkles)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+96, b_+99); playSound_b00_hook(gb); return; // jp
 }
 
 // 0b:7c0f, called from interactiond7_makuSeed@state2 and @state3.
@@ -441,7 +441,7 @@ state4Substate4:
   CYC(b_+459, b_+460);
   CYC(b_+460, b_+462); A = 0x11; // CUTSCENE_FLAME_OF_SORROW
   CYC(b_+462, b_+465); mem_wr(gb, wCutsceneTrigger, A);
-  CYC(b_+465, SYM(interactiond7_essence)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+465, b_+468); interactionDelete_hook(gb); return; // jp
 }
 
 // ==================================================================================================

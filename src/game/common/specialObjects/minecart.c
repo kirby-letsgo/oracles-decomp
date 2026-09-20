@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(specialObjectCode_minecart_b06), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(specialObjectCode_minecart_b06), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static void minecart_add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -193,7 +193,7 @@ minecart_stopped:
   CALL_C(b_+195, setCameraFocusedObjectToLink_hook, SYM(setCameraFocusedObjectToLink), b_+198);
   CYC(b_+198, b_+200); B = 0x16;
   CALL_C(b_+200, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+203);
-  CYC(b_+203, SYM(minecartCheckCollisions));
+  CYC(b_+203, b_+206);
   objectDelete_useActiveObjectType_hook(gb);
 }
 
@@ -221,7 +221,7 @@ static void minecart_check_door(GB *gb, uint16_t sp0_) {
   CYC(b_+204, b_+206); A = H8(hFF8B);
   CYC(b_+206, b_+207); mem_wr(gb, HL, A);
   CYC(b_+207, b_+208); alu_scf(gb);
-  CYC(b_+208, SYM(minecartCreateCollisionItem)); ret_effect(gb);
+  CYC(b_+208, b_+209); ret_effect(gb);
 }
 
 void minecartCheckCollisions_hook(GB *gb) {
@@ -392,5 +392,5 @@ void minecartCreateCollisionItem_hook(GB *gb) {
   CYC(b_+13, b_+14); mem_wr(gb, DE, A);
   CYC(b_+14, b_+15); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+15, b_+17); mem_wr(gb, HL, 0x1d);
-  CYC(b_+17, SYM(specialObjectCode_raft_b06)); ret_effect(gb);
+  CYC(b_+17, b_+18); ret_effect(gb);
 }

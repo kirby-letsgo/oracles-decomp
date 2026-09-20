@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(checkNoOtherParentItemsInUse), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(checkNoOtherParentItemsInUse), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void itemIndexToBit_hook(GB *gb);
 void andHlWithGameKeysPressed_hook(GB *gb);
@@ -56,7 +56,7 @@ next_item:
   }
   CYC(b_+14, b_+16);
   CYC(b_+16, b_+17); alu_xor(gb, A);
-  CYC(b_+17, SYM(parentItemLoadAnimationAndIncState)); ret_effect(gb);
+  CYC(b_+17, b_+18); ret_effect(gb);
 }
 
 void parentItemCode_magnetGloves_hook(GB *gb) {
@@ -79,7 +79,7 @@ item_loop:
     goto item_loop;
   }
   CYC(b_+11, b_+13);
-  CYC(b_+13, SYM(checkNoOtherParentItemsInUse)); ret_effect(gb);
+  CYC(b_+13, b_+14); ret_effect(gb);
 }
 
 void checkNoOtherParentItemsInUse_hook(GB *gb) {
@@ -177,12 +177,12 @@ not_underwater:
   CYC(b_+87, b_+89); alu_add(gb, 0x04);
 
 set_animation:
-  CYC(b_+89, SYM(itemCreateChildIfDoesntExistAlready)); specialObjectSetAnimationWithLinkData_hook(gb);
+  CYC(b_+89, b_+92); specialObjectSetAnimationWithLinkData_hook(gb);
 }
 
 void itemCreateChildIfDoesntExistAlready_hook(GB *gb) {
   BASE(itemCreateChildIfDoesntExistAlready);
-  CYC(b_+0, SYM(itemCreateChildAndDeleteOnFailure)); E = 0x01;
+  CYC(b_+0, b_+2); E = 0x01;
   itemCreateChildAndDeleteOnFailure_hook(gb);
 }
 
@@ -194,7 +194,7 @@ void itemCreateChildAndDeleteOnFailure_hook(GB *gb) {
     CYCT(b_+3, b_+4); ret_effect(gb); return;
   }
   CYC(b_+3, b_+4);
-  CYC(b_+4, SYM(itemCreateChild)); clearParentItem_hook(gb);
+  CYC(b_+4, b_+7); clearParentItem_hook(gb);
 }
 
 void itemCreateChild_hook(GB *gb) {
@@ -202,7 +202,7 @@ void itemCreateChild_hook(GB *gb) {
   CYC(b_+0, b_+2); C = 0x00;
   CYC(b_+2, b_+3); H = D;
   CYC(b_+3, b_+5); L = 0x01;
-  CYC(b_+5, SYM(itemCreateChildWithID)); B = mem_rd(gb, HL);
+  CYC(b_+5, b_+6); B = mem_rd(gb, HL);
   itemCreateChildWithID_hook(gb);
 }
 
@@ -256,7 +256,7 @@ void itemCreateChildWithID_hook(GB *gb) {
   CYC(b_+47, b_+48); A = H;
   CYC(b_+48, b_+49); mem_wr(gb, DE, A);
   CYC(b_+49, b_+50); alu_xor(gb, A);
-  CYC(b_+50, SYM(getFreeItemSlotWithObjectCap)); ret_effect(gb);
+  CYC(b_+50, b_+51); ret_effect(gb);
 }
 
 void getFreeItemSlotWithObjectCap_hook(GB *gb) {
@@ -300,7 +300,7 @@ next_item:
 
 failure:
   CYC(b_+25, b_+26); alu_scf(gb);
-  CYC(b_+26, SYM(getNumFreeItemSlots)); ret_effect(gb);
+  CYC(b_+26, b_+27); ret_effect(gb);
 }
 
 void getNumFreeItemSlots_hook(GB *gb) {
@@ -323,7 +323,7 @@ void getNumFreeItemSlots_hook(GB *gb) {
   } while (F & FC);
   CYC(b_+16, b_+17); A = B;
   CYC(b_+17, b_+18); alu_or(gb, A);
-  CYC(b_+18, SYM(setLinkUsingItem1)); ret_effect(gb);
+  CYC(b_+18, b_+19); ret_effect(gb);
 }
 
 void setLinkUsingItem1_hook(GB *gb) {
@@ -335,7 +335,7 @@ void setLinkUsingItem1_hook(GB *gb) {
   CYC(b_+6, b_+9); SET_HL(wLinkUsingItem1);
   CYC(b_+9, b_+10); alu_or(gb, mem_rd(gb, HL));
   CYC(b_+10, b_+11); mem_wr(gb, HL, A);
-  CYC(b_+11, SYM(clearLinkUsingItem1)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 void clearLinkUsingItem1_hook(GB *gb) {
@@ -348,7 +348,7 @@ void clearLinkUsingItem1_hook(GB *gb) {
   CYC(b_+7, b_+10); SET_HL(wLinkUsingItem1);
   CYC(b_+10, b_+11); alu_and(gb, mem_rd(gb, HL));
   CYC(b_+11, b_+12); mem_wr(gb, HL, A);
-  CYC(b_+12, SYM(itemDisableLinkMovement)); ret_effect(gb);
+  CYC(b_+12, b_+13); ret_effect(gb);
 }
 
 void itemDisableLinkMovement_hook(GB *gb) {
@@ -358,7 +358,7 @@ void itemDisableLinkMovement_hook(GB *gb) {
   CYC(b_+3, b_+6); SET_HL(wLinkImmobilized);
   CYC(b_+6, b_+7); alu_or(gb, mem_rd(gb, HL));
   CYC(b_+7, b_+8); mem_wr(gb, HL, A);
-  CYC(b_+8, SYM(itemEnableLinkMovement)); ret_effect(gb);
+  CYC(b_+8, b_+9); ret_effect(gb);
 }
 
 void itemEnableLinkMovement_hook(GB *gb) {
@@ -369,7 +369,7 @@ void itemEnableLinkMovement_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_cpl(gb);
   CYC(b_+7, b_+8); alu_and(gb, mem_rd(gb, HL));
   CYC(b_+8, b_+9); mem_wr(gb, HL, A);
-  CYC(b_+9, SYM(itemDisableLinkTurning)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 void itemDisableLinkTurning_hook(GB *gb) {
@@ -379,7 +379,7 @@ void itemDisableLinkTurning_hook(GB *gb) {
   CYC(b_+3, b_+6); SET_HL(wLinkTurningDisabled);
   CYC(b_+6, b_+7); alu_or(gb, mem_rd(gb, HL));
   CYC(b_+7, b_+8); mem_wr(gb, HL, A);
-  CYC(b_+8, SYM(itemEnableLinkTurning)); ret_effect(gb);
+  CYC(b_+8, b_+9); ret_effect(gb);
 }
 
 void itemEnableLinkTurning_hook(GB *gb) {
@@ -390,7 +390,7 @@ void itemEnableLinkTurning_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_cpl(gb);
   CYC(b_+7, b_+8); alu_and(gb, mem_rd(gb, HL));
   CYC(b_+8, b_+9); mem_wr(gb, HL, A);
-  CYC(b_+9, SYM(setCc95Bit)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 void setCc95Bit_hook(GB *gb) {
@@ -400,7 +400,7 @@ void setCc95Bit_hook(GB *gb) {
   CYC(b_+3, b_+6); SET_HL(wcc95);
   CYC(b_+6, b_+7); alu_or(gb, mem_rd(gb, HL));
   CYC(b_+7, b_+8); mem_wr(gb, HL, A);
-  CYC(b_+8, SYM(itemIndexToBit)); ret_effect(gb);
+  CYC(b_+8, b_+9); ret_effect(gb);
 }
 
 void itemIndexToBit_hook(GB *gb) {
@@ -412,14 +412,14 @@ void itemIndexToBit_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_add(gb, L);
   CYC(b_+7, b_+8); L = A;
   CYC(b_+8, b_+9); A = mem_rd(gb, HL);
-  CYC(b_+9, SYM(parentItemCheckButtonPressed)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 void parentItemCheckButtonPressed_hook(GB *gb) {
   BASE(parentItemCheckButtonPressed);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); H = D;
-  CYC(b_+1, SYM(andHlWithGameKeysPressed)); L = 0x03;
+  CYC(b_+1, b_+3); L = 0x03;
   andHlWithGameKeysPressed_hook(gb);
 }
 
@@ -428,7 +428,7 @@ void andHlWithGameKeysPressed_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = W8(wGameKeysPressed);
   CYC(b_+3, b_+4); alu_and(gb, mem_rd(gb, HL));
-  CYC(b_+4, SYM(clearParentItemIfCantUseSword)); ret_effect(gb);
+  CYC(b_+4, b_+5); ret_effect(gb);
 }
 
 void clearParentItemIfCantUseSword_hook(GB *gb) {
@@ -470,7 +470,7 @@ cant_use_sword:
   CYC(b_+30, b_+31); SET_AF(pop_effect(gb));
   CYC(b_+31, b_+32); alu_xor(gb, A);
   CYC(b_+32, b_+35); W8(wcc63) = A;
-  CYC(b_+35, SYM(checkLinkOnGround)); clearParentItem_hook(gb);
+  CYC(b_+35, b_+38); clearParentItem_hook(gb);
 }
 
 void checkLinkOnGround_hook(GB *gb) {
@@ -488,14 +488,14 @@ void checkLinkOnGround_hook(GB *gb) {
     CYCT(b_+11, b_+12); ret_effect(gb); return;
   }
   CYC(b_+11, b_+12);
-  CYC(b_+12, SYM(isLinkUnderwater)); isLinkUnderwater_hook(gb);
+  CYC(b_+12, b_+14); isLinkUnderwater_hook(gb);
 }
 
 void isLinkUnderwater_hook(GB *gb) {
   BASE(isLinkUnderwater);
   CYC(b_+0, b_+3); A = W8(w1Link_var2f);
   CYC(b_+3, b_+5); alu_bit(gb, 7, A);
-  CYC(b_+5, SYM(isLinkInHole)); ret_effect(gb);
+  CYC(b_+5, b_+6); ret_effect(gb);
 }
 
 void isLinkInHole_hook(GB *gb) {
@@ -503,7 +503,7 @@ void isLinkInHole_hook(GB *gb) {
   CYC(b_+0, b_+3); A = W8(wActiveTileType);
   CYC(b_+3, b_+4); A = alu_dec8(gb, A);
   CYC(b_+4, b_+6); alu_cp(gb, 0x02);
-  CYC(b_+6, SYM(updateGrabbedObjectPosition)); ret_effect(gb);
+  CYC(b_+6, b_+7); ret_effect(gb);
 }
 
 void updateGrabbedObjectPosition_hook(GB *gb) {

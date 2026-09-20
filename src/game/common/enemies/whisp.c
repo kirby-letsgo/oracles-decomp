@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode19), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode19), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void whisp_state_uninitialized_hook(GB *gb);
 void whisp_state8_hook(GB *gb);
@@ -99,7 +99,7 @@ void whisp_state_uninitialized_hook(GB *gb) {
   CYC(b_+9, b_+10); mem_wr(gb, DE, A);
   CYC(b_+10, b_+12); A = 0x1e; // SPEED_c0
   CALL_C(b_+12, ecom_setSpeedAndState8_b0d_hook, SYM(ecom_setSpeedAndState8_b0d), b_+15);
-  CYC(b_+15, SYM(whisp_state8)); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+15, b_+18); objectSetVisible82_hook(gb); return; // jp
 }
 
 // 0d:5142, bare global.
@@ -108,7 +108,7 @@ void whisp_state8_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, ecom_bounceOffWalls_b0d_hook, SYM(ecom_bounceOffWalls_b0d), b_+3);
   CALL_C(b_+3, objectApplySpeed_hook, SYM(objectApplySpeed), b_+6);
-  CYC(b_+6, SYM(spark_updateAngle)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+6, b_+9); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0d:514b, bare global; updates the spark's moving angle by checking for walls.
@@ -117,7 +117,7 @@ void spark_updateAngle_hook(GB *gb) {
   BASE(spark_updateAngle);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); A = 0x01;
-  CYC(b_+2, b_+4); hram_wr(gb, 0x8a, A);
+  CYC(b_+2, b_+4); mem_wr(gb, hFF8A, A);
   CYC(b_+4, b_+6); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+6, b_+7); A = mem_rd(gb, DE);
   CYC(b_+7, b_+9); alu_sub(gb, 0x08);

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode71), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode71), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void swoop_state_uninitialized_hook(GB *gb);
 void swoop_state_stub_hook(GB *gb);
@@ -100,7 +100,7 @@ void swoop_state_uninitialized_hook(GB *gb) {
   CALL_C(b_+7, ecom_setSpeedAndState8_b0f_hook, SYM(ecom_setSpeedAndState8_b0f), b_+10);
   CYC(b_+10, b_+12); B = 0x01;
   CYC(b_+12, b_+14); C = 0x08;
-  CYC(b_+14, SYM(swoop_state_stub));
+  CYC(b_+14, b_+17);
   enemyBoss_spawnShadow_b0f_hook(gb); return; // jp
 }
 
@@ -239,7 +239,7 @@ void swoop_state9_hook(GB *gb) {
   CYC(b_+49, b_+51); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+51, b_+52); mem_wr(gb, DE, A);
   CYC(b_+52, b_+54); A = 0x00;
-  CYC(b_+54, SYM(swoop_stateA));
+  CYC(b_+54, b_+57);
   enemySetAnimation_hook(gb); return; // jp
 }
 
@@ -287,7 +287,7 @@ updatePosition:
   CYC(b_+57, b_+58); mem_wr(gb, DE, A);
 
 applyVelocity:
-  CYC(b_+58, SYM(swoop_stateB));
+  CYC(b_+58, b_+61);
   ecom_applyVelocityForSideviewEnemy_b0f_hook(gb); return; // jp
 }
 
@@ -416,20 +416,20 @@ reachedStompTarget:
   CYC(b_+146, b_+148); mem_wr(gb, HL, 0x28); // SPEED_100
   CALL_C(b_+148, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+151);
   CYC(b_+151, b_+153); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(b_+153, SYM(swoop_setSpeedZForBounce)); mem_wr(gb, DE, A);
+  CYC(b_+153, b_+154); mem_wr(gb, DE, A);
   swoop_setSpeedZForBounce_hook(gb); return; // fallthrough
 }
 
 void swoop_setSpeedZForBounce_hook(GB *gb) {
   BASE(swoop_setSpeedZForBounce);
   CYC(b_+0, b_+3); SET_BC(0xff00);
-  CYC(b_+3, SYM(swoop_setVisible));
+  CYC(b_+3, b_+6);
   objectSetSpeedZ_hook(gb); return; // jp
 }
 
 void swoop_setVisible_hook(GB *gb) {
   BASE(swoop_setVisible);
-  CYC(b_+0, SYM(swoop_stomp_substate2));
+  CYC(b_+0, b_+3);
   objectSetVisible82_hook(gb); return; // jp
 }
 
@@ -459,14 +459,14 @@ flyBackUp:
   CYC(b_+25, b_+26); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+26, b_+28); mem_wr(gb, HL, 0x00); // [substate]
   CYC(b_+28, b_+30); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
-  CYC(b_+30, SYM(swoop_beginFlyingUp)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
+  CYC(b_+30, b_+32); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
   swoop_beginFlyingUp_hook(gb); return; // fallthrough
 }
 
 void swoop_beginFlyingUp_hook(GB *gb) {
   BASE(swoop_beginFlyingUp);
   CYC(b_+0, b_+2); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(b_+2, SYM(swoop_flyFurtherUp)); mem_wr(gb, HL, 0x03); // 3 flaps before he goes to next state
+  CYC(b_+2, b_+4); mem_wr(gb, HL, 0x03); // 3 flaps before he goes to next state
   swoop_flyFurtherUp_hook(gb); return; // fallthrough
 }
 
@@ -477,7 +477,7 @@ void swoop_flyFurtherUp_hook(GB *gb) {
   CYC(b_+2, b_+4); mem_wr(gb, HL, 0x30); // $30 frames per wing flap
   CALL_C(b_+4, objectSetVisible80_hook, SYM(objectSetVisible80), b_+7);
   CYC(b_+7, b_+9); A = 0x03;
-  CYC(b_+9, SYM(swoop_stomp_substate3));
+  CYC(b_+9, b_+12);
   enemySetAnimation_hook(gb); return; // jp
 }
 
@@ -496,7 +496,7 @@ void swoop_stomp_substate3_hook(GB *gb) {
   CYC(b_+15, b_+17);
   CYC(b_+17, b_+19); L = ENEMY_BASE + OBJ_SUBSTATE;
   CYC(b_+19, b_+20); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+20, SYM(swoop_getAngerLevel));
+  CYC(b_+20, b_+23);
   objectSetVisible82_hook(gb); return; // jp
 }
 
@@ -530,7 +530,7 @@ void swoop_hitGround_hook(GB *gb) {
   CALL_C(b_+7, playSound_b00_hook, SYM(playSound_b00), b_+10);
 
   // Replace tile at this position if it's of the appropriate type, and not solid.
-  CYC(b_+10, b_+13); SET_BC((SYM(initializeVramMap1) + 19));
+  CYC(b_+10, b_+13); SET_BC(0x0500);
   CALL_C(b_+13, objectGetRelativeTile_hook, SYM(objectGetRelativeTile), b_+16);
   CYC(b_+16, b_+17); C = L;
   CYC(b_+17, b_+19); H = 0xce; // >wRoomCollisions
@@ -551,7 +551,7 @@ void swoop_hitGround_hook(GB *gb) {
   CYC(b_+32, b_+34); A = 0x48;
   CALL_C(b_+34, setTile_hook, SYM(setTile), b_+37);
   CYC(b_+37, b_+39); B = 0x06; // INTERAC_ROCKDEBRIS
-  CYC(b_+39, SYM(swoop_animate));
+  CYC(b_+39, b_+42);
   objectCreateInteractionWithSubid00_hook(gb); return; // jp
 }
 
@@ -566,6 +566,6 @@ void swoop_animate_hook(GB *gb) {
   if (F & FZ) { RET_TAKEN(b_+7); return; } // ret z
   CYC(b_+7, b_+8);
   CYC(b_+8, b_+10); A = 0x53; // SND_JUMP
-  CYC(b_+10, SYM(swoop_speedVals));
+  CYC(b_+10, b_+13);
   playSound_b00_hook(gb); return; // jp
 }

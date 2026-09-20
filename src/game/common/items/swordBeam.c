@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode27), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode27), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t sword_beam_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -92,9 +92,9 @@ no_collision:
       CYC(b_+93, b_+96); itemDelete_hook(gb); return;
 
 collision:
-      CYC(b_+96, b_+99); SET_BC((SYM(_adjustHLSequential) + 11));
+      CYC(b_+96, b_+99); SET_BC(0x0781);
       CALL_C(b_+99, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+102);
-      CYC(b_+102, SYM(updateSwingableItemAnimation)); itemDelete_hook(gb); return;
+      CYC(b_+102, b_+105); itemDelete_hook(gb); return;
     }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);

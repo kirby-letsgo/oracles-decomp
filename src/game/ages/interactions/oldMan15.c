@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(oldMan_takeRupees), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(oldMan_takeRupees), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void oldMan_takeRupees_hook(GB *gb);
 void oldMan_giveRupees_hook(GB *gb);
@@ -45,7 +45,7 @@ void oldMan_takeRupees_hook(GB *gb) {
   CYC(b_+15, b_+18); SET_HL(SYM(oldMan_rupeeValues));
   CYC(b_+18, b_+19); oldMan_addAToHl_from_rst(gb, b_+19);
   CYC(b_+19, b_+20); A = mem_rd(gb, HL);
-  CYC(b_+20, SYM(oldMan_giveRupees)); removeRupeeValue_hook(gb);
+  CYC(b_+20, b_+23); removeRupeeValue_hook(gb);
 }
 
 void oldMan_giveRupees_hook(GB *gb) {
@@ -56,7 +56,7 @@ void oldMan_giveRupees_hook(GB *gb) {
   CYC(b_+6, b_+7); oldMan_addAToHl_from_rst(gb, b_+7);
   CYC(b_+7, b_+8); C = mem_rd(gb, HL);
   CYC(b_+8, b_+10); A = 0x28;
-  CYC(b_+10, SYM(oldMan_rupeeValues)); giveTreasure_hook(gb);
+  CYC(b_+10, b_+13); giveTreasure_hook(gb);
 }
 
 void oldManGiveShieldUpgradeToLink_hook(GB *gb) {
@@ -100,12 +100,12 @@ void oldManWarpLinkToLibrary_hook(GB *gb) {
 
 void oldManSetAnimationToVar38_hook(GB *gb) {
   BASE(oldManSetAnimationToVar38);
-  CYC(b_+0, SYM(label_15_097)); E = 0x78;
+  CYC(b_+0, b_+2); E = 0x78;
   label_15_097_hook(gb); return;
 }
 
 void label_15_097_hook(GB *gb) {
   BASE(label_15_097);
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);
-  CYC(b_+1, SYM(oldManScript_givesShieldUpgrade_b15)); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+1, b_+4); interactionSetAnimation_hook(gb); return; // jp
 }

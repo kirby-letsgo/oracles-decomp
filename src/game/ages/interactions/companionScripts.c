@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(companionScript_cpYToCompanion), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(companionScript_cpYToCompanion), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t companionScripts_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -89,7 +89,7 @@ static void companionScripts_restrictTail(GB *gb) {
   CYC(b_+26, b_+27); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+27, b_+28); B = mem_rd(gb, HL);
   CYC(b_+28, b_+29); C = A;
-  CYC(b_+29, SYM(companionScript_cpYToCompanion)); showText_hook(gb); return; // jp
+  CYC(b_+29, b_+32); showText_hook(gb); return; // jp
 }
 
 void companionScript_restrictHigherX_hook(GB *gb) {
@@ -132,12 +132,12 @@ void companionScript_restrictHigherY_hook(GB *gb) {
 
 void companionScript_deleteSelf_hook(GB *gb) {
   BASE(companionScript_deleteSelf);
-  CYC(b_+0, SYM(companionScript_subid08)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+0, b_+3); interactionDelete_hook(gb); return; // jp
 }
 
 void companionScript_delete_hook(GB *gb) {
   BASE(companionScript_delete);
-  CYC(b_+0, SYM(companionScript_subid0a_state2)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+0, b_+3); interactionDelete_hook(gb); return; // jp
 }
 
 // Delete self if game is completed; otherwise, stay in state 0 until Link mounts the companion.
@@ -191,7 +191,7 @@ void companionScript_subid00_state1_hook(GB *gb) {
   CYC(b_+10, b_+12);
   CYC(b_+12, b_+15); A = W8(w1Companion_xh);
   CYC(b_+15, b_+17); alu_xor(gb, 0x02);
-  CYC(b_+17, SYM(companionScript_runScript)); W8(w1Companion_xh) = A;
+  CYC(b_+17, b_+20); W8(w1Companion_xh) = A;
   companionScript_runScript_hook(gb); return;
 }
 
@@ -261,7 +261,7 @@ void companionScript_subid00_hook(GB *gb) {
   CYC(b_+37, b_+40); W8(wDisableScreenTransitions) = A;
   CYC(b_+40, b_+43); W8(wDiggingUpEnemiesForbidden) = A;
   CYC(b_+43, b_+46); SET_HL((SYM(fallingRock_subid01__state1) + 11)); // mainScripts.companionScript_subid00Script
-  CYC(b_+46, SYM(companionScript_subid01)); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+46, b_+49); interactionSetScript_hook(gb); return; // jp
 }
 
 // Ricky script when he loses his gloves
@@ -281,7 +281,7 @@ void companionScript_subid03_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+17, b_+19); companionScript_deleteSelf_hook(gb); return; } // jr nz
   CYC(b_+17, b_+19);
   CYC(b_+19, b_+22); SET_HL((SYM(fallingRock_subid02__angles) + 3)); // mainScripts.companionScript_subid03Script
-  CYC(b_+22, SYM(companionScript_subid07)); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+22, b_+25); interactionSetScript_hook(gb); return; // jp
 }
 
 // Dimitri script where he's harrassed by tokays
@@ -300,7 +300,7 @@ void companionScript_subid07_hook(GB *gb) {
   CYC(b_+15, b_+17); A = 0x01;
   CYC(b_+17, b_+18); mem_wr(gb, DE, A);
   CYC(b_+18, b_+21); SET_HL((SYM(fallingRock_subid02__angles) + 7)); // mainScripts.companionScript_subid07Script
-  CYC(b_+21, SYM(companionScript_subid06)); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+21, b_+24); interactionSetScript_hook(gb); return; // jp
 }
 
 // Dimitri script where he leaves Link after bringing him to the mainland
@@ -337,7 +337,7 @@ void companionScript_subid06_hook(GB *gb) {
   CYC(b_+38, b_+39); L = alu_inc8(gb, L);
   CYC(b_+39, b_+41); mem_wr(gb, HL, 0x0a);
   CYC(b_+41, b_+44); SET_HL((SYM(fallingRock_subid02__angles) + 11)); // mainScripts.companionScript_subid06Script
-  CYC(b_+44, SYM(companionScript_deleteSelf)); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+44, b_+47); interactionSetScript_hook(gb); return; // jp
 }
 
 // A fairy appears to tell you about the animal companion in the forest
@@ -398,7 +398,7 @@ state1:
   CYC(b_+88, b_+90); mem_wr(gb, HL, 0x0f);
   CYC(b_+90, b_+93); SET_HL((SYM(fallingRock_updateSpeedAndDeleteWhenLanded) + 7)); // mainScripts.companionScript_subid08Script
   CALL_C(b_+93, interactionSetScript_hook, SYM(interactionSetScript), b_+96);
-  CYC(b_+96, SYM(companionScript_subid09)); interactionIncState_hook(gb); return; // jp
+  CYC(b_+96, b_+99); interactionIncState_hook(gb); return; // jp
 }
 
 // Companion script where they're found in the fairy forest
@@ -502,7 +502,7 @@ l5ba9:
   CYC(b_+69, b_+70); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+70, b_+73); W8(wTextSubstitutions) = A;
   // Spawn in the fairies
-  CYC(b_+73, b_+76); SET_BC((SYM(setDeathRespawnPoint) + 3));
+  CYC(b_+73, b_+76); SET_BC(0x1103);
 
 nextFairy:
   CYC(b_+76, b_+77); push_effect(gb, BC);
@@ -584,7 +584,7 @@ l5c44:
   CYC(b_+91, b_+92); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+92, b_+94); mem_wr(gb, HL, 0x01); // [wcc50] = $01
   CALL_C(b_+94, objectSetVisible80_hook, SYM(objectSetVisible80), b_+97);
-  CYC(b_+97, SYM(companionScript_subid0a_state3)); interactionRunScript_hook(gb); return; // jp
+  CYC(b_+97, b_+100); interactionRunScript_hook(gb); return; // jp
 }
 
 void companionScript_subid0a_state3_hook(GB *gb) {
@@ -606,7 +606,7 @@ void companionScript_subid0a_state3_hook(GB *gb) {
   CYC(b_+21, b_+22); alu_xor(gb, A);
   CYC(b_+22, b_+25); W8(wDisabledObjects) = A;
   CYC(b_+25, b_+28); W8(wMenuDisabled) = A;
-  CYC(b_+28, SYM(interactionCode72)); companionScript_delete_hook(gb); return; // jp
+  CYC(b_+28, b_+31); companionScript_delete_hook(gb); return; // jp
 }
 
 // Script in first screen of forest, where fairy leads you to the companion
@@ -642,7 +642,7 @@ void companionScript_subid0b_hook(GB *gb) {
   CYC(b_+48, b_+51); W8(wTmpcfc0_fairyHideAndSeek_cfd2) = A;
   CYC(b_+51, b_+54); SET_HL((SYM(fallingRock_subid03__state0) + 3)); // mainScripts.companionScript_subid0bScript
   CALL_C(b_+54, interactionSetScript_hook, SYM(interactionSetScript), b_+57);
-  CYC(b_+57, SYM(companionScript_subid0c)); interactionIncState_hook(gb); return; // jp
+  CYC(b_+57, b_+60); interactionIncState_hook(gb); return; // jp
 }
 
 // Sets bit 6 of wDimitriState so he disappears from Tokay Island
@@ -654,7 +654,7 @@ void companionScript_subid0c_hook(GB *gb) {
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+9); alu_or(gb, 0x40);
   CYC(b_+9, b_+12); W8(wDimitriState) = A;
-  CYC(b_+12, SYM(companionScript_subid00_state1)); companionScript_delete_hook(gb); return; // jr
+  CYC(b_+12, b_+14); companionScript_delete_hook(gb); return; // jr
 }
 
 // Companion barrier to Symmetry City, until the tuni nut is restored

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode5a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode5a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // PART_TRIFORCE_STONE: stone blocking path to Nayru at the start of the game
 void partCode5a_hook(GB *gb) {
@@ -35,5 +35,5 @@ L_7f52:
   CYC(b_+31, b_+33); mem_wr(gb, HL, 0x00);
   CYC(b_+33, b_+35); A = 0x98; // PALH_98
   CALL_C(b_+35, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+38);
-  CYC(b_+38, SYM(func_11_7f64)); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+38, b_+41); objectSetVisible83_hook(gb); return; // jp
 }

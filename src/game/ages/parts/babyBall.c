@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode2f), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode2f), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t babyBall_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -104,5 +104,5 @@ veranFairyBeat:
   CALL_C(b_+100, objectCreatePuff_hook, SYM(objectCreatePuff), b_+103);
 
 delete:
-  CYC(b_+103, SYM(partCode32)); partDelete_hook(gb); return; // jp
+  CYC(b_+103, b_+106); partDelete_hook(gb); return; // jp
 }

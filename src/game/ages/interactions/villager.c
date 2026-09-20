@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode3a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode3a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // Script pointer tables (bank $0c mainScripts.*), indexed by subid or game progress.
 #define interactionCode3a_scriptTable_bank08 SYM(interactionCode3a__scriptTable)
@@ -194,7 +194,7 @@ runSubid02:
 subid02_substate0:
   CALL_C(b_+397, npcFaceLinkAndAnimate_hook, SYM(npcFaceLinkAndAnimate), b_+400);
   CALL_C(b_+400, interactionRunScript_hook, SYM(interactionRunScript), b_+403);
-  CYC(b_+403, b_+406); SET_BC((SYM(initializeVramMap1) + 22));
+  CYC(b_+403, b_+406); SET_BC(0x0503);
   CALL_C(b_+406, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+409);
   // Temporarily overwrite the worker's X position to check for "collision" at the
   // position he's left open. His position will be reverted before returning.
@@ -228,7 +228,7 @@ subid02_restorePosition:
   CYC(b_+443, b_+445); E = INTERACTION_BASE + OBJ_VAR39;
   CYC(b_+445, b_+446); A = mem_rd(gb, HL);
   CYC(b_+446, b_+447); mem_wr(gb, DE, A);
-  CYC(b_+447, b_+450); SET_BC((SYM(loadUncompressedGfxHeader) + 44));
+  CYC(b_+447, b_+450); SET_BC(0x0606);
   CALL_C(b_+450, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+453);
   CYC(b_+453, b_+455); E = INTERACTION_BASE + OBJ_VAR3D;
   CYC(b_+455, b_+456); A = mem_rd(gb, DE);
@@ -387,7 +387,7 @@ runSubid0c:
   CYC(b_+615, b_+616);
   CYC(b_+616, b_+617); alu_xor(gb, A);
   CYC(b_+617, b_+618); mem_wr(gb, DE, A);
-  CYC(b_+618, b_+621); SET_BC((SYM(objectGetRelativeTile) + 13)); // TX_1442
+  CYC(b_+618, b_+621); SET_BC(0x1442); // TX_1442
   CYC(b_+621, b_+624); SET_HL(wGroup4RoomFlags + 0xfc);
   CYC(b_+624, b_+626); alu_bit(gb, 7, mem_rd(gb, HL)); // Has Veran been beaten?
   if (F & FZ) {

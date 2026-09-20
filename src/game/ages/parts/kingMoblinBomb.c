@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode3f), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode3f), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t kingMoblinBomb_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -207,7 +207,7 @@ atRest:
   CYC(b_+61, b_+63); A = 0x04;
   CYC(b_+63, b_+64); mem_wr(gb, DE, A);
   CALL_C(b_+64, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+67);
-  CYC(b_+67, SYM(kingMoblinBomb_state3)); kingMoblinBomb_state4_hook(gb); return; // jr
+  CYC(b_+67, b_+69); kingMoblinBomb_state4_hook(gb); return; // jr
 }
 
 void kingMoblinBomb_state3_hook(GB *gb) {
@@ -233,7 +233,7 @@ doneBouncing:
   CALL_C(b_+21, playSound_b00_hook, SYM(playSound_b00), b_+24);
   CYC(b_+24, b_+25); H = D;
   CYC(b_+25, b_+27); L = 0xc4; // Part.state
-  CYC(b_+27, SYM(kingMoblinBomb_state4)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+27, b_+28); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   kingMoblinBomb_state4_hook(gb);
 }
 
@@ -243,7 +243,7 @@ void kingMoblinBomb_state4_hook(GB *gb) {
   CALL_C(b_+0, common_kingMoblinBomb_state1_hook, SYM(common_kingMoblinBomb_state1), b_+3);
   if (F & FZ) { RET_TAKEN(b_+3); return; } // ret z
   CYC(b_+3, b_+4);
-  CYC(b_+4, SYM(kingMoblinBomb_state5)); objectAddToGrabbableObjectBuffer_hook(gb); return; // jp
+  CYC(b_+4, b_+7); objectAddToGrabbableObjectBuffer_hook(gb); return; // jp
 }
 
 void kingMoblinBomb_state5_hook(GB *gb) {
@@ -264,7 +264,7 @@ void kingMoblinBomb_state5_hook(GB *gb) {
   CALL_C(b_+15, kingMoblinBomb_checkCollisionWithLink_hook, SYM(kingMoblinBomb_checkCollisionWithLink), b_+18);
   CALL_C(b_+18, kingMoblinBomb_checkCollisionWithKingMoblin_hook, SYM(kingMoblinBomb_checkCollisionWithKingMoblin), b_+21);
 animate:
-  CYC(b_+21, SYM(kingMoblinBomb_state6)); partAnimate_hook(gb); return; // jp
+  CYC(b_+21, b_+24); partAnimate_hook(gb); return; // jp
 }
 
 void kingMoblinBomb_state6_hook(GB *gb) {
@@ -299,7 +299,7 @@ void kingMoblinBomb_state7_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } // ret nz
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+5); L = E; // Part.state
-  CYC(b_+5, SYM(kingMoblinBomb_state8)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+5, b_+6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   kingMoblinBomb_state8_hook(gb);
 }
 
@@ -311,7 +311,7 @@ void kingMoblinBomb_state8_hook(GB *gb) {
   if (!(F & FC)) { CYCT(b_+5, b_+8); objectApplySpeed_hook(gb); return; } // jp nc
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+9); H = D;
-  CYC(b_+9, SYM(kingMoblinBomb_checkCollisionWithLink)); kingMoblinBomb_explode_hook(gb); return; // jp
+  CYC(b_+9, b_+12); kingMoblinBomb_explode_hook(gb); return; // jp
 }
 
 void kingMoblinBomb_checkCollisionWithLink_hook(GB *gb) {

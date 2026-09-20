@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(agesFunc_10_70f6), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(agesFunc_10_70f6), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void agesFunc_10_70f6__func_71fd_hook(GB *gb);
 void agesFunc_10_70f6__func_7174_hook(GB *gb);
@@ -35,7 +35,7 @@ void agesFunc_10_70f6_hook(GB *gb) {
   BASE(agesFunc_10_70f6);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+1); alu_xor(gb, A);
-  CYC(b_+1, b_+3); hram_wr(gb, 0x9f, A);
+  CYC(b_+1, b_+3); mem_wr(gb, hOamTail, A);
   CYC(b_+3, b_+6); SET_DE(wGenericCutscene_cbc2);
   CYC(b_+6, b_+7); A = mem_rd(gb, DE);
   CYC(b_+7, b_+8); push_effect(gb, b_+8);
@@ -103,7 +103,7 @@ void agesFunc_10_70f6__func_71aa_hook(GB *gb) {
   CYC(b_+186, b_+189); SET_HL(wGfxRegs1_SCY);
   CYC(b_+189, b_+190); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   CYC(b_+190, b_+191); A = mem_rd(gb, HL);
-  CYC(b_+191, b_+193); hram_wr(gb, 0xaa, A);
+  CYC(b_+191, b_+193); mem_wr(gb, hCameraY, A);
   CYC(b_+193, b_+194); ret_effect(gb);
 }
 
@@ -111,7 +111,7 @@ void agesFunc_10_70f6__func_71fd_hook(GB *gb) {
   BASE(agesFunc_10_70f6);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+263, b_+264); alu_xor(gb, A);
-  CYC(b_+264, b_+266); hram_wr(gb, 0x9f, A);
+  CYC(b_+264, b_+266); mem_wr(gb, hOamTail, A);
   CYC(b_+266, b_+269); A = mem_rd(gb, wGfxRegs1_SCY);
   CYC(b_+269, b_+271); alu_cp(gb, 0x60);
   if (!(F & FC)) {
@@ -191,7 +191,7 @@ void agesFunc_10_70f6__func_7262_hook(GB *gb) {
     CYC(b_+371, b_+374); SET_HL(wGfxRegs1_SCY);
     CYC(b_+374, b_+375); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
     CYC(b_+375, b_+376); A = mem_rd(gb, HL);
-    CYC(b_+376, b_+378); hram_wr(gb, 0xaa, A);
+    CYC(b_+376, b_+378); mem_wr(gb, hCameraY, A);
     CYC(b_+378, b_+380); alu_cp(gb, 0x60);
     if (!(F & FZ)) {
       CYCT(b_+380, b_+382);
@@ -247,9 +247,9 @@ void agesFunc_10_7298__func_7450_hook(GB *gb) {
   BASE(agesFunc_10_7298);
   CYC(b_+440, b_+443); SET_HL((SYM(twinrova_subid0_targetPositions__pattern3) + 12));
   CYC(b_+443, b_+445); E = 0x16;
-  CYC(b_+445, b_+448); SET_BC((SYM(objectLoadMovementScript) + 3));
+  CYC(b_+445, b_+448); SET_BC(0x3038);
   CYC(b_+448, b_+449); alu_xor(gb, A);
-  CYC(b_+449, b_+451); hram_wr(gb, 0x9f, A);
+  CYC(b_+449, b_+451); mem_wr(gb, hOamTail, A);
   CYC(b_+451, b_+454); addSpritesFromBankToOam_withOffset_hook(gb);
 }
 
@@ -315,7 +315,7 @@ void agesFunc_10_70f6__func_7174_hook(GB *gb) {
   CYC(b_+126, b_+128); A = 0x04;
   CYC(b_+128, b_+131); mem_wr(gb, wTmpcbb3, A);
   CYC(b_+131, b_+134); A = mem_rd(gb, wGfxRegs1_SCY);
-  CYC(b_+134, b_+136); hram_wr(gb, 0xaa, A);
+  CYC(b_+134, b_+136); mem_wr(gb, hCameraY, A);
   CYC(b_+136, b_+138); A = 0x01;
   CALL_C(b_+138, loadUncompressedGfxHeader_hook, SYM(loadUncompressedGfxHeader), b_+141);
   CYC(b_+141, b_+143); A = 0x0b;
@@ -440,7 +440,7 @@ void agesFunc_10_70f6__substate8_hook(GB *gb) {
   CYC(b_+408, b_+410); A = 0x03;
   CYC(b_+410, b_+413); mem_wr(gb, wGenericCutscene_cbc1, A);
   CYC(b_+413, b_+415); A = 0x04;
-  CYC(b_+415, SYM(agesFunc_10_7298)); fadeoutToWhiteWithDelay_hook(gb);
+  CYC(b_+415, b_+418); fadeoutToWhiteWithDelay_hook(gb);
 }
 
 void agesFunc_10_7298__substate1_hook(GB *gb) {
@@ -667,7 +667,7 @@ void agesFunc_10_7298__substateB_hook(GB *gb) {
     return;
   }
   CYC(b_+485, b_+486);
-  CYC(b_+486, SYM(interactionCodedc)); resetGame_hook(gb);
+  CYC(b_+486, b_+489); resetGame_hook(gb);
 }
 
 void agesFunc_10_70f6__substate0_hook(GB *gb) {
@@ -735,7 +735,7 @@ void agesFunc_10_7298__substate4_hook(GB *gb) {
   CYC(b_+206, b_+207); CALL_C(b_+207, incCbc2_hook, SYM(incCbc2), b_+210); CALL_C(b_+210, disableLcd_hook, SYM(disableLcd), b_+213);
   CYC(b_+213, b_+216); SET_HL((SYM(mergedTwinrova_lavaRoom_stateE__doneAttack) + 19)); CYC(b_+216, b_+218); E = 0x03; CALL_C(b_+218, interBankCall_hook, 0x008a, b_+221);
   CYC(b_+221, b_+223); A = 0xff; CYC(b_+223, b_+226); mem_wr(gb, wTmpcbba, A); CYC(b_+226, b_+228); A = hram_rd(gb, 0x70); CYC(b_+228, b_+229); push_effect(gb, AF);
-  CYC(b_+229, b_+231); A = 0x07; CYC(b_+231, b_+233); hram_wr(gb, 0x70, A); CYC(b_+233, b_+236); SET_HL(w7SecretText1); CYC(b_+236, b_+239); SET_DE(w2WaveScrollValues); CYC(b_+239, b_+242); SET_BC((SYM(getRandomRingOfGivenTier) + 32));
+  CYC(b_+229, b_+231); A = 0x07; CYC(b_+231, b_+233); hram_wr(gb, 0x70, A); CYC(b_+233, b_+236); SET_HL(w7SecretText1); CYC(b_+236, b_+239); SET_DE(w2WaveScrollValues); CYC(b_+239, b_+242); SET_BC(0x1800);
   do { CYC(b_+242, b_+243); A = mem_rd(gb, HL); SET_HL(HL + 1); CALL_C(b_+243, copyTextCharacterGfx_hook, SYM(copyTextCharacterGfx), b_+246); CYC(b_+246, b_+247); B = alu_dec8(gb, B); if (!(F & FZ)) { CYCT(b_+247, b_+249); } else { CYC(b_+247, b_+249); break; } } while (true);
   CYC(b_+249, b_+250); SET_AF(pop_effect(gb)); CYC(b_+250, b_+252); hram_wr(gb, 0x70, A); CYC(b_+252, b_+254); A = 0x97; CALL_C(b_+254, loadGfxHeader_hook, SYM(loadGfxHeader), b_+257); CYC(b_+257, b_+259); A = 0x05; CALL_C(b_+259, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+262); CYC(b_+262, b_+264); A = 0x2b; CALL_C(b_+264, loadUncompressedGfxHeader_hook, SYM(loadUncompressedGfxHeader), b_+267); CALL_C(b_+267, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+270); CYC(b_+270, b_+272); A = 0x06; if (!(F & FZ)) CALL_C_CC(b_+272, loadGfxHeader_hook, SYM(loadGfxHeader), b_+275); else CYC(b_+272, b_+275); CALL_C(b_+275, clearDynamicInteractions_hook, SYM(clearDynamicInteractions), b_+278); CALL_C(b_+278, clearOam_hook, SYM(clearOam), b_+281); CYC(b_+281, b_+283); A = 0x04; CALL_C(b_+283, loadGfxRegisterStateIndex_hook, SYM(loadGfxRegisterStateIndex), b_+286); CYC(b_+286, b_+289); SET_HL(wTmpcbb3); CYC(b_+289, b_+291); mem_wr(gb, HL, 0x3c); CALL_C(b_+291, fileSelect_redrawDecorations_hook, SYM(fileSelect_redrawDecorations), b_+294); CYC(b_+294, b_+297); fadeinFromWhite_hook(gb);
 }

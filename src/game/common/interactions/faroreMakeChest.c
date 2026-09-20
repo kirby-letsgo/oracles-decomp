@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode11), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode11), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // objectData.objectData_faroreSparkle (bank $12 object data, referenced by address only).
 #define objectData_faroreSparkle_bank12 SYM(objectData_faroreSparkle)
@@ -205,7 +205,7 @@ stateA:
   CYC(b_+175, b_+176); alu_xor(gb, A);
   CYC(b_+176, b_+179); mem_wr(gb, wPaletteThread_parameter, A);
   CALL_C(b_+179, setCameraFocusedObjectToLink_hook, SYM(setCameraFocusedObjectToLink), b_+182);
-  CYC(b_+182, SYM(interac11_subid01)); interactionDelete_hook(gb);
+  CYC(b_+182, b_+185); interactionDelete_hook(gb);
 }
 
 // interac11_subid01@interac11_updateSparkle: rotate the sparkle around the circle center
@@ -236,7 +236,7 @@ static void faroreMakeChest_updateSparkle(GB *gb, uint16_t sp0_) {
   CYC(b_+117, b_+120); SET_BC((SYM(interactionCode3b__runSubid00__substate2) + 16));
   CYC(b_+120, b_+123); A = mem_rd(gb, faroreSparkleRadius);
   CALL_C(b_+123, objectSetPositionInCircleArc_hook, SYM(objectSetPositionInCircleArc), b_+126);
-  CYC(b_+126, SYM(interactionCode12)); interactionAnimate_hook(gb);
+  CYC(b_+126, b_+129); interactionAnimate_hook(gb);
 }
 
 void interac11_subid01_hook(GB *gb) {

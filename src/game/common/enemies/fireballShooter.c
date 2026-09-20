@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode50), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode50), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void fireballShooter_state_uninitialized_hook(GB *gb);
 void fireballShooter_state1_hook(GB *gb);
@@ -141,7 +141,7 @@ notThisTile:
   CYC(b_+60, b_+62);
 
 delete:
-  CYC(b_+62, SYM(fireballShooter_state_stub)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+62, b_+65); enemyDelete_hook(gb); return; // jp
 }
 
 // 0e:63a3, bare global; jump-table target from enemyCode50.
@@ -201,5 +201,5 @@ void fireballShooter_checkAllEnemiesKilled_hook(GB *gb) {
   CYC(b_+9, b_+10); alu_or(gb, A);
   if (!(F & FZ)) { RET_TAKEN(b_+10); return; } // ret nz
   CYC(b_+10, b_+11);
-  CYC(b_+11, SYM(enemyCode51)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+11, b_+14); enemyDelete_hook(gb); return; // jp
 }

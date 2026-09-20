@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode37), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode37), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t butterfly_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -50,7 +50,7 @@ state0:
   CYC(b_+18, b_+21); objectSetVisible81_hook(gb); return; // jp
 
 state1:
-  CYC(b_+21, b_+24); SET_BC((SYM(pushDirectionData) + 26));
+  CYC(b_+21, b_+24); SET_BC(0x1f1f);
   CALL_C(b_+24, ecom_randomBitwiseAndBCE_b0e_hook, SYM(ecom_randomBitwiseAndBCE_b0e), b_+27);
   CYC(b_+27, b_+28); alu_or(gb, B);
   if (!(F & FZ)) { CYCT(b_+28, b_+30); goto L_4ffb; } // jr nz
@@ -62,5 +62,5 @@ state1:
 L_4ffb:
   CALL_C(b_+34, objectApplySpeed_hook, SYM(objectApplySpeed), b_+37);
   CALL_C(b_+37, ecom_bounceOffScreenBoundary_b0e_hook, SYM(ecom_bounceOffScreenBoundary_b0e), b_+40);
-  CYC(b_+40, SYM(enemyCode38)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+40, b_+43); enemyAnimate_hook(gb); return; // jp
 }

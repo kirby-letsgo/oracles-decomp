@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(raftwreckCutscene_spawnHelperSubid), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(raftwreckCutscene_spawnHelperSubid), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void raftwreckCutscene_spawnHelperSubid_hook(GB *gb) {
   BASE(raftwreckCutscene_spawnHelperSubid);
@@ -16,5 +16,5 @@ void raftwreckCutscene_spawnHelperSubid_hook(GB *gb) {
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x64);
   CYC(b_+7, b_+8); L = alu_inc8(gb, L);
   CYC(b_+8, b_+9); mem_wr(gb, HL, B);
-  CYC(b_+9, SYM(tokkey_jump)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }

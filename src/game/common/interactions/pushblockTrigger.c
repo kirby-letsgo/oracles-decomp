@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode13), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode13), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define TILEINDEX_PUSHABLE_BLOCK 0x1d
 
@@ -106,7 +106,7 @@ static void pushblockTrigger_state3(GB *gb, uint16_t sp0_) {
   CYC(b_+91, b_+92);
   CYC(b_+92, b_+93); alu_xor(gb, A);
   CYC(b_+93, b_+96); mem_wr(gb, wNumEnemies, A);
-  CYC(b_+96, SYM(interactionCode14)); interactionDelete_hook(gb);
+  CYC(b_+96, b_+99); interactionDelete_hook(gb);
 }
 
 void interactionCode13_hook(GB *gb) {

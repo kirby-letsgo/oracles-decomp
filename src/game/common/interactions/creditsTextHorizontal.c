@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(creditsTextHorizontal_6537), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(creditsTextHorizontal_6537), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCodeae_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -80,7 +80,7 @@ void creditsTextHorizontal_6537_hook(GB *gb) {
 l_6550:
   CYC(b_+25, b_+26); H = D;
   CYC(b_+26, b_+28); L = INTERACTION_BASE + OBJ_COUNTER2;
-  CYC(b_+28, SYM(creditsTextHorizontal_6554)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
+  CYC(b_+28, b_+29); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
   creditsTextHorizontal_6554_hook(gb); return; // falls through
 }
 
@@ -91,7 +91,7 @@ void creditsTextHorizontal_6554_hook(GB *gb) {
   CYC(b_+0, b_+2); L = INTERACTION_BASE + OBJ_SCRIPT_PTR;
   CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+3, b_+4); H = mem_rd(gb, HL);
-  CYC(b_+4, SYM(creditsTextHorizontal_6559)); L = A;
+  CYC(b_+4, b_+5); L = A;
   creditsTextHorizontal_6559_hook(gb); return; // falls through
 }
 
@@ -127,7 +127,7 @@ void creditsTextHorizontal_6559_hook(GB *gb) {
   CYC(b_+29, b_+30); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+30, b_+31); ret_effect(gb); return; } // ret nz
   CYC(b_+30, b_+31);
-  CYC(b_+31, SYM(horizontalCreditsText_var03Nonzero)); creditsTextHorizontal_6537_hook(gb); return; // jp
+  CYC(b_+31, b_+34); creditsTextHorizontal_6537_hook(gb); return; // jp
 }
 
 // 0b:657b, called from interactionCodeae@state1 (tail `jp`).
@@ -466,5 +466,5 @@ substate2:
   CYC(b_+337, b_+338);
   CYC(b_+338, b_+341); SET_HL(wTmpcfc0_genericCutscene_cfdf);
   CYC(b_+341, b_+343); mem_wr(gb, HL, 0xff);
-  CYC(b_+343, SYM(creditsTextHorizontal_6537)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+343, b_+346); interactionDelete_hook(gb); return; // jp
 }

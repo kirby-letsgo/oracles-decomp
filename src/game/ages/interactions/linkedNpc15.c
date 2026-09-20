@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(linkedNpc_checkShouldSpawn), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(linkedNpc_checkShouldSpawn), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void checkEssenceNotObtained_hook(GB *gb);
 void checkEssenceObtained_hook(GB *gb);
@@ -72,7 +72,7 @@ checkd2_2:
   CYC(b_+49, b_+52); checkEssenceNotObtained_hook(gb); return;
 always:
   CYC(b_+52, b_+53); alu_or(gb, D);
-  CYC(b_+53, SYM(linkedNpc_checkHasExtraTextBox)); writeFlagsTocddb_hook(gb);
+  CYC(b_+53, b_+56); writeFlagsTocddb_hook(gb);
 }
 
 void linkedNpc_checkHasExtraTextBox_hook(GB *gb) {
@@ -99,13 +99,13 @@ void linkedNpc_generateSecret_hook(GB *gb) {
   CYC(b_+12, b_+13); alu_add(gb, B);
   CYC(b_+13, b_+16); mem_wr(gb, wShortSecretIndex, A);
   CYC(b_+16, b_+19); SET_BC(0x0003);
-  CYC(b_+19, SYM(linkedNpc_initHighTextIndex)); secretFunctionCaller_hook(gb);
+  CYC(b_+19, b_+22); secretFunctionCaller_hook(gb);
 }
 
 void linkedNpc_initHighTextIndex_hook(GB *gb) {
   BASE(linkedNpc_initHighTextIndex);
   CYC(b_+0, b_+2); A = 0x4d;
-  CYC(b_+2, SYM(linkedNpc_calcLowTextIndex)); interactionSetHighTextIndex_hook(gb);
+  CYC(b_+2, b_+5); interactionSetHighTextIndex_hook(gb);
 }
 
 void linkedNpc_calcLowTextIndex_hook(GB *gb) {
@@ -121,5 +121,5 @@ void linkedNpc_calcLowTextIndex_hook(GB *gb) {
   CYC(b_+10, b_+11); alu_add(gb, C);
   CYC(b_+11, b_+13); E = 0x72;
   CYC(b_+13, b_+14); mem_wr(gb, DE, A);
-  CYC(b_+14, SYM(plenSubid0Script_b15)); ret_effect(gb);
+  CYC(b_+14, b_+15); ret_effect(gb);
 }

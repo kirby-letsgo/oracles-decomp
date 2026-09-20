@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(turnToFaceSomething), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(turnToFaceSomething), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void turnToFaceSomething_hook(GB *gb);
 void turnToFaceSomethingAtInterval_hook(GB *gb);
@@ -12,7 +12,7 @@ void setLinkAnimation_hook(GB *gb);
 
 void turnToFaceSomething_hook(GB *gb) {
   BASE(turnToFaceSomething);
-  CYC(b_+0, SYM(turnToFaceSomethingAtInterval)); A = 0x0f;
+  CYC(b_+0, b_+2); A = 0x0f;
   turnToFaceSomethingAtInterval_hook(gb);
 }
 
@@ -39,7 +39,7 @@ void turnToFaceSomethingAtInterval_hook(GB *gb) {
   }
   CYC(b_+24, b_+25);
   CYC(b_+25, b_+26); mem_wr(gb, HL, A);
-  CYC(b_+26, SYM(setLinkAnimation)); interactionSetAnimation_hook(gb);
+  CYC(b_+26, b_+29); interactionSetAnimation_hook(gb);
 }
 
 void setLinkAnimation_hook(GB *gb) {

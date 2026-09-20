@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode35), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode35), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // INTERAC_CHILD (interactionCode35): the child raised by Link in Ages.
 //   var03: index of script and code to run (personality + growth stage)
@@ -215,7 +215,7 @@ arborist:
 
 singer:
   CYC(b_+210, b_+212); A = 0x00;
-  CYC(b_+212, SYM(interac65_state1)); child_setAnimation(gb, sp0_);
+  CYC(b_+212, b_+214); child_setAnimation(gb, sp0_);
 }
 
 void interactionCode35_hook(GB *gb) {
@@ -364,7 +364,7 @@ singerMovement:
 
 runScriptAndUpdateAnimation:
   CALL_C(b_+174, interactionRunScript_hook, SYM(interactionRunScript), b_+177);
-  CYC(b_+177, SYM(childUpdateAnimationAndSolidity)); childUpdateAnimationAndSolidity_hook(gb);
+  CYC(b_+177, b_+180); childUpdateAnimationAndSolidity_hook(gb);
 }
 
 // Falls through into childUpdateSolidityAndVisibility.
@@ -397,7 +397,7 @@ void childUpdateSolidityAndVisibility_hook(GB *gb) {
 
 lightSolidity:
   CALL_C(b_+18, objectPushLinkAwayOnCollision_hook, SYM(objectPushLinkAwayOnCollision), b_+21);
-  CYC(b_+21, SYM(childDetermineAnimationBase)); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
+  CYC(b_+21, b_+24); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
 }
 
 // Writes the "base" animation index to var37 based on subid (personality type).
@@ -446,7 +446,7 @@ void childUpdateHyperactiveMovement_hook(GB *gb) {
   CALL_C(b_+29, addAToBc_hook, 0x006d, b_+32);
   CYC(b_+32, b_+33); A = mem_rd(gb, BC);
   CYC(b_+33, b_+35); L = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(b_+35, SYM(childFlipAnimation)); mem_wr(gb, HL, A);
+  CYC(b_+35, b_+36); mem_wr(gb, HL, A);
   childFlipAnimation_hook(gb);
 }
 
@@ -459,7 +459,7 @@ void childFlipAnimation_hook(GB *gb) {
   CYC(b_+5, b_+6); mem_wr(gb, HL, A);
   CYC(b_+6, b_+8); L = INTERACTION_BASE + OBJ_VAR37;
   CYC(b_+8, b_+9); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+9, SYM(childHyperactiveMovementAngles)); interactionSetAnimation_hook(gb);
+  CYC(b_+9, b_+12); interactionSetAnimation_hook(gb);
 }
 
 // Bounces between x=$14 and x=$3b, flipping the angle horizontally.
@@ -480,7 +480,7 @@ void childUpdateUnknownMovement_hook(GB *gb) {
   CYC(b_+14, b_+15); A = mem_rd(gb, HL);
   CYC(b_+15, b_+17); alu_xor(gb, 0x10);
   CYC(b_+17, b_+18); mem_wr(gb, HL, A);
-  CYC(b_+18, SYM(childUpdateShyMovement)); childFlipAnimation_hook(gb);
+  CYC(b_+18, b_+20); childFlipAnimation_hook(gb);
 }
 
 // "Shy" personality: runs to the next position when Link approaches.
@@ -515,7 +515,7 @@ substate1:
   CYC(b_+24, b_+25); H = D;
   CYC(b_+25, b_+27); L = INTERACTION_BASE + OBJ_SUBSTATE;
   CYC(b_+27, b_+29); mem_wr(gb, HL, 0x00);
-  CYC(b_+29, SYM(childUpdateAngleAndApplySpeed)); childIncPositionIndex_hook(gb);
+  CYC(b_+29, b_+32); childIncPositionIndex_hook(gb);
 }
 
 // Sets the angle toward position list entry var3c, then applies speed.
@@ -541,7 +541,7 @@ void childUpdateAngleAndApplySpeed_hook(GB *gb) {
   CALL_C(b_+19, objectGetRelativeAngle_hook, SYM(objectGetRelativeAngle), b_+22);
   CYC(b_+22, b_+24); E = INTERACTION_BASE + OBJ_ANGLE;
   CYC(b_+24, b_+25); mem_wr(gb, DE, A);
-  CYC(b_+25, SYM(childCheckReachedDestination)); objectApplySpeed_hook(gb);
+  CYC(b_+25, b_+28); objectApplySpeed_hook(gb);
 }
 
 // @param[out] cflag Set if within 1 pixel of position list entry var3c on both axes.
@@ -576,7 +576,7 @@ void childCheckReachedDestination_hook(GB *gb) {
   CYC(b_+31, b_+32); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+32, b_+34); alu_add(gb, 0x01);
   CYC(b_+34, b_+36); alu_cp(gb, 0x03);
-  CYC(b_+36, SYM(childCheckAnimationDirectionChanged)); ret_effect(gb);
+  CYC(b_+36, b_+37); ret_effect(gb);
 }
 
 // Updates the animation when the horizontal direction derived from the angle changes.
@@ -599,7 +599,7 @@ void childCheckAnimationDirectionChanged_hook(GB *gb) {
   CYC(b_+17, b_+18); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+18, b_+20); L = INTERACTION_BASE + OBJ_VAR37;
   CYC(b_+20, b_+21); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+21, SYM(childIncPositionIndex)); interactionSetAnimation_hook(gb);
+  CYC(b_+21, b_+24); interactionSetAnimation_hook(gb);
 }
 
 // var3c++, wrapping to 0 once it passes var3d.
@@ -616,7 +616,7 @@ void childIncPositionIndex_hook(GB *gb) {
   }
   CYC(b_+8, b_+9);
   CYC(b_+9, b_+11); mem_wr(gb, HL, 0x00);
-  CYC(b_+11, SYM(childLoadPositionListPointer)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 // Loads position list pointer A into var3e/var3f and its entry count-1 into var3d.
@@ -700,5 +700,5 @@ substate2:
     CYCT(b_+70, b_+71); ret_effect(gb); return;
   }
   CYC(b_+70, b_+71);
-  CYC(b_+71, SYM(childScriptTable)); goto gotoSubstate1AndJump;
+  CYC(b_+71, b_+73); goto gotoSubstate1AndJump;
 }

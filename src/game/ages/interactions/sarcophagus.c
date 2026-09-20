@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode82), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode82), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t sarcophagus_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -150,5 +150,5 @@ state3:
   CYC(b_+177, b_+178); A = alu_inc8(gb, A);
   if (!(F & FZ)) { CYCT(b_+178, b_+181); interactionAnimate_hook(gb); return; } // jp nz
   CYC(b_+178, b_+181);
-  CYC(b_+181, SYM(interactionCode83)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+181, b_+184); interactionDelete_hook(gb); return; // jp
 }

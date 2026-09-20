@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode18), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode18), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void buzzblob_state_uninitialized_hook(GB *gb);
 void buzzblob_state_scentSeed_hook(GB *gb);
@@ -134,7 +134,7 @@ seek:
   CYC(b_+19, b_+21); alu_and(gb, 0x18);
   CYC(b_+21, b_+22); mem_wr(gb, DE, A);
   CALL_C(b_+22, ecom_applyVelocityForSideviewEnemy_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemy_b0d), b_+25);
-  CYC(b_+25, SYM(buzzblob_state_stub)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+25, b_+28); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0d:56c3, bare global.
@@ -149,7 +149,7 @@ void buzzblob_state8_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); A = 0x09;
   CYC(b_+2, b_+3); mem_wr(gb, DE, A); // [state] = 9
-  CYC(b_+3, b_+6); SET_BC((SYM(objectCheckCollidedWithLink_notDead) + 2));
+  CYC(b_+3, b_+6); SET_BC(0x1c30);
   CALL_C(b_+6, ecom_randomBitwiseAndBCE_b0d_hook, SYM(ecom_randomBitwiseAndBCE_b0d), b_+9);
   CYC(b_+9, b_+11); E = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+11, b_+13); A = 0x30;
@@ -158,7 +158,7 @@ void buzzblob_state8_hook(GB *gb) {
   CYC(b_+15, b_+17); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+17, b_+18); A = B;
   CYC(b_+18, b_+19); mem_wr(gb, DE, A);
-  CYC(b_+19, SYM(buzzblob_state9)); buzzblob_animate_hook(gb); return; // jr
+  CYC(b_+19, b_+21); buzzblob_animate_hook(gb); return; // jr
 }
 
 // 0d:56d9, bare global; moving in some direction for a certain amount of time.
@@ -176,7 +176,7 @@ void buzzblob_state9_hook(GB *gb) {
 // 0d:56e4, bare global.
 void buzzblob_animate_hook(GB *gb) {
   BASE(buzzblob_animate);
-  CYC(b_+0, SYM(buzzblob_stateA)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0d:56e7, bare global; "shocking Link" state.
@@ -202,7 +202,7 @@ void buzzblob_chooseNewDirection_hook(GB *gb) {
   CYC(b_+7, b_+9); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 4))); // set 4,(hl)
   CYC(b_+9, b_+11); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+11, b_+13); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
-  CYC(b_+13, SYM(buzzblob_checkShowText)); buzzblob_animate_hook(gb); return; // jr
+  CYC(b_+13, b_+15); buzzblob_animate_hook(gb); return; // jr
 }
 
 // 0d:5701, bare global; boundary item shared with the buzzblob source file.
@@ -221,5 +221,5 @@ void buzzblob_checkShowText_hook(GB *gb) {
   CYC(b_+12, b_+14); alu_add(gb, 0x1e); // <TX_2f1e
   CYC(b_+14, b_+15); C = A;
   CYC(b_+15, b_+17); B = 0x2f; // >TX_2f00
-  CYC(b_+17, SYM(enemyCode1a)); showText_hook(gb); return; // jp
+  CYC(b_+17, b_+20); showText_hook(gb); return; // jp
 }

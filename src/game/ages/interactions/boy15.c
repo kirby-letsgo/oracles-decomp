@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(createExclamationMark), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(createExclamationMark), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void writeFlagsTocddb_hook(GB *gb);
 
@@ -28,7 +28,7 @@ void createExclamationMark_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
   CYC(b_+0, b_+3); SET_BC(0xf300);
-  CYC(b_+3, SYM(oscillateXRandomly)); objectCreateExclamationMark_hook(gb); return; // jp
+  CYC(b_+3, b_+6); objectCreateExclamationMark_hook(gb); return; // jp
 }
 
 void oscillateXRandomly_hook(GB *gb) {
@@ -37,7 +37,7 @@ void oscillateXRandomly_hook(GB *gb) {
   (void)sp0_;
   CYC(b_+0, b_+3); SET_HL((SYM(oldManScript_givesShieldUpgrade__validSecret_b15) + 16)); // agesInteractionsBank08.interactionOscillateXRandomly
   CYC(b_+3, b_+5); E = 0x08; // target bank
-  CYC(b_+5, SYM(loadNextAnimationFrameAndMore)); interBankCall_hook(gb); return; // jp
+  CYC(b_+5, b_+8); interBankCall_hook(gb); return; // jp
 }
 
 // Forces the next animation frame to be loaded; does something with var38 and cfd3.
@@ -52,7 +52,7 @@ void loadNextAnimationFrameAndMore_hook(GB *gb) {
   CYC(b_+5, b_+7); L = INTERACTION_BASE + OBJ_VAR38;
   CYC(b_+7, b_+8); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   CYC(b_+8, b_+11); mem_wr(gb, wTmpcfc0_genericCutscene_cfd3, A);
-  CYC(b_+11, SYM(boy_createLightning)); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+11, b_+14); interactionAnimate_hook(gb); return; // jp
 }
 
 // Creates lightning for the cutscene where the boy's father turns to stone.
@@ -74,7 +74,7 @@ void boy_createLightning_hook(GB *gb) {
   CYC(b_+13, b_+16); SET_BC((SYM(group2ObjectDataTable) + 253));
   if (F & FZ) { CYCT(b_+16, b_+18); goto write_pos; } // jr z
   CYC(b_+16, b_+18);
-  CYC(b_+18, b_+21); SET_BC((SYM(_enemyNextAnimationFrame) + 52));
+  CYC(b_+18, b_+21); SET_BC(0x2878);
 
 write_pos:
   CYC(b_+21, b_+23); L = PART_BASE + OBJ_YH;

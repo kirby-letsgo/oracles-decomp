@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(giantBladeTrap_checkCanMoveInDirection), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(giantBladeTrap_checkCanMoveInDirection), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t enemyCode2a_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -115,7 +115,7 @@ void giantBladeTrap_state_uninitialized_hook(GB *gb) {
   BASE(giantBladeTrap_state_uninitialized);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, ecom_setSpeedAndState8_b0d_hook, SYM(ecom_setSpeedAndState8_b0d), b_+3);
-  CYC(b_+3, SYM(giantBladeTrap_state_stub)); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+3, b_+6); objectSetVisible82_hook(gb); return; // jp
 }
 
 void giantBladeTrap_state_stub_hook(GB *gb) {

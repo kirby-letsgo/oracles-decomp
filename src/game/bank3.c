@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(init), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(init), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void generateGameTransferSecret_hook(GB *gb);
 void secretFunctionCaller_body_hook(GB *gb);
@@ -91,7 +91,7 @@ void init_hook(GB *gb) {
   CYC(b_+8, b_+10); mem_wr(gb, IO_TAC, A);
   CYC(b_+10, b_+12); mem_wr(gb, IO_SC, A);
   CYC(b_+12, b_+13); alu_xor(gb, A);
-  CYC(b_+13, b_+16); mem_wr(gb, (SYM(setDeathRespawnPoint) + 17), A);
+  CYC(b_+13, b_+16); mem_wr(gb, 0x1111, A);
   CALL_C(b_+16, disableLcd_hook, SYM(disableLcd), b_+19);
   CYC(b_+19, b_+21); A = H8(hGameboyType);
   CYC(b_+21, b_+22); alu_or(gb, A);
@@ -109,7 +109,7 @@ void init_hook(GB *gb) {
   CYC(b_+37, b_+39); B = 0x26;
   CALL_C(b_+39, clearMemory_hook, SYM(clearMemory), b_+42);
   CYC(b_+42, b_+45); SET_HL(wThread3StackTop);
-  CYC(b_+45, b_+48); SET_BC((SYM(checkLinkCollisionsEnabled) + 13));
+  CYC(b_+45, b_+48); SET_BC(0x1d3f);
   CALL_C(b_+48, clearMemoryBc_hook, SYM(clearMemoryBc), b_+51);
   CALL_C(b_+51, clearVram_hook, SYM(clearVram), b_+54);
   CYC(b_+54, b_+57); SET_HL(SYM(oamDmaFunction));
@@ -137,7 +137,7 @@ void init_hook(GB *gb) {
   CYC(b_+102, b_+105); SET_HL(b_+0);
   CYC(b_+105, b_+107); E = 0x02;
   CALL_C(b_+107, interBankCall_hook, 0x008a, b_+110);
-  CYC(b_+110, SYM(setCpuToDoubleSpeed));
+  CYC(b_+110, b_+113);
   startGame_hook(gb);
 }
 
@@ -156,7 +156,7 @@ static void verifyUnpackedSecretGameID_fail(GB *gb) {
 static void verifyUnpackedSecretGameID_success(GB *gb) {
   BASE(verifyUnpackedSecretGameID);
   CYC(b_+23, b_+25); B = 0x00;
-  CYC(b_+25, SYM(generateGameIDIfNeeded)); ret_effect(gb);
+  CYC(b_+25, b_+26); ret_effect(gb);
 }
 
 void generateGameTransferSecret_hook(GB *gb) {
@@ -179,7 +179,7 @@ void generateGameTransferSecret_hook(GB *gb) {
   CYC(b_+23, b_+24); mem_wr(gb, HL, C);
   CYC(b_+24, b_+25); L = alu_inc8(gb, L);
   CYC(b_+25, b_+26); mem_wr(gb, HL, B);
-  CYC(b_+26, SYM(secretFunctionCaller_body)); ret_effect(gb);
+  CYC(b_+26, b_+27); ret_effect(gb);
 }
 
 void secretFunctionCaller_body_hook(GB *gb) {
@@ -238,7 +238,7 @@ void generateSecret__ret_hook(GB *gb) {
   BASE(generateSecret);
   CYC(b_+81, b_+83); alu_and(gb, 0x07);
   CYC(b_+83, b_+84); SET_BC(pop_effect(gb));
-  CYC(b_+84, SYM(encodeSecretData_paramC)); ret_effect(gb);
+  CYC(b_+84, b_+85); ret_effect(gb);
 }
 
 void generateSecret__determineXorCipher_hook(GB *gb) {
@@ -273,7 +273,7 @@ void generateSecret__determineXorCipher_hook(GB *gb) {
 
 void encodeSecretData_paramC_hook(GB *gb) {
   BASE(encodeSecretData_paramC);
-  CYC(b_+0, SYM(encodeSecretData)); A = C;
+  CYC(b_+0, b_+1); A = C;
   encodeSecretData_hook(gb);
 }
 
@@ -302,7 +302,7 @@ void encodeSecretData_hook(GB *gb) {
     break;
   }
   CYC(b_+23, b_+24); SET_BC(pop_effect(gb));
-  CYC(b_+24, SYM(insertBitsIntoSecretGenerationBuffer)); ret_effect(gb);
+  CYC(b_+24, b_+25); ret_effect(gb);
 }
 
 void insertBitsIntoSecretGenerationBuffer_hook(GB *gb) {
@@ -331,7 +331,7 @@ void insertBitsIntoSecretGenerationBuffer_hook(GB *gb) {
     break;
   }
   CYC(b_+21, b_+24); SET_HL(w7SecretGenerationBuffer);
-  CYC(b_+24, b_+27); SET_DE((SYM(func_3ee4) + 48));
+  CYC(b_+24, b_+27); SET_DE(0x3f14);
   for (;;) {
     CYC(b_+27, b_+28); A = mem_rd(gb, HL);
     CYC(b_+28, b_+29); alu_and(gb, D);
@@ -343,7 +343,7 @@ void insertBitsIntoSecretGenerationBuffer_hook(GB *gb) {
   }
   CYC(b_+33, b_+34); SET_BC(pop_effect(gb));
   CYC(b_+34, b_+35); SET_HL(pop_effect(gb));
-  CYC(b_+35, SYM(unpackSecret)); ret_effect(gb);
+  CYC(b_+35, b_+36); ret_effect(gb);
 }
 
 void unpackSecret_hook(GB *gb) {
@@ -482,7 +482,7 @@ void unpackSecret__readBits__end_hook(GB *gb) {
   CYC(b_+119, b_+120); SET_HL(pop_effect(gb));
   CYC(b_+120, b_+121); SET_DE(pop_effect(gb));
   CYC(b_+121, b_+122); SET_BC(pop_effect(gb));
-  CYC(b_+122, SYM(loadUnpackedSecretData)); ret_effect(gb);
+  CYC(b_+122, b_+123); ret_effect(gb);
 }
 
 void loadUnpackedSecretData_hook(GB *gb) {
@@ -557,7 +557,7 @@ void loadUnpackedSecretData__type2_hook(GB *gb) {
     CYC(b_+65, b_+67);
     break;
   }
-  CYC(b_+67, SYM(verifyUnpackedSecretGameID)); ret_effect(gb);
+  CYC(b_+67, b_+68); ret_effect(gb);
 }
 
 void verifyUnpackedSecretGameID_hook(GB *gb) {
@@ -626,7 +626,7 @@ void generateGameIDIfNeeded_hook(GB *gb) {
   CYC(b_+22, b_+24); L = 0x00;
   CYC(b_+24, b_+25); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+25, b_+26); mem_wr(gb, HL, B);
-  CYC(b_+26, SYM(convertSecretBufferToText)); ret_effect(gb);
+  CYC(b_+26, b_+27); ret_effect(gb);
 }
 
 void convertSecretBufferToText_hook(GB *gb) {
@@ -726,7 +726,7 @@ void loadSecretBufferFromText__end_hook(GB *gb) {
   CYC(b_+37, b_+38); A = C;
   CYC(b_+38, b_+39); SET_BC(pop_effect(gb));
   CYC(b_+39, b_+40); SET_HL(pop_effect(gb));
-  CYC(b_+40, SYM(runXorCipherOnSecretBuffer)); ret_effect(gb);
+  CYC(b_+40, b_+41); ret_effect(gb);
 }
 
 void runXorCipherOnSecretBuffer_hook(GB *gb) {
@@ -751,7 +751,7 @@ void runXorCipherOnSecretBuffer_hook(GB *gb) {
     CYC(b_+26, b_+28);
     break;
   }
-  CYC(b_+28, SYM(getSecretBufferChecksum)); ret_effect(gb);
+  CYC(b_+28, b_+29); ret_effect(gb);
 }
 
 void getSecretBufferChecksum_hook(GB *gb) {
@@ -768,7 +768,7 @@ void getSecretBufferChecksum_hook(GB *gb) {
     break;
   }
   CYC(b_+11, b_+13); alu_and(gb, 0x0f);
-  CYC(b_+13, SYM(shiftSecretBufferContentsToFront)); ret_effect(gb);
+  CYC(b_+13, b_+14); ret_effect(gb);
 }
 
 void shiftSecretBufferContentsToFront_hook(GB *gb) {
@@ -795,7 +795,7 @@ void shiftSecretBufferContentsToFront_hook(GB *gb) {
     CYC(b_+17, b_+19);
     break;
   }
-  CYC(b_+19, SYM(andCWith3)); ret_effect(gb);
+  CYC(b_+19, b_+20); ret_effect(gb);
 }
 
 void andCWith3_hook(GB *gb) {
@@ -803,7 +803,7 @@ void andCWith3_hook(GB *gb) {
   CYC(b_+0, b_+1); A = C;
   CYC(b_+1, b_+3); alu_and(gb, 0x03);
   CYC(b_+3, b_+4); C = A;
-  CYC(b_+4, SYM(secretDataToEncodeTable)); ret_effect(gb);
+  CYC(b_+4, b_+5); ret_effect(gb);
 }
 
 void getNumCharactersForSecretType_hook(GB *gb) {

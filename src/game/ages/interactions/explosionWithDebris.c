@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode99), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode99), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCode99_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -145,9 +145,9 @@ runSubid0:
   CYC(b_+133, b_+136);
   CYC(b_+136, b_+137); alu_xor(gb, A);
   CYC(b_+137, b_+138); mem_wr(gb, DE, A);
-  CYC(b_+138, b_+140); hram_wr(gb, 0x8b, A);
-  CYC(b_+140, b_+142); hram_wr(gb, 0x8d, A);
-  CYC(b_+142, b_+144); hram_wr(gb, 0x8c, A);
+  CYC(b_+138, b_+140); mem_wr(gb, hFF8B, A);
+  CYC(b_+140, b_+142); mem_wr(gb, hFF8D, A);
+  CYC(b_+142, b_+144); mem_wr(gb, hFF8C, A);
   CYC(b_+144, b_+146); B = 0x04;
 
 spawnDebrisLoop:

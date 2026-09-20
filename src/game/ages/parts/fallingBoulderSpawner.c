@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode45), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode45), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t fallingBoulderSpawner_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -141,5 +141,5 @@ state2_afterBounceCall:
   CYC(b_+129, b_+130); L = alu_inc8(gb, L);
   CYC(b_+130, b_+131); A = mem_rd(gb, DE);
   CYC(b_+131, b_+132); mem_wr(gb, HL, A);
-  CYC(b_+132, SYM(partCode46)); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+132, b_+135); objectSetInvisible_hook(gb); return; // jp
 }

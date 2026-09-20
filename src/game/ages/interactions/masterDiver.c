@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodecd), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodecd), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // rst_addDoubleIndex (rst $18): self-contained push+compute+ret_effect, balanced regardless of caller.
 static void interactionCodecd_addDoubleIndex(GB *gb, uint16_t return_address) {

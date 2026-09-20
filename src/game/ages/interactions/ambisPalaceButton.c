@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodebe), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodebe), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/object_code/ages/interactions/ambisPalaceButton.s (interactionCodebe /
 // INTERAC_AMBIS_PALACE_BUTTON), bank 0x0b.
@@ -96,5 +96,5 @@ state2: // interactionCodebe@state2
   CYC(b_+100, b_+101); A = mem_rd(gb, DE);
   CYC(b_+101, b_+104); W8(wGenericCutscene_cbbd) = A;
   CALL_C(b_+104, fadeoutToWhite_hook, SYM(fadeoutToWhite), b_+107);
-  CYC(b_+107, SYM(interactionCodebf)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+107, b_+110); interactionDelete_hook(gb); return; // jp
 }

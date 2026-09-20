@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode0e), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode0e), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t detectionHelper_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -199,7 +199,7 @@ initSpeed:
   CYC(b_+213, b_+214); C = mem_rd(gb, HL);
   CYC(b_+214, b_+216); B = 0x64; // SPEED_280
   CYC(b_+216, b_+218); A = 0x04;
-  CYC(b_+218, SYM(partCode0f)); objectSetComponentSpeedByScaledVelocity_hook(gb); return; // jp
+  CYC(b_+218, b_+221); objectSetComponentSpeedByScaledVelocity_hook(gb); return; // jp
 }
 
 void detectionHelper_spawnCollisionHelper_hook(GB *gb) {

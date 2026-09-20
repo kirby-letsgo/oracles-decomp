@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode35), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode35), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t ramrockGloveFormArm_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -549,7 +549,7 @@ state6:
   CYC(b_+687, b_+689); A = 0x80;
   CYC(b_+689, b_+690); mem_wr(gb, HL, A);
 L_6938:
-  CYC(b_+690, SYM(func_693b)); goto func_6762; // jp
+  CYC(b_+690, b_+693); goto func_6762; // jp
 }
 
 void func_693b_hook(GB *gb) {

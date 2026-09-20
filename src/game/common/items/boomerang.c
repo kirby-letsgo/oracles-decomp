@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode06), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode06), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void itemCheckWithinRangeOfLink_hook(GB *gb);
 
@@ -176,7 +176,7 @@ next_state:
 state2:
   CALL_C(b_+147, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+150);
   CALL_C(b_+150, objectNudgeAngleTowards_hook, SYM(objectNudgeAngleTowards), b_+153);
-  CYC(b_+153, b_+156); SET_BC((SYM(extractColorComponents) + 33));
+  CYC(b_+153, b_+156); SET_BC(0x140a);
   CALL_C(b_+156, itemCheckWithinRangeOfLink_hook, SYM(itemCheckWithinRangeOfLink), b_+159);
   if (F & FC) CALL_C_CC(b_+159, itemIncState_hook, SYM(itemIncState), b_+162);
   else CYC(b_+159, b_+162);
@@ -187,7 +187,7 @@ state3:
   CALL_C(b_+164, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+167);
   CYC(b_+167, b_+169); E = 0x09;
   CYC(b_+169, b_+170); mem_wr(gb, DE, A);
-  CYC(b_+170, b_+173); SET_BC((SYM(gfxRegisterStates) + 252));
+  CYC(b_+170, b_+173); SET_BC(0x0402);
   CALL_C(b_+173, itemCheckWithinRangeOfLink_hook, SYM(itemCheckWithinRangeOfLink), b_+176);
   if (!(F & FC)) {
     CYCT(b_+176, b_+178);
@@ -228,7 +228,7 @@ update_speed_and_animation:
   CYC(b_+217, b_+219); A = 0x78;
   if (!(F & FZ)) CALL_C_CC(b_+219, playSound_b00_hook, SYM(playSound_b00), b_+222);
   else CYC(b_+219, b_+222);
-  CYC(b_+222, SYM(itemCheckWithinRangeOfLink));
+  CYC(b_+222, b_+225);
   itemAnimate_hook(gb);
 }
 
@@ -250,5 +250,5 @@ void itemCheckWithinRangeOfLink_hook(GB *gb) {
   CYC(b_+15, b_+16); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+16, b_+17); alu_add(gb, C);
   CYC(b_+17, b_+18); alu_cp(gb, B);
-  CYC(b_+18, SYM(itemCode0bPost)); ret_effect(gb);
+  CYC(b_+18, b_+19); ret_effect(gb);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(runRoomSpecificCode), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(runRoomSpecificCode), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t room_specific_code_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -51,7 +51,7 @@ void roomSpecificCode0_hook(GB *gb) {
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+9); SET_HL(wTmpcfc0_fairyHideAndSeek_active);
   CYC(b_+9, b_+11); B = 0x10;
-  CYC(b_+11, SYM(roomSpecificCode1)); clearMemory_hook(gb);
+  CYC(b_+11, b_+14); clearMemory_hook(gb);
 }
 
 void room_specific_code_create_spinner_hook(GB *gb) {
@@ -68,7 +68,7 @@ void room_specific_code_create_spinner_hook(GB *gb) {
   CYC(b_+14, b_+16); mem_wr(gb, HL, 0x57);
   CYC(b_+16, b_+18); L = 0x4d;
   CYC(b_+18, b_+20); mem_wr(gb, HL, 0x01);
-  CYC(b_+20, SYM(roomSpecificCode2)); ret_effect(gb);
+  CYC(b_+20, b_+21); ret_effect(gb);
 }
 
 void roomSpecificCode1_hook(GB *gb) {
@@ -93,7 +93,7 @@ void roomSpecificCode2_hook(GB *gb) {
     return;
   }
   CYC(b_+5, b_+6);
-  CYC(b_+6, SYM(roomSpecificCode3)); room_specific_code_create_spinner_hook(gb);
+  CYC(b_+6, b_+8); room_specific_code_create_spinner_hook(gb);
 }
 
 void roomSpecificCode3_hook(GB *gb) {
@@ -126,7 +126,7 @@ void roomSpecificCode3_hook(GB *gb) {
   CYC(b_+24, b_+26); mem_wr(gb, HL, 0x0a);
   CYC(b_+26, b_+28); A = 0x01;
   CYC(b_+28, b_+31); W8(wDiggingUpEnemiesForbidden) = A;
-  CYC(b_+31, SYM(roomSpecificCode7)); ret_effect(gb);
+  CYC(b_+31, b_+32); ret_effect(gb);
 }
 
 void roomSpecificCode7_hook(GB *gb) {
@@ -148,7 +148,7 @@ void roomSpecificCode7_hook(GB *gb) {
   CYC(b_+11, b_+12);
   CYC(b_+12, b_+14); A = 0x35;
   CYC(b_+14, b_+17); W8(wActiveMusic2) = A;
-  CYC(b_+17, SYM(roomSpecificCode5)); ret_effect(gb);
+  CYC(b_+17, b_+18); ret_effect(gb);
 }
 
 void roomSpecificCode5_hook(GB *gb) {
@@ -163,7 +163,7 @@ void roomSpecificCode5_hook(GB *gb) {
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+8); A = 0x1f;
   CYC(b_+8, b_+11); W8(wActiveMusic2) = A;
-  CYC(b_+11, SYM(roomSpecificCode4)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 void roomSpecificCode4_hook(GB *gb) {
@@ -172,7 +172,7 @@ void roomSpecificCode4_hook(GB *gb) {
   CYC(b_+2, b_+5); W8(wMinimapRoom) = A;
   CYC(b_+5, b_+8); SET_HL(wGroup1RoomFlags + 0x06);
   CYC(b_+8, b_+10); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 4));
-  CYC(b_+10, SYM(roomSpecificCode8)); ret_effect(gb);
+  CYC(b_+10, b_+11); ret_effect(gb);
 }
 
 void roomSpecificCode8_hook(GB *gb) {
@@ -194,7 +194,7 @@ void roomSpecificCode8_hook(GB *gb) {
   CYC(b_+11, b_+12);
   CYC(b_+12, b_+14); A = 0x35;
   CYC(b_+14, b_+17); W8(wActiveMusic2) = A;
-  CYC(b_+17, SYM(roomSpecificCode9)); ret_effect(gb);
+  CYC(b_+17, b_+18); ret_effect(gb);
 }
 
 void roomSpecificCode9_hook(GB *gb) {
@@ -209,7 +209,7 @@ void roomSpecificCode9_hook(GB *gb) {
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+8); A = 0x08;
   CYC(b_+8, b_+11); W8(wActiveMusic2) = A;
-  CYC(b_+11, SYM(roomSpecificCodeA)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 void roomSpecificCodeA_hook(GB *gb) {
@@ -218,7 +218,7 @@ void roomSpecificCodeA_hook(GB *gb) {
   CYC(b_+3, b_+5); mem_wr(gb, HL, 0x00);
   CYC(b_+5, b_+6); L = alu_inc8(gb, L);
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0x3c);
-  CYC(b_+8, SYM(roomSpecificCodeB)); ret_effect(gb);
+  CYC(b_+8, b_+9); ret_effect(gb);
 }
 
 void roomSpecificCodeB_hook(GB *gb) {
@@ -227,7 +227,7 @@ void roomSpecificCodeB_hook(GB *gb) {
   CYC(b_+3, b_+5); mem_wr(gb, HL, 0x01);
   CYC(b_+5, b_+6); L = alu_inc8(gb, L);
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0x3c);
-  CYC(b_+8, SYM(roomSpecificCodeC)); ret_effect(gb);
+  CYC(b_+8, b_+9); ret_effect(gb);
 }
 
 void roomSpecificCodeC_hook(GB *gb) {
@@ -241,5 +241,5 @@ void roomSpecificCodeC_hook(GB *gb) {
   }
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0xff);
-  CYC(b_+8, SYM(group0Map08ObjectData)); ret_effect(gb);
+  CYC(b_+8, b_+9); ret_effect(gb);
 }

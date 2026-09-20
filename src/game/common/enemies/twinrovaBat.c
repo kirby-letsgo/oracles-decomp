@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode5e), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode5e), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void enemyCode5e_checkInBounds_hook(GB *gb);
 void enemyCode5e_updateOamFlags_hook(GB *gb);

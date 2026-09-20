@@ -28,12 +28,12 @@ void fillMemory(GB *gb, uint16_t dst, uint8_t value, unsigned n) {
     CYC(b_+0, b_+1); mem_wr(gb, dst + i, value);
     if (i + 1 < n) CYCT(b_+1, b_+4); else CYC(b_+1, b_+4);
   }
-  CYC(b_+4, SYM(clearMemoryBc));
+  CYC(b_+4, b_+5);
 }
 
 void clearMemory(GB *gb, uint16_t dst, unsigned n) {
   BASE(clearMemory);
-  CYC(b_+0, SYM(fillMemory));
+  CYC(b_+0, b_+1);
   fillMemory(gb, dst, 0, n);
 }
 
@@ -44,12 +44,12 @@ void fillMemoryBc(GB *gb, uint16_t dst, uint8_t value, unsigned n) {
     CYC(b_+1, b_+3); mem_wr(gb, dst + i, value);
     if (i + 1 < n) CYCT(b_+3, b_+8); else CYC(b_+3, b_+8);
   }
-  CYC(b_+8, SYM(copyMemoryReverse));
+  CYC(b_+8, b_+9);
 }
 
 void clearMemoryBc(GB *gb, uint16_t dst, unsigned n) {
   BASE(clearMemoryBc);
-  CYC(b_+0, SYM(fillMemoryBc));
+  CYC(b_+0, b_+1);
   fillMemoryBc(gb, dst, 0, n);
 }
 
@@ -214,7 +214,7 @@ void getNumSetBits_hook(GB *gb) {
   } while (a);
   A = B = b;
   F = FZ;
-  CYC(b_+9, SYM(addDecimalToHlRef));
+  CYC(b_+9, b_+11);
   ret_effect(gb);
 }
 
@@ -228,7 +228,7 @@ void addDecimalToHlRef_hook(GB *gb) {
   if (F & FC) {
     CYC(b_+8, b_+12); A = 0x63; mem_wr(gb, p, A);
     CYC(b_+12, b_+13); mem_wr(gb, p + 1, A);
-    CYC(b_+13, SYM(subDecimalFromHlRef));
+    CYC(b_+13, b_+14);
   } else CYCT(b_+8, b_+9);
   ret_effect(gb);
 }
@@ -245,7 +245,7 @@ static void sub_decimal_from_hl_ref(GB *gb) {
     CYC(b_+8, b_+11); mem_wr(gb, p, 0);
     CYC(b_+11, b_+12); mem_wr(gb, p + 1, 0);
     alu_scf(gb);
-    CYC(b_+12, SYM(multiplyAByC));
+    CYC(b_+12, b_+14);
   } else CYCT(b_+8, b_+9);
 }
 
@@ -266,7 +266,7 @@ static void multiply_a_by_c(GB *gb) {
     E = alu_dec8(gb, E);
     if (E) CYCT(b_+11, b_+14); else CYC(b_+11, b_+14);
   } while (E);
-  CYC(b_+14, SYM(multiplyABy16));
+  CYC(b_+14, b_+15);
 }
 
 void multiplyAByC_hook(GB *gb) {
@@ -280,7 +280,7 @@ static void multiply_a_by_16(GB *gb) {
   C = (uint8_t)(a << 4);
   A = B = a >> 4;
   F = (A == 0 ? FZ : 0) | FH;
-  CYC(b_+0, SYM(multiplyABy8));
+  CYC(b_+0, b_+11);
 }
 
 void multiplyABy16_hook(GB *gb) {
@@ -294,7 +294,7 @@ static void multiply_a_by_8(GB *gb) {
   C = (uint8_t)(a << 3);
   A = B = a >> 5;
   F = (A == 0 ? FZ : 0) | FH;
-  CYC(b_+0, SYM(multiplyABy4));
+  CYC(b_+0, b_+12);
 }
 
 void multiplyABy8_hook(GB *gb) {
@@ -308,7 +308,7 @@ void multiplyABy4_hook(GB *gb) {
   B = a >> 6;
   A = C = (uint8_t)(a << 2);
   F = B == 0 ? FZ : 0;
-  CYC(b_+0, SYM(s8ToS16));
+  CYC(b_+0, b_+10);
   ret_effect(gb);
 }
 
@@ -319,7 +319,7 @@ void s8ToS16_hook(GB *gb) {
   if (A & 0x80) CYCT(b_+0, b_+6);
   else { CYC(b_+0, b_+7); B = alu_inc8(gb, B); }
   C = A;
-  CYC(b_+7, SYM(compareHlToBc));
+  CYC(b_+7, b_+9);
   ret_effect(gb);
 }
 
@@ -327,12 +327,12 @@ static void compare_hl_to_bc(GB *gb) {
   BASE(compareHlToBc);
   A = H; alu_cp(gb, B);
   if (F & FC) { CYCT(b_+0, b_+4); A = 0xff; CYC(b_+14, b_+17); }
-  else if (!(F & FZ)) { CYC(b_+0, b_+4); CYCT(b_+4, b_+6); A = 0x01; CYC(b_+17, SYM(getHighestSetBit)); }
+  else if (!(F & FZ)) { CYC(b_+0, b_+4); CYCT(b_+4, b_+6); A = 0x01; CYC(b_+17, b_+20); }
   else {
     CYC(b_+0, b_+8);
     A = L; alu_cp(gb, C);
     if (F & FC) { CYCT(b_+8, b_+10); A = 0xff; CYC(b_+14, b_+17); }
-    else if (!(F & FZ)) { CYC(b_+8, b_+10); CYCT(b_+10, b_+12); A = 0x01; CYC(b_+17, SYM(getHighestSetBit)); }
+    else if (!(F & FZ)) { CYC(b_+8, b_+10); CYCT(b_+10, b_+12); A = 0x01; CYC(b_+17, b_+20); }
     else { CYC(b_+8, b_+14); alu_xor(gb, A); }
   }
 }
@@ -355,7 +355,7 @@ void getHighestSetBit_hook(GB *gb) {
   } while (A);
   A = c;
   alu_scf(gb);
-  CYC(b_+10, SYM(getLowestSetBit));
+  CYC(b_+10, b_+14);
   ret_effect(gb);
 }
 
@@ -372,7 +372,7 @@ void getLowestSetBit_hook(GB *gb) {
   } while (A);
   A = c;
   alu_scf(gb);
-  CYC(b_+9, SYM(checkFlag));
+  CYC(b_+9, b_+13);
   ret_effect(gb);
 }
 
@@ -393,7 +393,7 @@ static void flag_hlpr(GB *gb) {
   alu_add(gb, C);
   C = A;
   A = mem_rd(gb, BC);
-  CYC(b_+0, SYM(decHlRef16WithCap));
+  CYC(b_+0, b_+20);
 }
 
 void _flagHlpr_hook(GB *gb) {
@@ -408,7 +408,7 @@ static void check_flag(GB *gb) {
   flag_hlpr(gb);
   CYC(b_+5, b_+6); alu_and(gb, mem_rd(gb, HL));
   SET_BC(bc); SET_HL(hl);
-  CYC(b_+6, SYM(setFlag));
+  CYC(b_+6, b_+9);
 }
 
 void checkFlag_hook(GB *gb) {
@@ -424,7 +424,7 @@ static void set_flag(GB *gb) {
   CYC(b_+5, b_+6); alu_or(gb, mem_rd(gb, HL));
   CYC(b_+6, b_+7); mem_wr(gb, HL, A);
   SET_BC(bc); SET_HL(hl);
-  CYC(b_+7, SYM(unsetFlag));
+  CYC(b_+7, b_+10);
 }
 
 void setFlag_hook(GB *gb) {
@@ -441,7 +441,7 @@ static void unset_flag(GB *gb) {
   CYC(b_+5, b_+7); alu_and(gb, mem_rd(gb, HL));
   CYC(b_+7, b_+8); mem_wr(gb, HL, A);
   SET_BC(bc); SET_HL(hl);
-  CYC(b_+8, SYM(_flagHlpr));
+  CYC(b_+8, b_+11);
 }
 
 void unsetFlag_hook(GB *gb) {
@@ -461,7 +461,7 @@ static void dec16_cap(GB *gb, uint16_t p) {
   CYC(b_+8, b_+9); A = mem_rd(gb, p + 1); alu_sbc(gb, 0);
   CYC(b_+9, b_+12); mem_wr(gb, p + 1, A);
   CYC(b_+12, b_+13); alu_or(gb, mem_rd(gb, p));
-  CYC(b_+13, SYM(incHlRefWithCap));
+  CYC(b_+13, b_+14);
 }
 
 void decHlRef16WithCap_hook(GB *gb) {
@@ -475,7 +475,7 @@ static void dec16_ff8c(GB *gb) {
   CYC(b_+0, b_+7);
   dec16_cap(gb, hFF8C);
   SET_HL(hl);
-  CYC(b_+7, SYM(enableIntroInputs));
+  CYC(b_+7, b_+9);
 }
 
 void dec16_ff8c_hook(GB *gb) {
@@ -487,7 +487,7 @@ static void inc_hl_ref_with_cap(GB *gb) {
   BASE(incHlRefWithCap);
   CYC(b_+0, b_+1); uint8_t v = alu_inc8(gb, mem_rd(gb, HL)); mem_wr(gb, HL, v);
   if (v) CYCT(b_+1, b_+2);
-  else { CYC(b_+1, b_+4); mem_wr(gb, HL, 0xff); CYC(b_+4, SYM(incHlRef16WithCap)); }
+  else { CYC(b_+1, b_+4); mem_wr(gb, HL, 0xff); CYC(b_+4, b_+5); }
 }
 
 void incHlRefWithCap_hook(GB *gb) {
@@ -504,7 +504,7 @@ static void inc_hl_ref16_with_cap(GB *gb) {
   CYCT(b_+4, b_+6);
   CYC(b_+8, b_+12); mem_wr(gb, HL + 1, 0xff);
   CYC(b_+12, b_+13); mem_wr(gb, HL, 0xff);
-  CYC(b_+13, SYM(hexToDec));
+  CYC(b_+13, b_+15);
 }
 
 void incHlRef16WithCap_hook(GB *gb) {
@@ -526,7 +526,7 @@ void hexToDec_hook(GB *gb) {
   for (;;) {
     alu_cp(gb, 0x0a);
     if (F & FC) { CYCT(b_+12, b_+15); break; }
-    CYC(b_+12, SYM(pollInput));
+    CYC(b_+12, b_+20);
     alu_sub(gb, 0x0a);
     C = alu_inc8(gb, C);
   }
@@ -543,7 +543,7 @@ uint8_t getRandomNumber(GB *gb) {
   uint16_t v = (uint16_t)(((hi << 8) | lo) * 3);
   CYC(b_+8, b_+15); H8(hRng2) = v >> 8;
   CYC(b_+15, b_+18); H8(hRng1) = (uint8_t)((v >> 8) + lo);
-  CYC(b_+18, SYM(getRandomNumber_noPreserveVars));
+  CYC(b_+18, b_+21);
   return H8(hRng1);
 }
 
@@ -554,7 +554,7 @@ uint8_t getRandomNumber_noPreserveVars(GB *gb) {
   uint16_t v = (uint16_t)(((hi << 8) | lo) * 3);
   CYC(b_+6, b_+13); H8(hRng2) = v >> 8;
   CYC(b_+13, b_+16); H8(hRng1) = (uint8_t)((v >> 8) + lo);
-  CYC(b_+16, SYM(getRandomIndexFromProbabilityDistribution));
+  CYC(b_+16, b_+17);
   return H8(hRng1);
 }
 
@@ -585,7 +585,7 @@ void getRandomIndexFromProbabilityDistribution_hook(GB *gb) {
   for (;;) {
     CYC(b_+5, b_+6); alu_sub(gb, mem_rd(gb, HL));
     if (F & FC) { CYCT(b_+6, b_+7); break; }
-    CYC(b_+6, SYM(clearMemory));
+    CYC(b_+6, b_+11);
     SET_HL(HL + 1);
     B++;
   }
@@ -602,7 +602,7 @@ void clearOam(GB *gb) {
     CYC(b_+7, b_+9); mem_wr(gb, wOam + i * 4, 0xe0);
     if (i < 39) CYCT(b_+9, b_+15); else CYC(b_+9, b_+15);
   }
-  CYC(b_+15, SYM(clearVram));
+  CYC(b_+15, b_+16);
 }
 
 void clearOam_hook(GB *gb) {
@@ -632,7 +632,7 @@ bool disableLcd(GB *gb) {
   CYC(b_+32, b_+34); mem_wr(gb, IO_LCDC, 0);
   CYC(b_+34, b_+36); mem_wr(gb, IO_IF, 0);
   CYC(b_+36, b_+39); mem_wr(gb, IO_IE, ie);
-  CYC(b_+39, SYM(loadGfxRegisterStateIndex));
+  CYC(b_+39, b_+41);
   return true;
 }
 
@@ -649,7 +649,7 @@ void clearVram(GB *gb) {
   CYC(b_+6, b_+10); mem_wr(gb, IO_VBK, 1);
   CYC(b_+10, b_+19); clearMemoryBc(gb, 0x8000, (SYM(objectCheckCenteredWithLink) + 18));
   CYC(b_+19, b_+22); mem_wr(gb, IO_VBK, 0);
-  CYC(b_+22, SYM(initializeVramMaps)); clearMemoryBc(gb, 0x8000, (SYM(objectCheckCenteredWithLink) + 18));
+  CYC(b_+22, b_+30); clearMemoryBc(gb, 0x8000, (SYM(objectCheckCenteredWithLink) + 18));
 }
 
 static void clear_bc_done(GB *gb, uint16_t end) {
@@ -672,7 +672,7 @@ void initializeVramMap0(GB *gb) {
   CYC(b_+3, b_+7); mem_wr(gb, IO_VBK, 1);
   CYC(b_+7, b_+18); fillMemoryBc(gb, 0x9800, 0x80, 0x400);
   CYC(b_+18, b_+21); mem_wr(gb, IO_VBK, 0);
-  CYC(b_+21, SYM(initializeVramMap1)); clearMemoryBc(gb, 0x9800, 0x400);
+  CYC(b_+21, b_+29); clearMemoryBc(gb, 0x9800, 0x400);
 }
 
 void initializeVramMap1(GB *gb) {
@@ -681,12 +681,12 @@ void initializeVramMap1(GB *gb) {
   CYC(b_+3, b_+7); mem_wr(gb, IO_VBK, 1);
   CYC(b_+7, b_+18); fillMemoryBc(gb, 0x9c00, 0x80, 0x400);
   CYC(b_+18, b_+21); mem_wr(gb, IO_VBK, 0);
-  CYC(b_+21, SYM(loadPaletteHeader)); clearMemoryBc(gb, 0x9c00, 0x400);
+  CYC(b_+21, b_+30); clearMemoryBc(gb, 0x9c00, 0x400);
 }
 
 void initializeVramMaps(GB *gb) {
   BASE(initializeVramMaps);
-  CYC(b_+0, SYM(initializeVramMap0));
+  CYC(b_+0, b_+3);
   initializeVramMap1(gb);
   initializeVramMap0(gb);
 }
@@ -707,7 +707,7 @@ static void read_byte_sequential(GB *gb) {
   CYC(b_+7, b_+9); uint8_t bank = (uint8_t)(H8(hRomBank) + 1);
   CYC(b_+9, b_+12); H8(hRomBank) = bank;
   CYC(b_+12, b_+15); mem_wr(gb, MBC_ROM_BANK, bank);
-  CYC(b_+15, SYM(loadTileset));
+  CYC(b_+15, b_+17);
   A = v;
 }
 
@@ -728,7 +728,7 @@ static void add16_bit_refs(GB *gb) {
   CYC(b_+3, b_+6); A = mem_rd(gb, DE);
   CYC(b_+6, b_+7); alu_adc(gb, mem_rd(gb, HL));
   CYC(b_+7, b_+8); mem_wr(gb, DE, A);
-  CYC(b_+8, SYM(cpActiveRing));
+  CYC(b_+8, b_+9);
 }
 
 void add16BitRefs_hook(GB *gb) {
@@ -739,7 +739,7 @@ void add16BitRefs_hook(GB *gb) {
 static void cp_active_ring(GB *gb) {
   BASE(cpActiveRing);
   CYC(b_+0, b_+5); alu_cp(gb, W8(wActiveRing));
-  CYC(b_+5, SYM(disableActiveRing));
+  CYC(b_+5, b_+7);
 }
 
 void cpActiveRing_hook(GB *gb) {
@@ -750,7 +750,7 @@ void cpActiveRing_hook(GB *gb) {
 void disableActiveRing_hook(GB *gb) {
   BASE(disableActiveRing);
   CYC(b_+0, b_+6); W8(wActiveRing) |= 0x40;
-  CYC(b_+6, SYM(enableActiveRing));
+  CYC(b_+6, b_+8);
   ret_effect(gb);
 }
 
@@ -760,7 +760,7 @@ void enableActiveRing_hook(GB *gb) {
   alu_cp(gb, 0xff);
   if (F & FZ) CYCT(b_+5, b_+9);
   else { CYC(b_+5, b_+11); W8(wActiveRing) &= (uint8_t)~0x40; }
-  CYC(b_+11, SYM(interactionDecCounter1));
+  CYC(b_+11, b_+13);
   ret_effect(gb);
 }
 
@@ -831,7 +831,7 @@ void objectSetReservedBit1_hook(GB *gb) {
   L = A;
   H = D;
   CYC(b_+2, b_+6); mem_wr(gb, HL, mem_rd(gb, HL) | 0x02);
-  CYC(b_+6, SYM(objectGetAngleTowardEnemyTarget));
+  CYC(b_+6, b_+7);
   ret_effect(gb);
 }
 
@@ -840,7 +840,7 @@ void checkInteractionState_hook(GB *gb) {
   E = INTERACTION_BASE + OBJ_STATE;
   CYC(b_+0, b_+3); A = mem_rd(gb, DE);
   alu_or(gb, A);
-  CYC(b_+3, SYM(checkInteractionSubstate));
+  CYC(b_+3, b_+5);
   ret_effect(gb);
 }
 
@@ -861,7 +861,7 @@ static void room_flags(GB *gb, uint8_t group, uint8_t room) {
   CYC(b_+4, b_+5); H = mem_rd(gb, HL);
   L = room;
   CYC(b_+5, b_+7); A = mem_rd(gb, HL);
-  CYC(b_+7, SYM(checkIsLinkedGame));
+  CYC(b_+7, b_+8);
 }
 
 void getRoomFlags_hook(GB *gb) {
@@ -876,7 +876,7 @@ static void a_room_flags(GB *gb, uint8_t room) {
   CYC(b_+5, b_+8);
   room_flags(gb, group, room);
   SET_BC(bc);
-  CYC(b_+8, SYM(getRoomFlags));
+  CYC(b_+8, b_+10);
 }
 
 void getARoomFlags_hook(GB *gb) {
@@ -886,7 +886,7 @@ void getARoomFlags_hook(GB *gb) {
 
 static void this_room_flags(GB *gb) {
   BASE(getThisRoomFlags);
-  CYC(b_+0, SYM(getARoomFlags)); uint8_t room = W8(wActiveRoom);
+  CYC(b_+0, b_+3); uint8_t room = W8(wActiveRoom);
   a_room_flags(gb, room);
 }
 
@@ -899,7 +899,7 @@ void checkIsLinkedGame_hook(GB *gb) {
   BASE(checkIsLinkedGame);
   CYC(b_+0, b_+3); A = W8(wIsLinkedGame);
   alu_or(gb, A);
-  CYC(b_+3, SYM(setWarpDestVariables));
+  CYC(b_+3, b_+5);
   ret_effect(gb);
 }
 
@@ -914,7 +914,7 @@ static void find_byte_at_hl(GB *gb) {
     alu_cp(gb, E);
     if (!(F & FZ)) { CYCT(b_+1, b_+6); continue; }
     alu_scf(gb);
-    CYC(b_+1, SYM(lookupCollisionTable));
+    CYC(b_+1, b_+8);
     break;
   }
 }
@@ -935,7 +935,7 @@ static void lookup_key(GB *gb) {
     CYC(b_+1, b_+5); A = mem_rd(gb, HL); SET_HL(HL + 1);
     if (!found) { CYCT(b_+5, b_+7); continue; }
     alu_scf(gb);
-    CYC(b_+5, SYM(findByteInGroupTable));
+    CYC(b_+5, b_+9);
     break;
   }
 }
@@ -950,7 +950,7 @@ void lookupKey_hook(GB *gb) {
 void setStatusBarNeedsRefreshBit1(GB *gb) {
   BASE(setStatusBarNeedsRefreshBit1);
   CYC(b_+0, b_+6); W8(wStatusBarNeedsRefresh) |= 0x02;
-  CYC(b_+6, SYM(getRandomRingOfGivenTier));
+  CYC(b_+6, b_+8);
 }
 
 void setStatusBarNeedsRefreshBit1_hook(GB *gb) {
@@ -970,7 +970,7 @@ static void dec_bcd_count(GB *gb) {
   alu_daa(gb);
   CYC(b_+10, b_+14); mem_wr(gb, HL, A);
   alu_or(gb, H);
-  CYC(b_+14, SYM(setStatusBarNeedsRefreshBit1));
+  CYC(b_+14, b_+16);
 }
 
 void decNumActiveSeeds_hook(GB *gb) {
@@ -979,7 +979,7 @@ void decNumActiveSeeds_hook(GB *gb) {
   SET_HL(wNumEmberSeeds);
   CYC(b_+0, b_+6);
   add_a_to_hl(gb);
-  CYC(b_+6, SYM(decNumBombchus));
+  CYC(b_+6, b_+8);
   dec_bcd_count(gb);
   ret_effect(gb);
 }
@@ -987,7 +987,7 @@ void decNumActiveSeeds_hook(GB *gb) {
 void decNumBombchus_hook(GB *gb) {
   BASE(decNumBombchus);
   SET_HL(wNumBombchus);
-  CYC(b_+0, SYM(decNumBombs));
+  CYC(b_+0, b_+5);
   dec_bcd_count(gb);
   ret_effect(gb);
 }
@@ -1013,7 +1013,7 @@ static void short_pos_from_de(GB *gb) {
   alu_swap_a(gb);
   alu_and(gb, 0x0f);
   alu_or(gb, B);
-  CYC(b_+7, SYM(objectGetShortPosition_withYOffset));
+  CYC(b_+7, b_+13);
 }
 
 void getShortPositionFromDE_hook(GB *gb) {
@@ -1026,7 +1026,7 @@ static void object_get_short_position(GB *gb) {
   CYC(b_+0, b_+2); A = H8(hActiveObjectType);
   alu_add(gb, OBJ_YH);
   E = A;
-  CYC(b_+2, SYM(getShortPositionFromDE));
+  CYC(b_+2, b_+5);
   short_pos_from_de(gb);
 }
 
@@ -1043,7 +1043,7 @@ void objectGetShortPosition_withYOffset_hook(GB *gb) {
   E = A;
   CYC(b_+3, b_+7); A = mem_rd(gb, DE);
   alu_add(gb, B);
-  CYC(b_+7, SYM(objectMakeTileSolid));
+  CYC(b_+7, b_+10);
   alu_and(gb, 0xf0);
   B = A;
   E = alu_inc8(gb, E);
@@ -1052,7 +1052,7 @@ void objectGetShortPosition_withYOffset_hook(GB *gb) {
   alu_swap_a(gb);
   alu_and(gb, 0x0f);
   alu_or(gb, B);
-  CYC((SYM(getShortPositionFromDE) + 7), b_+0);
+  CYC((SYM(getShortPositionFromDE) + 7), (SYM(getShortPositionFromDE) + 13));
   ret_effect(gb);
 }
 
@@ -1067,7 +1067,7 @@ static void object_get_position(GB *gb) {
   E = alu_inc8(gb, E);
   CYC(b_+6, b_+10); A = mem_rd(gb, DE);
   C = A;
-  CYC(b_+10, SYM(objectGetShortPosition));
+  CYC(b_+10, b_+12);
 }
 
 void objectGetPosition_hook(GB *gb) {
@@ -1086,7 +1086,7 @@ static void short_to_long_pos(GB *gb) {
   alu_and(gb, 0xf0);
   alu_or(gb, 0x08);
   C = A;
-  CYC(b_+0, SYM(objectCenterOnTile));
+  CYC(b_+0, b_+15);
 }
 
 void convertShortToLongPosition_paramC_hook(GB *gb) {
@@ -1097,7 +1097,7 @@ void convertShortToLongPosition_paramC_hook(GB *gb) {
 void convertShortToLongPosition_hook(GB *gb) {
   BASE(convertShortToLongPosition);
   C = A;
-  CYC(b_+0, SYM(convertShortToLongPosition_paramC));
+  CYC(b_+0, b_+1);
   short_to_long_pos(gb);
   ret_effect(gb);
 }
@@ -1112,7 +1112,7 @@ static void set_short_pos_param_c(GB *gb) {
   L = alu_inc8(gb, L);
   CYC(b_+5, b_+8); mem_wr(gb, HL, C);
   SET_BC(bc);
-  CYC(b_+8, SYM(objectSetShortPosition));
+  CYC(b_+8, b_+10);
 }
 
 void setShortPosition_paramC_hook(GB *gb) {
@@ -1123,7 +1123,7 @@ void setShortPosition_paramC_hook(GB *gb) {
 void setShortPosition_hook(GB *gb) {
   BASE(setShortPosition);
   C = A;
-  CYC(b_+0, SYM(setShortPosition_paramC));
+  CYC(b_+0, b_+1);
   set_short_pos_param_c(gb);
   ret_effect(gb);
 }
@@ -1134,7 +1134,7 @@ void objectSetShortPosition_hook(GB *gb) {
   CYC(b_+0, b_+3); A = H8(hActiveObjectType);
   alu_add(gb, OBJ_YH);
   L = A;
-  CYC(b_+3, SYM(convertShortToLongPosition));
+  CYC(b_+3, b_+8);
   set_short_pos_param_c(gb);
   ret_effect(gb);
 }
@@ -1153,7 +1153,7 @@ static void center_on_tile(GB *gb) {
   alu_and(gb, 0xf0);
   alu_or(gb, 0x08);
   CYC(b_+11, b_+16); mem_wr(gb, HL, A);
-  CYC(b_+16, SYM(checkBPartSlotsAvailable));
+  CYC(b_+16, b_+17);
 }
 
 void centerCoordinatesOnTile_hook(GB *gb) {
@@ -1167,7 +1167,7 @@ void objectCenterOnTile_hook(GB *gb) {
   alu_add(gb, OBJ_Y);
   L = A;
   H = D;
-  CYC(b_+2, SYM(centerCoordinatesOnTile));
+  CYC(b_+2, b_+6);
   center_on_tile(gb);
   ret_effect(gb);
 }
@@ -1186,7 +1186,7 @@ static void copy_pos_raw(GB *gb) {
   E = alu_inc8(gb, E); E = alu_inc8(gb, E); L = alu_inc8(gb, L);
   CYC(b_+13, b_+17); A = mem_rd(gb, DE);
   CYC(b_+17, b_+18); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+18, SYM(objectCopyPositionWithOffset));
+  CYC(b_+18, b_+19);
 }
 
 void objectCopyPosition_rawAddress_hook(GB *gb) {
@@ -1199,7 +1199,7 @@ static void object_copy_position(GB *gb) {
   CYC(b_+0, b_+2); A = H8(hActiveObjectType);
   alu_add(gb, OBJ_YH);
   E = A;
-  CYC(b_+2, SYM(objectCopyPosition_rawAddress));
+  CYC(b_+2, b_+5);
   copy_pos_raw(gb);
 }
 
@@ -1227,7 +1227,7 @@ static void copy_position_with_offset(GB *gb) {
   E = alu_inc8(gb, E); E = alu_inc8(gb, E); L = alu_inc8(gb, L);
   CYC(b_+20, b_+24); A = mem_rd(gb, DE);
   CYC(b_+24, b_+25); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+25, SYM(objectTakePosition));
+  CYC(b_+25, b_+26);
 }
 
 void objectCopyPositionWithOffset_hook(GB *gb) {
@@ -1254,7 +1254,7 @@ static void take_pos(GB *gb) {
   E = alu_inc8(gb, E); E = alu_inc8(gb, E); L = alu_inc8(gb, L);
   CYC(b_+20, b_+24); A = mem_rd(gb, HL);
   CYC(b_+24, b_+25); mem_wr(gb, DE, A);
-  CYC(b_+25, SYM(breakCrackedFloor));
+  CYC(b_+25, b_+26);
 }
 
 void objectTakePositionWithOffset_hook(GB *gb) {
@@ -1265,7 +1265,7 @@ void objectTakePositionWithOffset_hook(GB *gb) {
 void objectTakePosition_hook(GB *gb) {
   BASE(objectTakePosition);
   SET_BC(0);
-  CYC(b_+0, SYM(objectTakePositionWithOffset));
+  CYC(b_+0, b_+3);
   take_pos(gb);
   ret_effect(gb);
 }
@@ -1301,7 +1301,7 @@ void lookupCollisionTable_paramE_hook(GB *gb) {
 static void lookup_collision_table(GB *gb) {
   BASE(lookupCollisionTable);
   E = A;
-  CYC(b_+0, SYM(lookupCollisionTable_paramE));
+  CYC(b_+0, b_+1);
   collision_table(gb, SYM(lookupCollisionTable_paramE));
   lookup_key(gb);
 }
@@ -1320,7 +1320,7 @@ void findByteInCollisionTable_paramE_hook(GB *gb) {
 void findByteInCollisionTable_hook(GB *gb) {
   BASE(findByteInCollisionTable);
   E = A;
-  CYC(b_+0, SYM(findByteInCollisionTable_paramE));
+  CYC(b_+0, b_+1);
   collision_table(gb, SYM(findByteInCollisionTable_paramE));
   find_byte_at_hl(gb);
   ret_effect(gb);
@@ -1349,7 +1349,7 @@ static void slots_available(GB *gb) {
     if (F & FC) { CYCT(b_+17, b_+21); CYCT(b_+6, b_+8); continue; }
     CYC(b_+17, b_+21);
     alu_or(gb, H);
-    CYC(b_+21, SYM(objectSetPositionInCircleArc));
+    CYC(b_+21, b_+23);
     CYC(b_+6, b_+8); CYCT(b_+8, b_+9);
     return;
   }
@@ -1358,7 +1358,7 @@ static void slots_available(GB *gb) {
 void checkBPartSlotsAvailable_hook(GB *gb) {
   BASE(checkBPartSlotsAvailable);
   SET_HL(PART_SLOTS);
-  CYC(b_+0, SYM(checkBEnemySlotsAvailable));
+  CYC(b_+0, b_+5);
   slots_available(gb);
   ret_effect(gb);
 }
@@ -1385,13 +1385,13 @@ static void related_object_var(GB *gb) {
   E = alu_inc8(gb, E);
   CYC(b_+8, b_+12); A = mem_rd(gb, DE);
   H = A;
-  CYC(b_+12, SYM(objectGetZAboveScreen));
+  CYC(b_+12, b_+14);
 }
 
 void objectGetRelatedObject1Var_hook(GB *gb) {
   BASE(objectGetRelatedObject1Var);
   L = OBJ_RELATED1;
-  CYC(b_+0, SYM(objectGetRelatedObject2Var));
+  CYC(b_+0, b_+4);
   related_object_var(gb);
   ret_effect(gb);
 }
@@ -1416,7 +1416,7 @@ void objectGetZAboveScreen_hook(GB *gb) {
   alu_sub(gb, 0x08);
   alu_cp(gb, 0x80);
   if (!(F & FC)) CYCT(b_+9, b_+15);
-  else { CYC(b_+9, b_+15); A = 0x80; CYC(b_+15, SYM(objectCheckWithinScreenBoundary)); }
+  else { CYC(b_+9, b_+15); A = 0x80; CYC(b_+15, b_+18); }
   ret_effect(gb);
 }
 
@@ -1440,7 +1440,7 @@ void objectCheckWithinScreenBoundary_hook(GB *gb) {
     alu_sub(gb, C);
     alu_add(gb, 0x07);
     alu_cp(gb, 0xaf);
-    CYC(b_+21, SYM(objectCheckWithinRoomBoundary));
+    CYC(b_+21, b_+27);
   }
   ret_effect(gb);
 }
@@ -1460,7 +1460,7 @@ void objectCheckWithinRoomBoundary_hook(GB *gb) {
     L = alu_inc8(gb, L);
     CYC(b_+10, b_+15); A = mem_rd(gb, DE);
     CYC(b_+15, b_+16); alu_cp(gb, mem_rd(gb, HL));
-    CYC(b_+16, SYM(objectReplaceWithID));
+    CYC(b_+16, b_+17);
   }
   ret_effect(gb);
 }
@@ -1479,7 +1479,7 @@ static void tile_at_position(GB *gb) {
   L = A;
   H = wRoomLayout >> 8;
   CYC(b_+0, b_+14); A = mem_rd(gb, HL);
-  CYC(b_+14, SYM(objectGetRelativePositionOfTile));
+  CYC(b_+14, b_+15);
 }
 
 void getTileAtPosition_hook(GB *gb) {
@@ -1489,7 +1489,7 @@ void getTileAtPosition_hook(GB *gb) {
 
 static void object_get_tile_at_position(GB *gb) {
   BASE(objectGetTileAtPosition);
-  CYC(b_+0, SYM(getTileAtPosition));
+  CYC(b_+0, b_+3);
   object_get_position(gb);
   tile_at_position(gb);
 }
@@ -1512,7 +1512,7 @@ static void object_get_relative_tile(GB *gb) {
   CYC(b_+7, b_+11); A = mem_rd(gb, HL); SET_HL(HL + 1);
   alu_add(gb, C);
   C = A;
-  CYC(b_+11, SYM(objectGetTileAtPosition));
+  CYC(b_+11, b_+15);
   tile_at_position(gb);
 }
 
@@ -1528,7 +1528,7 @@ static bool tile_at_offset_matches(GB *gb, uint16_t call_addr) {
   L = A;
   CYC(b_+43, b_+47); A = H8(hFF8B);
   CYC(b_+47, b_+48); alu_cp(gb, mem_rd(gb, HL));
-  CYC(b_+48, SYM(objectCheckSimpleCollision));
+  CYC(b_+48, b_+49);
   return F & FZ;
 }
 
@@ -1570,10 +1570,10 @@ static void tile_index_from_layout_buffer(GB *gb) {
   CYC(b_+19, b_+22); mem_wr(gb, IO_SVBK, svbk);
   A = B;
   alu_cp(gb, 0x10);
-  if (!(F & FC)) { CYCT(b_+22, b_+27); A = E; CYC(b_+33, SYM(interactionInitGraphics)); return; }
+  if (!(F & FC)) { CYCT(b_+22, b_+27); A = E; CYC(b_+33, b_+35); return; }
   CYC(b_+22, b_+28);
   alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+28, b_+30); A = E; CYC(b_+33, SYM(interactionInitGraphics)); return; }
+  if (F & FZ) { CYCT(b_+28, b_+30); A = E; CYC(b_+33, b_+35); return; }
   CYC(b_+28, b_+30);
   alu_scf(gb);
   A = E;
@@ -1588,7 +1588,7 @@ void getTileIndexFromRoomLayoutBuffer_paramC_hook(GB *gb) {
 void getTileIndexFromRoomLayoutBuffer_hook(GB *gb) {
   BASE(getTileIndexFromRoomLayoutBuffer);
   C = A;
-  CYC(b_+0, SYM(getTileIndexFromRoomLayoutBuffer_paramC));
+  CYC(b_+0, b_+1);
   tile_index_from_layout_buffer(gb);
   ret_effect(gb);
 }
@@ -1600,7 +1600,7 @@ static void object_get_relative_angle(GB *gb) {
   CYC(b_+0, b_+2); A = H8(hActiveObjectType);
   alu_or(gb, OBJ_YH);
   E = A;
-  CYC(b_+2, SYM(getRelativeAngle));
+  CYC(b_+2, b_+5);
   getRelativeAngle_hook(gb);
 }
 
@@ -1612,7 +1612,7 @@ void objectGetAngleTowardLink_hook(GB *gb) {
   B = A;
   CYC(b_+3, b_+7); A = mem_rd(gb, w1Link_xh);
   C = A;
-  CYC(b_+7, SYM(objectGetRelativeAngle));
+  CYC(b_+7, b_+8);
   object_get_relative_angle(gb);
 }
 
@@ -1620,7 +1620,7 @@ static void angle_toward_enemy_target(GB *gb) {
   BASE(objectGetAngleTowardEnemyTarget);
   CYC(b_+0, b_+2); B = H8(hEnemyTargetY);
   CYC(b_+2, b_+5); C = H8(hEnemyTargetX);
-  CYC(b_+5, SYM(objectGetAngleTowardLink));
+  CYC(b_+5, b_+8);
   object_get_relative_angle(gb);
 }
 
@@ -1646,7 +1646,7 @@ void objectNudgeAngleTowards_hook(GB *gb) {
   A = B;
   alu_and(gb, 0x1f);
   CYC(b_+21, b_+25); mem_wr(gb, DE, A);
-  CYC(b_+25, SYM(objectCheckCenteredWithLink));
+  CYC(b_+25, b_+26);
   ret_effect(gb);
 }
 
@@ -1671,7 +1671,7 @@ static void centered_with_link(GB *gb) {
     CYC(b_+22, b_+23); alu_sub(gb, mem_rd(gb, HL));
     alu_add(gb, B);
     alu_cp(gb, C);
-    CYC(b_+23, SYM(objectApplyComponentSpeed));
+    CYC(b_+23, b_+26);
   }
 }
 
@@ -1714,7 +1714,7 @@ static void link_within_distance(GB *gb) {
   A = E;
   alu_and(gb, 0x06);
   alu_scf(gb);
-  CYC(b_+45, SYM(objectNudgeAngleTowards));
+  CYC(b_+45, b_+50);
 }
 
 void objectCheckLinkWithinDistance_hook(GB *gb) {
@@ -1733,7 +1733,7 @@ static void add_speed_component(GB *gb) {
   CYC(b_+16, b_+18); A = mem_rd(gb, DE);
   CYC(b_+18, b_+19); alu_adc(gb, mem_rd(gb, HL));
   CYC(b_+19, b_+20); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+20, SYM(objectApplySpeed));
+  CYC(b_+20, b_+21);
 }
 
 void objectApplyComponentSpeed_hook(GB *gb) {
@@ -1760,7 +1760,7 @@ static void velocity_invalid(GB *gb) {
   CYC(b_+69, b_+70); mem_wr(gb, HL, A); SET_HL(HL - 1);
   CYC(b_+70, b_+71); mem_wr(gb, HL, A); SET_HL(HL - 1);
   CYC(b_+71, b_+72); mem_wr(gb, HL, A);
-  CYC(b_+72, SYM(objectGetPosition));
+  CYC(b_+72, b_+73);
 }
 
 static void position_offset_for_velocity(GB *gb) {
@@ -1837,7 +1837,7 @@ static void apply_given_speed(GB *gb) {
   CYC(b_+18, b_+21); A = mem_rd(gb, DE);
   CYC(b_+21, b_+22); alu_adc(gb, mem_rd(gb, HL));
   CYC(b_+22, b_+23); mem_wr(gb, DE, A);
-  CYC(b_+23, SYM(getPositionOffsetForVelocity));
+  CYC(b_+23, b_+24);
 }
 
 void objectApplyGivenSpeed_hook(GB *gb) {
@@ -1855,7 +1855,7 @@ static void object_apply_speed(GB *gb) {
   CYC(b_+3, b_+8); C = mem_rd(gb, HL);
   alu_add(gb, 0x07);
   L = A;
-  CYC(b_+8, SYM(objectApplyGivenSpeed)); B = mem_rd(gb, HL);
+  CYC(b_+8, b_+12); B = mem_rd(gb, HL);
   apply_given_speed(gb);
 }
 
@@ -1884,7 +1884,7 @@ static void update_speed_z_param_c(GB *gb) {
     E = alu_dec8(gb, E);
     CYC(b_+28, b_+30); mem_wr(gb, DE, A);
     alu_xor(gb, A);
-    CYC(b_+30, SYM(objectUpdateSpeedZ_sidescroll));
+    CYC(b_+30, b_+32);
     return;
   }
   CYC(b_+12, b_+16);
@@ -1907,7 +1907,7 @@ void objectUpdateSpeedZ_paramC_hook(GB *gb) {
 void objectUpdateSpeedZ_hook(GB *gb) {
   BASE(objectUpdateSpeedZ);
   C = A;
-  CYC(b_+0, SYM(objectUpdateSpeedZ_paramC));
+  CYC(b_+0, b_+1);
   update_speed_z_param_c(gb);
   ret_effect(gb);
 }
@@ -1915,7 +1915,7 @@ void objectUpdateSpeedZ_hook(GB *gb) {
 void objectUpdateSpeedZ_sidescroll_hook(GB *gb) {
   BASE(objectUpdateSpeedZ_sidescroll);
   B = 0x06;
-  CYC(b_+0, SYM(objectUpdateSpeedZ_sidescroll_givenYOffset));
+  CYC(b_+0, b_+2);
   objectUpdateSpeedZ_sidescroll_givenYOffset_hook(gb);
 }
 
@@ -1928,7 +1928,7 @@ void objectSetSpeedZ_hook(GB *gb) {
   CYC(b_+2, b_+7); mem_wr(gb, HL, C);
   L = alu_inc8(gb, L);
   CYC(b_+7, b_+9); mem_wr(gb, HL, B);
-  CYC(b_+9, SYM(add16BitRefs));
+  CYC(b_+9, b_+10);
   ret_effect(gb);
 }
 
@@ -1966,7 +1966,7 @@ static void negate_and_halve_speed_z(GB *gb) {
   if (F & FZ) { CYCT(b_+36, b_+39); return; }
   CYC(b_+36, b_+39);
   alu_xor(gb, A);
-  CYC(b_+39, SYM(objectSetSpeedZ));
+  CYC(b_+39, b_+41);
 }
 
 void objectNegateAndHalveSpeedZ_hook(GB *gb) {
@@ -1978,8 +1978,8 @@ void objectUpdateSpeedZAndBounce_hook(GB *gb) {
   BASE(objectUpdateSpeedZAndBounce);
   CYC(b_+0, b_+3);
   update_speed_z_param_c(gb);
-  if (!(F & FZ)) { CYCT(b_+3, SYM(objectNegateAndHalveSpeedZ)); ret_effect(gb); return; }
-  CYC(b_+3, SYM(objectNegateAndHalveSpeedZ));
+  if (!(F & FZ)) { CYCT(b_+3, b_+4); ret_effect(gb); return; }
+  CYC(b_+3, b_+4);
   negate_and_halve_speed_z(gb);
   ret_effect(gb);
 }
@@ -2012,7 +2012,7 @@ static void h_check_contains_point(GB *gb) {
   L = alu_inc8(gb, L);
   A = C;
   CYC(b_+27, b_+31); alu_sub(gb, mem_rd(gb, HL));
-  CYC(b_+31, SYM(checkObjectsCollidedFromVariables));
+  CYC(b_+31, b_+32);
 }
 
 void objectHCheckContainsPoint_hook(GB *gb) {
@@ -2024,7 +2024,7 @@ void objectCheckContainsPoint_hook(GB *gb) {
   BASE(objectCheckContainsPoint);
   H = D;
   CYC(b_+0, b_+3); L = H8(hActiveObjectType);
-  CYC(b_+3, SYM(interactionCheckContainsPoint));
+  CYC(b_+3, b_+6);
   h_check_contains_point(gb);
   ret_effect(gb);
 }
@@ -2033,7 +2033,7 @@ void interactionCheckContainsPoint_hook(GB *gb) {
   BASE(interactionCheckContainsPoint);
   H = D;
   L = INTERACTION_BASE;
-  CYC(b_+0, SYM(objectHCheckContainsPoint));
+  CYC(b_+0, b_+3);
   h_check_contains_point(gb);
   ret_effect(gb);
 }
@@ -2068,7 +2068,7 @@ static void objects_collided_from_variables(GB *gb) {
   alu_add(gb, B);
   B = alu_sla(gb, B);
   alu_cp(gb, B);
-  CYC(b_+30, SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing));
+  CYC(b_+30, b_+36);
 }
 
 void checkObjectsCollidedFromVariables_hook(GB *gb) {
@@ -2093,7 +2093,7 @@ static void collided_with_link_from_1c56(GB *gb) {
   L = OBJ_XH;
   CYC(b_+33, b_+36); C = mem_rd(gb, HL);
   L = OBJ_COLLISION_RADIUS_Y;
-  CYC(b_+36, SYM(objectCheckCollidedWithLink_ignoreZ));
+  CYC(b_+36, b_+40);
   objects_collided_from_variables(gb);
 }
 
@@ -2125,7 +2125,7 @@ static void object_check_collided_with_link(GB *gb) {
   alu_add(gb, OBJ_ZH);
   L = A;
   H = D;
-  CYC(b_+2, SYM(_checkCollidedWithLink));
+  CYC(b_+2, b_+6);
   check_collided_with_link(gb);
 }
 
@@ -2140,7 +2140,7 @@ void objectCheckCollidedWithLink_ignoreZ_hook(GB *gb) {
   alu_add(gb, OBJ_XH);
   L = A;
   H = D;
-  CYC(b_+2, SYM(hObjectCheckCollidedWithLink));
+  CYC(b_+2, b_+8);
   collided_with_link_from_1c56(gb);
   ret_effect(gb);
 }
@@ -2150,7 +2150,7 @@ static void collided_with_link_not_dead(GB *gb) {
   CYC(b_+0, b_+3); A = W8(wLinkDeathTrigger);
   alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+3, b_+5); return; }
-  CYC(b_+3, SYM(objectCheckCollidedWithLink_onGround));
+  CYC(b_+3, b_+7);
   object_check_collided_with_link(gb);
 }
 
@@ -2163,8 +2163,8 @@ void objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook(GB *gb) {
   BASE(objectCheckCollidedWithLink_notDeadAndNotGrabbing);
   CYC(b_+0, b_+3); A = W8(wLinkGrabState);
   alu_and(gb, 0xbe);
-  if (!(F & FZ)) { CYCT(b_+3, SYM(objectCheckCollidedWithLink_notDead)); ret_effect(gb); return; }
-  CYC(b_+3, SYM(objectCheckCollidedWithLink_notDead));
+  if (!(F & FZ)) { CYCT(b_+3, b_+6); ret_effect(gb); return; }
+  CYC(b_+3, b_+6);
   collided_with_link_not_dead(gb);
   ret_effect(gb);
 }
@@ -2177,7 +2177,7 @@ void objectCheckCollidedWithLink_onGround_hook(GB *gb) {
   CYC(b_+3, b_+8); A = mem_rd(gb, w1Link_zh);
   alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+8, b_+10); ret_effect(gb); return; }
-  CYC(b_+8, SYM(objectCheckCollidedWithLink));
+  CYC(b_+8, b_+12);
   collided_with_link_not_dead(gb);
   ret_effect(gb);
 }
@@ -2210,7 +2210,7 @@ static void objects_collided(GB *gb) {
   CYC(b_+28, b_+31); C = mem_rd(gb, HL);
   alu_add(gb, 0x1b);
   L = A;
-  CYC(b_+31, SYM(preventObjectHFromPassingObjectD));
+  CYC(b_+31, b_+37);
   objects_collided_from_variables(gb);
 }
 
@@ -2272,7 +2272,7 @@ static void check_collision_with_h_and_d(GB *gb) {
   alu_add(gb, 0x1b);
   L = A;
   E = OBJ_COLLISION_RADIUS_Y;
-  CYC(b_+22, SYM(checkLinkID0AndControlNormal));
+  CYC(b_+22, b_+32);
   objects_collided_from_variables(gb);
 }
 
@@ -2292,7 +2292,7 @@ static void object_h_check_collision_with_link(GB *gb) {
   CYC(b_+5, b_+12);
   check_collision_with_h_and_d(gb);
   SET_DE(de);
-  CYC(b_+12, SYM(checkGrabbableObjects));
+  CYC(b_+12, b_+14);
 }
 
 void objectHCheckCollisionWithLink_hook(GB *gb) {
@@ -2305,7 +2305,7 @@ void objectHCheckCollisionWithLink_hook(GB *gb) {
 static void link_check_no_carry(GB *gb) {
   BASE(checkLinkCollisionsEnabled);
   alu_xor(gb, A);
-  CYC(b_+38, SYM(checkObjectsCollided));
+  CYC(b_+38, b_+40);
 }
 
 static void link_control_checks_tail(GB *gb) {
@@ -2328,7 +2328,7 @@ void checkLinkID0AndControlNormal_hook(GB *gb) {
   BASE(checkLinkID0AndControlNormal);
   CYC(b_+0, b_+3); A = mem_rd(gb, w1Link_id);
   alu_or(gb, A);
-  if (!(F & FZ)) { CYC(b_+3, b_+6); alu_xor(gb, A); CYC(b_+6, SYM(checkLinkVulnerableAndIDZero)); ret_effect(gb); return; }
+  if (!(F & FZ)) { CYC(b_+3, b_+6); alu_xor(gb, A); CYC(b_+6, b_+8); ret_effect(gb); return; }
   CYCT(b_+3, b_+6);
   link_control_checks_tail(gb);
   ret_effect(gb);
@@ -2361,8 +2361,8 @@ static void link_vulnerable(GB *gb) {
   CYC(b_+3, b_+4); alu_or(gb, mem_rd(gb, HL));
   L = 0x2d;
   CYC(b_+4, b_+7); alu_or(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(b_+7, SYM(checkLinkCollisionsEnabled)); link_check_no_carry(gb); return; }
-  CYC(b_+7, SYM(checkLinkCollisionsEnabled));
+  if (!(F & FZ)) { CYCT(b_+7, b_+10); link_check_no_carry(gb); return; }
+  CYC(b_+7, b_+10);
   link_collisions_enabled(gb);
 }
 
@@ -2375,7 +2375,7 @@ void checkLinkVulnerableAndIDZero_hook(GB *gb) {
   BASE(checkLinkVulnerableAndIDZero);
   CYC(b_+0, b_+3); A = mem_rd(gb, w1Link_id);
   alu_or(gb, A);
-  if (!(F & FZ)) { CYC(b_+3, b_+6); alu_xor(gb, A); CYC(b_+6, SYM(checkLinkVulnerable)); ret_effect(gb); return; }
+  if (!(F & FZ)) { CYC(b_+3, b_+6); alu_xor(gb, A); CYC(b_+6, b_+8); ret_effect(gb); return; }
   CYCT(b_+3, b_+6);
   link_vulnerable(gb);
   ret_effect(gb);
@@ -2410,7 +2410,7 @@ void objectCheckSimpleCollision_hook(GB *gb) {
   if (F & FZ) { CYC(b_+30, b_+34); alu_rrca(gb); CYC(b_+34, b_+35); }
   else CYCT(b_+30, b_+34);
   alu_and(gb, 0x01);
-  CYC(b_+35, SYM(objectGetTileCollisions));
+  CYC(b_+35, b_+38);
   ret_effect(gb);
 }
 
@@ -2446,7 +2446,7 @@ static void tile_collisions_at_position(GB *gb) {
   H = wRoomCollisions >> 8;
   CYC(b_+11, b_+13); A = mem_rd(gb, HL);
   alu_or(gb, A);
-  CYC(b_+13, SYM(objectCheckTileCollision_allowHoles));
+  CYC(b_+13, b_+16);
 }
 
 void getTileCollisionsAtPosition_hook(GB *gb) {
@@ -2473,7 +2473,7 @@ static void simple_collision(GB *gb) {
   if (F & FZ) { CYC(b_+6, b_+10); alu_rrca(gb); CYC(b_+10, b_+11); }
   else CYCT(b_+6, b_+10);
   alu_rrca(gb);
-  CYC(b_+11, SYM(_complexCollision));
+  CYC(b_+11, b_+13);
 }
 
 void _simpleCollision_hook(GB *gb) {
@@ -2505,7 +2505,7 @@ static void complex_collision(GB *gb) {
   if (F & FZ) { CYCT(b_+22, b_+26); return; }
   CYC(b_+22, b_+26);
   alu_scf(gb);
-  CYC(b_+26, SYM(retrieveTileCollisionValue));
+  CYC(b_+26, b_+28);
 }
 
 void _complexCollision_hook(GB *gb) {
@@ -2571,7 +2571,7 @@ static void retrieve_tile_collision_value(GB *gb) {
   alu_xor(gb, A);
   CYC(b_+8, b_+11); mem_wr(gb, IO_SVBK, A);
   A = L;
-  CYC(b_+11, SYM(loadRoomCollisions));
+  CYC(b_+11, b_+13);
 }
 
 void retrieveTileCollisionValue_hook(GB *gb) {
@@ -2587,7 +2587,7 @@ static void backwards_search(GB *gb) {
     L = alu_dec8(gb, L);
     if (L) { CYC(b_+1, b_+3); CYCT(b_+3, b_+5); continue; }
     CYC(b_+1, b_+6); alu_cp(gb, mem_rd(gb, HL));
-    CYC(b_+6, SYM(getTileIndexFromRoomLayoutBuffer));
+    CYC(b_+6, b_+7);
     return;
   }
 }
@@ -2601,7 +2601,7 @@ void findTileInRoom_hook(GB *gb) {
   BASE(findTileInRoom);
   H = wRoomLayout >> 8;
   L = 0xbf;
-  CYC(b_+0, SYM(backwardsSearch));
+  CYC(b_+0, b_+4);
   backwards_search(gb);
   ret_effect(gb);
 }
@@ -2610,12 +2610,12 @@ void findTileInRoom_hook(GB *gb) {
 
 static void object_check_is_over_hazard(GB *gb) {
   BASE(objectCheckIsOverHazard);
-  SET_BC((SYM(initializeVramMap1) + 19));
+  SET_BC(0x0500);
   CYC(b_+0, b_+6);
   object_get_relative_tile(gb);
   CYC(b_+6, b_+9); W8(wObjectTileIndex) = A;
   SET_HL(hazardCollisionTable);
-  CYC(b_+9, SYM(objectReplaceWithAnimationIfOnHazard));
+  CYC(b_+9, b_+15);
   lookup_collision_table(gb);
 }
 
@@ -2631,8 +2631,8 @@ static void object_check_is_on_hazard(GB *gb) {
   E = A;
   CYC(b_+2, b_+6); A = mem_rd(gb, DE);
   alu_and(gb, 0x80);
-  if (!(F & FZ)) { CYCT(b_+6, SYM(objectCheckIsOverHazard)); return; }
-  CYC(b_+6, SYM(objectCheckIsOverHazard));
+  if (!(F & FZ)) { CYCT(b_+6, b_+9); return; }
+  CYC(b_+6, b_+9);
   object_check_is_over_hazard(gb);
 }
 
@@ -2657,7 +2657,7 @@ void checkLinkIsOverHazard_hook(GB *gb) {
   object_check_is_over_hazard(gb);
   SET_HL(hl);
   SET_BC(bc);
-  CYC(b_+20, SYM(objectCheckIsOnHazard));
+  CYC(b_+20, b_+23);
   ret_effect(gb);
 }
 
@@ -2667,7 +2667,7 @@ void objectCheckTileAtPositionIsWater_hook(GB *gb) {
   object_get_tile_at_position(gb);
   alu_sub(gb, 0xf9);
   alu_cp(gb, 0x05);
-  CYC(b_+3, SYM(checkTileAtPositionIsWater));
+  CYC(b_+3, b_+8);
   ret_effect(gb);
 }
 
@@ -2677,30 +2677,30 @@ void checkTileAtPositionIsWater_hook(GB *gb) {
   tile_at_position(gb);
   alu_sub(gb, 0xf9);
   alu_cp(gb, 0x05);
-  CYC(b_+3, SYM(findItemWithID));
+  CYC(b_+3, b_+8);
   ret_effect(gb);
 }
 
 // object searches by id
 
 static void find_item_with_id(GB *gb, bool check_first) {
-  BASE(findItemWithID_startingAfterH);
+  BASE(findItemWithID);
   for (;;) {
     if (check_first) {
       L = 0x01;
-      CYC((SYM(findItemWithID) + 2), (SYM(findItemWithID) + 5)); A = mem_rd(gb, HL);
+      CYC(b_+2, b_+5); A = mem_rd(gb, HL);
       alu_cp(gb, C);
-      if (F & FZ) { CYCT((SYM(findItemWithID) + 5), b_+0); return; }
-      CYC((SYM(findItemWithID) + 5), b_+0);
+      if (F & FZ) { CYCT(b_+5, b_+7); return; }
+      CYC(b_+5, b_+7);
     }
     check_first = true;
     H = alu_inc8(gb, H);
     A = H;
     alu_cp(gb, 0xe0);
-    if (F & FC) { CYCT(b_+0, b_+6); continue; }
-    CYC(b_+0, b_+6);
+    if (F & FC) { CYCT(SYM(findItemWithID_startingAfterH), (SYM(findItemWithID_startingAfterH) + 6)); continue; }
+    CYC(SYM(findItemWithID_startingAfterH), (SYM(findItemWithID_startingAfterH) + 6));
     alu_or(gb, H);
-    CYC(b_+6, SYM(objectFindSameTypeObjectWithID));
+    CYC((SYM(findItemWithID_startingAfterH) + 6), (SYM(findItemWithID_startingAfterH) + 8));
     return;
   }
 }
@@ -2719,22 +2719,22 @@ void findItemWithID_startingAfterH_hook(GB *gb) {
 }
 
 static void find_same_type_object(GB *gb, bool check_first) {
-  BASE(func_228f);
+  BASE(objectFindSameTypeObjectWithID);
   for (;;) {
     if (check_first) {
-      CYC((SYM(objectFindSameTypeObjectWithID) + 9), (SYM(objectFindSameTypeObjectWithID) + 10)); A = mem_rd(gb, HL);
+      CYC(b_+9, b_+10); A = mem_rd(gb, HL);
       alu_cp(gb, C);
-      if (F & FZ) { CYCT((SYM(objectFindSameTypeObjectWithID) + 10), b_+0); return; }
-      CYC((SYM(objectFindSameTypeObjectWithID) + 10), b_+0);
+      if (F & FZ) { CYCT(b_+10, b_+12); return; }
+      CYC(b_+10, b_+12);
     }
     check_first = true;
     H = alu_inc8(gb, H);
     A = H;
     alu_cp(gb, 0xe0);
-    if (F & FC) { CYCT(b_+0, b_+6); continue; }
-    CYC(b_+0, b_+6);
+    if (F & FC) { CYCT(SYM(func_228f), (SYM(func_228f) + 6)); continue; }
+    CYC(SYM(func_228f), (SYM(func_228f) + 6));
     alu_or(gb, H);
-    CYC(b_+6, SYM(objectSetPriorityRelativeToLink));
+    CYC((SYM(func_228f) + 6), (SYM(func_228f) + 8));
     return;
   }
 }
@@ -2785,7 +2785,7 @@ static void get_priority(GB *gb) {
   if (!(F & FC)) { CYCT(b_+40, b_+44); return; }
   CYC(b_+40, b_+44);
   B = alu_dec8(gb, B);
-  CYC(b_+44, SYM(objectPushLinkAwayOnCollision));
+  CYC(b_+44, b_+46);
 }
 
 static void set_priority_relative_to_link(GB *gb) {
@@ -2804,7 +2804,7 @@ static void set_priority_relative_to_link(GB *gb) {
 void objectSetPriorityRelativeToLink_hook(GB *gb) {
   BASE(objectSetPriorityRelativeToLink);
   C = 0x80;
-  CYC(b_+0, SYM(objectSetPriorityRelativeToLink_withTerrainEffects));
+  CYC(b_+0, b_+4);
   set_priority_relative_to_link(gb);
   ret_effect(gb);
 }
@@ -2851,7 +2851,7 @@ void cpRupeeValue_hook(GB *gb) {
   CYC(b_+8, b_+12);
   compare_hl_to_bc(gb);
   A = alu_inc8(gb, A);
-  if (!(F & FZ)) { CYCT(b_+12, b_+15); alu_xor(gb, A); CYC(b_+17, SYM(removeRupeeValue)); }
+  if (!(F & FZ)) { CYCT(b_+12, b_+15); alu_xor(gb, A); CYC(b_+17, b_+19); }
   else { CYC(b_+12, b_+15); A = alu_inc8(gb, A); CYC(b_+15, b_+17); }
   ret_effect(gb);
 }
@@ -2862,7 +2862,7 @@ void retIfTextIsActive_hook(GB *gb) {
   alu_or(gb, A);
   if (F & FZ) { CYCT(b_+3, b_+5); ret_effect(gb); return; }
   CYC(b_+3, b_+5); SET_AF(pop_effect(gb));
-  CYC(b_+5, SYM(showTextOnInventoryMenu));
+  CYC(b_+5, b_+7);
   ret_effect(gb);
 }
 
@@ -2891,7 +2891,7 @@ static void scale_component(GB *gb) {
   SET_HL(hl);
   CYC(b_+28, b_+32); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+32, b_+33); mem_wr(gb, HL, B);
-  CYC(b_+33, SYM(objectSetComponentSpeedByScaledVelocity));
+  CYC(b_+33, b_+34);
 }
 
 static void scaled_position_offset_for_velocity(GB *gb) {
@@ -2929,7 +2929,7 @@ void objectSetComponentSpeedByScaledVelocity_hook(GB *gb) {
   E = alu_dec8(gb, E);
   CYC(b_+16, b_+18); A = mem_rd(gb, HL);
   CYC(b_+18, b_+19); mem_wr(gb, DE, A);
-  CYC(b_+19, SYM(objectGetRelatedObject1Var));
+  CYC(b_+19, b_+20);
   ret_effect(gb);
 }
 
@@ -2954,7 +2954,7 @@ void objectSetPositionInCircleArc_hook(GB *gb) {
   CYC(b_+20, b_+25); A = mem_rd(gb, wTmpcec0 + 3);
   alu_add(gb, C);
   CYC(b_+25, b_+27); mem_wr(gb, DE, A);
-  CYC(b_+27, SYM(getScaledPositionOffsetForVelocity));
+  CYC(b_+27, b_+28);
   ret_effect(gb);
 }
 
@@ -2965,7 +2965,7 @@ void objectMakeTileSolid_hook(GB *gb) {
   CYC(b_+0, b_+3);
   object_get_tile_collisions(gb);
   CYC(b_+3, b_+5); mem_wr(gb, HL, 0x0f);
-  CYC(b_+5, SYM(setShortPosition));
+  CYC(b_+5, b_+6);
   ret_effect(gb);
 }
 
@@ -2977,7 +2977,7 @@ static void set_tile_without_gfx_reload(GB *gb) {
   retrieve_tile_collision_value(gb);
   B = wRoomCollisions >> 8;
   CYC(b_+6, b_+9); mem_wr(gb, BC, A);
-  CYC(b_+9, SYM(setTileInRoomLayoutBuffer));
+  CYC(b_+9, b_+10);
 }
 
 void setTileWithoutGfxReload_hook(GB *gb) {
@@ -2994,7 +2994,7 @@ static void set_tile_in_room_layout_buffer(GB *gb) {
   CYC(b_+7, b_+11); mem_wr(gb, BC, A);
   A = svbk;
   CYC(b_+11, b_+14); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+14, SYM(objectGetRelativeTile));
+  CYC(b_+14, b_+15);
 }
 
 void setTileInRoomLayoutBuffer_hook(GB *gb) {
@@ -3040,7 +3040,7 @@ static void extract_color_components(GB *gb) {
   CYC(b_+44, b_+45); SET_AF(pop_effect(gb));
   CYC(b_+45, b_+47); H8(hRomBank) = A;
   CYC(b_+47, b_+50); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+50, SYM(setTileWithoutGfxReload));
+  CYC(b_+50, b_+51);
 }
 
 void extractColorComponents_hook(GB *gb) {
@@ -3056,7 +3056,7 @@ void enableIntroInputs_hook(GB *gb) {
   CYC(b_+2, b_+5);
   A = 0x01;
   CYC(b_+5, b_+9); H8(hIntroInputsEnabled) = A;
-  CYC(b_+9, SYM(threadFunc_088b));
+  CYC(b_+9, b_+10);
   ret_effect(gb);
 }
 
@@ -3083,7 +3083,7 @@ void getChestData_hook(GB *gb) {
     CYC(b_+24, b_+25); A = mem_rd(gb, HL); SET_HL(HL + 1);
     E = A;
     A = alu_inc8(gb, A);
-    if (F & FZ) { CYCT(b_+25, b_+29); SET_BC((SYM(objectCreateFloatingMusicNote) + 2)); CYC(b_+42, b_+45); break; }
+    if (F & FZ) { CYCT(b_+25, b_+29); SET_BC(0x2800); CYC(b_+42, b_+45); break; }
     CYC(b_+25, b_+30); A = mem_rd(gb, HL); SET_HL(HL + 1);
     alu_cp(gb, B);
     if (F & FZ) {
@@ -3100,7 +3100,7 @@ void getChestData_hook(GB *gb) {
   CYC(b_+45, b_+46); SET_AF(pop_effect(gb));
   CYC(b_+46, b_+48); H8(hRomBank) = A;
   CYC(b_+48, b_+51); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+51, SYM(setDeathRespawnPoint));
+  CYC(b_+51, b_+52);
   ret_effect(gb);
 }
 
@@ -3122,7 +3122,7 @@ void setDeathRespawnPoint_hook(GB *gb) {
     CYC(copies[i].insn, copies[i].insn + 3); A = mem_rd(gb, copies[i].src);
     CYC(copies[i].insn + 3, copies[i].insn + 4); mem_wr(gb, HL, A); SET_HL(HL + 1);
   }
-  CYC(b_+52, SYM(func_1135));
+  CYC(b_+52, b_+53);
   ret_effect(gb);
 }
 
@@ -3139,7 +3139,7 @@ void updateLinkLocalRespawnPosition_hook(GB *gb) {
   L = OBJ_XH;
   CYC(b_+16, b_+19); A = mem_rd(gb, HL);
   CYC(b_+19, b_+22); W8(wLinkLocalRespawnX) = A;
-  CYC(b_+22, SYM(updateRoomFlagsForBrokenTile));
+  CYC(b_+22, b_+23);
   ret_effect(gb);
 }
 
@@ -3190,7 +3190,7 @@ static void set_room_flags_for_unlocked_key_door(GB *gb) {
     CYC(b_+46, b_+47); A = mem_rd(gb, DE);
     CYC(b_+47, b_+48); alu_or(gb, mem_rd(gb, HL));
     CYC(b_+48, b_+49); mem_wr(gb, HL, A);
-    CYC(b_+49, SYM(_adjacentRoomsData));
+    CYC(b_+49, b_+50);
     return;
   }
   CYC(b_+11, b_+15);
@@ -3232,7 +3232,7 @@ static void set_room_flags_for_unlocked_key_door_overworld(GB *gb) {
   CYC(b_+17, b_+20); A = mem_rd(gb, BC);
   CYC(b_+20, b_+21); alu_or(gb, mem_rd(gb, HL));
   CYC(b_+21, b_+22); mem_wr(gb, BC, A);
-  CYC(b_+22, SYM(checkAndUpdateLinkOnChest));
+  CYC(b_+22, b_+23);
 }
 
 void setRoomFlagsForUnlockedKeyDoor_overworldOnly_hook(GB *gb) {
@@ -3276,7 +3276,7 @@ void updateRoomFlagsForBrokenTile_hook(GB *gb) {
   CYC(b_+46, b_+48); A = mem_rd(gb, BC);
   CYC(b_+48, b_+49); alu_or(gb, mem_rd(gb, HL));
   CYC(b_+49, b_+50); mem_wr(gb, HL, A);
-  CYC(b_+50, SYM(tileUpdateRoomFlagsOnBreakTable));
+  CYC(b_+50, b_+51);
   ret_effect(gb);
 }
 
@@ -3299,7 +3299,7 @@ void checkAndUpdateLinkOnChest_hook(GB *gb) {
     CYC(b_+36, b_+38); mem_wr(gb, BC, A);
     alu_xor(gb, A);
     CYC(b_+38, b_+42); W8(wLinkOnChest) = A;
-    CYC(b_+42, SYM(interactWithTileBeforeLink_b00));
+    CYC(b_+42, b_+43);
     ret_effect(gb);
     return;
   }
@@ -3323,7 +3323,7 @@ void showInfoTextForRoller_hook(GB *gb) {
   CYC(b_+10, b_+12);
   CALL_C(b_+12, showInfoTextForTile_hook, SYM(showInfoTextForTile), b_+15);
   bank_pop(gb, b_+15);
-  CYC(b_+21, SYM(updateCamera));
+  CYC(b_+21, b_+22);
   ret_effect(gb);
 }
 
@@ -3340,7 +3340,7 @@ void updateCamera_hook(GB *gb) {
   CALL_ROM(b_+19, ROM_b01_updateGfxRegs2Scroll);
   CALL_ROM(b_+22, ROM_b01_updateScreenShake);
   bank_pop(gb, b_+25);
-  CYC(b_+31, SYM(resetCamera));
+  CYC(b_+31, b_+32);
   ret_effect(gb);
 }
 
@@ -3350,7 +3350,7 @@ void resetCamera_hook(GB *gb) {
   CALL_ROM(b_+10, ROM_b01_calculateCameraPosition);
   CALL_ROM(b_+13, ROM_b01_updateGfxRegs2Scroll);
   bank_pop(gb, b_+16);
-  CYC(b_+22, SYM(setCameraFocusedObject));
+  CYC(b_+22, b_+23);
   ret_effect(gb);
 }
 
@@ -3360,7 +3360,7 @@ void setCameraFocusedObject_hook(GB *gb) {
   CYC(b_+2, b_+5); W8(wCameraFocusedObject) = A;
   CYC(b_+5, b_+7); A = H8(hActiveObjectType);
   CYC(b_+7, b_+10); W8(wCameraFocusedObjectType) = A;
-  CYC(b_+10, SYM(setCameraFocusedObjectToLink));
+  CYC(b_+10, b_+11);
   ret_effect(gb);
 }
 
@@ -3370,7 +3370,7 @@ void setCameraFocusedObjectToLink_hook(GB *gb) {
   CYC(b_+3, b_+6); W8(wCameraFocusedObject) = A;
   A = 0x00;
   CYC(b_+6, b_+11); W8(wCameraFocusedObjectType) = A;
-  CYC(b_+11, SYM(reloadTileMap));
+  CYC(b_+11, b_+12);
   ret_effect(gb);
 }
 
@@ -3389,7 +3389,7 @@ void reloadTileMap_hook(GB *gb) {
   CALL_ROM(b_+22, ROM_b01_setScreenTransitionState02);
   CALL_ROM(b_+25, ROM_b01_updateGfxRegs2Scroll);
   bank_pop(gb, b_+28);
-  CYC(b_+34, SYM(func_131f));
+  CYC(b_+34, b_+35);
   ret_effect(gb);
 }
 
@@ -3453,7 +3453,7 @@ static void blank_collisions_vertically(GB *gb) {
     B = alu_dec8(gb, B);
     if (B) CYCT(b_+73, b_+80); else CYC(b_+73, b_+80);
   } while (B);
-  CYC(b_+80, SYM(findTileInRoom));
+  CYC(b_+80, b_+81);
 }
 
 static void blank_data_around_collisions(GB *gb) {
@@ -3524,7 +3524,7 @@ void decideItemDrop_hook(GB *gb) {
   bank_pop(gb, b_+14);
   A = C;
   alu_cp(gb, 0xff);
-  CYC(b_+20, SYM(checkItemDropAvailable));
+  CYC(b_+20, b_+24);
   ret_effect(gb);
 }
 
@@ -3541,7 +3541,7 @@ void checkItemDropAvailable_hook(GB *gb) {
   bank_pop(gb, b_+15);
   A = C;
   alu_cp(gb, 0xff);
-  CYC(b_+21, SYM(giveTreasure));
+  CYC(b_+21, b_+25);
   ret_effect(gb);
 }
 
@@ -3554,7 +3554,7 @@ static void give_treasure(GB *gb, uint16_t sp0_) {
   bank_pop(gb, b_+14);
   A = B;
   alu_or(gb, A);
-  CYC(b_+20, SYM(loseTreasure));
+  CYC(b_+20, b_+23);
 }
 
 void giveTreasure_hook(GB *gb) {
@@ -3571,7 +3571,7 @@ void loseTreasure_hook(GB *gb) {
   bank_push(gb, b_+1, 0x3f);
   CALL_C(b_+11, loseTreasure_body_hook, ROM_b3f_loseTreasure_body, b_+14);
   bank_pop(gb, b_+14);
-  CYC(b_+20, SYM(checkTreasureObtained));
+  CYC(b_+20, b_+21);
   ret_effect(gb);
 }
 
@@ -3580,7 +3580,7 @@ void removeRupeeValue_hook(GB *gb) {
   SET_HL(wNumRupees);
   CYC(b_+0, b_+6);
   get_rupee_value(gb);
-  CYC(b_+6, SYM(getRupeeValue));
+  CYC(b_+6, b_+9);
   sub_decimal_from_hl_ref(gb);
   ret_effect(gb);
 }
@@ -3609,7 +3609,7 @@ void getRandomRingOfGivenTier_hook(GB *gb) {
   CYC(b_+34, b_+35); C = mem_rd(gb, HL);
   bank_pop(gb, b_+35);
   A = 0x2d;
-  CYC(b_+41, SYM(refillSeedSatchel));
+  CYC(b_+41, b_+44);
   ret_effect(gb);
 }
 
@@ -3637,7 +3637,7 @@ void refillSeedSatchel_hook(GB *gb) {
     CYC(b_+14, b_+20);
     break;
   }
-  CYC(b_+20, SYM(addToGashaMaturity));
+  CYC(b_+20, b_+21);
   ret_effect(gb);
 }
 
@@ -3657,7 +3657,7 @@ static void add_to_gasha_maturity(GB *gb) {
     }
   }
   SET_HL(hl);
-  CYC(b_+15, SYM(makeActiveObjectFollowLink_b00));
+  CYC(b_+15, b_+17);
 }
 
 void addToGashaMaturity_hook(GB *gb) {
@@ -3676,7 +3676,7 @@ void findRoomSpecificData_hook(GB *gb) {
   CYC(b_+5, b_+6); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+6, b_+7); H = mem_rd(gb, HL);
   L = A;
-  CYC(b_+7, SYM(lookupKey));
+  CYC(b_+7, b_+8);
   lookup_key(gb);
   ret_effect(gb);
 }
@@ -3703,7 +3703,7 @@ static void object_delete_de(GB *gb) {
     B = alu_dec8(gb, B);
     if (B) CYCT(b_+13, b_+16); else CYC(b_+13, b_+16);
   } while (B);
-  CYC(b_+16, SYM(checkLinkIsOverHazard));
+  CYC(b_+16, b_+19);
   remove_from_abutton_list(gb);
 }
 
@@ -3712,7 +3712,7 @@ void objectDelete_de_hook(GB *gb) { object_delete_de(gb); ret_effect(gb); }
 static void object_delete_use_active_type(GB *gb) {
   BASE(objectDelete_useActiveObjectType);
   CYC(b_+0, b_+2); E = H8(hActiveObjectType);
-  CYC(b_+2, SYM(objectDelete_de));
+  CYC(b_+2, b_+3);
   object_delete_de(gb);
 }
 
@@ -3756,7 +3756,7 @@ void objectReplaceWithID_hook(GB *gb) {
   CYC(b_+43, b_+45); mem_wr(gb, HL, B);
   L = alu_inc8(gb, L);
   CYC(b_+45, b_+47); mem_wr(gb, HL, C);
-  CYC(b_+47, SYM(objectDelete_useActiveObjectType));
+  CYC(b_+47, b_+48);
   ret_effect(gb);
 }
 
@@ -3765,7 +3765,7 @@ void checkInteractionSubstate_hook(GB *gb) {
   E = INTERACTION_BASE + OBJ_SUBSTATE;
   CYC(b_+0, b_+3); A = mem_rd(gb, DE);
   alu_or(gb, A);
-  CYC(b_+3, SYM(hazardCollisionTable));
+  CYC(b_+3, b_+5);
   ret_effect(gb);
 }
 
@@ -3778,7 +3778,7 @@ static void set_collide_radii(GB *gb) {
   CYC(b_+2, b_+7); mem_wr(gb, HL, B);
   L = alu_inc8(gb, L);
   CYC(b_+7, b_+9); mem_wr(gb, HL, C);
-  CYC(b_+9, SYM(decNumEnemies));
+  CYC(b_+9, b_+10);
 }
 
 void objectSetCollideRadii_hook(GB *gb) {
@@ -3794,7 +3794,7 @@ void objectSetCollideRadius_hook(GB *gb) {
   CYC(b_+0, b_+6);
   set_collide_radii(gb);
   SET_BC(bc);
-  CYC(b_+6, SYM(objectSetCollideRadii));
+  CYC(b_+6, b_+8);
   ret_effect(gb);
 }
 
@@ -3805,7 +3805,7 @@ static void dec_num_enemies(GB *gb) {
   alu_or(gb, A);
   if (F & FZ) { CYCT(b_+4, b_+6); return; }
   CYC(b_+4, b_+7); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+7, SYM(setScreenShakeCounter));
+  CYC(b_+7, b_+8);
 }
 
 void decNumEnemies_hook(GB *gb) {
@@ -3818,7 +3818,7 @@ void setScreenShakeCounter_hook(GB *gb) {
   SET_HL(wScreenShakeCounterY);
   CYC(b_+0, b_+4); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+4, b_+5); mem_wr(gb, HL, A);
-  CYC(b_+5, SYM(objectCreatePuff));
+  CYC(b_+5, b_+6);
   ret_effect(gb);
 }
 
@@ -3832,7 +3832,7 @@ static void object_create_interaction(GB *gb) {
   CYC(b_+7, b_+10);
   object_copy_position(gb);
   alu_xor(gb, A);
-  CYC(b_+10, SYM(objectCreateFallingDownHoleInteraction));
+  CYC(b_+10, b_+12);
 }
 
 void objectCreateInteraction_hook(GB *gb) {
@@ -3843,17 +3843,17 @@ void objectCreateInteraction_hook(GB *gb) {
 void objectCreateInteractionWithSubid00_hook(GB *gb) {
   BASE(objectCreateInteractionWithSubid00);
   C = 0x00;
-  CYC(b_+0, SYM(objectCreateInteraction));
+  CYC(b_+0, b_+2);
   object_create_interaction(gb);
   ret_effect(gb);
 }
 
 void objectCreatePuff_hook(GB *gb) {
-  BASE(objectCreateInteractionWithSubid00);
+  BASE(objectCreatePuff);
   B = 0x05;
-  CYC(SYM(objectCreatePuff), b_+0);
+  CYC(b_+0, b_+2);
   C = 0x00;
-  CYC(b_+0, SYM(objectCreateInteraction));
+  CYC(SYM(objectCreateInteractionWithSubid00), (SYM(objectCreateInteractionWithSubid00) + 2));
   object_create_interaction(gb);
   ret_effect(gb);
 }
@@ -3873,7 +3873,7 @@ static void object_create_falling_down_hole(GB *gb) {
   CYC(b_+16, b_+19);
   object_copy_position(gb);
   alu_xor(gb, A);
-  CYC(b_+19, SYM(objectFlickerVisibility));
+  CYC(b_+19, b_+21);
 }
 
 void objectCreateFallingDownHoleInteraction_hook(GB *gb) {
@@ -3886,7 +3886,7 @@ void objectFlickerVisibility_hook(GB *gb) {
   CYC(b_+0, b_+3); A = W8(wFrameCounter);
   alu_and(gb, B);
   if (F & FZ) { CYCT(b_+3, b_+7); obj_visible_bit(gb, SYM(objectSetInvisible), false); }
-  else { CYC(b_+3, b_+7); CYC(b_+7, SYM(objectMarkSolidPosition)); obj_visible_bit(gb, SYM(objectSetVisible), true); }
+  else { CYC(b_+3, b_+7); CYC(b_+7, b_+10); obj_visible_bit(gb, SYM(objectSetVisible), true); }
   ret_effect(gb);
 }
 
@@ -3903,7 +3903,7 @@ static void unmark_solid_position(GB *gb) {
   unset_flag(gb);
   A = 0x00;
   CYC(b_+15, b_+19); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+19, SYM(_interactionActuallyRunScript));
+  CYC(b_+19, b_+20);
 }
 
 void objectUnmarkSolidPosition_hook(GB *gb) {
@@ -3920,7 +3920,7 @@ void interactionSetHighTextIndex_hook(GB *gb) {
   E = 0x70;
   A |= 0x80;
   CYC(b_+3, b_+8); mem_wr(gb, DE, A);
-  CYC(b_+8, SYM(interactionSetScript));
+  CYC(b_+8, b_+9);
   ret_effect(gb);
 }
 
@@ -3937,7 +3937,7 @@ void interactionSetScript_hook(GB *gb) {
   alu_xor(gb, A);
   CYC(b_+7, b_+12); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+12, b_+13); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+13, SYM(interactionRunScript));
+  CYC(b_+13, b_+14);
   ret_effect(gb);
 }
 
@@ -3978,7 +3978,7 @@ void objectMimicBgTile_hook(GB *gb) {
   A = svbk;
   F = f;
   CYC(b_+49, b_+52); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+52, SYM(objectUpdateSpeedZAndBounce));
+  CYC(b_+52, b_+53);
   ret_effect(gb);
 }
 
@@ -3995,7 +3995,7 @@ void copy8BytesFromRingMapToCec0_hook(GB *gb) {
   SET_DE(DE + 8);
   B = 0;
   bank_pop(gb, b_+18);
-  CYC(b_+24, SYM(thread_1b10));
+  CYC(b_+24, b_+25);
   ret_effect(gb);
 }
 
@@ -4015,7 +4015,7 @@ void copy20BytesFromBank_hook(GB *gb) {
   CYC(b_+14, b_+15); SET_AF(pop_effect(gb));
   CYC(b_+15, b_+17); H8(hRomBank) = A;
   CYC(b_+17, b_+20); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+20, SYM(loadCommonGraphics));
+  CYC(b_+20, b_+21);
   ret_effect(gb);
 }
 
@@ -4036,7 +4036,7 @@ void objectAddToAButtonSensitiveObjectList_hook(GB *gb) {
       CYC(b_+16, b_+18); mem_wr(gb, HL, A); SET_HL(HL - 1);
       CYC(b_+18, b_+19); mem_wr(gb, HL, D);
       alu_scf(gb);
-      CYC(b_+19, SYM(objectRemoveFromAButtonSensitiveObjectList));
+      CYC(b_+19, b_+21);
       break;
     }
     CYC(b_+7, b_+9);
@@ -4076,7 +4076,7 @@ static void remove_from_abutton_list(GB *gb) {
     A = L;
     alu_cp(gb, 0xd3);
     if (F & FC) { CYCT(b_+20, b_+26); continue; }
-    CYC(b_+20, SYM(linkInteractWithAButtonSensitiveObjects));
+    CYC(b_+20, b_+28);
     break;
   }
   SET_DE(de);
@@ -4093,13 +4093,13 @@ void checkEnemyAndPartCollisionsIfTextInactive_hook(GB *gb) {
   CYC(SYM(checkEnemyAndPartCollisionsIfTextInactive), (SYM(checkEnemyAndPartCollisionsIfTextInactive) + 3));
   CYC(b_+0, b_+3); A = W8(wTextIsActive);
   alu_or(gb, A);
-  if (!(F & FZ)) { CYC(b_+3, b_+5); SET_AF((SYM(checkEnemyAndPartCollisionsIfTextInactive) + 3)); CYC(b_+5, SYM(showTextOnInventoryMenu)); ret_effect(gb); return; }
+  if (!(F & FZ)) { CYC(b_+3, b_+5); SET_AF(0x1dea); CYC(b_+5, b_+7); ret_effect(gb); return; }
   CYCT(b_+3, b_+5);
   bank_push(gb, (SYM(checkEnemyAndPartCollisionsIfTextInactive) + 3), 0x07);
   CALL_C((SYM(checkEnemyAndPartCollisionsIfTextInactive) + 13), checkEnemyAndPartCollisions_hook,
          ROM_b07_checkEnemyAndPartCollisions, (SYM(checkEnemyAndPartCollisionsIfTextInactive) + 16));
   bank_pop(gb, (SYM(checkEnemyAndPartCollisionsIfTextInactive) + 16));
-  CYC((SYM(checkEnemyAndPartCollisionsIfTextInactive) + 22), SYM(findRoomSpecificData));
+  CYC((SYM(checkEnemyAndPartCollisionsIfTextInactive) + 22), (SYM(checkEnemyAndPartCollisionsIfTextInactive) + 23));
   ret_effect(gb);
 }
 
@@ -4110,14 +4110,14 @@ static void delete_and_scf(GB *gb) {
   CYC(b_+5, b_+8);
   object_delete_use_active_type(gb);
   alu_scf(gb);
-  CYC(b_+8, SYM(objectCopyPosition));
+  CYC(b_+8, b_+10);
 }
 
 static void replace_with_interaction_b(GB *gb) {
   BASE(objectReplaceWithSplash);
   CYC(b_+2, b_+5);
   C = 0x00;
-  CYC(SYM(objectCreateInteractionWithSubid00), SYM(objectCreateInteraction));
+  CYC(SYM(objectCreateInteractionWithSubid00), (SYM(objectCreateInteractionWithSubid00) + 2));
   object_create_interaction(gb);
   delete_and_scf(gb);
 }
@@ -4133,7 +4133,7 @@ static void replace_with_falling_down_hole(GB *gb) {
   BASE(objectReplaceWithFallingDownHoleInteraction);
   CYC(b_+0, b_+3);
   object_create_falling_down_hole(gb);
-  CYC(b_+3, SYM(objectReplaceWithSplash));
+  CYC(b_+3, b_+5);
   delete_and_scf(gb);
 }
 
@@ -4153,7 +4153,7 @@ void objectReplaceWithAnimationIfOnHazard_hook(GB *gb) {
   if (F & FC) { CYCT(b_+7, b_+10); replace_with_falling_down_hole(gb); ret_effect(gb); return; }
   CYC(b_+7, b_+10);
   B = 0x04;
-  CYC(b_+10, SYM(objectReplaceWithFallingDownHoleInteraction));
+  CYC(b_+10, b_+14);
   replace_with_interaction_b(gb);
   ret_effect(gb);
 }
@@ -4173,7 +4173,7 @@ void breakCrackedFloor_hook(GB *gb) {
   L = alu_inc8(gb, L);
   CYC(b_+16, b_+19); mem_wr(gb, HL, 0x80);
   L = 0x4b;
-  CYC(b_+19, SYM(objectCheckTileAtPositionIsWater));
+  CYC(b_+19, b_+24);
   set_short_pos_param_c(gb);
   ret_effect(gb);
 }
@@ -4194,7 +4194,7 @@ static void update_link_position_given_velocity(GB *gb, uint16_t sp0_) {
   CYC(b_+20, b_+21);
   bank_pop(gb, b_+21);
   alu_scf(gb);
-  CYC(b_+27, SYM(objectMimicBgTile));
+  CYC(b_+27, b_+29);
 }
 
 void updateLinkPositionGivenVelocity_hook(GB *gb) {
@@ -4218,7 +4218,7 @@ void objectPushLinkAwayOnCollision_hook(GB *gb) {
   angle_toward_enemy_target(gb);
   C = A;
   B = 0x28;
-  CYC(b_+13, SYM(updateLinkPositionGivenVelocity));
+  CYC(b_+13, b_+16);
   update_link_position_given_velocity(gb, sp0_);
   ret_effect(gb);
 }
@@ -4269,7 +4269,7 @@ void interactionRunScript_hook(GB *gb) {
     CYCT(b_+42, b_+44);
     CALL_ROM(b_+49, ROM__interactionSaveScriptAddress);
     alu_scf(gb);
-    CYC(b_+52, SYM(_interactionSaveScriptAddress));
+    CYC(b_+52, b_+54);
     ret_effect(gb);
     return;
   }
@@ -4291,7 +4291,7 @@ static void set_both_object_variables(GB *gb, uint16_t call_addr) {
   CYC(b_+97, b_+101); A = H8(hFF8B);
   alu_or(gb, B);
   L = A;
-  CYC(b_+101, SYM(checkEnemyAndPartCollisionsIfTextInactive));
+  CYC(b_+101, b_+104);
 }
 
 static void check_collision_direction(GB *gb) {
@@ -4403,7 +4403,7 @@ static void script_jump(GB *gb) {
   CYC(b_+25, b_+28); A = H8(hActiveObject);
   D = A;
   alu_xor(gb, A);
-  CYC(b_+28, SYM(scriptFunc_add3ToHl_scf));
+  CYC(b_+28, b_+31);
 }
 
 void scriptFunc_jump_hook(GB *gb) {
@@ -4416,23 +4416,23 @@ void scriptFunc_jump_scf_hook(GB *gb) {
   CYC(b_+0, b_+3);
   script_jump(gb);
   alu_scf(gb);
-  CYC(b_+3, SYM(scriptFunc_jump));
+  CYC(b_+3, b_+5);
   ret_effect(gb);
 }
 
 void scriptFunc_add3ToHl_hook(GB *gb) {
   BASE(scriptFunc_add3ToHl);
   SET_HL(HL + 3);
-  CYC(b_+0, SYM(scriptCmd_loadScript));
+  CYC(b_+0, b_+4);
   ret_effect(gb);
 }
 
 void scriptFunc_add3ToHl_scf_hook(GB *gb) {
-  BASE(scriptFunc_add3ToHl);
+  BASE(scriptFunc_add3ToHl_scf);
   alu_scf(gb);
-  CYC(SYM(scriptFunc_add3ToHl_scf), b_+0);
+  CYC(b_+0, b_+1);
   SET_HL(HL + 3);
-  CYC(b_+0, SYM(scriptCmd_loadScript));
+  CYC(SYM(scriptFunc_add3ToHl), (SYM(scriptFunc_add3ToHl) + 4));
   ret_effect(gb);
 }
 
@@ -4452,7 +4452,7 @@ static void interaction_animate(GB *gb) {
   CYC(b_+8, b_+12); H8(hRomBank) = 0x16;
   CYC(b_+12, b_+15); mem_wr(gb, MBC_ROM_BANK, 0x16);
   L = 0x62;
-  CYC(b_+15, SYM(interactionSetAnimation));
+  CYC(b_+15, b_+19);
   next_animation_frame(gb, SYM(_interactionNextAnimationFrame), 0x60, 0x41, interactionAnimationFrameTable_bank16, 0x5e);
 }
 
@@ -4484,7 +4484,7 @@ static void interaction_set_animation(GB *gb) {
   CYC(b_+22, b_+23); H = mem_rd(gb, HL);
   L = A;
   alu_add_hl(gb, BC);
-  CYC(b_+23, SYM(_interactionNextAnimationFrame));
+  CYC(b_+23, b_+25);
   next_animation_frame(gb, SYM(_interactionNextAnimationFrame), 0x60, 0x41, interactionAnimationFrameTable_bank16, 0x5e);
 }
 
@@ -4493,7 +4493,7 @@ void interactionSetAnimation_hook(GB *gb) { interaction_set_animation(gb); ret_e
 static void interaction_animate_2_times(GB *gb) {
   BASE(interactionAnimate2Times);
   call_interaction_animate(gb, b_+0);
-  CYC(b_+3, SYM(interactionAnimateBasedOnSpeed));
+  CYC(b_+3, b_+6);
   interaction_animate(gb);
 }
 
@@ -4529,7 +4529,7 @@ void interactionAnimateBasedOnSpeed_hook(GB *gb) {
   alu_cp(gb, 0x78);
   if (F & FC) { CYCT(b_+19, b_+24); interaction_animate_2_times(gb); ret_effect(gb); return; }
   CYC(b_+19, b_+24);
-  CYC(b_+24, SYM(interactionSetPosition));
+  CYC(b_+24, b_+27);
   interaction_animate_3_times(gb);
   ret_effect(gb);
 }
@@ -4569,7 +4569,7 @@ static void prevent_link_from_passing(GB *gb) {
     }
   }
   SET_AF(af);
-  CYC(b_+39, SYM(npcFaceLinkAndAnimate));
+  CYC(b_+39, b_+41);
 }
 
 void objectPreventLinkFromPassing_hook(GB *gb) {
@@ -4581,7 +4581,7 @@ static void push_link_away_and_update_draw_priority(GB *gb) {
   BASE(interactionPushLinkAwayAndUpdateDrawPriority);
   CYC(b_+0, b_+3);
   prevent_link_from_passing(gb);
-  CYC(b_+3, SYM(returnIfScrollMode01Unset));
+  CYC(b_+3, b_+6);
   C = 0xc0;
   CYC(SYM(objectSetPriorityRelativeToLink_withTerrainEffects), (SYM(objectSetPriorityRelativeToLink_withTerrainEffects) + 2));
   set_priority_relative_to_link(gb);
@@ -4644,7 +4644,7 @@ void npcFaceLinkAndAnimate_hook(GB *gb) {
   }
   A = alu_dec8(gb, A);
   CYC(b_+46, b_+48); mem_wr(gb, DE, A);
-  CYC(b_+48, SYM(interactionAnimateAsNpc));
+  CYC(b_+48, b_+50);
   interaction_animate_as_npc(gb);
   ret_effect(gb);
 }
@@ -4655,7 +4655,7 @@ void returnIfScrollMode01Unset_hook(GB *gb) {
   alu_and(gb, 0x01);
   if (!(F & FZ)) { CYCT(b_+3, b_+6); ret_effect(gb); return; }
   CYC(b_+3, b_+6); SET_HL(pop_effect(gb));
-  CYC(b_+6, SYM(interactionDeleteAndRetIfEnabled02));
+  CYC(b_+6, b_+8);
   ret_effect(gb);
 }
 
@@ -4667,7 +4667,7 @@ void interactionDeleteAndRetIfEnabled02_hook(GB *gb) {
   alu_cp(gb, 0x02);
   if (!(F & FZ)) { CYCT(b_+3, b_+8); ret_effect(gb); return; }
   CYC(b_+3, b_+8); SET_HL(pop_effect(gb));
-  CYC(b_+8, SYM(convertAngleDeToDirection));
+  CYC(b_+8, b_+12);
   interaction_delete(gb);
   ret_effect(gb);
 }
@@ -4678,7 +4678,7 @@ static void angle_to_direction(GB *gb) {
   alu_add(gb, A);
   alu_swap_a(gb);
   alu_and(gb, 0x03);
-  CYC(b_+0, SYM(interactionSetAlwaysUpdateBit));
+  CYC(b_+0, b_+8);
 }
 
 void convertAngleToDirection_hook(GB *gb) {
@@ -4688,7 +4688,7 @@ void convertAngleToDirection_hook(GB *gb) {
 
 static void angle_de_to_direction(GB *gb) {
   BASE(convertAngleDeToDirection);
-  CYC(b_+0, SYM(convertAngleToDirection)); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   angle_to_direction(gb);
 }
 
@@ -4702,7 +4702,7 @@ void interactionSetAlwaysUpdateBit_hook(GB *gb) {
   H = D;
   L = INTERACTION_BASE;
   CYC(b_+0, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
-  CYC(b_+5, SYM(objectCheckLinkPushingAgainstCenter));
+  CYC(b_+5, b_+6);
   ret_effect(gb);
 }
 
@@ -4711,7 +4711,7 @@ void interactionUnsetAlwaysUpdateBit_hook(GB *gb) {
   H = D;
   L = INTERACTION_BASE;
   CYC(b_+0, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) & 0x7f);
-  CYC(b_+5, SYM(interactionLoadExtraGraphics));
+  CYC(b_+5, b_+6);
   ret_effect(gb);
 }
 
@@ -4728,7 +4728,7 @@ void objectCheckLinkPushingAgainstCenter_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+14, b_+17); ret_effect(gb); return; }
   CYC(b_+14, b_+17);
   B = 0x04;
-  CYC(b_+17, SYM(interactionCheckAdjacentTileIsSolid));
+  CYC(b_+17, b_+22);
   centered_with_link(gb);
   ret_effect(gb);
 }
@@ -4754,7 +4754,7 @@ void interactionCheckAdjacentTileIsSolid_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+6);
   angle_de_to_direction(gb);
-  CYC(b_+6, SYM(interactionCheckAdjacentTileIsSolid_viaDirection));
+  CYC(b_+6, b_+8);
   adjacent_tile_is_solid(gb);
   ret_effect(gb);
 }
@@ -4774,7 +4774,7 @@ void interactionDecCounter1IfTextNotActive_hook(GB *gb) {
   CYC(b_+0, b_+3); A = W8(wTextIsActive);
   alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+3, b_+5); ret_effect(gb); return; }
-  CYC(b_+3, SYM(interactionDecCounter1IfPaletteNotFading));
+  CYC(b_+3, b_+8);
   obj_dec_body(gb, SYM(interactionDecCounter1), INTERACTION_BASE + OBJ_COUNTER1);
   ret_effect(gb);
 }
@@ -4784,7 +4784,7 @@ void interactionDecCounter1IfPaletteNotFading_hook(GB *gb) {
   CYC(b_+0, b_+3); A = W8(wPaletteThread_mode);
   alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+3, b_+5); ret_effect(gb); return; }
-  CYC(b_+3, SYM(interactionAnimate4Times));
+  CYC(b_+3, b_+8);
   obj_dec_body(gb, SYM(interactionDecCounter1), INTERACTION_BASE + OBJ_COUNTER1);
   ret_effect(gb);
 }
@@ -4795,7 +4795,7 @@ static void interaction_h_set_position(GB *gb) {
   CYC(b_+0, b_+3); mem_wr(gb, HL, B);
   L = INTERACTION_BASE + OBJ_XH;
   CYC(b_+3, b_+6); mem_wr(gb, HL, C);
-  CYC(b_+6, SYM(interactionUnsetAlwaysUpdateBit));
+  CYC(b_+6, b_+7);
 }
 
 void interactionHSetPosition_hook(GB *gb) {
@@ -4806,7 +4806,7 @@ void interactionHSetPosition_hook(GB *gb) {
 void interactionSetPosition_hook(GB *gb) {
   BASE(interactionSetPosition);
   H = D;
-  CYC(b_+0, SYM(interactionHSetPosition));
+  CYC(b_+0, b_+1);
   interaction_h_set_position(gb);
   ret_effect(gb);
 }
@@ -4821,7 +4821,7 @@ void objectCreateFloatingMusicNote_hook(GB *gb) {
   bank_push(gb, b_+6, 0x0b);
   CALL_ROM(b_+16, ROM_b0b_objectCreateFloatingImage);
   bank_pop(gb, b_+19);
-  CYC(b_+25, SYM(enemyAnimate));
+  CYC(b_+25, b_+26);
   ret_effect(gb);
 }
 
@@ -4838,7 +4838,7 @@ static void enemy_animate(GB *gb) {
   CYC(b_+8, b_+12); H8(hRomBank) = 0x0d;
   CYC(b_+12, b_+15); mem_wr(gb, MBC_ROM_BANK, 0x0d);
   L = 0xa2;
-  CYC(b_+15, SYM(enemySetAnimation));
+  CYC(b_+15, b_+19);
   next_animation_frame(gb, SYM(_enemyNextAnimationFrame), 0xa0, 0x81, enemyAnimationFrameTable_bank0d, 0x9e);
 }
 
@@ -4865,7 +4865,7 @@ void enemySetAnimation_hook(GB *gb) {
   CYC(b_+22, b_+23); H = mem_rd(gb, HL);
   L = A;
   alu_add_hl(gb, BC);
-  CYC(b_+23, SYM(_enemyNextAnimationFrame));
+  CYC(b_+23, b_+25);
   next_animation_frame(gb, SYM(_enemyNextAnimationFrame), 0xa0, 0x81, enemyAnimationFrameTable_bank0d, 0x9e);
   ret_effect(gb);
 }
@@ -4879,7 +4879,7 @@ void partAnimate_hook(GB *gb) {
   CYC(b_+4, b_+9); H8(hRomBank) = 0x16;
   CYC(b_+9, b_+12); mem_wr(gb, MBC_ROM_BANK, 0x16);
   L = 0xe2;
-  CYC(b_+12, SYM(partSetAnimation));
+  CYC(b_+12, b_+16);
   next_animation_frame(gb, SYM(_partNextAnimationFrame), 0xe0, 0xc1, partAnimationFrameTable_bank16, 0xde);
   ret_effect(gb);
 }
@@ -4901,7 +4901,7 @@ void partSetAnimation_hook(GB *gb) {
   CYC(b_+19, b_+20); H = mem_rd(gb, HL);
   L = A;
   alu_add_hl(gb, BC);
-  CYC(b_+20, SYM(_partNextAnimationFrame));
+  CYC(b_+20, b_+22);
   next_animation_frame(gb, SYM(_partNextAnimationFrame), 0xe0, 0xc1, partAnimationFrameTable_bank16, 0xde);
   ret_effect(gb);
 }
@@ -4926,7 +4926,7 @@ static void enemy_delete(GB *gb) {
     B = alu_dec8(gb, B);
     if (B) CYCT(b_+14, b_+17); else CYC(b_+14, b_+17);
   } while (B);
-  CYC(b_+17, SYM(enemyReplaceWithID));
+  CYC(b_+17, b_+18);
 }
 
 void enemyDelete_hook(GB *gb) {
@@ -4963,7 +4963,7 @@ static void enemy_create_death_puff(GB *gb) {
   L = 0xc7;
   CYC(b_+110, b_+113); mem_wr(gb, HL, B);
   A = 0x73;
-  CYC(b_+113, SYM(enemyStandardUpdate));
+  CYC(b_+113, b_+118);
   asm_call(gb, ROM_playSound, b_+5);
 }
 
@@ -4987,7 +4987,7 @@ static void enemy_die_common(GB *gb) {
     CYC(b_+22, b_+23); A = mem_rd(gb, HL); SET_HL(HL + 1);
     CYC(b_+23, b_+24); H = mem_rd(gb, HL);
     L = A;
-    SET_BC((SYM(gfxRegisterStates) + 226));
+    SET_BC(0x03e8);
     CYC(b_+24, b_+31);
     compare_hl_to_bc(gb);
     alu_rlca(gb);
@@ -5025,10 +5025,10 @@ static void enemy_die_common(GB *gb) {
   enemy_delete(gb);
 }
 
-void enemyDie_hook(GB *gb) { B = 0x01; CYC(SYM(enemyDie), (SYM(enemyDie) + 2)); enemy_die_common(gb); ret_effect(gb); }
-void enemyDie_uncounted_hook(GB *gb) { B = 0x00; CYC(SYM(enemyDie_uncounted), SYM(enemyDie)); enemy_die_common(gb); ret_effect(gb); }
-void enemyDie_withoutItemDrop_hook(GB *gb) { B = 0x81; CYC(SYM(enemyDie_withoutItemDrop), SYM(enemyDie_uncounted)); enemy_die_common(gb); ret_effect(gb); }
-void enemyDie_uncounted_withoutItemDrop_hook(GB *gb) { B = 0x80; CYC(SYM(enemyDie_uncounted_withoutItemDrop), SYM(enemyDie_withoutItemDrop)); enemy_die_common(gb); ret_effect(gb); }
+void enemyDie_hook(GB *gb) {BASE(enemyDie); B = 0x01; CYC(b_+0, b_+2); enemy_die_common(gb); ret_effect(gb); }
+void enemyDie_uncounted_hook(GB *gb) {BASE(enemyDie_uncounted); B = 0x00; CYC(b_+0, b_+4); enemy_die_common(gb); ret_effect(gb); }
+void enemyDie_withoutItemDrop_hook(GB *gb) {BASE(enemyDie_withoutItemDrop); B = 0x81; CYC(b_+0, b_+4); enemy_die_common(gb); ret_effect(gb); }
+void enemyDie_uncounted_withoutItemDrop_hook(GB *gb) {BASE(enemyDie_uncounted_withoutItemDrop); B = 0x80; CYC(b_+0, b_+4); enemy_die_common(gb); ret_effect(gb); }
 
 // energy swirls (bank $11 bodies)
 
@@ -5039,7 +5039,7 @@ void createEnergySwirlGoingIn_hook(GB *gb) {
   bank_push(gb, b_+1, 0x11);
   CALL_ROM(b_+11, ROM_b11_createEnergySwirlGoingIn_body);
   bank_pop(gb, b_+14);
-  CYC(b_+20, SYM(createEnergySwirlGoingOut));
+  CYC(b_+20, b_+21);
   ret_effect(gb);
 }
 
@@ -5050,7 +5050,7 @@ void createEnergySwirlGoingOut_hook(GB *gb) {
   bank_push(gb, b_+1, 0x11);
   CALL_ROM(b_+11, ROM_b11_createEnergySwirlGoingOut_body);
   bank_pop(gb, b_+14);
-  CYC(b_+20, SYM(convertLinkAngleToDirectionButtons));
+  CYC(b_+20, b_+21);
   ret_effect(gb);
 }
 
@@ -5080,7 +5080,7 @@ static void clear_pegasus_seed_counter(GB *gb) {
   alu_xor(gb, A);
   CYC(b_+0, b_+5); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+5, b_+6); mem_wr(gb, HL, A);
-  CYC(b_+6, SYM(putLinkOnGround));
+  CYC(b_+6, b_+7);
 }
 
 void clearPegasusSeedCounter_hook(GB *gb) {
@@ -5106,7 +5106,7 @@ void setSimulatedInputAddress_hook(GB *gb) {
   E = alu_dec8(gb, E);
   A = alu_inc8(gb, A);
   CYC(b_+16, b_+19); mem_wr(gb, DE, A);
-  CYC(b_+19, SYM(getSimulatedInput));
+  CYC(b_+19, b_+22);
   clear_pegasus_seed_counter(gb);
   ret_effect(gb);
 }
@@ -5160,7 +5160,7 @@ void getSimulatedInput_hook(GB *gb) {
     }
   }
   CYC(b_+71, b_+74); A = W8(wSimulatedInputValue);
-  CYC(b_+74, SYM(itemSetState));
+  CYC(b_+74, b_+75);
   ret_effect(gb);
 }
 
@@ -5170,7 +5170,7 @@ void itemSetState_hook(GB *gb) {
   L = OBJ_STATE;
   CYC(b_+0, b_+4); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+4, b_+6); mem_wr(gb, HL, 0x00);
-  CYC(b_+6, SYM(clearPegasusSeedCounter));
+  CYC(b_+6, b_+7);
   ret_effect(gb);
 }
 
@@ -5186,7 +5186,7 @@ void special_object_set_animation_hook(GB *gb) {
   bank_push(gb, b_+7, 0x06);
   CALL_C(b_+17, specialObjectSetAnimation_body_hook, SYM(specialObjectSetAnimation_body), b_+20);
   bank_pop(gb, b_+20);
-  CYC(b_+26, SYM(loadLinkAndCompanionAnimationFrame));
+  CYC(b_+26, b_+27);
 }
 
 void specialObjectSetAnimation_hook(GB *gb) {
@@ -5207,7 +5207,7 @@ void specialObjectAnimate_hook(GB *gb) {
   CYC(b_+15, b_+17);
   CALL_C(b_+17, specialObjectNextAnimationFrame_hook, SYM(specialObjectNextAnimationFrame), b_+20);
   bank_pop(gb, b_+20);
-  CYC(b_+26, SYM(specialObjectSetAnimation));
+  CYC(b_+26, b_+27);
   ret_effect(gb);
 }
 
@@ -5238,7 +5238,7 @@ void putLinkOnGround_hook(GB *gb) {
     special_object_set_animation_hook(gb);
   }
   SET_DE(de);
-  CYC(b_+31, SYM(setLinkForceStateToState08));
+  CYC(b_+31, b_+33);
   ret_effect(gb);
 }
 
@@ -5249,7 +5249,7 @@ static void set_link_force_state_08(GB *gb) {
   CYC(b_+0, b_+5); mem_wr(gb, HL, A); SET_HL(HL - 1);
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x08);
   SET_HL(hl);
-  CYC(b_+7, SYM(linkApplyDamage_b00));
+  CYC(b_+7, b_+9);
 }
 
 void setLinkForceStateToState08_withParam_hook(GB *gb) {
@@ -5260,7 +5260,7 @@ void setLinkForceStateToState08_withParam_hook(GB *gb) {
 void setLinkForceStateToState08_hook(GB *gb) {
   BASE(setLinkForceStateToState08);
   alu_xor(gb, A);
-  CYC(b_+0, SYM(setLinkForceStateToState08_withParam));
+  CYC(b_+0, b_+1);
   set_link_force_state_08(gb);
   ret_effect(gb);
 }
@@ -5272,7 +5272,7 @@ static void clear_link_state_bytes(GB *gb) {
   CYC(b_+6, b_+7); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+7, b_+8); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+8, b_+9); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+9, SYM(respawnLink));
+  CYC(b_+9, b_+10);
 }
 
 void setLinkIDOverride_hook(GB *gb) {
@@ -5280,7 +5280,7 @@ void setLinkIDOverride_hook(GB *gb) {
   alu_or(gb, 0x80);
   CYC(b_+0, b_+5); W8(wLinkIDOverride) = A;
   SET_HL(w1Link_subid);
-  CYC(b_+5, SYM(setLinkID));
+  CYC(b_+5, b_+10);
   clear_link_state_bytes(gb);
   ret_effect(gb);
 }
@@ -5300,7 +5300,7 @@ void respawnLink_hook(GB *gb) {
   A = 0x02;
   CYC(b_+5, b_+10); W8(wLinkStateParameter) = A;
   alu_or(gb, D);
-  CYC(b_+10, SYM(specialObjectAnimate));
+  CYC(b_+10, b_+12);
   ret_effect(gb);
 }
 
@@ -5368,12 +5368,12 @@ static void update_direction_from_angle(GB *gb, uint16_t from, uint16_t target) 
   BASE(updateLinkDirectionFromAngle);
   uint16_t bc = BC, hl = HL;
   SET_HL(target);
-  CYC(from, from == SYM(updateCompanionDirectionFromAngle) ? b_+0 : b_+5);
+  CYC(from, from == (SYM(checkLinkPushingAgainstWall__collisionDirections) + 8) ? (SYM(updateCompanionDirectionFromAngle) + 7) : b_+5);
   direction_from_angle(gb);
   A = B;
   SET_HL(hl);
   SET_BC(bc);
-  CYC(b_+34, SYM(specialObjectSetCoordinatesToRespawnYX));
+  CYC(b_+34, b_+38);
 }
 
 void updateLinkDirectionFromAngle_hook(GB *gb) {
@@ -5406,7 +5406,7 @@ void specialObjectSetCoordinatesToRespawnYX_hook(GB *gb) {
   CYC(b_+26, b_+27); mem_wr(gb, HL, A); SET_HL(HL + 1);
   L = 0x2d;
   CYC(b_+27, b_+30); mem_wr(gb, HL, A);
-  CYC(b_+30, SYM(resetLinkInvincibility));
+  CYC(b_+30, b_+31);
   ret_effect(gb);
 }
 
@@ -5427,7 +5427,7 @@ void resetLinkInvincibility_hook(GB *gb) {
   CYC(b_+16, b_+17); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+17, b_+18); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+18, b_+19); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+19, SYM(decPegasusSeedCounter));
+  CYC(b_+19, b_+20);
   ret_effect(gb);
 }
 
@@ -5463,7 +5463,7 @@ void decPegasusSeedCounter_hook(GB *gb) {
   CYC(b_+39, b_+40); A = mem_rd(gb, HL);
   alu_or(gb, B);
   CYC(b_+40, b_+42); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(b_+42, SYM(checkPegasusSeedCounter));
+  CYC(b_+42, b_+43);
   ret_effect(gb);
 }
 
@@ -5473,7 +5473,7 @@ void checkPegasusSeedCounter_hook(GB *gb) {
   CYC(b_+0, b_+4); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+4, b_+5); alu_or(gb, mem_rd(gb, HL));
   CYC(b_+5, b_+6); A = mem_rd(gb, HL); SET_HL(HL - 1);
-  CYC(b_+6, SYM(itemTryToBreakTile));
+  CYC(b_+6, b_+7);
   ret_effect(gb);
 }
 
@@ -5494,7 +5494,7 @@ void itemDelete_hook(GB *gb) {
     B = alu_dec8(gb, B);
     if (B) CYCT(b_+10, b_+13); else CYC(b_+10, b_+13);
   } while (B);
-  CYC(b_+13, SYM(itemUpdateAngle));
+  CYC(b_+13, b_+14);
   ret_effect(gb);
 }
 
@@ -5506,7 +5506,7 @@ void itemUpdateAngle_hook(GB *gb) {
   alu_swap_a(gb);
   alu_rrca(gb);
   CYC(b_+4, b_+8); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(b_+8, SYM(getFreeItemSlot));
+  CYC(b_+8, b_+9);
   ret_effect(gb);
 }
 
@@ -5525,7 +5525,7 @@ void getFreeItemSlot_hook(GB *gb) {
     if (F & FC) { CYCT(b_+6, b_+12); continue; }
     CYC(b_+6, b_+12);
     alu_or(gb, H);
-    CYC(b_+12, SYM(introThreadStart));
+    CYC(b_+12, b_+14);
     break;
   }
   ret_effect(gb);
@@ -5538,7 +5538,7 @@ void setVisitedRoomFlag_hook(GB *gb) {
   CYC(b_+0, b_+3);
   this_room_flags(gb);
   CYC(b_+3, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) | 0x10);
-  CYC(b_+5, SYM(getThisRoomDungeonProperties));
+  CYC(b_+5, b_+6);
   ret_effect(gb);
 }
 
@@ -5561,7 +5561,7 @@ void getThisRoomDungeonProperties_hook(GB *gb) {
   CYC(b_+27, b_+32); A = mem_rd(gb, HL);
   CYC(b_+32, b_+35); W8(wDungeonRoomProperties) = A;
   bank_pop(gb, b_+35);
-  CYC(b_+41, SYM(getDungeonLayoutAddress));
+  CYC(b_+41, b_+42);
   ret_effect(gb);
 }
 
@@ -5576,7 +5576,7 @@ static void dungeon_layout_address(GB *gb) {
   alu_add_hl(gb, BC);
   SET_DE(de);
   SET_BC(bc);
-  CYC(b_+10, SYM(getActiveRoomFromDungeonMapPosition));
+  CYC(b_+10, b_+17);
 }
 
 void getDungeonLayoutAddress_hook(GB *gb) {
@@ -5598,7 +5598,7 @@ static void room_in_dungeon(GB *gb) {
   alu_xor(gb, A);
   CYC(b_+13, b_+16); mem_wr(gb, IO_SVBK, A);
   A = L;
-  CYC(b_+16, SYM(getFreeEnemySlot));
+  CYC(b_+16, b_+18);
 }
 
 void getRoomInDungeon_hook(GB *gb) {
@@ -5608,7 +5608,7 @@ void getRoomInDungeon_hook(GB *gb) {
 
 void getActiveRoomFromDungeonMapPosition_hook(GB *gb) {
   BASE(getActiveRoomFromDungeonMapPosition);
-  CYC(b_+0, SYM(getRoomInDungeon)); A = W8(wDungeonMapPosition);
+  CYC(b_+0, b_+3); A = W8(wDungeonMapPosition);
   room_in_dungeon(gb);
   ret_effect(gb);
 }
@@ -5625,7 +5625,7 @@ static void free_enemy_slot_uncounted(GB *gb) {
       A = alu_inc8(gb, A);
       CYC(b_+15, b_+17); mem_wr(gb, HL, A); SET_HL(HL + 1);
       alu_xor(gb, A);
-      CYC(b_+17, SYM(enemyDelete));
+      CYC(b_+17, b_+19);
       return;
     }
     CYC(b_+4, b_+7);
@@ -5654,7 +5654,7 @@ void getFreeEnemySlot_hook(GB *gb) {
   A = alu_inc8(gb, A);
   CYC(b_+7, b_+11); W8(wNumEnemies) = A;
   alu_xor(gb, A);
-  CYC(b_+11, SYM(getFreeEnemySlot_uncounted));
+  CYC(b_+11, b_+13);
   ret_effect(gb);
 }
 
@@ -5690,7 +5690,7 @@ void enemyReplaceWithID_hook(GB *gb) {
   CYC(b_+36, b_+38); mem_wr(gb, HL, B);
   L = alu_inc8(gb, L);
   CYC(b_+38, b_+40); mem_wr(gb, HL, C);
-  CYC(b_+40, SYM(_updateEnemiesIfStateIsZero));
+  CYC(b_+40, b_+41);
   ret_effect(gb);
 }
 
@@ -5711,7 +5711,7 @@ void findFreeStaticObjectSlot_hook(GB *gb) {
     if (B) { CYCT(b_+8, b_+15); continue; }
     CYC(b_+8, b_+15);
     alu_or(gb, H);
-    CYC(b_+15, SYM(objectDeleteRelatedObj1AsStaticObject));
+    CYC(b_+15, b_+17);
     break;
   }
   ret_effect(gb);
@@ -5725,7 +5725,7 @@ void interactionLoadExtraGraphics_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+6); W8(wInteractionIDToLoadExtraGfx) = A;
   CYC(b_+6, b_+9); W8(wLoadedObjectGfxEnd) = A;
-  CYC(b_+9, SYM(interactionFunc_278b));
+  CYC(b_+9, b_+10);
   ret_effect(gb);
 }
 
@@ -5736,7 +5736,7 @@ void interactionGetMiniScript_hook(GB *gb) {
   CYC(b_+0, b_+4); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+4, b_+5); H = mem_rd(gb, HL);
   L = A;
-  CYC(b_+5, SYM(interactionSetMiniScript));
+  CYC(b_+5, b_+7);
   ret_effect(gb);
 }
 
@@ -5747,7 +5747,7 @@ void clearFadingPalettes_hook(GB *gb) {
   bank_push(gb, b_+0, 0x03);
   CALL_ROM(b_+10, ROM_b03_clearFadingPalettes_body);
   bank_pop(gb, b_+13);
-  CYC(b_+19, SYM(flashScreen));
+  CYC(b_+19, b_+20);
   ret_effect(gb);
 }
 
@@ -5761,7 +5761,7 @@ void flashScreen_hook(GB *gb) {
   bank_pop(gb, b_+18);
   A = B;
   alu_or(gb, A);
-  CYC(b_+24, SYM(specialObjectCode_companionCutscene_b00));
+  CYC(b_+24, b_+27);
   ret_effect(gb);
 }
 
@@ -5775,7 +5775,7 @@ void loadDungeonLayout_hook(GB *gb) {
   bank_push(gb, b_+6, 0x01);
   CALL_C(b_+16, loadDungeonLayout_b01_hook, SYM(loadDungeonLayout_b01), b_+19);
   bank_pop(gb, b_+19);
-  CYC(b_+25, SYM(initializeDungeonStuff));
+  CYC(b_+25, b_+26);
   ret_effect(gb);
 }
 
@@ -5785,7 +5785,7 @@ void initializeDungeonStuff_hook(GB *gb) {
   CYC(b_+0, b_+4); W8(wToggleBlocksState) = A;
   CYC(b_+4, b_+7); W8(wSwitchState) = A;
   CYC(b_+7, b_+10); W8(wSpinnerState) = A;
-  CYC(b_+10, SYM(setVisitedRoomFlag));
+  CYC(b_+10, b_+13);
   loadStaticObjects_hook(gb);
 }
 
@@ -5793,7 +5793,7 @@ void clearStaticObjects_hook(GB *gb) {
   BASE(clearStaticObjects);
   SET_HL(wStaticObjects);
   B = 0x40;
-  CYC(b_+0, SYM(findFreeStaticObjectSlot));
+  CYC(b_+0, b_+8);
   clearMemory(gb, HL, 0x40);
   SET_HL(HL + 0x40);
   B = 0;
@@ -5827,7 +5827,7 @@ void objectDeleteRelatedObj1AsStaticObject_hook(GB *gb) {
     E = alu_dec8(gb, E);
     if (E) CYCT(b_+19, b_+22); else CYC(b_+19, b_+22);
   } while (E);
-  CYC(b_+22, SYM(objectSaveAsStaticObject));
+  CYC(b_+22, b_+23);
   ret_effect(gb);
 }
 
@@ -5838,14 +5838,14 @@ static void bank6_function_caller(GB *gb, uint16_t sp0_) {
   bank_push(gb, b_+2, 0x06);
   CALL_C(b_+12, functionCaller_b06_hook, SYM(functionCaller_b06), b_+15);
   bank_pop(gb, b_+15);
-  CYC(b_+21, SYM(objectAddToGrabbableObjectBuffer));
+  CYC(b_+21, b_+22);
 }
 
 void clearAllParentItems_hook(GB *gb) {
   BASE(clearAllParentItems);
   uint16_t sp0_ = gb->sp;
   C = 0x00;
-  CYC(b_+0, SYM(updateParentItemButtonAssignment));
+  CYC(b_+0, b_+4);
   bank6_function_caller(gb, sp0_);
   ret_effect(gb);
 }
@@ -5854,7 +5854,7 @@ void updateParentItemButtonAssignment_hook(GB *gb) {
   BASE(updateParentItemButtonAssignment);
   uint16_t sp0_ = gb->sp;
   C = 0x01;
-  CYC(b_+0, SYM(checkUseItems_b00));
+  CYC(b_+0, b_+4);
   bank6_function_caller(gb, sp0_);
   ret_effect(gb);
 }
@@ -5869,7 +5869,7 @@ void clearVar3fForParentItems_hook(GB *gb) {
     A = H;
     alu_cp(gb, 0xd6);
     if (F & FC) { CYCT(b_+5, b_+11); continue; }
-    CYC(b_+5, SYM(linkCreateSplash));
+    CYC(b_+5, b_+12);
     break;
   }
   ret_effect(gb);
@@ -5887,7 +5887,7 @@ void linkCreateSplash_hook(GB *gb) {
   if (F & FZ) {
     CYCT(b_+13, b_+18);
     C = 0x00;
-    CYC(SYM(objectCreateInteractionWithSubid00), SYM(objectCreateInteraction));
+    CYC(SYM(objectCreateInteractionWithSubid00), (SYM(objectCreateInteractionWithSubid00) + 2));
     object_create_interaction(gb);
     ret_effect(gb);
     return;
@@ -5897,7 +5897,7 @@ void linkCreateSplash_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+21, b_+22); ret_effect(gb); return; }
   CYC(b_+21, b_+23); mem_wr(gb, HL, B);
   SET_BC(0xfd00);
-  CYC(b_+23, SYM(clearVariousLinkVariables));
+  CYC(b_+23, b_+29);
   copy_position_with_offset(gb);
   ret_effect(gb);
 }
@@ -5911,7 +5911,7 @@ void clearVariousLinkVariables_hook(GB *gb) {
   CYC(b_+10, b_+13); mem_wr(gb, w1Link_var12, A);
   A = alu_dec8(gb, A);
   CYC(b_+13, b_+17); mem_wr(gb, w1Link_angle, A);
-  CYC(b_+17, SYM(linkState07));
+  CYC(b_+17, b_+18);
   ret_effect(gb);
 }
 
@@ -5950,7 +5950,7 @@ void dropLinkHeldItem_hook(GB *gb) {
   alu_xor(gb, A);
   CYC(b_+39, b_+43); W8(wLinkGrabState) = A;
   CYC(b_+43, b_+46); W8(wLinkGrabState2) = A;
-  CYC(b_+46, SYM(clearVar3fForParentItems));
+  CYC(b_+46, b_+47);
   ret_effect(gb);
 }
 
@@ -5967,7 +5967,7 @@ void objectAddToGrabbableObjectBuffer_hook(GB *gb) {
       CYC(b_+15, b_+17); mem_wr(gb, HL, A); SET_HL(HL - 1);
       CYC(b_+17, b_+19); A = H8(hActiveObjectType);
       CYC(b_+19, b_+20); mem_wr(gb, HL, A);
-      CYC(b_+20, SYM(dropLinkHeldItem));
+      CYC(b_+20, b_+21);
       break;
     }
     CYC(b_+6, b_+8);
@@ -5993,7 +5993,7 @@ static void try_to_break_tile(GB *gb, uint16_t sp0_) {
   CYC(b_+15, b_+17); E = alu_rl(gb, E);
   bank_pop(gb, b_+17);
   CYC(b_+23, b_+25); E = alu_rr(gb, E);
-  CYC(b_+25, SYM(clearAllParentItems));
+  CYC(b_+25, b_+26);
 }
 
 void tryToBreakTile_hook(GB *gb) {
@@ -6009,7 +6009,7 @@ void itemTryToBreakTile_hook(GB *gb) {
   CYC(b_+1, b_+3); L = OBJ_YH;
   CYC(b_+3, b_+4); B = mem_rd(gb, HL);
   CYC(b_+4, b_+6); L = OBJ_XH;
-  CYC(b_+6, SYM(tryToBreakTile)); C = mem_rd(gb, HL);
+  CYC(b_+6, b_+7); C = mem_rd(gb, HL);
   try_to_break_tile(gb, sp0_);
   ret_effect(gb);
 }
@@ -6019,7 +6019,7 @@ void itemTryToBreakTile_hook(GB *gb) {
 void unsetGlobalFlag_hook(GB *gb) {
   BASE(unsetGlobalFlag);
   SET_HL(wGlobalFlags);
-  CYC(b_+0, SYM(clearEnemiesKilledList_b00));
+  CYC(b_+0, b_+6);
   unset_flag(gb);
   ret_effect(gb);
 }
@@ -6040,7 +6040,7 @@ static void clear_palette_fade_variables(GB *gb) {
   CYC(b_+21, b_+22); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+22, b_+23); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+23, b_+24); mem_wr(gb, HL, A);
-  CYC(b_+24, SYM(fadeoutToWhiteWithDelay));
+  CYC(b_+24, b_+25);
 }
 
 void clearPaletteFadeVariables_hook(GB *gb) {
@@ -6052,7 +6052,7 @@ void clearPaletteFadeVariablesAndRefreshPalettes_hook(GB *gb) {
   BASE(clearPaletteFadeVariablesAndRefreshPalettes);
   A = 0xff;
   CYC(b_+0, b_+4); H8(hDirtyBgPalettes) = A;
-  CYC(b_+4, SYM(clearPaletteFadeVariables)); H8(hDirtySprPalettes) = A;
+  CYC(b_+4, b_+6); H8(hDirtySprPalettes) = A;
   clear_palette_fade_variables(gb);
   ret_effect(gb);
 }
@@ -6065,7 +6065,7 @@ static void make_all_palettes_use_fading(GB *gb) {
   CYC(b_+6, b_+7); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+7, b_+8); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+8, b_+9); mem_wr(gb, HL, A);
-  CYC(b_+9, SYM(fadeinFromWhiteWithDelay));
+  CYC(b_+9, b_+10);
 }
 
 void makeAllPaletteUseFading_hook(GB *gb) {
@@ -6078,7 +6078,7 @@ static void set_palette_thread_delay(GB *gb) {
   CYC(b_+0, b_+3); W8(wPaletteThread_counterRefill) = A;
   A = 0x01;
   CYC(b_+3, b_+8); W8(wPaletteThread_counter) = A;
-  CYC(b_+8, SYM(paletteFadeThreadStart));
+  CYC(b_+8, b_+9);
 }
 
 void setPaletteThreadDelay_hook(GB *gb) {
@@ -6090,7 +6090,7 @@ static void fadeout_white_tail(GB *gb) {
   BASE(fadeoutToWhite);
   CYC(b_+7, b_+10); W8(wPaletteThread_speed) = A;
   alu_xor(gb, A);
-  CYC(b_+10, SYM(makeAllPaletteUseFading)); mem_wr(gb, wPaletteFadeOffset, A);
+  CYC(b_+10, b_+14); mem_wr(gb, wPaletteFadeOffset, A);
   make_all_palettes_use_fading(gb);
 }
 
@@ -6109,7 +6109,7 @@ void fastFadeoutToWhite_hook(GB *gb) {
   A = 0x01;
   CYC(b_+0, b_+5); W8(wPaletteThread_mode) = A;
   A = 0x03;
-  CYC(b_+5, SYM(fadeoutToWhite));
+  CYC(b_+5, b_+9);
   fadeout_white_tail(gb);
   ret_effect(gb);
 }
@@ -6121,7 +6121,7 @@ void fadeoutToWhiteWithDelay_hook(GB *gb) {
   A = 0x09;
   CYC(b_+3, b_+8); W8(wPaletteThread_mode) = A;
   A = 0x01;
-  CYC(b_+8, SYM(fastFadeoutToWhite));
+  CYC(b_+8, b_+12);
   fadeout_white_tail(gb);
   ret_effect(gb);
 }
@@ -6131,7 +6131,7 @@ static void fadein_white_tail(GB *gb) {
   CYC(b_+7, b_+10); W8(wPaletteThread_speed) = A;
   A = 0x20;
   CYC(b_+10, b_+15); mem_wr(gb, wPaletteFadeOffset, A);
-  CYC(b_+15, SYM(fadeoutToBlackWithDelay));
+  CYC(b_+15, b_+18);
   make_all_palettes_use_fading(gb);
 }
 
@@ -6149,7 +6149,7 @@ static void fast_fadein_from_white(GB *gb) {
   A = 0x02;
   CYC(b_+0, b_+5); W8(wPaletteThread_mode) = A;
   A = 0x03;
-  CYC(b_+5, SYM(fadeinFromWhite));
+  CYC(b_+5, b_+9);
   fadein_white_tail(gb);
 }
 
@@ -6163,7 +6163,7 @@ void fadeinFromWhiteWithDelay_hook(GB *gb) {
   A = 0x0a;
   CYC(b_+3, b_+8); W8(wPaletteThread_mode) = A;
   A = 0x01;
-  CYC(b_+8, SYM(fastFadeinFromWhite));
+  CYC(b_+8, b_+12);
   fadein_white_tail(gb);
   ret_effect(gb);
 }
@@ -6173,7 +6173,7 @@ static void fadeout_black_tail(GB *gb) {
   CYC(b_+7, b_+10); W8(wPaletteThread_speed) = A;
   alu_xor(gb, A);
   CYC(b_+10, b_+14); mem_wr(gb, wPaletteFadeOffset, A);
-  CYC(b_+14, SYM(fadeinFromBlackWithDelay));
+  CYC(b_+14, b_+17);
   make_all_palettes_use_fading(gb);
 }
 
@@ -6192,7 +6192,7 @@ void fastFadeoutToBlack_hook(GB *gb) {
   A = 0x03;
   CYC(b_+0, b_+5); W8(wPaletteThread_mode) = A;
   A = 0x03;
-  CYC(b_+5, SYM(fadeoutToBlack));
+  CYC(b_+5, b_+9);
   fadeout_black_tail(gb);
   ret_effect(gb);
 }
@@ -6204,7 +6204,7 @@ void fadeoutToBlackWithDelay_hook(GB *gb) {
   A = 0x0b;
   CYC(b_+3, b_+8); W8(wPaletteThread_mode) = A;
   A = 0x01;
-  CYC(b_+8, SYM(fastFadeoutToBlack));
+  CYC(b_+8, b_+12);
   fadeout_black_tail(gb);
   ret_effect(gb);
 }
@@ -6214,7 +6214,7 @@ static void fadein_black_tail(GB *gb) {
   CYC(b_+7, b_+10); W8(wPaletteThread_speed) = A;
   A = 0xe0;
   CYC(b_+10, b_+15); mem_wr(gb, wPaletteFadeOffset, A);
-  CYC(b_+15, SYM(darkenRoomLightly));
+  CYC(b_+15, b_+18);
   make_all_palettes_use_fading(gb);
 }
 
@@ -6233,7 +6233,7 @@ void fastFadeinFromBlack_hook(GB *gb) {
   A = 0x04;
   CYC(b_+0, b_+5); W8(wPaletteThread_mode) = A;
   A = 0x03;
-  CYC(b_+5, SYM(fadeinFromBlack));
+  CYC(b_+5, b_+9);
   fadein_black_tail(gb);
   ret_effect(gb);
 }
@@ -6245,7 +6245,7 @@ void fadeinFromBlackWithDelay_hook(GB *gb) {
   A = 0x0c;
   CYC(b_+3, b_+8); W8(wPaletteThread_mode) = A;
   A = 0x01;
-  CYC(b_+8, SYM(fastFadeinFromBlack));
+  CYC(b_+8, b_+12);
   fadein_black_tail(gb);
   ret_effect(gb);
 }
@@ -6264,7 +6264,7 @@ static void set_darkening_variables(GB *gb) {
   L = alu_inc8(gb, L);
   CYC(b_+21, b_+23); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+23, b_+25); mem_wr(gb, HL, 0x00);
-  CYC(b_+25, SYM(brightenRoomLightly));
+  CYC(b_+25, b_+26);
 }
 
 void _setDarkeningVariables_hook(GB *gb) {
@@ -6277,13 +6277,13 @@ static void darken_room_helper(GB *gb) {
   A = 0x05;
   CYC(b_+0, b_+5); W8(wPaletteThread_mode) = A;
   A = 0x01;
-  CYC(b_+5, SYM(_setDarkeningVariables));
+  CYC(b_+5, b_+7);
   set_darkening_variables(gb);
 }
 
 void _darkenRoomHelper_hook(GB *gb) { darken_room_helper(gb); ret_effect(gb); }
-void darkenRoom_hook(GB *gb) { B = 0xf0; CYC(SYM(darkenRoom), SYM(_darkenRoomHelper)); darken_room_helper(gb); ret_effect(gb); }
-void darkenRoomLightly_hook(GB *gb) { B = 0xf7; CYC(SYM(darkenRoomLightly), SYM(func_32fc)); darken_room_helper(gb); ret_effect(gb); }
+void darkenRoom_hook(GB *gb) {BASE(darkenRoom); B = 0xf0; CYC(b_+0, b_+2); darken_room_helper(gb); ret_effect(gb); }
+void darkenRoomLightly_hook(GB *gb) {BASE(darkenRoomLightly); B = 0xf7; CYC(b_+0, b_+4); darken_room_helper(gb); ret_effect(gb); }
 
 void darkenRoomWithSpeed_hook(GB *gb) {
   BASE(darkenRoomWithSpeed);
@@ -6292,7 +6292,7 @@ void darkenRoomWithSpeed_hook(GB *gb) {
   set_darkening_variables(gb);
   A = 0x05;
   CYC(b_+5, b_+10); W8(wPaletteThread_mode) = A;
-  CYC(b_+10, SYM(darkenRoom));
+  CYC(b_+10, b_+11);
   ret_effect(gb);
 }
 
@@ -6302,19 +6302,19 @@ static void brighten_room_helper(GB *gb) {
   set_darkening_variables(gb);
   A = 0x06;
   CYC(b_+3, b_+8); W8(wPaletteThread_mode) = A;
-  CYC(b_+8, SYM(fastFadeinFromWhiteToRoom));
+  CYC(b_+8, b_+9);
 }
 
 void _brightenRoomHelper_hook(GB *gb) { brighten_room_helper(gb); ret_effect(gb); }
-void brightenRoom_hook(GB *gb) { B = 0x00; A = 0x01; CYC(SYM(brightenRoom), SYM(_brightenRoomHelper)); brighten_room_helper(gb); ret_effect(gb); }
-void brightenRoomLightly_hook(GB *gb) { B = 0xf7; A = 0x01; CYC(SYM(brightenRoomLightly), SYM(func_333e)); brighten_room_helper(gb); ret_effect(gb); }
-void brightenRoomWithSpeed_hook(GB *gb) { B = 0x00; CYC(SYM(brightenRoomWithSpeed), SYM(brightenRoom)); brighten_room_helper(gb); ret_effect(gb); }
+void brightenRoom_hook(GB *gb) {BASE(brightenRoom); B = 0x00; A = 0x01; CYC(b_+0, b_+4); brighten_room_helper(gb); ret_effect(gb); }
+void brightenRoomLightly_hook(GB *gb) {BASE(brightenRoomLightly); B = 0xf7; A = 0x01; CYC(b_+0, b_+6); brighten_room_helper(gb); ret_effect(gb); }
+void brightenRoomWithSpeed_hook(GB *gb) {BASE(brightenRoomWithSpeed); B = 0x00; CYC(b_+0, b_+4); brighten_room_helper(gb); ret_effect(gb); }
 
 static void fadein_to_room_tail(GB *gb) {
   BASE(fastFadeinFromWhiteToRoom);
   A = 0x07;
   CYC(b_+8, b_+13); W8(wPaletteThread_mode) = A;
-  CYC(b_+13, SYM(fadeinFromWhiteToRoom));
+  CYC(b_+13, b_+14);
 }
 
 void fastFadeinFromWhiteToRoom_hook(GB *gb) {
@@ -6331,7 +6331,7 @@ void fadeinFromWhiteToRoom_hook(GB *gb) {
   BASE(fadeinFromWhiteToRoom);
   CYC(b_+0, b_+3);
   fadein_from_white(gb);
-  CYC(b_+3, SYM(startFadeBetweenTwoPalettes));
+  CYC(b_+3, b_+5);
   fadein_to_room_tail(gb);
   ret_effect(gb);
 }
@@ -6342,7 +6342,7 @@ static void start_fade_between_two_palettes(GB *gb) {
   CYC(b_+0, b_+5); W8(wPaletteThread_mode) = A;
   A = 0x20;
   CYC(b_+5, b_+10); mem_wr(gb, wPaletteFadeOffset, A);
-  CYC(b_+10, SYM(setPaletteThreadDelay));
+  CYC(b_+10, b_+11);
 }
 
 void startFadeBetweenTwoPalettes_hook(GB *gb) {
@@ -6372,7 +6372,7 @@ void setEnemyTargetToLinkPosition_hook(GB *gb) {
   L = alu_inc8(gb, L);
   CYC(b_+23, b_+25); A = mem_rd(gb, HL);
   CYC(b_+25, b_+27); H8(hFFB3) = A;
-  CYC(b_+27, SYM(getEntryFromObjectTable2));
+  CYC(b_+27, b_+28);
   ret_effect(gb);
 }
 
@@ -6388,7 +6388,7 @@ void getEntryFromObjectTable2_hook(GB *gb) {
   L = A;
   CYC(b_+17, b_+18);
   bank_pop(gb, b_+18);
-  CYC(b_+24, SYM(checkDungeonUsesToggleBlocks));
+  CYC(b_+24, b_+25);
   ret_effect(gb);
 }
 
@@ -6399,7 +6399,7 @@ void checkDungeonUsesToggleBlocks_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+3, b_+6); ret_effect(gb); return; }
   CYC(b_+3, b_+6);
   SET_HL(dungeonsUsingToggleBlocks);
-  CYC(b_+6, SYM(dungeonsUsingToggleBlocks));
+  CYC(b_+6, b_+12);
   check_flag(gb);
   ret_effect(gb);
 }
@@ -6415,7 +6415,7 @@ void getIndexOfGashaSpotInRoom_hook(GB *gb) {
   SET_BC(AF);
   CYC(b_+15, b_+17);
   bank_pop(gb, b_+17);
-  CYC(b_+23, SYM(getBlackTowerProgress));
+  CYC(b_+23, b_+24);
   ret_effect(gb);
 }
 
@@ -6435,7 +6435,7 @@ void getBlackTowerProgress_hook(GB *gb) {
   }
   A = C;
   SET_BC(bc);
-  CYC(b_+19, SYM(vramBgMapTable));
+  CYC(b_+19, b_+22);
   ret_effect(gb);
 }
 
@@ -6447,7 +6447,7 @@ static void set_hl_to_tile_mapping_data(GB *gb) {
   multiply_a_by_8(gb);
   SET_HL(w3TileMappingData);
   alu_add_hl(gb, BC);
-  CYC(b_+3, SYM(setTile));
+  CYC(b_+3, b_+8);
 }
 
 void setHlToTileMappingDataPlusATimes8_hook(GB *gb) {
@@ -6477,7 +6477,7 @@ void getTileMappingData_hook(GB *gb) {
   A = svbk;
   F = f;
   CYC(b_+29, b_+33); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+33, SYM(setHlToTileMappingDataPlusATimes8));
+  CYC(b_+33, b_+34);
   ret_effect(gb);
 }
 
@@ -6511,7 +6511,7 @@ static void set_tile(GB *gb) {
   F = f;
   CYC(b_+37, b_+40); mem_wr(gb, IO_SVBK, A);
   alu_or(gb, H);
-  CYC(b_+40, SYM(setTileInAllBuffers));
+  CYC(b_+40, b_+42);
 }
 
 void setTile_hook(GB *gb) {
@@ -6526,7 +6526,7 @@ void setTileInAllBuffers_hook(GB *gb) {
   CYC(b_+0, b_+5);
   set_tile_in_room_layout_buffer(gb);
   A = E;
-  CYC(b_+5, SYM(setInterleavedTile));
+  CYC(b_+5, b_+9);
   set_tile(gb);
   ret_effect(gb);
 }
@@ -6550,7 +6550,7 @@ static void set_interleaved_tile(GB *gb, uint16_t sp0_) {
   A = C;
   CYC(b_+27, b_+30); mem_wr(gb, IO_SVBK, A);
   SET_DE(de);
-  CYC(b_+30, SYM(getFreeInteractionSlot));
+  CYC(b_+30, b_+32);
 }
 
 void setInterleavedTile_hook(GB *gb) {
@@ -6573,7 +6573,7 @@ static void get_free_interaction_slot(GB *gb) {
       CYC(b_+15, b_+16); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
       L = alu_inc8(gb, L);
       alu_xor(gb, A);
-      CYC(b_+16, SYM(interactionDeleteAndUnmarkSolidPosition));
+      CYC(b_+16, b_+19);
       break;
     }
     CYC(b_+4, b_+7);
@@ -6608,7 +6608,7 @@ static void interaction_delete(GB *gb) {
     B = alu_dec8(gb, B);
     if (B) CYCT(b_+10, b_+13); else CYC(b_+10, b_+13);
   } while (B);
-  CYC(b_+13, SYM(_updateInteractionsIfStateIsZero));
+  CYC(b_+13, b_+14);
 }
 
 void interactionDelete_hook(GB *gb) {
@@ -6618,7 +6618,7 @@ void interactionDelete_hook(GB *gb) {
 
 void interactionDeleteAndUnmarkSolidPosition_hook(GB *gb) {
   BASE(interactionDeleteAndUnmarkSolidPosition);
-  CYC(b_+0, SYM(interactionDelete));
+  CYC(b_+0, b_+3);
   unmark_solid_position(gb);
   interaction_delete(gb);
   ret_effect(gb);
@@ -6636,7 +6636,7 @@ void checkNpcShouldExistAtGameStage_hook(GB *gb) {
   bank_pop(gb, b_+22);
   A = C;
   alu_or(gb, A);
-  CYC(b_+28, SYM(tokayIslandStolenItems));
+  CYC(b_+28, b_+31);
   ret_effect(gb);
 }
 
@@ -6648,7 +6648,7 @@ void interactionSetSimpleScript_hook(GB *gb) {
   E = alu_inc8(gb, E);
   A = H;
   CYC(b_+4, b_+7); mem_wr(gb, DE, A);
-  CYC(b_+7, SYM(interactionRunSimpleScript));
+  CYC(b_+7, b_+8);
   ret_effect(gb);
 }
 
@@ -6685,7 +6685,7 @@ static void load_screen_music(GB *gb) {
     CYC(b_+45, b_+48); W8(wLoadingRoomPack) = A;
   }
   bank_pop(gb, b_+48);
-  CYC(b_+54, SYM(applyWarpDest));
+  CYC(b_+54, b_+55);
 }
 
 void loadScreenMusic_hook(GB *gb) {
@@ -6698,7 +6698,7 @@ void applyWarpDest_hook(GB *gb) {
   bank_push(gb, b_+0, 0x04);
   CALL_ROM(b_+10, ROM_b04_applyWarpDest_b04);
   bank_pop(gb, b_+13);
-  CYC(b_+19, SYM(loadScreenMusicAndSetRoomPack));
+  CYC(b_+19, b_+20);
   ret_effect(gb);
 }
 
@@ -6714,7 +6714,7 @@ static void load_screen_music_and_set_room_pack(GB *gb) {
   CYC(b_+12, b_+17); A = W8(wLoadingRoomPack);
   alu_and(gb, 0x7f);
   CYC(b_+17, b_+22); W8(wRoomPack) = A;
-  CYC(b_+22, SYM(dismountCompanionAndSetRememberedPositionToScreenCenter));
+  CYC(b_+22, b_+23);
 }
 
 void loadScreenMusicAndSetRoomPack_hook(GB *gb) {
@@ -6738,7 +6738,7 @@ void dismountCompanionAndSetRememberedPositionToScreenCenter_hook(GB *gb) {
   A = 0x50;
   CYC(b_+30, b_+35); W8(wRememberedCompanionX) = A;
   bank_pop(gb, b_+35);
-  CYC(b_+41, SYM(updateAllObjects));
+  CYC(b_+41, b_+42);
   ret_effect(gb);
 }
 
@@ -6757,10 +6757,10 @@ static void clear_wram_bank1(GB *gb) {
   alu_xor(gb, A);
   CYC(b_+0, b_+3); mem_wr(gb, IO_SVBK, A);
   SET_HL(w1Link);
-  SET_BC((SYM(_getObjectPositionOnScreen_duringScreenTransition) + 63));
-  CYC(b_+3, SYM(clearScreenVariablesAndWramBank1));
+  SET_BC(0x1000);
+  CYC(b_+3, b_+12);
   clearMemoryBc(gb, HL, (SYM(_getObjectPositionOnScreen_duringScreenTransition) + 63));
-  SET_HL(HL + (SYM(_getObjectPositionOnScreen_duringScreenTransition) + 63));
+  SET_HL(HL + 0x1000);
   SET_BC(0);
   A = 0;
   E = 0;
@@ -6782,7 +6782,7 @@ static void clear_screen_variables(GB *gb) {
   CYC(b_+8, b_+13); W8(wLoadedTilesetUniqueGfx) = A;
   CYC(b_+13, b_+16); W8(wLoadedTilesetLayout) = A;
   CYC(b_+16, b_+19); W8(wLoadedTilesetAnimation) = A;
-  CYC(b_+19, SYM(clearLinkObject));
+  CYC(b_+19, b_+20);
 }
 
 void clearScreenVariables_hook(GB *gb) {
@@ -6792,7 +6792,7 @@ void clearScreenVariables_hook(GB *gb) {
 
 void clearScreenVariablesAndWramBank1_hook(GB *gb) {
   BASE(clearScreenVariablesAndWramBank1);
-  CYC(b_+0, SYM(clearScreenVariables));
+  CYC(b_+0, b_+3);
   clear_wram_bank1(gb);
   clear_screen_variables(gb);
   ret_effect(gb);
@@ -6802,7 +6802,7 @@ void clearLinkObject_hook(GB *gb) {
   BASE(clearLinkObject);
   SET_HL(w1Link);
   B = 0x40;
-  CYC(b_+0, SYM(clearReservedInteraction0));
+  CYC(b_+0, b_+8);
   clear_block(gb, HL, 0x40);
   ret_effect(gb);
 }
@@ -6811,7 +6811,7 @@ static void clear_reserved_interaction1(GB *gb) {
   BASE(clearReservedInteraction1);
   SET_HL(w1ReservedInteraction0 + 0x100);
   B = 0x40;
-  CYC(b_+0, SYM(clearDynamicInteractions));
+  CYC(b_+0, b_+8);
   clear_block(gb, HL, 0x40);
 }
 
@@ -6824,7 +6824,7 @@ void clearReservedInteraction0_hook(GB *gb) {
   BASE(clearReservedInteraction0);
   SET_HL(w1ReservedInteraction0);
   B = 0x40;
-  CYC(b_+0, SYM(clearReservedInteraction1));
+  CYC(b_+0, b_+8);
   clear_block(gb, HL, 0x40);
   clear_reserved_interaction1(gb);
   ret_effect(gb);
@@ -6870,7 +6870,7 @@ static void load_animation_pointer(GB *gb) {
   A = H;
   CYC(b_+72, b_+75); mem_wr(gb, DE, A);
   SET_HL((uint16_t)(hl + 2));
-  CYC(b_+75, SYM(getIndexOfGashaSpotInRoom));
+  CYC(b_+75, b_+79);
 }
 
 static void load_animation_data(GB *gb) {
@@ -6928,7 +6928,7 @@ void forceLoadRoom_hook(GB *gb) {
   CALL_ROM(b_+16, ROM_loadTilesetData);
   CALL_ROM(b_+19, ROM_loadTilesetGraphics);
   CALL_ROM(b_+22, ROM_loadTilesetAndRoomLayout);
-  CYC(b_+25, SYM(loadTilesetLayout));
+  CYC(b_+25, b_+28);
   generate_vram_tiles_with_room_changes(gb, sp0_);
   ret_effect(gb);
 }
@@ -6950,7 +6950,7 @@ void loadUniqueGfxHeader_hook(GB *gb) {
   CYC(b_+22, b_+23); A = mem_rd(gb, HL);
   CYC(b_+23, b_+26); mem_wr(gb, wUniqueGfxHeaderAddress + 1, A);
   bank_pop(gb, b_+26);
-  CYC(b_+32, SYM(loadTilesetGraphics));
+  CYC(b_+32, b_+33);
   ret_effect(gb);
 }
 
@@ -6983,7 +6983,7 @@ void updateTilesetUniqueGfx_hook(GB *gb) {
   CYC(b_+42, b_+45); mem_wr(gb, MBC_ROM_BANK, A);
   A = C;
   alu_add(gb, A);
-  CYC(b_+45, SYM(uniqueGfxFunc_380b));
+  CYC(b_+45, b_+48);
   ret_effect(gb);
 }
 
@@ -7002,7 +7002,7 @@ static void load_unique_gfx_header_entry(GB *gb) {
     CALL_ROM(b_+64, ROM_loadPaletteHeader);
     SET_HL(hl);
     CYC(b_+67, b_+69); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+69, SYM(loadTilesetData));
+    CYC(b_+69, b_+70);
     return;
   }
   CYC(b_+1, b_+4);
@@ -7065,7 +7065,7 @@ void uniqueGfxFunc_380b_hook(GB *gb) {
   CYC(b_+18, b_+22);
   load_unique_gfx_header_entry(gb);
   bank_pop(gb, b_+22);
-  CYC(b_+28, SYM(loadTilesetUniqueGfx));
+  CYC(b_+28, b_+29);
   ret_effect(gb);
 }
 
@@ -7087,7 +7087,7 @@ static void generate_vram_tiles_with_room_changes(GB *gb, uint16_t sp0_) {
   CYC(b_+29, b_+32); mem_wr(gb, MBC_ROM_BANK, A);
   A = C;
   CYC(b_+32, b_+35); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+35, SYM(getTileMappingData));
+  CYC(b_+35, b_+36);
 }
 
 void generateVramTilesWithRoomChanges_hook(GB *gb) {
@@ -7169,7 +7169,7 @@ static void simple_script_run_command(GB *gb, uint16_t sp0_) {
     set_interleaved_tile(gb, sp0_);
     SET_HL(hl);
     alu_scf(gb);
-    CYC(b_+100, SYM(getWildTokayObjectDataIndex));
+    CYC(b_+100, b_+103);
     break;
   }
     }
@@ -7208,7 +7208,7 @@ void interactionRunSimpleScript_hook(GB *gb) {
     E = alu_inc8(gb, E);
     A = H;
     CYC((SYM(interactionSetSimpleScript) + 4), (SYM(interactionSetSimpleScript) + 7)); mem_wr(gb, DE, A);
-    CYC((SYM(interactionSetSimpleScript) + 7), b_+0);
+    CYC((SYM(interactionSetSimpleScript) + 7), (SYM(interactionSetSimpleScript) + 8));
     bank_pop(gb, b_+28);
     alu_xor(gb, A);
     CYC(b_+34, b_+36);
@@ -7227,7 +7227,7 @@ void objectCreateSparkle_hook(GB *gb) {
   CYC(b_+3, b_+6); mem_wr(gb, HL, 0x84);
   L = alu_inc8(gb, L);
   CYC(b_+6, b_+9); mem_wr(gb, HL, 0x00);
-  CYC(b_+9, SYM(objectCreateSparkleMovingUp));
+  CYC(b_+9, b_+12);
   copy_position_with_offset(gb);
   ret_effect(gb);
 }
@@ -7244,7 +7244,7 @@ void objectCreateSparkleMovingUp_hook(GB *gb) {
   CYC(b_+9, b_+13); mem_wr(gb, HL, 0x80);
   L = alu_inc8(gb, L);
   CYC(b_+13, b_+16); mem_wr(gb, HL, 0xff);
-  CYC(b_+16, SYM(objectCreateRedBlueOrb));
+  CYC(b_+16, b_+19);
   copy_position_with_offset(gb);
   ret_effect(gb);
 }
@@ -7257,7 +7257,7 @@ void objectCreateRedBlueOrb_hook(GB *gb) {
   CYC(b_+3, b_+6); mem_wr(gb, HL, 0x84);
   L = alu_inc8(gb, L);
   CYC(b_+6, b_+9); mem_wr(gb, HL, 0x04);
-  CYC(b_+9, SYM(incMakuTreeState));
+  CYC(b_+9, b_+12);
   copy_position_with_offset(gb);
   ret_effect(gb);
 }
@@ -7270,7 +7270,7 @@ void incMakuTreeState_hook(GB *gb) {
   if (F & FC) CYCT(b_+4, b_+8);
   else { CYC(b_+4, b_+10); A = 0x10; }
   CYC(b_+10, b_+13); W8(wMakuTreeState) = A;
-  CYC(b_+13, SYM(setLinkDirection));
+  CYC(b_+13, b_+14);
   ret_effect(gb);
 }
 
@@ -7283,7 +7283,7 @@ void setLinkDirection_hook(GB *gb) {
   CYC(b_+4, b_+8); mem_wr(gb, HL, B);
   H = w1Link >> 8;
   CYC(b_+8, b_+11); mem_wr(gb, HL, B);
-  CYC(b_+11, SYM(interactionFunc_3e6d));
+  CYC(b_+11, b_+12);
   ret_effect(gb);
 }
 
@@ -7304,7 +7304,7 @@ void interactionFunc_3e6d_hook(GB *gb) {
   CALL_ROM(b_+22, ROM_addSpritesToOam_withOffset);
   bank_pop(gb, b_+25);
   SET_DE(de);
-  CYC(b_+31, SYM(getFreePartSlot));
+  CYC(b_+31, b_+33);
   ret_effect(gb);
 }
 
@@ -7322,7 +7322,7 @@ void getFreePartSlot_hook(GB *gb) {
       A = alu_inc8(gb, A);
       CYC(b_+15, b_+17); mem_wr(gb, HL, A); SET_HL(HL + 1);
       alu_xor(gb, A);
-      CYC(b_+17, SYM(partDelete));
+      CYC(b_+17, b_+19);
       break;
     }
     CYC(b_+4, b_+7);
@@ -7353,7 +7353,7 @@ void partDelete_hook(GB *gb) {
     B = alu_dec8(gb, B);
     if (B) CYCT(b_+10, b_+13); else CYC(b_+10, b_+13);
   } while (B);
-  CYC(b_+13, SYM(checkLinkCanSurface));
+  CYC(b_+13, b_+14);
   ret_effect(gb);
 }
 
@@ -7368,7 +7368,7 @@ void checkLinkCanSurface_hook(GB *gb) {
   CYC(b_+6, b_+11);
   CALL_ROM(b_+11, ROM_interBankCall);
   C = alu_srl(gb, C);
-  CYC(b_+14, SYM(copy256BytesFromBank));
+  CYC(b_+14, b_+17);
   ret_effect(gb);
 }
 
@@ -7381,7 +7381,7 @@ void copy256BytesFromBank_hook(GB *gb) {
   CYC(b_+6, b_+9); mem_wr(gb, MBC_ROM_BANK, A);
   E = 0x00;
   B = 0x00;
-  CYC(b_+9, SYM(func_3ed0));
+  CYC(b_+9, b_+16);
   copy_loop(gb, SYM(copyMemory), DE, HL, 256);
   copy_done(gb, HL, 256);
 }
@@ -7394,7 +7394,7 @@ void objectLoadMovementScript_hook(GB *gb) {
   bank_push(gb, b_+0, 0x0e);
   CALL_C(b_+10, objectLoadMovementScript_body_hook, SYM(objectLoadMovementScript_body), b_+13);
   bank_pop(gb, b_+13);
-  CYC(b_+19, SYM(objectRunMovementScript));
+  CYC(b_+19, b_+20);
   ret_effect(gb);
 }
 
@@ -7404,7 +7404,7 @@ void objectRunMovementScript_hook(GB *gb) {
   bank_push(gb, b_+0, 0x0e);
   CALL_C(b_+10, objectRunMovementScript_body_hook, SYM(objectRunMovementScript_body), b_+13);
   bank_pop(gb, b_+13);
-  CYC(b_+19, SYM(decCbb3));
+  CYC(b_+19, b_+20);
   ret_effect(gb);
 }
 
@@ -7412,7 +7412,7 @@ void decCbb3_hook(GB *gb) {
   BASE(decCbb3);
   SET_HL(wFakeResetMenu);
   CYC(b_+0, b_+4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+4, SYM(incCbc1));
+  CYC(b_+4, b_+5);
   ret_effect(gb);
 }
 
@@ -7420,7 +7420,7 @@ void incCbc1_hook(GB *gb) {
   BASE(incCbc1);
   SET_HL(wGenericCutscene_cbc1);
   CYC(b_+0, b_+4); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+4, SYM(incCbc2));
+  CYC(b_+4, b_+5);
   ret_effect(gb);
 }
 
@@ -7428,7 +7428,7 @@ void incCbc2_hook(GB *gb) {
   BASE(incCbc2);
   SET_HL(wGenericCutscene_cbc2);
   CYC(b_+0, b_+4); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+4, SYM(endgameCutsceneHandler));
+  CYC(b_+4, b_+5);
   ret_effect(gb);
 }
 
@@ -7488,7 +7488,7 @@ void pollInput_hook(GB *gb) {
   CYC(b_+33, b_+35); mem_wr(gb, HL, A);
   A = 0x30;
   CYC(b_+35, b_+38); mem_wr(gb, IO_P1, A);
-  CYC(b_+38, SYM(getInputWithAutofire));
+  CYC(b_+38, b_+39);
   ret_effect(gb);
 }
 
@@ -7531,7 +7531,7 @@ void getInputWithAutofire_hook(GB *gb) {
   if (just_pressed) { CYC(b_+39, b_+42); A = W8(wKeysJustPressed); }
   SET_BC(bc);
   SET_HL(hl);
-  CYC(b_+42, SYM(disableLcd));
+  CYC(b_+42, b_+45);
   ret_effect(gb);
 }
 
@@ -7559,7 +7559,7 @@ void loadGfxRegisterStateIndex_hook(GB *gb) {
   CYC(b_+19, b_+22); A = W8(wGfxRegs1);
   CYC(b_+22, b_+25); W8(wGfxRegsFinal) = A;
   CYC(b_+25, b_+27); mem_wr(gb, IO_LCDC, A);
-  CYC(b_+27, SYM(gfxRegisterStates));
+  CYC(b_+27, b_+28);
   ret_effect(gb);
 }
 
@@ -7629,7 +7629,7 @@ static void queue_dma_transfer(GB *gb) {
   CYC(b_+73, b_+75); H8(hRomBank) = A;
   CYC(b_+75, b_+78); mem_wr(gb, MBC_ROM_BANK, A);
   alu_xor(gb, A);
-  CYC(b_+78, SYM(loadUncompressedGfxHeader));
+  CYC(b_+78, b_+80);
 }
 
 void queueDmaTransfer_hook(GB *gb) {
@@ -7786,7 +7786,7 @@ void loadTileset_hook(GB *gb) {
   CYC(b_+94, b_+97); mem_wr(gb, MBC_ROM_BANK, A);
   A = C;
   CYC(b_+97, b_+100); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+100, SYM(loadTilesetHlpr));
+  CYC(b_+100, b_+101);
   ret_effect(gb);
 }
 
@@ -7843,20 +7843,20 @@ static void next_animation_frame(GB *gb, uint16_t o, uint8_t counter, uint8_t id
     CYC(b_+50, b_+51); SET_AF(pop_effect(gb));
     CYC(b_+51, b_+53); H8(hRomBank) = A;
     CYC(b_+53, b_+56); mem_wr(gb, MBC_ROM_BANK, A);
-    CYC(b_+56, SYM(objectPreventLinkFromPassing));
+    CYC(b_+56, b_+57);
   } else if (o == SYM(_enemyNextAnimationFrame)) {
     CYC((SYM(_enemyNextAnimationFrame) + 45), (SYM(_enemyNextAnimationFrame) + 48)); mem_wr(gb, DE, A);
     CYC((SYM(_enemyNextAnimationFrame) + 48), (SYM(_enemyNextAnimationFrame) + 49)); SET_AF(pop_effect(gb));
     CYC((SYM(_enemyNextAnimationFrame) + 49), (SYM(_enemyNextAnimationFrame) + 51)); H8(hRomBank) = A;
     CYC((SYM(_enemyNextAnimationFrame) + 51), (SYM(_enemyNextAnimationFrame) + 54)); mem_wr(gb, MBC_ROM_BANK, A);
-    CYC((SYM(_enemyNextAnimationFrame) + 54), SYM(enemyDie_uncounted_withoutItemDrop));
+    CYC((SYM(_enemyNextAnimationFrame) + 54), (SYM(_enemyNextAnimationFrame) + 55));
   } else {
     alu_or(gb, 0x40);
     CYC((SYM(_partNextAnimationFrame) + 45), (SYM(_partNextAnimationFrame) + 50)); mem_wr(gb, DE, A);
     A = 0x11;
     CYC((SYM(_partNextAnimationFrame) + 50), (SYM(_partNextAnimationFrame) + 54)); H8(hRomBank) = A;
     CYC((SYM(_partNextAnimationFrame) + 54), (SYM(_partNextAnimationFrame) + 57)); mem_wr(gb, MBC_ROM_BANK, A);
-    CYC((SYM(_partNextAnimationFrame) + 57), SYM(createEnergySwirlGoingIn));
+    CYC((SYM(_partNextAnimationFrame) + 57), (SYM(_partNextAnimationFrame) + 58));
   }
 }
 
@@ -7872,7 +7872,7 @@ static void disable_timer(GB *gb) {
   CYC(b_+0, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
   alu_xor(gb, A);
   CYC(b_+5, b_+8); mem_wr(gb, IO_TAC, A);
-  CYC(b_+8, SYM(enableTimer));
+  CYC(b_+8, b_+9);
 }
 
 void disableTimer_hook(GB *gb) {
@@ -7900,7 +7900,7 @@ static void enable_timer(GB *gb) {
   CYC(b_+25, b_+27); mem_wr(gb, HL, mem_rd(gb, HL) | 0x04);
   SET_HL(hFFB7);
   CYC(b_+27, b_+32); mem_wr(gb, HL, mem_rd(gb, HL) & 0xfe);
-  CYC(b_+32, SYM(timerInterrupt));
+  CYC(b_+32, b_+33);
 }
 
 void enableTimer_hook(GB *gb) {
@@ -7927,7 +7927,7 @@ static void start_sound(GB *gb) {
   CYC(b_+25, b_+27); H8(hRomBank) = A;
   CYC(b_+27, b_+30); mem_wr(gb, MBC_ROM_BANK, A);
   CYC(b_+30, b_+31); SET_DE(pop_effect(gb));
-  CYC(b_+31, SYM(jpBc));
+  CYC(b_+31, b_+32);
 }
 
 void _startSound_hook(GB *gb) {
@@ -7938,7 +7938,7 @@ void _startSound_hook(GB *gb) {
 void restartSound_hook(GB *gb) {
   BASE(restartSound);
   SET_BC(0x4009);
-  CYC(b_+0, SYM(initSound_b00));
+  CYC(b_+0, b_+5);
   start_sound(gb);
   ret_effect(gb);
 }
@@ -7979,7 +7979,7 @@ static void add_sprites_to_oam_with_offset(GB *gb) {
       SET_HL(HL + 2);
       A = 0xe0;
       CYC(b_+50, b_+55); mem_wr(gb, DE, A);
-      CYC(b_+55, SYM(drawAllSprites));
+      CYC(b_+55, b_+57);
     } else {
       CYC(b_+21, b_+26);
       E = alu_inc8(gb, E);
@@ -8015,7 +8015,7 @@ void addSpritesToOam_withOffset_hook(GB *gb) {
 void addSpritesToOam_hook(GB *gb) {
   BASE(addSpritesToOam);
   SET_BC(0);
-  CYC(b_+0, SYM(addSpritesToOam_withOffset));
+  CYC(b_+0, b_+3);
   add_sprites_to_oam_with_offset(gb);
   ret_effect(gb);
 }
@@ -8055,7 +8055,7 @@ static void object_queue_draw(GB *gb) {
   A = B;
   CYC(b_+24, b_+34); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+34, b_+35); mem_wr(gb, HL, D);
-  CYC(b_+35, SYM(getChestData));
+  CYC(b_+35, b_+36);
 }
 
 void objectQueueDraw_hook(GB *gb) {
@@ -8072,7 +8072,7 @@ static void queue_draw_objects(GB *gb) {
     A = D;
     alu_cp(gb, 0xe0);
     if (F & FC) { CYCT(b_+41, b_+47); continue; }
-    CYC(b_+41, SYM(objectQueueDraw));
+    CYC(b_+41, b_+48);
     break;
   }
 }
@@ -8120,7 +8120,7 @@ void loadTilesetAnimation_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+7, b_+9); ret_effect(gb); return; }
   CYC(b_+7, b_+9);
   CYC(b_+9, b_+12); W8(wLoadedTilesetAnimation) = A;
-  CYC(b_+12, SYM(func_1383));
+  CYC(b_+12, b_+15);
   load_animation_data(gb);
   ret_effect(gb);
 }
@@ -8129,7 +8129,7 @@ void func_1135_hook(GB *gb) {
   BASE(func_1135);
   alu_xor(gb, A);
   CYC(b_+0, b_+4); W8(wDeathRespawnBuffer_rememberedCompanionGroup) = A;
-  CYC(b_+4, SYM(updateLinkLocalRespawnPosition));
+  CYC(b_+4, b_+5);
   ret_effect(gb);
 }
 
@@ -8174,13 +8174,13 @@ void func_131f_hook(GB *gb) {
   CYC(b_+72, b_+75); A = W8(wTilesetUniqueGfx);
   CYC(b_+75, b_+78); W8(wLoadedTilesetUniqueGfx) = A;
   bank_pop(gb, b_+78);
-  CYC(b_+84, SYM(loadTilesetAnimation));
+  CYC(b_+84, b_+85);
   ret_effect(gb);
 }
 
 void func_1383_hook(GB *gb) {
   BASE(func_1383);
-  CYC(b_+0, SYM(initWaveScrollValues));
+  CYC(b_+0, b_+1);
   ret_effect(gb);
 }
 
@@ -8205,7 +8205,7 @@ void func_13c6_hook(GB *gb) {
   CYC(b_+26, b_+29); mem_wr(gb, MBC_ROM_BANK, A);
   alu_xor(gb, A);
   CYC(b_+29, b_+32); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+32, SYM(extractColorComponents));
+  CYC(b_+32, b_+35);
   start_fade_between_two_palettes(gb);
   ret_effect(gb);
 }
@@ -8224,7 +8224,7 @@ void readByteFromW7ActiveBank_hook(GB *gb) {
   CYC(b_+14, b_+17); mem_wr(gb, MBC_ROM_BANK, A);
   A = B;
   SET_BC(bc);
-  CYC(b_+17, SYM(readByteFromW7TextTableBank));
+  CYC(b_+17, b_+20);
   ret_effect(gb);
 }
 
@@ -8248,7 +8248,7 @@ void readByteFromW7TextTableBank_hook(GB *gb) {
   CYC(b_+24, b_+26); H8(hRomBank) = A;
   CYC(b_+26, b_+29); mem_wr(gb, MBC_ROM_BANK, A);
   CYC(b_+29, b_+31); A = H8(hFF8B);
-  CYC(b_+31, SYM(getThisRoomFlags));
+  CYC(b_+31, b_+32);
   ret_effect(gb);
 }
 
@@ -8261,7 +8261,7 @@ void secretFunctionCaller_hook(GB *gb) {
   bank_pop(gb, b_+13);
   A = B;
   alu_or(gb, A);
-  CYC(b_+19, SYM(openSecretInputMenu));
+  CYC(b_+19, b_+22);
   ret_effect(gb);
 }
 
@@ -8281,13 +8281,13 @@ static void open_menu_tail(GB *gb, uint16_t sp0_) {
   CYC(b_+24, b_+27); mem_wr(gb, MBC_ROM_BANK, A);
   A = C;
   CYC(b_+27, b_+30); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+30, SYM(getRoomDungeonProperties));
+  CYC(b_+30, b_+31);
 }
 
 void openMenu_hook(GB *gb) {
   BASE(openMenu);
   H = 0x06;
-  CYC(b_+0, SYM(copyW2TilesetBgPalettesToW4PaletteData));
+  CYC(b_+0, b_+4);
   open_menu_tail(gb, gb->sp);
   ret_effect(gb);
 }
@@ -8298,9 +8298,9 @@ void openSecretInputMenu_hook(GB *gb) {
   A = 0x01;
   CYC(b_+3, b_+8); W8(wTextInputResult) = A;
   A = 0x06;
-  CYC(b_+8, SYM(updateMenus));
+  CYC(b_+8, b_+13);
   H = 0x06;
-  CYC(SYM(openMenu), SYM(copyW2TilesetBgPalettesToW4PaletteData));
+  CYC(SYM(openMenu), (SYM(openMenu) + 4));
   open_menu_tail(gb, gb->sp);
   ret_effect(gb);
 }
@@ -8323,7 +8323,7 @@ void updateMenus_hook(GB *gb) {
   CYC(b_+24, b_+27); mem_wr(gb, IO_SVBK, A);
   CYC(b_+27, b_+30); A = W8(wOpenedMenuType);
   alu_or(gb, A);
-  CYC(b_+30, SYM(checkReloadStatusBarGraphics));
+  CYC(b_+30, b_+32);
   ret_effect(gb);
 }
 
@@ -8354,7 +8354,7 @@ void interactionInitGraphics_hook(GB *gb) {
   CYC(b_+13, b_+14);
   bank_pop_af(gb, b_+14);
   A = C;
-  CYC(b_+20, SYM(refreshLoadedTreeGfx));
+  CYC(b_+20, b_+24);
   interaction_set_animation(gb);
   ret_effect(gb);
 }
@@ -8366,7 +8366,7 @@ static void refresh_object_gfx(GB *gb, uint16_t sp0_) {
   alu_xor(gb, A);
   CYC(b_+13, b_+17); W8(wLoadedTreeGfxIndex) = A;
   bank_pop_af(gb, b_+17);
-  CYC(b_+23, SYM(reloadObjectGfx_b00));
+  CYC(b_+23, b_+24);
 }
 
 void refreshObjectGfx_hook(GB *gb) {
@@ -8380,8 +8380,8 @@ void refreshLoadedTreeGfx_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+3); A = W8(wLoadedTreeGfxIndex);
   alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+3, SYM(refreshObjectGfx)); ret_effect(gb); return; }
-  CYC(b_+3, SYM(refreshObjectGfx));
+  if (F & FZ) { CYCT(b_+3, b_+5); ret_effect(gb); return; }
+  CYC(b_+3, b_+5);
   refresh_object_gfx(gb, sp0_);
   ret_effect(gb);
 }
@@ -8393,7 +8393,7 @@ void loadObjectGfxHeaderToSlot4_hook(GB *gb) {
   CALL_C(b_+10, loadObjectGfxHeaderToSlot4_body_hook,
       ROM_b3f_loadObjectGfxHeaderToSlot4_body, b_+13);
   bank_pop_af(gb, b_+13);
-  CYC(b_+19, SYM(loadTreeGfx));
+  CYC(b_+19, b_+20);
   ret_effect(gb);
 }
 
@@ -8405,7 +8405,7 @@ void loadTreeGfx_hook(GB *gb) {
   bank3f_push(gb, b_+1);
   CALL_C(b_+11, loadTreeGfx_body_hook, ROM_b3f_loadTreeGfx_body, b_+14);
   bank_pop_af(gb, b_+14);
-  CYC(b_+20, SYM(loadWeaponGfx_b00));
+  CYC(b_+20, b_+21);
   ret_effect(gb);
 }
 
@@ -8436,7 +8436,7 @@ static void load_object_gfx2(GB *gb) {
     A = 0x3f;
     CYC(b_+72, b_+76); H8(hRomBank) = A;
     CYC(b_+76, b_+79); mem_wr(gb, MBC_ROM_BANK, A);
-    CYC(b_+79, SYM(loadTreasureDisplayData_b00));
+    CYC(b_+79, b_+80);
     return;
   }
   CYC(b_+9, b_+13); push_effect(gb, DE);
@@ -8472,7 +8472,7 @@ void loadObjectGfx_hook(GB *gb) {
   BASE(loadObjectGfx);
   D = B;
   E = 0x00;
-  CYC(b_+0, SYM(loadObjectGfx2)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+0, b_+4); A = mem_rd(gb, HL); SET_HL(HL + 1);
   load_object_gfx2(gb);
   ret_effect(gb);
 }
@@ -8485,7 +8485,7 @@ void clearFollowingLinkObject_hook(GB *gb) {
   alu_xor(gb, A);
   CYC(b_+0, b_+5); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+5, b_+6); mem_wr(gb, HL, A);
-  CYC(b_+6, SYM(stopTextThread));
+  CYC(b_+6, b_+7);
   ret_effect(gb);
 }
 
@@ -8498,7 +8498,7 @@ void setWarpDestVariables_hook(GB *gb) {
   copyMemory(gb, DE, HL, 5);
   SET_HL(HL + 5);
   SET_DE(de);
-  CYC(b_+9, SYM(setInstrumentsDisabledCounterAndScrollMode));
+  CYC(b_+9, b_+11);
   ret_effect(gb);
 }
 
@@ -8508,7 +8508,7 @@ void setInstrumentsDisabledCounterAndScrollMode_hook(GB *gb) {
   CYC(b_+0, b_+5); W8(wInstrumentsDisabledCounter) = A;
   A = 0x01;
   CYC(b_+5, b_+10); W8(wScrollMode) = A;
-  CYC(b_+10, SYM(clearAllItemsAndPutLinkOnGround));
+  CYC(b_+10, b_+11);
   ret_effect(gb);
 }
 
@@ -8523,7 +8523,7 @@ void stopTextThread_hook(GB *gb) {
   CYC(b_+0, b_+4); W8(wTextIsActive) = A;
   CYC(b_+4, b_+7); W8(wTextboxFlags) = A;
   A = 0xf0;
-  CYC(b_+7, SYM(retIfTextIsActive));
+  CYC(b_+7, b_+12);
   hook_handoff(gb, ROM_threadStop);
 }
 
@@ -8552,13 +8552,13 @@ static void show_text_tail(GB *gb) {
   CYC(b_+29, b_+34); W8(wTextIsActive) = A;
   CYC(b_+34, b_+37); SET_BC(SYM(textThreadStart));
   CYC(b_+37, b_+39); A = 0xf0;
-  CYC(b_+39, SYM(textThreadStart));
+  CYC(b_+39, b_+42);
   threadRestart_hook(gb);
 }
 
 void _label_00_203_hook(GB *gb) {
   BASE(_label_00_203);
-  CYC(b_+0, SYM(_label_00_204)); E = 0x00;
+  CYC(b_+0, b_+2); E = 0x00;
   show_text_tail(gb);
 }
 
@@ -8569,14 +8569,14 @@ void _label_00_204_hook(GB *gb) {
 void showText_hook(GB *gb) {
   BASE(showText);
   L = 0x00;
-  CYC(b_+0, SYM(_label_00_203));
+  CYC(b_+0, b_+2);
   _label_00_203_hook(gb);
 }
 
 void showTextNonExitable_hook(GB *gb) {
   BASE(showTextNonExitable);
   L = 0x02;
-  CYCT(b_+0, SYM(showText));
+  CYCT(b_+0, b_+4);
   _label_00_203_hook(gb);
 }
 
@@ -8587,7 +8587,7 @@ void showTextOnInventoryMenu_hook(GB *gb) {
   CYC(b_+3, b_+8); W8(wTextboxFlags) = A;
   L = 0x00;
   E = 0x02;
-  CYCT(b_+8, SYM(showTextNonExitable));
+  CYCT(b_+8, b_+14);
   _label_00_204_hook(gb);
 }
 
@@ -8629,7 +8629,7 @@ void clearAllItemsAndPutLinkOnGround_hook(GB *gb) {
     break;
   }
   SET_DE(de);
-  CYC(b_+46, SYM(copyTextCharacterGfx));
+  CYC(b_+46, b_+50);
   hook_handoff(gb, ROM_putLinkOnGround);
 }
 
@@ -8678,7 +8678,7 @@ void copyTextCharacterGfx_hook(GB *gb) {
   CYC(b_+50, b_+53); mem_wr(gb, MBC_ROM_BANK, A);
   CYC(b_+53, b_+54); SET_BC(pop_effect(gb));
   CYC(b_+54, b_+55); SET_HL(pop_effect(gb));
-  CYC(b_+55, SYM(fileSelectThreadStart));
+  CYC(b_+55, b_+56);
   ret_effect(gb);
 }
 
@@ -8722,7 +8722,7 @@ void jpBc_hook(GB *gb) {
   BASE(jpBc);
   L = C;
   H = B;
-  CYC(b_+0, SYM(disableTimer));
+  CYC(b_+0, b_+3);
   hook_handoff(gb, HL);
 }
 
@@ -8747,7 +8747,7 @@ void cpInteractionState_hook(GB *gb) {
   H = D;
   L = INTERACTION_BASE | OBJ_STATE;
   CYC(b_+0, b_+4); alu_cp(gb, mem_rd(gb, HL));
-  CYC(b_+4, SYM(cpInteractionSubstate));
+  CYC(b_+4, b_+5);
   ret_effect(gb);
 }
 
@@ -8756,7 +8756,7 @@ void cpInteractionSubstate_hook(GB *gb) {
   H = D;
   L = INTERACTION_BASE | OBJ_SUBSTATE;
   CYC(b_+0, b_+4); alu_cp(gb, mem_rd(gb, HL));
-  CYC(b_+4, SYM(checkInteractionState));
+  CYC(b_+4, b_+5);
   ret_effect(gb);
 }
 
@@ -8769,7 +8769,7 @@ void findByteInGroupTable_hook(GB *gb) {
   CYC(b_+5, b_+6); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+6, b_+7); H = mem_rd(gb, HL);
   L = A;
-  CYC(b_+7, SYM(findByteAtHl));
+  CYC(b_+7, b_+8);
   find_byte_at_hl(gb);
   ret_effect(gb);
 }
@@ -8858,7 +8858,7 @@ static void object_get_relative_angle_with_temp_vars(GB *gb) {
   SET_HL(ROM_pushDirectionData);
   alu_add_hl(gb, BC);
   CYC(b_+70, b_+83); A = mem_rd(gb, HL);
-  CYC(b_+83, SYM(pushDirectionData));
+  CYC(b_+83, b_+84);
 }
 
 void objectGetRelativeAngleWithTempVars_hook(GB *gb) {
@@ -8877,7 +8877,7 @@ void hObjectCheckCollidedWithLink_hook(GB *gb) {
   CYC(b_+0, b_+11);
   check_collided_with_link(gb);
   SET_DE(de);
-  CYC(b_+11, SYM(func_1c84));
+  CYC(b_+11, b_+13);
   ret_effect(gb);
 }
 
@@ -8885,8 +8885,8 @@ void func_1c84_hook(GB *gb) {
   BASE(func_1c84);
   CYC(b_+0, b_+3); A = W8(w1ReservedItemC);
   alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+3, SYM(objectHCheckCollisionWithLink)); ret_effect(gb); return; }
-  CYC(b_+3, SYM(objectHCheckCollisionWithLink));
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); ret_effect(gb); return; }
+  CYC(b_+3, b_+5);
   object_h_check_collision_with_link(gb);
   ret_effect(gb);
 }
@@ -8905,7 +8905,7 @@ void checkReloadStatusBarGraphics_hook(GB *gb) {
   A = 0x02;
   if (F & FC) CYCT(b_+8, b_+13);
   else { CYC(b_+8, b_+15); A = 0x03; }
-  CYC(b_+15, SYM(copy20BytesFromBank));
+  CYC(b_+15, b_+18);
   load_gfx_header(gb, SYM(loadUncompressedGfxHeader), uncmpGfxHeaderTable_bank01, false);
   ret_effect(gb);
 }
@@ -8949,7 +8949,7 @@ void getRoomDungeonProperties_hook(GB *gb) {
   add_a_to_hl(gb);
   CYC(b_+24, b_+25); B = mem_rd(gb, HL);
   bank_pop(gb, b_+25);
-  CYC(b_+31, SYM(copy8BytesFromRingMapToCec0));
+  CYC(b_+31, b_+32);
   ret_effect(gb);
 }
 
@@ -8961,7 +8961,7 @@ void interactionFunc_278b_hook(GB *gb) {
   CYC(b_+0, b_+3); mem_wr(gb, HL, C);
   L = alu_inc8(gb, L);
   CYC(b_+3, b_+5); mem_wr(gb, HL, B);
-  CYC(b_+5, SYM(interactionGetMiniScript));
+  CYC(b_+5, b_+6);
   ret_effect(gb);
 }
 
@@ -8973,7 +8973,7 @@ void interactionSetMiniScript_hook(GB *gb) {
   E = alu_inc8(gb, E);
   A = H;
   CYC(b_+4, b_+7); mem_wr(gb, DE, A);
-  CYC(b_+7, SYM(objectOscillateZ));
+  CYC(b_+7, b_+8);
   ret_effect(gb);
 }
 
@@ -8982,7 +8982,7 @@ void objectOscillateZ_hook(GB *gb) {
   bank_push(gb, b_+0, 0x09);
   CALL_ROM(b_+10, ROM_b09_objectOscillateZ_body);
   bank_pop(gb, b_+13);
-  CYC(b_+19, SYM(giveRingToLink));
+  CYC(b_+19, b_+20);
   ret_effect(gb);
 }
 
@@ -9001,7 +9001,7 @@ static void create_ring_treasure(GB *gb) {
   B |= 0x40;
   CYC(b_+11, b_+16); mem_wr(gb, HL, B);
   alu_xor(gb, A);
-  CYC(b_+16, SYM(createTreasure));
+  CYC(b_+16, b_+18);
 }
 
 void createRingTreasure_hook(GB *gb) {
@@ -9021,7 +9021,7 @@ void giveRingToLink_hook(GB *gb) {
   copy_pos_raw(gb);
   SET_DE(de);
   alu_xor(gb, A);
-  CYC(b_+11, SYM(createRingTreasure));
+  CYC(b_+11, b_+14);
   ret_effect(gb);
 }
 
@@ -9037,7 +9037,7 @@ void createTreasure_hook(GB *gb) {
   L = alu_inc8(gb, L);
   CYC(b_+8, b_+10); mem_wr(gb, HL, C);
   alu_xor(gb, A);
-  CYC(b_+10, SYM(objectCreateExclamationMark));
+  CYC(b_+10, b_+12);
   ret_effect(gb);
 }
 
@@ -9048,7 +9048,7 @@ void objectCreateExclamationMark_hook(GB *gb) {
   CYC(b_+12, b_+14); A = H8(hFF8B);
   CALL_ROM(b_+14, ROM_b0b_objectCreateExclamationMark_body);
   bank_pop(gb, b_+17);
-  CYC(b_+23, SYM(objectCreateFloatingSnore));
+  CYC(b_+23, b_+24);
   ret_effect(gb);
 }
 
@@ -9056,19 +9056,19 @@ void objectCreateFloatingSnore_hook(GB *gb) {
   BASE(objectCreateFloatingMusicNote);
   CYC(SYM(objectCreateFloatingSnore), (SYM(objectCreateFloatingSnore) + 2)); H8(hFF8B) = A;
   A = 0x00;
-  CYC((SYM(objectCreateFloatingSnore) + 2), b_+0);
+  CYC((SYM(objectCreateFloatingSnore) + 2), (SYM(objectCreateFloatingSnore) + 6));
   CYC(b_+4, b_+6); H8(hFF8D) = A;
   bank_push(gb, b_+6, 0x0b);
   CALL_ROM(b_+16, ROM_b0b_objectCreateFloatingImage);
   bank_pop(gb, b_+19);
-  CYC(b_+25, SYM(enemyAnimate));
+  CYC(b_+25, b_+26);
   ret_effect(gb);
 }
 
 void checkGlobalFlag_hook(GB *gb) {
   BASE(checkGlobalFlag);
   SET_HL(wGlobalFlags);
-  CYC(b_+0, SYM(setGlobalFlag));
+  CYC(b_+0, b_+6);
   check_flag(gb);
   ret_effect(gb);
 }
@@ -9076,7 +9076,7 @@ void checkGlobalFlag_hook(GB *gb) {
 void setGlobalFlag_hook(GB *gb) {
   BASE(setGlobalFlag);
   SET_HL(wGlobalFlags);
-  CYC(b_+0, SYM(unsetGlobalFlag));
+  CYC(b_+0, b_+6);
   set_flag(gb);
   ret_effect(gb);
 }
@@ -9101,7 +9101,7 @@ void getEntryFromObjectTable1_hook(GB *gb) { bank12_table_pointer(gb, SYM(getEnt
 
 void enemyCodeNil_hook(GB *gb) {
   BASE(enemyCodeNil);
-  CYC(b_+0, SYM(objectLoadMovementScript));
+  CYC(b_+0, b_+1);
   ret_effect(gb);
 }
 
@@ -9117,7 +9117,7 @@ static void bank2_function_caller(GB *gb, uint16_t a, uint8_t h, uint16_t sp0_) 
   CYC(b_+16, b_+18);
   bank_pop(gb, b_+18);
   C = alu_srl(gb, C);
-  CYC(b_+24, SYM(clearPaletteFadeVariablesAndRefreshPalettes));
+  CYC(b_+24, b_+27);
   ret_effect(gb);
 }
 
@@ -9171,7 +9171,7 @@ void checkGrabbableObjects_hook(GB *gb) {
         CYC(b_+54, b_+57); mem_wr(gb, HL, 0x00);
         SET_DE(de);
         alu_scf(gb);
-        CYC(b_+57, SYM(_getLinkPositionPlusDirectionOffset));
+        CYC(b_+57, b_+60);
         ret_effect(gb);
         return;
       }
@@ -9335,7 +9335,7 @@ static void update_enemies_if_state_is_zero(GB *gb) {
     A = D;
     alu_cp(gb, 0xe0);
     if (F & FC) { CYCT(b_+28, b_+34); continue; }
-    CYC(b_+28, SYM(updateEnemies));
+    CYC(b_+28, b_+35);
     break;
   }
 }
@@ -9429,7 +9429,7 @@ void updateEnemies_hook(GB *gb) {
     A = D;
     alu_cp(gb, 0xe0);
     if (F & FC) { CYCT(b_+91, b_+97); continue; }
-    CYC(b_+91, SYM(updateEnemy));
+    CYC(b_+91, b_+98);
     break;
   }
   ret_effect(gb);
@@ -9470,7 +9470,7 @@ void updateEnemy_hook(GB *gb) {
   CYC(b_+39, b_+42); mem_wr(gb, MBC_ROM_BANK, A);
   A = C;
   alu_or(gb, A);
-  CYC(b_+42, SYM(enemyCodeTable));
+  CYC(b_+42, b_+45);
   hook_handoff(gb, HL);
 }
 
@@ -9506,7 +9506,7 @@ static void update_interactions_if_state_is_zero(GB *gb) {
     A = alu_inc8(gb, A);
     alu_cp(gb, 0xe0);
     if (F & FC) { CYCT(b_+29, b_+34); continue; }
-    CYC(b_+29, SYM(updateInteractions));
+    CYC(b_+29, b_+35);
     break;
   }
 }
@@ -9547,7 +9547,7 @@ void updateInteractions_hook(GB *gb) {
     A = alu_inc8(gb, A);
     alu_cp(gb, 0xe0);
     if (F & FC) { CYCT(b_+38, b_+43); continue; }
-    CYC(b_+38, SYM(updateInteraction));
+    CYC(b_+38, b_+44);
     break;
   }
   ret_effect(gb);
@@ -9589,7 +9589,7 @@ void updateInteraction_hook(GB *gb) {
   CYC(b_+37, b_+38); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+38, b_+39); H = mem_rd(gb, HL);
   L = A;
-  CYC(b_+39, SYM(interactionCodeTable));
+  CYC(b_+39, b_+41);
   hook_handoff(gb, HL);
 }
 
@@ -9599,7 +9599,7 @@ void load_link_and_companion_animation_frame_hook(GB *gb) {
   bank_push(gb, b_+0, 0x06);
   CALL_C(b_+10, loadLinkAndCompanionAnimationFrame_body_hook, SYM(loadLinkAndCompanionAnimationFrame_body), b_+13);
   bank_pop(gb, b_+13);
-  CYC(b_+19, SYM(checkLinkPushingAgainstWall));
+  CYC(b_+19, b_+20);
 }
 
 void loadLinkAndCompanionAnimationFrame_hook(GB *gb) {
@@ -9663,7 +9663,7 @@ static void update_all_objects_after_bank6_selected(GB *gb, uint16_t sp0_) {
   CYC(b_+151, b_+152); SET_AF(pop_effect(gb));
   CYC(b_+152, b_+154); H8(hRomBank) = A;
   CYC(b_+154, b_+157); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+157, SYM(updateSpecialObjectsAndInteractions));
+  CYC(b_+157, b_+158);
   ret_effect(gb);
 }
 
@@ -9687,7 +9687,7 @@ void updateSpecialObjectsAndInteractions_hook(GB *gb) {
   CYC(b_+30, b_+31); SET_AF(pop_effect(gb));
   CYC(b_+31, b_+33); H8(hRomBank) = A;
   CYC(b_+33, b_+36); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+36, SYM(updateInteractionsAndDrawAllSprites));
+  CYC(b_+36, b_+37);
   ret_effect(gb);
 }
 
@@ -9703,7 +9703,7 @@ void updateInteractionsAndDrawAllSprites_hook(GB *gb) {
   CYC(b_+20, b_+21); SET_AF(pop_effect(gb));
   CYC(b_+21, b_+23); H8(hRomBank) = A;
   CYC(b_+23, b_+26); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+26, SYM(func_3539));
+  CYC(b_+26, b_+27);
   ret_effect(gb);
 }
 
@@ -9734,7 +9734,7 @@ void func_3539_hook(GB *gb) {
   CYC(b_+87, b_+88); SET_AF(pop_effect(gb));
   CYC(b_+88, b_+90); H8(hRomBank) = A;
   CYC(b_+90, b_+93); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+93, SYM(clearWramBank1));
+  CYC(b_+93, b_+94);
   ret_effect(gb);
 }
 
@@ -9785,7 +9785,7 @@ static void load_tileset_unique_gfx(GB *gb) {
     load_unique_gfx_header_entry(gb);
     alu_add(gb, A);
     if (F & FC) { CYCT(b_+23, b_+26); continue; }
-    CYC(b_+23, SYM(loadUniqueGfxHeaderEntry));
+    CYC(b_+23, b_+27);
     break;
   }
 }
@@ -9825,7 +9825,7 @@ void loadTilesetGraphics_hook(GB *gb) {
   CYC(b_+62, b_+63); SET_AF(pop_effect(gb));
   CYC(b_+63, b_+65); H8(hRomBank) = A;
   CYC(b_+65, b_+68); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+68, SYM(updateTilesetUniqueGfx));
+  CYC(b_+68, b_+69);
   ret_effect(gb);
 }
 
@@ -9842,7 +9842,7 @@ void loadTilesetData_hook(GB *gb) {
   CYC(b_+21, b_+22); SET_AF(pop_effect(gb));
   CYC(b_+22, b_+24); H8(hRomBank) = A;
   CYC(b_+24, b_+27); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+27, SYM(loadTilesetAndRoomLayout));
+  CYC(b_+27, b_+28);
   ret_effect(gb);
 }
 
@@ -9872,7 +9872,7 @@ void loadTilesetAndRoomLayout_hook(GB *gb) {
   CYC(b_+48, b_+49); SET_AF(pop_effect(gb));
   CYC(b_+49, b_+51); H8(hRomBank) = A;
   CYC(b_+51, b_+54); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+54, SYM(loadRoomLayout));
+  CYC(b_+54, b_+55);
   ret_effect(gb);
 }
 
@@ -9922,7 +9922,7 @@ void initializeRoom_hook(GB *gb) {
   switch_bank(gb, b_+98, 0x16);
   CALL_ROM(b_+105, ROM_b16_parseStaticObjects);
   bank_pop(gb, b_+108);
-  CYC(b_+114, SYM(parseGivenObjectData_b00));
+  CYC(b_+114, b_+115);
   ret_effect(gb);
 }
 
@@ -9934,7 +9934,7 @@ void loadStaticObjects_hook(GB *gb) {
   CALL_C(b_+11, loadStaticObjects_body_hook, SYM(loadStaticObjects_body), b_+14);
   CYC(b_+14, b_+15); SET_DE(pop_effect(gb));
   bank_pop(gb, b_+15);
-  CYC(b_+21, SYM(clearStaticObjects));
+  CYC(b_+21, b_+22);
   ret_effect(gb);
 }
 
@@ -9969,7 +9969,7 @@ void objectSaveAsStaticObject_hook(GB *gb) {
   E = alu_inc8(gb, E);
   CYC(b_+31, b_+34); A = mem_rd(gb, DE);
   CYC(b_+34, b_+35); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+35, SYM(checkGlobalFlag));
+  CYC(b_+35, b_+36);
   ret_effect(gb);
 }
 
@@ -9986,7 +9986,7 @@ void objectMarkSolidPosition_hook(GB *gb) {
   set_flag(gb);
   A = 0x00;
   CYC(b_+15, b_+19); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+19, SYM(objectUnmarkSolidPosition));
+  CYC(b_+19, b_+20);
   ret_effect(gb);
 }
 
@@ -10006,7 +10006,7 @@ void disableLcdAndLoadRoom_hook(GB *gb) {
   bank_push(gb, b_+0, 0x03);
   CALL_C(b_+10, disableLcdAndLoadRoom_body_hook, SYM(disableLcdAndLoadRoom_body), b_+13);
   bank_pop(gb, b_+13);
-  CYC(b_+19, SYM(playWaveSoundAtRandomIntervals)); ret_effect(gb);
+  CYC(b_+19, b_+20); ret_effect(gb);
 }
 void playWaveSoundAtRandomIntervals_hook(GB *gb) { banked_body_call(gb, SYM(playWaveSoundAtRandomIntervals), 0x10, ROM_b10_playWaveSoundAtRandomIntervals_body); }
 void func_3ed0_hook(GB *gb) { banked_body_call(gb, SYM(func_3ed0), 0x03, ROM_b03_func_03_7841); }
@@ -10020,7 +10020,7 @@ void fileSelect_redrawDecorations_hook(GB *gb) {
   bank_pop(gb, b_+13);
   alu_xor(gb, A);
   CYC(b_+19, b_+22); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+22, SYM(disableLcdAndLoadRoom));
+  CYC(b_+22, b_+23);
   ret_effect(gb);
 }
 
@@ -10033,7 +10033,7 @@ void func_2d48_hook(GB *gb) {
   add_a_to_hl(gb);
   CYC(b_+15, b_+16); B = mem_rd(gb, HL);
   bank_pop(gb, b_+16);
-  CYC(b_+22, SYM(clearFadingPalettes));
+  CYC(b_+22, b_+23);
   ret_effect(gb);
 }
 
@@ -10045,7 +10045,7 @@ void func_32fc_hook(GB *gb) {
   B = 0xf0;
   CYC(b_+3, b_+10); W8(wPaletteThread_mode) = A;
   A = 0x01;
-  CYC(b_+10, SYM(darkenRoomWithSpeed));
+  CYC(b_+10, b_+14);
   set_darkening_variables(gb);
   ret_effect(gb);
 }
@@ -10058,7 +10058,7 @@ void func_333e_hook(GB *gb) {
   B = 0x00;
   CYC(b_+3, b_+10); W8(wPaletteThread_mode) = A;
   A = 0x01;
-  CYC(b_+10, SYM(brightenRoomWithSpeed));
+  CYC(b_+10, b_+14);
   set_darkening_variables(gb);
   ret_effect(gb);
 }
@@ -10083,7 +10083,7 @@ void playSound_b00_hook(GB *gb) {
   A = L;
   alu_and(gb, 0xaf);
   CYC(b_+15, b_+20); H8(hMusicQueueTail) = A;
-  CYC(b_+20, SYM(setMusicVolume));
+  CYC(b_+20, b_+21);
   ret_effect(gb);
 }
 
@@ -10091,7 +10091,7 @@ void setMusicVolume_hook(GB *gb) {
   BASE(setMusicVolume);
   alu_or(gb, 0x80);
   CYC(b_+0, b_+4); H8(hMusicVolume) = A;
-  CYC(b_+4, SYM(restartSound));
+  CYC(b_+4, b_+5);
   ret_effect(gb);
 }
 
@@ -10112,7 +10112,7 @@ static void adjust_hl_sequential(GB *gb) {
   }
   A = B;
   alu_or(gb, C);
-  CYC(b_+15, SYM(readByteSequential));
+  CYC(b_+15, b_+18);
 }
 
 void _adjustHLSequential_hook(GB *gb) {
@@ -10126,7 +10126,7 @@ static void copy_byte_sequential(GB *gb) {
   CYC(b_+1, b_+2); mem_wr(gb, DE, A);
   SET_DE(DE + 1);
   SET_BC(BC - 1);
-  CYC(b_+2, SYM(_adjustHLSequential));
+  CYC(b_+2, b_+4);
   adjust_hl_sequential(gb);
 }
 
@@ -10150,11 +10150,11 @@ static void decompress_block(GB *gb) {
     read_byte_sequential(gb);
     CYC((SYM(_label_00_050) + 3), (SYM(_label_00_050) + 5)); H8(hFF8B) = A;
     B = 0x08;
-    CYC((SYM(_label_00_050) + 5), SYM(_label_00_051));
+    CYC((SYM(_label_00_050) + 5), (SYM(_label_00_050) + 7));
     for (;;) {
       C = alu_rl(gb, C);
-      if (F & FC) { CYCT(SYM(_label_00_051), (SYM(_label_00_051) + 4)); CYC(SYM(_label_00_052), SYM(_label_00_053)); A = H8(hFF8B); }
-      else { CYC(SYM(_label_00_051), (SYM(_label_00_051) + 4)); CYC((SYM(_label_00_051) + 4), (SYM(_label_00_051) + 7)); read_byte_sequential(gb); CYC((SYM(_label_00_051) + 7), SYM(_label_00_052)); }
+      if (F & FC) { CYCT(SYM(_label_00_051), (SYM(_label_00_051) + 4)); CYC(SYM(_label_00_052), (SYM(_label_00_052) + 2)); A = H8(hFF8B); }
+      else { CYC(SYM(_label_00_051), (SYM(_label_00_051) + 4)); CYC((SYM(_label_00_051) + 4), (SYM(_label_00_051) + 7)); read_byte_sequential(gb); CYC((SYM(_label_00_051) + 7), (SYM(_label_00_051) + 9)); }
       CYC(SYM(_label_00_053), (SYM(_label_00_053) + 1)); mem_wr(gb, DE, A);
       SET_DE(DE + 1);
       B = alu_dec8(gb, B);
@@ -10165,22 +10165,22 @@ static void decompress_block(GB *gb) {
     CYC((SYM(_label_00_053) + 5), (SYM(_label_00_053) + 7)); A = H8(hFF8A);
     C = A;
     B = 0x08;
-    CYC((SYM(_label_00_053) + 7), SYM(_label_00_054));
+    CYC((SYM(_label_00_053) + 7), (SYM(_label_00_053) + 10));
     for (;;) {
       C = alu_rl(gb, C);
-      if (F & FC) { CYCT(SYM(_label_00_054), (SYM(_label_00_054) + 4)); CYC(SYM(_label_00_055), SYM(_label_00_056)); A = H8(hFF8B); }
-      else { CYC(SYM(_label_00_054), (SYM(_label_00_054) + 4)); CYC((SYM(_label_00_054) + 4), (SYM(_label_00_054) + 7)); read_byte_sequential(gb); CYC((SYM(_label_00_054) + 7), SYM(_label_00_055)); }
+      if (F & FC) { CYCT(SYM(_label_00_054), (SYM(_label_00_054) + 4)); CYC(SYM(_label_00_055), (SYM(_label_00_055) + 2)); A = H8(hFF8B); }
+      else { CYC(SYM(_label_00_054), (SYM(_label_00_054) + 4)); CYC((SYM(_label_00_054) + 4), (SYM(_label_00_054) + 7)); read_byte_sequential(gb); CYC((SYM(_label_00_054) + 7), (SYM(_label_00_054) + 9)); }
       CYC(SYM(_label_00_056), (SYM(_label_00_056) + 1)); mem_wr(gb, DE, A);
       SET_DE(DE + 1);
       B = alu_dec8(gb, B);
       if (B) { CYCT((SYM(_label_00_056) + 1), (SYM(_label_00_056) + 5)); continue; }
-      CYC((SYM(_label_00_056) + 1), SYM(func_06e0));
+      CYC((SYM(_label_00_056) + 1), (SYM(_label_00_056) + 6));
       return;
     }
   }
   CYC(b_+9, b_+12);
   B = 0x10;
-  CYC(b_+12, SYM(_label_00_049));
+  CYC(b_+12, b_+14);
   for (;;) {
     CYC(SYM(_label_00_049), (SYM(_label_00_049) + 3));
     read_byte_sequential(gb);
@@ -10188,7 +10188,7 @@ static void decompress_block(GB *gb) {
     SET_DE(DE + 1);
     B = alu_dec8(gb, B);
     if (B) { CYCT((SYM(_label_00_049) + 4), (SYM(_label_00_049) + 8)); continue; }
-    CYC((SYM(_label_00_049) + 4), SYM(_label_00_050));
+    CYC((SYM(_label_00_049) + 4), (SYM(_label_00_049) + 9));
     return;
   }
 }
@@ -10215,7 +10215,7 @@ static void copy_uncompressed(GB *gb) {
     }
     B = alu_dec8(gb, B);
     if (B) { CYCT(b_+10, b_+13); continue; }
-    CYC(b_+10, SYM(_label_00_059));
+    CYC(b_+10, b_+14);
     return;
   }
 }
@@ -10235,7 +10235,7 @@ static void decompress_lz(GB *gb) {
   alu_xor(gb, B);
   B = A;
   A = 0x01;
-  CYC((SYM(_label_00_061) + 2), SYM(_label_00_062)); H8(hFF8B) = A;
+  CYC((SYM(_label_00_061) + 2), (SYM(_label_00_061) + 14)); H8(hFF8B) = A;
   for (;;) {
     CYC(SYM(_label_00_062), (SYM(_label_00_062) + 2)); A = H8(hFF8B);
     A = alu_dec8(gb, A);
@@ -10247,7 +10247,7 @@ static void decompress_lz(GB *gb) {
       CYC((SYM(_label_00_062) + 7), (SYM(_label_00_062) + 11)); H8(hFF8B) = A;
       CYC((SYM(_label_00_062) + 11), (SYM(_label_00_062) + 12)); A = mem_rd(gb, HL); SET_HL(HL + 1);
       CYC((SYM(_label_00_062) + 12), (SYM(_label_00_062) + 14)); H8(hFF8A) = A;
-      CYC((SYM(_label_00_062) + 14), SYM(_label_00_063));
+      CYC((SYM(_label_00_062) + 14), (SYM(_label_00_062) + 17));
       adjust_hl_sequential(gb);
     }
     CYC(SYM(_label_00_063), (SYM(_label_00_063) + 2)); A = H8(hFF8A);
@@ -10258,7 +10258,7 @@ static void decompress_lz(GB *gb) {
       CYC((SYM(_label_00_063) + 7), (SYM(_label_00_063) + 10));
       copy_byte_sequential(gb);
       if (!(F & FZ)) { CYCT((SYM(_label_00_063) + 10), (SYM(_label_00_063) + 12)); continue; }
-      CYC((SYM(_label_00_063) + 10), SYM(_label_00_064));
+      CYC((SYM(_label_00_063) + 10), (SYM(_label_00_063) + 13));
       return;
     }
     CYCT((SYM(_label_00_063) + 5), (SYM(_label_00_063) + 7));
@@ -10282,7 +10282,7 @@ static void decompress_lz(GB *gb) {
         alu_rrca(gb);
         alu_rrca(gb);
         alu_add(gb, 0x02);
-        CYC((SYM(_label_00_065) + 14), SYM(_label_00_066));
+        CYC((SYM(_label_00_065) + 14), (SYM(_label_00_065) + 21));
       }
     } else {
       CYC((SYM(_label_00_064) + 2), (SYM(_label_00_064) + 5));
@@ -10296,14 +10296,14 @@ static void decompress_lz(GB *gb) {
         A = alu_swap(gb, A);
         alu_rrca(gb);
         A = alu_inc8(gb, A);
-        CYC((SYM(_label_00_064) + 13), SYM(_label_00_065));
+        CYC((SYM(_label_00_064) + 13), (SYM(_label_00_064) + 19));
       }
     }
     if (no_length) {
       SET_HL(HL + 1);
       CYC(SYM(_label_00_066), (SYM(_label_00_066) + 4));
       adjust_hl_sequential(gb);
-      CYC((SYM(_label_00_066) + 4), SYM(_label_00_067)); A = mem_rd(gb, HL);
+      CYC((SYM(_label_00_066) + 4), (SYM(_label_00_066) + 5)); A = mem_rd(gb, HL);
     }
     CYC(SYM(_label_00_067), (SYM(_label_00_067) + 2)); H8(hFF8F) = A;
     SET_HL(HL + 1);
@@ -10317,7 +10317,7 @@ static void decompress_lz(GB *gb) {
     alu_cpl(gb);
     H = A;
     alu_add_hl(gb, DE);
-    CYC((SYM(_label_00_067) + 13), b_+0);
+    CYC((SYM(_label_00_067) + 13), (SYM(_label_00_067) + 16));
     for (;;) {
       CYC(b_+0, b_+1); A = mem_rd(gb, HL); SET_HL(HL + 1);
       CYC(b_+1, b_+2); mem_wr(gb, DE, A);
@@ -10328,7 +10328,7 @@ static void decompress_lz(GB *gb) {
       if (F & FZ) {
         CYCT(b_+2, b_+8);
         CYC(SYM(_label_00_069), (SYM(_label_00_069) + 1)); SET_HL(pop_effect(gb));
-        CYC((SYM(_label_00_069) + 1), SYM(copyByteSequential));
+        CYC((SYM(_label_00_069) + 1), (SYM(_label_00_069) + 2));
         return;
       }
       CYC(b_+2, b_+8);
@@ -10338,7 +10338,7 @@ static void decompress_lz(GB *gb) {
       if (!(F & FZ)) { CYCT(b_+13, b_+15); continue; }
       CYC(b_+13, b_+15);
       CYC(b_+15, b_+16); SET_HL(pop_effect(gb));
-      CYC(b_+16, SYM(_label_00_069));
+      CYC(b_+16, b_+18);
       break;
     }
   }
@@ -10362,13 +10362,13 @@ void decompressGraphics_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+17, b_+24); copy_uncompressed(gb); ret_effect(gb); return; }
   CYC(b_+17, b_+24);
   alu_cp(gb, 0xc0);
-  if (F & FZ) { CYCT(b_+24, b_+28); A = 0xff; CYC(SYM(_label_00_059), SYM(_label_00_060)); decompress_lz(gb); ret_effect(gb); return; }
+  if (F & FZ) { CYCT(b_+24, b_+28); A = 0xff; CYC(SYM(_label_00_059), (SYM(_label_00_059) + 4)); decompress_lz(gb); ret_effect(gb); return; }
   CYC(b_+24, b_+28);
   alu_cp(gb, 0x40);
   if (F & FZ) {
     CYCT(b_+28, b_+32);
     alu_xor(gb, A);
-    CYC(SYM(_label_00_060), SYM(_label_00_061)); H8(hFF93) = A;
+    CYC(SYM(_label_00_060), (SYM(_label_00_060) + 3)); H8(hFF93) = A;
     decompress_lz(gb);
     ret_effect(gb);
     return;
@@ -10383,7 +10383,7 @@ void decompressGraphics_hook(GB *gb) {
     CYC(b_+37, b_+38); SET_AF(pop_effect(gb));
     A = alu_dec8(gb, A);
     if (A) { CYCT(b_+38, b_+41); continue; }
-    CYC(b_+38, SYM(func_069c));
+    CYC(b_+38, b_+42);
     break;
   }
   ret_effect(gb);
@@ -10428,7 +10428,7 @@ static bool decompress_label_049(GB *gb, uint16_t sp0_) {
     CYC(b_+5, b_+6); B = alu_dec8(gb, B);
     if (B) { CYCT(b_+6, b_+8); continue; }
     CYC(b_+6, b_+8);
-    CYC(b_+8, SYM(_label_00_050));
+    CYC(b_+8, b_+9);
     return false;
   }
 }
@@ -10442,14 +10442,14 @@ static bool decompress_label_053(GB *gb, uint16_t sp0_) {
     if (B) {
       CYCT(b_+3, b_+5);
       CYC(SYM(_label_00_051), (SYM(_label_00_051) + 2)); C = alu_rl(gb, C);
-      if (F & FC) { CYCT((SYM(_label_00_051) + 2), (SYM(_label_00_051) + 4)); CYC(SYM(_label_00_052), b_+0); A = H8(hFF8B); }
-      else { CYC((SYM(_label_00_051) + 2), (SYM(_label_00_051) + 4)); CALL_C_FRAGMENT((SYM(_label_00_051) + 4), readByteSequential_hook, SYM(readByteSequential), (SYM(_label_00_051) + 7)); CYC((SYM(_label_00_051) + 7), SYM(_label_00_052)); }
+      if (F & FC) { CYCT((SYM(_label_00_051) + 2), (SYM(_label_00_051) + 4)); CYC(SYM(_label_00_052), (SYM(_label_00_052) + 2)); A = H8(hFF8B); }
+      else { CYC((SYM(_label_00_051) + 2), (SYM(_label_00_051) + 4)); CALL_C_FRAGMENT((SYM(_label_00_051) + 4), readByteSequential_hook, SYM(readByteSequential), (SYM(_label_00_051) + 7)); CYC((SYM(_label_00_051) + 7), (SYM(_label_00_051) + 9)); }
       continue;
     }
     CYC(b_+3, b_+5);
     CYC(b_+5, b_+7); A = H8(hFF8A);
     CYC(b_+7, b_+8); C = A;
-    CYC(b_+8, SYM(_label_00_054)); B = 0x08;
+    CYC(b_+8, b_+10); B = 0x08;
     return decompress_label_054(gb, sp0_);
   }
 }
@@ -10457,8 +10457,8 @@ static bool decompress_label_053(GB *gb, uint16_t sp0_) {
 static bool decompress_label_051(GB *gb, uint16_t sp0_) {
   BASE(_label_00_051);
   CYC(b_+0, b_+2); C = alu_rl(gb, C);
-  if (F & FC) { CYCT(b_+2, b_+4); CYC(SYM(_label_00_052), SYM(_label_00_053)); A = H8(hFF8B); }
-  else { CYC(b_+2, b_+4); CALL_C_FRAGMENT(b_+4, readByteSequential_hook, SYM(readByteSequential), b_+7); CYC(b_+7, SYM(_label_00_052)); }
+  if (F & FC) { CYCT(b_+2, b_+4); CYC(SYM(_label_00_052), (SYM(_label_00_052) + 2)); A = H8(hFF8B); }
+  else { CYC(b_+2, b_+4); CALL_C_FRAGMENT(b_+4, readByteSequential_hook, SYM(readByteSequential), b_+7); CYC(b_+7, b_+9); }
   return decompress_label_053(gb, sp0_);
 }
 
@@ -10466,15 +10466,15 @@ static bool decompress_label_050(GB *gb, uint16_t sp0_) {
   BASE(_label_00_050);
   CALL_C_FRAGMENT(b_+0, readByteSequential_hook, SYM(readByteSequential), b_+3);
   CYC(b_+3, b_+5); H8(hFF8B) = A;
-  CYC(b_+5, SYM(_label_00_051)); B = 0x08;
+  CYC(b_+5, b_+7); B = 0x08;
   return decompress_label_051(gb, sp0_);
 }
 
 static bool decompress_label_054(GB *gb, uint16_t sp0_) {
   BASE(_label_00_054);
   CYC(b_+0, b_+2); C = alu_rl(gb, C);
-  if (F & FC) { CYCT(b_+2, b_+4); CYC(SYM(_label_00_055), SYM(_label_00_056)); A = H8(hFF8B); }
-  else { CYC(b_+2, b_+4); CALL_C_FRAGMENT(b_+4, readByteSequential_hook, SYM(readByteSequential), b_+7); CYC(b_+7, SYM(_label_00_055)); }
+  if (F & FC) { CYCT(b_+2, b_+4); CYC(SYM(_label_00_055), (SYM(_label_00_055) + 2)); A = H8(hFF8B); }
+  else { CYC(b_+2, b_+4); CALL_C_FRAGMENT(b_+4, readByteSequential_hook, SYM(readByteSequential), b_+7); CYC(b_+7, b_+9); }
   return decompress_label_056(gb, sp0_);
 }
 
@@ -10485,7 +10485,7 @@ static bool decompress_label_056(GB *gb, uint16_t sp0_) {
   CYC(b_+2, b_+3); B = alu_dec8(gb, B);
   if (B) { CYCT(b_+3, b_+5); return decompress_label_054(gb, sp0_); }
   CYC(b_+3, b_+5);
-  CYC(b_+5, SYM(func_06e0));
+  CYC(b_+5, b_+6);
   return false;
 }
 
@@ -10493,7 +10493,7 @@ static bool decompress_label_069(GB *gb, uint16_t sp0_) {
   BASE(_label_00_069);
   (void)sp0_;
   CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
-  CYC(b_+1, SYM(copyByteSequential));
+  CYC(b_+1, b_+2);
   return false;
 }
 
@@ -10517,7 +10517,7 @@ static bool decompress_label_068(GB *gb, uint16_t sp0_) {
     if (!(F & FZ)) { CYCT(b_+13, b_+15); continue; }
     CYC(b_+13, b_+15);
     CYC(b_+15, b_+16); SET_HL(pop_effect(gb));
-    CYC(b_+16, SYM(_label_00_069));
+    CYC(b_+16, b_+18);
     return decompress_label_062(gb, sp0_);
   }
 }
@@ -10534,7 +10534,7 @@ static bool decompress_label_067(GB *gb, uint16_t sp0_) {
   CYC(b_+11, b_+13); A = H8(hFF93);
   CYC(b_+13, b_+14); alu_cpl(gb);
   CYC(b_+14, b_+15); H = A;
-  CYC(b_+15, SYM(_label_00_068)); alu_add_hl(gb, DE);
+  CYC(b_+15, b_+16); alu_add_hl(gb, DE);
   return decompress_label_068(gb, sp0_);
 }
 
@@ -10542,7 +10542,7 @@ static bool decompress_label_066(GB *gb, uint16_t sp0_) {
   BASE(_label_00_066);
   CYC(b_+0, b_+1); SET_HL(HL + 1);
   CALL_C_FRAGMENT(b_+1, _adjustHLSequential_hook, SYM(_adjustHLSequential), b_+4);
-  CYC(b_+4, SYM(_label_00_067)); A = mem_rd(gb, HL);
+  CYC(b_+4, b_+5); A = mem_rd(gb, HL);
   return decompress_label_067(gb, sp0_);
 }
 
@@ -10561,7 +10561,7 @@ static bool decompress_label_065(GB *gb, uint16_t sp0_) {
   CYC(b_+15, b_+16); alu_rrca(gb);
   CYC(b_+16, b_+17); alu_rrca(gb);
   CYC(b_+17, b_+19); alu_add(gb, 0x02);
-  CYC(b_+19, SYM(_label_00_066));
+  CYC(b_+19, b_+21);
   return decompress_label_067(gb, sp0_);
 }
 
@@ -10580,7 +10580,7 @@ static bool decompress_label_064(GB *gb, uint16_t sp0_) {
   CYC(b_+13, b_+15); A = alu_swap(gb, A);
   CYC(b_+15, b_+16); alu_rrca(gb);
   CYC(b_+16, b_+17); A = alu_inc8(gb, A);
-  CYC(b_+17, SYM(_label_00_065));
+  CYC(b_+17, b_+19);
   return decompress_label_067(gb, sp0_);
 }
 
@@ -10594,7 +10594,7 @@ static bool decompress_label_063(GB *gb, uint16_t sp0_) {
     CALL_C_FRAGMENT(b_+7, copyByteSequential_hook, SYM(copyByteSequential), b_+10);
     if (!(F & FZ)) { CYCT(b_+10, b_+12); return decompress_label_062(gb, sp0_); }
     CYC(b_+10, b_+12);
-    CYC(b_+12, SYM(_label_00_064));
+    CYC(b_+12, b_+13);
     return false;
   }
   CYCT(b_+5, b_+7);
@@ -10628,7 +10628,7 @@ static bool decompress_label_061(GB *gb, uint16_t sp0_) {
   CYC(b_+8, b_+9); alu_xor(gb, B);
   CYC(b_+9, b_+10); B = A;
   CYC(b_+10, b_+12); A = 0x01;
-  CYC(b_+12, SYM(_label_00_062)); H8(hFF8B) = A;
+  CYC(b_+12, b_+14); H8(hFF8B) = A;
   return decompress_label_062(gb, sp0_);
 }
 
@@ -10640,13 +10640,13 @@ static bool decompress_label_061(GB *gb, uint16_t sp0_) {
 void _label_00_049_hook(GB *gb) { uint16_t sp0_ = gb->sp; DECOMPRESS_HOOK(decompress_label_049); }
 void _label_00_050_hook(GB *gb) { uint16_t sp0_ = gb->sp; DECOMPRESS_HOOK(decompress_label_050); }
 void _label_00_051_hook(GB *gb) { uint16_t sp0_ = gb->sp; DECOMPRESS_HOOK(decompress_label_051); }
-void _label_00_052_hook(GB *gb) { uint16_t sp0_ = gb->sp; CYC(SYM(_label_00_052), SYM(_label_00_053)); A = H8(hFF8B); DECOMPRESS_HOOK(decompress_label_053); }
+void _label_00_052_hook(GB *gb) {BASE(_label_00_052); uint16_t sp0_ = gb->sp; CYC(b_+0, b_+2); A = H8(hFF8B); DECOMPRESS_HOOK(decompress_label_053); }
 void _label_00_053_hook(GB *gb) { uint16_t sp0_ = gb->sp; DECOMPRESS_HOOK(decompress_label_053); }
 void _label_00_054_hook(GB *gb) { uint16_t sp0_ = gb->sp; DECOMPRESS_HOOK(decompress_label_054); }
-void _label_00_055_hook(GB *gb) { uint16_t sp0_ = gb->sp; CYC(SYM(_label_00_055), SYM(_label_00_056)); A = H8(hFF8B); DECOMPRESS_HOOK(decompress_label_056); }
+void _label_00_055_hook(GB *gb) {BASE(_label_00_055); uint16_t sp0_ = gb->sp; CYC(b_+0, b_+2); A = H8(hFF8B); DECOMPRESS_HOOK(decompress_label_056); }
 void _label_00_056_hook(GB *gb) { uint16_t sp0_ = gb->sp; DECOMPRESS_HOOK(decompress_label_056); }
-void _label_00_059_hook(GB *gb) { uint16_t sp0_ = gb->sp; CYC(SYM(_label_00_059), (SYM(_label_00_059) + 2)); A = 0xff; CYC((SYM(_label_00_059) + 2), SYM(_label_00_060)); DECOMPRESS_HOOK(decompress_label_061); }
-void _label_00_060_hook(GB *gb) { uint16_t sp0_ = gb->sp; CYC(SYM(_label_00_060), (SYM(_label_00_060) + 1)); alu_xor(gb, A); CYC((SYM(_label_00_060) + 1), SYM(_label_00_061)); H8(hFF93) = A; DECOMPRESS_HOOK(decompress_label_061); }
+void _label_00_059_hook(GB *gb) {BASE(_label_00_059); uint16_t sp0_ = gb->sp; CYC(b_+0, b_+2); A = 0xff; CYC(b_+2, b_+4); DECOMPRESS_HOOK(decompress_label_061); }
+void _label_00_060_hook(GB *gb) {BASE(_label_00_060); uint16_t sp0_ = gb->sp; CYC(b_+0, b_+1); alu_xor(gb, A); CYC(b_+1, b_+3); H8(hFF93) = A; DECOMPRESS_HOOK(decompress_label_061); }
 void _label_00_061_hook(GB *gb) { uint16_t sp0_ = gb->sp; DECOMPRESS_HOOK(decompress_label_061); }
 void _label_00_062_hook(GB *gb) { uint16_t sp0_ = gb->sp; DECOMPRESS_HOOK(decompress_label_062); }
 void _label_00_063_hook(GB *gb) { uint16_t sp0_ = gb->sp; DECOMPRESS_HOOK(decompress_label_063); }
@@ -10768,7 +10768,7 @@ void loadPaletteHeader_hook(GB *gb) {
   A = C;
   CYC(b_+122, b_+125); mem_wr(gb, IO_SVBK, A);
   CYC(b_+125, b_+126); SET_DE(pop_effect(gb));
-  CYC(b_+126, SYM(queueDmaTransfer));
+  CYC(b_+126, b_+127);
   ret_effect(gb);
 }
 
@@ -10849,7 +10849,7 @@ void loadTilesetHlpr_hook(GB *gb) {
             CYCT(b_+107, b_+109);
             CYC(b_+119, b_+120); SET_HL(pop_effect(gb));
             CYC(b_+120, b_+121); SET_BC(pop_effect(gb));
-            CYC(b_+121, SYM(dec16_ff8c));
+            CYC(b_+121, b_+122);
             ret_effect(gb);
             return;
           }
@@ -10897,7 +10897,7 @@ static void draw_sprite_list(GB *gb) {
   alu_add(gb, A);
   alu_add(gb, E);
   alu_cp(gb, 0xa1);
-  if (!(F & FC)) { CYCT(b_+11, b_+19); CYC(b_+45, SYM(_drawObjectTerrainEffects)); return; }
+  if (!(F & FC)) { CYCT(b_+11, b_+19); CYC(b_+45, b_+46); return; }
   CYC(b_+11, b_+19);
   D = wOam >> 8;
   CYC(b_+19, b_+21);
@@ -10925,7 +10925,7 @@ static void draw_sprite_list(GB *gb) {
   }
   A = E;
   CYC(b_+42, b_+45); H8(hOamTail) = A;
-  CYC(b_+45, SYM(_drawObjectTerrainEffects));
+  CYC(b_+45, b_+46);
 }
 
 void func_0eda_hook(GB *gb) {
@@ -10990,7 +10990,7 @@ static void draw_object_terrain_effects(GB *gb) {
       if (!(F & FZ)) {
         CYCT(b_+86, b_+90);
         CYC(b_+120, b_+121); SET_HL(pop_effect(gb));
-        CYC(b_+121, SYM(_getObjectPositionOnScreen));
+        CYC(b_+121, b_+122);
         return;
       }
       CYC(b_+86, b_+90);
@@ -11006,7 +11006,7 @@ static void draw_object_terrain_effects(GB *gb) {
     draw_sprite_list(gb);
     CYC(b_+119, b_+120); SET_DE(pop_effect(gb));
     CYC(b_+120, b_+121); SET_HL(pop_effect(gb));
-    CYC(b_+121, SYM(_getObjectPositionOnScreen));
+    CYC(b_+121, b_+122);
     return;
   }
   CYC(b_+10, b_+14);
@@ -11065,7 +11065,7 @@ static void object_position_on_screen_tail(GB *gb) {
   alu_add(gb, 0x1c);
   L = A;
   alu_scf(gb);
-  CYC(b_+37, SYM(_label_00_152));
+  CYC(b_+37, b_+45);
 }
 
 void _getObjectPositionOnScreen_hook(GB *gb) {
@@ -11255,7 +11255,7 @@ void drawAllSprites_hook(GB *gb) {
   CYC(b_+0, b_+5); alu_bit(gb, 0, mem_rd(gb, HL));
   if (!(F & FZ)) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
   CYC(b_+5, b_+6);
-  CYC(b_+6, SYM(drawAllSpritesUnconditionally)); mem_wr(gb, HL, 0xff);
+  CYC(b_+6, b_+8); mem_wr(gb, HL, 0xff);
   draw_all_sprites_unconditionally(gb);
   ret_effect(gb);
 }
@@ -11273,7 +11273,7 @@ static void write_palette_regs(GB *gb) {
       A = L;
       alu_add(gb, 0x08);
       L = A;
-      CYC(b_+57, SYM(lcdInterrupt));
+      CYC(b_+57, b_+63);
       continue;
     }
     CYC(b_+28, b_+32);
@@ -11327,7 +11327,7 @@ void _interactionActuallyRunScript_hook(GB *gb) {
       CYCT(b_+11, b_+14);
       bank_pop(gb, b_+27);
       alu_scf(gb);
-      CYC(b_+33, SYM(interactionSetHighTextIndex));
+      CYC(b_+33, b_+35);
       ret_effect(gb);
       return;
     }
@@ -11351,7 +11351,7 @@ void _interactionSaveScriptAddress_hook(GB *gb) {
   E = alu_inc8(gb, E);
   A = H;
   CYC(b_+4, b_+7); mem_wr(gb, DE, A);
-  CYC(b_+7, SYM(scriptCmd_asmCall));
+  CYC(b_+7, b_+8);
   ret_effect(gb);
 }
 
@@ -11364,7 +11364,7 @@ void _scriptCmd_asmRetFunc_hook(GB *gb) {
   CYC(b_+7, b_+9); A = H8(hActiveObject);
   D = A;
   alu_scf(gb);
-  CYC(b_+9, SYM(_scriptFunc_setupAsmCall));
+  CYC(b_+9, b_+12);
   ret_effect(gb);
 }
 
@@ -11376,7 +11376,7 @@ static void script_setup_asm_call(GB *gb) {
   C = A;
   CYC(b_+4, b_+6); A = mem_rd(gb, HL); SET_HL(HL + 1);
   B = A;
-  CYC(b_+6, SYM(scriptFunc_jump_scf));
+  CYC(b_+6, b_+8);
 }
 
 void _scriptFunc_setupAsmCall_hook(GB *gb) {
@@ -11399,7 +11399,7 @@ static void script_asm_call_tail(GB *gb) {
   H = B;
   L = C;
   A = E;
-  CYC(b_+22, SYM(_scriptCmd_asmRetFunc));
+  CYC(b_+22, b_+27);
   hook_handoff(gb, HL);
 }
 
@@ -11408,7 +11408,7 @@ void scriptCmd_asmCall_hook(GB *gb) {
   CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
   CYC(b_+1, b_+4);
   script_setup_asm_call(gb);
-  CYC(b_+4, SYM(scriptCmd_asmCallWithParam));
+  CYC(b_+4, b_+6);
   script_asm_call_tail(gb);
 }
 
@@ -11455,7 +11455,7 @@ void scriptCmd_loadScript_hook(GB *gb) {
   D = A;
   SET_HL(wBigBuffer);
   alu_scf(gb);
-  CYC(b_+39, SYM(interactionAnimate));
+  CYC(b_+39, b_+45);
   ret_effect(gb);
 }
 
@@ -11505,7 +11505,7 @@ void linkState07__substate2_hook(GB *gb) {
   CYC(b_+45, b_+47); alu_add(gb, 0x04);
   CYC(b_+47, b_+48); mem_wr(gb, DE, A);
   CYC(b_+48, b_+50); A = 0x0a;
-  CYC(b_+50, SYM(itemDelete));
+  CYC(b_+50, b_+53);
   linkSetState_hook(gb);
 }
 
@@ -11528,7 +11528,7 @@ static void load_large_room_layout(GB *gb) {
   H = A;
   CYC(b_+78, b_+81); A = H8(hFF8E);
   L = A;
-  SET_BC((SYM(_getObjectPositionOnScreen_duringScreenTransition) + 63));
+  SET_BC(0x1000);
   alu_add_hl(gb, BC);
   CYC(b_+81, b_+88); A = H8(hFF8D);
   CYC(b_+88, b_+90); H8(hRomBank) = A;
@@ -11653,7 +11653,7 @@ static void load_small_room_layout(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+203, b_+207); decompress_layout_rows(gb, b_+264, 0x0a, ROM_loadRoomLayout_decompressLayoutMode1Helper); return; }
   CYC(b_+203, b_+207);
   SET_DE(wRoomLayout);
-  SET_BC((SYM(vblankInterrupt) + 16));
+  SET_BC(0x0a08);
   CYC(b_+207, b_+213);
   for (;;) {
     CYC(b_+213, b_+214); push_effect(gb, BC);
@@ -11869,7 +11869,7 @@ void _getObjectPositionOnScreen_duringScreenTransition_hook(GB *gb) {
     CYC(b_+144, b_+149); mem_wr(gb, HL, 0x00);
   }
   alu_xor(gb, A);
-  CYC(b_+149, SYM(data_1058));
+  CYC(b_+149, b_+151);
   ret_effect(gb);
 }
 
@@ -11887,7 +11887,7 @@ void _label_00_152_hook(GB *gb) {
   CYC(b_+13, b_+14); L = alu_inc8(gb, L);
   CYC(b_+14, b_+15); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+15, b_+16); alu_sub(gb, C);
-  CYC(b_+16, SYM(_getObjectPositionOnScreen_duringScreenTransition));
+  CYC(b_+16, b_+18);
   object_position_on_screen_tail(gb);
   ret_effect(gb);
 }
@@ -11901,7 +11901,7 @@ void getRelativeAngle_hook(GB *gb) {
   E = alu_inc8(gb, E);
   E = alu_inc8(gb, E);
   CYC(b_+3, b_+6); A = mem_rd(gb, DE);
-  CYC(b_+6, SYM(objectGetRelativeAngleWithTempVars)); H8(hFF8E) = A;
+  CYC(b_+6, b_+8); H8(hFF8E) = A;
   object_get_relative_angle_with_temp_vars(gb);
   ret_effect(gb);
 }
@@ -11955,7 +11955,7 @@ void objectUpdateSpeedZ_sidescroll_givenYOffset_hook(GB *gb) {
   CYC(b_+52, b_+55); alu_adc(gb, mem_rd(gb, HL));
   CYC(b_+55, b_+56); mem_wr(gb, HL, A);
   alu_or(gb, D);
-  CYC(b_+56, SYM(objectCheckLinkWithinDistance));
+  CYC(b_+56, b_+58);
   ret_effect(gb);
 }
 
@@ -11970,7 +11970,7 @@ void interactWithTileBeforeLink_b00_hook(GB *gb) {
   CYC(b_+13, b_+15);
   bank_pop(gb, b_+15);
   C = alu_srl(gb, C);
-  CYC(b_+21, SYM(showInfoTextForRoller));
+  CYC(b_+21, b_+24);
   ret_effect(gb);
 }
 
@@ -11980,7 +11980,7 @@ void reloadObjectGfx_b00_hook(GB *gb) {
   bank3f_push(gb, b_+0);
   CALL_C(b_+10, reloadObjectGfx_b3f_hook, ROM_b3f_reloadObjectGfx, b_+13);
   bank_pop_af(gb, b_+13);
-  CYC(b_+19, SYM(loadObjectGfxHeaderToSlot4));
+  CYC(b_+19, b_+20);
   ret_effect(gb);
 }
 
@@ -11992,7 +11992,7 @@ void loadWeaponGfx_b00_hook(GB *gb) {
   bank3f_push(gb, b_+1);
   CALL_C(b_+11, loadWeaponGfx_b3f_hook, ROM_b3f_loadWeaponGfx, b_+14);
   bank_pop_af(gb, b_+14);
-  CYC(b_+20, SYM(loadObjectGfx));
+  CYC(b_+20, b_+21);
   ret_effect(gb);
 }
 
@@ -12004,7 +12004,7 @@ void loadTreasureDisplayData_b00_hook(GB *gb) {
   bank3f_push(gb, b_+1);
   CALL_C(b_+11, loadTreasureDisplayData_b3f_hook, ROM_b3f_loadTreasureDisplayData, b_+14);
   bank_pop_af(gb, b_+14);
-  CYC(b_+20, SYM(decideItemDrop));
+  CYC(b_+20, b_+21);
   ret_effect(gb);
 }
 
@@ -12027,7 +12027,7 @@ void checkTreasureObtained_hook(GB *gb) {
     CYC(b_+24, b_+27);
   }
   CYC(b_+27, b_+28); SET_HL(pop_effect(gb));
-  CYC(b_+28, SYM(cpRupeeValue));
+  CYC(b_+28, b_+29);
   ret_effect(gb);
 }
 
@@ -12039,7 +12039,7 @@ void specialObjectCode_companionCutscene_b00_hook(GB *gb) {
   CALL_C(b_+10, specialObjectCode_companionCutscene_b06_hook,
          ROM_b06_specialObjectCode_companionCutscene, b_+13);
   bank_pop(gb, b_+13);
-  CYC(b_+19, SYM(specialObjectCode_linkInCutscene_b00));
+  CYC(b_+19, b_+20);
   ret_effect(gb);
 }
 
@@ -12047,7 +12047,7 @@ void specialObjectCode_linkInCutscene_b00_hook(GB *gb) {
   BASE(specialObjectCode_linkInCutscene_b00);
   SET_HL(ROM_b06_specialObjectCode_linkInCutscene);
   E = 0x06;
-  CYC(b_+0, SYM(loadDungeonLayout));
+  CYC(b_+0, b_+8);
   interBankCall_hook(gb);
 }
 
@@ -12064,7 +12064,7 @@ void linkApplyDamage_b00_hook(GB *gb) {
   CALL_C(b_+13, linkApplyDamage_b5_hook, SYM(linkApplyDamage_b5), b_+16);
   bank_pop(gb, b_+16);
   CYC(b_+22, b_+23); SET_DE(pop_effect(gb));
-  CYC(b_+23, SYM(setLinkIDOverride));
+  CYC(b_+23, b_+24);
   ret_effect(gb);
 }
 
@@ -12088,7 +12088,7 @@ void parseGivenObjectData_b00_hook(GB *gb) {
   CALL_C(b_+13, parseGivenObjectData_b12_hook, ROM_b12_parseGivenObjectData, b_+16);
   CYC(b_+16, b_+17); SET_DE(pop_effect(gb));
   bank_pop(gb, b_+17);
-  CYC(b_+23, SYM(loadStaticObjects));
+  CYC(b_+23, b_+24);
   ret_effect(gb);
 }
 
@@ -12107,7 +12107,7 @@ void checkObjectIsCloseToPosition_b00_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+26, b_+29); ret_effect(gb); return; }
   CYC(b_+26, b_+29);
   alu_scf(gb);
-  CYC(b_+29, SYM(checkNpcShouldExistAtGameStage));
+  CYC(b_+29, b_+31);
   ret_effect(gb);
 }
 
@@ -12122,7 +12122,7 @@ static void file_management(GB *gb, uint16_t a, uint8_t op) {
   CYC(b_+15, b_+16);
   bank_pop(gb, b_+16);
   A = C;
-  CYC(b_+22, SYM(vblankInterrupt));
+  CYC(b_+22, b_+24);
   ret_effect(gb);
 }
 
@@ -12134,7 +12134,7 @@ void eraseFile_b00_hook(GB *gb) { file_management(gb, SYM(eraseFile_b00), 0x03);
 void initSound_b00_hook(GB *gb) {
   BASE(initSound_b00);
   SET_BC(0x4000);
-  CYC(b_+0, SYM(_startSound));
+  CYC(b_+0, b_+3);
   start_sound(gb);
   ret_effect(gb);
 }
@@ -12148,7 +12148,7 @@ static void intro_cinematic_after_call(GB *gb, uint16_t sp0_) {
   CALL_C(b_+33, updateAnimations_hook, SYM(updateAnimations), b_+36);
   CALL_C(b_+36, updateInteractionsAndDrawAllSprites_hook, SYM(updateInteractionsAndDrawAllSprites), b_+39);
   bank_pop(gb, b_+39);
-  CYC(b_+45, SYM(func_2d48));
+  CYC(b_+45, b_+46);
   ret_effect(gb);
 }
 
@@ -12262,7 +12262,7 @@ void enemyStandardUpdate_hook(GB *gb) {
       C = 0x20;
       CYC(b_+107, b_+109);
       CALL_ROM(b_+109, ROM_objectUpdateSpeedZAndBounce);
-      if (!(F & FC)) { CYCT(b_+112, b_+114); C = 0x02; CYC(b_+120, SYM(partAnimate)); ret_effect(gb); return; }
+      if (!(F & FC)) { CYCT(b_+112, b_+114); C = 0x02; CYC(b_+120, b_+123); ret_effect(gb); return; }
       CYC(b_+112, b_+114);
       H = D;
       CYC(b_+114, b_+115);
@@ -12273,7 +12273,7 @@ void enemyStandardUpdate_hook(GB *gb) {
   CYC(b_+115, b_+119); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+119, b_+120); mem_wr(gb, HL, A);
   C = 0x02;
-  CYC(b_+120, SYM(partAnimate));
+  CYC(b_+120, b_+123);
   ret_effect(gb);
 }
 
@@ -12304,7 +12304,7 @@ void threadStop_hook(GB *gb) {
   CYC(b_+1, b_+4);
   CYC(b_+4, b_+6); mem_wr(gb, HL, 0x00);
   CYC(b_+6, b_+7); SET_HL(pop_effect(gb));
-  CYC(b_+7, SYM(threadRestart));
+  CYC(b_+7, b_+8);
   ret_effect(gb);
 }
 
@@ -12349,7 +12349,7 @@ void threadRestart_hook(GB *gb) {
   set_thread_restart_address(gb, b_+23);
   CYC(b_+29, b_+30); SET_DE(pop_effect(gb));
   CYC(b_+30, b_+31); SET_HL(pop_effect(gb));
-  CYC(b_+31, SYM(restartThisThread));
+  CYC(b_+31, b_+32);
   ret_effect(gb);
 }
 
@@ -12368,7 +12368,7 @@ void restartThisThread_hook(GB *gb) {
   CYC(b_+1, b_+17);
   copy_initial_thread_state(gb, b_+17);
   set_thread_restart_address(gb, b_+23);
-  CYCT(b_+29, SYM(stubThreadStart));
+  CYCT(b_+29, b_+31);
   _nextThread_hook(gb);
 }
 
@@ -12379,7 +12379,7 @@ void stubThreadStart_hook(GB *gb) {
   H = wThreadStateBuffer >> 8;
   CYC(b_+0, b_+5);
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x00);
-  CYCT(b_+7, SYM(resumeThreadNextFrameAndSaveBank));
+  CYCT(b_+7, b_+9);
   _nextThread_hook(gb);
 }
 
@@ -12400,14 +12400,14 @@ void resumeThreadNextFrameAndSaveBank_hook(GB *gb) {
   CYC(b_+12, b_+14); H8(hRomBank) = A;
   CYC(b_+14, b_+17); mem_wr(gb, MBC_ROM_BANK, A);
   CYC(b_+17, b_+18); SET_BC(pop_effect(gb));
-  CYC(b_+18, SYM(resumeThreadNextFrame));
+  CYC(b_+18, b_+19);
   ret_effect(gb);
 }
 
 void resumeThreadNextFrame_hook(GB *gb) {
   BASE(resumeThreadNextFrame);
   A = 0x01;
-  CYC(b_+0, SYM(resumeThreadInAFrames));
+  CYC(b_+0, b_+2);
   resumeThreadInAFrames_hook(gb);
 }
 
@@ -12433,7 +12433,7 @@ void resumeThreadInAFrames_hook(GB *gb) {
   CYC(b_+17, b_+19); A = mem_rd(gb, hFF92);
   CYC(b_+19, b_+20); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+20, b_+22); A = mem_rd(gb, hFF93);
-  CYC(b_+22, SYM(_nextThread)); mem_wr(gb, HL, A);
+  CYC(b_+22, b_+23); mem_wr(gb, HL, A);
   _nextThread_hook(gb);
 }
 
@@ -12445,7 +12445,7 @@ void writeToSC_hook(GB *gb) {
   CYC(b_+3, b_+5); mem_wr(gb, IO_SC, A);
   CYC(b_+5, b_+6); SET_AF(pop_effect(gb));
   CYC(b_+6, b_+8); mem_wr(gb, IO_SC, A);
-  CYC(b_+8, SYM(serialFunc_0c73));
+  CYC(b_+8, b_+9);
   ret_effect(gb);
 }
 
@@ -12512,7 +12512,7 @@ void serialFunc_0c73_hook(GB *gb) {
   CYC(b_+5, b_+7); mem_wr(gb, IO_SB, A);
   A = 0x81;
   CYC(b_+7, b_+9);
-  CYCT(b_+9, SYM(disableSerialPort));
+  CYCT(b_+9, b_+11);
   writeToSC_hook(gb);
 }
 
@@ -12522,7 +12522,7 @@ void disableSerialPort_hook(GB *gb) {
   CYC(b_+0, b_+1);
   CYC(b_+1, b_+3); H8(hSerialInterruptBehaviour) = A;
   CYC(b_+3, b_+5); mem_wr(gb, IO_SB, A);
-  CYCT(b_+5, SYM(serialFunc_0c85));
+  CYCT(b_+5, b_+7);
   writeToSC_hook(gb);
 }
 
@@ -12531,7 +12531,7 @@ void serialFunc_0c85_hook(GB *gb) {
   SET_HL(ROM_b16_serialFunc_44ac);
   E = 0x16;
   CYC(b_+0, b_+5);
-  CYC(b_+5, SYM(serialFunc_0c8d));
+  CYC(b_+5, b_+8);
   interBankCall_hook(gb);
 }
 
@@ -12543,7 +12543,7 @@ void serialFunc_0c8d_hook(GB *gb) {
   CYC(b_+1, b_+6);
   CALL_ROM(b_+6, ROM_interBankCall);
   CYC(b_+9, b_+10); SET_DE(pop_effect(gb));
-  CYC(b_+10, SYM(playSound_b00));
+  CYC(b_+10, b_+11);
   ret_effect(gb);
 }
 
@@ -12553,7 +12553,7 @@ static void timer_interrupt_end(GB *gb) {
   CYC(b_+83, b_+84); SET_DE(pop_effect(gb));
   CYC(b_+84, b_+85); SET_BC(pop_effect(gb));
   CYC(b_+85, b_+86); SET_AF(pop_effect(gb));
-  CYC(b_+86, SYM(addSpritesToOam));
+  CYC(b_+86, b_+87);
   reti_effect(gb);
 }
 
@@ -12676,7 +12676,7 @@ static void vblank_queue_dispatch(GB *gb, uint16_t sp0) {
   CYC(b_+5, b_+11);
   alu_add_hl(gb, BC);
   CYC(b_+11, b_+12);
-  CYC(b_+12, SYM(vblankFunctionRet));
+  CYC(b_+12, b_+13);
   hook_continue(gb, HL, sp0);
 }
 
@@ -12699,7 +12699,7 @@ void vblankFunctionRet_hook(GB *gb) {
   alu_xor(gb, A);
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+8); H8(hVBlankFunctionQueueTail) = A;
-  CYC(b_+8, SYM(vblankFunctionOffset0));
+  CYC(b_+8, b_+9);
   ret_effect(gb);
 }
 
@@ -12739,7 +12739,7 @@ void vblankRunBank4Function_hook(GB *gb) {
   A = 0x04;
   CYC(b_+0, b_+2);
   CYC(b_+2, b_+5); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+5, SYM(vblankFunction0aa8));
+  CYC(b_+5, b_+8);
   vblankRunBank4Function_b04_hook(gb);
 }
 
@@ -12778,7 +12778,7 @@ static void vblank_write4_bytes(GB *gb) {
   CYC(b_+30, b_+31);
   CYC(b_+31, b_+32); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+32, b_+33); mem_wr(gb, DE, A);
-  CYC(b_+33, SYM(vblankFunction0ad9));
+  CYC(b_+33, b_+34);
   ret_effect(gb);
 }
 
@@ -12828,7 +12828,7 @@ void vblankDmaFunction_hook(GB *gb) {
   CYC(b_+20, b_+22); mem_wr(gb, IO_HDMA4, A);
   CYC(b_+22, b_+23); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+23, b_+25); mem_wr(gb, IO_HDMA5, A);
-  CYC(b_+25, SYM(updateDirtyPalettes));
+  CYC(b_+25, b_+28);
   vblankFunctionRet_hook(gb);
 }
 
@@ -12912,7 +12912,7 @@ void vblankInterrupt_hook(GB *gb) {
   CYC(b_+117, b_+118); SET_DE(pop_effect(gb));
   CYC(b_+118, b_+119); SET_BC(pop_effect(gb));
   CYC(b_+119, b_+120); SET_AF(pop_effect(gb));
-  CYC(b_+120, SYM(runVBlankFunctions));
+  CYC(b_+120, b_+121);
   reti_effect(gb);
 }
 
@@ -12921,7 +12921,7 @@ void _lcdInterruptEnd_hook(GB *gb) {
   CYC(b_+0, b_+1); SET_BC(pop_effect(gb));
   CYC(b_+1, b_+2); SET_HL(pop_effect(gb));
   CYC(b_+2, b_+3); SET_AF(pop_effect(gb));
-  CYC(b_+3, SYM(lcdInterrupt_0bea));
+  CYC(b_+3, b_+4);
   reti_effect(gb);
 }
 
@@ -12929,7 +12929,7 @@ void lcdInterrupt_clearLYC_hook(GB *gb) {
   BASE(lcdInterrupt_clearLYC);
   A = 0xc7;
   CYC(b_+0, b_+2); mem_wr(gb, IO_LYC, A);
-  CYC(b_+2, SYM(_lcdInterruptEnd));
+  CYC(b_+2, b_+4);
   _lcdInterruptEnd_hook(gb);
 }
 
@@ -12938,7 +12938,7 @@ void lcdInterrupt_clearWXY_hook(GB *gb) {
   A = 0xc7;
   CYC(b_+0, b_+2); mem_wr(gb, IO_WY, A);
   CYC(b_+2, b_+4); mem_wr(gb, IO_WX, A);
-  CYC(b_+4, SYM(lcdInterrupt_clearLYC));
+  CYC(b_+4, b_+6);
   lcdInterrupt_clearLYC_hook(gb);
 }
 
@@ -12954,7 +12954,7 @@ void lcdInterrupt_setLcdcToA7_hook(GB *gb) {
   A = 0xa7;
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+9); mem_wr(gb, IO_LCDC, A);
-  CYCT(b_+9, SYM(lcdInterrupt_ringMenu));
+  CYCT(b_+9, b_+11);
   lcdInterrupt_clearLYC_hook(gb);
 }
 
@@ -12999,7 +12999,7 @@ void lcdInterrupt_ringMenu_hook(GB *gb) {
   A = 0x80;
   CYC(b_+32, b_+34);
   CYC(b_+34, b_+36); mem_wr(gb, IO_SCY, A);
-  CYCT(b_+36, SYM(lcdInterrupt_clearWXY));
+  CYCT(b_+36, b_+38);
   lcdInterrupt_clearWXY_hook(gb);
 }
 
@@ -13023,7 +13023,7 @@ void lcdInterrupt_0bea_hook(GB *gb) {
   A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+14, b_+15);
   CYC(b_+15, b_+17); mem_wr(gb, IO_SCX, A);
-  CYCT(b_+17, SYM(data_0bfd));
+  CYCT(b_+17, b_+19);
   lcdInterrupt_clearLYC_hook(gb);
 }
 
@@ -13151,7 +13151,7 @@ void begin_hook(GB *gb) {
   CYC(b_+19, b_+21); H8(hRng1) = A;
   A = 0x0d;
   CYC(b_+21, b_+23);
-  CYC(b_+23, SYM(resetGame)); H8(hRng2) = A;
+  CYC(b_+23, b_+25); H8(hRng2) = A;
   resetGame_hook(gb);
 }
 
@@ -13161,7 +13161,7 @@ void resetGame__afterSp016c_hook(GB *gb) {
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+7); H8(hRomBank) = A;
   CYC(b_+7, b_+10); mem_wr(gb, MBC_ROM_BANK, A);
-  CYCT(b_+10, SYM(getNumSetBits));
+  CYCT(b_+10, b_+13);
   init_hook(gb);
 }
 
@@ -13178,7 +13178,7 @@ void _nextThread__afterSp091a_hook(GB *gb) {
   A = 0x01;
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+9); mem_wr(gb, IO_SVBK, A);
-  CYCT(b_+9, SYM(startGame));
+  CYCT(b_+9, b_+11);
   _mainLoop_nextThread_hook(gb);
 }
 
@@ -13203,8 +13203,8 @@ void startGame__afterSp0925_hook(GB *gb) {
     CYC(b_+13, b_+14);
     B = alu_dec8(gb, B);
     CYC(b_+14, b_+15);
-    if (!(F & FZ)) { CYCT(b_+15, SYM(_mainLoop)); continue; }
-    CYC(b_+15, SYM(_mainLoop));
+    if (!(F & FZ)) { CYCT(b_+15, b_+17); continue; }
+    CYC(b_+15, b_+17);
     break;
   }
   _mainLoop_hook(gb);
@@ -13252,8 +13252,8 @@ void _mainLoop_hook(GB *gb) {
   CYC(b_+29, b_+31);
   A = alu_dec8(gb, A);
   CYC(b_+31, b_+32);
-  if (F & FZ) { CYCT(b_+32, SYM(_mainLoop_nextThread)); _initializeThread_hook(gb); return; }
-  CYC(b_+32, SYM(_mainLoop_nextThread));
+  if (F & FZ) { CYCT(b_+32, b_+34); _initializeThread_hook(gb); return; }
+  CYC(b_+32, b_+34);
   _mainLoop_nextThread_hook(gb);
 }
 
@@ -13279,8 +13279,8 @@ void _mainLoop_nextThread_hook(GB *gb) {
       CYC((SYM(_mainLoop) + 29), (SYM(_mainLoop) + 31));
       A = alu_dec8(gb, A);
       CYC((SYM(_mainLoop) + 31), (SYM(_mainLoop) + 32));
-      if (F & FZ) { CYCT((SYM(_mainLoop) + 32), b_+0); _initializeThread_hook(gb); return; }
-      CYC((SYM(_mainLoop) + 32), b_+0);
+      if (F & FZ) { CYCT((SYM(_mainLoop) + 32), (SYM(_mainLoop) + 34)); _initializeThread_hook(gb); return; }
+      CYC((SYM(_mainLoop) + 32), (SYM(_mainLoop) + 34));
       continue;
     }
     CYC(b_+8, b_+10);
@@ -13329,7 +13329,7 @@ void _mainLoop_nextThread_hook(GB *gb) {
     CYC(b_+50, b_+52);
     break;
   }
-  CYCT(b_+52, SYM(_countdownToRunThread));
+  CYCT(b_+52, b_+54);
   _mainLoop_hook(gb);
 }
 
@@ -13338,7 +13338,7 @@ void _countdownToRunThread__afterSp0998_hook(GB *gb) {
   CYC(b_+13, b_+14); SET_BC(pop_effect(gb));
   CYC(b_+14, b_+15); SET_DE(pop_effect(gb));
   CYC(b_+15, b_+16); SET_HL(pop_effect(gb));
-  CYC(b_+16, SYM(_initializeThread));
+  CYC(b_+16, b_+17);
   ret_effect(gb);
 }
 
@@ -13371,7 +13371,7 @@ void _countdownToRunThread_hook(GB *gb) {
 void _initializeThread__afterSp09aa_hook(GB *gb) {
   BASE(_initializeThread);
   CYC(b_+14, b_+15); push_effect(gb, BC);
-  CYC(b_+15, SYM(_initialThreadStates));
+  CYC(b_+15, b_+16);
   ret_effect(gb);
 }
 
@@ -13441,7 +13441,7 @@ void textThreadStart_hook(GB *gb) {
     CYC(b_+34, b_+37); mem_wr(gb, MBC_ROM_BANK, A);
     CALL_C(b_+37, updateTextbox_hook, ROM_updateTextbox, b_+40);
     CALL_C(b_+40, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, b_+43);
-    CYCT(b_+43, SYM(retrieveTextCharacter));
+    CYCT(b_+43, b_+45);
   }
 }
 
@@ -13460,7 +13460,7 @@ void fileSelectThreadStart_hook(GB *gb) {
     CYC(b_+12, b_+15); mem_wr(gb, MBC_ROM_BANK, A);
     CALL_C(b_+15, b2_fileSelectScreen_hook, ROM_b2_fileSelectScreen, b_+18);
     CALL_C(b_+18, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, b_+21);
-    CYCT(b_+21, SYM(secretFunctionCaller));
+    CYCT(b_+21, b_+23);
   }
 }
 
@@ -13482,7 +13482,7 @@ void thread_1b10_hook(GB *gb) {
     CYC(b_+17, b_+20); mem_wr(gb, MBC_ROM_BANK, A);
     CALL_C(b_+20, runSaveAndQuitMenu_hook, ROM_runSaveAndQuitMenu, b_+23);
     CALL_C(b_+23, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, b_+26);
-    CYCT(b_+26, SYM(objectAddToAButtonSensitiveObjectList));
+    CYCT(b_+26, b_+28);
   }
 }
 
@@ -13499,7 +13499,7 @@ void introThreadStart_hook(GB *gb) {
     CYC(b_+8, b_+11); mem_wr(gb, MBC_ROM_BANK, A);
     CALL_C(b_+11, runIntro_hook, ROM_runIntro, b_+14);
     CALL_C(b_+14, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, b_+17);
-    CYCT(b_+17, SYM(intro_cinematic));
+    CYCT(b_+17, b_+19);
   }
 }
 
@@ -13527,7 +13527,7 @@ void paletteFadeThreadStart_hook(GB *gb) {
       CYC(b_+23, b_+24);
     }
     CALL_C(b_+24, resumeThreadInAFrames_hook, ROM_resumeThreadInAFrames, b_+27);
-    CYCT(b_+27, SYM(mainThreadStart));
+    CYCT(b_+27, b_+29);
   }
 }
 
@@ -13576,7 +13576,7 @@ void mainThreadStart_hook(GB *gb) {
     CALL_C(b_+35, drawAllSprites_hook, ROM_drawAllSprites, b_+38);
     CALL_C(b_+38, checkReloadStatusBarGraphics_hook, ROM_checkReloadStatusBarGraphics, b_+41);
     CALL_C(b_+41, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, b_+44);
-    CYCT(b_+44, SYM(loadScreenMusic));
+    CYCT(b_+44, b_+46);
   }
 }
 
@@ -13595,12 +13595,12 @@ void hramOamDmaFunction_hook(GB *gb) {
 
 void wMusicReadFunction_hook(GB *gb) {
   I(wMusicReadFunction, 3); H8(hSoundDataBaseBank2) = A;
-  I((wMusicReadFunction + 2), 4); mem_wr(gb, (SYM(objectCheckCenteredWithLink) + 18), A);
+  I((wMusicReadFunction + 2), 4); mem_wr(gb, 0x2000, A);
   I((wMusicReadFunction + 5), 2); A = mem_rd(gb, HL); SET_HL(HL + 1);
   I((wMusicReadFunction + 6), 1); C = A;
   I((wMusicReadFunction + 7), 3); A = H8(hSoundDataBaseBank);
   I((wMusicReadFunction + 9), 3); H8(hSoundDataBaseBank2) = A;
-  I((wMusicReadFunction + 11), 4); mem_wr(gb, (SYM(objectCheckCenteredWithLink) + 18), A);
+  I((wMusicReadFunction + 11), 4); mem_wr(gb, 0x2000, A);
   I((wMusicReadFunction + 14), 1); A = C;
   RET((wMusicReadFunction + 15)); return;
 }

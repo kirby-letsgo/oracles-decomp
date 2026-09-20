@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(monkeyJumpSpeed100), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(monkeyJumpSpeed100), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t monkey_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -38,7 +38,7 @@ static void monkey_add_double_index_from_rst(GB *gb, uint16_t return_address) {
 void monkeyJumpSpeed100_hook(GB *gb) {
   BASE(monkeyJumpSpeed100);
   CYC(b_+0, b_+3); SET_BC(0xff00);
-  CYC(b_+3, SYM(monkeySubid0State1Substate3));
+  CYC(b_+3, b_+6);
   objectSetSpeedZ_hook(gb);
 }
 
@@ -71,14 +71,14 @@ void monkeySubid0State1Substate3_hook(GB *gb) {
   }
   CYC(b_+18, b_+21);
   CYC(b_+21, b_+23); A = 0x04;
-  CYC(b_+23, SYM(monkeyUpdateGravityAndHop));
+  CYC(b_+23, b_+25);
   monkeySetAnimationAndJump_hook(gb);
 }
 
 void monkeyJumpSpeed120_hook(GB *gb) {
   BASE(monkeyJumpSpeed120);
   CYC(b_+0, b_+3); SET_BC(0xfee0);
-  CYC(b_+3, SYM(monkeyUpdateGravityAndJumpIfLanded));
+  CYC(b_+3, b_+6);
   objectSetSpeedZ_hook(gb);
 }
 
@@ -88,10 +88,10 @@ void monkeyUpdateGravityAndHop_hook(GB *gb) {
   CYC(b_+0, b_+2); C = 0x20;
   CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
   if (!(F & FZ)) {
-    CYCT(b_+5, SYM(monkeyJumpSpeed120)); ret_effect(gb);
+    CYCT(b_+5, b_+6); ret_effect(gb);
     return;
   }
-  CYC(b_+5, SYM(monkeyJumpSpeed120));
+  CYC(b_+5, b_+6);
   monkeyJumpSpeed120_hook(gb);
 }
 
@@ -104,7 +104,7 @@ void monkeySetJumpSpeed_hook(GB *gb) {
   CYC(b_+6, b_+7); E = alu_inc8(gb, E);
   CYC(b_+7, b_+8); A = mem_rd(gb, HL);
   CYC(b_+8, b_+9); mem_wr(gb, DE, A);
-  CYC(b_+9, SYM(monkeySubid1State1)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 void monkeyUpdateGravityAndJumpIfLanded_hook(GB *gb) {
@@ -113,10 +113,10 @@ void monkeyUpdateGravityAndJumpIfLanded_hook(GB *gb) {
   CYC(b_+0, b_+2); C = 0x10;
   CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
   if (!(F & FZ)) {
-    CYCT(b_+5, SYM(monkeySetJumpSpeed)); ret_effect(gb);
+    CYCT(b_+5, b_+6); ret_effect(gb);
     return;
   }
-  CYC(b_+5, SYM(monkeySetJumpSpeed));
+  CYC(b_+5, b_+6);
   monkeySetJumpSpeed_hook(gb);
 }
 
@@ -130,7 +130,7 @@ void monkeyBeginDisappearing_hook(GB *gb) {
   CYC(b_+8, b_+10); mem_wr(gb, HL, 0x00);
   CYC(b_+10, b_+12); A = 0x50;
   CALL_C(b_+12, playSound_b00_hook, SYM(playSound_b00), b_+15);
-  CYC(b_+15, SYM(monkeyWaitBeforeFlickering));
+  CYC(b_+15, b_+18);
   interactionIncSubstate_hook(gb);
 }
 
@@ -144,7 +144,7 @@ void monkeyWaitBeforeFlickering_hook(GB *gb) {
   }
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+6); mem_wr(gb, HL, 0x3c);
-  CYC(b_+6, SYM(monkeyFlickerUntilDeletion));
+  CYC(b_+6, b_+9);
   interactionIncSubstate_hook(gb);
 }
 
@@ -155,7 +155,7 @@ void monkeyFlickerUntilDeletion_hook(GB *gb) {
   if (!(F & FZ)) {
     CYCT(b_+3, b_+5);
     CYC(b_+8, b_+10); B = 0x01;
-    CYC(b_+10, SYM(monkey3Disappearance));
+    CYC(b_+10, b_+13);
     objectFlickerVisibility_hook(gb);
     return;
   }
@@ -188,7 +188,7 @@ static void monkey0_disappearance_substate1_hook(GB *gb, uint16_t sp0_) {
   }
   CYCT(b_+25, b_+27);
   CALL_C(b_+29, monkeyUpdateGravityAndJumpIfLanded_hook, SYM(monkeyUpdateGravityAndJumpIfLanded), b_+32);
-  CYC(b_+32, SYM(monkeyBeginDisappearing));
+  CYC(b_+32, b_+35);
   interactionAnimate_hook(gb);
 }
 
@@ -216,7 +216,7 @@ static void monkey3_disappearance_substate0_hook(GB *gb, uint16_t sp0_) {
     return;
   }
   CYC(b_+13, b_+16);
-  CYC(b_+16, SYM(monkey5Disappearance));
+  CYC(b_+16, b_+18);
   monkeyBeginDisappearing_hook(gb);
 }
 
@@ -310,7 +310,7 @@ void monkeyCheckChangeAnimation_hook(GB *gb) {
   CYC(b_+17, b_+18); mem_wr(gb, HL, A);
   CYC(b_+18, b_+20); L = 0x60;
   CYC(b_+20, b_+22); mem_wr(gb, HL, 0x01);
-  CYC(b_+22, SYM(monkey8Disappearance));
+  CYC(b_+22, b_+25);
   interactionAnimate_hook(gb);
 }
 
@@ -400,7 +400,7 @@ static void monkey9_disappearance_substate3_hook(GB *gb, uint16_t sp0_) {
   CYC(b_+121, b_+123); L = 0x45;
   CYC(b_+123, b_+124); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   CYC(b_+124, b_+125); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+125, SYM(monkeyCheckChangeAnimation)); ret_effect(gb);
+  CYC(b_+125, b_+126); ret_effect(gb);
 }
 
 void monkey9Disappearance_hook(GB *gb) {
@@ -528,7 +528,7 @@ static void monkey8_disappearance_substate4_hook(GB *gb, uint16_t sp0_) {
   CYC(b_+96, b_+97);
   CYC(b_+97, b_+99); A = 0xff;
   CYC(b_+99, b_+102); mem_wr(gb, wTmpcfc0_genericCutscene_cfdf, A);
-  CYC(b_+102, SYM(monkeySubid2State1));
+  CYC(b_+102, b_+105);
   interactionDelete_hook(gb);
 }
 
@@ -553,7 +553,7 @@ void monkeySubid2State1_hook(GB *gb) {
   BASE(monkeySubid2State1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
-  CYC(b_+3, SYM(monkeySubid4State1));
+  CYC(b_+3, b_+6);
   interactionAnimateAsNpc_hook(gb);
 }
 
@@ -622,7 +622,7 @@ static void monkey_subid0_substate2_hook(GB *gb, uint16_t sp0_) {
   CYC(b_+73, b_+75); L = 0x4f;
   CYC(b_+75, b_+77); mem_wr(gb, HL, 0x00);
   CYC(b_+77, b_+79); L = 0x50;
-  CYC(b_+79, SYM(monkeySetAnimationAndJump)); mem_wr(gb, HL, 0x3c);
+  CYC(b_+79, b_+81); mem_wr(gb, HL, 0x3c);
   monkeySetAnimationAndJump_hook(gb);
 }
 
@@ -847,7 +847,7 @@ void monkeyAnimateAndRunScript_hook(GB *gb) {
   BASE(monkeyAnimateAndRunScript);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
-  CYC(b_+3, SYM(monkeySubid5State1_monkey9));
+  CYC(b_+3, b_+6);
   interactionAnimateAsNpc_hook(gb);
 }
 
@@ -1147,7 +1147,7 @@ static void monkey_init_set_animation(GB *gb) {
   BASE(interactionCode39_body);
   CYC(b_+462, b_+464); E = 0x7a;
   CYC(b_+464, b_+465); mem_wr(gb, DE, A);
-  CYC(b_+465, SYM(monkeyState1));
+  CYC(b_+465, b_+468);
   interactionSetAnimation_hook(gb);
 }
 

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode24), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode24), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void partCode24_hook(GB *gb) {
   BASE(partCode24);
@@ -45,5 +45,5 @@ L_6029:
   CALL_C(b_+51, objectMakeTileSolid_hook, SYM(objectMakeTileSolid), b_+54);
   CYC(b_+54, b_+56); H = 0xcf;
   CYC(b_+56, b_+58); mem_wr(gb, HL, 0x0a);
-  CYC(b_+58, SYM(partCode25)); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+58, b_+61); objectSetVisible83_hook(gb); return; // jp
 }

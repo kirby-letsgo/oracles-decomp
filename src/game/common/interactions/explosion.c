@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode56), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode56), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void interactionCode56_hook(GB *gb) {
   BASE(interactionCode56);
@@ -35,5 +35,5 @@ L_495f:
     CYCT(b_+29, b_+32); objectSetVisible81_hook(gb); return;
   }
   CYC(b_+29, b_+32);
-  CYC(b_+32, SYM(interactionCode60)); objectSetVisible82_hook(gb); return;
+  CYC(b_+32, b_+35); objectSetVisible82_hook(gb); return;
 }

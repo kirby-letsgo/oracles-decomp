@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode33), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode33), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // Enemy struct fields live at $80 + offset (same layout as interactions at $40).
 

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode1a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode1a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t enemyArrow_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -142,5 +142,5 @@ L_5144:
   CYC(b_+131, b_+133); E = 0xc4; // Part.state
   CYC(b_+133, b_+134); mem_wr(gb, DE, A);
   CYC(b_+134, b_+136); A = 0x04;
-  CYC(b_+136, SYM(partCode1b)); partCommon_bounceWhenCollisionsEnabled_hook(gb); return; // jp
+  CYC(b_+136, b_+139); partCommon_bounceWhenCollisionsEnabled_hook(gb); return; // jp
 }

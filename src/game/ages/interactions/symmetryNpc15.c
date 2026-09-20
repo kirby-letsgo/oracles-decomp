@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(symmetryNpc_getTuniNutState), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(symmetryNpc_getTuniNutState), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void symmetryNpc_getTuniNutState_hook(GB *gb);
 
@@ -24,7 +24,7 @@ void symmetryNpc_getTuniNutState_hook(GB *gb) {
 store:
   CYC(b_+14, b_+15); A = B;
   CYC(b_+15, b_+18); mem_wr(gb, wTmpcfc0_bigBangGame_filler1, A);
-  CYC(b_+18, SYM(symmetryNpc_setRoomFlagIfTalkedToRightSister)); ret_effect(gb);
+  CYC(b_+18, b_+19); ret_effect(gb);
 }
 
 void symmetryNpc_setRoomFlagIfTalkedToRightSister_hook(GB *gb) {
@@ -36,7 +36,7 @@ void symmetryNpc_setRoomFlagIfTalkedToRightSister_hook(GB *gb) {
   CYC(b_+6, b_+8); alu_sub(gb, 0x08);
   CYC(b_+8, b_+9); alu_or(gb, mem_rd(gb, HL));
   CYC(b_+9, b_+10); mem_wr(gb, HL, A);
-  CYC(b_+10, SYM(symmetryNpc_getTuniNutStateForSister)); ret_effect(gb);
+  CYC(b_+10, b_+11); ret_effect(gb);
 }
 
 void symmetryNpc_getTuniNutStateForSister_hook(GB *gb) {
@@ -61,7 +61,7 @@ void symmetryNpc_getTuniNutStateForSister_hook(GB *gb) {
 store:
   CYC(b_+26, b_+27); A = C;
   CYC(b_+27, b_+30); mem_wr(gb, wTmpcfc0_bigBangGame_filler1, A);
-  CYC(b_+30, SYM(symmetryNpc_getUpgradeCapacityForText)); ret_effect(gb);
+  CYC(b_+30, b_+31); ret_effect(gb);
 }
 
 void symmetryNpc_getUpgradeCapacityForText_hook(GB *gb) {
@@ -85,5 +85,5 @@ finish:
   CYC(b_+24, b_+25); mem_wr(gb, HL, C);
   CYC(b_+25, b_+26); SET_HL(HL + 1);
   CYC(b_+26, b_+28); mem_wr(gb, HL, 0x00);
-  CYC(b_+28, SYM(symmetryNpcSubid8And9Script_b15)); ret_effect(gb);
+  CYC(b_+28, b_+29); ret_effect(gb);
 }

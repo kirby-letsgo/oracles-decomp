@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode32), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode32), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t subterrorDirt_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -52,5 +52,5 @@ state1:
   CYC(b_+25, b_+26); alu_or(gb, A);
   if (!(F & FZ)) { RET_TAKEN(b_+26); return; } // ret nz
   CYC(b_+26, b_+27);
-  CYC(b_+27, SYM(partCode33)); partDelete_hook(gb); return; // jp
+  CYC(b_+27, b_+30); partDelete_hook(gb); return; // jp
 }

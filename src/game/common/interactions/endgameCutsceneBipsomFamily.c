@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodea7), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodea7), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCodea7_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -118,5 +118,5 @@ substate2:
   if (!(F & FZ)) { CYCT(b_+114, b_+115); ret_effect(gb); return; } // ret nz
   CYC(b_+114, b_+115);
   CYC(b_+115, b_+117); A = 0x03;
-  CYC(b_+117, SYM(interactionCodea8)); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+117, b_+120); interactionSetAnimation_hook(gb); return; // jp
 }

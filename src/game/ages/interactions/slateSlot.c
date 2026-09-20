@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodedb), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodedb), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCodedb_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -110,5 +110,5 @@ state2:
   CALL_C(b_+93, interactionRunScript_hook, SYM(interactionRunScript), b_+96);
   if (!(F & FC)) { CYCT(b_+96, b_+97); ret_effect(gb); return; } // ret nc
   CYC(b_+96, b_+97);
-  CYC(b_+97, SYM(func_7fa1)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+97, b_+100); interactionDelete_hook(gb); return; // jp
 }

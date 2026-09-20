@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode10), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode10), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // mainScripts.faroreScript (bank $0c script data, referenced by address only).
 #define faroreScript_bank0c SYM(faroreScript)
@@ -57,8 +57,8 @@ state0:
   return;
 
 state1:
-  CYC(b_+43, b_+46); SET_BC((SYM(extractColorComponents) + 29));
+  CYC(b_+43, b_+46); SET_BC(0x1406);
   CALL_C(b_+46, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+49);
   CALL_C(b_+49, interactionRunScript_hook, SYM(interactionRunScript), b_+52);
-  CYC(b_+52, SYM(interactionCode11)); interactionAnimate_hook(gb);
+  CYC(b_+52, b_+55); interactionAnimate_hook(gb);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(child_addValueToChildStatus), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(child_addValueToChildStatus), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void child_addValueToChildStatus_hook(GB *gb);
 void child_checkHasRupees_hook(GB *gb);
@@ -35,7 +35,7 @@ void child_checkHasRupees_hook(GB *gb) {
 void child_setStage8ResponseToSelectedTextOption_hook(GB *gb) {
   BASE(child_setStage8ResponseToSelectedTextOption);
   CYC(b_+0, b_+3); SET_HL(wSelectedTextOption);
-  CYC(b_+3, SYM(child_setStage8Response)); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+3, b_+4); alu_add(gb, mem_rd(gb, HL));
   child_setStage8Response_hook(gb);
 }
 
@@ -60,19 +60,19 @@ void child_playMusic_hook(GB *gb) {
 
 playHigh:
   CYC(b_+11, b_+13); A = 0x4a;
-  CYC(b_+13, SYM(child_giveHeartRefill)); playSound_b00_hook(gb);
+  CYC(b_+13, b_+16); playSound_b00_hook(gb);
 }
 
 static void child_giveHealthFromC(GB *gb) {
   BASE(child_giveOneHeart);
   CYC(b_+2, b_+4); A = 0x29;
-  CYC(b_+4, SYM(child_giveRupees)); giveTreasure_hook(gb);
+  CYC(b_+4, b_+7); giveTreasure_hook(gb);
 }
 
 void child_giveHeartRefill_hook(GB *gb) {
   BASE(child_giveHeartRefill);
   CYC(b_+0, b_+2); C = 0x40;
-  CYC(b_+2, SYM(child_giveOneHeart));
+  CYC(b_+2, b_+4);
   child_giveHealthFromC(gb);
 }
 
@@ -86,5 +86,5 @@ void child_giveRupees_hook(GB *gb) {
   BASE(child_giveRupees);
   CYC(b_+0, b_+1); C = A;
   CYC(b_+1, b_+3); A = 0x28;
-  CYC(b_+3, SYM(nayruScript01_b15)); giveTreasure_hook(gb);
+  CYC(b_+3, b_+6); giveTreasure_hook(gb);
 }

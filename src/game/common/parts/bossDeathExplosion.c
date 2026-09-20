@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode04), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode04), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void partCode04_hook(GB *gb) {
   BASE(partCode04);
@@ -51,5 +51,5 @@ state0:
   } else {
     CYC(b_+46, b_+49);
   }
-  CYC(b_+49, SYM(partCode05)); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+49, b_+52); objectSetVisible80_hook(gb); return; // jp
 }

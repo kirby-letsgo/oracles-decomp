@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(func_5535), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(func_5535), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t fallingFire_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -46,7 +46,7 @@ void func_5535_hook(GB *gb) {
   CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+3, b_+5); L = 0xe4; // Part.collisionType
   CYC(b_+5, b_+7); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  CYC(b_+7, SYM(func_553f)); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+7, b_+10); objectSetVisible81_hook(gb); return; // jp
 }
 
 void func_553f_hook(GB *gb) {
@@ -139,5 +139,5 @@ subid2:
   CYC(b_+80, b_+81); A = mem_rd(gb, HL);
   CYC(b_+81, b_+83); alu_adc(gb, 0x00);
   CYC(b_+83, b_+84); mem_wr(gb, HL, A);
-  CYC(b_+84, SYM(func_5535)); partAnimate_hook(gb); return; // jp
+  CYC(b_+84, b_+87); partAnimate_hook(gb); return; // jp
 }

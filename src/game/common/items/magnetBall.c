@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode29), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode29), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t magnet_ball_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -39,7 +39,7 @@ void itemCode29_hook(GB *gb) {
       CYC(b_+20, b_+21); mem_wr(gb, DE, A);
       CYC(b_+21, b_+24); objectSetVisible81_hook(gb); return;
     }
-    else if (jt_ == b_+24) { CYC(b_+24, SYM(itemCode0fPost)); ret_effect(gb); return; }
+    else if (jt_ == b_+24) { CYC(b_+24, b_+25); ret_effect(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

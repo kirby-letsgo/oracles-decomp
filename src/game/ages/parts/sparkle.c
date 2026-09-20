@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode26), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode26), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static void sparkle_addAToHl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -135,5 +135,5 @@ var03_00:
   CYC(b_+134, b_+135); A = alu_dec8(gb, A);
   CYC(b_+135, b_+136); alu_add(gb, A);
   CYC(b_+136, b_+137); mem_wr(gb, DE, A);
-  CYC(b_+137, SYM(table_6114)); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+137, b_+140); objectSetVisible81_hook(gb); return; // jp
 }

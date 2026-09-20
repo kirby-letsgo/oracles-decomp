@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(label_0b_006), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(label_0b_006), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t bipin_jump_table(GB *gb) {
   burn_rom(gb, 0, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -65,7 +65,7 @@ static void bipin_label_006(GB *gb) {
   CYC(b_+10, b_+11); SET_HL(HL + 1);
   CYC(b_+11, b_+12); A = mem_rd(gb, HL);
   CYC(b_+12, b_+15); mem_wr(gb, wChildPersonality, A);
-  CYC(b_+15, SYM(initialChildPersonalityTable)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }
 
 void label_0b_006_hook(GB *gb) {
@@ -75,7 +75,7 @@ void label_0b_006_hook(GB *gb) {
 void decideInitialChildPersonality_hook(GB *gb) {
   BASE(decideInitialChildPersonality);
   CYC(b_+0, b_+3); SET_HL(SYM(initialChildPersonalityTable));
-  CYC(b_+3, SYM(decideFinalChildPersonality));
+  CYC(b_+3, b_+5);
   bipin_label_006(gb);
 }
 
@@ -87,7 +87,7 @@ void decideFinalChildPersonality_hook(GB *gb) {
   CYC(b_+5, b_+6); alu_add(gb, A);
   CYC(b_+6, b_+7); alu_add(gb, B);
   CYC(b_+7, b_+10); SET_HL(SYM(finalChildPersonalityTable));
-  CYC(b_+10, SYM(label_0b_006)); bipin_add_a_to_hl(gb, SYM(label_0b_006));
+  CYC(b_+10, b_+11); bipin_add_a_to_hl(gb, SYM(label_0b_006));
   bipin_label_006(gb);
 }
 
@@ -104,7 +104,7 @@ void initializeChildOnGameStart_hook(GB *gb) {
   CYC(b_+6, b_+8); A = 5;
   CYC(b_+8, b_+10); L = 0xe0;
   CYC(b_+10, b_+11); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+11, SYM(decideInitialChildPersonality)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+11, b_+12); mem_wr(gb, HL, A); SET_HL(HL + 1);
   decideInitialChildPersonality_hook(gb);
 }
 
@@ -164,6 +164,7 @@ void interactionCodeac__gotoNextState_hook(GB *gb) {
 }
 
 static void bipin_need_essences(GB *gb, uint16_t from, uint8_t amount) {
+  BANKOF(label_0b_006);
   CYC(from, from + 2); E = 0x78;
   CYC(from + 2, from + 4); A = mem_rd(gb, DE);
   CYC(from + 4, from + 6); alu_cp(gb, amount);

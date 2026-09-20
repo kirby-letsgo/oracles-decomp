@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode1f), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode1f), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t enemyCode1f_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -121,5 +121,5 @@ stateA:
   if (F & FC) { CYCT(b_+99, b_+101); goto animate; } // jr c
   CYC(b_+99, b_+101);
   CALL_C(b_+101, decNumEnemies_hook, SYM(decNumEnemies), b_+104);
-  CYC(b_+104, SYM(enemyCode26)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+104, b_+107); enemyDelete_hook(gb); return; // jp
 }

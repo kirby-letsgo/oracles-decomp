@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodea2), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodea2), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // Bare-global, implemented in src/game/movingSidescrollPlatform.c; shared by both interactions'
 // updateState jump tables (both @-locals dispatch their last entry into it identically).

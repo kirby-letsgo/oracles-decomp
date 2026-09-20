@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode2a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode2a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t spikedBall_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -129,7 +129,7 @@ void spikedBall_head_state1_hook(GB *gb) {
   CYC(b_+3, b_+4); A = alu_inc8(gb, A);
   CYC(b_+4, b_+6); alu_and(gb, 0x1f);
   CYC(b_+6, b_+7); mem_wr(gb, DE, A);
-  CYC(b_+7, SYM(spikedBall_head_state2)); spikedBall_head_setDefaultDistanceAway_hook(gb); return; // jr
+  CYC(b_+7, b_+9); spikedBall_head_setDefaultDistanceAway_hook(gb); return; // jr
 }
 
 void spikedBall_head_state2_hook(GB *gb) {
@@ -138,7 +138,7 @@ void spikedBall_head_state2_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+5); alu_add(gb, 0x02);
   CYC(b_+5, b_+7); alu_and(gb, 0x1f);
-  CYC(b_+7, SYM(spikedBall_head_setDefaultDistanceAway)); mem_wr(gb, DE, A);
+  CYC(b_+7, b_+8); mem_wr(gb, DE, A);
   spikedBall_head_setDefaultDistanceAway_hook(gb); // falls through
 }
 
@@ -146,7 +146,7 @@ void spikedBall_head_setDefaultDistanceAway_hook(GB *gb) {
   BASE(spikedBall_head_setDefaultDistanceAway);
   CYC(b_+0, b_+2); E = 0xf0; // Part.var30
   CYC(b_+2, b_+4); A = 0x0a;
-  CYC(b_+4, SYM(spikedBall_updatePosition)); mem_wr(gb, DE, A);
+  CYC(b_+4, b_+5); mem_wr(gb, DE, A);
   spikedBall_updatePosition_hook(gb); // falls through
 }
 
@@ -157,17 +157,17 @@ void spikedBall_updatePosition_hook(GB *gb) {
   CYC(b_+3, b_+5); E = 0xf0; // Part.var30
   CYC(b_+5, b_+6); A = mem_rd(gb, DE);
   CYC(b_+6, b_+8); E = 0xc9; // Part.angle
-  CYC(b_+8, SYM(spikedBall_head_state3)); objectSetPositionInCircleArc_hook(gb); return; // jp
+  CYC(b_+8, b_+11); objectSetPositionInCircleArc_hook(gb); return; // jp
 }
 
 void spikedBall_head_state3_hook(GB *gb) {
   BASE(spikedBall_head_state3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, spikedBall_copyParentPosition_hook, SYM(spikedBall_copyParentPosition), b_+3);
-  CYC(b_+3, b_+5); A = hram_rd(gb, 0xb0); // hEnemyTargetY
-  CYC(b_+5, b_+7); hram_wr(gb, 0x8f, A);
-  CYC(b_+7, b_+9); A = hram_rd(gb, 0xb1); // hEnemyTargetX
-  CYC(b_+9, b_+11); hram_wr(gb, 0x8e, A);
+  CYC(b_+3, b_+5); A = mem_rd(gb, hEnemyTargetY); // hEnemyTargetY
+  CYC(b_+5, b_+7); mem_wr(gb, hFF8F, A);
+  CYC(b_+7, b_+9); A = mem_rd(gb, hEnemyTargetX); // hEnemyTargetX
+  CYC(b_+9, b_+11); mem_wr(gb, hFF8E, A);
   CYC(b_+11, b_+12); push_effect(gb, HL);
   CALL_C(b_+12, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+15);
   CYC(b_+15, b_+16); SET_BC(pop_effect(gb));
@@ -191,7 +191,7 @@ void spikedBall_head_state3_hook(GB *gb) {
   CYC(b_+42, b_+43); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+43, b_+45); L = 0xf0; // Part.var30
   CYC(b_+45, b_+47); mem_wr(gb, HL, 0x0d);
-  CYC(b_+47, SYM(spikedBall_head_state4)); spikedBall_updatePosition_hook(gb); return; // jp
+  CYC(b_+47, b_+50); spikedBall_updatePosition_hook(gb); return; // jp
 }
 
 void spikedBall_head_state4_hook(GB *gb) {
@@ -212,7 +212,7 @@ void spikedBall_head_state4_hook(GB *gb) {
   CYC(b_+21, b_+23); A = 0x40;
   CYC(b_+23, b_+24); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+24, b_+26); mem_wr(gb, HL, 0x03);
-  CYC(b_+26, SYM(spikedBall_head_state5)); spikedBall_updatePosition_hook(gb); return; // jp
+  CYC(b_+26, b_+29); spikedBall_updatePosition_hook(gb); return; // jp
 }
 
 void spikedBall_head_state5_hook(GB *gb) {
@@ -220,7 +220,7 @@ void spikedBall_head_state5_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, spikedBall_checkCollisionWithItem_hook, SYM(spikedBall_checkCollisionWithItem), b_+3);
   CALL_C(b_+3, spikedBall_head_updateDistanceFromOrigin_hook, SYM(spikedBall_head_updateDistanceFromOrigin), b_+6);
-  CYC(b_+6, SYM(spikedBall_chain)); spikedBall_updatePosition_hook(gb); return; // jp
+  CYC(b_+6, b_+9); spikedBall_updatePosition_hook(gb); return; // jp
 }
 
 void spikedBall_chain_hook(GB *gb) {
@@ -249,7 +249,7 @@ chain_state1:
   CALL_C(b_+28, spikedBall_chain_updateDistanceFromOrigin_hook, SYM(spikedBall_chain_updateDistanceFromOrigin), b_+31);
   CYC(b_+31, b_+33); L = 0xd7; // Part.relatedObj1+1
   CYC(b_+33, b_+34); B = mem_rd(gb, HL);
-  CYC(b_+34, SYM(spikedBall_copyParentPosition)); spikedBall_updatePosition_hook(gb); return; // jp
+  CYC(b_+34, b_+37); spikedBall_updatePosition_hook(gb); return; // jp
 }
 
 void spikedBall_copyParentPosition_hook(GB *gb) {

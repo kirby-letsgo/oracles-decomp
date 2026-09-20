@@ -214,6 +214,7 @@ def main():
             if bare in ages.labels: insts = [ages.labels[bare]]
         if not insts: continue
         s_insts = seasons.instances.get(bare) or ([seasons.labels[bare]] if bare in seasons.labels else None)
+        if re.match(r'^(_label_[0-9a-f]{2}_\d+|func_[0-9a-f]{2}_[0-9a-f]{4}|label_[0-9a-f]{2}_\d+)', bare.split('@')[0]): s_insts = None
         if not s_insts:
             results[n] = ('AGES_ONLY', '', 0)
             continue

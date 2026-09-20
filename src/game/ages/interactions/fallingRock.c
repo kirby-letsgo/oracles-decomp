@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode92), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode92), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t fallingRock_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -231,8 +231,8 @@ lowSpeed:
 state1:
   CYC(b_+94, b_+97); A = W8(wTmpcfc0_goronCutscenes_cfde);
   CYC(b_+97, b_+98); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+98, SYM(fallingRock_updateSpeedAndDeleteWhenLanded)); interactionDelete_hook(gb); return; } // jp nz
-  CYC(b_+98, SYM(fallingRock_updateSpeedAndDeleteWhenLanded));
+  if (!(F & FZ)) { CYCT(b_+98, b_+101); interactionDelete_hook(gb); return; } // jp nz
+  CYC(b_+98, b_+101);
   fallingRock_updateSpeedAndDeleteWhenLanded_hook(gb); return; // falls through
 }
 
@@ -243,7 +243,7 @@ void fallingRock_updateSpeedAndDeleteWhenLanded_hook(GB *gb) {
   CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
   if (F & FZ) { CYCT(b_+5, b_+8); interactionDelete_hook(gb); return; } // jp z
   CYC(b_+5, b_+8);
-  CYC(b_+8, SYM(fallingRock_subid03)); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+8, b_+11); objectApplySpeed_hook(gb); return; // jp
 }
 
 // A twinkle? angle is a value from 0-3, indicating a diagonal to move in.
@@ -283,7 +283,7 @@ void fallingRock_subid03_state1_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+5, b_+8); interactionDelete_hook(gb); return; } // jp z
   CYC(b_+5, b_+8);
   CALL_C(b_+8, interactionAnimate_hook, SYM(interactionAnimate), b_+11);
-  CYC(b_+11, SYM(fallingRock_subid04)); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+11, b_+14); objectApplySpeed_hook(gb); return; // jp
 }
 
 // Blue/Red rock debris, moving straight on a diagonal? (angle from 0-3). fallingRock_subid04
@@ -308,7 +308,7 @@ state1:
   if (F & FZ) { CYCT(b_+20, b_+23); interactionDelete_hook(gb); return; } // jp z
   CYC(b_+20, b_+23);
   CALL_C(b_+23, interactionAnimate_hook, SYM(interactionAnimate), b_+26);
-  CYC(b_+26, SYM(fallingRock_subid06)); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+26, b_+29); objectApplySpeed_hook(gb); return; // jp
 }
 
 void fallingRock_subid04_hook(GB *gb) {
@@ -365,7 +365,7 @@ void fallingRock_initGraphicsAndIncState_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+3);
   CALL_C(b_+3, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+6);
-  CYC(b_+6, SYM(fallingRock_chooseRandomPosition)); interactionIncState_hook(gb); return; // jp
+  CYC(b_+6, b_+9); interactionIncState_hook(gb); return; // jp
 }
 
 // Randomly choose a position from a list of possible positions. var03 determines which

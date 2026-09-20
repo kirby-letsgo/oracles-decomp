@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(movingPlatform_stateC), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(movingPlatform_stateC), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCodea1_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -43,7 +43,7 @@ void movingPlatform_stateC_hook(GB *gb) {
   CALL_C(b_+0, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+3);
   if (!(F & FZ)) { CYCT(b_+3, b_+4); ret_effect(gb); return; } // ret nz
   CYC(b_+3, b_+4);
-  CYC(b_+4, SYM(interactionCodea2)); sidescrollPlatformFunc_5bfc_hook(gb); return; // jp
+  CYC(b_+4, b_+7); sidescrollPlatformFunc_5bfc_hook(gb); return; // jp
 }
 
 // ==================================================================================================
@@ -172,7 +172,7 @@ stateB:
 l_58bf:
   CYC(b_+168, b_+169); A = mem_rd(gb, DE);
   CYC(b_+169, b_+170); mem_wr(gb, HL, A);
-  CYC(b_+170, SYM(movingPlatform_stateC)); sidescrollPlatformFunc_5bfc_hook(gb); goto afterUpdateSubid; // jp
+  CYC(b_+170, b_+173); sidescrollPlatformFunc_5bfc_hook(gb); goto afterUpdateSubid; // jp
 
 afterUpdateSubid:
   if (!(gb->pc == b_+6 && gb->sp == sp0_)) { hook_continue(gb, gb->pc, sp0_); return; }

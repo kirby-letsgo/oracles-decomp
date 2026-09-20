@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodec4), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodec4), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/object_code/ages/interactions/pirate.s (interactionCodec4 / INTERAC_PIRATE),
 // bank 0x0b. Distinct from src/game/pirateShip.c and src/game/pirateShipInteraction.c
@@ -52,7 +52,7 @@ static void interactionCodec4_resetPushCounter(GB *gb) {
   CYC(b_+214, b_+216); E = INTERACTION_BASE + OBJ_VAR3F;
   CYC(b_+216, b_+218); A = 10;
   CYC(b_+218, b_+219); mem_wr(gb, DE, A);
-  CYC(b_+219, SYM(interactionCodec5)); return; // ret
+  CYC(b_+219, b_+220); return; // ret
 }
 
 // interactionCodec4@checkCenteredWithLink (0b:73eb): single caller (@state3), tail-jumps into the
@@ -174,7 +174,7 @@ state3: // interactionCodec4@state3
   CALL_C(b_+170, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+173);
   if (F & FC) { CYCT(b_+173, b_+175); goto haveEyeball; } // jr c
   CYC(b_+173, b_+175);
-  CYC(b_+175, b_+178); SET_BC((SYM(clearParts) + 8)); // TX_360d
+  CYC(b_+175, b_+178); SET_BC(0x360d); // TX_360d
   CALL_C(b_+178, showText_hook, SYM(showText), b_+181);
   CYC(b_+181, b_+183); interactionCodec4_resetPushCounter(gb); return; // jr
 

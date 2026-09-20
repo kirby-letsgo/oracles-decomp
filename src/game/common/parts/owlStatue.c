@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode13), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode13), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t owlStatue_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -131,5 +131,5 @@ L_4d07:
   CYC(b_+119, b_+121); L = 0xc2; // Part.subid
   CYC(b_+121, b_+122); C = mem_rd(gb, HL);
   CYC(b_+122, b_+124); B = 0x39;
-  CYC(b_+124, SYM(partCode14)); showText_hook(gb); return; // jp
+  CYC(b_+124, b_+127); showText_hook(gb); return; // jp
 }

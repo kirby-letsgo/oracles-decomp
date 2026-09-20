@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCoded6), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCoded6), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // 0b:79b9, called once from interactionCoded6@state0.
 void interactionCoded6_initialize_hook(GB *gb) {
@@ -12,7 +12,7 @@ void interactionCoded6_initialize_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+62, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+65);
   CALL_C(b_+65, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+68);
-  CYC(b_+68, SYM(interactionCoded7)); interactionIncState_hook(gb); return; // jp
+  CYC(b_+68, b_+71); interactionIncState_hook(gb); return; // jp
 }
 
 // ==================================================================================================

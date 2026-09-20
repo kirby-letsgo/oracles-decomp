@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(bombchuUpdateVelocity), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(bombchuUpdateVelocity), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void bombchuUpdateSpeed_hook(GB *gb);
 void bombchuGetTileCollisions_hook(GB *gb);
@@ -63,7 +63,7 @@ void bombchuUpdateVelocity_hook(GB *gb) {
   CYC(b_+0, b_+3); A = W8(wFrameCounter);
   CYC(b_+3, b_+5); alu_and(gb, 0x07);
   if (F & FZ) CALL_C_CC(b_+5, bombchuUpdateAngle_topDown_hook, SYM(bombchuUpdateAngle_topDown), SYM(bombchuUpdateSpeed));
-  else CYC(b_+5, SYM(bombchuUpdateSpeed));
+  else CYC(b_+5, b_+8);
   bombchuUpdateSpeed_hook(gb);
 }
 
@@ -121,7 +121,7 @@ impassable:
   CYC(b_+60, b_+61); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+61, b_+63); alu_and(gb, 0x18);
   CYC(b_+63, b_+64); mem_wr(gb, HL, A);
-  CYC(b_+64, SYM(bombchuGetTileCollisions));
+  CYC(b_+64, b_+67);
   bombchuSetAnimationFromAngle_hook(gb);
 }
 
@@ -164,7 +164,7 @@ void bombchuUpdateVelocityAndClimbing_sidescroll_hook(GB *gb) {
   CYC(b_+0, b_+3); A = W8(wFrameCounter);
   CYC(b_+3, b_+5); alu_and(gb, 0x07);
   if (F & FZ) CALL_C_CC(b_+5, bombchuUpdateAngle_sidescrolling_hook, SYM(bombchuUpdateAngle_sidescrolling), SYM(bombchuCheckWallsAndApplySpeed));
-  else CYC(b_+5, SYM(bombchuCheckWallsAndApplySpeed));
+  else CYC(b_+5, b_+8);
   bombchuCheckWallsAndApplySpeed_hook(gb);
 }
 
@@ -284,7 +284,7 @@ touching_wall:
   }
   CYC(b_+120, b_+122);
   CYC(b_+122, b_+123); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+123, SYM(bombchuUpdateAngle_topDown));
+  CYC(b_+123, b_+125);
   bombchuSetAnimationFromAngle_hook(gb);
 }
 
@@ -322,7 +322,7 @@ void bombchuUpdateAngle_topDown_hook(GB *gb) {
     CYC(b_+29, b_+31); A = 0xf8;
   }
   CYC(b_+31, b_+33); E = 0x31;
-  CYC(b_+33, SYM(bombchuSetAnimationFromAngle)); mem_wr(gb, DE, A);
+  CYC(b_+33, b_+34); mem_wr(gb, DE, A);
   bombchuSetAnimationFromAngle_hook(gb);
 }
 
@@ -353,7 +353,7 @@ void bombchuSetAnimationFromAngle_hook(GB *gb) {
       CYC(b_+23, b_+24); A = alu_inc8(gb, A);
     }
   }
-  CYC(b_+24, SYM(bombchuUpdateAngle_sidescrolling));
+  CYC(b_+24, b_+27);
   itemSetAnimation_hook(gb);
 }
 
@@ -402,7 +402,7 @@ horizontal:
 set_angle:
   CYC(b_+43, b_+45); E = 0x09;
   CYC(b_+45, b_+46); mem_wr(gb, DE, A);
-  CYC(b_+46, SYM(bombchuSetPositionInFrontOfLink));
+  CYC(b_+46, b_+48);
   bombchuSetAnimationFromAngle_hook(gb);
 }
 
@@ -451,8 +451,8 @@ void bombchuCountdownToExplosion_hook(GB *gb) {
   BASE(bombchuCountdownToExplosion);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, itemDecCounter2_hook, SYM(itemDecCounter2), b_+3);
-  if (!(F & FZ)) { CYCT(b_+3, SYM(bombchuClearCounter2AndInitializeExplosion)); ret_effect(gb); return; }
-  CYC(b_+3, SYM(bombchuClearCounter2AndInitializeExplosion));
+  if (!(F & FZ)) { CYCT(b_+3, b_+4); ret_effect(gb); return; }
+  CYC(b_+3, b_+4);
   bombchuClearCounter2AndInitializeExplosion_hook(gb);
 }
 
@@ -461,7 +461,7 @@ void bombchuClearCounter2AndInitializeExplosion_hook(GB *gb) {
   CYC(b_+0, b_+2); E = 0x07;
   CYC(b_+2, b_+3); alu_xor(gb, A);
   CYC(b_+3, b_+4); mem_wr(gb, DE, A);
-  CYC(b_+4, SYM(bombchuCheckCollidedWithTarget));
+  CYC(b_+4, b_+7);
   itemInitializeBombExplosion_hook(gb);
 }
 
@@ -475,7 +475,7 @@ void bombchuCheckCollidedWithTarget_hook(GB *gb) {
   CYC(b_+7, b_+8); alu_scf(gb);
   if (F & FZ) { CYCT(b_+8, b_+9); ret_effect(gb); return; }
   CYC(b_+8, b_+9);
-  CYC(b_+9, SYM(bombchuCheckForEnemyTarget));
+  CYC(b_+9, b_+12);
   checkObjectsCollided_hook(gb);
 }
 
@@ -494,7 +494,7 @@ static void bombchu_increase_vision_radius(GB *gb) {
   CYC(b_+102, b_+103); mem_wr(gb, DE, A);
   CYC(b_+103, b_+104); E = alu_inc8(gb, E);
   CYC(b_+104, b_+105); mem_wr(gb, DE, A);
-  CYC(b_+105, SYM(bombchuTargets)); ret_effect(gb);
+  CYC(b_+105, b_+106); ret_effect(gb);
 }
 
 void bombchuCheckForEnemyTarget_hook(GB *gb) {
@@ -763,6 +763,6 @@ ss_state3:
   }
   CYC(b_+214, b_+217);
   CALL_C(b_+217, bombchuUpdateVelocityAndClimbing_sidescroll_hook, SYM(bombchuUpdateVelocityAndClimbing_sidescroll), b_+220);
-  CYC(b_+220, SYM(bombchuUpdateVelocity));
+  CYC(b_+220, b_+222);
   goto animate_sidescroll;
 }

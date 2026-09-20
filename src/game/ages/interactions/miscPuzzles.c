@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode90), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode90), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t miscPuzzles_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -215,7 +215,7 @@ state3:
 alreadyOpened:
   CYC(b_+111, b_+113); A = 0x01;
   CYC(b_+113, b_+116); W8(wActiveTriggers) = A;
-  CYC(b_+116, SYM(miscPuzzles_subid01)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+116, b_+119); interactionDelete_hook(gb); return; // jp
 }
 
 // Underwater switch hook puzzle in past d6
@@ -258,7 +258,7 @@ void miscPuzzles_subid02_hook(GB *gb) {
   CYC(b_+31, b_+32); mem_wr(gb, BC, A);
   CYC(b_+32, b_+34); A = 0x4d; // SND_SOLVEPUZZLE
   CALL_C(b_+34, playSound_b00_hook, SYM(playSound_b00), b_+37);
-  CYC(b_+37, SYM(miscPuzzles_subid03)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+37, b_+40); interactionDelete_hook(gb); return; // jp
 }
 
 // Chest from solving colored cube puzzle in d6 (related to subid $02)
@@ -304,7 +304,7 @@ nextTile:
   CYC(b_+14, b_+15); alu_cp(gb, E);
   if (!(F & FZ)) { RET_TAKEN(b_+15); return; } // ret nz
   CYC(b_+15, b_+16);
-  CYC(b_+16, SYM(miscPuzzles_subid04)); goto nextTile; // jr
+  CYC(b_+16, b_+18); goto nextTile; // jr
 }
 
 // Floor changer in present D6, triggered by orb
@@ -368,7 +368,7 @@ state0:
   CYC(b_+62, b_+65); A = W8(wToggleBlocksState);
   CYC(b_+65, b_+67); E = INTERACTION_BASE + OBJ_COUNTER2;
   CYC(b_+67, b_+68); mem_wr(gb, DE, A);
-  CYC(b_+68, SYM(miscPuzzles_subid05)); interactionIncState_hook(gb); return; // jp
+  CYC(b_+68, b_+71); interactionIncState_hook(gb); return; // jp
 }
 
 // Helpers for floor changer (subid $04). subid05 and subid06 both target 0a:6e25 in
@@ -439,7 +439,7 @@ deleteSelf:
   CYC(b_+93, b_+94); alu_xor(gb, A);
   CYC(b_+94, b_+97); W8(wDisabledObjects) = A;
   CYC(b_+97, b_+100); W8(wMenuDisabled) = A;
-  CYC(b_+100, SYM(miscPuzzles_subid07)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+100, b_+103); interactionDelete_hook(gb); return; // jp
 
   // [var30] += [var31]; shared by @nextTile and @setTile, both at top-level depth (sp0_).
 nextRow:
@@ -630,7 +630,7 @@ void miscPuzzles_subid08_hook(GB *gb) {
   CYC(b_+8, b_+9);
   CYC(b_+9, b_+11); L = 0x19; // <ROOM_AGES_519
   CYC(b_+11, b_+13); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01); // set 0,(hl)
-  CYC(b_+13, SYM(miscPuzzles_subid09)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+13, b_+16); interactionDelete_hook(gb); return; // jp
 }
 
 // Checks to set the "bombable wall open" bit in d6 (east)
@@ -644,7 +644,7 @@ void miscPuzzles_subid09_hook(GB *gb) {
   CYC(b_+8, b_+9);
   CYC(b_+9, b_+11); L = 0x26; // <ROOM_AGES_526
   CYC(b_+11, b_+13); mem_wr(gb, HL, mem_rd(gb, HL) | 0x02); // set 1,(hl)
-  CYC(b_+13, SYM(miscPuzzles_subid0a)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+13, b_+16); interactionDelete_hook(gb); return; // jp
 }
 
 // Jabu-jabu water level controller script, in the room with the 3 buttons
@@ -754,7 +754,7 @@ state3:
   CYC(b_+153, b_+155); A = 0xf1; // SNDCTRL_STOPSFX
   CALL_C(b_+155, playSound_b00_hook, SYM(playSound_b00), b_+158);
   CYC(b_+158, b_+161); A = W8(wActiveMusic);
-  CYC(b_+161, SYM(miscPuzzles_subid0b)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+161, b_+164); playSound_b00_hook(gb); return; // jp
 }
 
 // Ladder spawner in d7 miniboss room
@@ -816,7 +816,7 @@ state2:
   CALL_C(b_+82, playSound_b00_hook, SYM(playSound_b00), b_+85);
   CYC(b_+85, b_+86); alu_xor(gb, A);
   CYC(b_+86, b_+89); W8(wDisableLinkCollisionsAndMenu) = A;
-  CYC(b_+89, SYM(miscPuzzles_subid0c)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+89, b_+92); interactionDelete_hook(gb); return; // jp
 }
 
 // Shared with subid19, which reaches this via `jp` from a fully independent call
@@ -824,12 +824,12 @@ state2:
 void miscPuzzles_dropSmallKeyHere_hook(GB *gb) {
   BASE(miscPuzzles_dropSmallKeyHere);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); SET_BC((SYM(enemyCodeTable) + 205)); // TREASURE_SMALL_KEY, $01
+  CYC(b_+0, b_+3); SET_BC(0x3001); // TREASURE_SMALL_KEY, $01
   CALL_C(b_+3, createTreasure_hook, SYM(createTreasure), b_+6);
   if (!(F & FZ)) { RET_TAKEN(b_+6); return; } // ret nz
   CYC(b_+6, b_+7);
   CALL_C(b_+7, objectCopyPosition_hook, SYM(objectCopyPosition), b_+10);
-  CYC(b_+10, SYM(miscPuzzles_subid0c_wantedTiles)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+10, b_+13); interactionDelete_hook(gb); return; // jp
 }
 
 // Switch hook puzzle early in d7 for a small key
@@ -841,7 +841,7 @@ void miscPuzzles_subid0c_hook(GB *gb) {
   CYC(b_+6, b_+9); SET_HL(SYM(miscPuzzles_subid0c_wantedTiles)); // miscPuzzles_subid0c_wantedTiles (pure ROM data, no C rep needed)
   CALL_C(b_+9, miscPuzzles_verifyTilesAtPositions_hook, SYM(miscPuzzles_verifyTilesAtPositions), b_+12);
   if (!(F & FZ)) { RET_TAKEN(b_+12); return; } // ret nz
-  CYC(b_+12, SYM(miscPuzzles_dropSmallKeyHere));
+  CYC(b_+12, b_+13);
   miscPuzzles_dropSmallKeyHere_hook(gb); return; // falls through
 }
 
@@ -912,7 +912,7 @@ state2:
   CYC(b_+90, b_+91); C = L;
   CYC(b_+91, b_+93); A = 0x52; // TILEINDEX_NORTH_STAIRS
   CALL_C(b_+93, setTile_hook, SYM(setTile), b_+96);
-  CYC(b_+96, SYM(miscPuzzles_subid0e)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+96, b_+99); interactionDelete_hook(gb); return; // jp
 }
 
 // Staircase spawner after putting in slates in d8
@@ -950,7 +950,7 @@ state1:
   CYC(b_+47, b_+48); C = L;
   CYC(b_+48, b_+50); A = 0x52; // TILEINDEX_NORTH_STAIRS
   CALL_C(b_+50, setTile_hook, SYM(setTile), b_+53);
-  CYC(b_+53, SYM(miscPuzzles_subid0f)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+53, b_+56); interactionDelete_hook(gb); return; // jp
 }
 
 // Octogon boss initialization (in the room just before the boss)
@@ -969,7 +969,7 @@ void miscPuzzles_subid0f_hook(GB *gb) {
   CYC(b_+14, b_+16); mem_wr(gb, HL, 0x78); // [x]
   CYC(b_+16, b_+17); L = alu_inc8(gb, L);
   CYC(b_+17, b_+18); mem_wr(gb, HL, A); // [var30] = $ff
-  CYC(b_+18, SYM(miscPuzzles_subid10)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+18, b_+21); interactionDelete_hook(gb); return; // jp
 }
 
 // Something at the top of Talus Peaks?
@@ -979,7 +979,7 @@ void miscPuzzles_subid10_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(wTmpcfc0_patchMinigame_fixingSword);
   CYC(b_+3, b_+5); B = 0x08;
   CALL_C(b_+5, clearMemory_hook, SYM(clearMemory), b_+8);
-  CYC(b_+8, SYM(miscPuzzles_subid11)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+8, b_+11); interactionDelete_hook(gb); return; // jp
 }
 
 // D5 keyhole opening
@@ -997,7 +997,7 @@ void miscPuzzles_subid11_hook(GB *gb) {
   CYC(b_+17, b_+18); push_effect(gb, DE); // push de
   CALL_C(b_+18, reloadTileMap_hook, SYM(reloadTileMap), b_+21);
   CYC(b_+21, b_+22); SET_DE(pop_effect(gb)); // pop de
-  CYC(b_+22, SYM(miscPuzzles_setScriptAndIncState)); SET_HL((SYM(twinrova_state1__runOtherHalf) + 15)); // mainScripts.miscPuzzles_crownDungeonOpeningScript
+  CYC(b_+22, b_+25); SET_HL((SYM(twinrova_state1__runOtherHalf) + 15)); // mainScripts.miscPuzzles_crownDungeonOpeningScript
   miscPuzzles_setScriptAndIncState_hook(gb); return; // falls into miscPuzzles_setScriptAndIncState
 }
 
@@ -1007,7 +1007,7 @@ void miscPuzzles_setScriptAndIncState_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionSetScript_hook, SYM(interactionSetScript), b_+3);
   CALL_C(b_+3, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+6);
-  CYC(b_+6, SYM(miscPuzzles_subid12)); interactionIncState_hook(gb); return; // jp
+  CYC(b_+6, b_+9); interactionIncState_hook(gb); return; // jp
 }
 
 // D6 present/past keyhole opening
@@ -1022,7 +1022,7 @@ void miscPuzzles_subid12_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+11, b_+14); interactionDelete_hook(gb); return; } // jp nz
   CYC(b_+11, b_+14);
   CYC(b_+14, b_+17); SET_HL((SYM(twinrova_state1__runSubid06) + 2)); // mainScripts.miscPuzzles_mermaidsCaveDungeonOpeningScript
-  CYC(b_+17, SYM(miscPuzzles_subid13)); miscPuzzles_setScriptAndIncState_hook(gb); return; // jr
+  CYC(b_+17, b_+19); miscPuzzles_setScriptAndIncState_hook(gb); return; // jr
 }
 
 // Eyeglass library keyhole opening
@@ -1037,7 +1037,7 @@ void miscPuzzles_subid13_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+11, b_+14); interactionDelete_hook(gb); return; } // jp nz
   CYC(b_+11, b_+14);
   CYC(b_+14, b_+17); SET_HL((SYM(twinrova_loadScript) + 4)); // mainScripts.miscPuzzles_eyeglassLibraryOpeningScript
-  CYC(b_+17, SYM(miscPuzzles_subid14)); miscPuzzles_setScriptAndIncState_hook(gb); return; // jr
+  CYC(b_+17, b_+19); miscPuzzles_setScriptAndIncState_hook(gb); return; // jr
 }
 
 // Spot to put a rolling colored block on in Hero's Cave
@@ -1072,7 +1072,7 @@ void miscPuzzles_subid14_hook(GB *gb) {
   CYC(b_+42, b_+44); A = 0x0f;
   CYC(b_+44, b_+45); mem_wr(gb, BC, A);
   CYC(b_+45, b_+47); A = 0x50; // SND_CLINK
-  CYC(b_+47, SYM(miscPuzzles_subid15)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+47, b_+50); playSound_b00_hook(gb); return; // jp
 }
 
 // Stairs from solving colored cube puzzle in Hero's Cave (related to subid $14)
@@ -1093,7 +1093,7 @@ void miscPuzzles_subid15_hook(GB *gb) {
   CALL_C(b_+21, setTile_hook, SYM(setTile), b_+24);
   CALL_C(b_+24, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+27);
   CYC(b_+27, b_+29); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80); // set 7,(hl)
-  CYC(b_+29, SYM(miscPuzzles_subid16)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+29, b_+32); interactionDelete_hook(gb); return; // jp
 }
 
 // Warps Link out of Hero's Cave upon opening the chest
@@ -1144,7 +1144,7 @@ void miscPuzzles_subid17_hook(GB *gb) {
   CYC(b_+11, b_+13); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 5))); // set 5,(hl)
 
 subid17_skip:
-  CYC(b_+13, SYM(miscPuzzles_subid18)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+13, b_+16); interactionDelete_hook(gb); return; // jp
 }
 
 // Drops a key in hero's cave block-pushing puzzle
@@ -1164,7 +1164,7 @@ void miscPuzzles_subid18_hook(GB *gb) {
   CYC(b_+16, b_+18); alu_cp(gb, 0x2a); // TILEINDEX_PUSHABLE_STATUE
   if (!(F & FZ)) { RET_TAKEN(b_+18); return; } // ret nz
   CYC(b_+18, b_+19);
-  CYC(b_+19, SYM(miscPuzzles_subid19)); miscPuzzles_dropSmallKeyHere_hook(gb); return; // jp
+  CYC(b_+19, b_+22); miscPuzzles_dropSmallKeyHere_hook(gb); return; // jp
 }
 
 // Bridge controller in d5 room after the miniboss
@@ -1319,7 +1319,7 @@ static void miscPuzzles_subid1bcd_common(GB *gb, uint16_t sp0_) {
   CYC(b_+21, b_+23); alu_and(gb, 0x20); // ROOMFLAG_ITEM
   if (!(F & FZ)) { CYCT(b_+23, b_+25); goto subid1bcd_delete; } // jr nz
   CYC(b_+23, b_+25);
-  CYC(b_+25, b_+28); SET_BC((SYM(applyWarpDest) + 1)); // TREASURE_OBJECT_GASHA_SEED_07
+  CYC(b_+25, b_+28); SET_BC(0x3407); // TREASURE_OBJECT_GASHA_SEED_07
   CALL_C(b_+28, createTreasure_hook, SYM(createTreasure), b_+31);
   if (F & FZ) {
     CALL_C_CC(b_+31, objectCopyPosition_hook, SYM(objectCopyPosition), b_+34);
@@ -1328,27 +1328,27 @@ static void miscPuzzles_subid1bcd_common(GB *gb, uint16_t sp0_) {
   } // call z
 
 subid1bcd_delete:
-  CYC(b_+34, SYM(miscPuzzles_subid1e)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+34, b_+37); interactionDelete_hook(gb); return; // jp
 }
 
 void miscPuzzles_subid1b_hook(GB *gb) {
   BASE(miscPuzzles_subid1b);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); SET_BC((SYM(loadTilesetHlpr) + 85)); // b = essence $08, c = position $53
-  CYC(b_+3, SYM(miscPuzzles_subid1c)); miscPuzzles_subid1bcd_common(gb, sp0_); return; // jr
+  CYC(b_+0, b_+3); SET_BC(0x0853); // b = essence $08, c = position $53
+  CYC(b_+3, b_+5); miscPuzzles_subid1bcd_common(gb, sp0_); return; // jr
 }
 
 void miscPuzzles_subid1c_hook(GB *gb) {
   BASE(miscPuzzles_subid1c);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+3); SET_BC((SYM(interactionCode78__state1) + 32)); // b = essence $40, c = position $34
-  CYC(b_+3, SYM(miscPuzzles_subid1d)); miscPuzzles_subid1bcd_common(gb, sp0_); return; // jr
+  CYC(b_+3, b_+5); miscPuzzles_subid1bcd_common(gb, sp0_); return; // jr
 }
 
 void miscPuzzles_subid1d_hook(GB *gb) {
   BASE(miscPuzzles_subid1d);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); SET_BC((SYM(objectApplyGivenSpeed) + 11)); // b = essence $20, c = position $34
+  CYC(b_+0, b_+3); SET_BC(0x2034); // b = essence $20, c = position $34
   miscPuzzles_subid1bcd_common(gb, sp0_); return;
 }
 
@@ -1363,7 +1363,7 @@ void miscPuzzles_subid1e_hook(GB *gb) {
   CYC(b_+7, b_+10);
   CYC(b_+10, b_+12); A = 0x4d; // SND_SOLVEPUZZLE
   CALL_C(b_+12, playSound_b00_hook, SYM(playSound_b00), b_+15);
-  CYC(b_+15, SYM(miscPuzzles_subid1f)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+15, b_+18); interactionDelete_hook(gb); return; // jp
 }
 
 // Checks if Link gets stuck in the d5 boss key puzzle, resets the room if so
@@ -1462,14 +1462,14 @@ void miscPuzzles_subid20_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x20); // ROOMFLAG_ITEM
   if (!(F & FZ)) { CYCT(b_+5, b_+7); goto subid20_delete; } // jr nz
   CYC(b_+5, b_+7);
-  CYC(b_+7, b_+10); SET_BC((SYM(objectCreateFloatingMusicNote) + 24)); // TREASURE_OBJECT_RUPEES_16
+  CYC(b_+7, b_+10); SET_BC(0x2816); // TREASURE_OBJECT_RUPEES_16
   CALL_C(b_+10, createTreasure_hook, SYM(createTreasure), b_+13);
   if (!(F & FZ)) { CYCT(b_+13, b_+16); goto subid20_delete; } // jp nz
   CYC(b_+13, b_+16);
   CALL_C(b_+16, objectCopyPosition_hook, SYM(objectCopyPosition), b_+19);
 
 subid20_delete:
-  CYC(b_+19, SYM(miscPuzzles_subid21)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+19, b_+22); interactionDelete_hook(gb); return; // jp
 }
 
 // Creates explosions while screen is fading out; used in some cutscene?
@@ -1505,7 +1505,7 @@ void miscPuzzles_subid21_hook(GB *gb) {
 subid21_state0:
   CALL_C(b_+56, interactionIncState_hook, SYM(interactionIncState), b_+59);
   CYC(b_+59, b_+61); A = 0x04;
-  CYC(b_+61, SYM(miscPuzzles_deleteSelfAndRetIfItemFlagSet)); fadeoutToWhiteWithDelay_hook(gb); return; // jp
+  CYC(b_+61, b_+64); fadeoutToWhiteWithDelay_hook(gb); return; // jp
 }
 
 // Shared helper: called with `call`; if the room's item flag is already set, discards
@@ -1519,7 +1519,7 @@ void miscPuzzles_deleteSelfAndRetIfItemFlagSet_hook(GB *gb) {
   if (F & FZ) { RET_TAKEN(b_+5); return; } // ret z
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+7); SET_HL(pop_effect(gb)); // pop hl (discard return address)
-  CYC(b_+7, SYM(miscPuzzles_deleteSelfOrIncStateIfItemFlagSet)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+7, b_+10); interactionDelete_hook(gb); return; // jp
 }
 
 // Shared helper: deletes self if the room's item flag is set, else increments state.
@@ -1530,7 +1530,7 @@ void miscPuzzles_deleteSelfOrIncStateIfItemFlagSet_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x20); // ROOMFLAG_ITEM
   if (!(F & FZ)) { CYCT(b_+5, b_+8); interactionDelete_hook(gb); return; } // jp nz
   CYC(b_+5, b_+8);
-  CYC(b_+8, SYM(miscPuzzles_deleteSelfOrIncStateIfRoomFlag7Set)); interactionIncState_hook(gb); return; // jp
+  CYC(b_+8, b_+11); interactionIncState_hook(gb); return; // jp
 }
 
 // Shared helper: deletes self if room flag bit 7 is set, else increments state.
@@ -1541,7 +1541,7 @@ void miscPuzzles_deleteSelfOrIncStateIfRoomFlag7Set_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x80);
   if (!(F & FZ)) { CYCT(b_+5, b_+8); interactionDelete_hook(gb); return; } // jp nz
   CYC(b_+5, b_+8);
-  CYC(b_+8, SYM(miscPuzzles_deleteSelfOrIncStateIfRoomFlag6Set)); interactionIncState_hook(gb); return; // jp
+  CYC(b_+8, b_+11); interactionIncState_hook(gb); return; // jp
 }
 
 // Shared helper (unused): deletes self if room flag bit 6 is set, else increments state.
@@ -1552,5 +1552,5 @@ void miscPuzzles_deleteSelfOrIncStateIfRoomFlag6Set_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x40);
   if (!(F & FZ)) { CYCT(b_+5, b_+8); interactionDelete_hook(gb); return; } // jp nz
   CYC(b_+5, b_+8);
-  CYC(b_+8, SYM(interactionCode92)); interactionIncState_hook(gb); return; // jp
+  CYC(b_+8, b_+11); interactionIncState_hook(gb); return; // jp
 }

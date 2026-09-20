@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(updateItems), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(updateItems), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t item_post_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -103,7 +103,7 @@ next:
 
 void itemCodeNilPost_hook(GB *gb) {
   BASE(itemCodeNilPost);
-  CYC(b_+0, SYM(updateItemPost));
+  CYC(b_+0, b_+1);
   ret_effect(gb);
 }
 
@@ -132,7 +132,7 @@ loop:
   CYC(b_+15, b_+16); D = alu_inc8(gb, D);
   CYC(b_+16, b_+17); A = D;
   CYC(b_+17, b_+19); alu_cp(gb, 0xe0);
-  if (F & FC) { CYCT(b_+19, SYM(itemCodeNilPost)); goto loop; }
-  CYC(b_+19, SYM(itemCodeNilPost));
+  if (F & FC) { CYCT(b_+19, b_+21); goto loop; }
+  CYC(b_+19, b_+21);
   itemCodeNilPost_hook(gb);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodea5), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodea5), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCodea5_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -90,7 +90,7 @@ state0:
   CYC(b_+33, b_+35); A = 0x01;
   CYC(b_+35, b_+36); mem_wr(gb, DE, A); // [state]
   CALL_C(b_+36, objectTakePosition_hook, SYM(objectTakePosition), b_+39);
-  CYC(b_+39, b_+42); SET_BC((SYM(loadUniqueGfxHeaderEntry) + 13));
+  CYC(b_+39, b_+42); SET_BC(0x3850);
   CALL_C(b_+42, objectGetRelativeAngle_hook, SYM(objectGetRelativeAngle), b_+45);
   CYC(b_+45, b_+47); alu_and(gb, 0x1c);
   CYC(b_+47, b_+49); E = INTERACTION_BASE + OBJ_ANGLE;
@@ -124,7 +124,7 @@ state2:
   CALL_C(b_+100, objectSetInvisible_hook, SYM(objectSetInvisible), b_+103);
   CYC(b_+103, b_+105); A = 0x5e; // SND_GETSEED
   CALL_C(b_+105, playSound_b00_hook, SYM(playSound_b00), b_+108);
-  CYC(b_+108, b_+111); SET_BC((SYM(_label_00_062) + 11)); // TX_070e
+  CYC(b_+108, b_+111); SET_BC(0x070e); // TX_070e
   CYC(b_+111, b_+114); showText_hook(gb); return; // jp
 
 state3:
@@ -161,7 +161,7 @@ state4:
   CYC(b_+158, b_+159); H = alu_dec8(gb, H);
   CYC(b_+159, b_+160); mem_wr(gb, HL, A); // [w1Link.direction]
   CALL_C(b_+160, interactionIncState_hook, SYM(interactionIncState), b_+163);
-  CYC(b_+163, b_+166); SET_BC((SYM(_label_00_062) + 12)); // TX_070f
+  CYC(b_+163, b_+166); SET_BC(0x070f); // TX_070f
   CYC(b_+166, b_+169); showText_hook(gb); return; // jp
 
 state5:
@@ -171,7 +171,7 @@ state5:
   CYC(b_+177, b_+179); A = (uint8_t)(A | (1 << 7));
   CYC(b_+179, b_+182); mem_wr(gb, w1Companion_direction, A);
   CALL_C(b_+182, interactionIncState_hook, SYM(interactionIncState), b_+185);
-  CYC(b_+185, b_+188); SET_BC((SYM(_label_00_062) + 13)); // TX_0710
+  CYC(b_+185, b_+188); SET_BC(0x0710); // TX_0710
   CYC(b_+188, b_+191); showText_hook(gb); return; // jp
 
 state6:

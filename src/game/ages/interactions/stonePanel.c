@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode7b), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode7b), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCode7b_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -39,7 +39,7 @@ void interactionCode7b_hook(GB *gb) {
   }
 
   // @state0
-  CYC(b_+12, b_+15); SET_BC((SYM(drawAllSpritesUnconditionally__loop) + 71));
+  CYC(b_+12, b_+15); SET_BC(0x0e08);
   CALL_C(b_+15, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+18);
   CALL_C(b_+18, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+21);
   CALL_C(b_+21, objectSetVisible83_hook, SYM(objectSetVisible83), b_+24);
@@ -184,5 +184,5 @@ substate2:
 after1_updateSolidityUponOpening:
   CYC(b_+220, b_+223); A = W8(wActiveMusic);
   CALL_C(b_+223, playSound_b00_hook, SYM(playSound_b00), b_+226);
-  CYC(b_+226, SYM(interactionCode7c)); interactionIncState_hook(gb); return; // jp
+  CYC(b_+226, b_+229); interactionIncState_hook(gb); return; // jp
 }

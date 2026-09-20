@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode0f), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode0f), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t enemyCode0f_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -106,12 +106,12 @@ retryPosition:
   CYC(b_+14, b_+15); C = A;
   CALL_C(b_+15, objectSetShortPosition_hook, SYM(objectSetShortPosition), b_+18);
   // Adjust position to be relative to screen bounds
-  CYC(b_+18, b_+20); A = hram_rd(gb, 0xac); // hCameraX
+  CYC(b_+18, b_+20); A = mem_rd(gb, hCameraX); // hCameraX
   CYC(b_+20, b_+21); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+21, b_+22); mem_wr(gb, HL, A); SET_HL(HL - 1);
   CYC(b_+22, b_+23); C = A;
   CYC(b_+23, b_+24); L = alu_dec8(gb, L);
-  CYC(b_+24, b_+26); A = hram_rd(gb, 0xaa); // hCameraY
+  CYC(b_+24, b_+26); A = mem_rd(gb, hCameraY); // hCameraY
   CYC(b_+26, b_+27); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+27, b_+28); mem_wr(gb, HL, A);
   CYC(b_+28, b_+29); B = A;
@@ -127,7 +127,7 @@ retryPosition:
   CYC(b_+45, b_+47); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
   CYC(b_+47, b_+49); A = 0x59; // SND_FALLINHOLE
   CALL_C(b_+49, playSound_b00_hook, SYM(playSound_b00), b_+52);
-  CYC(b_+52, SYM(veranSpider_state_switchHook)); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+52, b_+55); objectSetVisiblec1_hook(gb); return; // jp
 }
 
 void veranSpider_state_switchHook_hook(GB *gb) {
@@ -140,7 +140,7 @@ void veranSpider_state_switchHook_hook(GB *gb) {
     if (target == SYM(ecom_incSubstate_b0d)) { ecom_incSubstate_b0d_hook(gb); return; }
     if (target == b_+12) {
       CYC(b_+12, b_+14); B = 0x09;
-      CYC(b_+14, SYM(veranSpider_state_scentSeed)); ecom_fallToGroundAndSetState_b0d_hook(gb); return; // jp
+      CYC(b_+14, b_+17); ecom_fallToGroundAndSetState_b0d_hook(gb); return; // jp
     }
     RET(b_+11); return; // @substate1/@substate2 both target 0x687b, a bare `ret`
   }
@@ -176,7 +176,7 @@ void veranSpider_updateAnimation_hook(GB *gb) {
 incAndSet:
   CYC(b_+9, b_+10); A = alu_inc8(gb, A);
   CYC(b_+10, b_+11); mem_wr(gb, HL, A);
-  CYC(b_+11, SYM(veranSpider_gotoState9)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+11, b_+14); enemyAnimate_hook(gb); return; // jp
 }
 
 void veranSpider_gotoState9_hook(GB *gb) {
@@ -215,7 +215,7 @@ void veranSpider_state8_hook(GB *gb) {
   CYC(b_+20, b_+22); A = 0x52; // SND_BOMB_LAND
   CALL_C(b_+22, playSound_b00_hook, SYM(playSound_b00), b_+25);
   CALL_C(b_+25, veranSpider_setRandomAngleAndCounter1_hook, SYM(veranSpider_setRandomAngleAndCounter1), b_+28);
-  CYC(b_+28, SYM(veranSpider_state9)); veranSpider_animate_hook(gb); return; // jr
+  CYC(b_+28, b_+30); veranSpider_animate_hook(gb); return; // jr
 }
 
 // Moving in some direction for [counter1] frames
@@ -252,14 +252,14 @@ moveNormally:
   CYC(b_+41, b_+42); L = alu_dec8(gb, L);
   CYC(b_+42, b_+43); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // [counter1]--
   if (!(F & FZ)) CALL_C_CC(b_+43, ecom_applyVelocityForSideviewEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0d), b_+46); else CYC(b_+43, b_+46); // call nz
-  if (F & FZ) { CYCT(b_+46, SYM(veranSpider_animate)); veranSpider_setRandomAngleAndCounter1_hook(gb); return; } // jp z
-  CYC(b_+46, SYM(veranSpider_animate));
+  if (F & FZ) { CYCT(b_+46, b_+49); veranSpider_setRandomAngleAndCounter1_hook(gb); return; } // jp z
+  CYC(b_+46, b_+49);
   veranSpider_animate_hook(gb); return; // falls through
 }
 
 void veranSpider_animate_hook(GB *gb) {
   BASE(veranSpider_animate);
-  CYC(b_+0, SYM(veranSpider_stateA)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // Charging in some direction for [counter1] frames
@@ -276,14 +276,14 @@ void veranSpider_stateA_hook(GB *gb) {
 afterCharge:
   CALL_C(b_+11, veranSpider_gotoState9_hook, SYM(veranSpider_gotoState9), b_+14);
   CYC(b_+14, b_+16); L = ENEMY_BASE + OBJ_COUNTER2;
-  CYC(b_+16, SYM(veranSpider_setRandomAngleAndCounter1)); mem_wr(gb, HL, 0x40);
+  CYC(b_+16, b_+18); mem_wr(gb, HL, 0x40);
   veranSpider_setRandomAngleAndCounter1_hook(gb); return; // falls through
 }
 
 void veranSpider_setRandomAngleAndCounter1_hook(GB *gb) {
   BASE(veranSpider_setRandomAngleAndCounter1);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); SET_BC((SYM(showTextNonExitable) + 2));
+  CYC(b_+0, b_+3); SET_BC(0x1870);
   CALL_C(b_+3, ecom_randomBitwiseAndBCE_b0d_hook, SYM(ecom_randomBitwiseAndBCE_b0d), b_+6);
   CYC(b_+6, b_+8); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+8, b_+9); A = B;

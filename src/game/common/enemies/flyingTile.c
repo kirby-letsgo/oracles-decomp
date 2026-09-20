@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(flyingTile_state_spawner), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(flyingTile_state_spawner), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void flyingTile_state_uninitialized_hook(GB *gb);
 void flyingTile_state_spawner_hook(GB *gb);
@@ -186,7 +186,7 @@ childDone:
   CYC(b_+72, b_+73); alu_or(gb, A);
   if (!(F & FZ)) { RET_TAKEN(b_+73); return; } // ret nz
   CYC(b_+73, b_+74);
-  CYC(b_+74, SYM(flyingTile_state_stub)); flyingTile_delete_hook(gb); return; // jp
+  CYC(b_+74, b_+77); flyingTile_delete_hook(gb); return; // jp
 }
 
 // 0e:65fc, bare global; jump-table target from enemyCode52.
@@ -206,7 +206,7 @@ void flyingTile_state8_hook(GB *gb) {
   CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+5, b_+7); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
   CALL_C(b_+7, flyingTile_overwriteTileHere_hook, SYM(flyingTile_overwriteTileHere), b_+10);
-  CYC(b_+10, SYM(flyingTile_state9)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+10, b_+13); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 // 0e:660a, bare global; jump-table target from enemyCode52. Moving up before charging at
@@ -227,7 +227,7 @@ void flyingTile_state9_hook(GB *gb) {
   CYC(b_+15, b_+16); L = E;
   CYC(b_+16, b_+17); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
   CYC(b_+17, b_+19); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(b_+19, SYM(flyingTile_animate)); mem_wr(gb, HL, 0x0f);
+  CYC(b_+19, b_+21); mem_wr(gb, HL, 0x0f);
   flyingTile_animate_hook(gb); return; // fallthrough
 }
 
@@ -235,7 +235,7 @@ void flyingTile_state9_hook(GB *gb) {
 // flyingTile_stateA/flyingTile_stateB.
 void flyingTile_animate_hook(GB *gb) {
   BASE(flyingTile_animate);
-  CYC(b_+0, SYM(flyingTile_stateA)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:6622, bare global; jump-table target from enemyCode52. Staying in place for [counter1]
@@ -249,7 +249,7 @@ void flyingTile_stateA_hook(GB *gb) {
   CYC(b_+5, b_+6); L = E;
   CYC(b_+6, b_+7); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
   CALL_C(b_+7, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+10);
-  CYC(b_+10, SYM(flyingTile_stateB)); flyingTile_animate_hook(gb); return; // jr
+  CYC(b_+10, b_+12); flyingTile_animate_hook(gb); return; // jr
 }
 
 // 0e:662e, bare global; jump-table target from enemyCode52. Charging at Link. Falls through
@@ -259,8 +259,8 @@ void flyingTile_stateB_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, objectApplySpeed_hook, SYM(objectApplySpeed), b_+3);
   CALL_C(b_+3, objectCheckTileCollision_allowHoles_hook, SYM(objectCheckTileCollision_allowHoles), b_+6);
-  if (!(F & FC)) { CYCT(b_+6, SYM(flyingTile_dead)); flyingTile_animate_hook(gb); return; } // jr nc
-  CYC(b_+6, SYM(flyingTile_dead));
+  if (!(F & FC)) { CYCT(b_+6, b_+8); flyingTile_animate_hook(gb); return; } // jr nc
+  CYC(b_+6, b_+8);
   flyingTile_dead_hook(gb); return; // fallthrough
 }
 
@@ -279,7 +279,7 @@ void flyingTile_delete_hook(GB *gb) {
   BASE(flyingTile_delete);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, decNumEnemies_hook, SYM(decNumEnemies), b_+3);
-  CYC(b_+3, SYM(flyingTile_overwriteTileHere)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+3, b_+6); enemyDelete_hook(gb); return; // jp
 }
 
 // 0e:6641, bare global; called from flyingTile_state8. Overwrites the tile at this position

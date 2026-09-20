@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodee0), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodee0), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/common/interactions/eraOrSeasonInfo.s (INTERAC_ERA_OR_SEASON_INFO), bank $10.
 
@@ -89,6 +89,6 @@ state3:
   CYC(b_+78, b_+79); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) { RET_TAKEN(b_+79); return; }
   CYC(b_+79, b_+80);
-  CYC(b_+80, SYM(interactionCodee2));
+  CYC(b_+80, b_+83);
   interactionDelete_hook(gb);
 }

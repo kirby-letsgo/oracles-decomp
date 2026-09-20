@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode89), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode89), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCode89_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -300,7 +300,7 @@ label_0a_036:
   CALL_C(b_+332, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+335);
   CYC(b_+335, b_+337); L = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+337, b_+339); mem_wr(gb, HL, 180);
-  CYC(b_+339, b_+342); SET_BC((SYM(enemyCodeTable) + 252)); // TX_3030
+  CYC(b_+339, b_+342); SET_BC(0x3030); // TX_3030
   CYC(b_+342, b_+345); showTextNonExitable_hook(gb);
   if (gb->pc == b_+19 && gb->sp == sp0_) goto afterUpdateState;
   return; // jp

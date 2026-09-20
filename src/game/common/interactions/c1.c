@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodec1), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodec1), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t c1_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -61,7 +61,7 @@ void interactionCodec1__updateSparkles_hook(GB *gb) {
   CYC(b_+115, b_+116);
   CYC(b_+116, b_+118); mem_wr(gb, HL, 6);
   CYC(b_+118, b_+121); SET_BC(0x8409);
-  CYC(b_+121, SYM(interactionCodec2)); objectCreateInteraction_hook(gb);
+  CYC(b_+121, b_+124); objectCreateInteraction_hook(gb);
 }
 
 void interactionCodec1__updateMovementAndSparkles_hook(GB *gb) {

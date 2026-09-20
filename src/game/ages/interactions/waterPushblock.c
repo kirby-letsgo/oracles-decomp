@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode9e), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode9e), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCode9e_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -28,11 +28,11 @@ static uint16_t interactionCode9e_jump_table(GB *gb) {
 // (no stack effect) from each of them, ends with a tail-jump into the ROM's own setInterleavedTile.
 static void interactionCode9e_setInterleavedTile_tail(GB *gb) {
   BASE(interactionCode9e);
-  CYC(b_+428, b_+430); hram_wr(gb, 0x8c, A);
+  CYC(b_+428, b_+430); mem_wr(gb, hFF8C, A);
   CYC(b_+430, b_+431); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(b_+431, b_+433); hram_wr(gb, 0x8f, A);
+  CYC(b_+431, b_+433); mem_wr(gb, hFF8F, A);
   CYC(b_+433, b_+434); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(b_+434, b_+436); hram_wr(gb, 0x8e, A);
+  CYC(b_+434, b_+436); mem_wr(gb, hFF8E, A);
   CYC(b_+436, b_+437); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+437, b_+440); setInterleavedTile_hook(gb); return; // jp
 }

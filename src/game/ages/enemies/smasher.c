@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(smasher_state_uninitialized), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(smasher_state_uninitialized), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void ecom_setSpeedAndState8AndVisible_b0f_hook(GB *gb);
 void ecom_bounceOffWallsAndHoles_b0f_hook(GB *gb);
@@ -148,7 +148,7 @@ initialize:
   CALL_C(b_+67, enemySetAnimation_hook, SYM(enemySetAnimation), b_+70);
 
 gotoState8:
-  CYC(b_+70, SYM(smasher_state_grabbed)); ecom_setSpeedAndState8AndVisible_b0f_hook(gb); return; // jp
+  CYC(b_+70, b_+73); ecom_setSpeedAndState8AndVisible_b0f_hook(gb); return; // jp
 }
 
 void smasher_state_grabbed_hook(GB *gb) {
@@ -226,7 +226,7 @@ atRest:
   CYC(b_+90, b_+91); E = alu_dec8(gb, E);
   CYC(b_+91, b_+93); A = 0x08;
   CYC(b_+93, b_+94); mem_wr(gb, DE, A); // [state]
-  CYC(b_+94, SYM(smasher_state_stub)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+94, b_+97); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 void smasher_state_stub_hook(GB *gb) {
@@ -263,7 +263,7 @@ void smasher_ball_state8_hook(GB *gb) {
   CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x63); // ENEMYCOLLISION_SMASHER_BALL
   CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(b_+9, SYM(smasher_ball_state9)); mem_wr(gb, HL, 0x19); // SPEED_a0
+  CYC(b_+9, b_+11); mem_wr(gb, HL, 0x19); // SPEED_a0
   smasher_ball_state9_hook(gb); return; // fallthrough
 }
 
@@ -272,7 +272,7 @@ void smasher_ball_state9_hook(GB *gb) {
   BASE(smasher_ball_state9);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, objectAddToGrabbableObjectBuffer_hook, SYM(objectAddToGrabbableObjectBuffer), b_+3);
-  CYC(b_+3, SYM(smasher_ball_stateA)); objectPushLinkAwayOnCollision_hook(gb); return; // jp
+  CYC(b_+3, b_+6); objectPushLinkAwayOnCollision_hook(gb); return; // jp
 }
 
 // Parent is picking up the ball
@@ -299,7 +299,7 @@ L_5299:
   CYC(b_+24, b_+25); alu_cp(gb, C);
   if (!(F & FZ)) { CYCT(b_+25, b_+28); ecom_moveTowardPosition_b0f_hook(gb); return; } // jp nz
   CYC(b_+25, b_+28);
-  CYC(b_+28, b_+30); A = hram_rd(gb, 0x8f);
+  CYC(b_+28, b_+30); A = mem_rd(gb, hFF8F);
   CYC(b_+30, b_+31); alu_cp(gb, B);
   if (!(F & FZ)) { CYCT(b_+31, b_+34); ecom_moveTowardPosition_b0f_hook(gb); return; } // jp nz
   CYC(b_+31, b_+34);
@@ -313,7 +313,7 @@ L_5299:
   CYC(b_+45, b_+47); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
   CYC(b_+47, b_+49); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+49, b_+51); mem_wr(gb, HL, 0x78);
-  CYC(b_+51, SYM(smasher_ball_stateB)); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+51, b_+54); objectSetVisiblec1_hook(gb); return; // jp
 }
 
 // This state is a signal for the parent, which will update the ball's state when it gets released.
@@ -355,7 +355,7 @@ doneBouncing:
 void smasher_ball_playLandSound_hook(GB *gb) {
   BASE(smasher_ball_playLandSound);
   CYC(b_+0, b_+2); A = 0x52; // SND_BOMB_LAND
-  CYC(b_+2, SYM(smasher_ball_stateD)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+2, b_+5); playSound_b00_hook(gb); return; // jp
 }
 
 // Disappearing (either after being thrown, or after a time limit)
@@ -383,7 +383,7 @@ L_52ff:
   CYC(b_+27, b_+29); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
   CYC(b_+29, b_+31); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+31, b_+33); mem_wr(gb, HL, 0x3c);
-  CYC(b_+33, SYM(smasher_ball_stateE)); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+33, b_+36); objectSetInvisible_hook(gb); return; // jp
 }
 
 // Ball is gone, will reappear after [counter1] frames
@@ -431,7 +431,7 @@ doneBouncing:
   CYC(b_+11, b_+13); E = ENEMY_BASE + OBJ_STATE;
   CYC(b_+13, b_+15); A = 0x08;
   CYC(b_+15, b_+16); mem_wr(gb, DE, A);
-  CYC(b_+16, SYM(smasher_parent)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+16, b_+19); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 void smasher_parent_hook(GB *gb) {
@@ -555,7 +555,7 @@ L_53d8:
   CYC(b_+104, b_+106); L = ENEMY_BASE + 0x30; // Enemy.var30
   CALL_C(b_+106, ecom_readPositionVars_b0f_hook, SYM(ecom_readPositionVars_b0f), b_+109);
   CALL_C(b_+109, smasher_updateAngleTowardPosition_hook, SYM(smasher_updateAngleTowardPosition), b_+112);
-  CYC(b_+112, SYM(smasher_parent_stateA)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+112, b_+119); enemySetAnimation_hook(gb); return; // jp
 }
 
 // Moving toward ball on the ground
@@ -576,7 +576,7 @@ void smasher_parent_stateA_hook(GB *gb) {
   CYC(b_+19, b_+21); alu_cp(gb, 0x05);
   if (!(F & FC)) { CYCT(b_+21, b_+23); goto movingTowardBall; } // jr nc
   CYC(b_+21, b_+23);
-  CYC(b_+23, b_+25); A = hram_rd(gb, 0x8f);
+  CYC(b_+23, b_+25); A = mem_rd(gb, hFF8F);
   CYC(b_+25, b_+26); alu_sub(gb, B);
   CYC(b_+26, b_+28); alu_add(gb, 0x02);
   CYC(b_+28, b_+30); alu_cp(gb, 0x05);
@@ -607,7 +607,7 @@ movingTowardBall:
   CALL_C(b_+74, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+77);
   if (!(F & FZ)) { RET_TAKEN(b_+77); return; } // ret nz
   CYC(b_+77, b_+78);
-  CYCT(b_+78, SYM(smasher_parent_linkPickedUpBall)); smasher_hop_hook(gb); return; // jr
+  CYCT(b_+78, b_+80); smasher_hop_hook(gb); return; // jr
 }
 
 void smasher_parent_linkPickedUpBall_hook(GB *gb) {
@@ -623,7 +623,7 @@ void smasher_parent_linkPickedUpBall_hook(GB *gb) {
   CYC(b_+13, b_+15); A = 0x03;
   CALL_C(b_+15, smasher_setOamFlags_hook, SYM(smasher_setOamFlags), b_+18);
   CALL_C(b_+18, ecom_updateCardinalAngleAwayFromTarget_b0f_hook, SYM(ecom_updateCardinalAngleAwayFromTarget_b0f), b_+21);
-  CYC(b_+21, SYM(smasher_parent_stateB)); smasher_updateDirectionFromAngle_hook(gb); return; // jp
+  CYC(b_+21, b_+24); smasher_updateDirectionFromAngle_hook(gb); return; // jp
 }
 
 // About to pick up ball
@@ -646,7 +646,7 @@ void smasher_parent_stateB_hook(GB *gb) {
   CYC(b_+21, b_+23); L = ENEMY_BASE + OBJ_COUNTER2;
   CYC(b_+23, b_+25); mem_wr(gb, HL, 0x1e);
   CYC(b_+25, b_+27); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(b_+27, SYM(smasher_hop)); mem_wr(gb, HL, 0x0a);
+  CYC(b_+27, b_+29); mem_wr(gb, HL, 0x0a);
   smasher_hop_hook(gb); return; // fallthrough
 }
 
@@ -694,7 +694,7 @@ hitGround:
   CYC(b_+47, b_+49); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+49, b_+50); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
   CYC(b_+50, b_+52); A = 0x02;
-  CYC(b_+52, SYM(smasher_parent_stateD)); smasher_setOamFlags_hook(gb); return; // jp
+  CYC(b_+52, b_+55); smasher_setOamFlags_hook(gb); return; // jp
 }
 
 // In midair just before throwing ball
@@ -747,7 +747,7 @@ movingDown:
   CALL_C(b_+57, smasher_setOamFlags_hook, SYM(smasher_setOamFlags), b_+60);
   CYC(b_+60, b_+62); E = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+62, b_+63); A = mem_rd(gb, DE);
-  CYC(b_+63, SYM(smasher_updateAngleTowardPosition)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+63, b_+66); enemySetAnimation_hook(gb); return; // jp
 }
 
 // @param[out] a direction value
@@ -757,7 +757,7 @@ void smasher_updateAngleTowardPosition_hook(GB *gb) {
   CALL_C(b_+0, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+3);
   CYC(b_+3, b_+5); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+5, b_+6); mem_wr(gb, DE, A);
-  CYCT(b_+6, SYM(smasher_updateAngleTowardLink)); smasher_updateDirectionFromAngle_hook(gb); return; // jr
+  CYCT(b_+6, b_+8); smasher_updateDirectionFromAngle_hook(gb); return; // jr
 }
 
 void smasher_updateAngleTowardLink_hook(GB *gb) {
@@ -765,7 +765,7 @@ void smasher_updateAngleTowardLink_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+3);
   CYC(b_+3, b_+5); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(b_+5, SYM(smasher_updateDirectionFromAngle)); mem_wr(gb, DE, A);
+  CYC(b_+5, b_+6); mem_wr(gb, DE, A);
   smasher_updateDirectionFromAngle_hook(gb); return; // fallthrough
 }
 
@@ -806,12 +806,12 @@ void smasher_ball_loadPositions_hook(GB *gb) {
   CYC(b_+0, b_+2); L = ENEMY_BASE + OBJ_YH;
   CYC(b_+2, b_+3); E = L;
   CYC(b_+3, b_+4); A = mem_rd(gb, DE);
-  CYC(b_+4, b_+6); hram_wr(gb, 0x8f, A);
+  CYC(b_+4, b_+6); mem_wr(gb, hFF8F, A);
   CYC(b_+6, b_+7); B = mem_rd(gb, HL);
   CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_XH;
   CYC(b_+9, b_+10); E = L;
   CYC(b_+10, b_+11); A = mem_rd(gb, DE);
-  CYC(b_+11, b_+13); hram_wr(gb, 0x8e, A);
+  CYC(b_+11, b_+13); mem_wr(gb, hFF8E, A);
   CYC(b_+13, b_+14); C = mem_rd(gb, HL);
   RET(b_+14); return;
 }
@@ -863,7 +863,7 @@ void smasher_ball_makeLinkDrop_hook(GB *gb) {
   CYC(b_+8, b_+10); alu_cp(gb, 0x02);
   if (!(F & FC)) { RET_TAKEN(b_+10); return; } // ret nc
   CYC(b_+10, b_+11);
-  CYC(b_+11, SYM(enemyCode75)); dropLinkHeldItem_hook(gb); return; // jp
+  CYC(b_+11, b_+14); dropLinkHeldItem_hook(gb); return; // jp
 }
 
 void enemyCode74_hook(GB *gb) {

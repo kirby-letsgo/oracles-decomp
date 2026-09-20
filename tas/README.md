@@ -17,6 +17,12 @@ to record a playthrough on our own core: `oracles ROM roms/cgb_boot.bin --record
 boots exactly like the headless runner (AGB patch, `gbhawk-wram0.txt`, fresh SRAM), writes the
 file every 60 seconds and on quit, and fast-forwards through an existing file before appending.
 
+`seasons-noinput.ref` is the interpreter's (`--no-hooks`) state every 60 frames for a 30,000-frame
+run of the Seasons ROM with no input (logos, title, attract demo); `tests/test_tas.c` replays it
+with hooks on, so it checks the hooks that run under Seasons against the interpreter, not the
+core against hardware. Re-record it with `--no-hooks --frames 30000 --ref-out` after a deliberate
+emulation change.
+
 BK2 files are zip archives. `Input Log.txt` holds one line per frame in the order
 Up, Down, Left, Right, Start, Select, B, A, Power.
 

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode84), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode84), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t sparkleInteraction_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -134,7 +134,7 @@ flicker:
 runSubid05:
   CYC(b_+162, b_+164); A = OBJ_YH; // Object.yh
   CALL_C(b_+164, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+167);
-  CYC(b_+167, b_+170); SET_BC((SYM(loadTilesetHlpr) + 2));
+  CYC(b_+167, b_+170); SET_BC(0x0800);
   CALL_C(b_+170, objectTakePositionWithOffset_hook, SYM(objectTakePositionWithOffset), b_+173);
   CYC(b_+173, b_+175); goto animateAndFlickerAndDeleteWhenCounter1Zero; // jr
 
@@ -191,5 +191,5 @@ runSubid0d:
   CYC(b_+257, b_+259); alu_cp(gb, 0x06);
   if (F & FZ) { CYCT(b_+259, b_+262); interactionDelete_hook(gb); return; } // jp z
   CYC(b_+259, b_+262);
-  CYC(b_+262, SYM(interactionCode86)); goto animateFlickerAndTakeRelatedObj1Position; // jr
+  CYC(b_+262, b_+264); goto animateFlickerAndTakeRelatedObj1Position; // jr
 }

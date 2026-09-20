@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyBoss_beginBoss_b0f), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyBoss_beginBoss_b0f), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/common/enemies/commonBossCode.s, bank $0f instance.
 
@@ -17,7 +17,7 @@ void enemyBoss_beginBoss_common_b0f_hook(GB *gb) {
   CYC(b_+6, b_+9); W8(wMenuDisabled) = A;
   CYC(b_+9, b_+10); A = B;
   CYC(b_+10, b_+13); W8(wActiveMusic) = A;
-  CYC(b_+13, SYM(enemyCode70));
+  CYC(b_+13, b_+16);
   playSound_b00_hook(gb);
 }
 
@@ -72,7 +72,7 @@ alreadyPlayedDeathSound:
   CYC(b_+59, b_+62); W8(wActiveMusic) = A;
   CALL_C(b_+62, playSound_b00_hook, SYM(playSound_b00), b_+65);
 finish:
-  CYC(b_+65, SYM(enemyBoss_spawnShadow_b0f));
+  CYC(b_+65, b_+68);
   enemyDelete_hook(gb);
 }
 
@@ -109,7 +109,7 @@ skipScreenVarStore:
   CYC(b_+7, b_+8); A = B;
   CYC(b_+8, b_+9); alu_or(gb, A);
   if (F & FZ) {
-    CYC(b_+9, SYM(enemyBoss_initializeRoomWithoutExtraGfx_b0f));
+    CYC(b_+9, b_+12);
   } else {
     CALL_C_CC(b_+9, loadPaletteHeader_hook, SYM(loadPaletteHeader), SYM(enemyBoss_initializeRoomWithoutExtraGfx_b0f));
   }
@@ -147,7 +147,7 @@ void enemyBoss_initializeRoomWithoutExtraGfx_b0f_hook(GB *gb) {
 void enemyBoss_beginMiniboss_b0f_hook(GB *gb) {
   BASE(enemyBoss_beginMiniboss_b0f);
   CYC(b_+0, b_+2); B = 0x2d;
-  CYC(b_+2, SYM(enemyBoss_beginBoss_b0f));
+  CYC(b_+2, b_+4);
   enemyBoss_beginBoss_common_b0f_hook(gb);
 }
 

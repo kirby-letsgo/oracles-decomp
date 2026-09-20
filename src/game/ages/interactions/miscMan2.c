@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode44), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode44), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t bank09_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -253,7 +253,7 @@ L_5515:
   CYC(b_+159, b_+160); H = mem_rd(gb, HL);
   CYC(b_+160, b_+161); L = A;
   CALL_C(b_+161, interactionSetScript_hook, SYM(interactionSetScript), b_+164);
-  CYC(b_+164, SYM(getGameProgress_1)); if (hook_enabled_at(SYM(interactionIncState))) { interactionIncState_hook(gb); return; } HANDOFF(SYM(interactionIncState));
+  CYC(b_+164, b_+167); if (hook_enabled_at(SYM(interactionIncState))) { interactionIncState_hook(gb); return; } HANDOFF(SYM(interactionIncState));
 }
 
 void getGameProgress_1_hook(GB *gb) {
@@ -285,7 +285,7 @@ void getGameProgress_1_hook(GB *gb) {
   if (!(F & FC)) { CYCT(b_+42, b_+43); ret_effect(gb); return; } CYC(b_+42, b_+43);
 L_5556:
   CYC(b_+43, b_+45); B = 0x00;
-  CYC(b_+45, SYM(getGameProgress_2)); ret_effect(gb); return;
+  CYC(b_+45, b_+46); ret_effect(gb); return;
 }
 
 void getGameProgress_1__noEssences_hook(GB *gb) {
@@ -293,7 +293,7 @@ void getGameProgress_1__noEssences_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5556:
   CYC(b_+43, b_+45); B = 0x00;
-  CYC(b_+45, SYM(getGameProgress_2)); ret_effect(gb); return;
+  CYC(b_+45, b_+46); ret_effect(gb); return;
 }
 
 void getGameProgress_2_hook(GB *gb) {
@@ -336,7 +336,7 @@ L_556d:
   if (!(F & FC)) { CYCT(b_+59, b_+60); ret_effect(gb); return; } CYC(b_+59, b_+60);
 L_5595:
   CYC(b_+60, b_+62); B = 0x00;
-  CYC(b_+62, SYM(unusedFunc5598)); ret_effect(gb); return;
+  CYC(b_+62, b_+63); ret_effect(gb); return;
 }
 
 void getGameProgress_2__noEssences_hook(GB *gb) {
@@ -344,7 +344,7 @@ void getGameProgress_2__noEssences_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5595:
   CYC(b_+60, b_+62); B = 0x00;
-  CYC(b_+62, SYM(unusedFunc5598)); ret_effect(gb); return;
+  CYC(b_+62, b_+63); ret_effect(gb); return;
 }
 
 void unusedFunc5598_hook(GB *gb) {
@@ -358,7 +358,7 @@ void unusedFunc5598_hook(GB *gb) {
   CYC(b_+6, b_+7); H = mem_rd(gb, HL);
   CYC(b_+7, b_+8); L = A;
   CALL_C(b_+8, interactionSetScript_hook, SYM(interactionSetScript), b_+11);
-  CYC(b_+11, SYM(checkNpcShouldExistAtGameStage_body)); if (hook_enabled_at(SYM(interactionIncState))) { interactionIncState_hook(gb); return; } HANDOFF(SYM(interactionIncState));
+  CYC(b_+11, b_+14); if (hook_enabled_at(SYM(interactionIncState))) { interactionIncState_hook(gb); return; } HANDOFF(SYM(interactionIncState));
 }
 
 void checkNpcShouldExistAtGameStage_body_hook(GB *gb) {

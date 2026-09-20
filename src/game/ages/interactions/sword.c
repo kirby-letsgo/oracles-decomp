@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode05), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode05), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static void sword_add_a_to_hl(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -154,7 +154,7 @@ set_damage:
     else if (jt_ == b_+147) {
       CYC(b_+147, b_+149); A = 0x08;
       CALL_C(b_+149, tryBreakTileWithSword_calculateLevel_hook, SYM(tryBreakTileWithSword_calculateLevel), b_+152);
-      CYC(b_+152, SYM(itemCode00)); itemDelete_hook(gb); return;
+      CYC(b_+152, b_+155); itemDelete_hook(gb); return;
     }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
@@ -162,7 +162,7 @@ set_damage:
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode5e), (from), (to), false)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, 0x09, (from), (to), true)
 
 static uint16_t bank09_jump_table_sword(GB *gb) {
@@ -221,7 +221,7 @@ void interactionCode5e__afterCall6e68_hook(GB *gb) {
 L_6e8f:
   SET_HL(POP(b_+58));
   CALL_C(b_+59, objectTakePosition_hook, SYM(objectTakePosition), b_+62);
-  CYC(b_+62, SYM(interactionCode5f)); objectSetVisible83_hook(gb); return;
+  CYC(b_+62, b_+65); objectSetVisible83_hook(gb); return;
 }
 
 void interactionCode5e_hook(GB *gb) {

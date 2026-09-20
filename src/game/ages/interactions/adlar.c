@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode29), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode29), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define adlarScript_bank0c SYM(adlarScript)
 
@@ -55,7 +55,7 @@ setVar38:
   CYC(b_+56, b_+57); mem_wr(gb, DE, A);
   CALL_C(b_+57, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+60);
   CYC(b_+60, b_+63); SET_HL(adlarScript_bank0c);
-  CYC(b_+63, SYM(interactionCode2a)); interactionSetScript_hook(gb);
+  CYC(b_+63, b_+66); interactionSetScript_hook(gb);
 }
 
 // INTERAC_ADLAR

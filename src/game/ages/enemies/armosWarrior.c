@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode73), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode73), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void armosWarrior_state_uninitialized_hook(GB *gb);
 void armosWarrior_state_spawner_hook(GB *gb);
@@ -184,7 +184,7 @@ void armosWarrior_state_uninitialized_hook(GB *gb) {
   CYC(b_+7, b_+10); W8(wDisabledObjects) = A;
   CYC(b_+10, b_+13); W8(wMenuDisabled) = A;
   CYC(b_+13, b_+15); A = 0x73; // ENEMY_ARMOS_WARRIOR
-  CYC(b_+15, SYM(armosWarrior_state_spawner));
+  CYC(b_+15, b_+18);
   enemyBoss_initializeRoom_b0f_hook(gb); return; // jp
 }
 
@@ -242,7 +242,7 @@ void armosWarrior_state_spawner_hook(GB *gb) {
   CYC(b_+58, b_+59); E = L;
   CYC(b_+59, b_+60); A = mem_rd(gb, DE);
   CYC(b_+60, b_+61); mem_wr(gb, HL, A);
-  CYC(b_+61, SYM(armosWarrior_state_stub));
+  CYC(b_+61, b_+64);
   enemyDelete_hook(gb); return; // jp
 }
 
@@ -291,7 +291,7 @@ void armosWarrior_parent_state8_hook(GB *gb) {
   CYC(b_+17, b_+19); mem_wr(gb, HL, 0x14); // SPEED_80
   CYC(b_+19, b_+21); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
   CYC(b_+21, b_+23); mem_wr(gb, HL, 0x60); // ENEMYCOLLISION_ARMOS_WARRIOR_PROTECTED
-  CYC(b_+23, SYM(armosWarrior_parent_state9));
+  CYC(b_+23, b_+26);
   objectSetVisible82_hook(gb); return; // jp
 }
 
@@ -344,7 +344,7 @@ substate1:
   CYC(b_+48, b_+49);
   CYC(b_+49, b_+50); L = E;
   CYC(b_+50, b_+51); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [substate]
-  CYC(b_+51, b_+54); SET_BC((SYM(updateEnemies__next) + 1)); // TX_2f01
+  CYC(b_+51, b_+54); SET_BC(0x2f01); // TX_2f01
   CYC(b_+54, b_+57);
   showText_hook(gb); return; // jp
 
@@ -399,7 +399,7 @@ substate4:
 
 applySpeed:
   CALL_C(b_+115, objectApplySpeed_hook, SYM(objectApplySpeed), b_+118);
-  CYC(b_+118, SYM(armosWarrior_parent_stateA));
+  CYC(b_+118, b_+121);
   enemyAnimate_hook(gb); return; // jp
 }
 
@@ -438,7 +438,7 @@ haveTurn:
   CALL_C(b_+33, ecom_incState_b0f_hook, SYM(ecom_incState_b0f), b_+36);
   CYC(b_+36, b_+38); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+38, b_+40); mem_wr(gb, HL, 0x4b);
-  CYC(b_+40, SYM(armosWarrior_parent_stateB));
+  CYC(b_+40, b_+42);
   armosWarrior_parent_animate_hook(gb); return; // jr
 }
 
@@ -450,7 +450,7 @@ void armosWarrior_parent_stateB_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+3, b_+5); armosWarrior_parent_updateBoxMovement_hook(gb); return; } // jr nz
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+6); L = E;
-  CYC(b_+6, SYM(armosWarrior_parent_updateBoxMovement)); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+6, b_+7); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // [state]
   armosWarrior_parent_updateBoxMovement_hook(gb); return; // fallthrough
 }
 
@@ -468,13 +468,13 @@ void armosWarrior_parent_updateBoxMovement_hook(GB *gb) {
   CYC(b_+10, b_+11); A = mem_rd(gb, DE);
   CYC(b_+11, b_+12); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+12, b_+14); alu_and(gb, 0x18);
-  CYC(b_+14, SYM(armosWarrior_parent_animate)); mem_wr(gb, DE, A);
+  CYC(b_+14, b_+15); mem_wr(gb, DE, A);
   armosWarrior_parent_animate_hook(gb); return; // fallthrough
 }
 
 void armosWarrior_parent_animate_hook(GB *gb) {
   BASE(armosWarrior_parent_animate);
-  CYC(b_+0, SYM(armosWarrior_parent_stateC));
+  CYC(b_+0, b_+3);
   enemyAnimate_hook(gb); return; // jp
 }
 
@@ -539,10 +539,10 @@ gotoNextState:
   CYC(b_+39, b_+41); mem_wr(gb, HL, 0x44); // ENEMYCOLLISION_STANDARD_MINIBOSS
   CYC(b_+41, b_+43); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+43, b_+45); mem_wr(gb, HL, 0x50); // SPEED_200
-  CYC(b_+45, b_+48); SET_BC((SYM(updateEnemies__next) + 2)); // TX_2f02
+  CYC(b_+45, b_+48); SET_BC(0x2f02); // TX_2f02
   CALL_C(b_+48, showText_hook, SYM(showText), b_+51);
   CYC(b_+51, b_+53); A = 0x01;
-  CYC(b_+53, SYM(armosWarrior_parent_stateE));
+  CYC(b_+53, b_+56);
   enemySetAnimation_hook(gb); return; // jp
 }
 
@@ -556,7 +556,7 @@ void armosWarrior_parent_stateE_hook(GB *gb) {
   CYC(b_+6, b_+8);
   CYC(b_+8, b_+10); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+10, b_+11); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+11, SYM(armosWarrior_parent_stateF));
+  CYC(b_+11, b_+14);
   ecom_updateAngleTowardTarget_b0f_hook(gb); return; // jp
 }
 
@@ -585,7 +585,7 @@ void armosWarrior_parent_stateF_hook(GB *gb) {
   CYC(b_+31, b_+33); A = 0x1e;
   CALL_C(b_+33, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+36);
   CYC(b_+36, b_+38); A = 0x81; // SND_STRONG_POUND
-  CYC(b_+38, SYM(armosWarrior_parent_state10));
+  CYC(b_+38, b_+41);
   playSound_b00_hook(gb); return; // jp
 }
 
@@ -674,7 +674,7 @@ state8:
 
   CALL_C(b_+70, enemySetAnimation_hook, SYM(enemySetAnimation), b_+73);
   CALL_C(b_+73, armosWarrior_shield_updatePosition_hook, SYM(armosWarrior_shield_updatePosition), b_+76);
-  CYC(b_+76, SYM(armosWarrior_sword));
+  CYC(b_+76, b_+79);
   objectSetVisible81_hook(gb); return; // jp
 }
 
@@ -728,7 +728,7 @@ void armosWarrior_sword_state8_hook(GB *gb) {
 
   CYC(b_+29, b_+31); A = 0x09;
   CALL_C(b_+31, enemySetAnimation_hook, SYM(enemySetAnimation), b_+34);
-  CYC(b_+34, SYM(armosWarrior_sword_state9));
+  CYC(b_+34, b_+37);
   objectSetVisible80_hook(gb); return; // jp
 }
 
@@ -809,7 +809,7 @@ void armosWarrior_sword_stateA_hook(GB *gb) {
 
   CALL_C(b_+22, ecom_updateAngleTowardTarget_b0f_hook, SYM(ecom_updateAngleTowardTarget_b0f), b_+25);
   CALL_C(b_+25, enemyAnimate_hook, SYM(enemyAnimate), b_+28);
-  CYC(b_+28, SYM(armosWarrior_sword_stateB));
+  CYC(b_+28, b_+31);
   armosWarrior_sword_updateCollisionBox_hook(gb); return; // jp
 }
 
@@ -878,7 +878,7 @@ void armosWarrior_sword_updatePosition_hook(GB *gb) {
   CYC(b_+11, b_+12); L = alu_inc8(gb, L);
   CYC(b_+12, b_+13); A = mem_rd(gb, HL);
   CYC(b_+13, b_+14); mem_wr(gb, DE, A);
-  CYC(b_+14, SYM(armosWarrior_sword_stateC));
+  CYC(b_+14, b_+17);
   armosWarrior_sword_updateCollisionBox_hook(gb); return; // jp
 }
 
@@ -949,7 +949,7 @@ atRest:
   CYC(b_+77, b_+79); E = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+79, b_+80); mem_wr(gb, DE, A);
   CYC(b_+80, b_+82); A = 0x0a;
-  CYC(b_+82, SYM(armosWarrior_shield_updatePosition));
+  CYC(b_+82, b_+85);
   enemySetAnimation_hook(gb); return; // jp
 }
 
@@ -1021,7 +1021,7 @@ void armosWarrior_sword_setPositionAsHeld_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0x0b; // Object.yh
   CALL_C(b_+2, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+5);
   CYC(b_+5, b_+8); SET_BC(0xf4fa);
-  CYC(b_+8, SYM(armosWarrior_sword_checkCollisionWithShield));
+  CYC(b_+8, b_+11);
   objectTakePositionWithOffset_hook(gb); return; // jp
 }
 
@@ -1209,6 +1209,6 @@ void armosWarrior_sword_playSlashSound_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+5); return; } // ret nz
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+8); A = 0x74; // SND_SWORDSLASH
-  CYC(b_+8, SYM(enemyCode74));
+  CYC(b_+8, b_+11);
   playSound_b00_hook(gb); return; // jp
 }

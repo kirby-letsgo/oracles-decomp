@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(spinner_setLinkRelativePosition), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(spinner_setLinkRelativePosition), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCode7d_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -81,7 +81,7 @@ void spinner_updateLinkPosition_hook(GB *gb) {
   CYC(b_+18, b_+19); alu_add(gb, B);
   CYC(b_+19, b_+21); alu_and(gb, 0x0f);
   CYC(b_+21, b_+24); SET_HL(SYM(spinner_linkRelativePositions)); // spinner_linkRelativePositions
-  CYC(b_+24, SYM(spinner_setLinkRelativePosition)); interactionCode7d_addDoubleIndexToHl_from_rst(gb, SYM(spinner_setLinkRelativePosition));
+  CYC(b_+24, b_+25); interactionCode7d_addDoubleIndexToHl_from_rst(gb, SYM(spinner_setLinkRelativePosition));
   spinner_setLinkRelativePosition_hook(gb); return; // falls through
 }
 
@@ -135,7 +135,7 @@ afterAnim:
   CYC(b_+53, b_+54); E = L;
   CYC(b_+54, b_+55); A = mem_rd(gb, HL);
   CYC(b_+55, b_+56); mem_wr(gb, DE, A);
-  CYC(b_+56, SYM(spinner_updateLinkPosition)); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+56, b_+59); interactionAnimate_hook(gb); return; // jp
 }
 
 // INTERAC_SPINNER
@@ -312,5 +312,5 @@ state4:
   CYC(b_+246, b_+248); L = INTERACTION_BASE + OBJ_STATE;
   CYC(b_+248, b_+250); mem_wr(gb, HL, 0x01);
   CYC(b_+250, b_+253); SET_HL((SYM(interactionCode91__subid00__state1) + 18)); // mainScripts.spinnerScript_waitForLinkAfterDelay
-  CYC(b_+253, SYM(spinner_subid02)); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+253, b_+256); interactionSetScript_hook(gb); return; // jp
 }

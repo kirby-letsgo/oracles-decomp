@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode4e), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode4e), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t twinrovaSnowball_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -94,5 +94,5 @@ state2:
 destroy:
   CYC(b_+82, b_+84); B = 0x09; // INTERAC_SNOWDEBRIS
   CALL_C(b_+84, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+87);
-  CYC(b_+87, SYM(partCode50)); partDelete_hook(gb); return; // jp
+  CYC(b_+87, b_+90); partDelete_hook(gb); return; // jp
 }

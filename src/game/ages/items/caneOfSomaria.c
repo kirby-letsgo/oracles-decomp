@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode04), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode04), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t somaria_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -211,7 +211,7 @@ static void somaria_align_on_tile(GB *gb, uint16_t sp0_) {
   CYC(b_+425, b_+427); L = 0x0b;
   CYC(b_+427, b_+428); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   CYC(b_+428, b_+429); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+429, SYM(itemCode1d)); ret_effect(gb);
+  CYC(b_+429, b_+430); ret_effect(gb);
 }
 
 static void somaria_create_block_if_not_on_hazard(GB *gb, uint16_t sp0_) {
@@ -333,14 +333,14 @@ state4:
   } while (0);
   CALL_C(b_+109, itemIncSubstate_hook, SYM(itemIncSubstate), b_+112);
   CALL_C(b_+112, itemUpdateAngle_hook, SYM(itemUpdateAngle), b_+115);
-  CYC(b_+115, b_+118); SET_BC((SYM(setTileWithoutGfxReload) + 4));
+  CYC(b_+115, b_+118); SET_BC(0x1420);
   CYC(b_+118, b_+121); A = W8(wBraceletLevel);
   CYC(b_+121, b_+123); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
     CYCT(b_+123, b_+125);
   } else {
     CYC(b_+123, b_+125);
-    CYC(b_+125, b_+128); SET_BC((SYM(findByteInGroupTable) + 6));
+    CYC(b_+125, b_+128); SET_BC(0x1e15);
   }
   CYC(b_+128, b_+130); L = 0x10;
   CYC(b_+130, b_+131); mem_wr(gb, HL, B);

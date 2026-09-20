@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode72), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode72), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void subterror_state_uninitialized_hook(GB *gb);
 void subterror_state_stub_hook(GB *gb);
@@ -198,7 +198,7 @@ substate2:
   CALL_C(b_+104, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+107);
   if (!(F & FZ)) { RET_TAKEN(b_+107); return; } // ret nz
   CYC(b_+107, b_+108);
-  CYC(b_+108, b_+111); SET_BC((SYM(updateEnemies__next) + 3)); // TX_2f03
+  CYC(b_+108, b_+111); SET_BC(0x2f03); // TX_2f03
   CALL_C(b_+111, showText_hook, SYM(showText), b_+114);
   CYC(b_+114, b_+117);
   ecom_incSubstate_b0f_hook(gb); return; // jp
@@ -208,7 +208,7 @@ substate3:
   CALL_C(b_+120, enemyBoss_beginMiniboss_b0f_hook, SYM(enemyBoss_beginMiniboss_b0f), b_+123);
   CYC(b_+123, b_+124); alu_xor(gb, A);
   CYC(b_+124, b_+127); W8(wDisabledObjects) = A;
-  CYC(b_+127, SYM(subterror_digIntoGround)); W8(wMenuDisabled) = A;
+  CYC(b_+127, b_+130); W8(wMenuDisabled) = A;
   subterror_digIntoGround_hook(gb); return; // fallthrough
 }
 
@@ -218,7 +218,7 @@ void subterror_digIntoGround_hook(GB *gb) {
   CYC(b_+2, b_+4); A = 0x09;
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);
   CYC(b_+5, b_+7); A = 0x04;
-  CYC(b_+7, SYM(subterror_state9));
+  CYC(b_+7, b_+10);
   enemySetAnimation_hook(gb); return; // jp
 }
 
@@ -257,7 +257,7 @@ void subterror_beginUndergroundMovement_hook(GB *gb) {
   CYC(b_+34, b_+35); mem_wr(gb, DE, A);
   CYC(b_+35, b_+37); A = 0xa9; // SND_DIG
   CALL_C(b_+37, playSound_b00_hook, SYM(playSound_b00), b_+40);
-  CYC(b_+40, SYM(subterror_stateA));
+  CYC(b_+40, b_+43);
   subterror_spawnDirt_hook(gb); return; // jp
 }
 
@@ -400,7 +400,7 @@ substate2:
   CYC(b_+213, b_+214);
   CYC(b_+214, b_+216); L = ENEMY_BASE + OBJ_SUBSTATE;
   CYC(b_+216, b_+217); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+217, SYM(subterror_stateB));
+  CYC(b_+217, b_+220);
   subterror_stateA_resetUndergroundMovement_hook(gb); return; // jp
 }
 
@@ -574,7 +574,7 @@ substate2:
   CALL_C(b_+110, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+113);
   if (!(F & FZ)) { RET_TAKEN(b_+113); return; } // ret nz
   CYC(b_+113, b_+114);
-  CYC(b_+114, SYM(subterror_spawnDirtEvery8Frames));
+  CYC(b_+114, b_+117);
   subterror_digIntoGround_hook(gb); return; // jp
 }
 
@@ -586,7 +586,7 @@ void subterror_spawnDirtEvery8Frames_hook(GB *gb) {
   CYC(b_+2, b_+3); A = alu_dec8(gb, A);
   CYC(b_+3, b_+4); mem_wr(gb, DE, A);
   if (!(F & FZ)) { RET_TAKEN(b_+4); return; } // ret nz
-  CYC(b_+4, SYM(subterror_spawnDirt));
+  CYC(b_+4, b_+5);
   subterror_spawnDirt_hook(gb); return; // fallthrough
 }
 
@@ -603,7 +603,7 @@ void subterror_spawnDirt_hook(GB *gb) {
   CALL_C(b_+12, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+15);
   CYC(b_+15, b_+16); C = L;
   CYC(b_+16, b_+18); A = 0xef;
-  CYC(b_+18, SYM(subterror_retFromCallerIfAnimationUnfinished));
+  CYC(b_+18, b_+21);
   setTile_hook(gb); return; // jp
 }
 
@@ -653,6 +653,6 @@ void subterror_setAnimationFromAngle_hook(GB *gb) {
   CYC(b_+7, b_+9); alu_and(gb, 0x03);
   CYC(b_+9, b_+10); mem_wr(gb, HL, A); // [direction]
   CYC(b_+10, b_+12); alu_add(gb, 0x00);
-  CYC(b_+12, SYM(subterror_speedVals));
+  CYC(b_+12, b_+15);
   enemySetAnimation_hook(gb); return; // jp
 }

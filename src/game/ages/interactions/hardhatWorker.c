@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode58), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode58), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t hardhat_worker_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A); burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
@@ -68,7 +68,7 @@ subid01:
   CYC(b_+54, b_+57); CYC(b_+57, b_+60); npcFaceLinkAndAnimate_hook(gb); return;
 subid02:
   CALL_C(b_+60, checkInteractionState_hook, SYM(checkInteractionState), b_+63);
-  if (F & FZ) { CYC(b_+63, b_+65); CYC(b_+65, b_+68); A = W8(wEssencesObtained); CYC(b_+68, b_+70); alu_bit(gb, 3, A); if (!(F & FZ)) { CYCT(b_+70, b_+73); interactionDelete_hook(gb); return; } CYC(b_+70, b_+73); CALL_C(b_+73, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+76); CYC(b_+76, b_+78); alu_bit(gb, 7, A); if (F & FZ) CYCT(b_+78, b_+80); else { CYC(b_+78, b_+80); CYC(b_+80, b_+83); SET_BC((SYM(loadUniqueGfxHeaderEntry) + 21)); CALL_C(b_+83, interactionSetPosition_hook, SYM(interactionSetPosition), b_+86); } CYC(b_+86, b_+89); push_effect(gb, b_+89); hardhat_worker_load_script_and_init_graphics_hook(gb); } else CYCT(b_+63, b_+65);
+  if (F & FZ) { CYC(b_+63, b_+65); CYC(b_+65, b_+68); A = W8(wEssencesObtained); CYC(b_+68, b_+70); alu_bit(gb, 3, A); if (!(F & FZ)) { CYCT(b_+70, b_+73); interactionDelete_hook(gb); return; } CYC(b_+70, b_+73); CALL_C(b_+73, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+76); CYC(b_+76, b_+78); alu_bit(gb, 7, A); if (F & FZ) CYCT(b_+78, b_+80); else { CYC(b_+78, b_+80); CYC(b_+80, b_+83); SET_BC(0x3858); CALL_C(b_+83, interactionSetPosition_hook, SYM(interactionSetPosition), b_+86); } CYC(b_+86, b_+89); push_effect(gb, b_+89); hardhat_worker_load_script_and_init_graphics_hook(gb); } else CYCT(b_+63, b_+65);
   CALL_C(b_+89, interactionRunScript_hook, SYM(interactionRunScript), b_+92); CYC(b_+92, b_+94); E = INTERACTION_BASE + OBJ_VAR38; CYC(b_+94, b_+95); A = mem_rd(gb, DE); CYC(b_+95, b_+96); alu_or(gb, A); if (F & FZ) { CYCT(b_+96, b_+99); npcFaceLinkAndAnimate_hook(gb); } else { CYC(b_+96, b_+99); interactionAnimateAsNpc_hook(gb); } return;
 subid03:
   CALL_C(b_+102, checkInteractionState_hook, SYM(checkInteractionState), b_+105);

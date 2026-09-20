@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(tokayGame_resetRoomFlag40), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(tokayGame_resetRoomFlag40), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/scripts/ages/scriptHelper.s (INTERAC_TOKAY), bank 0x15.
 
@@ -46,7 +46,7 @@ void tokayGame_determinePrizeAndCheckRupees_hook(GB *gb) {
   CYC(b_+17, b_+18); A = alu_inc8(gb, A);
 
 write_prize:
-  CYC(b_+18, SYM(tokayGame_checkRupees)); mem_wr(gb, wTmpcfc0_wildTokay_cfdd, A);
+  CYC(b_+18, b_+21); mem_wr(gb, wTmpcfc0_wildTokay_cfdd, A);
   tokayGame_checkRupees_hook(gb); return; // fallthrough
 }
 
@@ -102,7 +102,7 @@ void tokayMakeLinkJump_hook(GB *gb) {
   CYC(b_+10, b_+11); L = alu_inc8(gb, L);
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0xfe);
   CYC(b_+13, b_+15); A = 0x53; // SND_JUMP
-  CYC(b_+15, SYM(tokayGiveShieldUpgradeToLink)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+15, b_+18); playSound_b00_hook(gb); return; // jp
 }
 
 void tokayGiveShieldUpgradeToLink_hook(GB *gb) {
@@ -121,7 +121,7 @@ have_tier:
   if (!(F & FZ)) { RET_TAKEN(b_+15); return; }
   CYC(b_+15, b_+16);
   CYC(b_+16, b_+19); SET_DE(w1Link_yh);
-  CYC(b_+19, SYM(tokayGiveItemToLink)); objectCopyPosition_rawAddress_hook(gb); return; // jp
+  CYC(b_+19, b_+22); objectCopyPosition_rawAddress_hook(gb); return; // jp
 }
 
 // Creates a treasure object at Link's position which he will immediately pick up.
@@ -162,7 +162,7 @@ set_counter:
   CYC(b_+42, b_+44); A = 0x03;
   CYC(b_+44, b_+45); mem_wr(gb, DE, A);
   CYC(b_+45, b_+48); SET_DE(w1Link_yh);
-  CYC(b_+48, SYM(tokayGame_givePrizeToLink)); objectCopyPosition_rawAddress_hook(gb); return; // jp
+  CYC(b_+48, b_+51); objectCopyPosition_rawAddress_hook(gb); return; // jp
 }
 
 void tokayGame_givePrizeToLink_hook(GB *gb) {
@@ -265,7 +265,7 @@ void tokayTurnToFaceLink_hook(GB *gb) {
   CYC(b_+3, b_+5); E = INTERACTION_BASE + OBJ_ANGLE;
   CYC(b_+5, b_+7); alu_add(gb, 0x04);
   CYC(b_+7, b_+9); alu_and(gb, 0x18);
-  CYC(b_+9, SYM(tokayUpdateAnimationFromAngle)); mem_wr(gb, DE, A);
+  CYC(b_+9, b_+10); mem_wr(gb, DE, A);
   tokayUpdateAnimationFromAngle_hook(gb); return; // fallthrough
 }
 
@@ -273,7 +273,7 @@ void tokayUpdateAnimationFromAngle_hook(GB *gb) {
   BASE(tokayUpdateAnimationFromAngle);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, convertAngleDeToDirection_hook, SYM(convertAngleDeToDirection), b_+3);
-  CYC(b_+3, SYM(tokayFlipDirection)); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+3, b_+6); interactionSetAnimation_hook(gb); return; // jp
 }
 
 // Turn to the opposite direction.
@@ -285,7 +285,7 @@ void tokayFlipDirection_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+5); alu_xor(gb, 0x10);
   CYC(b_+5, b_+6); mem_wr(gb, DE, A);
-  CYC(b_+6, SYM(tokayPlantScentSeedling)); tokayUpdateAnimationFromAngle_hook(gb); return; // jr
+  CYC(b_+6, b_+8); tokayUpdateAnimationFromAngle_hook(gb); return; // jr
 }
 
 // Removes the seedling from Link's inventory, and sets flag on the present and past versions of
@@ -298,7 +298,7 @@ void tokayPlantScentSeedling_hook(GB *gb) {
   CYC(b_+5, b_+6); H = alu_dec8(gb, H);
   CYC(b_+6, b_+8); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
   CYC(b_+8, b_+10); A = 0x4d; // TREASURE_SCENT_SEEDLING
-  CYC(b_+10, SYM(tokayGiveBombUpgrade)); loseTreasure_hook(gb); return; // jp
+  CYC(b_+10, b_+13); loseTreasure_hook(gb); return; // jp
 }
 
 void tokayGiveBombUpgrade_hook(GB *gb) {
@@ -310,7 +310,7 @@ void tokayGiveBombUpgrade_hook(GB *gb) {
   CYC(b_+4, b_+6); alu_add(gb, 0x20);
   CYC(b_+6, b_+7); mem_wr(gb, HL, A); SET_HL(HL - 1);
   CYC(b_+7, b_+8); mem_wr(gb, HL, A);
-  CYC(b_+8, SYM(tokayCreateExclamationMark)); setStatusBarNeedsRefreshBit1_hook(gb); return; // jp
+  CYC(b_+8, b_+11); setStatusBarNeedsRefreshBit1_hook(gb); return; // jp
 }
 
 void tokayCreateExclamationMark_hook(GB *gb) {
@@ -319,5 +319,5 @@ void tokayCreateExclamationMark_hook(GB *gb) {
   (void)sp0_;
   CYC(b_+0, b_+3); SET_BC(0xf3f3);
   CYC(b_+3, b_+5); A = 0x1e;
-  CYC(b_+5, SYM(tokayWithShieldUpgradeScript_b15)); objectCreateExclamationMark_hook(gb); return; // jp
+  CYC(b_+5, b_+8); objectCreateExclamationMark_hook(gb); return; // jp
 }

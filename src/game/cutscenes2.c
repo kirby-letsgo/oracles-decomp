@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(cutscene02), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(cutscene02), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void cutscene02__func_7c86_hook(GB *gb);
 void cutscene02__func_7c8e_hook(GB *gb);
@@ -266,7 +266,7 @@ void cutscene0b_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL((SYM(gfxHeader62) + 17));
   CYC(b_+3, b_+5); E = 0x03;
   CALL_C(b_+5, interBankCall_hook, 0x008a, b_+8);
-  CYC(b_+8, SYM(cutscene1a));
+  CYC(b_+8, b_+11);
   updateAllObjects_hook(gb);
 }
 
@@ -276,7 +276,7 @@ void cutscene1a_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL((SYM(gfxHeader7e) + 12));
   CYC(b_+3, b_+5); E = 0x03;
   CALL_C(b_+5, interBankCall_hook, 0x008a, b_+8);
-  CYC(b_+8, SYM(cutscene1b));
+  CYC(b_+8, b_+11);
   updateAllObjects_hook(gb);
 }
 
@@ -290,7 +290,7 @@ void cutscene1b_hook(GB *gb) {
   CALL_C(b_+8, interBankCall_hook, 0x008a, b_+11);
   CYC(b_+11, b_+12); SET_AF(pop_effect(gb));
   CYC(b_+12, b_+14); hram_wr(gb, 0x70, A);
-  CYC(b_+14, SYM(warpToMoblinKeepUnderground));
+  CYC(b_+14, b_+17);
   updateAllObjects_hook(gb);
 }
 
@@ -308,7 +308,7 @@ void cutscene1c_hook(GB *gb) {
   CYC(b_+3, b_+5); E = 0x03;
   CALL_C(b_+5, interBankCall_hook, 0x008a, b_+8);
   CALL_C(b_+8, updateAllObjects_hook, SYM(updateAllObjects), b_+11);
-  CYC(b_+11, SYM(cutscene1d));
+  CYC(b_+11, b_+14);
   updateStatusBar_hook(gb);
 }
 
@@ -321,7 +321,7 @@ void cutscene1d_hook(GB *gb) {
   CYC(b_+8, b_+11); SET_HL(SYM(checkUpdateUnderwaterWaves));
   CYC(b_+11, b_+13); E = 0x01;
   CALL_C(b_+13, interBankCall_hook, 0x008a, b_+16);
-  CYC(b_+16, SYM(cutscene1e));
+  CYC(b_+16, b_+19);
   updateAllObjects_hook(gb);
 }
 
@@ -332,6 +332,6 @@ void cutscene1e_hook(GB *gb) {
   CYC(b_+3, b_+5); E = 0x03;
   CALL_C(b_+5, interBankCall_hook, 0x008a, b_+8);
   CALL_C(b_+8, updateStatusBar_hook, SYM(updateStatusBar), b_+11);
-  CYC(b_+11, SYM(updatePirateShip));
+  CYC(b_+11, b_+14);
   updateAllObjects_hook(gb);
 }

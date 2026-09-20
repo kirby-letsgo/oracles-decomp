@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(loadAttributesAndGraphicsAndIncState), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(loadAttributesAndGraphicsAndIncState), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void itemNextAnimationFrame_hook(GB *gb);
 void itemLoadAttributesAndGraphics_hook(GB *gb);
@@ -45,7 +45,7 @@ void loadAttributesAndGraphicsAndIncState_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, itemIncState_hook, SYM(itemIncState), b_+3);
   CYC(b_+3, b_+5); L = 0x00;
-  CYC(b_+5, SYM(itemLoadAttributesAndGraphics)); mem_wr(gb, HL, 0x03);
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 0x03);
   itemLoadAttributesAndGraphics_hook(gb);
 }
 
@@ -82,7 +82,7 @@ void itemLoadAttributesAndGraphics_hook(GB *gb) {
   CALL_C(b_+36, itemSetVar3cToFF_hook, SYM(itemSetVar3cToFF), b_+39);
   CYC(b_+39, b_+42); SET_HL((SYM(collisionEffect3c__ringProtections) + 5));
   CYC(b_+42, b_+44); E = 0x3f;
-  CYC(b_+44, SYM(itemSetVar3cToFF)); interBankCall_hook(gb);
+  CYC(b_+44, b_+47); interBankCall_hook(gb);
 }
 
 void itemSetVar3cToFF_hook(GB *gb) {
@@ -90,7 +90,7 @@ void itemSetVar3cToFF_hook(GB *gb) {
   CYC(b_+0, b_+2); E = 0x3c;
   CYC(b_+2, b_+4); A = 0xff;
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);
-  CYC(b_+5, SYM(itemUpdateDamageToApply)); ret_effect(gb);
+  CYC(b_+5, b_+6); ret_effect(gb);
 }
 
 void itemUpdateDamageToApply_hook(GB *gb) {
@@ -107,7 +107,7 @@ void itemUpdateDamageToApply_hook(GB *gb) {
   CYC(b_+13, b_+14); A = mem_rd(gb, HL);
   CYC(b_+14, b_+15); A = alu_dec8(gb, A);
   CYC(b_+15, b_+16); A = alu_inc8(gb, A);
-  CYC(b_+16, SYM(itemAnimate)); ret_effect(gb);
+  CYC(b_+16, b_+17); ret_effect(gb);
 }
 
 void itemAnimate_hook(GB *gb) {
@@ -120,7 +120,7 @@ void itemAnimate_hook(GB *gb) {
   }
   CYC(b_+4, b_+5);
   CYC(b_+5, b_+7); L = 0x22;
-  CYC(b_+7, SYM(itemSetAnimation)); itemNextAnimationFrame_hook(gb);
+  CYC(b_+7, b_+9); itemNextAnimationFrame_hook(gb);
 }
 
 void itemSetAnimation_hook(GB *gb) {
@@ -135,7 +135,7 @@ void itemSetAnimation_hook(GB *gb) {
   CYC(b_+11, b_+12); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+12, b_+13); H = mem_rd(gb, HL);
   CYC(b_+13, b_+14); L = A;
-  CYC(b_+14, SYM(itemNextAnimationFrame)); alu_add_hl(gb, BC);
+  CYC(b_+14, b_+15); alu_add_hl(gb, BC);
   itemNextAnimationFrame_hook(gb);
 }
 
@@ -184,7 +184,7 @@ void itemNextAnimationFrame_hook(GB *gb) {
   CYC(b_+44, b_+45); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+45, b_+47); alu_and(gb, 0x3f);
   CYC(b_+47, b_+48); mem_wr(gb, DE, A);
-  CYC(b_+48, SYM(itemTransferKnockbackToLink)); ret_effect(gb);
+  CYC(b_+48, b_+49); ret_effect(gb);
 }
 
 void itemTransferKnockbackToLink_hook(GB *gb) {
@@ -210,7 +210,7 @@ void itemTransferKnockbackToLink_hook(GB *gb) {
   }
   CYC(b_+17, b_+18); L = alu_dec8(gb, L);
   CYC(b_+18, b_+19); mem_wr(gb, HL, B);
-  CYC(b_+19, SYM(applyOffsetTableHL)); ret_effect(gb);
+  CYC(b_+19, b_+20); ret_effect(gb);
 }
 
 void applyOffsetTableHL_hook(GB *gb) {
@@ -235,7 +235,7 @@ void applyOffsetTableHL_hook(GB *gb) {
   CYC(b_+21, b_+22); A = mem_rd(gb, DE);
   CYC(b_+22, b_+23); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+23, b_+24); mem_wr(gb, DE, A);
-  CYC(b_+24, SYM(itemMergeZPositionIfSidescrollingArea)); ret_effect(gb);
+  CYC(b_+24, b_+25); ret_effect(gb);
 }
 
 void itemMergeZPositionIfSidescrollingArea_hook(GB *gb) {
@@ -256,7 +256,7 @@ void itemMergeZPositionIfSidescrollingArea_hook(GB *gb) {
   CYC(b_+15, b_+16); mem_wr(gb, HL, A); SET_HL(HL - 1);
   CYC(b_+16, b_+17); mem_wr(gb, HL, A);
   CYC(b_+17, b_+18); alu_or(gb, D);
-  CYC(b_+18, SYM(itemUpdateSpeedZAndCheckHazards)); ret_effect(gb);
+  CYC(b_+18, b_+19); ret_effect(gb);
 }
 
 void itemUpdateSpeedZAndCheckHazards_hook(GB *gb) {
@@ -297,7 +297,7 @@ above_ground:
   CYC(b_+28, b_+30); A = H8(hFF8B);
   CYC(b_+30, b_+31); alu_rlca(gb);
   CYC(b_+31, b_+32); alu_or(gb, A);
-  CYC(b_+32, SYM(bombPullTowardPoint)); ret_effect(gb);
+  CYC(b_+32, b_+33); ret_effect(gb);
 }
 
 void bombPullTowardPoint_hook(GB *gb) {
@@ -337,7 +337,7 @@ void bombPullTowardPoint_hook(GB *gb) {
 
 end:
   CYC(b_+32, b_+33); alu_xor(gb, A);
-  CYC(b_+33, SYM(itemUpdateThrowingVertically)); ret_effect(gb);
+  CYC(b_+33, b_+34); ret_effect(gb);
 }
 
 void itemUpdateThrowingVertically_hook(GB *gb) {
@@ -508,7 +508,7 @@ update_collision:
     CYC(b_+146, b_+148);
     CYC(b_+148, b_+150); mem_wr(gb, HL, mem_rd(gb, HL) | 0x40);
   }
-  CYC(b_+150, SYM(itemUpdateThrowingVerticallyAndCheckHazards)); ret_effect(gb);
+  CYC(b_+150, b_+151); ret_effect(gb);
 }
 
 static void item_update_throwing_create_splash(GB *gb, uint16_t sp0_) {
@@ -600,13 +600,13 @@ no_collisions:
 create_hole_animation:
   CALL_C(b_+64, objectCreateFallingDownHoleInteraction_hook, SYM(objectCreateFallingDownHoleInteraction), b_+67);
   CYC(b_+67, b_+68); alu_scf(gb);
-  CYC(b_+68, SYM(objectCreateClinkInteraction)); ret_effect(gb);
+  CYC(b_+68, b_+69); ret_effect(gb);
 }
 
 void objectCreateClinkInteraction_hook(GB *gb) {
   BASE(objectCreateClinkInteraction);
   CYC(b_+0, b_+2); B = 0x07;
-  CYC(b_+2, SYM(cpRelatedObject1ID)); objectCreateInteractionWithSubid00_hook(gb);
+  CYC(b_+2, b_+5); objectCreateInteractionWithSubid00_hook(gb);
 }
 
 void cpRelatedObject1ID_hook(GB *gb) {
@@ -617,14 +617,14 @@ void cpRelatedObject1ID_hook(GB *gb) {
   CYC(b_+5, b_+7); E = 0x01;
   CYC(b_+7, b_+8); A = mem_rd(gb, DE);
   CYC(b_+8, b_+9); alu_cp(gb, mem_rd(gb, HL));
-  CYC(b_+9, SYM(itemCheckCanPassSolidTileAt)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 void itemCheckCanPassSolidTileAt_hook(GB *gb) {
   BASE(itemCheckCanPassSolidTileAt);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, getTileAtPosition_hook, SYM(getTileAtPosition), b_+3);
-  CYC(b_+3, SYM(itemCheckCanPassSolidTile));
+  CYC(b_+3, b_+5);
   item_check_can_pass_solid_tile_body(gb, sp0_);
 }
 
@@ -684,7 +684,7 @@ collision:
   CYC(b_+38, b_+39); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+39, b_+40); mem_wr(gb, HL, A);
   CYC(b_+40, b_+41); alu_or(gb, D);
-  CYC(b_+41, SYM(checkTileIsPassableFromDirection)); ret_effect(gb);
+  CYC(b_+41, b_+42); ret_effect(gb);
 }
 
 void checkTileIsPassableFromDirection_hook(GB *gb) {
@@ -751,7 +751,7 @@ can_pass_with_elevation_change:
 can_pass_without_elevation_change:
   CYC(b_+53, b_+54); alu_xor(gb, A);
   CYC(b_+54, b_+55); alu_scf(gb);
-  CYC(b_+55, SYM(itemUpdateConveyorBelt)); ret_effect(gb);
+  CYC(b_+55, b_+56); ret_effect(gb);
 }
 
 void itemUpdateConveyorBelt_hook(GB *gb) {
@@ -764,7 +764,7 @@ void itemUpdateConveyorBelt_hook(GB *gb) {
     CYCT(b_+4, b_+5); ret_effect(gb); return;
   }
   CYC(b_+4, b_+5);
-  CYC(b_+5, b_+8); SET_BC((SYM(initializeVramMap1) + 19));
+  CYC(b_+5, b_+8); SET_BC(0x0500);
   CALL_C(b_+8, objectGetRelativeTile_hook, SYM(objectGetRelativeTile), b_+11);
   CYC(b_+11, b_+14); SET_HL(SYM(itemConveyorTilesTable));
   CALL_C(b_+14, lookupCollisionTable_hook, SYM(lookupCollisionTable), b_+17);
@@ -809,5 +809,5 @@ void itemUpdateConveyorBelt_hook(GB *gb) {
 
 done:
   CYC(b_+58, b_+59); SET_AF(pop_effect(gb));
-  CYC(b_+59, SYM(bombEdgeOffsets)); ret_effect(gb);
+  CYC(b_+59, b_+60); ret_effect(gb);
 }

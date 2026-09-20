@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode12), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode12), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t enemyCode12_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -97,7 +97,7 @@ state_stub:
 state8:
   CYC(b_+78, b_+80); A = 0x09;
   CYC(b_+80, b_+81); mem_wr(gb, DE, A);
-  CYC(b_+81, b_+84); SET_BC((SYM(_label_00_204) + 9));
+  CYC(b_+81, b_+84); SET_BC(0x187f);
   CALL_C(b_+84, ecom_randomBitwiseAndBCE_b0d_hook, SYM(ecom_randomBitwiseAndBCE_b0d), b_+87);
   CYC(b_+87, b_+89); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+89, b_+90); A = B;
@@ -123,7 +123,7 @@ stateA:
   CALL_C(b_+112, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+115);
   if (!(F & FZ)) { RET_TAKEN(b_+115); return; } // ret nz
   CYC(b_+115, b_+116);
-  CYC(b_+116, b_+119); SET_BC((SYM(initializeRoom) + 4)); // ENEMY_STALFOS, subid 2
+  CYC(b_+116, b_+119); SET_BC(0x3102); // ENEMY_STALFOS, subid 2
   CYC(b_+119, b_+122); enemyReplaceWithID_hook(gb); return; // jp
 
 gotoState8:

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode0b), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode0b), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t movingOrb_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -137,5 +137,5 @@ stateC_waiting:
   CYC(b_+131, b_+132); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) { RET_TAKEN(b_+132); return; } // ret nz
   CYC(b_+132, b_+133);
-  CYC(b_+133, SYM(partCode0c)); objectRunMovementScript_hook(gb); return; // jp
+  CYC(b_+133, b_+136); objectRunMovementScript_hook(gb); return; // jp
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode4d), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode4d), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t hardhatBeetle_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -72,7 +72,7 @@ state_uninitialized:
 state8:
   CALL_C(b_+54, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+57);
   CALL_C(b_+57, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0e), b_+60);
-  CYC(b_+60, SYM(enemyCode64)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+60, b_+63); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:60bb, alias of enemyCode4d (ENEMY_HARMLESS_HARDHAT_BEETLE, ages only): identical bytes at

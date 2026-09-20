@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode3c), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode3c), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // PART_HEAD_THWOMP_CIRCULAR_PROJECTILE
 void partCode3c_hook(GB *gb) {
@@ -55,5 +55,5 @@ state0:
   CYC(b_+57, b_+59); mem_wr(gb, HL, 0x64); // SPEED_280
   CALL_C(b_+59, objectSetVisible82_hook, SYM(objectSetVisible82), b_+62);
   CYC(b_+62, b_+64); A = 0xa4; // SND_BEAM
-  CYC(b_+64, SYM(partCode3d)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+64, b_+67); playSound_b00_hook(gb); return; // jp
 }

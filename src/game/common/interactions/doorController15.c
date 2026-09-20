@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(doorController_updateLinkRespawn), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(doorController_updateLinkRespawn), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void doorController_updateLinkRespawn_hook(GB *gb);
 void doorController_decideActionBasedOnTriggers_hook(GB *gb);

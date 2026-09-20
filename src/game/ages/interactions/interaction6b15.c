@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interaction6b_isLinkAtScreenEdge), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interaction6b_isLinkAtScreenEdge), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void writeFlagsTocddb_hook(GB *gb);
 
@@ -20,14 +20,14 @@ static void interaction6b_isLinkWithinBox_from_call(GB *gb, uint16_t return_addr
   CYC(b_+22, b_+23); A = mem_rd(gb, HL);
   CYC(b_+23, b_+25); alu_sub(gb, 0x14);
   CYC(b_+25, b_+27); alu_cp(gb, 0x84);
-  CYC(b_+27, SYM(moveLinkToPosition)); ret_effect(gb);
+  CYC(b_+27, b_+28); ret_effect(gb);
 }
 
 void interaction6b_loadMoblinsAttackingMakuSprout_hook(GB *gb) {
   BASE(interaction6b_loadMoblinsAttackingMakuSprout);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL((SYM(symmetryNpcSubid8And9Script__askForSecret_b15) + 7));
-  CYC(b_+3, SYM(interaction6b_layoutSwapMakuTreeRooms)); parseGivenObjectData_b00_hook(gb);
+  CYC(b_+3, b_+6); parseGivenObjectData_b00_hook(gb);
 }
 
 void interaction6b_layoutSwapMakuTreeRooms_hook(GB *gb) {
@@ -37,7 +37,7 @@ void interaction6b_layoutSwapMakuTreeRooms_hook(GB *gb) {
   CYC(b_+3, b_+5); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 0)));
   CYC(b_+5, b_+8); SET_HL((wGroup1RoomFlags + 72));
   CYC(b_+8, b_+10); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0)));
-  CYC(b_+10, SYM(interaction6b_isLinkAtScreenEdge)); ret_effect(gb);
+  CYC(b_+10, b_+11); ret_effect(gb);
 }
 
 void interaction6b_isLinkAtScreenEdge_hook(GB *gb) {
@@ -65,7 +65,7 @@ void moveLinkToPosition_hook(GB *gb) {
   CYC(b_+10, b_+12); L = 0x03;
   CYC(b_+12, b_+13); SET_AF(pop_effect(gb));
   CYC(b_+13, b_+14); mem_wr(gb, HL, A);
-  CYC(b_+14, SYM(interaction6b_checkGotBombsFromAmbi)); ret_effect(gb);
+  CYC(b_+14, b_+15); ret_effect(gb);
 }
 
 void interaction6b_checkGotBombsFromAmbi_hook(GB *gb) {
@@ -73,7 +73,7 @@ void interaction6b_checkGotBombsFromAmbi_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, (wGroup0RoomFlags + 131));
   CYC(b_+3, b_+5); alu_bit(gb, 7, A);
-  CYC(b_+5, SYM(interaction6b_checkLinkCanCollect)); writeFlagsTocddb_hook(gb);
+  CYC(b_+5, b_+8); writeFlagsTocddb_hook(gb);
 }
 
 void interaction6b_checkLinkCanCollect_hook(GB *gb) {
@@ -97,7 +97,7 @@ void interaction6b_checkLinkCanCollect_hook(GB *gb) {
 L_6bdd:
   CYC(b_+21, b_+23); E = 0x78;
   CYC(b_+23, b_+24); mem_wr(gb, DE, A);
-  CYC(b_+24, SYM(interaction6b_refillBombs)); ret_effect(gb);
+  CYC(b_+24, b_+25); ret_effect(gb);
 }
 
 void interaction6b_refillBombs_hook(GB *gb) {
@@ -106,5 +106,5 @@ void interaction6b_refillBombs_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(wMaxBombs);
   CYC(b_+3, b_+4); A = mem_rd(gb, HL); SET_HL(HL - 1);
   CYC(b_+4, b_+5); mem_wr(gb, HL, A);
-  CYC(b_+5, SYM(interaction6b_subid04Script_b15)); ret_effect(gb);
+  CYC(b_+5, b_+6); ret_effect(gb);
 }

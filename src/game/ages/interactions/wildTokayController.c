@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode70), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode70), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t wildTokayController_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -157,7 +157,7 @@ substate2:
   CALL_C(b_+167, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+170);
   CYC(b_+170, b_+171); alu_xor(gb, A);
   CYC(b_+171, b_+174); W8(wDisabledObjects) = A;
-  CYC(b_+174, b_+177); SET_BC((SYM(vblankInterrupt) + 30)); // TX_0a16
+  CYC(b_+174, b_+177); SET_BC(0x0a16); // TX_0a16
   CYC(b_+177, b_+180); showText_hook(gb); return; // jp
 
 substate3:
@@ -217,7 +217,7 @@ substate5:
   CYC(b_+256, b_+257); H = D;
   CYC(b_+257, b_+259); L = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+259, b_+261); mem_wr(gb, HL, 0x14);
-  CYC(b_+261, b_+264); SET_BC((SYM(vblankInterrupt) + 32)); // TX_0a18
+  CYC(b_+261, b_+264); SET_BC(0x0a18); // TX_0a18
   CYC(b_+264, b_+266); L = INTERACTION_BASE + OBJ_VAR03;
   CYC(b_+266, b_+267); A = mem_rd(gb, HL);
   CYC(b_+267, b_+268); alu_add(gb, C);

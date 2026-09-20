@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode7a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode7a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void enemyCode7a_hook(GB *gb);
 void shadowHag_state_uninitialized_hook(GB *gb);
@@ -146,7 +146,7 @@ void shadowHag_state_uninitialized_hook(GB *gb) {
   CYC(b_+2, b_+4); B = 0x00;
   CALL_C(b_+4, enemyBoss_initializeRoom_b0f_hook, SYM(enemyBoss_initializeRoom_b0f), b_+7);
   CYC(b_+7, b_+9); A = 0x14; // SPEED_80
-  CYC(b_+9, SYM(shadowHag_state_stub)); ecom_setSpeedAndState8_b0f_hook(gb); return; // jp
+  CYC(b_+9, b_+12); ecom_setSpeedAndState8_b0f_hook(gb); return; // jp
 }
 
 void shadowHag_state_stub_hook(GB *gb) {
@@ -230,7 +230,7 @@ substate3:
   CYC(b_+96, b_+98); mem_wr(gb, HL, 0x08); // [counter1]
   CYC(b_+98, b_+99); L = E;
   CYC(b_+99, b_+100); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [state]
-  CYC(b_+100, b_+103); SET_BC((SYM(updateEnemy) + 36)); // TX_2f2b
+  CYC(b_+100, b_+103); SET_BC(0x2f2b); // TX_2f2b
   CYC(b_+103, b_+106); showText_hook(gb); return; // jp
 
 substate4:
@@ -241,7 +241,7 @@ substate4:
   CALL_C(b_+114, enemyBoss_beginBoss_b0f_hook, SYM(enemyBoss_beginBoss_b0f), b_+117);
 
 animate:
-  CYC(b_+117, SYM(shadowHag_state9)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+117, b_+120); enemyAnimate_hook(gb); return; // jp
 }
 
 // Currently in the ground, showing eyes
@@ -280,7 +280,7 @@ L_6c55:
   CYC(b_+41, b_+43); mem_wr(gb, HL, 0x04); // [counter2]
   CYC(b_+43, b_+45); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+45, b_+47); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
-  CYC(b_+47, SYM(shadowHag_stateA)); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+47, b_+50); objectSetInvisible_hook(gb); return; // jp
 }
 
 // Shadows chasing Link
@@ -323,7 +323,7 @@ void shadowHag_stateB_hook(GB *gb) {
   CYC(b_+8, b_+10); alu_and(gb, 0x01);
   CYC(b_+10, b_+12); alu_add(gb, 0x02);
   CYC(b_+12, b_+14); E = ENEMY_BASE + OBJ_COUNTER2;
-  CYC(b_+14, SYM(shadowHag_initStateC)); mem_wr(gb, DE, A);
+  CYC(b_+14, b_+15); mem_wr(gb, DE, A);
   shadowHag_initStateC_hook(gb); return; // fallthrough
 }
 
@@ -343,7 +343,7 @@ void shadowHag_initStateC_hook(GB *gb) {
   CYC(b_+18, b_+20); mem_wr(gb, HL, 0x05);
   CALL_C(b_+20, objectSetVisible83_hook, SYM(objectSetVisible83), b_+23);
   CYC(b_+23, b_+25); A = 0x04;
-  CYC(b_+25, SYM(shadowHag_stateC)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+25, b_+28); enemySetAnimation_hook(gb); return; // jp
 }
 
 // Delay before spawning bugs
@@ -358,7 +358,7 @@ void shadowHag_stateC_hook(GB *gb) {
   CYC(b_+8, b_+9); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
 
 L_6cc9:
-  CYC(b_+9, SYM(shadowHag_stateD)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+9, b_+12); enemyAnimate_hook(gb); return; // jp
 }
 
 // Spawning bugs
@@ -422,7 +422,7 @@ L_6d0c:
   CYC(b_+21, b_+22); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
   CYC(b_+22, b_+24); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+24, b_+26); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
-  CYC(b_+26, SYM(shadowHag_stateF)); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+26, b_+29); objectSetInvisible_hook(gb); return; // jp
 }
 
 // Waiting for Link to be in a position where the hag can spawn behind him
@@ -454,7 +454,7 @@ couldntSpawn:
   CYC(b_+30, b_+33);
   CALL_C(b_+33, shadowHag_beginReturningToGround_hook, SYM(shadowHag_beginReturningToGround), b_+36);
   CYC(b_+36, b_+38); A = 0x04;
-  CYC(b_+38, SYM(shadowHag_state10)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+38, b_+41); enemySetAnimation_hook(gb); return; // jp
 }
 
 // Spawning out of ground to attack Link
@@ -478,7 +478,7 @@ void shadowHag_state10_hook(GB *gb) {
   CYC(b_+27, b_+28); L = alu_inc8(gb, L);
   CYC(b_+28, b_+30); mem_wr(gb, HL, 0x08);
   CALL_C(b_+30, ecom_updateCardinalAngleTowardTarget_b0f_hook, SYM(ecom_updateCardinalAngleTowardTarget_b0f), b_+33);
-  CYC(b_+33, SYM(shadowHag_state11)); ecom_updateAnimationFromAngle_b0f_hook(gb); return; // jp
+  CYC(b_+33, b_+36); ecom_updateAnimationFromAngle_b0f_hook(gb); return; // jp
 }
 
 // Delay before charging at Link
@@ -493,13 +493,13 @@ void shadowHag_state11_hook(GB *gb) {
   CYC(b_+8, b_+9);
   CYC(b_+9, b_+11); mem_wr(gb, HL, 0x3c); // [counter1] = 60
   CYC(b_+11, b_+13); L = ENEMY_BASE + OBJ_STATE;
-  CYC(b_+13, SYM(shadowHag_animate)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
+  CYC(b_+13, b_+14); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
   shadowHag_animate_hook(gb); return; // fallthrough
 }
 
 void shadowHag_animate_hook(GB *gb) {
   BASE(shadowHag_animate);
-  CYC(b_+0, SYM(shadowHag_state12)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // Charging at Link
@@ -525,7 +525,7 @@ void shadowHag_state12_hook(GB *gb) {
   if (!(F & FC)) { CYCT(b_+26, b_+28); shadowHag_doneCharging_hook(gb); return; } // jr nc
   CYC(b_+26, b_+28);
   CALL_C(b_+28, objectApplySpeed_hook, SYM(objectApplySpeed), b_+31);
-  CYCT(b_+31, SYM(shadowHag_doneCharging)); shadowHag_animate_hook(gb); return; // jr
+  CYCT(b_+31, b_+33); shadowHag_animate_hook(gb); return; // jr
 }
 
 void shadowHag_doneCharging_hook(GB *gb) {
@@ -541,7 +541,7 @@ void shadowHag_doneCharging_hook(GB *gb) {
   CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+15, b_+17); mem_wr(gb, HL, 0x80 | 0x29); // ENEMY_PODOBOO
   CYC(b_+17, b_+19); A = 0x06;
-  CYC(b_+19, SYM(shadowHag_state13)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+19, b_+22); enemySetAnimation_hook(gb); return; // jp
 }
 
 // Delay before spawning bugs again
@@ -551,7 +551,7 @@ void shadowHag_state13_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+3);
   if (!(F & FZ)) { CYCT(b_+3, b_+5); shadowHag_updateReturningToGround_hook(gb); return; } // jr nz
   CYC(b_+3, b_+5);
-  CYC(b_+5, SYM(shadowHag_beginEmergingFromShadow)); shadowHag_initStateC_hook(gb); return; // jp
+  CYC(b_+5, b_+8); shadowHag_initStateC_hook(gb); return; // jp
 }
 
 void shadowHag_beginEmergingFromShadow_hook(GB *gb) {
@@ -632,7 +632,7 @@ void shadowHag_beginReturningToGround_hook(GB *gb) {
   CYC(b_+20, b_+21); L = alu_inc8(gb, L);
   CYC(b_+21, b_+23); mem_wr(gb, HL, 0x05);
   CYC(b_+23, b_+25); A = 0x06;
-  CYC(b_+25, SYM(shadowHag_chooseSpawnPosition)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+25, b_+28); enemySetAnimation_hook(gb); return; // jp
 }
 
 // Chooses position to spawn at for charge attack based on Link's facing direction.

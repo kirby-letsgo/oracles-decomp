@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode1a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode1a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // wRotatingCubeColor -> OAM palette index for the flame.
 #define coloredCubeFlamePalettes_bank08 SYM(interactionCode1a__palettes)

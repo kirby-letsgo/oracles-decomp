@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodeda), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodeda), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t zelda_approach_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -85,7 +85,7 @@ next_interaction:
     CYC(b_+83, b_+85); alu_cp(gb, 0xe0);
     if (F & FC) { CYCT(b_+85, b_+87); continue; }
     CYC(b_+85, b_+87);
-    CYC(b_+87, SYM(interactionCode99)); interactionDelete_hook(gb); return;
+    CYC(b_+87, b_+90); interactionDelete_hook(gb); return;
   }
 }
 

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(pirateCaptain_warpOut), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(pirateCaptain_warpOut), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void pirateCaptain_warpOut_hook(GB *gb) {
   BASE(pirateCaptain_warpOut);

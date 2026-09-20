@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode76), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode76), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCode76_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -214,7 +214,7 @@ next_loadPoofs:
   if (!(F & FZ)) { CYCT(b_+270, b_+272); goto next_loadPoofs; } // jr nz
   CYC(b_+270, b_+272);
   CYC(b_+272, b_+274); A = 0x73; // SND_KILLENEMY
-  CYC(b_+274, SYM(interactionCode77)); playSound_b00_hook(gb);
+  CYC(b_+274, b_+277); playSound_b00_hook(gb);
   if (gb->pc == b_+49 && gb->sp == sp0_) goto after1_loadPoofs;
   if (gb->pc == b_+75 && gb->sp == sp0_) goto after2_loadPoofs;
   if (gb->pc == b_+103 && gb->sp == sp0_) goto after3_loadPoofs;

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode38), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode38), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // interactionCode38@scriptTable: one mainScripts.pastGirlScript_* pointer per game
 // progress value returned by getGameProgress_2.

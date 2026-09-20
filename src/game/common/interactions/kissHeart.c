@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodeb7), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodeb7), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t kiss_heart_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -26,7 +26,7 @@ static uint16_t kiss_heart_jump_table(GB *gb) {
 
 void interactionCodeb7__afterCall48b5_hook(GB *gb) {
   BASE(interactionCodeb7);
-  CYC(b_+14, SYM(interactionCodec0)); objectSetVisible82_hook(gb);
+  CYC(b_+14, b_+17); objectSetVisible82_hook(gb);
 }
 
 void interactionCodeb7_hook(GB *gb) {

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(checkInitUnderwaterWaves), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(checkInitUnderwaterWaves), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void checkUpdateUnderwaterWaves_hook(GB *gb);
 
@@ -21,7 +21,7 @@ void checkInitUnderwaterWaves_hook(GB *gb) {
   CYC(b_+6, b_+8); A = 0x10;
   CYC(b_+8, b_+11); W8(wGfxRegs2_LYC) = A;
   CYC(b_+11, b_+13); A = 0x02;
-  CYC(b_+13, b_+15); hram_wr(gb, 0x9d, A);
+  CYC(b_+13, b_+15); mem_wr(gb, hNextLcdInterruptBehaviour, A);
   CYC(b_+15, b_+17); A = 0x02;
   CALL_C(b_+17, initWaveScrollValues_hook, SYM(initWaveScrollValues), SYM(checkUpdateUnderwaterWaves));
   checkUpdateUnderwaterWaves_hook(gb);
@@ -68,7 +68,7 @@ void checkUpdateUnderwaterWaves_hook(GB *gb) {
   }
   CYC(b_+46, b_+47); alu_xor(gb, A);
   CYC(b_+47, b_+49); hram_wr(gb, 0x70, A);
-  CYC(b_+49, SYM(checkDisableUnderwaterWaves)); ret_effect(gb);
+  CYC(b_+49, b_+50); ret_effect(gb);
 }
 
 void checkDisableUnderwaterWaves_hook(GB *gb) {
@@ -82,8 +82,8 @@ void checkDisableUnderwaterWaves_hook(GB *gb) {
   }
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+8); A = 0x03;
-  CYC(b_+8, b_+10); hram_wr(gb, 0x9d, A);
+  CYC(b_+8, b_+10); mem_wr(gb, hNextLcdInterruptBehaviour, A);
   CYC(b_+10, b_+12); A = 0xc7;
   CYC(b_+12, b_+15); W8(wGfxRegs2_LYC) = A;
-  CYC(b_+15, SYM(checkSolidObjectAtWarpDestPos)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }

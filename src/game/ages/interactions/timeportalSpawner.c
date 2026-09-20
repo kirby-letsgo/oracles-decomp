@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodee1), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodee1), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/ages/interactions/timeportalSpawner.s (INTERAC_TIMEPORTAL_SPAWNER), bank $10.
 
@@ -157,7 +157,7 @@ state2:
   CALL_C(b_+155, playSound_b00_hook, SYM(playSound_b00), b_+158);
   CYC(b_+158, b_+160); A = 0x8d;
   CALL_C(b_+160, playSound_b00_hook, SYM(playSound_b00), b_+163);
-  CYC(b_+163, SYM(interactionCodee3));
+  CYC(b_+163, b_+166);
   interactionIncState_hook(gb);
 }
 

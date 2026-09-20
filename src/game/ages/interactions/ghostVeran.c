@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(runVeranGhostSubid0), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(runVeranGhostSubid0), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t ghost_veran_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -38,8 +38,8 @@ static void ghost_veran_rumble_and_randomize_x(GB *gb, uint16_t sp0_) {
 }
 
 static void ghost_veran_update_script_position(GB *gb, uint16_t sp0_, uint16_t call, uint16_t ret) {
-  BASE(objectGetPosition);
-  CALL_C(call, objectGetPosition_hook, b_+0, ret);
+  BANKOF(runVeranGhostSubid0);
+  CALL_C(call, objectGetPosition_hook, SYM(objectGetPosition), ret);
   CYC(ret, ret + 3); SET_HL(wTmpcfc0_genericCutscene_cfd5);
   CYC(ret + 3, ret + 4); mem_wr(gb, HL, B);
   CYC(ret + 4, ret + 5); L = alu_inc8(gb, L);
@@ -217,7 +217,7 @@ script_position:
       CYC(b_+174, b_+176); alu_cp(gb, 0x12);
       if (!(F & FZ)) { CYCT(b_+176, b_+178); goto script_position_2; }
       CYC(b_+176, b_+178);
-      CYC(b_+178, b_+181); SET_BC((SYM(loadGfxRegisterStateIndex) + 24));
+      CYC(b_+178, b_+181); SET_BC(0x0302);
       CYC(b_+181, b_+184); push_effect(gb, b_+184);
       ghost_veran_rumble_and_randomize_x(gb, sp0_);
       CYC(b_+184, b_+186); goto run_script;
@@ -246,7 +246,7 @@ run_script:
       CALL_C(b_+250, interactionRunScript_hook, SYM(interactionRunScript), b_+253);
       if (!(F & FC)) { CYCT(b_+253, b_+254); ret_effect(gb); return; }
       CYC(b_+253, b_+254);
-      CYC(b_+254, SYM(runVeranGhostSubid1)); interactionDelete_hook(gb); return;
+      CYC(b_+254, b_+257); interactionDelete_hook(gb); return;
     }
     else { HANDOFF(HL); }
   } while (0);
@@ -263,7 +263,7 @@ void runVeranGhostSubid1_hook(GB *gb) {
     if (F & FC) { CYCT(b_+9, b_+12); interactionDelete_hook(gb); return; }
     CYC(b_+9, b_+12);
   } else CYCT(b_+4, b_+6);
-  CYC(b_+12, SYM(runVeranGhostSubid2)); interactionAnimate_hook(gb);
+  CYC(b_+12, b_+15); interactionAnimate_hook(gb);
 }
 
 void runVeranGhostSubid2_hook(GB *gb) {
@@ -347,7 +347,7 @@ animate:
 delete:
       CYC(b_+122, b_+124); A = 1;
       CYC(b_+124, b_+127); W8(wLoadedTreeGfxIndex) = A;
-      CYC(b_+127, SYM(interactionCode3f)); interactionDelete_hook(gb); return;
+      CYC(b_+127, b_+130); interactionDelete_hook(gb); return;
     }
     else { HANDOFF(HL); }
   } while (0);

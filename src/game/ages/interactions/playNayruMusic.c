@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode2f), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode2f), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // INTERAC_PLAY_NAYRU_MUSIC: starts Nayru's song at half volume until the intro is done,
 // then deletes itself.
@@ -30,5 +30,5 @@ void interactionCode2f_hook(GB *gb) {
 setVolume:
   CYC(b_+20, b_+22); A = 0x02;
   CALL_C(b_+22, setMusicVolume_hook, SYM(setMusicVolume), b_+25);
-  CYC(b_+25, SYM(interactionCode30)); interactionDelete_hook(gb);
+  CYC(b_+25, b_+28); interactionDelete_hook(gb);
 }

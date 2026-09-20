@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode7c), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode7c), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // INTERAC_SCREEN_DISTORTION
 void interactionCode7c_hook(GB *gb) {
@@ -28,5 +28,5 @@ state0:
   CYC(b_+25, b_+27); A = 0x95; // SND_WARP_START
   CALL_C(b_+27, playSound_b00_hook, SYM(playSound_b00), b_+30);
   CYC(b_+30, b_+32); A = 0xff;
-  CYC(b_+32, SYM(interactionCode80)); initWaveScrollValues_hook(gb); return; // jp
+  CYC(b_+32, b_+35); initWaveScrollValues_hook(gb); return; // jp
 }

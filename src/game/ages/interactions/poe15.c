@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(poe_decCounterAndFlickerVisibility), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(poe_decCounterAndFlickerVisibility), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void writeFlagsTocddb_hook(GB *gb);
 
@@ -28,5 +28,5 @@ void poe_decCounterAndFlickerVisibility_hook(GB *gb) {
   CYC(b_+16, b_+19);
 
 set_visible:
-  CYC(b_+19, SYM(poeScript_b15)); objectSetVisible_hook(gb); return; // jp
+  CYC(b_+19, b_+22); objectSetVisible_hook(gb); return; // jp
 }

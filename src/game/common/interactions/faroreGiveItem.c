@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactiond9_state2), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactiond9_state2), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactiond9_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -61,7 +61,7 @@ static void interactiond9_state2_createTreasure(GB *gb, uint16_t sp0_, uint16_t 
   CALL_C(b_+271, createTreasure_hook, SYM(createTreasure), b_+274);
   if (!(F & FZ)) { CYCT(b_+274, b_+275); ret_effect(gb); return; } // ret nz
   CYC(b_+274, b_+275);
-  CYC(b_+275, SYM(interactiond9_markSecretAsTold)); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+275, b_+278); objectCopyPosition_hook(gb); return; // jp
 }
 
 // 0b:4f65, interactiond9_state2@createTreasureAndIncSubstate. Reached by plain goto/fallthrough
@@ -137,7 +137,7 @@ void interactiond9_markSecretAsTold_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_add(gb, 0x5a); // GLOBALFLAG_FIRST_AGES_DONE_SECRET
   CALL_C(b_+5, setGlobalFlag_hook, SYM(setGlobalFlag), b_+8);
   CYC(b_+8, b_+10); A = 0x2c; // GLOBALFLAG_SECRET_CHEST_WAITING
-  CYC(b_+10, SYM(interactionCodeda)); unsetGlobalFlag_hook(gb); return; // jp
+  CYC(b_+10, b_+13); unsetGlobalFlag_hook(gb); return; // jp
 }
 
 // 0b:4e33, called from interactionCoded9@state1. Handles a brand-new (non-upgrade) item: it
@@ -212,7 +212,7 @@ substate4:
   CYC(b_+99, b_+100); C = A;
   CYC(b_+100, b_+102); A = 0xac;
   CALL_C(b_+102, setTile_hook, SYM(setTile), b_+105);
-  CYC(b_+105, SYM(interactiond9_state2)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+105, b_+108); interactionDelete_hook(gb); return; // jp
 }
 
 // 0b:4e9f, called from interactionCoded9@state2. Handles an upgrade item (ring box, sword,
@@ -345,7 +345,7 @@ bombUpgrade:
 
 satchelUpgrade:
   CYC(b_+187, b_+190); A = mem_rd(gb, wSeedSatchelLevel);
-  CYC(b_+190, b_+193); SET_BC((SYM(retrieveTextCharacter__func_18fd) + 7)); // TREASURE_OBJECT_SEED_SATCHEL_UPGRADE
+  CYC(b_+190, b_+193); SET_BC(0x1904); // TREASURE_OBJECT_SEED_SATCHEL_UPGRADE
   CYCT(b_+193, b_+195); interactiond9_state2_createTreasureAndIncSubstate_hook(gb); return; // jr
 
 label_0b_135:

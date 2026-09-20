@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodee6), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodee6), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/ages/interactions/raft.s (INTERAC_RAFT), bank $10.
 

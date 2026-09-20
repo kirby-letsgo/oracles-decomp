@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(ghiniHarassingMoosh_beginCircularMovement), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(ghiniHarassingMoosh_beginCircularMovement), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void ghiniHarassingMoosh_beginCircularMovement_hook(GB *gb) {
   BASE(ghiniHarassingMoosh_beginCircularMovement);
@@ -14,5 +14,5 @@ void ghiniHarassingMoosh_beginCircularMovement_hook(GB *gb) {
   CYC(b_+5, b_+7); E = 0x49;
   CYC(b_+7, b_+9); A = 0x18;
   CYC(b_+9, b_+10); mem_wr(gb, DE, A);
-  CYC(b_+10, SYM(tokayShopItem_giveFeatherAndLoseShovel)); ret_effect(gb);
+  CYC(b_+10, b_+11); ret_effect(gb);
 }

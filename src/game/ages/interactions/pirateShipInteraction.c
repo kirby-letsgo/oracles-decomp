@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodec2), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodec2), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/object_code/ages/interactions/pirateShip.s (interactionCodec2 /
 // INTERAC_PIRATE_SHIP), bank 0x0b. The SAME source file also contains updatePirateShip,
@@ -150,7 +150,7 @@ subid1And2State1:
   if (!(F & FZ)) { RET_TAKEN(b_+169); return; } // ret nz
   CYC(b_+169, b_+170);
   CYC(b_+170, b_+172); mem_wr(gb, HL, 0x80);
-  CYC(b_+172, b_+175); SET_BC((SYM(clearParts) + 7)); // TX_360c
+  CYC(b_+172, b_+175); SET_BC(0x360c); // TX_360c
   CALL_C(b_+175, showText_hook, SYM(showText), b_+178);
   CYC(b_+178, b_+181); interactionIncState_hook(gb); return; // jp
 
@@ -204,5 +204,5 @@ subid2:
 
 subid2State2:
   CYC(b_+259, b_+261); C = 0x00; // ANGLE_UP
-  CYC(b_+261, SYM(interactionCodec3)); goto moveOffScreen; // jr
+  CYC(b_+261, b_+263); goto moveOffScreen; // jr
 }

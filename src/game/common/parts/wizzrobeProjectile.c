@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(func_5369), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(func_5369), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void func_5369_hook(GB *gb) {
   BASE(func_5369);
@@ -19,7 +19,7 @@ void func_5369_hook(GB *gb) {
   CYC(b_+10, b_+12); A = alu_swap(gb, A);
   CYC(b_+12, b_+13); alu_rlca(gb);
   CALL_C(b_+13, partSetAnimation_hook, SYM(partSetAnimation), b_+16);
-  CYC(b_+16, SYM(partCode20)); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+16, b_+19); objectSetVisible81_hook(gb); return; // jp
 }
 
 void partCode1f_hook(GB *gb) {
@@ -40,5 +40,5 @@ void partCode1f_hook(GB *gb) {
   CYC(b_+16, b_+19);
 
 normalStatus:
-  CYC(b_+19, SYM(func_5369)); partDelete_hook(gb); return; // jp
+  CYC(b_+19, b_+22); partDelete_hook(gb); return; // jp
 }

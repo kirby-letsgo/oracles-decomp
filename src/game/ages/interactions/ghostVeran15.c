@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(ghostVeranApplySpeedUntilVar38Zero), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(ghostVeranApplySpeedUntilVar38Zero), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/scripts/ages/scriptHelper.s (INTERAC_VERAN_GHOST), bank 0x15.
 
@@ -17,5 +17,5 @@ void ghostVeranApplySpeedUntilVar38Zero_hook(GB *gb) {
   if (F & FZ) { RET_TAKEN(b_+4); return; }
   CYC(b_+4, b_+5);
   CALL_C(b_+5, objectApplySpeed_hook, SYM(objectApplySpeed), b_+8);
-  CYC(b_+8, SYM(ghostVeranSubid0Script_part1_b15)); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+8, b_+11); objectApplySpeed_hook(gb); return; // jp
 }

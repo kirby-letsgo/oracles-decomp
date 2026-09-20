@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode43), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode43), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void gel_state_uninitialized_hook(GB *gb);
 void gel_state_stub_hook(GB *gb);
@@ -89,7 +89,7 @@ void gel_state_uninitialized_hook(GB *gb) {
   CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+2, b_+4); A = 0x10;
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);
-  CYC(b_+5, SYM(gel_state_stub)); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
+  CYC(b_+5, b_+8); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
 }
 
 // 0e:5d83, bare global; jump-table target from enemyCode43.
@@ -135,7 +135,7 @@ inchForward:
   CYC(b_+35, b_+37); mem_wr(gb, HL, 0x0a); // SPEED_40
 
   CALL_C(b_+37, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+40);
-  CYC(b_+40, SYM(gel_state9)); gel_animate_hook(gb); return; // jr
+  CYC(b_+40, b_+42); gel_animate_hook(gb); return; // jr
 }
 
 // 0e:5dae, bare global; jump-table target from enemyCode43. Inching toward Link for
@@ -151,7 +151,7 @@ void gel_state9_hook(GB *gb) {
   CYC(b_+8, b_+10); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+10, b_+12); mem_wr(gb, HL, 0x08);
   CYC(b_+12, b_+14); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(b_+14, SYM(gel_animate)); mem_wr(gb, HL, 0x10);
+  CYC(b_+14, b_+16); mem_wr(gb, HL, 0x10);
   gel_animate_hook(gb); return; // fallthrough
 }
 
@@ -159,7 +159,7 @@ void gel_state9_hook(GB *gb) {
 // gel_state8, gel_stateA and gel_stateD.
 void gel_animate_hook(GB *gb) {
   BASE(gel_animate);
-  CYC(b_+0, SYM(gel_stateA)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:5dc1, bare global; jump-table target from enemyCode43. Preparing to hop toward Link.
@@ -170,7 +170,7 @@ void gel_stateA_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+3, b_+5); gel_animate_hook(gb); return; } // jr nz
   CYC(b_+3, b_+5);
   CALL_C(b_+5, gel_beginHop_hook, SYM(gel_beginHop), b_+8);
-  CYC(b_+8, SYM(gel_stateB)); ecom_updateAngleTowardTarget_b0e_hook(gb); return; // jp
+  CYC(b_+8, b_+11); ecom_updateAngleTowardTarget_b0e_hook(gb); return; // jp
 }
 
 // 0e:5dcc, bare global; jump-table target from enemyCode43. Hopping toward Link.
@@ -193,7 +193,7 @@ void gel_stateB_hook(GB *gb) {
 
   CYC(b_+18, b_+20); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+20, b_+22); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
-  CYC(b_+22, SYM(gel_stateC)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+22, b_+25); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 // 0e:5de5, bare global; jump-table target from enemyCode43. Just latched onto Link.
@@ -208,7 +208,7 @@ void gel_stateC_hook(GB *gb) {
   CYC(b_+5, b_+7); mem_wr(gb, HL, 120);
 
   CYC(b_+7, b_+9); A = 0x01;
-  CYC(b_+9, SYM(gel_stateD)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+9, b_+12); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:5df1, bare global; jump-table target from enemyCode43. Attached to Link, slowing him
@@ -269,7 +269,7 @@ disableSword:
 
 hopOff:
   CALL_C(b_+60, gel_setAngleAwayFromLink_hook, SYM(gel_setAngleAwayFromLink), b_+63);
-  CYC(b_+63, SYM(gel_beginHop)); gel_beginHop_hook(gb); return; // jr
+  CYC(b_+63, b_+65); gel_beginHop_hook(gb); return; // jr
 }
 
 // 0e:5e32, bare global; called from gel_stateA and gel_stateD.
@@ -290,7 +290,7 @@ void gel_beginHop_hook(GB *gb) {
 
   CYC(b_+18, b_+20); A = 0x8f; // SND_ENEMY_JUMP
   CALL_C(b_+20, playSound_b00_hook, SYM(playSound_b00), b_+23);
-  CYC(b_+23, SYM(gel_setAngleAwayFromLink)); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+23, b_+26); objectSetVisiblec1_hook(gb); return; // jp
 }
 
 // 0e:5e4c, bare global; called from gel_stateD.

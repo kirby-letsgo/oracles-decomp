@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode10), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode10), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void rope_subid00_hook(GB *gb);
 void rope_subid01_hook(GB *gb);
@@ -195,7 +195,7 @@ state8:
   CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+15, b_+17); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
   CYC(b_+17, b_+19); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(b_+19, SYM(rope_state_moveAround)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
+  CYC(b_+19, b_+21); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
   rope_state_moveAround_hook(gb); return; // fallthrough
 }
 
@@ -223,15 +223,15 @@ notCentered:
   CYC(b_+29, b_+30); L = alu_dec8(gb, L);
   CYC(b_+30, b_+31); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // [counter1]--
   if (!(F & FZ)) { CALL_C(b_+31, ecom_applyVelocityForSideviewEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0d), b_+34); } else { CYC(b_+31, b_+34); } // call nz
-  if (F & FZ) { CYCT(b_+34, SYM(rope_callEnemyAnimate)); rope_changeDirection_hook(gb); return; } // jp z
-  CYC(b_+34, SYM(rope_callEnemyAnimate));
+  if (F & FZ) { CYCT(b_+34, b_+37); rope_changeDirection_hook(gb); return; } // jp z
+  CYC(b_+34, b_+37);
   rope_callEnemyAnimate_hook(gb); return; // fallthrough
 }
 
 // 0d:4eda, bare global.
 void rope_callEnemyAnimate_hook(GB *gb) {
   BASE(rope_callEnemyAnimate);
-  CYC(b_+0, SYM(rope_state_chargeLink)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0d:4edd, bare global; charging Link.
@@ -248,7 +248,7 @@ void rope_state_chargeLink_hook(GB *gb) {
   CYC(b_+12, b_+14); mem_wr(gb, HL, 0x0f); // SPEED_60
   CYC(b_+14, b_+16); L = ENEMY_BASE + OBJ_COUNTER2;
   CYC(b_+16, b_+18); mem_wr(gb, HL, 0x40);
-  CYC(b_+18, SYM(rope_subid01)); rope_changeDirection_hook(gb); return; // jp
+  CYC(b_+18, b_+21); rope_changeDirection_hook(gb); return; // jp
 }
 
 // 0d:4ef2, bare global; rope that falls from the sky.
@@ -312,7 +312,7 @@ stateA:
   CYC(b_+77, b_+79); A = 0x52; // SND_BOMB_LAND
   CALL_C(b_+79, playSound_b00_hook, SYM(playSound_b00), b_+82);
   CALL_C(b_+82, rope_changeDirection_hook, SYM(rope_changeDirection), b_+85);
-  CYC(b_+85, SYM(rope_subid02)); rope_callEnemyAnimate_hook(gb); return; // jr
+  CYC(b_+85, b_+87); rope_callEnemyAnimate_hook(gb); return; // jr
 }
 
 // 0d:4f49, bare global; immediately charges Link upon spawning.
@@ -355,7 +355,7 @@ state9:
 
 applyVelocity:
   CALL_C(b_+45, ecom_applyVelocityForSideviewEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0d), b_+48);
-  CYC(b_+48, SYM(rope_subid03)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+48, b_+51); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0d:4f7c, bare global; falls and bounces toward Link when it spawns.
@@ -415,7 +415,7 @@ applyVelocity2:
 doneBouncing:
   CALL_C(b_+68, ecom_incState_b0d_hook, SYM(ecom_incState_b0d), b_+71);
   CYC(b_+71, b_+73); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(b_+73, SYM(rope_changeDirection)); mem_wr(gb, HL, 0x0f); // SPEED_60
+  CYC(b_+73, b_+75); mem_wr(gb, HL, 0x0f); // SPEED_60
   rope_changeDirection_hook(gb); return; // fallthrough
 }
 
@@ -423,7 +423,7 @@ doneBouncing:
 void rope_changeDirection_hook(GB *gb) {
   BASE(rope_changeDirection);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); SET_BC((SYM(showTextNonExitable) + 2));
+  CYC(b_+0, b_+3); SET_BC(0x1870);
   CALL_C(b_+3, ecom_randomBitwiseAndBCE_b0d_hook, SYM(ecom_randomBitwiseAndBCE_b0d), b_+6);
   CYC(b_+6, b_+8); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+8, b_+9); A = B;
@@ -431,7 +431,7 @@ void rope_changeDirection_hook(GB *gb) {
   CYC(b_+10, b_+12); E = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+12, b_+13); A = C;
   CYC(b_+13, b_+15); alu_add(gb, 0x70);
-  CYC(b_+15, SYM(rope_updateAnimationFromAngle)); mem_wr(gb, DE, A);
+  CYC(b_+15, b_+16); mem_wr(gb, DE, A);
   rope_updateAnimationFromAngle_hook(gb); return; // fallthrough
 }
 
@@ -452,7 +452,7 @@ void rope_updateAnimationFromAngle_hook(GB *gb) {
   if (F & FZ) { RET_TAKEN(b_+15); return; } // ret z
   CYC(b_+15, b_+16);
   CYC(b_+16, b_+17); mem_wr(gb, HL, A);
-  CYC(b_+17, SYM(rope_animate)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+17, b_+20); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0d:4feb, bare global.
@@ -469,7 +469,7 @@ void rope_animate_hook(GB *gb) {
 incAndStore:
   CYC(b_+9, b_+10); A = alu_inc8(gb, A);
   CYC(b_+10, b_+11); mem_wr(gb, HL, A);
-  CYC(b_+11, SYM(rope_checkHazardsIfApplicable)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+11, b_+14); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0d:4ff9, bare global.
@@ -480,5 +480,5 @@ void rope_checkHazardsIfApplicable_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_bit(gb, 7, mem_rd(gb, HL));
   if (F & FZ) { RET_TAKEN(b_+5); return; } // ret z
   CYC(b_+5, b_+6);
-  CYC(b_+6, SYM(enemyCode12)); ecom_checkHazards_b0d_hook(gb); return; // jp
+  CYC(b_+6, b_+9); ecom_checkHazards_b0d_hook(gb); return; // jp
 }

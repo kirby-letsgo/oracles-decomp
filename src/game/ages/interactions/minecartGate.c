@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode1b), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode1b), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // 3 bytes per [var30] value: two collision bytes for the gate's tile pair, then the offset
 // of the tile whose collision is set to $5e (closed) or $00 (open).
@@ -182,7 +182,7 @@ static void minecartGate_state3(GB *gb, uint16_t sp0_) {
   CYC(b_+182, b_+183); A = alu_inc8(gb, A);
   CYC(b_+183, b_+185); E = INTERACTION_BASE + OBJ_STATE;
   CYC(b_+185, b_+186); mem_wr(gb, DE, A);
-  CYC(b_+186, SYM(interactionCode1f)); ret_effect(gb);
+  CYC(b_+186, b_+187); ret_effect(gb);
 }
 
 // INTERAC_MINECART_GATE: a gate across the minecart track, opened/closed by a switch.

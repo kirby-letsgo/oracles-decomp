@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(func_5758), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(func_5758), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t beam_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -49,7 +49,7 @@ void func_5758_hook(GB *gb) {
   CYC(b_+10, b_+11); alu_and(gb, B);
   if (F & FZ) { CYCT(b_+11, b_+14); objectSetVisible81_hook(gb); return; } // jp z
   CYC(b_+11, b_+14);
-  CYC(b_+14, SYM(partCode2a)); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+14, b_+17); objectSetInvisible_hook(gb); return; // jp
 }
 
 void partCode29_hook(GB *gb) {

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(twinrovaInCutscene_state0), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(twinrovaInCutscene_state0), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/object_code/ages/interactions/twinrovaInCutscene.s (interactionCodeb0 /
 // INTERAC_TWINROVA_IN_CUTSCENE), bank 0x0b. Distinct from src/game/twinrova.c (bank 0x10,
@@ -115,7 +115,7 @@ subid3: // twinrovaInCutscene_state0@subid3
 commonInit2: // twinrovaInCutscene_state0@commonInit2
   CYC(b_+55, b_+57); E = INTERACTION_BASE + OBJ_OAM_FLAGS;
   CYC(b_+57, b_+58); mem_wr(gb, DE, A);
-  CYC(b_+58, SYM(twinrovaInCutscene_state1)); interactionSetAlwaysUpdateBit_hook(gb); return; // jp
+  CYC(b_+58, b_+61); interactionSetAlwaysUpdateBit_hook(gb); return; // jp
 }
 
 void twinrovaInCutscene_state1_hook(GB *gb) {
@@ -158,7 +158,7 @@ substate1: // twinrovaInCutscene_state1@substate1
   CYC(b_+51, b_+54); W8(wGenericCutscene_cbb8) = A;
   CYC(b_+54, b_+56); A = 0x08; // CUTSCENE_BLACK_TOWER_EXPLANATION
   CYC(b_+56, b_+59); W8(wCutsceneTrigger) = A;
-  CYC(b_+59, SYM(twinrovaInCutscene_loadScript)); ret_effect(gb); return; // ret
+  CYC(b_+59, b_+60); ret_effect(gb); return; // ret
 }
 
 void twinrovaInCutscene_loadScript_hook(GB *gb) {

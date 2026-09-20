@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(fairyHidingMinigame_spawnForestFairyIndex), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(fairyHidingMinigame_spawnForestFairyIndex), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static void fairyHidingMinigame_addAToHl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -25,7 +25,7 @@ void fairyHidingMinigame_spawnForestFairyIndex_hook(GB *gb) {
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x49);
   CYC(b_+7, b_+9); L = 0x43;
   CYC(b_+9, b_+10); mem_wr(gb, HL, B);
-  CYC(b_+10, SYM(fairyHidingMinigame_showFairyFoundText)); ret_effect(gb);
+  CYC(b_+10, b_+11); ret_effect(gb);
 }
 
 void fairyHidingMinigame_showFairyFoundText_hook(GB *gb) {
@@ -61,5 +61,5 @@ void fairyHidingMinigame_moveLinkBackLeft_hook(GB *gb) {
   CYC(b_+10, b_+13); mem_wr(gb, wLinkForceState, A);
   CYC(b_+13, b_+15); A = 0x08;
   CYC(b_+15, b_+18); mem_wr(gb, wLinkStateParameter, A);
-  CYC(b_+18, SYM(fairyHidingMinigame_subid00Script_b15)); ret_effect(gb);
+  CYC(b_+18, b_+19); ret_effect(gb);
 }

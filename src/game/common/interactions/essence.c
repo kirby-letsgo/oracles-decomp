@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interaction7f_subid01), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interaction7f_subid01), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCode7f_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -58,13 +58,13 @@ void interaction7f_subid01_hook(GB *gb) {
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+8); A = 0x01;
   CYC(b_+8, b_+9); mem_wr(gb, DE, A);
-  CYC(b_+9, b_+12); SET_BC((SYM(loadUncompressedGfxHeader) + 48));
+  CYC(b_+9, b_+12); SET_BC(0x060a);
   CALL_C(b_+12, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+15);
   CALL_C(b_+15, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+18);
   CYC(b_+18, b_+19); H = alu_dec8(gb, H);
   CYC(b_+19, b_+21); mem_wr(gb, HL, 0x0f);
   CALL_C(b_+21, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+24);
-  CYC(b_+24, SYM(interaction7f_subid02)); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+24, b_+27); objectSetVisible83_hook(gb); return; // jp
 }
 
 // interaction7f_subid02@copyEssencePosition: reached by one genuine call, from @state1's
@@ -102,7 +102,7 @@ afterCopy:
 copyEssencePosition:
   CYC(b_+35, b_+37); A = 0x00; // Object.enabled
   CALL_C(b_+37, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+40);
-  CYC(b_+40, SYM(interactionCode89)); objectTakePosition_hook(gb);
+  CYC(b_+40, b_+43); objectTakePosition_hook(gb);
   if (gb->pc == b_+17 && gb->sp == sp0_) goto afterCopy;
   return;
 }

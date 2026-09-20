@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(tuniNut_gotoState4), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(tuniNut_gotoState4), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void tuniNut_state0_hook(GB *gb);
 void tuniNut_gotoState4_hook(GB *gb);
@@ -34,13 +34,13 @@ static uint16_t tuni_nut_jump_table(GB *gb) {
 void tuniNut_gotoState4_hook(GB *gb) {
   BASE(tuniNut_gotoState4);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); SET_BC((SYM(_label_00_204) + 2));
+  CYC(b_+0, b_+3); SET_BC(0x1878);
   CALL_C(b_+3, interactionSetPosition_hook, SYM(interactionSetPosition), b_+6);
   CYC(b_+6, b_+8); L = 0x44;
   CYC(b_+8, b_+10); mem_wr(gb, HL, 0x04);
   CYC(b_+10, b_+12); A = 0x06;
   CALL_C(b_+12, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+15);
-  CYC(b_+15, SYM(tuniNut_state1));
+  CYC(b_+15, b_+18);
   objectSetVisible82_hook(gb);
 }
 
@@ -58,7 +58,7 @@ static void tuni_nut_state0_after_graphics(GB *gb, uint16_t sp0_) {
   CALL_C(b_+12, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+15);
   if (!(F & FC)) {
     CYCT(b_+15, b_+17);
-    CYC(b_+30, SYM(tuniNut_gotoState4));
+    CYC(b_+30, b_+33);
     interactionDelete_hook(gb);
     return;
   }
@@ -66,12 +66,12 @@ static void tuni_nut_state0_after_graphics(GB *gb, uint16_t sp0_) {
   CYC(b_+17, b_+19); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
     CYCT(b_+19, b_+21);
-    CYC(b_+30, SYM(tuniNut_gotoState4));
+    CYC(b_+30, b_+33);
     interactionDelete_hook(gb);
     return;
   }
   CYC(b_+19, b_+21);
-  CYC(b_+21, b_+24); SET_BC((SYM(loadTilesetHlpr) + 18));
+  CYC(b_+21, b_+24); SET_BC(0x0810);
   CALL_C(b_+24, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+27);
   CYC(b_+27, b_+30);
   interactionIncState_hook(gb);
@@ -107,7 +107,7 @@ void tuniNut_beginMovingIntoPlace_hook(GB *gb) {
   CYC(b_+24, b_+26); A = 0xf0;
   CALL_C(b_+26, playSound_b00_hook, SYM(playSound_b00), b_+29);
   CALL_C(b_+29, objectSetVisiblec0_hook, SYM(objectSetVisiblec0), b_+32);
-  CYC(b_+32, SYM(tuniNut_state3));
+  CYC(b_+32, b_+35);
   interactionIncState_hook(gb);
 }
 
@@ -137,7 +137,7 @@ void tuniNut_state1_hook(GB *gb) {
   if (F & FZ) {
     CYCT(b_+26, b_+28);
     CALL_C(b_+62, interactionIncState_hook, SYM(interactionIncState), b_+65);
-    CYC(b_+65, SYM(tuniNut_state2));
+    CYC(b_+65, b_+67);
     tuniNut_beginMovingIntoPlace_hook(gb);
     return;
   }
@@ -171,10 +171,10 @@ void tuniNut_state2_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+3);
   if (!(F & FZ)) {
-    CYCT(b_+3, SYM(tuniNut_beginMovingIntoPlace)); ret_effect(gb);
+    CYCT(b_+3, b_+4); ret_effect(gb);
     return;
   }
-  CYC(b_+3, SYM(tuniNut_beginMovingIntoPlace));
+  CYC(b_+3, b_+4);
   tuniNut_beginMovingIntoPlace_hook(gb);
 }
 
@@ -186,7 +186,7 @@ static void tuni_nut_set_row(GB *gb) {
   CYC(b_+151, b_+152); L = alu_inc8(gb, L);
   CYC(b_+152, b_+154); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
   CYC(b_+154, b_+155); L = alu_inc8(gb, L);
-  CYC(b_+155, SYM(func_7ca7)); ret_effect(gb);
+  CYC(b_+155, b_+156); ret_effect(gb);
 }
 
 static void tuni_nut_set_room_flags(GB *gb) {

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode4e), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode4e), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void armMimic_uninitialized_hook(GB *gb);
 void armMimic_state_switchHook_hook(GB *gb);
@@ -80,7 +80,7 @@ void armMimic_uninitialized_hook(GB *gb) {
   CYC(b_+9, b_+10); mem_wr(gb, DE, A);
   CALL_C(b_+10, enemySetAnimation_hook, SYM(enemySetAnimation), b_+13);
   CYC(b_+13, b_+15); A = 0x28; // SPEED_100
-  CYC(b_+15, SYM(armMimic_state_switchHook)); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
+  CYC(b_+15, b_+18); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
 }
 
 // 0e:6167, bare global; jump-table target from enemyCode4e.
@@ -132,5 +132,5 @@ void armMimic_state8_hook(GB *gb) {
   CALL_C(b_+29, enemySetAnimation_hook, SYM(enemySetAnimation), b_+32);
 
 animate:
-  CYC(b_+32, SYM(enemyCode4f)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+32, b_+35); enemyAnimate_hook(gb); return; // jp
 }

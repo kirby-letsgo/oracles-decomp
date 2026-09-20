@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode87), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode87), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t makuTree_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -192,7 +192,7 @@ state02:
   CYC(b_+250, b_+252); goto runSubidCode; // jr
 
 state03:
-  CYC(b_+252, b_+255); SET_BC((SYM(getLowestSetBit) + 8)); // ldbc $02,<TX_0500
+  CYC(b_+252, b_+255); SET_BC(0x0200); // ldbc $02,<TX_0500
   CYC(b_+255, b_+257); goto runSubid0ScriptMode; // jr
 
 state04:
@@ -208,15 +208,15 @@ state06:
   CYC(b_+270, b_+272); goto runSubid0ScriptMode; // jr
 
 state07:
-  CYC(b_+272, b_+275); SET_BC((SYM(gfxRegisterStates) + 259)); // ldbc $04,<TX_0509
+  CYC(b_+272, b_+275); SET_BC(0x0409); // ldbc $04,<TX_0509
   CYC(b_+275, b_+277); goto runSubid0ScriptMode; // jr
 
 state08:
-  CYC(b_+277, b_+280); SET_BC((SYM(gfxRegisterStates) + 261)); // ldbc $04,<TX_050b
+  CYC(b_+277, b_+280); SET_BC(0x040b); // ldbc $04,<TX_050b
   CYC(b_+280, b_+282); goto runSubid0ScriptMode; // jr
 
 state09:
-  CYC(b_+282, b_+285); SET_BC((SYM(checkFlag) + 8)); // ldbc $02,<TX_050d
+  CYC(b_+282, b_+285); SET_BC(0x020d); // ldbc $02,<TX_050d
   CYC(b_+285, b_+287); goto runSubid0ScriptMode; // jr
 
 state0a:
@@ -224,11 +224,11 @@ state0a:
   CYC(b_+290, b_+292); goto runSubid0ScriptMode; // jr
 
 state0b:
-  CYC(b_+292, b_+295); SET_BC((SYM(loadPaletteHeader) + 7)); // ldbc $05,<TX_0512
+  CYC(b_+292, b_+295); SET_BC(0x0512); // ldbc $05,<TX_0512
   CYC(b_+295, b_+297); goto runSubid0ScriptMode; // jr
 
 state0c:
-  CYC(b_+297, b_+300); SET_BC((SYM(gfxRegisterStates) + 270)); // ldbc $04,<TX_0514
+  CYC(b_+297, b_+300); SET_BC(0x0414); // ldbc $04,<TX_0514
   CYC(b_+300, b_+302); goto runSubid0ScriptMode; // jr
 
 state0d:

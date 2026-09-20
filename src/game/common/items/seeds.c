@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(seedItemDelete), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(seedItemDelete), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void seedItemDelete_hook(GB *gb);
 void emberSeedBurn_hook(GB *gb);
@@ -69,7 +69,7 @@ void seedItemDelete_hook(GB *gb) {
   CYC(b_+13, b_+14); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
 
 delete_item:
-  CYC(b_+14, SYM(seedItemState3)); itemDelete_hook(gb);
+  CYC(b_+14, b_+17); itemDelete_hook(gb);
 }
 
 void seedItemState3_hook(GB *gb) {
@@ -146,7 +146,7 @@ break_tile:
   CALL_C(b_+45, itemTryToBreakTile_hook, SYM(itemTryToBreakTile), b_+48);
 
 delete_self:
-  CYC(b_+48, SYM(seedUpdateAnimation)); seedItemDelete_hook(gb);
+  CYC(b_+48, b_+51); seedItemDelete_hook(gb);
 }
 
 void seedUpdateAnimation_hook(GB *gb) {
@@ -163,7 +163,7 @@ void seedUpdateAnimation_hook(GB *gb) {
     CYCT(b_+11, b_+12); ret_effect(gb); return;
   }
   CYC(b_+11, b_+12);
-  CYC(b_+12, SYM(seedItemState2)); seedItemDelete_hook(gb);
+  CYC(b_+12, b_+15); seedItemDelete_hook(gb);
 }
 
 void seedItemState2_hook(GB *gb) {
@@ -228,7 +228,7 @@ void scentSeedSmell_hook(GB *gb) {
     return;
   }
   CYC(b_+44, b_+47);
-  CYC(b_+47, SYM(galeSeedUpdateAnimationAndCounter)); itemUpdateSpeedZAndCheckHazards_hook(gb);
+  CYC(b_+47, b_+50); itemUpdateSpeedZAndCheckHazards_hook(gb);
 }
 
 void galeSeedUpdateAnimationAndCounter_hook(GB *gb) {
@@ -252,7 +252,7 @@ void galeSeedUpdateAnimationAndCounter_hook(GB *gb) {
   CYC(b_+15, b_+16); A = mem_rd(gb, HL);
   CYC(b_+16, b_+18); alu_xor(gb, 0x80);
   CYC(b_+18, b_+19); mem_wr(gb, HL, A);
-  CYC(b_+19, SYM(galeSeedUpdateAnimation)); ret_effect(gb);
+  CYC(b_+19, b_+20); ret_effect(gb);
 }
 
 void galeSeedUpdateAnimation_hook(GB *gb) {
@@ -273,7 +273,7 @@ void galeSeedUpdateAnimation_hook(GB *gb) {
   CYC(b_+15, b_+16); mem_wr(gb, DE, A);
   CYC(b_+16, b_+17); E = alu_inc8(gb, E);
   CYC(b_+17, b_+18); mem_wr(gb, DE, A);
-  CYC(b_+18, SYM(galeSeedTryToWarpLink)); ret_effect(gb);
+  CYC(b_+18, b_+19); ret_effect(gb);
 }
 
 void galeSeedTryToWarpLink_hook(GB *gb) {
@@ -437,7 +437,7 @@ substate3:
   CYC(b_+164, b_+165); A = mem_rd(gb, HL);
   CYC(b_+165, b_+167); alu_xor(gb, 0x80);
   CYC(b_+167, b_+168); mem_wr(gb, HL, A);
-  CYC(b_+168, SYM(seedItemUpdateBouncing)); ret_effect(gb);
+  CYC(b_+168, b_+169); ret_effect(gb);
 }
 
 void seedItemUpdateBouncing_hook(GB *gb) {
@@ -649,7 +649,7 @@ void func_50f4_hook(GB *gb) {
 
 unset_zero:
   CYC(b_+25, b_+26); alu_or(gb, D);
-  CYC(b_+26, SYM(seedItemClearKnockback)); ret_effect(gb);
+  CYC(b_+26, b_+27); ret_effect(gb);
 }
 
 void seedItemClearKnockback_hook(GB *gb) {
@@ -657,7 +657,7 @@ void seedItemClearKnockback_hook(GB *gb) {
   CYC(b_+0, b_+2); E = 0x2d;
   CYC(b_+2, b_+3); alu_xor(gb, A);
   CYC(b_+3, b_+4); mem_wr(gb, DE, A);
-  CYC(b_+4, SYM(data_5114)); ret_effect(gb);
+  CYC(b_+4, b_+5); ret_effect(gb);
 }
 
 static void seed_add_double_index_from_rst(GB *gb, uint16_t return_address) {

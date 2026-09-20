@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode24), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode24), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t triggerTranslator_jumpTable(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -93,7 +93,7 @@ clearBits:
   CYC(b_+77, b_+80); A = mem_rd(gb, wActiveTriggers);
   CYC(b_+80, b_+81); alu_and(gb, C);
   CYC(b_+81, b_+84); mem_wr(gb, wActiveTriggers, A);
-  CYC(b_+84, SYM(interactionCode25)); ret_effect(gb);
+  CYC(b_+84, b_+85); ret_effect(gb);
 }
 
 // INTERAC_TRIGGER_TRANSLATOR: mirrors some game state (toggle blocks, switches, lit

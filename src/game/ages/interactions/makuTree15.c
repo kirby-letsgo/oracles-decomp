@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(makuTree_setAnimation), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(makuTree_setAnimation), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void label_15_203_hook(GB *gb);
 void makuTree_func_709c_hook(GB *gb);
@@ -26,41 +26,41 @@ void makuTree_setAnimation_hook(GB *gb) {
   BASE(makuTree_setAnimation);
   CYC(b_+0, b_+2); E = 0x7b;
   CYC(b_+2, b_+3); mem_wr(gb, DE, A);
-  CYC(b_+3, SYM(makuTree_showTextWithOffsetAndUpdateMapText)); interactionSetAnimation_hook(gb);
+  CYC(b_+3, b_+6); interactionSetAnimation_hook(gb);
 }
 
 void makuTree_showTextWithOffsetAndUpdateMapText_hook(GB *gb) {
   BASE(makuTree_showTextWithOffsetAndUpdateMapText);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, makuTree_func_70a2_hook, SYM(makuTree_func_70a2), b_+3);
-  CYC(b_+3, SYM(makuTree_showTextWithOffset)); label_15_203_hook(gb);
+  CYC(b_+3, b_+5); label_15_203_hook(gb);
 }
 
 void makuTree_showTextWithOffset_hook(GB *gb) {
   BASE(makuTree_showTextWithOffset);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, makuTree_func_709c_hook, SYM(makuTree_func_709c), b_+3);
-  CYC(b_+3, SYM(makuTree_showTextAndUpdateMapText)); label_15_203_hook(gb);
+  CYC(b_+3, b_+5); label_15_203_hook(gb);
 }
 
 void makuTree_showTextAndUpdateMapText_hook(GB *gb) {
   BASE(makuTree_showTextAndUpdateMapText);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, makuTree_checkLinkedAndUpdateMapText_hook, SYM(makuTree_checkLinkedAndUpdateMapText), b_+3);
-  CYC(b_+3, SYM(makuTree_showText)); label_15_203_hook(gb);
+  CYC(b_+3, b_+5); label_15_203_hook(gb);
 }
 
 void makuTree_showText_hook(GB *gb) {
   BASE(makuTree_showText);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, makuTree_modifyTextIndexForLinked_hook, SYM(makuTree_modifyTextIndexForLinked), b_+3);
-  CYC(b_+3, SYM(label_15_203)); label_15_203_hook(gb);
+  CYC(b_+3, b_+6); label_15_203_hook(gb);
 }
 
 void label_15_203_hook(GB *gb) {
   BASE(label_15_203);
   CYC(b_+0, b_+2); B = 0x05;
-  CYC(b_+2, SYM(makuTree_func_709c)); showText_hook(gb);
+  CYC(b_+2, b_+5); showText_hook(gb);
 }
 
 void makuTree_func_709c_hook(GB *gb) {
@@ -68,14 +68,14 @@ void makuTree_func_709c_hook(GB *gb) {
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = 0x7f;
   CYC(b_+3, b_+4); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+4, SYM(makuTree_func_70a2)); makuTree_modifyTextIndexForLinked_hook(gb);
+  CYC(b_+4, b_+6); makuTree_modifyTextIndexForLinked_hook(gb);
 }
 
 void makuTree_func_70a2_hook(GB *gb) {
   BASE(makuTree_func_70a2);
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = 0x7f;
-  CYC(b_+3, SYM(makuTree_checkLinkedAndUpdateMapText)); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+3, b_+4); alu_add(gb, mem_rd(gb, HL));
   makuTree_checkLinkedAndUpdateMapText_hook(gb);
 }
 
@@ -88,7 +88,7 @@ void makuTree_checkLinkedAndUpdateMapText_hook(GB *gb) {
   CYC(b_+6, b_+9); SET_HL(wMakuMapTextPresent);
   CYC(b_+9, b_+10); makuTree_add_a_to_hl(gb, b_+10);
   CYC(b_+10, b_+11); mem_wr(gb, HL, C);
-  CYC(b_+11, SYM(makuTree_modifyTextIndexForLinked)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 void makuTree_modifyTextIndexForLinked_hook(GB *gb) {
@@ -141,7 +141,7 @@ setX:
   CYC(b_+46, b_+47); mem_wr(gb, HL, B);
   CYC(b_+47, b_+48); A = B;
   CYC(b_+48, b_+51); mem_wr(gb, wMakuTreeSeedSatchelXPosition, A);
-  CYC(b_+51, SYM(makuTree_checkSpawnSeedSatchel)); ret_effect(gb);
+  CYC(b_+51, b_+52); ret_effect(gb);
 }
 
 void makuTree_checkSpawnSeedSatchel_hook(GB *gb) {
@@ -166,13 +166,13 @@ void makuTree_checkSpawnSeedSatchel_hook(GB *gb) {
   CYC(b_+25, b_+28); A = mem_rd(gb, wMakuTreeSeedSatchelXPosition);
   CYC(b_+28, b_+30); L = 0x4d;
   CYC(b_+30, b_+31); mem_wr(gb, HL, A);
-  CYC(b_+31, SYM(makuTree_spawnMakuSeed)); ret_effect(gb);
+  CYC(b_+31, b_+32); ret_effect(gb);
 }
 
 void makuTree_spawnMakuSeed_hook(GB *gb) {
   BASE(makuTree_spawnMakuSeed);
   CYC(b_+0, b_+3); SET_BC(0xa600);
-  CYC(b_+3, SYM(makuTree_chooseTextAfterSeeingTwinrova)); objectCreateInteraction_hook(gb);
+  CYC(b_+3, b_+6); objectCreateInteraction_hook(gb);
 }
 
 void makuTree_chooseTextAfterSeeingTwinrova_hook(GB *gb) {
@@ -187,5 +187,5 @@ setE:
   CYC(b_+9, b_+11); E = 0x72;
   CYC(b_+11, b_+12); A = C;
   CYC(b_+12, b_+13); mem_wr(gb, DE, A);
-  CYC(b_+13, SYM(makuTree_subid00Script_body)); ret_effect(gb);
+  CYC(b_+13, b_+14); ret_effect(gb);
 }

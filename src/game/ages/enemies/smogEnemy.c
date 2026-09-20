@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(smog_state_uninitialized), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(smog_state_uninitialized), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void smog_state_uninitialized_hook(GB *gb);
 void smog_state_stub_hook(GB *gb);
@@ -101,7 +101,7 @@ parameter1:
   CALL_C(b_+91, ecom_spawnProjectile_b0f_hook, SYM(ecom_spawnProjectile_b0f), b_+94);
   CYC(b_+94, b_+96); L = PART_BASE + OBJ_SUBID; // Part.subid
   CYC(b_+96, b_+97); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+97, b_+100); SET_BC((SYM(loadTilesetHlpr) + 2));
+  CYC(b_+97, b_+100); SET_BC(0x0800);
   CYC(b_+100, b_+103); objectCopyPositionWithOffset_hook(gb); return; // jp
 
 parameter0:
@@ -156,7 +156,7 @@ void smog_state_uninitialized_hook(GB *gb) {
   }
 
 subid0Init:
-  CYC(b_+20, b_+23); SET_BC((SYM(updateEnemy) + 31)); // TX_2f26
+  CYC(b_+20, b_+23); SET_BC(0x2f26); // TX_2f26
   CALL_C(b_+23, showText_hook, SYM(showText), b_+26);
   CYC(b_+26, b_+28); E = ENEMY_BASE + OBJ_COUNTER2;
   CYC(b_+28, b_+30); A = 0x3c; // 60
@@ -282,7 +282,7 @@ void smog_state8_subid0_hook(GB *gb) {
   CYC(b_+30, b_+32); mem_wr(gb, HL, 0x01); // [child.subid]
   CYC(b_+32, b_+35); SET_BC(0x0010);
   CALL_C(b_+35, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+38);
-  CYCT(b_+38, SYM(smog_state8_subid1)); smog_deleteSelf_hook(gb); return; // jr
+  CYCT(b_+38, b_+40); smog_deleteSelf_hook(gb); return; // jr
 }
 
 void smog_state8_subid1_hook(GB *gb) {
@@ -291,7 +291,7 @@ void smog_state8_subid1_hook(GB *gb) {
   CALL_C(b_+0, enemyAnimate_hook, SYM(enemyAnimate), b_+3);
   CALL_C(b_+3, ecom_decCounter2_b0f_hook, SYM(ecom_decCounter2_b0f), b_+6);
   if (!(F & FZ)) { RET_TAKEN(b_+6); return; } // ret nz
-  CYC(b_+6, SYM(smog_deleteSelf));
+  CYC(b_+6, b_+7);
   smog_deleteSelf_hook(gb); return; // fallthrough
 }
 
@@ -300,7 +300,7 @@ void smog_deleteSelf_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, objectCreatePuff_hook, SYM(objectCreatePuff), b_+3);
   CALL_C(b_+3, decNumEnemies_hook, SYM(decNumEnemies), b_+6);
-  CYC(b_+6, SYM(smog_state8_subid2)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+6, b_+9); enemyDelete_hook(gb); return; // jp
 }
 
 // Small or medium-sized smog; identical to smog_state8_subid3 (the disassembly labels
@@ -467,7 +467,7 @@ notHuggingWall:
   CYC(b_+207, b_+209); E = ENEMY_BASE + OBJ_SUBSTATE;
   CYC(b_+209, b_+210); alu_xor(gb, A);
   CYC(b_+210, b_+211); mem_wr(gb, DE, A);
-  CYC(b_+211, SYM(smog_state8_subid4)); smog_applySpeed_hook(gb); return; // jp
+  CYC(b_+211, b_+214); smog_applySpeed_hook(gb); return; // jp
 }
 
 // Large smog (can be attacked)
@@ -559,7 +559,7 @@ void smog_checkHitWall_hook(GB *gb) {
   CYC(b_+5, b_+6); alu_rrca(gb);
   CYC(b_+6, b_+7); E = alu_inc8(gb, E);
   CYC(b_+7, b_+8); mem_wr(gb, DE, A);
-  CYCT(b_+8, SYM(smog_positionOffsets)); smog_checkAdjacentWallsBitset_hook(gb); return; // jr
+  CYCT(b_+8, b_+10); smog_checkAdjacentWallsBitset_hook(gb); return; // jr
 }
 
 // @param[out] zflag nz if hugging a wall
@@ -600,7 +600,7 @@ L_7314:
   CYC(b_+43, b_+45); A = alu_swap(gb, A);
   CYC(b_+45, b_+47); alu_and(gb, 0x0f);
   CYC(b_+47, b_+48); alu_add(gb, C);
-  CYC(b_+48, SYM(smog_checkAdjacentWallsBitset)); mem_wr(gb, DE, A);
+  CYC(b_+48, b_+49); mem_wr(gb, DE, A);
   smog_checkAdjacentWallsBitset_hook(gb); return; // fallthrough
 }
 
@@ -669,7 +669,7 @@ void smog_updateAdjacentWallsBitset_hook(GB *gb) {
   CYC(b_+8, b_+10); L = ENEMY_BASE + OBJ_XH;
   CYC(b_+10, b_+11); C = mem_rd(gb, HL);
   CYC(b_+11, b_+13); A = 0x01;
-  CYC(b_+13, b_+15); hram_wr(gb, 0x8b, A);
+  CYC(b_+13, b_+15); mem_wr(gb, hFF8B, A);
   CYC(b_+15, b_+18); SET_HL(b_+47); // adjacent-tile offsets
 
 loop:
@@ -690,9 +690,9 @@ loop:
 
 L_738a:
   CYC(b_+35, b_+36); SET_HL(pop_effect(gb));
-  CYC(b_+36, b_+38); A = hram_rd(gb, 0x8b);
+  CYC(b_+36, b_+38); A = mem_rd(gb, hFF8B);
   CYC(b_+38, b_+39); alu_rla(gb);
-  CYC(b_+39, b_+41); hram_wr(gb, 0x8b, A);
+  CYC(b_+39, b_+41); mem_wr(gb, hFF8B, A);
   if (!(F & FC)) { CYCT(b_+41, b_+43); goto loop; } // jr nc
   CYC(b_+41, b_+43);
   CYC(b_+43, b_+45); E = ENEMY_BASE + 0x30; // var30

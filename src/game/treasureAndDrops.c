@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(giveTreasure_body), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(giveTreasure_body), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void loseTreasure_helper_hook(GB *gb);
 void realignUnappraisedRings__findNextFilledSlot_hook(GB *gb);
@@ -212,7 +212,7 @@ void checkTreasureObtained_body_hook(GB *gb) {
     }
     CYC(b_+47, b_+49);
     CYC(b_+49, b_+51); H = 0x00;
-    CYC(b_+51, SYM(loseTreasure_body)); ret_effect(gb); return;
+    CYC(b_+51, b_+52); ret_effect(gb); return;
   }
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+7); H8(hFF8B) = A;
@@ -221,7 +221,7 @@ void checkTreasureObtained_body_hook(GB *gb) {
   if (F & FZ) {
     CYCT(b_+13, b_+15);
     CYC(b_+49, b_+51); H = 0x00;
-    CYC(b_+51, SYM(loseTreasure_body)); ret_effect(gb); return;
+    CYC(b_+51, b_+52); ret_effect(gb); return;
   }
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+16); push_effect(gb, BC);
@@ -255,7 +255,7 @@ void loseTreasure_body_hook(GB *gb) {
   CYC(b_+1, b_+2); A = B;
   CALL_C(b_+2, loseTreasure_helper_hook, SYM(loseTreasure_helper), b_+5);
   CYC(b_+5, b_+6); SET_HL(pop_effect(gb));
-  CYC(b_+6, SYM(loseTreasure_helper)); ret_effect(gb);
+  CYC(b_+6, b_+7); ret_effect(gb);
 }
 
 void loseTreasure_helper_hook(GB *gb) {
@@ -291,7 +291,7 @@ void loseTreasure_helper_hook(GB *gb) {
   CYC(b_+24, b_+26); mem_wr(gb, HL, 0x00);
   CYC(b_+26, b_+29); SET_HL(wStatusBarNeedsRefresh);
   CYC(b_+29, b_+31); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
-  CYC(b_+31, SYM(giveTreasure_body)); ret_effect(gb);
+  CYC(b_+31, b_+32); ret_effect(gb);
 }
 
 void getNumUnappraisedRings_hook(GB *gb) {
@@ -323,7 +323,7 @@ void getNumUnappraisedRings_hook(GB *gb) {
   CYC(b_+27, b_+28); SET_BC(pop_effect(gb));
   CYC(b_+28, b_+29); B = E;
   CYC(b_+29, b_+30); SET_DE(pop_effect(gb));
-  CYC(b_+30, SYM(addTreasureToInventory)); ret_effect(gb);
+  CYC(b_+30, b_+31); ret_effect(gb);
 }
 
 void realignUnappraisedRings_hook(GB *gb) {
@@ -382,7 +382,7 @@ void realignUnappraisedRings__findNextFilledSlot_hook(GB *gb) {
   CYC(b_+35, b_+36); SET_HL(HL - 1);
   CYC(b_+36, b_+38); mem_wr(gb, HL, 0xff);
   CYC(b_+38, b_+39); alu_scf(gb);
-  CYC(b_+39, SYM(getNumUnappraisedRings)); ret_effect(gb);
+  CYC(b_+39, b_+40); ret_effect(gb);
 }
 
 void addTreasureToInventory_hook(GB *gb) {
@@ -463,7 +463,7 @@ void addTreasureToInventory__addToInventory_hook(GB *gb) {
   CYC(b_+60, b_+61); A = L;
   CYC(b_+61, b_+63); alu_sub(gb, 0x8a);
   CYC(b_+63, b_+65); alu_bit(gb, 7, B);
-  CYC(b_+65, SYM(loadTreasureDisplayData_b3f)); ret_effect(gb);
+  CYC(b_+65, b_+66); ret_effect(gb);
 }
 
 void loadTreasureDisplayData_b3f_hook(GB *gb) {
@@ -546,7 +546,7 @@ void loadTreasureDisplayData__getTableIndices_b3f_hook(GB *gb) {
     CYC(b_+72, b_+74); H = 0xc6;
     CYC(b_+74, b_+75); D = mem_rd(gb, HL);
   }
-  CYC(b_+75, SYM(decideItemDrop_body)); ret_effect(gb);
+  CYC(b_+75, b_+76); ret_effect(gb);
 }
 
 void decideItemDrop_body_hook(GB *gb) {
@@ -601,13 +601,13 @@ void decideItemDrop_body_hook(GB *gb) {
   CYC(b_+57, b_+59); alu_and(gb, 0x1f);
   CYC(b_+59, b_+60); treasure_add_index_to_hl_from_rst(gb, b_+60);
   CYC(b_+60, b_+61); A = mem_rd(gb, HL);
-  CYC(b_+61, SYM(checkItemDropAvailable_body)); C = A;
+  CYC(b_+61, b_+62); C = A;
   checkItemDropAvailable_body_hook(gb);
   return;
 
 unavailable:
   CYC(SYM(checkItemDropAvailable_body__done), (SYM(checkItemDropAvailable_body__done) + 2)); C = 0xff;
-  CYC((SYM(checkItemDropAvailable_body__done) + 2), SYM(ringTierTable)); ret_effect(gb);
+  CYC((SYM(checkItemDropAvailable_body__done) + 2), (SYM(checkItemDropAvailable_body__done) + 3)); ret_effect(gb);
 }
 
 void checkItemDropAvailable_body_hook(GB *gb) {
@@ -627,7 +627,7 @@ void checkItemDropAvailable_body_hook(GB *gb) {
   }
   CYC(b_+12, b_+13);
   CYC(b_+13, b_+15); C = 0xff;
-  CYC(b_+15, SYM(ringTierTable)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }
 
 void giveTreasure_body__modeb_hook(GB *gb) {
@@ -808,7 +808,7 @@ void giveTreasure_body__modee_hook(GB *gb) {
   CYC(b_+289, b_+290); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+290, b_+291); H = mem_rd(gb, HL);
   CYC(b_+291, b_+292); L = A;
-  CYC(b_+292, b_+295); SET_BC((SYM(_countdownToRunThread) + 14));
+  CYC(b_+292, b_+295); SET_BC(0x0999);
   CALL_C(b_+295, compareHlToBc_hook, SYM(compareHlToBc), b_+298);
   CYC(b_+298, b_+299); A = alu_dec8(gb, A);
   if (!(F & FZ)) {
@@ -917,7 +917,7 @@ void giveTreasure_body__removeOneDuplicateRing_hook(GB *gb) {
   } while (!(F & FZ));
   CYC(b_+419, b_+420); SET_HL(HL + 1);
   CYC(b_+420, b_+422); mem_wr(gb, HL, 0xff);
-  CYC(b_+422, SYM(realignUnappraisedRings)); ret_effect(gb);
+  CYC(b_+422, b_+423); ret_effect(gb);
 }
 
 void checkIncreaseGashaMaturityForGettingTreasure_hook(GB *gb) {

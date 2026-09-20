@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode15), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode15), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t enemyCode15_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -28,7 +28,7 @@ static uint16_t enemyCode15_jump_table(GB *gb) {
 void enemyCode15_chooseNewDirection_hook(GB *gb) {
   BASE(enemyCode15);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+78, b_+81); SET_BC((SYM(_label_00_063) + 4));
+  CYC(b_+78, b_+81); SET_BC(0x0718);
   CALL_C(b_+81, ecom_randomBitwiseAndBCE_b0d_hook, SYM(ecom_randomBitwiseAndBCE_b0d), b_+84);
   CYC(b_+84, b_+85); alu_or(gb, B);
   if (!(F & FZ)) { RET_TAKEN(b_+85); return; } // ret nz

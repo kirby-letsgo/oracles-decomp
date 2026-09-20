@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode15), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode15), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void itemCode15_hook(GB *gb) {
   BASE(itemCode15);
@@ -40,5 +40,5 @@ state1:
     CYCT(b_+38, b_+39); ret_effect(gb); return;
   }
   CYC(b_+38, b_+39);
-  CYC(b_+39, SYM(itemCode04)); itemDelete_hook(gb);
+  CYC(b_+39, b_+42); itemDelete_hook(gb);
 }

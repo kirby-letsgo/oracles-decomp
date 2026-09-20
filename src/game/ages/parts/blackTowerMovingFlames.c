@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode59), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode59), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t blackTowerMovingFlames_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -157,5 +157,5 @@ state5:
   if (!(F & FZ)) { CYCT(b_+153, b_+155); goto animate; } // jr nz
   CYC(b_+153, b_+155);
   CALL_C(b_+155, objectCreatePuff_hook, SYM(objectCreatePuff), b_+158);
-  CYC(b_+158, SYM(partCode5a)); partDelete_hook(gb); return; // jp
+  CYC(b_+158, b_+161); partDelete_hook(gb); return; // jp
 }

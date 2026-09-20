@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode30), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode30), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void partCode30_hook(GB *gb) {
   BASE(partCode30);
@@ -48,5 +48,5 @@ L_5903:
   CYC(b_+51, b_+53); A = 0x31;
   CALL_C(b_+53, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+56);
   CYC(b_+56, b_+57); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+57, SYM(partCode4b)); partDelete_hook(gb); return; // jp
+  CYC(b_+57, b_+60); partDelete_hook(gb); return; // jp
 }

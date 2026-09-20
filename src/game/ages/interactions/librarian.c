@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode2a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode2a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define librarianScript_bank0c SYM(librarianScript)
 
@@ -40,7 +40,7 @@ setTextId:
   CYC(b_+41, b_+42); mem_wr(gb, DE, A);
   CALL_C(b_+42, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+45);
   CYC(b_+45, b_+48); SET_HL(librarianScript_bank0c);
-  CYC(b_+48, SYM(interactionCode2b)); interactionSetScript_hook(gb);
+  CYC(b_+48, b_+51); interactionSetScript_hook(gb);
 }
 
 // INTERAC_LIBRARIAN

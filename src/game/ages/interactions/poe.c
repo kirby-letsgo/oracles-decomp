@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode59), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode59), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void interactionCode59__afterCall6c0b_hook(GB *gb);
 

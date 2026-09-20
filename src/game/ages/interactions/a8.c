@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodea8), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodea8), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/object_code/ages/interactions/a8.s (interactionCodea8 / INTERAC_a8), bank
 // 0x0b.

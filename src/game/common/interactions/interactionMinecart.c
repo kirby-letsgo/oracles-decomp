@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode16), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode16), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define TILEINDEX_MINECART_PLATFORM 0x5f
 #define STATICOBJTYPE_INTERACTION 0x03
@@ -154,7 +154,7 @@ static void interactionMinecart_state2(GB *gb, uint16_t sp0_) {
   CYC(b_+160, b_+161); A = mem_rd(gb, DE);
   CYC(b_+161, b_+162); mem_wr(gb, HL, A);
   CALL_C(b_+162, objectCopyPosition_hook, SYM(objectCopyPosition), b_+165);
-  CYC(b_+165, SYM(interactionCode17)); objectDeleteRelatedObj1AsStaticObject_hook(gb);
+  CYC(b_+165, b_+168); objectDeleteRelatedObj1AsStaticObject_hook(gb);
 }
 
 void interactionCode16_hook(GB *gb) {

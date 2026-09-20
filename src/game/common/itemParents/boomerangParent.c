@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(parentItemCode_boomerang), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(parentItemCode_boomerang), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t boomerang_parent_jump_table(GB *gb) {
   burn_rom(gb, 0, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -73,5 +73,5 @@ state1:
   CYC(b_+73, b_+74); A = mem_rd(gb, DE);
   CYC(b_+74, b_+75); alu_rlca(gb);
   if (!(F & FC)) { CYCT(b_+75, b_+78); specialObjectAnimate_optimized_hook(gb); return; }
-  CYC(b_+75, b_+78); CYC(b_+78, SYM(parentItemCode_bombchu)); clearParentItem_hook(gb);
+  CYC(b_+75, b_+78); CYC(b_+78, b_+81); clearParentItem_hook(gb);
 }

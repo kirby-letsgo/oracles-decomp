@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode58), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode58), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t veranBeeProjectile_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -76,7 +76,7 @@ state1:
   CYC(b_+63, b_+65);
   CYC(b_+65, b_+67); A = 0x0b; // Object.state
   CALL_C(b_+67, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+70);
-  CYC(b_+70, b_+73); SET_BC((SYM(extractColorComponents) + 23));
+  CYC(b_+70, b_+73); SET_BC(0x1400);
   CYC(b_+73, b_+76); objectTakePositionWithOffset_hook(gb); return; // jp
 
 incState:

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(runScriptCommand), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(runScriptCommand), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void scriptFunc_checkRoomFlag_hook(GB *gb);
 void scriptFunc_popHlAndInc_hook(GB *gb);
@@ -68,14 +68,14 @@ void runScriptCommand_hook(GB *gb) {
 void scriptCmd_none_hook(GB *gb) {
   BASE(scriptCmd_none);
   CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
-  CYC(b_+1, SYM(scriptCmd_stopIfItemFlagSet)); ret_effect(gb);
+  CYC(b_+1, b_+2); ret_effect(gb);
 }
 
 // 0c:4105
 void scriptCmd_stopIfItemFlagSet_hook(GB *gb) {
   BASE(scriptCmd_stopIfItemFlagSet);
   CYC(b_+0, b_+2); B = 0x20;
-  CYC(b_+2, SYM(scriptCmd_stopIfRoomFlag40Set));
+  CYC(b_+2, b_+4);
   scriptFunc_checkRoomFlag_hook(gb);
 }
 
@@ -83,14 +83,14 @@ void scriptCmd_stopIfItemFlagSet_hook(GB *gb) {
 void scriptCmd_stopIfRoomFlag40Set_hook(GB *gb) {
   BASE(scriptCmd_stopIfRoomFlag40Set);
   CYC(b_+0, b_+2); B = 0x40;
-  CYC(b_+2, SYM(scriptCmd_stopIfRoomFlag80Set));
+  CYC(b_+2, b_+4);
   scriptFunc_checkRoomFlag_hook(gb);
 }
 
 // 0c:410d
 void scriptCmd_stopIfRoomFlag80Set_hook(GB *gb) {
   BASE(scriptCmd_stopIfRoomFlag80Set);
-  CYC(b_+0, SYM(scriptFunc_checkRoomFlag)); B = 0x80;
+  CYC(b_+0, b_+2); B = 0x80;
   scriptFunc_checkRoomFlag_hook(gb);
 }
 
@@ -109,14 +109,14 @@ void scriptFunc_checkRoomFlag_hook(GB *gb) {
   CYC(b_+7, b_+8); SET_HL(pop_effect(gb));
   CYC(b_+8, b_+11); SET_HL(SYM(stubScript));
   CYC(b_+11, b_+12); alu_scf(gb);
-  CYC(b_+12, SYM(scriptCmd_showPasswordScreen)); ret_effect(gb);
+  CYC(b_+12, b_+13); ret_effect(gb);
 }
 
 static void scriptCmd_showPasswordScreen_finish(GB *gb) {
   BASE(scriptCmd_showPasswordScreen);
   CYC(b_+40, b_+41); SET_HL(pop_effect(gb));
   CYC(b_+41, b_+42); alu_xor(gb, A);
-  CYC(b_+42, SYM(scriptCmd_disableInput)); ret_effect(gb);
+  CYC(b_+42, b_+43); ret_effect(gb);
 }
 
 static void scriptCmd_showPasswordScreen_openSecretMenu(GB *gb, uint16_t sp0_) {
@@ -171,7 +171,7 @@ void scriptCmd_showPasswordScreen_hook(GB *gb) {
 void scriptCmd_disableInput_hook(GB *gb) {
   BASE(scriptCmd_disableInput);
   CYC(b_+0, b_+2); A = 0x81;
-  CYC(b_+2, SYM(scriptCmd_disableMenu)); W8(wDisabledObjects) = A;
+  CYC(b_+2, b_+5); W8(wDisabledObjects) = A;
   scriptCmd_disableMenu_hook(gb);
 }
 
@@ -191,13 +191,13 @@ void scriptFunc_popHlAndInc_hook(GB *gb) {
   CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
   CYC(b_+1, b_+2); SET_HL(HL + 1);
   CYC(b_+2, b_+3); alu_scf(gb);
-  CYC(b_+3, SYM(scriptCmd_enableInput)); ret_effect(gb);
+  CYC(b_+3, b_+4); ret_effect(gb);
 }
 
 void scriptCmd_enableInput_hook(GB *gb) {
   BASE(scriptCmd_enableInput);
   CYC(b_+0, b_+1); alu_xor(gb, A);
-  CYC(b_+1, SYM(scriptCmd_enableMenu)); W8(wDisabledObjects) = A;
+  CYC(b_+1, b_+4); W8(wDisabledObjects) = A;
   scriptCmd_enableMenu_hook(gb);
 }
 
@@ -205,12 +205,12 @@ void scriptCmd_enableMenu_hook(GB *gb) {
   BASE(scriptCmd_enableMenu);
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+4); W8(wMenuDisabled) = A;
-  CYC(b_+4, SYM(scriptCmd_setLinkCantMoveTo91)); scriptFunc_popHlAndInc_hook(gb);
+  CYC(b_+4, b_+6); scriptFunc_popHlAndInc_hook(gb);
 }
 
 void scriptCmd_setLinkCantMoveTo91_hook(GB *gb) {
   BASE(scriptCmd_setLinkCantMoveTo91);
-  CYC(b_+0, SYM(scriptFunc_setLinkCantMove)); A = 0x91;
+  CYC(b_+0, b_+2); A = 0x91;
   scriptFunc_setLinkCantMove_hook(gb);
 }
 
@@ -219,19 +219,19 @@ void scriptFunc_setLinkCantMove_hook(GB *gb) {
   CYC(b_+0, b_+3); W8(wDisabledObjects) = A;
   CYC(b_+3, b_+4); SET_HL(pop_effect(gb));
   CYC(b_+4, b_+5); SET_HL(HL + 1);
-  CYC(b_+5, SYM(scriptCmd_setLinkCantMoveTo00)); ret_effect(gb);
+  CYC(b_+5, b_+6); ret_effect(gb);
 }
 
 void scriptCmd_setLinkCantMoveTo00_hook(GB *gb) {
   BASE(scriptCmd_setLinkCantMoveTo00);
   CYC(b_+0, b_+1); alu_xor(gb, A);
-  CYC(b_+1, SYM(scriptCmd_setLinkCantMoveTo11)); scriptFunc_setLinkCantMove_hook(gb);
+  CYC(b_+1, b_+3); scriptFunc_setLinkCantMove_hook(gb);
 }
 
 void scriptCmd_setLinkCantMoveTo11_hook(GB *gb) {
   BASE(scriptCmd_setLinkCantMoveTo11);
   CYC(b_+0, b_+2); A = 0x11;
-  CYC(b_+2, SYM(func_0c_4177)); scriptFunc_setLinkCantMove_hook(gb);
+  CYC(b_+2, b_+4); scriptFunc_setLinkCantMove_hook(gb);
 }
 
 void func_0c_4177_hook(GB *gb) {
@@ -244,14 +244,14 @@ void func_0c_4177_hook(GB *gb) {
   CYC(b_+9, b_+11); L = 0x2d;
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x00);
   CYC(b_+13, b_+14); SET_HL(pop_effect(gb));
-  CYC(b_+14, SYM(scriptCmd_setState)); ret_effect(gb);
+  CYC(b_+14, b_+15); ret_effect(gb);
 }
 
 void scriptCmd_setState_hook(GB *gb) {
   BASE(scriptCmd_setState);
   CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
   CYC(b_+1, b_+2); SET_HL(HL + 1);
-  CYC(b_+2, SYM(scriptFunc_setState)); E = 0x44;
+  CYC(b_+2, b_+4); E = 0x44;
   scriptFunc_setState_hook(gb);
 }
 
@@ -270,7 +270,7 @@ increment_state:
   CYC(b_+9, b_+10); A = alu_inc8(gb, A);
   CYC(b_+10, b_+11); mem_wr(gb, DE, A);
   CYC(b_+11, b_+12); alu_xor(gb, A);
-  CYC(b_+12, SYM(scriptCmd_setSubstate)); ret_effect(gb);
+  CYC(b_+12, b_+13); ret_effect(gb);
 }
 
 void scriptCmd_setSubstate_hook(GB *gb) {
@@ -278,7 +278,7 @@ void scriptCmd_setSubstate_hook(GB *gb) {
   CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
   CYC(b_+1, b_+2); SET_HL(HL + 1);
   CYC(b_+2, b_+4); E = 0x45;
-  CYC(b_+4, SYM(scriptCmd_jump)); scriptFunc_setState_hook(gb);
+  CYC(b_+4, b_+6); scriptFunc_setState_hook(gb);
 }
 
 static void scriptCmd_jump_far(GB *gb) {
@@ -287,7 +287,7 @@ static void scriptCmd_jump_far(GB *gb) {
   CYC(b_+25, b_+26); L = mem_rd(gb, HL);
   CYC(b_+26, b_+27); H = A;
   CYC(b_+27, b_+28); alu_scf(gb);
-  CYC(b_+28, SYM(scriptCmd_spawnInteraction)); ret_effect(gb);
+  CYC(b_+28, b_+29); ret_effect(gb);
 }
 
 // 0c:419d
@@ -343,7 +343,7 @@ void scriptFunc_restoreActiveObject_hook(GB *gb) {
   CYC(b_+0, b_+2); A = H8(hActiveObject);
   CYC(b_+2, b_+3); D = A;
   CYC(b_+3, b_+4); SET_HL(pop_effect(gb));
-  CYC(b_+4, SYM(scriptFunc_loadBcAndDe)); ret_effect(gb);
+  CYC(b_+4, b_+5); ret_effect(gb);
 }
 
 void scriptFunc_loadBcAndDe_hook(GB *gb) {
@@ -356,7 +356,7 @@ void scriptFunc_loadBcAndDe_hook(GB *gb) {
   CYC(b_+5, b_+6); D = A;
   CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+7, b_+8); E = A;
-  CYC(b_+8, SYM(scriptFunc_initializeObject)); ret_effect(gb);
+  CYC(b_+8, b_+9); ret_effect(gb);
 }
 
 void scriptFunc_initializeObject_hook(GB *gb) {
@@ -370,7 +370,7 @@ void scriptFunc_initializeObject_hook(GB *gb) {
   CYC(b_+6, b_+7); L = alu_inc8(gb, L);
   CYC(b_+7, b_+8); L = alu_inc8(gb, L);
   CYC(b_+8, b_+9); mem_wr(gb, HL, E);
-  CYC(b_+9, SYM(scriptCmd_spawnEnemy)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 void scriptCmd_spawnEnemy_hook(GB *gb) {
@@ -385,7 +385,7 @@ void scriptCmd_spawnEnemy_hook(GB *gb) {
   CYC(b_+9, b_+11);
   CYC(b_+11, b_+13); A = 0x8b;
   CALL_C(b_+13, scriptFunc_initializeObject_hook, SYM(scriptFunc_initializeObject), b_+16);
-  CYC(b_+16, SYM(scriptCmd_spawnEnemyHere)); scriptFunc_restoreActiveObject_hook(gb);
+  CYC(b_+16, b_+18); scriptFunc_restoreActiveObject_hook(gb);
 }
 
 // 0c:41f4
@@ -415,7 +415,7 @@ void scriptCmd_spawnEnemyHere_hook(GB *gb) {
   CYC(b_+19, b_+21);
   CYC(b_+21, b_+23); A = 0x8b;
   CALL_C(b_+23, scriptFunc_initializeObject_hook, SYM(scriptFunc_initializeObject), b_+26);
-  CYC(b_+26, SYM(scriptCmd_jumpTable_memoryAddress));
+  CYC(b_+26, b_+28);
   scriptFunc_restoreActiveObject_hook(gb);
 }
 
@@ -430,7 +430,7 @@ void scriptCmd_jumpTable_memoryAddress_hook(GB *gb) {
   CYC(b_+5, b_+6); B = A;
   CYC(b_+6, b_+7); A = mem_rd(gb, BC);
   CYC(b_+7, b_+8); add_double_index_to_hl_from_rst(gb, b_+8);
-  CYC(b_+8, SYM(scriptCmd_setCoords)); scriptFunc_jump_hook(gb);
+  CYC(b_+8, b_+11); scriptFunc_jump_hook(gb);
 }
 
 void scriptCmd_setCoords_hook(GB *gb) {
@@ -448,7 +448,7 @@ void scriptCmd_setCoords_hook(GB *gb) {
   CYC(b_+11, b_+13); L = 0x4d;
   CYC(b_+13, b_+14); mem_wr(gb, HL, C);
   CYC(b_+14, b_+15); SET_HL(pop_effect(gb));
-  CYC(b_+15, SYM(scriptCmd_setAngle)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }
 
 void scriptCmd_setAngle_hook(GB *gb) {
@@ -458,7 +458,7 @@ void scriptCmd_setAngle_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+3, b_+5); E = 0x49;
   CYC(b_+5, b_+6); mem_wr(gb, DE, A);
-  CYC(b_+6, SYM(scriptCmd_setSpeed)); ret_effect(gb);
+  CYC(b_+6, b_+7); ret_effect(gb);
 }
 
 void scriptCmd_setSpeed_hook(GB *gb) {
@@ -468,7 +468,7 @@ void scriptCmd_setSpeed_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+3, b_+5); E = 0x50;
   CYC(b_+5, b_+6); mem_wr(gb, DE, A);
-  CYC(b_+6, SYM(scriptCmd_setZSpeed)); ret_effect(gb);
+  CYC(b_+6, b_+7); ret_effect(gb);
 }
 
 void scriptCmd_setZSpeed_hook(GB *gb) {
@@ -482,7 +482,7 @@ void scriptCmd_setZSpeed_hook(GB *gb) {
   CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+8, b_+9); mem_wr(gb, DE, A);
   CYC(b_+9, b_+10); alu_scf(gb);
-  CYC(b_+10, SYM(scriptCmd_checkCounter2ZeroAndReset)); ret_effect(gb);
+  CYC(b_+10, b_+11); ret_effect(gb);
 }
 
 void scriptCmd_checkCounter2ZeroAndReset_hook(GB *gb) {
@@ -496,7 +496,7 @@ void scriptCmd_checkCounter2ZeroAndReset_hook(GB *gb) {
   CYC(b_+6, b_+7); SET_HL(HL + 1);
   CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+8, b_+9); mem_wr(gb, DE, A);
-  CYC(b_+9, SYM(scriptCmd_setCollideRadii)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 void scriptCmd_setCollideRadii_hook(GB *gb) {
@@ -509,7 +509,7 @@ void scriptCmd_setCollideRadii_hook(GB *gb) {
   CYC(b_+6, b_+7); E = alu_inc8(gb, E);
   CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+8, b_+9); mem_wr(gb, DE, A);
-  CYC(b_+9, SYM(scriptCmd_writeInteractionByte)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 void scriptCmd_writeInteractionByte_hook(GB *gb) {
@@ -520,7 +520,7 @@ void scriptCmd_writeInteractionByte_hook(GB *gb) {
   CYC(b_+3, b_+4); E = A;
   CYC(b_+4, b_+5); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+5, b_+6); mem_wr(gb, DE, A);
-  CYC(b_+6, SYM(scriptCmd_addinteractionByte)); ret_effect(gb);
+  CYC(b_+6, b_+7); ret_effect(gb);
 }
 
 void scriptCmd_addinteractionByte_hook(GB *gb) {
@@ -535,7 +535,7 @@ void scriptCmd_addinteractionByte_hook(GB *gb) {
   CYC(b_+7, b_+8); alu_add(gb, B);
   CYC(b_+8, b_+9); mem_wr(gb, DE, A);
   CYC(b_+9, b_+10); alu_scf(gb);
-  CYC(b_+10, SYM(scriptCmd_getRandomBits)); ret_effect(gb);
+  CYC(b_+10, b_+11); ret_effect(gb);
 }
 
 void scriptCmd_getRandomBits_hook(GB *gb) {
@@ -550,7 +550,7 @@ void scriptCmd_getRandomBits_hook(GB *gb) {
   CYC(b_+8, b_+9); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+9, b_+10); alu_and(gb, B);
   CYC(b_+10, b_+11); mem_wr(gb, DE, A);
-  CYC(b_+11, SYM(scriptCmd_loadSprite)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 // 0c:4276
@@ -587,7 +587,7 @@ set_animation:
   CYC(b_+26, b_+28); A = 0x0c;
   CYC(b_+28, b_+30); H8(hRomBank) = A;
   CYC(b_+30, b_+33); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+33, SYM(scriptCmd_turnToFaceLink)); ret_effect(gb);
+  CYC(b_+33, b_+34); ret_effect(gb);
 }
 
 void scriptCmd_turnToFaceLink_hook(GB *gb) {
@@ -599,7 +599,7 @@ void scriptCmd_turnToFaceLink_hook(GB *gb) {
   CYC(b_+7, b_+9); A = alu_swap(gb, A);
   CYC(b_+9, b_+10); alu_rlca(gb);
   CALL_C(b_+10, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+13);
-  CYC(b_+13, SYM(scriptCmd_setAngleAndExtra)); scriptFunc_popHlAndInc_hook(gb);
+  CYC(b_+13, b_+16); scriptFunc_popHlAndInc_hook(gb);
 }
 
 void scriptCmd_setAngleAndExtra_hook(GB *gb) {
@@ -615,7 +615,7 @@ void scriptCmd_setAngleAndExtra_hook(GB *gb) {
   CALL_C(b_+10, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+13);
   CYC(b_+13, b_+14); SET_HL(pop_effect(gb));
   CYC(b_+14, b_+15); alu_scf(gb);
-  CYC(b_+15, SYM(scriptCmd_runGenericNpc)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }
 
 void scriptCmd_runGenericNpc_hook(GB *gb) {
@@ -631,7 +631,7 @@ void scriptCmd_runGenericNpc_hook(GB *gb) {
   CYC(b_+10, b_+11); E = alu_inc8(gb, E);
   CYC(b_+11, b_+12); mem_wr(gb, DE, A);
   CYC(b_+12, b_+15); SET_HL(SYM(genericNpcScript));
-  CYC(b_+15, SYM(scriptFunc_getTextIndex)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }
 
 void scriptFunc_getTextIndex_hook(GB *gb) {
@@ -651,7 +651,7 @@ use_script_text_index:
 load_text_index:
   CYC(b_+14, b_+15); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+15, b_+16); C = A;
-  CYC(b_+16, SYM(scriptCmd_showText)); ret_effect(gb);
+  CYC(b_+16, b_+17); ret_effect(gb);
 }
 
 void scriptCmd_showText_hook(GB *gb) {
@@ -663,7 +663,7 @@ void scriptCmd_showText_hook(GB *gb) {
   CYC(b_+5, b_+6); push_effect(gb, HL);
   CALL_C(b_+6, showText_hook, SYM(showText), b_+9);
   CYC(b_+9, b_+10); SET_HL(pop_effect(gb));
-  CYC(b_+10, SYM(scriptCmd_showTextDifferentForLinked)); ret_effect(gb);
+  CYC(b_+10, b_+11); ret_effect(gb);
 }
 
 void scriptCmd_showTextDifferentForLinked_hook(GB *gb) {
@@ -690,7 +690,7 @@ show_text:
   CYC(b_+16, b_+17); push_effect(gb, HL);
   CALL_C(b_+17, showText_hook, SYM(showText), b_+20);
   CYC(b_+20, b_+21); SET_HL(pop_effect(gb));
-  CYC(b_+21, SYM(scriptCmd_showTextNonExitable)); ret_effect(gb);
+  CYC(b_+21, b_+22); ret_effect(gb);
 }
 
 void scriptCmd_showTextNonExitable_hook(GB *gb) {
@@ -702,7 +702,7 @@ void scriptCmd_showTextNonExitable_hook(GB *gb) {
   CYC(b_+5, b_+6); push_effect(gb, HL);
   CALL_C(b_+6, showTextNonExitable_hook, SYM(showTextNonExitable), b_+9);
   CYC(b_+9, b_+10); SET_HL(pop_effect(gb));
-  CYC(b_+10, SYM(scriptCmd_waitForText)); ret_effect(gb);
+  CYC(b_+10, b_+11); ret_effect(gb);
 }
 
 void scriptCmd_waitForText_hook(GB *gb) {
@@ -716,14 +716,14 @@ void scriptCmd_waitForText_hook(GB *gb) {
   }
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+7); SET_HL(HL + 1);
-  CYC(b_+7, SYM(scriptCmd_setCounter1)); ret_effect(gb);
+  CYC(b_+7, b_+8); ret_effect(gb);
 }
 
 void scriptCmd_setCounter1_hook(GB *gb) {
   BASE(scriptCmd_setCounter1);
   CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
   CYC(b_+1, b_+2); SET_HL(HL + 1);
-  CYC(b_+2, SYM(scriptFunc_4310)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
   scriptFunc_4310_hook(gb);
 }
 
@@ -732,7 +732,7 @@ void scriptFunc_4310_hook(GB *gb) {
   CYC(b_+0, b_+2); E = 0x46;
   CYC(b_+2, b_+3); mem_wr(gb, DE, A);
   CYC(b_+3, b_+4); alu_xor(gb, A);
-  CYC(b_+4, SYM(scriptCmd_cpLinkX)); ret_effect(gb);
+  CYC(b_+4, b_+5); ret_effect(gb);
 }
 
 void scriptCmd_cpLinkX_hook(GB *gb) {
@@ -757,7 +757,7 @@ void scriptCmd_cpLinkX_hook(GB *gb) {
 store_result:
   CYC(b_+18, b_+19); mem_wr(gb, DE, A);
   CYC(b_+19, b_+20); alu_scf(gb);
-  CYC(b_+20, SYM(scriptCmd_shakeScreen)); ret_effect(gb);
+  CYC(b_+20, b_+21); ret_effect(gb);
 }
 
 void scriptCmd_shakeScreen_hook(GB *gb) {
@@ -766,7 +766,7 @@ void scriptCmd_shakeScreen_hook(GB *gb) {
   CYC(b_+1, b_+2); SET_HL(HL + 1);
   CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+3, b_+6); W8(wScreenShakeCounterX) = A;
-  CYC(b_+6, SYM(scriptCmd_writeMemory)); ret_effect(gb);
+  CYC(b_+6, b_+7); ret_effect(gb);
 }
 
 void scriptCmd_writeMemory_hook(GB *gb) {
@@ -780,7 +780,7 @@ void scriptCmd_writeMemory_hook(GB *gb) {
   CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+7, b_+8); mem_wr(gb, BC, A);
   CYC(b_+8, b_+9); alu_scf(gb);
-  CYC(b_+9, SYM(scriptCmd_checkPaletteFadeDone)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 void scriptCmd_checkPaletteFadeDone_hook(GB *gb) {
@@ -794,7 +794,7 @@ void scriptCmd_checkPaletteFadeDone_hook(GB *gb) {
   }
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+7); SET_HL(HL + 1);
-  CYC(b_+7, SYM(scriptCmd_checkCFC0Bit)); ret_effect(gb);
+  CYC(b_+7, b_+8); ret_effect(gb);
 }
 
 void scriptCmd_checkCFC0Bit_hook(GB *gb) {
@@ -815,7 +815,7 @@ void scriptCmd_checkCFC0Bit_hook(GB *gb) {
   }
   CYC(b_+15, b_+16);
   CYC(b_+16, b_+17); SET_HL(HL + 1);
-  CYC(b_+17, SYM(scriptCmd_xorCFC0Bit)); ret_effect(gb);
+  CYC(b_+17, b_+18); ret_effect(gb);
 }
 
 void scriptCmd_xorCFC0Bit_hook(GB *gb) {
@@ -832,7 +832,7 @@ void scriptCmd_xorCFC0Bit_hook(GB *gb) {
   CYC(b_+14, b_+15); alu_xor(gb, B);
   CYC(b_+15, b_+18); mem_wr(gb, wRoomLayoutEnd, A);
   CYC(b_+18, b_+19); SET_HL(HL + 1);
-  CYC(b_+19, SYM(scriptCmd_jumpIfNoEnemies)); ret_effect(gb);
+  CYC(b_+19, b_+20); ret_effect(gb);
 }
 
 void scriptCmd_jumpIfNoEnemies_hook(GB *gb) {
@@ -847,7 +847,7 @@ void scriptCmd_jumpIfNoEnemies_hook(GB *gb) {
   }
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+9); SET_HL(HL + 1);
-  CYC(b_+9, SYM(scriptCmd_jumpIfC6xxSet)); scriptFunc_jump_hook(gb);
+  CYC(b_+9, b_+12); scriptFunc_jump_hook(gb);
 }
 
 void scriptCmd_jumpIfC6xxSet_hook(GB *gb) {
@@ -866,7 +866,7 @@ void scriptCmd_jumpIfC6xxSet_hook(GB *gb) {
   }
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+12); SET_HL(HL + 1);
-  CYC(b_+12, SYM(scriptCmd_playSound)); scriptFunc_jump_hook(gb);
+  CYC(b_+12, b_+15); scriptFunc_jump_hook(gb);
 }
 
 void scriptCmd_playSound_hook(GB *gb) {
@@ -878,7 +878,7 @@ void scriptCmd_playSound_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, HL);
   CALL_C(b_+4, playSound_b00_hook, SYM(playSound_b00), b_+7);
   CYC(b_+7, b_+8); SET_HL(pop_effect(gb));
-  CYC(b_+8, SYM(scriptCmd_updateLinkLocalRespawnPosition)); ret_effect(gb);
+  CYC(b_+8, b_+9); ret_effect(gb);
 }
 
 void scriptCmd_updateLinkLocalRespawnPosition_hook(GB *gb) {
@@ -887,7 +887,7 @@ void scriptCmd_updateLinkLocalRespawnPosition_hook(GB *gb) {
   CALL_C(b_+0, updateLinkLocalRespawnPosition_hook, SYM(updateLinkLocalRespawnPosition), b_+3);
   CYC(b_+3, b_+4); SET_HL(pop_effect(gb));
   CYC(b_+4, b_+5); SET_HL(HL + 1);
-  CYC(b_+5, SYM(scriptCmd_jumpIfLinkVariableNe)); ret_effect(gb);
+  CYC(b_+5, b_+6); ret_effect(gb);
 }
 
 void scriptCmd_jumpIfLinkVariableNe_hook(GB *gb) {
@@ -905,7 +905,7 @@ void scriptCmd_jumpIfLinkVariableNe_hook(GB *gb) {
     CYC(b_+17, b_+18); alu_add_hl(gb, BC);
     CYC(b_+18, b_+20); A = H8(hActiveObject);
     CYC(b_+20, b_+21); D = A;
-    CYC(b_+21, SYM(scriptCmd_jumpIfMemoryEq)); ret_effect(gb);
+    CYC(b_+21, b_+22); ret_effect(gb);
     return;
   }
   CYC(b_+8, b_+10);
@@ -923,7 +923,7 @@ static void scriptCmd_compareMemoryThenJump(GB *gb) {
   }
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+12); SET_HL(HL + 1);
-  CYC(b_+12, SYM(scriptCmd_jumpIfInteractionByteEq)); scriptFunc_jump_scf_hook(gb);
+  CYC(b_+12, b_+15); scriptFunc_jump_scf_hook(gb);
 }
 
 void scriptCmd_jumpIfMemoryEq_hook(GB *gb) {
@@ -945,7 +945,7 @@ void scriptCmd_jumpIfInteractionByteEq_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+3, b_+4); E = A;
   CYC(b_+4, b_+5); A = mem_rd(gb, DE);
-  CYC(b_+5, SYM(scriptCmd_jumpIfRoomFlagSet));
+  CYC(b_+5, b_+7);
   scriptCmd_compareMemoryThenJump(gb);
 }
 
@@ -962,7 +962,7 @@ void scriptCmd_jumpIfRoomFlagSet_hook(GB *gb) {
   if (!(F & FZ)) {
     CYCT(b_+9, b_+11);
     CYC(b_+16, b_+17); SET_HL(pop_effect(gb));
-    CYC(b_+17, SYM(scriptCmd_orRoomFlags)); scriptFunc_jump_scf_hook(gb);
+    CYC(b_+17, b_+20); scriptFunc_jump_scf_hook(gb);
     return;
   }
   CYC(b_+9, b_+11);
@@ -985,7 +985,7 @@ void scriptCmd_orRoomFlags_hook(GB *gb) {
   CYC(b_+8, b_+9); alu_or(gb, B);
   CYC(b_+9, b_+10); mem_wr(gb, HL, A);
   CYC(b_+10, b_+11); SET_HL(pop_effect(gb));
-  CYC(b_+11, SYM(scriptCmd_checkSomething)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 void scriptCmd_checkSomething_hook(GB *gb) {
@@ -996,12 +996,12 @@ void scriptCmd_checkSomething_hook(GB *gb) {
   CYC(b_+5, b_+6); SET_HL(pop_effect(gb));
   if (!(F & FC)) {
     CYCT(b_+6, b_+8);
-    CYC(b_+9, SYM(scriptCmd_showLoadedText)); ret_effect(gb);
+    CYC(b_+9, b_+10); ret_effect(gb);
     return;
   }
   CYC(b_+6, b_+8);
   CYC(b_+8, b_+9); SET_HL(HL + 1);
-  CYC(b_+9, SYM(scriptCmd_showLoadedText)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 void scriptCmd_showLoadedText_hook(GB *gb) {
@@ -1016,7 +1016,7 @@ void scriptCmd_showLoadedText_hook(GB *gb) {
   CALL_C(b_+7, showText_hook, SYM(showText), b_+10);
   CYC(b_+10, b_+11); SET_HL(pop_effect(gb));
   CYC(b_+11, b_+12); SET_HL(HL + 1);
-  CYC(b_+12, SYM(scriptCmd_setTextID)); ret_effect(gb);
+  CYC(b_+12, b_+13); ret_effect(gb);
 }
 
 void scriptCmd_setTextID_hook(GB *gb) {
@@ -1030,7 +1030,7 @@ void scriptCmd_setTextID_hook(GB *gb) {
   CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+8, b_+9); mem_wr(gb, DE, A);
   CYC(b_+9, b_+10); alu_scf(gb);
-  CYC(b_+10, SYM(scriptCmd_setMusic)); ret_effect(gb);
+  CYC(b_+10, b_+11); ret_effect(gb);
 }
 
 void scriptCmd_setMusic_hook(GB *gb) {
@@ -1051,7 +1051,7 @@ set_music:
   CYC(b_+13, b_+14); push_effect(gb, HL);
   CALL_C(b_+14, playSound_b00_hook, SYM(playSound_b00), b_+17);
   CYC(b_+17, b_+18); SET_HL(pop_effect(gb));
-  CYC(b_+18, SYM(scriptCmd_orMemory)); ret_effect(gb);
+  CYC(b_+18, b_+19); ret_effect(gb);
 }
 
 void scriptCmd_orMemory_hook(GB *gb) {
@@ -1067,7 +1067,7 @@ void scriptCmd_orMemory_hook(GB *gb) {
   CYC(b_+8, b_+9); mem_wr(gb, BC, A);
   CYC(b_+9, b_+10); SET_HL(HL + 1);
   CYC(b_+10, b_+11); alu_scf(gb);
-  CYC(b_+11, SYM(scriptCmd_spawnItem)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 void scriptCmd_spawnItem_hook(GB *gb) {
@@ -1109,7 +1109,7 @@ create_link_item:
   CYC(b_+35, b_+36); mem_wr(gb, DE, A);
   CYC(b_+36, b_+39); SET_DE(w1Link_yh);
   CALL_C(b_+39, objectCopyPosition_rawAddress_hook, SYM(objectCopyPosition_rawAddress), b_+42);
-  CYC(b_+42, SYM(scriptCmd_df)); scriptFunc_restoreActiveObject_hook(gb);
+  CYC(b_+42, b_+45); scriptFunc_restoreActiveObject_hook(gb);
 }
 
 void scriptCmd_df_hook(GB *gb) {
@@ -1130,7 +1130,7 @@ void scriptCmd_df_hook(GB *gb) {
 skip_jump:
   CYC(b_+14, b_+15); SET_HL(HL + 1);
   CYC(b_+15, b_+16); SET_HL(HL + 1);
-  CYC(b_+16, SYM(scriptCmd_jumpIfSomething)); ret_effect(gb);
+  CYC(b_+16, b_+17); ret_effect(gb);
 }
 
 void scriptCmd_jumpIfSomething_hook(GB *gb) {
@@ -1161,7 +1161,7 @@ skip_first_argument:
 skip_remaining_arguments:
   CYC(b_+19, b_+20); SET_HL(HL + 1);
   CYC(b_+20, b_+21); SET_HL(HL + 1);
-  CYC(b_+21, SYM(scriptCmd_setLinkCantMove)); ret_effect(gb);
+  CYC(b_+21, b_+22); ret_effect(gb);
 }
 
 void scriptCmd_setLinkCantMove_hook(GB *gb) {
@@ -1170,7 +1170,7 @@ void scriptCmd_setLinkCantMove_hook(GB *gb) {
   CYC(b_+1, b_+2); SET_HL(HL + 1);
   CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+3, b_+6); W8(wDisabledObjects) = A;
-  CYC(b_+6, SYM(scriptCmd_checkCounter2Zero)); ret_effect(gb);
+  CYC(b_+6, b_+7); ret_effect(gb);
 }
 
 void scriptCmd_checkCounter2Zero_hook(GB *gb) {
@@ -1185,7 +1185,7 @@ void scriptCmd_checkCounter2Zero_hook(GB *gb) {
   }
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+7); SET_HL(HL + 1);
-  CYC(b_+7, SYM(scriptCmd_setTile)); ret_effect(gb);
+  CYC(b_+7, b_+8); ret_effect(gb);
 }
 
 void scriptCmd_setTile_body_hook(GB *gb) {
@@ -1197,7 +1197,7 @@ void scriptCmd_setTile_body_hook(GB *gb) {
   CALL_C(b_+6, setTile_hook, SYM(setTile), b_+9);
   CYC(b_+9, b_+10); SET_HL(pop_effect(gb));
   CYC(b_+10, b_+11); alu_scf(gb);
-  CYC(b_+11, SYM(scriptCmd_setTileHere)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 void scriptCmd_setTile_hook(GB *gb) {
@@ -1214,7 +1214,7 @@ void scriptCmd_setTileHere_hook(GB *gb) {
   CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
   CYC(b_+1, b_+2); SET_HL(HL + 1);
   CALL_C(b_+2, objectGetShortPosition_hook, SYM(objectGetShortPosition), b_+5);
-  CYC(b_+5, SYM(scriptCmd_callScript));
+  CYC(b_+5, b_+7);
   scriptCmd_setTile_body_hook(gb);
 }
 
@@ -1234,7 +1234,7 @@ void scriptCmd_callScript_hook(GB *gb) {
   CYC(b_+12, b_+13); mem_wr(gb, DE, A);
   CYC(b_+13, b_+14); L = C;
   CYC(b_+14, b_+15); H = B;
-  CYC(b_+15, SYM(scriptCmd_ret)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }
 
 void scriptCmd_ret_hook(GB *gb) {
@@ -1258,18 +1258,18 @@ void scriptCmd_jumpIfCBA5Eq_hook(GB *gb) {
   if (F & FZ) {
     CYCT(b_+6, b_+8);
     CYC((SYM(scriptCmd_ret) + 9), (SYM(scriptCmd_ret) + 10)); SET_HL(HL + 1);
-    CYC((SYM(scriptCmd_ret) + 10), b_+0); scriptFunc_jump_scf_hook(gb);
+    CYC((SYM(scriptCmd_ret) + 10), (SYM(scriptCmd_ret) + 13)); scriptFunc_jump_scf_hook(gb);
     return;
   }
   CYC(b_+6, b_+8);
-  CYC(b_+8, SYM(scriptCmd_jumpRandom)); scriptFunc_add3ToHl_scf_hook(gb);
+  CYC(b_+8, b_+11); scriptFunc_add3ToHl_scf_hook(gb);
 }
 
 void scriptCmd_jumpRandom_hook(GB *gb) {
   BASE(scriptCmd_jumpRandom);
   CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
   CYC(b_+1, b_+2); SET_HL(HL + 1);
-  CYC(b_+2, SYM(scriptCmd_jumpTable)); scriptFunc_jump_scf_hook(gb);
+  CYC(b_+2, b_+5); scriptFunc_jump_scf_hook(gb);
 }
 
 // 0c:44c3
@@ -1281,7 +1281,7 @@ void scriptCmd_jumpTable_hook(GB *gb) {
   CYC(b_+3, b_+4); E = A;
   CYC(b_+4, b_+5); A = mem_rd(gb, DE);
   CYC(b_+5, b_+6); add_double_index_to_hl_from_rst(gb, b_+6);
-  CYC(b_+6, SYM(scriptCmd_jumpIfMemorySet)); scriptFunc_jump_hook(gb);
+  CYC(b_+6, b_+9); scriptFunc_jump_hook(gb);
 }
 
 void scriptCmd_jumpIfMemorySet_hook(GB *gb) {
@@ -1301,7 +1301,7 @@ void scriptCmd_jumpIfMemorySet_hook(GB *gb) {
   }
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+12); SET_HL(HL + 1);
-  CYC(b_+12, SYM(scriptCmd_writeC6xx)); scriptFunc_jump_scf_hook(gb);
+  CYC(b_+12, b_+15); scriptFunc_jump_scf_hook(gb);
 }
 
 void scriptCmd_writeC6xx_hook(GB *gb) {
@@ -1313,7 +1313,7 @@ void scriptCmd_writeC6xx_hook(GB *gb) {
   CYC(b_+5, b_+6); SET_HL(HL + 1);
   CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+7, b_+8); mem_wr(gb, BC, A);
-  CYC(b_+8, SYM(scriptCmd_checkCollidedWithLink_ignoreZ)); ret_effect(gb);
+  CYC(b_+8, b_+9); ret_effect(gb);
 }
 
 void scriptCmd_checkCollidedWithLink_body_hook(GB *gb) {
@@ -1321,7 +1321,7 @@ void scriptCmd_checkCollidedWithLink_body_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+5, func_0c_4177_hook, SYM(func_0c_4177), b_+8);
   CYC(b_+8, b_+9); SET_HL(HL + 1);
-  CYC(b_+9, SYM(scriptCmd_checkAButton)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 void scriptCmd_checkCollidedWithLink_ignoreZ_hook(GB *gb) {
@@ -1334,7 +1334,7 @@ void scriptCmd_checkCollidedWithLink_ignoreZ_hook(GB *gb) {
     return;
   }
   CYC(b_+4, b_+5);
-  CYC(b_+5, SYM(scriptCmd_checkCollidedWithLink_onGround));
+  CYC(b_+5, b_+7);
   scriptCmd_checkCollidedWithLink_body_hook(gb);
 }
 
@@ -1368,7 +1368,7 @@ void scriptCmd_checkAButton_hook(GB *gb) {
   CALL_C(b_+8, func_0c_4177_hook, SYM(func_0c_4177), b_+11);
   CYC(b_+11, b_+12); SET_HL(HL + 1);
   CYC(b_+12, b_+13); alu_scf(gb);
-  CYC(b_+13, SYM(scriptCmd_checkNoEnemies)); ret_effect(gb);
+  CYC(b_+13, b_+14); ret_effect(gb);
 }
 
 void scriptCmd_checkNoEnemies_hook(GB *gb) {
@@ -1382,7 +1382,7 @@ void scriptCmd_checkNoEnemies_hook(GB *gb) {
   }
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+7); SET_HL(HL + 1);
-  CYC(b_+7, SYM(scriptCmd_checkFlagSet)); ret_effect(gb);
+  CYC(b_+7, b_+8); ret_effect(gb);
 }
 
 void scriptCmd_checkFlagSet_hook(GB *gb) {
@@ -1407,7 +1407,7 @@ void scriptCmd_checkFlagSet_hook(GB *gb) {
   CYC(b_+14, b_+17); SET_BC(0x0004);
   CYC(b_+17, b_+18); alu_add_hl(gb, BC);
   CYC(b_+18, b_+19); alu_scf(gb);
-  CYC(b_+19, SYM(scriptCmd_checkInteractionByteEq)); ret_effect(gb);
+  CYC(b_+19, b_+20); ret_effect(gb);
 }
 
 void scriptCmd_checkInteractionByteEq_hook(GB *gb) {
@@ -1431,7 +1431,7 @@ void scriptCmd_checkInteractionByteEq_hook(GB *gb) {
 matched:
   CYC(b_+12, b_+13); SET_BC(pop_effect(gb));
   CYC(b_+13, b_+14); SET_HL(HL + 1);
-  CYC(b_+14, SYM(scriptCmd_checkMemoryEq)); ret_effect(gb);
+  CYC(b_+14, b_+15); ret_effect(gb);
 }
 
 void scriptCmd_checkMemoryEq_hook(GB *gb) {
@@ -1457,7 +1457,7 @@ void scriptCmd_checkMemoryEq_hook(GB *gb) {
 matched:
   CYC(b_+14, b_+15); SET_BC(pop_effect(gb));
   CYC(b_+15, b_+16); SET_HL(HL + 1);
-  CYC(b_+16, SYM(scriptCmd_checkHeartDisplayUpdated)); ret_effect(gb);
+  CYC(b_+16, b_+17); ret_effect(gb);
 }
 
 void scriptCmd_checkHeartDisplayUpdated_hook(GB *gb) {
@@ -1478,7 +1478,7 @@ void scriptCmd_checkHeartDisplayUpdated_hook(GB *gb) {
 updated:
   CYC(b_+13, b_+14); SET_HL(HL + 1);
   CYC(b_+14, b_+15); alu_scf(gb);
-  CYC(b_+15, SYM(scriptCmd_checkRupeeDisplayUpdated)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }
 
 void scriptCmd_checkRupeeDisplayUpdated_hook(GB *gb) {
@@ -1503,7 +1503,7 @@ void scriptCmd_checkRupeeDisplayUpdated_hook(GB *gb) {
 not_updated:
   CYC(b_+17, b_+18); SET_HL(pop_effect(gb));
   CYC(b_+18, b_+19); alu_xor(gb, A);
-  CYC(b_+19, SYM(scriptCmd_checkNotCollidedWithLink_ignoreZ)); ret_effect(gb);
+  CYC(b_+19, b_+20); ret_effect(gb);
 }
 
 void scriptCmd_checkNotCollidedWithLink_ignoreZ_hook(GB *gb) {
@@ -1521,7 +1521,7 @@ void scriptCmd_checkNotCollidedWithLink_ignoreZ_hook(GB *gb) {
   return;
 collided:
   CYC(b_+8, b_+9); alu_xor(gb, A);
-  CYC(b_+9, SYM(scriptCmd_createPuff)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 void scriptCmd_createPuff_hook(GB *gb) {
@@ -1530,7 +1530,7 @@ void scriptCmd_createPuff_hook(GB *gb) {
   CALL_C(b_+0, objectCreatePuff_hook, SYM(objectCreatePuff), b_+3);
   CYC(b_+3, b_+4); SET_HL(pop_effect(gb));
   CYC(b_+4, b_+5); SET_HL(HL + 1);
-  CYC(b_+5, SYM(scriptCmd_jumpIfGlobalFlagSet)); ret_effect(gb);
+  CYC(b_+5, b_+6); ret_effect(gb);
 }
 
 void scriptCmd_jumpIfGlobalFlagSet_hook(GB *gb) {
@@ -1553,7 +1553,7 @@ skip_jump:
   CYC(b_+13, b_+14); SET_HL(HL + 1);
   CYC(b_+14, b_+15); SET_HL(HL + 1);
   CYC(b_+15, b_+16); alu_scf(gb);
-  CYC(b_+16, SYM(scriptCmd_setOrUnsetGlobalFlag)); ret_effect(gb);
+  CYC(b_+16, b_+17); ret_effect(gb);
 }
 
 void scriptCmd_setOrUnsetGlobalFlag_hook(GB *gb) {
@@ -1580,7 +1580,7 @@ unset_flag:
   CALL_C(b_+17, unsetGlobalFlag_hook, SYM(unsetGlobalFlag), b_+20);
   CYC(b_+20, b_+21); SET_HL(pop_effect(gb));
   CYC(b_+21, b_+22); alu_scf(gb);
-  CYC(b_+22, SYM(scriptCmd_initNpcHitbox)); ret_effect(gb);
+  CYC(b_+22, b_+23); ret_effect(gb);
 }
 
 void scriptCmd_initNpcHitbox_hook(GB *gb) {
@@ -1609,7 +1609,7 @@ update_a_button_list:
   CYC(b_+22, b_+23);
   CYC(b_+23, b_+24); SET_HL(HL + 1);
   CYC(b_+24, b_+25); alu_scf(gb);
-  CYC(b_+25, SYM(scriptCmd_moveNpcUp)); ret_effect(gb);
+  CYC(b_+25, b_+26); ret_effect(gb);
 }
 
 void scriptCmd_moveNpc_body_hook(GB *gb) {
@@ -1625,7 +1625,7 @@ void scriptCmd_moveNpc_body_hook(GB *gb) {
   CYC(b_+14, b_+16); E = 0x47;
   CYC(b_+16, b_+17); mem_wr(gb, DE, A);
   CYC(b_+17, b_+18); alu_xor(gb, A);
-  CYC(b_+18, SYM(scriptCmd_moveNpcRight)); ret_effect(gb);
+  CYC(b_+18, b_+19); ret_effect(gb);
 }
 
 void scriptCmd_moveNpcUp_hook(GB *gb) {
@@ -1637,21 +1637,21 @@ void scriptCmd_moveNpcUp_hook(GB *gb) {
 void scriptCmd_moveNpcRight_hook(GB *gb) {
   BASE(scriptCmd_moveNpcRight);
   CYC(b_+0, b_+2); A = 0x08;
-  CYC(b_+2, SYM(scriptCmd_moveNpcDown));
+  CYC(b_+2, b_+4);
   scriptCmd_moveNpc_body_hook(gb);
 }
 
 void scriptCmd_moveNpcDown_hook(GB *gb) {
   BASE(scriptCmd_moveNpcDown);
   CYC(b_+0, b_+2); A = 0x10;
-  CYC(b_+2, SYM(scriptCmd_moveNpcLeft));
+  CYC(b_+2, b_+4);
   scriptCmd_moveNpc_body_hook(gb);
 }
 
 void scriptCmd_moveNpcLeft_hook(GB *gb) {
   BASE(scriptCmd_moveNpcLeft);
   CYC(b_+0, b_+2); A = 0x18;
-  CYC(b_+2, SYM(scriptCmd_delay));
+  CYC(b_+2, b_+4);
   scriptCmd_moveNpc_body_hook(gb);
 }
 

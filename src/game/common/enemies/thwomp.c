@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode2f), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode2f), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t enemyCode2f_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -82,7 +82,7 @@ void thwomp_uninitialized_hook(GB *gb) {
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x10); // ANGLE_DOWN
   CYC(b_+13, b_+15); A = 0x04;
   CALL_C(b_+15, enemySetAnimation_hook, SYM(enemySetAnimation), b_+18);
-  CYC(b_+18, SYM(thwomp_state_stub)); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+18, b_+21); objectSetVisible82_hook(gb); return; // jp
 }
 
 void thwomp_state_stub_hook(GB *gb) {
@@ -123,7 +123,7 @@ linkApproached:
   CYC(b_+37, b_+38); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+38, b_+39); mem_wr(gb, HL, A);
   CYC(b_+39, b_+41); A = 0x08;
-  CYC(b_+41, SYM(thwomp_state9)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+41, b_+44); enemySetAnimation_hook(gb); return; // jp
 }
 
 // Falling to ground
@@ -150,7 +150,7 @@ hitGround:
   CYC(b_+23, b_+25); A = 45;
   CYC(b_+25, b_+28); W8(wScreenShakeCounterY) = A;
   CYC(b_+28, b_+30); A = 0x70; // SND_DOORCLOSE
-  CYC(b_+30, SYM(thwomp_stateA)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+30, b_+33); playSound_b00_hook(gb); return; // jp
 }
 
 // Resting on ground for 50 frames after hitting it, then moving back to starting position
@@ -192,7 +192,7 @@ void thwomp_stateB_hook(GB *gb) {
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+5); L = E;
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x08); // [state] = 8
-  CYC(b_+7, SYM(thwomp_func67ba)); thwomp_updateLinkRidingSelf_hook(gb); return; // jp
+  CYC(b_+7, b_+10); thwomp_updateLinkRidingSelf_hook(gb); return; // jp
 }
 
 // Unused function.
@@ -208,7 +208,7 @@ void thwomp_func67ba_hook(GB *gb) {
   CYC(b_+5, b_+7); E = ENEMY_BASE + OBJ_XH;
   CYC(b_+7, b_+8); A = mem_rd(gb, DE);
   CYC(b_+8, b_+9); C = A;
-  CYC(b_+9, SYM(thwomp_updateLinkRidingSelf)); getTileCollisionsAtPosition_hook(gb); return; // jp
+  CYC(b_+9, b_+12); getTileCollisionsAtPosition_hook(gb); return; // jp
 }
 
 // Checks if Link is riding the thwomp, updates appropriate variables if so.

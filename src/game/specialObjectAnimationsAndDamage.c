@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(linkApplyDamage_b06), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(linkApplyDamage_b06), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define specialObjectAnimationData_bank06 SYM(specialObjectAnimationTable)
 
@@ -102,7 +102,7 @@ finish:
   CYC(b_+118, b_+119); A = alu_dec8(gb, A);
   CYC(b_+119, b_+120); mem_wr(gb, DE, A);
 end:
-  CYC(b_+120, SYM(tryToBreakTile_body)); ret_effect(gb);
+  CYC(b_+120, b_+121); ret_effect(gb);
 }
 
 static void add_a_to_hl(GB *gb, uint16_t return_address) {
@@ -240,7 +240,7 @@ void getSpecialObjectGraphicsFrame_hook(GB *gb) {
   CYC(b_+56, b_+57); B = A;
   CYC(b_+57, b_+59); L &= 0xef;
   CYC(b_+59, b_+60); alu_or(gb, D);
-  CYC(b_+60, SYM(func_4553));
+  CYC(b_+60, b_+61);
   ret_effect(gb);
 }
 
@@ -252,7 +252,7 @@ void specialObjectSetAnimationWithLinkData_hook(GB *gb) {
   CYC(b_+4, b_+5); C = A;
   CYC(b_+5, b_+7); B = 0;
   CYC(b_+7, b_+10); A = mem_rd(gb, w1Link_id);
-  CYC(b_+10, SYM(specialObjectAnimate_optimized));
+  CYC(b_+10, b_+12);
   label_06_032_hook(gb);
 }
 
@@ -306,7 +306,7 @@ write:
   CYC(b_+26, b_+28); E = 0x31;
   CYC(b_+28, b_+29); A = C;
   CYC(b_+29, b_+30); mem_wr(gb, DE, A);
-  CYC(b_+30, SYM(specialObjectGraphicsTable));
+  CYC(b_+30, b_+31);
   ret_effect(gb);
 }
 
@@ -317,7 +317,7 @@ void specialObjectSetAnimation_data_hook(GB *gb) {
   CYC(b_+4, b_+5); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+5, b_+6); H = mem_rd(gb, HL);
   CYC(b_+6, b_+7); L = A;
-  CYC(b_+7, SYM(specialObjectNextAnimationFrame)); alu_add_hl(gb, BC);
+  CYC(b_+7, b_+8); alu_add_hl(gb, BC);
   specialObjectNextAnimationFrame_hook(gb);
 }
 
@@ -328,7 +328,7 @@ void label_06_032_hook(GB *gb) {
 void specialObjectSetAnimation_body_hook(GB *gb) {
   BASE(specialObjectSetAnimation_body);
   CYC(b_+0, b_+2); E = 0x01;
-  CYC(b_+2, SYM(label_06_032)); A = mem_rd(gb, DE);
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   specialObjectSetAnimation_data_hook(gb);
 }
 
@@ -340,7 +340,7 @@ void specialObjectAnimate_optimized_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
   CYC(b_+4, b_+5);
   CYC(b_+5, b_+7); L = 0x22;
-  CYC(b_+7, SYM(specialObjectSetAnimation_body));
+  CYC(b_+7, b_+9);
   specialObjectNextAnimationFrame_hook(gb);
 }
 

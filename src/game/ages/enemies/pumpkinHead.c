@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode78), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode78), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void ecom_getSubidAndCpStateTo08_b0f_hook(GB *gb);
 
@@ -186,7 +186,7 @@ void pumpkinHead_state_uninitialized_hook(GB *gb) {
   CYC(b_+6, b_+7); mem_wr(gb, DE, A); // [state] = 1
   CYC(b_+7, b_+9); A = 0x78; // ENEMY_PUMPKIN_HEAD
   CYC(b_+9, b_+11); B = 0x00;
-  CYC(b_+11, SYM(pumpkinHead_state_spawner)); enemyBoss_initializeRoom_b0f_hook(gb); return; // jp
+  CYC(b_+11, b_+14); enemyBoss_initializeRoom_b0f_hook(gb); return; // jp
 }
 
 static void pumpkinHead_state_spawner_commonInit(GB *gb) {
@@ -196,7 +196,7 @@ static void pumpkinHead_state_spawner_commonInit(GB *gb) {
   CYC(b_+58, b_+60); mem_wr(gb, HL, ENEMY_BASE); // ld (hl),Enemy.start
   CYC(b_+60, b_+61); L = alu_inc8(gb, L);
   CYC(b_+61, b_+62); mem_wr(gb, HL, C);
-  CYC(b_+62, SYM(pumpkinHead_state_grabbed)); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+62, b_+65); objectCopyPosition_hook(gb); return; // jp
 }
 
 // Subid 0 (spawner). Waits for doors to close, spawns body/ghost/head, deletes self.
@@ -309,7 +309,7 @@ atRest:
   CYC(b_+86, b_+88); mem_wr(gb, HL, 0x15);
   CYC(b_+88, b_+89); H = D;
   CYC(b_+89, b_+91); mem_wr(gb, HL, 0x16);
-  CYC(b_+91, SYM(pumpkinHead_state_stub)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+91, b_+94); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 void pumpkinHead_state_stub_hook(GB *gb) {
@@ -360,7 +360,7 @@ void pumpkinHead_body_state08_hook(GB *gb) {
   CYC(b_+19, b_+21); C = 0x08;
   CALL_C(b_+21, ecom_setZAboveScreen_b0f_hook, SYM(ecom_setZAboveScreen_b0f), b_+24);
   CYC(b_+24, b_+26); A = 0x0d;
-  CYC(b_+26, SYM(pumpkinHead_body_state09)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+26, b_+29); enemySetAnimation_hook(gb); return; // jp
 }
 
 // Falling from ceiling
@@ -377,7 +377,7 @@ void pumpkinHead_body_state09_hook(GB *gb) {
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x1e); // 30
   CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+15, b_+17); mem_wr(gb, HL, 0x10); // ANGLE_DOWN
-  CYC(b_+17, SYM(pumpkinHead_body_shakeScreen)); A = 0x1e; // 30
+  CYC(b_+17, b_+19); A = 0x1e; // 30
   pumpkinHead_body_shakeScreen_hook(gb); return; // fallthrough
 }
 
@@ -386,7 +386,7 @@ void pumpkinHead_body_shakeScreen_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+3);
   CYC(b_+3, b_+5); A = 0x70; // SND_DOORCLOSE
-  CYC(b_+5, SYM(pumpkinHead_body_state0a)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+5, b_+8); playSound_b00_hook(gb); return; // jp
 }
 
 // Waiting for head to catch up with body
@@ -403,7 +403,7 @@ void pumpkinHead_body_state0a_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+12); return; } // ret nz
   CYC(b_+12, b_+13);
   CALL_C(b_+13, pumpkinHead_body_chooseRandomStompTimerAndCount_hook, SYM(pumpkinHead_body_chooseRandomStompTimerAndCount), b_+16);
-  CYCT(b_+16, SYM(pumpkinHead_body_state0b)); pumpkinHead_body_beginMoving_hook(gb); return; // jr
+  CYCT(b_+16, b_+18); pumpkinHead_body_beginMoving_hook(gb); return; // jr
 }
 
 // Walking around
@@ -419,7 +419,7 @@ void pumpkinHead_body_state0b_hook(GB *gb) {
   CALL_C(b_+9, ecom_applyVelocityForSideviewEnemyNoHoles_b0f_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0f), b_+12);
   if (F & FZ) { CYCT(b_+12, b_+14); pumpkinHead_body_chooseNextAction_hook(gb); return; } // jr z
   CYC(b_+12, b_+14);
-  CYC(b_+14, SYM(pumpkinHead_body_chooseNextAction)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+14, b_+17); enemyAnimate_hook(gb); return; // jp
 }
 
 void pumpkinHead_body_chooseNextAction_hook(GB *gb) {
@@ -444,7 +444,7 @@ void pumpkinHead_body_chooseNextAction_hook(GB *gb) {
   CYC(b_+28, b_+30); A = OBJ_STATE; // Object.state
   CALL_C(b_+30, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+33);
   CYC(b_+33, b_+34); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
-  CYCT(b_+34, SYM(pumpkinHead_body_state0c)); pumpkinHead_body_updateAnimationFromAngle_hook(gb); return; // jr
+  CYCT(b_+34, b_+36); pumpkinHead_body_updateAnimationFromAngle_hook(gb); return; // jr
 }
 
 // Head is firing projectiles; waiting for it to finish.
@@ -453,7 +453,7 @@ void pumpkinHead_body_state0c_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+3);
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } // ret nz
-  CYC(b_+3, SYM(pumpkinHead_body_beginMoving));
+  CYC(b_+3, b_+4);
   pumpkinHead_body_beginMoving_hook(gb); return; // fallthrough
 }
 
@@ -490,7 +490,7 @@ void pumpkinHead_body_updateAnimationFromAngle_hook(GB *gb) {
   CYC(b_+14, b_+15); mem_wr(gb, DE, A);
   CYC(b_+15, b_+16); A = B;
   CYC(b_+16, b_+18); alu_add(gb, 0x0b);
-  CYC(b_+18, SYM(pumpkinHead_body_walkDurations)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+18, b_+21); enemySetAnimation_hook(gb); return; // jp
 }
 
 // Preparing to stomp
@@ -505,7 +505,7 @@ void pumpkinHead_body_state0d_hook(GB *gb) {
   if (!(F & FC)) { RET_TAKEN(b_+7); return; } // ret nc
   CYC(b_+7, b_+8);
   CALL_C(b_+8, ecom_updateCardinalAngleTowardTarget_b0f_hook, SYM(ecom_updateCardinalAngleTowardTarget_b0f), b_+11);
-  CYCT(b_+11, SYM(pumpkinHead_body_beginStomp)); pumpkinHead_body_updateAnimationFromAngle_hook(gb); return; // jr
+  CYCT(b_+11, b_+13); pumpkinHead_body_updateAnimationFromAngle_hook(gb); return; // jr
 }
 
 void pumpkinHead_body_beginStomp_hook(GB *gb) {
@@ -539,7 +539,7 @@ void pumpkinHead_body_beginStomp_hook(GB *gb) {
   CYC(b_+48, b_+49); A = B;
   CYC(b_+49, b_+51); alu_add(gb, 0x0b);
   CALL_C(b_+51, enemySetAnimation_hook, SYM(enemySetAnimation), b_+54);
-  CYC(b_+54, SYM(pumpkinHead_body_state0e)); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+54, b_+57); objectSetVisible81_hook(gb); return; // jp
 }
 
 // In midair during stomp
@@ -565,7 +565,7 @@ L_63a8:
   CYC(b_+23, b_+24); mem_wr(gb, HL, A);
   CYC(b_+24, b_+26); A = 0x14;
   CALL_C(b_+26, pumpkinHead_body_shakeScreen_hook, SYM(pumpkinHead_body_shakeScreen), b_+29);
-  CYC(b_+29, SYM(pumpkinHead_body_state0f)); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+29, b_+32); objectSetVisible83_hook(gb); return; // jp
 }
 
 // Landed after a stomp
@@ -579,7 +579,7 @@ void pumpkinHead_body_state0f_hook(GB *gb) {
   CYC(b_+6, b_+7); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)
   if (!(F & FZ)) { CYCT(b_+7, b_+9); pumpkinHead_body_beginStomp_hook(gb); return; } // jr nz
   CYC(b_+7, b_+9);
-  CYC(b_+9, SYM(pumpkinHead_body_state10)); pumpkinHead_body_beginMoving_hook(gb); return; // jp
+  CYC(b_+9, b_+12); pumpkinHead_body_beginMoving_hook(gb); return; // jp
 }
 
 // Body has been destroyed
@@ -598,7 +598,7 @@ void pumpkinHead_body_state11_hook(GB *gb) {
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x08);
   CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+9, b_+11); mem_wr(gb, HL, 0x10);
-  CYC(b_+11, SYM(pumpkinHead_body_state12)); objectCreatePuff_hook(gb); return; // jp
+  CYC(b_+11, b_+14); objectCreatePuff_hook(gb); return; // jp
 }
 
 // Delay before making body visible
@@ -613,7 +613,7 @@ void pumpkinHead_body_state12_hook(GB *gb) {
   CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [state]
   CALL_C(b_+8, objectSetVisible83_hook, SYM(objectSetVisible83), b_+11);
   CYC(b_+11, b_+13); A = 0x0d;
-  CYC(b_+13, SYM(pumpkinHead_body_state13)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+13, b_+16); enemySetAnimation_hook(gb); return; // jp
 }
 
 // Body has regenerated, waiting a moment before resuming
@@ -626,7 +626,7 @@ void pumpkinHead_body_state13_hook(GB *gb) {
   CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+6, b_+8); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
   CALL_C(b_+8, pumpkinHead_body_chooseRandomStompTimerAndCount_hook, SYM(pumpkinHead_body_chooseRandomStompTimerAndCount), b_+11);
-  CYC(b_+11, SYM(pumpkinHead_ghost)); pumpkinHead_body_beginMoving_hook(gb); return; // jp
+  CYC(b_+11, b_+14); pumpkinHead_body_beginMoving_hook(gb); return; // jp
 }
 
 void pumpkinHead_ghost_hook(GB *gb) {
@@ -680,7 +680,7 @@ void pumpkinHead_ghost_state08_hook(GB *gb) {
   CYC(b_+26, b_+28); C = 0x20;
   CALL_C(b_+28, ecom_setZAboveScreen_b0f_hook, SYM(ecom_setZAboveScreen_b0f), b_+31);
   CYC(b_+31, b_+33); A = 0x0a;
-  CYC(b_+33, SYM(pumpkinHead_ghost_state09)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+33, b_+36); enemySetAnimation_hook(gb); return; // jp
 }
 
 // Falling from ceiling. (Also called by "head" state 9.)
@@ -725,7 +725,7 @@ void pumpkinHead_ghost_state0b_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); A = OBJ_ENABLED; // Object.enabled
   CALL_C(b_+2, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+5);
-  CYC(b_+5, SYM(pumpkinHead_ghost_state0c)); objectTakePosition_hook(gb); return; // jp
+  CYC(b_+5, b_+8); objectTakePosition_hook(gb); return; // jp
 }
 
 // Body just began stomping; is moving upward
@@ -755,7 +755,7 @@ void pumpkinHead_ghost_state0d_hook(GB *gb) {
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0xf0); // [zh] = 0
   CYC(b_+8, b_+10); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+10, b_+11); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
-  CYC(b_+11, SYM(pumpkinHead_ghost_state0e)); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+11, b_+14); objectSetVisible83_hook(gb); return; // jp
 }
 
 // Reached target z-position after stomping; waiting for head to catch up
@@ -773,7 +773,7 @@ void pumpkinHead_ghost_state0e_hook(GB *gb) {
   CYC(b_+12, b_+14); E = ENEMY_BASE + OBJ_STATE;
   CYC(b_+14, b_+16); A = 0x0b;
   CYC(b_+16, b_+17); mem_wr(gb, DE, A);
-  CYC(b_+17, SYM(pumpkinHead_ghost_state0f)); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+17, b_+20); objectSetInvisible_hook(gb); return; // jp
 }
 
 // Body just destroyed
@@ -786,7 +786,7 @@ void pumpkinHead_ghost_state0f_hook(GB *gb) {
   CYC(b_+5, b_+7); A = 0xe0;
   CYC(b_+7, b_+8); mem_wr(gb, HL, A); SET_HL(HL + 1); // ld (hl+),a
   CYC(b_+8, b_+10); mem_wr(gb, HL, 0xfe); // speedZ = -0x120
-  CYC(b_+10, SYM(pumpkinHead_ghost_state10)); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+10, b_+13); objectSetInvisible_hook(gb); return; // jp
 }
 
 // Falling to ground after body disappeared
@@ -842,7 +842,7 @@ void pumpkinHead_ghost_state13_hook(GB *gb) {
   CALL_C(b_+20, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+23);
   CALL_C(b_+23, ecom_updateCardinalAngleAwayFromTarget_b0f_hook, SYM(ecom_updateCardinalAngleAwayFromTarget_b0f), b_+26);
   CYC(b_+26, b_+28); A = 0x0a;
-  CYC(b_+28, SYM(pumpkinHead_ghost_state14)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+28, b_+31); enemySetAnimation_hook(gb); return; // jp
 }
 
 // Falling to ground, then running away with angle computed earlier
@@ -862,7 +862,7 @@ void pumpkinHead_ghost_state14_hook(GB *gb) {
 
 L_64e5:
   CALL_C(b_+17, ecom_applyVelocityForSideviewEnemyNoHoles_b0f_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0f), b_+20);
-  CYC(b_+20, SYM(pumpkinHead_ghost_state15)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+20, b_+23); enemyAnimate_hook(gb); return; // jp
 }
 
 // Stopped running away, or head just landed on ground
@@ -874,7 +874,7 @@ void pumpkinHead_ghost_state15_hook(GB *gb) {
   CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x78); // 120
   CYC(b_+7, b_+9); A = 0x09;
-  CYC(b_+9, SYM(pumpkinHead_ghost_state16)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+9, b_+12); enemySetAnimation_hook(gb); return; // jp
 }
 
 // After [counter1] frames, will choose which direction to move in next
@@ -919,7 +919,7 @@ checkHeadOnGround:
 
 setAnim:
   CYC(b_+52, b_+54); A = 0x0a;
-  CYC(b_+54, SYM(pumpkinHead_ghost_state17)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+54, b_+57); enemySetAnimation_hook(gb); return; // jp
 }
 
 // Moving toward head (or where head used to be)
@@ -957,7 +957,7 @@ void pumpkinHead_ghost_state17_hook(GB *gb) {
 
 moveTowardHead:
   CALL_C(b_+46, ecom_moveTowardPosition_b0f_hook, SYM(ecom_moveTowardPosition_b0f), b_+49);
-  CYC(b_+49, SYM(pumpkinHead_head)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+49, b_+52); enemyAnimate_hook(gb); return; // jp
 }
 
 void pumpkinHead_head_hook(GB *gb) {
@@ -1004,7 +1004,7 @@ void pumpkinHead_head_state08_hook(GB *gb) {
   CYC(b_+18, b_+20); C = 0x30;
   CALL_C(b_+20, ecom_setZAboveScreen_b0f_hook, SYM(ecom_setZAboveScreen_b0f), b_+23);
   CYC(b_+23, b_+25); A = 0x04;
-  CYC(b_+25, SYM(pumpkinHead_head_setAnimation)); B = 0x00;
+  CYC(b_+25, b_+27); B = 0x00;
   pumpkinHead_head_setAnimation_hook(gb); return; // fallthrough
 }
 
@@ -1032,7 +1032,7 @@ void pumpkinHead_head_state09_hook(GB *gb) {
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+6); A = 0x2e; // MUS_BOSS
   CYC(b_+6, b_+9); mem_wr(gb, wActiveMusic, A);
-  CYC(b_+9, SYM(pumpkinHead_head_state0a)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+9, b_+12); playSound_b00_hook(gb); return; // jp
 }
 
 // Head follows body. Called by other states.
@@ -1087,7 +1087,7 @@ void pumpkinHead_head_state0b_hook(GB *gb) {
   CYC(b_+13, b_+14); alu_rrca(gb);
   CYC(b_+14, b_+15); alu_rrca(gb);
   CYC(b_+15, b_+17); B = 0x01;
-  CYC(b_+17, SYM(pumpkinHead_head_state0c)); pumpkinHead_head_setAnimation_hook(gb); return; // jp
+  CYC(b_+17, b_+20); pumpkinHead_head_setAnimation_hook(gb); return; // jp
 }
 
 // Delay before firing projectile
@@ -1116,7 +1116,7 @@ void pumpkinHead_head_state0c_hook(GB *gb) {
   CYC(b_+31, b_+32); mem_wr(gb, HL, A);
   CALL_C(b_+32, objectCopyPosition_hook, SYM(objectCopyPosition), b_+35);
   CYC(b_+35, b_+37); A = 0xa8; // SND_VERAN_FAIRY_ATTACK
-  CYC(b_+37, SYM(pumpkinHead_head_state0d)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+37, b_+40); playSound_b00_hook(gb); return; // jp
 }
 
 // Delay after firing projectile
@@ -1128,7 +1128,7 @@ void pumpkinHead_head_state0d_hook(GB *gb) {
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+7); L = E;
   CYC(b_+7, b_+9); mem_wr(gb, HL, 0x0a);
-  CYCT(b_+9, SYM(pumpkinHead_head_state0e)); pumpkinHead_head_state0a_hook(gb); return; // jr
+  CYCT(b_+9, b_+11); pumpkinHead_head_state0a_hook(gb); return; // jr
 }
 
 // Began a stomp; moving up
@@ -1174,7 +1174,7 @@ void pumpkinHead_head_state0f_hook(GB *gb) {
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0xf0); // [zh] = 0
   CYC(b_+8, b_+10); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+10, b_+12); mem_wr(gb, HL, 0x0a);
-  CYC(b_+12, SYM(pumpkinHead_head_state10)); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+12, b_+15); objectSetVisible82_hook(gb); return; // jp
 }
 
 // Body just destroyed
@@ -1187,7 +1187,7 @@ void pumpkinHead_head_state10_hook(GB *gb) {
   CYC(b_+5, b_+7); A = 0xe0;
   CYC(b_+7, b_+8); mem_wr(gb, HL, A); SET_HL(HL + 1); // ld (hl+),a
   CYC(b_+8, b_+10); mem_wr(gb, HL, 0xfe); // speedZ = -0x120
-  CYC(b_+10, SYM(pumpkinHead_head_state11)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+10, b_+13); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 // Head falling down after body destroyed
@@ -1233,7 +1233,7 @@ void pumpkinHead_head_state13_hook(GB *gb) {
   CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_COLLISION_RADIUS_X;
   CYC(b_+9, b_+11); mem_wr(gb, HL, 0x0a);
   CYC(b_+11, b_+13); A = 0x08;
-  CYC(b_+13, SYM(pumpkinHead_head_state14)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+13, b_+16); enemySetAnimation_hook(gb); return; // jp
 }
 
 // Delay before moving back up, respawning body
@@ -1252,7 +1252,7 @@ void pumpkinHead_head_state14_hook(GB *gb) {
   CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_COLLISION_RADIUS_X;
   CYC(b_+15, b_+17); mem_wr(gb, HL, 0x06);
   CYC(b_+17, b_+19); A = 0x04;
-  CYC(b_+19, SYM(pumpkinHead_head_state15)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+19, b_+22); enemySetAnimation_hook(gb); return; // jp
 }
 
 // Head moving up
@@ -1280,7 +1280,7 @@ void pumpkinHead_head_state15_hook(GB *gb) {
   CYC(b_+36, b_+38); mem_wr(gb, HL, 0x00);
   CYC(b_+38, b_+40); A = 0x04;
   CYC(b_+40, b_+42); B = 0x00;
-  CYC(b_+42, SYM(pumpkinHead_head_state16)); pumpkinHead_head_setAnimation_hook(gb); return; // jp
+  CYC(b_+42, b_+45); pumpkinHead_head_setAnimation_hook(gb); return; // jp
 }
 
 // Head has just come to rest after being thrown.
@@ -1295,7 +1295,7 @@ void pumpkinHead_head_state16_hook(GB *gb) {
   if (F & FZ) { RET_TAKEN(b_+7); return; } // ret z
   CYC(b_+7, b_+8);
   CALL_C(b_+8, objectAddToGrabbableObjectBuffer_hook, SYM(objectAddToGrabbableObjectBuffer), b_+11);
-  CYC(b_+11, SYM(pumpkinHead_body_countdownUntilStomp)); objectPushLinkAwayOnCollision_hook(gb); return; // jp
+  CYC(b_+11, b_+14); objectPushLinkAwayOnCollision_hook(gb); return; // jp
 }
 
 // @param[out] zflag z if time to stomp
@@ -1312,7 +1312,7 @@ void pumpkinHead_body_countdownUntilStomp_hook(GB *gb) {
   CYC(b_+9, b_+11); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x0d);
   CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(b_+15, SYM(pumpkinHead_body_chooseRandomStompTimerAndCount)); mem_wr(gb, HL, 0x3c); // 60
+  CYC(b_+15, b_+17); mem_wr(gb, HL, 0x3c); // 60
   pumpkinHead_body_chooseRandomStompTimerAndCount_hook(gb); return; // fallthrough
 }
 
@@ -1320,7 +1320,7 @@ void pumpkinHead_body_countdownUntilStomp_hook(GB *gb) {
 void pumpkinHead_body_chooseRandomStompTimerAndCount_hook(GB *gb) {
   BASE(pumpkinHead_body_chooseRandomStompTimerAndCount);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); SET_BC((SYM(_label_00_061) + 12));
+  CYC(b_+0, b_+3); SET_BC(0x0701);
   CALL_C(b_+3, ecom_randomBitwiseAndBCE_b0f_hook, SYM(ecom_randomBitwiseAndBCE_b0f), b_+6);
   CYC(b_+6, b_+7); A = B;
   CYC(b_+7, b_+10); SET_HL(b_+23); // @counter2Vals
@@ -1440,5 +1440,5 @@ bodyHealthZero:
   CALL_C(b_+81, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+84);
   CYC(b_+84, b_+86); mem_wr(gb, HL, 0x10);
   CALL_C(b_+86, objectCreatePuff_hook, SYM(objectCreatePuff), b_+89);
-  CYC(b_+89, SYM(enemyCode79)); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+89, b_+92); objectSetInvisible_hook(gb); return; // jp
 }

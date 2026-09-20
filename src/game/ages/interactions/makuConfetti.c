@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(makuConfetti_subid0), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(makuConfetti_subid0), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void makuConfetti_subid0_hook(GB *gb);
 void makuConfetti_subid1_hook(GB *gb);
@@ -112,7 +112,7 @@ static void maku_confetti_make_sparkle(GB *gb, uint16_t sp0_) {
   CYC(b_+323, b_+325); mem_wr(gb, HL, 0x84);
   CYC(b_+325, b_+326); L = alu_inc8(gb, L);
   CYC(b_+326, b_+328); mem_wr(gb, HL, 2);
-  CYC(b_+328, SYM(makuConfetti_subid1)); objectCopyPosition_hook(gb);
+  CYC(b_+328, b_+331); objectCopyPosition_hook(gb);
 }
 
 static void maku_confetti_update_speed(GB *gb, uint16_t e, uint16_t l, uint16_t start, uint16_t jump_end, uint16_t sp0_) {
@@ -122,7 +122,7 @@ static void maku_confetti_update_speed(GB *gb, uint16_t e, uint16_t l, uint16_t 
   if (jump_end != start + 4) CYC(start + 4, jump_end);
   CYC(b_+0, b_+1); H = D;
   CALL_C(b_+1, add16BitRefs_hook, SYM(add16BitRefs), b_+4);
-  CYC(b_+4, SYM(interactionCode63)); ret_effect(gb);
+  CYC(b_+4, b_+5); ret_effect(gb);
 }
 
 void interactionCode62_hook(GB *gb) {
@@ -284,7 +284,7 @@ adjust_x:
   CYC(b_+250, b_+252);
   CYC(b_+252, b_+255); push_effect(gb, b_+255); maku_confetti_negate_bc(gb);
 compare_x:
-  CYC(b_+255, b_+258); SET_HL((SYM(getLowestSetBit) + 8));
+  CYC(b_+255, b_+258); SET_HL(0x0200);
   CALL_C(b_+258, compareHlToBc_hook, SYM(compareHlToBc), b_+261);
   CYC(b_+261, b_+263); alu_cp(gb, 1);
   if (F & FZ) { CYCT(b_+263, b_+265); goto update_direction; }
@@ -418,7 +418,7 @@ state2:
   CYC(b_+170, b_+172); alu_bit(gb, 7, A);
   if (!(F & FZ)) { CYCT(b_+172, b_+175); interactionDelete_hook(gb); return; }
   CYC(b_+172, b_+175);
-  CYC(b_+175, SYM(makuConfetti_updateSpeedY)); objectApplyComponentSpeed_hook(gb);
+  CYC(b_+175, b_+178); objectApplyComponentSpeed_hook(gb);
 }
 
 void makuConfetti_updateSpeedY_hook(GB *gb) {

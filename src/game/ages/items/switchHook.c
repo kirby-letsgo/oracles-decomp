@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode0bPost), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode0bPost), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void func_5902_hook(GB *gb);
 void switchHookState3_hook(GB *gb);
@@ -78,7 +78,7 @@ static void switch_hook_set_position_component(GB *gb) {
   CYC(b_+71, b_+72); alu_add(gb, B);
   CYC(b_+72, b_+73); H = D;
   CYC(b_+73, b_+74); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+74, SYM(itemCode0b)); ret_effect(gb);
+  CYC(b_+74, b_+75); ret_effect(gb);
 }
 
 void itemCode0bPost_hook(GB *gb) {
@@ -139,7 +139,7 @@ void itemCode0aPost_hook(GB *gb) {
     return;
   }
   CYC(b_+8, b_+11);
-  CYC(b_+11, SYM(itemCode0a));
+  CYC(b_+11, b_+14);
   func_5902_hook(gb);
 }
 
@@ -157,7 +157,7 @@ void itemCode0b_hook(GB *gb) {
   CYC(b_+13, b_+15); mem_wr(gb, HL, 0x03);
   CYC(b_+15, b_+16); alu_xor(gb, A);
   CALL_C(b_+16, itemSetAnimation_hook, SYM(itemSetAnimation), b_+19);
-  CYC(b_+19, SYM(itemCode0aPost));
+  CYC(b_+19, b_+22);
   objectSetVisible83_hook(gb);
 }
 
@@ -326,7 +326,7 @@ state2:
     CALL_C(b_+251, itemDecCounter1_hook, SYM(itemDecCounter1), b_+254);
     if (!(F & FZ)) { CYCT(b_+254, b_+255); ret_effect(gb); return; }
     CYC(b_+254, b_+255);
-    CYC(b_+255, SYM(func_5902));
+    CYC(b_+255, b_+258);
     itemDelete_hook(gb);
     return;
   }
@@ -337,7 +337,7 @@ state2:
   CYC(b_+219, b_+221); E = 0x09;
   CYC(b_+221, b_+222); mem_wr(gb, DE, A);
   CALL_C(b_+222, objectApplySpeed_hook, SYM(objectApplySpeed), b_+225);
-  CYC(b_+225, b_+228); SET_BC((SYM(_getObjectPositionOnScreen_duringScreenTransition) + 71));
+  CYC(b_+225, b_+228); SET_BC(0x1008);
   CALL_C(b_+228, itemCheckWithinRangeOfLink_hook, SYM(itemCheckWithinRangeOfLink), b_+231);
   if (!(F & FC)) { CYCT(b_+231, b_+232); ret_effect(gb); return; }
   CYC(b_+231, b_+232);
@@ -370,7 +370,7 @@ void func_5902_hook(GB *gb) {
   CYC(b_+14, b_+15); alu_xor(gb, A);
   CYC(b_+15, b_+18); W8(wDisableLinkCollisionsAndMenu) = A;
   CYC(b_+18, b_+21); W8(wSwitchHookState) = A;
-  CYC(b_+21, SYM(switchHookState3));
+  CYC(b_+21, b_+24);
   itemDelete_hook(gb);
 }
 
@@ -397,7 +397,7 @@ void checkRelatedObject2States_hook(GB *gb) {
     CYC(b_+19, b_+20); alu_or(gb, D);
   }
   CYC(b_+20, b_+21); alu_scf(gb);
-  CYC(b_+21, SYM(updateSwitchHookSound)); ret_effect(gb);
+  CYC(b_+21, b_+22); ret_effect(gb);
 }
 
 void updateSwitchHookSound_hook(GB *gb) {
@@ -408,7 +408,7 @@ void updateSwitchHookSound_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+8); A = 0xa7;
-  CYC(b_+8, SYM(checkCanPlaceDiamondOnTile));
+  CYC(b_+8, b_+11);
   playSound_b00_hook(gb);
 }
 
@@ -422,7 +422,7 @@ void checkCanPlaceDiamondOnTile_hook(GB *gb) {
   CYC(b_+5, b_+7); H = 0xcf;
   CYC(b_+7, b_+8); A = mem_rd(gb, HL);
   CYC(b_+8, b_+10); alu_cp(gb, 0xda);
-  CYC(b_+10, SYM(itemCode09)); ret_effect(gb);
+  CYC(b_+10, b_+11); ret_effect(gb);
 }
 
 static void switch_hook_update_other_positions(GB *gb, uint16_t sp0_) {
@@ -694,7 +694,7 @@ delete:
   CYC(b_+368, b_+369); alu_xor(gb, A);
   CYC(b_+369, b_+372); W8(wSwitchHookState) = A;
   CYC(b_+372, b_+375); W8(wDisableLinkCollisionsAndMenu) = A;
-  CYC(b_+375, SYM(checkRelatedObject2States));
+  CYC(b_+375, b_+378);
   itemDelete_hook(gb);
 }
 
@@ -740,7 +740,7 @@ state1:
 
 state2:
   CALL_C(b_+47, setCameraFocusedObjectToLink_hook, SYM(setCameraFocusedObjectToLink), b_+50);
-  CYC(b_+50, SYM(func_5af5)); itemDelete_hook(gb);
+  CYC(b_+50, b_+53); itemDelete_hook(gb);
 }
 
 void func_5af5_hook(GB *gb) {
@@ -753,5 +753,5 @@ void func_5af5_hook(GB *gb) {
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+8); L = 0x2f;
   CYC(b_+8, b_+10); mem_wr(gb, HL, mem_rd(gb, HL) | 0x20);
-  CYC(b_+10, SYM(itemCode2a)); ret_effect(gb);
+  CYC(b_+10, b_+11); ret_effect(gb);
 }

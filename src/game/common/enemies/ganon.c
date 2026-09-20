@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode04), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode04), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/common/enemies/ganon.s (ENEMY_GANON), bank $10.
 
@@ -191,7 +191,7 @@ void enemyCode04_hook(GB *gb) {
   CYC(b_+57, b_+59); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   CYC(b_+59, b_+61); A = 0xf0;  // ld a,SNDCTRL_STOPMUSIC
   CALL_C(b_+61, playSound_b00_hook, SYM(playSound_b00), b_+64);
-  CYC(b_+64, b_+67); SET_BC((SYM(updateEnemy) + 7));  // ld bc,TX_2f0e
+  CYC(b_+64, b_+67); SET_BC(0x2f0e);  // ld bc,TX_2f0e
   CYC(b_+67, b_+70); if (hook_enabled_at(SYM(showText))) { showText_hook(gb); return; } HANDOFF(SYM(showText));  // jp showText
 normalStatus:
   CYC(b_+70, b_+72); push_effect(gb, b_+72); enemyCode04__normalStatus_hook(gb);  // call @normalStatus
@@ -273,7 +273,7 @@ void ganon_state_uninitialized_hook(GB *gb) {
   CYC(b_+132, b_+134); A = mem_rd(gb, hActiveObject);  // ldh a,(<hActiveObject)
   CYC(b_+134, b_+135); D = A;  // ld d,a
   CALL_C(b_+135, objectSetVisible83_hook, SYM(objectSetVisible83), b_+138);
-  CYC(b_+138, SYM(ganon_state1)); if (hook_enabled_at(SYM(fadeinFromWhite))) { fadeinFromWhite_hook(gb); return; } HANDOFF(SYM(fadeinFromWhite));  // jp fadeinFromWhite
+  CYC(b_+138, b_+141); if (hook_enabled_at(SYM(fadeinFromWhite))) { fadeinFromWhite_hook(gb); return; } HANDOFF(SYM(fadeinFromWhite));  // jp fadeinFromWhite
 }
 
 void ganon_state1_hook(GB *gb) {
@@ -307,7 +307,7 @@ void ganon_state2_hook(GB *gb) {
   CYC(b_+16, b_+17); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+17, b_+19); A = 0x0d;  // ld a,$0d
   CALL_C(b_+19, enemySetAnimation_hook, SYM(enemySetAnimation), b_+22);
-  CYC(b_+22, SYM(ganon_state3)); if (hook_enabled_at(SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; } HANDOFF(SYM(objectSetVisible83));  // jp objectSetVisible83
+  CYC(b_+22, b_+25); if (hook_enabled_at(SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; } HANDOFF(SYM(objectSetVisible83));  // jp objectSetVisible83
 }
 
 void ganon_state3_hook(GB *gb) {
@@ -329,7 +329,7 @@ nextState:
   CALL_C(b_+24, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+27);
   CYC(b_+27, b_+29); mem_wr(gb, HL, 0x02);  // ld (hl),$02
   CYC(b_+29, b_+31); A = 0x01;  // ld a,$01
-  CYC(b_+31, SYM(ganon_state4)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+31, b_+34); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void ganon_state4_hook(GB *gb) {
@@ -353,7 +353,7 @@ void ganon_state4_hook(GB *gb) {
   CYC(b_+32, b_+34); A = mem_rd(gb, hActiveObject);  // ldh a,(<hActiveObject)
   CYC(b_+34, b_+35); D = A;  // ld d,a
   CYC(b_+35, b_+37); A = 0x02;  // ld a,$02
-  CYC(b_+37, SYM(ganon_state5)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+37, b_+40); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void ganon_state5_hook(GB *gb) {
@@ -373,7 +373,7 @@ void ganon_state5_hook(GB *gb) {
   CALL_C(b_+22, showStatusBar_hook, SYM(showStatusBar), b_+25);
   CYC(b_+25, b_+27); A = mem_rd(gb, hActiveObject);  // ldh a,(<hActiveObject)
   CYC(b_+27, b_+28); D = A;  // ld d,a
-  CYC(b_+28, SYM(ganon_state6)); if (hook_enabled_at(SYM(clearPaletteFadeVariablesAndRefreshPalettes))) { clearPaletteFadeVariablesAndRefreshPalettes_hook(gb); return; } HANDOFF(SYM(clearPaletteFadeVariablesAndRefreshPalettes));  // jp clearPaletteFadeVariablesAndRefreshPalettes
+  CYC(b_+28, b_+31); if (hook_enabled_at(SYM(clearPaletteFadeVariablesAndRefreshPalettes))) { clearPaletteFadeVariablesAndRefreshPalettes_hook(gb); return; } HANDOFF(SYM(clearPaletteFadeVariablesAndRefreshPalettes));  // jp clearPaletteFadeVariablesAndRefreshPalettes
 }
 
 void ganon_state6_hook(GB *gb) {
@@ -392,10 +392,10 @@ void ganon_state6_hook(GB *gb) {
   CYC(b_+17, b_+18); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
   CYC(b_+18, b_+21); mem_wr(gb, wDisableLinkCollisionsAndMenu, A);  // ld (wDisableLinkCollisionsAndMenu),a
   CYC(b_+21, b_+24); mem_wr(gb, wDisabledObjects, A);  // ld (wDisabledObjects),a
-  CYC(b_+24, b_+27); SET_BC((SYM(updateEnemy) + 6));  // ld bc,TX_2f0d
+  CYC(b_+24, b_+27); SET_BC(0x2f0d);  // ld bc,TX_2f0d
   CALL_C(b_+27, showText_hook, SYM(showText), b_+30);
   CYC(b_+30, b_+32); A = 0x02;  // ld a,$02
-  CYC(b_+32, SYM(ganon_state7)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+32, b_+35); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void ganon_state7_hook(GB *gb) {
@@ -404,7 +404,7 @@ void ganon_state7_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0x34;  // ld a,MUS_GANON
   CYC(b_+2, b_+5); mem_wr(gb, wActiveMusic, A);  // ld (wActiveMusic),a
   CALL_C(b_+5, playSound_b00_hook, SYM(playSound_b00), b_+8);
-  CYC(b_+8, SYM(ganon_state8)); ganon_decideNextMove_hook(gb); return;  // jp ganon_decideNextMove
+  CYC(b_+8, b_+11); ganon_decideNextMove_hook(gb); return;  // jp ganon_decideNextMove
 }
 
 void ganon_state8_hook(GB *gb) {
@@ -445,7 +445,7 @@ void ganon_state8_substate1_hook(GB *gb) {
   CYC(b_+6, b_+7); L = E;  // ld l,e
   CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CALL_C(b_+8, ganon_decideTeleportLocationAndCounter_hook, SYM(ganon_decideTeleportLocationAndCounter), b_+11);
-  CYC(b_+11, SYM(ganon_state8_substate2)); if (hook_enabled_at(SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible));  // jp objectSetInvisible
+  CYC(b_+11, b_+14); if (hook_enabled_at(SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible));  // jp objectSetInvisible
 }
 
 // Also used by state 9, C, D substate2.
@@ -456,7 +456,7 @@ void ganon_state8_substate2_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
   CYC(b_+4, b_+5); L = E;  // ld l,e
   CYC(b_+5, b_+6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(b_+6, SYM(ganon_state8_substate3)); ganon_updateTeleportVarsAndPlaySound_hook(gb); return;  // jp ganon_updateTeleportVarsAndPlaySound
+  CYC(b_+6, b_+9); ganon_updateTeleportVarsAndPlaySound_hook(gb); return;  // jp ganon_updateTeleportVarsAndPlaySound
 }
 
 void ganon_state8_substate3_hook(GB *gb) {
@@ -473,7 +473,7 @@ void ganon_state8_substate3_hook(GB *gb) {
   CYC(b_+15, b_+16); mem_wr(gb, HL, A);  // ld (hl),a
   CYC(b_+16, b_+18); L = 0xa4;  // ld l,Enemy.collisionType
   CYC(b_+18, b_+20); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CYC(b_+20, SYM(ganon_state8_substate4)); if (hook_enabled_at(SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; } HANDOFF(SYM(objectSetVisible83));  // jp objectSetVisible83
+  CYC(b_+20, b_+23); if (hook_enabled_at(SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; } HANDOFF(SYM(objectSetVisible83));  // jp objectSetVisible83
 }
 
 void ganon_state8_substate4_hook(GB *gb) {
@@ -485,7 +485,7 @@ void ganon_state8_substate4_hook(GB *gb) {
   CYC(b_+6, b_+7); L = E;  // ld l,e
   CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+8, b_+10); A = 0xb3;  // ld a,GFXH_GANON_C
-  CYC(b_+10, SYM(ganon_state8_substate5)); ganon_loadGfxHeader_hook(gb); return;  // jp ganon_loadGfxHeader
+  CYC(b_+10, b_+13); ganon_loadGfxHeader_hook(gb); return;  // jp ganon_loadGfxHeader
 }
 
 void ganon_state8_substate5_hook(GB *gb) {
@@ -500,7 +500,7 @@ void ganon_state8_substate5_hook(GB *gb) {
   CALL_C(b_+10, enemySetAnimation_hook, SYM(enemySetAnimation), b_+13);
   CALL_C(b_+13, ecom_updateAngleTowardTarget_b10_hook, SYM(ecom_updateAngleTowardTarget_b10), b_+16);
   CYC(b_+16, b_+19); SET_BC(0x003c);  // ldbc $00,SPEED_180
-  CYC(b_+19, SYM(ganon_state8_substate6)); ganon_state8_spawnProjectile_hook(gb); return;  // jr ganon_state8_spawnProjectile
+  CYC(b_+19, b_+21); ganon_state8_spawnProjectile_hook(gb); return;  // jr ganon_state8_spawnProjectile
 }
 
 void ganon_state8_substate6_hook(GB *gb) {
@@ -517,9 +517,9 @@ checkAttackDone:
   CYC(b_+14, b_+15); A = mem_rd(gb, HL);  // ld a,(hl)
   CYC(b_+15, b_+17); alu_cp(gb, 0x19);  // cp $19
   if (!(F & FZ)) { RET_TAKEN(b_+17); return; } CYC(b_+17, b_+18);  // ret nz
-  CYC(b_+18, b_+21); SET_BC((SYM(hexToDec) + 11));  // ldbc $02,SPEED_280
+  CYC(b_+18, b_+21); SET_BC(0x0264);  // ldbc $02,SPEED_280
   CALL_C(b_+21, ganon_state8_spawnProjectile_hook, SYM(ganon_state8_spawnProjectile), b_+24);
-  CYC(b_+24, SYM(ganon_state8_spawnProjectile)); SET_BC(0xfe64);  // ldbc $fe,SPEED_280
+  CYC(b_+24, b_+27); SET_BC(0xfe64);  // ldbc $fe,SPEED_280
   ganon_state8_spawnProjectile_hook(gb); return;  // fallthrough
 }
 
@@ -537,7 +537,7 @@ void ganon_state8_spawnProjectile_hook(GB *gb) {
   CYC(b_+14, b_+15); mem_wr(gb, HL, A);  // ld (hl),a
   CYC(b_+15, b_+17); L = 0xd0;  // ld l,Part.speed
   CYC(b_+17, b_+18); mem_wr(gb, HL, C);  // ld (hl),c
-  CYC(b_+18, SYM(ganon_state8_substate7)); if (hook_enabled_at(SYM(objectCopyPosition))) { objectCopyPosition_hook(gb); return; } HANDOFF(SYM(objectCopyPosition));  // jp objectCopyPosition
+  CYC(b_+18, b_+21); if (hook_enabled_at(SYM(objectCopyPosition))) { objectCopyPosition_hook(gb); return; } HANDOFF(SYM(objectCopyPosition));  // jp objectCopyPosition
 }
 
 void ganon_state8_substate7_hook(GB *gb) {
@@ -545,7 +545,7 @@ void ganon_state8_substate7_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
-  CYC(b_+4, SYM(ganon_state9)); ganon_finishAttack_hook(gb); return;  // jp ganon_finishAttack
+  CYC(b_+4, b_+7); ganon_finishAttack_hook(gb); return;  // jp ganon_finishAttack
 }
 
 void ganon_state9_hook(GB *gb) {
@@ -589,7 +589,7 @@ void ganon_state9_substate1_hook(GB *gb) {
   CYC(b_+12, b_+14); mem_wr(gb, HL, 0x58);  // ld (hl),$58
   CYC(b_+14, b_+16); L = 0x8d;  // ld l,Enemy.xh
   CYC(b_+16, b_+18); mem_wr(gb, HL, 0x78);  // ld (hl),$78
-  CYC(b_+18, SYM(ganon_state9_substate3)); if (hook_enabled_at(SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible));  // jp objectSetInvisible
+  CYC(b_+18, b_+21); if (hook_enabled_at(SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible));  // jp objectSetInvisible
 }
 
 void ganon_state9_substate3_hook(GB *gb) {
@@ -602,7 +602,7 @@ void ganon_state9_substate3_hook(GB *gb) {
   CYC(b_+9, b_+10); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+10, b_+12); L = 0xa4;  // ld l,Enemy.collisionType
   CYC(b_+12, b_+14); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CYC(b_+14, SYM(ganon_state9_substate4)); if (hook_enabled_at(SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; } HANDOFF(SYM(objectSetVisible83));  // jp objectSetVisible83
+  CYC(b_+14, b_+17); if (hook_enabled_at(SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; } HANDOFF(SYM(objectSetVisible83));  // jp objectSetVisible83
 }
 
 void ganon_state9_substate4_hook(GB *gb) {
@@ -642,7 +642,7 @@ void ganon_state9_substate4__spawnProjectile_hook(GB *gb) {
   CYC(b_+48, b_+49); mem_wr(gb, HL, D);  // ld (hl),d
   CYC(b_+49, b_+50); L = alu_dec8(gb, L);  // dec l
   CYC(b_+50, b_+52); mem_wr(gb, HL, 0x80);  // ld (hl),Enemy.start
-  CYC(b_+52, SYM(ganon_state9_substate5)); if (hook_enabled_at(SYM(objectCopyPosition))) { objectCopyPosition_hook(gb); return; } HANDOFF(SYM(objectCopyPosition));  // jp objectCopyPosition
+  CYC(b_+52, b_+55); if (hook_enabled_at(SYM(objectCopyPosition))) { objectCopyPosition_hook(gb); return; } HANDOFF(SYM(objectCopyPosition));  // jp objectCopyPosition
 }
 
 void ganon_state9_substate5_hook(GB *gb) {
@@ -656,7 +656,7 @@ void ganon_state9_substate5_hook(GB *gb) {
   CYC(b_+8, b_+10); A = 0xb2;  // ld a,GFXH_GANON_B
   CALL_C(b_+10, ganon_loadGfxHeader_hook, SYM(ganon_loadGfxHeader), b_+13);
   CYC(b_+13, b_+15); A = 0x07;  // ld a,$07
-  CYC(b_+15, SYM(ganon_state9_substate6)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+15, b_+18); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void ganon_state9_substate6_hook(GB *gb) {
@@ -668,7 +668,7 @@ void ganon_state9_substate6_hook(GB *gb) {
   CYC(b_+6, b_+7); L = E;  // ld l,e
   CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+8, b_+10); A = 0x02;  // ld a,$02
-  CYC(b_+10, SYM(ganon_state9_substate7)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+10, b_+13); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void ganon_state9_substate7_hook(GB *gb) {
@@ -676,7 +676,7 @@ void ganon_state9_substate7_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
-  CYC(b_+4, SYM(ganon_stateA)); ganon_finishAttack_hook(gb); return;  // jp ganon_finishAttack
+  CYC(b_+4, b_+7); ganon_finishAttack_hook(gb); return;  // jp ganon_finishAttack
 }
 
 void ganon_stateA_hook(GB *gb) {
@@ -707,7 +707,7 @@ void ganon_stateA_substate1_hook(GB *gb) {
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0x78);  // ld (hl),$78
   CYC(b_+8, b_+9); L = E;  // ld l,e
   CYC(b_+9, b_+10); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(b_+10, SYM(ganon_stateA_substate2)); if (hook_enabled_at(SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible));  // jp objectSetInvisible
+  CYC(b_+10, b_+13); if (hook_enabled_at(SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible));  // jp objectSetInvisible
 }
 
 // Delay before reappearing.
@@ -720,7 +720,7 @@ void ganon_stateA_substate2_hook(GB *gb) {
   CYC(b_+5, b_+6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+6, b_+8); A = mem_rd(gb, hEnemyTargetX);  // ldh a,(<hEnemyTargetX)
   CYC(b_+8, b_+10); alu_cp(gb, 0x78);  // cp (LARGE_ROOM_WIDTH<<4)/2
-  CYC(b_+10, b_+13); SET_BC((SYM(gfxRegisterStates) + 34));  // ldbc $03,$28
+  CYC(b_+10, b_+13); SET_BC(0x0328);  // ldbc $03,$28
   if ((F & FC)) { CYCT(b_+13, b_+15); goto haveBC; } CYC(b_+13, b_+15);  // jr c,+
   CYC(b_+15, b_+18); SET_BC(0x00d8);  // ldbc $00,-$28
 haveBC:
@@ -742,7 +742,7 @@ setYh:
   CYC(b_+42, b_+43); A = mem_rd(gb, DE);  // ld a,(de)
   CYC(b_+43, b_+45); alu_add(gb, 0x07);  // add $07
   CALL_C(b_+45, enemySetAnimation_hook, SYM(enemySetAnimation), b_+48);
-  CYC(b_+48, SYM(ganon_stateA_substate3)); ganon_updateTeleportVarsAndPlaySound_hook(gb); return;  // jp ganon_updateTeleportVarsAndPlaySound
+  CYC(b_+48, b_+51); ganon_updateTeleportVarsAndPlaySound_hook(gb); return;  // jp ganon_updateTeleportVarsAndPlaySound
 }
 
 void ganon_stateA_substate3_hook(GB *gb) {
@@ -760,7 +760,7 @@ void ganon_stateA_substate3_hook(GB *gb) {
   CALL_C(b_+18, ecom_updateAngleTowardTarget_b10_hook, SYM(ecom_updateAngleTowardTarget_b10), b_+21);
   CYC(b_+21, b_+23); E = 0x50;  // ld e,PART_GANON_TRIDENT
   CALL_C(b_+23, ganon_spawnPart_hook, SYM(ganon_spawnPart), b_+26);
-  CYC(b_+26, SYM(ganon_stateA_substate4)); if (hook_enabled_at(SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; } HANDOFF(SYM(objectSetVisible83));  // jp objectSetVisible83
+  CYC(b_+26, b_+29); if (hook_enabled_at(SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; } HANDOFF(SYM(objectSetVisible83));  // jp objectSetVisible83
 }
 
 void ganon_stateA_substate4_hook(GB *gb) {
@@ -781,31 +781,31 @@ void ganon_stateA_substate4_hook(GB *gb) {
 }
 
 void ganon_stateA_substate5_hook(GB *gb) {
-  BASE(ganon_stateA_substate6);
+  BASE(ganon_stateA_substate5);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(SYM(ganon_stateA_substate5), ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), (SYM(ganon_stateA_substate5) + 3));
-  if (!(F & FZ)) { CYCT((SYM(ganon_stateA_substate5) + 3), (SYM(ganon_stateA_substate5) + 5)); goto checkBounds; } CYC((SYM(ganon_stateA_substate5) + 3), (SYM(ganon_stateA_substate5) + 5));  // jr nz,+++
-  CYC((SYM(ganon_stateA_substate5) + 5), (SYM(ganon_stateA_substate5) + 7)); mem_wr(gb, HL, 16);  // ld (hl),16
-  CYC((SYM(ganon_stateA_substate5) + 7), (SYM(ganon_stateA_substate5) + 8)); L = E;  // ld l,e
-  CYC((SYM(ganon_stateA_substate5) + 8), (SYM(ganon_stateA_substate5) + 9)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC((SYM(ganon_stateA_substate5) + 9), (SYM(ganon_stateA_substate5) + 11)); A = 0xb6;  // ld a,GFXH_GANON_F
-  CALL_C((SYM(ganon_stateA_substate5) + 11), ganon_loadGfxHeader_hook, SYM(ganon_loadGfxHeader), (SYM(ganon_stateA_substate5) + 14));
-  CYC((SYM(ganon_stateA_substate5) + 14), (SYM(ganon_stateA_substate5) + 16)); E = 0xb2;  // ld e,Enemy.var32
-  CYC((SYM(ganon_stateA_substate5) + 16), (SYM(ganon_stateA_substate5) + 17)); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC((SYM(ganon_stateA_substate5) + 17), (SYM(ganon_stateA_substate5) + 19)); alu_add(gb, 0x09);  // add $09
-  CYC((SYM(ganon_stateA_substate5) + 19), b_+0); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); goto checkBounds; } CYC(b_+3, b_+5);  // jr nz,+++
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 16);  // ld (hl),16
+  CYC(b_+7, b_+8); L = E;  // ld l,e
+  CYC(b_+8, b_+9); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+9, b_+11); A = 0xb6;  // ld a,GFXH_GANON_F
+  CALL_C(b_+11, ganon_loadGfxHeader_hook, SYM(ganon_loadGfxHeader), b_+14);
+  CYC(b_+14, b_+16); E = 0xb2;  // ld e,Enemy.var32
+  CYC(b_+16, b_+17); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+17, b_+19); alu_add(gb, 0x09);  // add $09
+  CYC(b_+19, b_+22); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 checkBounds:
-  CYC(b_+11, b_+13); E = 0x8b;  // ld e,Enemy.yh
-  CYC(b_+13, b_+14); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(b_+14, b_+16); alu_sub(gb, 0x18);  // sub $18
-  CYC(b_+16, b_+18); alu_cp(gb, 0x80);  // cp $80
-  if (!(F & FC)) { RET_TAKEN(b_+18); return; } CYC(b_+18, b_+19);  // ret nc
-  CYC(b_+19, b_+21); E = 0x8d;  // ld e,Enemy.xh
-  CYC(b_+21, b_+22); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(b_+22, b_+24); alu_sub(gb, 0x18);  // sub $18
-  CYC(b_+24, b_+26); alu_cp(gb, 0xc0);  // cp $c0
-  if (!(F & FC)) { RET_TAKEN(b_+26); return; } CYC(b_+26, b_+27);  // ret nc
-  CYC(b_+27, SYM(ganon_stateA_substate7)); if (hook_enabled_at(SYM(objectApplySpeed))) { objectApplySpeed_hook(gb); return; } HANDOFF(SYM(objectApplySpeed));  // jp objectApplySpeed
+  CYC((SYM(ganon_stateA_substate6) + 11), (SYM(ganon_stateA_substate6) + 13)); E = 0x8b;  // ld e,Enemy.yh
+  CYC((SYM(ganon_stateA_substate6) + 13), (SYM(ganon_stateA_substate6) + 14)); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC((SYM(ganon_stateA_substate6) + 14), (SYM(ganon_stateA_substate6) + 16)); alu_sub(gb, 0x18);  // sub $18
+  CYC((SYM(ganon_stateA_substate6) + 16), (SYM(ganon_stateA_substate6) + 18)); alu_cp(gb, 0x80);  // cp $80
+  if (!(F & FC)) { RET_TAKEN((SYM(ganon_stateA_substate6) + 18)); return; } CYC((SYM(ganon_stateA_substate6) + 18), (SYM(ganon_stateA_substate6) + 19));  // ret nc
+  CYC((SYM(ganon_stateA_substate6) + 19), (SYM(ganon_stateA_substate6) + 21)); E = 0x8d;  // ld e,Enemy.xh
+  CYC((SYM(ganon_stateA_substate6) + 21), (SYM(ganon_stateA_substate6) + 22)); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC((SYM(ganon_stateA_substate6) + 22), (SYM(ganon_stateA_substate6) + 24)); alu_sub(gb, 0x18);  // sub $18
+  CYC((SYM(ganon_stateA_substate6) + 24), (SYM(ganon_stateA_substate6) + 26)); alu_cp(gb, 0xc0);  // cp $c0
+  if (!(F & FC)) { RET_TAKEN((SYM(ganon_stateA_substate6) + 26)); return; } CYC((SYM(ganon_stateA_substate6) + 26), (SYM(ganon_stateA_substate6) + 27));  // ret nc
+  CYC((SYM(ganon_stateA_substate6) + 27), (SYM(ganon_stateA_substate6) + 30)); if (hook_enabled_at(SYM(objectApplySpeed))) { objectApplySpeed_hook(gb); return; } HANDOFF(SYM(objectApplySpeed));  // jp objectApplySpeed
 }
 
 void ganon_stateA_substate6_hook(GB *gb) {
@@ -829,7 +829,7 @@ checkBounds:
   CYC(b_+22, b_+24); alu_sub(gb, 0x18);  // sub $18
   CYC(b_+24, b_+26); alu_cp(gb, 0xc0);  // cp $c0
   if (!(F & FC)) { RET_TAKEN(b_+26); return; } CYC(b_+26, b_+27);  // ret nc
-  CYC(b_+27, SYM(ganon_stateA_substate7)); if (hook_enabled_at(SYM(objectApplySpeed))) { objectApplySpeed_hook(gb); return; } HANDOFF(SYM(objectApplySpeed));  // jp objectApplySpeed
+  CYC(b_+27, b_+30); if (hook_enabled_at(SYM(objectApplySpeed))) { objectApplySpeed_hook(gb); return; } HANDOFF(SYM(objectApplySpeed));  // jp objectApplySpeed
 }
 
 void ganon_stateA_substate7_hook(GB *gb) {
@@ -839,7 +839,7 @@ void ganon_stateA_substate7_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
   CYC(b_+4, b_+6); A = 0x02;  // ld a,$02
   CALL_C(b_+6, enemySetAnimation_hook, SYM(enemySetAnimation), b_+9);
-  CYC(b_+9, SYM(ganon_stateB)); ganon_finishAttack_hook(gb); return;  // jp ganon_finishAttack
+  CYC(b_+9, b_+12); ganon_finishAttack_hook(gb); return;  // jp ganon_finishAttack
 }
 
 void ganon_stateB_hook(GB *gb) {
@@ -872,7 +872,7 @@ void ganon_stateB_substate1_hook(GB *gb) {
   CYC(b_+6, b_+8); mem_wr(gb, HL, 180);  // ld (hl),180
   CYC(b_+8, b_+9); L = E;  // ld l,e
   CYC(b_+9, b_+10); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(b_+10, SYM(ganon_stateB_substate2)); if (hook_enabled_at(SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible));  // jp objectSetInvisible
+  CYC(b_+10, b_+13); if (hook_enabled_at(SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible));  // jp objectSetInvisible
 }
 
 void ganon_stateB_substate2_hook(GB *gb) {
@@ -890,7 +890,7 @@ void ganon_stateB_substate2_hook(GB *gb) {
   CALL_C(b_+16, ganon_loadGfxHeader_hook, SYM(ganon_loadGfxHeader), b_+19);
   CYC(b_+19, b_+21); A = 0x04;  // ld a,$04
   CALL_C(b_+21, enemySetAnimation_hook, SYM(enemySetAnimation), b_+24);
-  CYC(b_+24, SYM(ganon_stateB_substate3)); ganon_updateTeleportVarsAndPlaySound_hook(gb); return;  // jp ganon_updateTeleportVarsAndPlaySound
+  CYC(b_+24, b_+27); ganon_updateTeleportVarsAndPlaySound_hook(gb); return;  // jp ganon_updateTeleportVarsAndPlaySound
 }
 
 void ganon_stateB_substate3_hook(GB *gb) {
@@ -908,7 +908,7 @@ void ganon_stateB_substate3_hook(GB *gb) {
   CALL_C(b_+19, ganon_spawnPart_hook, SYM(ganon_spawnPart), b_+22);
   if (!(F & FZ)) { RET_TAKEN(b_+22); return; } CYC(b_+22, b_+23);  // ret nz
   CYC(b_+23, b_+26); SET_BC(0xf810);  // ld bc,$f810
-  CYC(b_+26, SYM(ganon_stateB_substate4)); if (hook_enabled_at(SYM(objectCopyPositionWithOffset))) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(SYM(objectCopyPositionWithOffset));  // jp objectCopyPositionWithOffset
+  CYC(b_+26, b_+29); if (hook_enabled_at(SYM(objectCopyPositionWithOffset))) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(SYM(objectCopyPositionWithOffset));  // jp objectCopyPositionWithOffset
 }
 
 void ganon_stateB_substate4_hook(GB *gb) {
@@ -925,7 +925,7 @@ void ganon_stateB_substate4_hook(GB *gb) {
   CYC(b_+13, b_+15); A = 0xb3;  // ld a,GFXH_GANON_C
   CALL_C(b_+15, ganon_loadGfxHeader_hook, SYM(ganon_loadGfxHeader), b_+18);
   CYC(b_+18, b_+20); A = 0x05;  // ld a,$05
-  CYC(b_+20, SYM(ganon_stateB_substate5)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+20, b_+23); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void ganon_stateB_substate5_hook(GB *gb) {
@@ -952,7 +952,7 @@ shakeAndAdvance:
   CYC(b_+32, b_+34); L = 0x85;  // ld l,Enemy.substate
   CYC(b_+34, b_+35); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+35, b_+37); A = 0x6f;  // ld a,SND_EXPLOSION
-  CYC(b_+37, SYM(ganon_stateB_substate6)); if (hook_enabled_at(SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
+  CYC(b_+37, b_+40); if (hook_enabled_at(SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
 }
 
 void ganon_stateB_substate6_hook(GB *gb) {
@@ -978,7 +978,7 @@ nextState:
   CYC(b_+27, b_+29); A = 0xb2;  // ld a,GFXH_GANON_B
   CALL_C(b_+29, ganon_loadGfxHeader_hook, SYM(ganon_loadGfxHeader), b_+32);
   CYC(b_+32, b_+34); A = 0x04;  // ld a,$04
-  CYC(b_+34, SYM(ganon_stateB_substate7)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+34, b_+37); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void ganon_stateB_substate7_hook(GB *gb) {
@@ -995,7 +995,7 @@ void ganon_stateB_substate7_hook(GB *gb) {
   CYC(b_+14, b_+16); L = 0xc2;  // ld l,Part.subid
   CYC(b_+16, b_+17); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+17, b_+20); SET_BC(0xf810);  // ld bc,$f810
-  CYC(b_+20, SYM(ganon_stateB_substate8)); if (hook_enabled_at(SYM(objectCopyPositionWithOffset))) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(SYM(objectCopyPositionWithOffset));  // jp objectCopyPositionWithOffset
+  CYC(b_+20, b_+23); if (hook_enabled_at(SYM(objectCopyPositionWithOffset))) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(SYM(objectCopyPositionWithOffset));  // jp objectCopyPositionWithOffset
 }
 
 void ganon_stateB_substate8_hook(GB *gb) {
@@ -1010,7 +1010,7 @@ void ganon_stateB_substate8_hook(GB *gb) {
   CYC(b_+11, b_+13); A = 0xb3;  // ld a,GFXH_GANON_C
   CALL_C(b_+13, ganon_loadGfxHeader_hook, SYM(ganon_loadGfxHeader), b_+16);
   CYC(b_+16, b_+18); A = 0x05;  // ld a,$05
-  CYC(b_+18, SYM(ganon_stateB_substate9)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+18, b_+21); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void ganon_stateB_substate9_hook(GB *gb) {
@@ -1022,7 +1022,7 @@ void ganon_stateB_substate9_hook(GB *gb) {
   CYC(b_+6, b_+7); L = E;  // ld l,e
   CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+8, b_+10); A = 0x02;  // ld a,$02
-  CYC(b_+10, SYM(ganon_stateB_substateA)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+10, b_+13); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void ganon_stateB_substateA_hook(GB *gb) {
@@ -1030,7 +1030,7 @@ void ganon_stateB_substateA_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
-  CYC(b_+4, SYM(ganon_stateC)); ganon_finishAttack_hook(gb); return;  // jp ganon_finishAttack
+  CYC(b_+4, b_+7); ganon_finishAttack_hook(gb); return;  // jp ganon_finishAttack
 }
 
 void ganon_stateC_hook(GB *gb) {
@@ -1067,7 +1067,7 @@ void ganon_stateC_substate1_hook(GB *gb) {
   CYC(b_+12, b_+14); mem_wr(gb, HL, 0x58);  // ld (hl),$58
   CYC(b_+14, b_+16); L = 0x8d;  // ld l,Enemy.xh
   CYC(b_+16, b_+18); mem_wr(gb, HL, 0x78);  // ld (hl),$78
-  CYC(b_+18, SYM(ganon_stateC_substate3)); if (hook_enabled_at(SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible));  // jp objectSetInvisible
+  CYC(b_+18, b_+21); if (hook_enabled_at(SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible));  // jp objectSetInvisible
 }
 
 void ganon_stateC_substate3_hook(GB *gb) {
@@ -1082,7 +1082,7 @@ void ganon_stateC_substate3_hook(GB *gb) {
   CYC(b_+12, b_+14); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   CALL_C(b_+14, objectSetVisible83_hook, SYM(objectSetVisible83), b_+17);
   CYC(b_+17, b_+19); A = 0xb4;  // ld a,SND_FADEOUT
-  CYC(b_+19, SYM(ganon_stateC_substate4)); if (hook_enabled_at(SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
+  CYC(b_+19, b_+22); if (hook_enabled_at(SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
 }
 
 void ganon_stateC_substate4_hook(GB *gb) {
@@ -1115,7 +1115,7 @@ nextSubstate:
   CYC(b_+35, b_+36); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
   CYC(b_+36, b_+37); mem_wr(gb, HL, A);  // ld (hl),a
   CYC(b_+37, b_+39); A = 0x02;  // ld a,$02
-  CYC(b_+39, SYM(ganon_stateC_substate5)); if (hook_enabled_at(SYM(fadeoutToBlackWithDelay))) { fadeoutToBlackWithDelay_hook(gb); return; } HANDOFF(SYM(fadeoutToBlackWithDelay));  // jp fadeoutToBlackWithDelay
+  CYC(b_+39, b_+42); if (hook_enabled_at(SYM(fadeoutToBlackWithDelay))) { fadeoutToBlackWithDelay_hook(gb); return; } HANDOFF(SYM(fadeoutToBlackWithDelay));  // jp fadeoutToBlackWithDelay
 }
 
 void ganon_stateC_substate5_hook(GB *gb) {
@@ -1128,7 +1128,7 @@ void ganon_stateC_substate5_hook(GB *gb) {
   CYC(b_+7, b_+8); mem_wr(gb, DE, A);  // ld (de),a [substate]
   CYC(b_+8, b_+10); A = 0x04;  // ld a,$04
   CALL_C(b_+10, ganon_setTileReplacementMode_hook, SYM(ganon_setTileReplacementMode), b_+13);
-  CYC(b_+13, SYM(ganon_stateC_substate6)); ganon_makeRoomBoundarySolid_hook(gb); return;  // jp ganon_makeRoomBoundarySolid
+  CYC(b_+13, b_+16); ganon_makeRoomBoundarySolid_hook(gb); return;  // jp ganon_makeRoomBoundarySolid
 }
 
 void ganon_stateC_substate6_hook(GB *gb) {
@@ -1183,7 +1183,7 @@ loadGfx:
   CALL_C(b_+44, ecom_updateAngleTowardTarget_b10_hook, SYM(ecom_updateAngleTowardTarget_b10), b_+47);
   CALL_C(b_+47, ecom_applyVelocityForSideviewEnemyNoHoles_b10_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b10), b_+50);
   CALL_C(b_+50, enemyAnimate_hook, SYM(enemyAnimate), b_+53);
-  CYC(b_+53, SYM(ganon_stateC_substate8)); ganon_updateSeizurePalette_hook(gb); return;  // jp ganon_updateSeizurePalette
+  CYC(b_+53, b_+56); ganon_updateSeizurePalette_hook(gb); return;  // jp ganon_updateSeizurePalette
 }
 
 void ganon_stateC_substate8_hook(GB *gb) {
@@ -1214,7 +1214,7 @@ nextSubstate:
   CYC(b_+46, b_+47); L = alu_inc8(gb, L);  // inc l
   CYC(b_+47, b_+49); mem_wr(gb, HL, 60);  // ld (hl),60
   CYC(b_+49, b_+51); A = 0x02;  // ld a,$02
-  CYC(b_+51, SYM(ganon_stateC_substate9)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+51, b_+54); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void ganon_stateC_substate9_hook(GB *gb) {
@@ -1229,7 +1229,7 @@ void ganon_stateC_substate9_hook(GB *gb) {
   CALL_C(b_+10, ganon_setTileReplacementMode_hook, SYM(ganon_setTileReplacementMode), b_+13);
   CYC(b_+13, b_+15); A = 0xb1;  // ld a,PALH_b1
   CYC(b_+15, b_+18); mem_wr(gb, wExtraBgPaletteHeader, A);  // ld (wExtraBgPaletteHeader),a
-  CYC(b_+18, SYM(ganon_stateC_substateA)); if (hook_enabled_at(SYM(loadPaletteHeader))) { loadPaletteHeader_hook(gb); return; } HANDOFF(SYM(loadPaletteHeader));  // jp loadPaletteHeader
+  CYC(b_+18, b_+21); if (hook_enabled_at(SYM(loadPaletteHeader))) { loadPaletteHeader_hook(gb); return; } HANDOFF(SYM(loadPaletteHeader));  // jp loadPaletteHeader
 }
 
 void ganon_stateC_substateA_hook(GB *gb) {
@@ -1239,7 +1239,7 @@ void ganon_stateC_substateA_hook(GB *gb) {
   CYC(b_+1, b_+3); L = 0xa4;  // ld l,Enemy.collisionType
   CYC(b_+3, b_+5); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   CALL_C(b_+5, clearPaletteFadeVariablesAndRefreshPalettes_hook, SYM(clearPaletteFadeVariablesAndRefreshPalettes), b_+8);
-  CYC(b_+8, SYM(ganon_stateD)); ganon_finishAttack_hook(gb); return;  // jp ganon_finishAttack
+  CYC(b_+8, b_+11); ganon_finishAttack_hook(gb); return;  // jp ganon_finishAttack
 }
 
 void ganon_stateD_hook(GB *gb) {
@@ -1269,7 +1269,7 @@ void ganon_stateD_substate3_hook(GB *gb) {
   CYC(b_+10, b_+11); A = mem_rd(gb, HL);  // ld a,(hl)
   CYC(b_+11, b_+13); L = 0x8d;  // ld l,Enemy.xh
   CYC(b_+13, b_+14); mem_wr(gb, HL, A);  // ld (hl),a
-  CYC(b_+14, SYM(ganon_stateE)); if (hook_enabled_at(SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; } HANDOFF(SYM(objectSetVisible83));  // jp objectSetVisible83
+  CYC(b_+14, b_+17); if (hook_enabled_at(SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; } HANDOFF(SYM(objectSetVisible83));  // jp objectSetVisible83
 }
 
 void ganon_stateE_hook(GB *gb) {
@@ -1314,7 +1314,7 @@ void ganon_stateE_substate0_hook(GB *gb) {
   CYC(b_+37, b_+39); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   CALL_C(b_+39, objectSetInvisible_hook, SYM(objectSetInvisible), b_+42);
   CYC(b_+42, b_+44); A = 0xbc;  // ld a,SND_BIG_EXPLOSION_2
-  CYC(b_+44, SYM(ganon_stateE_substate1)); if (hook_enabled_at(SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
+  CYC(b_+44, b_+47); if (hook_enabled_at(SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
 }
 
 void ganon_stateE_substate1_hook(GB *gb) {
@@ -1329,7 +1329,7 @@ void ganon_stateE_substate1_hook(GB *gb) {
   CYC(b_+11, b_+12); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+12, b_+13); L = alu_inc8(gb, L);  // inc l
   CYC(b_+13, b_+15); mem_wr(gb, HL, 0x08);  // ld (hl),$08
-  CYC(b_+15, SYM(ganon_stateE_substate2)); if (hook_enabled_at(SYM(fastFadeoutToWhite))) { fastFadeoutToWhite_hook(gb); return; } HANDOFF(SYM(fastFadeoutToWhite));  // jp fastFadeoutToWhite
+  CYC(b_+15, b_+18); if (hook_enabled_at(SYM(fastFadeoutToWhite))) { fastFadeoutToWhite_hook(gb); return; } HANDOFF(SYM(fastFadeoutToWhite));  // jp fastFadeoutToWhite
 }
 
 void ganon_stateE_substate2_hook(GB *gb) {
@@ -1344,7 +1344,7 @@ void ganon_stateE_substate2_hook(GB *gb) {
   CYC(b_+9, b_+12); mem_wr(gb, wExtraBgPaletteHeader, A);  // ld (wExtraBgPaletteHeader),a
   CALL_C(b_+12, ganon_setTileReplacementMode_hook, SYM(ganon_setTileReplacementMode), b_+15);
   CYC(b_+15, b_+17); A = 0x02;  // ld a,$02
-  CYC(b_+17, SYM(ganon_stateE_substate3)); if (hook_enabled_at(SYM(fadeinFromWhiteWithDelay))) { fadeinFromWhiteWithDelay_hook(gb); return; } HANDOFF(SYM(fadeinFromWhiteWithDelay));  // jp fadeinFromWhiteWithDelay
+  CYC(b_+17, b_+20); if (hook_enabled_at(SYM(fadeinFromWhiteWithDelay))) { fadeinFromWhiteWithDelay_hook(gb); return; } HANDOFF(SYM(fadeinFromWhiteWithDelay));  // jp fadeinFromWhiteWithDelay
 }
 
 void ganon_stateE_substate3_hook(GB *gb) {
@@ -1358,7 +1358,7 @@ void ganon_stateE_substate3_hook(GB *gb) {
   CYC(b_+9, b_+10); alu_xor(gb, A);  // xor a
   CYC(b_+10, b_+13); mem_wr(gb, wDisableLinkCollisionsAndMenu, A);  // ld (wDisableLinkCollisionsAndMenu),a
   CALL_C(b_+13, decNumEnemies_hook, SYM(decNumEnemies), b_+16);
-  CYC(b_+16, SYM(ganon_loadGfxHeader)); if (hook_enabled_at(SYM(enemyDelete))) { enemyDelete_hook(gb); return; } HANDOFF(SYM(enemyDelete));  // jp enemyDelete
+  CYC(b_+16, b_+19); if (hook_enabled_at(SYM(enemyDelete))) { enemyDelete_hook(gb); return; } HANDOFF(SYM(enemyDelete));  // jp enemyDelete
 }
 
 void ganon_loadGfxHeader_hook(GB *gb) {
@@ -1388,7 +1388,7 @@ void ganon_updateTeleportAnimationGoingOut_hook(GB *gb) {
   CYC(b_+3, b_+4); alu_rrca(gb);  // rrca
   CYC(b_+4, b_+5); B = A;  // ld b,a
   CYC(b_+5, b_+7); A = 0x20;  // ld a,$20
-  CYC(b_+7, SYM(ganon_updateFlickeringXPosition)); alu_sub(gb, B);  // sub b
+  CYC(b_+7, b_+8); alu_sub(gb, B);  // sub b
   ganon_updateFlickeringXPosition_hook(gb); return;  // fallthrough
 }
 
@@ -1404,7 +1404,7 @@ haveDelta:
   CYC(b_+8, b_+9); alu_add(gb, mem_rd(gb, HL));  // add (hl)
   CYC(b_+9, b_+11); L = 0x8d;  // ld l,Enemy.xh
   CYC(b_+11, b_+12); mem_wr(gb, HL, A);  // ld (hl),a
-  CYC(b_+12, SYM(ganon_updateTeleportVarsAndPlaySound)); if (hook_enabled_at(SYM(ecom_flickerVisibility_b10))) { ecom_flickerVisibility_b10_hook(gb); return; } HANDOFF(SYM(ecom_flickerVisibility_b10));  // jp ecom_flickerVisibility
+  CYC(b_+12, b_+15); if (hook_enabled_at(SYM(ecom_flickerVisibility_b10))) { ecom_flickerVisibility_b10_hook(gb); return; } HANDOFF(SYM(ecom_flickerVisibility_b10));  // jp ecom_flickerVisibility
 }
 
 void ganon_updateTeleportVarsAndPlaySound_hook(GB *gb) {
@@ -1430,7 +1430,7 @@ void ganon_updateTeleportAnimationComingIn_hook(GB *gb) {
   CYC(b_+0, b_+1); A = mem_rd(gb, HL);  // ld a,(hl)
   CYC(b_+1, b_+3); alu_and(gb, 0x3e);  // and $3e
   CYC(b_+3, b_+4); alu_rrca(gb);  // rrca
-  CYC(b_+4, SYM(ganon_finishAttack)); ganon_updateFlickeringXPosition_hook(gb); return;  // jr ganon_updateFlickeringXPosition
+  CYC(b_+4, b_+6); ganon_updateFlickeringXPosition_hook(gb); return;  // jr ganon_updateFlickeringXPosition
 }
 
 void ganon_finishAttack_hook(GB *gb) {
@@ -1443,7 +1443,7 @@ void ganon_finishAttack_hook(GB *gb) {
   CYC(b_+5, b_+6); L = A;  // ld l,a
   CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   CYC(b_+7, b_+8); alu_or(gb, A);  // or a
-  if ((F & FZ)) { CYCT(b_+8, SYM(label_10_135)); ganon_decideNextMove_hook(gb); return; } CYC(b_+8, SYM(label_10_135));  // jr z,ganon_decideNextMove
+  if ((F & FZ)) { CYCT(b_+8, b_+10); ganon_decideNextMove_hook(gb); return; } CYC(b_+8, b_+10);  // jr z,ganon_decideNextMove
   label_10_135_hook(gb); return;  // fallthrough
 }
 
@@ -1490,7 +1490,7 @@ haveC:
 void ganon_decideTeleportLocationAndCounter_hook(GB *gb) {
   BASE(ganon_decideTeleportLocationAndCounter);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); SET_BC((SYM(drawAllSpritesUnconditionally__loop) + 78));  // ld bc,$0e0f
+  CYC(b_+0, b_+3); SET_BC(0x0e0f);  // ld bc,$0e0f
   CALL_C(b_+3, ecom_randomBitwiseAndBCE_b10_hook, SYM(ecom_randomBitwiseAndBCE_b10), b_+6);
   CYC(b_+6, b_+7); A = B;  // ld a,b
   CYC(b_+7, b_+10); SET_HL(b_+29);  // ld hl,@teleportTargetTable
@@ -1582,7 +1582,7 @@ void ganon_updateSeizurePalette_hook(GB *gb) {
   CYC(b_+21, b_+23); alu_and(gb, 0x07);  // and $07
   CYC(b_+23, b_+25); alu_add(gb, 0xb1);  // add PALH_b1
   CYC(b_+25, b_+28); mem_wr(gb, wExtraBgPaletteHeader, A);  // ld (wExtraBgPaletteHeader),a
-  CYC(b_+28, SYM(ganon_setTileReplacementMode)); if (hook_enabled_at(SYM(loadPaletteHeader))) { loadPaletteHeader_hook(gb); return; } HANDOFF(SYM(loadPaletteHeader));  // jp loadPaletteHeader
+  CYC(b_+28, b_+31); if (hook_enabled_at(SYM(loadPaletteHeader))) { loadPaletteHeader_hook(gb); return; } HANDOFF(SYM(loadPaletteHeader));  // jp loadPaletteHeader
 }
 
 void ganon_setTileReplacementMode_hook(GB *gb) {

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode25), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode25), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define getLinkTilePosition_bank08 SYM(getLinkTilePosition)
 
@@ -49,7 +49,7 @@ static void tileFiller_updateFloor(GB *gb, uint16_t sp0_) {
   CYC(b_+95, b_+97); A = 0x9e; // TILEINDEX_YELLOW_FLOOR
   CALL_C(b_+97, setTile_hook, SYM(setTile), b_+100);
   CYC(b_+100, b_+102); A = 0x5e; // SND_GETSEED
-  CYC(b_+102, SYM(interactionCode28)); playSound_b00_hook(gb);
+  CYC(b_+102, b_+105); playSound_b00_hook(gb);
 }
 
 // @state1: wait for Link to step onto an adjacent tile.

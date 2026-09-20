@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode3c), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode3c), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void bari_state_uninitialized_hook(GB *gb);
 void bari_state_stub_hook(GB *gb);
@@ -154,7 +154,7 @@ void bari_state_uninitialized_hook(GB *gb) {
   CYC(b_+38, b_+40); A = 0x0a; // SPEED_40
   CYC(b_+40, b_+41); mem_wr(gb, DE, A);
   CYC(b_+41, b_+43); A = 0x02;
-  CYC(b_+43, SYM(bari_state_stub)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+43, b_+46); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:6c6c, bare global; jump-table target from enemyCode3c@commonState.
@@ -223,7 +223,7 @@ void bari_applySpeed_hook(GB *gb) {
 // bari_state9.
 void bari_animate_hook(GB *gb) {
   BASE(bari_animate);
-  CYC(b_+0, SYM(bari_state9)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:6caa, bare global; jump-table target from bari_subid0, also called from bari_subid1. In
@@ -295,7 +295,7 @@ substate0:
   CYC(b_+68, b_+69); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+69, b_+71); A = 0x73; // SND_KILLENEMY
   CALL_C(b_+71, playSound_b00_hook, SYM(playSound_b00), b_+74);
-  CYC(b_+74, SYM(bari_subid1)); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+74, b_+77); objectSetInvisible_hook(gb); return; // jp
 }
 
 // 0e:6cec, bare local (no exported symbol); called via genuine call/ret twice from
@@ -340,7 +340,7 @@ void bari_subid1_hook(GB *gb) {
   CYC(b_+18, b_+19); mem_wr(gb, HL, A); // [counter1]
   CALL_C(b_+19, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+22);
   CALL_C(b_+22, objectNudgeAngleTowards_hook, SYM(objectNudgeAngleTowards), b_+25);
-  CYC(b_+25, SYM(bari_updateZPosition)); bari_applySpeed_hook(gb); return; // jp
+  CYC(b_+25, b_+28); bari_applySpeed_hook(gb); return; // jp
 }
 
 // 0e:6d39, bare global; called from enemyCode3c. Bobs up and down.

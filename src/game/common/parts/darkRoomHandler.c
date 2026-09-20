@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode08), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode08), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void partCode08_hook(GB *gb);
 void darkRoomHandler_state0_hook(GB *gb);
@@ -87,7 +87,7 @@ L_470f:
   CALL_C(b_+117, objectGetShortPosition_hook, SYM(objectGetShortPosition), b_+120);
   CYC(b_+120, b_+122); E = 0xcb; // Part.yh
   CYC(b_+122, b_+123); mem_wr(gb, DE, A);
-  CYC(b_+123, SYM(partCode09)); return; // ret
+  CYC(b_+123, b_+124); return; // ret
 }
 
 void darkRoomHandler_spawnLightableTorch_hook(GB *gb) {

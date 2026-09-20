@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode77), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode77), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCode77_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -100,8 +100,8 @@ state2:
   CALL_C(b_+91, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+94);
   if (!(F & FZ)) { RET_TAKEN(b_+94); return; } // ret nz
   CYC(b_+94, b_+95);
-  CYC(b_+95, b_+98); SET_BC((SYM(enemyCodeTable) + 204)); // TREASURE_SMALL_KEY, $00
+  CYC(b_+95, b_+98); SET_BC(0x3000); // TREASURE_SMALL_KEY, $00
   CALL_C(b_+98, createTreasure_hook, SYM(createTreasure), b_+101);
   CALL_C(b_+101, objectCopyPosition_hook, SYM(objectCopyPosition), b_+104);
-  CYC(b_+104, SYM(interactionCode7b)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+104, b_+107); interactionDelete_hook(gb); return; // jp
 }

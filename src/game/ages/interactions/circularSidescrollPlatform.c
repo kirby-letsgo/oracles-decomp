@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodea4), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodea4), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void sidescrollingPlatformCommon_hook(GB *gb);
 void sidescrollPlatform_checkLinkSquished_hook(GB *gb);
@@ -211,7 +211,7 @@ label_0b_183:
   CYC(b_+56, b_+57); alu_cp(gb, D);
   if (!(F & FZ)) { CYCT(b_+57, b_+59); goto label_0b_184; } // jr nz
   CYC(b_+57, b_+59);
-  CYC(b_+59, b_+61); A = hram_rd(gb, 0x8b);
+  CYC(b_+59, b_+61); A = mem_rd(gb, hFF8B);
   CYC(b_+61, b_+63); alu_cp(gb, 0x03);
   if (F & FZ) { CYCT(b_+63, b_+65); goto label_0b_184; } // jr z
   CYC(b_+63, b_+65);
@@ -236,7 +236,7 @@ l_5ac4:
 
 moveLinkAtAngle:
   CYC(b_+87, b_+89); B = 0x14; // SPEED_80
-  CYC(b_+89, SYM(sidescrollPlatform_checkLinkSquished)); updateLinkPositionGivenVelocity_hook(gb); return; // jp
+  CYC(b_+89, b_+92); updateLinkPositionGivenVelocity_hook(gb); return; // jp
 }
 
 // @param[out] cflag c if Link got squished
@@ -352,7 +352,7 @@ l_5b3e:
   CYC(b_+24, b_+25); A = B;
   CYC(b_+25, b_+27); alu_add(gb, 0x08);
   CYC(b_+27, b_+28); B = A;
-  CYC(b_+28, SYM(sidescrollPlatformFunc_5b51)); getTileCollisionsAtPosition_hook(gb); return; // jp
+  CYC(b_+28, b_+31); getTileCollisionsAtPosition_hook(gb); return; // jp
 }
 
 // @param[out] hl
@@ -504,7 +504,7 @@ void sidescrollPlatform_pushLinkAwayVertical_hook(GB *gb) {
   CYC(b_+7, b_+8); B = A;
   CYC(b_+8, b_+10); L = (uint8_t)w1Link_yh;
   CYC(b_+10, b_+12); E = INTERACTION_BASE + OBJ_YH;
-  CYC(b_+12, SYM(sidescrollPlatform_pushLinkAwayHorizontal)); interactionCode9e_pushLinkAway_tail(gb); // jr
+  CYC(b_+12, b_+14); interactionCode9e_pushLinkAway_tail(gb); // jr
 }
 
 void sidescrollPlatform_pushLinkAwayHorizontal_hook(GB *gb) {
@@ -527,8 +527,8 @@ void sidescrollPlatformFunc_5bfc_hook(GB *gb) {
   CALL_C(b_+0, objectRunMovementScript_hook, SYM(objectRunMovementScript), b_+3);
   CYC(b_+3, b_+6); A = mem_rd(gb, wLinkRidingObject);
   CYC(b_+6, b_+7); alu_cp(gb, D);
-  if (!(F & FZ)) { CYCT(b_+7, SYM(sidescrollPlatform_updateLinkSubpixels)); ret_effect(gb); return; } // ret nz
-  CYC(b_+7, SYM(sidescrollPlatform_updateLinkSubpixels));
+  if (!(F & FZ)) { CYCT(b_+7, b_+8); ret_effect(gb); return; } // ret nz
+  CYC(b_+7, b_+8);
   sidescrollPlatform_updateLinkSubpixels_hook(gb); // falls through
 }
 

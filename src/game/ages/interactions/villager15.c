@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(villager_setLinkYToVar39), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(villager_setLinkYToVar39), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/scripts/ages/scriptHelper.s (INTERAC_MALE_VILLAGER), bank 0x15.
 
@@ -47,5 +47,5 @@ void villager_createBall_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+6); return; }
   CYC(b_+6, b_+7);
   CYC(b_+7, b_+10); SET_BC((SYM(group3ObjectDataTable) + 257));
-  CYC(b_+10, SYM(createExclamationMark)); interactionHSetPosition_hook(gb); return; // jp
+  CYC(b_+10, b_+13); interactionHSetPosition_hook(gb); return; // jp
 }

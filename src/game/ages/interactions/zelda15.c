@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(zelda_warpOutOfVireMinigame), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(zelda_warpOutOfVireMinigame), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void zelda_warpOutOfVireMinigame_hook(GB *gb) {
   BASE(zelda_warpOutOfVireMinigame);
@@ -22,6 +22,6 @@ void zelda_warpOutOfVireMinigame_hook(GB *gb) {
 
 void zelda_giveBlueJoyRing_hook(GB *gb) {
   BASE(zelda_giveBlueJoyRing);
-  CYC(b_+0, b_+3); SET_BC((SYM(objectMarkSolidPosition) + 16));
-  CYC(b_+3, SYM(zeldaSubid01Script_body)); giveRingToLink_hook(gb);
+  CYC(b_+0, b_+3); SET_BC(0x2500);
+  CYC(b_+3, b_+6); giveRingToLink_hook(gb);
 }

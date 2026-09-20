@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode34), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode34), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t triforceStone_jumpTable(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -111,7 +111,7 @@ static void triforceStone_setSolidTile(GB *gb, uint16_t sp0_) {
   CYC(b_+234, b_+236); B = wRoomCollisions >> 8;
   CYC(b_+236, b_+238); A = 0x0f;
   CYC(b_+238, b_+239); mem_wr(gb, BC, A);
-  CYC(b_+239, SYM(interactionCode35)); ret_effect(gb);
+  CYC(b_+239, b_+240); ret_effect(gb);
 }
 
 // @state1: waiting for Link to push (substate 0), pushing (substate 1), done (substate 2).

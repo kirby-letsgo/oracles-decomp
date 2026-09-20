@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode3d), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode3d), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void enemyCode3d_runState_hook(GB *gb);
 void swordEnemy_state_uninitialized_hook(GB *gb);
@@ -148,7 +148,7 @@ void swordEnemy_state_uninitialized_hook(GB *gb) {
   // Enable scent seeds
   CYC(b_+20, b_+22); L = ENEMY_BASE + 0x3f; // Enemy.var3f
   CYC(b_+22, b_+24); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 4))); // set 4,(hl)
-  CYC(b_+24, SYM(swordEnemy_state_switchHook)); swordEnemy_setChaseCooldown_hook(gb); return; // jp
+  CYC(b_+24, b_+27); swordEnemy_setChaseCooldown_hook(gb); return; // jp
 }
 
 // 0e:55b8, bare global; jump-table target from enemyCode3d_runState and enemyCode48_runState.
@@ -187,7 +187,7 @@ void swordEnemy_state_scentSeed_hook(GB *gb) {
   CALL_C(b_+11, ecom_updateAnimationFromAngle_b0e_hook, SYM(ecom_updateAnimationFromAngle_b0e), b_+14);
   CALL_C(b_+14, ecom_applyVelocityForSideviewEnemy_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemy_b0e), b_+17);
   CALL_C(b_+17, enemyAnimate_hook, SYM(enemyAnimate), b_+20);
-  CYC(b_+20, SYM(swordEnemy_state_stub)); swordEnemy_animate_hook(gb); return; // jr
+  CYC(b_+20, b_+22); swordEnemy_animate_hook(gb); return; // jr
 }
 
 // 0e:55e4, bare global; jump-table target from enemyCode3d_runState and enemyCode48_runState.
@@ -213,8 +213,8 @@ void swordEnemy_state8_hook(GB *gb) {
 
   // Hit a wall
   CALL_C(b_+17, ecom_bounceOffWallsAndHoles_b0e_hook, SYM(ecom_bounceOffWallsAndHoles_b0e), b_+20);
-  if (!(F & FZ)) { CYCT(b_+20, SYM(swordEnemy_animate)); ecom_updateAnimationFromAngle_b0e_hook(gb); return; } // jp nz
-  CYC(b_+20, SYM(swordEnemy_animate));
+  if (!(F & FZ)) { CYCT(b_+20, b_+23); ecom_updateAnimationFromAngle_b0e_hook(gb); return; } // jp nz
+  CYC(b_+20, b_+23);
   swordEnemy_animate_hook(gb); return; // fallthrough
 }
 
@@ -222,7 +222,7 @@ void swordEnemy_state8_hook(GB *gb) {
 // from swordEnemy_gotoState8, swordEnemy_stateA and swordEnemy_state_scentSeed.
 void swordEnemy_animate_hook(GB *gb) {
   BASE(swordEnemy_animate);
-  CYC(b_+0, SYM(swordEnemy_state9)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:55ff, bare global; jump-table target from enemyCode3d_runState. Started chasing Link
@@ -262,7 +262,7 @@ applyVelocity:
 
   // Animate at double speed
   CALL_C(b_+23, enemyAnimate_hook, SYM(enemyAnimate), b_+26);
-  CYC(b_+26, SYM(swordEnemy_gotoState8)); swordEnemy_animate_hook(gb); return; // jr
+  CYC(b_+26, b_+28); swordEnemy_animate_hook(gb); return; // jr
 }
 
 // 0e:5628, bare global; called from swordEnemy_stateA, swordEnemy_state_scentSeed and
@@ -281,7 +281,7 @@ void swordEnemy_gotoState8_hook(GB *gb) {
   CYC(b_+14, b_+15); mem_wr(gb, HL, A);
   CALL_C(b_+15, ecom_updateAnimationFromAngle_b0e_hook, SYM(ecom_updateAnimationFromAngle_b0e), b_+18);
   CALL_C(b_+18, swordEnemy_setChaseCooldown_hook, SYM(swordEnemy_setChaseCooldown), b_+21);
-  CYC(b_+21, SYM(enemyCode48)); swordEnemy_animate_hook(gb); return; // jr
+  CYC(b_+21, b_+23); swordEnemy_animate_hook(gb); return; // jr
 }
 
 // ==================================================================================================
@@ -355,7 +355,7 @@ void swordDarknut_state_uninitialized_hook(GB *gb) {
   CYC(b_+12, b_+15);
 
 notGolden:
-  CYC(b_+15, SYM(swordDarknut_state8)); swordEnemy_state_uninitialized_hook(gb); return; // jp
+  CYC(b_+15, b_+18); swordEnemy_state_uninitialized_hook(gb); return; // jp
 }
 
 // 0e:5692, bare global; jump-table target from enemyCode48_runState. Moving slowly in
@@ -375,8 +375,8 @@ void swordDarknut_state8_hook(GB *gb) {
 
   // Hit a wall
   CALL_C(b_+15, ecom_bounceOffWallsAndHoles_b0e_hook, SYM(ecom_bounceOffWallsAndHoles_b0e), b_+18);
-  if (!(F & FZ)) { CYCT(b_+18, SYM(swordDarknut_animate)); ecom_updateAnimationFromAngle_b0e_hook(gb); return; } // jp nz
-  CYC(b_+18, SYM(swordDarknut_animate));
+  if (!(F & FZ)) { CYCT(b_+18, b_+21); ecom_updateAnimationFromAngle_b0e_hook(gb); return; } // jp nz
+  CYC(b_+18, b_+21);
   swordDarknut_animate_hook(gb); return; // fallthrough
 }
 
@@ -384,7 +384,7 @@ void swordDarknut_state8_hook(GB *gb) {
 // from swordDarknut_stateA.
 void swordDarknut_animate_hook(GB *gb) {
   BASE(swordDarknut_animate);
-  CYC(b_+0, SYM(swordDarknut_state9)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:56aa, bare global; jump-table target from enemyCode48_runState. Started chasing Link
@@ -426,7 +426,7 @@ applyVelocity:
 
   // Animate at double speed
   CALL_C(b_+23, enemyAnimate_hook, SYM(enemyAnimate), b_+26);
-  CYC(b_+26, SYM(swordEnemy_beginChasingLink)); swordDarknut_animate_hook(gb); return; // jr
+  CYC(b_+26, b_+28); swordDarknut_animate_hook(gb); return; // jr
 }
 
 // 0e:56d3, bare global; called from swordEnemy_state8 and swordDarknut_state8.
@@ -438,14 +438,14 @@ void swordEnemy_beginChasingLink_hook(GB *gb) {
   CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x10);
   CALL_C(b_+7, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+10);
-  CYC(b_+10, SYM(swordEnemy_chooseRandomAngleAndCounter1)); ecom_updateAnimationFromAngle_b0e_hook(gb); return; // jp
+  CYC(b_+10, b_+13); ecom_updateAnimationFromAngle_b0e_hook(gb); return; // jp
 }
 
 // 0e:56e0, bare global; called from swordEnemy_state8 and swordDarknut_state8.
 void swordEnemy_chooseRandomAngleAndCounter1_hook(GB *gb) {
   BASE(swordEnemy_chooseRandomAngleAndCounter1);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); SET_BC((SYM(func_3ee4) + 35));
+  CYC(b_+0, b_+3); SET_BC(0x3f07);
   CALL_C(b_+3, ecom_randomBitwiseAndBCE_b0e_hook, SYM(ecom_randomBitwiseAndBCE_b0e), b_+6);
   CYC(b_+6, b_+8); E = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+8, b_+10); A = 0x50;
@@ -462,9 +462,9 @@ void swordEnemy_chooseRandomAngleAndCounter1_chooseAngle_hook(GB *gb) {
   BASE(swordEnemy_chooseRandomAngleAndCounter1);
   CYC(b_+18, b_+19); A = C;
   CYC(b_+19, b_+20); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+20, SYM(ecom_updateCardinalAngleTowardTarget_b0e)); ecom_updateCardinalAngleTowardTarget_b0e_hook(gb); return; } // jp z
+  if (F & FZ) { CYCT(b_+20, (SYM(ecom_updateCardinalAngleAwayFromTarget_b0e) + 9)); ecom_updateCardinalAngleTowardTarget_b0e_hook(gb); return; } // jp z
   CYC(b_+20, b_+23);
-  CYC(b_+23, SYM(ecom_setRandomCardinalAngle_b0e)); ecom_setRandomCardinalAngle_b0e_hook(gb); return; // jp
+  CYC(b_+23, (SYM(ecom_updateAngleTowardTarget_b0e) + 7)); ecom_setRandomCardinalAngle_b0e_hook(gb); return; // jp
 }
 
 // 0e:56fa, bare global; called from swordEnemy_state8.
@@ -480,14 +480,14 @@ void swordEnemy_checkLinkIsClose_hook(GB *gb) {
   // NOTE: Why does this use hFFB2, then hEnemyTargetX? It's mixing two position
   // variables.
   CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_YH;
-  CYC(b_+6, b_+8); A = hram_rd(gb, 0xb2); // hFFB2
+  CYC(b_+6, b_+8); A = mem_rd(gb, hFFB2); // hFFB2
   CYC(b_+8, b_+9); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+9, b_+11); alu_add(gb, 0x28);
   CYC(b_+11, b_+13); alu_cp(gb, 0x51);
   if (!(F & FC)) { RET_TAKEN(b_+13); return; } // ret nc
   CYC(b_+13, b_+14);
   CYC(b_+14, b_+16); L = ENEMY_BASE + OBJ_XH;
-  CYC(b_+16, b_+18); A = hram_rd(gb, 0xb1); // hEnemyTargetX
+  CYC(b_+16, b_+18); A = mem_rd(gb, hEnemyTargetX); // hEnemyTargetX
   CYC(b_+18, b_+19); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+19, b_+21); alu_add(gb, 0x28);
   CYC(b_+21, b_+23); alu_cp(gb, 0x51);
@@ -506,14 +506,14 @@ void swordDarknut_checkLinkIsClose_hook(GB *gb) {
   // NOTE: Why does this use hFFB2, then hEnemyTargetX? It's mixing two position
   // variables.
   CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_YH;
-  CYC(b_+6, b_+8); A = hram_rd(gb, 0xb2); // hFFB2
+  CYC(b_+6, b_+8); A = mem_rd(gb, hFFB2); // hFFB2
   CYC(b_+8, b_+9); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+9, b_+11); alu_add(gb, 0x28);
   CYC(b_+11, b_+13); alu_cp(gb, 0x51);
   if (!(F & FC)) { RET_TAKEN(b_+13); return; } // ret nc
   CYC(b_+13, b_+14);
   CYC(b_+14, b_+16); L = ENEMY_BASE + OBJ_XH;
-  CYC(b_+16, b_+18); A = hram_rd(gb, 0xb1); // hEnemyTargetX
+  CYC(b_+16, b_+18); A = mem_rd(gb, hEnemyTargetX); // hEnemyTargetX
   CYC(b_+18, b_+19); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+19, b_+21); alu_add(gb, 0x28);
   CYC(b_+21, b_+23); alu_cp(gb, 0x51);
@@ -638,5 +638,5 @@ void swordDarknut_delete_hook(GB *gb) {
   BASE(swordDarknut_delete);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, decNumEnemies_hook, SYM(decNumEnemies), b_+3);
-  CYC(b_+3, SYM(enemyCode3e)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+3, b_+6); enemyDelete_hook(gb); return; // jp
 }

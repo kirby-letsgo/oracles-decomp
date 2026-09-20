@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(setChannelWaitCounter), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(setChannelWaitCounter), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void getNextChannelByte_hook(GB *gb);
 void isWaveChannelUnavailable_hook(GB *gb);
@@ -230,7 +230,7 @@ haveEnvelopeState:
   CYC(b_+190, b_+193); A = W8(wSoundCmdEnvelope);
   CYC(b_+193, b_+194); alu_or(gb, C);
   CYC(b_+194, b_+197); W8(wSoundCmdEnvelope) = A;
-  CYC(b_+197, SYM(updateSquareChannelVolume)); updateSquareChannelVolume_hook(gb); return; // jp
+  CYC(b_+197, b_+200); updateSquareChannelVolume_hook(gb); return; // jp
 }
 
 void updateSquareChannelVolume_hook(GB *gb) {
@@ -499,7 +499,7 @@ arbitraryFrequency:
   CYC(b_+206, b_+209); A = W8(wSoundFrequencyH);
   CYC(b_+209, b_+211); mem_wr(gb, 0xff1e, A);
 waitFreq:
-  CYC(b_+211, SYM(getWaveChannelVolume)); setChannelWaitCounter_hook(gb); return; // jp
+  CYC(b_+211, b_+214); setChannelWaitCounter_hook(gb); return; // jp
 }
 
 // @param[out] a Volume of channel wSoundChannel dependent of wMusicVolume,
@@ -589,7 +589,7 @@ found:
   CYC(b_+51, b_+53); A = 0x80;
   CYC(b_+53, b_+55); mem_wr(gb, 0xff23, A);
 wait:
-  CYC(b_+55, SYM(standardCmdChannel7)); setChannelWaitCounter_hook(gb); return; // jp
+  CYC(b_+55, b_+58); setChannelWaitCounter_hook(gb); return; // jp
 }
 
 void standardCmdChannel7_hook(GB *gb) {
@@ -606,7 +606,7 @@ void standardCmdChannel7_hook(GB *gb) {
 skipTrigger:
   CYC(b_+18, b_+20); A = 0x00;
   CYC(b_+20, b_+23); W8(wChannel7TriggerOnNextSound) = A;
-  CYC(b_+23, SYM(channelCmdff)); setChannelWaitCounter_hook(gb); return; // jp
+  CYC(b_+23, b_+26); setChannelWaitCounter_hook(gb); return; // jp
 }
 
 // Disables and silences the current channel
@@ -620,7 +620,7 @@ void channelCmdff_hook(GB *gb) {
   CYC(b_+10, b_+12); D = 0x00;
   CYC(b_+12, b_+13); alu_add_hl(gb, DE);
   CYC(b_+13, b_+14); SET_AF(pop_effect(gb));
-  CYC(b_+14, SYM(silencePlayedSound)); mem_wr(gb, HL, A);
+  CYC(b_+14, b_+15); mem_wr(gb, HL, A);
   silencePlayedSound_hook(gb);
 }
 
@@ -784,7 +784,7 @@ void channelCmdfe_hook(GB *gb) {
   CYC(b_+20, b_+21); A = H;
   CYC(b_+21, b_+22); mem_wr(gb, 0xff00 | C, A);
   CYC(b_+22, b_+23); C = alu_inc8(gb, C);
-  CYC(b_+23, SYM(multiplyHlByA)); doNextChannelCommand_hook(gb); return; // jp
+  CYC(b_+23, b_+26); doNextChannelCommand_hook(gb); return; // jp
 }
 
 void multiplyHlByA_hook(GB *gb) {

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(tryToBreakTile_body), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(tryToBreakTile_body), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define breakableTileCollisionTable_bank06 SYM(breakableTileCollisionTable)
 #define breakableTileModes_bank06 SYM(breakableTileModes)
@@ -45,7 +45,7 @@ static void tryToBreakTile_deleteSomariaBlock(GB *gb) {
   CYC(b_+207, b_+208);
   CYC(b_+208, b_+210); L = 0x2f;
   CYC(b_+210, b_+212); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 5));
-  CYC(b_+212, SYM(itemMakeInteractionForBreakableTile)); ret_effect(gb);
+  CYC(b_+212, b_+213); ret_effect(gb);
 }
 
 void tryToBreakTile_body_hook(GB *gb) {
@@ -245,7 +245,7 @@ void itemMakeInteractionForBreakableTile_hook(GB *gb) {
   CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+8, b_+10); H8(hFF91) = A;
   CYC(b_+10, b_+12); L = 0x03;
-  CYC(b_+12, SYM(makeInteractionForBreakableTile)); A = mem_rd(gb, HL);
+  CYC(b_+12, b_+13); A = mem_rd(gb, HL);
   makeInteractionForBreakableTile_hook(gb);
 }
 
@@ -283,7 +283,7 @@ void makeInteractionForBreakableTile_hook(GB *gb) {
   CYC(b_+34, b_+35); L = alu_inc8(gb, L);
   CYC(b_+35, b_+37); A = H8(hFF91);
   CYC(b_+37, b_+38); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+38, SYM(decideItemDropForBrokenTile)); ret_effect(gb);
+  CYC(b_+38, b_+39); ret_effect(gb);
 }
 
 void decideItemDropForBrokenTile_hook(GB *gb) {
@@ -335,5 +335,5 @@ void decideItemDropForBrokenTile_hook(GB *gb) {
   }
 done:
   CYC(b_+49, b_+50); SET_HL(pop_effect(gb));
-  CYC(b_+50, SYM(functionCaller_b06)); ret_effect(gb);
+  CYC(b_+50, b_+51); ret_effect(gb);
 }

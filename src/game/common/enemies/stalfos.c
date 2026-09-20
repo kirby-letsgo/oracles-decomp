@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode31), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode31), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void stalfos_state_uninitialized_hook(GB *gb);
 void stalfos_state_switchHook_hook(GB *gb);
@@ -86,7 +86,7 @@ normalStatus:
 void stalfos_state_uninitialized_hook(GB *gb) {
   BASE(stalfos_state_uninitialized);
   CYC(b_+0, b_+2); A = 0x14; // SPEED_80
-  CYC(b_+2, SYM(stalfos_state_switchHook)); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
+  CYC(b_+2, b_+5); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
 }
 
 void stalfos_state_switchHook_hook(GB *gb) {
@@ -146,7 +146,7 @@ void stalfos_state09_hook(GB *gb) {
 L_4635:
   CALL_C(b_+12, ecom_bounceOffWallsAndHoles_b0e_hook, SYM(ecom_bounceOffWallsAndHoles_b0e), b_+15);
   CALL_C(b_+15, objectApplySpeed_hook, SYM(objectApplySpeed), b_+18);
-  CYC(b_+18, SYM(stalfos_state0a)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+18, b_+21); enemyAnimate_hook(gb); return; // jp
 }
 
 // Just starting a jump away from Link
@@ -162,7 +162,7 @@ void stalfos_state0a_hook(GB *gb) {
   CYC(b_+12, b_+14); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+14, b_+16); mem_wr(gb, HL, 0x32); // SPEED_140
   CALL_C(b_+16, ecom_updateCardinalAngleAwayFromTarget_b0e_hook, SYM(ecom_updateCardinalAngleAwayFromTarget_b0e), b_+19);
-  CYC(b_+19, SYM(stalfos_state0b)); stalfos_beginJumpAnimation_hook(gb); return; // jp
+  CYC(b_+19, b_+22); stalfos_beginJumpAnimation_hook(gb); return; // jp
 }
 
 // Jumping until hitting the ground
@@ -188,7 +188,7 @@ hitGround:
   CALL_C(b_+20, ecom_setSpeedAndState8_b0e_hook, SYM(ecom_setSpeedAndState8_b0e), b_+23);
   CYC(b_+23, b_+24); alu_xor(gb, A);
   CALL_C(b_+24, enemySetAnimation_hook, SYM(enemySetAnimation), b_+27);
-  CYC(b_+27, SYM(stalfos_state0c)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+27, b_+30); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 // Firing a projectile, then immediately going to state 9 to keep moving
@@ -197,7 +197,7 @@ void stalfos_state0c_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); B = 0x1c; // PART_STALFOS_BONE
   CALL_C(b_+2, ecom_spawnProjectile_b0e_hook, SYM(ecom_spawnProjectile_b0e), b_+5);
-  CYCT(b_+5, SYM(stalfos_state0d)); stalfos_moveInRandomAngle_hook(gb); return; // jr
+  CYCT(b_+5, b_+7); stalfos_moveInRandomAngle_hook(gb); return; // jr
 }
 
 // Stomping on Link
@@ -246,7 +246,7 @@ void stalfos_state0f_hook(GB *gb) {
   CYC(b_+13, b_+14); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [state]
   CYC(b_+14, b_+16); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+16, b_+18); mem_wr(gb, HL, 30);
-  CYC(b_+18, SYM(stalfos_state10)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+18, b_+21); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 // Laying on the ground for [counter1] frames until he starts moving again
@@ -255,7 +255,7 @@ void stalfos_state10_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+3);
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } // ret nz
-  CYC(b_+3, SYM(stalfos_moveInRandomAngle));
+  CYC(b_+3, b_+4);
   stalfos_moveInRandomAngle_hook(gb); return; // fallthrough
 }
 
@@ -264,7 +264,7 @@ void stalfos_moveInRandomAngle_hook(GB *gb) {
   BASE(stalfos_moveInRandomAngle);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); E = 0x30; // Enemy.var30
-  CYC(b_+2, b_+5); SET_BC((SYM(pushDirectionData) + 10));
+  CYC(b_+2, b_+5); SET_BC(0x1f0f);
   CALL_C(b_+5, ecom_randomBitwiseAndBCE_b0e_hook, SYM(ecom_randomBitwiseAndBCE_b0e), b_+8);
   CYC(b_+8, b_+9); H = D;
   CYC(b_+9, b_+11); L = ENEMY_BASE + OBJ_STATE;
@@ -281,7 +281,7 @@ void stalfos_moveInRandomAngle_hook(GB *gb) {
   CYC(b_+28, b_+30); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+30, b_+31); mem_wr(gb, DE, A);
   CYC(b_+31, b_+32); alu_xor(gb, A);
-  CYC(b_+32, SYM(stalfos_checkSubid3StompsLink)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+32, b_+35); enemySetAnimation_hook(gb); return; // jp
 }
 
 // For subid 3 only, if Link approaches close enough, it will jump toward Link to stomp on
@@ -316,7 +316,7 @@ void stalfos_beginJumpAnimation_hook(GB *gb) {
   CALL_C(b_+2, enemySetAnimation_hook, SYM(enemySetAnimation), b_+5);
   CYC(b_+5, b_+7); A = 0x8f; // SND_ENEMY_JUMP
   CALL_C(b_+7, playSound_b00_hook, SYM(playSound_b00), b_+10);
-  CYC(b_+10, SYM(stalfos_checkJumpAwayFromLink)); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+10, b_+13); objectSetVisiblec1_hook(gb); return; // jp
 }
 
 // If Link is swinging something near this object, it will set its state to $0a if not

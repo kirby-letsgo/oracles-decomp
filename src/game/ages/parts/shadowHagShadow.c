@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode41), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode41), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t shadowHagShadow_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -128,5 +128,5 @@ updateAngleAndApplySpeed:
   CALL_C(b_+121, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+124);
   CYC(b_+124, b_+126); E = 0xc9; // Part.angle
   CYC(b_+126, b_+127); mem_wr(gb, DE, A);
-  CYC(b_+127, SYM(partCode42)); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+127, b_+130); objectApplySpeed_hook(gb); return; // jp
 }

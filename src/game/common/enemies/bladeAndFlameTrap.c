@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode0e), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode0e), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void bladeTrap_subid00_hook(GB *gb);
 void bladeTrap_subid01_hook(GB *gb);
@@ -175,7 +175,7 @@ stateB:
   CYC(b_+79, b_+81); A = 0x09;
   CYC(b_+81, b_+82); mem_wr(gb, DE, A);
   CYC(b_+82, b_+84); A = 0x01;
-  CYC(b_+84, SYM(bladeTrap_subid01)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+84, b_+87); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0d:4c3e, bare global; bladeTrap_subid02 aliases the same address (blue/gold blade traps).
@@ -308,7 +308,7 @@ state8:
   CYC(b_+20, b_+21); C = A;
   CYC(b_+21, b_+22); A = mem_rd(gb, HL);
   CYC(b_+22, b_+24); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(b_+24, SYM(bladeTrap_subid05)); objectSetPositionInCircleArc_hook(gb); return; // jp
+  CYC(b_+24, b_+27); objectSetPositionInCircleArc_hook(gb); return; // jp
 }
 
 // 0d:4cd7, bare global; unlimited range green blade.
@@ -398,7 +398,7 @@ void bladeTrap_updateAngle_hook(GB *gb) {
   CYC(b_+5, b_+7); E = ENEMY_BASE + OBJ_ANGLE;
   if (!(F & FZ)) { CYCT(b_+7, b_+10); bladeTrap_decAngle_hook(gb); return; } // jp nz
   CYC(b_+7, b_+10);
-  CYC(b_+10, SYM(bladeTrap_initCircular)); bladeTrap_incAngle_hook(gb); return; // jp
+  CYC(b_+10, b_+13); bladeTrap_incAngle_hook(gb); return; // jp
 }
 
 // 0d:4d43, bare global.
@@ -429,7 +429,7 @@ void bladeTrap_initCircular_hook(GB *gb) {
   CYC(b_+34, b_+36); E = ENEMY_BASE + 0x32; // Enemy.var32
   CYC(b_+36, b_+37); mem_wr(gb, DE, A);
   CYC(b_+37, b_+39); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(b_+39, SYM(bladeTrap_directionOffsets)); objectSetPositionInCircleArc_hook(gb); return; // jp
+  CYC(b_+39, b_+42); objectSetPositionInCircleArc_hook(gb); return; // jp
 }
 
 // 0d:4dbf, called once from bladeTrap_checkObstructionsToTarget.
@@ -458,7 +458,7 @@ afterAbs:
   CYC(b_+95, b_+96); A = alu_inc8(gb, A);
 
 storeResult:
-  CYC(b_+96, b_+98); hram_wr(gb, 0x8b, A);
+  CYC(b_+96, b_+98); mem_wr(gb, hFF8B, A);
   RET(b_+98); return; // ret
 }
 
@@ -522,9 +522,9 @@ checkNextTile:
   CALL_C(b_+42, bladeTrap_checkObstructionsToTarget_checkNextTileSolid, b_+56, b_+45);
   if (!(F & FZ)) { CYCT(b_+45, b_+47); goto doneChecking; } // jr nz
   CYC(b_+45, b_+47);
-  CYC(b_+47, b_+49); A = hram_rd(gb, 0x8b);
+  CYC(b_+47, b_+49); A = mem_rd(gb, hFF8B);
   CYC(b_+49, b_+50); A = alu_dec8(gb, A);
-  CYC(b_+50, b_+52); hram_wr(gb, 0x8b, A);
+  CYC(b_+50, b_+52); mem_wr(gb, hFF8B, A);
   if (!(F & FZ)) { CYCT(b_+52, b_+54); goto checkNextTile; } // jr nz
   CYC(b_+52, b_+54);
 

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(linkCutsceneRet), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(linkCutsceneRet), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define linkCutscene0OscillationData_bank06 SYM(linkCutscene_zOscillation0)
 
@@ -56,14 +56,14 @@ static void link_cutscene_add_a_to_hl(GB *gb) {
 
 void linkCutsceneRet_hook(GB *gb) {
   BASE(linkCutsceneRet);
-  CYC(b_+0, SYM(linkCutscene2)); ret_effect(gb);
+  CYC(b_+0, b_+1); ret_effect(gb);
 }
 
 void linkCutscene_animateAndDecCounter1_hook(GB *gb) {
   BASE(linkCutscene_animateAndDecCounter1);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+3);
-  CYC(b_+3, SYM(linkCutscene5)); itemDecCounter1_hook(gb);
+  CYC(b_+3, b_+6); itemDecCounter1_hook(gb);
 }
 
 void linkCutscene_oscillateZ_hook(GB *gb) {
@@ -86,19 +86,19 @@ void linkCutscene_oscillateZ_hook(GB *gb) {
     CYC(b_+21, b_+22); alu_add(gb, B);
     CYC(b_+22, b_+23); mem_wr(gb, DE, A);
   }
-  CYC(b_+23, SYM(linkCutscene_zOscillation0)); specialObjectAnimate_hook(gb);
+  CYC(b_+23, b_+26); specialObjectAnimate_hook(gb);
 }
 
 void linkCutscene_oscillateZ_1_hook(GB *gb) {
   BASE(linkCutscene_oscillateZ_1);
-  CYC(b_+0, SYM(linkCutscene_oscillateZ)); SET_HL(SYM(linkCutscene_zOscillation1));
+  CYC(b_+0, b_+3); SET_HL(SYM(linkCutscene_zOscillation1));
   linkCutscene_oscillateZ_hook(gb);
 }
 
 void linkCutscene_oscillateZ_2_hook(GB *gb) {
   BASE(linkCutscene_oscillateZ_2);
   CYC(b_+0, b_+3); SET_HL(SYM(linkCutscene_zOscillation2));
-  CYC(b_+3, SYM(linkCutscene_updateAngleOnPath)); linkCutscene_oscillateZ_hook(gb);
+  CYC(b_+3, b_+6); linkCutscene_oscillateZ_hook(gb);
 }
 
 void linkCutscene_createGlowingOrb_hook(GB *gb) {
@@ -117,7 +117,7 @@ void linkCutscene_createGlowingOrb_hook(GB *gb) {
   }
   CALL_C(b_+14, itemIncSubstate_hook, SYM(itemIncSubstate), b_+17);
   CYC(b_+17, b_+19); A = 0x05;
-  CYC(b_+19, SYM(linkCutscene_oscillateZ_1)); specialObjectSetAnimation_hook(gb);
+  CYC(b_+19, b_+22); specialObjectSetAnimation_hook(gb);
 }
 
 void linkCutscene0_substate6_hook(GB *gb) {
@@ -144,7 +144,7 @@ void linkCutscene0_substate6_hook(GB *gb) {
     return;
   }
   CYC(b_+19, b_+22);
-  CYC(b_+22, SYM(linkCutscene1));
+  CYC(b_+22, b_+25);
   objectSetVisible_hook(gb);
 }
 
@@ -293,11 +293,11 @@ substate5:
   CYC(b_+162, b_+165); A = W8(wTmpcbb9);
   CYC(b_+165, b_+167); alu_cp(gb, 0x06);
   if (!(F & FZ)) {
-    CYCT(b_+167, SYM(linkCutscene_createGlowingOrb));
+    CYCT(b_+167, b_+169);
     linkCutscene_oscillateZ_1_hook(gb);
     return;
   }
-  CYC(b_+167, SYM(linkCutscene_createGlowingOrb));
+  CYC(b_+167, b_+169);
   linkCutscene_createGlowingOrb_hook(gb);
 }
 
@@ -306,7 +306,7 @@ void linkCutscene_cpyTo48_hook(GB *gb) {
   CYC(b_+0, b_+2); E = 0x0b;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+5); alu_cp(gb, 0x48);
-  CYC(b_+5, SYM(linkCutscene_cpxTo38)); ret_effect(gb);
+  CYC(b_+5, b_+6); ret_effect(gb);
 }
 
 void linkCutscene_cpxTo38_hook(GB *gb) {
@@ -314,7 +314,7 @@ void linkCutscene_cpxTo38_hook(GB *gb) {
   CYC(b_+0, b_+2); E = 0x0d;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+5); alu_cp(gb, 0x38);
-  CYC(b_+5, SYM(linkCutscene_initOam_setVisible_incState)); ret_effect(gb);
+  CYC(b_+5, b_+6); ret_effect(gb);
 }
 
 void linkCutscene_initOam_setVisible_incState_hook(GB *gb) {
@@ -324,7 +324,7 @@ void linkCutscene_initOam_setVisible_incState_hook(GB *gb) {
   CYC(b_+3, b_+5); E = 0x05;
   CALL_C(b_+5, interBankCall_hook, 0x008a, b_+8);
   CALL_C(b_+8, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+11);
-  CYC(b_+11, SYM(linkCutscene_animateAndDecCounter1));
+  CYC(b_+11, b_+14);
   itemIncState_hook(gb);
 }
 
@@ -437,7 +437,7 @@ void linkCutsceneFunc_73e8_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+24, b_+25); ret_effect(gb); return; }
   CYC(b_+24, b_+25);
   CYC(b_+25, b_+26); mem_wr(gb, HL, A);
-  CYC(b_+26, SYM(linkCutscene4));
+  CYC(b_+26, b_+29);
   specialObjectSetAnimation_hook(gb);
 }
 
@@ -616,7 +616,7 @@ substate8:
   CYC(b_+188, b_+190);
   CYC(b_+190, b_+192); A = 0x03;
   CALL_C(b_+192, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+195);
-  CYC(b_+195, SYM(linkCutsceneFunc_73e8));
+  CYC(b_+195, b_+198);
   itemIncSubstate_hook(gb);
 }
 
@@ -735,7 +735,7 @@ substate5:
   CYC(b_+123, b_+125); A = 0x03;
   CYC(b_+125, b_+126); mem_wr(gb, DE, A);
   CYC(b_+126, b_+127); alu_xor(gb, A);
-  CYC(b_+127, SYM(linkCutscene_cpyTo48));
+  CYC(b_+127, b_+130);
   setLinkIDOverride_hook(gb);
 }
 
@@ -846,7 +846,7 @@ substate3:
   CYC(b_+123, b_+125); mem_wr(gb, HL, 0x01);
   CYC(b_+125, b_+127); A = 0x50;
   CALL_C(b_+127, playSound_b00_hook, SYM(playSound_b00), b_+130);
-  CYC(b_+130, SYM(linkCutsceneRet));
+  CYC(b_+130, b_+133);
   itemIncSubstate_hook(gb);
 }
 
@@ -864,7 +864,7 @@ void linkCutscene2_hook(GB *gb) {
 
 state0:
   CALL_C(b_+8, linkCutscene_initOam_setVisible_incState_hook, SYM(linkCutscene_initOam_setVisible_incState), b_+11);
-  CYC(b_+11, b_+14); SET_BC((SYM(loadTilesetUniqueGfx) + 16));
+  CYC(b_+11, b_+14); SET_BC(0x3838);
   CALL_C(b_+14, objectGetRelativeAngle_hook, SYM(objectGetRelativeAngle), b_+17);
   CYC(b_+17, b_+19); E = 0x09;
   CYC(b_+19, b_+20); mem_wr(gb, DE, A);
@@ -1015,7 +1015,7 @@ substate7:
   return;
 
 substate8:
-  CYC(b_+208, SYM(linkCutscene3)); ret_effect(gb);
+  CYC(b_+208, b_+209); ret_effect(gb);
   return;
 
 label_72c8:
@@ -1069,7 +1069,7 @@ state1:
     return;
   }
   CYC(b_+34, b_+36); A = 0x00;
-  CYC(b_+36, SYM(linkCutscene6));
+  CYC(b_+36, b_+39);
   setLinkIDOverride_hook(gb);
 }
 
@@ -1139,7 +1139,7 @@ substate1:
   return;
 
 substate2:
-  CYC(b_+68, SYM(linkCutscene7)); ret_effect(gb);
+  CYC(b_+68, b_+69); ret_effect(gb);
 }
 
 void linkCutscene7_hook(GB *gb) {
@@ -1175,7 +1175,7 @@ state1:
   CYC(b_+35, b_+37); A = 0x01;
   CYC(b_+37, b_+40); W8(wUseSimulatedInput) = A;
   CYC(b_+40, b_+43); W8(wMenuDisabled) = A;
-  CYC(b_+43, SYM(linkCutscene8)); ret_effect(gb);
+  CYC(b_+43, b_+44); ret_effect(gb);
 }
 
 void linkCutscene8_hook(GB *gb) {
@@ -1230,7 +1230,7 @@ substate0:
   return;
 
 substate1:
-  CYC(b_+54, SYM(linkCutscene9)); ret_effect(gb);
+  CYC(b_+54, b_+55); ret_effect(gb);
 }
 
 void linkCutscene9_hook(GB *gb) {
@@ -1323,7 +1323,7 @@ substate4:
   CYC(b_+97, b_+100);
   CYC(b_+100, b_+103); SET_HL(wTmpcfc0_genericCutscene_cfdf);
   CYC(b_+103, b_+105); mem_wr(gb, HL, 0xff);
-  CYC(b_+105, SYM(linkCutsceneA)); ret_effect(gb);
+  CYC(b_+105, b_+106); ret_effect(gb);
 }
 
 static void link_cutscene_check_shield_equipped(GB *gb) {
@@ -1454,7 +1454,7 @@ substate3:
   CYC(b_+129, b_+130);
   CYC(b_+130, b_+133); SET_HL(wTmpcfc0_genericCutscene_state);
   CYC(b_+133, b_+135); mem_wr(gb, HL, 0x09);
-  CYC(b_+135, SYM(linkCutsceneB)); ret_effect(gb);
+  CYC(b_+135, b_+136); ret_effect(gb);
 }
 
 void linkCutsceneB_hook(GB *gb) {
@@ -1527,7 +1527,7 @@ substate1:
   if (!(F & FZ)) { CYCT(b_+91, b_+92); ret_effect(gb); return; }
   CYC(b_+91, b_+92);
   CALL_C(b_+92, itemIncSubstate_hook, SYM(itemIncSubstate), b_+95);
-  CYC(b_+95, b_+98); SET_BC((SYM(setRoomFlagsForUnlockedKeyDoor) + 23));
+  CYC(b_+95, b_+98); SET_BC(0x1213);
   CYC(b_+98, b_+101);
   showText_hook(gb);
   return;
@@ -1569,7 +1569,7 @@ substate3:
     return;
   }
   CYC(b_+144, b_+147);
-  CYC(b_+147, SYM(linkCutsceneC));
+  CYC(b_+147, b_+150);
   objectSetVisible_hook(gb);
 }
 
@@ -1593,7 +1593,7 @@ state0:
   CYC(b_+19, b_+21); L = 0x42;
   CYC(b_+21, b_+23); mem_wr(gb, HL, 0x01);
   CYC(b_+23, b_+25); A = 0x06;
-  CYC(b_+25, SYM(linkCutscene_oscillateZ_2));
+  CYC(b_+25, b_+28);
   specialObjectSetAnimation_hook(gb);
 }
 

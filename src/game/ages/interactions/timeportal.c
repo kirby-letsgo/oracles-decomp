@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(timeportal_updatePalette), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(timeportal_updatePalette), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/ages/interactions/timeportal.s (INTERAC_TIMEPORTAL), bank $10.
 
@@ -42,7 +42,7 @@ void timeportal_updatePalette_hook(GB *gb) {
   CYC(b_+11, b_+13); alu_and(gb, 0x0b);
   CYC(b_+13, b_+14); mem_wr(gb, DE, A);
 animate:
-  CYC(b_+14, SYM(interactionCodedf));
+  CYC(b_+14, b_+17);
   interactionAnimate_hook(gb);
 }
 
@@ -67,7 +67,7 @@ void interactionBeginTimewarp_hook(GB *gb) {
   CYC(b_+38, b_+40); A = 0x1b;
   CYC(b_+40, b_+43); mem_wr(gb, wCutsceneTrigger, A);
   CALL_C(b_+43, restartSound_hook, SYM(restartSound), b_+46);
-  CYC(b_+46, SYM(timeportal_updatePalette));
+  CYC(b_+46, b_+49);
   interactionDelete_hook(gb);
 }
 
@@ -157,6 +157,6 @@ state2:
   if (!(F & FC)) { RET_TAKEN(b_+96); return; }
   CYC(b_+96, b_+97);
   CYC(b_+97, b_+99); A = 0xff;
-  CYC(b_+99, SYM(interactionBeginTimewarp)); mem_wr(gb, wPortalGroup, A);
+  CYC(b_+99, b_+102); mem_wr(gb, wPortalGroup, A);
   interactionBeginTimewarp_hook(gb);
 }

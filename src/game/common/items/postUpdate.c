@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(label_07_227), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(label_07_227), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define swingableItemAnimationData_bank07 SYM(label_07_227__data)
 
@@ -97,7 +97,7 @@ void updateSwingableItemAnimation_hook(GB *gb) {
   CYC(b_+23, b_+25); alu_and(gb, 0x07);
   CYC(b_+25, b_+26); push_effect(gb, HL);
   CALL_C(b_+26, tryBreakTileWithSword_calculateLevel_hook, SYM(tryBreakTileWithSword_calculateLevel), b_+29);
-  CYC(b_+29, SYM(label_07_227)); SET_HL(pop_effect(gb));
+  CYC(b_+29, b_+30); SET_HL(pop_effect(gb));
   label_07_227_hook(gb);
 }
 
@@ -144,7 +144,7 @@ void updateBiggoronSwordAnimation_hook(GB *gb) {
   }
   CYC(b_+43, b_+45); E = 0x30;
   CYC(b_+45, b_+46); mem_wr(gb, DE, A);
-  CYC(b_+46, SYM(itemCode08Post));
+  CYC(b_+46, b_+49);
   itemSetAnimation_hook(gb);
 }
 
@@ -167,7 +167,7 @@ void itemCode08Post_hook(GB *gb) {
   CYC(b_+20, b_+21); alu_adc(gb, A);
   CYC(b_+21, b_+23); E = 0x30;
   CYC(b_+23, b_+24); mem_wr(gb, DE, A);
-  CYC(b_+24, SYM(itemCode13Post));
+  CYC(b_+24, b_+27);
   itemSetAnimation_hook(gb);
 }
 
@@ -186,7 +186,7 @@ void itemCode13Post_hook(GB *gb) {
   CYC(b_+12, b_+15); A = W8(w1Link_direction);
   CYC(b_+15, b_+17); E = 0x30;
   CYC(b_+17, b_+18); mem_wr(gb, DE, A);
-  CYC(b_+18, SYM(itemCode1ePost));
+  CYC(b_+18, b_+21);
   itemSetAnimation_hook(gb);
 }
 
@@ -210,7 +210,7 @@ void itemCode1ePost_hook(GB *gb) {
   CYC(b_+17, b_+19); E = 0x30;
   CYC(b_+19, b_+20); mem_wr(gb, DE, A);
   CYC(b_+20, b_+23); SET_HL(SYM(swordArcData));
-  CYC(b_+23, SYM(itemCode00Post));
+  CYC(b_+23, b_+25);
   itemSetPositionInSwordArc_hook(gb);
 }
 
@@ -219,7 +219,7 @@ void itemCode00Post_hook(GB *gb) {
   CYC(b_+0, b_+3); A = W8(w1Link_direction);
   CYC(b_+3, b_+5); alu_add(gb, 0x18);
   CYC(b_+5, b_+8); SET_HL(SYM(swordArcData));
-  CYC(b_+8, SYM(itemCode0cPost));
+  CYC(b_+8, b_+10);
   itemSetPositionInSwordArc_hook(gb);
 }
 
@@ -238,7 +238,7 @@ void itemCode0cPost_hook(GB *gb) {
   CYC(b_+11, b_+12); A = mem_rd(gb, DE);
   CYC(b_+12, b_+15); SET_HL(SYM(biggoronSwordArcData));
   CALL_C(b_+15, itemSetPositionInSwordArc_hook, SYM(itemSetPositionInSwordArc), b_+18);
-  CYC(b_+18, SYM(itemCode04Post));
+  CYC(b_+18, b_+21);
   itemCalculateSwordDamage_hook(gb);
 }
 
@@ -257,14 +257,14 @@ void itemCode04Post_hook(GB *gb) {
   CYC(b_+11, b_+12); A = mem_rd(gb, DE);
   CYC(b_+12, b_+15); SET_HL(SYM(swordArcData));
   CALL_C(b_+15, itemSetPositionInSwordArc_hook, SYM(itemSetPositionInSwordArc), b_+18);
-  CYC(b_+18, SYM(itemSetPositionInSwordArc));
+  CYC(b_+18, b_+21);
   itemCalculateSwordDamage_hook(gb);
 }
 
 void itemSetPositionInSwordArc_hook(GB *gb) {
   BASE(itemSetPositionInSwordArc);
   CYC(b_+0, b_+1); alu_add(gb, A);
-  CYC(b_+1, SYM(itemInitializeFromLinkPosition)); post_update_add_double_index(gb, SYM(itemInitializeFromLinkPosition));
+  CYC(b_+1, b_+2); post_update_add_double_index(gb, SYM(itemInitializeFromLinkPosition));
   itemInitializeFromLinkPosition_hook(gb);
 }
 
@@ -292,5 +292,5 @@ void itemInitializeFromLinkPosition_hook(GB *gb) {
   CYC(b_+30, b_+32); E = 0x0f;
   CYC(b_+32, b_+34); alu_sub(gb, 0x02);
   CYC(b_+34, b_+35); mem_wr(gb, DE, A);
-  CYC(b_+35, SYM(swordArcData)); ret_effect(gb);
+  CYC(b_+35, b_+36); ret_effect(gb);
 }

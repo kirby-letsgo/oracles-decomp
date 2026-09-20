@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(impa_moveLinkRight8Frames), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(impa_moveLinkRight8Frames), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void impa_moveLinkUp32Frames_hook(GB *gb);
 void impa_moveLinkRight8Frames_hook(GB *gb);
@@ -25,7 +25,7 @@ void impa_moveLinkUp32Frames_hook(GB *gb) {
   CYC(b_+5, b_+6); alu_xor(gb, A);
   CYC(b_+6, b_+9); mem_wr(gb, w1Link_angle, A);
   CYC(b_+9, b_+12); mem_wr(gb, w1Link_direction, A);
-  CYC(b_+12, SYM(impa_moveLinkRight8Frames));
+  CYC(b_+12, b_+14);
   impa_setLinkAnimState0b(gb);
 }
 
@@ -53,5 +53,5 @@ void impa_restoreNormalSpriteSheet_hook(GB *gb) {
 void impa_showZeldaKidnappedTextNonExitable_hook(GB *gb) {
   BASE(impa_showZeldaKidnappedTextNonExitable);
   CYC(b_+0, b_+3); SET_BC(0x0131);
-  CYC(b_+3, SYM(impaScript_rockJustMoved_b15)); showTextNonExitable_hook(gb);
+  CYC(b_+3, b_+6); showTextNonExitable_hook(gb);
 }

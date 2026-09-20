@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode1d), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode1d), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void itemCode1d_hook(GB *gb) {
   BASE(itemCode1d);
@@ -18,7 +18,7 @@ void itemCode1d_hook(GB *gb) {
   CALL_C(b_+8, itemIncState_hook, SYM(itemIncState), b_+11);
   CYC(b_+11, b_+13); L = 0x00;
   CYC(b_+13, b_+15); mem_wr(gb, HL, mem_rd(gb, HL) | 0x02);
-  CYC(b_+15, SYM(itemCode1dPost)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }
 
 void itemCode1dPost_hook(GB *gb) {
@@ -32,6 +32,6 @@ void itemCode1dPost_hook(GB *gb) {
     return;
   }
   CYC(b_+6, b_+9);
-  CYC(b_+9, SYM(itemCode13));
+  CYC(b_+9, b_+12);
   itemDelete_hook(gb);
 }

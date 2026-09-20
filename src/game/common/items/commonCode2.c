@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(tryBreakTileWithExpertsRing), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(tryBreakTileWithExpertsRing), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void tryBreakTileWithSword_hook(GB *gb);
 
@@ -39,7 +39,7 @@ void tryBreakTileWithExpertsRing_hook(GB *gb) {
   CYC(b_+3, b_+4); alu_add(gb, A);
   CYC(b_+4, b_+5); C = A;
   CYC(b_+5, b_+7); A = 0x03;
-  CYC(b_+7, SYM(tryBreakTileWithSword_calculateLevel));
+  CYC(b_+7, b_+9);
   tryBreakTileWithSword_hook(gb);
 }
 
@@ -54,7 +54,7 @@ void tryBreakTileWithSword_calculateLevel_hook(GB *gb) {
     return;
   }
   CYC(b_+6, b_+8);
-  CYC(b_+8, SYM(tryBreakTileWithSword)); A = 0x02;
+  CYC(b_+8, b_+10); A = 0x02;
   tryBreakTileWithSword_hook(gb);
 }
 
@@ -282,5 +282,5 @@ void itemMimicBgTile_hook(GB *gb) {
   CYC(b_+51, b_+52); alu_xor(gb, A);
   CYC(b_+52, b_+54); hram_wr(gb, R_SVBK, A);
   CYC(b_+54, b_+55); SET_DE(pop_effect(gb));
-  CYC(b_+55, SYM(itemCode16)); ret_effect(gb);
+  CYC(b_+55, b_+56); ret_effect(gb);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(tingle_createGlowAroundLink), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(tingle_createGlowAroundLink), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void tingle_createGlowAroundLink_hook(GB *gb) {
   BASE(tingle_createGlowAroundLink);
@@ -21,5 +21,5 @@ void tingle_createGlowAroundLink_hook(GB *gb) {
   CYC(b_+17, b_+18); L = alu_inc8(gb, L);
   CYC(b_+18, b_+21); A = mem_rd(gb, w1Link_xh);
   CYC(b_+21, b_+22); mem_wr(gb, HL, A);
-  CYC(b_+22, SYM(troy_chooseRandomAnimalText)); ret_effect(gb);
+  CYC(b_+22, b_+23); ret_effect(gb);
 }

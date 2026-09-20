@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(drawRectangleToVramTiles), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(drawRectangleToVramTiles), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void drawCollapsedWingDungeon_hook(GB *gb);
 void roomTileChangesAfterLoad01_hook(GB *gb);
@@ -91,7 +91,7 @@ static void draw_rectangle_to_vram_tiles_rows(GB *gb, uint16_t sp0_) {
   }
   CYC(b_+33, b_+34); SET_AF(pop_effect(gb));
   CYC(b_+34, b_+36); hram_wr(gb, IO_SVBK - 0xff00, A);
-  CYC(b_+36, SYM(copyRectangleFromTmpGfxBuffer_paramBc)); ret_effect(gb);
+  CYC(b_+36, b_+37); ret_effect(gb);
 }
 
 // 02:7a54
@@ -112,7 +112,7 @@ void getIndexOfGashaSpotInRoom_body_hook(GB *gb) {
   }
   CYC(b_+12, b_+13); A = C;
   CYC(b_+13, b_+16); SET_HL(wGashaSpotsPlantedBitset);
-  CYC(b_+16, SYM(gashaSpotRooms)); checkFlag_hook(gb);
+  CYC(b_+16, b_+19); checkFlag_hook(gb);
 }
 
 // 02:7a77
@@ -134,7 +134,7 @@ void func_02_7a77_hook(GB *gb) {
     CYC(b_+10, b_+12);
     CYC(b_+12, b_+14); A = 0x3f;
   }
-  CYC(b_+14, SYM(applyRoomSpecificTileChangesAfterGfxLoad)); loadUncompressedGfxHeader_hook(gb);
+  CYC(b_+14, b_+17); loadUncompressedGfxHeader_hook(gb);
 }
 
 void applyRoomSpecificTileChangesAfterGfxLoad_hook(GB *gb) {
@@ -184,7 +184,7 @@ void roomTileChangesAfterLoad0a_hook(GB *gb) {
       continue;
     }
     CYC(b_+13, b_+15);
-    CYC(b_+15, SYM(roomTileChangesAfterLoad09)); ret_effect(gb);
+    CYC(b_+15, b_+16); ret_effect(gb);
     return;
   }
 }
@@ -222,7 +222,7 @@ void roomTileChangesAfterLoad06_hook(GB *gb) {
   CYC(b_+12, b_+13);
   CYC(b_+13, b_+15); A = 0xdc;
   CYC(b_+15, b_+18); mem_wr(gb, wRoomLayout + 0x57, A);
-  CYC(b_+18, SYM(roomTileChangesAfterLoad07)); ret_effect(gb);
+  CYC(b_+18, b_+19); ret_effect(gb);
 }
 
 void roomTileChangesAfterLoad07_hook(GB *gb) {
@@ -255,10 +255,10 @@ void roomTileChangesAfterLoad00_hook(GB *gb) {
   CALL_C(b_+0, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+3);
   CYC(b_+3, b_+5); alu_and(gb, 0x80);
   if (F & FZ) {
-    CYCT(b_+5, SYM(drawCollapsedWingDungeon)); ret_effect(gb);
+    CYCT(b_+5, b_+6); ret_effect(gb);
     return;
   }
-  CYC(b_+5, SYM(drawCollapsedWingDungeon));
+  CYC(b_+5, b_+6);
   drawCollapsedWingDungeon_hook(gb);
 }
 
@@ -283,7 +283,7 @@ void roomTileChangesAfterLoad02_hook(GB *gb) {
     return;
   }
   CYC(b_+5, b_+6);
-  CYC(b_+6, SYM(roomTileChangesAfterLoad03)); roomTileChangesAfterLoad01_hook(gb);
+  CYC(b_+6, b_+8); roomTileChangesAfterLoad01_hook(gb);
 }
 
 void roomTileChangesAfterLoad03_hook(GB *gb) {
@@ -292,10 +292,10 @@ void roomTileChangesAfterLoad03_hook(GB *gb) {
   CALL_C(b_+0, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+3);
   CYC(b_+3, b_+5); alu_and(gb, 0x80);
   if (F & FZ) {
-    CYCT(b_+5, SYM(roomTileChangesAfterLoad01)); ret_effect(gb);
+    CYCT(b_+5, b_+6); ret_effect(gb);
     return;
   }
-  CYC(b_+5, SYM(roomTileChangesAfterLoad01));
+  CYC(b_+5, b_+6);
   roomTileChangesAfterLoad01_hook(gb);
 }
 
@@ -335,17 +335,17 @@ void roomTileChangesAfterLoad01_hook(GB *gb) {
   CYC(b_+28, b_+29); D = mem_rd(gb, HL);
   CYC(b_+29, b_+30); E = A;
   CYC(b_+30, b_+31); A = B;
-  CYC(b_+31, b_+33); hram_wr(gb, 0x93, A);
+  CYC(b_+31, b_+33); mem_wr(gb, hFF93, A);
   CYC(b_+33, b_+36); SET_HL(SYM(treeTilesTable));
   CYC(b_+36, b_+37); add_double_index_to_hl_from_rst(gb, b_+37);
   CYC(b_+37, b_+38); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+38, b_+39); H = mem_rd(gb, HL);
   CYC(b_+39, b_+40); L = A;
-  CYC(b_+40, b_+43); SET_BC((SYM(loadGfxRegisterStateIndex) + 26));
+  CYC(b_+40, b_+43); SET_BC(0x0304);
   CALL_C(b_+43, drawRectangleToVramTiles_withParameters_hook, SYM(drawRectangleToVramTiles_withParameters), b_+46);
-  CYC(b_+46, b_+48); A = hram_rd(gb, 0x93);
+  CYC(b_+46, b_+48); A = mem_rd(gb, hFF93);
   CYC(b_+48, b_+50); alu_add(gb, 0x07);
-  CYC(b_+50, SYM(treeGfxLocationsTable)); loadTreeGfx_hook(gb);
+  CYC(b_+50, b_+53); loadTreeGfx_hook(gb);
 }
 
 void roomTileChangesAfterLoad08_hook(GB *gb) {
@@ -397,7 +397,7 @@ void roomTileChangesAfterLoad05_hook(GB *gb) {
   CYC(b_+6, b_+7); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+7, b_+8); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+8, b_+9); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+9, SYM(readParametersForRectangleDrawing)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 // 02:7d35
@@ -411,7 +411,7 @@ void readParametersForRectangleDrawing_hook(GB *gb) {
   CYC(b_+5, b_+6); B = A;
   CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+7, b_+8); C = A;
-  CYC(b_+8, SYM(drawRectangleToVramTiles_withParameters)); ret_effect(gb);
+  CYC(b_+8, b_+9); ret_effect(gb);
 }
 
 void drawRectangleToVramTiles_withParameters_hook(GB *gb) {
@@ -421,7 +421,7 @@ void drawRectangleToVramTiles_withParameters_hook(GB *gb) {
   CYC(b_+2, b_+3); push_effect(gb, AF);
   CYC(b_+3, b_+5); A = 0x03;
   CYC(b_+5, b_+7); hram_wr(gb, IO_SVBK - 0xff00, A);
-  CYC(b_+7, SYM(drawRectangleToVramTiles));
+  CYC(b_+7, b_+9);
   draw_rectangle_to_vram_tiles_rows(gb, sp0_);
 }
 
@@ -439,7 +439,7 @@ void drawRectangleToVramTiles_hook(GB *gb) {
 void copyRectangleFromTmpGfxBuffer_paramBc_hook(GB *gb) {
   BASE(copyRectangleFromTmpGfxBuffer_paramBc);
   CYC(b_+0, b_+1); L = C;
-  CYC(b_+1, SYM(copyRectangleFromTmpGfxBuffer)); H = B;
+  CYC(b_+1, b_+2); H = B;
   copyRectangleFromTmpGfxBuffer_hook(gb);
 }
 
@@ -498,7 +498,7 @@ void copyRectangleFromTmpGfxBuffer_hook(GB *gb) {
   }
   CYC(b_+45, b_+46); SET_AF(pop_effect(gb));
   CYC(b_+46, b_+48); hram_wr(gb, IO_SVBK - 0xff00, A);
-  CYC(b_+48, SYM(copyRectangleToRoomLayoutAndCollisions)); ret_effect(gb);
+  CYC(b_+48, b_+49); ret_effect(gb);
 }
 
 void copyRectangleToRoomLayoutAndCollisions_paramDe_body_hook(GB *gb) {
@@ -538,7 +538,7 @@ void copyRectangleToRoomLayoutAndCollisions_paramDe_body_hook(GB *gb) {
     CYC(b_+23, b_+25);
     break;
   }
-  CYC(b_+25, SYM(roomTileChangesAfterLoad04)); ret_effect(gb);
+  CYC(b_+25, b_+26); ret_effect(gb);
 }
 
 // 02:7d9f
@@ -547,7 +547,7 @@ void copyRectangleToRoomLayoutAndCollisions_hook(GB *gb) {
   CYC(b_+0, b_+1); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+1, b_+2); E = A;
   CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+3, SYM(copyRectangleToRoomLayoutAndCollisions_paramDe)); D = A;
+  CYC(b_+3, b_+4); D = A;
   copyRectangleToRoomLayoutAndCollisions_paramDe_body_hook(gb);
 }
 
@@ -561,7 +561,7 @@ void roomTileChangesAfterLoad04_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(wInShop);
   CYC(b_+3, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) | 0x02);
   CYC(b_+5, b_+7); A = 0x03;
-  CYC(b_+7, SYM(checkLoadPastSignAndChestGfx)); loadTreeGfx_hook(gb);
+  CYC(b_+7, b_+10); loadTreeGfx_hook(gb);
 }
 
 void checkLoadPastSignAndChestGfx_hook(GB *gb) {
@@ -599,5 +599,5 @@ void checkLoadPastSignAndChestGfx_hook(GB *gb) {
   }
   CYC(b_+20, b_+21);
   CYC(b_+21, b_+23); A = 0x37;
-  CYC(b_+23, SYM(rectangleData_02_7de1)); loadUncompressedGfxHeader_hook(gb);
+  CYC(b_+23, b_+26); loadUncompressedGfxHeader_hook(gb);
 }

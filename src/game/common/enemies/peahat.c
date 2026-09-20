@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode3e), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode3e), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void peahat_state_uninitialized_hook(GB *gb);
 void peahet_state_stub_hook(GB *gb);
@@ -120,7 +120,7 @@ void peahat_state8_hook(GB *gb) {
   CYC(b_+15, b_+17); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+17, b_+19); mem_wr(gb, HL, 0x0f);
   CALL_C(b_+19, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+22);
-  CYC(b_+22, SYM(peahat_state9)); peahat_animate_hook(gb); return; // jr
+  CYC(b_+22, b_+24); peahat_animate_hook(gb); return; // jr
 }
 
 // 0e:57f4, bare global; jump-table target from enemyCode3e. Accelerating.
@@ -140,7 +140,7 @@ void peahat_state9_hook(GB *gb) {
   CYC(b_+20, b_+21); A = mem_rd(gb, HL);
   CYC(b_+21, b_+22); mem_wr(gb, DE, A);
   CALL_C(b_+22, ecom_setRandomAngle_b0e_hook, SYM(ecom_setRandomAngle_b0e), b_+25);
-  CYC(b_+25, SYM(peahat_stateA)); peahat_animate_hook(gb); return; // jr
+  CYC(b_+25, b_+27); peahat_animate_hook(gb); return; // jr
 }
 
 // 0e:580f, bare global; jump-table target from enemyCode3e. Flying around at top speed.
@@ -163,7 +163,7 @@ beginSlowingDown:
   CYC(b_+19, b_+20); L = E;
   CYC(b_+20, b_+21); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
   CYC(b_+21, b_+23); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(b_+23, SYM(peahat_animate)); mem_wr(gb, HL, 0x00);
+  CYC(b_+23, b_+25); mem_wr(gb, HL, 0x00);
   peahat_animate_hook(gb); return; // fallthrough
 }
 
@@ -171,7 +171,7 @@ beginSlowingDown:
 // peahat_state8, peahat_state9 and peahat_stateB.
 void peahat_animate_hook(GB *gb) {
   BASE(peahat_animate);
-  CYC(b_+0, SYM(peahat_stateB)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:582b, bare global; jump-table target from enemyCode3e. Slowing down.
@@ -200,7 +200,7 @@ keepCounter:
   CYC(b_+21, b_+23); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+23, b_+25); mem_wr(gb, HL, 0x08);
   CALL_C(b_+25, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+28);
-  CYC(b_+28, SYM(peahat_updateEnemyCollisionMode)); peahat_animate_hook(gb); return; // jr
+  CYC(b_+28, b_+30); peahat_animate_hook(gb); return; // jr
 }
 
 // 0e:5849, bare global; called from enemyCode3e.

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode2e), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode2e), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t enemyCode2e_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -90,7 +90,7 @@ state_uninitialized:
 state9:
   CYC(b_+61, b_+62); H = D;
   CYC(b_+62, b_+64); L = ENEMY_BASE + OBJ_XH;
-  CYC(b_+64, b_+66); A = hram_rd(gb, 0xb1); // hEnemyTargetX
+  CYC(b_+64, b_+66); A = mem_rd(gb, hEnemyTargetX); // hEnemyTargetX
   CYC(b_+66, b_+67); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+67, b_+69); alu_add(gb, 0x0a);
   CYC(b_+69, b_+71); alu_cp(gb, 0x15);

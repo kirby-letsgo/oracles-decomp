@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode58), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode58), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook(GB *gb);
 void enemyCode58_copyParentPosition_hook(GB *gb);

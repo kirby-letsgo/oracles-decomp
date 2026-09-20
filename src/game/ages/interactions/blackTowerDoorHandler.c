@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodec6), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodec6), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t black_tower_door_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A); burn_rom(gb, 0, 1, 2, false); SET_HL(pop_effect(gb)); burn_rom(gb, 0, 2, 3, false); alu_add(gb, L); burn_rom(gb, 0, 3, 4, false); L = A;
@@ -30,7 +30,7 @@ no_seed:
       CYC(b_+78,b_+80); A=0x44; CYC(b_+80,b_+83); SET_HL(wRoomLayout+0x44); CYC(b_+83,b_+84); mem_wr(gb,HL,A); CYC(b_+84,b_+86); L=0x47; CYC(b_+86,b_+87); mem_wr(gb,HL,A); CYC(b_+87,b_+89); L=0x4a; CYC(b_+89,b_+90); mem_wr(gb,HL,A); CYC(b_+90,b_+93); W8(wDisableWarps)=A; CYC(b_+93,b_+96); interactionDelete_hook(gb); return;
     }
     else if (jt_ == b_+96) { CALL_C(b_+96,interactionDecCounter1_hook,SYM(interactionDecCounter1),b_+99); if (!(F&FZ)) { CYCT(b_+99,b_+100); ret_effect(gb); return; } CYC(b_+99,b_+100); CYC(b_+100,b_+102); mem_wr(gb,HL,0x1e); CYC(b_+102,b_+103); A=0; CYC(b_+103,b_+106); SET_HL(w1Link_direction); CYC(b_+106,b_+107); mem_wr(gb,HL,A); SET_HL(HL+1); CYC(b_+107,b_+108); mem_wr(gb,HL,A); CYC(b_+108,b_+111); interactionIncState_hook(gb); return; }
-    else if (jt_ == b_+111) { CALL_C(b_+111,interactionDecCounter1_hook,SYM(interactionDecCounter1),b_+114); if (!(F&FZ)) { CYCT(b_+114,b_+115); ret_effect(gb); return; } CYC(b_+114,b_+115); CYC(b_+115,b_+117); B=0xd7; CALL_C(b_+117,objectCreateInteractionWithSubid00_hook,SYM(objectCreateInteractionWithSubid00),b_+120); CYC(b_+120,SYM(interactionCodec8)); interactionDelete_hook(gb); return; }
+    else if (jt_ == b_+111) { CALL_C(b_+111,interactionDecCounter1_hook,SYM(interactionDecCounter1),b_+114); if (!(F&FZ)) { CYCT(b_+114,b_+115); ret_effect(gb); return; } CYC(b_+114,b_+115); CYC(b_+115,b_+117); B=0xd7; CALL_C(b_+117,objectCreateInteractionWithSubid00_hook,SYM(objectCreateInteractionWithSubid00),b_+120); CYC(b_+120,b_+123); interactionDelete_hook(gb); return; }
     else { hook_continue(gb,HL,sp0_); return; }
   } while (0);
 }

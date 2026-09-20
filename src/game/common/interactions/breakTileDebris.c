@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode00), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode00), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t breakTileDebris_jumpTable(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -79,7 +79,7 @@ stored:
   CYC(b_+167, b_+168); mem_wr(gb, DE, A);
   CYC(b_+168, b_+169); E = alu_inc8(gb, E);
   CYC(b_+169, b_+170); mem_wr(gb, DE, A);
-  CYC(b_+170, SYM(interactionCode0f)); ret_effect(gb);
+  CYC(b_+170, b_+171); ret_effect(gb);
 }
 
 void interactionCode00_hook(GB *gb) {

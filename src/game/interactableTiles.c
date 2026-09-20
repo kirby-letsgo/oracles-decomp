@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(resetPushingAgainstTileCounter), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(resetPushingAgainstTileCounter), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void specialObjectGetTileAtOffset_hook(GB *gb);
 void showInfoTextForTile_hook(GB *gb);
@@ -58,7 +58,7 @@ void resetPushingAgainstTileCounter_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); A = 0x14;
   CYC(b_+2, b_+5); W8(wPushingAgainstTileCounter) = A;
-  CYC(b_+5, SYM(decPushingAgainstTileCounter)); ret_effect(gb);
+  CYC(b_+5, b_+6); ret_effect(gb);
 }
 
 void decPushingAgainstTileCounter_hook(GB *gb) {
@@ -66,7 +66,7 @@ void decPushingAgainstTileCounter_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(wPushingAgainstTileCounter);
   CYC(b_+3, b_+4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+4, SYM(nextToOverworldKeyhole)); ret_effect(gb);
+  CYC(b_+4, b_+5); ret_effect(gb);
 }
 
 void specialObjectGetTileInFront_hook(GB *gb) {
@@ -75,7 +75,7 @@ void specialObjectGetTileInFront_hook(GB *gb) {
   CYC(b_+0, b_+2); E = 0x08;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+6); SET_HL(SYM(nextTileOffsets));
-  CYC(b_+6, SYM(specialObjectGetTileAtOffset)); add_double_index_to_hl_from_rst(gb, SYM(specialObjectGetTileAtOffset));
+  CYC(b_+6, b_+7); add_double_index_to_hl_from_rst(gb, SYM(specialObjectGetTileAtOffset));
   specialObjectGetTileAtOffset_hook(gb);
 }
 
@@ -97,7 +97,7 @@ void specialObjectGetTileAtOffset_hook(GB *gb) {
   CYC(b_+17, b_+18); C = A;
   CYC(b_+18, b_+20); B = 0xcf;
   CYC(b_+20, b_+21); A = mem_rd(gb, BC);
-  CYC(b_+21, SYM(nextTileOffsets)); ret_effect(gb);
+  CYC(b_+21, b_+22); ret_effect(gb);
 }
 
 void checkTileAfterNext_hook(GB *gb) {
@@ -121,7 +121,7 @@ void checkTileAfterNext_hook(GB *gb) {
 void jumpToShowInfoText_hook(GB *gb) {
   BASE(jumpToShowInfoText);
   CYC(b_+0, b_+2); A = 0x08;
-  CYC(b_+2, SYM(createKeySpriteInteraction)); showInfoTextForTile_hook(gb);
+  CYC(b_+2, b_+5); showInfoTextForTile_hook(gb);
 }
 
 void createKeySpriteInteraction_hook(GB *gb) {
@@ -138,13 +138,13 @@ void createKeySpriteInteraction_hook(GB *gb) {
   CYC(b_+9, b_+10); mem_wr(gb, HL, A);
   CYC(b_+10, b_+12); A = H8(hFF8D);
   CYC(b_+12, b_+14); L = 0x4b;
-  CYC(b_+14, SYM(nextToSubrosiaKeydoor)); setShortPosition_hook(gb);
+  CYC(b_+14, b_+17); setShortPosition_hook(gb);
 }
 
 void nextToSubrosiaKeydoor_hook(GB *gb) {
   BASE(nextToSubrosiaKeydoor);
   CYC(b_+0, b_+1); alu_scf(gb);
-  CYC(b_+1, SYM(nextToGhiniSpawner)); ret_effect(gb);
+  CYC(b_+1, b_+2); ret_effect(gb);
 }
 
 void nextToGhiniSpawner_hook(GB *gb) {
@@ -183,7 +183,7 @@ void nextToGhiniSpawner_hook(GB *gb) {
   CYC(b_+35, b_+36); mem_wr(gb, HL, B);
   CYC(b_+36, b_+38); L = 0x8d;
   CYC(b_+38, b_+39); mem_wr(gb, HL, C);
-  CYC(b_+39, SYM(nextToTileWithInfoText)); ret_effect(gb);
+  CYC(b_+39, b_+40); ret_effect(gb);
 }
 
 void nextToTileWithInfoText_hook(GB *gb) {
@@ -230,7 +230,7 @@ void nextToTileWithInfoText_hook(GB *gb) {
     }
     else if (jt_ == b_+52) {
       CYC(b_+52, b_+54); A = 0x04;
-      CYC(b_+54, SYM(showInfoTextForTile)); showInfoTextForTile_hook(gb); return;
+      CYC(b_+54, b_+56); showInfoTextForTile_hook(gb); return;
     }
   } while (0);
   hook_continue(gb, HL, sp0_);
@@ -267,7 +267,7 @@ static void special_object_check_position_component(GB *gb) {
   CYC(b_+32, b_+34); alu_and(gb, 0x0f);
   CYC(b_+34, b_+36); alu_sub(gb, 0x03);
   CYC(b_+36, b_+38); alu_cp(gb, 0x0b);
-  CYC(b_+38, SYM(checkAndDecKeyCount)); ret_effect(gb);
+  CYC(b_+38, b_+39); ret_effect(gb);
 }
 
 static void special_object_check_position(GB *gb) {
@@ -327,7 +327,7 @@ void checkAndDecKeyCount_hook(GB *gb) {
   if (!(F & FC)) {
     CYCT(b_+14, b_+16);
     CYC(b_+30, b_+32); L = 0x82;
-    CYC(b_+32, SYM(specialObjectGetTileInFront)); checkFlag_hook(gb); return;
+    CYC(b_+32, b_+35); checkFlag_hook(gb); return;
   }
   CYC(b_+14, b_+16);
   CYC(b_+16, b_+18); alu_add(gb, 0x72);
@@ -349,7 +349,7 @@ static void facing_bottom_abort(GB *gb) {
   BASE(checkFacingBottomOfTile);
   CYC(b_+21, b_+22); SET_AF(pop_effect(gb));
   CYC(b_+22, b_+23); alu_xor(gb, A);
-  CYC(b_+23, SYM(nextToPushableBlock)); ret_effect(gb);
+  CYC(b_+23, b_+24); ret_effect(gb);
 }
 
 void checkFacingBottomOfTile_hook(GB *gb) {
@@ -373,9 +373,9 @@ void checkFacingBottomOfTileAndPressedA_hook(GB *gb) {
   CYC(b_+0, b_+3); A = W8(wGameKeysJustPressed);
   CYC(b_+3, b_+5); alu_and(gb, 0x01);
   if (F & FZ) {
-    CYCT(b_+5, SYM(checkFacingBottomOfTile)); facing_bottom_abort(gb); return;
+    CYCT(b_+5, b_+7); facing_bottom_abort(gb); return;
   }
-  CYC(b_+5, SYM(checkFacingBottomOfTile));
+  CYC(b_+5, b_+7);
   checkFacingBottomOfTile_hook(gb);
 }
 
@@ -482,7 +482,7 @@ record_opened:
   CYC(b_+127, b_+130); W8(wChestContentsOverride) = A;
   CYC(b_+130, b_+133); mem_wr(gb, wChestContentsOverride + 1, A);
   CYC(b_+133, b_+134); alu_scf(gb);
-  CYC(b_+134, SYM(nextToSignTile)); ret_effect(gb);
+  CYC(b_+134, b_+135); ret_effect(gb);
 }
 
 void nextToSignTile_hook(GB *gb) {
@@ -509,7 +509,7 @@ void nextToSignTile_hook(GB *gb) {
     CYC(b_+26, b_+27); alu_or(gb, A);
     if (F & FZ) {
       CYCT(b_+27, b_+29);
-      CYC(b_+51, b_+54); SET_BC((SYM(resumeThreadInAFrames) + 1));
+      CYC(b_+51, b_+54); SET_BC(0x0901);
       goto show_text;
     }
     CYC(b_+27, b_+29);
@@ -540,7 +540,7 @@ void nextToSignTile_hook(GB *gb) {
 show_text:
   CALL_C(b_+54, showText_hook, SYM(showText), b_+57);
   CYC(b_+57, b_+58); alu_scf(gb);
-  CYC(b_+58, SYM(checkFacingBottomOfTileAndPressedA)); ret_effect(gb);
+  CYC(b_+58, b_+59); ret_effect(gb);
 }
 
 void nextToPushableBlock_hook(GB *gb) {
@@ -654,7 +654,7 @@ somaria_block:
   CYC(b_+123, b_+126); A = W8(wLinkPushingDirection);
   CYC(b_+126, b_+128); L = 0x08;
   CYC(b_+128, b_+129); mem_wr(gb, HL, A);
-  CYC(b_+129, SYM(nextToKeyBlock));
+  CYC(b_+129, b_+131);
 
 end:
   CYC(b_+108, b_+109); alu_xor(gb, A);
@@ -699,7 +699,7 @@ void nextToKeyBlock_hook(GB *gb) {
 
 finish:
   CYC(b_+50, b_+51); alu_xor(gb, A);
-  CYC(b_+51, SYM(nextToKeyDoor)); resetPushingAgainstTileCounter_hook(gb);
+  CYC(b_+51, b_+53); resetPushingAgainstTileCounter_hook(gb);
 }
 
 void nextToKeyDoor_hook(GB *gb) {
@@ -767,7 +767,7 @@ no_key:
   }
   CYC(b_+63, b_+66);
   CYC(b_+66, b_+67); alu_xor(gb, A);
-  CYC(b_+67, SYM(resetPushingAgainstTileCounter)); showInfoTextForTile_hook(gb);
+  CYC(b_+67, b_+70); showInfoTextForTile_hook(gb);
 }
 
 void nextToOverworldKeyhole_hook(GB *gb) {

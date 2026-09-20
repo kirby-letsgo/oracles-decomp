@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(parentItemCode_sword), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(parentItemCode_sword), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t sword_parent_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -64,7 +64,7 @@ escape:
 
 static void sword_parent_create_beam(GB *gb, uint16_t sp0_) {
   BASE(parentItemCode_sword);
-  CYC(b_+468, b_+471); SET_BC((SYM(convertAngleToDirection) + 7));
+  CYC(b_+468, b_+471); SET_BC(0x2700);
   CYC(b_+471, b_+473); E = 0x01;
   CALL_C(b_+473, getFreeItemSlotWithObjectCap_hook, SYM(getFreeItemSlotWithObjectCap), b_+476);
   if (F & FC) { CYCT(b_+476, b_+477); ret_effect(gb); return; }
@@ -82,7 +82,7 @@ static void sword_parent_create_beam(GB *gb, uint16_t sp0_) {
   CALL_C(b_+491, copyMemoryReverse_hook, SYM(copyMemoryReverse), b_+494);
   CYC(b_+494, b_+495); SET_DE(pop_effect(gb));
   CYC(b_+495, b_+496); F = (F & FZ) | FC;
-  CYC(b_+496, SYM(parentItemCode_flute)); ret_effect(gb);
+  CYC(b_+496, b_+497); ret_effect(gb);
 }
 
 void parentItemCode_sword_hook(GB *gb) {

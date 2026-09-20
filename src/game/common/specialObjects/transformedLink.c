@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(specialObjectCode_transformedLink), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(specialObjectCode_transformedLink), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t transformed_link_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -300,7 +300,7 @@ animate:
   CYC(b_+295, b_+297); mem_wr(gb, HL, 0x0f);
   CYC(b_+297, b_+298); L = alu_inc8(gb, L);
   CYC(b_+298, b_+299); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+299, b_+302); SET_BC((SYM(initializeVramMap1) + 19));
+  CYC(b_+299, b_+302); SET_BC(0x0500);
   CALL_C(b_+302, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+305);
 
 set_animation:
@@ -323,5 +323,5 @@ animate_if_pegasus_seeds_active:
   }
   CYC(b_+319, b_+321);
   CYC(b_+321, b_+322); alu_xor(gb, A);
-  CYC(b_+322, SYM(specialObjectCode_linkRidingAnimal)); specialObjectSetAnimation_hook(gb);
+  CYC(b_+322, b_+325); specialObjectSetAnimation_hook(gb);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodeb6), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodeb6), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCodeb6_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -157,7 +157,7 @@ state1:
   // @pressedAButton
   CYC(b_+139, b_+140); alu_xor(gb, A);
   CYC(b_+140, b_+141); mem_wr(gb, DE, A);
-  CYC(b_+141, b_+144); SET_BC((SYM(updateSpecialObjectsAndInteractions) + 16)); // TX_3509
+  CYC(b_+141, b_+144); SET_BC(0x3509); // TX_3509
   CYC(b_+144, b_+147); A = mem_rd(gb, wNumGashaSeeds);
   CYC(b_+147, b_+148); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+148, b_+150); goto l_4490; } // jr z
@@ -240,7 +240,7 @@ l_4503:
   CALL_C(b_+270, interactionIncState_hook, SYM(interactionIncState), b_+273);
   CYC(b_+273, b_+275); L = INTERACTION_BASE + OBJ_VISIBLE;
   CYC(b_+275, b_+277); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
-  CYC(b_+277, b_+280); SET_BC((SYM(updateSpecialObjectsAndInteractions) + 8)); // TX_3501
+  CYC(b_+277, b_+280); SET_BC(0x3501); // TX_3501
   CYC(b_+280, b_+283); showText_hook(gb); return; // jp
 
 state5:
@@ -440,7 +440,7 @@ state6:
   CYC(b_+576, b_+577); E = alu_inc8(gb, E);
   CYC(b_+577, b_+578); A = H;
   CYC(b_+578, b_+579); mem_wr(gb, DE, A);
-  CYC(b_+579, b_+582); SET_BC((SYM(gfxRegisterStates) + 250));
+  CYC(b_+579, b_+582); SET_BC(0x0400);
   CYC(b_+582, b_+583); alu_add_hl(gb, BC);
   CYC(b_+583, b_+585); A = hram_rd(gb, R_SVBK);
   CYC(b_+585, b_+586); push_effect(gb, AF); // push af

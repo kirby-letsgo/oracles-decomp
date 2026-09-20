@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode4f), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode4f), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t ramrockSeedFormOrb_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -85,5 +85,5 @@ func_7aa9:
   CYC(b_+80, b_+81);
 
 delete:
-  CYC(b_+81, SYM(partCode54)); partDelete_hook(gb); return; // jp
+  CYC(b_+81, b_+84); partDelete_hook(gb); return; // jp
 }

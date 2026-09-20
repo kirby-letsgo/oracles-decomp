@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode2c), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode2c), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t veranCutsceneWallmaster_jumpTable(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -131,5 +131,5 @@ counterDone:
   CYC(b_+107, b_+108);
   CYC(b_+108, b_+110); A = 0x08;
   CYC(b_+110, b_+113); mem_wr(gb, wTmpcbb5, A);
-  CYC(b_+113, SYM(interactionCode2d)); interactionDelete_hook(gb);
+  CYC(b_+113, b_+116); interactionDelete_hook(gb);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode33), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode33), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void babyCucco_state_uninitialized_hook(GB *gb);
 void babyCucco_state_grabbed_hook(GB *gb);
@@ -55,7 +55,7 @@ void enemyCode33_hook(GB *gb) {
 void babyCucco_state_uninitialized_hook(GB *gb) {
   BASE(babyCucco_state_uninitialized);
   CYC(b_+0, b_+2); A = 0x0a; // SPEED_40
-  CYC(b_+2, SYM(babyCucco_state_grabbed)); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
+  CYC(b_+2, b_+5); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
 }
 
 void babyCucco_state_grabbed_hook(GB *gb) {
@@ -124,7 +124,7 @@ landed:
   CYC(b_+80, b_+82); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
   CYC(b_+82, b_+84); L = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+84, b_+86); mem_wr(gb, HL, 0xff);
-  CYC(b_+86, SYM(babyCucco_state_stub)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+86, b_+89); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 void babyCucco_state_stub_hook(GB *gb) {
@@ -161,7 +161,7 @@ moveCloserToLink:
 
 void babyCucco_animate_hook(GB *gb) {
   BASE(babyCucco_animate);
-  CYC(b_+0, SYM(babyCucco_state9)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // Hopping
@@ -195,5 +195,5 @@ L_4924:
   if (F & FZ) { RET_TAKEN(b_+14); return; } // ret z
   CYC(b_+14, b_+15);
   CYC(b_+15, b_+16); mem_wr(gb, HL, A);
-  CYC(b_+16, SYM(enemyCode34)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+16, b_+19); enemySetAnimation_hook(gb); return; // jp
 }

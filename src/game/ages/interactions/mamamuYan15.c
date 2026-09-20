@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(mamamuYanRandomizeDogLocation), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(mamamuYanRandomizeDogLocation), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/scripts/ages/scriptHelper.s (INTERAC_MAMAMU_YAN), bank 0x15.
 

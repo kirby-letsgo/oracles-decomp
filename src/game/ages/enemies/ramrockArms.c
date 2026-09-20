@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode05), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode05), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/ages/enemies/ramrockArms.s (ENEMY_RAMROCK_ARMS), bank $10.
 
@@ -235,7 +235,7 @@ afterDec:
   CYC(b_+41, b_+42); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+42, b_+44); A = 0x02;
   CYC(b_+44, b_+45); alu_add(gb, B);
-  CYC(b_+45, SYM(ramrockArm_subid0_substate1));
+  CYC(b_+45, b_+48);
   enemySetAnimation_hook(gb);
 }
 
@@ -251,7 +251,7 @@ void ramrockArm_subid0_substate1_hook(GB *gb) {
   CYC(b_+13, b_+14); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FZ)) { RET_TAKEN(b_+14); return; }
   CYC(b_+14, b_+15);
-  CYC(b_+15, SYM(ramrockArm_subid0_substate2));
+  CYC(b_+15, b_+17);
   ramrockArm_subid0_moveBackToRamrock_hook(gb);
 }
 
@@ -285,7 +285,7 @@ void ramrockArm_subid0_substate2_hook(GB *gb) {
   CYC(b_+44, b_+45); alu_add(gb, mem_rd(gb, HL));
   CALL_C(b_+45, enemySetAnimation_hook, SYM(enemySetAnimation), b_+48);
   CYC(b_+48, b_+50); A = 0xb1;
-  CYC(b_+50, SYM(ramrockArm_subid0_substate3));
+  CYC(b_+50, b_+53);
   playSound_b00_hook(gb);
 }
 
@@ -345,7 +345,7 @@ moveTowardLink:
   CYC(b_+47, b_+48);
   CYC(b_+48, b_+50); mem_wr(gb, HL, 0x06);
   CALL_C(b_+50, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+53);
-  CYC(b_+53, SYM(ramrockArm_subid0_moveBackToRamrock));
+  CYC(b_+53, b_+56);
   objectNudgeAngleTowards_hook(gb);
 }
 
@@ -356,7 +356,7 @@ void ramrockArm_subid0_moveBackToRamrock_hook(GB *gb) {
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);
   CYC(b_+5, b_+7); E = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+7, b_+9); A = 0x3c;
-  CYC(b_+9, SYM(ramrockArm_subid0_setAngleTowardRamrock)); mem_wr(gb, DE, A);
+  CYC(b_+9, b_+10); mem_wr(gb, DE, A);
   ramrockArm_subid0_setAngleTowardRamrock_hook(gb);
 }
 
@@ -389,7 +389,7 @@ void ramrockArm_subid0_substate4_hook(GB *gb) {
   CYC(b_+25, b_+27); E = ENEMY_BASE + OBJ_SUBID;
   CYC(b_+27, b_+28); A = mem_rd(gb, DE);
   CYC(b_+28, b_+30); alu_add(gb, 0x02);
-  CYC(b_+30, b_+0);
+  CYC(b_+30, (SYM(ramrockArm_subid0_setAngleTowardRamrock) + 10));
   enemySetAnimation_hook(gb);
 }
 
@@ -443,7 +443,7 @@ noDamage:
   CYC(b_+50, b_+51); alu_or(gb, A);
   if (F & FZ) { RET_TAKEN(b_+51); return; }
   CYC(b_+51, b_+52);
-  CYC(b_+52, SYM(ramrockArm_subid0_substate6));
+  CYC(b_+52, b_+54);
   ramrockArm_subid0_moveBackToRamrock_hook(gb);
 }
 
@@ -467,7 +467,7 @@ void ramrockArm_subid0_substate6_hook(GB *gb) {
   CYC(b_+21, b_+23); A = 0x02;
   CALL_C(b_+23, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+26);
   CYC(b_+26, b_+27); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+27, SYM(ramrockArm_subid2));
+  CYC(b_+27, b_+30);
   ramrockArm_deleteSelf_hook(gb);
 }
 
@@ -487,7 +487,7 @@ void ramrockArm_subid0_checkReachedRamrock_hook(GB *gb) {
   BASE(ramrockArm_subid0_checkReachedRamrock);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, ramrockArm_getRelativePosition_hook, SYM(ramrockArm_getRelativePosition), b_+3);
-  CYC(b_+3, SYM(ramrockArm_checkPositionAtRamrock)); E = 0x02;
+  CYC(b_+3, b_+5); E = 0x02;
   ramrockArm_checkPositionAtRamrock_hook(gb);
 }
 
@@ -504,7 +504,7 @@ void ramrockArm_checkPositionAtRamrock_hook(GB *gb) {
     return;
   }
   CYC(b_+6, b_+8);
-  CYC(b_+8, SYM(label_10_211)); alu_sub(gb, E);
+  CYC(b_+8, b_+9); alu_sub(gb, E);
   label_10_211_hook(gb);
 }
 
@@ -569,7 +569,7 @@ void ramrockArm_deleteSelf_hook(GB *gb) {
   BASE(ramrockArm_deleteSelf);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, decNumEnemies_hook, SYM(decNumEnemies), b_+3);
-  CYC(b_+3, SYM(ramrockArm_subid4));
+  CYC(b_+3, b_+6);
   enemyDelete_hook(gb);
 }
 
@@ -599,7 +599,7 @@ void ramrockArm_subid2_substate0_hook(GB *gb) {
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x07);
   CYC(b_+13, b_+15); A = 0x85;
   CALL_C(b_+15, playSound_b00_hook, SYM(playSound_b00), b_+18);
-  CYC(b_+18, SYM(ramrockArm_subid2_substate1));
+  CYC(b_+18, b_+21);
   ecom_incSubstate_b10_hook(gb);
 }
 
@@ -623,7 +623,7 @@ void ramrockArm_subid2_substate1_hook(GB *gb) {
   CYC(b_+12, b_+14);
   CYC(b_+14, b_+16); L = ENEMY_BASE + OBJ_VISIBLE;
   CYC(b_+16, b_+18); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
-  CYC(b_+18, SYM(ramrockArm_subid2_substate2));
+  CYC(b_+18, b_+21);
   ecom_incSubstate_b10_hook(gb);
 }
 
@@ -708,7 +708,7 @@ nextPuff:
   }
   CYC(b_+95, b_+97);
   CYC(b_+97, b_+99); A = 0x02;
-  CYC(b_+99, SYM(ramrockArm_deleteSelf)); mem_wr(gb, DE, A);
+  CYC(b_+99, b_+100); mem_wr(gb, DE, A);
   ramrockArm_deleteSelf_hook(gb);
 }
 
@@ -742,7 +742,7 @@ void ramrockArm_subid4_substate0_hook(GB *gb) {
   CYC(b_+19, b_+21); mem_wr(gb, HL, 0x28);
   CYC(b_+21, b_+23); L = ENEMY_BASE + OBJ_COUNTER2;
   CYC(b_+23, b_+25); mem_wr(gb, HL, 0x3e);
-  CYC(b_+25, SYM(ramrockArm_subid4_substate1));
+  CYC(b_+25, b_+28);
   ecom_incSubstate_b10_hook(gb);
 }
 
@@ -776,7 +776,7 @@ void ramrockArm_subid4_substate1_hook(GB *gb) {
   CALL_C(b_+26, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+29);
   CYC(b_+29, b_+31); mem_wr(gb, HL, 0x0c);
   CYC(b_+31, b_+33); A = 0x84;
-  CYC(b_+33, SYM(ramrockArm_subid4_substate2));
+  CYC(b_+33, b_+36);
   loadPaletteHeader_hook(gb);
 }
 
@@ -813,7 +813,7 @@ void ramrockArm_subid4_collisionOccurred_hook(GB *gb) {
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x0d);
   CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_VAR36;
   CYC(b_+9, b_+11); mem_wr(gb, HL, 0x10);
-  CYC(b_+11, SYM(ramrockArm_subid4_substate3));
+  CYC(b_+11, b_+14);
   ecom_incSubstate_b10_hook(gb);
 }
 
@@ -873,7 +873,7 @@ void ramrockArm_subid4_substate2_hook(GB *gb) {
     return;
   }
   CYC(b_+37, b_+39);
-  CYC(b_+39, SYM(ramrockArm_subid4_updateXPosition));
+  CYC(b_+39, b_+45);
   ramrockArm_subid4_updateXPosition_hook(gb);
 }
 
@@ -924,7 +924,7 @@ checkSubid:
   CYC(b_+40, b_+42); E = ENEMY_BASE + OBJ_SUBSTATE;
   CYC(b_+42, b_+44); A = 0x02;
   CYC(b_+44, b_+45); mem_wr(gb, DE, A);
-  CYC(b_+45, SYM(ramrockArm_subid4_updateXPosition));
+  CYC(b_+45, (SYM(ramrockArm_subid4_substate2__updateXPosition) + 11));
   ramrockArm_subid4_updateXPosition_hook(gb);
 }
 

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode16), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode16), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void braceletCheckBreakable_hook(GB *gb);
 void braceletCheckDeleteSelfWhileThrowing_hook(GB *gb);
@@ -179,7 +179,7 @@ destroy:
   CYC(b_+156, b_+159); SET_HL((SYM(applyDamageToLink) + 41));
   CYC(b_+159, b_+161); E = 0x06;
   CALL_C(b_+161, interBankCall_hook, 0x008a, b_+164);
-  CYC(b_+164, SYM(braceletCheckBreakable));
+  CYC(b_+164, b_+167);
   itemDelete_hook(gb);
 }
 
@@ -191,7 +191,7 @@ void braceletCheckBreakable_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
   CYC(b_+4, b_+5);
   CYC(b_+5, b_+6); alu_scf(gb);
-  CYC(b_+6, SYM(braceletCheckDeleteSelfWhileThrowing)); ret_effect(gb);
+  CYC(b_+6, b_+7); ret_effect(gb);
 }
 
 void braceletCheckDeleteSelfWhileThrowing_hook(GB *gb) {
@@ -243,5 +243,5 @@ throwing_tile:
   CYC(b_+34, b_+36);
   CYC(b_+36, b_+37); H = D;
   CYC(b_+37, b_+39); L = 0x05;
-  CYC(b_+39, SYM(bombUpdateThrowingLaterally)); ret_effect(gb);
+  CYC(b_+39, b_+40); ret_effect(gb);
 }

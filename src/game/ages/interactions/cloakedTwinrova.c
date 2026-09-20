@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode8d), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode8d), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCode8d_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -145,7 +145,7 @@ subid1Substate1:
   CYC(b_+150, b_+151);
   CYC(b_+151, b_+153); mem_wr(gb, HL, 20);
   CALL_C(b_+153, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+156);
-  CYC(b_+156, b_+159); SET_BC((SYM(objectCreateFloatingMusicNote) + 10)); // TX_2808
+  CYC(b_+156, b_+159); SET_BC(0x2808); // TX_2808
   CYC(b_+159, b_+162); showText_hook(gb); return; // jp
 
 subid1Substate2:

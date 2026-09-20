@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(func_53f5), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(func_53f5), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t moblinBoomerang_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -165,5 +165,5 @@ func_53ee:
   CYC(b_+89, b_+91); E = 0xc4; // Part.state
   CYC(b_+91, b_+93); A = 0x02;
   CYC(b_+93, b_+94); mem_wr(gb, DE, A);
-  CYC(b_+94, SYM(func_53f5)); goto animate; // jr
+  CYC(b_+94, b_+96); goto animate; // jr
 }

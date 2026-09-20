@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode53), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode53), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static void mamamuYan_add_double_index(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);

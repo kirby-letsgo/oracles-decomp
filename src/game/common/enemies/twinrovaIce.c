@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode5d), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode5d), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void twinrovaIce_bounceOffShield_hook(GB *gb);
 
@@ -119,7 +119,7 @@ state2:
 
 delete:
   CALL_C(b_+93, objectCreatePuff_hook, SYM(objectCreatePuff), b_+96);
-  CYC(b_+96, SYM(twinrovaIce_bounceOffShield)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+96, b_+99); enemyDelete_hook(gb); return; // jp
 }
 
 // 0e:6972, bare global; called from enemyCode5d. This doesn't appear to do anything other

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(faroreCheckSecretValidity), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(faroreCheckSecretValidity), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void faroreCheckSecretValidity_hook(GB *gb);
 void faroreShowTextForSecretHint_hook(GB *gb);
@@ -97,7 +97,7 @@ jump3:
   }
   CYC(b_+58, b_+60);
   CYC(b_+60, b_+62); A = 0x05;
-  CYC(b_+62, SYM(faroreShowTextForSecretHint));
+  CYC(b_+62, b_+64);
   farore_setVar3f(gb, sp0_);
 }
 
@@ -108,7 +108,7 @@ void faroreShowTextForSecretHint_hook(GB *gb) {
   CYC(b_+5, b_+7); alu_add(gb, 0x0f);
   CYC(b_+7, b_+8); C = A;
   CYC(b_+8, b_+10); B = 0x55;
-  CYC(b_+10, SYM(faroreSpawnSecretChest)); showText_hook(gb);
+  CYC(b_+10, b_+13); showText_hook(gb);
 }
 
 void faroreSpawnSecretChest_hook(GB *gb) {
@@ -126,12 +126,12 @@ void faroreSpawnSecretChest_hook(GB *gb) {
   CYC(b_+12, b_+13); mem_wr(gb, HL, A);
   CYC(b_+13, b_+15); L = 0x4b;
   CYC(b_+15, b_+17); C = 0x75;
-  CYC(b_+17, SYM(faroreGenerateGameTransferSecret)); setShortPosition_paramC_hook(gb);
+  CYC(b_+17, b_+20); setShortPosition_paramC_hook(gb);
 }
 
 void faroreGenerateGameTransferSecret_hook(GB *gb) {
   BASE(faroreGenerateGameTransferSecret);
   CYC(b_+0, b_+3); SET_HL((SYM(group2ObjectDataTable) + 224));
   CYC(b_+3, b_+5); E = 0x03;
-  CYC(b_+5, SYM(doorController_updateLinkRespawn)); interBankCall_hook(gb);
+  CYC(b_+5, b_+8); interBankCall_hook(gb);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode49), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode49), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t forest_fairy_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -103,7 +103,7 @@ void forestFairy_subid00State0_hook(GB *gb) {
   CYC(b_+6, b_+8); L = 0x50;
   CYC(b_+8, b_+10); mem_wr(gb, HL, 0x50);
   CYC(b_+10, b_+12); L = 0x7a;
-  CYC(b_+12, SYM(forestFairy_loadMovementPreset)); mem_wr(gb, HL, 0x5a);
+  CYC(b_+12, b_+14); mem_wr(gb, HL, 0x5a);
   forestFairy_loadMovementPreset_hook(gb);
 }
 
@@ -240,7 +240,7 @@ void forestFairy_updateMovement_hook(GB *gb) {
   CYC(b_+6, b_+8); alu_and(gb, 0x1f);
   CYC(b_+8, b_+10); A = 0x83;
   if (F & FZ) CALL_C_CC(b_+10, playSound_b00_hook, SYM(playSound_b00), SYM(forestFairy_animate));
-  else CYC(b_+10, SYM(forestFairy_animate));
+  else CYC(b_+10, b_+13);
   forestFairy_animate_hook(gb);
 }
 
@@ -249,7 +249,7 @@ void forestFairy_animate_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionAnimate_hook, SYM(interactionAnimate), b_+3);
   CYC(b_+3, b_+4); alu_or(gb, D);
-  CYC(b_+4, SYM(forestFairy_subid00State2)); ret_effect(gb);
+  CYC(b_+4, b_+5); ret_effect(gb);
 }
 
 void forestFairy_subid00State2_hook(GB *gb) {
@@ -271,7 +271,7 @@ void forestFairy_subid00State2_hook(GB *gb) {
   return;
 delete:
   CALL_C(b_+22, objectCreatePuff_hook, SYM(objectCreatePuff), b_+25);
-  CYC(b_+25, SYM(forestFairy_subid00State3)); interactionDelete_hook(gb);
+  CYC(b_+25, b_+27); interactionDelete_hook(gb);
 }
 
 void forestFairy_subid00State3_hook(GB *gb) {
@@ -292,14 +292,14 @@ void forestFairy_subid00State3_hook(GB *gb) {
   CYC(b_+17, b_+18);
 done:
   CYC(b_+18, b_+21); SET_HL(wTmpcfc0_fairyHideAndSeek_cfd2);
-  CYC(b_+21, SYM(forestFairy_deleteSelf)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(SYM(forestFairy_deleteSelf), SYM(forestFairy_subid01)); interactionDelete_hook(gb);
+  CYC(b_+21, b_+22); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(SYM(forestFairy_deleteSelf), (SYM(forestFairy_deleteSelf) + 3)); interactionDelete_hook(gb);
 }
 
 void forestFairy_deleteSelf_hook(GB *gb) {
   BASE(forestFairy_deleteSelf);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, SYM(forestFairy_subid01)); interactionDelete_hook(gb);
+  CYC(b_+0, b_+3); interactionDelete_hook(gb);
 }
 
 void forestFairy_initCollisionRadiusAndSetZAndIncState_hook(GB *gb) {
@@ -312,13 +312,13 @@ void forestFairy_initCollisionRadiusAndSetZAndIncState_hook(GB *gb) {
   CYC(b_+8, b_+9); mem_wr(gb, HL, A);
   CYC(b_+9, b_+11); L = 0x4f;
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0xfc);
-  CYC(b_+13, SYM(forestFairyDiscoveredScriptTable)); objectSetVisiblec1_hook(gb);
+  CYC(b_+13, b_+16); objectSetVisiblec1_hook(gb);
 }
 
 void forestFairy_subid02_hook(GB *gb) {
   BASE(forestFairy_subid02);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, SYM(forestFairy_subid03)); interactionDelete_hook(gb);
+  CYC(b_+0, b_+3); interactionDelete_hook(gb);
 }
 
 void forestFairy_subid03_hook(GB *gb) {
@@ -362,7 +362,7 @@ void forestFairy_subid03State1_hook(GB *gb) {
   CYC(b_+12, b_+13); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+13, b_+15); L = 0x7b;
   CYC(b_+15, b_+17); mem_wr(gb, HL, 0x20);
-  CYC(b_+17, SYM(forestFairy_subid03State2)); ret_effect(gb);
+  CYC(b_+17, b_+18); ret_effect(gb);
 }
 
 void forestFairy_subid03State2_hook(GB *gb) {
@@ -403,7 +403,7 @@ void forestFairy_subid03State2_hook(GB *gb) {
     }
     CYCT(b_+34, b_+36);
   } else CYCT(b_+20, b_+22);
-  CYC(b_+43, SYM(forestFairy_subid03State3)); forestFairy_updateMovement_hook(gb);
+  CYC(b_+43, b_+46); forestFairy_updateMovement_hook(gb);
 }
 
 void forestFairy_subid03State3_hook(GB *gb) {
@@ -429,7 +429,7 @@ void forestFairy_subid03State3_hook(GB *gb) {
   CYC(b_+27, b_+28); mem_wr(gb, HL, B);
   CYC(b_+28, b_+30); L = 0x4d;
   CYC(b_+30, b_+31); mem_wr(gb, HL, C);
-  CYC(b_+31, SYM(forestFairy_subid04State1)); ret_effect(gb);
+  CYC(b_+31, b_+32); ret_effect(gb);
 }
 
 void forestFairy_subid04State1_hook(GB *gb) {
@@ -440,7 +440,7 @@ void forestFairy_subid04State1_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+4, b_+7); forestFairy_animate_hook(gb); return; }
   CYC(b_+4, b_+7);
   CALL_C(b_+7, interactionIncState_hook, SYM(interactionIncState), b_+10);
-  CYC(b_+10, SYM(forestFairy_subid05)); forestFairy_loadMovementPreset_hook(gb);
+  CYC(b_+10, b_+13); forestFairy_loadMovementPreset_hook(gb);
 }
 
 void forestFairy_subid01_hook(GB *gb) {
@@ -528,7 +528,7 @@ void forestFairy_initNpcFromData_hook(GB *gb) {
   CYC(b_+37, b_+39); mem_wr(gb, HL, 0x11);
   CYC(b_+39, b_+42); SET_HL((SYM(ambi_runSubid05) + 11));
   CALL_C(b_+42, interactionSetScript_hook, SYM(interactionSetScript), b_+45);
-  CYC(b_+45, SYM(forestFairy_subid5To7NpcData)); objectSetVisiblec1_hook(gb);
+  CYC(b_+45, b_+48); objectSetVisiblec1_hook(gb);
 }
 
 void forestFairy_standardUpdate_hook(GB *gb) {
@@ -536,7 +536,7 @@ void forestFairy_standardUpdate_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
   CALL_C(b_+3, interactionAnimate_hook, SYM(interactionAnimate), b_+6);
-  CYC(b_+6, SYM(forestFairy_subid08)); objectPreventLinkFromPassing_hook(gb);
+  CYC(b_+6, b_+9); objectPreventLinkFromPassing_hook(gb);
 }
 
 void forestFairy_subid05_hook(GB *gb) {
@@ -561,7 +561,7 @@ void forestFairy_subid05_hook(GB *gb) {
   CYC(b_+31, b_+32); A = mem_rd(gb, DE);
   CYC(b_+32, b_+34); alu_sub(gb, 5);
   CYC(b_+34, b_+37); SET_HL(SYM(forestFairy_subid5To7NpcData));
-  CYC(b_+37, SYM(forestFairy_initNpcFromData)); forest_fairy_add_double_index(gb, SYM(forestFairy_initNpcFromData));
+  CYC(b_+37, b_+38); forest_fairy_add_double_index(gb, SYM(forestFairy_initNpcFromData));
   forestFairy_initNpcFromData_hook(gb);
 }
 
@@ -616,7 +616,7 @@ void forestFairy_subid0b_hook(GB *gb) {
   CYC(b_+31, b_+32); mem_wr(gb, HL, A);
   CYC(b_+32, b_+35); SET_HL((SYM(ambi_runSubid05__data) + 4));
   CALL_C(b_+35, interactionSetScript_hook, SYM(interactionSetScript), b_+38);
-  CYC(b_+38, SYM(forestFairy_subid0c)); objectSetVisiblec1_hook(gb);
+  CYC(b_+38, b_+41); objectSetVisiblec1_hook(gb);
 }
 
 void forestFairy_subid0c_hook(GB *gb) {

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(zelda_loadScript), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(zelda_loadScript), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCodead_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -82,7 +82,7 @@ runSubid4:
 
 faceLinkAndRunScript:
   CALL_C(b_+51, interactionRunScript_hook, SYM(interactionRunScript), b_+54);
-  CYC(b_+54, SYM(zelda_loadScript)); npcFaceLinkAndAnimate_hook(gb); return; // jp
+  CYC(b_+54, b_+57); npcFaceLinkAndAnimate_hook(gb); return; // jp
 }
 
 // 0b:62b1, called from interactionCodead@state0 (top-level jump table).

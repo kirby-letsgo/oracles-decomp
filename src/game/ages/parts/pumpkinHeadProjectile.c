@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode42), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode42), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t pumpkinHeadProjectile_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -135,5 +135,5 @@ state2:
   CALL_C(b_+130, partCommon_checkTileCollisionOrOutOfBounds_hook, SYM(partCommon_checkTileCollisionOrOutOfBounds), b_+133);
   if (!(F & FC)) { RET_TAKEN(b_+133); return; } // ret nc
   CYC(b_+133, b_+134);
-  CYC(b_+134, SYM(partCode43)); partDelete_hook(gb); return; // jp
+  CYC(b_+134, b_+137); partDelete_hook(gb); return; // jp
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode8e), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode8e), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // INTERAC_OCTOGON_SPLASH
 void interactionCode8e_hook(GB *gb) {
@@ -32,5 +32,5 @@ state0:
   CYC(b_+25, b_+26); alu_rrca(gb);
   CYC(b_+26, b_+27); alu_rrca(gb);
   CALL_C(b_+27, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+30);
-  CYC(b_+30, SYM(interactionCode8f)); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+30, b_+33); objectSetVisible81_hook(gb); return; // jp
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(zora_subid10), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(zora_subid10), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define zoraAnimationTable SYM(zora_subid0B__animationTable)
 #define zoraScriptTable SYM(zora_subid12__scriptTable)
@@ -69,7 +69,7 @@ void zora_commonInit__afterCall60d7_hook(GB *gb) {
   CALL_C(b_+6, interactionIncState_hook, SYM(interactionIncState), b_+9);
   CYC(b_+9, b_+11); L = INTERACTION_BASE + OBJ_TEXT_ID + 1;
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x34);
-  CYC(b_+13, SYM(zora_subid0C)); objectSetVisiblec2_hook(gb);
+  CYC(b_+13, b_+16); objectSetVisiblec2_hook(gb);
 }
 
 void zora_commonInit_hook(GB *gb) {
@@ -111,7 +111,7 @@ void zora_getWorldState_hook(GB *gb) {
   }
   CYC(b_+23, b_+24);
   CYC(b_+24, b_+25); B = alu_inc8(gb, B);
-  CYC(b_+25, SYM(zora_textIndices)); ret_effect(gb);
+  CYC(b_+25, b_+26); ret_effect(gb);
 }
 
 void zora_subid0B__afterCall611f_hook(GB *gb) {
@@ -212,7 +212,7 @@ update_speed_z:
   CYC(b_+112, b_+114); A = 0x80;
   CYC(b_+114, b_+115); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+115, b_+117); mem_wr(gb, HL, 0xfe);
-  CYC(b_+117, SYM(zora_subid10)); ret_effect(gb);
+  CYC(b_+117, b_+118); ret_effect(gb);
 }
 
 void zora_subid0D_hook(GB *gb) {
@@ -255,7 +255,7 @@ state0:
   }
   CYC(b_+37, b_+39);
   CYC(b_+39, b_+42); SET_HL(SYM(interactiond7_essence__playCirclingSound));
-  CYC(b_+42, SYM(zora_subid0A)); zora_commonInitWithScript_hook(gb);
+  CYC(b_+42, b_+44); zora_commonInitWithScript_hook(gb);
 }
 
 void zora_subid12__afterCall6193_hook(GB *gb) {
@@ -358,7 +358,7 @@ state2:
     CYCT(b_+108, b_+111); interactionDelete_hook(gb); return;
   }
   CYC(b_+108, b_+111);
-  CYC(b_+111, SYM(zora_subid0E)); interactionAnimate_hook(gb);
+  CYC(b_+111, b_+114); interactionAnimate_hook(gb);
 }
 
 void zora_subid0E__afterCall6206_hook(GB *gb) {
@@ -383,7 +383,7 @@ set_text_id:
   CALL_C(b_+36, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+39);
   CALL_C(b_+39, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+42);
   CYC(b_+42, b_+45); SET_HL((SYM(interactiond7_updateSmallSparkles) + 18));
-  CYC(b_+45, SYM(zora_subid13)); interactionSetScript_hook(gb);
+  CYC(b_+45, b_+48); interactionSetScript_hook(gb);
 }
 
 void zora_subid0E_hook(GB *gb) {
@@ -492,7 +492,7 @@ state0:
   CYC(b_+40, b_+43);
 
 initialize:
-  CYC(b_+43, SYM(zora_commonInitWithScript)); SET_HL((SYM(interactionCodeb6__state6) + 40));
+  CYC(b_+43, b_+46); SET_HL((SYM(interactionCodeb6__state6) + 40));
   zora_commonInitWithScript_hook(gb);
 }
 

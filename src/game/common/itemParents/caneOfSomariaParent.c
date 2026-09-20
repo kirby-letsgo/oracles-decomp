@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(parentItemCode_caneOfSomaria), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(parentItemCode_caneOfSomaria), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void parentItemCode_caneOfSomaria_hook(GB *gb) {
   BASE(parentItemCode_caneOfSomaria);
@@ -16,5 +16,5 @@ void parentItemCode_caneOfSomaria_hook(GB *gb) {
   if(HL==b_+8){CALL_C(b_+8,updateLinkDirectionFromAngle_hook,SYM(updateLinkDirectionFromAngle),b_+11);CALL_C(b_+11,parentItemLoadAnimationAndIncState_hook,SYM(parentItemLoadAnimationAndIncState),b_+14);CYC(b_+14,b_+17);itemCreateChild_hook(gb);return;}
   if(HL!=b_+17){hook_continue(gb,HL,sp0_);return;}
   CYC(b_+17,b_+19);E=0x21;CYC(b_+19,b_+20);A=mem_rd(gb,DE);CYC(b_+20,b_+21);alu_rlca(gb);
-  if(!(F&FC)){CYCT(b_+21,b_+24);specialObjectAnimate_optimized_hook(gb);}else{CYC(b_+21,b_+24);CYC(b_+24,SYM(parentItemCode_sword));clearParentItem_hook(gb);}
+  if(!(F&FC)){CYCT(b_+21,b_+24);specialObjectAnimate_optimized_hook(gb);}else{CYC(b_+21,b_+24);CYC(b_+24,b_+27);clearParentItem_hook(gb);}
 }

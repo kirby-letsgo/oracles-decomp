@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodeb5), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodeb5), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t final_dungeon_energy_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -92,7 +92,7 @@ void interactionCodeb5__substate2_hook(GB *gb) {
   CYC(b_+111, b_+114); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+114, b_+117); mem_wr(gb, wMenuDisabled, A);
   CYC(b_+117, b_+120); mem_wr(gb, wMenuUnionEnd, A);
-  CYC(b_+120, SYM(interactionCodeb8)); interactionDelete_hook(gb); return;
+  CYC(b_+120, b_+123); interactionDelete_hook(gb); return;
 }
 
 void interactionCodeb5__state1_hook(GB *gb) {

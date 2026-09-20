@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode57), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode57), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t veranAcidPool_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -165,5 +165,5 @@ state6:
   CYC(b_+170, b_+173); push_effect(gb, b_+173); goto func_7db7; // call $7db7 (own burn; local, inlined)
 
 state6_afterFunc7db7:
-  CYC(b_+173, SYM(partCode58)); partDelete_hook(gb); return; // jp
+  CYC(b_+173, b_+176); partDelete_hook(gb); return; // jp
 }

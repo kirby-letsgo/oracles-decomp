@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(checkReloadShopItemTiles), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(checkReloadShopItemTiles), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t shopkeeper_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -50,7 +50,7 @@ void checkReloadShopItemTiles_hook(GB *gb) {
   CYC(b_+15, b_+17); A = 0x11;
   CALL_C(b_+17, loadUncompressedGfxHeader_hook, SYM(loadUncompressedGfxHeader), b_+20);
   CYC(b_+20, b_+21); SET_DE(pop_effect(gb));
-  CYC(b_+21, SYM(interactionCode46)); ret_effect(gb);
+  CYC(b_+21, b_+22); ret_effect(gb);
 }
 
 void interactionCode46_hook(GB *gb) {
@@ -95,7 +95,7 @@ L_40e9:
   CYC(b_+27, b_+29); E = 0x44;
   CYC(b_+29, b_+31); A = 2;
   CYC(b_+31, b_+32); mem_wr(gb, DE, A);
-  CYC(b_+32, SYM(shopkeeperState2)); shopkeeperTurnToFaceLink_hook(gb);
+  CYC(b_+32, b_+35); shopkeeperTurnToFaceLink_hook(gb);
 }
 
 void shopkeeperState2_hook(GB *gb) {
@@ -130,7 +130,7 @@ L_4124:
   CYC(b_+49, b_+51); alu_cp(gb, 2);
   CYC(b_+51, b_+54); SET_HL((SYM(interactionCode50__state0__substate0) + 5));
   if (!(F & FZ)) { CYCT(b_+54, b_+56); shopkeeperLoadScript_hook(gb); return; } CYC(b_+54, b_+56);
-  CYC(b_+56, SYM(shopkeeperLoadScript)); SET_HL((SYM(interactionCode50__state0__substate0) + 8));
+  CYC(b_+56, b_+59); SET_HL((SYM(interactionCode50__state0__substate0) + 8));
   shopkeeperLoadScript_hook(gb);
 }
 
@@ -140,7 +140,7 @@ void shopkeeperLoadScript_hook(GB *gb) {
   CYC(b_+0, b_+2); E = 0x44;
   CYC(b_+2, b_+4); A = 4;
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);
-  CYC(b_+5, SYM(shopkeeperPromptChestGame)); interactionSetScript_hook(gb);
+  CYC(b_+5, b_+8); interactionSetScript_hook(gb);
 }
 
 void shopkeeperPromptChestGame_hook(GB *gb) {
@@ -149,7 +149,7 @@ void shopkeeperPromptChestGame_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0x0c;
   CALL_C(b_+2, shopkeeperGetItemPrice_hook, SYM(shopkeeperGetItemPrice), b_+5);
   CYC(b_+5, b_+8); SET_HL((SYM(interactionCode50__func_48d0) + 25));
-  CYC(b_+8, SYM(shopkeeperState3)); shopkeeperLoadScript_hook(gb);
+  CYC(b_+8, b_+10); shopkeeperLoadScript_hook(gb);
 }
 
 void shopkeeperState3_hook(GB *gb) {
@@ -207,7 +207,7 @@ void shopkeeperGotoState1_hook(GB *gb) {
   CYC(b_+0, b_+2); E = 0x44;
   CYC(b_+2, b_+4); A = 1;
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);
-  CYC(b_+5, b_+8); SET_BC((SYM(loadUncompressedGfxHeader) + 58));
+  CYC(b_+5, b_+8); SET_BC(0x0614);
   CALL_C(b_+8, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+11);
   CYC(b_+11, b_+13); E = 0x42;
   CYC(b_+13, b_+14); A = mem_rd(gb, DE);
@@ -218,7 +218,7 @@ void shopkeeperGotoState1_hook(GB *gb) {
 L_41a6:
   CALL_C(b_+21, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+24);
   CYC(b_+24, b_+26); E = 0x71;
-  CYC(b_+26, SYM(shopkeeperState5)); objectAddToAButtonSensitiveObjectList_hook(gb);
+  CYC(b_+26, b_+29); objectAddToAButtonSensitiveObjectList_hook(gb);
 }
 
 void shopkeeperState5_hook(GB *gb) {
@@ -320,7 +320,7 @@ L_4246:
   if (!(F & FC)) { CYCT(b_+155, b_+156); ret_effect(gb); return; } CYC(b_+155, b_+156);
   CYC(b_+156, b_+158); E = 0x45;
   CYC(b_+158, b_+159); alu_xor(gb, A);
-  CYC(b_+159, SYM(shopkeeperGetItemPrice)); mem_wr(gb, DE, A);
+  CYC(b_+159, b_+160); mem_wr(gb, DE, A);
   shopkeeperGetItemPrice_hook(gb);
 }
 
@@ -341,7 +341,7 @@ void shopkeeperGetItemPrice_hook(GB *gb) {
   CYC(b_+17, b_+18); mem_wr(gb, HL, C);
   CYC(b_+18, b_+19); L = alu_inc8(gb, L);
   CYC(b_+19, b_+20); mem_wr(gb, HL, B);
-  CYC(b_+20, SYM(shopkeeperCloseOpenedChest)); ret_effect(gb);
+  CYC(b_+20, b_+21); ret_effect(gb);
 }
 
 void shopkeeperCloseOpenedChest_hook(GB *gb) {
@@ -352,7 +352,7 @@ void shopkeeperCloseOpenedChest_hook(GB *gb) {
   CYC(b_+5, b_+6); C = A;
   CYC(b_+6, b_+8); A = 0xf1;
   if (F & FZ) { CYCT(b_+8, b_+11); setTile_hook(gb); return; } CYC(b_+8, b_+11);
-  CYC(b_+11, SYM(shopkeeperCheckLinkHasItemAlready)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 void shopkeeperCheckLinkHasItemAlready_hook(GB *gb) {
@@ -400,7 +400,7 @@ L_42a6:
   CALL_C(b_+55, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+58);
   CYC(b_+58, b_+60); E = 0x78;
   if (!(F & FC)) { CYCT(b_+60, b_+61); ret_effect(gb); return; } CYC(b_+60, b_+61);
-  CYC(b_+61, SYM(shopkeeperCheckAllItemsBought)); goto L_429c;
+  CYC(b_+61, b_+63); goto L_429c;
 }
 
 void shopkeeperCheckAllItemsBought_hook(GB *gb) {
@@ -422,7 +422,7 @@ L_42bb:
   if (F & FC) { CYCT(b_+17, b_+19); goto L_42b1; } CYC(b_+17, b_+19);
   CYC(b_+19, b_+22); SET_HL((SYM(interactionCode50__state0__substate0) + 11));
   CYC(b_+22, b_+23); alu_or(gb, D);
-  CYC(b_+23, SYM(shopkeeperTurnToFaceLink)); ret_effect(gb);
+  CYC(b_+23, b_+24); ret_effect(gb);
 }
 
 void shopkeeperTurnToFaceLink_hook(GB *gb) {
@@ -434,7 +434,7 @@ void shopkeeperTurnToFaceLink_hook(GB *gb) {
   CALL_C(b_+6, convertAngleDeToDirection_hook, SYM(convertAngleDeToDirection), b_+9);
   CYC(b_+9, b_+10); E = alu_dec8(gb, E);
   CYC(b_+10, b_+11); mem_wr(gb, DE, A);
-  CYC(b_+11, SYM(shopkeeperTheftPreventionScriptTable)); interactionSetAnimation_hook(gb);
+  CYC(b_+11, b_+14); interactionSetAnimation_hook(gb);
 }
 
 void shopkeeperState0_hook(GB *gb) {
@@ -452,7 +452,7 @@ void shopkeeperState0_hook(GB *gb) {
   CYC(b_+17, b_+19); E = 0x49;
   CYC(b_+19, b_+21); A = 4;
   CYC(b_+21, b_+22); mem_wr(gb, DE, A);
-  CYC(b_+22, b_+25); SET_BC((SYM(loadUncompressedGfxHeader) + 58));
+  CYC(b_+22, b_+25); SET_BC(0x0614);
   CALL_C(b_+25, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+28);
   CYC(b_+28, b_+30); L = 0x42;
   CYC(b_+30, b_+31); A = mem_rd(gb, HL);
@@ -472,7 +472,7 @@ L_405f:
   CYC(b_+55, b_+57); A = 0x0e;
   CALL_C(b_+57, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+60);
   CYC(b_+60, b_+62); E = 0x71;
-  CYC(b_+62, SYM(shopkeeperState1)); objectAddToAButtonSensitiveObjectList_hook(gb);
+  CYC(b_+62, b_+65); objectAddToAButtonSensitiveObjectList_hook(gb);
 }
 
 void shopkeeperState1_hook(GB *gb) {
@@ -513,7 +513,7 @@ L_4097:
   CYC(b_+53, b_+54); A = L;
   CYC(b_+54, b_+57); SET_HL(w1Link_yh);
   CYC(b_+57, b_+58); mem_wr(gb, HL, A);
-  CYC(b_+58, b_+61); SET_BC((SYM(loadUncompressedGfxHeader) + 44));
+  CYC(b_+58, b_+61); SET_BC(0x0606);
   CALL_C(b_+61, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+64);
   CYC(b_+64, b_+66); E = 0x42;
   CYC(b_+66, b_+67); A = mem_rd(gb, DE);
@@ -525,7 +525,7 @@ L_4097:
   CYC(b_+73, b_+74); L = A;
   CYC(b_+74, b_+77); shopkeeperLoadScript_hook(gb); return;
 L_40bf:
-  CYC(b_+77, b_+80); SET_BC((SYM(loadUncompressedGfxHeader) + 58));
+  CYC(b_+77, b_+80); SET_BC(0x0614);
   CYC(b_+80, b_+83); objectSetCollideRadii_hook(gb); return;
 L_40c5:
   CYC(b_+83, b_+84); alu_xor(gb, A);
@@ -537,5 +537,5 @@ L_40c5:
   CYC(b_+96, b_+98); E = 0x44;
   CYC(b_+98, b_+100); A = 2;
   CYC(b_+100, b_+101); mem_wr(gb, DE, A);
-  CYC(b_+101, SYM(shopkeeperState6)); ret_effect(gb);
+  CYC(b_+101, b_+102); ret_effect(gb);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(loadD6ChangingFloorPatternToBigBuffer), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(loadD6ChangingFloorPatternToBigBuffer), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define changingFloorData_bank16 SYM(loadD6ChangingFloorPatternToBigBuffer__changingFloorData)
 

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode2c), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode2c), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t enemyCode2c_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -81,7 +81,7 @@ void cheepCheep_state_uninitialized_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); A = 0x14; // SPEED_80
   CALL_C(b_+2, ecom_setSpeedAndState8_b0d_hook, SYM(ecom_setSpeedAndState8_b0d), b_+5);
-  CYC(b_+5, SYM(cheepCheep_state_stub)); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+5, b_+8); objectSetVisible82_hook(gb); return; // jp
 }
 
 void cheepCheep_state_stub_hook(GB *gb) {
@@ -137,7 +137,7 @@ applySpeed:
 
 void cheepCheep_animate_hook(GB *gb) {
   BASE(cheepCheep_animate);
-  CYC(b_+0, SYM(cheepCheep_stateA)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // Waiting for 60 frames, then reverse direction
@@ -159,7 +159,7 @@ void cheepCheep_stateA_hook(GB *gb) {
   CYC(b_+18, b_+19); A = mem_rd(gb, HL);
   CYC(b_+19, b_+21); alu_xor(gb, 0x01);
   CYC(b_+21, b_+22); mem_wr(gb, HL, A);
-  CYC(b_+22, SYM(cheepCheep_subid01)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+22, b_+25); enemySetAnimation_hook(gb); return; // jp
 }
 
 void cheepCheep_subid01_hook(GB *gb) {

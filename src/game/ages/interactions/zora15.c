@@ -3,27 +3,27 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(zora_createExclamationMark), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(zora_createExclamationMark), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void zora_createExclamationMark_hook(GB *gb) {
   BASE(zora_createExclamationMark);
   CYC(b_+0, b_+3); SET_BC(0xf200);
   CYC(b_+3, b_+5); A = 0x1e;
-  CYC(b_+5, SYM(zora_beginJump)); objectCreateExclamationMark_hook(gb);
+  CYC(b_+5, b_+8); objectCreateExclamationMark_hook(gb);
 }
 
 void zora_beginJump_hook(GB *gb) {
   BASE(zora_beginJump);
   CYC(b_+0, b_+3); SET_BC(0xff00);
-  CYC(b_+3, SYM(zora_makeLinkFaceDown)); objectSetSpeedZ_hook(gb);
+  CYC(b_+3, b_+6); objectSetSpeedZ_hook(gb);
 }
 
 void zora_makeLinkFaceDown_hook(GB *gb) {
   BASE(zora_makeLinkFaceDown);
   CYC(b_+0, b_+2); A = 0x02;
   CYC(b_+2, b_+5); mem_wr(gb, w1Link_direction, A);
-  CYC(b_+5, SYM(zora_moveToLinksXPosition)); clearAllParentItems_hook(gb);
+  CYC(b_+5, b_+8); clearAllParentItems_hook(gb);
 }
 
 void zora_moveToLinksXPosition_hook(GB *gb) {
@@ -35,7 +35,7 @@ void zora_moveToLinksXPosition_hook(GB *gb) {
   CYC(b_+7, b_+8); alu_sub(gb, B);
   CYC(b_+8, b_+10); E = 0x47;
   CYC(b_+10, b_+11); mem_wr(gb, DE, A);
-  CYC(b_+11, SYM(zora_waitForLinkToMoveDown)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 void zora_waitForLinkToMoveDown_hook(GB *gb) {
@@ -48,7 +48,7 @@ void zora_waitForLinkToMoveDown_hook(GB *gb) {
   CYC(b_+9, b_+10); A = alu_dec8(gb, A);
 store:
   CYC(b_+10, b_+13); mem_wr(gb, wTmpcfc0_bigBangGame_filler1, A);
-  CYC(b_+13, SYM(zora_checkIsLinkedGame)); ret_effect(gb);
+  CYC(b_+13, b_+14); ret_effect(gb);
 }
 
 void zora_checkIsLinkedGame_hook(GB *gb) {
@@ -61,7 +61,7 @@ void zora_checkIsLinkedGame_hook(GB *gb) {
   CYC(b_+7, b_+8); A = alu_dec8(gb, A);
 store:
   CYC(b_+8, b_+11); mem_wr(gb, wTmpcfc0_bigBangGame_filler1, A);
-  CYC(b_+11, SYM(zora_createExclamationMarkToTheRight)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 void zora_createExclamationMarkToTheRight_hook(GB *gb) {
@@ -71,31 +71,31 @@ void zora_createExclamationMarkToTheRight_hook(GB *gb) {
   CALL_C(b_+2, playSound_b00_hook, SYM(playSound_b00), b_+5);
   CYC(b_+5, b_+7); A = 0x2d;
   CYC(b_+7, b_+10); SET_BC(0xf808);
-  CYC(b_+10, SYM(zora_setLinkDirectionUp)); objectCreateExclamationMark_hook(gb);
+  CYC(b_+10, b_+13); objectCreateExclamationMark_hook(gb);
 }
 
 static void zora_setLinkDirection(GB *gb) {
   BASE(zora_setLinkDirectionLeft);
   CYC(b_+2, b_+5); mem_wr(gb, w1Link_direction, A);
-  CYC(b_+5, SYM(zelda_warpOutOfVireMinigame)); ret_effect(gb);
+  CYC(b_+5, b_+6); ret_effect(gb);
 }
 
 void zora_setLinkDirectionUp_hook(GB *gb) {
   BASE(zora_setLinkDirectionUp);
   CYC(b_+0, b_+2); A = 0x00;
-  CYC(b_+2, SYM(zora_setLinkDirectionRight)); zora_setLinkDirection(gb);
+  CYC(b_+2, b_+4); zora_setLinkDirection(gb);
 }
 
 void zora_setLinkDirectionRight_hook(GB *gb) {
   BASE(zora_setLinkDirectionRight);
   CYC(b_+0, b_+2); A = 0x01;
-  CYC(b_+2, SYM(zora_setLinkDirectionDown)); zora_setLinkDirection(gb);
+  CYC(b_+2, b_+4); zora_setLinkDirection(gb);
 }
 
 void zora_setLinkDirectionDown_hook(GB *gb) {
   BASE(zora_setLinkDirectionDown);
   CYC(b_+0, b_+2); A = 0x02;
-  CYC(b_+2, SYM(zora_setLinkDirectionLeft)); zora_setLinkDirection(gb);
+  CYC(b_+2, b_+4); zora_setLinkDirection(gb);
 }
 
 void zora_setLinkDirectionLeft_hook(GB *gb) {

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode61), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode61), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 #define LEVER_VAR30 OBJ_USE_TEXT_ID
 #define LEVER_VAR31 OBJ_PRESSED_A_BUTTON
 
@@ -129,7 +129,7 @@ static void lever_update_pull_offset(GB *gb, uint16_t sp0_) {
   CYC(b_+457, b_+458); L = A;
   CYC(b_+458, b_+459); A = mem_rd(gb, HL);
   CYC(b_+459, b_+460); mem_wr(gb, HL, B);
-  CYC(b_+460, SYM(interactionCode62)); ret_effect(gb);
+  CYC(b_+460, b_+461); ret_effect(gb);
 }
 
 static void lever_state1(GB *gb, uint16_t sp0_) {

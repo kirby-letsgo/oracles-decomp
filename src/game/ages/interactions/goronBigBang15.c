@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(goron_bigBang_initLinkPosition), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(goron_bigBang_initLinkPosition), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void writeFlagsTocddb_hook(GB *gb);
 
@@ -34,7 +34,7 @@ void goron_bigBang_initLinkPosition_hook(GB *gb) {
   BASE(goron_bigBang_initLinkPosition);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); A = 0x00;
-  CYC(b_+2, SYM(goron_setLinkPositionAndDirection)); SET_BC((SYM(group2ObjectDataTable) + 277));
+  CYC(b_+2, b_+5); SET_BC((SYM(group2ObjectDataTable) + 277));
   goron_setLinkPositionAndDirection_hook(gb);
 }
 
@@ -97,7 +97,7 @@ void goron_bigBang_hideSelf_hook(GB *gb) {
   CYC(b_+6, b_+8); L = 0x66;
   CYC(b_+8, b_+9); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+9, b_+10); mem_wr(gb, HL, A);
-  CYC(b_+10, SYM(goron_bigBang_unhideSelf)); objectSetInvisible_hook(gb);
+  CYC(b_+10, b_+13); objectSetInvisible_hook(gb);
 }
 
 void goron_bigBang_unhideSelf_hook(GB *gb) {
@@ -110,7 +110,7 @@ void goron_bigBang_unhideSelf_hook(GB *gb) {
   CYC(b_+7, b_+9); L = 0x66;
   CYC(b_+9, b_+10); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+10, b_+11); mem_wr(gb, HL, A);
-  CYC(b_+11, SYM(goron_bigBang_checkLinkHitByBomb)); objectSetVisible_hook(gb);
+  CYC(b_+11, b_+14); objectSetVisible_hook(gb);
 }
 
 void goron_bigBang_checkLinkHitByBomb_hook(GB *gb) {
@@ -121,7 +121,7 @@ void goron_bigBang_checkLinkHitByBomb_hook(GB *gb) {
   CALL_C(b_+4, writeFlagsTocddb_hook, SYM(writeFlagsTocddb), b_+7);
   CYC(b_+7, b_+8); alu_cpl(gb);
   CYC(b_+8, b_+11); mem_wr(gb, wcddb, A);
-  CYC(b_+11, SYM(goron_bigBang_createBombSpawner)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 void goron_bigBang_createBombSpawner_hook(GB *gb) {
@@ -133,7 +133,7 @@ void goron_bigBang_createBombSpawner_hook(GB *gb) {
   CYC(b_+4, b_+6); mem_wr(gb, HL, 0x49);
   CYC(b_+6, b_+7); L = alu_inc8(gb, L);
   CYC(b_+7, b_+9); mem_wr(gb, HL, 0xff);
-  CYC(b_+9, SYM(goron_createBombFlowerSprite)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 void goron_createBombFlowerSprite_hook(GB *gb) {
@@ -151,7 +151,7 @@ void goron_createBombFlowerSprite_hook(GB *gb) {
   CYC(b_+14, b_+16); mem_wr(gb, HL, 0x60);
   CYC(b_+16, b_+18); L = 0x4d;
   CYC(b_+18, b_+20); mem_wr(gb, HL, 0x38);
-  CYC(b_+20, SYM(goron_countdownToNextExplosionGroup)); ret_effect(gb);
+  CYC(b_+20, b_+21); ret_effect(gb);
 }
 
 void goron_createExplosionIndex_hook(GB *gb) {
@@ -186,20 +186,20 @@ void goron_countdownToNextExplosionGroup_hook(GB *gb) {
   CYC(b_+8, b_+9); A = alu_inc8(gb, A);
   CYC(b_+9, b_+11); alu_and(gb, 0x07);
   CYC(b_+11, b_+12); mem_wr(gb, HL, A);
-  CYC(b_+12, b_+14); hram_wr(gb, 0x8b, A);
+  CYC(b_+12, b_+14); mem_wr(gb, hFF8B, A);
   CYC(b_+14, b_+17); SET_BC(b_+53);
   CALL_C(b_+17, addAToBc_hook, 0x006d, b_+20);
   CYC(b_+20, b_+21); A = mem_rd(gb, BC);
   CYC(b_+21, b_+23); L = 0x7a;
   CYC(b_+23, b_+24); mem_wr(gb, HL, A);
-  CYC(b_+24, b_+26); A = hram_rd(gb, 0x8b);
+  CYC(b_+24, b_+26); A = mem_rd(gb, hFF8B);
   CYC(b_+26, b_+27); alu_add(gb, A);
   CYC(b_+27, b_+30); SET_BC(b_+61);
   CALL_C(b_+30, addDoubleIndexToBc_hook, 0x007e, b_+33);
   CYC(b_+33, b_+35); A = 0x04;
 
 next:
-  CYC(b_+35, b_+37); hram_wr(gb, 0x8d, A);
+  CYC(b_+35, b_+37); mem_wr(gb, hFF8D, A);
   CYC(b_+37, b_+38); A = mem_rd(gb, BC);
   CYC(b_+38, b_+40); alu_cp(gb, 0xff);
   if (F & FZ) { CYCT(b_+40, b_+41); ret_effect(gb); return; }
@@ -208,7 +208,7 @@ next:
   CALL_C(b_+42, goron_createExplosionIndex_hook, SYM(goron_createExplosionIndex), b_+45);
   CYC(b_+45, b_+46); SET_BC(pop_effect(gb));
   CYC(b_+46, b_+47); SET_BC(BC + 1);
-  CYC(b_+47, b_+49); A = hram_rd(gb, 0x8d);
+  CYC(b_+47, b_+49); A = mem_rd(gb, hFF8D);
   CYC(b_+49, b_+50); A = alu_dec8(gb, A);
   if (!(F & FZ)) { CYCT(b_+50, b_+52); goto next; }
   CYC(b_+50, b_+52);
@@ -222,7 +222,7 @@ void goron_bigBang_loadMinigameLayout1_topHalf_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(SYM(goron_bigBang_minigameLayout1_topHalf));
   CYC(b_+3, b_+5); C = 0x11;
-  CYC(b_+5, SYM(goron_bigBang_loadMinigameLayout1_bottomHalf)); goron_bigBang_loadRoomLayout_hook(gb);
+  CYC(b_+5, b_+7); goron_bigBang_loadRoomLayout_hook(gb);
 }
 
 void goron_bigBang_loadMinigameLayout1_bottomHalf_hook(GB *gb) {
@@ -230,7 +230,7 @@ void goron_bigBang_loadMinigameLayout1_bottomHalf_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(SYM(goron_bigBang_minigameLayout1_bottomHalf));
   CYC(b_+3, b_+5); C = 0x41;
-  CYC(b_+5, SYM(goron_bigBang_loadMinigameLayout2_topHalf)); goron_bigBang_loadRoomLayout_hook(gb);
+  CYC(b_+5, b_+7); goron_bigBang_loadRoomLayout_hook(gb);
 }
 
 void goron_bigBang_loadMinigameLayout2_topHalf_hook(GB *gb) {
@@ -238,7 +238,7 @@ void goron_bigBang_loadMinigameLayout2_topHalf_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(SYM(goron_bigBang_minigameLayout2_topHalf));
   CYC(b_+3, b_+5); C = 0x11;
-  CYC(b_+5, SYM(goron_bigBang_loadMinigameLayout2_bottomHalf)); goron_bigBang_loadRoomLayout_hook(gb);
+  CYC(b_+5, b_+7); goron_bigBang_loadRoomLayout_hook(gb);
 }
 
 void goron_bigBang_loadMinigameLayout2_bottomHalf_hook(GB *gb) {
@@ -246,7 +246,7 @@ void goron_bigBang_loadMinigameLayout2_bottomHalf_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(SYM(goron_bigBang_minigameLayout2_bottomHalf));
   CYC(b_+3, b_+5); C = 0x41;
-  CYC(b_+5, SYM(goron_bigBang_loadNormalRoomLayout_topHalf)); goron_bigBang_loadRoomLayout_hook(gb);
+  CYC(b_+5, b_+7); goron_bigBang_loadRoomLayout_hook(gb);
 }
 
 void goron_bigBang_loadNormalRoomLayout_topHalf_hook(GB *gb) {
@@ -254,14 +254,14 @@ void goron_bigBang_loadNormalRoomLayout_topHalf_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(SYM(goron_bigBang_normalRoomLayout));
   CYC(b_+3, b_+5); C = 0x11;
-  CYC(b_+5, SYM(goron_bigBang_loadNormalRoomLayout_bottomHalf)); goron_bigBang_loadRoomLayout_hook(gb);
+  CYC(b_+5, b_+7); goron_bigBang_loadRoomLayout_hook(gb);
 }
 
 void goron_bigBang_loadNormalRoomLayout_bottomHalf_hook(GB *gb) {
   BASE(goron_bigBang_loadNormalRoomLayout_bottomHalf);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(SYM(goron_bigBang_normalRoomLayout));
-  CYC(b_+3, SYM(goron_bigBang_loadRoomLayout)); C = 0x41;
+  CYC(b_+3, b_+5); C = 0x41;
   goron_bigBang_loadRoomLayout_hook(gb);
 }
 
@@ -271,28 +271,28 @@ void goron_bigBang_loadRoomLayout_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0x03;
 
 nextRow:
-  CYC(b_+2, b_+4); hram_wr(gb, 0x93, A);
+  CYC(b_+2, b_+4); mem_wr(gb, hFF93, A);
   CYC(b_+4, b_+6); A = 0x08;
 
 nextColumn:
-  CYC(b_+6, b_+8); hram_wr(gb, 0x92, A);
+  CYC(b_+6, b_+8); mem_wr(gb, hFF92, A);
   CYC(b_+8, b_+9); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+9, b_+10); push_effect(gb, HL);
   CALL_C(b_+10, setTile_hook, SYM(setTile), b_+13);
   CYC(b_+13, b_+14); SET_HL(pop_effect(gb));
   CYC(b_+14, b_+15); C = alu_inc8(gb, C);
-  CYC(b_+15, b_+17); A = hram_rd(gb, 0x92);
+  CYC(b_+15, b_+17); A = mem_rd(gb, hFF92);
   CYC(b_+17, b_+18); A = alu_dec8(gb, A);
   if (!(F & FZ)) { CYCT(b_+18, b_+20); goto nextColumn; }
   CYC(b_+18, b_+20);
   CYC(b_+20, b_+21); A = C;
   CYC(b_+21, b_+23); alu_add(gb, 0x08);
   CYC(b_+23, b_+24); C = A;
-  CYC(b_+24, b_+26); A = hram_rd(gb, 0x93);
+  CYC(b_+24, b_+26); A = mem_rd(gb, hFF93);
   CYC(b_+26, b_+27); A = alu_dec8(gb, A);
   if (!(F & FZ)) { CYCT(b_+27, b_+29); goto nextRow; }
   CYC(b_+27, b_+29);
-  CYC(b_+29, SYM(goron_bigBang_minigameLayout1_topHalf)); ret_effect(gb);
+  CYC(b_+29, b_+30); ret_effect(gb);
 }
 
 void goron_bigBang_blockOrRestoreExit_hook(GB *gb) {

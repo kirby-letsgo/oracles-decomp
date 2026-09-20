@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(func_5313), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(func_5313), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t dekuScrubProjectile_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -60,7 +60,7 @@ void func_52f4_hook(GB *gb) {
   CYC(b_+2, b_+4); A = 0x04;
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);
   CYC(b_+5, b_+6); alu_xor(gb, A);
-  CYC(b_+6, SYM(func_52fd)); partCommon_bounceWhenCollisionsEnabled_hook(gb); return; // jp
+  CYC(b_+6, b_+9); partCommon_bounceWhenCollisionsEnabled_hook(gb); return; // jp
 }
 
 void func_52fd_hook(GB *gb) {
@@ -175,5 +175,5 @@ state3:
   CYC(b_+83, b_+85); goto state2; // jr
 
 state5:
-  CYC(b_+85, SYM(func_52f4)); partDelete_hook(gb); return; // jp
+  CYC(b_+85, b_+88); partDelete_hook(gb); return; // jp
 }

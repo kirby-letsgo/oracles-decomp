@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(fake_drawRectangleToVramTiles), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(fake_drawRectangleToVramTiles), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void fake_copyRectangleFromVramTilesToAddress_hook(GB *gb);
 
@@ -56,7 +56,7 @@ static void fake_draw_rectangle_to_vram_tiles_rows(GB *gb, uint16_t sp0_) {
   }
   CYC(b_+33, b_+34); SET_AF(pop_effect(gb));
   CYC(b_+34, b_+36); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+36, SYM(fake_copyRectangleFromVramTilesToAddress_paramBc)); ret_effect(gb);
+  CYC(b_+36, b_+37); ret_effect(gb);
 }
 
 static void fake_copy_rectangle_from_vram_tiles_rows(GB *gb, uint16_t sp0_) {
@@ -98,7 +98,7 @@ static void fake_copy_rectangle_from_vram_tiles_rows(GB *gb, uint16_t sp0_) {
   }
   CYC(b_+45, b_+46); SET_AF(pop_effect(gb));
   CYC(b_+46, b_+48); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+48, SYM(fake_copyRectangleToRoomLayoutAndCollisions)); ret_effect(gb);
+  CYC(b_+48, b_+49); ret_effect(gb);
 }
 
 static void fake_copy_rectangle_to_room_layout_rows(GB *gb, uint16_t sp0_) {
@@ -133,7 +133,7 @@ static void fake_copy_rectangle_to_room_layout_rows(GB *gb, uint16_t sp0_) {
     CYC(b_+23, b_+25);
     break;
   }
-  CYC(b_+25, SYM(fake_roomTileChangesAfterLoad04)); ret_effect(gb);
+  CYC(b_+25, b_+26); ret_effect(gb);
 }
 
 void fake_readParametersForRectangleDrawing_hook(GB *gb) {
@@ -142,7 +142,7 @@ void fake_readParametersForRectangleDrawing_hook(GB *gb) {
   CYC(b_+1, b_+2); B = A;
   CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+3, b_+4); C = A;
-  CYC(b_+4, SYM(fake_drawRectangleToVramTiles_withParameters)); ret_effect(gb);
+  CYC(b_+4, b_+5); ret_effect(gb);
 }
 
 void fake_drawRectangleToVramTiles_withParameters_hook(GB *gb) {
@@ -152,7 +152,7 @@ void fake_drawRectangleToVramTiles_withParameters_hook(GB *gb) {
   CYC(b_+2, b_+3); push_effect(gb, AF);
   CYC(b_+3, b_+5); A = 0x03;
   CYC(b_+5, b_+7); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+7, SYM(fake_drawRectangleToVramTiles));
+  CYC(b_+7, b_+9);
   fake_draw_rectangle_to_vram_tiles_rows(gb, sp0_);
 }
 
@@ -175,7 +175,7 @@ void fake_drawRectangleToVramTiles__nextRow_hook(GB *gb) {
 void fake_copyRectangleFromVramTilesToAddress_paramBc_hook(GB *gb) {
   BASE(fake_copyRectangleFromVramTilesToAddress_paramBc);
   CYC(b_+0, b_+1); L = C;
-  CYC(b_+1, SYM(fake_copyRectangleFromVramTilesToAddress)); H = B;
+  CYC(b_+1, b_+2); H = B;
   fake_copyRectangleFromVramTilesToAddress_hook(gb);
 }
 
@@ -204,16 +204,16 @@ void fake_copyRectangleFromVramTilesToAddress__nextRow_hook(GB *gb) {
 }
 
 void fake_copyRectangleToRoomLayoutAndCollisions_hook(GB *gb) {
-  BASE(fake_copyRectangleToRoomLayoutAndCollisions_paramDe);
+  BASE(fake_copyRectangleToRoomLayoutAndCollisions);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(SYM(fake_copyRectangleToRoomLayoutAndCollisions), (SYM(fake_copyRectangleToRoomLayoutAndCollisions) + 1)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC((SYM(fake_copyRectangleToRoomLayoutAndCollisions) + 1), (SYM(fake_copyRectangleToRoomLayoutAndCollisions) + 2)); E = A;
-  CYC((SYM(fake_copyRectangleToRoomLayoutAndCollisions) + 2), (SYM(fake_copyRectangleToRoomLayoutAndCollisions) + 3)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC((SYM(fake_copyRectangleToRoomLayoutAndCollisions) + 3), b_+0); D = A;
   CYC(b_+0, b_+1); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+1, b_+2); B = A;
+  CYC(b_+1, b_+2); E = A;
   CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+3, b_+4); C = A;
+  CYC(b_+3, b_+4); D = A;
+  CYC(SYM(fake_copyRectangleToRoomLayoutAndCollisions_paramDe), (SYM(fake_copyRectangleToRoomLayoutAndCollisions_paramDe) + 1)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC((SYM(fake_copyRectangleToRoomLayoutAndCollisions_paramDe) + 1), (SYM(fake_copyRectangleToRoomLayoutAndCollisions_paramDe) + 2)); B = A;
+  CYC((SYM(fake_copyRectangleToRoomLayoutAndCollisions_paramDe) + 2), (SYM(fake_copyRectangleToRoomLayoutAndCollisions_paramDe) + 3)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC((SYM(fake_copyRectangleToRoomLayoutAndCollisions_paramDe) + 3), (SYM(fake_copyRectangleToRoomLayoutAndCollisions_paramDe) + 4)); C = A;
   fake_copy_rectangle_to_room_layout_rows(gb, sp0_);
 }
 
@@ -237,7 +237,7 @@ void fake_roomTileChangesAfterLoad04_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(wInShop);
   CYC(b_+3, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) | 0x02);
   CYC(b_+5, b_+7); A = 0x03;
-  CYC(b_+7, SYM(fake_checkLoadPastSignAndChestGfx)); loadObjectGfx2_hook(gb);
+  CYC(b_+7, b_+10); loadObjectGfx2_hook(gb);
 }
 
 void fake_checkLoadPastSignAndChestGfx_hook(GB *gb) {
@@ -276,6 +276,6 @@ void fake_checkLoadPastSignAndChestGfx_hook(GB *gb) {
   }
   CYC(b_+20, b_+21);
   CYC(b_+21, b_+23); A = 0x37;
-  CYC(b_+23, SYM(fake_rectangleData_02_7de1));
+  CYC(b_+23, b_+26);
   hook_continue(gb, (SYM(loadUncompressedGfxHeader) + 5), sp0_);
 }

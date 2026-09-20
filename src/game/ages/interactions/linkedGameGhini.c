@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodecb), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodecb), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static void interactionCodecb_addDoubleIndexToHl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);

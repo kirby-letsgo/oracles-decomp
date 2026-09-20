@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(itemBeginThrow), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(itemBeginThrow), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void braceletCheckBreakable_hook(GB *gb);
 
@@ -243,7 +243,7 @@ unset_z:
 
 set_z:
   CYC(b_+121, b_+122); alu_xor(gb, A);
-  CYC(b_+122, SYM(itemBounce)); ret_effect(gb);
+  CYC(b_+122, b_+123); ret_effect(gb);
 }
 
 void itemBounce_hook(GB *gb) {
@@ -264,5 +264,5 @@ void itemBounce_hook(GB *gb) {
   CYC(b_+19, b_+21); E = 0x10;
   CYC(b_+21, b_+22); mem_wr(gb, DE, A);
   CYC(b_+22, b_+23); alu_or(gb, A);
-  CYC(b_+23, SYM(data_649a)); ret_effect(gb);
+  CYC(b_+23, b_+24); ret_effect(gb);
 }

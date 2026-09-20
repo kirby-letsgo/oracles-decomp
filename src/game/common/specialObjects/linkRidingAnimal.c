@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(specialObjectCode_linkRidingAnimal), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(specialObjectCode_linkRidingAnimal), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t link_riding_animal_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -31,7 +31,7 @@ static void read_companion_anim_parameter(GB *gb) {
   CYC(b_+75, b_+77); alu_and(gb, 0x3f);
   CYC(b_+77, b_+79); E = 0x31;
   CYC(b_+79, b_+80); mem_wr(gb, DE, A);
-  CYC(b_+80, SYM(specialObjectCode_minecart_b05)); ret_effect(gb);
+  CYC(b_+80, b_+81); ret_effect(gb);
 }
 
 void specialObjectCode_linkRidingAnimal_hook(GB *gb) {

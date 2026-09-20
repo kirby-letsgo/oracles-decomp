@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode52), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode52), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t partCode52_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -268,5 +268,5 @@ subid2_state2:
   CYC(b_+289, b_+291); E = 0xc9; // Part.angle
   CYC(b_+291, b_+292); mem_wr(gb, DE, A);
   CYC(b_+292, b_+294); A = 0x02;
-  CYC(b_+294, SYM(partCode53)); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+294, b_+297); partSetAnimation_hook(gb); return; // jp
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(rabbitSubid0), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(rabbitSubid0), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t rabbit_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -113,7 +113,7 @@ static void rabbit_subid0_substate3(GB *gb, uint16_t sp0_) {
     return;
   }
   CYC(b_+86, b_+89);
-  CYC(b_+89, SYM(rabbitSubid1));
+  CYC(b_+89, b_+91);
   rabbit_subid0_jump(gb, sp0_);
 }
 
@@ -261,7 +261,7 @@ static void rabbit_subid1_substate6(GB *gb, uint16_t sp0_) {
   CYC(b_+152, b_+153);
   CYC(b_+153, b_+155); A = 0xff;
   CYC(b_+155, b_+158); mem_wr(gb, wTmpcfc0_genericCutscene_cfdf, A);
-  CYC(b_+158, SYM(rabbitSubid2)); ret_effect(gb);
+  CYC(b_+158, b_+159); ret_effect(gb);
 }
 
 void rabbitSubid1_hook(GB *gb) {
@@ -348,7 +348,7 @@ static void rabbit_subid3_substate1(GB *gb, uint16_t sp0_) {
   CYC(b_+49, b_+51); mem_wr(gb, HL, 0x02);
   CYC(b_+51, b_+53); L = 0x78;
   CYC(b_+53, b_+55); mem_wr(gb, HL, 0x20);
-  CYC(b_+55, SYM(rabbitSubid4));
+  CYC(b_+55, b_+58);
   rabbit_init_subid1(gb, sp0_);
 }
 
@@ -373,7 +373,7 @@ void rabbitJump_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0x07;
   CALL_C(b_+2, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+5);
   CYC(b_+5, b_+8); SET_BC(0xff20);
-  CYC(b_+8, SYM(rabbitSubid4Substate2));
+  CYC(b_+8, b_+11);
   objectSetSpeedZ_hook(gb);
 }
 
@@ -396,7 +396,7 @@ void rabbitSubid4Substate2_hook(GB *gb) {
   CYC(b_+19, b_+22); SET_BC(0xfe80);
   CALL_C(b_+22, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+25);
   CYC(b_+25, b_+27); A = 0x09;
-  CYC(b_+27, SYM(rabbitSubid5));
+  CYC(b_+27, b_+30);
   interactionSetAnimation_hook(gb);
 }
 
@@ -455,7 +455,7 @@ static void rabbit_subid4_substate1(GB *gb, uint16_t sp0_) {
   CYC(b_+48, b_+49);
   CYC(b_+49, b_+50); H = D;
   CYC(b_+50, b_+52); L = 0x45;
-  CYC(b_+52, SYM(rabbitJump)); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+52, b_+53); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   rabbitJump_hook(gb);
 }
 
@@ -490,7 +490,7 @@ void rabbitSubid7_hook(GB *gb) {
     return;
   }
   CYC(b_+3, b_+6);
-  CYC(b_+6, SYM(rabbitSubid2SetRandomSpawnDelay));
+  CYC(b_+6, b_+9);
   npcFaceLinkAndAnimate_hook(gb);
 }
 
@@ -504,7 +504,7 @@ void rabbitSubid2SetRandomSpawnDelay_hook(GB *gb) {
   CYC(b_+11, b_+12); A = mem_rd(gb, BC);
   CYC(b_+12, b_+14); E = 0x78;
   CYC(b_+14, b_+15); mem_wr(gb, DE, A);
-  CYC(b_+15, SYM(spawnNextRabbitThatTurnsToStone)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }
 
 void spawnNextRabbitThatTurnsToStone_hook(GB *gb) {
@@ -568,7 +568,7 @@ void rabbitSubid2_hook(GB *gb) {
   CYC(b_+33, b_+35); alu_add(gb, 0xb0);
   CYC(b_+35, b_+36); C = A;
   CALL_ROM(b_+36, SYM(spawnRabbitWithSubid1));
-  CYC(b_+39, SYM(rabbitSubid3));
+  CYC(b_+39, b_+42);
   rabbitSubid2SetRandomSpawnDelay_hook(gb);
 }
 
@@ -599,7 +599,7 @@ static void rabbit_subid5_substate4(GB *gb, uint16_t sp0_) {
   CYC(b_+104, b_+105);
   CYC(b_+105, b_+107); A = 0xff;
   CYC(b_+107, b_+110); mem_wr(gb, wTmpcfc0_genericCutscene_cfdf, A);
-  CYC(b_+110, SYM(rabbitSubid7)); ret_effect(gb);
+  CYC(b_+110, b_+111); ret_effect(gb);
 }
 
 void rabbitSubid5_hook(GB *gb) {
@@ -626,7 +626,7 @@ void rabbitSubid5_hook(GB *gb) {
       CYC(b_+20, b_+22); mem_wr(gb, HL, 0x19);
       CYC(b_+22, b_+25); SET_BC(0xfe20);
       CALL_C(b_+25, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+28);
-      CYC(b_+28, b_+31); SET_BC((SYM(_adjustHLSequential) + 10));
+      CYC(b_+28, b_+31); SET_BC(0x0780);
       CALL_C(b_+31, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+34);
       if (!(F & FZ)) {
         CYCT(b_+34, b_+36);

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode28), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode28), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static void ricky_moosh_add_double_index(GB *gb) {
   burn_rom(gb, 0, 0x0018, 0x0019, false); push_effect(gb, BC);

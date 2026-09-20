@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(specialObjectCode_raft_b06), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(specialObjectCode_raft_b06), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define raftDismountTileOffsets_bank06 SYM(specialObjectCode_raft__dismountTileOffsets_b06)
 #define raftWallPositionOffsets_bank06 SYM(specialObjectCode_raft__raftCalculateAdjacentWallsBitset__wallPositionOffsets_b06)
@@ -112,7 +112,7 @@ end:
   CYC(b_+446, b_+447); mem_wr(gb, DE, A);
   CYC(b_+447, b_+448); E = alu_inc8(gb, E);
   CYC(b_+448, b_+449); mem_wr(gb, DE, A);
-  CYC(b_+449, SYM(specialObject00GfxPointers)); ret_effect(gb);
+  CYC(b_+449, b_+450); ret_effect(gb);
 }
 
 void specialObjectCode_raft_b06_hook(GB *gb) {

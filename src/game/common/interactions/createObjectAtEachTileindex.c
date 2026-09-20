@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodec7), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodec7), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void interactionCodec7__ret_hook(GB *gb) {
   BASE(interactionCodec7);
@@ -33,7 +33,7 @@ void interactionCodec7__spawnObjectType_hook(GB *gb) {
     return;
   }
   CYC(b_+77, b_+80);
-  CYC(b_+80, SYM(interactionCodece)); ret_effect(gb);
+  CYC(b_+80, b_+81); ret_effect(gb);
 }
 
 void interactionCodec7__createObject_hook(GB *gb) {

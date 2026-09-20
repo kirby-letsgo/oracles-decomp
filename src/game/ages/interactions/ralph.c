@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(ralphState0), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(ralphState0), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // mainScripts.* (bank $0c), scriptHelp.* (bank $15) and agesInteractionsBank0a.* (bank $0a),
 // referenced by address only.
@@ -612,7 +612,7 @@ substate0:
   CALL_C(b_+17, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+20);
   CYC(b_+20, b_+22); L = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+22, b_+24); mem_wr(gb, HL, 0x3c);
-  CYC(b_+24, b_+27); SET_BC((SYM(getEntryFromObjectTable1) + 8));
+  CYC(b_+24, b_+27); SET_BC(0x3088);
   CALL_C(b_+27, interactionSetPosition_hook, SYM(interactionSetPosition), b_+30);
   CYC(b_+30, b_+32); A = 0x03;
   CALL_C(b_+32, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+35);
@@ -638,7 +638,7 @@ substate1:
     CYCT(b_+57, b_+60); interactionAnimate_hook(gb); return;
   }
   CYC(b_+57, b_+60);
-  CYC(b_+60, SYM(ralphSubid02)); ret_effect(gb);
+  CYC(b_+60, b_+61); ret_effect(gb);
 }
 
 // Cutscene after Nayru is possessed
@@ -687,7 +687,7 @@ state1:
   // Script done
   CYC(b_+42, b_+44); A = 0xfb; // SNDCTRL_MEDIUM_FADEOUT
   CALL_C(b_+44, playSound_b00_hook, SYM(playSound_b00), b_+47);
-  CYC(b_+47, SYM(ralphSubid01)); interactionDelete_hook(gb);
+  CYC(b_+47, b_+50); interactionDelete_hook(gb);
 }
 
 // Cutscene outside Ambi's palace before getting mystery seeds
@@ -708,7 +708,7 @@ void ralphSubid01_hook(GB *gb) {
   } else {
     CYC(b_+13, b_+16);
   }
-  CYC(b_+16, SYM(ralphSubid03)); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb);
+  CYC(b_+16, b_+19); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb);
 }
 
 // Cutscene after talking to Rafton
@@ -788,7 +788,7 @@ substate3:
   CYC(b_+82, b_+83);
   CYC(b_+83, b_+85); mem_wr(gb, HL, 0x1e);
   CALL_C(b_+85, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+88);
-  CYC(b_+88, b_+91); SET_BC((SYM(convertLinkAngleToDirectionButtons) + 8)); // TX_2a0a
+  CYC(b_+88, b_+91); SET_BC(0x2a0a); // TX_2a0a
   CYC(b_+91, b_+94); showText_hook(gb);
   return;
 
@@ -881,7 +881,7 @@ substate8:
   CYC(b_+195, b_+198); mem_wr(gb, wActiveMusic2, A);
   CYC(b_+198, b_+201); mem_wr(gb, wActiveMusic, A);
   CALL_C(b_+201, playSound_b00_hook, SYM(playSound_b00), b_+204);
-  CYC(b_+204, SYM(ralphSubid04)); interactionDelete_hook(gb);
+  CYC(b_+204, b_+207); interactionDelete_hook(gb);
 }
 
 // Cutscene on maku tree screen after saving Nayru
@@ -917,7 +917,7 @@ substate2:
     CYCT(b_+33, b_+34); ret_effect(gb); return;
   }
   CYC(b_+33, b_+34);
-  CYC(b_+34, SYM(ralphSubid05)); interactionDelete_hook(gb);
+  CYC(b_+34, b_+37); interactionDelete_hook(gb);
 }
 
 // Cutscene in black tower where Nayru/Ralph meet you to try to escape. Substate 3 falls
@@ -981,13 +981,13 @@ substate3:
   CYC(b_+63, b_+64);
   CALL_C(b_+64, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+67);
   CYC(b_+67, b_+69); L = INTERACTION_BASE + OBJ_VAR3E;
-  CYC(b_+69, SYM(ralphRunScript)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+69, b_+70); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   ralphRunScript_hook(gb);
 }
 
 void ralphRunScript_hook(GB *gb) {
   BASE(ralphRunScript);
-  CYC(b_+0, SYM(ralphSubid06)); interactionRunScript_hook(gb);
+  CYC(b_+0, b_+3); interactionRunScript_hook(gb);
 }
 
 void ralphSubid06_hook(GB *gb) {
@@ -1029,7 +1029,7 @@ substate1:
   CALL_C(b_+41, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+44);
   CYC(b_+44, b_+46); L = INTERACTION_BASE + OBJ_VAR3E;
   CYC(b_+46, b_+47); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+47, SYM(ralphSubid07)); ralphRunScript_hook(gb);
+  CYC(b_+47, b_+49); ralphRunScript_hook(gb);
 }
 
 // Cutscene postgame where they warp to the maku tree, Ralph notices the statue
@@ -1055,7 +1055,7 @@ void ralphAnimateBasedOnSpeedAndRunScript_hook(GB *gb) {
   BASE(ralphAnimateBasedOnSpeedAndRunScript);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+3);
-  CYC(b_+3, SYM(ralphSubid07Substate1)); interactionRunScript_hook(gb);
+  CYC(b_+3, b_+6); interactionRunScript_hook(gb);
 }
 
 // Falls through into ralphSubid07Substate2.
@@ -1081,7 +1081,7 @@ void ralphSubid07Substate2_hook(GB *gb) {
   CALL_C(b_+6, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+9);
   CYC(b_+9, b_+11); L = INTERACTION_BASE + OBJ_VAR3E;
   CYC(b_+11, b_+12); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+12, SYM(ralphSubid08)); objectSetVisible82_hook(gb);
+  CYC(b_+12, b_+15); objectSetVisible82_hook(gb);
 }
 
 // Cutscene in credits where Ralph is training with his sword
@@ -1141,7 +1141,7 @@ substate2:
   CYC(b_+68, b_+69);
   CYC(b_+69, b_+71); A = 0xff;
   CYC(b_+71, b_+74); mem_wr(gb, wTmpcfc0 + 0x1f, A);
-  CYC(b_+74, SYM(ralphSubid09)); ret_effect(gb);
+  CYC(b_+74, b_+75); ret_effect(gb);
 }
 
 // Cutscene where Ralph charges in to Ambi's palace
@@ -1157,7 +1157,7 @@ void ralphSubid09_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_xor(gb, A);
   CYC(b_+7, b_+10); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+10, b_+13); mem_wr(gb, wMenuDisabled, A);
-  CYC(b_+13, SYM(ralphSubid0a)); interactionDelete_hook(gb);
+  CYC(b_+13, b_+16); interactionDelete_hook(gb);
 }
 
 // Cutscene where Ralph's about to charge into the black tower
@@ -1241,7 +1241,7 @@ substate4:
   CYC(b_+170, b_+171); alu_xor(gb, A);
   CYC(b_+171, b_+174); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+174, b_+177); mem_wr(gb, wMenuDisabled, A);
-  CYC(b_+177, SYM(ralphSubid0a_linked)); interactionDelete_hook(gb);
+  CYC(b_+177, b_+180); interactionDelete_hook(gb);
 }
 
 void ralphSubid0a_linked_hook(GB *gb) {
@@ -1281,12 +1281,12 @@ substate1:
   return;
 
 substate2:
-  CYC(b_+34, b_+37); SET_BC((SYM(getLowestSetBit) + 8)); // ldbc DIR_DOWN,$00
+  CYC(b_+34, b_+37); SET_BC(0x0200); // ldbc DIR_DOWN,$00
   CYC(b_+37, b_+40); ralph_setDirectionAndAnimationWhenLinkFinishedMoving(gb, sp0_);
   return;
 
 substate3:
-  CYC(b_+40, SYM(ralphSubid0b)); ret_effect(gb);
+  CYC(b_+40, b_+41); ret_effect(gb);
 }
 
 // $0b: Cutscene where Ralph tells you about getting Tune of Currents
@@ -1332,9 +1332,9 @@ substate1:
   CYC(b_+34, b_+36); mem_wr(gb, HL, 0x05); // INTERAC_PUFF
   CYC(b_+36, b_+37); L = alu_inc8(gb, L);
   CYC(b_+37, b_+39); mem_wr(gb, HL, 0x81);
-  CYC(b_+39, b_+42); SET_BC((SYM(loadTilesetHlpr) + 6));
+  CYC(b_+39, b_+42); SET_BC(0x0804);
   CALL_C(b_+42, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+45);
-  CYC(b_+45, SYM(ralphRunScriptWithConditionalAnimation)); ralphRunScriptWithConditionalAnimation_hook(gb);
+  CYC(b_+45, b_+47); ralphRunScriptWithConditionalAnimation_hook(gb);
 }
 
 // Runs script, deletes self when finished, and updates animations only if var3f is 0.
@@ -1353,7 +1353,7 @@ void ralphRunScriptWithConditionalAnimation_hook(GB *gb) {
     CYCT(b_+10, b_+13); interactionAnimate_hook(gb); return;
   }
   CYC(b_+10, b_+13);
-  CYC(b_+13, SYM(ralphSubid0e)); ret_effect(gb);
+  CYC(b_+13, b_+14); ret_effect(gb);
 }
 
 // Cutscene with Nayru and Ralph when Link exits the black tower. Falls through into
@@ -1395,7 +1395,7 @@ void ralphRunScriptAndDeleteWhenOver_hook(GB *gb) {
     CYCT(b_+3, b_+6); interactionDelete_hook(gb); return;
   }
   CYC(b_+3, b_+6);
-  CYC(b_+6, SYM(ralphSubid12)); interactionAnimateAsNpc_hook(gb);
+  CYC(b_+6, b_+9); interactionAnimateAsNpc_hook(gb);
 }
 
 // NPC after beating Veran, before beating Twinrova in a linked game
@@ -1403,7 +1403,7 @@ void ralphSubid12_hook(GB *gb) {
   BASE(ralphSubid12);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, npcFaceLinkAndAnimate_hook, SYM(npcFaceLinkAndAnimate), b_+3);
-  CYC(b_+3, SYM(ralphFunc_738b)); interactionRunScript_hook(gb);
+  CYC(b_+3, b_+6); interactionRunScript_hook(gb);
 }
 
 // Unused?
@@ -1417,7 +1417,7 @@ void ralphFunc_738b_hook(GB *gb) {
     CYCT(b_+5, b_+7); goto angleDecreasing;
   }
   CYC(b_+5, b_+7);
-  CYC(b_+7, b_+10); SET_BC((SYM(getPositionOffsetForVelocity) + 39));
+  CYC(b_+7, b_+10); SET_BC(0x2068);
   CYC(b_+10, b_+13); A = mem_rd(gb, wFrameCounter);
   CYC(b_+13, b_+14); alu_rrca(gb);
   if (!(F & FC)) {
@@ -1452,7 +1452,7 @@ angleDecreasing:
   CYC(b_+43, b_+44); A = alu_dec8(gb, A);
   CYC(b_+44, b_+46); alu_and(gb, 0x1f);
   CYC(b_+46, b_+47); mem_wr(gb, HL, A);
-  CYC(b_+47, SYM(ralphTurnLinkTowardSelf)); ret_effect(gb);
+  CYC(b_+47, b_+48); ret_effect(gb);
 }
 
 void ralphTurnLinkTowardSelf_hook(GB *gb) {
@@ -1481,7 +1481,7 @@ checkDistance:
 setDirection:
   CYC(b_+25, b_+28); SET_HL(w1Link_direction);
   CYC(b_+28, b_+29); mem_wr(gb, HL, B);
-  CYC(b_+29, SYM(startJump)); setLinkForceStateToState08_hook(gb);
+  CYC(b_+29, b_+32); setLinkForceStateToState08_hook(gb);
 }
 
 // Also called from boy (subid 4), interactionCode3d and nayruSubid03.
@@ -1491,5 +1491,5 @@ void startJump_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_BC(0xfe40); // -$1c0
   CALL_C(b_+3, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+6);
   CYC(b_+6, b_+8); A = 0x53; // SND_JUMP
-  CYC(b_+8, SYM(interactionCode38)); playSound_b00_hook(gb);
+  CYC(b_+8, b_+11); playSound_b00_hook(gb);
 }

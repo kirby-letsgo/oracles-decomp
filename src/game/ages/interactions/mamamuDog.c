@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode54), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode54), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t mamamuDog_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -98,7 +98,7 @@ state1:
   if (F & FC) { CYCT(b_+51, b_+54); interactionDelete_hook(gb); return; }
   CYC(b_+51, b_+54);
   CALL_C(b_+54, interactionAnimate_hook, SYM(interactionAnimate), b_+57);
-  CYC(b_+57, SYM(dog_subid01)); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
+  CYC(b_+57, b_+60); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
 }
 
 void dog_subid01_hook(GB *gb) {
@@ -243,7 +243,7 @@ void dog_initGraphicsLoadScriptAndIncState_hook(GB *gb) {
   CYC(b_+14, b_+15); H = mem_rd(gb, HL);
   CYC(b_+15, b_+16); L = A;
   CALL_C(b_+16, interactionSetScript_hook, SYM(interactionSetScript), b_+19);
-  CYC(b_+19, SYM(dog_moveTowardTargetPosition)); interactionIncState_hook(gb);
+  CYC(b_+19, b_+22); interactionIncState_hook(gb);
 }
 
 void dog_moveTowardTargetPosition_hook(GB *gb) {
@@ -268,7 +268,7 @@ void dog_moveTowardTargetPosition_hook(GB *gb) {
   CALL_C(b_+19, objectGetRelativeAngle_hook, SYM(objectGetRelativeAngle), b_+22);
   CYC(b_+22, b_+24); E = INTERACTION_BASE + OBJ_ANGLE;
   CYC(b_+24, b_+25); mem_wr(gb, DE, A);
-  CYC(b_+25, SYM(dog_checkCloseToTargetPosition)); objectApplySpeed_hook(gb);
+  CYC(b_+25, b_+28); objectApplySpeed_hook(gb);
 }
 
 void dog_checkCloseToTargetPosition_hook(GB *gb) {
@@ -288,7 +288,7 @@ void dog_checkCloseToTargetPosition_hook(GB *gb) {
   CYC(b_+16, b_+17); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+17, b_+19); alu_add(gb, 1);
   CYC(b_+19, b_+21); alu_cp(gb, 5);
-  CYC(b_+21, SYM(dog_updateDirection)); ret_effect(gb);
+  CYC(b_+21, b_+22); ret_effect(gb);
 }
 
 void dog_updateDirection_hook(GB *gb) {
@@ -306,7 +306,7 @@ void dog_updateDirection_hook(GB *gb) {
   CYC(b_+13, b_+14);
   CYC(b_+14, b_+15); mem_wr(gb, HL, A);
   CYC(b_+15, b_+17); alu_add(gb, 2);
-  CYC(b_+17, SYM(dog_incTargetPositionIndex)); interactionSetAnimation_hook(gb);
+  CYC(b_+17, b_+20); interactionSetAnimation_hook(gb);
 }
 
 void dog_incTargetPositionIndex_hook(GB *gb) {
@@ -323,7 +323,7 @@ void dog_incTargetPositionIndex_hook(GB *gb) {
   CYC(b_+11, b_+12);
   CYC(b_+12, b_+14); mem_wr(gb, HL, 0);
   CYC(b_+14, b_+15); alu_scf(gb);
-  CYC(b_+15, SYM(dog_snapToTargetPosition)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }
 
 void dog_snapToTargetPosition_hook(GB *gb) {
@@ -341,7 +341,7 @@ void dog_snapToTargetPosition_hook(GB *gb) {
   CYC(b_+13, b_+14); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+14, b_+15); A = mem_rd(gb, BC);
   CYC(b_+15, b_+16); mem_wr(gb, HL, A);
-  CYC(b_+16, SYM(dog_getTargetPositionAddress)); ret_effect(gb);
+  CYC(b_+16, b_+17); ret_effect(gb);
 }
 
 void dog_getTargetPositionAddress_hook(GB *gb) {
@@ -357,7 +357,7 @@ void dog_getTargetPositionAddress_hook(GB *gb) {
   CYC(b_+9, b_+11); L = INTERACTION_BASE + OBJ_VAR3A;
   CYC(b_+11, b_+12); A = mem_rd(gb, HL);
   CALL_C(b_+12, addDoubleIndexToBc_hook, 0x007e, b_+15);
-  CYC(b_+15, SYM(dog_setTargetPositionIndex)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }
 
 void dog_setTargetPositionIndex_hook(GB *gb) {

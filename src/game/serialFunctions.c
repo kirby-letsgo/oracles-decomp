@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(func_4000_b16), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(func_4000_b16), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define ackPacket_bank16 SYM(ackPacket)
 #define retryPacket_bank16 SYM(retryPacket)
@@ -131,7 +131,7 @@ write_serial_control:
 restore_wram_bank:
   CYC(b_+50, b_+51); SET_AF(pop_effect(gb));
   CYC(b_+51, b_+53); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+53, SYM(func_4036)); ret_effect(gb);
+  CYC(b_+53, b_+54); ret_effect(gb);
 }
 
 void func_4036_hook(GB *gb) {
@@ -153,8 +153,8 @@ void func_4043_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, waitForSerialByte_hook, SYM(waitForSerialByte), b_+3);
   CYC(b_+3, b_+5); alu_cp(gb, 0x80);
-  if (F & FZ) { CYCT(b_+5, SYM(sendPacketByte)); ret_effect(gb); return; }
-  CYC(b_+5, SYM(sendPacketByte));
+  if (F & FZ) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
+  CYC(b_+5, b_+6);
   sendPacketByte_hook(gb);
 }
 
@@ -207,7 +207,7 @@ next_byte:
   CYC(b_+56, b_+57); mem_wr(gb, HL, A);
   CYC(b_+57, b_+58); alu_xor(gb, A);
   CYC(b_+58, b_+61); W8(w4d98b) = A;
-  CYC(b_+61, SYM(func_4087)); ret_effect(gb);
+  CYC(b_+61, b_+62); ret_effect(gb);
 }
 
 void func_4087_hook(GB *gb) {
@@ -221,7 +221,7 @@ void func_4087_hook(GB *gb) {
   CYC(b_+9, b_+10); alu_xor(gb, A);
   CYC(b_+10, b_+12); mem_wr(gb, IO_SB, A);
   CYC(b_+12, b_+14); H8(hReceivedSerialByte) = A;
-  CYC(b_+14, SYM(func_4096)); ret_effect(gb);
+  CYC(b_+14, b_+15); ret_effect(gb);
 }
 
 void func_4096_hook(GB *gb) {
@@ -235,7 +235,7 @@ void func_4096_hook(GB *gb) {
     return;
   }
   CYC(b_+5, b_+8);
-  CYC(b_+8, SYM(disableSerialIfByteReceived));
+  CYC(b_+8, b_+11);
   prepareForNextPacket_hook(gb);
 }
 
@@ -243,7 +243,7 @@ void disableSerialIfByteReceived_hook(GB *gb) {
   BASE(disableSerialIfByteReceived);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, waitForSerialByte_hook, SYM(waitForSerialByte), b_+3);
-  CYC(b_+3, SYM(receivePacketByte));
+  CYC(b_+3, b_+6);
   disableSerialPort_hook(gb);
 }
 
@@ -335,7 +335,7 @@ get_next_byte:
   CYC(b_+96, b_+97); alu_xor(gb, A);
   CYC(b_+97, b_+99); mem_wr(gb, IO_SB, A);
   CYC(b_+99, b_+102); W8(w4d984) = A;
-  CYC(b_+102, SYM(FFBE_04)); ret_effect(gb);
+  CYC(b_+102, b_+103); ret_effect(gb);
 }
 
 void FFBE_04_hook(GB *gb) {
@@ -389,7 +389,7 @@ static void receive_link_state_common(GB *gb, uint16_t sp0_) {
   BASE(receiveLinkState06);
   CYC(b_+2, b_+4); H8(hActiveFileSlot) = A;
   CALL_C(b_+4, loadFile_b00_hook, SYM(loadFile_b00), b_+7);
-  CYC(b_+7, SYM(sendFileHeader)); H8(hFF8B) = A;
+  CYC(b_+7, b_+9); H8(hFF8B) = A;
   sendFileHeader_hook(gb);
 }
 
@@ -397,7 +397,7 @@ void receiveLinkState00_hook(GB *gb) {
   BASE(receiveLinkState00);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+1); alu_xor(gb, A);
-  CYC(b_+1, SYM(receiveLinkState03));
+  CYC(b_+1, b_+3);
   receive_link_state_common(gb, sp0_);
 }
 
@@ -405,7 +405,7 @@ void receiveLinkState03_hook(GB *gb) {
   BASE(receiveLinkState03);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); A = 0x01;
-  CYC(b_+2, SYM(receiveLinkState06));
+  CYC(b_+2, b_+4);
   receive_link_state_common(gb, sp0_);
 }
 
@@ -481,7 +481,7 @@ copy_file_header:
   CYC(b_+77, b_+78); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+78, b_+80); A = 0x01;
   CYC(b_+80, b_+83); W8(w4WaitingForNextByte) = A;
-  CYC(b_+83, SYM(waitForSerialByte)); sendPacketByte_hook(gb);
+  CYC(b_+83, b_+86); sendPacketByte_hook(gb);
 }
 
 void waitForSerialByte_hook(GB *gb) {
@@ -515,7 +515,7 @@ byte_received:
   CYC(b_+30, b_+33); W8(w4WaitingForNextByte) = A;
   CYC(b_+33, b_+34); alu_xor(gb, A);
   CYC(b_+34, b_+36); H8(hReceivedSerialByte) = A;
-  CYC(b_+36, SYM(setLinkTimerTo180)); H8(hFFBD) = A;
+  CYC(b_+36, b_+38); H8(hFFBD) = A;
   setLinkTimerTo180_hook(gb);
 }
 
@@ -525,7 +525,7 @@ void setLinkTimerTo180_hook(GB *gb) {
   CYC(b_+2, b_+5); W8(w4FileLinkTimer) = A;
   CYC(b_+5, b_+7); A = 0x00;
   CYC(b_+7, b_+10); WP(w4FileLinkTimer)[1] = A;
-  CYC(b_+10, SYM(FFBE_00)); ret_effect(gb);
+  CYC(b_+10, b_+11); ret_effect(gb);
 }
 
 void FFBE_00_hook(GB *gb) {
@@ -611,14 +611,14 @@ choose_ring:
 no_match:
   CYC(b_+53, b_+55); A = 0x84;
   CYC(b_+55, b_+57); H8(hFFBD) = A;
-  CYC(b_+57, SYM(prepareForNextPacket)); ret_effect(gb);
+  CYC(b_+57, b_+58); ret_effect(gb);
 }
 
 void prepareForNextPacket_hook(GB *gb) {
   BASE(prepareForNextPacket);
   CYC(b_+0, b_+2); A = H8(hSerialLinkState);
   CYC(b_+2, b_+3); A = alu_inc8(gb, A);
-  CYC(b_+3, SYM(func_426e)); H8(hSerialLinkState) = A;
+  CYC(b_+3, b_+5); H8(hSerialLinkState) = A;
   func_426e_hook(gb);
 }
 
@@ -631,7 +631,7 @@ void func_426e_hook(GB *gb) {
   CYC(b_+9, b_+12); W8(w4d984) = A;
   CYC(b_+12, b_+13); A = alu_inc8(gb, A);
   CYC(b_+13, b_+16); W8(w4WaitingForNextByte) = A;
-  CYC(b_+16, SYM(waitForNextPacket));
+  CYC(b_+16, b_+18);
   setLinkTimerTo180_hook(gb);
 }
 
@@ -651,7 +651,7 @@ void waitForNextPacket_hook(GB *gb) {
   CYC(b_+12, b_+14); A = H8(hSerialLinkState);
   CYC(b_+14, b_+15); A = alu_dec8(gb, A);
   CYC(b_+15, b_+17); H8(hSerialLinkState) = A;
-  CYC(b_+17, SYM(func_4293));
+  CYC(b_+17, b_+19);
   func_426e_hook(gb);
 }
 
@@ -664,7 +664,7 @@ void func_4293_hook(GB *gb) {
   CYC(b_+9, b_+12); SET_DE(w4PacketBuffer + 9);
   CYC(b_+12, b_+14); B = 0x07;
   CALL_C(b_+14, copyMemoryReverse_hook, SYM(copyMemoryReverse), b_+17);
-  CYC(b_+17, SYM(receiveLinkState0b));
+  CYC(b_+17, b_+20);
   sendAckPacket_hook(gb);
 }
 
@@ -696,7 +696,7 @@ set_timeout_mode:
     return;
   }
   CYC(b_+25, b_+27);
-  CYC(b_+27, SYM(func_42c5)); sendAckPacket_hook(gb);
+  CYC(b_+27, b_+30); sendAckPacket_hook(gb);
 }
 
 void func_42c5_hook(GB *gb) {
@@ -721,7 +721,7 @@ void func_42c5_hook(GB *gb) {
   CALL_C(b_+15, loadFile_b00_hook, SYM(loadFile_b00), b_+18);
   CYC(b_+18, b_+20); A = 0x0d;
   CYC(b_+20, b_+22); H8(hSerialLinkState) = A;
-  CYC(b_+22, SYM(receiveLinkState10)); sendAckPacket_hook(gb);
+  CYC(b_+22, b_+25); sendAckPacket_hook(gb);
 }
 
 void receiveLinkState10_hook(GB *gb) {
@@ -732,7 +732,7 @@ void receiveLinkState10_hook(GB *gb) {
   CYC(b_+6, b_+9); SET_DE(wRingsObtained);
   CYC(b_+9, b_+11); B = 0x08;
   CALL_C(b_+11, copyMemoryReverse_hook, SYM(copyMemoryReverse), b_+14);
-  CYC(b_+14, SYM(gameLinkState08)); func_4350_hook(gb);
+  CYC(b_+14, b_+16); func_4350_hook(gb);
 }
 
 void gameLinkState08_hook(GB *gb) {
@@ -748,7 +748,7 @@ void gameLinkState08_hook(GB *gb) {
   CYC(b_+14, b_+15); mem_wr(gb, HL, A);
   CYC(b_+15, b_+17); A = 0x01;
   CYC(b_+17, b_+20); W8(w4WaitingForNextByte) = A;
-  CYC(b_+20, SYM(gameLinkState09)); sendPacketByte_hook(gb);
+  CYC(b_+20, b_+23); sendPacketByte_hook(gb);
 }
 
 void gameLinkState09_hook(GB *gb) {
@@ -756,7 +756,7 @@ void gameLinkState09_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, func_4043_hook, SYM(func_4043), b_+3);
   CALL_C(b_+3, returnIfPacketNotComplete_hook, SYM(returnIfPacketNotComplete), b_+6);
-  CYC(b_+6, SYM(receiveLinkState13)); prepareForNextPacket_hook(gb);
+  CYC(b_+6, b_+9); prepareForNextPacket_hook(gb);
 }
 
 void receiveLinkState13_hook(GB *gb) {
@@ -776,7 +776,7 @@ void receiveLinkState13_hook(GB *gb) {
   CYC(b_+16, b_+19); SET_DE(w4PacketBuffer + 1);
   CYC(b_+19, b_+21); B = 0x08;
   CALL_C(b_+21, copyMemoryReverse_hook, SYM(copyMemoryReverse), b_+24);
-  CYC(b_+24, SYM(gameLinkState0f)); prepareForNextPacket_hook(gb);
+  CYC(b_+24, b_+27); prepareForNextPacket_hook(gb);
 }
 
 void gameLinkState0f_hook(GB *gb) {
@@ -804,7 +804,7 @@ merge_rings:
   CYC(b_+25, b_+28); SET_DE(w4PacketBuffer + 1);
   CYC(b_+28, b_+30); B = 0x08;
   CALL_C(b_+30, copyMemoryReverse_hook, SYM(copyMemoryReverse), b_+33);
-  CYC(b_+33, SYM(gameLinkState12)); sendAckPacket_hook(gb);
+  CYC(b_+33, b_+36); sendAckPacket_hook(gb);
 }
 
 void gameLinkState12_hook(GB *gb) {
@@ -839,7 +839,7 @@ copy_ring_fortune:
   CYC(b_+23, b_+24); mem_wr(gb, DE, A);
   CYC(b_+24, b_+26); A = 0x01;
   CYC(b_+26, b_+29); W8(w4WaitingForNextByte) = A;
-  CYC(b_+29, SYM(gameLinkState0b)); sendPacketByte_hook(gb);
+  CYC(b_+29, b_+32); sendPacketByte_hook(gb);
 }
 
 void gameLinkState0b_hook(GB *gb) {
@@ -853,7 +853,7 @@ void gameLinkState0b_hook(GB *gb) {
     return;
   }
   CYC(b_+5, b_+8);
-  CYC(b_+8, SYM(func_437b)); disableSerialPort_hook(gb);
+  CYC(b_+8, b_+11); disableSerialPort_hook(gb);
 }
 
 void func_437b_hook(GB *gb) {
@@ -865,7 +865,7 @@ void func_437b_hook(GB *gb) {
   CYC(b_+8, b_+11); SET_HL(wRingsObtained);
   CYC(b_+11, b_+13); B = 0x08;
   CALL_C(b_+13, copyMemoryReverse_hook, SYM(copyMemoryReverse), b_+16);
-  CYC(b_+16, SYM(func_438e)); saveFile_b00_hook(gb);
+  CYC(b_+16, b_+19); saveFile_b00_hook(gb);
 }
 
 void func_438e_hook(GB *gb) {
@@ -874,7 +874,7 @@ void func_438e_hook(GB *gb) {
   CALL_C(b_+0, func_439a_hook, SYM(func_439a), b_+3);
   CALL_C(b_+3, returnIfPacketNotComplete_hook, SYM(returnIfPacketNotComplete), b_+6);
   CALL_C(b_+6, prepareForNextPacket_hook, SYM(prepareForNextPacket), b_+9);
-  CYC(b_+9, SYM(func_439a)); func_4036_hook(gb);
+  CYC(b_+9, b_+12); func_4036_hook(gb);
 }
 
 void func_439a_hook(GB *gb) {
@@ -894,7 +894,7 @@ void func_439a_hook(GB *gb) {
   }
   CYC(b_+11, b_+13);
   CYC(b_+13, b_+14); SET_AF(pop_effect(gb));
-  CYC(b_+14, SYM(func_43ab)); disableSerialPort_hook(gb);
+  CYC(b_+14, b_+17); disableSerialPort_hook(gb);
 }
 
 void func_43ab_hook(GB *gb) {
@@ -912,7 +912,7 @@ void func_43ab_hook(GB *gb) {
   CYC(b_+11, b_+13); A = H8(hSerialLinkState);
   CYC(b_+13, b_+15); alu_sub(gb, 0x02);
   CYC(b_+15, b_+17); H8(hSerialLinkState) = A;
-  CYC(b_+17, SYM(func_43bd)); ret_effect(gb);
+  CYC(b_+17, b_+18); ret_effect(gb);
 }
 
 void func_43bd_hook(GB *gb) {
@@ -922,7 +922,7 @@ void func_43bd_hook(GB *gb) {
   CYC(b_+2, b_+3);
   CYC(b_+3, b_+5); A = 0x82;
   CYC(b_+5, b_+7); H8(hFFBD) = A;
-  CYC(b_+7, SYM(gameLinkState0c)); ret_effect(gb);
+  CYC(b_+7, b_+8); ret_effect(gb);
 }
 
 void gameLinkState0c_hook(GB *gb) {
@@ -940,7 +940,7 @@ void gameLinkState0c_hook(GB *gb) {
   CYC(b_+18, b_+19); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+19, b_+21); A = 0x01;
   CYC(b_+21, b_+24); W8(w4WaitingForNextByte) = A;
-  CYC(b_+24, SYM(sendRetryPacket)); sendPacketByte_hook(gb);
+  CYC(b_+24, b_+27); sendPacketByte_hook(gb);
 }
 
 void sendRetryPacket_hook(GB *gb) {
@@ -958,14 +958,14 @@ void sendRetryPacket_hook(GB *gb) {
   CYC(b_+12, b_+14);
   CYC(b_+14, b_+16); A = 0x80;
   CYC(b_+16, b_+18); H8(hFFBD) = A;
-  CYC(b_+18, SYM(sendAckPacket)); disableSerialPort_hook(gb);
+  CYC(b_+18, b_+21); disableSerialPort_hook(gb);
 }
 
 void sendAckPacket_hook(GB *gb) {
   BASE(sendAckPacket);
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+4); W8(w4LinkRetryCounter) = A;
-  CYC(b_+4, SYM(setPacketBuffer)); SET_HL(ackPacket_bank16);
+  CYC(b_+4, b_+7); SET_HL(ackPacket_bank16);
   setPacketBuffer_hook(gb);
 }
 
@@ -987,7 +987,7 @@ copy_packet:
     goto copy_packet;
   }
   CYC(b_+12, b_+14);
-  CYC(b_+14, SYM(gameLink_getFile1)); sendPacketByte_hook(gb);
+  CYC(b_+14, b_+17); sendPacketByte_hook(gb);
 }
 
 static void game_link_get_file_body(GB *gb, uint16_t sp0_) {
@@ -1096,14 +1096,14 @@ verify_other_mode:
     return;
   }
   CYC(b_+114, b_+116);
-  CYC(b_+116, SYM(markFileAsBlank)); sendAckPacket_hook(gb);
+  CYC(b_+116, b_+119); sendAckPacket_hook(gb);
 }
 
 void gameLink_getFile1_hook(GB *gb) {
   BASE(gameLink_getFile1);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); A = 0x00;
-  CYC(b_+2, SYM(gameLink_getFile2));
+  CYC(b_+2, b_+4);
   game_link_get_file_body(gb, sp0_);
 }
 
@@ -1111,7 +1111,7 @@ void gameLink_getFile2_hook(GB *gb) {
   BASE(gameLink_getFile2);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); A = 0x01;
-  CYC(b_+2, SYM(gameLink_getFile3));
+  CYC(b_+2, b_+4);
   game_link_get_file_body(gb, sp0_);
 }
 
@@ -1142,7 +1142,7 @@ void markFileAsBlank_hook(GB *gb) {
   CYC(b_+23, b_+24); serial_add_a_to_hl(gb, b_+24);
   CYC(b_+24, b_+26); B = 0x06;
   CALL_C(b_+26, clearMemory_hook, SYM(clearMemory), b_+29);
-  CYC(b_+29, SYM(func_44ac)); sendAckPacket_hook(gb);
+  CYC(b_+29, b_+32); sendAckPacket_hook(gb);
 }
 
 void func_44ac_hook(GB *gb) {
@@ -1172,7 +1172,7 @@ void func_44ac_hook(GB *gb) {
   CALL_C(b_+36, writeToSC_hook, SYM(writeToSC), b_+39);
   CYC(b_+39, b_+40); SET_AF(pop_effect(gb));
   CYC(b_+40, b_+42); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+42, SYM(returnIfPacketNotComplete)); ret_effect(gb);
+  CYC(b_+42, b_+43); ret_effect(gb);
 }
 
 void returnIfPacketNotComplete_hook(GB *gb) {
@@ -1197,13 +1197,13 @@ packet_complete:
   }
   CYC(b_+14, b_+17);
   CYC(b_+17, b_+18); SET_AF(pop_effect(gb));
-  CYC(b_+18, SYM(compareFileHeader));
+  CYC(b_+18, b_+21);
   disableSerialPort_hook(gb);
 }
 
 void compareFileHeader_hook(GB *gb) {
   BASE(compareFileHeader);
-  CYC(b_+0, SYM(compareFileIDsAndNames)); SET_DE(w4RingFortuneStuff);
+  CYC(b_+0, b_+3); SET_DE(w4RingFortuneStuff);
   compareFileIDsAndNames_hook(gb);
 }
 
@@ -1225,5 +1225,5 @@ compare_byte:
     goto compare_byte;
   }
   CYC(b_+11, b_+13);
-  CYC(b_+13, SYM(ackPacket)); ret_effect(gb);
+  CYC(b_+13, b_+14); ret_effect(gb);
 }

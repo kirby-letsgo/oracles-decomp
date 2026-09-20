@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode4b), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode4b), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t twinrovaProjectile_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -160,5 +160,5 @@ delete:
 
 deleteWithPoof:
   CALL_C(b_+185, objectCreatePuff_hook, SYM(objectCreatePuff), b_+188);
-  CYC(b_+188, SYM(partCode4c)); partDelete_hook(gb); return; // jp
+  CYC(b_+188, b_+191); partDelete_hook(gb); return; // jp
 }

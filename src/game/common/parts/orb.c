@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode03), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode03), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void partCode03_hook(GB *gb) {
   BASE(partCode03);
@@ -59,5 +59,5 @@ L_44c5:
   CYC(b_+63, b_+65); L = 0xdb; // Part.oamFlagsBackup
   CYC(b_+65, b_+66); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+66, b_+67); mem_wr(gb, HL, A);
-  CYC(b_+67, SYM(partCode04)); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+67, b_+70); objectSetVisible82_hook(gb); return; // jp
 }

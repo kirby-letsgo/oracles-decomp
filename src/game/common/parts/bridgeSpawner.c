@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode0c), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode0c), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static void bridgeSpawner_addDoubleIndexToHl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -89,5 +89,5 @@ void bridgeSpawner_state0_hook(GB *gb) {
   CYC(b_+87, b_+88); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = 1
   CYC(b_+88, b_+90); L = 0xc6; // Part.counter1
   CYC(b_+90, b_+92); mem_wr(gb, HL, 0x08);
-  CYC(b_+92, SYM(partCode0e)); return; // ret
+  CYC(b_+92, b_+93); return; // ret
 }

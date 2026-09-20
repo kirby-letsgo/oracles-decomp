@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode2d), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode2d), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // interactionCode2d@warpDestVariables: m_HardcodedWarpA ROOM_AGES_4d4, $0c, $67, $03
 #define veranCutsceneFaceWarpDestVariables_bank08 SYM(interactionCode2d__warpDestVariables)

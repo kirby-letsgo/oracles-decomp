@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode2e), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode2e), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // interactionCode2e@scriptTable: subid 0 = mainScripts.oldManScript_givesRupees,
 // subid 1 = mainScripts.oldManScript_takesRupees.

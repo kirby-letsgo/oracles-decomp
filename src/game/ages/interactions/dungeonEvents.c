@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interaction21_subid03), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interaction21_subid03), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // verifyTiles data: b0 = tile index, then positions; $ff starts a new group, $00 ends.
 #define subid01_tileData_bank08 SYM(subid01_tileData)
@@ -91,7 +91,7 @@ static void dungeonEvents_lightCubeTorches(GB *gb) {
   CYC(b_+47, b_+50); SET_HL(wRotatingCubeColor);
   CYC(b_+50, b_+52); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
   CYC(b_+52, b_+54); A = 0x72; // SND_LIGHTTORCH
-  CYC(b_+54, SYM(interaction21_subid04)); playSound_b00_hook(gb);
+  CYC(b_+54, b_+57); playSound_b00_hook(gb);
 }
 
 // Body shared by subid06 (`jr ++`) and subid19 (fallthrough): set trigger 0 iff
@@ -108,7 +108,7 @@ static void dungeonEvents_setTriggerIfCubeColorIs(GB *gb) {
     CYC(b_+10, b_+11); A = alu_dec8(gb, A);
   }
   CYC(b_+11, b_+14); mem_wr(gb, wActiveTriggers, A);
-  CYC(b_+14, SYM(interaction21_subid07)); ret_effect(gb);
+  CYC(b_+14, b_+15); ret_effect(gb);
 }
 
 // D2: Verify a 2x2 floor pattern. Falls through into verifyTilesAndDropSmallKey.
@@ -116,7 +116,7 @@ void interaction21_subid01_hook(GB *gb) {
   BASE(interaction21_subid01);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionDeleteAndRetIfItemFlagSet_hook, SYM(interactionDeleteAndRetIfItemFlagSet), b_+3);
-  CYC(b_+3, SYM(verifyTilesAndDropSmallKey)); SET_HL(subid01_tileData_bank08);
+  CYC(b_+3, b_+6); SET_HL(subid01_tileData_bank08);
   verifyTilesAndDropSmallKey_hook(gb);
 }
 
@@ -128,7 +128,7 @@ void verifyTilesAndDropSmallKey_hook(GB *gb) {
     CYCT(b_+3, b_+4); ret_effect(gb); return;
   }
   CYC(b_+3, b_+4);
-  CYC(b_+4, SYM(subid01_tileData)); spawnSmallKeyFromCeiling_hook(gb);
+  CYC(b_+4, b_+7); spawnSmallKeyFromCeiling_hook(gb);
 }
 
 // D2: Verify a floor tile is red to open a door
@@ -144,7 +144,7 @@ void interaction21_subid02_hook(GB *gb) {
     CYC(b_+9, b_+10); A = alu_dec8(gb, A);
   }
   CYC(b_+10, b_+13); mem_wr(gb, wActiveTriggers, A);
-  CYC(b_+13, SYM(interaction21_subid03)); ret_effect(gb);
+  CYC(b_+13, b_+14); ret_effect(gb);
 }
 
 // Light torches when a colored cube rolls into this position.
@@ -232,7 +232,7 @@ initialized:
   CYC(b_+42, b_+44); alu_sub(gb, 0xad);
   CYC(b_+44, b_+46); A |= 1 << 7;
   CYC(b_+46, b_+49); mem_wr(gb, wRotatingCubeColor, A);
-  CYC(b_+49, SYM(interaction21_subid05)); ret_effect(gb);
+  CYC(b_+49, b_+50); ret_effect(gb);
 }
 
 // d2: Drop a small key here when a colored block puzzle has been solved.
@@ -248,7 +248,7 @@ void interaction21_subid05_hook(GB *gb) {
 void interaction21_subid06_hook(GB *gb) {
   BASE(interaction21_subid06);
   CYC(b_+0, b_+2); B = 0x80;
-  CYC(b_+2, SYM(interaction21_subid19)); dungeonEvents_setTriggerIfCubeColorIs(gb);
+  CYC(b_+2, b_+4); dungeonEvents_setTriggerIfCubeColorIs(gb);
 }
 
 // d1: Set trigger 0 when the colored flames are lit blue.
@@ -281,9 +281,9 @@ void interaction21_subid07_hook(GB *gb) {
   CYC(b_+15, b_+17);
   CYC(b_+17, b_+19); alu_cp(gb, 0xae); // TILEINDEX_YELLOW_TOGGLE_FLOOR
   if (F & FZ) {
-    CYCT(b_+19, SYM(setSwitch)); unsetSwitch_hook(gb); return;
+    CYCT(b_+19, b_+21); unsetSwitch_hook(gb); return;
   }
-  CYC(b_+19, SYM(setSwitch));
+  CYC(b_+19, b_+21);
   setSwitch_hook(gb);
 }
 
@@ -294,7 +294,7 @@ void setSwitch_hook(GB *gb) {
   CYC(b_+3, b_+6); SET_HL(wSwitchState);
   CYC(b_+6, b_+7); alu_or(gb, mem_rd(gb, HL));
   CYC(b_+7, b_+8); mem_wr(gb, HL, A);
-  CYC(b_+8, SYM(unsetSwitch)); ret_effect(gb);
+  CYC(b_+8, b_+9); ret_effect(gb);
 }
 
 void unsetSwitch_hook(GB *gb) {
@@ -305,7 +305,7 @@ void unsetSwitch_hook(GB *gb) {
   CYC(b_+4, b_+7); SET_HL(wSwitchState);
   CYC(b_+7, b_+8); alu_and(gb, mem_rd(gb, HL));
   CYC(b_+8, b_+9); mem_wr(gb, HL, A);
-  CYC(b_+9, SYM(interaction21_subid08)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 // Toggle a bit in wSwitchState based on whether blue flames are lit. The bitmask to use is
@@ -325,7 +325,7 @@ void interaction21_subid08_hook(GB *gb) {
     CYCT(b_+11, b_+13); setSwitch_hook(gb); return;
   }
   CYC(b_+11, b_+13);
-  CYC(b_+13, SYM(interaction21_subid09)); unsetSwitch_hook(gb);
+  CYC(b_+13, b_+15); unsetSwitch_hook(gb);
 }
 
 // d3: Drop a small key when 3 blocks have been pushed.
@@ -366,7 +366,7 @@ initialized:
   CYC(b_+30, b_+33); mem_wr(gb, wcca2, A);
   CYC(b_+33, b_+36); SET_HL(moonlitGrotto_onOrbActivation_bank12);
   CALL_C(b_+36, parseGivenObjectData_b00_hook, SYM(parseGivenObjectData_b00), b_+39);
-  CYC(b_+39, SYM(interaction21_subid0b)); interactionDelete_hook(gb);
+  CYC(b_+39, b_+42); interactionDelete_hook(gb);
 }
 
 // Unused? A chest appears when 4 torches in a diamond formation are lit?
@@ -430,7 +430,7 @@ initialized:
   CYC(b_+72, b_+74); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
   CYC(b_+74, b_+76); A = 0x01;
   CYC(b_+76, b_+79); mem_wr(gb, wActiveTriggers, A);
-  CYC(b_+79, SYM(interaction21_subid0c)); interactionDelete_hook(gb);
+  CYC(b_+79, b_+82); interactionDelete_hook(gb);
 }
 
 // d3: 4 armos spawn when trigger 0 is activated.
@@ -446,7 +446,7 @@ void interaction21_subid0c_hook(GB *gb) {
   CYC(b_+5, b_+8); mem_wr(gb, wcca2, A);
   CYC(b_+8, b_+11); SET_HL(moonlitGrotto_onArmosSwitchPressed_bank12);
   CALL_C(b_+11, parseGivenObjectData_b00_hook, SYM(parseGivenObjectData_b00), b_+14);
-  CYC(b_+14, SYM(interaction21_subid0d)); interactionDelete_hook(gb);
+  CYC(b_+14, b_+17); interactionDelete_hook(gb);
 }
 
 // d3: Crystal breakage handler
@@ -534,7 +534,7 @@ enableControl:
   // jpab scriptHelp.moonlitGrotto_enableControlAfterBreakingCrystal
   CYC(b_+106, b_+109); SET_HL(moonlitGrotto_enableControlAfterBreakingCrystal_bank15);
   CYC(b_+109, b_+111); E = 0x15;
-  CYC(b_+111, SYM(interaction21_subid0e)); interBankCall_hook(gb);
+  CYC(b_+111, b_+114); interBankCall_hook(gb);
 }
 
 // d3: Small key falls when a block is pushed into place
@@ -549,7 +549,7 @@ void interaction21_subid0e_hook(GB *gb) {
     CYCT(b_+9, b_+10); ret_effect(gb); return;
   }
   CYC(b_+9, b_+10);
-  CYC(b_+10, SYM(interaction21_subid0f)); spawnSmallKeyFromCeiling_hook(gb);
+  CYC(b_+10, b_+13); spawnSmallKeyFromCeiling_hook(gb);
 }
 
 // d4: A door opens when a certain floor pattern is achieved
@@ -590,9 +590,9 @@ void interaction21_subid11_hook(GB *gb) {
   CYC(b_+6, b_+8); A = 0x9f; // TILEINDEX_BLUE_FLOOR
   CALL_C(b_+8, findTileInRoom_hook, SYM(findTileInRoom), b_+11);
   if (F & FZ) {
-    CYCT(b_+11, SYM(spawnChestAndDeleteSelf)); ret_effect(gb); return;
+    CYCT(b_+11, b_+12); ret_effect(gb); return;
   }
-  CYC(b_+11, SYM(spawnChestAndDeleteSelf));
+  CYC(b_+11, b_+12);
   spawnChestAndDeleteSelf_hook(gb);
 }
 
@@ -606,7 +606,7 @@ void spawnChestAndDeleteSelf_hook(GB *gb) {
   CYC(b_+9, b_+11); A = 0xf1; // TILEINDEX_CHEST
   CALL_C(b_+11, setTile_hook, SYM(setTile), b_+14);
   CALL_C(b_+14, objectCreatePuff_hook, SYM(objectCreatePuff), b_+17);
-  CYC(b_+17, SYM(interaction21_subid12)); interactionDelete_hook(gb);
+  CYC(b_+17, b_+20); interactionDelete_hook(gb);
 }
 
 // d4: A chest spawns here when the torches light up with the color blue.
@@ -626,7 +626,7 @@ void interaction21_subid12_hook(GB *gb) {
     CYCT(b_+13, b_+14); ret_effect(gb); return;
   }
   CYC(b_+13, b_+14);
-  CYC(b_+14, SYM(interaction21_subid13)); spawnChestAndDeleteSelf_hook(gb);
+  CYC(b_+14, b_+16); spawnChestAndDeleteSelf_hook(gb);
 }
 
 // d5: A chest spawns here when all the spaces around the owl statue are filled.
@@ -730,13 +730,13 @@ state0:
 
   CYC(b_+54, b_+56); C = 0x7b;
   CYC(b_+56, b_+58); A = 0xaf;
-  CYC(b_+58, SYM(setTileToStandardFloor)); setTileWithPuff_hook(gb);
+  CYC(b_+58, b_+60); setTileWithPuff_hook(gb);
 }
 
 // Falls through into setTileWithPuff.
 void setTileToStandardFloor_hook(GB *gb) {
   BASE(setTileToStandardFloor);
-  CYC(b_+0, SYM(setTileWithPuff)); A = 0xa0; // TILEINDEX_STANDARD_FLOOR
+  CYC(b_+0, b_+2); A = 0xa0; // TILEINDEX_STANDARD_FLOOR
   setTileWithPuff_hook(gb);
 }
 
@@ -759,7 +759,7 @@ void createPuffAt_hook(GB *gb) {
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+6); mem_wr(gb, HL, 0x05); // INTERAC_PUFF
   CYC(b_+6, b_+8); L = INTERACTION_BASE + OBJ_YH;
-  CYC(b_+8, SYM(interaction21_subid16_state1)); setShortPosition_paramC_hook(gb);
+  CYC(b_+8, b_+11); setShortPosition_paramC_hook(gb);
 }
 
 void interaction21_subid16_state1_hook(GB *gb) {
@@ -787,7 +787,7 @@ void interaction21_subid16_state1_hook(GB *gb) {
   CYC(b_+35, b_+37); E = INTERACTION_BASE + OBJ_STATE;
   CYC(b_+37, b_+38); alu_xor(gb, A);
   CYC(b_+38, b_+39); mem_wr(gb, DE, A);
-  CYC(b_+39, SYM(interaction21_subid17)); ret_effect(gb);
+  CYC(b_+39, b_+40); ret_effect(gb);
 }
 
 // Create a chest at position Y which appears when [wActiveTriggers] == X, but which also
@@ -851,7 +851,7 @@ triggerInactive:
   CYC(b_+63, b_+65); mem_wr(gb, 0xff70, A); // R_SVBK
   CYC(b_+65, b_+66); A = L;
   CALL_C(b_+66, setTile_hook, SYM(setTile), b_+69);
-  CYC(b_+69, SYM(interaction21_subid18)); createPuffAt_hook(gb);
+  CYC(b_+69, b_+72); createPuffAt_hook(gb);
 }
 
 // d3: Calculate the value for [wSwitchState] based on which crystals are broken.
@@ -900,7 +900,7 @@ void interaction21_subid18_hook(GB *gb) {
   CYC(b_+37, b_+40); A = mem_rd(gb, wSwitchState);
   CYC(b_+40, b_+41); alu_or(gb, B);
   CYC(b_+41, b_+44); mem_wr(gb, wSwitchState, A);
-  CYC(b_+44, SYM(interactionDeleteAndRetIfItemFlagSet)); interactionDelete_hook(gb);
+  CYC(b_+44, b_+47); interactionDelete_hook(gb);
 }
 
 // Deletes the interaction and returns to the caller's caller if this room's item flag is
@@ -915,20 +915,20 @@ void interactionDeleteAndRetIfItemFlagSet_hook(GB *gb) {
   }
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+7); SET_HL(pop_effect(gb));
-  CYC(b_+7, SYM(spawnSmallKeyFromCeiling)); interactionDelete_hook(gb);
+  CYC(b_+7, b_+10); interactionDelete_hook(gb);
 }
 
 void spawnSmallKeyFromCeiling_hook(GB *gb) {
   BASE(spawnSmallKeyFromCeiling);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); SET_BC((SYM(enemyCodeTable) + 205)); // TREASURE_SMALL_KEY, $01
+  CYC(b_+0, b_+3); SET_BC(0x3001); // TREASURE_SMALL_KEY, $01
   CALL_C(b_+3, createTreasure_hook, SYM(createTreasure), b_+6);
   if (!(F & FZ)) {
     CYCT(b_+6, b_+7); ret_effect(gb); return;
   }
   CYC(b_+6, b_+7);
   CALL_C(b_+7, objectCopyPosition_hook, SYM(objectCopyPosition), b_+10);
-  CYC(b_+10, SYM(verifyTiles)); interactionDelete_hook(gb);
+  CYC(b_+10, b_+13); interactionDelete_hook(gb);
 }
 
 // Verifies that certain tiles in the room layout equal specified values.
@@ -965,7 +965,7 @@ nextPosition:
     CYCT(b_+15, b_+16); ret_effect(gb); return;
   }
   CYC(b_+15, b_+16);
-  CYC(b_+16, SYM(makeTorchAtPositionTemporarilyLightable)); goto nextPosition;
+  CYC(b_+16, b_+18); goto nextPosition;
 }
 
 // @param b Number of frames it can stay lit before burning out
@@ -987,7 +987,7 @@ void makeTorchAtPositionTemporarilyLightable_hook(GB *gb) {
   CYC(b_+12, b_+14); L = PART_BASE + OBJ_YH;
   CALL_C(b_+14, setShortPosition_paramC_hook, SYM(setShortPosition_paramC), b_+17);
   CYC(b_+17, b_+18); alu_xor(gb, A);
-  CYC(b_+18, SYM(interactionCode22)); ret_effect(gb);
+  CYC(b_+18, b_+19); ret_effect(gb);
 }
 
 // INTERAC_DUNGEON_EVENTS: subid-dispatched one-off dungeon puzzle handlers.

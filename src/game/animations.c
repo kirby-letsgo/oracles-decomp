@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(initializeAnimations), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(initializeAnimations), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void initializeAnimations__locFunc_hook(GB *gb) {
   BASE(initializeAnimations);
@@ -14,7 +14,7 @@ void initializeAnimations__locFunc_hook(GB *gb) {
     CALL_C(b_+28, updateAnimationQueue_hook, SYM(updateAnimationQueue), b_+31);
     if (!(F & FZ)) { CYCT(b_+31, b_+33); continue; }
     CYC(b_+31, b_+33);
-    CYC(b_+33, SYM(updateAnimations));
+    CYC(b_+33, b_+34);
     ret_effect(gb);
     return;
   }
@@ -51,7 +51,7 @@ void updateAnimations_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+15, b_+16); ret_effect(gb); return; }
   CYC(b_+15, b_+16);
   CALL_C(b_+16, updateAnimationQueue_hook, SYM(updateAnimationQueue), b_+19);
-  CYC(b_+19, SYM(updateAnimationQueue));
+  CYC(b_+19, b_+21);
   updateAnimationData_hook(gb);
 }
 
@@ -92,7 +92,7 @@ void updateAnimationQueue_hook(GB *gb) {
   CYC(b_+32, b_+35); SET_HL(wAnimationState);
   CYC(b_+35, b_+37); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x40));
   CYC(b_+37, b_+38); alu_or(gb, H);
-  CYC(b_+38, SYM(updateAnimationData));
+  CYC(b_+38, b_+39);
   ret_effect(gb);
 }
 
@@ -116,7 +116,7 @@ void loadAnimationGfxIndex_hook(GB *gb) {
   CYC(b_+19, b_+20); E = A;
   CYC(b_+20, b_+21); B = mem_rd(gb, HL);
   CYC(b_+21, b_+22); SET_HL(pop_effect(gb));
-  CYC(b_+22, SYM(uniqueGfxHeadersStart));
+  CYC(b_+22, b_+25);
   queueDmaTransfer_hook(gb);
 }
 
@@ -174,7 +174,7 @@ save_data:
   CYC(b_+59, b_+60); alu_xor(gb, A);
   CYC(b_+60, b_+62); mem_wr(gb, 0xff70, A);
   CYC(b_+62, b_+63); alu_or(gb, H);
-  CYC(b_+63, SYM(loadAnimationGfxIndex));
+  CYC(b_+63, b_+64);
   ret_effect(gb);
 }
 
@@ -200,6 +200,6 @@ void updateAnimationData_hook(GB *gb) {
   CYC(b_+44, b_+47); A = mem_rd(gb, wAnimationState);
   CYC(b_+47, b_+49); alu_and(gb, 0x7f);
   CYC(b_+49, b_+52); mem_wr(gb, wAnimationState, A);
-  CYC(b_+52, SYM(updateAnimationDataPointer));
+  CYC(b_+52, b_+53);
   ret_effect(gb);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode19), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode19), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t fireProjectiles_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -87,5 +87,5 @@ L_50b5:
   CALL_C(b_+75, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+78);
   if (!(F & FC)) { CYCT(b_+78, b_+81); partDelete_hook(gb); return; } // jp nc
   CYC(b_+78, b_+81);
-  CYC(b_+81, SYM(partCode1a)); partAnimate_hook(gb); return; // jp
+  CYC(b_+81, b_+84); partAnimate_hook(gb); return; // jp
 }

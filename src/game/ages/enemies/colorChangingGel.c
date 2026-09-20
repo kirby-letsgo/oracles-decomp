@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(colorChangingGel_updateColor), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(colorChangingGel_updateColor), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void enemyCode47_hook(GB *gb);
 void colorChangingGel_state_uninitialized_hook(GB *gb);
@@ -151,7 +151,7 @@ void colorChangingGel_state_uninitialized_hook(GB *gb) {
   CYC(b_+26, b_+28); A = 0xbf; // PALH_bf
   CALL_C(b_+28, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+31);
   CYC(b_+31, b_+33); A = 0x03;
-  CYC(b_+33, SYM(colorChangingGel_state_stub)); enemySetAnimation_hook(gb); return; // jp $282b
+  CYC(b_+33, b_+36); enemySetAnimation_hook(gb); return; // jp $282b
 }
 
 // 0e:6fa1, bare global; jump-table target from enemyCode47.
@@ -216,7 +216,7 @@ void colorChangingGel_state9_hook(GB *gb) {
   CALL_C(b_+14, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+17);
   CYC(b_+17, b_+19); alu_and(gb, 0x10);
   CYC(b_+19, b_+21); A = alu_swap(gb, A);
-  CYC(b_+21, SYM(colorChangingGel_stateA)); enemySetAnimation_hook(gb); return; // jp $282b
+  CYC(b_+21, b_+24); enemySetAnimation_hook(gb); return; // jp $282b
 }
 
 // 0e:7000, bare global; jump-table target from enemyCode47. Hopping to the target
@@ -252,7 +252,7 @@ stillInAir:
   CYC(b_+40, b_+41);
 
 notThereYetX:
-  CYC(b_+41, SYM(colorChangingGel_updateColor)); ecom_moveTowardPosition_b0e_hook(gb); return; // jp
+  CYC(b_+41, b_+44); ecom_moveTowardPosition_b0e_hook(gb); return; // jp
 }
 
 // 0e:702c, bare global; called from enemyCode47. Updates the gel's color with

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(specialObjectCode_dimitri), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(specialObjectCode_dimitri), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void specialObjectCode_dimitri__runState_hook(GB *gb);
 void dimitriState0_hook(GB *gb);
@@ -152,7 +152,7 @@ initialize_cutscene:
   CYC(b_+46, b_+48); E = 0x3f;
   CYC(b_+48, b_+49); mem_wr(gb, DE, A);
   CALL_C(b_+49, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+52);
-  CYC(b_+52, b_+55); SET_BC((SYM(gfxRegisterStates) + 258));
+  CYC(b_+52, b_+55); SET_BC(0x0408);
   CALL_C(b_+55, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+58);
   CYC(b_+58, b_+60);
   goto set_visible;
@@ -162,7 +162,7 @@ set_animation:
   CALL_C(b_+62, companionSetAnimation_hook, SYM(companionSetAnimation), b_+65);
 
 set_visible:
-  CYC(b_+65, SYM(dimitriState1)); objectSetVisible81_hook(gb);
+  CYC(b_+65, b_+68); objectSetVisible81_hook(gb);
 }
 
 void dimitriState1_hook(GB *gb) {
@@ -222,7 +222,7 @@ after_landing:
     return;
   }
   CYC(b_+57, b_+60);
-  CYC(b_+60, SYM(dimitriState2)); companionTryToMount_hook(gb);
+  CYC(b_+60, b_+63); companionTryToMount_hook(gb);
 }
 
 void dimitriState2_hook(GB *gb) {
@@ -257,7 +257,7 @@ void dimitriState2Substate0_hook(GB *gb) {
   CYC(b_+24, b_+27); SET_HL(wCompanionTutorialTextShown);
   CALL_C(b_+27, setFlag_hook, SYM(setFlag), b_+30);
   CYC(b_+30, b_+32); C = 0x18;
-  CYC(b_+32, SYM(dimitriState2Substate1)); companionSetAnimation_hook(gb);
+  CYC(b_+32, b_+35); companionSetAnimation_hook(gb);
 }
 
 void dimitriState2Substate1_hook(GB *gb) {
@@ -317,7 +317,7 @@ update:
   if (F & FZ) { CYCT(b_+60, b_+61); ret_effect(gb); return; }
   CYC(b_+60, b_+61);
   CYC(b_+61, b_+64); W8(wcc67) = A;
-  CYC(b_+64, SYM(dimitriState2Substate2)); ret_effect(gb);
+  CYC(b_+64, b_+65); ret_effect(gb);
 }
 
 void dimitriState2Substate2_hook(GB *gb) {
@@ -500,7 +500,7 @@ on_hazard:
   CYC(b_+166, b_+167); E = alu_dec8(gb, E);
   CYC(b_+167, b_+168); mem_wr(gb, DE, A);
   CYC(b_+168, b_+170); C = 0x00;
-  CYC(b_+170, SYM(dimitriState2Substate3)); companionSetAnimation_hook(gb);
+  CYC(b_+170, b_+173); companionSetAnimation_hook(gb);
 }
 
 void dimitriState2Substate3_hook(GB *gb) {
@@ -528,7 +528,7 @@ void dimitriState2Substate3_hook(GB *gb) {
   return;
 
 state1:
-  CYC(b_+27, SYM(dimitriFunc_756d)); alu_xor(gb, A);
+  CYC(b_+27, b_+28); alu_xor(gb, A);
   dimitriFunc_756d_hook(gb);
 }
 
@@ -542,7 +542,7 @@ void dimitriFunc_756d_hook(GB *gb) {
   CYC(b_+8, b_+9); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+9, b_+11); mem_wr(gb, HL, 0x00);
   CYC(b_+11, b_+13); C = 0x1c;
-  CYC(b_+13, SYM(dimitriState3)); companionSetAnimation_hook(gb);
+  CYC(b_+13, b_+16); companionSetAnimation_hook(gb);
 }
 
 void dimitriState3_hook(GB *gb) {
@@ -553,7 +553,7 @@ void dimitriState3_hook(GB *gb) {
   CYC(b_+3, b_+4);
   CALL_C(b_+4, companionFinalizeMounting_hook, SYM(companionFinalizeMounting), b_+7);
   CYC(b_+7, b_+9); C = 0x00;
-  CYC(b_+9, SYM(dimitriState4)); companionSetAnimation_hook(gb);
+  CYC(b_+9, b_+12); companionSetAnimation_hook(gb);
 }
 
 void dimitriState4_hook(GB *gb) {
@@ -580,7 +580,7 @@ animate:
   if (!(F & FC)) { CYCT(b_+23, b_+24); ret_effect(gb); return; }
   CYC(b_+23, b_+24);
   CYC(b_+24, b_+26); C = 0x00;
-  CYC(b_+26, SYM(dimitriState5)); companionUpdateDirectionAndSetAnimation_hook(gb);
+  CYC(b_+26, b_+29); companionUpdateDirectionAndSetAnimation_hook(gb);
 }
 
 void dimitriState5_hook(GB *gb) {
@@ -632,8 +632,8 @@ check_dismount:
   }
   CYC(b_+38, b_+41);
   CALL_C(b_+41, companionCheckHopDownCliff_hook, SYM(companionCheckHopDownCliff), b_+44);
-  if (F & FZ) { CYCT(b_+44, SYM(dimitriUpdateMovement)); ret_effect(gb); return; }
-  CYC(b_+44, SYM(dimitriUpdateMovement));
+  if (F & FZ) { CYCT(b_+44, b_+45); ret_effect(gb); return; }
+  CYC(b_+44, b_+45);
   dimitriUpdateMovement_hook(gb);
   return;
 
@@ -665,11 +665,11 @@ check_hazards:
 waterfall:
   CALL_C((SYM(dimitriUpdateMovement__checkHazards) + 27), dimitriAddWaterfallResistance_hook, SYM(dimitriAddWaterfallResistance), (SYM(dimitriUpdateMovement__checkHazards) + 30));
   CYC((SYM(dimitriUpdateMovement__checkHazards) + 30), (SYM(dimitriUpdateMovement__checkHazards) + 32)); B = 0x04;
-  CYC((SYM(dimitriUpdateMovement__checkHazards) + 32), SYM(dimitriUpdateMovement__setNotInWater));
+  CYC((SYM(dimitriUpdateMovement__checkHazards) + 32), (SYM(dimitriUpdateMovement__checkHazards) + 34));
   goto set_water_status;
 
 not_in_water:
-  CYC(SYM(dimitriUpdateMovement__setNotInWater), SYM(dimitriUpdateMovement__setWaterStatus)); B = 0x00;
+  CYC(SYM(dimitriUpdateMovement__setNotInWater), (SYM(dimitriUpdateMovement__setNotInWater) + 2)); B = 0x00;
 
 set_water_status:
   CYC(SYM(dimitriUpdateMovement__setWaterStatus), (SYM(dimitriUpdateMovement__setWaterStatus) + 2)); L = 0x38;
@@ -678,11 +678,11 @@ set_water_status:
   CYC((SYM(dimitriUpdateMovement__setWaterStatus) + 4), (SYM(dimitriUpdateMovement__setWaterStatus) + 5)); mem_wr(gb, HL, B);
   CYC((SYM(dimitriUpdateMovement__setWaterStatus) + 5), (SYM(dimitriUpdateMovement__setWaterStatus) + 7)); C = 0x00;
   if (!(F & FZ)) {
-    CYCT((SYM(dimitriUpdateMovement__setWaterStatus) + 7), SYM(dimitriState9));
+    CYCT((SYM(dimitriUpdateMovement__setWaterStatus) + 7), (SYM(dimitriUpdateMovement__setWaterStatus) + 10));
     companionUpdateDirectionAndSetAnimation_hook(gb);
     return;
   }
-  CYC((SYM(dimitriUpdateMovement__setWaterStatus) + 7), SYM(dimitriState9));
+  CYC((SYM(dimitriUpdateMovement__setWaterStatus) + 7), (SYM(dimitriUpdateMovement__setWaterStatus) + 10));
   dimitriState9_hook(gb);
 }
 
@@ -753,17 +753,17 @@ set_water_status:
   CYC(b_+69, b_+70); mem_wr(gb, HL, B);
   CYC(b_+70, b_+72); C = 0x00;
   if (!(F & FZ)) {
-    CYCT(b_+72, SYM(dimitriState9));
+    CYCT(b_+72, b_+75);
     companionUpdateDirectionAndSetAnimation_hook(gb);
     return;
   }
-  CYC(b_+72, SYM(dimitriState9));
+  CYC(b_+72, b_+75);
   dimitriState9_hook(gb);
 }
 
 void dimitriState9_hook(GB *gb) {
   BASE(dimitriState9);
-  CYC(b_+0, SYM(dimitriGotoEatingState)); ret_effect(gb);
+  CYC(b_+0, b_+1); ret_effect(gb);
 }
 
 void dimitriGotoEatingState_hook(GB *gb) {
@@ -789,10 +789,10 @@ void dimitriGotoEatingState_hook(GB *gb) {
   CYC(b_+26, b_+28); mem_wr(gb, HL, 0x1e);
   CYC(b_+28, b_+30); C = 0x08;
   CALL_C(b_+30, companionSetAnimation_hook, SYM(companionSetAnimation), b_+33);
-  CYC(b_+33, b_+36); SET_BC((SYM(specialObjectAnimate) + 17));
+  CYC(b_+33, b_+36); SET_BC(0x2b00);
   CALL_C(b_+36, companionCreateWeaponItem_hook, SYM(companionCreateWeaponItem), b_+39);
   CYC(b_+39, b_+41); A = 0xc4;
-  CYC(b_+41, SYM(dimitriState6)); playSound_b00_hook(gb);
+  CYC(b_+41, b_+44); playSound_b00_hook(gb);
 }
 
 void dimitriState6_hook(GB *gb) {
@@ -834,8 +834,8 @@ void dimitriGotoState1IfLinkFarAway_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); C = 0x09;
   CALL_C(b_+2, objectCheckLinkWithinDistance_hook, SYM(objectCheckLinkWithinDistance), b_+5);
-  if (F & FC) { CYCT(b_+5, SYM(dimitriGotoState1)); ret_effect(gb); return; }
-  CYC(b_+5, SYM(dimitriGotoState1));
+  if (F & FC) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
+  CYC(b_+5, b_+6);
   dimitriGotoState1_hook(gb);
 }
 
@@ -849,7 +849,7 @@ void dimitriGotoState1_hook(GB *gb) {
   CYC(b_+7, b_+8); mem_wr(gb, DE, A);
   CYC(b_+8, b_+10); E = 0x3b;
   CYC(b_+10, b_+11); mem_wr(gb, DE, A);
-  CYC(b_+11, SYM(dimitriState7)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 void dimitriState7_hook(GB *gb) {
@@ -875,7 +875,7 @@ stopped:
   CYC(b_+17, b_+18); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+18, b_+19); ret_effect(gb); return; }
   CYC(b_+18, b_+19);
-  CYC(b_+19, SYM(dimitriState8)); dimitriLandOnGroundAndGotoState5_hook(gb);
+  CYC(b_+19, b_+22); dimitriLandOnGroundAndGotoState5_hook(gb);
 }
 
 void dimitriState8_hook(GB *gb) {
@@ -943,7 +943,7 @@ substate2:
   CALL_C(b_+79, companionDecCounter1IfNonzero_hook, SYM(companionDecCounter1IfNonzero), b_+82);
   if (!(F & FZ)) { CYCT(b_+82, b_+83); ret_effect(gb); return; }
   CYC(b_+82, b_+83);
-  CYC(b_+83, SYM(dimitriStateB)); dimitriLandOnGroundAndGotoState5_hook(gb);
+  CYC(b_+83, b_+85); dimitriLandOnGroundAndGotoState5_hook(gb);
 }
 
 void dimitriStateB_hook(GB *gb) {
@@ -963,7 +963,7 @@ void dimitriStateB_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+18, b_+19); ret_effect(gb); return; }
   CYC(b_+18, b_+19);
   CYC(b_+19, b_+21); mem_wr(gb, HL, 0x01);
-  CYC(b_+21, SYM(dimitriStateC)); ret_effect(gb);
+  CYC(b_+21, b_+22); ret_effect(gb);
 }
 
 void dimitriStateC_hook(GB *gb) {
@@ -997,7 +997,7 @@ parameter1:
   CYC(b_+37, b_+39); E = 0x03;
   CYC(b_+39, b_+40); alu_xor(gb, A);
   CYC(b_+40, b_+41); mem_wr(gb, DE, A);
-  CYC(b_+41, SYM(dimitriStateD)); dimitriState0_hook(gb);
+  CYC(b_+41, b_+44); dimitriState0_hook(gb);
 }
 
 void dimitriStateD_hook(GB *gb) {
@@ -1023,7 +1023,7 @@ void dimitriStateD_hook(GB *gb) {
 state5:
   CYC(b_+21, b_+23); E = 0x04;
   CYC(b_+23, b_+25); A = 0x05;
-  CYC(b_+25, SYM(dimitriLandOnGroundAndGotoState5)); mem_wr(gb, DE, A);
+  CYC(b_+25, b_+26); mem_wr(gb, DE, A);
   dimitriLandOnGroundAndGotoState5_hook(gb);
 }
 
@@ -1032,7 +1032,7 @@ void dimitriLandOnGroundAndGotoState5_hook(GB *gb) {
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+4); W8(wLinkInAir) = A;
   CYC(b_+4, b_+6); C = 0x00;
-  CYC(b_+6, SYM(dimitriStateA)); companionSetAnimationAndGotoState5_hook(gb);
+  CYC(b_+6, b_+9); companionSetAnimationAndGotoState5_hook(gb);
 }
 
 void dimitriStateA_hook(GB *gb) {
@@ -1083,7 +1083,7 @@ update:
   CYC(b_+38, b_+41); W8(wStatusBarNeedsRefresh) = A;
   CYC(b_+41, b_+43); C = 0x1c;
   CALL_C(b_+43, companionSetAnimation_hook, SYM(companionSetAnimation), b_+46);
-  CYC(b_+46, SYM(dimitriStateASubstate1)); companionForceMount_hook(gb);
+  CYC(b_+46, b_+49); companionForceMount_hook(gb);
 }
 
 void dimitriStateASubstate1_hook(GB *gb) {
@@ -1093,7 +1093,7 @@ void dimitriStateASubstate1_hook(GB *gb) {
   CALL_C(b_+2, objectRemoveFromAButtonSensitiveObjectList_hook, SYM(objectRemoveFromAButtonSensitiveObjectList), b_+5);
   CYC(b_+5, b_+7); C = 0x1c;
   CALL_C(b_+7, companionSetAnimation_hook, SYM(companionSetAnimation), b_+10);
-  CYC(b_+10, SYM(dimitriStateASubstate3)); companionForceMount_hook(gb);
+  CYC(b_+10, b_+13); companionForceMount_hook(gb);
 }
 
 void dimitriStateASubstate3_hook(GB *gb) {
@@ -1111,7 +1111,7 @@ void dimitriStateASubstate3_hook(GB *gb) {
   CYC(b_+16, b_+18); A = 0x04;
   CYC(b_+18, b_+19); mem_wr(gb, DE, A);
   CYC(b_+19, b_+21); A = 0xc4;
-  CYC(b_+21, SYM(dimitriStateASubstate4)); playSound_b00_hook(gb);
+  CYC(b_+21, b_+24); playSound_b00_hook(gb);
 }
 
 void dimitriStateASubstate4_hook(GB *gb) {
@@ -1128,7 +1128,7 @@ void dimitriStateASubstate4_hook(GB *gb) {
   CYC(b_+13, b_+16); W8(wDisabledObjects) = A;
   CYC(b_+16, b_+19); W8(wMenuDisabled) = A;
   CYC(b_+19, b_+22); W8(wUseSimulatedInput) = A;
-  CYC(b_+22, SYM(dimitriStateASubstate2)); itemDelete_hook(gb);
+  CYC(b_+22, b_+25); itemDelete_hook(gb);
 }
 
 void dimitriStateASubstate2_hook(GB *gb) {
@@ -1141,7 +1141,7 @@ void dimitriStateASubstate2_hook(GB *gb) {
   CALL_C(b_+6, companionDismountAndSavePosition_hook, SYM(companionDismountAndSavePosition), b_+9);
   CYC(b_+9, b_+10); alu_xor(gb, A);
   CYC(b_+10, b_+13); W8(wRememberedCompanionId) = A;
-  CYC(b_+13, SYM(dimitriCheckAddToGrabbableObjectBuffer)); ret_effect(gb);
+  CYC(b_+13, b_+14); ret_effect(gb);
 }
 
 void dimitriCheckAddToGrabbableObjectBuffer_hook(GB *gb) {
@@ -1177,7 +1177,7 @@ void dimitriCheckAddToGrabbableObjectBuffer_hook(GB *gb) {
   }
 
 done:
-  CYC(b_+39, SYM(dimitriCheckCanBeHeldInDirection)); ret_effect(gb);
+  CYC(b_+39, b_+40); ret_effect(gb);
 }
 
 void dimitriCheckCanBeHeldInDirection_hook(GB *gb) {
@@ -1240,7 +1240,7 @@ check_tile:
   if (F & FZ) { CYCT(b_+57, b_+58); goto return_from_check_tile; }
   CYC(b_+57, b_+58);
   CYC(b_+58, b_+60); alu_cp(gb, 0x19);
-  CYC(b_+60, SYM(dimitriAddWaterfallResistance));
+  CYC(b_+60, b_+61);
 
 return_from_check_tile:
   ret_effect(gb);
@@ -1276,5 +1276,5 @@ move_down:
   CYC(b_+25, b_+26);
   CYC(b_+26, b_+28); A = 0x82;
   CYC(b_+28, b_+31); W8(wScreenTransitionDirection) = A;
-  CYC(b_+31, SYM(dimitriTileOffsets)); ret_effect(gb);
+  CYC(b_+31, b_+32); ret_effect(gb);
 }

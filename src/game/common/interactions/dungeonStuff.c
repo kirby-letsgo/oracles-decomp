@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode12), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode12), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // interactionCode12@dungeonTextIndices: low byte of TX_02xx, one per dungeon.
 #define dungeonTextIndices_bank08 SYM(interactionCode12__dungeonTextIndices)
@@ -61,7 +61,7 @@ static void dungeonStuff_createPuff(GB *gb, uint16_t sp0_) {
   CYC(b_+245, b_+246);
   CYC(b_+246, b_+248); mem_wr(gb, HL, 0x05);
   CYC(b_+248, b_+250); L = INTERACTION_BASE + OBJ_YH;
-  CYC(b_+250, SYM(interactionCode13)); setShortPosition_paramC_hook(gb);
+  CYC(b_+250, b_+253); setShortPosition_paramC_hook(gb);
 }
 
 // interactionCode12@createStaircaseTile: replace tile $40+A at position C with a staircase

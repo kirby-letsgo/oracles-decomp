@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode2d), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode2d), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // PART_VERAN_FAIRY_PROJECTILE
 void partCode2d_hook(GB *gb) {
@@ -46,5 +46,5 @@ noRelatedObj:
   CALL_C(b_+49, objectCreatePuff_hook, SYM(objectCreatePuff), b_+52);
 
 notNormalStatus:
-  CYC(b_+52, SYM(partCode2e)); partDelete_hook(gb); return; // jp
+  CYC(b_+52, b_+55); partDelete_hook(gb); return; // jp
 }

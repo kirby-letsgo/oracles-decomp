@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode13), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode13), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void spark_updateAngle_hook(GB *gb);
 void spark_getWallAngle_hook(GB *gb);
@@ -83,7 +83,7 @@ void spark_state_uninitialized_hook(GB *gb) {
   CYC(b_+5, b_+6); mem_wr(gb, DE, A);
   CYC(b_+6, b_+8); A = 0x28; // SPEED_100
   CALL_C(b_+8, ecom_setSpeedAndState8_b0d_hook, SYM(ecom_setSpeedAndState8_b0d), b_+11);
-  CYC(b_+11, SYM(spark_state_stub)); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+11, b_+14); objectSetVisible82_hook(gb); return; // jp
 }
 
 // 0d:50c8, bare global.
@@ -98,14 +98,14 @@ void spark_state8_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, spark_updateAngle_hook, SYM(spark_updateAngle), b_+3);
   CALL_C(b_+3, objectApplySpeed_hook, SYM(objectApplySpeed), b_+6);
-  CYC(b_+6, SYM(spark_state9)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+6, b_+9); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0d:50d2, bare global; just hit by a boomerang (also whisp's state 9).
 void spark_state9_hook(GB *gb) {
   BASE(spark_state9);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); SET_BC((SYM(initializeVramMap1) + 21)); // INTERAC_PUFF, subid 2
+  CYC(b_+0, b_+3); SET_BC(0x0502); // INTERAC_PUFF, subid 2
   CALL_C(b_+3, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+6);
   if (!(F & FZ)) { RET_TAKEN(b_+6); return; } // ret nz
   CYC(b_+6, b_+7);
@@ -116,7 +116,7 @@ void spark_state9_hook(GB *gb) {
   CYC(b_+13, b_+14); A = H;
   CYC(b_+14, b_+15); mem_wr(gb, DE, A);
   CALL_C(b_+15, ecom_incState_b0d_hook, SYM(ecom_incState_b0d), b_+18);
-  CYC(b_+18, SYM(spark_stateA)); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+18, b_+21); objectSetInvisible_hook(gb); return; // jp
 }
 
 // 0d:50e7, bare global; deletes self and creates fairy when the "puff" is gone
@@ -135,5 +135,5 @@ void spark_stateA_hook(GB *gb) {
   CYC(b_+11, b_+13); alu_cp(gb, 0x13); // ENEMY_SPARK
   CYC(b_+13, b_+15); B = 0x01; // PART_ITEM_DROP
   if (F & FZ) { CALL_C(b_+15, ecom_spawnProjectile_b0d_hook, SYM(ecom_spawnProjectile_b0d), b_+18); } else { CYC(b_+15, b_+18); } // call z
-  CYC(b_+18, SYM(enemyCode19)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+18, b_+21); enemyDelete_hook(gb); return; // jp
 }

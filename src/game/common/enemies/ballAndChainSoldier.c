@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode4b), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode4b), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void ballAndChain_state_uninitialized_hook(GB *gb);
 void ballAndChain_state_switchHook_hook(GB *gb);
@@ -108,7 +108,7 @@ substate3:
   CYC(b_+12, b_+14); E = ENEMY_BASE + 0x31; // Enemy.var31
   CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   CYC(b_+15, b_+16); B = A;
-  CYC(b_+16, SYM(ballAndChain_state_stub)); ecom_fallToGroundAndSetState_b0e_hook(gb); return; // jp
+  CYC(b_+16, b_+19); ecom_fallToGroundAndSetState_b0e_hook(gb); return; // jp
 }
 
 // 0e:603c, bare global; jump-table target from enemyCode4b.
@@ -145,7 +145,7 @@ moveTowardLink:
 // ballAndChain_state9.
 void ballAndChain_animate_hook(GB *gb) {
   BASE(ballAndChain_animate);
-  CYC(b_+0, SYM(ballAndChain_state9)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:605f, bare global; jump-table target from enemyCode4b. Spinning up ball for [counter1]
@@ -195,7 +195,7 @@ gotoState8:
   CYC(b_+32, b_+34); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+34, b_+35); alu_xor(gb, A);
   CYC(b_+35, b_+36); mem_wr(gb, HL, A);
-  CYC(b_+36, SYM(ballAndChain_spawnSpikedBall)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+36, b_+39); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:6095, bare global; called from ballAndChain_state_uninitialized.

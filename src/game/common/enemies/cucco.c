@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode36), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode36), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void cucco_state_uninitialized_hook(GB *gb);
 void cucco_state_grabbed_hook(GB *gb);
@@ -187,7 +187,7 @@ landed:
   CYC(b_+95, b_+97); mem_wr(gb, HL, 0x28); // SPEED_100
   CYC(b_+97, b_+99); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+99, b_+101); mem_wr(gb, HL, 0x01);
-  CYC(b_+101, SYM(cucco_state_stub)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+101, b_+104); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 void cucco_state_stub_hook(GB *gb) {
@@ -202,7 +202,7 @@ void cucco_state8_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, objectAddToGrabbableObjectBuffer_hook, SYM(objectAddToGrabbableObjectBuffer), b_+3);
   CYC(b_+3, b_+5); E = 0x3f;
-  CYC(b_+5, b_+8); SET_BC((SYM(gfxRegisterStates) + 25));
+  CYC(b_+5, b_+8); SET_BC(0x031f);
   CALL_C(b_+8, ecom_randomBitwiseAndBCE_b0e_hook, SYM(ecom_randomBitwiseAndBCE_b0e), b_+11);
   CYC(b_+11, b_+12); alu_or(gb, E);
   if (!(F & FZ)) { RET_TAKEN(b_+12); return; } // ret nz (63 in 64 chance of returning)
@@ -216,7 +216,7 @@ void cucco_state8_hook(GB *gb) {
   CYC(b_+23, b_+25); L = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+25, b_+26); A = C;
   CYC(b_+26, b_+27); mem_wr(gb, HL, A);
-  CYC(b_+27, SYM(cucco_state9)); cucco_setAnimationFromAngle_hook(gb); return; // jp
+  CYC(b_+27, b_+30); cucco_setAnimationFromAngle_hook(gb); return; // jp
 }
 
 // Moving in some direction until [counter2] == 0.
@@ -253,7 +253,7 @@ L_4e81:
 
 void cucco_animate_hook(GB *gb) {
   BASE(cucco_animate);
-  CYC(b_+0, SYM(cucco_stateA)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // Just landed after being thrown. Run away from Link indefinitely.
@@ -264,7 +264,7 @@ void cucco_stateA_hook(GB *gb) {
   CALL_C(b_+3, ecom_updateCardinalAngleAwayFromTarget_b0e_hook, SYM(ecom_updateCardinalAngleAwayFromTarget_b0e), b_+6);
   CALL_C(b_+6, cucco_setAnimationFromAngle_hook, SYM(cucco_setAnimationFromAngle), b_+9);
   CALL_C(b_+9, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0e), b_+12);
-  CYCT(b_+12, SYM(cucco_stateB)); cucco_animate_hook(gb); return; // jr
+  CYCT(b_+12, b_+14); cucco_animate_hook(gb); return; // jr
 }
 
 // In the process of transforming (into ENEMY_BABY_CUCCO or ENEMY_GIANT_CUCCO, based on
@@ -281,7 +281,7 @@ void cucco_stateB_hook(GB *gb) {
   CYC(b_+10, b_+11); A = mem_rd(gb, DE);
   CYC(b_+11, b_+12); B = A;
   CYC(b_+12, b_+14); C = 0x00;
-  CYC(b_+14, SYM(enemyCode3b)); objectReplaceWithID_hook(gb); return; // jp
+  CYC(b_+14, b_+17); objectReplaceWithID_hook(gb); return; // jp
 }
 
 // ==================================================================================================
@@ -341,7 +341,7 @@ void giantCucco_state_uninitialized_hook(GB *gb) {
   CALL_C(b_+2, ecom_setSpeedAndState8_b0e_hook, SYM(ecom_setSpeedAndState8_b0e), b_+5);
   CYC(b_+5, b_+7); A = 0x30;
   CALL_C(b_+7, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+10);
-  CYC(b_+10, SYM(giantCucco_stateA)); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+10, b_+13); objectSetVisiblec1_hook(gb); return; // jp
 }
 
 // Hit with anything other than Link or shield
@@ -363,7 +363,7 @@ runAway:
   CALL_C(b_+19, ecom_updateCardinalAngleAwayFromTarget_b0e_hook, SYM(ecom_updateCardinalAngleAwayFromTarget_b0e), b_+22);
   CALL_C(b_+22, cucco_setAnimationFromAngle_hook, SYM(cucco_setAnimationFromAngle), b_+25);
   CALL_C(b_+25, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0e), b_+28);
-  CYCT(b_+28, SYM(giantCucco_stateB)); giantCucco_animate_hook(gb); return; // jr
+  CYCT(b_+28, b_+30); giantCucco_animate_hook(gb); return; // jr
 }
 
 // Charging toward Link after being hit 8 times
@@ -379,7 +379,7 @@ void giantCucco_stateB_hook(GB *gb) {
 
 void giantCucco_animate_hook(GB *gb) {
   BASE(giantCucco_animate);
-  CYC(b_+0, SYM(cucco_setAnimationFromAngle)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 void cucco_setAnimationFromAngle_hook(GB *gb) {
@@ -399,7 +399,7 @@ void cucco_setAnimationFromAngle_hook(GB *gb) {
   if (F & FZ) { RET_TAKEN(b_+15); return; } // ret z
   CYC(b_+15, b_+16);
   CYC(b_+16, b_+17); mem_wr(gb, HL, A);
-  CYC(b_+17, SYM(cucco_zVals)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+17, b_+20); enemySetAnimation_hook(gb); return; // jp
 }
 
 void cucco_checkSpawnCuccoAttacker_hook(GB *gb) {
@@ -465,7 +465,7 @@ L_4f8b:
 
 L_4f97:
   CYC(b_+32, b_+34); A = 0xa0; // SND_CHICKEN
-  CYC(b_+34, SYM(cucco_hitWithMysterySeed)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+34, b_+37); playSound_b00_hook(gb); return; // jp
 }
 
 // Cucco will transform into ENEMY_BABY_CUCCO (if not aggressive) or ENEMY_GIANT_CUCCO
@@ -489,7 +489,7 @@ L_4fab:
 L_4fad:
   CYC(b_+17, b_+19); E = ENEMY_BASE + 0x31; // Enemy.var31
   CYC(b_+19, b_+20); mem_wr(gb, DE, A);
-  CYC(b_+20, b_+23); SET_BC((SYM(initializeVramMap1) + 21)); // INTERAC_PUFF,$02
+  CYC(b_+20, b_+23); SET_BC(0x0502); // INTERAC_PUFF,$02
   CALL_C(b_+23, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+26);
   if (!(F & FZ)) { RET_TAKEN(b_+26); return; } // ret nz
   CYC(b_+26, b_+27);
@@ -502,7 +502,7 @@ L_4fad:
   CYC(b_+35, b_+37); E = ENEMY_BASE + OBJ_STATE;
   CYC(b_+37, b_+39); A = 0x0b;
   CYC(b_+39, b_+40); mem_wr(gb, DE, A);
-  CYC(b_+40, SYM(cucco_playChickenSoundEvery32Frames)); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+40, b_+43); objectSetInvisible_hook(gb); return; // jp
 }
 
 void cucco_playChickenSoundEvery32Frames_hook(GB *gb) {
@@ -520,5 +520,5 @@ void cucco_playChickenSoundEvery32Frames_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+12); return; } // ret nz
   CYC(b_+12, b_+13);
   CYC(b_+13, b_+15); A = 0xa0; // SND_CHICKEN
-  CYC(b_+15, SYM(enemyCode37)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+15, b_+18); playSound_b00_hook(gb); return; // jp
 }

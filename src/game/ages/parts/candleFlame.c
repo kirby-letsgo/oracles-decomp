@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode36), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode36), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t candleFlame_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -76,5 +76,5 @@ state2:
   CYC(b_+57, b_+59); E = 0xcf; // Part.zh
   CYC(b_+59, b_+61); A = 0xf3;
   CYC(b_+61, b_+62); mem_wr(gb, DE, A);
-  CYC(b_+62, SYM(partCode37)); partAnimate_hook(gb); return; // jp
+  CYC(b_+62, b_+65); partAnimate_hook(gb); return; // jp
 }

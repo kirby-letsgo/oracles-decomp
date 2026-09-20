@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode55), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode55), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t octogonBubble_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -134,5 +134,5 @@ gotoState2:
   CYC(b_+131, b_+133); L = 0xe4; // Part.collisionType
   CYC(b_+133, b_+135); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
   CYC(b_+135, b_+137); A = 0x01;
-  CYC(b_+137, SYM(partCode56)); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+137, b_+140); partSetAnimation_hook(gb); return; // jp
 }

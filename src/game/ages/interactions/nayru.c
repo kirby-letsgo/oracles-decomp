@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(nayruState0), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(nayruState0), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // nayruSubid00@swayHorizontally@xOffsets: $ff $ff $ff $00 $01 $01 $01 $00
 #define nayruSwayXOffsets_bank08 SYM(nayruSubid00__swayHorizontally__xOffsets)
@@ -413,7 +413,7 @@ init13:
   CYC(b_+437, b_+440); mem_wr(gb, wActiveMusic2, A);
   CYC(b_+440, b_+442); A = 0xff;
   CYC(b_+442, b_+445); mem_wr(gb, wActiveMusic, A);
-  CYC(b_+445, SYM(nayruState1)); nayru_setSingingAnimation(gb, sp0_);
+  CYC(b_+445, b_+448); nayru_setSingingAnimation(gb, sp0_);
 }
 
 // nayruSubid00@createMusicNotes: spawn a floating music note when the animation signals
@@ -743,7 +743,7 @@ substate8_scriptRunning:
   }
   CYC(b_+294, b_+295);
   CYC(b_+295, b_+297); B = 0x01;
-  CYC(b_+297, SYM(nayruSubid01)); objectFlickerVisibility_hook(gb);
+  CYC(b_+297, b_+300); objectFlickerVisibility_hook(gb);
 }
 
 // Subid $01: Cutscene in Ambi's palace after getting bombs. When the script finishes, load
@@ -777,7 +777,7 @@ void nayruSubid01_hook(GB *gb) {
   CYC(b_+39, b_+42); A = mem_rd(gb, wActiveMusic2);
   CYC(b_+42, b_+45); mem_wr(gb, wActiveMusic, A);
   CALL_C(b_+45, playSound_b00_hook, SYM(playSound_b00), b_+48);
-  CYC(b_+48, SYM(nayruSubid02)); clearPaletteFadeVariablesAndRefreshPalettes_hook(gb);
+  CYC(b_+48, b_+51); clearPaletteFadeVariablesAndRefreshPalettes_hook(gb);
 }
 
 // Subid $02: Cutscene on maku tree screen after being saved
@@ -816,7 +816,7 @@ void nayruSubid02Substate0_hook(GB *gb) {
   return;
 
 createNotes:
-  CYC(b_+23, SYM(nayruAnimateAndRunScript)); push_effect(gb, SYM(nayruAnimateAndRunScript)); nayru_createMusicNotes(gb);
+  CYC(b_+23, b_+26); push_effect(gb, SYM(nayruAnimateAndRunScript)); nayru_createMusicNotes(gb);
   nayruAnimateAndRunScript_hook(gb);
 }
 
@@ -824,7 +824,7 @@ void nayruAnimateAndRunScript_hook(GB *gb) {
   BASE(nayruAnimateAndRunScript);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+3);
-  CYC(b_+3, SYM(nayruSubid02Substate1)); interactionRunScript_hook(gb);
+  CYC(b_+3, b_+6); interactionRunScript_hook(gb);
 }
 
 void nayruSubid02Substate1_hook(GB *gb) {
@@ -840,7 +840,7 @@ void nayruSubid02Substate1_hook(GB *gb) {
   CYC(b_+10, b_+13); SET_HL(nayruScript02_part3_bank0c);
   CALL_C(b_+13, interactionSetScript_hook, SYM(interactionSetScript), b_+16);
   CYC(b_+16, b_+18); A = 0x01;
-  CYC(b_+18, SYM(nayruFlipDirectionAtRandomIntervals)); interactionSetAnimation_hook(gb);
+  CYC(b_+18, b_+21); interactionSetAnimation_hook(gb);
 }
 
 // Also called by Ralph in the same cutscene. Falls through into nayruSetCounter1Randomly.
@@ -870,7 +870,7 @@ void nayruSetCounter1Randomly_hook(GB *gb) {
   CYC(b_+7, b_+9); alu_add(gb, 0x10);
   CYC(b_+9, b_+11); E = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+11, b_+12); mem_wr(gb, DE, A);
-  CYC(b_+12, SYM(nayruSubid02Substate2)); ret_effect(gb);
+  CYC(b_+12, b_+13); ret_effect(gb);
 }
 
 void nayruSubid02Substate2_hook(GB *gb) {
@@ -881,7 +881,7 @@ void nayruSubid02Substate2_hook(GB *gb) {
     CYCT(b_+3, b_+4); ret_effect(gb); return;
   }
   CYC(b_+3, b_+4);
-  CYC(b_+4, SYM(nayruSubid03)); interactionDelete_hook(gb);
+  CYC(b_+4, b_+7); interactionDelete_hook(gb);
 }
 
 // Subid $03: Cutscene with Nayru and Ralph when Link exits the black tower
@@ -923,7 +923,7 @@ substate1:
   return;
 
 substate2:
-  CYC(b_+40, SYM(nayruSubid04)); interactionRunScript_hook(gb);
+  CYC(b_+40, b_+43); interactionRunScript_hook(gb);
 }
 
 // Subid $04: Cutscene at end of game with Ambi and her guards
@@ -945,7 +945,7 @@ void nayruSubid04_hook(GB *gb) {
   // jpab scriptHelp.turnToFaceSomething
   CYC(b_+16, b_+19); SET_HL(turnToFaceSomething_bank15);
   CYC(b_+19, b_+21); E = 0x15;
-  CYC(b_+21, SYM(nayruSubid05)); interBankCall_hook(gb);
+  CYC(b_+21, b_+24); interBankCall_hook(gb);
 }
 
 // Subid $05: ?
@@ -967,7 +967,7 @@ void nayruSubid05_hook(GB *gb) {
   // jpab scriptHelp.turnToFaceSomething
   CYC(b_+12, b_+15); SET_HL(turnToFaceSomething_bank15);
   CYC(b_+15, b_+17); E = 0x15;
-  CYC(b_+17, SYM(nayruUpdatePossessionPaletteDurations)); interBankCall_hook(gb);
+  CYC(b_+17, b_+20); interBankCall_hook(gb);
 }
 
 // For Nayru subid 0 (getting possessed cutscene), this updates var3a, var3b representing
@@ -1071,7 +1071,7 @@ var38_4:
     CYCT(b_+77, b_+78); ret_effect(gb); return;
   }
   CYC(b_+77, b_+78);
-  CYC(b_+78, SYM(nayruSubid07)); ret_effect(gb);
+  CYC(b_+78, b_+79); ret_effect(gb);
 }
 
 // Subid $07: Cutscene with the vision of Nayru teaching you Tune of Echoes
@@ -1149,14 +1149,14 @@ scriptDone:
   CALL_C(b_+87, showStatusBar_hook, SYM(showStatusBar), b_+90);
   CYC(b_+90, b_+92); A = H8(hActiveObject);
   CYC(b_+92, b_+93); D = A;
-  CYC(b_+93, SYM(nayruAsNpc)); interactionDelete_hook(gb);
+  CYC(b_+93, b_+96); interactionDelete_hook(gb);
 }
 
 void nayruAsNpc_hook(GB *gb) {
   BASE(nayruAsNpc);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
-  CYC(b_+3, SYM(nayruSubid09)); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+3, b_+6); npcFaceLinkAndAnimate_hook(gb);
 }
 
 // Subid $09: Cutscene where Ralph's heritage is revealed (unlinked?)
@@ -1173,7 +1173,7 @@ void nayruSubid09_hook(GB *gb) {
   CYC(b_+8, b_+11); mem_wr(gb, wMenuDisabled, A);
   CYC(b_+11, b_+13); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
   CALL_C(b_+13, setGlobalFlag_hook, SYM(setGlobalFlag), b_+16);
-  CYC(b_+16, SYM(nayruSubid10)); interactionDelete_hook(gb);
+  CYC(b_+16, b_+19); interactionDelete_hook(gb);
 }
 
 // Subid $10: Cutscene in black tower where Nayru/Ralph meet you to try to escape. Falls
@@ -1216,14 +1216,14 @@ void nayruSubid0a_hook(GB *gb) {
     CYCT(b_+3, b_+4); ret_effect(gb); return;
   }
   CYC(b_+3, b_+4);
-  CYC(b_+4, SYM(nayruSubid13)); interactionDelete_hook(gb);
+  CYC(b_+4, b_+7); interactionDelete_hook(gb);
 }
 
 // Subid $13: NPC after completing game (singing to animals). Falls through into
 // nayruRunScriptWithConditionalAnimation.
 void nayruSubid13_hook(GB *gb) {
-  BASE(nayruRunScriptWithConditionalAnimation);
-  CYC(SYM(nayruSubid13), b_+0); push_effect(gb, b_+0); nayru_createMusicNotes(gb);
+  BASE(nayruSubid13);
+  CYC(b_+0, b_+3); push_effect(gb, SYM(nayruRunScriptWithConditionalAnimation)); nayru_createMusicNotes(gb);
   nayruRunScriptWithConditionalAnimation_hook(gb);
 }
 
@@ -1241,5 +1241,5 @@ void nayruRunScriptWithConditionalAnimation_hook(GB *gb) {
     CYC(b_+7, b_+10);
   }
   CALL_C(b_+10, objectPreventLinkFromPassing_hook, SYM(objectPreventLinkFromPassing), b_+13);
-  CYC(b_+13, SYM(interactionCode37)); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
+  CYC(b_+13, b_+16); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
 }

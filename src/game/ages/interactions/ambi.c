@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode4d), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode4d), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t ambi_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -164,7 +164,7 @@ subida:
   CYC(b_+207, b_+209); alu_bit(gb, 7, mem_rd(gb, HL));
   if (F & FZ) { CYCT(b_+209, b_+212); interactionDelete_hook(gb); return; }
   CYC(b_+209, b_+212);
-  CYC(b_+212, SYM(ambi_state1)); ambi_loadScript_hook(gb);
+  CYC(b_+212, b_+215); ambi_loadScript_hook(gb);
 }
 
 void interactionCode4d_hook(GB *gb) {
@@ -218,7 +218,7 @@ void ambi_updateAnimationAndRunScript_hook(GB *gb) {
   BASE(ambi_updateAnimationAndRunScript);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionAnimate_hook, SYM(interactionAnimate), b_+3);
-  CYC(b_+3, SYM(ambi_runSubid01)); interactionRunScript_hook(gb);
+  CYC(b_+3, b_+6); interactionRunScript_hook(gb);
 }
 
 void ambi_runSubid01_hook(GB *gb) {
@@ -266,14 +266,14 @@ substate1:
   CYC(b_+57, b_+58);
   CALL_C(b_+58, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+61);
   CYC(b_+61, b_+63); L = 0x7e;
-  CYC(b_+63, SYM(ambi_ret)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+63, b_+64); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   ambi_ret_hook(gb);
 }
 
 void ambi_ret_hook(GB *gb) {
   BASE(ambi_ret);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, SYM(ambi_runSubid02)); ret_effect(gb);
+  CYC(b_+0, b_+1); ret_effect(gb);
 }
 
 void ambi_runSubid02_hook(GB *gb) {
@@ -305,7 +305,7 @@ substate1:
   CYC(b_+28, b_+29);
   CALL_C(b_+29, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+32);
   CYC(b_+32, b_+35); SET_BC((SYM(soldierSubid04Substate1) + 5));
-  CYC(b_+35, SYM(ambi_runSubid03)); interactionSetPosition_hook(gb);
+  CYC(b_+35, b_+38); interactionSetPosition_hook(gb);
 }
 
 void ambi_runSubid03_hook(GB *gb) {
@@ -378,7 +378,7 @@ substate3:
   CYC(b_+89, b_+90);
   CYC(b_+90, b_+92); A = 2;
   CYC(b_+92, b_+95); W8(wTmpcfc0_genericCutscene_cfd0) = A;
-  CYC(b_+95, SYM(ambi_runSubid04)); interactionIncSubstate_hook(gb);
+  CYC(b_+95, b_+98); interactionIncSubstate_hook(gb);
 }
 
 void ambi_runSubid04_hook(GB *gb) {
@@ -413,7 +413,7 @@ substate1:
   CYC(b_+33, b_+34);
   CYC(b_+34, b_+36); A = 3;
   CYC(b_+36, b_+39); W8(wTmpcfc0_genericCutscene_cfd0) = A;
-  CYC(b_+39, SYM(ambi_runSubid05)); interactionIncSubstate_hook(gb);
+  CYC(b_+39, b_+42); interactionIncSubstate_hook(gb);
 }
 
 void ambi_runSubid05_hook(GB *gb) {
@@ -437,7 +437,7 @@ void ambi_runSubid06_hook(GB *gb) {
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+8); A = 1;
   CYC(b_+8, b_+11); W8(wLoadedTreeGfxIndex) = A;
-  CYC(b_+11, SYM(ambi_runSubid08)); interactionDelete_hook(gb);
+  CYC(b_+11, b_+14); interactionDelete_hook(gb);
 }
 
 void ambi_runSubid08_hook(GB *gb) {
@@ -450,14 +450,14 @@ void ambi_runSubid08_hook(GB *gb) {
   CYC(b_+6, b_+9); W8(wTmpcbb8) = A;
   CYC(b_+9, b_+11); A = 8;
   CYC(b_+11, b_+14); W8(wCutsceneTrigger) = A;
-  CYC(b_+14, SYM(ambi_runSubid0a)); interactionDelete_hook(gb);
+  CYC(b_+14, b_+17); interactionDelete_hook(gb);
 }
 
 void ambi_runSubid0a_hook(GB *gb) {
   BASE(ambi_runSubid0a);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, npcFaceLinkAndAnimate_hook, SYM(npcFaceLinkAndAnimate), b_+3);
-  CYC(b_+3, SYM(ambi_loadScript)); interactionRunScript_hook(gb);
+  CYC(b_+3, b_+6); interactionRunScript_hook(gb);
 }
 
 void ambi_loadScript_hook(GB *gb) {

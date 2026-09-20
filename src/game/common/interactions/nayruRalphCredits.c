@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodedf), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodedf), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/common/interactions/nayruRalphCredits.s (INTERAC_NAYRU_RALPH_CREDITS), bank $10.
 

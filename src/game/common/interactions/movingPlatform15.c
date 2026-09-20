@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(movingPlatform_loadScript), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(movingPlatform_loadScript), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void movingPlatform_loadScript_hook(GB *gb);
 void movingPlatform_runScript_hook(GB *gb);
@@ -69,7 +69,7 @@ loadScript:
   CYC(b_+24, b_+25); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+25, b_+26); H = mem_rd(gb, HL);
   CYC(b_+26, b_+27); L = A;
-  CYC(b_+27, SYM(movingPlatform_runScript));
+  CYC(b_+27, b_+29);
   movingPlatform_setScript_hook(gb);
 }
 
@@ -195,7 +195,7 @@ opcode0b:
 moveAtAngle:
   CYC(b_+115, b_+117); E = INTERACTION_BASE + OBJ_ANGLE;
   CYC(b_+117, b_+118); mem_wr(gb, DE, A);
-  CYC(b_+118, SYM(movingPlatform_setScript));
+  CYC(b_+118, b_+120);
   goto opcode01;
 }
 

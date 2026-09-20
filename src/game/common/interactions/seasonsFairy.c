@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(objectOscillateZ_body), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(objectOscillateZ_body), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void objectOscillateZ_body_hook(GB *gb) {
   BASE(objectOscillateZ_body);
@@ -176,7 +176,7 @@ static void seasonsFairyCheckLinkIsClose(GB *gb) {
   CYC(b_+396, b_+397); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+397, b_+399); alu_add(gb, 0x02);
   CYC(b_+399, b_+401); alu_cp(gb, 0x05);
-  CYC(b_+401, SYM(objectOscillateZ_body)); ret_effect(gb);
+  CYC(b_+401, b_+402); ret_effect(gb);
 }
 
 void interactionCode50_hook(GB *gb) {

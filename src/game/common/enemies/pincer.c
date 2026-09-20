@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(pincer_body_updateExtendedAmount), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(pincer_body_updateExtendedAmount), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void pincer_state_uninitialized_hook(GB *gb);
 void pincer_state1_hook(GB *gb);
@@ -48,7 +48,7 @@ static uint8_t pincer_getExtendedAmountDividedByFour(GB *gb) {
   CYC(b_+38, b_+39); A = mem_rd(gb, HL);
   CYC(b_+39, b_+41); A = alu_srl(gb, A);
   CYC(b_+41, b_+43); A = alu_srl(gb, A);
-  CYC(b_+43, SYM(enemyCode4b));
+  CYC(b_+43, b_+44);
   return A;
 }
 
@@ -106,7 +106,7 @@ void pincer_state_uninitialized_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+2, b_+5); ecom_setSpeedAndState8_b0e_hook(gb); return; } // jp nz
   CYC(b_+2, b_+5);
   CYC(b_+5, b_+6); A = alu_inc8(gb, A); // inc a
-  CYC(b_+6, SYM(pincer_state1)); mem_wr(gb, DE, A); // [state] = 1
+  CYC(b_+6, b_+7); mem_wr(gb, DE, A); // [state] = 1
   pincer_state1_hook(gb); return; // fallthrough
 }
 
@@ -136,7 +136,7 @@ void pincer_state1_hook(GB *gb) {
   CYC(b_+36, b_+37); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl), [child.subid]
   CYC(b_+37, b_+38); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl), [child.subid]
   CALL_C(b_+38, pincer_setChildRelatedObj1_hook, SYM(pincer_setChildRelatedObj1), b_+41);
-  CYC(b_+41, SYM(pincer_state_stub)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+41, b_+44); enemyDelete_hook(gb); return; // jp
 }
 
 // 0e:5eb6, bare global; jump-table target from enemyCode45.
@@ -193,7 +193,7 @@ void pincer_head_state9_hook(GB *gb) {
   CYC(b_+6, b_+8); E = ENEMY_BASE + OBJ_STATE;
   CYC(b_+8, b_+10); A = 0x0a;
   CYC(b_+10, b_+11); mem_wr(gb, DE, A);
-  CYC(b_+11, SYM(pincer_head_stateA)); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+11, b_+14); objectSetVisible82_hook(gb); return; // jp
 }
 
 // 0e:5ee5, bare global; jump-table target from pincer_head. Showing eyes as a "warning" that
@@ -234,7 +234,7 @@ attack:
   CYC(b_+54, b_+55); alu_rrca(gb);
   CYC(b_+55, b_+56); alu_rrca(gb);
   CYC(b_+56, b_+57); A = alu_inc8(gb, A);
-  CYC(b_+57, SYM(pincer_head_stateB)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+57, b_+60); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:5f21, bare global; jump-table target from pincer_head. Extending toward target.
@@ -287,7 +287,7 @@ void pincer_head_stateD_hook(GB *gb) {
   CYC(b_+14, b_+15); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+15, b_+17); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+17, b_+19); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
-  CYC(b_+19, SYM(pincer_head_stateE)); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+19, b_+22); objectSetInvisible_hook(gb); return; // jp
 }
 
 // 0e:5f54, bare global; jump-table target from pincer_head. Fully retracted; on cooldown.
@@ -307,7 +307,7 @@ void pincer_head_stateE_hook(GB *gb) {
   CYC(b_+15, b_+16); A = mem_rd(gb, HL);
   CYC(b_+16, b_+17); mem_wr(gb, DE, A);
   CYC(b_+17, b_+18); alu_xor(gb, A);
-  CYC(b_+18, SYM(pincer_body)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+18, b_+21); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:5f69, bare global; jump-table target from enemyCode45@normalState. Subid 2-4: body of
@@ -372,7 +372,7 @@ state9:
 
 updateExtendedAmount:
   CALL_C(b_+69, pincer_body_updateExtendedAmount_hook, SYM(pincer_body_updateExtendedAmount), b_+72);
-  CYC(b_+72, SYM(pincer_setChildRelatedObj1)); pincer_updatePosition_hook(gb); return; // jr
+  CYC(b_+72, b_+74); pincer_updatePosition_hook(gb); return; // jr
 }
 
 // 0e:5fb3, bare global; called from pincer_state1 for each of the 3 body parts. Sets
@@ -400,7 +400,7 @@ void pincer_updatePosition_hook(GB *gb) {
   CYC(b_+6, b_+7); L = alu_inc8(gb, L);
   CYC(b_+7, b_+8); A = mem_rd(gb, HL);
   CYC(b_+8, b_+10); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(b_+10, SYM(pincer_body_updateExtendedAmount)); objectSetPositionInCircleArc_hook(gb); return; // jp
+  CYC(b_+10, b_+13); objectSetPositionInCircleArc_hook(gb); return; // jp
 }
 
 // 0e:5fc8, bare global; called from pincer_body. Calculates value for var33 (amount extended)

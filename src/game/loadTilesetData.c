@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(loadTilesetData_body), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(loadTilesetData_body), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void checkTilesetOverride_hook(GB *gb);
 
@@ -78,7 +78,7 @@ static void load_tileset_data(GB *gb, uint16_t sp0_) {
   CYC(b_+87, b_+89); A = H8(hFF8B);
   CYC(b_+89, b_+90); alu_or(gb, B);
   CYC(b_+90, b_+91); mem_wr(gb, DE, A);
-  CYC(b_+91, SYM(getAdjustedRoomGroup)); ret_effect(gb);
+  CYC(b_+91, b_+92); ret_effect(gb);
 }
 
 void loadTilesetData_body_hook(GB *gb) {
@@ -128,7 +128,7 @@ void getAdjustedRoomGroup_hook(GB *gb) {
     CYC(b_+13, b_+15); B |= 0x02;
   }
   CYC(b_+15, b_+16); A = B;
-  CYC(b_+16, SYM(checkTilesetOverride)); ret_effect(gb);
+  CYC(b_+16, b_+17); ret_effect(gb);
 }
 
 void checkTilesetOverride_hook(GB *gb) {
@@ -257,7 +257,7 @@ void setPastCliffPalettesToRed_hook(GB *gb) {
 done:
   CYC(b_+52, b_+53); alu_xor(gb, A);
   CYC(b_+53, b_+55); mem_wr(gb, 0xff70, A);
-  CYC(b_+55, SYM(func_04_6e9b)); ret_effect(gb);
+  CYC(b_+55, b_+56); ret_effect(gb);
 }
 
 void func_04_6e9b_hook(GB *gb) {
@@ -296,7 +296,7 @@ void func_04_6e9b_hook(GB *gb) {
   }
   CYC(b_+50, b_+51); alu_xor(gb, A);
   CYC(b_+51, b_+53); mem_wr(gb, 0xff70, A);
-  CYC(b_+53, SYM(func_04_6ed1)); ret_effect(gb);
+  CYC(b_+53, b_+54); ret_effect(gb);
 }
 
 void func_04_6ed1_hook(GB *gb) {
@@ -335,7 +335,7 @@ void func_04_6ed1_hook(GB *gb) {
   }
   CYC(b_+50, b_+51); alu_xor(gb, A);
   CYC(b_+51, b_+53); mem_wr(gb, 0xff70, A);
-  CYC(b_+53, SYM(func_04_6f07)); ret_effect(gb);
+  CYC(b_+53, b_+54); ret_effect(gb);
 }
 
 static void func_04_6f07_locfunc(GB *gb) {
@@ -360,19 +360,19 @@ static void func_04_6f07_locfunc(GB *gb) {
     CYC(b_+39, b_+41);
     break;
   }
-  CYC(b_+41, SYM(func_04_6f31)); ret_effect(gb);
+  CYC(b_+41, b_+42); ret_effect(gb);
 }
 
 void func_04_6f07_hook(GB *gb) {
   BASE(func_04_6f07);
   CYC(b_+0, b_+3); SET_HL(w3VramTiles);
   CYC(b_+3, b_+6); SET_DE(w6TileBuffer);
-  CYC(b_+6, b_+9); SET_BC((SYM(getLowestSetBit) + 8));
+  CYC(b_+6, b_+9); SET_BC(0x0200);
   CYC(b_+9, b_+12); push_effect(gb, b_+12);
   func_04_6f07_locfunc(gb);
   CYC(b_+12, b_+15); SET_HL(w3VramAttributes);
   CYC(b_+15, b_+18); SET_DE(w6AttributeBuffer);
-  CYC(b_+18, b_+21); SET_BC((SYM(getLowestSetBit) + 8));
+  CYC(b_+18, b_+21); SET_BC(0x0200);
   func_04_6f07_locfunc(gb);
 }
 
@@ -398,18 +398,18 @@ static void func_04_6f31_locfunc(GB *gb) {
     CYC(b_+39, b_+41);
     break;
   }
-  CYC(b_+41, SYM(warpDestTable)); ret_effect(gb);
+  CYC(b_+41, b_+42); ret_effect(gb);
 }
 
 void func_04_6f31_hook(GB *gb) {
   BASE(func_04_6f31);
   CYC(b_+0, b_+3); SET_HL(w6TileBuffer);
   CYC(b_+3, b_+6); SET_DE(w3VramTiles);
-  CYC(b_+6, b_+9); SET_BC((SYM(getLowestSetBit) + 8));
+  CYC(b_+6, b_+9); SET_BC(0x0200);
   CYC(b_+9, b_+12); push_effect(gb, b_+12);
   func_04_6f31_locfunc(gb);
   CYC(b_+12, b_+15); SET_HL(w6AttributeBuffer);
   CYC(b_+15, b_+18); SET_DE(w3VramAttributes);
-  CYC(b_+18, b_+21); SET_BC((SYM(getLowestSetBit) + 8));
+  CYC(b_+18, b_+21); SET_BC(0x0200);
   func_04_6f31_locfunc(gb);
 }

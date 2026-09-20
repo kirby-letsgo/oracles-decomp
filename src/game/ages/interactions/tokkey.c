@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode9d), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode9d), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCode9d_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -39,7 +39,7 @@ void interactionCode9d_checkCreateMusicNote_hook(GB *gb) {
   CALL_C(b_+146, getRandomNumber_hook, SYM(getRandomNumber), b_+149);
   CYC(b_+149, b_+151); alu_and(gb, 0x01);
   CYC(b_+151, b_+154); SET_BC(0xf808);
-  CYC(b_+154, SYM(interactionCode9e)); objectCreateFloatingMusicNote_hook(gb); return; // jp
+  CYC(b_+154, b_+157); objectCreateFloatingMusicNote_hook(gb); return; // jp
 }
 
 // ==================================================================================================
@@ -85,7 +85,7 @@ state1:
   CYC(b_+55, b_+57); alu_cp(gb, 0x32);
   if (F & FZ) { CYCT(b_+57, b_+59); goto l_5519; } // jr z
   CYC(b_+57, b_+59);
-  CYC(b_+59, b_+62); SET_BC((SYM(tryToBreakTile) + 15)); // TX_2c05
+  CYC(b_+59, b_+62); SET_BC(0x2c05); // TX_2c05
   CYC(b_+62, b_+65); showText_hook(gb); return; // jp
 
 l_5519:

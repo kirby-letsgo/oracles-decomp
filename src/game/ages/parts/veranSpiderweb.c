@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode56), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode56), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t veranSpiderweb_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -101,7 +101,7 @@ L_7c05:
   if (!(F & FZ)) { CYCT(b_+97, b_+100); goto func_7c28; } // jp nz
   CYC(b_+97, b_+100);
   CYC(b_+100, b_+101); C = H;
-  CYC(b_+101, b_+103); A = hram_rd(gb, 0xaa); // hCameraY
+  CYC(b_+101, b_+103); A = mem_rd(gb, hCameraY); // hCameraY
   CYC(b_+103, b_+104); B = A;
   CYC(b_+104, b_+106); E = 0xcf; // Part.zh
   CYC(b_+106, b_+107); A = mem_rd(gb, DE);
@@ -291,7 +291,7 @@ subid1_state4:
   CYC(b_+361, b_+363); alu_cp(gb, 0x02);
   if (F & FZ) { CYCT(b_+363, b_+366); partDelete_hook(gb); return; } // jp z
   CYC(b_+363, b_+366);
-  CYC(b_+366, b_+369); SET_BC((SYM(loadUncompressedGfxHeader) + 38));
+  CYC(b_+366, b_+369); SET_BC(0x0600);
   CYC(b_+369, b_+372); objectTakePositionWithOffset_hook(gb); return; // jp
 
 subid2:
@@ -354,5 +354,5 @@ func_7d59:
   CYC(b_+441, b_+442); alu_rrca(gb);
   CYC(b_+442, b_+443); A = alu_inc8(gb, A);
   CALL_C(b_+443, partSetAnimation_hook, SYM(partSetAnimation), b_+446);
-  CYC(b_+446, SYM(partCode57)); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+446, b_+449); objectSetVisible83_hook(gb); return; // jp
 }

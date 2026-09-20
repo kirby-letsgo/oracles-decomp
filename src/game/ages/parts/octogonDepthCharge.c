@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode48), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode48), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void octogonDepthCharge_subid1_hook(GB *gb);
 void octogonDepthCharge_subid0_hook(GB *gb);
@@ -57,8 +57,8 @@ normalStatus:
   CYC(b_+11, b_+12); A = mem_rd(gb, DE);
   CYC(b_+12, b_+13); alu_or(gb, A);
   CYC(b_+13, b_+15); E = 0xc4; // Part.state
-  if (F & FZ) { CYCT(b_+15, SYM(octogonDepthCharge_subid1)); octogonDepthCharge_subid0_hook(gb); return; } // jr z
-  CYC(b_+15, SYM(octogonDepthCharge_subid1));
+  if (F & FZ) { CYCT(b_+15, b_+17); octogonDepthCharge_subid0_hook(gb); return; } // jr z
+  CYC(b_+15, b_+17);
   octogonDepthCharge_subid1_hook(gb);
 }
 
@@ -90,7 +90,7 @@ state0:
   CYC(b_+27, b_+29); mem_wr(gb, HL, 0x3c); // SPEED_180
   CYC(b_+29, b_+31); A = 0x01;
   CALL_C(b_+31, partSetAnimation_hook, SYM(partSetAnimation), b_+34);
-  CYC(b_+34, SYM(octogonDepthCharge_subid0)); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+34, b_+37); objectSetVisible82_hook(gb); return; // jp
 }
 
 // Large projectile, before being split into 4 smaller ones (subid 1)
@@ -227,5 +227,5 @@ L_772a:
   CYC(b_+179, b_+181);
   CYC(b_+181, b_+183); A = 0x68; // SND_UNKNOWN3
   CALL_C(b_+183, playSound_b00_hook, SYM(playSound_b00), b_+186);
-  CYC(b_+186, SYM(partCode49)); partDelete_hook(gb); return; // jp
+  CYC(b_+186, b_+189); partDelete_hook(gb); return; // jp
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodea3), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodea3), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // Defined in src/game/circularSidescrollPlatform.c (the shared sidescroll-platform helper
 // cluster from ref/oracles-disasm/object_code/ages/interactions/circularSidescrollPlatform.s).
@@ -141,5 +141,5 @@ state4:
   CYC(b_+110, b_+112); mem_wr(gb, HL, 120);
   CYC(b_+112, b_+113); L = E;
   CYC(b_+113, b_+115); mem_wr(gb, HL, 0x01);
-  CYC(b_+115, SYM(interactionCodea4)); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+115, b_+118); objectSetVisible83_hook(gb); return; // jp
 }

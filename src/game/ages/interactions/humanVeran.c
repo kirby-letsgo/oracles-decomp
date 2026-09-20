@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodebb), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodebb), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t human_veran_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -50,7 +50,7 @@ void interactionCodebb__state1_hook(GB *gb) {
   CALL_C(b_+33, interactionRunScript_hook, SYM(interactionRunScript), b_+36);
   if (!(F & FC)) { CYCT(b_+36, b_+37); ret_effect(gb); return; }
   CYC(b_+36, b_+37);
-  CYC(b_+37, SYM(interactionCodebc)); interactionDelete_hook(gb);
+  CYC(b_+37, b_+40); interactionDelete_hook(gb);
 }
 
 void interactionCodebb_hook(GB *gb) {

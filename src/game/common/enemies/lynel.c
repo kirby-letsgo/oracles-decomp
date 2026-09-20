@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode0d), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode0d), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t enemyCode0d_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -262,7 +262,7 @@ chooseNewAngle:
     return;
   } // jp nz
   CYC(b_+289, b_+292);
-  CYC(b_+292, SYM(enemyCode0e)); ecom_updateCardinalAngleTowardTarget_b0d_hook(gb);
+  CYC(b_+292, b_+295); ecom_updateCardinalAngleTowardTarget_b0d_hook(gb);
   if (gb->pc == b_+237 && gb->sp == sp0_) goto updateAngleAndSpeed_resume;
   return; // jp
 }

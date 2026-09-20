@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(timewarp_animate), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(timewarp_animate), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/ages/interactions/timewarp.s (INTERAC_TIMEWARP), bank $10.
 
@@ -62,7 +62,7 @@ void timewarp_common_state0_hook(GB *gb) {
   CYC(b_+13, b_+14); L = alu_inc8(gb, L);
   CYC(b_+14, b_+16); A = mem_rd(gb, hEnemyTargetX);
   CYC(b_+16, b_+17); mem_wr(gb, HL, A);
-  CYC(b_+17, SYM(timewarp_subid0_state1));
+  CYC(b_+17, b_+20);
   objectSetVisible83_hook(gb);
 }
 
@@ -86,7 +86,7 @@ void timewarp_spawnChild_hook(GB *gb) {
   CYC(b_+18, b_+19); A = H;
   CYC(b_+19, b_+20); mem_wr(gb, DE, A);
   CYC(b_+20, b_+23); SET_BC(0xf800);
-  CYC(b_+23, SYM(timewarp_subid0_state2));
+  CYC(b_+23, b_+26);
   objectCopyPositionWithOffset_hook(gb);
 }
 
@@ -96,7 +96,7 @@ void timewarp_animateUntilFinished_hook(GB *gb) {
   CALL_C(b_+0, timewarp_animate_hook, SYM(timewarp_animate), b_+3);
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; }
   CYC(b_+3, b_+4);
-  CYC(b_+4, SYM(timewarp_subid1));
+  CYC(b_+4, b_+7);
   interactionDelete_hook(gb);
 }
 
@@ -120,7 +120,7 @@ void timewarp_subid0_state1_hook(GB *gb) {
 spawnChild:
   CYC(b_+10, b_+11); alu_xor(gb, A);
   CYC(b_+11, b_+12); mem_wr(gb, DE, A);
-  CYC(b_+12, SYM(timewarp_spawnChild)); B = 0x03;
+  CYC(b_+12, b_+14); B = 0x03;
   timewarp_spawnChild_hook(gb);
 }
 
@@ -202,7 +202,7 @@ afterAnimate:
   CYC(b_+19, b_+20); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CALL_C(b_+20, interactionIncState_hook, SYM(interactionIncState), b_+23);
   CYC(b_+23, b_+25); A = 0x01;
-  CYC(b_+25, SYM(timewarp_subid2));
+  CYC(b_+25, b_+28);
   interactionSetAnimation_hook(gb);
 }
 
@@ -215,7 +215,7 @@ void itemwarp_subid3Or4_state0_hook(GB *gb) {
   CALL_C(b_+5, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+8);
   CALL_C(b_+8, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+11);
   CALL_C(b_+11, interactionIncState_hook, SYM(interactionIncState), b_+14);
-  CYC(b_+14, SYM(timewarp_subid3_state1));
+  CYC(b_+14, b_+17);
   objectSetVisible82_hook(gb);
 }
 
@@ -227,7 +227,7 @@ void timewarp_subid3_state1_hook(GB *gb) {
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+6); A = 0x03;
   CALL_C(b_+6, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+9);
-  CYC(b_+9, SYM(timewarp_subid3Or4_state3));
+  CYC(b_+9, b_+12);
   interactionIncState_hook(gb);
 }
 
@@ -236,7 +236,7 @@ void timewarp_subid3Or4_state3_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionIncState_hook, SYM(interactionIncState), b_+3);
   CYC(b_+3, b_+5); A = 0x04;
-  CYC(b_+5, SYM(timewarp_subid3Or4_state4));
+  CYC(b_+5, b_+8);
   interactionSetAnimation_hook(gb);
 }
 
@@ -246,7 +246,7 @@ void timewarp_subid3Or4_state4_hook(GB *gb) {
   CALL_C(b_+0, timewarp_animate_hook, SYM(timewarp_animate), b_+3);
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; }
   CYC(b_+3, b_+4);
-  CYC(b_+4, SYM(timewarp_subid4));
+  CYC(b_+4, b_+7);
   interactionDelete_hook(gb);
 }
 

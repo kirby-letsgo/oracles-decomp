@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(parentItemCode_punch), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(parentItemCode_punch), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t other_swords_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -28,7 +28,7 @@ static void other_swords_state1(GB *gb) {
   CYC(b_+72, b_+73); A = mem_rd(gb, DE);
   CYC(b_+73, b_+74); alu_rlca(gb);
   if (!(F & FC)) { CYCT(b_+74, b_+77); specialObjectAnimate_optimized_hook(gb); }
-  else { CYC(b_+74, b_+77); CYC(b_+77, SYM(parentItemCode_switchHook)); clearParentItem_hook(gb); }
+  else { CYC(b_+74, b_+77); CYC(b_+77, b_+80); clearParentItem_hook(gb); }
 }
 
 void parentItemCode_foolsOre_hook(GB *gb) {
@@ -44,7 +44,7 @@ void parentItemCode_foolsOre_hook(GB *gb) {
       CYC(b_+12, b_+13); mem_wr(gb, DE, A);
       CALL_C(b_+13, updateLinkDirectionFromAngle_hook, SYM(updateLinkDirectionFromAngle), b_+16);
       CALL_C(b_+16, parentItemLoadAnimationAndIncState_hook, SYM(parentItemLoadAnimationAndIncState), b_+19);
-      CYC(b_+19, SYM(parentItemCode_punch)); itemCreateChild_hook(gb); return;
+      CYC(b_+19, b_+22); itemCreateChild_hook(gb); return;
     }
     else if (jt_ == SYM(parentItemCode_punch__state1)) { other_swords_state1(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
@@ -56,8 +56,8 @@ void parentItemCode_rodOfSeasons_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, clearParentItemIfCantUseSword_hook, SYM(clearParentItemIfCantUseSword), b_+3);
   CALL_C(b_+3, isLinkUnderwater_hook, SYM(isLinkUnderwater), b_+6);
-  if (!(F & FZ)) { CYCT(b_+6, SYM(parentItemCode_foolsOre)); clearParentItem_hook(gb); return; }
-  CYC(b_+6, SYM(parentItemCode_foolsOre));
+  if (!(F & FZ)) { CYCT(b_+6, b_+9); clearParentItem_hook(gb); return; }
+  CYC(b_+6, b_+9);
   parentItemCode_foolsOre_hook(gb);
 }
 

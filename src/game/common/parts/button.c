@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode09), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode09), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void partCode09_hook(GB *gb);
 void button_state0_hook(GB *gb);
@@ -127,7 +127,7 @@ void button_state0_hook(GB *gb) {
   CYC(b_+170, b_+171); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+171, b_+173); alu_and(gb, 0x07);
   CYC(b_+173, b_+174); mem_wr(gb, HL, A); SET_HL(HL - 1); // [var03]
-  CYC(b_+174, SYM(partCode0b)); return; // ret
+  CYC(b_+174, b_+175); return; // ret
 }
 
 void button_updateTileBeforeDeletion_hook(GB *gb) {

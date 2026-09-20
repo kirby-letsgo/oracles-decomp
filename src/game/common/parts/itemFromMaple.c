@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode14), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode14), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t itemFromMaple_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -378,7 +378,7 @@ L_4e68:
   CYC(b_+344, b_+347); partDelete_hook(gb); return; // jp
 
 func_4e6e:
-  CYC(b_+347, b_+350); SET_BC((SYM(specialObjectAnimate) + 19)); // TREASURE_HEART_PIECE, $02
+  CYC(b_+347, b_+350); SET_BC(0x2b02); // TREASURE_HEART_PIECE, $02
   CALL_C(b_+350, createTreasure_hook, SYM(createTreasure), b_+353);
   if (!(F & FZ)) { RET_TAKEN(b_+353); return; } // ret nz
   CYC(b_+353, b_+354);

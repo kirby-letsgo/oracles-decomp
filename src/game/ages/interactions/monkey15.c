@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(monkey_decideTextIndex), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(monkey_decideTextIndex), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/scripts/ages/scriptHelper.s (INTERAC_MONKEY), bank 0x15.
 
@@ -43,7 +43,7 @@ void monkey_turnToFaceLink_hook(GB *gb) {
   CYC(b_+11, b_+12); A = alu_dec8(gb, A);
 
 set_animation:
-  CYC(b_+12, SYM(monkey_setAnimationFromVar3a)); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+12, b_+15); interactionSetAnimation_hook(gb); return; // jp
 }
 
 void monkey_setAnimationFromVar3a_hook(GB *gb) {
@@ -52,5 +52,5 @@ void monkey_setAnimationFromVar3a_hook(GB *gb) {
   (void)sp0_;
   CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_VAR3A;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, SYM(villager_setLinkYToVar39)); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+3, b_+6); interactionSetAnimation_hook(gb); return; // jp
 }

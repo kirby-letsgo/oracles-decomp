@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode20), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode20), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void partCode20_hook(GB *gb) {
   BASE(partCode20);
@@ -25,5 +25,5 @@ state0:
   CYC(b_+17, b_+18); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+18, b_+20); L = 0xc6; // Part.counter1
   CYC(b_+20, b_+22); mem_wr(gb, HL, 0xb4);
-  CYC(b_+22, SYM(partCode21)); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+22, b_+25); objectSetVisible82_hook(gb); return; // jp
 }

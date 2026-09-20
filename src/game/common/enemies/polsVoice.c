@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode23), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode23), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void polsVoice_state_uninitialized_hook(GB *gb);
 void polsVoice_state_stub_hook(GB *gb);
@@ -80,7 +80,7 @@ void polsVoice_state_uninitialized_hook(GB *gb) {
   CYC(b_+8, b_+10); alu_and(gb, 0x3f);
   CYC(b_+10, b_+11); A = alu_inc8(gb, A);
   CYC(b_+11, b_+12); mem_wr(gb, DE, A);
-  CYC(b_+12, SYM(polsVoice_state_stub)); polsVoice_setLandedAnimation_hook(gb); return; // jr
+  CYC(b_+12, b_+14); polsVoice_setLandedAnimation_hook(gb); return; // jr
 }
 
 // 0d:5c2e, bare global; jump-table target from enemyCode23.
@@ -98,7 +98,7 @@ void polsVoice_state8_hook(GB *gb) {
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+5); L = E;
   CYC(b_+5, b_+6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = 9
-  CYC(b_+6, b_+9); SET_BC((SYM(_drawObjectTerrainEffects__inAir) + 6));
+  CYC(b_+6, b_+9); SET_BC(0x0f1c);
   CALL_C(b_+9, ecom_randomBitwiseAndBCE_b0d_hook, SYM(ecom_randomBitwiseAndBCE_b0d), b_+12);
   CYC(b_+12, b_+13); alu_or(gb, B);
   CYC(b_+13, b_+16); SET_HL(b_+59); // @jumpSpeeds1
@@ -154,7 +154,7 @@ void polsVoice_state9_hook(GB *gb) {
   CYC(b_+12, b_+14); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+14, b_+15); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // [state] = 8
   CYC(b_+15, b_+17); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(b_+17, SYM(polsVoice_setLandedAnimation)); mem_wr(gb, HL, 0x20);
+  CYC(b_+17, b_+19); mem_wr(gb, HL, 0x20);
   polsVoice_setLandedAnimation_hook(gb); return; // fallthrough
 }
 
@@ -165,7 +165,7 @@ void polsVoice_setLandedAnimation_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); A = 0x01;
   CALL_C(b_+2, enemySetAnimation_hook, SYM(enemySetAnimation), b_+5);
-  CYC(b_+5, SYM(polsVoice_checkLinkPlayingInstrument)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+5, b_+8); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 // 0d:5c8d, bare global; called from enemyCode23.

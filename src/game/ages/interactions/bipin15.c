@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(bipin_showText_subid1To9), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(bipin_showText_subid1To9), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void bipin_showText_subid1To9_hook(GB *gb);
 

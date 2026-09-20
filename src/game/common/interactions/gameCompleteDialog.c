@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCoded1), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCoded1), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t game_complete_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -42,5 +42,5 @@ void interactionCoded1_hook(GB *gb) {
   CYC(b_+15, b_+17); E = 1;
   CALL_C(b_+17, interBankCall_hook, 0x008a, b_+20);
   CYC(b_+20, b_+23); SET_HL(SYM(interactionCodecf__state0));
-  CYC(b_+23, SYM(interactionCoded2)); interactionSetScript_hook(gb);
+  CYC(b_+23, b_+26); interactionSetScript_hook(gb);
 }

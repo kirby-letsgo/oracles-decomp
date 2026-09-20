@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode22), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode22), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // roomInitialization.generateRandomBuffer, called through interBankCall (bank $02).
 #define generateRandomBuffer_bank02 SYM(generateRandomBuffer_b02)
@@ -107,7 +107,7 @@ notColoredFloor:
   CYC(b_+205, b_+206); B = A;
   CYC(b_+206, b_+207); C = L;
   CALL_C(b_+207, setTileInRoomLayoutBuffer_hook, SYM(setTileInRoomLayoutBuffer), b_+210);
-  CYC(b_+210, SYM(interactionCode23)); interactionDecCounter1_hook(gb);
+  CYC(b_+210, b_+213); interactionDecCounter1_hook(gb);
 }
 
 // @subid0: the "controller"; detects when the tile under it has changed color and spawns

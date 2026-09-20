@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(updatePirateShipRoom), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(updatePirateShipRoom), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void checkLoadPirateShip_hook(GB *gb);
 void updatePirateShipChangedTile_hook(GB *gb);
@@ -73,7 +73,7 @@ void updatePirateShip_hook(GB *gb) {
   CALL_C(b_+9, updatePirateShipChangedTile_hook, SYM(updatePirateShipChangedTile), b_+12);
   CALL_C(b_+12, updatePirateShipAngle_hook, SYM(updatePirateShipAngle), b_+15);
   CALL_C(b_+15, updatePirateShipPosition_hook, SYM(updatePirateShipPosition), b_+18);
-  CYC(b_+18, SYM(checkLoadPirateShip)); updatePirateShipRoom_hook(gb);
+  CYC(b_+18, b_+21); updatePirateShipRoom_hook(gb);
 }
 
 void checkLoadPirateShip_hook(GB *gb) {
@@ -148,7 +148,7 @@ check_room:
   CYC(b_+55, b_+56); L = alu_inc8(gb, L);
   CYC(b_+56, b_+59); A = W8(wPirateShipX);
   CYC(b_+59, b_+60); mem_wr(gb, HL, A);
-  CYC(b_+60, SYM(updatePirateShipChangedTile)); ret_effect(gb);
+  CYC(b_+60, b_+61); ret_effect(gb);
 }
 
 void updatePirateShipChangedTile_hook(GB *gb) {
@@ -177,7 +177,7 @@ void updatePirateShipChangedTile_hook(GB *gb) {
   CYC(b_+27, b_+29); alu_and(gb, 0x0f);
   CYC(b_+29, b_+30); alu_or(gb, B);
   CYC(b_+30, b_+33); W8(wPirateShipChangedTile) = A;
-  CYC(b_+33, SYM(updatePirateShipPosition)); ret_effect(gb);
+  CYC(b_+33, b_+34); ret_effect(gb);
 }
 
 void updatePirateShipPosition_hook(GB *gb) {
@@ -246,7 +246,7 @@ void updatePirateShipRoom_hook(GB *gb) {
       CYC(b_+53, b_+56); SET_HL(wPirateShipX);
       CYC(b_+56, b_+59); SET_BC(0xa0ff);
       CYC(b_+59, b_+61); A = 0xf8;
-      CYC(b_+61, SYM(updatePirateShipAngle));
+      CYC(b_+61, b_+63);
       update_pirate_ship_room_value(gb);
       return;
     }
@@ -267,7 +267,7 @@ void updatePirateShipAngle_hook(GB *gb) {
     return;
   }
   CYC(b_+4, b_+5);
-  CYC(b_+5, b_+7); hram_wr(gb, 0x8b, A);
+  CYC(b_+5, b_+7); mem_wr(gb, hFF8B, A);
   CYC(b_+7, b_+8); alu_xor(gb, A);
   CYC(b_+8, b_+11); W8(wPirateShipChangedTile) = A;
   CYC(b_+11, b_+14); SET_HL(b_+88);
@@ -295,7 +295,7 @@ next_direction:
   }
   CYC(b_+30, b_+32);
   CYC(b_+32, b_+33); SET_HL(HL + 1);
-  CYC(b_+33, b_+35); A = hram_rd(gb, 0x8b);
+  CYC(b_+33, b_+35); A = mem_rd(gb, hFF8B);
   CYC(b_+35, b_+36); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FZ)) {
     CYCT(b_+36, b_+38);

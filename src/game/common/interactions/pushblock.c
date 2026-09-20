@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode14), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode14), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define pushableTilePropertiesTable_bank08 SYM(pushableTilePropertiesTable)
 
@@ -156,7 +156,7 @@ match:
   CYC(b_+249, b_+250); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+250, b_+251); E = alu_inc8(gb, E);
   CYC(b_+251, b_+252); mem_wr(gb, DE, A);
-  CYC(b_+252, SYM(pushableTilePropertiesTable)); ret_effect(gb);
+  CYC(b_+252, b_+253); ret_effect(gb);
 }
 
 // interactionCode14@state1 (also reached by fallthrough from state0): move the block, and once
@@ -240,7 +240,7 @@ static void pushblock_state0(GB *gb, uint16_t sp0_) {
     CYC(b_+48, b_+51);
   }
   CYC(b_+51, b_+52); H = D;
-  CYC(b_+52, b_+55); SET_BC((SYM(setTileWithoutGfxReload) + 4));
+  CYC(b_+52, b_+55); SET_BC(0x1420);
   CYC(b_+55, b_+58); A = mem_rd(gb, wBraceletLevel);
   CYC(b_+58, b_+60); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
@@ -253,7 +253,7 @@ static void pushblock_state0(GB *gb, uint16_t sp0_) {
     CYCT(b_+66, b_+68); goto setSpeed;
   }
   CYC(b_+66, b_+68);
-  CYC(b_+68, b_+71); SET_BC((SYM(findByteInGroupTable) + 6));
+  CYC(b_+68, b_+71); SET_BC(0x1e15);
 setSpeed:
   CYC(b_+71, b_+73); L = INTERACTION_BASE + OBJ_SPEED;
   CYC(b_+73, b_+74); mem_wr(gb, HL, B);

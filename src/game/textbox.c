@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(updateTextbox), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(updateTextbox), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void getExtraTextIndex_hook(GB *gb);
 void handleTextControlCode_hook(GB *gb);
@@ -466,7 +466,7 @@ void standardTextState10_hook(GB *gb) {
   BASE(updateTextbox);
   CYC(b_+418, b_+419); alu_xor(gb, A);
   CYC(b_+419, b_+422); mem_wr(gb, wTextIsActive, A);
-  CYC(b_+422, SYM(textOptionCode));
+  CYC(b_+422, b_+425);
   dmaTextboxMap_hook(gb);
 }
 
@@ -583,7 +583,7 @@ void textOptionCode__state04_hook(GB *gb) {
   CYC(b_+138, b_+140); B = 0x0a;
   CALL_C(b_+140, clearMemory_hook, SYM(clearMemory), b_+143);
   CALL_C(b_+143, drawLineOfText_hook, SYM(drawLineOfText), b_+146);
-  CYC(b_+146, SYM(inventoryTextCode));
+  CYC(b_+146, b_+149);
   dmaTextGfxBuffer_hook(gb);
 }
 
@@ -901,7 +901,7 @@ void inventoryTextCode__state07_hook(GB *gb) {
   CYC(b_+271, b_+272); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+272, b_+273); H = mem_rd(gb, HL);
   CYC(b_+273, b_+274); L = A;
-  CYC(b_+274, SYM(initTextboxStuff));
+  CYC(b_+274, b_+277);
   inventoryTextCode__drawSpace_hook(gb);
 }
 
@@ -912,7 +912,7 @@ void initTextbox_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_bit(gb, 3, A);
   if (!(F & FZ)) { CYCT(b_+5, b_+7); goto clear_textbox_wram; }
   CYC(b_+5, b_+7);
-  CYC(b_+7, b_+9); A = hram_rd(gb, 0xaa);
+  CYC(b_+7, b_+9); A = mem_rd(gb, hCameraY);
   CYC(b_+9, b_+10); B = A;
   CYC(b_+10, b_+13); A = W8(w1Link_yh);
   CYC(b_+13, b_+14); alu_sub(gb, B);
@@ -927,9 +927,9 @@ clear_textbox_wram:
   CYC(b_+24, b_+26); A = 0x07;
   CYC(b_+26, b_+28); hram_wr(gb, IO_SVBK - 0xff00, A);
   CYC(b_+28, b_+31); SET_HL(w1Link);
-  CYC(b_+31, b_+34); SET_BC((SYM(getRandomNumber_noPreserveVars) + 13));
+  CYC(b_+31, b_+34); SET_BC(0x0460);
   CALL_C(b_+34, clearMemoryBc_hook, SYM(clearMemoryBc), b_+37);
-  CYC(b_+37, SYM(updateTextbox)); initTextboxStuff_hook(gb);
+  CYC(b_+37, b_+40); initTextboxStuff_hook(gb);
 }
 
 void initTextboxStuff_hook(GB *gb) {
@@ -1110,9 +1110,9 @@ static void add_a_to_hl(GB *gb) {
 void clearTextGfxBuffer_hook(GB *gb) {
   BASE(clearTextGfxBuffer);
   CYC(b_+0, b_+3); SET_HL(w1ParentItem2);
-  CYC(b_+3, b_+6); SET_BC((SYM(getLowestSetBit) + 8));
+  CYC(b_+3, b_+6); SET_BC(0x0200);
   CYC(b_+6, b_+8); A = 0xff;
-  CYC(b_+8, SYM(clearLineTextBuffer));
+  CYC(b_+8, b_+11);
   fillMemoryBc_hook(gb);
 }
 
@@ -1122,7 +1122,7 @@ void clearLineTextBuffer_hook(GB *gb) {
   CYC(b_+3, b_+4); D = H;
   CYC(b_+4, b_+5); E = L;
   CYC(b_+5, b_+7); B = 0x10;
-  CYC(b_+7, SYM(setLineTextBuffers));
+  CYC(b_+7, b_+10);
   clearMemory_hook(gb);
 }
 
@@ -1163,7 +1163,7 @@ void setLineTextBuffers_hook(GB *gb) {
   CYC(b_+34, b_+35); SET_DE(pop_effect(gb));
   CYC(b_+35, b_+36); A = mem_rd(gb, DE);
   CYC(b_+36, b_+37); E = alu_inc8(gb, E);
-  CYC(b_+37, SYM(dmaTextGfxBuffer)); ret_effect(gb);
+  CYC(b_+37, b_+38); ret_effect(gb);
 }
 
 void drawLineOfText_hook(GB *gb) {
@@ -1210,7 +1210,7 @@ void drawLineOfText_hook(GB *gb) {
   CYC(b_+55, b_+57); E = 0xd0;
   CYC(b_+57, b_+58); alu_xor(gb, A);
   CYC(b_+58, b_+59); mem_wr(gb, DE, A);
-  CYC(b_+59, SYM(clearTextGfxBuffer)); ret_effect(gb);
+  CYC(b_+59, b_+60); ret_effect(gb);
 }
 
 void dmaTextGfxBuffer_hook(GB *gb) {
@@ -1220,11 +1220,11 @@ void dmaTextGfxBuffer_hook(GB *gb) {
   CYC(b_+2, b_+3); D = A;
   CYC(b_+3, b_+5); E = 0x00;
   CYC(b_+5, b_+8); SET_HL(w7TextGfxBuffer);
-  CYC(b_+8, b_+11); SET_BC((SYM(pushDirectionData) + 2));
+  CYC(b_+8, b_+11); SET_BC(0x1f07);
   CYC(b_+11, b_+12); push_effect(gb, HL);
   CALL_C(b_+12, queueDmaTransfer_hook, SYM(queueDmaTransfer), b_+15);
   CYC(b_+15, b_+16); SET_HL(pop_effect(gb));
-  CYC(b_+16, SYM(saveTilesUnderTextbox)); ret_effect(gb);
+  CYC(b_+16, b_+17); ret_effect(gb);
 }
 
 void saveTilesUnderTextbox_copyTileMap_hook(GB *gb) {
@@ -1307,7 +1307,7 @@ void saveTilesUnderTextbox_copyTileMap_hook(GB *gb) {
     CYC(b_+106, b_+108);
     break;
   }
-  CYC(b_+108, SYM(initTextboxMapping)); ret_effect(gb);
+  CYC(b_+108, b_+109); ret_effect(gb);
 }
 
 void saveTilesUnderTextbox_hook(GB *gb) {
@@ -1374,7 +1374,7 @@ void initTextboxMapping_hook(GB *gb) {
     CYC(b_+38, b_+40);
     break;
   }
-  CYC(b_+40, SYM(dmaTextboxMap)); ret_effect(gb);
+  CYC(b_+40, b_+41); ret_effect(gb);
 }
 
 void getTextAddress_hook(GB *gb) {
@@ -1438,7 +1438,7 @@ save_address:
   CYC(b_+84, b_+86); H &= (uint8_t)~0x80;
   CYC(b_+86, b_+88); H |= 0x40;
   CYC(b_+88, b_+89); SET_DE(pop_effect(gb));
-  CYC(b_+89, SYM(textOffset1Table)); ret_effect(gb);
+  CYC(b_+89, b_+90); ret_effect(gb);
 }
 
 void checkInitialTextCommands_hook(GB *gb) {
@@ -1502,7 +1502,7 @@ no_extra:
   CYC(b_+90, b_+92); mem_wr(gb, HL, mem_rd(gb, HL) | 0x08);
   CYC(b_+92, b_+93); L = alu_inc8(gb, L);
   CYC(b_+93, b_+95); mem_wr(gb, HL, 0);
-  CYC(b_+95, SYM(drawLineOfText)); ret_effect(gb);
+  CYC(b_+95, b_+96); ret_effect(gb);
 }
 
 void doInventoryTextFirstPass_hook(GB *gb) {
@@ -1512,7 +1512,7 @@ void doInventoryTextFirstPass_hook(GB *gb) {
   CYC(b_+3, b_+4); H = D;
   CYC(b_+4, b_+6); L = 0xd4;
   CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+7, b_+9); hram_wr(gb, 0x8a, A);
+  CYC(b_+7, b_+9); mem_wr(gb, hFF8A, A);
   CYC(b_+9, b_+10); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+10, b_+11); H = mem_rd(gb, HL);
   CYC(b_+11, b_+12); L = A;
@@ -1549,7 +1549,7 @@ line_end:
     CALL_C(b_+49, popFromTextStack_hook, SYM(popFromTextStack), b_+52);
     CYC(b_+52, b_+53); SET_BC(pop_effect(gb));
     CYC(b_+53, b_+56); SET_HL(w7TextAddress - 1);
-    CYC(b_+56, b_+58); A = hram_rd(gb, 0x8a);
+    CYC(b_+56, b_+58); A = mem_rd(gb, hFF8A);
     CYC(b_+58, b_+59); mem_wr(gb, HL, A); SET_HL(HL + 1);
     CYC(b_+59, b_+60); mem_wr(gb, HL, C);
     CYC(b_+60, b_+61); L = alu_inc8(gb, L);
@@ -1647,7 +1647,7 @@ alternate:
   CYC(b_+64, b_+66); A = alu_swap(gb, A);
   CYC(b_+66, b_+67); A = alu_dec8(gb, A);
   CYC(b_+67, b_+68); B = A;
-  CYC(b_+68, SYM(updateCharacterDisplayTimer)); dmaTextboxMap_func_hook(gb);
+  CYC(b_+68, b_+70); dmaTextboxMap_func_hook(gb);
 }
 
 void updateCharacterDisplayTimer_hook(GB *gb) {
@@ -1682,7 +1682,7 @@ skip_to_line_end:
   CYC(b_+28, b_+30); L = 0xc1;
   CYC(b_+30, b_+32); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
   CYC(b_+32, b_+33); alu_xor(gb, A);
-  CYC(b_+33, SYM(displayNextTextCharacter)); ret_effect(gb);
+  CYC(b_+33, b_+34); ret_effect(gb);
 }
 
 void displayNextTextCharacter_readSubsequentLineBuffers_hook(GB *gb);
@@ -1850,7 +1850,7 @@ void displayNextTextCharacter_checkCanAdvanceWithAB_hook(GB *gb) {
   CYC(b_+167, b_+169); H = 0xd4;
   CYC(b_+169, b_+171); alu_bit(gb, 0, mem_rd(gb, HL));
   CYC(b_+171, b_+172); SET_HL(pop_effect(gb));
-  CYC(b_+172, SYM(getNextCharacterToDisplay)); ret_effect(gb);
+  CYC(b_+172, b_+173); ret_effect(gb);
 }
 
 void getNextCharacterToDisplay_hook(GB *gb) {
@@ -1865,7 +1865,7 @@ void getNextCharacterToDisplay_hook(GB *gb) {
   CYC(b_+9, b_+11); H = 0xd4;
   CYC(b_+11, b_+12); A = mem_rd(gb, HL);
   CYC(b_+12, b_+13); alu_or(gb, A);
-  CYC(b_+13, SYM(func_5296)); ret_effect(gb);
+  CYC(b_+13, b_+14); ret_effect(gb);
 }
 
 void func_5296_hook(GB *gb) {
@@ -1907,7 +1907,7 @@ choose_option:
   CYC(b_+43, b_+45); A = 0x01;
   CYC(b_+45, b_+48); mem_wr(gb, wTextDisplayMode, A);
   CYC(b_+48, b_+49); alu_or(gb, H);
-  CYC(b_+49, SYM(label_3f_155)); ret_effect(gb);
+  CYC(b_+49, b_+50); ret_effect(gb);
 }
 
 void label_3f_155_hook(GB *gb) {
@@ -1929,7 +1929,7 @@ check_input:
   CYC(b_+20, b_+22); mem_wr(gb, HL, mem_rd(gb, HL) & ~0x02);
   CYC(b_+22, b_+23); SET_HL(pop_effect(gb));
   CYC(b_+23, b_+25); A = 0x89;
-  CYC(b_+25, SYM(label_3f_157)); playSound_b00_hook(gb);
+  CYC(b_+25, b_+28); playSound_b00_hook(gb);
 }
 
 void label_3f_157_hook(GB *gb) {
@@ -1937,19 +1937,19 @@ void label_3f_157_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, updateTextboxArrow_hook, SYM(updateTextboxArrow), b_+3);
   CYC(b_+3, b_+4); alu_or(gb, H);
-  CYC(b_+4, SYM(label_3f_158)); ret_effect(gb);
+  CYC(b_+4, b_+5); ret_effect(gb);
 }
 
 void label_3f_158_hook(GB *gb) {
   BASE(label_3f_158);
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+4); mem_wr(gb, 0x00c2, A);
-  CYC(b_+4, SYM(label_3f_159)); ret_effect(gb);
+  CYC(b_+4, b_+5); ret_effect(gb);
 }
 
 void label_3f_159_hook(GB *gb) {
   BASE(label_3f_159);
-  CYC(b_+0, SYM(label_3f_160)); SET_HL(w7TextboxOptionPositions);
+  CYC(b_+0, b_+3); SET_HL(w7TextboxOptionPositions);
   label_3f_160_hook(gb);
 }
 
@@ -1996,7 +1996,7 @@ void getExtraTextIndex_hook(GB *gb) {
   CYC(b_+12, b_+13); push_effect(gb, b_+13);
   add_a_to_hl(gb);
   CYC(b_+13, b_+14); A = mem_rd(gb, HL);
-  CYC(b_+14, SYM(updateTextboxArrow)); ret_effect(gb);
+  CYC(b_+14, b_+15); ret_effect(gb);
 }
 
 void updateTextboxArrow_hook(GB *gb) {
@@ -2042,7 +2042,7 @@ queue_dma:
   CYC(b_+56, b_+57); D = A;
   CYC(b_+57, b_+58); E = B;
   CYC(b_+58, b_+61); SET_BC(0x0107);
-  CYC(b_+61, SYM(clearTopRowOfTextMap)); queueDmaTransfer_hook(gb);
+  CYC(b_+61, b_+64); queueDmaTransfer_hook(gb);
 }
 
 void clearTopRowOfTextMap_func_hook(GB *gb) {
@@ -2063,7 +2063,7 @@ void clearTopRowOfTextMap_func_hook(GB *gb) {
     CYC(b_+38, b_+40);
     break;
   }
-  CYC(b_+40, SYM(shiftTextboxMapUp)); ret_effect(gb);
+  CYC(b_+40, b_+41); ret_effect(gb);
 }
 
 void clearTopRowOfTextMap_hook(GB *gb) {
@@ -2129,7 +2129,7 @@ void shiftTextboxMapUp_func_hook(GB *gb) {
     CYC(b_+51, b_+53);
     break;
   }
-  CYC(b_+53, SYM(subFirstRowOfTextMapBy20)); ret_effect(gb);
+  CYC(b_+53, b_+54); ret_effect(gb);
 }
 
 void shiftTextboxMapUp_hook(GB *gb) {
@@ -2169,7 +2169,7 @@ next_tile:
     CYC(b_+39, b_+41);
     break;
   }
-  CYC(b_+41, SYM(func_53dd)); ret_effect(gb);
+  CYC(b_+41, b_+42); ret_effect(gb);
 }
 
 void subFirstRowOfTextMapBy20_hook(GB *gb) {
@@ -2193,7 +2193,7 @@ void func_53dd_hook(GB *gb) {
   CYC(b_+3, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) & ~0x02);
   CALL_C(b_+5, saveTilesUnderTextbox_hook, SYM(saveTilesUnderTextbox), b_+8);
   CALL_C(b_+8, initTextboxMapping_hook, SYM(initTextboxMapping), b_+11);
-  CYC(b_+11, SYM(func_53eb)); dmaTextboxMap_hook(gb);
+  CYC(b_+11, b_+14); dmaTextboxMap_hook(gb);
 }
 
 void func_53eb_hook(GB *gb) {
@@ -2307,14 +2307,14 @@ void func_53eb_dmaHeartPieceDisplay_hook(GB *gb) {
   CALL_C(b_+168, queueDmaTransfer_hook, SYM(queueDmaTransfer), b_+171);
   CYC(b_+171, b_+174); SET_HL(SYM(handleTextControlCode__controlCode3));
   CYC(b_+174, b_+176); E = 0xe0;
-  CYC(b_+176, SYM(doInventoryTextFirstPass)); queueDmaTransfer_hook(gb);
+  CYC(b_+176, b_+179); queueDmaTransfer_hook(gb);
 }
 
 void shiftTextGfxBufferLeft_hook(GB *gb) {
   BASE(shiftTextGfxBufferLeft);
   CYC(b_+0, b_+3); SET_HL(w1ParentItem2);
   CYC(b_+3, b_+6); SET_DE(w1ParentItem2_animCounter);
-  CYC(b_+6, b_+9); SET_BC((SYM(compareHlToBc) + 10));
+  CYC(b_+6, b_+9); SET_BC(0x01e0);
   for (;;) {
     CYC(b_+9, b_+10); A = mem_rd(gb, DE);
     CYC(b_+10, b_+11); mem_wr(gb, HL, A); SET_HL(HL + 1);
@@ -2330,7 +2330,7 @@ void shiftTextGfxBufferLeft_hook(GB *gb) {
   CYC(b_+20, b_+21); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+21, b_+22); H = mem_rd(gb, HL);
   CYC(b_+22, b_+23); L = A;
-  CYC(b_+23, SYM(decInvTextScrollTimer)); ret_effect(gb);
+  CYC(b_+23, b_+24); ret_effect(gb);
 }
 
 void decInvTextScrollTimer_hook(GB *gb) {
@@ -2345,7 +2345,7 @@ void decInvTextScrollTimer_hook(GB *gb) {
   CYC(b_+4, b_+5);
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x08);
   CYC(b_+7, b_+8); alu_xor(gb, A);
-  CYC(b_+8, SYM(handleTextControlCodeWithSpecialCase)); ret_effect(gb);
+  CYC(b_+8, b_+9); ret_effect(gb);
 }
 
 void handleTextControlCodeWithSpecialCase_hook(GB *gb) {
@@ -2363,7 +2363,7 @@ cmd6:
   CYC(b_+12, b_+15); SET_DE((w1ParentItem5_var3f + 161));
   CALL_C(b_+15, handleTextControlCode_hook, SYM(handleTextControlCode), b_+18);
   CYC(b_+18, b_+19); alu_xor(gb, A);
-  CYC(b_+19, SYM(updateSelectedTextPosition)); ret_effect(gb);
+  CYC(b_+19, b_+20); ret_effect(gb);
 }
 
 void updateSelectedTextPosition_hook(GB *gb) {
@@ -2381,7 +2381,7 @@ set_position:
   CYC(b_+13, b_+14); mem_wr(gb, DE, A);
   CALL_C(b_+14, getAddressInTextboxMap_hook, SYM(getAddressInTextboxMap), b_+17);
   CYC(b_+17, b_+19); mem_wr(gb, HL, 0x04);
-  CYC(b_+19, SYM(getSelectedTextOptionAddress)); ret_effect(gb);
+  CYC(b_+19, b_+20); ret_effect(gb);
 }
 
 void getSelectedTextOptionAddress_hook(GB *gb) {
@@ -2391,7 +2391,7 @@ void getSelectedTextOptionAddress_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_add(gb, 0xe0);
   CYC(b_+5, b_+6); L = A;
   CYC(b_+6, b_+7); H = D;
-  CYC(b_+7, SYM(getAddressInTextboxMap)); ret_effect(gb);
+  CYC(b_+7, b_+8); ret_effect(gb);
 }
 
 void getAddressInTextboxMap_hook(GB *gb) {
@@ -2407,7 +2407,7 @@ void getAddressInTextboxMap_hook(GB *gb) {
   CYC(b_+12, b_+13); alu_add(gb, B);
   CYC(b_+13, b_+14); L = A;
   CYC(b_+14, b_+16); H = 0xd0;
-  CYC(b_+16, SYM(removeCursorFromSelectedTextPosition)); ret_effect(gb);
+  CYC(b_+16, b_+17); ret_effect(gb);
 }
 
 void removeCursorFromSelectedTextPosition_hook(GB *gb) {
@@ -2426,7 +2426,7 @@ void removeCursorFromSelectedTextPosition_hook(GB *gb) {
   }
   CALL_C(b_+12, getAddressInTextboxMap_hook, SYM(getAddressInTextboxMap), b_+15);
   CYC(b_+15, b_+16); mem_wr(gb, HL, C);
-  CYC(b_+16, SYM(moveSelectedTextOptionRight)); ret_effect(gb);
+  CYC(b_+16, b_+17); ret_effect(gb);
 }
 
 void moveSelectedTextOptionRight_hook(GB *gb) {
@@ -2447,7 +2447,7 @@ void moveSelectedTextOptionRight_hook(GB *gb) {
   CYC(b_+12, b_+13);
   CYC(b_+13, b_+14); alu_xor(gb, A);
   CYC(b_+14, b_+15); mem_wr(gb, DE, A);
-  CYC(b_+15, SYM(moveSelectedTextOptionLeft)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }
 
 void textOptionCode_checkDirectionButtons_updateSelectedTextOption_hook(GB *gb);
@@ -2467,7 +2467,7 @@ void moveSelectedTextOptionLeft_hook(GB *gb) {
     CYC(b_+11, b_+12); alu_or(gb, A);
     if (!(F & FZ)) { CYCT(b_+12, b_+13); ret_effect(gb); return; }
     CYC(b_+12, b_+13);
-    CYCT(b_+13, SYM(textOptionCode_checkDirectionButtons));
+    CYCT(b_+13, b_+15);
   }
 }
 
@@ -2537,14 +2537,14 @@ update_end:
   CYC(b_+69, b_+71); alu_sub(gb, 0xe0);
   CYC(b_+71, b_+73); E = 0xe8;
   CYC(b_+73, b_+74); mem_wr(gb, DE, A);
-  CYC(b_+74, SYM(updateSelectedTextPositionAndDmaTextboxMap)); ret_effect(gb);
+  CYC(b_+74, b_+75); ret_effect(gb);
 }
 
 void updateSelectedTextPositionAndDmaTextboxMap_hook(GB *gb) {
   BASE(updateSelectedTextPositionAndDmaTextboxMap);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, updateSelectedTextPosition_hook, SYM(updateSelectedTextPosition), b_+3);
-  CYC(b_+3, SYM(textOptionCode_checkBButton)); dmaTextboxMap_hook(gb);
+  CYC(b_+3, b_+6); dmaTextboxMap_hook(gb);
 }
 
 void textOptionCode_checkBButton_hook(GB *gb) {
@@ -2571,7 +2571,7 @@ void textOptionCode_checkBButton_hook(GB *gb) {
   CALL_C(b_+21, removeCursorFromSelectedTextPosition_hook, SYM(removeCursorFromSelectedTextPosition), b_+24);
   CALL_C(b_+24, updateSelectedTextPositionAndDmaTextboxMap_hook, SYM(updateSelectedTextPositionAndDmaTextboxMap), b_+27);
   CYC(b_+27, b_+28); alu_or(gb, D);
-  CYC(b_+28, SYM(pushToTextStack)); ret_effect(gb);
+  CYC(b_+28, b_+29); ret_effect(gb);
 }
 
 void pushToTextStack_hook(GB *gb) {
@@ -2606,7 +2606,7 @@ void pushToTextStack_hook(GB *gb) {
   CYC(b_+33, b_+34); L = E;
   CYC(b_+34, b_+35); SET_BC(pop_effect(gb));
   CYC(b_+35, b_+36); SET_DE(pop_effect(gb));
-  CYC(b_+36, SYM(popFromTextStack)); ret_effect(gb);
+  CYC(b_+36, b_+37); ret_effect(gb);
 }
 
 void popFromTextStack_hook(GB *gb) {
@@ -2647,7 +2647,7 @@ void popFromTextStack_hook(GB *gb) {
   CYC(b_+39, b_+40); SET_HL(pop_effect(gb));
   CYC(b_+40, b_+41); SET_BC(pop_effect(gb));
   CYC(b_+41, b_+42); SET_DE(pop_effect(gb));
-  CYC(b_+42, SYM(readByteFromW7ActiveBankAndIncHl)); ret_effect(gb);
+  CYC(b_+42, b_+43); ret_effect(gb);
 }
 
 void incHlAndUpdateBank_hook(GB *gb);
@@ -2678,7 +2678,7 @@ void incHlAndUpdateBank_hook(GB *gb) {
   CYC(b_+12, b_+13); A = alu_inc8(gb, A);
   CYC(b_+13, b_+16); mem_wr(gb, w7ActiveBank, A);
   CYC(b_+16, b_+17); SET_AF(pop_effect(gb));
-  CYC(b_+17, SYM(handleTextControlCode)); ret_effect(gb);
+  CYC(b_+17, b_+18); ret_effect(gb);
 }
 
 void getCharacterDisplayLength_hook(GB *gb) {
@@ -2692,7 +2692,7 @@ void getCharacterDisplayLength_hook(GB *gb) {
   add_a_to_hl(gb);
   CYC(b_+11, b_+12); A = mem_rd(gb, HL);
   CYC(b_+12, b_+13); SET_HL(pop_effect(gb));
-  CYC(b_+13, SYM(textControlCodeC_0)); ret_effect(gb);
+  CYC(b_+13, b_+14); ret_effect(gb);
 }
 
 void textControlCodeC_0_hook(GB *gb) {
@@ -2706,27 +2706,27 @@ void textControlCodeC_0_hook(GB *gb) {
   add_a_to_hl(gb);
   CYC(b_+11, b_+12); A = mem_rd(gb, HL);
   CYC(b_+12, b_+15); mem_wr(gb, w7CharacterDisplayLength, A);
-  CYC(b_+15, SYM(textSpeedData)); textControlCodeC_ret_hook(gb);
+  CYC(b_+15, b_+17); textControlCodeC_ret_hook(gb);
 }
 
 void textControlCodeC_7_hook(GB *gb) {
   BASE(textControlCodeC_7);
   CYC(b_+0, b_+2); A = 0x78;
   CYC(b_+2, b_+5); mem_wr(gb, w7TextSlowdownTimer, A);
-  CYC(b_+5, SYM(textControlCodeC_5)); textControlCodeC_ret_hook(gb);
+  CYC(b_+5, b_+7); textControlCodeC_ret_hook(gb);
 }
 
 void textControlCodeC_5_hook(GB *gb) {
   BASE(textControlCodeC_5);
   CYC(b_+0, b_+3); SET_HL(w7d0c1);
-  CYC(b_+3, SYM(textControlCodeC_3)); mem_wr(gb, HL, mem_rd(gb, HL) | 0x20);
+  CYC(b_+3, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) | 0x20);
   textControlCodeC_3_hook(gb);
 }
 
 void textControlCodeC_3_hook(GB *gb) {
   BASE(textControlCodeC_3);
   CYC(b_+0, b_+3); SET_HL(w7d0c1);
-  CYC(b_+3, SYM(textControlCodeC_ret)); mem_wr(gb, HL, mem_rd(gb, HL) | 0x02);
+  CYC(b_+3, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) | 0x02);
   textControlCodeC_ret_hook(gb);
 }
 
@@ -2734,7 +2734,7 @@ void textControlCodeC_ret_hook(GB *gb) {
   BASE(textControlCodeC_ret);
   CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
   CYC(b_+1, b_+2); SET_BC(pop_effect(gb));
-  CYC(b_+2, SYM(textControlCodeC_6)); ret_effect(gb);
+  CYC(b_+2, b_+3); ret_effect(gb);
 }
 
 void textControlCodeC_6_hook(GB *gb) {
@@ -2742,7 +2742,7 @@ void textControlCodeC_6_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, (wcbaa + 1));
   CYC(b_+3, b_+6); mem_wr(gb, (wTextNumberSubstitution + 1), A);
   CYC(b_+6, b_+9); A = mem_rd(gb, wcbaa);
-  CYC(b_+9, SYM(textControlCodeC_1)); mem_wr(gb, wTextNumberSubstitution, A);
+  CYC(b_+9, b_+12); mem_wr(gb, wTextNumberSubstitution, A);
   textControlCodeC_1_hook(gb);
 }
 
@@ -2779,7 +2779,7 @@ void textControlCodeC_1_drawDigit_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+35, b_+37); alu_add(gb, 0x30);
   CALL_C(b_+37, setLineTextBuffers_hook, SYM(setLineTextBuffers), b_+40);
-  CYC(b_+40, SYM(textControlCodeC_2)); retrieveTextCharacter_hook(gb);
+  CYC(b_+40, b_+43); retrieveTextCharacter_hook(gb);
 }
 
 static void textControlCodeC_2_getNextTextboxOptionPosition(GB *gb) {
@@ -2794,7 +2794,7 @@ static void textControlCodeC_2_getNextTextboxOptionPosition(GB *gb) {
     }
     CYC(b_+33, b_+34);
     CYC(b_+34, b_+35); L = alu_inc8(gb, L);
-    CYC(b_+35, SYM(nameAddressTable));
+    CYC(b_+35, b_+37);
   }
 }
 

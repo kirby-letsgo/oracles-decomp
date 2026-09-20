@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode7a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode7a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCode7a_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -375,7 +375,7 @@ preventLinkFromPassing:
     return;
   }
   CYC(b_+403, b_+404);
-  CYC(b_+404, SYM(interactionCode7d)); objectPreventLinkFromPassing_hook(gb); // jp
+  CYC(b_+404, b_+407); objectPreventLinkFromPassing_hook(gb); // jp
   if (gb->pc == b_+58 && gb->sp == sp0_) goto afterPrevent1;
   if (gb->pc == b_+287 && gb->sp == (uint16_t)(sp0_ - 2)) goto afterPrevent2;
   return;

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(comedian_checkGameProgress), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(comedian_checkGameProgress), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void writeFlagsTocddb_hook(GB *gb);
 
@@ -48,7 +48,7 @@ void checkEssenceNotObtained_hook(GB *gb) {
   (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(wEssencesObtained);
   CALL_C(b_+3, checkFlag_hook, SYM(checkFlag), b_+6);
-  CYC(b_+6, SYM(comedian_enableMustache)); writeFlagsTocddb_hook(gb); return; // jp
+  CYC(b_+6, b_+9); writeFlagsTocddb_hook(gb); return; // jp
 }
 
 void comedian_enableMustache_hook(GB *gb) {
@@ -56,7 +56,7 @@ void comedian_enableMustache_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
   CYC(SYM(comedian_enableMustache), (SYM(comedian_enableMustache) + 2)); A = 0x04;
-  CYC((SYM(comedian_enableMustache) + 2), b_+0); // jr $6280 -- shared tail duplicated below (matches comedian_disableMustache)
+  CYC((SYM(comedian_enableMustache) + 2), (SYM(comedian_enableMustache) + 4)); // jr $6280 -- shared tail duplicated below (matches comedian_disableMustache)
   CYC(b_+2, b_+3); H = D;
   CYC(b_+3, b_+5); L = INTERACTION_BASE + OBJ_VAR37; // animation base
   CYC(b_+5, b_+6); mem_wr(gb, HL, A);
@@ -99,5 +99,5 @@ compare_var3e:
   CYC(b_+16, b_+17); mem_wr(gb, HL, A);
   CYC(b_+17, b_+19); L = INTERACTION_BASE + OBJ_VAR37; // "animation base"?
   CYC(b_+19, b_+20); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+20, SYM(comedianScript_b15)); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+20, b_+23); interactionSetAnimation_hook(gb); return; // jp
 }

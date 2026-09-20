@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(getLinkTilePosition), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(getLinkTilePosition), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define OBJ_VAR30 0x30
 
@@ -26,7 +26,7 @@ void getLinkTilePosition_hook(GB *gb) {
   CYC(b_+16, b_+17); alu_or(gb, B);
   CYC(b_+17, b_+18); L = A;
   CYC(b_+18, b_+19); SET_BC(pop_effect(gb));
-  CYC(b_+19, SYM(interactionCode19)); ret_effect(gb);
+  CYC(b_+19, b_+20); ret_effect(gb);
 }
 
 // @subid00: tracks Link's position and spawns a subid 1 instance when he jumps onto a
@@ -150,7 +150,7 @@ setTile:
   CALL_C(b_+128, setTileInRoomLayoutBuffer_hook, SYM(setTileInRoomLayoutBuffer), b_+131);
   CYC(b_+131, b_+133); A = SND_GETSEED;
   CALL_C(b_+133, playSound_b00_hook, SYM(playSound_b00), b_+136);
-  CYC(b_+136, SYM(getLinkTilePosition)); interactionDelete_hook(gb);
+  CYC(b_+136, b_+139); interactionDelete_hook(gb);
 }
 
 // INTERAC_TOGGLE_FLOOR: red/yellow/blue floor tiles that change color when jumped over.

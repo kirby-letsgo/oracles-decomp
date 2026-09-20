@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode1c), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode1c), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t stalfosBone_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -92,5 +92,5 @@ func_11_51dd:
   CYC(b_+79, b_+81); A = 0x02;
   CYC(b_+81, b_+82); mem_wr(gb, DE, A);
   CYC(b_+82, b_+83); alu_xor(gb, A);
-  CYC(b_+83, SYM(partCode1d)); partCommon_bounceWhenCollisionsEnabled_hook(gb); return; // jp
+  CYC(b_+83, b_+86); partCommon_bounceWhenCollisionsEnabled_hook(gb); return; // jp
 }

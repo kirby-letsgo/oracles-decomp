@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(vasu_giveRingBox), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(vasu_giveRingBox), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void vasu_giveRingBox_hook(GB *gb);
 void vasu_openRingMenu_hook(GB *gb);
@@ -19,7 +19,7 @@ void vasu_giveRingBox_hook(GB *gb) {
   BASE(vasu_giveRingBox);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+3);
-  CYC(b_+3, b_+6); SET_BC((SYM(tryToBreakTile) + 10));
+  CYC(b_+3, b_+6); SET_BC(0x2c00);
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0x60);
   CYC(b_+8, b_+9); L = alu_inc8(gb, L);
   CYC(b_+9, b_+10); mem_wr(gb, HL, B);
@@ -40,13 +40,13 @@ void vasu_openRingMenu_hook(GB *gb) {
   CYC(b_+3, b_+5); A = 0x01;
   CYC(b_+5, b_+8); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+8, b_+10); A = 0x04;
-  CYC(b_+10, SYM(redSnake_openSecretInputMenu)); openMenu_hook(gb);
+  CYC(b_+10, b_+13); openMenu_hook(gb);
 }
 
 void redSnake_openSecretInputMenu_hook(GB *gb) {
   BASE(redSnake_openSecretInputMenu);
   CYC(b_+0, b_+2); A = 0x02;
-  CYC(b_+2, SYM(redSnake_generateRingSecret)); openSecretInputMenu_hook(gb);
+  CYC(b_+2, b_+5); openSecretInputMenu_hook(gb);
 }
 
 void redSnake_generateRingSecret_hook(GB *gb) {
@@ -55,7 +55,7 @@ void redSnake_generateRingSecret_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0x28;
   CALL_C(b_+2, setGlobalFlag_hook, SYM(setGlobalFlag), b_+5);
   CYC(b_+5, b_+8); SET_BC(0x0002);
-  CYC(b_+8, SYM(blueSnake_linkOrFortune_b15)); secretFunctionCaller_hook(gb);
+  CYC(b_+8, b_+11); secretFunctionCaller_hook(gb);
 }
 
 static void vasu_checkFlagSet(GB *gb, uint16_t sp0_) {
@@ -132,20 +132,20 @@ static void vasu_giveRingFromA(GB *gb) {
   BASE(vasu_giveRingInVar3a);
   CYC(b_+3, b_+4); B = A;
   CYC(b_+4, b_+6); C = 0x00;
-  CYC(b_+6, SYM(gameCompleteDialog_markGameAsComplete)); giveRingToLink_hook(gb);
+  CYC(b_+6, b_+9); giveRingToLink_hook(gb);
 }
 
 void vasu_giveFriendshipRing_hook(GB *gb) {
   BASE(vasu_giveFriendshipRing);
   CYC(b_+0, b_+2); A = 0x00;
-  CYC(b_+2, SYM(vasu_giveHundredthRing));
+  CYC(b_+2, b_+4);
   vasu_giveRingFromA(gb);
 }
 
 void vasu_giveHundredthRing_hook(GB *gb) {
   BASE(vasu_giveHundredthRing);
   CYC(b_+0, b_+2); A = 0x38;
-  CYC(b_+2, SYM(vasu_giveRingInVar3a));
+  CYC(b_+2, b_+4);
   vasu_giveRingFromA(gb);
 }
 

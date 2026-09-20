@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode83), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode83), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t bombUpgradeFairy_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -122,7 +122,7 @@ state1:
   CALL_C(b_+89, checkLinkVulnerable_hook, SYM(checkLinkVulnerable), b_+92);
   if (!(F & FC)) { RET_TAKEN(b_+92); return; } // ret nc
   CYC(b_+92, b_+93);
-  CYC(b_+93, b_+96); SET_BC((SYM(initializeVramMap1) + 21)); // INTERAC_PUFF, $02
+  CYC(b_+93, b_+96); SET_BC(0x0502); // INTERAC_PUFF, $02
   CALL_C(b_+96, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+99);
   if (!(F & FZ)) { RET_TAKEN(b_+99); return; } // ret nz
   CYC(b_+99, b_+100);
@@ -201,7 +201,7 @@ state3:
   CYC(b_+208, b_+209); A = alu_inc8(gb, A);
   CYC(b_+209, b_+212); W8(wTmpcfc0_bombUpgradeCutscene_state) = A;
   CALL_C(b_+212, objectCreatePuff_hook, SYM(objectCreatePuff), b_+215);
-  CYC(b_+215, SYM(bombUpgradeFairy_subid01)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+215, b_+218); interactionDelete_hook(gb); return; // jp
 }
 
 // Bombs that surround Link (depending on his answer)
@@ -302,7 +302,7 @@ l650f:
   CYC(b_+37, b_+39); mem_wr(gb, HL, 0x3c);
   CYC(b_+39, b_+41); L = INTERACTION_BASE + OBJ_XH;
   CYC(b_+41, b_+42); mem_wr(gb, HL, B);
-  CYC(b_+42, b_+45); SET_BC((SYM(initializeVramMap1) + 21)); // INTERAC_PUFF, $02
+  CYC(b_+42, b_+45); SET_BC(0x0502); // INTERAC_PUFF, $02
   CALL_C(b_+45, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+48);
   if (!(F & FZ)) { RET_TAKEN(b_+48); return; } // ret nz
   CYC(b_+48, b_+49);
@@ -330,5 +330,5 @@ subid2state2:
   if (F & FZ) { RET_TAKEN(b_+76); return; } // ret z
   CYC(b_+76, b_+77);
   CALL_C(b_+77, objectCreatePuff_hook, SYM(objectCreatePuff), b_+80);
-  CYC(b_+80, SYM(interactionCode84)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+80, b_+83); interactionDelete_hook(gb); return; // jp
 }

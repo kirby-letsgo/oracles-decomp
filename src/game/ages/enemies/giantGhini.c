@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode70), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode70), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void giantGhini_state_uninitialized_hook(GB *gb);
 void giantGhini_state_stub_hook(GB *gb);
@@ -92,7 +92,7 @@ void giantGhini_state_uninitialized_hook(GB *gb) {
   CYC(b_+26, b_+28); mem_wr(gb, HL, 0xf8);
   CYC(b_+28, b_+30); L = ENEMY_BASE + OBJ_VAR33;
   CYC(b_+30, b_+32); mem_wr(gb, HL, 0x10);
-  CYC(b_+32, SYM(giantGhini_state_stub));
+  CYC(b_+32, b_+35);
   giantGhini_spawnChildren_hook(gb); return; // jp
 }
 
@@ -180,7 +180,7 @@ void giantGhini_gotoState9_hook(GB *gb) {
   CYC(b_+19, b_+21); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+21, b_+23); mem_wr(gb, HL, 0x02);
   CYC(b_+23, b_+25); L = ENEMY_BASE + OBJ_VAR32;
-  CYC(b_+25, SYM(giantGhini_setChildRespawnTimer)); mem_wr(gb, HL, 0x00);
+  CYC(b_+25, b_+27); mem_wr(gb, HL, 0x00);
   giantGhini_setChildRespawnTimer_hook(gb); return; // fallthrough
 }
 
@@ -240,7 +240,7 @@ beginCharge:
   CYC(b_+53, b_+55); L = ENEMY_BASE + OBJ_COUNTER2;
   CYC(b_+55, b_+57); mem_wr(gb, HL, 0x96);
   CYC(b_+57, b_+59); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(b_+59, SYM(giantGhini_updateChargeTargetPosition)); mem_wr(gb, HL, 0x05); // SPEED_20
+  CYC(b_+59, b_+61); mem_wr(gb, HL, 0x05); // SPEED_20
   giantGhini_updateChargeTargetPosition_hook(gb); return; // fallthrough
 }
 
@@ -407,6 +407,6 @@ haveAngle:
   CYC(b_+41, b_+43); A = hram_rd(gb, hCameraX & 0xff);
   CYC(b_+43, b_+45); alu_add(gb, 0x50); // (SCREEN_WIDTH/2)<<4
   CYC(b_+45, b_+46); C = A;
-  CYC(b_+46, SYM(enemyCode71));
+  CYC(b_+46, b_+49);
   objectGetRelativeAngle_hook(gb); return; // jp
 }

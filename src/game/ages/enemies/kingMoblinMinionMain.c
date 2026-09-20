@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode56_body), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode56_body), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/ages/enemies/kingMoblinMinionMain.s, bank $10.
 
@@ -148,7 +148,7 @@ void kingMoblinMinion_state2_hook(GB *gb) {
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x0c);
   CYC(b_+7, b_+9); E = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+9, b_+10); A = mem_rd(gb, DE);
-  CYC(b_+10, SYM(kingMoblinMinion_state3));
+  CYC(b_+10, b_+13);
   enemySetAnimation_hook(gb);
 }
 
@@ -168,7 +168,7 @@ void kingMoblinMinion_state3_hook(GB *gb) {
   CYC(b_+10, b_+11);
   CALL_C(b_+11, ecom_incState_b10_hook, SYM(ecom_incState_b10), b_+14);
   CYC(b_+14, b_+16); A = 0x02;
-  CYC(b_+16, SYM(kingMoblinMinion_state4));
+  CYC(b_+16, b_+19);
   enemySetAnimation_hook(gb);
 }
 
@@ -199,13 +199,13 @@ jump:
   CYC(b_+17, b_+19); L = ENEMY_BASE + OBJ_SPEED_Z;
   CYC(b_+19, b_+21); A = 0x80;
   CYC(b_+21, b_+22); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+22, SYM(kingMoblinMinion_animate)); mem_wr(gb, HL, 0xfe);
+  CYC(b_+22, b_+24); mem_wr(gb, HL, 0xfe);
   kingMoblinMinion_animate_hook(gb);
 }
 
 void kingMoblinMinion_animate_hook(GB *gb) {
   BASE(kingMoblinMinion_animate);
-  CYC(b_+0, SYM(kingMoblinMinion_state5));
+  CYC(b_+0, b_+3);
   enemyAnimate_hook(gb);
 }
 
@@ -236,7 +236,7 @@ landed:
   CYC(b_+26, b_+27); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+27, b_+29); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+29, b_+31); mem_wr(gb, HL, 0x10);
-  CYC(b_+31, SYM(kingMoblinMinion_state6));
+  CYC(b_+31, b_+33);
   kingMoblinMinion_animate_hook(gb);
 }
 
@@ -253,7 +253,7 @@ void kingMoblinMinion_state6_hook(GB *gb) {
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0xc8);
   CYC(b_+7, b_+8); L = E;
   CYC(b_+8, b_+10); mem_wr(gb, HL, 0x02);
-  CYC(b_+10, SYM(kingMoblinMinion_state7));
+  CYC(b_+10, b_+12);
   kingMoblinMinion_animate_hook(gb);
 }
 
@@ -337,7 +337,7 @@ void kingMoblinMinion_state9_hook(GB *gb) {
   CYC(b_+13, b_+14); L = alu_inc8(gb, L);
   CYC(b_+14, b_+16); mem_wr(gb, HL, 0x08);
   CYC(b_+16, b_+17); alu_xor(gb, A);
-  CYC(b_+17, SYM(kingMoblinMinion_stateA));
+  CYC(b_+17, b_+20);
   enemySetAnimation_hook(gb);
 }
 
@@ -365,6 +365,6 @@ delete_:
   CYC(b_+16, b_+18); A = 0x33;
   CALL_C(b_+18, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+21);
   CYC(b_+21, b_+23); mem_wr(gb, HL, 0x01);
-  CYC(b_+23, SYM(blackTower_getMovingFlamesNextTileCoords));
+  CYC(b_+23, b_+26);
   enemyDelete_hook(gb);
 }

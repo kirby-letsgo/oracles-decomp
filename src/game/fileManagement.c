@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(fileManagementFunction), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(fileManagementFunction), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void clearFileAtHl_hook(GB *gb);
 void fileManagementFunction_hook(GB *gb);
@@ -152,7 +152,7 @@ void saveFile_b07_hook(GB *gb) {
   CYC(b_+37, b_+38); E = C;
   CYC(b_+38, b_+39); D = B;
   CALL_C(b_+39, copyFileFromHlToDe_hook, SYM(copyFileFromHlToDe), b_+42);
-  CYC(b_+42, SYM(loadFile_b07));
+  CYC(b_+42, b_+44);
   verifyFileCopies_hook(gb);
 }
 
@@ -175,7 +175,7 @@ void loadFile_b07_hook(GB *gb) {
   CYC(b_+17, b_+20); SET_DE(wFileStart);
   CALL_C(b_+20, copyFileFromHlToDe_hook, SYM(copyFileFromHlToDe), b_+23);
   CYC(b_+23, b_+24); SET_AF(pop_effect(gb));
-  CYC(b_+24, SYM(eraseFile_b07)); ret_effect(gb);
+  CYC(b_+24, b_+25); ret_effect(gb);
 }
 
 void eraseFile_b07_hook(GB *gb) {
@@ -191,19 +191,19 @@ void eraseFile__clearFile_b07_hook(GB *gb) {
   BASE(eraseFile_b07);
   uint16_t sp0_ = gb->sp;
   CYC(b_+9, b_+11); A = 0x0a;
-  CYC(b_+11, b_+14); mem_wr(gb, (SYM(setDeathRespawnPoint) + 17), A);
+  CYC(b_+11, b_+14); mem_wr(gb, 0x1111, A);
   CYC(b_+14, b_+15); L = C;
   CYC(b_+15, b_+16); H = B;
   CALL_C(b_+16, clearFileAtHl_hook, SYM(clearFileAtHl), b_+19);
   CYC(b_+19, b_+20); alu_xor(gb, A);
-  CYC(b_+20, b_+23); mem_wr(gb, (SYM(setDeathRespawnPoint) + 17), A);
-  CYC(b_+23, SYM(clearFileAtHl)); ret_effect(gb);
+  CYC(b_+20, b_+23); mem_wr(gb, 0x1111, A);
+  CYC(b_+23, b_+24); ret_effect(gb);
 }
 
 void clearFileAtHl_hook(GB *gb) {
   BASE(clearFileAtHl);
-  CYC(b_+0, b_+3); SET_BC((SYM(loadPaletteHeader) + 69));
-  CYC(b_+3, SYM(verifyFileCopies));
+  CYC(b_+0, b_+3); SET_BC(0x0550);
+  CYC(b_+3, b_+6);
   clearMemoryBc_hook(gb);
 }
 
@@ -241,7 +241,7 @@ static void verify_file_copies_copy1_invalid(GB *gb, uint16_t sp0_) {
 static void verify_file_copies_both_invalid(GB *gb) {
   BASE(verifyFileCopies);
   CYC(b_+63, b_+65); A = 0xff;
-  CYC(b_+65, SYM(copyFileFromHlToDe)); ret_effect(gb);
+  CYC(b_+65, b_+66); ret_effect(gb);
 }
 
 void verifyFileCopies_hook(GB *gb) {
@@ -293,19 +293,19 @@ void copyFileFromHlToDe_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+1); push_effect(gb, HL);
   CYC(b_+1, b_+3); A = 0x0a;
-  CYC(b_+3, b_+6); mem_wr(gb, (SYM(setDeathRespawnPoint) + 17), A);
-  CYC(b_+6, b_+9); SET_BC((SYM(loadPaletteHeader) + 69));
+  CYC(b_+3, b_+6); mem_wr(gb, 0x1111, A);
+  CYC(b_+6, b_+9); SET_BC(0x0550);
   CALL_C(b_+9, copyMemoryBc_hook, SYM(copyMemoryBc), b_+12);
   CYC(b_+12, b_+13); alu_xor(gb, A);
-  CYC(b_+13, b_+16); mem_wr(gb, (SYM(setDeathRespawnPoint) + 17), A);
+  CYC(b_+13, b_+16); mem_wr(gb, 0x1111, A);
   CYC(b_+16, b_+17); SET_HL(pop_effect(gb));
-  CYC(b_+17, SYM(verifyFileAtHl)); ret_effect(gb);
+  CYC(b_+17, b_+18); ret_effect(gb);
 }
 
 static void verify_file_done(GB *gb) {
   BASE(verifyFileAtHl);
   CYC(b_+31, b_+32); alu_xor(gb, A);
-  CYC(b_+32, b_+35); mem_wr(gb, (SYM(setDeathRespawnPoint) + 17), A);
+  CYC(b_+32, b_+35); mem_wr(gb, 0x1111, A);
   CYC(b_+35, b_+36); SET_HL(pop_effect(gb));
   CYC(b_+36, b_+37); A = B;
   CYC(b_+37, b_+38); alu_rrca(gb);
@@ -318,7 +318,7 @@ static void verify_file_failed(GB *gb, uint16_t sp0_) {
   CYC(b_+40, b_+41); push_effect(gb, HL);
   CALL_C(b_+41, clearFileAtHl_hook, SYM(clearFileAtHl), b_+44);
   CYC(b_+44, b_+46); B = 0xff;
-  CYC(b_+46, SYM(calculateFileChecksum));
+  CYC(b_+46, b_+48);
   verify_file_done(gb);
 }
 
@@ -351,7 +351,7 @@ void verifyFileAtHl_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+1); push_effect(gb, HL);
   CYC(b_+1, b_+3); A = 0x0a;
-  CYC(b_+3, b_+6); mem_wr(gb, (SYM(setDeathRespawnPoint) + 17), A);
+  CYC(b_+3, b_+6); mem_wr(gb, 0x1111, A);
   CALL_C(b_+6, calculateFileChecksum_hook, SYM(calculateFileChecksum), b_+9);
   CYC(b_+9, b_+10); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+10, b_+11); alu_cp(gb, E);
@@ -394,7 +394,7 @@ void calculateFileChecksum_hook(GB *gb) {
   CYC(b_+1, b_+3); A = 0x02;
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   add_a_to_hl_from_rst(gb);
-  CYC(b_+4, b_+7); SET_BC((SYM(getInputWithAutofire) + 19));
+  CYC(b_+4, b_+7); SET_BC(0x02a7);
   CYC(b_+7, b_+10); SET_DE(0x0000);
   for (;;) {
     CYC(b_+10, b_+11); A = mem_rd(gb, HL); SET_HL(HL + 1);
@@ -414,7 +414,7 @@ void calculateFileChecksum_hook(GB *gb) {
     break;
   }
   CYC(b_+21, b_+22); SET_HL(pop_effect(gb));
-  CYC(b_+22, SYM(getFileAddress1)); ret_effect(gb);
+  CYC(b_+22, b_+23); ret_effect(gb);
 }
 
 static void get_file_address(GB *gb) {
@@ -435,7 +435,7 @@ static void get_file_address(GB *gb) {
 void getFileAddress1_hook(GB *gb) {
   BASE(getFileAddress1);
   CYC(b_+0, b_+2); C = 0x00;
-  CYC(b_+2, SYM(getFileAddress2));
+  CYC(b_+2, b_+4);
   get_file_address(gb);
 }
 
@@ -461,5 +461,5 @@ void initializeFileVariables_hook(GB *gb) {
     CYC(b_+8, b_+9); mem_wr(gb, DE, A);
     CYC(b_+9, b_+11);
   }
-  CYC(b_+11, SYM(initialFileVariablesTable)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode55), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode55), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void enemyCode55_hook(GB *gb);
 void candle_state_uninitialized_hook(GB *gb);
@@ -92,7 +92,7 @@ void candle_state_uninitialized_hook(GB *gb) {
   CYC(b_+2, b_+4); A = 0x1e; // 30
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);
   CYC(b_+5, b_+7); A = 0x0a; // SPEED_40
-  CYC(b_+7, SYM(candle_state_stub)); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
+  CYC(b_+7, b_+10); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
 }
 
 // 0e:764f, bare global; jump-table target from enemyCode55.
@@ -119,7 +119,7 @@ void candle_state8_hook(GB *gb) {
   CYC(b_+17, b_+19); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+19, b_+20); mem_wr(gb, DE, A);
   CYC(b_+20, b_+22); A = 0x01;
-  CYC(b_+22, SYM(candle_state9)); enemySetAnimation_hook(gb); return; // jp $282b
+  CYC(b_+22, b_+25); enemySetAnimation_hook(gb); return; // jp $282b
 }
 
 // 0e:7669, bare global; jump-table target from enemyCode55. Walking for [counter1]
@@ -138,7 +138,7 @@ void candle_state9_hook(GB *gb) {
 
 applySpeed:
   CALL_C(b_+13, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0e), b_+16);
-  CYC(b_+16, SYM(candle_stateA)); candle_animate_hook(gb); return; // jr
+  CYC(b_+16, b_+18); candle_animate_hook(gb); return; // jr
 }
 
 // 0e:767b, bare global; jump-table target from enemyCode55. Just lit on fire.
@@ -155,7 +155,7 @@ void candle_stateA_hook(GB *gb) {
   CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+15, b_+17); mem_wr(gb, HL, 0x28); // SPEED_100
   CYC(b_+17, b_+19); A = 0x02;
-  CYC(b_+19, SYM(candle_stateB)); enemySetAnimation_hook(gb); return; // jp $282b
+  CYC(b_+19, b_+22); enemySetAnimation_hook(gb); return; // jp $282b
 }
 
 // 0e:7691, bare global; jump-table target from enemyCode55. Moving slowly at first.
@@ -189,7 +189,7 @@ void candle_applySpeed_hook(GB *gb) {
 // from candle_state9.
 void candle_animate_hook(GB *gb) {
   BASE(candle_animate);
-  CYC(b_+0, SYM(candle_stateC)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:76ac, bare global; jump-table target from enemyCode55. Moving faster.
@@ -201,7 +201,7 @@ void candle_stateC_hook(GB *gb) {
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x3c); // [counter1] = 60
   CYC(b_+7, b_+8); L = E;
-  CYC(b_+8, SYM(candle_stateD)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+8, b_+9); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
   candle_stateD_hook(gb); return; // fallthrough
 }
 
@@ -228,7 +228,7 @@ void candle_stateD_hook(GB *gb) {
   CYC(b_+24, b_+25); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+25, b_+27); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
   CYC(b_+27, b_+29); mem_wr(gb, HL, 0x04); // ENEMYCOLLISION_PODOBOO
-  CYC(b_+29, SYM(candle_stateE)); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+29, b_+32); objectSetInvisible_hook(gb); return; // jp
 }
 
 // 0e:76d5, bare global; jump-table target from enemyCode55. Waiting for the
@@ -255,5 +255,5 @@ void candle_stateE_hook(GB *gb) {
 done:
   CALL_C(b_+20, markEnemyAsKilledInRoom_b00_hook, SYM(markEnemyAsKilledInRoom_b00), b_+23);
   CALL_C(b_+23, decNumEnemies_hook, SYM(decNumEnemies), b_+26);
-  CYC(b_+26, SYM(enemyCode56)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+26, b_+29); enemyDelete_hook(gb); return; // jp
 }

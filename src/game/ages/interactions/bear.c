@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode5d), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode5d), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t bank09_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -237,7 +237,7 @@ void bear_state0__textIDs_hook(GB *gb) {
 L_6dc8:
   CYC(b_+131, b_+132); mem_wr(gb, DE, A);
   CYC(b_+132, b_+133); SET_DE(DE + 1);
-  CYC(b_+133, SYM(bear_state1)); D = alu_inc8(gb, D);
+  CYC(b_+133, b_+134); D = alu_inc8(gb, D);
   bear_state1_hook(gb); return;
 }
 
@@ -410,5 +410,5 @@ void bear_state1__runSubid02_hook(GB *gb) {
 L_6e4c:
   CALL_C(b_+129, interactionRunScript_hook, SYM(interactionRunScript), b_+132);
   if ((F & FC)) { CYCT(b_+132, b_+135); if (hook_enabled_at(SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+132, b_+135);
-  CYC(b_+135, SYM(interactionCode5e)); if (hook_enabled_at(SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
+  CYC(b_+135, b_+138); if (hook_enabled_at(SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
 }

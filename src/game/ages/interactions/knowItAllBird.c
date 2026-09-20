@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodee3), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodee3), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/ages/interactions/knowItAllBird.s (INTERAC_KNOW_IT_ALL_BIRD), bank $10.
 
@@ -37,7 +37,7 @@ void interactionCodee3__beginJump_hook(GB *gb) {
   BASE(interactionCodee3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+163, b_+166); SET_BC(0xff40);  // ld bc,-$c0
-  CYC(b_+166, SYM(interactionCodee6)); objectSetSpeedZ_hook(gb); return;  // jp objectSetSpeedZ
+  CYC(b_+166, b_+169); objectSetSpeedZ_hook(gb); return;  // jp objectSetSpeedZ
 }
 
 void interactionCodee3_hook(GB *gb) {

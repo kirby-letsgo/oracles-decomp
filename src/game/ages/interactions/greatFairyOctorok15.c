@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(greatFairyOctorok_createMagicPowderAnimation), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(greatFairyOctorok_createMagicPowderAnimation), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void greatFairyOctorok_createMagicPowderAnimation_hook(GB *gb);
 

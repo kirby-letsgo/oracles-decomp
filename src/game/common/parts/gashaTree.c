@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode17), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode17), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t gashaTree_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -166,7 +166,7 @@ substate2:
   if (!(F & FC)) { CYCT(b_+175, b_+177); func_5010_hook(gb); return; } // jr nc
   CYC(b_+175, b_+177);
   CALL_C(b_+177, func_5010_hook, SYM(func_5010), b_+180);
-  CYC(b_+180, SYM(func_5010)); partDelete_hook(gb); return; // jp
+  CYC(b_+180, b_+183); partDelete_hook(gb); return; // jp
 }
 
 void gashaTree_func_4fb2_hook(GB *gb) {
@@ -191,5 +191,5 @@ void func_5010_hook(GB *gb) {
   }
   CYC(b_+6, b_+8); A = 0x00;
   CALL_C(b_+8, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+11);
-  CYC(b_+11, SYM(table_501e)); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+11, b_+14); objectCopyPosition_hook(gb); return; // jp
 }

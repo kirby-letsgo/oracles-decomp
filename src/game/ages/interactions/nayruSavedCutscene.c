@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interaction6e_subid00), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interaction6e_subid00), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t nayruSavedCutscene_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -97,7 +97,7 @@ state2:
   CALL_C(b_+103, setGlobalFlag_hook, SYM(setGlobalFlag), b_+106);
   CYC(b_+106, b_+108); A = 0x0c; // CUTSCENE_NAYRU_WARP_TO_MAKU_TREE
   CYC(b_+108, b_+111); W8(wCutsceneTrigger) = A;
-  CYC(b_+111, SYM(interaction6e_subid01)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+111, b_+114); interactionDelete_hook(gb); return; // jp
 }
 
 // Queen Ambi
@@ -215,7 +215,7 @@ state4:
   CALL_C(b_+158, interactionRunScript_hook, SYM(interactionRunScript), b_+161);
 
 l55ed:
-  CYC(b_+161, SYM(interaction6e_subid02)); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+161, b_+164); interactionAnimate_hook(gb); return; // jp
 }
 
 // Ghost Veran
@@ -324,14 +324,14 @@ l568d:
 
 applySpeedAndAnimate:
   CALL_C(b_+163, objectApplySpeed_hook, SYM(objectApplySpeed), b_+166);
-  CYC(b_+166, SYM(interaction6e_subid03)); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+166, b_+169); interactionAnimate_hook(gb); return; // jp
 }
 
 void interaction6e_runScriptAndAnimate_hook(GB *gb) {
   BASE(interaction6e_runScriptAndAnimate);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
-  CYC(b_+3, SYM(interaction6e_initRalph)); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+3, b_+6); interactionAnimate_hook(gb); return; // jp
 }
 
 void interaction6e_initRalph_hook(GB *gb) {
@@ -343,7 +343,7 @@ void interaction6e_initRalph_hook(GB *gb) {
   CYC(b_+8, b_+10); mem_wr(gb, HL, 0x50); // SPEED_200
   CALL_C(b_+10, objectSetVisible82_hook, SYM(objectSetVisible82), b_+13);
   CYC(b_+13, b_+16); SET_HL((SYM(miscPuzzles_subid1f__state2) + 10)); // mainScripts.interaction6e_subid03Script
-  CYC(b_+16, SYM(interaction6e_subid04)); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+16, b_+19); interactionSetScript_hook(gb); return; // jp
 }
 
 // Ralph
@@ -351,8 +351,8 @@ void interaction6e_subid03_hook(GB *gb) {
   BASE(interaction6e_subid03);
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   CYC(b_+1, b_+2); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+2, SYM(interaction6e_runScriptAndAnimate)); interaction6e_initRalph_hook(gb); return; } // jr z
-  CYC(b_+2, SYM(interaction6e_runScriptAndAnimate));
+  if (F & FZ) { CYCT(b_+2, b_+4); interaction6e_initRalph_hook(gb); return; } // jr z
+  CYC(b_+2, b_+4);
   interaction6e_runScriptAndAnimate_hook(gb); return;
 }
 

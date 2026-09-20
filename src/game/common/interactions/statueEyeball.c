@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodee2), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodee2), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/common/interactions/statueEyeball.s (INTERAC_STATUE_EYEBALL), bank $10.
 

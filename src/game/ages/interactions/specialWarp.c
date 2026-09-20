@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode1f), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode1f), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // Subid 0, indexed by var03 (the original xh): b0 = dest room, b1 = dest position.
 #define specialWarpSubid0WarpData_bank08 SYM(interactionCode1f__subid0__warpData)
@@ -106,7 +106,7 @@ static void specialWarp_subid1State0(GB *gb, uint16_t sp0_) {
     CYCT(b_+96, b_+99); interactionDelete_hook(gb); return;
   }
   CYC(b_+96, b_+99);
-  CYC(b_+99, b_+102); SET_BC((SYM(loadTilesetHlpr) + 18));
+  CYC(b_+99, b_+102); SET_BC(0x0810);
   CALL_C(b_+102, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+105);
   CALL_C(b_+105, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing), b_+108);
   if (!(F & FC)) {
@@ -201,7 +201,7 @@ static void specialWarp_subid2(GB *gb, uint16_t sp0_) {
 initialize:
   // @subid2@initialize
   CALL_C(b_+191, interactionIncState_hook, SYM(interactionIncState), b_+194);
-  CYC(b_+194, SYM(interactionCode20)); interactionSetAlwaysUpdateBit_hook(gb);
+  CYC(b_+194, b_+197); interactionSetAlwaysUpdateBit_hook(gb);
 }
 
 // INTERAC_SPECIAL_WARP: hardcoded warps that are not part of the room's warp data.

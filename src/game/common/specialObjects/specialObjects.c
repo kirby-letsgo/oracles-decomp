@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(updateGameKeysPressed), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(updateGameKeysPressed), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t func_410d_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -327,7 +327,7 @@ raft_position:
   CYC(b_+227, b_+228); B = alu_dec8(gb, B);
 copy_raft_position:
   CALL_C(b_+228, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+231);
-  CYC(b_+231, SYM(specialObjectSetOamVariables));
+  CYC(b_+231, b_+234);
   objectSetVisiblec3_hook(gb);
 }
 
@@ -337,14 +337,14 @@ void linkApplyDamage_b5_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL((SYM(companionDragToCenterOfHole__adjustX) + 9));
   CYC(b_+3, b_+5); E = 0x06;
   CALL_C(b_+5, interBankCall_hook, 0x008a, b_+8);
-  CYC(b_+8, SYM(updateLinkInvincibilityCounter)); ret_effect(gb);
+  CYC(b_+8, b_+9); ret_effect(gb);
 }
 
 void specialObjectCode_minecart_b05_hook(GB *gb) {
   BASE(specialObjectCode_minecart_b05);
   CYC(b_+0, b_+3); SET_HL(SYM(updateHeartRingCounter));
   CYC(b_+3, b_+5); E = 0x06;
-  CYC(b_+5, SYM(specialObjectCode_maple));
+  CYC(b_+5, b_+8);
   interBankCall_hook(gb);
 }
 
@@ -352,6 +352,6 @@ void specialObjectCode_raft_b05_hook(GB *gb) {
   BASE(specialObjectCode_raft_b05);
   CYC(b_+0, b_+3); SET_HL((SYM(linkUpdateFlippersSpeed__nextState) + 6));
   CYC(b_+3, b_+5); E = 0x06;
-  CYC(b_+5, SYM(tileTypesTable));
+  CYC(b_+5, b_+8);
   interBankCall_hook(gb);
 }

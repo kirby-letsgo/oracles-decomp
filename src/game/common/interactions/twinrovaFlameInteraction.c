@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodea9), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodea9), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/object_code/common/interactions/twinrovaFlame.s (INTERAC_TWINROVA_FLAME
 // under ROM_AGES), bank 0x0b. This is a DIFFERENT, unrelated source file from
@@ -105,5 +105,5 @@ state2:
   CYC(b_+91, b_+92); alu_rrca(gb);
   if (F & FC) { CYCT(b_+92, b_+95); objectSetVisible_hook(gb); return; } // jp c
   CYC(b_+92, b_+95);
-  CYC(b_+95, SYM(interactionCodeaa)); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+95, b_+98); objectSetInvisible_hook(gb); return; // jp
 }

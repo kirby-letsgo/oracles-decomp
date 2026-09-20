@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCoded8), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCoded8), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCoded8_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -56,7 +56,7 @@ static void interactionCoded8_addDoubleIndex(GB *gb, uint16_t return_address) {
 void interactionCoded8_updateTile_hook(GB *gb) {
   BASE(interactionCoded8);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+105, b_+107); A = hram_rd(gb, 0x8d); // ldh a,($ff8d)
+  CYC(b_+105, b_+107); A = mem_rd(gb, hFF8D); // ldh a,($ff8d)
   CYC(b_+107, b_+108); B = mem_rd(gb, HL);
   CYC(b_+108, b_+109); alu_add(gb, B);
   CYC(b_+109, b_+110); C = L;
@@ -109,7 +109,7 @@ void interactionCoded8_toggleLavaSource_hook(GB *gb) {
 
 setOrUnsetLavaSource:
   CYC(b_+87, b_+88); A = B;
-  CYC(b_+88, b_+90); hram_wr(gb, 0x8d, A); // ldh ($ff8d),a
+  CYC(b_+88, b_+90); mem_wr(gb, hFF8D, A); // ldh ($ff8d),a
   CALL_C(b_+90, interactionCoded8_updateTile_hook, b_+105, b_+93);
 
 tileLoop:

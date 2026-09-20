@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode1e), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode1e), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // Data format: b0 = tile to transition into, b1 = tile to transition from.
 #define doorControllerShutterTiles_bank08 SYM(interactionCode1e__shutterTiles)

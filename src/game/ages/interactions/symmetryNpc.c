@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodebf), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodebf), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/object_code/ages/interactions/symmetryNpc.s (interactionCodebf /
 // INTERAC_SYMMETRY_NPC), bank 0x0b.
@@ -98,5 +98,5 @@ state2: // interactionCodebf@state2
 
 runScriptAndAnimate: // interactionCodebf@runScriptAndAnimate
   CALL_C(b_+119, interactionRunScript_hook, SYM(interactionRunScript), b_+122);
-  CYC(b_+122, SYM(interactionCodec1)); npcFaceLinkAndAnimate_hook(gb); return; // jp
+  CYC(b_+122, b_+125); npcFaceLinkAndAnimate_hook(gb); return; // jp
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode0b), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode0b), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t enemyCode0b_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -126,7 +126,7 @@ void enemyCode0b_nudgeTowardsLink_hook(GB *gb) {
   CYC(b_+470, b_+471);
   CYC(b_+471, b_+473); mem_wr(gb, HL, 0x06);
   CALL_C(b_+473, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+476);
-  CYC(b_+476, SYM(enemyCode0c)); objectNudgeAngleTowards_hook(gb); return; // jp
+  CYC(b_+476, b_+479); objectNudgeAngleTowards_hook(gb); return; // jp
 }
 
 // ==================================================================================================

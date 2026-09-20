@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(label_04_033), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(label_04_033), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void label_04_032_hook(GB *gb);
 void label_04_033_hook(GB *gb);
@@ -51,6 +51,7 @@ static void bank4_add_a_to_hl(GB *gb, uint16_t return_address) {
 }
 
 static void b4_vblank_function(GB *gb, uint16_t base, uint8_t column) {
+  BANKOF(label_04_033);
   CYC(base, base + 1); H = B;
   CYC(base + 1, base + 2); L = E;
   CYC(base + 2, base + 4); B = 0x04;
@@ -205,7 +206,7 @@ static void applyWarpDest_finish(GB *gb) {
   CYC(b_+20, b_+22); A = 0x0a;
   CYC(b_+22, b_+25); W8(wLinkForceState) = A;
   CYC(b_+25, b_+28); A = W8(wActiveGroup);
-  CYC(b_+28, b_+30); hram_wr(gb, 0x8b, A);
+  CYC(b_+28, b_+30); mem_wr(gb, hFF8B, A);
   CYC(b_+30, b_+33); A = W8(wWarpDestGroup);
   CYC(b_+33, b_+35); alu_and(gb, 0x07);
   CYC(b_+35, b_+38); W8(wActiveGroup) = A;
@@ -225,7 +226,7 @@ static void applyWarpDest_finish(GB *gb) {
   CYC(b_+64, b_+66); alu_swap_a(gb);
   CYC(b_+66, b_+68); alu_or(gb, 0x08);
   CYC(b_+68, b_+69); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+69, SYM(findWarpSourceAndDest)); loadScreenMusicAndSetRoomPack_hook(gb);
+  CYC(b_+69, b_+72); loadScreenMusicAndSetRoomPack_hook(gb);
 }
 
 void vblankRunBank4Function_b04_hook(GB *gb) {
@@ -242,7 +243,7 @@ void vblankRunBank4Function_b04_hook(GB *gb) {
   CYC(b_+12, b_+13); L = alu_inc8(gb, L);
   CYC(b_+13, b_+14); C = L;
   CYC(b_+14, b_+15); L = A;
-  CYC(b_+15, SYM(applyWarpDest_b04)); hook_handoff(gb, HL);
+  CYC(b_+15, b_+16); hook_handoff(gb, HL);
 }
 
 void label_04_033_hook(GB *gb) {
@@ -269,7 +270,7 @@ void label_04_032_hook(GB *gb) {
   CYC(b_+4, b_+5); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+5, b_+6); H = mem_rd(gb, HL);
   CYC(b_+6, b_+7); L = A;
-  CYC(b_+7, SYM(label_04_033)); A = W8(wWarpDestRoom);
+  CYC(b_+7, b_+10); A = W8(wWarpDestRoom);
   label_04_033_hook(gb);
 }
 
@@ -278,11 +279,11 @@ void applyWarpDest_b04_hook(GB *gb) {
   CYC(b_+0, b_+3); A = W8(wWarpDestGroup);
   CYC(b_+3, b_+5); alu_bit(gb, 7, A);
   if (!(F & FZ)) {
-    CYCT(b_+5, SYM(label_04_032));
+    CYCT(b_+5, b_+7);
     applyWarpDest_finish(gb);
     return;
   }
-  CYC(b_+5, SYM(label_04_032));
+  CYC(b_+5, b_+7);
   label_04_032_hook(gb);
 }
 
@@ -334,7 +335,7 @@ void findWarpSourceAndDest_hook(GB *gb) {
       CYC(b_+52, b_+53); A = mem_rd(gb, HL); SET_HL(HL + 1);
       CYC(b_+53, b_+54); H = mem_rd(gb, HL);
       CYC(b_+54, b_+55); L = A;
-      CYC(b_+55, b_+57); A = hram_rd(gb, 0x8d);
+      CYC(b_+55, b_+57); A = mem_rd(gb, hFF8D);
       CYC(b_+57, b_+58); B = A;
       CYC(b_+58, b_+60);
       continue;
@@ -369,7 +370,7 @@ skip:
     return;
   }
   CYC(b_+86, b_+88);
-  CYC(b_+88, b_+90); A = hram_rd(gb, 0x8c);
+  CYC(b_+88, b_+90); A = mem_rd(gb, hFF8C);
   CYC(b_+90, b_+91); alu_rrca(gb);
   CYC(b_+91, b_+93); B = 0x01;
   if (!(F & FC)) {
@@ -383,7 +384,7 @@ skip:
   CYC(b_+101, b_+104); W8(wDungeonFloor) = A;
   CALL_C(b_+104, getActiveRoomFromDungeonMapPosition_hook, SYM(getActiveRoomFromDungeonMapPosition), b_+107);
   CYC(b_+107, b_+110); W8(wWarpDestRoom) = A;
-  CYC(b_+110, b_+112); A = hram_rd(gb, 0x8d);
+  CYC(b_+110, b_+112); A = mem_rd(gb, hFF8D);
   CYC(b_+112, b_+115); W8(wWarpDestPos) = A;
   CYC(b_+115, b_+118); A = W8(wActiveGroup);
   CYC(b_+118, b_+120); alu_or(gb, 0x80);
@@ -393,7 +394,7 @@ skip:
   CYC(b_+127, b_+129); A = 0x03;
   CYC(b_+129, b_+132); W8(wWarpTransition2) = A;
   CYC(b_+132, b_+134); A = 0x6e;
-  CYC(b_+134, SYM(setWarpDestDefault)); playSound_b00_hook(gb);
+  CYC(b_+134, b_+137); playSound_b00_hook(gb);
   return;
 
 found:
@@ -421,10 +422,10 @@ void setWarpDestDefault_hook(GB *gb) {
   CYC(b_+12, b_+13); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+13, b_+15); mem_wr(gb, HL, 0x00);
   CYC(b_+15, b_+16); L = alu_inc8(gb, L);
-  CYC(b_+16, b_+18); A = hram_rd(gb, 0x8d);
+  CYC(b_+16, b_+18); A = mem_rd(gb, hFF8D);
   CYC(b_+18, b_+19); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+19, b_+21); mem_wr(gb, HL, 0x03);
-  CYC(b_+21, SYM(findScreenEdgeWarpSource)); ret_effect(gb);
+  CYC(b_+21, b_+22); ret_effect(gb);
 }
 
 void findScreenEdgeWarpSource_hook(GB *gb) {
@@ -530,7 +531,7 @@ edge_skip:
   }
   CYC(b_+101, b_+102); alu_xor(gb, A);
   CYC(b_+102, b_+105); W8(wTmpcec0) = A;
-  CYC(b_+105, SYM(func_04_4732)); ret_effect(gb);
+  CYC(b_+105, b_+106); ret_effect(gb);
 }
 
 void func_04_4732_hook(GB *gb) {
@@ -543,7 +544,7 @@ void func_04_4732_hook(GB *gb) {
   CYC(b_+9, b_+11); A = 0x01;
   CYC(b_+11, b_+14); W8(wWarpTransition2) = A;
   CYC(b_+14, b_+15); SET_HL(pop_effect(gb));
-  CYC(b_+15, SYM(getLinkWarpQuadrant)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }
 
 void getLinkWarpQuadrant_hook(GB *gb) {
@@ -563,7 +564,7 @@ void getLinkWarpQuadrant_hook(GB *gb) {
     }
     CYC(b_+23, b_+24);
     CYC(b_+24, b_+25); A = alu_inc8(gb, A);
-    CYC(b_+25, SYM(roomPackData)); ret_effect(gb);
+    CYC(b_+25, b_+26); ret_effect(gb);
     return;
   }
   CYC(b_+12, b_+14);
@@ -766,7 +767,7 @@ void replaceOpenedChest_hook(GB *gb) {
   CYC(b_+9, b_+11); D = wRoomLayout >> 8;
   CYC(b_+11, b_+13); A = 0xf0;
   CYC(b_+13, b_+14); mem_wr(gb, DE, A);
-  CYC(b_+14, SYM(replaceSwitchTiles)); ret_effect(gb);
+  CYC(b_+14, b_+15); ret_effect(gb);
 }
 
 static void replace_switch_tiles(GB *gb, uint16_t entry) {
@@ -901,7 +902,7 @@ finished:
   CYC(b_+76, b_+77); SET_HL(pop_effect(gb));
   if (F & FZ) { CYCT(b_+77, b_+78); ret_effect(gb); return; }
   CYC(b_+77, b_+78);
-  CYC(b_+78, SYM(singleTileChangeGroupTable)); goto match;
+  CYC(b_+78, b_+80); goto match;
 }
 
 void applySingleTileChanges_hook(GB *gb) { uint16_t sp0_ = gb->sp; apply_single_tile_changes(gb, SYM(applySingleTileChanges), sp0_); }
@@ -974,7 +975,7 @@ static void update_changed_tile_queue(GB *gb, uint16_t entry, uint16_t sp0_) {
   CALL_C(b_+80, queueTileWriteAtVBlank_hook, SYM(queueTileWriteAtVBlank), b_+83);
   CYC(b_+83, b_+84); SET_AF(pop_effect(gb));
   CYC(b_+84, b_+86); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+86, SYM(getVramSubtileAddressOfTile)); ret_effect(gb);
+  CYC(b_+86, b_+87); ret_effect(gb);
 }
 
 void updateChangedTileQueue_hook(GB *gb) { uint16_t sp0_ = gb->sp; update_changed_tile_queue(gb, SYM(updateChangedTileQueue), sp0_); }
@@ -995,7 +996,7 @@ void write4BytesToVramLayout_hook(GB *gb) {
   CYC(b_+11, b_+12); E = alu_inc8(gb, E);
   CYC(b_+12, b_+13); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+13, b_+14); mem_wr(gb, DE, A);
-  CYC(b_+14, SYM(updateChangedTileQueue)); ret_effect(gb);
+  CYC(b_+14, b_+15); ret_effect(gb);
 }
 
 void getVramSubtileAddressOfTile_hook(GB *gb) {
@@ -1112,7 +1113,7 @@ queue_write:
   CALL_C(b_+106, queueTileWriteAtVBlank_hook, SYM(queueTileWriteAtVBlank), b_+109);
   CYC(b_+109, b_+110); SET_AF(pop_effect(gb));
   CYC(b_+110, b_+112); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+112, SYM(queueTileWriteAtVBlank)); ret_effect(gb);
+  CYC(b_+112, b_+113); ret_effect(gb);
 }
 
 void setInterleavedTile_body_hook(GB *gb) { uint16_t sp0_ = gb->sp; set_interleaved_tile_body(gb, SYM(setInterleavedTile_body), sp0_); }
@@ -1194,7 +1195,7 @@ get_tile_position_in_vram:
   CYC(b_+82, b_+83); alu_add(gb, E);
   CYC(b_+83, b_+84); E = A;
   CYC(b_+84, b_+85); D = mem_rd(gb, HL);
-  CYC(b_+85, SYM(loadTilesetData_body)); ret_effect(gb);
+  CYC(b_+85, b_+86); ret_effect(gb);
 }
 
 void queueTileWriteAtVBlank_hook(GB *gb) { uint16_t sp0_ = gb->sp; queue_tile_write_at_vblank(gb, SYM(queueTileWriteAtVBlank), sp0_); }
@@ -1239,5 +1240,5 @@ void generateW3VramTilesAndAttributes_hook(GB *gb) {
     CYC(b_+47, b_+49);
     break;
   }
-  CYC(b_+49, SYM(write4BytesToVramLayout)); ret_effect(gb);
+  CYC(b_+49, b_+50); ret_effect(gb);
 }

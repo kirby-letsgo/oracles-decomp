@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode51), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode51), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void beetle_state_uninitialized_hook(GB *gb);
 void beetle_state_spawner_hook(GB *gb);
@@ -149,7 +149,7 @@ void beetle_state_uninitialized_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+4, b_+7); ecom_setSpeedAndState8_b0e_hook(gb); return; } // jp nz
   CYC(b_+4, b_+7);
   CYC(b_+7, b_+9); A = 0x01;
-  CYC(b_+9, SYM(beetle_state_spawner)); mem_wr(gb, DE, A); // [state] = 1
+  CYC(b_+9, b_+10); mem_wr(gb, DE, A); // [state] = 1
   beetle_state_spawner_hook(gb); return; // fallthrough
 }
 
@@ -173,7 +173,7 @@ void beetle_state_spawner_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+20); return; } // ret nz
   CYC(b_+20, b_+21);
   CYC(b_+21, b_+22); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [subid] = 2
-  CYC(b_+22, SYM(beetle_state_galeSeed)); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+22, b_+25); objectCopyPosition_hook(gb); return; // jp
 }
 
 // 0e:645e, bare global; jump-table target from enemyCode51.
@@ -194,7 +194,7 @@ void beetle_state_galeSeed_hook(GB *gb) {
 
 skip:
   CALL_C(b_+14, decNumEnemies_hook, SYM(decNumEnemies), b_+17);
-  CYC(b_+17, SYM(beetle_state_switchHook)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+17, b_+20); enemyDelete_hook(gb); return; // jp
 }
 
 // 0e:6472, bare global; jump-table target from enemyCode51.
@@ -214,7 +214,7 @@ void beetle_state_switchHook_hook(GB *gb) {
 
 substate3:
   CYC(b_+12, b_+14); B = 0x0a;
-  CYC(b_+14, SYM(beetle_state_stub)); ecom_fallToGroundAndSetState_b0e_hook(gb); return; // jp
+  CYC(b_+14, b_+17); ecom_fallToGroundAndSetState_b0e_hook(gb); return; // jp
 }
 
 // 0e:6483, bare global; jump-table target from enemyCode51.
@@ -264,7 +264,7 @@ state9:
   CYC(b_+46, b_+48); A = 0x52; // SND_BOMB_LAND
   CALL_C(b_+48, playSound_b00_hook, SYM(playSound_b00), b_+51);
   CALL_C(b_+51, beetle_chooseRandomAngleAndCounter1_hook, SYM(beetle_chooseRandomAngleAndCounter1), b_+54);
-  CYC(b_+54, SYM(beetle_stateA)); beetle_animate_hook(gb); return; // jr
+  CYC(b_+54, b_+56); beetle_animate_hook(gb); return; // jr
 }
 
 // 0e:64bc, bare global; jump-table target from beetle_subid1/beetle_subid2/beetle_subid3.
@@ -282,7 +282,7 @@ void beetle_stateA_hook(GB *gb) {
 // beetle_subid1/beetle_subid2.
 void beetle_animate_hook(GB *gb) {
   BASE(beetle_animate);
-  CYC(b_+0, SYM(beetle_subid2)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:64c8, bare global; jump-table target from enemyCode51@normalState. Spawns in instantly.
@@ -328,7 +328,7 @@ keepMovingTowardLink:
 
 applyVelocity:
   CALL_C(b_+42, ecom_applyVelocityForSideviewEnemy_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemy_b0e), b_+45);
-  CYC(b_+45, SYM(beetle_subid3)); beetle_animate_hook(gb); return; // jr
+  CYC(b_+45, b_+47); beetle_animate_hook(gb); return; // jr
 }
 
 // 0e:64f7, bare global; jump-table target from enemyCode51@normalState. "Bounces in" when it
@@ -386,7 +386,7 @@ applyVelocity:
 doneBouncing:
   CALL_C(b_+62, ecom_incState_b0e_hook, SYM(ecom_incState_b0e), b_+65);
   CYC(b_+65, b_+67); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(b_+67, SYM(beetle_chooseRandomAngleAndCounter1)); mem_wr(gb, HL, 0x14); // SPEED_80
+  CYC(b_+67, b_+69); mem_wr(gb, HL, 0x14); // SPEED_80
   beetle_chooseRandomAngleAndCounter1_hook(gb); return; // fallthrough
 }
 
@@ -395,7 +395,7 @@ doneBouncing:
 void beetle_chooseRandomAngleAndCounter1_hook(GB *gb) {
   BASE(beetle_chooseRandomAngleAndCounter1);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); SET_BC((SYM(_label_00_063) + 8));
+  CYC(b_+0, b_+3); SET_BC(0x071c);
   CALL_C(b_+3, ecom_randomBitwiseAndBCE_b0e_hook, SYM(ecom_randomBitwiseAndBCE_b0e), b_+6);
   CYC(b_+6, b_+8); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+8, b_+9); A = C;
@@ -441,5 +441,5 @@ void beetle_checkHazards_hook(GB *gb) {
 
 checkHazards:
   CYC(b_+32, b_+33); A = B;
-  CYC(b_+33, SYM(enemyCode52)); ecom_checkHazards_b0e_hook(gb); return; // jp
+  CYC(b_+33, b_+36); ecom_checkHazards_b0e_hook(gb); return; // jp
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(initGbaModePaletteData), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(initGbaModePaletteData), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void getAddressOfLoadedObjectGfxIndex_hook(GB *gb);
 void incLoadedObjectGfxIndex_hook(GB *gb);
@@ -34,7 +34,7 @@ void initGbaModePaletteData_hook(GB *gb) {
   CALL_C(b_+15, copyMemory_hook, SYM(copyMemory), b_+18);
   CYC(b_+18, b_+19); SET_AF(pop_effect(gb));
   CYC(b_+19, b_+21); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+21, SYM(refreshDirtyPalettes)); ret_effect(gb);
+  CYC(b_+21, b_+22); ret_effect(gb);
 }
 
 void refreshDirtyPalettes_hook(GB *gb) {
@@ -180,7 +180,7 @@ static void refresh_dirty_palettes_gba_brighten_palette(GB *gb) {
   CYC(b_+130, b_+131); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+131, b_+133); L = (uint8_t)(L | (1 << 7));
   CYC(b_+133, b_+134); H = C;
-  CYC(b_+134, SYM(gbaModePaletteData)); ret_effect(gb);
+  CYC(b_+134, b_+135); ret_effect(gb);
 }
 
 static void add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
@@ -247,7 +247,7 @@ void findIndexInLoadedObjectGfx_hook(GB *gb) {
   CYC(b_+24, b_+26); alu_sub(gb, (uint8_t)wLoadedObjectGfx);
   CYC(b_+26, b_+28); A = alu_swap(gb, A);
   CYC(b_+28, b_+29); C = A;
-  CYC(b_+29, SYM(findUnusedIndexInLoadedObjectGfx)); ret_effect(gb);
+  CYC(b_+29, b_+30); ret_effect(gb);
 }
 
 void updateTileIndexBaseForAllObjects__updateTileIndexBase_hook(GB *gb) {
@@ -287,7 +287,7 @@ void updateTileIndexBaseForAllObjects__updateTileIndexBase_hook(GB *gb) {
   CYC(b_+106, b_+108); alu_and(gb, 0x1f);
   CYC(b_+108, b_+109); alu_add(gb, C);
   CYC(b_+109, b_+110); mem_wr(gb, DE, A);
-  CYC(b_+110, SYM(findIndexInLoadedObjectGfx)); ret_effect(gb);
+  CYC(b_+110, b_+111); ret_effect(gb);
 }
 
 void findUnusedIndexInLoadedObjectGfx_hook(GB *gb) {
@@ -321,7 +321,7 @@ void findUnusedIndexInLoadedObjectGfx_hook(GB *gb) {
   CYC(b_+21, b_+23); alu_sub(gb, (uint8_t)wLoadedObjectGfx);
   CYC(b_+23, b_+25); A = alu_swap(gb, A);
   CYC(b_+25, b_+26); C = A;
-  CYC(b_+26, SYM(incLoadedObjectGfxIndex)); ret_effect(gb);
+  CYC(b_+26, b_+27); ret_effect(gb);
 }
 
 void incLoadedObjectGfxIndex_hook(GB *gb) {
@@ -330,7 +330,7 @@ void incLoadedObjectGfxIndex_hook(GB *gb) {
   CYC(b_+3, b_+4); A = alu_inc8(gb, A);
   CYC(b_+4, b_+6); alu_and(gb, 0x07);
   CYC(b_+6, b_+9); W8(wLoadedObjectGfxIndex) = A;
-  CYC(b_+9, SYM(getAddressOfLoadedObjectGfxIndex)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 void getAddressOfLoadedObjectGfxIndex_hook(GB *gb) {
@@ -338,7 +338,7 @@ void getAddressOfLoadedObjectGfxIndex_hook(GB *gb) {
   CYC(b_+0, b_+3); A = W8(wLoadedObjectGfxIndex);
   CYC(b_+3, b_+6); SET_HL(wLoadedObjectGfx);
   CYC(b_+6, b_+7); add_double_index_to_hl_from_rst(gb, b_+7);
-  CYC(b_+7, SYM(addIndexToLoadedObjectGfx)); ret_effect(gb);
+  CYC(b_+7, b_+8); ret_effect(gb);
 }
 
 void addIndexToLoadedObjectGfx_hook(GB *gb) {
@@ -369,7 +369,7 @@ void addIndexToLoadedObjectGfx_hook(GB *gb) {
   CYC(b_+16, b_+17); A = C;
   CYC(b_+17, b_+18); SET_BC(pop_effect(gb));
   CYC(b_+18, b_+19); SET_HL(pop_effect(gb));
-  CYC(b_+19, SYM(insertIndexIntoLoadedObjectGfx)); ret_effect(gb);
+  CYC(b_+19, b_+20); ret_effect(gb);
 }
 
 static void insert_index_into_loaded_object_gfx_tail(GB *gb, uint16_t sp0_) {
@@ -382,7 +382,7 @@ static void insert_index_into_loaded_object_gfx_tail(GB *gb, uint16_t sp0_) {
   CYC(b_+59, b_+60); SET_HL(pop_effect(gb));
   CYC(b_+60, b_+61); SET_DE(pop_effect(gb));
   CYC(b_+61, b_+62); SET_BC(pop_effect(gb));
-  CYC(b_+62, SYM(markLoadedObjectGfxUsed)); ret_effect(gb);
+  CYC(b_+62, b_+63); ret_effect(gb);
 }
 
 static void insert_index_into_loaded_object_gfx_tree(GB *gb, uint16_t sp0_) {
@@ -467,7 +467,7 @@ static void mark_loaded_object_gfx_used_end(GB *gb) {
   BASE(markLoadedObjectGfxUsed);
   CYC(b_+22, b_+23); SET_HL(pop_effect(gb));
   CYC(b_+23, b_+24); SET_BC(pop_effect(gb));
-  CYC(b_+24, SYM(markAllLoadedObjectGfxUnused)); ret_effect(gb);
+  CYC(b_+24, b_+25); ret_effect(gb);
 }
 
 static void mark_loaded_object_gfx_used_found(GB *gb) {
@@ -540,13 +540,13 @@ void markAllLoadedObjectGfxUnused_hook(GB *gb) {
   }
   CYC(b_+13, b_+14); SET_HL(pop_effect(gb));
   CYC(b_+14, b_+15); SET_BC(pop_effect(gb));
-  CYC(b_+15, SYM(enemyGetObjectGfxIndex)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }
 
 void enemyGetObjectGfxIndex_hook(GB *gb) {
   BASE(enemyGetObjectGfxIndex);
   CYC(b_+0, b_+2); E = 0x81;
-  CYC(b_+2, SYM(getObjectGfxIndexForEnemy)); A = mem_rd(gb, DE);
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   getObjectGfxIndexForEnemy_hook(gb);
 }
 
@@ -561,7 +561,7 @@ void getObjectGfxIndexForEnemy_hook(GB *gb) {
   CYC(b_+9, b_+10); alu_add_hl(gb, BC);
   CYC(b_+10, b_+11); SET_BC(pop_effect(gb));
   CYC(b_+11, b_+12); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+12, SYM(partGetObjectGfxIndex)); ret_effect(gb);
+  CYC(b_+12, b_+13); ret_effect(gb);
 }
 
 void partGetObjectGfxIndex_hook(GB *gb) {
@@ -575,7 +575,7 @@ void partGetObjectGfxIndex_hook(GB *gb) {
   CYC(b_+10, b_+11); alu_add_hl(gb, BC);
   CYC(b_+11, b_+12); SET_BC(pop_effect(gb));
   CYC(b_+12, b_+13); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+13, SYM(interactionGetObjectGfxIndex)); ret_effect(gb);
+  CYC(b_+13, b_+14); ret_effect(gb);
 }
 
 void interactionGetObjectGfxIndex_hook(GB *gb) {
@@ -585,7 +585,7 @@ void interactionGetObjectGfxIndex_hook(GB *gb) {
   CALL_C(b_+1, interactionGetData_hook, SYM(interactionGetData), b_+4);
   CYC(b_+4, b_+5); SET_BC(pop_effect(gb));
   CYC(b_+5, b_+6); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+6, SYM(itemGetObjectGfxIndex)); ret_effect(gb);
+  CYC(b_+6, b_+7); ret_effect(gb);
 }
 
 void itemGetObjectGfxIndex_hook(GB *gb) {
@@ -598,12 +598,12 @@ void itemGetObjectGfxIndex_hook(GB *gb) {
   CYC(b_+6, b_+9); SET_HL(SYM(itemData));
   CYC(b_+9, b_+10); add_a_to_hl_from_rst(gb, b_+10);
   CYC(b_+10, b_+11); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+11, SYM(enemyLoadGraphicsAndProperties)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 void resumeThreadNextFrameIfLcdIsOn__afterCall4124_hook(GB *gb) {
   BASE(resumeThreadNextFrameIfLcdIsOn);
-  CYC(b_+7, SYM(reloadObjectGfx_b3f)); ret_effect(gb);
+  CYC(b_+7, b_+8); ret_effect(gb);
 }
 
 void resumeThreadNextFrameIfLcdIsOn_hook(GB *gb) {
@@ -634,7 +634,7 @@ void reloadObjectGfx_b3f_hook(GB *gb) {
   if (!(F & FZ)) {
     CALL_C_CC(b_+11, loadUncompressedGfxHeader_hook, SYM(loadUncompressedGfxHeader), SYM(agesFunc_3f_4133));
   } else {
-    CYC(b_+11, SYM(agesFunc_3f_4133));
+    CYC(b_+11, b_+14);
   }
   agesFunc_3f_4133_hook(gb);
 }
@@ -669,7 +669,7 @@ void agesFunc_3f_4133__afterCall4143_hook(GB *gb) {
   CYC(b_+24, b_+27); SET_HL(wLoadedTreeGfxIndex + 1);
   CYC(b_+27, b_+28); E = mem_rd(gb, HL);
   CYC(b_+28, b_+30); mem_wr(gb, HL, 0x00);
-  CYC(b_+30, SYM(refreshObjectGfx_body)); loadTreeGfx_body_hook(gb);
+  CYC(b_+30, b_+33); loadTreeGfx_body_hook(gb);
 }
 
 void agesFunc_3f_4133_hook(GB *gb) {
@@ -738,7 +738,7 @@ void refreshObjectGfx_body__afterCall41d2_hook(GB *gb) {
   CYC(b_+142, b_+143); alu_xor(gb, A);
   CYC(b_+143, b_+146); W8(wEnemyIDToLoadExtraGfx) = A;
   CYC(b_+146, b_+149); W8(wInteractionIDToLoadExtraGfx) = A;
-  CYC(b_+149, SYM(loadObjectGfxHeaderToSlot4_body)); incLoadedObjectGfxIndex_hook(gb);
+  CYC(b_+149, b_+152); incLoadedObjectGfxIndex_hook(gb);
 }
 
 void refreshObjectGfx_body__afterCall41ad_hook(GB *gb) {
@@ -821,7 +821,7 @@ void loadObjectGfxHeaderToSlot4_body__afterCall41f0_hook(GB *gb) {
   BASE(loadObjectGfxHeaderToSlot4_body);
   CYC(b_+4, b_+5); SET_DE(pop_effect(gb));
   CYC(b_+5, b_+7); A = 0x03;
-  CYC(b_+7, SYM(loadTreeGfx_body));
+  CYC(b_+7, b_+9);
   refresh_object_gfx_next_extra(gb, gb->sp);
 }
 
@@ -844,7 +844,7 @@ void loadTreeGfx_body_hook(GB *gb) {
   }
   CYC(b_+5, b_+6);
   CALL_C(b_+6, insertIndexIntoLoadedObjectGfx_hook, SYM(insertIndexIntoLoadedObjectGfx), b_+9);
-  CYC(b_+9, SYM(updateTileIndexBaseForAllObjects)); resumeThreadNextFrameIfLcdIsOn_hook(gb);
+  CYC(b_+9, b_+12); resumeThreadNextFrameIfLcdIsOn_hook(gb);
 }
 
 void updateTileIndexBaseForAllObjects__afterCall4252_hook(GB *gb) {
@@ -996,7 +996,7 @@ void enemyLoadGraphicsAndProperties__afterCall4372_hook(GB *gb) {
   CYC(b_+91, b_+92); E = alu_dec8(gb, E);
   CYC(b_+92, b_+93); mem_wr(gb, DE, A);
   CYC(b_+93, b_+94); alu_xor(gb, A);
-  CYC(b_+94, SYM(partLoadGraphicsAndProperties)); enemySetAnimation_hook(gb);
+  CYC(b_+94, b_+97); enemySetAnimation_hook(gb);
 }
 
 void enemyLoadGraphicsAndProperties_hook(GB *gb) {
@@ -1055,7 +1055,7 @@ void partLoadGraphicsAndProperties__afterCall43d3_hook(GB *gb) {
   CYC(b_+53, b_+54); E = alu_dec8(gb, E);
   CYC(b_+54, b_+55); mem_wr(gb, DE, A);
   CYC(b_+55, b_+56); alu_xor(gb, A);
-  CYC(b_+56, SYM(interactionLoadGraphics)); partSetAnimation_hook(gb);
+  CYC(b_+56, b_+59); partSetAnimation_hook(gb);
 }
 
 void partLoadGraphicsAndProperties_hook(GB *gb) {
@@ -1088,7 +1088,7 @@ void interactionLoadGraphics__afterCall440e_hook(GB *gb) {
   CYC(b_+25, b_+26); mem_wr(gb, DE, A);
   CYC(b_+26, b_+27); A = mem_rd(gb, HL);
   CYC(b_+27, b_+29); alu_and(gb, 0x0f);
-  CYC(b_+29, SYM(itemLoadGraphics)); ret_effect(gb);
+  CYC(b_+29, b_+30); ret_effect(gb);
 }
 
 void interactionLoadGraphics_hook(GB *gb) {
@@ -1116,7 +1116,7 @@ void itemLoadGraphics__afterCall442c_hook(GB *gb) {
   CYC(b_+17, b_+18); mem_wr(gb, DE, A);
   CYC(b_+18, b_+19); E = alu_dec8(gb, E);
   CYC(b_+19, b_+20); mem_wr(gb, DE, A);
-  CYC(b_+20, SYM(interactionGetData)); ret_effect(gb);
+  CYC(b_+20, b_+21); ret_effect(gb);
 }
 
 void itemLoadGraphics_hook(GB *gb) {
@@ -1138,7 +1138,7 @@ void interactionGetData_hook(GB *gb) {
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = 0x41;
   CYC(b_+3, b_+4); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+4, SYM(getDataForInteraction)); E = mem_rd(gb, HL);
+  CYC(b_+4, b_+5); E = mem_rd(gb, HL);
   getDataForInteraction_hook(gb);
 }
 
@@ -1189,7 +1189,7 @@ void getDataForInteraction_hook(GB *gb) {
     }
     CYCT(b_+28, b_+30);
   }
-  CYC(b_+30, SYM(loadWeaponGfx_b3f)); ret_effect(gb);
+  CYC(b_+30, b_+31); ret_effect(gb);
 }
 
 void loadWeaponGfx_b3f_hook(GB *gb) {
@@ -1215,5 +1215,5 @@ void loadWeaponGfx_b3f_hook(GB *gb) {
   CYC(b_+12, b_+13); push_effect(gb, DE);
   CALL_C(b_+13, loadUncompressedGfxHeader_hook, SYM(loadUncompressedGfxHeader), b_+16);
   CYC(b_+16, b_+17); SET_DE(pop_effect(gb));
-  CYC(b_+17, SYM(checkTreasureObtained_body)); ret_effect(gb);
+  CYC(b_+17, b_+18); ret_effect(gb);
 }

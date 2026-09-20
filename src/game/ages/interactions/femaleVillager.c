@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode3b), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode3b), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // Script pointer tables (bank $0c mainScripts.*), indexed by subid or game progress.
 #define interactionCode3b_scriptTable_bank08 SYM(interactionCode3b__scriptTable)

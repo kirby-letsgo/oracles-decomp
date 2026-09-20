@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode57), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode57), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t bank09_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -235,7 +235,7 @@ L_6a5f:
   CYC(b_+317, b_+319); alu_cp(gb, 0x06);
   if (!(F & FZ)) { CYCT(b_+319, b_+320); ret_effect(gb); return; } CYC(b_+319, b_+320);
   CALL_C(b_+320, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+323);
-  CYC(b_+323, b_+326); SET_BC((SYM(loadTilesetData) + 1));
+  CYC(b_+323, b_+326); SET_BC(0x388a);
   CALL_C(b_+326, interactionSetPosition_hook, SYM(interactionSetPosition), b_+329);
   CYC(b_+329, b_+331); A = 0x03;
   CYC(b_+331, b_+334); SET_HL(b_+441);
@@ -1304,7 +1304,7 @@ L_6a5f:
   CYC(b_+317, b_+319); alu_cp(gb, 0x06);
   if (!(F & FZ)) { CYCT(b_+319, b_+320); ret_effect(gb); return; } CYC(b_+319, b_+320);
   CALL_C(b_+320, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+323);
-  CYC(b_+323, b_+326); SET_BC((SYM(loadTilesetData) + 1));
+  CYC(b_+323, b_+326); SET_BC(0x388a);
   CALL_C(b_+326, interactionSetPosition_hook, SYM(interactionSetPosition), b_+329);
   CYC(b_+329, b_+331); A = 0x03;
   CYC(b_+331, b_+334); SET_HL(b_+441);
@@ -1330,7 +1330,7 @@ L_6a5f:
   CYC(b_+317, b_+319); alu_cp(gb, 0x06);
   if (!(F & FZ)) { CYCT(b_+319, b_+320); ret_effect(gb); return; } CYC(b_+319, b_+320);
   CALL_C(b_+320, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+323);
-  CYC(b_+323, b_+326); SET_BC((SYM(loadTilesetData) + 1));
+  CYC(b_+323, b_+326); SET_BC(0x388a);
   CALL_C(b_+326, interactionSetPosition_hook, SYM(interactionSetPosition), b_+329);
   CYC(b_+329, b_+331); A = 0x03;
   CYC(b_+331, b_+334); SET_HL(b_+441);
@@ -1352,7 +1352,7 @@ L_6a5f:
   CYC(b_+317, b_+319); alu_cp(gb, 0x06);
   if (!(F & FZ)) { CYCT(b_+319, b_+320); ret_effect(gb); return; } CYC(b_+319, b_+320);
   CALL_C(b_+320, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+323);
-  CYC(b_+323, b_+326); SET_BC((SYM(loadTilesetData) + 1));
+  CYC(b_+323, b_+326); SET_BC(0x388a);
   CALL_C(b_+326, interactionSetPosition_hook, SYM(interactionSetPosition), b_+329);
   CYC(b_+329, b_+331); A = 0x03;
   CYC(b_+331, b_+334); SET_HL(b_+441);

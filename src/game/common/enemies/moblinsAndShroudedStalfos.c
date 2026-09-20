@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode0c), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode0c), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void arrowDarknut_state_uninitialized_hook(GB *gb);
 void arrowDarknut_state_9_hook(GB *gb);
@@ -105,7 +105,7 @@ void moblin_state_uninitialized_hook(GB *gb) {
   CYC(b_+16, b_+19);
 
 callArrowDarknutUninit:
-  CYC(b_+19, SYM(moblin_state_scentSeed)); arrowDarknut_state_uninitialized_hook(gb); return; // jp
+  CYC(b_+19, b_+22); arrowDarknut_state_uninitialized_hook(gb); return; // jp
 }
 
 // 0d:49ba, bare global.
@@ -124,7 +124,7 @@ void moblin_state_scentSeed_hook(GB *gb) {
   CYC(b_+17, b_+18); mem_wr(gb, DE, A);
   CALL_C(b_+18, ecom_updateAnimationFromAngle_b0d_hook, SYM(ecom_updateAnimationFromAngle_b0d), b_+21);
   CALL_C(b_+21, ecom_applyVelocityForSideviewEnemy_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemy_b0d), b_+24);
-  CYC(b_+24, SYM(moblin_state_switchHook)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+24, b_+27); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0d:49d5, bare global (also used by darknuts).
@@ -169,7 +169,7 @@ incState:
   CYC(b_+15, b_+17); mem_wr(gb, HL, 0x08);
 
 animate:
-  CYC(b_+17, SYM(moblin_state_9)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+17, b_+20); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0d:49f6, bare global; standing until counter1 reaches 0 and a new direction is decided on.
@@ -181,5 +181,5 @@ void moblin_state_9_hook(GB *gb) {
   CYC(b_+3, b_+4);
   CALL_C(b_+4, ecom_setRandomCardinalAngle_b0d_hook, SYM(ecom_setRandomCardinalAngle_b0d), b_+7);
   CALL_C(b_+7, arrowDarknut_setState8WithRandomAngleAndCounter_hook, SYM(arrowDarknut_setState8WithRandomAngleAndCounter), b_+10);
-  CYC(b_+10, SYM(enemyCode21)); arrowDarknut_fireArrowEveryOtherTime_hook(gb); return; // jr
+  CYC(b_+10, b_+12); arrowDarknut_fireArrowEveryOtherTime_hook(gb); return; // jr
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode2a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode2a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t ricky_tornado_jump_table(GB *gb) {
   burn_rom(gb, 0, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -82,5 +82,5 @@ state1:
     CYCT(b_+75, b_+78); itemDelete_hook(gb); return;
   }
   CYC(b_+75, b_+78);
-  CYC(b_+78, SYM(itemCode29)); itemAnimate_hook(gb);
+  CYC(b_+78, b_+81); itemAnimate_hook(gb);
 }

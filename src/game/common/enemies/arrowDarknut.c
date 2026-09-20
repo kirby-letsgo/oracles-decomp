@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode21), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode21), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void arrowDarknut_state_uninitialized_hook(GB *gb);
 void arrowDarknut_state_9_hook(GB *gb);
@@ -76,7 +76,7 @@ void arrowDarknut_state_uninitialized_hook(GB *gb) {
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);
   CALL_C(b_+5, ecom_setRandomCardinalAngle_b0d_hook, SYM(ecom_setRandomCardinalAngle_b0d), b_+8);
   CALL_C(b_+8, arrowDarknut_setState8WithRandomAngleAndCounter_hook, SYM(arrowDarknut_setState8WithRandomAngleAndCounter), b_+11);
-  CYC(b_+11, SYM(arrowDarknut_state_9)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+11, b_+14); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 // 0d:4a38, bare global (also a jump-table target from moblin's dispatcher).
@@ -110,7 +110,7 @@ void arrowDarknut_fireArrowEveryOtherTime_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+18); return; } // ret nz
   CYC(b_+18, b_+19);
   CYC(b_+19, b_+21); B = 0x1a; // PART_ENEMY_ARROW
-  CYC(b_+21, SYM(arrowDarknut_setState8WithRandomAngleAndCounter)); ecom_spawnProjectile_b0d_hook(gb); return; // jp
+  CYC(b_+21, b_+24); ecom_spawnProjectile_b0d_hook(gb); return; // jp
 }
 
 // 0d:4a5a, bare global; sets random angle and counter, and goes to state 8.
@@ -125,7 +125,7 @@ void arrowDarknut_setState8WithRandomAngleAndCounter_hook(GB *gb) {
   CYC(b_+10, b_+11); mem_wr(gb, HL, A);
   CYC(b_+11, b_+13); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+13, b_+15); mem_wr(gb, HL, 0x08);
-  CYC(b_+15, SYM(arrowDarknut_chooseAngle)); ecom_updateAnimationFromAngle_b0d_hook(gb); return; // jp
+  CYC(b_+15, b_+18); ecom_updateAnimationFromAngle_b0d_hook(gb); return; // jp
 }
 
 // 0d:4a6c, bare global.
@@ -136,5 +136,5 @@ void arrowDarknut_chooseAngle_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x03);
   if (F & FZ) { CYCT(b_+5, b_+8); ecom_updateCardinalAngleTowardTarget_b0d_hook(gb); return; } // jp z
   CYC(b_+5, b_+8);
-  CYC(b_+8, SYM(enemyCode0d)); ecom_setRandomCardinalAngle_b0d_hook(gb); return; // jp
+  CYC(b_+8, b_+11); ecom_setRandomCardinalAngle_b0d_hook(gb); return; // jp
 }

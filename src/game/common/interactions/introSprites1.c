@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(introSpriteFunc_461a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(introSpriteFunc_461a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void interactionCode4a_hook(GB *gb);
 void introSpriteIncStateAndLoadGraphics_hook(GB *gb);
@@ -150,7 +150,7 @@ initGlow:
   CALL_C(b_+123, objectSetVisible83_hook, SYM(objectSetVisible83), b_+126);
   CYC(b_+126, b_+128); alu_xor(gb, 0x80);
   CYC(b_+128, b_+129); mem_wr(gb, DE, A);
-  CYC(b_+129, SYM(introSpriteIncStateAndLoadGraphics)); ret_effect(gb);
+  CYC(b_+129, b_+130); ret_effect(gb);
 }
 
 void introSpriteIncStateAndLoadGraphics_hook(GB *gb) {
@@ -158,7 +158,7 @@ void introSpriteIncStateAndLoadGraphics_hook(GB *gb) {
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = 0x44;
   CYC(b_+3, b_+4); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+4, SYM(introSpriteFunc_461a)); interactionInitGraphics_hook(gb);
+  CYC(b_+4, b_+7); interactionInitGraphics_hook(gb);
 }
 
 void introSpriteFunc_461a_hook(GB *gb) {
@@ -343,7 +343,7 @@ substate4:
   CYC(b_+158, b_+160); A = 2;
   CYC(b_+160, b_+163); W8(wIntro_triforceState) = A;
   CYC(b_+163, b_+165); A = 0x7c;
-  CYC(b_+165, SYM(introSpriteRunSubid07)); playSound_b00_hook(gb);
+  CYC(b_+165, b_+168); playSound_b00_hook(gb);
 }
 
 void introSpriteRunSubid07_hook(GB *gb) {
@@ -357,7 +357,7 @@ void introSpriteRunSubid07_hook(GB *gb) {
   CYC(b_+9, b_+12); A = W8(wIntro_frameCounter);
   CYC(b_+12, b_+14); alu_and(gb, 1);
   CYC(b_+14, b_+15); alu_xor(gb, B);
-  if (F & FZ) CALL_C_CC(b_+15, objectSetInvisible_hook, SYM(objectSetInvisible), SYM(introSpriteRunTriforceGlowSubid)); else CYC(b_+15, SYM(introSpriteRunTriforceGlowSubid));
+  if (F & FZ) CALL_C_CC(b_+15, objectSetInvisible_hook, SYM(objectSetInvisible), SYM(introSpriteRunTriforceGlowSubid)); else CYC(b_+15, b_+18);
   introSpriteRunTriforceGlowSubid_hook(gb);
 }
 
@@ -368,7 +368,7 @@ void introSpriteRunTriforceGlowSubid_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); A = alu_inc8(gb, A);
   if (F & FZ) CALL_C_CC(b_+4, introSpriteFunc_461a_hook, SYM(introSpriteFunc_461a), b_+7); else CYC(b_+4, b_+7);
-  CYC(b_+7, SYM(introSpriteRunSubid04)); interactionAnimate_hook(gb);
+  CYC(b_+7, b_+10); interactionAnimate_hook(gb);
 }
 
 void introSpriteRunSubid04_hook(GB *gb) {
@@ -384,7 +384,7 @@ void introSpriteRunSubid04_hook(GB *gb) {
   CYC(b_+15, b_+17); L = 0x60;
   CYC(b_+17, b_+18); alu_cp(gb, mem_rd(gb, HL));
   CYC(b_+18, b_+20); L = 0x5a;
-  if (!(F & FZ)) { CYCT(b_+20, b_+22); CYC(b_+25, b_+27); mem_wr(gb, HL, mem_rd(gb, HL) & 0x7f); CYC(b_+27, SYM(introSpriteRunSubid08)); ret_effect(gb); return; }
+  if (!(F & FZ)) { CYCT(b_+20, b_+22); CYC(b_+25, b_+27); mem_wr(gb, HL, mem_rd(gb, HL) & 0x7f); CYC(b_+27, b_+28); ret_effect(gb); return; }
   CYC(b_+20, b_+22);
   CYC(b_+22, b_+24); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
   CYC(b_+24, b_+25); ret_effect(gb);
@@ -402,7 +402,7 @@ void introSpriteRunSubid08_hook(GB *gb) {
   CYC(b_+11, b_+12); alu_sub(gb, B);
   CYC(b_+12, b_+13); E = alu_inc8(gb, E);
   CYC(b_+13, b_+14); mem_wr(gb, DE, A);
-  CYC(b_+14, SYM(introSpriteSetChildRelatedObject1ToSelf)); ret_effect(gb);
+  CYC(b_+14, b_+15); ret_effect(gb);
 }
 
 void introSpriteSetChildRelatedObject1ToSelf_hook(GB *gb) {
@@ -411,5 +411,5 @@ void introSpriteSetChildRelatedObject1ToSelf_hook(GB *gb) {
   CYC(b_+2, b_+4); mem_wr(gb, HL, 0x40);
   CYC(b_+4, b_+5); L = alu_inc8(gb, L);
   CYC(b_+5, b_+6); mem_wr(gb, HL, D);
-  CYC(b_+6, SYM(interactionCode50)); ret_effect(gb);
+  CYC(b_+6, b_+7); ret_effect(gb);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(func_7cf8), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(func_7cf8), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static void func_7cf8_set_bits(GB *gb) {
   BASE(func_7cf8);
@@ -60,14 +60,14 @@ void func_7caf_hook(GB *gb) {
   CYC(b_+15, b_+16); mem_wr(gb, DE, A);
   CYC(b_+16, b_+18); A = 0x5b;
   CALL_ROM(b_+18, (SYM(setMusicVolume) + 4));
-  CYC(b_+21, SYM(func_7cc7));
+  CYC(b_+21, b_+24);
   hook_continue(gb, (SYM(hazardCollisionTable__overworld) + 14), sp0_);
 }
 
 void func_7cc7__afterCall7cce_hook(GB *gb) {
   BASE(func_7cc7);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+7, SYM(func_7cd1));
+  CYC(b_+7, b_+10);
   hook_continue(gb, (SYM(hazardCollisionTable__overworld) + 14), sp0_);
 }
 
@@ -96,7 +96,7 @@ static void func_7cd1_tail(GB *gb, uint16_t sp0_) {
   CYC(b_+24, b_+26); A = 0xf0;
   CALL_C(b_+26, playSound_b00_hook, SYM(playSound_b00), b_+29);
   CALL_C(b_+29, objectSetVisiblec0_hook, SYM(objectSetVisiblec0), b_+32);
-  CYC(b_+32, SYM(tuniNut_state3));
+  CYC(b_+32, b_+35);
   interactionIncState_hook(gb);
 }
 
@@ -121,6 +121,6 @@ void func_7cd1_hook(GB *gb) {
   CYC(b_+28, b_+30); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
   CYC(b_+30, b_+33); A = W8(wActiveMusic);
   CALL_ROM(b_+33, (SYM(setMusicVolume) + 4));
-  CYC(b_+36, SYM(func_7cf8));
+  CYC(b_+36, b_+39);
   func_7cd1_tail(gb, sp0_);
 }

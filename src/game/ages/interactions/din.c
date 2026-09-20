@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodeaa), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodeaa), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/object_code/ages/interactions/din.s (interactionCodeaa / INTERAC_DIN), bank
 // 0x0b.
@@ -83,7 +83,7 @@ substate2: // interactionCodeaa@substate2
   CALL_C(b_+123, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+126);
   CYC(b_+126, b_+128); L = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+128, b_+130); mem_wr(gb, HL, 60);
-  CYC(b_+130, b_+133); SET_BC((SYM(interactionCodeTable) + 382)); // TX_3d09
+  CYC(b_+130, b_+133); SET_BC(0x3d09); // TX_3d09
   CALL_C(b_+133, showText_hook, SYM(showText), b_+136);
 
 l6038: // L_6038
@@ -109,7 +109,7 @@ updateSpeedZ: // interactionCodeaa@updateSpeedZ
 
 beginJump: // interactionCodeaa@beginJump
   CYC(b_+177, b_+180); SET_BC(0xff00); // -$100
-  CYC(b_+180, SYM(interactionCodeab)); objectSetSpeedZ_hook(gb); return; // jp
+  CYC(b_+180, b_+183); objectSetSpeedZ_hook(gb); return; // jp
 }
 
 // ==================================================================================================

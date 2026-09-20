@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode88), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode88), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t makuSprout_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -135,7 +135,7 @@ state01: // also @state02
   CYC(b_+122, b_+124); goto runSubidCode; // jr
 
 state03: // also @state04, @state05
-  CYC(b_+124, b_+127); SET_BC((SYM(resetGame) + 7)); // ldbc $01, <TX_0570
+  CYC(b_+124, b_+127); SET_BC(0x0170); // ldbc $01, <TX_0570
   CYC(b_+127, b_+129); goto runSubid0ScriptMode; // jr
 
 state06:
@@ -147,15 +147,15 @@ state07:
   CYC(b_+137, b_+139); goto runSubid0ScriptMode; // jr
 
 state08:
-  CYC(b_+139, b_+142); SET_BC((SYM(pollInput) + 13)); // ldbc $02, <TX_057a
+  CYC(b_+139, b_+142); SET_BC(0x027a); // ldbc $02, <TX_057a
   CYC(b_+142, b_+144); goto runSubid0ScriptMode; // jr
 
 state09:
-  CYC(b_+144, b_+147); SET_BC((SYM(getNumSetBits) + 6)); // ldbc $01, <TX_057c
+  CYC(b_+144, b_+147); SET_BC(0x017c); // ldbc $01, <TX_057c
   CYC(b_+147, b_+149); goto runSubid0ScriptMode; // jr
 
 state0a:
-  CYC(b_+149, b_+152); SET_BC((SYM(getNumSetBits) + 8)); // ldbc $01, <TX_057e
+  CYC(b_+149, b_+152); SET_BC(0x017e); // ldbc $01, <TX_057e
   CYC(b_+152, b_+154); goto runSubid0ScriptMode; // jr
 
 state0b:
@@ -167,15 +167,15 @@ state0c:
   CYC(b_+162, b_+164); goto runSubid0ScriptMode; // jr
 
 state0d:
-  CYC(b_+164, b_+167); SET_BC((SYM(addDecimalToHlRef) + 3)); // ldbc $01, <TX_0584
+  CYC(b_+164, b_+167); SET_BC(0x0184); // ldbc $01, <TX_0584
   CYC(b_+167, b_+169); goto runSubid0ScriptMode; // jr
 
 state0e:
-  CYC(b_+169, b_+172); SET_BC((SYM(addDecimalToHlRef) + 5)); // ldbc $01, <TX_0586
+  CYC(b_+169, b_+172); SET_BC(0x0186); // ldbc $01, <TX_0586
   CYC(b_+172, b_+174); goto runSubid0ScriptMode; // jr
 
 state0f:
-  CYC(b_+174, b_+177); SET_BC((SYM(pollInput) + 27)); // ldbc $02, <TX_0588
+  CYC(b_+174, b_+177); SET_BC(0x0288); // ldbc $02, <TX_0588
   CYC(b_+177, b_+179); goto runSubid0ScriptMode; // jr
 
 state10:
@@ -186,7 +186,7 @@ state10:
   CYC(b_+187, b_+189); goto runSubid0ScriptMode; // jr
 
 state10Linked:
-  CYC(b_+189, b_+192); SET_BC((SYM(addDecimalToHlRef) + 11)); // ldbc $01, <TX_058c
+  CYC(b_+189, b_+192); SET_BC(0x018c); // ldbc $01, <TX_058c
   CYC(b_+192, b_+194); goto runSubid0ScriptMode; // jr
 
 runSubidCode:

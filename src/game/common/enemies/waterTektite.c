@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode3a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode3a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void waterTektite_state_uninitialized_hook(GB *gb);
 void waterTektike_decideNewAngle_hook(GB *gb);
@@ -131,10 +131,10 @@ void waterTektike_decideNewAngle_hook(GB *gb) {
   CYC(b_+25, b_+27); waterTektike_animate_hook(gb); return; // jr
 
 scentSeedActive:
-  CYC(b_+27, b_+29); A = hram_rd(gb, 0xb2); // hFFB2
-  CYC(b_+29, b_+31); hram_wr(gb, 0x8f, A); // hFF8F
-  CYC(b_+31, b_+33); A = hram_rd(gb, 0xb3); // hFFB3
-  CYC(b_+33, b_+35); hram_wr(gb, 0x8e, A); // hFF8E
+  CYC(b_+27, b_+29); A = mem_rd(gb, hFFB2); // hFFB2
+  CYC(b_+29, b_+31); mem_wr(gb, hFF8F, A); // hFF8F
+  CYC(b_+31, b_+33); A = mem_rd(gb, hFFB3); // hFFB3
+  CYC(b_+33, b_+35); mem_wr(gb, hFF8E, A); // hFF8E
   CYC(b_+35, b_+37); L = ENEMY_BASE + OBJ_YH;
   CYC(b_+37, b_+38); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+38, b_+39); B = A;
@@ -143,7 +143,7 @@ scentSeedActive:
   CALL_C(b_+41, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+44);
   CYC(b_+44, b_+46); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+46, b_+47); mem_wr(gb, DE, A);
-  CYC(b_+47, SYM(waterTektike_state_stub)); waterTektike_animate_hook(gb); return; // jr
+  CYC(b_+47, b_+49); waterTektike_animate_hook(gb); return; // jr
 }
 
 // 0e:54e2, bare global; jump-table target from enemyCode3a.
@@ -180,7 +180,7 @@ keepMoving:
 // waterTektike_state9.
 void waterTektike_animate_hook(GB *gb) {
   BASE(waterTektike_animate);
-  CYC(b_+0, SYM(waterTektike_state9)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:5501, bare global; jump-table target from enemyCode3a. Not moving for [counter1]
@@ -191,7 +191,7 @@ void waterTektike_state9_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+3);
   if (!(F & FZ)) { CYCT(b_+3, b_+5); waterTektike_animate_hook(gb); return; } // jr nz
   CYC(b_+3, b_+5);
-  CYC(b_+5, SYM(waterTektite_getAdjacentWallsBitset)); waterTektike_decideNewAngle_hook(gb); return; // jr
+  CYC(b_+5, b_+7); waterTektike_decideNewAngle_hook(gb); return; // jr
 }
 
 // 0e:5508, bare global; called from waterTektike_state8. Gets the "adjacent walls bitset"
@@ -199,7 +199,7 @@ void waterTektike_state9_hook(GB *gb) {
 // identical to "fish_getAdjacentWallsBitsetForKnockback".
 void waterTektite_getAdjacentWallsBitset_hook(GB *gb) {
   BASE(waterTektite_getAdjacentWallsBitset);
-  CYC(b_+0, SYM(waterTektite_getAdjacentWallsBitsetGivenAngle)); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_ANGLE;
   waterTektite_getAdjacentWallsBitsetGivenAngle_hook(gb); return; // fallthrough
 }
 
@@ -220,7 +220,7 @@ void waterTektite_getAdjacentWallsBitsetGivenAngle_hook(GB *gb) {
   waterTektite_addAToHl_from_rst(gb, b_+15);
 
   CYC(b_+15, b_+17); A = 0x10;
-  CYC(b_+17, b_+19); hram_wr(gb, 0x8b, A); // hFF8B
+  CYC(b_+17, b_+19); mem_wr(gb, hFF8B, A); // hFF8B
   CYC(b_+19, b_+21); D = 0xcf; // >wRoomLayout
 
 nextOffset:
@@ -239,15 +239,15 @@ nextOffset:
   CYC(b_+36, b_+37); A = mem_rd(gb, DE);
   CYC(b_+37, b_+39); alu_sub(gb, 0xf9); // TILEINDEX_PUDDLE
   CYC(b_+39, b_+41); alu_cp(gb, 0x05); // TILEINDEX_FD-TILEINDEX_PUDDLE+1
-  CYC(b_+41, b_+43); A = hram_rd(gb, 0x8b); // hFF8B
+  CYC(b_+41, b_+43); A = mem_rd(gb, hFF8B); // hFF8B
   CYC(b_+43, b_+44); alu_rla(gb);
-  CYC(b_+44, b_+46); hram_wr(gb, 0x8b, A); // hFF8B
+  CYC(b_+44, b_+46); mem_wr(gb, hFF8B, A); // hFF8B
   if (!(F & FC)) { CYCT(b_+46, b_+48); goto nextOffset; } // jr nc
   CYC(b_+46, b_+48);
 
   CYC(b_+48, b_+50); alu_xor(gb, 0x0f);
-  CYC(b_+50, b_+52); hram_wr(gb, 0x8b, A); // hFF8B
-  CYC(b_+52, b_+54); A = hram_rd(gb, 0xaf); // hActiveObject
+  CYC(b_+50, b_+52); mem_wr(gb, hFF8B, A); // hFF8B
+  CYC(b_+52, b_+54); A = mem_rd(gb, hActiveObject); // hActiveObject
   CYC(b_+54, b_+55); D = A;
   RET(b_+55); return; // ret
 }

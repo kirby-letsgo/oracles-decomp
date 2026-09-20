@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(func_78dd), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(func_78dd), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t bigBangBombSpawner_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -213,7 +213,7 @@ state5:
   CALL_C(b_+179, func_77f0_hook, SYM(func_77f0), b_+182);
   if (F & FZ) { CYCT(b_+182, b_+185); partDelete_hook(gb); return; } // jp z
   CYC(b_+182, b_+185);
-  CYC(b_+185, SYM(func_77f0)); func_7858_hook(gb); return; // jr
+  CYC(b_+185, b_+187); func_7858_hook(gb); return; // jr
 }
 
 void func_77f0_hook(GB *gb) {
@@ -257,9 +257,9 @@ void func_7858_hook(GB *gb) {
   CYC(b_+9, b_+11); E = 0xf5;
   CYC(b_+11, b_+12); A = mem_rd(gb, DE);
 loop:
-  CYC(b_+12, b_+14); hram_wr(gb, 0x92, A);
+  CYC(b_+12, b_+14); mem_wr(gb, hFF92, A);
   CALL_C(b_+14, func_786f_hook, SYM(func_786f), b_+17);
-  CYC(b_+17, b_+19); A = hram_rd(gb, 0x92);
+  CYC(b_+17, b_+19); A = mem_rd(gb, hFF92);
   CYC(b_+19, b_+20); A = alu_dec8(gb, A);
   if (!(F & FZ)) { CYCT(b_+20, b_+22); goto loop; } // jr nz
   CYC(b_+20, b_+22);
@@ -280,7 +280,7 @@ restart:
   CYC(b_+14, b_+16); alu_and(gb, 0x07);
   CALL_C(b_+16, addAToBc_hook, 0x006d, b_+19);
   CYC(b_+19, b_+20); A = mem_rd(gb, BC);
-  CYC(b_+20, b_+22); hram_wr(gb, 0x8b, A);
+  CYC(b_+20, b_+22); mem_wr(gb, hFF8B, A);
   CYC(b_+22, b_+23); H = D;
   CYC(b_+23, b_+25); L = 0xf2;
   CALL_C(b_+25, checkFlag_hook, SYM(checkFlag), b_+28);
@@ -291,11 +291,11 @@ restart:
   CYC(b_+33, b_+34);
   CYC(b_+34, b_+36); mem_wr(gb, HL, 0x49); // PART_BIGBANG_BOMB_SPAWNER
   CYC(b_+36, b_+37); L = alu_inc8(gb, L);
-  CYC(b_+37, b_+39); A = hram_rd(gb, 0x8b);
+  CYC(b_+37, b_+39); A = mem_rd(gb, hFF8B);
   CYC(b_+39, b_+40); mem_wr(gb, HL, A);
   CYC(b_+40, b_+41); H = D;
   CYC(b_+41, b_+43); L = 0xf2;
-  CYC(b_+43, SYM(table_789d)); setFlag_hook(gb); return; // jp
+  CYC(b_+43, b_+46); setFlag_hook(gb); return; // jp
 }
 
 void func_78bd_hook(GB *gb) {
@@ -309,13 +309,13 @@ void func_78bd_hook(GB *gb) {
   if (!(F & FC)) { CYCT(b_+12, b_+14); func_78ce_hook(gb); return; } // jr nc
   CYC(b_+12, b_+14);
   CYC(b_+14, b_+15); alu_xor(gb, A);
-  CYC(b_+15, SYM(func_78ce)); bbbs_setHazardAndReturn(gb); return; // jr
+  CYC(b_+15, b_+17); bbbs_setHazardAndReturn(gb); return; // jr
 }
 
 void func_78ce_hook(GB *gb) {
   BASE(func_78ce);
   CYC(b_+0, b_+2); A = 0x01;
-  CYC(b_+2, SYM(func_78d2)); bbbs_setHazardAndReturn(gb); return; // jr
+  CYC(b_+2, b_+4); bbbs_setHazardAndReturn(gb); return; // jr
 }
 
 void func_78d2_hook(GB *gb) {
@@ -325,7 +325,7 @@ void func_78d2_hook(GB *gb) {
   if (!(F & FC)) { CYCT(b_+5, b_+7); func_78dd_hook(gb); return; } // jr nc
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+9); A = 0x02;
-  CYC(b_+9, SYM(func_78dd)); bbbs_setHazardAndReturn(gb); return; // jr
+  CYC(b_+9, b_+11); bbbs_setHazardAndReturn(gb); return; // jr
 }
 
 void func_78dd_hook(GB *gb) {
@@ -418,29 +418,29 @@ void func_79c4_hook(GB *gb) {
   BASE(func_79c4);
   CYC(b_+0, b_+3); SET_HL(SYM(table_79e3));
   CYC(b_+3, b_+5); E = 0xca;
-  CYC(b_+5, SYM(func_79cb)); // jr $79de
-  CYC((SYM(func_79d9) + 5), SYM(table_79e1)); add16BitRefs_hook(gb); return; // jp
+  CYC(b_+5, b_+7); // jr $79de
+  CYC((SYM(func_79d9) + 5), (SYM(func_79d9) + 8)); add16BitRefs_hook(gb); return; // jp
 }
 
 void func_79cb_hook(GB *gb) {
   BASE(func_79cb);
   CYC(b_+0, b_+3); SET_HL(SYM(table_79e1));
   CYC(b_+3, b_+5); E = 0xcc;
-  CYC(b_+5, SYM(func_79d2)); // jr $79de
-  CYC((SYM(func_79d9) + 5), SYM(table_79e1)); add16BitRefs_hook(gb); return; // jp
+  CYC(b_+5, b_+7); // jr $79de
+  CYC((SYM(func_79d9) + 5), (SYM(func_79d9) + 8)); add16BitRefs_hook(gb); return; // jp
 }
 
 void func_79d2_hook(GB *gb) {
   BASE(func_79d2);
   CYC(b_+0, b_+3); SET_HL(SYM(table_79e1));
   CYC(b_+3, b_+5); E = 0xca;
-  CYC(b_+5, SYM(func_79d9)); // jr $79de
-  CYC((SYM(func_79d9) + 5), SYM(table_79e1)); add16BitRefs_hook(gb); return; // jp
+  CYC(b_+5, b_+7); // jr $79de
+  CYC((SYM(func_79d9) + 5), (SYM(func_79d9) + 8)); add16BitRefs_hook(gb); return; // jp
 }
 
 void func_79d9_hook(GB *gb) {
   BASE(func_79d9);
   CYC(b_+0, b_+3); SET_HL(SYM(table_79e3));
   CYC(b_+3, b_+5); E = 0xcc;
-  CYC(b_+5, SYM(table_79e1)); add16BitRefs_hook(gb); return; // jp
+  CYC(b_+5, b_+8); add16BitRefs_hook(gb); return; // jp
 }

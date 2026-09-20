@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(parentItemCode_switchHook), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(parentItemCode_switchHook), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t switch_hook_parent_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A); burn_rom(gb, 0, 1, 2, false); SET_HL(pop_effect(gb));
@@ -43,5 +43,5 @@ state1:
   CALL_C(b_+64,clearVariousLinkVariables_hook,SYM(clearVariousLinkVariables),b_+67);
   CYC(b_+67,b_+70); SET_HL(w1Link_var2a); CYC(b_+70,b_+71); A=mem_rd(gb,HL); CYC(b_+71,b_+73); L=(uint8_t)w1Link_knockbackCounter; CYC(b_+73,b_+74); alu_or(gb,mem_rd(gb,HL));
   if (F&FZ) { CYCT(b_+74,b_+75); ret_effect(gb); return; } CYC(b_+74,b_+75);
-  CYC(b_+75,b_+78); SET_HL(w1WeaponItem_var2f); CYC(b_+78,b_+80); mem_wr(gb,HL,mem_rd(gb,HL)|(1<<5)); CYC(b_+80,SYM(parentItemCode_caneOfSomaria)); ret_effect(gb);
+  CYC(b_+75,b_+78); SET_HL(w1WeaponItem_var2f); CYC(b_+78,b_+80); mem_wr(gb,HL,mem_rd(gb,HL)|(1<<5)); CYC(b_+80,b_+81); ret_effect(gb);
 }

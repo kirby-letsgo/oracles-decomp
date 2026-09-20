@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode41), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode41), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void crow_state_uninitialized_hook(GB *gb);
 void crow_state_stub_hook(GB *gb);
@@ -121,7 +121,7 @@ void crow_state_uninitialized_hook(GB *gb) {
   // Subid 0
   CYC(b_+7, b_+9); A = 0x32; // SPEED_140
   CALL_C(b_+9, ecom_setSpeedAndState8_b0e_hook, SYM(ecom_setSpeedAndState8_b0e), b_+12);
-  CYC(b_+12, SYM(crow_state_stub)); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+12, b_+15); objectSetVisiblec1_hook(gb); return; // jp
 }
 
 // 0e:5b6c, bare global; jump-table target from enemyCode41.
@@ -157,7 +157,7 @@ void crow_subid0_state8_hook(GB *gb) {
   // Check if Link has approached
   CYC(b_+6, b_+7); H = D;
   CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_YH;
-  CYC(b_+9, b_+11); A = hram_rd(gb, 0xb0); // hEnemyTargetY
+  CYC(b_+9, b_+11); A = mem_rd(gb, hEnemyTargetY); // hEnemyTargetY
   CYC(b_+11, b_+12); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+12, b_+14); alu_add(gb, 0x30);
   CYC(b_+14, b_+16); alu_cp(gb, 0x61);
@@ -165,7 +165,7 @@ void crow_subid0_state8_hook(GB *gb) {
   CYC(b_+16, b_+17);
 
   CYC(b_+17, b_+19); L = ENEMY_BASE + OBJ_XH;
-  CYC(b_+19, b_+21); A = hram_rd(gb, 0xb1); // hEnemyTargetX
+  CYC(b_+19, b_+21); A = mem_rd(gb, hEnemyTargetX); // hEnemyTargetX
   CYC(b_+21, b_+22); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+22, b_+24); alu_add(gb, 0x18);
   CYC(b_+24, b_+26); alu_cp(gb, 0x31);
@@ -225,7 +225,7 @@ addAngle:
   CYC(b_+46, b_+47); A = mem_rd(gb, DE);
   CYC(b_+47, b_+48); alu_add(gb, B);
   CYC(b_+48, b_+49); mem_wr(gb, DE, A);
-  CYC(b_+49, SYM(crow_subid0_stateA)); crow_subid0_animate_hook(gb); return; // jr
+  CYC(b_+49, b_+51); crow_subid0_animate_hook(gb); return; // jr
 }
 
 // 0e:5bd1, bare global; jump-table target from crow_subid0. Charging toward Link.
@@ -258,7 +258,7 @@ applySpeed:
 // from crow_subid0_state9.
 void crow_subid0_animate_hook(GB *gb) {
   BASE(crow_subid0_animate);
-  CYC(b_+0, SYM(crow_subid1)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:5bf0, bare global; jump-table target from enemyCode41.
@@ -348,14 +348,14 @@ void crow_subid1_state9_hook(GB *gb) {
   // Determine spawn/target position data to read based on which screen quadrant Link
   // is in
   CYC(b_+4, b_+6); B = 0x00;
-  CYC(b_+6, b_+8); A = hram_rd(gb, 0xb0); // hEnemyTargetY
+  CYC(b_+6, b_+8); A = mem_rd(gb, hEnemyTargetY); // hEnemyTargetY
   CYC(b_+8, b_+10); alu_cp(gb, 0x40); // (SMALL_ROOM_HEIGHT/2)<<4
   if (F & FC) { CYCT(b_+10, b_+12); goto checkX; } // jr c
   CYC(b_+10, b_+12);
   CYC(b_+12, b_+14); B = 0x08;
 
 checkX:
-  CYC(b_+14, b_+16); A = hram_rd(gb, 0xb1); // hEnemyTargetX
+  CYC(b_+14, b_+16); A = mem_rd(gb, hEnemyTargetX); // hEnemyTargetX
   CYC(b_+16, b_+18); alu_cp(gb, 0x50); // (SMALL_ROOM_WIDTH/2)<<4
   if (F & FC) { CYCT(b_+18, b_+20); goto lookup; } // jr c
   CYC(b_+18, b_+20);
@@ -370,12 +370,12 @@ lookup:
   CYC(b_+27, b_+29); E = ENEMY_BASE + OBJ_YH;
   CYC(b_+29, b_+30); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+30, b_+31); mem_wr(gb, DE, A);
-  CYC(b_+31, b_+33); hram_wr(gb, 0x8f, A); // hFF8F
+  CYC(b_+31, b_+33); mem_wr(gb, hFF8F, A); // hFF8F
 
   CYC(b_+33, b_+35); E = ENEMY_BASE + OBJ_XH;
   CYC(b_+35, b_+36); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+36, b_+37); mem_wr(gb, DE, A);
-  CYC(b_+37, b_+39); hram_wr(gb, 0x8e, A); // hFF8E
+  CYC(b_+37, b_+39); mem_wr(gb, hFF8E, A); // hFF8E
 
   // Read in target position
   CYC(b_+39, b_+41); E = ENEMY_BASE + 0x32; // Enemy.var32
@@ -402,7 +402,7 @@ lookup:
   CYC(b_+64, b_+66); mem_wr(gb, HL, 0xfa); // -$06
 
   CALL_C(b_+66, crow_setAnimationFromAngle_hook, SYM(crow_setAnimationFromAngle), b_+69);
-  CYC(b_+69, SYM(crow_subid1_stateA)); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+69, b_+72); objectSetVisiblec1_hook(gb); return; // jp
 }
 
 // 0e:5c77, bare global; jump-table target from crow_subid1. Moving into screen.
@@ -428,7 +428,7 @@ void crow_subid1_stateA_hook(GB *gb) {
 // from crow_subid1_stateB and crow_subid1_stateC.
 void crow_subid1_animate_hook(GB *gb) {
   BASE(crow_subid1_animate);
-  CYC(b_+0, SYM(crow_subid1_stateB)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:5c8b, bare global; jump-table target from crow_subid1. Hovering in position for
@@ -448,14 +448,14 @@ void crow_subid1_stateB_hook(GB *gb) {
   CYC(b_+11, b_+12); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
 
   CYC(b_+12, b_+14); L = ENEMY_BASE + 0x32; // Enemy.var32
-  CYC(b_+14, b_+16); A = hram_rd(gb, 0xb0); // hEnemyTargetY
+  CYC(b_+14, b_+16); A = mem_rd(gb, hEnemyTargetY); // hEnemyTargetY
   CYC(b_+16, b_+17); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(b_+17, b_+19); A = hram_rd(gb, 0xb1); // hEnemyTargetX
+  CYC(b_+17, b_+19); A = mem_rd(gb, hEnemyTargetX); // hEnemyTargetX
   CYC(b_+19, b_+20); mem_wr(gb, HL, A);
 
   CYC(b_+20, b_+22); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+22, b_+24); mem_wr(gb, HL, 0x05); // SPEED_20
-  CYC(b_+24, SYM(crow_subid1_stateC)); crow_subid1_animate_hook(gb); return; // jr
+  CYC(b_+24, b_+26); crow_subid1_animate_hook(gb); return; // jr
 }
 
 // 0e:5ca5, bare global; jump-table target from crow_subid1. Moving, accelerating toward
@@ -474,7 +474,7 @@ void crow_subid1_stateC_hook(GB *gb) {
 
 outOfBounds:
   CALL_C(b_+16, ecom_incState_b0e_hook, SYM(ecom_incState_b0e), b_+19);
-  CYC(b_+19, SYM(crow_subid1_stateD)); crow_subid1_animate_hook(gb); return; // jr
+  CYC(b_+19, b_+21); crow_subid1_animate_hook(gb); return; // jr
 }
 
 // 0e:5cba, bare global; jump-table target from crow_subid1. Moved out of bounds; go back
@@ -489,7 +489,7 @@ void crow_subid1_stateD_hook(GB *gb) {
   CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+6, b_+8); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
 
-  CYC(b_+8, SYM(crow_updateAngleTowardLinkIfCounter1Zero)); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+8, b_+11); objectSetInvisible_hook(gb); return; // jp
 }
 
 // 0e:5cc5, bare global; called from crow_subid1_stateC. Adjusts angle to move directly
@@ -531,7 +531,7 @@ compareAnim:
   if (F & FZ) { RET_TAKEN(b_+18); return; } // ret z
   CYC(b_+18, b_+19);
   CYC(b_+19, b_+20); mem_wr(gb, HL, A);
-  CYC(b_+20, SYM(crow_subid0_checkWithinScreenBounds)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+20, b_+23); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:5ce3, bare global; called from crow_subid0_stateA. Identical to
@@ -565,7 +565,7 @@ void crow_moveTowardTargetPosition_hook(GB *gb) {
   if (!(F & FC)) { CYCT(b_+10, b_+12); goto moveToward; } // jr nc
   CYC(b_+10, b_+12);
 
-  CYC(b_+12, b_+14); A = hram_rd(gb, 0x8f); // hFF8F
+  CYC(b_+12, b_+14); A = mem_rd(gb, hFF8F); // hFF8F
   CYC(b_+14, b_+15); alu_sub(gb, B);
   CYC(b_+15, b_+16); A = alu_inc8(gb, A);
   CYC(b_+16, b_+18); alu_cp(gb, 0x02);

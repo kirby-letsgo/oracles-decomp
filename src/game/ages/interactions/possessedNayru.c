@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(possessedNayru_subid00), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(possessedNayru_subid00), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t possessedNayru_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -106,7 +106,7 @@ state3:
   CYC(b_+123, b_+126); W8(wMenuDisabled) = A;
   CYC(b_+126, b_+127); A = alu_inc8(gb, A);
   CYC(b_+127, b_+130); W8(wLoadedTreeGfxIndex) = A;
-  CYC(b_+130, SYM(possessedNayru_ghost)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+130, b_+133); interactionDelete_hook(gb); return; // jp
 }
 
 // possessedNayru_ghost: also relies on E already holding INTERACTION_BASE + OBJ_STATE, set by
@@ -152,7 +152,7 @@ state2:
   CYC(b_+50, b_+52); A = 0x37; // Object.var37
   CALL_C(b_+52, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+55);
   CYC(b_+55, b_+57); mem_wr(gb, HL, 0x00);
-  CYC(b_+57, SYM(interactionCode6e)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+57, b_+60); interactionDelete_hook(gb); return; // jp
 }
 
 // INTERAC_POSSESSED_NAYRU

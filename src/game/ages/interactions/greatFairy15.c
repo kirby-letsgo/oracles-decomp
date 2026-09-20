@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(greatFairy_checkScreenIsScrolling), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(greatFairy_checkScreenIsScrolling), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void writeFlagsTocddb_hook(GB *gb);
 
@@ -16,5 +16,5 @@ void greatFairy_checkScreenIsScrolling_hook(GB *gb) {
   CALL_C(b_+5, writeFlagsTocddb_hook, SYM(writeFlagsTocddb), b_+8);
   CYC(b_+8, b_+9); alu_cpl(gb);
   CYC(b_+9, b_+12); mem_wr(gb, wcddb, A);
-  CYC(b_+12, SYM(slateSlot_7b21)); ret_effect(gb);
+  CYC(b_+12, b_+13); ret_effect(gb);
 }

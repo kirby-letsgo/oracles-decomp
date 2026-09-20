@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodee5), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodee5), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/common/interactions/ringHelpBook.s (INTERAC_RING_HELP_BOOK), bank $10.
 
@@ -66,7 +66,7 @@ setScript:
   objectAddToAButtonSensitiveObjectList_hook(gb);
   return;
 state1:
-  CYC(b_+74, SYM(templeIntro_simulatedInput));
+  CYC(b_+74, b_+77);
   interactionRunScript_hook(gb);
 }
 

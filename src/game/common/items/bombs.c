@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode03), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode03), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void bombUpdateThrowingVerticallyAndCheckDelete_hook(GB *gb);
 void itemUpdateExplosion_hook(GB *gb);
@@ -201,7 +201,7 @@ stopped_bouncing:
   CYC(b_+135, b_+137); mem_wr(gb, HL, 0x01);
   CYC(b_+137, b_+139); L = 0x2f;
   CYC(b_+139, b_+141); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 6)));
-  CYC(b_+141, SYM(bombUpdateThrowingVerticallyAndCheckDelete));
+  CYC(b_+141, b_+144);
   bombUpdateAnimation_hook(gb);
 }
 
@@ -263,7 +263,7 @@ restore_bc:
 delete_bomb:
   CALL_C(b_+48, itemDelete_hook, SYM(itemDelete), b_+51);
   CYC(b_+51, b_+52); alu_scf(gb);
-  CYC(b_+52, SYM(itemUpdateExplosion)); ret_effect(gb);
+  CYC(b_+52, b_+53); ret_effect(gb);
 }
 
 void itemUpdateExplosion_hook(GB *gb) {
@@ -300,7 +300,7 @@ void itemUpdateExplosion_hook(GB *gb) {
   CYC(b_+32, b_+34); alu_bit(gb, 7, mem_rd(gb, HL));
   if (F & FZ) CALL_C_CC(b_+34, explosionTryToBreakNextTile_hook, SYM(explosionTryToBreakNextTile), b_+37);
   else CYC(b_+34, b_+37);
-  CYC(b_+37, SYM(bombUpdateExplosion));
+  CYC(b_+37, b_+40);
   itemAnimate_hook(gb);
 }
 
@@ -316,7 +316,7 @@ void bombUpdateExplosion_hook(GB *gb) {
     return;
   }
   CYC(b_+6, b_+8);
-  CYC(b_+8, SYM(bombUpdateAnimation));
+  CYC(b_+8, b_+10);
   itemUpdateExplosion_hook(gb);
 }
 
@@ -328,9 +328,9 @@ void bombUpdateAnimation_hook(GB *gb) {
   CYC(b_+5, b_+6); A = mem_rd(gb, DE);
   CYC(b_+6, b_+7); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+7, SYM(itemInitializeBombExplosion)); ret_effect(gb); return;
+    CYCT(b_+7, b_+8); ret_effect(gb); return;
   }
-  CYC(b_+7, SYM(itemInitializeBombExplosion));
+  CYC(b_+7, b_+8);
   itemInitializeBombExplosion_hook(gb);
 }
 
@@ -379,7 +379,7 @@ void itemInitializeBombExplosion_hook(GB *gb) {
   CYC(b_+57, b_+59); A = 0x6f;
   CALL_C(b_+59, playSound_b00_hook, SYM(playSound_b00), b_+62);
   CYC(b_+62, b_+63); alu_or(gb, D);
-  CYC(b_+63, SYM(bombInitializeIfNeeded)); ret_effect(gb);
+  CYC(b_+63, b_+64); ret_effect(gb);
 }
 
 void bombInitializeIfNeeded_hook(GB *gb) {
@@ -404,7 +404,7 @@ void bombResetAnimationAndSetVisiblec1_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CALL_C(b_+1, itemSetAnimation_hook, SYM(itemSetAnimation), b_+4);
-  CYC(b_+4, SYM(explosionCheckAndApplyLinkCollision));
+  CYC(b_+4, b_+7);
   objectSetVisiblec1_hook(gb);
 }
 
@@ -470,7 +470,7 @@ void explosionCheckAndApplyLinkCollision_hook(GB *gb) {
   CYC(b_+63, b_+65); mem_wr(gb, HL, 0x10);
   CYC(b_+65, b_+66); L = alu_dec8(gb, L);
   CYC(b_+66, b_+68); mem_wr(gb, HL, 0x01);
-  CYC(b_+68, SYM(explosionTryToBreakNextTile));
+  CYC(b_+68, b_+71);
   linkApplyDamage_b00_hook(gb);
 }
 
@@ -567,6 +567,6 @@ void bombUpdateThrowingLaterally_hook(GB *gb) {
   CYC(b_+13, b_+15); alu_bit(gb, 0, mem_rd(gb, HL));
   if (F & FZ) CALL_C_CC(b_+15, itemBeginThrow_hook, SYM(itemBeginThrow), b_+18);
   else CYC(b_+15, b_+18);
-  CYC(b_+18, SYM(itemBeginThrow));
+  CYC(b_+18, b_+21);
   itemUpdateThrowingLaterally_hook(gb);
 }

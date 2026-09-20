@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactiondc_removeGraveyardGateTiles1), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactiondc_removeGraveyardGateTiles1), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void interactiondc_7bde_hook(GB *gb);
 void interactiondc_spawnPuff_hook(GB *gb);
@@ -51,23 +51,23 @@ void interactiondc_removeGraveyardGateTiles2_hook(GB *gb) {
   CYC(b_+33, b_+36); SET_BC((SYM(group2ObjectDataTable) + 245));
   CALL_C(b_+36, interactiondc_spawnPuff_hook, SYM(interactiondc_spawnPuff), b_+39);
   CYC(b_+39, b_+42); SET_BC((SYM(group2ObjectDataTable) + 293));
-  CYC(b_+42, SYM(interactiondc_7bde)); interactiondc_spawnPuff_hook(gb);
+  CYC(b_+42, b_+45); interactiondc_spawnPuff_hook(gb);
 }
 
 void interactiondc_7bde_hook(GB *gb) {
   BASE(interactiondc_7bde);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+1); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+1, b_+3); hram_wr(gb, 0x8c, A);
+  CYC(b_+1, b_+3); mem_wr(gb, hFF8C, A);
   CYC(b_+3, b_+4); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+4, b_+6); hram_wr(gb, 0x8f, A);
+  CYC(b_+4, b_+6); mem_wr(gb, hFF8F, A);
   CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+7, b_+9); hram_wr(gb, 0x8e, A);
+  CYC(b_+7, b_+9); mem_wr(gb, hFF8E, A);
   CYC(b_+9, b_+10); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+10, b_+11); push_effect(gb, HL);
   CALL_C(b_+11, setInterleavedTile_hook, SYM(setInterleavedTile), b_+14);
   CYC(b_+14, b_+15); SET_HL(pop_effect(gb));
-  CYC(b_+15, SYM(interactiondc_spawnPuff)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }
 
 void interactiondc_spawnPuff_hook(GB *gb) {

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode2b), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode2b), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void partCode2b_hook(GB *gb) {
   BASE(partCode2b);
@@ -45,5 +45,5 @@ relatedObj1_stateLessThan3:
   CYC(b_+47, b_+48); alu_rrca(gb);
   if (F & FC) { CYCT(b_+48, b_+51); objectSetInvisible_hook(gb); return; } // jp c
   CYC(b_+48, b_+51);
-  CYC(b_+51, SYM(partCode2c)); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+51, b_+54); objectSetVisible83_hook(gb); return; // jp
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(applyAllTileSubstitutions), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(applyAllTileSubstitutions), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void replaceBreakableTileOverPortal_hook(GB *gb);
 void removeBreakableTileForTimeWarp_hook(GB *gb);
@@ -74,7 +74,7 @@ void applyAllTileSubstitutions_hook(GB *gb) {
   }
   CYC(b_+65, b_+66);
   CYC(b_+66, b_+67); mem_wr(gb, BC, A);
-  CYC(b_+67, SYM(timewarpReturnTileReplacementDict)); ret_effect(gb);
+  CYC(b_+67, b_+68); ret_effect(gb);
 }
 
 void replaceBreakableTileOverPortal_hook(GB *gb) {
@@ -96,7 +96,7 @@ void replaceBreakableTileOverPortal_hook(GB *gb) {
   }
   CYC(b_+13, b_+14);
   CYC(b_+14, b_+15); L = alu_inc8(gb, L);
-  CYC(b_+15, SYM(removeBreakableTileForTimeWarp)); C = mem_rd(gb, HL);
+  CYC(b_+15, b_+16); C = mem_rd(gb, HL);
   removeBreakableTileForTimeWarp_hook(gb);
 }
 
@@ -114,7 +114,7 @@ void removeBreakableTileForTimeWarp_hook(GB *gb) {
   }
   CYC(b_+10, b_+11);
   CYC(b_+11, b_+12); mem_wr(gb, BC, A);
-  CYC(b_+12, SYM(timewarpEntryTileReplacementDict)); ret_effect(gb);
+  CYC(b_+12, b_+13); ret_effect(gb);
 }
 
 void replaceBreakableTileOverLinkTimeWarpingIn_hook(GB *gb) {
@@ -129,7 +129,7 @@ void replaceBreakableTileOverLinkTimeWarpingIn_hook(GB *gb) {
   CYC(b_+7, b_+8);
   CYC(b_+8, b_+11); A = W8(wWarpDestPos);
   CYC(b_+11, b_+12); C = A;
-  CYC(b_+12, SYM(replacePollutionWithWaterIfPollutionFixed)); removeBreakableTileForTimeWarp_hook(gb);
+  CYC(b_+12, b_+14); removeBreakableTileForTimeWarp_hook(gb);
 }
 
 void replacePollutionWithWaterIfPollutionFixed_hook(GB *gb) {
@@ -208,7 +208,7 @@ void replaceTiles_hook(GB *gb) {
         break;
       }
       CYC(b_+29, b_+31);
-      CYC(b_+31, SYM(applyStandardTileSubstitutions));
+      CYC(b_+31, b_+33);
     }
   }
 }
@@ -217,28 +217,28 @@ void applyStandardTileSubstitutions_hook(GB *gb) {
   BASE(applyStandardTileSubstitutions);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+3);
-  CYC(b_+3, b_+5); hram_wr(gb, 0x8b, A);
+  CYC(b_+3, b_+5); mem_wr(gb, hFF8B, A);
   CYC(b_+5, b_+8); SET_HL(SYM(standardTileSubstitutions));
   CYC(b_+8, b_+10); alu_bit(gb, 0, A);
   if (!(F & FZ)) CALL_C_CC(b_+10, applyStandardTileSubstitutions__locFunc_hook, b_+51, b_+13);
   else CYC(b_+10, b_+13);
   CYC(b_+13, b_+16); SET_HL(SYM(standardTileSubstitutions__bit1));
-  CYC(b_+16, b_+18); A = hram_rd(gb, 0x8b);
+  CYC(b_+16, b_+18); A = mem_rd(gb, hFF8B);
   CYC(b_+18, b_+20); alu_bit(gb, 1, A);
   if (!(F & FZ)) CALL_C_CC(b_+20, applyStandardTileSubstitutions__locFunc_hook, b_+51, b_+23);
   else CYC(b_+20, b_+23);
   CYC(b_+23, b_+26); SET_HL(SYM(standardTileSubstitutions__bit2));
-  CYC(b_+26, b_+28); A = hram_rd(gb, 0x8b);
+  CYC(b_+26, b_+28); A = mem_rd(gb, hFF8B);
   CYC(b_+28, b_+30); alu_bit(gb, 2, A);
   if (!(F & FZ)) CALL_C_CC(b_+30, applyStandardTileSubstitutions__locFunc_hook, b_+51, b_+33);
   else CYC(b_+30, b_+33);
   CYC(b_+33, b_+36); SET_HL(SYM(standardTileSubstitutions__bit3));
-  CYC(b_+36, b_+38); A = hram_rd(gb, 0x8b);
+  CYC(b_+36, b_+38); A = mem_rd(gb, hFF8B);
   CYC(b_+38, b_+40); alu_bit(gb, 3, A);
   if (!(F & FZ)) CALL_C_CC(b_+40, applyStandardTileSubstitutions__locFunc_hook, b_+51, b_+43);
   else CYC(b_+40, b_+43);
   CYC(b_+43, b_+46); SET_HL(SYM(standardTileSubstitutions__bit7));
-  CYC(b_+46, b_+48); A = hram_rd(gb, 0x8b);
+  CYC(b_+46, b_+48); A = mem_rd(gb, hFF8B);
   CYC(b_+48, b_+50); alu_bit(gb, 7, A);
   if (F & FZ) {
     CYCT(b_+50, b_+51); ret_effect(gb);
@@ -257,5 +257,5 @@ void applyStandardTileSubstitutions__locFunc_hook(GB *gb) {
   CYC(b_+57, b_+58); L = A;
   CYC(b_+58, b_+59); E = L;
   CYC(b_+59, b_+60); D = H;
-  CYC(b_+60, SYM(standardTileSubstitutions)); replaceTiles_hook(gb);
+  CYC(b_+60, b_+62); replaceTiles_hook(gb);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode09), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode09), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void octorok_state_uninitialized_hook(GB *gb);
 void octorok_state_followingScentSeed_hook(GB *gb);
@@ -132,7 +132,7 @@ setSpeed:
   CYC(b_+40, b_+41); A = mem_rd(gb, HL);
   CYC(b_+41, b_+42); mem_wr(gb, DE, A);
   CYC(b_+42, b_+43); E = A;
-  CYC(b_+43, b_+46); SET_BC((SYM(getRandomRingOfGivenTier) + 35));
+  CYC(b_+43, b_+46); SET_BC(0x1803);
   CALL_C(b_+46, ecom_randomBitwiseAndBCE_b0d_hook, SYM(ecom_randomBitwiseAndBCE_b0d), b_+49);
   CYC(b_+49, b_+50); A = E;
   CYC(b_+50, b_+53); SET_HL(SYM(octorok_counter1Values)); // octorok_counter1Values (data)
@@ -173,7 +173,7 @@ seek:
   CYC(b_+20, b_+21); mem_wr(gb, DE, A);
   CALL_C(b_+21, ecom_updateAnimationFromAngle_b0d_hook, SYM(ecom_updateAnimationFromAngle_b0d), b_+24);
   CALL_C(b_+24, ecom_applyVelocityForTopDownEnemy_b0d_hook, SYM(ecom_applyVelocityForTopDownEnemy_b0d), b_+27);
-  CYC(b_+27, SYM(octorok_state_latchedBySwitchHook)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+27, b_+30); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0d:4636, bare global.
@@ -243,7 +243,7 @@ void octorok_state_09_hook(GB *gb) {
   CYC(b_+4, b_+5); L = E;
   CYC(b_+5, b_+6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = $0a
   CYC(b_+6, b_+8); E = 0x03;
-  CYC(b_+8, b_+11); SET_BC((SYM(gfxRegisterStates) + 18));
+  CYC(b_+8, b_+11); SET_BC(0x0318);
   CALL_C(b_+11, ecom_randomBitwiseAndBCE_b0d_hook, SYM(ecom_randomBitwiseAndBCE_b0d), b_+14);
   CYC(b_+14, b_+15); A = E;
   CYC(b_+15, b_+18); SET_HL(SYM(octorok_walkCounterValues)); // octorok_walkCounterValues (data)
@@ -257,7 +257,7 @@ void octorok_state_09_hook(GB *gb) {
   CYC(b_+27, b_+28); A = B;
   CYC(b_+28, b_+29); alu_or(gb, A);
   if (F & FZ) { CALL_C(b_+29, ecom_updateCardinalAngleTowardTarget_b0d_hook, SYM(ecom_updateCardinalAngleTowardTarget_b0d), b_+32); } else { CYC(b_+29, b_+32); } // call z
-  CYC(b_+32, SYM(octorok_walkCounterValues)); ecom_updateAnimationFromAngle_b0d_hook(gb); return; // jp
+  CYC(b_+32, b_+35); ecom_updateAnimationFromAngle_b0d_hook(gb); return; // jp
 }
 
 // 0d:469b, bare global.
@@ -281,7 +281,7 @@ keepWalking:
   CALL_C(b_+18, ecom_updateAnimationFromAngle_b0d_hook, SYM(ecom_updateAnimationFromAngle_b0d), b_+21);
 
 animate:
-  CYC(b_+21, SYM(octorok_state_0b)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+21, b_+24); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0d:46b3, bare global.
@@ -299,5 +299,5 @@ void octorok_state_0b_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+14); return; } // ret nz
   CYC(b_+14, b_+15);
   CYC(b_+15, b_+17); A = 0x51; // SND_THROW
-  CYC(b_+17, SYM(enemyCode0a)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+17, b_+20); playSound_b00_hook(gb); return; // jp
 }

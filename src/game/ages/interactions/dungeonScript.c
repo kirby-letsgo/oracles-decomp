@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode20), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode20), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // Table of per-dungeon script tables, indexed by wDungeonIndex then by subid.
 #define dungeonScriptTable_bank08 SYM(interactionCode20__scriptTable)

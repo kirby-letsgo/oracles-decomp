@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode74), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode74), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // INTERAC_RICKYS_GLOVE_SPAWNER
 void interactionCode74_hook(GB *gb) {
@@ -28,5 +28,5 @@ void interactionCode74_hook(GB *gb) {
   CYC(b_+24, b_+25);
 
 deleteThis:
-  CYC(b_+25, SYM(interactionCode75)); interactionDelete_hook(gb); return; // jp
+  CYC(b_+25, b_+28); interactionDelete_hook(gb); return; // jp
 }

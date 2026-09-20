@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode18), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode18), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t octorokProjectile_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -82,5 +82,5 @@ state2:
   CYC(b_+64, b_+66); A = 0x03;
   CYC(b_+66, b_+67); mem_wr(gb, DE, A);
   CYC(b_+67, b_+68); alu_xor(gb, A);
-  CYC(b_+68, SYM(partCode19)); partCommon_bounceWhenCollisionsEnabled_hook(gb); return; // jp
+  CYC(b_+68, b_+71); partCommon_bounceWhenCollisionsEnabled_hook(gb); return; // jp
 }

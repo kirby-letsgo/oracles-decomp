@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(specialObjectCode_maple), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(specialObjectCode_maple), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define mapleShadowPathsTable_bank05 SYM(mapleShadowPathsTable)
 #define mapleMovementPatternIndices_bank05 SYM(mapleMovementPatternIndices)
@@ -226,7 +226,7 @@ vehicle_decided:
   CALL_C(b_+111, mapleDecideNextAngle_hook, SYM(mapleDecideNextAngle), b_+114);
   CALL_C(b_+114, objectSetVisiblec0_hook, SYM(objectSetVisiblec0), b_+117);
   CYC(b_+117, b_+119); A = 0x19;
-  CYC(b_+119, SYM(mapleState1)); specialObjectSetAnimation_hook(gb);
+  CYC(b_+119, b_+122); specialObjectSetAnimation_hook(gb);
 }
 
 void mapleState1_hook(GB *gb) {
@@ -245,7 +245,7 @@ void mapleState1_hook(GB *gb) {
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+13); A = 0x2b;
   CYC(b_+13, b_+16); W8(wActiveMusic) = A;
-  CYC(b_+16, SYM(mapleState4)); playSound_b00_hook(gb);
+  CYC(b_+16, b_+19); playSound_b00_hook(gb);
 }
 
 void mapleState4_hook(GB *gb) {
@@ -259,7 +259,7 @@ void mapleState4_hook(GB *gb) {
   CYC(b_+4, b_+5);
   CALL_C(b_+5, itemIncState_hook, SYM(itemIncState), b_+8);
   CYC(b_+8, b_+9); alu_xor(gb, A);
-  CYC(b_+9, SYM(mapleState2)); ret_effect(gb);
+  CYC(b_+9, b_+10); ret_effect(gb);
 }
 
 void mapleState2_hook(GB *gb) {
@@ -396,7 +396,7 @@ variation_mask_ready:
   CYC(b_+133, b_+134); mem_wr(gb, DE, A);
   CYC(b_+134, b_+135); E = alu_inc8(gb, E);
   CYC(b_+135, b_+136); A = H;
-  CYC(b_+136, SYM(mapleDecideNextAngle)); mem_wr(gb, DE, A);
+  CYC(b_+136, b_+137); mem_wr(gb, DE, A);
   mapleDecideNextAngle_hook(gb);
 }
 
@@ -425,7 +425,7 @@ void mapleDecideNextAngle_hook(GB *gb) {
     CYCT(b_+25, b_+26); ret_effect(gb); return;
   }
   CYC(b_+25, b_+26);
-  CYC(b_+26, SYM(mapleCollideWithLink)); mapleDecideAnimation_hook(gb);
+  CYC(b_+26, b_+29); mapleDecideAnimation_hook(gb);
 }
 
 void mapleCollideWithLink_hook(GB *gb) {
@@ -657,7 +657,7 @@ finished_floating_up:
   CYC(b_+79, b_+81);
   CYC(b_+81, b_+84); A = W8(wMapleState);
   CYC(b_+84, b_+86); alu_and(gb, 0x0f);
-  CYC(b_+86, b_+89); SET_BC((SYM(_label_00_062) + 15));
+  CYC(b_+86, b_+89); SET_BC(0x0712);
   if (F & FZ) {
     CYCT(b_+89, b_+91);
     goto set_past_encounter_flag;
@@ -665,7 +665,7 @@ finished_floating_up:
   CYC(b_+89, b_+91);
   CYC(b_+91, b_+93); A = 0x44;
   CALL_C(b_+93, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+96);
-  CYC(b_+96, b_+99); SET_BC((SYM(_label_00_062) + 16));
+  CYC(b_+96, b_+99); SET_BC(0x0713);
   if (!(F & FZ)) {
     CYCT(b_+99, b_+101);
     goto normal_encounter;
@@ -681,7 +681,7 @@ set_past_encounter_flag:
 normal_encounter:
   CYC(b_+108, b_+111); A = W8(wMapleState);
   CYC(b_+111, b_+113); alu_and(gb, 0x0f);
-  CYC(b_+113, b_+116); SET_BC((SYM(_label_00_061) + 11));
+  CYC(b_+113, b_+116); SET_BC(0x0700);
   if (F & FZ) {
     CYCT(b_+116, b_+118);
     goto show_text;
@@ -716,7 +716,7 @@ exchange_touching_book:
   CYC(b_+155, b_+157); mem_wr(gb, HL, 0xff);
   CYC(b_+157, b_+159); L = 0x10;
   CYC(b_+159, b_+161); mem_wr(gb, HL, 0x28);
-  CYC(b_+161, b_+164); SET_BC((SYM(_label_00_062) + 10));
+  CYC(b_+161, b_+164); SET_BC(0x070d);
   CYC(b_+164, b_+167); showText_hook(gb);
 }
 
@@ -751,7 +751,7 @@ void mapleUpdateOscillation_hook(GB *gb) {
   CYC(b_+27, b_+28); A = mem_rd(gb, HL);
   CYC(b_+28, b_+29); alu_cpl(gb);
   CYC(b_+29, b_+30); mem_wr(gb, HL, A);
-  CYC(b_+30, SYM(mapleUpdateAngle)); ret_effect(gb);
+  CYC(b_+30, b_+31); ret_effect(gb);
 }
 
 void mapleUpdateAngle_hook(GB *gb) {
@@ -807,7 +807,7 @@ void mapleDecideAnimation_hook(GB *gb) {
 
 done:
   CYC(b_+28, b_+29); alu_or(gb, D);
-  CYC(b_+29, SYM(mapleState6)); ret_effect(gb);
+  CYC(b_+29, b_+30); ret_effect(gb);
 }
 
 void mapleState6_hook(GB *gb) {
@@ -884,7 +884,7 @@ update_angle:
   }
   CYC(b_+86, b_+87);
   CYC(b_+87, b_+89); alu_add(gb, 0x16);
-  CYC(b_+89, SYM(mapleState7)); specialObjectSetAnimation_hook(gb);
+  CYC(b_+89, b_+92); specialObjectSetAnimation_hook(gb);
 }
 
 void mapleState7_hook(GB *gb) {
@@ -1138,7 +1138,7 @@ set_state:
   CYC(b_+235, b_+236); A = mem_rd(gb, DE);
   CYC(b_+236, b_+238); E = 0x09;
   CYC(b_+238, b_+239); mem_wr(gb, DE, A);
-  CYC(b_+239, SYM(mapleStateA)); ret_effect(gb);
+  CYC(b_+239, b_+240); ret_effect(gb);
 }
 
 void mapleStateA_hook(GB *gb) {
@@ -1157,7 +1157,7 @@ void mapleStateA_hook(GB *gb) {
   CYC(b_+14, b_+16); L = 0x0f;
   CYC(b_+16, b_+17); mem_wr(gb, HL, A);
   CYC(b_+17, b_+19); A = 0x04;
-  CYC(b_+19, SYM(mapleState8)); specialObjectSetAnimation_hook(gb);
+  CYC(b_+19, b_+22); specialObjectSetAnimation_hook(gb);
 }
 
 void mapleState8_hook(GB *gb) {
@@ -1234,7 +1234,7 @@ substate3:
   CYC(b_+78, b_+80); A = 0x40;
   CYC(b_+80, b_+81); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+81, b_+83); mem_wr(gb, HL, 0x00);
-  CYC(b_+83, SYM(mapleState9)); mapleDecideItemToCollectAndUpdateTargetAngle_hook(gb);
+  CYC(b_+83, b_+86); mapleDecideItemToCollectAndUpdateTargetAngle_hook(gb);
 }
 
 void mapleState9_hook(GB *gb) {
@@ -1328,9 +1328,9 @@ substate2:
   CALL_C(b_+119, objectApplySpeed_hook, SYM(objectApplySpeed), b_+122);
   CALL_C(b_+122, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+125);
   if (F & FC) {
-    CYCT(b_+125, SYM(mapleEndEncounter)); ret_effect(gb); return;
+    CYCT(b_+125, b_+126); ret_effect(gb); return;
   }
-  CYC(b_+125, SYM(mapleEndEncounter));
+  CYC(b_+125, b_+126);
   mapleEndEncounter_hook(gb);
 }
 
@@ -1355,7 +1355,7 @@ void mapleDeleteSelf_hook(GB *gb) {
   CYC(b_+9, b_+10); SET_AF(pop_effect(gb));
   CYC(b_+10, b_+11); alu_xor(gb, A);
   CYC(b_+11, b_+14); W8(wIsMaplePresent) = A;
-  CYC(b_+14, SYM(mapleStateB)); itemDelete_hook(gb);
+  CYC(b_+14, b_+17); itemDelete_hook(gb);
 }
 
 void mapleStateB_hook(GB *gb) {
@@ -1427,14 +1427,14 @@ substate1:
     CYCT(b_+62, b_+63); ret_effect(gb); return;
   }
   CYC(b_+62, b_+63);
-  CYC(b_+63, b_+66); SET_BC((SYM(_label_00_062) + 14));
+  CYC(b_+63, b_+66); SET_BC(0x0711);
   CALL_C(b_+66, showText_hook, SYM(showText), b_+69);
   CYC(b_+69, b_+71); E = 0x09;
   CYC(b_+71, b_+73); A = 0x18;
   CYC(b_+73, b_+74); mem_wr(gb, DE, A);
   CALL_C(b_+74, itemIncState_hook, SYM(itemIncState), b_+77);
   CYC(b_+77, b_+79); L = 0x10;
-  CYC(b_+79, SYM(mapleStateC)); mem_wr(gb, HL, 0x78);
+  CYC(b_+79, b_+81); mem_wr(gb, HL, 0x78);
   mapleStateC_hook(gb);
 }
 
@@ -1462,7 +1462,7 @@ void mapleStateC_hook(GB *gb) {
     CYCT(b_+29, b_+30); ret_effect(gb); return;
   }
   CYC(b_+29, b_+30);
-  CYC(b_+30, SYM(mapleKeepInBounds)); mapleEndEncounter_hook(gb);
+  CYC(b_+30, b_+33); mapleEndEncounter_hook(gb);
 }
 
 void mapleKeepInBounds_hook(GB *gb) {
@@ -1529,7 +1529,7 @@ check_x_upper:
   CYC(b_+47, b_+48); mem_wr(gb, DE, A);
 
 done:
-  CYC(b_+48, SYM(mapleSpawnItemDrops)); ret_effect(gb);
+  CYC(b_+48, b_+49); ret_effect(gb);
 }
 
 static void maple_spawn_item_drop_check(GB *gb, uint16_t sp0_) {
@@ -1728,7 +1728,7 @@ void mapleSpawnItemDrop_hook(GB *gb) {
   CYC(b_+16, b_+17); mem_wr(gb, HL, A); SET_HL(HL - 1);
   CYC(b_+17, b_+18); mem_wr(gb, HL, A);
   CYC(b_+18, b_+19); alu_xor(gb, A);
-  CYC(b_+19, SYM(mapleSpawnItemDrop_variant)); ret_effect(gb);
+  CYC(b_+19, b_+20); ret_effect(gb);
 }
 
 void mapleSpawnItemDrop_variant_hook(GB *gb) {
@@ -1747,7 +1747,7 @@ void mapleSpawnItemDrop_variant_hook(GB *gb) {
   CYC(b_+12, b_+13); mem_wr(gb, HL, A);
   CALL_C(b_+13, objectCopyPosition_hook, SYM(objectCopyPosition), b_+16);
   CYC(b_+16, b_+17); alu_or(gb, A);
-  CYC(b_+17, SYM(mapleDecideItemToCollect)); ret_effect(gb);
+  CYC(b_+17, b_+18); ret_effect(gb);
 }
 
 void mapleDecideItemToCollect_hook(GB *gb) {
@@ -1961,7 +1961,7 @@ found:
   CYC(b_+25, b_+26); E = alu_inc8(gb, E);
   CYC(b_+26, b_+27); alu_xor(gb, A);
   CYC(b_+27, b_+28); mem_wr(gb, DE, A);
-  CYC(b_+28, SYM(mapleInitZPositionAndSpeed)); ret_effect(gb);
+  CYC(b_+28, b_+29); ret_effect(gb);
 }
 
 void mapleFindUnexplodedBomb_hook(GB *gb) {
@@ -1978,7 +1978,7 @@ void mapleFindUnexplodedBomb_hook(GB *gb) {
     CYCT(b_+11, b_+12); ret_effect(gb); return;
   }
   CYC(b_+11, b_+12);
-  CYC(b_+12, SYM(mapleFindNextUnexplodedBomb));
+  CYC(b_+12, b_+14);
   maple_find_bomb_finish(gb);
 }
 
@@ -2007,7 +2007,7 @@ void mapleInitZPositionAndSpeed_hook(GB *gb) {
   CYC(b_+13, b_+15); L = 0x3c;
   CYC(b_+15, b_+17); A = 0x16;
   CYC(b_+17, b_+18); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+18, SYM(mapleGetCardinalAngleTowardLink)); ret_effect(gb);
+  CYC(b_+18, b_+19); ret_effect(gb);
 }
 
 void mapleGetCardinalAngleTowardLink_hook(GB *gb) {
@@ -2015,7 +2015,7 @@ void mapleGetCardinalAngleTowardLink_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+3);
   CYC(b_+3, b_+5); alu_and(gb, 0x18);
-  CYC(b_+5, SYM(mapleDecideItemToCollectAndUpdateTargetAngle)); ret_effect(gb);
+  CYC(b_+5, b_+6); ret_effect(gb);
 }
 
 void mapleDecideItemToCollectAndUpdateTargetAngle_hook(GB *gb) {
@@ -2045,7 +2045,7 @@ no_more_items:
   CYC(b_+23, b_+24); E = alu_inc8(gb, E);
   CYC(b_+24, b_+25); alu_xor(gb, A);
   CYC(b_+25, b_+26); mem_wr(gb, DE, A);
-  CYC(b_+26, SYM(mapleSetTargetDirectionToRelatedObj2)); ret_effect(gb);
+  CYC(b_+26, b_+27); ret_effect(gb);
 }
 
 void mapleSetTargetDirectionToRelatedObj2_hook(GB *gb) {
@@ -2066,7 +2066,7 @@ void mapleSetTargetDirectionToRelatedObj2_hook(GB *gb) {
   CALL_C(b_+14, objectGetRelativeAngle_hook, SYM(objectGetRelativeAngle), b_+17);
   CYC(b_+17, b_+19); E = 0x3d;
   CYC(b_+19, b_+20); mem_wr(gb, DE, A);
-  CYC(b_+20, SYM(mapleCheckLinkCanDropItem)); ret_effect(gb);
+  CYC(b_+20, b_+21); ret_effect(gb);
 }
 
 void mapleCheckLinkCanDropItem_hook(GB *gb) {
@@ -2171,7 +2171,7 @@ heart:
 set_item_index:
   CYC(b_+111, b_+113); H8(hFF8B) = A;
   CYC(b_+113, b_+114); alu_or(gb, D);
-  CYC(b_+114, SYM(mapleFunc_6c27)); ret_effect(gb);
+  CYC(b_+114, b_+115); ret_effect(gb);
 }
 
 void mapleFunc_6c27_hook(GB *gb) {
@@ -2200,7 +2200,7 @@ void mapleFunc_6c27_hook(GB *gb) {
 
 collision:
   CYC(b_+25, b_+26); alu_xor(gb, A);
-  CYC(b_+26, SYM(mapleIncrementMeetingCounter)); ret_effect(gb);
+  CYC(b_+26, b_+27); ret_effect(gb);
 }
 
 void mapleIncrementMeetingCounter_hook(GB *gb) {
@@ -2219,5 +2219,5 @@ void mapleIncrementMeetingCounter_hook(GB *gb) {
   CYC(b_+12, b_+13); alu_xor(gb, mem_rd(gb, HL));
   CYC(b_+13, b_+14); alu_or(gb, B);
   CYC(b_+14, b_+15); mem_wr(gb, HL, A);
-  CYC(b_+15, SYM(mapleShadowPathsTable)); ret_effect(gb);
+  CYC(b_+15, b_+16); ret_effect(gb);
 }

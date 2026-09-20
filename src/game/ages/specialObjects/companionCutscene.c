@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(rickyCutsceneJump), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(rickyCutsceneJump), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 #define dimitriCutsceneData_bank06 SYM(specialObjectCode_dimitriCutscene__substate0__data)
 #define mapleCutsceneData_bank06 SYM(specialObjectCode_mapleCutscene__initPositionSpeedAnimation__data)
@@ -62,7 +62,7 @@ void rickyCutsceneJump_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_BC(0xfe00);
   CALL_C(b_+3, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+6);
   CYC(b_+6, b_+8); A = 0x02;
-  CYC(b_+8, SYM(companionCutsceneInitOam)); specialObjectSetAnimation_hook(gb);
+  CYC(b_+8, b_+11); specialObjectSetAnimation_hook(gb);
 }
 
 void companionCutsceneInitOam_hook(GB *gb) {
@@ -73,7 +73,7 @@ void companionCutsceneInitOam_hook(GB *gb) {
   CYC(b_+3, b_+6); SET_HL((SYM(nextToKeyDoor) + 49));
   CYC(b_+6, b_+8); E = 0x05;
   CALL_C(b_+8, interBankCall_hook, 0x008a, b_+11);
-  CYC(b_+11, SYM(rickyCutscene_state1)); objectSetVisiblec0_hook(gb);
+  CYC(b_+11, b_+14); objectSetVisiblec0_hook(gb);
 }
 
 void companionCutsceneFunc_7081_hook(GB *gb) {
@@ -92,7 +92,7 @@ void companionCutsceneFunc_7081_hook(GB *gb) {
   CYC(b_+16, b_+17); mem_wr(gb, HL, A);
   CYC(b_+17, b_+19); L = 0x36;
   CYC(b_+19, b_+20); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+20, SYM(companionCutsceneDecAngle)); specialObjectSetAnimation_hook(gb);
+  CYC(b_+20, b_+23); specialObjectSetAnimation_hook(gb);
 }
 
 void companionCutsceneDecAngle_hook(GB *gb) {
@@ -102,7 +102,7 @@ void companionCutsceneDecAngle_hook(GB *gb) {
   CYC(b_+3, b_+4); A = alu_dec8(gb, A);
   CYC(b_+4, b_+6); alu_and(gb, 0x1f);
   CYC(b_+6, b_+7); mem_wr(gb, DE, A);
-  CYC(b_+7, SYM(specialObjectCode_linkInCutscene_b06)); ret_effect(gb);
+  CYC(b_+7, b_+8); ret_effect(gb);
 }
 
 void specialObjectCode_companionCutscene_b06_hook(GB *gb) {
@@ -138,7 +138,7 @@ void specialObjectCode_rickyCutscene_hook(GB *gb) {
   CYC(b_+13, b_+15); L = 0x10;
   CYC(b_+15, b_+17); mem_wr(gb, HL, 0x50);
   CYC(b_+17, b_+19); L = 0x09;
-  CYC(b_+19, SYM(rickyCutsceneJump)); mem_wr(gb, HL, 0x08);
+  CYC(b_+19, b_+21); mem_wr(gb, HL, 0x08);
   rickyCutsceneJump_hook(gb);
 }
 
@@ -337,7 +337,7 @@ substate_a:
   CYC(b_+292, b_+293);
   CYC(b_+293, b_+295); L = 0x05;
   CYC(b_+295, b_+296); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+296, SYM(specialObjectCode_mooshCutscene)); goto jump;
+  CYC(b_+296, b_+299); goto jump;
 }
 
 void specialObjectCode_mooshCutscene_hook(GB *gb) {
@@ -466,7 +466,7 @@ substate4:
   CYC(b_+161, b_+162); L = alu_inc8(gb, L);
   CYC(b_+162, b_+163); L = alu_inc8(gb, L);
   CYC(b_+163, b_+165); mem_wr(gb, HL, 0x28);
-  CYC(b_+165, SYM(specialObjectCode_dimitriCutscene)); ret_effect(gb);
+  CYC(b_+165, b_+166); ret_effect(gb);
 }
 
 void specialObjectCode_dimitriCutscene_hook(GB *gb) {
@@ -633,7 +633,7 @@ substate6:
   CYC(b_+229, b_+230); L = alu_inc8(gb, L);
   CYC(b_+230, b_+231); L = alu_inc8(gb, L);
   CYC(b_+231, b_+233); mem_wr(gb, HL, 0xd8);
-  CYC(b_+233, SYM(specialObjectCode_mapleCutscene)); ret_effect(gb);
+  CYC(b_+233, b_+234); ret_effect(gb);
 }
 
 void specialObjectCode_mapleCutscene_hook(GB *gb) {
@@ -738,7 +738,7 @@ substate3:
     CYCT(b_+144, b_+146);
     CYC(b_+151, b_+153); A = 0xff;
     CYC(b_+153, b_+156); W8(wTmpcfc0_genericCutscene_cfdf) = A;
-    CYC(b_+156, SYM(companionCutsceneFunc_7081)); ret_effect(gb); return;
+    CYC(b_+156, b_+157); ret_effect(gb); return;
   }
   CYC(b_+144, b_+146);
   CYC(b_+146, b_+148); C = 0x02;

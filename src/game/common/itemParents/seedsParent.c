@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(parentItemGenericState1), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(parentItemGenericState1), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t seeds_parent_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -41,7 +41,7 @@ void parentItemGenericState1_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); alu_rlca(gb);
   if (!(F & FC)) { CYCT(b_+4, b_+7); specialObjectAnimate_optimized_hook(gb); }
-  else { CYC(b_+4, b_+7); CYC(b_+7, SYM(parentItemCode_shovel)); clearParentItem_hook(gb); }
+  else { CYC(b_+4, b_+7); CYC(b_+7, b_+10); clearParentItem_hook(gb); }
 }
 
 void clearSelfIfNoSeeds_hook(GB *gb) {
@@ -59,7 +59,7 @@ void clearSelfIfNoSeeds_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+14, b_+15); ret_effect(gb); return; }
   CYC(b_+14, b_+15);
   CYC(b_+15, b_+16); SET_HL(pop_effect(gb));
-  CYC(b_+16, SYM(parentItemGenericState1)); clearParentItem_hook(gb);
+  CYC(b_+16, b_+19); clearParentItem_hook(gb);
 }
 
 void parentItemCode_satchel_hook(GB *gb) {
@@ -121,7 +121,7 @@ pegasus:
   CYC(b_+80, b_+82); mem_wr(gb, HL, 0x1a);
 
 clear:
-  CYC(b_+82, SYM(clearSelfIfNoSeeds)); clearParentItem_hook(gb);
+  CYC(b_+82, b_+85); clearParentItem_hook(gb);
 }
 
 void parentItemCode_slingshot_hook(GB *gb) {
@@ -146,5 +146,5 @@ check_angle:
 update_angle:
   CYC(b_+159,b_+160);H=D;CYC(b_+160,b_+162);L=9;CYC(b_+162,b_+164);alu_and(gb,7);CYC(b_+164,b_+165);mem_wr(gb,HL,A);CYC(b_+165,b_+167);L=7;CYC(b_+167,b_+169);mem_wr(gb,HL,0x10);
 animation:
-  CALL_C(b_+169,isLinkUnderwater_hook,SYM(isLinkUnderwater),b_+172);CYC(b_+172,b_+174);A=0x48;if(!(F&FZ))CYCT(b_+174,b_+176);else{CYC(b_+174,b_+176);CYC(b_+176,b_+179);A=W8(w1Companion_id);CYC(b_+179,b_+181);alu_cp(gb,0x0a);CYC(b_+181,b_+183);A=0x40;if(F&FZ)CYCT(b_+183,b_+185);else{CYC(b_+183,b_+185);CYC(b_+185,b_+187);A=0x38;}}CYC(b_+187,b_+188);H=D;CYC(b_+188,b_+190);L=9;CYC(b_+190,b_+191);alu_add(gb,mem_rd(gb,HL));CYC(b_+191,b_+193);L=0x31;CYC(b_+193,b_+194);mem_wr(gb,HL,A);CYC(b_+194,b_+196);L=0x3f;CYC(b_+196,b_+198);mem_wr(gb,HL,4);CYC(b_+198,SYM(parentItemCode_satchel));ret_effect(gb);
+  CALL_C(b_+169,isLinkUnderwater_hook,SYM(isLinkUnderwater),b_+172);CYC(b_+172,b_+174);A=0x48;if(!(F&FZ))CYCT(b_+174,b_+176);else{CYC(b_+174,b_+176);CYC(b_+176,b_+179);A=W8(w1Companion_id);CYC(b_+179,b_+181);alu_cp(gb,0x0a);CYC(b_+181,b_+183);A=0x40;if(F&FZ)CYCT(b_+183,b_+185);else{CYC(b_+183,b_+185);CYC(b_+185,b_+187);A=0x38;}}CYC(b_+187,b_+188);H=D;CYC(b_+188,b_+190);L=9;CYC(b_+190,b_+191);alu_add(gb,mem_rd(gb,HL));CYC(b_+191,b_+193);L=0x31;CYC(b_+193,b_+194);mem_wr(gb,HL,A);CYC(b_+194,b_+196);L=0x3f;CYC(b_+196,b_+198);mem_wr(gb,HL,4);CYC(b_+198,b_+199);ret_effect(gb);
 }

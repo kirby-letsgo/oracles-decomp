@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode23), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode23), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // Pointer tables indexed by Interaction.xh. Each entry: tile index, then positions
 // to write it at, terminated by $ff.

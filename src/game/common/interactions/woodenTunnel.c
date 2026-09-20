@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode98), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode98), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t wooden_tunnel_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -26,7 +26,7 @@ void wooden_tunnel_set_solidity_hook(GB *gb) {
   CYC(b_+67, b_+69); H = 0xce;
   CYC(b_+69, b_+70); L = A;
   CYC(b_+70, b_+71); mem_wr(gb, HL, C);
-  CYC(b_+71, SYM(interactionCode9f)); ret_effect(gb);
+  CYC(b_+71, b_+72); ret_effect(gb);
 }
 
 void interactionCode98__setSolidity_hook(GB *gb) { wooden_tunnel_set_solidity_hook(gb); }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodec9), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodec9), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCodec9_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -277,7 +277,7 @@ initState3:
   CYC(b_+325, b_+327); L = INTERACTION_BASE + OBJ_VAR3E;
   CYC(b_+327, b_+329); A = 0x01;
   CYC(b_+329, b_+330); mem_wr(gb, HL, A);
-  CYC(b_+330, SYM(interactionCodeca)); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+330, b_+333); interactionSetAnimation_hook(gb); return; // jp
 }
 
 // ==================================================================================================

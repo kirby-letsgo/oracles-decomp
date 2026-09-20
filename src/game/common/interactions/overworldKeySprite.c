@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode18), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode18), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t overworldKeySprite_jumpTable(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -70,5 +70,5 @@ state2:
     CYCT(b_+50, b_+51); ret_effect(gb); return;
   }
   CYC(b_+50, b_+51);
-  CYC(b_+51, SYM(interactionCode1c)); interactionDelete_hook(gb);
+  CYC(b_+51, b_+54); interactionDelete_hook(gb);
 }

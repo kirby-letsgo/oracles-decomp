@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode3b), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode3b), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t partCode3b_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -175,5 +175,5 @@ subid1_state1:
   CALL_C(b_+175, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+178);
   if (!(F & FZ)) { CYCT(b_+178, b_+180); goto animate; } // jr nz
   CYC(b_+178, b_+180);
-  CYC(b_+180, SYM(partCode3c)); goto func_6ebd; // jr
+  CYC(b_+180, b_+182); goto func_6ebd; // jr
 }

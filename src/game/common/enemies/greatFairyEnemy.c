@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode38), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode38), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void greatFairy_state_uninitialized_hook(GB *gb);
 void greatFairy_state1_hook(GB *gb);
@@ -150,11 +150,11 @@ void greatFairy_animate_hook(GB *gb) {
   CYC(b_+6, b_+8); E = ENEMY_BASE + OBJ_YH;
   CYC(b_+8, b_+9); A = mem_rd(gb, DE);
   CYC(b_+9, b_+10); B = A;
-  CYC(b_+10, b_+12); A = hram_rd(gb, 0xb0); // hEnemyTargetY
+  CYC(b_+10, b_+12); A = mem_rd(gb, hEnemyTargetY); // hEnemyTargetY
   CYC(b_+12, b_+13); alu_cp(gb, B);
   if (F & FC) { CYCT(b_+13, b_+16); objectSetVisiblec1_hook(gb); return; } // jp c
   CYC(b_+13, b_+16);
-  CYC(b_+16, SYM(greatFairy_state4)); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+16, b_+19); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 // Begin healing Link
@@ -166,7 +166,7 @@ void greatFairy_state4_hook(GB *gb) {
   CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x0c);
   CYC(b_+7, b_+8); L = alu_inc8(gb, L);
-  CYC(b_+8, SYM(greatFairy_state5)); mem_wr(gb, HL, 0x09); // [counter2]
+  CYC(b_+8, b_+10); mem_wr(gb, HL, 0x09); // [counter2]
   greatFairy_state5_hook(gb); return; // fallthrough
 }
 
@@ -191,7 +191,7 @@ spawnedAllHearts:
   CYC(b_+20, b_+22); mem_wr(gb, HL, 30); // [counter1]
   CYC(b_+22, b_+24); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+24, b_+25); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
-  CYCT(b_+25, SYM(greatFairy_state6)); greatFairy_animate_hook(gb); return; // jr
+  CYCT(b_+25, b_+27); greatFairy_animate_hook(gb); return; // jr
 }
 
 // Hearts have all spawned, are now circling around Link
@@ -222,7 +222,7 @@ void greatFairy_state7_hook(GB *gb) {
   CYC(b_+7, b_+9);
   CALL_C(b_+9, ecom_incState_b0e_hook, SYM(ecom_incState_b0e), b_+12);
   CYC(b_+12, b_+14); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(b_+14, SYM(greatFairy_state8)); mem_wr(gb, HL, 0x1e);
+  CYC(b_+14, b_+16); mem_wr(gb, HL, 0x1e);
   greatFairy_state8_hook(gb); return; // fallthrough
 }
 
@@ -299,14 +299,14 @@ void greatFairy_checkLinkApproached_hook(GB *gb) {
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+5); H = D;
   CYC(b_+5, b_+7); L = ENEMY_BASE + OBJ_YH;
-  CYC(b_+7, b_+9); A = hram_rd(gb, 0xb0); // hEnemyTargetY
+  CYC(b_+7, b_+9); A = mem_rd(gb, hEnemyTargetY); // hEnemyTargetY
   CYC(b_+9, b_+10); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+10, b_+12); alu_sub(gb, 0x10);
   CYC(b_+12, b_+14); alu_cp(gb, 0x21);
   if (!(F & FC)) { RET_TAKEN(b_+14); return; } // ret nc
   CYC(b_+14, b_+15);
   CYC(b_+15, b_+17); L = ENEMY_BASE + OBJ_XH;
-  CYC(b_+17, b_+19); A = hram_rd(gb, 0xb1); // hEnemyTargetX
+  CYC(b_+17, b_+19); A = mem_rd(gb, hEnemyTargetX); // hEnemyTargetX
   CYC(b_+19, b_+20); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+20, b_+22); alu_add(gb, 0x18);
   CYC(b_+22, b_+24); alu_cp(gb, 0x31);
@@ -333,7 +333,7 @@ void greatFairy_spawnCirclingHeart_hook(GB *gb) {
 void greatFairy_createPuff_hook(GB *gb) {
   BASE(greatFairy_createPuff);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); SET_BC((SYM(initializeVramMap1) + 21)); // INTERAC_PUFF,$02
+  CYC(b_+0, b_+3); SET_BC(0x0502); // INTERAC_PUFF,$02
   CALL_C(b_+3, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+6);
   if (!(F & FZ)) { RET_TAKEN(b_+6); return; } // ret nz
   CYC(b_+6, b_+7);
@@ -353,5 +353,5 @@ void greatFairy_playSoundEvery8Frames_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+5); return; } // ret nz
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+8); A = 0x8c; // SND_FAIRY_HEAL
-  CYC(b_+8, SYM(enemyCode39)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+8, b_+11); playSound_b00_hook(gb); return; // jp
 }

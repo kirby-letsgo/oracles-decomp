@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(veranFairy_checkWithinBoundary), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(veranFairy_checkWithinBoundary), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // object_code/ages/enemies/veranFairy.s (ENEMY_VERAN_FAIRY), bank $10.
 
@@ -219,7 +219,7 @@ afterFire:
   CYC(b_+58, b_+60); L = ENEMY_BASE + OBJ_VAR36;
   CYC(b_+60, b_+62); mem_wr(gb, HL, 0x00);
   CYC(b_+62, b_+64); A = 0x05;
-  CYC(b_+64, SYM(attack2));
+  CYC(b_+64, b_+67);
   enemySetAnimation_hook(gb);
 }
 
@@ -258,7 +258,7 @@ afterFire:
   CYC(b_+37, b_+39); L = ENEMY_BASE + OBJ_VAR36;
   CYC(b_+39, b_+41); mem_wr(gb, HL, 0x00);
   CYC(b_+41, b_+43); A = 0x05;
-  CYC(b_+43, SYM(veranFairy_checkWithinBoundary));
+  CYC(b_+43, b_+46);
   enemySetAnimation_hook(gb);
 }
 
@@ -317,7 +317,7 @@ void veranFairy_saveMovementPatternPointer_hook(GB *gb) {
 void veranFairy_animate_hook(GB *gb) {
   BASE(veranFairy_animate);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, SYM(veranFairy_state4));
+  CYC(b_+0, b_+3);
   enemyAnimate_hook(gb);
 }
 
@@ -335,7 +335,7 @@ void veranFairy_state0_hook(GB *gb) {
   CYC(b_+18, b_+19); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   CYC(b_+19, b_+21); A = 0x02;
   CALL_C(b_+21, enemySetAnimation_hook, SYM(enemySetAnimation), b_+24);
-  CYC(b_+24, SYM(veranFairy_state1));
+  CYC(b_+24, b_+27);
   objectSetVisible82_hook(gb);
 }
 
@@ -517,7 +517,7 @@ substateC:
   CYC(b_+227, b_+228); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+228, b_+230); L = ENEMY_BASE + OBJ_COUNTER2;
   CYC(b_+230, b_+232); mem_wr(gb, HL, 0x78);
-  CYC(b_+232, SYM(veranFairy_state2));
+  CYC(b_+232, b_+235);
   enemyBoss_beginBoss_b10_hook(gb);
 }
 
@@ -565,7 +565,7 @@ pickMovementPattern:
   CYC(b_+53, b_+54); mem_wr(gb, DE, A);
   CYC(b_+54, b_+55); E = alu_inc8(gb, E);
   CYC(b_+55, b_+56); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+56, SYM(veranFairy_saveMovementPatternPointer)); mem_wr(gb, DE, A);
+  CYC(b_+56, b_+57); mem_wr(gb, DE, A);
   veranFairy_saveMovementPatternPointer_hook(gb);
 }
 
@@ -643,7 +643,7 @@ void veranFairy_state4_hook(GB *gb) {
   CYC(b_+4, b_+6);
   CYC(b_+6, b_+7); L = E;
   CYC(b_+7, b_+9); mem_wr(gb, HL, 0x02);
-  CYC(b_+9, SYM(veranFairy_state5));
+  CYC(b_+9, b_+11);
   veranFairy_animate_hook(gb);
 }
 

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodeb3), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodeb3), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t harp_of_ages_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -135,7 +135,7 @@ void interactionCodeb3__state4_hook(GB *gb) {
   CYC(b_+163, b_+164); L = alu_inc8(gb, L);
   CYC(b_+164, b_+166); mem_wr(gb, HL, 0x07);
   CALL_C(b_+166, objectCopyPosition_hook, SYM(objectCopyPosition), b_+169);
-  CYC(b_+169, SYM(interactionCodeb4)); interactionDelete_hook(gb); return;
+  CYC(b_+169, b_+172); interactionDelete_hook(gb); return;
 }
 
 void interactionCodeb3_hook(GB *gb) {

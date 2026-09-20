@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(objectLoadMovementScript_body), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(objectLoadMovementScript_body), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void objectRunMovementScript_body_hook(GB *gb);
 
@@ -68,7 +68,7 @@ void objectLoadMovementScript_body_hook(GB *gb) {
   CYC(b_+27, b_+28); mem_wr(gb, DE, A);
   CYC(b_+28, b_+29); E = alu_inc8(gb, E);
   CYC(b_+29, b_+30); A = H;
-  CYC(b_+30, SYM(objectRunMovementScript_body)); mem_wr(gb, DE, A);
+  CYC(b_+30, b_+31); mem_wr(gb, DE, A);
   objectRunMovementScript_body_hook(gb); return; // fallthrough
 }
 
@@ -211,5 +211,5 @@ setstate:
   CYC(b_+152, b_+153); SET_BC(BC + 1); // inc bc
   CYC(b_+153, b_+154); A = mem_rd(gb, BC);
   CYC(b_+154, b_+155); mem_wr(gb, HL, A); // [state]
-  CYC(b_+155, SYM(enemyCode3c)); goto storePointer; // jr
+  CYC(b_+155, b_+157); goto storePointer; // jr
 }

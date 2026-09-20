@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(checkSolidObjectAtWarpDestPos), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(checkSolidObjectAtWarpDestPos), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void checkSolidObjectAtWarpDestPos_hook(GB *gb) {
   BASE(checkSolidObjectAtWarpDestPos);
@@ -23,7 +23,7 @@ void checkSolidObjectAtWarpDestPos_hook(GB *gb) {
   }
   CYC(b_+18, b_+19); alu_xor(gb, A);
   CYC(b_+19, b_+21); hram_wr(gb, IO_SVBK - 0xff00, A);
-  CYC(b_+21, SYM(clearSolidObjectPositions)); ret_effect(gb);
+  CYC(b_+21, b_+22); ret_effect(gb);
 }
 
 void clearSolidObjectPositions_hook(GB *gb) {
@@ -35,7 +35,7 @@ void clearSolidObjectPositions_hook(GB *gb) {
   CYC(b_+6, b_+9); SET_HL(w2SolidObjectPositions);
   CALL_C(b_+9, clearMemory_hook, SYM(clearMemory), b_+12);
   CYC(b_+12, b_+14); hram_wr(gb, IO_SVBK - 0xff00, A);
-  CYC(b_+14, SYM(checkLinkCanStandOnTile)); ret_effect(gb);
+  CYC(b_+14, b_+15); ret_effect(gb);
 }
 
 void checkLinkCanStandOnTile_hook(GB *gb) {
@@ -83,5 +83,5 @@ void checkLinkCanStandOnTile_hook(GB *gb) {
 
 invalid_tile:
   CYC(b_+43, b_+45); C = 0x01;
-  CYC(b_+45, SYM(invalidTimewarpTileList)); ret_effect(gb);
+  CYC(b_+45, b_+46); ret_effect(gb);
 }

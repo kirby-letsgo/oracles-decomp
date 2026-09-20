@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodebd), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodebd), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/object_code/ages/interactions/pushblockSynchronizer.s (interactionCodebd /
 // INTERAC_PUSHBLOCK_SYNCHRONIZER), bank 0x0b.
@@ -67,7 +67,7 @@ static void interactionCodebd_pushBlockAt(GB *gb, uint16_t sp0_) {
 ret_label: // interactionCodebd@return
   CYC(b_+101, b_+102); SET_HL(pop_effect(gb)); // pop hl
   CYC(b_+102, b_+103); L = alu_dec8(gb, L);
-  CYC(b_+103, SYM(interactionCodebe)); return; // ret
+  CYC(b_+103, b_+104); return; // ret
 }
 
 // ==================================================================================================

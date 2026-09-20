@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode75), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode75), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCode75_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -84,7 +84,7 @@ subid3Init:
   RET(b_+75); return;
 
 subid4Init:
-  CYC(b_+76, b_+79); SET_BC((SYM(makeActiveObjectFollowLink_b00) + 6));
+  CYC(b_+76, b_+79); SET_BC(0x1838);
   CYC(b_+79, b_+82); interactionSetPosition_hook(gb); return; // jp
 
 subid6Init:
@@ -163,5 +163,5 @@ runSubid6:
   if (!(F & FZ)) { RET_TAKEN(b_+182); return; } // ret nz
   CYC(b_+182, b_+183);
   CALL_C(b_+183, interactionAnimate_hook, SYM(interactionAnimate), b_+186);
-  CYC(b_+186, SYM(interactionCode76)); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+186, b_+189); objectApplySpeed_hook(gb); return; // jp
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode9a), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode9a), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t interactionCode9a_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -143,7 +143,7 @@ l_5140:
   CYC(b_+120, b_+121);
   CYC(b_+121, b_+123); A = 0x01;
   CYC(b_+123, b_+124); mem_wr(gb, DE, A); // [substate] = $01
-  CYC(b_+124, b_+127); SET_BC((SYM(objectSetPriorityRelativeToLink_withTerrainEffects__getPriority) + 25)); // TX_2307
+  CYC(b_+124, b_+127); SET_BC(0x2307); // TX_2307
   CYC(b_+127, b_+130); showText_hook(gb); return; // jp
 
 substate1:

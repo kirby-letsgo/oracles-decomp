@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(initializeParentItem), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(initializeParentItem), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void clearLinkUsingItem1_hook(GB *gb);
 void itemEnableLinkMovement_hook(GB *gb);
@@ -52,7 +52,7 @@ void initializeParentItem_hook(GB *gb) {
   CYC(b_+8, b_+9); L = alu_inc8(gb, L);
   CYC(b_+9, b_+10); L = alu_inc8(gb, L);
   CYC(b_+10, b_+11); mem_wr(gb, HL, D);
-  CYC(b_+11, SYM(chooseParentItemSlot)); ret_effect(gb);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 void checkShopInput_hook(GB *gb) {
@@ -77,7 +77,7 @@ void checkShopInput_hook(GB *gb) {
   CYC(b_+14, b_+15);
   CYC(b_+15, b_+17); A = 0x83;
   CYC(b_+17, b_+20); W8(wLinkGrabState) = A;
-  CYC(b_+20, SYM(parentItemUpdate)); ret_effect(gb);
+  CYC(b_+20, b_+21); ret_effect(gb);
 }
 
 void clearParentItem_hook(GB *gb) {
@@ -87,7 +87,7 @@ void clearParentItem_hook(GB *gb) {
   CALL_C(b_+3, itemEnableLinkTurning_hook, SYM(itemEnableLinkTurning), b_+6);
   CALL_C(b_+6, itemEnableLinkMovement_hook, SYM(itemEnableLinkMovement), b_+9);
   CYC(b_+9, b_+11); E = 0x00;
-  CYC(b_+11, SYM(clearParentItemH)); objectDelete_de_hook(gb);
+  CYC(b_+11, b_+14); objectDelete_de_hook(gb);
 }
 
 void clearParentItemH_hook(GB *gb) {
@@ -97,7 +97,7 @@ void clearParentItemH_hook(GB *gb) {
   CYC(b_+1, b_+2); D = H;
   CALL_C(b_+2, clearParentItem_hook, SYM(clearParentItem), b_+5);
   CYC(b_+5, b_+6); SET_DE(pop_effect(gb));
-  CYC(b_+6, SYM(parentItemCode_shield)); ret_effect(gb);
+  CYC(b_+6, b_+7); ret_effect(gb);
 }
 
 void clearAllParentItems_body_hook(GB *gb) {
@@ -122,7 +122,7 @@ void clearAllParentItems_body_hook(GB *gb) {
   CYC(b_+16, b_+19); W8(wcc63) = A;
   CYC(b_+19, b_+22); W8(wMagnetGloveState) = A;
   CYC(b_+22, b_+23); SET_DE(pop_effect(gb));
-  CYC(b_+23, SYM(updateParentItemButtonAssignment_body)); ret_effect(gb);
+  CYC(b_+23, b_+24); ret_effect(gb);
 }
 
 void updateParentItemButtonAssignment_body_hook(GB *gb) {
@@ -167,7 +167,7 @@ void updateParentItemButtonAssignment_body_hook(GB *gb) {
       break;
     }
   } while (1);
-  CYC(b_+34, SYM(checkUseItems_b06)); ret_effect(gb);
+  CYC(b_+34, b_+35); ret_effect(gb);
 }
 
 void chooseParentItemSlot_hook(GB *gb) {
@@ -254,7 +254,7 @@ thing5:
 
 thing0:
   CYC(b_+76, b_+77); alu_or(gb, H);
-  CYC(b_+77, SYM(checkShopInput)); ret_effect(gb);
+  CYC(b_+77, b_+78); ret_effect(gb);
 }
 
 void parentItemUpdate_hook(GB *gb) {
@@ -329,9 +329,9 @@ check_item:
   CYC(b_+39, b_+40);
   CALL_C(b_+40, chooseParentItemSlot_hook, SYM(chooseParentItemSlot), b_+43);
   if (!(F & FZ)) {
-    CYCT(b_+43, SYM(initializeParentItem)); ret_effect(gb); return;
+    CYCT(b_+43, b_+44); ret_effect(gb); return;
   }
-  CYC(b_+43, SYM(initializeParentItem));
+  CYC(b_+43, b_+44);
   initializeParentItem_hook(gb);
 }
 
@@ -399,7 +399,7 @@ void checkUseItems_b06_hook(GB *gb) {
     CYCT(b_+68, b_+70); goto normal;
   }
   CYC(b_+68, b_+70);
-  CYC(b_+70, b_+73); SET_DE((SYM(addDecimalToHlRef) + 8));
+  CYC(b_+70, b_+73); SET_DE(0x0189);
   CALL_C(b_+73, checkItemUsed_hook, SYM(checkItemUsed), b_+76);
   CYC(b_+76, b_+78); goto update_parent_items;
 
@@ -427,11 +427,11 @@ sidescroll:
   CYC(b_+97, b_+99);
 
 check_ab:
-  CYC(b_+99, b_+102); SET_DE((SYM(addDecimalToHlRef) + 8));
+  CYC(b_+99, b_+102); SET_DE(0x0189);
   CALL_C(b_+102, checkItemUsed_hook, SYM(checkItemUsed), b_+105);
 
 check_b:
-  CYC(b_+105, b_+108); SET_DE((SYM(pollInput) + 27));
+  CYC(b_+105, b_+108); SET_DE(0x0288);
   CALL_C(b_+108, checkItemUsed_hook, SYM(checkItemUsed), b_+111);
 
 update_parent_items:
@@ -475,7 +475,7 @@ items_disabled:
   CALL_C(b_+151, initializeParentItem_hook, SYM(initializeParentItem), b_+154);
   CYC(b_+154, b_+156); A = 0x80;
   CYC(b_+156, b_+159); W8(wcc63) = A;
-  CYC(b_+159, SYM(checkItemUsed)); goto update_parent_items;
+  CYC(b_+159, b_+161); goto update_parent_items;
 }
 
 void functionCaller_b06_hook(GB *gb) {

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(toiletHand_checkLinkIsClose), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(toiletHand_checkLinkIsClose), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void writeFlagsTocddb_hook(GB *gb);
 
@@ -51,7 +51,7 @@ void toiletHand_retreatIntoToiletIfNotAlready_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+5); alu_cp(gb, 0x02);
   if (F & FZ) { RET_TAKEN(b_+5); return; }
-  CYC(b_+5, SYM(toiletHand_retreatIntoToilet));
+  CYC(b_+5, b_+6);
   toiletHand_retreatIntoToilet_hook(gb); return; // fallthrough
 }
 
@@ -62,7 +62,7 @@ void toiletHand_retreatIntoToilet_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
   CYC(b_+0, b_+2); A = 0x02;
-  CYC(b_+2, SYM(toiletHand_comeOutOfToilet)); toiletHand_setAnimation_hook(gb); return; // jr
+  CYC(b_+2, b_+4); toiletHand_setAnimation_hook(gb); return; // jr
 }
 
 void toiletHand_comeOutOfToilet_hook(GB *gb) {
@@ -70,14 +70,14 @@ void toiletHand_comeOutOfToilet_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
   CYC(b_+0, b_+2); A = 0x01;
-  CYC(b_+2, SYM(toiletHand_disappear)); toiletHand_setAnimation_hook(gb); return; // jr
+  CYC(b_+2, b_+4); toiletHand_setAnimation_hook(gb); return; // jr
 }
 
 void toiletHand_disappear_hook(GB *gb) {
   BASE(toiletHand_disappear);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(b_+0, SYM(toiletHand_setAnimation)); A = 0x00;
+  CYC(b_+0, b_+2); A = 0x00;
   toiletHand_setAnimation_hook(gb); return; // fallthrough
 }
 
@@ -87,7 +87,7 @@ void toiletHand_setAnimation_hook(GB *gb) {
   (void)sp0_;
   CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_DIRECTION;
   CYC(b_+2, b_+3); mem_wr(gb, DE, A);
-  CYC(b_+3, SYM(toiletHand_checkVisibility)); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+3, b_+6); interactionSetAnimation_hook(gb); return; // jp
 }
 
 void toiletHand_checkVisibility_hook(GB *gb) {

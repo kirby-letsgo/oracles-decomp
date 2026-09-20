@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode19), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode19), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // Per-direction y/x offsets applied when the cube rolls one tile.
 #define coloredCubeDirectionOffsets_bank08 SYM(interactionCode19__directionOffsets)
@@ -127,7 +127,7 @@ static void coloredCube_fallDownHole(GB *gb, uint16_t sp0_) {
   CYC(b_+291, b_+293); A = TILEINDEX_HOLE;
   CALL_C(b_+293, setTile_hook, SYM(setTile), b_+296);
   CALL_C(b_+296, objectCreateFallingDownHoleInteraction_hook, SYM(objectCreateFallingDownHoleInteraction), b_+299);
-  CYC(b_+299, SYM(interactionCode1a)); interactionDelete_hook(gb);
+  CYC(b_+299, b_+302); interactionDelete_hook(gb);
 }
 
 // interactionCode19@checkAnimParameter: advance the cube one tile on animation parameter 2-5,

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(goron_targetCarts_setLinkPositionToCartPlatform), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(goron_targetCarts_setLinkPositionToCartPlatform), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void writeFlagsTocddb_hook(GB *gb);
 
@@ -36,7 +36,7 @@ void goron_targetCarts_setLinkPositionToCartPlatform_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); A = 0x00;
   CYC(b_+2, b_+5); SET_BC(0x8838);
-  CYC(b_+5, SYM(goron_targetCarts_setLinkPositionAfterGame)); goron_setLinkPositionAndDirection_hook(gb);
+  CYC(b_+5, b_+7); goron_setLinkPositionAndDirection_hook(gb);
 }
 
 void goron_targetCarts_setLinkPositionAfterGame_hook(GB *gb) {
@@ -44,7 +44,7 @@ void goron_targetCarts_setLinkPositionAfterGame_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); A = 0x01;
   CYC(b_+2, b_+5); SET_BC((SYM(symmetryNpcSubid8And9Script__askForSecret_b15) + 6));
-  CYC(b_+5, SYM(goron_bigBang_initLinkPosition)); goron_setLinkPositionAndDirection_hook(gb);
+  CYC(b_+5, b_+7); goron_setLinkPositionAndDirection_hook(gb);
 }
 
 void goron_targetCarts_spawnPrize_hook(GB *gb) {
@@ -105,7 +105,7 @@ void goron_targetCarts_deleteMinecartAndClearStaticObjects_hook(GB *gb) {
   CYC(b_+7, b_+8); D = H;
   CALL_C(b_+8, objectDelete_de_hook, SYM(objectDelete_de), b_+11);
   CYC(b_+11, b_+12); SET_DE(pop_effect(gb));
-  CYC(b_+12, SYM(goron_findInteractionWithID)); clearStaticObjects_hook(gb);
+  CYC(b_+12, b_+15); clearStaticObjects_hook(gb);
 }
 
 void goron_targetCarts_deleteCrystals_hook(GB *gb) {
@@ -138,7 +138,7 @@ nextEnemy:
   CYC(b_+28, b_+30); alu_cp(gb, 0xe0);
   if (F & FC) { CYCT(b_+30, b_+32); goto loop; }
   CYC(b_+30, b_+32);
-  CYC(b_+32, SYM(goron_targetCarts_beginGame)); ret_effect(gb);
+  CYC(b_+32, b_+33); ret_effect(gb);
 }
 
 void goron_targetCarts_setPlayingFlag_hook(GB *gb);
@@ -152,13 +152,13 @@ void goron_targetCarts_beginGame_hook(GB *gb) {
   CYC(b_+4, b_+7); mem_wr(gb, wTmpcfc0_goronCutscenes_elderVar_cfdd, A);
   CYC(b_+7, b_+10); mem_wr(gb, wTmpcfc0_genericCutscene_cfde, A);
   CYC(b_+10, b_+13); mem_wr(gb, wTmpcfc0_goronDance_beat, A);
-  CYC(b_+13, SYM(goron_targetCarts_endGame)); goron_targetCarts_setPlayingFlag_hook(gb);
+  CYC(b_+13, b_+16); goron_targetCarts_setPlayingFlag_hook(gb);
 }
 
 void goron_targetCarts_endGame_hook(GB *gb) {
   BASE(goron_targetCarts_endGame);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, SYM(goron_targetCarts_setPlayingFlag)); goron_targetCarts_clearPlayingFlag_hook(gb);
+  CYC(b_+0, b_+3); goron_targetCarts_clearPlayingFlag_hook(gb);
 }
 
 void goron_targetCarts_setPlayingFlag_hook(GB *gb) {
@@ -166,7 +166,7 @@ void goron_targetCarts_setPlayingFlag_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+3);
   CYC(b_+3, b_+5); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  CYC(b_+5, SYM(goron_targetCarts_clearPlayingFlag)); ret_effect(gb);
+  CYC(b_+5, b_+6); ret_effect(gb);
 }
 
 void goron_targetCarts_clearPlayingFlag_hook(GB *gb) {
@@ -174,7 +174,7 @@ void goron_targetCarts_clearPlayingFlag_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+3);
   CYC(b_+3, b_+5); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
-  CYC(b_+5, SYM(goron_checkLinkNotInAir)); ret_effect(gb);
+  CYC(b_+5, b_+6); ret_effect(gb);
 }
 
 void goron_targetCarts_setupNumTargetsHitText_hook(GB *gb) {
@@ -187,7 +187,7 @@ void goron_targetCarts_setupNumTargetsHitText_hook(GB *gb) {
   CYC(b_+9, b_+10); mem_wr(gb, HL, A);
   CYC(b_+10, b_+11); SET_HL(HL + 1);
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x00);
-  CYC(b_+13, SYM(goron_targetCarts_checkHitAllTargets)); ret_effect(gb);
+  CYC(b_+13, b_+14); ret_effect(gb);
 }
 
 void goron_targetCarts_checkHitAllTargets_hook(GB *gb) {
@@ -195,7 +195,7 @@ void goron_targetCarts_checkHitAllTargets_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfde);
   CYC(b_+3, b_+5); alu_cp(gb, 0x0c);
-  CYC(b_+5, SYM(goron_targetCarts_checkHit9OrMoreTargets)); writeFlagsTocddb_hook(gb);
+  CYC(b_+5, b_+8); writeFlagsTocddb_hook(gb);
 }
 
 void goron_targetCarts_checkHit9OrMoreTargets_hook(GB *gb) {
@@ -204,7 +204,7 @@ void goron_targetCarts_checkHit9OrMoreTargets_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfde);
   CYC(b_+3, b_+5); alu_cp(gb, 0x09);
   CYC(b_+5, b_+6); alu_ccf(gb);
-  CYC(b_+6, SYM(goron_targetCarts_configureInventory)); writeFlagsTocddb_hook(gb);
+  CYC(b_+6, b_+9); writeFlagsTocddb_hook(gb);
 }
 
 void goron_targetCarts_configureInventory_hook(GB *gb) {
@@ -251,7 +251,7 @@ setupSeedShooter:
   CYC(b_+46, b_+47); mem_wr(gb, BC, A);
   CYC(b_+47, b_+49); A = 0xff;
   CYC(b_+49, b_+52); mem_wr(gb, wStatusBarNeedsRefresh, A);
-  CYC(b_+52, SYM(goron_targetCarts_restoreInventory)); ret_effect(gb);
+  CYC(b_+52, b_+53); ret_effect(gb);
 }
 
 void goron_targetCarts_restoreInventory_hook(GB *gb) {
@@ -272,7 +272,7 @@ void goron_targetCarts_restoreInventory_hook(GB *gb) {
   CYC(b_+18, b_+19); mem_wr(gb, BC, A);
   CYC(b_+19, b_+21); A = 0xff;
   CYC(b_+21, b_+24); mem_wr(gb, wStatusBarNeedsRefresh, A);
-  CYC(b_+24, SYM(goron_targetCarts_loadCrystals)); ret_effect(gb);
+  CYC(b_+24, b_+25); ret_effect(gb);
 }
 
 void goron_targetCarts_loadCrystals_hook(GB *gb) {
@@ -290,7 +290,7 @@ void goron_targetCarts_loadCrystals_hook(GB *gb) {
 L_6848:
   CYC(b_+15, b_+18); mem_wr(gb, wTmpcfc0_genericCutscene_cfd4, A);
   CYC(b_+18, b_+21); SET_HL((SYM(symmetryNpcSubid8And9Script__repeat_b15) + 4));
-  CYC(b_+21, SYM(goron_targetCarts_reloadCrystalsInFirstRoom)); parseGivenObjectData_b00_hook(gb);
+  CYC(b_+21, b_+24); parseGivenObjectData_b00_hook(gb);
 }
 
 void goron_targetCarts_reloadCrystalsInFirstRoom_hook(GB *gb) {
@@ -299,19 +299,19 @@ void goron_targetCarts_reloadCrystalsInFirstRoom_hook(GB *gb) {
   CYC(b_+0, b_+1); alu_xor(gb, A);
 
 loop:
-  CYC(b_+1, b_+3); hram_wr(gb, 0x8b, A);
+  CYC(b_+1, b_+3); mem_wr(gb, hFF8B, A);
   CYC(b_+3, b_+6); SET_HL(wTmpcfc0_goronCutscenes_elderVar_cfdd);
   CALL_C(b_+6, checkFlag_hook, SYM(checkFlag), b_+9);
   if (!(F & FZ)) { CYCT(b_+9, b_+11); goto nextCrystal; }
   CYC(b_+9, b_+11);
   CALL_C(b_+11, getFreeEnemySlot_hook, SYM(getFreeEnemySlot), b_+14);
-  CYC(b_+14, b_+16); A = hram_rd(gb, 0x8b);
+  CYC(b_+14, b_+16); A = mem_rd(gb, hFF8B);
   CYC(b_+16, b_+18); mem_wr(gb, HL, 0x63);
   CYC(b_+18, b_+19); L = alu_inc8(gb, L);
   CYC(b_+19, b_+20); mem_wr(gb, HL, A);
 
 nextCrystal:
-  CYC(b_+20, b_+22); A = hram_rd(gb, 0x8b);
+  CYC(b_+20, b_+22); A = mem_rd(gb, hFF8B);
   CYC(b_+22, b_+23); A = alu_inc8(gb, A);
   CYC(b_+23, b_+25); alu_cp(gb, 0x05);
   if (!(F & FZ)) { CYCT(b_+25, b_+27); goto loop; }

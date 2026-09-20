@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode2d), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode2d), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static uint16_t enemyCode2d_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -48,7 +48,7 @@ static void enemyCode2d_decCounter2Every4Frames(GB *gb, uint16_t return_address)
   CYC(b_+239, b_+241); alu_and(gb, 0x03);
   if (!(F & FZ)) { CYCT(b_+241, b_+242); ret_effect(gb); return; } // ret nz
   CYC(b_+241, b_+242);
-  CYC(b_+242, SYM(enemyCode2e)); ecom_decCounter2_b0d_hook(gb); // jp
+  CYC(b_+242, b_+245); ecom_decCounter2_b0d_hook(gb); // jp
 }
 
 // enemyCode2d@updateCollisionRadiiAndYPosition: an @-local reached both by a genuine `call`

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode39), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode39), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void fireKeese_stateBOrHigher_hook(GB *gb);
 void fireKeese_state_uninitialized_hook(GB *gb);
@@ -172,7 +172,7 @@ subid0:
   CYC(b_+27, b_+29); mem_wr(gb, HL, 0x14); // SPEED_80
 
   // Random angle
-  CYC(b_+29, b_+32); SET_BC((SYM(objectGetRelativeAngleWithTempVars) + 80));
+  CYC(b_+29, b_+32); SET_BC(0x1f01);
   CALL_C(b_+32, ecom_randomBitwiseAndBCE_b0e_hook, SYM(ecom_randomBitwiseAndBCE_b0e), b_+35);
   CYC(b_+35, b_+37); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+37, b_+38); A = B;
@@ -190,7 +190,7 @@ setVar35:
   CYC(b_+46, b_+47); mem_wr(gb, DE, A);
   CYC(b_+47, b_+49); A = 0x01;
   CALL_C(b_+49, enemySetAnimation_hook, SYM(enemySetAnimation), b_+52);
-  CYC(b_+52, SYM(fireKeese_state_stub)); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+52, b_+55); objectSetVisiblec1_hook(gb); return; // jp
 }
 
 // 0e:51e2, bare global; jump-table target from enemyCode39.
@@ -246,7 +246,7 @@ torchFound:
   CYC(b_+51, b_+53); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+53, b_+55); mem_wr(gb, HL, 0x1e); // SPEED_c0
   CYC(b_+55, b_+57); A = 0x03;
-  CYC(b_+57, SYM(fireKeese_state9)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+57, b_+60); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:521f, bare global; jump-table target from enemyCode39. Moving towards a torch's
@@ -260,7 +260,7 @@ void fireKeese_state9_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_cp(gb, C);
   if (!(F & FZ)) { CYCT(b_+7, b_+9); goto notAtTargetPosition; } // jr nz
   CYC(b_+7, b_+9);
-  CYC(b_+9, b_+11); A = hram_rd(gb, 0x8f); // hFF8F
+  CYC(b_+9, b_+11); A = mem_rd(gb, hFF8F); // hFF8F
   CYC(b_+11, b_+12); alu_cp(gb, B);
   if (F & FZ) { CYCT(b_+12, b_+14); goto atTargetPosition; } // jr z
   CYC(b_+12, b_+14);
@@ -279,7 +279,7 @@ atTargetPosition:
   CYC(b_+30, b_+32); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+32, b_+34); mem_wr(gb, HL, 60);
   CYC(b_+34, b_+36); A = 0x02;
-  CYC(b_+36, SYM(fireKeese_stateA)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+36, b_+39); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:5246, bare global; jump-table target from enemyCode39. Touched down on the torch; in
@@ -325,7 +325,7 @@ gotoNextState:
 setStateFromA:
   CYC(b_+48, b_+49); mem_wr(gb, DE, A);
   CYC(b_+49, b_+51); A = 0x01;
-  CYC(b_+51, SYM(fireKeese_subid0)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+51, b_+54); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:527c, bare global; jump-table target from fireKeese_stateBOrHigher. Keese which move
@@ -382,7 +382,7 @@ linkNotClose:
 applySpeed:
   CALL_C(b_+32, objectApplySpeed_hook, SYM(objectApplySpeed), b_+35);
   CALL_C(b_+35, fireKeese_moveTowardCenterIfOutOfBounds_hook, SYM(fireKeese_moveTowardCenterIfOutOfBounds), b_+38);
-  CYC(b_+38, SYM(fireKeese_subid0_stateC)); fireKeese_animate_hook(gb); return; // jr
+  CYC(b_+38, b_+40); fireKeese_animate_hook(gb); return; // jr
 }
 
 // 0e:52b3, bare global; jump-table target from fireKeese_subid0. Divebombing because Link
@@ -421,7 +421,7 @@ stillDiving:
   CYC(b_+35, b_+36); A = mem_rd(gb, DE);
   CYC(b_+36, b_+38); alu_and(gb, 0x03);
   CYC(b_+38, b_+39); A = B;
-  if (F & FZ) CALL_C_CC(b_+39, objectNudgeAngleTowards_hook, SYM(objectNudgeAngleTowards), SYM(fireKeese_updatePosition)); else CYC(b_+39, SYM(fireKeese_updatePosition)); // call z
+  if (F & FZ) CALL_C_CC(b_+39, objectNudgeAngleTowards_hook, SYM(objectNudgeAngleTowards), SYM(fireKeese_updatePosition)); else CYC(b_+39, b_+42); // call z
   fireKeese_updatePosition_hook(gb); return; // fallthrough
 }
 
@@ -439,7 +439,7 @@ void fireKeese_updatePosition_hook(GB *gb) {
 // jr from fireKeese_subid0_stateB, fireKeese_subid0_stateC and fireKeese_subid0_stateD.
 void fireKeese_animate_hook(GB *gb) {
   BASE(fireKeese_animate);
-  CYC(b_+0, SYM(fireKeese_subid0_stateD)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:52e6, bare global; jump-table target from fireKeese_subid0. Moving back up after
@@ -464,7 +464,7 @@ void fireKeese_subid0_stateD_hook(GB *gb) {
   CYC(b_+20, b_+22); mem_wr(gb, HL, 0x14); // SPEED_80
   CYC(b_+22, b_+24); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+24, b_+26); mem_wr(gb, HL, 0x08);
-  CYC(b_+26, SYM(fireKeese_subid1)); fireKeese_animate_hook(gb); return; // jr
+  CYC(b_+26, b_+28); fireKeese_animate_hook(gb); return; // jr
 }
 
 // 0e:5302, bare global; jump-table target from fireKeese_stateBOrHigher. Keese which has no
@@ -501,7 +501,7 @@ void fireKeese_subid1_stateB_hook(GB *gb) {
   CYC(b_+8, b_+10); mem_wr(gb, HL, 0x1e); // SPEED_c0
 
   // Random angle
-  CYC(b_+10, b_+13); SET_BC((SYM(pushDirectionData) + 58));
+  CYC(b_+10, b_+13); SET_BC(0x1f3f);
   CALL_C(b_+13, ecom_randomBitwiseAndBCE_b0e_hook, SYM(ecom_randomBitwiseAndBCE_b0e), b_+16);
   CYC(b_+16, b_+18); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+18, b_+19); A = B;
@@ -525,7 +525,7 @@ void fireKeese_subid1_stateB_hook(GB *gb) {
   CYC(b_+36, b_+37); alu_or(gb, A);
   CYC(b_+37, b_+39); B = 0x20; // PART_FIRE
   if (F & FZ) CALL_C_CC(b_+39, ecom_spawnProjectile_b0e_hook, SYM(ecom_spawnProjectile_b0e), b_+42); else CYC(b_+39, b_+42); // call z
-  CYC(b_+42, SYM(fireKeese_subid1_stateC)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+42, b_+45); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:533e, bare global; jump-table target from fireKeese_subid1. Moving around randomly
@@ -543,7 +543,7 @@ void fireKeese_subid1_stateC_hook(GB *gb) {
   CYC(b_+12, b_+14);
 
   // 1 in 16 chance of changing angle (every 2 frames)
-  CYC(b_+14, b_+17); SET_BC((SYM(_drawObjectTerrainEffects__inAir) + 9));
+  CYC(b_+14, b_+17); SET_BC(0x0f1f);
   CALL_C(b_+17, ecom_randomBitwiseAndBCE_b0e_hook, SYM(ecom_randomBitwiseAndBCE_b0e), b_+20);
   CYC(b_+20, b_+21); alu_or(gb, B);
   if (!(F & FZ)) { RET_TAKEN(b_+21); return; } // ret nz
@@ -638,14 +638,14 @@ void fireKeese_checkCloseToLink_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = ENEMY_BASE + OBJ_YH;
-  CYC(b_+3, b_+5); A = hram_rd(gb, 0xb0); // hEnemyTargetY
+  CYC(b_+3, b_+5); A = mem_rd(gb, hEnemyTargetY); // hEnemyTargetY
   CYC(b_+5, b_+6); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+6, b_+8); alu_add(gb, 0x20);
   CYC(b_+8, b_+10); alu_cp(gb, 0x41);
   if (!(F & FC)) { RET_TAKEN(b_+10); return; } // ret nc
   CYC(b_+10, b_+11);
   CYC(b_+11, b_+13); L = ENEMY_BASE + OBJ_XH;
-  CYC(b_+13, b_+15); A = hram_rd(gb, 0xb1); // hEnemyTargetX
+  CYC(b_+13, b_+15); A = mem_rd(gb, hEnemyTargetX); // hEnemyTargetX
   CYC(b_+15, b_+16); alu_sub(gb, mem_rd(gb, HL));
   CYC(b_+16, b_+18); alu_add(gb, 0x20);
   CYC(b_+18, b_+20); alu_cp(gb, 0x41);
@@ -816,15 +816,15 @@ void fireKeese_moveTowardCenterIfOutOfBounds_hook(GB *gb) {
 outOfBounds:
   CYC(b_+13, b_+15); E = ENEMY_BASE + OBJ_YH;
   CYC(b_+15, b_+16); A = mem_rd(gb, DE);
-  CYC(b_+16, b_+18); hram_wr(gb, 0x8f, A); // hFF8F
+  CYC(b_+16, b_+18); mem_wr(gb, hFF8F, A); // hFF8F
   CYC(b_+18, b_+20); E = ENEMY_BASE + OBJ_XH;
   CYC(b_+20, b_+21); A = mem_rd(gb, DE);
-  CYC(b_+21, b_+23); hram_wr(gb, 0x8e, A); // hFF8E
+  CYC(b_+21, b_+23); mem_wr(gb, hFF8E, A); // hFF8E
 
   CYC(b_+23, b_+26); SET_BC((SYM(peahat_updatePosition) + 33)); // ((LARGE_ROOM_HEIGHT/2)<<4)+8, ((LARGE_ROOM_WIDTH/2)<<4)+8
   CALL_C(b_+26, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+29);
   CYC(b_+29, b_+30); C = A;
   CYC(b_+30, b_+32); B = 0x28; // SPEED_100
   CYC(b_+32, b_+34); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(b_+34, SYM(fireKeese_subid0_zOffsets)); objectApplyGivenSpeed_hook(gb); return; // jp
+  CYC(b_+34, b_+37); objectApplyGivenSpeed_hook(gb); return; // jp
 }

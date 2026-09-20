@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode0fPost), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode0fPost), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void itemInitializeFromLinkPosition_hook(GB *gb);
 

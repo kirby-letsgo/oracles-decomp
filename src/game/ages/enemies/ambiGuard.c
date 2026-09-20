@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode54), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode54), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void enemyCode54_hook(GB *gb);
 void ambiGuard_tossesLinkOut_hook(GB *gb);
@@ -96,8 +96,8 @@ normalStatus:
   CYC(b_+15, b_+17); E = ENEMY_BASE + OBJ_SUBID;
   CYC(b_+17, b_+18); A = mem_rd(gb, DE);
   CYC(b_+18, b_+19); alu_rlca(gb);
-  if (F & FC) { CYCT(b_+19, SYM(ambiGuard_tossesLinkOut)); ambiGuard_attacksLink_hook(gb); return; } // jp c
-  CYC(b_+19, SYM(ambiGuard_tossesLinkOut));
+  if (F & FC) { CYCT(b_+19, b_+22); ambiGuard_attacksLink_hook(gb); return; } // jp c
+  CYC(b_+19, b_+22);
   ambiGuard_tossesLinkOut_hook(gb); return; // fallthrough
 }
 
@@ -139,7 +139,7 @@ void ambiGuard_tossesLinkOut_uninitialized_hook(GB *gb) {
   CYC(b_+9, b_+10);
   CYC(b_+10, b_+12); E = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+12, b_+13); A = mem_rd(gb, DE);
-  CYC(b_+13, SYM(ambiGuard_state_galeSeed)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+13, b_+16); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:70f2, bare global; jump-table target from ambiGuard_tossesLinkOut/ambiGuard_attacksLink.
@@ -156,7 +156,7 @@ void ambiGuard_state_galeSeed_hook(GB *gb) {
   CYC(b_+8, b_+10); E = ENEMY_BASE + OBJ_VAR35;
   if (F & FZ) { CALL_C_CC(b_+10, ambiGuard_alertAllGuards_hook, SYM(ambiGuard_alertAllGuards), b_+13); } else { CYC(b_+10, b_+13); } // call z
   CALL_C(b_+13, decNumEnemies_hook, SYM(decNumEnemies), b_+16);
-  CYC(b_+16, SYM(ambiGuard_state_stub)); enemyDelete_hook(gb); return; // jp
+  CYC(b_+16, b_+19); enemyDelete_hook(gb); return; // jp
 }
 
 // 0e:7105, bare global; jump-table target from ambiGuard_tossesLinkOut/ambiGuard_attacksLink.
@@ -182,7 +182,7 @@ void ambiGuard_state8_hook(GB *gb) {
 reachedDestination8:
   CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   CYC(b_+15, b_+16); mem_wr(gb, HL, A);
-  CYC(b_+16, SYM(ambiGuard_state9)); ambiGuard_runMovementScript_hook(gb); return; // jp
+  CYC(b_+16, b_+19); ambiGuard_runMovementScript_hook(gb); return; // jp
 }
 
 // 0e:7119, bare global; jump-table target from ambiGuard_tossesLinkOut/ambiGuard_attacksLink.
@@ -202,7 +202,7 @@ void ambiGuard_state9_hook(GB *gb) {
 reachedDestination9:
   CYC(b_+14, b_+15); A = mem_rd(gb, HL);
   CYC(b_+15, b_+16); mem_wr(gb, DE, A);
-  CYC(b_+16, SYM(ambiGuard_stateA)); ambiGuard_runMovementScript_hook(gb); return; // jp
+  CYC(b_+16, b_+19); ambiGuard_runMovementScript_hook(gb); return; // jp
 }
 
 // 0e:712c, bare global; jump-table target from ambiGuard_tossesLinkOut/ambiGuard_attacksLink.
@@ -222,7 +222,7 @@ void ambiGuard_stateA_hook(GB *gb) {
 reachedDestinationA:
   CYC(b_+14, b_+15); A = mem_rd(gb, HL);
   CYC(b_+15, b_+16); mem_wr(gb, DE, A);
-  CYC(b_+16, SYM(ambiGuard_stateB)); ambiGuard_runMovementScript_hook(gb); return; // jp
+  CYC(b_+16, b_+19); ambiGuard_runMovementScript_hook(gb); return; // jp
 }
 
 // 0e:713f, bare global; jump-table target from ambiGuard_tossesLinkOut/ambiGuard_attacksLink.
@@ -242,7 +242,7 @@ void ambiGuard_stateB_hook(GB *gb) {
 reachedDestinationB:
   CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   CYC(b_+15, b_+16); mem_wr(gb, HL, A);
-  CYC(b_+16, SYM(ambiGuard_stateC)); ambiGuard_runMovementScript_hook(gb); return; // jp
+  CYC(b_+16, b_+19); ambiGuard_runMovementScript_hook(gb); return; // jp
 }
 
 // 0e:7152, bare global; jump-table target from ambiGuard_tossesLinkOut/ambiGuard_attacksLink
@@ -251,8 +251,8 @@ void ambiGuard_stateC_hook(GB *gb) {
   BASE(ambiGuard_stateC);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+3);
-  if (F & FZ) { CYCT(b_+3, SYM(ambiGuard_animate)); ambiGuard_runMovementScript_hook(gb); return; } // jp z
-  CYC(b_+3, SYM(ambiGuard_animate));
+  if (F & FZ) { CYCT(b_+3, b_+6); ambiGuard_runMovementScript_hook(gb); return; } // jp z
+  CYC(b_+3, b_+6);
   ambiGuard_animate_hook(gb); return; // fallthrough
 }
 
@@ -266,7 +266,7 @@ void ambiGuard_stateE_hook(GB *gb) {
 // ambiGuard_state8/9/A/B.
 void ambiGuard_animate_hook(GB *gb) {
   BASE(ambiGuard_animate);
-  CYC(b_+0, SYM(ambiGuard_stateD)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:715b, bare global; jump-table target from ambiGuard_tossesLinkOut/ambiGuard_attacksLink.
@@ -288,7 +288,7 @@ void ambiGuard_stateD_hook(GB *gb) {
   CYC(b_+15, b_+16); mem_wr(gb, HL, A);
   CYC(b_+16, b_+18); A = alu_swap(gb, A);
   CYC(b_+18, b_+19); alu_rlca(gb);
-  CYC(b_+19, SYM(ambiGuard_tossesLinkOut_stateF)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+19, b_+22); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:7171, bare global; jump-table target from ambiGuard_tossesLinkOut. Begin moving toward
@@ -303,7 +303,7 @@ void ambiGuard_tossesLinkOut_stateF_hook(GB *gb) {
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x5a); // 90
   CALL_C(b_+7, ambiGuard_turnToFaceLink_hook, SYM(ambiGuard_turnToFaceLink), b_+10);
   CYC(b_+10, b_+12); A = 0xcc; // SND_WHISTLE
-  CYC(b_+12, SYM(ambiGuard_tossesLinkOut_state10)); playSound_b00_hook(gb); return; // jp
+  CYC(b_+12, b_+15); playSound_b00_hook(gb); return; // jp
 }
 
 // 0e:7180, bare global; jump-table target from ambiGuard_tossesLinkOut. Moving toward Link
@@ -376,7 +376,7 @@ void ambiGuard_attacksLink_state_uninitialized_hook(GB *gb) {
   CYC(b_+19, b_+20);
   CYC(b_+20, b_+22); E = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+22, b_+23); A = mem_rd(gb, DE);
-  CYC(b_+23, SYM(ambiGuard_attacksLink_stateF)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+23, b_+26); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:71df, bare global; jump-table target from ambiGuard_attacksLink. Just noticed Link.
@@ -395,7 +395,7 @@ void ambiGuard_attacksLink_stateF_hook(GB *gb) {
 
 haveCounter2:
   CALL_C(b_+11, ambiGuard_createExclamationMark_hook, SYM(ambiGuard_createExclamationMark), b_+14);
-  CYC(b_+14, SYM(ambiGuard_attacksLink_state10)); ambiGuard_turnToFaceLink_hook(gb); return; // jr
+  CYC(b_+14, b_+16); ambiGuard_turnToFaceLink_hook(gb); return; // jr
 }
 
 // 0e:71ef, bare global; jump-table target from ambiGuard_attacksLink. Looking at Link;
@@ -423,7 +423,7 @@ beginChasing:
   CYC(b_+24, b_+26); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+26, b_+28); mem_wr(gb, HL, 0x3c); // SPEED_180
   CYC(b_+28, b_+30); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
-  CYC(b_+30, SYM(ambiGuard_turnToFaceLink)); mem_wr(gb, HL, 0x3d); // ENEMYCOLLISION_AMBI_GUARD_CHASING_LINK
+  CYC(b_+30, b_+32); mem_wr(gb, HL, 0x3d); // ENEMYCOLLISION_AMBI_GUARD_CHASING_LINK
   ambiGuard_turnToFaceLink_hook(gb); return; // fallthrough
 }
 
@@ -435,7 +435,7 @@ void ambiGuard_turnToFaceLink_hook(GB *gb) {
   CALL_C(b_+0, ecom_updateCardinalAngleTowardTarget_b0e_hook, SYM(ecom_updateCardinalAngleTowardTarget_b0e), b_+3);
   CYC(b_+3, b_+5); A = alu_swap(gb, A);
   CYC(b_+5, b_+6); alu_rlca(gb);
-  CYC(b_+6, SYM(ambiGuard_attacksLink_state11)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+6, b_+9); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:7218, bare global; jump-table target from ambiGuard_attacksLink. Currently chasing
@@ -451,7 +451,7 @@ void ambiGuard_attacksLink_state11_hook(GB *gb) {
 
 stillChasing:
   CALL_C(b_+10, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0e), b_+13);
-  CYC(b_+13, SYM(ambiGuard_commonInitialization)); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+13, b_+16); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:7228, bare global; called from ambiGuard_tossesLinkOut_uninitialized and
@@ -510,7 +510,7 @@ void ambiGuard_runMovementScript_hook(GB *gb) {
   CYC(b_+6, b_+8); alu_and(gb, 0x18);
   CYC(b_+8, b_+10); A = alu_swap(gb, A);
   CYC(b_+10, b_+11); alu_rlca(gb);
-  CYC(b_+11, SYM(ambiGuard_checkAlertTrigger)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+11, b_+14); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:7269, bare global; called from ambiGuard_tossesLinkOut and ambiGuard_attacksLink. When
@@ -553,7 +553,7 @@ stillCountingDown:
   CYC(b_+33, b_+34);
   CYC(b_+34, b_+36); A = 0xce; // SND_MAKU_TREE_PAST
   CALL_C(b_+36, playSound_b00_hook, SYM(playSound_b00), b_+39);
-  CYC(b_+39, SYM(ambiGuard_alertAllGuards)); E = ENEMY_BASE + OBJ_VAR35;
+  CYC(b_+39, b_+41); E = ENEMY_BASE + OBJ_VAR35;
   ambiGuard_alertAllGuards_hook(gb); return; // fallthrough
 }
 
@@ -720,7 +720,7 @@ haventSeenLinkYet:
   CYC(b_+148, b_+149); alu_xor(gb, A);
   CYC(b_+149, b_+150); mem_wr(gb, DE, A);
   CYC(b_+150, b_+152); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(b_+152, SYM(ambiGuard_createExclamationMark)); mem_wr(gb, HL, 0x32); // SPEED_140
+  CYC(b_+152, b_+154); mem_wr(gb, HL, 0x32); // SPEED_140
   ambiGuard_createExclamationMark_hook(gb); return; // fallthrough
 }
 
@@ -731,7 +731,7 @@ void ambiGuard_createExclamationMark_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); A = 0x2d;
   CYC(b_+2, b_+5); SET_BC(0xf408);
-  CYC(b_+5, SYM(ambiGuard_collisionOccured)); objectCreateExclamationMark_hook(gb); return; // jp
+  CYC(b_+5, b_+8); objectCreateExclamationMark_hook(gb); return; // jp
 }
 
 // 0e:7357, bare global; called from enemyCode54.
@@ -763,7 +763,7 @@ void ambiGuard_collisionOccured_hook(GB *gb) {
   CYC(b_+24, b_+26); mem_wr(gb, HL, 0x5a); // [var36] = 90
   CYC(b_+26, b_+28); L = ENEMY_BASE + OBJ_KNOCKBACK_ANGLE;
   CYC(b_+28, b_+29); A = mem_rd(gb, HL);
-  CYC(b_+29, SYM(ambiGuard_setAngle)); alu_xor(gb, 0x10);
+  CYC(b_+29, b_+31); alu_xor(gb, 0x10);
   ambiGuard_setAngle_hook(gb); return; // fallthrough
 }
 
@@ -779,7 +779,7 @@ void ambiGuard_setAngle_hook(GB *gb) {
   CYC(b_+6, b_+7); mem_wr(gb, DE, A);
   CYC(b_+7, b_+9); A = alu_swap(gb, A);
   CYC(b_+9, b_+10); alu_rlca(gb);
-  CYC(b_+10, SYM(ambiGuard_directAttackOccurred)); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+10, b_+13); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:7383, bare global; falls into from ambiGuard_collisionOccured. A collision with one of
@@ -789,7 +789,7 @@ void ambiGuard_directAttackOccurred_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_VAR34;
   CYC(b_+2, b_+4); A = 0x01;
-  CYC(b_+4, SYM(ambiGuard_setCounter2ForAttackingTypeOnly)); mem_wr(gb, DE, A);
+  CYC(b_+4, b_+5); mem_wr(gb, DE, A);
   ambiGuard_setCounter2ForAttackingTypeOnly_hook(gb); return; // fallthrough
 }
 

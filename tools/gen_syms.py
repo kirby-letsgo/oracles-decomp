@@ -7,7 +7,7 @@ src/hooks/ram_syms.txt (written by tools/gen_ram.py). A label that a game does n
 poison value 0xffffffff there; a hook that reaches it would burn at address 0xffff in bank 0xff.
 Labels with several copies in Ages are paired with Seasons copies by bank order.
 """
-import os, sys
+import os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from symfiles import rom_labels
 
@@ -25,6 +25,7 @@ for line in open('src/hooks/syms_used.txt'):
     a_inst = ages.get(parent, [])
     rank = [b for b, a in a_inst].index(bank) if bank in [b for b, a in a_inst] else 0
     s_inst = seasons.get(name, [])
+    if re.match(r'^(_label_[0-9a-f]{2}_\d+|func_[0-9a-f]{2}_[0-9a-f]{4}|label_[0-9a-f]{2}_\d+)', parent): s_inst = []
     if len(s_inst) == len(a_inst) and s_inst: s = s_inst[rank]
     elif len(s_inst) == 1: s = s_inst[0]
     elif s_inst and len(s_inst) == len(seasons.get(parent, [])) and rank < len(s_inst): s = s_inst[rank]
@@ -45,7 +46,8 @@ with open('src/game/syms.h', 'w') as h:
     h.write('extern const uint32_t *game_syms;\nextern const uint32_t *game_ram;\n')
     h.write('#define SYM(l) ((uint16_t)game_syms[S_##l])\n')
     h.write('#define SYMBANK(l) ((uint8_t)(game_syms[S_##l] >> 16))\n')
-    h.write('#define BASE(l) const uint16_t b_ = SYM(l)\n')
+    h.write('#define BASE(l) const uint16_t b_ = SYM(l); const uint8_t bk_ = SYMBANK(l); (void)bk_\n')
+    h.write('#define BANKOF(l) const uint8_t bk_ = SYMBANK(l); (void)bk_\n')
     h.write('#define RAMSYM(i) ((uint16_t)game_ram[i])\n')
     h.write('#define RAMBANK(i) (game_ram[i] >> 16)\n')
     h.write('void syms_select(int seasons);\n')

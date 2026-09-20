@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode1d), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode1d), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 static void enemySword_addAToHl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -55,7 +55,7 @@ L_5294:
   CYC(b_+177, b_+179); A = (uint8_t)(A & ~(1 << 7));
   CYC(b_+179, b_+180); mem_wr(gb, DE, A);
   CYC(b_+180, b_+181); alu_xor(gb, A);
-  CYC(b_+181, SYM(partCode1e)); return; // ret
+  CYC(b_+181, b_+182); return; // ret
 }
 
 void partCode1d_hook(GB *gb) {

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(objectCreateExclamationMark_body), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(objectCreateExclamationMark_body), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 void objectCreateExclamationMark_body_hook(GB *gb) {
   BASE(objectCreateExclamationMark_body);
@@ -25,7 +25,7 @@ void objectCreateExclamationMark_body_hook(GB *gb) {
   CYC(b_+17, b_+19); A = 0x50;
   CALL_ROM(b_+19, SYM(playSound_b00));
   CYC(b_+22, b_+23); SET_HL(pop_effect(gb));
-  CYC(b_+23, SYM(objectCreateFloatingImage)); ret_effect(gb);
+  CYC(b_+23, b_+24); ret_effect(gb);
 }
 
 void objectCreateFloatingImage_hook(GB *gb) {
@@ -43,7 +43,7 @@ void objectCreateFloatingImage_hook(GB *gb) {
   CYC(b_+9, b_+10); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+10, b_+12); A = H8(hFF8B);
   CYC(b_+12, b_+13); mem_wr(gb, HL, A);
-  CYC(b_+13, SYM(interactionCodea0)); objectCopyPositionWithOffset_hook(gb);
+  CYC(b_+13, b_+16); objectCopyPositionWithOffset_hook(gb);
 }
 
 static uint16_t exclamation_jump_table(GB *gb) {
@@ -98,7 +98,7 @@ void interactionCode9f__state1_hook(GB *gb) {
     return;
   }
   CYC(b_+31, b_+34);
-  CYC(b_+34, SYM(objectCreateExclamationMark_body)); interactionDelete_hook(gb);
+  CYC(b_+34, b_+37); interactionDelete_hook(gb);
 }
 
 void interactionCode9f_hook(GB *gb) {

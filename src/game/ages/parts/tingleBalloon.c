@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, SYMBANK(partCode44), (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode44), (from), (to), true)
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // PART_TINGLE_BALLOON
 void partCode44_hook(GB *gb) {
@@ -68,5 +68,5 @@ beenHit:
   CYC(b_+79, b_+81); mem_wr(gb, HL, 0x01);
   CYC(b_+81, b_+84); SET_BC(0xf000);
   CALL_C(b_+84, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+87);
-  CYC(b_+87, SYM(partCode45)); partDelete_hook(gb); return; // jp
+  CYC(b_+87, b_+90); partDelete_hook(gb); return; // jp
 }
