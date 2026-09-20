@@ -3564,7 +3564,7 @@ void getNameBufferLength_hook(GB *gb) {
     CYC(b_+22, b_+23); mem_wr(gb, HL, A); L = alu_dec8(gb, L);
     CYC(b_+23, b_+24); B = alu_dec8(gb, B);
     if (!(F & FZ)) { CYCT(b_+24, b_+26); continue; }
-    CYC(b_+24, b_+26); ret_effect(gb); return;
+    CYC(b_+24, b_+26); RET(b_+26); return;
   }
 }
 

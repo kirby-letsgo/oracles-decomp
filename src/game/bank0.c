@@ -8496,6 +8496,9 @@ void setWarpDestVariables_hook(GB *gb) {
   B = 0x05;
   CYC(b_+0, b_+9);
   copyMemory(gb, DE, HL, 5);
+  A = mem_rd(gb, HL + 4);
+  B = 0;
+  F = (F & FC) | FZ | FN;
   SET_HL(HL + 5);
   SET_DE(de);
   CYC(b_+9, b_+11);

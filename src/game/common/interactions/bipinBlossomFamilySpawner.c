@@ -135,7 +135,7 @@ void childSetVar38ToNumEssencesObtained_hook(GB *gb) {
       CYCT(b_+18, b_+20);
       continue;
     }
-    CYC(b_+18, b_+20); ret_effect(gb);
+    CYC(b_+18, b_+20); RET(b_+20);
     return;
   }
 }

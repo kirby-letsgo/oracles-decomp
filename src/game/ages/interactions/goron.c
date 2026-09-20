@@ -213,7 +213,7 @@ void goronDance_checkInputNotTooEarlyOrLate_hook(GB *gb) {
   CALL_C(b_+28, compareHlToBc_hook, SYM(compareHlToBc), b_+31);
   CYC(b_+31, b_+33); alu_cp(gb, 0xff);
   if (F & FZ) { CYCT(b_+33, b_+35); goto too_late; }
-  CYC(b_+33, b_+35); ret_effect(gb); return;
+  CYC(b_+33, b_+35); RET(b_+35); return;
 too_early:
   CYC(b_+36, b_+38); A = 0;
   CYC(b_+38, b_+41); W8(wTmpcfc0_goronDance_failureType) = A;

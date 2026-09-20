@@ -1965,7 +1965,7 @@ void label_3f_160_hook(GB *gb) {
     CYC(b_+6, b_+7); A = L;
     CYC(b_+7, b_+9); alu_and(gb, 0x07);
     if (!(F & FZ)) { CYCT(b_+9, b_+11); continue; }
-    CYC(b_+9, b_+11); ret_effect(gb);
+    CYC(b_+9, b_+11); RET(b_+11);
     return;
   }
 }

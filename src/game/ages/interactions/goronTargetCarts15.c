@@ -315,5 +315,5 @@ nextCrystal:
   CYC(b_+22, b_+23); A = alu_inc8(gb, A);
   CYC(b_+23, b_+25); alu_cp(gb, 0x05);
   if (!(F & FZ)) { CYCT(b_+25, b_+27); goto loop; }
-  CYC(b_+25, b_+27); ret_effect(gb);
+  CYC(b_+25, b_+27); RET(b_+27);
 }
