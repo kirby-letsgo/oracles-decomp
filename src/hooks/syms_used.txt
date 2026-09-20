@@ -67,6 +67,7 @@ _updateInteractionsIfStateIsZero _updateInteractionsIfStateIsZero 00:3b13
 _updateInteractionsIfStateIsZero__next _updateInteractionsIfStateIsZero@next 00:3b2e
 ackPacket ackPacket 16:44fd
 add16BitRefs add16BitRefs 00:23a7
+addAToBc addAToBc 00:006d
 addDecimalToHlRef addDecimalToHlRef 00:0181
 addDoubleIndexToBc addDoubleIndexToBc 00:007e
 addFunctionsToVBlankQueue addFunctionsToVBlankQueue 01:45c4

@@ -72,6 +72,419 @@ void tokayRunSubid1a_hook(GB *gb);
 void tokayRunStinkBagCutscene_hook(GB *gb);
 void tokayLoadScript_hook(GB *gb);
 
+// interactionCode48@initSubid0d: the past NPC running the wild Tokay game; also called from
+// @initSubid19. Ends in tokayLoadScript, whose ret pops the caller's address.
+static void tokay_init_subid0d(GB *gb) {
+  BASE(interactionCode48__initSubid);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CALL_C(b_+408, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+411);
+  alu_bit(gb, 6, A);
+  CYC(b_+411, b_+413);
+  if (F & FZ) CYCT(b_+413, b_+415);
+  else {
+    CYC(b_+413, b_+415);
+    A = 0x81;
+    CYC(b_+415, b_+417);
+    CYC(b_+417, b_+420); mem_wr(gb, wDisabledObjects, A);
+    CYC(b_+420, b_+423); mem_wr(gb, wMenuDisabled, A);
+    SET_HL(w1Link_yh);
+    CYC(b_+423, b_+426);
+    CYC(b_+426, b_+428); mem_wr(gb, HL, 0x48);
+    L = w1Link_xh & 0xff;
+    CYC(b_+428, b_+430);
+    CYC(b_+430, b_+432); mem_wr(gb, HL, 0x50);
+    alu_xor(gb, A);
+    L = w1Link_direction & 0xff;
+    CYC(b_+432, b_+435);
+    CYC(b_+435, b_+436); mem_wr(gb, HL, A);
+  }
+  H = D;
+  L = INTERACTION_BASE + OBJ_OAM_FLAGS;
+  CYC(b_+436, b_+439);
+  CYC(b_+439, b_+441); mem_wr(gb, HL, 0x03);
+  CYC(b_+441, b_+444);
+  tokayLoadScript_hook(gb);
+}
+
+// interactionCode48@initSubid: per-subid initialisation of the Tokay interaction, reached
+// through the 32-entry jump table; the caller pushed the return address each path pops.
+static void tokay_init_subid(GB *gb) {
+  BASE(interactionCode48__initSubid);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (tokay_jump_table(gb));
+    if (jt_ == b_+68) { goto subid00; }
+    else if (jt_ == b_+72) { goto subid01; }
+    else if (jt_ == b_+76) { goto subid02; }
+    else if (jt_ == b_+124) { goto subid1d; }
+    else if (jt_ == b_+167) { goto subid07; }
+    else if (jt_ == b_+173) { goto subid06; }
+    else if (jt_ == b_+263) { goto subid11; }
+    else if (jt_ == b_+281) { goto subid1e; }
+    else if (jt_ == b_+290) { goto subid0f; }
+    else if (jt_ == b_+294) { goto subid10; }
+    else if (jt_ == b_+316) { goto subid0e; }
+    else if (jt_ == b_+321) { goto subid05; }
+    else if (jt_ == b_+333) { goto subid0b; }
+    else if (jt_ == b_+363) { goto subid0c; }
+    else if (jt_ == b_+408) { tokay_init_subid0d(gb); return; }
+    else if (jt_ == b_+444) { goto subid12; }
+    else if (jt_ == b_+467) { goto subid19; }
+    else if (jt_ == b_+473) { goto subid1a; }
+    else if (jt_ == b_+486) { goto subid1c; }
+    else if (jt_ == b_+494) { goto subid1b; }
+    else if (jt_ == b_+495) { goto subid1f; }
+    else { HANDOFF(jt_); }
+  } while (0);
+subid00:
+  A = 0x01;
+  CYC(b_+68, b_+70);
+  CYCT(b_+70, b_+72);
+  goto initLinkRobberyTokay;
+subid01:
+  A = 0x03;
+  CYC(b_+72, b_+74);
+  CYCT(b_+74, b_+76);
+  goto initLinkRobberyTokay;
+subid02:
+  CALL_C(b_+76, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+79);
+  alu_bit(gb, 6, A);
+  CYC(b_+79, b_+81);
+  if (!(F & FZ)) { CYCT(b_+81, b_+84); goto deleteSelf; }
+  CYC(b_+81, b_+84);
+  alu_xor(gb, A);
+  CYC(b_+84, b_+85);
+  CALL_C(b_+85, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+88);
+  CALL_C(b_+88, tokayLoadScript_hook, SYM(tokayLoadScript), b_+91);
+  A = 0x08;
+  CYC(b_+91, b_+93);
+  CALL_C(b_+93, setLinkIDOverride_hook, SYM(setLinkIDOverride), b_+96);
+  L = w1Link_subid & 0xff;
+  CYC(b_+96, b_+98);
+  CYC(b_+98, b_+100); mem_wr(gb, HL, 0x07);
+  E = INTERACTION_BASE + OBJ_VAR38;
+  A = 0x46;
+  CYC(b_+100, b_+104);
+  CYC(b_+104, b_+105); mem_wr(gb, DE, A);
+  A = 0xf0;
+  CYC(b_+105, b_+107);
+  CYC(b_+107, b_+110);
+  playSound_b00_hook(gb);
+  return;
+initLinkRobberyTokay:
+  CALL_C(b_+110, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+113);
+  CALL_C(b_+113, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+116);
+  alu_bit(gb, 6, A);
+  CYC(b_+116, b_+118);
+  if (!(F & FZ)) { CYCT(b_+118, b_+121); goto deleteSelf; }
+  CYC(b_+118, b_+121);
+  CYC(b_+121, b_+124);
+  tokayLoadScript_hook(gb);
+  return;
+subid1d:
+  CALL_C(b_+124, tokayLoadScript_hook, SYM(tokayLoadScript), b_+127);
+  CALL_C(b_+127, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+130);
+  alu_bit(gb, 6, A);
+  A = 0x02;
+  CYC(b_+130, b_+134);
+  if (!(F & FZ)) { CYCT(b_+134, b_+137); interactionSetAnimation_hook(gb); return; }
+  CYC(b_+134, b_+137);
+  B = 0x14;
+  CYC(b_+137, b_+139);
+  CYC(b_+139, b_+142); A = mem_rd(gb, wShieldLevel);
+  alu_cp(gb, 0x02);
+  CYC(b_+142, b_+144);
+  if (F & FC) CYCT(b_+144, b_+146);
+  else {
+    CYC(b_+144, b_+146);
+    B = 0x15;
+    CYC(b_+146, b_+148);
+  }
+  A = B;
+  E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+148, b_+151);
+  CYC(b_+151, b_+152); mem_wr(gb, DE, A);
+  CALL_C(b_+152, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+155);
+  if (!(F & FZ)) { CYCT(b_+155, b_+156); ret_effect(gb); return; }
+  CYC(b_+155, b_+156);
+  L = alu_inc8(gb, L);
+  CYC(b_+156, b_+157);
+  CYC(b_+157, b_+158); mem_wr(gb, HL, B);
+  L = alu_dec8(gb, L);
+  CYC(b_+158, b_+159);
+  CALL_C(b_+159, tokayInitAccessory_hook, SYM(tokayInitAccessory), b_+162);
+  A = 0x06;
+  CYC(b_+162, b_+164);
+  CYC(b_+164, b_+167);
+  interactionSetAnimation_hook(gb);
+  return;
+subid07:
+  CALL_C(b_+167, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+170);
+  if (!(F & FZ)) { CYCT(b_+170, b_+173); interactionDelete_hook(gb); return; }
+  CYC(b_+170, b_+173);
+subid06:
+  CALL_C(b_+173, tokayLoadScript_hook, SYM(tokayLoadScript), b_+176);
+  H = D;
+  L = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+176, b_+179);
+  CYC(b_+179, b_+180); A = mem_rd(gb, HL);
+  alu_sub(gb, 0x06);
+  SET_BC(SYM(tokayIslandStolenItems));
+  CYC(b_+180, b_+185);
+  CALL_C(b_+185, addAToBc_hook, SYM(addAToBc), b_+188);
+  CYC(b_+188, b_+189); A = mem_rd(gb, BC);
+  L = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+189, b_+191);
+  CYC(b_+191, b_+192); mem_wr(gb, HL, A);
+  C = 0x00;
+  CYC(b_+192, b_+194);
+  CALL_C(b_+194, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+197);
+  alu_bit(gb, 6, A);
+  CYC(b_+197, b_+199);
+  if (F & FZ) { CYCT(b_+199, b_+201); goto endLoop; }
+  CYC(b_+199, b_+201);
+  C = alu_inc8(gb, C);
+  B = 0x09;
+  CYC(b_+201, b_+204);
+  for (;;) {
+    A = B;
+    A = alu_dec8(gb, A);
+    SET_HL(SYM(tokayIslandStolenItems));
+    CYC(b_+204, b_+209);
+    CYC(b_+209, b_+210); tokay_add_a_to_hl(gb, b_+210);
+    CYC(b_+210, b_+211); A = mem_rd(gb, HL);
+    alu_cp(gb, 0x01);
+    CYC(b_+211, b_+213);
+    if (F & FZ) CYCT(b_+213, b_+215);
+    else {
+      CYC(b_+213, b_+215);
+      CALL_C(b_+215, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+218);
+      if (!(F & FC)) { CYCT(b_+218, b_+221); goto endLoop; }
+      CYC(b_+218, b_+221);
+    }
+    B = alu_dec8(gb, B);
+    CYC(b_+221, b_+222);
+    if (B) { CYCT(b_+222, b_+224); continue; }
+    CYC(b_+222, b_+224);
+    break;
+  }
+  C = alu_inc8(gb, C);
+  CYC(b_+224, b_+225);
+endLoop:
+  A = C;
+  E = INTERACTION_BASE + OBJ_VAR3C;
+  CYC(b_+225, b_+228);
+  CYC(b_+228, b_+229); mem_wr(gb, DE, A);
+  alu_or(gb, A);
+  CYC(b_+229, b_+230);
+  if (!(F & FZ)) {
+    CYCT(b_+230, b_+232);
+    A = 0x02;
+    CYC(b_+258, b_+260);
+    CYC(b_+260, b_+263);
+    interactionSetAnimation_hook(gb);
+    return;
+  }
+  CYC(b_+230, b_+232);
+  A = 0x06;
+  CYC(b_+232, b_+234);
+  CALL_C(b_+234, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+237);
+  E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+237, b_+239);
+  CYC(b_+239, b_+240); A = mem_rd(gb, DE);
+  B = 0x0a;
+  alu_cp(gb, 0x07);
+  CYC(b_+240, b_+244);
+  if (F & FZ) CYCT(b_+244, b_+246);
+  else {
+    CYC(b_+244, b_+246);
+    B = 0x0b;
+    CYC(b_+246, b_+248);
+  }
+  H = D;
+  L = INTERACTION_BASE + OBJ_TEXT_ID;
+  CYC(b_+248, b_+251);
+  CYC(b_+251, b_+252); mem_wr(gb, HL, B);
+  alu_sub(gb, 0x06);
+  B = A;
+  CYC(b_+252, b_+255);
+  CYC(b_+255, b_+258);
+  tokayInitHeldItem_hook(gb);
+  return;
+subid11:
+  CALL_C(b_+263, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+266);
+  alu_bit(gb, 7, A);
+  CYC(b_+266, b_+268);
+  if (F & FZ) { CYCT(b_+268, b_+270); goto subid0e; }
+  CYC(b_+268, b_+270);
+  E = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+270, b_+272);
+  CYC(b_+272, b_+273); A = mem_rd(gb, DE);
+  alu_add(gb, 0x10);
+  CYC(b_+273, b_+275);
+  CYC(b_+275, b_+276); mem_wr(gb, DE, A);
+  CALL_C(b_+276, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+279);
+  CYCT(b_+279, b_+281);
+  goto subid0e;
+subid1e:
+  CALL_C(b_+281, objectMakeTileSolid_hook, SYM(objectMakeTileSolid), b_+284);
+  H = wRoomLayout >> 8;
+  CYC(b_+284, b_+286);
+  CYC(b_+286, b_+288); mem_wr(gb, HL, 0x00);
+  CYCT(b_+288, b_+290);
+  goto subid0e;
+subid0f:
+  A = 0x01;
+  CYC(b_+290, b_+292);
+  CYCT(b_+292, b_+294);
+  goto eatDimitri;
+subid10:
+  alu_xor(gb, A);
+  CYC(b_+294, b_+295);
+eatDimitri:
+  CALL_C(b_+295, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+298);
+  SET_HL(wDimitriState);
+  CYC(b_+298, b_+301);
+  CYC(b_+301, b_+303); alu_bit(gb, 1, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+303, b_+305); goto deleteSelf; }
+  CYC(b_+303, b_+305);
+  L = wEssencesObtained & 0xff;
+  CYC(b_+305, b_+307);
+  CYC(b_+307, b_+309); alu_bit(gb, 2, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+309, b_+311); goto deleteSelf; }
+  CYC(b_+309, b_+311);
+  E = INTERACTION_BASE + OBJ_SPEED;
+  A = 0x50;
+  CYC(b_+311, b_+315);
+  CYC(b_+315, b_+316); mem_wr(gb, DE, A);
+subid0e:
+  A = 0x06;
+  CYC(b_+316, b_+318);
+  CALL_C(b_+318, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+321);
+subid05:
+  CALL_C(b_+321, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+324);
+  CALL_C(b_+324, tokayLoadScript_hook, SYM(tokayLoadScript), b_+327);
+  CYC(b_+327, b_+330);
+  tokayState1_hook(gb);
+  return;
+deleteSelf:
+  CYC(b_+330, b_+333);
+  interactionDelete_hook(gb);
+  return;
+subid0b:
+  CALL_C(b_+333, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+336);
+  if (F & FZ) { CYCT(b_+336, b_+339); interactionDelete_hook(gb); return; }
+  CYC(b_+336, b_+339);
+  A = 0x15;
+  CYC(b_+339, b_+341);
+  CALL_C(b_+341, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+344);
+  if (F & FC) { CYCT(b_+344, b_+347); interactionDelete_hook(gb); return; }
+  CYC(b_+344, b_+347);
+  CALL_C(b_+347, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+350);
+  alu_bit(gb, 7, A);
+  CYC(b_+350, b_+352);
+  if (!(F & FZ)) { CYCT(b_+352, b_+355); interactionDelete_hook(gb); return; }
+  CYC(b_+352, b_+355);
+  A = 0x01;
+  CYC(b_+355, b_+357);
+  CYC(b_+357, b_+360); mem_wr(gb, wDiggingUpEnemiesForbidden, A);
+  CYC(b_+360, b_+363);
+  tokayLoadScript_hook(gb);
+  return;
+subid0c:
+  H = D;
+  CYC(b_+363, b_+364);
+  CYC(b_+364, b_+367); A = mem_rd(gb, wTmpcfc0_wildTokay_cfdf);
+  alu_or(gb, A);
+  CYC(b_+367, b_+368);
+  if (F & FZ) CYCT(b_+368, b_+370);
+  else {
+    CYC(b_+368, b_+370);
+    L = INTERACTION_BASE + OBJ_OAM_FLAGS;
+    CYC(b_+370, b_+372);
+    CYC(b_+372, b_+374); mem_wr(gb, HL, 0x02);
+  }
+  L = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+374, b_+376);
+  CYC(b_+376, b_+378); mem_wr(gb, HL, 0x10);
+  L = INTERACTION_BASE + OBJ_COUNTER2;
+  CYC(b_+378, b_+380);
+  CYC(b_+380, b_+381); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  L = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+381, b_+383);
+  CYC(b_+383, b_+384); A = mem_rd(gb, HL);
+  alu_cp(gb, 0x88);
+  CYC(b_+384, b_+386);
+  if (F & FZ) CYCT(b_+386, b_+388);
+  else {
+    CYC(b_+386, b_+388);
+    L = INTERACTION_BASE + OBJ_DIRECTION;
+    CYC(b_+388, b_+390);
+    CYC(b_+390, b_+391); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  }
+  CYC(b_+391, b_+394); A = mem_rd(gb, wWildTokayGameLevel);
+  SET_HL(b_+403);
+  CYC(b_+394, b_+397);
+  CYC(b_+397, b_+398); tokay_add_a_to_hl(gb, b_+398);
+  CYC(b_+398, b_+399); A = mem_rd(gb, HL);
+  E = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+399, b_+401);
+  CYC(b_+401, b_+402); mem_wr(gb, DE, A);
+  CYC(b_+402, b_+403); ret_effect(gb);
+  return;
+subid12:
+  E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+444, b_+446);
+  CYC(b_+446, b_+447); A = mem_rd(gb, DE);
+  alu_sub(gb, 0x12);
+  SET_HL(b_+460);
+  CYC(b_+447, b_+452);
+  CYC(b_+452, b_+453); tokay_add_a_to_hl(gb, b_+453);
+  E = INTERACTION_BASE + OBJ_TEXT_ID;
+  CYC(b_+453, b_+455);
+  CYC(b_+455, b_+456); A = mem_rd(gb, HL);
+  CYC(b_+456, b_+457); mem_wr(gb, DE, A);
+  CYC(b_+457, b_+460);
+  tokayLoadScript_hook(gb);
+  return;
+subid19:
+  CYC(b_+467, b_+470); push_effect(gb, b_+470);
+  tokay_init_subid0d(gb);
+  CYC(b_+470, b_+473);
+  tokayLoadScript_hook(gb);
+  return;
+subid1a:
+  E = INTERACTION_BASE + OBJ_OAM_FLAGS;
+  A = 0x02;
+  CYC(b_+473, b_+477);
+  CYC(b_+477, b_+478); mem_wr(gb, DE, A);
+  E = INTERACTION_BASE + OBJ_ANIM_COUNTER;
+  A = 0x01;
+  CYC(b_+478, b_+482);
+  CYC(b_+482, b_+483); mem_wr(gb, DE, A);
+  CYC(b_+483, b_+486);
+  interactionAnimate_hook(gb);
+  return;
+subid1c:
+  A = 0x09;
+  CYC(b_+486, b_+488);
+  CALL_C(b_+488, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+491);
+  CALL_C(b_+491, tokayInitMeatAccessory_hook, SYM(tokayInitMeatAccessory), b_+494);
+subid1b:
+  CYC(b_+494, b_+495); ret_effect(gb);
+  return;
+subid1f:
+  E = INTERACTION_BASE + OBJ_TEXT_ID;
+  A = 0x6c;
+  CYC(b_+495, b_+499);
+  CYC(b_+499, b_+500); mem_wr(gb, DE, A);
+  CYC(b_+500, b_+503);
+  tokayLoadScript_hook(gb);
+}
+
 void interactionCode48_hook(GB *gb) {
   BASE(interactionCode48);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -85,7 +498,8 @@ void interactionCode48_hook(GB *gb) {
   CALL_C(b_+14, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+17);
   CYC(b_+17, b_+19); A = 0x0a;
   CALL_C(b_+19, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+22);
-  CALL_ROM(b_+22, b_+33);
+  CYC(b_+22, b_+25); push_effect(gb, b_+25);
+  tokay_init_subid(gb);
   CYC(b_+25, b_+27); E = 0x40;
   CYC(b_+27, b_+28); A = mem_rd(gb, DE);
   CYC(b_+28, b_+29); alu_or(gb, A);
@@ -573,6 +987,40 @@ void tokayRunSubid1a_hook(GB *gb) {
   CYC(b_+5, b_+8); interactionDelete_hook(gb);
 }
 
+// tokayRunStinkBagCutscene@initJumpVariables: loads angle, speedZ and gravity for jump var3b
+// from @jumpPaths.
+static void tokay_init_jump_variables(GB *gb) {
+  BASE(tokayRunStinkBagCutscene__initJumpVariables);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  H = D;
+  L = INTERACTION_BASE + OBJ_VAR3B;
+  CYC(b_+0, b_+3);
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
+  alu_add(gb, A);
+  SET_BC(SYM(tokayRunStinkBagCutscene__jumpPaths));
+  CYC(b_+4, b_+8);
+  CALL_C(b_+8, addDoubleIndexToBc_hook, SYM(addDoubleIndexToBc), b_+11);
+  CYC(b_+11, b_+12); A = mem_rd(gb, BC);
+  SET_BC(BC + 1);
+  L = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+12, b_+15);
+  CYC(b_+15, b_+16); mem_wr(gb, HL, A);
+  CYC(b_+16, b_+17); A = mem_rd(gb, BC);
+  SET_BC(BC + 1);
+  L = INTERACTION_BASE + OBJ_SPEED_Z;
+  CYC(b_+17, b_+20);
+  CYC(b_+20, b_+21); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+21, b_+22); A = mem_rd(gb, BC);
+  SET_BC(BC + 1);
+  CYC(b_+22, b_+23);
+  CYC(b_+23, b_+24); mem_wr(gb, HL, A);
+  CYC(b_+24, b_+25); A = mem_rd(gb, BC);
+  L = INTERACTION_BASE + OBJ_VAR3C;
+  CYC(b_+25, b_+27);
+  CYC(b_+27, b_+28); mem_wr(gb, HL, A);
+  CYC(b_+28, b_+29); ret_effect(gb);
+}
+
 void tokayRunStinkBagCutscene_hook(GB *gb) {
   BASE(tokayRunStinkBagCutscene);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -587,7 +1035,7 @@ void tokayRunStinkBagCutscene_hook(GB *gb) {
     CYC(b_+15, b_+16); H = D; CYC(b_+16, b_+18); L = 0x4b; CYC(b_+18, b_+19); A = mem_rd(gb, HL); CYC(b_+19, b_+21); L = 0x79; CYC(b_+21, b_+22); mem_wr(gb, HL, A);
     CYC(b_+22, b_+24); L = 0x4d; CYC(b_+24, b_+25); A = mem_rd(gb, HL); CYC(b_+25, b_+27); L = 0x7a; CYC(b_+27, b_+28); mem_wr(gb, HL, A);
     CYC(b_+28, b_+29); H = D; CYC(b_+29, b_+31); L = 0x45; CYC(b_+31, b_+33); mem_wr(gb, HL, 1); CYC(b_+33, b_+35); L = 0x7e; CYC(b_+35, b_+37); mem_wr(gb, HL, 1);
-    CALL_ROM(b_+37, b_+45); CYC(b_+40, b_+42); A = 0x53; CYC(b_+42, b_+45); playSound_b00_hook(gb); return;
+    CYC(b_+37, b_+40); push_effect(gb, b_+40); tokay_init_jump_variables(gb); CYC(b_+40, b_+42); A = 0x53; CYC(b_+42, b_+45); playSound_b00_hook(gb); return;
   }
   if (substate == 1) {
     CYC(b_+98, b_+100); E = 0x7c; CYC(b_+100, b_+101); A = mem_rd(gb, DE); CYC(b_+101, b_+102); C = A;

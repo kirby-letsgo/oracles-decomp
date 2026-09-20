@@ -71,6 +71,7 @@ enum {
   S__updateInteractionsIfStateIsZero__next,
   S_ackPacket,
   S_add16BitRefs,
+  S_addAToBc,
   S_addDecimalToHlRef,
   S_addDoubleIndexToBc,
   S_addFunctionsToVBlankQueue,
