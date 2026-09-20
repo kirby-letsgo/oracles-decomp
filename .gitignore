@@ -10,3 +10,4 @@ CLAUDE.md
 .cache
 Testing
 __pycache__/
+.claude/
