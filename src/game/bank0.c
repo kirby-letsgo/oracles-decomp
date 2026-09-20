@@ -647,9 +647,9 @@ void clearVram(GB *gb) {
   CYC(b_+0, b_+3); disableLcd(gb);
   CYC(b_+3, b_+6); clearOam(gb);
   CYC(b_+6, b_+10); mem_wr(gb, IO_VBK, 1);
-  CYC(b_+10, b_+19); clearMemoryBc(gb, 0x8000, (SYM(objectCheckCenteredWithLink) + 18));
+  CYC(b_+10, b_+19); clearMemoryBc(gb, 0x8000, 0x2000);
   CYC(b_+19, b_+22); mem_wr(gb, IO_VBK, 0);
-  CYC(b_+22, b_+30); clearMemoryBc(gb, 0x8000, (SYM(objectCheckCenteredWithLink) + 18));
+  CYC(b_+22, b_+30); clearMemoryBc(gb, 0x8000, 0x2000);
 }
 
 static void clear_bc_done(GB *gb, uint16_t end) {
@@ -2310,7 +2310,7 @@ static void link_check_no_carry(GB *gb) {
 
 static void link_control_checks_tail(GB *gb) {
   BASE(checkLinkCollisionsEnabled);
-  CYC(b_+18, b_+21); A = W8(wLinkDeathTrigger);
+  CYC(b_+18, b_+21); A = GVW(wLinkDeathTrigger, wMenuDisabled);
   alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+21, b_+24); link_check_no_carry(gb); return; }
   CYC(b_+21, b_+27); A = W8(wcc95);
@@ -2339,10 +2339,10 @@ static void link_collisions_enabled(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, w1Link_collisionType);
   alu_rlca(gb);
   if (!(F & FC)) { CYCT(b_+3, b_+6); link_check_no_carry(gb); return; }
-  CYC(b_+3, b_+9); A = W8(wDisableLinkCollisionsAndMenu);
+  CYC(b_+3, b_+9); A = GVW(wDisableLinkCollisionsAndMenu, wLinkDeathTrigger);
   alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+9, b_+12); link_check_no_carry(gb); return; }
-  CYC(b_+9, b_+15); A = W8(wMenuDisabled);
+  CYC(b_+9, b_+15); A = GVW(wMenuDisabled, wDisableLinkCollisionsAndMenu);
   alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+15, b_+18); link_check_no_carry(gb); return; }
   CYC(b_+15, b_+18);
@@ -2665,8 +2665,8 @@ void objectCheckTileAtPositionIsWater_hook(GB *gb) {
   BASE(objectCheckTileAtPositionIsWater);
   CYC(b_+0, b_+3);
   object_get_tile_at_position(gb);
-  alu_sub(gb, 0xf9);
-  alu_cp(gb, 0x05);
+  alu_sub(gb, GV(0xf9, 0xfa));
+  alu_cp(gb, GV(0x05, 0x04));
   CYC(b_+3, b_+8);
   ret_effect(gb);
 }
@@ -2675,8 +2675,8 @@ void checkTileAtPositionIsWater_hook(GB *gb) {
   BASE(checkTileAtPositionIsWater);
   CYC(b_+0, b_+3);
   tile_at_position(gb);
-  alu_sub(gb, 0xf9);
-  alu_cp(gb, 0x05);
+  alu_sub(gb, GV(0xf9, 0xfa));
+  alu_cp(gb, GV(0x05, 0x04));
   CYC(b_+3, b_+8);
   ret_effect(gb);
 }
@@ -3008,9 +3008,9 @@ static void extract_color_components(GB *gb) {
   BASE(extractColorComponents);
   CYC(b_+0, b_+2); A = H8(hRomBank);
   CYC(b_+2, b_+3); push_effect(gb, AF);
-  A = 0x17;
+  A = GV(0x17, 0x16);
   CYC(b_+3, b_+7); H8(hRomBank) = A;
-  CYC(b_+7, b_+10); mem_wr(gb, MBC_ROM_BANK, 0x17);
+  CYC(b_+7, b_+10); mem_wr(gb, MBC_ROM_BANK, GV(0x17, 0x16));
   B = 0x30;
   CYC(b_+10, b_+12);
   do {
@@ -3066,9 +3066,9 @@ void getChestData_hook(GB *gb) {
   BASE(getChestData);
   CYC(b_+0, b_+2); A = H8(hRomBank);
   CYC(b_+2, b_+3); push_effect(gb, AF);
-  A = 0x16;
+  A = GV(0x16, 0x15);
   CYC(b_+3, b_+7); H8(hRomBank) = A;
-  CYC(b_+7, b_+10); mem_wr(gb, MBC_ROM_BANK, 0x16);
+  CYC(b_+7, b_+10); mem_wr(gb, MBC_ROM_BANK, GV(0x16, 0x15));
   CYC(b_+10, b_+13); A = W8(wActiveGroup);
   SET_HL(chestDataGroupTable_bank16);
   CYC(b_+13, b_+17);
@@ -3221,7 +3221,7 @@ static void set_room_flags_for_unlocked_key_door_overworld(GB *gb) {
   add_a_to_hl(gb);
   CYC(b_+6, b_+9); A = W8(wActiveRoom);
   C = A;
-  B = 0xc7;
+  B = GV(0xc7, 0xc8);
   CYC(b_+9, b_+13); A = mem_rd(gb, BC);
   CYC(b_+13, b_+14); alu_or(gb, mem_rd(gb, HL));
   CYC(b_+14, b_+15); mem_wr(gb, BC, A);
@@ -4042,7 +4042,7 @@ void objectAddToAButtonSensitiveObjectList_hook(GB *gb) {
     CYC(b_+7, b_+9);
     L = alu_inc8(gb, L);
     A = L;
-    alu_cp(gb, 0xd3);
+    alu_cp(gb, GV(0xd3, 0xea));
     if (F & FC) { CYCT(b_+9, b_+15); continue; }
     CYC(b_+9, b_+16);
     break;
@@ -4074,7 +4074,7 @@ static void remove_from_abutton_list(GB *gb) {
     }
     L = alu_inc8(gb, L);
     A = L;
-    alu_cp(gb, 0xd3);
+    alu_cp(gb, GV(0xd3, 0xea));
     if (F & FC) { CYCT(b_+20, b_+26); continue; }
     CYC(b_+20, b_+28);
     break;
@@ -4449,8 +4449,8 @@ static void interaction_animate(GB *gb) {
   if (v) { CYCT(b_+4, b_+5); return; }
   CYC(b_+4, b_+7); A = H8(hRomBank);
   CYC(b_+7, b_+8); push_effect(gb, AF);
-  CYC(b_+8, b_+12); H8(hRomBank) = 0x16;
-  CYC(b_+12, b_+15); mem_wr(gb, MBC_ROM_BANK, 0x16);
+  CYC(b_+8, b_+12); H8(hRomBank) = GV(0x16, 0x14);
+  CYC(b_+12, b_+15); mem_wr(gb, MBC_ROM_BANK, GV(0x16, 0x14));
   L = 0x62;
   CYC(b_+15, b_+19);
   next_animation_frame(gb, SYM(_interactionNextAnimationFrame), 0x60, 0x41, interactionAnimationFrameTable_bank16, 0x5e);
@@ -4473,8 +4473,8 @@ static void interaction_set_animation(GB *gb) {
   B = 0x00;
   CYC(b_+0, b_+6); A = H8(hRomBank);
   CYC(b_+6, b_+7); push_effect(gb, AF);
-  CYC(b_+7, b_+11); H8(hRomBank) = 0x16;
-  CYC(b_+11, b_+14); mem_wr(gb, MBC_ROM_BANK, 0x16);
+  CYC(b_+7, b_+11); H8(hRomBank) = GV(0x16, 0x14);
+  CYC(b_+11, b_+14); mem_wr(gb, MBC_ROM_BANK, GV(0x16, 0x14));
   E = INTERACTION_BASE + 0x01;
   CYC(b_+14, b_+17); A = mem_rd(gb, DE);
   SET_HL(interactionAnimationTable_bank16);
@@ -4818,7 +4818,7 @@ void objectCreateFloatingMusicNote_hook(GB *gb) {
   CYC(b_+0, b_+2); H8(hFF8B) = A;
   A = 0x01;
   CYC(b_+2, b_+6); H8(hFF8D) = A;
-  bank_push(gb, b_+6, 0x0b);
+  bank_push(gb, b_+6, GV(0x0b, 0x0a));
   CALL_ROM(b_+16, ROM_b0b_objectCreateFloatingImage);
   bank_pop(gb, b_+19);
   CYC(b_+25, b_+26);
@@ -4835,8 +4835,8 @@ static void enemy_animate(GB *gb) {
   if (v) { CYCT(b_+4, b_+5); return; }
   CYC(b_+4, b_+7); A = H8(hRomBank);
   CYC(b_+7, b_+8); push_effect(gb, AF);
-  CYC(b_+8, b_+12); H8(hRomBank) = 0x0d;
-  CYC(b_+12, b_+15); mem_wr(gb, MBC_ROM_BANK, 0x0d);
+  CYC(b_+8, b_+12); H8(hRomBank) = GV(0x0d, 0x0c);
+  CYC(b_+12, b_+15); mem_wr(gb, MBC_ROM_BANK, GV(0x0d, 0x0c));
   L = 0xa2;
   CYC(b_+15, b_+19);
   next_animation_frame(gb, SYM(_enemyNextAnimationFrame), 0xa0, 0x81, enemyAnimationFrameTable_bank0d, 0x9e);
@@ -4854,8 +4854,8 @@ void enemySetAnimation_hook(GB *gb) {
   B = 0x00;
   CYC(b_+0, b_+6); A = H8(hRomBank);
   CYC(b_+6, b_+7); push_effect(gb, AF);
-  CYC(b_+7, b_+11); H8(hRomBank) = 0x0d;
-  CYC(b_+11, b_+14); mem_wr(gb, MBC_ROM_BANK, 0x0d);
+  CYC(b_+7, b_+11); H8(hRomBank) = GV(0x0d, 0x0c);
+  CYC(b_+11, b_+14); mem_wr(gb, MBC_ROM_BANK, GV(0x0d, 0x0c));
   E = 0x81;
   CYC(b_+14, b_+17); A = mem_rd(gb, DE);
   SET_HL(enemyAnimationTable_bank0d);
@@ -4876,8 +4876,8 @@ void partAnimate_hook(GB *gb) {
   L = 0xe0;
   CYC(b_+0, b_+4); uint8_t v = alu_dec8(gb, mem_rd(gb, HL)); mem_wr(gb, HL, v);
   if (v) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
-  CYC(b_+4, b_+9); H8(hRomBank) = 0x16;
-  CYC(b_+9, b_+12); mem_wr(gb, MBC_ROM_BANK, 0x16);
+  CYC(b_+4, b_+9); H8(hRomBank) = GV(0x16, 0x15);
+  CYC(b_+9, b_+12); mem_wr(gb, MBC_ROM_BANK, GV(0x16, 0x15));
   L = 0xe2;
   CYC(b_+12, b_+16);
   next_animation_frame(gb, SYM(_partNextAnimationFrame), 0xe0, 0xc1, partAnimationFrameTable_bank16, 0xde);
@@ -4889,7 +4889,7 @@ void partSetAnimation_hook(GB *gb) {
   alu_add(gb, A);
   C = A;
   B = 0x00;
-  A = 0x16;
+  A = GV(0x16, 0x15);
   CYC(b_+0, b_+8); H8(hRomBank) = A;
   CYC(b_+8, b_+11); mem_wr(gb, MBC_ROM_BANK, A);
   E = 0xc1;
@@ -5005,7 +5005,7 @@ static void enemy_die_common(GB *gb) {
   A = 0xff;
   if (F & FZ) CYCT(b_+48, b_+52);
   else { CYC(b_+48, b_+53); alu_xor(gb, A); }
-  L = 0x4f;
+  L = GV(0x4f, 0x4c);
   C = 0x10;
   CYC(b_+53, b_+57);
   do {
@@ -5036,7 +5036,7 @@ void createEnergySwirlGoingIn_hook(GB *gb) {
   BASE(createEnergySwirlGoingIn);
   L = A;
   CYC(b_+0, b_+1);
-  bank_push(gb, b_+1, 0x11);
+  bank_push(gb, b_+1, GV(0x11, 0x10));
   CALL_ROM(b_+11, ROM_b11_createEnergySwirlGoingIn_body);
   bank_pop(gb, b_+14);
   CYC(b_+20, b_+21);
@@ -5047,7 +5047,7 @@ void createEnergySwirlGoingOut_hook(GB *gb) {
   BASE(createEnergySwirlGoingOut);
   L = A;
   CYC(b_+0, b_+1);
-  bank_push(gb, b_+1, 0x11);
+  bank_push(gb, b_+1, GV(0x11, 0x10));
   CALL_ROM(b_+11, ROM_b11_createEnergySwirlGoingOut_body);
   bank_pop(gb, b_+14);
   CYC(b_+20, b_+21);
@@ -5792,10 +5792,10 @@ void initializeDungeonStuff_hook(GB *gb) {
 void clearStaticObjects_hook(GB *gb) {
   BASE(clearStaticObjects);
   SET_HL(wStaticObjects);
-  B = 0x40;
+  B = GV(0x40, 0x80);
   CYC(b_+0, b_+8);
-  clearMemory(gb, HL, 0x40);
-  SET_HL(HL + 0x40);
+  clearMemory(gb, HL, GV(0x40, 0x80));
+  SET_HL(HL + GV(0x40, 0x80));
   B = 0;
   A = 0;
   F = FZ | FN;
@@ -5836,7 +5836,7 @@ void objectDeleteRelatedObj1AsStaticObject_hook(GB *gb) {
 static void bank6_function_caller(GB *gb, uint16_t sp0_) {
   BASE(checkUseItems_b00);
   bank_push(gb, b_+2, 0x06);
-  CALL_C(b_+12, functionCaller_b06_hook, SYM(functionCaller_b06), b_+15);
+  CALL_C(b_+12, functionCaller_b06_hook, GV(SYM(functionCaller_b06), 0x4822), b_+15);
   bank_pop(gb, b_+15);
   CYC(b_+21, b_+22);
 }
@@ -5973,7 +5973,7 @@ void objectAddToGrabbableObjectBuffer_hook(GB *gb) {
     CYC(b_+6, b_+8);
     L = alu_inc8(gb, L);
     A = L;
-    alu_cp(gb, 0x84);
+    alu_cp(gb, GV(0x84, 0x9e));
     if (F & FC) { CYCT(b_+8, b_+14); continue; }
     CYC(b_+8, b_+15);
     break;
@@ -6408,7 +6408,7 @@ void getIndexOfGashaSpotInRoom_hook(GB *gb) {
   BASE(getIndexOfGashaSpotInRoom);
   C = A;
   CYC(b_+0, b_+1);
-  bank_push(gb, b_+1, 0x02);
+  bank_push(gb, b_+1, GV(0x02, 0x04));
   A = C;
   CYC(b_+11, b_+12);
   CALL_ROM(b_+12, ROM_b02_getIndexOfGashaSpotInRoom_body);
@@ -6759,7 +6759,7 @@ static void clear_wram_bank1(GB *gb) {
   SET_HL(w1Link);
   SET_BC(0x1000);
   CYC(b_+3, b_+12);
-  clearMemoryBc(gb, HL, (SYM(_getObjectPositionOnScreen_duringScreenTransition) + 63));
+  clearMemoryBc(gb, HL, 0x1000);
   SET_HL(HL + 0x1000);
   SET_BC(0);
   A = 0;
@@ -7179,7 +7179,7 @@ static void simple_script_run_command(GB *gb, uint16_t sp0_) {
 void interactionRunSimpleScript_hook(GB *gb) {
   BASE(interactionRunSimpleScript);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  bank_push(gb, b_+0, 0x0c);
+  bank_push(gb, b_+0, GV(0x0c, 0x14));
   H = D;
   L = 0x58;
   CYC(b_+10, b_+14); A = mem_rd(gb, HL); SET_HL(HL + 1);
@@ -7292,7 +7292,7 @@ void interactionFunc_3e6d_hook(GB *gb) {
   uint16_t de = DE;
   L = 0x43;
   CYC(b_+0, b_+4); E = mem_rd(gb, HL);
-  bank_push(gb, b_+4, 0x16);
+  bank_push(gb, b_+4, GV(0x16, 0x14));
   A = E;
   SET_HL(creditsSpriteTable_bank16);
   CYC(b_+14, b_+19);
@@ -7391,7 +7391,7 @@ void copy256BytesFromBank_hook(GB *gb) {
 void objectLoadMovementScript_hook(GB *gb) {
   BASE(objectLoadMovementScript);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  bank_push(gb, b_+0, 0x0e);
+  bank_push(gb, b_+0, GV(0x0e, 0x0d));
   CALL_C(b_+10, objectLoadMovementScript_body_hook, SYM(objectLoadMovementScript_body), b_+13);
   bank_pop(gb, b_+13);
   CYC(b_+19, b_+20);
@@ -7401,7 +7401,7 @@ void objectLoadMovementScript_hook(GB *gb) {
 void objectRunMovementScript_hook(GB *gb) {
   BASE(objectRunMovementScript);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  bank_push(gb, b_+0, 0x0e);
+  bank_push(gb, b_+0, GV(0x0e, 0x0d));
   CALL_C(b_+10, objectRunMovementScript_body_hook, SYM(objectRunMovementScript_body), b_+13);
   bank_pop(gb, b_+13);
   CYC(b_+19, b_+20);
@@ -8038,7 +8038,7 @@ static void object_queue_draw(GB *gb) {
   CYC(b_+9, b_+12);
   alu_and(gb, 0x03);
   H = A;
-  alu_add(gb, 0xa1);
+  alu_add(gb, GV(0xa1, 0x9f));
   C = A;
   CYC(b_+12, b_+19); A = mem_rd(gb, IO_P1 | C);
   alu_cp(gb, 0x10);
@@ -9086,7 +9086,7 @@ void interactionSetMiniScript_hook(GB *gb) {
 
 void objectOscillateZ_hook(GB *gb) {
   BASE(objectOscillateZ);
-  bank_push(gb, b_+0, 0x09);
+  bank_push(gb, b_+0, GV(0x09, 0x08));
   CALL_ROM(b_+10, ROM_b09_objectOscillateZ_body);
   bank_pop(gb, b_+13);
   CYC(b_+19, b_+20);
@@ -9151,7 +9151,7 @@ void createTreasure_hook(GB *gb) {
 void objectCreateExclamationMark_hook(GB *gb) {
   BASE(objectCreateExclamationMark);
   CYC(b_+0, b_+2); H8(hFF8B) = A;
-  bank_push(gb, b_+2, 0x0b);
+  bank_push(gb, b_+2, GV(0x0b, 0x0a));
   CYC(b_+12, b_+14); A = H8(hFF8B);
   CALL_ROM(b_+14, ROM_b0b_objectCreateExclamationMark_body);
   bank_pop(gb, b_+17);
@@ -9286,7 +9286,7 @@ void checkGrabbableObjects_hook(GB *gb) {
     } else CYCT(b_+15, b_+17);
     L = alu_inc8(gb, L);
     A = L;
-    alu_cp(gb, 0x84);
+    alu_cp(gb, GV(0x84, 0x9e));
     if (F & FC) { CYCT(b_+27, b_+33); continue; }
     CYC(b_+27, b_+33);
     break;
@@ -9357,7 +9357,7 @@ void linkInteractWithAButtonSensitiveObjects_hook(GB *gb) {
     }
     E = alu_inc8(gb, E);
     A = E;
-    alu_cp(gb, 0xd3);
+    alu_cp(gb, GV(0xd3, 0xea));
     if (F & FC) { CYCT(b_+66, b_+72); continue; }
     CYC(b_+66, b_+72);
     break;
@@ -9728,7 +9728,7 @@ void updateAllObjects_hook(GB *gb) {
   CALL_ROM(b_+23, ROM_setEnemyTargetToLinkPosition);
   switch_bank(gb, b_+26, 0x00);
   CALL_ROM(b_+33, ROM_updateEnemies);
-  switch_bank(gb, b_+36, 0x11);
+  switch_bank(gb, b_+36, GV(0x11, 0x10));
   CALL_ROM(b_+43, ROM_b11_updateParts);
   switch_bank(gb, b_+46, 0x00);
   CALL_ROM(b_+53, ROM_updateInteractions);
@@ -10036,7 +10036,7 @@ void initializeRoom_hook(GB *gb) {
 void loadStaticObjects_hook(GB *gb) {
   BASE(loadStaticObjects);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  bank_push(gb, b_+0, 0x16);
+  bank_push(gb, b_+0, GV(0x16, 0x15));
   CYC(b_+10, b_+11); push_effect(gb, DE);
   CALL_C(b_+11, loadStaticObjects_body_hook, SYM(loadStaticObjects_body), b_+14);
   CYC(b_+14, b_+15); SET_DE(pop_effect(gb));
@@ -10133,7 +10133,7 @@ void fileSelect_redrawDecorations_hook(GB *gb) {
 
 void func_2d48_hook(GB *gb) {
   BASE(func_2d48);
-  bank_push(gb, b_+0, 0x3f);
+  bank_push(gb, b_+0, GV(0x3f, 0x03));
   A = B;
   SET_HL(data_5951_bank3f);
   CYC(b_+10, b_+15);
@@ -10819,10 +10819,10 @@ void loadPaletteHeader_hook(GB *gb) {
       CYC(b_+58, b_+61);
     }
     B = A;
-    C = 0xa6;
+    C = GV(0xa6, 0xa4);
     CYC(b_+61, b_+66); alu_bit(gb, 6, mem_rd(gb, HL));
     if (F & FZ) CYCT(b_+66, b_+68);
-    else { CYC(b_+66, b_+70); C = 0xa7; }
+    else { CYC(b_+66, b_+70); C = GV(0xa7, 0xa5); }
     CYC(b_+70, b_+71); A = mem_rd(gb, 0xff00 | C);
     alu_or(gb, B);
     CYC(b_+71, b_+73); mem_wr(gb, 0xff00 | C, A);
@@ -10843,7 +10843,7 @@ void loadPaletteHeader_hook(GB *gb) {
     CYC(b_+91, b_+92); push_effect(gb, HL);
     L = C;
     H = A;
-    A = 0x17;
+    A = GV(0x17, 0x16);
     CYC(b_+92, b_+98); H8(hRomBank) = A;
     CYC(b_+98, b_+101); mem_wr(gb, MBC_ROM_BANK, A);
     for (;;) {
@@ -10995,7 +10995,7 @@ void loadTilesetHlpr_hook(GB *gb) {
 
 static void draw_sprite_list(GB *gb) {
   BASE(func_0eda);
-  switch_bank(gb, b_+0, 0x14);
+  switch_bank(gb, b_+0, GV(0x14, 0x13));
   CYC(b_+7, b_+9); A = H8(hOamTail);
   E = A;
   CYC(b_+9, b_+11); A = mem_rd(gb, HL); SET_HL(HL + 1);
@@ -11535,7 +11535,7 @@ void updateDirtyPalettes_hook(GB *gb) {
 
 void _interactionActuallyRunScript_hook(GB *gb) {
   BASE(_interactionActuallyRunScript);
-  bank_push(gb, b_+0, 0x0c);
+  bank_push(gb, b_+0, GV(0x0c, 0x0b));
   for (;;) {
     CYC(b_+10, b_+11); A = mem_rd(gb, HL);
     alu_or(gb, A);
@@ -12296,7 +12296,7 @@ void checkUseItems_b00_hook(GB *gb) {
 void parseGivenObjectData_b00_hook(GB *gb) {
   BASE(parseGivenObjectData_b00);
   uint16_t sp0_ = gb->sp;
-  bank_push(gb, b_+0, 0x12);
+  bank_push(gb, b_+0, GV(0x12, 0x11));
   CYC(b_+10, b_+11); push_effect(gb, DE);
   D = H;
   E = L;
@@ -12745,7 +12745,7 @@ void disableSerialPort_hook(GB *gb) {
 void serialFunc_0c85_hook(GB *gb) {
   BASE(serialFunc_0c85);
   SET_HL(ROM_b16_serialFunc_44ac);
-  E = 0x16;
+  E = GV(0x16, 0x15);
   CYC(b_+0, b_+5);
   CYC(b_+5, b_+8);
   interBankCall_hook(gb);
@@ -12755,7 +12755,7 @@ void serialFunc_0c8d_hook(GB *gb) {
   BASE(serialFunc_0c8d);
   CYC(b_+0, b_+1); push_effect(gb, DE);
   SET_HL(ROM_b16_serialFunc_4000);
-  E = 0x16;
+  E = GV(0x16, 0x15);
   CYC(b_+1, b_+6);
   CALL_ROM(b_+6, ROM_interBankCall);
   CYC(b_+9, b_+10); SET_DE(pop_effect(gb));

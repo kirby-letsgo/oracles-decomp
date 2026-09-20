@@ -38,9 +38,9 @@ void interactionCoded1_hook(GB *gb) {
   CYC(b_+8, b_+10); A = 1;
   CYC(b_+10, b_+11); mem_wr(gb, DE, A);
   CYC(b_+11, b_+12); C = A;
-  CYC(b_+12, b_+15); SET_HL((SYM(interactionCodea8__thing5) + 9));
+  CYC(b_+12, b_+15); SET_HL(GV((SYM(interactionCodea8__thing5) + 9), 0x5d0d));
   CYC(b_+15, b_+17); E = 1;
   CALL_C(b_+17, interBankCall_hook, 0x008a, b_+20);
-  CYC(b_+20, b_+23); SET_HL(SYM(interactionCodecf__state0));
+  CYC(b_+20, b_+23); SET_HL(GV(SYM(interactionCodecf__state0), 0x4b17));
   CYC(b_+23, b_+26); interactionSetScript_hook(gb);
 }

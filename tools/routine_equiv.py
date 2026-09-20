@@ -174,6 +174,7 @@ class Game:
             for k, v in ops:
                 if k == 'imm': syms.append(f'${v:02x}')
                 elif v >= 0x8000: syms.append(self.ram_sym(v))
+                elif k == 'ram' and 0x0000 <= v < 0x8000 and not (0x0150 <= v < 0x4000 and tmpl.startswith('ld a,(')): syms.append(f'${v:04x}')   # MBC register writes
                 elif v in addrs or (k != 'any' and lo <= v < lo + 0x200 and any(x <= v < x + l for x, l, *_ in insns)):
                     syms.append(f'@{v - start:+d}')
                 else: syms.append(self.rom_sym(bank, v))

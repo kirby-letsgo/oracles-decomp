@@ -290,7 +290,7 @@ void swordEnemy_gotoState8_hook(GB *gb) {
 void enemyCode48_hook(GB *gb) {
   BASE(enemyCode48);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+0, ecom_checkHazards_b0e_hook, SYM(ecom_checkHazards_b0e), b_+3);
+  CALL_C(b_+0, ecom_checkHazards_b0e_hook, GV(SYM(ecom_checkHazards_b0e), 0x4446), b_+3);
   CALL_C(b_+3, enemyCode48_runState_hook, b_+9, b_+6);
   CYC(b_+6, b_+9); swordDarknut_updateEnemyCollisionMode_hook(gb); return; // jp
 }
@@ -550,7 +550,7 @@ void swordEnemy_updateEnemyCollisionMode_hook(GB *gb) {
   CYC(b_+6, b_+8);
 
   CALL_C(b_+8, swordEnemy_checkIgnoreCollision_hook, SYM(swordEnemy_checkIgnoreCollision), b_+11);
-  CYC(b_+11, b_+13); A = 0x55; // ENEMYCOLLISION_STALFOS_BLOCKED_WITH_SWORD
+  CYC(b_+11, b_+13); A = GV(0x55, 0x52); // ENEMYCOLLISION_STALFOS_BLOCKED_WITH_SWORD
   CYC(b_+13, b_+15); B = 0x00;
   if (!(F & FZ)) { CYCT(b_+15, b_+17); goto setVars; } // jr nz
   CYC(b_+15, b_+17);
@@ -563,7 +563,7 @@ stunned:
   CYC(b_+23, b_+25); A = 0x11; // ENEMYCOLLISION_BURNABLE_ENEMY
   if (!(F & FZ)) { CYCT(b_+25, b_+27); goto setVars; } // jr nz
   CYC(b_+25, b_+27);
-  CYC(b_+27, b_+29); A = 0x11; // ENEMYCOLLISION_BURNABLE_ENEMY
+  CYC(b_+27, b_+29); A = GV(0x11, 0x20); // ENEMYCOLLISION_BURNABLE_ENEMY
 
 setVars:
   CYC(b_+29, b_+31); E = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
@@ -589,13 +589,13 @@ void swordDarknut_updateEnemyCollisionMode_hook(GB *gb) {
   CYC(b_+6, b_+8);
 
   CALL_C(b_+8, swordEnemy_checkIgnoreCollision_hook, SYM(swordEnemy_checkIgnoreCollision), b_+11);
-  CYC(b_+11, b_+13); A = 0x56; // ENEMYCOLLISION_DARKNUT_BLOCKED_WITH_SWORD
+  CYC(b_+11, b_+13); A = GV(0x56, 0x53); // ENEMYCOLLISION_DARKNUT_BLOCKED_WITH_SWORD
   CYC(b_+13, b_+15); B = 0x00;
   if (!(F & FZ)) { CYCT(b_+15, b_+17); goto setVars; } // jr nz
   CYC(b_+15, b_+17);
 
 stunned:
-  CYC(b_+17, b_+19); A = 0x20; // ENEMYCOLLISION_DARKNUT
+  CYC(b_+17, b_+19); A = GV(0x20, 0x1f); // ENEMYCOLLISION_DARKNUT
   CYC(b_+19, b_+20); B = alu_inc8(gb, B);
 
 setVars:

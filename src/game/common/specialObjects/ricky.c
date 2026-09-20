@@ -1345,7 +1345,7 @@ void rickyCheckHopUpCliff_hook(GB *gb) {
   }
   CYC(b_+22, b_+24);
   CYC(b_+24, b_+25); A = B;
-  CYC(b_+25, b_+27); alu_cp(gb, 0xd4);
+  CYC(b_+25, b_+27); alu_cp(gb, GV(0xd4, 0xdd));
   if (!(F & FZ)) {
     CYCT(b_+27, b_+29);
     goto try_two_tiles_up;
@@ -1362,7 +1362,7 @@ check_one_up_left:
   }
   CYC(b_+37, b_+39);
   CYC(b_+39, b_+40); A = B;
-  CYC(b_+40, b_+42); alu_cp(gb, 0xd4);
+  CYC(b_+40, b_+42); alu_cp(gb, GV(0xd4, 0xdd));
   if (F & FZ) {
     CYCT(b_+42, b_+44);
     goto can_jump;
@@ -1379,7 +1379,7 @@ try_two_tiles_up:
   }
   CYC(b_+52, b_+54);
   CYC(b_+54, b_+55); A = B;
-  CYC(b_+55, b_+57); alu_cp(gb, 0xd4);
+  CYC(b_+55, b_+57); alu_cp(gb, GV(0xd4, 0xdd));
   if (!(F & FZ)) { CYCT(b_+57, b_+58); ret_effect(gb); return; }
   CYC(b_+57, b_+58);
 
@@ -1393,7 +1393,7 @@ check_two_up_left:
   }
   CYC(b_+66, b_+68);
   CYC(b_+68, b_+69); A = B;
-  CYC(b_+69, b_+71); alu_cp(gb, 0xd4);
+  CYC(b_+69, b_+71); alu_cp(gb, GV(0xd4, 0xdd));
   if (!(F & FZ)) { CYCT(b_+71, b_+72); ret_effect(gb); return; }
   CYC(b_+71, b_+72);
 

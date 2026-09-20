@@ -471,7 +471,7 @@ copy_file_header:
     goto copy_file_header;
   }
   CYC(b_+66, b_+68);
-  CYC(b_+68, b_+70); A = 0xa1;
+  CYC(b_+68, b_+70); A = GV(0xa1, 0xa0);
   CYC(b_+70, b_+71); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+71, b_+72); alu_add(gb, C);
   CYC(b_+72, b_+73); C = A;
@@ -1081,7 +1081,7 @@ copy_file_header:
 
 verify_other_mode:
   CYC(b_+103, b_+106); A = mem_rd(gb, w2ColorComponentBuffer1 + 4);
-  CYC(b_+106, b_+108); alu_cp(gb, 0xa0);
+  CYC(b_+106, b_+108); alu_cp(gb, GV(0xa0, 0xa1));
   if (!(F & FZ)) {
     CYCT(b_+108, b_+110);
     markFileAsBlank_hook(gb);

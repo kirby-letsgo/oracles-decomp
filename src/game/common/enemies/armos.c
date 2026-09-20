@@ -268,7 +268,7 @@ void armos_subid00_stateA_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+3);
   if (!(F & FZ)) { CYCT(b_+3, b_+6); ecom_flickerVisibility_b0d_hook(gb); return; } // jp nz
   CYC(b_+3, b_+6);
-  CYC(b_+6, b_+8); A = 0x1e; // ENEMYCOLLISION_ACTIVE_RED_ARMOS
+  CYC(b_+6, b_+8); A = GV(0x1e, 0x1d); // ENEMYCOLLISION_ACTIVE_RED_ARMOS
   armos_beginMoving_hook(gb); return; // fallthrough
 }
 
@@ -387,7 +387,7 @@ void armos_subid01_stateA_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+3);
   if (!(F & FZ)) { CYCT(b_+3, b_+6); ecom_flickerVisibility_b0d_hook(gb); return; } // jp nz
   CYC(b_+3, b_+6);
-  CYC(b_+6, b_+8); A = 0x54; // ENEMYCOLLISION_ACTIVE_BLUE_ARMOS
+  CYC(b_+6, b_+8); A = GV(0x54, 0x51); // ENEMYCOLLISION_ACTIVE_BLUE_ARMOS
   CYC(b_+8, b_+11); armos_beginMoving_hook(gb); return; // jp
 }
 

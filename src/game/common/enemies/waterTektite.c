@@ -237,8 +237,8 @@ nextOffset:
   CYC(b_+34, b_+35); alu_or(gb, E);
   CYC(b_+35, b_+36); E = A;
   CYC(b_+36, b_+37); A = mem_rd(gb, DE);
-  CYC(b_+37, b_+39); alu_sub(gb, 0xf9); // TILEINDEX_PUDDLE
-  CYC(b_+39, b_+41); alu_cp(gb, 0x05); // TILEINDEX_FD-TILEINDEX_PUDDLE+1
+  CYC(b_+37, b_+39); alu_sub(gb, GV(0xf9, 0xfa)); // TILEINDEX_PUDDLE
+  CYC(b_+39, b_+41); alu_cp(gb, GV(0x05, 0x04)); // TILEINDEX_FD-TILEINDEX_PUDDLE+1
   CYC(b_+41, b_+43); A = mem_rd(gb, hFF8B); // hFF8B
   CYC(b_+43, b_+44); alu_rla(gb);
   CYC(b_+44, b_+46); mem_wr(gb, hFF8B, A); // hFF8B

@@ -83,9 +83,9 @@ void func_11_5e8a_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, partCommon_standardUpdate_hook, SYM(partCommon_standardUpdate), b_+3);
   CYC(b_+3, b_+6); E = 0xc1; A = mem_rd(gb, DE);
-  CYC(b_+6, b_+9); alu_add(gb, A); alu_add(gb, 0x9f);
+  CYC(b_+6, b_+9); alu_add(gb, A); alu_add(gb, GV(0x9f, 0x23));
   CYC(b_+9, b_+12); L = A; A = 0;
-  CYC(b_+12, b_+15); alu_adc(gb, 0x5e); H = A;
+  CYC(b_+12, b_+15); alu_adc(gb, GV(0x5e, 0x62)); H = A;
   CYC(b_+15, b_+16); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+16, b_+18); H = mem_rd(gb, HL); L = A;
   CYC(b_+18, b_+20); A = C; alu_or(gb, A);

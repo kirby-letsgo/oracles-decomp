@@ -69,7 +69,7 @@ normalStatus:
   }
 
 state0To7:
-  CYC(b_+51, b_+54); SET_HL((SYM(partCode38__state2) + 22)); // bank0e.orbMovementScript
+  CYC(b_+51, b_+54); SET_HL(GV((SYM(partCode38__state2) + 22), 0x6b30)); // bank0e.orbMovementScript
   CALL_C(b_+54, objectLoadMovementScript_hook, SYM(objectLoadMovementScript), b_+57);
   CYC(b_+57, b_+58); H = D;
   CYC(b_+58, b_+60); L = 0xc3; // Part.var03

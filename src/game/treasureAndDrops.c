@@ -69,7 +69,7 @@ void giveTreasure_body_hook(GB *gb) {
   CYC(b_+2, b_+3); A = B;
   CYC(b_+3, b_+5); H8(hFF8B) = A;
   CYC(b_+5, b_+6); push_effect(gb, BC);
-  CYC(b_+6, b_+9); SET_HL(b_+127);
+  CYC(b_+6, b_+9); SET_HL(GV(b_+127, 0x4544));
   CALL_C(b_+9, giveTreasure_body__findItemInTable_hook, b_+40, b_+12);
   if (F & FZ) {
     CYCT(b_+12, b_+14);
@@ -411,7 +411,7 @@ void addTreasureToInventory_hook(GB *gb) {
   CYC(b_+11, b_+14);
   CYC(b_+14, b_+15); push_effect(gb, BC);
   CYC(b_+15, b_+16); alu_cpl(gb);
-  CYC(b_+16, b_+18); alu_add(gb, 0x88);
+  CYC(b_+16, b_+18); alu_add(gb, GV(0x88, 0x80));
   CYC(b_+18, b_+19); L = A;
   CYC(b_+19, b_+21); A = H8(hFF8B);
   CYC(b_+21, b_+22); C = A;
@@ -461,7 +461,7 @@ void addTreasureToInventory__addToInventory_hook(GB *gb) {
   CYC(b_+58, b_+59); L = alu_dec8(gb, L);
   CYC(b_+59, b_+60); mem_wr(gb, HL, C);
   CYC(b_+60, b_+61); A = L;
-  CYC(b_+61, b_+63); alu_sub(gb, 0x8a);
+  CYC(b_+61, b_+63); alu_sub(gb, GV(0x8a, 0x82));
   CYC(b_+63, b_+65); alu_bit(gb, 7, B);
   CYC(b_+65, b_+66); ret_effect(gb);
 }
@@ -830,7 +830,7 @@ void giveTreasure_body__modef_hook(GB *gb) {
   CALL_C(b_+310, giveTreasure_body__mode4_hook, b_+198, b_+313);
   CALL_C(b_+313, setStatusBarNeedsRefreshBit1_hook, SYM(setStatusBarNeedsRefreshBit1), b_+316);
   CYC(b_+316, b_+319); A = W8(wSeedSatchelLevel);
-  CYC(b_+319, b_+322); SET_HL(b_+328);
+  CYC(b_+319, b_+322); SET_HL(GV(b_+328, 0x4616));
   CYC(b_+322, b_+323); treasure_add_index_to_hl_from_rst(gb, b_+323);
   CYC(b_+323, b_+324); A = mem_rd(gb, DE);
   CYC(b_+324, b_+325); alu_cp(gb, mem_rd(gb, HL));

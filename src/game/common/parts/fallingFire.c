@@ -87,7 +87,7 @@ subid0:
   CALL_C(b_+16, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+19);
   if (!(F & FZ)) { RET_TAKEN(b_+19); return; } // ret nz
   CYC(b_+19, b_+20);
-  CYC(b_+20, b_+22); mem_wr(gb, HL, 0x78);
+  CYC(b_+20, b_+22); mem_wr(gb, HL, GV(0x78, 0x3c));
   CYC(b_+22, b_+24); goto L_5504; // jr
 
 func_54f6:

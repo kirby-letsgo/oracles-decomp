@@ -269,11 +269,11 @@ void ironMask_updateCollisionsFromLinkRelativeAngle_hook(GB *gb) {
   CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
   if (F & FC) { CYCT(b_+15, b_+17); goto unmasked; } // jr c
   CYC(b_+15, b_+17);
-  CYC(b_+17, b_+19); mem_wr(gb, HL, 0x1d); // ENEMYCOLLISION_IRON_MASK
+  CYC(b_+17, b_+19); mem_wr(gb, HL, GV(0x1d, 0x1c)); // ENEMYCOLLISION_IRON_MASK
   RET(b_+19); return;
 
 unmasked:
-  CYC(b_+20, b_+22); mem_wr(gb, HL, 0x53); // ENEMYCOLLISION_UNMASKED_IRON_MASK
+  CYC(b_+20, b_+22); mem_wr(gb, HL, GV(0x53, 0x50)); // ENEMYCOLLISION_UNMASKED_IRON_MASK
   RET(b_+22); return;
 }
 

@@ -96,7 +96,7 @@ void enemyCode24_hook(GB *gb) {
   CYC(b_+24, b_+25); B = A;
   CYC(b_+25, b_+26); L = alu_inc8(gb, L);
   CYC(b_+26, b_+27); C = mem_rd(gb, HL);
-  CYC(b_+27, b_+30); SET_HL((SYM(likelike_subid03) + 8)); // bank5.checkPositionSurroundedByWalls
+  CYC(b_+27, b_+30); SET_HL(GV((SYM(likelike_subid03) + 8), 0x5d74)); // bank5.checkPositionSurroundedByWalls
   CYC(b_+30, b_+32); E = 0x05;
   CALL_C(b_+32, interBankCall_hook, 0x008a, b_+35);
   CYC(b_+35, b_+37); B = alu_rl(gb, B);
@@ -339,7 +339,7 @@ releaseLink:
   CYC(b_+32, b_+34);
   CYC(b_+34, b_+36); A = 0x01; // TREASURE_SHIELD
   CALL_C(b_+36, loseTreasure_hook, SYM(loseTreasure), b_+39);
-  CYC(b_+39, b_+42); SET_BC((SYM(enemyCode19) + 15)); // TX_510b
+  CYC(b_+39, b_+42); SET_BC(0x510b); // TX_510b
   CALL_C(b_+42, showText_hook, SYM(showText), b_+45);
 
 afterShieldCheck:

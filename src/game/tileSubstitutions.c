@@ -250,7 +250,7 @@ void applyStandardTileSubstitutions_hook(GB *gb) {
 
 void applyStandardTileSubstitutions__locFunc_hook(GB *gb) {
   BASE(applyStandardTileSubstitutions);
-  CYC(b_+51, b_+54); A = W8(wActiveCollisions);
+  CYC(b_+51, b_+54); A = GVW(wActiveCollisions, wActiveGroup);
   CYC(b_+54, b_+55); tile_substitutions_add_double_index(gb, b_+55);
   CYC(b_+55, b_+56); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+56, b_+57); H = mem_rd(gb, HL);

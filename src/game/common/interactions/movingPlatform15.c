@@ -50,7 +50,7 @@ void movingPlatform_loadScript_hook(GB *gb) {
     goto inDungeon;
   }
   CYC(b_+5, b_+7);
-  CYC(b_+7, b_+10); SET_HL(SYM(movingPlatform_scriptTable));
+  CYC(b_+7, b_+10); SET_HL(GV(SYM(movingPlatform_scriptTable), 0x471d));
   CYC(b_+10, b_+12);
   goto loadScript;
 

@@ -130,8 +130,8 @@ storeVar30Value:
   CYC(b_+53, b_+54); A = alu_inc8(gb, A);
   if (!(F & FZ)) { CYCT(b_+54, b_+55); ret_effect(gb); return; } // ret nz
   CYC(b_+54, b_+55);
-  CYC(b_+55, b_+58); SET_HL(wTmpcfc0_genericCutscene_cfdf);
-  CYC(b_+58, b_+60); mem_wr(gb, HL, 0xff);
+  CYC(b_+55, b_+58); SET_HL(GV(wTmpcfc0_genericCutscene_cfdf, wTmpcfc0_wildTokay_cfde));
+  CYC(b_+58, b_+60); mem_wr(gb, HL, GV(0xff, 0x01));
   CYC(b_+60, b_+63); interactionDelete_hook(gb); return; // jp
 
 subid1:

@@ -46,7 +46,7 @@ void enemyCode60_hook(GB *gb) {
 // 0e:6a6c, bare global; falls into from enemyCode60, also reached by genuine jr from same.
 void label_266_hook(GB *gb) {
   BASE(label_266);
-  CYC(b_+0, b_+3); SET_BC((SYM(enemyCode3a) + 2));
+  CYC(b_+0, b_+3); SET_BC(0x5478);
   CYC(b_+3, b_+5); E = ENEMY_BASE + OBJ_YH;
   CYC(b_+5, b_+6); A = mem_rd(gb, DE);
   CYC(b_+6, b_+8); hram_wr(gb, (uint8_t)hFF8F, A);

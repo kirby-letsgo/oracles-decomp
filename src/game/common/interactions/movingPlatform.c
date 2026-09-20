@@ -92,10 +92,10 @@ state0:
   CYC(b_+46, b_+47); E = alu_inc8(gb, E);
   CYC(b_+47, b_+48); A = mem_rd(gb, HL);
   CYC(b_+48, b_+49); mem_wr(gb, DE, A);
-  CYC(b_+49, b_+52); SET_HL((SYM(interactionCode7a) + 12)); // scriptHelp.movingPlatform_loadScript
+  CYC(b_+49, b_+52); SET_HL(GV((SYM(interactionCode7a) + 12), 0x4680)); // scriptHelp.movingPlatform_loadScript
   CYC(b_+52, b_+54); E = 0x15;
   CALL_C(b_+54, interBankCall_hook, 0x008a, b_+57);
-  CYC(b_+57, b_+60); SET_HL((SYM(interactionCode7a__state0) + 28)); // scriptHelp.movingPlatform_runScript
+  CYC(b_+57, b_+60); SET_HL(GV((SYM(interactionCode7a__state0) + 28), 0x469d)); // scriptHelp.movingPlatform_runScript
   CYC(b_+60, b_+62); E = 0x15;
   CALL_C(b_+62, interBankCall_hook, 0x008a, b_+65);
   CYC(b_+65, b_+68); objectSetVisible83_hook(gb); return; // jp
@@ -142,7 +142,7 @@ substate0:
   CALL_C(b_+129, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+132);
   if (!(F & FZ)) { RET_TAKEN(b_+132); return; } // ret nz
   CYC(b_+132, b_+133);
-  CYC(b_+133, b_+136); SET_HL((SYM(interactionCode7a__state0) + 28)); // scriptHelp.movingPlatform_runScript
+  CYC(b_+133, b_+136); SET_HL(GV((SYM(interactionCode7a__state0) + 28), 0x469d)); // scriptHelp.movingPlatform_runScript
   CYC(b_+136, b_+138); E = 0x15;
   CALL_C(b_+138, interBankCall_hook, 0x008a, b_+141);
   RET(b_+141); return; // ret

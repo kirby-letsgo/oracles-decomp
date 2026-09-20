@@ -56,7 +56,7 @@ void specialObjectCode_minecart_b06_hook(GB *gb) {
 
   CYC(b_+11, b_+13); A = 0x01;
   CYC(b_+13, b_+14); mem_wr(gb, DE, A);
-  CYC(b_+14, b_+17); SET_HL((SYM(nextToKeyDoor) + 49));
+  CYC(b_+14, b_+17); SET_HL(GV((SYM(nextToKeyDoor) + 49), 0x41b5));
   CYC(b_+17, b_+19); E = 0x05;
   CALL_C(b_+19, interBankCall_hook, 0x008a, b_+22);
   CYC(b_+22, b_+23); H = D;

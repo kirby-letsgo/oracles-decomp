@@ -257,7 +257,7 @@ void generateSecret__determineXorCipher_hook(GB *gb) {
     return;
   }
   CYC(b_+64, b_+66);
-  CYC(b_+66, b_+68); L = 0xfb;
+  CYC(b_+66, b_+68); L = GV(0xfb, 0xe6);
   CYC(b_+68, b_+69); A = mem_rd(gb, HL);
   CYC(b_+69, b_+71); A = alu_swap(gb, A);
   CYC(b_+71, b_+73); alu_and(gb, 0x0f);

@@ -171,7 +171,7 @@ void twinrovaCutscene_state1_hook(GB *gb) {
   }
   CYC(b_+4, b_+5);
   CALL_C(b_+5, incCutsceneState_hook, SYM(incCutsceneState), b_+8);
-  CYC(b_+8, b_+10); A = 0xf1;
+  CYC(b_+8, b_+10); A = GV(0xf1, 0x9a);
   CYC(b_+10, b_+13); mem_wr(gb, wActiveRoom, A);
   CALL_C(b_+13, twinrovaCutscene_fadeinToRoom_hook, SYM(twinrovaCutscene_fadeinToRoom), b_+16);
   CALL_C(b_+16, refreshObjectGfx_hook, SYM(refreshObjectGfx), b_+19);
@@ -293,7 +293,7 @@ void cutscene18_state5_hook(GB *gb) {
     return;
   }
   CYC(b_+7, b_+8);
-  CYC(b_+8, b_+10); A = 0xf5;
+  CYC(b_+8, b_+10); A = GV(0xf5, 0x9e);
   CYC(b_+10, b_+13); mem_wr(gb, wActiveRoom, A);
   CALL_C(b_+13, twinrovaCutscene_fadeinToRoom_hook, SYM(twinrovaCutscene_fadeinToRoom), b_+16);
   CALL_C(b_+16, getFreeEnemySlot_hook, SYM(getFreeEnemySlot), b_+19);
@@ -331,7 +331,7 @@ void twinrovaCutscene_deleteAllInteractionsExceptFlames_hook(GB *gb) {
     } else {
       CYC(b_+7, b_+9);
       CYC(b_+9, b_+10); A = mem_rd(gb, HL); SET_HL(HL + 1);
-      CYC(b_+10, b_+12); alu_cp(gb, 0xa9);
+      CYC(b_+10, b_+12); alu_cp(gb, GV(0xa9, 0xb0));
       if (F & FZ) {
         CYCT(b_+12, b_+15); push_effect(gb, b_+15);
         twinrovaCutscene_deleteAllInteractionsExceptFlames_delete(gb);
@@ -1466,7 +1466,7 @@ void introCinematic_inTemple_state0_hook(GB *gb) {
   CALL_C(b_+22, loadGfxRegisterStateIndex_hook, SYM(loadGfxRegisterStateIndex), b_+25);
   CYC(b_+25, b_+28); A = mem_rd(gb, wGfxRegs1_SCY);
   CYC(b_+28, b_+30); mem_wr(gb, hCameraY, A);
-  CYC(b_+30, b_+32); A = 0x10;
+  CYC(b_+30, b_+32); A = GV(0x10, 0x18);
   CYC(b_+32, b_+35); mem_wr(gb, wTilesetAnimation, A);
   CALL_C(b_+35, loadAnimationData_hook, SYM(loadAnimationData), b_+38);
   CYC(b_+38, b_+40); A = 0x01;
@@ -1481,8 +1481,8 @@ void introCinematic_inTemple_state0_hook(GB *gb) {
   CYC(b_+59, b_+60); mem_wr(gb, HL, A);
   CYC(b_+60, b_+62); L = 0x0d;
   CYC(b_+62, b_+64); mem_wr(gb, HL, 0x50);
-  CYC(b_+64, b_+67); SET_HL((SYM(func_7098) + 2));
-  CYC(b_+67, b_+69); A = 0x10;
+  CYC(b_+64, b_+67); SET_HL(GV((SYM(func_7098) + 2), 0x54a8));
+  CYC(b_+67, b_+69); A = GV(0x10, 0x03);
   CALL_C(b_+69, setSimulatedInputAddress_hook, SYM(setSimulatedInputAddress), b_+72);
   CYC(b_+72, b_+74); B = 0x03;
   CYC(b_+74, b_+76); C = 0x30;

@@ -584,7 +584,7 @@ set_animation:
   CYC(b_+21, b_+22); push_effect(gb, HL);
   CALL_C(b_+22, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+25);
   CYC(b_+25, b_+26); SET_HL(pop_effect(gb));
-  CYC(b_+26, b_+28); A = 0x0c;
+  CYC(b_+26, b_+28); A = GV(0x0c, 0x0b);
   CYC(b_+28, b_+30); H8(hRomBank) = A;
   CYC(b_+30, b_+33); mem_wr(gb, MBC_ROM_BANK, A);
   CYC(b_+33, b_+34); ret_effect(gb);

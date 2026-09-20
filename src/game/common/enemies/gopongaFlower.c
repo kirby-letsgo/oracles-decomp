@@ -70,7 +70,7 @@ state_uninitialized:
   CYC(b_+53, b_+55); alu_add(gb, 0x04);
   CYC(b_+55, b_+56); mem_wr(gb, HL, A);
   CYC(b_+56, b_+58); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
-  CYC(b_+58, b_+60); mem_wr(gb, HL, 0x57); // ENEMYCOLLISION_BIG_GOPONGA_FLOWER
+  CYC(b_+58, b_+60); mem_wr(gb, HL, GV(0x57, 0x54)); // ENEMYCOLLISION_BIG_GOPONGA_FLOWER
 
 setSpeedAndState8:
   CALL_C(b_+60, ecom_setSpeedAndState8_b0d_hook, SYM(ecom_setSpeedAndState8_b0d), b_+63);

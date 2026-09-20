@@ -19,7 +19,7 @@ void interactionCode1c_hook(GB *gb) {
   }
   CYC(b_+3, b_+6);
 
-  CYC(b_+6, b_+8); A = 0x14; // GLOBALFLAG_FINISHEDGAME
+  CYC(b_+6, b_+8); A = GV(0x14, 0x28); // GLOBALFLAG_FINISHEDGAME
   CALL_C(b_+8, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+11);
   if (!(F & FZ)) {
     CYCT(b_+11, b_+13); goto init;

@@ -552,7 +552,7 @@ void addRoomToEnemiesKilledList_b02_hook(GB *gb) {
     CYC(b_+24, b_+27); mem_wr(gb, wEnemiesKilledListTail, A);
     CYC(b_+27, b_+28); A = B;
     CYC(b_+28, b_+30); alu_and(gb, 0x0f);
-    CYC(b_+30, b_+32); alu_add(gb, 0xc0);
+    CYC(b_+30, b_+32); alu_add(gb, GV(0xc0, 0x1f));
     CYC(b_+32, b_+33); L = A;
     CYC(b_+33, b_+36); A = mem_rd(gb, wActiveRoom);
     CYC(b_+36, b_+37); mem_wr(gb, HL, A); SET_HL(HL + 1);
@@ -1542,13 +1542,13 @@ void mapMenu_clearUnvisitedTiles__nextTile_hook(GB *gb) {
 
 void checkMoblinsKeepDestroyed_hook(GB *gb) {
   BASE(checkMoblinsKeepDestroyed);
-  CYC(b_+0, b_+2); A = 0x1a;
+  CYC(b_+0, b_+2); A = GV(0x1a, 0x16);
   CYC(b_+2, b_+5); checkGlobalFlag_hook(gb);
 }
 
 void checkAdvanceShopVisited_hook(GB *gb) {
   BASE(checkAdvanceShopVisited);
-  CYC(b_+0, b_+3); A = mem_rd(gb, (wGroup1RoomFlags + 254));
+  CYC(b_+0, b_+3); A = mem_rd(gb, GV((wGroup1RoomFlags + 254), 0xc8af));
   CYC(b_+3, b_+5); alu_and(gb, 0x10);
   CYC(b_+5, b_+6); ret_effect(gb);
 }
@@ -2856,7 +2856,7 @@ void dungeonMap_calculateVisitedFloorsAndLinkPosition_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+38, b_+39); ret_effect(gb); return; }
   CYC(b_+38, b_+39);
   CYC(b_+39, b_+42); A = W8(wActiveRoom);
-  CYC(b_+42, b_+44); alu_cp(gb, 0xf5);
+  CYC(b_+42, b_+44); alu_cp(gb, GV(0xf5, 0x9e));
   if (!(F & FZ)) { CYCT(b_+44, b_+45); ret_effect(gb); return; }
   CYC(b_+44, b_+45);
   CYC(b_+45, b_+47); A = 0x13;
@@ -3083,7 +3083,7 @@ void mapGetRoomText__specialCode2_hook(GB *gb) {
   BASE(mapGetRoomText);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+81, checkMoblinsKeepDestroyed_hook, SYM(checkMoblinsKeepDestroyed), b_+84);
-  CYC(b_+84, b_+86); C = 0x17;
+  CYC(b_+84, b_+86); C = GV(0x17, 0x0b);
   if (!(F & FZ)) { CYCT(b_+86, b_+87); ret_effect(gb); return; }
   CYC(b_+86, b_+87);
   CYC(b_+87, b_+88); C = alu_inc8(gb, C);
@@ -3094,7 +3094,7 @@ void mapGetRoomText__specialCode3_hook(GB *gb) {
   BASE(mapGetRoomText);
   CYC(b_+89, b_+92); A = W8(wAnimalCompanion);
   CYC(b_+92, b_+94); alu_sub(gb, 0x0b);
-  CYC(b_+94, b_+96); alu_add(gb, 0x2d);
+  CYC(b_+94, b_+96); alu_add(gb, GV(0x2d, 0x08));
   CYC(b_+96, b_+97); C = A;
   CYC(b_+97, b_+98); ret_effect(gb);
 }
@@ -4787,7 +4787,7 @@ write_sprites:
 void updateStatusBar_body__biggoronSword_hook(GB *gb) {
   BASE(updateStatusBar_body);
   CYC(b_+291, b_+294); SET_HL(wOam);
-  CYC(b_+294, b_+297); SET_DE(b_+302);
+  CYC(b_+294, b_+297); SET_DE(GV(b_+302, 0x528d));
   CYC(b_+297, b_+299); B = 0x10;
   CYC(b_+299, b_+302); copyMemoryReverse_hook(gb);
 }
@@ -4878,7 +4878,7 @@ void loadEquippedItemSpriteData_hook(GB *gb) {
   CYC(b_+7, b_+9);
   CYC(b_+9, b_+10); E = alu_inc8(gb, E);
   CYC(b_+10, b_+11); B = A;
-  CYC(b_+11, b_+13); alu_cp(gb, 0x84);
+  CYC(b_+11, b_+13); alu_cp(gb, GV(0x84, 0x86));
   CYC(b_+13, b_+14); A = mem_rd(gb, HL); SET_HL(HL + 1);
   if (!(F & FC)) { CYCT(b_+14, b_+16); goto attr1; }
   CYC(b_+14, b_+16);
@@ -5788,7 +5788,7 @@ void ringMenu_state0_hook(GB *gb) {
   CALL_C(b_+21, loadGfxHeader_hook, SYM(loadGfxHeader), b_+24);
   CYC(b_+24, b_+26); A = 0x0a;
   CALL_C(b_+26, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+29);
-  CYC(b_+29, b_+32); SET_HL((SYM(func_02_465c) + 19));
+  CYC(b_+29, b_+32); SET_HL(GV((SYM(func_02_465c) + 19), 0x4675));
   CYC(b_+32, b_+34); E = 0x3f;
   CALL_C(b_+34, interBankCall_hook, 0x008a, b_+37);
   CALL_C(b_+37, ringMenu_calculateNumPagesForUnappraisedRings_hook, SYM(ringMenu_calculateNumPagesForUnappraisedRings), b_+40);
@@ -6048,7 +6048,7 @@ void ringMenu_unappraisedRings_state4_hook(GB *gb) {
   CYC(b_+11, b_+13); A = 0x28;
   if (!(F & FZ)) CALL_C_CC(b_+13, giveTreasure_hook, SYM(giveTreasure), b_+16);
   else CYC(b_+13, b_+16);
-  CYC(b_+16, b_+19); SET_HL((SYM(label_02_038) + 24));
+  CYC(b_+16, b_+19); SET_HL(GV((SYM(label_02_038) + 24), 0x469d));
   CYC(b_+19, b_+21); E = 0x3f;
   CALL_C(b_+21, interBankCall_hook, 0x008a, b_+24);
   CALL_C(b_+24, ringMenu_drawUnappraisedRings_hook, SYM(ringMenu_drawUnappraisedRings), b_+27);
@@ -6161,7 +6161,7 @@ void secretListMenu_state0_hook(GB *gb) {
   CALL_C(b_+15, secretListMenu_state0__clearVramBank_hook, b_+44, b_+18);
   CYC(b_+18, b_+20); A = 0x05;
   CALL_C(b_+20, loadGfxHeader_hook, SYM(loadGfxHeader), b_+23);
-  CYC(b_+23, b_+25); A = 0xa8;
+  CYC(b_+23, b_+25); A = GV(0xa8, 0x3f);
   CALL_C(b_+25, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+28);
   CALL_C(b_+28, secretListMenu_loadAllSecretNames_hook, SYM(secretListMenu_loadAllSecretNames), b_+31);
   CYC(b_+31, b_+33); A = 0xff;
@@ -6359,7 +6359,7 @@ void secretListMenu_printSecret__getSecretText_hook(GB *gb) {
 
 void secretListMenu_printSecret__val0_hook(GB *gb) {
   BASE(secretListMenu_printSecret);
-  CYC(b_+79, b_+82); SET_HL((SYM(textInput_getCursorPosition) + 32));
+  CYC(b_+79, b_+82); SET_HL(0x481b);
   CYC(b_+82, b_+84); E = 0x03;
   CYC(b_+84, b_+87); interBankCall_hook(gb);
 }
@@ -7043,7 +7043,7 @@ void ringMenu_drawSpritesForRingsInBox__nextRing_hook(GB *gb) {
 void ringMenu_calculateNumPagesForUnappraisedRings_hook(GB *gb) {
   BASE(ringMenu_calculateNumPagesForUnappraisedRings);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); SET_HL((SYM(label_02_038) + 24));
+  CYC(b_+0, b_+3); SET_HL(GV((SYM(label_02_038) + 24), 0x469d));
   CYC(b_+3, b_+5); E = 0x3f;
   CALL_C(b_+5, interBankCall_hook, 0x008a, b_+8);
   CYC(b_+8, b_+11); A = W8(wNumUnappraisedRingsBcd);
@@ -7238,7 +7238,7 @@ void getRingTiles_hook(GB *gb) {
     }
   }
   CALL_C(b_+20, multiplyABy8_hook, SYM(multiplyABy8), b_+23);
-  CYC(b_+23, b_+26); SET_HL(SYM(inventoryMenuState2__subState2));
+  CYC(b_+23, b_+26); SET_HL(0x57a0);
   CYC(b_+26, b_+27); alu_add_hl(gb, BC);
   CYC(b_+27, b_+28); push_effect(gb, DE);
   CALL_C(b_+28, copy8BytesFromRingMapToCec0_hook, SYM(copy8BytesFromRingMapToCec0), b_+31);
@@ -7541,14 +7541,14 @@ draw:
 }
 void fileSelectDrawLinkInOtherGame_hook(GB *gb) {
   BASE(fileSelectDrawLinkInOtherGame);
-  CYC(b_+0, b_+2); B = 0;
+  CYC(b_+0, b_+2); B = GV(0x00, 0x04);
   CYC(b_+2, b_+4);
   fileSelectDrawLink_body_hook(gb);
 }
 
 void fileSelectDrawLink_hook(GB *gb) {
   BASE(fileSelectDrawLink);
-  CYC(b_+0, b_+2); B = 4;
+  CYC(b_+0, b_+2); B = GV(0x04, 0x00);
   fileSelectDrawLink_body_hook(gb);
 }
 void fileSelectDrawLink__draw_hook(GB *gb) {
@@ -8925,7 +8925,7 @@ void func_02_5afc_hook(GB *gb) {
   BASE(func_02_5afc);
   CYC(b_+0, b_+1); C = A;
   CYC(b_+1, b_+4); A = W8(wInventory_cbb8);
-  CYC(b_+4, b_+7); SET_HL((SYM(seedAndHarpSpriteTable__sprite7) + 5));
+  CYC(b_+4, b_+7); SET_HL(GV((SYM(seedAndHarpSpriteTable__sprite7) + 5), 0x5a70));
   CYC(b_+7, b_+8); add_double_index_to_hl(gb, b_+8);
   CYC(b_+8, b_+9); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+9, b_+10); H = mem_rd(gb, HL);
@@ -9495,7 +9495,7 @@ void inventoryMenuDrawSprites__drawSpriteWithXOffset_hook(GB *gb) {
 
 void inventoryMenuDrawSprites__drawSprite_hook(GB *gb) {
   BASE(inventoryMenuDrawSprites);
-  CYC(b_+54, b_+57); SET_HL(b_+60);
+  CYC(b_+54, b_+57); SET_HL(GV(b_+60, 0x5d5f));
   CYC(b_+57, b_+60); addSpritesToOam_withOffset_hook(gb);
 }
 

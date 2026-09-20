@@ -65,7 +65,7 @@ void enemyCode3e_hook(GB *gb) {
   // ENEMYSTATUS_KNOCKBACK
   CYC(b_+8, b_+10); E = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
   CYC(b_+10, b_+11); A = mem_rd(gb, DE);
-  CYC(b_+11, b_+13); alu_cp(gb, 0x58); // ENEMYCOLLISION_PEAHAT
+  CYC(b_+11, b_+13); alu_cp(gb, GV(0x58, 0x55)); // ENEMYCOLLISION_PEAHAT
   if (!(F & FZ)) { RET_TAKEN(b_+13); return; } // ret nz
   CYC(b_+13, b_+14);
 
@@ -213,7 +213,7 @@ void peahat_updateEnemyCollisionMode_hook(GB *gb) {
   CYC(b_+4, b_+6); A = 0x2e; // ENEMYCOLLISION_PEAHAT_VULNERABLE
   if (F & FZ) { CYCT(b_+6, b_+8); goto setVars; } // jr z
   CYC(b_+6, b_+8);
-  CYC(b_+8, b_+10); A = 0x58; // ENEMYCOLLISION_PEAHAT
+  CYC(b_+8, b_+10); A = GV(0x58, 0x55); // ENEMYCOLLISION_PEAHAT
 
 setVars:
   CYC(b_+10, b_+12); E = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;

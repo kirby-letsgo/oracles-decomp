@@ -70,7 +70,7 @@ void enemyCode14_hook(GB *gb) {
 checkFlipCollision:
   CYC(b_+29, b_+31); E = ENEMY_BASE + OBJ_VAR2A;
   CYC(b_+31, b_+32); A = mem_rd(gb, DE);
-  CYC(b_+32, b_+34); alu_cp(gb, 0x8c); // $80|ITEMCOLLISION_SHOVEL
+  CYC(b_+32, b_+34); alu_cp(gb, GV(0x8c, 0x8d)); // $80|ITEMCOLLISION_SHOVEL
   if (F & FZ) { CYCT(b_+34, b_+36); goto alreadyFlipped; } // jr z
   CYC(b_+34, b_+36);
   CYC(b_+36, b_+38); A = (uint8_t)(A & ~(1 << 7)); // res 7,a
@@ -91,7 +91,7 @@ alreadyFlipped:
   CYC(b_+58, b_+60); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+60, b_+62); mem_wr(gb, HL, 0x0b);
   CYC(b_+62, b_+64); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
-  CYC(b_+64, b_+66); mem_wr(gb, HL, 0x51); // ENEMYCOLLISION_SPIKED_BEETLE_FLIPPED
+  CYC(b_+64, b_+66); mem_wr(gb, HL, GV(0x51, 0x4e)); // ENEMYCOLLISION_SPIKED_BEETLE_FLIPPED
   CYC(b_+66, b_+68); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+68, b_+70); mem_wr(gb, HL, 180);
   CYC(b_+70, b_+72); L = ENEMY_BASE + OBJ_KNOCKBACK_ANGLE;
@@ -202,7 +202,7 @@ stateB:
   CYC(b_+229, b_+231); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+231, b_+233); mem_wr(gb, HL, 0x1e); // SPEED_c0
   CYC(b_+233, b_+235); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
-  CYC(b_+235, b_+237); mem_wr(gb, HL, 0x18); // ENEMYCOLLISION_SPIKED_BEETLE
+  CYC(b_+235, b_+237); mem_wr(gb, HL, GV(0x18, 0x17)); // ENEMYCOLLISION_SPIKED_BEETLE
   CYC(b_+237, b_+239); L = ENEMY_BASE + OBJ_XH;
   CYC(b_+239, b_+240); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+240, b_+243); SET_BC(0xfe80); // -$180

@@ -377,7 +377,7 @@ void standardTextStateF_hook(GB *gb) {
   CYC(b_+325, b_+327); mem_wr(gb, HL, 0x00);
   CYC(b_+327, b_+328); L = E;
   CYC(b_+328, b_+330); mem_wr(gb, HL, 0x00);
-  CYC(b_+330, b_+332); A = 0x49;
+  CYC(b_+330, b_+332); A = GV(GV(0x49, 0x24), 0x24);
   CYC(b_+332, b_+335); mem_wr(gb, wTextIndexL, A);
   CYC(b_+335, b_+337); A = 0x00;
   CYC(b_+337, b_+339); alu_add(gb, 0x04);

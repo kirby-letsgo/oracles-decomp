@@ -460,7 +460,7 @@ compare:
 void ghini_chooseTargetPosition_hook(GB *gb) {
   BASE(ghini_chooseTargetPosition);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); SET_BC((SYM(enemy27Animations) + 2));
+  CYC(b_+0, b_+3); SET_BC(0x7070);
   CALL_C(b_+3, ecom_randomBitwiseAndBCE_b0d_hook, SYM(ecom_randomBitwiseAndBCE_b0d), b_+6);
   CYC(b_+6, b_+7); A = B;
   CYC(b_+7, b_+9); alu_sub(gb, 0x20);

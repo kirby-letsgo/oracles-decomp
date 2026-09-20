@@ -171,7 +171,7 @@ leapOutOfWater:
   CYC(b_+25, b_+26); L = E;
   CYC(b_+26, b_+27); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
   CYC(b_+27, b_+29); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
-  CYC(b_+29, b_+31); mem_wr(gb, HL, 0x14); // ENEMYCOLLISION_SWITCHHOOK_DAMAGE_ENEMY
+  CYC(b_+29, b_+31); mem_wr(gb, HL, GV(0x14, 0x10)); // ENEMYCOLLISION_SWITCHHOOK_DAMAGE_ENEMY
   CYC(b_+31, b_+33); L = ENEMY_BASE + OBJ_ZH;
   CYC(b_+33, b_+35); mem_wr(gb, HL, 0x00);
   CYC(b_+35, b_+37); L = ENEMY_BASE + OBJ_SPEED_Z;
@@ -331,8 +331,8 @@ void fish_updatePosition_hook(GB *gb) {
   CYC(b_+26, b_+27); C = A;
   CYC(b_+27, b_+29); B = 0xcf; // >wRoomLayout
   CYC(b_+29, b_+30); A = mem_rd(gb, BC);
-  CYC(b_+30, b_+32); alu_sub(gb, 0xf9); // TILEINDEX_PUDDLE
-  CYC(b_+32, b_+34); alu_cp(gb, 0x05); // TILEINDEX_FD-TILEINDEX_PUDDLE+1
+  CYC(b_+30, b_+32); alu_sub(gb, GV(0xf9, 0xfa)); // TILEINDEX_PUDDLE
+  CYC(b_+32, b_+34); alu_cp(gb, GV(0x05, 0x04)); // TILEINDEX_FD-TILEINDEX_PUDDLE+1
   if (!(F & FC)) { RET_TAKEN(b_+34); return; } // ret nc
   CYC(b_+34, b_+35);
   CALL_C(b_+35, objectApplySpeed_hook, SYM(objectApplySpeed), b_+38);
@@ -389,8 +389,8 @@ scanWall:
   CYC(b_+36, b_+37); alu_or(gb, E);
   CYC(b_+37, b_+38); E = A;
   CYC(b_+38, b_+39); A = mem_rd(gb, DE);
-  CYC(b_+39, b_+41); alu_sub(gb, 0xf9); // TILEINDEX_PUDDLE
-  CYC(b_+41, b_+43); alu_cp(gb, 0x05); // TILEINDEX_FD-TILEINDEX_PUDDLE+1
+  CYC(b_+39, b_+41); alu_sub(gb, GV(0xf9, 0xfa)); // TILEINDEX_PUDDLE
+  CYC(b_+41, b_+43); alu_cp(gb, GV(0x05, 0x04)); // TILEINDEX_FD-TILEINDEX_PUDDLE+1
   CYC(b_+43, b_+45); A = H8(hFF8B);
   CYC(b_+45, b_+46); alu_rla(gb);
   CYC(b_+46, b_+48); H8(hFF8B) = A;

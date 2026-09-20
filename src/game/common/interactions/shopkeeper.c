@@ -148,7 +148,7 @@ void shopkeeperPromptChestGame_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); A = 0x0c;
   CALL_C(b_+2, shopkeeperGetItemPrice_hook, SYM(shopkeeperGetItemPrice), b_+5);
-  CYC(b_+5, b_+8); SET_HL((SYM(interactionCode50__func_48d0) + 25));
+  CYC(b_+5, b_+8); SET_HL(GV((SYM(interactionCode50__func_48d0) + 25), 0x48ba));
   CYC(b_+8, b_+10); shopkeeperLoadScript_hook(gb);
 }
 
@@ -254,7 +254,7 @@ L_41d0:
   if (F & FZ) { CYCT(b_+38, b_+40); goto L_41de; } CYC(b_+38, b_+40);
   CYC(b_+40, b_+41); alu_xor(gb, A);
   CYC(b_+41, b_+42); mem_wr(gb, DE, A);
-  CYC(b_+42, b_+45); SET_HL((SYM(interactionCode60__state0) + 28));
+  CYC(b_+42, b_+45); SET_HL(GV((SYM(interactionCode60__state0) + 28), 0x496e));
   CYC(b_+45, b_+48); shopkeeperLoadScript_hook(gb); return;
 L_41de:
   CYC(b_+48, b_+51); A = mem_rd(gb, wcca2);
@@ -276,7 +276,7 @@ L_41de:
   CYC(b_+75, b_+77); L = 0x7c;
   if (!(F & FZ)) { CYCT(b_+77, b_+79); goto L_4204; } CYC(b_+77, b_+79);
   CYC(b_+79, b_+80); mem_wr(gb, HL, A);
-  CYC(b_+80, b_+83); SET_HL((SYM(objectOscillateZ_body) + 15));
+  CYC(b_+80, b_+83); SET_HL(GV((SYM(objectOscillateZ_body) + 15), 0x490d));
   CYC(b_+83, b_+86); shopkeeperLoadScript_hook(gb); return;
 L_4204:
   CYC(b_+86, b_+87); alu_add(gb, mem_rd(gb, HL));
@@ -300,7 +300,7 @@ L_4204:
   CYC(b_+121, b_+123); L = 0x4d;
   CYC(b_+123, b_+124); A = mem_rd(gb, BC);
   CYC(b_+124, b_+125); mem_wr(gb, HL, A);
-  CYC(b_+125, b_+128); SET_HL(SYM(interactionCode56));
+  CYC(b_+125, b_+128); SET_HL(GV(SYM(interactionCode56), 0x4921));
   CYC(b_+128, b_+131); shopkeeperLoadScript_hook(gb); return;
 L_4231:
   CYC(b_+131, b_+133); E = 0x49;
@@ -379,10 +379,10 @@ void shopkeeperCheckLinkHasItemAlready_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+28, b_+30); goto L_42a0; } CYC(b_+28, b_+30);
   CYC(b_+30, b_+32); alu_cp(gb, 0x0d);
   if (F & FZ) { CYCT(b_+32, b_+34); goto L_42a4; } CYC(b_+32, b_+34);
-  CYC(b_+34, b_+36); L = 0xb0;
+  CYC(b_+34, b_+36); L = GV(0xb0, 0xaa);
   CYC(b_+36, b_+38); alu_cp(gb, 4);
   if (F & FZ) { CYCT(b_+38, b_+40); goto L_4299; } CYC(b_+38, b_+40);
-  CYC(b_+40, b_+42); L = 0xaa;
+  CYC(b_+40, b_+42); L = GV(0xaa, 0xa2);
 L_4299:
   CYC(b_+42, b_+43); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+43, b_+44); alu_cp(gb, mem_rd(gb, HL));
@@ -420,7 +420,7 @@ L_42bb:
   CYC(b_+14, b_+15); A = H;
   CYC(b_+15, b_+17); alu_cp(gb, 0xe0);
   if (F & FC) { CYCT(b_+17, b_+19); goto L_42b1; } CYC(b_+17, b_+19);
-  CYC(b_+19, b_+22); SET_HL((SYM(interactionCode50__state0__substate0) + 11));
+  CYC(b_+19, b_+22); SET_HL(GV((SYM(interactionCode50__state0__substate0) + 11), 0x47b5));
   CYC(b_+22, b_+23); alu_or(gb, D);
   CYC(b_+23, b_+24); ret_effect(gb);
 }

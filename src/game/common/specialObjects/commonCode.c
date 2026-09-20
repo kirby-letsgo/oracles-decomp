@@ -135,7 +135,7 @@ void dealSpikeDamageToLink_hook(GB *gb) {
 void updateLinkDamageTaken_hook(GB *gb) {
   BASE(updateLinkDamageTaken);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); SET_HL((SYM(companionDismount) + 56));
+  CYC(b_+0, b_+3); SET_HL(GV((SYM(companionDismount) + 56), 0x4647));
   CYC(b_+3, b_+5); E = 0x06;
   CALL_C(b_+5, interBankCall_hook, 0x008a, SYM(linkApplyDamage_b5));
   linkApplyDamage_b5_hook(gb);
@@ -1148,7 +1148,7 @@ void companionDragToCenterOfHole_hook(GB *gb) {
       CYCT(b_+29, b_+31);
     } else {
       CYC(b_+29, b_+31);
-      CYC(b_+31, b_+34); SET_HL(hramEnd);
+      CYC(b_+31, b_+34); SET_HL(0xffc0);
     }
     CYC(b_+34, b_+35); E = alu_dec8(gb, E);
     CYC(b_+35, b_+36); A = mem_rd(gb, DE);
@@ -1172,7 +1172,7 @@ void companionDragToCenterOfHole_hook(GB *gb) {
       CYCT(b_+52, b_+54);
     } else {
       CYC(b_+52, b_+54);
-      CYC(b_+54, b_+57); SET_HL(hramEnd);
+      CYC(b_+54, b_+57); SET_HL(0xffc0);
     }
     CYC(b_+57, b_+58); E = alu_dec8(gb, E);
     CYC(b_+58, b_+59); A = mem_rd(gb, DE);
@@ -1303,7 +1303,7 @@ check_tile:
   CYC(b_+34, b_+35); B = A;
   CYC(b_+35, b_+36); C = mem_rd(gb, HL);
   CALL_C(b_+36, objectGetRelativeTile_hook, SYM(objectGetRelativeTile), b_+39);
-  CYC(b_+39, b_+41); alu_cp(gb, 0xd4);
+  CYC(b_+39, b_+41); alu_cp(gb, GV(0xd4, 0xdd));
   if (F & FZ) {
     CYCT(b_+41, b_+43);
     CYC(b_+53, b_+55); A = 0x10;

@@ -60,7 +60,7 @@ void interactionCodec1__updateSparkles_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+115, b_+116); ret_effect(gb); return; }
   CYC(b_+115, b_+116);
   CYC(b_+116, b_+118); mem_wr(gb, HL, 6);
-  CYC(b_+118, b_+121); SET_BC(0x8409);
+  CYC(b_+118, b_+121); SET_BC(GV(0x8409, 0x8405));
   CYC(b_+121, b_+124); objectCreateInteraction_hook(gb);
 }
 

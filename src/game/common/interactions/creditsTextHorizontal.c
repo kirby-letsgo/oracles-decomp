@@ -464,7 +464,7 @@ substate2:
   CALL_C(b_+334, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+337);
   if (!(F & FZ)) { CYCT(b_+337, b_+338); ret_effect(gb); return; } // ret nz
   CYC(b_+337, b_+338);
-  CYC(b_+338, b_+341); SET_HL(wTmpcfc0_genericCutscene_cfdf);
-  CYC(b_+341, b_+343); mem_wr(gb, HL, 0xff);
+  CYC(b_+338, b_+341); SET_HL(GV(wTmpcfc0_genericCutscene_cfdf, wTmpcfc0_wildTokay_cfde));
+  CYC(b_+341, b_+343); mem_wr(gb, HL, GV(0xff, 0x01));
   CYC(b_+343, b_+346); interactionDelete_hook(gb); return; // jp
 }

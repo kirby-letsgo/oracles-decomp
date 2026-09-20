@@ -76,7 +76,7 @@ jump0:
 jump3:
   CYC(b_+35, b_+38); A = mem_rd(gb, wTextInputResult);
   CYC(b_+38, b_+40); alu_and(gb, 0x0f);
-  CYC(b_+40, b_+42); alu_add(gb, 0x5a);
+  CYC(b_+40, b_+42); alu_add(gb, GV(0x5a, 0x6e));
   CYC(b_+42, b_+43); B = A;
   CALL_C(b_+43, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+46);
   CYC(b_+46, b_+48); A = 0x02;
@@ -131,7 +131,7 @@ void faroreSpawnSecretChest_hook(GB *gb) {
 
 void faroreGenerateGameTransferSecret_hook(GB *gb) {
   BASE(faroreGenerateGameTransferSecret);
-  CYC(b_+0, b_+3); SET_HL((SYM(group2ObjectDataTable) + 224));
+  CYC(b_+0, b_+3); SET_HL(0x481b);
   CYC(b_+3, b_+5); E = 0x03;
   CYC(b_+5, b_+8); interBankCall_hook(gb);
 }

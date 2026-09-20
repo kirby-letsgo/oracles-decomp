@@ -295,7 +295,7 @@ substate1:
   CYC(b_+224, b_+225); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+225, b_+227); L = 0xe4; // Part.collisionType
   CYC(b_+227, b_+229); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
-  CYC(b_+229, b_+232); SET_BC(hramEnd);
+  CYC(b_+229, b_+232); SET_BC(0xffc0);
   CYC(b_+232, b_+235); objectSetSpeedZ_hook(gb); return; // jp
 
 substate2:

@@ -223,7 +223,8 @@ bool hook_dispatch(GB *gb) {
   if (!h) return false;
   if (hook_mode == HOOK_MODE_VERIFY && (h->flags & (HOOK_NOVERIFY | HOOK_LOCAL))) return false;
   h->calls++;
-  if (hook_mode == HOOK_MODE_VERIFY && (h->calls <= 4 || h->calls % 256 == 0 || verify_depth == 0)) { verify(gb, h); return true; }
+  static int verify_all = -1; if (verify_all < 0) verify_all = getenv("VERIFY_ALL") != NULL;
+  if (hook_mode == HOOK_MODE_VERIFY && (verify_all || h->calls <= 4 || h->calls % 256 == 0 || verify_depth == 0)) { verify(gb, h); return true; }
   static int hooklog = -1; if (hooklog < 0) hooklog = getenv("HOOKLOG") != NULL;
   if (hooklog) fprintf(stderr, "HOOK> %s mc %llu frame %llu sp %04x ime %d\n", h->name, (unsigned long long)gb->mcycles, (unsigned long long)GRID_FRAME(gb->cycles), gb->sp, gb->ime);
   int depth0 = depth;

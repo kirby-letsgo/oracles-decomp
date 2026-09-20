@@ -89,11 +89,11 @@ void interactiond9_state0_hook(GB *gb) {
   CYC(b_+5, b_+7); E = INTERACTION_BASE + OBJ_SUBID;
   CYC(b_+7, b_+8); A = mem_rd(gb, DE);
   CYC(b_+8, b_+9); B = A;
-  CYC(b_+9, b_+11); alu_add(gb, 0x5a); // GLOBALFLAG_FIRST_AGES_DONE_SECRET
+  CYC(b_+9, b_+11); alu_add(gb, GV(0x5a, 0x6e)); // GLOBALFLAG_FIRST_AGES_DONE_SECRET
   CALL_C(b_+11, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+14);
   if (F & FZ) { CYCT(b_+14, b_+16); goto secretNotTold; } // jr z
   CYC(b_+14, b_+16);
-  CYC(b_+16, b_+19); SET_BC((SYM(interactionCode9d__state1) + 18)); // TX_550c
+  CYC(b_+16, b_+19); SET_BC(0x550c); // TX_550c
   CALL_C(b_+19, showText_hook, SYM(showText), b_+22);
   CYC(b_+22, b_+24); A = 0x02;
   CYC(b_+24, b_+27); mem_wr(gb, wTmpcfc0_genericCutscene_state, A);
@@ -134,7 +134,7 @@ void interactiond9_markSecretAsTold_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, b_+5); alu_add(gb, 0x5a); // GLOBALFLAG_FIRST_AGES_DONE_SECRET
+  CYC(b_+3, b_+5); alu_add(gb, GV(0x5a, 0x6e)); // GLOBALFLAG_FIRST_AGES_DONE_SECRET
   CALL_C(b_+5, setGlobalFlag_hook, SYM(setGlobalFlag), b_+8);
   CYC(b_+8, b_+10); A = 0x2c; // GLOBALFLAG_SECRET_CHEST_WAITING
   CYC(b_+10, b_+13); unsetGlobalFlag_hook(gb); return; // jp
@@ -188,7 +188,7 @@ substate2:
   CALL_C(b_+56, setGlobalFlag_hook, SYM(setGlobalFlag), b_+59);
   CYC(b_+59, b_+61); A = 0x02;
   CYC(b_+61, b_+64); mem_wr(gb, wTmpcfc0_genericCutscene_state, A);
-  CYC(b_+64, b_+67); SET_BC((SYM(interactionCode9d__state1) + 15)); // TX_5509
+  CYC(b_+64, b_+67); SET_BC(0x5509); // TX_5509
   CALL_C(b_+67, showText_hook, SYM(showText), b_+70);
   CYC(b_+70, b_+73); interactionIncSubstate_hook(gb); return; // jp
 
@@ -333,7 +333,7 @@ l_4f41:
   CYCT(b_+168, b_+170); goto label_0b_135; // jr
 
 bombUpgrade:
-  CYC(b_+170, b_+173); SET_BC((SYM(zora_subid0D__state0) + 4)); // TREASURE_OBJECT_BOMB_UPGRADE_00
+  CYC(b_+170, b_+173); SET_BC(0x6100); // TREASURE_OBJECT_BOMB_UPGRADE_00
   CYC(b_+173, b_+176); push_effect(gb, b_+176); interactiond9_state2_createTreasureAndIncSubstate_hook(gb); // call
   if (!(gb->pc == b_+176 && gb->sp == sp0_)) { hook_continue(gb, gb->pc, sp0_); return; }
   CYC(b_+176, b_+179); SET_HL(wMaxBombs);
@@ -345,7 +345,7 @@ bombUpgrade:
 
 satchelUpgrade:
   CYC(b_+187, b_+190); A = mem_rd(gb, wSeedSatchelLevel);
-  CYC(b_+190, b_+193); SET_BC(0x1904); // TREASURE_OBJECT_SEED_SATCHEL_UPGRADE
+  CYC(b_+190, b_+193); SET_BC(GV(0x1904, 0x1901)); // TREASURE_OBJECT_SEED_SATCHEL_UPGRADE
   CYCT(b_+193, b_+195); interactiond9_state2_createTreasureAndIncSubstate_hook(gb); return; // jr
 
 label_0b_135:
@@ -384,7 +384,7 @@ fillSatchel:
 cleanup:
   CYC(b_+248, b_+250); A = 0x02;
   CYC(b_+250, b_+253); mem_wr(gb, wTmpcfc0_genericCutscene_state, A);
-  CYC(b_+253, b_+256); SET_BC((SYM(interactionCode9d__state1) + 15)); // TX_5509
+  CYC(b_+253, b_+256); SET_BC(0x5509); // TX_5509
   CALL_C(b_+256, showText_hook, SYM(showText), b_+259);
   CALL_C(b_+259, interactiond9_markSecretAsTold_hook, SYM(interactiond9_markSecretAsTold), b_+262);
   CYC(b_+262, b_+265); interactionDelete_hook(gb); return; // jp

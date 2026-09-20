@@ -320,7 +320,7 @@ void linkCutscene_cpxTo38_hook(GB *gb) {
 void linkCutscene_initOam_setVisible_incState_hook(GB *gb) {
   BASE(linkCutscene_initOam_setVisible_incState);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); SET_HL((SYM(nextToKeyDoor) + 49));
+  CYC(b_+0, b_+3); SET_HL(GV((SYM(nextToKeyDoor) + 49), 0x41b5));
   CYC(b_+3, b_+5); E = 0x05;
   CALL_C(b_+5, interBankCall_hook, 0x008a, b_+8);
   CALL_C(b_+8, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+11);

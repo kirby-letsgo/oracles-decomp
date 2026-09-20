@@ -269,7 +269,7 @@ void volcanoRock_setRandomPosition_hook(GB *gb) {
   CYC(b_+17, b_+19); alu_and(gb, 0xfe);
   CYC(b_+19, b_+21); E = 0xcf; // Part.zh
   CYC(b_+21, b_+22); mem_wr(gb, DE, A);
-  CYC(b_+22, b_+24); L = 0xac; // <hCameraX
+  CYC(b_+22, b_+24); L = GV(0xac, 0xaa); // <hCameraX
   CYC(b_+24, b_+26); E = 0xcd; // Part.xh
   CYC(b_+26, b_+27); A = B;
   CYC(b_+27, b_+29); alu_and(gb, 0x07);

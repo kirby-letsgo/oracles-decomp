@@ -80,7 +80,7 @@ void itemLoadAttributesAndGraphics_hook(GB *gb) {
   CYC(b_+34, b_+35); A = C;
   CYC(b_+35, b_+36); mem_wr(gb, DE, A);
   CALL_C(b_+36, itemSetVar3cToFF_hook, SYM(itemSetVar3cToFF), b_+39);
-  CYC(b_+39, b_+42); SET_HL((SYM(collisionEffect3c__ringProtections) + 5));
+  CYC(b_+39, b_+42); SET_HL(0x4422);
   CYC(b_+42, b_+44); E = 0x3f;
   CYC(b_+44, b_+47); interBankCall_hook(gb);
 }

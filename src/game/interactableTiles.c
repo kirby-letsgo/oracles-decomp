@@ -387,7 +387,7 @@ void nextToChestTile_hook(GB *gb) {
     CYCT(b_+3, b_+5);
   } else {
     CYC(b_+3, b_+5);
-    CYC(b_+5, b_+8); SET_BC((SYM(parentItemCode_bracelet__state0) + 23));
+    CYC(b_+5, b_+8); SET_BC(0x510d);
     CALL_C(b_+8, showText_hook, SYM(showText), b_+11);
     CYC(b_+11, b_+12); alu_scf(gb);
     CYC(b_+12, b_+13); ret_effect(gb); return;
@@ -489,7 +489,7 @@ void nextToSignTile_hook(GB *gb) {
   BASE(nextToSignTile);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, checkFacingBottomOfTileAndPressedA_hook, SYM(checkFacingBottomOfTileAndPressedA), b_+3);
-  CYC(b_+3, b_+6); SET_BC((SYM(parentItemCode_bracelet__state0) + 24));
+  CYC(b_+3, b_+6); SET_BC(0x510e);
   if (!(F & FZ)) {
     CYCT(b_+6, b_+8); goto show_text;
   }

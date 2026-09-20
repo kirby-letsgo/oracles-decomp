@@ -940,7 +940,7 @@ void checkScreenEdgeWarps_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); A = 0xff;
   CYC(b_+2, b_+5); W8(wTmpcec0) = A;
-  CYC(b_+5, b_+8); SET_HL((SYM(screenTransitionState5Substate1__queueRowDmaTransfer) + 32));
+  CYC(b_+5, b_+8); SET_HL(GV((SYM(screenTransitionState5Substate1__queueRowDmaTransfer) + 32), 0x46a8));
   CYC(b_+8, b_+10); E = 0x04;
   CALL_C(b_+10, interBankCall_hook, 0x008a, b_+13);
   CYC(b_+13, b_+16); A = W8(wTmpcec0);
@@ -2592,7 +2592,7 @@ void clearMemoryOnScreenReload_hook(GB *gb) {
   BASE(clearMemoryOnScreenReload);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(wLinkInAir);
-  CYC(b_+3, b_+5); B = 0x8d;
+  CYC(b_+3, b_+5); B = GV(0x8d, 0x88);
   CALL_C(b_+5, clearMemory_hook, SYM(clearMemory), b_+8);
   CYC(b_+8, b_+11); SET_HL(wLinkObjectIndex);
   CYC(b_+11, b_+13); A = 0xd1;
@@ -2613,7 +2613,7 @@ void func_49c9_hook(GB *gb) {
   BASE(func_49c9);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(wDisabledObjects);
-  CYC(b_+3, b_+5); B = 0x57;
+  CYC(b_+3, b_+5); B = GV(0x57, 0x53);
   CALL_C(b_+5, clearMemory_hook, SYM(clearMemory), b_+8);
   finish_clear_memory_on_screen_reload(gb);
 }
@@ -3442,7 +3442,7 @@ void finishScrollingTransition_hook(GB *gb) {
   CYC(b_+11, b_+14); A = mem_rd(gb, wScreenTransitionDirection);
   CYC(b_+14, b_+15); alu_add(gb, A);
   CYC(b_+15, b_+16); alu_add(gb, E);
-  CYC(b_+16, b_+19); SET_DE(SYM(label_01_037__positionOffsets));
+  CYC(b_+16, b_+19); SET_DE(GV(SYM(label_01_037__positionOffsets), 0x4454));
   CALL_C(b_+19, addAToDe_hook, 0x0068, SYM(label_01_037));
   label_01_037_hook(gb);
 }
@@ -4058,7 +4058,7 @@ void cutscene17__state0_hook(GB *gb) {
     } else {
       CYC(b_+29, b_+31);
       CYC(b_+31, b_+32); A = mem_rd(gb, HL); SET_HL(HL + 1);
-      CYC(b_+32, b_+34); alu_cp(gb, 0xad);
+      CYC(b_+32, b_+34); alu_cp(gb, GV(GV(0xad, 0x44), 0x44));
       if (F & FZ) {
         CYCT(b_+34, b_+36);
         break;
@@ -5373,7 +5373,7 @@ static void cutscene18_19(GB *gb, uint16_t entry, uint16_t sp0_) {
   } else {
     CYC(b_+0, b_+2); C = 0x01;
   }
-  CYC(b_+2, b_+5); SET_HL((SYM(cutscene17__state0) + 4));
+  CYC(b_+2, b_+5); SET_HL(0x4b0a);
   CYC(b_+5, b_+7); E = 0x03;
   CALL_C(b_+7, interBankCall_hook, 0x008a, b_+10);
   CALL_C(b_+10, refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+13);

@@ -443,8 +443,8 @@ sharedF9:
   CYC(b_+152, b_+153); A = B;
   CYC(b_+153, b_+154); alu_cp(gb, C);
   if (F & FC) { RET_TAKEN(b_+154); return; }
-capSpeed:
   CYC(b_+154, b_+155);
+capSpeed:
   CYC(b_+155, b_+157); mem_wr(gb, hFF8D, A);
   RET(b_+157); return;
 }
@@ -486,7 +486,7 @@ checkSlide1:
   }
   CYC(b_+33, b_+35);
   CYC(b_+35, b_+37); alu_xor(gb, 0x10);
-  CYC(b_+37, b_+40); SET_BC(hTerrainEffectsBufferUsedSize);
+  CYC(b_+37, b_+40); SET_BC(0xffa0);
 checkSlideCap1:
   CYC(b_+40, b_+42); alu_cp(gb, 0x11);
   if (!(F & FC)) {
@@ -542,7 +542,7 @@ checkSlide2:
   }
   CYC(b_+89, b_+91);
   CYC(b_+91, b_+93); alu_sub(gb, 0x10);
-  CYC(b_+93, b_+96); SET_BC(hTerrainEffectsBufferUsedSize);
+  CYC(b_+93, b_+96); SET_BC(0xffa0);
 checkSlideCap2:
   CYC(b_+96, b_+98); alu_add(gb, 0x08);
   CYC(b_+98, b_+100); alu_and(gb, 0x1f);
@@ -1666,8 +1666,8 @@ sharedF9:
   CYC(b_+152, b_+153); A = B;
   CYC(b_+153, b_+154); alu_cp(gb, C);
   if (F & FC) { RET_TAKEN(b_+154); return; }
-capSpeed:
   CYC(b_+154, b_+155);
+capSpeed:
   CYC(b_+155, b_+157); mem_wr(gb, hFF8D, A);
   RET(b_+157); return;
 }
@@ -1709,7 +1709,7 @@ checkSlide1:
   }
   CYC(b_+33, b_+35);
   CYC(b_+35, b_+37); alu_xor(gb, 0x10);
-  CYC(b_+37, b_+40); SET_BC(hTerrainEffectsBufferUsedSize);
+  CYC(b_+37, b_+40); SET_BC(0xffa0);
 checkSlideCap1:
   CYC(b_+40, b_+42); alu_cp(gb, 0x11);
   if (!(F & FC)) {
@@ -1765,7 +1765,7 @@ checkSlide2:
   }
   CYC(b_+89, b_+91);
   CYC(b_+91, b_+93); alu_sub(gb, 0x10);
-  CYC(b_+93, b_+96); SET_BC(hTerrainEffectsBufferUsedSize);
+  CYC(b_+93, b_+96); SET_BC(0xffa0);
 checkSlideCap2:
   CYC(b_+96, b_+98); alu_add(gb, 0x08);
   CYC(b_+98, b_+100); alu_and(gb, 0x1f);
@@ -2890,8 +2890,8 @@ sharedF9:
   CYC(b_+152, b_+153); A = B;
   CYC(b_+153, b_+154); alu_cp(gb, C);
   if (F & FC) { RET_TAKEN(b_+154); return; }
-capSpeed:
   CYC(b_+154, b_+155);
+capSpeed:
   CYC(b_+155, b_+157); mem_wr(gb, hFF8D, A);
   RET(b_+157); return;
 }
@@ -2933,7 +2933,7 @@ checkSlide1:
   }
   CYC(b_+33, b_+35);
   CYC(b_+35, b_+37); alu_xor(gb, 0x10);
-  CYC(b_+37, b_+40); SET_BC(hTerrainEffectsBufferUsedSize);
+  CYC(b_+37, b_+40); SET_BC(0xffa0);
 checkSlideCap1:
   CYC(b_+40, b_+42); alu_cp(gb, 0x11);
   if (!(F & FC)) {
@@ -2989,7 +2989,7 @@ checkSlide2:
   }
   CYC(b_+89, b_+91);
   CYC(b_+91, b_+93); alu_sub(gb, 0x10);
-  CYC(b_+93, b_+96); SET_BC(hTerrainEffectsBufferUsedSize);
+  CYC(b_+93, b_+96); SET_BC(0xffa0);
 checkSlideCap2:
   CYC(b_+96, b_+98); alu_add(gb, 0x08);
   CYC(b_+98, b_+100); alu_and(gb, 0x1f);
@@ -4114,8 +4114,8 @@ sharedF9:
   CYC(b_+152, b_+153); A = B;
   CYC(b_+153, b_+154); alu_cp(gb, C);
   if (F & FC) { RET_TAKEN(b_+154); return; }
-capSpeed:
   CYC(b_+154, b_+155);
+capSpeed:
   CYC(b_+155, b_+157); mem_wr(gb, hFF8D, A);
   RET(b_+157); return;
 }
@@ -4157,7 +4157,7 @@ checkSlide1:
   }
   CYC(b_+33, b_+35);
   CYC(b_+35, b_+37); alu_xor(gb, 0x10);
-  CYC(b_+37, b_+40); SET_BC(hTerrainEffectsBufferUsedSize);
+  CYC(b_+37, b_+40); SET_BC(0xffa0);
 checkSlideCap1:
   CYC(b_+40, b_+42); alu_cp(gb, 0x11);
   if (!(F & FC)) {
@@ -4213,7 +4213,7 @@ checkSlide2:
   }
   CYC(b_+89, b_+91);
   CYC(b_+91, b_+93); alu_sub(gb, 0x10);
-  CYC(b_+93, b_+96); SET_BC(hTerrainEffectsBufferUsedSize);
+  CYC(b_+93, b_+96); SET_BC(0xffa0);
 checkSlideCap2:
   CYC(b_+96, b_+98); alu_add(gb, 0x08);
   CYC(b_+98, b_+100); alu_and(gb, 0x1f);

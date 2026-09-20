@@ -27184,4 +27184,5 @@ static const uint32_t ram_seasons[RAMSYM_COUNT] = {
 };
 const uint32_t *game_syms = syms_ages;
 const uint32_t *game_ram = ram_ages;
-void syms_select(int seasons) { game_syms = seasons ? syms_seasons : syms_ages; game_ram = seasons ? ram_seasons : ram_ages; }
+int game_seasons;
+void syms_select(int seasons) { game_seasons = seasons; game_syms = seasons ? syms_seasons : syms_ages; game_ram = seasons ? ram_seasons : ram_ages; }

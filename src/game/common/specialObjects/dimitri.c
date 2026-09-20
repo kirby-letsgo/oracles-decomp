@@ -1222,13 +1222,13 @@ check_tile:
   CYC(b_+35, b_+36); C = mem_rd(gb, HL);
   CYC(b_+36, b_+37); B = A;
   CALL_C(b_+37, objectGetRelativeTile_hook, SYM(objectGetRelativeTile), b_+40);
-  CYC(b_+40, b_+42); alu_cp(gb, 0xd6);
+  CYC(b_+40, b_+42); alu_cp(gb, GV(0xd6, 0xdf));
   if (F & FZ) { CYCT(b_+42, b_+43); goto return_from_check_tile; }
   CYC(b_+42, b_+43);
-  CYC(b_+43, b_+45); alu_cp(gb, 0xd5);
+  CYC(b_+43, b_+45); alu_cp(gb, GV(0xd5, 0xde));
   if (F & FZ) { CYCT(b_+45, b_+46); goto return_from_check_tile; }
   CYC(b_+45, b_+46);
-  CYC(b_+46, b_+48); alu_cp(gb, 0xd4);
+  CYC(b_+46, b_+48); alu_cp(gb, GV(0xd4, 0xdd));
   if (F & FZ) { CYCT(b_+48, b_+49); goto return_from_check_tile; }
   CYC(b_+48, b_+49);
   CYC(b_+49, b_+51); H = 0xce;

@@ -28,6 +28,10 @@ def main():
     for l in open(tsv):
         n, v, *_ = l.rstrip('\n').split('\t')
         verdict[n] = v
+    if os.path.exists('src/hooks/seasons_ok.txt'):
+        for l in open('src/hooks/seasons_ok.txt'):
+            n = l.strip()
+            if n and verdict.get(n) == 'SAME_SHAPE': verdict[n] = 'IDENTICAL'
 
     # C call graph: function name -> callees, per file (static helpers are file-local)
     callees, burns = {}, {}

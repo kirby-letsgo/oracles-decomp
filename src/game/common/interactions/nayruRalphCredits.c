@@ -151,7 +151,7 @@ label_10_330:
   } else {
     CYC(b_+155, b_+158);
   }
-  CYC(b_+158, b_+160); L = INTERACTION_BASE + OBJ_VAR38;
+  CYC(b_+158, b_+160); L = GV(0x78, 0x77);
   CYC(b_+160, b_+161); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) { RET_TAKEN(b_+161); return; }
   CYC(b_+161, b_+162);
@@ -169,7 +169,7 @@ setRandomVar38:
   CYC(b_+179, b_+181); alu_and(gb, 0x03);
   CYC(b_+181, b_+183); A = alu_swap(gb, A);
   CYC(b_+183, b_+185); alu_add(gb, 0x20);
-  CYC(b_+185, b_+187); E = INTERACTION_BASE + OBJ_VAR38;
+  CYC(b_+185, b_+187); E = GV(0x78, 0x77);
   CYC(b_+187, b_+188); mem_wr(gb, DE, A);
   RET(b_+188); return;
 substate4:

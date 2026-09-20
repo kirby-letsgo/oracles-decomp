@@ -188,7 +188,7 @@ L_5650:
   CYC(b_+28, b_+30); C = alu_srl(gb, C);
   if ((F & FC)) { CALL_ROM_CC(b_+30, b_+66); } else CYC(b_+30, b_+33);
   CYC(b_+33, b_+35); E = 0xc3;
-  CYC(b_+35, b_+37); L = 0x53;
+  CYC(b_+35, b_+37); L = GV(0x53, 0x6e);
   CYC(b_+37, b_+39); C = alu_srl(gb, C);
   if ((F & FC)) { CALL_ROM_CC(b_+39, b_+66); } else CYC(b_+39, b_+42);
   CYC(b_+42, b_+43); SET_DE(pop_effect(gb));
@@ -322,8 +322,8 @@ void checkLinkPushingAgainstBed_hook(GB *gb) {
   CYC(b_+6, b_+9); A = mem_rd(gb, wActiveGroup);
   CYC(b_+9, b_+11); alu_cp(gb, 0x03);
   if (!(F & FZ)) { CYCT(b_+11, b_+12); ret_effect(gb); return; } CYC(b_+11, b_+12);
-  CYC(b_+12, b_+15); SET_BC(0x9e17);
-  CYC(b_+15, b_+17); L = 0x01;
+  CYC(b_+12, b_+15); SET_BC(GV(0x9e17, 0x8214));
+  CYC(b_+15, b_+17); L = GV(0x01, 0x03);
   CYC(b_+17, b_+20); A = mem_rd(gb, wActiveRoom);
   CYC(b_+20, b_+21); alu_cp(gb, B);
   if (!(F & FZ)) { CYCT(b_+21, b_+22); ret_effect(gb); return; } CYC(b_+21, b_+22);
@@ -894,7 +894,7 @@ L_5b0c:
   CYC(b_+33, b_+36); SET_HL(wIsTileSlippery);
   CYC(b_+36, b_+38); alu_bit(gb, 6, mem_rd(gb, HL));
   if (!(F & FZ)) { CYCT(b_+38, b_+40); goto L_5b28; } CYC(b_+38, b_+40);
-  CYC(b_+40, b_+42); L = 0x9c;
+  CYC(b_+40, b_+42); L = GV(0x9c, 0xb6);
   CYC(b_+42, b_+44); mem_wr(gb, HL, 0x00);
   CALL_C(b_+44, updateLinkSpeed_standard_hook, SYM(updateLinkSpeed_standard), b_+47);
   CYC(b_+47, b_+50); A = mem_rd(gb, wLinkAngle);
@@ -3999,7 +3999,7 @@ substate0:
   CALL_C(b_+10, itemIncSubstate_hook, SYM(itemIncSubstate), b_+13);
   CYC(b_+13, b_+15); L = 0x10;
   CYC(b_+15, b_+17); mem_wr(gb, HL, 0x14);
-  CYC(b_+17, b_+19); L = 0x18;
+  CYC(b_+17, b_+19); L = GV(0x18, 0x13);
   CYC(b_+19, b_+21); A = 0x02;
   CALL_C(b_+21, specialObjectSetVar37AndVar38_hook, SYM(specialObjectSetVar37AndVar38), b_+24);
   CYC(b_+24, b_+27); SET_BC(0xfe80);
@@ -4065,9 +4065,9 @@ anim_parameter4:
   CYC(b_+99, b_+102); SET_BC(0xfe80);
   CALL_C(b_+102, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+105);
   CYC(b_+105, b_+107); L = 0x08;
-  CYC(b_+107, b_+109); mem_wr(gb, HL, 0x03);
+  CYC(b_+107, b_+109); mem_wr(gb, HL, GV(0x03, 0x01));
   CYC(b_+109, b_+110); L = alu_inc8(gb, L);
-  CYC(b_+110, b_+112); mem_wr(gb, HL, 0x18);
+  CYC(b_+110, b_+112); mem_wr(gb, HL, GV(0x18, 0x08));
   CYC(b_+112, b_+114); L = 0x10;
   CYC(b_+114, b_+116); mem_wr(gb, HL, 0x14);
   CYC(b_+116, b_+118); A = 0x81;

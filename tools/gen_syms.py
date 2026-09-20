@@ -49,6 +49,9 @@ with open('src/game/syms.h', 'w') as h:
     h.write('#define BASE(l) const uint16_t b_ = SYM(l); const uint8_t bk_ = SYMBANK(l); (void)bk_\n')
     h.write('#define BANKOF(l) const uint8_t bk_ = SYMBANK(l); (void)bk_\n')
     h.write('#define RAMSYM(i) ((uint16_t)game_ram[i])\n')
+    h.write('extern int game_seasons;\n#define GV(ages, seasons) (game_seasons ? (seasons) : (ages))\n')
+    h.write('#define GVW(a, s) (*(game_seasons ? &gb->wram[s##_BANK][(s) & 0xfff] : &gb->wram[a##_BANK][(a) & 0xfff]))\n')
+    h.write('#define GVH(a, s) (*(game_seasons ? &gb->hram[(s) - 0xff80] : &gb->hram[(a) - 0xff80]))\n')
     h.write('#define RAMBANK(i) (game_ram[i] >> 16)\n')
     h.write('void syms_select(int seasons);\n')
 
@@ -63,6 +66,7 @@ with open('src/game/syms.c', 'w') as c:
         for r in ram: c.write(f'  0x{r[col]:08x},\n')
         c.write('};\n')
     c.write('const uint32_t *game_syms = syms_ages;\nconst uint32_t *game_ram = ram_ages;\n')
-    c.write('void syms_select(int seasons) { game_syms = seasons ? syms_seasons : syms_ages; game_ram = seasons ? ram_seasons : ram_ages; }\n')
+    c.write('int game_seasons;\n')
+    c.write('void syms_select(int seasons) { game_seasons = seasons; game_syms = seasons ? syms_seasons : syms_ages; game_ram = seasons ? ram_seasons : ram_ages; }\n')
 
 print(f'{len(rows)} ROM symbols ({len(missing)} missing in Seasons), {len(ram)} per-game RAM symbols')

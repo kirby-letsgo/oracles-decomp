@@ -568,7 +568,7 @@ void getLinkWarpQuadrant_hook(GB *gb) {
     return;
   }
   CYC(b_+12, b_+14);
-  CYC(b_+14, b_+16); alu_cp(gb, 0x58);
+  CYC(b_+14, b_+16); alu_cp(gb, GV(0x58, 0x60));
   CYC(b_+16, b_+17); A = B;
   if (F & FC) {
     CYCT(b_+17, b_+18); ret_effect(gb);
@@ -783,7 +783,7 @@ static void replace_switch_tiles(GB *gb, uint16_t entry) {
       CYC(b_+10, b_+11); A = alu_dec8(gb, A);
       if (!(F & FZ)) { CYCT(b_+11, b_+12); ret_effect(gb); return; }
       CYC(b_+11, b_+12);
-      CYC(b_+12, b_+15); SET_HL(b_+95);
+      CYC(b_+12, b_+15); SET_HL(GV(b_+95, 0x5fd1));
     }
     CYC(b_+15, b_+18); A = W8(wActiveRoom);
     CYC(b_+18, b_+19); B = A;

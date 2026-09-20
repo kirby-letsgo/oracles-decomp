@@ -52,7 +52,7 @@ void redSnake_openSecretInputMenu_hook(GB *gb) {
 void redSnake_generateRingSecret_hook(GB *gb) {
   BASE(redSnake_generateRingSecret);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+2); A = 0x28;
+  CYC(b_+0, b_+2); A = GV(0x28, 0x31);
   CALL_C(b_+2, setGlobalFlag_hook, SYM(setGlobalFlag), b_+5);
   CYC(b_+5, b_+8); SET_BC(0x0002);
   CYC(b_+8, b_+11); secretFunctionCaller_hook(gb);

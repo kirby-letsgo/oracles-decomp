@@ -166,7 +166,7 @@ apply_tile_types:
     goto reset_id_to_normal;
   }
   CYC(b_+162, b_+164);
-  CYC(b_+164, b_+167); SET_HL((SYM(companionDismountAndSavePosition__dimitri) + 9));
+  CYC(b_+164, b_+167); SET_HL(GV((SYM(companionDismountAndSavePosition__dimitri) + 9), 0x460c));
   CYC(b_+167, b_+169); E = 0x06;
   CALL_C(b_+169, interBankCall_hook, 0x008a, b_+172);
   CYC(b_+172, b_+174); E = 0x01;

@@ -13601,5 +13601,9 @@ extern const uint32_t *game_ram;
 #define BASE(l) const uint16_t b_ = SYM(l); const uint8_t bk_ = SYMBANK(l); (void)bk_
 #define BANKOF(l) const uint8_t bk_ = SYMBANK(l); (void)bk_
 #define RAMSYM(i) ((uint16_t)game_ram[i])
+extern int game_seasons;
+#define GV(ages, seasons) (game_seasons ? (seasons) : (ages))
+#define GVW(a, s) (*(game_seasons ? &gb->wram[s##_BANK][(s) & 0xfff] : &gb->wram[a##_BANK][(a) & 0xfff]))
+#define GVH(a, s) (*(game_seasons ? &gb->hram[(s) - 0xff80] : &gb->hram[(a) - 0xff80]))
 #define RAMBANK(i) (game_ram[i] >> 16)
 void syms_select(int seasons);

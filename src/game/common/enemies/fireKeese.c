@@ -821,7 +821,7 @@ outOfBounds:
   CYC(b_+20, b_+21); A = mem_rd(gb, DE);
   CYC(b_+21, b_+23); mem_wr(gb, hFF8E, A); // hFF8E
 
-  CYC(b_+23, b_+26); SET_BC((SYM(peahat_updatePosition) + 33)); // ((LARGE_ROOM_HEIGHT/2)<<4)+8, ((LARGE_ROOM_WIDTH/2)<<4)+8
+  CYC(b_+23, b_+26); SET_BC(0x5878); // ((LARGE_ROOM_HEIGHT/2)<<4)+8, ((LARGE_ROOM_WIDTH/2)<<4)+8
   CALL_C(b_+26, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+29);
   CYC(b_+29, b_+30); C = A;
   CYC(b_+30, b_+32); B = 0x28; // SPEED_100

@@ -143,7 +143,7 @@ check_item:
   CYC(b_+64, b_+66);
   CYC(b_+66, b_+69); SET_BC(0x0e07);
   CYC(b_+69, b_+71); A = H8(hFF90);
-  CYC(b_+71, b_+73); alu_cp(gb, 0x18);
+  CYC(b_+71, b_+73); alu_cp(gb, GV(0x18, 0x17));
   if (!(F & FZ)) {
     CYCT(b_+73, b_+75);
   } else {
@@ -556,7 +556,7 @@ void collisionEffect05_hook(GB *gb) {
 
 void collisionEffect06_hook(GB *gb) {
   BASE(collisionEffect06);
-  CYC(b_+0, b_+3); SET_HL(SYM(setTileWithoutGfxReload));
+  CYC(b_+0, b_+3); SET_HL(0x141c);
   CYC(b_+3, b_+5); applyDamageToBothObjects_hook(gb);
 }
 
@@ -633,7 +633,7 @@ void collisionEffect1b_hook(GB *gb) {
   BASE(collisionEffect1b);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, createClinkInteraction_hook, SYM(createClinkInteraction), b_+3);
-  CYC(b_+3, b_+6); SET_HL(SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing));
+  CYC(b_+3, b_+6); SET_HL(0x1c28);
   CYC(b_+6, b_+8); applyDamageToBothObjects_hook(gb);
 }
 

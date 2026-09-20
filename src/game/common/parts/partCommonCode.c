@@ -125,7 +125,7 @@ doneUpdatingInvincibility:
   RET(b_+32); return; // ret
 
 uninitialized:
-  CYC(b_+33, b_+36); SET_HL((SYM(itemDrop_updateFairyMovement) + 10));
+  CYC(b_+33, b_+36); SET_HL(0x43c9);
   CYC(b_+36, b_+38); E = 0x3f;
   CALL_C(b_+38, interBankCall_hook, 0x008a, b_+41);
   CYC(b_+41, b_+43); E = 0xfe; // Part.var3e

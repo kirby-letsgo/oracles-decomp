@@ -90,12 +90,12 @@ void linkedNpc_generateSecret_hook(GB *gb) {
   BASE(linkedNpc_generateSecret);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+1); H = D;
-  CYC(b_+1, b_+3); L = 0x7f;
+  CYC(b_+1, b_+3); L = GV(0x7f, 0x7e);
   CYC(b_+3, b_+4); B = mem_rd(gb, HL);
-  CYC(b_+4, b_+6); A = 0x50;
+  CYC(b_+4, b_+6); A = GV(0x50, 0x64);
   CYC(b_+6, b_+7); alu_add(gb, B);
   CALL_C(b_+7, setGlobalFlag_hook, SYM(setGlobalFlag), b_+10);
-  CYC(b_+10, b_+12); A = 0x20;
+  CYC(b_+10, b_+12); A = GV(0x20, 0x00);
   CYC(b_+12, b_+13); alu_add(gb, B);
   CYC(b_+13, b_+16); mem_wr(gb, wShortSecretIndex, A);
   CYC(b_+16, b_+19); SET_BC(0x0003);

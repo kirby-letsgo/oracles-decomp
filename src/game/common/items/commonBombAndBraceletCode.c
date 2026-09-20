@@ -114,7 +114,7 @@ void itemUpdateThrowingLaterally_hook(GB *gb) {
     goto normal;
   }
   CYC(b_+5, b_+7);
-  CYC(b_+7, b_+9); alu_cp(gb, 0x30);
+  CYC(b_+7, b_+9); alu_cp(gb, GV(0x30, 0x20));
   if (!(F & FC)) {
     CYCT(b_+9, b_+11);
     goto weight3;

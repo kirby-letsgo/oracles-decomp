@@ -39,7 +39,7 @@ static uint16_t enemyCode21_jump_table(GB *gb) {
 void enemyCode21_hook(GB *gb) {
   BASE(enemyCode21);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+0, ecom_checkHazards_b0d_hook, SYM(ecom_checkHazards_b0d), b_+3);
+  CALL_C(b_+0, ecom_checkHazards_b0d_hook, GV(SYM(ecom_checkHazards_b0d), 0x4446), b_+3);
   if (F & FZ) { CYCT(b_+3, b_+5); goto normalStatus; } // jr z
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+7); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH

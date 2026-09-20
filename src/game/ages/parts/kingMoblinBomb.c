@@ -368,7 +368,7 @@ void kingMoblinBomb_checkCollisionWithKingMoblin_hook(GB *gb) {
   if (!(F & FC)) { RET_TAKEN(b_+21); return; } // ret nc
   CYC(b_+21, b_+22);
   CYC(b_+22, b_+24); L = 0xaa; // Enemy.var2a
-  CYC(b_+24, b_+26); mem_wr(gb, HL, 0x98); // 0x80|ITEMCOLLISION_BOMB
+  CYC(b_+24, b_+26); mem_wr(gb, HL, GV(0x98, 0x97)); // 0x80|ITEMCOLLISION_BOMB
   CYC(b_+26, b_+28); L = 0xab; // Enemy.invincibilityCounter
   CYC(b_+28, b_+30); mem_wr(gb, HL, 0x1e);
   CYC(b_+30, b_+32); L = 0xa9; // Enemy.health

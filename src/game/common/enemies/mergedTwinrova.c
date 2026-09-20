@@ -128,7 +128,7 @@ void enemyCode01_hook(GB *gb) {
   CYC(b_+30, b_+31); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
   CYC(b_+31, b_+32); mem_wr(gb, HL, A);  // ld (hl),a
   CYC(b_+32, b_+34); L = 0xa4;  // ld l,Enemy.collisionType
-  CYC(b_+34, b_+36); mem_wr(gb, HL, 0xff);  // ld (hl),$ff
+  CYC(b_+34, b_+36); mem_wr(gb, HL, GV(0xff, 0x87));  // ld (hl),$ff
   CYC(b_+36, b_+38); A = 0x09;  // ld a,$09
   CYC(b_+38, b_+41); if (hook_enabled_at(gb, SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 collisionOccurred:
@@ -229,7 +229,7 @@ void mergedTwinrova_state8_hook(GB *gb) {
 void mergedTwinrova_state9_hook(GB *gb) {
   BASE(mergedTwinrova_state9);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); SET_BC((SYM(mergedTwinrova_iceRoom) + 7));  // ld bc,$4878
+  CYC(b_+0, b_+3); SET_BC(0x4878);  // ld bc,$4878
   CYC(b_+3, b_+4); H = D;  // ld h,d
   CYC(b_+4, b_+6); L = 0x8b;  // ld l,Enemy.yh
   CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ldi a,(hl)

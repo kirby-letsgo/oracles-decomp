@@ -242,7 +242,7 @@ restore_bc:
     CYCT(b_+27, b_+28); ret_effect(gb); return;
   }
   CYC(b_+27, b_+28);
-  CYC(b_+28, b_+31); SET_BC(0x0050);
+  CYC(b_+28, b_+31); SET_BC(GV(0x0050, 0x04ef));
   CYC(b_+31, b_+34); A = W8(wActiveGroup);
   CYC(b_+34, b_+35); alu_cp(gb, B);
   if (!(F & FZ)) {

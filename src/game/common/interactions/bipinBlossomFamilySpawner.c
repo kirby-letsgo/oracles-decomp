@@ -102,7 +102,7 @@ void initializeChildOnGameStart_hook(GB *gb) {
   }
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+8); A = 5;
-  CYC(b_+8, b_+10); L = 0xe0;
+  CYC(b_+8, b_+10); L = GV(0xe0, 0xda);
   CYC(b_+10, b_+11); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+11, b_+12); mem_wr(gb, HL, A); SET_HL(HL + 1);
   decideInitialChildPersonality_hook(gb);

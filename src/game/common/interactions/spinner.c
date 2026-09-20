@@ -190,10 +190,10 @@ afterSubidCalc:
   CYC(b_+54, b_+55); A = mem_rd(gb, HL);
   CALL_C(b_+55, setShortPosition_hook, SYM(setShortPosition), b_+58);
   CALL_C(b_+58, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+61);
-  CYC(b_+61, b_+64); SET_HL((SYM(interactionCode91__subid00__state1) + 15)); // mainScripts.spinnerScript_initialization
+  CYC(b_+61, b_+64); SET_HL(GV((SYM(interactionCode91__subid00__state1) + 15), 0x49bc)); // mainScripts.spinnerScript_initialization
   CALL_C(b_+64, interactionSetScript_hook, SYM(interactionSetScript), b_+67);
   CALL_C(b_+67, objectSetVisible82_hook, SYM(objectSetVisible82), b_+70);
-  CYC(b_+70, b_+73); SET_BC((SYM(interactionCode95__subid2) + 23)); // INTERAC_SPINNER, $02
+  CYC(b_+70, b_+73); SET_BC(0x7d02); // INTERAC_SPINNER, $02
   CALL_C(b_+73, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+76);
   if (!(F & FZ)) { RET_TAKEN(b_+76); return; } // ret nz
   CYC(b_+76, b_+77);
@@ -216,7 +216,7 @@ revertToState1:
   CYC(b_+96, b_+98); E = INTERACTION_BASE + OBJ_STATE;
   CYC(b_+98, b_+100); A = 0x01;
   CYC(b_+100, b_+101); mem_wr(gb, DE, A);
-  CYC(b_+101, b_+104); SET_HL((SYM(interactionCode91__subid00__state1) + 19)); // mainScripts.spinnerScript_waitForLink
+  CYC(b_+101, b_+104); SET_HL(GV((SYM(interactionCode91__subid00__state1) + 19), 0x49c0)); // mainScripts.spinnerScript_waitForLink
   CYC(b_+104, b_+107); interactionSetScript_hook(gb); return; // jp
 
 beginTurning:
@@ -311,6 +311,6 @@ state4:
   CYC(b_+245, b_+246); mem_wr(gb, HL, A);
   CYC(b_+246, b_+248); L = INTERACTION_BASE + OBJ_STATE;
   CYC(b_+248, b_+250); mem_wr(gb, HL, 0x01);
-  CYC(b_+250, b_+253); SET_HL((SYM(interactionCode91__subid00__state1) + 18)); // mainScripts.spinnerScript_waitForLinkAfterDelay
+  CYC(b_+250, b_+253); SET_HL(GV((SYM(interactionCode91__subid00__state1) + 18), 0x49bf)); // mainScripts.spinnerScript_waitForLinkAfterDelay
   CYC(b_+253, b_+256); interactionSetScript_hook(gb); return; // jp
 }

@@ -47,8 +47,8 @@ void enemyCode13_hook(GB *gb) {
   CYC(b_+8, b_+10); E = ENEMY_BASE + OBJ_VAR2A;
   CYC(b_+10, b_+11); A = mem_rd(gb, DE);
   CYC(b_+11, b_+13); A = (uint8_t)(A & ~(1 << 7)); // res 7,a
-  CYC(b_+13, b_+15); alu_sub(gb, 0x17); // ITEMCOLLISION_L1_BOOMERANG
-  CYC(b_+15, b_+17); alu_cp(gb, 0x01); // MAX_BOOMERANG_LEVEL
+  CYC(b_+13, b_+15); alu_sub(gb, GV(0x17, 0x15)); // ITEMCOLLISION_L1_BOOMERANG
+  CYC(b_+15, b_+17); alu_cp(gb, GV(0x01, 0x02)); // MAX_BOOMERANG_LEVEL
   if (!(F & FC)) { CYCT(b_+17, b_+19); goto normalStatus; } // jr nc
   CYC(b_+17, b_+19);
   CYC(b_+19, b_+21); E = ENEMY_BASE + OBJ_STATE;

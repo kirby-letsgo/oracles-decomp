@@ -365,7 +365,7 @@ void shopItemGetTilesForRupeeDisplay_hook(GB *gb) {
   CYC(b_+28, b_+29); L = alu_inc8(gb, L);
   CYC(b_+29, b_+30); mem_wr(gb, HL, D);
   CYC(b_+30, b_+31); L = alu_inc8(gb, L);
-  CYC(b_+31, b_+33); E = 6;
+  CYC(b_+31, b_+33); E = GV(0x06, 0x03);
   CYC(b_+33, b_+35); D = 0x30;
   CYC(b_+35, b_+37); A = 2;
   CYC(b_+37, b_+38); mem_wr(gb, HL, A); SET_HL(HL + 1);

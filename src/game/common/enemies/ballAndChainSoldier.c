@@ -59,7 +59,7 @@ void enemyCode4b_hook(GB *gb) {
   CYC(b_+7, b_+10); enemyDie_hook(gb); return; // jp
 
 normalStatus:
-  CALL_C(b_+10, ecom_checkHazards_b0e_hook, SYM(ecom_checkHazards_b0e), b_+13);
+  CALL_C(b_+10, ecom_checkHazards_b0e_hook, GV(SYM(ecom_checkHazards_b0e), 0x4446), b_+13);
   CYC(b_+13, b_+15); E = ENEMY_BASE + OBJ_STATE;
   CYC(b_+15, b_+16); A = mem_rd(gb, DE);
   {

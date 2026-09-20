@@ -395,7 +395,7 @@ static void insert_index_into_loaded_object_gfx_tree(GB *gb, uint16_t sp0_) {
 
 static void insert_index_into_loaded_object_gfx_object(GB *gb, uint16_t sp0_) {
   BASE(insertIndexIntoLoadedObjectGfx);
-  CYC(b_+43, b_+45); alu_sub(gb, 0x08);
+  CYC(b_+43, b_+45); alu_sub(gb, GV(GV(0x08, 0x07), 0x07));
   CYC(b_+45, b_+47); alu_or(gb, 0x80);
   CYC(b_+47, b_+48); B = A;
   CYC(b_+48, b_+51); SET_HL(SYM(objectGfxHeaderTable));
@@ -647,7 +647,7 @@ void agesFunc_3f_4133__afterCall4143_hook(GB *gb) {
     CYC(b_+17, b_+18); mem_wr(gb, HL, D);
     CYC(b_+18, b_+19); L = alu_inc8(gb, L);
     CYC(b_+19, b_+20); A = L;
-    CYC(b_+20, b_+22); alu_cp(gb, 0x18);
+    CYC(b_+20, b_+22); alu_cp(gb, GV(0x18, 0x17));
     if (!(F & FC)) {
       CYC(b_+22, b_+24);
       break;
@@ -747,7 +747,7 @@ void refreshObjectGfx_body__afterCall41ad_hook(GB *gb) {
   CYC(b_+89, b_+90); A = E;
   CALL_C(b_+90, findIndexInLoadedObjectGfx_hook, SYM(findIndexInLoadedObjectGfx), b_+93);
   CYC(b_+93, b_+94); A = L;
-  CYC(b_+94, b_+96); alu_sub(gb, 0x08);
+  CYC(b_+94, b_+96); alu_sub(gb, GV(0x08, 0x07));
   CYC(b_+96, b_+98); A = alu_srl(gb, A);
   refresh_object_gfx_next_extra(gb, sp0_);
 }

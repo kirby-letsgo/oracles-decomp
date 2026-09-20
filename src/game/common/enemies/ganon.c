@@ -185,9 +185,9 @@ void enemyCode04_hook(GB *gb) {
   CALL_C(b_+43, enemySetAnimation_hook, SYM(enemySetAnimation), b_+46);
   CALL_C(b_+46, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+49);
   CYC(b_+49, b_+51); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CYC(b_+51, b_+53); L = 0xf1;  // ld l,<ROOM_ZELDA_IN_FINAL_DUNGEON
+  CYC(b_+51, b_+53); L = GV(0xf1, 0x9a);  // ld l,<ROOM_ZELDA_IN_FINAL_DUNGEON
   CYC(b_+53, b_+55); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CYC(b_+55, b_+57); L = 0xf5;  // ld l,<ROOM_TWINROVA_FIGHT
+  CYC(b_+55, b_+57); L = GV(0xf5, 0x9e);  // ld l,<ROOM_TWINROVA_FIGHT
   CYC(b_+57, b_+59); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   CYC(b_+59, b_+61); A = 0xf0;  // ld a,SNDCTRL_STOPMUSIC
   CALL_C(b_+61, playSound_b00_hook, SYM(playSound_b00), b_+64);
@@ -252,7 +252,7 @@ void ganon_state_uninitialized_hook(GB *gb) {
   CYC(b_+79, b_+80); A = H;  // ld a,h
   CYC(b_+80, b_+81); mem_wr(gb, DE, A);  // ld (de),a
   CALL_C(b_+81, disableLcd_hook, SYM(disableLcd), b_+84);
-  CYC(b_+84, b_+86); A = 0xf5;  // ld a,<ROOM_TWINROVA_FIGHT
+  CYC(b_+84, b_+86); A = GV(0xf5, 0x9e);  // ld a,<ROOM_TWINROVA_FIGHT
   CYC(b_+86, b_+89); mem_wr(gb, wActiveRoom, A);  // ld (wActiveRoom),a
   CYC(b_+89, b_+91); A = 0x03;  // ld a,$03
   CYC(b_+91, b_+94); mem_wr(gb, wTwinrovaTileReplacementMode, A);  // ld (wTwinrovaTileReplacementMode),a

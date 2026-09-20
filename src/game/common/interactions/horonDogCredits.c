@@ -169,7 +169,7 @@ setZPosition:
   RET(b_+136); return;
 
 subid7Init:
-  CYC(b_+137, b_+140); SET_HL((SYM(interactionCoded8__subid0Script) + 37)); // mainScripts.horonDogCreditsScript
+  CYC(b_+137, b_+140); SET_HL(GV((SYM(interactionCoded8__subid0Script) + 37), 0x7a81)); // mainScripts.horonDogCreditsScript
   CYC(b_+140, b_+143); interactionSetScript_hook(gb); return; // jp
 
 state1:

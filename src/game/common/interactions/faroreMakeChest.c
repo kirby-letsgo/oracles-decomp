@@ -155,7 +155,7 @@ state5:
   CYC(b_+105, b_+107); mem_wr(gb, HL, 0x08);
   CYC(b_+107, b_+109); A = 0x01;
   CYC(b_+109, b_+112); mem_wr(gb, faroreSparkleFlyAway, A);
-  CYC(b_+112, b_+115); SET_BC(0x840c);
+  CYC(b_+112, b_+115); SET_BC(GV(0x840c, 0x8404));
   CALL_C(b_+115, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+118);
   CYC(b_+118, b_+120); L = INTERACTION_BASE + OBJ_RELATED1;
   CYC(b_+120, b_+122); mem_wr(gb, HL, INTERACTION_BASE);

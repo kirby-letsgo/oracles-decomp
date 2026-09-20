@@ -133,7 +133,7 @@ void saveFile_b07_hook(GB *gb) {
   BASE(saveFile_b07);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+3); SET_HL(wWhichGame);
-  CYC(b_+3, b_+5); mem_wr(gb, HL, 0x01);
+  CYC(b_+3, b_+5); mem_wr(gb, HL, GV(0x01, 0x00));
   CYC(b_+5, b_+8); SET_HL(wSavefileString);
   CYC(b_+8, b_+11); SET_DE(SYM(saveVerificationString));
   CYC(b_+11, b_+13); B = 0x08;

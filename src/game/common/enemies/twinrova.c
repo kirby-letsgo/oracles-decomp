@@ -598,7 +598,7 @@ substate3_visible:
   CYC(b_+145, b_+147); A = 0xd3;  // ld a,SND_WIND
   CALL_C(b_+147, playSound_b00_hook, SYM(playSound_b00), b_+150);
 substate4:
-  CYC(b_+150, b_+153); SET_BC((SYM(enemyCode02__normalStatus) + 10));  // ld bc,$5878
+  CYC(b_+150, b_+153); SET_BC(0x5878);  // ld bc,$5878
   CYC(b_+153, b_+155); E = 0x86;  // ld e,Enemy.counter1
   CYC(b_+155, b_+156); A = mem_rd(gb, DE);  // ld a,(de)
   CYC(b_+156, b_+158); E = 0x89;  // ld e,Enemy.angle

@@ -318,7 +318,7 @@ move:
     CYCT(b_+43, b_+44); ret_effect(gb); return;
   }
   CYC(b_+43, b_+44);
-  CALL_C(b_+44, checkLinkVulnerableAndIDZero_hook, SYM(checkLinkVulnerableAndIDZero), b_+47);
+  CALL_C(b_+44, checkLinkVulnerableAndIDZero_hook, GV(SYM(checkLinkVulnerableAndIDZero), 0x1cde), b_+47);
   if (!(F & FC)) {
     CYCT(b_+47, b_+49);
     goto animate;
@@ -1610,13 +1610,13 @@ void mapleSpawnItemDrops_hook(GB *gb) {
     goto no_trade_item;
   }
   CYC(b_+5, b_+7);
-  CYC(b_+7, b_+9); alu_cp(gb, 0x08);
+  CYC(b_+7, b_+9); alu_cp(gb, GV(0x08, 0x01));
   if (!(F & FZ)) {
     CYCT(b_+9, b_+11);
     goto no_trade_item;
   }
   CYC(b_+9, b_+11);
-  CYC(b_+11, b_+13); B = 0xa5;
+  CYC(b_+11, b_+13); B = GV(0xa5, 0x94);
   CALL_C(b_+13, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+16);
   if (!(F & FZ)) {
     CYCT(b_+16, b_+17); ret_effect(gb); return;

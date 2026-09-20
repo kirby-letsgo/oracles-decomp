@@ -568,7 +568,7 @@ void wizzrobe_subid2_stateB_hook(GB *gb) {
   CYC(b_+12, b_+14); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
 
   // Choose random counter1 between $80-$ff (how long to stay in state 8)
-  CYC(b_+14, b_+17); SET_BC((SYM(movingSidescrollPlatformScript_subid0a) + 1));
+  CYC(b_+14, b_+17); SET_BC(0x7f3f);
   CALL_C(b_+17, ecom_randomBitwiseAndBCE_b0e_hook, SYM(ecom_randomBitwiseAndBCE_b0e), b_+20);
   CYC(b_+20, b_+22); E = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+22, b_+23); A = B;

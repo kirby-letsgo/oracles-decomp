@@ -60,8 +60,8 @@ void enemyCode19_hook(GB *gb) {
   CYC(b_+5, b_+7); E = ENEMY_BASE + OBJ_VAR2A;
   CYC(b_+7, b_+8); A = mem_rd(gb, DE);
   CYC(b_+8, b_+10); A = (uint8_t)(A & ~(1 << 7)); // res 7,a
-  CYC(b_+10, b_+12); alu_sub(gb, 0x17); // ITEMCOLLISION_L1_BOOMERANG
-  CYC(b_+12, b_+14); alu_cp(gb, 0x01); // MAX_BOOMERANG_LEVEL
+  CYC(b_+10, b_+12); alu_sub(gb, GV(0x17, 0x15)); // ITEMCOLLISION_L1_BOOMERANG
+  CYC(b_+12, b_+14); alu_cp(gb, GV(0x01, 0x02)); // MAX_BOOMERANG_LEVEL
   if (!(F & FC)) { CYCT(b_+14, b_+16); goto normalStatus; } // jr nc
   CYC(b_+14, b_+16);
   CYC(b_+16, b_+18); E = ENEMY_BASE + OBJ_STATE;

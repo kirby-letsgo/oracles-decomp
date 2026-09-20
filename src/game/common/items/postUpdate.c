@@ -69,7 +69,7 @@ void updateSwingableItemAnimation_hook(GB *gb) {
   BASE(updateSwingableItemAnimation);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); L = 0x21;
-  CYC(b_+2, b_+4); alu_cp(gb, 0x04);
+  CYC(b_+2, b_+4); alu_cp(gb, GV(0x04, 0x07));
   if (F & FZ) {
     CYCT(b_+4, b_+6);
     label_07_227_hook(gb);
