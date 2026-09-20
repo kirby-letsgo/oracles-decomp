@@ -30,6 +30,7 @@ target_include_directories(oraclescore PUBLIC src)
 
 add_executable(oracles-run src/platform/headless.c)
 target_link_libraries(oracles-run oraclescore)
+add_custom_target(oracles-ref DEPENDS oracles-run)
 
 if(ORACLES_SDL)
   find_package(SDL3 CONFIG QUIET)
