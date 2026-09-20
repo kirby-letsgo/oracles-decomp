@@ -37,3 +37,11 @@ hash per frame) were recorded with
 from a core whose per-frame memory matches GBHawk 2.11.1 for the whole movie. `gbhawk-wram0.txt`
 is GBHawk's WRAM and HRAM at power-on, which the game's RNG seeding depends on. Re-record both
 files whenever the emulation changes on purpose; `tests/test_tas.c` compares against them.
+
+`ages-hooked.frames` is the per-frame framebuffer hash of the emulator-hosted C build (every
+routine hooked, replace mode) at commit `f7a211f`, recorded on 2026-09-20 with `--frame-hash-out`
+on the same replay that checked `ages.ref`. It differs from `ages.frames` (pure interpreter) by
+the few M-cycles of interrupt latency a rewrite shifts. It is the frame reference for the
+milestone 5 native renderer, whose IO writes land on the same instruction boundaries as this
+build's; `oracles-ref` (the emulator-hosted headless runner, `cmake --build build --target
+oracles-ref`) is the tool that regenerates both files.

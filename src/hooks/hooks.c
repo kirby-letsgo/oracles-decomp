@@ -81,11 +81,14 @@ static void run_interrupt(GB *gb) {
   if (gb->hdma_chunk_pending) { gb->hdma_chunk_pending = false; bus_hdma_chunk(gb); }
 }
 
+uint64_t dbg_vbl_midlogic, dbg_vbl_halt, dbg_vbl_step, dbg_vbl_step_halted;
+
 void gb_burn(GB *gb, int mcycles) {
   if (depth > 0 && hook_mode == HOOK_MODE_REPLACE) {
     if (gb->hdma_chunk_pending) { gb->hdma_chunk_pending = false; bus_hdma_chunk(gb); }
     uint16_t pc0 = gb->hook_pc;
     while (gb->ime && (gb->ie & gb->io[R_IF] & 0x1f) && !gb->hung) {
+      if (gb->ie & gb->io[R_IF] & INT_VBLANK) dbg_vbl_midlogic++;
       gb->pc = pc0;
       run_interrupt(gb);
     }
@@ -110,7 +113,7 @@ int hook_halt(GB *gb, uint16_t next) {
   }
   gb->halted = false;
   gb_tick(gb);
-  if (gb->ime && pending && !hook_suppress_interrupts) { gb->pc = next; run_interrupt(gb); }
+  if (gb->ime && pending && !hook_suppress_interrupts) { if (pending & INT_VBLANK) dbg_vbl_halt++; gb->pc = next; run_interrupt(gb); }
   return 0;
 }
 
@@ -228,6 +231,7 @@ void hooks_report(void) {
   uint64_t total = 0;
   for (size_t i = 0; i < NHOOKS; i++) total += hooks[i].calls;
   fprintf(stderr, "hooks: %zu routines, %llu calls, %llu verify failures\n", NHOOKS, (unsigned long long)total, (unsigned long long)hook_verify_failures);
+  fprintf(stderr, "vblank dispatch: mid-logic %llu, from halt %llu, interpreter %llu (of which halted %llu)\n", (unsigned long long)dbg_vbl_midlogic, (unsigned long long)dbg_vbl_halt, (unsigned long long)dbg_vbl_step, (unsigned long long)dbg_vbl_step_halted);
   for (size_t i = 0; i < NHOOKS; i++) {
     size_t n = strlen(hooks[i].name);
     if (n > 5 && strcmp(hooks[i].name + n - 5, "_hook") == 0 && hooks[i].calls == 0) fprintf(stderr, "  never called: %s\n", hooks[i].name);

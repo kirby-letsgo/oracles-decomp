@@ -282,9 +282,11 @@ void cpu_dispatch_interrupt(GB *gb) {
   gb->pc = 0x40 + i * 8;
 }
 
+extern uint64_t dbg_vbl_step, dbg_vbl_step_halted;
 void gb_step(GB *gb) {
   if (gb->hdma_chunk_pending) { gb->hdma_chunk_pending = false; bus_hdma_chunk(gb); }
   uint8_t pending = gb->ie & gb->io[R_IF] & 0x1f;
+  bool was_halted = gb->halted;
   if (gb->halted) {
     gb_tick(gb);
     pending = gb->ie & gb->io[R_IF] & 0x1f;
@@ -293,7 +295,7 @@ void gb_step(GB *gb) {
     gb->halted = false;
     gb_tick(gb);
   }
-  if (gb->ime && pending && !hook_suppress_interrupts) { cpu_dispatch_interrupt(gb); return; }
+  if (gb->ime && pending && !hook_suppress_interrupts) { if (pending & INT_VBLANK) { dbg_vbl_step++; if (was_halted) dbg_vbl_step_halted++; } cpu_dispatch_interrupt(gb); return; }
   if (gb->ime_delay) { gb->ime = true; gb->ime_delay = false; }
   if (hook_dispatch(gb)) return;
   { static long long tr_at = -1, tr_n = 0; if (tr_at < 0) { tr_at = 0; if (getenv("PCTRACE")) sscanf(getenv("PCTRACE"), "%lld,%lld", &tr_at, &tr_n); }
