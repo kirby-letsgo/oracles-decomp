@@ -26,13 +26,38 @@ void func_7cf8_hook(GB *gb) {
   func_7cf8_set_bits(gb);
 }
 
+// tuniNut_state3@setSymmetryVillageRoomFlags: sets bit 0 of six Symmetry Village room flags;
+// @setRow (at +8) is called once and then fallen into, and its ret pops the caller's address.
+static void tuni_nut_set_row(GB *gb) {
+  BASE(tuniNut_state3__setSymmetryVillageRoomFlags);
+  CYC(b_+8, b_+10); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
+  CYC(b_+10, b_+11); L = alu_inc8(gb, L);
+  CYC(b_+11, b_+13); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
+  CYC(b_+13, b_+14); L = alu_inc8(gb, L);
+  CYC(b_+14, b_+16); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
+  CYC(b_+16, b_+17); L = alu_inc8(gb, L);
+  CYC(b_+17, b_+18); ret_effect(gb);
+}
+
+static void tuni_nut_set_symmetry_village_room_flags(GB *gb) {
+  BASE(tuniNut_state3__setSymmetryVillageRoomFlags);
+  SET_HL(wGroup0RoomFlags + 2);
+  CYC(b_+0, b_+3);
+  CYC(b_+3, b_+6); push_effect(gb, b_+6);
+  tuni_nut_set_row(gb);
+  L = 0x12;
+  CYC(b_+6, b_+8);
+  tuni_nut_set_row(gb);
+}
+
 void func_7ca7_hook(GB *gb) {
   BASE(tuniNut_state3);
   uint16_t sp0_ = gb->sp;
   CYC(SYM(func_7ca7), (SYM(func_7ca7) + 2));
   CYC(b_+110, b_+111); C = H;
   CALL_C(b_+111, loseTreasure_hook, SYM(loseTreasure), b_+114);
-  CALL_ROM(b_+114, b_+138);
+  CYC(b_+114, b_+117); push_effect(gb, b_+117);
+  tuni_nut_set_symmetry_village_room_flags(gb);
   CYC(b_+117, b_+118); alu_xor(gb, A);
   CYC(b_+118, b_+121); W8(wDisabledObjects) = A;
   CYC(b_+121, b_+124); W8(wMenuDisabled) = A;

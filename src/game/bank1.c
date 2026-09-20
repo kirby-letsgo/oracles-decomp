@@ -839,6 +839,34 @@ static void check_tile_warps_multi_tile_door(GB *gb, uint16_t sp0_) {
   check_tile_warps_initiate(gb, sp0_);
 }
 
+// checkTileWarps@checkAdjacentTileIsWarpTile: carry set when the tile left or right of hFF8D is
+// a warp tile. @@checkIsWarpTile (at +10) ends in checkTileIsWarpTile, whose return pops the
+// caller's address.
+static void check_tile_warps_is_warp_tile(GB *gb) {
+  BASE(checkTileWarps__checkAdjacentTileIsWarpTile);
+  C = A;
+  B = wRoomLayout >> 8;
+  CYC(b_+10, b_+13);
+  CYC(b_+13, b_+14); A = mem_rd(gb, BC);
+  CYCT(b_+14, b_+16);
+  checkTileIsWarpTile_hook(gb);
+}
+
+static void check_tile_warps_adjacent(GB *gb) {
+  BASE(checkTileWarps__checkAdjacentTileIsWarpTile);
+  CYC(b_+0, b_+2); A = H8(hFF8D);
+  A = alu_inc8(gb, A);
+  CYC(b_+2, b_+3);
+  CYC(b_+3, b_+6); push_effect(gb, b_+6);
+  check_tile_warps_is_warp_tile(gb);
+  if (F & FC) { CYCT(b_+6, b_+7); ret_effect(gb); return; }
+  CYC(b_+6, b_+7);
+  CYC(b_+7, b_+9); A = H8(hFF8D);
+  A = alu_dec8(gb, A);
+  CYC(b_+9, b_+10);
+  check_tile_warps_is_warp_tile(gb);
+}
+
 void checkTileWarps_hook(GB *gb) {
   BASE(checkTileWarps);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -876,7 +904,8 @@ void checkTileWarps_hook(GB *gb) {
     return;
   }
   CYC(b_+26, b_+28);
-  CALL_ROM(b_+28, b_+49);
+  CYC(b_+28, b_+31); push_effect(gb, b_+31);
+  check_tile_warps_adjacent(gb);
   if (F & FC) {
     CYCT(b_+31, b_+33);
     check_tile_warps_multi_tile_door(gb, sp0_);

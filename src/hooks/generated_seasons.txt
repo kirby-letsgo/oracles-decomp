@@ -1944,7 +1944,6 @@
 3f:56d3 popFromTextStack_hook -
 3f:56fe readByteFromW7ActiveBankAndIncHl_hook -
 3f:5701 incHlAndUpdateBank_hook -
-3f:5713 handleTextControlCode_hook -
 3f:5885 getCharacterDisplayLength_hook -
 3f:5893 textControlCodeC_0_hook -
 3f:58cc textControlCodeC_7_hook -

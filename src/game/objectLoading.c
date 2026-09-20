@@ -520,12 +520,45 @@ allocate:
   }
 }
 
+static uint16_t object_loading_jump_table(GB *gb) {
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (!(F & FC)) burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  return HL;
+}
+
+// objectDataOp9@allocateObjectType: the byte at de picks the slot allocator; the caller pushed
+// the return address the allocator's ret pops.
+static void object_data_op9_allocate(GB *gb) {
+  BASE(objectDataOp9__allocateObjectType);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);
+  CYC(b_+1, b_+2); push_effect(gb, b_+2);
+  do { uint16_t jt_ = (object_loading_jump_table(gb));
+    if (jt_ == SYM(getFreeInteractionSlot)) { getFreeInteractionSlot_hook(gb); return; }
+    else if (jt_ == SYM(getFreeEnemySlot_uncounted)) { getFreeEnemySlot_uncounted_hook(gb); return; }
+    else if (jt_ == SYM(getFreePartSlot)) { getFreePartSlot_hook(gb); return; }
+    else { HANDOFF(jt_); }
+  } while (0);
+}
+
 void objectDataOp9_hook(GB *gb) {
   BASE(objectDataOp9);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   for (;;) {
     CALL_C(b_+0, continueObjectLoopIfOpDone_hook, SYM(continueObjectLoopIfOpDone), b_+3);
-    CALL_ROM(b_+3, b_+40);
+    CYC(b_+3, b_+6); push_effect(gb, b_+6);
+    object_data_op9_allocate(gb);
     if (!(F & FZ)) { CYCT(b_+6, b_+8); goto allocation_failure; }
     CYC(b_+6, b_+8);
     CYC(b_+8, b_+11); SET_DE(DE + 1); A = mem_rd(gb, DE); SET_DE(DE + 1);
