@@ -9,6 +9,14 @@ Used as deterministic playthrough scripts for the verification suite. See `docs/
 
 Both expect ROM SHA1 `880374fb978b18af4aa529e2e32f7ffb4d7dd2f4`.
 
+Seasons has no usable movie yet. `seasons.vbm` (SwordlessLink and Tompa 2012, VBA-rr, 309,433
+frames; `tools/vbm_to_inputs.py` converts it) reaches the file-select menu with ~220 blank
+frames prepended to account for VBA-rr skipping the boot ROM, then desyncs. `seasons.bk2` is a
+Gambatte movie of the Japanese ROM. Egobuff's 2005 submission has the same problems. The plan is
+to record a playthrough on our own core: `oracles ROM roms/cgb_boot.bin --record FILE.inputs`
+boots exactly like the headless runner (AGB patch, `gbhawk-wram0.txt`, fresh SRAM), writes the
+file every 60 seconds and on quit, and fast-forwards through an existing file before appending.
+
 BK2 files are zip archives. `Input Log.txt` holds one line per frame in the order
 Up, Down, Left, Right, Start, Select, B, A, Power.
 

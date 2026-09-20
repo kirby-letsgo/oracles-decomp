@@ -3,11 +3,46 @@
 #include "core/gb.h"
 #include "platform/png.h"
 #include "platform/render.h"
+#include "platform/setup.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 static uint8_t live_joy;
 static uint8_t live_input(void *ctx, uint64_t frame) { (void)ctx; (void)frame; return live_joy; }
+
+static uint8_t *read_all(const char *path, size_t *size);
+
+static uint8_t *rec_buf;
+static uint64_t rec_len, rec_cap, rec_resume;
+static const char *rec_path;
+
+static void rec_push(uint8_t joy) {
+  if (rec_len == rec_cap) { rec_cap = rec_cap ? rec_cap * 2 : 1 << 16; rec_buf = realloc(rec_buf, rec_cap); }
+  rec_buf[rec_len++] = joy;
+}
+
+static void rec_load_existing(void) {
+  size_t n;
+  uint8_t *d = read_all(rec_path, &n);
+  if (!d) return;
+  if (n < 8 || memcmp(d, "ORIN", 4)) { fprintf(stderr, "%s is not an .inputs file\n", rec_path); exit(2); }
+  uint32_t count;
+  memcpy(&count, d + 4, 4);
+  for (uint32_t i = 0; i < count && 8 + i < n; i++) rec_push(d[8 + i]);
+  rec_resume = rec_len;
+  free(d);
+  fprintf(stderr, "resuming: replaying %llu recorded frames first\n", (unsigned long long)rec_resume);
+}
+
+static void rec_write(void) {
+  FILE *f = fopen(rec_path, "wb");
+  if (!f) return;
+  uint32_t n = (uint32_t)rec_len;
+  fwrite("ORIN", 1, 4, f);
+  fwrite(&n, 4, 1, f);
+  fwrite(rec_buf, 1, rec_len, f);
+  fclose(f);
+}
 
 #define SCALE 4
 #define AUDIO_TARGET_BYTES (APU_SAMPLE_RATE / 10 * 4)
@@ -77,21 +112,29 @@ static uint8_t pad_bit(int button) {
 }
 
 int main(int argc, char **argv) {
-  if (argc < 2) { fprintf(stderr, "usage: oracles ROM [BOOTROM]\n"); return 2; }
+  if (argc < 2) { fprintf(stderr, "usage: oracles ROM [BOOTROM] [--record FILE.inputs]\n"); return 2; }
+  const char *init_ram = NULL;
+  for (int i = 2; i + 1 < argc; i++) {
+    if (!strcmp(argv[i], "--record")) { rec_path = argv[++i]; }
+    else if (!strcmp(argv[i], "--init-ram")) { init_ram = argv[++i]; }
+  }
+  if (rec_path && !init_ram) init_ram = "tas/gbhawk-wram0.txt";
   size_t rom_size, boot_size;
   uint8_t *rom = read_all(argv[1], &rom_size);
   if (!rom) { fprintf(stderr, "cannot read %s\n", argv[1]); return 2; }
   GB *gb = calloc(1, sizeof *gb);
   gb_init(gb);
   if (!gb_load_rom(gb, rom, rom_size)) { fprintf(stderr, "unsupported ROM\n"); return 2; }
-  if (argc > 2) {
+  if (argc > 2 && argv[2][0] != '-') {
     uint8_t *boot = read_all(argv[2], &boot_size);
-    if (boot) gb_set_boot_rom(gb, boot, boot_size);
-  }
+    if (boot) { oracles_apply_agb_boot_patch(boot, boot_size); gb_set_boot_rom(gb, boot, boot_size); }
+  } else if (rec_path) { fprintf(stderr, "--record needs the boot ROM argument to match the headless runner\n"); return 2; }
+  if (init_ram && !oracles_load_init_ram(gb, init_ram)) { fprintf(stderr, "cannot read %s\n", init_ram); return 2; }
   gb_reset(gb);
   char sav[1024];
   sav_path(argv[1], sav, sizeof sav);
-  load_sram(gb, sav);
+  if (!rec_path) load_sram(gb, sav);
+  else rec_load_existing();
 
   if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMEPAD)) { fprintf(stderr, "%s\n", SDL_GetError()); return 2; }
   SDL_Window *win;
@@ -128,19 +171,32 @@ int main(int argc, char **argv) {
       case SDL_EVENT_GAMEPAD_BUTTON_UP: live_joy &= ~pad_bit(ev.gbutton.button); break;
       }
     }
-    if (audio && SDL_GetAudioStreamQueued(audio) > AUDIO_TARGET_BYTES) { SDL_Delay(1); continue; }
+    bool fast_forward = frames < rec_resume;
+    if (!fast_forward && audio && SDL_GetAudioStreamQueued(audio) > AUDIO_TARGET_BYTES) { SDL_Delay(1); continue; }
+    if (fast_forward) live_joy = rec_buf[frames];
+    else if (rec_path) rec_push(live_joy);
     gb_run_frame(gb);
     frames++;
+    if (rec_path && !fast_forward && frames % 3600 == 0) rec_write();
     uint32_t n = apu_read_samples(&gb->apu, samples, APU_RING);
-    if (audio) SDL_PutAudioStreamData(audio, samples, n * 4);
+    if (fast_forward) {
+      if (frames == rec_resume) { live_joy = 0; fprintf(stderr, "resumed at frame %llu, recording live\n", (unsigned long long)frames); }
+      else if (frames % 600) continue;
+    }
+    if (audio && !fast_forward) SDL_PutAudioStreamData(audio, samples, n * 4);
     framebuffer_to_rgb(gb->sample->framebuffer, rgb);
     SDL_UpdateTexture(tex, NULL, rgb, FB_W * 3);
     SDL_RenderClear(ren);
     SDL_RenderTexture(ren, tex, NULL, NULL);
     SDL_RenderPresent(ren);
-    if (frames % 600 == 0) save_sram(gb, sav);
+    if (!rec_path && frames % 600 == 0) save_sram(gb, sav);
   }
-  save_sram(gb, sav);
+  if (rec_path) {
+    rec_write();
+    fprintf(stderr, "recorded %llu frames to %s, state %016llx\n", (unsigned long long)rec_len, rec_path,
+            (unsigned long long)gb_state_hash(gb));
+  }
+  else save_sram(gb, sav);
   SDL_Quit();
   return 0;
 }
