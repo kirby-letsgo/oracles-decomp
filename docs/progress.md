@@ -448,6 +448,68 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-20 (evening): milestone 5 spec and plan written to
+  `~/Projects/agent-docs/oracles-decomp/{specs,plans}/2026-09-20-m5-native-engine*.md`, adopted
+  with three review conditions (separate worktree, `lockstep_native` before the first native
+  boot, inline data in jump-table routines handled before assets v1). Step 0 of the plan done in
+  worktree `.claude/worktrees/m5-step0` (uncommitted): VBlank delivery-context counters in
+  `hooks.c`/`cpu.c`, `oracles-ref` CMake target, `tas/ages-hooked.frames` (hooked build's frame
+  hashes, the native renderer's reference), `tools/pc_sites.py`. Inventory in
+  `~/Projects/agent-docs/oracles-decomp/specs/2026-09-20-m5-step0-inventory.md`. Findings: the
+  interpreter still executes 87.9M instructions per movie (303 per frame) at 1,979 addresses in
+  111 routines, 72% of them in `drawAllSpritesUnconditionally@drawObject` because
+  `CALL_ROM_CC(b_+132, ROM_drawAllSprites_drawObject)` calls an unhooked local label; 32 static
+  `CALL_ROM`-to-local sites account for 95%, the six thread loop bodies re-entered after a yield
+  for 3.7%, and about 90 routines' unlisted jump-table locals for the rest. 9,359 VBlanks (3.3%
+  of frames) are delivered mid-logic, so the movie has lag frames and the native engine keeps
+  the faithful clock. Only seven `gb->` field kinds are used outside the register file. Next:
+  plan step 1 item 7b, the 32 local blocks as static C, starting with `@drawObject`.
+
+- 2026-09-20 (night): milestone 5 plan step 1 item 7b, first batch, worktree `m5-step0`
+  (uncommitted on top of `75221a4`): the four largest interpreter-executed local blocks
+  rewritten as static C helpers called directly. `drawAllSpritesUnconditionally@drawObject`
+  (`draw_object`, `bank0.c`, the OAM data bank is `SYMBANK(itemOamData4cf40)` because
+  `BASE_OAM_DATA_BANK` is $13 in Ages and $12 in Seasons), `func_4553@getLinkWalkingAnimation`
+  (`specialObjectAnimationsAndDamage.c`; the Ages-only underwater preamble is guarded by
+  `SYM(func_4553__getLinkWalkingAnimation) != SYM(func_4553__notUnderwater)`, since the labels
+  coincide in Seasons and the tail is instruction-identical), `retrieveTextCharacter@func_18fd`
+  (`retrieve_text_character_tile`, byte-identical in both games), and
+  `updateSpecialObjects@updateSpecialObject` (`update_special_object`, an if-chain over the
+  `rst_jumpTable` targets with `HANDOFF` for the Seasons-only entry). Gates: `--verify-hooks-
+  continue` 30k frames 0 failures after each block; whole movie against `ages.ref` and
+  `ages-hooked.frames` clean; `ctest` 8/8 with the Ages 20k and Seasons demo; `lint_game.py` 0.
+  Interpreted instructions per movie: 87,944,533 to 6,830,645 (92% removed); the remaining
+  6.8M are 49% `mainThreadStart`'s loop after yields, then `loadTilesetLayout`,
+  `checkLinkJumpingOffCliff`, `loadRoomLayout`, `updateItemsPost`, `paletteFadeThreadStart`.
+  Seasons `--verify-hooks-continue` (30k no-input frames) reports 17 `lcdInterrupt_hook` IF-register
+  (io off=15) mismatches on this build and 34 on the main tree's `build/oracles-run`, so that
+  class predates this batch and is unrelated to it. Four labels added to
+  `src/hooks/syms_used.txt` (`itemOamData4cf40`, `func_4553__getLinkWalkingAnimation`,
+  `func_4553__notUnderwater`, `updateSpecialObjects__updateSpecialObject`), `syms.*` regenerated.
+
+- 2026-09-20: Oracle of Seasons, first day. The Seasons ROM boots and plays on the same C: after
+  building `seasons.sym` (`make seasons` in the disasm; the user's dump differs from the build
+  only in padding fill and the header checksum), `tools/routine_equiv.py` showed that almost
+  every routine lives at a different (bank, address) in Seasons even when byte-identical, so
+  `tools/symbolize.py` rewrote all 271k hard-coded addresses in `src/game/` to per-game symbols
+  (`BASE(label)` + `b_+offset`, `SYM(label)`, `RAMSYM()` for the 290 RAM names that move,
+  `switch_to_if.py` for the 667 jump-table switches; the Ages replay proved it behaviour-neutral),
+  `tools/seasons_hooks.py` picks the hooks that are instruction-identical and only burn or call
+  identical code, and `hooks.c` selects the hook and symbol tables from the ROM title. Bugs found
+  on the way, all by the Seasons runs: per-file bank anchors (a shared routine's copy can sit in a
+  different bank per game), `game.h`'s `ROM_*` defines, 2-digit `hram_wr` offsets and loop-bound
+  addresses left literal, `CALL_C` targets voting for a function's base, `hook_enabled_at`
+  ignoring the bank, `_label_XX_N` names that mean different code per game, and one latent Ages
+  bug (`assignRandomPositionToEnemy` never burned its `ret`; the Ages movie never reaches it).
+  Verification without a console movie: the 2012 VBA-rr TAS desyncs at file select even with the
+  boot offset corrected (no boot ROM, different power-on RAM), so the SDL app got `--record`
+  (boots like the headless runner, keyed by the core's frame counter, resumes) and the user
+  recorded a 33,337-frame playthrough; `tests/test_tas.c` now replays it and an input-free
+  30k-frame demo run against the interpreter's hashes. 1,953 hooks run under Seasons; the
+  playthrough ends on the recorded state hash. Commits `bd7ce5a` `287113e` `f7a211f` `e9579e9`
+  `df583ea`; `src/game/` was reorganised to mirror `object_code/{common,ages,seasons}/` earlier
+  in the day (`e447dd0`).
+
 - 2026-09-20: milestone 3 phase 6 batch 344, bank 15: **CLOSED OUT -- the last remaining large
   bank.** Four parallel agent clusters (A/B/C/D, ~90 routines each) ported all 360 remaining
   routines across 60+ new files, every one ending in the literal `15` per a blanket naming rule
