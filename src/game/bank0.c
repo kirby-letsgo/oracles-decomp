@@ -9847,6 +9847,66 @@ void func_3539_hook(GB *gb) {
 
 // tileset and room loading
 
+// loadTilesetLayout@helper: hl points at a tile mapping index in w3TileMappingIndices, de at the
+// destination in w3TileMappingData; copies the four tile indices and four attributes.
+static void load_tileset_layout_helper(GB *gb) {
+  BASE(loadTilesetLayout__helper);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  C = A;
+  CYC(b_+1, b_+2);
+  CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  B = A;
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+5); push_effect(gb, HL);
+  SET_HL(SYM(tileMappingTable));
+  alu_add_hl(gb, BC);
+  alu_add_hl(gb, BC);
+  alu_add_hl(gb, BC);
+  CYC(b_+5, b_+11);
+  CYC(b_+11, b_+12); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  C = A;
+  CYC(b_+12, b_+13);
+  CYC(b_+13, b_+14); A = mem_rd(gb, HL);
+  alu_swap_a(gb);
+  alu_and(gb, 0x0f);
+  B = A;
+  CYC(b_+14, b_+19);
+  CYC(b_+19, b_+20); push_effect(gb, HL);
+  SET_HL(SYM(tileMappingIndexDataPointer));
+  CYC(b_+20, b_+23);
+  CYC(b_+23, b_+24); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+24, b_+25); H = mem_rd(gb, HL);
+  L = A;
+  alu_add_hl(gb, BC);
+  alu_add_hl(gb, BC);
+  alu_add_hl(gb, BC);
+  alu_add_hl(gb, BC);
+  B = 0x04;
+  CYC(b_+25, b_+32);
+  CALL_C(b_+32, copyMemory_hook, SYM(copyMemory), b_+35);
+  CYC(b_+35, b_+36); SET_HL(pop_effect(gb));
+  CYC(b_+36, b_+37); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  alu_and(gb, 0x0f);
+  B = A;
+  CYC(b_+37, b_+40);
+  CYC(b_+40, b_+41); C = mem_rd(gb, HL);
+  SET_HL(SYM(tileMappingAttributeDataPointer));
+  CYC(b_+41, b_+44);
+  CYC(b_+44, b_+45); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+45, b_+46); H = mem_rd(gb, HL);
+  L = A;
+  alu_add_hl(gb, BC);
+  alu_add_hl(gb, BC);
+  alu_add_hl(gb, BC);
+  alu_add_hl(gb, BC);
+  B = 0x04;
+  CYC(b_+46, b_+53);
+  CALL_C(b_+53, copyMemory_hook, SYM(copyMemory), b_+56);
+  CYC(b_+56, b_+57); SET_HL(pop_effect(gb));
+  CYC(b_+57, b_+58);
+}
+
 void loadTilesetLayout_hook(GB *gb) {
   BASE(loadTilesetLayout);
   CYC(b_+0, b_+3); A = W8(wTilesetLayout);
@@ -9860,7 +9920,8 @@ void loadTilesetLayout_hook(GB *gb) {
   CYC(b_+17, b_+25);
   for (;;) {
     CYC(b_+25, b_+26); push_effect(gb, BC);
-    CALL_ROM(b_+26, ROM_loadTilesetLayout_helper);
+    CYC(b_+26, b_+29);
+    load_tileset_layout_helper(gb);
     CYC(b_+29, b_+30); SET_BC(pop_effect(gb));
     B = alu_dec8(gb, B);
     if (B) { CYCT(b_+30, b_+33); continue; }
@@ -11738,6 +11799,178 @@ void linkState07_hook(GB *gb) {
   } while (0);
 }
 
+// loadRoomLayout's local blocks. The Ages instruction stream; loadRoomLayout is not hooked under
+// Seasons, whose @loadLayoutData differs.
+
+// @loadLargeRoomLayoutHlpr: bc is a chunk descriptor; returns hl = its data and b = its length.
+static void room_layout_large_hlpr(GB *gb) {
+  BASE(loadRoomLayout__loadLargeRoomLayoutHlpr);
+  D = B;
+  A = B;
+  alu_and(gb, 0x0f);
+  B = A;
+  CYC(b_+0, b_+5);
+  CYC(b_+5, b_+7); A = H8(hFF8F);
+  H = A;
+  CYC(b_+7, b_+8);
+  CYC(b_+8, b_+10); A = H8(hFF8E);
+  L = A;
+  alu_add_hl(gb, BC);
+  A = D;
+  alu_swap_a(gb);
+  alu_and(gb, 0x0f);
+  alu_add(gb, 0x03);
+  B = A;
+  CYC(b_+10, b_+21);
+}
+
+// @checkDeNextLayoutRow: keeps de inside the small room's 10-wide rows.
+static void room_layout_check_de_next_row(GB *gb) {
+  BASE(loadRoomLayout__checkDeNextLayoutRow);
+  A = E;
+  alu_and(gb, 0x0f);
+  alu_cp(gb, 0x0a);
+  CYC(b_+0, b_+5);
+  if (F & FC) { CYCT(b_+5, b_+6); return; }
+  CYC(b_+5, b_+6);
+  A = 0x06;
+  alu_add(gb, E);
+  E = A;
+  CYC(b_+6, b_+11);
+}
+
+// @layoutCopyBytes: copies b bytes from hl to de with row wrapping.
+static void room_layout_copy_bytes(GB *gb) {
+  BASE(loadRoomLayout__layoutCopyBytes);
+  for (;;) {
+    CYC(b_+0, b_+1); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+1, b_+2); mem_wr(gb, DE, A);
+    E = alu_inc8(gb, E);
+    CYC(b_+2, b_+6);
+    room_layout_check_de_next_row(gb);
+    B = alu_dec8(gb, B);
+    CYC(b_+6, b_+7);
+    if (B) { CYCT(b_+7, b_+9); continue; }
+    CYC(b_+7, b_+9);
+    break;
+  }
+  CYC(b_+9, b_+10);
+}
+
+// @decompressLayoutHelper: eight bytes, each either the next byte at hl or the repeat byte in
+// hFF8B, chosen by the bits of c.
+static void room_layout_decompress_helper(GB *gb) {
+  BASE(loadRoomLayout__decompressLayoutHelper);
+  B = 0x08;
+  CYC(b_+0, b_+2);
+  for (;;) {
+    C = alu_srl(gb, C);
+    CYC(b_+2, b_+4);
+    if (F & FC) {
+      CYCT(b_+4, b_+6);
+      CYC(b_+9, b_+11); A = H8(hFF8B);
+    } else {
+      CYC(b_+4, b_+6);
+      CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYCT(b_+7, b_+9);
+    }
+    CYC(b_+11, b_+12); mem_wr(gb, DE, A);
+    E = alu_inc8(gb, E);
+    CYC(b_+12, b_+16);
+    room_layout_check_de_next_row(gb);
+    B = alu_dec8(gb, B);
+    CYC(b_+16, b_+17);
+    if (B) { CYCT(b_+17, b_+19); continue; }
+    CYC(b_+17, b_+19);
+    break;
+  }
+  CYC(b_+19, b_+20);
+}
+
+// @decompressLayoutMode2Helper: a 16-bit repeat mask, the repeat byte, then literal bytes.
+static void room_layout_mode2_helper(GB *gb) {
+  BASE(loadRoomLayout__decompressLayoutMode2Helper);
+  CYC(b_+0, b_+1); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  C = A;
+  CYC(b_+1, b_+2);
+  CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+3, b_+5); H8(hFF8A) = A;
+  alu_or(gb, C);
+  B = 0x10;
+  CYC(b_+5, b_+8);
+  if (F & FZ) { CYCT(b_+8, b_+10); room_layout_copy_bytes(gb); return; }
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+11); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+11, b_+13); H8(hFF8B) = A;
+  CYC(b_+13, b_+16);
+  room_layout_decompress_helper(gb);
+  CYC(b_+16, b_+18); A = H8(hFF8A);
+  C = A;
+  CYC(b_+18, b_+19);
+  CYCT(b_+19, b_+21);
+  room_layout_decompress_helper(gb);
+}
+
+// @decompressLayoutMode1Helper: an 8-bit repeat mask, the repeat byte, then literal bytes.
+static void room_layout_mode1_helper(GB *gb) {
+  BASE(loadRoomLayout__decompressLayoutMode1Helper);
+  CYC(b_+0, b_+1); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  C = A;
+  alu_or(gb, A);
+  B = 0x08;
+  CYC(b_+1, b_+5);
+  if (F & FZ) { CYCT(b_+5, b_+7); room_layout_copy_bytes(gb); return; }
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+8, b_+10); H8(hFF8B) = A;
+  CYCT(b_+10, b_+12);
+  room_layout_decompress_helper(gb);
+}
+
+// @loadLayoutData: reads the $b0 layout bytes at bank hFF8C:hl into wRoomCollisions, walking
+// into the next bank when hl crosses $8000; returns hl = wRoomCollisions.
+static void room_layout_load_data(GB *gb) {
+  BASE(loadRoomLayout__loadLayoutData);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); push_effect(gb, DE);
+  CYC(b_+1, b_+3); A = H8(hFF8C);
+  E = A;
+  CYC(b_+3, b_+4);
+  for (;;) {
+    alu_bit(gb, 7, H);
+    CYC(b_+4, b_+6);
+    if (F & FZ) { CYCT(b_+6, b_+8); break; }
+    CYC(b_+6, b_+8);
+    A = H;
+    alu_sub(gb, 0x40);
+    H = A;
+    E = alu_inc8(gb, E);
+    CYC(b_+8, b_+13);
+    CYCT(b_+13, b_+15);
+  }
+  A = E;
+  CYC(b_+15, b_+16);
+  CYC(b_+16, b_+18); H8(hRomBank) = A;
+  CYC(b_+18, b_+21); mem_wr(gb, MBC_ROM_BANK, A);
+  B = 0xb0;
+  SET_DE(wRoomCollisions);
+  CYC(b_+21, b_+26);
+  for (;;) {
+    CALL_C(b_+26, readByteSequential_hook, SYM(readByteSequential), b_+29);
+    CYC(b_+29, b_+30); mem_wr(gb, DE, A);
+    E = alu_inc8(gb, E);
+    B = alu_dec8(gb, B);
+    CYC(b_+30, b_+32);
+    if (B) { CYCT(b_+32, b_+34); continue; }
+    CYC(b_+32, b_+34);
+    break;
+  }
+  SET_HL(wRoomCollisions);
+  CYC(b_+34, b_+37);
+  CYC(b_+37, b_+38); SET_DE(pop_effect(gb));
+  CYC(b_+38, b_+39);
+}
+
 static void load_large_room_layout(GB *gb) {
   BASE(loadRoomLayout);
   CYC(b_+76, b_+78); A = H8(hFF8F);
@@ -11760,7 +11993,8 @@ static void load_large_room_layout(GB *gb) {
   SET_BC(0xfe00);
   alu_add_hl(gb, BC);
   CYC(b_+100, b_+106);
-  CALL_ROM(b_+106, ROM_loadRoomLayout_loadLayoutData);
+  CYC(b_+106, b_+109);
+  room_layout_load_data(gb);
   SET_DE(wRoomLayout);
   CYC(b_+109, b_+112);
   for (;;) {
@@ -11778,7 +12012,8 @@ static void load_large_room_layout(GB *gb) {
         CYC(b_+136, b_+138); A = mem_rd(gb, HL); SET_HL(HL + 1);
         B = A;
         CYC(b_+138, b_+140); push_effect(gb, HL);
-        CALL_ROM(b_+140, ROM_loadRoomLayout_loadLargeRoomLayoutHlpr);
+        CYC(b_+140, b_+143);
+        room_layout_large_hlpr(gb);
         D = wRoomLayout >> 8;
         CYC(b_+143, b_+147); A = H8(hFF8D);
         CYC(b_+147, b_+149); H8(hRomBank) = A;
@@ -11825,13 +12060,14 @@ static void load_large_room_layout(GB *gb) {
   }
 }
 
-static void decompress_layout_rows(GB *gb, uint16_t a, uint8_t rows, uint16_t helper) {
+static void decompress_layout_rows(GB *gb, uint16_t a, uint8_t rows, void (*helper)(GB *)) {
   SET_DE(wRoomLayout);
   A = rows;
   CYC(a, a + 5);
   for (;;) {
     CYC(a + 5, a + 6); push_effect(gb, AF);
-    CALL_ROM(a + 6, helper);
+    CYC(a + 6, a + 9);
+    helper(gb);
     CYC(a + 9, a + 10); SET_AF(pop_effect(gb));
     A = alu_dec8(gb, A);
     if (A) { CYCT(a + 10, a + 13); continue; }
@@ -11861,12 +12097,13 @@ static void load_small_room_layout(GB *gb) {
   CYC(b_+190, b_+195); SET_HL(pop_effect(gb));
   alu_add_hl(gb, BC);
   CYC(b_+195, b_+196);
-  CALL_ROM(b_+196, ROM_loadRoomLayout_loadLayoutData);
+  CYC(b_+196, b_+199);
+  room_layout_load_data(gb);
   alu_bit(gb, 7, E);
-  if (!(F & FZ)) { CYCT(b_+199, b_+203); decompress_layout_rows(gb, b_+229, 0x05, ROM_loadRoomLayout_decompressLayoutMode2Helper); return; }
+  if (!(F & FZ)) { CYCT(b_+199, b_+203); decompress_layout_rows(gb, b_+229, 0x05, room_layout_mode2_helper); return; }
   CYC(b_+199, b_+203);
   alu_bit(gb, 6, E);
-  if (!(F & FZ)) { CYCT(b_+203, b_+207); decompress_layout_rows(gb, b_+264, 0x0a, ROM_loadRoomLayout_decompressLayoutMode1Helper); return; }
+  if (!(F & FZ)) { CYCT(b_+203, b_+207); decompress_layout_rows(gb, b_+264, 0x0a, room_layout_mode1_helper); return; }
   CYC(b_+203, b_+207);
   SET_DE(wRoomLayout);
   SET_BC(0x0a08);

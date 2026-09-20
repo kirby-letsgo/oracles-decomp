@@ -109,10 +109,25 @@ void itemCodeNilPost_hook(GB *gb) {
 
 void updateItemPost_hook(GB *gb) {
   BASE(updateItemPost);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   CYC(b_+0, b_+2); E = 0x01;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
-  hook_handoff(gb, item_post_jump_table(gb));
+  do { uint16_t jt_ = (item_post_jump_table(gb));
+    if (jt_ == SYM(itemCodeNilPost)) { itemCodeNilPost_hook(gb); return; }
+    else if (jt_ == SYM(itemCode00Post)) { itemCode00Post_hook(gb); return; }
+    else if (jt_ == SYM(itemCode04Post)) { itemCode04Post_hook(gb); return; }
+    else if (jt_ == SYM(itemCode08Post)) { itemCode08Post_hook(gb); return; }
+    else if (jt_ == SYM(itemCode0aPost)) { itemCode0aPost_hook(gb); return; }
+    else if (jt_ == SYM(itemCode0bPost)) { itemCode0bPost_hook(gb); return; }
+    else if (jt_ == SYM(itemCode0cPost)) { itemCode0cPost_hook(gb); return; }
+    else if (jt_ == SYM(itemCode0fPost)) { itemCode0fPost_hook(gb); return; }
+    else if (jt_ == SYM(itemCode13Post)) { itemCode13Post_hook(gb); return; }
+    else if (jt_ == SYM(itemCode1dPost)) { itemCode1dPost_hook(gb); return; }
+    else if (jt_ == SYM(itemCode1ePost)) { itemCode1ePost_hook(gb); return; }
+    else if (jt_ == SYM(itemDelete)) { itemDelete_hook(gb); return; }
+    else { HANDOFF(jt_); }
+  } while (0);
 }
 
 void updateItemsPost_hook(GB *gb) {

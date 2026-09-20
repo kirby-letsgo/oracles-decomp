@@ -167,6 +167,44 @@ L_5d89:
   CYC(b_+50, b_+51); ret_effect(gb); return;
 }
 
+// updateHeartRingCounter@addOffsetsToCounter: adds or subtracts (bit 7 of the first byte at de)
+// the 16-bit offset at de-1..de to the counter at hl.
+static void heart_ring_add_offsets_to_counter(GB *gb) {
+  BASE(updateHeartRingCounter__addOffsetsToCounter);
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);
+  E = alu_dec8(gb, E);
+  alu_rlca(gb);
+  CYC(b_+1, b_+3);
+  if (!(F & FC)) {
+    CYCT(b_+3, b_+5);
+    CYC(b_+14, b_+15); A = mem_rd(gb, DE);
+    CYC(b_+15, b_+16); alu_add(gb, mem_rd(gb, HL));
+    CYC(b_+16, b_+17); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    E = alu_inc8(gb, E);
+    CYC(b_+17, b_+18);
+    CYC(b_+18, b_+19); A = mem_rd(gb, DE);
+  } else {
+    CYC(b_+3, b_+5);
+    CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+    alu_cpl(gb);
+    CYC(b_+6, b_+7);
+    CYC(b_+7, b_+8); alu_adc(gb, mem_rd(gb, HL));
+    CYC(b_+8, b_+9); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    E = alu_inc8(gb, E);
+    CYC(b_+9, b_+10);
+    CYC(b_+10, b_+11); A = mem_rd(gb, DE);
+    alu_cpl(gb);
+    CYC(b_+11, b_+12);
+    CYCT(b_+12, b_+14);
+  }
+  CYC(b_+19, b_+20); alu_adc(gb, mem_rd(gb, HL));
+  CYC(b_+20, b_+21); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  if (!(F & FC)) { CYCT(b_+21, b_+22); return; }
+  CYC(b_+21, b_+22);
+  CYC(b_+22, b_+23); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+23, b_+24);
+}
+
 void updateHeartRingCounter_hook(GB *gb) {
   BASE(updateHeartRingCounter);
   uint16_t sp0_ = gb->sp;
@@ -186,11 +224,11 @@ L_5650:
   CYC(b_+22, b_+25); SET_DE(wEnemyPlacement_numEnemies);
   CYC(b_+25, b_+28); SET_HL(wHeartRingCounter);
   CYC(b_+28, b_+30); C = alu_srl(gb, C);
-  if ((F & FC)) { CALL_ROM_CC(b_+30, b_+66); } else CYC(b_+30, b_+33);
+  if ((F & FC)) { CYCT(b_+30, b_+33); heart_ring_add_offsets_to_counter(gb); } else CYC(b_+30, b_+33);
   CYC(b_+33, b_+35); E = 0xc3;
   CYC(b_+35, b_+37); L = 0x53;
   CYC(b_+37, b_+39); C = alu_srl(gb, C);
-  if ((F & FC)) { CALL_ROM_CC(b_+39, b_+66); } else CYC(b_+39, b_+42);
+  if ((F & FC)) { CYCT(b_+39, b_+42); heart_ring_add_offsets_to_counter(gb); } else CYC(b_+39, b_+42);
   CYC(b_+42, b_+43); SET_DE(pop_effect(gb));
   CYC(b_+43, b_+46); A = mem_rd(gb, (wHeartRingCounter + 2));
   CYC(b_+46, b_+47); alu_cp(gb, B);
@@ -1062,6 +1100,39 @@ L_5803:
   CYC(b_+111, b_+112); ret_effect(gb); return;
 }
 
+// checkLinkJumpingOffCliff@checkCliffTile: hl points at a (y,x) offset pair; carry set when the
+// tile there is a cliff facing Link's direction.
+static void link_check_cliff_tile(GB *gb) {
+  BASE(checkLinkJumpingOffCliff__checkCliffTile);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  SET_HL(HL + 1);
+  CYC(b_+0, b_+1);
+  CYC(b_+1, b_+2); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+2, b_+3); C = mem_rd(gb, HL);
+  B = A;
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+5); push_effect(gb, HL);
+  CALL_C(b_+5, objectGetRelativeTile_hook, SYM(objectGetRelativeTile), b_+8);
+  CYC(b_+8, b_+10); H8(hFF8B) = A;
+  SET_HL(SYM(cliffTilesTable));
+  CYC(b_+10, b_+13);
+  CALL_C(b_+13, lookupCollisionTable_hook, SYM(lookupCollisionTable), b_+16);
+  CYC(b_+16, b_+17); SET_HL(pop_effect(gb));
+  if (!(F & FC)) { CYCT(b_+17, b_+18); return; }
+  CYC(b_+17, b_+18);
+  C = A;
+  E = 0x09;
+  CYC(b_+18, b_+21);
+  CYC(b_+21, b_+22); A = mem_rd(gb, DE);
+  alu_cp(gb, C);
+  alu_scf(gb);
+  CYC(b_+22, b_+24);
+  if (F & FZ) { CYCT(b_+24, b_+25); return; }
+  CYC(b_+24, b_+25);
+  alu_xor(gb, A);
+  CYC(b_+25, b_+27);
+}
+
 void checkLinkJumpingOffCliff_hook(GB *gb) {
   BASE(checkLinkJumpingOffCliff);
   uint16_t sp0_ = gb->sp;
@@ -1087,9 +1158,11 @@ void checkLinkJumpingOffCliff_hook(GB *gb) {
   CYC(b_+27, b_+28); alu_and(gb, mem_rd(gb, HL));
   CYC(b_+28, b_+29); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FZ)) { CYCT(b_+29, b_+30); ret_effect(gb); return; } CYC(b_+29, b_+30);
-  CALL_ROM(b_+30, b_+66);
+  CYC(b_+30, b_+33);
+  link_check_cliff_tile(gb);
   if (!(F & FC)) { CYCT(b_+33, b_+34); ret_effect(gb); return; } CYC(b_+33, b_+34);
-  CALL_ROM(b_+34, b_+66);
+  CYC(b_+34, b_+37);
+  link_check_cliff_tile(gb);
   if (!(F & FC)) { CYCT(b_+37, b_+38); ret_effect(gb); return; } CYC(b_+37, b_+38);
   CYC(b_+38, b_+40); A = 0x81;
   CYC(b_+40, b_+43); mem_wr(gb, wLinkInAir, A);

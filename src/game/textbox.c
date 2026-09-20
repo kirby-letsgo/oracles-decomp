@@ -1505,6 +1505,124 @@ no_extra:
   CYC(b_+95, b_+96); ret_effect(gb);
 }
 
+// doInventoryTextFirstPass@controlCode and its handlers: advance e by the number of characters
+// a control code produces, reading the text stream the way the second pass does. Each handler
+// ends in the routine that pops the return address the caller pushed.
+static void inventory_text_cc_dictionary(GB *gb) {
+  BASE(doInventoryTextFirstPass__dictionary);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CALL_C(b_+1, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+4);
+  CYC(b_+4, b_+7); mem_wr(gb, wTextIndexL, A);
+  CALL_C(b_+7, pushToTextStack_hook, SYM(pushToTextStack), b_+10);
+  A = B;
+  CYC(b_+10, b_+11);
+  CYC(b_+11, b_+14); mem_wr(gb, wTextIndexH, A);
+  CYC(b_+14, b_+17);
+  getTextAddress_hook(gb);
+}
+
+static void inventory_text_cc_nil(GB *gb) {
+  BASE(doInventoryTextFirstPass__controlCodeNil);
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CYC(b_+1, b_+4);
+  incHlAndUpdateBank_hook(gb);
+}
+
+static void inventory_text_cc_6(GB *gb) {
+  BASE(doInventoryTextFirstPass__controlCode6);
+  E = alu_inc8(gb, E);
+  CYC(b_+0, b_+1);
+  inventory_text_cc_nil(gb);
+}
+
+static void inventory_text_cc_7(GB *gb) {
+  BASE(doInventoryTextFirstPass__controlCode7);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CALL_C(b_+1, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+4);
+  CYC(b_+4, b_+7); mem_wr(gb, wTextIndexL, A);
+  CYC(b_+7, b_+10);
+  checkInitialTextCommands_hook(gb);
+}
+
+static void inventory_text_cc_8(GB *gb) {
+  BASE(doInventoryTextFirstPass__controlCode8);
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CYC(b_+1, b_+2);
+  ret_effect(gb);
+}
+
+static void inventory_text_cc_a(GB *gb) {
+  BASE(doInventoryTextFirstPass__controlCodeA);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CALL_C(b_+1, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+4);
+  CYC(b_+4, b_+5); push_effect(gb, HL);
+  SET_HL(SYM(nameAddressTable));
+  CYC(b_+5, b_+8);
+  CYC(b_+8, b_+9); add_double_index_to_hl(gb, b_+9);
+  CYC(b_+9, b_+10); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+10, b_+11); H = mem_rd(gb, HL);
+  L = A;
+  CYC(b_+11, b_+12);
+  for (;;) {
+    CYC(b_+12, b_+13); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    alu_or(gb, A);
+    CYC(b_+13, b_+14);
+    if (F & FZ) { CYCT(b_+14, b_+16); break; }
+    CYC(b_+14, b_+16);
+    E = alu_inc8(gb, E);
+    CYC(b_+16, b_+17);
+    CYCT(b_+17, b_+19);
+  }
+  inventory_text_cc_8(gb);
+}
+
+static void inventory_text_cc_f(GB *gb) {
+  BASE(doInventoryTextFirstPass__controlCodeF);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CALL_C(b_+1, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+4);
+  alu_cp(gb, 0xfc);
+  CYC(b_+4, b_+6);
+  if (F & FC) CYCT(b_+6, b_+8);
+  else {
+    CYC(b_+6, b_+8);
+    CYC(b_+8, b_+9); push_effect(gb, HL);
+    alu_cpl(gb);
+    SET_HL(wTextSubstitutions);
+    CYC(b_+9, b_+13);
+    CYC(b_+13, b_+14); push_effect(gb, b_+14); add_a_to_hl(gb);
+    CYC(b_+14, b_+15); A = mem_rd(gb, HL);
+    CYC(b_+15, b_+16); SET_HL(pop_effect(gb));
+  }
+  CYC(b_+16, b_+19); mem_wr(gb, wTextIndexL, A);
+  CALL_C(b_+19, pushToTextStack_hook, SYM(pushToTextStack), b_+22);
+  CYC(b_+22, b_+25);
+  checkInitialTextCommands_hook(gb);
+}
+
+static void inventory_text_control_code(GB *gb) {
+  BASE(doInventoryTextFirstPass__controlCode);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  alu_sub(gb, 0x02);
+  B = A;
+  CYC(b_+0, b_+3);
+  CYC(b_+3, b_+4); push_effect(gb, HL);
+  CYC(b_+4, b_+5); push_effect(gb, b_+5);
+  do { uint16_t jt_ = (textbox_jump_table(gb));
+    if (jt_ == SYM(doInventoryTextFirstPass__dictionary)) { inventory_text_cc_dictionary(gb); return; }
+    else if (jt_ == SYM(doInventoryTextFirstPass__controlCode6)) { inventory_text_cc_6(gb); return; }
+    else if (jt_ == SYM(doInventoryTextFirstPass__controlCode7)) { inventory_text_cc_7(gb); return; }
+    else if (jt_ == SYM(doInventoryTextFirstPass__controlCode8)) { inventory_text_cc_8(gb); return; }
+    else if (jt_ == SYM(doInventoryTextFirstPass__controlCodeNil)) { inventory_text_cc_nil(gb); return; }
+    else if (jt_ == SYM(doInventoryTextFirstPass__controlCodeA)) { inventory_text_cc_a(gb); return; }
+    else if (jt_ == SYM(doInventoryTextFirstPass__controlCodeF)) { inventory_text_cc_f(gb); return; }
+    else { HANDOFF(jt_); }
+  } while (0);
+}
+
 void doInventoryTextFirstPass_hook(GB *gb) {
   BASE(doInventoryTextFirstPass);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1529,7 +1647,8 @@ void doInventoryTextFirstPass_hook(GB *gb) {
     CYC(b_+26, b_+28); alu_cp(gb, 0x10);
     if (!(F & FC)) { CYCT(b_+28, b_+30); goto not_control; }
     CYC(b_+28, b_+30);
-    CALL_ROM(b_+30, b_+114);
+    CYC(b_+30, b_+33); push_effect(gb, b_+33);
+    inventory_text_control_code(gb);
     CYC(b_+33, b_+35);
     continue;
 null_terminator:
