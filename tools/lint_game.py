@@ -10,7 +10,7 @@ def err(path, ln, msg):
     global bad
     bad += 1
     print(f'{path}:{ln}: {msg}')
-for path in sorted(glob.glob('src/game/*.c')):
+for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
     if os.path.basename(path).startswith('gen_') or os.path.basename(path) in ('ram_code.c', 'kernel.c', 'cyc.c'): continue
     in_hook = False
     for ln, line in enumerate(open(path), 1):
