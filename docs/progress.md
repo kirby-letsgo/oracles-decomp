@@ -448,6 +448,50 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-20 (late): milestone 5 plan step 1 item 7b, batches 2 to 6, worktree branch
+  `worktree-m5-step0` (commits `6a092d6`, `e9804b0`, `4a6528f`, `6c1a76b`, `badecee` on top of
+  main `ed9f340`, merged with main first and generated files regenerated, never merged by hand).
+  Every live `CALL_ROM`-to-local site is now a static C helper called directly: the tileset and
+  room layout locals, the cliff and heart-ring locals, item post dispatch, the inventory text
+  control codes, `handleTextControlCode` and its sixteen handlers (whose interpreter hand-off had
+  been unwinding the callers' loops into the interpreter too), the engine-file jump-table locals
+  (warp tile check, map popup, inventory and ring menu states, secret text, tileset override,
+  object allocation, Symmetry Village flags), the interaction, item and item-parent locals, and
+  the 32-way Tokay subid initialiser. What stays interpreted on purpose: `func_7f55` and the
+  `fake_*` bodies in `bank02End.c`/`bank3fEnd.c` (garbage-region code calling into the middle of
+  other routines). Interpreted instructions per movie: 6,830,645 after batch 1 to 3,896,076;
+  96% of the remainder is the six thread loops (class B, deferred by request), the rest is
+  class C (`interactionCode60`, `updateItems`, `updateInteractions`,
+  `checkSpawnTimeportalInteraction`, the RST vectors they run) at about 140k. Gates after every
+  batch: `--verify-hooks-continue` 30k frames 0 failures, whole movie clean against `ages.ref`
+  and `ages-hooked.frames`, `ctest` 8/8 with `seasons_demo_matches_reference` and
+  `seasons_play_matches_reference`, Seasons playthrough `--verify-hooks-continue` showing only the
+  known 1-cycle `lcdInterrupt` LYC-write skew, `lint_game.py` 0. Seasons hook count: 1,953 before,
+  1,952 after batch 4 and unchanged since: `handleTextControlCode_hook` now tail-calls
+  `retrieveTextCharacter_hook` (SAME_SHAPE) and `textControlCodeC_1/2/6_hook` (not eligible)
+  directly, so `tools/seasons_hooks.py` drops it and Seasons runs it interpreted as before. If
+  that one hook matters, the direct tail calls could be guarded with `hook_enabled_at` and the
+  selector taught to accept the guard; that is a `tools/` change. New labels went through
+  `src/hooks/syms_used.txt` and `tools/gen_syms.py` (33 added). Lessons recorded in the inventory
+  doc: an `.ifdef ROM_AGES` preamble can be guarded by a label-equality test when the tail is
+  identical; a per-game bank immediate needs a shared label in that bank (`SYMBANK`); a
+  `CALL_C` cannot sit in a non-void helper (its failure path is a bare `return`); a helper that
+  the assembly reaches by `call` and by fallthrough gets the `ret_effect` in the callee and a
+  `push_effect` at the call site.
+
+- 2026-09-20 (late): Seasons per-game constants. `tools/gameconst.py` makes the SAME_SHAPE
+  routines (same instructions, some constant differs) run under Seasons by evaluating each C
+  site for both games and wrapping the wrong ones as `GV(ages, seasons)` (`GVW`/`GVH` for a named
+  RAM byte); it also audits every identical routine's constants and restored 36 literals the
+  symbolizer had turned into label+offset, only right for Ages. 291 of 382 resolved; the rest are
+  a different callee or variable and are hand work. Found on the way: the readable style repeats
+  a constant in helper arguments and the MBC write (fixed 7+3 sites), and the enemy wall code's
+  `capSpeed` path burned the fall-through `ret c` (latent in Ages, all four bank copies).
+  `VERIFY_ALL=1` verifies every nested call. Merged Fable's item 7b batches 2-6 (interpreted
+  instructions per movie 6.8M to 3.9M; the tool is idempotent on their code now). 2,406 hooks run
+  under Seasons; the playthrough verifies clean apart from the lcdInterrupt LYC skew; Ages full
+  replay passes. Commits `57ff81d`, `8085e5e` and this one.
+
 - 2026-09-20 (evening): milestone 5 spec and plan written to
   `~/Projects/agent-docs/oracles-decomp/{specs,plans}/2026-09-20-m5-native-engine*.md`, adopted
   with three review conditions (separate worktree, `lockstep_native` before the first native

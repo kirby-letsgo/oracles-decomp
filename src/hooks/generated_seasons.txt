@@ -962,6 +962,8 @@
 04:57cf updateAnimationDataPointer_hook -
 04:580f loadAnimationGfxIndex_hook -
 04:5dc7 replaceTiles_hook -
+04:5de8 applyStandardTileSubstitutions_hook -
+04:5e1b applyStandardTileSubstitutions__locFunc_hook -
 04:5f53 replaceOpenedChest_hook -
 04:5f62 replaceSwitchTiles_hook -
 04:5f7b replaceSwitchTiles__next6297_hook -
@@ -1257,7 +1259,6 @@
 07:485a updateItems_hook -
 07:4902 updateItemsPost_hook -
 07:4917 itemCodeNilPost_hook -
-07:4918 updateItemPost_hook -
 07:4974 loadAttributesAndGraphicsAndIncState_hook -
 07:497b itemLoadAttributesAndGraphics_hook -
 07:49aa itemSetVar3cToFF_hook -

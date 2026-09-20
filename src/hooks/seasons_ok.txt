@@ -1,12 +1,10 @@
-_adjustHLSequential
 _mainLoop_nextThread
-_scriptCmd_asmRetFunc
-_startSound
 addRoomToEnemiesKilledList_b02
 addTreasureToInventory
 addTreasureToInventory__addToInventory
 agesFunc_3f_4133
 applyStandardTileSubstitutions
+applyStandardTileSubstitutions__locFunc
 armos_subid00_stateA
 armos_subid01_stateA
 beetle_chooseRandomAngleAndCounter1
@@ -56,7 +54,6 @@ collisionEffect35
 collisionEffect3d
 companionCheckHopDownCliff
 companionDragToCenterOfHole
-copy20BytesFromBank
 copyFileFromHlToDe
 copyW4PaletteDataToW2TilesetBgPalettes
 cucco_hitWithMysterySeed
@@ -66,7 +63,6 @@ cutscene15__update
 cutscene18_state5
 cutscene19
 cutscene19_state4
-decompressGraphics
 dimitriCheckCanBeHeldInDirection
 dimitriGotoEatingState
 dmaTextGfxBuffer
@@ -106,7 +102,6 @@ enemyCode48
 enemyCode4b
 enemyDie
 enemySetAnimation
-eraseFile_b07
 explosionCheckAndApplyLinkCollision
 extractColorComponents
 faroreCheckSecretValidity
@@ -123,7 +118,6 @@ fish_updatePosition
 func_02_465c
 func_02_5afc
 func_11_5e8a
-func_13c6
 func_49c9
 gameLink_getFile3
 ganon_decideTeleportLocationAndCounter
@@ -135,7 +129,6 @@ getLinkWarpQuadrant
 getMinimapPopupType
 getNextActiveRoom
 getRingTiles
-getSimulatedInput
 ghini_chooseTargetPosition
 ghini_subid00
 ghini_subid01
@@ -169,7 +162,6 @@ interactiond9_state0
 interactiond9_state1
 interactiond9_state2
 introCinematic_inTemple_state0
-introThreadStart
 inventoryMenuState1__equipItem__equipBiggoron
 inventoryMenuState1__equipItem__putItemInFirstBlankSlot
 inventoryMenuState1__equipItem__unequipBiggoron
@@ -196,8 +188,6 @@ linkUpdateInAir
 linkedNpc_generateSecret
 loadEquippedItemSpriteData
 loadTileset
-loadTilesetHlpr
-loadUniqueGfxHeaderEntry
 mainThreadStart
 mapGetRoomText__specialCode2
 mapGetRoomText__specialCode3
@@ -231,14 +221,8 @@ partCommon_standardUpdate
 partSetAnimation
 peahat_updateEnemyCollisionMode
 polsVoice_state8
-queueDmaTransfer
-readByteFromW7ActiveBank
-readByteFromW7TextTableBank
-readByteSequential
 redSnake_generateRingSecret
 refreshObjectGfx_body
-resumeThreadNextFrameAndSaveBank
-retrieveTextCharacter
 rickyCheckHopUpCliff
 rickyStartPunch
 rickyState8
@@ -256,7 +240,6 @@ ringMenu_unappraisedRings_state4
 rope_changeDirection
 runGameLogic
 saveFile_b07
-scriptCmd_asmCallWithParam
 scriptCmd_loadSprite
 scriptCmd_showPasswordScreen
 secretListMenu_printSecret__getSecretText
@@ -289,7 +272,6 @@ textInput_getCursorPosition
 textInput_loadCharacterGfx
 textThreadStart
 thread_1b10
-timerInterrupt
 twinrovaCutscene_deleteAllInteractionsExceptFlames
 twinrovaCutscene_state1
 twinrova_state10
@@ -302,13 +284,7 @@ updateLinkDamageTaken
 updateMenus
 updateSwingableItemAnimation
 updateTextbox__standardText
-updateTilesetUniqueGfx
 vasu_giveRingBox
-vblankDmaFunction
-verifyFileAtHl
-verifyFileAtHl__nextChar
-verifyFileAtHl__verifyDone
-verifyFileAtHl__verifyFailed
 vire_mainForm_stateF
 volcanoRock_setRandomPosition
 waterTektite_getAdjacentWallsBitsetGivenAngle

@@ -74,6 +74,19 @@ class Tool:
         for _ in range(3):
             e = re.sub(r'(?<!SYM\()\b([A-Za-z_]\w*)\b', lambda m: f'({macros[m.group(1)]})' if m.group(1) in macros else m.group(0), e)
         if base is not None: e = re.sub(r'\bb_\b', str(base), e)
+        while True:
+            m = re.search(r'\bGV[WH]?\(', e)
+            if not m: break
+            depth, j, args, start = 1, m.end(), [], m.end()
+            while j < len(e) and depth:
+                if e[j] == '(': depth += 1
+                elif e[j] == ')':
+                    depth -= 1
+                    if depth == 0: args.append(e[start:j]); break
+                elif e[j] == ',' and depth == 1: args.append(e[start:j]); start = j + 1
+                j += 1
+            if len(args) != 2: return None
+            e = e[:m.start()] + '(' + args[1 if game else 0].strip() + ')' + e[j + 1:]
         e = re.sub(r'\bSYM\((\w+)\)', lambda m: str(self.syms[m.group(1)][game] & 0xffff) if m.group(1) in self.syms else 'None', e)
         ram = self.ram_s if game else self.ram_a
         e = re.sub(r'\b([wh][A-Za-z0-9_]+)\b', lambda m: str(ram[m.group(1)]) if m.group(1) in ram else m.group(0), e)
@@ -138,8 +151,11 @@ class Tool:
                 # candidate expressions on this line
                 if kind == 'imm':
                     lit = f'0x{v1:02x}'
-                    cands = [m for m in re.finditer(r'(?<![\w.])0x[0-9a-f]{2}(?![0-9a-f])', code) if int(m.group(0), 16) == v1]
+                    def in_gv(pos):
+                        pre = code[:pos]; return len(re.findall(r'\bGV[WH]?\(', pre)) > pre.count(')') - (pre.count('(') - len(re.findall(r'\bGV[WH]?\(', pre))) and re.search(r'\bGV[WH]?\([^)]*$', pre) is not None
+                    cands = [m for m in re.finditer(r'(?<![\w.])0x[0-9a-f]{2}(?![0-9a-f])', code) if int(m.group(0), 16) == v1 and not in_gv(m.start())]
                     cands = [m for m in cands if not re.search(r'burn_rom\(gb, $', code[:m.start()])]
+                    if not cands and any(int(m.group(0), 16) == v1 and in_gv(m.start()) for m in re.finditer(r'(?<![\w.])0x[0-9a-f]{2}(?![0-9a-f])', code)): return True
                     if not cands:
                         cands = [m for m in re.finditer(r'(?<=[=, (])\d{1,3}(?=[;,) ])', code) if int(m.group(0)) == v1 and not re.search(r'\bb_\+$|CYCT?\(b_\+\d+, b_\+$|alu_bit\(gb, $', code[:m.start()])]
                     if not cands:
@@ -185,6 +201,9 @@ class Tool:
                         exprs.append((st, en, code[st:en]))
                 bases = [self.syms.get(self.base_sid, (None, None))]
                 b0, b1 = (bases[0][0] & 0xffff) if bases[0][0] is not None else None, (bases[0][1] & 0xffff) if bases[0][1] is not None else None
+                exprs = [(st, en, ex) for st, en, ex in exprs if not re.search(r'\bGV[WH]?\($', code[:st]) and not re.search(r'\bGV[WH]?\([^()]*,$', code[:st].rstrip())]
+                for m in re.finditer(r'\bGV[WH]?\((?:[^()]|\([^()]*\))*\)', code):
+                    if not any(st <= m.start() < en for st, en, _ in exprs): exprs.append((m.start(), m.end(), m.group(0)))
                 hits = [(st, en, ex) for st, en, ex in exprs if ex.strip() and not re.match(r'\s*gb\s*$', ex) and self.eval_expr(ex, 0, b0) == v1]
                 if not hits:
                     if i != order[-1]: continue
@@ -231,7 +250,9 @@ class Tool:
                     code = lines[i].split('//')[0]
                     ms = [int(x) for x in re.findall(r'\bb_\+(\d+)', code)]
                     if ms and max(ms) <= off and (best is None or max(ms) > best[0]):
-                        cands = [m for m in re.finditer(r'(?<![\w.])0x[0-9a-f]{2}(?![0-9a-f])', code) if int(m.group(0), 16) == v1]
+                        allc = [m for m in re.finditer(r'(?<![\w.])0x[0-9a-f]{2}(?![0-9a-f])', code) if int(m.group(0), 16) == v1]
+                        if any(re.search(r'\bGV[WH]?\([^)]*$', code[:m.start()]) for m in allc): return True
+                        cands = [m for m in allc if not re.search(r'\bGV[WH]?\([^)]*$', code[:m.start()])]
                         if len(cands) == 1: best = (max(ms), f, i, cands[0])
             if best:
                 _, f, i, m = best
