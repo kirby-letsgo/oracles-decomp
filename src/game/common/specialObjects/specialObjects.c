@@ -110,6 +110,43 @@ dying:
   ret_effect(gb);
 }
 
+// updateSpecialObjects@updateSpecialObject: hl is w1Link or w1Companion; the caller has pushed
+// the return address the dispatched special-object handler pops.
+static void update_special_object(GB *gb) {
+  BASE(updateSpecialObjects__updateSpecialObject);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); A = mem_rd(gb, HL);
+  alu_or(gb, A);
+  CYC(b_+1, b_+2);
+  if (F & FZ) { CYCT(b_+2, b_+3); ret_effect(gb); return; }
+  CYC(b_+2, b_+3);
+  A = L;
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+6); H8(hActiveObjectType) = A;
+  A = H;
+  CYC(b_+6, b_+7);
+  CYC(b_+7, b_+9); H8(hActiveObject) = A;
+  D = H;
+  L = OBJ_ID;
+  CYC(b_+9, b_+12);
+  CYC(b_+12, b_+13); A = mem_rd(gb, HL);
+  CYC(b_+13, b_+14); push_effect(gb, b_+14);
+  do { uint16_t jt_ = (func_410d_jump_table(gb));
+    if (jt_ == SYM(specialObjectCode_link)) { specialObjectCode_link_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_transformedLink)) { specialObjectCode_transformedLink_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_linkInCutscene_b00)) { specialObjectCode_linkInCutscene_b00_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_linkRidingAnimal)) { specialObjectCode_linkRidingAnimal_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_minecart_b05)) { specialObjectCode_minecart_b05_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_ricky)) { specialObjectCode_ricky_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_dimitri)) { specialObjectCode_dimitri_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_moosh)) { specialObjectCode_moosh_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_maple)) { specialObjectCode_maple_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_companionCutscene_b00)) { specialObjectCode_companionCutscene_b00_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_raft_b05)) { specialObjectCode_raft_b05_hook(gb); return; }
+    else { HANDOFF(jt_); }
+  } while (0);
+}
+
 void updateSpecialObjects_hook(GB *gb) {
   BASE(updateSpecialObjects);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -150,12 +187,14 @@ no_input_block:
   CYC(b_+59, b_+61); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & 0x7f));
   CALL_C(b_+61, updateGameKeysPressed_hook, SYM(updateGameKeysPressed), b_+64);
   CYC(b_+64, b_+67); SET_HL(w1Companion);
-  CALL_ROM(b_+67, b_+125);
+  CYC(b_+67, b_+70); push_effect(gb, b_+70);
+  update_special_object(gb);
   CYC(b_+70, b_+71); alu_xor(gb, A);
   CYC(b_+71, b_+74); mem_wr(gb, wLinkClimbingVine, A);
   CYC(b_+74, b_+77); mem_wr(gb, wDisallowMountingCompanion, A);
   CYC(b_+77, b_+80); SET_HL(w1Link);
-  CALL_ROM(b_+80, b_+125);
+  CYC(b_+80, b_+83); push_effect(gb, b_+83);
+  update_special_object(gb);
   CALL_C(b_+83, updateLinkInvincibilityCounter_hook, SYM(updateLinkInvincibilityCounter), b_+86);
   CYC(b_+86, b_+89); A = mem_rd(gb, wLinkPlayingInstrument);
   CYC(b_+89, b_+92); mem_wr(gb, wLinkRidingObject, A);
