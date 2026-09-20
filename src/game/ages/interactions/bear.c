@@ -59,7 +59,7 @@ void bear_state0_hook(GB *gb) {
   CALL_C(b_+3, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+6);
 L_6d4b:
   CALL_C(b_+6, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+9);
-  CALL_C(b_+9, bear_state0__initSubid_hook, b_+20, b_+12);
+  CALL_L(b_+9, bear_state0__initSubid_hook, b_+12);
   CYC(b_+12, b_+14); E = 0x40;
   CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   CYC(b_+15, b_+16); alu_or(gb, A);
@@ -72,7 +72,7 @@ void bear_state0__afterCall6d4b_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6d4b:
   CALL_C(b_+6, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+9);
-  CALL_C(b_+9, bear_state0__initSubid_hook, b_+20, b_+12);
+  CALL_L(b_+9, bear_state0__initSubid_hook, b_+12);
   CYC(b_+12, b_+14); E = 0x40;
   CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   CYC(b_+15, b_+16); alu_or(gb, A);
@@ -135,7 +135,7 @@ L_6da8:
   if ((F & FZ)) { CYCT(b_+104, b_+107); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+104, b_+107);
   CYC(b_+107, b_+109); A = 0x02;
 L_6db2:
-  CALL_C(b_+109, bear_state0__chooseTextID_hook, b_+118, b_+112);
+  CALL_L(b_+109, bear_state0__chooseTextID_hook, b_+112);
   CYC(b_+112, b_+115); SET_HL((SYM(dog_subid01__state0) + 31));
   CYC(b_+115, b_+118); if (hook_enabled_at(gb, SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
 }
@@ -195,7 +195,7 @@ L_6da8:
   if ((F & FZ)) { CYCT(b_+104, b_+107); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+104, b_+107);
   CYC(b_+107, b_+109); A = 0x02;
 L_6db2:
-  CALL_C(b_+109, bear_state0__chooseTextID_hook, b_+118, b_+112);
+  CALL_L(b_+109, bear_state0__chooseTextID_hook, b_+112);
   CYC(b_+112, b_+115); SET_HL((SYM(dog_subid01__state0) + 31));
   CYC(b_+115, b_+118); if (hook_enabled_at(gb, SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
 }
@@ -208,7 +208,7 @@ L_6da8:
   CALL_C(b_+101, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+104);
   if ((F & FZ)) { CYCT(b_+104, b_+107); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+104, b_+107);
   CYC(b_+107, b_+109); A = 0x02;
-  CALL_C(b_+109, bear_state0__chooseTextID_hook, b_+118, b_+112);
+  CALL_L(b_+109, bear_state0__chooseTextID_hook, b_+112);
   CYC(b_+112, b_+115); SET_HL((SYM(dog_subid01__state0) + 31));
   CYC(b_+115, b_+118); if (hook_enabled_at(gb, SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
 }

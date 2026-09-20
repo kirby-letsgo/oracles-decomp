@@ -34,10 +34,11 @@ static uint16_t item_jump_table(GB *gb) {
 
 static void update_item_hook(GB *gb) {
   BASE(updateItems);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   CYC(b_+76, b_+78); E = 0x01;
   CYC(b_+78, b_+79); A = mem_rd(gb, DE);
   CYC(b_+79, b_+80); push_effect(gb, b_+80);
-  hook_handoff(gb, item_jump_table(gb));
+  HANDOFF(item_jump_table(gb));
 }
 
 void updateItems_hook(GB *gb) {
@@ -89,7 +90,7 @@ loop:
   CYC(b_+62, b_+65); A = mem_rd(gb, wcc8b);
   CYC(b_+65, b_+66); alu_or(gb, A);
 update:
-  if (F & FZ) CALL_C_CC(b_+66, update_item_hook, b_+76, b_+69);
+  if (F & FZ) CALL_L_CC(b_+66, update_item_hook, b_+69);
   else CYC(b_+66, b_+69);
 next:
   CYC(b_+69, b_+70); D = alu_inc8(gb, D);

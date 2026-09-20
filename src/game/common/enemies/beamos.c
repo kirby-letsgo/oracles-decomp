@@ -92,7 +92,7 @@ state_stub:
   RET(b_+39); return; // ret
 
 state8:
-  CALL_C(b_+40, enemyCode16_updateAngle_hook, b_+86, b_+43);
+  CALL_L(b_+40, enemyCode16_updateAngle_hook, b_+43);
   CALL_C(b_+43, ecom_decCounter2_b0d_hook, SYM(ecom_decCounter2_b0d), b_+46);
   if (!(F & FZ)) { RET_TAKEN(b_+46); return; } // ret nz
   CYC(b_+46, b_+47);

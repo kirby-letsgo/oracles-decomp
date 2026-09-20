@@ -30,7 +30,7 @@ void interactionCoded6_hook(GB *gb) {
   CYC(b_+3, b_+5);
 
   // interactionCoded6@state0 (0x7980): reached solely by fallthrough, never a jump target.
-  CALL_C(b_+5, interactionCoded6_initialize_hook, b_+62, b_+8);
+  CALL_L(b_+5, interactionCoded6_initialize_hook, b_+8);
   CALL_C(b_+8, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+11);
   CYC(b_+11, b_+13); L = INTERACTION_BASE + OBJ_VAR3F;
   CYC(b_+13, b_+15); mem_wr(gb, HL, 0x07); // DEKU_SECRET & 0x0f

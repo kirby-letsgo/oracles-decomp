@@ -128,7 +128,7 @@ flickerVisibility:
   RET(b_+95); return;
 
 state3:
-  CALL_C(b_+96, interactionCodea3_state1_hook, b_+67, b_+99);
+  CALL_L(b_+96, interactionCodea3_state1_hook, b_+99);
   if (!(F & FZ)) { CYCT(b_+99, b_+100); ret_effect(gb); return; } // ret nz
   CYC(b_+99, b_+100);
   CYC(b_+100, b_+102); A = 0x7b; // SND_MYSTERY_SEED

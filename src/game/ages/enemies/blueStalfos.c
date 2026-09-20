@@ -777,7 +777,7 @@ void blueStalfos_main_moveToQuadrant_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+3); SET_HL(b_+57);
   CYC(b_+3, b_+4); blueStalfos_addAToHl_from_rst(gb, b_+4);
-  CALL_C(b_+4, blueStalfos_main_moveToQuadrant_getLinkQuadrant_hook, b_+37, b_+7);
+  CALL_L(b_+4, blueStalfos_main_moveToQuadrant_getLinkQuadrant_hook, b_+7);
   CYC(b_+7, b_+8); alu_cp(gb, mem_rd(gb, HL));
   if (F & FZ) { CYCT(b_+8, b_+10); goto moveToLinksPosition; } // jr z
   CYC(b_+8, b_+10);

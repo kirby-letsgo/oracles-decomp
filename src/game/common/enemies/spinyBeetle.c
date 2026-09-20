@@ -158,7 +158,7 @@ state_stub:
   RET(b_+123); return; // ret
 
 state8:
-  CALL_C(b_+124, enemyCode1b_checkBushOrRockGone_hook, b_+229, b_+127);
+  CALL_L(b_+124, enemyCode1b_checkBushOrRockGone_hook, b_+127);
   if (F & FZ) { RET_TAKEN(b_+127); return; } // ret z
   CYC(b_+127, b_+128);
   CALL_C(b_+128, ecom_decCounter2_b0d_hook, SYM(ecom_decCounter2_b0d), b_+131);
@@ -186,7 +186,7 @@ chargeAtLink:
   CYC(b_+160, b_+163); objectSetVisiblec3_hook(gb); return; // jp
 
 state9:
-  CALL_C(b_+163, enemyCode1b_checkBushOrRockGone_hook, b_+229, b_+166);
+  CALL_L(b_+163, enemyCode1b_checkBushOrRockGone_hook, b_+166);
   if (F & FZ) { RET_TAKEN(b_+166); return; } // ret z
   CYC(b_+166, b_+167);
   CALL_C(b_+167, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+170);

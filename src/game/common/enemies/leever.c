@@ -197,7 +197,7 @@ normalState:
   }
 
 state_uninitialized:
-  CALL_C(b_+72, enemyCode0b_setRandomCounter1_hook, b_+438, b_+75);
+  CALL_L(b_+72, enemyCode0b_setRandomCounter1_hook, b_+75);
   CYC(b_+75, b_+78); ecom_setSpeedAndState8_b0d_hook(gb); return; // jp
 
 state_switchHook:
@@ -244,7 +244,7 @@ state8:
   if (!(F & FZ)) { RET_TAKEN(b_+120); return; } // ret nz
   CYC(b_+120, b_+121);
   CYC(b_+121, b_+122); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CALL_C(b_+122, enemyCode0b_chooseSpawnPosition_hook, b_+359, b_+125);
+  CALL_L(b_+122, enemyCode0b_chooseSpawnPosition_hook, b_+125);
   if (!(F & FZ)) { RET_TAKEN(b_+125); return; } // ret nz
   CYC(b_+125, b_+126);
   CALL_C(b_+126, objectSetShortPosition_hook, SYM(objectSetShortPosition), b_+129);
@@ -268,7 +268,7 @@ state9:
   CYC(b_+152, b_+154); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+154, b_+156); mem_wr(gb, HL, 0x14); // SPEED_80
   CALL_C(b_+156, ecom_updateCardinalAngleTowardTarget_b0d_hook, SYM(ecom_updateCardinalAngleTowardTarget_b0d), b_+159);
-  CALL_C(b_+159, enemyCode0b_setRandomHighCounter1_hook, b_+456, b_+162);
+  CALL_L(b_+159, enemyCode0b_setRandomHighCounter1_hook, b_+162);
 
 animate:
   CYC(b_+162, b_+165); enemyAnimate_hook(gb); return; // jp
@@ -296,7 +296,7 @@ stateB:
   CYC(b_+192, b_+194);
   CYC(b_+194, b_+195); L = E;
   CYC(b_+195, b_+197); mem_wr(gb, HL, 0x08);
-  CALL_C(b_+197, enemyCode0b_setRandomCounter1_hook, b_+438, b_+200);
+  CALL_L(b_+197, enemyCode0b_setRandomCounter1_hook, b_+200);
   CYC(b_+200, b_+203); objectSetInvisible_hook(gb); return; // jp
 
 normalState_subid01:
@@ -381,14 +381,14 @@ subid02_stateA:
   CYC(b_+301, b_+303); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+303, b_+305); mem_wr(gb, HL, 0x19); // SPEED_a0
   CALL_C(b_+305, ecom_updateCardinalAngleTowardTarget_b0d_hook, SYM(ecom_updateCardinalAngleTowardTarget_b0d), b_+308);
-  CALL_C(b_+308, enemyCode0b_setRandomHighCounter1_hook, b_+456, b_+311);
+  CALL_L(b_+308, enemyCode0b_setRandomHighCounter1_hook, b_+311);
   CYC(b_+311, b_+313); goto animate2; // jr
 
 subid02_stateB:
   CALL_C(b_+313, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+316);
   if (F & FZ) { CYCT(b_+316, b_+319); goto backIntoGround; } // jp z
   CYC(b_+316, b_+319);
-  CALL_C(b_+319, enemyCode0b_nudgeTowardsLink_hook, b_+467, b_+322);
+  CALL_L(b_+319, enemyCode0b_nudgeTowardsLink_hook, b_+322);
   CALL_C(b_+322, ecom_applyVelocityForSideviewEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0d), b_+325);
 
 animate2:
@@ -403,7 +403,7 @@ subid02_stateC:
   CYC(b_+334, b_+336); E = ENEMY_BASE + OBJ_STATE;
   CYC(b_+336, b_+338); A = 0x09;
   CYC(b_+338, b_+339); mem_wr(gb, DE, A);
-  CALL_C(b_+339, enemyCode0b_setRandomCounter1_hook, b_+438, b_+342);
+  CALL_L(b_+339, enemyCode0b_setRandomCounter1_hook, b_+342);
   CYC(b_+342, b_+345); objectSetInvisible_hook(gb); return; // jp
 
 updatePosition:

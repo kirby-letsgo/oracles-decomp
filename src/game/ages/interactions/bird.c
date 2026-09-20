@@ -60,7 +60,7 @@ L_5ff8:
   CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
 L_5ffe:
   CALL_C(b_+14, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+17);
-  CALL_C(b_+17, interactionCode4c__initSubid_hook, b_+28, b_+20);
+  CALL_L(b_+17, interactionCode4c__initSubid_hook, b_+20);
   CYC(b_+20, b_+22); E = 0x40;
   CYC(b_+22, b_+23); A = mem_rd(gb, DE);
   CYC(b_+23, b_+24); alu_or(gb, A);
@@ -73,7 +73,7 @@ void interactionCode4c__afterCall5ffe_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5ffe:
   CALL_C(b_+14, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+17);
-  CALL_C(b_+17, interactionCode4c__initSubid_hook, b_+28, b_+20);
+  CALL_L(b_+17, interactionCode4c__initSubid_hook, b_+20);
   CYC(b_+20, b_+22); E = 0x40;
   CYC(b_+22, b_+23); A = mem_rd(gb, DE);
   CYC(b_+23, b_+24); alu_or(gb, A);

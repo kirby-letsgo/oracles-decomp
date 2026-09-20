@@ -144,15 +144,15 @@ state0:
   CYC(b_+40, b_+42); mem_wr(gb, HL, 0x06);
   CYC(b_+42, b_+44); L = INTERACTION_BASE + OBJ_SPEED;
   CYC(b_+44, b_+46); mem_wr(gb, HL, 0x19);
-  CALL_C(b_+46, interactionCodec9_beginHop_hook, b_+230, b_+49);
+  CALL_L(b_+46, interactionCodec9_beginHop_hook, b_+49);
   CYC(b_+49, b_+51); E = INTERACTION_BASE + OBJ_PRESSED_A_BUTTON;
   CALL_C(b_+51, objectAddToAButtonSensitiveObjectList_hook, SYM(objectAddToAButtonSensitiveObjectList), b_+54);
   CALL_C(b_+54, objectSetVisible80_hook, SYM(objectSetVisible80), b_+57);
   CYC(b_+57, b_+60); goto func_7710; // jp
 
 state1:
-  CALL_C(b_+60, interactionCodec9_updateHopping_hook, b_+223, b_+63);
-  CALL_C(b_+63, interactionCodec9_updateMovement_hook, b_+236, b_+66);
+  CALL_L(b_+60, interactionCodec9_updateHopping_hook, b_+63);
+  CALL_L(b_+63, interactionCodec9_updateMovement_hook, b_+66);
   CYC(b_+66, b_+69); SET_HL(w1Link_yh);
   CYC(b_+69, b_+71); C = 0x69;
   CYC(b_+71, b_+72); B = mem_rd(gb, HL);
@@ -177,7 +177,7 @@ state1:
   CYC(b_+98, b_+101); goto initState2; // jp
 
 state2:
-  CALL_C(b_+141, interactionCodec9_updateHopping_hook, b_+223, b_+144);
+  CALL_L(b_+141, interactionCodec9_updateHopping_hook, b_+144);
   CALL_C(b_+144, objectApplySpeed_hook, SYM(objectApplySpeed), b_+147);
   CYC(b_+147, b_+149); E = INTERACTION_BASE + OBJ_XH;
   CYC(b_+149, b_+150); A = mem_rd(gb, DE);
@@ -193,7 +193,7 @@ state2:
   CYC(b_+164, b_+167); interactionCodec9_setScriptAndGotoState4_hook(gb); return; // jp $768f
 
 state3:
-  CALL_C(b_+167, interactionCodec9_updateHopping_hook, b_+223, b_+170);
+  CALL_L(b_+167, interactionCodec9_updateHopping_hook, b_+170);
   CALL_C(b_+170, objectApplySpeed_hook, SYM(objectApplySpeed), b_+173);
   CYC(b_+173, b_+175); E = INTERACTION_BASE + OBJ_XH;
   CYC(b_+175, b_+176); A = mem_rd(gb, DE);
@@ -286,6 +286,6 @@ initState3:
 void interactionCodec9_hook(GB *gb) {
   BASE(interactionCodec9);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+0, interactionCodec9_runState_hook, b_+6, b_+3);
+  CALL_L(b_+0, interactionCodec9_runState_hook, b_+3);
   CYC(b_+3, b_+6); interactionCodec9_updateAnimation_hook(gb); return; // jp
 }

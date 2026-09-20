@@ -277,9 +277,9 @@ void bari_subid0_stateA_hook(GB *gb) {
   CYC(b_+8, b_+9);
   CALL_C(b_+9, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+12);
   CYC(b_+12, b_+14); C = 0x04;
-  CALL_C(b_+14, bari_subid0_stateA_spawnSmallBari_hook, b_+28, b_+17);
+  CALL_L(b_+14, bari_subid0_stateA_spawnSmallBari_hook, b_+17);
   CYC(b_+17, b_+19); C = 0xfc;
-  CALL_C(b_+19, bari_subid0_stateA_spawnSmallBari_hook, b_+28, b_+22);
+  CALL_L(b_+19, bari_subid0_stateA_spawnSmallBari_hook, b_+22);
   CALL_C(b_+22, decNumEnemies_hook, SYM(decNumEnemies), b_+25);
   CYC(b_+25, b_+28); enemyDelete_hook(gb); return; // jp
 

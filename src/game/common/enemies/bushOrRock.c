@@ -149,9 +149,9 @@ state_uninitialized:
   CYC(b_+40, b_+41); mem_wr(gb, DE, A);
   CYC(b_+41, b_+42); A = mem_rd(gb, HL);
   CALL_C(b_+42, objectMimicBgTile_hook, SYM(objectMimicBgTile), b_+45);
-  CALL_C(b_+45, enemyCode58_checkDisableDestruction_hook, b_+221, b_+48);
+  CALL_L(b_+45, enemyCode58_checkDisableDestruction_hook, b_+48);
   CALL_C(b_+48, ecom_setSpeedAndState8_b0e_hook, SYM(ecom_setSpeedAndState8_b0e), b_+51);
-  CALL_C(b_+51, enemyCode58_copyParentPosition_hook, b_+194, b_+54);
+  CALL_L(b_+51, enemyCode58_copyParentPosition_hook, b_+54);
   CYC(b_+54, b_+56); goto setPriorityRelativeToLink; // jr
 
 state_grabbed:
@@ -175,7 +175,7 @@ grabbedSubstate0:
   CYC(b_+80, b_+82); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
   CYC(b_+82, b_+83); alu_xor(gb, A);
   CYC(b_+83, b_+86); mem_wr(gb, wLinkGrabState2, A);
-  CALL_C(b_+86, enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook, b_+181, b_+89);
+  CALL_L(b_+86, enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook, b_+89);
   CYC(b_+89, b_+92); objectSetVisible81_hook(gb); return; // jp
 
 grabbedSubstate2:
@@ -204,7 +204,7 @@ state_switchHook:
   }
 
 switchHookSubstate0:
-  CALL_C(b_+119, enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook, b_+181, b_+122);
+  CALL_L(b_+119, enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook, b_+122);
   CYC(b_+122, b_+125); ecom_incSubstate_b0e_hook(gb); return; // jp
 
 switchHookSubstate3:
@@ -229,13 +229,13 @@ state8:
   CYC(b_+149, b_+150); A = mem_rd(gb, HL);
   CYC(b_+150, b_+151); alu_rlca(gb);
   if (F & FC) CALL_C_CC(b_+151, objectAddToGrabbableObjectBuffer_hook, SYM(objectAddToGrabbableObjectBuffer), b_+154); else CYC(b_+151, b_+154); // call c
-  CALL_C(b_+154, enemyCode58_copyParentPosition_hook, b_+194, b_+157);
+  CALL_L(b_+154, enemyCode58_copyParentPosition_hook, b_+157);
 
 setPriorityRelativeToLink:
   CYC(b_+157, b_+160); objectSetPriorityRelativeToLink_hook(gb); return; // jp
 
 destroyed:
-  CALL_C(b_+160, enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook, b_+181, b_+163);
+  CALL_L(b_+160, enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook, b_+163);
 
 makeDebrisAndDelete:
   CYC(b_+163, b_+165); E = ENEMY_BASE + OBJ_SUBID;

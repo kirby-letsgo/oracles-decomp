@@ -115,7 +115,7 @@ state1:
   CYC(b_+85, b_+88); interactionIncState_hook(gb); return; // jp
 
 state2:
-  CALL_C(b_+88, interactionCodea5_updateMapleAngle_hook, b_+253, b_+91);
+  CALL_L(b_+88, interactionCodea5_updateMapleAngle_hook, b_+91);
   if (!(F & FZ)) { CYCT(b_+91, b_+92); ret_effect(gb); return; } // ret nz
   CYC(b_+91, b_+92);
   CYC(b_+92, b_+94); A = 0xff;
@@ -150,7 +150,7 @@ l_5c92:
   CYC(b_+142, b_+145); interactionIncState_hook(gb); return; // jp
 
 state4:
-  CALL_C(b_+145, interactionCodea5_updateMapleAngle_hook, b_+253, b_+148);
+  CALL_L(b_+145, interactionCodea5_updateMapleAngle_hook, b_+148);
   if (!(F & FZ)) { CYCT(b_+148, b_+149); ret_effect(gb); return; } // ret nz
   CYC(b_+148, b_+149);
   CYC(b_+149, b_+152); SET_HL(w1Companion_angle);

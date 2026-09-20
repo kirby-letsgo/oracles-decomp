@@ -240,7 +240,7 @@ state0:
   CYC(b_+42, b_+45); interactionIncState_hook(gb); return; // jp
 
 state1:
-  CALL_C(b_+45, interactionCode9b_updateSubstate_hook, b_+57, b_+48);
+  CALL_L(b_+45, interactionCode9b_updateSubstate_hook, b_+48);
   CYC(b_+48, b_+51); A = mem_rd(gb, wLinkObjectIndex);
   CYC(b_+51, b_+52); H = A;
   CYC(b_+52, b_+54); L = 0x0b; // SpecialObject.yh

@@ -78,7 +78,7 @@ L_533c:
 L_5340:
   CALL_C(b_+48, checkInteractionState_hook, SYM(checkInteractionState), b_+51);
   if (!(F & FZ)) { CYCT(b_+51, b_+53); goto L_5348; } CYC(b_+51, b_+53);
-  CALL_C(b_+53, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+315, b_+56);
+  CALL_L(b_+53, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+56);
 L_5348:
   CALL_C(b_+56, interactionRunScript_hook, SYM(interactionRunScript), b_+59);
   CYC(b_+59, b_+62); if (hook_enabled_at(gb, SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
@@ -102,7 +102,7 @@ L_534e:
   CALL_C(b_+93, interactionSetScript_hook, SYM(interactionSetScript), b_+96);
   CYC(b_+96, b_+98); A = 0x17;
   CALL_C(b_+98, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+101);
-  CALL_C(b_+101, interactionCode43__initGraphicsAndIncState_hook, b_+306, b_+104);
+  CALL_L(b_+101, interactionCode43__initGraphicsAndIncState_hook, b_+104);
 L_5378:
   CYC(b_+104, b_+106); A = 0x03;
   CYC(b_+106, b_+108); E = 0x5c;
@@ -113,7 +113,7 @@ L_537d:
 L_5383:
   CALL_C(b_+115, checkInteractionState_hook, SYM(checkInteractionState), b_+118);
   if (!(F & FZ)) { CYCT(b_+118, b_+120); goto L_538e; } CYC(b_+118, b_+120);
-  CALL_C(b_+120, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+315, b_+123);
+  CALL_L(b_+120, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+123);
 L_538b:
   CYC(b_+123, b_+126); if (hook_enabled_at(gb, SYM(objectSetVisiblec2))) { objectSetVisiblec2_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec2));
 L_538e:
@@ -125,7 +125,7 @@ L_538e:
 L_539a:
   CALL_C(b_+138, checkInteractionState_hook, SYM(checkInteractionState), b_+141);
   if (!(F & FZ)) { CYCT(b_+141, b_+142); ret_effect(gb); return; } CYC(b_+141, b_+142);
-  CALL_C(b_+142, interactionCode43__initGraphicsAndIncState_hook, b_+306, b_+145);
+  CALL_L(b_+142, interactionCode43__initGraphicsAndIncState_hook, b_+145);
 L_53a1:
   CYC(b_+145, b_+147); L = 0x5c;
   CYC(b_+147, b_+149); mem_wr(gb, HL, 0x06);
@@ -133,7 +133,7 @@ L_53a1:
 L_53a8:
   CALL_C(b_+152, checkInteractionState_hook, SYM(checkInteractionState), b_+155);
   if (!(F & FZ)) { CYCT(b_+155, b_+157); goto L_53b7; } CYC(b_+155, b_+157);
-  CALL_C(b_+157, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+315, b_+160);
+  CALL_L(b_+157, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+160);
 L_53b0:
   CYC(b_+160, b_+162); L = 0x5c;
   CYC(b_+162, b_+164); mem_wr(gb, HL, 0x06);
@@ -187,7 +187,7 @@ L_53fa:
   CYC(b_+246, b_+249); A = mem_rd(gb, wEssencesObtained);
   CYC(b_+249, b_+251); alu_bit(gb, 6, A);
   if ((F & FZ)) { CYCT(b_+251, b_+253); goto L_541e; } CYC(b_+251, b_+253);
-  CALL_C(b_+253, interactionCode43__initGraphicsAndIncState_hook, b_+306, b_+256);
+  CALL_L(b_+253, interactionCode43__initGraphicsAndIncState_hook, b_+256);
 L_5410:
   CYC(b_+256, b_+258); L = 0x5c;
   CYC(b_+258, b_+260); mem_wr(gb, HL, 0x06);
@@ -197,7 +197,7 @@ L_5410:
   CALL_C(b_+265, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+268);
   CYC(b_+268, b_+270); goto L_5421;
 L_541e:
-  CALL_C(b_+270, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+315, b_+273);
+  CALL_L(b_+270, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+273);
 L_5421:
   CYC(b_+273, b_+275); E = 0x43;
   CYC(b_+275, b_+276); A = mem_rd(gb, DE);
@@ -211,7 +211,7 @@ L_5431:
   if ((F & FZ)) { CYCT(b_+292, b_+295); goto L_5438; } CYC(b_+292, b_+295);
   CYC(b_+295, b_+296); ret_effect(gb); return;
 L_5438:
-  CALL_C(b_+296, interactionCode43__initGraphicsAndIncState_hook, b_+306, b_+299);
+  CALL_L(b_+296, interactionCode43__initGraphicsAndIncState_hook, b_+299);
 L_543b:
   CYC(b_+299, b_+301); L = 0x5c;
   CYC(b_+301, b_+303); mem_wr(gb, HL, 0x06);
@@ -239,7 +239,7 @@ L_533c:
 L_5340:
   CALL_C(b_+48, checkInteractionState_hook, SYM(checkInteractionState), b_+51);
   if (!(F & FZ)) { CYCT(b_+51, b_+53); goto L_5348; } CYC(b_+51, b_+53);
-  CALL_C(b_+53, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+315, b_+56);
+  CALL_L(b_+53, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+56);
 L_5348:
   CALL_C(b_+56, interactionRunScript_hook, SYM(interactionRunScript), b_+59);
   CYC(b_+59, b_+62); if (hook_enabled_at(gb, SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
@@ -276,7 +276,7 @@ L_534e:
   CALL_C(b_+93, interactionSetScript_hook, SYM(interactionSetScript), b_+96);
   CYC(b_+96, b_+98); A = 0x17;
   CALL_C(b_+98, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+101);
-  CALL_C(b_+101, interactionCode43__initGraphicsAndIncState_hook, b_+306, b_+104);
+  CALL_L(b_+101, interactionCode43__initGraphicsAndIncState_hook, b_+104);
 L_5378:
   CYC(b_+104, b_+106); A = 0x03;
   CYC(b_+106, b_+108); E = 0x5c;
@@ -312,7 +312,7 @@ void interactionCode43__subid3_hook(GB *gb) {
 L_5383:
   CALL_C(b_+115, checkInteractionState_hook, SYM(checkInteractionState), b_+118);
   if (!(F & FZ)) { CYCT(b_+118, b_+120); goto L_538e; } CYC(b_+118, b_+120);
-  CALL_C(b_+120, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+315, b_+123);
+  CALL_L(b_+120, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+123);
 L_538b:
   CYC(b_+123, b_+126); if (hook_enabled_at(gb, SYM(objectSetVisiblec2))) { objectSetVisiblec2_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec2));
 L_538e:
@@ -336,7 +336,7 @@ void interactionCode43__subid4_hook(GB *gb) {
 L_539a:
   CALL_C(b_+138, checkInteractionState_hook, SYM(checkInteractionState), b_+141);
   if (!(F & FZ)) { CYCT(b_+141, b_+142); ret_effect(gb); return; } CYC(b_+141, b_+142);
-  CALL_C(b_+142, interactionCode43__initGraphicsAndIncState_hook, b_+306, b_+145);
+  CALL_L(b_+142, interactionCode43__initGraphicsAndIncState_hook, b_+145);
 L_53a1:
   CYC(b_+145, b_+147); L = 0x5c;
   CYC(b_+147, b_+149); mem_wr(gb, HL, 0x06);
@@ -358,7 +358,7 @@ void interactionCode43__subid5_hook(GB *gb) {
 L_53a8:
   CALL_C(b_+152, checkInteractionState_hook, SYM(checkInteractionState), b_+155);
   if (!(F & FZ)) { CYCT(b_+155, b_+157); goto L_53b7; } CYC(b_+155, b_+157);
-  CALL_C(b_+157, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+315, b_+160);
+  CALL_L(b_+157, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+160);
 L_53b0:
   CYC(b_+160, b_+162); L = 0x5c;
   CYC(b_+162, b_+164); mem_wr(gb, HL, 0x06);
@@ -516,7 +516,7 @@ L_53fa:
   CYC(b_+246, b_+249); A = mem_rd(gb, wEssencesObtained);
   CYC(b_+249, b_+251); alu_bit(gb, 6, A);
   if ((F & FZ)) { CYCT(b_+251, b_+253); goto L_541e; } CYC(b_+251, b_+253);
-  CALL_C(b_+253, interactionCode43__initGraphicsAndIncState_hook, b_+306, b_+256);
+  CALL_L(b_+253, interactionCode43__initGraphicsAndIncState_hook, b_+256);
 L_5410:
   CYC(b_+256, b_+258); L = 0x5c;
   CYC(b_+258, b_+260); mem_wr(gb, HL, 0x06);
@@ -526,7 +526,7 @@ L_5410:
   CALL_C(b_+265, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+268);
   CYC(b_+268, b_+270); goto L_5421;
 L_541e:
-  CALL_C(b_+270, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+315, b_+273);
+  CALL_L(b_+270, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+273);
 L_5421:
   CYC(b_+273, b_+275); E = 0x43;
   CYC(b_+275, b_+276); A = mem_rd(gb, DE);
@@ -562,7 +562,7 @@ void interactionCode43__subid6__initAndLoadScript_hook(GB *gb) {
   BASE(interactionCode43);
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_541e:
-  CALL_C(b_+270, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+315, b_+273);
+  CALL_L(b_+270, interactionCode43__initGraphicsIncStateAndLoadScript_hook, b_+273);
 L_5421:
   CYC(b_+273, b_+275); E = 0x43;
   CYC(b_+275, b_+276); A = mem_rd(gb, DE);
@@ -594,7 +594,7 @@ L_5431:
   if ((F & FZ)) { CYCT(b_+292, b_+295); goto L_5438; } CYC(b_+292, b_+295);
   CYC(b_+295, b_+296); ret_effect(gb); return;
 L_5438:
-  CALL_C(b_+296, interactionCode43__initGraphicsAndIncState_hook, b_+306, b_+299);
+  CALL_L(b_+296, interactionCode43__initGraphicsAndIncState_hook, b_+299);
 L_543b:
   CYC(b_+299, b_+301); L = 0x5c;
   CYC(b_+301, b_+303); mem_wr(gb, HL, 0x06);

@@ -105,7 +105,7 @@ state0:
   CYC(b_+60, b_+62); alu_add(gb, 0x08);
   CYC(b_+62, b_+64); alu_and(gb, 0x1f);
   CYC(b_+64, b_+65); mem_wr(gb, DE, A);
-  CALL_C(b_+65, interactionCodea4_func_5a67_hook, b_+121, b_+68);
+  CALL_L(b_+65, interactionCodea4_func_5a67_hook, b_+68);
   CYC(b_+68, b_+71); objectSetVisible82_hook(gb); return; // jp
 
   // @angles (0b:5a35): pure ROM data (ANGLE_UP, ANGLE_RIGHT, ANGLE_DOWN), referenced only via
@@ -158,7 +158,7 @@ void interactionCodea4_hook(GB *gb) {
   BASE(interactionCodea4);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, sidescrollPlatform_checkLinkOnPlatform_hook, SYM(sidescrollPlatform_checkLinkOnPlatform), b_+3);
-  CALL_C(b_+3, interactionCodea4_updateState_hook, b_+9, b_+6);
+  CALL_L(b_+3, interactionCodea4_updateState_hook, b_+6);
   CYC(b_+6, b_+9); sidescrollingPlatformCommon_hook(gb); return; // jp
 }
 

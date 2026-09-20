@@ -82,7 +82,7 @@ subid0:
   CYC(b_+9, b_+11);
 
   // interactionCodecc@state0 (0x77ef): reached solely by fallthrough, never a jump target.
-  CALL_C(b_+11, interactionCodecc_initialize_hook, b_+32, b_+14);
+  CALL_L(b_+11, interactionCodecc_initialize_hook, b_+14);
   CALL_C(b_+14, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+17);
 
 state1:
