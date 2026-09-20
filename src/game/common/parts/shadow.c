@@ -3,80 +3,82 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode07), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode07), (from), (to), true)
 
 void partCode07_hook(GB *gb);
 void shadow_initialize_hook(GB *gb);
 
 void partCode07_hook(GB *gb) {
+  BASE(partCode07);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x4642, 0x4644); E = 0xc4; // Part.state
-  CYC(0x4644, 0x4645); A = mem_rd(gb, DE);
-  CYC(0x4645, 0x4646); alu_or(gb, A);
+  CYC(b_+0, b_+2); E = 0xc4; // Part.state
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x4646, 0x4649); // call z
-    push_effect(gb, 0x4649);
+    CYCT(b_+4, b_+7); // call z
+    push_effect(gb, b_+7);
     shadow_initialize_hook(gb);
   } else {
-    CYC(0x4646, 0x4649);
+    CYC(b_+4, b_+7);
   }
-  CYC(0x4649, 0x464b); A = 0x01; // Object.id
-  CALL_C(0x464b, objectGetRelatedObject1Var_hook, 0x2160, 0x464e);
-  CYC(0x464e, 0x4650); E = 0xf0; // Part.var30
-  CYC(0x4650, 0x4651); A = mem_rd(gb, DE);
-  CYC(0x4651, 0x4652); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(0x4652, 0x4655); partDelete_hook(gb); return; } // jp nz
-  CYC(0x4652, 0x4655);
-  CYC(0x4655, 0x4657); A = 0x0b; // Object.yh
-  CALL_C(0x4657, objectGetRelatedObject1Var_hook, 0x2160, 0x465a);
-  CYC(0x465a, 0x465c); E = 0xc3; // Part.var03
-  CYC(0x465c, 0x465d); A = mem_rd(gb, DE);
-  CYC(0x465d, 0x465e); B = A;
-  CYC(0x465e, 0x4660); C = 0x00;
-  CALL_C(0x4660, objectTakePositionWithOffset_hook, 0x2277, 0x4663);
-  CYC(0x4663, 0x4664); alu_xor(gb, A);
-  CYC(0x4664, 0x4665); mem_wr(gb, DE, A); // [this.zh] = 0
-  CYC(0x4665, 0x4666); A = mem_rd(gb, HL); // [parent.zh]
-  CYC(0x4666, 0x4667); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x4667, 0x466a); objectSetInvisible_hook(gb); return; } // jp z
-  CYC(0x4667, 0x466a);
-  CYC(0x466a, 0x466c); E = 0xda; // Part.visible
-  CYC(0x466c, 0x466d); A = mem_rd(gb, DE);
-  CYC(0x466d, 0x466f); alu_xor(gb, 0x80);
-  CYC(0x466f, 0x4670); mem_wr(gb, DE, A);
-  CYC(0x4670, 0x4672); E = 0xc2; // Part.subid
-  CYC(0x4672, 0x4673); A = mem_rd(gb, DE);
-  CYC(0x4673, 0x4674); alu_add(gb, A);
-  CYC(0x4674, 0x4677); SET_BC(0x468e); // @animationIndices
-  CALL_C(0x4677, addDoubleIndexToBc_hook, 0x007e, 0x467a);
-  CYC(0x467a, 0x467b); A = mem_rd(gb, HL); // [parent.zh]
-  CYC(0x467b, 0x467d); alu_cp(gb, 0xe0);
-  if (!(F & FC)) { CYCT(0x467d, 0x467f); goto setAnim; } // jr nc
-  CYC(0x467d, 0x467f);
-  CYC(0x467f, 0x4680); SET_BC(BC + 1);
-  CYC(0x4680, 0x4682); alu_cp(gb, 0xc0);
-  if (!(F & FC)) { CYCT(0x4682, 0x4684); goto setAnim; } // jr nc
-  CYC(0x4682, 0x4684);
-  CYC(0x4684, 0x4685); SET_BC(BC + 1);
-  CYC(0x4685, 0x4687); alu_cp(gb, 0xa0);
-  if (!(F & FC)) { CYCT(0x4687, 0x4689); goto setAnim; } // jr nc
-  CYC(0x4687, 0x4689);
-  CYC(0x4689, 0x468a); SET_BC(BC + 1);
+  CYC(b_+7, b_+9); A = 0x01; // Object.id
+  CALL_C(b_+9, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+12);
+  CYC(b_+12, b_+14); E = 0xf0; // Part.var30
+  CYC(b_+14, b_+15); A = mem_rd(gb, DE);
+  CYC(b_+15, b_+16); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+16, b_+19); partDelete_hook(gb); return; } // jp nz
+  CYC(b_+16, b_+19);
+  CYC(b_+19, b_+21); A = 0x0b; // Object.yh
+  CALL_C(b_+21, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+24);
+  CYC(b_+24, b_+26); E = 0xc3; // Part.var03
+  CYC(b_+26, b_+27); A = mem_rd(gb, DE);
+  CYC(b_+27, b_+28); B = A;
+  CYC(b_+28, b_+30); C = 0x00;
+  CALL_C(b_+30, objectTakePositionWithOffset_hook, SYM(objectTakePositionWithOffset), b_+33);
+  CYC(b_+33, b_+34); alu_xor(gb, A);
+  CYC(b_+34, b_+35); mem_wr(gb, DE, A); // [this.zh] = 0
+  CYC(b_+35, b_+36); A = mem_rd(gb, HL); // [parent.zh]
+  CYC(b_+36, b_+37); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+37, b_+40); objectSetInvisible_hook(gb); return; } // jp z
+  CYC(b_+37, b_+40);
+  CYC(b_+40, b_+42); E = 0xda; // Part.visible
+  CYC(b_+42, b_+43); A = mem_rd(gb, DE);
+  CYC(b_+43, b_+45); alu_xor(gb, 0x80);
+  CYC(b_+45, b_+46); mem_wr(gb, DE, A);
+  CYC(b_+46, b_+48); E = 0xc2; // Part.subid
+  CYC(b_+48, b_+49); A = mem_rd(gb, DE);
+  CYC(b_+49, b_+50); alu_add(gb, A);
+  CYC(b_+50, b_+53); SET_BC(b_+76); // @animationIndices
+  CALL_C(b_+53, addDoubleIndexToBc_hook, 0x007e, b_+56);
+  CYC(b_+56, b_+57); A = mem_rd(gb, HL); // [parent.zh]
+  CYC(b_+57, b_+59); alu_cp(gb, 0xe0);
+  if (!(F & FC)) { CYCT(b_+59, b_+61); goto setAnim; } // jr nc
+  CYC(b_+59, b_+61);
+  CYC(b_+61, b_+62); SET_BC(BC + 1);
+  CYC(b_+62, b_+64); alu_cp(gb, 0xc0);
+  if (!(F & FC)) { CYCT(b_+64, b_+66); goto setAnim; } // jr nc
+  CYC(b_+64, b_+66);
+  CYC(b_+66, b_+67); SET_BC(BC + 1);
+  CYC(b_+67, b_+69); alu_cp(gb, 0xa0);
+  if (!(F & FC)) { CYCT(b_+69, b_+71); goto setAnim; } // jr nc
+  CYC(b_+69, b_+71);
+  CYC(b_+71, b_+72); SET_BC(BC + 1);
 
 setAnim:
-  CYC(0x468a, 0x468b); A = mem_rd(gb, BC);
-  CYC(0x468b, 0x468e); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+72, b_+73); A = mem_rd(gb, BC);
+  CYC(b_+73, b_+76); partSetAnimation_hook(gb); return; // jp
 }
 
 void shadow_initialize_hook(GB *gb) {
+  BASE(partCode07);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x469a, 0x469b); A = alu_inc8(gb, A);
-  CYC(0x469b, 0x469c); mem_wr(gb, DE, A); // [state] = 1
-  CYC(0x469c, 0x469e); A = 0x01; // Object.id
-  CALL_C(0x469e, objectGetRelatedObject1Var_hook, 0x2160, 0x46a1);
-  CYC(0x46a1, 0x46a3); E = 0xf0; // Part.var30
-  CYC(0x46a3, 0x46a4); A = mem_rd(gb, HL);
-  CYC(0x46a4, 0x46a5); mem_wr(gb, DE, A);
-  CYC(0x46a5, 0x46a8); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+88, b_+89); A = alu_inc8(gb, A);
+  CYC(b_+89, b_+90); mem_wr(gb, DE, A); // [state] = 1
+  CYC(b_+90, b_+92); A = 0x01; // Object.id
+  CALL_C(b_+92, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+95);
+  CYC(b_+95, b_+97); E = 0xf0; // Part.var30
+  CYC(b_+97, b_+98); A = mem_rd(gb, HL);
+  CYC(b_+98, b_+99); mem_wr(gb, DE, A);
+  CYC(b_+99, SYM(partCode08)); objectSetVisible83_hook(gb); return; // jp
 }

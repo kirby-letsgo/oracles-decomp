@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(func_5758), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(func_5758), (from), (to), true)
 
 static uint16_t beam_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -39,69 +39,71 @@ static void beam_addAToHl_from_rst(GB *gb, uint16_t return_address) {
 }
 
 void func_5758_hook(GB *gb) {
+  BASE(func_5758);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5758, objectApplyComponentSpeed_hook, 0x2008, 0x575b);
-  CYC(0x575b, 0x575d); E = 0xc2; // Part.subid
-  CYC(0x575d, 0x575e); A = mem_rd(gb, DE);
-  CYC(0x575e, 0x575f); B = A;
-  CYC(0x575f, 0x5762); A = mem_rd(gb, wFrameCounter);
-  CYC(0x5762, 0x5763); alu_and(gb, B);
-  if (F & FZ) { CYCT(0x5763, 0x5766); objectSetVisible81_hook(gb); return; } // jp z
-  CYC(0x5763, 0x5766);
-  CYC(0x5766, 0x5769); objectSetInvisible_hook(gb); return; // jp
+  CALL_C(b_+0, objectApplyComponentSpeed_hook, SYM(objectApplyComponentSpeed), b_+3);
+  CYC(b_+3, b_+5); E = 0xc2; // Part.subid
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+7); B = A;
+  CYC(b_+7, b_+10); A = mem_rd(gb, wFrameCounter);
+  CYC(b_+10, b_+11); alu_and(gb, B);
+  if (F & FZ) { CYCT(b_+11, b_+14); objectSetVisible81_hook(gb); return; } // jp z
+  CYC(b_+11, b_+14);
+  CYC(b_+14, SYM(partCode2a)); objectSetInvisible_hook(gb); return; // jp
 }
 
 void partCode29_hook(GB *gb) {
+  BASE(partCode29);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  if (F & FZ) { CYCT(0x5705, 0x5707); goto normalStatus; } // jr z
-  CYC(0x5705, 0x5707);
-  CYC(0x5707, 0x5709); E = 0xea; // Part.var2a
-  CYC(0x5709, 0x570a); A = mem_rd(gb, DE);
-  CYC(0x570a, 0x570c); alu_cp(gb, 0x83);
-  if (F & FZ) { CYCT(0x570c, 0x570f); partDelete_hook(gb); return; } // jp z
-  CYC(0x570c, 0x570f);
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); E = 0xea; // Part.var2a
+  CYC(b_+4, b_+5); A = mem_rd(gb, DE);
+  CYC(b_+5, b_+7); alu_cp(gb, 0x83);
+  if (F & FZ) { CYCT(b_+7, b_+10); partDelete_hook(gb); return; } // jp z
+  CYC(b_+7, b_+10);
 
 normalStatus:
-  CYC(0x570f, 0x5711); E = 0xc4; // Part.state
-  CYC(0x5711, 0x5712); A = mem_rd(gb, DE);
+  CYC(b_+10, b_+12); E = 0xc4; // Part.state
+  CYC(b_+12, b_+13); A = mem_rd(gb, DE);
   {
-    CYC(0x5712, 0x5713); push_effect(gb, 0x5713);
+    CYC(b_+13, b_+14); push_effect(gb, b_+14);
     uint16_t target = beam_jump_table(gb);
-    if (target == 0x5719) goto state0;
-    if (target == 0x5747) goto state1;
+    if (target == b_+20) goto state0;
+    if (target == b_+66) goto state1;
     goto state2;
   }
 
 state0:
-  CYC(0x5719, 0x571a); H = D;
-  CYC(0x571a, 0x571b); L = E;
-  CYC(0x571b, 0x571c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x571c, 0x571e); L = 0xc6; // Part.counter1
-  CYC(0x571e, 0x5720); mem_wr(gb, HL, 0x02);
-  CYC(0x5720, 0x5722); L = 0xc9; // Part.angle
-  CYC(0x5722, 0x5723); C = mem_rd(gb, HL);
-  CYC(0x5723, 0x5725); B = 0x50;
-  CYC(0x5725, 0x5727); A = 0x04;
-  CALL_C(0x5727, objectSetComponentSpeedByScaledVelocity_hook, 0x214c, 0x572a);
-  CYC(0x572a, 0x572c); E = 0xc9; // Part.angle
-  CYC(0x572c, 0x572d); A = mem_rd(gb, DE);
-  CYC(0x572d, 0x572f); alu_and(gb, 0x0f);
-  CYC(0x572f, 0x5732); SET_HL(0x5737); // table_5737
-  CYC(0x5732, 0x5733); beam_addAToHl_from_rst(gb, 0x5733);
-  CYC(0x5733, 0x5734); A = mem_rd(gb, HL);
-  CYC(0x5734, 0x5737); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+20, b_+21); H = D;
+  CYC(b_+21, b_+22); L = E;
+  CYC(b_+22, b_+23); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+23, b_+25); L = 0xc6; // Part.counter1
+  CYC(b_+25, b_+27); mem_wr(gb, HL, 0x02);
+  CYC(b_+27, b_+29); L = 0xc9; // Part.angle
+  CYC(b_+29, b_+30); C = mem_rd(gb, HL);
+  CYC(b_+30, b_+32); B = 0x50;
+  CYC(b_+32, b_+34); A = 0x04;
+  CALL_C(b_+34, objectSetComponentSpeedByScaledVelocity_hook, SYM(objectSetComponentSpeedByScaledVelocity), b_+37);
+  CYC(b_+37, b_+39); E = 0xc9; // Part.angle
+  CYC(b_+39, b_+40); A = mem_rd(gb, DE);
+  CYC(b_+40, b_+42); alu_and(gb, 0x0f);
+  CYC(b_+42, b_+45); SET_HL(b_+50); // table_5737
+  CYC(b_+45, b_+46); beam_addAToHl_from_rst(gb, b_+46);
+  CYC(b_+46, b_+47); A = mem_rd(gb, HL);
+  CYC(b_+47, b_+50); partSetAnimation_hook(gb); return; // jp
 
 state1:
-  CALL_C(0x5747, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x574a);
-  if (!(F & FZ)) { CYCT(0x574a, 0x574c); func_5758_hook(gb); return; } // jr nz
-  CYC(0x574a, 0x574c);
-  CYC(0x574c, 0x574d); L = E;
-  CYC(0x574d, 0x574e); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CALL_C(b_+66, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+69);
+  if (!(F & FZ)) { CYCT(b_+69, b_+71); func_5758_hook(gb); return; } // jr nz
+  CYC(b_+69, b_+71);
+  CYC(b_+71, b_+72); L = E;
+  CYC(b_+72, b_+73); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
 
 state2:
-  CALL_C(0x574e, func_5758_hook, 0x5758, 0x5751);
-  CALL_C(0x5751, partCommon_checkTileCollisionOrOutOfBounds_hook, 0x4072, 0x5754);
-  if (F & FC) { CYCT(0x5754, 0x5757); partDelete_hook(gb); return; } // jp c
-  CYC(0x5754, 0x5757);
-  RET(0x5757); return; // ret
+  CALL_C(b_+73, func_5758_hook, SYM(func_5758), b_+76);
+  CALL_C(b_+76, partCommon_checkTileCollisionOrOutOfBounds_hook, SYM(partCommon_checkTileCollisionOrOutOfBounds), b_+79);
+  if (F & FC) { CYCT(b_+79, b_+82); partDelete_hook(gb); return; } // jp c
+  CYC(b_+79, b_+82);
+  RET(b_+82); return; // ret
 }

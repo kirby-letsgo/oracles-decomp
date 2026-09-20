@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0d, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0d, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode2e), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode2e), (from), (to), true)
 
 static uint16_t enemyCode2e_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -30,14 +30,15 @@ static uint16_t enemyCode2e_jump_table(GB *gb) {
 // own, since registering enemyCode2e collapses this whole routine's @-locals out of the
 // generated fallback (rule 6).
 void enemyCode2e_state8_hook(GB *gb) {
+  BASE(enemyCode2e);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x66af, ecom_decCounter1_b0d_hook, 0x439a, 0x66b2);
-  if (!(F & FZ)) { CYCT(0x66b2, 0x66b3); ret_effect(gb); return; } // ret nz
-  CYC(0x66b2, 0x66b3);
-  CYC(0x66b3, 0x66b4); L = E;
-  CYC(0x66b4, 0x66b5); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(0x66b5, 0x66b6); alu_xor(gb, A);
-  RET(0x66b6); return;
+  CALL_C(b_+53, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+56);
+  if (!(F & FZ)) { CYCT(b_+56, b_+57); ret_effect(gb); return; } // ret nz
+  CYC(b_+56, b_+57);
+  CYC(b_+57, b_+58); L = E;
+  CYC(b_+58, b_+59); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+59, b_+60); alu_xor(gb, A);
+  RET(b_+60); return;
 }
 
 // ==================================================================================================
@@ -50,105 +51,106 @@ void enemyCode2e_state8_hook(GB *gb) {
 // separate top-level symbols), so they live inline in this one hook.
 // ==================================================================================================
 void enemyCode2e_hook(GB *gb) {
+  BASE(enemyCode2e);
   uint16_t sp0_ = gb->sp;
-  if (F & FZ) { CYCT(0x667a, 0x667c); goto normalStatus; } // jr z
-  CYC(0x667a, 0x667c);
-  CYC(0x667c, 0x667e); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { CYCT(0x667e, 0x667f); ret_effect(gb); return; } // ret c
-  CYC(0x667e, 0x667f);
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { CYCT(b_+4, b_+5); ret_effect(gb); return; } // ret c
+  CYC(b_+4, b_+5);
 
 normalStatus:
-  CYC(0x667f, 0x6681); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6681, 0x6682); A = mem_rd(gb, DE);
-  CYC(0x6682, 0x6683); push_effect(gb, 0x6683);
+  CYC(b_+5, b_+7); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+7, b_+8); A = mem_rd(gb, DE);
+  CYC(b_+8, b_+9); push_effect(gb, b_+9);
   {
     uint16_t target = enemyCode2e_jump_table(gb);
-    if (target == 0x66af) { enemyCode2e_state8_hook(gb); return; }
-    if (target == 0x66b7) goto state9;
-    if (target == 0x66cd) goto stateA;
-    if (target == 0x66e7) goto stateB;
-    if (target == 0x66ee) goto stateC;
-    if (target == 0x669d) goto state_uninitialized;
-    RET(0x66ae); return; // states 1-7 all target 0x66ae, a bare `ret`
+    if (target == b_+53) { enemyCode2e_state8_hook(gb); return; }
+    if (target == b_+61) goto state9;
+    if (target == b_+83) goto stateA;
+    if (target == b_+109) goto stateB;
+    if (target == b_+116) goto stateC;
+    if (target == b_+35) goto state_uninitialized;
+    RET(b_+52); return; // states 1-7 all target 0x66ae, a bare `ret`
   }
 
 state_uninitialized:
-  CYC(0x669d, 0x669f); E = ENEMY_BASE + OBJ_YH;
-  CYC(0x669f, 0x66a0); A = mem_rd(gb, DE);
-  CYC(0x66a0, 0x66a2); E = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x66a2, 0x66a3); mem_wr(gb, DE, A);
-  CYC(0x66a3, 0x66a4); H = D;
-  CYC(0x66a4, 0x66a6); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x66a6, 0x66a7); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x66a7, 0x66a9); L = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x66a9, 0x66ab); mem_wr(gb, HL, 0x10); // ANGLE_DOWN
-  CYC(0x66ab, 0x66ae); ecom_setSpeedAndState8AndVisible_b0d_hook(gb); return; // jp
+  CYC(b_+35, b_+37); E = ENEMY_BASE + OBJ_YH;
+  CYC(b_+37, b_+38); A = mem_rd(gb, DE);
+  CYC(b_+38, b_+40); E = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+40, b_+41); mem_wr(gb, DE, A);
+  CYC(b_+41, b_+42); H = D;
+  CYC(b_+42, b_+44); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+44, b_+45); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+45, b_+47); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+47, b_+49); mem_wr(gb, HL, 0x10); // ANGLE_DOWN
+  CYC(b_+49, b_+52); ecom_setSpeedAndState8AndVisible_b0d_hook(gb); return; // jp
 
   // Waiting for Link to approach
 state9:
-  CYC(0x66b7, 0x66b8); H = D;
-  CYC(0x66b8, 0x66ba); L = ENEMY_BASE + OBJ_XH;
-  CYC(0x66ba, 0x66bc); A = hram_rd(gb, 0xb1); // hEnemyTargetX
-  CYC(0x66bc, 0x66bd); alu_sub(gb, mem_rd(gb, HL));
-  CYC(0x66bd, 0x66bf); alu_add(gb, 0x0a);
-  CYC(0x66bf, 0x66c1); alu_cp(gb, 0x15);
-  if (!(F & FC)) { CYCT(0x66c1, 0x66c2); ret_effect(gb); return; } // ret nc
-  CYC(0x66c1, 0x66c2);
-  CYC(0x66c2, 0x66c3); L = E;
-  CYC(0x66c3, 0x66c4); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(0x66c4, 0x66c6); L = ENEMY_BASE + OBJ_SPEED_Z;
-  CYC(0x66c6, 0x66c7); alu_xor(gb, A);
-  CYC(0x66c7, 0x66c8); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x66c8, 0x66c9); mem_wr(gb, HL, A);
-  CYC(0x66c9, 0x66ca); A = alu_inc8(gb, A);
-  CYC(0x66ca, 0x66cd); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+61, b_+62); H = D;
+  CYC(b_+62, b_+64); L = ENEMY_BASE + OBJ_XH;
+  CYC(b_+64, b_+66); A = hram_rd(gb, 0xb1); // hEnemyTargetX
+  CYC(b_+66, b_+67); alu_sub(gb, mem_rd(gb, HL));
+  CYC(b_+67, b_+69); alu_add(gb, 0x0a);
+  CYC(b_+69, b_+71); alu_cp(gb, 0x15);
+  if (!(F & FC)) { CYCT(b_+71, b_+72); ret_effect(gb); return; } // ret nc
+  CYC(b_+71, b_+72);
+  CYC(b_+72, b_+73); L = E;
+  CYC(b_+73, b_+74); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+74, b_+76); L = ENEMY_BASE + OBJ_SPEED_Z;
+  CYC(b_+76, b_+77); alu_xor(gb, A);
+  CYC(b_+77, b_+78); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+78, b_+79); mem_wr(gb, HL, A);
+  CYC(b_+79, b_+80); A = alu_inc8(gb, A);
+  CYC(b_+80, b_+83); enemySetAnimation_hook(gb); return; // jp
 
   // Falling down
 stateA:
-  CYC(0x66cd, 0x66cf); A = 0x40;
-  CALL_C(0x66cf, objectUpdateSpeedZ_sidescroll_hook, 0x1f66, 0x66d2);
-  if (F & FC) { CYCT(0x66d2, 0x66d4); goto landed; } // jr c
-  CYC(0x66d2, 0x66d4);
+  CYC(b_+83, b_+85); A = 0x40;
+  CALL_C(b_+85, objectUpdateSpeedZ_sidescroll_hook, SYM(objectUpdateSpeedZ_sidescroll), b_+88);
+  if (F & FC) { CYCT(b_+88, b_+90); goto landed; } // jr c
+  CYC(b_+88, b_+90);
   // Cap speedZ to $0200 (ish... doesn't fix the low byte)
-  CYC(0x66d4, 0x66d5); A = mem_rd(gb, HL);
-  CYC(0x66d5, 0x66d7); alu_cp(gb, 0x03);
-  if (F & FC) { CYCT(0x66d7, 0x66d8); ret_effect(gb); return; } // ret c
-  CYC(0x66d7, 0x66d8);
-  CYC(0x66d8, 0x66da); mem_wr(gb, HL, 0x02);
-  RET(0x66da); return;
+  CYC(b_+90, b_+91); A = mem_rd(gb, HL);
+  CYC(b_+91, b_+93); alu_cp(gb, 0x03);
+  if (F & FC) { CYCT(b_+93, b_+94); ret_effect(gb); return; } // ret c
+  CYC(b_+93, b_+94);
+  CYC(b_+94, b_+96); mem_wr(gb, HL, 0x02);
+  RET(b_+96); return;
 
 landed:
-  CALL_C(0x66db, ecom_incState_b0d_hook, 0x4000, 0x66de);
-  CYC(0x66de, 0x66e0); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x66e0, 0x66e2); mem_wr(gb, HL, 45);
-  CYC(0x66e2, 0x66e4); A = 0x50; // SND_CLINK
-  CYC(0x66e4, 0x66e7); playSound_b00_hook(gb); return; // jp
+  CALL_C(b_+97, ecom_incState_b0d_hook, SYM(ecom_incState_b0d), b_+100);
+  CYC(b_+100, b_+102); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+102, b_+104); mem_wr(gb, HL, 45);
+  CYC(b_+104, b_+106); A = 0x50; // SND_CLINK
+  CYC(b_+106, b_+109); playSound_b00_hook(gb); return; // jp
 
   // Just landed. Wait for [counter1] frames
 stateB:
-  CYC(0x66e7, 0x66ea); push_effect(gb, 0x66ea); enemyCode2e_state8_hook(gb);
-  if (!(F & FZ)) { CYCT(0x66ea, 0x66eb); ret_effect(gb); return; } // ret nz
-  CYC(0x66ea, 0x66eb);
-  CYC(0x66eb, 0x66ee); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+109, b_+112); push_effect(gb, b_+112); enemyCode2e_state8_hook(gb);
+  if (!(F & FZ)) { CYCT(b_+112, b_+113); ret_effect(gb); return; } // ret nz
+  CYC(b_+112, b_+113);
+  CYC(b_+113, b_+116); enemySetAnimation_hook(gb); return; // jp
 
   // Moving back up at constant speed
 stateC:
-  CYC(0x66ee, 0x66ef); H = D;
-  CYC(0x66ef, 0x66f1); L = ENEMY_BASE + OBJ_Y;
-  CYC(0x66f1, 0x66f2); A = mem_rd(gb, HL);
-  CYC(0x66f2, 0x66f4); alu_sub(gb, 0x80);
-  CYC(0x66f4, 0x66f5); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x66f5, 0x66f6); A = mem_rd(gb, HL);
-  CYC(0x66f6, 0x66f8); alu_sbc(gb, 0x00);
-  CYC(0x66f8, 0x66f9); mem_wr(gb, HL, A);
-  CYC(0x66f9, 0x66fb); E = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x66fb, 0x66fc); A = mem_rd(gb, DE);
-  CYC(0x66fc, 0x66fd); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(0x66fd, 0x66fe); ret_effect(gb); return; } // ret nz
-  CYC(0x66fd, 0x66fe);
-  CYC(0x66fe, 0x6700); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x6700, 0x6702); mem_wr(gb, HL, 24);
-  CYC(0x6702, 0x6704); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6704, 0x6706); mem_wr(gb, HL, 0x08);
-  RET(0x6706); return;
+  CYC(b_+116, b_+117); H = D;
+  CYC(b_+117, b_+119); L = ENEMY_BASE + OBJ_Y;
+  CYC(b_+119, b_+120); A = mem_rd(gb, HL);
+  CYC(b_+120, b_+122); alu_sub(gb, 0x80);
+  CYC(b_+122, b_+123); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+123, b_+124); A = mem_rd(gb, HL);
+  CYC(b_+124, b_+126); alu_sbc(gb, 0x00);
+  CYC(b_+126, b_+127); mem_wr(gb, HL, A);
+  CYC(b_+127, b_+129); E = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+129, b_+130); A = mem_rd(gb, DE);
+  CYC(b_+130, b_+131); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+131, b_+132); ret_effect(gb); return; } // ret nz
+  CYC(b_+131, b_+132);
+  CYC(b_+132, b_+134); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+134, b_+136); mem_wr(gb, HL, 24);
+  CYC(b_+136, b_+138); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+138, b_+140); mem_wr(gb, HL, 0x08);
+  RET(b_+140); return;
 }

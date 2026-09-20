@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0e, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0e, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode58), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode58), (from), (to), true)
 
 void enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook(GB *gb);
 void enemyCode58_copyParentPosition_hook(GB *gb);
@@ -57,52 +57,55 @@ static void bushOrRock_addDoubleIndexToHl_from_rst(GB *gb, uint16_t return_addre
 // 0e:6825, bare local (no exported symbol); called via genuine call/ret from several states
 // of enemyCode58. Make parent visible, remove self from Parent.relatedObj2.
 void enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook(GB *gb) {
+  BASE(enemyCode58);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6825, 0x6827); A = OBJ_VISIBLE; // Object.visible
-  CALL_C(0x6827, objectGetRelatedObject1Var_hook, 0x2160, 0x682a);
-  CYC(0x682a, 0x682c); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
-  CYC(0x682c, 0x682e); L = ENEMY_BASE + OBJ_RELATED2;
-  CYC(0x682e, 0x682f); alu_xor(gb, A);
-  CYC(0x682f, 0x6830); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x6830, 0x6831); mem_wr(gb, HL, A);
-  RET(0x6831); return; // ret
+  CYC(b_+181, b_+183); A = OBJ_VISIBLE; // Object.visible
+  CALL_C(b_+183, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+186);
+  CYC(b_+186, b_+188); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
+  CYC(b_+188, b_+190); L = ENEMY_BASE + OBJ_RELATED2;
+  CYC(b_+190, b_+191); alu_xor(gb, A);
+  CYC(b_+191, b_+192); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+192, b_+193); mem_wr(gb, HL, A);
+  RET(b_+193); return; // ret
 }
 
 // 0e:6832, bare local (no exported symbol); called via genuine call/ret from two states of
 // enemyCode58. Copies parent position, with a Z offset determined by parent.var03.
 void enemyCode58_copyParentPosition_hook(GB *gb) {
+  BASE(enemyCode58);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6832, 0x6834); A = OBJ_YH; // Object.yh
-  CALL_C(0x6834, objectGetRelatedObject1Var_hook, 0x2160, 0x6837);
-  CALL_C(0x6837, objectTakePosition_hook, 0x2274, 0x683a);
-  CYC(0x683a, 0x683c); L = ENEMY_BASE + OBJ_VAR03;
-  CYC(0x683c, 0x683d); A = mem_rd(gb, HL);
-  CYC(0x683d, 0x683f); alu_and(gb, 0x03);
-  CYC(0x683f, 0x6842); SET_HL(0x6849); // @zVals
-  CYC(0x6842, 0x6843); bushOrRock_addAToHl_from_rst(gb, 0x6843);
-  CYC(0x6843, 0x6845); E = ENEMY_BASE + OBJ_Z + 1; // Enemy.zh
-  CYC(0x6845, 0x6846); A = mem_rd(gb, DE);
-  CYC(0x6846, 0x6847); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x6847, 0x6848); mem_wr(gb, DE, A);
-  RET(0x6848); return; // ret
+  CYC(b_+194, b_+196); A = OBJ_YH; // Object.yh
+  CALL_C(b_+196, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+199);
+  CALL_C(b_+199, objectTakePosition_hook, SYM(objectTakePosition), b_+202);
+  CYC(b_+202, b_+204); L = ENEMY_BASE + OBJ_VAR03;
+  CYC(b_+204, b_+205); A = mem_rd(gb, HL);
+  CYC(b_+205, b_+207); alu_and(gb, 0x03);
+  CYC(b_+207, b_+210); SET_HL(b_+217); // @zVals
+  CYC(b_+210, b_+211); bushOrRock_addAToHl_from_rst(gb, b_+211);
+  CYC(b_+211, b_+213); E = ENEMY_BASE + OBJ_Z + 1; // Enemy.zh
+  CYC(b_+213, b_+214); A = mem_rd(gb, DE);
+  CYC(b_+214, b_+215); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+215, b_+216); mem_wr(gb, DE, A);
+  RET(b_+216); return; // ret
 }
 
 // 0e:684d, bare local (no exported symbol); called via genuine call/ret from
 // enemyCode58@state_uninitialized. Disable bush destruction for deku scrubs only.
 void enemyCode58_checkDisableDestruction_hook(GB *gb) {
+  BASE(enemyCode58);
   uint16_t sp0_ = gb->sp;
-  CYC(0x684d, 0x684f); A = OBJ_ID; // Object.id
-  CALL_C(0x684f, objectGetRelatedObject1Var_hook, 0x2160, 0x6852);
-  CYC(0x6852, 0x6854); E = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x6854, 0x6855); A = mem_rd(gb, HL);
-  CYC(0x6855, 0x6856); mem_wr(gb, DE, A);
-  CYC(0x6856, 0x6858); alu_cp(gb, 0x27); // ENEMY_DEKU_SCRUB
-  if (!(F & FZ)) { RET_TAKEN(0x6858); return; } // ret nz
-  CYC(0x6858, 0x6859);
-  CYC(0x6859, 0x685b); E = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
-  CYC(0x685b, 0x685d); A = 0x52; // ENEMYCOLLISION_ROCK
-  CYC(0x685d, 0x685e); mem_wr(gb, DE, A);
-  RET(0x685e); return; // ret
+  CYC(b_+221, b_+223); A = OBJ_ID; // Object.id
+  CALL_C(b_+223, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+226);
+  CYC(b_+226, b_+228); E = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+228, b_+229); A = mem_rd(gb, HL);
+  CYC(b_+229, b_+230); mem_wr(gb, DE, A);
+  CYC(b_+230, b_+232); alu_cp(gb, 0x27); // ENEMY_DEKU_SCRUB
+  if (!(F & FZ)) { RET_TAKEN(b_+232); return; } // ret nz
+  CYC(b_+232, b_+233);
+  CYC(b_+233, b_+235); E = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
+  CYC(b_+235, b_+237); A = 0x52; // ENEMYCOLLISION_ROCK
+  CYC(b_+237, b_+238); mem_wr(gb, DE, A);
+  RET(b_+238); return; // ret
 }
 
 // ==================================================================================================
@@ -112,133 +115,134 @@ void enemyCode58_checkDisableDestruction_hook(GB *gb) {
 //   var30: Enemy ID of parent object
 // ==================================================================================================
 void enemyCode58_hook(GB *gb) {
+  BASE(enemyCode58);
   uint16_t sp0_ = gb->sp;
-  if (F & FZ) { CYCT(0x6770, 0x6772); goto normalStatus; } // jr z
-  CYC(0x6770, 0x6772);
-  CYC(0x6772, 0x6774); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(0x6774); return; } // ret c
-  CYC(0x6774, 0x6775);
-  if (F & FZ) { CYCT(0x6775, 0x6778); goto destroyed; } // jp z
-  CYC(0x6775, 0x6778);
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+4); return; } // ret c
+  CYC(b_+4, b_+5);
+  if (F & FZ) { CYCT(b_+5, b_+8); goto destroyed; } // jp z
+  CYC(b_+5, b_+8);
 
 normalStatus:
-  CYC(0x6778, 0x677a); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x677a, 0x677b); A = mem_rd(gb, DE);
+  CYC(b_+8, b_+10); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+10, b_+11); A = mem_rd(gb, DE);
   {
-    CYC(0x677b, 0x677c); push_effect(gb, 0x677c);
+    CYC(b_+11, b_+12); push_effect(gb, b_+12);
     uint16_t target = bushOrRock_jump_table(gb);
-    if (target == 0x678e) goto state_uninitialized;
-    if (target == 0x67f6) goto state_stub;
-    if (target == 0x67b0) goto state_grabbed;
-    if (target == 0x67dc) goto state_switchHook;
-    if (target == 0x67f7) goto state8;
+    if (target == b_+30) goto state_uninitialized;
+    if (target == b_+134) goto state_stub;
+    if (target == b_+64) goto state_grabbed;
+    if (target == b_+108) goto state_switchHook;
+    if (target == b_+135) goto state8;
     HANDOFF(target);
   }
 
 state_uninitialized:
-  CYC(0x678e, 0x6790); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x6790, 0x6791); A = mem_rd(gb, DE);
-  CYC(0x6791, 0x6794); SET_HL(0x67a8); // @collisionAndTileData
-  CYC(0x6794, 0x6795); bushOrRock_addDoubleIndexToHl_from_rst(gb, 0x6795);
-  CYC(0x6795, 0x6797); E = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
-  CYC(0x6797, 0x6798); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x6798, 0x6799); mem_wr(gb, DE, A);
-  CYC(0x6799, 0x679a); A = mem_rd(gb, HL);
-  CALL_C(0x679a, objectMimicBgTile_hook, 0x233b, 0x679d);
-  CALL_C(0x679d, enemyCode58_checkDisableDestruction_hook, 0x684d, 0x67a0);
-  CALL_C(0x67a0, ecom_setSpeedAndState8_b0e_hook, 0x4364, 0x67a3);
-  CALL_C(0x67a3, enemyCode58_copyParentPosition_hook, 0x6832, 0x67a6);
-  CYC(0x67a6, 0x67a8); goto setPriorityRelativeToLink; // jr
+  CYC(b_+30, b_+32); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+32, b_+33); A = mem_rd(gb, DE);
+  CYC(b_+33, b_+36); SET_HL(b_+56); // @collisionAndTileData
+  CYC(b_+36, b_+37); bushOrRock_addDoubleIndexToHl_from_rst(gb, b_+37);
+  CYC(b_+37, b_+39); E = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
+  CYC(b_+39, b_+40); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+40, b_+41); mem_wr(gb, DE, A);
+  CYC(b_+41, b_+42); A = mem_rd(gb, HL);
+  CALL_C(b_+42, objectMimicBgTile_hook, SYM(objectMimicBgTile), b_+45);
+  CALL_C(b_+45, enemyCode58_checkDisableDestruction_hook, b_+221, b_+48);
+  CALL_C(b_+48, ecom_setSpeedAndState8_b0e_hook, SYM(ecom_setSpeedAndState8_b0e), b_+51);
+  CALL_C(b_+51, enemyCode58_copyParentPosition_hook, b_+194, b_+54);
+  CYC(b_+54, b_+56); goto setPriorityRelativeToLink; // jr
 
 state_grabbed:
-  CYC(0x67b0, 0x67b1); E = alu_inc8(gb, E);
-  CYC(0x67b1, 0x67b2); A = mem_rd(gb, DE);
+  CYC(b_+64, b_+65); E = alu_inc8(gb, E);
+  CYC(b_+65, b_+66); A = mem_rd(gb, DE);
   {
-    CYC(0x67b2, 0x67b3); push_effect(gb, 0x67b3);
+    CYC(b_+66, b_+67); push_effect(gb, b_+67);
     uint16_t target = bushOrRock_jump_table(gb);
-    if (target == 0x67bb) goto grabbedSubstate0;
-    if (target == 0x67cc) { RET(0x67cc); return; } // ret (grabbed substate1)
-    if (target == 0x67cd) goto grabbedSubstate2;
-    if (target == 0x67d7) goto grabbedSubstate3;
+    if (target == b_+75) goto grabbedSubstate0;
+    if (target == b_+92) { RET(b_+92); return; } // ret (grabbed substate1)
+    if (target == b_+93) goto grabbedSubstate2;
+    if (target == b_+103) goto grabbedSubstate3;
     HANDOFF(target);
   }
 
 grabbedSubstate0:
-  CYC(0x67bb, 0x67bc); H = D;
-  CYC(0x67bc, 0x67bd); L = E;
-  CYC(0x67bd, 0x67be); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [substate]
-  CYC(0x67be, 0x67c0); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
-  CYC(0x67c0, 0x67c2); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
-  CYC(0x67c2, 0x67c3); alu_xor(gb, A);
-  CYC(0x67c3, 0x67c6); mem_wr(gb, wLinkGrabState2, A);
-  CALL_C(0x67c6, enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook, 0x6825, 0x67c9);
-  CYC(0x67c9, 0x67cc); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+75, b_+76); H = D;
+  CYC(b_+76, b_+77); L = E;
+  CYC(b_+77, b_+78); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [substate]
+  CYC(b_+78, b_+80); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
+  CYC(b_+80, b_+82); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
+  CYC(b_+82, b_+83); alu_xor(gb, A);
+  CYC(b_+83, b_+86); mem_wr(gb, wLinkGrabState2, A);
+  CALL_C(b_+86, enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook, b_+181, b_+89);
+  CYC(b_+89, b_+92); objectSetVisible81_hook(gb); return; // jp
 
 grabbedSubstate2:
-  CYC(0x67cd, 0x67ce); H = D;
-  CYC(0x67ce, 0x67d0); L = ENEMY_BASE + OBJ_ENABLED;
-  CYC(0x67d0, 0x67d2); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 1))); // res 1,(hl)
-  CYC(0x67d2, 0x67d4); L = ENEMY_BASE + OBJ_Z + 1; // Enemy.zh
-  CYC(0x67d4, 0x67d6); alu_bit(gb, 7, mem_rd(gb, HL));
-  if (!(F & FZ)) { RET_TAKEN(0x67d6); return; } // ret nz
-  CYC(0x67d6, 0x67d7);
+  CYC(b_+93, b_+94); H = D;
+  CYC(b_+94, b_+96); L = ENEMY_BASE + OBJ_ENABLED;
+  CYC(b_+96, b_+98); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 1))); // res 1,(hl)
+  CYC(b_+98, b_+100); L = ENEMY_BASE + OBJ_Z + 1; // Enemy.zh
+  CYC(b_+100, b_+102); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (!(F & FZ)) { RET_TAKEN(b_+102); return; } // ret nz
+  CYC(b_+102, b_+103);
 
 grabbedSubstate3:
-  CALL_C(0x67d7, objectSetPriorityRelativeToLink_hook, 0x22dc, 0x67da);
-  CYC(0x67da, 0x67dc); goto makeDebrisAndDelete; // jr
+  CALL_C(b_+103, objectSetPriorityRelativeToLink_hook, SYM(objectSetPriorityRelativeToLink), b_+106);
+  CYC(b_+106, b_+108); goto makeDebrisAndDelete; // jr
 
 state_switchHook:
-  CYC(0x67dc, 0x67dd); E = alu_inc8(gb, E);
-  CYC(0x67dd, 0x67de); A = mem_rd(gb, DE);
+  CYC(b_+108, b_+109); E = alu_inc8(gb, E);
+  CYC(b_+109, b_+110); A = mem_rd(gb, DE);
   {
-    CYC(0x67de, 0x67df); push_effect(gb, 0x67df);
+    CYC(b_+110, b_+111); push_effect(gb, b_+111);
     uint16_t target = bushOrRock_jump_table(gb);
-    if (target == 0x67e7) goto switchHookSubstate0;
-    if (target == 0x67ed) { RET(0x67ed); return; } // ret (switchHook substate1/substate2)
-    if (target == 0x67ee) goto switchHookSubstate3;
+    if (target == b_+119) goto switchHookSubstate0;
+    if (target == b_+125) { RET(b_+125); return; } // ret (switchHook substate1/substate2)
+    if (target == b_+126) goto switchHookSubstate3;
     HANDOFF(target);
   }
 
 switchHookSubstate0:
-  CALL_C(0x67e7, enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook, 0x6825, 0x67ea);
-  CYC(0x67ea, 0x67ed); ecom_incSubstate_b0e_hook(gb); return; // jp
+  CALL_C(b_+119, enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook, b_+181, b_+122);
+  CYC(b_+122, b_+125); ecom_incSubstate_b0e_hook(gb); return; // jp
 
 switchHookSubstate3:
-  CYC(0x67ee, 0x67f0); C = 0x20;
-  CALL_C(0x67f0, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x67f3);
-  if (!(F & FZ)) { RET_TAKEN(0x67f3); return; } // ret nz
-  CYC(0x67f3, 0x67f4);
-  CYC(0x67f4, 0x67f6); goto makeDebrisAndDelete; // jr
+  CYC(b_+126, b_+128); C = 0x20;
+  CALL_C(b_+128, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+131);
+  if (!(F & FZ)) { RET_TAKEN(b_+131); return; } // ret nz
+  CYC(b_+131, b_+132);
+  CYC(b_+132, b_+134); goto makeDebrisAndDelete; // jr
 
 state_stub:
-  RET(0x67f6); return; // ret
+  RET(b_+134); return; // ret
 
 state8:
-  CYC(0x67f7, 0x67f9); A = OBJ_ID; // Object.id
-  CALL_C(0x67f9, objectGetRelatedObject1Var_hook, 0x2160, 0x67fc);
-  CYC(0x67fc, 0x67fe); E = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x67fe, 0x67ff); A = mem_rd(gb, DE);
-  CYC(0x67ff, 0x6800); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(0x6800, 0x6803); enemyDelete_hook(gb); return; } // jp nz
-  CYC(0x6800, 0x6803);
-  CYC(0x6803, 0x6805); L = ENEMY_BASE + OBJ_VAR03;
-  CYC(0x6805, 0x6806); A = mem_rd(gb, HL);
-  CYC(0x6806, 0x6807); alu_rlca(gb);
-  if (F & FC) CALL_C_CC(0x6807, objectAddToGrabbableObjectBuffer_hook, 0x2c2e, 0x680a); else CYC(0x6807, 0x680a); // call c
-  CALL_C(0x680a, enemyCode58_copyParentPosition_hook, 0x6832, 0x680d);
+  CYC(b_+135, b_+137); A = OBJ_ID; // Object.id
+  CALL_C(b_+137, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+140);
+  CYC(b_+140, b_+142); E = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+142, b_+143); A = mem_rd(gb, DE);
+  CYC(b_+143, b_+144); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+144, b_+147); enemyDelete_hook(gb); return; } // jp nz
+  CYC(b_+144, b_+147);
+  CYC(b_+147, b_+149); L = ENEMY_BASE + OBJ_VAR03;
+  CYC(b_+149, b_+150); A = mem_rd(gb, HL);
+  CYC(b_+150, b_+151); alu_rlca(gb);
+  if (F & FC) CALL_C_CC(b_+151, objectAddToGrabbableObjectBuffer_hook, SYM(objectAddToGrabbableObjectBuffer), b_+154); else CYC(b_+151, b_+154); // call c
+  CALL_C(b_+154, enemyCode58_copyParentPosition_hook, b_+194, b_+157);
 
 setPriorityRelativeToLink:
-  CYC(0x680d, 0x6810); objectSetPriorityRelativeToLink_hook(gb); return; // jp
+  CYC(b_+157, b_+160); objectSetPriorityRelativeToLink_hook(gb); return; // jp
 
 destroyed:
-  CALL_C(0x6810, enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook, 0x6825, 0x6813);
+  CALL_C(b_+160, enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook, b_+181, b_+163);
 
 makeDebrisAndDelete:
-  CYC(0x6813, 0x6815); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x6815, 0x6816); A = mem_rd(gb, DE);
-  CYC(0x6816, 0x6819); SET_HL(0x6821); // @debrisTypes
-  CYC(0x6819, 0x681a); bushOrRock_addAToHl_from_rst(gb, 0x681a);
-  CYC(0x681a, 0x681b); B = mem_rd(gb, HL);
-  CALL_C(0x681b, objectCreateInteractionWithSubid00_hook, 0x24c3, 0x681e);
-  CYC(0x681e, 0x6821); enemyDelete_hook(gb); return; // jp
+  CYC(b_+163, b_+165); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+165, b_+166); A = mem_rd(gb, DE);
+  CYC(b_+166, b_+169); SET_HL(b_+177); // @debrisTypes
+  CYC(b_+169, b_+170); bushOrRock_addAToHl_from_rst(gb, b_+170);
+  CYC(b_+170, b_+171); B = mem_rd(gb, HL);
+  CALL_C(b_+171, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+174);
+  CYC(b_+174, b_+177); enemyDelete_hook(gb); return; // jp
 }

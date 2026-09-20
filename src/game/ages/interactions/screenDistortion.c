@@ -3,29 +3,30 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0a, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0a, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode7c), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode7c), (from), (to), true)
 
 // INTERAC_SCREEN_DISTORTION
 void interactionCode7c_hook(GB *gb) {
+  BASE(interactionCode7c);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6167, checkInteractionState_hook, 0x23fe, 0x616a);
-  if (F & FZ) { CYCT(0x616a, 0x616c); goto state0; } // jr z
-  CYC(0x616a, 0x616c);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
+  if (F & FZ) { CYCT(b_+3, b_+5); goto state0; } // jr z
+  CYC(b_+3, b_+5);
 
   // interactionCode7c@state1
-  CYC(0x616c, 0x616e); A = 0x01;
-  CYC(0x616e, 0x6171); loadBigBufferScrollValues_hook(gb); return; // jp
+  CYC(b_+5, b_+7); A = 0x01;
+  CYC(b_+7, b_+10); loadBigBufferScrollValues_hook(gb); return; // jp
 
 state0:
-  CALL_C(0x6171, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x6174);
-  CALL_C(0x6174, interactionIncState_hook, 0x23e0, 0x6177);
-  CYC(0x6177, 0x6179); A = 0x10;
-  CYC(0x6179, 0x617c); W8(wGfxRegs2_LYC) = A;
-  CYC(0x617c, 0x617e); A = 0x02;
-  CYC(0x617e, 0x6180); H8(hNextLcdInterruptBehaviour) = A;
-  CYC(0x6180, 0x6182); A = 0x95; // SND_WARP_START
-  CALL_C(0x6182, playSound_b00_hook, 0x0c98, 0x6185);
-  CYC(0x6185, 0x6187); A = 0xff;
-  CYC(0x6187, 0x618a); initWaveScrollValues_hook(gb); return; // jp
+  CALL_C(b_+10, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+13);
+  CALL_C(b_+13, interactionIncState_hook, SYM(interactionIncState), b_+16);
+  CYC(b_+16, b_+18); A = 0x10;
+  CYC(b_+18, b_+21); W8(wGfxRegs2_LYC) = A;
+  CYC(b_+21, b_+23); A = 0x02;
+  CYC(b_+23, b_+25); H8(hNextLcdInterruptBehaviour) = A;
+  CYC(b_+25, b_+27); A = 0x95; // SND_WARP_START
+  CALL_C(b_+27, playSound_b00_hook, SYM(playSound_b00), b_+30);
+  CYC(b_+30, b_+32); A = 0xff;
+  CYC(b_+32, SYM(interactionCode80)); initWaveScrollValues_hook(gb); return; // jp
 }

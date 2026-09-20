@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodeb4), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodeb4), (from), (to), true)
 
 static uint16_t book_of_seals_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -27,48 +27,63 @@ static void book_add_a_to_hl(GB *gb, uint16_t ra) {
 }
 
 void interactionCodeb4__func_69ce_hook(GB *gb) {
+  BASE(interactionCodeb4);
   uint16_t sp0_ = gb->sp;
-  CYC(0x69ce,0x69d0); E=0x42; CYC(0x69d0,0x69d1); A=mem_rd(gb,DE); CYC(0x69d1,0x69d2); C=A;
-  CYC(0x69d2,0x69d5); SET_HL(0x6a05); CYC(0x69d5,0x69d6); book_add_a_to_hl(gb,0x69d6);
-  CYC(0x69d6,0x69d8); A=mem_rd(gb,HL); CYC(0x69d7,0x69d8); book_add_a_to_hl(gb,0x69d8);
-  CYC(0x69d8,0x69da); E=0x58; CYC(0x69da,0x69db); A=L; CYC(0x69db,0x69dd); mem_wr(gb,DE,A);
-  CYC(0x69dc,0x69dd); E=alu_inc8(gb,E); CYC(0x69dd,0x69de); A=H; CYC(0x69de,0x69e0); mem_wr(gb,DE,A); CYC(0x69df,0x69e0); ret_effect(gb);
+  CYC(b_+279,b_+281); E=0x42; CYC(b_+281,b_+282); A=mem_rd(gb,DE); CYC(b_+282,b_+283); C=A;
+  CYC(b_+283,b_+286); SET_HL(b_+334); CYC(b_+286,b_+287); book_add_a_to_hl(gb,b_+287);
+  CYC(b_+287,b_+289); A=mem_rd(gb,HL); CYC(b_+288,b_+289); book_add_a_to_hl(gb,b_+289);
+  CYC(b_+289,b_+291); E=0x58; CYC(b_+291,b_+292); A=L; CYC(b_+292,b_+294); mem_wr(gb,DE,A);
+  CYC(b_+293,b_+294); E=alu_inc8(gb,E); CYC(b_+294,b_+295); A=H; CYC(b_+295,b_+297); mem_wr(gb,DE,A); CYC(b_+296,b_+297); ret_effect(gb);
 }
 
 void interactionCodeb4__state0_hook(GB *gb) {
-  uint16_t sp0_=gb->sp; CYC(0x68c5,0x68c7); A=1; CYC(0x68c7,0x68c8); mem_wr(gb,DE,A); CYC(0x68c8,0x68ca); A=6;
-  CALL_C(0x68ca,objectSetCollideRadius_hook,0x24a1,0x68cd); CALL_C(0x68cd,interactionInitGraphics_hook,0x15fb,0x68d0);
-  CALL_C(0x68d0,interactionSetAlwaysUpdateBit_hook,0x2701,0x68d3); CYC(0x68d3,0x68d5); A=0x12; CALL_C(0x68d5,interactionSetHighTextIndex_hook,0x253b,0x68d8);
-  CYC(0x68d8,0x68da); E=0x71; CALL_C(0x68da,objectAddToAButtonSensitiveObjectList_hook,0x1b2c,0x68dd); CYC(0x68dd,0x68df); E=0x42; CYC(0x68df,0x68e0); A=mem_rd(gb,DE); CYC(0x68e0,0x68e1); alu_or(gb,A);
-  if (!(F&FZ)) { CYCT(0x68e1,0x68e2); ret_effect(gb); return; } CYC(0x68e1,0x68e2); CYC(0x68e2,0x68e5); SET_HL(0xcfd0); CYC(0x68e5,0x68e7); B=0x10;
-  if (F&FZ) CALL_C_CC(0x68e7,clearMemory_hook,0x046f,0x68ea); else CYC(0x68e7,0x68ea); CALL_C(0x68ea,getThisRoomFlags_hook,0x197d,0x68ed); CYC(0x68ed,0x68ef); alu_bit(gb,6,A);
-  if (!(F&FZ)) { CYCT(0x68ef,0x68f0); ret_effect(gb); return; } CYC(0x68ef,0x68f0); CALL_C(0x68f0,interactionIncState_hook,0x23e0,0x68f3); CYC(0x68f3,0x68f6); SET_HL(0x7d38); CYC(0x68f6,0x68f9); interactionSetScript_hook(gb); return;
+  BASE(interactionCodeb4);
+  uint16_t sp0_=gb->sp; CYC(b_+14,b_+16); A=1; CYC(b_+16,b_+17); mem_wr(gb,DE,A); CYC(b_+17,b_+19); A=6;
+  CALL_C(b_+19,objectSetCollideRadius_hook,SYM(objectSetCollideRadius),b_+22); CALL_C(b_+22,interactionInitGraphics_hook,SYM(interactionInitGraphics),b_+25);
+  CALL_C(b_+25,interactionSetAlwaysUpdateBit_hook,SYM(interactionSetAlwaysUpdateBit),b_+28); CYC(b_+28,b_+30); A=0x12; CALL_C(b_+30,interactionSetHighTextIndex_hook,SYM(interactionSetHighTextIndex),b_+33);
+  CYC(b_+33,b_+35); E=0x71; CALL_C(b_+35,objectAddToAButtonSensitiveObjectList_hook,SYM(objectAddToAButtonSensitiveObjectList),b_+38); CYC(b_+38,b_+40); E=0x42; CYC(b_+40,b_+41); A=mem_rd(gb,DE); CYC(b_+41,b_+42); alu_or(gb,A);
+  if (!(F&FZ)) { CYCT(b_+42,b_+43); ret_effect(gb); return; } CYC(b_+42,b_+43); CYC(b_+43,b_+46); SET_HL(wTmpcfc0_armosStatue_killedArmosPositions); CYC(b_+46,b_+48); B=0x10;
+  if (F&FZ) CALL_C_CC(b_+48,clearMemory_hook,SYM(clearMemory),b_+51); else CYC(b_+48,b_+51); CALL_C(b_+51,getThisRoomFlags_hook,SYM(getThisRoomFlags),b_+54); CYC(b_+54,b_+56); alu_bit(gb,6,A);
+  if (!(F&FZ)) { CYCT(b_+56,b_+57); ret_effect(gb); return; } CYC(b_+56,b_+57); CALL_C(b_+57,interactionIncState_hook,SYM(interactionIncState),b_+60); CYC(b_+60,b_+63); SET_HL((SYM(interactionCoded8__fillNextGroupWithLava) + 10)); CYC(b_+63,b_+66); interactionSetScript_hook(gb); return;
 }
 
 void interactionCodeb4__activatedBook_hook(GB *gb) {
-  uint16_t sp0_=gb->sp; CYC(0x6907,0x6909); A=1; CALL_C(0x6909,interactionSetAnimation_hook,0x262e,0x690c); CALL_C(0x690c,interactionCodeb4__func_69ce_hook,0x69ce,0x690f);
-  CYC(0x690f,0x6910); A=C; CYC(0x6910,0x6913); mem_wr(gb,0xcfd0,A); CYC(0x6913,0x6916); SET_HL(0x6932); CYC(0x6916,0x6917); book_add_a_to_hl(gb,0x6917); CYC(0x6917,0x6919); C=mem_rd(gb,HL); CYC(0x6918,0x691a); B=0x12; CALL_C(0x691a,showText_hook,0x1872,0x691d);
-  CYC(0x691d,0x6921); A=0x81; CYC(0x691f,0x6923); mem_wr(gb,0xcc02,A); CYC(0x6922,0x6926); mem_wr(gb,0xcc8a,A); CYC(0x6925,0x6927); H=D; CYC(0x6926,0x6928); L=0x43; CYC(0x6928,0x692a); A=0xd3; CYC(0x692a,0x692c); mem_wr(gb,HL,A); CYC(0x692b,0x692d); A=3; CYC(0x692d,0x692f); mem_wr(gb,HL,A); CYC(0x692e,0x692f); L=alu_inc8(gb,L); CYC(0x692f,0x6932); mem_wr(gb,HL,2); CYC(0x6931,0x6932); ret_effect(gb);
+  BASE(interactionCodeb4);
+  uint16_t sp0_=gb->sp; CYC(b_+80,b_+82); A=1; CALL_C(b_+82,interactionSetAnimation_hook,SYM(interactionSetAnimation),b_+85); CALL_C(b_+85,interactionCodeb4__func_69ce_hook,b_+279,b_+88);
+  CYC(b_+88,b_+89); A=C; CYC(b_+89,b_+92); mem_wr(gb,wTmpcfc0_armosStatue_killedArmosPositions,A); CYC(b_+92,b_+95); SET_HL(b_+123); CYC(b_+95,b_+96); book_add_a_to_hl(gb,b_+96); CYC(b_+96,b_+98); C=mem_rd(gb,HL); CYC(b_+97,b_+99); B=0x12; CALL_C(b_+99,showText_hook,SYM(showText),b_+102);
+  CYC(b_+102,b_+106); A=0x81; CYC(b_+104,b_+108); mem_wr(gb,wMenuDisabled,A); CYC(b_+107,b_+111); mem_wr(gb,wDisabledObjects,A); CYC(b_+110,b_+112); H=D; CYC(b_+111,b_+113); L=0x43; CYC(b_+113,b_+115); A=0xd3; CYC(b_+115,b_+117); mem_wr(gb,HL,A); CYC(b_+116,b_+118); A=3; CYC(b_+118,b_+120); mem_wr(gb,HL,A); CYC(b_+119,b_+120); L=alu_inc8(gb,L); CYC(b_+120,b_+123); mem_wr(gb,HL,2); CYC(b_+122,b_+123); ret_effect(gb);
 }
 
 void interactionCodeb4__state1_hook(GB *gb) {
-  uint16_t sp0_=gb->sp; CYC(0x68f9,0x68fa); E=alu_inc8(gb,E); CYC(0x68fa,0x68fb); A=mem_rd(gb,DE); CYC(0x68fb,0x68fc); alu_or(gb,A); if (F&FZ) CALL_ROM_CC(0x68fc,0x69e0); else CYC(0x68fc,0x68ff); CALL_C(0x68ff,objectSetPriorityRelativeToLink_withTerrainEffects_hook,0x22e0,0x6902); CYC(0x6902,0x6904); E=0x71; CYC(0x6904,0x6905); A=mem_rd(gb,DE); CYC(0x6905,0x6906); alu_or(gb,A); if (F&FZ) { CYCT(0x6906,0x6907); ret_effect(gb); return; } CYC(0x6906,0x6907); interactionCodeb4__activatedBook_hook(gb); return;
+  BASE(interactionCodeb4);
+  uint16_t sp0_=gb->sp; CYC(b_+66,b_+67); E=alu_inc8(gb,E); CYC(b_+67,b_+68); A=mem_rd(gb,DE); CYC(b_+68,b_+69); alu_or(gb,A); if (F&FZ) CALL_ROM_CC(b_+69,b_+297); else CYC(b_+69,b_+72); CALL_C(b_+72,objectSetPriorityRelativeToLink_withTerrainEffects_hook,SYM(objectSetPriorityRelativeToLink_withTerrainEffects),b_+75); CYC(b_+75,b_+77); E=0x71; CYC(b_+77,b_+78); A=mem_rd(gb,DE); CYC(b_+78,b_+79); alu_or(gb,A); if (F&FZ) { CYCT(b_+79,b_+80); ret_effect(gb); return; } CYC(b_+79,b_+80); interactionCodeb4__activatedBook_hook(gb); return;
 }
 
 void interactionCodeb4__state2_hook(GB *gb) {
-  uint16_t sp0_=gb->sp; CYC(0x6938,0x6939); E=alu_inc8(gb,E); CYC(0x6939,0x693a); A=mem_rd(gb,DE); CYC(0x693a,0x693b); alu_or(gb,A); if (F&FZ) CALL_ROM_CC(0x693b,0x69e0); else CYC(0x693b,0x693e); CALL_C(0x693e,interactionRunScript_hook,0x2552,0x6941); if (!(F&FC)) { CYCT(0x6941,0x6942); ret_effect(gb); return; } CYC(0x6941,0x6942); CALL_C(0x6942,objectSetPriorityRelativeToLink_withTerrainEffects_hook,0x22e0,0x6945); CYC(0x6945,0x6947); A=0x4d; CALL_C(0x6947,playSound_b00_hook,0x0c98,0x694a); CYC(0x694a,0x694c); A=0x55; CALL_C(0x694c,loseTreasure_hook,0x1733,0x694f); CYC(0x694f,0x6952); interactionCodeb4__activatedBook_hook(gb); return;
+  BASE(interactionCodeb4);
+  uint16_t sp0_=gb->sp; CYC(b_+129,b_+130); E=alu_inc8(gb,E); CYC(b_+130,b_+131); A=mem_rd(gb,DE); CYC(b_+131,b_+132); alu_or(gb,A); if (F&FZ) CALL_ROM_CC(b_+132,b_+297); else CYC(b_+132,b_+135); CALL_C(b_+135,interactionRunScript_hook,SYM(interactionRunScript),b_+138); if (!(F&FC)) { CYCT(b_+138,b_+139); ret_effect(gb); return; } CYC(b_+138,b_+139); CALL_C(b_+139,objectSetPriorityRelativeToLink_withTerrainEffects_hook,SYM(objectSetPriorityRelativeToLink_withTerrainEffects),b_+142); CYC(b_+142,b_+144); A=0x4d; CALL_C(b_+144,playSound_b00_hook,SYM(playSound_b00),b_+147); CYC(b_+147,b_+149); A=0x55; CALL_C(b_+149,loseTreasure_hook,SYM(loseTreasure),b_+152); CYC(b_+152,b_+155); interactionCodeb4__activatedBook_hook(gb); return;
 }
 
 void interactionCodeb4__state3_hook(GB *gb) {
-  uint16_t sp0_=gb->sp; CALL_C(0x6951,retIfTextIsActive_hook,0x1859,0x6954); CALL_ROM(0x6954,0x6964); CYC(0x6957,0x695a); A=mem_rd(gb,0xcc8a); CYC(0x695a,0x695b); alu_or(gb,A); if (!(F&FZ)) { CYCT(0x695b,0x695c); ret_effect(gb); return; } CYC(0x695b,0x695c); CYC(0x695c,0x695e); E=0x43; CYC(0x695e,0x6960); A=0xf4; CYC(0x6960,0x6961); mem_wr(gb,DE,A); CYC(0x6961,0x6965); interactionCodeb4__func_69ce_hook(gb); return;
+  BASE(interactionCodeb4);
+  uint16_t sp0_=gb->sp; CALL_C(b_+154,retIfTextIsActive_hook,SYM(retIfTextIsActive),b_+157); CALL_ROM(b_+157,b_+173); CYC(b_+160,b_+163); A=mem_rd(gb,wDisabledObjects); CYC(b_+163,b_+164); alu_or(gb,A); if (!(F&FZ)) { CYCT(b_+164,b_+165); ret_effect(gb); return; } CYC(b_+164,b_+165); CYC(b_+165,b_+167); E=0x43; CYC(b_+167,b_+169); A=0xf4; CYC(b_+169,b_+170); mem_wr(gb,DE,A); CYC(b_+170,b_+174); interactionCodeb4__func_69ce_hook(gb); return;
 }
 
 void interactionCodeb4__state4_hook(GB *gb) {
-  uint16_t sp0_=gb->sp; CALL_C(0x6996,objectSetPriorityRelativeToLink_withTerrainEffects_hook,0x22e0,0x6999); CYC(0x6999,0x699b); E=0x71; CYC(0x699b,0x699c); A=mem_rd(gb,DE); CYC(0x699c,0x699d); alu_or(gb,A); if (F&FZ) goto after_prompt; CYC(0x699d,0x699f); alu_xor(gb,A); CYC(0x69a0,0x69a2); mem_wr(gb,DE,A); CYC(0x69a1,0x69a3); E=0x42; CYC(0x69a3,0x69a4); A=mem_rd(gb,DE); CYC(0x69a4,0x69a7); SET_HL(0x6932); CYC(0x69a7,0x69a8); book_add_a_to_hl(gb,0x69a8); CYC(0x69a8,0x69aa); C=mem_rd(gb,HL); CYC(0x69a9,0x69ab); B=0x12; CYC(0x69ab,0x69af); showText_hook(gb); return;
+  BASE(interactionCodeb4);
+  uint16_t sp0_=gb->sp; CALL_C(b_+223,objectSetPriorityRelativeToLink_withTerrainEffects_hook,SYM(objectSetPriorityRelativeToLink_withTerrainEffects),b_+226); CYC(b_+226,b_+228); E=0x71; CYC(b_+228,b_+229); A=mem_rd(gb,DE); CYC(b_+229,b_+230); alu_or(gb,A); if (F&FZ) goto after_prompt; CYC(b_+230,b_+232); alu_xor(gb,A); CYC(b_+233,b_+235); mem_wr(gb,DE,A); CYC(b_+234,b_+236); E=0x42; CYC(b_+236,b_+237); A=mem_rd(gb,DE); CYC(b_+237,b_+240); SET_HL(b_+123); CYC(b_+240,b_+241); book_add_a_to_hl(gb,b_+241); CYC(b_+241,b_+243); C=mem_rd(gb,HL); CYC(b_+242,b_+244); B=0x12; CYC(b_+244,b_+248); showText_hook(gb); return;
 after_prompt:
-  CYC(0x69ae,0x69b1); SET_HL(0xcfd0); CYC(0x69b1,0x69b3); E=0x42; CYC(0x69b3,0x69b4); A=mem_rd(gb,DE); CYC(0x69b4,0x69b5); alu_cp(gb,mem_rd(gb,HL)); if (F&FZ) { CYCT(0x69b5,0x69b6); ret_effect(gb); return; } CYC(0x69b5,0x69b6); CALL_C(0x69b6,retIfTextIsActive_hook,0x1859,0x69b9); CALL_ROM(0x69b9,0x6964); CYC(0x69bc,0x69c0); A=mem_rd(gb,0xcc8a); CYC(0x69bf,0x69c0); alu_or(gb,A); if (!(F&FZ)) { CYCT(0x69c0,0x69c1); ret_effect(gb); return; } CYC(0x69c0,0x69c1); CALL_C(0x69c1,interactionSetAnimation_hook,0x262e,0x69c4); CYC(0x69c4,0x69c6); E=0x44; CYC(0x69c6,0x69c8); A=1; CYC(0x69c8,0x69ca); mem_wr(gb,DE,A); CYC(0x69c9,0x69cb); E=0x71; CYC(0x69cb,0x69cc); alu_xor(gb,A); CYC(0x69cc,0x69ce); mem_wr(gb,DE,A); CYC(0x69cd,0x69ce); ret_effect(gb);
+  CYC(b_+247,b_+250); SET_HL(wTmpcfc0_armosStatue_killedArmosPositions); CYC(b_+250,b_+252); E=0x42; CYC(b_+252,b_+253); A=mem_rd(gb,DE); CYC(b_+253,b_+254); alu_cp(gb,mem_rd(gb,HL)); if (F&FZ) { CYCT(b_+254,b_+255); ret_effect(gb); return; } CYC(b_+254,b_+255); CALL_C(b_+255,retIfTextIsActive_hook,SYM(retIfTextIsActive),b_+258); CALL_ROM(b_+258,b_+173); CYC(b_+261,b_+265); A=mem_rd(gb,wDisabledObjects); CYC(b_+264,b_+265); alu_or(gb,A); if (!(F&FZ)) { CYCT(b_+265,b_+266); ret_effect(gb); return; } CYC(b_+265,b_+266); CALL_C(b_+266,interactionSetAnimation_hook,SYM(interactionSetAnimation),b_+269); CYC(b_+269,b_+271); E=0x44; CYC(b_+271,b_+273); A=1; CYC(b_+273,b_+275); mem_wr(gb,DE,A); CYC(b_+274,b_+276); E=0x71; CYC(b_+276,b_+277); alu_xor(gb,A); CYC(b_+277,b_+279); mem_wr(gb,DE,A); CYC(b_+278,b_+279); ret_effect(gb);
 }
 
 void interactionCodeb4_hook(GB *gb) {
-  uint16_t sp0_=gb->sp; CYC(0x68b7,0x68b9); E=0x44; CYC(0x68b9,0x68bb); A=mem_rd(gb,DE); CYC(0x68ba,0x68bb); push_effect(gb,0x68bb); switch(book_of_seals_jump_table(gb)) { case 0x68c5: interactionCodeb4__state0_hook(gb); return; case 0x68f9: interactionCodeb4__state1_hook(gb); return; case 0x6938: interactionCodeb4__state2_hook(gb); return; case 0x6951: interactionCodeb4__state3_hook(gb); return; case 0x6996: interactionCodeb4__state4_hook(gb); return; default: hook_continue(gb,HL,sp0_); return; }
+  BASE(interactionCodeb4);
+  uint16_t sp0_=gb->sp; CYC(b_+0,b_+2); E=0x44; CYC(b_+2,b_+4); A=mem_rd(gb,DE); CYC(b_+3,b_+4); push_effect(gb,b_+4); do { uint16_t jt_ = (book_of_seals_jump_table(gb));
+    if (jt_ == b_+14) { interactionCodeb4__state0_hook(gb); return; }
+    else if (jt_ == b_+66) { interactionCodeb4__state1_hook(gb); return; }
+    else if (jt_ == b_+129) { interactionCodeb4__state2_hook(gb); return; }
+    else if (jt_ == b_+154) { interactionCodeb4__state3_hook(gb); return; }
+    else if (jt_ == b_+223) { interactionCodeb4__state4_hook(gb); return; }
+    else { hook_continue(gb,HL,sp0_); return; }
+  } while (0);
 }

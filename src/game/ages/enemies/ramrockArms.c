@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x10, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x10, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode05), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode05), (from), (to), true)
 
 // object_code/ages/enemies/ramrockArms.s (ENEMY_RAMROCK_ARMS), bank $10.
 
@@ -41,882 +41,915 @@ static void ramrockArm_addAToHl_from_rst(GB *gb, uint16_t return_address) {
 }
 
 void enemyCode05_hook(GB *gb) {
+  BASE(enemyCode05);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6047, 0x6049); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6049, 0x604a); A = mem_rd(gb, DE);
-  CYC(0x604a, 0x604b); push_effect(gb, 0x604b);
-  switch (ramrockArm_jump_table(gb)) {
-    case 0x605d: ramrockArm_state0_hook(gb); return;
-    case 0x60d0: ramrockArm_state_stub_hook(gb); return;
-    case 0x60d1: ramrockArm_state8_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (ramrockArm_jump_table(gb));
+    if (jt_ == SYM(ramrockArm_state0)) { ramrockArm_state0_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_state_stub)) { ramrockArm_state_stub_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_state8)) { ramrockArm_state8_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void ramrockArm_state0_hook(GB *gb) {
+  BASE(ramrockArm_state0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x605d, 0x605f); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x605f, 0x6060); A = mem_rd(gb, DE);
-  CYC(0x6060, 0x6062); alu_and(gb, 0x7f);
-  CYC(0x6062, 0x6063); push_effect(gb, 0x6063);
-  switch (ramrockArm_jump_table(gb)) {
-    case 0x606f: goto initSubid0;
-    case 0x6098: goto initSubid2;
-    case 0x60a7: goto initSubid4;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); alu_and(gb, 0x7f);
+  CYC(b_+5, b_+6); push_effect(gb, b_+6);
+  do { uint16_t jt_ = (ramrockArm_jump_table(gb));
+    if (jt_ == b_+18) { goto initSubid0; }
+    else if (jt_ == b_+59) { goto initSubid2; }
+    else if (jt_ == b_+74) { goto initSubid4; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 initSubid0:
-  CYC(0x606f, 0x6070); A = mem_rd(gb, DE);
-  CYC(0x6070, 0x6071); B = A;
-  CYC(0x6071, 0x6074); SET_HL(0x6407);
-  CYC(0x6074, 0x6075);
-  ramrockArm_addAToHl_from_rst(gb, 0x6075);
-  CYC(0x6075, 0x6076); A = mem_rd(gb, HL);
-  CYC(0x6076, 0x6077); H = D;
-  CYC(0x6077, 0x6079); L = ENEMY_BASE + OBJ_XH;
-  CYC(0x6079, 0x607a); mem_wr(gb, HL, A);
-  CYC(0x607a, 0x607c); L = ENEMY_BASE + OBJ_YH;
-  CYC(0x607c, 0x607e); mem_wr(gb, HL, 0x10);
-  CYC(0x607e, 0x6080); L = ENEMY_BASE + OBJ_ZH;
-  CYC(0x6080, 0x6082); mem_wr(gb, HL, 0xf9);
-  CYC(0x6082, 0x6084); L = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x6084, 0x6086); mem_wr(gb, HL, 0x10);
-  CYC(0x6086, 0x6088); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x6088, 0x608a); mem_wr(gb, HL, 0x08);
-  CYC(0x608a, 0x608c); A = 0x00;
-  CYC(0x608c, 0x608d); alu_add(gb, B);
-  CALL_C(0x608d, enemySetAnimation_hook, 0x282b, 0x6090);
-  CYC(0x6090, 0x6092); A = 0x3c;
+  CYC(b_+18, b_+19); A = mem_rd(gb, DE);
+  CYC(b_+19, b_+20); B = A;
+  CYC(b_+20, b_+23); SET_HL(SYM(ramrockArm_subid0And1XPositions));
+  CYC(b_+23, b_+24);
+  ramrockArm_addAToHl_from_rst(gb, b_+24);
+  CYC(b_+24, b_+25); A = mem_rd(gb, HL);
+  CYC(b_+25, b_+26); H = D;
+  CYC(b_+26, b_+28); L = ENEMY_BASE + OBJ_XH;
+  CYC(b_+28, b_+29); mem_wr(gb, HL, A);
+  CYC(b_+29, b_+31); L = ENEMY_BASE + OBJ_YH;
+  CYC(b_+31, b_+33); mem_wr(gb, HL, 0x10);
+  CYC(b_+33, b_+35); L = ENEMY_BASE + OBJ_ZH;
+  CYC(b_+35, b_+37); mem_wr(gb, HL, 0xf9);
+  CYC(b_+37, b_+39); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+39, b_+41); mem_wr(gb, HL, 0x10);
+  CYC(b_+41, b_+43); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+43, b_+45); mem_wr(gb, HL, 0x08);
+  CYC(b_+45, b_+47); A = 0x00;
+  CYC(b_+47, b_+48); alu_add(gb, B);
+  CALL_C(b_+48, enemySetAnimation_hook, SYM(enemySetAnimation), b_+51);
+  CYC(b_+51, b_+53); A = 0x3c;
 commonInit:
-  CALL_C(0x6092, ecom_setSpeedAndState8_b10_hook, 0x4364, 0x6095);
-  CYC(0x6095, 0x6098);
+  CALL_C(b_+53, ecom_setSpeedAndState8_b10_hook, SYM(ecom_setSpeedAndState8_b10), b_+56);
+  CYC(b_+56, b_+59);
   objectSetVisiblec0_hook(gb);
   return;
 initSubid2:
-  CYC(0x6098, 0x6099); A = mem_rd(gb, DE);
-  CYC(0x6099, 0x609b); alu_add(gb, 0x02);
-  CALL_C(0x609b, enemySetAnimation_hook, 0x282b, 0x609e);
-  CALL_C(0x609e, ramrockArm_setRelativePosition_hook, 0x63b0, 0x60a1);
-  CYC(0x60a1, 0x60a3); L = ENEMY_BASE + OBJ_ZH;
-  CYC(0x60a3, 0x60a5); mem_wr(gb, HL, 0x81);
-  CYC(0x60a5, 0x6098);
+  CYC(b_+59, b_+60); A = mem_rd(gb, DE);
+  CYC(b_+60, b_+62); alu_add(gb, 0x02);
+  CALL_C(b_+62, enemySetAnimation_hook, SYM(enemySetAnimation), b_+65);
+  CALL_C(b_+65, ramrockArm_setRelativePosition_hook, SYM(ramrockArm_setRelativePosition), b_+68);
+  CYC(b_+68, b_+70); L = ENEMY_BASE + OBJ_ZH;
+  CYC(b_+70, b_+72); mem_wr(gb, HL, 0x81);
+  CYC(b_+72, b_+59);
   goto commonInit;
 initSubid4:
-  CYC(0x60a7, 0x60a8); A = mem_rd(gb, DE);
-  CYC(0x60a8, 0x60aa); alu_sub(gb, 0x04);
-  CYC(0x60aa, 0x60ab); B = A;
-  CYC(0x60ab, 0x60ae); SET_HL(0x640b);
-  CYC(0x60ae, 0x60af);
-  ramrockArm_addAToHl_from_rst(gb, 0x60af);
-  CYC(0x60af, 0x60b0); C = mem_rd(gb, HL);
-  CYC(0x60b0, 0x60b1); A = B;
-  CYC(0x60b1, 0x60b4); SET_HL(0x6409);
-  CYC(0x60b4, 0x60b5);
-  ramrockArm_addAToHl_from_rst(gb, 0x60b5);
-  CYC(0x60b5, 0x60b6); A = mem_rd(gb, HL);
-  CYC(0x60b6, 0x60b7); H = D;
-  CYC(0x60b7, 0x60b9); L = ENEMY_BASE + OBJ_XH;
-  CYC(0x60b9, 0x60ba); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(0x60ba, 0x60bb); L = alu_dec8(gb, L);
-  CYC(0x60bb, 0x60bd); mem_wr(gb, HL, 0x4e);
-  CYC(0x60bd, 0x60bf); L = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x60bf, 0x60c0); mem_wr(gb, HL, C);
-  CYC(0x60c0, 0x60c2); L = ENEMY_BASE + OBJ_ZH;
-  CYC(0x60c2, 0x60c4); mem_wr(gb, HL, 0x81);
-  CYC(0x60c4, 0x60c6); L = ENEMY_BASE + OBJ_VAR32;
-  CYC(0x60c6, 0x60c8); mem_wr(gb, HL, 0x04);
-  CYC(0x60c8, 0x60c9); A = mem_rd(gb, DE);
-  CYC(0x60c9, 0x60cb); alu_add(gb, 0x02);
-  CALL_C(0x60cb, enemySetAnimation_hook, 0x282b, 0x60ce);
-  CYC(0x60ce, 0x6092);
+  CYC(b_+74, b_+75); A = mem_rd(gb, DE);
+  CYC(b_+75, b_+77); alu_sub(gb, 0x04);
+  CYC(b_+77, b_+78); B = A;
+  CYC(b_+78, b_+81); SET_HL(SYM(ramrockArm_subid4And5Angles));
+  CYC(b_+81, b_+82);
+  ramrockArm_addAToHl_from_rst(gb, b_+82);
+  CYC(b_+82, b_+83); C = mem_rd(gb, HL);
+  CYC(b_+83, b_+84); A = B;
+  CYC(b_+84, b_+87); SET_HL(SYM(ramrockArm_subid4And5XPositions));
+  CYC(b_+87, b_+88);
+  ramrockArm_addAToHl_from_rst(gb, b_+88);
+  CYC(b_+88, b_+89); A = mem_rd(gb, HL);
+  CYC(b_+89, b_+90); H = D;
+  CYC(b_+90, b_+92); L = ENEMY_BASE + OBJ_XH;
+  CYC(b_+92, b_+93); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+93, b_+94); L = alu_dec8(gb, L);
+  CYC(b_+94, b_+96); mem_wr(gb, HL, 0x4e);
+  CYC(b_+96, b_+98); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+98, b_+99); mem_wr(gb, HL, C);
+  CYC(b_+99, b_+101); L = ENEMY_BASE + OBJ_ZH;
+  CYC(b_+101, b_+103); mem_wr(gb, HL, 0x81);
+  CYC(b_+103, b_+105); L = ENEMY_BASE + OBJ_VAR32;
+  CYC(b_+105, b_+107); mem_wr(gb, HL, 0x04);
+  CYC(b_+107, b_+108); A = mem_rd(gb, DE);
+  CYC(b_+108, b_+110); alu_add(gb, 0x02);
+  CALL_C(b_+110, enemySetAnimation_hook, SYM(enemySetAnimation), b_+113);
+  CYC(b_+113, b_+53);
   goto commonInit;
 }
 
 void ramrockArm_state_stub_hook(GB *gb) {
-  RET(0x60d0); return;
+  BASE(ramrockArm_state_stub);
+  RET(b_+0); return;
 }
 
 void ramrockArm_state8_hook(GB *gb) {
+  BASE(ramrockArm_state8);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x60d1, 0x60d3); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x60d3, 0x60d4); A = mem_rd(gb, DE);
-  CYC(0x60d4, 0x60d6); alu_and(gb, 0x7f);
-  CYC(0x60d6, 0x60d7); push_effect(gb, 0x60d7);
-  switch (ramrockArm_jump_table(gb)) {
-    case 0x60e3: ramrockArm_subid0_hook(gb); return;
-    case 0x6248: ramrockArm_subid2_hook(gb); return;
-    case 0x62e6: ramrockArm_subid4_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); alu_and(gb, 0x7f);
+  CYC(b_+5, b_+6); push_effect(gb, b_+6);
+  do { uint16_t jt_ = (ramrockArm_jump_table(gb));
+    if (jt_ == SYM(ramrockArm_subid0)) { ramrockArm_subid0_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid2)) { ramrockArm_subid2_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid4)) { ramrockArm_subid4_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void ramrockArm_subid0_hook(GB *gb) {
+  BASE(ramrockArm_subid0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x60e3, 0x60e5); A = 0x02;
-  CALL_C(0x60e5, objectGetRelatedObject1Var_hook, 0x2160, 0x60e8);
-  CYC(0x60e8, 0x60e9); A = mem_rd(gb, HL);
-  CYC(0x60e9, 0x60eb); alu_cp(gb, 0x04);
+  CYC(b_+0, b_+2); A = 0x02;
+  CALL_C(b_+2, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+5);
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL);
+  CYC(b_+6, b_+8); alu_cp(gb, 0x04);
   if (!(F & FZ)) {
-    CYCT(0x60eb, 0x60ed);
+    CYCT(b_+8, b_+10);
     goto runStates;
   }
-  CYC(0x60eb, 0x60ed);
-  CYC(0x60ed, 0x60ef); E = ENEMY_BASE + OBJ_PRESSED_A_BUTTON;
-  CYC(0x60ef, 0x60f0); A = mem_rd(gb, DE);
-  CYC(0x60f0, 0x60f1); alu_or(gb, A);
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+12); E = ENEMY_BASE + OBJ_PRESSED_A_BUTTON;
+  CYC(b_+12, b_+13); A = mem_rd(gb, DE);
+  CYC(b_+13, b_+14); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x60f1, 0x60f3);
+    CYCT(b_+14, b_+16);
     goto runStates;
   }
-  CYC(0x60f1, 0x60f3);
-  CYC(0x60f3, 0x60f4); A = alu_inc8(gb, A);
-  CYC(0x60f4, 0x60f5); mem_wr(gb, DE, A);
-  CYC(0x60f5, 0x60f7); E = ENEMY_BASE + OBJ_SUBSTATE;
-  CYC(0x60f7, 0x60f9); A = 0x06;
-  CYC(0x60f9, 0x60fa); mem_wr(gb, DE, A);
-  CYC(0x60fa, 0x60fc); A = 0x3c;
-  CYC(0x60fc, 0x60fe); E = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x60fe, 0x60ff); mem_wr(gb, DE, A);
+  CYC(b_+14, b_+16);
+  CYC(b_+16, b_+17); A = alu_inc8(gb, A);
+  CYC(b_+17, b_+18); mem_wr(gb, DE, A);
+  CYC(b_+18, b_+20); E = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+20, b_+22); A = 0x06;
+  CYC(b_+22, b_+23); mem_wr(gb, DE, A);
+  CYC(b_+23, b_+25); A = 0x3c;
+  CYC(b_+25, b_+27); E = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+27, b_+28); mem_wr(gb, DE, A);
 runStates:
-  CYC(0x60ff, 0x6101); E = ENEMY_BASE + OBJ_SUBSTATE;
-  CYC(0x6101, 0x6102); A = mem_rd(gb, DE);
-  CYC(0x6102, 0x6103); push_effect(gb, 0x6103);
-  switch (ramrockArm_jump_table(gb)) {
-    case 0x6111: ramrockArm_subid0_substate0_hook(gb); return;
-    case 0x6141: ramrockArm_subid0_substate1_hook(gb); return;
-    case 0x6152: ramrockArm_subid0_substate2_hook(gb); return;
-    case 0x6187: ramrockArm_subid0_substate3_hook(gb); return;
-    case 0x61d3: ramrockArm_subid0_substate4_hook(gb); return;
-    case 0x61f4: ramrockArm_subid0_substate5_hook(gb); return;
-    case 0x622a: ramrockArm_subid0_substate6_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+28, b_+30); E = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+30, b_+31); A = mem_rd(gb, DE);
+  CYC(b_+31, b_+32); push_effect(gb, b_+32);
+  do { uint16_t jt_ = (ramrockArm_jump_table(gb));
+    if (jt_ == SYM(ramrockArm_subid0_substate0)) { ramrockArm_subid0_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate1)) { ramrockArm_subid0_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate2)) { ramrockArm_subid0_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate3)) { ramrockArm_subid0_substate3_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate4)) { ramrockArm_subid0_substate4_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate5)) { ramrockArm_subid0_substate5_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate6)) { ramrockArm_subid0_substate6_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void ramrockArm_subid0_substate0_hook(GB *gb) {
+  BASE(ramrockArm_subid0_substate0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6111, enemyAnimate_hook, 0x2818, 0x6114);
-  CALL_C(0x6114, objectApplySpeed_hook, 0x201d, 0x6117);
-  CALL_C(0x6117, ecom_decCounter1_b10_hook, 0x439a, 0x611a);
-  if (!(F & FZ)) { RET_TAKEN(0x611a); return; }
-  CYC(0x611a, 0x611b);
-  CYC(0x611b, 0x611d); mem_wr(gb, HL, 0x08);
-  CYC(0x611d, 0x611f); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x611f, 0x6120); A = mem_rd(gb, DE);
-  CYC(0x6120, 0x6121); alu_or(gb, A);
+  CALL_C(b_+0, enemyAnimate_hook, SYM(enemyAnimate), b_+3);
+  CALL_C(b_+3, objectApplySpeed_hook, SYM(objectApplySpeed), b_+6);
+  CALL_C(b_+6, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+9);
+  if (!(F & FZ)) { RET_TAKEN(b_+9); return; }
+  CYC(b_+9, b_+10);
+  CYC(b_+10, b_+12); mem_wr(gb, HL, 0x08);
+  CYC(b_+12, b_+14); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+14, b_+15); A = mem_rd(gb, DE);
+  CYC(b_+15, b_+16); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x6121, 0x6123);
+    CYCT(b_+16, b_+18);
     goto afterDec;
   }
-  CYC(0x6121, 0x6123);
-  CYC(0x6123, 0x6124); A = alu_dec8(gb, A);
+  CYC(b_+16, b_+18);
+  CYC(b_+18, b_+19); A = alu_dec8(gb, A);
 afterDec:
-  CYC(0x6124, 0x6126); L = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x6126, 0x6127); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x6127, 0x6129); alu_and(gb, 0x1f);
-  CYC(0x6129, 0x612a); mem_wr(gb, HL, A);
-  CYC(0x612a, 0x612c); alu_and(gb, 0x0f);
-  CYC(0x612c, 0x612e); alu_cp(gb, 0x08);
-  if (!(F & FZ)) { RET_TAKEN(0x612e); return; }
-  CYC(0x612e, 0x612f);
-  CYC(0x612f, 0x6131); L = ENEMY_BASE + OBJ_SUBSTATE;
-  CYC(0x6131, 0x6132); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6132, 0x6134); L = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x6134, 0x6135); B = mem_rd(gb, HL);
-  CYC(0x6135, 0x6137); L = ENEMY_BASE + OBJ_RELATED1 + 1;
-  CYC(0x6137, 0x6138); H = mem_rd(gb, HL);
-  CYC(0x6138, 0x613a); L = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x613a, 0x613b); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x613b, 0x613d); A = 0x02;
-  CYC(0x613d, 0x613e); alu_add(gb, B);
-  CYC(0x613e, 0x6141);
+  CYC(b_+19, b_+21); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+21, b_+22); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+22, b_+24); alu_and(gb, 0x1f);
+  CYC(b_+24, b_+25); mem_wr(gb, HL, A);
+  CYC(b_+25, b_+27); alu_and(gb, 0x0f);
+  CYC(b_+27, b_+29); alu_cp(gb, 0x08);
+  if (!(F & FZ)) { RET_TAKEN(b_+29); return; }
+  CYC(b_+29, b_+30);
+  CYC(b_+30, b_+32); L = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+32, b_+33); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+33, b_+35); L = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+35, b_+36); B = mem_rd(gb, HL);
+  CYC(b_+36, b_+38); L = ENEMY_BASE + OBJ_RELATED1 + 1;
+  CYC(b_+38, b_+39); H = mem_rd(gb, HL);
+  CYC(b_+39, b_+41); L = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+41, b_+42); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+42, b_+44); A = 0x02;
+  CYC(b_+44, b_+45); alu_add(gb, B);
+  CYC(b_+45, SYM(ramrockArm_subid0_substate1));
   enemySetAnimation_hook(gb);
 }
 
 void ramrockArm_subid0_substate1_hook(GB *gb) {
+  BASE(ramrockArm_subid0_substate1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6141, enemyAnimate_hook, 0x2818, 0x6144);
-  CALL_C(0x6144, ramrockArm_setRelativePosition_hook, 0x63b0, 0x6147);
-  CYC(0x6147, 0x6149); L = ENEMY_BASE + OBJ_RELATED1 + 1;
-  CYC(0x6149, 0x614a); H = mem_rd(gb, HL);
-  CYC(0x614a, 0x614c); L = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x614c, 0x614e); A = 0x03;
-  CYC(0x614e, 0x614f); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { RET_TAKEN(0x614f); return; }
-  CYC(0x614f, 0x6150);
-  CYC(0x6150, 0x6152);
+  CALL_C(b_+0, enemyAnimate_hook, SYM(enemyAnimate), b_+3);
+  CALL_C(b_+3, ramrockArm_setRelativePosition_hook, SYM(ramrockArm_setRelativePosition), b_+6);
+  CYC(b_+6, b_+8); L = ENEMY_BASE + OBJ_RELATED1 + 1;
+  CYC(b_+8, b_+9); H = mem_rd(gb, HL);
+  CYC(b_+9, b_+11); L = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+11, b_+13); A = 0x03;
+  CYC(b_+13, b_+14); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { RET_TAKEN(b_+14); return; }
+  CYC(b_+14, b_+15);
+  CYC(b_+15, SYM(ramrockArm_subid0_substate2));
   ramrockArm_subid0_moveBackToRamrock_hook(gb);
 }
 
 void ramrockArm_subid0_substate2_hook(GB *gb) {
+  BASE(ramrockArm_subid0_substate2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6152, enemyAnimate_hook, 0x2818, 0x6155);
-  CALL_C(0x6155, ramrockArm_setRelativePosition_hook, 0x63b0, 0x6158);
-  CALL_C(0x6158, ecom_decCounter2_b10_hook, 0x43a3, 0x615b);
-  if (!(F & FZ)) { RET_TAKEN(0x615b); return; }
-  CYC(0x615b, 0x615c);
-  CYC(0x615c, 0x615e); B = 0x04;
-  CALL_C(0x615e, objectCheckCenteredWithLink_hook, 0x1fee, 0x6161);
-  if (!(F & FC)) { RET_TAKEN(0x6161); return; }
-  CYC(0x6161, 0x6162);
-  CALL_C(0x6162, objectGetAngleTowardLink_hook, 0x1e9c, 0x6165);
-  CYC(0x6165, 0x6167); alu_cp(gb, 0x10);
-  if (!(F & FZ)) { RET_TAKEN(0x6167); return; }
-  CYC(0x6167, 0x6168);
-  CALL_C(0x6168, ecom_incSubstate_b10_hook, 0x4005, 0x616b);
-  CYC(0x616b, 0x616d); L = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x616d, 0x616e); mem_wr(gb, HL, A);
-  CYC(0x616e, 0x6170); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x6170, 0x6172); mem_wr(gb, HL, 0x06);
-  CYC(0x6172, 0x6174); L = ENEMY_BASE + OBJ_USE_TEXT_ID;
-  CYC(0x6174, 0x6176); mem_wr(gb, HL, 0x00);
-  CYC(0x6176, 0x6178); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x6178, 0x617a); mem_wr(gb, HL, 0x28);
-  CYC(0x617a, 0x617c); L = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x617c, 0x617e); A = 0x00;
-  CYC(0x617e, 0x617f); alu_add(gb, mem_rd(gb, HL));
-  CALL_C(0x617f, enemySetAnimation_hook, 0x282b, 0x6182);
-  CYC(0x6182, 0x6184); A = 0xb1;
-  CYC(0x6184, 0x6187);
+  CALL_C(b_+0, enemyAnimate_hook, SYM(enemyAnimate), b_+3);
+  CALL_C(b_+3, ramrockArm_setRelativePosition_hook, SYM(ramrockArm_setRelativePosition), b_+6);
+  CALL_C(b_+6, ecom_decCounter2_b10_hook, SYM(ecom_decCounter2_b10), b_+9);
+  if (!(F & FZ)) { RET_TAKEN(b_+9); return; }
+  CYC(b_+9, b_+10);
+  CYC(b_+10, b_+12); B = 0x04;
+  CALL_C(b_+12, objectCheckCenteredWithLink_hook, SYM(objectCheckCenteredWithLink), b_+15);
+  if (!(F & FC)) { RET_TAKEN(b_+15); return; }
+  CYC(b_+15, b_+16);
+  CALL_C(b_+16, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+19);
+  CYC(b_+19, b_+21); alu_cp(gb, 0x10);
+  if (!(F & FZ)) { RET_TAKEN(b_+21); return; }
+  CYC(b_+21, b_+22);
+  CALL_C(b_+22, ecom_incSubstate_b10_hook, SYM(ecom_incSubstate_b10), b_+25);
+  CYC(b_+25, b_+27); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+27, b_+28); mem_wr(gb, HL, A);
+  CYC(b_+28, b_+30); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+30, b_+32); mem_wr(gb, HL, 0x06);
+  CYC(b_+32, b_+34); L = ENEMY_BASE + OBJ_USE_TEXT_ID;
+  CYC(b_+34, b_+36); mem_wr(gb, HL, 0x00);
+  CYC(b_+36, b_+38); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+38, b_+40); mem_wr(gb, HL, 0x28);
+  CYC(b_+40, b_+42); L = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+42, b_+44); A = 0x00;
+  CYC(b_+44, b_+45); alu_add(gb, mem_rd(gb, HL));
+  CALL_C(b_+45, enemySetAnimation_hook, SYM(enemySetAnimation), b_+48);
+  CYC(b_+48, b_+50); A = 0xb1;
+  CYC(b_+50, SYM(ramrockArm_subid0_substate3));
   playSound_b00_hook(gb);
 }
 
 void ramrockArm_subid0_substate3_hook(GB *gb) {
+  BASE(ramrockArm_subid0_substate3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6187, objectApplySpeed_hook, 0x201d, 0x618a);
-  CYC(0x618a, 0x618c); E = ENEMY_BASE + OBJ_VAR2A;
-  CYC(0x618c, 0x618d); A = mem_rd(gb, DE);
-  CYC(0x618d, 0x618f); alu_cp(gb, 0x80);
+  CALL_C(b_+0, objectApplySpeed_hook, SYM(objectApplySpeed), b_+3);
+  CYC(b_+3, b_+5); E = ENEMY_BASE + OBJ_VAR2A;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+8); alu_cp(gb, 0x80);
   if (F & FZ) {
-    CYCT(0x618f, 0x6191);
+    CYCT(b_+8, b_+10);
     ramrockArm_subid0_moveBackToRamrock_hook(gb);
     return;
   }
-  CYC(0x618f, 0x6191);
-  CYC(0x6191, 0x6193); alu_cp(gb, 0x84);
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+12); alu_cp(gb, 0x84);
   if (F & FZ) {
-    CYCT(0x6193, 0x6195);
+    CYCT(b_+12, b_+14);
     goto sword;
   }
-  CYC(0x6193, 0x6195);
-  CYC(0x6195, 0x6197); alu_cp(gb, 0x85);
+  CYC(b_+12, b_+14);
+  CYC(b_+14, b_+16); alu_cp(gb, 0x85);
   if (F & FZ) {
-    CYCT(0x6197, 0x6199);
+    CYCT(b_+16, b_+18);
     goto sword;
   }
-  CYC(0x6197, 0x6199);
-  CYC(0x6199, 0x619b); alu_cp(gb, 0x86);
+  CYC(b_+16, b_+18);
+  CYC(b_+18, b_+20); alu_cp(gb, 0x86);
   if (!(F & FZ)) {
-    CYCT(0x619b, 0x619d);
+    CYCT(b_+20, b_+22);
     goto moveTowardLink;
   }
-  CYC(0x619b, 0x619d);
+  CYC(b_+20, b_+22);
 sword:
-  CYC(0x619d, 0x619f); E = ENEMY_BASE + OBJ_SUBSTATE;
-  CYC(0x619f, 0x61a1); A = 0x05;
-  CYC(0x61a1, 0x61a2); mem_wr(gb, DE, A);
-  CYC(0x61a2, 0x61a4); A = 0x50;
-  CYC(0x61a4, 0x61a6); E = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x61a6, 0x61a7); mem_wr(gb, DE, A);
-  CYC(0x61a7, 0x61a9); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x61a9, 0x61aa); A = mem_rd(gb, DE);
-  CYC(0x61aa, 0x61ac); alu_xor(gb, 0x10);
-  CYC(0x61ac, 0x61ad); mem_wr(gb, DE, A);
-  RET(0x61ad); return;
+  CYC(b_+22, b_+24); E = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+24, b_+26); A = 0x05;
+  CYC(b_+26, b_+27); mem_wr(gb, DE, A);
+  CYC(b_+27, b_+29); A = 0x50;
+  CYC(b_+29, b_+31); E = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+31, b_+32); mem_wr(gb, DE, A);
+  CYC(b_+32, b_+34); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+34, b_+35); A = mem_rd(gb, DE);
+  CYC(b_+35, b_+37); alu_xor(gb, 0x10);
+  CYC(b_+37, b_+38); mem_wr(gb, DE, A);
+  RET(b_+38); return;
 moveTowardLink:
-  CALL_C(0x61ae, ecom_getSideviewAdjacentWallsBitset_b10_hook, 0x420b, 0x61b1);
+  CALL_C(b_+39, ecom_getSideviewAdjacentWallsBitset_b10_hook, SYM(ecom_getSideviewAdjacentWallsBitset_b10), b_+42);
   if (!(F & FZ)) {
-    CYCT(0x61b1, 0x61b3);
+    CYCT(b_+42, b_+44);
     ramrockArm_subid0_moveBackToRamrock_hook(gb);
     return;
   }
-  CYC(0x61b1, 0x61b3);
-  CALL_C(0x61b3, ecom_decCounter1_b10_hook, 0x439a, 0x61b6);
-  if (!(F & FZ)) { RET_TAKEN(0x61b6); return; }
-  CYC(0x61b6, 0x61b7);
-  CYC(0x61b7, 0x61b9); mem_wr(gb, HL, 0x06);
-  CALL_C(0x61b9, objectGetAngleTowardLink_hook, 0x1e9c, 0x61bc);
-  CYC(0x61bc, 0x61bf);
+  CYC(b_+42, b_+44);
+  CALL_C(b_+44, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+47);
+  if (!(F & FZ)) { RET_TAKEN(b_+47); return; }
+  CYC(b_+47, b_+48);
+  CYC(b_+48, b_+50); mem_wr(gb, HL, 0x06);
+  CALL_C(b_+50, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+53);
+  CYC(b_+53, SYM(ramrockArm_subid0_moveBackToRamrock));
   objectNudgeAngleTowards_hook(gb);
 }
 
 void ramrockArm_subid0_moveBackToRamrock_hook(GB *gb) {
-  CYC(0x61bf, 0x61c1); E = ENEMY_BASE + OBJ_SUBSTATE;
-  CYC(0x61c1, 0x61c3); A = 0x04;
-  CYC(0x61c3, 0x61c4); mem_wr(gb, DE, A);
-  CYC(0x61c4, 0x61c6); E = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x61c6, 0x61c8); A = 0x3c;
-  CYC(0x61c8, 0x61c9); mem_wr(gb, DE, A);
+  BASE(ramrockArm_subid0_moveBackToRamrock);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+2, b_+4); A = 0x04;
+  CYC(b_+4, b_+5); mem_wr(gb, DE, A);
+  CYC(b_+5, b_+7); E = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+7, b_+9); A = 0x3c;
+  CYC(b_+9, SYM(ramrockArm_subid0_setAngleTowardRamrock)); mem_wr(gb, DE, A);
   ramrockArm_subid0_setAngleTowardRamrock_hook(gb);
 }
 
 void ramrockArm_subid0_setAngleTowardRamrock_hook(GB *gb) {
+  BASE(ramrockArm_subid0_setAngleTowardRamrock);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x61c9, ramrockArm_getRelativePosition_hook, 0x63dd, 0x61cc);
-  CALL_C(0x61cc, objectGetRelativeAngle_hook, 0x1ea4, 0x61cf);
-  CYC(0x61cf, 0x61d1); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x61d1, 0x61d2); mem_wr(gb, DE, A);
-  RET(0x61d2); return;
+  CALL_C(b_+0, ramrockArm_getRelativePosition_hook, SYM(ramrockArm_getRelativePosition), b_+3);
+  CALL_C(b_+3, objectGetRelativeAngle_hook, SYM(objectGetRelativeAngle), b_+6);
+  CYC(b_+6, b_+8); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+8, b_+9); mem_wr(gb, DE, A);
+  RET(b_+9); return;
 }
 
 void ramrockArm_subid0_substate4_hook(GB *gb) {
+  BASE(ramrockArm_subid0_substate4);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x61d3, objectApplySpeed_hook, 0x201d, 0x61d6);
-  CALL_C(0x61d6, ramrockArm_subid0_setAngleTowardRamrock_hook, 0x61c9, 0x61d9);
-  CALL_C(0x61d9, ramrockArm_subid0_checkReachedRamrock_hook, 0x63bb, 0x61dc);
-  if (!(F & FZ)) { RET_TAKEN(0x61dc); return; }
-  CYC(0x61dc, 0x61dd);
-  CYC(0x61dd, 0x61df); A = 0x52;
-  CALL_C(0x61df, playSound_b00_hook, 0x0c98, 0x61e2);
-  CYC(0x61e2, 0x61e4); E = ENEMY_BASE + OBJ_SUBSTATE;
-  CYC(0x61e4, 0x61e6); A = 0x02;
-  CYC(0x61e6, 0x61e7); mem_wr(gb, DE, A);
-  CYC(0x61e7, 0x61e9); E = ENEMY_BASE + OBJ_COUNTER2;
-  CYC(0x61e9, 0x61eb); A = 0x3c;
-  CYC(0x61eb, 0x61ec); mem_wr(gb, DE, A);
-  CYC(0x61ec, 0x61ee); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x61ee, 0x61ef); A = mem_rd(gb, DE);
-  CYC(0x61ef, 0x61f1); alu_add(gb, 0x02);
-  CYC(0x61f1, 0x61d3);
+  CALL_C(b_+0, objectApplySpeed_hook, SYM(objectApplySpeed), b_+3);
+  CALL_C(b_+3, ramrockArm_subid0_setAngleTowardRamrock_hook, SYM(ramrockArm_subid0_setAngleTowardRamrock), b_+6);
+  CALL_C(b_+6, ramrockArm_subid0_checkReachedRamrock_hook, SYM(ramrockArm_subid0_checkReachedRamrock), b_+9);
+  if (!(F & FZ)) { RET_TAKEN(b_+9); return; }
+  CYC(b_+9, b_+10);
+  CYC(b_+10, b_+12); A = 0x52;
+  CALL_C(b_+12, playSound_b00_hook, SYM(playSound_b00), b_+15);
+  CYC(b_+15, b_+17); E = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+17, b_+19); A = 0x02;
+  CYC(b_+19, b_+20); mem_wr(gb, DE, A);
+  CYC(b_+20, b_+22); E = ENEMY_BASE + OBJ_COUNTER2;
+  CYC(b_+22, b_+24); A = 0x3c;
+  CYC(b_+24, b_+25); mem_wr(gb, DE, A);
+  CYC(b_+25, b_+27); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+27, b_+28); A = mem_rd(gb, DE);
+  CYC(b_+28, b_+30); alu_add(gb, 0x02);
+  CYC(b_+30, b_+0);
   enemySetAnimation_hook(gb);
 }
 
 void ramrockArm_subid0_substate5_hook(GB *gb) {
+  BASE(ramrockArm_subid0_substate5);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x61f4, enemyAnimate_hook, 0x2818, 0x61f7);
-  CYC(0x61f7, 0x61f9); E = ENEMY_BASE + OBJ_USE_TEXT_ID;
-  CYC(0x61f9, 0x61fa); A = mem_rd(gb, DE);
-  CYC(0x61fa, 0x61fb); alu_or(gb, A);
+  CALL_C(b_+0, enemyAnimate_hook, SYM(enemyAnimate), b_+3);
+  CYC(b_+3, b_+5); E = ENEMY_BASE + OBJ_USE_TEXT_ID;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+7); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x61fb, 0x61fd);
+    CYCT(b_+7, b_+9);
     goto noDamage;
   }
-  CYC(0x61fb, 0x61fd);
-  CYC(0x61fd, 0x61ff); A = 0x00;
-  CALL_C(0x61ff, objectGetRelatedObject1Var_hook, 0x2160, 0x6202);
-  CALL_C(0x6202, checkObjectsCollided_hook, 0x1d5a, 0x6205);
+  CYC(b_+7, b_+9);
+  CYC(b_+9, b_+11); A = 0x00;
+  CALL_C(b_+11, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+14);
+  CALL_C(b_+14, checkObjectsCollided_hook, SYM(checkObjectsCollided), b_+17);
   if (!(F & FC)) {
-    CYCT(0x6205, 0x6207);
+    CYCT(b_+17, b_+19);
     goto noDamage;
   }
-  CYC(0x6205, 0x6207);
-  CYC(0x6207, 0x6209); E = ENEMY_BASE + OBJ_USE_TEXT_ID;
-  CYC(0x6209, 0x620b); A = 0x01;
-  CYC(0x620b, 0x620c); mem_wr(gb, DE, A);
-  CYC(0x620c, 0x620e); L = ENEMY_BASE + OBJ_INVINCIBILITY_COUNTER;
-  CYC(0x620e, 0x620f); A = mem_rd(gb, HL);
-  CYC(0x620f, 0x6210); alu_or(gb, A);
+  CYC(b_+17, b_+19);
+  CYC(b_+19, b_+21); E = ENEMY_BASE + OBJ_USE_TEXT_ID;
+  CYC(b_+21, b_+23); A = 0x01;
+  CYC(b_+23, b_+24); mem_wr(gb, DE, A);
+  CYC(b_+24, b_+26); L = ENEMY_BASE + OBJ_INVINCIBILITY_COUNTER;
+  CYC(b_+26, b_+27); A = mem_rd(gb, HL);
+  CYC(b_+27, b_+28); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x6210, 0x6212);
+    CYCT(b_+28, b_+30);
     goto noDamage;
   }
-  CYC(0x6210, 0x6212);
-  CYC(0x6212, 0x6214); mem_wr(gb, HL, 0x3c);
-  CYC(0x6214, 0x6216); L = ENEMY_BASE + OBJ_SCRIPT_RET;
-  CYC(0x6216, 0x6217); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6217, 0x6219); A = 0x63;
-  CALL_C(0x6219, playSound_b00_hook, 0x0c98, 0x621c);
+  CYC(b_+28, b_+30);
+  CYC(b_+30, b_+32); mem_wr(gb, HL, 0x3c);
+  CYC(b_+32, b_+34); L = ENEMY_BASE + OBJ_SCRIPT_RET;
+  CYC(b_+34, b_+35); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+35, b_+37); A = 0x63;
+  CALL_C(b_+37, playSound_b00_hook, SYM(playSound_b00), b_+40);
 noDamage:
-  CYC(0x621c, 0x621d); alu_xor(gb, A);
-  CALL_C(0x621d, ecom_getSideviewAdjacentWallsBitset_b10_hook, 0x420b, 0x6220);
+  CYC(b_+40, b_+41); alu_xor(gb, A);
+  CALL_C(b_+41, ecom_getSideviewAdjacentWallsBitset_b10_hook, SYM(ecom_getSideviewAdjacentWallsBitset_b10), b_+44);
   if (F & FZ) {
-    CYCT(0x6220, 0x6223);
+    CYCT(b_+44, b_+47);
     objectApplySpeed_hook(gb);
     return;
   }
-  CYC(0x6220, 0x6223);
-  CYC(0x6223, 0x6225); E = ENEMY_BASE + OBJ_ANIM_PARAMETER;
-  CYC(0x6225, 0x6226); A = mem_rd(gb, DE);
-  CYC(0x6226, 0x6227); alu_or(gb, A);
-  if (F & FZ) { RET_TAKEN(0x6227); return; }
-  CYC(0x6227, 0x6228);
-  CYC(0x6228, 0x622a);
+  CYC(b_+44, b_+47);
+  CYC(b_+47, b_+49); E = ENEMY_BASE + OBJ_ANIM_PARAMETER;
+  CYC(b_+49, b_+50); A = mem_rd(gb, DE);
+  CYC(b_+50, b_+51); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+51); return; }
+  CYC(b_+51, b_+52);
+  CYC(b_+52, SYM(ramrockArm_subid0_substate6));
   ramrockArm_subid0_moveBackToRamrock_hook(gb);
 }
 
 void ramrockArm_subid0_substate6_hook(GB *gb) {
+  BASE(ramrockArm_subid0_substate6);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x622a, 0x622c); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x622c, 0x622d); A = mem_rd(gb, DE);
-  CYC(0x622d, 0x622f); alu_add(gb, 0x04);
-  CYC(0x622f, 0x6230); B = A;
-  CYC(0x6230, 0x6232); A = 0x02;
-  CALL_C(0x6232, objectGetRelatedObject1Var_hook, 0x2160, 0x6235);
-  CYC(0x6235, 0x6236); A = mem_rd(gb, HL);
-  CYC(0x6236, 0x6237); alu_cp(gb, B);
-  if (!(F & FZ)) { RET_TAKEN(0x6237); return; }
-  CYC(0x6237, 0x6238);
-  CALL_C(0x6238, ecom_decCounter1_b10_hook, 0x439a, 0x623b);
-  if (!(F & FZ)) { RET_TAKEN(0x623b); return; }
-  CYC(0x623b, 0x623c);
-  CALL_C(0x623c, objectCreatePuff_hook, 0x24c1, 0x623f);
-  CYC(0x623f, 0x6241); A = 0x02;
-  CALL_C(0x6241, objectGetRelatedObject1Var_hook, 0x2160, 0x6244);
-  CYC(0x6244, 0x6245); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6245, 0x6248);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); alu_add(gb, 0x04);
+  CYC(b_+5, b_+6); B = A;
+  CYC(b_+6, b_+8); A = 0x02;
+  CALL_C(b_+8, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+11);
+  CYC(b_+11, b_+12); A = mem_rd(gb, HL);
+  CYC(b_+12, b_+13); alu_cp(gb, B);
+  if (!(F & FZ)) { RET_TAKEN(b_+13); return; }
+  CYC(b_+13, b_+14);
+  CALL_C(b_+14, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+17);
+  if (!(F & FZ)) { RET_TAKEN(b_+17); return; }
+  CYC(b_+17, b_+18);
+  CALL_C(b_+18, objectCreatePuff_hook, SYM(objectCreatePuff), b_+21);
+  CYC(b_+21, b_+23); A = 0x02;
+  CALL_C(b_+23, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+26);
+  CYC(b_+26, b_+27); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+27, SYM(ramrockArm_subid2));
   ramrockArm_deleteSelf_hook(gb);
 }
 
 void ramrockArm_setRelativePosition_hook(GB *gb) {
+  BASE(ramrockArm_setRelativePosition);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x63b0, ramrockArm_getRelativePosition_hook, 0x63dd, 0x63b3);
-  CYC(0x63b3, 0x63b4); H = D;
-  CYC(0x63b4, 0x63b6); L = ENEMY_BASE + OBJ_YH;
-  CYC(0x63b6, 0x63b7); mem_wr(gb, HL, B);
-  CYC(0x63b7, 0x63b9); L = ENEMY_BASE + OBJ_XH;
-  CYC(0x63b9, 0x63ba); mem_wr(gb, HL, C);
-  RET(0x63ba); return;
+  CALL_C(b_+0, ramrockArm_getRelativePosition_hook, SYM(ramrockArm_getRelativePosition), b_+3);
+  CYC(b_+3, b_+4); H = D;
+  CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_YH;
+  CYC(b_+6, b_+7); mem_wr(gb, HL, B);
+  CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_XH;
+  CYC(b_+9, b_+10); mem_wr(gb, HL, C);
+  RET(b_+10); return;
 }
 
 void ramrockArm_subid0_checkReachedRamrock_hook(GB *gb) {
+  BASE(ramrockArm_subid0_checkReachedRamrock);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x63bb, ramrockArm_getRelativePosition_hook, 0x63dd, 0x63be);
-  CYC(0x63be, 0x63c0); E = 0x02;
+  CALL_C(b_+0, ramrockArm_getRelativePosition_hook, SYM(ramrockArm_getRelativePosition), b_+3);
+  CYC(b_+3, SYM(ramrockArm_checkPositionAtRamrock)); E = 0x02;
   ramrockArm_checkPositionAtRamrock_hook(gb);
 }
 
 void ramrockArm_checkPositionAtRamrock_hook(GB *gb) {
-  CYC(0x63c0, 0x63c1); H = D;
-  CYC(0x63c1, 0x63c3); L = ENEMY_BASE + OBJ_YH;
-  CYC(0x63c3, 0x63c4); A = E;
-  CYC(0x63c4, 0x63c5); alu_add(gb, B);
-  CYC(0x63c5, 0x63c6); alu_cp(gb, mem_rd(gb, HL));
+  BASE(ramrockArm_checkPositionAtRamrock);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = ENEMY_BASE + OBJ_YH;
+  CYC(b_+3, b_+4); A = E;
+  CYC(b_+4, b_+5); alu_add(gb, B);
+  CYC(b_+5, b_+6); alu_cp(gb, mem_rd(gb, HL));
   if (F & FC) {
-    CYCT(0x63c6, 0x63c8);
+    CYCT(b_+6, b_+8);
     label_10_212_hook(gb);
     return;
   }
-  CYC(0x63c6, 0x63c8);
-  CYC(0x63c8, 0x63c9); alu_sub(gb, E);
+  CYC(b_+6, b_+8);
+  CYC(b_+8, SYM(label_10_211)); alu_sub(gb, E);
   label_10_211_hook(gb);
 }
 
 void label_10_211_hook(GB *gb) {
-  CYC(0x63c9, 0x63ca); alu_sub(gb, E);
-  CYC(0x63ca, 0x63cb); alu_cp(gb, mem_rd(gb, HL));
+  BASE(label_10_211);
+  CYC(b_+0, b_+1); alu_sub(gb, E);
+  CYC(b_+1, b_+2); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FC)) {
-    CYCT(0x63cb, 0x63cd);
+    CYCT(b_+2, b_+4);
     label_10_212_hook(gb);
     return;
   }
-  CYC(0x63cb, 0x63cd);
-  CYC(0x63cd, 0x63cf); L = ENEMY_BASE + OBJ_XH;
-  CYC(0x63cf, 0x63d0); A = E;
-  CYC(0x63d0, 0x63d1); alu_add(gb, C);
-  CYC(0x63d1, 0x63d2); alu_cp(gb, mem_rd(gb, HL));
+  CYC(b_+2, b_+4);
+  CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_XH;
+  CYC(b_+6, b_+7); A = E;
+  CYC(b_+7, b_+8); alu_add(gb, C);
+  CYC(b_+8, b_+9); alu_cp(gb, mem_rd(gb, HL));
   if (F & FC) {
-    CYCT(0x63d2, 0x63d4);
+    CYCT(b_+9, b_+11);
     label_10_212_hook(gb);
     return;
   }
-  CYC(0x63d2, 0x63d4);
-  CYC(0x63d4, 0x63d5); alu_sub(gb, E);
-  CYC(0x63d5, 0x63d6); alu_sub(gb, E);
-  CYC(0x63d6, 0x63d7); alu_cp(gb, mem_rd(gb, HL));
+  CYC(b_+9, b_+11);
+  CYC(b_+11, b_+12); alu_sub(gb, E);
+  CYC(b_+12, b_+13); alu_sub(gb, E);
+  CYC(b_+13, b_+14); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FC)) {
-    CYCT(0x63d7, 0x63d9);
+    CYCT(b_+14, b_+16);
     label_10_212_hook(gb);
     return;
   }
-  CYC(0x63d7, 0x63d9);
-  CYC(0x63d9, 0x63da); alu_xor(gb, A);
-  RET(0x63da); return;
+  CYC(b_+14, b_+16);
+  CYC(b_+16, b_+17); alu_xor(gb, A);
+  RET(b_+17); return;
 }
 
 void label_10_212_hook(GB *gb) {
-  CYC(0x63db, 0x63dc); alu_or(gb, D);
-  RET(0x63dc); return;
+  BASE(label_10_212);
+  CYC(b_+0, b_+1); alu_or(gb, D);
+  RET(b_+1); return;
 }
 
 void ramrockArm_subid2_copyRamrockPosition_hook(GB *gb) {
+  BASE(ramrockArm_subid2_copyRamrockPosition);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x63f5, 0x63f7); A = 0x0b;
-  CALL_C(0x63f7, objectGetRelatedObject1Var_hook, 0x2160, 0x63fa);
-  CYC(0x63fa, 0x63fb); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x63fb, 0x63fd); alu_add(gb, 0x08);
-  CYC(0x63fd, 0x63fe); B = A;
-  CYC(0x63fe, 0x63ff); L = alu_inc8(gb, L);
-  CYC(0x63ff, 0x6400); A = mem_rd(gb, HL);
-  CYC(0x6400, 0x6401); H = D;
-  CYC(0x6401, 0x6403); L = ENEMY_BASE + OBJ_XH;
-  CYC(0x6403, 0x6404); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(0x6404, 0x6405); L = alu_dec8(gb, L);
-  CYC(0x6405, 0x6406); mem_wr(gb, HL, B);
-  RET(0x6406); return;
+  CYC(b_+0, b_+2); A = 0x0b;
+  CALL_C(b_+2, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+5);
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+6, b_+8); alu_add(gb, 0x08);
+  CYC(b_+8, b_+9); B = A;
+  CYC(b_+9, b_+10); L = alu_inc8(gb, L);
+  CYC(b_+10, b_+11); A = mem_rd(gb, HL);
+  CYC(b_+11, b_+12); H = D;
+  CYC(b_+12, b_+14); L = ENEMY_BASE + OBJ_XH;
+  CYC(b_+14, b_+15); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+15, b_+16); L = alu_dec8(gb, L);
+  CYC(b_+16, b_+17); mem_wr(gb, HL, B);
+  RET(b_+17); return;
 }
 
 void ramrockArm_deleteSelf_hook(GB *gb) {
+  BASE(ramrockArm_deleteSelf);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x62e0, decNumEnemies_hook, 0x24b3, 0x62e3);
-  CYC(0x62e3, 0x62e6);
+  CALL_C(b_+0, decNumEnemies_hook, SYM(decNumEnemies), b_+3);
+  CYC(b_+3, SYM(ramrockArm_subid4));
   enemyDelete_hook(gb);
 }
 
 void ramrockArm_subid2_hook(GB *gb) {
+  BASE(ramrockArm_subid2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6248, 0x624a); E = ENEMY_BASE + OBJ_SUBSTATE;
-  CYC(0x624a, 0x624b); A = mem_rd(gb, DE);
-  CYC(0x624b, 0x624c); push_effect(gb, 0x624c);
-  switch (ramrockArm_jump_table(gb)) {
-    case 0x6252: ramrockArm_subid2_substate0_hook(gb); return;
-    case 0x6267: ramrockArm_subid2_substate1_hook(gb); return;
-    case 0x627c: ramrockArm_subid2_substate2_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (ramrockArm_jump_table(gb));
+    if (jt_ == SYM(ramrockArm_subid2_substate0)) { ramrockArm_subid2_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid2_substate1)) { ramrockArm_subid2_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid2_substate2)) { ramrockArm_subid2_substate2_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void ramrockArm_subid2_substate0_hook(GB *gb) {
+  BASE(ramrockArm_subid2_substate0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6252, 0x6254); C = 0x10;
-  CALL_C(0x6254, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x6257);
-  if (!(F & FZ)) { RET_TAKEN(0x6257); return; }
-  CYC(0x6257, 0x6258);
-  CYC(0x6258, 0x625a); A = 0x02;
-  CALL_C(0x625a, objectGetRelatedObject1Var_hook, 0x2160, 0x625d);
-  CYC(0x625d, 0x625f); mem_wr(gb, HL, 0x07);
-  CYC(0x625f, 0x6261); A = 0x85;
-  CALL_C(0x6261, playSound_b00_hook, 0x0c98, 0x6264);
-  CYC(0x6264, 0x6267);
+  CYC(b_+0, b_+2); C = 0x10;
+  CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
+  if (!(F & FZ)) { RET_TAKEN(b_+5); return; }
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+8); A = 0x02;
+  CALL_C(b_+8, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+11);
+  CYC(b_+11, b_+13); mem_wr(gb, HL, 0x07);
+  CYC(b_+13, b_+15); A = 0x85;
+  CALL_C(b_+15, playSound_b00_hook, SYM(playSound_b00), b_+18);
+  CYC(b_+18, SYM(ramrockArm_subid2_substate1));
   ecom_incSubstate_b10_hook(gb);
 }
 
 void ramrockArm_subid2_substate1_hook(GB *gb) {
+  BASE(ramrockArm_subid2_substate1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6267, 0x6269); A = 0x02;
-  CALL_C(0x6269, objectGetRelatedObject1Var_hook, 0x2160, 0x626c);
-  CYC(0x626c, 0x626d); A = mem_rd(gb, HL);
-  CYC(0x626d, 0x626f); alu_cp(gb, 0x08);
-  if (!(F & FZ)) { RET_TAKEN(0x626f); return; }
-  CYC(0x626f, 0x6270);
-  CYC(0x6270, 0x6271); H = D;
-  CYC(0x6271, 0x6272); A = mem_rd(gb, HL);
-  CYC(0x6272, 0x6273); alu_rrca(gb);
+  CYC(b_+0, b_+2); A = 0x02;
+  CALL_C(b_+2, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+5);
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL);
+  CYC(b_+6, b_+8); alu_cp(gb, 0x08);
+  if (!(F & FZ)) { RET_TAKEN(b_+8); return; }
+  CYC(b_+8, b_+9);
+  CYC(b_+9, b_+10); H = D;
+  CYC(b_+10, b_+11); A = mem_rd(gb, HL);
+  CYC(b_+11, b_+12); alu_rrca(gb);
   if (F & FC) {
-    CYCT(0x6273, 0x6275);
+    CYCT(b_+12, b_+14);
     ramrockArm_deleteSelf_hook(gb);
     return;
   }
-  CYC(0x6273, 0x6275);
-  CYC(0x6275, 0x6277); L = ENEMY_BASE + OBJ_VISIBLE;
-  CYC(0x6277, 0x6279); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
-  CYC(0x6279, 0x627c);
+  CYC(b_+12, b_+14);
+  CYC(b_+14, b_+16); L = ENEMY_BASE + OBJ_VISIBLE;
+  CYC(b_+16, b_+18); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
+  CYC(b_+18, SYM(ramrockArm_subid2_substate2));
   ecom_incSubstate_b10_hook(gb);
 }
 
 void ramrockArm_subid2_substate2_hook(GB *gb) {
+  BASE(ramrockArm_subid2_substate2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x627c, ramrockArm_subid2_copyRamrockPosition_hook, 0x63f5, 0x627f);
-  CYC(0x627f, 0x6281); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
-  CYC(0x6281, 0x6283); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
-  CYC(0x6283, 0x6285); A = 0x02;
-  CALL_C(0x6285, objectGetRelatedObject1Var_hook, 0x2160, 0x6288);
-  CYC(0x6288, 0x6289); A = mem_rd(gb, HL);
-  CYC(0x6289, 0x628b); alu_cp(gb, 0x0a);
+  CALL_C(b_+0, ramrockArm_subid2_copyRamrockPosition_hook, SYM(ramrockArm_subid2_copyRamrockPosition), b_+3);
+  CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
+  CYC(b_+5, b_+7); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
+  CYC(b_+7, b_+9); A = 0x02;
+  CALL_C(b_+9, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+12);
+  CYC(b_+12, b_+13); A = mem_rd(gb, HL);
+  CYC(b_+13, b_+15); alu_cp(gb, 0x0a);
   if (F & FZ) {
-    CYCT(0x628b, 0x628d);
+    CYCT(b_+15, b_+17);
     goto relatedSubid0a;
   }
-  CYC(0x628b, 0x628d);
-  CYC(0x628d, 0x628f); alu_cp(gb, 0x09);
-  if (!(F & FZ)) { RET_TAKEN(0x628f); return; }
-  CYC(0x628f, 0x6290);
+  CYC(b_+15, b_+17);
+  CYC(b_+17, b_+19); alu_cp(gb, 0x09);
+  if (!(F & FZ)) { RET_TAKEN(b_+19); return; }
+  CYC(b_+19, b_+20);
 relatedSubid09:
-  CYC(0x6290, 0x6291); H = D;
-  CYC(0x6291, 0x6293); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
-  CYC(0x6293, 0x6295); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  CYC(0x6295, 0x6297); C = 0x03;
-  CALL_C(0x6297, findItemWithID_hook, 0x22b9, 0x629a);
-  if (!(F & FZ)) { RET_TAKEN(0x629a); return; }
-  CYC(0x629a, 0x629b);
-  CYC(0x629b, 0x629d); L = 0x0b;
-  CYC(0x629d, 0x629e); B = mem_rd(gb, HL);
-  CYC(0x629e, 0x62a0); L = 0x0d;
-  CYC(0x62a0, 0x62a1); C = mem_rd(gb, HL);
-  PUSH(0x62a1, HL);
-  CYC(0x62a2, 0x62a4); E = 0x06;
-  CALL_C(0x62a4, ramrockArm_checkPositionAtRamrock_hook, 0x63c0, 0x62a7);
-  SET_HL(POP(0x62a7));
-  if (!(F & FZ)) { RET_TAKEN(0x62a8); return; }
-  CYC(0x62a8, 0x62a9);
-  CYC(0x62a9, 0x62ab); L = 0x0f;
-  CYC(0x62ab, 0x62ac); A = mem_rd(gb, HL);
-  CYC(0x62ac, 0x62ad); alu_or(gb, A);
+  CYC(b_+20, b_+21); H = D;
+  CYC(b_+21, b_+23); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
+  CYC(b_+23, b_+25); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
+  CYC(b_+25, b_+27); C = 0x03;
+  CALL_C(b_+27, findItemWithID_hook, SYM(findItemWithID), b_+30);
+  if (!(F & FZ)) { RET_TAKEN(b_+30); return; }
+  CYC(b_+30, b_+31);
+  CYC(b_+31, b_+33); L = 0x0b;
+  CYC(b_+33, b_+34); B = mem_rd(gb, HL);
+  CYC(b_+34, b_+36); L = 0x0d;
+  CYC(b_+36, b_+37); C = mem_rd(gb, HL);
+  PUSH(b_+37, HL);
+  CYC(b_+38, b_+40); E = 0x06;
+  CALL_C(b_+40, ramrockArm_checkPositionAtRamrock_hook, SYM(ramrockArm_checkPositionAtRamrock), b_+43);
+  SET_HL(POP(b_+43));
+  if (!(F & FZ)) { RET_TAKEN(b_+44); return; }
+  CYC(b_+44, b_+45);
+  CYC(b_+45, b_+47); L = 0x0f;
+  CYC(b_+47, b_+48); A = mem_rd(gb, HL);
+  CYC(b_+48, b_+49); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x62ad, 0x62af);
+    CYCT(b_+49, b_+51);
     goto setSparkle;
   }
-  CYC(0x62ad, 0x62af);
-  CYC(0x62af, 0x62b1); alu_cp(gb, 0xfc);
-  if (F & FC) { RET_TAKEN(0x62b1); return; }
-  CYC(0x62b1, 0x62b2);
+  CYC(b_+49, b_+51);
+  CYC(b_+51, b_+53); alu_cp(gb, 0xfc);
+  if (F & FC) { RET_TAKEN(b_+53); return; }
+  CYC(b_+53, b_+54);
 setSparkle:
-  CYC(0x62b2, 0x62b4); L = 0x2f;
-  CYC(0x62b4, 0x62b6); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 4)));
-  CYC(0x62b6, 0x62b8); A = 0x2b;
-  CALL_C(0x62b8, objectGetRelatedObject1Var_hook, 0x2160, 0x62bb);
-  CYC(0x62bb, 0x62bc); A = mem_rd(gb, HL);
-  CYC(0x62bc, 0x62bd); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x62bd); return; }
-  CYC(0x62bd, 0x62be);
-  CYC(0x62be, 0x62c0); mem_wr(gb, HL, 0x3c);
-  CYC(0x62c0, 0x62c2); L = ENEMY_BASE + OBJ_SCRIPT_RET;
-  CYC(0x62c2, 0x62c3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  RET(0x62c3); return;
+  CYC(b_+54, b_+56); L = 0x2f;
+  CYC(b_+56, b_+58); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 4)));
+  CYC(b_+58, b_+60); A = 0x2b;
+  CALL_C(b_+60, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+63);
+  CYC(b_+63, b_+64); A = mem_rd(gb, HL);
+  CYC(b_+64, b_+65); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+65); return; }
+  CYC(b_+65, b_+66);
+  CYC(b_+66, b_+68); mem_wr(gb, HL, 0x3c);
+  CYC(b_+68, b_+70); L = ENEMY_BASE + OBJ_SCRIPT_RET;
+  CYC(b_+70, b_+71); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  RET(b_+71); return;
 relatedSubid0a:
-  CYC(0x62c4, 0x62c6); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x62c6, 0x62c8); A = 0x01;
-  CYC(0x62c8, 0x62c9); mem_wr(gb, DE, A);
+  CYC(b_+72, b_+74); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+74, b_+76); A = 0x01;
+  CYC(b_+76, b_+77); mem_wr(gb, DE, A);
 nextPuff:
-  CALL_C(0x62c9, getFreeInteractionSlot_hook, 0x3aef, 0x62cc);
-  CYC(0x62cc, 0x62ce); mem_wr(gb, HL, 0x05);
-  PUSH(0x62ce, HL);
-  CALL_C(0x62cf, ramrockArm_setRelativePosition_hook, 0x63b0, 0x62d2);
-  SET_HL(POP(0x62d2));
-  CALL_C(0x62d3, objectCopyPosition_hook, 0x2242, 0x62d6);
-  CYC(0x62d6, 0x62d8); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x62d8, 0x62d9); A = mem_rd(gb, DE);
-  CYC(0x62d9, 0x62da); A = alu_dec8(gb, A);
-  CYC(0x62da, 0x62db); mem_wr(gb, DE, A);
+  CALL_C(b_+77, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+80);
+  CYC(b_+80, b_+82); mem_wr(gb, HL, 0x05);
+  PUSH(b_+82, HL);
+  CALL_C(b_+83, ramrockArm_setRelativePosition_hook, SYM(ramrockArm_setRelativePosition), b_+86);
+  SET_HL(POP(b_+86));
+  CALL_C(b_+87, objectCopyPosition_hook, SYM(objectCopyPosition), b_+90);
+  CYC(b_+90, b_+92); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+92, b_+93); A = mem_rd(gb, DE);
+  CYC(b_+93, b_+94); A = alu_dec8(gb, A);
+  CYC(b_+94, b_+95); mem_wr(gb, DE, A);
   if (F & FZ) {
-    CYCT(0x62db, 0x62dd);
+    CYCT(b_+95, b_+97);
     goto nextPuff;
   }
-  CYC(0x62db, 0x62dd);
-  CYC(0x62dd, 0x62df); A = 0x02;
-  CYC(0x62df, 0x62e0); mem_wr(gb, DE, A);
+  CYC(b_+95, b_+97);
+  CYC(b_+97, b_+99); A = 0x02;
+  CYC(b_+99, SYM(ramrockArm_deleteSelf)); mem_wr(gb, DE, A);
   ramrockArm_deleteSelf_hook(gb);
 }
 
 void ramrockArm_subid4_hook(GB *gb) {
+  BASE(ramrockArm_subid4);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x62e6, 0x62e8); E = ENEMY_BASE + OBJ_SUBSTATE;
-  CYC(0x62e8, 0x62e9); A = mem_rd(gb, DE);
-  CYC(0x62e9, 0x62ea); push_effect(gb, 0x62ea);
-  switch (ramrockArm_jump_table(gb)) {
-    case 0x62f2: ramrockArm_subid4_substate0_hook(gb); return;
-    case 0x630e: ramrockArm_subid4_substate1_hook(gb); return;
-    case 0x6332: ramrockArm_subid4_substate2_hook(gb); return;
-    case 0x6381: ramrockArm_subid4_substate3_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (ramrockArm_jump_table(gb));
+    if (jt_ == SYM(ramrockArm_subid4_substate0)) { ramrockArm_subid4_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid4_substate1)) { ramrockArm_subid4_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid4_substate2)) { ramrockArm_subid4_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid4_substate3)) { ramrockArm_subid4_substate3_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void ramrockArm_subid4_substate0_hook(GB *gb) {
+  BASE(ramrockArm_subid4_substate0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x62f2, 0x62f4); C = 0x10;
-  CALL_C(0x62f4, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x62f7);
-  if (!(F & FZ)) { RET_TAKEN(0x62f7); return; }
-  CYC(0x62f7, 0x62f8);
-  CYC(0x62f8, 0x62fa); A = 0x06;
-  CALL_C(0x62fa, objectSetCollideRadius_hook, 0x24a1, 0x62fd);
-  CYC(0x62fd, 0x6300); SET_BC(0xff80);
-  CALL_C(0x6300, objectSetSpeedZ_hook, 0x239d, 0x6303);
-  CYC(0x6303, 0x6305); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x6305, 0x6307); mem_wr(gb, HL, 0x28);
-  CYC(0x6307, 0x6309); L = ENEMY_BASE + OBJ_COUNTER2;
-  CYC(0x6309, 0x630b); mem_wr(gb, HL, 0x3e);
-  CYC(0x630b, 0x630e);
+  CYC(b_+0, b_+2); C = 0x10;
+  CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
+  if (!(F & FZ)) { RET_TAKEN(b_+5); return; }
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+8); A = 0x06;
+  CALL_C(b_+8, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+11);
+  CYC(b_+11, b_+14); SET_BC(hOamFunc);
+  CALL_C(b_+14, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+17);
+  CYC(b_+17, b_+19); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+19, b_+21); mem_wr(gb, HL, 0x28);
+  CYC(b_+21, b_+23); L = ENEMY_BASE + OBJ_COUNTER2;
+  CYC(b_+23, b_+25); mem_wr(gb, HL, 0x3e);
+  CYC(b_+25, SYM(ramrockArm_subid4_substate1));
   ecom_incSubstate_b10_hook(gb);
 }
 
 void ramrockArm_subid4_substate1_hook(GB *gb) {
+  BASE(ramrockArm_subid4_substate1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x630e, 0x6310); E = ENEMY_BASE + OBJ_ZH;
-  CYC(0x6310, 0x6311); A = mem_rd(gb, DE);
-  CYC(0x6311, 0x6313); alu_cp(gb, 0xf9);
-  CYC(0x6313, 0x6315); C = 0x00;
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_ZH;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); alu_cp(gb, 0xf9);
+  CYC(b_+5, b_+7); C = 0x00;
   if (!(F & FZ)) {
-    CYCT(0x6315, 0x6318);
+    CYCT(b_+7, b_+10);
     objectUpdateSpeedZ_paramC_hook(gb);
     return;
   }
-  CYC(0x6315, 0x6318);
-  CALL_C(0x6318, ecom_decCounter2_b10_hook, 0x43a3, 0x631b);
+  CYC(b_+7, b_+10);
+  CALL_C(b_+10, ecom_decCounter2_b10_hook, SYM(ecom_decCounter2_b10), b_+13);
   if (!(F & FZ)) {
-    CYCT(0x631b, 0x631e);
+    CYCT(b_+13, b_+16);
     objectApplySpeed_hook(gb);
     return;
   }
-  CYC(0x631b, 0x631e);
-  CALL_C(0x631e, ecom_incSubstate_b10_hook, 0x4005, 0x6321);
-  CYC(0x6321, 0x6323); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x6323, 0x6324); A = mem_rd(gb, DE);
-  CYC(0x6324, 0x6325); alu_rrca(gb);
-  if (!(F & FC)) { RET_TAKEN(0x6325); return; }
-  CYC(0x6325, 0x6326);
-  CYC(0x6326, 0x6328); A = 0x02;
-  CALL_C(0x6328, objectGetRelatedObject1Var_hook, 0x2160, 0x632b);
-  CYC(0x632b, 0x632d); mem_wr(gb, HL, 0x0c);
-  CYC(0x632d, 0x632f); A = 0x84;
-  CYC(0x632f, 0x6332);
+  CYC(b_+13, b_+16);
+  CALL_C(b_+16, ecom_incSubstate_b10_hook, SYM(ecom_incSubstate_b10), b_+19);
+  CYC(b_+19, b_+21); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+21, b_+22); A = mem_rd(gb, DE);
+  CYC(b_+22, b_+23); alu_rrca(gb);
+  if (!(F & FC)) { RET_TAKEN(b_+23); return; }
+  CYC(b_+23, b_+24);
+  CYC(b_+24, b_+26); A = 0x02;
+  CALL_C(b_+26, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+29);
+  CYC(b_+29, b_+31); mem_wr(gb, HL, 0x0c);
+  CYC(b_+31, b_+33); A = 0x84;
+  CYC(b_+33, SYM(ramrockArm_subid4_substate2));
   loadPaletteHeader_hook(gb);
 }
 
 void ramrockArm_subid4_updateXPosition_hook(GB *gb) {
+  BASE(ramrockArm_subid4_updateXPosition);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x635f, 0x6361); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x6361, 0x6362); A = mem_rd(gb, DE);
-  CYC(0x6362, 0x6363); alu_rrca(gb);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_rrca(gb);
   if (F & FC) {
-    CYCT(0x6363, 0x6365);
+    CYCT(b_+4, b_+6);
     goto related;
   }
-  CYC(0x6363, 0x6365);
-  CYC(0x6365, 0x6366); A = B;
-  CYC(0x6366, 0x6367); alu_cpl(gb);
-  CYC(0x6367, 0x6368); A = alu_inc8(gb, A);
-  CYC(0x6368, 0x6369); B = A;
+  CYC(b_+4, b_+6);
+  CYC(b_+6, b_+7); A = B;
+  CYC(b_+7, b_+8); alu_cpl(gb);
+  CYC(b_+8, b_+9); A = alu_inc8(gb, A);
+  CYC(b_+9, b_+10); B = A;
 related:
-  CYC(0x6369, 0x636b); A = 0x0d;
-  CALL_C(0x636b, objectGetRelatedObject1Var_hook, 0x2160, 0x636e);
-  CYC(0x636e, 0x636f); A = mem_rd(gb, HL);
-  CYC(0x636f, 0x6370); alu_add(gb, B);
-  CYC(0x6370, 0x6371); E = L;
-  CYC(0x6371, 0x6372); mem_wr(gb, DE, A);
-  RET(0x6372); return;
+  CYC(b_+10, b_+12); A = 0x0d;
+  CALL_C(b_+12, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+15);
+  CYC(b_+15, b_+16); A = mem_rd(gb, HL);
+  CYC(b_+16, b_+17); alu_add(gb, B);
+  CYC(b_+17, b_+18); E = L;
+  CYC(b_+18, b_+19); mem_wr(gb, DE, A);
+  RET(b_+19); return;
 }
 
 void ramrockArm_subid4_collisionOccurred_hook(GB *gb) {
+  BASE(ramrockArm_subid4_collisionOccurred);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6373, 0x6375); A = 0x02;
-  CALL_C(0x6375, objectGetRelatedObject1Var_hook, 0x2160, 0x6378);
-  CYC(0x6378, 0x637a); mem_wr(gb, HL, 0x0d);
-  CYC(0x637a, 0x637c); L = ENEMY_BASE + OBJ_VAR36;
-  CYC(0x637c, 0x637e); mem_wr(gb, HL, 0x10);
-  CYC(0x637e, 0x6381);
+  CYC(b_+0, b_+2); A = 0x02;
+  CALL_C(b_+2, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+5);
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 0x0d);
+  CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_VAR36;
+  CYC(b_+9, b_+11); mem_wr(gb, HL, 0x10);
+  CYC(b_+11, SYM(ramrockArm_subid4_substate3));
   ecom_incSubstate_b10_hook(gb);
 }
 
 void ramrockArm_subid4_substate2_hook(GB *gb) {
+  BASE(ramrockArm_subid4_substate2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6332, 0x6334); A = 0x05;
-  CALL_C(0x6334, objectGetRelatedObject1Var_hook, 0x2160, 0x6337);
-  CYC(0x6337, 0x6338); A = mem_rd(gb, HL);
-  CYC(0x6338, 0x6339); A = alu_dec8(gb, A);
+  CYC(b_+0, b_+2); A = 0x05;
+  CALL_C(b_+2, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+5);
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL);
+  CYC(b_+6, b_+7); A = alu_dec8(gb, A);
   if (F & FZ) {
-    CYCT(0x6339, 0x633b);
+    CYCT(b_+7, b_+9);
     ramrockArm_subid4_substate3_hook(gb);
     return;
   }
-  CYC(0x6339, 0x633b);
-  CYC(0x633b, 0x633d); E = ENEMY_BASE + OBJ_INVINCIBILITY_COUNTER;
-  CYC(0x633d, 0x633e); A = mem_rd(gb, DE);
-  CYC(0x633e, 0x633f); alu_rlca(gb);
+  CYC(b_+7, b_+9);
+  CYC(b_+9, b_+11); E = ENEMY_BASE + OBJ_INVINCIBILITY_COUNTER;
+  CYC(b_+11, b_+12); A = mem_rd(gb, DE);
+  CYC(b_+12, b_+13); alu_rlca(gb);
   if (F & FC) {
-    CYCT(0x633f, 0x6341);
+    CYCT(b_+13, b_+15);
     ramrockArm_subid4_collisionOccurred_hook(gb);
     return;
   }
-  CYC(0x633f, 0x6341);
-  CYC(0x6341, 0x6343); A = 0x02;
-  CALL_C(0x6343, objectGetRelatedObject1Var_hook, 0x2160, 0x6346);
-  CYC(0x6346, 0x6347); A = mem_rd(gb, HL);
-  CYC(0x6347, 0x6349); alu_cp(gb, 0x0d);
+  CYC(b_+13, b_+15);
+  CYC(b_+15, b_+17); A = 0x02;
+  CALL_C(b_+17, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+20);
+  CYC(b_+20, b_+21); A = mem_rd(gb, HL);
+  CYC(b_+21, b_+23); alu_cp(gb, 0x0d);
   if (F & FZ) {
-    CYCT(0x6349, 0x634b);
+    CYCT(b_+23, b_+25);
     ramrockArm_subid4_collisionOccurred_hook(gb);
     return;
   }
-  CYC(0x6349, 0x634b);
-  CYC(0x634b, 0x634d); alu_cp(gb, 0x10);
+  CYC(b_+23, b_+25);
+  CYC(b_+25, b_+27); alu_cp(gb, 0x10);
   if (!(F & FZ)) {
-    CYCT(0x634d, 0x634f);
+    CYCT(b_+27, b_+29);
     ramrockArm_subid4_substate3_hook(gb);
     return;
   }
-  CYC(0x634d, 0x634f);
-  CYC(0x634f, 0x6351); E = ENEMY_BASE + OBJ_VAR36;
-  CYC(0x6351, 0x6352); A = mem_rd(gb, DE);
-  CYC(0x6352, 0x6353); alu_or(gb, A);
+  CYC(b_+27, b_+29);
+  CYC(b_+29, b_+31); E = ENEMY_BASE + OBJ_VAR36;
+  CYC(b_+31, b_+32); A = mem_rd(gb, DE);
+  CYC(b_+32, b_+33); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x6353, 0x6355);
+    CYCT(b_+33, b_+35);
     ramrockArm_subid4_substate3_hook(gb);
     return;
   }
-  CYC(0x6353, 0x6355);
-  CYC(0x6355, 0x6356); A = alu_dec8(gb, A);
-  CYC(0x6356, 0x6357); mem_wr(gb, DE, A);
+  CYC(b_+33, b_+35);
+  CYC(b_+35, b_+36); A = alu_dec8(gb, A);
+  CYC(b_+36, b_+37); mem_wr(gb, DE, A);
   if (F & FZ) {
-    CYCT(0x6357, 0x6359);
+    CYCT(b_+37, b_+39);
     ramrockArm_subid4_collisionOccurred_hook(gb);
     return;
   }
-  CYC(0x6357, 0x6359);
-  CYC(0x6359, 0x635f);
+  CYC(b_+37, b_+39);
+  CYC(b_+39, SYM(ramrockArm_subid4_updateXPosition));
   ramrockArm_subid4_updateXPosition_hook(gb);
 }
 
 void ramrockArm_subid4_substate3_hook(GB *gb) {
+  BASE(ramrockArm_subid4_substate3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6381, 0x6383); E = ENEMY_BASE + OBJ_VAR2A;
-  CYC(0x6383, 0x6384); A = mem_rd(gb, DE);
-  CYC(0x6384, 0x6385); alu_rlca(gb);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_VAR2A;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_rlca(gb);
   if (!(F & FC)) {
-    CYCT(0x6385, 0x6387);
+    CYCT(b_+4, b_+6);
     goto afterCollision;
   }
-  CYC(0x6385, 0x6387);
-  CYC(0x6387, 0x6389); A = 0x36;
-  CALL_C(0x6389, objectGetRelatedObject1Var_hook, 0x2160, 0x638c);
-  CYC(0x638c, 0x638e); mem_wr(gb, HL, 0x10);
+  CYC(b_+4, b_+6);
+  CYC(b_+6, b_+8); A = 0x36;
+  CALL_C(b_+8, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+11);
+  CYC(b_+11, b_+13); mem_wr(gb, HL, 0x10);
 afterCollision:
-  CYC(0x638e, 0x6390); E = ENEMY_BASE + OBJ_TEXT_ID;
-  CYC(0x6390, 0x6391); A = mem_rd(gb, DE);
-  CYC(0x6391, 0x6393); alu_sub(gb, 0x02);
-  CYC(0x6393, 0x6395); alu_cp(gb, 0x04);
+  CYC(b_+13, b_+15); E = ENEMY_BASE + OBJ_TEXT_ID;
+  CYC(b_+15, b_+16); A = mem_rd(gb, DE);
+  CYC(b_+16, b_+18); alu_sub(gb, 0x02);
+  CYC(b_+18, b_+20); alu_cp(gb, 0x04);
   if (!(F & FC)) {
-    CYCT(0x6395, 0x6397);
+    CYCT(b_+20, b_+22);
     goto atLimit;
   }
-  CYC(0x6395, 0x6397);
-  CYC(0x6397, 0x6399); B = 0x04;
-  CYC(0x6399, 0x639b);
+  CYC(b_+20, b_+22);
+  CYC(b_+22, b_+24); B = 0x04;
+  CYC(b_+24, b_+26);
   goto checkSubid;
 atLimit:
-  CYC(0x639b, 0x639c); mem_wr(gb, DE, A);
-  CYC(0x639c, 0x639d); B = A;
-  CYC(0x639d, 0x63a0);
+  CYC(b_+26, b_+27); mem_wr(gb, DE, A);
+  CYC(b_+27, b_+28); B = A;
+  CYC(b_+28, b_+31);
   ramrockArm_subid4_updateXPosition_hook(gb);
   return;
 checkSubid:
-  CYC(0x639f, 0x63a1); A = 0x02;
-  CALL_C(0x63a1, objectGetRelatedObject1Var_hook, 0x2160, 0x63a4);
-  CYC(0x63a4, 0x63a5); A = mem_rd(gb, HL);
-  CYC(0x63a5, 0x63a7); alu_cp(gb, 0x0d);
+  CYC(b_+30, b_+32); A = 0x02;
+  CALL_C(b_+32, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+35);
+  CYC(b_+35, b_+36); A = mem_rd(gb, HL);
+  CYC(b_+36, b_+38); alu_cp(gb, 0x0d);
   if (F & FZ) {
-    CYCT(0x63a7, 0x63a9);
+    CYCT(b_+38, b_+40);
     ramrockArm_subid4_updateXPosition_hook(gb);
     return;
   }
-  CYC(0x63a7, 0x63a9);
-  CYC(0x63a9, 0x63ab); E = ENEMY_BASE + OBJ_SUBSTATE;
-  CYC(0x63ab, 0x63ad); A = 0x02;
-  CYC(0x63ad, 0x63ae); mem_wr(gb, DE, A);
-  CYC(0x63ae, 0x635f);
+  CYC(b_+38, b_+40);
+  CYC(b_+40, b_+42); E = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+42, b_+44); A = 0x02;
+  CYC(b_+44, b_+45); mem_wr(gb, DE, A);
+  CYC(b_+45, SYM(ramrockArm_subid4_updateXPosition));
   ramrockArm_subid4_updateXPosition_hook(gb);
 }
 
 void ramrockArm_getRelativePosition_hook(GB *gb) {
+  BASE(ramrockArm_getRelativePosition);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x63dd, 0x63df); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x63df, 0x63e0); A = mem_rd(gb, DE);
-  CYC(0x63e0, 0x63e2); C = 0x0e;
-  CYC(0x63e2, 0x63e3); alu_rrca(gb);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); C = 0x0e;
+  CYC(b_+5, b_+6); alu_rrca(gb);
   if (!(F & FC)) {
-    CYCT(0x63e3, 0x63e5);
+    CYCT(b_+6, b_+8);
     goto related;
   }
-  CYC(0x63e3, 0x63e5);
-  CYC(0x63e5, 0x63e7); C = 0xf2;
+  CYC(b_+6, b_+8);
+  CYC(b_+8, b_+10); C = 0xf2;
 related:
-  CYC(0x63e7, 0x63e9); A = 0x0b;
-  CALL_C(0x63e9, objectGetRelatedObject1Var_hook, 0x2160, 0x63ec);
-  CYC(0x63ec, 0x63ed); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x63ed, 0x63ef); alu_add(gb, 0x08);
-  CYC(0x63ef, 0x63f0); B = A;
-  CYC(0x63f0, 0x63f1); L = alu_inc8(gb, L);
-  CYC(0x63f1, 0x63f2); A = mem_rd(gb, HL);
-  CYC(0x63f2, 0x63f3); alu_add(gb, C);
-  CYC(0x63f3, 0x63f4); C = A;
-  RET(0x63f4); return;
+  CYC(b_+10, b_+12); A = 0x0b;
+  CALL_C(b_+12, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+15);
+  CYC(b_+15, b_+16); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+16, b_+18); alu_add(gb, 0x08);
+  CYC(b_+18, b_+19); B = A;
+  CYC(b_+19, b_+20); L = alu_inc8(gb, L);
+  CYC(b_+20, b_+21); A = mem_rd(gb, HL);
+  CYC(b_+21, b_+22); alu_add(gb, C);
+  CYC(b_+22, b_+23); C = A;
+  RET(b_+23); return;
 }

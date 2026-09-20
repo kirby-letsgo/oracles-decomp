@@ -3,77 +3,80 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode02), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode02), (from), (to), true)
 
 void partCode02_hook(GB *gb);
 void enemyDestroyed_initialize_hook(GB *gb);
 static void enemyDestroyed_decCounter2_hook(GB *gb);
 
 void partCode02_hook(GB *gb) {
+  BASE(partCode02);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x4441, 0x4443); E = 0xc4; // Part.state
-  CYC(0x4443, 0x4444); A = mem_rd(gb, DE);
-  CYC(0x4444, 0x4445); alu_or(gb, A);
+  CYC(b_+0, b_+2); E = 0xc4; // Part.state
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x4445, 0x4448); // call z
-    push_effect(gb, 0x4448);
+    CYCT(b_+4, b_+7); // call z
+    push_effect(gb, b_+7);
     enemyDestroyed_initialize_hook(gb);
   } else {
-    CYC(0x4445, 0x4448);
+    CYC(b_+4, b_+7);
   }
-  CALL_C(0x4448, partAnimate_hook, 0x2978, 0x444b);
-  CYC(0x444b, 0x444e); A = mem_rd(gb, 0xcc00); // wFrameCounter
-  CYC(0x444e, 0x444f); alu_rrca(gb);
-  if (F & FC) { CYCT(0x444f, 0x4451); goto L_4457; } // jr c
-  CYC(0x444f, 0x4451);
-  CYC(0x4451, 0x4453); E = 0xdc; // Part.oamFlags
-  CYC(0x4453, 0x4454); A = mem_rd(gb, DE);
-  CYC(0x4454, 0x4456); alu_xor(gb, 0x01);
-  CYC(0x4456, 0x4457); mem_wr(gb, DE, A);
+  CALL_C(b_+7, partAnimate_hook, SYM(partAnimate), b_+10);
+  CYC(b_+10, b_+13); A = mem_rd(gb, wFrameCounter); // wFrameCounter
+  CYC(b_+13, b_+14); alu_rrca(gb);
+  if (F & FC) { CYCT(b_+14, b_+16); goto L_4457; } // jr c
+  CYC(b_+14, b_+16);
+  CYC(b_+16, b_+18); E = 0xdc; // Part.oamFlags
+  CYC(b_+18, b_+19); A = mem_rd(gb, DE);
+  CYC(b_+19, b_+21); alu_xor(gb, 0x01);
+  CYC(b_+21, b_+22); mem_wr(gb, DE, A);
 
 L_4457:
-  CYC(0x4457, 0x4459); E = 0xe1; // Part.animParameter
-  CYC(0x4459, 0x445a); A = mem_rd(gb, DE);
-  CYC(0x445a, 0x445b); alu_or(gb, A);
-  if (F & FZ) { RET_TAKEN(0x445b); return; } // ret z
-  CYC(0x445b, 0x445c);
+  CYC(b_+22, b_+24); E = 0xe1; // Part.animParameter
+  CYC(b_+24, b_+25); A = mem_rd(gb, DE);
+  CYC(b_+25, b_+26); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+26); return; } // ret z
+  CYC(b_+26, b_+27);
 
-  CYC(0x445c, 0x445f); push_effect(gb, 0x445f); enemyDestroyed_decCounter2_hook(gb);
-  CYC(0x445f, 0x4460); A = mem_rd(gb, DE); // [counter2]
-  CYC(0x4460, 0x4461); alu_rlca(gb);
-  if (F & FC) { CYCT(0x4461, 0x4464); partDelete_hook(gb); return; } // jp c
-  CYC(0x4461, 0x4464);
+  CYC(b_+27, b_+30); push_effect(gb, b_+30); enemyDestroyed_decCounter2_hook(gb);
+  CYC(b_+30, b_+31); A = mem_rd(gb, DE); // [counter2]
+  CYC(b_+31, b_+32); alu_rlca(gb);
+  if (F & FC) { CYCT(b_+32, b_+35); partDelete_hook(gb); return; } // jp c
+  CYC(b_+32, b_+35);
 
-  CYC(0x4464, 0x4465); alu_xor(gb, A);
-  CALL_C(0x4465, decideItemDrop_hook, 0x16eb, 0x4468);
-  if (F & FZ) { CYCT(0x4468, 0x446b); partDelete_hook(gb); return; } // jp z
-  CYC(0x4468, 0x446b);
-  CYC(0x446b, 0x446d); B = 0x01; // PART_ITEM_DROP
-  CYC(0x446d, 0x4470); objectReplaceWithID_hook(gb); return; // jp
+  CYC(b_+35, b_+36); alu_xor(gb, A);
+  CALL_C(b_+36, decideItemDrop_hook, SYM(decideItemDrop), b_+39);
+  if (F & FZ) { CYCT(b_+39, b_+42); partDelete_hook(gb); return; } // jp z
+  CYC(b_+39, b_+42);
+  CYC(b_+42, b_+44); B = 0x01; // PART_ITEM_DROP
+  CYC(b_+44, b_+47); objectReplaceWithID_hook(gb); return; // jp
 }
 
 void enemyDestroyed_initialize_hook(GB *gb) {
+  BASE(partCode02);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x4470, 0x4471); A = alu_inc8(gb, A);
-  CYC(0x4471, 0x4472); mem_wr(gb, DE, A); // [state] = 1
-  CYC(0x4472, 0x4474); E = 0xed; // Part.knockbackCounter
-  CYC(0x4474, 0x4475); A = mem_rd(gb, DE);
-  CYC(0x4475, 0x4476); alu_rlca(gb);
-  CYC(0x4476, 0x4478); A = 0x01;
+  CYC(b_+47, b_+48); A = alu_inc8(gb, A);
+  CYC(b_+48, b_+49); mem_wr(gb, DE, A); // [state] = 1
+  CYC(b_+49, b_+51); E = 0xed; // Part.knockbackCounter
+  CYC(b_+51, b_+52); A = mem_rd(gb, DE);
+  CYC(b_+52, b_+53); alu_rlca(gb);
+  CYC(b_+53, b_+55); A = 0x01;
   if (F & FC) {
-    CALL_C_CC(0x4478, partSetAnimation_hook, 0x2988, 0x447b);
+    CALL_C_CC(b_+55, partSetAnimation_hook, SYM(partSetAnimation), b_+58);
   } else {
-    CYC(0x4478, 0x447b);
+    CYC(b_+55, b_+58);
   }
-  CYC(0x447b, 0x447e); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+58, b_+61); objectSetVisible82_hook(gb); return; // jp
 }
 
 static void enemyDestroyed_decCounter2_hook(GB *gb) {
-  CYC(0x447e, 0x4480); E = 0xc7; // Part.counter2
-  CYC(0x4480, 0x4481); A = mem_rd(gb, DE);
-  CYC(0x4481, 0x4482); alu_rrca(gb);
-  if (!(F & FC)) { RET_TAKEN(0x4482); return; } // ret nc
-  CYC(0x4482, 0x4483);
-  CYC(0x4483, 0x4486); decNumEnemies_hook(gb); return; // jp
+  BASE(partCode02);
+  CYC(b_+61, b_+63); E = 0xc7; // Part.counter2
+  CYC(b_+63, b_+64); A = mem_rd(gb, DE);
+  CYC(b_+64, b_+65); alu_rrca(gb);
+  if (!(F & FC)) { RET_TAKEN(b_+65); return; } // ret nc
+  CYC(b_+65, b_+66);
+  CYC(b_+66, SYM(partCode03)); decNumEnemies_hook(gb); return; // jp
 }

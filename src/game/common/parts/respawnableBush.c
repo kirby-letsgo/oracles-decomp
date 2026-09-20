@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode0f), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode0f), (from), (to), true)
 
 static uint16_t respawnableBush_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -28,102 +28,104 @@ void partCode0f_hook(GB *gb);
 void respawnableBush_setTileHere_hook(GB *gb);
 
 void partCode0f_hook(GB *gb) {
+  BASE(partCode0f);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  if (F & FZ) { CYCT(0x4995, 0x4997); goto normalStatus; } // jr z
-  CYC(0x4995, 0x4997);
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
 
-  CYC(0x4997, 0x4998); H = D;
-  CYC(0x4998, 0x499a); L = 0xc4; // Part.state
-  CYC(0x499a, 0x499b); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = 2
-  CYC(0x499b, 0x499d); L = 0xc6; // Part.counter1
-  CYC(0x499d, 0x499f); mem_wr(gb, HL, 0xf0);
-  CYC(0x499f, 0x49a1); L = 0xe4; // Part.collisionType
-  CYC(0x49a1, 0x49a3); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
-  CYC(0x49a3, 0x49a5); A = 0x02; // TILEINDEX_RESPAWNING_BUSH_CUT
-  CYC(0x49a5, 0x49a8); push_effect(gb, 0x49a8); respawnableBush_setTileHere_hook(gb);
-  CALL_C(0x49a8, getRandomNumber_noPreserveVars_hook, 0x0453, 0x49ab);
-  CYC(0x49ab, 0x49ac); alu_rrca(gb);
-  if (!(F & FC)) { CYCT(0x49ac, 0x49ae); goto doneItemDropSpawn; } // jr nc
-  CYC(0x49ac, 0x49ae);
-  CALL_C(0x49ae, getFreePartSlot_hook, 0x3e8e, 0x49b1);
-  if (!(F & FZ)) { CYCT(0x49b1, 0x49b3); goto doneItemDropSpawn; } // jr nz
-  CYC(0x49b1, 0x49b3);
-  CYC(0x49b3, 0x49b5); mem_wr(gb, HL, 0x01); // PART_ITEM_DROP
-  CYC(0x49b5, 0x49b6); L = alu_inc8(gb, L);
-  CYC(0x49b6, 0x49b7); E = L;
-  CYC(0x49b7, 0x49b8); A = mem_rd(gb, DE);
-  CYC(0x49b8, 0x49b9); mem_wr(gb, HL, A); // [itemDrop.subid] = [this.subid]
-  CALL_C(0x49b9, objectCopyPosition_hook, 0x2242, 0x49bc);
+  CYC(b_+2, b_+3); H = D;
+  CYC(b_+3, b_+5); L = 0xc4; // Part.state
+  CYC(b_+5, b_+6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = 2
+  CYC(b_+6, b_+8); L = 0xc6; // Part.counter1
+  CYC(b_+8, b_+10); mem_wr(gb, HL, 0xf0);
+  CYC(b_+10, b_+12); L = 0xe4; // Part.collisionType
+  CYC(b_+12, b_+14); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
+  CYC(b_+14, b_+16); A = 0x02; // TILEINDEX_RESPAWNING_BUSH_CUT
+  CYC(b_+16, b_+19); push_effect(gb, b_+19); respawnableBush_setTileHere_hook(gb);
+  CALL_C(b_+19, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+22);
+  CYC(b_+22, b_+23); alu_rrca(gb);
+  if (!(F & FC)) { CYCT(b_+23, b_+25); goto doneItemDropSpawn; } // jr nc
+  CYC(b_+23, b_+25);
+  CALL_C(b_+25, getFreePartSlot_hook, SYM(getFreePartSlot), b_+28);
+  if (!(F & FZ)) { CYCT(b_+28, b_+30); goto doneItemDropSpawn; } // jr nz
+  CYC(b_+28, b_+30);
+  CYC(b_+30, b_+32); mem_wr(gb, HL, 0x01); // PART_ITEM_DROP
+  CYC(b_+32, b_+33); L = alu_inc8(gb, L);
+  CYC(b_+33, b_+34); E = L;
+  CYC(b_+34, b_+35); A = mem_rd(gb, DE);
+  CYC(b_+35, b_+36); mem_wr(gb, HL, A); // [itemDrop.subid] = [this.subid]
+  CALL_C(b_+36, objectCopyPosition_hook, SYM(objectCopyPosition), b_+39);
 
 doneItemDropSpawn:
-  CYC(0x49bc, 0x49be); B = 0x00; // INTERAC_GRASSDEBRIS
-  CALL_C(0x49be, objectCreateInteractionWithSubid00_hook, 0x24c3, 0x49c1);
+  CYC(b_+39, b_+41); B = 0x00; // INTERAC_GRASSDEBRIS
+  CALL_C(b_+41, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+44);
 
 normalStatus:
-  CYC(0x49c1, 0x49c3); E = 0xc4; // Part.state
-  CYC(0x49c3, 0x49c4); A = mem_rd(gb, DE);
+  CYC(b_+44, b_+46); E = 0xc4; // Part.state
+  CYC(b_+46, b_+47); A = mem_rd(gb, DE);
   {
-    CYC(0x49c4, 0x49c5); push_effect(gb, 0x49c5);
+    CYC(b_+47, b_+48); push_effect(gb, b_+48);
     uint16_t target = respawnableBush_jump_table(gb);
-    if (target == 0x49cf) goto state0;
-    if (target == 0x49d3) goto state1;
-    if (target == 0x49d4) goto state2;
-    if (target == 0x49e5) goto state3;
+    if (target == b_+58) goto state0;
+    if (target == b_+62) goto state1;
+    if (target == b_+63) goto state2;
+    if (target == b_+80) goto state3;
     goto state4;
   }
 
 state0:
-  CYC(0x49cf, 0x49d1); A = 0x01;
-  CYC(0x49d1, 0x49d2); mem_wr(gb, DE, A);
-  RET(0x49d2); return; // ret
+  CYC(b_+58, b_+60); A = 0x01;
+  CYC(b_+60, b_+61); mem_wr(gb, DE, A);
+  RET(b_+61); return; // ret
 
 state1:
-  RET(0x49d3); return; // ret
+  RET(b_+62); return; // ret
 
 state2:
-  CYC(0x49d4, 0x49d7); A = mem_rd(gb, 0xcc00); // wFrameCounter
-  CYC(0x49d7, 0x49d8); alu_rrca(gb);
-  if (!(F & FC)) { RET_TAKEN(0x49d8); return; } // ret nc
-  CYC(0x49d8, 0x49d9);
-  CALL_C(0x49d9, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x49dc);
-  if (!(F & FZ)) { RET_TAKEN(0x49dc); return; } // ret nz
-  CYC(0x49dc, 0x49dd);
-  CYC(0x49dd, 0x49df); mem_wr(gb, HL, 0x0c); // [counter1]
-  CYC(0x49df, 0x49e0); L = E;
-  CYC(0x49e0, 0x49e1); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = 3
-  CYC(0x49e1, 0x49e3); A = 0x03; // TILEINDEX_RESPAWNING_BUSH_REGEN
-  CYC(0x49e3, 0x49e5); respawnableBush_setTileHere_hook(gb); return; // jr
+  CYC(b_+63, b_+66); A = mem_rd(gb, wFrameCounter); // wFrameCounter
+  CYC(b_+66, b_+67); alu_rrca(gb);
+  if (!(F & FC)) { RET_TAKEN(b_+67); return; } // ret nc
+  CYC(b_+67, b_+68);
+  CALL_C(b_+68, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+71);
+  if (!(F & FZ)) { RET_TAKEN(b_+71); return; } // ret nz
+  CYC(b_+71, b_+72);
+  CYC(b_+72, b_+74); mem_wr(gb, HL, 0x0c); // [counter1]
+  CYC(b_+74, b_+75); L = E;
+  CYC(b_+75, b_+76); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = 3
+  CYC(b_+76, b_+78); A = 0x03; // TILEINDEX_RESPAWNING_BUSH_REGEN
+  CYC(b_+78, b_+80); respawnableBush_setTileHere_hook(gb); return; // jr
 
 state3:
-  CALL_C(0x49e5, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x49e8);
-  if (!(F & FZ)) { RET_TAKEN(0x49e8); return; } // ret nz
-  CYC(0x49e8, 0x49e9);
-  CYC(0x49e9, 0x49eb); mem_wr(gb, HL, 0x08); // [counter1]
-  CYC(0x49eb, 0x49ec); L = E;
-  CYC(0x49ec, 0x49ed); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = 4
-  CYC(0x49ed, 0x49ef); A = 0x04; // TILEINDEX_RESPAWNING_BUSH_READY
+  CALL_C(b_+80, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+83);
+  if (!(F & FZ)) { RET_TAKEN(b_+83); return; } // ret nz
+  CYC(b_+83, b_+84);
+  CYC(b_+84, b_+86); mem_wr(gb, HL, 0x08); // [counter1]
+  CYC(b_+86, b_+87); L = E;
+  CYC(b_+87, b_+88); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = 4
+  CYC(b_+88, b_+90); A = 0x04; // TILEINDEX_RESPAWNING_BUSH_READY
   respawnableBush_setTileHere_hook(gb); return; // falls through
 
 state4:
-  CALL_C(0x49f8, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x49fb);
-  if (!(F & FZ)) { RET_TAKEN(0x49fb); return; } // ret nz
-  CYC(0x49fb, 0x49fc);
-  CYC(0x49fc, 0x49fd); L = E;
-  CYC(0x49fd, 0x49ff); mem_wr(gb, HL, 0x01); // [state] = 1
-  CYC(0x49ff, 0x4a01); L = 0xe4; // Part.collisionType
-  CYC(0x4a01, 0x4a03); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  RET(0x4a03); return; // ret
+  CALL_C(b_+99, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+102);
+  if (!(F & FZ)) { RET_TAKEN(b_+102); return; } // ret nz
+  CYC(b_+102, b_+103);
+  CYC(b_+103, b_+104); L = E;
+  CYC(b_+104, b_+106); mem_wr(gb, HL, 0x01); // [state] = 1
+  CYC(b_+106, b_+108); L = 0xe4; // Part.collisionType
+  CYC(b_+108, b_+110); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
+  RET(b_+110); return; // ret
 }
 
 void respawnableBush_setTileHere_hook(GB *gb) {
+  BASE(partCode0f);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x49ef, 0x49f0); push_effect(gb, (uint16_t)((A << 8) | F));
-  CALL_C(0x49f0, objectGetShortPosition_hook, 0x2096, 0x49f3);
-  CYC(0x49f3, 0x49f4); C = A;
+  CYC(b_+90, b_+91); push_effect(gb, (uint16_t)((A << 8) | F));
+  CALL_C(b_+91, objectGetShortPosition_hook, SYM(objectGetShortPosition), b_+94);
+  CYC(b_+94, b_+95); C = A;
   {
     uint16_t af = pop_effect(gb);
     A = (uint8_t)(af >> 8); F = (uint8_t)(af & 0xff);
   }
-  CYC(0x49f4, 0x49f5);
-  CYC(0x49f5, 0x49f8); setTile_hook(gb); return; // jp
+  CYC(b_+95, b_+96);
+  CYC(b_+96, b_+99); setTile_hook(gb); return; // jp
 }

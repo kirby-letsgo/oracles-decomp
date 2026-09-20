@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0a, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0a, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode80), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode80), (from), (to), true)
 
 static uint16_t interactionCode80_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -26,91 +26,92 @@ static uint16_t interactionCode80_jump_table(GB *gb) {
 
 // INTERAC_DECORATION
 void interactionCode80_hook(GB *gb) {
+  BASE(interactionCode80);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x618a, checkInteractionState_hook, 0x23fe, 0x618d);
-  if (F & FZ) { CYCT(0x618d, 0x618f); goto state0; } // jr z
-  CYC(0x618d, 0x618f);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
+  if (F & FZ) { CYCT(b_+3, b_+5); goto state0; } // jr z
+  CYC(b_+3, b_+5);
 
   // interactionCode80@state1
-  CYC(0x618f, 0x6191); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x6191, 0x6192); A = mem_rd(gb, DE);
+  CYC(b_+5, b_+7); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+7, b_+8); A = mem_rd(gb, DE);
   {
-    CYC(0x6192, 0x6193); push_effect(gb, 0x6193);
+    CYC(b_+8, b_+9); push_effect(gb, b_+9);
     uint16_t target = interactionCode80_jump_table(gb);
-    if (target == 0x61df) goto deleteIfGotRoomItem;
-    if (target == 0x261b) { interactionAnimate_hook(gb); return; }
+    if (target == b_+85) goto deleteIfGotRoomItem;
+    if (target == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
     HANDOFF(target);
   }
 
 state0:
-  CALL_C(0x61a9, interactionInitGraphics_hook, 0x15fb, 0x61ac);
-  CALL_C(0x61ac, interactionIncState_hook, 0x23e0, 0x61af);
-  CALL_C(0x61af, objectSetVisible83_hook, 0x1e72, 0x61b2);
-  CYC(0x61b2, 0x61b4); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x61b4, 0x61b5); A = mem_rd(gb, DE);
+  CALL_C(b_+31, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+34);
+  CALL_C(b_+34, interactionIncState_hook, SYM(interactionIncState), b_+37);
+  CALL_C(b_+37, objectSetVisible83_hook, SYM(objectSetVisible83), b_+40);
+  CYC(b_+40, b_+42); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+42, b_+43); A = mem_rd(gb, DE);
   {
-    CYC(0x61b5, 0x61b6); push_effect(gb, 0x61b6);
+    CYC(b_+43, b_+44); push_effect(gb, b_+44);
     uint16_t target = interactionCode80_jump_table(gb);
-    if (target == 0x61cc) { CYC(0x61cc, 0x61cd); ret_effect(gb); return; } // @stub
-    if (target == 0x61cd) goto deleteIfMoblinsKeepDestroyed;
-    if (target == 0x61d6) goto deleteIfRoomFlagBit7Unset;
-    if (target == 0x61df) goto deleteIfGotRoomItem;
-    if (target == 0x61e8) goto subid0a;
+    if (target == b_+66) { CYC(b_+66, b_+67); ret_effect(gb); return; } // @stub
+    if (target == b_+67) goto deleteIfMoblinsKeepDestroyed;
+    if (target == b_+76) goto deleteIfRoomFlagBit7Unset;
+    if (target == b_+85) goto deleteIfGotRoomItem;
+    if (target == b_+94) goto subid0a;
     HANDOFF(target);
   }
 
 deleteIfMoblinsKeepDestroyed:
-  CYC(0x61cd, 0x61cf); A = 0x1a; // GLOBALFLAG_MOBLINS_KEEP_DESTROYED
-  CALL_C(0x61cf, checkGlobalFlag_hook, 0x31f3, 0x61d2);
-  if (F & FZ) { RET_TAKEN(0x61d2); return; } // ret z
-  CYC(0x61d2, 0x61d3);
-  CYC(0x61d3, 0x61d6); interactionDelete_hook(gb); return; // jp
+  CYC(b_+67, b_+69); A = 0x1a; // GLOBALFLAG_MOBLINS_KEEP_DESTROYED
+  CALL_C(b_+69, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+72);
+  if (F & FZ) { RET_TAKEN(b_+72); return; } // ret z
+  CYC(b_+72, b_+73);
+  CYC(b_+73, b_+76); interactionDelete_hook(gb); return; // jp
 
 deleteIfRoomFlagBit7Unset:
-  CALL_C(0x61d6, getThisRoomFlags_hook, 0x197d, 0x61d9);
-  CYC(0x61d9, 0x61db); alu_bit(gb, 7, A);
-  if (!(F & FZ)) { RET_TAKEN(0x61db); return; } // ret nz
-  CYC(0x61db, 0x61dc);
-  CYC(0x61dc, 0x61df); interactionDelete_hook(gb); return; // jp
+  CALL_C(b_+76, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+79);
+  CYC(b_+79, b_+81); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+81); return; } // ret nz
+  CYC(b_+81, b_+82);
+  CYC(b_+82, b_+85); interactionDelete_hook(gb); return; // jp
 
 deleteIfGotRoomItem:
-  CALL_C(0x61df, getThisRoomFlags_hook, 0x197d, 0x61e2);
-  CYC(0x61e2, 0x61e4); alu_bit(gb, 5, A); // ROOMFLAG_BIT_ITEM
-  if (F & FZ) { RET_TAKEN(0x61e4); return; } // ret z
-  CYC(0x61e4, 0x61e5);
-  CYC(0x61e5, 0x61e8); interactionDelete_hook(gb); return; // jp
+  CALL_C(b_+85, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+88);
+  CYC(b_+88, b_+90); alu_bit(gb, 5, A); // ROOMFLAG_BIT_ITEM
+  if (F & FZ) { RET_TAKEN(b_+90); return; } // ret z
+  CYC(b_+90, b_+91);
+  CYC(b_+91, b_+94); interactionDelete_hook(gb); return; // jp
 
 subid0a:
-  CALL_C(0x61e8, objectSetVisible80_hook, 0x1e57, 0x61eb);
+  CALL_C(b_+94, objectSetVisible80_hook, SYM(objectSetVisible80), b_+97);
 
   // interactionCode80@isSymmetryCityRoom, entered via `call` from here and
   // ending in a tail `jp lookupKey`; the call's own end address (0x61ee) is
   // the resume point, matched against gb->pc/gb->sp exactly like CALL_C does.
-  CYC(0x61eb, 0x61ee); push_effect(gb, 0x61ee);
-  CYC(0x6207, 0x620a); A = W8(wActiveRoom);
-  CYC(0x620a, 0x620b); E = A;
-  CYC(0x620b, 0x620e); SET_HL(0x6211); // @symmetryCityRooms
-  CYC(0x620e, 0x6211); lookupKey_hook(gb); // jp lookupKey
-  if (!(gb->pc == 0x61ee && gb->sp == sp0_)) { hook_continue(gb, gb->pc, sp0_); return; }
+  CYC(b_+97, b_+100); push_effect(gb, b_+100);
+  CYC(b_+125, b_+128); A = W8(wActiveRoom);
+  CYC(b_+128, b_+129); E = A;
+  CYC(b_+129, b_+132); SET_HL(b_+135); // @symmetryCityRooms
+  CYC(b_+132, b_+135); lookupKey_hook(gb); // jp lookupKey
+  if (!(gb->pc == b_+100 && gb->sp == sp0_)) { hook_continue(gb, gb->pc, sp0_); return; }
 
-  if (F & FC) { CYCT(0x61ee, 0x61f0); goto isSymmetryCity; } // jr c
-  CYC(0x61ee, 0x61f0);
+  if (F & FC) { CYCT(b_+100, b_+102); goto isSymmetryCity; } // jr c
+  CYC(b_+100, b_+102);
 
 normalPalette:
-  CYC(0x61f0, 0x61f2); A = 0x7d; // PALH_7d
-  CYC(0x61f2, 0x61f5); loadPaletteHeader_hook(gb); return; // jp
+  CYC(b_+102, b_+104); A = 0x7d; // PALH_7d
+  CYC(b_+104, b_+107); loadPaletteHeader_hook(gb); return; // jp
 
 isSymmetryCity:
-  CYC(0x61f5, 0x61f8); A = W8(wActiveGroup);
-  CYC(0x61f8, 0x61f9); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x61f9, 0x61fb); goto ruinedSymmetryPalette; } // jr nz
-  CYC(0x61f9, 0x61fb);
-  CALL_C(0x61fb, getThisRoomFlags_hook, 0x197d, 0x61fe);
-  CYC(0x61fe, 0x6200); alu_and(gb, 0x01);
-  if (!(F & FZ)) { CYCT(0x6200, 0x6202); goto normalPalette; } // jr nz
-  CYC(0x6200, 0x6202);
+  CYC(b_+107, b_+110); A = W8(wActiveGroup);
+  CYC(b_+110, b_+111); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+111, b_+113); goto ruinedSymmetryPalette; } // jr nz
+  CYC(b_+111, b_+113);
+  CALL_C(b_+113, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+116);
+  CYC(b_+116, b_+118); alu_and(gb, 0x01);
+  if (!(F & FZ)) { CYCT(b_+118, b_+120); goto normalPalette; } // jr nz
+  CYC(b_+118, b_+120);
 
 ruinedSymmetryPalette:
-  CYC(0x6202, 0x6204); A = 0x7c; // PALH_7c
-  CYC(0x6204, 0x6207); loadPaletteHeader_hook(gb); return; // jp
+  CYC(b_+120, b_+122); A = 0x7c; // PALH_7c
+  CYC(b_+122, b_+125); loadPaletteHeader_hook(gb); return; // jp
 }

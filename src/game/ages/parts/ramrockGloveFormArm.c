@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode35), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode35), (from), (to), true)
 
 static uint16_t ramrockGloveFormArm_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -39,12 +39,13 @@ static void ramrockGloveFormArm_addAToHl_from_rst(GB *gb, uint16_t return_addres
 }
 
 static void ramrock35_state0func_6731(GB *gb) {
-  CYC(0x6731, 0x6733); A = 0x01;
-  CYC(0x6733, 0x6734); mem_wr(gb, DE, A);
-  CYC(0x6734, 0x6736); E = 0xcf;
-  CYC(0x6736, 0x6738); A = 0x81;
-  CYC(0x6738, 0x6739); mem_wr(gb, DE, A);
-  CYC(0x6739, 0x673a);
+  BASE(partCode35);
+  CYC(b_+171, b_+173); A = 0x01;
+  CYC(b_+173, b_+174); mem_wr(gb, DE, A);
+  CYC(b_+174, b_+176); E = 0xcf;
+  CYC(b_+176, b_+178); A = 0x81;
+  CYC(b_+178, b_+179); mem_wr(gb, DE, A);
+  CYC(b_+179, b_+180);
 }
 
 void partCode35_hook(GB *gb);
@@ -55,601 +56,607 @@ void state0func_6992_hook(GB *gb);
 void func_69a5_hook(GB *gb);
 
 void partCode35_hook(GB *gb) {
+  BASE(partCode35);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6686, 0x6688); A = 0x29; // Object.health
-  CALL_C(0x6688, objectGetRelatedObject1Var_hook, 0x2160, 0x668b);
-  CYC(0x668b, 0x668c); A = mem_rd(gb, HL);
-  CYC(0x668c, 0x668d); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x668d, 0x6690); partDelete_hook(gb); return; } // jp z
-  CYC(0x668d, 0x6690);
-  CYC(0x6690, 0x6692); E = 0xc2; // Part.subid
-  CYC(0x6692, 0x6693); A = mem_rd(gb, DE);
-  CYC(0x6693, 0x6694); alu_rlca(gb);
-  if (F & FC) { CYCT(0x6694, 0x6696); goto subidBit7SetArm; } // jr c
-  CYC(0x6694, 0x6696);
-  CYC(0x6696, 0x6699); A = mem_rd(gb, 0xcc5a); // wLinkGrabState
-  CYC(0x6699, 0x669a); alu_or(gb, A);
+  CYC(b_+0, b_+2); A = 0x29; // Object.health
+  CALL_C(b_+2, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+5);
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL);
+  CYC(b_+6, b_+7); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+7, b_+10); partDelete_hook(gb); return; } // jp z
+  CYC(b_+7, b_+10);
+  CYC(b_+10, b_+12); E = 0xc2; // Part.subid
+  CYC(b_+12, b_+13); A = mem_rd(gb, DE);
+  CYC(b_+13, b_+14); alu_rlca(gb);
+  if (F & FC) { CYCT(b_+14, b_+16); goto subidBit7SetArm; } // jr c
+  CYC(b_+14, b_+16);
+  CYC(b_+16, b_+19); A = mem_rd(gb, wLinkGrabState); // wLinkGrabState
+  CYC(b_+19, b_+20); alu_or(gb, A);
   if (F & FZ) {
-    CALL_C_CC(0x669a, objectPushLinkAwayOnCollision_hook, 0x230e, 0x669d);
+    CALL_C_CC(b_+20, objectPushLinkAwayOnCollision_hook, SYM(objectPushLinkAwayOnCollision), b_+23);
   } else {
-    CYC(0x669a, 0x669d);
+    CYC(b_+20, b_+23);
   }
-  CYC(0x669d, 0x669f); E = 0xc4; // Part.state
-  CYC(0x669f, 0x66a0); A = mem_rd(gb, DE);
+  CYC(b_+23, b_+25); E = 0xc4; // Part.state
+  CYC(b_+25, b_+26); A = mem_rd(gb, DE);
   {
-    CYC(0x66a0, 0x66a1); push_effect(gb, 0x66a1);
+    CYC(b_+26, b_+27); push_effect(gb, b_+27);
     uint16_t target = ramrockGloveFormArm_jump_table(gb);
-    if (target == 0x66d2) goto state0;
-    if (target == 0x673a) goto state1;
-    if (target == 0x677c) goto state2;
-    if (target == 0x680f) goto state3;
-    if (target == 0x686d) goto state4;
-    if (target == 0x68e2) goto state5;
+    if (target == b_+76) goto state0;
+    if (target == b_+180) goto state1;
+    if (target == b_+246) goto state2;
+    if (target == b_+393) goto state3;
+    if (target == b_+487) goto state4;
+    if (target == b_+604) goto state5;
     goto state6;
   }
 
 subidBit7SetArm:
-  CYC(0x66af, 0x66b1); E = 0xc6;
-  CYC(0x66b1, 0x66b2); A = mem_rd(gb, DE);
-  CYC(0x66b2, 0x66b3); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x66b3, 0x66b5); goto L_66c2; } // jr nz
-  CYC(0x66b3, 0x66b5);
-  CYC(0x66b5, 0x66b7); E = 0xc4;
-  CYC(0x66b7, 0x66b8); A = mem_rd(gb, DE);
-  CYC(0x66b8, 0x66ba); alu_cp(gb, 0x04);
-  if (F & FZ) { CYCT(0x66ba, 0x66bc); goto L_66c2; } // jr z
-  CYC(0x66ba, 0x66bc);
-  CYC(0x66bc, 0x66be); E = 0xda;
-  CYC(0x66be, 0x66bf); A = mem_rd(gb, DE);
-  CYC(0x66bf, 0x66c1); alu_xor(gb, 0x80);
-  CYC(0x66c1, 0x66c2); mem_wr(gb, DE, A);
+  CYC(b_+41, b_+43); E = 0xc6;
+  CYC(b_+43, b_+44); A = mem_rd(gb, DE);
+  CYC(b_+44, b_+45); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+45, b_+47); goto L_66c2; } // jr nz
+  CYC(b_+45, b_+47);
+  CYC(b_+47, b_+49); E = 0xc4;
+  CYC(b_+49, b_+50); A = mem_rd(gb, DE);
+  CYC(b_+50, b_+52); alu_cp(gb, 0x04);
+  if (F & FZ) { CYCT(b_+52, b_+54); goto L_66c2; } // jr z
+  CYC(b_+52, b_+54);
+  CYC(b_+54, b_+56); E = 0xda;
+  CYC(b_+56, b_+57); A = mem_rd(gb, DE);
+  CYC(b_+57, b_+59); alu_xor(gb, 0x80);
+  CYC(b_+59, b_+60); mem_wr(gb, DE, A);
 L_66c2:
-  CYC(0x66c2, 0x66c4); E = 0xc4;
-  CYC(0x66c4, 0x66c5); A = mem_rd(gb, DE);
+  CYC(b_+60, b_+62); E = 0xc4;
+  CYC(b_+62, b_+63); A = mem_rd(gb, DE);
   {
-    CYC(0x66c5, 0x66c6); push_effect(gb, 0x66c6);
+    CYC(b_+63, b_+64); push_effect(gb, b_+64);
     uint16_t target = ramrockGloveFormArm_jump_table(gb);
-    if (target == 0x6705) goto subidBit7SetArm_state0;
-    if (target == 0x6747) goto subidBit7SetArm_state1;
-    if (target == 0x67f1) goto subidBit7SetArm_state2;
-    if (target == 0x680f) goto state3;
-    if (target == 0x68c3) goto subidBit7SetArm_state4;
+    if (target == b_+127) goto subidBit7SetArm_state0;
+    if (target == b_+193) goto subidBit7SetArm_state1;
+    if (target == b_+363) goto subidBit7SetArm_state2;
+    if (target == b_+393) goto state3;
+    if (target == b_+573) goto subidBit7SetArm_state4;
     goto subidBit7SetArm_state5;
   }
 
 state0:
-  CYC(0x66d2, 0x66d5); ramrock35_state0func_6731(gb);
-  CYC(0x66d5, 0x66d7); E = 0xd7;
-  CYC(0x66d7, 0x66d8); A = mem_rd(gb, DE);
-  CYC(0x66d8, 0x66da); E = 0xf0;
-  CYC(0x66da, 0x66db); mem_wr(gb, DE, A);
-  CALL_C(0x66db, state0func_6956_hook, 0x6956, 0x66de);
-  CYC(0x66de, 0x66df); A = mem_rd(gb, DE);
-  CYC(0x66df, 0x66e1); A = alu_swap(gb, A);
-  CYC(0x66e1, 0x66e2); mem_wr(gb, DE, A);
-  CYC(0x66e2, 0x66e4); alu_or(gb, 0x80);
-  CYC(0x66e4, 0x66e5); mem_wr(gb, HL, A);
-  CALL_C(0x66e5, state0func_6992_hook, 0x6992, 0x66e8);
-  CYC(0x66e8, 0x66ea); L = 0xd6;
-  CYC(0x66ea, 0x66ec); A = 0xc0;
-  CYC(0x66ec, 0x66ed); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x66ed, 0x66ee); mem_wr(gb, HL, D);
-  CYC(0x66ee, 0x66f0); E = 0xc2;
-  CYC(0x66f0, 0x66f1); A = mem_rd(gb, DE);
-  CYC(0x66f1, 0x66f3); A = alu_swap(gb, A);
-  CYC(0x66f3, 0x66f6); SET_HL(0x6703);
-  CYC(0x66f6, 0x66f7); ramrockGloveFormArm_addAToHl_from_rst(gb, 0x66f7);
-  CYC(0x66f7, 0x66f8); A = mem_rd(gb, HL);
-  CYC(0x66f8, 0x66fa); E = 0xc9;
-  CYC(0x66fa, 0x66fb); mem_wr(gb, DE, A);
-  CYC(0x66fb, 0x66fd); A = 0x51; // SND_THROW
-  CALL_C(0x66fd, playSound_b00_hook, 0x0c98, 0x6700);
-  CYC(0x6700, 0x6703); objectSetVisiblec0_hook(gb); return; // jp
+  CYC(b_+76, b_+79); ramrock35_state0func_6731(gb);
+  CYC(b_+79, b_+81); E = 0xd7;
+  CYC(b_+81, b_+82); A = mem_rd(gb, DE);
+  CYC(b_+82, b_+84); E = 0xf0;
+  CYC(b_+84, b_+85); mem_wr(gb, DE, A);
+  CALL_C(b_+85, state0func_6956_hook, SYM(state0func_6956), b_+88);
+  CYC(b_+88, b_+89); A = mem_rd(gb, DE);
+  CYC(b_+89, b_+91); A = alu_swap(gb, A);
+  CYC(b_+91, b_+92); mem_wr(gb, DE, A);
+  CYC(b_+92, b_+94); alu_or(gb, 0x80);
+  CYC(b_+94, b_+95); mem_wr(gb, HL, A);
+  CALL_C(b_+95, state0func_6992_hook, SYM(state0func_6992), b_+98);
+  CYC(b_+98, b_+100); L = 0xd6;
+  CYC(b_+100, b_+102); A = 0xc0;
+  CYC(b_+102, b_+103); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+103, b_+104); mem_wr(gb, HL, D);
+  CYC(b_+104, b_+106); E = 0xc2;
+  CYC(b_+106, b_+107); A = mem_rd(gb, DE);
+  CYC(b_+107, b_+109); A = alu_swap(gb, A);
+  CYC(b_+109, b_+112); SET_HL(b_+125);
+  CYC(b_+112, b_+113); ramrockGloveFormArm_addAToHl_from_rst(gb, b_+113);
+  CYC(b_+113, b_+114); A = mem_rd(gb, HL);
+  CYC(b_+114, b_+116); E = 0xc9;
+  CYC(b_+116, b_+117); mem_wr(gb, DE, A);
+  CYC(b_+117, b_+119); A = 0x51; // SND_THROW
+  CALL_C(b_+119, playSound_b00_hook, SYM(playSound_b00), b_+122);
+  CYC(b_+122, b_+125); objectSetVisiblec0_hook(gb); return; // jp
 
 subidBit7SetArm_state0:
-  CYC(0x6705, 0x6708); ramrock35_state0func_6731(gb);
-  CALL_C(0x6708, state0func_6956_hook, 0x6956, 0x670b);
-  CALL_C(0x670b, state0func_6992_hook, 0x6992, 0x670e);
-  CYC(0x670e, 0x6710); L = 0xd6;
-  CYC(0x6710, 0x6712); A = 0xc0;
-  CYC(0x6712, 0x6713); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x6713, 0x6714); mem_wr(gb, HL, D);
-  CYC(0x6714, 0x6716); L = 0xf0;
-  CYC(0x6716, 0x6717); E = L;
-  CYC(0x6717, 0x6718); A = mem_rd(gb, DE);
-  CYC(0x6718, 0x6719); mem_wr(gb, HL, A);
-  CYC(0x6719, 0x671b); A = 0x01;
-  CALL_C(0x671b, partSetAnimation_hook, 0x2988, 0x671e);
-  CYC(0x671e, 0x6720); E = 0xc2;
-  CYC(0x6720, 0x6721); A = mem_rd(gb, DE);
-  CYC(0x6721, 0x6723); alu_and(gb, 0x0f);
-  CYC(0x6723, 0x6725); alu_add(gb, 0x0a);
-  CYC(0x6725, 0x6727); E = 0xc6;
-  CYC(0x6727, 0x6728); mem_wr(gb, DE, A);
-  CYC(0x6728, 0x672a); E = 0xe4;
-  CYC(0x672a, 0x672b); A = mem_rd(gb, DE);
-  CYC(0x672b, 0x672d); A = (uint8_t)(A & ~(1 << 7));
-  CYC(0x672d, 0x672e); mem_wr(gb, DE, A);
-  CYC(0x672e, 0x6731); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+127, b_+130); ramrock35_state0func_6731(gb);
+  CALL_C(b_+130, state0func_6956_hook, SYM(state0func_6956), b_+133);
+  CALL_C(b_+133, state0func_6992_hook, SYM(state0func_6992), b_+136);
+  CYC(b_+136, b_+138); L = 0xd6;
+  CYC(b_+138, b_+140); A = 0xc0;
+  CYC(b_+140, b_+141); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+141, b_+142); mem_wr(gb, HL, D);
+  CYC(b_+142, b_+144); L = 0xf0;
+  CYC(b_+144, b_+145); E = L;
+  CYC(b_+145, b_+146); A = mem_rd(gb, DE);
+  CYC(b_+146, b_+147); mem_wr(gb, HL, A);
+  CYC(b_+147, b_+149); A = 0x01;
+  CALL_C(b_+149, partSetAnimation_hook, SYM(partSetAnimation), b_+152);
+  CYC(b_+152, b_+154); E = 0xc2;
+  CYC(b_+154, b_+155); A = mem_rd(gb, DE);
+  CYC(b_+155, b_+157); alu_and(gb, 0x0f);
+  CYC(b_+157, b_+159); alu_add(gb, 0x0a);
+  CYC(b_+159, b_+161); E = 0xc6;
+  CYC(b_+161, b_+162); mem_wr(gb, DE, A);
+  CYC(b_+162, b_+164); E = 0xe4;
+  CYC(b_+164, b_+165); A = mem_rd(gb, DE);
+  CYC(b_+165, b_+167); A = (uint8_t)(A & ~(1 << 7));
+  CYC(b_+167, b_+168); mem_wr(gb, DE, A);
+  CYC(b_+168, b_+171); objectSetVisiblec1_hook(gb); return; // jp
 
 state1:
-  CYC(0x673a, 0x673c); C = 0x10;
-  CALL_C(0x673c, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x673f);
-  if (!(F & FZ)) { RET_TAKEN(0x673f); return; } // ret nz
-  CYC(0x673f, 0x6740);
-  CYC(0x6740, 0x6742); E = 0xf1;
-  CYC(0x6742, 0x6743); A = mem_rd(gb, DE);
-  CYC(0x6743, 0x6744); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x6744, 0x6746); goto func_675e; } // jr nz
-  CYC(0x6744, 0x6746);
-  RET(0x6746); return; // ret
+  CYC(b_+180, b_+182); C = 0x10;
+  CALL_C(b_+182, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+185);
+  if (!(F & FZ)) { RET_TAKEN(b_+185); return; } // ret nz
+  CYC(b_+185, b_+186);
+  CYC(b_+186, b_+188); E = 0xf1;
+  CYC(b_+188, b_+189); A = mem_rd(gb, DE);
+  CYC(b_+189, b_+190); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+190, b_+192); goto func_675e; } // jr nz
+  CYC(b_+190, b_+192);
+  RET(b_+192); return; // ret
 
 subidBit7SetArm_state1:
-  CALL_C(0x6747, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x674a);
-  if (!(F & FZ)) { RET_TAKEN(0x674a); return; } // ret nz
-  CYC(0x674a, 0x674b);
-  CYC(0x674b, 0x674d); C = 0x10;
-  CALL_C(0x674d, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x6750);
-  if (!(F & FZ)) { RET_TAKEN(0x6750); return; } // ret nz
-  CYC(0x6750, 0x6751);
-  CYC(0x6751, 0x6753); L = 0xc7;
-  CYC(0x6753, 0x6754); A = mem_rd(gb, HL);
-  CYC(0x6754, 0x6755); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x6755, 0x6757); goto func_675e; } // jr nz
-  CYC(0x6755, 0x6757);
-  CYC(0x6757, 0x6758); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6758, 0x675b); SET_BC(0xfe80);
-  CYC(0x675b, 0x675e); objectSetSpeedZ_hook(gb); return; // jp
+  CALL_C(b_+193, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+196);
+  if (!(F & FZ)) { RET_TAKEN(b_+196); return; } // ret nz
+  CYC(b_+196, b_+197);
+  CYC(b_+197, b_+199); C = 0x10;
+  CALL_C(b_+199, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+202);
+  if (!(F & FZ)) { RET_TAKEN(b_+202); return; } // ret nz
+  CYC(b_+202, b_+203);
+  CYC(b_+203, b_+205); L = 0xc7;
+  CYC(b_+205, b_+206); A = mem_rd(gb, HL);
+  CYC(b_+206, b_+207); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+207, b_+209); goto func_675e; } // jr nz
+  CYC(b_+207, b_+209);
+  CYC(b_+209, b_+210); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+210, b_+213); SET_BC(0xfe80);
+  CYC(b_+213, b_+216); objectSetSpeedZ_hook(gb); return; // jp
 
 func_675e:
-  CYC(0x675e, 0x6760); A = 0x78;
-  CYC(0x6760, 0x6762); goto L_6764; // jr
+  CYC(b_+216, b_+218); A = 0x78;
+  CYC(b_+218, b_+220); goto L_6764; // jr
 
 func_6762:
-  CYC(0x6762, 0x6764); A = 0x14;
+  CYC(b_+220, b_+222); A = 0x14;
 L_6764:
-  CYC(0x6764, 0x6766); E = 0xd0;
-  CYC(0x6766, 0x6767); mem_wr(gb, DE, A);
-  CYC(0x6767, 0x6769); A = 0x31;
-  CALL_C(0x6769, objectGetRelatedObject1Var_hook, 0x2160, 0x676c);
-  CYC(0x676c, 0x676d); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x676d, 0x676f); E = 0xc4;
-  CYC(0x676f, 0x6771); A = 0x03;
-  CYC(0x6771, 0x6772); mem_wr(gb, DE, A);
-  CALL_C(0x6772, func_693b_hook, 0x693b, 0x6775);
-  CALL_C(0x6775, objectGetRelativeAngle_hook, 0x1ea4, 0x6778);
-  CYC(0x6778, 0x677a); E = 0xc9;
-  CYC(0x677a, 0x677b); mem_wr(gb, DE, A);
-  RET(0x677b); return; // ret
+  CYC(b_+222, b_+224); E = 0xd0;
+  CYC(b_+224, b_+225); mem_wr(gb, DE, A);
+  CYC(b_+225, b_+227); A = 0x31;
+  CALL_C(b_+227, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+230);
+  CYC(b_+230, b_+231); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+231, b_+233); E = 0xc4;
+  CYC(b_+233, b_+235); A = 0x03;
+  CYC(b_+235, b_+236); mem_wr(gb, DE, A);
+  CALL_C(b_+236, func_693b_hook, SYM(func_693b), b_+239);
+  CALL_C(b_+239, objectGetRelativeAngle_hook, SYM(objectGetRelativeAngle), b_+242);
+  CYC(b_+242, b_+244); E = 0xc9;
+  CYC(b_+244, b_+245); mem_wr(gb, DE, A);
+  RET(b_+245); return; // ret
 
 state2:
-  CYC(0x677c, 0x677d); E = alu_inc8(gb, E);
-  CYC(0x677d, 0x677e); A = mem_rd(gb, DE);
+  CYC(b_+246, b_+247); E = alu_inc8(gb, E);
+  CYC(b_+247, b_+248); A = mem_rd(gb, DE);
   {
-    CYC(0x677e, 0x677f); push_effect(gb, 0x677f);
+    CYC(b_+248, b_+249); push_effect(gb, b_+249);
     uint16_t target = ramrockGloveFormArm_jump_table(gb);
-    if (target == 0x6787) goto state2_substate0;
-    if (target == 0x67b7) goto state2_substate1;
+    if (target == b_+257) goto state2_substate0;
+    if (target == b_+305) goto state2_substate1;
     goto state2_substate2; // substate2 and substate3 both target 0x67b0
   }
 
 state2_substate0:
-  CYC(0x6787, 0x6788); H = D;
-  CYC(0x6788, 0x6789); L = E;
-  CYC(0x6789, 0x678a); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x678a, 0x678c); A = 0x90;
-  CYC(0x678c, 0x678f); mem_wr(gb, 0xcc5b, A); // wLinkGrabState2
-  CYC(0x678f, 0x6790); alu_xor(gb, A);
-  CYC(0x6790, 0x6792); L = 0xca;
-  CYC(0x6792, 0x6793); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(0x6793, 0x6796); mem_wr(gb, 0xd00a, A);
-  CYC(0x6796, 0x6798); mem_wr(gb, HL, 0x10);
-  CYC(0x6798, 0x679a); L = 0xd0;
-  CYC(0x679a, 0x679c); mem_wr(gb, HL, 0x14);
-  CYC(0x679c, 0x679e); L = 0xc7;
-  CYC(0x679e, 0x67a0); mem_wr(gb, HL, 0x60);
-  CALL_C(0x67a0, func_69a5_hook, 0x69a5, 0x67a3);
-  CYC(0x67a3, 0x67a5); L = 0xb7;
-  CYC(0x67a5, 0x67a7); E = 0xc2;
-  CYC(0x67a7, 0x67a8); A = mem_rd(gb, DE);
-  CYC(0x67a8, 0x67aa); A = alu_swap(gb, A);
-  CYC(0x67aa, 0x67ad); unsetFlag_hook(gb); return; // jp
+  CYC(b_+257, b_+258); H = D;
+  CYC(b_+258, b_+259); L = E;
+  CYC(b_+259, b_+260); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+260, b_+262); A = 0x90;
+  CYC(b_+262, b_+265); mem_wr(gb, wLinkGrabState2, A); // wLinkGrabState2
+  CYC(b_+265, b_+266); alu_xor(gb, A);
+  CYC(b_+266, b_+268); L = 0xca;
+  CYC(b_+268, b_+269); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+269, b_+272); mem_wr(gb, w1Link_y, A);
+  CYC(b_+272, b_+274); mem_wr(gb, HL, 0x10);
+  CYC(b_+274, b_+276); L = 0xd0;
+  CYC(b_+276, b_+278); mem_wr(gb, HL, 0x14);
+  CYC(b_+278, b_+280); L = 0xc7;
+  CYC(b_+280, b_+282); mem_wr(gb, HL, 0x60);
+  CALL_C(b_+282, func_69a5_hook, SYM(func_69a5), b_+285);
+  CYC(b_+285, b_+287); L = 0xb7;
+  CYC(b_+287, b_+289); E = 0xc2;
+  CYC(b_+289, b_+290); A = mem_rd(gb, DE);
+  CYC(b_+290, b_+292); A = alu_swap(gb, A);
+  CYC(b_+292, b_+295); unsetFlag_hook(gb); return; // jp
 
 state2_dropLinkHeldItem:
-  CALL_C(0x67ad, dropLinkHeldItem_hook, 0x2c43, 0x67b0);
+  CALL_C(b_+295, dropLinkHeldItem_hook, SYM(dropLinkHeldItem), b_+298);
 state2_substate2:
-  CYC(0x67b0, 0x67b2); A = 0xb1; // SND_BIGSWORD
-  CALL_C(0x67b2, playSound_b00_hook, 0x0c98, 0x67b5);
-  CYC(0x67b5, 0x67b7); goto func_675e; // jr
+  CYC(b_+298, b_+300); A = 0xb1; // SND_BIGSWORD
+  CALL_C(b_+300, playSound_b00_hook, SYM(playSound_b00), b_+303);
+  CYC(b_+303, b_+305); goto func_675e; // jr
 
 state2_substate1:
-  CALL_C(0x67b7, func_69a5_hook, 0x69a5, 0x67ba);
-  CYC(0x67ba, 0x67bb); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x67bb, 0x67bd); alu_cp(gb, 0x11);
-  if (F & FZ) { CYCT(0x67bd, 0x67bf); goto state2_dropLinkHeldItem; } // jr z
-  CYC(0x67bd, 0x67bf);
-  CYC(0x67bf, 0x67c2); A = mem_rd(gb, 0xd221);
-  CYC(0x67c2, 0x67c3); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x67c3, 0x67c5); goto state2func_67c9; } // jr nz
-  CYC(0x67c3, 0x67c5);
-  CYC(0x67c5, 0x67c7); E = 0xf3;
-  CYC(0x67c7, 0x67c8); mem_wr(gb, DE, A);
-  RET(0x67c8); return; // ret
+  CALL_C(b_+305, func_69a5_hook, SYM(func_69a5), b_+308);
+  CYC(b_+308, b_+309); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+309, b_+311); alu_cp(gb, 0x11);
+  if (F & FZ) { CYCT(b_+311, b_+313); goto state2_dropLinkHeldItem; } // jr z
+  CYC(b_+311, b_+313);
+  CYC(b_+313, b_+316); A = mem_rd(gb, w1ParentItem2_animParameter);
+  CYC(b_+316, b_+317); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+317, b_+319); goto state2func_67c9; } // jr nz
+  CYC(b_+317, b_+319);
+  CYC(b_+319, b_+321); E = 0xf3;
+  CYC(b_+321, b_+322); mem_wr(gb, DE, A);
+  RET(b_+322); return; // ret
 
 state2func_67c9:
-  CYC(0x67c9, 0x67ca); H = D;
-  CYC(0x67ca, 0x67cc); L = 0xc7;
-  CYC(0x67cc, 0x67cd); A = mem_rd(gb, HL);
-  CYC(0x67cd, 0x67ce); alu_or(gb, A);
-  if (F & FZ) { RET_TAKEN(0x67ce); return; } // ret z
-  CYC(0x67ce, 0x67cf);
-  CYC(0x67cf, 0x67d0); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  if (!(F & FZ)) { CYCT(0x67d0, 0x67d2); goto L_67d8; } // jr nz
-  CYC(0x67d0, 0x67d2);
-  CYC(0x67d2, 0x67d3); L = alu_dec8(gb, L);
-  CYC(0x67d3, 0x67d5); mem_wr(gb, HL, 0x14);
-  CYC(0x67d5, 0x67d7); L = 0xf2;
-  CYC(0x67d7, 0x67d8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+323, b_+324); H = D;
+  CYC(b_+324, b_+326); L = 0xc7;
+  CYC(b_+326, b_+327); A = mem_rd(gb, HL);
+  CYC(b_+327, b_+328); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+328); return; } // ret z
+  CYC(b_+328, b_+329);
+  CYC(b_+329, b_+330); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(b_+330, b_+332); goto L_67d8; } // jr nz
+  CYC(b_+330, b_+332);
+  CYC(b_+332, b_+333); L = alu_dec8(gb, L);
+  CYC(b_+333, b_+335); mem_wr(gb, HL, 0x14);
+  CYC(b_+335, b_+337); L = 0xf2;
+  CYC(b_+337, b_+338); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
 L_67d8:
-  CYC(0x67d8, 0x67da); L = 0xf3;
-  CYC(0x67da, 0x67db); A = mem_rd(gb, HL);
-  CYC(0x67db, 0x67dc); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x67dc, 0x67de); goto L_67e4; } // jr nz
-  CYC(0x67dc, 0x67de);
-  CYC(0x67de, 0x67e0); A = 0x71; // SND_MOVEBLOCK
-  CYC(0x67e0, 0x67e1); mem_wr(gb, HL, A);
-  CALL_C(0x67e1, playSound_b00_hook, 0x0c98, 0x67e4);
+  CYC(b_+338, b_+340); L = 0xf3;
+  CYC(b_+340, b_+341); A = mem_rd(gb, HL);
+  CYC(b_+341, b_+342); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+342, b_+344); goto L_67e4; } // jr nz
+  CYC(b_+342, b_+344);
+  CYC(b_+344, b_+346); A = 0x71; // SND_MOVEBLOCK
+  CYC(b_+346, b_+347); mem_wr(gb, HL, A);
+  CALL_C(b_+347, playSound_b00_hook, SYM(playSound_b00), b_+350);
 L_67e4:
-  CYC(0x67e4, 0x67e5); H = D;
-  CYC(0x67e5, 0x67e7); L = 0xc9;
-  CYC(0x67e7, 0x67e8); C = mem_rd(gb, HL);
-  CYC(0x67e8, 0x67ea); L = 0xd0;
-  CYC(0x67ea, 0x67eb); B = mem_rd(gb, HL);
-  CALL_C(0x67eb, updateLinkPositionGivenVelocity_hook, 0x231e, 0x67ee);
-  CYC(0x67ee, 0x67f1); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+350, b_+351); H = D;
+  CYC(b_+351, b_+353); L = 0xc9;
+  CYC(b_+353, b_+354); C = mem_rd(gb, HL);
+  CYC(b_+354, b_+356); L = 0xd0;
+  CYC(b_+356, b_+357); B = mem_rd(gb, HL);
+  CALL_C(b_+357, updateLinkPositionGivenVelocity_hook, SYM(updateLinkPositionGivenVelocity), b_+360);
+  CYC(b_+360, b_+363); objectApplySpeed_hook(gb); return; // jp
 
 subidBit7SetArm_state2:
-  CYC(0x67f1, 0x67f3); A = 0x0b;
-  CALL_C(0x67f3, objectGetRelatedObject1Var_hook, 0x2160, 0x67f6);
-  CYC(0x67f6, 0x67f8); E = 0xcb;
-  CYC(0x67f8, 0x67f9); A = mem_rd(gb, DE);
-  CYC(0x67f9, 0x67fa); alu_sub(gb, mem_rd(gb, HL));
-  CYC(0x67fa, 0x67fb); alu_cpl(gb);
-  CYC(0x67fb, 0x67fc); A = alu_inc8(gb, A);
-  CYC(0x67fc, 0x67fe); alu_cp(gb, 0x10);
-  if (F & FC) { CYCT(0x67fe, 0x6800); goto L_6803; } // jr c
-  CYC(0x67fe, 0x6800);
-  CYC(0x6800, 0x6801); A = mem_rd(gb, DE);
-  CYC(0x6801, 0x6802); A = alu_inc8(gb, A);
-  CYC(0x6802, 0x6803); mem_wr(gb, DE, A);
+  CYC(b_+363, b_+365); A = 0x0b;
+  CALL_C(b_+365, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+368);
+  CYC(b_+368, b_+370); E = 0xcb;
+  CYC(b_+370, b_+371); A = mem_rd(gb, DE);
+  CYC(b_+371, b_+372); alu_sub(gb, mem_rd(gb, HL));
+  CYC(b_+372, b_+373); alu_cpl(gb);
+  CYC(b_+373, b_+374); A = alu_inc8(gb, A);
+  CYC(b_+374, b_+376); alu_cp(gb, 0x10);
+  if (F & FC) { CYCT(b_+376, b_+378); goto L_6803; } // jr c
+  CYC(b_+376, b_+378);
+  CYC(b_+378, b_+379); A = mem_rd(gb, DE);
+  CYC(b_+379, b_+380); A = alu_inc8(gb, A);
+  CYC(b_+380, b_+381); mem_wr(gb, DE, A);
 L_6803:
-  CYC(0x6803, 0x6805); A = 0x04;
-  CALL_C(0x6805, objectGetRelatedObject1Var_hook, 0x2160, 0x6808);
-  CYC(0x6808, 0x6809); A = mem_rd(gb, HL);
-  CYC(0x6809, 0x680b); alu_cp(gb, 0x02);
-  if (F & FZ) { RET_TAKEN(0x680b); return; } // ret z
-  CYC(0x680b, 0x680c);
-  CYC(0x680c, 0x680f); goto func_675e; // jp
+  CYC(b_+381, b_+383); A = 0x04;
+  CALL_C(b_+383, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+386);
+  CYC(b_+386, b_+387); A = mem_rd(gb, HL);
+  CYC(b_+387, b_+389); alu_cp(gb, 0x02);
+  if (F & FZ) { RET_TAKEN(b_+389); return; } // ret z
+  CYC(b_+389, b_+390);
+  CYC(b_+390, b_+393); goto func_675e; // jp
 
 state3:
-  CYC(0x680f, 0x6811); E = 0xc6;
-  CYC(0x6811, 0x6812); A = mem_rd(gb, DE);
-  CYC(0x6812, 0x6813); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x6813, 0x6815); goto state3func_681a; } // jr z
-  CYC(0x6813, 0x6815);
-  CYC(0x6815, 0x6816); A = alu_dec8(gb, A);
-  CYC(0x6816, 0x6817); mem_wr(gb, DE, A);
-  CYC(0x6817, 0x681a); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+393, b_+395); E = 0xc6;
+  CYC(b_+395, b_+396); A = mem_rd(gb, DE);
+  CYC(b_+396, b_+397); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+397, b_+399); goto state3func_681a; } // jr z
+  CYC(b_+397, b_+399);
+  CYC(b_+399, b_+400); A = alu_dec8(gb, A);
+  CYC(b_+400, b_+401); mem_wr(gb, DE, A);
+  CYC(b_+401, b_+404); objectApplySpeed_hook(gb); return; // jp
 
 state3func_681a:
-  CALL_C(0x681a, func_693b_hook, 0x693b, 0x681d);
-  CALL_C(0x681d, objectGetRelativeAngle_hook, 0x1ea4, 0x6820);
-  CYC(0x6820, 0x6822); E = 0xc9;
-  CYC(0x6822, 0x6823); mem_wr(gb, DE, A);
-  CALL_C(0x6823, objectApplySpeed_hook, 0x201d, 0x6826);
-  CALL_C(0x6826, state3func_6970_hook, 0x6970, 0x6829);
-  if (!(F & FZ)) { RET_TAKEN(0x6829); return; } // ret nz
-  CYC(0x6829, 0x682a);
-  CYC(0x682a, 0x682c); E = 0xc2;
-  CYC(0x682c, 0x682d); A = mem_rd(gb, DE);
-  CYC(0x682d, 0x682e); alu_rlca(gb);
-  if (F & FC) { CYCT(0x682e, 0x6830); goto state3func_6864; } // jr c
-  CYC(0x682e, 0x6830);
-  CYC(0x6830, 0x6831); H = D;
-  CYC(0x6831, 0x6833); L = 0xe4;
-  CYC(0x6833, 0x6835); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  CYC(0x6835, 0x6837); E = 0xf2;
-  CYC(0x6837, 0x6838); A = mem_rd(gb, DE);
-  CYC(0x6838, 0x6839); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x6839, 0x683b); goto L_6850; } // jr z
-  CYC(0x6839, 0x683b);
-  CYC(0x683b, 0x683c); alu_xor(gb, A);
-  CYC(0x683c, 0x683d); mem_wr(gb, DE, A);
-  CALL_C(0x683d, func_69a5_hook, 0x69a5, 0x6840);
-  CYC(0x6840, 0x6842); L = 0xab;
-  CYC(0x6842, 0x6843); A = mem_rd(gb, HL);
-  CYC(0x6843, 0x6844); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x6844, 0x6846); goto L_6850; } // jr nz
-  CYC(0x6844, 0x6846);
-  CYC(0x6846, 0x6848); mem_wr(gb, HL, 0x3c);
-  CYC(0x6848, 0x684a); L = 0xb5;
-  CYC(0x684a, 0x684b); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x684b, 0x684d); A = 0x63; // SND_BOSS_DAMAGE
-  CALL_C(0x684d, playSound_b00_hook, 0x0c98, 0x6850);
+  CALL_C(b_+404, func_693b_hook, SYM(func_693b), b_+407);
+  CALL_C(b_+407, objectGetRelativeAngle_hook, SYM(objectGetRelativeAngle), b_+410);
+  CYC(b_+410, b_+412); E = 0xc9;
+  CYC(b_+412, b_+413); mem_wr(gb, DE, A);
+  CALL_C(b_+413, objectApplySpeed_hook, SYM(objectApplySpeed), b_+416);
+  CALL_C(b_+416, state3func_6970_hook, SYM(state3func_6970), b_+419);
+  if (!(F & FZ)) { RET_TAKEN(b_+419); return; } // ret nz
+  CYC(b_+419, b_+420);
+  CYC(b_+420, b_+422); E = 0xc2;
+  CYC(b_+422, b_+423); A = mem_rd(gb, DE);
+  CYC(b_+423, b_+424); alu_rlca(gb);
+  if (F & FC) { CYCT(b_+424, b_+426); goto state3func_6864; } // jr c
+  CYC(b_+424, b_+426);
+  CYC(b_+426, b_+427); H = D;
+  CYC(b_+427, b_+429); L = 0xe4;
+  CYC(b_+429, b_+431); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
+  CYC(b_+431, b_+433); E = 0xf2;
+  CYC(b_+433, b_+434); A = mem_rd(gb, DE);
+  CYC(b_+434, b_+435); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+435, b_+437); goto L_6850; } // jr z
+  CYC(b_+435, b_+437);
+  CYC(b_+437, b_+438); alu_xor(gb, A);
+  CYC(b_+438, b_+439); mem_wr(gb, DE, A);
+  CALL_C(b_+439, func_69a5_hook, SYM(func_69a5), b_+442);
+  CYC(b_+442, b_+444); L = 0xab;
+  CYC(b_+444, b_+445); A = mem_rd(gb, HL);
+  CYC(b_+445, b_+446); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+446, b_+448); goto L_6850; } // jr nz
+  CYC(b_+446, b_+448);
+  CYC(b_+448, b_+450); mem_wr(gb, HL, 0x3c);
+  CYC(b_+450, b_+452); L = 0xb5;
+  CYC(b_+452, b_+453); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+453, b_+455); A = 0x63; // SND_BOSS_DAMAGE
+  CALL_C(b_+455, playSound_b00_hook, SYM(playSound_b00), b_+458);
 L_6850:
-  CYC(0x6850, 0x6852); E = 0xc6;
-  CYC(0x6852, 0x6854); A = 0x3c;
-  CYC(0x6854, 0x6855); mem_wr(gb, DE, A);
-  CALL_C(0x6855, func_69a5_hook, 0x69a5, 0x6858);
-  CYC(0x6858, 0x685a); L = 0xb7;
-  CYC(0x685a, 0x685c); E = 0xc2;
-  CYC(0x685c, 0x685d); A = mem_rd(gb, DE);
-  CYC(0x685d, 0x685f); A = alu_swap(gb, A);
-  CALL_C(0x685f, setFlag_hook, 0x020e, 0x6862);
-  CYC(0x6862, 0x6864); goto L_6867; // jr
+  CYC(b_+458, b_+460); E = 0xc6;
+  CYC(b_+460, b_+462); A = 0x3c;
+  CYC(b_+462, b_+463); mem_wr(gb, DE, A);
+  CALL_C(b_+463, func_69a5_hook, SYM(func_69a5), b_+466);
+  CYC(b_+466, b_+468); L = 0xb7;
+  CYC(b_+468, b_+470); E = 0xc2;
+  CYC(b_+470, b_+471); A = mem_rd(gb, DE);
+  CYC(b_+471, b_+473); A = alu_swap(gb, A);
+  CALL_C(b_+473, setFlag_hook, SYM(setFlag), b_+476);
+  CYC(b_+476, b_+478); goto L_6867; // jr
 
 state3func_6864:
-  CALL_C(0x6864, objectSetInvisible_hook, 0x1e7b, 0x6867);
+  CALL_C(b_+478, objectSetInvisible_hook, SYM(objectSetInvisible), b_+481);
 L_6867:
-  CYC(0x6867, 0x6869); E = 0xc4;
-  CYC(0x6869, 0x686b); A = 0x04;
-  CYC(0x686b, 0x686c); mem_wr(gb, DE, A);
-  RET(0x686c); return; // ret
+  CYC(b_+481, b_+483); E = 0xc4;
+  CYC(b_+483, b_+485); A = 0x04;
+  CYC(b_+485, b_+486); mem_wr(gb, DE, A);
+  RET(b_+486); return; // ret
 
 state4:
-  CYC(0x686d, 0x686e); H = D;
-  CYC(0x686e, 0x6870); L = 0xe4;
-  CYC(0x6870, 0x6872); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  CYC(0x6872, 0x6875);
-  CALL_C(0x68d7, func_693b_hook, 0x693b, 0x68da);
-  CYC(0x68da, 0x68db); H = D;
-  CYC(0x68db, 0x68dd); L = 0xcb;
-  CYC(0x68dd, 0x68de); mem_wr(gb, HL, B);
-  CYC(0x68de, 0x68e0); L = 0xcd;
-  CYC(0x68e0, 0x68e1); mem_wr(gb, HL, C);
-  CYC(0x68e1, 0x68e2); // ret (returns to 0x6875, no continuation check needed here)
-  CALL_C(0x6875, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x6878);
-  if (!(F & FZ)) { RET_TAKEN(0x6878); return; } // ret nz
-  CYC(0x6878, 0x6879);
-  CALL_C(0x6879, func_69a5_hook, 0x69a5, 0x687c);
-  CYC(0x687c, 0x687d); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x687d, 0x687f); alu_cp(gb, 0x12);
-  if (!(F & FZ)) { RET_TAKEN(0x687f); return; } // ret nz
-  CYC(0x687f, 0x6880);
-  CYC(0x6880, 0x6881); A = mem_rd(gb, HL);
-  CYC(0x6881, 0x6883); alu_bit(gb, 5, A);
-  if (!(F & FZ)) { CYCT(0x6883, 0x6885); goto state4func_689e; } // jr nz
-  CYC(0x6883, 0x6885);
-  CYC(0x6885, 0x6887); E = 0xc2;
-  CYC(0x6887, 0x6888); A = mem_rd(gb, DE);
-  CYC(0x6888, 0x6889); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(0x6889, 0x688b); goto state4func_689e; } // jr z
-  CYC(0x6889, 0x688b);
-  CALL_C(0x688b, objectGetAngleTowardLink_hook, 0x1e9c, 0x688e);
-  CYC(0x688e, 0x6890); alu_cp(gb, 0x10);
-  if (!(F & FZ)) { RET_TAKEN(0x6890); return; } // ret nz
-  CYC(0x6890, 0x6891);
-  CYC(0x6891, 0x6894); A = mem_rd(gb, 0xd008); // w1Link.direction
-  CYC(0x6894, 0x6895); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x6895); return; } // ret nz
-  CYC(0x6895, 0x6896);
-  CYC(0x6896, 0x6897); H = D;
-  CYC(0x6897, 0x6899); L = 0xe4;
-  CYC(0x6899, 0x689b); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
-  CYC(0x689b, 0x689e); objectAddToGrabbableObjectBuffer_hook(gb); return; // jp
+  CYC(b_+487, b_+488); H = D;
+  CYC(b_+488, b_+490); L = 0xe4;
+  CYC(b_+490, b_+492); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
+  CYC(b_+492, b_+495);
+  CALL_C(b_+593, func_693b_hook, SYM(func_693b), b_+596);
+  CYC(b_+596, b_+597); H = D;
+  CYC(b_+597, b_+599); L = 0xcb;
+  CYC(b_+599, b_+600); mem_wr(gb, HL, B);
+  CYC(b_+600, b_+602); L = 0xcd;
+  CYC(b_+602, b_+603); mem_wr(gb, HL, C);
+  CYC(b_+603, b_+604); // ret (returns to 0x6875, no continuation check needed here)
+  CALL_C(b_+495, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+498);
+  if (!(F & FZ)) { RET_TAKEN(b_+498); return; } // ret nz
+  CYC(b_+498, b_+499);
+  CALL_C(b_+499, func_69a5_hook, SYM(func_69a5), b_+502);
+  CYC(b_+502, b_+503); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+503, b_+505); alu_cp(gb, 0x12);
+  if (!(F & FZ)) { RET_TAKEN(b_+505); return; } // ret nz
+  CYC(b_+505, b_+506);
+  CYC(b_+506, b_+507); A = mem_rd(gb, HL);
+  CYC(b_+507, b_+509); alu_bit(gb, 5, A);
+  if (!(F & FZ)) { CYCT(b_+509, b_+511); goto state4func_689e; } // jr nz
+  CYC(b_+509, b_+511);
+  CYC(b_+511, b_+513); E = 0xc2;
+  CYC(b_+513, b_+514); A = mem_rd(gb, DE);
+  CYC(b_+514, b_+515); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+515, b_+517); goto state4func_689e; } // jr z
+  CYC(b_+515, b_+517);
+  CALL_C(b_+517, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+520);
+  CYC(b_+520, b_+522); alu_cp(gb, 0x10);
+  if (!(F & FZ)) { RET_TAKEN(b_+522); return; } // ret nz
+  CYC(b_+522, b_+523);
+  CYC(b_+523, b_+526); A = mem_rd(gb, w1Link_direction); // w1Link.direction
+  CYC(b_+526, b_+527); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+527); return; } // ret nz
+  CYC(b_+527, b_+528);
+  CYC(b_+528, b_+529); H = D;
+  CYC(b_+529, b_+531); L = 0xe4;
+  CYC(b_+531, b_+533); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
+  CYC(b_+533, b_+536); objectAddToGrabbableObjectBuffer_hook(gb); return; // jp
 
 state4func_689e:
-  CYC(0x689e, 0x68a0); A = 0x6f; // SND_EXPLOSION
-  CALL_C(0x68a0, playSound_b00_hook, 0x0c98, 0x68a3);
-  CALL_C(0x68a3, objectGetAngleTowardLink_hook, 0x1e9c, 0x68a6);
-  CYC(0x68a6, 0x68a7); H = D;
-  CYC(0x68a7, 0x68a9); L = 0xc9;
-  CYC(0x68a9, 0x68aa); mem_wr(gb, HL, A);
-  CYC(0x68aa, 0x68ac); L = 0xc4;
-  CYC(0x68ac, 0x68ae); mem_wr(gb, HL, 0x05);
-  CYC(0x68ae, 0x68b0); L = 0xc6;
-  CYC(0x68b0, 0x68b2); mem_wr(gb, HL, 0x02);
-  CYC(0x68b2, 0x68b4); L = 0xd0;
-  CYC(0x68b4, 0x68b6); mem_wr(gb, HL, 0x78);
-  CALL_C(0x68b6, func_69a5_hook, 0x69a5, 0x68b9);
-  CYC(0x68b9, 0x68bb); L = 0xb7;
-  CYC(0x68bb, 0x68bd); E = 0xc2;
-  CYC(0x68bd, 0x68be); A = mem_rd(gb, DE);
-  CYC(0x68be, 0x68c0); A = alu_swap(gb, A);
-  CYC(0x68c0, 0x68c3); unsetFlag_hook(gb); return; // jp
+  CYC(b_+536, b_+538); A = 0x6f; // SND_EXPLOSION
+  CALL_C(b_+538, playSound_b00_hook, SYM(playSound_b00), b_+541);
+  CALL_C(b_+541, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+544);
+  CYC(b_+544, b_+545); H = D;
+  CYC(b_+545, b_+547); L = 0xc9;
+  CYC(b_+547, b_+548); mem_wr(gb, HL, A);
+  CYC(b_+548, b_+550); L = 0xc4;
+  CYC(b_+550, b_+552); mem_wr(gb, HL, 0x05);
+  CYC(b_+552, b_+554); L = 0xc6;
+  CYC(b_+554, b_+556); mem_wr(gb, HL, 0x02);
+  CYC(b_+556, b_+558); L = 0xd0;
+  CYC(b_+558, b_+560); mem_wr(gb, HL, 0x78);
+  CALL_C(b_+560, func_69a5_hook, SYM(func_69a5), b_+563);
+  CYC(b_+563, b_+565); L = 0xb7;
+  CYC(b_+565, b_+567); E = 0xc2;
+  CYC(b_+567, b_+568); A = mem_rd(gb, DE);
+  CYC(b_+568, b_+570); A = alu_swap(gb, A);
+  CYC(b_+570, b_+573); unsetFlag_hook(gb); return; // jp
 
 subidBit7SetArm_state4:
-  CYC(0x68c3, 0x68c5); A = 0x04;
-  CALL_C(0x68c5, objectGetRelatedObject1Var_hook, 0x2160, 0x68c8);
-  CYC(0x68c8, 0x68c9); A = mem_rd(gb, HL);
-  CYC(0x68c9, 0x68cb); alu_cp(gb, 0x04);
-  if (F & FZ) { CYCT(0x68cb, 0x68cd); goto state4func_68d7; } // jr z
-  CYC(0x68cb, 0x68cd);
-  CYC(0x68cd, 0x68ce); E = L;
-  CYC(0x68ce, 0x68cf); mem_wr(gb, DE, A);
-  CYC(0x68cf, 0x68d1); L = 0xc9;
-  CYC(0x68d1, 0x68d2); E = L;
-  CYC(0x68d2, 0x68d3); A = mem_rd(gb, HL);
-  CYC(0x68d3, 0x68d4); mem_wr(gb, DE, A);
-  CYC(0x68d4, 0x68d7); objectSetVisible_hook(gb); return; // jp
+  CYC(b_+573, b_+575); A = 0x04;
+  CALL_C(b_+575, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+578);
+  CYC(b_+578, b_+579); A = mem_rd(gb, HL);
+  CYC(b_+579, b_+581); alu_cp(gb, 0x04);
+  if (F & FZ) { CYCT(b_+581, b_+583); goto state4func_68d7; } // jr z
+  CYC(b_+581, b_+583);
+  CYC(b_+583, b_+584); E = L;
+  CYC(b_+584, b_+585); mem_wr(gb, DE, A);
+  CYC(b_+585, b_+587); L = 0xc9;
+  CYC(b_+587, b_+588); E = L;
+  CYC(b_+588, b_+589); A = mem_rd(gb, HL);
+  CYC(b_+589, b_+590); mem_wr(gb, DE, A);
+  CYC(b_+590, b_+593); objectSetVisible_hook(gb); return; // jp
 
 state4func_68d7:
-  CALL_C(0x68d7, func_693b_hook, 0x693b, 0x68da);
-  CYC(0x68da, 0x68db); H = D;
-  CYC(0x68db, 0x68dd); L = 0xcb;
-  CYC(0x68dd, 0x68de); mem_wr(gb, HL, B);
-  CYC(0x68de, 0x68e0); L = 0xcd;
-  CYC(0x68e0, 0x68e1); mem_wr(gb, HL, C);
-  RET(0x68e1); return; // ret
+  CALL_C(b_+593, func_693b_hook, SYM(func_693b), b_+596);
+  CYC(b_+596, b_+597); H = D;
+  CYC(b_+597, b_+599); L = 0xcb;
+  CYC(b_+599, b_+600); mem_wr(gb, HL, B);
+  CYC(b_+600, b_+602); L = 0xcd;
+  CYC(b_+602, b_+603); mem_wr(gb, HL, C);
+  RET(b_+603); return; // ret
 
 state5:
-  CALL_C(0x68e2, partCommon_getTileCollisionInFront_hook, 0x4000, 0x68e5);
-  if (!(F & FZ)) { CYCT(0x68e5, 0x68e7); goto state5func_68fe; } // jr nz
-  CYC(0x68e5, 0x68e7);
-  CALL_C(0x68e7, objectApplySpeed_hook, 0x201d, 0x68ea);
-  CALL_C(0x68ea, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x68ed);
-  if (!(F & FZ)) { RET_TAKEN(0x68ed); return; } // ret nz
-  CYC(0x68ed, 0x68ee);
-  CYC(0x68ee, 0x68f0); mem_wr(gb, HL, 0x03);
-  CYC(0x68f0, 0x68f2); E = 0xd0;
-  CYC(0x68f2, 0x68f3); A = mem_rd(gb, DE);
-  CYC(0x68f3, 0x68f4); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x68f4, 0x68f7); goto state5func_68fe; } // jp z
-  CYC(0x68f4, 0x68f7);
-  CYC(0x68f7, 0x68f9); alu_sub(gb, 0x0a);
-  if (!(F & FC)) { CYCT(0x68f9, 0x68fb); goto L_68fc; } // jr nc
-  CYC(0x68f9, 0x68fb);
-  CYC(0x68fb, 0x68fc); alu_xor(gb, A);
+  CALL_C(b_+604, partCommon_getTileCollisionInFront_hook, SYM(partCommon_getTileCollisionInFront), b_+607);
+  if (!(F & FZ)) { CYCT(b_+607, b_+609); goto state5func_68fe; } // jr nz
+  CYC(b_+607, b_+609);
+  CALL_C(b_+609, objectApplySpeed_hook, SYM(objectApplySpeed), b_+612);
+  CALL_C(b_+612, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+615);
+  if (!(F & FZ)) { RET_TAKEN(b_+615); return; } // ret nz
+  CYC(b_+615, b_+616);
+  CYC(b_+616, b_+618); mem_wr(gb, HL, 0x03);
+  CYC(b_+618, b_+620); E = 0xd0;
+  CYC(b_+620, b_+621); A = mem_rd(gb, DE);
+  CYC(b_+621, b_+622); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+622, b_+625); goto state5func_68fe; } // jp z
+  CYC(b_+622, b_+625);
+  CYC(b_+625, b_+627); alu_sub(gb, 0x0a);
+  if (!(F & FC)) { CYCT(b_+627, b_+629); goto L_68fc; } // jr nc
+  CYC(b_+627, b_+629);
+  CYC(b_+629, b_+630); alu_xor(gb, A);
 L_68fc:
-  CYC(0x68fc, 0x68fd); mem_wr(gb, DE, A);
-  RET(0x68fd); return; // ret
+  CYC(b_+630, b_+631); mem_wr(gb, DE, A);
+  RET(b_+631); return; // ret
 
 state5func_68fe:
-  CYC(0x68fe, 0x68ff); H = D;
-  CYC(0x68ff, 0x6901); L = 0xc4;
-  CYC(0x6901, 0x6903); mem_wr(gb, HL, 0x06);
-  CYC(0x6903, 0x6905); L = 0xc6;
-  CYC(0x6905, 0x6907); mem_wr(gb, HL, 0x3c);
-  CYC(0x6907, 0x6909); L = 0xd0;
-  CYC(0x6909, 0x690b); mem_wr(gb, HL, 0x00);
-  RET(0x690b); return; // ret
+  CYC(b_+632, b_+633); H = D;
+  CYC(b_+633, b_+635); L = 0xc4;
+  CYC(b_+635, b_+637); mem_wr(gb, HL, 0x06);
+  CYC(b_+637, b_+639); L = 0xc6;
+  CYC(b_+639, b_+641); mem_wr(gb, HL, 0x3c);
+  CYC(b_+641, b_+643); L = 0xd0;
+  CYC(b_+643, b_+645); mem_wr(gb, HL, 0x00);
+  RET(b_+645); return; // ret
 
 subidBit7SetArm_state5:
-  CYC(0x690c, 0x690e); A = 0x10;
-  CALL_C(0x690e, objectGetRelatedObject1Var_hook, 0x2160, 0x6911);
-  CYC(0x6911, 0x6912); E = L;
-  CYC(0x6912, 0x6913); A = mem_rd(gb, HL);
-  CYC(0x6913, 0x6915); alu_sub(gb, 0x19);
-  if (!(F & FC)) { CYCT(0x6915, 0x6917); goto L_6918; } // jr nc
-  CYC(0x6915, 0x6917);
-  CYC(0x6917, 0x6918); alu_xor(gb, A);
+  CYC(b_+646, b_+648); A = 0x10;
+  CALL_C(b_+648, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+651);
+  CYC(b_+651, b_+652); E = L;
+  CYC(b_+652, b_+653); A = mem_rd(gb, HL);
+  CYC(b_+653, b_+655); alu_sub(gb, 0x19);
+  if (!(F & FC)) { CYCT(b_+655, b_+657); goto L_6918; } // jr nc
+  CYC(b_+655, b_+657);
+  CYC(b_+657, b_+658); alu_xor(gb, A);
 L_6918:
-  CYC(0x6918, 0x6919); mem_wr(gb, DE, A);
-  CYC(0x6919, 0x691b); L = 0xc4;
-  CYC(0x691b, 0x691c); A = mem_rd(gb, HL);
-  CYC(0x691c, 0x691e); alu_cp(gb, 0x03);
-  if (!(F & FZ)) { CYCT(0x691e, 0x6921); objectApplySpeed_hook(gb); return; } // jp nz
-  CYC(0x691e, 0x6921);
-  CYC(0x6921, 0x6924); goto func_6762; // jp
+  CYC(b_+658, b_+659); mem_wr(gb, DE, A);
+  CYC(b_+659, b_+661); L = 0xc4;
+  CYC(b_+661, b_+662); A = mem_rd(gb, HL);
+  CYC(b_+662, b_+664); alu_cp(gb, 0x03);
+  if (!(F & FZ)) { CYCT(b_+664, b_+667); objectApplySpeed_hook(gb); return; } // jp nz
+  CYC(b_+664, b_+667);
+  CYC(b_+667, b_+670); goto func_6762; // jp
 
 state6:
-  CALL_C(0x6924, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x6927);
-  if (!(F & FZ)) { RET_TAKEN(0x6927); return; } // ret nz
-  CYC(0x6927, 0x6928);
-  CYC(0x6928, 0x692a); L = 0xe4;
-  CYC(0x692a, 0x692c); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
-  CALL_C(0x692c, func_69a5_hook, 0x69a5, 0x692f);
-  CYC(0x692f, 0x6930); L = alu_inc8(gb, L);
-  CYC(0x6930, 0x6931); A = mem_rd(gb, HL);
-  CYC(0x6931, 0x6933); alu_bit(gb, 5, A);
-  if (F & FZ) { CYCT(0x6933, 0x6935); goto L_6938; } // jr z
-  CYC(0x6933, 0x6935);
-  CYC(0x6935, 0x6937); A = 0x80;
-  CYC(0x6937, 0x6938); mem_wr(gb, HL, A);
+  CALL_C(b_+670, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+673);
+  if (!(F & FZ)) { RET_TAKEN(b_+673); return; } // ret nz
+  CYC(b_+673, b_+674);
+  CYC(b_+674, b_+676); L = 0xe4;
+  CYC(b_+676, b_+678); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
+  CALL_C(b_+678, func_69a5_hook, SYM(func_69a5), b_+681);
+  CYC(b_+681, b_+682); L = alu_inc8(gb, L);
+  CYC(b_+682, b_+683); A = mem_rd(gb, HL);
+  CYC(b_+683, b_+685); alu_bit(gb, 5, A);
+  if (F & FZ) { CYCT(b_+685, b_+687); goto L_6938; } // jr z
+  CYC(b_+685, b_+687);
+  CYC(b_+687, b_+689); A = 0x80;
+  CYC(b_+689, b_+690); mem_wr(gb, HL, A);
 L_6938:
-  CYC(0x6938, 0x693b); goto func_6762; // jp
+  CYC(b_+690, SYM(func_693b)); goto func_6762; // jp
 }
 
 void func_693b_hook(GB *gb) {
-  CYC(0x693b, 0x693d); E = 0xc2; // Part.subid
-  CYC(0x693d, 0x693e); A = mem_rd(gb, DE);
-  CYC(0x693e, 0x6940); A = alu_swap(gb, A);
-  CYC(0x6940, 0x6942); C = 0x0c;
-  CYC(0x6942, 0x6943); alu_rrca(gb);
+  BASE(func_693b);
+  CYC(b_+0, b_+2); E = 0xc2; // Part.subid
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); A = alu_swap(gb, A);
+  CYC(b_+5, b_+7); C = 0x0c;
+  CYC(b_+7, b_+8); alu_rrca(gb);
   if (!(F & FC)) {
-    CYCT(0x6943, 0x6945);
+    CYCT(b_+8, b_+10);
   } else {
-    CYC(0x6943, 0x6945);
-    CYC(0x6945, 0x6947); C = 0xf4;
+    CYC(b_+8, b_+10);
+    CYC(b_+10, b_+12); C = 0xf4;
   }
-  CYC(0x6947, 0x6949); E = 0xf0;
-  CYC(0x6949, 0x694a); A = mem_rd(gb, DE);
-  CYC(0x694a, 0x694b); H = A;
-  CYC(0x694b, 0x694d); L = 0x8b;
-  CYC(0x694d, 0x694e); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x694e, 0x6950); alu_add(gb, 0x0c);
-  CYC(0x6950, 0x6951); B = A;
-  CYC(0x6951, 0x6952); L = alu_inc8(gb, L);
-  CYC(0x6952, 0x6953); A = mem_rd(gb, HL);
-  CYC(0x6953, 0x6954); alu_add(gb, C);
-  CYC(0x6954, 0x6955); C = A;
-  RET(0x6955); return;
+  CYC(b_+12, b_+14); E = 0xf0;
+  CYC(b_+14, b_+15); A = mem_rd(gb, DE);
+  CYC(b_+15, b_+16); H = A;
+  CYC(b_+16, b_+18); L = 0x8b;
+  CYC(b_+18, b_+19); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+19, b_+21); alu_add(gb, 0x0c);
+  CYC(b_+21, b_+22); B = A;
+  CYC(b_+22, b_+23); L = alu_inc8(gb, L);
+  CYC(b_+23, b_+24); A = mem_rd(gb, HL);
+  CYC(b_+24, b_+25); alu_add(gb, C);
+  CYC(b_+25, b_+26); C = A;
+  RET(b_+26); return;
 }
 
 void state0func_6956_hook(GB *gb) {
+  BASE(state0func_6956);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6956, 0x6958); E = 0xc2; // Part.subid
-  CYC(0x6958, 0x6959); A = mem_rd(gb, DE);
-  CYC(0x6959, 0x695b); alu_and(gb, 0x0f);
-  CYC(0x695b, 0x695d); alu_cp(gb, 0x02);
-  if (F & FZ) { RET_TAKEN(0x695d); return; } // ret z
-  CYC(0x695d, 0x695e);
-  CALL_C(0x695e, getFreePartSlot_hook, 0x3e8e, 0x6961);
-  CYC(0x6961, 0x6963); A = 0x35; // PART_RAMROCK_GLOVE_FORM_ARM
-  CYC(0x6963, 0x6964); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x6964, 0x6965); A = mem_rd(gb, DE);
-  CYC(0x6965, 0x6966); A = alu_inc8(gb, A);
-  CYC(0x6966, 0x6967); mem_wr(gb, HL, A);
-  CYC(0x6967, 0x6969); E = 0xf0;
-  CYC(0x6969, 0x696a); L = E;
-  CYC(0x696a, 0x696b); A = mem_rd(gb, DE);
-  CYC(0x696b, 0x696c); mem_wr(gb, HL, A);
-  CYC(0x696c, 0x696e); L = 0xc2;
-  CYC(0x696e, 0x696f); E = L;
-  RET(0x696f); return;
+  CYC(b_+0, b_+2); E = 0xc2; // Part.subid
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); alu_and(gb, 0x0f);
+  CYC(b_+5, b_+7); alu_cp(gb, 0x02);
+  if (F & FZ) { RET_TAKEN(b_+7); return; } // ret z
+  CYC(b_+7, b_+8);
+  CALL_C(b_+8, getFreePartSlot_hook, SYM(getFreePartSlot), b_+11);
+  CYC(b_+11, b_+13); A = 0x35; // PART_RAMROCK_GLOVE_FORM_ARM
+  CYC(b_+13, b_+14); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+14, b_+15); A = mem_rd(gb, DE);
+  CYC(b_+15, b_+16); A = alu_inc8(gb, A);
+  CYC(b_+16, b_+17); mem_wr(gb, HL, A);
+  CYC(b_+17, b_+19); E = 0xf0;
+  CYC(b_+19, b_+20); L = E;
+  CYC(b_+20, b_+21); A = mem_rd(gb, DE);
+  CYC(b_+21, b_+22); mem_wr(gb, HL, A);
+  CYC(b_+22, b_+24); L = 0xc2;
+  CYC(b_+24, b_+25); E = L;
+  RET(b_+25); return;
 }
 
 void state3func_6970_hook(GB *gb) {
+  BASE(state3func_6970);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6970, func_693b_hook, 0x693b, 0x6973);
-  CYC(0x6973, 0x6975); E = 0x03;
-  CYC(0x6975, 0x6976); H = D;
-  CYC(0x6976, 0x6978); L = 0xcb;
-  CYC(0x6978, 0x6979); A = E;
-  CYC(0x6979, 0x697a); alu_add(gb, B);
-  CYC(0x697a, 0x697b); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FC) { CYCT(0x697b, 0x697d); goto ret_6990; } // jr c
-  CYC(0x697b, 0x697d);
-  CYC(0x697d, 0x697e); alu_sub(gb, E);
-  CYC(0x697e, 0x697f); alu_sub(gb, E);
-  CYC(0x697f, 0x6980); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FC)) { CYCT(0x6980, 0x6982); goto ret_6990; } // jr nc
-  CYC(0x6980, 0x6982);
-  CYC(0x6982, 0x6984); L = 0xcd;
-  CYC(0x6984, 0x6985); A = E;
-  CYC(0x6985, 0x6986); alu_add(gb, C);
-  CYC(0x6986, 0x6987); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FC) { CYCT(0x6987, 0x6989); goto ret_6990; } // jr c
-  CYC(0x6987, 0x6989);
-  CYC(0x6989, 0x698a); alu_sub(gb, E);
-  CYC(0x698a, 0x698b); alu_sub(gb, E);
-  CYC(0x698b, 0x698c); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FC)) { CYCT(0x698c, 0x698e); goto ret_6990; } // jr nc
-  CYC(0x698c, 0x698e);
-  CYC(0x698e, 0x698f); alu_xor(gb, A);
-  RET(0x698f); return;
+  CALL_C(b_+0, func_693b_hook, SYM(func_693b), b_+3);
+  CYC(b_+3, b_+5); E = 0x03;
+  CYC(b_+5, b_+6); H = D;
+  CYC(b_+6, b_+8); L = 0xcb;
+  CYC(b_+8, b_+9); A = E;
+  CYC(b_+9, b_+10); alu_add(gb, B);
+  CYC(b_+10, b_+11); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) { CYCT(b_+11, b_+13); goto ret_6990; } // jr c
+  CYC(b_+11, b_+13);
+  CYC(b_+13, b_+14); alu_sub(gb, E);
+  CYC(b_+14, b_+15); alu_sub(gb, E);
+  CYC(b_+15, b_+16); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(b_+16, b_+18); goto ret_6990; } // jr nc
+  CYC(b_+16, b_+18);
+  CYC(b_+18, b_+20); L = 0xcd;
+  CYC(b_+20, b_+21); A = E;
+  CYC(b_+21, b_+22); alu_add(gb, C);
+  CYC(b_+22, b_+23); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) { CYCT(b_+23, b_+25); goto ret_6990; } // jr c
+  CYC(b_+23, b_+25);
+  CYC(b_+25, b_+26); alu_sub(gb, E);
+  CYC(b_+26, b_+27); alu_sub(gb, E);
+  CYC(b_+27, b_+28); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(b_+28, b_+30); goto ret_6990; } // jr nc
+  CYC(b_+28, b_+30);
+  CYC(b_+30, b_+31); alu_xor(gb, A);
+  RET(b_+31); return;
 ret_6990:
-  CYC(0x6990, 0x6991); alu_or(gb, D);
-  RET(0x6991); return;
+  CYC(b_+32, b_+33); alu_or(gb, D);
+  RET(b_+33); return;
 }
 
 void state0func_6992_hook(GB *gb) {
-  CYC(0x6992, 0x6993); push_effect(gb, HL);
-  CYC(0x6993, 0x6994); A = mem_rd(gb, HL);
-  CYC(0x6994, 0x6996); alu_and(gb, 0x10);
-  CYC(0x6996, 0x6998); A = alu_swap(gb, A);
-  CYC(0x6998, 0x699b); SET_HL(0x69a3);
-  CYC(0x699b, 0x699c); ramrockGloveFormArm_addAToHl_from_rst(gb, 0x699c);
-  CYC(0x699c, 0x699d); C = mem_rd(gb, HL);
-  CYC(0x699d, 0x699f); B = 0xfc;
-  CYC(0x699f, 0x69a0); SET_HL(pop_effect(gb));
-  CYC(0x69a0, 0x69a3); objectCopyPositionWithOffset_hook(gb); return; // jp
+  BASE(state0func_6992);
+  CYC(b_+0, b_+1); push_effect(gb, HL);
+  CYC(b_+1, b_+2); A = mem_rd(gb, HL);
+  CYC(b_+2, b_+4); alu_and(gb, 0x10);
+  CYC(b_+4, b_+6); A = alu_swap(gb, A);
+  CYC(b_+6, b_+9); SET_HL(b_+17);
+  CYC(b_+9, b_+10); ramrockGloveFormArm_addAToHl_from_rst(gb, b_+10);
+  CYC(b_+10, b_+11); C = mem_rd(gb, HL);
+  CYC(b_+11, b_+13); B = 0xfc;
+  CYC(b_+13, b_+14); SET_HL(pop_effect(gb));
+  CYC(b_+14, b_+17); objectCopyPositionWithOffset_hook(gb); return; // jp
 }
 
 void func_69a5_hook(GB *gb) {
-  CYC(0x69a5, 0x69a7); E = 0xf0;
-  CYC(0x69a7, 0x69a8); A = mem_rd(gb, DE);
-  CYC(0x69a8, 0x69a9); H = A;
-  CYC(0x69a9, 0x69ab); L = 0x82;
-  RET(0x69ab); return;
+  BASE(func_69a5);
+  CYC(b_+0, b_+2); E = 0xf0;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); H = A;
+  CYC(b_+4, b_+6); L = 0x82;
+  RET(b_+6); return;
 }

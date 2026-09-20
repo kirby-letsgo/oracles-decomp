@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode00), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode00), (from), (to), true)
 
 static uint16_t breakTileDebris_jumpTable(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -39,135 +39,137 @@ static void breakTileDebris_addDoubleIndex(GB *gb, uint16_t return_address) {
 // breaking) and $0a (shovel debris). Reached only by a static `call` from interactionCode00
 // itself; not independently hookable.
 static void breakTileDebris_doSpecializedInitialization(GB *gb, uint16_t sp0_) {
-  CYC(0x407e, 0x4080); E = INTERACTION_BASE + OBJ_ID;
-  CYC(0x4080, 0x4081); A = mem_rd(gb, DE);
-  CYC(0x4081, 0x4082); alu_or(gb, A);
+  BASE(interactionCode00);
+  CYC(b_+126, b_+128); E = INTERACTION_BASE + OBJ_ID;
+  CYC(b_+128, b_+129); A = mem_rd(gb, DE);
+  CYC(b_+129, b_+130); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x4082, 0x4084);
+    CYCT(b_+130, b_+132);
   } else {
-    CYC(0x4082, 0x4084);
-    CYC(0x4084, 0x4086); alu_cp(gb, 0x0a);
+    CYC(b_+130, b_+132);
+    CYC(b_+132, b_+134); alu_cp(gb, 0x0a);
     if (F & FZ) {
-      CYC(0x4086, 0x4087);
+      CYC(b_+134, b_+135);
     } else {
-      CYCT(0x4086, 0x4087); ret_effect(gb); return;
+      CYCT(b_+134, b_+135); ret_effect(gb); return;
     }
     // @interac0A
-    CYC(0x4087, 0x408a); SET_BC(0xfdc0);
-    CALL_C(0x408a, objectSetSpeedZ_hook, 0x239d, 0x408d);
-    CYC(0x408d, 0x408f); E = INTERACTION_BASE + OBJ_DIRECTION;
-    CYC(0x408f, 0x4090); A = mem_rd(gb, DE);
-    CYC(0x4090, 0x4093); interactionSetAnimation_hook(gb);
+    CYC(b_+135, b_+138); SET_BC(0xfdc0);
+    CALL_C(b_+138, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+141);
+    CYC(b_+141, b_+143); E = INTERACTION_BASE + OBJ_DIRECTION;
+    CYC(b_+143, b_+144); A = mem_rd(gb, DE);
+    CYC(b_+144, b_+147); interactionSetAnimation_hook(gb);
     return;
   }
   // @interac00
-  CYC(0x4093, 0x4096); A = mem_rd(gb, wTilesetFlags);
-  CYC(0x4096, 0x4098); alu_and(gb, 0x40);
+  CYC(b_+147, b_+150); A = mem_rd(gb, wTilesetFlags);
+  CYC(b_+150, b_+152); alu_and(gb, 0x40);
   if (F & FZ) {
-    CYCT(0x4098, 0x409a); goto notUnderwater;
+    CYCT(b_+152, b_+154); goto notUnderwater;
   }
-  CYC(0x4098, 0x409a);
-  CYC(0x409a, 0x409c); A = 0x0e;
-  CYC(0x409c, 0x409e); goto stored;
+  CYC(b_+152, b_+154);
+  CYC(b_+154, b_+156); A = 0x0e;
+  CYC(b_+156, b_+158); goto stored;
 notUnderwater:
-  CYC(0x409e, 0x40a1); A = mem_rd(gb, wGrassAnimationModifier);
-  CYC(0x40a1, 0x40a3); alu_and(gb, 0x03);
-  CYC(0x40a3, 0x40a5); alu_or(gb, 0x08);
+  CYC(b_+158, b_+161); A = mem_rd(gb, wGrassAnimationModifier);
+  CYC(b_+161, b_+163); alu_and(gb, 0x03);
+  CYC(b_+163, b_+165); alu_or(gb, 0x08);
 stored:
-  CYC(0x40a5, 0x40a7); E = INTERACTION_BASE + OBJ_OAM_FLAGS_BACKUP;
-  CYC(0x40a7, 0x40a8); mem_wr(gb, DE, A);
-  CYC(0x40a8, 0x40a9); E = alu_inc8(gb, E);
-  CYC(0x40a9, 0x40aa); mem_wr(gb, DE, A);
-  CYC(0x40aa, 0x40ab); ret_effect(gb);
+  CYC(b_+165, b_+167); E = INTERACTION_BASE + OBJ_OAM_FLAGS_BACKUP;
+  CYC(b_+167, b_+168); mem_wr(gb, DE, A);
+  CYC(b_+168, b_+169); E = alu_inc8(gb, E);
+  CYC(b_+169, b_+170); mem_wr(gb, DE, A);
+  CYC(b_+170, SYM(interactionCode0f)); ret_effect(gb);
 }
 
 void interactionCode00_hook(GB *gb) {
+  BASE(interactionCode00);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4000, 0x4002); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4002, 0x4003); A = mem_rd(gb, DE);
-  CYC(0x4003, 0x4004); push_effect(gb, 0x4004);
-  switch (breakTileDebris_jumpTable(gb)) {
-    case 0x4008: goto state0;
-    case 0x4051: goto state1;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (breakTileDebris_jumpTable(gb));
+    if (jt_ == b_+8) { goto state0; }
+    else if (jt_ == b_+81) { goto state1; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 state0:
-  CYC(0x4008, 0x400a); A = 0x01;
-  CYC(0x400a, 0x400b); mem_wr(gb, DE, A);
-  CALL_C(0x400b, interactionInitGraphics_hook, 0x15fb, 0x400e);
-  CYC(0x400e, 0x400f); H = D;
-  CYC(0x400f, 0x4011); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x4011, 0x4013); mem_wr(gb, HL, 0x14);
-  CYC(0x4013, 0x4015); L = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x4015, 0x4017); alu_bit(gb, 1, mem_rd(gb, HL));
+  CYC(b_+8, b_+10); A = 0x01;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
+  CYC(b_+14, b_+15); H = D;
+  CYC(b_+15, b_+17); L = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+17, b_+19); mem_wr(gb, HL, 0x14);
+  CYC(b_+19, b_+21); L = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+21, b_+23); alu_bit(gb, 1, mem_rd(gb, HL));
   if (F & FZ) {
-    CALL_C_CC(0x4017, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x401a);
+    CALL_C_CC(b_+23, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+26);
   } else {
-    CYC(0x4017, 0x401a);
+    CYC(b_+23, b_+26);
   }
-  CYC(0x401a, 0x401d); push_effect(gb, 0x401d); breakTileDebris_doSpecializedInitialization(gb, sp0_);
-  CYC(0x401d, 0x401f); E = INTERACTION_BASE + OBJ_ID;
-  CYC(0x401f, 0x4020); A = mem_rd(gb, DE);
-  CYC(0x4020, 0x4023); SET_HL(0x4037);
-  CYC(0x4023, 0x4024); breakTileDebris_addDoubleIndex(gb, 0x4024);
-  CYC(0x4024, 0x4026); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x4026, 0x4027); A = mem_rd(gb, DE);
-  CYC(0x4027, 0x4028); alu_rlca(gb);
-  CYC(0x4028, 0x4029); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4029, 0x402a); E = mem_rd(gb, HL);
+  CYC(b_+26, b_+29); push_effect(gb, b_+29); breakTileDebris_doSpecializedInitialization(gb, sp0_);
+  CYC(b_+29, b_+31); E = INTERACTION_BASE + OBJ_ID;
+  CYC(b_+31, b_+32); A = mem_rd(gb, DE);
+  CYC(b_+32, b_+35); SET_HL(b_+55);
+  CYC(b_+35, b_+36); breakTileDebris_addDoubleIndex(gb, b_+36);
+  CYC(b_+36, b_+38); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+38, b_+39); A = mem_rd(gb, DE);
+  CYC(b_+39, b_+40); alu_rlca(gb);
+  CYC(b_+40, b_+41); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+41, b_+42); E = mem_rd(gb, HL);
   if (!(F & FC)) {
-    CALL_C_CC(0x402a, playSound_b00_hook, 0x0c98, 0x402d);
+    CALL_C_CC(b_+42, playSound_b00_hook, SYM(playSound_b00), b_+45);
   } else {
-    CYC(0x402a, 0x402d);
+    CYC(b_+42, b_+45);
   }
-  CYC(0x402d, 0x402e); A = E;
-  CYC(0x402e, 0x402f); push_effect(gb, 0x402f);
-  switch (breakTileDebris_jumpTable(gb)) {
-    case 0x1e57: objectSetVisible80_hook(gb); return;
-    case 0x1e60: objectSetVisible81_hook(gb); return;
-    case 0x1e69: objectSetVisible82_hook(gb); return;
-    case 0x1e72: objectSetVisible83_hook(gb); return;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+45, b_+46); A = E;
+  CYC(b_+46, b_+47); push_effect(gb, b_+47);
+  do { uint16_t jt_ = (breakTileDebris_jumpTable(gb));
+    if (jt_ == SYM(objectSetVisible80)) { objectSetVisible80_hook(gb); return; }
+    else if (jt_ == SYM(objectSetVisible81)) { objectSetVisible81_hook(gb); return; }
+    else if (jt_ == SYM(objectSetVisible82)) { objectSetVisible82_hook(gb); return; }
+    else if (jt_ == SYM(objectSetVisible83)) { objectSetVisible83_hook(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 state1:
-  CYC(0x4051, 0x4052); H = D;
-  CYC(0x4052, 0x4054); L = INTERACTION_BASE + OBJ_ANIM_PARAMETER;
-  CYC(0x4054, 0x4056); alu_bit(gb, 7, mem_rd(gb, HL));
+  CYC(b_+81, b_+82); H = D;
+  CYC(b_+82, b_+84); L = INTERACTION_BASE + OBJ_ANIM_PARAMETER;
+  CYC(b_+84, b_+86); alu_bit(gb, 7, mem_rd(gb, HL));
   if (F & FZ) {
-    CYC(0x4056, 0x4059);
+    CYC(b_+86, b_+89);
   } else {
-    CYCT(0x4056, 0x4059); interactionDelete_hook(gb); return;
+    CYCT(b_+86, b_+89); interactionDelete_hook(gb); return;
   }
-  CYC(0x4059, 0x405b); L = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x405b, 0x405d); alu_bit(gb, 0, mem_rd(gb, HL));
+  CYC(b_+89, b_+91); L = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+91, b_+93); alu_bit(gb, 0, mem_rd(gb, HL));
   if (F & FZ) {
-    CYCT(0x405d, 0x405f); goto checkId;
+    CYCT(b_+93, b_+95); goto checkId;
   }
-  CYC(0x405d, 0x405f);
-  CYC(0x405f, 0x4062); A = mem_rd(gb, wFrameCounter);
-  CYC(0x4062, 0x4063); alu_xor(gb, D);
-  CYC(0x4063, 0x4064); alu_rrca(gb);
-  CYC(0x4064, 0x4066); L = INTERACTION_BASE + OBJ_VISIBLE;
-  CYC(0x4066, 0x4068); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 7));
+  CYC(b_+93, b_+95);
+  CYC(b_+95, b_+98); A = mem_rd(gb, wFrameCounter);
+  CYC(b_+98, b_+99); alu_xor(gb, D);
+  CYC(b_+99, b_+100); alu_rrca(gb);
+  CYC(b_+100, b_+102); L = INTERACTION_BASE + OBJ_VISIBLE;
+  CYC(b_+102, b_+104); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 7));
   if (!(F & FC)) {
-    CYCT(0x4068, 0x406a); goto checkId;
+    CYCT(b_+104, b_+106); goto checkId;
   }
-  CYC(0x4068, 0x406a);
-  CYC(0x406a, 0x406c); mem_wr(gb, HL, mem_rd(gb, HL) & ~(1 << 7));
+  CYC(b_+104, b_+106);
+  CYC(b_+106, b_+108); mem_wr(gb, HL, mem_rd(gb, HL) & ~(1 << 7));
 
 checkId:
-  CYC(0x406c, 0x406e); E = INTERACTION_BASE + OBJ_ID;
-  CYC(0x406e, 0x406f); A = mem_rd(gb, DE);
-  CYC(0x406f, 0x4071); alu_cp(gb, 0x0a);
+  CYC(b_+108, b_+110); E = INTERACTION_BASE + OBJ_ID;
+  CYC(b_+110, b_+111); A = mem_rd(gb, DE);
+  CYC(b_+111, b_+113); alu_cp(gb, 0x0a);
   if (F & FZ) {
-    CYC(0x4071, 0x4073);
-    CYC(0x4073, 0x4075); C = 0x60;
-    CALL_C(0x4075, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x4078);
-    CALL_C(0x4078, objectApplySpeed_hook, 0x201d, 0x407b);
+    CYC(b_+113, b_+115);
+    CYC(b_+115, b_+117); C = 0x60;
+    CALL_C(b_+117, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+120);
+    CALL_C(b_+120, objectApplySpeed_hook, SYM(objectApplySpeed), b_+123);
   } else {
-    CYCT(0x4071, 0x4073);
+    CYCT(b_+113, b_+115);
   }
-  CYC(0x407b, 0x407e); interactionAnimate_hook(gb);
+  CYC(b_+123, b_+126); interactionAnimate_hook(gb);
 }

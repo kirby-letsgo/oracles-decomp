@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodeb8), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodeb8), (from), (to), true)
 
 static uint16_t vire_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -33,175 +33,184 @@ static void vire_add_a_to_hl(GB *gb, uint16_t ra) {
 }
 
 void interactionCodeb8_hook(GB *gb) {
+  BASE(interactionCodeb8);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6abf, 0x6ac1); E = 0x42;
-  CYC(0x6ac1, 0x6ac2); A = mem_rd(gb, DE);
-  CYC(0x6ac2, 0x6ac3); push_effect(gb, 0x6ac3); switch (vire_jump_table(gb)) {
-    case 0x6ac9: vire_subid0_hook(gb); return;
-    case 0x6b0a: vire_subid1_hook(gb); return;
-    case 0x6b88: vire_subid2_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x42;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4); do { uint16_t jt_ = (vire_jump_table(gb));
+    if (jt_ == SYM(vire_subid0)) { vire_subid0_hook(gb); return; }
+    else if (jt_ == SYM(vire_subid1)) { vire_subid1_hook(gb); return; }
+    else if (jt_ == SYM(vire_subid2)) { vire_subid2_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void vire_subid0_hook(GB *gb) {
+  BASE(vire_subid0);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6ac9, checkInteractionState_hook, 0x23fe, 0x6acc);
-  if (F & FZ) { CYCT(0x6acc, 0x6ace); goto state0; }
-  CYC(0x6acc, 0x6ace);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
+  if (F & FZ) { CYCT(b_+3, b_+5); goto state0; }
+  CYC(b_+3, b_+5);
 state1:
-  CYC(0x6ace, 0x6ad0); E = 0x78;
-  CYC(0x6ad0, 0x6ad1); A = mem_rd(gb, DE);
-  CYC(0x6ad1, 0x6ad2); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x6ad2, 0x6ad4); goto runScript; }
-  CYC(0x6ad2, 0x6ad4); CALL_C(0x6ad4, vire_disableObjectsIfLinkIsReady_hook, 0x6c33, 0x6ad7);
-  if (!(F & FC)) { CYC(0x6ad7, 0x6ad9); goto animate; }
-  CYCT(0x6ad7, 0x6ad9); CYC(0x6ad9, 0x6ada); alu_xor(gb, A);
-  CYC(0x6ada, 0x6add); mem_wr(gb, 0xd008, A);
+  CYC(b_+5, b_+7); E = 0x78;
+  CYC(b_+7, b_+8); A = mem_rd(gb, DE);
+  CYC(b_+8, b_+9); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+9, b_+11); goto runScript; }
+  CYC(b_+9, b_+11); CALL_C(b_+11, vire_disableObjectsIfLinkIsReady_hook, SYM(vire_disableObjectsIfLinkIsReady), b_+14);
+  if (!(F & FC)) { CYC(b_+14, b_+16); goto animate; }
+  CYCT(b_+14, b_+16); CYC(b_+16, b_+17); alu_xor(gb, A);
+  CYC(b_+17, b_+20); mem_wr(gb, w1Link_direction, A);
 runScript:
-  CALL_C(0x6add, interactionRunScript_hook, 0x2552, 0x6ae0);
-  if (F & FC) { CYC(0x6ae0, 0x6ae3); vire_deleteAndReturnControl_hook(gb); return; }
-  CYC(0x6ae0, 0x6ae3);
+  CALL_C(b_+20, interactionRunScript_hook, SYM(interactionRunScript), b_+23);
+  if (F & FC) { CYC(b_+23, b_+26); vire_deleteAndReturnControl_hook(gb); return; }
+  CYC(b_+23, b_+26);
 animate:
-  CYC(0x6ae3, 0x6ae6); interactionAnimate_hook(gb); return;
+  CYC(b_+26, b_+29); interactionAnimate_hook(gb); return;
 state0:
-  CALL_C(0x6ae6, getThisRoomFlags_hook, 0x197d, 0x6ae9);
-  CYC(0x6ae9, 0x6aeb); alu_bit(gb, 6, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYC(0x6aeb, 0x6aee); interactionDelete_hook(gb); return; }
-  CYC(0x6aeb, 0x6aee); CYC(0x6aee, 0x6af0); A = 0x39;
-  CALL_C(0x6af0, playSound_b00_hook, 0x0c98, 0x6af3);
-  CYC(0x6af3, 0x6af6); SET_HL(0x7d4a);
+  CALL_C(b_+29, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+32);
+  CYC(b_+32, b_+34); alu_bit(gb, 6, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYC(b_+34, b_+37); interactionDelete_hook(gb); return; }
+  CYC(b_+34, b_+37); CYC(b_+37, b_+39); A = 0x39;
+  CALL_C(b_+39, playSound_b00_hook, SYM(playSound_b00), b_+42);
+  CYC(b_+42, SYM(vire_setScript)); SET_HL(SYM(interactionCoded8__scriptTable));
   vire_setScript_hook(gb);
 }
 
 void vire_setScript_hook(GB *gb) {
+  BASE(vire_setScript);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6af6, interactionSetScript_hook, 0x2544, 0x6af9);
-  CALL_C(0x6af9, interactionInitGraphics_hook, 0x15fb, 0x6afc);
-  CALL_C(0x6afc, interactionIncState_hook, 0x23e0, 0x6aff);
-  CYC(0x6aff, 0x6b01); L = 0x50;
-  CYC(0x6b01, 0x6b03); mem_wr(gb, HL, 0x50);
-  CYC(0x6b03, 0x6b04); alu_xor(gb, A);
-  CYC(0x6b04, 0x6b07); mem_wr(gb, 0xcfd0, A);
-  CYC(0x6b07, 0x6b0a); objectSetVisiblec2_hook(gb); return;
+  CALL_C(b_+0, interactionSetScript_hook, SYM(interactionSetScript), b_+3);
+  CALL_C(b_+3, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+6);
+  CALL_C(b_+6, interactionIncState_hook, SYM(interactionIncState), b_+9);
+  CYC(b_+9, b_+11); L = 0x50;
+  CYC(b_+11, b_+13); mem_wr(gb, HL, 0x50);
+  CYC(b_+13, b_+14); alu_xor(gb, A);
+  CYC(b_+14, b_+17); mem_wr(gb, wTmpcfc0_armosStatue_killedArmosPositions, A);
+  CYC(b_+17, SYM(vire_subid1)); objectSetVisiblec2_hook(gb); return;
 }
 
 void vire_subid1_hook(GB *gb) {
+  BASE(vire_subid1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6b0a, 0x6b0c); E = 0x44;
-  CYC(0x6b0c, 0x6b0d); A = mem_rd(gb, DE);
-  CYC(0x6b0d, 0x6b0e); push_effect(gb, 0x6b0e); switch (vire_jump_table(gb)) {
-    case 0x6b14: goto state0;
-    case 0x6b31: goto state1;
-    case 0x6b5b: goto state2;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x44;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4); do { uint16_t jt_ = (vire_jump_table(gb));
+    if (jt_ == b_+10) { goto state0; }
+    else if (jt_ == b_+39) { goto state1; }
+    else if (jt_ == b_+81) { goto state2; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 state0:
-  CYC(0x6b14, 0x6b17); A = mem_rd(gb, 0xcae7);
-  CYC(0x6b17, 0x6b19); alu_bit(gb, 6, A);
-  if (!(F & FZ)) { CYC(0x6b19, 0x6b1c); interactionDelete_hook(gb); return; }
-  CALL_C(0x6b1c, getThisRoomFlags_hook, 0x197d, 0x6b1f);
-  CYC(0x6b1f, 0x6b21); alu_bit(gb, 6, mem_rd(gb, HL));
-  CYC(0x6b21, 0x6b24); SET_HL(0x7d57);
-  if (F & FZ) { CYCT(0x6b24, 0x6b26); vire_setScript_hook(gb); return; }
-  CYC(0x6b24, 0x6b26); CYC(0x6b26, 0x6b29); A = mem_rd(gb, 0xcc35);
-  CYC(0x6b29, 0x6b2a); alu_or(gb, A); CYC(0x6b2a, 0x6b2c); A = 0x2d;
-  if (!(F & FZ)) CALL_C(0x6b2c, playSound_b00_hook, 0x0c98, 0x6b2f); else CYC(0x6b2c, 0x6b2f);
-  CYC(0x6b2f, 0x6b31); goto gotoState2;
+  CYC(b_+10, b_+13); A = mem_rd(gb, (wGroup5RoomFlags + 231));
+  CYC(b_+13, b_+15); alu_bit(gb, 6, A);
+  if (!(F & FZ)) { CYC(b_+15, b_+18); interactionDelete_hook(gb); return; }
+  CALL_C(b_+18, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+21);
+  CYC(b_+21, b_+23); alu_bit(gb, 6, mem_rd(gb, HL));
+  CYC(b_+23, b_+26); SET_HL((SYM(interactionCoded8__subid0Script) + 1));
+  if (F & FZ) { CYCT(b_+26, b_+28); vire_setScript_hook(gb); return; }
+  CYC(b_+26, b_+28); CYC(b_+28, b_+31); A = mem_rd(gb, wActiveMusic);
+  CYC(b_+31, b_+32); alu_or(gb, A); CYC(b_+32, b_+34); A = 0x2d;
+  if (!(F & FZ)) CALL_C(b_+34, playSound_b00_hook, SYM(playSound_b00), b_+37); else CYC(b_+34, b_+37);
+  CYC(b_+37, b_+39); goto gotoState2;
 state1:
-  CYC(0x6b31, 0x6b33); E = 0x78; CYC(0x6b33, 0x6b34); A = mem_rd(gb, DE); CYC(0x6b34, 0x6b35); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x6b35, 0x6b37); goto runScript; }
-  CYC(0x6b35, 0x6b37); CYC(0x6b37, 0x6b3a); A = mem_rd(gb, 0xd00b); CYC(0x6b3a, 0x6b3c); alu_cp(gb, 0x9b);
-  if (!(F & FC)) { CYC(0x6b3c, 0x6b3f); goto animate1; }
-  CYC(0x6b3c, 0x6b3f); CALL_C(0x6b3f, vire_disableObjectsIfLinkIsReady_hook, 0x6c33, 0x6b42);
-  if (!(F & FC)) { CYC(0x6b42, 0x6b45); goto animate1; }
+  CYC(b_+39, b_+41); E = 0x78; CYC(b_+41, b_+42); A = mem_rd(gb, DE); CYC(b_+42, b_+43); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+43, b_+45); goto runScript; }
+  CYC(b_+43, b_+45); CYC(b_+45, b_+48); A = mem_rd(gb, w1Link_yh); CYC(b_+48, b_+50); alu_cp(gb, 0x9b);
+  if (!(F & FC)) { CYC(b_+50, b_+53); goto animate1; }
+  CYC(b_+50, b_+53); CALL_C(b_+53, vire_disableObjectsIfLinkIsReady_hook, SYM(vire_disableObjectsIfLinkIsReady), b_+56);
+  if (!(F & FC)) { CYC(b_+56, b_+59); goto animate1; }
 runScript:
-  CALL_C(0x6b45, interactionRunScript_hook, 0x2552, 0x6b48);
-  if (!(F & FC)) { CYC(0x6b48, 0x6b4b); goto animate1; }
-  CALL_C(0x6b4b, objectSetInvisible_hook, 0x1e7b, 0x6b4e);
-  CALL_C(0x6b4e, vire_returnControl_hook, 0x6c52, 0x6b51);
+  CALL_C(b_+59, interactionRunScript_hook, SYM(interactionRunScript), b_+62);
+  if (!(F & FC)) { CYC(b_+62, b_+65); goto animate1; }
+  CALL_C(b_+65, objectSetInvisible_hook, SYM(objectSetInvisible), b_+68);
+  CALL_C(b_+68, vire_returnControl_hook, SYM(vire_returnControl), b_+71);
 gotoState2:
-  CYC(0x6b51, 0x6b52); H = D; CYC(0x6b52, 0x6b54); L = 0x44; CYC(0x6b54, 0x6b56); mem_wr(gb, HL, 0x02); CYC(0x6b56, 0x6b58); L = 0x46; CYC(0x6b58, 0x6b5a); mem_wr(gb, HL, 0x08); RET(0x6b5a); return;
+  CYC(b_+71, b_+72); H = D; CYC(b_+72, b_+74); L = 0x44; CYC(b_+74, b_+76); mem_wr(gb, HL, 0x02); CYC(b_+76, b_+78); L = 0x46; CYC(b_+78, b_+80); mem_wr(gb, HL, 0x08); RET(b_+80); return;
 animate1:
-  CYC(0x6b42, 0x6b46); interactionAnimate_hook(gb); return;
+  CYC(b_+56, b_+60); interactionAnimate_hook(gb); return;
 state2:
-  CALL_C(0x6b5b, interactionDecCounter1_hook, 0x23cc, 0x6b5e);
-  if (!(F & FZ)) { RET_TAKEN(0x6b5e); return; }
-  CYC(0x6b5f, 0x6b62); SET_HL(0xd00b); CYC(0x6b62, 0x6b63); A = mem_rd(gb, HL); SET_HL(HL + 1); CYC(0x6b63, 0x6b65); alu_cp(gb, 0x10);
-  if (!(F & FC)) { CYC(0x6b65, 0x6b67); goto spawn; }
-  CYC(0x6b65, 0x6b67); L = alu_inc8(gb, L); CYC(0x6b68, 0x6b69); A = mem_rd(gb, HL); CYC(0x6b69, 0x6b6b); alu_cp(gb, 0xa0);
-  if (!(F & FC)) { CYC(0x6b6b, 0x6b6d); vire_setRandomCounter1_hook(gb); return; }
+  CALL_C(b_+81, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+84);
+  if (!(F & FZ)) { RET_TAKEN(b_+84); return; }
+  CYC(b_+85, b_+88); SET_HL(w1Link_yh); CYC(b_+88, b_+89); A = mem_rd(gb, HL); SET_HL(HL + 1); CYC(b_+89, b_+91); alu_cp(gb, 0x10);
+  if (!(F & FC)) { CYC(b_+91, b_+93); goto spawn; }
+  CYC(b_+91, b_+93); L = alu_inc8(gb, L); CYC(b_+94, b_+95); A = mem_rd(gb, HL); CYC(b_+95, b_+97); alu_cp(gb, 0xa0);
+  if (!(F & FC)) { CYC(b_+97, b_+99); vire_setRandomCounter1_hook(gb); return; }
 spawn:
-  CALL_C(0x6b6d, getFreePartSlot_hook, 0x3e8e, 0x6b70);
-  if (!(F & FZ)) { CYC(0x6b70, 0x6b72); vire_setRandomCounter1_hook(gb); return; }
-  CYC(0x6b72, 0x6b74); mem_wr(gb, HL, 0x2c); CYC(0x6b74, 0x6b75); L = alu_inc8(gb, L); CYC(0x6b75, 0x6b76); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); vire_setRandomCounter1_hook(gb);
+  CALL_C(b_+99, getFreePartSlot_hook, SYM(getFreePartSlot), b_+102);
+  if (!(F & FZ)) { CYC(b_+102, b_+104); vire_setRandomCounter1_hook(gb); return; }
+  CYC(b_+104, b_+106); mem_wr(gb, HL, 0x2c); CYC(b_+106, b_+107); L = alu_inc8(gb, L); CYC(b_+107, SYM(vire_setRandomCounter1)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); vire_setRandomCounter1_hook(gb);
 }
 
 void vire_setRandomCounter1_hook(GB *gb) {
+  BASE(vire_setRandomCounter1);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6b76, getRandomNumber_noPreserveVars_hook, 0x0453, 0x6b79);
-  CYC(0x6b79, 0x6b7b); alu_and(gb, 0x03); CYC(0x6b7b, 0x6b7e); SET_HL(0x6b84);
-  vire_add_a_to_hl(gb, 0x6b7f);
-  CYC(0x6b7f, 0x6b81); E = 0x46; CYC(0x6b81, 0x6b82); A = mem_rd(gb, HL); CYC(0x6b82, 0x6b83); mem_wr(gb, DE, A); RET(0x6b83); return;
+  CALL_C(b_+0, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+3);
+  CYC(b_+3, b_+5); alu_and(gb, 0x03); CYC(b_+5, b_+8); SET_HL(b_+14);
+  vire_add_a_to_hl(gb, b_+9);
+  CYC(b_+9, b_+11); E = 0x46; CYC(b_+11, b_+12); A = mem_rd(gb, HL); CYC(b_+12, b_+13); mem_wr(gb, DE, A); RET(b_+13); return;
 }
 
 void vire_subid2_hook(GB *gb) {
+  BASE(vire_subid2);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6b88, 0x6b8a); E = 0x44; CYC(0x6b8a, 0x6b8b); A = mem_rd(gb, DE);
-  CYC(0x6b8b, 0x6b8c); push_effect(gb, 0x6b8c); switch (vire_jump_table(gb)) {
-    case 0x6b94: goto state0;
-    case 0x6bb6: goto state1;
-    case 0x6c0c: goto state2;
-    case 0x6c25: goto state3;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x44; CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4); do { uint16_t jt_ = (vire_jump_table(gb));
+    if (jt_ == b_+12) { goto state0; }
+    else if (jt_ == b_+46) { goto state1; }
+    else if (jt_ == b_+132) { goto state2; }
+    else if (jt_ == b_+157) { goto state3; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 state0:
-  CALL_C(0x6b94, getThisRoomFlags_hook, 0x197d, 0x6b97); CYC(0x6b97, 0x6b99); alu_bit(gb, 6, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYC(0x6b99, 0x6b9c); interactionDelete_hook(gb); return; }
-  CYC(0x6b9c, 0x6b9f); SET_BC(0xad03); CALL_C(0x6b9f, objectCreateInteraction_hook, 0x24c5, 0x6ba2);
-  if (!(F & FZ)) { RET_TAKEN(0x6ba2); return; }
-  CYC(0x6ba3, 0x6ba5); E = 0x56; CYC(0x6ba5, 0x6ba7); A = 0x40; CYC(0x6ba7, 0x6ba8); mem_wr(gb, DE, A); CYC(0x6ba8, 0x6ba9); E = alu_inc8(gb, E); CYC(0x6ba9, 0x6baa); A = H; CYC(0x6baa, 0x6bab); mem_wr(gb, DE, A); CYC(0x6bab, 0x6bae); SET_HL(0x7d6a); CALL_C(0x6bae, vire_setScript_hook, 0x6af6, 0x6bb1);
-  CYC(0x6bb1, 0x6bb3); L = 0x46; CYC(0x6bb3, 0x6bb5); mem_wr(gb, HL, 0x08); RET(0x6bb5); return;
+  CALL_C(b_+12, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+15); CYC(b_+15, b_+17); alu_bit(gb, 6, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYC(b_+17, b_+20); interactionDelete_hook(gb); return; }
+  CYC(b_+20, b_+23); SET_BC(0xad03); CALL_C(b_+23, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+26);
+  if (!(F & FZ)) { RET_TAKEN(b_+26); return; }
+  CYC(b_+27, b_+29); E = 0x56; CYC(b_+29, b_+31); A = 0x40; CYC(b_+31, b_+32); mem_wr(gb, DE, A); CYC(b_+32, b_+33); E = alu_inc8(gb, E); CYC(b_+33, b_+34); A = H; CYC(b_+34, b_+35); mem_wr(gb, DE, A); CYC(b_+35, b_+38); SET_HL((SYM(interactionCoded8__subid0Script) + 20)); CALL_C(b_+38, vire_setScript_hook, SYM(vire_setScript), b_+41);
+  CYC(b_+41, b_+43); L = 0x46; CYC(b_+43, b_+45); mem_wr(gb, HL, 0x08); RET(b_+45); return;
 state1:
-  CYC(0x6bb6, 0x6bb9); SET_HL(0xd00b); CYC(0x6bb9, 0x6bba); A = mem_rd(gb, HL); SET_HL(HL + 1); CYC(0x6bba, 0x6bbc); alu_cp(gb, 0x40);
-  if (!(F & FC)) { CYC(0x6bbc, 0x6bbe); goto game; }
-  CYC(0x6bbe, 0x6bbf); L = alu_inc8(gb, L); CYC(0x6bbf, 0x6bc0); A = mem_rd(gb, HL); CYC(0x6bc0, 0x6bc2); alu_cp(gb, 0x58);
-  if (!(F & FC)) { CYC(0x6bc2, 0x6bc4); goto game; }
-  CALL_C(0x6bc4, vire_disableObjectsIfLinkIsReady_hook, 0x6c33, 0x6bc7); if (!(F & FC)) { CYC(0x6bc7, 0x6bc9); goto game; }
-  CYC(0x6bc9, 0x6bcb); A = 1; CYC(0x6bcb, 0x6bce); mem_wr(gb, 0xcc8a, A); CYC(0x6bce, 0x6bd1); mem_wr(gb, 0xcfd0, A); CYC(0x6bd1, 0x6bd3); A = 3; CYC(0x6bd3, 0x6bd6); mem_wr(gb, 0xd008, A); CYC(0x6bd6, 0x6bd9); interactionIncState_hook(gb); return;
+  CYC(b_+46, b_+49); SET_HL(w1Link_yh); CYC(b_+49, b_+50); A = mem_rd(gb, HL); SET_HL(HL + 1); CYC(b_+50, b_+52); alu_cp(gb, 0x40);
+  if (!(F & FC)) { CYC(b_+52, b_+54); goto game; }
+  CYC(b_+54, b_+55); L = alu_inc8(gb, L); CYC(b_+55, b_+56); A = mem_rd(gb, HL); CYC(b_+56, b_+58); alu_cp(gb, 0x58);
+  if (!(F & FC)) { CYC(b_+58, b_+60); goto game; }
+  CALL_C(b_+60, vire_disableObjectsIfLinkIsReady_hook, SYM(vire_disableObjectsIfLinkIsReady), b_+63); if (!(F & FC)) { CYC(b_+63, b_+65); goto game; }
+  CYC(b_+65, b_+67); A = 1; CYC(b_+67, b_+70); mem_wr(gb, wDisabledObjects, A); CYC(b_+70, b_+73); mem_wr(gb, wTmpcfc0_armosStatue_killedArmosPositions, A); CYC(b_+73, b_+75); A = 3; CYC(b_+75, b_+78); mem_wr(gb, w1Link_direction, A); CYC(b_+78, b_+81); interactionIncState_hook(gb); return;
 game:
-  CYC(0x6bd9, 0x6bda); H = D; CYC(0x6bda, 0x6bdc); L = 0x47; CYC(0x6bdc, 0x6bde); A = mem_rd(gb, HL); CYC(0x6bdd, 0x6bde); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x6bde, 0x6be0); goto counter; }
-  CYC(0x6be0, 0x6be1); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); if (!(F & FZ)) { CYCT(0x6be1, 0x6be3); goto counter; }
-  CYC(0x6be1, 0x6be3); CYC(0x6be3, 0x6be5); E = 0x48; CYC(0x6be5, 0x6be6); alu_xor(gb, A); CYC(0x6be6, 0x6be7); mem_wr(gb, DE, A); CALL_C(0x6be7, interactionSetAnimation_hook, 0x262e, 0x6bea);
+  CYC(b_+81, b_+82); H = D; CYC(b_+82, b_+84); L = 0x47; CYC(b_+84, b_+86); A = mem_rd(gb, HL); CYC(b_+85, b_+86); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+86, b_+88); goto counter; }
+  CYC(b_+88, b_+89); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); if (!(F & FZ)) { CYCT(b_+89, b_+91); goto counter; }
+  CYC(b_+89, b_+91); CYC(b_+91, b_+93); E = 0x48; CYC(b_+93, b_+94); alu_xor(gb, A); CYC(b_+94, b_+95); mem_wr(gb, DE, A); CALL_C(b_+95, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+98);
 counter:
-  CALL_C(0x6bea, interactionDecCounter1_hook, 0x23cc, 0x6bed); if (!(F & FZ)) { CYC(0x6bed, 0x6bef); goto animate2; }
-  CALL_C(0x6bef, getFreePartSlot_hook, 0x3e8e, 0x6bf2); if (!(F & FZ)) { CYC(0x6bf2, 0x6bf4); goto setCounter; }
-  CYC(0x6bf4, 0x6bf6); mem_wr(gb, HL, 0x2c); CALL_C(0x6bf6, objectCopyPosition_hook, 0x2242, 0x6bf9); CYC(0x6bf9, 0x6bfb); E = 0x48; CYC(0x6bfb, 0x6bfd); A = 1; CYC(0x6bfd, 0x6bfe); mem_wr(gb, DE, A); CALL_C(0x6bfe, interactionSetAnimation_hook, 0x262e, 0x6c01); CYC(0x6c01, 0x6c03); E = 0x47; CYC(0x6c03, 0x6c05); A = 0x18; CYC(0x6c05, 0x6c06); mem_wr(gb, DE, A);
+  CALL_C(b_+98, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+101); if (!(F & FZ)) { CYC(b_+101, b_+103); goto animate2; }
+  CALL_C(b_+103, getFreePartSlot_hook, SYM(getFreePartSlot), b_+106); if (!(F & FZ)) { CYC(b_+106, b_+108); goto setCounter; }
+  CYC(b_+108, b_+110); mem_wr(gb, HL, 0x2c); CALL_C(b_+110, objectCopyPosition_hook, SYM(objectCopyPosition), b_+113); CYC(b_+113, b_+115); E = 0x48; CYC(b_+115, b_+117); A = 1; CYC(b_+117, b_+118); mem_wr(gb, DE, A); CALL_C(b_+118, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+121); CYC(b_+121, b_+123); E = 0x47; CYC(b_+123, b_+125); A = 0x18; CYC(b_+125, b_+126); mem_wr(gb, DE, A);
 setCounter:
-  CALL_C(0x6c06, vire_setRandomCounter1_hook, 0x6b76, 0x6c09);
+  CALL_C(b_+126, vire_setRandomCounter1_hook, SYM(vire_setRandomCounter1), b_+129);
 animate2:
-  CYC(0x6c09, 0x6c0c); interactionAnimate_hook(gb); return;
+  CYC(b_+129, b_+132); interactionAnimate_hook(gb); return;
 state2:
-  CALL_C(0x6c0c, interactionIncState_hook, 0x23e0, 0x6c0f); CYC(0x6c0f, 0x6c11); L = 0x46; CYC(0x6c11, 0x6c12); alu_xor(gb, A); CYC(0x6c12, 0x6c13); mem_wr(gb, HL, A); SET_HL(HL + 1); CYC(0x6c13, 0x6c14); mem_wr(gb, HL, A); CYC(0x6c14, 0x6c16); E = 0x48; CYC(0x6c16, 0x6c17); A = mem_rd(gb, DE); CYC(0x6c17, 0x6c18); A = alu_dec8(gb, A); if (F & FZ) CALL_C_CC(0x6c18, interactionSetAnimation_hook, 0x262e, 0x6c1b); else CYC(0x6c18, 0x6c1b); CYC(0x6c1b, 0x6c1d); A = 0x80; CYC(0x6c1d, 0x6c20); mem_wr(gb, 0xcc8a, A); CYC(0x6c20, 0x6c22); A = 0xf0; CALL_C(0x6c22, playSound_b00_hook, 0x0c98, 0x6c25); goto state3;
+  CALL_C(b_+132, interactionIncState_hook, SYM(interactionIncState), b_+135); CYC(b_+135, b_+137); L = 0x46; CYC(b_+137, b_+138); alu_xor(gb, A); CYC(b_+138, b_+139); mem_wr(gb, HL, A); SET_HL(HL + 1); CYC(b_+139, b_+140); mem_wr(gb, HL, A); CYC(b_+140, b_+142); E = 0x48; CYC(b_+142, b_+143); A = mem_rd(gb, DE); CYC(b_+143, b_+144); A = alu_dec8(gb, A); if (F & FZ) CALL_C_CC(b_+144, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+147); else CYC(b_+144, b_+147); CYC(b_+147, b_+149); A = 0x80; CYC(b_+149, b_+152); mem_wr(gb, wDisabledObjects, A); CYC(b_+152, b_+154); A = 0xf0; CALL_C(b_+154, playSound_b00_hook, SYM(playSound_b00), b_+157); goto state3;
 state3:
-  CALL_C(0x6c25, interactionRunScript_hook, 0x2552, 0x6c28); if (!(F & FC)) { CYC(0x6c28, 0x6c2a); goto animate2; } CYC(0x6c2a, 0x6c2c); A = 5; CALL_C(0x6c2c, objectGetRelatedObject1Var_hook, 0x2160, 0x6c2f); CYC(0x6c2f, 0x6c30); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); CYC(0x6c30, 0x6c33); interactionDelete_hook(gb); return;
+  CALL_C(b_+157, interactionRunScript_hook, SYM(interactionRunScript), b_+160); if (!(F & FC)) { CYC(b_+160, b_+162); goto animate2; } CYC(b_+162, b_+164); A = 5; CALL_C(b_+164, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+167); CYC(b_+167, b_+168); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); CYC(b_+168, SYM(vire_disableObjectsIfLinkIsReady)); interactionDelete_hook(gb); return;
 }
 
 void vire_disableObjectsIfLinkIsReady_hook(GB *gb) {
+  BASE(vire_disableObjectsIfLinkIsReady);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6c33, 0x6c36); A = mem_rd(gb, 0xcc5c); CYC(0x6c36, 0x6c37); alu_or(gb, A); if (!(F & FZ)) { RET_TAKEN(0x6c37); return; }
-  CALL_C(0x6c38, checkLinkVulnerable_hook, 0x1d28, 0x6c3b); if (!(F & FC)) { RET_TAKEN(0x6c3b); return; }
-  CYC(0x6c3c, 0x6c3e); A = 0x80; CYC(0x6c3e, 0x6c41); mem_wr(gb, 0xcc8a, A); CYC(0x6c41, 0x6c44); mem_wr(gb, 0xcc02, A); CYC(0x6c44, 0x6c46); E = 0x78; CYC(0x6c46, 0x6c47); mem_wr(gb, DE, A); CALL_C(0x6c47, clearAllParentItems_hook, 0x2c10, 0x6c4a); CALL_C(0x6c4a, dropLinkHeldItem_hook, 0x2c43, 0x6c4d); CYC(0x6c4d, 0x6c4e); alu_scf(gb); RET(0x6c4e); return;
+  CYC(b_+0, b_+3); A = mem_rd(gb, wLinkInAir); CYC(b_+3, b_+4); alu_or(gb, A); if (!(F & FZ)) { RET_TAKEN(b_+4); return; }
+  CALL_C(b_+5, checkLinkVulnerable_hook, SYM(checkLinkVulnerable), b_+8); if (!(F & FC)) { RET_TAKEN(b_+8); return; }
+  CYC(b_+9, b_+11); A = 0x80; CYC(b_+11, b_+14); mem_wr(gb, wDisabledObjects, A); CYC(b_+14, b_+17); mem_wr(gb, wMenuDisabled, A); CYC(b_+17, b_+19); E = 0x78; CYC(b_+19, b_+20); mem_wr(gb, DE, A); CALL_C(b_+20, clearAllParentItems_hook, SYM(clearAllParentItems), b_+23); CALL_C(b_+23, dropLinkHeldItem_hook, SYM(dropLinkHeldItem), b_+26); CYC(b_+26, b_+27); alu_scf(gb); RET(b_+27); return;
 }
 
 void vire_deleteAndReturnControl_hook(GB *gb) {
+  BASE(vire_deleteAndReturnControl);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6c4f, interactionDelete_hook, 0x3b05, 0x6c52);
+  CALL_C(b_+0, interactionDelete_hook, SYM(interactionDelete), SYM(vire_returnControl));
   vire_returnControl_hook(gb);
 }
 
 void vire_returnControl_hook(GB *gb) {
+  BASE(vire_returnControl);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6c52, 0x6c53); alu_xor(gb, A); CYC(0x6c53, 0x6c56); mem_wr(gb, 0xcc8a, A); CYC(0x6c56, 0x6c59); mem_wr(gb, 0xcc02, A); RET(0x6c59); return;
+  CYC(b_+0, b_+1); alu_xor(gb, A); CYC(b_+1, b_+4); mem_wr(gb, wDisabledObjects, A); CYC(b_+4, b_+7); mem_wr(gb, wMenuDisabled, A); RET(b_+7); return;
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x3f, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x3f, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(rabbitSubid0), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(rabbitSubid0), (from), (to), true)
 
 static uint16_t rabbit_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -39,759 +39,811 @@ static void rabbit_add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
 }
 
 static void rabbit_subid0_jump(GB *gb, uint16_t sp0_) {
-  CYC(0x7923, 0x7926); SET_BC(0xfe00);
-  CALL_C(0x7926, objectSetSpeedZ_hook, 0x239d, 0x7929);
-  CYC(0x7929, 0x792b); A = 0x04;
-  CYC(0x792b, 0x792e);
+  BASE(rabbitSubid0);
+  CYC(b_+64, b_+67); SET_BC(0xfe00);
+  CALL_C(b_+67, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+70);
+  CYC(b_+70, b_+72); A = 0x04;
+  CYC(b_+72, b_+75);
   interactionSetAnimation_hook(gb);
 }
 
 static void rabbit_subid0_substate0(GB *gb, uint16_t sp0_) {
-  CYC(0x78f2, 0x78f5); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfd0);
-  CYC(0x78f5, 0x78f7); alu_cp(gb, 0x0e);
+  BASE(rabbitSubid0);
+  CYC(b_+15, b_+18); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfd0);
+  CYC(b_+18, b_+20); alu_cp(gb, 0x0e);
   if (!(F & FZ)) {
-    CYCT(0x78f7, 0x78fa);
+    CYCT(b_+20, b_+23);
     interactionRunScript_hook(gb);
     return;
   }
-  CYC(0x78f7, 0x78fa);
-  CALL_C(0x78fa, interactionIncSubstate_hook, 0x23e5, 0x78fd);
-  CYC(0x78fd, 0x78ff); A = 0x02;
-  CYC(0x78ff, 0x7902);
+  CYC(b_+20, b_+23);
+  CALL_C(b_+23, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+26);
+  CYC(b_+26, b_+28); A = 0x02;
+  CYC(b_+28, b_+31);
   interactionSetAnimation_hook(gb);
 }
 
 static void rabbit_subid0_substate1(GB *gb, uint16_t sp0_) {
-  CYC(0x7902, 0x7905); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfd0);
-  CYC(0x7905, 0x7907); alu_cp(gb, 0x10);
+  BASE(rabbitSubid0);
+  CYC(b_+31, b_+34); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfd0);
+  CYC(b_+34, b_+36); alu_cp(gb, 0x10);
   if (!(F & FZ)) {
-    CYCT(0x7907, 0x790a);
+    CYCT(b_+36, b_+39);
     interactionRunScript_hook(gb);
     return;
   }
-  CYC(0x7907, 0x790a);
-  CALL_C(0x790a, interactionIncSubstate_hook, 0x23e5, 0x790d);
-  CYC(0x790d, 0x790f); L = 0x46;
-  CYC(0x790f, 0x7911); mem_wr(gb, HL, 0x28);
-  CYC(0x7911, 0x7912); ret_effect(gb);
+  CYC(b_+36, b_+39);
+  CALL_C(b_+39, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+42);
+  CYC(b_+42, b_+44); L = 0x46;
+  CYC(b_+44, b_+46); mem_wr(gb, HL, 0x28);
+  CYC(b_+46, b_+47); ret_effect(gb);
 }
 
 static void rabbit_subid0_substate2(GB *gb, uint16_t sp0_) {
-  CALL_C(0x7912, interactionDecCounter1_hook, 0x23cc, 0x7915);
+  BASE(rabbitSubid0);
+  CALL_C(b_+47, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+50);
   if (!(F & FZ)) {
-    CYCT(0x7915, 0x7918);
+    CYCT(b_+50, b_+53);
     interactionAnimate_hook(gb);
     return;
   }
-  CYC(0x7915, 0x7918);
-  CALL_C(0x7918, interactionIncSubstate_hook, 0x23e5, 0x791b);
-  CYC(0x791b, 0x791d); L = 0x49;
-  CYC(0x791d, 0x791f); mem_wr(gb, HL, 0x06);
-  CYC(0x791f, 0x7921); L = 0x50;
-  CYC(0x7921, 0x7923); mem_wr(gb, HL, 0x3c);
+  CYC(b_+50, b_+53);
+  CALL_C(b_+53, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+56);
+  CYC(b_+56, b_+58); L = 0x49;
+  CYC(b_+58, b_+60); mem_wr(gb, HL, 0x06);
+  CYC(b_+60, b_+62); L = 0x50;
+  CYC(b_+62, b_+64); mem_wr(gb, HL, 0x3c);
   rabbit_subid0_jump(gb, sp0_);
 }
 
 static void rabbit_subid0_substate3(GB *gb, uint16_t sp0_) {
-  CALL_C(0x792e, objectCheckWithinScreenBoundary_hook, 0x2184, 0x7931);
+  BASE(rabbitSubid0);
+  CALL_C(b_+75, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+78);
   if (!(F & FC)) {
-    CYCT(0x7931, 0x7934);
+    CYCT(b_+78, b_+81);
     interactionDelete_hook(gb);
     return;
   }
-  CYC(0x7931, 0x7934);
-  CYC(0x7934, 0x7936); C = 0x20;
-  CALL_C(0x7936, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x7939);
+  CYC(b_+78, b_+81);
+  CYC(b_+81, b_+83); C = 0x20;
+  CALL_C(b_+83, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+86);
   if (!(F & FZ)) {
-    CYCT(0x7939, 0x793c);
+    CYCT(b_+86, b_+89);
     objectApplySpeed_hook(gb);
     return;
   }
-  CYC(0x7939, 0x793c);
-  CYC(0x793c, 0x793e);
+  CYC(b_+86, b_+89);
+  CYC(b_+89, SYM(rabbitSubid1));
   rabbit_subid0_jump(gb, sp0_);
 }
 
 void rabbitSubid0_hook(GB *gb) {
+  BASE(rabbitSubid0);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x78e3, interactionAnimateAsNpc_hook, 0x26db, 0x78e6);
-  CYC(0x78e6, 0x78e8); E = 0x45;
-  CYC(0x78e8, 0x78e9); A = mem_rd(gb, DE);
-  CYC(0x78e9, 0x78ea); push_effect(gb, 0x78ea);
-  switch (rabbit_jump_table(gb)) {
-    case 0x78f2: rabbit_subid0_substate0(gb, sp0_); return;
-    case 0x7902: rabbit_subid0_substate1(gb, sp0_); return;
-    case 0x7912: rabbit_subid0_substate2(gb, sp0_); return;
-    case 0x792e: rabbit_subid0_substate3(gb, sp0_); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CALL_C(b_+0, interactionAnimateAsNpc_hook, SYM(interactionAnimateAsNpc), b_+3);
+  CYC(b_+3, b_+5); E = 0x45;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+7); push_effect(gb, b_+7);
+  do { uint16_t jt_ = (rabbit_jump_table(gb));
+    if (jt_ == b_+15) { rabbit_subid0_substate0(gb, sp0_); return; }
+    else if (jt_ == b_+31) { rabbit_subid0_substate1(gb, sp0_); return; }
+    else if (jt_ == b_+47) { rabbit_subid0_substate2(gb, sp0_); return; }
+    else if (jt_ == b_+75) { rabbit_subid0_substate3(gb, sp0_); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 static void rabbit_set_jump_animation(GB *gb, uint16_t sp0_) {
-  CYC(0x7856, 0x7858); A = 0x05;
-  CALL_C(0x7858, interactionSetAnimation_hook, 0x262e, 0x785b);
-  CYC(0x785b, 0x785e); SET_BC(0xfe80);
-  CYC(0x785e, 0x7861);
+  BASE(interactionCode4b_body);
+  CYC(b_+63, b_+65); A = 0x05;
+  CALL_C(b_+65, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+68);
+  CYC(b_+68, b_+71); SET_BC(0xfe80);
+  CYC(b_+71, b_+74);
   objectSetSpeedZ_hook(gb);
 }
 
 static void rabbit_subid1_substate0(GB *gb, uint16_t sp0_) {
-  CALL_C(0x7968, interactionAnimate_hook, 0x261b, 0x796b);
-  CYC(0x796b, 0x796d); E = 0x61;
-  CYC(0x796d, 0x796e); A = mem_rd(gb, DE);
-  CYC(0x796e, 0x796f); alu_or(gb, A);
+  BASE(rabbitSubid1);
+  CALL_C(b_+42, interactionAnimate_hook, SYM(interactionAnimate), b_+45);
+  CYC(b_+45, b_+47); E = 0x61;
+  CYC(b_+47, b_+48); A = mem_rd(gb, DE);
+  CYC(b_+48, b_+49); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x796f, 0x7970); ret_effect(gb);
+    CYCT(b_+49, b_+50); ret_effect(gb);
     return;
   }
-  CYC(0x796f, 0x7970);
-  CYC(0x7970, 0x7972); A = 0x53;
-  CALL_C(0x7972, playSound_b00_hook, 0x0c98, 0x7975);
-  CYC(0x7975, 0x7978);
+  CYC(b_+49, b_+50);
+  CYC(b_+50, b_+52); A = 0x53;
+  CALL_C(b_+52, playSound_b00_hook, SYM(playSound_b00), b_+55);
+  CYC(b_+55, b_+58);
   interactionIncSubstate_hook(gb);
 }
 
 static void rabbit_subid1_substate1(GB *gb, uint16_t sp0_) {
-  CYC(0x7978, 0x797a); E = 0x4d;
-  CYC(0x797a, 0x797b); A = mem_rd(gb, DE);
-  CYC(0x797b, 0x797d); alu_cp(gb, 0xd0);
+  BASE(rabbitSubid1);
+  CYC(b_+58, b_+60); E = 0x4d;
+  CYC(b_+60, b_+61); A = mem_rd(gb, DE);
+  CYC(b_+61, b_+63); alu_cp(gb, 0xd0);
   if (!(F & FC)) {
-    CYCT(0x797d, 0x7980);
+    CYCT(b_+63, b_+66);
     interactionDelete_hook(gb);
     return;
   }
-  CYC(0x797d, 0x7980);
-  CALL_C(0x7980, objectApplySpeed_hook, 0x201d, 0x7983);
-  CYC(0x7983, 0x7985); C = 0x20;
-  CALL_C(0x7985, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x7988);
+  CYC(b_+63, b_+66);
+  CALL_C(b_+66, objectApplySpeed_hook, SYM(objectApplySpeed), b_+69);
+  CYC(b_+69, b_+71); C = 0x20;
+  CALL_C(b_+71, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+74);
   if (!(F & FZ)) {
-    CYCT(0x7988, 0x7989); ret_effect(gb);
+    CYCT(b_+74, b_+75); ret_effect(gb);
     return;
   }
-  CYC(0x7988, 0x7989);
-  CYC(0x7989, 0x798a); H = D;
-  CYC(0x798a, 0x798c); L = 0x45;
-  CYC(0x798c, 0x798d); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x798d, 0x7990);
+  CYC(b_+74, b_+75);
+  CYC(b_+75, b_+76); H = D;
+  CYC(b_+76, b_+78); L = 0x45;
+  CYC(b_+78, b_+79); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+79, b_+82);
   rabbit_set_jump_animation(gb, sp0_);
 }
 
 static void rabbit_subid1_substate2(GB *gb, uint16_t sp0_) {
-  CALL_C(0x7990, interactionDecCounter2_hook, 0x23d1, 0x7993);
+  BASE(rabbitSubid1);
+  CALL_C(b_+82, interactionDecCounter2_hook, SYM(interactionDecCounter2), b_+85);
   if (!(F & FZ)) {
-    CYCT(0x7993, 0x7994); ret_effect(gb);
+    CYCT(b_+85, b_+86); ret_effect(gb);
     return;
   }
-  CYC(0x7993, 0x7994);
-  CYC(0x7994, 0x7996); mem_wr(gb, HL, 0x3c);
-  CYC(0x7996, 0x7998); L = 0x4d;
-  CYC(0x7998, 0x7999); A = mem_rd(gb, HL);
-  CYC(0x7999, 0x799b); L = 0x7d;
-  CYC(0x799b, 0x799c); mem_wr(gb, HL, A);
-  CYC(0x799c, 0x799f);
+  CYC(b_+85, b_+86);
+  CYC(b_+86, b_+88); mem_wr(gb, HL, 0x3c);
+  CYC(b_+88, b_+90); L = 0x4d;
+  CYC(b_+90, b_+91); A = mem_rd(gb, HL);
+  CYC(b_+91, b_+93); L = 0x7d;
+  CYC(b_+93, b_+94); mem_wr(gb, HL, A);
+  CYC(b_+94, b_+97);
   interactionIncSubstate_hook(gb);
 }
 
 static void rabbit_subid1_substate3(GB *gb, uint16_t sp0_) {
-  CYC(0x799f, 0x79a2); SET_HL(0x5d87);
-  CYC(0x79a2, 0x79a4); E = 0x08;
-  CALL_C(0x79a4, interBankCall_hook, 0x008a, 0x79a7);
-  CALL_C(0x79a7, interactionDecCounter2_hook, 0x23d1, 0x79aa);
+  BASE(rabbitSubid1);
+  CYC(b_+97, b_+100); SET_HL((SYM(enemyData) + 60));
+  CYC(b_+100, b_+102); E = 0x08;
+  CALL_C(b_+102, interBankCall_hook, 0x008a, b_+105);
+  CALL_C(b_+105, interactionDecCounter2_hook, SYM(interactionDecCounter2), b_+108);
   if (!(F & FZ)) {
-    CYCT(0x79aa, 0x79ab); ret_effect(gb);
+    CYCT(b_+108, b_+109); ret_effect(gb);
     return;
   }
-  CYC(0x79aa, 0x79ab);
-  CYC(0x79ab, 0x79ad); mem_wr(gb, HL, 0x14);
-  CYC(0x79ad, 0x79af); L = 0x5c;
-  CYC(0x79af, 0x79b1); mem_wr(gb, HL, 0x06);
-  CYC(0x79b1, 0x79b4);
+  CYC(b_+108, b_+109);
+  CYC(b_+109, b_+111); mem_wr(gb, HL, 0x14);
+  CYC(b_+111, b_+113); L = 0x5c;
+  CYC(b_+113, b_+115); mem_wr(gb, HL, 0x06);
+  CYC(b_+115, b_+118);
   interactionIncSubstate_hook(gb);
 }
 
 static void rabbit_subid1_substate4(GB *gb, uint16_t sp0_) {
-  CALL_C(0x79b4, interactionDecCounter2_hook, 0x23d1, 0x79b7);
+  BASE(rabbitSubid1);
+  CALL_C(b_+118, interactionDecCounter2_hook, SYM(interactionDecCounter2), b_+121);
   if (!(F & FZ)) {
-    CYCT(0x79b7, 0x79b8); ret_effect(gb);
+    CYCT(b_+121, b_+122); ret_effect(gb);
     return;
   }
-  CYC(0x79b7, 0x79b8);
-  CYC(0x79b8, 0x79bb); SET_BC(0x0000);
-  CALL_C(0x79bb, objectSetSpeedZ_hook, 0x239d, 0x79be);
-  CYC(0x79be, 0x79c1);
+  CYC(b_+121, b_+122);
+  CYC(b_+122, b_+125); SET_BC(0x0000);
+  CALL_C(b_+125, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+128);
+  CYC(b_+128, b_+131);
   interactionIncSubstate_hook(gb);
 }
 
 static void rabbit_subid1_substate5(GB *gb, uint16_t sp0_) {
-  CYC(0x79c1, 0x79c3); C = 0x20;
-  CALL_C(0x79c3, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x79c6);
+  BASE(rabbitSubid1);
+  CYC(b_+131, b_+133); C = 0x20;
+  CALL_C(b_+133, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+136);
   if (!(F & FZ)) {
-    CYCT(0x79c6, 0x79c7); ret_effect(gb);
+    CYCT(b_+136, b_+137); ret_effect(gb);
     return;
   }
-  CYC(0x79c6, 0x79c7);
-  CALL_C(0x79c7, interactionIncSubstate_hook, 0x23e5, 0x79ca);
-  CYC(0x79ca, 0x79cc); L = 0x47;
-  CYC(0x79cc, 0x79ce); mem_wr(gb, HL, 0xf0);
-  CYC(0x79ce, 0x79d0); A = 0x04;
-  CYC(0x79d0, 0x79d3);
+  CYC(b_+136, b_+137);
+  CALL_C(b_+137, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+140);
+  CYC(b_+140, b_+142); L = 0x47;
+  CYC(b_+142, b_+144); mem_wr(gb, HL, 0xf0);
+  CYC(b_+144, b_+146); A = 0x04;
+  CYC(b_+146, b_+149);
   setScreenShakeCounter_hook(gb);
 }
 
 static void rabbit_subid1_substate6(GB *gb, uint16_t sp0_) {
-  CALL_C(0x79d3, interactionDecCounter2_hook, 0x23d1, 0x79d6);
+  BASE(rabbitSubid1);
+  CALL_C(b_+149, interactionDecCounter2_hook, SYM(interactionDecCounter2), b_+152);
   if (!(F & FZ)) {
-    CYCT(0x79d6, 0x79d7); ret_effect(gb);
+    CYCT(b_+152, b_+153); ret_effect(gb);
     return;
   }
-  CYC(0x79d6, 0x79d7);
-  CYC(0x79d7, 0x79d9); A = 0xff;
-  CYC(0x79d9, 0x79dc); mem_wr(gb, wTmpcfc0_genericCutscene_cfdf, A);
-  CYC(0x79dc, 0x79dd); ret_effect(gb);
+  CYC(b_+152, b_+153);
+  CYC(b_+153, b_+155); A = 0xff;
+  CYC(b_+155, b_+158); mem_wr(gb, wTmpcfc0_genericCutscene_cfdf, A);
+  CYC(b_+158, SYM(rabbitSubid2)); ret_effect(gb);
 }
 
 void rabbitSubid1_hook(GB *gb) {
+  BASE(rabbitSubid1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x793e, 0x793f); H = D;
-  CYC(0x793f, 0x7941); L = 0x46;
-  CYC(0x7941, 0x7942); A = mem_rd(gb, HL);
-  CYC(0x7942, 0x7943); alu_or(gb, A);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = 0x46;
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
+  CYC(b_+4, b_+5); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x7943, 0x7945);
+    CYCT(b_+5, b_+7);
   } else {
-    CYC(0x7943, 0x7945);
-    CYC(0x7945, 0x7946); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+    CYC(b_+5, b_+7);
+    CYC(b_+7, b_+8); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
     if (!(F & FZ)) {
-      CYCT(0x7946, 0x7948);
+      CYCT(b_+8, b_+10);
     } else {
-      CYC(0x7946, 0x7948);
-      CYC(0x7948, 0x7949); L = alu_inc8(gb, L);
-      CYC(0x7949, 0x794b); A = 0x1e;
-      CYC(0x794b, 0x794c); mem_wr(gb, HL, A);
-      CYC(0x794c, 0x794e); L = 0x45;
-      CYC(0x794e, 0x7950); mem_wr(gb, HL, 0x02);
-      CYC(0x7950, 0x7953); SET_BC(0xf000);
-      CALL_C(0x7953, objectCreateExclamationMark_hook, 0x27e0, 0x7956);
+      CYC(b_+8, b_+10);
+      CYC(b_+10, b_+11); L = alu_inc8(gb, L);
+      CYC(b_+11, b_+13); A = 0x1e;
+      CYC(b_+13, b_+14); mem_wr(gb, HL, A);
+      CYC(b_+14, b_+16); L = 0x45;
+      CYC(b_+16, b_+18); mem_wr(gb, HL, 0x02);
+      CYC(b_+18, b_+21); SET_BC(0xf000);
+      CALL_C(b_+21, objectCreateExclamationMark_hook, SYM(objectCreateExclamationMark), b_+24);
     }
   }
-  CYC(0x7956, 0x7958); E = 0x45;
-  CYC(0x7958, 0x7959); A = mem_rd(gb, DE);
-  CYC(0x7959, 0x795a); push_effect(gb, 0x795a);
-  switch (rabbit_jump_table(gb)) {
-    case 0x7968: rabbit_subid1_substate0(gb, sp0_); return;
-    case 0x7978: rabbit_subid1_substate1(gb, sp0_); return;
-    case 0x7990: rabbit_subid1_substate2(gb, sp0_); return;
-    case 0x799f: rabbit_subid1_substate3(gb, sp0_); return;
-    case 0x79b4: rabbit_subid1_substate4(gb, sp0_); return;
-    case 0x79c1: rabbit_subid1_substate5(gb, sp0_); return;
-    case 0x79d3: rabbit_subid1_substate6(gb, sp0_); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+24, b_+26); E = 0x45;
+  CYC(b_+26, b_+27); A = mem_rd(gb, DE);
+  CYC(b_+27, b_+28); push_effect(gb, b_+28);
+  do { uint16_t jt_ = (rabbit_jump_table(gb));
+    if (jt_ == b_+42) { rabbit_subid1_substate0(gb, sp0_); return; }
+    else if (jt_ == b_+58) { rabbit_subid1_substate1(gb, sp0_); return; }
+    else if (jt_ == b_+82) { rabbit_subid1_substate2(gb, sp0_); return; }
+    else if (jt_ == b_+97) { rabbit_subid1_substate3(gb, sp0_); return; }
+    else if (jt_ == b_+118) { rabbit_subid1_substate4(gb, sp0_); return; }
+    else if (jt_ == b_+131) { rabbit_subid1_substate5(gb, sp0_); return; }
+    else if (jt_ == b_+149) { rabbit_subid1_substate6(gb, sp0_); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 static void rabbit_init_subid1(GB *gb, uint16_t sp0_) {
-  CYC(0x784d, 0x784e); H = D;
-  CYC(0x784e, 0x7850); L = 0x49;
-  CYC(0x7850, 0x7852); mem_wr(gb, HL, 0x18);
-  CYC(0x7852, 0x7854); L = 0x50;
-  CYC(0x7854, 0x7856); mem_wr(gb, HL, 0x3c);
+  BASE(interactionCode4b_body);
+  CYC(b_+54, b_+55); H = D;
+  CYC(b_+55, b_+57); L = 0x49;
+  CYC(b_+57, b_+59); mem_wr(gb, HL, 0x18);
+  CYC(b_+59, b_+61); L = 0x50;
+  CYC(b_+61, b_+63); mem_wr(gb, HL, 0x3c);
   rabbit_set_jump_animation(gb, sp0_);
 }
 
 static void rabbit_subid3_substate0(GB *gb, uint16_t sp0_) {
-  CALL_C(0x7a13, interactionDecCounter1_hook, 0x23cc, 0x7a16);
+  BASE(rabbitSubid3);
+  CALL_C(b_+12, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+15);
   if (!(F & FZ)) {
-    CYCT(0x7a16, 0x7a17); ret_effect(gb);
+    CYCT(b_+15, b_+16); ret_effect(gb);
     return;
   }
-  CYC(0x7a16, 0x7a17);
-  CYC(0x7a17, 0x7a19); mem_wr(gb, HL, 0x5a);
-  CYC(0x7a19, 0x7a1b); A = 0x01;
-  CYC(0x7a1b, 0x7a1e); mem_wr(gb, wTmpcfc0_genericCutscene_cfd1, A);
-  CYC(0x7a1e, 0x7a20); A = 0xc1;
-  CALL_C(0x7a20, playSound_b00_hook, 0x0c98, 0x7a23);
-  CYC(0x7a23, 0x7a26);
+  CYC(b_+15, b_+16);
+  CYC(b_+16, b_+18); mem_wr(gb, HL, 0x5a);
+  CYC(b_+18, b_+20); A = 0x01;
+  CYC(b_+20, b_+23); mem_wr(gb, wTmpcfc0_genericCutscene_cfd1, A);
+  CYC(b_+23, b_+25); A = 0xc1;
+  CALL_C(b_+25, playSound_b00_hook, SYM(playSound_b00), b_+28);
+  CYC(b_+28, b_+31);
   interactionIncSubstate_hook(gb);
 }
 
 static void rabbit_subid3_substate1(GB *gb, uint16_t sp0_) {
-  CALL_C(0x7a26, interactionDecCounter1_hook, 0x23cc, 0x7a29);
+  BASE(rabbitSubid3);
+  CALL_C(b_+31, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+34);
   if (!(F & FZ)) {
-    CYC(0x7a29, 0x7a2b);
-    CYC(0x7a2b, 0x7a2e); SET_HL(0x7b70);
-    CYC(0x7a2e, 0x7a30); E = 0x08;
-    CYC(0x7a30, 0x7a33);
+    CYC(b_+34, b_+36);
+    CYC(b_+36, b_+39); SET_HL((SYM(tuniNut_state0) + 2));
+    CYC(b_+39, b_+41); E = 0x08;
+    CYC(b_+41, b_+44);
     interBankCall_hook(gb);
     return;
   }
-  CYCT(0x7a29, 0x7a2b);
-  CALL_C(0x7a33, interactionIncSubstate_hook, 0x23e5, 0x7a36);
-  CYC(0x7a36, 0x7a38); L = 0x5c;
-  CYC(0x7a38, 0x7a3a); mem_wr(gb, HL, 0x02);
-  CYC(0x7a3a, 0x7a3c); L = 0x78;
-  CYC(0x7a3c, 0x7a3e); mem_wr(gb, HL, 0x20);
-  CYC(0x7a3e, 0x7a41);
+  CYCT(b_+34, b_+36);
+  CALL_C(b_+44, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+47);
+  CYC(b_+47, b_+49); L = 0x5c;
+  CYC(b_+49, b_+51); mem_wr(gb, HL, 0x02);
+  CYC(b_+51, b_+53); L = 0x78;
+  CYC(b_+53, b_+55); mem_wr(gb, HL, 0x20);
+  CYC(b_+55, SYM(rabbitSubid4));
   rabbit_init_subid1(gb, sp0_);
 }
 
 void rabbitSubid3_hook(GB *gb) {
+  BASE(rabbitSubid3);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7a07, 0x7a09); E = 0x45;
-  CYC(0x7a09, 0x7a0a); A = mem_rd(gb, DE);
-  CYC(0x7a0a, 0x7a0b); push_effect(gb, 0x7a0b);
-  switch (rabbit_jump_table(gb)) {
-    case 0x7a13: rabbit_subid3_substate0(gb, sp0_); return;
-    case 0x7a26: rabbit_subid3_substate1(gb, sp0_); return;
-    case 0x7968: rabbit_subid1_substate0(gb, sp0_); return;
-    case 0x7978: rabbit_subid1_substate1(gb, sp0_); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x45;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (rabbit_jump_table(gb));
+    if (jt_ == b_+12) { rabbit_subid3_substate0(gb, sp0_); return; }
+    else if (jt_ == b_+31) { rabbit_subid3_substate1(gb, sp0_); return; }
+    else if (jt_ == SYM(rabbitSubid1__substate0)) { rabbit_subid1_substate0(gb, sp0_); return; }
+    else if (jt_ == SYM(rabbitSubid1__substate1)) { rabbit_subid1_substate1(gb, sp0_); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void rabbitJump_hook(GB *gb) {
+  BASE(rabbitJump);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7a76, 0x7a78); A = 0x07;
-  CALL_C(0x7a78, interactionSetAnimation_hook, 0x262e, 0x7a7b);
-  CYC(0x7a7b, 0x7a7e); SET_BC(0xff20);
-  CYC(0x7a7e, 0x7a81);
+  CYC(b_+0, b_+2); A = 0x07;
+  CALL_C(b_+2, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+5);
+  CYC(b_+5, b_+8); SET_BC(0xff20);
+  CYC(b_+8, SYM(rabbitSubid4Substate2));
   objectSetSpeedZ_hook(gb);
 }
 
 void rabbitSubid4Substate2_hook(GB *gb) {
+  BASE(rabbitSubid4Substate2);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7a81, 0x7a84); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfd1);
-  CYC(0x7a84, 0x7a86); alu_cp(gb, 0x02);
+  CYC(b_+0, b_+3); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfd1);
+  CYC(b_+3, b_+5); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
-    CYCT(0x7a86, 0x7a89);
+    CYCT(b_+5, b_+8);
     interactionRunScript_hook(gb);
     return;
   }
-  CYC(0x7a86, 0x7a89);
-  CALL_C(0x7a89, interactionIncSubstate_hook, 0x23e5, 0x7a8c);
-  CYC(0x7a8c, 0x7a8e); L = 0x49;
-  CYC(0x7a8e, 0x7a90); mem_wr(gb, HL, 0x18);
-  CYC(0x7a90, 0x7a92); L = 0x50;
-  CYC(0x7a92, 0x7a94); mem_wr(gb, HL, 0x19);
-  CYC(0x7a94, 0x7a97); SET_BC(0xfe80);
-  CALL_C(0x7a97, objectSetSpeedZ_hook, 0x239d, 0x7a9a);
-  CYC(0x7a9a, 0x7a9c); A = 0x09;
-  CYC(0x7a9c, 0x7a9f);
+  CYC(b_+5, b_+8);
+  CALL_C(b_+8, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+11);
+  CYC(b_+11, b_+13); L = 0x49;
+  CYC(b_+13, b_+15); mem_wr(gb, HL, 0x18);
+  CYC(b_+15, b_+17); L = 0x50;
+  CYC(b_+17, b_+19); mem_wr(gb, HL, 0x19);
+  CYC(b_+19, b_+22); SET_BC(0xfe80);
+  CALL_C(b_+22, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+25);
+  CYC(b_+25, b_+27); A = 0x09;
+  CYC(b_+27, SYM(rabbitSubid5));
   interactionSetAnimation_hook(gb);
 }
 
 static void rabbit_subid5_substate3(GB *gb, uint16_t sp0_) {
-  CALL_C(0x7af3, objectApplySpeed_hook, 0x201d, 0x7af6);
-  CYC(0x7af6, 0x7af8); C = 0x20;
-  CALL_C(0x7af8, objectUpdateSpeedZAndBounce_hook, 0x2370, 0x7afb);
+  BASE(rabbitSubid5);
+  CALL_C(b_+84, objectApplySpeed_hook, SYM(objectApplySpeed), b_+87);
+  CYC(b_+87, b_+89); C = 0x20;
+  CALL_C(b_+89, objectUpdateSpeedZAndBounce_hook, SYM(objectUpdateSpeedZAndBounce), b_+92);
   if (!(F & FC)) {
-    CYCT(0x7afb, 0x7afc); ret_effect(gb);
+    CYCT(b_+92, b_+93); ret_effect(gb);
     return;
   }
-  CYC(0x7afb, 0x7afc);
-  CALL_C(0x7afc, interactionIncSubstate_hook, 0x23e5, 0x7aff);
-  CYC(0x7aff, 0x7b01); L = 0x46;
-  CYC(0x7b01, 0x7b03); mem_wr(gb, HL, 0x3c);
-  CYC(0x7b03, 0x7b04); ret_effect(gb);
+  CYC(b_+92, b_+93);
+  CALL_C(b_+93, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+96);
+  CYC(b_+96, b_+98); L = 0x46;
+  CYC(b_+98, b_+100); mem_wr(gb, HL, 0x3c);
+  CYC(b_+100, b_+101); ret_effect(gb);
 }
 
 static void rabbit_subid4_substate0(GB *gb, uint16_t sp0_) {
-  CYC(0x7a4f, 0x7a52); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfd1);
-  CYC(0x7a52, 0x7a54); alu_cp(gb, 0x01);
+  BASE(rabbitSubid4);
+  CYC(b_+14, b_+17); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfd1);
+  CYC(b_+17, b_+19); alu_cp(gb, 0x01);
   if (F & FZ) {
-    CYC(0x7a54, 0x7a56);
-    CYC(0x7a56, 0x7a57); H = D;
-    CYC(0x7a57, 0x7a59); L = 0x45;
-    CYC(0x7a59, 0x7a5b); mem_wr(gb, HL, 0x02);
-    CYC(0x7a5b, 0x7a5e); SET_HL(0x635c);
-    CYC(0x7a5e, 0x7a61);
+    CYC(b_+19, b_+21);
+    CYC(b_+21, b_+22); H = D;
+    CYC(b_+22, b_+24); L = 0x45;
+    CYC(b_+24, b_+26); mem_wr(gb, HL, 0x02);
+    CYC(b_+26, b_+29); SET_HL((SYM(partData) + 655));
+    CYC(b_+29, b_+32);
     interactionSetScript_hook(gb);
     return;
   }
-  CYCT(0x7a54, 0x7a56);
-  CALL_C(0x7a61, interactionAnimate_hook, 0x261b, 0x7a64);
-  CYC(0x7a64, 0x7a66); E = 0x61;
-  CYC(0x7a66, 0x7a67); A = mem_rd(gb, DE);
-  CYC(0x7a67, 0x7a68); alu_or(gb, A);
+  CYCT(b_+19, b_+21);
+  CALL_C(b_+32, interactionAnimate_hook, SYM(interactionAnimate), b_+35);
+  CYC(b_+35, b_+37); E = 0x61;
+  CYC(b_+37, b_+38); A = mem_rd(gb, DE);
+  CYC(b_+38, b_+39); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x7a68, 0x7a69); ret_effect(gb);
+    CYCT(b_+39, b_+40); ret_effect(gb);
     return;
   }
-  CYC(0x7a68, 0x7a69);
-  CYC(0x7a69, 0x7a6c);
+  CYC(b_+39, b_+40);
+  CYC(b_+40, b_+43);
   interactionIncSubstate_hook(gb);
 }
 
 static void rabbit_subid4_substate1(GB *gb, uint16_t sp0_) {
-  CYC(0x7a6c, 0x7a6e); C = 0x20;
-  CALL_C(0x7a6e, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x7a71);
+  BASE(rabbitSubid4);
+  CYC(b_+43, b_+45); C = 0x20;
+  CALL_C(b_+45, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+48);
   if (!(F & FZ)) {
-    CYCT(0x7a71, 0x7a72); ret_effect(gb);
+    CYCT(b_+48, b_+49); ret_effect(gb);
     return;
   }
-  CYC(0x7a71, 0x7a72);
-  CYC(0x7a72, 0x7a73); H = D;
-  CYC(0x7a73, 0x7a75); L = 0x45;
-  CYC(0x7a75, 0x7a76); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+48, b_+49);
+  CYC(b_+49, b_+50); H = D;
+  CYC(b_+50, b_+52); L = 0x45;
+  CYC(b_+52, SYM(rabbitJump)); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   rabbitJump_hook(gb);
 }
 
 static void rabbit_subid5_ret(GB *gb) {
-  CYC(0x7b03, 0x7b04); ret_effect(gb);
+  BASE(rabbitSubid5);
+  CYC(b_+100, b_+101); ret_effect(gb);
 }
 
 void rabbitSubid4_hook(GB *gb) {
+  BASE(rabbitSubid4);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7a41, 0x7a43); E = 0x45;
-  CYC(0x7a43, 0x7a44); A = mem_rd(gb, DE);
-  CYC(0x7a44, 0x7a45); push_effect(gb, 0x7a45);
-  switch (rabbit_jump_table(gb)) {
-    case 0x7a4f: rabbit_subid4_substate0(gb, sp0_); return;
-    case 0x7a6c: rabbit_subid4_substate1(gb, sp0_); return;
-    case 0x7a81: rabbitSubid4Substate2_hook(gb); return;
-    case 0x7af3: rabbit_subid5_substate3(gb, sp0_); return;
-    case 0x7b03: rabbit_subid5_ret(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x45;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (rabbit_jump_table(gb));
+    if (jt_ == b_+14) { rabbit_subid4_substate0(gb, sp0_); return; }
+    else if (jt_ == b_+43) { rabbit_subid4_substate1(gb, sp0_); return; }
+    else if (jt_ == SYM(rabbitSubid4Substate2)) { rabbitSubid4Substate2_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid5__substate3)) { rabbit_subid5_substate3(gb, sp0_); return; }
+    else if (jt_ == SYM(rabbitSubid5__ret)) { rabbit_subid5_ret(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void rabbitSubid7_hook(GB *gb) {
+  BASE(rabbitSubid7);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7b0e, interactionRunScript_hook, 0x2552, 0x7b11);
+  CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
   if (F & FC) {
-    CYCT(0x7b11, 0x7b14);
+    CYCT(b_+3, b_+6);
     interactionDelete_hook(gb);
     return;
   }
-  CYC(0x7b11, 0x7b14);
-  CYC(0x7b14, 0x7b17);
+  CYC(b_+3, b_+6);
+  CYC(b_+6, SYM(rabbitSubid2SetRandomSpawnDelay));
   npcFaceLinkAndAnimate_hook(gb);
 }
 
 void rabbitSubid2SetRandomSpawnDelay_hook(GB *gb) {
+  BASE(rabbitSubid2SetRandomSpawnDelay);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7b17, getRandomNumber_noPreserveVars_hook, 0x0453, 0x7b1a);
-  CYC(0x7b1a, 0x7b1c); alu_and(gb, 0x03);
-  CYC(0x7b1c, 0x7b1f); SET_BC(0x7b5c);
-  CALL_C(0x7b1f, addAToBc_hook, 0x006d, 0x7b22);
-  CYC(0x7b22, 0x7b23); A = mem_rd(gb, BC);
-  CYC(0x7b23, 0x7b25); E = 0x78;
-  CYC(0x7b25, 0x7b26); mem_wr(gb, DE, A);
-  CYC(0x7b26, 0x7b27); ret_effect(gb);
+  CALL_C(b_+0, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+3);
+  CYC(b_+3, b_+5); alu_and(gb, 0x03);
+  CYC(b_+5, b_+8); SET_BC(SYM(rabbitSubid2SpawnDelays));
+  CALL_C(b_+8, addAToBc_hook, 0x006d, b_+11);
+  CYC(b_+11, b_+12); A = mem_rd(gb, BC);
+  CYC(b_+12, b_+14); E = 0x78;
+  CYC(b_+14, b_+15); mem_wr(gb, DE, A);
+  CYC(b_+15, SYM(spawnNextRabbitThatTurnsToStone)); ret_effect(gb);
 }
 
 void spawnNextRabbitThatTurnsToStone_hook(GB *gb) {
+  BASE(spawnNextRabbitThatTurnsToStone);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x7b27, 0x7b28); L = alu_inc8(gb, L);
-  CYC(0x7b28, 0x7b29); A = mem_rd(gb, HL);
-  CYC(0x7b29, 0x7b2a); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x7b2a, 0x7b2b); B = A;
-  CYC(0x7b2b, 0x7b2c); alu_add(gb, A);
-  CYC(0x7b2c, 0x7b2d); alu_add(gb, B);
-  CYC(0x7b2d, 0x7b30); SET_HL(0x7b40);
-  CYC(0x7b30, 0x7b31); rabbit_add_a_to_hl_from_rst(gb, 0x7b31);
-  CYC(0x7b31, 0x7b32); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x7b32, 0x7b34); E = 0x46;
-  CYC(0x7b34, 0x7b35); mem_wr(gb, DE, A);
-  CYC(0x7b35, 0x7b36); B = mem_rd(gb, HL);
-  CYC(0x7b36, 0x7b37); SET_HL(HL + 1);
-  CYC(0x7b37, 0x7b38); C = mem_rd(gb, HL);
-  CALL_ROM(0x7b38, 0x7b49);
-  CYC(0x7b3b, 0x7b3d); L = 0x46;
-  CYC(0x7b3d, 0x7b3f); mem_wr(gb, HL, 0x5f);
-  CYC(0x7b3f, 0x7b40); ret_effect(gb);
+  CYC(b_+0, b_+1); L = alu_inc8(gb, L);
+  CYC(b_+1, b_+2); A = mem_rd(gb, HL);
+  CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+3, b_+4); B = A;
+  CYC(b_+4, b_+5); alu_add(gb, A);
+  CYC(b_+5, b_+6); alu_add(gb, B);
+  CYC(b_+6, b_+9); SET_HL(b_+25);
+  CYC(b_+9, b_+10); rabbit_add_a_to_hl_from_rst(gb, b_+10);
+  CYC(b_+10, b_+11); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+11, b_+13); E = 0x46;
+  CYC(b_+13, b_+14); mem_wr(gb, DE, A);
+  CYC(b_+14, b_+15); B = mem_rd(gb, HL);
+  CYC(b_+15, b_+16); SET_HL(HL + 1);
+  CYC(b_+16, b_+17); C = mem_rd(gb, HL);
+  CALL_ROM(b_+17, SYM(spawnRabbitWithSubid1));
+  CYC(b_+20, b_+22); L = 0x46;
+  CYC(b_+22, b_+24); mem_wr(gb, HL, 0x5f);
+  CYC(b_+24, b_+25); ret_effect(gb);
 }
 
 void rabbitSubid2_hook(GB *gb) {
+  BASE(rabbitSubid2);
   uint16_t sp0_ = gb->sp;
-  CYC(0x79dd, 0x79de); H = D;
-  CYC(0x79de, 0x79e0); L = 0x46;
-  CYC(0x79e0, 0x79e1); A = mem_rd(gb, HL);
-  CYC(0x79e1, 0x79e2); alu_or(gb, A);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = 0x46;
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
+  CYC(b_+4, b_+5); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x79e2, 0x79e4);
+    CYCT(b_+5, b_+7);
   } else {
-    CYC(0x79e2, 0x79e4);
-    CYC(0x79e4, 0x79e5); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+    CYC(b_+5, b_+7);
+    CYC(b_+7, b_+8); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
     if (F & FZ) {
-      CALL_C_CC(0x79e5, spawnNextRabbitThatTurnsToStone_hook, 0x7b27, 0x79e8);
+      CALL_C_CC(b_+8, spawnNextRabbitThatTurnsToStone_hook, SYM(spawnNextRabbitThatTurnsToStone), b_+11);
     } else {
-      CYC(0x79e5, 0x79e8);
+      CYC(b_+8, b_+11);
     }
   }
-  CYC(0x79e8, 0x79e9); H = D;
-  CYC(0x79e9, 0x79eb); L = 0x78;
-  CYC(0x79eb, 0x79ec); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+11, b_+12); H = D;
+  CYC(b_+12, b_+14); L = 0x78;
+  CYC(b_+14, b_+15); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) {
-    CYCT(0x79ec, 0x79ed); ret_effect(gb);
+    CYCT(b_+15, b_+16); ret_effect(gb);
     return;
   }
-  CYC(0x79ec, 0x79ed);
-  CALL_C(0x79ed, getRandomNumber_noPreserveVars_hook, 0x0453, 0x79f0);
-  CYC(0x79f0, 0x79f2); alu_and(gb, 0x07);
-  CYC(0x79f2, 0x79f5); SET_HL(0x7b54);
-  CYC(0x79f5, 0x79f6); rabbit_add_a_to_hl_from_rst(gb, 0x79f6);
-  CYC(0x79f6, 0x79f7); B = mem_rd(gb, HL);
-  CALL_C(0x79f7, getRandomNumber_hook, 0x043e, 0x79fa);
-  CYC(0x79fa, 0x79fc); alu_and(gb, 0x0f);
-  CYC(0x79fc, 0x79fd); alu_cpl(gb);
-  CYC(0x79fd, 0x79fe); A = alu_inc8(gb, A);
-  CYC(0x79fe, 0x7a00); alu_add(gb, 0xb0);
-  CYC(0x7a00, 0x7a01); C = A;
-  CALL_ROM(0x7a01, 0x7b49);
-  CYC(0x7a04, 0x7a07);
+  CYC(b_+15, b_+16);
+  CALL_C(b_+16, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+19);
+  CYC(b_+19, b_+21); alu_and(gb, 0x07);
+  CYC(b_+21, b_+24); SET_HL(SYM(rabbitSubid2YPositions));
+  CYC(b_+24, b_+25); rabbit_add_a_to_hl_from_rst(gb, b_+25);
+  CYC(b_+25, b_+26); B = mem_rd(gb, HL);
+  CALL_C(b_+26, getRandomNumber_hook, SYM(getRandomNumber), b_+29);
+  CYC(b_+29, b_+31); alu_and(gb, 0x0f);
+  CYC(b_+31, b_+32); alu_cpl(gb);
+  CYC(b_+32, b_+33); A = alu_inc8(gb, A);
+  CYC(b_+33, b_+35); alu_add(gb, 0xb0);
+  CYC(b_+35, b_+36); C = A;
+  CALL_ROM(b_+36, SYM(spawnRabbitWithSubid1));
+  CYC(b_+39, SYM(rabbitSubid3));
   rabbitSubid2SetRandomSpawnDelay_hook(gb);
 }
 
 static void rabbit_subid5_substate0(GB *gb, uint16_t sp0_) {
-  CYC(0x7ae2, 0x7ae3); H = D;
-  CYC(0x7ae3, 0x7ae5); L = 0x46;
-  CALL_C(0x7ae5, decHlRef16WithCap_hook, 0x0237, 0x7ae8);
+  BASE(rabbitSubid5);
+  CYC(b_+67, b_+68); H = D;
+  CYC(b_+68, b_+70); L = 0x46;
+  CALL_C(b_+70, decHlRef16WithCap_hook, SYM(decHlRef16WithCap), b_+73);
   if (!(F & FZ)) {
-    CYCT(0x7ae8, 0x7ae9); ret_effect(gb);
+    CYCT(b_+73, b_+74); ret_effect(gb);
     return;
   }
-  CYC(0x7ae8, 0x7ae9);
-  CYC(0x7ae9, 0x7aeb); mem_wr(gb, HL, 0x5a);
-  CALL_C(0x7aeb, interactionIncSubstate_hook, 0x23e5, 0x7aee);
-  CYC(0x7aee, 0x7af0); A = 0xc1;
-  CYC(0x7af0, 0x7af3);
+  CYC(b_+73, b_+74);
+  CYC(b_+74, b_+76); mem_wr(gb, HL, 0x5a);
+  CALL_C(b_+76, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+79);
+  CYC(b_+79, b_+81); A = 0xc1;
+  CYC(b_+81, b_+84);
   playSound_b00_hook(gb);
 }
 
 static void rabbit_subid5_substate4(GB *gb, uint16_t sp0_) {
-  CALL_C(0x7b04, interactionDecCounter1_hook, 0x23cc, 0x7b07);
+  BASE(rabbitSubid5);
+  CALL_C(b_+101, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+104);
   if (!(F & FZ)) {
-    CYCT(0x7b07, 0x7b08); ret_effect(gb);
+    CYCT(b_+104, b_+105); ret_effect(gb);
     return;
   }
-  CYC(0x7b07, 0x7b08);
-  CYC(0x7b08, 0x7b0a); A = 0xff;
-  CYC(0x7b0a, 0x7b0d); mem_wr(gb, wTmpcfc0_genericCutscene_cfdf, A);
-  CYC(0x7b0d, 0x7b0e); ret_effect(gb);
+  CYC(b_+104, b_+105);
+  CYC(b_+105, b_+107); A = 0xff;
+  CYC(b_+107, b_+110); mem_wr(gb, wTmpcfc0_genericCutscene_cfdf, A);
+  CYC(b_+110, SYM(rabbitSubid7)); ret_effect(gb);
 }
 
 void rabbitSubid5_hook(GB *gb) {
+  BASE(rabbitSubid5);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7a9f, 0x7aa0); H = D;
-  CYC(0x7aa0, 0x7aa2); L = 0x78;
-  CYC(0x7aa2, 0x7aa3); A = mem_rd(gb, HL);
-  CYC(0x7aa3, 0x7aa4); alu_or(gb, A);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = 0x78;
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
+  CYC(b_+4, b_+5); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x7aa4, 0x7aa6);
+    CYCT(b_+5, b_+7);
   } else {
-    CYC(0x7aa4, 0x7aa6);
-    CYC(0x7aa6, 0x7aa7); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+    CYC(b_+5, b_+7);
+    CYC(b_+7, b_+8); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
     if (!(F & FZ)) {
-      CYCT(0x7aa7, 0x7aa9);
+      CYCT(b_+8, b_+10);
     } else {
-      CYC(0x7aa7, 0x7aa9);
-      CYC(0x7aa9, 0x7aab); L = 0x45;
-      CYC(0x7aab, 0x7aad); mem_wr(gb, HL, 0x04);
-      CYC(0x7aad, 0x7aaf); L = 0x49;
-      CYC(0x7aaf, 0x7ab1); mem_wr(gb, HL, 0x08);
-      CYC(0x7ab1, 0x7ab3); L = 0x50;
-      CYC(0x7ab3, 0x7ab5); mem_wr(gb, HL, 0x19);
-      CYC(0x7ab5, 0x7ab8); SET_BC(0xfe20);
-      CALL_C(0x7ab8, objectSetSpeedZ_hook, 0x239d, 0x7abb);
-      CYC(0x7abb, 0x7abe); SET_BC(0x0780);
-      CALL_C(0x7abe, objectCreateInteraction_hook, 0x24c5, 0x7ac1);
+      CYC(b_+8, b_+10);
+      CYC(b_+10, b_+12); L = 0x45;
+      CYC(b_+12, b_+14); mem_wr(gb, HL, 0x04);
+      CYC(b_+14, b_+16); L = 0x49;
+      CYC(b_+16, b_+18); mem_wr(gb, HL, 0x08);
+      CYC(b_+18, b_+20); L = 0x50;
+      CYC(b_+20, b_+22); mem_wr(gb, HL, 0x19);
+      CYC(b_+22, b_+25); SET_BC(0xfe20);
+      CALL_C(b_+25, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+28);
+      CYC(b_+28, b_+31); SET_BC((SYM(_adjustHLSequential) + 10));
+      CALL_C(b_+31, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+34);
       if (!(F & FZ)) {
-        CYCT(0x7ac1, 0x7ac3);
+        CYCT(b_+34, b_+36);
       } else {
-        CYC(0x7ac1, 0x7ac3);
-        CYC(0x7ac3, 0x7ac5); A = 0x4e;
-        CALL_C(0x7ac5, playSound_b00_hook, 0x0c98, 0x7ac8);
-        CYC(0x7ac8, 0x7aca); A = 0x02;
-        CYC(0x7aca, 0x7acd); mem_wr(gb, wTmpcfc0_genericCutscene_cfd1, A);
+        CYC(b_+34, b_+36);
+        CYC(b_+36, b_+38); A = 0x4e;
+        CALL_C(b_+38, playSound_b00_hook, SYM(playSound_b00), b_+41);
+        CYC(b_+41, b_+43); A = 0x02;
+        CYC(b_+43, b_+46); mem_wr(gb, wTmpcfc0_genericCutscene_cfd1, A);
       }
-      CYC(0x7acd, 0x7acf); A = 0x08;
-      CALL_C(0x7acf, interactionSetAnimation_hook, 0x262e, 0x7ad2);
+      CYC(b_+46, b_+48); A = 0x08;
+      CALL_C(b_+48, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+51);
     }
   }
-  CYC(0x7ad2, 0x7ad4); E = 0x45;
-  CYC(0x7ad4, 0x7ad5); A = mem_rd(gb, DE);
-  CYC(0x7ad5, 0x7ad6); push_effect(gb, 0x7ad6);
-  switch (rabbit_jump_table(gb)) {
-    case 0x7ae2: rabbit_subid5_substate0(gb, sp0_); return;
-    case 0x7a26: rabbit_subid3_substate1(gb, sp0_); return;
-    case 0x7968: rabbit_subid1_substate0(gb, sp0_); return;
-    case 0x7978: rabbit_subid1_substate1(gb, sp0_); return;
-    case 0x7af3: rabbit_subid5_substate3(gb, sp0_); return;
-    case 0x7b04: rabbit_subid5_substate4(gb, sp0_); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+51, b_+53); E = 0x45;
+  CYC(b_+53, b_+54); A = mem_rd(gb, DE);
+  CYC(b_+54, b_+55); push_effect(gb, b_+55);
+  do { uint16_t jt_ = (rabbit_jump_table(gb));
+    if (jt_ == b_+67) { rabbit_subid5_substate0(gb, sp0_); return; }
+    else if (jt_ == SYM(rabbitSubid3__substate1)) { rabbit_subid3_substate1(gb, sp0_); return; }
+    else if (jt_ == SYM(rabbitSubid1__substate0)) { rabbit_subid1_substate0(gb, sp0_); return; }
+    else if (jt_ == SYM(rabbitSubid1__substate1)) { rabbit_subid1_substate1(gb, sp0_); return; }
+    else if (jt_ == b_+84) { rabbit_subid5_substate3(gb, sp0_); return; }
+    else if (jt_ == b_+101) { rabbit_subid5_substate4(gb, sp0_); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 static void rabbit_dispatch_state1(GB *gb, uint16_t sp0_) {
-  CYC(0x78cf, 0x78d1); E = 0x42;
-  CYC(0x78d1, 0x78d2); A = mem_rd(gb, DE);
-  CYC(0x78d2, 0x78d3); push_effect(gb, 0x78d3);
-  switch (rabbit_jump_table(gb)) {
-    case 0x78e3: rabbitSubid0_hook(gb); return;
-    case 0x793e: rabbitSubid1_hook(gb); return;
-    case 0x79dd: rabbitSubid2_hook(gb); return;
-    case 0x7a07: rabbitSubid3_hook(gb); return;
-    case 0x7a41: rabbitSubid4_hook(gb); return;
-    case 0x7a9f: rabbitSubid5_hook(gb); return;
-    case 0x26de: interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return;
-    case 0x7b0e: rabbitSubid7_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  BASE(interactionCode4b_body);
+  CYC(b_+184, b_+186); E = 0x42;
+  CYC(b_+186, b_+187); A = mem_rd(gb, DE);
+  CYC(b_+187, b_+188); push_effect(gb, b_+188);
+  do { uint16_t jt_ = (rabbit_jump_table(gb));
+    if (jt_ == SYM(rabbitSubid0)) { rabbitSubid0_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid1)) { rabbitSubid1_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid2)) { rabbitSubid2_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid3)) { rabbitSubid3_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid4)) { rabbitSubid4_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid5)) { rabbitSubid5_hook(gb); return; }
+    else if (jt_ == SYM(interactionPushLinkAwayAndUpdateDrawPriority)) { interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid7)) { rabbitSubid7_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 static void rabbit_init_subid(GB *gb, uint16_t sp0_) {
-  CYC(0x7833, 0x7835); E = 0x42;
-  CYC(0x7835, 0x7836); A = mem_rd(gb, DE);
-  CYC(0x7836, 0x7837); push_effect(gb, 0x7837);
-  switch (rabbit_jump_table(gb)) {
-    case 0x7847:
-      CYC(0x7847, 0x784a); SET_HL(0x634b);
-      CYC(0x784a, 0x784d); interactionSetScript_hook(gb);
+  BASE(interactionCode4b_body);
+  CYC(b_+28, b_+30); E = 0x42;
+  CYC(b_+30, b_+31); A = mem_rd(gb, DE);
+  CYC(b_+31, b_+32); push_effect(gb, b_+32);
+  do { uint16_t jt_ = (rabbit_jump_table(gb));
+    if (jt_ == b_+48) {
+      CYC(b_+48, b_+51); SET_HL((SYM(partData) + 638));
+      CYC(b_+51, b_+54); interactionSetScript_hook(gb);
       return;
-    case 0x784d:
+    }
+    else if (jt_ == b_+54) {
       rabbit_init_subid1(gb, sp0_);
       return;
-    case 0x7861:
-      CYC(0x7861, 0x7863); E = 0x46;
-      CYC(0x7863, 0x7865); A = 0xb4;
-      CYC(0x7865, 0x7866); mem_wr(gb, DE, A);
-      CYC(0x7866, 0x7869); SET_HL(0x7de5);
-      CYC(0x7869, 0x786b); E = 0x08;
-      CALL_C(0x786b, interBankCall_hook, 0x008a, 0x786e);
-      CYC(0x786e, 0x7871); rabbitSubid2SetRandomSpawnDelay_hook(gb);
+    }
+    else if (jt_ == b_+74) {
+      CYC(b_+74, b_+76); E = 0x46;
+      CYC(b_+76, b_+78); A = 0xb4;
+      CYC(b_+78, b_+79); mem_wr(gb, DE, A);
+      CYC(b_+79, b_+82); SET_HL((SYM(func_7cf8) + 237));
+      CYC(b_+82, b_+84); E = 0x08;
+      CALL_C(b_+84, interBankCall_hook, 0x008a, b_+87);
+      CYC(b_+87, b_+90); rabbitSubid2SetRandomSpawnDelay_hook(gb);
       return;
-    case 0x7871:
-      CYC(0x7871, 0x7874); SET_HL(wGroup4RoomFlags + 0xfc);
-      CYC(0x7874, 0x7876); alu_bit(gb, 7, mem_rd(gb, HL));
+    }
+    else if (jt_ == b_+90) {
+      CYC(b_+90, b_+93); SET_HL(wGroup4RoomFlags + 0xfc);
+      CYC(b_+93, b_+95); alu_bit(gb, 7, mem_rd(gb, HL));
       if (!(F & FZ)) {
-        CYCT(0x7876, 0x7879); interactionDelete_hook(gb);
+        CYCT(b_+95, b_+98); interactionDelete_hook(gb);
         return;
       }
-      CYC(0x7876, 0x7879);
-      CYC(0x7879, 0x787c); A = mem_rd(gb, wEssencesObtained);
-      CYC(0x787c, 0x787e); alu_bit(gb, 6, A);
+      CYC(b_+95, b_+98);
+      CYC(b_+98, b_+101); A = mem_rd(gb, wEssencesObtained);
+      CYC(b_+101, b_+103); alu_bit(gb, 6, A);
       if (F & FZ) {
-        CYCT(0x787e, 0x7881); interactionDelete_hook(gb);
+        CYCT(b_+103, b_+106); interactionDelete_hook(gb);
         return;
       }
-      CYC(0x787e, 0x7881);
-      CYC(0x7881, 0x7884); SET_HL(0x7de5);
-      CYC(0x7884, 0x7886); E = 0x08;
-      CALL_C(0x7886, interBankCall_hook, 0x008a, 0x7889);
-      CYC(0x7889, 0x788b); A = 0x06;
-      CALL_C(0x788b, objectSetCollideRadius_hook, 0x24a1, 0x788e);
-      CYC(0x788e, 0x7890); A = 0x78;
-      CYC(0x7890, 0x7892); E = 0x46;
-      CYC(0x7892, 0x7893); mem_wr(gb, DE, A);
-      CYC(0x7893, 0x7895); A = 0x06;
-      CYC(0x7895, 0x7897); E = 0x5c;
-      CYC(0x7897, 0x7898); mem_wr(gb, DE, A);
-      CYC(0x7898, 0x789b); interactionSetAnimation_hook(gb);
+      CYC(b_+103, b_+106);
+      CYC(b_+106, b_+109); SET_HL((SYM(func_7cf8) + 237));
+      CYC(b_+109, b_+111); E = 0x08;
+      CALL_C(b_+111, interBankCall_hook, 0x008a, b_+114);
+      CYC(b_+114, b_+116); A = 0x06;
+      CALL_C(b_+116, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+119);
+      CYC(b_+119, b_+121); A = 0x78;
+      CYC(b_+121, b_+123); E = 0x46;
+      CYC(b_+123, b_+124); mem_wr(gb, DE, A);
+      CYC(b_+124, b_+126); A = 0x06;
+      CYC(b_+126, b_+128); E = 0x5c;
+      CYC(b_+128, b_+129); mem_wr(gb, DE, A);
+      CYC(b_+129, b_+132); interactionSetAnimation_hook(gb);
       return;
-    case 0x788e:
-      CYC(0x788e, 0x7890); A = 0x78;
-      CYC(0x7890, 0x7892); E = 0x46;
-      CYC(0x7892, 0x7893); mem_wr(gb, DE, A);
-      CYC(0x7893, 0x7895); A = 0x06;
-      CYC(0x7895, 0x7897); E = 0x5c;
-      CYC(0x7897, 0x7898); mem_wr(gb, DE, A);
-      CYC(0x7898, 0x789b); interactionSetAnimation_hook(gb);
+    }
+    else if (jt_ == b_+119) {
+      CYC(b_+119, b_+121); A = 0x78;
+      CYC(b_+121, b_+123); E = 0x46;
+      CYC(b_+123, b_+124); mem_wr(gb, DE, A);
+      CYC(b_+124, b_+126); A = 0x06;
+      CYC(b_+126, b_+128); E = 0x5c;
+      CYC(b_+128, b_+129); mem_wr(gb, DE, A);
+      CYC(b_+129, b_+132); interactionSetAnimation_hook(gb);
       return;
-    case 0x789b:
-      CALL_C(0x789b, interactionLoadExtraGraphics_hook, 0x2781, 0x789e);
-      CYC(0x789e, 0x789f); H = D;
-      CYC(0x789f, 0x78a1); L = 0x46;
-      CYC(0x78a1, 0x78a3); mem_wr(gb, HL, 0x0e);
-      CYC(0x78a3, 0x78a4); L = alu_inc8(gb, L);
-      CYC(0x78a4, 0x78a6); mem_wr(gb, HL, 0x01);
-      CYC(0x78a6, 0x78a8);
-      CYC(0x7893, 0x7895); A = 0x06;
-      CYC(0x7895, 0x7897); E = 0x5c;
-      CYC(0x7897, 0x7898); mem_wr(gb, DE, A);
-      CYC(0x7898, 0x789b); interactionSetAnimation_hook(gb);
+    }
+    else if (jt_ == b_+132) {
+      CALL_C(b_+132, interactionLoadExtraGraphics_hook, SYM(interactionLoadExtraGraphics), b_+135);
+      CYC(b_+135, b_+136); H = D;
+      CYC(b_+136, b_+138); L = 0x46;
+      CYC(b_+138, b_+140); mem_wr(gb, HL, 0x0e);
+      CYC(b_+140, b_+141); L = alu_inc8(gb, L);
+      CYC(b_+141, b_+143); mem_wr(gb, HL, 0x01);
+      CYC(b_+143, b_+145);
+      CYC(b_+124, b_+126); A = 0x06;
+      CYC(b_+126, b_+128); E = 0x5c;
+      CYC(b_+128, b_+129); mem_wr(gb, DE, A);
+      CYC(b_+129, b_+132); interactionSetAnimation_hook(gb);
       return;
-    case 0x78a8:
-      CALL_C(0x78a8, interactionLoadExtraGraphics_hook, 0x2781, 0x78ab);
-      CYC(0x78ab, 0x78ae); rabbitJump_hook(gb);
+    }
+    else if (jt_ == b_+145) {
+      CALL_C(b_+145, interactionLoadExtraGraphics_hook, SYM(interactionLoadExtraGraphics), b_+148);
+      CYC(b_+148, b_+151); rabbitJump_hook(gb);
       return;
-    case 0x78ae:
-      CYC(0x78ae, 0x78b0); A = 0x14;
-      CALL_C(0x78b0, checkGlobalFlag_hook, 0x31f3, 0x78b3);
+    }
+    else if (jt_ == b_+151) {
+      CYC(b_+151, b_+153); A = 0x14;
+      CALL_C(b_+153, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+156);
       if (!(F & FZ)) {
-        CYCT(0x78b3, 0x78b6); interactionDelete_hook(gb);
+        CYCT(b_+156, b_+159); interactionDelete_hook(gb);
         return;
       }
-      CYC(0x78b3, 0x78b6);
-      CYC(0x78b6, 0x78b8); A = 0x12;
-      CALL_C(0x78b8, checkGlobalFlag_hook, 0x31f3, 0x78bb);
+      CYC(b_+156, b_+159);
+      CYC(b_+159, b_+161); A = 0x12;
+      CALL_C(b_+161, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+164);
       if (F & FZ) {
-        CYCT(0x78bb, 0x78be); interactionDelete_hook(gb);
+        CYCT(b_+164, b_+167); interactionDelete_hook(gb);
         return;
       }
-      CYC(0x78bb, 0x78be);
-      CYC(0x78be, 0x78c0); A = 0x11;
-      CALL_C(0x78c0, checkGlobalFlag_hook, 0x31f3, 0x78c3);
-      CYC(0x78c3, 0x78c6); SET_HL(0x6363);
+      CYC(b_+164, b_+167);
+      CYC(b_+167, b_+169); A = 0x11;
+      CALL_C(b_+169, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+172);
+      CYC(b_+172, b_+175); SET_HL((SYM(partData) + 662));
       if (F & FZ) {
-        CYCT(0x78c6, 0x78c9);
+        CYCT(b_+175, b_+178);
       } else {
-        CYC(0x78c6, 0x78c9);
-        CYC(0x78c9, 0x78cc); SET_HL(0x6366);
+        CYC(b_+175, b_+178);
+        CYC(b_+178, b_+181); SET_HL((SYM(partData) + 665));
       }
-      CALL_C(0x78cc, interactionSetScript_hook, 0x2544, 0x78cf);
+      CALL_C(b_+181, interactionSetScript_hook, SYM(interactionSetScript), b_+184);
       rabbit_dispatch_state1(gb, sp0_);
       return;
-    default:
+    }
+    else {
       hook_continue(gb, HL, sp0_);
       return;
-  }
+    }
+  } while (0);
 }
 
 static void rabbit_state0_before_init_subid(GB *gb, uint16_t sp0_) {
-  CALL_C(0x7825, objectSetVisiblec2_hook, 0x1e45, 0x7828);
-  CYC(0x7828, 0x782b); push_effect(gb, 0x782b);
+  BASE(interactionCode4b_body);
+  CALL_C(b_+14, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+17);
+  CYC(b_+17, b_+20); push_effect(gb, b_+20);
   rabbit_init_subid(gb, sp0_);
 }
 
 static void rabbit_state0_after_init_subid(GB *gb) {
-  CYC(0x782b, 0x782d); E = 0x40;
-  CYC(0x782d, 0x782e); A = mem_rd(gb, DE);
-  CYC(0x782e, 0x782f); alu_or(gb, A);
+  BASE(interactionCode4b_body);
+  CYC(b_+20, b_+22); E = 0x40;
+  CYC(b_+22, b_+23); A = mem_rd(gb, DE);
+  CYC(b_+23, b_+24); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x782f, 0x7832); objectMarkSolidPosition_hook(gb);
+    CYCT(b_+24, b_+27); objectMarkSolidPosition_hook(gb);
     return;
   }
-  CYC(0x782f, 0x7832);
-  CYC(0x7832, 0x7833); ret_effect(gb);
+  CYC(b_+24, b_+27);
+  CYC(b_+27, b_+28); ret_effect(gb);
 }
 
 void interactionCode4b_body__afterCall7825_hook(GB *gb) {
+  BASE(interactionCode4b_body);
   uint16_t sp0_ = gb->sp;
   rabbit_state0_before_init_subid(gb, sp0_);
-  if (!(gb->pc == 0x782b && gb->sp == sp0_)) return;
+  if (!(gb->pc == b_+20 && gb->sp == sp0_)) return;
   rabbit_state0_after_init_subid(gb);
 }
 
 void interactionCode4b_body_hook(GB *gb) {
+  BASE(interactionCode4b_body);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7817, 0x7819); E = 0x44;
-  CYC(0x7819, 0x781a); A = mem_rd(gb, DE);
-  CYC(0x781a, 0x781b); push_effect(gb, 0x781b);
-  switch (rabbit_jump_table(gb)) {
-    case 0x781f: {
-      CYC(0x781f, 0x7821); A = 0x01;
-      CYC(0x7821, 0x7822); mem_wr(gb, DE, A);
-      CALL_C(0x7822, interactionInitGraphics_hook, 0x15fb, 0x7825);
+  CYC(b_+0, b_+2); E = 0x44;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (rabbit_jump_table(gb));
+    if (jt_ == b_+8) {
+{
+      CYC(b_+8, b_+10); A = 0x01;
+      CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+      CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
       rabbit_state0_before_init_subid(gb, sp0_);
-      if (!(gb->pc == 0x782b && gb->sp == sp0_)) return;
+      if (!(gb->pc == b_+20 && gb->sp == sp0_)) return;
       rabbit_state0_after_init_subid(gb);
       return;
     }
-    case 0x78cf:
+    }
+    else if (jt_ == b_+184) {
       rabbit_dispatch_state1(gb, sp0_);
       return;
-    default:
+    }
+    else {
       hook_continue(gb, HL, sp0_);
       return;
-  }
+    }
+  } while (0);
 }

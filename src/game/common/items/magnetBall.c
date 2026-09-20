@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x07, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x07, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode29), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode29), (from), (to), true)
 
 static uint16_t magnet_ball_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -24,20 +24,22 @@ static uint16_t magnet_ball_jump_table(GB *gb) {
 }
 
 void itemCode29_hook(GB *gb) {
+  BASE(itemCode29);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5b51, 0x5b53); E = 0x04;
-  CYC(0x5b53, 0x5b54); A = mem_rd(gb, DE);
-  CYC(0x5b54, 0x5b55); push_effect(gb, 0x5b55);
-  switch (magnet_ball_jump_table(gb)) {
-    case 0x5b59:
-      CYC(0x5b59, 0x5b5b); A = 0x1d;
-      CALL_C(0x5b5b, loadWeaponGfx_b00_hook, 0x166d, 0x5b5e);
-      CALL_C(0x5b5e, loadAttributesAndGraphicsAndIncState_hook, 0x498c, 0x5b61);
-      CYC(0x5b61, 0x5b63); E = 0x30;
-      CYC(0x5b63, 0x5b65); A = 0xff;
-      CYC(0x5b65, 0x5b66); mem_wr(gb, DE, A);
-      CYC(0x5b66, 0x5b69); objectSetVisible81_hook(gb); return;
-    case 0x5b69: CYC(0x5b69, 0x5b6a); ret_effect(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x04;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (magnet_ball_jump_table(gb));
+    if (jt_ == b_+8) {
+      CYC(b_+8, b_+10); A = 0x1d;
+      CALL_C(b_+10, loadWeaponGfx_b00_hook, SYM(loadWeaponGfx_b00), b_+13);
+      CALL_C(b_+13, loadAttributesAndGraphicsAndIncState_hook, SYM(loadAttributesAndGraphicsAndIncState), b_+16);
+      CYC(b_+16, b_+18); E = 0x30;
+      CYC(b_+18, b_+20); A = 0xff;
+      CYC(b_+20, b_+21); mem_wr(gb, DE, A);
+      CYC(b_+21, b_+24); objectSetVisible81_hook(gb); return;
+    }
+    else if (jt_ == b_+24) { CYC(b_+24, SYM(itemCode0fPost)); ret_effect(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }

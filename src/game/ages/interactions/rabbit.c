@@ -2,10 +2,11 @@
 #include "game/gen.h"
 
 #undef CYC
-#define CYC(from, to) burn_rom(gb, 0x09, (from), (to), false)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode4b), (from), (to), false)
 
 void interactionCode4b_hook(GB *gb) {
-  CYC(0x5fe8, 0x5feb); SET_HL(0x7817);
-  CYC(0x5feb, 0x5fed); E = 0x3f;
-  CYC(0x5fed, 0x5ff0); interBankCall_hook(gb);
+  BASE(interactionCode4b);
+  CYC(b_+0, b_+3); SET_HL((SYM(goronSubid04__state1) + 5));
+  CYC(b_+3, b_+5); E = 0x3f;
+  CYC(b_+5, SYM(interactionCode4c)); interBankCall_hook(gb);
 }

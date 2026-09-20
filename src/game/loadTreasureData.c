@@ -3,56 +3,57 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x16, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x16, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionLoadTreasureData), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionLoadTreasureData), (from), (to), true)
 
 void interactionLoadTreasureData_hook(GB *gb) {
+  BASE(interactionLoadTreasureData);
   uint16_t sp0_ = gb->sp;
 
-  CYC(0x451e, 0x4520); E = 0x42;
-  CYC(0x4520, 0x4521); A = mem_rd(gb, DE);
-  CYC(0x4521, 0x4523); E = 0x70;
-  CYC(0x4523, 0x4524); mem_wr(gb, DE, A);
-  CYC(0x4524, 0x4527); SET_HL(0x5332);
+  CYC(b_+0, b_+2); E = 0x42;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); E = 0x70;
+  CYC(b_+5, b_+6); mem_wr(gb, DE, A);
+  CYC(b_+6, b_+9); SET_HL(SYM(treasureObjectData));
   for (;;) {
-    CALL_C(0x4527, multiplyABy4_hook, 0x01c3, 0x452a);
-    CYC(0x452a, 0x452b); alu_add_hl(gb, BC);
-    CYC(0x452b, 0x452d); alu_bit(gb, 7, mem_rd(gb, HL));
+    CALL_C(b_+9, multiplyABy4_hook, SYM(multiplyABy4), b_+12);
+    CYC(b_+12, b_+13); alu_add_hl(gb, BC);
+    CYC(b_+13, b_+15); alu_bit(gb, 7, mem_rd(gb, HL));
     if (F & FZ) {
-      CYCT(0x452d, 0x452f);
+      CYCT(b_+15, b_+17);
       break;
     }
-    CYC(0x452d, 0x452f);
-    CYC(0x452f, 0x4530); SET_HL(HL + 1);
-    CYC(0x4530, 0x4531); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(0x4531, 0x4532); H = mem_rd(gb, HL);
-    CYC(0x4532, 0x4533); L = A;
-    CYC(0x4533, 0x4535); E = 0x43;
-    CYC(0x4535, 0x4536); A = mem_rd(gb, DE);
-    CYC(0x4536, 0x4538);
+    CYC(b_+15, b_+17);
+    CYC(b_+17, b_+18); SET_HL(HL + 1);
+    CYC(b_+18, b_+19); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+19, b_+20); H = mem_rd(gb, HL);
+    CYC(b_+20, b_+21); L = A;
+    CYC(b_+21, b_+23); E = 0x43;
+    CYC(b_+23, b_+24); A = mem_rd(gb, DE);
+    CYC(b_+24, b_+26);
   }
-  CYC(0x4538, 0x4539); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4539, 0x453a); B = A;
-  CYC(0x453a, 0x453c); A = alu_swap(gb, A);
-  CYC(0x453c, 0x453e); alu_and(gb, 0x07);
-  CYC(0x453e, 0x4540); E = 0x71;
-  CYC(0x4540, 0x4541); mem_wr(gb, DE, A);
-  CYC(0x4541, 0x4542); A = B;
-  CYC(0x4542, 0x4544); alu_and(gb, 0x07);
-  CYC(0x4544, 0x4545); E = alu_inc8(gb, E);
-  CYC(0x4545, 0x4546); mem_wr(gb, DE, A);
-  CYC(0x4546, 0x4547); A = B;
-  CYC(0x4547, 0x4549); alu_and(gb, 0x08);
-  CYC(0x4549, 0x454a); E = alu_inc8(gb, E);
-  CYC(0x454a, 0x454b); mem_wr(gb, DE, A);
-  CYC(0x454b, 0x454c); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x454c, 0x454d); E = alu_inc8(gb, E);
-  CYC(0x454d, 0x454e); mem_wr(gb, DE, A);
-  CYC(0x454e, 0x454f); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x454f, 0x4550); E = alu_inc8(gb, E);
-  CYC(0x4550, 0x4551); mem_wr(gb, DE, A);
-  CYC(0x4551, 0x4552); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4552, 0x4554); E = 0x42;
-  CYC(0x4554, 0x4555); mem_wr(gb, DE, A);
-  CYC(0x4555, 0x4556); ret_effect(gb);
+  CYC(b_+26, b_+27); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+27, b_+28); B = A;
+  CYC(b_+28, b_+30); A = alu_swap(gb, A);
+  CYC(b_+30, b_+32); alu_and(gb, 0x07);
+  CYC(b_+32, b_+34); E = 0x71;
+  CYC(b_+34, b_+35); mem_wr(gb, DE, A);
+  CYC(b_+35, b_+36); A = B;
+  CYC(b_+36, b_+38); alu_and(gb, 0x07);
+  CYC(b_+38, b_+39); E = alu_inc8(gb, E);
+  CYC(b_+39, b_+40); mem_wr(gb, DE, A);
+  CYC(b_+40, b_+41); A = B;
+  CYC(b_+41, b_+43); alu_and(gb, 0x08);
+  CYC(b_+43, b_+44); E = alu_inc8(gb, E);
+  CYC(b_+44, b_+45); mem_wr(gb, DE, A);
+  CYC(b_+45, b_+46); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+46, b_+47); E = alu_inc8(gb, E);
+  CYC(b_+47, b_+48); mem_wr(gb, DE, A);
+  CYC(b_+48, b_+49); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+49, b_+50); E = alu_inc8(gb, E);
+  CYC(b_+50, b_+51); mem_wr(gb, DE, A);
+  CYC(b_+51, b_+52); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+52, b_+54); E = 0x42;
+  CYC(b_+54, b_+55); mem_wr(gb, DE, A);
+  CYC(b_+55, SYM(data_4556)); ret_effect(gb);
 }

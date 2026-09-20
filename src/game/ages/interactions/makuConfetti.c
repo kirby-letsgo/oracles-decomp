@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x09, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x09, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(makuConfetti_subid0), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(makuConfetti_subid0), (from), (to), true)
 
 void makuConfetti_subid0_hook(GB *gb);
 void makuConfetti_subid1_hook(GB *gb);
@@ -56,378 +56,387 @@ static void maku_confetti_add_a_to_hl(GB *gb, uint16_t return_address) {
 }
 
 static void maku_confetti_copy_acceleration_component(GB *gb) {
-  CYC(0x717e, 0x717f); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x717f, 0x7180); mem_wr(gb, DE, A);
-  CYC(0x7180, 0x7181); E = alu_inc8(gb, E);
-  CYC(0x7181, 0x7182); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x7182, 0x7183); mem_wr(gb, DE, A);
-  CYC(0x7183, 0x7184); E = alu_inc8(gb, E);
-  CYC(0x7184, 0x7185); ret_effect(gb);
+  BASE(makuConfetti_subid0);
+  CYC(b_+68, b_+69); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+69, b_+70); mem_wr(gb, DE, A);
+  CYC(b_+70, b_+71); E = alu_inc8(gb, E);
+  CYC(b_+71, b_+72); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+72, b_+73); mem_wr(gb, DE, A);
+  CYC(b_+73, b_+74); E = alu_inc8(gb, E);
+  CYC(b_+74, b_+75); ret_effect(gb);
 }
 
 static void maku_confetti_negate_bc(GB *gb) {
-  CYC(0x7260, 0x7261); alu_xor(gb, A);
-  CYC(0x7261, 0x7262); A = C;
-  CYC(0x7262, 0x7263); alu_cpl(gb);
-  CYC(0x7263, 0x7265); alu_add(gb, 1);
-  CYC(0x7265, 0x7266); C = A;
-  CYC(0x7266, 0x7267); A = B;
-  CYC(0x7267, 0x7268); alu_cpl(gb);
-  CYC(0x7268, 0x726a); alu_adc(gb, 0);
-  CYC(0x726a, 0x726b); B = A;
-  CYC(0x726b, 0x726c); ret_effect(gb);
+  BASE(makuConfetti_subid0);
+  CYC(b_+294, b_+295); alu_xor(gb, A);
+  CYC(b_+295, b_+296); A = C;
+  CYC(b_+296, b_+297); alu_cpl(gb);
+  CYC(b_+297, b_+299); alu_add(gb, 1);
+  CYC(b_+299, b_+300); C = A;
+  CYC(b_+300, b_+301); A = B;
+  CYC(b_+301, b_+302); alu_cpl(gb);
+  CYC(b_+302, b_+304); alu_adc(gb, 0);
+  CYC(b_+304, b_+305); B = A;
+  CYC(b_+305, b_+306); ret_effect(gb);
 }
 
 static void maku_confetti_negate_word_at_de(GB *gb) {
-  CYC(0x726c, 0x726d); alu_xor(gb, A);
-  CYC(0x726d, 0x726e); A = mem_rd(gb, DE);
-  CYC(0x726e, 0x726f); alu_cpl(gb);
-  CYC(0x726f, 0x7271); alu_add(gb, 1);
-  CYC(0x7271, 0x7272); mem_wr(gb, DE, A);
-  CYC(0x7272, 0x7273); E = alu_inc8(gb, E);
-  CYC(0x7273, 0x7274); A = mem_rd(gb, DE);
-  CYC(0x7274, 0x7275); alu_cpl(gb);
-  CYC(0x7275, 0x7277); alu_adc(gb, 0);
-  CYC(0x7277, 0x7278); mem_wr(gb, DE, A);
-  CYC(0x7278, 0x7279); ret_effect(gb);
+  BASE(makuConfetti_subid0);
+  CYC(b_+306, b_+307); alu_xor(gb, A);
+  CYC(b_+307, b_+308); A = mem_rd(gb, DE);
+  CYC(b_+308, b_+309); alu_cpl(gb);
+  CYC(b_+309, b_+311); alu_add(gb, 1);
+  CYC(b_+311, b_+312); mem_wr(gb, DE, A);
+  CYC(b_+312, b_+313); E = alu_inc8(gb, E);
+  CYC(b_+313, b_+314); A = mem_rd(gb, DE);
+  CYC(b_+314, b_+315); alu_cpl(gb);
+  CYC(b_+315, b_+317); alu_adc(gb, 0);
+  CYC(b_+317, b_+318); mem_wr(gb, DE, A);
+  CYC(b_+318, b_+319); ret_effect(gb);
 }
 
 static void maku_confetti_set_speed_component(GB *gb) {
-  CYC(0x72d9, 0x72da); mem_wr(gb, HL, B);
-  CYC(0x72da, 0x72db); L = alu_inc8(gb, L);
-  CYC(0x72db, 0x72dc); mem_wr(gb, HL, C);
-  CYC(0x72dc, 0x72dd); L = alu_inc8(gb, L);
-  CYC(0x72dd, 0x72de); ret_effect(gb);
+  BASE(makuConfetti_subid1);
+  CYC(b_+84, b_+85); mem_wr(gb, HL, B);
+  CYC(b_+85, b_+86); L = alu_inc8(gb, L);
+  CYC(b_+86, b_+87); mem_wr(gb, HL, C);
+  CYC(b_+87, b_+88); L = alu_inc8(gb, L);
+  CYC(b_+88, b_+89); ret_effect(gb);
 }
 
 static void maku_confetti_make_sparkle(GB *gb, uint16_t sp0_) {
-  CALL_C(0x7279, getFreeInteractionSlot_hook, 0x3aef, 0x727c);
-  if (!(F & FZ)) { CYCT(0x727c, 0x727d); ret_effect(gb); return; }
-  CYC(0x727c, 0x727d);
-  CYC(0x727d, 0x727f); mem_wr(gb, HL, 0x84);
-  CYC(0x727f, 0x7280); L = alu_inc8(gb, L);
-  CYC(0x7280, 0x7282); mem_wr(gb, HL, 2);
-  CYC(0x7282, 0x7285); objectCopyPosition_hook(gb);
+  BASE(makuConfetti_subid0);
+  CALL_C(b_+319, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+322);
+  if (!(F & FZ)) { CYCT(b_+322, b_+323); ret_effect(gb); return; }
+  CYC(b_+322, b_+323);
+  CYC(b_+323, b_+325); mem_wr(gb, HL, 0x84);
+  CYC(b_+325, b_+326); L = alu_inc8(gb, L);
+  CYC(b_+326, b_+328); mem_wr(gb, HL, 2);
+  CYC(b_+328, SYM(makuConfetti_subid1)); objectCopyPosition_hook(gb);
 }
 
 static void maku_confetti_update_speed(GB *gb, uint16_t e, uint16_t l, uint16_t start, uint16_t jump_end, uint16_t sp0_) {
+  BASE(makuConfetti_add16BitRefs);
   CYC(start, start + 2); E = e;
   CYC(start + 2, start + 4); L = l;
   if (jump_end != start + 4) CYC(start + 4, jump_end);
-  CYC(0x734d, 0x734e); H = D;
-  CALL_C(0x734e, add16BitRefs_hook, 0x23a7, 0x7351);
-  CYC(0x7351, 0x7352); ret_effect(gb);
+  CYC(b_+0, b_+1); H = D;
+  CALL_C(b_+1, add16BitRefs_hook, SYM(add16BitRefs), b_+4);
+  CYC(b_+4, SYM(interactionCode63)); ret_effect(gb);
 }
 
 void interactionCode62_hook(GB *gb) {
+  BASE(interactionCode62);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7132, 0x7134); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7134, 0x7135); A = mem_rd(gb, DE);
-  CYC(0x7135, 0x7136); push_effect(gb, 0x7136);
-  switch (maku_confetti_jump_table(gb)) {
-    case 0x713a: makuConfetti_subid0_hook(gb); return;
-    case 0x7285: makuConfetti_subid1_hook(gb); return;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (maku_confetti_jump_table(gb));
+    if (jt_ == SYM(makuConfetti_subid0)) { makuConfetti_subid0_hook(gb); return; }
+    else if (jt_ == SYM(makuConfetti_subid1)) { makuConfetti_subid1_hook(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 }
 
 void makuConfetti_subid0_hook(GB *gb) {
+  BASE(makuConfetti_subid0);
   uint16_t sp0_ = gb->sp;
-  CYC(0x713a, 0x713c); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x713c, 0x713d); A = mem_rd(gb, DE);
-  CYC(0x713d, 0x713e); push_effect(gb, 0x713e);
-  switch (maku_confetti_jump_table(gb)) {
-    case 0x7144: goto state0;
-    case 0x71a3: goto state1;
-    case 0x71db: goto state2;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (maku_confetti_jump_table(gb));
+    if (jt_ == b_+10) { goto state0; }
+    else if (jt_ == b_+105) { goto state1; }
+    else if (jt_ == b_+161) { goto state2; }
+    else { HANDOFF(HL); }
+  } while (0);
 state0:
-  CYC(0x7144, 0x7145); H = D;
-  CYC(0x7145, 0x7146); L = E;
-  CYC(0x7146, 0x7147); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x7147, 0x7149); L = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x7149, 0x714a); A = mem_rd(gb, HL);
-  CYC(0x714a, 0x714b); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x714b, 0x714d); goto init_piece; }
-  CYC(0x714b, 0x714d);
-  CYC(0x714d, 0x7150); goto set_delay;
+  CYC(b_+10, b_+11); H = D;
+  CYC(b_+11, b_+12); L = E;
+  CYC(b_+12, b_+13); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+13, b_+15); L = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+15, b_+16); A = mem_rd(gb, HL);
+  CYC(b_+16, b_+17); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+17, b_+19); goto init_piece; }
+  CYC(b_+17, b_+19);
+  CYC(b_+19, b_+22); goto set_delay;
 init_piece:
-  CYC(0x7150, 0x7151); alu_add(gb, A);
-  CYC(0x7151, 0x7152); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x7152, 0x7155); SET_HL(0x717f);
-  CYC(0x7155, 0x7156); maku_confetti_add_double_index(gb, 0x7156);
-  CYC(0x7156, 0x7158); E = INTERACTION_BASE + OBJ_YH;
-  CYC(0x7158, 0x715a); A = mem_rd(gb, hCameraY);
-  CYC(0x715a, 0x715b); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x715b, 0x715c); SET_HL(HL + 1);
-  CYC(0x715c, 0x715d); mem_wr(gb, DE, A);
-  CYC(0x715d, 0x715e); E = alu_inc8(gb, E);
-  CYC(0x715e, 0x715f); E = alu_inc8(gb, E);
-  CYC(0x715f, 0x7161); A = mem_rd(gb, hCameraX);
-  CYC(0x7161, 0x7162); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x7162, 0x7163); SET_HL(HL + 1);
-  CYC(0x7163, 0x7164); mem_wr(gb, DE, A);
-  CYC(0x7164, 0x7166); E = INTERACTION_BASE + OBJ_VAR3C;
-  CYC(0x7166, 0x7169); push_effect(gb, 0x7169); maku_confetti_copy_acceleration_component(gb);
-  CYC(0x7169, 0x716c); push_effect(gb, 0x716c); maku_confetti_copy_acceleration_component(gb);
-  CYC(0x716c, 0x716d); H = D;
-  CYC(0x716d, 0x716f); L = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x716f, 0x7170); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x7170, 0x7172); L = INTERACTION_BASE + OBJ_VAR3A;
-  CYC(0x7172, 0x7174); mem_wr(gb, HL, 0x10);
-  CYC(0x7174, 0x7176); L = INTERACTION_BASE + OBJ_DIRECTION;
-  CYC(0x7176, 0x7178); mem_wr(gb, HL, 0);
-  CALL_C(0x7178, interactionInitGraphics_hook, 0x15fb, 0x717b);
-  CYC(0x717b, 0x717e); objectSetVisible80_hook(gb);
+  CYC(b_+22, b_+23); alu_add(gb, A);
+  CYC(b_+23, b_+24); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+24, b_+27); SET_HL(b_+69);
+  CYC(b_+27, b_+28); maku_confetti_add_double_index(gb, b_+28);
+  CYC(b_+28, b_+30); E = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+30, b_+32); A = mem_rd(gb, hCameraY);
+  CYC(b_+32, b_+33); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+33, b_+34); SET_HL(HL + 1);
+  CYC(b_+34, b_+35); mem_wr(gb, DE, A);
+  CYC(b_+35, b_+36); E = alu_inc8(gb, E);
+  CYC(b_+36, b_+37); E = alu_inc8(gb, E);
+  CYC(b_+37, b_+39); A = mem_rd(gb, hCameraX);
+  CYC(b_+39, b_+40); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+40, b_+41); SET_HL(HL + 1);
+  CYC(b_+41, b_+42); mem_wr(gb, DE, A);
+  CYC(b_+42, b_+44); E = INTERACTION_BASE + OBJ_VAR3C;
+  CYC(b_+44, b_+47); push_effect(gb, b_+47); maku_confetti_copy_acceleration_component(gb);
+  CYC(b_+47, b_+50); push_effect(gb, b_+50); maku_confetti_copy_acceleration_component(gb);
+  CYC(b_+50, b_+51); H = D;
+  CYC(b_+51, b_+53); L = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+53, b_+54); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+54, b_+56); L = INTERACTION_BASE + OBJ_VAR3A;
+  CYC(b_+56, b_+58); mem_wr(gb, HL, 0x10);
+  CYC(b_+58, b_+60); L = INTERACTION_BASE + OBJ_DIRECTION;
+  CYC(b_+60, b_+62); mem_wr(gb, HL, 0);
+  CALL_C(b_+62, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+65);
+  CYC(b_+65, b_+68); objectSetVisible80_hook(gb);
   return;
 state1:
-  CYC(0x71a3, 0x71a4); H = D;
-  CYC(0x71a4, 0x71a6); L = INTERACTION_BASE + OBJ_VAR37;
-  CYC(0x71a6, 0x71a7); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  if (!(F & FZ)) { CYCT(0x71a7, 0x71a8); ret_effect(gb); return; }
-  CYC(0x71a7, 0x71a8);
-  CYC(0x71a8, 0x71aa); mem_wr(gb, HL, 1);
-  CALL_C(0x71aa, getFreeInteractionSlot_hook, 0x3aef, 0x71ad);
-  if (!(F & FZ)) { CYCT(0x71ad, 0x71ae); ret_effect(gb); return; }
-  CYC(0x71ad, 0x71ae);
-  CYC(0x71ae, 0x71b0); mem_wr(gb, HL, 0x62);
-  CYC(0x71b0, 0x71b2); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x71b2, 0x71b3); A = mem_rd(gb, DE);
-  CYC(0x71b3, 0x71b4); A = alu_inc8(gb, A);
-  CYC(0x71b4, 0x71b5); mem_wr(gb, DE, A);
-  CYC(0x71b5, 0x71b7); L = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x71b7, 0x71b8); mem_wr(gb, HL, A);
-  CYC(0x71b8, 0x71ba); L = INTERACTION_BASE + OBJ_COUNTER2;
-  CYC(0x71ba, 0x71bc); mem_wr(gb, HL, 180);
-  CYC(0x71bc, 0x71be); A = 0x83;
-  CALL_C(0x71be, playSound_b00_hook, 0x0c98, 0x71c1);
-  CYC(0x71c1, 0x71c3); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x71c3, 0x71c4); A = mem_rd(gb, DE);
-  CYC(0x71c4, 0x71c6); alu_cp(gb, 5);
-  if (F & FZ) { CYCT(0x71c6, 0x71c9); interactionDelete_hook(gb); return; }
-  CYC(0x71c6, 0x71c9);
+  CYC(b_+105, b_+106); H = D;
+  CYC(b_+106, b_+108); L = INTERACTION_BASE + OBJ_VAR37;
+  CYC(b_+108, b_+109); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(b_+109, b_+110); ret_effect(gb); return; }
+  CYC(b_+109, b_+110);
+  CYC(b_+110, b_+112); mem_wr(gb, HL, 1);
+  CALL_C(b_+112, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+115);
+  if (!(F & FZ)) { CYCT(b_+115, b_+116); ret_effect(gb); return; }
+  CYC(b_+115, b_+116);
+  CYC(b_+116, b_+118); mem_wr(gb, HL, 0x62);
+  CYC(b_+118, b_+120); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+120, b_+121); A = mem_rd(gb, DE);
+  CYC(b_+121, b_+122); A = alu_inc8(gb, A);
+  CYC(b_+122, b_+123); mem_wr(gb, DE, A);
+  CYC(b_+123, b_+125); L = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+125, b_+126); mem_wr(gb, HL, A);
+  CYC(b_+126, b_+128); L = INTERACTION_BASE + OBJ_COUNTER2;
+  CYC(b_+128, b_+130); mem_wr(gb, HL, 180);
+  CYC(b_+130, b_+132); A = 0x83;
+  CALL_C(b_+132, playSound_b00_hook, SYM(playSound_b00), b_+135);
+  CYC(b_+135, b_+137); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+137, b_+138); A = mem_rd(gb, DE);
+  CYC(b_+138, b_+140); alu_cp(gb, 5);
+  if (F & FZ) { CYCT(b_+140, b_+143); interactionDelete_hook(gb); return; }
+  CYC(b_+140, b_+143);
 set_delay:
-  CYC(0x71c9, 0x71cb); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x71cb, 0x71cc); A = mem_rd(gb, DE);
-  CYC(0x71cc, 0x71cf); SET_HL(0x71d5);
-  CYC(0x71cf, 0x71d0); maku_confetti_add_a_to_hl(gb, 0x71d0);
-  CYC(0x71d0, 0x71d1); A = mem_rd(gb, HL);
-  CYC(0x71d1, 0x71d3); E = INTERACTION_BASE + OBJ_VAR37;
-  CYC(0x71d3, 0x71d4); mem_wr(gb, DE, A);
-  CYC(0x71d4, 0x71d5); ret_effect(gb);
+  CYC(b_+143, b_+145); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+145, b_+146); A = mem_rd(gb, DE);
+  CYC(b_+146, b_+149); SET_HL(b_+155);
+  CYC(b_+149, b_+150); maku_confetti_add_a_to_hl(gb, b_+150);
+  CYC(b_+150, b_+151); A = mem_rd(gb, HL);
+  CYC(b_+151, b_+153); E = INTERACTION_BASE + OBJ_VAR37;
+  CYC(b_+153, b_+154); mem_wr(gb, DE, A);
+  CYC(b_+154, b_+155); ret_effect(gb);
   return;
 state2:
-  CALL_C(0x71db, interactionDecCounter2_hook, 0x23d1, 0x71de);
-  if (!(F & FZ)) { CYCT(0x71de, 0x71e0); goto update_sparkle; }
-  CYC(0x71de, 0x71e0);
-  CYC(0x71e0, 0x71e2); mem_wr(gb, HL, 180);
-  CYC(0x71e2, 0x71e4); A = 0x83;
-  CALL_C(0x71e4, playSound_b00_hook, 0x0c98, 0x71e7);
+  CALL_C(b_+161, interactionDecCounter2_hook, SYM(interactionDecCounter2), b_+164);
+  if (!(F & FZ)) { CYCT(b_+164, b_+166); goto update_sparkle; }
+  CYC(b_+164, b_+166);
+  CYC(b_+166, b_+168); mem_wr(gb, HL, 180);
+  CYC(b_+168, b_+170); A = 0x83;
+  CALL_C(b_+170, playSound_b00_hook, SYM(playSound_b00), b_+173);
 update_sparkle:
-  CYC(0x71e7, 0x71e8); H = D;
-  CYC(0x71e8, 0x71ea); L = INTERACTION_BASE + OBJ_VAR3A;
-  CYC(0x71ea, 0x71eb); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  if (!(F & FZ)) { CYCT(0x71eb, 0x71ed); goto update_motion; }
-  CYC(0x71eb, 0x71ed);
-  CYC(0x71ed, 0x71ef); mem_wr(gb, HL, 0x18);
-  CYC(0x71ef, 0x71f2); push_effect(gb, 0x71f2); maku_confetti_make_sparkle(gb, sp0_);
+  CYC(b_+173, b_+174); H = D;
+  CYC(b_+174, b_+176); L = INTERACTION_BASE + OBJ_VAR3A;
+  CYC(b_+176, b_+177); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(b_+177, b_+179); goto update_motion; }
+  CYC(b_+177, b_+179);
+  CYC(b_+179, b_+181); mem_wr(gb, HL, 0x18);
+  CYC(b_+181, b_+184); push_effect(gb, b_+184); maku_confetti_make_sparkle(gb, sp0_);
 update_motion:
-  CYC(0x71f2, 0x71f5); SET_HL(0x725e);
-  CYC(0x71f5, 0x71f7); E = INTERACTION_BASE + OBJ_Y;
-  CALL_C(0x71f7, add16BitRefs_hook, 0x23a7, 0x71fa);
-  CALL_C(0x71fa, makuConfetti_updateSpeedY_hook, 0x7337, 0x71fd);
-  CALL_C(0x71fd, makuConfetti_updateSpeedX_hook, 0x733d, 0x7200);
-  CALL_C(0x7200, objectApplyComponentSpeed_hook, 0x2008, 0x7203);
-  CYC(0x7203, 0x7205); E = INTERACTION_BASE + OBJ_YH;
-  CYC(0x7205, 0x7206); A = mem_rd(gb, DE);
-  CYC(0x7206, 0x7208); alu_cp(gb, 0x88);
-  if (F & FC) { CYCT(0x7208, 0x720b); goto adjust_y; }
-  CYC(0x7208, 0x720b);
-  CYC(0x720b, 0x720d); alu_cp(gb, 0xd8);
-  if (F & FC) { CYCT(0x720d, 0x7210); interactionDelete_hook(gb); return; }
-  CYC(0x720d, 0x7210);
+  CYC(b_+184, b_+187); SET_HL(b_+292);
+  CYC(b_+187, b_+189); E = INTERACTION_BASE + OBJ_Y;
+  CALL_C(b_+189, add16BitRefs_hook, SYM(add16BitRefs), b_+192);
+  CALL_C(b_+192, makuConfetti_updateSpeedY_hook, SYM(makuConfetti_updateSpeedY), b_+195);
+  CALL_C(b_+195, makuConfetti_updateSpeedX_hook, SYM(makuConfetti_updateSpeedX), b_+198);
+  CALL_C(b_+198, objectApplyComponentSpeed_hook, SYM(objectApplyComponentSpeed), b_+201);
+  CYC(b_+201, b_+203); E = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+203, b_+204); A = mem_rd(gb, DE);
+  CYC(b_+204, b_+206); alu_cp(gb, 0x88);
+  if (F & FC) { CYCT(b_+206, b_+209); goto adjust_y; }
+  CYC(b_+206, b_+209);
+  CYC(b_+209, b_+211); alu_cp(gb, 0xd8);
+  if (F & FC) { CYCT(b_+211, b_+214); interactionDelete_hook(gb); return; }
+  CYC(b_+211, b_+214);
 adjust_y:
-  CYC(0x7210, 0x7211); H = D;
-  CYC(0x7211, 0x7213); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x7213, 0x7214); C = mem_rd(gb, HL);
-  CYC(0x7214, 0x7215); L = alu_inc8(gb, L);
-  CYC(0x7215, 0x7216); B = mem_rd(gb, HL);
-  CYC(0x7216, 0x7218); alu_bit(gb, 7, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(0x7218, 0x721a); goto compare_y; }
-  CYC(0x7218, 0x721a);
-  CYC(0x721a, 0x721d); push_effect(gb, 0x721d); maku_confetti_negate_bc(gb);
+  CYC(b_+214, b_+215); H = D;
+  CYC(b_+215, b_+217); L = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+217, b_+218); C = mem_rd(gb, HL);
+  CYC(b_+218, b_+219); L = alu_inc8(gb, L);
+  CYC(b_+219, b_+220); B = mem_rd(gb, HL);
+  CYC(b_+220, b_+222); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+222, b_+224); goto compare_y; }
+  CYC(b_+222, b_+224);
+  CYC(b_+224, b_+227); push_effect(gb, b_+227); maku_confetti_negate_bc(gb);
 compare_y:
-  CYC(0x721d, 0x7220); SET_HL(0x0100);
-  CALL_C(0x7220, compareHlToBc_hook, 0x01d6, 0x7223);
-  CYC(0x7223, 0x7225); alu_cp(gb, 1);
-  if (F & FZ) { CYCT(0x7225, 0x7227); goto adjust_x; }
-  CYC(0x7225, 0x7227);
-  CYC(0x7227, 0x7229); E = INTERACTION_BASE + OBJ_VAR3C;
-  CYC(0x7229, 0x722c); push_effect(gb, 0x722c); maku_confetti_negate_word_at_de(gb);
+  CYC(b_+227, b_+230); SET_HL(0x0100);
+  CALL_C(b_+230, compareHlToBc_hook, SYM(compareHlToBc), b_+233);
+  CYC(b_+233, b_+235); alu_cp(gb, 1);
+  if (F & FZ) { CYCT(b_+235, b_+237); goto adjust_x; }
+  CYC(b_+235, b_+237);
+  CYC(b_+237, b_+239); E = INTERACTION_BASE + OBJ_VAR3C;
+  CYC(b_+239, b_+242); push_effect(gb, b_+242); maku_confetti_negate_word_at_de(gb);
 adjust_x:
-  CYC(0x722c, 0x722d); H = D;
-  CYC(0x722d, 0x722f); L = INTERACTION_BASE + OBJ_SPEED_X;
-  CYC(0x722f, 0x7230); C = mem_rd(gb, HL);
-  CYC(0x7230, 0x7231); L = alu_inc8(gb, L);
-  CYC(0x7231, 0x7232); B = mem_rd(gb, HL);
-  CYC(0x7232, 0x7234); alu_bit(gb, 7, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(0x7234, 0x7236); goto compare_x; }
-  CYC(0x7234, 0x7236);
-  CYC(0x7236, 0x7239); push_effect(gb, 0x7239); maku_confetti_negate_bc(gb);
+  CYC(b_+242, b_+243); H = D;
+  CYC(b_+243, b_+245); L = INTERACTION_BASE + OBJ_SPEED_X;
+  CYC(b_+245, b_+246); C = mem_rd(gb, HL);
+  CYC(b_+246, b_+247); L = alu_inc8(gb, L);
+  CYC(b_+247, b_+248); B = mem_rd(gb, HL);
+  CYC(b_+248, b_+250); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+250, b_+252); goto compare_x; }
+  CYC(b_+250, b_+252);
+  CYC(b_+252, b_+255); push_effect(gb, b_+255); maku_confetti_negate_bc(gb);
 compare_x:
-  CYC(0x7239, 0x723c); SET_HL(0x0200);
-  CALL_C(0x723c, compareHlToBc_hook, 0x01d6, 0x723f);
-  CYC(0x723f, 0x7241); alu_cp(gb, 1);
-  if (F & FZ) { CYCT(0x7241, 0x7243); goto update_direction; }
-  CYC(0x7241, 0x7243);
-  CYC(0x7243, 0x7245); E = INTERACTION_BASE + OBJ_VAR3E;
-  CYC(0x7245, 0x7248); push_effect(gb, 0x7248); maku_confetti_negate_word_at_de(gb);
+  CYC(b_+255, b_+258); SET_HL((SYM(getLowestSetBit) + 8));
+  CALL_C(b_+258, compareHlToBc_hook, SYM(compareHlToBc), b_+261);
+  CYC(b_+261, b_+263); alu_cp(gb, 1);
+  if (F & FZ) { CYCT(b_+263, b_+265); goto update_direction; }
+  CYC(b_+263, b_+265);
+  CYC(b_+265, b_+267); E = INTERACTION_BASE + OBJ_VAR3E;
+  CYC(b_+267, b_+270); push_effect(gb, b_+270); maku_confetti_negate_word_at_de(gb);
 update_direction:
-  CYC(0x7248, 0x7249); H = D;
-  CYC(0x7249, 0x724b); L = INTERACTION_BASE + OBJ_SPEED_X + 1;
-  CYC(0x724b, 0x724d); alu_bit(gb, 7, mem_rd(gb, HL));
-  CYC(0x724d, 0x724f); L = INTERACTION_BASE + OBJ_DIRECTION;
-  CYC(0x724f, 0x7250); A = mem_rd(gb, HL);
-  if (F & FZ) { CYCT(0x7250, 0x7252); goto positive_x; }
-  CYC(0x7250, 0x7252);
-  CYC(0x7252, 0x7253); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x7253, 0x7254); ret_effect(gb); return; }
-  CYC(0x7253, 0x7254);
-  CYC(0x7254, 0x7256); goto invert_direction;
+  CYC(b_+270, b_+271); H = D;
+  CYC(b_+271, b_+273); L = INTERACTION_BASE + OBJ_SPEED_X + 1;
+  CYC(b_+273, b_+275); alu_bit(gb, 7, mem_rd(gb, HL));
+  CYC(b_+275, b_+277); L = INTERACTION_BASE + OBJ_DIRECTION;
+  CYC(b_+277, b_+278); A = mem_rd(gb, HL);
+  if (F & FZ) { CYCT(b_+278, b_+280); goto positive_x; }
+  CYC(b_+278, b_+280);
+  CYC(b_+280, b_+281); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+281, b_+282); ret_effect(gb); return; }
+  CYC(b_+281, b_+282);
+  CYC(b_+282, b_+284); goto invert_direction;
 positive_x:
-  CYC(0x7256, 0x7257); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x7257, 0x7258); ret_effect(gb); return; }
-  CYC(0x7257, 0x7258);
+  CYC(b_+284, b_+285); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+285, b_+286); ret_effect(gb); return; }
+  CYC(b_+285, b_+286);
 invert_direction:
-  CYC(0x7258, 0x725a); alu_xor(gb, 1);
-  CYC(0x725a, 0x725b); mem_wr(gb, HL, A);
-  CYC(0x725b, 0x725e); interactionSetAnimation_hook(gb);
+  CYC(b_+286, b_+288); alu_xor(gb, 1);
+  CYC(b_+288, b_+289); mem_wr(gb, HL, A);
+  CYC(b_+289, b_+292); interactionSetAnimation_hook(gb);
 }
 
 void makuConfetti_subid1_hook(GB *gb) {
+  BASE(makuConfetti_subid1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7285, 0x7287); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x7287, 0x7288); A = mem_rd(gb, DE);
-  CYC(0x7288, 0x7289); push_effect(gb, 0x7289);
-  switch (maku_confetti_jump_table(gb)) {
-    case 0x728f: goto state0;
-    case 0x72ea: goto state1;
-    case 0x7329: goto state2;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (maku_confetti_jump_table(gb));
+    if (jt_ == b_+10) { goto state0; }
+    else if (jt_ == b_+101) { goto state1; }
+    else if (jt_ == b_+164) { goto state2; }
+    else { HANDOFF(HL); }
+  } while (0);
 state0:
-  CYC(0x728f, 0x7290); H = D;
-  CYC(0x7290, 0x7291); L = E;
-  CYC(0x7291, 0x7292); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x7292, 0x7294); L = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x7294, 0x7295); A = mem_rd(gb, HL);
-  CYC(0x7295, 0x7296); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x7296, 0x7298); goto init_piece; }
-  CYC(0x7296, 0x7298);
-  CYC(0x7298, 0x729a); L = INTERACTION_BASE + OBJ_COUNTER2;
-  CYC(0x729a, 0x729c); mem_wr(gb, HL, 10);
-  CYC(0x729c, 0x729f); goto set_delay;
+  CYC(b_+10, b_+11); H = D;
+  CYC(b_+11, b_+12); L = E;
+  CYC(b_+12, b_+13); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+13, b_+15); L = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+15, b_+16); A = mem_rd(gb, HL);
+  CYC(b_+16, b_+17); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+17, b_+19); goto init_piece; }
+  CYC(b_+17, b_+19);
+  CYC(b_+19, b_+21); L = INTERACTION_BASE + OBJ_COUNTER2;
+  CYC(b_+21, b_+23); mem_wr(gb, HL, 10);
+  CYC(b_+23, b_+26); goto set_delay;
 init_piece:
-  CYC(0x729f, 0x72a0); A = alu_dec8(gb, A);
-  CYC(0x72a0, 0x72a2); alu_cp(gb, 6);
-  if (F & FC) { CYCT(0x72a2, 0x72a4); goto position; }
-  CYC(0x72a2, 0x72a4);
-  CYC(0x72a4, 0x72a6); alu_sub(gb, 6);
+  CYC(b_+26, b_+27); A = alu_dec8(gb, A);
+  CYC(b_+27, b_+29); alu_cp(gb, 6);
+  if (F & FC) { CYCT(b_+29, b_+31); goto position; }
+  CYC(b_+29, b_+31);
+  CYC(b_+31, b_+33); alu_sub(gb, 6);
 position:
-  CYC(0x72a6, 0x72a9); SET_HL(0x72de);
-  CYC(0x72a9, 0x72aa); maku_confetti_add_double_index(gb, 0x72aa);
-  CYC(0x72aa, 0x72ac); E = INTERACTION_BASE + OBJ_YH;
-  CYC(0x72ac, 0x72ae); A = mem_rd(gb, hCameraY);
-  CYC(0x72ae, 0x72af); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x72af, 0x72b0); SET_HL(HL + 1);
-  CYC(0x72b0, 0x72b1); mem_wr(gb, DE, A);
-  CYC(0x72b1, 0x72b2); E = alu_inc8(gb, E);
-  CYC(0x72b2, 0x72b3); E = alu_inc8(gb, E);
-  CYC(0x72b3, 0x72b5); A = mem_rd(gb, hCameraX);
-  CYC(0x72b5, 0x72b6); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x72b6, 0x72b7); SET_HL(HL + 1);
-  CYC(0x72b7, 0x72b8); mem_wr(gb, DE, A);
-  CYC(0x72b8, 0x72b9); H = D;
-  CYC(0x72b9, 0x72bb); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x72bb, 0x72bd); B = 0x80;
-  CYC(0x72bd, 0x72bf); C = 0xfd;
-  CYC(0x72bf, 0x72c2); push_effect(gb, 0x72c2); maku_confetti_set_speed_component(gb);
-  CYC(0x72c2, 0x72c4); B = 0;
-  CYC(0x72c4, 0x72c6); C = 4;
-  CYC(0x72c6, 0x72c9); push_effect(gb, 0x72c9); maku_confetti_set_speed_component(gb);
-  CYC(0x72c9, 0x72cb); B = 0xf0;
-  CYC(0x72cb, 0x72cd); C = 0xff;
-  CYC(0x72cd, 0x72d0); push_effect(gb, 0x72d0); maku_confetti_set_speed_component(gb);
-  CYC(0x72d0, 0x72d2); L = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x72d2, 0x72d3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CALL_C(0x72d3, interactionInitGraphics_hook, 0x15fb, 0x72d6);
-  CYC(0x72d6, 0x72d9); objectSetVisible80_hook(gb);
+  CYC(b_+33, b_+36); SET_HL(b_+89);
+  CYC(b_+36, b_+37); maku_confetti_add_double_index(gb, b_+37);
+  CYC(b_+37, b_+39); E = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+39, b_+41); A = mem_rd(gb, hCameraY);
+  CYC(b_+41, b_+42); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+42, b_+43); SET_HL(HL + 1);
+  CYC(b_+43, b_+44); mem_wr(gb, DE, A);
+  CYC(b_+44, b_+45); E = alu_inc8(gb, E);
+  CYC(b_+45, b_+46); E = alu_inc8(gb, E);
+  CYC(b_+46, b_+48); A = mem_rd(gb, hCameraX);
+  CYC(b_+48, b_+49); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+49, b_+50); SET_HL(HL + 1);
+  CYC(b_+50, b_+51); mem_wr(gb, DE, A);
+  CYC(b_+51, b_+52); H = D;
+  CYC(b_+52, b_+54); L = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+54, b_+56); B = 0x80;
+  CYC(b_+56, b_+58); C = 0xfd;
+  CYC(b_+58, b_+61); push_effect(gb, b_+61); maku_confetti_set_speed_component(gb);
+  CYC(b_+61, b_+63); B = 0;
+  CYC(b_+63, b_+65); C = 4;
+  CYC(b_+65, b_+68); push_effect(gb, b_+68); maku_confetti_set_speed_component(gb);
+  CYC(b_+68, b_+70); B = 0xf0;
+  CYC(b_+70, b_+72); C = 0xff;
+  CYC(b_+72, b_+75); push_effect(gb, b_+75); maku_confetti_set_speed_component(gb);
+  CYC(b_+75, b_+77); L = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+77, b_+78); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CALL_C(b_+78, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+81);
+  CYC(b_+81, b_+84); objectSetVisible80_hook(gb);
   return;
 state1:
-  CALL_C(0x72ea, interactionDecCounter2_hook, 0x23d1, 0x72ed);
-  if (!(F & FZ)) { CYCT(0x72ed, 0x72ef); goto spawn; }
-  CYC(0x72ed, 0x72ef);
-  CYC(0x72ef, 0x72f1); mem_wr(gb, HL, 45);
-  CYC(0x72f1, 0x72f3); A = 0xce;
-  CALL_C(0x72f3, playSound_b00_hook, 0x0c98, 0x72f6);
+  CALL_C(b_+101, interactionDecCounter2_hook, SYM(interactionDecCounter2), b_+104);
+  if (!(F & FZ)) { CYCT(b_+104, b_+106); goto spawn; }
+  CYC(b_+104, b_+106);
+  CYC(b_+106, b_+108); mem_wr(gb, HL, 45);
+  CYC(b_+108, b_+110); A = 0xce;
+  CALL_C(b_+110, playSound_b00_hook, SYM(playSound_b00), b_+113);
 spawn:
-  CYC(0x72f6, 0x72f7); H = D;
-  CYC(0x72f7, 0x72f9); L = INTERACTION_BASE + OBJ_VAR37;
-  CYC(0x72f9, 0x72fa); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  if (!(F & FZ)) { CYCT(0x72fa, 0x72fb); ret_effect(gb); return; }
-  CYC(0x72fa, 0x72fb);
-  CALL_C(0x72fb, getFreeInteractionSlot_hook, 0x3aef, 0x72fe);
-  if (!(F & FZ)) { CYCT(0x72fe, 0x72ff); ret_effect(gb); return; }
-  CYC(0x72fe, 0x72ff);
-  CYC(0x72ff, 0x7301); mem_wr(gb, HL, 0x62);
-  CYC(0x7301, 0x7302); L = alu_inc8(gb, L);
-  CYC(0x7302, 0x7304); mem_wr(gb, HL, 1);
-  CYC(0x7304, 0x7306); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x7306, 0x7307); A = mem_rd(gb, DE);
-  CYC(0x7307, 0x7308); A = alu_inc8(gb, A);
-  CYC(0x7308, 0x7309); mem_wr(gb, DE, A);
-  CYC(0x7309, 0x730b); L = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x730b, 0x730c); mem_wr(gb, HL, A);
-  CYC(0x730c, 0x730e); alu_cp(gb, 12);
-  if (F & FZ) { CYCT(0x730e, 0x7311); interactionDelete_hook(gb); return; }
-  CYC(0x730e, 0x7311);
+  CYC(b_+113, b_+114); H = D;
+  CYC(b_+114, b_+116); L = INTERACTION_BASE + OBJ_VAR37;
+  CYC(b_+116, b_+117); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(b_+117, b_+118); ret_effect(gb); return; }
+  CYC(b_+117, b_+118);
+  CALL_C(b_+118, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+121);
+  if (!(F & FZ)) { CYCT(b_+121, b_+122); ret_effect(gb); return; }
+  CYC(b_+121, b_+122);
+  CYC(b_+122, b_+124); mem_wr(gb, HL, 0x62);
+  CYC(b_+124, b_+125); L = alu_inc8(gb, L);
+  CYC(b_+125, b_+127); mem_wr(gb, HL, 1);
+  CYC(b_+127, b_+129); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+129, b_+130); A = mem_rd(gb, DE);
+  CYC(b_+130, b_+131); A = alu_inc8(gb, A);
+  CYC(b_+131, b_+132); mem_wr(gb, DE, A);
+  CYC(b_+132, b_+134); L = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+134, b_+135); mem_wr(gb, HL, A);
+  CYC(b_+135, b_+137); alu_cp(gb, 12);
+  if (F & FZ) { CYCT(b_+137, b_+140); interactionDelete_hook(gb); return; }
+  CYC(b_+137, b_+140);
 set_delay:
-  CYC(0x7311, 0x7313); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x7313, 0x7314); A = mem_rd(gb, DE);
-  CYC(0x7314, 0x7317); SET_HL(0x731d);
-  CYC(0x7317, 0x7318); maku_confetti_add_a_to_hl(gb, 0x7318);
-  CYC(0x7318, 0x7319); A = mem_rd(gb, HL);
-  CYC(0x7319, 0x731b); E = INTERACTION_BASE + OBJ_VAR37;
-  CYC(0x731b, 0x731c); mem_wr(gb, DE, A);
-  CYC(0x731c, 0x731d); ret_effect(gb);
+  CYC(b_+140, b_+142); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+142, b_+143); A = mem_rd(gb, DE);
+  CYC(b_+143, b_+146); SET_HL(b_+152);
+  CYC(b_+146, b_+147); maku_confetti_add_a_to_hl(gb, b_+147);
+  CYC(b_+147, b_+148); A = mem_rd(gb, HL);
+  CYC(b_+148, b_+150); E = INTERACTION_BASE + OBJ_VAR37;
+  CYC(b_+150, b_+151); mem_wr(gb, DE, A);
+  CYC(b_+151, b_+152); ret_effect(gb);
   return;
 state2:
-  CALL_C(0x7329, makuConfetti_updateSpeedXUsingSpeedZ_hook, 0x7349, 0x732c);
-  CYC(0x732c, 0x732e); E = INTERACTION_BASE + OBJ_SPEED_X + 1;
-  CYC(0x732e, 0x732f); A = mem_rd(gb, DE);
-  CYC(0x732f, 0x7331); alu_bit(gb, 7, A);
-  if (!(F & FZ)) { CYCT(0x7331, 0x7334); interactionDelete_hook(gb); return; }
-  CYC(0x7331, 0x7334);
-  CYC(0x7334, 0x7337); objectApplyComponentSpeed_hook(gb);
+  CALL_C(b_+164, makuConfetti_updateSpeedXUsingSpeedZ_hook, SYM(makuConfetti_updateSpeedXUsingSpeedZ), b_+167);
+  CYC(b_+167, b_+169); E = INTERACTION_BASE + OBJ_SPEED_X + 1;
+  CYC(b_+169, b_+170); A = mem_rd(gb, DE);
+  CYC(b_+170, b_+172); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(b_+172, b_+175); interactionDelete_hook(gb); return; }
+  CYC(b_+172, b_+175);
+  CYC(b_+175, SYM(makuConfetti_updateSpeedY)); objectApplyComponentSpeed_hook(gb);
 }
 
 void makuConfetti_updateSpeedY_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
-  maku_confetti_update_speed(gb, INTERACTION_BASE + OBJ_SPEED, INTERACTION_BASE + OBJ_VAR3C, 0x7337, 0x733d, sp0_);
+  maku_confetti_update_speed(gb, INTERACTION_BASE + OBJ_SPEED, INTERACTION_BASE + OBJ_VAR3C, SYM(makuConfetti_updateSpeedY), SYM(makuConfetti_updateSpeedX), sp0_);
 }
 
 void makuConfetti_updateSpeedX_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
-  maku_confetti_update_speed(gb, INTERACTION_BASE + OBJ_SPEED_X, INTERACTION_BASE + OBJ_VAR3E, 0x733d, 0x7343, sp0_);
+  maku_confetti_update_speed(gb, INTERACTION_BASE + OBJ_SPEED_X, INTERACTION_BASE + OBJ_VAR3E, SYM(makuConfetti_updateSpeedX), SYM(makuConfetti_updateSpeedYUsingSpeedZ), sp0_);
 }
 
 void makuConfetti_updateSpeedYUsingSpeedZ_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
-  maku_confetti_update_speed(gb, INTERACTION_BASE + OBJ_SPEED, INTERACTION_BASE + OBJ_SPEED_Z, 0x7343, 0x7349, sp0_);
+  maku_confetti_update_speed(gb, INTERACTION_BASE + OBJ_SPEED, INTERACTION_BASE + OBJ_SPEED_Z, SYM(makuConfetti_updateSpeedYUsingSpeedZ), SYM(makuConfetti_updateSpeedXUsingSpeedZ), sp0_);
 }
 
 void makuConfetti_updateSpeedXUsingSpeedZ_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
-  maku_confetti_update_speed(gb, INTERACTION_BASE + OBJ_SPEED_X, INTERACTION_BASE + OBJ_SPEED_Z, 0x7349, 0x734d, sp0_);
+  maku_confetti_update_speed(gb, INTERACTION_BASE + OBJ_SPEED_X, INTERACTION_BASE + OBJ_SPEED_Z, SYM(makuConfetti_updateSpeedXUsingSpeedZ), SYM(makuConfetti_add16BitRefs), sp0_);
 }

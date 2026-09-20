@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodebe), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodebe), (from), (to), true)
 
 // ref/oracles-disasm/object_code/ages/interactions/ambisPalaceButton.s (interactionCodebe /
 // INTERAC_AMBIS_PALACE_BUTTON), bank 0x0b.
@@ -31,69 +31,70 @@ static uint16_t interactionCodebe_jump_table(GB *gb) {
 // INTERAC_AMBIS_PALACE_BUTTON
 // ==================================================================================================
 void interactionCodebe_hook(GB *gb) {
+  BASE(interactionCodebe);
   uint16_t sp0_ = gb->sp;
-  CYC(0x70d5, 0x70d7); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x70d7, 0x70d8); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x70d8, 0x70d9); push_effect(gb, 0x70d9);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = interactionCodebe_jump_table(gb);
-    if (target == 0x70ef) goto state1;
-    if (target == 0x7122) goto state2;
+    if (target == b_+26) goto state1;
+    if (target == b_+77) goto state2;
     // target == 0x70df falls through to state0
   }
 
   // interactionCodebe@state0
-  CALL_C(0x70df, getThisRoomFlags_hook, 0x197d, 0x70e2);
-  CYC(0x70e2, 0x70e4); alu_and(gb, 0x80);
-  if (!(F & FZ)) { CYCT(0x70e4, 0x70e7); interactionDelete_hook(gb); return; } // jp nz
-  CYC(0x70e4, 0x70e7);
-  CYC(0x70e7, 0x70e9); A = 0x02;
-  CALL_C(0x70e9, objectSetCollideRadius_hook, 0x24a1, 0x70ec);
-  CYC(0x70ec, 0x70ef); interactionIncState_hook(gb); return; // jp
+  CALL_C(b_+10, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+13);
+  CYC(b_+13, b_+15); alu_and(gb, 0x80);
+  if (!(F & FZ)) { CYCT(b_+15, b_+18); interactionDelete_hook(gb); return; } // jp nz
+  CYC(b_+15, b_+18);
+  CYC(b_+18, b_+20); A = 0x02;
+  CALL_C(b_+20, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+23);
+  CYC(b_+23, b_+26); interactionIncState_hook(gb); return; // jp
 
 state1: // interactionCodebe@state1
-  CALL_C(0x70ef, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, 0x1c28, 0x70f2);
-  if (!(F & FC)) { CYCT(0x70f2, 0x70f3); ret_effect(gb); return; } // ret nc
-  CYC(0x70f2, 0x70f3);
-  CALL_C(0x70f3, objectGetTileAtPosition_hook, 0x1444, 0x70f6);
-  CYC(0x70f6, 0x70f9); A = W8(wActiveTilePos);
-  CYC(0x70f9, 0x70fa); alu_cp(gb, L);
-  if (!(F & FZ)) { CYCT(0x70fa, 0x70fb); ret_effect(gb); return; } // ret nz
-  CYC(0x70fa, 0x70fb);
-  CYC(0x70fb, 0x70fe); A = W8(wLinkInAir);
-  CYC(0x70fe, 0x70ff); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x70ff, 0x7100); ret_effect(gb); return; } // ret nz
-  CYC(0x70ff, 0x7100);
-  CALL_C(0x7100, checkLinkVulnerable_hook, 0x1d28, 0x7103);
-  if (!(F & FC)) { CYCT(0x7103, 0x7104); ret_effect(gb); return; } // ret nc
-  CYC(0x7103, 0x7104);
-  CYC(0x7104, 0x7106); A = 0x81; // DISABLE_ALL_BUT_INTERACTIONS | DISABLE_LINK
-  CYC(0x7106, 0x7109); W8(wDisabledObjects) = A;
-  CYC(0x7109, 0x710c); W8(wMenuDisabled) = A;
-  CYC(0x710c, 0x710e); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x710e, 0x7110); A = 0x2d;
-  CYC(0x7110, 0x7111); mem_wr(gb, DE, A);
-  CALL_C(0x7111, objectGetTileAtPosition_hook, 0x1444, 0x7114);
-  CYC(0x7114, 0x7115); C = L;
-  CYC(0x7115, 0x7117); A = 0x9e;
-  CALL_C(0x7117, setTile_hook, 0x3a9c, 0x711a);
-  CYC(0x711a, 0x711c); A = 0x6c;
-  CALL_C(0x711c, playSound_b00_hook, 0x0c98, 0x711f);
-  CYC(0x711f, 0x7122); interactionIncState_hook(gb); return; // jp
+  CALL_C(b_+26, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing), b_+29);
+  if (!(F & FC)) { CYCT(b_+29, b_+30); ret_effect(gb); return; } // ret nc
+  CYC(b_+29, b_+30);
+  CALL_C(b_+30, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+33);
+  CYC(b_+33, b_+36); A = W8(wActiveTilePos);
+  CYC(b_+36, b_+37); alu_cp(gb, L);
+  if (!(F & FZ)) { CYCT(b_+37, b_+38); ret_effect(gb); return; } // ret nz
+  CYC(b_+37, b_+38);
+  CYC(b_+38, b_+41); A = W8(wLinkInAir);
+  CYC(b_+41, b_+42); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+42, b_+43); ret_effect(gb); return; } // ret nz
+  CYC(b_+42, b_+43);
+  CALL_C(b_+43, checkLinkVulnerable_hook, SYM(checkLinkVulnerable), b_+46);
+  if (!(F & FC)) { CYCT(b_+46, b_+47); ret_effect(gb); return; } // ret nc
+  CYC(b_+46, b_+47);
+  CYC(b_+47, b_+49); A = 0x81; // DISABLE_ALL_BUT_INTERACTIONS | DISABLE_LINK
+  CYC(b_+49, b_+52); W8(wDisabledObjects) = A;
+  CYC(b_+52, b_+55); W8(wMenuDisabled) = A;
+  CYC(b_+55, b_+57); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+57, b_+59); A = 0x2d;
+  CYC(b_+59, b_+60); mem_wr(gb, DE, A);
+  CALL_C(b_+60, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+63);
+  CYC(b_+63, b_+64); C = L;
+  CYC(b_+64, b_+66); A = 0x9e;
+  CALL_C(b_+66, setTile_hook, SYM(setTile), b_+69);
+  CYC(b_+69, b_+71); A = 0x6c;
+  CALL_C(b_+71, playSound_b00_hook, SYM(playSound_b00), b_+74);
+  CYC(b_+74, b_+77); interactionIncState_hook(gb); return; // jp
 
 state2: // interactionCodebe@state2
-  CALL_C(0x7122, interactionDecCounter1_hook, 0x23cc, 0x7125);
-  if (!(F & FZ)) { CYCT(0x7125, 0x7126); ret_effect(gb); return; } // ret nz
-  CYC(0x7125, 0x7126);
-  CYC(0x7126, 0x7128); A = 0x1c;
-  CYC(0x7128, 0x712b); W8(wCutsceneTrigger) = A;
-  CYC(0x712b, 0x712e); A = W8(wActiveRoom);
-  CYC(0x712e, 0x7131); W8(wGenericCutscene_cbbb) = A;
-  CYC(0x7131, 0x7134); A = W8(wActiveTilePos);
-  CYC(0x7134, 0x7137); W8(wGenericCutscene_cbbc) = A;
-  CYC(0x7137, 0x7139); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7139, 0x713a); A = mem_rd(gb, DE);
-  CYC(0x713a, 0x713d); W8(wGenericCutscene_cbbd) = A;
-  CALL_C(0x713d, fadeoutToWhite_hook, 0x326c, 0x7140);
-  CYC(0x7140, 0x7143); interactionDelete_hook(gb); return; // jp
+  CALL_C(b_+77, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+80);
+  if (!(F & FZ)) { CYCT(b_+80, b_+81); ret_effect(gb); return; } // ret nz
+  CYC(b_+80, b_+81);
+  CYC(b_+81, b_+83); A = 0x1c;
+  CYC(b_+83, b_+86); W8(wCutsceneTrigger) = A;
+  CYC(b_+86, b_+89); A = W8(wActiveRoom);
+  CYC(b_+89, b_+92); W8(wGenericCutscene_cbbb) = A;
+  CYC(b_+92, b_+95); A = W8(wActiveTilePos);
+  CYC(b_+95, b_+98); W8(wGenericCutscene_cbbc) = A;
+  CYC(b_+98, b_+100); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+100, b_+101); A = mem_rd(gb, DE);
+  CYC(b_+101, b_+104); W8(wGenericCutscene_cbbd) = A;
+  CALL_C(b_+104, fadeoutToWhite_hook, SYM(fadeoutToWhite), b_+107);
+  CYC(b_+107, SYM(interactionCodebf)); interactionDelete_hook(gb); return; // jp
 }

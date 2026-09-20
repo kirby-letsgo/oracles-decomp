@@ -3,11 +3,12 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x09, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x09, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode65), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode65), (from), (to), true)
 
 static void comedian_add_double_index(GB *gb, uint16_t ra) {
-  CYC(0x7542, 0x7543); push_effect(gb, ra);
+  BASE(interactionCode65);
+  CYC(b_+60, b_+61); push_effect(gb, ra);
   burn_rom(gb, 0x00, 0x0018, 0x0019, false); push_effect(gb, BC);
   burn_rom(gb, 0x00, 0x0019, 0x001a, false); C = A;
   burn_rom(gb, 0x00, 0x001a, 0x001c, false); B = 0;
@@ -18,27 +19,29 @@ static void comedian_add_double_index(GB *gb, uint16_t ra) {
 }
 
 void interactionCode65__loadScriptAndInitGraphics_hook(GB *gb) {
+  BASE(interactionCode65);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7531, interactionInitGraphics_hook, 0x15fb, 0x7534);
-  CALL_C(0x7534, objectMarkSolidPosition_hook, 0x24f0, 0x7537);
-  CYC(0x7537, 0x7539); A = 0x0b;
-  CALL_C(0x7539, interactionSetHighTextIndex_hook, 0x253b, 0x753c);
-  CYC(0x753c, 0x753e); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x753e, 0x753f); A = mem_rd(gb, DE);
-  CYC(0x753f, 0x7542); SET_HL(0x754c);
-  comedian_add_double_index(gb, 0x7543);
-  CYC(0x7543, 0x7544); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x7544, 0x7545); H = mem_rd(gb, HL);
-  CYC(0x7545, 0x7546); L = A;
-  CALL_C(0x7546, interactionSetScript_hook, 0x2544, 0x7549);
-  CYC(0x7549, 0x754c); interactionIncState_hook(gb);
+  CALL_C(b_+43, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+46);
+  CALL_C(b_+46, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+49);
+  CYC(b_+49, b_+51); A = 0x0b;
+  CALL_C(b_+51, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+54);
+  CYC(b_+54, b_+56); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+56, b_+57); A = mem_rd(gb, DE);
+  CYC(b_+57, b_+60); SET_HL(b_+70);
+  comedian_add_double_index(gb, b_+61);
+  CYC(b_+61, b_+62); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+62, b_+63); H = mem_rd(gb, HL);
+  CYC(b_+63, b_+64); L = A;
+  CALL_C(b_+64, interactionSetScript_hook, SYM(interactionSetScript), b_+67);
+  CYC(b_+67, b_+70); interactionIncState_hook(gb);
 }
 
 void comedian_run_state0_after_load_hook(GB *gb) {
+  BASE(interactionCode65);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x750e, interactionRunScript_hook, 0x2552, 0x7511);
-  CALL_C(0x7511, interactionRunScript_hook, 0x2552, 0x7514);
-  CYC(0x7514, 0x7517); interactionAnimateAsNpc_hook(gb);
+  CALL_C(b_+8, interactionRunScript_hook, SYM(interactionRunScript), b_+11);
+  CALL_C(b_+11, interactionRunScript_hook, SYM(interactionRunScript), b_+14);
+  CYC(b_+14, b_+17); interactionAnimateAsNpc_hook(gb);
 }
 
 void interactionCode65__afterCall750e_hook(GB *gb) {
@@ -46,27 +49,28 @@ void interactionCode65__afterCall750e_hook(GB *gb) {
 }
 
 void interactionCode65_hook(GB *gb) {
+  BASE(interactionCode65);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7506, checkInteractionState_hook, 0x23fe, 0x7509);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
   if (!(F & FZ)) {
-    CYCT(0x7509, 0x750b);
+    CYCT(b_+3, b_+5);
     goto state1;
   }
-  CYC(0x7509, 0x750b);
-  CALL_C(0x750b, interactionCode65__loadScriptAndInitGraphics_hook, 0x7531, 0x750e);
+  CYC(b_+3, b_+5);
+  CALL_C(b_+5, interactionCode65__loadScriptAndInitGraphics_hook, b_+43, b_+8);
   comedian_run_state0_after_load_hook(gb);
   return;
 
 state1:
-  CALL_C(0x7517, interactionRunScript_hook, 0x2552, 0x751a);
+  CALL_C(b_+17, interactionRunScript_hook, SYM(interactionRunScript), b_+20);
   if (F & FC) {
-    CYCT(0x751a, 0x751d);
+    CYCT(b_+20, b_+23);
     interactionDelete_hook(gb);
     return;
   }
-  CYC(0x751a, 0x751d);
-  CYC(0x751d, 0x7520); SET_HL(0x6289);
-  CYC(0x7520, 0x7522); E = 0x15;
-  CALL_C(0x7522, interBankCall_hook, 0x008a, 0x7525);
-  CYC(0x7525, 0x7528); interactionAnimateAsNpc_hook(gb);
+  CYC(b_+20, b_+23);
+  CYC(b_+23, b_+26); SET_HL((SYM(ambi_runSubid03__substate0) + 15));
+  CYC(b_+26, b_+28); E = 0x15;
+  CALL_C(b_+28, interBankCall_hook, 0x008a, b_+31);
+  CYC(b_+31, b_+34); interactionAnimateAsNpc_hook(gb);
 }

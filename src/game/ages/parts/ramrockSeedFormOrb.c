@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode4f), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode4f), (from), (to), true)
 
 static uint16_t ramrockSeedFormOrb_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -26,63 +26,64 @@ static uint16_t ramrockSeedFormOrb_jump_table(GB *gb) {
 
 // PART_RAMROCK_SEED_FORM_ORB
 void partCode4f_hook(GB *gb) {
+  BASE(partCode4f);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7a5f, 0x7a61); E = 0xc4; // Part.state
-  CYC(0x7a61, 0x7a62); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = 0xc4; // Part.state
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x7a62, 0x7a63); push_effect(gb, 0x7a63);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = ramrockSeedFormOrb_jump_table(gb);
-    if (target == 0x7a78) goto state1;
-    if (target == 0x7a99) goto state2;
+    if (target == b_+25) goto state1;
+    if (target == b_+58) goto state2;
     goto state0;
   }
 
 state0:
-  CYC(0x7a69, 0x7a6b); A = 0x01;
-  CYC(0x7a6b, 0x7a6c); mem_wr(gb, DE, A); // Part.state
-  CYC(0x7a6c, 0x7a6d); A = alu_inc8(gb, A);
-  CALL_C(0x7a6d, partSetAnimation_hook, 0x2988, 0x7a70);
-  CYC(0x7a70, 0x7a72); E = 0xc6; // Part.counter1
-  CYC(0x7a72, 0x7a74); A = 0x28;
-  CYC(0x7a74, 0x7a75); mem_wr(gb, DE, A);
-  CYC(0x7a75, 0x7a78); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+10, b_+12); A = 0x01;
+  CYC(b_+12, b_+13); mem_wr(gb, DE, A); // Part.state
+  CYC(b_+13, b_+14); A = alu_inc8(gb, A);
+  CALL_C(b_+14, partSetAnimation_hook, SYM(partSetAnimation), b_+17);
+  CYC(b_+17, b_+19); E = 0xc6; // Part.counter1
+  CYC(b_+19, b_+21); A = 0x28;
+  CYC(b_+21, b_+22); mem_wr(gb, DE, A);
+  CYC(b_+22, b_+25); objectSetVisible80_hook(gb); return; // jp
 
 state1:
-  CALL_C(0x7a78, partAnimate_hook, 0x2978, 0x7a7b);
-  CYC(0x7a7b, 0x7a7d); A = 0x02; // Object.state
-  CALL_C(0x7a7d, objectGetRelatedObject1Var_hook, 0x2160, 0x7a80);
-  CYC(0x7a80, 0x7a81); A = mem_rd(gb, HL);
-  CYC(0x7a81, 0x7a83); alu_cp(gb, 0x0f);
-  if (!(F & FZ)) { CYCT(0x7a83, 0x7a85); goto delete; } // jr nz
-  CYC(0x7a83, 0x7a85);
-  CALL_C(0x7a85, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x7a88);
-  if (!(F & FZ)) { RET_TAKEN(0x7a88); return; } // ret nz
-  CYC(0x7a88, 0x7a89);
-  CALL_C(0x7a89, objectGetAngleTowardLink_hook, 0x1e9c, 0x7a8c);
-  CYC(0x7a8c, 0x7a8e); E = 0xc9; // Part.angle
-  CYC(0x7a8e, 0x7a8f); mem_wr(gb, DE, A);
-  CYC(0x7a8f, 0x7a91); A = 0x50;
-  CYC(0x7a91, 0x7a93); E = 0xd0; // Part.speed
-  CYC(0x7a93, 0x7a94); mem_wr(gb, DE, A);
-  CYC(0x7a94, 0x7a96); E = 0xc4; // Part.state
-  CYC(0x7a96, 0x7a98); A = 0x02;
-  CYC(0x7a98, 0x7a99); mem_wr(gb, DE, A);
+  CALL_C(b_+25, partAnimate_hook, SYM(partAnimate), b_+28);
+  CYC(b_+28, b_+30); A = 0x02; // Object.state
+  CALL_C(b_+30, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+33);
+  CYC(b_+33, b_+34); A = mem_rd(gb, HL);
+  CYC(b_+34, b_+36); alu_cp(gb, 0x0f);
+  if (!(F & FZ)) { CYCT(b_+36, b_+38); goto delete; } // jr nz
+  CYC(b_+36, b_+38);
+  CALL_C(b_+38, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+41);
+  if (!(F & FZ)) { RET_TAKEN(b_+41); return; } // ret nz
+  CYC(b_+41, b_+42);
+  CALL_C(b_+42, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+45);
+  CYC(b_+45, b_+47); E = 0xc9; // Part.angle
+  CYC(b_+47, b_+48); mem_wr(gb, DE, A);
+  CYC(b_+48, b_+50); A = 0x50;
+  CYC(b_+50, b_+52); E = 0xd0; // Part.speed
+  CYC(b_+52, b_+53); mem_wr(gb, DE, A);
+  CYC(b_+53, b_+55); E = 0xc4; // Part.state
+  CYC(b_+55, b_+57); A = 0x02;
+  CYC(b_+57, b_+58); mem_wr(gb, DE, A);
 
 state2:
-  CALL_C(0x7a99, partAnimate_hook, 0x2978, 0x7a9c);
-  CALL_C(0x7a9c, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x7a9f);
-  if (!(F & FZ)) { CYCT(0x7a9f, 0x7aa1); goto func_7aa9; } // jr nz
-  CYC(0x7a9f, 0x7aa1);
-  CYC(0x7aa1, 0x7aa3); mem_wr(gb, HL, 0x0a);
-  CALL_C(0x7aa3, objectGetAngleTowardLink_hook, 0x1e9c, 0x7aa6);
-  CYC(0x7aa6, 0x7aa9); objectNudgeAngleTowards_hook(gb); return; // jp
+  CALL_C(b_+58, partAnimate_hook, SYM(partAnimate), b_+61);
+  CALL_C(b_+61, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+64);
+  if (!(F & FZ)) { CYCT(b_+64, b_+66); goto func_7aa9; } // jr nz
+  CYC(b_+64, b_+66);
+  CYC(b_+66, b_+68); mem_wr(gb, HL, 0x0a);
+  CALL_C(b_+68, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+71);
+  CYC(b_+71, b_+74); objectNudgeAngleTowards_hook(gb); return; // jp
 
 func_7aa9:
-  CALL_C(0x7aa9, objectApplySpeed_hook, 0x201d, 0x7aac);
-  CALL_C(0x7aac, objectCheckWithinScreenBoundary_hook, 0x2184, 0x7aaf);
-  if (F & FC) { RET_TAKEN(0x7aaf); return; } // ret c
-  CYC(0x7aaf, 0x7ab0);
+  CALL_C(b_+74, objectApplySpeed_hook, SYM(objectApplySpeed), b_+77);
+  CALL_C(b_+77, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+80);
+  if (F & FC) { RET_TAKEN(b_+80); return; } // ret c
+  CYC(b_+80, b_+81);
 
 delete:
-  CYC(0x7ab0, 0x7ab3); partDelete_hook(gb); return; // jp
+  CYC(b_+81, SYM(partCode54)); partDelete_hook(gb); return; // jp
 }

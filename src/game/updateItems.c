@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x07, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x07, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(updateItems), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(updateItems), (from), (to), true)
 
 static uint16_t item_post_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -33,101 +33,106 @@ static uint16_t item_jump_table(GB *gb) {
 }
 
 static void update_item_hook(GB *gb) {
-  CYC(0x48be, 0x48c0); E = 0x01;
-  CYC(0x48c0, 0x48c1); A = mem_rd(gb, DE);
-  CYC(0x48c1, 0x48c2); push_effect(gb, 0x48c2);
+  BASE(updateItems);
+  CYC(b_+76, b_+78); E = 0x01;
+  CYC(b_+78, b_+79); A = mem_rd(gb, DE);
+  CYC(b_+79, b_+80); push_effect(gb, b_+80);
   hook_handoff(gb, item_jump_table(gb));
 }
 
 void updateItems_hook(GB *gb) {
+  BASE(updateItems);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x4872, 0x4874); B = 0;
-  CYC(0x4874, 0x4877); A = mem_rd(gb, 0xcd00);
-  CYC(0x4877, 0x4879); alu_cp(gb, 0x08);
-  if (F & FZ) { CYCT(0x4879, 0x487b); goto dont_update; }
-  CYC(0x4879, 0x487b);
-  CYC(0x487b, 0x487e); A = mem_rd(gb, 0xcc8a);
-  CYC(0x487e, 0x4880); alu_and(gb, 0x90);
-  if (!(F & FZ)) { CYCT(0x4880, 0x4882); goto dont_update; }
-  CYC(0x4880, 0x4882);
-  CYC(0x4882, 0x4885); A = mem_rd(gb, 0xc4ab);
-  CYC(0x4885, 0x4886); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x4886, 0x4888); goto dont_update; }
-  CYC(0x4886, 0x4888);
-  CYC(0x4888, 0x488b); A = mem_rd(gb, 0xcba0);
-  CYC(0x488b, 0x488c); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x488c, 0x488e); goto setup; }
-  CYC(0x488c, 0x488e);
+  CYC(b_+0, b_+2); B = 0;
+  CYC(b_+2, b_+5); A = mem_rd(gb, wScreenVariables);
+  CYC(b_+5, b_+7); alu_cp(gb, 0x08);
+  if (F & FZ) { CYCT(b_+7, b_+9); goto dont_update; }
+  CYC(b_+7, b_+9);
+  CYC(b_+9, b_+12); A = mem_rd(gb, wDisabledObjects);
+  CYC(b_+12, b_+14); alu_and(gb, 0x90);
+  if (!(F & FZ)) { CYCT(b_+14, b_+16); goto dont_update; }
+  CYC(b_+14, b_+16);
+  CYC(b_+16, b_+19); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(b_+19, b_+20); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+20, b_+22); goto dont_update; }
+  CYC(b_+20, b_+22);
+  CYC(b_+22, b_+25); A = mem_rd(gb, wOamEnd);
+  CYC(b_+25, b_+26); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+26, b_+28); goto setup; }
+  CYC(b_+26, b_+28);
 dont_update:
-  CYC(0x488e, 0x488f); B = alu_inc8(gb, B);
+  CYC(b_+28, b_+29); B = alu_inc8(gb, B);
 setup:
-  CYC(0x488f, 0x4892); SET_HL(0xcc8b);
-  CYC(0x4892, 0x4893); A = mem_rd(gb, HL);
-  CYC(0x4893, 0x4895); alu_and(gb, 0xfe);
-  CYC(0x4895, 0x4896); alu_or(gb, B);
-  CYC(0x4896, 0x4897); mem_wr(gb, HL, A);
-  CYC(0x4897, 0x4898); alu_xor(gb, A);
-  CYC(0x4898, 0x489b); mem_wr(gb, 0xccd9, A);
-  CYC(0x489b, 0x489d); A = 0;
-  CYC(0x489d, 0x489f); H8(hActiveObjectType) = A;
-  CYC(0x489f, 0x48a1); D = 0xd6;
-  CYC(0x48a1, 0x48a2); A = D;
+  CYC(b_+29, b_+32); SET_HL(wcc8b);
+  CYC(b_+32, b_+33); A = mem_rd(gb, HL);
+  CYC(b_+33, b_+35); alu_and(gb, 0xfe);
+  CYC(b_+35, b_+36); alu_or(gb, B);
+  CYC(b_+36, b_+37); mem_wr(gb, HL, A);
+  CYC(b_+37, b_+38); alu_xor(gb, A);
+  CYC(b_+38, b_+41); mem_wr(gb, wScentSeedActive, A);
+  CYC(b_+41, b_+43); A = 0;
+  CYC(b_+43, b_+45); H8(hActiveObjectType) = A;
+  CYC(b_+45, b_+47); D = 0xd6;
+  CYC(b_+47, b_+48); A = D;
 loop:
-  CYC(0x48a2, 0x48a4); H8(hActiveObject) = A;
-  CYC(0x48a4, 0x48a6); E = 0;
-  CYC(0x48a6, 0x48a7); A = mem_rd(gb, DE);
-  CYC(0x48a7, 0x48a8); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x48a8, 0x48aa); goto next; }
-  CYC(0x48a8, 0x48aa);
-  CYC(0x48aa, 0x48ac); E = 0x04;
-  CYC(0x48ac, 0x48ad); A = mem_rd(gb, DE);
-  CYC(0x48ad, 0x48ae); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x48ae, 0x48b0); goto update; }
-  CYC(0x48ae, 0x48b0);
-  CYC(0x48b0, 0x48b3); A = mem_rd(gb, 0xcc8b);
-  CYC(0x48b3, 0x48b4); alu_or(gb, A);
+  CYC(b_+48, b_+50); H8(hActiveObject) = A;
+  CYC(b_+50, b_+52); E = 0;
+  CYC(b_+52, b_+53); A = mem_rd(gb, DE);
+  CYC(b_+53, b_+54); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+54, b_+56); goto next; }
+  CYC(b_+54, b_+56);
+  CYC(b_+56, b_+58); E = 0x04;
+  CYC(b_+58, b_+59); A = mem_rd(gb, DE);
+  CYC(b_+59, b_+60); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+60, b_+62); goto update; }
+  CYC(b_+60, b_+62);
+  CYC(b_+62, b_+65); A = mem_rd(gb, wcc8b);
+  CYC(b_+65, b_+66); alu_or(gb, A);
 update:
-  if (F & FZ) CALL_C_CC(0x48b4, update_item_hook, 0x48be, 0x48b7);
-  else CYC(0x48b4, 0x48b7);
+  if (F & FZ) CALL_C_CC(b_+66, update_item_hook, b_+76, b_+69);
+  else CYC(b_+66, b_+69);
 next:
-  CYC(0x48b7, 0x48b8); D = alu_inc8(gb, D);
-  CYC(0x48b8, 0x48b9); A = D;
-  CYC(0x48b9, 0x48bb); alu_cp(gb, 0xe0);
-  if (F & FC) { CYCT(0x48bb, 0x48bd); goto loop; }
-  CYC(0x48bb, 0x48bd);
-  CYC(0x48bd, 0x48be);
+  CYC(b_+69, b_+70); D = alu_inc8(gb, D);
+  CYC(b_+70, b_+71); A = D;
+  CYC(b_+71, b_+73); alu_cp(gb, 0xe0);
+  if (F & FC) { CYCT(b_+73, b_+75); goto loop; }
+  CYC(b_+73, b_+75);
+  CYC(b_+75, b_+76);
   ret_effect(gb);
 }
 
 void itemCodeNilPost_hook(GB *gb) {
-  CYC(0x492f, 0x4930);
+  BASE(itemCodeNilPost);
+  CYC(b_+0, SYM(updateItemPost));
   ret_effect(gb);
 }
 
 void updateItemPost_hook(GB *gb) {
-  CYC(0x4930, 0x4932); E = 0x01;
-  CYC(0x4932, 0x4933); A = mem_rd(gb, DE);
-  CYC(0x4933, 0x4934); push_effect(gb, 0x4934);
+  BASE(updateItemPost);
+  CYC(b_+0, b_+2); E = 0x01;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
   hook_handoff(gb, item_post_jump_table(gb));
 }
 
 void updateItemsPost_hook(GB *gb) {
+  BASE(updateItemsPost);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x491a, 0x491b); alu_xor(gb, A);
-  CYC(0x491b, 0x491d); H8(hActiveObjectType) = A;
-  CYC(0x491d, 0x491f); D = 0xd6;
-  CYC(0x491f, 0x4920); A = D;
+  CYC(b_+0, b_+1); alu_xor(gb, A);
+  CYC(b_+1, b_+3); H8(hActiveObjectType) = A;
+  CYC(b_+3, b_+5); D = 0xd6;
+  CYC(b_+5, b_+6); A = D;
 loop:
-  CYC(0x4920, 0x4922); H8(hActiveObject) = A;
-  CYC(0x4922, 0x4924); E = 0;
-  CYC(0x4924, 0x4925); A = mem_rd(gb, DE);
-  CYC(0x4925, 0x4926); alu_or(gb, A);
-  if (!(F & FZ)) CALL_C_CC(0x4926, updateItemPost_hook, 0x4930, 0x4929);
-  else CYC(0x4926, 0x4929);
-  CYC(0x4929, 0x492a); D = alu_inc8(gb, D);
-  CYC(0x492a, 0x492b); A = D;
-  CYC(0x492b, 0x492d); alu_cp(gb, 0xe0);
-  if (F & FC) { CYCT(0x492d, 0x492f); goto loop; }
-  CYC(0x492d, 0x492f);
+  CYC(b_+6, b_+8); H8(hActiveObject) = A;
+  CYC(b_+8, b_+10); E = 0;
+  CYC(b_+10, b_+11); A = mem_rd(gb, DE);
+  CYC(b_+11, b_+12); alu_or(gb, A);
+  if (!(F & FZ)) CALL_C_CC(b_+12, updateItemPost_hook, SYM(updateItemPost), b_+15);
+  else CYC(b_+12, b_+15);
+  CYC(b_+15, b_+16); D = alu_inc8(gb, D);
+  CYC(b_+16, b_+17); A = D;
+  CYC(b_+17, b_+19); alu_cp(gb, 0xe0);
+  if (F & FC) { CYCT(b_+19, SYM(itemCodeNilPost)); goto loop; }
+  CYC(b_+19, SYM(itemCodeNilPost));
   itemCodeNilPost_hook(gb);
 }

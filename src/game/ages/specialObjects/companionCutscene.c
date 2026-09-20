@@ -3,11 +3,11 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x06, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x06, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(rickyCutsceneJump), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(rickyCutsceneJump), (from), (to), true)
 
-#define dimitriCutsceneData_bank06 0x6f4b
-#define mapleCutsceneData_bank06 0x7015
+#define dimitriCutsceneData_bank06 SYM(specialObjectCode_dimitriCutscene__substate0__data)
+#define mapleCutsceneData_bank06 SYM(specialObjectCode_mapleCutscene__initPositionSpeedAnimation__data)
 
 static uint16_t companion_cutscene_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -57,680 +57,690 @@ void specialObjectCode_dimitriCutscene_hook(GB *gb);
 void specialObjectCode_mapleCutscene_hook(GB *gb);
 
 void rickyCutsceneJump_hook(GB *gb) {
+  BASE(rickyCutsceneJump);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6d10, 0x6d13); SET_BC(0xfe00);
-  CALL_C(0x6d13, objectSetSpeedZ_hook, 0x239d, 0x6d16);
-  CYC(0x6d16, 0x6d18); A = 0x02;
-  CYC(0x6d18, 0x6d1b); specialObjectSetAnimation_hook(gb);
+  CYC(b_+0, b_+3); SET_BC(0xfe00);
+  CALL_C(b_+3, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+6);
+  CYC(b_+6, b_+8); A = 0x02;
+  CYC(b_+8, SYM(companionCutsceneInitOam)); specialObjectSetAnimation_hook(gb);
 }
 
 void companionCutsceneInitOam_hook(GB *gb) {
+  BASE(companionCutsceneInitOam);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6d1b, 0x6d1d); A = 0x01;
-  CYC(0x6d1d, 0x6d1e); mem_wr(gb, DE, A);
-  CYC(0x6d1e, 0x6d21); SET_HL(0x41f7);
-  CYC(0x6d21, 0x6d23); E = 0x05;
-  CALL_C(0x6d23, interBankCall_hook, 0x008a, 0x6d26);
-  CYC(0x6d26, 0x6d29); objectSetVisiblec0_hook(gb);
+  CYC(b_+0, b_+2); A = 0x01;
+  CYC(b_+2, b_+3); mem_wr(gb, DE, A);
+  CYC(b_+3, b_+6); SET_HL((SYM(nextToKeyDoor) + 49));
+  CYC(b_+6, b_+8); E = 0x05;
+  CALL_C(b_+8, interBankCall_hook, 0x008a, b_+11);
+  CYC(b_+11, SYM(rickyCutscene_state1)); objectSetVisiblec0_hook(gb);
 }
 
 void companionCutsceneFunc_7081_hook(GB *gb) {
+  BASE(companionCutsceneFunc_7081);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7081, 0x7083); alu_sub(gb, 0x04);
-  CYC(0x7083, 0x7085); alu_and(gb, 0x07);
-  if (!(F & FZ)) { CYCT(0x7085, 0x7086); ret_effect(gb); return; }
-  CYC(0x7085, 0x7086);
-  CYC(0x7086, 0x7088); E = 0x09;
-  CALL_C(0x7088, convertAngleDeToDirection_hook, 0x26f8, 0x708b);
-  CYC(0x708b, 0x708c); A = alu_dec8(gb, A);
-  CYC(0x708c, 0x708e); alu_and(gb, 0x03);
-  CYC(0x708e, 0x708f); H = D;
-  CYC(0x708f, 0x7091); L = 0x08;
-  CYC(0x7091, 0x7092); mem_wr(gb, HL, A);
-  CYC(0x7092, 0x7094); L = 0x36;
-  CYC(0x7094, 0x7095); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x7095, 0x7098); specialObjectSetAnimation_hook(gb);
+  CYC(b_+0, b_+2); alu_sub(gb, 0x04);
+  CYC(b_+2, b_+4); alu_and(gb, 0x07);
+  if (!(F & FZ)) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
+  CYC(b_+4, b_+5);
+  CYC(b_+5, b_+7); E = 0x09;
+  CALL_C(b_+7, convertAngleDeToDirection_hook, SYM(convertAngleDeToDirection), b_+10);
+  CYC(b_+10, b_+11); A = alu_dec8(gb, A);
+  CYC(b_+11, b_+13); alu_and(gb, 0x03);
+  CYC(b_+13, b_+14); H = D;
+  CYC(b_+14, b_+16); L = 0x08;
+  CYC(b_+16, b_+17); mem_wr(gb, HL, A);
+  CYC(b_+17, b_+19); L = 0x36;
+  CYC(b_+19, b_+20); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+20, SYM(companionCutsceneDecAngle)); specialObjectSetAnimation_hook(gb);
 }
 
 void companionCutsceneDecAngle_hook(GB *gb) {
-  CYC(0x7098, 0x709a); E = 0x09;
-  CYC(0x709a, 0x709b); A = mem_rd(gb, DE);
-  CYC(0x709b, 0x709c); A = alu_dec8(gb, A);
-  CYC(0x709c, 0x709e); alu_and(gb, 0x1f);
-  CYC(0x709e, 0x709f); mem_wr(gb, DE, A);
-  CYC(0x709f, 0x70a0); ret_effect(gb);
+  BASE(companionCutsceneDecAngle);
+  CYC(b_+0, b_+2); E = 0x09;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); A = alu_dec8(gb, A);
+  CYC(b_+4, b_+6); alu_and(gb, 0x1f);
+  CYC(b_+6, b_+7); mem_wr(gb, DE, A);
+  CYC(b_+7, SYM(specialObjectCode_linkInCutscene_b06)); ret_effect(gb);
 }
 
 void specialObjectCode_companionCutscene_b06_hook(GB *gb) {
+  BASE(specialObjectCode_companionCutscene_b06);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6cec, 0x6cef); SET_HL(w1Companion_id);
-  CYC(0x6cef, 0x6cf0); A = mem_rd(gb, HL);
-  CYC(0x6cf0, 0x6cf2); alu_sub(gb, 0x0f);
-  CYC(0x6cf2, 0x6cf3); push_effect(gb, 0x6cf3);
-  switch (companion_cutscene_jump_table(gb)) {
-    case 0x6cfb: specialObjectCode_rickyCutscene_hook(gb); return;
-    case 0x6efa: specialObjectCode_dimitriCutscene_hook(gb); return;
-    case 0x6e54: specialObjectCode_mooshCutscene_hook(gb); return;
-    case 0x6fe4: specialObjectCode_mapleCutscene_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+3); SET_HL(w1Companion_id);
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
+  CYC(b_+4, b_+6); alu_sub(gb, 0x0f);
+  CYC(b_+6, b_+7); push_effect(gb, b_+7);
+  do { uint16_t jt_ = (companion_cutscene_jump_table(gb));
+    if (jt_ == SYM(specialObjectCode_rickyCutscene)) { specialObjectCode_rickyCutscene_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_dimitriCutscene)) { specialObjectCode_dimitriCutscene_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_mooshCutscene)) { specialObjectCode_mooshCutscene_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_mapleCutscene)) { specialObjectCode_mapleCutscene_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void specialObjectCode_rickyCutscene_hook(GB *gb) {
+  BASE(specialObjectCode_rickyCutscene);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6cfb, 0x6cfd); E = 0x04;
-  CYC(0x6cfd, 0x6cfe); A = mem_rd(gb, DE);
-  CYC(0x6cfe, 0x6cff); A = mem_rd(gb, DE);
-  CYC(0x6cff, 0x6d00); push_effect(gb, 0x6d00);
-  switch (companion_cutscene_jump_table(gb)) {
-    case 0x6d04: break;
-    case 0x6d29: rickyCutscene_state1_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
-  CALL_C(0x6d04, companionCutsceneInitOam_hook, 0x6d1b, 0x6d07);
-  CYC(0x6d07, 0x6d08); H = D;
-  CYC(0x6d08, 0x6d0a); L = 0x10;
-  CYC(0x6d0a, 0x6d0c); mem_wr(gb, HL, 0x50);
-  CYC(0x6d0c, 0x6d0e); L = 0x09;
-  CYC(0x6d0e, 0x6d10); mem_wr(gb, HL, 0x08);
+  CYC(b_+0, b_+2); E = 0x04;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); A = mem_rd(gb, DE);
+  CYC(b_+4, b_+5); push_effect(gb, b_+5);
+  do { uint16_t jt_ = (companion_cutscene_jump_table(gb));
+    if (jt_ == b_+9) { break; }
+    else if (jt_ == SYM(rickyCutscene_state1)) { rickyCutscene_state1_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
+  CALL_C(b_+9, companionCutsceneInitOam_hook, SYM(companionCutsceneInitOam), b_+12);
+  CYC(b_+12, b_+13); H = D;
+  CYC(b_+13, b_+15); L = 0x10;
+  CYC(b_+15, b_+17); mem_wr(gb, HL, 0x50);
+  CYC(b_+17, b_+19); L = 0x09;
+  CYC(b_+19, SYM(rickyCutsceneJump)); mem_wr(gb, HL, 0x08);
   rickyCutsceneJump_hook(gb);
 }
 
 void rickyCutscene_state1_hook(GB *gb) {
+  BASE(rickyCutscene_state1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6d29, 0x6d2b); E = 0x02;
-  CYC(0x6d2b, 0x6d2c); A = mem_rd(gb, DE);
-  CYC(0x6d2c, 0x6d2d); push_effect(gb, 0x6d2d);
-  switch (companion_cutscene_jump_table(gb)) {
-    case 0x6d31: CYC(0x6d31, 0x6d32); ret_effect(gb); return;
-    case 0x6d32: break;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
-  CYC(0x6d32, 0x6d34); E = 0x05;
-  CYC(0x6d34, 0x6d35); A = mem_rd(gb, DE);
-  CYC(0x6d35, 0x6d36); push_effect(gb, 0x6d36);
-  switch (companion_cutscene_jump_table(gb)) {
-    case 0x6d4c: goto substate0;
-    case 0x6d4f: goto substate1;
-    case 0x6d82: goto substate2;
-    case 0x6d8c: goto substate3;
-    case 0x6d9c: goto substate4;
-    case 0x6dc4: goto substate5;
-    case 0x6dd4: goto substate6;
-    case 0x6dfe: goto substate7;
-    case 0x6e13: goto substate8;
-    case 0x6e29: goto substate9;
-    case 0x6e4a: goto substate_a;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x02;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (companion_cutscene_jump_table(gb));
+    if (jt_ == b_+8) { CYC(b_+8, b_+9); ret_effect(gb); return; }
+    else if (jt_ == b_+9) { break; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
+  CYC(b_+9, b_+11); E = 0x05;
+  CYC(b_+11, b_+12); A = mem_rd(gb, DE);
+  CYC(b_+12, b_+13); push_effect(gb, b_+13);
+  do { uint16_t jt_ = (companion_cutscene_jump_table(gb));
+    if (jt_ == b_+35) { goto substate0; }
+    else if (jt_ == b_+38) { goto substate1; }
+    else if (jt_ == b_+89) { goto substate2; }
+    else if (jt_ == b_+99) { goto substate3; }
+    else if (jt_ == b_+115) { goto substate4; }
+    else if (jt_ == b_+155) { goto substate5; }
+    else if (jt_ == b_+171) { goto substate6; }
+    else if (jt_ == b_+213) { goto substate7; }
+    else if (jt_ == b_+234) { goto substate8; }
+    else if (jt_ == b_+256) { goto substate9; }
+    else if (jt_ == b_+289) { goto substate_a; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 substate0:
-  CYC(0x6d4c, 0x6d4e); L = 0x05;
-  CYC(0x6d4e, 0x6d4f); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+35, b_+37); L = 0x05;
+  CYC(b_+37, b_+38); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
 
 substate1:
-  CALL_C(0x6d4f, objectApplySpeed_hook, 0x201d, 0x6d52);
-  CYC(0x6d52, 0x6d54); E = 0x0d;
-  CYC(0x6d54, 0x6d55); A = mem_rd(gb, DE);
-  CYC(0x6d55, 0x6d57); alu_bit(gb, 7, A);
-  if (!(F & FZ)) { CYCT(0x6d57, 0x6d59); goto update_z; }
-  CYC(0x6d57, 0x6d59);
-  CYC(0x6d59, 0x6d5c); SET_HL(w1Link_xh);
-  CYC(0x6d5c, 0x6d5d); B = mem_rd(gb, HL);
-  CYC(0x6d5d, 0x6d5f); alu_add(gb, 0x18);
-  CYC(0x6d5f, 0x6d60); alu_cp(gb, B);
-  if (F & FC) { CYCT(0x6d60, 0x6d62); goto update_z; }
-  CYC(0x6d60, 0x6d62);
-  CALL_C(0x6d62, itemIncSubstate_hook, 0x23ef, 0x6d65);
-  CYC(0x6d65, 0x6d66); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6d66, 0x6d68); L = 0x0e;
-  CYC(0x6d68, 0x6d69); alu_xor(gb, A);
-  CYC(0x6d69, 0x6d6a); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x6d6a, 0x6d6b); mem_wr(gb, HL, A);
-  CYC(0x6d6b, 0x6d6d); L = 0x06;
-  CYC(0x6d6d, 0x6d6f); mem_wr(gb, HL, 0x3c);
-  CYC(0x6d6f, 0x6d72); specialObjectAnimate_hook(gb); return;
+  CALL_C(b_+38, objectApplySpeed_hook, SYM(objectApplySpeed), b_+41);
+  CYC(b_+41, b_+43); E = 0x0d;
+  CYC(b_+43, b_+44); A = mem_rd(gb, DE);
+  CYC(b_+44, b_+46); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(b_+46, b_+48); goto update_z; }
+  CYC(b_+46, b_+48);
+  CYC(b_+48, b_+51); SET_HL(w1Link_xh);
+  CYC(b_+51, b_+52); B = mem_rd(gb, HL);
+  CYC(b_+52, b_+54); alu_add(gb, 0x18);
+  CYC(b_+54, b_+55); alu_cp(gb, B);
+  if (F & FC) { CYCT(b_+55, b_+57); goto update_z; }
+  CYC(b_+55, b_+57);
+  CALL_C(b_+57, itemIncSubstate_hook, SYM(itemIncSubstate), b_+60);
+  CYC(b_+60, b_+61); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+61, b_+63); L = 0x0e;
+  CYC(b_+63, b_+64); alu_xor(gb, A);
+  CYC(b_+64, b_+65); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+65, b_+66); mem_wr(gb, HL, A);
+  CYC(b_+66, b_+68); L = 0x06;
+  CYC(b_+68, b_+70); mem_wr(gb, HL, 0x3c);
+  CYC(b_+70, b_+73); specialObjectAnimate_hook(gb); return;
 
 update_z:
-  CYC(0x6d72, 0x6d74); C = 0x40;
-  CALL_C(0x6d74, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x6d77);
-  if (!(F & FZ)) { CYCT(0x6d77, 0x6d78); ret_effect(gb); return; }
-  CYC(0x6d77, 0x6d78);
-  CALL_C(0x6d78, itemIncSubstate_hook, 0x23ef, 0x6d7b);
-  CYC(0x6d7b, 0x6d7d); L = 0x06;
-  CYC(0x6d7d, 0x6d7f); mem_wr(gb, HL, 0x08);
-  CYC(0x6d7f, 0x6d82); specialObjectAnimate_hook(gb); return;
+  CYC(b_+73, b_+75); C = 0x40;
+  CALL_C(b_+75, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+78);
+  if (!(F & FZ)) { CYCT(b_+78, b_+79); ret_effect(gb); return; }
+  CYC(b_+78, b_+79);
+  CALL_C(b_+79, itemIncSubstate_hook, SYM(itemIncSubstate), b_+82);
+  CYC(b_+82, b_+84); L = 0x06;
+  CYC(b_+84, b_+86); mem_wr(gb, HL, 0x08);
+  CYC(b_+86, b_+89); specialObjectAnimate_hook(gb); return;
 
 substate2:
-  CALL_C(0x6d82, itemDecCounter1_hook, 0x23d6, 0x6d85);
-  if (!(F & FZ)) { CYCT(0x6d85, 0x6d86); ret_effect(gb); return; }
-  CYC(0x6d85, 0x6d86);
-  CYC(0x6d86, 0x6d88); L = 0x05;
-  CYC(0x6d88, 0x6d89); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x6d89, 0x6d8c); rickyCutsceneJump_hook(gb); return;
+  CALL_C(b_+89, itemDecCounter1_hook, SYM(itemDecCounter1), b_+92);
+  if (!(F & FZ)) { CYCT(b_+92, b_+93); ret_effect(gb); return; }
+  CYC(b_+92, b_+93);
+  CYC(b_+93, b_+95); L = 0x05;
+  CYC(b_+95, b_+96); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+96, b_+99); rickyCutsceneJump_hook(gb); return;
 
 substate3:
-  CALL_C(0x6d8c, itemDecCounter1_hook, 0x23d6, 0x6d8f);
-  if (!(F & FZ)) { CYCT(0x6d8f, 0x6d90); ret_effect(gb); return; }
-  CYC(0x6d8f, 0x6d90);
-  CYC(0x6d90, 0x6d92); L = 0x05;
-  CYC(0x6d92, 0x6d93); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6d93, 0x6d95); L = 0x06;
-  CYC(0x6d95, 0x6d97); mem_wr(gb, HL, 0x5a);
-  CYC(0x6d97, 0x6d99); A = 0x14;
-  CYC(0x6d99, 0x6d9c); specialObjectSetAnimation_hook(gb); return;
+  CALL_C(b_+99, itemDecCounter1_hook, SYM(itemDecCounter1), b_+102);
+  if (!(F & FZ)) { CYCT(b_+102, b_+103); ret_effect(gb); return; }
+  CYC(b_+102, b_+103);
+  CYC(b_+103, b_+105); L = 0x05;
+  CYC(b_+105, b_+106); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+106, b_+108); L = 0x06;
+  CYC(b_+108, b_+110); mem_wr(gb, HL, 0x5a);
+  CYC(b_+110, b_+112); A = 0x14;
+  CYC(b_+112, b_+115); specialObjectSetAnimation_hook(gb); return;
 
 substate4:
-  CALL_C(0x6d9c, specialObjectAnimate_hook, 0x2aef, 0x6d9f);
-  CALL_C(0x6d9f, itemDecCounter1_hook, 0x23d6, 0x6da2);
-  if (!(F & FZ)) { CYCT(0x6da2, 0x6da3); ret_effect(gb); return; }
-  CYC(0x6da2, 0x6da3);
-  CYC(0x6da3, 0x6da5); L = 0x05;
-  CYC(0x6da5, 0x6da6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6da6, 0x6da8); L = 0x06;
-  CYC(0x6da8, 0x6daa); mem_wr(gb, HL, 0x0c);
-  CYC(0x6daa, 0x6dac); A = 0x1f;
-  CALL_C(0x6dac, specialObjectSetAnimation_hook, 0x2b0a, 0x6daf);
-  CALL_C(0x6daf, getFreeInteractionSlot_hook, 0x3aef, 0x6db2);
-  if (!(F & FZ)) { CYCT(0x6db2, 0x6db3); ret_effect(gb); return; }
-  CYC(0x6db2, 0x6db3);
-  CYC(0x6db3, 0x6db5); mem_wr(gb, HL, 0x07);
-  CYC(0x6db5, 0x6db8); SET_BC(0xf812);
-  CYC(0x6db8, 0x6dbb); objectCopyPositionWithOffset_hook(gb); return;
+  CALL_C(b_+115, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+118);
+  CALL_C(b_+118, itemDecCounter1_hook, SYM(itemDecCounter1), b_+121);
+  if (!(F & FZ)) { CYCT(b_+121, b_+122); ret_effect(gb); return; }
+  CYC(b_+121, b_+122);
+  CYC(b_+122, b_+124); L = 0x05;
+  CYC(b_+124, b_+125); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+125, b_+127); L = 0x06;
+  CYC(b_+127, b_+129); mem_wr(gb, HL, 0x0c);
+  CYC(b_+129, b_+131); A = 0x1f;
+  CALL_C(b_+131, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+134);
+  CALL_C(b_+134, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+137);
+  if (!(F & FZ)) { CYCT(b_+137, b_+138); ret_effect(gb); return; }
+  CYC(b_+137, b_+138);
+  CYC(b_+138, b_+140); mem_wr(gb, HL, 0x07);
+  CYC(b_+140, b_+143); SET_BC(0xf812);
+  CYC(b_+143, b_+146); objectCopyPositionWithOffset_hook(gb); return;
 
 substate5:
-  CALL_C(0x6dc4, itemDecCounter1_hook, 0x23d6, 0x6dc7);
-  if (!(F & FZ)) { CYCT(0x6dc7, 0x6dc8); ret_effect(gb); return; }
-  CYC(0x6dc7, 0x6dc8);
-  CYC(0x6dc8, 0x6dca); L = 0x05;
-  CYC(0x6dca, 0x6dcb); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6dcb, 0x6dcd); L = 0x06;
-  CYC(0x6dcd, 0x6dcf); mem_wr(gb, HL, 0x3c);
-  CYC(0x6dcf, 0x6dd1); A = 0x1e;
-  CYC(0x6dd1, 0x6dd4); specialObjectSetAnimation_hook(gb); return;
+  CALL_C(b_+155, itemDecCounter1_hook, SYM(itemDecCounter1), b_+158);
+  if (!(F & FZ)) { CYCT(b_+158, b_+159); ret_effect(gb); return; }
+  CYC(b_+158, b_+159);
+  CYC(b_+159, b_+161); L = 0x05;
+  CYC(b_+161, b_+162); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+162, b_+164); L = 0x06;
+  CYC(b_+164, b_+166); mem_wr(gb, HL, 0x3c);
+  CYC(b_+166, b_+168); A = 0x1e;
+  CYC(b_+168, b_+171); specialObjectSetAnimation_hook(gb); return;
 
 substate6:
-  CALL_C(0x6dd4, itemDecCounter1_hook, 0x23d6, 0x6dd7);
-  if (!(F & FZ)) { CYCT(0x6dd7, 0x6dd8); ret_effect(gb); return; }
-  CYC(0x6dd7, 0x6dd8);
-  CYC(0x6dd8, 0x6dda); L = 0x05;
-  CYC(0x6dda, 0x6ddb); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6ddb, 0x6ddc); L = alu_inc8(gb, L);
-  CYC(0x6ddc, 0x6dde); mem_wr(gb, HL, 0x1e);
-  CYC(0x6dde, 0x6de1); SET_HL(wActiveRing);
-  CYC(0x6de1, 0x6de3); mem_wr(gb, HL, 0xff);
-  CYC(0x6de3, 0x6de5); A = 0x81;
-  CYC(0x6de5, 0x6de8); W8(wLinkInAir) = A;
-  CYC(0x6de8, 0x6deb); SET_HL(w1Link_speed);
-  CYC(0x6deb, 0x6ded); mem_wr(gb, HL, 0x14);
-  CYC(0x6ded, 0x6def); L = 0x14;
-  CYC(0x6def, 0x6df1); mem_wr(gb, HL, 0x00);
-  CYC(0x6df1, 0x6df2); L = alu_inc8(gb, L);
-  CYC(0x6df2, 0x6df4); mem_wr(gb, HL, 0xfe);
-  CYC(0x6df4, 0x6df6); A = 0x18;
-  CYC(0x6df6, 0x6df9); W8(w1Link_angle) = A;
-  CYC(0x6df9, 0x6dfb); A = 0x53;
-  CYC(0x6dfb, 0x6dfe); playSound_b00_hook(gb); return;
+  CALL_C(b_+171, itemDecCounter1_hook, SYM(itemDecCounter1), b_+174);
+  if (!(F & FZ)) { CYCT(b_+174, b_+175); ret_effect(gb); return; }
+  CYC(b_+174, b_+175);
+  CYC(b_+175, b_+177); L = 0x05;
+  CYC(b_+177, b_+178); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+178, b_+179); L = alu_inc8(gb, L);
+  CYC(b_+179, b_+181); mem_wr(gb, HL, 0x1e);
+  CYC(b_+181, b_+184); SET_HL(wActiveRing);
+  CYC(b_+184, b_+186); mem_wr(gb, HL, 0xff);
+  CYC(b_+186, b_+188); A = 0x81;
+  CYC(b_+188, b_+191); W8(wLinkInAir) = A;
+  CYC(b_+191, b_+194); SET_HL(w1Link_speed);
+  CYC(b_+194, b_+196); mem_wr(gb, HL, 0x14);
+  CYC(b_+196, b_+198); L = 0x14;
+  CYC(b_+198, b_+200); mem_wr(gb, HL, 0x00);
+  CYC(b_+200, b_+201); L = alu_inc8(gb, L);
+  CYC(b_+201, b_+203); mem_wr(gb, HL, 0xfe);
+  CYC(b_+203, b_+205); A = 0x18;
+  CYC(b_+205, b_+208); W8(w1Link_angle) = A;
+  CYC(b_+208, b_+210); A = 0x53;
+  CYC(b_+210, b_+213); playSound_b00_hook(gb); return;
 
 substate7:
-  CALL_C(0x6dfe, itemDecCounter1_hook, 0x23d6, 0x6e01);
-  if (!(F & FZ)) { CYCT(0x6e01, 0x6e02); ret_effect(gb); return; }
-  CYC(0x6e01, 0x6e02);
-  CYC(0x6e02, 0x6e04); L = 0x05;
-  CYC(0x6e04, 0x6e05); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6e05, 0x6e07); L = 0x06;
-  CYC(0x6e07, 0x6e09); mem_wr(gb, HL, 0x14);
-  CYC(0x6e09, 0x6e0a); alu_xor(gb, A);
-  CYC(0x6e0a, 0x6e0d); SET_HL(w1Link_visible);
-  CYC(0x6e0d, 0x6e0e); mem_wr(gb, HL, A);
-  CYC(0x6e0e, 0x6e0f); A = alu_inc8(gb, A);
-  CYC(0x6e0f, 0x6e12); W8(wDisabledObjects) = A;
-  CYC(0x6e12, 0x6e13); ret_effect(gb); return;
+  CALL_C(b_+213, itemDecCounter1_hook, SYM(itemDecCounter1), b_+216);
+  if (!(F & FZ)) { CYCT(b_+216, b_+217); ret_effect(gb); return; }
+  CYC(b_+216, b_+217);
+  CYC(b_+217, b_+219); L = 0x05;
+  CYC(b_+219, b_+220); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+220, b_+222); L = 0x06;
+  CYC(b_+222, b_+224); mem_wr(gb, HL, 0x14);
+  CYC(b_+224, b_+225); alu_xor(gb, A);
+  CYC(b_+225, b_+228); SET_HL(w1Link_visible);
+  CYC(b_+228, b_+229); mem_wr(gb, HL, A);
+  CYC(b_+229, b_+230); A = alu_inc8(gb, A);
+  CYC(b_+230, b_+233); W8(wDisabledObjects) = A;
+  CYC(b_+233, b_+234); ret_effect(gb); return;
 
 substate8:
-  CALL_C(0x6e13, itemDecCounter1_hook, 0x23d6, 0x6e16);
-  if (!(F & FZ)) { CYCT(0x6e16, 0x6e17); ret_effect(gb); return; }
-  CYC(0x6e16, 0x6e17);
-  CYC(0x6e17, 0x6e19); L = 0x05;
-  CYC(0x6e19, 0x6e1a); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6e1a, 0x6e1c); L = 0x09;
-  CYC(0x6e1c, 0x6e1e); mem_wr(gb, HL, 0x18);
+  CALL_C(b_+234, itemDecCounter1_hook, SYM(itemDecCounter1), b_+237);
+  if (!(F & FZ)) { CYCT(b_+237, b_+238); ret_effect(gb); return; }
+  CYC(b_+237, b_+238);
+  CYC(b_+238, b_+240); L = 0x05;
+  CYC(b_+240, b_+241); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+241, b_+243); L = 0x09;
+  CYC(b_+243, b_+245); mem_wr(gb, HL, 0x18);
 
 jump:
-  CYC(0x6e1e, 0x6e20); A = 0x1c;
-  CALL_C(0x6e20, specialObjectSetAnimation_hook, 0x2b0a, 0x6e23);
-  CYC(0x6e23, 0x6e26); SET_BC(0xfe00);
-  CYC(0x6e26, 0x6e29); objectSetSpeedZ_hook(gb); return;
+  CYC(b_+245, b_+247); A = 0x1c;
+  CALL_C(b_+247, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+250);
+  CYC(b_+250, b_+253); SET_BC(0xfe00);
+  CYC(b_+253, b_+256); objectSetSpeedZ_hook(gb); return;
 
 substate9:
-  CALL_C(0x6e29, objectApplySpeed_hook, 0x201d, 0x6e2c);
-  CYC(0x6e2c, 0x6e2e); E = 0x0d;
-  CYC(0x6e2e, 0x6e2f); A = mem_rd(gb, DE);
-  CYC(0x6e2f, 0x6e31); alu_sub(gb, 0x10);
-  CYC(0x6e31, 0x6e32); alu_rlca(gb);
-  if (!(F & FC)) { CYCT(0x6e32, 0x6e34); goto substate9_update_z; }
-  CYC(0x6e32, 0x6e34);
-  CYC(0x6e34, 0x6e37); SET_HL(wTmpcfc0_genericCutscene_cfdf);
-  CYC(0x6e37, 0x6e39); mem_wr(gb, HL, 0x01);
-  CYC(0x6e39, 0x6e3a); ret_effect(gb); return;
+  CALL_C(b_+256, objectApplySpeed_hook, SYM(objectApplySpeed), b_+259);
+  CYC(b_+259, b_+261); E = 0x0d;
+  CYC(b_+261, b_+262); A = mem_rd(gb, DE);
+  CYC(b_+262, b_+264); alu_sub(gb, 0x10);
+  CYC(b_+264, b_+265); alu_rlca(gb);
+  if (!(F & FC)) { CYCT(b_+265, b_+267); goto substate9_update_z; }
+  CYC(b_+265, b_+267);
+  CYC(b_+267, b_+270); SET_HL(wTmpcfc0_genericCutscene_cfdf);
+  CYC(b_+270, b_+272); mem_wr(gb, HL, 0x01);
+  CYC(b_+272, b_+273); ret_effect(gb); return;
 
 substate9_update_z:
-  CYC(0x6e3a, 0x6e3c); C = 0x40;
-  CALL_C(0x6e3c, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x6e3f);
-  if (!(F & FZ)) { CYCT(0x6e3f, 0x6e40); ret_effect(gb); return; }
-  CYC(0x6e3f, 0x6e40);
-  CALL_C(0x6e40, itemIncSubstate_hook, 0x23ef, 0x6e43);
-  CYC(0x6e43, 0x6e45); L = 0x06;
-  CYC(0x6e45, 0x6e47); mem_wr(gb, HL, 0x08);
-  CYC(0x6e47, 0x6e4a); specialObjectAnimate_hook(gb); return;
+  CYC(b_+273, b_+275); C = 0x40;
+  CALL_C(b_+275, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+278);
+  if (!(F & FZ)) { CYCT(b_+278, b_+279); ret_effect(gb); return; }
+  CYC(b_+278, b_+279);
+  CALL_C(b_+279, itemIncSubstate_hook, SYM(itemIncSubstate), b_+282);
+  CYC(b_+282, b_+284); L = 0x06;
+  CYC(b_+284, b_+286); mem_wr(gb, HL, 0x08);
+  CYC(b_+286, b_+289); specialObjectAnimate_hook(gb); return;
 
 substate_a:
-  CALL_C(0x6e4a, itemDecCounter1_hook, 0x23d6, 0x6e4d);
-  if (!(F & FZ)) { CYCT(0x6e4d, 0x6e4e); ret_effect(gb); return; }
-  CYC(0x6e4d, 0x6e4e);
-  CYC(0x6e4e, 0x6e50); L = 0x05;
-  CYC(0x6e50, 0x6e51); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x6e51, 0x6e54); goto jump;
+  CALL_C(b_+289, itemDecCounter1_hook, SYM(itemDecCounter1), b_+292);
+  if (!(F & FZ)) { CYCT(b_+292, b_+293); ret_effect(gb); return; }
+  CYC(b_+292, b_+293);
+  CYC(b_+293, b_+295); L = 0x05;
+  CYC(b_+295, b_+296); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+296, SYM(specialObjectCode_mooshCutscene)); goto jump;
 }
 
 void specialObjectCode_mooshCutscene_hook(GB *gb) {
+  BASE(specialObjectCode_mooshCutscene);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6e54, 0x6e56); E = 0x04;
-  CYC(0x6e56, 0x6e57); A = mem_rd(gb, DE);
-  CYC(0x6e57, 0x6e58); push_effect(gb, 0x6e58);
-  switch (companion_cutscene_jump_table(gb)) {
-    case 0x6e5c: break;
-    case 0x6e86: goto state1;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
-  CALL_C(0x6e5c, companionCutsceneInitOam_hook, 0x6d1b, 0x6e5f);
-  CYC(0x6e5f, 0x6e60); H = D;
-  CYC(0x6e60, 0x6e62); L = 0x06;
-  CYC(0x6e62, 0x6e64); mem_wr(gb, HL, 0x5a);
-  CYC(0x6e64, 0x6e66); L = 0x10;
-  CYC(0x6e66, 0x6e68); mem_wr(gb, HL, 0x37);
-  CYC(0x6e68, 0x6e6a); L = 0x36;
-  CYC(0x6e6a, 0x6e6c); mem_wr(gb, HL, 0x05);
-  CYC(0x6e6c, 0x6e6e); L = 0x09;
-  CYC(0x6e6e, 0x6e70); mem_wr(gb, HL, 0x10);
-  CYC(0x6e70, 0x6e72); L = 0x0e;
-  CYC(0x6e72, 0x6e74); mem_wr(gb, HL, 0xff);
-  CYC(0x6e74, 0x6e75); L = alu_inc8(gb, L);
-  CYC(0x6e75, 0x6e77); mem_wr(gb, HL, 0xe0);
-  CALL_C(0x6e77, getFreeInteractionSlot_hook, 0x3aef, 0x6e7a);
+  CYC(b_+0, b_+2); E = 0x04;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (companion_cutscene_jump_table(gb));
+    if (jt_ == b_+8) { break; }
+    else if (jt_ == b_+50) { goto state1; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
+  CALL_C(b_+8, companionCutsceneInitOam_hook, SYM(companionCutsceneInitOam), b_+11);
+  CYC(b_+11, b_+12); H = D;
+  CYC(b_+12, b_+14); L = 0x06;
+  CYC(b_+14, b_+16); mem_wr(gb, HL, 0x5a);
+  CYC(b_+16, b_+18); L = 0x10;
+  CYC(b_+18, b_+20); mem_wr(gb, HL, 0x37);
+  CYC(b_+20, b_+22); L = 0x36;
+  CYC(b_+22, b_+24); mem_wr(gb, HL, 0x05);
+  CYC(b_+24, b_+26); L = 0x09;
+  CYC(b_+26, b_+28); mem_wr(gb, HL, 0x10);
+  CYC(b_+28, b_+30); L = 0x0e;
+  CYC(b_+30, b_+32); mem_wr(gb, HL, 0xff);
+  CYC(b_+32, b_+33); L = alu_inc8(gb, L);
+  CYC(b_+33, b_+35); mem_wr(gb, HL, 0xe0);
+  CALL_C(b_+35, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+38);
   if (!(F & FZ)) {
-    CYCT(0x6e7a, 0x6e7c);
+    CYCT(b_+38, b_+40);
   } else {
-    CYC(0x6e7a, 0x6e7c);
-    CYC(0x6e7c, 0x6e7e); mem_wr(gb, HL, 0xc0);
-    CYC(0x6e7e, 0x6e80); L = 0x57;
-    CYC(0x6e80, 0x6e81); mem_wr(gb, HL, D);
+    CYC(b_+38, b_+40);
+    CYC(b_+40, b_+42); mem_wr(gb, HL, 0xc0);
+    CYC(b_+42, b_+44); L = 0x57;
+    CYC(b_+44, b_+45); mem_wr(gb, HL, D);
   }
-  CYC(0x6e81, 0x6e83); A = 0x07;
-  CYC(0x6e83, 0x6e86); specialObjectSetAnimation_hook(gb); return;
+  CYC(b_+45, b_+47); A = 0x07;
+  CYC(b_+47, b_+50); specialObjectSetAnimation_hook(gb); return;
 
 state1:
-  CYC(0x6e86, 0x6e88); E = 0x05;
-  CYC(0x6e88, 0x6e89); A = mem_rd(gb, DE);
-  CYC(0x6e89, 0x6e8a); alu_or(gb, A);
+  CYC(b_+50, b_+52); E = 0x05;
+  CYC(b_+52, b_+53); A = mem_rd(gb, DE);
+  CYC(b_+53, b_+54); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x6e8a, 0x6e8c);
+    CYCT(b_+54, b_+56);
   } else {
-    CYC(0x6e8a, 0x6e8c);
-    CALL_C(0x6e8c, specialObjectAnimate_hook, 0x2aef, 0x6e8f);
-    CALL_C(0x6e8f, objectApplySpeed_hook, 0x201d, 0x6e92);
+    CYC(b_+54, b_+56);
+    CALL_C(b_+56, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+59);
+    CALL_C(b_+59, objectApplySpeed_hook, SYM(objectApplySpeed), b_+62);
   }
-  CYC(0x6e92, 0x6e94); E = 0x05;
-  CYC(0x6e94, 0x6e95); A = mem_rd(gb, DE);
-  CYC(0x6e95, 0x6e96); push_effect(gb, 0x6e96);
-  switch (companion_cutscene_jump_table(gb)) {
-    case 0x6ea0: goto substate0;
-    case 0x6eaa: goto substate1;
-    case 0x6eb6: goto substate2;
-    case 0x6ece: goto substate3;
-    case 0x6ede: goto substate4;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+62, b_+64); E = 0x05;
+  CYC(b_+64, b_+65); A = mem_rd(gb, DE);
+  CYC(b_+65, b_+66); push_effect(gb, b_+66);
+  do { uint16_t jt_ = (companion_cutscene_jump_table(gb));
+    if (jt_ == b_+76) { goto substate0; }
+    else if (jt_ == b_+86) { goto substate1; }
+    else if (jt_ == b_+98) { goto substate2; }
+    else if (jt_ == b_+122) { goto substate3; }
+    else if (jt_ == b_+138) { goto substate4; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 substate0:
-  CALL_C(0x6ea0, itemDecCounter1_hook, 0x23d6, 0x6ea3);
-  if (!(F & FZ)) { CYCT(0x6ea3, 0x6ea4); ret_effect(gb); return; }
-  CYC(0x6ea3, 0x6ea4);
-  CYC(0x6ea4, 0x6ea6); mem_wr(gb, HL, 0x48);
-  CYC(0x6ea6, 0x6ea8); L = 0x05;
-  CYC(0x6ea8, 0x6ea9); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6ea9, 0x6eaa); ret_effect(gb); return;
+  CALL_C(b_+76, itemDecCounter1_hook, SYM(itemDecCounter1), b_+79);
+  if (!(F & FZ)) { CYCT(b_+79, b_+80); ret_effect(gb); return; }
+  CYC(b_+79, b_+80);
+  CYC(b_+80, b_+82); mem_wr(gb, HL, 0x48);
+  CYC(b_+82, b_+84); L = 0x05;
+  CYC(b_+84, b_+85); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+85, b_+86); ret_effect(gb); return;
 
 substate1:
-  CALL_C(0x6eaa, itemDecCounter1_hook, 0x23d6, 0x6ead);
-  if (!(F & FZ)) { CYCT(0x6ead, 0x6eae); ret_effect(gb); return; }
-  CYC(0x6ead, 0x6eae);
-  CYC(0x6eae, 0x6eb0); mem_wr(gb, HL, 0x06);
-  CYC(0x6eb0, 0x6eb2); L = 0x05;
-  CYC(0x6eb2, 0x6eb3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6eb3, 0x6eb6); companionCutsceneFunc_7081_hook(gb); return;
+  CALL_C(b_+86, itemDecCounter1_hook, SYM(itemDecCounter1), b_+89);
+  if (!(F & FZ)) { CYCT(b_+89, b_+90); ret_effect(gb); return; }
+  CYC(b_+89, b_+90);
+  CYC(b_+90, b_+92); mem_wr(gb, HL, 0x06);
+  CYC(b_+92, b_+94); L = 0x05;
+  CYC(b_+94, b_+95); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+95, b_+98); companionCutsceneFunc_7081_hook(gb); return;
 
 substate2:
-  CYC(0x6eb6, 0x6eb7); H = D;
-  CYC(0x6eb7, 0x6eb9); L = 0x09;
-  CYC(0x6eb9, 0x6eba); A = mem_rd(gb, HL);
-  CYC(0x6eba, 0x6ebc); alu_cp(gb, 0x10);
-  if (F & FZ) { CYCT(0x6ebc, 0x6ebe); goto turn; }
-  CYC(0x6ebc, 0x6ebe);
-  CYC(0x6ebe, 0x6ec0); L = 0x05;
-  CYC(0x6ec0, 0x6ec1); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6ec1, 0x6ec2); ret_effect(gb); return;
+  CYC(b_+98, b_+99); H = D;
+  CYC(b_+99, b_+101); L = 0x09;
+  CYC(b_+101, b_+102); A = mem_rd(gb, HL);
+  CYC(b_+102, b_+104); alu_cp(gb, 0x10);
+  if (F & FZ) { CYCT(b_+104, b_+106); goto turn; }
+  CYC(b_+104, b_+106);
+  CYC(b_+106, b_+108); L = 0x05;
+  CYC(b_+108, b_+109); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+109, b_+110); ret_effect(gb); return;
 
 turn:
-  CYC(0x6ec2, 0x6ec4); L = 0x06;
-  CYC(0x6ec4, 0x6ec5); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  if (!(F & FZ)) { CYCT(0x6ec5, 0x6ec6); ret_effect(gb); return; }
-  CYC(0x6ec5, 0x6ec6);
-  CALL_C(0x6ec6, companionCutsceneDecAngle_hook, 0x7098, 0x6ec9);
-  CYC(0x6ec9, 0x6ecb); mem_wr(gb, HL, 0x06);
-  CYC(0x6ecb, 0x6ece); companionCutsceneFunc_7081_hook(gb); return;
+  CYC(b_+110, b_+112); L = 0x06;
+  CYC(b_+112, b_+113); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(b_+113, b_+114); ret_effect(gb); return; }
+  CYC(b_+113, b_+114);
+  CALL_C(b_+114, companionCutsceneDecAngle_hook, SYM(companionCutsceneDecAngle), b_+117);
+  CYC(b_+117, b_+119); mem_wr(gb, HL, 0x06);
+  CYC(b_+119, b_+122); companionCutsceneFunc_7081_hook(gb); return;
 
 substate3:
-  CYC(0x6ece, 0x6ecf); H = D;
-  CYC(0x6ecf, 0x6ed1); L = 0x09;
-  CYC(0x6ed1, 0x6ed2); A = mem_rd(gb, HL);
-  CYC(0x6ed2, 0x6ed4); alu_cp(gb, 0x10);
-  if (!(F & FZ)) { CYCT(0x6ed4, 0x6ed6); goto turn; }
-  CYC(0x6ed4, 0x6ed6);
-  CYC(0x6ed6, 0x6ed8); L = 0x05;
-  CYC(0x6ed8, 0x6ed9); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6ed9, 0x6edb); A = 0x07;
-  CYC(0x6edb, 0x6ede); specialObjectSetAnimation_hook(gb); return;
+  CYC(b_+122, b_+123); H = D;
+  CYC(b_+123, b_+125); L = 0x09;
+  CYC(b_+125, b_+126); A = mem_rd(gb, HL);
+  CYC(b_+126, b_+128); alu_cp(gb, 0x10);
+  if (!(F & FZ)) { CYCT(b_+128, b_+130); goto turn; }
+  CYC(b_+128, b_+130);
+  CYC(b_+130, b_+132); L = 0x05;
+  CYC(b_+132, b_+133); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+133, b_+135); A = 0x07;
+  CYC(b_+135, b_+138); specialObjectSetAnimation_hook(gb); return;
 
 substate4:
-  CYC(0x6ede, 0x6ee0); E = 0x0b;
-  CYC(0x6ee0, 0x6ee1); A = mem_rd(gb, DE);
-  CYC(0x6ee1, 0x6ee3); alu_cp(gb, 0xb0);
-  if (F & FC) { CYCT(0x6ee3, 0x6ee4); ret_effect(gb); return; }
-  CYC(0x6ee3, 0x6ee4);
-  CYC(0x6ee4, 0x6ee7); SET_HL(w1Companion_id);
-  CYC(0x6ee7, 0x6ee9); B = 0x3f;
-  CALL_C(0x6ee9, clearMemory_hook, 0x046f, 0x6eec);
-  CYC(0x6eec, 0x6eef); SET_HL(w1Companion_id);
-  CYC(0x6eef, 0x6ef1); mem_wr(gb, HL, 0x10);
-  CYC(0x6ef1, 0x6ef3); L = 0x0b;
-  CYC(0x6ef3, 0x6ef5); mem_wr(gb, HL, 0xe8);
-  CYC(0x6ef5, 0x6ef6); L = alu_inc8(gb, L);
-  CYC(0x6ef6, 0x6ef7); L = alu_inc8(gb, L);
-  CYC(0x6ef7, 0x6ef9); mem_wr(gb, HL, 0x28);
-  CYC(0x6ef9, 0x6efa); ret_effect(gb);
+  CYC(b_+138, b_+140); E = 0x0b;
+  CYC(b_+140, b_+141); A = mem_rd(gb, DE);
+  CYC(b_+141, b_+143); alu_cp(gb, 0xb0);
+  if (F & FC) { CYCT(b_+143, b_+144); ret_effect(gb); return; }
+  CYC(b_+143, b_+144);
+  CYC(b_+144, b_+147); SET_HL(w1Companion_id);
+  CYC(b_+147, b_+149); B = 0x3f;
+  CALL_C(b_+149, clearMemory_hook, SYM(clearMemory), b_+152);
+  CYC(b_+152, b_+155); SET_HL(w1Companion_id);
+  CYC(b_+155, b_+157); mem_wr(gb, HL, 0x10);
+  CYC(b_+157, b_+159); L = 0x0b;
+  CYC(b_+159, b_+161); mem_wr(gb, HL, 0xe8);
+  CYC(b_+161, b_+162); L = alu_inc8(gb, L);
+  CYC(b_+162, b_+163); L = alu_inc8(gb, L);
+  CYC(b_+163, b_+165); mem_wr(gb, HL, 0x28);
+  CYC(b_+165, SYM(specialObjectCode_dimitriCutscene)); ret_effect(gb);
 }
 
 void specialObjectCode_dimitriCutscene_hook(GB *gb) {
+  BASE(specialObjectCode_dimitriCutscene);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6efa, 0x6efc); E = 0x04;
-  CYC(0x6efc, 0x6efd); A = mem_rd(gb, DE);
-  CYC(0x6efd, 0x6efe); push_effect(gb, 0x6efe);
-  switch (companion_cutscene_jump_table(gb)) {
-    case 0x6f02: break;
-    case 0x6f16: goto state1;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
-  CALL_C(0x6f02, companionCutsceneInitOam_hook, 0x6d1b, 0x6f05);
-  CYC(0x6f05, 0x6f06); H = D;
-  CYC(0x6f06, 0x6f08); L = 0x10;
-  CYC(0x6f08, 0x6f0a); mem_wr(gb, HL, 0x28);
-  CYC(0x6f0a, 0x6f0c); L = 0x0e;
-  CYC(0x6f0c, 0x6f0e); mem_wr(gb, HL, 0xe0);
-  CYC(0x6f0e, 0x6f0f); L = alu_inc8(gb, L);
-  CYC(0x6f0f, 0x6f11); mem_wr(gb, HL, 0xff);
-  CYC(0x6f11, 0x6f13); A = 0x19;
-  CYC(0x6f13, 0x6f16); specialObjectSetAnimation_hook(gb); return;
+  CYC(b_+0, b_+2); E = 0x04;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (companion_cutscene_jump_table(gb));
+    if (jt_ == b_+8) { break; }
+    else if (jt_ == b_+28) { goto state1; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
+  CALL_C(b_+8, companionCutsceneInitOam_hook, SYM(companionCutsceneInitOam), b_+11);
+  CYC(b_+11, b_+12); H = D;
+  CYC(b_+12, b_+14); L = 0x10;
+  CYC(b_+14, b_+16); mem_wr(gb, HL, 0x28);
+  CYC(b_+16, b_+18); L = 0x0e;
+  CYC(b_+18, b_+20); mem_wr(gb, HL, 0xe0);
+  CYC(b_+20, b_+21); L = alu_inc8(gb, L);
+  CYC(b_+21, b_+23); mem_wr(gb, HL, 0xff);
+  CYC(b_+23, b_+25); A = 0x19;
+  CYC(b_+25, b_+28); specialObjectSetAnimation_hook(gb); return;
 
 state1:
-  CYC(0x6f16, 0x6f18); E = 0x05;
-  CYC(0x6f18, 0x6f19); A = mem_rd(gb, DE);
-  CYC(0x6f19, 0x6f1a); push_effect(gb, 0x6f1a);
-  switch (companion_cutscene_jump_table(gb)) {
-    case 0x6f28: goto substate0;
-    case 0x6f54: goto substate1;
-    case 0x6f77: goto substate2;
-    case 0x6f87: goto substate3;
-    case 0x6f93: goto substate4;
-    case 0x6faa: goto substate5;
-    case 0x6fb6: goto substate6;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+28, b_+30); E = 0x05;
+  CYC(b_+30, b_+31); A = mem_rd(gb, DE);
+  CYC(b_+31, b_+32); push_effect(gb, b_+32);
+  do { uint16_t jt_ = (companion_cutscene_jump_table(gb));
+    if (jt_ == b_+46) { goto substate0; }
+    else if (jt_ == b_+90) { goto substate1; }
+    else if (jt_ == b_+125) { goto substate2; }
+    else if (jt_ == b_+141) { goto substate3; }
+    else if (jt_ == b_+153) { goto substate4; }
+    else if (jt_ == b_+176) { goto substate5; }
+    else if (jt_ == b_+188) { goto substate6; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 substate0:
-  CYC(0x6f28, 0x6f29); H = D;
-  CYC(0x6f29, 0x6f2b); L = 0x05;
-  CYC(0x6f2b, 0x6f2c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6f2c, 0x6f2e); L = 0x07;
-  CYC(0x6f2e, 0x6f2f); A = mem_rd(gb, HL);
-  CYC(0x6f2f, 0x6f31); alu_cp(gb, 0x02);
+  CYC(b_+46, b_+47); H = D;
+  CYC(b_+47, b_+49); L = 0x05;
+  CYC(b_+49, b_+50); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+50, b_+52); L = 0x07;
+  CYC(b_+52, b_+53); A = mem_rd(gb, HL);
+  CYC(b_+53, b_+55); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
-    CYCT(0x6f31, 0x6f33);
+    CYCT(b_+55, b_+57);
   } else {
-    CYC(0x6f31, 0x6f33);
-    CYC(0x6f33, 0x6f34); push_effect(gb, AF);
-    CYC(0x6f34, 0x6f36); A = 0x1a;
-    CALL_C(0x6f36, specialObjectSetAnimation_hook, 0x2b0a, 0x6f39);
-    CYC(0x6f39, 0x6f3a); SET_AF(pop_effect(gb));
+    CYC(b_+55, b_+57);
+    CYC(b_+57, b_+58); push_effect(gb, AF);
+    CYC(b_+58, b_+60); A = 0x1a;
+    CALL_C(b_+60, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+63);
+    CYC(b_+63, b_+64); SET_AF(pop_effect(gb));
   }
-  CYC(0x6f3a, 0x6f3b); B = A;
-  CYC(0x6f3b, 0x6f3c); alu_add(gb, A);
-  CYC(0x6f3c, 0x6f3d); alu_add(gb, B);
-  CYC(0x6f3d, 0x6f40); SET_HL(dimitriCutsceneData_bank06);
-  CYC(0x6f40, 0x6f41); push_effect(gb, 0x6f41); companion_cutscene_add_a_to_hl(gb);
-  CYC(0x6f41, 0x6f42); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x6f42, 0x6f44); E = 0x09;
-  CYC(0x6f44, 0x6f45); mem_wr(gb, DE, A);
-  CYC(0x6f45, 0x6f46); C = mem_rd(gb, HL);
-  CYC(0x6f46, 0x6f47); SET_HL(HL + 1);
-  CYC(0x6f47, 0x6f48); B = mem_rd(gb, HL);
-  CYC(0x6f48, 0x6f4b); objectSetSpeedZ_hook(gb); return;
+  CYC(b_+64, b_+65); B = A;
+  CYC(b_+65, b_+66); alu_add(gb, A);
+  CYC(b_+66, b_+67); alu_add(gb, B);
+  CYC(b_+67, b_+70); SET_HL(dimitriCutsceneData_bank06);
+  CYC(b_+70, b_+71); push_effect(gb, b_+71); companion_cutscene_add_a_to_hl(gb);
+  CYC(b_+71, b_+72); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+72, b_+74); E = 0x09;
+  CYC(b_+74, b_+75); mem_wr(gb, DE, A);
+  CYC(b_+75, b_+76); C = mem_rd(gb, HL);
+  CYC(b_+76, b_+77); SET_HL(HL + 1);
+  CYC(b_+77, b_+78); B = mem_rd(gb, HL);
+  CYC(b_+78, b_+81); objectSetSpeedZ_hook(gb); return;
 
 substate1:
-  CALL_C(0x6f54, specialObjectAnimate_hook, 0x2aef, 0x6f57);
-  CALL_C(0x6f57, objectApplySpeed_hook, 0x201d, 0x6f5a);
-  CYC(0x6f5a, 0x6f5c); C = 0x18;
-  CALL_C(0x6f5c, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x6f5f);
-  if (!(F & FZ)) { CYCT(0x6f5f, 0x6f60); ret_effect(gb); return; }
-  CYC(0x6f5f, 0x6f60);
-  CYC(0x6f60, 0x6f61); H = D;
-  CYC(0x6f61, 0x6f63); L = 0x07;
-  CYC(0x6f63, 0x6f64); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6f64, 0x6f65); A = mem_rd(gb, HL);
-  CYC(0x6f65, 0x6f67); L = 0x05;
-  CYC(0x6f67, 0x6f69); alu_cp(gb, 0x03);
+  CALL_C(b_+90, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+93);
+  CALL_C(b_+93, objectApplySpeed_hook, SYM(objectApplySpeed), b_+96);
+  CYC(b_+96, b_+98); C = 0x18;
+  CALL_C(b_+98, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+101);
+  if (!(F & FZ)) { CYCT(b_+101, b_+102); ret_effect(gb); return; }
+  CYC(b_+101, b_+102);
+  CYC(b_+102, b_+103); H = D;
+  CYC(b_+103, b_+105); L = 0x07;
+  CYC(b_+105, b_+106); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+106, b_+107); A = mem_rd(gb, HL);
+  CYC(b_+107, b_+109); L = 0x05;
+  CYC(b_+109, b_+111); alu_cp(gb, 0x03);
   if (F & FZ) {
-    CYCT(0x6f69, 0x6f6b);
-    CYC(0x6f71, 0x6f72); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-    CYC(0x6f72, 0x6f74); L = 0x06;
-    CYC(0x6f74, 0x6f76); mem_wr(gb, HL, 0x06);
-    CYC(0x6f76, 0x6f77); ret_effect(gb); return;
+    CYCT(b_+111, b_+113);
+    CYC(b_+119, b_+120); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+    CYC(b_+120, b_+122); L = 0x06;
+    CYC(b_+122, b_+124); mem_wr(gb, HL, 0x06);
+    CYC(b_+124, b_+125); ret_effect(gb); return;
   }
-  CYC(0x6f69, 0x6f6b);
-  CYC(0x6f6b, 0x6f6c); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x6f6c, 0x6f6e); L = 0x06;
-  CYC(0x6f6e, 0x6f70); mem_wr(gb, HL, 0x08);
-  CYC(0x6f70, 0x6f71); ret_effect(gb); return;
+  CYC(b_+111, b_+113);
+  CYC(b_+113, b_+114); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+114, b_+116); L = 0x06;
+  CYC(b_+116, b_+118); mem_wr(gb, HL, 0x08);
+  CYC(b_+118, b_+119); ret_effect(gb); return;
 
 substate2:
-  CALL_C(0x6f77, itemDecCounter1_hook, 0x23d6, 0x6f7a);
-  if (!(F & FZ)) { CYCT(0x6f7a, 0x6f7b); ret_effect(gb); return; }
-  CYC(0x6f7a, 0x6f7b);
-  CYC(0x6f7b, 0x6f7d); L = 0x05;
-  CYC(0x6f7d, 0x6f7e); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6f7e, 0x6f80); L = 0x06;
-  CYC(0x6f80, 0x6f82); mem_wr(gb, HL, 0x14);
-  CYC(0x6f82, 0x6f84); A = 0x27;
-  CYC(0x6f84, 0x6f87); specialObjectSetAnimation_hook(gb); return;
+  CALL_C(b_+125, itemDecCounter1_hook, SYM(itemDecCounter1), b_+128);
+  if (!(F & FZ)) { CYCT(b_+128, b_+129); ret_effect(gb); return; }
+  CYC(b_+128, b_+129);
+  CYC(b_+129, b_+131); L = 0x05;
+  CYC(b_+131, b_+132); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+132, b_+134); L = 0x06;
+  CYC(b_+134, b_+136); mem_wr(gb, HL, 0x14);
+  CYC(b_+136, b_+138); A = 0x27;
+  CYC(b_+138, b_+141); specialObjectSetAnimation_hook(gb); return;
 
 substate3:
-  CALL_C(0x6f87, itemDecCounter1_hook, 0x23d6, 0x6f8a);
-  if (!(F & FZ)) { CYCT(0x6f8a, 0x6f8b); ret_effect(gb); return; }
-  CYC(0x6f8a, 0x6f8b);
-  CYC(0x6f8b, 0x6f8d); L = 0x05;
-  CYC(0x6f8d, 0x6f8e); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6f8e, 0x6f90); L = 0x06;
-  CYC(0x6f90, 0x6f92); mem_wr(gb, HL, 0x78);
-  CYC(0x6f92, 0x6f93); ret_effect(gb); return;
+  CALL_C(b_+141, itemDecCounter1_hook, SYM(itemDecCounter1), b_+144);
+  if (!(F & FZ)) { CYCT(b_+144, b_+145); ret_effect(gb); return; }
+  CYC(b_+144, b_+145);
+  CYC(b_+145, b_+147); L = 0x05;
+  CYC(b_+147, b_+148); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+148, b_+150); L = 0x06;
+  CYC(b_+150, b_+152); mem_wr(gb, HL, 0x78);
+  CYC(b_+152, b_+153); ret_effect(gb); return;
 
 substate4:
-  CALL_C(0x6f93, specialObjectAnimate_hook, 0x2aef, 0x6f96);
-  CALL_C(0x6f96, itemDecCounter1_hook, 0x23d6, 0x6f99);
-  if (!(F & FZ)) { CYCT(0x6f99, 0x6f9a); ret_effect(gb); return; }
-  CYC(0x6f99, 0x6f9a);
-  CYC(0x6f9a, 0x6f9c); L = 0x05;
-  CYC(0x6f9c, 0x6f9d); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6f9d, 0x6f9f); L = 0x06;
-  CYC(0x6f9f, 0x6fa1); mem_wr(gb, HL, 0x3c);
-  CYC(0x6fa1, 0x6fa3); L = 0x09;
-  CYC(0x6fa3, 0x6fa5); mem_wr(gb, HL, 0x0b);
-  CYC(0x6fa5, 0x6fa7); L = 0x10;
-  CYC(0x6fa7, 0x6fa9); mem_wr(gb, HL, 0x14);
-  CYC(0x6fa9, 0x6faa); ret_effect(gb); return;
+  CALL_C(b_+153, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+156);
+  CALL_C(b_+156, itemDecCounter1_hook, SYM(itemDecCounter1), b_+159);
+  if (!(F & FZ)) { CYCT(b_+159, b_+160); ret_effect(gb); return; }
+  CYC(b_+159, b_+160);
+  CYC(b_+160, b_+162); L = 0x05;
+  CYC(b_+162, b_+163); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+163, b_+165); L = 0x06;
+  CYC(b_+165, b_+167); mem_wr(gb, HL, 0x3c);
+  CYC(b_+167, b_+169); L = 0x09;
+  CYC(b_+169, b_+171); mem_wr(gb, HL, 0x0b);
+  CYC(b_+171, b_+173); L = 0x10;
+  CYC(b_+173, b_+175); mem_wr(gb, HL, 0x14);
+  CYC(b_+175, b_+176); ret_effect(gb); return;
 
 substate5:
-  CALL_C(0x6faa, itemDecCounter1_hook, 0x23d6, 0x6fad);
-  if (!(F & FZ)) { CYCT(0x6fad, 0x6fae); ret_effect(gb); return; }
-  CYC(0x6fad, 0x6fae);
-  CYC(0x6fae, 0x6fb0); L = 0x05;
-  CYC(0x6fb0, 0x6fb1); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6fb1, 0x6fb3); A = 0x26;
-  CYC(0x6fb3, 0x6fb6); specialObjectSetAnimation_hook(gb); return;
+  CALL_C(b_+176, itemDecCounter1_hook, SYM(itemDecCounter1), b_+179);
+  if (!(F & FZ)) { CYCT(b_+179, b_+180); ret_effect(gb); return; }
+  CYC(b_+179, b_+180);
+  CYC(b_+180, b_+182); L = 0x05;
+  CYC(b_+182, b_+183); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+183, b_+185); A = 0x26;
+  CYC(b_+185, b_+188); specialObjectSetAnimation_hook(gb); return;
 
 substate6:
-  CALL_C(0x6fb6, specialObjectAnimate_hook, 0x2aef, 0x6fb9);
-  CALL_C(0x6fb9, objectApplySpeed_hook, 0x201d, 0x6fbc);
-  CYC(0x6fbc, 0x6fbe); E = 0x0d;
-  CYC(0x6fbe, 0x6fbf); A = mem_rd(gb, DE);
-  CYC(0x6fbf, 0x6fc1); alu_cp(gb, 0x78);
+  CALL_C(b_+188, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+191);
+  CALL_C(b_+191, objectApplySpeed_hook, SYM(objectApplySpeed), b_+194);
+  CYC(b_+194, b_+196); E = 0x0d;
+  CYC(b_+196, b_+197); A = mem_rd(gb, DE);
+  CYC(b_+197, b_+199); alu_cp(gb, 0x78);
   if (F & FZ) {
-    CYC(0x6fc1, 0x6fc3);
-    CYC(0x6fc3, 0x6fc5); A = 0x05;
-    CYC(0x6fc5, 0x6fc8); specialObjectSetAnimation_hook(gb); return;
+    CYC(b_+199, b_+201);
+    CYC(b_+201, b_+203); A = 0x05;
+    CYC(b_+203, b_+206); specialObjectSetAnimation_hook(gb); return;
   }
-  CYCT(0x6fc1, 0x6fc3);
-  CYC(0x6fc8, 0x6fca); alu_cp(gb, 0xb0);
-  if (F & FC) { CYCT(0x6fca, 0x6fcb); ret_effect(gb); return; }
-  CYC(0x6fca, 0x6fcb);
-  CYC(0x6fcb, 0x6fce); SET_HL(w1Companion_id);
-  CYC(0x6fce, 0x6fd0); B = 0x3f;
-  CALL_C(0x6fd0, clearMemory_hook, 0x046f, 0x6fd3);
-  CYC(0x6fd3, 0x6fd6); SET_HL(w1Companion_id);
-  CYC(0x6fd6, 0x6fd8); mem_wr(gb, HL, 0x0f);
-  CYC(0x6fd8, 0x6fd9); L = alu_inc8(gb, L);
-  CYC(0x6fd9, 0x6fdb); mem_wr(gb, HL, 0x01);
-  CYC(0x6fdb, 0x6fdd); L = 0x0b;
-  CYC(0x6fdd, 0x6fdf); mem_wr(gb, HL, 0x48);
-  CYC(0x6fdf, 0x6fe0); L = alu_inc8(gb, L);
-  CYC(0x6fe0, 0x6fe1); L = alu_inc8(gb, L);
-  CYC(0x6fe1, 0x6fe3); mem_wr(gb, HL, 0xd8);
-  CYC(0x6fe3, 0x6fe4); ret_effect(gb);
+  CYCT(b_+199, b_+201);
+  CYC(b_+206, b_+208); alu_cp(gb, 0xb0);
+  if (F & FC) { CYCT(b_+208, b_+209); ret_effect(gb); return; }
+  CYC(b_+208, b_+209);
+  CYC(b_+209, b_+212); SET_HL(w1Companion_id);
+  CYC(b_+212, b_+214); B = 0x3f;
+  CALL_C(b_+214, clearMemory_hook, SYM(clearMemory), b_+217);
+  CYC(b_+217, b_+220); SET_HL(w1Companion_id);
+  CYC(b_+220, b_+222); mem_wr(gb, HL, 0x0f);
+  CYC(b_+222, b_+223); L = alu_inc8(gb, L);
+  CYC(b_+223, b_+225); mem_wr(gb, HL, 0x01);
+  CYC(b_+225, b_+227); L = 0x0b;
+  CYC(b_+227, b_+229); mem_wr(gb, HL, 0x48);
+  CYC(b_+229, b_+230); L = alu_inc8(gb, L);
+  CYC(b_+230, b_+231); L = alu_inc8(gb, L);
+  CYC(b_+231, b_+233); mem_wr(gb, HL, 0xd8);
+  CYC(b_+233, SYM(specialObjectCode_mapleCutscene)); ret_effect(gb);
 }
 
 void specialObjectCode_mapleCutscene_hook(GB *gb) {
+  BASE(specialObjectCode_mapleCutscene);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6fe4, 0x6fe6); E = 0x04;
-  CYC(0x6fe6, 0x6fe7); A = mem_rd(gb, DE);
-  CYC(0x6fe7, 0x6fe8); push_effect(gb, 0x6fe8);
-  switch (companion_cutscene_jump_table(gb)) {
-    case 0x6fec: break;
-    case 0x7025: goto state1;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
-  CALL_C(0x6fec, companionCutsceneInitOam_hook, 0x6d1b, 0x6fef);
-  CYC(0x6fef, 0x6ff0); H = D;
-  CYC(0x6ff0, 0x6ff2); L = 0x0f;
-  CYC(0x6ff2, 0x6ff4); mem_wr(gb, HL, 0xf0);
-  CYC(0x6ff4, 0x6ff6); L = 0x09;
-  CYC(0x6ff6, 0x6ff8); mem_wr(gb, HL, 0x08);
-  CYC(0x6ff8, 0x6ffa); L = 0x06;
-  CYC(0x6ffa, 0x6ffc); mem_wr(gb, HL, 0x5a);
-  CYC(0x6ffc, 0x6ffd); ret_effect(gb); return;
+  CYC(b_+0, b_+2); E = 0x04;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (companion_cutscene_jump_table(gb));
+    if (jt_ == b_+8) { break; }
+    else if (jt_ == b_+65) { goto state1; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
+  CALL_C(b_+8, companionCutsceneInitOam_hook, SYM(companionCutsceneInitOam), b_+11);
+  CYC(b_+11, b_+12); H = D;
+  CYC(b_+12, b_+14); L = 0x0f;
+  CYC(b_+14, b_+16); mem_wr(gb, HL, 0xf0);
+  CYC(b_+16, b_+18); L = 0x09;
+  CYC(b_+18, b_+20); mem_wr(gb, HL, 0x08);
+  CYC(b_+20, b_+22); L = 0x06;
+  CYC(b_+22, b_+24); mem_wr(gb, HL, 0x5a);
+  CYC(b_+24, b_+25); ret_effect(gb); return;
 
 init_position:
-  CYC(0x6ffd, 0x6fff); L = 0x07;
-  CYC(0x6fff, 0x7000); A = mem_rd(gb, HL);
-  CYC(0x7000, 0x7001); alu_add(gb, A);
-  CYC(0x7001, 0x7004); SET_HL(mapleCutsceneData_bank06);
-  CYC(0x7004, 0x7005); companion_cutscene_add_double_index(gb, 0x7005);
-  CYC(0x7005, 0x7006); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x7006, 0x7008); E = 0x10;
-  CYC(0x7008, 0x7009); mem_wr(gb, DE, A);
-  CYC(0x7009, 0x700a); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x700a, 0x700c); E = 0x06;
-  CYC(0x700c, 0x700d); mem_wr(gb, DE, A);
-  CYC(0x700d, 0x700e); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x700e, 0x7010); E = 0x0b;
-  CYC(0x7010, 0x7011); mem_wr(gb, DE, A);
-  CYC(0x7011, 0x7012); A = mem_rd(gb, HL);
-  CYC(0x7012, 0x7015); specialObjectSetAnimation_hook(gb); return;
+  CYC(b_+25, b_+27); L = 0x07;
+  CYC(b_+27, b_+28); A = mem_rd(gb, HL);
+  CYC(b_+28, b_+29); alu_add(gb, A);
+  CYC(b_+29, b_+32); SET_HL(mapleCutsceneData_bank06);
+  CYC(b_+32, b_+33); companion_cutscene_add_double_index(gb, b_+33);
+  CYC(b_+33, b_+34); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+34, b_+36); E = 0x10;
+  CYC(b_+36, b_+37); mem_wr(gb, DE, A);
+  CYC(b_+37, b_+38); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+38, b_+40); E = 0x06;
+  CYC(b_+40, b_+41); mem_wr(gb, DE, A);
+  CYC(b_+41, b_+42); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+42, b_+44); E = 0x0b;
+  CYC(b_+44, b_+45); mem_wr(gb, DE, A);
+  CYC(b_+45, b_+46); A = mem_rd(gb, HL);
+  CYC(b_+46, b_+49); specialObjectSetAnimation_hook(gb); return;
 
 state1:
-  CALL_C(0x7025, specialObjectAnimate_hook, 0x2aef, 0x7028);
-  CALL_C(0x7028, objectOscillateZ_hook, 0x27a0, 0x702b);
-  CYC(0x702b, 0x702d); E = 0x05;
-  CYC(0x702d, 0x702e); A = mem_rd(gb, DE);
-  CYC(0x702e, 0x702f); push_effect(gb, 0x702f);
-  switch (companion_cutscene_jump_table(gb)) {
-    case 0x7037: goto substate0;
-    case 0x7044: goto substate1;
-    case 0x7051: goto substate2;
-    case 0x7071: goto substate3;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CALL_C(b_+65, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+68);
+  CALL_C(b_+68, objectOscillateZ_hook, SYM(objectOscillateZ), b_+71);
+  CYC(b_+71, b_+73); E = 0x05;
+  CYC(b_+73, b_+74); A = mem_rd(gb, DE);
+  CYC(b_+74, b_+75); push_effect(gb, b_+75);
+  do { uint16_t jt_ = (companion_cutscene_jump_table(gb));
+    if (jt_ == b_+83) { goto substate0; }
+    else if (jt_ == b_+96) { goto substate1; }
+    else if (jt_ == b_+109) { goto substate2; }
+    else if (jt_ == b_+141) { goto substate3; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 substate0:
-  CYC(0x7037, 0x703a); A = W8(wPaletteThread_mode);
-  CYC(0x703a, 0x703b); alu_or(gb, A);
-  if (F & FZ) CALL_C_CC(0x703b, itemDecCounter1_hook, 0x23d6, 0x703e);
-  else CYC(0x703b, 0x703e);
-  if (!(F & FZ)) { CYCT(0x703e, 0x703f); ret_effect(gb); return; }
-  CYC(0x703e, 0x703f);
-  CALL_C(0x703f, itemIncSubstate_hook, 0x23ef, 0x7042);
-  CYC(0x7042, 0x7044); goto init_position;
+  CYC(b_+83, b_+86); A = W8(wPaletteThread_mode);
+  CYC(b_+86, b_+87); alu_or(gb, A);
+  if (F & FZ) CALL_C_CC(b_+87, itemDecCounter1_hook, SYM(itemDecCounter1), b_+90);
+  else CYC(b_+87, b_+90);
+  if (!(F & FZ)) { CYCT(b_+90, b_+91); ret_effect(gb); return; }
+  CYC(b_+90, b_+91);
+  CALL_C(b_+91, itemIncSubstate_hook, SYM(itemIncSubstate), b_+94);
+  CYC(b_+94, b_+96); goto init_position;
 
 substate1:
-  CALL_C(0x7044, itemDecCounter1_hook, 0x23d6, 0x7047);
-  if (!(F & FZ)) { CYCT(0x7047, 0x704a); objectApplySpeed_hook(gb); return; }
-  CYC(0x7047, 0x704a);
-  CYC(0x704a, 0x704c); mem_wr(gb, HL, 0x5a);
-  CYC(0x704c, 0x704d); L = alu_inc8(gb, L);
-  CYC(0x704d, 0x704e); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x704e, 0x7051); itemIncSubstate_hook(gb); return;
+  CALL_C(b_+96, itemDecCounter1_hook, SYM(itemDecCounter1), b_+99);
+  if (!(F & FZ)) { CYCT(b_+99, b_+102); objectApplySpeed_hook(gb); return; }
+  CYC(b_+99, b_+102);
+  CYC(b_+102, b_+104); mem_wr(gb, HL, 0x5a);
+  CYC(b_+104, b_+105); L = alu_inc8(gb, L);
+  CYC(b_+105, b_+106); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+106, b_+109); itemIncSubstate_hook(gb); return;
 
 substate2:
-  CALL_C(0x7051, itemDecCounter1_hook, 0x23d6, 0x7054);
-  if (!(F & FZ)) { CYCT(0x7054, 0x7055); ret_effect(gb); return; }
-  CYC(0x7054, 0x7055);
-  CYC(0x7055, 0x7056); L = alu_inc8(gb, L);
-  CYC(0x7056, 0x7057); A = mem_rd(gb, HL);
-  CYC(0x7057, 0x7059); alu_cp(gb, 0x04);
+  CALL_C(b_+109, itemDecCounter1_hook, SYM(itemDecCounter1), b_+112);
+  if (!(F & FZ)) { CYCT(b_+112, b_+113); ret_effect(gb); return; }
+  CYC(b_+112, b_+113);
+  CYC(b_+113, b_+114); L = alu_inc8(gb, L);
+  CYC(b_+114, b_+115); A = mem_rd(gb, HL);
+  CYC(b_+115, b_+117); alu_cp(gb, 0x04);
   if (!(F & FZ)) {
-    CYCT(0x7059, 0x705b);
-    CYC(0x7066, 0x7068); L = 0x05;
-    CYC(0x7068, 0x7069); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-    CYC(0x7069, 0x706b); L = 0x09;
-    CYC(0x706b, 0x706c); A = mem_rd(gb, HL);
-    CYC(0x706c, 0x706e); alu_xor(gb, 0x10);
-    CYC(0x706e, 0x706f); mem_wr(gb, HL, A);
-    CYC(0x706f, 0x7071); goto init_position;
+    CYCT(b_+117, b_+119);
+    CYC(b_+130, b_+132); L = 0x05;
+    CYC(b_+132, b_+133); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+    CYC(b_+133, b_+135); L = 0x09;
+    CYC(b_+135, b_+136); A = mem_rd(gb, HL);
+    CYC(b_+136, b_+138); alu_xor(gb, 0x10);
+    CYC(b_+138, b_+139); mem_wr(gb, HL, A);
+    CYC(b_+139, b_+141); goto init_position;
   }
-  CYC(0x7059, 0x705b);
-  CYC(0x705b, 0x705c); L = alu_dec8(gb, L);
-  CYC(0x705c, 0x705e); mem_wr(gb, HL, 0x1e);
-  CALL_C(0x705e, itemIncSubstate_hook, 0x23ef, 0x7061);
-  CYC(0x7061, 0x7063); A = 0x07;
-  CYC(0x7063, 0x7066); specialObjectSetAnimation_hook(gb); return;
+  CYC(b_+117, b_+119);
+  CYC(b_+119, b_+120); L = alu_dec8(gb, L);
+  CYC(b_+120, b_+122); mem_wr(gb, HL, 0x1e);
+  CALL_C(b_+122, itemIncSubstate_hook, SYM(itemIncSubstate), b_+125);
+  CYC(b_+125, b_+127); A = 0x07;
+  CYC(b_+127, b_+130); specialObjectSetAnimation_hook(gb); return;
 
 substate3:
-  CALL_C(0x7071, itemDecCounter1_hook, 0x23d6, 0x7074);
+  CALL_C(b_+141, itemDecCounter1_hook, SYM(itemDecCounter1), b_+144);
   if (F & FZ) {
-    CYCT(0x7074, 0x7076);
-    CYC(0x707b, 0x707d); A = 0xff;
-    CYC(0x707d, 0x7080); W8(wTmpcfc0_genericCutscene_cfdf) = A;
-    CYC(0x7080, 0x7081); ret_effect(gb); return;
+    CYCT(b_+144, b_+146);
+    CYC(b_+151, b_+153); A = 0xff;
+    CYC(b_+153, b_+156); W8(wTmpcfc0_genericCutscene_cfdf) = A;
+    CYC(b_+156, SYM(companionCutsceneFunc_7081)); ret_effect(gb); return;
   }
-  CYC(0x7074, 0x7076);
-  CYC(0x7076, 0x7078); C = 0x02;
-  CYC(0x7078, 0x707b); objectUpdateSpeedZ_paramC_hook(gb);
+  CYC(b_+144, b_+146);
+  CYC(b_+146, b_+148); C = 0x02;
+  CYC(b_+148, b_+151); objectUpdateSpeedZ_paramC_hook(gb);
 }

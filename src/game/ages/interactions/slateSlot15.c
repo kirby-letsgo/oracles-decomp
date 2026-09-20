@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(slateSlot_7b21), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(slateSlot_7b21), (from), (to), true)
 
 static void slateSlot_add_double_index(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -18,53 +18,55 @@ static void slateSlot_add_double_index(GB *gb, uint16_t return_address) {
 }
 
 void slateSlot_7b21_hook(GB *gb) {
-  CYC(0x7b21, 0x7b24); A = mem_rd(gb, wNumSlates);
-  CYC(0x7b24, 0x7b25); alu_or(gb, A);
-  CYC(0x7b25, 0x7b27); B = 0x01;
-  if (!(F & FZ)) { CYCT(0x7b27, 0x7b29); goto store; }
-  CYC(0x7b27, 0x7b29);
-  CYC(0x7b29, 0x7b2a); B = alu_dec8(gb, B);
+  BASE(slateSlot_7b21);
+  CYC(b_+0, b_+3); A = mem_rd(gb, wNumSlates);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  CYC(b_+4, b_+6); B = 0x01;
+  if (!(F & FZ)) { CYCT(b_+6, b_+8); goto store; }
+  CYC(b_+6, b_+8);
+  CYC(b_+8, b_+9); B = alu_dec8(gb, B);
 store:
-  CYC(0x7b2a, 0x7b2b); A = B;
-  CYC(0x7b2b, 0x7b2e); mem_wr(gb, 0xcfc1, A);
-  CYC(0x7b2e, 0x7b2f); ret_effect(gb);
+  CYC(b_+9, b_+10); A = B;
+  CYC(b_+10, b_+13); mem_wr(gb, wTmpcfc0_bigBangGame_filler1, A);
+  CYC(b_+13, SYM(slateSlot_placeSlate)); ret_effect(gb);
 }
 
 void slateSlot_placeSlate_hook(GB *gb) {
+  BASE(slateSlot_placeSlate);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7b2f, 0x7b31); A = 0x70;
-  CALL_C(0x7b31, playSound_b00_hook, 0x0c98, 0x7b34);
-  CALL_C(0x7b34, objectGetTileAtPosition_hook, 0x1444, 0x7b37);
-  CYC(0x7b37, 0x7b38); C = L;
-  CYC(0x7b38, 0x7b3a); E = 0x42;
-  CYC(0x7b3a, 0x7b3b); A = mem_rd(gb, DE);
-  CYC(0x7b3b, 0x7b3c); B = A;
-  CYC(0x7b3c, 0x7b3e); A = 0xd4;
-  CYC(0x7b3e, 0x7b3f); alu_add(gb, B);
-  CALL_C(0x7b3f, setTile_hook, 0x3a9c, 0x7b42);
-  CALL_C(0x7b42, getThisRoomFlags_hook, 0x197d, 0x7b45);
-  CYC(0x7b45, 0x7b47); E = 0x42;
-  CYC(0x7b47, 0x7b48); A = mem_rd(gb, DE);
-  CYC(0x7b48, 0x7b4b); SET_BC(bitTable);
-  CYC(0x7b4b, 0x7b4c); alu_add(gb, C);
-  CYC(0x7b4c, 0x7b4d); C = A;
-  CYC(0x7b4d, 0x7b4e); A = mem_rd(gb, BC);
-  CYC(0x7b4e, 0x7b4f); alu_or(gb, mem_rd(gb, HL));
-  CYC(0x7b4f, 0x7b50); mem_wr(gb, HL, A);
-  CYC(0x7b50, 0x7b53); SET_HL(wNumSlates);
-  CYC(0x7b53, 0x7b54); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x7b54, 0x7b56); E = 0x42;
-  CYC(0x7b56, 0x7b57); A = mem_rd(gb, DE);
-  CYC(0x7b57, 0x7b5a); SET_HL(0x7b6b);
-  CYC(0x7b5a, 0x7b5b); slateSlot_add_double_index(gb, 0x7b5b);
-  CYC(0x7b5b, 0x7b5c); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x7b5c, 0x7b5d); C = A;
-  CYC(0x7b5d, 0x7b5f); A = 0x09;
-  CYC(0x7b5f, 0x7b60); push_effect(gb, HL);
-  CALL_C(0x7b60, setTile_hook, 0x3a9c, 0x7b63);
-  CYC(0x7b63, 0x7b64); SET_HL(pop_effect(gb));
-  CYC(0x7b64, 0x7b65); A = mem_rd(gb, HL);
-  CYC(0x7b65, 0x7b66); C = A;
-  CYC(0x7b66, 0x7b68); A = 0x09;
-  CYC(0x7b68, 0x7b6b); setTile_hook(gb);
+  CYC(b_+0, b_+2); A = 0x70;
+  CALL_C(b_+2, playSound_b00_hook, SYM(playSound_b00), b_+5);
+  CALL_C(b_+5, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+8);
+  CYC(b_+8, b_+9); C = L;
+  CYC(b_+9, b_+11); E = 0x42;
+  CYC(b_+11, b_+12); A = mem_rd(gb, DE);
+  CYC(b_+12, b_+13); B = A;
+  CYC(b_+13, b_+15); A = 0xd4;
+  CYC(b_+15, b_+16); alu_add(gb, B);
+  CALL_C(b_+16, setTile_hook, SYM(setTile), b_+19);
+  CALL_C(b_+19, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+22);
+  CYC(b_+22, b_+24); E = 0x42;
+  CYC(b_+24, b_+25); A = mem_rd(gb, DE);
+  CYC(b_+25, b_+28); SET_BC(bitTable);
+  CYC(b_+28, b_+29); alu_add(gb, C);
+  CYC(b_+29, b_+30); C = A;
+  CYC(b_+30, b_+31); A = mem_rd(gb, BC);
+  CYC(b_+31, b_+32); alu_or(gb, mem_rd(gb, HL));
+  CYC(b_+32, b_+33); mem_wr(gb, HL, A);
+  CYC(b_+33, b_+36); SET_HL(wNumSlates);
+  CYC(b_+36, b_+37); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+37, b_+39); E = 0x42;
+  CYC(b_+39, b_+40); A = mem_rd(gb, DE);
+  CYC(b_+40, b_+43); SET_HL(b_+60);
+  CYC(b_+43, b_+44); slateSlot_add_double_index(gb, b_+44);
+  CYC(b_+44, b_+45); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+45, b_+46); C = A;
+  CYC(b_+46, b_+48); A = 0x09;
+  CYC(b_+48, b_+49); push_effect(gb, HL);
+  CALL_C(b_+49, setTile_hook, SYM(setTile), b_+52);
+  CYC(b_+52, b_+53); SET_HL(pop_effect(gb));
+  CYC(b_+53, b_+54); A = mem_rd(gb, HL);
+  CYC(b_+54, b_+55); C = A;
+  CYC(b_+55, b_+57); A = 0x09;
+  CYC(b_+57, b_+60); setTile_hook(gb);
 }

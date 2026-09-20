@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCoded1), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCoded1), (from), (to), true)
 
 static uint16_t game_complete_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -25,21 +25,22 @@ static uint16_t game_complete_jump_table(GB *gb) {
 }
 
 void interactionCoded1_hook(GB *gb) {
+  BASE(interactionCoded1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4c33, 0x4c35); E = 0x44;
-  CYC(0x4c35, 0x4c36); A = mem_rd(gb, DE);
-  CYC(0x4c36, 0x4c37); push_effect(gb, 0x4c37);
-  switch (game_complete_jump_table(gb)) {
-    case 0x4c3b: break;
-    case 0x2552: interactionRunScript_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
-  CYC(0x4c3b, 0x4c3d); A = 1;
-  CYC(0x4c3d, 0x4c3e); mem_wr(gb, DE, A);
-  CYC(0x4c3e, 0x4c3f); C = A;
-  CYC(0x4c3f, 0x4c42); SET_HL(0x5ea4);
-  CYC(0x4c42, 0x4c44); E = 1;
-  CALL_C(0x4c44, interBankCall_hook, 0x008a, 0x4c47);
-  CYC(0x4c47, 0x4c4a); SET_HL(0x4b13);
-  CYC(0x4c4a, 0x4c4d); interactionSetScript_hook(gb);
+  CYC(b_+0, b_+2); E = 0x44;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (game_complete_jump_table(gb));
+    if (jt_ == b_+8) { break; }
+    else if (jt_ == SYM(interactionRunScript)) { interactionRunScript_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
+  CYC(b_+8, b_+10); A = 1;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CYC(b_+11, b_+12); C = A;
+  CYC(b_+12, b_+15); SET_HL((SYM(interactionCodea8__thing5) + 9));
+  CYC(b_+15, b_+17); E = 1;
+  CALL_C(b_+17, interBankCall_hook, 0x008a, b_+20);
+  CYC(b_+20, b_+23); SET_HL(SYM(interactionCodecf__state0));
+  CYC(b_+23, SYM(interactionCoded2)); interactionSetScript_hook(gb);
 }

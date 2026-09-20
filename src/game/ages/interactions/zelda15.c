@@ -3,23 +3,25 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(zelda_warpOutOfVireMinigame), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(zelda_warpOutOfVireMinigame), (from), (to), true)
 
 void zelda_warpOutOfVireMinigame_hook(GB *gb) {
+  BASE(zelda_warpOutOfVireMinigame);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7739, 0x773b); A = 0xf0;
-  CALL_C(0x773b, playSound_b00_hook, 0x0c98, 0x773e);
-  CYC(0x773e, 0x773f); alu_xor(gb, A);
-  CYC(0x773f, 0x7742); mem_wr(gb, wDisabledObjects, A);
-  CYC(0x7742, 0x7745); mem_wr(gb, wMenuDisabled, A);
-  CYC(0x7745, 0x7747); A = 0x3c;
-  CALL_C(0x7747, setGlobalFlag_hook, 0x31f9, 0x774a);
-  CYC(0x774a, 0x774d); SET_HL(0x7750);
-  CYC(0x774d, 0x7750); setWarpDestVariables_hook(gb);
+  CYC(b_+0, b_+2); A = 0xf0;
+  CALL_C(b_+2, playSound_b00_hook, SYM(playSound_b00), b_+5);
+  CYC(b_+5, b_+6); alu_xor(gb, A);
+  CYC(b_+6, b_+9); mem_wr(gb, wDisabledObjects, A);
+  CYC(b_+9, b_+12); mem_wr(gb, wMenuDisabled, A);
+  CYC(b_+12, b_+14); A = 0x3c;
+  CALL_C(b_+14, setGlobalFlag_hook, SYM(setGlobalFlag), b_+17);
+  CYC(b_+17, b_+20); SET_HL(b_+23);
+  CYC(b_+20, b_+23); setWarpDestVariables_hook(gb);
 }
 
 void zelda_giveBlueJoyRing_hook(GB *gb) {
-  CYC(0x7755, 0x7758); SET_BC(0x2500);
-  CYC(0x7758, 0x775b); giveRingToLink_hook(gb);
+  BASE(zelda_giveBlueJoyRing);
+  CYC(b_+0, b_+3); SET_BC((SYM(objectMarkSolidPosition) + 16));
+  CYC(b_+3, SYM(zeldaSubid01Script_body)); giveRingToLink_hook(gb);
 }

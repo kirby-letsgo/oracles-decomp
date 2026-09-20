@@ -3,81 +3,83 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode12), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode12), (from), (to), true)
 
 void partCode12_hook(GB *gb);
 void flame_state0_hook(GB *gb);
 
 void partCode12_hook(GB *gb) {
+  BASE(partCode12);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x4c33, 0x4c35); E = 0xc4; // Part.state
-  CYC(0x4c35, 0x4c36); A = mem_rd(gb, DE);
-  CYC(0x4c36, 0x4c37); alu_or(gb, A);
+  CYC(b_+0, b_+2); E = 0xc4; // Part.state
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x4c37, 0x4c3a); // call z
-    push_effect(gb, 0x4c3a); flame_state0_hook(gb);
+    CYCT(b_+4, b_+7); // call z
+    push_effect(gb, b_+7); flame_state0_hook(gb);
   } else {
-    CYC(0x4c37, 0x4c3a);
+    CYC(b_+4, b_+7);
   }
 
-  CYC(0x4c3a, 0x4c3c); A = 0x01; // Object.id
-  CALL_C(0x4c3c, objectGetRelatedObject1Var_hook, 0x2160, 0x4c3f);
-  CYC(0x4c3f, 0x4c41); E = 0xf0; // Part.var30
-  CYC(0x4c41, 0x4c42); A = mem_rd(gb, DE);
-  CYC(0x4c42, 0x4c43); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(0x4c43, 0x4c45); goto delete; } // jr nz
-  CYC(0x4c43, 0x4c45);
-  CYC(0x4c45, 0x4c47); C = 0x10;
-  CALL_C(0x4c47, objectUpdateSpeedZAndBounce_hook, 0x2370, 0x4c4a);
-  CYC(0x4c4a, 0x4c4c); A = 0x0f; // Object.zh
-  CALL_C(0x4c4c, objectGetRelatedObject1Var_hook, 0x2160, 0x4c4f);
-  CYC(0x4c4f, 0x4c51); E = 0xcf; // Part.zh
-  CYC(0x4c51, 0x4c52); A = mem_rd(gb, DE);
-  CYC(0x4c52, 0x4c53); mem_wr(gb, HL, A);
-  CALL_C(0x4c53, objectTakePosition_hook, 0x2274, 0x4c56);
-  CYC(0x4c56, 0x4c57); C = H;
-  CALL_C(0x4c57, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x4c5a);
-  if (!(F & FZ)) { CYCT(0x4c5a, 0x4c5d); partAnimate_hook(gb); return; } // jp nz
-  CYC(0x4c5a, 0x4c5d);
-  CYC(0x4c5d, 0x4c5e); H = C;
-  CYC(0x4c5e, 0x4c60); L = 0xa9; // Enemy.health
-  CYC(0x4c60, 0x4c62); E = 0xf1; // Part.var31
-  CYC(0x4c62, 0x4c63); A = mem_rd(gb, DE);
-  CYC(0x4c63, 0x4c64); mem_wr(gb, HL, A);
-  CYC(0x4c64, 0x4c65); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x4c65, 0x4c67); goto L_4c6b; } // jr nz
-  CYC(0x4c65, 0x4c67);
-  CYC(0x4c67, 0x4c69); L = 0xa4; // Enemy.collisionType
-  CYC(0x4c69, 0x4c6b); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
+  CYC(b_+7, b_+9); A = 0x01; // Object.id
+  CALL_C(b_+9, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+12);
+  CYC(b_+12, b_+14); E = 0xf0; // Part.var30
+  CYC(b_+14, b_+15); A = mem_rd(gb, DE);
+  CYC(b_+15, b_+16); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+16, b_+18); goto delete; } // jr nz
+  CYC(b_+16, b_+18);
+  CYC(b_+18, b_+20); C = 0x10;
+  CALL_C(b_+20, objectUpdateSpeedZAndBounce_hook, SYM(objectUpdateSpeedZAndBounce), b_+23);
+  CYC(b_+23, b_+25); A = 0x0f; // Object.zh
+  CALL_C(b_+25, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+28);
+  CYC(b_+28, b_+30); E = 0xcf; // Part.zh
+  CYC(b_+30, b_+31); A = mem_rd(gb, DE);
+  CYC(b_+31, b_+32); mem_wr(gb, HL, A);
+  CALL_C(b_+32, objectTakePosition_hook, SYM(objectTakePosition), b_+35);
+  CYC(b_+35, b_+36); C = H;
+  CALL_C(b_+36, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+39);
+  if (!(F & FZ)) { CYCT(b_+39, b_+42); partAnimate_hook(gb); return; } // jp nz
+  CYC(b_+39, b_+42);
+  CYC(b_+42, b_+43); H = C;
+  CYC(b_+43, b_+45); L = 0xa9; // Enemy.health
+  CYC(b_+45, b_+47); E = 0xf1; // Part.var31
+  CYC(b_+47, b_+48); A = mem_rd(gb, DE);
+  CYC(b_+48, b_+49); mem_wr(gb, HL, A);
+  CYC(b_+49, b_+50); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+50, b_+52); goto L_4c6b; } // jr nz
+  CYC(b_+50, b_+52);
+  CYC(b_+52, b_+54); L = 0xa4; // Enemy.collisionType
+  CYC(b_+54, b_+56); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
 
 L_4c6b:
-  CYC(0x4c6b, 0x4c6d); L = 0xab; // Enemy.invincibilityCounter
-  CYC(0x4c6d, 0x4c6f); mem_wr(gb, HL, 0x00);
-  CYC(0x4c6f, 0x4c71); L = 0xae; // Enemy.stunCounter
-  CYC(0x4c71, 0x4c73); mem_wr(gb, HL, 0x01);
+  CYC(b_+56, b_+58); L = 0xab; // Enemy.invincibilityCounter
+  CYC(b_+58, b_+60); mem_wr(gb, HL, 0x00);
+  CYC(b_+60, b_+62); L = 0xae; // Enemy.stunCounter
+  CYC(b_+62, b_+64); mem_wr(gb, HL, 0x01);
 
 delete:
-  CYC(0x4c73, 0x4c76); partDelete_hook(gb); return; // jp
+  CYC(b_+64, b_+67); partDelete_hook(gb); return; // jp
 }
 
 void flame_state0_hook(GB *gb) {
+  BASE(partCode12);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x4c76, 0x4c77); H = D;
-  CYC(0x4c77, 0x4c78); L = E;
-  CYC(0x4c78, 0x4c79); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(0x4c79, 0x4c7b); L = 0xc6; // Part.counter1
-  CYC(0x4c7b, 0x4c7d); mem_wr(gb, HL, 0x3b);
-  CYC(0x4c7d, 0x4c7f); A = 0x01; // Object.id
-  CALL_C(0x4c7f, objectGetRelatedObject1Var_hook, 0x2160, 0x4c82);
-  CYC(0x4c82, 0x4c84); E = 0xf0; // Part.var30
-  CYC(0x4c84, 0x4c85); A = mem_rd(gb, HL);
-  CYC(0x4c85, 0x4c86); mem_wr(gb, DE, A);
-  CYC(0x4c86, 0x4c88); E = 0xf1; // Part.var31
-  CYC(0x4c88, 0x4c8a); L = 0xa9; // Enemy.health
-  CYC(0x4c8a, 0x4c8b); A = mem_rd(gb, HL);
-  CYC(0x4c8b, 0x4c8c); mem_wr(gb, DE, A);
-  CYC(0x4c8c, 0x4c8e); mem_wr(gb, HL, 0x01);
-  CALL_C(0x4c8e, objectTakePosition_hook, 0x2274, 0x4c91);
-  CYC(0x4c91, 0x4c94); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+67, b_+68); H = D;
+  CYC(b_+68, b_+69); L = E;
+  CYC(b_+69, b_+70); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+70, b_+72); L = 0xc6; // Part.counter1
+  CYC(b_+72, b_+74); mem_wr(gb, HL, 0x3b);
+  CYC(b_+74, b_+76); A = 0x01; // Object.id
+  CALL_C(b_+76, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+79);
+  CYC(b_+79, b_+81); E = 0xf0; // Part.var30
+  CYC(b_+81, b_+82); A = mem_rd(gb, HL);
+  CYC(b_+82, b_+83); mem_wr(gb, DE, A);
+  CYC(b_+83, b_+85); E = 0xf1; // Part.var31
+  CYC(b_+85, b_+87); L = 0xa9; // Enemy.health
+  CYC(b_+87, b_+88); A = mem_rd(gb, HL);
+  CYC(b_+88, b_+89); mem_wr(gb, DE, A);
+  CYC(b_+89, b_+91); mem_wr(gb, HL, 0x01);
+  CALL_C(b_+91, objectTakePosition_hook, SYM(objectTakePosition), b_+94);
+  CYC(b_+94, SYM(partCode13)); objectSetVisible80_hook(gb); return; // jp
 }

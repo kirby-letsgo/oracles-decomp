@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x07, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x07, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode1e), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode1e), (from), (to), true)
 
 static uint16_t biggoron_sword_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -24,19 +24,21 @@ static uint16_t biggoron_sword_jump_table(GB *gb) {
 }
 
 void itemCode0c_hook(GB *gb) {
+  BASE(itemCode1e);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5e77, 0x5e79); E = 0x04;
-  CYC(0x5e79, 0x5e7a); A = mem_rd(gb, DE);
-  CYC(0x5e7a, 0x5e7b); push_effect(gb, 0x5e7b);
-  switch (biggoron_sword_jump_table(gb)) {
-    case 0x5e69: CYC(0x5e69, 0x5e6a); ret_effect(gb); return;
-    case 0x5e7f:
-      CYC(0x5e7f, 0x5e81); A = 0x1b;
-      CALL_C(0x5e81, loadWeaponGfx_b00_hook, 0x166d, 0x5e84);
-      CALL_C(0x5e84, loadAttributesAndGraphicsAndIncState_hook, 0x498c, 0x5e87);
-      CYC(0x5e87, 0x5e89); A = 0xb1;
-      CALL_C(0x5e89, playSound_b00_hook, 0x0c98, 0x5e8c);
-      CYC(0x5e8c, 0x5e8f); objectSetVisible82_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x04;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (biggoron_sword_jump_table(gb));
+    if (jt_ == SYM(itemCode1d__ret)) { CYC(SYM(itemCode1d__ret), SYM(itemCode1dPost)); ret_effect(gb); return; }
+    else if (jt_ == b_+8) {
+      CYC(b_+8, b_+10); A = 0x1b;
+      CALL_C(b_+10, loadWeaponGfx_b00_hook, SYM(loadWeaponGfx_b00), b_+13);
+      CALL_C(b_+13, loadAttributesAndGraphicsAndIncState_hook, SYM(loadAttributesAndGraphicsAndIncState), b_+16);
+      CYC(b_+16, b_+18); A = 0xb1;
+      CALL_C(b_+18, playSound_b00_hook, SYM(playSound_b00), b_+21);
+      CYC(b_+21, SYM(itemCode05)); objectSetVisible82_hook(gb); return;
+    }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }

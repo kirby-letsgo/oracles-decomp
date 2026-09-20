@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(movingPlatform_loadScript), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(movingPlatform_loadScript), (from), (to), true)
 
 void movingPlatform_loadScript_hook(GB *gb);
 void movingPlatform_runScript_hook(GB *gb);
@@ -41,168 +41,171 @@ static uint16_t movingPlatform_jumpTable(GB *gb) {
 }
 
 void movingPlatform_loadScript_hook(GB *gb) {
-  CYC(0x4121, 0x4124); A = mem_rd(gb, 0xcc39);
-  CYC(0x4124, 0x4125); B = A;
-  CYC(0x4125, 0x4126); A = alu_inc8(gb, A);
+  BASE(movingPlatform_loadScript);
+  CYC(b_+0, b_+3); A = mem_rd(gb, wDungeonIndex);
+  CYC(b_+3, b_+4); B = A;
+  CYC(b_+4, b_+5); A = alu_inc8(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x4126, 0x4128);
+    CYCT(b_+5, b_+7);
     goto inDungeon;
   }
-  CYC(0x4126, 0x4128);
-  CYC(0x4128, 0x412b); SET_HL(0x41be);
-  CYC(0x412b, 0x412d);
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+10); SET_HL(SYM(movingPlatform_scriptTable));
+  CYC(b_+10, b_+12);
   goto loadScript;
 
 inDungeon:
-  CYC(0x412d, 0x412e); A = B;
-  CYC(0x412e, 0x4131); SET_HL(0x41be);
-  CYC(0x4131, 0x4132); movingPlatform_addDoubleIndexToHl_from_rst(gb, 0x4132);
-  CYC(0x4132, 0x4133); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4133, 0x4134); H = mem_rd(gb, HL);
-  CYC(0x4134, 0x4135); L = A;
+  CYC(b_+12, b_+13); A = B;
+  CYC(b_+13, b_+16); SET_HL(SYM(movingPlatform_scriptTable));
+  CYC(b_+16, b_+17); movingPlatform_addDoubleIndexToHl_from_rst(gb, b_+17);
+  CYC(b_+17, b_+18); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+18, b_+19); H = mem_rd(gb, HL);
+  CYC(b_+19, b_+20); L = A;
 
 loadScript:
-  CYC(0x4135, 0x4137); E = INTERACTION_BASE + OBJ_VAR32;
-  CYC(0x4137, 0x4138); A = mem_rd(gb, DE);
-  CYC(0x4138, 0x4139); movingPlatform_addDoubleIndexToHl_from_rst(gb, 0x4139);
-  CYC(0x4139, 0x413a); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x413a, 0x413b); H = mem_rd(gb, HL);
-  CYC(0x413b, 0x413c); L = A;
-  CYC(0x413c, 0x413e);
+  CYC(b_+20, b_+22); E = INTERACTION_BASE + OBJ_VAR32;
+  CYC(b_+22, b_+23); A = mem_rd(gb, DE);
+  CYC(b_+23, b_+24); movingPlatform_addDoubleIndexToHl_from_rst(gb, b_+24);
+  CYC(b_+24, b_+25); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+25, b_+26); H = mem_rd(gb, HL);
+  CYC(b_+26, b_+27); L = A;
+  CYC(b_+27, SYM(movingPlatform_runScript));
   movingPlatform_setScript_hook(gb);
 }
 
 void movingPlatform_runScript_hook(GB *gb) {
+  BASE(movingPlatform_runScript);
   uint16_t sp0_ = gb->sp;
-  CYC(0x413e, 0x4140); E = INTERACTION_BASE + OBJ_SCRIPT_PTR;
-  CYC(0x4140, 0x4141); A = mem_rd(gb, DE);
-  CYC(0x4141, 0x4142); L = A;
-  CYC(0x4142, 0x4143); E = alu_inc8(gb, E);
-  CYC(0x4143, 0x4144); A = mem_rd(gb, DE);
-  CYC(0x4144, 0x4145); H = A;
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SCRIPT_PTR;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); L = A;
+  CYC(b_+4, b_+5); E = alu_inc8(gb, E);
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+7); H = A;
 
 nextOpcode:
-  CYC(0x4145, 0x4146); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4146, 0x4147); push_effect(gb, HL);
-  CYC(0x4147, 0x4148); push_effect(gb, 0x4148);
-  switch (movingPlatform_jumpTable(gb)) {
-    case 0x4160: goto opcode00;
-    case 0x416b: goto opcode01;
-    case 0x4177: goto opcode02;
-    case 0x417e: goto opcode03;
-    case 0x4185: goto opcode04;
-    case 0x418d: goto opcode05;
-    case 0x41a3: goto opcode08;
-    case 0x41a7: goto opcode09;
-    case 0x41ab: goto opcode0a;
-    case 0x41af: goto opcode0b;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+8, b_+9); push_effect(gb, HL);
+  CYC(b_+9, b_+10); push_effect(gb, b_+10);
+  do { uint16_t jt_ = (movingPlatform_jumpTable(gb));
+    if (jt_ == b_+34) { goto opcode00; }
+    else if (jt_ == b_+45) { goto opcode01; }
+    else if (jt_ == b_+57) { goto opcode02; }
+    else if (jt_ == b_+64) { goto opcode03; }
+    else if (jt_ == b_+71) { goto opcode04; }
+    else if (jt_ == b_+79) { goto opcode05; }
+    else if (jt_ == b_+101) { goto opcode08; }
+    else if (jt_ == b_+105) { goto opcode09; }
+    else if (jt_ == b_+109) { goto opcode0a; }
+    else if (jt_ == b_+113) { goto opcode0b; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 opcode00:
-  CYC(0x4160, 0x4161); SET_HL(pop_effect(gb));
-  CYC(0x4161, 0x4162); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4162, 0x4164); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x4164, 0x4165); mem_wr(gb, DE, A);
-  CYC(0x4165, 0x4167); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x4167, 0x4168); alu_xor(gb, A);
-  CYC(0x4168, 0x4169); mem_wr(gb, DE, A);
-  CYC(0x4169, 0x416b);
+  CYC(b_+34, b_+35); SET_HL(pop_effect(gb));
+  CYC(b_+35, b_+36); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+36, b_+38); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+38, b_+39); mem_wr(gb, DE, A);
+  CYC(b_+39, b_+41); E = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+41, b_+42); alu_xor(gb, A);
+  CYC(b_+42, b_+43); mem_wr(gb, DE, A);
+  CYC(b_+43, b_+45);
   movingPlatform_setScript_hook(gb);
   return;
 
 opcode01:
-  CYC(0x416b, 0x416c); SET_HL(pop_effect(gb));
-  CYC(0x416c, 0x416d); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x416d, 0x416f); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x416f, 0x4170); mem_wr(gb, DE, A);
-  CYC(0x4170, 0x4172); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x4172, 0x4174); A = 0x01;
-  CYC(0x4174, 0x4175); mem_wr(gb, DE, A);
-  CYC(0x4175, 0x4177);
+  CYC(b_+45, b_+46); SET_HL(pop_effect(gb));
+  CYC(b_+46, b_+47); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+47, b_+49); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+49, b_+50); mem_wr(gb, DE, A);
+  CYC(b_+50, b_+52); E = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+52, b_+54); A = 0x01;
+  CYC(b_+54, b_+55); mem_wr(gb, DE, A);
+  CYC(b_+55, b_+57);
   movingPlatform_setScript_hook(gb);
   return;
 
 opcode02:
-  CYC(0x4177, 0x4178); SET_HL(pop_effect(gb));
-  CYC(0x4178, 0x4179); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4179, 0x417b); E = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x417b, 0x417c); mem_wr(gb, DE, A);
-  CYC(0x417c, 0x417e);
+  CYC(b_+57, b_+58); SET_HL(pop_effect(gb));
+  CYC(b_+58, b_+59); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+59, b_+61); E = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+61, b_+62); mem_wr(gb, DE, A);
+  CYC(b_+62, b_+64);
   goto nextOpcode;
 
 opcode03:
-  CYC(0x417e, 0x417f); SET_HL(pop_effect(gb));
-  CYC(0x417f, 0x4180); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4180, 0x4182); E = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x4182, 0x4183); mem_wr(gb, DE, A);
-  CYC(0x4183, 0x4185);
+  CYC(b_+64, b_+65); SET_HL(pop_effect(gb));
+  CYC(b_+65, b_+66); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+66, b_+68); E = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+68, b_+69); mem_wr(gb, DE, A);
+  CYC(b_+69, b_+71);
   goto nextOpcode;
 
 opcode04:
-  CYC(0x4185, 0x4186); SET_HL(pop_effect(gb));
-  CYC(0x4186, 0x4187); A = mem_rd(gb, HL);
-  CALL_C(0x4187, s8ToS16_hook, 0x01cd, 0x418a);
-  CYC(0x418a, 0x418b); alu_add_hl(gb, BC);
-  CYC(0x418b, 0x418d);
+  CYC(b_+71, b_+72); SET_HL(pop_effect(gb));
+  CYC(b_+72, b_+73); A = mem_rd(gb, HL);
+  CALL_C(b_+73, s8ToS16_hook, SYM(s8ToS16), b_+76);
+  CYC(b_+76, b_+77); alu_add_hl(gb, BC);
+  CYC(b_+77, b_+79);
   goto nextOpcode;
 
 opcode05:
-  CYC(0x418d, 0x418e); SET_HL(pop_effect(gb));
-  CYC(0x418e, 0x4191); A = mem_rd(gb, 0xcc96);
-  CYC(0x4191, 0x4192); alu_cp(gb, D);
+  CYC(b_+79, b_+80); SET_HL(pop_effect(gb));
+  CYC(b_+80, b_+83); A = mem_rd(gb, wLinkRidingObject);
+  CYC(b_+83, b_+84); alu_cp(gb, D);
   if (!(F & FZ)) {
-    CYCT(0x4192, 0x4194);
+    CYCT(b_+84, b_+86);
     goto opcode05_linkNotOn;
   }
-  CYC(0x4192, 0x4194);
-  CYC(0x4194, 0x4195); SET_HL(HL + 1);
-  CYC(0x4195, 0x4197);
+  CYC(b_+84, b_+86);
+  CYC(b_+86, b_+87); SET_HL(HL + 1);
+  CYC(b_+87, b_+89);
   goto nextOpcode;
 
 opcode05_linkNotOn:
-  CYC(0x4197, 0x4198); SET_HL(HL - 1);
-  CYC(0x4198, 0x419a); A = 0x01;
-  CYC(0x419a, 0x419c); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x419c, 0x419d); mem_wr(gb, DE, A);
-  CYC(0x419d, 0x419e); alu_xor(gb, A);
-  CYC(0x419e, 0x41a0); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x41a0, 0x41a1); mem_wr(gb, DE, A);
-  CYC(0x41a1, 0x41a3);
+  CYC(b_+89, b_+90); SET_HL(HL - 1);
+  CYC(b_+90, b_+92); A = 0x01;
+  CYC(b_+92, b_+94); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+94, b_+95); mem_wr(gb, DE, A);
+  CYC(b_+95, b_+96); alu_xor(gb, A);
+  CYC(b_+96, b_+98); E = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+98, b_+99); mem_wr(gb, DE, A);
+  CYC(b_+99, b_+101);
   movingPlatform_setScript_hook(gb);
   return;
 
 opcode08:
-  CYC(0x41a3, 0x41a5); A = 0x00;
-  CYC(0x41a5, 0x41a7);
+  CYC(b_+101, b_+103); A = 0x00;
+  CYC(b_+103, b_+105);
   goto moveAtAngle;
 
 opcode09:
-  CYC(0x41a7, 0x41a9); A = 0x08;
-  CYC(0x41a9, 0x41ab);
+  CYC(b_+105, b_+107); A = 0x08;
+  CYC(b_+107, b_+109);
   goto moveAtAngle;
 
 opcode0a:
-  CYC(0x41ab, 0x41ad); A = 0x10;
-  CYC(0x41ad, 0x41af);
+  CYC(b_+109, b_+111); A = 0x10;
+  CYC(b_+111, b_+113);
   goto moveAtAngle;
 
 opcode0b:
-  CYC(0x41af, 0x41b1); A = 0x18;
+  CYC(b_+113, b_+115); A = 0x18;
 
 moveAtAngle:
-  CYC(0x41b1, 0x41b3); E = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x41b3, 0x41b4); mem_wr(gb, DE, A);
-  CYC(0x41b4, 0x41b6);
+  CYC(b_+115, b_+117); E = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+117, b_+118); mem_wr(gb, DE, A);
+  CYC(b_+118, SYM(movingPlatform_setScript));
   goto opcode01;
 }
 
 void movingPlatform_setScript_hook(GB *gb) {
-  CYC(0x41b6, 0x41b8); E = INTERACTION_BASE + OBJ_SCRIPT_PTR;
-  CYC(0x41b8, 0x41b9); A = L;
-  CYC(0x41b9, 0x41ba); mem_wr(gb, DE, A);
-  CYC(0x41ba, 0x41bb); E = alu_inc8(gb, E);
-  CYC(0x41bb, 0x41bc); A = H;
-  CYC(0x41bc, 0x41bd); mem_wr(gb, DE, A);
-  RET(0x41bd);
+  BASE(movingPlatform_setScript);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SCRIPT_PTR;
+  CYC(b_+2, b_+3); A = L;
+  CYC(b_+3, b_+4); mem_wr(gb, DE, A);
+  CYC(b_+4, b_+5); E = alu_inc8(gb, E);
+  CYC(b_+5, b_+6); A = H;
+  CYC(b_+6, b_+7); mem_wr(gb, DE, A);
+  RET(b_+7);
 }

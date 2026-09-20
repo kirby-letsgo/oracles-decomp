@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodeb7), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodeb7), (from), (to), true)
 
 static uint16_t kiss_heart_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -25,24 +25,28 @@ static uint16_t kiss_heart_jump_table(GB *gb) {
 }
 
 void interactionCodeb7__afterCall48b5_hook(GB *gb) {
-  CYC(0x48b5, 0x48b8); objectSetVisible82_hook(gb);
+  BASE(interactionCodeb7);
+  CYC(b_+14, SYM(interactionCodec0)); objectSetVisible82_hook(gb);
 }
 
 void interactionCodeb7_hook(GB *gb) {
+  BASE(interactionCodeb7);
   uint16_t sp0_ = gb->sp;
-  CYC(0x48a7, 0x48a9); E = 0x44;
-  CYC(0x48a9, 0x48aa); A = mem_rd(gb, DE);
-  CYC(0x48aa, 0x48ab); push_effect(gb, 0x48ab);
-  switch (kiss_heart_jump_table(gb)) {
-    case 0x48af:
-      CYC(0x48af, 0x48b1); A = 1;
-      CYC(0x48b1, 0x48b2); mem_wr(gb, DE, A);
-      CALL_C(0x48b2, interactionInitGraphics_hook, 0x15fb, 0x48b5);
+  CYC(b_+0, b_+2); E = 0x44;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (kiss_heart_jump_table(gb));
+    if (jt_ == b_+8) {
+      CYC(b_+8, b_+10); A = 1;
+      CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+      CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
       interactionCodeb7__afterCall48b5_hook(gb);
       return;
-    case 0x261b:
+    }
+    else if (jt_ == SYM(interactionAnimate)) {
       interactionAnimate_hook(gb);
       return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+    }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }

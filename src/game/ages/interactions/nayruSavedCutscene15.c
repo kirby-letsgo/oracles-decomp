@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(nayruSavedCutscene_createEnergySwirl), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(nayruSavedCutscene_createEnergySwirl), (from), (to), true)
 
 static void nayruSavedCutscene_addDoubleIndexToHl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -18,77 +18,84 @@ static void nayruSavedCutscene_addDoubleIndexToHl_from_rst(GB *gb, uint16_t retu
 }
 
 void nayruSavedCutscene_createEnergySwirl_hook(GB *gb) {
+  BASE(nayruSavedCutscene_createEnergySwirl);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6d45, 0x6d46); H = D;
-  CYC(0x6d46, 0x6d48); L = 0x4b;
-  CYC(0x6d48, 0x6d49); B = mem_rd(gb, HL);
-  CYC(0x6d49, 0x6d4b); L = 0x4d;
-  CYC(0x6d4b, 0x6d4c); C = mem_rd(gb, HL);
-  CYC(0x6d4c, 0x6d4e); A = 0xff;
-  CYC(0x6d4e, 0x6d51); createEnergySwirlGoingIn_hook(gb);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = 0x4b;
+  CYC(b_+3, b_+4); B = mem_rd(gb, HL);
+  CYC(b_+4, b_+6); L = 0x4d;
+  CYC(b_+6, b_+7); C = mem_rd(gb, HL);
+  CYC(b_+7, b_+9); A = 0xff;
+  CYC(b_+9, SYM(nayruSavedCutscene_spawnGuardIndex)); createEnergySwirlGoingIn_hook(gb);
 }
 
 void nayruSavedCutscene_spawnGuardIndex_hook(GB *gb) {
+  BASE(nayruSavedCutscene_spawnGuardIndex);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6d51, 0x6d52); B = A;
-  CALL_C(0x6d52, getFreeInteractionSlot_hook, 0x3aef, 0x6d55);
-  if (!(F & FZ)) { CYCT(0x6d55, 0x6d56); ret_effect(gb); return; }
-  CYC(0x6d55, 0x6d56);
-  CYC(0x6d56, 0x6d58); mem_wr(gb, HL, 0x6e);
-  CYC(0x6d58, 0x6d59); L = alu_inc8(gb, L);
-  CYC(0x6d59, 0x6d5b); mem_wr(gb, HL, 0x04);
-  CYC(0x6d5b, 0x6d5c); L = alu_inc8(gb, L);
-  CYC(0x6d5c, 0x6d5d); mem_wr(gb, HL, B);
-  CYC(0x6d5d, 0x6d5e); ret_effect(gb);
+  CYC(b_+0, b_+1); B = A;
+  CALL_C(b_+1, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+4);
+  if (!(F & FZ)) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
+  CYC(b_+4, b_+5);
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 0x6e);
+  CYC(b_+7, b_+8); L = alu_inc8(gb, L);
+  CYC(b_+8, b_+10); mem_wr(gb, HL, 0x04);
+  CYC(b_+10, b_+11); L = alu_inc8(gb, L);
+  CYC(b_+11, b_+12); mem_wr(gb, HL, B);
+  CYC(b_+12, SYM(nayruSavedCutscene_setSpeedZIndex)); ret_effect(gb);
 }
 
 void nayruSavedCutscene_setSpeedZIndex_hook(GB *gb) {
+  BASE(nayruSavedCutscene_setSpeedZIndex);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6d5e, 0x6d61); SET_HL(0x6d6a);
-  CYC(0x6d61, 0x6d62); nayruSavedCutscene_addDoubleIndexToHl_from_rst(gb, 0x6d62);
-  CYC(0x6d62, 0x6d64); E = 0x54;
-  CYC(0x6d64, 0x6d65); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x6d65, 0x6d66); mem_wr(gb, DE, A);
-  CYC(0x6d66, 0x6d67); E = alu_inc8(gb, E);
-  CYC(0x6d67, 0x6d68); A = mem_rd(gb, HL);
-  CYC(0x6d68, 0x6d69); mem_wr(gb, DE, A);
-  CYC(0x6d69, 0x6d6a); ret_effect(gb);
+  CYC(b_+0, b_+3); SET_HL(b_+12);
+  CYC(b_+3, b_+4); nayruSavedCutscene_addDoubleIndexToHl_from_rst(gb, b_+4);
+  CYC(b_+4, b_+6); E = 0x54;
+  CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+7, b_+8); mem_wr(gb, DE, A);
+  CYC(b_+8, b_+9); E = alu_inc8(gb, E);
+  CYC(b_+9, b_+10); A = mem_rd(gb, HL);
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CYC(b_+11, b_+12); ret_effect(gb);
 }
 
 void nayruSavedCutscene_setAngleAndAnimationAtAddress_hook(GB *gb);
 void nayruSavedCutscene_setAnimationAtAddress_hook(GB *gb);
 
 void nayruSavedCutscene_loadAngleAndAnimationPreset_hook(GB *gb) {
+  BASE(nayruSavedCutscene_loadAngleAndAnimationPreset);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6d6e, 0x6d71); SET_HL(0x6d7a);
-  CYC(0x6d71, 0x6d72); nayruSavedCutscene_addDoubleIndexToHl_from_rst(gb, 0x6d72);
+  CYC(b_+0, b_+3); SET_HL(SYM(nayruSavedCutscene_angleAndAnimationPresets));
+  CYC(b_+3, SYM(nayruSavedCutscene_setAngleAndAnimationAtAddress)); nayruSavedCutscene_addDoubleIndexToHl_from_rst(gb, SYM(nayruSavedCutscene_setAngleAndAnimationAtAddress));
   nayruSavedCutscene_setAngleAndAnimationAtAddress_hook(gb);
 }
 
 void nayruSavedCutscene_setAngleAndAnimationAtAddress_hook(GB *gb) {
+  BASE(nayruSavedCutscene_setAngleAndAnimationAtAddress);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6d72, 0x6d74); E = 0x49;
-  CYC(0x6d74, 0x6d75); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x6d75, 0x6d76); mem_wr(gb, DE, A);
+  CYC(b_+0, b_+2); E = 0x49;
+  CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+3, SYM(nayruSavedCutscene_setAnimationAtAddress)); mem_wr(gb, DE, A);
   nayruSavedCutscene_setAnimationAtAddress_hook(gb);
 }
 
 void nayruSavedCutscene_setAnimationAtAddress_hook(GB *gb) {
+  BASE(nayruSavedCutscene_setAnimationAtAddress);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6d76, 0x6d77); A = mem_rd(gb, HL);
-  CYC(0x6d77, 0x6d7a); interactionSetAnimation_hook(gb);
+  CYC(b_+0, b_+1); A = mem_rd(gb, HL);
+  CYC(b_+1, SYM(nayruSavedCutscene_angleAndAnimationPresets)); interactionSetAnimation_hook(gb);
 }
 
 void nayruSavedCutscene_loadGuardAngleToMoveTowardCenter_hook(GB *gb) {
+  BASE(nayruSavedCutscene_loadGuardAngleToMoveTowardCenter);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6d84, 0x6d86); E = 0x50;
-  CYC(0x6d86, 0x6d88); A = 0x0a;
-  CYC(0x6d88, 0x6d89); mem_wr(gb, DE, A);
-  CYC(0x6d89, 0x6d8b); E = 0x43;
-  CYC(0x6d8b, 0x6d8c); A = mem_rd(gb, DE);
-  CYC(0x6d8c, 0x6d8f); SET_HL(0x6d92);
-  CYC(0x6d8f, 0x6d90); nayruSavedCutscene_addDoubleIndexToHl_from_rst(gb, 0x6d90);
-  CYC(0x6d90, 0x6d92); nayruSavedCutscene_setAngleAndAnimationAtAddress_hook(gb);
+  CYC(b_+0, b_+2); E = 0x50;
+  CYC(b_+2, b_+4); A = 0x0a;
+  CYC(b_+4, b_+5); mem_wr(gb, DE, A);
+  CYC(b_+5, b_+7); E = 0x43;
+  CYC(b_+7, b_+8); A = mem_rd(gb, DE);
+  CYC(b_+8, b_+11); SET_HL(b_+14);
+  CYC(b_+11, b_+12); nayruSavedCutscene_addDoubleIndexToHl_from_rst(gb, b_+12);
+  CYC(b_+12, b_+14); nayruSavedCutscene_setAngleAndAnimationAtAddress_hook(gb);
 }
 
 static void nayruSavedCutscene_addAToHl_from_rst(GB *gb, uint16_t return_address) {
@@ -101,10 +108,11 @@ static void nayruSavedCutscene_addAToHl_from_rst(GB *gb, uint16_t return_address
 }
 
 void nayruSavedCutscene_loadGuardAnimation_hook(GB *gb) {
+  BASE(nayruSavedCutscene_loadGuardAnimation);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6d9e, 0x6da0); E = 0x43;
-  CYC(0x6da0, 0x6da1); A = mem_rd(gb, DE);
-  CYC(0x6da1, 0x6da4); SET_HL(0x6da7);
-  CYC(0x6da4, 0x6da5); nayruSavedCutscene_addAToHl_from_rst(gb, 0x6da5);
-  CYC(0x6da5, 0x6da7); nayruSavedCutscene_setAnimationAtAddress_hook(gb);
+  CYC(b_+0, b_+2); E = 0x43;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+6); SET_HL(b_+9);
+  CYC(b_+6, b_+7); nayruSavedCutscene_addAToHl_from_rst(gb, b_+7);
+  CYC(b_+7, b_+9); nayruSavedCutscene_setAnimationAtAddress_hook(gb);
 }

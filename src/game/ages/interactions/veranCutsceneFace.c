@@ -3,13 +3,13 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode2d), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode2d), (from), (to), true)
 
 // interactionCode2d@warpDestVariables: m_HardcodedWarpA ROOM_AGES_4d4, $0c, $67, $03
-#define veranCutsceneFaceWarpDestVariables_bank08 0x55ca
+#define veranCutsceneFaceWarpDestVariables_bank08 SYM(interactionCode2d__warpDestVariables)
 // mainScripts.veranFaceCutsceneScript (bank $0c script data, referenced by address only).
-#define veranFaceCutsceneScript_bank0c 0x4f1c
+#define veranFaceCutsceneScript_bank0c SYM(veranFaceCutsceneScript_b0c)
 
 static uint16_t veranCutsceneFace_jumpTable(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -32,42 +32,43 @@ static uint16_t veranCutsceneFace_jumpTable(GB *gb) {
 // INTERAC_VERAN_CUTSCENE_FACE: Veran's face during the possession cutscene; runs a script
 // and warps out when it finishes.
 void interactionCode2d_hook(GB *gb) {
+  BASE(interactionCode2d);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5597, 0x5599); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x5599, 0x559a); A = mem_rd(gb, DE);
-  CYC(0x559a, 0x559b); push_effect(gb, 0x559b);
-  switch (veranCutsceneFace_jumpTable(gb)) {
-    case 0x55a1: goto state0;
-    case 0x55b6: goto state1;
-    case 0x55b5: goto state2;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (veranCutsceneFace_jumpTable(gb));
+    if (jt_ == b_+10) { goto state0; }
+    else if (jt_ == b_+31) { goto state1; }
+    else if (jt_ == b_+30) { goto state2; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 state0:
-  CYC(0x55a1, 0x55a3); A = 0x01;
-  CYC(0x55a3, 0x55a4); mem_wr(gb, DE, A);
-  CALL_C(0x55a4, interactionInitGraphics_hook, 0x15fb, 0x55a7);
-  CALL_C(0x55a7, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x55aa);
-  CYC(0x55aa, 0x55ac); A = 0x87; // PALH_87
-  CALL_C(0x55ac, loadPaletteHeader_hook, 0x050b, 0x55af);
-  CYC(0x55af, 0x55b2); SET_HL(veranFaceCutsceneScript_bank0c);
-  CALL_C(0x55b2, interactionSetScript_hook, 0x2544, 0x55b5);
+  CYC(b_+10, b_+12); A = 0x01;
+  CYC(b_+12, b_+13); mem_wr(gb, DE, A);
+  CALL_C(b_+13, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+16);
+  CALL_C(b_+16, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+19);
+  CYC(b_+19, b_+21); A = 0x87; // PALH_87
+  CALL_C(b_+21, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+24);
+  CYC(b_+24, b_+27); SET_HL(veranFaceCutsceneScript_bank0c);
+  CALL_C(b_+27, interactionSetScript_hook, SYM(interactionSetScript), b_+30);
   // falls through into state 2 (just a ret)
 
 state2:
-  CYC(0x55b5, 0x55b6); ret_effect(gb);
+  CYC(b_+30, b_+31); ret_effect(gb);
   return;
 
 state1:
-  CALL_C(0x55b6, interactionAnimate_hook, 0x261b, 0x55b9);
-  CALL_C(0x55b9, interactionRunScript_hook, 0x2552, 0x55bc);
+  CALL_C(b_+31, interactionAnimate_hook, SYM(interactionAnimate), b_+34);
+  CALL_C(b_+34, interactionRunScript_hook, SYM(interactionRunScript), b_+37);
   if (!(F & FC)) {
-    CYCT(0x55bc, 0x55bd); ret_effect(gb); return;
+    CYCT(b_+37, b_+38); ret_effect(gb); return;
   }
-  CYC(0x55bc, 0x55bd);
-  CYC(0x55bd, 0x55c0); SET_HL(veranCutsceneFaceWarpDestVariables_bank08);
-  CALL_C(0x55c0, setWarpDestVariables_hook, 0x1997, 0x55c3);
-  CYC(0x55c3, 0x55c4); alu_xor(gb, A);
-  CYC(0x55c4, 0x55c7); mem_wr(gb, wcc50, A);
-  CYC(0x55c7, 0x55ca); interactionIncState_hook(gb);
+  CYC(b_+37, b_+38);
+  CYC(b_+38, b_+41); SET_HL(veranCutsceneFaceWarpDestVariables_bank08);
+  CALL_C(b_+41, setWarpDestVariables_hook, SYM(setWarpDestVariables), b_+44);
+  CYC(b_+44, b_+45); alu_xor(gb, A);
+  CYC(b_+45, b_+48); mem_wr(gb, wcc50, A);
+  CYC(b_+48, b_+51); interactionIncState_hook(gb);
 }

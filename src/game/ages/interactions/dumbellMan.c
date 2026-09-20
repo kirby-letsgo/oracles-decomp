@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x09, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x09, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode51), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode51), (from), (to), true)
 
 static void dumbbellMan_add_double_index(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -18,30 +18,32 @@ static void dumbbellMan_add_double_index(GB *gb, uint16_t return_address) {
 }
 
 static void dumbbellMan_initialize(GB *gb, uint16_t sp0_) {
-  CALL_C(0x65bf, interactionInitGraphics_hook, 0x15fb, 0x65c2);
-  CYC(0x65c2, 0x65c4); A = 0x0b;
-  CALL_C(0x65c4, interactionSetHighTextIndex_hook, 0x253b, 0x65c7);
-  CYC(0x65c7, 0x65c9); E = 0x42;
-  CYC(0x65c9, 0x65ca); A = mem_rd(gb, DE);
-  CYC(0x65ca, 0x65cd); SET_HL(0x65d7);
-  CYC(0x65cd, 0x65ce); dumbbellMan_add_double_index(gb, 0x65ce);
-  CYC(0x65ce, 0x65cf); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x65cf, 0x65d0); H = mem_rd(gb, HL);
-  CYC(0x65d0, 0x65d1); L = A;
-  CALL_C(0x65d1, interactionSetScript_hook, 0x2544, 0x65d4);
-  CYC(0x65d4, 0x65d7); interactionIncState_hook(gb);
+  BASE(interactionCode51);
+  CALL_C(b_+26, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+29);
+  CYC(b_+29, b_+31); A = 0x0b;
+  CALL_C(b_+31, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+34);
+  CYC(b_+34, b_+36); E = 0x42;
+  CYC(b_+36, b_+37); A = mem_rd(gb, DE);
+  CYC(b_+37, b_+40); SET_HL(b_+50);
+  CYC(b_+40, b_+41); dumbbellMan_add_double_index(gb, b_+41);
+  CYC(b_+41, b_+42); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+42, b_+43); H = mem_rd(gb, HL);
+  CYC(b_+43, b_+44); L = A;
+  CALL_C(b_+44, interactionSetScript_hook, SYM(interactionSetScript), b_+47);
+  CYC(b_+47, b_+50); interactionIncState_hook(gb);
 }
 
 void interactionCode51_hook(GB *gb) {
+  BASE(interactionCode51);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x65a5, checkInteractionState_hook, 0x23fe, 0x65a8);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
   if (F & FZ) {
-    CYC(0x65a8, 0x65aa);
-    CYC(0x65aa, 0x65ad); push_effect(gb, 0x65ad); dumbbellMan_initialize(gb, sp0_);
-    CALL_C(0x65ad, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x65b0);
-  } else CYCT(0x65a8, 0x65aa);
-  CALL_C(0x65b0, interactionRunScript_hook, 0x2552, 0x65b3);
-  if (F & FC) { CYCT(0x65b3, 0x65b6); interactionDelete_hook(gb); return; }
-  CYC(0x65b3, 0x65b6);
-  CYC(0x65b6, 0x65b9); interactionAnimateAsNpc_hook(gb);
+    CYC(b_+3, b_+5);
+    CYC(b_+5, b_+8); push_effect(gb, b_+8); dumbbellMan_initialize(gb, sp0_);
+    CALL_C(b_+8, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+11);
+  } else CYCT(b_+3, b_+5);
+  CALL_C(b_+11, interactionRunScript_hook, SYM(interactionRunScript), b_+14);
+  if (F & FC) { CYCT(b_+14, b_+17); interactionDelete_hook(gb); return; }
+  CYC(b_+14, b_+17);
+  CYC(b_+17, b_+20); interactionAnimateAsNpc_hook(gb);
 }

@@ -3,40 +3,42 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(func_5369), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(func_5369), (from), (to), true)
 
 void func_5369_hook(GB *gb) {
+  BASE(func_5369);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5369, 0x536a); H = D;
-  CYC(0x536a, 0x536b); L = E;
-  CYC(0x536b, 0x536c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x536c, 0x536e); L = 0xd0; // Part.speed
-  CYC(0x536e, 0x5370); mem_wr(gb, HL, 0x50);
-  CYC(0x5370, 0x5372); E = 0xc9; // Part.angle
-  CYC(0x5372, 0x5373); A = mem_rd(gb, DE);
-  CYC(0x5373, 0x5375); A = alu_swap(gb, A);
-  CYC(0x5375, 0x5376); alu_rlca(gb);
-  CALL_C(0x5376, partSetAnimation_hook, 0x2988, 0x5379);
-  CYC(0x5379, 0x537c); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+2); L = E;
+  CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+3, b_+5); L = 0xd0; // Part.speed
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 0x50);
+  CYC(b_+7, b_+9); E = 0xc9; // Part.angle
+  CYC(b_+9, b_+10); A = mem_rd(gb, DE);
+  CYC(b_+10, b_+12); A = alu_swap(gb, A);
+  CYC(b_+12, b_+13); alu_rlca(gb);
+  CALL_C(b_+13, partSetAnimation_hook, SYM(partSetAnimation), b_+16);
+  CYC(b_+16, SYM(partCode20)); objectSetVisible81_hook(gb); return; // jp
 }
 
 void partCode1f_hook(GB *gb) {
+  BASE(partCode1f);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  if (!(F & FZ)) { CYCT(0x5353, 0x5355); goto normalStatus; } // jr nz
-  CYC(0x5353, 0x5355);
-  CYC(0x5355, 0x5357); E = 0xc4; // Part.state
-  CYC(0x5357, 0x5358); A = mem_rd(gb, DE);
-  CYC(0x5358, 0x5359); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x5359, 0x535b); func_5369_hook(gb); return; } // jr z
-  CYC(0x5359, 0x535b);
-  CALL_C(0x535b, objectCheckWithinScreenBoundary_hook, 0x2184, 0x535e);
-  if (!(F & FC)) { CYCT(0x535e, 0x5360); goto normalStatus; } // jr nc
-  CYC(0x535e, 0x5360);
-  CALL_C(0x5360, partCommon_checkTileCollisionOrOutOfBounds_hook, 0x4072, 0x5363);
-  if (!(F & FC)) { CYCT(0x5363, 0x5366); objectApplySpeed_hook(gb); return; } // jp nc
-  CYC(0x5363, 0x5366);
+  if (!(F & FZ)) { CYCT(b_+0, b_+2); goto normalStatus; } // jr nz
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); E = 0xc4; // Part.state
+  CYC(b_+4, b_+5); A = mem_rd(gb, DE);
+  CYC(b_+5, b_+6); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+6, b_+8); func_5369_hook(gb); return; } // jr z
+  CYC(b_+6, b_+8);
+  CALL_C(b_+8, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+11);
+  if (!(F & FC)) { CYCT(b_+11, b_+13); goto normalStatus; } // jr nc
+  CYC(b_+11, b_+13);
+  CALL_C(b_+13, partCommon_checkTileCollisionOrOutOfBounds_hook, SYM(partCommon_checkTileCollisionOrOutOfBounds), b_+16);
+  if (!(F & FC)) { CYCT(b_+16, b_+19); objectApplySpeed_hook(gb); return; } // jp nc
+  CYC(b_+16, b_+19);
 
 normalStatus:
-  CYC(0x5366, 0x5369); partDelete_hook(gb); return; // jp
+  CYC(b_+19, SYM(func_5369)); partDelete_hook(gb); return; // jp
 }

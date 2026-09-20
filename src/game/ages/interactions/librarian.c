@@ -3,51 +3,54 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode2a), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode2a), (from), (to), true)
 
-#define librarianScript_bank0c 0x4d1a
+#define librarianScript_bank0c SYM(librarianScript)
 
 // @state1
 static void librarian_state1(GB *gb, uint16_t sp0_) {
-  CALL_C(0x548a, interactionRunScript_hook, 0x2552, 0x548d);
-  CYC(0x548d, 0x5490); interactionAnimateAsNpc_hook(gb);
+  BASE(interactionCode2a);
+  CALL_C(b_+5, interactionRunScript_hook, SYM(interactionRunScript), b_+8);
+  CYC(b_+8, b_+11); interactionAnimateAsNpc_hook(gb);
 }
 
 // @state0: init. Text is TX_2715 or TX_2716 depending on whether the water pollution is fixed.
 static void librarian_state0(GB *gb, uint16_t sp0_) {
-  CALL_C(0x5490, interactionInitGraphics_hook, 0x15fb, 0x5493);
-  CALL_C(0x5493, interactionIncState_hook, 0x23e0, 0x5496);
-  CYC(0x5496, 0x5498); L = INTERACTION_BASE + OBJ_TEXT_ID + 1;
-  CYC(0x5498, 0x549a); mem_wr(gb, HL, 0x27); // >TX_2700
-  CYC(0x549a, 0x549c); L = INTERACTION_BASE + OBJ_COLLISION_RADIUS_Y;
-  CYC(0x549c, 0x549e); mem_wr(gb, HL, 0x0c);
-  CYC(0x549e, 0x549f); L = alu_inc8(gb, L);
-  CYC(0x549f, 0x54a1); mem_wr(gb, HL, 0x06);
-  CYC(0x54a1, 0x54a3); A = 0x30; // GLOBALFLAG_WATER_POLLUTION_FIXED
-  CALL_C(0x54a3, checkGlobalFlag_hook, 0x31f3, 0x54a6);
-  CYC(0x54a6, 0x54a8); A = 0x15; // <TX_2715
+  BASE(interactionCode2a);
+  CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
+  CALL_C(b_+14, interactionIncState_hook, SYM(interactionIncState), b_+17);
+  CYC(b_+17, b_+19); L = INTERACTION_BASE + OBJ_TEXT_ID + 1;
+  CYC(b_+19, b_+21); mem_wr(gb, HL, 0x27); // >TX_2700
+  CYC(b_+21, b_+23); L = INTERACTION_BASE + OBJ_COLLISION_RADIUS_Y;
+  CYC(b_+23, b_+25); mem_wr(gb, HL, 0x0c);
+  CYC(b_+25, b_+26); L = alu_inc8(gb, L);
+  CYC(b_+26, b_+28); mem_wr(gb, HL, 0x06);
+  CYC(b_+28, b_+30); A = 0x30; // GLOBALFLAG_WATER_POLLUTION_FIXED
+  CALL_C(b_+30, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+33);
+  CYC(b_+33, b_+35); A = 0x15; // <TX_2715
   if (F & FZ) {
-    CYCT(0x54a8, 0x54aa); goto setTextId;
+    CYCT(b_+35, b_+37); goto setTextId;
   }
-  CYC(0x54a8, 0x54aa);
-  CYC(0x54aa, 0x54ac); A = 0x16; // <TX_2716
+  CYC(b_+35, b_+37);
+  CYC(b_+37, b_+39); A = 0x16; // <TX_2716
 
 setTextId:
-  CYC(0x54ac, 0x54ae); E = INTERACTION_BASE + OBJ_TEXT_ID;
-  CYC(0x54ae, 0x54af); mem_wr(gb, DE, A);
-  CALL_C(0x54af, objectSetVisiblec2_hook, 0x1e45, 0x54b2);
-  CYC(0x54b2, 0x54b5); SET_HL(librarianScript_bank0c);
-  CYC(0x54b5, 0x54b8); interactionSetScript_hook(gb);
+  CYC(b_+39, b_+41); E = INTERACTION_BASE + OBJ_TEXT_ID;
+  CYC(b_+41, b_+42); mem_wr(gb, DE, A);
+  CALL_C(b_+42, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+45);
+  CYC(b_+45, b_+48); SET_HL(librarianScript_bank0c);
+  CYC(b_+48, SYM(interactionCode2b)); interactionSetScript_hook(gb);
 }
 
 // INTERAC_LIBRARIAN
 void interactionCode2a_hook(GB *gb) {
+  BASE(interactionCode2a);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x5485, checkInteractionState_hook, 0x23fe, 0x5488);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
   if (F & FZ) {
-    CYCT(0x5488, 0x548a); librarian_state0(gb, sp0_); return;
+    CYCT(b_+3, b_+5); librarian_state0(gb, sp0_); return;
   }
-  CYC(0x5488, 0x548a);
+  CYC(b_+3, b_+5);
   librarian_state1(gb, sp0_);
 }

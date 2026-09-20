@@ -1,4 +1,5 @@
 #include "hooks/hooks.h"
+#include "game/syms.h"
 #include "core/bus.h"
 #include "game/gen.h"
 #include <stdio.h>
@@ -48,7 +49,12 @@ void hooks_init(void) {
 static Hook *lookup(const GB *gb, uint16_t pc) {
   if (!inited) hooks_init();
   if (gb->boot_mapped) return NULL;
-  if (!gb->hooks_checked) { GB *g = (GB *)gb; g->hooks_checked = true; g->hooks_ok = gb->rom_size > 0x150 && memcmp(gb->rom + 0x134, "ZELDA NAYRU", 11) == 0; }
+  if (!gb->hooks_checked) {
+    GB *g = (GB *)gb;
+    g->hooks_checked = true;
+    g->hooks_ok = gb->rom_size > 0x150 && memcmp(gb->rom + 0x134, "ZELDA NAYRU", 11) == 0;
+    syms_select(gb->rom_size > 0x150 && memcmp(gb->rom + 0x134, "ZELDA DIN", 9) == 0);
+  }
   if (!gb->hooks_ok) return NULL;
   int i = first_at[pc];
   if (i < 0) return NULL;

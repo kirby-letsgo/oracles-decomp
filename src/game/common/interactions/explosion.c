@@ -3,36 +3,37 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x09, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x09, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode56), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode56), (from), (to), true)
 
 void interactionCode56_hook(GB *gb) {
+  BASE(interactionCode56);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x4950, checkInteractionState_hook, 0x23fe, 0x4953);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
   if (F & FZ) {
-    CYCT(0x4953, 0x4955); goto L_495f;
+    CYCT(b_+3, b_+5); goto L_495f;
   }
-  CYC(0x4953, 0x4955);
-  CYC(0x4955, 0x4957); E = 0x61;
-  CYC(0x4957, 0x4958); A = mem_rd(gb, DE);
-  CYC(0x4958, 0x4959); A = alu_inc8(gb, A);
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+7); E = 0x61;
+  CYC(b_+7, b_+8); A = mem_rd(gb, DE);
+  CYC(b_+8, b_+9); A = alu_inc8(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x4959, 0x495c); interactionAnimate_hook(gb); return;
+    CYCT(b_+9, b_+12); interactionAnimate_hook(gb); return;
   }
-  CYC(0x4959, 0x495c);
-  CYC(0x495c, 0x495f); interactionDelete_hook(gb); return;
+  CYC(b_+9, b_+12);
+  CYC(b_+12, b_+15); interactionDelete_hook(gb); return;
 L_495f:
-  CYC(0x495f, 0x4960); A = alu_inc8(gb, A);
-  CYC(0x4960, 0x4961); mem_wr(gb, DE, A);
-  CALL_C(0x4961, interactionInitGraphics_hook, 0x15fb, 0x4964);
-  CYC(0x4964, 0x4966); A = 0x6f;
-  CALL_C(0x4966, playSound_b00_hook, 0x0c98, 0x4969);
-  CYC(0x4969, 0x496b); E = 0x43;
-  CYC(0x496b, 0x496c); A = mem_rd(gb, DE);
-  CYC(0x496c, 0x496d); alu_rrca(gb);
+  CYC(b_+15, b_+16); A = alu_inc8(gb, A);
+  CYC(b_+16, b_+17); mem_wr(gb, DE, A);
+  CALL_C(b_+17, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+20);
+  CYC(b_+20, b_+22); A = 0x6f;
+  CALL_C(b_+22, playSound_b00_hook, SYM(playSound_b00), b_+25);
+  CYC(b_+25, b_+27); E = 0x43;
+  CYC(b_+27, b_+28); A = mem_rd(gb, DE);
+  CYC(b_+28, b_+29); alu_rrca(gb);
   if (F & FC) {
-    CYCT(0x496d, 0x4970); objectSetVisible81_hook(gb); return;
+    CYCT(b_+29, b_+32); objectSetVisible81_hook(gb); return;
   }
-  CYC(0x496d, 0x4970);
-  CYC(0x4970, 0x4973); objectSetVisible82_hook(gb); return;
+  CYC(b_+29, b_+32);
+  CYC(b_+32, SYM(interactionCode60)); objectSetVisible82_hook(gb); return;
 }

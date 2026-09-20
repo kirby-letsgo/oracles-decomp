@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodea2), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodea2), (from), (to), true)
 
 // Bare-global, implemented in src/game/movingSidescrollPlatform.c; shared by both interactions'
 // updateState jump tables (both @-locals dispatch their last entry into it identically).
@@ -49,120 +49,121 @@ static void interactionCodea2_addDoubleIndex(GB *gb, uint16_t return_address) {
 // "jp sidescrollingPlatformCommon" to run afterward, so the resume is verified like CALL_C at the
 // shared `afterUpdateState` label (same idiom as movingSidescrollPlatform.c's interactionCodea1).
 void interactionCodea2_hook(GB *gb) {
+  BASE(interactionCodea2);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x58cb, interactionAnimate_hook, 0x261b, 0x58ce);
-  CALL_C(0x58ce, sidescrollPlatform_checkLinkOnPlatform_hook, 0x5b7f, 0x58d1);
-  if (!(F & FZ)) { CALL_C_CC(0x58d1, sidescrollPlatform_updateLinkKnockbackForConveyor_hook, 0x5bb4, 0x58d4); } else { CYC(0x58d1, 0x58d4); } // call nz
-  CYC(0x58d4, 0x58d7); push_effect(gb, 0x58d7);
+  CALL_C(b_+0, interactionAnimate_hook, SYM(interactionAnimate), b_+3);
+  CALL_C(b_+3, sidescrollPlatform_checkLinkOnPlatform_hook, SYM(sidescrollPlatform_checkLinkOnPlatform), b_+6);
+  if (!(F & FZ)) { CALL_C_CC(b_+6, sidescrollPlatform_updateLinkKnockbackForConveyor_hook, SYM(sidescrollPlatform_updateLinkKnockbackForConveyor), b_+9); } else { CYC(b_+6, b_+9); } // call nz
+  CYC(b_+9, b_+12); push_effect(gb, b_+12);
 
-  CYC(0x58da, 0x58dc); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x58dc, 0x58dd); A = mem_rd(gb, DE);
-  CYC(0x58dd, 0x58df); alu_sub(gb, 0x08);
-  if (F & FC) { CYCT(0x58df, 0x58e1); goto state0To7; } // jr c
-  CYC(0x58df, 0x58e1);
-  CYC(0x58e1, 0x58e2); push_effect(gb, 0x58e2);
-  switch (interactionCodea2_jump_table(gb)) {
-    case 0x5906: goto state8;
-    case 0x5914: goto state9;
-    case 0x5922: goto stateA;
-    case 0x593e: goto stateB;
-    case 0x58c4: movingPlatform_stateC_hook(gb); goto afterUpdateState;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+15, b_+17); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+17, b_+18); A = mem_rd(gb, DE);
+  CYC(b_+18, b_+20); alu_sub(gb, 0x08);
+  if (F & FC) { CYCT(b_+20, b_+22); goto state0To7; } // jr c
+  CYC(b_+20, b_+22);
+  CYC(b_+22, b_+23); push_effect(gb, b_+23);
+  do { uint16_t jt_ = (interactionCodea2_jump_table(gb));
+    if (jt_ == b_+59) { goto state8; }
+    else if (jt_ == b_+73) { goto state9; }
+    else if (jt_ == b_+87) { goto stateA; }
+    else if (jt_ == b_+115) { goto stateB; }
+    else if (jt_ == SYM(movingPlatform_stateC)) { movingPlatform_stateC_hook(gb); goto afterUpdateState; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 state0To7:
-  CYC(0x58ec, 0x58ef); SET_HL(0x7f0b); // bank0e.movingSidescrollConveyorScriptTable
-  CALL_C(0x58ef, objectLoadMovementScript_hook, 0x3035, 0x58f2);
-  CALL_C(0x58f2, interactionInitGraphics_hook, 0x15fb, 0x58f5);
-  CYC(0x58f5, 0x58f6); H = D;
-  CYC(0x58f6, 0x58f8); L = INTERACTION_BASE + OBJ_COLLISION_RADIUS_Y;
-  CYC(0x58f8, 0x58fa); mem_wr(gb, HL, 0x08);
-  CYC(0x58fa, 0x58fb); L = alu_inc8(gb, L);
-  CYC(0x58fb, 0x58fd); mem_wr(gb, HL, 0x0c);
-  CYC(0x58fd, 0x58ff); E = INTERACTION_BASE + OBJ_DIRECTION;
-  CYC(0x58ff, 0x5900); A = mem_rd(gb, DE);
-  CALL_C(0x5900, interactionSetAnimation_hook, 0x262e, 0x5903);
-  CYC(0x5903, 0x5906); objectSetVisible82_hook(gb); goto afterUpdateState; // jp
+  CYC(b_+33, b_+36); SET_HL((SYM(interactionCoded8__subid5Script) + 27)); // bank0e.movingSidescrollConveyorScriptTable
+  CALL_C(b_+36, objectLoadMovementScript_hook, SYM(objectLoadMovementScript), b_+39);
+  CALL_C(b_+39, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+42);
+  CYC(b_+42, b_+43); H = D;
+  CYC(b_+43, b_+45); L = INTERACTION_BASE + OBJ_COLLISION_RADIUS_Y;
+  CYC(b_+45, b_+47); mem_wr(gb, HL, 0x08);
+  CYC(b_+47, b_+48); L = alu_inc8(gb, L);
+  CYC(b_+48, b_+50); mem_wr(gb, HL, 0x0c);
+  CYC(b_+50, b_+52); E = INTERACTION_BASE + OBJ_DIRECTION;
+  CYC(b_+52, b_+53); A = mem_rd(gb, DE);
+  CALL_C(b_+53, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+56);
+  CYC(b_+56, b_+59); objectSetVisible82_hook(gb); goto afterUpdateState; // jp
 
 state8:
-  CYC(0x5906, 0x5908); E = INTERACTION_BASE + OBJ_VAR32;
-  CYC(0x5908, 0x5909); A = mem_rd(gb, DE);
-  CYC(0x5909, 0x590a); H = D;
-  CYC(0x590a, 0x590c); L = INTERACTION_BASE + OBJ_YH;
-  CYC(0x590c, 0x590d); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FC) { CYCT(0x590d, 0x590f); goto applySpeed; } // jr c
-  CYC(0x590d, 0x590f);
-  CYC(0x590f, 0x5910); A = mem_rd(gb, DE);
-  CYC(0x5910, 0x5911); mem_wr(gb, HL, A);
-  CYC(0x5911, 0x5914); sidescrollPlatformFunc_5bfc_hook(gb); goto afterUpdateState; // jp
+  CYC(b_+59, b_+61); E = INTERACTION_BASE + OBJ_VAR32;
+  CYC(b_+61, b_+62); A = mem_rd(gb, DE);
+  CYC(b_+62, b_+63); H = D;
+  CYC(b_+63, b_+65); L = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+65, b_+66); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) { CYCT(b_+66, b_+68); goto applySpeed; } // jr c
+  CYC(b_+66, b_+68);
+  CYC(b_+68, b_+69); A = mem_rd(gb, DE);
+  CYC(b_+69, b_+70); mem_wr(gb, HL, A);
+  CYC(b_+70, b_+73); sidescrollPlatformFunc_5bfc_hook(gb); goto afterUpdateState; // jp
 
 state9:
-  CYC(0x5914, 0x5916); E = INTERACTION_BASE + OBJ_XH;
-  CYC(0x5916, 0x5917); A = mem_rd(gb, DE);
-  CYC(0x5917, 0x5918); H = D;
-  CYC(0x5918, 0x591a); L = INTERACTION_BASE + OBJ_VAR33;
-  CYC(0x591a, 0x591b); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FC) { CYCT(0x591b, 0x591d); goto applySpeed; } // jr c
-  CYC(0x591b, 0x591d);
-  CYC(0x591d, 0x591e); A = mem_rd(gb, HL);
-  CYC(0x591e, 0x591f); mem_wr(gb, DE, A);
-  CYC(0x591f, 0x5922); sidescrollPlatformFunc_5bfc_hook(gb); goto afterUpdateState; // jp
+  CYC(b_+73, b_+75); E = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+75, b_+76); A = mem_rd(gb, DE);
+  CYC(b_+76, b_+77); H = D;
+  CYC(b_+77, b_+79); L = INTERACTION_BASE + OBJ_VAR33;
+  CYC(b_+79, b_+80); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) { CYCT(b_+80, b_+82); goto applySpeed; } // jr c
+  CYC(b_+80, b_+82);
+  CYC(b_+82, b_+83); A = mem_rd(gb, HL);
+  CYC(b_+83, b_+84); mem_wr(gb, DE, A);
+  CYC(b_+84, b_+87); sidescrollPlatformFunc_5bfc_hook(gb); goto afterUpdateState; // jp
 
 stateA:
-  CYC(0x5922, 0x5924); E = INTERACTION_BASE + OBJ_YH;
-  CYC(0x5924, 0x5925); A = mem_rd(gb, DE);
-  CYC(0x5925, 0x5926); H = D;
-  CYC(0x5926, 0x5928); L = INTERACTION_BASE + OBJ_VAR32;
-  CYC(0x5928, 0x5929); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FC)) { CYCT(0x5929, 0x592b); goto l_5939; } // jr nc
-  CYC(0x5929, 0x592b);
-  CYC(0x592b, 0x592d); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x592d, 0x592e); B = mem_rd(gb, HL);
-  CYC(0x592e, 0x5930); C = 0x10; // ANGLE_DOWN
-  CYC(0x5930, 0x5933); A = mem_rd(gb, wLinkRidingObject);
-  CYC(0x5933, 0x5934); alu_cp(gb, D);
-  if (F & FZ) { CALL_C_CC(0x5934, updateLinkPositionGivenVelocity_hook, 0x231e, 0x5937); } else { CYC(0x5934, 0x5937); } // call z
-  CYCT(0x5937, 0x5939); goto applySpeed; // jr
+  CYC(b_+87, b_+89); E = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+89, b_+90); A = mem_rd(gb, DE);
+  CYC(b_+90, b_+91); H = D;
+  CYC(b_+91, b_+93); L = INTERACTION_BASE + OBJ_VAR32;
+  CYC(b_+93, b_+94); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(b_+94, b_+96); goto l_5939; } // jr nc
+  CYC(b_+94, b_+96);
+  CYC(b_+96, b_+98); L = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+98, b_+99); B = mem_rd(gb, HL);
+  CYC(b_+99, b_+101); C = 0x10; // ANGLE_DOWN
+  CYC(b_+101, b_+104); A = mem_rd(gb, wLinkRidingObject);
+  CYC(b_+104, b_+105); alu_cp(gb, D);
+  if (F & FZ) { CALL_C_CC(b_+105, updateLinkPositionGivenVelocity_hook, SYM(updateLinkPositionGivenVelocity), b_+108); } else { CYC(b_+105, b_+108); } // call z
+  CYCT(b_+108, b_+110); goto applySpeed; // jr
 
 l_5939:
-  CYC(0x5939, 0x593a); A = mem_rd(gb, HL);
-  CYC(0x593a, 0x593b); mem_wr(gb, DE, A);
-  CYC(0x593b, 0x593e); sidescrollPlatformFunc_5bfc_hook(gb); goto afterUpdateState; // jp
+  CYC(b_+110, b_+111); A = mem_rd(gb, HL);
+  CYC(b_+111, b_+112); mem_wr(gb, DE, A);
+  CYC(b_+112, b_+115); sidescrollPlatformFunc_5bfc_hook(gb); goto afterUpdateState; // jp
 
 stateB:
-  CYC(0x593e, 0x5940); E = INTERACTION_BASE + OBJ_VAR33;
-  CYC(0x5940, 0x5941); A = mem_rd(gb, DE);
-  CYC(0x5941, 0x5942); H = D;
-  CYC(0x5942, 0x5944); L = INTERACTION_BASE + OBJ_XH;
-  CYC(0x5944, 0x5945); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FC) { CYCT(0x5945, 0x5947); goto applySpeed; } // jr c
-  CYC(0x5945, 0x5947);
-  CYC(0x5947, 0x5948); A = mem_rd(gb, DE);
-  CYC(0x5948, 0x5949); mem_wr(gb, HL, A);
-  CYC(0x5949, 0x594c); sidescrollPlatformFunc_5bfc_hook(gb); goto afterUpdateState; // jp
+  CYC(b_+115, b_+117); E = INTERACTION_BASE + OBJ_VAR33;
+  CYC(b_+117, b_+118); A = mem_rd(gb, DE);
+  CYC(b_+118, b_+119); H = D;
+  CYC(b_+119, b_+121); L = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+121, b_+122); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) { CYCT(b_+122, b_+124); goto applySpeed; } // jr c
+  CYC(b_+122, b_+124);
+  CYC(b_+124, b_+125); A = mem_rd(gb, DE);
+  CYC(b_+125, b_+126); mem_wr(gb, HL, A);
+  CYC(b_+126, b_+129); sidescrollPlatformFunc_5bfc_hook(gb); goto afterUpdateState; // jp
 
 applySpeed:
-  CALL_C(0x594c, objectApplySpeed_hook, 0x201d, 0x594f);
-  CYC(0x594f, 0x5952); A = mem_rd(gb, wLinkRidingObject);
-  CYC(0x5952, 0x5953); alu_cp(gb, D);
-  if (!(F & FZ)) { CYCT(0x5953, 0x5954); ret_effect(gb); return; } // ret nz
-  CYC(0x5953, 0x5954);
-  CYC(0x5954, 0x5956); E = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x5956, 0x5957); A = mem_rd(gb, DE);
-  CYC(0x5957, 0x5958); alu_rrca(gb);
-  CYC(0x5958, 0x5959); alu_rrca(gb);
-  CYC(0x5959, 0x595a); B = A;
-  CYC(0x595a, 0x595c); E = INTERACTION_BASE + OBJ_DIRECTION;
-  CYC(0x595c, 0x595d); A = mem_rd(gb, DE);
-  CYC(0x595d, 0x595e); alu_add(gb, B);
-  CYC(0x595e, 0x5961); SET_HL(0x5968); // @directions
-  CYC(0x5961, 0x5962); interactionCodea2_addDoubleIndex(gb, 0x5962);
-  CYC(0x5962, 0x5963); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x5963, 0x5964); C = A;
-  CYC(0x5964, 0x5965); B = mem_rd(gb, HL);
-  CYC(0x5965, 0x5968); updateLinkPositionGivenVelocity_hook(gb); goto afterUpdateState; // jp
+  CALL_C(b_+129, objectApplySpeed_hook, SYM(objectApplySpeed), b_+132);
+  CYC(b_+132, b_+135); A = mem_rd(gb, wLinkRidingObject);
+  CYC(b_+135, b_+136); alu_cp(gb, D);
+  if (!(F & FZ)) { CYCT(b_+136, b_+137); ret_effect(gb); return; } // ret nz
+  CYC(b_+136, b_+137);
+  CYC(b_+137, b_+139); E = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+139, b_+140); A = mem_rd(gb, DE);
+  CYC(b_+140, b_+141); alu_rrca(gb);
+  CYC(b_+141, b_+142); alu_rrca(gb);
+  CYC(b_+142, b_+143); B = A;
+  CYC(b_+143, b_+145); E = INTERACTION_BASE + OBJ_DIRECTION;
+  CYC(b_+145, b_+146); A = mem_rd(gb, DE);
+  CYC(b_+146, b_+147); alu_add(gb, B);
+  CYC(b_+147, b_+150); SET_HL(b_+157); // @directions
+  CYC(b_+150, b_+151); interactionCodea2_addDoubleIndex(gb, b_+151);
+  CYC(b_+151, b_+152); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+152, b_+153); C = A;
+  CYC(b_+153, b_+154); B = mem_rd(gb, HL);
+  CYC(b_+154, b_+157); updateLinkPositionGivenVelocity_hook(gb); goto afterUpdateState; // jp
 
 afterUpdateState:
-  if (!(gb->pc == 0x58d7 && gb->sp == sp0_)) { hook_continue(gb, gb->pc, sp0_); return; }
-  CYC(0x58d7, 0x58da); sidescrollingPlatformCommon_hook(gb); return; // jp
+  if (!(gb->pc == b_+12 && gb->sp == sp0_)) { hook_continue(gb, gb->pc, sp0_); return; }
+  CYC(b_+12, b_+15); sidescrollingPlatformCommon_hook(gb); return; // jp
 }

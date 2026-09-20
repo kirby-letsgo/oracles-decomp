@@ -3,22 +3,23 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(pirate_openEyeballCave), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(pirate_openEyeballCave), (from), (to), true)
 
 void pirate_openEyeballCave_hook(GB *gb) {
+  BASE(pirate_openEyeballCave);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7972, 0x7974); C = 0x54;
-  CYC(0x7974, 0x7976); A = 0xa2;
-  CALL_C(0x7976, setTile_hook, 0x3a9c, 0x7979);
-  CYC(0x7979, 0x797a); C = alu_inc8(gb, C);
-  CYC(0x797a, 0x797c); A = 0xef;
-  CALL_C(0x797c, setTile_hook, 0x3a9c, 0x797f);
-  CYC(0x797f, 0x7980); C = alu_inc8(gb, C);
-  CYC(0x7980, 0x7982); A = 0xa4;
-  CALL_C(0x7982, setTile_hook, 0x3a9c, 0x7985);
-  CYC(0x7985, 0x7987); A = 0x70;
-  CALL_C(0x7987, playSound_b00_hook, 0x0c98, 0x798a);
-  CYC(0x798a, 0x798d); SET_BC(0x0500);
-  CYC(0x798d, 0x7990); objectCreateInteraction_hook(gb);
+  CYC(b_+0, b_+2); C = 0x54;
+  CYC(b_+2, b_+4); A = 0xa2;
+  CALL_C(b_+4, setTile_hook, SYM(setTile), b_+7);
+  CYC(b_+7, b_+8); C = alu_inc8(gb, C);
+  CYC(b_+8, b_+10); A = 0xef;
+  CALL_C(b_+10, setTile_hook, SYM(setTile), b_+13);
+  CYC(b_+13, b_+14); C = alu_inc8(gb, C);
+  CYC(b_+14, b_+16); A = 0xa4;
+  CALL_C(b_+16, setTile_hook, SYM(setTile), b_+19);
+  CYC(b_+19, b_+21); A = 0x70;
+  CALL_C(b_+21, playSound_b00_hook, SYM(playSound_b00), b_+24);
+  CYC(b_+24, b_+27); SET_BC((SYM(initializeVramMap1) + 19));
+  CYC(b_+27, SYM(tingle_createGlowAroundLink)); objectCreateInteraction_hook(gb);
 }

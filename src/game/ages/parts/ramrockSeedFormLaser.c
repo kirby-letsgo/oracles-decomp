@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode34), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode34), (from), (to), true)
 
 static uint16_t ramrockSeedFormLaser_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -26,124 +26,125 @@ static uint16_t ramrockSeedFormLaser_jump_table(GB *gb) {
 
 // PART_RAMROCK_SEED_FORM_LASER
 void partCode34_hook(GB *gb) {
+  BASE(partCode34);
   uint16_t sp0_ = gb->sp;
-  CYC(0x65e9, 0x65eb); E = 0xc4; // Part.state
-  CYC(0x65eb, 0x65ec); A = mem_rd(gb, DE);
-  CYC(0x65ec, 0x65ee); alu_cp(gb, 0x03);
-  if (!(F & FC)) { CYCT(0x65ee, 0x65f0); goto L_65f9; } // jr nc
-  CYC(0x65ee, 0x65f0);
-  CYC(0x65f0, 0x65f2); A = 0x0d; // Object.xh
-  CALL_C(0x65f2, objectGetRelatedObject1Var_hook, 0x2160, 0x65f5);
-  CYC(0x65f5, 0x65f6); A = mem_rd(gb, HL);
-  CYC(0x65f6, 0x65f8); E = 0xcd; // Part.xh
-  CYC(0x65f8, 0x65f9); mem_wr(gb, DE, A);
+  CYC(b_+0, b_+2); E = 0xc4; // Part.state
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); alu_cp(gb, 0x03);
+  if (!(F & FC)) { CYCT(b_+5, b_+7); goto L_65f9; } // jr nc
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+9); A = 0x0d; // Object.xh
+  CALL_C(b_+9, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+12);
+  CYC(b_+12, b_+13); A = mem_rd(gb, HL);
+  CYC(b_+13, b_+15); E = 0xcd; // Part.xh
+  CYC(b_+15, b_+16); mem_wr(gb, DE, A);
 
 L_65f9:
-  CYC(0x65f9, 0x65fb); E = 0xc7; // Part.counter2
-  CYC(0x65fb, 0x65fc); A = mem_rd(gb, DE);
-  CYC(0x65fc, 0x65fd); A = alu_dec8(gb, A);
-  CYC(0x65fd, 0x65fe); mem_wr(gb, DE, A);
-  CYC(0x65fe, 0x6600); alu_and(gb, 0x03);
-  if (!(F & FZ)) { CYCT(0x6600, 0x6602); goto L_6608; } // jr nz
-  CYC(0x6600, 0x6602);
-  CYC(0x6602, 0x6604); E = 0xdc; // Part.oamFlags
-  CYC(0x6604, 0x6605); A = mem_rd(gb, DE);
-  CYC(0x6605, 0x6607); alu_xor(gb, 0x01);
-  CYC(0x6607, 0x6608); mem_wr(gb, DE, A);
+  CYC(b_+16, b_+18); E = 0xc7; // Part.counter2
+  CYC(b_+18, b_+19); A = mem_rd(gb, DE);
+  CYC(b_+19, b_+20); A = alu_dec8(gb, A);
+  CYC(b_+20, b_+21); mem_wr(gb, DE, A);
+  CYC(b_+21, b_+23); alu_and(gb, 0x03);
+  if (!(F & FZ)) { CYCT(b_+23, b_+25); goto L_6608; } // jr nz
+  CYC(b_+23, b_+25);
+  CYC(b_+25, b_+27); E = 0xdc; // Part.oamFlags
+  CYC(b_+27, b_+28); A = mem_rd(gb, DE);
+  CYC(b_+28, b_+30); alu_xor(gb, 0x01);
+  CYC(b_+30, b_+31); mem_wr(gb, DE, A);
 
 L_6608:
-  CYC(0x6608, 0x660a); E = 0xc4; // Part.state
-  CYC(0x660a, 0x660b); A = mem_rd(gb, DE);
+  CYC(b_+31, b_+33); E = 0xc4; // Part.state
+  CYC(b_+33, b_+34); A = mem_rd(gb, DE);
   {
-    CYC(0x660b, 0x660c); push_effect(gb, 0x660c);
+    CYC(b_+34, b_+35); push_effect(gb, b_+35);
     uint16_t target = ramrockSeedFormLaser_jump_table(gb);
-    if (target == 0x662c) goto state1;
-    if (target == 0x665c) goto state2;
-    if (target == 0x666f) goto state3;
-    if (target == 0x3ea1) { partDelete_hook(gb); return; }
+    if (target == b_+67) goto state1;
+    if (target == b_+115) goto state2;
+    if (target == b_+134) goto state3;
+    if (target == SYM(partDelete)) { partDelete_hook(gb); return; }
     goto state0;
   }
 
 state0:
-  CYC(0x6616, 0x6618); A = 0x01;
-  CYC(0x6618, 0x6619); mem_wr(gb, DE, A);
-  CYC(0x6619, 0x661a); H = D;
-  CYC(0x661a, 0x661c); L = 0xd0; // Part.speed
-  CYC(0x661c, 0x661e); mem_wr(gb, HL, 0x6e); // SPEED_2c0
-  CYC(0x661e, 0x6620); L = 0xc9; // Part.angle
-  CYC(0x6620, 0x6622); mem_wr(gb, HL, 0x10); // ANGLE_DOWN
-  CYC(0x6622, 0x6624); L = 0xc6; // Part.counter1
-  CYC(0x6624, 0x6626); A = 0x07;
-  CYC(0x6626, 0x6627); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x6627, 0x6629); mem_wr(gb, HL, 0x03); // Part.counter2
-  CALL_C(0x6629, objectSetVisible80_hook, 0x1e57, 0x662c);
+  CYC(b_+45, b_+47); A = 0x01;
+  CYC(b_+47, b_+48); mem_wr(gb, DE, A);
+  CYC(b_+48, b_+49); H = D;
+  CYC(b_+49, b_+51); L = 0xd0; // Part.speed
+  CYC(b_+51, b_+53); mem_wr(gb, HL, 0x6e); // SPEED_2c0
+  CYC(b_+53, b_+55); L = 0xc9; // Part.angle
+  CYC(b_+55, b_+57); mem_wr(gb, HL, 0x10); // ANGLE_DOWN
+  CYC(b_+57, b_+59); L = 0xc6; // Part.counter1
+  CYC(b_+59, b_+61); A = 0x07;
+  CYC(b_+61, b_+62); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+62, b_+64); mem_wr(gb, HL, 0x03); // Part.counter2
+  CALL_C(b_+64, objectSetVisible80_hook, SYM(objectSetVisible80), b_+67);
 
 state1:
-  CYC(0x662c, 0x662e); E = 0xc3; // Part.var03
-  CYC(0x662e, 0x662f); A = mem_rd(gb, DE);
-  CYC(0x662f, 0x6630); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x6630, 0x6632); goto L_6638; } // jr z
-  CYC(0x6630, 0x6632);
-  CALL_C(0x6632, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x6635);
-  if (!(F & FZ)) { CYCT(0x6635, 0x6638); objectApplySpeed_hook(gb); return; } // jp nz
-  CYC(0x6635, 0x6638);
+  CYC(b_+67, b_+69); E = 0xc3; // Part.var03
+  CYC(b_+69, b_+70); A = mem_rd(gb, DE);
+  CYC(b_+70, b_+71); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+71, b_+73); goto L_6638; } // jr z
+  CYC(b_+71, b_+73);
+  CALL_C(b_+73, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+76);
+  if (!(F & FZ)) { CYCT(b_+76, b_+79); objectApplySpeed_hook(gb); return; } // jp nz
+  CYC(b_+76, b_+79);
 
 L_6638:
-  CYC(0x6638, 0x663a); E = 0xc3; // Part.var03
-  CYC(0x663a, 0x663b); A = mem_rd(gb, DE);
-  CYC(0x663b, 0x663d); alu_cp(gb, 0x06);
-  if (F & FZ) { CYCT(0x663d, 0x663f); goto L_6657; } // jr z
-  CYC(0x663d, 0x663f);
-  CALL_C(0x663f, getFreePartSlot_hook, 0x3e8e, 0x6642);
-  if (!(F & FZ)) { RET_TAKEN(0x6642); return; } // ret nz
-  CYC(0x6642, 0x6643);
-  CYC(0x6643, 0x6645); mem_wr(gb, HL, 0x34); // PART_RAMROCK_SEED_FORM_LASER
-  CYC(0x6645, 0x6646); L = alu_inc8(gb, L);
-  CYC(0x6646, 0x6648); mem_wr(gb, HL, 0x0e);
-  CYC(0x6648, 0x6649); L = E;
-  CYC(0x6649, 0x664a); A = mem_rd(gb, DE);
-  CYC(0x664a, 0x664b); A = alu_inc8(gb, A);
-  CYC(0x664b, 0x664c); mem_wr(gb, HL, A);
-  CYC(0x664c, 0x664e); E = 0xd6; // Part.relatedObj1
-  CYC(0x664e, 0x664f); L = E;
-  CYC(0x664f, 0x6651); A = 0xc0; // Part
-  CYC(0x6651, 0x6652); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x6652, 0x6653); A = D;
-  CYC(0x6653, 0x6654); mem_wr(gb, HL, A);
-  CALL_C(0x6654, objectCopyPosition_hook, 0x2242, 0x6657);
+  CYC(b_+79, b_+81); E = 0xc3; // Part.var03
+  CYC(b_+81, b_+82); A = mem_rd(gb, DE);
+  CYC(b_+82, b_+84); alu_cp(gb, 0x06);
+  if (F & FZ) { CYCT(b_+84, b_+86); goto L_6657; } // jr z
+  CYC(b_+84, b_+86);
+  CALL_C(b_+86, getFreePartSlot_hook, SYM(getFreePartSlot), b_+89);
+  if (!(F & FZ)) { RET_TAKEN(b_+89); return; } // ret nz
+  CYC(b_+89, b_+90);
+  CYC(b_+90, b_+92); mem_wr(gb, HL, 0x34); // PART_RAMROCK_SEED_FORM_LASER
+  CYC(b_+92, b_+93); L = alu_inc8(gb, L);
+  CYC(b_+93, b_+95); mem_wr(gb, HL, 0x0e);
+  CYC(b_+95, b_+96); L = E;
+  CYC(b_+96, b_+97); A = mem_rd(gb, DE);
+  CYC(b_+97, b_+98); A = alu_inc8(gb, A);
+  CYC(b_+98, b_+99); mem_wr(gb, HL, A);
+  CYC(b_+99, b_+101); E = 0xd6; // Part.relatedObj1
+  CYC(b_+101, b_+102); L = E;
+  CYC(b_+102, b_+104); A = 0xc0; // Part
+  CYC(b_+104, b_+105); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+105, b_+106); A = D;
+  CYC(b_+106, b_+107); mem_wr(gb, HL, A);
+  CALL_C(b_+107, objectCopyPosition_hook, SYM(objectCopyPosition), b_+110);
 
 L_6657:
-  CYC(0x6657, 0x6659); E = 0xc4; // Part.state
-  CYC(0x6659, 0x665b); A = 0x02;
-  CYC(0x665b, 0x665c); mem_wr(gb, DE, A);
+  CYC(b_+110, b_+112); E = 0xc4; // Part.state
+  CYC(b_+112, b_+114); A = 0x02;
+  CYC(b_+114, b_+115); mem_wr(gb, DE, A);
 
 state2:
-  CYC(0x665c, 0x665e); A = 0x02; // Object.subid
-  CALL_C(0x665e, objectGetRelatedObject1Var_hook, 0x2160, 0x6661);
-  CYC(0x6661, 0x6662); A = mem_rd(gb, HL);
-  CYC(0x6662, 0x6664); alu_cp(gb, 0x0e);
-  if (F & FZ) { RET_TAKEN(0x6664); return; } // ret z
-  CYC(0x6664, 0x6665);
-  CYC(0x6665, 0x6667); E = 0xc4; // Part.state
-  CYC(0x6667, 0x6669); A = 0x03;
-  CYC(0x6669, 0x666a); mem_wr(gb, DE, A);
-  CYC(0x666a, 0x666c); E = 0xc6; // Part.counter1
-  CYC(0x666c, 0x666e); A = 0x07;
-  CYC(0x666e, 0x666f); mem_wr(gb, DE, A);
+  CYC(b_+115, b_+117); A = 0x02; // Object.subid
+  CALL_C(b_+117, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+120);
+  CYC(b_+120, b_+121); A = mem_rd(gb, HL);
+  CYC(b_+121, b_+123); alu_cp(gb, 0x0e);
+  if (F & FZ) { RET_TAKEN(b_+123); return; } // ret z
+  CYC(b_+123, b_+124);
+  CYC(b_+124, b_+126); E = 0xc4; // Part.state
+  CYC(b_+126, b_+128); A = 0x03;
+  CYC(b_+128, b_+129); mem_wr(gb, DE, A);
+  CYC(b_+129, b_+131); E = 0xc6; // Part.counter1
+  CYC(b_+131, b_+133); A = 0x07;
+  CYC(b_+133, b_+134); mem_wr(gb, DE, A);
 
 state3:
-  CYC(0x666f, 0x6671); E = 0xc3; // Part.var03
-  CYC(0x6671, 0x6672); A = mem_rd(gb, DE);
-  CYC(0x6672, 0x6674); alu_cp(gb, 0x06);
-  if (F & FZ) { CYCT(0x6674, 0x6677); partDelete_hook(gb); return; } // jp z
-  CYC(0x6674, 0x6677);
-  CALL_C(0x6677, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x667a);
-  if (!(F & FZ)) { CYCT(0x667a, 0x667d); objectApplySpeed_hook(gb); return; } // jp nz
-  CYC(0x667a, 0x667d);
-  CYC(0x667d, 0x667f); E = 0xc2; // Part.subid
-  CYC(0x667f, 0x6680); mem_wr(gb, DE, A);
-  CYC(0x6680, 0x6682); E = 0xc4; // Part.state
-  CYC(0x6682, 0x6684); A = 0x04;
-  CYC(0x6684, 0x6685); mem_wr(gb, DE, A);
-  RET(0x6685); return; // ret
+  CYC(b_+134, b_+136); E = 0xc3; // Part.var03
+  CYC(b_+136, b_+137); A = mem_rd(gb, DE);
+  CYC(b_+137, b_+139); alu_cp(gb, 0x06);
+  if (F & FZ) { CYCT(b_+139, b_+142); partDelete_hook(gb); return; } // jp z
+  CYC(b_+139, b_+142);
+  CALL_C(b_+142, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+145);
+  if (!(F & FZ)) { CYCT(b_+145, b_+148); objectApplySpeed_hook(gb); return; } // jp nz
+  CYC(b_+145, b_+148);
+  CYC(b_+148, b_+150); E = 0xc2; // Part.subid
+  CYC(b_+150, b_+151); mem_wr(gb, DE, A);
+  CYC(b_+151, b_+153); E = 0xc4; // Part.state
+  CYC(b_+153, b_+155); A = 0x04;
+  CYC(b_+155, b_+156); mem_wr(gb, DE, A);
+  RET(b_+156); return; // ret
 }

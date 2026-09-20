@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(mamamuDog_checkReverseDirection), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(mamamuDog_checkReverseDirection), (from), (to), true)
 
 void writeFlagsTocddb_hook(GB *gb);
 
@@ -28,86 +28,93 @@ static void mamamuDog15_addAToHl_from_rst(GB *gb, uint16_t return_address) {
 
 // Reverse direction if x-position gets too high or low.
 void mamamuDog_checkReverseDirection_hook(GB *gb) {
+  BASE(mamamuDog_checkReverseDirection);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x5e94, objectApplySpeed_hook, 0x201d, 0x5e97);
-  CYC(0x5e97, 0x5e99); E = INTERACTION_BASE + OBJ_XH;
-  CYC(0x5e99, 0x5e9a); A = mem_rd(gb, DE);
-  CYC(0x5e9a, 0x5e9c); alu_sub(gb, 0x18);
-  CYC(0x5e9c, 0x5e9e); alu_cp(gb, 0x70);
-  if (F & FC) { RET_TAKEN(0x5e9e); return; }
-  CYC(0x5e9e, 0x5e9f);
-  CYC(0x5e9f, 0x5ea0); H = D;
-  CYC(0x5ea0, 0x5ea2); L = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x5ea2, 0x5ea3); A = mem_rd(gb, HL);
-  CYC(0x5ea3, 0x5ea5); alu_xor(gb, 0x10);
-  CYC(0x5ea5, 0x5ea6); mem_wr(gb, HL, A);
-  CYC(0x5ea6, 0x5ea8); B = 0x01;
-  CYC(0x5ea8, 0x5eaa); // jr $5eac -- shared tail duplicated below (matches mamamuDog_reverseDirection)
-  CYC(0x5eac, 0x5ead); H = D;
-  CYC(0x5ead, 0x5eaf); L = INTERACTION_BASE + OBJ_VAR3F;
-  CYC(0x5eaf, 0x5eb0); A = mem_rd(gb, HL);
-  CYC(0x5eb0, 0x5eb1); alu_xor(gb, B);
-  CYC(0x5eb1, 0x5eb2); mem_wr(gb, HL, A);
-  CYC(0x5eb2, 0x5eb5); interactionSetAnimation_hook(gb); return; // jp
+  CALL_C(b_+0, objectApplySpeed_hook, SYM(objectApplySpeed), b_+3);
+  CYC(b_+3, b_+5); E = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+8); alu_sub(gb, 0x18);
+  CYC(b_+8, b_+10); alu_cp(gb, 0x70);
+  if (F & FC) { RET_TAKEN(b_+10); return; }
+  CYC(b_+10, b_+11);
+  CYC(b_+11, b_+12); H = D;
+  CYC(b_+12, b_+14); L = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+14, b_+15); A = mem_rd(gb, HL);
+  CYC(b_+15, b_+17); alu_xor(gb, 0x10);
+  CYC(b_+17, b_+18); mem_wr(gb, HL, A);
+  CYC(b_+18, b_+20); B = 0x01;
+  CYC(b_+20, SYM(mamamuDog_reverseDirection)); // jr $5eac -- shared tail duplicated below (matches mamamuDog_reverseDirection)
+  CYC((SYM(mamamuDog_reverseDirection) + 2), (SYM(mamamuDog_reverseDirection) + 3)); H = D;
+  CYC((SYM(mamamuDog_reverseDirection) + 3), (SYM(mamamuDog_reverseDirection) + 5)); L = INTERACTION_BASE + OBJ_VAR3F;
+  CYC((SYM(mamamuDog_reverseDirection) + 5), (SYM(mamamuDog_reverseDirection) + 6)); A = mem_rd(gb, HL);
+  CYC((SYM(mamamuDog_reverseDirection) + 6), (SYM(mamamuDog_reverseDirection) + 7)); alu_xor(gb, B);
+  CYC((SYM(mamamuDog_reverseDirection) + 7), (SYM(mamamuDog_reverseDirection) + 8)); mem_wr(gb, HL, A);
+  CYC((SYM(mamamuDog_reverseDirection) + 8), SYM(mamamuDog_setCounterRandomly)); interactionSetAnimation_hook(gb); return; // jp
 }
 
 void mamamuDog_reverseDirection_hook(GB *gb) {
+  BASE(mamamuDog_reverseDirection);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(0x5eaa, 0x5eac); B = 0x02;
-  CYC(0x5eac, 0x5ead); H = D;
-  CYC(0x5ead, 0x5eaf); L = INTERACTION_BASE + OBJ_VAR3F;
-  CYC(0x5eaf, 0x5eb0); A = mem_rd(gb, HL);
-  CYC(0x5eb0, 0x5eb1); alu_xor(gb, B);
-  CYC(0x5eb1, 0x5eb2); mem_wr(gb, HL, A);
-  CYC(0x5eb2, 0x5eb5); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+0, b_+2); B = 0x02;
+  CYC(b_+2, b_+3); H = D;
+  CYC(b_+3, b_+5); L = INTERACTION_BASE + OBJ_VAR3F;
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL);
+  CYC(b_+6, b_+7); alu_xor(gb, B);
+  CYC(b_+7, b_+8); mem_wr(gb, HL, A);
+  CYC(b_+8, SYM(mamamuDog_setCounterRandomly)); interactionSetAnimation_hook(gb); return; // jp
 }
 
 void mamamuDog_setCounterRandomly_hook(GB *gb) {
+  BASE(mamamuDog_setCounterRandomly);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x5eb5, getRandomNumber_hook, 0x043e, 0x5eb8);
-  CYC(0x5eb8, 0x5eba); alu_and(gb, 0x07);
-  CYC(0x5eba, 0x5ebd); SET_HL(0x5ecc); // mamamuDog_randomCounterValues
-  CYC(0x5ebd, 0x5ebe); mamamuDog15_addAToHl_from_rst(gb, 0x5ebe);
-  CYC(0x5ebe, 0x5ebf); A = mem_rd(gb, HL);
-  CYC(0x5ebf, 0x5ec1); E = INTERACTION_BASE + OBJ_VAR3E;
-  CYC(0x5ec1, 0x5ec2); mem_wr(gb, DE, A);
-  CALL_C(0x5ec2, mamamuDog_hop_hook, 0x5eda, 0x5ec5);
+  CALL_C(b_+0, getRandomNumber_hook, SYM(getRandomNumber), b_+3);
+  CYC(b_+3, b_+5); alu_and(gb, 0x07);
+  CYC(b_+5, b_+8); SET_HL(SYM(mamamuDog_randomCounterValues)); // mamamuDog_randomCounterValues
+  CYC(b_+8, b_+9); mamamuDog15_addAToHl_from_rst(gb, b_+9);
+  CYC(b_+9, b_+10); A = mem_rd(gb, HL);
+  CYC(b_+10, b_+12); E = INTERACTION_BASE + OBJ_VAR3E;
+  CYC(b_+12, b_+13); mem_wr(gb, DE, A);
+  CALL_C(b_+13, mamamuDog_hop_hook, SYM(mamamuDog_hop), SYM(mamamuDog_setZPositionTo0));
   mamamuDog_setZPositionTo0_hook(gb); return; // fallthrough
 }
 
 void mamamuDog_setZPositionTo0_hook(GB *gb) {
+  BASE(mamamuDog_setZPositionTo0);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(0x5ec5, 0x5ec6); H = D;
-  CYC(0x5ec6, 0x5ec8); L = INTERACTION_BASE + OBJ_Z;
-  CYC(0x5ec8, 0x5ec9); alu_xor(gb, A);
-  CYC(0x5ec9, 0x5eca); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x5eca, 0x5ecb); mem_wr(gb, HL, A);
-  RET(0x5ecb); return;
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_Z;
+  CYC(b_+3, b_+4); alu_xor(gb, A);
+  CYC(b_+4, b_+5); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+5, b_+6); mem_wr(gb, HL, A);
+  RET(b_+6); return;
 }
 
 void mamamuDog_updateSpeedZ_hook(GB *gb) {
+  BASE(mamamuDog_updateSpeedZ);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5ed4, 0x5ed6); C = 0x20;
-  CALL_C(0x5ed6, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x5ed9);
-  if (!(F & FZ)) { RET_TAKEN(0x5ed9); return; }
-  CYC(0x5ed9, 0x5eda);
+  CYC(b_+0, b_+2); C = 0x20;
+  CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
+  if (!(F & FZ)) { RET_TAKEN(b_+5); return; }
+  CYC(b_+5, SYM(mamamuDog_hop));
   mamamuDog_hop_hook(gb); return; // fallthrough
 }
 
 void mamamuDog_hop_hook(GB *gb) {
+  BASE(mamamuDog_hop);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(0x5eda, 0x5edd); SET_BC(0xff40); // -$c0
-  CYC(0x5edd, 0x5ee0); objectSetSpeedZ_hook(gb); return; // jp
+  CYC(b_+0, b_+3); SET_BC(0xff40); // -$c0
+  CYC(b_+3, SYM(mamamuDog_decCounter)); objectSetSpeedZ_hook(gb); return; // jp
 }
 
 void mamamuDog_decCounter_hook(GB *gb) {
+  BASE(mamamuDog_decCounter);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(0x5ee0, 0x5ee1); H = D;
-  CYC(0x5ee1, 0x5ee3); L = INTERACTION_BASE + OBJ_VAR3E;
-  CYC(0x5ee3, 0x5ee4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x5ee4, 0x5ee7); writeFlagsTocddb_hook(gb); return; // jp
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR3E;
+  CYC(b_+3, b_+4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+4, SYM(postmanScript_b15)); writeFlagsTocddb_hook(gb); return; // jp
 }

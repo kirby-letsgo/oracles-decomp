@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x09, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x09, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode45), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode45), (from), (to), true)
 
 static uint16_t past_old_lady_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -36,77 +36,80 @@ static void past_old_lady_add_double_index(GB *gb, uint16_t return_address) {
 }
 
 static void past_old_lady_init_graphics_and_inc_state(GB *gb, uint16_t sp0_) {
-  CALL_C(0x568f, interactionInitGraphics_hook, 0x15fb, 0x5692);
-  CALL_C(0x5692, objectMarkSolidPosition_hook, 0x24f0, 0x5695);
-  CYC(0x5695, 0x5698); interactionIncState_hook(gb);
+  BASE(interactionCode45);
+  CALL_C(b_+73, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+76);
+  CALL_C(b_+76, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+79);
+  CYC(b_+79, b_+82); interactionIncState_hook(gb);
 }
 
 static void past_old_lady_init_graphics_text_and_script(GB *gb, uint16_t sp0_) {
-  CALL_C(0x5698, interactionInitGraphics_hook, 0x15fb, 0x569b);
-  CALL_C(0x569b, objectMarkSolidPosition_hook, 0x24f0, 0x569e);
-  CYC(0x569e, 0x56a0); A = 0x18;
-  CALL_C(0x56a0, interactionSetHighTextIndex_hook, 0x253b, 0x56a3);
-  CYC(0x56a3, 0x56a5); E = 0x42;
-  CYC(0x56a5, 0x56a6); A = mem_rd(gb, DE);
-  CYC(0x56a6, 0x56a9); SET_HL(0x56b3);
-  CYC(0x56a9, 0x56aa); past_old_lady_add_double_index(gb, 0x56aa);
-  CYC(0x56aa, 0x56ab); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x56ab, 0x56ac); H = mem_rd(gb, HL);
-  CYC(0x56ac, 0x56ad); L = A;
-  CALL_C(0x56ad, interactionSetScript_hook, 0x2544, 0x56b0);
-  CYC(0x56b0, 0x56b3); interactionIncState_hook(gb);
+  BASE(interactionCode45);
+  CALL_C(b_+82, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+85);
+  CALL_C(b_+85, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+88);
+  CYC(b_+88, b_+90); A = 0x18;
+  CALL_C(b_+90, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+93);
+  CYC(b_+93, b_+95); E = 0x42;
+  CYC(b_+95, b_+96); A = mem_rd(gb, DE);
+  CYC(b_+96, b_+99); SET_HL(b_+109);
+  CYC(b_+99, b_+100); past_old_lady_add_double_index(gb, b_+100);
+  CYC(b_+100, b_+101); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+101, b_+102); H = mem_rd(gb, HL);
+  CYC(b_+102, b_+103); L = A;
+  CALL_C(b_+103, interactionSetScript_hook, SYM(interactionSetScript), b_+106);
+  CYC(b_+106, b_+109); interactionIncState_hook(gb);
 }
 
 void interactionCode45_hook(GB *gb) {
+  BASE(interactionCode45);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5646, 0x5648); E = 0x42;
-  CYC(0x5648, 0x5649); A = mem_rd(gb, DE);
-  CYC(0x5649, 0x564a); push_effect(gb, 0x564a);
-  switch (past_old_lady_jump_table(gb)) {
-    case 0x564e: goto subid0;
-    case 0x5664: goto subid1;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = 0x42;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (past_old_lady_jump_table(gb));
+    if (jt_ == b_+8) { goto subid0; }
+    else if (jt_ == b_+30) { goto subid1; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 subid0:
-  CALL_C(0x564e, checkInteractionState_hook, 0x23fe, 0x5651);
-  if (!(F & FZ)) { CYCT(0x5651, 0x5653); goto run0; }
-  CYC(0x5651, 0x5653);
-  CYC(0x5653, 0x5655); A = 0x14;
-  CALL_C(0x5655, checkGlobalFlag_hook, 0x31f3, 0x5658);
-  if (!(F & FZ)) { CYCT(0x5658, 0x565b); interactionDelete_hook(gb); return; }
-  CYC(0x5658, 0x565b);
-  CYC(0x565b, 0x565e); push_effect(gb, 0x565e);
+  CALL_C(b_+8, checkInteractionState_hook, SYM(checkInteractionState), b_+11);
+  if (!(F & FZ)) { CYCT(b_+11, b_+13); goto run0; }
+  CYC(b_+11, b_+13);
+  CYC(b_+13, b_+15); A = 0x14;
+  CALL_C(b_+15, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+18);
+  if (!(F & FZ)) { CYCT(b_+18, b_+21); interactionDelete_hook(gb); return; }
+  CYC(b_+18, b_+21);
+  CYC(b_+21, b_+24); push_effect(gb, b_+24);
   past_old_lady_init_graphics_text_and_script(gb, sp0_);
 
 run0:
-  CALL_C(0x565e, interactionRunScript_hook, 0x2552, 0x5661);
-  CYC(0x5661, 0x5664); interactionAnimateAsNpc_hook(gb);
+  CALL_C(b_+24, interactionRunScript_hook, SYM(interactionRunScript), b_+27);
+  CYC(b_+27, b_+30); interactionAnimateAsNpc_hook(gb);
   return;
 
 subid1:
-  CALL_C(0x5664, checkInteractionState_hook, 0x23fe, 0x5667);
-  if (!(F & FZ)) { CYCT(0x5667, 0x5669); goto run1; }
-  CYC(0x5667, 0x5669);
-  CYC(0x5669, 0x566c); SET_HL(0x5559);
-  CYC(0x566c, 0x566e); E = 0x09;
-  CALL_C(0x566e, interBankCall_hook, 0x008a, 0x5671);
-  CYC(0x5671, 0x5672); A = B;
-  CYC(0x5672, 0x5674); alu_cp(gb, 0x04);
-  if (!(F & FC)) { CYCT(0x5674, 0x5677); interactionDelete_hook(gb); return; }
-  CYC(0x5674, 0x5677);
-  CYC(0x5677, 0x567a); SET_HL(0x56b7);
-  CYC(0x567a, 0x567b); past_old_lady_add_double_index(gb, 0x567b);
-  CYC(0x567b, 0x567c); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x567c, 0x567d); H = mem_rd(gb, HL);
-  CYC(0x567d, 0x567e); L = A;
-  CALL_C(0x567e, interactionSetScript_hook, 0x2544, 0x5681);
-  CYC(0x5681, 0x5683); A = 0x18;
-  CALL_C(0x5683, interactionSetHighTextIndex_hook, 0x253b, 0x5686);
-  CYC(0x5686, 0x5689); push_effect(gb, 0x5689);
+  CALL_C(b_+30, checkInteractionState_hook, SYM(checkInteractionState), b_+33);
+  if (!(F & FZ)) { CYCT(b_+33, b_+35); goto run1; }
+  CYC(b_+33, b_+35);
+  CYC(b_+35, b_+38); SET_HL(SYM(getGameProgress_2));
+  CYC(b_+38, b_+40); E = 0x09;
+  CALL_C(b_+40, interBankCall_hook, 0x008a, b_+43);
+  CYC(b_+43, b_+44); A = B;
+  CYC(b_+44, b_+46); alu_cp(gb, 0x04);
+  if (!(F & FC)) { CYCT(b_+46, b_+49); interactionDelete_hook(gb); return; }
+  CYC(b_+46, b_+49);
+  CYC(b_+49, b_+52); SET_HL(b_+113);
+  CYC(b_+52, b_+53); past_old_lady_add_double_index(gb, b_+53);
+  CYC(b_+53, b_+54); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+54, b_+55); H = mem_rd(gb, HL);
+  CYC(b_+55, b_+56); L = A;
+  CALL_C(b_+56, interactionSetScript_hook, SYM(interactionSetScript), b_+59);
+  CYC(b_+59, b_+61); A = 0x18;
+  CALL_C(b_+61, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+64);
+  CYC(b_+64, b_+67); push_effect(gb, b_+67);
   past_old_lady_init_graphics_and_inc_state(gb, sp0_);
 
 run1:
-  CALL_C(0x5689, interactionRunScript_hook, 0x2552, 0x568c);
-  CYC(0x568c, 0x568f); interactionAnimateAsNpc_hook(gb);
+  CALL_C(b_+67, interactionRunScript_hook, SYM(interactionRunScript), b_+70);
+  CYC(b_+70, b_+73); interactionAnimateAsNpc_hook(gb);
 }

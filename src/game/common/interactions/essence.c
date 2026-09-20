@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0a, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0a, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interaction7f_subid01), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interaction7f_subid01), (from), (to), true)
 
 static uint16_t interactionCode7f_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -51,303 +51,307 @@ static void interaction7f_subid00_addDoubleIndexToHl_from_rst(GB *gb, uint16_t r
 }
 
 void interaction7f_subid01_hook(GB *gb) {
+  BASE(interaction7f_subid01);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x476f, checkInteractionState_hook, 0x23fe, 0x4772);
-  if (!(F & FZ)) { CYCT(0x4772, 0x4775); objectPreventLinkFromPassing_hook(gb); return; } // jp nz
-  CYC(0x4772, 0x4775);
-  CYC(0x4775, 0x4777); A = 0x01;
-  CYC(0x4777, 0x4778); mem_wr(gb, DE, A);
-  CYC(0x4778, 0x477b); SET_BC(0x060a);
-  CALL_C(0x477b, objectSetCollideRadii_hook, 0x24a9, 0x477e);
-  CALL_C(0x477e, objectGetTileAtPosition_hook, 0x1444, 0x4781);
-  CYC(0x4781, 0x4782); H = alu_dec8(gb, H);
-  CYC(0x4782, 0x4784); mem_wr(gb, HL, 0x0f);
-  CALL_C(0x4784, interactionInitGraphics_hook, 0x15fb, 0x4787);
-  CYC(0x4787, 0x478a); objectSetVisible83_hook(gb); return; // jp
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+6); objectPreventLinkFromPassing_hook(gb); return; } // jp nz
+  CYC(b_+3, b_+6);
+  CYC(b_+6, b_+8); A = 0x01;
+  CYC(b_+8, b_+9); mem_wr(gb, DE, A);
+  CYC(b_+9, b_+12); SET_BC((SYM(loadUncompressedGfxHeader) + 48));
+  CALL_C(b_+12, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+15);
+  CALL_C(b_+15, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+18);
+  CYC(b_+18, b_+19); H = alu_dec8(gb, H);
+  CYC(b_+19, b_+21); mem_wr(gb, HL, 0x0f);
+  CALL_C(b_+21, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+24);
+  CYC(b_+24, SYM(interaction7f_subid02)); objectSetVisible83_hook(gb); return; // jp
 }
 
 // interaction7f_subid02@copyEssencePosition: reached by one genuine call, from @state1's
 // return address 0x479b below; never separately hooked.
 void interaction7f_subid02_hook(GB *gb) {
+  BASE(interaction7f_subid02);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x478a, checkInteractionState_hook, 0x23fe, 0x478d);
-  if (!(F & FZ)) { CYCT(0x478d, 0x478f); goto state1; } // jr nz
-  CYC(0x478d, 0x478f);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); goto state1; } // jr nz
+  CYC(b_+3, b_+5);
 
   // interaction7f_subid02@state0
-  CYC(0x478f, 0x4791); A = 0x01;
-  CYC(0x4791, 0x4792); mem_wr(gb, DE, A);
-  CALL_C(0x4792, interactionInitGraphics_hook, 0x15fb, 0x4795);
-  CYC(0x4795, 0x4798); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+5, b_+7); A = 0x01;
+  CYC(b_+7, b_+8); mem_wr(gb, DE, A);
+  CALL_C(b_+8, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+11);
+  CYC(b_+11, b_+14); objectSetVisible82_hook(gb); return; // jp
 
 state1:
-  CYC(0x4798, 0x479b); push_effect(gb, 0x479b); goto copyEssencePosition;
+  CYC(b_+14, b_+17); push_effect(gb, b_+17); goto copyEssencePosition;
 afterCopy:
-  CALL_C(0x479b, interactionAnimate_hook, 0x261b, 0x479e);
-  CYC(0x479e, 0x479f); H = D;
-  CYC(0x479f, 0x47a1); L = INTERACTION_BASE + OBJ_ANIM_PARAMETER;
-  CYC(0x47a1, 0x47a2); A = mem_rd(gb, HL);
-  CYC(0x47a2, 0x47a3); alu_or(gb, A);
-  if (F & FZ) { RET_TAKEN(0x47a3); return; } // ret z
-  CYC(0x47a3, 0x47a4);
-  CYC(0x47a4, 0x47a6); mem_wr(gb, HL, 0x00);
-  CYC(0x47a6, 0x47a8); L = INTERACTION_BASE + OBJ_VISIBLE;
-  CYC(0x47a8, 0x47aa); A = 0x80;
-  CYC(0x47aa, 0x47ab); alu_xor(gb, mem_rd(gb, HL));
-  CYC(0x47ab, 0x47ac); mem_wr(gb, HL, A);
-  RET(0x47ac); return; // ret
+  CALL_C(b_+17, interactionAnimate_hook, SYM(interactionAnimate), b_+20);
+  CYC(b_+20, b_+21); H = D;
+  CYC(b_+21, b_+23); L = INTERACTION_BASE + OBJ_ANIM_PARAMETER;
+  CYC(b_+23, b_+24); A = mem_rd(gb, HL);
+  CYC(b_+24, b_+25); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+25); return; } // ret z
+  CYC(b_+25, b_+26);
+  CYC(b_+26, b_+28); mem_wr(gb, HL, 0x00);
+  CYC(b_+28, b_+30); L = INTERACTION_BASE + OBJ_VISIBLE;
+  CYC(b_+30, b_+32); A = 0x80;
+  CYC(b_+32, b_+33); alu_xor(gb, mem_rd(gb, HL));
+  CYC(b_+33, b_+34); mem_wr(gb, HL, A);
+  RET(b_+34); return; // ret
 
 copyEssencePosition:
-  CYC(0x47ad, 0x47af); A = 0x00; // Object.enabled
-  CALL_C(0x47af, objectGetRelatedObject1Var_hook, 0x2160, 0x47b2);
-  CYC(0x47b2, 0x47b5); objectTakePosition_hook(gb);
-  if (gb->pc == 0x479b && gb->sp == sp0_) goto afterCopy;
+  CYC(b_+35, b_+37); A = 0x00; // Object.enabled
+  CALL_C(b_+37, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+40);
+  CYC(b_+40, SYM(interactionCode89)); objectTakePosition_hook(gb);
+  if (gb->pc == b_+17 && gb->sp == sp0_) goto afterCopy;
   return;
 }
 
 void interaction7f_subid00_hook(GB *gb) {
+  BASE(interaction7f_subid00);
   uint16_t sp0_ = gb->sp;
-  CYC(0x45ac, 0x45ae); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x45ae, 0x45af); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x45af, 0x45b0); push_effect(gb, 0x45b0);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = interactionCode7f_jump_table(gb);
-    if (target == 0x45c0) goto state0;
-    if (target == 0x4638) goto state1;
-    if (target == 0x46a3) goto state2;
-    if (target == 0x46b8) goto state3;
-    if (target == 0x46cb) goto state4;
-    if (target == 0x4710) goto state5;
-    if (target == 0x471c) goto state6;
+    if (target == b_+20) goto state0;
+    if (target == b_+140) goto state1;
+    if (target == b_+247) goto state2;
+    if (target == b_+268) goto state3;
+    if (target == b_+287) goto state4;
+    if (target == b_+356) goto state5;
+    if (target == b_+368) goto state6;
     goto state7;
   }
 
 state0:
-  CYC(0x45c0, 0x45c2); A = 0x01;
-  CYC(0x45c2, 0x45c3); mem_wr(gb, DE, A);
-  CALL_C(0x45c3, interactionInitGraphics_hook, 0x15fb, 0x45c6);
-  CYC(0x45c6, 0x45c8); A = 0x04;
-  CALL_C(0x45c8, objectSetCollideRadius_hook, 0x24a1, 0x45cb);
-  CYC(0x45cb, 0x45ce); SET_BC(0x7f01); // INTERAC_ESSENCE, $01
-  CALL_C(0x45ce, objectCreateInteraction_hook, 0x24c5, 0x45d1);
-  CALL_C(0x45d1, getThisRoomFlags_hook, 0x197d, 0x45d4);
-  CYC(0x45d4, 0x45d6); alu_and(gb, 0x20);
-  if (!(F & FZ)) { CYCT(0x45d6, 0x45d9); interactionDelete_hook(gb); return; } // jp nz
-  CYC(0x45d6, 0x45d9);
-  CYC(0x45d9, 0x45dc); SET_HL(w1ReservedInteraction1);
-  CYC(0x45dc, 0x45de); B = 0x40;
-  CALL_C(0x45de, clearMemory_hook, 0x046f, 0x45e1);
-  CYC(0x45e1, 0x45e4); SET_HL(w1ReservedInteraction1);
-  CYC(0x45e4, 0x45e6); mem_wr(gb, HL, 0x81);
-  CYC(0x45e6, 0x45e7); L = alu_inc8(gb, L);
-  CYC(0x45e7, 0x45e9); mem_wr(gb, HL, 0x7f); // INTERAC_ESSENCE
-  CYC(0x45e9, 0x45ea); L = alu_inc8(gb, L);
-  CYC(0x45ea, 0x45ec); mem_wr(gb, HL, 0x02);
-  CALL_C(0x45ec, objectCopyPosition_hook, 0x2242, 0x45ef);
-  CYC(0x45ef, 0x45f1); L = INTERACTION_BASE + OBJ_RELATED1;
-  CYC(0x45f1, 0x45f3); A = H8(hActiveObjectType);
-  CYC(0x45f3, 0x45f4); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x45f4, 0x45f6); A = H8(hActiveObject);
-  CYC(0x45f6, 0x45f7); mem_wr(gb, HL, A);
-  CYC(0x45f7, 0x45f8); H = D;
-  CYC(0x45f8, 0x45fa); L = INTERACTION_BASE + OBJ_ZH;
-  CYC(0x45fa, 0x45fc); mem_wr(gb, HL, (uint8_t)-0x10);
-  CYC(0x45fc, 0x45ff); A = W8(wDungeonIndex);
-  CYC(0x45ff, 0x4600); A = alu_dec8(gb, A);
-  CYC(0x4600, 0x4602); alu_cp(gb, 0x0b);
-  if (!(F & FZ)) { CYCT(0x4602, 0x4604); goto afterDungeonOverride; } // jr nz
-  CYC(0x4602, 0x4604);
-  CYC(0x4604, 0x4606); A = 0x05;
+  CYC(b_+20, b_+22); A = 0x01;
+  CYC(b_+22, b_+23); mem_wr(gb, DE, A);
+  CALL_C(b_+23, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+26);
+  CYC(b_+26, b_+28); A = 0x04;
+  CALL_C(b_+28, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+31);
+  CYC(b_+31, b_+34); SET_BC((SYM(interaction97_subid01__positions) + 298)); // INTERAC_ESSENCE, $01
+  CALL_C(b_+34, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+37);
+  CALL_C(b_+37, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+40);
+  CYC(b_+40, b_+42); alu_and(gb, 0x20);
+  if (!(F & FZ)) { CYCT(b_+42, b_+45); interactionDelete_hook(gb); return; } // jp nz
+  CYC(b_+42, b_+45);
+  CYC(b_+45, b_+48); SET_HL(w1ReservedInteraction1);
+  CYC(b_+48, b_+50); B = 0x40;
+  CALL_C(b_+50, clearMemory_hook, SYM(clearMemory), b_+53);
+  CYC(b_+53, b_+56); SET_HL(w1ReservedInteraction1);
+  CYC(b_+56, b_+58); mem_wr(gb, HL, 0x81);
+  CYC(b_+58, b_+59); L = alu_inc8(gb, L);
+  CYC(b_+59, b_+61); mem_wr(gb, HL, 0x7f); // INTERAC_ESSENCE
+  CYC(b_+61, b_+62); L = alu_inc8(gb, L);
+  CYC(b_+62, b_+64); mem_wr(gb, HL, 0x02);
+  CALL_C(b_+64, objectCopyPosition_hook, SYM(objectCopyPosition), b_+67);
+  CYC(b_+67, b_+69); L = INTERACTION_BASE + OBJ_RELATED1;
+  CYC(b_+69, b_+71); A = H8(hActiveObjectType);
+  CYC(b_+71, b_+72); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+72, b_+74); A = H8(hActiveObject);
+  CYC(b_+74, b_+75); mem_wr(gb, HL, A);
+  CYC(b_+75, b_+76); H = D;
+  CYC(b_+76, b_+78); L = INTERACTION_BASE + OBJ_ZH;
+  CYC(b_+78, b_+80); mem_wr(gb, HL, (uint8_t)-0x10);
+  CYC(b_+80, b_+83); A = W8(wDungeonIndex);
+  CYC(b_+83, b_+84); A = alu_dec8(gb, A);
+  CYC(b_+84, b_+86); alu_cp(gb, 0x0b);
+  if (!(F & FZ)) { CYCT(b_+86, b_+88); goto afterDungeonOverride; } // jr nz
+  CYC(b_+86, b_+88);
+  CYC(b_+88, b_+90); A = 0x05;
 
 afterDungeonOverride:
-  CYC(0x4606, 0x4608); L = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x4608, 0x4609); mem_wr(gb, HL, A);
-  CYC(0x4609, 0x460a); B = A;
-  CYC(0x460a, 0x460b); alu_add(gb, A);
-  CYC(0x460b, 0x460c); alu_add(gb, B);
-  CYC(0x460c, 0x460f); SET_HL(0x4620); // interaction7f_subid00@essenceOamData
-  CYC(0x460f, 0x4610); interaction7f_subid00_addAToHl_from_rst(gb, 0x4610);
-  CYC(0x4610, 0x4612); E = INTERACTION_BASE + OBJ_OAM_TILE_INDEX_BASE;
-  CYC(0x4612, 0x4613); A = mem_rd(gb, DE);
-  CYC(0x4613, 0x4614); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x4614, 0x4615); SET_HL(HL + 1); // inc hl
-  CYC(0x4615, 0x4616); mem_wr(gb, DE, A);
-  CYC(0x4616, 0x4617); E = alu_dec8(gb, E);
-  CYC(0x4617, 0x4618); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x4618, 0x4619); mem_wr(gb, DE, A);
-  CYC(0x4619, 0x461a); A = mem_rd(gb, HL);
-  CALL_C(0x461a, interactionSetAnimation_hook, 0x262e, 0x461d);
-  CYC(0x461d, 0x4620); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+90, b_+92); L = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+92, b_+93); mem_wr(gb, HL, A);
+  CYC(b_+93, b_+94); B = A;
+  CYC(b_+94, b_+95); alu_add(gb, A);
+  CYC(b_+95, b_+96); alu_add(gb, B);
+  CYC(b_+96, b_+99); SET_HL(b_+116); // interaction7f_subid00@essenceOamData
+  CYC(b_+99, b_+100); interaction7f_subid00_addAToHl_from_rst(gb, b_+100);
+  CYC(b_+100, b_+102); E = INTERACTION_BASE + OBJ_OAM_TILE_INDEX_BASE;
+  CYC(b_+102, b_+103); A = mem_rd(gb, DE);
+  CYC(b_+103, b_+104); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+104, b_+105); SET_HL(HL + 1); // inc hl
+  CYC(b_+105, b_+106); mem_wr(gb, DE, A);
+  CYC(b_+106, b_+107); E = alu_dec8(gb, E);
+  CYC(b_+107, b_+108); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+108, b_+109); mem_wr(gb, DE, A);
+  CYC(b_+109, b_+110); A = mem_rd(gb, HL);
+  CALL_C(b_+110, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+113);
+  CYC(b_+113, b_+116); objectSetVisible81_hook(gb); return; // jp
 
 state1:
-  CYC(0x4638, 0x463b); A = W8(wFrameCounter);
-  CYC(0x463b, 0x463d); alu_and(gb, 0x03);
-  if (!(F & FZ)) { RET_TAKEN(0x463d); return; } // ret nz
-  CYC(0x463d, 0x463e);
-  CYC(0x463e, 0x463f); H = D;
-  CYC(0x463f, 0x4641); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x4641, 0x4642); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x4642, 0x4643); A = mem_rd(gb, HL);
-  CYC(0x4643, 0x4645); alu_and(gb, 0x0f);
-  CYC(0x4645, 0x4648); SET_HL(0x4693); // interaction7f_subid00@essenceFloatOffsets
-  CYC(0x4648, 0x4649); interaction7f_subid00_addAToHl_from_rst(gb, 0x4649);
-  CYC(0x4649, 0x464a); A = mem_rd(gb, HL);
-  CYC(0x464a, 0x464c); alu_add(gb, 0xf0);
-  CYC(0x464c, 0x464e); E = INTERACTION_BASE + OBJ_ZH;
-  CYC(0x464e, 0x464f); mem_wr(gb, DE, A);
-  CYC(0x464f, 0x4652); A = W8(wLinkInAir);
-  CYC(0x4652, 0x4653); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x4653); return; } // ret nz
-  CYC(0x4653, 0x4654);
-  CYC(0x4654, 0x4657); A = W8(wLinkGrabState);
-  CYC(0x4657, 0x4658); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x4658); return; } // ret nz
-  CYC(0x4658, 0x4659);
-  CYC(0x4659, 0x465b); B = 0x04;
-  CALL_C(0x465b, objectCheckCenteredWithLink_hook, 0x1fee, 0x465e);
-  if (!(F & FC)) { RET_TAKEN(0x465e); return; } // ret nc
-  CYC(0x465e, 0x465f);
-  CYC(0x465f, 0x4661); C = 0x14;
-  CALL_C(0x4661, objectCheckLinkWithinDistance_hook, 0x1fa2, 0x4664);
-  if (!(F & FC)) { RET_TAKEN(0x4664); return; } // ret nc
-  CYC(0x4664, 0x4665);
-  CYC(0x4665, 0x4667); alu_cp(gb, 0x04);
-  if (!(F & FZ)) { RET_TAKEN(0x4667); return; } // ret nz
-  CYC(0x4667, 0x4668);
-  CALL_C(0x4668, clearAllParentItems_hook, 0x2c10, 0x466b);
-  CYC(0x466b, 0x466d); A = 0x81;
-  CYC(0x466d, 0x4670); W8(wDisabledObjects) = A;
-  CYC(0x4670, 0x4673); W8(wDisableLinkCollisionsAndMenu) = A;
-  CYC(0x4673, 0x4676); SET_HL(w1Link_direction);
-  CYC(0x4676, 0x4678); mem_wr(gb, HL, 0x00); // DIR_UP
-  CALL_C(0x4678, objectGetAngleTowardLink_hook, 0x1e9c, 0x467b);
-  CYC(0x467b, 0x467c); H = D;
-  CYC(0x467c, 0x467e); L = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x467e, 0x467f); mem_wr(gb, HL, A);
-  CYC(0x467f, 0x4681); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x4681, 0x4683); mem_wr(gb, HL, 0x14); // SPEED_80
-  CYC(0x4683, 0x4685); L = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4685, 0x4686); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CALL_C(0x4686, darkenRoom_hook, 0x3315, 0x4689);
-  CYC(0x4689, 0x468b); A = 0x77; // SND_DROPESSENCE
-  CALL_C(0x468b, playSound_b00_hook, 0x0c98, 0x468e);
-  CYC(0x468e, 0x4690); A = 0xfc; // SNDCTRL_SLOW_FADEOUT
-  CYC(0x4690, 0x4693); playSound_b00_hook(gb); return; // jp
+  CYC(b_+140, b_+143); A = W8(wFrameCounter);
+  CYC(b_+143, b_+145); alu_and(gb, 0x03);
+  if (!(F & FZ)) { RET_TAKEN(b_+145); return; } // ret nz
+  CYC(b_+145, b_+146);
+  CYC(b_+146, b_+147); H = D;
+  CYC(b_+147, b_+149); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+149, b_+150); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+150, b_+151); A = mem_rd(gb, HL);
+  CYC(b_+151, b_+153); alu_and(gb, 0x0f);
+  CYC(b_+153, b_+156); SET_HL(b_+231); // interaction7f_subid00@essenceFloatOffsets
+  CYC(b_+156, b_+157); interaction7f_subid00_addAToHl_from_rst(gb, b_+157);
+  CYC(b_+157, b_+158); A = mem_rd(gb, HL);
+  CYC(b_+158, b_+160); alu_add(gb, 0xf0);
+  CYC(b_+160, b_+162); E = INTERACTION_BASE + OBJ_ZH;
+  CYC(b_+162, b_+163); mem_wr(gb, DE, A);
+  CYC(b_+163, b_+166); A = W8(wLinkInAir);
+  CYC(b_+166, b_+167); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+167); return; } // ret nz
+  CYC(b_+167, b_+168);
+  CYC(b_+168, b_+171); A = W8(wLinkGrabState);
+  CYC(b_+171, b_+172); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+172); return; } // ret nz
+  CYC(b_+172, b_+173);
+  CYC(b_+173, b_+175); B = 0x04;
+  CALL_C(b_+175, objectCheckCenteredWithLink_hook, SYM(objectCheckCenteredWithLink), b_+178);
+  if (!(F & FC)) { RET_TAKEN(b_+178); return; } // ret nc
+  CYC(b_+178, b_+179);
+  CYC(b_+179, b_+181); C = 0x14;
+  CALL_C(b_+181, objectCheckLinkWithinDistance_hook, SYM(objectCheckLinkWithinDistance), b_+184);
+  if (!(F & FC)) { RET_TAKEN(b_+184); return; } // ret nc
+  CYC(b_+184, b_+185);
+  CYC(b_+185, b_+187); alu_cp(gb, 0x04);
+  if (!(F & FZ)) { RET_TAKEN(b_+187); return; } // ret nz
+  CYC(b_+187, b_+188);
+  CALL_C(b_+188, clearAllParentItems_hook, SYM(clearAllParentItems), b_+191);
+  CYC(b_+191, b_+193); A = 0x81;
+  CYC(b_+193, b_+196); W8(wDisabledObjects) = A;
+  CYC(b_+196, b_+199); W8(wDisableLinkCollisionsAndMenu) = A;
+  CYC(b_+199, b_+202); SET_HL(w1Link_direction);
+  CYC(b_+202, b_+204); mem_wr(gb, HL, 0x00); // DIR_UP
+  CALL_C(b_+204, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+207);
+  CYC(b_+207, b_+208); H = D;
+  CYC(b_+208, b_+210); L = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+210, b_+211); mem_wr(gb, HL, A);
+  CYC(b_+211, b_+213); L = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+213, b_+215); mem_wr(gb, HL, 0x14); // SPEED_80
+  CYC(b_+215, b_+217); L = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+217, b_+218); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CALL_C(b_+218, darkenRoom_hook, SYM(darkenRoom), b_+221);
+  CYC(b_+221, b_+223); A = 0x77; // SND_DROPESSENCE
+  CALL_C(b_+223, playSound_b00_hook, SYM(playSound_b00), b_+226);
+  CYC(b_+226, b_+228); A = 0xfc; // SNDCTRL_SLOW_FADEOUT
+  CYC(b_+228, b_+231); playSound_b00_hook(gb); return; // jp
 
 state2:
-  CALL_C(0x46a3, objectGetAngleTowardLink_hook, 0x1e9c, 0x46a6);
-  CYC(0x46a6, 0x46a8); E = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x46a8, 0x46a9); mem_wr(gb, DE, A);
-  CALL_C(0x46a9, objectApplySpeed_hook, 0x201d, 0x46ac);
-  CALL_C(0x46ac, objectCheckCollidedWithLink_ignoreZ_hook, 0x1c6f, 0x46af);
-  if (!(F & FC)) { RET_TAKEN(0x46af); return; } // ret nc
-  CYC(0x46af, 0x46b0);
-  CYC(0x46b0, 0x46b2); E = INTERACTION_BASE + OBJ_COLLISION_RADIUS_X;
-  CYC(0x46b2, 0x46b4); A = 0x06;
-  CYC(0x46b4, 0x46b5); mem_wr(gb, DE, A);
-  CYC(0x46b5, 0x46b8); interactionIncState_hook(gb); return; // jp
+  CALL_C(b_+247, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+250);
+  CYC(b_+250, b_+252); E = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+252, b_+253); mem_wr(gb, DE, A);
+  CALL_C(b_+253, objectApplySpeed_hook, SYM(objectApplySpeed), b_+256);
+  CALL_C(b_+256, objectCheckCollidedWithLink_ignoreZ_hook, SYM(objectCheckCollidedWithLink_ignoreZ), b_+259);
+  if (!(F & FC)) { RET_TAKEN(b_+259); return; } // ret nc
+  CYC(b_+259, b_+260);
+  CYC(b_+260, b_+262); E = INTERACTION_BASE + OBJ_COLLISION_RADIUS_X;
+  CYC(b_+262, b_+264); A = 0x06;
+  CYC(b_+264, b_+265); mem_wr(gb, DE, A);
+  CYC(b_+265, b_+268); interactionIncState_hook(gb); return; // jp
 
 state3:
-  CYC(0x46b8, 0x46ba); C = 0x08;
-  CALL_C(0x46ba, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x46bd);
-  if (F & FZ) { CYCT(0x46bd, 0x46bf); goto afterSpeedZCheck; } // jr z
-  CYC(0x46bd, 0x46bf);
-  CALL_C(0x46bf, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, 0x1c28, 0x46c2);
-  if (!(F & FC)) { RET_TAKEN(0x46c2); return; } // ret nc
-  CYC(0x46c2, 0x46c3);
+  CYC(b_+268, b_+270); C = 0x08;
+  CALL_C(b_+270, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+273);
+  if (F & FZ) { CYCT(b_+273, b_+275); goto afterSpeedZCheck; } // jr z
+  CYC(b_+273, b_+275);
+  CALL_C(b_+275, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing), b_+278);
+  if (!(F & FC)) { RET_TAKEN(b_+278); return; } // ret nc
+  CYC(b_+278, b_+279);
 
 afterSpeedZCheck:
-  CYC(0x46c3, 0x46c4); H = D;
-  CYC(0x46c4, 0x46c6); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x46c6, 0x46c8); mem_wr(gb, HL, 30);
-  CYC(0x46c8, 0x46cb); interactionIncState_hook(gb); return; // jp
+  CYC(b_+279, b_+280); H = D;
+  CYC(b_+280, b_+282); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+282, b_+284); mem_wr(gb, HL, 30);
+  CYC(b_+284, b_+287); interactionIncState_hook(gb); return; // jp
 
 state4:
-  CALL_C(0x46cb, interactionDecCounter1_hook, 0x23cc, 0x46ce);
-  if (!(F & FZ)) { RET_TAKEN(0x46ce); return; } // ret nz
-  CYC(0x46ce, 0x46cf);
-  CYC(0x46cf, 0x46d1); A = 0x04; // LINK_STATE_04
-  CYC(0x46d1, 0x46d4); W8(wLinkForceState) = A;
-  CYC(0x46d4, 0x46d6); A = 0x01;
-  CYC(0x46d6, 0x46d9); W8(wcc50) = A;
-  CALL_C(0x46d9, interactionIncState_hook, 0x23e0, 0x46dc);
-  CYC(0x46dc, 0x46df); A = W8(w1Link_yh);
-  CYC(0x46df, 0x46e1); alu_sub(gb, 0x0e);
-  CYC(0x46e1, 0x46e3); L = INTERACTION_BASE + OBJ_YH;
-  CYC(0x46e3, 0x46e4); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x46e4, 0x46e5); L = alu_inc8(gb, L);
-  CYC(0x46e5, 0x46e8); A = W8(w1Link_xh);
-  CYC(0x46e8, 0x46e9); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x46e9, 0x46ea); L = alu_inc8(gb, L);
-  CYC(0x46ea, 0x46eb); alu_xor(gb, A);
-  CYC(0x46eb, 0x46ec); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x46ec, 0x46ed); mem_wr(gb, HL, A);
-  CYC(0x46ed, 0x46ef); L = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x46ef, 0x46f0); A = mem_rd(gb, HL);
-  CYC(0x46f0, 0x46f3); SET_HL(0x4708); // interaction7f_subid00@getEssenceTextTable
-  CYC(0x46f3, 0x46f4); interaction7f_subid00_addAToHl_from_rst(gb, 0x46f4);
-  CYC(0x46f4, 0x46f6); B = 0x00; // >TX_0000
-  CYC(0x46f6, 0x46f7); C = mem_rd(gb, HL);
-  CALL_C(0x46f7, showText_hook, 0x1872, 0x46fa);
-  CALL_C(0x46fa, getThisRoomFlags_hook, 0x197d, 0x46fd);
-  CYC(0x46fd, 0x46ff); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 5)); // ROOMFLAG_BIT_ITEM
-  CYC(0x46ff, 0x4701); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x4701, 0x4702); A = mem_rd(gb, DE);
-  CYC(0x4702, 0x4703); C = A;
-  CYC(0x4703, 0x4705); A = 0x40; // TREASURE_ESSENCE
-  CYC(0x4705, 0x4708); giveTreasure_hook(gb); return; // jp
+  CALL_C(b_+287, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+290);
+  if (!(F & FZ)) { RET_TAKEN(b_+290); return; } // ret nz
+  CYC(b_+290, b_+291);
+  CYC(b_+291, b_+293); A = 0x04; // LINK_STATE_04
+  CYC(b_+293, b_+296); W8(wLinkForceState) = A;
+  CYC(b_+296, b_+298); A = 0x01;
+  CYC(b_+298, b_+301); W8(wcc50) = A;
+  CALL_C(b_+301, interactionIncState_hook, SYM(interactionIncState), b_+304);
+  CYC(b_+304, b_+307); A = W8(w1Link_yh);
+  CYC(b_+307, b_+309); alu_sub(gb, 0x0e);
+  CYC(b_+309, b_+311); L = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+311, b_+312); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+312, b_+313); L = alu_inc8(gb, L);
+  CYC(b_+313, b_+316); A = W8(w1Link_xh);
+  CYC(b_+316, b_+317); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+317, b_+318); L = alu_inc8(gb, L);
+  CYC(b_+318, b_+319); alu_xor(gb, A);
+  CYC(b_+319, b_+320); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+320, b_+321); mem_wr(gb, HL, A);
+  CYC(b_+321, b_+323); L = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+323, b_+324); A = mem_rd(gb, HL);
+  CYC(b_+324, b_+327); SET_HL(b_+348); // interaction7f_subid00@getEssenceTextTable
+  CYC(b_+327, b_+328); interaction7f_subid00_addAToHl_from_rst(gb, b_+328);
+  CYC(b_+328, b_+330); B = 0x00; // >TX_0000
+  CYC(b_+330, b_+331); C = mem_rd(gb, HL);
+  CALL_C(b_+331, showText_hook, SYM(showText), b_+334);
+  CALL_C(b_+334, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+337);
+  CYC(b_+337, b_+339); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 5)); // ROOMFLAG_BIT_ITEM
+  CYC(b_+339, b_+341); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+341, b_+342); A = mem_rd(gb, DE);
+  CYC(b_+342, b_+343); C = A;
+  CYC(b_+343, b_+345); A = 0x40; // TREASURE_ESSENCE
+  CYC(b_+345, b_+348); giveTreasure_hook(gb); return; // jp
 
 state5:
-  CALL_C(0x4710, retIfTextIsActive_hook, 0x1859, 0x4713);
-  CALL_C(0x4713, interactionIncState_hook, 0x23e0, 0x4716);
-  CYC(0x4716, 0x4719); SET_HL(0x49c8); // mainScripts.essenceScript_essenceGetCutscene
-  CYC(0x4719, 0x471c); interactionSetScript_hook(gb); return; // jp
+  CALL_C(b_+356, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+359);
+  CALL_C(b_+359, interactionIncState_hook, SYM(interactionIncState), b_+362);
+  CYC(b_+362, b_+365); SET_HL((SYM(interactionCode91__subid00__state1) + 31)); // mainScripts.essenceScript_essenceGetCutscene
+  CYC(b_+365, b_+368); interactionSetScript_hook(gb); return; // jp
 
 state6:
-  CALL_C(0x471c, interactionRunScript_hook, 0x2552, 0x471f);
-  if (!(F & FC)) { RET_TAKEN(0x471f); return; } // ret nc
-  CYC(0x471f, 0x4720);
-  CALL_C(0x4720, interactionIncState_hook, 0x23e0, 0x4723);
-  CYC(0x4723, 0x4725); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x4725, 0x4727); mem_wr(gb, HL, 30);
+  CALL_C(b_+368, interactionRunScript_hook, SYM(interactionRunScript), b_+371);
+  if (!(F & FC)) { RET_TAKEN(b_+371); return; } // ret nc
+  CYC(b_+371, b_+372);
+  CALL_C(b_+372, interactionIncState_hook, SYM(interactionIncState), b_+375);
+  CYC(b_+375, b_+377); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+377, b_+379); mem_wr(gb, HL, 30);
 
 state7:
-  CALL_C(0x4727, interactionDecCounter1_hook, 0x23cc, 0x472a);
-  if (!(F & FZ)) { RET_TAKEN(0x472a); return; } // ret nz
-  CYC(0x472a, 0x472b);
-  CYC(0x472b, 0x472d); L = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x472d, 0x472e); A = mem_rd(gb, HL);
-  CYC(0x472e, 0x472f); alu_add(gb, A);
-  CYC(0x472f, 0x4732); SET_HL(0x474f); // interaction7f_subid00@essenceWarps
-  CYC(0x4732, 0x4733); interaction7f_subid00_addDoubleIndexToHl_from_rst(gb, 0x4733);
-  CYC(0x4733, 0x4734); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x4734, 0x4737); W8(wWarpDestGroup) = A;
-  CYC(0x4737, 0x4738); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x4738, 0x473b); W8(wWarpDestRoom) = A;
-  CYC(0x473b, 0x473c); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x473c, 0x473f); W8(wWarpDestPos) = A;
-  CYC(0x473f, 0x4740); A = mem_rd(gb, HL);
-  CYC(0x4740, 0x4743); W8(wWarpTransition) = A;
-  CYC(0x4743, 0x4745); A = 0x83;
-  CYC(0x4745, 0x4748); W8(wWarpTransition2) = A;
-  CYC(0x4748, 0x4749); alu_xor(gb, A);
-  CYC(0x4749, 0x474c); W8(wActiveMusic) = A;
-  CYC(0x474c, 0x474f); clearStaticObjects_hook(gb); return; // jp
+  CALL_C(b_+379, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+382);
+  if (!(F & FZ)) { RET_TAKEN(b_+382); return; } // ret nz
+  CYC(b_+382, b_+383);
+  CYC(b_+383, b_+385); L = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+385, b_+386); A = mem_rd(gb, HL);
+  CYC(b_+386, b_+387); alu_add(gb, A);
+  CYC(b_+387, b_+390); SET_HL(b_+419); // interaction7f_subid00@essenceWarps
+  CYC(b_+390, b_+391); interaction7f_subid00_addDoubleIndexToHl_from_rst(gb, b_+391);
+  CYC(b_+391, b_+392); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+392, b_+395); W8(wWarpDestGroup) = A;
+  CYC(b_+395, b_+396); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+396, b_+399); W8(wWarpDestRoom) = A;
+  CYC(b_+399, b_+400); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+400, b_+403); W8(wWarpDestPos) = A;
+  CYC(b_+403, b_+404); A = mem_rd(gb, HL);
+  CYC(b_+404, b_+407); W8(wWarpTransition) = A;
+  CYC(b_+407, b_+409); A = 0x83;
+  CYC(b_+409, b_+412); W8(wWarpTransition2) = A;
+  CYC(b_+412, b_+413); alu_xor(gb, A);
+  CYC(b_+413, b_+416); W8(wActiveMusic) = A;
+  CYC(b_+416, b_+419); clearStaticObjects_hook(gb); return; // jp
 }
 
 // INTERAC_ESSENCE
 void interactionCode7f_hook(GB *gb) {
-  CYC(0x459d, 0x45a0); A = W8(wLinkDeathTrigger);
-  CYC(0x45a0, 0x45a1); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x45a1); return; } // ret nz
-  CYC(0x45a1, 0x45a2);
-  CYC(0x45a2, 0x45a4); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x45a4, 0x45a5); A = mem_rd(gb, DE);
+  BASE(interactionCode7f);
+  CYC(b_+0, b_+3); A = W8(wLinkDeathTrigger);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+4); return; } // ret nz
+  CYC(b_+4, b_+5);
+  CYC(b_+5, b_+7); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+7, b_+8); A = mem_rd(gb, DE);
   {
-    CYC(0x45a5, 0x45a6); push_effect(gb, 0x45a6);
+    CYC(b_+8, b_+9); push_effect(gb, b_+9);
     uint16_t target = interactionCode7f_jump_table(gb);
-    if (target == 0x45ac) { interaction7f_subid00_hook(gb); return; }
-    if (target == 0x476f) { interaction7f_subid01_hook(gb); return; }
+    if (target == SYM(interaction7f_subid00)) { interaction7f_subid00_hook(gb); return; }
+    if (target == SYM(interaction7f_subid01)) { interaction7f_subid01_hook(gb); return; }
     interaction7f_subid02_hook(gb); return;
   }
 }

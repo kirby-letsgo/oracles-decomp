@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(impa_moveLinkRight8Frames), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(impa_moveLinkRight8Frames), (from), (to), true)
 
 void impa_moveLinkUp32Frames_hook(GB *gb);
 void impa_moveLinkRight8Frames_hook(GB *gb);
@@ -12,41 +12,46 @@ void impa_restoreNormalSpriteSheet_hook(GB *gb);
 void impa_showZeldaKidnappedTextNonExitable_hook(GB *gb);
 
 static void impa_setLinkAnimState0b(GB *gb) {
-  CYC(0x52fa, 0x52fc); A = 0x0b;
-  CYC(0x52fc, 0x52ff); mem_wr(gb, wLinkForceState, A);
-  RET(0x52ff);
+  BASE(impa_moveLinkRight8Frames);
+  CYC(b_+10, b_+12); A = 0x0b;
+  CYC(b_+12, b_+15); mem_wr(gb, wLinkForceState, A);
+  RET(b_+15);
 }
 
 void impa_moveLinkUp32Frames_hook(GB *gb) {
-  CYC(0x52e2, 0x52e4); A = 0x20;
-  CYC(0x52e4, 0x52e7); mem_wr(gb, wLinkStateParameter, A);
-  CYC(0x52e7, 0x52e8); alu_xor(gb, A);
-  CYC(0x52e8, 0x52eb); mem_wr(gb, w1Link_angle, A);
-  CYC(0x52eb, 0x52ee); mem_wr(gb, w1Link_direction, A);
-  CYC(0x52ee, 0x52f0);
+  BASE(impa_moveLinkUp32Frames);
+  CYC(b_+0, b_+2); A = 0x20;
+  CYC(b_+2, b_+5); mem_wr(gb, wLinkStateParameter, A);
+  CYC(b_+5, b_+6); alu_xor(gb, A);
+  CYC(b_+6, b_+9); mem_wr(gb, w1Link_angle, A);
+  CYC(b_+9, b_+12); mem_wr(gb, w1Link_direction, A);
+  CYC(b_+12, SYM(impa_moveLinkRight8Frames));
   impa_setLinkAnimState0b(gb);
 }
 
 void impa_moveLinkRight8Frames_hook(GB *gb) {
-  CYC(0x52f0, 0x52f2); A = 0x08;
-  CYC(0x52f2, 0x52f5); mem_wr(gb, wLinkStateParameter, A);
-  CYC(0x52f5, 0x52f7); A = 0x08;
-  CYC(0x52f7, 0x52fa); mem_wr(gb, w1Link_angle, A);
+  BASE(impa_moveLinkRight8Frames);
+  CYC(b_+0, b_+2); A = 0x08;
+  CYC(b_+2, b_+5); mem_wr(gb, wLinkStateParameter, A);
+  CYC(b_+5, b_+7); A = 0x08;
+  CYC(b_+7, b_+10); mem_wr(gb, w1Link_angle, A);
   impa_setLinkAnimState0b(gb);
 }
 
 void impa_restoreNormalSpriteSheet_hook(GB *gb) {
-  CYC(0x5300, 0x5302); E = INTERACTION_BASE + OBJ_VAR3B;
-  CYC(0x5302, 0x5303); A = mem_rd(gb, DE);
-  CYC(0x5303, 0x5305); E = INTERACTION_BASE + OBJ_OAM_TILE_INDEX_BASE;
-  CYC(0x5305, 0x5306); mem_wr(gb, DE, A);
-  CYC(0x5306, 0x5308); E = INTERACTION_BASE + OBJ_OAM_FLAGS;
-  CYC(0x5308, 0x530a); A = 0x02;
-  CYC(0x530a, 0x530b); mem_wr(gb, DE, A);
-  RET(0x530b);
+  BASE(impa_restoreNormalSpriteSheet);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_VAR3B;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); E = INTERACTION_BASE + OBJ_OAM_TILE_INDEX_BASE;
+  CYC(b_+5, b_+6); mem_wr(gb, DE, A);
+  CYC(b_+6, b_+8); E = INTERACTION_BASE + OBJ_OAM_FLAGS;
+  CYC(b_+8, b_+10); A = 0x02;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  RET(b_+11);
 }
 
 void impa_showZeldaKidnappedTextNonExitable_hook(GB *gb) {
-  CYC(0x530c, 0x530f); SET_BC(0x0131);
-  CYC(0x530f, 0x5312); showTextNonExitable_hook(gb);
+  BASE(impa_showZeldaKidnappedTextNonExitable);
+  CYC(b_+0, b_+3); SET_BC(0x0131);
+  CYC(b_+3, SYM(impaScript_rockJustMoved_b15)); showTextNonExitable_hook(gb);
 }

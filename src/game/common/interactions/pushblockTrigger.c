@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode13), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode13), (from), (to), true)
 
 #define TILEINDEX_PUSHABLE_BLOCK 0x1d
 
@@ -29,94 +29,99 @@ static uint16_t pushblockTrigger_jumpTable(GB *gb) {
 // interactionCode13@state0: replace the tile at the object's position with a pushable block,
 // remembering the original tile in var19, and count it as an "enemy".
 static void pushblockTrigger_state0(GB *gb, uint16_t sp0_) {
-  CYC(0x43df, 0x43e0); H = D;
-  CYC(0x43e0, 0x43e2); L = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x43e2, 0x43e4); mem_wr(gb, HL, 0x01);
-  CALL_C(0x43e4, objectGetShortPosition_hook, 0x2096, 0x43e7);
-  CYC(0x43e7, 0x43e9); L = INTERACTION_BASE + OBJ_VAR18;
-  CYC(0x43e9, 0x43ea); mem_wr(gb, HL, A);
-  CYC(0x43ea, 0x43eb); C = A;
-  CYC(0x43eb, 0x43ed); B = wRoomLayout >> 8;
-  CYC(0x43ed, 0x43ee); A = mem_rd(gb, BC);
-  CYC(0x43ee, 0x43ef); L = alu_inc8(gb, L);
-  CYC(0x43ef, 0x43f0); mem_wr(gb, HL, A);
-  CYC(0x43f0, 0x43f2); A = TILEINDEX_PUSHABLE_BLOCK;
-  CYC(0x43f2, 0x43f3); mem_wr(gb, BC, A);
-  CYC(0x43f3, 0x43f6); SET_HL(wNumEnemies);
-  CYC(0x43f6, 0x43f7); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x43f7, 0x43f8); ret_effect(gb);
+  BASE(interactionCode13);
+  CYC(b_+18, b_+19); H = D;
+  CYC(b_+19, b_+21); L = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+21, b_+23); mem_wr(gb, HL, 0x01);
+  CALL_C(b_+23, objectGetShortPosition_hook, SYM(objectGetShortPosition), b_+26);
+  CYC(b_+26, b_+28); L = INTERACTION_BASE + OBJ_VAR18;
+  CYC(b_+28, b_+29); mem_wr(gb, HL, A);
+  CYC(b_+29, b_+30); C = A;
+  CYC(b_+30, b_+32); B = wRoomLayout >> 8;
+  CYC(b_+32, b_+33); A = mem_rd(gb, BC);
+  CYC(b_+33, b_+34); L = alu_inc8(gb, L);
+  CYC(b_+34, b_+35); mem_wr(gb, HL, A);
+  CYC(b_+35, b_+37); A = TILEINDEX_PUSHABLE_BLOCK;
+  CYC(b_+37, b_+38); mem_wr(gb, BC, A);
+  CYC(b_+38, b_+41); SET_HL(wNumEnemies);
+  CYC(b_+41, b_+42); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+42, b_+43); ret_effect(gb);
 }
 
 // interactionCode13@state1: wait for wNumEnemies to reach subid, then restore the original tile.
 static void pushblockTrigger_state1(GB *gb) {
-  CYC(0x43f8, 0x43fb); A = mem_rd(gb, wNumEnemies);
-  CYC(0x43fb, 0x43fc); B = A;
-  CYC(0x43fc, 0x43fe); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x43fe, 0x43ff); A = mem_rd(gb, DE);
-  CYC(0x43ff, 0x4400); alu_cp(gb, B);
+  BASE(interactionCode13);
+  CYC(b_+43, b_+46); A = mem_rd(gb, wNumEnemies);
+  CYC(b_+46, b_+47); B = A;
+  CYC(b_+47, b_+49); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+49, b_+50); A = mem_rd(gb, DE);
+  CYC(b_+50, b_+51); alu_cp(gb, B);
   if (F & FC) {
-    CYCT(0x4400, 0x4401); ret_effect(gb); return;
+    CYCT(b_+51, b_+52); ret_effect(gb); return;
   }
-  CYC(0x4400, 0x4401);
-  CYC(0x4401, 0x4403); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4403, 0x4405); A = 0x02;
-  CYC(0x4405, 0x4406); mem_wr(gb, DE, A);
-  CYC(0x4406, 0x4408); E = INTERACTION_BASE + OBJ_VAR18;
-  CYC(0x4408, 0x4409); A = mem_rd(gb, DE);
-  CYC(0x4409, 0x440a); C = A;
-  CYC(0x440a, 0x440b); E = alu_inc8(gb, E);
-  CYC(0x440b, 0x440c); A = mem_rd(gb, DE);
-  CYC(0x440c, 0x440e); B = wRoomLayout >> 8;
-  CYC(0x440e, 0x440f); mem_wr(gb, BC, A);
-  CYC(0x440f, 0x4410); ret_effect(gb);
+  CYC(b_+51, b_+52);
+  CYC(b_+52, b_+54); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+54, b_+56); A = 0x02;
+  CYC(b_+56, b_+57); mem_wr(gb, DE, A);
+  CYC(b_+57, b_+59); E = INTERACTION_BASE + OBJ_VAR18;
+  CYC(b_+59, b_+60); A = mem_rd(gb, DE);
+  CYC(b_+60, b_+61); C = A;
+  CYC(b_+61, b_+62); E = alu_inc8(gb, E);
+  CYC(b_+62, b_+63); A = mem_rd(gb, DE);
+  CYC(b_+63, b_+65); B = wRoomLayout >> 8;
+  CYC(b_+65, b_+66); mem_wr(gb, BC, A);
+  CYC(b_+66, b_+67); ret_effect(gb);
 }
 
 // interactionCode13@state2: wait for the tile at var18 to differ from var19 (block pushed).
 static void pushblockTrigger_state2(GB *gb) {
-  CYC(0x4410, 0x4412); E = INTERACTION_BASE + OBJ_VAR18;
-  CYC(0x4412, 0x4413); A = mem_rd(gb, DE);
-  CYC(0x4413, 0x4414); L = A;
-  CYC(0x4414, 0x4415); E = alu_inc8(gb, E);
-  CYC(0x4415, 0x4416); A = mem_rd(gb, DE);
-  CYC(0x4416, 0x4418); H = wRoomLayout >> 8;
-  CYC(0x4418, 0x4419); alu_cp(gb, mem_rd(gb, HL));
+  BASE(interactionCode13);
+  CYC(b_+67, b_+69); E = INTERACTION_BASE + OBJ_VAR18;
+  CYC(b_+69, b_+70); A = mem_rd(gb, DE);
+  CYC(b_+70, b_+71); L = A;
+  CYC(b_+71, b_+72); E = alu_inc8(gb, E);
+  CYC(b_+72, b_+73); A = mem_rd(gb, DE);
+  CYC(b_+73, b_+75); H = wRoomLayout >> 8;
+  CYC(b_+75, b_+76); alu_cp(gb, mem_rd(gb, HL));
   if (F & FZ) {
-    CYCT(0x4419, 0x441a); ret_effect(gb); return;
+    CYCT(b_+76, b_+77); ret_effect(gb); return;
   }
-  CYC(0x4419, 0x441a);
-  CYC(0x441a, 0x441c); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x441c, 0x441e); A = 0x03;
-  CYC(0x441e, 0x441f); mem_wr(gb, DE, A);
-  CYC(0x441f, 0x4421); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x4421, 0x4423); A = 0x1e;
-  CYC(0x4423, 0x4424); mem_wr(gb, DE, A);
-  CYC(0x4424, 0x4425); ret_effect(gb);
+  CYC(b_+76, b_+77);
+  CYC(b_+77, b_+79); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+79, b_+81); A = 0x03;
+  CYC(b_+81, b_+82); mem_wr(gb, DE, A);
+  CYC(b_+82, b_+84); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+84, b_+86); A = 0x1e;
+  CYC(b_+86, b_+87); mem_wr(gb, DE, A);
+  CYC(b_+87, b_+88); ret_effect(gb);
 }
 
 // interactionCode13@state3: short delay, then clear wNumEnemies and delete self.
 static void pushblockTrigger_state3(GB *gb, uint16_t sp0_) {
-  CALL_C(0x4425, interactionDecCounter1_hook, 0x23cc, 0x4428);
+  BASE(interactionCode13);
+  CALL_C(b_+88, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+91);
   if (!(F & FZ)) {
-    CYCT(0x4428, 0x4429); ret_effect(gb); return;
+    CYCT(b_+91, b_+92); ret_effect(gb); return;
   }
-  CYC(0x4428, 0x4429);
-  CYC(0x4429, 0x442a); alu_xor(gb, A);
-  CYC(0x442a, 0x442d); mem_wr(gb, wNumEnemies, A);
-  CYC(0x442d, 0x4430); interactionDelete_hook(gb);
+  CYC(b_+91, b_+92);
+  CYC(b_+92, b_+93); alu_xor(gb, A);
+  CYC(b_+93, b_+96); mem_wr(gb, wNumEnemies, A);
+  CYC(b_+96, SYM(interactionCode14)); interactionDelete_hook(gb);
 }
 
 void interactionCode13_hook(GB *gb) {
+  BASE(interactionCode13);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x43cd, interactionDeleteAndRetIfEnabled02_hook, 0x26ec, 0x43d0);
-  CALL_C(0x43d0, returnIfScrollMode01Unset_hook, 0x26e4, 0x43d3);
-  CYC(0x43d3, 0x43d5); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x43d5, 0x43d6); A = mem_rd(gb, DE);
-  CYC(0x43d6, 0x43d7); push_effect(gb, 0x43d7);
-  switch (pushblockTrigger_jumpTable(gb)) {
-    case 0x43df: pushblockTrigger_state0(gb, sp0_); return;
-    case 0x43f8: pushblockTrigger_state1(gb); return;
-    case 0x4410: pushblockTrigger_state2(gb); return;
-    case 0x4425: pushblockTrigger_state3(gb, sp0_); return;
-    default: HANDOFF(HL);
-  }
+  CALL_C(b_+0, interactionDeleteAndRetIfEnabled02_hook, SYM(interactionDeleteAndRetIfEnabled02), b_+3);
+  CALL_C(b_+3, returnIfScrollMode01Unset_hook, SYM(returnIfScrollMode01Unset), b_+6);
+  CYC(b_+6, b_+8); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+8, b_+9); A = mem_rd(gb, DE);
+  CYC(b_+9, b_+10); push_effect(gb, b_+10);
+  do { uint16_t jt_ = (pushblockTrigger_jumpTable(gb));
+    if (jt_ == b_+18) { pushblockTrigger_state0(gb, sp0_); return; }
+    else if (jt_ == b_+43) { pushblockTrigger_state1(gb); return; }
+    else if (jt_ == b_+67) { pushblockTrigger_state2(gb); return; }
+    else if (jt_ == b_+88) { pushblockTrigger_state3(gb, sp0_); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 }

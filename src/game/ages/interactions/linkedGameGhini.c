@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodecb), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodecb), (from), (to), true)
 
 static void interactionCodecb_addDoubleIndexToHl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -19,28 +19,30 @@ static void interactionCodecb_addDoubleIndexToHl_from_rst(GB *gb, uint16_t retur
 
 // 0b:77be, called once from interactionCodecb@state0.
 void interactionCodecb_initialize_hook(GB *gb) {
+  BASE(interactionCodecb);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x77be, interactionInitGraphics_hook, 0x15fb, 0x77c1);
-  CALL_C(0x77c1, objectMarkSolidPosition_hook, 0x24f0, 0x77c4);
-  CYC(0x77c4, 0x77c7); interactionIncState_hook(gb); return; // jp
+  CALL_C(b_+32, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+35);
+  CALL_C(b_+35, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+38);
+  CYC(b_+38, b_+41); interactionIncState_hook(gb); return; // jp
 }
 
 // 0b:77c7, unused (no callers).
 void interactionCodecb_func_77c7_hook(GB *gb) {
+  BASE(interactionCodecb);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x77c7, interactionInitGraphics_hook, 0x15fb, 0x77ca);
-  CALL_C(0x77ca, objectMarkSolidPosition_hook, 0x24f0, 0x77cd);
-  CYC(0x77cd, 0x77cf); A = 0x4d; // >TX_4d00
-  CALL_C(0x77cf, interactionSetHighTextIndex_hook, 0x253b, 0x77d2);
-  CYC(0x77d2, 0x77d4); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x77d4, 0x77d5); A = mem_rd(gb, DE);
-  CYC(0x77d5, 0x77d8); SET_HL(0x77e2); // interactionCodecb@scriptTable
-  CYC(0x77d8, 0x77d9); interactionCodecb_addDoubleIndexToHl_from_rst(gb, 0x77d9);
-  CYC(0x77d9, 0x77da); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x77da, 0x77db); H = mem_rd(gb, HL);
-  CYC(0x77db, 0x77dc); L = A;
-  CALL_C(0x77dc, interactionSetScript_hook, 0x2544, 0x77df);
-  CYC(0x77df, 0x77e2); interactionIncState_hook(gb); return; // jp
+  CALL_C(b_+41, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+44);
+  CALL_C(b_+44, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+47);
+  CYC(b_+47, b_+49); A = 0x4d; // >TX_4d00
+  CALL_C(b_+49, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+52);
+  CYC(b_+52, b_+54); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+54, b_+55); A = mem_rd(gb, DE);
+  CYC(b_+55, b_+58); SET_HL(b_+68); // interactionCodecb@scriptTable
+  CYC(b_+58, b_+59); interactionCodecb_addDoubleIndexToHl_from_rst(gb, b_+59);
+  CYC(b_+59, b_+60); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+60, b_+61); H = mem_rd(gb, HL);
+  CYC(b_+61, b_+62); L = A;
+  CALL_C(b_+62, interactionSetScript_hook, SYM(interactionSetScript), b_+65);
+  CYC(b_+65, b_+68); interactionIncState_hook(gb); return; // jp
 }
 
 // ==================================================================================================
@@ -50,24 +52,25 @@ void interactionCodecb_func_77c7_hook(GB *gb) {
 //   var3f: Secret index (for "linkedGameNpcScript")
 // ==================================================================================================
 void interactionCodecb_hook(GB *gb) {
+  BASE(interactionCodecb);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x779e, checkInteractionState_hook, 0x23fe, 0x77a1);
-  if (!(F & FZ)) { CYCT(0x77a1, 0x77a3); goto state1; } // jr nz
-  CYC(0x77a1, 0x77a3);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); goto state1; } // jr nz
+  CYC(b_+3, b_+5);
 
   // interactionCodecb@state0 (0x77a3): reached solely by fallthrough, never a jump target.
-  CALL_C(0x77a3, interactionCodecb_initialize_hook, 0x77be, 0x77a6);
-  CYC(0x77a6, 0x77a7); H = D;
-  CYC(0x77a7, 0x77a9); L = INTERACTION_BASE + OBJ_OAM_FLAGS;
-  CYC(0x77a9, 0x77ab); mem_wr(gb, HL, 0x02);
-  CYC(0x77ab, 0x77ad); L = INTERACTION_BASE + OBJ_VAR3F;
-  CYC(0x77ad, 0x77af); mem_wr(gb, HL, 0x01); // GRAVEYARD_SECRET & 0x0f
-  CYC(0x77af, 0x77b2); SET_HL(0x7ed9); // mainScripts.linkedGameNpcScript
-  CALL_C(0x77b2, interactionSetScript_hook, 0x2544, 0x77b5);
+  CALL_C(b_+5, interactionCodecb_initialize_hook, b_+32, b_+8);
+  CYC(b_+8, b_+9); H = D;
+  CYC(b_+9, b_+11); L = INTERACTION_BASE + OBJ_OAM_FLAGS;
+  CYC(b_+11, b_+13); mem_wr(gb, HL, 0x02);
+  CYC(b_+13, b_+15); L = INTERACTION_BASE + OBJ_VAR3F;
+  CYC(b_+15, b_+17); mem_wr(gb, HL, 0x01); // GRAVEYARD_SECRET & 0x0f
+  CYC(b_+17, b_+20); SET_HL((SYM(interactionCoded8__subid4Script) + 93)); // mainScripts.linkedGameNpcScript
+  CALL_C(b_+20, interactionSetScript_hook, SYM(interactionSetScript), b_+23);
 
 state1:
-  CALL_C(0x77b5, interactionRunScript_hook, 0x2552, 0x77b8);
-  if (F & FC) { CYCT(0x77b8, 0x77bb); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp c
-  CYC(0x77b8, 0x77bb);
-  CYC(0x77bb, 0x77be); interactionAnimateAsNpc_hook(gb); return; // jp
+  CALL_C(b_+23, interactionRunScript_hook, SYM(interactionRunScript), b_+26);
+  if (F & FC) { CYCT(b_+26, b_+29); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp c
+  CYC(b_+26, b_+29);
+  CYC(b_+29, b_+32); interactionAnimateAsNpc_hook(gb); return; // jp
 }

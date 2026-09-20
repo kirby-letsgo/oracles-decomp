@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodea3), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodea3), (from), (to), true)
 
 // Defined in src/game/circularSidescrollPlatform.c (the shared sidescroll-platform helper
 // cluster from ref/oracles-disasm/object_code/ages/interactions/circularSidescrollPlatform.s).
@@ -45,99 +45,101 @@ static void interactionCodea3_add_double_index_from_rst(GB *gb, uint16_t return_
 // @state3 below -- a plain function works for both: the jump-table redirect has no stack effect
 // (matching a tail dispatch), and @state3's CALL_C models the real `call` correctly.
 void interactionCodea3_state1_hook(GB *gb) {
+  BASE(interactionCodea3);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x59bb, sidescrollPlatform_decCounter1_hook, 0x5bce, 0x59be);
-  if (!(F & FZ)) { CYCT(0x59be, 0x59bf); ret_effect(gb); return; } // ret nz
-  CYC(0x59be, 0x59bf);
-  CYC(0x59bf, 0x59c1); mem_wr(gb, HL, 30);
-  CYC(0x59c1, 0x59c2); L = E;
-  CYC(0x59c2, 0x59c3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x59c3, 0x59c4); alu_xor(gb, A);
-  RET(0x59c4); return;
+  CALL_C(b_+67, sidescrollPlatform_decCounter1_hook, SYM(sidescrollPlatform_decCounter1), b_+70);
+  if (!(F & FZ)) { CYCT(b_+70, b_+71); ret_effect(gb); return; } // ret nz
+  CYC(b_+70, b_+71);
+  CYC(b_+71, b_+73); mem_wr(gb, HL, 30);
+  CYC(b_+73, b_+74); L = E;
+  CYC(b_+74, b_+75); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+75, b_+76); alu_xor(gb, A);
+  RET(b_+76); return;
 }
 
 // ==================================================================================================
 // INTERAC_DISAPPEARING_SIDESCROLL_PLATFORM
 // ==================================================================================================
 void interactionCodea3_hook(GB *gb) {
+  BASE(interactionCodea3);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5978, 0x597a); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x597a, 0x597b); A = mem_rd(gb, DE);
-  CYC(0x597b, 0x597d); alu_cp(gb, 0x03);
-  if (F & FZ) { CYCT(0x597d, 0x597f); goto l_5985; } // jr z
-  CYC(0x597d, 0x597f);
-  CALL_C(0x597f, sidescrollPlatform_checkLinkOnPlatform_hook, 0x5b7f, 0x5982);
-  CALL_C(0x5982, sidescrollingPlatformCommon_hook, 0x5a73, 0x5985);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); alu_cp(gb, 0x03);
+  if (F & FZ) { CYCT(b_+5, b_+7); goto l_5985; } // jr z
+  CYC(b_+5, b_+7);
+  CALL_C(b_+7, sidescrollPlatform_checkLinkOnPlatform_hook, SYM(sidescrollPlatform_checkLinkOnPlatform), b_+10);
+  CALL_C(b_+10, sidescrollingPlatformCommon_hook, SYM(sidescrollingPlatformCommon), b_+13);
 
 l_5985:
-  CYC(0x5985, 0x5987); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x5987, 0x5988); A = mem_rd(gb, DE);
-  CYC(0x5988, 0x5989); push_effect(gb, 0x5989);
-  switch (interactionCodea3_jump_table(gb)) {
-    case 0x5993: goto state0;
-    case 0x59bb: interactionCodea3_state1_hook(gb); return;
-    case 0x59c5: goto state2;
-    case 0x59d8: goto state3;
-    case 0x59e1: goto state4;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+13, b_+15); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+15, b_+16); A = mem_rd(gb, DE);
+  CYC(b_+16, b_+17); push_effect(gb, b_+17);
+  do { uint16_t jt_ = (interactionCodea3_jump_table(gb));
+    if (jt_ == b_+27) { goto state0; }
+    else if (jt_ == b_+67) { interactionCodea3_state1_hook(gb); return; }
+    else if (jt_ == b_+77) { goto state2; }
+    else if (jt_ == b_+96) { goto state3; }
+    else if (jt_ == b_+105) { goto state4; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 state0:
-  CYC(0x5993, 0x5995); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x5995, 0x5996); A = mem_rd(gb, DE);
-  CYC(0x5996, 0x5999); SET_HL(0x59b5); // @subidData
-  CYC(0x5999, 0x599a); interactionCodea3_add_double_index_from_rst(gb, 0x599a);
-  CYC(0x599a, 0x599c); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x599c, 0x599d); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x599d, 0x599e); mem_wr(gb, DE, A);
-  CYC(0x599e, 0x59a0); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x59a0, 0x59a1); A = mem_rd(gb, HL);
-  CYC(0x59a1, 0x59a2); mem_wr(gb, DE, A);
-  CYC(0x59a2, 0x59a4); E = INTERACTION_BASE + OBJ_COLLISION_RADIUS_Y;
-  CYC(0x59a4, 0x59a6); A = 0x08;
-  CYC(0x59a6, 0x59a7); mem_wr(gb, DE, A);
-  CYC(0x59a7, 0x59a8); E = alu_inc8(gb, E);
-  CYC(0x59a8, 0x59a9); mem_wr(gb, DE, A);
-  CALL_C(0x59a9, interactionInitGraphics_hook, 0x15fb, 0x59ac);
-  CYC(0x59ac, 0x59ae); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x59ae, 0x59af); A = mem_rd(gb, DE);
-  CYC(0x59af, 0x59b1); alu_cp(gb, 0x02);
-  if (F & FZ) { CYCT(0x59b1, 0x59b4); objectSetVisible83_hook(gb); return; } // jp z
-  CYC(0x59b1, 0x59b4);
-  RET(0x59b4); return;
+  CYC(b_+27, b_+29); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+29, b_+30); A = mem_rd(gb, DE);
+  CYC(b_+30, b_+33); SET_HL(b_+61); // @subidData
+  CYC(b_+33, b_+34); interactionCodea3_add_double_index_from_rst(gb, b_+34);
+  CYC(b_+34, b_+36); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+36, b_+37); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+37, b_+38); mem_wr(gb, DE, A);
+  CYC(b_+38, b_+40); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+40, b_+41); A = mem_rd(gb, HL);
+  CYC(b_+41, b_+42); mem_wr(gb, DE, A);
+  CYC(b_+42, b_+44); E = INTERACTION_BASE + OBJ_COLLISION_RADIUS_Y;
+  CYC(b_+44, b_+46); A = 0x08;
+  CYC(b_+46, b_+47); mem_wr(gb, DE, A);
+  CYC(b_+47, b_+48); E = alu_inc8(gb, E);
+  CYC(b_+48, b_+49); mem_wr(gb, DE, A);
+  CALL_C(b_+49, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+52);
+  CYC(b_+52, b_+54); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+54, b_+55); A = mem_rd(gb, DE);
+  CYC(b_+55, b_+57); alu_cp(gb, 0x02);
+  if (F & FZ) { CYCT(b_+57, b_+60); objectSetVisible83_hook(gb); return; } // jp z
+  CYC(b_+57, b_+60);
+  RET(b_+60); return;
 
   // @subidData (0b:59b5): pure ROM data (three (state,counter1) byte pairs), referenced only via
   // SET_HL(0x59b5) above.
 
 state2:
-  CALL_C(0x59c5, sidescrollPlatform_decCounter1_hook, 0x5bce, 0x59c8);
-  if (!(F & FZ)) { CYCT(0x59c8, 0x59ca); goto flickerVisibility; } // jr nz
-  CYC(0x59c8, 0x59ca);
-  CYC(0x59ca, 0x59cc); mem_wr(gb, HL, 150);
-  CYC(0x59cc, 0x59cd); L = E;
-  CYC(0x59cd, 0x59ce); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x59ce, 0x59d1); objectSetInvisible_hook(gb); return; // jp
+  CALL_C(b_+77, sidescrollPlatform_decCounter1_hook, SYM(sidescrollPlatform_decCounter1), b_+80);
+  if (!(F & FZ)) { CYCT(b_+80, b_+82); goto flickerVisibility; } // jr nz
+  CYC(b_+80, b_+82);
+  CYC(b_+82, b_+84); mem_wr(gb, HL, 150);
+  CYC(b_+84, b_+85); L = E;
+  CYC(b_+85, b_+86); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+86, b_+89); objectSetInvisible_hook(gb); return; // jp
 
 flickerVisibility:
-  CYC(0x59d1, 0x59d3); E = INTERACTION_BASE + OBJ_VISIBLE;
-  CYC(0x59d3, 0x59d4); A = mem_rd(gb, DE);
-  CYC(0x59d4, 0x59d6); A = (uint8_t)(A ^ 0x80);
-  CYC(0x59d6, 0x59d7); mem_wr(gb, DE, A);
-  RET(0x59d7); return;
+  CYC(b_+89, b_+91); E = INTERACTION_BASE + OBJ_VISIBLE;
+  CYC(b_+91, b_+92); A = mem_rd(gb, DE);
+  CYC(b_+92, b_+94); A = (uint8_t)(A ^ 0x80);
+  CYC(b_+94, b_+95); mem_wr(gb, DE, A);
+  RET(b_+95); return;
 
 state3:
-  CALL_C(0x59d8, interactionCodea3_state1_hook, 0x59bb, 0x59db);
-  if (!(F & FZ)) { CYCT(0x59db, 0x59dc); ret_effect(gb); return; } // ret nz
-  CYC(0x59db, 0x59dc);
-  CYC(0x59dc, 0x59de); A = 0x7b; // SND_MYSTERY_SEED
-  CYC(0x59de, 0x59e1); playSound_b00_hook(gb); return; // jp
+  CALL_C(b_+96, interactionCodea3_state1_hook, b_+67, b_+99);
+  if (!(F & FZ)) { CYCT(b_+99, b_+100); ret_effect(gb); return; } // ret nz
+  CYC(b_+99, b_+100);
+  CYC(b_+100, b_+102); A = 0x7b; // SND_MYSTERY_SEED
+  CYC(b_+102, b_+105); playSound_b00_hook(gb); return; // jp
 
 state4:
-  CALL_C(0x59e1, sidescrollPlatform_decCounter1_hook, 0x5bce, 0x59e4);
-  if (!(F & FZ)) { CYCT(0x59e4, 0x59e6); goto flickerVisibility; } // jr nz
-  CYC(0x59e4, 0x59e6);
-  CYC(0x59e6, 0x59e8); mem_wr(gb, HL, 120);
-  CYC(0x59e8, 0x59e9); L = E;
-  CYC(0x59e9, 0x59eb); mem_wr(gb, HL, 0x01);
-  CYC(0x59eb, 0x59ee); objectSetVisible83_hook(gb); return; // jp
+  CALL_C(b_+105, sidescrollPlatform_decCounter1_hook, SYM(sidescrollPlatform_decCounter1), b_+108);
+  if (!(F & FZ)) { CYCT(b_+108, b_+110); goto flickerVisibility; } // jr nz
+  CYC(b_+108, b_+110);
+  CYC(b_+110, b_+112); mem_wr(gb, HL, 120);
+  CYC(b_+112, b_+113); L = E;
+  CYC(b_+113, b_+115); mem_wr(gb, HL, 0x01);
+  CYC(b_+115, SYM(interactionCodea4)); objectSetVisible83_hook(gb); return; // jp
 }

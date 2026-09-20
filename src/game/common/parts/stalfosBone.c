@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode1c), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode1c), (from), (to), true)
 
 static uint16_t stalfosBone_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -25,71 +25,72 @@ static uint16_t stalfosBone_jump_table(GB *gb) {
 }
 
 void partCode1c_hook(GB *gb) {
+  BASE(partCode1c);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  if (F & FZ) { CYCT(0x5190, 0x5192); goto normalStatus; } // jr z
-  CYC(0x5190, 0x5192);
-  CYC(0x5192, 0x5194); E = 0xea; // Part.var2a
-  CYC(0x5194, 0x5195); A = mem_rd(gb, DE);
-  CYC(0x5195, 0x5197); alu_cp(gb, 0x80);
-  if (F & FZ) { CYCT(0x5197, 0x5199); goto partDelete; } // jr z
-  CYC(0x5197, 0x5199);
-  CYC(0x5199, 0x519b); goto func_11_51dd; // jr
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); E = 0xea; // Part.var2a
+  CYC(b_+4, b_+5); A = mem_rd(gb, DE);
+  CYC(b_+5, b_+7); alu_cp(gb, 0x80);
+  if (F & FZ) { CYCT(b_+7, b_+9); goto partDelete; } // jr z
+  CYC(b_+7, b_+9);
+  CYC(b_+9, b_+11); goto func_11_51dd; // jr
 
 normalStatus:
-  CYC(0x519b, 0x519d); E = 0xc4; // Part.state
-  CYC(0x519d, 0x519e); A = mem_rd(gb, DE);
+  CYC(b_+11, b_+13); E = 0xc4; // Part.state
+  CYC(b_+13, b_+14); A = mem_rd(gb, DE);
   {
-    CYC(0x519e, 0x519f); push_effect(gb, 0x519f);
+    CYC(b_+14, b_+15); push_effect(gb, b_+15);
     uint16_t target = stalfosBone_jump_table(gb);
-    if (target == 0x51a5) goto state0;
-    if (target == 0x51b5) goto state1;
+    if (target == b_+21) goto state0;
+    if (target == b_+37) goto state1;
     goto state2;
   }
 
 state0:
-  CYC(0x51a5, 0x51a6); H = D;
-  CYC(0x51a6, 0x51a7); L = E;
-  CYC(0x51a7, 0x51a8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x51a8, 0x51aa); L = 0xd0; // Part.speed
-  CYC(0x51aa, 0x51ac); mem_wr(gb, HL, 0x3c);
-  CALL_C(0x51ac, objectGetAngleTowardEnemyTarget_hook, 0x1e94, 0x51af);
-  CYC(0x51af, 0x51b1); E = 0xc9; // Part.angle
-  CYC(0x51b1, 0x51b2); mem_wr(gb, DE, A);
-  CYC(0x51b2, 0x51b5); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+21, b_+22); H = D;
+  CYC(b_+22, b_+23); L = E;
+  CYC(b_+23, b_+24); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+24, b_+26); L = 0xd0; // Part.speed
+  CYC(b_+26, b_+28); mem_wr(gb, HL, 0x3c);
+  CALL_C(b_+28, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+31);
+  CYC(b_+31, b_+33); E = 0xc9; // Part.angle
+  CYC(b_+33, b_+34); mem_wr(gb, DE, A);
+  CYC(b_+34, b_+37); objectSetVisible81_hook(gb); return; // jp
 
 state1:
-  CALL_C(0x51b5, partCommon_checkTileCollisionOrOutOfBounds_hook, 0x4072, 0x51b8);
-  if (F & FC) { CYCT(0x51b8, 0x51ba); goto L_51db; } // jr c
-  CYC(0x51b8, 0x51ba);
-  CALL_C(0x51ba, objectApplySpeed_hook, 0x201d, 0x51bd);
-  CALL_C(0x51bd, objectCheckWithinScreenBoundary_hook, 0x2184, 0x51c0);
-  if (F & FC) { CYCT(0x51c0, 0x51c3); partAnimate_hook(gb); return; } // jp c
-  CYC(0x51c0, 0x51c3);
+  CALL_C(b_+37, partCommon_checkTileCollisionOrOutOfBounds_hook, SYM(partCommon_checkTileCollisionOrOutOfBounds), b_+40);
+  if (F & FC) { CYCT(b_+40, b_+42); goto L_51db; } // jr c
+  CYC(b_+40, b_+42);
+  CALL_C(b_+42, objectApplySpeed_hook, SYM(objectApplySpeed), b_+45);
+  CALL_C(b_+45, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+48);
+  if (F & FC) { CYCT(b_+48, b_+51); partAnimate_hook(gb); return; } // jp c
+  CYC(b_+48, b_+51);
 
 partDelete:
-  CYC(0x51c3, 0x51c6); partDelete_hook(gb); return; // jp
+  CYC(b_+51, b_+54); partDelete_hook(gb); return; // jp
 
 state2:
-  CALL_C(0x51c6, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x51c9);
-  if (F & FZ) { CYCT(0x51c9, 0x51cb); goto partDelete; } // jr z
-  CYC(0x51c9, 0x51cb);
-  CYC(0x51cb, 0x51cd); C = 0x0e;
-  CALL_C(0x51cd, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x51d0);
-  CALL_C(0x51d0, objectApplySpeed_hook, 0x201d, 0x51d3);
-  CYC(0x51d3, 0x51d6); A = mem_rd(gb, 0xcc00); // wFrameCounter
-  CYC(0x51d6, 0x51d7); alu_rrca(gb);
-  if (F & FC) { RET_TAKEN(0x51d7); return; } // ret c
-  CYC(0x51d7, 0x51d8);
-  CYC(0x51d8, 0x51db); partAnimate_hook(gb); return; // jp
+  CALL_C(b_+54, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+57);
+  if (F & FZ) { CYCT(b_+57, b_+59); goto partDelete; } // jr z
+  CYC(b_+57, b_+59);
+  CYC(b_+59, b_+61); C = 0x0e;
+  CALL_C(b_+61, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+64);
+  CALL_C(b_+64, objectApplySpeed_hook, SYM(objectApplySpeed), b_+67);
+  CYC(b_+67, b_+70); A = mem_rd(gb, wFrameCounter); // wFrameCounter
+  CYC(b_+70, b_+71); alu_rrca(gb);
+  if (F & FC) { RET_TAKEN(b_+71); return; } // ret c
+  CYC(b_+71, b_+72);
+  CYC(b_+72, b_+75); partAnimate_hook(gb); return; // jp
 
 L_51db:
-  if (F & FZ) { CYCT(0x51db, 0x51dd); goto partDelete; } // jr z
-  CYC(0x51db, 0x51dd);
+  if (F & FZ) { CYCT(b_+75, b_+77); goto partDelete; } // jr z
+  CYC(b_+75, b_+77);
 
 func_11_51dd:
-  CYC(0x51dd, 0x51df); E = 0xc4; // Part.state
-  CYC(0x51df, 0x51e1); A = 0x02;
-  CYC(0x51e1, 0x51e2); mem_wr(gb, DE, A);
-  CYC(0x51e2, 0x51e3); alu_xor(gb, A);
-  CYC(0x51e3, 0x51e6); partCommon_bounceWhenCollisionsEnabled_hook(gb); return; // jp
+  CYC(b_+77, b_+79); E = 0xc4; // Part.state
+  CYC(b_+79, b_+81); A = 0x02;
+  CYC(b_+81, b_+82); mem_wr(gb, DE, A);
+  CYC(b_+82, b_+83); alu_xor(gb, A);
+  CYC(b_+83, SYM(partCode1d)); partCommon_bounceWhenCollisionsEnabled_hook(gb); return; // jp
 }

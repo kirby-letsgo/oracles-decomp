@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodec0), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodec0), (from), (to), true)
 
 static uint16_t banana_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -36,74 +36,79 @@ static void banana_add_a_to_hl(GB *gb, uint16_t return_address) {
 }
 
 void interactionCodec0__afterCall48c6_hook(GB *gb) {
-  CYC(0x48c6, 0x48c9); objectSetVisible80_hook(gb);
+  BASE(interactionCodec0);
+  CYC(b_+14, b_+17); objectSetVisible80_hook(gb);
 }
 
 void interactionCodec0__state0_hook(GB *gb) {
+  BASE(interactionCodec0);
   uint16_t sp0_ = gb->sp;
-  CYC(0x48c0, 0x48c2); A = 1;
-  CYC(0x48c2, 0x48c3); mem_wr(gb, DE, A);
-  CALL_C(0x48c3, interactionInitGraphics_hook, 0x15fb, 0x48c6);
+  CYC(b_+8, b_+10); A = 1;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
   interactionCodec0__afterCall48c6_hook(gb);
 }
 
 void interactionCodec0__updatePosition_hook(GB *gb) {
-  CYC(0x48f8, 0x48f9); push_effect(gb, HL);
-  CYC(0x48f9, 0x48fc); SET_HL(0x4908);
-  CYC(0x48fc, 0x48fd); banana_add_a_to_hl(gb, 0x48fd);
-  CYC(0x48fd, 0x48ff); B = 0;
-  CYC(0x48ff, 0x4900); C = mem_rd(gb, HL);
-  CYC(0x4900, 0x4901); SET_HL(pop_effect(gb));
-  CYC(0x4901, 0x4904); objectTakePositionWithOffset_hook(gb);
+  BASE(interactionCodec0);
+  CYC(b_+64, b_+65); push_effect(gb, HL);
+  CYC(b_+65, b_+68); SET_HL(b_+80);
+  CYC(b_+68, b_+69); banana_add_a_to_hl(gb, b_+69);
+  CYC(b_+69, b_+71); B = 0;
+  CYC(b_+71, b_+72); C = mem_rd(gb, HL);
+  CYC(b_+72, b_+73); SET_HL(pop_effect(gb));
+  CYC(b_+73, b_+76); objectTakePositionWithOffset_hook(gb);
 }
 
 void interactionCodec0__state1_hook(GB *gb) {
+  BASE(interactionCodec0);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x48c9, interactionAnimate_hook, 0x261b, 0x48cc);
-  CYC(0x48cc, 0x48ce); A = OBJ_ENABLED;
-  CALL_C(0x48ce, objectGetRelatedObject1Var_hook, 0x2160, 0x48d1);
-  CYC(0x48d1, 0x48d3); L = OBJ_ID;
-  CYC(0x48d3, 0x48d4); A = mem_rd(gb, HL);
-  CYC(0x48d4, 0x48d6); alu_cp(gb, 0x11);
+  CALL_C(b_+17, interactionAnimate_hook, SYM(interactionAnimate), b_+20);
+  CYC(b_+20, b_+22); A = OBJ_ENABLED;
+  CALL_C(b_+22, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+25);
+  CYC(b_+25, b_+27); L = OBJ_ID;
+  CYC(b_+27, b_+28); A = mem_rd(gb, HL);
+  CYC(b_+28, b_+30); alu_cp(gb, 0x11);
   if (!(F & FZ)) {
-    CYCT(0x48d6, 0x48d9); interactionDelete_hook(gb);
+    CYCT(b_+30, b_+33); interactionDelete_hook(gb);
     return;
   }
-  CYC(0x48d6, 0x48d9);
-  CYC(0x48d9, 0x48db); E = 0x48;
-  CYC(0x48db, 0x48dc); A = mem_rd(gb, DE);
-  CYC(0x48dc, 0x48de); L = OBJ_DIRECTION;
-  CYC(0x48de, 0x48df); alu_cp(gb, mem_rd(gb, HL));
-  CYC(0x48df, 0x48e0); A = mem_rd(gb, HL);
+  CYC(b_+30, b_+33);
+  CYC(b_+33, b_+35); E = 0x48;
+  CYC(b_+35, b_+36); A = mem_rd(gb, DE);
+  CYC(b_+36, b_+38); L = OBJ_DIRECTION;
+  CYC(b_+38, b_+39); alu_cp(gb, mem_rd(gb, HL));
+  CYC(b_+39, b_+40); A = mem_rd(gb, HL);
   if (F & FZ) {
-    CYCT(0x48e0, 0x48e2); interactionCodec0__updatePosition_hook(gb);
+    CYCT(b_+40, b_+42); interactionCodec0__updatePosition_hook(gb);
     return;
   }
-  CYC(0x48e0, 0x48e2);
-  CYC(0x48e2, 0x48e3); mem_wr(gb, DE, A);
-  CYC(0x48e3, 0x48e4); push_effect(gb, AF);
-  CYC(0x48e4, 0x48e7); SET_HL(0x4904);
-  CYC(0x48e7, 0x48e8); banana_add_a_to_hl(gb, 0x48e8);
-  CYC(0x48e8, 0x48e9); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x48e9, 0x48eb); E = 0x5a;
-  CYC(0x48eb, 0x48ec); mem_wr(gb, DE, A);
-  CYC(0x48ec, 0x48ed); SET_AF(pop_effect(gb));
-  CALL_C(0x48ed, interactionSetAnimation_hook, 0x262e, 0x48f0);
-  CYC(0x48f0, 0x48f2); A = OBJ_ENABLED;
-  CALL_C(0x48f2, objectGetRelatedObject1Var_hook, 0x2160, 0x48f5);
-  CYC(0x48f5, 0x48f7); L = OBJ_DIRECTION;
-  CYC(0x48f7, 0x48f8); A = mem_rd(gb, HL);
+  CYC(b_+40, b_+42);
+  CYC(b_+42, b_+43); mem_wr(gb, DE, A);
+  CYC(b_+43, b_+44); push_effect(gb, AF);
+  CYC(b_+44, b_+47); SET_HL(b_+76);
+  CYC(b_+47, b_+48); banana_add_a_to_hl(gb, b_+48);
+  CYC(b_+48, b_+49); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+49, b_+51); E = 0x5a;
+  CYC(b_+51, b_+52); mem_wr(gb, DE, A);
+  CYC(b_+52, b_+53); SET_AF(pop_effect(gb));
+  CALL_C(b_+53, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+56);
+  CYC(b_+56, b_+58); A = OBJ_ENABLED;
+  CALL_C(b_+58, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+61);
+  CYC(b_+61, b_+63); L = OBJ_DIRECTION;
+  CYC(b_+63, b_+64); A = mem_rd(gb, HL);
   interactionCodec0__updatePosition_hook(gb);
 }
 
 void interactionCodec0_hook(GB *gb) {
+  BASE(interactionCodec0);
   uint16_t sp0_ = gb->sp;
-  CYC(0x48b8, 0x48ba); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x48ba, 0x48bb); A = mem_rd(gb, DE);
-  CYC(0x48bb, 0x48bc); push_effect(gb, 0x48bc);
-  switch (banana_jump_table(gb)) {
-    case 0x48c0: interactionCodec0__state0_hook(gb); return;
-    case 0x48c9: interactionCodec0__state1_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (banana_jump_table(gb));
+    if (jt_ == b_+8) { interactionCodec0__state0_hook(gb); return; }
+    else if (jt_ == b_+17) { interactionCodec0__state1_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(linkedNpc_checkShouldSpawn), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(linkedNpc_checkShouldSpawn), (from), (to), true)
 
 void checkEssenceNotObtained_hook(GB *gb);
 void checkEssenceObtained_hook(GB *gb);
@@ -40,81 +40,86 @@ static void linkedNpc_add_a_to_hl(GB *gb, uint16_t return_address) {
 }
 
 void linkedNpc_checkShouldSpawn_hook(GB *gb) {
+  BASE(linkedNpc_checkShouldSpawn);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7a54, checkIsLinkedGame_hook, 0x1992, 0x7a57);
-  if (!(F & FZ)) { CYCT(0x7a57, 0x7a59); goto notLinked; }
-  CYC(0x7a57, 0x7a59);
-  CYC(0x7a59, 0x7a5c); writeFlagsTocddb_hook(gb); return;
+  CALL_C(b_+0, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); goto notLinked; }
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+8); writeFlagsTocddb_hook(gb); return;
 notLinked:
-  CYC(0x7a5c, 0x7a5e); E = 0x7f;
-  CYC(0x7a5e, 0x7a5f); A = mem_rd(gb, DE);
-  CYC(0x7a5f, 0x7a60); push_effect(gb, 0x7a60);
-  switch (linkedNpc_checkShouldSpawn_jump_table(gb)) {
-    case 0x7a74: goto checkd4;
-    case 0x7a79: goto checkd1;
-    case 0x7a7e: goto checkd2;
-    case 0x7a83: goto checkd2_2;
-    case 0x7a88: goto always;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+8, b_+10); E = 0x7f;
+  CYC(b_+10, b_+11); A = mem_rd(gb, DE);
+  CYC(b_+11, b_+12); push_effect(gb, b_+12);
+  do { uint16_t jt_ = (linkedNpc_checkShouldSpawn_jump_table(gb));
+    if (jt_ == b_+32) { goto checkd4; }
+    else if (jt_ == b_+37) { goto checkd1; }
+    else if (jt_ == b_+42) { goto checkd2; }
+    else if (jt_ == b_+47) { goto checkd2_2; }
+    else if (jt_ == b_+52) { goto always; }
+    else { HANDOFF(HL); }
+  } while (0);
 checkd4:
-  CYC(0x7a74, 0x7a76); A = 0x03;
-  CYC(0x7a76, 0x7a79); checkEssenceNotObtained_hook(gb); return;
+  CYC(b_+32, b_+34); A = 0x03;
+  CYC(b_+34, b_+37); checkEssenceNotObtained_hook(gb); return;
 checkd1:
-  CYC(0x7a79, 0x7a7b); A = 0x00;
-  CYC(0x7a7b, 0x7a7e); checkEssenceNotObtained_hook(gb); return;
+  CYC(b_+37, b_+39); A = 0x00;
+  CYC(b_+39, b_+42); checkEssenceNotObtained_hook(gb); return;
 checkd2:
-  CYC(0x7a7e, 0x7a80); A = 0x01;
-  CYC(0x7a80, 0x7a83); checkEssenceNotObtained_hook(gb); return;
+  CYC(b_+42, b_+44); A = 0x01;
+  CYC(b_+44, b_+47); checkEssenceNotObtained_hook(gb); return;
 checkd2_2:
-  CYC(0x7a83, 0x7a85); A = 0x01;
-  CYC(0x7a85, 0x7a88); checkEssenceNotObtained_hook(gb); return;
+  CYC(b_+47, b_+49); A = 0x01;
+  CYC(b_+49, b_+52); checkEssenceNotObtained_hook(gb); return;
 always:
-  CYC(0x7a88, 0x7a89); alu_or(gb, D);
-  CYC(0x7a89, 0x7a8c); writeFlagsTocddb_hook(gb);
+  CYC(b_+52, b_+53); alu_or(gb, D);
+  CYC(b_+53, SYM(linkedNpc_checkHasExtraTextBox)); writeFlagsTocddb_hook(gb);
 }
 
 void linkedNpc_checkHasExtraTextBox_hook(GB *gb) {
-  CYC(0x7a8c, 0x7a8e); E = 0x7f;
-  CYC(0x7a8e, 0x7a8f); A = mem_rd(gb, DE);
-  CYC(0x7a8f, 0x7a92); SET_HL(0x7a98);
-  CYC(0x7a92, 0x7a93); linkedNpc_add_a_to_hl(gb, 0x7a93);
-  CYC(0x7a93, 0x7a94); A = mem_rd(gb, HL);
-  CYC(0x7a94, 0x7a95); alu_or(gb, A);
-  CYC(0x7a95, 0x7a98); writeFlagsTocddb_hook(gb);
+  BASE(linkedNpc_checkHasExtraTextBox);
+  CYC(b_+0, b_+2); E = 0x7f;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+6); SET_HL(b_+12);
+  CYC(b_+6, b_+7); linkedNpc_add_a_to_hl(gb, b_+7);
+  CYC(b_+7, b_+8); A = mem_rd(gb, HL);
+  CYC(b_+8, b_+9); alu_or(gb, A);
+  CYC(b_+9, b_+12); writeFlagsTocddb_hook(gb);
 }
 
 void linkedNpc_generateSecret_hook(GB *gb) {
+  BASE(linkedNpc_generateSecret);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7aa2, 0x7aa3); H = D;
-  CYC(0x7aa3, 0x7aa5); L = 0x7f;
-  CYC(0x7aa5, 0x7aa6); B = mem_rd(gb, HL);
-  CYC(0x7aa6, 0x7aa8); A = 0x50;
-  CYC(0x7aa8, 0x7aa9); alu_add(gb, B);
-  CALL_C(0x7aa9, setGlobalFlag_hook, 0x31f9, 0x7aac);
-  CYC(0x7aac, 0x7aae); A = 0x20;
-  CYC(0x7aae, 0x7aaf); alu_add(gb, B);
-  CYC(0x7aaf, 0x7ab2); mem_wr(gb, wShortSecretIndex, A);
-  CYC(0x7ab2, 0x7ab5); SET_BC(0x0003);
-  CYC(0x7ab5, 0x7ab8); secretFunctionCaller_hook(gb);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = 0x7f;
+  CYC(b_+3, b_+4); B = mem_rd(gb, HL);
+  CYC(b_+4, b_+6); A = 0x50;
+  CYC(b_+6, b_+7); alu_add(gb, B);
+  CALL_C(b_+7, setGlobalFlag_hook, SYM(setGlobalFlag), b_+10);
+  CYC(b_+10, b_+12); A = 0x20;
+  CYC(b_+12, b_+13); alu_add(gb, B);
+  CYC(b_+13, b_+16); mem_wr(gb, wShortSecretIndex, A);
+  CYC(b_+16, b_+19); SET_BC(0x0003);
+  CYC(b_+19, SYM(linkedNpc_initHighTextIndex)); secretFunctionCaller_hook(gb);
 }
 
 void linkedNpc_initHighTextIndex_hook(GB *gb) {
-  CYC(0x7ab8, 0x7aba); A = 0x4d;
-  CYC(0x7aba, 0x7abd); interactionSetHighTextIndex_hook(gb);
+  BASE(linkedNpc_initHighTextIndex);
+  CYC(b_+0, b_+2); A = 0x4d;
+  CYC(b_+2, SYM(linkedNpc_calcLowTextIndex)); interactionSetHighTextIndex_hook(gb);
 }
 
 void linkedNpc_calcLowTextIndex_hook(GB *gb) {
-  CYC(0x7abd, 0x7abf); alu_add(gb, 0x00);
-  CYC(0x7abf, 0x7ac0); C = A;
-  CYC(0x7ac0, 0x7ac2); E = 0x7f;
-  CYC(0x7ac2, 0x7ac3); A = mem_rd(gb, DE);
-  CYC(0x7ac3, 0x7ac4); B = A;
-  CYC(0x7ac4, 0x7ac5); alu_add(gb, A);
-  CYC(0x7ac5, 0x7ac6); alu_add(gb, A);
-  CYC(0x7ac6, 0x7ac7); alu_add(gb, B);
-  CYC(0x7ac7, 0x7ac8); alu_add(gb, C);
-  CYC(0x7ac8, 0x7aca); E = 0x72;
-  CYC(0x7aca, 0x7acb); mem_wr(gb, DE, A);
-  CYC(0x7acb, 0x7acc); ret_effect(gb);
+  BASE(linkedNpc_calcLowTextIndex);
+  CYC(b_+0, b_+2); alu_add(gb, 0x00);
+  CYC(b_+2, b_+3); C = A;
+  CYC(b_+3, b_+5); E = 0x7f;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+7); B = A;
+  CYC(b_+7, b_+8); alu_add(gb, A);
+  CYC(b_+8, b_+9); alu_add(gb, A);
+  CYC(b_+9, b_+10); alu_add(gb, B);
+  CYC(b_+10, b_+11); alu_add(gb, C);
+  CYC(b_+11, b_+13); E = 0x72;
+  CYC(b_+13, b_+14); mem_wr(gb, DE, A);
+  CYC(b_+14, SYM(plenSubid0Script_b15)); ret_effect(gb);
 }

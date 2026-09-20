@@ -3,12 +3,12 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode2e), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode2e), (from), (to), true)
 
 // interactionCode2e@scriptTable: subid 0 = mainScripts.oldManScript_givesRupees,
 // subid 1 = mainScripts.oldManScript_takesRupees.
-#define oldManWithRupeesScriptTable_bank08 0x55fa
+#define oldManWithRupeesScriptTable_bank08 SYM(interactionCode2e__scriptTable)
 
 static void oldManWithRupees_addDoubleIndex(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -23,34 +23,35 @@ static void oldManWithRupees_addDoubleIndex(GB *gb, uint16_t return_address) {
 
 // INTERAC_OLD_MAN_WITH_RUPEES: the old man who gives or takes rupees.
 void interactionCode2e_hook(GB *gb) {
+  BASE(interactionCode2e);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x55cf, checkInteractionState_hook, 0x23fe, 0x55d2);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
   if (!(F & FZ)) {
-    CYCT(0x55d2, 0x55d4); goto state1;
+    CYCT(b_+3, b_+5); goto state1;
   }
-  CYC(0x55d2, 0x55d4);
+  CYC(b_+3, b_+5);
 
   // @state0
-  CYC(0x55d4, 0x55d5); A = alu_inc8(gb, A);
-  CYC(0x55d5, 0x55d6); mem_wr(gb, DE, A);
-  CALL_C(0x55d6, interactionInitGraphics_hook, 0x15fb, 0x55d9);
-  CYC(0x55d9, 0x55db); A = 0x33; // >TX_3300
-  CALL_C(0x55db, interactionSetHighTextIndex_hook, 0x253b, 0x55de);
-  CYC(0x55de, 0x55e0); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x55e0, 0x55e1); A = mem_rd(gb, DE);
-  CYC(0x55e1, 0x55e4); SET_HL(oldManWithRupeesScriptTable_bank08);
-  CYC(0x55e4, 0x55e5); oldManWithRupees_addDoubleIndex(gb, 0x55e5);
-  CYC(0x55e5, 0x55e6); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x55e6, 0x55e7); H = mem_rd(gb, HL);
-  CYC(0x55e7, 0x55e8); L = A;
-  CALL_C(0x55e8, interactionSetScript_hook, 0x2544, 0x55eb);
-  CYC(0x55eb, 0x55ec); H = D;
-  CYC(0x55ec, 0x55ee); L = INTERACTION_BASE + OBJ_YH;
-  CYC(0x55ee, 0x55f0); mem_wr(gb, HL, 0x38);
-  CYC(0x55f0, 0x55f2); L = INTERACTION_BASE + OBJ_XH;
-  CYC(0x55f2, 0x55f4); mem_wr(gb, HL, 0x28);
+  CYC(b_+5, b_+6); A = alu_inc8(gb, A);
+  CYC(b_+6, b_+7); mem_wr(gb, DE, A);
+  CALL_C(b_+7, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+10);
+  CYC(b_+10, b_+12); A = 0x33; // >TX_3300
+  CALL_C(b_+12, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+15);
+  CYC(b_+15, b_+17); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+17, b_+18); A = mem_rd(gb, DE);
+  CYC(b_+18, b_+21); SET_HL(oldManWithRupeesScriptTable_bank08);
+  CYC(b_+21, b_+22); oldManWithRupees_addDoubleIndex(gb, b_+22);
+  CYC(b_+22, b_+23); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+23, b_+24); H = mem_rd(gb, HL);
+  CYC(b_+24, b_+25); L = A;
+  CALL_C(b_+25, interactionSetScript_hook, SYM(interactionSetScript), b_+28);
+  CYC(b_+28, b_+29); H = D;
+  CYC(b_+29, b_+31); L = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+31, b_+33); mem_wr(gb, HL, 0x38);
+  CYC(b_+33, b_+35); L = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+35, b_+37); mem_wr(gb, HL, 0x28);
 
 state1:
-  CALL_C(0x55f4, interactionRunScript_hook, 0x2552, 0x55f7);
-  CYC(0x55f7, 0x55fa); npcFaceLinkAndAnimate_hook(gb);
+  CALL_C(b_+37, interactionRunScript_hook, SYM(interactionRunScript), b_+40);
+  CYC(b_+40, b_+43); npcFaceLinkAndAnimate_hook(gb);
 }

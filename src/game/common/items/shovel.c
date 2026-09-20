@@ -3,41 +3,42 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x07, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x07, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode15), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode15), (from), (to), true)
 
 void itemCode15_hook(GB *gb) {
+  BASE(itemCode15);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5c1f, 0x5c21); E = 0x04;
-  CYC(0x5c21, 0x5c22); A = mem_rd(gb, DE);
-  CYC(0x5c22, 0x5c23); alu_or(gb, A);
+  CYC(b_+0, b_+2); E = 0x04;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x5c23, 0x5c25);
+    CYCT(b_+4, b_+6);
     goto state1;
   }
-  CYC(0x5c23, 0x5c25);
-  CALL_C(0x5c25, itemLoadAttributesAndGraphics_hook, 0x4993, 0x5c28);
-  CALL_C(0x5c28, itemIncState_hook, 0x23ea, 0x5c2b);
-  CYC(0x5c2b, 0x5c2d); L = 0x06;
-  CYC(0x5c2d, 0x5c2f); mem_wr(gb, HL, 0x04);
-  CYC(0x5c2f, 0x5c31); A = 0x06;
-  CALL_C(0x5c31, itemTryToBreakTile_hook, 0x2bef, 0x5c34);
-  CYC(0x5c34, 0x5c36); A = 0x50;
+  CYC(b_+4, b_+6);
+  CALL_C(b_+6, itemLoadAttributesAndGraphics_hook, SYM(itemLoadAttributesAndGraphics), b_+9);
+  CALL_C(b_+9, itemIncState_hook, SYM(itemIncState), b_+12);
+  CYC(b_+12, b_+14); L = 0x06;
+  CYC(b_+14, b_+16); mem_wr(gb, HL, 0x04);
+  CYC(b_+16, b_+18); A = 0x06;
+  CALL_C(b_+18, itemTryToBreakTile_hook, SYM(itemTryToBreakTile), b_+21);
+  CYC(b_+21, b_+23); A = 0x50;
   if (!(F & FC)) {
-    CYCT(0x5c36, 0x5c38);
+    CYCT(b_+23, b_+25);
   } else {
-    CYC(0x5c36, 0x5c38);
-    CYC(0x5c38, 0x5c3a); A = 0x01;
-    CALL_C(0x5c3a, addToGashaMaturity_hook, 0x1821, 0x5c3d);
-    CYC(0x5c3d, 0x5c3f); A = 0xa9;
+    CYC(b_+23, b_+25);
+    CYC(b_+25, b_+27); A = 0x01;
+    CALL_C(b_+27, addToGashaMaturity_hook, SYM(addToGashaMaturity), b_+30);
+    CYC(b_+30, b_+32); A = 0xa9;
   }
-  CYC(0x5c3f, 0x5c42); playSound_b00_hook(gb); return;
+  CYC(b_+32, b_+35); playSound_b00_hook(gb); return;
 
 state1:
-  CALL_C(0x5c42, itemDecCounter1_hook, 0x23d6, 0x5c45);
+  CALL_C(b_+35, itemDecCounter1_hook, SYM(itemDecCounter1), b_+38);
   if (!(F & FZ)) {
-    CYCT(0x5c45, 0x5c46); ret_effect(gb); return;
+    CYCT(b_+38, b_+39); ret_effect(gb); return;
   }
-  CYC(0x5c45, 0x5c46);
-  CYC(0x5c46, 0x5c49); itemDelete_hook(gb);
+  CYC(b_+38, b_+39);
+  CYC(b_+39, SYM(itemCode04)); itemDelete_hook(gb);
 }

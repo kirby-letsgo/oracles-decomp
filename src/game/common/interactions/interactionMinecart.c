@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode16), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode16), (from), (to), true)
 
 #define TILEINDEX_MINECART_PLATFORM 0x5f
 #define STATICOBJTYPE_INTERACTION 0x03
@@ -31,93 +31,95 @@ static uint16_t interactionMinecart_jumpTable(GB *gb) {
 // interactionCode16@state1 (also reached by fallthrough from state0): wait for Link to push
 // against the cart for a few frames, then launch him into it.
 static void interactionMinecart_state1(GB *gb, uint16_t sp0_) {
-  CALL_C(0x45bc, objectSetPriorityRelativeToLink_hook, 0x22dc, 0x45bf);
-  CYC(0x45bf, 0x45c2); A = mem_rd(gb, wLinkInAir);
-  CYC(0x45c2, 0x45c3); alu_add(gb, A);
+  BASE(interactionCode16);
+  CALL_C(b_+59, objectSetPriorityRelativeToLink_hook, SYM(objectSetPriorityRelativeToLink), b_+62);
+  CYC(b_+62, b_+65); A = mem_rd(gb, wLinkInAir);
+  CYC(b_+65, b_+66); alu_add(gb, A);
   if (F & FC) {
-    CYCT(0x45c3, 0x45c5); goto linkInAir;
+    CYCT(b_+66, b_+68); goto linkInAir;
   }
-  CYC(0x45c3, 0x45c5);
-  CALL_C(0x45c5, objectPreventLinkFromPassing_hook, 0x2680, 0x45c8);
+  CYC(b_+66, b_+68);
+  CALL_C(b_+68, objectPreventLinkFromPassing_hook, SYM(objectPreventLinkFromPassing), b_+71);
   if (!(F & FC)) {
-    CYCT(0x45c8, 0x45c9); ret_effect(gb); return;
+    CYCT(b_+71, b_+72); ret_effect(gb); return;
   }
-  CYC(0x45c8, 0x45c9);
+  CYC(b_+71, b_+72);
 linkInAir:
-  CYC(0x45c9, 0x45cc); A = mem_rd(gb, w1Link_zh);
-  CYC(0x45cc, 0x45cd); alu_or(gb, A);
+  CYC(b_+72, b_+75); A = mem_rd(gb, w1Link_zh);
+  CYC(b_+75, b_+76); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x45cd, 0x45cf); goto resetCounter;
+    CYCT(b_+76, b_+78); goto resetCounter;
   }
-  CYC(0x45cd, 0x45cf);
-  CALL_C(0x45cf, checkLinkID0AndControlNormal_hook, 0x1d18, 0x45d2);
+  CYC(b_+76, b_+78);
+  CALL_C(b_+78, checkLinkID0AndControlNormal_hook, SYM(checkLinkID0AndControlNormal), b_+81);
   if (!(F & FC)) {
-    CYCT(0x45d2, 0x45d4); goto resetCounter;
+    CYCT(b_+81, b_+83); goto resetCounter;
   }
-  CYC(0x45d2, 0x45d4);
-  CALL_C(0x45d4, objectCheckLinkPushingAgainstCenter_hook, 0x2707, 0x45d7);
+  CYC(b_+81, b_+83);
+  CALL_C(b_+83, objectCheckLinkPushingAgainstCenter_hook, SYM(objectCheckLinkPushingAgainstCenter), b_+86);
   if (!(F & FC)) {
-    CYCT(0x45d7, 0x45d9); goto resetCounter;
+    CYCT(b_+86, b_+88); goto resetCounter;
   }
-  CYC(0x45d7, 0x45d9);
-  CYC(0x45d9, 0x45db); A = 0x01;
-  CYC(0x45db, 0x45de); mem_wr(gb, wForceLinkPushAnimation, A);
-  CALL_C(0x45de, interactionDecCounter1_hook, 0x23cc, 0x45e1);
+  CYC(b_+86, b_+88);
+  CYC(b_+88, b_+90); A = 0x01;
+  CYC(b_+90, b_+93); mem_wr(gb, wForceLinkPushAnimation, A);
+  CALL_C(b_+93, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+96);
   if (!(F & FZ)) {
-    CYCT(0x45e1, 0x45e2); ret_effect(gb); return;
+    CYCT(b_+96, b_+97); ret_effect(gb); return;
   }
-  CYC(0x45e1, 0x45e2);
-  CALL_C(0x45e2, interactionIncState_hook, 0x23e0, 0x45e5);
-  CYC(0x45e5, 0x45e7); A = 0x81;
-  CYC(0x45e7, 0x45ea); mem_wr(gb, wLinkInAir, A);
-  CYC(0x45ea, 0x45ed); SET_HL(w1Link_speed);
-  CYC(0x45ed, 0x45ef); mem_wr(gb, HL, 0x14);
-  CYC(0x45ef, 0x45f1); L = (uint8_t)w1Link_speedZ;
-  CYC(0x45f1, 0x45f3); mem_wr(gb, HL, 0x40);
-  CYC(0x45f3, 0x45f4); L = alu_inc8(gb, L);
-  CYC(0x45f4, 0x45f6); mem_wr(gb, HL, 0xfe);
-  CALL_C(0x45f6, objectGetAngleTowardLink_hook, 0x1e9c, 0x45f9);
-  CYC(0x45f9, 0x45fb); alu_xor(gb, 0x10);
-  CYC(0x45fb, 0x45fe); mem_wr(gb, w1Link_angle, A);
-  CYC(0x45fe, 0x45ff); ret_effect(gb);
+  CYC(b_+96, b_+97);
+  CALL_C(b_+97, interactionIncState_hook, SYM(interactionIncState), b_+100);
+  CYC(b_+100, b_+102); A = 0x81;
+  CYC(b_+102, b_+105); mem_wr(gb, wLinkInAir, A);
+  CYC(b_+105, b_+108); SET_HL(w1Link_speed);
+  CYC(b_+108, b_+110); mem_wr(gb, HL, 0x14);
+  CYC(b_+110, b_+112); L = (uint8_t)w1Link_speedZ;
+  CYC(b_+112, b_+114); mem_wr(gb, HL, 0x40);
+  CYC(b_+114, b_+115); L = alu_inc8(gb, L);
+  CYC(b_+115, b_+117); mem_wr(gb, HL, 0xfe);
+  CALL_C(b_+117, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+120);
+  CYC(b_+120, b_+122); alu_xor(gb, 0x10);
+  CYC(b_+122, b_+125); mem_wr(gb, w1Link_angle, A);
+  CYC(b_+125, b_+126); ret_effect(gb);
   return;
 
 resetCounter:
-  CYC(0x45ff, 0x4601); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x4601, 0x4603); A = 0x04;
-  CYC(0x4603, 0x4604); mem_wr(gb, DE, A);
-  CYC(0x4604, 0x4605); ret_effect(gb);
+  CYC(b_+126, b_+128); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+128, b_+130); A = 0x04;
+  CYC(b_+130, b_+131); mem_wr(gb, DE, A);
+  CYC(b_+131, b_+132); ret_effect(gb);
 }
 
 // interactionCode16@state0: init graphics, face the platform, register as a static object.
 // Falls through into state1.
 static void interactionMinecart_state0(GB *gb, uint16_t sp0_) {
-  CYC(0x458d, 0x458f); A = 0x01;
-  CYC(0x458f, 0x4590); mem_wr(gb, DE, A);
-  CALL_C(0x4590, interactionInitGraphics_hook, 0x15fb, 0x4593);
-  CYC(0x4593, 0x4595); A = 0x06;
-  CALL_C(0x4595, objectSetCollideRadius_hook, 0x24a1, 0x4598);
-  CYC(0x4598, 0x459a); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x459a, 0x459c); mem_wr(gb, HL, 0x04);
-  CYC(0x459c, 0x459e); A = TILEINDEX_MINECART_PLATFORM;
-  CALL_C(0x459e, objectGetRelativePositionOfTile_hook, 0x1456, 0x45a1);
-  CYC(0x45a1, 0x45a2); H = D;
-  CYC(0x45a2, 0x45a4); L = INTERACTION_BASE + OBJ_DIRECTION;
-  CYC(0x45a4, 0x45a6); alu_xor(gb, 0x02);
-  CYC(0x45a6, 0x45a7); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x45a7, 0x45a9); A = alu_swap(gb, A);
-  CYC(0x45a9, 0x45aa); alu_rrca(gb);
-  CYC(0x45aa, 0x45ab); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(0x45ab, 0x45ac); A = mem_rd(gb, HL);
-  CYC(0x45ac, 0x45ae); alu_and(gb, 0x01);
-  CALL_C(0x45ae, interactionSetAnimation_hook, 0x262e, 0x45b1);
-  CALL_C(0x45b1, objectDeleteRelatedObj1AsStaticObject_hook, 0x31b8, 0x45b4);
-  CALL_C(0x45b4, findFreeStaticObjectSlot_hook, 0x31a7, 0x45b7);
-  CYC(0x45b7, 0x45b9); A = STATICOBJTYPE_INTERACTION;
+  BASE(interactionCode16);
+  CYC(b_+12, b_+14); A = 0x01;
+  CYC(b_+14, b_+15); mem_wr(gb, DE, A);
+  CALL_C(b_+15, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+18);
+  CYC(b_+18, b_+20); A = 0x06;
+  CALL_C(b_+20, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+23);
+  CYC(b_+23, b_+25); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+25, b_+27); mem_wr(gb, HL, 0x04);
+  CYC(b_+27, b_+29); A = TILEINDEX_MINECART_PLATFORM;
+  CALL_C(b_+29, objectGetRelativePositionOfTile_hook, SYM(objectGetRelativePositionOfTile), b_+32);
+  CYC(b_+32, b_+33); H = D;
+  CYC(b_+33, b_+35); L = INTERACTION_BASE + OBJ_DIRECTION;
+  CYC(b_+35, b_+37); alu_xor(gb, 0x02);
+  CYC(b_+37, b_+38); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+38, b_+40); A = alu_swap(gb, A);
+  CYC(b_+40, b_+41); alu_rrca(gb);
+  CYC(b_+41, b_+42); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+42, b_+43); A = mem_rd(gb, HL);
+  CYC(b_+43, b_+45); alu_and(gb, 0x01);
+  CALL_C(b_+45, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+48);
+  CALL_C(b_+48, objectDeleteRelatedObj1AsStaticObject_hook, SYM(objectDeleteRelatedObj1AsStaticObject), b_+51);
+  CALL_C(b_+51, findFreeStaticObjectSlot_hook, SYM(findFreeStaticObjectSlot), b_+54);
+  CYC(b_+54, b_+56); A = STATICOBJTYPE_INTERACTION;
   if (F & FZ) {
-    CALL_C_CC(0x45b9, objectSaveAsStaticObject_hook, 0x31cf, 0x45bc);
+    CALL_C_CC(b_+56, objectSaveAsStaticObject_hook, SYM(objectSaveAsStaticObject), b_+59);
   } else {
-    CYC(0x45b9, 0x45bc);
+    CYC(b_+56, b_+59);
   }
   interactionMinecart_state1(gb, sp0_);
 }
@@ -125,45 +127,47 @@ static void interactionMinecart_state0(GB *gb, uint16_t sp0_) {
 // interactionCode16@state2: once Link is high enough and falling, spawn the rideable minecart
 // special object in the companion slot and hand over direction/angle/position.
 static void interactionMinecart_state2(GB *gb, uint16_t sp0_) {
-  CYC(0x4605, 0x4608); SET_HL(w1Link_zh);
-  CYC(0x4608, 0x4609); A = mem_rd(gb, HL);
-  CYC(0x4609, 0x460b); alu_cp(gb, 0xfa);
+  BASE(interactionCode16);
+  CYC(b_+132, b_+135); SET_HL(w1Link_zh);
+  CYC(b_+135, b_+136); A = mem_rd(gb, HL);
+  CYC(b_+136, b_+138); alu_cp(gb, 0xfa);
   if (F & FC) {
-    CYCT(0x460b, 0x460c); ret_effect(gb); return;
+    CYCT(b_+138, b_+139); ret_effect(gb); return;
   }
-  CYC(0x460b, 0x460c);
-  CYC(0x460c, 0x460e); L = (uint8_t)(w1Link_speedZ + 1);
-  CYC(0x460e, 0x4610); alu_bit(gb, 7, mem_rd(gb, HL));
+  CYC(b_+138, b_+139);
+  CYC(b_+139, b_+141); L = (uint8_t)(w1Link_speedZ + 1);
+  CYC(b_+141, b_+143); alu_bit(gb, 7, mem_rd(gb, HL));
   if (!(F & FZ)) {
-    CYCT(0x4610, 0x4611); ret_effect(gb); return;
+    CYCT(b_+143, b_+144); ret_effect(gb); return;
   }
-  CYC(0x4610, 0x4611);
-  CYC(0x4611, 0x4613); A = 0x03;
-  CYC(0x4613, 0x4614); mem_wr(gb, DE, A);
-  CYC(0x4614, 0x4617); SET_HL(w1Companion_enabled);
-  CYC(0x4617, 0x4618); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x4618, 0x461a); mem_wr(gb, HL, SPECIALOBJECT_MINECART);
-  CYC(0x461a, 0x461c); E = INTERACTION_BASE + OBJ_DIRECTION;
-  CYC(0x461c, 0x461e); L = (uint8_t)w1Companion_direction;
-  CYC(0x461e, 0x461f); A = mem_rd(gb, DE);
-  CYC(0x461f, 0x4620); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x4620, 0x4621); E = alu_inc8(gb, E);
-  CYC(0x4621, 0x4622); A = mem_rd(gb, DE);
-  CYC(0x4622, 0x4623); mem_wr(gb, HL, A);
-  CALL_C(0x4623, objectCopyPosition_hook, 0x2242, 0x4626);
-  CYC(0x4626, 0x4629); objectDeleteRelatedObj1AsStaticObject_hook(gb);
+  CYC(b_+143, b_+144);
+  CYC(b_+144, b_+146); A = 0x03;
+  CYC(b_+146, b_+147); mem_wr(gb, DE, A);
+  CYC(b_+147, b_+150); SET_HL(w1Companion_enabled);
+  CYC(b_+150, b_+151); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+151, b_+153); mem_wr(gb, HL, SPECIALOBJECT_MINECART);
+  CYC(b_+153, b_+155); E = INTERACTION_BASE + OBJ_DIRECTION;
+  CYC(b_+155, b_+157); L = (uint8_t)w1Companion_direction;
+  CYC(b_+157, b_+158); A = mem_rd(gb, DE);
+  CYC(b_+158, b_+159); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+159, b_+160); E = alu_inc8(gb, E);
+  CYC(b_+160, b_+161); A = mem_rd(gb, DE);
+  CYC(b_+161, b_+162); mem_wr(gb, HL, A);
+  CALL_C(b_+162, objectCopyPosition_hook, SYM(objectCopyPosition), b_+165);
+  CYC(b_+165, SYM(interactionCode17)); objectDeleteRelatedObj1AsStaticObject_hook(gb);
 }
 
 void interactionCode16_hook(GB *gb) {
+  BASE(interactionCode16);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4581, 0x4583); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4583, 0x4584); A = mem_rd(gb, DE);
-  CYC(0x4584, 0x4585); push_effect(gb, 0x4585);
-  switch (interactionMinecart_jumpTable(gb)) {
-    case 0x458d: interactionMinecart_state0(gb, sp0_); return;
-    case 0x45bc: interactionMinecart_state1(gb, sp0_); return;
-    case 0x4605: interactionMinecart_state2(gb, sp0_); return;
-    case 0x3b05: interactionDelete_hook(gb); return;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (interactionMinecart_jumpTable(gb));
+    if (jt_ == b_+12) { interactionMinecart_state0(gb, sp0_); return; }
+    else if (jt_ == b_+59) { interactionMinecart_state1(gb, sp0_); return; }
+    else if (jt_ == b_+132) { interactionMinecart_state2(gb, sp0_); return; }
+    else if (jt_ == SYM(interactionDelete)) { interactionDelete_hook(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 }

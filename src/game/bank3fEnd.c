@@ -3,116 +3,124 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x3f, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x3f, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(func_7cf8), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(func_7cf8), (from), (to), true)
 
 static void func_7cf8_set_bits(GB *gb) {
-  CYC(0x7d00, 0x7d02); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
-  CYC(0x7d02, 0x7d03); L = alu_inc8(gb, L);
-  CYC(0x7d03, 0x7d05); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
-  CYC(0x7d05, 0x7d06); L = alu_inc8(gb, L);
-  CYC(0x7d06, 0x7d08); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
-  CYC(0x7d08, 0x7d09); L = alu_inc8(gb, L);
-  CYC(0x7d09, 0x7d0a); ret_effect(gb);
+  BASE(func_7cf8);
+  CYC(b_+8, b_+10); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
+  CYC(b_+10, b_+11); L = alu_inc8(gb, L);
+  CYC(b_+11, b_+13); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
+  CYC(b_+13, b_+14); L = alu_inc8(gb, L);
+  CYC(b_+14, b_+16); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
+  CYC(b_+16, b_+17); L = alu_inc8(gb, L);
+  CYC(b_+17, b_+18); ret_effect(gb);
 }
 
 void func_7cf8_hook(GB *gb) {
-  CYC(0x7cf8, 0x7cfb); SET_HL(0xc702);
-  CYC(0x7cfb, 0x7cfe); push_effect(gb, 0x7cfe);
+  BASE(func_7cf8);
+  CYC(b_+0, b_+3); SET_HL((wGroup0RoomFlags + 2));
+  CYC(b_+3, b_+6); push_effect(gb, b_+6);
   func_7cf8_set_bits(gb);
-  CYC(0x7cfe, 0x7d00); L = 0x12;
+  CYC(b_+6, b_+8); L = 0x12;
   func_7cf8_set_bits(gb);
 }
 
 void func_7ca7_hook(GB *gb) {
+  BASE(tuniNut_state3);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7ca7, 0x7ca9);
-  CYC(0x7c79, 0x7c7a); C = H;
-  CALL_C(0x7c7a, loseTreasure_hook, 0x1733, 0x7c7d);
-  CALL_ROM(0x7c7d, 0x7c95);
-  CYC(0x7c80, 0x7c81); alu_xor(gb, A);
-  CYC(0x7c81, 0x7c84); W8(wDisabledObjects) = A;
-  CYC(0x7c84, 0x7c87); W8(wMenuDisabled) = A;
-  CYC(0x7c87, 0x7c8a); SET_HL(0xcfc0);
-  CYC(0x7c8a, 0x7c8c); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
-  CYC(0x7c8c, 0x7c8f); A = W8(wActiveMusic);
-  CALL_C(0x7c8f, playSound_b00_hook, 0x0c98, 0x7c92);
-  CYC(0x7c92, 0x7c95);
+  CYC(SYM(func_7ca7), (SYM(func_7ca7) + 2));
+  CYC(b_+110, b_+111); C = H;
+  CALL_C(b_+111, loseTreasure_hook, SYM(loseTreasure), b_+114);
+  CALL_ROM(b_+114, b_+138);
+  CYC(b_+117, b_+118); alu_xor(gb, A);
+  CYC(b_+118, b_+121); W8(wDisabledObjects) = A;
+  CYC(b_+121, b_+124); W8(wMenuDisabled) = A;
+  CYC(b_+124, b_+127); SET_HL(wRoomLayoutEnd);
+  CYC(b_+127, b_+129); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
+  CYC(b_+129, b_+132); A = W8(wActiveMusic);
+  CALL_C(b_+132, playSound_b00_hook, SYM(playSound_b00), b_+135);
+  CYC(b_+135, b_+138);
   tuniNut_gotoState4_hook(gb);
 }
 
 void func_7caf_hook(GB *gb) {
+  BASE(func_7caf);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7caf, 0x7cb1); C = 0x20;
-  CALL_ROM(0x7cb1, 0x1f83);
+  CYC(b_+0, b_+2); C = 0x20;
+  CALL_ROM(b_+2, (SYM(objectUpdateSpeedZ_sidescroll_givenYOffset) + 27));
   if (!(F & FZ)) {
-    CYCT(0x7cb4, 0x7cb5); ret_effect(gb); return;
+    CYCT(b_+5, b_+6); ret_effect(gb); return;
   }
-  CYC(0x7cb4, 0x7cb5);
-  CYC(0x7cb5, 0x7cb7); A = 0x77;
-  CALL_ROM(0x7cb7, 0x0cb1);
-  CYC(0x7cba, 0x7cbc); E = 0x46;
-  CYC(0x7cbc, 0x7cbe); A = 0x5a;
-  CYC(0x7cbe, 0x7cbf); mem_wr(gb, DE, A);
-  CYC(0x7cbf, 0x7cc1); A = 0x5b;
-  CALL_ROM(0x7cc1, 0x0cb1);
-  CYC(0x7cc4, 0x7cc7);
-  hook_continue(gb, 0x2422, sp0_);
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+8); A = 0x77;
+  CALL_ROM(b_+8, (SYM(setMusicVolume) + 4));
+  CYC(b_+11, b_+13); E = 0x46;
+  CYC(b_+13, b_+15); A = 0x5a;
+  CYC(b_+15, b_+16); mem_wr(gb, DE, A);
+  CYC(b_+16, b_+18); A = 0x5b;
+  CALL_ROM(b_+18, (SYM(setMusicVolume) + 4));
+  CYC(b_+21, SYM(func_7cc7));
+  hook_continue(gb, (SYM(hazardCollisionTable__overworld) + 14), sp0_);
 }
 
 void func_7cc7__afterCall7cce_hook(GB *gb) {
+  BASE(func_7cc7);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7cce, 0x7cd1);
-  hook_continue(gb, 0x2422, sp0_);
+  CYC(b_+7, SYM(func_7cd1));
+  hook_continue(gb, (SYM(hazardCollisionTable__overworld) + 14), sp0_);
 }
 
 void func_7cc7_hook(GB *gb) {
-  CALL_ROM(0x7cc7, 0x2409);
+  BASE(func_7cc7);
+  CALL_ROM(b_+0, (SYM(hazardCollisionTable) + 1));
   if (!(F & FZ)) {
-    CYCT(0x7cca, 0x7ccb); ret_effect(gb); return;
+    CYCT(b_+3, b_+4); ret_effect(gb); return;
   }
-  CYC(0x7cca, 0x7ccb);
-  CALL_ROM(0x7ccb, 0x33a2);
+  CYC(b_+3, b_+4);
+  CALL_ROM(b_+4, (SYM(mainThreadStart) + 1));
   func_7cc7__afterCall7cce_hook(gb);
 }
 
 static void func_7cd1_tail(GB *gb, uint16_t sp0_) {
-  CYC(0x7bf2, 0x7bf3); alu_rlca(gb);
-  CYC(0x7bf3, 0x7bf4); alu_add(gb, H);
-  CALL_C(0x7bf4, objectCreateInteraction_hook, 0x24c5, 0x7bf7);
-  CYC(0x7bf7, 0x7bf9); L = 0x56;
-  CYC(0x7bf9, 0x7bfa); A = E;
-  CYC(0x7bfa, 0x7bfb); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x7bfb, 0x7bfc); A = D;
-  CYC(0x7bfc, 0x7bfd); mem_wr(gb, HL, A);
-  CALL_C(0x7bfd, darkenRoomLightly_hook, 0x32f8, 0x7c00);
-  CYC(0x7c00, 0x7c02); A = 0xf0;
-  CALL_C(0x7c02, playSound_b00_hook, 0x0c98, 0x7c05);
-  CALL_C(0x7c05, objectSetVisiblec0_hook, 0x1e33, 0x7c08);
-  CYC(0x7c08, 0x7c0b);
+  BASE(tuniNut_beginMovingIntoPlace);
+  CYC(b_+10, b_+11); alu_rlca(gb);
+  CYC(b_+11, b_+12); alu_add(gb, H);
+  CALL_C(b_+12, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+15);
+  CYC(b_+15, b_+17); L = 0x56;
+  CYC(b_+17, b_+18); A = E;
+  CYC(b_+18, b_+19); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+19, b_+20); A = D;
+  CYC(b_+20, b_+21); mem_wr(gb, HL, A);
+  CALL_C(b_+21, darkenRoomLightly_hook, SYM(darkenRoomLightly), b_+24);
+  CYC(b_+24, b_+26); A = 0xf0;
+  CALL_C(b_+26, playSound_b00_hook, SYM(playSound_b00), b_+29);
+  CALL_C(b_+29, objectSetVisiblec0_hook, SYM(objectSetVisiblec0), b_+32);
+  CYC(b_+32, SYM(tuniNut_state3));
   interactionIncState_hook(gb);
 }
 
 void func_7cd1_hook(GB *gb) {
+  BASE(func_7cd1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7cd1, 0x7cd4); A = W8(wPaletteThread_mode);
-  CYC(0x7cd4, 0x7cd5); alu_or(gb, A);
+  CYC(b_+0, b_+3); A = W8(wPaletteThread_mode);
+  CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x7cd5, 0x7cd6); ret_effect(gb); return;
+    CYCT(b_+4, b_+5); ret_effect(gb); return;
   }
-  CYC(0x7cd5, 0x7cd6);
-  CYC(0x7cd6, 0x7cd8); A = 0x29;
-  CALL_ROM(0x7cd8, 0x324b);
-  CYC(0x7cdb, 0x7cdd); A = 0x4c;
-  CALL_ROM(0x7cdd, 0x1761);
-  CALL_C(0x7ce0, func_7cf8_hook, 0x7cf8, 0x7ce3);
-  CYC(0x7ce3, 0x7ce4); alu_xor(gb, A);
-  CYC(0x7ce4, 0x7ce7); W8(wDisabledObjects) = A;
-  CYC(0x7ce7, 0x7cea); W8(wMenuDisabled) = A;
-  CYC(0x7cea, 0x7ced); SET_HL(0xcfc0);
-  CYC(0x7ced, 0x7cef); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
-  CYC(0x7cef, 0x7cf2); A = W8(wActiveMusic);
-  CALL_ROM(0x7cf2, 0x0cb1);
-  CYC(0x7cf5, 0x7cf8);
+  CYC(b_+4, b_+5);
+  CYC(b_+5, b_+7); A = 0x29;
+  CALL_ROM(b_+7, (SYM(clearPaletteFadeVariables) + 13));
+  CYC(b_+10, b_+12); A = 0x4c;
+  CALL_ROM(b_+12, (SYM(checkTreasureObtained) + 25));
+  CALL_C(b_+15, func_7cf8_hook, SYM(func_7cf8), b_+18);
+  CYC(b_+18, b_+19); alu_xor(gb, A);
+  CYC(b_+19, b_+22); W8(wDisabledObjects) = A;
+  CYC(b_+22, b_+25); W8(wMenuDisabled) = A;
+  CYC(b_+25, b_+28); SET_HL(wRoomLayoutEnd);
+  CYC(b_+28, b_+30); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
+  CYC(b_+30, b_+33); A = W8(wActiveMusic);
+  CALL_ROM(b_+33, (SYM(setMusicVolume) + 4));
+  CYC(b_+36, SYM(func_7cf8));
   func_7cd1_tail(gb, sp0_);
 }

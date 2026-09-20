@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0a, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0a, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode77), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode77), (from), (to), true)
 
 static uint16_t interactionCode77_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -26,81 +26,82 @@ static uint16_t interactionCode77_jump_table(GB *gb) {
 
 // INTERAC_SMALL_KEY_ON_ENEMY
 void interactionCode77_hook(GB *gb) {
+  BASE(interactionCode77);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6017, 0x6019); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x6019, 0x601a); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x601a, 0x601b); push_effect(gb, 0x601b);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = interactionCode77_jump_table(gb);
-    if (target == 0x6056) goto state1;
-    if (target == 0x606d) goto state2;
+    if (target == b_+63) goto state1;
+    if (target == b_+86) goto state2;
   }
 
   // state0
-  CALL_C(0x6021, getThisRoomFlags_hook, 0x197d, 0x6024);
-  CYC(0x6024, 0x6026); alu_and(gb, 0x20); // ROOMFLAG_ITEM
-  if (!(F & FZ)) { CYCT(0x6026, 0x6029); interactionDelete_hook(gb); return; } // jp nz
-  CYC(0x6026, 0x6029);
-  CYC(0x6029, 0x602b); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x602b, 0x602c); A = mem_rd(gb, DE);
-  CYC(0x602c, 0x602d); B = A;
-  CYC(0x602d, 0x6030); SET_HL(ENEMY_SLOTS + OBJ_ID); // FIRST_ENEMY_INDEX, Enemy.id
+  CALL_C(b_+10, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+13);
+  CYC(b_+13, b_+15); alu_and(gb, 0x20); // ROOMFLAG_ITEM
+  if (!(F & FZ)) { CYCT(b_+15, b_+18); interactionDelete_hook(gb); return; } // jp nz
+  CYC(b_+15, b_+18);
+  CYC(b_+18, b_+20); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+20, b_+21); A = mem_rd(gb, DE);
+  CYC(b_+21, b_+22); B = A;
+  CYC(b_+22, b_+25); SET_HL(ENEMY_SLOTS + OBJ_ID); // FIRST_ENEMY_INDEX, Enemy.id
 
 nextEnemy:
-  CYC(0x6030, 0x6031); A = mem_rd(gb, HL);
-  CYC(0x6031, 0x6032); alu_cp(gb, B);
-  if (F & FZ) { CYCT(0x6032, 0x6034); goto foundMatch; } // jr z
-  CYC(0x6032, 0x6034);
-  CYC(0x6034, 0x6035); H = alu_inc8(gb, H);
-  CYC(0x6035, 0x6036); A = H;
-  CYC(0x6036, 0x6038); alu_cp(gb, 0xe0); // LAST_ENEMY_INDEX+1
+  CYC(b_+25, b_+26); A = mem_rd(gb, HL);
+  CYC(b_+26, b_+27); alu_cp(gb, B);
+  if (F & FZ) { CYCT(b_+27, b_+29); goto foundMatch; } // jr z
+  CYC(b_+27, b_+29);
+  CYC(b_+29, b_+30); H = alu_inc8(gb, H);
+  CYC(b_+30, b_+31); A = H;
+  CYC(b_+31, b_+33); alu_cp(gb, 0xe0); // LAST_ENEMY_INDEX+1
   // BUG: original game checks carry here, so this only works if the enemy is in the first slot.
-  if (F & FC) { CYCT(0x6038, 0x603b); interactionDelete_hook(gb); return; } // jp c
-  CYC(0x6038, 0x603b);
-  CYC(0x603b, 0x603d); goto nextEnemy; // jr
+  if (F & FC) { CYCT(b_+33, b_+36); interactionDelete_hook(gb); return; } // jp c
+  CYC(b_+33, b_+36);
+  CYC(b_+36, b_+38); goto nextEnemy; // jr
 
 foundMatch:
-  CYC(0x603d, 0x603e); L = alu_dec8(gb, L);
-  CYC(0x603e, 0x603f); A = L;
-  CYC(0x603f, 0x6041); E = INTERACTION_BASE + OBJ_RELATED2; // Interaction.relatedObj2 low byte
-  CYC(0x6041, 0x6042); mem_wr(gb, DE, A);
-  CYC(0x6042, 0x6043); A = H;
-  CYC(0x6043, 0x6044); E = alu_inc8(gb, E);
-  CYC(0x6044, 0x6045); mem_wr(gb, DE, A);
-  CALL_C(0x6045, interactionInitGraphics_hook, 0x15fb, 0x6048); // SWITCHES THREADS
-  CALL_C(0x6048, objectSetVisible80_hook, 0x1e57, 0x604b);
-  CALL_C(0x604b, interactionIncState_hook, 0x23e0, 0x604e);
+  CYC(b_+38, b_+39); L = alu_dec8(gb, L);
+  CYC(b_+39, b_+40); A = L;
+  CYC(b_+40, b_+42); E = INTERACTION_BASE + OBJ_RELATED2; // Interaction.relatedObj2 low byte
+  CYC(b_+42, b_+43); mem_wr(gb, DE, A);
+  CYC(b_+43, b_+44); A = H;
+  CYC(b_+44, b_+45); E = alu_inc8(gb, E);
+  CYC(b_+45, b_+46); mem_wr(gb, DE, A);
+  CALL_C(b_+46, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+49); // SWITCHES THREADS
+  CALL_C(b_+49, objectSetVisible80_hook, SYM(objectSetVisible80), b_+52);
+  CALL_C(b_+52, interactionIncState_hook, SYM(interactionIncState), b_+55);
 
 takeRelatedObj2Position:
-  CYC(0x604e, 0x6050); A = OBJ_Y; // Object.y
-  CALL_C(0x6050, objectGetRelatedObject2Var_hook, 0x2164, 0x6053);
-  CYC(0x6053, 0x6056); objectTakePosition_hook(gb);
-  if (gb->pc == 0x6063 && gb->sp == sp0_) goto afterTakeRelatedObj2Position;
+  CYC(b_+55, b_+57); A = OBJ_Y; // Object.y
+  CALL_C(b_+57, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+60);
+  CYC(b_+60, b_+63); objectTakePosition_hook(gb);
+  if (gb->pc == b_+76 && gb->sp == sp0_) goto afterTakeRelatedObj2Position;
   return; // jp
 
 state1:
-  CYC(0x6056, 0x6058); A = OBJ_ENABLED; // Object.enabled
-  CALL_C(0x6058, objectGetRelatedObject2Var_hook, 0x2164, 0x605b);
-  CYC(0x605b, 0x605c); A = mem_rd(gb, HL);
-  CYC(0x605c, 0x605d); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x605d, 0x6060); interactionIncState_hook(gb); return; } // jp z
-  CYC(0x605d, 0x6060);
-  CYC(0x6060, 0x6063); push_effect(gb, 0x6063); goto takeRelatedObj2Position;
+  CYC(b_+63, b_+65); A = OBJ_ENABLED; // Object.enabled
+  CALL_C(b_+65, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+68);
+  CYC(b_+68, b_+69); A = mem_rd(gb, HL);
+  CYC(b_+69, b_+70); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+70, b_+73); interactionIncState_hook(gb); return; } // jp z
+  CYC(b_+70, b_+73);
+  CYC(b_+73, b_+76); push_effect(gb, b_+76); goto takeRelatedObj2Position;
 
 afterTakeRelatedObj2Position:
-  CYC(0x6063, 0x6065); A = OBJ_VISIBLE; // Object.visible
-  CALL_C(0x6065, objectGetRelatedObject2Var_hook, 0x2164, 0x6068);
-  CYC(0x6068, 0x606a); B = 0x01;
-  CYC(0x606a, 0x606d); objectFlickerVisibility_hook(gb); return; // jp
+  CYC(b_+76, b_+78); A = OBJ_VISIBLE; // Object.visible
+  CALL_C(b_+78, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+81);
+  CYC(b_+81, b_+83); B = 0x01;
+  CYC(b_+83, b_+86); objectFlickerVisibility_hook(gb); return; // jp
 
 state2:
-  CALL_C(0x606d, objectSetVisible_hook, 0x1e84, 0x6070);
-  CYC(0x6070, 0x6072); C = 0x20;
-  CALL_C(0x6072, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x6075);
-  if (!(F & FZ)) { RET_TAKEN(0x6075); return; } // ret nz
-  CYC(0x6075, 0x6076);
-  CYC(0x6076, 0x6079); SET_BC(0x3000); // TREASURE_SMALL_KEY, $00
-  CALL_C(0x6079, createTreasure_hook, 0x27d4, 0x607c);
-  CALL_C(0x607c, objectCopyPosition_hook, 0x2242, 0x607f);
-  CYC(0x607f, 0x6082); interactionDelete_hook(gb); return; // jp
+  CALL_C(b_+86, objectSetVisible_hook, SYM(objectSetVisible), b_+89);
+  CYC(b_+89, b_+91); C = 0x20;
+  CALL_C(b_+91, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+94);
+  if (!(F & FZ)) { RET_TAKEN(b_+94); return; } // ret nz
+  CYC(b_+94, b_+95);
+  CYC(b_+95, b_+98); SET_BC((SYM(enemyCodeTable) + 204)); // TREASURE_SMALL_KEY, $00
+  CALL_C(b_+98, createTreasure_hook, SYM(createTreasure), b_+101);
+  CALL_C(b_+101, objectCopyPosition_hook, SYM(objectCopyPosition), b_+104);
+  CYC(b_+104, SYM(interactionCode7b)); interactionDelete_hook(gb); return; // jp
 }

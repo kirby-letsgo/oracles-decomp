@@ -3,40 +3,44 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(remoteMakuCutscene_fadeinFromBlackWithDelay), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(remoteMakuCutscene_fadeinFromBlackWithDelay), (from), (to), true)
 
 static void remoteMakuCutscene_setPaletteFadeFlags(GB *gb) {
-  CYC(0x7320, 0x7322); A = 0xff;
-  CYC(0x7322, 0x7325); mem_wr(gb, wDirtyFadeBgPalettes, A);
-  CYC(0x7325, 0x7328); mem_wr(gb, wFadeBgPaletteSources, A);
-  CYC(0x7328, 0x732a); A = 0x01;
-  CYC(0x732a, 0x732d); mem_wr(gb, wDirtyFadeSprPalettes, A);
-  CYC(0x732d, 0x732f); A = 0xfe;
-  CYC(0x732f, 0x7332); mem_wr(gb, wFadeSprPaletteSources, A);
-  CYC(0x7332, 0x7333); ret_effect(gb);
+  BASE(remoteMakuCutscene_fadeinFromBlackWithDelay);
+  CYC(b_+3, b_+5); A = 0xff;
+  CYC(b_+5, b_+8); mem_wr(gb, wDirtyFadeBgPalettes, A);
+  CYC(b_+8, b_+11); mem_wr(gb, wFadeBgPaletteSources, A);
+  CYC(b_+11, b_+13); A = 0x01;
+  CYC(b_+13, b_+16); mem_wr(gb, wDirtyFadeSprPalettes, A);
+  CYC(b_+16, b_+18); A = 0xfe;
+  CYC(b_+18, b_+21); mem_wr(gb, wFadeSprPaletteSources, A);
+  CYC(b_+21, SYM(remoteMakuCutscene_checkinitUnderwaterWaves)); ret_effect(gb);
 }
 
 void remoteMakuCutscene_fadeoutToBlackWithDelay_hook(GB *gb) {
+  BASE(remoteMakuCutscene_fadeoutToBlackWithDelay);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7318, fadeoutToBlackWithDelay_hook, 0x32ab, 0x731b);
-  CYC(0x731b, 0x731d);
+  CALL_C(b_+0, fadeoutToBlackWithDelay_hook, SYM(fadeoutToBlackWithDelay), b_+3);
+  CYC(b_+3, SYM(remoteMakuCutscene_fadeinFromBlackWithDelay));
   remoteMakuCutscene_setPaletteFadeFlags(gb);
 }
 
 void remoteMakuCutscene_fadeinFromBlackWithDelay_hook(GB *gb) {
+  BASE(remoteMakuCutscene_fadeinFromBlackWithDelay);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x731d, fadeinFromBlackWithDelay_hook, 0x32d1, 0x7320);
+  CALL_C(b_+0, fadeinFromBlackWithDelay_hook, SYM(fadeinFromBlackWithDelay), b_+3);
   remoteMakuCutscene_setPaletteFadeFlags(gb);
 }
 
 void remoteMakuCutscene_checkinitUnderwaterWaves_hook(GB *gb) {
-  CYC(0x7333, 0x7335); E = 0x43;
-  CYC(0x7335, 0x7336); A = mem_rd(gb, DE);
-  CYC(0x7336, 0x7338); alu_cp(gb, 0x09);
-  if (!(F & FZ)) { RET_TAKEN(0x7338); return; }
-  CYC(0x7338, 0x7339);
-  CYC(0x7339, 0x733c); SET_HL(0x626e);
-  CYC(0x733c, 0x733e); E = 0x01;
-  CYC(0x733e, 0x7341); interBankCall_hook(gb);
+  BASE(remoteMakuCutscene_checkinitUnderwaterWaves);
+  CYC(b_+0, b_+2); E = 0x43;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); alu_cp(gb, 0x09);
+  if (!(F & FZ)) { RET_TAKEN(b_+5); return; }
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+9); SET_HL((SYM(checkEssenceObtained) + 5));
+  CYC(b_+9, b_+11); E = 0x01;
+  CYC(b_+11, SYM(goronElder_lookingUpAnimation)); interBankCall_hook(gb);
 }

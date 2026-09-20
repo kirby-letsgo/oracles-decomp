@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x06, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x06, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(parentItemCode_boomerang), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(parentItemCode_boomerang), (from), (to), true)
 
 static uint16_t boomerang_parent_jump_table(GB *gb) {
   burn_rom(gb, 0, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -21,56 +21,57 @@ static uint16_t boomerang_parent_jump_table(GB *gb) {
 }
 
 void parentItemCode_boomerang_hook(GB *gb) {
+  BASE(parentItemCode_boomerang);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4fdd, 0x4fdf); E = 0x04;
-  CYC(0x4fdf, 0x4fe0); A = mem_rd(gb, DE);
-  CYC(0x4fe0, 0x4fe1); push_effect(gb, 0x4fe1);
-  switch (boomerang_parent_jump_table(gb)) {
-    case 0x4fe5: break;
-    case 0x5024: goto state1;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
-  CALL_C(0x4fe5, isLinkUnderwater_hook, 0x54d2, 0x4fe8);
-  if (!(F & FZ)) { CYCT(0x4fe8, 0x4feb); clearParentItem_hook(gb); return; }
-  CYC(0x4fe8, 0x4feb);
-  CYC(0x4feb, 0x4fee); A = W8(w1ParentItem2_id);
-  CYC(0x4fee, 0x4ff0); alu_cp(gb, 0x0a);
-  if (F & FZ) { CYCT(0x4ff0, 0x4ff3); clearParentItem_hook(gb); return; }
-  CYC(0x4ff0, 0x4ff3);
-  CYC(0x4ff3, 0x4ff6); A = W8(wLinkSwimmingState);
-  CYC(0x4ff6, 0x4ff7); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x4ff7, 0x4ffa); clearParentItem_hook(gb); return; }
-  CYC(0x4ff7, 0x4ffa);
-  CALL_C(0x4ffa, parentItemLoadAnimationAndIncState_hook, 0x5378, 0x4ffd);
-  CYC(0x4ffd, 0x4fff); A = 1;
-  CYC(0x4fff, 0x5001); E = 0x04;
-  CYC(0x5001, 0x5002); mem_wr(gb, DE, A);
-  CYC(0x5002, 0x5003); A = alu_dec8(gb, A);
-  CYC(0x5003, 0x5004); C = A;
-  CYC(0x5004, 0x5006); E = 1;
-  CYC(0x5006, 0x5008); A = mem_rd(gb, DE); B = A;
-  CYC(0x5008, 0x500a); E = 1;
-  CALL_C(0x500a, itemCreateChildWithID_hook, 0x53e3, 0x500d);
-  if (F & FC) { CYCT(0x500d, 0x5010); clearParentItem_hook(gb); return; }
-  CYC(0x500d, 0x5010);
-  CYC(0x5010, 0x5013); A = W8(wLinkAngle);
-  CYC(0x5013, 0x5015); alu_bit(gb, 7, A);
-  if (F & FZ) CYCT(0x5015, 0x5017);
+  CYC(b_+0, b_+2); E = 0x04;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (boomerang_parent_jump_table(gb));
+    if (jt_ == b_+8) { break; }
+    else if (jt_ == b_+71) { goto state1; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
+  CALL_C(b_+8, isLinkUnderwater_hook, SYM(isLinkUnderwater), b_+11);
+  if (!(F & FZ)) { CYCT(b_+11, b_+14); clearParentItem_hook(gb); return; }
+  CYC(b_+11, b_+14);
+  CYC(b_+14, b_+17); A = W8(w1ParentItem2_id);
+  CYC(b_+17, b_+19); alu_cp(gb, 0x0a);
+  if (F & FZ) { CYCT(b_+19, b_+22); clearParentItem_hook(gb); return; }
+  CYC(b_+19, b_+22);
+  CYC(b_+22, b_+25); A = W8(wLinkSwimmingState);
+  CYC(b_+25, b_+26); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+26, b_+29); clearParentItem_hook(gb); return; }
+  CYC(b_+26, b_+29);
+  CALL_C(b_+29, parentItemLoadAnimationAndIncState_hook, SYM(parentItemLoadAnimationAndIncState), b_+32);
+  CYC(b_+32, b_+34); A = 1;
+  CYC(b_+34, b_+36); E = 0x04;
+  CYC(b_+36, b_+37); mem_wr(gb, DE, A);
+  CYC(b_+37, b_+38); A = alu_dec8(gb, A);
+  CYC(b_+38, b_+39); C = A;
+  CYC(b_+39, b_+41); E = 1;
+  CYC(b_+41, b_+43); A = mem_rd(gb, DE); B = A;
+  CYC(b_+43, b_+45); E = 1;
+  CALL_C(b_+45, itemCreateChildWithID_hook, SYM(itemCreateChildWithID), b_+48);
+  if (F & FC) { CYCT(b_+48, b_+51); clearParentItem_hook(gb); return; }
+  CYC(b_+48, b_+51);
+  CYC(b_+51, b_+54); A = W8(wLinkAngle);
+  CYC(b_+54, b_+56); alu_bit(gb, 7, A);
+  if (F & FZ) CYCT(b_+56, b_+58);
   else {
-    CYC(0x5015, 0x5017);
-    CYC(0x5017, 0x501a); A = W8(w1Link_direction);
-    CYC(0x501a, 0x501c); A = alu_swap(gb, A);
-    CYC(0x501c, 0x501d); alu_rrca(gb);
+    CYC(b_+56, b_+58);
+    CYC(b_+58, b_+61); A = W8(w1Link_direction);
+    CYC(b_+61, b_+63); A = alu_swap(gb, A);
+    CYC(b_+63, b_+64); alu_rrca(gb);
   }
-  CYC(0x501d, 0x501f); L = 0x09;
-  CYC(0x501f, 0x5020); mem_wr(gb, HL, A);
-  CYC(0x5020, 0x5022); L = 0x34;
-  CYC(0x5022, 0x5024); mem_wr(gb, HL, A); ret_effect(gb); return;
+  CYC(b_+64, b_+66); L = 0x09;
+  CYC(b_+66, b_+67); mem_wr(gb, HL, A);
+  CYC(b_+67, b_+69); L = 0x34;
+  CYC(b_+69, b_+71); mem_wr(gb, HL, A); ret_effect(gb); return;
 
 state1:
-  CYC(0x5024, 0x5026); E = 0x21;
-  CYC(0x5026, 0x5027); A = mem_rd(gb, DE);
-  CYC(0x5027, 0x5028); alu_rlca(gb);
-  if (!(F & FC)) { CYCT(0x5028, 0x502b); specialObjectAnimate_optimized_hook(gb); return; }
-  CYC(0x5028, 0x502b); CYC(0x502b, 0x502e); clearParentItem_hook(gb);
+  CYC(b_+71, b_+73); E = 0x21;
+  CYC(b_+73, b_+74); A = mem_rd(gb, DE);
+  CYC(b_+74, b_+75); alu_rlca(gb);
+  if (!(F & FC)) { CYCT(b_+75, b_+78); specialObjectAnimate_optimized_hook(gb); return; }
+  CYC(b_+75, b_+78); CYC(b_+78, SYM(parentItemCode_bombchu)); clearParentItem_hook(gb);
 }

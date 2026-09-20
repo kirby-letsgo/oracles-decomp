@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode54), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode54), (from), (to), true)
 
 void func_7ad3_hook(GB *gb);
 void func_7adb_hook(GB *gb);
@@ -12,90 +12,94 @@ void func_7b0a_hook(GB *gb);
 
 // PART_ROOM_OF_RITES_FALLING_BOULDER
 void partCode54_hook(GB *gb) {
+  BASE(partCode54);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7ab3, 0x7ab5); E = 0xc2; // Part.subid
-  CYC(0x7ab5, 0x7ab6); A = mem_rd(gb, DE);
-  CYC(0x7ab6, 0x7ab7); alu_or(gb, A);
-  CYC(0x7ab7, 0x7ab9); E = 0xc4; // Part.state
-  if (!(F & FZ)) { CYCT(0x7ab9, 0x7abc); func_7adb_hook(gb); return; } // jp nz
-  CYC(0x7ab9, 0x7abc);
-  CYC(0x7abc, 0x7abd); A = mem_rd(gb, DE);
-  CYC(0x7abd, 0x7abe); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x7abe, 0x7ac0); func_7ad3_hook(gb); return; } // jr z
-  CYC(0x7abe, 0x7ac0);
-  CALL_C(0x7ac0, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x7ac3);
-  if (F & FZ) { CYCT(0x7ac3, 0x7ac6); partDelete_hook(gb); return; } // jp z
-  CYC(0x7ac3, 0x7ac6);
-  CYC(0x7ac6, 0x7ac7); A = mem_rd(gb, HL);
-  CYC(0x7ac7, 0x7ac9); alu_and(gb, 0x0f);
-  if (!(F & FZ)) { RET_TAKEN(0x7ac9); return; } // ret nz
-  CYC(0x7ac9, 0x7aca);
-  CALL_C(0x7aca, getFreePartSlot_hook, 0x3e8e, 0x7acd);
-  if (!(F & FZ)) { RET_TAKEN(0x7acd); return; } // ret nz
-  CYC(0x7acd, 0x7ace);
-  CYC(0x7ace, 0x7ad0); mem_wr(gb, HL, 0x54); // PART_ROOM_OF_RITES_FALLING_BOULDER
-  CYC(0x7ad0, 0x7ad1); L = alu_inc8(gb, L);
-  CYC(0x7ad1, 0x7ad2); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  RET(0x7ad2); return; // ret
+  CYC(b_+0, b_+2); E = 0xc2; // Part.subid
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  CYC(b_+4, b_+6); E = 0xc4; // Part.state
+  if (!(F & FZ)) { CYCT(b_+6, b_+9); func_7adb_hook(gb); return; } // jp nz
+  CYC(b_+6, b_+9);
+  CYC(b_+9, b_+10); A = mem_rd(gb, DE);
+  CYC(b_+10, b_+11); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+11, b_+13); func_7ad3_hook(gb); return; } // jr z
+  CYC(b_+11, b_+13);
+  CALL_C(b_+13, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+16);
+  if (F & FZ) { CYCT(b_+16, b_+19); partDelete_hook(gb); return; } // jp z
+  CYC(b_+16, b_+19);
+  CYC(b_+19, b_+20); A = mem_rd(gb, HL);
+  CYC(b_+20, b_+22); alu_and(gb, 0x0f);
+  if (!(F & FZ)) { RET_TAKEN(b_+22); return; } // ret nz
+  CYC(b_+22, b_+23);
+  CALL_C(b_+23, getFreePartSlot_hook, SYM(getFreePartSlot), b_+26);
+  if (!(F & FZ)) { RET_TAKEN(b_+26); return; } // ret nz
+  CYC(b_+26, b_+27);
+  CYC(b_+27, b_+29); mem_wr(gb, HL, 0x54); // PART_ROOM_OF_RITES_FALLING_BOULDER
+  CYC(b_+29, b_+30); L = alu_inc8(gb, L);
+  CYC(b_+30, b_+31); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  RET(b_+31); return; // ret
 }
 
 void func_7ad3_hook(GB *gb) {
-  CYC(0x7ad3, 0x7ad4); H = D;
-  CYC(0x7ad4, 0x7ad5); L = E;
-  CYC(0x7ad5, 0x7ad6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x7ad6, 0x7ad8); L = 0xc6; // Part.counter1
-  CYC(0x7ad8, 0x7ada); mem_wr(gb, HL, 0x96); // 150
-  RET(0x7ada); return; // ret
+  BASE(func_7ad3);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+2); L = E;
+  CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+3, b_+5); L = 0xc6; // Part.counter1
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 0x96); // 150
+  RET(b_+7); return; // ret
 }
 
 void func_7adb_hook(GB *gb) {
+  BASE(func_7adb);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7adb, 0x7adc); A = mem_rd(gb, DE);
-  CYC(0x7adc, 0x7add); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x7add, 0x7adf); func_7b0a_hook(gb); return; } // jr nz
-  CYC(0x7add, 0x7adf);
-  CYC(0x7adf, 0x7ae0); A = alu_inc8(gb, A);
-  CYC(0x7ae0, 0x7ae1); mem_wr(gb, DE, A);
-  CYC(0x7ae1, 0x7ae3); A = mem_rd(gb, 0xffaa); // hCameraY
-  CYC(0x7ae3, 0x7ae4); B = A;
-  CYC(0x7ae4, 0x7ae6); A = mem_rd(gb, 0xffac); // hCameraX
-  CYC(0x7ae6, 0x7ae7); C = A;
-  CALL_C(0x7ae7, getRandomNumber_hook, 0x043e, 0x7aea);
-  CYC(0x7aea, 0x7aeb); L = A;
-  CYC(0x7aeb, 0x7aed); alu_and(gb, 0x07);
-  CYC(0x7aed, 0x7aef); A = alu_swap(gb, A);
-  CYC(0x7aef, 0x7af1); alu_add(gb, 0x28);
-  CYC(0x7af1, 0x7af2); alu_add(gb, C);
-  CYC(0x7af2, 0x7af4); E = 0xcd; // Part.xh
-  CYC(0x7af4, 0x7af5); mem_wr(gb, DE, A);
-  CYC(0x7af5, 0x7af6); A = L;
-  CYC(0x7af6, 0x7af8); alu_and(gb, 0x70);
-  CYC(0x7af8, 0x7afa); alu_add(gb, 0x08);
-  CYC(0x7afa, 0x7afb); L = A;
-  CYC(0x7afb, 0x7afc); alu_add(gb, B);
-  CYC(0x7afc, 0x7afe); E = 0xcb; // Part.yh
-  CYC(0x7afe, 0x7aff); mem_wr(gb, DE, A);
-  CYC(0x7aff, 0x7b00); A = L;
-  CYC(0x7b00, 0x7b01); alu_cpl(gb);
-  CYC(0x7b01, 0x7b02); A = alu_inc8(gb, A);
-  CYC(0x7b02, 0x7b04); alu_sub(gb, 0x07);
-  CYC(0x7b04, 0x7b06); E = 0xcf; // Part.zh
-  CYC(0x7b06, 0x7b07); mem_wr(gb, DE, A);
-  CYC(0x7b07, 0x7b0a); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);
+  CYC(b_+1, b_+2); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+2, b_+4); func_7b0a_hook(gb); return; } // jr nz
+  CYC(b_+2, b_+4);
+  CYC(b_+4, b_+5); A = alu_inc8(gb, A);
+  CYC(b_+5, b_+6); mem_wr(gb, DE, A);
+  CYC(b_+6, b_+8); A = mem_rd(gb, hCameraY); // hCameraY
+  CYC(b_+8, b_+9); B = A;
+  CYC(b_+9, b_+11); A = mem_rd(gb, hCameraX); // hCameraX
+  CYC(b_+11, b_+12); C = A;
+  CALL_C(b_+12, getRandomNumber_hook, SYM(getRandomNumber), b_+15);
+  CYC(b_+15, b_+16); L = A;
+  CYC(b_+16, b_+18); alu_and(gb, 0x07);
+  CYC(b_+18, b_+20); A = alu_swap(gb, A);
+  CYC(b_+20, b_+22); alu_add(gb, 0x28);
+  CYC(b_+22, b_+23); alu_add(gb, C);
+  CYC(b_+23, b_+25); E = 0xcd; // Part.xh
+  CYC(b_+25, b_+26); mem_wr(gb, DE, A);
+  CYC(b_+26, b_+27); A = L;
+  CYC(b_+27, b_+29); alu_and(gb, 0x70);
+  CYC(b_+29, b_+31); alu_add(gb, 0x08);
+  CYC(b_+31, b_+32); L = A;
+  CYC(b_+32, b_+33); alu_add(gb, B);
+  CYC(b_+33, b_+35); E = 0xcb; // Part.yh
+  CYC(b_+35, b_+36); mem_wr(gb, DE, A);
+  CYC(b_+36, b_+37); A = L;
+  CYC(b_+37, b_+38); alu_cpl(gb);
+  CYC(b_+38, b_+39); A = alu_inc8(gb, A);
+  CYC(b_+39, b_+41); alu_sub(gb, 0x07);
+  CYC(b_+41, b_+43); E = 0xcf; // Part.zh
+  CYC(b_+43, b_+44); mem_wr(gb, DE, A);
+  CYC(b_+44, SYM(func_7b0a)); objectSetVisiblec1_hook(gb); return; // jp
 }
 
 void func_7b0a_hook(GB *gb) {
+  BASE(func_7b0a);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7b0a, 0x7b0c); C = 0x20;
-  CALL_C(0x7b0c, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x7b0f);
-  if (!(F & FZ)) { CYCT(0x7b0f, 0x7b12); partAnimate_hook(gb); return; } // jp nz
-  CYC(0x7b0f, 0x7b12);
-  CALL_C(0x7b12, objectReplaceWithAnimationIfOnHazard_hook, 0x2225, 0x7b15);
-  if (F & FC) { CYCT(0x7b15, 0x7b17); goto delete; } // jr c
-  CYC(0x7b15, 0x7b17);
-  CYC(0x7b17, 0x7b19); B = 0x06; // INTERAC_ROCKDEBRIS
-  CALL_C(0x7b19, objectCreateInteractionWithSubid00_hook, 0x24c3, 0x7b1c);
+  CYC(b_+0, b_+2); C = 0x20;
+  CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
+  if (!(F & FZ)) { CYCT(b_+5, b_+8); partAnimate_hook(gb); return; } // jp nz
+  CYC(b_+5, b_+8);
+  CALL_C(b_+8, objectReplaceWithAnimationIfOnHazard_hook, SYM(objectReplaceWithAnimationIfOnHazard), b_+11);
+  if (F & FC) { CYCT(b_+11, b_+13); goto delete; } // jr c
+  CYC(b_+11, b_+13);
+  CYC(b_+13, b_+15); B = 0x06; // INTERAC_ROCKDEBRIS
+  CALL_C(b_+15, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+18);
 
 delete:
-  CYC(0x7b1c, 0x7b1f); partDelete_hook(gb); return; // jp
+  CYC(b_+18, SYM(partCode55)); partDelete_hook(gb); return; // jp
 }

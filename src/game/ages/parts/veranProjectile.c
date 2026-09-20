@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode37), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode37), (from), (to), true)
 
 static uint16_t veranProjectile_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -29,131 +29,134 @@ void veranProjectile_subid1_hook(GB *gb);
 
 // PART_VERAN_PROJECTILE
 void partCode37_hook(GB *gb) {
+  BASE(partCode37);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  if (!(F & FZ)) { CYCT(0x69ed, 0x69f0); partDelete_hook(gb); return; } // jp nz
-  CYC(0x69ed, 0x69f0);
-  CYC(0x69f0, 0x69f2); E = 0xc2; // Part.subid
-  CYC(0x69f2, 0x69f3); A = mem_rd(gb, DE);
-  CYC(0x69f3, 0x69f4); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x69f4, 0x69f7); veranProjectile_subid1_hook(gb); return; } // jp nz
-  CYC(0x69f4, 0x69f7);
+  if (!(F & FZ)) { CYCT(b_+0, b_+3); partDelete_hook(gb); return; } // jp nz
+  CYC(b_+0, b_+3);
+  CYC(b_+3, b_+5); E = 0xc2; // Part.subid
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+7); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+7, SYM(veranProjectile_subid0)); veranProjectile_subid1_hook(gb); return; } // jp nz
+  CYC(b_+7, SYM(veranProjectile_subid0));
   veranProjectile_subid0_hook(gb);
 }
 
 // The "core" projectile spawner
 void veranProjectile_subid0_hook(GB *gb) {
+  BASE(veranProjectile_subid0);
   uint16_t sp0_ = gb->sp;
-  CYC(0x69f7, 0x69f9); A = 0x24; // Object.collisionType
-  CALL_C(0x69f9, objectGetRelatedObject1Var_hook, 0x2160, 0x69fc);
-  CYC(0x69fc, 0x69fe); alu_bit(gb, 7, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(0x69fe, 0x6a00); goto delete; } // jr z
-  CYC(0x69fe, 0x6a00);
-  CYC(0x6a00, 0x6a02); E = 0xc4; // Part.state
-  CYC(0x6a02, 0x6a03); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); A = 0x24; // Object.collisionType
+  CALL_C(b_+2, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+5);
+  CYC(b_+5, b_+7); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+7, b_+9); goto delete; } // jr z
+  CYC(b_+7, b_+9);
+  CYC(b_+9, b_+11); E = 0xc4; // Part.state
+  CYC(b_+11, b_+12); A = mem_rd(gb, DE);
   {
-    CYC(0x6a03, 0x6a04); push_effect(gb, 0x6a04);
+    CYC(b_+12, b_+13); push_effect(gb, b_+13);
     uint16_t target = veranProjectile_jump_table(gb);
-    if (target == 0x6a14) goto state1;
-    if (target == 0x6a25) goto state2;
+    if (target == b_+29) goto state1;
+    if (target == b_+46) goto state2;
     goto state0;
   }
 
 state0:
-  CYC(0x6a0a, 0x6a0b); H = D;
-  CYC(0x6a0b, 0x6a0c); L = E;
-  CYC(0x6a0c, 0x6a0d); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6a0d, 0x6a0f); L = 0xcf; // Part.zh
-  CYC(0x6a0f, 0x6a11); mem_wr(gb, HL, 0xfc);
-  CYC(0x6a11, 0x6a14); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+19, b_+20); H = D;
+  CYC(b_+20, b_+21); L = E;
+  CYC(b_+21, b_+22); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+22, b_+24); L = 0xcf; // Part.zh
+  CYC(b_+24, b_+26); mem_wr(gb, HL, 0xfc);
+  CYC(b_+26, b_+29); objectSetVisible81_hook(gb); return; // jp
 
 state1:
-  CYC(0x6a14, 0x6a15); H = D;
-  CYC(0x6a15, 0x6a17); L = 0xcf; // Part.zh
-  CYC(0x6a17, 0x6a18); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x6a18, 0x6a19); A = mem_rd(gb, HL);
-  CYC(0x6a19, 0x6a1b); alu_cp(gb, 0xf0);
-  if (!(F & FZ)) { CYCT(0x6a1b, 0x6a1d); goto animate; } // jr nz
-  CYC(0x6a1b, 0x6a1d);
-  CYC(0x6a1d, 0x6a1e); L = E;
-  CYC(0x6a1e, 0x6a1f); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6a1f, 0x6a21); L = 0xc6; // Part.counter1
-  CYC(0x6a21, 0x6a23); mem_wr(gb, HL, 0x81);
-  CYC(0x6a23, 0x6a25); goto animate; // jr
+  CYC(b_+29, b_+30); H = D;
+  CYC(b_+30, b_+32); L = 0xcf; // Part.zh
+  CYC(b_+32, b_+33); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+33, b_+34); A = mem_rd(gb, HL);
+  CYC(b_+34, b_+36); alu_cp(gb, 0xf0);
+  if (!(F & FZ)) { CYCT(b_+36, b_+38); goto animate; } // jr nz
+  CYC(b_+36, b_+38);
+  CYC(b_+38, b_+39); L = E;
+  CYC(b_+39, b_+40); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+40, b_+42); L = 0xc6; // Part.counter1
+  CYC(b_+42, b_+44); mem_wr(gb, HL, 0x81);
+  CYC(b_+44, b_+46); goto animate; // jr
 
 state2:
-  CALL_C(0x6a25, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x6a28);
-  if (F & FZ) { CYCT(0x6a28, 0x6a2a); goto delete; } // jr z
-  CYC(0x6a28, 0x6a2a);
-  CYC(0x6a2a, 0x6a2b); A = mem_rd(gb, HL);
-  CYC(0x6a2b, 0x6a2d); alu_and(gb, 0x07);
-  if (!(F & FZ)) { CYCT(0x6a2d, 0x6a2f); goto animate; } // jr nz
-  CYC(0x6a2d, 0x6a2f);
-  CYC(0x6a2f, 0x6a30); A = mem_rd(gb, HL);
-  CYC(0x6a30, 0x6a31); alu_rrca(gb);
-  CYC(0x6a31, 0x6a32); alu_rrca(gb);
-  CYC(0x6a32, 0x6a34); alu_and(gb, 0x1f);
-  CYC(0x6a34, 0x6a35); B = A;
-  CALL_C(0x6a35, getFreePartSlot_hook, 0x3e8e, 0x6a38);
-  if (!(F & FZ)) { CYCT(0x6a38, 0x6a3a); goto animate; } // jr nz
-  CYC(0x6a38, 0x6a3a);
-  CYC(0x6a3a, 0x6a3c); mem_wr(gb, HL, 0x37); // PART_VERAN_PROJECTILE
-  CYC(0x6a3c, 0x6a3d); L = alu_inc8(gb, L);
-  CYC(0x6a3d, 0x6a3e); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // subid = 1
-  CYC(0x6a3e, 0x6a40); L = 0xc9; // Part.angle
-  CYC(0x6a40, 0x6a41); mem_wr(gb, HL, B);
-  CALL_C(0x6a41, objectCopyPosition_hook, 0x2242, 0x6a44);
+  CALL_C(b_+46, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+49);
+  if (F & FZ) { CYCT(b_+49, b_+51); goto delete; } // jr z
+  CYC(b_+49, b_+51);
+  CYC(b_+51, b_+52); A = mem_rd(gb, HL);
+  CYC(b_+52, b_+54); alu_and(gb, 0x07);
+  if (!(F & FZ)) { CYCT(b_+54, b_+56); goto animate; } // jr nz
+  CYC(b_+54, b_+56);
+  CYC(b_+56, b_+57); A = mem_rd(gb, HL);
+  CYC(b_+57, b_+58); alu_rrca(gb);
+  CYC(b_+58, b_+59); alu_rrca(gb);
+  CYC(b_+59, b_+61); alu_and(gb, 0x1f);
+  CYC(b_+61, b_+62); B = A;
+  CALL_C(b_+62, getFreePartSlot_hook, SYM(getFreePartSlot), b_+65);
+  if (!(F & FZ)) { CYCT(b_+65, b_+67); goto animate; } // jr nz
+  CYC(b_+65, b_+67);
+  CYC(b_+67, b_+69); mem_wr(gb, HL, 0x37); // PART_VERAN_PROJECTILE
+  CYC(b_+69, b_+70); L = alu_inc8(gb, L);
+  CYC(b_+70, b_+71); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // subid = 1
+  CYC(b_+71, b_+73); L = 0xc9; // Part.angle
+  CYC(b_+73, b_+74); mem_wr(gb, HL, B);
+  CALL_C(b_+74, objectCopyPosition_hook, SYM(objectCopyPosition), b_+77);
 
 animate:
-  CYC(0x6a44, 0x6a47); partAnimate_hook(gb); return; // jp
+  CYC(b_+77, b_+80); partAnimate_hook(gb); return; // jp
 
 delete:
-  CYC(0x6a47, 0x6a4a); SET_BC(0x0580);
-  CALL_C(0x6a4a, objectCreateInteraction_hook, 0x24c5, 0x6a4d);
-  CYC(0x6a4d, 0x6a50); partDelete_hook(gb); return; // jp
+  CYC(b_+80, b_+83); SET_BC((SYM(loadPaletteHeader) + 117));
+  CALL_C(b_+83, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+86);
+  CYC(b_+86, SYM(veranProjectile_subid1)); partDelete_hook(gb); return; // jp
 }
 
 // An individual projectile
 void veranProjectile_subid1_hook(GB *gb) {
+  BASE(veranProjectile_subid1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6a50, 0x6a52); E = 0xc4; // Part.state
-  CYC(0x6a52, 0x6a53); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = 0xc4; // Part.state
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x6a53, 0x6a54); push_effect(gb, 0x6a54);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = veranProjectile_jump_table(gb);
-    if (target == 0x6a74) goto state1;
-    if (target == 0x6a7c) goto state2;
+    if (target == b_+36) goto state1;
+    if (target == b_+44) goto state2;
     goto state0;
   }
 
 state0:
-  CYC(0x6a5a, 0x6a5b); H = D;
-  CYC(0x6a5b, 0x6a5c); L = E;
-  CYC(0x6a5c, 0x6a5d); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6a5d, 0x6a5f); L = 0xd0; // Part.speed
-  CYC(0x6a5f, 0x6a61); mem_wr(gb, HL, 0x64); // SPEED_280
-  CYC(0x6a61, 0x6a63); L = 0xe6; // Part.collisionRadiusY
-  CYC(0x6a63, 0x6a65); A = 0x04;
-  CYC(0x6a65, 0x6a66); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x6a66, 0x6a67); mem_wr(gb, HL, A);
-  CALL_C(0x6a67, objectSetVisible81_hook, 0x1e60, 0x6a6a);
-  CYC(0x6a6a, 0x6a6c); A = 0xbe; // SND_VERAN_PROJECTILE
-  CALL_C(0x6a6c, playSound_b00_hook, 0x0c98, 0x6a6f);
-  CYC(0x6a6f, 0x6a71); A = 0x01;
-  CYC(0x6a71, 0x6a74); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+10, b_+11); H = D;
+  CYC(b_+11, b_+12); L = E;
+  CYC(b_+12, b_+13); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+13, b_+15); L = 0xd0; // Part.speed
+  CYC(b_+15, b_+17); mem_wr(gb, HL, 0x64); // SPEED_280
+  CYC(b_+17, b_+19); L = 0xe6; // Part.collisionRadiusY
+  CYC(b_+19, b_+21); A = 0x04;
+  CYC(b_+21, b_+22); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+22, b_+23); mem_wr(gb, HL, A);
+  CALL_C(b_+23, objectSetVisible81_hook, SYM(objectSetVisible81), b_+26);
+  CYC(b_+26, b_+28); A = 0xbe; // SND_VERAN_PROJECTILE
+  CALL_C(b_+28, playSound_b00_hook, SYM(playSound_b00), b_+31);
+  CYC(b_+31, b_+33); A = 0x01;
+  CYC(b_+33, b_+36); partSetAnimation_hook(gb); return; // jp
 
 state1:
-  CYC(0x6a74, 0x6a75); H = D;
-  CYC(0x6a75, 0x6a77); L = 0xcf; // Part.zh
-  CYC(0x6a77, 0x6a78); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  if (!(F & FZ)) { CYCT(0x6a78, 0x6a7a); goto state2; } // jr nz
-  CYC(0x6a78, 0x6a7a);
-  CYC(0x6a7a, 0x6a7b); L = E;
-  CYC(0x6a7b, 0x6a7c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+36, b_+37); H = D;
+  CYC(b_+37, b_+39); L = 0xcf; // Part.zh
+  CYC(b_+39, b_+40); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(b_+40, b_+42); goto state2; } // jr nz
+  CYC(b_+40, b_+42);
+  CYC(b_+42, b_+43); L = E;
+  CYC(b_+43, b_+44); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
 
 state2:
-  CALL_C(0x6a7c, objectApplySpeed_hook, 0x201d, 0x6a7f);
-  CALL_C(0x6a7f, partCommon_checkTileCollisionOrOutOfBounds_hook, 0x4072, 0x6a82);
-  if (!(F & FZ)) { RET_TAKEN(0x6a82); return; } // ret nz
-  CYC(0x6a82, 0x6a83);
-  CYC(0x6a83, 0x6a86); partDelete_hook(gb); return; // jp
+  CALL_C(b_+44, objectApplySpeed_hook, SYM(objectApplySpeed), b_+47);
+  CALL_C(b_+47, partCommon_checkTileCollisionOrOutOfBounds_hook, SYM(partCommon_checkTileCollisionOrOutOfBounds), b_+50);
+  if (!(F & FZ)) { RET_TAKEN(b_+50); return; } // ret nz
+  CYC(b_+50, b_+51);
+  CYC(b_+51, SYM(partCode38)); partDelete_hook(gb); return; // jp
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(func_5b2b), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(func_5b2b), (from), (to), true)
 
 static uint16_t ganonTrident_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -39,104 +39,106 @@ static void ganonTrident_addAToHl_from_rst(GB *gb, uint16_t return_address) {
 }
 
 void func_5b2b_hook(GB *gb) {
+  BASE(func_5b2b);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5b2b, 0x5b2c); H = D;
-  CYC(0x5b2c, 0x5b2d); L = E;
-  CYC(0x5b2d, 0x5b2f); alu_bit(gb, 7, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(0x5b2f, 0x5b31); goto L_5b3e; } // jr z
-  CYC(0x5b2f, 0x5b31);
-  CYC(0x5b31, 0x5b33); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
-  CALL_C(0x5b33, objectSetVisible82_hook, 0x1e69, 0x5b36);
-  CYC(0x5b36, 0x5b38); A = 0xb1; // SND_BIGSWORD
-  CALL_C(0x5b38, playSound_b00_hook, 0x0c98, 0x5b3b);
-  CYC(0x5b3b, 0x5b3c); H = D;
-  CYC(0x5b3c, 0x5b3e); L = 0xe1; // Part.animParameter
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+2); L = E;
+  CYC(b_+2, b_+4); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+4, b_+6); goto L_5b3e; } // jr z
+  CYC(b_+4, b_+6);
+  CYC(b_+6, b_+8); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
+  CALL_C(b_+8, objectSetVisible82_hook, SYM(objectSetVisible82), b_+11);
+  CYC(b_+11, b_+13); A = 0xb1; // SND_BIGSWORD
+  CALL_C(b_+13, playSound_b00_hook, SYM(playSound_b00), b_+16);
+  CYC(b_+16, b_+17); H = D;
+  CYC(b_+17, b_+19); L = 0xe1; // Part.animParameter
 
 L_5b3e:
-  CYC(0x5b3e, 0x5b3f); A = mem_rd(gb, HL);
-  CYC(0x5b3f, 0x5b42); SET_HL(0x5b5b); // table_5b5b
-  CYC(0x5b42, 0x5b43); ganonTrident_addAToHl_from_rst(gb, 0x5b43);
-  CYC(0x5b43, 0x5b45); E = 0xe6; // Part.collisionRadiusY
-  CYC(0x5b45, 0x5b46); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x5b46, 0x5b47); mem_wr(gb, DE, A);
-  CYC(0x5b47, 0x5b48); E = alu_inc8(gb, E);
-  CYC(0x5b48, 0x5b49); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x5b49, 0x5b4a); mem_wr(gb, DE, A);
-  CYC(0x5b4a, 0x5b4b); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x5b4b, 0x5b4c); B = A;
-  CYC(0x5b4c, 0x5b4d); C = mem_rd(gb, HL);
-  CYC(0x5b4d, 0x5b4e); SET_HL(pop_effect(gb));
-  CYC(0x5b4e, 0x5b50); L = 0xb2; // Enemy.var32
-  CYC(0x5b50, 0x5b51); A = mem_rd(gb, HL);
-  CYC(0x5b51, 0x5b52); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x5b52, 0x5b54); goto L_5b58; } // jr z
-  CYC(0x5b52, 0x5b54);
-  CYC(0x5b54, 0x5b55); A = C;
-  CYC(0x5b55, 0x5b56); alu_cpl(gb);
-  CYC(0x5b56, 0x5b57); A = alu_inc8(gb, A);
-  CYC(0x5b57, 0x5b58); C = A;
+  CYC(b_+19, b_+20); A = mem_rd(gb, HL);
+  CYC(b_+20, b_+23); SET_HL(SYM(table_5b5b)); // table_5b5b
+  CYC(b_+23, b_+24); ganonTrident_addAToHl_from_rst(gb, b_+24);
+  CYC(b_+24, b_+26); E = 0xe6; // Part.collisionRadiusY
+  CYC(b_+26, b_+27); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+27, b_+28); mem_wr(gb, DE, A);
+  CYC(b_+28, b_+29); E = alu_inc8(gb, E);
+  CYC(b_+29, b_+30); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+30, b_+31); mem_wr(gb, DE, A);
+  CYC(b_+31, b_+32); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+32, b_+33); B = A;
+  CYC(b_+33, b_+34); C = mem_rd(gb, HL);
+  CYC(b_+34, b_+35); SET_HL(pop_effect(gb));
+  CYC(b_+35, b_+37); L = 0xb2; // Enemy.var32
+  CYC(b_+37, b_+38); A = mem_rd(gb, HL);
+  CYC(b_+38, b_+39); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+39, b_+41); goto L_5b58; } // jr z
+  CYC(b_+39, b_+41);
+  CYC(b_+41, b_+42); A = C;
+  CYC(b_+42, b_+43); alu_cpl(gb);
+  CYC(b_+43, b_+44); A = alu_inc8(gb, A);
+  CYC(b_+44, b_+45); C = A;
 
 L_5b58:
-  CYC(0x5b58, 0x5b5b); objectTakePositionWithOffset_hook(gb); return; // jp
+  CYC(b_+45, SYM(table_5b5b)); objectTakePositionWithOffset_hook(gb); return; // jp
 }
 
 void partCode50_hook(GB *gb) {
+  BASE(partCode50);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5ae0, 0x5ae2); A = 0x04;
-  CALL_C(0x5ae2, objectGetRelatedObject1Var_hook, 0x2160, 0x5ae5);
-  CYC(0x5ae5, 0x5ae6); A = mem_rd(gb, HL);
-  CYC(0x5ae6, 0x5ae8); alu_cp(gb, 0x0e);
-  if (F & FZ) { CYCT(0x5ae8, 0x5aeb); partDelete_hook(gb); return; } // jp z
-  CYC(0x5ae8, 0x5aeb);
-  CYC(0x5aeb, 0x5aec); push_effect(gb, HL);
-  CYC(0x5aec, 0x5aee); E = 0xc4; // Part.state
-  CYC(0x5aee, 0x5aef); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); A = 0x04;
+  CALL_C(b_+2, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+5);
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL);
+  CYC(b_+6, b_+8); alu_cp(gb, 0x0e);
+  if (F & FZ) { CYCT(b_+8, b_+11); partDelete_hook(gb); return; } // jp z
+  CYC(b_+8, b_+11);
+  CYC(b_+11, b_+12); push_effect(gb, HL);
+  CYC(b_+12, b_+14); E = 0xc4; // Part.state
+  CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   {
-    CYC(0x5aef, 0x5af0); push_effect(gb, 0x5af0);
+    CYC(b_+15, b_+16); push_effect(gb, b_+16);
     uint16_t target = ganonTrident_jump_table(gb);
-    if (target == 0x5af6) goto state0;
-    if (target == 0x5b08) goto state1;
+    if (target == b_+22) goto state0;
+    if (target == b_+40) goto state1;
     goto state2;
   }
 
 state0:
-  CYC(0x5af6, 0x5af8); A = 0x01;
-  CYC(0x5af8, 0x5af9); mem_wr(gb, DE, A);
-  CYC(0x5af9, 0x5afa); SET_HL(pop_effect(gb));
-  CALL_C(0x5afa, objectTakePosition_hook, 0x2274, 0x5afd);
-  CYC(0x5afd, 0x5aff); L = 0xb2; // Enemy.var32
-  CYC(0x5aff, 0x5b00); A = mem_rd(gb, HL);
-  CYC(0x5b00, 0x5b01); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x5b01, 0x5b03); goto L_5b05; } // jr z
-  CYC(0x5b01, 0x5b03);
-  CYC(0x5b03, 0x5b05); A = 0x01;
+  CYC(b_+22, b_+24); A = 0x01;
+  CYC(b_+24, b_+25); mem_wr(gb, DE, A);
+  CYC(b_+25, b_+26); SET_HL(pop_effect(gb));
+  CALL_C(b_+26, objectTakePosition_hook, SYM(objectTakePosition), b_+29);
+  CYC(b_+29, b_+31); L = 0xb2; // Enemy.var32
+  CYC(b_+31, b_+32); A = mem_rd(gb, HL);
+  CYC(b_+32, b_+33); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+33, b_+35); goto L_5b05; } // jr z
+  CYC(b_+33, b_+35);
+  CYC(b_+35, b_+37); A = 0x01;
 
 L_5b05:
-  CYC(0x5b05, 0x5b08); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+37, b_+40); partSetAnimation_hook(gb); return; // jp
 
 state1:
-  CALL_C(0x5b08, partAnimate_hook, 0x2978, 0x5b0b);
-  CYC(0x5b0b, 0x5b0d); E = 0xe1; // Part.animParameter
-  CYC(0x5b0d, 0x5b0e); A = mem_rd(gb, DE);
-  CYC(0x5b0e, 0x5b0f); A = alu_inc8(gb, A);
-  if (!(F & FZ)) { CYCT(0x5b0f, 0x5b11); func_5b2b_hook(gb); return; } // jr nz
-  CYC(0x5b0f, 0x5b11);
-  CYC(0x5b11, 0x5b12); H = D;
-  CYC(0x5b12, 0x5b14); L = 0xc4; // Part.state
-  CYC(0x5b14, 0x5b15); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x5b15, 0x5b17); L = 0xe6; // Part.collisionRadiusY
-  CYC(0x5b17, 0x5b19); A = 0x07;
-  CYC(0x5b19, 0x5b1a); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x5b1a, 0x5b1b); mem_wr(gb, HL, A);
-  CALL_C(0x5b1b, objectSetInvisible_hook, 0x1e7b, 0x5b1e);
+  CALL_C(b_+40, partAnimate_hook, SYM(partAnimate), b_+43);
+  CYC(b_+43, b_+45); E = 0xe1; // Part.animParameter
+  CYC(b_+45, b_+46); A = mem_rd(gb, DE);
+  CYC(b_+46, b_+47); A = alu_inc8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+47, b_+49); func_5b2b_hook(gb); return; } // jr nz
+  CYC(b_+47, b_+49);
+  CYC(b_+49, b_+50); H = D;
+  CYC(b_+50, b_+52); L = 0xc4; // Part.state
+  CYC(b_+52, b_+53); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+53, b_+55); L = 0xe6; // Part.collisionRadiusY
+  CYC(b_+55, b_+57); A = 0x07;
+  CYC(b_+57, b_+58); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+58, b_+59); mem_wr(gb, HL, A);
+  CALL_C(b_+59, objectSetInvisible_hook, SYM(objectSetInvisible), b_+62);
 
 state2:
-  CYC(0x5b1e, 0x5b1f); SET_HL(pop_effect(gb));
-  CYC(0x5b1f, 0x5b20); L = alu_inc8(gb, L);
-  CYC(0x5b20, 0x5b21); A = mem_rd(gb, HL);
-  CYC(0x5b21, 0x5b22); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x5b22, 0x5b25); partDelete_hook(gb); return; } // jp z
-  CYC(0x5b22, 0x5b25);
-  CYC(0x5b25, 0x5b28); SET_BC(0x2000);
-  CYC(0x5b28, 0x5b2b); objectTakePositionWithOffset_hook(gb); return; // jp
+  CYC(b_+62, b_+63); SET_HL(pop_effect(gb));
+  CYC(b_+63, b_+64); L = alu_inc8(gb, L);
+  CYC(b_+64, b_+65); A = mem_rd(gb, HL);
+  CYC(b_+65, b_+66); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+66, b_+69); partDelete_hook(gb); return; } // jp z
+  CYC(b_+66, b_+69);
+  CYC(b_+69, b_+72); SET_BC((SYM(objectCheckCenteredWithLink) + 18));
+  CYC(b_+72, SYM(func_5b2b)); objectTakePositionWithOffset_hook(gb); return; // jp
 }

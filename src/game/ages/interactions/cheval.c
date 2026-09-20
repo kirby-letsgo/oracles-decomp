@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0a, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0a, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode6a), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode6a), (from), (to), true)
 
 static uint16_t interactionCode6a_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -42,51 +42,52 @@ static void interactionCode6a_addDoubleIndexToHl_from_rst(GB *gb, uint16_t retur
 // one subid used by this NPC), so those two RST calls are modeled but never need a target check --
 // they always continue at their one destination. Every transfer here is a goto, never a call.
 void interactionCode6a_hook(GB *gb) {
+  BASE(interactionCode6a);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4dbd, 0x4dbf); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4dbf, 0x4dc0); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x4dc0, 0x4dc1); push_effect(gb, 0x4dc1);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = interactionCode6a_jump_table(gb);
-    if (target == 0x4dc5) goto state0;
+    if (target == b_+8) goto state0;
     goto state1;
   }
 
 state0:
-  CYC(0x4dc5, 0x4dc7); A = 0x01;
-  CYC(0x4dc7, 0x4dc8); mem_wr(gb, DE, A);
-  CALL_C(0x4dc8, interactionInitGraphics_hook, 0x15fb, 0x4dcb);
-  CALL_C(0x4dcb, objectSetVisiblec2_hook, 0x1e45, 0x4dce);
-  CYC(0x4dce, 0x4dd0); A = 0x27; // >TX_2700
-  CALL_C(0x4dd0, interactionSetHighTextIndex_hook, 0x253b, 0x4dd3);
-  CYC(0x4dd3, 0x4dd5); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x4dd5, 0x4dd6); A = mem_rd(gb, DE);
+  CYC(b_+8, b_+10); A = 0x01;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
+  CALL_C(b_+14, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+17);
+  CYC(b_+17, b_+19); A = 0x27; // >TX_2700
+  CALL_C(b_+19, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+22);
+  CYC(b_+22, b_+24); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+24, b_+25); A = mem_rd(gb, DE);
   {
-    CYC(0x4dd6, 0x4dd7); push_effect(gb, 0x4dd7);
+    CYC(b_+25, b_+26); push_effect(gb, b_+26);
     interactionCode6a_jump_table(gb);
     goto loadScript;
   }
 
 state1:
-  CYC(0x4dd9, 0x4ddb); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x4ddb, 0x4ddc); A = mem_rd(gb, DE);
+  CYC(b_+28, b_+30); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+30, b_+31); A = mem_rd(gb, DE);
   {
-    CYC(0x4ddc, 0x4ddd); push_effect(gb, 0x4ddd);
+    CYC(b_+31, b_+32); push_effect(gb, b_+32);
     interactionCode6a_jump_table(gb);
     goto runSubid00;
   }
 
 runSubid00:
-  CALL_C(0x4ddf, interactionRunScript_hook, 0x2552, 0x4de2);
-  CYC(0x4de2, 0x4de5); interactionAnimateAsNpc_hook(gb); return; // jp
+  CALL_C(b_+34, interactionRunScript_hook, SYM(interactionRunScript), b_+37);
+  CYC(b_+37, b_+40); interactionAnimateAsNpc_hook(gb); return; // jp
 
 loadScript:
-  CYC(0x4de5, 0x4de7); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x4de7, 0x4de8); A = mem_rd(gb, DE);
-  CYC(0x4de8, 0x4deb); SET_HL(0x4df2); // interactionCode6a@scriptTable
-  CYC(0x4deb, 0x4dec); interactionCode6a_addDoubleIndexToHl_from_rst(gb, 0x4dec);
-  CYC(0x4dec, 0x4ded); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x4ded, 0x4dee); H = mem_rd(gb, HL);
-  CYC(0x4dee, 0x4def); L = A;
-  CYC(0x4def, 0x4df2); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+40, b_+42); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+42, b_+43); A = mem_rd(gb, DE);
+  CYC(b_+43, b_+46); SET_HL(b_+53); // interactionCode6a@scriptTable
+  CYC(b_+46, b_+47); interactionCode6a_addDoubleIndexToHl_from_rst(gb, b_+47);
+  CYC(b_+47, b_+48); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+48, b_+49); H = mem_rd(gb, HL);
+  CYC(b_+49, b_+50); L = A;
+  CYC(b_+50, b_+53); interactionSetScript_hook(gb); return; // jp
 }

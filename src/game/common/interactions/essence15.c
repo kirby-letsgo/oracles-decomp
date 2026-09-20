@@ -3,21 +3,23 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(movingPlatform_scriptTable), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(movingPlatform_scriptTable), (from), (to), true)
 
 void essence_createEnergySwirl_hook(GB *gb);
 void essence_stopEnergySwirl_hook(GB *gb);
 
 void essence_createEnergySwirl_hook(GB *gb) {
+  BASE(movingPlatform_scriptTable);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4248, objectGetPosition_hook, 0x208a, 0x424b);
-  CYC(0x424b, 0x424d); A = 0xff;
-  CYC(0x424d, 0x4250); createEnergySwirlGoingIn_hook(gb);
+  CALL_C(b_+138, objectGetPosition_hook, SYM(objectGetPosition), b_+141);
+  CYC(b_+141, b_+143); A = 0xff;
+  CYC(b_+143, SYM(essence_stopEnergySwirl)); createEnergySwirlGoingIn_hook(gb);
 }
 
 void essence_stopEnergySwirl_hook(GB *gb) {
-  CYC(0x4250, 0x4252); A = 0x01;
-  CYC(0x4252, 0x4255); mem_wr(gb, 0xcd2d, A);
-  RET(0x4255);
+  BASE(essence_stopEnergySwirl);
+  CYC(b_+0, b_+2); A = 0x01;
+  CYC(b_+2, b_+5); mem_wr(gb, wDeleteEnergyBeads, A);
+  RET(b_+5);
 }

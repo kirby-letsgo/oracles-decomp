@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodebb), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodebb), (from), (to), true)
 
 static uint16_t human_veran_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -23,41 +23,45 @@ static uint16_t human_veran_jump_table(GB *gb) {
 }
 
 void interactionCodebb__afterCall6dd1_hook(GB *gb) {
+  BASE(interactionCodebb);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6dd1, 0x6dd4); SET_HL(0x7d90);
-  CALL_C(0x6dd4, interactionSetScript_hook, 0x2544, 0x6dd7);
-  CYC(0x6dd7, 0x6dda); objectSetVisible82_hook(gb);
+  CYC(b_+14, b_+17); SET_HL((SYM(interactionCoded8__subid0Script) + 58));
+  CALL_C(b_+17, interactionSetScript_hook, SYM(interactionSetScript), b_+20);
+  CYC(b_+20, b_+23); objectSetVisible82_hook(gb);
 }
 
 void interactionCodebb__state0_hook(GB *gb) {
+  BASE(interactionCodebb);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6dcb, interactionIncState_hook, 0x23e0, 0x6dce);
-  CALL_C(0x6dce, interactionInitGraphics_hook, 0x15fb, 0x6dd1);
+  CALL_C(b_+8, interactionIncState_hook, SYM(interactionIncState), b_+11);
+  CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
   interactionCodebb__afterCall6dd1_hook(gb);
 }
 
 void interactionCodebb__state1_hook(GB *gb) {
+  BASE(interactionCodebb);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6dda, 0x6ddc); A = 0x1a;
-  CALL_C(0x6ddc, objectGetRelatedObject1Var_hook, 0x2160, 0x6ddf);
-  CYC(0x6ddf, 0x6de0); A = mem_rd(gb, HL);
-  CYC(0x6de0, 0x6de2); alu_xor(gb, 0x80);
-  CYC(0x6de2, 0x6de3); E = L;
-  CYC(0x6de3, 0x6de4); mem_wr(gb, DE, A);
-  CALL_C(0x6de4, interactionRunScript_hook, 0x2552, 0x6de7);
-  if (!(F & FC)) { CYCT(0x6de7, 0x6de8); ret_effect(gb); return; }
-  CYC(0x6de7, 0x6de8);
-  CYC(0x6de8, 0x6deb); interactionDelete_hook(gb);
+  CYC(b_+23, b_+25); A = 0x1a;
+  CALL_C(b_+25, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+28);
+  CYC(b_+28, b_+29); A = mem_rd(gb, HL);
+  CYC(b_+29, b_+31); alu_xor(gb, 0x80);
+  CYC(b_+31, b_+32); E = L;
+  CYC(b_+32, b_+33); mem_wr(gb, DE, A);
+  CALL_C(b_+33, interactionRunScript_hook, SYM(interactionRunScript), b_+36);
+  if (!(F & FC)) { CYCT(b_+36, b_+37); ret_effect(gb); return; }
+  CYC(b_+36, b_+37);
+  CYC(b_+37, SYM(interactionCodebc)); interactionDelete_hook(gb);
 }
 
 void interactionCodebb_hook(GB *gb) {
+  BASE(interactionCodebb);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6dc3, 0x6dc5); E = 0x44;
-  CYC(0x6dc5, 0x6dc6); A = mem_rd(gb, DE);
-  CYC(0x6dc6, 0x6dc7); push_effect(gb, 0x6dc7);
-  switch (human_veran_jump_table(gb)) {
-    case 0x6dcb: interactionCodebb__state0_hook(gb); return;
-    case 0x6dda: interactionCodebb__state1_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x44;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (human_veran_jump_table(gb));
+    if (jt_ == b_+8) { interactionCodebb__state0_hook(gb); return; }
+    else if (jt_ == b_+23) { interactionCodebb__state1_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }

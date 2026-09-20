@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0e, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0e, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode5d), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode5d), (from), (to), true)
 
 void twinrovaIce_bounceOffShield_hook(GB *gb);
 
@@ -47,94 +47,96 @@ static void twinrovaIce_addAToHl_from_rst(GB *gb, uint16_t return_address) {
 //   var3e: ?
 // ==================================================================================================
 void enemyCode5d_hook(GB *gb) {
+  BASE(enemyCode5d);
   uint16_t sp0_ = gb->sp;
-  if (F & FZ) { CYCT(0x690f, 0x6911); goto normalStatus; } // jr z
-  CYC(0x690f, 0x6911);
-  CYC(0x6911, 0x6913); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(0x6913); return; } // ret c
-  CYC(0x6913, 0x6914);
-  CYC(0x6914, 0x6916); E = ENEMY_BASE + OBJ_VAR2A;
-  CYC(0x6916, 0x6917); A = mem_rd(gb, DE);
-  CYC(0x6917, 0x6919); alu_cp(gb, 0x80); // $80|ITEMCOLLISION_LINK
-  if (F & FZ) { CYCT(0x6919, 0x691b); goto normalStatus; } // jr z
-  CYC(0x6919, 0x691b);
-  CYC(0x691b, 0x691d); A = (uint8_t)(A & ~(1 << 7)); // res 7,a
-  CYC(0x691d, 0x691f); alu_sub(gb, 0x02); // ITEMCOLLISION_L2_SHIELD
-  CYC(0x691f, 0x6921); alu_cp(gb, 0x02); // ITEMCOLLISION_L3_SHIELD-ITEMCOLLISION_L2_SHIELD+1
-  if (F & FC) CALL_C_CC(0x6921, twinrovaIce_bounceOffShield_hook, 0x6972, 0x6924); else CYC(0x6921, 0x6924); // call c
-  CALL_C(0x6924, ecom_updateCardinalAngleAwayFromTarget_b0e_hook, 0x43ab, 0x6927);
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+4); return; } // ret c
+  CYC(b_+4, b_+5);
+  CYC(b_+5, b_+7); E = ENEMY_BASE + OBJ_VAR2A;
+  CYC(b_+7, b_+8); A = mem_rd(gb, DE);
+  CYC(b_+8, b_+10); alu_cp(gb, 0x80); // $80|ITEMCOLLISION_LINK
+  if (F & FZ) { CYCT(b_+10, b_+12); goto normalStatus; } // jr z
+  CYC(b_+10, b_+12);
+  CYC(b_+12, b_+14); A = (uint8_t)(A & ~(1 << 7)); // res 7,a
+  CYC(b_+14, b_+16); alu_sub(gb, 0x02); // ITEMCOLLISION_L2_SHIELD
+  CYC(b_+16, b_+18); alu_cp(gb, 0x02); // ITEMCOLLISION_L3_SHIELD-ITEMCOLLISION_L2_SHIELD+1
+  if (F & FC) CALL_C_CC(b_+18, twinrovaIce_bounceOffShield_hook, SYM(twinrovaIce_bounceOffShield), b_+21); else CYC(b_+18, b_+21); // call c
+  CALL_C(b_+21, ecom_updateCardinalAngleAwayFromTarget_b0e_hook, SYM(ecom_updateCardinalAngleAwayFromTarget_b0e), b_+24);
 
 normalStatus:
-  CYC(0x6927, 0x6929); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6929, 0x692a); A = mem_rd(gb, DE);
+  CYC(b_+24, b_+26); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+26, b_+27); A = mem_rd(gb, DE);
   {
-    CYC(0x692a, 0x692b); push_effect(gb, 0x692b);
+    CYC(b_+27, b_+28); push_effect(gb, b_+28);
     uint16_t target = twinrovaIce_jump_table(gb);
-    if (target == 0x6931) goto state0;
-    if (target == 0x6948) goto state1;
-    if (target == 0x6950) goto state2;
+    if (target == b_+34) goto state0;
+    if (target == b_+57) goto state1;
+    if (target == b_+65) goto state2;
     HANDOFF(target);
   }
 
 state0:
-  CYC(0x6931, 0x6932); H = D;
-  CYC(0x6932, 0x6933); L = E;
-  CYC(0x6933, 0x6934); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(0x6934, 0x6936); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x6936, 0x6938); mem_wr(gb, HL, 0x46); // SPEED_1c0
-  CYC(0x6938, 0x693a); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x693a, 0x693c); mem_wr(gb, HL, 120);
-  CYC(0x693c, 0x693e); L = ENEMY_BASE + 0x3e; // Enemy.var3e
-  CYC(0x693e, 0x6940); mem_wr(gb, HL, 0x08);
-  CYC(0x6940, 0x6942); A = 0x98; // SND_POOF
-  CALL_C(0x6942, playSound_b00_hook, 0x0c98, 0x6945);
-  CYC(0x6945, 0x6948); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+34, b_+35); H = D;
+  CYC(b_+35, b_+36); L = E;
+  CYC(b_+36, b_+37); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+37, b_+39); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+39, b_+41); mem_wr(gb, HL, 0x46); // SPEED_1c0
+  CYC(b_+41, b_+43); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+43, b_+45); mem_wr(gb, HL, 120);
+  CYC(b_+45, b_+47); L = ENEMY_BASE + 0x3e; // Enemy.var3e
+  CYC(b_+47, b_+49); mem_wr(gb, HL, 0x08);
+  CYC(b_+49, b_+51); A = 0x98; // SND_POOF
+  CALL_C(b_+51, playSound_b00_hook, SYM(playSound_b00), b_+54);
+  CYC(b_+54, b_+57); objectSetVisible82_hook(gb); return; // jp
 
 state1:
-  CALL_C(0x6948, ecom_decCounter1_b0e_hook, 0x439a, 0x694b);
-  if (!(F & FZ)) { CYCT(0x694b, 0x694e); enemyAnimate_hook(gb); return; } // jp nz
-  CYC(0x694b, 0x694e);
-  CYC(0x694e, 0x694f); L = E;
-  CYC(0x694f, 0x6950); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CALL_C(b_+57, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+60);
+  if (!(F & FZ)) { CYCT(b_+60, b_+63); enemyAnimate_hook(gb); return; } // jp nz
+  CYC(b_+60, b_+63);
+  CYC(b_+63, b_+64); L = E;
+  CYC(b_+64, b_+65); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
 
 state2:
-  CYC(0x6950, 0x6952); A = OBJ_HEALTH; // Object.health
-  CALL_C(0x6952, objectGetRelatedObject1Var_hook, 0x2160, 0x6955);
-  CYC(0x6955, 0x6956); A = mem_rd(gb, HL);
-  CYC(0x6956, 0x6957); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x6957, 0x6959); goto delete; } // jr z
-  CYC(0x6957, 0x6959);
-  CYC(0x6959, 0x695b); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x695b, 0x695c); A = mem_rd(gb, HL);
-  CYC(0x695c, 0x695e); alu_cp(gb, 0x0a);
-  if (F & FZ) { CYCT(0x695e, 0x6960); goto delete; } // jr z
-  CYC(0x695e, 0x6960);
-  CALL_C(0x6960, objectApplySpeed_hook, 0x201d, 0x6963);
-  CALL_C(0x6963, ecom_bounceOffWallsAndHoles_b0e_hook, 0x42de, 0x6966);
-  if (F & FZ) { RET_TAKEN(0x6966); return; } // ret z
-  CYC(0x6966, 0x6967);
-  CYC(0x6967, 0x6969); A = 0x50; // SND_CLINK
-  CYC(0x6969, 0x696c); playSound_b00_hook(gb); return; // jp
+  CYC(b_+65, b_+67); A = OBJ_HEALTH; // Object.health
+  CALL_C(b_+67, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+70);
+  CYC(b_+70, b_+71); A = mem_rd(gb, HL);
+  CYC(b_+71, b_+72); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+72, b_+74); goto delete; } // jr z
+  CYC(b_+72, b_+74);
+  CYC(b_+74, b_+76); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+76, b_+77); A = mem_rd(gb, HL);
+  CYC(b_+77, b_+79); alu_cp(gb, 0x0a);
+  if (F & FZ) { CYCT(b_+79, b_+81); goto delete; } // jr z
+  CYC(b_+79, b_+81);
+  CALL_C(b_+81, objectApplySpeed_hook, SYM(objectApplySpeed), b_+84);
+  CALL_C(b_+84, ecom_bounceOffWallsAndHoles_b0e_hook, SYM(ecom_bounceOffWallsAndHoles_b0e), b_+87);
+  if (F & FZ) { RET_TAKEN(b_+87); return; } // ret z
+  CYC(b_+87, b_+88);
+  CYC(b_+88, b_+90); A = 0x50; // SND_CLINK
+  CYC(b_+90, b_+93); playSound_b00_hook(gb); return; // jp
 
 delete:
-  CALL_C(0x696c, objectCreatePuff_hook, 0x24c1, 0x696f);
-  CYC(0x696f, 0x6972); enemyDelete_hook(gb); return; // jp
+  CALL_C(b_+93, objectCreatePuff_hook, SYM(objectCreatePuff), b_+96);
+  CYC(b_+96, SYM(twinrovaIce_bounceOffShield)); enemyDelete_hook(gb); return; // jp
 }
 
 // 0e:6972, bare global; called from enemyCode5d. This doesn't appear to do anything other
 // than make a sound, because the angle is immediately overwritten after this is called.
 void twinrovaIce_bounceOffShield_hook(GB *gb) {
-  CYC(0x6972, 0x6975); A = mem_rd(gb, w1Link + OBJ_DIRECTION);
-  CYC(0x6975, 0x6977); A = alu_swap(gb, A);
-  CYC(0x6977, 0x6978); B = A;
-  CYC(0x6978, 0x697a); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x697a, 0x697b); A = mem_rd(gb, DE);
-  CYC(0x697b, 0x697c); alu_add(gb, B);
-  CYC(0x697c, 0x697f); SET_HL(0x6989); // @bounceTable
-  CYC(0x697f, 0x6980); twinrovaIce_addAToHl_from_rst(gb, 0x6980);
-  CYC(0x6980, 0x6982); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x6982, 0x6983); A = mem_rd(gb, HL);
-  CYC(0x6983, 0x6984); mem_wr(gb, DE, A);
-  CYC(0x6984, 0x6986); A = 0x50; // SND_CLINK
-  CYC(0x6986, 0x6989); playSound_b00_hook(gb); return; // jp
+  BASE(twinrovaIce_bounceOffShield);
+  CYC(b_+0, b_+3); A = mem_rd(gb, w1Link + OBJ_DIRECTION);
+  CYC(b_+3, b_+5); A = alu_swap(gb, A);
+  CYC(b_+5, b_+6); B = A;
+  CYC(b_+6, b_+8); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+8, b_+9); A = mem_rd(gb, DE);
+  CYC(b_+9, b_+10); alu_add(gb, B);
+  CYC(b_+10, b_+13); SET_HL(b_+23); // @bounceTable
+  CYC(b_+13, b_+14); twinrovaIce_addAToHl_from_rst(gb, b_+14);
+  CYC(b_+14, b_+16); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+16, b_+17); A = mem_rd(gb, HL);
+  CYC(b_+17, b_+18); mem_wr(gb, DE, A);
+  CYC(b_+18, b_+20); A = 0x50; // SND_CLINK
+  CYC(b_+20, b_+23); playSound_b00_hook(gb); return; // jp
 }

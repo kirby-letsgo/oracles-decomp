@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0d, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0d, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode19), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode19), (from), (to), true)
 
 void whisp_state_uninitialized_hook(GB *gb);
 void whisp_state8_hook(GB *gb);
@@ -50,169 +50,176 @@ static void whisp_addAToHl_from_rst(GB *gb, uint16_t return_address) {
 // ENEMY_WHISP
 // ==================================================================================================
 void enemyCode19_hook(GB *gb) {
+  BASE(enemyCode19);
   uint16_t sp0_ = gb->sp;
-  if (F & FZ) { CYCT(0x50fc, 0x50fe); goto normalStatus; } // jr z
-  CYC(0x50fc, 0x50fe);
-  CYC(0x50fe, 0x5100); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(0x5100); return; } // ret c
-  CYC(0x5100, 0x5101);
-  CYC(0x5101, 0x5103); E = ENEMY_BASE + OBJ_VAR2A;
-  CYC(0x5103, 0x5104); A = mem_rd(gb, DE);
-  CYC(0x5104, 0x5106); A = (uint8_t)(A & ~(1 << 7)); // res 7,a
-  CYC(0x5106, 0x5108); alu_sub(gb, 0x17); // ITEMCOLLISION_L1_BOOMERANG
-  CYC(0x5108, 0x510a); alu_cp(gb, 0x01); // MAX_BOOMERANG_LEVEL
-  if (!(F & FC)) { CYCT(0x510a, 0x510c); goto normalStatus; } // jr nc
-  CYC(0x510a, 0x510c);
-  CYC(0x510c, 0x510e); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x510e, 0x510f); A = mem_rd(gb, DE);
-  CYC(0x510f, 0x5111); alu_cp(gb, 0x09);
-  if (!(F & FC)) { CYCT(0x5111, 0x5113); goto normalStatus; } // jr nc
-  CYC(0x5111, 0x5113);
-  CYC(0x5113, 0x5115); A = 0x09;
-  CYC(0x5115, 0x5116); mem_wr(gb, DE, A);
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+4); return; } // ret c
+  CYC(b_+4, b_+5);
+  CYC(b_+5, b_+7); E = ENEMY_BASE + OBJ_VAR2A;
+  CYC(b_+7, b_+8); A = mem_rd(gb, DE);
+  CYC(b_+8, b_+10); A = (uint8_t)(A & ~(1 << 7)); // res 7,a
+  CYC(b_+10, b_+12); alu_sub(gb, 0x17); // ITEMCOLLISION_L1_BOOMERANG
+  CYC(b_+12, b_+14); alu_cp(gb, 0x01); // MAX_BOOMERANG_LEVEL
+  if (!(F & FC)) { CYCT(b_+14, b_+16); goto normalStatus; } // jr nc
+  CYC(b_+14, b_+16);
+  CYC(b_+16, b_+18); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+18, b_+19); A = mem_rd(gb, DE);
+  CYC(b_+19, b_+21); alu_cp(gb, 0x09);
+  if (!(F & FC)) { CYCT(b_+21, b_+23); goto normalStatus; } // jr nc
+  CYC(b_+21, b_+23);
+  CYC(b_+23, b_+25); A = 0x09;
+  CYC(b_+25, b_+26); mem_wr(gb, DE, A);
 
 normalStatus:
-  CYC(0x5116, 0x5118); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x5118, 0x5119); A = mem_rd(gb, DE);
+  CYC(b_+26, b_+28); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+28, b_+29); A = mem_rd(gb, DE);
   {
-    CYC(0x5119, 0x511a); push_effect(gb, 0x511a);
+    CYC(b_+29, b_+30); push_effect(gb, b_+30);
     uint16_t target = enemyCode19_jump_table(gb);
-    if (target == 0x5130) { whisp_state_uninitialized_hook(gb); return; }
-    if (target == 0x50c8) { spark_state_stub_hook(gb); return; }
-    if (target == 0x44ac) { ecom_blownByGaleSeedState_b0d_hook(gb); return; }
-    if (target == 0x5142) { whisp_state8_hook(gb); return; }
-    if (target == 0x50d2) { spark_state9_hook(gb); return; }
-    if (target == 0x50e7) { spark_stateA_hook(gb); return; }
+    if (target == SYM(whisp_state_uninitialized)) { whisp_state_uninitialized_hook(gb); return; }
+    if (target == SYM(spark_state_stub)) { spark_state_stub_hook(gb); return; }
+    if (target == SYM(ecom_blownByGaleSeedState_b0d)) { ecom_blownByGaleSeedState_b0d_hook(gb); return; }
+    if (target == SYM(whisp_state8)) { whisp_state8_hook(gb); return; }
+    if (target == SYM(spark_state9)) { spark_state9_hook(gb); return; }
+    if (target == SYM(spark_stateA)) { spark_stateA_hook(gb); return; }
     HANDOFF(target);
   }
 }
 
 // 0d:5130, bare global.
 void whisp_state_uninitialized_hook(GB *gb) {
+  BASE(whisp_state_uninitialized);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x5130, getRandomNumber_noPreserveVars_hook, 0x0453, 0x5133);
-  CYC(0x5133, 0x5135); alu_and(gb, 0x18);
-  CYC(0x5135, 0x5137); alu_add(gb, 0x04);
-  CYC(0x5137, 0x5139); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x5139, 0x513a); mem_wr(gb, DE, A);
-  CYC(0x513a, 0x513c); A = 0x1e; // SPEED_c0
-  CALL_C(0x513c, ecom_setSpeedAndState8_b0d_hook, 0x4364, 0x513f);
-  CYC(0x513f, 0x5142); objectSetVisible82_hook(gb); return; // jp
+  CALL_C(b_+0, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+3);
+  CYC(b_+3, b_+5); alu_and(gb, 0x18);
+  CYC(b_+5, b_+7); alu_add(gb, 0x04);
+  CYC(b_+7, b_+9); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+9, b_+10); mem_wr(gb, DE, A);
+  CYC(b_+10, b_+12); A = 0x1e; // SPEED_c0
+  CALL_C(b_+12, ecom_setSpeedAndState8_b0d_hook, SYM(ecom_setSpeedAndState8_b0d), b_+15);
+  CYC(b_+15, SYM(whisp_state8)); objectSetVisible82_hook(gb); return; // jp
 }
 
 // 0d:5142, bare global.
 void whisp_state8_hook(GB *gb) {
+  BASE(whisp_state8);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x5142, ecom_bounceOffWalls_b0d_hook, 0x42e2, 0x5145);
-  CALL_C(0x5145, objectApplySpeed_hook, 0x201d, 0x5148);
-  CYC(0x5148, 0x514b); enemyAnimate_hook(gb); return; // jp
+  CALL_C(b_+0, ecom_bounceOffWalls_b0d_hook, SYM(ecom_bounceOffWalls_b0d), b_+3);
+  CALL_C(b_+3, objectApplySpeed_hook, SYM(objectApplySpeed), b_+6);
+  CYC(b_+6, SYM(spark_updateAngle)); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0d:514b, bare global; updates the spark's moving angle by checking for walls.
 // Sparks (and whisps) move by hugging walls.
 void spark_updateAngle_hook(GB *gb) {
+  BASE(spark_updateAngle);
   uint16_t sp0_ = gb->sp;
-  CYC(0x514b, 0x514d); A = 0x01;
-  CYC(0x514d, 0x514f); hram_wr(gb, 0x8a, A);
-  CYC(0x514f, 0x5151); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x5151, 0x5152); A = mem_rd(gb, DE);
-  CYC(0x5152, 0x5154); alu_sub(gb, 0x08);
-  CYC(0x5154, 0x5156); alu_and(gb, 0x18);
-  CALL_C(0x5156, spark_checkWallInDirection_hook, 0x51a0, 0x5159);
-  if (F & FC) { CYCT(0x5159, 0x515b); goto stillOnWall; } // jr c
-  CYC(0x5159, 0x515b);
-  CALL_C(0x515b, spark_getTileOffset_hook, 0x518d, 0x515e);
-  if (!(F & FZ)) { RET_TAKEN(0x515e); return; } // ret nz
-  CYC(0x515e, 0x515f);
-  CYC(0x515f, 0x5161); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x5161, 0x5162); A = mem_rd(gb, DE);
-  CYC(0x5162, 0x5164); alu_sub(gb, 0x08);
-  CYC(0x5164, 0x5166); alu_and(gb, 0x18);
-  CYC(0x5166, 0x5167); mem_wr(gb, DE, A);
-  RET(0x5167); return; // ret
+  CYC(b_+0, b_+2); A = 0x01;
+  CYC(b_+2, b_+4); hram_wr(gb, 0x8a, A);
+  CYC(b_+4, b_+6); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+6, b_+7); A = mem_rd(gb, DE);
+  CYC(b_+7, b_+9); alu_sub(gb, 0x08);
+  CYC(b_+9, b_+11); alu_and(gb, 0x18);
+  CALL_C(b_+11, spark_checkWallInDirection_hook, SYM(spark_checkWallInDirection), b_+14);
+  if (F & FC) { CYCT(b_+14, b_+16); goto stillOnWall; } // jr c
+  CYC(b_+14, b_+16);
+  CALL_C(b_+16, spark_getTileOffset_hook, SYM(spark_getTileOffset), b_+19);
+  if (!(F & FZ)) { RET_TAKEN(b_+19); return; } // ret nz
+  CYC(b_+19, b_+20);
+  CYC(b_+20, b_+22); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+22, b_+23); A = mem_rd(gb, DE);
+  CYC(b_+23, b_+25); alu_sub(gb, 0x08);
+  CYC(b_+25, b_+27); alu_and(gb, 0x18);
+  CYC(b_+27, b_+28); mem_wr(gb, DE, A);
+  RET(b_+28); return; // ret
 
 stillOnWall:
-  CYC(0x5168, 0x516a); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x516a, 0x516b); A = mem_rd(gb, DE);
-  CALL_C(0x516b, spark_checkWallInDirection_hook, 0x51a0, 0x516e);
-  if (!(F & FC)) { RET_TAKEN(0x516e); return; } // ret nc
-  CYC(0x516e, 0x516f);
-  CYC(0x516f, 0x5171); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x5171, 0x5172); A = mem_rd(gb, DE);
-  CYC(0x5172, 0x5174); alu_add(gb, 0x08);
-  CYC(0x5174, 0x5176); alu_and(gb, 0x18);
-  CYC(0x5176, 0x5177); mem_wr(gb, DE, A);
-  RET(0x5177); return; // ret
+  CYC(b_+29, b_+31); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+31, b_+32); A = mem_rd(gb, DE);
+  CALL_C(b_+32, spark_checkWallInDirection_hook, SYM(spark_checkWallInDirection), b_+35);
+  if (!(F & FC)) { RET_TAKEN(b_+35); return; } // ret nc
+  CYC(b_+35, b_+36);
+  CYC(b_+36, b_+38); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+38, b_+39); A = mem_rd(gb, DE);
+  CYC(b_+39, b_+41); alu_add(gb, 0x08);
+  CYC(b_+41, b_+43); alu_and(gb, 0x18);
+  CYC(b_+43, b_+44); mem_wr(gb, DE, A);
+  RET(b_+44); return; // ret
 }
 
 // 0d:5178, bare global.
 void spark_getWallAngle_hook(GB *gb) {
+  BASE(spark_getWallAngle);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5178, 0x5179); alu_xor(gb, A);
-  CALL_C(0x5179, spark_checkWallInDirection_hook, 0x51a0, 0x517c);
-  CYC(0x517c, 0x517e); A = 0x08;
-  if (F & FC) { RET_TAKEN(0x517e); return; } // ret c
-  CYC(0x517e, 0x517f);
-  CALL_C(0x517f, spark_checkWallInDirection_hook, 0x51a0, 0x5182);
-  CYC(0x5182, 0x5184); A = 0x10;
-  if (F & FC) { RET_TAKEN(0x5184); return; } // ret c
-  CYC(0x5184, 0x5185);
-  CALL_C(0x5185, spark_checkWallInDirection_hook, 0x51a0, 0x5188);
-  CYC(0x5188, 0x518a); A = 0x18;
-  if (F & FC) { RET_TAKEN(0x518a); return; } // ret c
-  CYC(0x518a, 0x518b);
-  CYC(0x518b, 0x518c); alu_xor(gb, A);
-  RET(0x518c); return; // ret
+  CYC(b_+0, b_+1); alu_xor(gb, A);
+  CALL_C(b_+1, spark_checkWallInDirection_hook, SYM(spark_checkWallInDirection), b_+4);
+  CYC(b_+4, b_+6); A = 0x08;
+  if (F & FC) { RET_TAKEN(b_+6); return; } // ret c
+  CYC(b_+6, b_+7);
+  CALL_C(b_+7, spark_checkWallInDirection_hook, SYM(spark_checkWallInDirection), b_+10);
+  CYC(b_+10, b_+12); A = 0x10;
+  if (F & FC) { RET_TAKEN(b_+12); return; } // ret c
+  CYC(b_+12, b_+13);
+  CALL_C(b_+13, spark_checkWallInDirection_hook, SYM(spark_checkWallInDirection), b_+16);
+  CYC(b_+16, b_+18); A = 0x18;
+  if (F & FC) { RET_TAKEN(b_+18); return; } // ret c
+  CYC(b_+18, b_+19);
+  CYC(b_+19, b_+20); alu_xor(gb, A);
+  RET(b_+20); return; // ret
 }
 
 // 0d:518d, bare global.
 void spark_getTileOffset_hook(GB *gb) {
-  CYC(0x518d, 0x518f); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x518f, 0x5190); A = mem_rd(gb, DE);
-  CYC(0x5190, 0x5192); alu_bit(gb, 3, A);
-  if (!(F & FZ)) { CYCT(0x5192, 0x5194); goto xOffset; } // jr nz
-  CYC(0x5192, 0x5194);
-  CYC(0x5194, 0x5196); E = ENEMY_BASE + OBJ_YH;
-  CYC(0x5196, 0x5197); A = mem_rd(gb, DE);
-  CYC(0x5197, 0x5199); alu_and(gb, 0x07);
-  RET(0x5199); return; // ret
+  BASE(spark_getTileOffset);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); alu_bit(gb, 3, A);
+  if (!(F & FZ)) { CYCT(b_+5, b_+7); goto xOffset; } // jr nz
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+9); E = ENEMY_BASE + OBJ_YH;
+  CYC(b_+9, b_+10); A = mem_rd(gb, DE);
+  CYC(b_+10, b_+12); alu_and(gb, 0x07);
+  RET(b_+12); return; // ret
 
 xOffset:
-  CYC(0x519a, 0x519c); E = ENEMY_BASE + OBJ_XH;
-  CYC(0x519c, 0x519d); A = mem_rd(gb, DE);
-  CYC(0x519d, 0x519f); alu_and(gb, 0x07);
-  RET(0x519f); return; // ret
+  CYC(b_+13, b_+15); E = ENEMY_BASE + OBJ_XH;
+  CYC(b_+15, b_+16); A = mem_rd(gb, DE);
+  CYC(b_+16, b_+18); alu_and(gb, 0x07);
+  RET(b_+18); return; // ret
 }
 
 // 0d:51a0, bare global.
 void spark_checkWallInDirection_hook(GB *gb) {
+  BASE(spark_checkWallInDirection);
   uint16_t sp0_ = gb->sp;
-  CYC(0x51a0, 0x51a2); alu_and(gb, 0x18);
-  CYC(0x51a2, 0x51a3); alu_rrca(gb);
-  CYC(0x51a3, 0x51a6); SET_HL(0x51c4); // @offsetTable (data)
-  CYC(0x51a6, 0x51a7); whisp_addAToHl_from_rst(gb, 0x51a7);
-  CYC(0x51a7, 0x51a9); E = ENEMY_BASE + OBJ_YH;
-  CYC(0x51a9, 0x51aa); A = mem_rd(gb, DE);
-  CYC(0x51aa, 0x51ab); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x51ab, 0x51ac); B = A;
-  CYC(0x51ac, 0x51ad); SET_HL(HL + 1); // inc hl
-  CYC(0x51ad, 0x51af); E = ENEMY_BASE + OBJ_XH;
-  CYC(0x51af, 0x51b0); A = mem_rd(gb, DE);
-  CYC(0x51b0, 0x51b1); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x51b1, 0x51b2); C = A;
-  PUSH(0x51b2, HL);
-  PUSH(0x51b3, BC);
-  CALL_C(0x51b4, checkTileCollisionAt_disallowHoles_hook, 0x1502, 0x51b7);
-  SET_BC(POP(0x51b7));
-  SET_HL(POP(0x51b8));
-  if (F & FC) { RET_TAKEN(0x51b9); return; } // ret c
-  CYC(0x51b9, 0x51ba);
-  CYC(0x51ba, 0x51bb); SET_HL(HL + 1); // inc hl
-  CYC(0x51bb, 0x51bc); A = mem_rd(gb, HL); SET_HL(HL + 1); // ld a,(hl+)
-  CYC(0x51bc, 0x51bd); alu_add(gb, B);
-  CYC(0x51bd, 0x51be); B = A;
-  CYC(0x51be, 0x51bf); A = mem_rd(gb, HL);
-  CYC(0x51bf, 0x51c0); alu_add(gb, C);
-  CYC(0x51c0, 0x51c1); C = A;
-  CYC(0x51c1, 0x51c4); checkTileCollisionAt_disallowHoles_hook(gb); return; // jp
+  CYC(b_+0, b_+2); alu_and(gb, 0x18);
+  CYC(b_+2, b_+3); alu_rrca(gb);
+  CYC(b_+3, b_+6); SET_HL(b_+36); // @offsetTable (data)
+  CYC(b_+6, b_+7); whisp_addAToHl_from_rst(gb, b_+7);
+  CYC(b_+7, b_+9); E = ENEMY_BASE + OBJ_YH;
+  CYC(b_+9, b_+10); A = mem_rd(gb, DE);
+  CYC(b_+10, b_+11); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+11, b_+12); B = A;
+  CYC(b_+12, b_+13); SET_HL(HL + 1); // inc hl
+  CYC(b_+13, b_+15); E = ENEMY_BASE + OBJ_XH;
+  CYC(b_+15, b_+16); A = mem_rd(gb, DE);
+  CYC(b_+16, b_+17); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+17, b_+18); C = A;
+  PUSH(b_+18, HL);
+  PUSH(b_+19, BC);
+  CALL_C(b_+20, checkTileCollisionAt_disallowHoles_hook, SYM(checkTileCollisionAt_disallowHoles), b_+23);
+  SET_BC(POP(b_+23));
+  SET_HL(POP(b_+24));
+  if (F & FC) { RET_TAKEN(b_+25); return; } // ret c
+  CYC(b_+25, b_+26);
+  CYC(b_+26, b_+27); SET_HL(HL + 1); // inc hl
+  CYC(b_+27, b_+28); A = mem_rd(gb, HL); SET_HL(HL + 1); // ld a,(hl+)
+  CYC(b_+28, b_+29); alu_add(gb, B);
+  CYC(b_+29, b_+30); B = A;
+  CYC(b_+30, b_+31); A = mem_rd(gb, HL);
+  CYC(b_+31, b_+32); alu_add(gb, C);
+  CYC(b_+32, b_+33); C = A;
+  CYC(b_+33, b_+36); checkTileCollisionAt_disallowHoles_hook(gb); return; // jp
 }

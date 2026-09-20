@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x07, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x07, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode16), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode16), (from), (to), true)
 
 void braceletCheckBreakable_hook(GB *gb);
 void braceletCheckDeleteSelfWhileThrowing_hook(GB *gb);
@@ -30,215 +30,218 @@ static uint16_t bracelet_jump_table(GB *gb) {
 }
 
 void itemCode16_hook(GB *gb) {
+  BASE(itemCode16);
   uint16_t sp0_ = gb->sp;
-  CYC(0x62c6, 0x62c8); E = 0x04;
-  CYC(0x62c8, 0x62c9); A = mem_rd(gb, DE);
-  CYC(0x62c9, 0x62ca); push_effect(gb, 0x62ca);
-  switch (bracelet_jump_table(gb)) {
-    case 0x62d2: goto state0;
-    case 0x62ea: goto held;
-    case 0x632c: goto thrown;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x04;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (bracelet_jump_table(gb));
+    if (jt_ == b_+12) { goto state0; }
+    else if (jt_ == b_+36) { goto held; }
+    else if (jt_ == b_+102) { goto thrown; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 state0:
-  CALL_C(0x62d2, itemLoadAttributesAndGraphics_hook, 0x4993, 0x62d5);
-  CYC(0x62d5, 0x62d6); H = D;
-  CYC(0x62d6, 0x62d8); L = 0x00;
-  CYC(0x62d8, 0x62da); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1)));
-  CYC(0x62da, 0x62dc); L = 0x02;
-  CYC(0x62dc, 0x62dd); A = mem_rd(gb, HL);
-  CYC(0x62dd, 0x62de); alu_or(gb, A);
+  CALL_C(b_+12, itemLoadAttributesAndGraphics_hook, SYM(itemLoadAttributesAndGraphics), b_+15);
+  CYC(b_+15, b_+16); H = D;
+  CYC(b_+16, b_+18); L = 0x00;
+  CYC(b_+18, b_+20); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1)));
+  CYC(b_+20, b_+22); L = 0x02;
+  CYC(b_+22, b_+23); A = mem_rd(gb, HL);
+  CYC(b_+23, b_+24); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x62de, 0x62e0);
+    CYCT(b_+24, b_+26);
     goto not_tile;
   }
-  CYC(0x62de, 0x62e0);
-  CYC(0x62e0, 0x62e2); L = 0x04;
-  CYC(0x62e2, 0x62e4); mem_wr(gb, HL, 0x02);
-  CALL_C(0x62e4, itemMimicBgTile_hook, 0x628e, 0x62e7);
-  CYC(0x62e7, 0x62ea);
+  CYC(b_+24, b_+26);
+  CYC(b_+26, b_+28); L = 0x04;
+  CYC(b_+28, b_+30); mem_wr(gb, HL, 0x02);
+  CALL_C(b_+30, itemMimicBgTile_hook, SYM(itemMimicBgTile), b_+33);
+  CYC(b_+33, b_+36);
   objectSetVisiblec0_hook(gb);
   return;
 
 held:
-  CYC(0x62ea, 0x62eb); H = D;
-  CYC(0x62eb, 0x62ed); L = 0x05;
-  CYC(0x62ed, 0x62ee); A = mem_rd(gb, HL);
-  CYC(0x62ee, 0x62ef); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x62ef, 0x62f0); ret_effect(gb); return; }
-  CYC(0x62ef, 0x62f0);
-  CYC(0x62f0, 0x62f2); L = 0x27;
-  CYC(0x62f2, 0x62f4); A = 0x06;
-  CYC(0x62f4, 0x62f5); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(0x62f5, 0x62f6); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(0x62f6, 0x62f7); L = alu_dec8(gb, L);
-  CYC(0x62f7, 0x62f9); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  CYC(0x62f9, 0x62fb);
+  CYC(b_+36, b_+37); H = D;
+  CYC(b_+37, b_+39); L = 0x05;
+  CYC(b_+39, b_+40); A = mem_rd(gb, HL);
+  CYC(b_+40, b_+41); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+41, b_+42); ret_effect(gb); return; }
+  CYC(b_+41, b_+42);
+  CYC(b_+42, b_+44); L = 0x27;
+  CYC(b_+44, b_+46); A = 0x06;
+  CYC(b_+46, b_+47); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+47, b_+48); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+48, b_+49); L = alu_dec8(gb, L);
+  CYC(b_+49, b_+51); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
+  CYC(b_+51, b_+53);
   goto throw_item;
 
 not_tile:
-  CALL_C(0x62fb, braceletCheckDeleteSelfWhileThrowing_hook, 0x6374, 0x62fe);
-  CYC(0x62fe, 0x62ff); A = H;
-  CYC(0x62ff, 0x6301); alu_cp(gb, 0xd1);
+  CALL_C(b_+53, braceletCheckDeleteSelfWhileThrowing_hook, SYM(braceletCheckDeleteSelfWhileThrowing), b_+56);
+  CYC(b_+56, b_+57); A = H;
+  CYC(b_+57, b_+59); alu_cp(gb, 0xd1);
   if (F & FZ) {
-    CYCT(0x6301, 0x6303);
+    CYCT(b_+59, b_+61);
     goto copy_collisions;
   }
-  CYC(0x6301, 0x6303);
-  CYC(0x6303, 0x6304); A = L;
-  CYC(0x6304, 0x6306); alu_cp(gb, 0x40);
+  CYC(b_+59, b_+61);
+  CYC(b_+61, b_+62); A = L;
+  CYC(b_+62, b_+64); alu_cp(gb, 0x40);
   if (F & FC) {
-    CYCT(0x6306, 0x6308);
+    CYCT(b_+64, b_+66);
     goto throw_item;
   }
-  CYC(0x6306, 0x6308);
+  CYC(b_+64, b_+66);
 
 copy_collisions:
-  CYC(0x6308, 0x630a); A = 0x09;
-  CALL_C(0x630a, objectGetRelatedObject2Var_hook, 0x2164, 0x630d);
-  CYC(0x630d, 0x630f); E = 0x09;
-  CYC(0x630f, 0x6310); A = mem_rd(gb, DE);
-  CYC(0x6310, 0x6311); mem_wr(gb, HL, A);
-  CYC(0x6311, 0x6312); A = L;
-  CYC(0x6312, 0x6314); alu_add(gb, 0x1d);
-  CYC(0x6314, 0x6315); L = A;
-  CYC(0x6315, 0x6317); E = 0x26;
-  CYC(0x6317, 0x6318); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x6318, 0x6319); mem_wr(gb, DE, A);
-  CYC(0x6319, 0x631a); E = alu_inc8(gb, E);
-  CYC(0x631a, 0x631b); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x631b, 0x631c); mem_wr(gb, DE, A);
-  CYC(0x631c, 0x631d); H = D;
-  CYC(0x631d, 0x631f); L = 0x24;
-  CYC(0x631f, 0x6321); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
+  CYC(b_+66, b_+68); A = 0x09;
+  CALL_C(b_+68, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+71);
+  CYC(b_+71, b_+73); E = 0x09;
+  CYC(b_+73, b_+74); A = mem_rd(gb, DE);
+  CYC(b_+74, b_+75); mem_wr(gb, HL, A);
+  CYC(b_+75, b_+76); A = L;
+  CYC(b_+76, b_+78); alu_add(gb, 0x1d);
+  CYC(b_+78, b_+79); L = A;
+  CYC(b_+79, b_+81); E = 0x26;
+  CYC(b_+81, b_+82); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+82, b_+83); mem_wr(gb, DE, A);
+  CYC(b_+83, b_+84); E = alu_inc8(gb, E);
+  CYC(b_+84, b_+85); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+85, b_+86); mem_wr(gb, DE, A);
+  CYC(b_+86, b_+87); H = D;
+  CYC(b_+87, b_+89); L = 0x24;
+  CYC(b_+89, b_+91); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
 
 throw_item:
-  CALL_C(0x6321, itemBeginThrow_hook, 0x63b1, 0x6324);
-  CYC(0x6324, 0x6325); H = D;
-  CYC(0x6325, 0x6327); L = 0x04;
-  CYC(0x6327, 0x6329); mem_wr(gb, HL, 0x03);
-  CYC(0x6329, 0x632a); L = alu_inc8(gb, L);
-  CYC(0x632a, 0x632c); mem_wr(gb, HL, 0x00);
+  CALL_C(b_+91, itemBeginThrow_hook, SYM(itemBeginThrow), b_+94);
+  CYC(b_+94, b_+95); H = D;
+  CYC(b_+95, b_+97); L = 0x04;
+  CYC(b_+97, b_+99); mem_wr(gb, HL, 0x03);
+  CYC(b_+99, b_+100); L = alu_inc8(gb, L);
+  CYC(b_+100, b_+102); mem_wr(gb, HL, 0x00);
 
 thrown:
-  CALL_C(0x632c, braceletCheckDeleteSelfWhileThrowing_hook, 0x6374, 0x632f);
-  CALL_C(0x632f, itemUpdateThrowingLaterally_hook, 0x6407, 0x6332);
+  CALL_C(b_+102, braceletCheckDeleteSelfWhileThrowing_hook, SYM(braceletCheckDeleteSelfWhileThrowing), b_+105);
+  CALL_C(b_+105, itemUpdateThrowingLaterally_hook, SYM(itemUpdateThrowingLaterally), b_+108);
   if (F & FZ) {
-    CYCT(0x6332, 0x6334);
+    CYCT(b_+108, b_+110);
     goto destroy;
   }
-  CYC(0x6332, 0x6334);
-  CYC(0x6334, 0x6336); E = 0x39;
-  CYC(0x6336, 0x6337); A = mem_rd(gb, DE);
-  CYC(0x6337, 0x6338); C = A;
-  CALL_C(0x6338, itemUpdateThrowingVertically_hook, 0x4aa5, 0x633b);
+  CYC(b_+108, b_+110);
+  CYC(b_+110, b_+112); E = 0x39;
+  CYC(b_+112, b_+113); A = mem_rd(gb, DE);
+  CYC(b_+113, b_+114); C = A;
+  CALL_C(b_+114, itemUpdateThrowingVertically_hook, SYM(itemUpdateThrowingVertically), b_+117);
   if (!(F & FC)) {
-    CYCT(0x633b, 0x633d);
+    CYCT(b_+117, b_+119);
     goto no_collision;
   }
-  CYC(0x633b, 0x633d);
-  CALL_C(0x633d, braceletCheckBreakable_hook, 0x636d, 0x6340);
+  CYC(b_+117, b_+119);
+  CALL_C(b_+119, braceletCheckBreakable_hook, SYM(braceletCheckBreakable), b_+122);
   if (!(F & FZ)) {
-    CYCT(0x6340, 0x6342);
+    CYCT(b_+122, b_+124);
     goto destroy;
   }
-  CYC(0x6340, 0x6342);
-  CALL_C(0x6342, itemBounce_hook, 0x6482, 0x6345);
+  CYC(b_+122, b_+124);
+  CALL_C(b_+124, itemBounce_hook, SYM(itemBounce), b_+127);
   if (F & FC) {
-    CYCT(0x6345, 0x6347);
+    CYCT(b_+127, b_+129);
     goto release;
   }
-  CYC(0x6345, 0x6347);
+  CYC(b_+127, b_+129);
 
 no_collision:
-  CYC(0x6347, 0x6349); E = 0x02;
-  CYC(0x6349, 0x634a); A = mem_rd(gb, DE);
-  CYC(0x634a, 0x634b); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x634b, 0x634c); ret_effect(gb); return; }
-  CYC(0x634b, 0x634c);
-  CYC(0x634c, 0x634e); A = 0x0b;
-  CALL_C(0x634e, objectGetRelatedObject2Var_hook, 0x2164, 0x6351);
-  CYC(0x6351, 0x6354);
+  CYC(b_+129, b_+131); E = 0x02;
+  CYC(b_+131, b_+132); A = mem_rd(gb, DE);
+  CYC(b_+132, b_+133); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+133, b_+134); ret_effect(gb); return; }
+  CYC(b_+133, b_+134);
+  CYC(b_+134, b_+136); A = 0x0b;
+  CALL_C(b_+136, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+139);
+  CYC(b_+139, b_+142);
   objectCopyPosition_hook(gb);
   return;
 
 release:
-  CYC(0x6354, 0x6356); A = 0x05;
-  CALL_C(0x6356, objectGetRelatedObject2Var_hook, 0x2164, 0x6359);
-  CYC(0x6359, 0x635b); mem_wr(gb, HL, 0x03);
-  CYC(0x635b, 0x635e);
+  CYC(b_+142, b_+144); A = 0x05;
+  CALL_C(b_+144, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+147);
+  CYC(b_+147, b_+149); mem_wr(gb, HL, 0x03);
+  CYC(b_+149, b_+152);
   itemDelete_hook(gb);
   return;
 
 destroy:
-  CALL_C(0x635e, objectReplaceWithAnimationIfOnHazard_hook, 0x2225, 0x6361);
-  if (F & FC) { CYCT(0x6361, 0x6362); ret_effect(gb); return; }
-  CYC(0x6361, 0x6362);
-  CYC(0x6362, 0x6365); SET_HL(0x4809);
-  CYC(0x6365, 0x6367); E = 0x06;
-  CALL_C(0x6367, interBankCall_hook, 0x008a, 0x636a);
-  CYC(0x636a, 0x636d);
+  CALL_C(b_+152, objectReplaceWithAnimationIfOnHazard_hook, SYM(objectReplaceWithAnimationIfOnHazard), b_+155);
+  if (F & FC) { CYCT(b_+155, b_+156); ret_effect(gb); return; }
+  CYC(b_+155, b_+156);
+  CYC(b_+156, b_+159); SET_HL((SYM(applyDamageToLink) + 41));
+  CYC(b_+159, b_+161); E = 0x06;
+  CALL_C(b_+161, interBankCall_hook, 0x008a, b_+164);
+  CYC(b_+164, SYM(braceletCheckBreakable));
   itemDelete_hook(gb);
 }
 
 void braceletCheckBreakable_hook(GB *gb) {
-  CYC(0x636d, 0x636f); E = 0x02;
-  CYC(0x636f, 0x6370); A = mem_rd(gb, DE);
-  CYC(0x6370, 0x6371); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x6371, 0x6372); ret_effect(gb); return; }
-  CYC(0x6371, 0x6372);
-  CYC(0x6372, 0x6373); alu_scf(gb);
-  CYC(0x6373, 0x6374); ret_effect(gb);
+  BASE(braceletCheckBreakable);
+  CYC(b_+0, b_+2); E = 0x02;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
+  CYC(b_+4, b_+5);
+  CYC(b_+5, b_+6); alu_scf(gb);
+  CYC(b_+6, SYM(braceletCheckDeleteSelfWhileThrowing)); ret_effect(gb);
 }
 
 void braceletCheckDeleteSelfWhileThrowing_hook(GB *gb) {
+  BASE(braceletCheckDeleteSelfWhileThrowing);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6374, 0x6376); E = 0x02;
-  CYC(0x6376, 0x6377); A = mem_rd(gb, DE);
-  CYC(0x6377, 0x6378); alu_or(gb, A);
+  CYC(b_+0, b_+2); E = 0x02;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x6378, 0x637a);
+    CYCT(b_+4, b_+6);
     goto throwing_tile;
   }
-  CYC(0x6378, 0x637a);
-  CYC(0x637a, 0x637b); alu_xor(gb, A);
-  CALL_C(0x637b, objectGetRelatedObject2Var_hook, 0x2164, 0x637e);
-  CYC(0x637e, 0x6380); alu_bit(gb, 0, mem_rd(gb, HL));
+  CYC(b_+4, b_+6);
+  CYC(b_+6, b_+7); alu_xor(gb, A);
+  CALL_C(b_+7, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+10);
+  CYC(b_+10, b_+12); alu_bit(gb, 0, mem_rd(gb, HL));
   if (F & FZ) {
-    CYCT(0x6380, 0x6382);
+    CYCT(b_+12, b_+14);
     goto delete_self;
   }
-  CYC(0x6380, 0x6382);
-  CYC(0x6382, 0x6383); A = L;
-  CYC(0x6383, 0x6385); alu_add(gb, 0x04);
-  CYC(0x6385, 0x6386); L = A;
-  CYC(0x6386, 0x6387); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x6387, 0x6389); alu_cp(gb, 0x02);
+  CYC(b_+12, b_+14);
+  CYC(b_+14, b_+15); A = L;
+  CYC(b_+15, b_+17); alu_add(gb, 0x04);
+  CYC(b_+17, b_+18); L = A;
+  CYC(b_+18, b_+19); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+19, b_+21); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
-    CYCT(0x6389, 0x638b);
+    CYCT(b_+21, b_+23);
     goto delete_self;
   }
-  CYC(0x6389, 0x638b);
-  CYC(0x638b, 0x638c); A = mem_rd(gb, HL);
-  CYC(0x638c, 0x638e); alu_cp(gb, 0x03);
-  if (F & FC) { CYCT(0x638e, 0x638f); ret_effect(gb); return; }
-  CYC(0x638e, 0x638f);
+  CYC(b_+21, b_+23);
+  CYC(b_+23, b_+24); A = mem_rd(gb, HL);
+  CYC(b_+24, b_+26); alu_cp(gb, 0x03);
+  if (F & FC) { CYCT(b_+26, b_+27); ret_effect(gb); return; }
+  CYC(b_+26, b_+27);
 
 delete_self:
-  CYC(0x638f, 0x6390); SET_AF(pop_effect(gb));
-  CYC(0x6390, 0x6393);
+  CYC(b_+27, b_+28); SET_AF(pop_effect(gb));
+  CYC(b_+28, b_+31);
   itemDelete_hook(gb);
   return;
 
 throwing_tile:
-  CALL_C(0x6393, objectCheckWithinRoomBoundary_hook, 0x219f, 0x6396);
+  CALL_C(b_+31, objectCheckWithinRoomBoundary_hook, SYM(objectCheckWithinRoomBoundary), b_+34);
   if (!(F & FC)) {
-    CYCT(0x6396, 0x6398);
+    CYCT(b_+34, b_+36);
     goto delete_self;
   }
-  CYC(0x6396, 0x6398);
-  CYC(0x6398, 0x6399); H = D;
-  CYC(0x6399, 0x639b); L = 0x05;
-  CYC(0x639b, 0x639c); ret_effect(gb);
+  CYC(b_+34, b_+36);
+  CYC(b_+36, b_+37); H = D;
+  CYC(b_+37, b_+39); L = 0x05;
+  CYC(b_+39, SYM(bombUpdateThrowingLaterally)); ret_effect(gb);
 }

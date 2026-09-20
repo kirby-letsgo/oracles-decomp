@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(faroreCheckSecretValidity), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(faroreCheckSecretValidity), (from), (to), true)
 
 void faroreCheckSecretValidity_hook(GB *gb);
 void faroreShowTextForSecretHint_hook(GB *gb);
@@ -30,103 +30,108 @@ static uint16_t farore_jumpTable(GB *gb) {
 }
 
 static void farore_setVar3f(GB *gb, uint16_t sp0_) {
-  CYC(0x4007, 0x4009); E = INTERACTION_BASE + OBJ_VAR3F;
-  CYC(0x4009, 0x400a); mem_wr(gb, DE, A);
-  RET(0x400a);
+  BASE(faroreCheckSecretValidity);
+  CYC(b_+7, b_+9); E = INTERACTION_BASE + OBJ_VAR3F;
+  CYC(b_+9, b_+10); mem_wr(gb, DE, A);
+  RET(b_+10);
 }
 
 void faroreCheckSecretValidity_hook(GB *gb) {
+  BASE(faroreCheckSecretValidity);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4000, 0x4003); A = mem_rd(gb, 0xcc88);
-  CYC(0x4003, 0x4004); A = alu_inc8(gb, A);
+  CYC(b_+0, b_+3); A = mem_rd(gb, wSecretInputType);
+  CYC(b_+3, b_+4); A = alu_inc8(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x4004, 0x4006);
+    CYCT(b_+4, b_+6);
   } else {
-    CYC(0x4004, 0x4006);
-    CYC(0x4006, 0x4007); alu_xor(gb, A);
+    CYC(b_+4, b_+6);
+    CYC(b_+6, b_+7); alu_xor(gb, A);
     farore_setVar3f(gb, sp0_);
     return;
   }
 
-  CYC(0x400b, 0x400e); A = mem_rd(gb, 0xcc89);
-  CYC(0x400e, 0x4010); alu_swap_a(gb);
-  CYC(0x4010, 0x4012); alu_and(gb, 0x03);
-  CYC(0x4012, 0x4013); push_effect(gb, 0x4013);
-  switch (farore_jumpTable(gb)) {
-    case 0x401f: goto jump0;
-    case 0x401b: goto jump1Or2;
-    case 0x4023: goto jump3;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+11, b_+14); A = mem_rd(gb, wTextInputResult);
+  CYC(b_+14, b_+16); alu_swap_a(gb);
+  CYC(b_+16, b_+18); alu_and(gb, 0x03);
+  CYC(b_+18, b_+19); push_effect(gb, b_+19);
+  do { uint16_t jt_ = (farore_jumpTable(gb));
+    if (jt_ == b_+31) { goto jump0; }
+    else if (jt_ == b_+27) { goto jump1Or2; }
+    else if (jt_ == b_+35) { goto jump3; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 jump1Or2:
-  CYC(0x401b, 0x401d); A = 0x04;
-  CYC(0x401d, 0x401f);
+  CYC(b_+27, b_+29); A = 0x04;
+  CYC(b_+29, b_+31);
   farore_setVar3f(gb, sp0_);
   return;
 
 jump0:
-  CYC(0x401f, 0x4021); A = 0x03;
-  CYC(0x4021, 0x4023);
+  CYC(b_+31, b_+33); A = 0x03;
+  CYC(b_+33, b_+35);
   farore_setVar3f(gb, sp0_);
   return;
 
 jump3:
-  CYC(0x4023, 0x4026); A = mem_rd(gb, 0xcc89);
-  CYC(0x4026, 0x4028); alu_and(gb, 0x0f);
-  CYC(0x4028, 0x402a); alu_add(gb, 0x5a);
-  CYC(0x402a, 0x402b); B = A;
-  CALL_C(0x402b, checkGlobalFlag_hook, 0x31f3, 0x402e);
-  CYC(0x402e, 0x4030); A = 0x02;
+  CYC(b_+35, b_+38); A = mem_rd(gb, wTextInputResult);
+  CYC(b_+38, b_+40); alu_and(gb, 0x0f);
+  CYC(b_+40, b_+42); alu_add(gb, 0x5a);
+  CYC(b_+42, b_+43); B = A;
+  CALL_C(b_+43, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+46);
+  CYC(b_+46, b_+48); A = 0x02;
   if (!(F & FZ)) {
-    CYCT(0x4030, 0x4032);
+    CYCT(b_+48, b_+50);
     farore_setVar3f(gb, sp0_);
     return;
   }
-  CYC(0x4030, 0x4032);
-  CYC(0x4032, 0x4033); A = B;
-  CYC(0x4033, 0x4035); alu_sub(gb, 0x0a);
-  CALL_C(0x4035, checkGlobalFlag_hook, 0x31f3, 0x4038);
-  CYC(0x4038, 0x403a); A = 0x01;
+  CYC(b_+48, b_+50);
+  CYC(b_+50, b_+51); A = B;
+  CYC(b_+51, b_+53); alu_sub(gb, 0x0a);
+  CALL_C(b_+53, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+56);
+  CYC(b_+56, b_+58); A = 0x01;
   if (!(F & FZ)) {
-    CYCT(0x403a, 0x403c);
+    CYCT(b_+58, b_+60);
     farore_setVar3f(gb, sp0_);
     return;
   }
-  CYC(0x403a, 0x403c);
-  CYC(0x403c, 0x403e); A = 0x05;
-  CYC(0x403e, 0x4040);
+  CYC(b_+58, b_+60);
+  CYC(b_+60, b_+62); A = 0x05;
+  CYC(b_+62, SYM(faroreShowTextForSecretHint));
   farore_setVar3f(gb, sp0_);
 }
 
 void faroreShowTextForSecretHint_hook(GB *gb) {
-  CYC(0x4040, 0x4043); A = mem_rd(gb, 0xcc89);
-  CYC(0x4043, 0x4045); alu_and(gb, 0x0f);
-  CYC(0x4045, 0x4047); alu_add(gb, 0x0f);
-  CYC(0x4047, 0x4048); C = A;
-  CYC(0x4048, 0x404a); B = 0x55;
-  CYC(0x404a, 0x404d); showText_hook(gb);
+  BASE(faroreShowTextForSecretHint);
+  CYC(b_+0, b_+3); A = mem_rd(gb, wTextInputResult);
+  CYC(b_+3, b_+5); alu_and(gb, 0x0f);
+  CYC(b_+5, b_+7); alu_add(gb, 0x0f);
+  CYC(b_+7, b_+8); C = A;
+  CYC(b_+8, b_+10); B = 0x55;
+  CYC(b_+10, SYM(faroreSpawnSecretChest)); showText_hook(gb);
 }
 
 void faroreSpawnSecretChest_hook(GB *gb) {
+  BASE(faroreSpawnSecretChest);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x404d, getFreeInteractionSlot_hook, 0x3aef, 0x4050);
+  CALL_C(b_+0, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+3);
   if (!(F & FZ)) {
-    RET_TAKEN(0x4050); return;
+    RET_TAKEN(b_+3); return;
   }
-  CYC(0x4050, 0x4051);
-  CYC(0x4051, 0x4053); mem_wr(gb, HL, 0xd9);
-  CYC(0x4053, 0x4054); L = alu_inc8(gb, L);
-  CYC(0x4054, 0x4057); A = mem_rd(gb, 0xcc89);
-  CYC(0x4057, 0x4059); alu_and(gb, 0x0f);
-  CYC(0x4059, 0x405a); mem_wr(gb, HL, A);
-  CYC(0x405a, 0x405c); L = 0x4b;
-  CYC(0x405c, 0x405e); C = 0x75;
-  CYC(0x405e, 0x4061); setShortPosition_paramC_hook(gb);
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+6); mem_wr(gb, HL, 0xd9);
+  CYC(b_+6, b_+7); L = alu_inc8(gb, L);
+  CYC(b_+7, b_+10); A = mem_rd(gb, wTextInputResult);
+  CYC(b_+10, b_+12); alu_and(gb, 0x0f);
+  CYC(b_+12, b_+13); mem_wr(gb, HL, A);
+  CYC(b_+13, b_+15); L = 0x4b;
+  CYC(b_+15, b_+17); C = 0x75;
+  CYC(b_+17, SYM(faroreGenerateGameTransferSecret)); setShortPosition_paramC_hook(gb);
 }
 
 void faroreGenerateGameTransferSecret_hook(GB *gb) {
-  CYC(0x4061, 0x4064); SET_HL(0x481b);
-  CYC(0x4064, 0x4066); E = 0x03;
-  CYC(0x4066, 0x4069); interBankCall_hook(gb);
+  BASE(faroreGenerateGameTransferSecret);
+  CYC(b_+0, b_+3); SET_HL((SYM(group2ObjectDataTable) + 224));
+  CYC(b_+3, b_+5); E = 0x03;
+  CYC(b_+5, SYM(doorController_updateLinkRespawn)); interBankCall_hook(gb);
 }

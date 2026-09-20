@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x10, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x10, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode02), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode02), (from), (to), true)
 
 // object_code/ages/enemies/veranFinalForm.s (ENEMY_VERAN_FINAL_FORM), bank $10.
 
@@ -117,1409 +117,1473 @@ void veranFinal_moveTowardTargetPosition_hook(GB *gb);
 void veranFinal_getQuadrant_hook(GB *gb);
 
 void enemyCode02_hook(GB *gb) {
+  BASE(enemyCode02);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  if ((F & FZ)) { CYCT(0x5827, 0x5829); goto normalStatus; } CYC(0x5827, 0x5829);  // jr z,@normalStatus
-  CYC(0x5829, 0x582b); alu_sub(gb, 0x03);  // sub ENEMYSTATUS_NO_HEALTH
-  if ((F & FC)) { RET_TAKEN(0x582b); return; } CYC(0x582b, 0x582c);  // ret c
-  if ((F & FZ)) { CYCT(0x582c, 0x582e); goto dead; } CYC(0x582c, 0x582e);  // jr z,@dead
-  CYC(0x582e, 0x582f); A = alu_dec8(gb, A);  // dec a
-  if ((F & FZ)) { CYCT(0x582f, 0x5831); goto justHit; } CYC(0x582f, 0x5831);  // jr z,@justHit
-  CYC(0x5831, 0x5833); C = 0x20;  // ld c,$20
-  CALL_C(0x5833, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x5836);
-  CYC(0x5836, 0x5839); if (hook_enabled_at(0x400a)) { ecom_updateKnockback_b10_hook(gb); return; } HANDOFF(0x400a);  // jp ecom_updateKnockback
+  if ((F & FZ)) { CYCT(b_+0, b_+2); goto normalStatus; } CYC(b_+0, b_+2);  // jr z,@normalStatus
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03);  // sub ENEMYSTATUS_NO_HEALTH
+  if ((F & FC)) { RET_TAKEN(b_+4); return; } CYC(b_+4, b_+5);  // ret c
+  if ((F & FZ)) { CYCT(b_+5, b_+7); goto dead; } CYC(b_+5, b_+7);  // jr z,@dead
+  CYC(b_+7, b_+8); A = alu_dec8(gb, A);  // dec a
+  if ((F & FZ)) { CYCT(b_+8, b_+10); goto justHit; } CYC(b_+8, b_+10);  // jr z,@justHit
+  CYC(b_+10, b_+12); C = 0x20;  // ld c,$20
+  CALL_C(b_+12, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+15);
+  CYC(b_+15, b_+18); if (hook_enabled_at(SYM(ecom_updateKnockback_b10))) { ecom_updateKnockback_b10_hook(gb); return; } HANDOFF(SYM(ecom_updateKnockback_b10));  // jp ecom_updateKnockback
 justHit:
-  CYC(0x5839, 0x583a); H = D;  // ld h,d
-  CYC(0x583a, 0x583c); L = 0x82;  // ld l,Enemy.subid
-  CYC(0x583c, 0x583d); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x583d, 0x583e); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { CYCT(0x583e, 0x5840); goto notTurtleForm; } CYC(0x583e, 0x5840);  // jr nz,@notTurtleForm
-  CYC(0x5840, 0x5842); L = 0xab;  // ld l,Enemy.invincibilityCounter
-  CYC(0x5842, 0x5843); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5843, 0x5844); alu_or(gb, A);  // or a
-  if ((F & FZ)) { CYCT(0x5844, 0x5846); goto normalStatus; } CYC(0x5844, 0x5846);  // jr z,@normalStatus
-  CYC(0x5846, 0x5848); L = 0xb3;  // ld l,Enemy.var33
-  CYC(0x5848, 0x584a); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  CYCT(0x584a, 0x584d); goto normalStatus;  // jr @normalStatus
+  CYC(b_+18, b_+19); H = D;  // ld h,d
+  CYC(b_+19, b_+21); L = 0x82;  // ld l,Enemy.subid
+  CYC(b_+21, b_+22); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+22, b_+23); alu_or(gb, A);  // or a
+  if (!(F & FZ)) { CYCT(b_+23, b_+25); goto notTurtleForm; } CYC(b_+23, b_+25);  // jr nz,@notTurtleForm
+  CYC(b_+25, b_+27); L = 0xab;  // ld l,Enemy.invincibilityCounter
+  CYC(b_+27, b_+28); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+28, b_+29); alu_or(gb, A);  // or a
+  if ((F & FZ)) { CYCT(b_+29, b_+31); goto normalStatus; } CYC(b_+29, b_+31);  // jr z,@normalStatus
+  CYC(b_+31, b_+33); L = 0xb3;  // ld l,Enemy.var33
+  CYC(b_+33, b_+35); mem_wr(gb, HL, 0x01);  // ld (hl),$01
+  CYCT(b_+35, b_+38); goto normalStatus;  // jr @normalStatus
 notTurtleForm:
-  CYC(0x584c, 0x584e); L = 0xad;  // ld l,Enemy.knockbackCounter
-  CYC(0x584e, 0x584f); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x584f, 0x5850); alu_or(gb, A);  // or a
-  if ((F & FZ)) { CYCT(0x5850, 0x5852); goto normalStatus; } CYC(0x5850, 0x5852);  // jr z,@normalStatus
-  CYC(0x5852, 0x5854); L = 0x84;  // ld l,Enemy.state
-  CYC(0x5854, 0x5856); mem_wr(gb, HL, 0x03);  // ld (hl),$03
-  CYC(0x5856, 0x5858); L = 0x86;  // ld l,Enemy.counter1
-  CYC(0x5858, 0x585a); mem_wr(gb, HL, 105);  // ld (hl),105
-  CYC(0x585a, 0x585c); L = 0xa5;  // ld l,Enemy.enemyCollisionMode
-  CYC(0x585c, 0x585e); mem_wr(gb, HL, 0x6b);  // ld (hl),ENEMYCOLLISION_VERAN_SPIDER_FORM_VULNERABLE
-  CYC(0x585e, 0x5861); A = mem_rd(gb, 0xd004);  // ld a,(w1Link.state)
-  CYC(0x5861, 0x5863); alu_cp(gb, 0x0d);  // cp LINK_STATE_GRABBED
-  if ((F & FZ)) { CALL_C_CC(0x5863, veranFinal_grabbingLink_hook, 0x5cd3, 0x5866); } else CYC(0x5863, 0x5866);  // call z,veranFinal_grabbingLink
-  CYC(0x5866, 0x5868); A = 0x06;  // ld a,$06
-  CYC(0x5868, 0x586b); if (hook_enabled_at(0x282b)) { enemySetAnimation_hook(gb); return; } HANDOFF(0x282b);  // jp enemySetAnimation
+  CYC(b_+37, b_+39); L = 0xad;  // ld l,Enemy.knockbackCounter
+  CYC(b_+39, b_+40); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+40, b_+41); alu_or(gb, A);  // or a
+  if ((F & FZ)) { CYCT(b_+41, b_+43); goto normalStatus; } CYC(b_+41, b_+43);  // jr z,@normalStatus
+  CYC(b_+43, b_+45); L = 0x84;  // ld l,Enemy.state
+  CYC(b_+45, b_+47); mem_wr(gb, HL, 0x03);  // ld (hl),$03
+  CYC(b_+47, b_+49); L = 0x86;  // ld l,Enemy.counter1
+  CYC(b_+49, b_+51); mem_wr(gb, HL, 105);  // ld (hl),105
+  CYC(b_+51, b_+53); L = 0xa5;  // ld l,Enemy.enemyCollisionMode
+  CYC(b_+53, b_+55); mem_wr(gb, HL, 0x6b);  // ld (hl),ENEMYCOLLISION_VERAN_SPIDER_FORM_VULNERABLE
+  CYC(b_+55, b_+58); A = mem_rd(gb, w1Link_state);  // ld a,(w1Link.state)
+  CYC(b_+58, b_+60); alu_cp(gb, 0x0d);  // cp LINK_STATE_GRABBED
+  if ((F & FZ)) { CALL_C_CC(b_+60, veranFinal_grabbingLink_hook, SYM(veranFinal_grabbingLink), b_+63); } else CYC(b_+60, b_+63);  // call z,veranFinal_grabbingLink
+  CYC(b_+63, b_+65); A = 0x06;  // ld a,$06
+  CYC(b_+65, b_+68); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 dead:
-  CALL_C(0x586b, veranFinal_dead_hook, 0x5f4e, 0x586e);
+  CALL_C(b_+68, veranFinal_dead_hook, SYM(veranFinal_dead), b_+71);
 normalStatus:
-  CYC(0x586e, 0x5870); E = 0x82;  // ld e,Enemy.subid
-  CYC(0x5870, 0x5871); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5871, 0x5873); E = 0x84;  // ld e,Enemy.state
-  CYC(0x5873, 0x5874); push_effect(gb, 0x5874);
-  switch (veranFinal_jump_table(gb)) {
-    case 0x587a: veranFinal_turtleForm_hook(gb); return;
-    case 0x5ab4: veranFinal_spiderForm_hook(gb); return;
-    case 0x5cdd: veranFinal_beeForm_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+71, b_+73); E = 0x82;  // ld e,Enemy.subid
+  CYC(b_+73, b_+74); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+74, b_+76); E = 0x84;  // ld e,Enemy.state
+  CYC(b_+76, b_+77); push_effect(gb, b_+77);
+  do { uint16_t jt_ = (veranFinal_jump_table(gb));
+    if (jt_ == SYM(veranFinal_turtleForm)) { veranFinal_turtleForm_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm)) { veranFinal_spiderForm_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm)) { veranFinal_beeForm_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void veranFinal_turtleForm_hook(GB *gb) {
+  BASE(veranFinal_turtleForm);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x587a, 0x587b); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x587b, 0x587c); push_effect(gb, 0x587c);
-  switch (veranFinal_jump_table(gb)) {
-    case 0x5892: veranFinal_turtleForm_state0_hook(gb); return;
-    case 0x58cd: veranFinal_turtleForm_state1_hook(gb); return;
-    case 0x5917: veranFinal_turtleForm_state2_hook(gb); return;
-    case 0x593c: veranFinal_turtleForm_state3_hook(gb); return;
-    case 0x5964: veranFinal_turtleForm_state4_hook(gb); return;
-    case 0x598f: veranFinal_turtleForm_state5_hook(gb); return;
-    case 0x59dc: veranFinal_turtleForm_state6_hook(gb); return;
-    case 0x59f9: veranFinal_turtleForm_state7_hook(gb); return;
-    case 0x5a06: veranFinal_turtleForm_state8_hook(gb); return;
-    case 0x5a25: veranFinal_turtleForm_state9_hook(gb); return;
-    case 0x5a47: veranFinal_turtleForm_stateA_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+1, b_+2); push_effect(gb, b_+2);
+  do { uint16_t jt_ = (veranFinal_jump_table(gb));
+    if (jt_ == SYM(veranFinal_turtleForm_state0)) { veranFinal_turtleForm_state0_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state1)) { veranFinal_turtleForm_state1_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state2)) { veranFinal_turtleForm_state2_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state3)) { veranFinal_turtleForm_state3_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state4)) { veranFinal_turtleForm_state4_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state5)) { veranFinal_turtleForm_state5_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state6)) { veranFinal_turtleForm_state6_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state7)) { veranFinal_turtleForm_state7_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state8)) { veranFinal_turtleForm_state8_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state9)) { veranFinal_turtleForm_state9_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_stateA)) { veranFinal_turtleForm_stateA_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void veranFinal_turtleForm_state0_hook(GB *gb) {
+  BASE(veranFinal_turtleForm_state0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5892, 0x5894); A = 0x02;  // ld a,$02
-  CYC(0x5894, 0x5897); mem_wr(gb, 0xcc1d, A);  // ld (wEnemyIDToLoadExtraGfx),a
-  CYC(0x5897, 0x5899); A = 0x87;  // ld a,PALH_87
-  CALL_C(0x5899, loadPaletteHeader_hook, 0x050b, 0x589c);
-  CYC(0x589c, 0x589e); A = 0xf0;  // ld a,SNDCTRL_STOPMUSIC
-  CALL_C(0x589e, playSound_b00_hook, 0x0c98, 0x58a1);
-  CYC(0x58a1, 0x58a3); A = 0x01;  // ld a,$01
-  CYC(0x58a3, 0x58a6); mem_wr(gb, 0xcc8a, A);  // ld (wDisabledObjects),a
-  CYC(0x58a6, 0x58a9); mem_wr(gb, 0xcc02, A);  // ld (wMenuDisabled),a
-  CYC(0x58a9, 0x58ac); SET_BC(0x0208);  // ld bc,$0208
-  CALL_C(0x58ac, enemyBoss_spawnShadow_b10_hook, 0x4534, 0x58af);
-  if (!(F & FZ)) { RET_TAKEN(0x58af); return; } CYC(0x58af, 0x58b0);  // ret nz
-  CALL_C(0x58b0, ecom_incState_b10_hook, 0x4000, 0x58b3);
-  CALL_C(0x58b3, checkIsLinkedGame_hook, 0x1992, 0x58b6);
-  CYC(0x58b6, 0x58b8); L = 0xa9;  // ld l,Enemy.health
-  CYC(0x58b8, 0x58b9); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x58b9, 0x58bc); SET_BC(0x0c18);  // ld bc,$0c18
-  if (!(F & FZ)) { CYCT(0x58bc, 0x58be); goto setForms; } CYC(0x58bc, 0x58be);  // jr nz,+
-  CYC(0x58be, 0x58c0); A = 0x14;  // ld a,$14
-  CYC(0x58c0, 0x58c1); mem_wr(gb, HL, A);  // ld (hl),a
-  CYC(0x58c1, 0x58c4); SET_BC(0x080f);  // ld bc,$080f
+  CYC(b_+0, b_+2); A = 0x02;  // ld a,$02
+  CYC(b_+2, b_+5); mem_wr(gb, wEnemyIDToLoadExtraGfx, A);  // ld (wEnemyIDToLoadExtraGfx),a
+  CYC(b_+5, b_+7); A = 0x87;  // ld a,PALH_87
+  CALL_C(b_+7, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+10);
+  CYC(b_+10, b_+12); A = 0xf0;  // ld a,SNDCTRL_STOPMUSIC
+  CALL_C(b_+12, playSound_b00_hook, SYM(playSound_b00), b_+15);
+  CYC(b_+15, b_+17); A = 0x01;  // ld a,$01
+  CYC(b_+17, b_+20); mem_wr(gb, wDisabledObjects, A);  // ld (wDisabledObjects),a
+  CYC(b_+20, b_+23); mem_wr(gb, wMenuDisabled, A);  // ld (wMenuDisabled),a
+  CYC(b_+23, b_+26); SET_BC((SYM(checkFlag) + 3));  // ld bc,$0208
+  CALL_C(b_+26, enemyBoss_spawnShadow_b10_hook, SYM(enemyBoss_spawnShadow_b10), b_+29);
+  if (!(F & FZ)) { RET_TAKEN(b_+29); return; } CYC(b_+29, b_+30);  // ret nz
+  CALL_C(b_+30, ecom_incState_b10_hook, SYM(ecom_incState_b10), b_+33);
+  CALL_C(b_+33, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+36);
+  CYC(b_+36, b_+38); L = 0xa9;  // ld l,Enemy.health
+  CYC(b_+38, b_+39); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+39, b_+42); SET_BC((SYM(data_0bfd) + 27));  // ld bc,$0c18
+  if (!(F & FZ)) { CYCT(b_+42, b_+44); goto setForms; } CYC(b_+42, b_+44);  // jr nz,+
+  CYC(b_+44, b_+46); A = 0x14;  // ld a,$14
+  CYC(b_+46, b_+47); mem_wr(gb, HL, A);  // ld (hl),a
+  CYC(b_+47, b_+50); SET_BC((SYM(loadTilesetHlpr) + 17));  // ld bc,$080f
 setForms:
-  CYC(0x58c4, 0x58c6); L = 0xb0;  // ld l,Enemy.var30
-  CYC(0x58c6, 0x58c7); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
-  CYC(0x58c7, 0x58c8); mem_wr(gb, HL, B);  // ld (hl),b [var31]
-  CYC(0x58c8, 0x58c9); L = alu_inc8(gb, L);  // inc l
-  CYC(0x58c9, 0x58ca); mem_wr(gb, HL, C);  // ld (hl),c [var32]
-  CYC(0x58ca, 0x58cd); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp objectSetVisible83
+  CYC(b_+50, b_+52); L = 0xb0;  // ld l,Enemy.var30
+  CYC(b_+52, b_+53); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
+  CYC(b_+53, b_+54); mem_wr(gb, HL, B);  // ld (hl),b [var31]
+  CYC(b_+54, b_+55); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+55, b_+56); mem_wr(gb, HL, C);  // ld (hl),c [var32]
+  CYC(b_+56, SYM(veranFinal_turtleForm_state1)); if (hook_enabled_at(SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; } HANDOFF(SYM(objectSetVisible83));  // jp objectSetVisible83
 }
 
 void veranFinal_turtleForm_state1_hook(GB *gb) {
+  BASE(veranFinal_turtleForm_state1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x58cd, 0x58ce); E = alu_inc8(gb, E);  // inc e
-  CYC(0x58ce, 0x58cf); A = mem_rd(gb, DE);  // ld a,(de) [substate]
-  CYC(0x58cf, 0x58d0); push_effect(gb, 0x58d0);
-  switch (veranFinal_jump_table(gb)) {
-    case 0x58d6: goto substate0;
-    case 0x58e9: goto substate1;
-    case 0x5900: goto substate2;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+1); E = alu_inc8(gb, E);  // inc e
+  CYC(b_+1, b_+2); A = mem_rd(gb, DE);  // ld a,(de) [substate]
+  CYC(b_+2, b_+3); push_effect(gb, b_+3);
+  do { uint16_t jt_ = (veranFinal_jump_table(gb));
+    if (jt_ == b_+9) { goto substate0; }
+    else if (jt_ == b_+28) { goto substate1; }
+    else if (jt_ == b_+51) { goto substate2; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 substate0:
-  CYC(0x58d6, 0x58d9); A = mem_rd(gb, 0xc4ab);  // ld a,(wPaletteThread_mode)
-  CYC(0x58d9, 0x58da); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x58da); return; } CYC(0x58da, 0x58db);  // ret nz
-  CYC(0x58db, 0x58dd); A = 0xd2;  // ld a,SND_LIGHTNING
-  CALL_C(0x58dd, playSound_b00_hook, 0x0c98, 0x58e0);
-  CYC(0x58e0, 0x58e3); SET_BC(0x5614);  // ld bc,TX_5614
-  CALL_C(0x58e3, showText_hook, 0x1872, 0x58e6);
-  CYC(0x58e6, 0x58e9); if (hook_enabled_at(0x4005)) { ecom_incSubstate_b10_hook(gb); return; } HANDOFF(0x4005);  // jp ecom_incSubstate
+  CYC(b_+9, b_+12); A = mem_rd(gb, wPaletteThread_mode);  // ld a,(wPaletteThread_mode)
+  CYC(b_+12, b_+13); alu_or(gb, A);  // or a
+  if (!(F & FZ)) { RET_TAKEN(b_+13); return; } CYC(b_+13, b_+14);  // ret nz
+  CYC(b_+14, b_+16); A = 0xd2;  // ld a,SND_LIGHTNING
+  CALL_C(b_+16, playSound_b00_hook, SYM(playSound_b00), b_+19);
+  CYC(b_+19, b_+22); SET_BC((SYM(ganon_stateC_substate8) + 29));  // ld bc,TX_5614
+  CALL_C(b_+22, showText_hook, SYM(showText), b_+25);
+  CYC(b_+25, b_+28); if (hook_enabled_at(SYM(ecom_incSubstate_b10))) { ecom_incSubstate_b10_hook(gb); return; } HANDOFF(SYM(ecom_incSubstate_b10));  // jp ecom_incSubstate
 substate1:
-  CYC(0x58e9, 0x58ea); H = D;  // ld h,d
-  CYC(0x58ea, 0x58eb); L = E;  // ld l,e
-  CYC(0x58eb, 0x58ec); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x58ec, 0x58ed); alu_xor(gb, A);  // xor a
-  CYC(0x58ed, 0x58f0); mem_wr(gb, 0xcc8a, A);  // ld (wDisabledObjects),a
-  CYC(0x58f0, 0x58f3); mem_wr(gb, 0xcc02, A);  // ld (wMenuDisabled),a
-  CYC(0x58f3, 0x58f5); A = 0x03;  // ld a,$03
-  CALL_C(0x58f5, enemySetAnimation_hook, 0x282b, 0x58f8);
-  CYC(0x58f8, 0x58fa); A = 0x32;  // ld a,MUS_FINAL_BOSS
-  CYC(0x58fa, 0x58fd); mem_wr(gb, 0xcc35, A);  // ld (wActiveMusic),a
-  CYC(0x58fd, 0x5900); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp playSound
+  CYC(b_+28, b_+29); H = D;  // ld h,d
+  CYC(b_+29, b_+30); L = E;  // ld l,e
+  CYC(b_+30, b_+31); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+31, b_+32); alu_xor(gb, A);  // xor a
+  CYC(b_+32, b_+35); mem_wr(gb, wDisabledObjects, A);  // ld (wDisabledObjects),a
+  CYC(b_+35, b_+38); mem_wr(gb, wMenuDisabled, A);  // ld (wMenuDisabled),a
+  CYC(b_+38, b_+40); A = 0x03;  // ld a,$03
+  CALL_C(b_+40, enemySetAnimation_hook, SYM(enemySetAnimation), b_+43);
+  CYC(b_+43, b_+45); A = 0x32;  // ld a,MUS_FINAL_BOSS
+  CYC(b_+45, b_+48); mem_wr(gb, wActiveMusic, A);  // ld (wActiveMusic),a
+  CYC(b_+48, b_+51); if (hook_enabled_at(SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
 substate2:
-  CALL_C(0x5900, enemyAnimate_hook, 0x2818, 0x5903);
-  CYC(0x5903, 0x5905); E = 0xa1;  // ld e,Enemy.animParameter
-  CYC(0x5905, 0x5906); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5906, 0x5907); A = alu_inc8(gb, A);  // inc a
-  if (!(F & FZ)) { RET_TAKEN(0x5907); return; } CYC(0x5907, 0x5908);  // ret nz
-  CALL_C(0x5908, ecom_incState_b10_hook, 0x4000, 0x590b);
-  CYC(0x590b, 0x590d); L = 0x86;  // ld l,Enemy.counter1
-  CYC(0x590d, 0x590f); mem_wr(gb, HL, 30);  // ld (hl),30
-  CYC(0x590f, 0x5911); L = 0x90;  // ld l,Enemy.speed
-  CYC(0x5911, 0x5913); mem_wr(gb, HL, 0x46);  // ld (hl),SPEED_1c0
-  CYC(0x5913, 0x5914); A = alu_inc8(gb, A);  // inc a
-  CYC(0x5914, 0x5917); if (hook_enabled_at(0x282b)) { enemySetAnimation_hook(gb); return; } HANDOFF(0x282b);  // jp enemySetAnimation
+  CALL_C(b_+51, enemyAnimate_hook, SYM(enemyAnimate), b_+54);
+  CYC(b_+54, b_+56); E = 0xa1;  // ld e,Enemy.animParameter
+  CYC(b_+56, b_+57); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+57, b_+58); A = alu_inc8(gb, A);  // inc a
+  if (!(F & FZ)) { RET_TAKEN(b_+58); return; } CYC(b_+58, b_+59);  // ret nz
+  CALL_C(b_+59, ecom_incState_b10_hook, SYM(ecom_incState_b10), b_+62);
+  CYC(b_+62, b_+64); L = 0x86;  // ld l,Enemy.counter1
+  CYC(b_+64, b_+66); mem_wr(gb, HL, 30);  // ld (hl),30
+  CYC(b_+66, b_+68); L = 0x90;  // ld l,Enemy.speed
+  CYC(b_+68, b_+70); mem_wr(gb, HL, 0x46);  // ld (hl),SPEED_1c0
+  CYC(b_+70, b_+71); A = alu_inc8(gb, A);  // inc a
+  CYC(b_+71, SYM(veranFinal_turtleForm_state2)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void veranFinal_turtleForm_state2_hook(GB *gb) {
+  BASE(veranFinal_turtleForm_state2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5917, 0x5919); E = 0xa1;  // ld e,Enemy.animParameter
-  CYC(0x5919, 0x591a); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x591a, 0x591b); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { CYCT(0x591b, 0x591e); if (hook_enabled_at(0x2818)) { enemyAnimate_hook(gb); return; } HANDOFF(0x2818); } CYC(0x591b, 0x591e);  // jp nz,enemyAnimate
-  CALL_C(0x591e, ecom_decCounter1_b10_hook, 0x439a, 0x5921);
-  if (!(F & FZ)) { RET_TAKEN(0x5921); return; } CYC(0x5921, 0x5922);  // ret nz
-  CYC(0x5922, 0x5924); L = 0x84;  // ld l,Enemy.state
-  CYC(0x5924, 0x5925); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x5925, 0x5927); L = 0x94;  // ld l,Enemy.speedZ
-  CYC(0x5927, 0x5929); mem_wr(gb, HL, 0x00);  // ld (hl),<(-$400)
-  CYC(0x5929, 0x592a); L = alu_inc8(gb, L);  // inc l
-  CYC(0x592a, 0x592c); mem_wr(gb, HL, 0xfc);  // ld (hl),>(-$400)
-  CALL_C(0x592c, ecom_updateAngleTowardTarget_b10_hook, 0x43bf, 0x592f);
-  CALL_C(0x592f, objectSetVisible81_hook, 0x1e60, 0x5932);
-  CYC(0x5932, 0x5934); A = 0x69;  // ld a,SND_UNKNOWN4
-  CALL_C(0x5934, playSound_b00_hook, 0x0c98, 0x5937);
-  CYC(0x5937, 0x5939); A = 0x02;  // ld a,$02
-  CYC(0x5939, 0x593c); if (hook_enabled_at(0x282b)) { enemySetAnimation_hook(gb); return; } HANDOFF(0x282b);  // jp enemySetAnimation
+  CYC(b_+0, b_+2); E = 0xa1;  // ld e,Enemy.animParameter
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+3, b_+4); alu_or(gb, A);  // or a
+  if (!(F & FZ)) { CYCT(b_+4, b_+7); if (hook_enabled_at(SYM(enemyAnimate))) { enemyAnimate_hook(gb); return; } HANDOFF(SYM(enemyAnimate)); } CYC(b_+4, b_+7);  // jp nz,enemyAnimate
+  CALL_C(b_+7, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+10);
+  if (!(F & FZ)) { RET_TAKEN(b_+10); return; } CYC(b_+10, b_+11);  // ret nz
+  CYC(b_+11, b_+13); L = 0x84;  // ld l,Enemy.state
+  CYC(b_+13, b_+14); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+14, b_+16); L = 0x94;  // ld l,Enemy.speedZ
+  CYC(b_+16, b_+18); mem_wr(gb, HL, 0x00);  // ld (hl),<(-$400)
+  CYC(b_+18, b_+19); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+19, b_+21); mem_wr(gb, HL, 0xfc);  // ld (hl),>(-$400)
+  CALL_C(b_+21, ecom_updateAngleTowardTarget_b10_hook, SYM(ecom_updateAngleTowardTarget_b10), b_+24);
+  CALL_C(b_+24, objectSetVisible81_hook, SYM(objectSetVisible81), b_+27);
+  CYC(b_+27, b_+29); A = 0x69;  // ld a,SND_UNKNOWN4
+  CALL_C(b_+29, playSound_b00_hook, SYM(playSound_b00), b_+32);
+  CYC(b_+32, b_+34); A = 0x02;  // ld a,$02
+  CYC(b_+34, SYM(veranFinal_turtleForm_state3)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void veranFinal_turtleForm_state3_hook(GB *gb) {
+  BASE(veranFinal_turtleForm_state3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x593c, 0x593e); C = 0x20;  // ld c,$20
-  CALL_C(0x593e, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x5941);
-  CYC(0x5941, 0x5942); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ldd a,(hl)
-  CYC(0x5942, 0x5943); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  if (!(F & FZ)) { CYCT(0x5943, 0x5946); if (hook_enabled_at(0x414c)) { ecom_applyVelocityForTopDownEnemyNoHoles_b10_hook(gb); return; } HANDOFF(0x414c); } CYC(0x5943, 0x5946);  // jp nz,ecom_applyVelocityForTopDownEnemyNoHoles
-  CYC(0x5946, 0x5947); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5947, 0x5948); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl) [speedZ]=$0100
-  CYC(0x5948, 0x594a); L = 0x84;  // ld l,Enemy.state
-  CYC(0x594a, 0x594b); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x594b, 0x594d); L = 0x90;  // ld l,Enemy.speed
-  CYC(0x594d, 0x594f); mem_wr(gb, HL, 0x78);  // ld (hl),SPEED_300
-  CYC(0x594f, 0x5951); L = 0xb6;  // ld l,Enemy.var36
-  CYC(0x5951, 0x5953); A = mem_rd(gb, 0xffb0);  // ldh a,(<hEnemyTargetY)
-  CYC(0x5953, 0x5955); alu_and(gb, 0xf0);  // and $f0
-  CYC(0x5955, 0x5957); alu_add(gb, 0x08);  // add $08
-  CYC(0x5957, 0x5958); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
-  CYC(0x5958, 0x595a); A = mem_rd(gb, 0xffb1);  // ldh a,(<hEnemyTargetX)
-  CYC(0x595a, 0x595c); alu_and(gb, 0xf0);  // and $f0
-  CYC(0x595c, 0x595e); alu_add(gb, 0x08);  // add $08
-  CYC(0x595e, 0x595f); mem_wr(gb, HL, A);  // ld (hl),a [var37]
-  CYC(0x595f, 0x5961); A = 0x01;  // ld a,$01
-  CYC(0x5961, 0x5964); if (hook_enabled_at(0x282b)) { enemySetAnimation_hook(gb); return; } HANDOFF(0x282b);  // jp enemySetAnimation
+  CYC(b_+0, b_+2); C = 0x20;  // ld c,$20
+  CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL); SET_HL(HL - 1);  // ldd a,(hl)
+  CYC(b_+6, b_+7); alu_or(gb, mem_rd(gb, HL));  // or (hl)
+  if (!(F & FZ)) { CYCT(b_+7, b_+10); if (hook_enabled_at(SYM(ecom_applyVelocityForTopDownEnemyNoHoles_b10))) { ecom_applyVelocityForTopDownEnemyNoHoles_b10_hook(gb); return; } HANDOFF(SYM(ecom_applyVelocityForTopDownEnemyNoHoles_b10)); } CYC(b_+7, b_+10);  // jp nz,ecom_applyVelocityForTopDownEnemyNoHoles
+  CYC(b_+10, b_+11); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+11, b_+12); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl) [speedZ]=$0100
+  CYC(b_+12, b_+14); L = 0x84;  // ld l,Enemy.state
+  CYC(b_+14, b_+15); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+15, b_+17); L = 0x90;  // ld l,Enemy.speed
+  CYC(b_+17, b_+19); mem_wr(gb, HL, 0x78);  // ld (hl),SPEED_300
+  CYC(b_+19, b_+21); L = 0xb6;  // ld l,Enemy.var36
+  CYC(b_+21, b_+23); A = mem_rd(gb, hEnemyTargetY);  // ldh a,(<hEnemyTargetY)
+  CYC(b_+23, b_+25); alu_and(gb, 0xf0);  // and $f0
+  CYC(b_+25, b_+27); alu_add(gb, 0x08);  // add $08
+  CYC(b_+27, b_+28); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
+  CYC(b_+28, b_+30); A = mem_rd(gb, hEnemyTargetX);  // ldh a,(<hEnemyTargetX)
+  CYC(b_+30, b_+32); alu_and(gb, 0xf0);  // and $f0
+  CYC(b_+32, b_+34); alu_add(gb, 0x08);  // add $08
+  CYC(b_+34, b_+35); mem_wr(gb, HL, A);  // ld (hl),a [var37]
+  CYC(b_+35, b_+37); A = 0x01;  // ld a,$01
+  CYC(b_+37, SYM(veranFinal_turtleForm_state4)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void veranFinal_turtleForm_state4_hook(GB *gb) {
+  BASE(veranFinal_turtleForm_state4);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5964, 0x5966); C = 0x10;  // ld c,$10
-  CALL_C(0x5966, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x5969);
-  if ((F & FZ)) { CYCT(0x5969, 0x596b); goto nextState; } CYC(0x5969, 0x596b);  // jr z,@nextState
-  CALL_C(0x596b, veranFinal_moveTowardTargetPosition_hook, 0x601c, 0x596e);
-  if (!(F & FC)) { RET_TAKEN(0x596e); return; } CYC(0x596e, 0x596f);  // ret nc
-  CYC(0x596f, 0x5971); L = 0x8b;  // ld l,Enemy.yh
-  CYC(0x5971, 0x5972); mem_wr(gb, HL, B);  // ld (hl),b
-  CYC(0x5972, 0x5974); L = 0x8d;  // ld l,Enemy.xh
-  CYC(0x5974, 0x5975); mem_wr(gb, HL, C);  // ld (hl),c
-  RET(0x5975); return;  // ret
+  CYC(b_+0, b_+2); C = 0x10;  // ld c,$10
+  CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
+  if ((F & FZ)) { CYCT(b_+5, b_+7); goto nextState; } CYC(b_+5, b_+7);  // jr z,@nextState
+  CALL_C(b_+7, veranFinal_moveTowardTargetPosition_hook, SYM(veranFinal_moveTowardTargetPosition), b_+10);
+  if (!(F & FC)) { RET_TAKEN(b_+10); return; } CYC(b_+10, b_+11);  // ret nc
+  CYC(b_+11, b_+13); L = 0x8b;  // ld l,Enemy.yh
+  CYC(b_+13, b_+14); mem_wr(gb, HL, B);  // ld (hl),b
+  CYC(b_+14, b_+16); L = 0x8d;  // ld l,Enemy.xh
+  CYC(b_+16, b_+17); mem_wr(gb, HL, C);  // ld (hl),c
+  RET(b_+17); return;  // ret
 nextState:
-  CYC(0x5976, 0x5978); A = 0x10;  // ld a,$10
-  CALL_C(0x5978, setScreenShakeCounter_hook, 0x24bb, 0x597b);
-  CALL_C(0x597b, ecom_incState_b10_hook, 0x4000, 0x597e);
-  CYC(0x597e, 0x5980); L = 0x86;  // ld l,Enemy.counter1
-  CYC(0x5980, 0x5982); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
-  CALL_C(0x5982, objectSetVisible83_hook, 0x1e72, 0x5985);
-  CYC(0x5985, 0x5987); A = 0x98;  // ld a,$98
-  CALL_C(0x5987, playSound_b00_hook, 0x0c98, 0x598a);
-  CYC(0x598a, 0x598c); B = 0x57;  // ld b,PART_VERAN_ACID_POOL
-  CYC(0x598c, 0x598f); if (hook_enabled_at(0x437c)) { ecom_spawnProjectile_b10_hook(gb); return; } HANDOFF(0x437c);  // jp ecom_spawnProjectile
+  CYC(b_+18, b_+20); A = 0x10;  // ld a,$10
+  CALL_C(b_+20, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+23);
+  CALL_C(b_+23, ecom_incState_b10_hook, SYM(ecom_incState_b10), b_+26);
+  CYC(b_+26, b_+28); L = 0x86;  // ld l,Enemy.counter1
+  CYC(b_+28, b_+30); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
+  CALL_C(b_+30, objectSetVisible83_hook, SYM(objectSetVisible83), b_+33);
+  CYC(b_+33, b_+35); A = 0x98;  // ld a,$98
+  CALL_C(b_+35, playSound_b00_hook, SYM(playSound_b00), b_+38);
+  CYC(b_+38, b_+40); B = 0x57;  // ld b,PART_VERAN_ACID_POOL
+  CYC(b_+40, SYM(veranFinal_turtleForm_state5)); if (hook_enabled_at(SYM(ecom_spawnProjectile_b10))) { ecom_spawnProjectile_b10_hook(gb); return; } HANDOFF(SYM(ecom_spawnProjectile_b10));  // jp ecom_spawnProjectile
 }
 
 void veranFinal_turtleForm_state5_hook(GB *gb) {
+  BASE(veranFinal_turtleForm_state5);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x598f, ecom_decCounter1_b10_hook, 0x439a, 0x5992);
-  if (!(F & FZ)) { RET_TAKEN(0x5992); return; } CYC(0x5992, 0x5993);  // ret nz
-  CYC(0x5993, 0x5995); L = 0x90;  // ld l,Enemy.speed
-  CYC(0x5995, 0x5997); mem_wr(gb, HL, 0x46);  // ld (hl),SPEED_1c0
-  CYC(0x5997, 0x5999); L = 0xb3;  // ld l,Enemy.var33
-  CYC(0x5999, 0x599b); alu_bit(gb, 0, mem_rd(gb, HL));  // bit 0,(hl)
-  CYC(0x599b, 0x599d); L = 0xb4;  // ld l,Enemy.var34
-  if ((F & FZ)) { CYCT(0x599d, 0x599f); goto haveVar34; } CYC(0x599d, 0x599f);  // jr z,+
-  CYC(0x599f, 0x59a0); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
+  CYC(b_+4, b_+6); L = 0x90;  // ld l,Enemy.speed
+  CYC(b_+6, b_+8); mem_wr(gb, HL, 0x46);  // ld (hl),SPEED_1c0
+  CYC(b_+8, b_+10); L = 0xb3;  // ld l,Enemy.var33
+  CYC(b_+10, b_+12); alu_bit(gb, 0, mem_rd(gb, HL));  // bit 0,(hl)
+  CYC(b_+12, b_+14); L = 0xb4;  // ld l,Enemy.var34
+  if ((F & FZ)) { CYCT(b_+14, b_+16); goto haveVar34; } CYC(b_+14, b_+16);  // jr z,+
+  CYC(b_+16, b_+17); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
 haveVar34:
-  CYC(0x59a0, 0x59a1); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x59a1, 0x59a4); SET_BC(0x59d7);  // ld bc,@transformProbabilities
-  CALL_C(0x59a4, addAToBc_hook, 0x006d, 0x59a7);
-  CYC(0x59a7, 0x59a8); A = mem_rd(gb, BC);  // ld a,(bc)
-  CYC(0x59a8, 0x59a9); B = A;  // ld b,a
-  CYC(0x59a9, 0x59aa); A = alu_inc8(gb, A);  // inc a
-  CYC(0x59aa, 0x59ab); L = E;  // ld l,e
-  if ((F & FZ)) { CYCT(0x59ab, 0x59ad); goto tryOpenFace; } CYC(0x59ab, 0x59ad);  // jr z,++
-  CALL_C(0x59ad, getRandomNumber_hook, 0x043e, 0x59b0);
-  CYC(0x59b0, 0x59b1); alu_and(gb, B);  // and b
-  if ((F & FZ)) { CYCT(0x59b1, 0x59b4); veranFinal_transformToBeeOrSpider_hook(gb); return; } CYC(0x59b1, 0x59b4);  // jp z,veranFinal_transformToBeeOrSpider
-  CYC(0x59b4, 0x59b6); E = 0xb3;  // ld e,Enemy.var33
-  CYC(0x59b6, 0x59b7); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x59b7, 0x59b8); alu_rrca(gb);  // rrca
-  if ((F & FC)) { CYCT(0x59b8, 0x59ba); goto jumpAgain; } CYC(0x59b8, 0x59ba);  // jr c,@jumpAgain
+  CYC(b_+17, b_+18); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+18, b_+21); SET_BC(b_+72);  // ld bc,@transformProbabilities
+  CALL_C(b_+21, addAToBc_hook, 0x006d, b_+24);
+  CYC(b_+24, b_+25); A = mem_rd(gb, BC);  // ld a,(bc)
+  CYC(b_+25, b_+26); B = A;  // ld b,a
+  CYC(b_+26, b_+27); A = alu_inc8(gb, A);  // inc a
+  CYC(b_+27, b_+28); L = E;  // ld l,e
+  if ((F & FZ)) { CYCT(b_+28, b_+30); goto tryOpenFace; } CYC(b_+28, b_+30);  // jr z,++
+  CALL_C(b_+30, getRandomNumber_hook, SYM(getRandomNumber), b_+33);
+  CYC(b_+33, b_+34); alu_and(gb, B);  // and b
+  if ((F & FZ)) { CYCT(b_+34, b_+37); veranFinal_transformToBeeOrSpider_hook(gb); return; } CYC(b_+34, b_+37);  // jp z,veranFinal_transformToBeeOrSpider
+  CYC(b_+37, b_+39); E = 0xb3;  // ld e,Enemy.var33
+  CYC(b_+39, b_+40); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+40, b_+41); alu_rrca(gb);  // rrca
+  if ((F & FC)) { CYCT(b_+41, b_+43); goto jumpAgain; } CYC(b_+41, b_+43);  // jr c,@jumpAgain
 tryOpenFace:
-  CALL_C(0x59ba, getRandomNumber_hook, 0x043e, 0x59bd);
-  CYC(0x59bd, 0x59bf); alu_cp(gb, 90);  // cp 90
-  if (!(F & FC)) { CYCT(0x59bf, 0x59c1); goto jumpAgain; } CYC(0x59bf, 0x59c1);  // jr nc,@jumpAgain
-  CYC(0x59c1, 0x59c2); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl) [substate]=6
-  CYC(0x59c2, 0x59c4); L = 0x86;  // ld l,Enemy.counter1
-  CYC(0x59c4, 0x59c6); mem_wr(gb, HL, 0x08);  // ld (hl),$08
-  CYC(0x59c6, 0x59c8); A = 0xc7;  // ld a,SND_GORON
-  CALL_C(0x59c8, playSound_b00_hook, 0x0c98, 0x59cb);
-  CYC(0x59cb, 0x59cd); A = 0x04;  // ld a,$04
-  CYC(0x59cd, 0x59d0); if (hook_enabled_at(0x282b)) { enemySetAnimation_hook(gb); return; } HANDOFF(0x282b);  // jp enemySetAnimation
+  CALL_C(b_+43, getRandomNumber_hook, SYM(getRandomNumber), b_+46);
+  CYC(b_+46, b_+48); alu_cp(gb, 90);  // cp 90
+  if (!(F & FC)) { CYCT(b_+48, b_+50); goto jumpAgain; } CYC(b_+48, b_+50);  // jr nc,@jumpAgain
+  CYC(b_+50, b_+51); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl) [substate]=6
+  CYC(b_+51, b_+53); L = 0x86;  // ld l,Enemy.counter1
+  CYC(b_+53, b_+55); mem_wr(gb, HL, 0x08);  // ld (hl),$08
+  CYC(b_+55, b_+57); A = 0xc7;  // ld a,SND_GORON
+  CALL_C(b_+57, playSound_b00_hook, SYM(playSound_b00), b_+60);
+  CYC(b_+60, b_+62); A = 0x04;  // ld a,$04
+  CYC(b_+62, b_+65); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 jumpAgain:
-  CYC(0x59d0, 0x59d2); mem_wr(gb, HL, 0x02);  // ld (hl),$02 [state]
-  CYC(0x59d2, 0x59d4); L = 0x86;  // ld l,Enemy.counter1
-  CYC(0x59d4, 0x59d6); mem_wr(gb, HL, 30);  // ld (hl),30
-  RET(0x59d6); return;  // ret
+  CYC(b_+65, b_+67); mem_wr(gb, HL, 0x02);  // ld (hl),$02 [state]
+  CYC(b_+67, b_+69); L = 0x86;  // ld l,Enemy.counter1
+  CYC(b_+69, b_+71); mem_wr(gb, HL, 30);  // ld (hl),30
+  RET(b_+71); return;  // ret
 }
 
 void veranFinal_turtleForm_state6_hook(GB *gb) {
+  BASE(veranFinal_turtleForm_state6);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x59dc, enemyAnimate_hook, 0x2818, 0x59df);
-  CYC(0x59df, 0x59e0); H = D;  // ld h,d
-  CYC(0x59e0, 0x59e2); L = 0xa1;  // ld l,Enemy.animParameter
-  CYC(0x59e2, 0x59e4); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if (!(F & FZ)) { CYCT(0x59e4, 0x59e6); goto nextState; } CYC(0x59e4, 0x59e6);  // jr nz,@nextState
-  CYC(0x59e6, 0x59e8); alu_bit(gb, 0, mem_rd(gb, HL));  // bit 0,(hl)
-  if ((F & FZ)) { RET_TAKEN(0x59e8); return; } CYC(0x59e8, 0x59e9);  // ret z
-  CYC(0x59e9, 0x59eb); L = 0xa5;  // ld l,Enemy.enemyCollisionMode
-  CYC(0x59eb, 0x59ed); mem_wr(gb, HL, 0x09);  // ld (hl),ENEMYCOLLISION_VERAN_TURTLE_FORM_VULNERABLE
-  RET(0x59ed); return;  // ret
+  CALL_C(b_+0, enemyAnimate_hook, SYM(enemyAnimate), b_+3);
+  CYC(b_+3, b_+4); H = D;  // ld h,d
+  CYC(b_+4, b_+6); L = 0xa1;  // ld l,Enemy.animParameter
+  CYC(b_+6, b_+8); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
+  if (!(F & FZ)) { CYCT(b_+8, b_+10); goto nextState; } CYC(b_+8, b_+10);  // jr nz,@nextState
+  CYC(b_+10, b_+12); alu_bit(gb, 0, mem_rd(gb, HL));  // bit 0,(hl)
+  if ((F & FZ)) { RET_TAKEN(b_+12); return; } CYC(b_+12, b_+13);  // ret z
+  CYC(b_+13, b_+15); L = 0xa5;  // ld l,Enemy.enemyCollisionMode
+  CYC(b_+15, b_+17); mem_wr(gb, HL, 0x09);  // ld (hl),ENEMYCOLLISION_VERAN_TURTLE_FORM_VULNERABLE
+  RET(b_+17); return;  // ret
 nextState:
-  CYC(0x59ee, 0x59f0); L = 0x84;  // ld l,Enemy.state
-  CYC(0x59f0, 0x59f1); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x59f1, 0x59f3); L = 0x86;  // ld l,Enemy.counter1
-  CYC(0x59f3, 0x59f5); mem_wr(gb, HL, 90);  // ld (hl),90
-  CYC(0x59f5, 0x59f6); alu_xor(gb, A);  // xor a
-  CYC(0x59f6, 0x59f9); if (hook_enabled_at(0x282b)) { enemySetAnimation_hook(gb); return; } HANDOFF(0x282b);  // jp enemySetAnimation
+  CYC(b_+18, b_+20); L = 0x84;  // ld l,Enemy.state
+  CYC(b_+20, b_+21); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+21, b_+23); L = 0x86;  // ld l,Enemy.counter1
+  CYC(b_+23, b_+25); mem_wr(gb, HL, 90);  // ld (hl),90
+  CYC(b_+25, b_+26); alu_xor(gb, A);  // xor a
+  CYC(b_+26, SYM(veranFinal_turtleForm_state7)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void veranFinal_turtleForm_state7_hook(GB *gb) {
+  BASE(veranFinal_turtleForm_state7);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x59f9, ecom_decCounter1_b10_hook, 0x439a, 0x59fc);
-  if (!(F & FZ)) { CYCT(0x59fc, 0x59ff); if (hook_enabled_at(0x2818)) { enemyAnimate_hook(gb); return; } HANDOFF(0x2818); } CYC(0x59fc, 0x59ff);  // jp nz,enemyAnimate
-  CYC(0x59ff, 0x5a00); L = E;  // ld l,e
-  CYC(0x5a00, 0x5a01); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x5a01, 0x5a03); A = 0x03;  // ld a,$03
-  CYC(0x5a03, 0x5a06); if (hook_enabled_at(0x282b)) { enemySetAnimation_hook(gb); return; } HANDOFF(0x282b);  // jp enemySetAnimation
+  CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+6); if (hook_enabled_at(SYM(enemyAnimate))) { enemyAnimate_hook(gb); return; } HANDOFF(SYM(enemyAnimate)); } CYC(b_+3, b_+6);  // jp nz,enemyAnimate
+  CYC(b_+6, b_+7); L = E;  // ld l,e
+  CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+8, b_+10); A = 0x03;  // ld a,$03
+  CYC(b_+10, SYM(veranFinal_turtleForm_state8)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void veranFinal_turtleForm_state8_hook(GB *gb) {
+  BASE(veranFinal_turtleForm_state8);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5a06, enemyAnimate_hook, 0x2818, 0x5a09);
-  CYC(0x5a09, 0x5a0a); H = D;  // ld h,d
-  CYC(0x5a0a, 0x5a0c); L = 0xa1;  // ld l,Enemy.animParameter
-  CYC(0x5a0c, 0x5a0e); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if (!(F & FZ)) { CYCT(0x5a0e, 0x5a10); goto nextState; } CYC(0x5a0e, 0x5a10);  // jr nz,@nextState
-  CYC(0x5a10, 0x5a12); alu_bit(gb, 0, mem_rd(gb, HL));  // bit 0,(hl)
-  if ((F & FZ)) { RET_TAKEN(0x5a12); return; } CYC(0x5a12, 0x5a13);  // ret z
-  CYC(0x5a13, 0x5a15); L = 0xa5;  // ld l,Enemy.enemyCollisionMode
-  CYC(0x5a15, 0x5a17); mem_wr(gb, HL, 0x6a);  // ld (hl),ENEMYCOLLISION_VERAN_TURTLE_FORM
-  RET(0x5a17); return;  // ret
+  CALL_C(b_+0, enemyAnimate_hook, SYM(enemyAnimate), b_+3);
+  CYC(b_+3, b_+4); H = D;  // ld h,d
+  CYC(b_+4, b_+6); L = 0xa1;  // ld l,Enemy.animParameter
+  CYC(b_+6, b_+8); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
+  if (!(F & FZ)) { CYCT(b_+8, b_+10); goto nextState; } CYC(b_+8, b_+10);  // jr nz,@nextState
+  CYC(b_+10, b_+12); alu_bit(gb, 0, mem_rd(gb, HL));  // bit 0,(hl)
+  if ((F & FZ)) { RET_TAKEN(b_+12); return; } CYC(b_+12, b_+13);  // ret z
+  CYC(b_+13, b_+15); L = 0xa5;  // ld l,Enemy.enemyCollisionMode
+  CYC(b_+15, b_+17); mem_wr(gb, HL, 0x6a);  // ld (hl),ENEMYCOLLISION_VERAN_TURTLE_FORM
+  RET(b_+17); return;  // ret
 nextState:
-  CYC(0x5a18, 0x5a1a); L = 0x84;  // ld l,Enemy.state
-  CYC(0x5a1a, 0x5a1c); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  CYC(0x5a1c, 0x5a1e); L = 0x86;  // ld l,Enemy.counter1
-  CYC(0x5a1e, 0x5a20); mem_wr(gb, HL, 30);  // ld (hl),30
-  CYC(0x5a20, 0x5a22); A = 0x01;  // ld a,$01
-  CYC(0x5a22, 0x5a25); if (hook_enabled_at(0x282b)) { enemySetAnimation_hook(gb); return; } HANDOFF(0x282b);  // jp enemySetAnimation
+  CYC(b_+18, b_+20); L = 0x84;  // ld l,Enemy.state
+  CYC(b_+20, b_+22); mem_wr(gb, HL, 0x02);  // ld (hl),$02
+  CYC(b_+22, b_+24); L = 0x86;  // ld l,Enemy.counter1
+  CYC(b_+24, b_+26); mem_wr(gb, HL, 30);  // ld (hl),30
+  CYC(b_+26, b_+28); A = 0x01;  // ld a,$01
+  CYC(b_+28, SYM(veranFinal_turtleForm_state9)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void veranFinal_turtleForm_state9_hook(GB *gb) {
+  BASE(veranFinal_turtleForm_state9);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5a25, enemyAnimate_hook, 0x2818, 0x5a28);
-  CYC(0x5a28, 0x5a2a); E = 0xa1;  // ld e,Enemy.animParameter
-  CYC(0x5a2a, 0x5a2b); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5a2b, 0x5a2c); A = alu_inc8(gb, A);  // inc a
-  if (!(F & FZ)) { RET_TAKEN(0x5a2c); return; } CYC(0x5a2c, 0x5a2d);  // ret nz
-  CYC(0x5a2d, 0x5a2e); H = D;  // ld h,d
-  CYC(0x5a2e, 0x5a30); L = 0xb3;  // ld l,Enemy.var33
-  CYC(0x5a30, 0x5a31); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a [var33]=0
-  CYC(0x5a31, 0x5a32); mem_wr(gb, HL, A);  // ld (hl),a [var34]=0
-  CYC(0x5a32, 0x5a34); L = 0x84;  // ld l,Enemy.state
-  CYC(0x5a34, 0x5a35); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  CYC(0x5a35, 0x5a37); L = 0xa4;  // ld l,Enemy.collisionType
-  CYC(0x5a37, 0x5a39); mem_wr(gb, HL, 0x82);  // ld (hl),$80|ENEMY_VERAN_FINAL_FORM
-  CYC(0x5a39, 0x5a3a); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5a3a, 0x5a3c); mem_wr(gb, HL, 0x09);  // ld (hl),ENEMYCOLLISION_VERAN_TURTLE_FORM_VULNERABLE
-  CYC(0x5a3c, 0x5a3e); L = 0x9b;  // ld l,Enemy.oamFlagsBackup
-  CYC(0x5a3e, 0x5a40); A = 0x06;  // ld a,$06
-  CYC(0x5a40, 0x5a41); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
-  CYC(0x5a41, 0x5a42); mem_wr(gb, HL, A);  // ld (hl),a
-  CYC(0x5a42, 0x5a44); A = 0x03;  // ld a,$03
-  CYC(0x5a44, 0x5a47); if (hook_enabled_at(0x282b)) { enemySetAnimation_hook(gb); return; } HANDOFF(0x282b);  // jp enemySetAnimation
+  CALL_C(b_+0, enemyAnimate_hook, SYM(enemyAnimate), b_+3);
+  CYC(b_+3, b_+5); E = 0xa1;  // ld e,Enemy.animParameter
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+6, b_+7); A = alu_inc8(gb, A);  // inc a
+  if (!(F & FZ)) { RET_TAKEN(b_+7); return; } CYC(b_+7, b_+8);  // ret nz
+  CYC(b_+8, b_+9); H = D;  // ld h,d
+  CYC(b_+9, b_+11); L = 0xb3;  // ld l,Enemy.var33
+  CYC(b_+11, b_+12); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a [var33]=0
+  CYC(b_+12, b_+13); mem_wr(gb, HL, A);  // ld (hl),a [var34]=0
+  CYC(b_+13, b_+15); L = 0x84;  // ld l,Enemy.state
+  CYC(b_+15, b_+16); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
+  CYC(b_+16, b_+18); L = 0xa4;  // ld l,Enemy.collisionType
+  CYC(b_+18, b_+20); mem_wr(gb, HL, 0x82);  // ld (hl),$80|ENEMY_VERAN_FINAL_FORM
+  CYC(b_+20, b_+21); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+21, b_+23); mem_wr(gb, HL, 0x09);  // ld (hl),ENEMYCOLLISION_VERAN_TURTLE_FORM_VULNERABLE
+  CYC(b_+23, b_+25); L = 0x9b;  // ld l,Enemy.oamFlagsBackup
+  CYC(b_+25, b_+27); A = 0x06;  // ld a,$06
+  CYC(b_+27, b_+28); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
+  CYC(b_+28, b_+29); mem_wr(gb, HL, A);  // ld (hl),a
+  CYC(b_+29, b_+31); A = 0x03;  // ld a,$03
+  CYC(b_+31, SYM(veranFinal_turtleForm_stateA)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void veranFinal_turtleForm_stateA_hook(GB *gb) {
+  BASE(veranFinal_turtleForm_stateA);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5a47, 0x5a48); E = alu_inc8(gb, E);  // inc e
-  CYC(0x5a48, 0x5a49); A = mem_rd(gb, DE);  // ld a,(de) [substate]
-  CYC(0x5a49, 0x5a4a); push_effect(gb, 0x5a4a);
-  switch (veranFinal_jump_table(gb)) {
-    case 0x5a52: goto substate0;
-    case 0x5a7a: goto substate1;
-    case 0x5a91: goto substate2;
-    case 0x5a9f: goto substate3;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+1); E = alu_inc8(gb, E);  // inc e
+  CYC(b_+1, b_+2); A = mem_rd(gb, DE);  // ld a,(de) [substate]
+  CYC(b_+2, b_+3); push_effect(gb, b_+3);
+  do { uint16_t jt_ = (veranFinal_jump_table(gb));
+    if (jt_ == b_+11) { goto substate0; }
+    else if (jt_ == b_+51) { goto substate1; }
+    else if (jt_ == b_+74) { goto substate2; }
+    else if (jt_ == b_+88) { goto substate3; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 substate0:
-  CYC(0x5a52, 0x5a54); E = 0xab;  // ld e,Enemy.invincibilityCounter
-  CYC(0x5a54, 0x5a55); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5a55, 0x5a56); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x5a56); return; } CYC(0x5a56, 0x5a57);  // ret nz
-  CALL_C(0x5a57, checkLinkVulnerable_hook, 0x1d28, 0x5a5a);
-  if (!(F & FC)) { RET_TAKEN(0x5a5a); return; } CYC(0x5a5a, 0x5a5b);  // ret nc
-  CYC(0x5a5b, 0x5a5d); A = 0x01;  // ld a,$01
-  CYC(0x5a5d, 0x5a60); mem_wr(gb, 0xcc02, A);  // ld (wMenuDisabled),a
-  CYC(0x5a60, 0x5a63); mem_wr(gb, 0xcc8a, A);  // ld (wDisabledObjects),a
-  CALL_C(0x5a63, dropLinkHeldItem_hook, 0x2c43, 0x5a66);
-  CALL_C(0x5a66, clearAllParentItems_hook, 0x2c10, 0x5a69);
-  CALL_C(0x5a69, ecom_incSubstate_b10_hook, 0x4005, 0x5a6c);
-  CALL_C(0x5a6c, checkIsLinkedGame_hook, 0x1992, 0x5a6f);
-  CYC(0x5a6f, 0x5a72); SET_BC(0x5615);  // ld bc,TX_5615
-  if ((F & FZ)) { CYCT(0x5a72, 0x5a74); goto showText; } CYC(0x5a72, 0x5a74);  // jr z,+
-  CYC(0x5a74, 0x5a77); SET_BC(0x5616);  // ld bc,TX_5616
+  CYC(b_+11, b_+13); E = 0xab;  // ld e,Enemy.invincibilityCounter
+  CYC(b_+13, b_+14); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+14, b_+15); alu_or(gb, A);  // or a
+  if (!(F & FZ)) { RET_TAKEN(b_+15); return; } CYC(b_+15, b_+16);  // ret nz
+  CALL_C(b_+16, checkLinkVulnerable_hook, SYM(checkLinkVulnerable), b_+19);
+  if (!(F & FC)) { RET_TAKEN(b_+19); return; } CYC(b_+19, b_+20);  // ret nc
+  CYC(b_+20, b_+22); A = 0x01;  // ld a,$01
+  CYC(b_+22, b_+25); mem_wr(gb, wMenuDisabled, A);  // ld (wMenuDisabled),a
+  CYC(b_+25, b_+28); mem_wr(gb, wDisabledObjects, A);  // ld (wDisabledObjects),a
+  CALL_C(b_+28, dropLinkHeldItem_hook, SYM(dropLinkHeldItem), b_+31);
+  CALL_C(b_+31, clearAllParentItems_hook, SYM(clearAllParentItems), b_+34);
+  CALL_C(b_+34, ecom_incSubstate_b10_hook, SYM(ecom_incSubstate_b10), b_+37);
+  CALL_C(b_+37, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+40);
+  CYC(b_+40, b_+43); SET_BC((SYM(ganon_stateC_substate8) + 30));  // ld bc,TX_5615
+  if ((F & FZ)) { CYCT(b_+43, b_+45); goto showText; } CYC(b_+43, b_+45);  // jr z,+
+  CYC(b_+45, b_+48); SET_BC((SYM(ganon_stateC_substate8) + 31));  // ld bc,TX_5616
 showText:
-  CYC(0x5a77, 0x5a7a); if (hook_enabled_at(0x1872)) { showText_hook(gb); return; } HANDOFF(0x1872);  // jp showText
+  CYC(b_+48, b_+51); if (hook_enabled_at(SYM(showText))) { showText_hook(gb); return; } HANDOFF(SYM(showText));  // jp showText
 substate1:
-  CYC(0x5a7a, 0x5a7d); A = mem_rd(gb, 0xcba0);  // ld a,(wTextIsActive)
-  CYC(0x5a7d, 0x5a7e); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x5a7e); return; } CYC(0x5a7e, 0x5a7f);  // ret nz
-  CALL_C(0x5a7f, ecom_incSubstate_b10_hook, 0x4005, 0x5a82);
-  CYC(0x5a82, 0x5a84); L = 0x87;  // ld l,Enemy.counter2
-  CYC(0x5a84, 0x5a86); mem_wr(gb, HL, 40);  // ld (hl),40
-  CYC(0x5a86, 0x5a88); L = 0x8b;  // ld l,Enemy.yh
-  CYC(0x5a88, 0x5a89); B = mem_rd(gb, HL);  // ld b,(hl)
-  CYC(0x5a89, 0x5a8b); L = 0x8d;  // ld l,Enemy.xh
-  CYC(0x5a8b, 0x5a8c); C = mem_rd(gb, HL);  // ld c,(hl)
-  CYC(0x5a8c, 0x5a8e); A = 0xff;  // ld a,$ff
-  CYC(0x5a8e, 0x5a91); if (hook_enabled_at(0x29ed)) { createEnergySwirlGoingOut_hook(gb); return; } HANDOFF(0x29ed);  // jp createEnergySwirlGoingOut
+  CYC(b_+51, b_+54); A = mem_rd(gb, wOamEnd);  // ld a,(wTextIsActive)
+  CYC(b_+54, b_+55); alu_or(gb, A);  // or a
+  if (!(F & FZ)) { RET_TAKEN(b_+55); return; } CYC(b_+55, b_+56);  // ret nz
+  CALL_C(b_+56, ecom_incSubstate_b10_hook, SYM(ecom_incSubstate_b10), b_+59);
+  CYC(b_+59, b_+61); L = 0x87;  // ld l,Enemy.counter2
+  CYC(b_+61, b_+63); mem_wr(gb, HL, 40);  // ld (hl),40
+  CYC(b_+63, b_+65); L = 0x8b;  // ld l,Enemy.yh
+  CYC(b_+65, b_+66); B = mem_rd(gb, HL);  // ld b,(hl)
+  CYC(b_+66, b_+68); L = 0x8d;  // ld l,Enemy.xh
+  CYC(b_+68, b_+69); C = mem_rd(gb, HL);  // ld c,(hl)
+  CYC(b_+69, b_+71); A = 0xff;  // ld a,$ff
+  CYC(b_+71, b_+74); if (hook_enabled_at(SYM(createEnergySwirlGoingOut))) { createEnergySwirlGoingOut_hook(gb); return; } HANDOFF(SYM(createEnergySwirlGoingOut));  // jp createEnergySwirlGoingOut
 substate2:
-  CALL_C(0x5a91, ecom_decCounter2_b10_hook, 0x43a3, 0x5a94);
-  if (!(F & FZ)) { RET_TAKEN(0x5a94); return; } CYC(0x5a94, 0x5a95);  // ret nz
-  CYC(0x5a95, 0x5a98); SET_BC(0x9021);  // ldbc INTERAC_MISC_PUZZLES,$21
-  CALL_C(0x5a98, objectCreateInteraction_hook, 0x24c5, 0x5a9b);
-  if (!(F & FZ)) { RET_TAKEN(0x5a9b); return; } CYC(0x5a9b, 0x5a9c);  // ret nz
-  CYC(0x5a9c, 0x5a9f); if (hook_enabled_at(0x4005)) { ecom_incSubstate_b10_hook(gb); return; } HANDOFF(0x4005);  // jp ecom_incSubstate
+  CALL_C(b_+74, ecom_decCounter2_b10_hook, SYM(ecom_decCounter2_b10), b_+77);
+  if (!(F & FZ)) { RET_TAKEN(b_+77); return; } CYC(b_+77, b_+78);  // ret nz
+  CYC(b_+78, b_+81); SET_BC(0x9021);  // ldbc INTERAC_MISC_PUZZLES,$21
+  CALL_C(b_+81, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+84);
+  if (!(F & FZ)) { RET_TAKEN(b_+84); return; } CYC(b_+84, b_+85);  // ret nz
+  CYC(b_+85, b_+88); if (hook_enabled_at(SYM(ecom_incSubstate_b10))) { ecom_incSubstate_b10_hook(gb); return; } HANDOFF(SYM(ecom_incSubstate_b10));  // jp ecom_incSubstate
 substate3:
-  CYC(0x5a9f, 0x5aa2); A = mem_rd(gb, 0xc4ab);  // ld a,(wPaletteThread_mode)
-  CYC(0x5aa2, 0x5aa3); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x5aa3); return; } CYC(0x5aa3, 0x5aa4);  // ret nz
-  CYC(0x5aa4, 0x5aa7); SET_HL(0xc9fc);  // ld hl,wGroup4RoomFlags+(<ROOM_AGES_4fc)
-  CYC(0x5aa7, 0x5aa9); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CYC(0x5aa9, 0x5aab); A = 0x09;  // ld a,CUTSCENE_BLACK_TOWER_ESCAPE
-  CYC(0x5aab, 0x5aae); mem_wr(gb, 0xcc04, A);  // ld (wCutsceneTrigger),a
-  CALL_C(0x5aae, incMakuTreeState_hook, 0x3e53, 0x5ab1);
-  CYC(0x5ab1, 0x5ab4); if (hook_enabled_at(0x2e47)) { enemyDelete_hook(gb); return; } HANDOFF(0x2e47);  // jp enemyDelete
+  CYC(b_+88, b_+91); A = mem_rd(gb, wPaletteThread_mode);  // ld a,(wPaletteThread_mode)
+  CYC(b_+91, b_+92); alu_or(gb, A);  // or a
+  if (!(F & FZ)) { RET_TAKEN(b_+92); return; } CYC(b_+92, b_+93);  // ret nz
+  CYC(b_+93, b_+96); SET_HL((wGroup4RoomFlags + 252));  // ld hl,wGroup4RoomFlags+(<ROOM_AGES_4fc)
+  CYC(b_+96, b_+98); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
+  CYC(b_+98, b_+100); A = 0x09;  // ld a,CUTSCENE_BLACK_TOWER_ESCAPE
+  CYC(b_+100, b_+103); mem_wr(gb, wCutsceneTrigger, A);  // ld (wCutsceneTrigger),a
+  CALL_C(b_+103, incMakuTreeState_hook, SYM(incMakuTreeState), b_+106);
+  CYC(b_+106, SYM(veranFinal_spiderForm)); if (hook_enabled_at(SYM(enemyDelete))) { enemyDelete_hook(gb); return; } HANDOFF(SYM(enemyDelete));  // jp enemyDelete
 }
 
 void veranFinal_spiderForm_hook(GB *gb) {
+  BASE(veranFinal_spiderForm);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5ab4, 0x5ab5); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5ab5, 0x5ab6); push_effect(gb, 0x5ab6);
-  switch (veranFinal_jump_table(gb)) {
-    case 0x5ac0: veranFinal_spiderOrBeeForm_state0_hook(gb); return;
-    case 0x5ac1: veranFinal_spiderForm_state1_hook(gb); return;
-    case 0x5afc: veranFinal_spiderForm_state2_hook(gb); return;
-    case 0x5b15: veranFinal_spiderForm_state3_hook(gb); return;
-    case 0x5b39: veranFinal_spiderForm_state4_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+1, b_+2); push_effect(gb, b_+2);
+  do { uint16_t jt_ = (veranFinal_jump_table(gb));
+    if (jt_ == SYM(veranFinal_spiderOrBeeForm_state0)) { veranFinal_spiderOrBeeForm_state0_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_state1)) { veranFinal_spiderForm_state1_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_state2)) { veranFinal_spiderForm_state2_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_state3)) { veranFinal_spiderForm_state3_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_state4)) { veranFinal_spiderForm_state4_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void veranFinal_spiderOrBeeForm_state0_hook(GB *gb) {
+  BASE(veranFinal_spiderOrBeeForm_state0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  RET(0x5ac0); return;  // ret
+  RET(b_+0); return;  // ret
 }
 
 void veranFinal_spiderForm_state1_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_state1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5ac1, enemyAnimate_hook, 0x2818, 0x5ac4);
-  CYC(0x5ac4, 0x5ac6); E = 0xa1;  // ld e,Enemy.animParameter
-  CYC(0x5ac6, 0x5ac7); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5ac7, 0x5ac8); A = alu_inc8(gb, A);  // inc a
-  if (!(F & FZ)) { RET_TAKEN(0x5ac8); return; } CYC(0x5ac8, 0x5ac9);  // ret nz
-  CYC(0x5ac9, 0x5acc); SET_BC(0x1010);  // ld bc,$1010
-  CYC(0x5acc, 0x5ace); E = 0x6c;  // ld e,ENEMYCOLLISION_VERAN_SPIDER_FORM
-  CYC(0x5ace, 0x5ad0); L = 0xb1;  // ld l,Enemy.var31
-  CALL_C(0x5ad0, veranFinal_initializeForm_hook, 0x5d12, 0x5ad3);
-  CYC(0x5ad3, 0x5ad5); A = 0x05;  // ld a,$05
-  CALL_C(0x5ad5, enemySetAnimation_hook, 0x282b, 0x5ad8);
+  CALL_C(b_+0, enemyAnimate_hook, SYM(enemyAnimate), b_+3);
+  CYC(b_+3, b_+5); E = 0xa1;  // ld e,Enemy.animParameter
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+6, b_+7); A = alu_inc8(gb, A);  // inc a
+  if (!(F & FZ)) { RET_TAKEN(b_+7); return; } CYC(b_+7, b_+8);  // ret nz
+  CYC(b_+8, b_+11); SET_BC((SYM(_getObjectPositionOnScreen_duringScreenTransition) + 79));  // ld bc,$1010
+  CYC(b_+11, b_+13); E = 0x6c;  // ld e,ENEMYCOLLISION_VERAN_SPIDER_FORM
+  CYC(b_+13, b_+15); L = 0xb1;  // ld l,Enemy.var31
+  CALL_C(b_+15, veranFinal_initializeForm_hook, SYM(veranFinal_initializeForm), b_+18);
+  CYC(b_+18, b_+20); A = 0x05;  // ld a,$05
+  CALL_C(b_+20, enemySetAnimation_hook, SYM(enemySetAnimation), SYM(veranFinal_spiderForm_setCounter2AndInitState2));
   veranFinal_spiderForm_setCounter2AndInitState2_hook(gb); return;  // fallthrough
 }
 
 void veranFinal_spiderForm_setCounter2AndInitState2_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_setCounter2AndInitState2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5ad8, 0x5ada); E = 0x87;  // ld e,Enemy.counter2
-  CYC(0x5ada, 0x5adc); A = 120;  // ld a,120
-  CYC(0x5adc, 0x5add); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+0, b_+2); E = 0x87;  // ld e,Enemy.counter2
+  CYC(b_+2, b_+4); A = 120;  // ld a,120
+  CYC(b_+4, SYM(veranFinal_spiderForm_initState2)); mem_wr(gb, DE, A);  // ld (de),a
   veranFinal_spiderForm_initState2_hook(gb); return;  // fallthrough
 }
 
 void veranFinal_spiderForm_initState2_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_initState2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5add, 0x5ade); H = D;  // ld h,d
-  CYC(0x5ade, 0x5ae0); L = 0x84;  // ld l,Enemy.state
-  CYC(0x5ae0, 0x5ae2); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  CYC(0x5ae2, 0x5ae4); L = 0x90;  // ld l,Enemy.speed
-  CYC(0x5ae4, 0x5ae6); mem_wr(gb, HL, 30);  // ld (hl),SPEED_c0
-  CALL_C(0x5ae6, getRandomNumber_noPreserveVars_hook, 0x0453, 0x5ae9);
-  CYC(0x5ae9, 0x5aeb); alu_and(gb, 0x03);  // and $03
-  CYC(0x5aeb, 0x5aee); SET_HL(0x5af8);  // ld hl,@counter1Vals
-  CYC(0x5aee, 0x5aef);
-  veranFinal_addAToHl_from_rst(gb, 0x5aef);  // rst_addAToHl
-  CYC(0x5aef, 0x5af1); E = 0x86;  // ld e,Enemy.counter1
-  CYC(0x5af1, 0x5af2); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5af2, 0x5af3); mem_wr(gb, DE, A);  // ld (de),a
-  CALL_C(0x5af3, veranFinal_spiderForm_decideAngle_hook, 0x5f8f, 0x5af6);
-  CYC(0x5af6, 0x5af8); veranFinal_spiderForm_animate_hook(gb); return;  // jr veranFinal_spiderForm_animate
+  CYC(b_+0, b_+1); H = D;  // ld h,d
+  CYC(b_+1, b_+3); L = 0x84;  // ld l,Enemy.state
+  CYC(b_+3, b_+5); mem_wr(gb, HL, 0x02);  // ld (hl),$02
+  CYC(b_+5, b_+7); L = 0x90;  // ld l,Enemy.speed
+  CYC(b_+7, b_+9); mem_wr(gb, HL, 30);  // ld (hl),SPEED_c0
+  CALL_C(b_+9, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+12);
+  CYC(b_+12, b_+14); alu_and(gb, 0x03);  // and $03
+  CYC(b_+14, b_+17); SET_HL(b_+27);  // ld hl,@counter1Vals
+  CYC(b_+17, b_+18);
+  veranFinal_addAToHl_from_rst(gb, b_+18);  // rst_addAToHl
+  CYC(b_+18, b_+20); E = 0x86;  // ld e,Enemy.counter1
+  CYC(b_+20, b_+21); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+21, b_+22); mem_wr(gb, DE, A);  // ld (de),a
+  CALL_C(b_+22, veranFinal_spiderForm_decideAngle_hook, SYM(veranFinal_spiderForm_decideAngle), b_+25);
+  CYC(b_+25, b_+27); veranFinal_spiderForm_animate_hook(gb); return;  // jr veranFinal_spiderForm_animate
 }
 
 void veranFinal_spiderForm_state2_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_state2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5afc, ecom_decCounter2_b10_hook, 0x43a3, 0x5aff);
-  if (!(F & FZ)) { CYCT(0x5aff, 0x5b01); goto decCounter1; } CYC(0x5aff, 0x5b01);  // jr nz,+
-  CYC(0x5b01, 0x5b03); mem_wr(gb, HL, 120);  // ld (hl),120
-  CALL_C(0x5b03, veranFinal_spiderForm_decideWhetherToAttack_hook, 0x5f11, 0x5b06);
-  if ((F & FC)) { RET_TAKEN(0x5b06); return; } CYC(0x5b06, 0x5b07);  // ret c
+  CALL_C(b_+0, ecom_decCounter2_b10_hook, SYM(ecom_decCounter2_b10), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); goto decCounter1; } CYC(b_+3, b_+5);  // jr nz,+
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 120);  // ld (hl),120
+  CALL_C(b_+7, veranFinal_spiderForm_decideWhetherToAttack_hook, SYM(veranFinal_spiderForm_decideWhetherToAttack), b_+10);
+  if ((F & FC)) { RET_TAKEN(b_+10); return; } CYC(b_+10, b_+11);  // ret c
 decCounter1:
-  CALL_C(0x5b07, ecom_decCounter1_b10_hook, 0x439a, 0x5b0a);
-  if ((F & FZ)) { CYCT(0x5b0a, 0x5b0c); veranFinal_spiderForm_initState2_hook(gb); return; } CYC(0x5b0a, 0x5b0c);  // jr z,veranFinal_spiderForm_initState2
+  CALL_C(b_+11, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+14);
+  if ((F & FZ)) { CYCT(b_+14, SYM(veranFinal_spiderForm_updateMovement)); veranFinal_spiderForm_initState2_hook(gb); return; } CYC(b_+14, SYM(veranFinal_spiderForm_updateMovement));  // jr z,veranFinal_spiderForm_initState2
   veranFinal_spiderForm_updateMovement_hook(gb); return;  // fallthrough
 }
 
 void veranFinal_spiderForm_updateMovement_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_updateMovement);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5b0c, ecom_bounceOffWallsAndHoles_b10_hook, 0x42de, 0x5b0f);
-  CALL_C(0x5b0f, objectApplySpeed_hook, 0x201d, 0x5b12);
+  CALL_C(b_+0, ecom_bounceOffWallsAndHoles_b10_hook, SYM(ecom_bounceOffWallsAndHoles_b10), b_+3);
+  CALL_C(b_+3, objectApplySpeed_hook, SYM(objectApplySpeed), SYM(veranFinal_spiderForm_animate));
   veranFinal_spiderForm_animate_hook(gb); return;  // fallthrough
 }
 
 void veranFinal_spiderForm_animate_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_animate);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5b12, 0x5b15); if (hook_enabled_at(0x2818)) { enemyAnimate_hook(gb); return; } HANDOFF(0x2818);  // jp enemyAnimate
+  CYC(b_+0, SYM(veranFinal_spiderForm_state3)); if (hook_enabled_at(SYM(enemyAnimate))) { enemyAnimate_hook(gb); return; } HANDOFF(SYM(enemyAnimate));  // jp enemyAnimate
 }
 
 void veranFinal_spiderForm_state3_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_state3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5b15, 0x5b17); E = 0x8f;  // ld e,Enemy.zh
-  CYC(0x5b17, 0x5b18); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5b18, 0x5b19); alu_rlca(gb);  // rlca
-  CYC(0x5b19, 0x5b1b); C = 0x20;  // ld c,$20
-  if ((F & FC)) { CYCT(0x5b1b, 0x5b1e); if (hook_enabled_at(0x1f46)) { objectUpdateSpeedZ_paramC_hook(gb); return; } HANDOFF(0x1f46); } CYC(0x5b1b, 0x5b1e);  // jp c,objectUpdateSpeedZ_paramC
-  CALL_C(0x5b1e, ecom_decCounter1_b10_hook, 0x439a, 0x5b21);
-  if ((F & FZ)) { CYCT(0x5b21, 0x5b23); goto gotoState2; } CYC(0x5b21, 0x5b23);  // jr z,+
-  CYC(0x5b23, 0x5b24); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5b24, 0x5b25); alu_rrca(gb);  // rrca
-  if ((F & FC)) { RET_TAKEN(0x5b25); return; } CYC(0x5b25, 0x5b26);  // ret c
-  CYC(0x5b26, 0x5b28); L = 0x8f;  // ld l,Enemy.zh
-  CYC(0x5b28, 0x5b29); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5b29, 0x5b2b); alu_xor(gb, 0x02);  // xor $02
-  CYC(0x5b2b, 0x5b2c); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x5b2c); return;  // ret
+  CYC(b_+0, b_+2); E = 0x8f;  // ld e,Enemy.zh
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+3, b_+4); alu_rlca(gb);  // rlca
+  CYC(b_+4, b_+6); C = 0x20;  // ld c,$20
+  if ((F & FC)) { CYCT(b_+6, b_+9); if (hook_enabled_at(SYM(objectUpdateSpeedZ_paramC))) { objectUpdateSpeedZ_paramC_hook(gb); return; } HANDOFF(SYM(objectUpdateSpeedZ_paramC)); } CYC(b_+6, b_+9);  // jp c,objectUpdateSpeedZ_paramC
+  CALL_C(b_+9, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+12);
+  if ((F & FZ)) { CYCT(b_+12, b_+14); goto gotoState2; } CYC(b_+12, b_+14);  // jr z,+
+  CYC(b_+14, b_+15); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+15, b_+16); alu_rrca(gb);  // rrca
+  if ((F & FC)) { RET_TAKEN(b_+16); return; } CYC(b_+16, b_+17);  // ret c
+  CYC(b_+17, b_+19); L = 0x8f;  // ld l,Enemy.zh
+  CYC(b_+19, b_+20); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+20, b_+22); alu_xor(gb, 0x02);  // xor $02
+  CYC(b_+22, b_+23); mem_wr(gb, HL, A);  // ld (hl),a
+  RET(b_+23); return;  // ret
 gotoState2:
-  CYC(0x5b2d, 0x5b2f); L = 0x8f;  // ld l,Enemy.zh
-  CYC(0x5b2f, 0x5b31); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL_C(0x5b31, objectSetVisible83_hook, 0x1e72, 0x5b34);
-  CALL_C(0x5b34, veranFinal_spiderForm_resetCollisionData_hook, 0x5c16, 0x5b37);
-  CYC(0x5b37, 0x5b3a); veranFinal_spiderForm_initState2_hook(gb); return;  // jr veranFinal_spiderForm_initState2
+  CYC(b_+24, b_+26); L = 0x8f;  // ld l,Enemy.zh
+  CYC(b_+26, b_+28); mem_wr(gb, HL, 0x00);  // ld (hl),$00
+  CALL_C(b_+28, objectSetVisible83_hook, SYM(objectSetVisible83), b_+31);
+  CALL_C(b_+31, veranFinal_spiderForm_resetCollisionData_hook, SYM(veranFinal_spiderForm_resetCollisionData), b_+34);
+  CYC(b_+34, (SYM(veranFinal_spiderForm_state4) + 1)); veranFinal_spiderForm_initState2_hook(gb); return;  // jr veranFinal_spiderForm_initState2
 }
 
 void veranFinal_spiderForm_state4_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_state4);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5b39, 0x5b3b); E = 0x83;  // ld e,Enemy.var03
-  CYC(0x5b3b, 0x5b3c); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5b3c, 0x5b3e); E = 0x85;  // ld e,Enemy.substate
-  CYC(0x5b3e, 0x5b3f); push_effect(gb, 0x5b3f);
-  switch (veranFinal_jump_table(gb)) {
-    case 0x5b45: veranFinal_spiderForm_rushAttack_hook(gb); return;
-    case 0x5b68: veranFinal_spiderForm_jumpAttack_hook(gb); return;
-    case 0x5bfa: veranFinal_spiderForm_webAttack_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x83;  // ld e,Enemy.var03
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+3, b_+5); E = 0x85;  // ld e,Enemy.substate
+  CYC(b_+5, b_+6); push_effect(gb, b_+6);
+  do { uint16_t jt_ = (veranFinal_jump_table(gb));
+    if (jt_ == SYM(veranFinal_spiderForm_rushAttack)) { veranFinal_spiderForm_rushAttack_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_jumpAttack)) { veranFinal_spiderForm_jumpAttack_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack)) { veranFinal_spiderForm_webAttack_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void veranFinal_spiderForm_rushAttack_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_rushAttack);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5b45, 0x5b46); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5b46, 0x5b47); alu_or(gb, A);  // or a
-  if ((F & FZ)) { CYCT(0x5b47, 0x5b49); goto substate0; } CYC(0x5b47, 0x5b49);  // jr z,@substate0
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+1, b_+2); alu_or(gb, A);  // or a
+  if ((F & FZ)) { CYCT(b_+2, b_+4); goto substate0; } CYC(b_+2, b_+4);  // jr z,@substate0
 substate1:
-  CALL_C(0x5b49, ecom_decCounter1_b10_hook, 0x439a, 0x5b4c);
-  if ((F & FZ)) { CYCT(0x5b4c, 0x5b4e); veranFinal_spiderForm_setCounter2AndInitState2_hook(gb); return; } CYC(0x5b4c, 0x5b4e);  // jr z,veranFinal_spiderForm_setCounter2AndInitState2
-  CALL_C(0x5b4e, veranFinal_spiderForm_updateMovement_hook, 0x5b0c, 0x5b51);
-  CYC(0x5b51, 0x5b54); if (hook_enabled_at(0x2818)) { enemyAnimate_hook(gb); return; } HANDOFF(0x2818);  // jp enemyAnimate
+  CALL_C(b_+4, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+7);
+  if ((F & FZ)) { CYCT(b_+7, b_+9); veranFinal_spiderForm_setCounter2AndInitState2_hook(gb); return; } CYC(b_+7, b_+9);  // jr z,veranFinal_spiderForm_setCounter2AndInitState2
+  CALL_C(b_+9, veranFinal_spiderForm_updateMovement_hook, SYM(veranFinal_spiderForm_updateMovement), b_+12);
+  CYC(b_+12, b_+15); if (hook_enabled_at(SYM(enemyAnimate))) { enemyAnimate_hook(gb); return; } HANDOFF(SYM(enemyAnimate));  // jp enemyAnimate
 substate0:
-  CALL_C(0x5b54, ecom_incSubstate_b10_hook, 0x4005, 0x5b57);
-  CYC(0x5b57, 0x5b58); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5b58, 0x5b5a); mem_wr(gb, HL, 60);  // ld (hl),60
-  CYC(0x5b5a, 0x5b5c); L = 0x90;  // ld l,Enemy.speed
-  CYC(0x5b5c, 0x5b5e); mem_wr(gb, HL, 60);  // ld (hl),SPEED_180
-  CALL_C(0x5b5e, ecom_updateAngleTowardTarget_b10_hook, 0x43bf, 0x5b61);
-  CYC(0x5b61, 0x5b63); alu_and(gb, 0x18);  // and $18
-  CYC(0x5b63, 0x5b65); alu_add(gb, 0x04);  // add $04
-  CYC(0x5b65, 0x5b66); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(0x5b66, 0x5b69); veranFinal_spiderForm_animate_hook(gb); return;  // jr veranFinal_spiderForm_animate
+  CALL_C(b_+15, ecom_incSubstate_b10_hook, SYM(ecom_incSubstate_b10), b_+18);
+  CYC(b_+18, b_+19); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+19, b_+21); mem_wr(gb, HL, 60);  // ld (hl),60
+  CYC(b_+21, b_+23); L = 0x90;  // ld l,Enemy.speed
+  CYC(b_+23, b_+25); mem_wr(gb, HL, 60);  // ld (hl),SPEED_180
+  CALL_C(b_+25, ecom_updateAngleTowardTarget_b10_hook, SYM(ecom_updateAngleTowardTarget_b10), b_+28);
+  CYC(b_+28, b_+30); alu_and(gb, 0x18);  // and $18
+  CYC(b_+30, b_+32); alu_add(gb, 0x04);  // add $04
+  CYC(b_+32, b_+33); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+33, (SYM(veranFinal_spiderForm_jumpAttack) + 1)); veranFinal_spiderForm_animate_hook(gb); return;  // jr veranFinal_spiderForm_animate
 }
 
 void veranFinal_spiderForm_jumpAttack_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_jumpAttack);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5b68, 0x5b69); A = mem_rd(gb, DE);  // ld a,(de) [substate]
-  CYC(0x5b69, 0x5b6a); push_effect(gb, 0x5b6a);
-  switch (veranFinal_jump_table(gb)) {
-    case 0x5b74: goto substate0;
-    case 0x5b87: goto substate1;
-    case 0x5bb6: goto substate2;
-    case 0x5bda: goto substate3;
-    case 0x5bf3: goto substate4;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);  // ld a,(de) [substate]
+  CYC(b_+1, b_+2); push_effect(gb, b_+2);
+  do { uint16_t jt_ = (veranFinal_jump_table(gb));
+    if (jt_ == b_+12) { goto substate0; }
+    else if (jt_ == b_+31) { goto substate1; }
+    else if (jt_ == b_+78) { goto substate2; }
+    else if (jt_ == b_+114) { goto substate3; }
+    else if (jt_ == b_+139) { goto substate4; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 substate0:
-  CYC(0x5b74, 0x5b76); B = 0x56;  // ld b,$56
-  CALL_C(0x5b76, ecom_spawnProjectile_b10_hook, 0x437c, 0x5b79);
-  if (!(F & FZ)) { RET_TAKEN(0x5b79); return; } CYC(0x5b79, 0x5b7a);  // ret nz
-  CALL_C(0x5b7a, ecom_incSubstate_b10_hook, 0x4005, 0x5b7d);
-  CYC(0x5b7d, 0x5b7f); L = 0xb8;  // ld l,Enemy.var38
-  CYC(0x5b7f, 0x5b81); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CALL_C(0x5b81, veranFinal_spiderForm_setVulnerableCollisionData_hook, 0x5c2d, 0x5b84);
-  CYC(0x5b84, 0x5b87); if (hook_enabled_at(0x1e60)) { objectSetVisible81_hook(gb); return; } HANDOFF(0x1e60);  // jp objectSetVisible81
+  CYC(b_+12, b_+14); B = 0x56;  // ld b,$56
+  CALL_C(b_+14, ecom_spawnProjectile_b10_hook, SYM(ecom_spawnProjectile_b10), b_+17);
+  if (!(F & FZ)) { RET_TAKEN(b_+17); return; } CYC(b_+17, b_+18);  // ret nz
+  CALL_C(b_+18, ecom_incSubstate_b10_hook, SYM(ecom_incSubstate_b10), b_+21);
+  CYC(b_+21, b_+23); L = 0xb8;  // ld l,Enemy.var38
+  CYC(b_+23, b_+25); mem_wr(gb, HL, 0x00);  // ld (hl),$00
+  CALL_C(b_+25, veranFinal_spiderForm_setVulnerableCollisionData_hook, SYM(veranFinal_spiderForm_setVulnerableCollisionData), b_+28);
+  CYC(b_+28, b_+31); if (hook_enabled_at(SYM(objectSetVisible81))) { objectSetVisible81_hook(gb); return; } HANDOFF(SYM(objectSetVisible81));  // jp objectSetVisible81
 substate1:
-  CYC(0x5b87, 0x5b89); E = 0xb8;  // ld e,Enemy.var38
-  CYC(0x5b89, 0x5b8a); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5b8a, 0x5b8b); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x5b8b); return; } CYC(0x5b8b, 0x5b8c);  // ret z
-  CYC(0x5b8c, 0x5b8d); H = D;  // ld h,d
-  CYC(0x5b8d, 0x5b8f); L = 0x8f;  // ld l,Enemy.zh
-  CYC(0x5b8f, 0x5b90); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5b90, 0x5b92); alu_sub(gb, 0x03);  // sub $03
-  CYC(0x5b92, 0x5b93); mem_wr(gb, HL, A);  // ld (hl),a
-  CYC(0x5b93, 0x5b95); alu_bit(gb, 7, A);  // bit 7,a
-  if ((F & FZ)) { CYCT(0x5b95, 0x5b97); goto zh; } CYC(0x5b95, 0x5b97);  // jr z,+
-  CYC(0x5b97, 0x5b99); alu_cp(gb, 0xe0);  // cp $e0
-  if (!(F & FC)) { RET_TAKEN(0x5b99); return; } CYC(0x5b99, 0x5b9a);  // ret nc
-  CYC(0x5b9a, 0x5b9c); A = mem_rd(gb, 0xffaa);  // ldh a,(<hCameraY)
-  CYC(0x5b9c, 0x5b9d); B = A;  // ld b,a
-  CYC(0x5b9d, 0x5b9e); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5b9e, 0x5ba0); L = 0x8b;  // ld l,Enemy.yh
-  CYC(0x5ba0, 0x5ba1); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  CYC(0x5ba1, 0x5ba2); alu_sub(gb, B);  // sub b
-  CYC(0x5ba2, 0x5ba4); alu_cp(gb, 0xb0);  // cp $b0
-  if ((F & FC)) { RET_TAKEN(0x5ba4); return; } CYC(0x5ba4, 0x5ba5);  // ret c
+  CYC(b_+31, b_+33); E = 0xb8;  // ld e,Enemy.var38
+  CYC(b_+33, b_+34); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+34, b_+35); alu_or(gb, A);  // or a
+  if ((F & FZ)) { RET_TAKEN(b_+35); return; } CYC(b_+35, b_+36);  // ret z
+  CYC(b_+36, b_+37); H = D;  // ld h,d
+  CYC(b_+37, b_+39); L = 0x8f;  // ld l,Enemy.zh
+  CYC(b_+39, b_+40); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+40, b_+42); alu_sub(gb, 0x03);  // sub $03
+  CYC(b_+42, b_+43); mem_wr(gb, HL, A);  // ld (hl),a
+  CYC(b_+43, b_+45); alu_bit(gb, 7, A);  // bit 7,a
+  if ((F & FZ)) { CYCT(b_+45, b_+47); goto zh; } CYC(b_+45, b_+47);  // jr z,+
+  CYC(b_+47, b_+49); alu_cp(gb, 0xe0);  // cp $e0
+  if (!(F & FC)) { RET_TAKEN(b_+49); return; } CYC(b_+49, b_+50);  // ret nc
+  CYC(b_+50, b_+52); A = mem_rd(gb, hCameraY);  // ldh a,(<hCameraY)
+  CYC(b_+52, b_+53); B = A;  // ld b,a
+  CYC(b_+53, b_+54); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+54, b_+56); L = 0x8b;  // ld l,Enemy.yh
+  CYC(b_+56, b_+57); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  CYC(b_+57, b_+58); alu_sub(gb, B);  // sub b
+  CYC(b_+58, b_+60); alu_cp(gb, 0xb0);  // cp $b0
+  if ((F & FC)) { RET_TAKEN(b_+60); return; } CYC(b_+60, b_+61);  // ret c
 zh:
-  CYC(0x5ba5, 0x5ba7); L = 0x85;  // ld l,Enemy.substate
-  CYC(0x5ba7, 0x5ba8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x5ba8, 0x5ba9); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5ba9, 0x5bab); mem_wr(gb, HL, 90);  // ld (hl),90
-  CYC(0x5bab, 0x5bad); L = 0xa4;  // ld l,Enemy.collisionType
-  CYC(0x5bad, 0x5baf); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
-  CYC(0x5baf, 0x5bb1); L = 0x8f;  // ld l,Enemy.zh
-  CYC(0x5bb1, 0x5bb3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CYC(0x5bb3, 0x5bb6); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp objectSetInvisible
+  CYC(b_+61, b_+63); L = 0x85;  // ld l,Enemy.substate
+  CYC(b_+63, b_+64); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+64, b_+65); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+65, b_+67); mem_wr(gb, HL, 90);  // ld (hl),90
+  CYC(b_+67, b_+69); L = 0xa4;  // ld l,Enemy.collisionType
+  CYC(b_+69, b_+71); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
+  CYC(b_+71, b_+73); L = 0x8f;  // ld l,Enemy.zh
+  CYC(b_+73, b_+75); mem_wr(gb, HL, 0x00);  // ld (hl),$00
+  CYC(b_+75, b_+78); if (hook_enabled_at(SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible));  // jp objectSetInvisible
 substate2:
-  CALL_C(0x5bb6, ecom_decCounter1_b10_hook, 0x439a, 0x5bb9);
-  if (!(F & FZ)) { RET_TAKEN(0x5bb9); return; } CYC(0x5bb9, 0x5bba);  // ret nz
-  CYC(0x5bba, 0x5bbb); L = E;  // ld l,e
-  CYC(0x5bbb, 0x5bbc); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x5bbc, 0x5bbe); L = 0xa4;  // ld l,Enemy.collisionType
-  CYC(0x5bbe, 0x5bc0); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CYC(0x5bc0, 0x5bc2); L = 0x94;  // ld l,Enemy.speedZ
-  CYC(0x5bc2, 0x5bc3); alu_xor(gb, A);  // xor a
-  CYC(0x5bc3, 0x5bc4); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
-  CYC(0x5bc4, 0x5bc6); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  CYC(0x5bc6, 0x5bc8); L = 0x8b;  // ld l,Enemy.yh
-  CYC(0x5bc8, 0x5bca); A = mem_rd(gb, 0xffb0);  // ldh a,(<hEnemyTargetY)
-  CYC(0x5bca, 0x5bcb); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
-  CYC(0x5bcb, 0x5bcc); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5bcc, 0x5bce); A = mem_rd(gb, 0xffb1);  // ldh a,(<hEnemyTargetX)
-  CYC(0x5bce, 0x5bcf); mem_wr(gb, HL, A);  // ld (hl),a
-  CYC(0x5bcf, 0x5bd1); C = 0x08;  // ld c,$08
-  CALL_C(0x5bd1, ecom_setZAboveScreen_b10_hook, 0x4446, 0x5bd4);
-  CALL_C(0x5bd4, veranFinal_spiderForm_resetCollisionData_hook, 0x5c16, 0x5bd7);
-  CYC(0x5bd7, 0x5bda); if (hook_enabled_at(0x1e60)) { objectSetVisible81_hook(gb); return; } HANDOFF(0x1e60);  // jp objectSetVisible81
+  CALL_C(b_+78, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+81);
+  if (!(F & FZ)) { RET_TAKEN(b_+81); return; } CYC(b_+81, b_+82);  // ret nz
+  CYC(b_+82, b_+83); L = E;  // ld l,e
+  CYC(b_+83, b_+84); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+84, b_+86); L = 0xa4;  // ld l,Enemy.collisionType
+  CYC(b_+86, b_+88); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
+  CYC(b_+88, b_+90); L = 0x94;  // ld l,Enemy.speedZ
+  CYC(b_+90, b_+91); alu_xor(gb, A);  // xor a
+  CYC(b_+91, b_+92); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
+  CYC(b_+92, b_+94); mem_wr(gb, HL, 0x01);  // ld (hl),$01
+  CYC(b_+94, b_+96); L = 0x8b;  // ld l,Enemy.yh
+  CYC(b_+96, b_+98); A = mem_rd(gb, hEnemyTargetY);  // ldh a,(<hEnemyTargetY)
+  CYC(b_+98, b_+99); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
+  CYC(b_+99, b_+100); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+100, b_+102); A = mem_rd(gb, hEnemyTargetX);  // ldh a,(<hEnemyTargetX)
+  CYC(b_+102, b_+103); mem_wr(gb, HL, A);  // ld (hl),a
+  CYC(b_+103, b_+105); C = 0x08;  // ld c,$08
+  CALL_C(b_+105, ecom_setZAboveScreen_b10_hook, SYM(ecom_setZAboveScreen_b10), b_+108);
+  CALL_C(b_+108, veranFinal_spiderForm_resetCollisionData_hook, SYM(veranFinal_spiderForm_resetCollisionData), b_+111);
+  CYC(b_+111, b_+114); if (hook_enabled_at(SYM(objectSetVisible81))) { objectSetVisible81_hook(gb); return; } HANDOFF(SYM(objectSetVisible81));  // jp objectSetVisible81
 substate3:
-  CYC(0x5bda, 0x5bdc); C = 0x20;  // ld c,$20
-  CALL_C(0x5bdc, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x5bdf);
-  if (!(F & FZ)) { RET_TAKEN(0x5bdf); return; } CYC(0x5bdf, 0x5be0);  // ret nz
-  CYC(0x5be0, 0x5be2); L = 0x85;  // ld l,Enemy.substate
-  CYC(0x5be2, 0x5be3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x5be3, 0x5be4); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5be4, 0x5be6); mem_wr(gb, HL, 120);  // ld (hl),120
-  CYC(0x5be6, 0x5be8); A = 0x81;  // ld a,SND_STRONG_POUND
-  CALL_C(0x5be8, playSound_b00_hook, 0x0c98, 0x5beb);
-  CYC(0x5beb, 0x5bed); A = 90;  // ld a,90
-  CALL_C(0x5bed, setScreenShakeCounter_hook, 0x24bb, 0x5bf0);
-  CYC(0x5bf0, 0x5bf3); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp objectSetVisible83
+  CYC(b_+114, b_+116); C = 0x20;  // ld c,$20
+  CALL_C(b_+116, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+119);
+  if (!(F & FZ)) { RET_TAKEN(b_+119); return; } CYC(b_+119, b_+120);  // ret nz
+  CYC(b_+120, b_+122); L = 0x85;  // ld l,Enemy.substate
+  CYC(b_+122, b_+123); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+123, b_+124); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+124, b_+126); mem_wr(gb, HL, 120);  // ld (hl),120
+  CYC(b_+126, b_+128); A = 0x81;  // ld a,SND_STRONG_POUND
+  CALL_C(b_+128, playSound_b00_hook, SYM(playSound_b00), b_+131);
+  CYC(b_+131, b_+133); A = 90;  // ld a,90
+  CALL_C(b_+133, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+136);
+  CYC(b_+136, b_+139); if (hook_enabled_at(SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; } HANDOFF(SYM(objectSetVisible83));  // jp objectSetVisible83
 substate4:
-  CALL_C(0x5bf3, ecom_decCounter1_b10_hook, 0x439a, 0x5bf6);
-  if (!(F & FZ)) { RET_TAKEN(0x5bf6); return; } CYC(0x5bf6, 0x5bf7);  // ret nz
-  CYC(0x5bf7, 0x5bfa); veranFinal_spiderForm_setCounter2AndInitState2_hook(gb); return;  // jp veranFinal_spiderForm_setCounter2AndInitState2
+  CALL_C(b_+139, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+142);
+  if (!(F & FZ)) { RET_TAKEN(b_+142); return; } CYC(b_+142, b_+143);  // ret nz
+  CYC(b_+143, SYM(veranFinal_spiderForm_webAttack)); veranFinal_spiderForm_setCounter2AndInitState2_hook(gb); return;  // jp veranFinal_spiderForm_setCounter2AndInitState2
 }
 
 void veranFinal_spiderForm_webAttack_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_webAttack);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5bfa, 0x5bfb); A = mem_rd(gb, DE);  // ld a,(de) [substate]
-  CYC(0x5bfb, 0x5bfc); push_effect(gb, 0x5bfc);
-  switch (veranFinal_jump_table(gb)) {
-    case 0x5c0c: veranFinal_spiderForm_webAttack_substate0_hook(gb); return;
-    case 0x5c24: veranFinal_spiderForm_webAttack_substate1_hook(gb); return;
-    case 0x5c3b: veranFinal_spiderForm_webAttack_substate2_hook(gb); return;
-    case 0x5c50: veranFinal_spiderForm_webAttack_substate3_hook(gb); return;
-    case 0x5c76: veranFinal_spiderForm_webAttack_substate4_hook(gb); return;
-    case 0x5c9b: veranFinal_spiderForm_webAttack_substate5_hook(gb); return;
-    case 0x5cac: veranFinal_spiderForm_webAttack_substate6_hook(gb); return;
-    case 0x5cc8: veranFinal_spiderForm_webAttack_substate7_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);  // ld a,(de) [substate]
+  CYC(b_+1, b_+2); push_effect(gb, b_+2);
+  do { uint16_t jt_ = (veranFinal_jump_table(gb));
+    if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate0)) { veranFinal_spiderForm_webAttack_substate0_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate1)) { veranFinal_spiderForm_webAttack_substate1_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate2)) { veranFinal_spiderForm_webAttack_substate2_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate3)) { veranFinal_spiderForm_webAttack_substate3_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate4)) { veranFinal_spiderForm_webAttack_substate4_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate5)) { veranFinal_spiderForm_webAttack_substate5_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate6)) { veranFinal_spiderForm_webAttack_substate6_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate7)) { veranFinal_spiderForm_webAttack_substate7_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void veranFinal_spiderForm_webAttack_substate0_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_webAttack_substate0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5c0c, 0x5c0d); H = D;  // ld h,d
-  CYC(0x5c0d, 0x5c0e); L = E;  // ld l,e
-  CYC(0x5c0e, 0x5c0f); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x5c0f, 0x5c10); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5c10, 0x5c12); mem_wr(gb, HL, 30);  // ld (hl),30
-  CYC(0x5c12, 0x5c14); L = 0xb8;  // ld l,Enemy.var38
-  CYC(0x5c14, 0x5c16); mem_wr(gb, HL, 0x00);  // ld (hl),$00
+  CYC(b_+0, b_+1); H = D;  // ld h,d
+  CYC(b_+1, b_+2); L = E;  // ld l,e
+  CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+3, b_+4); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+4, b_+6); mem_wr(gb, HL, 30);  // ld (hl),30
+  CYC(b_+6, b_+8); L = 0xb8;  // ld l,Enemy.var38
+  CYC(b_+8, SYM(veranFinal_spiderForm_resetCollisionData)); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   veranFinal_spiderForm_resetCollisionData_hook(gb); return;  // fallthrough
 }
 
 void veranFinal_spiderForm_resetCollisionData_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_resetCollisionData);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5c16, 0x5c17); H = D;  // ld h,d
-  CYC(0x5c17, 0x5c19); L = 0xa5;  // ld l,Enemy.enemyCollisionMode
-  CYC(0x5c19, 0x5c1b); mem_wr(gb, HL, 0x6c);  // ld (hl),ENEMYCOLLISION_VERAN_SPIDER_FORM
-  CYC(0x5c1b, 0x5c1d); L = 0xa6;  // ld l,Enemy.collisionRadiusY
-  CYC(0x5c1d, 0x5c1f); mem_wr(gb, HL, 0x10);  // ld (hl),$10
-  CYC(0x5c1f, 0x5c21); A = 0x05;  // ld a,$05
-  CYC(0x5c21, 0x5c24); if (hook_enabled_at(0x282b)) { enemySetAnimation_hook(gb); return; } HANDOFF(0x282b);  // jp enemySetAnimation
+  CYC(b_+0, b_+1); H = D;  // ld h,d
+  CYC(b_+1, b_+3); L = 0xa5;  // ld l,Enemy.enemyCollisionMode
+  CYC(b_+3, b_+5); mem_wr(gb, HL, 0x6c);  // ld (hl),ENEMYCOLLISION_VERAN_SPIDER_FORM
+  CYC(b_+5, b_+7); L = 0xa6;  // ld l,Enemy.collisionRadiusY
+  CYC(b_+7, b_+9); mem_wr(gb, HL, 0x10);  // ld (hl),$10
+  CYC(b_+9, b_+11); A = 0x05;  // ld a,$05
+  CYC(b_+11, SYM(veranFinal_spiderForm_webAttack_substate1)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void veranFinal_spiderForm_webAttack_substate1_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_webAttack_substate1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5c24, ecom_decCounter1_b10_hook, 0x439a, 0x5c27);
-  if (!(F & FZ)) { RET_TAKEN(0x5c27); return; } CYC(0x5c27, 0x5c28);  // ret nz
-  CYC(0x5c28, 0x5c29); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5c29, 0x5c2b); mem_wr(gb, HL, 0x08);  // ld (hl),$08
-  CYC(0x5c2b, 0x5c2c); L = E;  // ld l,e
-  CYC(0x5c2c, 0x5c2d); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
+  CYC(b_+4, b_+5); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 0x08);  // ld (hl),$08
+  CYC(b_+7, b_+8); L = E;  // ld l,e
+  CYC(b_+8, SYM(veranFinal_spiderForm_setVulnerableCollisionData)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   veranFinal_spiderForm_setVulnerableCollisionData_hook(gb); return;  // fallthrough
 }
 
 void veranFinal_spiderForm_setVulnerableCollisionData_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_setVulnerableCollisionData);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5c2d, 0x5c2e); H = D;  // ld h,d
-  CYC(0x5c2e, 0x5c30); L = 0xa5;  // ld l,Enemy.enemyCollisionMode
-  CYC(0x5c30, 0x5c32); mem_wr(gb, HL, 0x6b);  // ld (hl),ENEMYCOLLISION_VERAN_SPIDER_FORM_VULNERABLE
-  CYC(0x5c32, 0x5c34); L = 0xa6;  // ld l,Enemy.collisionRadiusY
-  CYC(0x5c34, 0x5c36); mem_wr(gb, HL, 0x08);  // ld (hl),$08
-  CYC(0x5c36, 0x5c38); A = 0x06;  // ld a,$06
-  CYC(0x5c38, 0x5c3b); if (hook_enabled_at(0x282b)) { enemySetAnimation_hook(gb); return; } HANDOFF(0x282b);  // jp enemySetAnimation
+  CYC(b_+0, b_+1); H = D;  // ld h,d
+  CYC(b_+1, b_+3); L = 0xa5;  // ld l,Enemy.enemyCollisionMode
+  CYC(b_+3, b_+5); mem_wr(gb, HL, 0x6b);  // ld (hl),ENEMYCOLLISION_VERAN_SPIDER_FORM_VULNERABLE
+  CYC(b_+5, b_+7); L = 0xa6;  // ld l,Enemy.collisionRadiusY
+  CYC(b_+7, b_+9); mem_wr(gb, HL, 0x08);  // ld (hl),$08
+  CYC(b_+9, b_+11); A = 0x06;  // ld a,$06
+  CYC(b_+11, SYM(veranFinal_spiderForm_webAttack_substate2)); if (hook_enabled_at(SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void veranFinal_spiderForm_webAttack_substate2_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_webAttack_substate2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5c3b, ecom_decCounter2_b10_hook, 0x43a3, 0x5c3e);
-  if (!(F & FZ)) { RET_TAKEN(0x5c3e); return; } CYC(0x5c3e, 0x5c3f);  // ret nz
-  CYC(0x5c3f, 0x5c41); B = 0x56;  // ld b,$56
-  CALL_C(0x5c41, ecom_spawnProjectile_b10_hook, 0x437c, 0x5c44);
-  if (!(F & FZ)) { RET_TAKEN(0x5c44); return; } CYC(0x5c44, 0x5c45);  // ret nz
-  CYC(0x5c45, 0x5c47); L = 0xc2;  // ld l,Part.subid
-  CYC(0x5c47, 0x5c48); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL_C(0x5c48, ecom_incSubstate_b10_hook, 0x4005, 0x5c4b);
-  CYC(0x5c4b, 0x5c4c); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5c4c, 0x5c4e); mem_wr(gb, HL, 90);  // ld (hl),90
-  CYC(0x5c4e, 0x5c51); veranFinal_spiderForm_resetCollisionData_hook(gb); return;  // jr veranFinal_spiderForm_resetCollisionData
+  CALL_C(b_+0, ecom_decCounter2_b10_hook, SYM(ecom_decCounter2_b10), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
+  CYC(b_+4, b_+6); B = 0x56;  // ld b,$56
+  CALL_C(b_+6, ecom_spawnProjectile_b10_hook, SYM(ecom_spawnProjectile_b10), b_+9);
+  if (!(F & FZ)) { RET_TAKEN(b_+9); return; } CYC(b_+9, b_+10);  // ret nz
+  CYC(b_+10, b_+12); L = 0xc2;  // ld l,Part.subid
+  CYC(b_+12, b_+13); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CALL_C(b_+13, ecom_incSubstate_b10_hook, SYM(ecom_incSubstate_b10), b_+16);
+  CYC(b_+16, b_+17); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+17, b_+19); mem_wr(gb, HL, 90);  // ld (hl),90
+  CYC(b_+19, (SYM(veranFinal_spiderForm_webAttack_substate3) + 1)); veranFinal_spiderForm_resetCollisionData_hook(gb); return;  // jr veranFinal_spiderForm_resetCollisionData
 }
 
 void veranFinal_spiderForm_webAttack_substate3_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_webAttack_substate3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5c50, 0x5c52); E = 0xb8;  // ld e,Enemy.var38
-  CYC(0x5c52, 0x5c53); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5c53, 0x5c54); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x5c54); return; } CYC(0x5c54, 0x5c55);  // ret z
-  CALL_C(0x5c55, ecom_decCounter1_b10_hook, 0x439a, 0x5c58);
-  if (!(F & FZ)) { RET_TAKEN(0x5c58); return; } CYC(0x5c58, 0x5c59);  // ret nz
-  CYC(0x5c59, 0x5c5c); A = mem_rd(gb, 0xd004);  // ld a,(w1Link.state)
-  CYC(0x5c5c, 0x5c5e); alu_cp(gb, 0x0d);  // cp LINK_STATE_GRABBED
-  if (!(F & FZ)) { CYCT(0x5c5e, 0x5c61); veranFinal_spiderForm_setCounter2AndInitState2_hook(gb); return; } CYC(0x5c5e, 0x5c61);  // jp nz,veranFinal_spiderForm_setCounter2AndInitState2
-  CALL_C(0x5c61, ecom_incSubstate_b10_hook, 0x4005, 0x5c64);
-  CYC(0x5c64, 0x5c65); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5c65, 0x5c67); mem_wr(gb, HL, 0x10);  // ld (hl),$10
-  CYC(0x5c67, 0x5c69); A = 0x06;  // ld a,$06
-  CALL_C(0x5c69, enemySetAnimation_hook, 0x282b, 0x5c6c);
-  CYC(0x5c6c, 0x5c6e); B = 0xf8;  // ld b,$f8
+  CYC(b_+0, b_+2); E = 0xb8;  // ld e,Enemy.var38
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+3, b_+4); alu_or(gb, A);  // or a
+  if ((F & FZ)) { RET_TAKEN(b_+4); return; } CYC(b_+4, b_+5);  // ret z
+  CALL_C(b_+5, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+8);
+  if (!(F & FZ)) { RET_TAKEN(b_+8); return; } CYC(b_+8, b_+9);  // ret nz
+  CYC(b_+9, b_+12); A = mem_rd(gb, w1Link_state);  // ld a,(w1Link.state)
+  CYC(b_+12, b_+14); alu_cp(gb, 0x0d);  // cp LINK_STATE_GRABBED
+  if (!(F & FZ)) { CYCT(b_+14, b_+17); veranFinal_spiderForm_setCounter2AndInitState2_hook(gb); return; } CYC(b_+14, b_+17);  // jp nz,veranFinal_spiderForm_setCounter2AndInitState2
+  CALL_C(b_+17, ecom_incSubstate_b10_hook, SYM(ecom_incSubstate_b10), b_+20);
+  CYC(b_+20, b_+21); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+21, b_+23); mem_wr(gb, HL, 0x10);  // ld (hl),$10
+  CYC(b_+23, b_+25); A = 0x06;  // ld a,$06
+  CALL_C(b_+25, enemySetAnimation_hook, SYM(enemySetAnimation), b_+28);
+  CYC(b_+28, SYM(veranFinal_spiderForm_webAttack_updateLinkPosition)); B = 0xf8;  // ld b,$f8
   veranFinal_spiderForm_webAttack_updateLinkPosition_hook(gb); return;  // fallthrough
 }
 
 void veranFinal_spiderForm_webAttack_updateLinkPosition_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_webAttack_updateLinkPosition);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5c6e, 0x5c71); SET_HL(0xd000);  // ld hl,w1Link
-  CYC(0x5c71, 0x5c73); C = 0x00;  // ld c,$00
-  CYC(0x5c73, 0x5c76); if (hook_enabled_at(0x225a)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(0x225a);  // jp objectCopyPositionWithOffset
+  CYC(b_+0, b_+3); SET_HL(w1Link);  // ld hl,w1Link
+  CYC(b_+3, b_+5); C = 0x00;  // ld c,$00
+  CYC(b_+5, SYM(veranFinal_spiderForm_webAttack_substate4)); if (hook_enabled_at(SYM(objectCopyPositionWithOffset))) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(SYM(objectCopyPositionWithOffset));  // jp objectCopyPositionWithOffset
 }
 
 void veranFinal_spiderForm_webAttack_substate4_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_webAttack_substate4);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5c76, ecom_decCounter1_b10_hook, 0x439a, 0x5c79);
-  if (!(F & FZ)) { RET_TAKEN(0x5c79); return; } CYC(0x5c79, 0x5c7a);  // ret nz
-  CYC(0x5c7a, 0x5c7c); mem_wr(gb, HL, 0x04);  // ld (hl),$04
-  CYC(0x5c7c, 0x5c7d); L = E;  // ld l,e
-  CYC(0x5c7d, 0x5c7e); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x5c7e, 0x5c80); A = 0x05;  // ld a,$05
-  CALL_C(0x5c80, enemySetAnimation_hook, 0x282b, 0x5c83);
-  CYC(0x5c83, 0x5c85); A = 0x04;  // ld a,$04
-  CALL_C(0x5c85, setScreenShakeCounter_hook, 0x24bb, 0x5c88);
-  CYC(0x5c88, 0x5c8a); B = 0x14;  // ld b,$14
-  CALL_C(0x5c8a, veranFinal_spiderForm_webAttack_updateLinkPosition_hook, 0x5c6e, 0x5c8d);
-  CYC(0x5c8d, 0x5c90); SET_BC(0xfa08);  // ld bc,-6,$08
+  CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
+  CYC(b_+4, b_+6); mem_wr(gb, HL, 0x04);  // ld (hl),$04
+  CYC(b_+6, b_+7); L = E;  // ld l,e
+  CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+8, b_+10); A = 0x05;  // ld a,$05
+  CALL_C(b_+10, enemySetAnimation_hook, SYM(enemySetAnimation), b_+13);
+  CYC(b_+13, b_+15); A = 0x04;  // ld a,$04
+  CALL_C(b_+15, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+18);
+  CYC(b_+18, b_+20); B = 0x14;  // ld b,$14
+  CALL_C(b_+20, veranFinal_spiderForm_webAttack_updateLinkPosition_hook, SYM(veranFinal_spiderForm_webAttack_updateLinkPosition), b_+23);
+  CYC(b_+23, SYM(veranFinal_spiderForm_webAttack_applyDamageToLink)); SET_BC(0xfa08);  // ld bc,-6,$08
   veranFinal_spiderForm_webAttack_applyDamageToLink_hook(gb); return;  // fallthrough
 }
 
 void veranFinal_spiderForm_webAttack_applyDamageToLink_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_webAttack_applyDamageToLink);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5c90, 0x5c92); L = 0x25;  // ld l,<w1Link.damageToApply
-  CYC(0x5c92, 0x5c93); mem_wr(gb, HL, B);  // ld (hl),b
-  CYC(0x5c93, 0x5c95); L = 0x2b;  // ld l,<w1Link.invincibilityCounter
-  CYC(0x5c95, 0x5c96); mem_wr(gb, HL, C);  // ld (hl),c
-  CYC(0x5c96, 0x5c98); A = 0x81;  // ld a,SND_STRONG_POUND
-  CYC(0x5c98, 0x5c9b); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp playSound
+  CYC(b_+0, b_+2); L = 0x25;  // ld l,<w1Link.damageToApply
+  CYC(b_+2, b_+3); mem_wr(gb, HL, B);  // ld (hl),b
+  CYC(b_+3, b_+5); L = 0x2b;  // ld l,<w1Link.invincibilityCounter
+  CYC(b_+5, b_+6); mem_wr(gb, HL, C);  // ld (hl),c
+  CYC(b_+6, b_+8); A = 0x81;  // ld a,SND_STRONG_POUND
+  CYC(b_+8, SYM(veranFinal_spiderForm_webAttack_substate5)); if (hook_enabled_at(SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
 }
 
 void veranFinal_spiderForm_webAttack_substate5_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_webAttack_substate5);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5c9b, ecom_decCounter1_b10_hook, 0x439a, 0x5c9e);
-  if (!(F & FZ)) { RET_TAKEN(0x5c9e); return; } CYC(0x5c9e, 0x5c9f);  // ret nz
-  CYC(0x5c9f, 0x5ca1); mem_wr(gb, HL, 0x08);  // ld (hl),$08
-  CYC(0x5ca1, 0x5ca2); L = E;  // ld l,e
-  CYC(0x5ca2, 0x5ca3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x5ca3, 0x5ca5); A = 0x06;  // ld a,$06
-  CALL_C(0x5ca5, enemySetAnimation_hook, 0x282b, 0x5ca8);
-  CYC(0x5ca8, 0x5caa); B = 0xf6;  // ld b,$f6
-  CYC(0x5caa, 0x5cac); veranFinal_spiderForm_webAttack_updateLinkPosition_hook(gb); return;  // jr veranFinal_spiderForm_webAttack_updateLinkPosition
+  CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
+  CYC(b_+4, b_+6); mem_wr(gb, HL, 0x08);  // ld (hl),$08
+  CYC(b_+6, b_+7); L = E;  // ld l,e
+  CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+8, b_+10); A = 0x06;  // ld a,$06
+  CALL_C(b_+10, enemySetAnimation_hook, SYM(enemySetAnimation), b_+13);
+  CYC(b_+13, b_+15); B = 0xf6;  // ld b,$f6
+  CYC(b_+15, SYM(veranFinal_spiderForm_webAttack_substate6)); veranFinal_spiderForm_webAttack_updateLinkPosition_hook(gb); return;  // jr veranFinal_spiderForm_webAttack_updateLinkPosition
 }
 
 void veranFinal_spiderForm_webAttack_substate6_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_webAttack_substate6);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5cac, ecom_decCounter1_b10_hook, 0x439a, 0x5caf);
-  if (!(F & FZ)) { RET_TAKEN(0x5caf); return; } CYC(0x5caf, 0x5cb0);  // ret nz
-  CYC(0x5cb0, 0x5cb2); mem_wr(gb, HL, 0x0f);  // ld (hl),$0f
-  CYC(0x5cb2, 0x5cb3); L = E;  // ld l,e
-  CYC(0x5cb3, 0x5cb4); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x5cb4, 0x5cb6); A = 0x05;  // ld a,$05
-  CALL_C(0x5cb6, enemySetAnimation_hook, 0x282b, 0x5cb9);
-  CYC(0x5cb9, 0x5cbb); A = 0x14;  // ld a,$14
-  CALL_C(0x5cbb, setScreenShakeCounter_hook, 0x24bb, 0x5cbe);
-  CYC(0x5cbe, 0x5cc0); B = 0x14;  // ld b,$14
-  CALL_C(0x5cc0, veranFinal_spiderForm_webAttack_updateLinkPosition_hook, 0x5c6e, 0x5cc3);
-  CYC(0x5cc3, 0x5cc6); SET_BC(0xf618);  // ld bc,-10,$18
-  CYC(0x5cc6, 0x5cc9); veranFinal_spiderForm_webAttack_applyDamageToLink_hook(gb); return;  // jr veranFinal_spiderForm_webAttack_applyDamageToLink
+  CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
+  CYC(b_+4, b_+6); mem_wr(gb, HL, 0x0f);  // ld (hl),$0f
+  CYC(b_+6, b_+7); L = E;  // ld l,e
+  CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+8, b_+10); A = 0x05;  // ld a,$05
+  CALL_C(b_+10, enemySetAnimation_hook, SYM(enemySetAnimation), b_+13);
+  CYC(b_+13, b_+15); A = 0x14;  // ld a,$14
+  CALL_C(b_+15, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+18);
+  CYC(b_+18, b_+20); B = 0x14;  // ld b,$14
+  CALL_C(b_+20, veranFinal_spiderForm_webAttack_updateLinkPosition_hook, SYM(veranFinal_spiderForm_webAttack_updateLinkPosition), b_+23);
+  CYC(b_+23, b_+26); SET_BC(0xf618);  // ld bc,-10,$18
+  CYC(b_+26, (SYM(veranFinal_spiderForm_webAttack_substate7) + 1)); veranFinal_spiderForm_webAttack_applyDamageToLink_hook(gb); return;  // jr veranFinal_spiderForm_webAttack_applyDamageToLink
 }
 
 void veranFinal_spiderForm_webAttack_substate7_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_webAttack_substate7);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5cc8, ecom_decCounter1_b10_hook, 0x439a, 0x5ccb);
-  if (!(F & FZ)) { RET_TAKEN(0x5ccb); return; } CYC(0x5ccb, 0x5ccc);  // ret nz
-  CYC(0x5ccc, 0x5cce); L = 0xa4;  // ld l,Enemy.collisionType
-  CYC(0x5cce, 0x5cd0); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CALL_C(0x5cd0, veranFinal_spiderForm_setCounter2AndInitState2_hook, 0x5ad8, 0x5cd3);
+  CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
+  CYC(b_+4, b_+6); L = 0xa4;  // ld l,Enemy.collisionType
+  CYC(b_+6, b_+8); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
+  CALL_C(b_+8, veranFinal_spiderForm_setCounter2AndInitState2_hook, SYM(veranFinal_spiderForm_setCounter2AndInitState2), SYM(veranFinal_grabbingLink));
   veranFinal_grabbingLink_hook(gb); return;  // fallthrough
 }
 
 void veranFinal_grabbingLink_hook(GB *gb) {
+  BASE(veranFinal_grabbingLink);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5cd3, 0x5cd6); SET_HL(0xd005);  // ld hl,w1Link.substate
-  CYC(0x5cd6, 0x5cd8); mem_wr(gb, HL, 0x02);  // ld (hl),$02
-  CYC(0x5cd8, 0x5cda); L = 0x24;  // ld l,<w1Link.collisionType
-  CYC(0x5cda, 0x5cdc); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  RET(0x5cdc); return;  // ret
+  CYC(b_+0, b_+3); SET_HL(w1Link_substate);  // ld hl,w1Link.substate
+  CYC(b_+3, b_+5); mem_wr(gb, HL, 0x02);  // ld (hl),$02
+  CYC(b_+5, b_+7); L = 0x24;  // ld l,<w1Link.collisionType
+  CYC(b_+7, b_+9); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
+  RET(b_+9); return;  // ret
 }
 
 void veranFinal_beeForm_hook(GB *gb) {
+  BASE(veranFinal_beeForm);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5cdd, 0x5cde); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5cde, 0x5cdf); push_effect(gb, 0x5cdf);
-  switch (veranFinal_jump_table(gb)) {
-    case 0x5ac0: veranFinal_spiderOrBeeForm_state0_hook(gb); return;
-    case 0x5cf7: veranFinal_beeForm_state1_hook(gb); return;
-    case 0x5d29: veranFinal_beeForm_state2_hook(gb); return;
-    case 0x5d52: veranFinal_beeForm_state3_hook(gb); return;
-    case 0x5d7d: veranFinal_beeForm_state4_hook(gb); return;
-    case 0x5da3: veranFinal_beeForm_state5_hook(gb); return;
-    case 0x5dca: veranFinal_beeForm_state6_hook(gb); return;
-    case 0x5df4: veranFinal_beeForm_state7_hook(gb); return;
-    case 0x5e2f: veranFinal_beeForm_state8_hook(gb); return;
-    case 0x5e43: veranFinal_beeForm_state9_hook(gb); return;
-    case 0x5e4f: veranFinal_beeForm_stateA_hook(gb); return;
-    case 0x5e82: veranFinal_beeForm_stateB_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+1, b_+2); push_effect(gb, b_+2);
+  do { uint16_t jt_ = (veranFinal_jump_table(gb));
+    if (jt_ == SYM(veranFinal_spiderOrBeeForm_state0)) { veranFinal_spiderOrBeeForm_state0_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state1)) { veranFinal_beeForm_state1_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state2)) { veranFinal_beeForm_state2_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state3)) { veranFinal_beeForm_state3_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state4)) { veranFinal_beeForm_state4_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state5)) { veranFinal_beeForm_state5_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state6)) { veranFinal_beeForm_state6_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state7)) { veranFinal_beeForm_state7_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state8)) { veranFinal_beeForm_state8_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state9)) { veranFinal_beeForm_state9_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_stateA)) { veranFinal_beeForm_stateA_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_stateB)) { veranFinal_beeForm_stateB_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void veranFinal_beeForm_state1_hook(GB *gb) {
+  BASE(veranFinal_beeForm_state1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5cf7, enemyAnimate_hook, 0x2818, 0x5cfa);
-  CYC(0x5cfa, 0x5cfc); E = 0xa1;  // ld e,Enemy.animParameter
-  CYC(0x5cfc, 0x5cfd); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5cfd, 0x5cfe); A = alu_inc8(gb, A);  // inc a
-  if (!(F & FZ)) { RET_TAKEN(0x5cfe); return; } CYC(0x5cfe, 0x5cff);  // ret nz
-  CYC(0x5cff, 0x5d01); A = 0x07;  // ld a,$07
-  CALL_C(0x5d01, enemySetAnimation_hook, 0x282b, 0x5d04);
-  CALL_C(0x5d04, ecom_incState_b10_hook, 0x4000, 0x5d07);
-  CYC(0x5d07, 0x5d09); L = 0x90;  // ld l,Enemy.speed
-  CYC(0x5d09, 0x5d0b); mem_wr(gb, HL, 0x50);  // ld (hl),SPEED_200
-  CYC(0x5d0b, 0x5d0e); SET_BC(0x100c);  // ld bc,$100c
-  CYC(0x5d0e, 0x5d10); E = 0x6b;  // ld e,ENEMYCOLLISION_VERAN_SPIDER_FORM_VULNERABLE
-  CYC(0x5d10, 0x5d12); L = 0xb2;  // ld l,Enemy.var32
+  CALL_C(b_+0, enemyAnimate_hook, SYM(enemyAnimate), b_+3);
+  CYC(b_+3, b_+5); E = 0xa1;  // ld e,Enemy.animParameter
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+6, b_+7); A = alu_inc8(gb, A);  // inc a
+  if (!(F & FZ)) { RET_TAKEN(b_+7); return; } CYC(b_+7, b_+8);  // ret nz
+  CYC(b_+8, b_+10); A = 0x07;  // ld a,$07
+  CALL_C(b_+10, enemySetAnimation_hook, SYM(enemySetAnimation), b_+13);
+  CALL_C(b_+13, ecom_incState_b10_hook, SYM(ecom_incState_b10), b_+16);
+  CYC(b_+16, b_+18); L = 0x90;  // ld l,Enemy.speed
+  CYC(b_+18, b_+20); mem_wr(gb, HL, 0x50);  // ld (hl),SPEED_200
+  CYC(b_+20, b_+23); SET_BC((SYM(_getObjectPositionOnScreen_duringScreenTransition) + 75));  // ld bc,$100c
+  CYC(b_+23, b_+25); E = 0x6b;  // ld e,ENEMYCOLLISION_VERAN_SPIDER_FORM_VULNERABLE
+  CYC(b_+25, SYM(veranFinal_initializeForm)); L = 0xb2;  // ld l,Enemy.var32
   veranFinal_initializeForm_hook(gb); return;  // fallthrough
 }
 
 void veranFinal_initializeForm_hook(GB *gb) {
+  BASE(veranFinal_initializeForm);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5d12, 0x5d13); H = D;  // ld h,d
-  CYC(0x5d13, 0x5d14); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5d14, 0x5d16); L = 0xa9;  // ld l,Enemy.health
-  CYC(0x5d16, 0x5d17); mem_wr(gb, HL, A);  // ld (hl),a
-  CYC(0x5d17, 0x5d19); L = 0xa4;  // ld l,Enemy.collisionType
-  CYC(0x5d19, 0x5d1b); mem_wr(gb, HL, 0x82);  // ld (hl),$80|ENEMY_VERAN_FINAL_FORM
-  CYC(0x5d1b, 0x5d1c); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5d1c, 0x5d1d); mem_wr(gb, HL, E);  // ld (hl),e
-  CYC(0x5d1d, 0x5d1f); L = 0xa6;  // ld l,Enemy.collisionRadiusY
-  CYC(0x5d1f, 0x5d20); mem_wr(gb, HL, B);  // ld (hl),b
-  CYC(0x5d20, 0x5d21); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5d21, 0x5d22); mem_wr(gb, HL, C);  // ld (hl),c
-  CYC(0x5d22, 0x5d24); L = 0x9b;  // ld l,Enemy.oamFlagsBackup
-  CYC(0x5d24, 0x5d26); A = 0x06;  // ld a,$06
-  CYC(0x5d26, 0x5d27); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
-  CYC(0x5d27, 0x5d28); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x5d28); return;  // ret
+  CYC(b_+0, b_+1); H = D;  // ld h,d
+  CYC(b_+1, b_+2); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+2, b_+4); L = 0xa9;  // ld l,Enemy.health
+  CYC(b_+4, b_+5); mem_wr(gb, HL, A);  // ld (hl),a
+  CYC(b_+5, b_+7); L = 0xa4;  // ld l,Enemy.collisionType
+  CYC(b_+7, b_+9); mem_wr(gb, HL, 0x82);  // ld (hl),$80|ENEMY_VERAN_FINAL_FORM
+  CYC(b_+9, b_+10); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+10, b_+11); mem_wr(gb, HL, E);  // ld (hl),e
+  CYC(b_+11, b_+13); L = 0xa6;  // ld l,Enemy.collisionRadiusY
+  CYC(b_+13, b_+14); mem_wr(gb, HL, B);  // ld (hl),b
+  CYC(b_+14, b_+15); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+15, b_+16); mem_wr(gb, HL, C);  // ld (hl),c
+  CYC(b_+16, b_+18); L = 0x9b;  // ld l,Enemy.oamFlagsBackup
+  CYC(b_+18, b_+20); A = 0x06;  // ld a,$06
+  CYC(b_+20, b_+21); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
+  CYC(b_+21, b_+22); mem_wr(gb, HL, A);  // ld (hl),a
+  RET(b_+22); return;  // ret
 }
 
 void veranFinal_beeForm_state2_hook(GB *gb) {
+  BASE(veranFinal_beeForm_state2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5d29, 0x5d2b); E = 0x8b;  // ld e,Enemy.yh
-  CYC(0x5d2b, 0x5d2c); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5d2c, 0x5d2e); mem_wr(gb, 0xff8f, A);  // ldh (<hFF8F),a
-  CYC(0x5d2e, 0x5d30); E = 0x8d;  // ld e,Enemy.xh
-  CYC(0x5d30, 0x5d31); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5d31, 0x5d33); mem_wr(gb, 0xff8e, A);  // ldh (<hFF8E),a
-  CYC(0x5d33, 0x5d36); SET_BC(0x5878);  // ldbc LARGE_ROOM_HEIGHT<<3,LARGE_ROOM_WIDTH<<3
-  CYC(0x5d36, 0x5d37); alu_sub(gb, C);  // sub c
-  CYC(0x5d37, 0x5d39); alu_add(gb, 0x02);  // add $02
-  CYC(0x5d39, 0x5d3b); alu_cp(gb, 0x05);  // cp $05
-  if (!(F & FC)) { CYCT(0x5d3b, 0x5d3d); goto updateMovement; } CYC(0x5d3b, 0x5d3d);  // jr nc,@updateMovement
-  CYC(0x5d3d, 0x5d3f); A = mem_rd(gb, 0xff8f);  // ldh a,(<hFF8F)
-  CYC(0x5d3f, 0x5d40); alu_sub(gb, B);  // sub b
-  CYC(0x5d40, 0x5d42); alu_add(gb, 0x02);  // add $02
-  CYC(0x5d42, 0x5d44); alu_cp(gb, 0x05);  // cp $05
-  if (!(F & FC)) { CYCT(0x5d44, 0x5d46); goto updateMovement; } CYC(0x5d44, 0x5d46);  // jr nc,@updateMovement
-  CALL_C(0x5d46, ecom_incState_b10_hook, 0x4000, 0x5d49);
-  CYC(0x5d49, 0x5d4c); veranFinal_beeForm_chooseRandomTargetPosition_hook(gb); return;  // jp veranFinal_beeForm_chooseRandomTargetPosition
+  CYC(b_+0, b_+2); E = 0x8b;  // ld e,Enemy.yh
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+3, b_+5); mem_wr(gb, hFF8F, A);  // ldh (<hFF8F),a
+  CYC(b_+5, b_+7); E = 0x8d;  // ld e,Enemy.xh
+  CYC(b_+7, b_+8); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+8, b_+10); mem_wr(gb, hFF8E, A);  // ldh (<hFF8E),a
+  CYC(b_+10, b_+13); SET_BC((SYM(enemyCode02__normalStatus) + 10));  // ldbc LARGE_ROOM_HEIGHT<<3,LARGE_ROOM_WIDTH<<3
+  CYC(b_+13, b_+14); alu_sub(gb, C);  // sub c
+  CYC(b_+14, b_+16); alu_add(gb, 0x02);  // add $02
+  CYC(b_+16, b_+18); alu_cp(gb, 0x05);  // cp $05
+  if (!(F & FC)) { CYCT(b_+18, b_+20); goto updateMovement; } CYC(b_+18, b_+20);  // jr nc,@updateMovement
+  CYC(b_+20, b_+22); A = mem_rd(gb, hFF8F);  // ldh a,(<hFF8F)
+  CYC(b_+22, b_+23); alu_sub(gb, B);  // sub b
+  CYC(b_+23, b_+25); alu_add(gb, 0x02);  // add $02
+  CYC(b_+25, b_+27); alu_cp(gb, 0x05);  // cp $05
+  if (!(F & FC)) { CYCT(b_+27, b_+29); goto updateMovement; } CYC(b_+27, b_+29);  // jr nc,@updateMovement
+  CALL_C(b_+29, ecom_incState_b10_hook, SYM(ecom_incState_b10), b_+32);
+  CYC(b_+32, b_+35); veranFinal_beeForm_chooseRandomTargetPosition_hook(gb); return;  // jp veranFinal_beeForm_chooseRandomTargetPosition
 updateMovement:
-  CALL_C(0x5d4c, ecom_moveTowardPosition_b10_hook, 0x4430, 0x5d4f);
+  CALL_C(b_+35, ecom_moveTowardPosition_b10_hook, SYM(ecom_moveTowardPosition_b10), SYM(veranFinal_beeForm_animate));
   veranFinal_beeForm_animate_hook(gb); return;  // fallthrough
 }
 
 void veranFinal_beeForm_animate_hook(GB *gb) {
+  BASE(veranFinal_beeForm_animate);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5d4f, 0x5d52); if (hook_enabled_at(0x2818)) { enemyAnimate_hook(gb); return; } HANDOFF(0x2818);  // jp enemyAnimate
+  CYC(b_+0, SYM(veranFinal_beeForm_state3)); if (hook_enabled_at(SYM(enemyAnimate))) { enemyAnimate_hook(gb); return; } HANDOFF(SYM(enemyAnimate));  // jp enemyAnimate
 }
 
 void veranFinal_beeForm_state3_hook(GB *gb) {
+  BASE(veranFinal_beeForm_state3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5d52, veranFinal_moveTowardTargetPosition_hook, 0x601c, 0x5d55);
-  if (!(F & FC)) { CYCT(0x5d55, 0x5d57); veranFinal_beeForm_animate_hook(gb); return; } CYC(0x5d55, 0x5d57);  // jr nc,veranFinal_beeForm_animate
-  CYC(0x5d57, 0x5d59); L = 0x8b;  // ld l,Enemy.yh
-  CYC(0x5d59, 0x5d5a); mem_wr(gb, HL, B);  // ld (hl),b
-  CYC(0x5d5a, 0x5d5c); L = 0x8d;  // ld l,Enemy.xh
-  CYC(0x5d5c, 0x5d5d); mem_wr(gb, HL, C);  // ld (hl),c
-  CALL_C(0x5d5d, veranFinal_beeForm_nextTargetPosition_hook, 0x5fe5, 0x5d60);
-  CALL_C(0x5d60, ecom_decCounter2_b10_hook, 0x43a3, 0x5d63);
-  if (!(F & FZ)) { CYCT(0x5d63, 0x5d65); veranFinal_beeForm_animate_hook(gb); return; } CYC(0x5d63, 0x5d65);  // jr nz,veranFinal_beeForm_animate
-  CYC(0x5d65, 0x5d67); L = 0x84;  // ld l,Enemy.state
-  CYC(0x5d67, 0x5d68); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x5d68, 0x5d6a); L = 0x86;  // ld l,Enemy.counter1
-  CYC(0x5d6a, 0x5d6c); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  CYC(0x5d6c, 0x5d6e); L = 0x8d;  // ld l,Enemy.xh
-  CYC(0x5d6e, 0x5d70); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  CYC(0x5d70, 0x5d72); A = 0x00;  // ld a,$00
-  if (!(F & FZ)) { CYCT(0x5d72, 0x5d74); goto setVar37; } CYC(0x5d72, 0x5d74);  // jr nz,+
-  CYC(0x5d74, 0x5d76); A = 0xf0;  // ld a,$f0
+  CALL_C(b_+0, veranFinal_moveTowardTargetPosition_hook, SYM(veranFinal_moveTowardTargetPosition), b_+3);
+  if (!(F & FC)) { CYCT(b_+3, b_+5); veranFinal_beeForm_animate_hook(gb); return; } CYC(b_+3, b_+5);  // jr nc,veranFinal_beeForm_animate
+  CYC(b_+5, b_+7); L = 0x8b;  // ld l,Enemy.yh
+  CYC(b_+7, b_+8); mem_wr(gb, HL, B);  // ld (hl),b
+  CYC(b_+8, b_+10); L = 0x8d;  // ld l,Enemy.xh
+  CYC(b_+10, b_+11); mem_wr(gb, HL, C);  // ld (hl),c
+  CALL_C(b_+11, veranFinal_beeForm_nextTargetPosition_hook, SYM(veranFinal_beeForm_nextTargetPosition), b_+14);
+  CALL_C(b_+14, ecom_decCounter2_b10_hook, SYM(ecom_decCounter2_b10), b_+17);
+  if (!(F & FZ)) { CYCT(b_+17, b_+19); veranFinal_beeForm_animate_hook(gb); return; } CYC(b_+17, b_+19);  // jr nz,veranFinal_beeForm_animate
+  CYC(b_+19, b_+21); L = 0x84;  // ld l,Enemy.state
+  CYC(b_+21, b_+22); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+22, b_+24); L = 0x86;  // ld l,Enemy.counter1
+  CYC(b_+24, b_+26); mem_wr(gb, HL, 0x01);  // ld (hl),$01
+  CYC(b_+26, b_+28); L = 0x8d;  // ld l,Enemy.xh
+  CYC(b_+28, b_+30); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
+  CYC(b_+30, b_+32); A = 0x00;  // ld a,$00
+  if (!(F & FZ)) { CYCT(b_+32, b_+34); goto setVar37; } CYC(b_+32, b_+34);  // jr nz,+
+  CYC(b_+34, b_+36); A = 0xf0;  // ld a,$f0
 setVar37:
-  CYC(0x5d76, 0x5d78); L = 0xb7;  // ld l,Enemy.var37
-  CYC(0x5d78, 0x5d79); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ldd (hl),a
-  CYC(0x5d79, 0x5d7b); mem_wr(gb, HL, 0xe0);  // ld (hl),$e0
-  CYC(0x5d7b, 0x5d7d); veranFinal_beeForm_animate_hook(gb); return;  // jr veranFinal_beeForm_animate
+  CYC(b_+36, b_+38); L = 0xb7;  // ld l,Enemy.var37
+  CYC(b_+38, b_+39); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ldd (hl),a
+  CYC(b_+39, b_+41); mem_wr(gb, HL, 0xe0);  // ld (hl),$e0
+  CYC(b_+41, SYM(veranFinal_beeForm_state4)); veranFinal_beeForm_animate_hook(gb); return;  // jr veranFinal_beeForm_animate
 }
 
 void veranFinal_beeForm_state4_hook(GB *gb) {
+  BASE(veranFinal_beeForm_state4);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5d7d, ecom_decCounter1_b10_hook, 0x439a, 0x5d80);
-  if (!(F & FZ)) { CYCT(0x5d80, 0x5d82); goto applySpeed; } CYC(0x5d80, 0x5d82);  // jr nz,+
-  CYC(0x5d82, 0x5d84); mem_wr(gb, HL, 0x06);  // ld (hl),$06
-  CYC(0x5d84, 0x5d86); L = 0xb6;  // ld l,Enemy.var36
-  CALL_C(0x5d86, ecom_readPositionVars_b10_hook, 0x4439, 0x5d89);
-  CALL_C(0x5d89, objectGetRelativeAngleWithTempVars_hook, 0x1eb1, 0x5d8c);
-  CALL_C(0x5d8c, objectNudgeAngleTowards_hook, 0x1fd4, 0x5d8f);
+  CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); goto applySpeed; } CYC(b_+3, b_+5);  // jr nz,+
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 0x06);  // ld (hl),$06
+  CYC(b_+7, b_+9); L = 0xb6;  // ld l,Enemy.var36
+  CALL_C(b_+9, ecom_readPositionVars_b10_hook, SYM(ecom_readPositionVars_b10), b_+12);
+  CALL_C(b_+12, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+15);
+  CALL_C(b_+15, objectNudgeAngleTowards_hook, SYM(objectNudgeAngleTowards), b_+18);
 applySpeed:
-  CALL_C(0x5d8f, objectApplySpeed_hook, 0x201d, 0x5d92);
-  CYC(0x5d92, 0x5d94); E = 0x8b;  // ld e,Enemy.yh
-  CYC(0x5d94, 0x5d95); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5d95, 0x5d97); alu_cp(gb, 0xc0);  // cp (LARGE_ROOM_HEIGHT+1)<<4
-  if ((F & FC)) { CYCT(0x5d97, 0x5d99); veranFinal_beeForm_animate_hook(gb); return; } CYC(0x5d97, 0x5d99);  // jr c,veranFinal_beeForm_animate
-  CALL_C(0x5d99, ecom_incState_b10_hook, 0x4000, 0x5d9c);
-  CYC(0x5d9c, 0x5d9e); L = 0x86;  // ld l,Enemy.counter1
-  CYC(0x5d9e, 0x5da0); mem_wr(gb, HL, 30);  // ld (hl),30
-  CYC(0x5da0, 0x5da3); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp objectSetInvisible
+  CALL_C(b_+18, objectApplySpeed_hook, SYM(objectApplySpeed), b_+21);
+  CYC(b_+21, b_+23); E = 0x8b;  // ld e,Enemy.yh
+  CYC(b_+23, b_+24); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+24, b_+26); alu_cp(gb, 0xc0);  // cp (LARGE_ROOM_HEIGHT+1)<<4
+  if ((F & FC)) { CYCT(b_+26, b_+28); veranFinal_beeForm_animate_hook(gb); return; } CYC(b_+26, b_+28);  // jr c,veranFinal_beeForm_animate
+  CALL_C(b_+28, ecom_incState_b10_hook, SYM(ecom_incState_b10), b_+31);
+  CYC(b_+31, b_+33); L = 0x86;  // ld l,Enemy.counter1
+  CYC(b_+33, b_+35); mem_wr(gb, HL, 30);  // ld (hl),30
+  CYC(b_+35, SYM(veranFinal_beeForm_state5)); if (hook_enabled_at(SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible));  // jp objectSetInvisible
 }
 
 void veranFinal_beeForm_state5_hook(GB *gb) {
+  BASE(veranFinal_beeForm_state5);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5da3, ecom_decCounter1_b10_hook, 0x439a, 0x5da6);
-  if (!(F & FZ)) { RET_TAKEN(0x5da6); return; } CYC(0x5da6, 0x5da7);  // ret nz
-  CYC(0x5da7, 0x5da9); mem_wr(gb, HL, 15);  // ld (hl),15
-  CYC(0x5da9, 0x5daa); L = E;  // ld l,e
-  CYC(0x5daa, 0x5dab); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x5dab, 0x5dad); L = 0x8b;  // ld l,Enemy.yh
-  CYC(0x5dad, 0x5daf); mem_wr(gb, HL, 0x20);  // ld (hl),$20
-  CALL_C(0x5daf, getRandomNumber_hook, 0x043e, 0x5db2);
-  CYC(0x5db2, 0x5db4); alu_and(gb, 0x10);  // and $10
-  CYC(0x5db4, 0x5db7); SET_BC(0x08e8);  // ldbc $08,$e8
-  if ((F & FZ)) { CYCT(0x5db7, 0x5db9); goto haveAngle; } CYC(0x5db7, 0x5db9);  // jr z,++
-  CYC(0x5db9, 0x5dba); B = C;  // ld b,c
-  CYC(0x5dba, 0x5dbc); C = 0x08;  // ld c,$08
+  CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
+  CYC(b_+4, b_+6); mem_wr(gb, HL, 15);  // ld (hl),15
+  CYC(b_+6, b_+7); L = E;  // ld l,e
+  CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+8, b_+10); L = 0x8b;  // ld l,Enemy.yh
+  CYC(b_+10, b_+12); mem_wr(gb, HL, 0x20);  // ld (hl),$20
+  CALL_C(b_+12, getRandomNumber_hook, SYM(getRandomNumber), b_+15);
+  CYC(b_+15, b_+17); alu_and(gb, 0x10);  // and $10
+  CYC(b_+17, b_+20); SET_BC((SYM(stubThreadStart) + 6));  // ldbc $08,$e8
+  if ((F & FZ)) { CYCT(b_+20, b_+22); goto haveAngle; } CYC(b_+20, b_+22);  // jr z,++
+  CYC(b_+22, b_+23); B = C;  // ld b,c
+  CYC(b_+23, b_+25); C = 0x08;  // ld c,$08
 haveAngle:
-  CYC(0x5dbc, 0x5dbe); alu_add(gb, 0x08);  // add $08
-  CYC(0x5dbe, 0x5dc0); L = 0x89;  // ld l,Enemy.angle
-  CYC(0x5dc0, 0x5dc1); mem_wr(gb, HL, A);  // ld (hl),a
-  CYC(0x5dc1, 0x5dc3); L = 0x8d;  // ld l,Enemy.xh
-  CYC(0x5dc3, 0x5dc4); mem_wr(gb, HL, B);  // ld (hl),b
-  CYC(0x5dc4, 0x5dc6); L = 0xb7;  // ld l,Enemy.var37
-  CYC(0x5dc6, 0x5dc7); mem_wr(gb, HL, C);  // ld (hl),c
-  CYC(0x5dc7, 0x5dca); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp objectSetVisible83
+  CYC(b_+25, b_+27); alu_add(gb, 0x08);  // add $08
+  CYC(b_+27, b_+29); L = 0x89;  // ld l,Enemy.angle
+  CYC(b_+29, b_+30); mem_wr(gb, HL, A);  // ld (hl),a
+  CYC(b_+30, b_+32); L = 0x8d;  // ld l,Enemy.xh
+  CYC(b_+32, b_+33); mem_wr(gb, HL, B);  // ld (hl),b
+  CYC(b_+33, b_+35); L = 0xb7;  // ld l,Enemy.var37
+  CYC(b_+35, b_+36); mem_wr(gb, HL, C);  // ld (hl),c
+  CYC(b_+36, SYM(veranFinal_beeForm_state6)); if (hook_enabled_at(SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; } HANDOFF(SYM(objectSetVisible83));  // jp objectSetVisible83
 }
 
 void veranFinal_beeForm_state6_hook(GB *gb) {
+  BASE(veranFinal_beeForm_state6);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5dca, ecom_decCounter1_b10_hook, 0x439a, 0x5dcd);
-  if (!(F & FZ)) { CYCT(0x5dcd, 0x5dcf); goto applySpeed; } CYC(0x5dcd, 0x5dcf);  // jr nz,+
-  CYC(0x5dcf, 0x5dd1); mem_wr(gb, HL, 15);  // ld (hl),15
-  CYC(0x5dd1, 0x5dd3); B = 0x58;  // ld b,PART_VERAN_BEE_PROJECTILE
-  CALL_C(0x5dd3, ecom_spawnProjectile_b10_hook, 0x437c, 0x5dd6);
+  CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); goto applySpeed; } CYC(b_+3, b_+5);  // jr nz,+
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 15);  // ld (hl),15
+  CYC(b_+7, b_+9); B = 0x58;  // ld b,PART_VERAN_BEE_PROJECTILE
+  CALL_C(b_+9, ecom_spawnProjectile_b10_hook, SYM(ecom_spawnProjectile_b10), b_+12);
 applySpeed:
-  CALL_C(0x5dd6, objectApplySpeed_hook, 0x201d, 0x5dd9);
-  CYC(0x5dd9, 0x5ddb); E = 0x8d;  // ld e,Enemy.xh
-  CYC(0x5ddb, 0x5ddc); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5ddc, 0x5ddd); H = D;  // ld h,d
-  CYC(0x5ddd, 0x5ddf); L = 0xb7;  // ld l,Enemy.var37
-  CYC(0x5ddf, 0x5de0); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
-  CYC(0x5de0, 0x5de1); A = alu_inc8(gb, A);  // inc a
-  CYC(0x5de1, 0x5de3); alu_cp(gb, 0x03);  // cp $03
-  if (!(F & FC)) { CYCT(0x5de3, 0x5de6); if (hook_enabled_at(0x2818)) { enemyAnimate_hook(gb); return; } HANDOFF(0x2818); } CYC(0x5de3, 0x5de6);  // jp nc,enemyAnimate
-  CALL_C(0x5de6, ecom_incState_b10_hook, 0x4000, 0x5de9);
-  CYC(0x5de9, 0x5deb); L = 0x86;  // ld l,Enemy.counter1
-  CYC(0x5deb, 0x5ded); mem_wr(gb, HL, 60);  // ld (hl),60
-  CYC(0x5ded, 0x5def); L = 0xa4;  // ld l,Enemy.collisionType
-  CYC(0x5def, 0x5df1); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
-  CYC(0x5df1, 0x5df4); if (hook_enabled_at(0x1e7b)) { objectSetInvisible_hook(gb); return; } HANDOFF(0x1e7b);  // jp objectSetInvisible
+  CALL_C(b_+12, objectApplySpeed_hook, SYM(objectApplySpeed), b_+15);
+  CYC(b_+15, b_+17); E = 0x8d;  // ld e,Enemy.xh
+  CYC(b_+17, b_+18); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+18, b_+19); H = D;  // ld h,d
+  CYC(b_+19, b_+21); L = 0xb7;  // ld l,Enemy.var37
+  CYC(b_+21, b_+22); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
+  CYC(b_+22, b_+23); A = alu_inc8(gb, A);  // inc a
+  CYC(b_+23, b_+25); alu_cp(gb, 0x03);  // cp $03
+  if (!(F & FC)) { CYCT(b_+25, b_+28); if (hook_enabled_at(SYM(enemyAnimate))) { enemyAnimate_hook(gb); return; } HANDOFF(SYM(enemyAnimate)); } CYC(b_+25, b_+28);  // jp nc,enemyAnimate
+  CALL_C(b_+28, ecom_incState_b10_hook, SYM(ecom_incState_b10), b_+31);
+  CYC(b_+31, b_+33); L = 0x86;  // ld l,Enemy.counter1
+  CYC(b_+33, b_+35); mem_wr(gb, HL, 60);  // ld (hl),60
+  CYC(b_+35, b_+37); L = 0xa4;  // ld l,Enemy.collisionType
+  CYC(b_+37, b_+39); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));  // res 7,(hl)
+  CYC(b_+39, SYM(veranFinal_beeForm_state7)); if (hook_enabled_at(SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible));  // jp objectSetInvisible
 }
 
 void veranFinal_beeForm_state7_hook(GB *gb) {
+  BASE(veranFinal_beeForm_state7);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5df4, ecom_decCounter1_b10_hook, 0x439a, 0x5df7);
-  if (!(F & FZ)) { RET_TAKEN(0x5df7); return; } CYC(0x5df7, 0x5df8);  // ret nz
-  CALL_C(0x5df8, veranFinal_getQuadrant_hook, 0x6036, 0x5dfb);
+  CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
+  CALL_C(b_+4, veranFinal_getQuadrant_hook, SYM(veranFinal_getQuadrant), b_+7);
 chooseQuadrant:
-  CALL_C(0x5dfb, getRandomNumber_hook, 0x043e, 0x5dfe);
-  CYC(0x5dfe, 0x5dff); C = A;  // ld c,a
-  CYC(0x5dff, 0x5e01); alu_and(gb, 0x03);  // and $03
-  CYC(0x5e01, 0x5e02); alu_cp(gb, B);  // cp b
-  if ((F & FZ)) { CYCT(0x5e02, 0x5e04); goto chooseQuadrant; } CYC(0x5e02, 0x5e04);  // jr z,-
-  CYC(0x5e04, 0x5e06); E = 0xb9;  // ld e,Enemy.var39
-  CYC(0x5e06, 0x5e07); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(0x5e07, 0x5e08); alu_add(gb, A);  // add a
-  CYC(0x5e08, 0x5e0b); SET_HL(0x5eaa);  // ld hl,veranFinal_beeForm_screenCornerEntrances
-  CYC(0x5e0b, 0x5e0c);
-  veranFinal_addDoubleIndexToHl_from_rst(gb, 0x5e0c);  // rst_addDoubleIndexToHl
-  CYC(0x5e0c, 0x5e0e); E = 0xb6;  // ld e,Enemy.var36
-  CYC(0x5e0e, 0x5e0f); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  CYC(0x5e0f, 0x5e10); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(0x5e10, 0x5e11); E = alu_inc8(gb, E);  // inc e
-  CYC(0x5e11, 0x5e12); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  CYC(0x5e12, 0x5e13); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(0x5e13, 0x5e15); E = 0x8b;  // ld e,Enemy.yh
-  CYC(0x5e15, 0x5e16); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  CYC(0x5e16, 0x5e17); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(0x5e17, 0x5e19); E = 0x8d;  // ld e,Enemy.xh
-  CYC(0x5e19, 0x5e1a); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5e1a, 0x5e1b); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(0x5e1b, 0x5e1c); A = C;  // ld a,c
-  CYC(0x5e1c, 0x5e1e); alu_and(gb, 0x30);  // and $30
-  CYC(0x5e1e, 0x5e20); A = alu_swap(gb, A);  // swap a
-  CYC(0x5e20, 0x5e22); alu_add(gb, 0x02);  // add $02
-  CYC(0x5e22, 0x5e24); E = 0x87;  // ld e,Enemy.counter2
-  CYC(0x5e24, 0x5e25); mem_wr(gb, DE, A);  // ld (de),a
-  CALL_C(0x5e25, ecom_incState_b10_hook, 0x4000, 0x5e28);
-  CYC(0x5e28, 0x5e2a); L = 0xa4;  // ld l,Enemy.collisionType
-  CYC(0x5e2a, 0x5e2c); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  CYC(0x5e2c, 0x5e2f); if (hook_enabled_at(0x1e72)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e72);  // jp objectSetVisible83
+  CALL_C(b_+7, getRandomNumber_hook, SYM(getRandomNumber), b_+10);
+  CYC(b_+10, b_+11); C = A;  // ld c,a
+  CYC(b_+11, b_+13); alu_and(gb, 0x03);  // and $03
+  CYC(b_+13, b_+14); alu_cp(gb, B);  // cp b
+  if ((F & FZ)) { CYCT(b_+14, b_+16); goto chooseQuadrant; } CYC(b_+14, b_+16);  // jr z,-
+  CYC(b_+16, b_+18); E = 0xb9;  // ld e,Enemy.var39
+  CYC(b_+18, b_+19); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+19, b_+20); alu_add(gb, A);  // add a
+  CYC(b_+20, b_+23); SET_HL(SYM(veranFinal_beeForm_screenCornerEntrances));  // ld hl,veranFinal_beeForm_screenCornerEntrances
+  CYC(b_+23, b_+24);
+  veranFinal_addDoubleIndexToHl_from_rst(gb, b_+24);  // rst_addDoubleIndexToHl
+  CYC(b_+24, b_+26); E = 0xb6;  // ld e,Enemy.var36
+  CYC(b_+26, b_+27); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  CYC(b_+27, b_+28); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+28, b_+29); E = alu_inc8(gb, E);  // inc e
+  CYC(b_+29, b_+30); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  CYC(b_+30, b_+31); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+31, b_+33); E = 0x8b;  // ld e,Enemy.yh
+  CYC(b_+33, b_+34); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  CYC(b_+34, b_+35); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+35, b_+37); E = 0x8d;  // ld e,Enemy.xh
+  CYC(b_+37, b_+38); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+38, b_+39); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+39, b_+40); A = C;  // ld a,c
+  CYC(b_+40, b_+42); alu_and(gb, 0x30);  // and $30
+  CYC(b_+42, b_+44); A = alu_swap(gb, A);  // swap a
+  CYC(b_+44, b_+46); alu_add(gb, 0x02);  // add $02
+  CYC(b_+46, b_+48); E = 0x87;  // ld e,Enemy.counter2
+  CYC(b_+48, b_+49); mem_wr(gb, DE, A);  // ld (de),a
+  CALL_C(b_+49, ecom_incState_b10_hook, SYM(ecom_incState_b10), b_+52);
+  CYC(b_+52, b_+54); L = 0xa4;  // ld l,Enemy.collisionType
+  CYC(b_+54, b_+56); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
+  CYC(b_+56, SYM(veranFinal_beeForm_state8)); if (hook_enabled_at(SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; } HANDOFF(SYM(objectSetVisible83));  // jp objectSetVisible83
 }
 
 void veranFinal_beeForm_state8_hook(GB *gb) {
+  BASE(veranFinal_beeForm_state8);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5e2f, veranFinal_moveTowardTargetPosition_hook, 0x601c, 0x5e32);
-  if (!(F & FC)) { CYCT(0x5e32, 0x5e34); veranFinal_beeForm_animate2_hook(gb); return; } CYC(0x5e32, 0x5e34);  // jr nc,veranFinal_beeForm_animate2
-  CYC(0x5e34, 0x5e36); L = 0x8b;  // ld l,Enemy.yh
-  CYC(0x5e36, 0x5e37); mem_wr(gb, HL, B);  // ld (hl),b
-  CYC(0x5e37, 0x5e39); L = 0x8d;  // ld l,Enemy.xh
-  CYC(0x5e39, 0x5e3a); mem_wr(gb, HL, C);  // ld (hl),c
-  CYC(0x5e3a, 0x5e3c); L = 0x84;  // ld l,Enemy.state
-  CYC(0x5e3c, 0x5e3d); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x5e3d, 0x5e3f); L = 0x86;  // ld l,Enemy.counter1
-  CYC(0x5e3f, 0x5e41); mem_wr(gb, HL, 30);  // ld (hl),30
-  CYC(0x5e41, 0x5e43); veranFinal_beeForm_animate2_hook(gb); return;  // jr veranFinal_beeForm_animate2
+  CALL_C(b_+0, veranFinal_moveTowardTargetPosition_hook, SYM(veranFinal_moveTowardTargetPosition), b_+3);
+  if (!(F & FC)) { CYCT(b_+3, b_+5); veranFinal_beeForm_animate2_hook(gb); return; } CYC(b_+3, b_+5);  // jr nc,veranFinal_beeForm_animate2
+  CYC(b_+5, b_+7); L = 0x8b;  // ld l,Enemy.yh
+  CYC(b_+7, b_+8); mem_wr(gb, HL, B);  // ld (hl),b
+  CYC(b_+8, b_+10); L = 0x8d;  // ld l,Enemy.xh
+  CYC(b_+10, b_+11); mem_wr(gb, HL, C);  // ld (hl),c
+  CYC(b_+11, b_+13); L = 0x84;  // ld l,Enemy.state
+  CYC(b_+13, b_+14); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+14, b_+16); L = 0x86;  // ld l,Enemy.counter1
+  CYC(b_+16, b_+18); mem_wr(gb, HL, 30);  // ld (hl),30
+  CYC(b_+18, SYM(veranFinal_beeForm_state9)); veranFinal_beeForm_animate2_hook(gb); return;  // jr veranFinal_beeForm_animate2
 }
 
 void veranFinal_beeForm_state9_hook(GB *gb) {
+  BASE(veranFinal_beeForm_state9);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5e43, ecom_decCounter1_b10_hook, 0x439a, 0x5e46);
-  if (!(F & FZ)) { CYCT(0x5e46, 0x5e48); veranFinal_beeForm_animate2_hook(gb); return; } CYC(0x5e46, 0x5e48);  // jr nz,veranFinal_beeForm_animate2
-  CYC(0x5e48, 0x5e4a); mem_wr(gb, HL, 25);  // ld (hl),25
-  CYC(0x5e4a, 0x5e4b); L = E;  // ld l,e
-  CYC(0x5e4b, 0x5e4c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); veranFinal_beeForm_animate2_hook(gb); return; } CYC(b_+3, b_+5);  // jr nz,veranFinal_beeForm_animate2
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 25);  // ld (hl),25
+  CYC(b_+7, b_+8); L = E;  // ld l,e
+  CYC(b_+8, SYM(veranFinal_beeForm_animate2)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   veranFinal_beeForm_animate2_hook(gb); return;  // fallthrough
 }
 
 void veranFinal_beeForm_animate2_hook(GB *gb) {
+  BASE(veranFinal_beeForm_animate2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5e4c, 0x5e4f); if (hook_enabled_at(0x2818)) { enemyAnimate_hook(gb); return; } HANDOFF(0x2818);  // jp enemyAnimate
+  CYC(b_+0, SYM(veranFinal_beeForm_stateA)); if (hook_enabled_at(SYM(enemyAnimate))) { enemyAnimate_hook(gb); return; } HANDOFF(SYM(enemyAnimate));  // jp enemyAnimate
 }
 
 void veranFinal_beeForm_stateA_hook(GB *gb) {
+  BASE(veranFinal_beeForm_stateA);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5e4f, ecom_decCounter1_b10_hook, 0x439a, 0x5e52);
-  if ((F & FZ)) { CYCT(0x5e52, 0x5e54); label_10_173_hook(gb); return; } CYC(0x5e52, 0x5e54);  // jr z,label_10_173
-  CYC(0x5e54, 0x5e55); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5e55, 0x5e57); alu_and(gb, 0x07);  // and $07
-  if (!(F & FZ)) { CYCT(0x5e57, 0x5e59); veranFinal_beeForm_animate2_hook(gb); return; } CYC(0x5e57, 0x5e59);  // jr nz,veranFinal_beeForm_animate2
-  CYC(0x5e59, 0x5e5a); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5e5a, 0x5e5c); alu_and(gb, 0x18);  // and $18
-  CYC(0x5e5c, 0x5e5e); A = alu_swap(gb, A);  // swap a
-  CYC(0x5e5e, 0x5e5f); alu_rlca(gb);  // rlca
-  CYC(0x5e5f, 0x5e60); A = alu_dec8(gb, A);  // dec a
-  CYC(0x5e60, 0x5e61); B = A;  // ld b,a
-  CALL_C(0x5e61, getFreeEnemySlot_hook, 0x2e27, 0x5e64);
-  if (!(F & FZ)) { CYCT(0x5e64, 0x5e66); veranFinal_beeForm_animate2_hook(gb); return; } CYC(0x5e64, 0x5e66);  // jr nz,veranFinal_beeForm_animate2
-  CYC(0x5e66, 0x5e68); mem_wr(gb, HL, 0x1f);  // ld (hl),ENEMY_VERAN_CHILD_BEE
-  CYC(0x5e68, 0x5e69); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5e69, 0x5e6a); mem_wr(gb, HL, B);  // ld (hl),b [child.subid]
-  CALL_C(0x5e6a, objectCopyPosition_hook, 0x2242, 0x5e6d);
-  CYC(0x5e6d, 0x5e6f); A = 0xba;  // ld a,SND_BEAM1
-  CALL_C(0x5e6f, playSound_b00_hook, 0x0c98, 0x5e72);
-  CYC(0x5e72, 0x5e74); veranFinal_beeForm_animate2_hook(gb); return;  // jr veranFinal_beeForm_animate2
+  CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
+  if ((F & FZ)) { CYCT(b_+3, b_+5); label_10_173_hook(gb); return; } CYC(b_+3, b_+5);  // jr z,label_10_173
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+6, b_+8); alu_and(gb, 0x07);  // and $07
+  if (!(F & FZ)) { CYCT(b_+8, b_+10); veranFinal_beeForm_animate2_hook(gb); return; } CYC(b_+8, b_+10);  // jr nz,veranFinal_beeForm_animate2
+  CYC(b_+10, b_+11); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+11, b_+13); alu_and(gb, 0x18);  // and $18
+  CYC(b_+13, b_+15); A = alu_swap(gb, A);  // swap a
+  CYC(b_+15, b_+16); alu_rlca(gb);  // rlca
+  CYC(b_+16, b_+17); A = alu_dec8(gb, A);  // dec a
+  CYC(b_+17, b_+18); B = A;  // ld b,a
+  CALL_C(b_+18, getFreeEnemySlot_hook, SYM(getFreeEnemySlot), b_+21);
+  if (!(F & FZ)) { CYCT(b_+21, b_+23); veranFinal_beeForm_animate2_hook(gb); return; } CYC(b_+21, b_+23);  // jr nz,veranFinal_beeForm_animate2
+  CYC(b_+23, b_+25); mem_wr(gb, HL, 0x1f);  // ld (hl),ENEMY_VERAN_CHILD_BEE
+  CYC(b_+25, b_+26); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+26, b_+27); mem_wr(gb, HL, B);  // ld (hl),b [child.subid]
+  CALL_C(b_+27, objectCopyPosition_hook, SYM(objectCopyPosition), b_+30);
+  CYC(b_+30, b_+32); A = 0xba;  // ld a,SND_BEAM1
+  CALL_C(b_+32, playSound_b00_hook, SYM(playSound_b00), b_+35);
+  CYC(b_+35, SYM(label_10_173)); veranFinal_beeForm_animate2_hook(gb); return;  // jr veranFinal_beeForm_animate2
 }
 
 void label_10_173_hook(GB *gb) {
+  BASE(label_10_173);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5e74, 0x5e76); mem_wr(gb, HL, 20);  // ld (hl),20
-  CYC(0x5e76, 0x5e77); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5e77, 0x5e78); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl) [counter2]
-  CYC(0x5e78, 0x5e79); L = E;  // ld l,e
-  if ((F & FZ)) { CYCT(0x5e79, 0x5e7b); goto setState02; } CYC(0x5e79, 0x5e7b);  // jr z,+
-  CYC(0x5e7b, 0x5e7c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl) [state]=$0b
-  CYC(0x5e7c, 0x5e7f); veranFinal_beeForm_animate2_hook(gb); return;  // jr veranFinal_beeForm_animate2
+  CYC(b_+0, b_+2); mem_wr(gb, HL, 20);  // ld (hl),20
+  CYC(b_+2, b_+3); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+3, b_+4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl) [counter2]
+  CYC(b_+4, b_+5); L = E;  // ld l,e
+  if ((F & FZ)) { CYCT(b_+5, b_+7); goto setState02; } CYC(b_+5, b_+7);  // jr z,+
+  CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl) [state]=$0b
+  CYC(b_+8, b_+11); veranFinal_beeForm_animate2_hook(gb); return;  // jr veranFinal_beeForm_animate2
 setState02:
-  CYC(0x5e7e, 0x5e80); mem_wr(gb, HL, 0x02);  // ld (hl),$02 [state]
-  CYC(0x5e80, 0x5e83); veranFinal_beeForm_animate2_hook(gb); return;  // jr veranFinal_beeForm_animate2
+  CYC(b_+10, b_+12); mem_wr(gb, HL, 0x02);  // ld (hl),$02 [state]
+  CYC(b_+12, (SYM(veranFinal_beeForm_stateB) + 1)); veranFinal_beeForm_animate2_hook(gb); return;  // jr veranFinal_beeForm_animate2
 }
 
 void veranFinal_beeForm_stateB_hook(GB *gb) {
+  BASE(veranFinal_beeForm_stateB);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5e82, ecom_decCounter1_b10_hook, 0x439a, 0x5e85);
-  if (!(F & FZ)) { CYCT(0x5e85, 0x5e87); veranFinal_beeForm_animate2_hook(gb); return; } CYC(0x5e85, 0x5e87);  // jr nz,veranFinal_beeForm_animate2
-  CYC(0x5e87, 0x5e88); L = E;  // ld l,e
-  CYC(0x5e88, 0x5e8a); mem_wr(gb, HL, 0x08);  // ld (hl),$08 [state]
-  CALL_C(0x5e8a, veranFinal_getQuadrant_hook, 0x6036, 0x5e8d);
+  CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); veranFinal_beeForm_animate2_hook(gb); return; } CYC(b_+3, b_+5);  // jr nz,veranFinal_beeForm_animate2
+  CYC(b_+5, b_+6); L = E;  // ld l,e
+  CYC(b_+6, b_+8); mem_wr(gb, HL, 0x08);  // ld (hl),$08 [state]
+  CALL_C(b_+8, veranFinal_getQuadrant_hook, SYM(veranFinal_getQuadrant), b_+11);
 chooseQuadrant:
-  CALL_C(0x5e8d, getRandomNumber_hook, 0x043e, 0x5e90);
-  CYC(0x5e90, 0x5e92); alu_and(gb, 0x03);  // and $03
-  CYC(0x5e92, 0x5e93); alu_cp(gb, B);  // cp b
-  if ((F & FZ)) { CYCT(0x5e93, 0x5e95); goto chooseQuadrant; } CYC(0x5e93, 0x5e95);  // jr z,@chooseQuadrant
-  CYC(0x5e95, 0x5e96); H = D;  // ld h,d
-  CYC(0x5e96, 0x5e98); L = 0xb9;  // ld l,Enemy.var39
-  CYC(0x5e98, 0x5e99); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if ((F & FZ)) { CYCT(0x5e99, 0x5e9b); goto chooseQuadrant; } CYC(0x5e99, 0x5e9b);  // jr z,@chooseQuadrant
-  CYC(0x5e9b, 0x5e9c); mem_wr(gb, HL, A);  // ld (hl),a [var39]
-  CYC(0x5e9c, 0x5e9d); alu_add(gb, A);  // add a
-  CYC(0x5e9d, 0x5ea0); SET_HL(0x5eaa);  // ld hl,veranFinal_beeForm_screenCornerEntrances
-  CYC(0x5ea0, 0x5ea1);
-  veranFinal_addDoubleIndexToHl_from_rst(gb, 0x5ea1);  // rst_addDoubleIndexToHl
-  CYC(0x5ea1, 0x5ea3); E = 0xb6;  // ld e,Enemy.var36
-  CYC(0x5ea3, 0x5ea4); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  CYC(0x5ea4, 0x5ea5); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(0x5ea5, 0x5ea6); E = alu_inc8(gb, E);  // inc e
-  CYC(0x5ea6, 0x5ea7); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5ea7, 0x5ea8); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(0x5ea8, 0x5eab); veranFinal_beeForm_animate2_hook(gb); return;  // jr veranFinal_beeForm_animate2
+  CALL_C(b_+11, getRandomNumber_hook, SYM(getRandomNumber), b_+14);
+  CYC(b_+14, b_+16); alu_and(gb, 0x03);  // and $03
+  CYC(b_+16, b_+17); alu_cp(gb, B);  // cp b
+  if ((F & FZ)) { CYCT(b_+17, b_+19); goto chooseQuadrant; } CYC(b_+17, b_+19);  // jr z,@chooseQuadrant
+  CYC(b_+19, b_+20); H = D;  // ld h,d
+  CYC(b_+20, b_+22); L = 0xb9;  // ld l,Enemy.var39
+  CYC(b_+22, b_+23); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
+  if ((F & FZ)) { CYCT(b_+23, b_+25); goto chooseQuadrant; } CYC(b_+23, b_+25);  // jr z,@chooseQuadrant
+  CYC(b_+25, b_+26); mem_wr(gb, HL, A);  // ld (hl),a [var39]
+  CYC(b_+26, b_+27); alu_add(gb, A);  // add a
+  CYC(b_+27, b_+30); SET_HL(SYM(veranFinal_beeForm_screenCornerEntrances));  // ld hl,veranFinal_beeForm_screenCornerEntrances
+  CYC(b_+30, b_+31);
+  veranFinal_addDoubleIndexToHl_from_rst(gb, b_+31);  // rst_addDoubleIndexToHl
+  CYC(b_+31, b_+33); E = 0xb6;  // ld e,Enemy.var36
+  CYC(b_+33, b_+34); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  CYC(b_+34, b_+35); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+35, b_+36); E = alu_inc8(gb, E);  // inc e
+  CYC(b_+36, b_+37); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+37, b_+38); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+38, (SYM(veranFinal_beeForm_screenCornerEntrances) + 1)); veranFinal_beeForm_animate2_hook(gb); return;  // jr veranFinal_beeForm_animate2
 }
 
 void veranFinal_transformToBeeOrSpider_hook(GB *gb) {
+  BASE(veranFinal_transformToBeeOrSpider);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5eba, 0x5ebc); mem_wr(gb, HL, 0x01);  // ld (hl),$01 [state]
-  CYC(0x5ebc, 0x5ebe); L = 0xa4;  // ld l,Enemy.collisionType
-  CYC(0x5ebe, 0x5ec0); mem_wr(gb, HL, 0x96);  // ld (hl),$80|ENEMY_BEAMOS
-  CYC(0x5ec0, 0x5ec2); L = 0xa9;  // ld l,Enemy.health
-  CYC(0x5ec2, 0x5ec3); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5ec3, 0x5ec5); L = 0xb0;  // ld l,Enemy.var30
-  CYC(0x5ec5, 0x5ec6); mem_wr(gb, HL, A);  // ld (hl),a
-  CYC(0x5ec6, 0x5ec8); L = 0x9b;  // ld l,Enemy.oamFlagsBackup
-  CYC(0x5ec8, 0x5eca); A = 0x07;  // ld a,$07
-  CYC(0x5eca, 0x5ecb); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
-  CYC(0x5ecb, 0x5ecc); mem_wr(gb, HL, A);  // ld (hl),a
-  CALL_C(0x5ecc, getRandomNumber_noPreserveVars_hook, 0x0453, 0x5ecf);
-  CYC(0x5ecf, 0x5ed1); alu_and(gb, 0x03);  // and $03
-  CYC(0x5ed1, 0x5ed2); B = A;  // ld b,a
-  CYC(0x5ed2, 0x5ed4); E = 0xb5;  // ld e,Enemy.var35
-  CYC(0x5ed4, 0x5ed5); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5ed5, 0x5ed6); C = A;  // ld c,a
-  CYC(0x5ed6, 0x5ed7); A = alu_inc8(gb, A);  // inc a
-  CYC(0x5ed7, 0x5ed9); alu_and(gb, 0x07);  // and $07
-  CYC(0x5ed9, 0x5eda); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(0x5eda, 0x5edb); A = C;  // ld a,c
-  CYC(0x5edb, 0x5edc); alu_add(gb, A);  // add a
-  CYC(0x5edc, 0x5edd); alu_add(gb, A);  // add a
-  CYC(0x5edd, 0x5ede); alu_add(gb, B);  // add b
-  CYC(0x5ede, 0x5ee1); SET_HL(0x5ef6);  // ld hl,@transformSequence
-  CALL_C(0x5ee1, checkFlag_hook, 0x0205, 0x5ee4);
-  if ((F & FZ)) { CYCT(0x5ee4, 0x5ee6); goto haveSubid; } CYC(0x5ee4, 0x5ee6);  // jr z,+
-  CYC(0x5ee6, 0x5ee8); A = 0x01;  // ld a,$01
+  CYC(b_+0, b_+2); mem_wr(gb, HL, 0x01);  // ld (hl),$01 [state]
+  CYC(b_+2, b_+4); L = 0xa4;  // ld l,Enemy.collisionType
+  CYC(b_+4, b_+6); mem_wr(gb, HL, 0x96);  // ld (hl),$80|ENEMY_BEAMOS
+  CYC(b_+6, b_+8); L = 0xa9;  // ld l,Enemy.health
+  CYC(b_+8, b_+9); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+9, b_+11); L = 0xb0;  // ld l,Enemy.var30
+  CYC(b_+11, b_+12); mem_wr(gb, HL, A);  // ld (hl),a
+  CYC(b_+12, b_+14); L = 0x9b;  // ld l,Enemy.oamFlagsBackup
+  CYC(b_+14, b_+16); A = 0x07;  // ld a,$07
+  CYC(b_+16, b_+17); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
+  CYC(b_+17, b_+18); mem_wr(gb, HL, A);  // ld (hl),a
+  CALL_C(b_+18, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+21);
+  CYC(b_+21, b_+23); alu_and(gb, 0x03);  // and $03
+  CYC(b_+23, b_+24); B = A;  // ld b,a
+  CYC(b_+24, b_+26); E = 0xb5;  // ld e,Enemy.var35
+  CYC(b_+26, b_+27); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+27, b_+28); C = A;  // ld c,a
+  CYC(b_+28, b_+29); A = alu_inc8(gb, A);  // inc a
+  CYC(b_+29, b_+31); alu_and(gb, 0x07);  // and $07
+  CYC(b_+31, b_+32); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+32, b_+33); A = C;  // ld a,c
+  CYC(b_+33, b_+34); alu_add(gb, A);  // add a
+  CYC(b_+34, b_+35); alu_add(gb, A);  // add a
+  CYC(b_+35, b_+36); alu_add(gb, B);  // add b
+  CYC(b_+36, b_+39); SET_HL(b_+60);  // ld hl,@transformSequence
+  CALL_C(b_+39, checkFlag_hook, SYM(checkFlag), b_+42);
+  if ((F & FZ)) { CYCT(b_+42, b_+44); goto haveSubid; } CYC(b_+42, b_+44);  // jr z,+
+  CYC(b_+44, b_+46); A = 0x01;  // ld a,$01
 haveSubid:
-  CYC(0x5ee8, 0x5ee9); A = alu_inc8(gb, A);  // inc a
-  CYC(0x5ee9, 0x5eeb); E = 0x82;  // ld e,Enemy.subid
-  CYC(0x5eeb, 0x5eec); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(0x5eec, 0x5eee); alu_add(gb, 0x09);  // add $09
-  CALL_C(0x5eee, enemySetAnimation_hook, 0x282b, 0x5ef1);
-  CYC(0x5ef1, 0x5ef3); A = 0xc0;  // ld a,SND_TRANSFORM
-  CYC(0x5ef3, 0x5ef6); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp playSound
+  CYC(b_+46, b_+47); A = alu_inc8(gb, A);  // inc a
+  CYC(b_+47, b_+49); E = 0x82;  // ld e,Enemy.subid
+  CYC(b_+49, b_+50); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+50, b_+52); alu_add(gb, 0x09);  // add $09
+  CALL_C(b_+52, enemySetAnimation_hook, SYM(enemySetAnimation), b_+55);
+  CYC(b_+55, b_+57); A = 0xc0;  // ld a,SND_TRANSFORM
+  CYC(b_+57, b_+60); if (hook_enabled_at(SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
 }
 
 void veranFinal_spiderForm_checkLinkWithinDistance_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_checkLinkWithinDistance);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5efa, 0x5efb); A = B;  // ld a,b
-  CYC(0x5efb, 0x5efc); alu_add(gb, A);  // add a
-  CYC(0x5efc, 0x5efd); A = alu_inc8(gb, A);  // inc a
-  CYC(0x5efd, 0x5efe); C = A;  // ld c,a
-  CYC(0x5efe, 0x5f01); A = mem_rd(gb, 0xd00b);  // ld a,(w1Link.yh)
-  CYC(0x5f01, 0x5f02); H = D;  // ld h,d
-  CYC(0x5f02, 0x5f04); L = 0x8b;  // ld l,Enemy.yh
-  CYC(0x5f04, 0x5f05); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
-  CYC(0x5f05, 0x5f06); alu_add(gb, B);  // add b
-  CYC(0x5f06, 0x5f07); alu_cp(gb, C);  // cp c
-  if (!(F & FC)) { RET_TAKEN(0x5f07); return; } CYC(0x5f07, 0x5f08);  // ret nc
-  CYC(0x5f08, 0x5f0b); A = mem_rd(gb, 0xd00d);  // ld a,(w1Link.xh)
-  CYC(0x5f0b, 0x5f0d); L = 0x8d;  // ld l,Enemy.xh
-  CYC(0x5f0d, 0x5f0e); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
-  CYC(0x5f0e, 0x5f0f); alu_add(gb, B);  // add b
-  CYC(0x5f0f, 0x5f10); alu_cp(gb, C);  // cp c
-  RET(0x5f10); return;  // ret
+  CYC(b_+0, b_+1); A = B;  // ld a,b
+  CYC(b_+1, b_+2); alu_add(gb, A);  // add a
+  CYC(b_+2, b_+3); A = alu_inc8(gb, A);  // inc a
+  CYC(b_+3, b_+4); C = A;  // ld c,a
+  CYC(b_+4, b_+7); A = mem_rd(gb, w1Link_yh);  // ld a,(w1Link.yh)
+  CYC(b_+7, b_+8); H = D;  // ld h,d
+  CYC(b_+8, b_+10); L = 0x8b;  // ld l,Enemy.yh
+  CYC(b_+10, b_+11); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
+  CYC(b_+11, b_+12); alu_add(gb, B);  // add b
+  CYC(b_+12, b_+13); alu_cp(gb, C);  // cp c
+  if (!(F & FC)) { RET_TAKEN(b_+13); return; } CYC(b_+13, b_+14);  // ret nc
+  CYC(b_+14, b_+17); A = mem_rd(gb, w1Link_xh);  // ld a,(w1Link.xh)
+  CYC(b_+17, b_+19); L = 0x8d;  // ld l,Enemy.xh
+  CYC(b_+19, b_+20); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
+  CYC(b_+20, b_+21); alu_add(gb, B);  // add b
+  CYC(b_+21, b_+22); alu_cp(gb, C);  // cp c
+  RET(b_+22); return;  // ret
 }
 
 void veranFinal_spiderForm_decideWhetherToAttack_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_decideWhetherToAttack);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5f11, objectGetAngleTowardLink_hook, 0x1e9c, 0x5f14);
-  CYC(0x5f14, 0x5f15); E = A;  // ld e,a
+  CALL_C(b_+0, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+3);
+  CYC(b_+3, b_+4); E = A;  // ld e,a
 considerRushAttack:
-  CYC(0x5f15, 0x5f17); B = 0x60;  // ld b,$60
-  CALL_C(0x5f17, veranFinal_spiderForm_checkLinkWithinDistance_hook, 0x5efa, 0x5f1a);
-  if (!(F & FC)) { CYCT(0x5f1a, 0x5f1c); goto considerJumpAttack; } CYC(0x5f1a, 0x5f1c);  // jr nc,@considerJumpAttack
-  CYC(0x5f1c, 0x5f1e); alu_and(gb, 0x07);  // and $07
-  CYC(0x5f1e, 0x5f20); alu_sub(gb, 0x03);  // sub $03
-  CYC(0x5f20, 0x5f22); alu_cp(gb, 0x03);  // cp $03
-  CYC(0x5f22, 0x5f24); A = 0x00;  // ld a,$00
-  if ((F & FC)) { CYCT(0x5f24, 0x5f26); goto doAttack; } CYC(0x5f24, 0x5f26);  // jr c,@doAttack
+  CYC(b_+4, b_+6); B = 0x60;  // ld b,$60
+  CALL_C(b_+6, veranFinal_spiderForm_checkLinkWithinDistance_hook, SYM(veranFinal_spiderForm_checkLinkWithinDistance), b_+9);
+  if (!(F & FC)) { CYCT(b_+9, b_+11); goto considerJumpAttack; } CYC(b_+9, b_+11);  // jr nc,@considerJumpAttack
+  CYC(b_+11, b_+13); alu_and(gb, 0x07);  // and $07
+  CYC(b_+13, b_+15); alu_sub(gb, 0x03);  // sub $03
+  CYC(b_+15, b_+17); alu_cp(gb, 0x03);  // cp $03
+  CYC(b_+17, b_+19); A = 0x00;  // ld a,$00
+  if ((F & FC)) { CYCT(b_+19, b_+21); goto doAttack; } CYC(b_+19, b_+21);  // jr c,@doAttack
 considerJumpAttack:
-  CYC(0x5f26, 0x5f28); B = 0x50;  // ld b,$50
-  CALL_C(0x5f28, veranFinal_spiderForm_checkLinkWithinDistance_hook, 0x5efa, 0x5f2b);
-  if ((F & FC)) { CYCT(0x5f2b, 0x5f2d); goto considerGrabAttack; } CYC(0x5f2b, 0x5f2d);  // jr c,@considerGrabAttack
-  CYC(0x5f2d, 0x5f2e); A = E;  // ld a,e
-  CYC(0x5f2e, 0x5f30); alu_and(gb, 0x07);  // and $07
-  CYC(0x5f30, 0x5f32); alu_sub(gb, 0x03);  // sub $03
-  CYC(0x5f32, 0x5f34); alu_cp(gb, 0x03);  // cp $03
-  CYC(0x5f34, 0x5f35); alu_ccf(gb);  // ccf
-  CYC(0x5f35, 0x5f37); A = 0x01;  // ld a,$01
-  if ((F & FC)) { CYCT(0x5f37, 0x5f39); goto doAttack; } CYC(0x5f37, 0x5f39);  // jr c,@doAttack
+  CYC(b_+21, b_+23); B = 0x50;  // ld b,$50
+  CALL_C(b_+23, veranFinal_spiderForm_checkLinkWithinDistance_hook, SYM(veranFinal_spiderForm_checkLinkWithinDistance), b_+26);
+  if ((F & FC)) { CYCT(b_+26, b_+28); goto considerGrabAttack; } CYC(b_+26, b_+28);  // jr c,@considerGrabAttack
+  CYC(b_+28, b_+29); A = E;  // ld a,e
+  CYC(b_+29, b_+31); alu_and(gb, 0x07);  // and $07
+  CYC(b_+31, b_+33); alu_sub(gb, 0x03);  // sub $03
+  CYC(b_+33, b_+35); alu_cp(gb, 0x03);  // cp $03
+  CYC(b_+35, b_+36); alu_ccf(gb);  // ccf
+  CYC(b_+36, b_+38); A = 0x01;  // ld a,$01
+  if ((F & FC)) { CYCT(b_+38, b_+40); goto doAttack; } CYC(b_+38, b_+40);  // jr c,@doAttack
 considerGrabAttack:
-  CYC(0x5f39, 0x5f3a); A = E;  // ld a,e
-  CYC(0x5f3a, 0x5f3c); alu_sub(gb, 0x0c);  // sub $0c
-  CYC(0x5f3c, 0x5f3e); alu_cp(gb, 0x09);  // cp $09
-  if (!(F & FC)) { RET_TAKEN(0x5f3e); return; } CYC(0x5f3e, 0x5f3f);  // ret nc
-  CYC(0x5f3f, 0x5f41); A = 0x02;  // ld a,$02
+  CYC(b_+40, b_+41); A = E;  // ld a,e
+  CYC(b_+41, b_+43); alu_sub(gb, 0x0c);  // sub $0c
+  CYC(b_+43, b_+45); alu_cp(gb, 0x09);  // cp $09
+  if (!(F & FC)) { RET_TAKEN(b_+45); return; } CYC(b_+45, b_+46);  // ret nc
+  CYC(b_+46, b_+48); A = 0x02;  // ld a,$02
 doAttack:
-  CYC(0x5f41, 0x5f43); E = 0x83;  // ld e,Enemy.var03
-  CYC(0x5f43, 0x5f44); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(0x5f44, 0x5f45); H = D;  // ld h,d
-  CYC(0x5f45, 0x5f47); L = 0x84;  // ld l,Enemy.state
-  CYC(0x5f47, 0x5f49); mem_wr(gb, HL, 0x04);  // ld (hl),$04
-  CYC(0x5f49, 0x5f4a); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5f4a, 0x5f4c); mem_wr(gb, HL, 0x00);  // ld (hl),$00 [substate]
-  CYC(0x5f4c, 0x5f4d); alu_scf(gb);  // scf
-  RET(0x5f4d); return;  // ret
+  CYC(b_+48, b_+50); E = 0x83;  // ld e,Enemy.var03
+  CYC(b_+50, b_+51); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+51, b_+52); H = D;  // ld h,d
+  CYC(b_+52, b_+54); L = 0x84;  // ld l,Enemy.state
+  CYC(b_+54, b_+56); mem_wr(gb, HL, 0x04);  // ld (hl),$04
+  CYC(b_+56, b_+57); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+57, b_+59); mem_wr(gb, HL, 0x00);  // ld (hl),$00 [substate]
+  CYC(b_+59, b_+60); alu_scf(gb);  // scf
+  RET(b_+60); return;  // ret
 }
 
 void veranFinal_dead_hook(GB *gb) {
+  BASE(veranFinal_dead);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5f4e, 0x5f50); E = 0x82;  // ld e,Enemy.subid
-  CYC(0x5f50, 0x5f51); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5f51, 0x5f52); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { CYCT(0x5f52, 0x5f54); goto transformed; } CYC(0x5f52, 0x5f54);  // jr nz,@transformed
-  CYC(0x5f54, 0x5f55); H = D;  // ld h,d
-  CYC(0x5f55, 0x5f57); L = 0x84;  // ld l,Enemy.state
-  CYC(0x5f57, 0x5f59); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
-  CYC(0x5f59, 0x5f5a); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5f5a, 0x5f5c); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  CYC(0x5f5c, 0x5f5e); L = 0xa9;  // ld l,Enemy.health
-  CYC(0x5f5e, 0x5f5f); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(0x5f5f, 0x5f61); A = 0xf0;  // ld a,SNDCTRL_STOPMUSIC
-  CYC(0x5f61, 0x5f64); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp playSound
+  CYC(b_+0, b_+2); E = 0x82;  // ld e,Enemy.subid
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+3, b_+4); alu_or(gb, A);  // or a
+  if (!(F & FZ)) { CYCT(b_+4, b_+6); goto transformed; } CYC(b_+4, b_+6);  // jr nz,@transformed
+  CYC(b_+6, b_+7); H = D;  // ld h,d
+  CYC(b_+7, b_+9); L = 0x84;  // ld l,Enemy.state
+  CYC(b_+9, b_+11); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
+  CYC(b_+11, b_+12); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+12, b_+14); mem_wr(gb, HL, 0x00);  // ld (hl),$00
+  CYC(b_+14, b_+16); L = 0xa9;  // ld l,Enemy.health
+  CYC(b_+16, b_+17); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
+  CYC(b_+17, b_+19); A = 0xf0;  // ld a,SNDCTRL_STOPMUSIC
+  CYC(b_+19, b_+22); if (hook_enabled_at(SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
 transformed:
-  CYC(0x5f64, 0x5f65); B = A;  // ld b,a
-  CYC(0x5f65, 0x5f66); H = D;  // ld h,d
-  CYC(0x5f66, 0x5f67); L = E;  // ld l,e
-  CYC(0x5f67, 0x5f69); mem_wr(gb, HL, 0x00);  // ld (hl),$00 [subid]
-  CYC(0x5f69, 0x5f6b); L = 0x84;  // ld l,Enemy.state
-  CYC(0x5f6b, 0x5f6d); mem_wr(gb, HL, 0x09);  // ld (hl),$09
-  CYC(0x5f6d, 0x5f6f); L = 0xb0;  // ld l,Enemy.var30
-  CYC(0x5f6f, 0x5f70); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5f70, 0x5f72); L = 0xa9;  // ld l,Enemy.health
-  CYC(0x5f72, 0x5f73); mem_wr(gb, HL, A);  // ld (hl),a
-  CYC(0x5f73, 0x5f75); L = 0xa4;  // ld l,Enemy.collisionType
-  CYC(0x5f75, 0x5f77); mem_wr(gb, HL, 0x96);  // ld (hl),$80|ENEMY_BEAMOS
-  CYC(0x5f77, 0x5f79); L = 0xa6;  // ld l,Enemy.collisionRadiusY
-  CYC(0x5f79, 0x5f7b); mem_wr(gb, HL, 0x08);  // ld (hl),$08
-  CYC(0x5f7b, 0x5f7c); L = alu_inc8(gb, L);  // inc l
-  CYC(0x5f7c, 0x5f7e); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a [collisionRadiusX]
-  CYC(0x5f7e, 0x5f80); L = 0x9b;  // ld l,Enemy.oamFlagsBackup
-  CYC(0x5f80, 0x5f82); A = 0x07;  // ld a,$07
-  CYC(0x5f82, 0x5f83); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
-  CYC(0x5f83, 0x5f84); mem_wr(gb, HL, A);  // ld (hl),a
-  CYC(0x5f84, 0x5f85); A = B;  // ld a,b [subid]
-  CYC(0x5f85, 0x5f87); alu_add(gb, 0x07);  // add $07
-  CALL_C(0x5f87, enemySetAnimation_hook, 0x282b, 0x5f8a);
-  CYC(0x5f8a, 0x5f8c); A = 0xc0;  // ld a,SND_TRANSFORM
-  CYC(0x5f8c, 0x5f8f); if (hook_enabled_at(0x0c98)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c98);  // jp playSound
+  CYC(b_+22, b_+23); B = A;  // ld b,a
+  CYC(b_+23, b_+24); H = D;  // ld h,d
+  CYC(b_+24, b_+25); L = E;  // ld l,e
+  CYC(b_+25, b_+27); mem_wr(gb, HL, 0x00);  // ld (hl),$00 [subid]
+  CYC(b_+27, b_+29); L = 0x84;  // ld l,Enemy.state
+  CYC(b_+29, b_+31); mem_wr(gb, HL, 0x09);  // ld (hl),$09
+  CYC(b_+31, b_+33); L = 0xb0;  // ld l,Enemy.var30
+  CYC(b_+33, b_+34); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+34, b_+36); L = 0xa9;  // ld l,Enemy.health
+  CYC(b_+36, b_+37); mem_wr(gb, HL, A);  // ld (hl),a
+  CYC(b_+37, b_+39); L = 0xa4;  // ld l,Enemy.collisionType
+  CYC(b_+39, b_+41); mem_wr(gb, HL, 0x96);  // ld (hl),$80|ENEMY_BEAMOS
+  CYC(b_+41, b_+43); L = 0xa6;  // ld l,Enemy.collisionRadiusY
+  CYC(b_+43, b_+45); mem_wr(gb, HL, 0x08);  // ld (hl),$08
+  CYC(b_+45, b_+46); L = alu_inc8(gb, L);  // inc l
+  CYC(b_+46, b_+48); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a [collisionRadiusX]
+  CYC(b_+48, b_+50); L = 0x9b;  // ld l,Enemy.oamFlagsBackup
+  CYC(b_+50, b_+52); A = 0x07;  // ld a,$07
+  CYC(b_+52, b_+53); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
+  CYC(b_+53, b_+54); mem_wr(gb, HL, A);  // ld (hl),a
+  CYC(b_+54, b_+55); A = B;  // ld a,b [subid]
+  CYC(b_+55, b_+57); alu_add(gb, 0x07);  // add $07
+  CALL_C(b_+57, enemySetAnimation_hook, SYM(enemySetAnimation), b_+60);
+  CYC(b_+60, b_+62); A = 0xc0;  // ld a,SND_TRANSFORM
+  CYC(b_+62, SYM(veranFinal_spiderForm_decideAngle)); if (hook_enabled_at(SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
 }
 
 void veranFinal_spiderForm_decideAngle_hook(GB *gb) {
+  BASE(veranFinal_spiderForm_decideAngle);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5f8f, 0x5f91); B = 0x00;  // ld b,$00
-  CYC(0x5f91, 0x5f93); E = 0x8b;  // ld e,Enemy.yh
-  CYC(0x5f93, 0x5f94); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5f94, 0x5f96); alu_cp(gb, 0x58);  // cp (LARGE_ROOM_HEIGHT<<4)/2
-  if ((F & FC)) { CYCT(0x5f96, 0x5f98); goto haveB1; } CYC(0x5f96, 0x5f98);  // jr c,+
-  CYC(0x5f98, 0x5f9a); B = 0x10;  // ld b,$10
+  CYC(b_+0, b_+2); B = 0x00;  // ld b,$00
+  CYC(b_+2, b_+4); E = 0x8b;  // ld e,Enemy.yh
+  CYC(b_+4, b_+5); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+5, b_+7); alu_cp(gb, 0x58);  // cp (LARGE_ROOM_HEIGHT<<4)/2
+  if ((F & FC)) { CYCT(b_+7, b_+9); goto haveB1; } CYC(b_+7, b_+9);  // jr c,+
+  CYC(b_+9, b_+11); B = 0x10;  // ld b,$10
 haveB1:
-  CYC(0x5f9a, 0x5f9c); E = 0x8d;  // ld e,Enemy.xh
-  CYC(0x5f9c, 0x5f9d); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5f9d, 0x5f9f); alu_cp(gb, 0x78);  // cp (LARGE_ROOM_WIDTH<<4)/2
-  if ((F & FC)) { CYCT(0x5f9f, 0x5fa1); goto haveB2; } CYC(0x5f9f, 0x5fa1);  // jr c,+
-  CYC(0x5fa1, 0x5fa3); B = (uint8_t)(B | (1 << 3));  // set 3,b
+  CYC(b_+11, b_+13); E = 0x8d;  // ld e,Enemy.xh
+  CYC(b_+13, b_+14); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+14, b_+16); alu_cp(gb, 0x78);  // cp (LARGE_ROOM_WIDTH<<4)/2
+  if ((F & FC)) { CYCT(b_+16, b_+18); goto haveB2; } CYC(b_+16, b_+18);  // jr c,+
+  CYC(b_+18, b_+20); B = (uint8_t)(B | (1 << 3));  // set 3,b
 haveB2:
-  CALL_C(0x5fa3, getRandomNumber_hook, 0x043e, 0x5fa6);
-  CYC(0x5fa6, 0x5fa8); alu_and(gb, 0x07);  // and $07
-  CYC(0x5fa8, 0x5fa9); alu_add(gb, B);  // add b
-  CYC(0x5fa9, 0x5fac); SET_HL(0x5fb2);  // ld hl,@angles
-  CYC(0x5fac, 0x5fad);
-  veranFinal_addAToHl_from_rst(gb, 0x5fad);  // rst_addAToHl
-  CYC(0x5fad, 0x5faf); E = 0x89;  // ld e,Enemy.angle
-  CYC(0x5faf, 0x5fb0); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5fb0, 0x5fb1); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x5fb1); return;  // ret
+  CALL_C(b_+20, getRandomNumber_hook, SYM(getRandomNumber), b_+23);
+  CYC(b_+23, b_+25); alu_and(gb, 0x07);  // and $07
+  CYC(b_+25, b_+26); alu_add(gb, B);  // add b
+  CYC(b_+26, b_+29); SET_HL(b_+35);  // ld hl,@angles
+  CYC(b_+29, b_+30);
+  veranFinal_addAToHl_from_rst(gb, b_+30);  // rst_addAToHl
+  CYC(b_+30, b_+32); E = 0x89;  // ld e,Enemy.angle
+  CYC(b_+32, b_+33); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+33, b_+34); mem_wr(gb, DE, A);  // ld (de),a
+  RET(b_+34); return;  // ret
 }
 
 void veranFinal_beeForm_chooseRandomTargetPosition_hook(GB *gb) {
+  BASE(veranFinal_beeForm_chooseRandomTargetPosition);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5fd2, 0x5fd5); SET_BC(0x0801);  // ld bc,$0801
-  CALL_C(0x5fd5, ecom_randomBitwiseAndBCE_b10_hook, 0x434f, 0x5fd8);
-  CYC(0x5fd8, 0x5fda); E = 0x86;  // ld e,Enemy.counter1
-  CYC(0x5fda, 0x5fdb); A = B;  // ld a,b
-  CYC(0x5fdb, 0x5fdc); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(0x5fdc, 0x5fdd); A = C;  // ld a,c
-  CYC(0x5fdd, 0x5fe0); SET_HL(0x5ffa);  // ld hl,veranFinal_beeForm_counter2Vals
-  CYC(0x5fe0, 0x5fe1);
-  veranFinal_addAToHl_from_rst(gb, 0x5fe1);  // rst_addAToHl
-  CYC(0x5fe1, 0x5fe3); E = 0x87;  // ld e,Enemy.counter2
-  CYC(0x5fe3, 0x5fe4); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5fe4, 0x5fe5); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+0, b_+3); SET_BC((SYM(loadTilesetHlpr) + 3));  // ld bc,$0801
+  CALL_C(b_+3, ecom_randomBitwiseAndBCE_b10_hook, SYM(ecom_randomBitwiseAndBCE_b10), b_+6);
+  CYC(b_+6, b_+8); E = 0x86;  // ld e,Enemy.counter1
+  CYC(b_+8, b_+9); A = B;  // ld a,b
+  CYC(b_+9, b_+10); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+10, b_+11); A = C;  // ld a,c
+  CYC(b_+11, b_+14); SET_HL(SYM(veranFinal_beeForm_counter2Vals));  // ld hl,veranFinal_beeForm_counter2Vals
+  CYC(b_+14, b_+15);
+  veranFinal_addAToHl_from_rst(gb, b_+15);  // rst_addAToHl
+  CYC(b_+15, b_+17); E = 0x87;  // ld e,Enemy.counter2
+  CYC(b_+17, b_+18); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+18, SYM(veranFinal_beeForm_nextTargetPosition)); mem_wr(gb, DE, A);  // ld (de),a
   veranFinal_beeForm_nextTargetPosition_hook(gb); return;  // fallthrough
 }
 
 void veranFinal_beeForm_nextTargetPosition_hook(GB *gb) {
+  BASE(veranFinal_beeForm_nextTargetPosition);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5fe5, 0x5fe7); E = 0x86;  // ld e,Enemy.counter1
-  CYC(0x5fe7, 0x5fe8); A = mem_rd(gb, DE);  // ld a,(de)
-  CYC(0x5fe8, 0x5fe9); B = A;  // ld b,a
-  CYC(0x5fe9, 0x5fea); A = alu_inc8(gb, A);  // inc a
-  CYC(0x5fea, 0x5fec); alu_and(gb, 0x0f);  // and $0f
-  CYC(0x5fec, 0x5fed); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(0x5fed, 0x5fee); A = B;  // ld a,b
-  CYC(0x5fee, 0x5ff1); SET_HL(0x5ffc);  // ld hl,veranFinal_beeForm_targetPositions
-  CYC(0x5ff1, 0x5ff2);
-  veranFinal_addDoubleIndexToHl_from_rst(gb, 0x5ff2);  // rst_addDoubleIndexToHl
-  CYC(0x5ff2, 0x5ff4); E = 0xb6;  // ld e,Enemy.var36
-  CYC(0x5ff4, 0x5ff5); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  CYC(0x5ff5, 0x5ff6); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(0x5ff6, 0x5ff7); E = alu_inc8(gb, E);  // inc e
-  CYC(0x5ff7, 0x5ff8); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(0x5ff8, 0x5ff9); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x5ff9); return;  // ret
+  CYC(b_+0, b_+2); E = 0x86;  // ld e,Enemy.counter1
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);  // ld a,(de)
+  CYC(b_+3, b_+4); B = A;  // ld b,a
+  CYC(b_+4, b_+5); A = alu_inc8(gb, A);  // inc a
+  CYC(b_+5, b_+7); alu_and(gb, 0x0f);  // and $0f
+  CYC(b_+7, b_+8); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+8, b_+9); A = B;  // ld a,b
+  CYC(b_+9, b_+12); SET_HL(SYM(veranFinal_beeForm_targetPositions));  // ld hl,veranFinal_beeForm_targetPositions
+  CYC(b_+12, b_+13);
+  veranFinal_addDoubleIndexToHl_from_rst(gb, b_+13);  // rst_addDoubleIndexToHl
+  CYC(b_+13, b_+15); E = 0xb6;  // ld e,Enemy.var36
+  CYC(b_+15, b_+16); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  CYC(b_+16, b_+17); mem_wr(gb, DE, A);  // ld (de),a
+  CYC(b_+17, b_+18); E = alu_inc8(gb, E);  // inc e
+  CYC(b_+18, b_+19); A = mem_rd(gb, HL);  // ld a,(hl)
+  CYC(b_+19, b_+20); mem_wr(gb, DE, A);  // ld (de),a
+  RET(b_+20); return;  // ret
 }
 
 void veranFinal_moveTowardTargetPosition_hook(GB *gb) {
+  BASE(veranFinal_moveTowardTargetPosition);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x601c, 0x601d); H = D;  // ld h,d
-  CYC(0x601d, 0x601f); L = 0xb6;  // ld l,Enemy.var36
-  CALL_C(0x601f, ecom_readPositionVars_b10_hook, 0x4439, 0x6022);
-  CYC(0x6022, 0x6023); alu_sub(gb, C);  // sub c
-  CYC(0x6023, 0x6025); alu_add(gb, 0x02);  // add $02
-  CYC(0x6025, 0x6027); alu_cp(gb, 0x05);  // cp $05
-  if (!(F & FC)) { CYCT(0x6027, 0x6029); goto moveToward; } CYC(0x6027, 0x6029);  // jr nc,+
-  CYC(0x6029, 0x602b); A = mem_rd(gb, 0xff8f);  // ldh a,(<hFF8F)
-  CYC(0x602b, 0x602c); alu_sub(gb, B);  // sub b
-  CYC(0x602c, 0x602e); alu_add(gb, 0x02);  // add $02
-  CYC(0x602e, 0x6030); alu_cp(gb, 0x05);  // cp $05
-  if ((F & FC)) { RET_TAKEN(0x6030); return; } CYC(0x6030, 0x6031);  // ret c
+  CYC(b_+0, b_+1); H = D;  // ld h,d
+  CYC(b_+1, b_+3); L = 0xb6;  // ld l,Enemy.var36
+  CALL_C(b_+3, ecom_readPositionVars_b10_hook, SYM(ecom_readPositionVars_b10), b_+6);
+  CYC(b_+6, b_+7); alu_sub(gb, C);  // sub c
+  CYC(b_+7, b_+9); alu_add(gb, 0x02);  // add $02
+  CYC(b_+9, b_+11); alu_cp(gb, 0x05);  // cp $05
+  if (!(F & FC)) { CYCT(b_+11, b_+13); goto moveToward; } CYC(b_+11, b_+13);  // jr nc,+
+  CYC(b_+13, b_+15); A = mem_rd(gb, hFF8F);  // ldh a,(<hFF8F)
+  CYC(b_+15, b_+16); alu_sub(gb, B);  // sub b
+  CYC(b_+16, b_+18); alu_add(gb, 0x02);  // add $02
+  CYC(b_+18, b_+20); alu_cp(gb, 0x05);  // cp $05
+  if ((F & FC)) { RET_TAKEN(b_+20); return; } CYC(b_+20, b_+21);  // ret c
 moveToward:
-  CALL_C(0x6031, ecom_moveTowardPosition_b10_hook, 0x4430, 0x6034);
-  CYC(0x6034, 0x6035); alu_or(gb, D);  // or d
-  RET(0x6035); return;  // ret
+  CALL_C(b_+21, ecom_moveTowardPosition_b10_hook, SYM(ecom_moveTowardPosition_b10), b_+24);
+  CYC(b_+24, b_+25); alu_or(gb, D);  // or d
+  RET(b_+25); return;  // ret
 }
 
 void veranFinal_getQuadrant_hook(GB *gb) {
+  BASE(veranFinal_getQuadrant);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6036, 0x6038); B = 0x00;  // ld b,$00
-  CYC(0x6038, 0x603a); A = mem_rd(gb, 0xffb0);  // ldh a,(<hEnemyTargetY)
-  CYC(0x603a, 0x603c); alu_cp(gb, 0x58);  // cp LARGE_ROOM_HEIGHT*16/2
-  if ((F & FC)) { CYCT(0x603c, 0x603e); goto checkX; } CYC(0x603c, 0x603e);  // jr c,+
-  CYC(0x603e, 0x6040); B = 0x02;  // ld b,$02
+  CYC(b_+0, b_+2); B = 0x00;  // ld b,$00
+  CYC(b_+2, b_+4); A = mem_rd(gb, hEnemyTargetY);  // ldh a,(<hEnemyTargetY)
+  CYC(b_+4, b_+6); alu_cp(gb, 0x58);  // cp LARGE_ROOM_HEIGHT*16/2
+  if ((F & FC)) { CYCT(b_+6, b_+8); goto checkX; } CYC(b_+6, b_+8);  // jr c,+
+  CYC(b_+8, b_+10); B = 0x02;  // ld b,$02
 checkX:
-  CYC(0x6040, 0x6042); A = mem_rd(gb, 0xffb1);  // ldh a,(<hEnemyTargetX)
-  CYC(0x6042, 0x6044); alu_cp(gb, 0x78);  // cp LARGE_ROOM_WIDTH*16/2
-  if ((F & FC)) { RET_TAKEN(0x6044); return; } CYC(0x6044, 0x6045);  // ret c
-  CYC(0x6045, 0x6046); B = alu_inc8(gb, B);  // inc b
-  RET(0x6046); return;  // ret
+  CYC(b_+10, b_+12); A = mem_rd(gb, hEnemyTargetX);  // ldh a,(<hEnemyTargetX)
+  CYC(b_+12, b_+14); alu_cp(gb, 0x78);  // cp LARGE_ROOM_WIDTH*16/2
+  if ((F & FC)) { RET_TAKEN(b_+14); return; } CYC(b_+14, b_+15);  // ret c
+  CYC(b_+15, b_+16); B = alu_inc8(gb, B);  // inc b
+  RET(b_+16); return;  // ret
 }

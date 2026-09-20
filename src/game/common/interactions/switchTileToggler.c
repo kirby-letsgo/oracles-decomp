@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0a, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0a, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode78), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode78), (from), (to), true)
 
 static uint16_t interactionCode78_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -40,47 +40,48 @@ static void interactionCode78_addDoubleIndexToHl_from_rst(GB *gb, uint16_t retur
 // dungeon's crystal-switch state flips, keyed by Interaction.xh into a table of
 // on/off tile pairs (interactionCode78__tileReplacement, pure data, no code).
 void interactionCode78_hook(GB *gb) {
-  CYC(0x4003, 0x4005); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4005, 0x4006); A = mem_rd(gb, DE);
+  BASE(interactionCode78);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x4006, 0x4007); push_effect(gb, 0x4007);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = interactionCode78_jump_table(gb);
-    if (target == 0x400b) goto state0;
+    if (target == b_+8) goto state0;
     goto state1;
   }
 
 state0:
-  CYC(0x400b, 0x400d); A = 0x01;
-  CYC(0x400d, 0x400e); mem_wr(gb, DE, A);
-  CYC(0x400e, 0x4011); A = W8(wSwitchState);
-  CYC(0x4011, 0x4013); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x4013, 0x4014); mem_wr(gb, DE, A);
+  CYC(b_+8, b_+10); A = 0x01;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CYC(b_+11, b_+14); A = W8(wSwitchState);
+  CYC(b_+14, b_+16); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+16, b_+17); mem_wr(gb, DE, A);
 
 state1:
-  CYC(0x4014, 0x4017); A = W8(wSwitchState);
-  CYC(0x4017, 0x4018); B = A;
-  CYC(0x4018, 0x401a); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x401a, 0x401b); A = mem_rd(gb, DE);
-  CYC(0x401b, 0x401c); alu_cp(gb, B);
-  if (F & FZ) { RET_TAKEN(0x401c); return; } // ret z
-  CYC(0x401c, 0x401d);
-  CYC(0x401d, 0x401e); A = B;
-  CYC(0x401e, 0x401f); mem_wr(gb, DE, A);
-  CYC(0x401f, 0x4021); E = INTERACTION_BASE + OBJ_XH;
-  CYC(0x4021, 0x4022); A = mem_rd(gb, DE);
-  CYC(0x4022, 0x4025); SET_HL(0x4035); // interactionCode78__tileReplacement
-  CYC(0x4025, 0x4026); interactionCode78_addDoubleIndexToHl_from_rst(gb, 0x4026);
-  CYC(0x4026, 0x4028); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x4028, 0x4029); A = mem_rd(gb, DE);
-  CYC(0x4029, 0x402a); alu_and(gb, B);
-  if (F & FZ) { CYCT(0x402a, 0x402c); goto afterTileOffset; } // jr z
-  CYC(0x402a, 0x402c);
-  CYC(0x402c, 0x402d); SET_HL(HL + 1);
+  CYC(b_+17, b_+20); A = W8(wSwitchState);
+  CYC(b_+20, b_+21); B = A;
+  CYC(b_+21, b_+23); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+23, b_+24); A = mem_rd(gb, DE);
+  CYC(b_+24, b_+25); alu_cp(gb, B);
+  if (F & FZ) { RET_TAKEN(b_+25); return; } // ret z
+  CYC(b_+25, b_+26);
+  CYC(b_+26, b_+27); A = B;
+  CYC(b_+27, b_+28); mem_wr(gb, DE, A);
+  CYC(b_+28, b_+30); E = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+30, b_+31); A = mem_rd(gb, DE);
+  CYC(b_+31, b_+34); SET_HL(b_+50); // interactionCode78__tileReplacement
+  CYC(b_+34, b_+35); interactionCode78_addDoubleIndexToHl_from_rst(gb, b_+35);
+  CYC(b_+35, b_+37); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+37, b_+38); A = mem_rd(gb, DE);
+  CYC(b_+38, b_+39); alu_and(gb, B);
+  if (F & FZ) { CYCT(b_+39, b_+41); goto afterTileOffset; } // jr z
+  CYC(b_+39, b_+41);
+  CYC(b_+41, b_+42); SET_HL(HL + 1);
 
 afterTileOffset:
-  CYC(0x402d, 0x402f); E = INTERACTION_BASE + OBJ_YH;
-  CYC(0x402f, 0x4030); A = mem_rd(gb, DE);
-  CYC(0x4030, 0x4031); C = A;
-  CYC(0x4031, 0x4032); A = mem_rd(gb, HL);
-  CYC(0x4032, 0x4035); setTile_hook(gb); // jp
+  CYC(b_+42, b_+44); E = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+44, b_+45); A = mem_rd(gb, DE);
+  CYC(b_+45, b_+46); C = A;
+  CYC(b_+46, b_+47); A = mem_rd(gb, HL);
+  CYC(b_+47, b_+50); setTile_hook(gb); // jp
 }

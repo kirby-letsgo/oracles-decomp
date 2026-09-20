@@ -3,22 +3,22 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode3b), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode3b), (from), (to), true)
 
 // Script pointer tables (bank $0c mainScripts.*), indexed by subid or game progress.
-#define interactionCode3b_scriptTable_bank08 0x7892
-#define interactionCode3b_subid1And2ScriptTable_bank08 0x78a0
-#define interactionCode3b_subid3And4ScriptTable_bank08 0x78ac
-#define interactionCode3b_subid5ScriptTable_bank08 0x78bc
+#define interactionCode3b_scriptTable_bank08 SYM(interactionCode3b__scriptTable)
+#define interactionCode3b_subid1And2ScriptTable_bank08 SYM(interactionCode3b__subid1And2ScriptTable)
+#define interactionCode3b_subid3And4ScriptTable_bank08 SYM(interactionCode3b__subid3And4ScriptTable)
+#define interactionCode3b_subid5ScriptTable_bank08 SYM(interactionCode3b__subid5ScriptTable)
 
 // Cross-bank targets referenced by address only.
-#define getGameProgress_1_bank09 0x552b
-#define getGameProgress_2_bank09 0x5559
-#define interactionOscillateXRandomly_bank08 0x5d87
-#define villagerGalSubid07Script_bank0c 0x5c0d
-#define genericNpcScript_bank0c 0x45f0
-#define linkedGameNpcScript_bank0c 0x7ed9
+#define getGameProgress_1_bank09 SYM(getGameProgress_1)
+#define getGameProgress_2_bank09 SYM(getGameProgress_2)
+#define interactionOscillateXRandomly_bank08 SYM(interactionOscillateXRandomly)
+#define villagerGalSubid07Script_bank0c SYM(villagerGalSubid07Script)
+#define genericNpcScript_bank0c SYM(genericNpcScript)
+#define linkedGameNpcScript_bank0c SYM(linkedGameNpcScript)
 
 static uint16_t femaleVillager_jumpTable(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -51,286 +51,289 @@ static void femaleVillager_addDoubleIndex(GB *gb, uint16_t return_address) {
 
 // @state1: per-subid update. Also reached by fallthrough from @initSubid06.
 static void femaleVillager_state1(GB *gb, uint16_t sp0_) {
-  CYC(0x77fc, 0x77fe); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x77fe, 0x77ff); A = mem_rd(gb, DE);
-  CYC(0x77ff, 0x7800); push_effect(gb, 0x7800);
-  switch (femaleVillager_jumpTable(gb)) {
-    case 0x7812: goto runSubid00;
-    case 0x7870: goto runScriptAndAnimateFacingLink;
-    case 0x7876: goto runSubid06;
-    case 0x787f: goto runSubid07;
-    default: HANDOFF(HL);
-  }
+  BASE(interactionCode3b);
+  CYC(b_+212, b_+214); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+214, b_+215); A = mem_rd(gb, DE);
+  CYC(b_+215, b_+216); push_effect(gb, b_+216);
+  do { uint16_t jt_ = (femaleVillager_jumpTable(gb));
+    if (jt_ == b_+234) { goto runSubid00; }
+    else if (jt_ == b_+328) { goto runScriptAndAnimateFacingLink; }
+    else if (jt_ == b_+334) { goto runSubid06; }
+    else if (jt_ == b_+343) { goto runSubid07; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 runSubid00:
   // Cutscene where guy is struck by lightning in intro
-  CYC(0x7812, 0x7814); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x7814, 0x7815); A = mem_rd(gb, DE);
-  CYC(0x7815, 0x7816); push_effect(gb, 0x7816);
-  switch (femaleVillager_jumpTable(gb)) {
-    case 0x7820: goto substate0;
-    case 0x7832: goto substate1;
-    case 0x7848: goto substate2;
-    case 0x785a: goto substate3;
-    case 0x7866: goto substate4;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+234, b_+236); E = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+236, b_+237); A = mem_rd(gb, DE);
+  CYC(b_+237, b_+238); push_effect(gb, b_+238);
+  do { uint16_t jt_ = (femaleVillager_jumpTable(gb));
+    if (jt_ == b_+248) { goto substate0; }
+    else if (jt_ == b_+266) { goto substate1; }
+    else if (jt_ == b_+288) { goto substate2; }
+    else if (jt_ == b_+306) { goto substate3; }
+    else if (jt_ == b_+318) { goto substate4; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 substate0:
-  CYC(0x7820, 0x7823); A = mem_rd(gb, wTmpcfc0 + 0x11);
-  CYC(0x7823, 0x7825); alu_cp(gb, 0x02);
+  CYC(b_+248, b_+251); A = mem_rd(gb, wTmpcfc0 + 0x11);
+  CYC(b_+251, b_+253); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
-    CYCT(0x7825, 0x7828); interactionAnimate_hook(gb); return;
+    CYCT(b_+253, b_+256); interactionAnimate_hook(gb); return;
   }
-  CYC(0x7825, 0x7828);
-  CALL_C(0x7828, interactionIncSubstate_hook, 0x23e5, 0x782b);
-  CYC(0x782b, 0x782d); L = INTERACTION_BASE + OBJ_XH;
-  CYC(0x782d, 0x782e); A = mem_rd(gb, HL);
-  CYC(0x782e, 0x7830); L = INTERACTION_BASE + OBJ_VAR3D;
-  CYC(0x7830, 0x7831); mem_wr(gb, HL, A);
-  CYC(0x7831, 0x7832); ret_effect(gb);
+  CYC(b_+253, b_+256);
+  CALL_C(b_+256, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+259);
+  CYC(b_+259, b_+261); L = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+261, b_+262); A = mem_rd(gb, HL);
+  CYC(b_+262, b_+264); L = INTERACTION_BASE + OBJ_VAR3D;
+  CYC(b_+264, b_+265); mem_wr(gb, HL, A);
+  CYC(b_+265, b_+266); ret_effect(gb);
   return;
 
 substate1:
   // callab interactionOscillateXRandomly
-  CYC(0x7832, 0x7835); SET_HL(interactionOscillateXRandomly_bank08);
-  CYC(0x7835, 0x7837); E = 0x08;
-  CALL_C(0x7837, interBankCall_hook, 0x008a, 0x783a);
-  CYC(0x783a, 0x783d); A = mem_rd(gb, wTmpcfc0 + 0x11);
-  CYC(0x783d, 0x783f); alu_cp(gb, 0x04);
+  CYC(b_+266, b_+269); SET_HL(interactionOscillateXRandomly_bank08);
+  CYC(b_+269, b_+271); E = 0x08;
+  CALL_C(b_+271, interBankCall_hook, 0x008a, b_+274);
+  CYC(b_+274, b_+277); A = mem_rd(gb, wTmpcfc0 + 0x11);
+  CYC(b_+277, b_+279); alu_cp(gb, 0x04);
   if (!(F & FZ)) {
-    CYCT(0x783f, 0x7840); ret_effect(gb); return;
+    CYCT(b_+279, b_+280); ret_effect(gb); return;
   }
-  CYC(0x783f, 0x7840);
-  CALL_C(0x7840, interactionIncSubstate_hook, 0x23e5, 0x7843);
-  CYC(0x7843, 0x7845); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x7845, 0x7847); mem_wr(gb, HL, 0x1e);
-  CYC(0x7847, 0x7848); ret_effect(gb);
+  CYC(b_+279, b_+280);
+  CALL_C(b_+280, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+283);
+  CYC(b_+283, b_+285); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+285, b_+287); mem_wr(gb, HL, 0x1e);
+  CYC(b_+287, b_+288); ret_effect(gb);
   return;
 
 substate2:
-  CALL_C(0x7848, interactionDecCounter1_hook, 0x23cc, 0x784b);
+  CALL_C(b_+288, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+291);
   if (!(F & FZ)) {
-    CYCT(0x784b, 0x784c); ret_effect(gb); return;
+    CYCT(b_+291, b_+292); ret_effect(gb); return;
   }
-  CYC(0x784b, 0x784c);
-  CYC(0x784c, 0x784f); SET_BC(0xfe40); // -$1c0
-  CALL_C(0x784f, objectSetSpeedZ_hook, 0x239d, 0x7852);
-  CYC(0x7852, 0x7854); A = 0x53; // SND_JUMP
-  CALL_C(0x7854, playSound_b00_hook, 0x0c98, 0x7857);
-  CYC(0x7857, 0x785a); interactionIncSubstate_hook(gb);
+  CYC(b_+291, b_+292);
+  CYC(b_+292, b_+295); SET_BC(0xfe40); // -$1c0
+  CALL_C(b_+295, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+298);
+  CYC(b_+298, b_+300); A = 0x53; // SND_JUMP
+  CALL_C(b_+300, playSound_b00_hook, SYM(playSound_b00), b_+303);
+  CYC(b_+303, b_+306); interactionIncSubstate_hook(gb);
   return;
 
 substate3:
-  CYC(0x785a, 0x785c); C = 0x20;
-  CALL_C(0x785c, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x785f);
+  CYC(b_+306, b_+308); C = 0x20;
+  CALL_C(b_+308, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+311);
   if (!(F & FZ)) {
-    CYCT(0x785f, 0x7860); ret_effect(gb); return;
+    CYCT(b_+311, b_+312); ret_effect(gb); return;
   }
-  CYC(0x785f, 0x7860);
-  CALL_C(0x7860, interactionIncSubstate_hook, 0x23e5, 0x7863);
-  CYC(0x7863, 0x7866); goto loadScript;
+  CYC(b_+311, b_+312);
+  CALL_C(b_+312, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+315);
+  CYC(b_+315, b_+318); goto loadScript;
 
 substate4:
-  CALL_C(0x7866, interactionAnimate2Times_hook, 0x2752, 0x7869);
-  CALL_C(0x7869, interactionRunScript_hook, 0x2552, 0x786c);
+  CALL_C(b_+318, interactionAnimate2Times_hook, SYM(interactionAnimate2Times), b_+321);
+  CALL_C(b_+321, interactionRunScript_hook, SYM(interactionRunScript), b_+324);
   if (!(F & FC)) {
-    CYCT(0x786c, 0x786d); ret_effect(gb); return;
+    CYCT(b_+324, b_+325); ret_effect(gb); return;
   }
-  CYC(0x786c, 0x786d);
-  CYC(0x786d, 0x7870); interactionDelete_hook(gb);
+  CYC(b_+324, b_+325);
+  CYC(b_+325, b_+328); interactionDelete_hook(gb);
   return;
 
 runScriptAndAnimateFacingLink:
   // Generic NPCs
-  CALL_C(0x7870, interactionRunScript_hook, 0x2552, 0x7873);
-  CYC(0x7873, 0x7876); npcFaceLinkAndAnimate_hook(gb);
+  CALL_C(b_+328, interactionRunScript_hook, SYM(interactionRunScript), b_+331);
+  CYC(b_+331, b_+334); npcFaceLinkAndAnimate_hook(gb);
   return;
 
 runSubid06:
   // Linked game NPC
-  CALL_C(0x7876, interactionRunScript_hook, 0x2552, 0x7879);
+  CALL_C(b_+334, interactionRunScript_hook, SYM(interactionRunScript), b_+337);
   if (F & FC) {
-    CYCT(0x7879, 0x787c); interactionDelete_hook(gb); return;
+    CYCT(b_+337, b_+340); interactionDelete_hook(gb); return;
   }
-  CYC(0x7879, 0x787c);
-  CYC(0x787c, 0x787f); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+337, b_+340);
+  CYC(b_+340, b_+343); npcFaceLinkAndAnimate_hook(gb);
   return;
 
 runSubid07:
   // NPC in eyeglasses library (present)
-  CALL_C(0x787f, interactionRunScript_hook, 0x2552, 0x7882);
-  CYC(0x7882, 0x7885); interactionAnimateAsNpc_hook(gb);
+  CALL_C(b_+343, interactionRunScript_hook, SYM(interactionRunScript), b_+346);
+  CYC(b_+346, b_+349); interactionAnimateAsNpc_hook(gb);
   return;
 
 loadScript:
-  CYC(0x7885, 0x7887); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7887, 0x7888); A = mem_rd(gb, DE);
-  CYC(0x7888, 0x788b); SET_HL(interactionCode3b_scriptTable_bank08);
-  CYC(0x788b, 0x788c); femaleVillager_addDoubleIndex(gb, 0x788c);
-  CYC(0x788c, 0x788d); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x788d, 0x788e); H = mem_rd(gb, HL);
-  CYC(0x788e, 0x788f); L = A;
-  CYC(0x788f, 0x7892); interactionSetScript_hook(gb);
+  CYC(b_+349, b_+351); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+351, b_+352); A = mem_rd(gb, DE);
+  CYC(b_+352, b_+355); SET_HL(interactionCode3b_scriptTable_bank08);
+  CYC(b_+355, b_+356); femaleVillager_addDoubleIndex(gb, b_+356);
+  CYC(b_+356, b_+357); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+357, b_+358); H = mem_rd(gb, HL);
+  CYC(b_+358, b_+359); L = A;
+  CYC(b_+359, b_+362); interactionSetScript_hook(gb);
 }
 
 // @initSubid: per-subid initialization. Reached only by a static `call` from
 // interactionCode3b@state0 (NOT HOOKED).
 static void femaleVillager_initSubid(GB *gb, uint16_t sp0_) {
-  CYC(0x7744, 0x7746); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7746, 0x7747); A = mem_rd(gb, DE);
-  CYC(0x7747, 0x7748); push_effect(gb, 0x7748);
-  switch (femaleVillager_jumpTable(gb)) {
-    case 0x775a: goto initSubid00;
-    case 0x775f: goto initSubid01;
-    case 0x777e: goto initSubid03;
-    case 0x779e: goto initSubid05;
-    case 0x77ee: goto initSubid06;
-    case 0x77c3: goto initSubid07;
-    case 0x77df: goto initSubid08;
-    default: HANDOFF(HL);
-  }
+  BASE(interactionCode3b);
+  CYC(b_+28, b_+30); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+30, b_+31); A = mem_rd(gb, DE);
+  CYC(b_+31, b_+32); push_effect(gb, b_+32);
+  do { uint16_t jt_ = (femaleVillager_jumpTable(gb));
+    if (jt_ == b_+50) { goto initSubid00; }
+    else if (jt_ == b_+55) { goto initSubid01; }
+    else if (jt_ == b_+86) { goto initSubid03; }
+    else if (jt_ == b_+118) { goto initSubid05; }
+    else if (jt_ == b_+198) { goto initSubid06; }
+    else if (jt_ == b_+155) { goto initSubid07; }
+    else if (jt_ == b_+183) { goto initSubid08; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 initSubid00:
-  CYC(0x775a, 0x775c); A = 0x01;
-  CYC(0x775c, 0x775f); interactionSetAnimation_hook(gb);
+  CYC(b_+50, b_+52); A = 0x01;
+  CYC(b_+52, b_+55); interactionSetAnimation_hook(gb);
   return;
 
 initSubid01:
   // callab agesInteractionsBank09.getGameProgress_1
-  CYC(0x775f, 0x7762); SET_HL(getGameProgress_1_bank09);
-  CYC(0x7762, 0x7764); E = 0x09;
-  CALL_C(0x7764, interBankCall_hook, 0x008a, 0x7767);
-  CYC(0x7767, 0x7769); C = 0x01;
-  CYC(0x7769, 0x776a); alu_xor(gb, A);
-  CALL_C(0x776a, checkNpcShouldExistAtGameStage_hook, 0x3d78, 0x776d);
+  CYC(b_+55, b_+58); SET_HL(getGameProgress_1_bank09);
+  CYC(b_+58, b_+60); E = 0x09;
+  CALL_C(b_+60, interBankCall_hook, 0x008a, b_+63);
+  CYC(b_+63, b_+65); C = 0x01;
+  CYC(b_+65, b_+66); alu_xor(gb, A);
+  CALL_C(b_+66, checkNpcShouldExistAtGameStage_hook, SYM(checkNpcShouldExistAtGameStage), b_+69);
   if (!(F & FZ)) {
-    CYCT(0x776d, 0x7770); interactionDelete_hook(gb); return;
+    CYCT(b_+69, b_+72); interactionDelete_hook(gb); return;
   }
-  CYC(0x776d, 0x7770);
-  CYC(0x7770, 0x7771); A = B;
-  CYC(0x7771, 0x7774); SET_HL(interactionCode3b_subid1And2ScriptTable_bank08);
-  CYC(0x7774, 0x7775); femaleVillager_addDoubleIndex(gb, 0x7775);
-  CYC(0x7775, 0x7776); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x7776, 0x7777); H = mem_rd(gb, HL);
-  CYC(0x7777, 0x7778); L = A;
-  CALL_C(0x7778, interactionSetScript_hook, 0x2544, 0x777b);
-  CYC(0x777b, 0x777e); objectSetVisible82_hook(gb);
+  CYC(b_+69, b_+72);
+  CYC(b_+72, b_+73); A = B;
+  CYC(b_+73, b_+76); SET_HL(interactionCode3b_subid1And2ScriptTable_bank08);
+  CYC(b_+76, b_+77); femaleVillager_addDoubleIndex(gb, b_+77);
+  CYC(b_+77, b_+78); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+78, b_+79); H = mem_rd(gb, HL);
+  CYC(b_+79, b_+80); L = A;
+  CALL_C(b_+80, interactionSetScript_hook, SYM(interactionSetScript), b_+83);
+  CYC(b_+83, b_+86); objectSetVisible82_hook(gb);
   return;
 
 initSubid03:
   // callab agesInteractionsBank09.getGameProgress_2
-  CYC(0x777e, 0x7781); SET_HL(getGameProgress_2_bank09);
-  CYC(0x7781, 0x7783); E = 0x09;
-  CALL_C(0x7783, interBankCall_hook, 0x008a, 0x7786);
-  CYC(0x7786, 0x7788); C = 0x03;
-  CYC(0x7788, 0x778a); A = 0x01;
-  CALL_C(0x778a, checkNpcShouldExistAtGameStage_hook, 0x3d78, 0x778d);
+  CYC(b_+86, b_+89); SET_HL(getGameProgress_2_bank09);
+  CYC(b_+89, b_+91); E = 0x09;
+  CALL_C(b_+91, interBankCall_hook, 0x008a, b_+94);
+  CYC(b_+94, b_+96); C = 0x03;
+  CYC(b_+96, b_+98); A = 0x01;
+  CALL_C(b_+98, checkNpcShouldExistAtGameStage_hook, SYM(checkNpcShouldExistAtGameStage), b_+101);
   if (!(F & FZ)) {
-    CYCT(0x778d, 0x7790); interactionDelete_hook(gb); return;
+    CYCT(b_+101, b_+104); interactionDelete_hook(gb); return;
   }
-  CYC(0x778d, 0x7790);
-  CYC(0x7790, 0x7791); A = B;
-  CYC(0x7791, 0x7794); SET_HL(interactionCode3b_subid3And4ScriptTable_bank08);
-  CYC(0x7794, 0x7795); femaleVillager_addDoubleIndex(gb, 0x7795);
-  CYC(0x7795, 0x7796); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x7796, 0x7797); H = mem_rd(gb, HL);
-  CYC(0x7797, 0x7798); L = A;
-  CALL_C(0x7798, interactionSetScript_hook, 0x2544, 0x779b);
-  CYC(0x779b, 0x779e); objectSetVisible82_hook(gb);
+  CYC(b_+101, b_+104);
+  CYC(b_+104, b_+105); A = B;
+  CYC(b_+105, b_+108); SET_HL(interactionCode3b_subid3And4ScriptTable_bank08);
+  CYC(b_+108, b_+109); femaleVillager_addDoubleIndex(gb, b_+109);
+  CYC(b_+109, b_+110); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+110, b_+111); H = mem_rd(gb, HL);
+  CYC(b_+111, b_+112); L = A;
+  CALL_C(b_+112, interactionSetScript_hook, SYM(interactionSetScript), b_+115);
+  CYC(b_+115, b_+118); objectSetVisible82_hook(gb);
   return;
 
 initSubid05:
-  CYC(0x779e, 0x77a0); A = 0x01;
-  CYC(0x77a0, 0x77a2); E = INTERACTION_BASE + OBJ_OAM_FLAGS;
-  CYC(0x77a2, 0x77a3); mem_wr(gb, DE, A);
+  CYC(b_+118, b_+120); A = 0x01;
+  CYC(b_+120, b_+122); E = INTERACTION_BASE + OBJ_OAM_FLAGS;
+  CYC(b_+122, b_+123); mem_wr(gb, DE, A);
   // callab agesInteractionsBank09.getGameProgress_2
-  CYC(0x77a3, 0x77a6); SET_HL(getGameProgress_2_bank09);
-  CYC(0x77a6, 0x77a8); E = 0x09;
-  CALL_C(0x77a8, interBankCall_hook, 0x008a, 0x77ab);
-  CYC(0x77ab, 0x77ad); C = 0x05;
-  CYC(0x77ad, 0x77af); A = 0x02;
-  CALL_C(0x77af, checkNpcShouldExistAtGameStage_hook, 0x3d78, 0x77b2);
+  CYC(b_+123, b_+126); SET_HL(getGameProgress_2_bank09);
+  CYC(b_+126, b_+128); E = 0x09;
+  CALL_C(b_+128, interBankCall_hook, 0x008a, b_+131);
+  CYC(b_+131, b_+133); C = 0x05;
+  CYC(b_+133, b_+135); A = 0x02;
+  CALL_C(b_+135, checkNpcShouldExistAtGameStage_hook, SYM(checkNpcShouldExistAtGameStage), b_+138);
   if (!(F & FZ)) {
-    CYCT(0x77b2, 0x77b5); interactionDelete_hook(gb); return;
+    CYCT(b_+138, b_+141); interactionDelete_hook(gb); return;
   }
-  CYC(0x77b2, 0x77b5);
-  CYC(0x77b5, 0x77b6); A = B;
-  CYC(0x77b6, 0x77b9); SET_HL(interactionCode3b_subid5ScriptTable_bank08);
-  CYC(0x77b9, 0x77ba); femaleVillager_addDoubleIndex(gb, 0x77ba);
-  CYC(0x77ba, 0x77bb); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x77bb, 0x77bc); H = mem_rd(gb, HL);
-  CYC(0x77bc, 0x77bd); L = A;
-  CALL_C(0x77bd, interactionSetScript_hook, 0x2544, 0x77c0);
-  CYC(0x77c0, 0x77c3); objectSetVisible82_hook(gb);
+  CYC(b_+138, b_+141);
+  CYC(b_+141, b_+142); A = B;
+  CYC(b_+142, b_+145); SET_HL(interactionCode3b_subid5ScriptTable_bank08);
+  CYC(b_+145, b_+146); femaleVillager_addDoubleIndex(gb, b_+146);
+  CYC(b_+146, b_+147); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+147, b_+148); H = mem_rd(gb, HL);
+  CYC(b_+148, b_+149); L = A;
+  CALL_C(b_+149, interactionSetScript_hook, SYM(interactionSetScript), b_+152);
+  CYC(b_+152, b_+155); objectSetVisible82_hook(gb);
   return;
 
 initSubid07:
-  CYC(0x77c3, 0x77c5); A = 0x30; // GLOBALFLAG_WATER_POLLUTION_FIXED
-  CALL_C(0x77c5, checkGlobalFlag_hook, 0x31f3, 0x77c8);
-  CYC(0x77c8, 0x77ca); A = 0x26; // <TX_1526
+  CYC(b_+155, b_+157); A = 0x30; // GLOBALFLAG_WATER_POLLUTION_FIXED
+  CALL_C(b_+157, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+160);
+  CYC(b_+160, b_+162); A = 0x26; // <TX_1526
   if (F & FZ) {
-    CYCT(0x77ca, 0x77cc);
+    CYCT(b_+162, b_+164);
   } else {
-    CYC(0x77ca, 0x77cc);
-    CYC(0x77cc, 0x77ce); A = 0x27; // <TX_1527
+    CYC(b_+162, b_+164);
+    CYC(b_+164, b_+166); A = 0x27; // <TX_1527
   }
-  CYC(0x77ce, 0x77d0); E = INTERACTION_BASE + OBJ_TEXT_ID;
-  CYC(0x77d0, 0x77d1); mem_wr(gb, DE, A);
-  CYC(0x77d1, 0x77d2); E = alu_inc8(gb, E);
-  CYC(0x77d2, 0x77d4); A = 0x15; // >TX_1500
-  CYC(0x77d4, 0x77d5); mem_wr(gb, DE, A);
-  CYC(0x77d5, 0x77d6); alu_xor(gb, A);
-  CALL_C(0x77d6, interactionSetAnimation_hook, 0x262e, 0x77d9);
-  CYC(0x77d9, 0x77dc); SET_HL(villagerGalSubid07Script_bank0c);
-  CYC(0x77dc, 0x77df); interactionSetScript_hook(gb);
+  CYC(b_+166, b_+168); E = INTERACTION_BASE + OBJ_TEXT_ID;
+  CYC(b_+168, b_+169); mem_wr(gb, DE, A);
+  CYC(b_+169, b_+170); E = alu_inc8(gb, E);
+  CYC(b_+170, b_+172); A = 0x15; // >TX_1500
+  CYC(b_+172, b_+173); mem_wr(gb, DE, A);
+  CYC(b_+173, b_+174); alu_xor(gb, A);
+  CALL_C(b_+174, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+177);
+  CYC(b_+177, b_+180); SET_HL(villagerGalSubid07Script_bank0c);
+  CYC(b_+180, b_+183); interactionSetScript_hook(gb);
   return;
 
 initSubid08:
-  CYC(0x77df, 0x77e1); E = INTERACTION_BASE + OBJ_TEXT_ID;
-  CYC(0x77e1, 0x77e3); A = 0x03; // <TX_0f03
-  CYC(0x77e3, 0x77e4); mem_wr(gb, DE, A);
-  CYC(0x77e4, 0x77e5); E = alu_inc8(gb, E);
-  CYC(0x77e5, 0x77e7); A = 0x0f; // >TX_0f03
-  CYC(0x77e7, 0x77e8); mem_wr(gb, DE, A);
-  CYC(0x77e8, 0x77eb); SET_HL(genericNpcScript_bank0c);
-  CYC(0x77eb, 0x77ee); interactionSetScript_hook(gb);
+  CYC(b_+183, b_+185); E = INTERACTION_BASE + OBJ_TEXT_ID;
+  CYC(b_+185, b_+187); A = 0x03; // <TX_0f03
+  CYC(b_+187, b_+188); mem_wr(gb, DE, A);
+  CYC(b_+188, b_+189); E = alu_inc8(gb, E);
+  CYC(b_+189, b_+191); A = 0x0f; // >TX_0f03
+  CYC(b_+191, b_+192); mem_wr(gb, DE, A);
+  CYC(b_+192, b_+195); SET_HL(genericNpcScript_bank0c);
+  CYC(b_+195, b_+198); interactionSetScript_hook(gb);
   return;
 
 initSubid06:
-  CYC(0x77ee, 0x77f0); A = 0x05;
-  CYC(0x77f0, 0x77f2); E = INTERACTION_BASE + OBJ_VAR3F;
-  CYC(0x77f2, 0x77f3); mem_wr(gb, DE, A);
-  CYC(0x77f3, 0x77f6); SET_HL(linkedGameNpcScript_bank0c);
-  CALL_C(0x77f6, interactionSetScript_hook, 0x2544, 0x77f9);
-  CALL_C(0x77f9, interactionRunScript_hook, 0x2552, 0x77fc);
+  CYC(b_+198, b_+200); A = 0x05;
+  CYC(b_+200, b_+202); E = INTERACTION_BASE + OBJ_VAR3F;
+  CYC(b_+202, b_+203); mem_wr(gb, DE, A);
+  CYC(b_+203, b_+206); SET_HL(linkedGameNpcScript_bank0c);
+  CALL_C(b_+206, interactionSetScript_hook, SYM(interactionSetScript), b_+209);
+  CALL_C(b_+209, interactionRunScript_hook, SYM(interactionRunScript), b_+212);
   femaleVillager_state1(gb, sp0_);
 }
 
 // INTERAC_FEMALE_VILLAGER: assorted female NPCs, subid-dispatched.
 void interactionCode3b_hook(GB *gb) {
+  BASE(interactionCode3b);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7728, 0x772a); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x772a, 0x772b); A = mem_rd(gb, DE);
-  CYC(0x772b, 0x772c); push_effect(gb, 0x772c);
-  switch (femaleVillager_jumpTable(gb)) {
-    case 0x7730: goto state0;
-    case 0x77fc: femaleVillager_state1(gb, sp0_); return;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (femaleVillager_jumpTable(gb));
+    if (jt_ == b_+8) { goto state0; }
+    else if (jt_ == b_+212) { femaleVillager_state1(gb, sp0_); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 state0:
-  CYC(0x7730, 0x7732); A = 0x01;
-  CYC(0x7732, 0x7733); mem_wr(gb, DE, A);
-  CALL_C(0x7733, interactionInitGraphics_hook, 0x15fb, 0x7736);
-  CALL_C(0x7736, objectSetVisiblec2_hook, 0x1e45, 0x7739);
-  CYC(0x7739, 0x773c); push_effect(gb, 0x773c); femaleVillager_initSubid(gb, sp0_);
-  CYC(0x773c, 0x773e); E = INTERACTION_BASE + OBJ_ENABLED;
-  CYC(0x773e, 0x773f); A = mem_rd(gb, DE);
-  CYC(0x773f, 0x7740); alu_or(gb, A);
+  CYC(b_+8, b_+10); A = 0x01;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
+  CALL_C(b_+14, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+17);
+  CYC(b_+17, b_+20); push_effect(gb, b_+20); femaleVillager_initSubid(gb, sp0_);
+  CYC(b_+20, b_+22); E = INTERACTION_BASE + OBJ_ENABLED;
+  CYC(b_+22, b_+23); A = mem_rd(gb, DE);
+  CYC(b_+23, b_+24); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x7740, 0x7743); objectMarkSolidPosition_hook(gb); return;
+    CYCT(b_+24, b_+27); objectMarkSolidPosition_hook(gb); return;
   }
-  CYC(0x7740, 0x7743);
-  CYC(0x7743, 0x7744); ret_effect(gb);
+  CYC(b_+24, b_+27);
+  CYC(b_+27, b_+28); ret_effect(gb);
 }

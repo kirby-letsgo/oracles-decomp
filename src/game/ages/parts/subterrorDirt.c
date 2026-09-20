@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode32), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode32), (from), (to), true)
 
 static uint16_t subterrorDirt_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -26,30 +26,31 @@ static uint16_t subterrorDirt_jump_table(GB *gb) {
 
 // PART_SUBTERROR_DIRT
 void partCode32_hook(GB *gb) {
+  BASE(partCode32);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x64bf, 0x64c1); E = 0xc4; // Part.state
-  CYC(0x64c1, 0x64c2); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = 0xc4; // Part.state
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x64c2, 0x64c3); push_effect(gb, 0x64c3);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = subterrorDirt_jump_table(gb);
-    if (target == 0x64c7) goto state0;
+    if (target == b_+8) goto state0;
     goto state1;
   }
 
 state0:
-  CYC(0x64c7, 0x64c9); A = 0x01;
-  CYC(0x64c9, 0x64ca); mem_wr(gb, DE, A);
-  CYC(0x64ca, 0x64cc); A = 0xa9; // SND_DIG
-  CALL_C(0x64cc, playSound_b00_hook, 0x0c98, 0x64cf);
+  CYC(b_+8, b_+10); A = 0x01;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CYC(b_+11, b_+13); A = 0xa9; // SND_DIG
+  CALL_C(b_+13, playSound_b00_hook, SYM(playSound_b00), b_+16);
 
 state1:
-  CALL_C(0x64cf, partAnimate_hook, 0x2978, 0x64d2);
-  CYC(0x64d2, 0x64d4); E = 0xe1; // Part.animParameter
-  CYC(0x64d4, 0x64d5); A = mem_rd(gb, DE);
-  CYC(0x64d5, 0x64d7); E = 0xda; // Part.visible
-  CYC(0x64d7, 0x64d8); mem_wr(gb, DE, A);
-  CYC(0x64d8, 0x64d9); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x64d9); return; } // ret nz
-  CYC(0x64d9, 0x64da);
-  CYC(0x64da, 0x64dd); partDelete_hook(gb); return; // jp
+  CALL_C(b_+16, partAnimate_hook, SYM(partAnimate), b_+19);
+  CYC(b_+19, b_+21); E = 0xe1; // Part.animParameter
+  CYC(b_+21, b_+22); A = mem_rd(gb, DE);
+  CYC(b_+22, b_+24); E = 0xda; // Part.visible
+  CYC(b_+24, b_+25); mem_wr(gb, DE, A);
+  CYC(b_+25, b_+26); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+26); return; } // ret nz
+  CYC(b_+26, b_+27);
+  CYC(b_+27, SYM(partCode33)); partDelete_hook(gb); return; // jp
 }

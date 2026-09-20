@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodec6), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodec6), (from), (to), true)
 
 static uint16_t black_tower_door_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A); burn_rom(gb, 0, 1, 2, false); SET_HL(pop_effect(gb)); burn_rom(gb, 0, 2, 3, false); alu_add(gb, L); burn_rom(gb, 0, 3, 4, false); L = A;
@@ -13,22 +13,24 @@ static uint16_t black_tower_door_jump_table(GB *gb) {
 }
 
 void interactionCodec6_hook(GB *gb) {
+  BASE(interactionCodec6);
   uint16_t sp0_ = gb->sp;
-  CYC(0x74c7,0x74c9); E=INTERACTION_BASE+OBJ_STATE; CYC(0x74c9,0x74ca); A=mem_rd(gb,DE); CYC(0x74ca,0x74cb); push_effect(gb,0x74cb);
-  switch (black_tower_door_jump_table(gb)) {
-    case 0x74d1:
-      CALL_C(0x74d1,getThisRoomFlags_hook,0x197d,0x74d4); CYC(0x74d4,0x74d6); alu_and(gb,0x40);
-      if (F&FZ) { CYCT(0x74d6,0x74d8); goto cutscene; }
-      CYC(0x74d6,0x74d8); CYC(0x74d8,0x74db); SET_HL(wRoomLayout+0x47); CYC(0x74db,0x74dd); mem_wr(gb,HL,0x44); CYC(0x74dd,0x74e0); interactionDelete_hook(gb); return;
+  CYC(b_+0,b_+2); E=INTERACTION_BASE+OBJ_STATE; CYC(b_+2,b_+3); A=mem_rd(gb,DE); CYC(b_+3,b_+4); push_effect(gb,b_+4);
+  do { uint16_t jt_ = (black_tower_door_jump_table(gb));
+    if (jt_ == b_+10) {
+      CALL_C(b_+10,getThisRoomFlags_hook,SYM(getThisRoomFlags),b_+13); CYC(b_+13,b_+15); alu_and(gb,0x40);
+      if (F&FZ) { CYCT(b_+15,b_+17); goto cutscene; }
+      CYC(b_+15,b_+17); CYC(b_+17,b_+20); SET_HL(wRoomLayout+0x47); CYC(b_+20,b_+22); mem_wr(gb,HL,0x44); CYC(b_+22,b_+25); interactionDelete_hook(gb); return;
 cutscene:
-      CYC(0x74e0,0x74e2); A=0x36; CALL_C(0x74e2,checkTreasureObtained_hook,0x1748,0x74e5);
-      if (!(F&FC)) { CYCT(0x74e5,0x74e7); goto no_seed; }
-      CYC(0x74e5,0x74e7); CALL_C(0x74e7,clearAllItemsAndPutLinkOnGround_hook,0x19ad,0x74ea); CALL_C(0x74ea,resetLinkInvincibility_hook,0x2ba9,0x74ed);
-      CYC(0x74ed,0x74ef); A=0x0b; CYC(0x74ef,0x74f2); W8(wLinkForceState)=A; CYC(0x74f2,0x74f4); A=0x70; CYC(0x74f4,0x74f7); W8(wLinkStateParameter)=A; CYC(0x74f7,0x74f9); E=0x46; CYC(0x74f9,0x74fa); mem_wr(gb,DE,A); CYC(0x74fa,0x74fd); SET_HL(w1Link_direction); CYC(0x74fd,0x74ff); mem_wr(gb,HL,1); CYC(0x74ff,0x7500); L=alu_inc8(gb,L); CYC(0x7500,0x7502); mem_wr(gb,HL,8); CYC(0x7502,0x7504); A=0x81; CYC(0x7504,0x7507); W8(wDisabledObjects)=A; CYC(0x7507,0x750a); W8(wMenuDisabled)=A; CALL_C(0x750a,interactionIncState_hook,0x23e0,0x750d); CYC(0x750d,0x750f); A=0xab; CALL_C(0x750f,loadPaletteHeader_hook,0x050b,0x7512); CYC(0x7512,0x7515); restartSound_hook(gb); return;
+      CYC(b_+25,b_+27); A=0x36; CALL_C(b_+27,checkTreasureObtained_hook,SYM(checkTreasureObtained),b_+30);
+      if (!(F&FC)) { CYCT(b_+30,b_+32); goto no_seed; }
+      CYC(b_+30,b_+32); CALL_C(b_+32,clearAllItemsAndPutLinkOnGround_hook,SYM(clearAllItemsAndPutLinkOnGround),b_+35); CALL_C(b_+35,resetLinkInvincibility_hook,SYM(resetLinkInvincibility),b_+38);
+      CYC(b_+38,b_+40); A=0x0b; CYC(b_+40,b_+43); W8(wLinkForceState)=A; CYC(b_+43,b_+45); A=0x70; CYC(b_+45,b_+48); W8(wLinkStateParameter)=A; CYC(b_+48,b_+50); E=0x46; CYC(b_+50,b_+51); mem_wr(gb,DE,A); CYC(b_+51,b_+54); SET_HL(w1Link_direction); CYC(b_+54,b_+56); mem_wr(gb,HL,1); CYC(b_+56,b_+57); L=alu_inc8(gb,L); CYC(b_+57,b_+59); mem_wr(gb,HL,8); CYC(b_+59,b_+61); A=0x81; CYC(b_+61,b_+64); W8(wDisabledObjects)=A; CYC(b_+64,b_+67); W8(wMenuDisabled)=A; CALL_C(b_+67,interactionIncState_hook,SYM(interactionIncState),b_+70); CYC(b_+70,b_+72); A=0xab; CALL_C(b_+72,loadPaletteHeader_hook,SYM(loadPaletteHeader),b_+75); CYC(b_+75,b_+78); restartSound_hook(gb); return;
 no_seed:
-      CYC(0x7515,0x7517); A=0x44; CYC(0x7517,0x751a); SET_HL(wRoomLayout+0x44); CYC(0x751a,0x751b); mem_wr(gb,HL,A); CYC(0x751b,0x751d); L=0x47; CYC(0x751d,0x751e); mem_wr(gb,HL,A); CYC(0x751e,0x7520); L=0x4a; CYC(0x7520,0x7521); mem_wr(gb,HL,A); CYC(0x7521,0x7524); W8(wDisableWarps)=A; CYC(0x7524,0x7527); interactionDelete_hook(gb); return;
-    case 0x7527: CALL_C(0x7527,interactionDecCounter1_hook,0x23cc,0x752a); if (!(F&FZ)) { CYCT(0x752a,0x752b); ret_effect(gb); return; } CYC(0x752a,0x752b); CYC(0x752b,0x752d); mem_wr(gb,HL,0x1e); CYC(0x752d,0x752e); A=0; CYC(0x752e,0x7531); SET_HL(w1Link_direction); CYC(0x7531,0x7532); mem_wr(gb,HL,A); SET_HL(HL+1); CYC(0x7532,0x7533); mem_wr(gb,HL,A); CYC(0x7533,0x7536); interactionIncState_hook(gb); return;
-    case 0x7536: CALL_C(0x7536,interactionDecCounter1_hook,0x23cc,0x7539); if (!(F&FZ)) { CYCT(0x7539,0x753a); ret_effect(gb); return; } CYC(0x7539,0x753a); CYC(0x753a,0x753c); B=0xd7; CALL_C(0x753c,objectCreateInteractionWithSubid00_hook,0x24c3,0x753f); CYC(0x753f,0x7542); interactionDelete_hook(gb); return;
-    default: hook_continue(gb,HL,sp0_); return;
-  }
+      CYC(b_+78,b_+80); A=0x44; CYC(b_+80,b_+83); SET_HL(wRoomLayout+0x44); CYC(b_+83,b_+84); mem_wr(gb,HL,A); CYC(b_+84,b_+86); L=0x47; CYC(b_+86,b_+87); mem_wr(gb,HL,A); CYC(b_+87,b_+89); L=0x4a; CYC(b_+89,b_+90); mem_wr(gb,HL,A); CYC(b_+90,b_+93); W8(wDisableWarps)=A; CYC(b_+93,b_+96); interactionDelete_hook(gb); return;
+    }
+    else if (jt_ == b_+96) { CALL_C(b_+96,interactionDecCounter1_hook,SYM(interactionDecCounter1),b_+99); if (!(F&FZ)) { CYCT(b_+99,b_+100); ret_effect(gb); return; } CYC(b_+99,b_+100); CYC(b_+100,b_+102); mem_wr(gb,HL,0x1e); CYC(b_+102,b_+103); A=0; CYC(b_+103,b_+106); SET_HL(w1Link_direction); CYC(b_+106,b_+107); mem_wr(gb,HL,A); SET_HL(HL+1); CYC(b_+107,b_+108); mem_wr(gb,HL,A); CYC(b_+108,b_+111); interactionIncState_hook(gb); return; }
+    else if (jt_ == b_+111) { CALL_C(b_+111,interactionDecCounter1_hook,SYM(interactionDecCounter1),b_+114); if (!(F&FZ)) { CYCT(b_+114,b_+115); ret_effect(gb); return; } CYC(b_+114,b_+115); CYC(b_+115,b_+117); B=0xd7; CALL_C(b_+117,objectCreateInteractionWithSubid00_hook,SYM(objectCreateInteractionWithSubid00),b_+120); CYC(b_+120,SYM(interactionCodec8)); interactionDelete_hook(gb); return; }
+    else { hook_continue(gb,HL,sp0_); return; }
+  } while (0);
 }

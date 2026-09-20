@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0a, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0a, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode69), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode69), (from), (to), true)
 
 static uint16_t interactionCode69_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -41,108 +41,109 @@ static void interactionCode69_addDoubleIndexToHl_from_rst(GB *gb, uint16_t retur
 // Every internal transfer in this routine is a jr/jp/jump-table dispatch, never a call, so
 // nothing here ever nests below the top level -- no push_effect or resume-check machinery needed.
 void interactionCode69_hook(GB *gb) {
+  BASE(interactionCode69);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4d2d, 0x4d2f); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4d2f, 0x4d30); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x4d30, 0x4d31); push_effect(gb, 0x4d31);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = interactionCode69_jump_table(gb);
-    if (target == 0x4d35) goto state0;
+    if (target == b_+8) goto state0;
     goto state1;
   }
 
 state0:
-  CYC(0x4d35, 0x4d37); A = 0x01;
-  CYC(0x4d37, 0x4d38); mem_wr(gb, DE, A);
-  CALL_C(0x4d38, getThisRoomFlags_hook, 0x197d, 0x4d3b);
-  CYC(0x4d3b, 0x4d3d); alu_bit(gb, 7, A);
-  if (!(F & FZ)) { CYCT(0x4d3d, 0x4d40); interactionDelete_hook(gb); return; } // jp nz
-  CYC(0x4d3d, 0x4d40);
-  CALL_C(0x4d40, interactionInitGraphics_hook, 0x15fb, 0x4d43);
-  CALL_C(0x4d43, objectSetVisiblec2_hook, 0x1e45, 0x4d46);
-  CYC(0x4d46, 0x4d48); A = 0x27; // >TX_2700
-  CALL_C(0x4d48, interactionSetHighTextIndex_hook, 0x253b, 0x4d4b);
-  CYC(0x4d4b, 0x4d4d); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x4d4d, 0x4d4e); A = mem_rd(gb, DE);
+  CYC(b_+8, b_+10); A = 0x01;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CALL_C(b_+11, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+14);
+  CYC(b_+14, b_+16); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(b_+16, b_+19); interactionDelete_hook(gb); return; } // jp nz
+  CYC(b_+16, b_+19);
+  CALL_C(b_+19, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+22);
+  CALL_C(b_+22, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+25);
+  CYC(b_+25, b_+27); A = 0x27; // >TX_2700
+  CALL_C(b_+27, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+30);
+  CYC(b_+30, b_+32); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+32, b_+33); A = mem_rd(gb, DE);
   {
-    CYC(0x4d4e, 0x4d4f); push_effect(gb, 0x4d4f);
+    CYC(b_+33, b_+34); push_effect(gb, b_+34);
     uint16_t target = interactionCode69_jump_table(gb);
-    if (target == 0x4d53) goto initSubid00;
+    if (target == b_+38) goto initSubid00;
     goto initSubid01;
   }
 
 initSubid00:
-  CYC(0x4d53, 0x4d55); A = 0x26; // GLOBALFLAG_RAFTON_CHANGED_ROOMS
-  CALL_C(0x4d55, checkGlobalFlag_hook, 0x31f3, 0x4d58);
-  if (!(F & FZ)) { CYCT(0x4d58, 0x4d5b); interactionDelete_hook(gb); return; } // jp nz
-  CYC(0x4d58, 0x4d5b);
-  CYC(0x4d5b, 0x4d5d); C = 0x04;
-  CYC(0x4d5d, 0x4d5f); A = 0x54; // TREASURE_ISLAND_CHART
-  CALL_C(0x4d5f, checkTreasureObtained_hook, 0x1748, 0x4d62);
-  if (F & FC) { CYCT(0x4d62, 0x4d64); goto setBehaviour; } // jr c
-  CYC(0x4d62, 0x4d64);
-  CYC(0x4d64, 0x4d65); C = alu_dec8(gb, C);
-  CYC(0x4d65, 0x4d67); A = 0x15; // GLOBALFLAG_GAVE_ROPE_TO_RAFTON
-  CALL_C(0x4d67, checkGlobalFlag_hook, 0x31f3, 0x4d6a);
-  if (!(F & FZ)) { CYCT(0x4d6a, 0x4d6c); goto setBehaviour; } // jr nz
-  CYC(0x4d6a, 0x4d6c);
-  CYC(0x4d6c, 0x4d6d); C = alu_dec8(gb, C);
-  CYC(0x4d6d, 0x4d6f); A = 0x52; // TREASURE_CHEVAL_ROPE
-  CALL_C(0x4d6f, checkTreasureObtained_hook, 0x1748, 0x4d72);
-  if (F & FC) { CYCT(0x4d72, 0x4d74); goto setBehaviour; } // jr c
-  CYC(0x4d72, 0x4d74);
-  CYC(0x4d74, 0x4d75); C = alu_dec8(gb, C);
-  CYC(0x4d75, 0x4d78); A = W8(wEssencesObtained);
-  CYC(0x4d78, 0x4d7a); alu_bit(gb, 1, A);
-  if (!(F & FZ)) { CYCT(0x4d7a, 0x4d7c); goto setBehaviour; } // jr nz
-  CYC(0x4d7a, 0x4d7c);
-  CYC(0x4d7c, 0x4d7d); C = alu_dec8(gb, C);
+  CYC(b_+38, b_+40); A = 0x26; // GLOBALFLAG_RAFTON_CHANGED_ROOMS
+  CALL_C(b_+40, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+43);
+  if (!(F & FZ)) { CYCT(b_+43, b_+46); interactionDelete_hook(gb); return; } // jp nz
+  CYC(b_+43, b_+46);
+  CYC(b_+46, b_+48); C = 0x04;
+  CYC(b_+48, b_+50); A = 0x54; // TREASURE_ISLAND_CHART
+  CALL_C(b_+50, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+53);
+  if (F & FC) { CYCT(b_+53, b_+55); goto setBehaviour; } // jr c
+  CYC(b_+53, b_+55);
+  CYC(b_+55, b_+56); C = alu_dec8(gb, C);
+  CYC(b_+56, b_+58); A = 0x15; // GLOBALFLAG_GAVE_ROPE_TO_RAFTON
+  CALL_C(b_+58, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+61);
+  if (!(F & FZ)) { CYCT(b_+61, b_+63); goto setBehaviour; } // jr nz
+  CYC(b_+61, b_+63);
+  CYC(b_+63, b_+64); C = alu_dec8(gb, C);
+  CYC(b_+64, b_+66); A = 0x52; // TREASURE_CHEVAL_ROPE
+  CALL_C(b_+66, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+69);
+  if (F & FC) { CYCT(b_+69, b_+71); goto setBehaviour; } // jr c
+  CYC(b_+69, b_+71);
+  CYC(b_+71, b_+72); C = alu_dec8(gb, C);
+  CYC(b_+72, b_+75); A = W8(wEssencesObtained);
+  CYC(b_+75, b_+77); alu_bit(gb, 1, A);
+  if (!(F & FZ)) { CYCT(b_+77, b_+79); goto setBehaviour; } // jr nz
+  CYC(b_+77, b_+79);
+  CYC(b_+79, b_+80); C = alu_dec8(gb, C);
 
 setBehaviour:
-  CYC(0x4d7d, 0x4d7e); H = D;
-  CYC(0x4d7e, 0x4d80); L = INTERACTION_BASE + 0x38; // Interaction.var38
-  CYC(0x4d80, 0x4d81); mem_wr(gb, HL, C);
-  CYC(0x4d81, 0x4dac); goto loadScript; // jr
+  CYC(b_+80, b_+81); H = D;
+  CYC(b_+81, b_+83); L = INTERACTION_BASE + 0x38; // Interaction.var38
+  CYC(b_+83, b_+84); mem_wr(gb, HL, C);
+  CYC(b_+84, b_+127); goto loadScript; // jr
 
 initSubid01:
-  CYC(0x4d83, 0x4d85); A = 0x26; // GLOBALFLAG_RAFTON_CHANGED_ROOMS
-  CALL_C(0x4d85, checkGlobalFlag_hook, 0x31f3, 0x4d88);
-  if (F & FZ) { CYCT(0x4d88, 0x4d8b); interactionDelete_hook(gb); return; } // jp z
-  CYC(0x4d88, 0x4d8b);
-  CYC(0x4d8b, 0x4dac); goto loadScript; // jr
+  CYC(b_+86, b_+88); A = 0x26; // GLOBALFLAG_RAFTON_CHANGED_ROOMS
+  CALL_C(b_+88, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+91);
+  if (F & FZ) { CYCT(b_+91, b_+94); interactionDelete_hook(gb); return; } // jp z
+  CYC(b_+91, b_+94);
+  CYC(b_+94, b_+127); goto loadScript; // jr
 
 state1:
-  CYC(0x4d8d, 0x4d8f); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x4d8f, 0x4d90); A = mem_rd(gb, DE);
+  CYC(b_+96, b_+98); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+98, b_+99); A = mem_rd(gb, DE);
   {
-    CYC(0x4d90, 0x4d91); push_effect(gb, 0x4d91);
+    CYC(b_+99, b_+100); push_effect(gb, b_+100);
     uint16_t target = interactionCode69_jump_table(gb);
-    if (target == 0x4d95) goto runSubid00;
+    if (target == b_+104) goto runSubid00;
     goto runSubid01;
   }
 
 runSubid00:
-  CALL_C(0x4d95, interactionRunScript_hook, 0x2552, 0x4d98);
-  if (F & FC) { CYCT(0x4d98, 0x4d9b); interactionDelete_hook(gb); return; } // jp c
-  CYC(0x4d98, 0x4d9b);
-  CYC(0x4d9b, 0x4d9d); E = INTERACTION_BASE + 0x38; // Interaction.var38
-  CYC(0x4d9d, 0x4d9e); A = mem_rd(gb, DE);
-  CYC(0x4d9e, 0x4da0); alu_cp(gb, 0x04);
-  if (F & FZ) { CYCT(0x4da0, 0x4da3); interactionAnimateBasedOnSpeed_hook(gb); return; } // jp z
-  CYC(0x4da0, 0x4da3);
-  CYC(0x4da3, 0x4da6); interactionAnimateAsNpc_hook(gb); return; // jp
+  CALL_C(b_+104, interactionRunScript_hook, SYM(interactionRunScript), b_+107);
+  if (F & FC) { CYCT(b_+107, b_+110); interactionDelete_hook(gb); return; } // jp c
+  CYC(b_+107, b_+110);
+  CYC(b_+110, b_+112); E = INTERACTION_BASE + 0x38; // Interaction.var38
+  CYC(b_+112, b_+113); A = mem_rd(gb, DE);
+  CYC(b_+113, b_+115); alu_cp(gb, 0x04);
+  if (F & FZ) { CYCT(b_+115, b_+118); interactionAnimateBasedOnSpeed_hook(gb); return; } // jp z
+  CYC(b_+115, b_+118);
+  CYC(b_+118, b_+121); interactionAnimateAsNpc_hook(gb); return; // jp
 
 runSubid01:
-  CALL_C(0x4da6, interactionAnimateAsNpc_hook, 0x26db, 0x4da9);
-  CYC(0x4da9, 0x4dac); interactionRunScript_hook(gb); return; // jp
+  CALL_C(b_+121, interactionAnimateAsNpc_hook, SYM(interactionAnimateAsNpc), b_+124);
+  CYC(b_+124, b_+127); interactionRunScript_hook(gb); return; // jp
 
 loadScript:
-  CYC(0x4dac, 0x4dae); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x4dae, 0x4daf); A = mem_rd(gb, DE);
-  CYC(0x4daf, 0x4db2); SET_HL(0x4db9); // interactionCode69@scriptTable
-  CYC(0x4db2, 0x4db3); interactionCode69_addDoubleIndexToHl_from_rst(gb, 0x4db3);
-  CYC(0x4db3, 0x4db4); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x4db4, 0x4db5); H = mem_rd(gb, HL);
-  CYC(0x4db5, 0x4db6); L = A;
-  CYC(0x4db6, 0x4db9); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+127, b_+129); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+129, b_+130); A = mem_rd(gb, DE);
+  CYC(b_+130, b_+133); SET_HL(b_+140); // interactionCode69@scriptTable
+  CYC(b_+133, b_+134); interactionCode69_addDoubleIndexToHl_from_rst(gb, b_+134);
+  CYC(b_+134, b_+135); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+135, b_+136); H = mem_rd(gb, HL);
+  CYC(b_+136, b_+137); L = A;
+  CYC(b_+137, b_+140); interactionSetScript_hook(gb); return; // jp
 }

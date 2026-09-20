@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0e, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0e, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode42), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode42), (from), (to), true)
 
 void shadowHagBug_state_uninitialized_hook(GB *gb);
 void shadowHagBug_state_galeSeed_hook(GB *gb);
@@ -39,137 +39,145 @@ static uint16_t shadowHagBug_jump_table(GB *gb) {
 //   counter2: Lifetime counter
 // ==================================================================================================
 void enemyCode42_hook(GB *gb) {
+  BASE(enemyCode42);
   uint16_t sp0_ = gb->sp;
-  if (F & FZ) { CYCT(0x6e8c, 0x6e8e); goto commonState; } // jr z
-  CYC(0x6e8c, 0x6e8e);
-  CYC(0x6e8e, 0x6e90); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(0x6e90); return; } // ret c
-  CYC(0x6e90, 0x6e91);
-  if (F & FZ) { CYCT(0x6e91, 0x6e93); goto dead; } // jr z
-  CYC(0x6e91, 0x6e93);
-  CYC(0x6e93, 0x6e94); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(0x6e94, 0x6e97); ecom_updateKnockbackNoSolidity_b0e_hook(gb); return; } // jp nz
-  CYC(0x6e94, 0x6e97);
-  RET(0x6e97); return; // ret
+  if (F & FZ) { CYCT(b_+0, b_+2); goto commonState; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+4); return; } // ret c
+  CYC(b_+4, b_+5);
+  if (F & FZ) { CYCT(b_+5, b_+7); goto dead; } // jr z
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+8); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+8, b_+11); ecom_updateKnockbackNoSolidity_b0e_hook(gb); return; } // jp nz
+  CYC(b_+8, b_+11);
+  RET(b_+11); return; // ret
 
 dead:
-  CYC(0x6e98, 0x6e9a); A = 0x30; // Object.var30
-  CALL_C(0x6e9a, objectGetRelatedObject1Var_hook, 0x2160, 0x6e9d);
-  CYC(0x6e9d, 0x6e9e); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x6e9e, 0x6ea1); enemyDie_uncounted_hook(gb); return; // jp
+  CYC(b_+12, b_+14); A = 0x30; // Object.var30
+  CALL_C(b_+14, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+17);
+  CYC(b_+17, b_+18); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+18, b_+21); enemyDie_uncounted_hook(gb); return; // jp
 
 commonState:
-  CYC(0x6ea1, 0x6ea3); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6ea3, 0x6ea4); A = mem_rd(gb, DE);
+  CYC(b_+21, b_+23); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+23, b_+24); A = mem_rd(gb, DE);
   {
-    CYC(0x6ea4, 0x6ea5); push_effect(gb, 0x6ea5);
+    CYC(b_+24, b_+25); push_effect(gb, b_+25);
     uint16_t target = shadowHagBug_jump_table(gb);
-    if (target == 0x6eb9) { shadowHagBug_state_uninitialized_hook(gb); return; }
-    if (target == 0x6ed7) { shadowHagBug_state_stub_hook(gb); return; }
-    if (target == 0x6ed0) { shadowHagBug_state_galeSeed_hook(gb); return; }
-    if (target == 0x6ed8) { shadowHagBug_state8_hook(gb); return; }
-    if (target == 0x6eea) { shadowHagBug_state9_hook(gb); return; }
+    if (target == SYM(shadowHagBug_state_uninitialized)) { shadowHagBug_state_uninitialized_hook(gb); return; }
+    if (target == SYM(shadowHagBug_state_stub)) { shadowHagBug_state_stub_hook(gb); return; }
+    if (target == SYM(shadowHagBug_state_galeSeed)) { shadowHagBug_state_galeSeed_hook(gb); return; }
+    if (target == SYM(shadowHagBug_state8)) { shadowHagBug_state8_hook(gb); return; }
+    if (target == SYM(shadowHagBug_state9)) { shadowHagBug_state9_hook(gb); return; }
     HANDOFF(target);
   }
 }
 
 // 0e:6eb9, bare global; jump-table target from enemyCode42.
 void shadowHagBug_state_uninitialized_hook(GB *gb) {
+  BASE(shadowHagBug_state_uninitialized);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6eb9, 0x6ebb); A = 0x0f; // SPEED_60
-  CALL_C(0x6ebb, ecom_setSpeedAndState8_b0e_hook, 0x4364, 0x6ebe);
-  CYC(0x6ebe, 0x6ec0); L = ENEMY_BASE + OBJ_SPEED_Z;
-  CYC(0x6ec0, 0x6ec2); A = 0x20; // <(-$e0)
-  CYC(0x6ec2, 0x6ec3); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x6ec3, 0x6ec5); mem_wr(gb, HL, 0xff); // >(-$e0)
-  CALL_C(0x6ec5, getRandomNumber_noPreserveVars_hook, 0x0453, 0x6ec8);
-  CYC(0x6ec8, 0x6eca); alu_and(gb, 0x1f);
-  CYC(0x6eca, 0x6ecc); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x6ecc, 0x6ecd); mem_wr(gb, DE, A);
-  CYC(0x6ecd, 0x6ed0); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+0, b_+2); A = 0x0f; // SPEED_60
+  CALL_C(b_+2, ecom_setSpeedAndState8_b0e_hook, SYM(ecom_setSpeedAndState8_b0e), b_+5);
+  CYC(b_+5, b_+7); L = ENEMY_BASE + OBJ_SPEED_Z;
+  CYC(b_+7, b_+9); A = 0x20; // <(-$e0)
+  CYC(b_+9, b_+10); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+10, b_+12); mem_wr(gb, HL, 0xff); // >(-$e0)
+  CALL_C(b_+12, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+15);
+  CYC(b_+15, b_+17); alu_and(gb, 0x1f);
+  CYC(b_+17, b_+19); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+19, b_+20); mem_wr(gb, DE, A);
+  CYC(b_+20, SYM(shadowHagBug_state_galeSeed)); objectSetVisible82_hook(gb); return; // jp
 }
 
 // 0e:6ed0, bare global; jump-table target from enemyCode42.
 void shadowHagBug_state_galeSeed_hook(GB *gb) {
+  BASE(shadowHagBug_state_galeSeed);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6ed0, ecom_galeSeedEffect_b0e_hook, 0x447b, 0x6ed3);
-  if (F & FC) { RET_TAKEN(0x6ed3); return; } // ret c
-  CYC(0x6ed3, 0x6ed4);
-  CYC(0x6ed4, 0x6ed7); enemyDelete_hook(gb); return; // jp
+  CALL_C(b_+0, ecom_galeSeedEffect_b0e_hook, SYM(ecom_galeSeedEffect_b0e), b_+3);
+  if (F & FC) { RET_TAKEN(b_+3); return; } // ret c
+  CYC(b_+3, b_+4);
+  CYC(b_+4, SYM(shadowHagBug_state_stub)); enemyDelete_hook(gb); return; // jp
 }
 
 // 0e:6ed7, bare global; jump-table target from enemyCode42.
 void shadowHagBug_state_stub_hook(GB *gb) {
-  RET(0x6ed7); return; // ret
+  BASE(shadowHagBug_state_stub);
+  RET(b_+0); return; // ret
 }
 
 // 0e:6ed8, bare global; jump-table target from enemyCode42. Falls through into
 // shadowHagBug_state9.
 void shadowHagBug_state8_hook(GB *gb) {
+  BASE(shadowHagBug_state8);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6ed8, 0x6eda); C = 0x12;
-  CALL_C(0x6eda, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x6edd);
-  if (!(F & FZ)) { CYCT(0x6edd, 0x6edf); shadowHagBug_applySpeedAndAnimate_hook(gb); return; } // jr nz
-  CYC(0x6edd, 0x6edf);
-  CYC(0x6edf, 0x6ee1); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6ee1, 0x6ee2); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CALL_C(0x6ee2, getRandomNumber_hook, 0x043e, 0x6ee5);
-  CYC(0x6ee5, 0x6ee7); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x6ee7, 0x6ee8); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x6ee8, 0x6eea); mem_wr(gb, HL, 0xb4); // [counter2] = 180
+  CYC(b_+0, b_+2); C = 0x12;
+  CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
+  if (!(F & FZ)) { CYCT(b_+5, b_+7); shadowHagBug_applySpeedAndAnimate_hook(gb); return; } // jr nz
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+9, b_+10); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CALL_C(b_+10, getRandomNumber_hook, SYM(getRandomNumber), b_+13);
+  CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+15, b_+16); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+16, SYM(shadowHagBug_state9)); mem_wr(gb, HL, 0xb4); // [counter2] = 180
   shadowHagBug_state9_hook(gb); return; // fallthrough
 }
 
 // 0e:6eea, bare global; jump-table target from enemyCode42, also falls into from
 // shadowHagBug_state8.
 void shadowHagBug_state9_hook(GB *gb) {
+  BASE(shadowHagBug_state9);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6eea, ecom_decCounter2_b0e_hook, 0x43a3, 0x6eed);
-  if (F & FZ) { CYCT(0x6eed, 0x6eef); shadowHagBug_delete_hook(gb); return; } // jr z
-  CYC(0x6eed, 0x6eef);
-  CYC(0x6eef, 0x6ef0); A = mem_rd(gb, HL); // [counter1]
-  CYC(0x6ef0, 0x6ef2); alu_cp(gb, 0x1e); // 30
-  if (F & FC) CALL_C_CC(0x6ef2, ecom_flickerVisibility_b0e_hook, 0x441f, 0x6ef5); else CYC(0x6ef2, 0x6ef5); // call c
-  CYC(0x6ef5, 0x6ef6); L = alu_dec8(gb, L);
-  CYC(0x6ef6, 0x6ef7); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // [counter1]
-  CYC(0x6ef7, 0x6ef8); A = mem_rd(gb, HL);
-  CYC(0x6ef8, 0x6efa); alu_and(gb, 0x07);
-  if (!(F & FZ)) { CYCT(0x6efa, 0x6efc); shadowHagBug_applySpeedAndAnimate_hook(gb); return; } // jr nz
-  CYC(0x6efa, 0x6efc);
-  CYC(0x6efc, 0x6eff); SET_BC(0x0f0f);
-  CALL_C(0x6eff, ecom_randomBitwiseAndBCE_b0e_hook, 0x434f, 0x6f02);
-  CYC(0x6f02, 0x6f04); A = hram_rd(gb, (uint8_t)hEnemyTargetY);
-  CYC(0x6f04, 0x6f05); alu_add(gb, B);
-  CYC(0x6f05, 0x6f07); alu_sub(gb, 0x08);
-  CYC(0x6f07, 0x6f08); B = A;
-  CYC(0x6f08, 0x6f0a); A = hram_rd(gb, (uint8_t)hEnemyTargetX);
-  CYC(0x6f0a, 0x6f0b); alu_add(gb, C);
-  CYC(0x6f0b, 0x6f0d); alu_sub(gb, 0x08);
-  CYC(0x6f0d, 0x6f0e); C = A;
-  CYC(0x6f0e, 0x6f10); E = ENEMY_BASE + OBJ_YH;
-  CYC(0x6f10, 0x6f11); A = mem_rd(gb, DE);
-  CYC(0x6f11, 0x6f13); hram_wr(gb, (uint8_t)hFF8F, A);
-  CYC(0x6f13, 0x6f15); E = ENEMY_BASE + OBJ_XH;
-  CYC(0x6f15, 0x6f16); A = mem_rd(gb, DE);
-  CYC(0x6f16, 0x6f18); hram_wr(gb, (uint8_t)hFF8E, A);
-  CALL_C(0x6f18, objectGetRelativeAngleWithTempVars_hook, 0x1eb1, 0x6f1b);
-  CALL_C(0x6f1b, objectNudgeAngleTowards_hook, 0x1fd4, 0x6f1e);
+  CALL_C(b_+0, ecom_decCounter2_b0e_hook, SYM(ecom_decCounter2_b0e), b_+3);
+  if (F & FZ) { CYCT(b_+3, b_+5); shadowHagBug_delete_hook(gb); return; } // jr z
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL); // [counter1]
+  CYC(b_+6, b_+8); alu_cp(gb, 0x1e); // 30
+  if (F & FC) CALL_C_CC(b_+8, ecom_flickerVisibility_b0e_hook, SYM(ecom_flickerVisibility_b0e), b_+11); else CYC(b_+8, b_+11); // call c
+  CYC(b_+11, b_+12); L = alu_dec8(gb, L);
+  CYC(b_+12, b_+13); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // [counter1]
+  CYC(b_+13, b_+14); A = mem_rd(gb, HL);
+  CYC(b_+14, b_+16); alu_and(gb, 0x07);
+  if (!(F & FZ)) { CYCT(b_+16, b_+18); shadowHagBug_applySpeedAndAnimate_hook(gb); return; } // jr nz
+  CYC(b_+16, b_+18);
+  CYC(b_+18, b_+21); SET_BC((SYM(_drawObjectTerrainEffects) + 7));
+  CALL_C(b_+21, ecom_randomBitwiseAndBCE_b0e_hook, SYM(ecom_randomBitwiseAndBCE_b0e), b_+24);
+  CYC(b_+24, b_+26); A = hram_rd(gb, (uint8_t)hEnemyTargetY);
+  CYC(b_+26, b_+27); alu_add(gb, B);
+  CYC(b_+27, b_+29); alu_sub(gb, 0x08);
+  CYC(b_+29, b_+30); B = A;
+  CYC(b_+30, b_+32); A = hram_rd(gb, (uint8_t)hEnemyTargetX);
+  CYC(b_+32, b_+33); alu_add(gb, C);
+  CYC(b_+33, b_+35); alu_sub(gb, 0x08);
+  CYC(b_+35, b_+36); C = A;
+  CYC(b_+36, b_+38); E = ENEMY_BASE + OBJ_YH;
+  CYC(b_+38, b_+39); A = mem_rd(gb, DE);
+  CYC(b_+39, b_+41); hram_wr(gb, (uint8_t)hFF8F, A);
+  CYC(b_+41, b_+43); E = ENEMY_BASE + OBJ_XH;
+  CYC(b_+43, b_+44); A = mem_rd(gb, DE);
+  CYC(b_+44, b_+46); hram_wr(gb, (uint8_t)hFF8E, A);
+  CALL_C(b_+46, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+49);
+  CALL_C(b_+49, objectNudgeAngleTowards_hook, SYM(objectNudgeAngleTowards), SYM(shadowHagBug_applySpeedAndAnimate));
   shadowHagBug_applySpeedAndAnimate_hook(gb); return; // fallthrough
 }
 
 // 0e:6f1e, bare global; falls into from shadowHagBug_state9, also reached by genuine jr from
 // shadowHagBug_state8 and shadowHagBug_state9.
 void shadowHagBug_applySpeedAndAnimate_hook(GB *gb) {
+  BASE(shadowHagBug_applySpeedAndAnimate);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6f1e, objectApplySpeed_hook, 0x201d, 0x6f21);
-  CYC(0x6f21, 0x6f24); enemyAnimate_hook(gb); return; // jp
+  CALL_C(b_+0, objectApplySpeed_hook, SYM(objectApplySpeed), b_+3);
+  CYC(b_+3, SYM(shadowHagBug_delete)); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:6f24, bare global; called from shadowHagBug_state9.
 void shadowHagBug_delete_hook(GB *gb) {
+  BASE(shadowHagBug_delete);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6f24, 0x6f26); A = 0x30; // Object.var30
-  CALL_C(0x6f26, objectGetRelatedObject1Var_hook, 0x2160, 0x6f29);
-  CYC(0x6f29, 0x6f2a); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x6f2a, 0x6f2d); enemyDelete_hook(gb); return; // jp
+  CYC(b_+0, b_+2); A = 0x30; // Object.var30
+  CALL_C(b_+2, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+5);
+  CYC(b_+5, b_+6); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+6, SYM(enemyCode47)); enemyDelete_hook(gb); return; // jp
 }

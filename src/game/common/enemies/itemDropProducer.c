@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0e, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0e, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode59), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode59), (from), (to), true)
 
 // ==================================================================================================
 // ENEMY_ITEM_DROP_PRODUCER
@@ -13,40 +13,41 @@
 //   var30: Tile at position (item drop will spawn when this changes)
 // ==================================================================================================
 void enemyCode59_hook(GB *gb) {
+  BASE(enemyCode59);
   uint16_t sp0_ = gb->sp;
-  CYC(0x685f, 0x6861); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6861, 0x6862); A = mem_rd(gb, DE);
-  CYC(0x6862, 0x6863); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x6863, 0x6865); goto state1; } // jr nz
-  CYC(0x6863, 0x6865);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+4, b_+6); goto state1; } // jr nz
+  CYC(b_+4, b_+6);
 
-  CYC(0x6865, 0x6867); A = 0x01;
-  CYC(0x6867, 0x6868); mem_wr(gb, DE, A);
-  CALL_C(0x6868, objectGetTileAtPosition_hook, 0x1444, 0x686b);
-  CYC(0x686b, 0x686d); E = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x686d, 0x686e); mem_wr(gb, DE, A);
+  CYC(b_+6, b_+8); A = 0x01;
+  CYC(b_+8, b_+9); mem_wr(gb, DE, A);
+  CALL_C(b_+9, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+12);
+  CYC(b_+12, b_+14); E = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+14, b_+15); mem_wr(gb, DE, A);
 
 state1:
-  CALL_C(0x686e, objectGetTileAtPosition_hook, 0x1444, 0x6871);
-  CYC(0x6871, 0x6872); H = D;
-  CYC(0x6872, 0x6874); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x6874, 0x6875); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FZ) { RET_TAKEN(0x6875); return; } // ret z
-  CYC(0x6875, 0x6876);
-  CYC(0x6876, 0x6878); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x6878, 0x6879); A = mem_rd(gb, DE);
-  CALL_C(0x6879, checkItemDropAvailable_hook, 0x1703, 0x687c);
-  if (F & FZ) { CYCT(0x687c, 0x687f); enemyDelete_hook(gb); return; } // jp z
-  CYC(0x687c, 0x687f);
-  CALL_C(0x687f, getFreePartSlot_hook, 0x3e8e, 0x6882);
-  if (!(F & FZ)) { RET_TAKEN(0x6882); return; } // ret nz
-  CYC(0x6882, 0x6883);
-  CYC(0x6883, 0x6885); mem_wr(gb, HL, 0x01);
-  CYC(0x6885, 0x6886); L = alu_inc8(gb, L);
-  CYC(0x6886, 0x6888); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x6888, 0x6889); A = mem_rd(gb, DE);
-  CYC(0x6889, 0x688a); mem_wr(gb, HL, A);
-  CALL_C(0x688a, objectCopyPosition_hook, 0x2242, 0x688d);
-  CALL_C(0x688d, markEnemyAsKilledInRoom_b00_hook, 0x320d, 0x6890);
-  CYC(0x6890, 0x6893); enemyDelete_hook(gb); return; // jp
+  CALL_C(b_+15, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+18);
+  CYC(b_+18, b_+19); H = D;
+  CYC(b_+19, b_+21); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+21, b_+22); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { RET_TAKEN(b_+22); return; } // ret z
+  CYC(b_+22, b_+23);
+  CYC(b_+23, b_+25); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+25, b_+26); A = mem_rd(gb, DE);
+  CALL_C(b_+26, checkItemDropAvailable_hook, SYM(checkItemDropAvailable), b_+29);
+  if (F & FZ) { CYCT(b_+29, b_+32); enemyDelete_hook(gb); return; } // jp z
+  CYC(b_+29, b_+32);
+  CALL_C(b_+32, getFreePartSlot_hook, SYM(getFreePartSlot), b_+35);
+  if (!(F & FZ)) { RET_TAKEN(b_+35); return; } // ret nz
+  CYC(b_+35, b_+36);
+  CYC(b_+36, b_+38); mem_wr(gb, HL, 0x01);
+  CYC(b_+38, b_+39); L = alu_inc8(gb, L);
+  CYC(b_+39, b_+41); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+41, b_+42); A = mem_rd(gb, DE);
+  CYC(b_+42, b_+43); mem_wr(gb, HL, A);
+  CALL_C(b_+43, objectCopyPosition_hook, SYM(objectCopyPosition), b_+46);
+  CALL_C(b_+46, markEnemyAsKilledInRoom_b00_hook, SYM(markEnemyAsKilledInRoom_b00), b_+49);
+  CYC(b_+49, SYM(enemyCode5a)); enemyDelete_hook(gb); return; // jp
 }

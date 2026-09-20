@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0a, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0a, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode8f), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode8f), (from), (to), true)
 
 static uint16_t interactionCode8f_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -26,59 +26,60 @@ static uint16_t interactionCode8f_jump_table(GB *gb) {
 
 // INTERAC_TOKAY_CUTSCENE_EMBER_SEED
 void interactionCode8f_hook(GB *gb) {
+  BASE(interactionCode8f);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6c5a, 0x6c5c); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x6c5c, 0x6c5d); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x6c5d, 0x6c5e); push_effect(gb, 0x6c5e);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = interactionCode8f_jump_table(gb);
-    if (target == 0x6c78) goto state1;
-    if (target == 0x6c8a) goto state2;
-    if (target == 0x6ca4) goto state3;
+    if (target == b_+30) goto state1;
+    if (target == b_+48) goto state2;
+    if (target == b_+74) goto state3;
   }
 
   // interactionCode8f@state0
-  CYC(0x6c66, 0x6c68); A = 0x01;
-  CYC(0x6c68, 0x6c69); mem_wr(gb, DE, A);
-  CYC(0x6c69, 0x6c6c); SET_BC(0xff00);
-  CALL_C(0x6c6c, objectSetSpeedZ_hook, 0x239d, 0x6c6f);
-  CALL_C(0x6c6f, interactionInitGraphics_hook, 0x15fb, 0x6c72);
-  CALL_C(0x6c72, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x6c75);
-  CYC(0x6c75, 0x6c78); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+12, b_+14); A = 0x01;
+  CYC(b_+14, b_+15); mem_wr(gb, DE, A);
+  CYC(b_+15, b_+18); SET_BC(0xff00);
+  CALL_C(b_+18, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+21);
+  CALL_C(b_+21, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+24);
+  CALL_C(b_+24, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+27);
+  CYC(b_+27, b_+30); objectSetVisible80_hook(gb); return; // jp
 
 state1:
-  CYC(0x6c78, 0x6c7a); C = 0x10;
-  CALL_C(0x6c7a, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x6c7d);
-  if (!(F & FZ)) { RET_TAKEN(0x6c7d); return; } // ret nz
-  CYC(0x6c7d, 0x6c7e);
-  CALL_C(0x6c7e, objectSetInvisible_hook, 0x1e7b, 0x6c81);
-  CYC(0x6c81, 0x6c84); A = W8(wTextIsActive);
-  CYC(0x6c84, 0x6c85); alu_or(gb, A);
-  if (F & FZ) { RET_TAKEN(0x6c85); return; } // ret z
-  CYC(0x6c85, 0x6c86);
-  CYC(0x6c86, 0x6c88); L = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x6c88, 0x6c89); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
-  RET(0x6c89);
+  CYC(b_+30, b_+32); C = 0x10;
+  CALL_C(b_+32, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+35);
+  if (!(F & FZ)) { RET_TAKEN(b_+35); return; } // ret nz
+  CYC(b_+35, b_+36);
+  CALL_C(b_+36, objectSetInvisible_hook, SYM(objectSetInvisible), b_+39);
+  CYC(b_+39, b_+42); A = W8(wTextIsActive);
+  CYC(b_+42, b_+43); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+43); return; } // ret z
+  CYC(b_+43, b_+44);
+  CYC(b_+44, b_+46); L = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+46, b_+47); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
+  RET(b_+47);
   return; // ret
 
 state2:
-  CALL_C(0x6c8a, retIfTextIsActive_hook, 0x1859, 0x6c8d);
-  CALL_C(0x6c8d, interactionIncState_hook, 0x23e0, 0x6c90);
-  CYC(0x6c90, 0x6c92); L = INTERACTION_BASE + OBJ_OAM_FLAGS_BACKUP;
-  CYC(0x6c92, 0x6c94); A = 0x0a;
-  CYC(0x6c94, 0x6c95); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x6c95, 0x6c96); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x6c96, 0x6c98); mem_wr(gb, HL, 0x06); // [oamTileIndexBase] = $06
-  CYC(0x6c98, 0x6c9a); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x6c9a, 0x6c9c); mem_wr(gb, HL, 0x3a); // 58
-  CYC(0x6c9c, 0x6c9e); A = 0x0b;
-  CALL_C(0x6c9e, interactionSetAnimation_hook, 0x262e, 0x6ca1);
-  CYC(0x6ca1, 0x6ca4); objectSetVisible_hook(gb); return; // jp
+  CALL_C(b_+48, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+51);
+  CALL_C(b_+51, interactionIncState_hook, SYM(interactionIncState), b_+54);
+  CYC(b_+54, b_+56); L = INTERACTION_BASE + OBJ_OAM_FLAGS_BACKUP;
+  CYC(b_+56, b_+58); A = 0x0a;
+  CYC(b_+58, b_+59); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+59, b_+60); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+60, b_+62); mem_wr(gb, HL, 0x06); // [oamTileIndexBase] = $06
+  CYC(b_+62, b_+64); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+64, b_+66); mem_wr(gb, HL, 0x3a); // 58
+  CYC(b_+66, b_+68); A = 0x0b;
+  CALL_C(b_+68, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+71);
+  CYC(b_+71, b_+74); objectSetVisible_hook(gb); return; // jp
 
 state3:
-  CALL_C(0x6ca4, interactionAnimate_hook, 0x261b, 0x6ca7);
-  CALL_C(0x6ca7, interactionDecCounter1_hook, 0x23cc, 0x6caa);
-  if (!(F & FZ)) { RET_TAKEN(0x6caa); return; } // ret nz
-  CYC(0x6caa, 0x6cab);
-  CYC(0x6cab, 0x6cae); interactionDelete_hook(gb); return; // jp
+  CALL_C(b_+74, interactionAnimate_hook, SYM(interactionAnimate), b_+77);
+  CALL_C(b_+77, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+80);
+  if (!(F & FZ)) { RET_TAKEN(b_+80); return; } // ret nz
+  CYC(b_+80, b_+81);
+  CYC(b_+81, SYM(interactionCode90)); interactionDelete_hook(gb); return; // jp
 }

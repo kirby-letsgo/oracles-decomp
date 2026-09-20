@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x09, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x09, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode58), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode58), (from), (to), true)
 
 static uint16_t hardhat_worker_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A); burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
@@ -26,48 +26,54 @@ static void hardhat_worker_add_double_index(GB *gb, uint16_t ra) {
 }
 
 void hardhat_worker_load_script_and_init_graphics_hook(GB *gb) {
+  BASE(interactionCode58);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6b79, interactionInitGraphics_hook, 0x15fb, 0x6b7c);
-  CALL_C(0x6b7c, objectMarkSolidPosition_hook, 0x24f0, 0x6b7f);
-  CYC(0x6b7f, 0x6b81); A = 0x10;
-  CALL_C(0x6b81, interactionSetHighTextIndex_hook, 0x253b, 0x6b84);
-  CYC(0x6b84, 0x6b86); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x6b86, 0x6b87); A = mem_rd(gb, DE);
-  CYC(0x6b87, 0x6b8a); SET_HL(0x6b94);
-  CYC(0x6b8a, 0x6b8b); hardhat_worker_add_double_index(gb, 0x6b8b);
-  CYC(0x6b8b, 0x6b8c); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x6b8c, 0x6b8d); H = mem_rd(gb, HL);
-  CYC(0x6b8d, 0x6b8e); L = A;
-  CALL_C(0x6b8e, interactionSetScript_hook, 0x2544, 0x6b91);
-  CYC(0x6b91, 0x6b94); interactionIncState_hook(gb);
+  CALL_C(b_+141, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+144);
+  CALL_C(b_+144, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+147);
+  CYC(b_+147, b_+149); A = 0x10;
+  CALL_C(b_+149, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+152);
+  CYC(b_+152, b_+154); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+154, b_+155); A = mem_rd(gb, DE);
+  CYC(b_+155, b_+158); SET_HL(b_+168);
+  CYC(b_+158, b_+159); hardhat_worker_add_double_index(gb, b_+159);
+  CYC(b_+159, b_+160); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+160, b_+161); H = mem_rd(gb, HL);
+  CYC(b_+161, b_+162); L = A;
+  CALL_C(b_+162, interactionSetScript_hook, SYM(interactionSetScript), b_+165);
+  CYC(b_+165, b_+168); interactionIncState_hook(gb);
 }
 
 void interactionCode58_hook(GB *gb) {
+  BASE(interactionCode58);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6aec, 0x6aee); E = INTERACTION_BASE + OBJ_SUBID; CYC(0x6aee, 0x6aef); A = mem_rd(gb, DE); CYC(0x6aef, 0x6af0); push_effect(gb, 0x6af0);
-  switch (hardhat_worker_jump_table(gb)) {
-    case 0x6af8: goto subid00; case 0x6b11: goto subid01; case 0x6b28: goto subid02; case 0x6b52: goto subid03; default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID; CYC(b_+2, b_+3); A = mem_rd(gb, DE); CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (hardhat_worker_jump_table(gb));
+    if (jt_ == b_+12) { goto subid00; }
+    else if (jt_ == b_+37) { goto subid01; }
+    else if (jt_ == b_+60) { goto subid02; }
+    else if (jt_ == b_+102) { goto subid03; }
+    else { HANDOFF(HL); }
+  } while (0);
 subid00:
-  CALL_C(0x6af8, checkInteractionState_hook, 0x23fe, 0x6afb);
-  if (F & FZ) { CYC(0x6afb, 0x6afd); CYC(0x6afd, 0x6b00); push_effect(gb, 0x6b00); hardhat_worker_load_script_and_init_graphics_hook(gb); CALL_C(0x6b00, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x6b03); CYC(0x6b03, 0x6b05); A = 4; CALL_C(0x6b05, interactionSetAnimation_hook, 0x262e, 0x6b08); } else CYCT(0x6afb, 0x6afd);
-  CALL_C(0x6b08, interactionRunScript_hook, 0x2552, 0x6b0b);
-  if (F & FC) { CYCT(0x6b0b, 0x6b0e); interactionDelete_hook(gb); return; }
-  CYC(0x6b0b, 0x6b0e); CYC(0x6b0e, 0x6b11); interactionAnimateAsNpc_hook(gb); return;
+  CALL_C(b_+12, checkInteractionState_hook, SYM(checkInteractionState), b_+15);
+  if (F & FZ) { CYC(b_+15, b_+17); CYC(b_+17, b_+20); push_effect(gb, b_+20); hardhat_worker_load_script_and_init_graphics_hook(gb); CALL_C(b_+20, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+23); CYC(b_+23, b_+25); A = 4; CALL_C(b_+25, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+28); } else CYCT(b_+15, b_+17);
+  CALL_C(b_+28, interactionRunScript_hook, SYM(interactionRunScript), b_+31);
+  if (F & FC) { CYCT(b_+31, b_+34); interactionDelete_hook(gb); return; }
+  CYC(b_+31, b_+34); CYC(b_+34, b_+37); interactionAnimateAsNpc_hook(gb); return;
 subid01:
-  CALL_C(0x6b11, checkInteractionState_hook, 0x23fe, 0x6b14);
-  if (F & FZ) { CYC(0x6b14, 0x6b16); CYC(0x6b16, 0x6b19); push_effect(gb, 0x6b19); hardhat_worker_load_script_and_init_graphics_hook(gb); CALL_C(0x6b19, interactionRunScript_hook, 0x2552, 0x6b1c); CALL_C(0x6b1c, interactionRunScript_hook, 0x2552, 0x6b1f); } else CYCT(0x6b14, 0x6b16);
-  CALL_C(0x6b1f, interactionRunScript_hook, 0x2552, 0x6b22);
-  if (F & FC) { CYCT(0x6b22, 0x6b25); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; }
-  CYC(0x6b22, 0x6b25); CYC(0x6b25, 0x6b28); npcFaceLinkAndAnimate_hook(gb); return;
+  CALL_C(b_+37, checkInteractionState_hook, SYM(checkInteractionState), b_+40);
+  if (F & FZ) { CYC(b_+40, b_+42); CYC(b_+42, b_+45); push_effect(gb, b_+45); hardhat_worker_load_script_and_init_graphics_hook(gb); CALL_C(b_+45, interactionRunScript_hook, SYM(interactionRunScript), b_+48); CALL_C(b_+48, interactionRunScript_hook, SYM(interactionRunScript), b_+51); } else CYCT(b_+40, b_+42);
+  CALL_C(b_+51, interactionRunScript_hook, SYM(interactionRunScript), b_+54);
+  if (F & FC) { CYCT(b_+54, b_+57); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; }
+  CYC(b_+54, b_+57); CYC(b_+57, b_+60); npcFaceLinkAndAnimate_hook(gb); return;
 subid02:
-  CALL_C(0x6b28, checkInteractionState_hook, 0x23fe, 0x6b2b);
-  if (F & FZ) { CYC(0x6b2b, 0x6b2d); CYC(0x6b2d, 0x6b30); A = W8(wEssencesObtained); CYC(0x6b30, 0x6b32); alu_bit(gb, 3, A); if (!(F & FZ)) { CYCT(0x6b32, 0x6b35); interactionDelete_hook(gb); return; } CYC(0x6b32, 0x6b35); CALL_C(0x6b35, getThisRoomFlags_hook, 0x197d, 0x6b38); CYC(0x6b38, 0x6b3a); alu_bit(gb, 7, A); if (F & FZ) CYCT(0x6b3a, 0x6b3c); else { CYC(0x6b3a, 0x6b3c); CYC(0x6b3c, 0x6b3f); SET_BC(0x3858); CALL_C(0x6b3f, interactionSetPosition_hook, 0x2773, 0x6b42); } CYC(0x6b42, 0x6b45); push_effect(gb, 0x6b45); hardhat_worker_load_script_and_init_graphics_hook(gb); } else CYCT(0x6b2b, 0x6b2d);
-  CALL_C(0x6b45, interactionRunScript_hook, 0x2552, 0x6b48); CYC(0x6b48, 0x6b4a); E = INTERACTION_BASE + OBJ_VAR38; CYC(0x6b4a, 0x6b4b); A = mem_rd(gb, DE); CYC(0x6b4b, 0x6b4c); alu_or(gb, A); if (F & FZ) { CYCT(0x6b4c, 0x6b4f); npcFaceLinkAndAnimate_hook(gb); } else { CYC(0x6b4c, 0x6b4f); interactionAnimateAsNpc_hook(gb); } return;
+  CALL_C(b_+60, checkInteractionState_hook, SYM(checkInteractionState), b_+63);
+  if (F & FZ) { CYC(b_+63, b_+65); CYC(b_+65, b_+68); A = W8(wEssencesObtained); CYC(b_+68, b_+70); alu_bit(gb, 3, A); if (!(F & FZ)) { CYCT(b_+70, b_+73); interactionDelete_hook(gb); return; } CYC(b_+70, b_+73); CALL_C(b_+73, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+76); CYC(b_+76, b_+78); alu_bit(gb, 7, A); if (F & FZ) CYCT(b_+78, b_+80); else { CYC(b_+78, b_+80); CYC(b_+80, b_+83); SET_BC((SYM(loadUniqueGfxHeaderEntry) + 21)); CALL_C(b_+83, interactionSetPosition_hook, SYM(interactionSetPosition), b_+86); } CYC(b_+86, b_+89); push_effect(gb, b_+89); hardhat_worker_load_script_and_init_graphics_hook(gb); } else CYCT(b_+63, b_+65);
+  CALL_C(b_+89, interactionRunScript_hook, SYM(interactionRunScript), b_+92); CYC(b_+92, b_+94); E = INTERACTION_BASE + OBJ_VAR38; CYC(b_+94, b_+95); A = mem_rd(gb, DE); CYC(b_+95, b_+96); alu_or(gb, A); if (F & FZ) { CYCT(b_+96, b_+99); npcFaceLinkAndAnimate_hook(gb); } else { CYC(b_+96, b_+99); interactionAnimateAsNpc_hook(gb); } return;
 subid03:
-  CALL_C(0x6b52, checkInteractionState_hook, 0x23fe, 0x6b55);
-  if (F & FZ) { CYC(0x6b55, 0x6b57); CYC(0x6b57, 0x6b5a); push_effect(gb, 0x6b5a); hardhat_worker_load_script_and_init_graphics_hook(gb); CALL_C(0x6b5a, interactionRunScript_hook, 0x2552, 0x6b5d); } else CYCT(0x6b55, 0x6b57);
-  CALL_C(0x6b5d, interactionRunScript_hook, 0x2552, 0x6b60);
-  if (F & FC) { CYCT(0x6b60, 0x6b63); interactionDelete_hook(gb); return; }
-  CYC(0x6b60, 0x6b63); CYC(0x6b63, 0x6b65); E = INTERACTION_BASE + OBJ_VAR3F; CYC(0x6b65, 0x6b66); A = mem_rd(gb, DE); CYC(0x6b66, 0x6b67); alu_or(gb, A); if (F & FZ) { CYCT(0x6b67, 0x6b6a); npcFaceLinkAndAnimate_hook(gb); return; } CYC(0x6b67, 0x6b6a); CALL_C(0x6b6a, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x6b6d); CYC(0x6b6d, 0x6b70); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb);
+  CALL_C(b_+102, checkInteractionState_hook, SYM(checkInteractionState), b_+105);
+  if (F & FZ) { CYC(b_+105, b_+107); CYC(b_+107, b_+110); push_effect(gb, b_+110); hardhat_worker_load_script_and_init_graphics_hook(gb); CALL_C(b_+110, interactionRunScript_hook, SYM(interactionRunScript), b_+113); } else CYCT(b_+105, b_+107);
+  CALL_C(b_+113, interactionRunScript_hook, SYM(interactionRunScript), b_+116);
+  if (F & FC) { CYCT(b_+116, b_+119); interactionDelete_hook(gb); return; }
+  CYC(b_+116, b_+119); CYC(b_+119, b_+121); E = INTERACTION_BASE + OBJ_VAR3F; CYC(b_+121, b_+122); A = mem_rd(gb, DE); CYC(b_+122, b_+123); alu_or(gb, A); if (F & FZ) { CYCT(b_+123, b_+126); npcFaceLinkAndAnimate_hook(gb); return; } CYC(b_+123, b_+126); CALL_C(b_+126, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+129); CYC(b_+129, b_+132); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb);
 }

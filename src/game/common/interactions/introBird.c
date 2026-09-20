@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCoded3), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCoded3), (from), (to), true)
 
 static uint16_t intro_bird_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -35,143 +35,151 @@ static void intro_bird_add_a_to_hl(GB *gb) {
 }
 
 void interactionCoded3__initializePositionAndCounter1_hook(GB *gb) {
-  CYC(0x4cf0, 0x4cf1); B = A;
-  CYC(0x4cf1, 0x4cf2); alu_add(gb, A);
-  CYC(0x4cf2, 0x4cf3); alu_add(gb, B);
-  CYC(0x4cf3, 0x4cf6); SET_HL(0x4d5f);
-  CYC(0x4cf6, 0x4cf7); push_effect(gb, 0x4cf7); intro_bird_add_a_to_hl(gb);
-  CYC(0x4cf7, 0x4cf8); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4cf8, 0x4cf9); B = mem_rd(gb, HL);
-  CYC(0x4cf9, 0x4cfa); L = alu_inc8(gb, L);
-  CYC(0x4cfa, 0x4cfb); C = mem_rd(gb, HL);
-  CYC(0x4cfb, 0x4cfc); H = D;
-  CYC(0x4cfc, 0x4cfe); L = 0x77;
-  CYC(0x4cfe, 0x4cff); mem_wr(gb, HL, A);
-  CYC(0x4cff, 0x4d01); L = 0x4b;
-  CYC(0x4d01, 0x4d02); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x4d02, 0x4d03); L = alu_inc8(gb, L);
-  CYC(0x4d03, 0x4d04); mem_wr(gb, HL, B);
-  CYC(0x4d04, 0x4d06); L = 0x46;
-  CYC(0x4d06, 0x4d07); mem_wr(gb, HL, C);
-  CYC(0x4d07, 0x4d08); ret_effect(gb);
+  BASE(interactionCoded3);
+  CYC(b_+46, b_+47); B = A;
+  CYC(b_+47, b_+48); alu_add(gb, A);
+  CYC(b_+48, b_+49); alu_add(gb, B);
+  CYC(b_+49, b_+52); SET_HL(b_+157);
+  CYC(b_+52, b_+53); push_effect(gb, b_+53); intro_bird_add_a_to_hl(gb);
+  CYC(b_+53, b_+54); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+54, b_+55); B = mem_rd(gb, HL);
+  CYC(b_+55, b_+56); L = alu_inc8(gb, L);
+  CYC(b_+56, b_+57); C = mem_rd(gb, HL);
+  CYC(b_+57, b_+58); H = D;
+  CYC(b_+58, b_+60); L = 0x77;
+  CYC(b_+60, b_+61); mem_wr(gb, HL, A);
+  CYC(b_+61, b_+63); L = 0x4b;
+  CYC(b_+63, b_+64); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+64, b_+65); L = alu_inc8(gb, L);
+  CYC(b_+65, b_+66); mem_wr(gb, HL, B);
+  CYC(b_+66, b_+68); L = 0x46;
+  CYC(b_+68, b_+69); mem_wr(gb, HL, C);
+  CYC(b_+69, b_+70); ret_effect(gb);
 }
 
 void interactionCoded3__afterCall4cd0_hook(GB *gb) {
+  BASE(interactionCoded3);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4cd0, 0x4cd1); H = D;
-  CYC(0x4cd1, 0x4cd3); L = 0x47;
-  CYC(0x4cd3, 0x4cd5); mem_wr(gb, HL, 45);
-  CYC(0x4cd5, 0x4cd7); L = 0x42;
-  CYC(0x4cd7, 0x4cd8); A = mem_rd(gb, HL);
-  CYC(0x4cd8, 0x4cda); B = 0;
-  CYC(0x4cda, 0x4cdc); C = 0x1a;
-  CYC(0x4cdc, 0x4cde); alu_cp(gb, 4);
-  if (F & FC) CYCT(0x4cde, 0x4ce0);
+  CYC(b_+14, b_+15); H = D;
+  CYC(b_+15, b_+17); L = 0x47;
+  CYC(b_+17, b_+19); mem_wr(gb, HL, 45);
+  CYC(b_+19, b_+21); L = 0x42;
+  CYC(b_+21, b_+22); A = mem_rd(gb, HL);
+  CYC(b_+22, b_+24); B = 0;
+  CYC(b_+24, b_+26); C = 0x1a;
+  CYC(b_+26, b_+28); alu_cp(gb, 4);
+  if (F & FC) CYCT(b_+28, b_+30);
   else {
-    CYC(0x4cde, 0x4ce0);
-    CYC(0x4ce0, 0x4ce1); B = alu_inc8(gb, B);
-    CYC(0x4ce1, 0x4ce3); C = 6;
+    CYC(b_+28, b_+30);
+    CYC(b_+30, b_+31); B = alu_inc8(gb, B);
+    CYC(b_+31, b_+33); C = 6;
   }
-  CYC(0x4ce3, 0x4ce5); L = 0x49;
-  CYC(0x4ce5, 0x4ce6); mem_wr(gb, HL, C);
-  CYC(0x4ce6, 0x4ce8); L = 0x50;
-  CYC(0x4ce8, 0x4cea); mem_wr(gb, HL, 0x32);
-  CYC(0x4cea, 0x4ceb); push_effect(gb, AF);
-  CYC(0x4ceb, 0x4cec); A = B;
-  CALL_C(0x4cec, interactionSetAnimation_hook, 0x262e, 0x4cef);
-  CYC(0x4cef, 0x4cf0); SET_AF(pop_effect(gb));
+  CYC(b_+33, b_+35); L = 0x49;
+  CYC(b_+35, b_+36); mem_wr(gb, HL, C);
+  CYC(b_+36, b_+38); L = 0x50;
+  CYC(b_+38, b_+40); mem_wr(gb, HL, 0x32);
+  CYC(b_+40, b_+41); push_effect(gb, AF);
+  CYC(b_+41, b_+42); A = B;
+  CALL_C(b_+42, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+45);
+  CYC(b_+45, b_+46); SET_AF(pop_effect(gb));
   interactionCoded3__initializePositionAndCounter1_hook(gb);
 }
 
 void interactionCoded3__state0_hook(GB *gb) {
+  BASE(interactionCoded3);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4cca, 0x4ccc); A = 1;
-  CYC(0x4ccc, 0x4ccd); mem_wr(gb, DE, A);
-  CALL_C(0x4ccd, interactionInitGraphics_hook, 0x15fb, 0x4cd0);
+  CYC(b_+8, b_+10); A = 1;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
   interactionCoded3__afterCall4cd0_hook(gb);
 }
 
 void interactionCoded3__substate0_hook(GB *gb) {
-  CYC(0x4d1e, 0x4d21); A = mem_rd(gb, wGfxRegs1_SCY);
-  CYC(0x4d21, 0x4d23); alu_cp(gb, 0x10);
-  if (!(F & FZ)) { CYCT(0x4d23, 0x4d24); ret_effect(gb); return; }
-  CYC(0x4d23, 0x4d24);
-  CYC(0x4d24, 0x4d27); interactionIncSubstate_hook(gb);
+  BASE(interactionCoded3);
+  CYC(b_+92, b_+95); A = mem_rd(gb, wGfxRegs1_SCY);
+  CYC(b_+95, b_+97); alu_cp(gb, 0x10);
+  if (!(F & FZ)) { CYCT(b_+97, b_+98); ret_effect(gb); return; }
+  CYC(b_+97, b_+98);
+  CYC(b_+98, b_+101); interactionIncSubstate_hook(gb);
 }
 
 void interactionCoded3__substate1_hook(GB *gb) {
+  BASE(interactionCoded3);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4d27, interactionDecCounter1_hook, 0x23cc, 0x4d2a);
-  if (!(F & FZ)) { CYCT(0x4d2a, 0x4d2b); ret_effect(gb); return; }
-  CYC(0x4d2a, 0x4d2b);
-  CALL_C(0x4d2b, interactionIncSubstate_hook, 0x23e5, 0x4d2e);
-  CYC(0x4d2e, 0x4d31); objectSetVisible82_hook(gb);
+  CALL_C(b_+101, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+104);
+  if (!(F & FZ)) { CYCT(b_+104, b_+105); ret_effect(gb); return; }
+  CYC(b_+104, b_+105);
+  CALL_C(b_+105, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+108);
+  CYC(b_+108, b_+111); objectSetVisible82_hook(gb);
 }
 
 void interactionCoded3__substate2_hook(GB *gb) {
+  BASE(interactionCoded3);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4d31, 0x4d33); E = 0x47;
-  CYC(0x4d33, 0x4d34); A = mem_rd(gb, DE);
-  CYC(0x4d34, 0x4d35); alu_or(gb, A);
-  if (F & FZ) CYCT(0x4d35, 0x4d37);
+  CYC(b_+111, b_+113); E = 0x47;
+  CYC(b_+113, b_+114); A = mem_rd(gb, DE);
+  CYC(b_+114, b_+115); alu_or(gb, A);
+  if (F & FZ) CYCT(b_+115, b_+117);
   else {
-    CYC(0x4d35, 0x4d37);
-    CYC(0x4d37, 0x4d38); A = alu_dec8(gb, A);
-    CYC(0x4d38, 0x4d39); mem_wr(gb, DE, A);
+    CYC(b_+115, b_+117);
+    CYC(b_+117, b_+118); A = alu_dec8(gb, A);
+    CYC(b_+118, b_+119); mem_wr(gb, DE, A);
   }
-  CALL_C(0x4d39, interactionAnimate_hook, 0x261b, 0x4d3c);
-  CALL_C(0x4d3c, introObject_applySpeed_hook, 0x4ca1, 0x4d3f);
-  CYC(0x4d3f, 0x4d41); alu_cp(gb, 0xb0);
-  if (F & FC) { CYCT(0x4d41, 0x4d42); ret_effect(gb); return; }
-  CYC(0x4d41, 0x4d42);
-  CYC(0x4d42, 0x4d43); H = D;
-  CYC(0x4d43, 0x4d45); L = 0x47;
-  CYC(0x4d45, 0x4d46); A = mem_rd(gb, HL);
-  CYC(0x4d46, 0x4d47); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x4d47, 0x4d4a); interactionDelete_hook(gb); return; }
-  CYC(0x4d47, 0x4d4a);
-  CYC(0x4d4a, 0x4d4c); L = 0x45;
-  CYC(0x4d4c, 0x4d4d); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x4d4d, 0x4d4f); L = 0x42;
-  CYC(0x4d4f, 0x4d50); A = mem_rd(gb, HL);
-  CALL_C(0x4d50, interactionCoded3__initializePositionAndCounter1_hook, 0x4cf0, 0x4d53);
-  CALL_C(0x4d53, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4d56);
-  CYC(0x4d56, 0x4d58); alu_and(gb, 0x0f);
-  CYC(0x4d58, 0x4d59); H = D;
-  CYC(0x4d59, 0x4d5b); L = 0x46;
-  CYC(0x4d5b, 0x4d5c); mem_wr(gb, HL, A);
-  CYC(0x4d5c, 0x4d5f); objectSetInvisible_hook(gb);
+  CALL_C(b_+119, interactionAnimate_hook, SYM(interactionAnimate), b_+122);
+  CALL_C(b_+122, introObject_applySpeed_hook, SYM(introObject_applySpeed), b_+125);
+  CYC(b_+125, b_+127); alu_cp(gb, 0xb0);
+  if (F & FC) { CYCT(b_+127, b_+128); ret_effect(gb); return; }
+  CYC(b_+127, b_+128);
+  CYC(b_+128, b_+129); H = D;
+  CYC(b_+129, b_+131); L = 0x47;
+  CYC(b_+131, b_+132); A = mem_rd(gb, HL);
+  CYC(b_+132, b_+133); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+133, b_+136); interactionDelete_hook(gb); return; }
+  CYC(b_+133, b_+136);
+  CYC(b_+136, b_+138); L = 0x45;
+  CYC(b_+138, b_+139); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+139, b_+141); L = 0x42;
+  CYC(b_+141, b_+142); A = mem_rd(gb, HL);
+  CALL_C(b_+142, interactionCoded3__initializePositionAndCounter1_hook, b_+46, b_+145);
+  CALL_C(b_+145, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+148);
+  CYC(b_+148, b_+150); alu_and(gb, 0x0f);
+  CYC(b_+150, b_+151); H = D;
+  CYC(b_+151, b_+153); L = 0x46;
+  CYC(b_+153, b_+154); mem_wr(gb, HL, A);
+  CYC(b_+154, b_+157); objectSetInvisible_hook(gb);
 }
 
 void interactionCoded3__state1_hook(GB *gb) {
+  BASE(interactionCoded3);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4d08, 0x4d0b); A = mem_rd(gb, wGfxRegs1_SCY);
-  CYC(0x4d0b, 0x4d0c); B = A;
-  CYC(0x4d0c, 0x4d0e); E = 0x77;
-  CYC(0x4d0e, 0x4d0f); A = mem_rd(gb, DE);
-  CYC(0x4d0f, 0x4d10); alu_sub(gb, B);
-  CYC(0x4d10, 0x4d11); E = alu_inc8(gb, E);
-  CYC(0x4d11, 0x4d13); E = 0x4b;
-  CYC(0x4d13, 0x4d14); mem_wr(gb, DE, A);
-  CYC(0x4d14, 0x4d16); E = 0x45;
-  CYC(0x4d16, 0x4d17); A = mem_rd(gb, DE);
-  CYC(0x4d17, 0x4d18); push_effect(gb, 0x4d18);
-  switch (intro_bird_jump_table(gb)) {
-    case 0x4d1e: interactionCoded3__substate0_hook(gb); return;
-    case 0x4d27: interactionCoded3__substate1_hook(gb); return;
-    case 0x4d31: interactionCoded3__substate2_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+70, b_+73); A = mem_rd(gb, wGfxRegs1_SCY);
+  CYC(b_+73, b_+74); B = A;
+  CYC(b_+74, b_+76); E = 0x77;
+  CYC(b_+76, b_+77); A = mem_rd(gb, DE);
+  CYC(b_+77, b_+78); alu_sub(gb, B);
+  CYC(b_+78, b_+79); E = alu_inc8(gb, E);
+  CYC(b_+79, b_+81); E = 0x4b;
+  CYC(b_+81, b_+82); mem_wr(gb, DE, A);
+  CYC(b_+82, b_+84); E = 0x45;
+  CYC(b_+84, b_+85); A = mem_rd(gb, DE);
+  CYC(b_+85, b_+86); push_effect(gb, b_+86);
+  do { uint16_t jt_ = (intro_bird_jump_table(gb));
+    if (jt_ == b_+92) { interactionCoded3__substate0_hook(gb); return; }
+    else if (jt_ == b_+101) { interactionCoded3__substate1_hook(gb); return; }
+    else if (jt_ == b_+111) { interactionCoded3__substate2_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void interactionCoded3_hook(GB *gb) {
+  BASE(interactionCoded3);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4cc2, 0x4cc4); E = 0x44;
-  CYC(0x4cc4, 0x4cc5); A = mem_rd(gb, DE);
-  CYC(0x4cc5, 0x4cc6); push_effect(gb, 0x4cc6);
-  switch (intro_bird_jump_table(gb)) {
-    case 0x4cca: interactionCoded3__state0_hook(gb); return;
-    case 0x4d08: interactionCoded3__state1_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x44;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (intro_bird_jump_table(gb));
+    if (jt_ == b_+8) { interactionCoded3__state0_hook(gb); return; }
+    else if (jt_ == b_+70) { interactionCoded3__state1_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }

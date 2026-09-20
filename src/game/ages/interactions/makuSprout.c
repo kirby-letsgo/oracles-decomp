@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0a, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0a, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode88), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode88), (from), (to), true)
 
 static uint16_t makuSprout_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -47,187 +47,188 @@ static void makuSprout_add_double_index(GB *gb, uint16_t return_address) {
 // is entered one level deeper -- one push already outstanding from initializeMakuSprout's own
 // call -- and its resume check below must compare against sp0_-2, not bare sp0_.
 void interactionCode88_hook(GB *gb) {
+  BASE(interactionCode88);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6855, 0x6857); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x6857, 0x6858); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x6858, 0x6859); push_effect(gb, 0x6859);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = makuSprout_jump_table(gb);
-    if (target == 0x687b) goto subid1;
-    if (target == 0x6888) goto subid2;
+    if (target == b_+38) goto subid1;
+    if (target == b_+51) goto subid2;
   }
 
   // interactionCode88@subid0
-  CALL_C(0x685f, checkInteractionState_hook, 0x23fe, 0x6862);
-  if (!(F & FZ)) { CYCT(0x6862, 0x6864); goto subid0State1; } // jr nz
-  CYC(0x6862, 0x6864);
-  CYC(0x6864, 0x6866); A = 0x01;
-  CYC(0x6866, 0x6868); E = INTERACTION_BASE + OBJ_VAR3D;
-  CYC(0x6868, 0x6869); mem_wr(gb, DE, A);
-  CYC(0x6869, 0x686c); push_effect(gb, 0x686c); goto initSubid0; // call
+  CALL_C(b_+10, checkInteractionState_hook, SYM(checkInteractionState), b_+13);
+  if (!(F & FZ)) { CYCT(b_+13, b_+15); goto subid0State1; } // jr nz
+  CYC(b_+13, b_+15);
+  CYC(b_+15, b_+17); A = 0x01;
+  CYC(b_+17, b_+19); E = INTERACTION_BASE + OBJ_VAR3D;
+  CYC(b_+19, b_+20); mem_wr(gb, DE, A);
+  CYC(b_+20, b_+23); push_effect(gb, b_+23); goto initSubid0; // call
 afterInitSubid0:
-  CYC(0x686c, 0x686f); push_effect(gb, 0x686f); goto initializeMakuSprout; // call
+  CYC(b_+23, b_+26); push_effect(gb, b_+26); goto initializeMakuSprout; // call
 
 subid0State1:
-  CALL_C(0x686f, interactionAnimateAsNpc_hook, 0x26db, 0x6872);
-  CYC(0x6872, 0x6874); E = INTERACTION_BASE + OBJ_VISIBLE;
-  CYC(0x6874, 0x6875); A = mem_rd(gb, DE);
-  CYC(0x6875, 0x6877); alu_and(gb, 0x8f);
-  CYC(0x6877, 0x6878); mem_wr(gb, DE, A);
-  CYC(0x6878, 0x687b); interactionRunScript_hook(gb); return; // jp
+  CALL_C(b_+26, interactionAnimateAsNpc_hook, SYM(interactionAnimateAsNpc), b_+29);
+  CYC(b_+29, b_+31); E = INTERACTION_BASE + OBJ_VISIBLE;
+  CYC(b_+31, b_+32); A = mem_rd(gb, DE);
+  CYC(b_+32, b_+34); alu_and(gb, 0x8f);
+  CYC(b_+34, b_+35); mem_wr(gb, DE, A);
+  CYC(b_+35, b_+38); interactionRunScript_hook(gb); return; // jp
 
 subid1:
-  CALL_C(0x687b, checkInteractionState_hook, 0x23fe, 0x687e);
-  if (!(F & FZ)) { CYCT(0x687e, 0x6880); goto subid1State1; } // jr nz
-  CYC(0x687e, 0x6880);
-  CYC(0x6880, 0x6883); push_effect(gb, 0x6883); goto initializeMakuSprout; // call
+  CALL_C(b_+38, checkInteractionState_hook, SYM(checkInteractionState), b_+41);
+  if (!(F & FZ)) { CYCT(b_+41, b_+43); goto subid1State1; } // jr nz
+  CYC(b_+41, b_+43);
+  CYC(b_+43, b_+46); push_effect(gb, b_+46); goto initializeMakuSprout; // call
 afterInitializeMakuSprout_subid1:
-  CALL_C(0x6883, interactionRunScript_hook, 0x2552, 0x6886);
+  CALL_C(b_+46, interactionRunScript_hook, SYM(interactionRunScript), b_+49);
 
 subid1State1:
-  CYC(0x6886, 0x6888); goto subid0State1; // jr
+  CYC(b_+49, b_+51); goto subid0State1; // jr
 
 subid2:
-  CALL_C(0x6888, checkInteractionState_hook, 0x23fe, 0x688b);
-  if (!(F & FZ)) { CYCT(0x688b, 0x688d); goto subid2State1; } // jr nz
-  CYC(0x688b, 0x688d);
-  CYC(0x688d, 0x6890); push_effect(gb, 0x6890); goto initializeMakuSprout; // call
+  CALL_C(b_+51, checkInteractionState_hook, SYM(checkInteractionState), b_+54);
+  if (!(F & FZ)) { CYCT(b_+54, b_+56); goto subid2State1; } // jr nz
+  CYC(b_+54, b_+56);
+  CYC(b_+56, b_+59); push_effect(gb, b_+59); goto initializeMakuSprout; // call
 afterInitializeMakuSprout_subid2:
-  CYC(0x6890, 0x6892); A = 0x01;
-  CYC(0x6892, 0x6895); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+59, b_+61); A = 0x01;
+  CYC(b_+61, b_+64); interactionSetAnimation_hook(gb); return; // jp
 
 subid2State1:
-  CALL_C(0x6895, checkInteractionSubstate_hook, 0x2403, 0x6898);
-  if (!(F & FZ)) { CYCT(0x6898, 0x689b); interactionAnimate_hook(gb); return; } // jp nz
-  CYC(0x6898, 0x689b);
-  CYC(0x689b, 0x689e); A = W8(wTmpcfc0_genericCutscene_state);
-  CYC(0x689e, 0x68a0); alu_cp(gb, 0x06);
-  if (!(F & FZ)) { RET_TAKEN(0x68a0); return; } // ret nz
-  CYC(0x68a0, 0x68a1);
-  CALL_C(0x68a1, interactionIncSubstate_hook, 0x23e5, 0x68a4);
-  CYC(0x68a4, 0x68a7); objectSetVisible82_hook(gb); return; // jp
+  CALL_C(b_+64, checkInteractionSubstate_hook, SYM(checkInteractionSubstate), b_+67);
+  if (!(F & FZ)) { CYCT(b_+67, b_+70); interactionAnimate_hook(gb); return; } // jp nz
+  CYC(b_+67, b_+70);
+  CYC(b_+70, b_+73); A = W8(wTmpcfc0_genericCutscene_state);
+  CYC(b_+73, b_+75); alu_cp(gb, 0x06);
+  if (!(F & FZ)) { RET_TAKEN(b_+75); return; } // ret nz
+  CYC(b_+75, b_+76);
+  CALL_C(b_+76, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+79);
+  CYC(b_+79, b_+82); objectSetVisible82_hook(gb); return; // jp
 
 initSubid0:
-  CYC(0x68a7, 0x68aa); A = W8(wMakuTreeState);
+  CYC(b_+82, b_+85); A = W8(wMakuTreeState);
   {
-    CYC(0x68aa, 0x68ab); push_effect(gb, 0x68ab);
+    CYC(b_+85, b_+86); push_effect(gb, b_+86);
     uint16_t target = makuSprout_jump_table(gb);
-    if (target == 0x6924) goto state00;
-    if (target == 0x68cd) goto state01;
-    if (target == 0x68d1) goto state03;
-    if (target == 0x68d6) goto state06;
-    if (target == 0x68db) goto state07;
-    if (target == 0x68e0) goto state08;
-    if (target == 0x68e5) goto state09;
-    if (target == 0x68ea) goto state0a;
-    if (target == 0x68ef) goto state0b;
-    if (target == 0x68f4) goto state0c;
-    if (target == 0x68f9) goto state0d;
-    if (target == 0x68fe) goto state0e;
-    if (target == 0x6903) goto state0f;
-    if (target == 0x6908) goto state10;
+    if (target == b_+207) goto state00;
+    if (target == b_+120) goto state01;
+    if (target == b_+124) goto state03;
+    if (target == b_+129) goto state06;
+    if (target == b_+134) goto state07;
+    if (target == b_+139) goto state08;
+    if (target == b_+144) goto state09;
+    if (target == b_+149) goto state0a;
+    if (target == b_+154) goto state0b;
+    if (target == b_+159) goto state0c;
+    if (target == b_+164) goto state0d;
+    if (target == b_+169) goto state0e;
+    if (target == b_+174) goto state0f;
+    if (target == b_+179) goto state10;
     HANDOFF(target);
   }
 
 state01: // also @state02
-  CYC(0x68cd, 0x68cf); A = 0x01;
-  CYC(0x68cf, 0x68d1); goto runSubidCode; // jr
+  CYC(b_+120, b_+122); A = 0x01;
+  CYC(b_+122, b_+124); goto runSubidCode; // jr
 
 state03: // also @state04, @state05
-  CYC(0x68d1, 0x68d4); SET_BC(0x0170); // ldbc $01, <TX_0570
-  CYC(0x68d4, 0x68d6); goto runSubid0ScriptMode; // jr
+  CYC(b_+124, b_+127); SET_BC((SYM(resetGame) + 7)); // ldbc $01, <TX_0570
+  CYC(b_+127, b_+129); goto runSubid0ScriptMode; // jr
 
 state06:
-  CYC(0x68d6, 0x68d9); SET_BC(0x0076); // ldbc $00, <TX_0576
-  CYC(0x68d9, 0x68db); goto runSubid0ScriptMode; // jr
+  CYC(b_+129, b_+132); SET_BC(0x0076); // ldbc $00, <TX_0576
+  CYC(b_+132, b_+134); goto runSubid0ScriptMode; // jr
 
 state07:
-  CYC(0x68db, 0x68de); SET_BC(0x0078); // ldbc $00, <TX_0578
-  CYC(0x68de, 0x68e0); goto runSubid0ScriptMode; // jr
+  CYC(b_+134, b_+137); SET_BC(0x0078); // ldbc $00, <TX_0578
+  CYC(b_+137, b_+139); goto runSubid0ScriptMode; // jr
 
 state08:
-  CYC(0x68e0, 0x68e3); SET_BC(0x027a); // ldbc $02, <TX_057a
-  CYC(0x68e3, 0x68e5); goto runSubid0ScriptMode; // jr
+  CYC(b_+139, b_+142); SET_BC((SYM(pollInput) + 13)); // ldbc $02, <TX_057a
+  CYC(b_+142, b_+144); goto runSubid0ScriptMode; // jr
 
 state09:
-  CYC(0x68e5, 0x68e8); SET_BC(0x017c); // ldbc $01, <TX_057c
-  CYC(0x68e8, 0x68ea); goto runSubid0ScriptMode; // jr
+  CYC(b_+144, b_+147); SET_BC((SYM(getNumSetBits) + 6)); // ldbc $01, <TX_057c
+  CYC(b_+147, b_+149); goto runSubid0ScriptMode; // jr
 
 state0a:
-  CYC(0x68ea, 0x68ed); SET_BC(0x017e); // ldbc $01, <TX_057e
-  CYC(0x68ed, 0x68ef); goto runSubid0ScriptMode; // jr
+  CYC(b_+149, b_+152); SET_BC((SYM(getNumSetBits) + 8)); // ldbc $01, <TX_057e
+  CYC(b_+152, b_+154); goto runSubid0ScriptMode; // jr
 
 state0b:
-  CYC(0x68ef, 0x68f2); SET_BC(0x0080); // ldbc $00, <TX_0580
-  CYC(0x68f2, 0x68f4); goto runSubid0ScriptMode; // jr
+  CYC(b_+154, b_+157); SET_BC(0x0080); // ldbc $00, <TX_0580
+  CYC(b_+157, b_+159); goto runSubid0ScriptMode; // jr
 
 state0c:
-  CYC(0x68f4, 0x68f7); SET_BC(0x0082); // ldbc $00, <TX_0582
-  CYC(0x68f7, 0x68f9); goto runSubid0ScriptMode; // jr
+  CYC(b_+159, b_+162); SET_BC(0x0082); // ldbc $00, <TX_0582
+  CYC(b_+162, b_+164); goto runSubid0ScriptMode; // jr
 
 state0d:
-  CYC(0x68f9, 0x68fc); SET_BC(0x0184); // ldbc $01, <TX_0584
-  CYC(0x68fc, 0x68fe); goto runSubid0ScriptMode; // jr
+  CYC(b_+164, b_+167); SET_BC((SYM(addDecimalToHlRef) + 3)); // ldbc $01, <TX_0584
+  CYC(b_+167, b_+169); goto runSubid0ScriptMode; // jr
 
 state0e:
-  CYC(0x68fe, 0x6901); SET_BC(0x0186); // ldbc $01, <TX_0586
-  CYC(0x6901, 0x6903); goto runSubid0ScriptMode; // jr
+  CYC(b_+169, b_+172); SET_BC((SYM(addDecimalToHlRef) + 5)); // ldbc $01, <TX_0586
+  CYC(b_+172, b_+174); goto runSubid0ScriptMode; // jr
 
 state0f:
-  CYC(0x6903, 0x6906); SET_BC(0x0288); // ldbc $02, <TX_0588
-  CYC(0x6906, 0x6908); goto runSubid0ScriptMode; // jr
+  CYC(b_+174, b_+177); SET_BC((SYM(pollInput) + 27)); // ldbc $02, <TX_0588
+  CYC(b_+177, b_+179); goto runSubid0ScriptMode; // jr
 
 state10:
-  CALL_C(0x6908, checkIsLinkedGame_hook, 0x1992, 0x690b);
-  if (F & FZ) { CYCT(0x690b, 0x690d); goto state10Linked; } // jr z
-  CYC(0x690b, 0x690d);
-  CYC(0x690d, 0x6910); SET_BC(0x008a); // ldbc $00, <TX_058a
-  CYC(0x6910, 0x6912); goto runSubid0ScriptMode; // jr
+  CALL_C(b_+179, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+182);
+  if (F & FZ) { CYCT(b_+182, b_+184); goto state10Linked; } // jr z
+  CYC(b_+182, b_+184);
+  CYC(b_+184, b_+187); SET_BC(0x008a); // ldbc $00, <TX_058a
+  CYC(b_+187, b_+189); goto runSubid0ScriptMode; // jr
 
 state10Linked:
-  CYC(0x6912, 0x6915); SET_BC(0x018c); // ldbc $01, <TX_058c
-  CYC(0x6915, 0x6917); goto runSubid0ScriptMode; // jr
+  CYC(b_+189, b_+192); SET_BC((SYM(addDecimalToHlRef) + 11)); // ldbc $01, <TX_058c
+  CYC(b_+192, b_+194); goto runSubid0ScriptMode; // jr
 
 runSubidCode:
-  CYC(0x6917, 0x6919); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x6919, 0x691a); mem_wr(gb, DE, A);
-  CYC(0x691a, 0x691b); SET_AF(pop_effect(gb));
-  CYC(0x691b, 0x691e); interactionCode88_hook(gb); return; // jp
+  CYC(b_+194, b_+196); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+196, b_+197); mem_wr(gb, DE, A);
+  CYC(b_+197, b_+198); SET_AF(pop_effect(gb));
+  CYC(b_+198, b_+201); interactionCode88_hook(gb); return; // jp
 
 runSubid0ScriptMode:
-  CYC(0x691e, 0x691f); H = D;
-  CYC(0x691f, 0x6921); L = INTERACTION_BASE + OBJ_VAR3E;
-  CYC(0x6921, 0x6922); mem_wr(gb, HL, B);
-  CYC(0x6922, 0x6923); L = alu_inc8(gb, L);
-  CYC(0x6923, 0x6924); mem_wr(gb, HL, C);
+  CYC(b_+201, b_+202); H = D;
+  CYC(b_+202, b_+204); L = INTERACTION_BASE + OBJ_VAR3E;
+  CYC(b_+204, b_+205); mem_wr(gb, HL, B);
+  CYC(b_+205, b_+206); L = alu_inc8(gb, L);
+  CYC(b_+206, b_+207); mem_wr(gb, HL, C);
 
 state00:
-  RET(0x6924);
-  if (gb->pc == 0x686c && gb->sp == sp0_) goto afterInitSubid0;
+  RET(b_+207);
+  if (gb->pc == b_+23 && gb->sp == sp0_) goto afterInitSubid0;
   return; // ret
 
 initializeMakuSprout:
-  CYC(0x6925, 0x6928); push_effect(gb, 0x6928); goto loadScriptAndInitGraphics; // call
+  CYC(b_+208, b_+211); push_effect(gb, b_+211); goto loadScriptAndInitGraphics; // call
 afterLoadScriptAndInitGraphics:
-  CYC(0x6928, 0x692b); interactionSetAlwaysUpdateBit_hook(gb);
-  if (gb->pc == 0x686f && gb->sp == sp0_) goto subid0State1;
-  if (gb->pc == 0x6883 && gb->sp == sp0_) goto afterInitializeMakuSprout_subid1;
-  if (gb->pc == 0x6890 && gb->sp == sp0_) goto afterInitializeMakuSprout_subid2;
+  CYC(b_+211, b_+214); interactionSetAlwaysUpdateBit_hook(gb);
+  if (gb->pc == b_+26 && gb->sp == sp0_) goto subid0State1;
+  if (gb->pc == b_+46 && gb->sp == sp0_) goto afterInitializeMakuSprout_subid1;
+  if (gb->pc == b_+59 && gb->sp == sp0_) goto afterInitializeMakuSprout_subid2;
   return; // jp
 
 loadScriptAndInitGraphics:
-  CALL_C(0x6931, interactionInitGraphics_hook, 0x15fb, 0x6934);
-  CYC(0x6934, 0x6936); A = 0x05; // >TX_0500
-  CALL_C(0x6936, interactionSetHighTextIndex_hook, 0x253b, 0x6939);
-  CYC(0x6939, 0x693b); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x693b, 0x693c); A = mem_rd(gb, DE);
-  CYC(0x693c, 0x693f); SET_HL(0x6949); // @scriptTable
-  CYC(0x693f, 0x6940); makuSprout_add_double_index(gb, 0x6940);
-  CYC(0x6940, 0x6941); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x6941, 0x6942); H = mem_rd(gb, HL);
-  CYC(0x6942, 0x6943); L = A;
-  CALL_C(0x6943, interactionSetScript_hook, 0x2544, 0x6946);
-  CYC(0x6946, 0x6949); interactionIncState_hook(gb);
-  if (gb->pc == 0x6928 && gb->sp == (uint16_t)(sp0_ - 2)) goto afterLoadScriptAndInitGraphics;
+  CALL_C(b_+220, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+223);
+  CYC(b_+223, b_+225); A = 0x05; // >TX_0500
+  CALL_C(b_+225, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+228);
+  CYC(b_+228, b_+230); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+230, b_+231); A = mem_rd(gb, DE);
+  CYC(b_+231, b_+234); SET_HL(b_+244); // @scriptTable
+  CYC(b_+234, b_+235); makuSprout_add_double_index(gb, b_+235);
+  CYC(b_+235, b_+236); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+236, b_+237); H = mem_rd(gb, HL);
+  CYC(b_+237, b_+238); L = A;
+  CALL_C(b_+238, interactionSetScript_hook, SYM(interactionSetScript), b_+241);
+  CYC(b_+241, b_+244); interactionIncState_hook(gb);
+  if (gb->pc == b_+211 && gb->sp == (uint16_t)(sp0_ - 2)) goto afterLoadScriptAndInitGraphics;
   return; // jp
 }

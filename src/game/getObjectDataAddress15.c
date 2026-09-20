@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(getObjectDataAddress), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(getObjectDataAddress), (from), (to), true)
 
 void getObjectDataAddress_hook(GB *gb);
 
@@ -21,19 +21,20 @@ static void getObjectDataAddress_addDoubleIndexToHl_from_rst(GB *gb, uint16_t re
 }
 
 void getObjectDataAddress_hook(GB *gb) {
-  CYC(0x4315, 0x4318); A = mem_rd(gb, 0xcc2d);
-  CYC(0x4318, 0x431b); SET_HL(0x432b);
-  CYC(0x431b, 0x431c); getObjectDataAddress_addDoubleIndexToHl_from_rst(gb, 0x431c);
-  CYC(0x431c, 0x431d); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x431d, 0x431e); H = mem_rd(gb, HL);
-  CYC(0x431e, 0x431f); L = A;
-  CYC(0x431f, 0x4322); A = mem_rd(gb, 0xcc30);
-  CYC(0x4322, 0x4323); E = A;
-  CYC(0x4323, 0x4325); D = 0x00;
-  CYC(0x4325, 0x4326); alu_add_hl(gb, DE);
-  CYC(0x4326, 0x4327); alu_add_hl(gb, DE);
-  CYC(0x4327, 0x4328); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4328, 0x4329); D = mem_rd(gb, HL);
-  CYC(0x4329, 0x432a); E = A;
-  RET(0x432a);
+  BASE(getObjectDataAddress);
+  CYC(b_+0, b_+3); A = mem_rd(gb, wActiveGroup);
+  CYC(b_+3, b_+6); SET_HL(SYM(objectDataGroupTable));
+  CYC(b_+6, b_+7); getObjectDataAddress_addDoubleIndexToHl_from_rst(gb, b_+7);
+  CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+8, b_+9); H = mem_rd(gb, HL);
+  CYC(b_+9, b_+10); L = A;
+  CYC(b_+10, b_+13); A = mem_rd(gb, wActiveRoom);
+  CYC(b_+13, b_+14); E = A;
+  CYC(b_+14, b_+16); D = 0x00;
+  CYC(b_+16, b_+17); alu_add_hl(gb, DE);
+  CYC(b_+17, b_+18); alu_add_hl(gb, DE);
+  CYC(b_+18, b_+19); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+19, b_+20); D = mem_rd(gb, HL);
+  CYC(b_+20, b_+21); E = A;
+  RET(b_+21);
 }

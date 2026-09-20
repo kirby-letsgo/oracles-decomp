@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodebf), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodebf), (from), (to), true)
 
 // ref/oracles-disasm/object_code/ages/interactions/symmetryNpc.s (interactionCodebf /
 // INTERAC_SYMMETRY_NPC), bank 0x0b.
@@ -42,60 +42,61 @@ static void interactionCodebf_add_double_index(GB *gb, uint16_t return_address) 
 // INTERAC_SYMMETRY_NPC
 // ==================================================================================================
 void interactionCodebf_hook(GB *gb) {
+  BASE(interactionCodebf);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7143, 0x7145); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x7145, 0x7146); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x7146, 0x7147); push_effect(gb, 0x7147);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = interactionCodebf_jump_table(gb);
-    if (target == 0x71ba) goto runScriptAndAnimate;
-    if (target == 0x71a8) goto state2;
+    if (target == b_+119) goto runScriptAndAnimate;
+    if (target == b_+101) goto state2;
     // target == 0x714d falls through to state0
   }
 
   // interactionCodebf@state0
-  CALL_C(0x714d, interactionInitGraphics_hook, 0x15fb, 0x7150); // SWITCHES THREADS
-  CALL_C(0x7150, objectSetVisible82_hook, 0x1e69, 0x7153);
-  CALL_C(0x7153, interactionIncState_hook, 0x23e0, 0x7156);
-  CYC(0x7156, 0x7158); A = 0x2d; // >TX_2d00
-  CALL_C(0x7158, interactionSetHighTextIndex_hook, 0x253b, 0x715b);
-  CYC(0x715b, 0x715d); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x715d, 0x715e); A = mem_rd(gb, DE);
+  CALL_C(b_+10, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+13); // SWITCHES THREADS
+  CALL_C(b_+13, objectSetVisible82_hook, SYM(objectSetVisible82), b_+16);
+  CALL_C(b_+16, interactionIncState_hook, SYM(interactionIncState), b_+19);
+  CYC(b_+19, b_+21); A = 0x2d; // >TX_2d00
+  CALL_C(b_+21, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+24);
+  CYC(b_+24, b_+26); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+26, b_+27); A = mem_rd(gb, DE);
   {
-    CYC(0x715e, 0x715f); push_effect(gb, 0x715f);
+    CYC(b_+27, b_+28); push_effect(gb, b_+28);
     uint16_t target = interactionCodebf_jump_table(gb);
-    if (target == 0x7181) goto loadScript; // subids 0x0-0xb, all aliased
+    if (target == b_+62) goto loadScript; // subids 0x0-0xb, all aliased
     // target == 0x7179 falls through to subid0cInit
   }
 
   // interactionCodebf@subid0cInit
-  CYC(0x7179, 0x717b); A = 0x29; // GLOBALFLAG_TUNI_NUT_PLACED
-  CALL_C(0x717b, checkGlobalFlag_hook, 0x31f3, 0x717e);
-  if (F & FZ) { CYCT(0x717e, 0x7181); interactionDelete_hook(gb); return; } // jp z
-  CYC(0x717e, 0x7181);
+  CYC(b_+54, b_+56); A = 0x29; // GLOBALFLAG_TUNI_NUT_PLACED
+  CALL_C(b_+56, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+59);
+  if (F & FZ) { CYCT(b_+59, b_+62); interactionDelete_hook(gb); return; } // jp z
+  CYC(b_+59, b_+62);
 
 loadScript: // interactionCodebf@loadScript
-  CYC(0x7181, 0x7183); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7183, 0x7184); A = mem_rd(gb, DE);
-  CYC(0x7184, 0x7187); SET_HL(0x718e); // @scriptTable
-  CYC(0x7187, 0x7188); interactionCodebf_add_double_index(gb, 0x7188);
-  CYC(0x7188, 0x7189); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x7189, 0x718a); H = mem_rd(gb, HL);
-  CYC(0x718a, 0x718b); L = A;
-  CYC(0x718b, 0x718e); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+62, b_+64); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+64, b_+65); A = mem_rd(gb, DE);
+  CYC(b_+65, b_+68); SET_HL(b_+75); // @scriptTable
+  CYC(b_+68, b_+69); interactionCodebf_add_double_index(gb, b_+69);
+  CYC(b_+69, b_+70); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+70, b_+71); H = mem_rd(gb, HL);
+  CYC(b_+71, b_+72); L = A;
+  CYC(b_+72, b_+75); interactionSetScript_hook(gb); return; // jp
 
 state2: // interactionCodebf@state2
-  CYC(0x71a8, 0x71ab); SET_HL(wTmpcfc0_genericCutscene_state);
-  CYC(0x71ab, 0x71ad); alu_bit(gb, 0, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(0x71ad, 0x71af); goto runScriptAndAnimate; } // jr z
-  CYC(0x71ad, 0x71af);
-  CYC(0x71af, 0x71b2); SET_HL(0x7daf); // mainScripts.symmetryNpcSubid8And9Script_afterTuniNutRestored
-  CALL_C(0x71b2, interactionSetScript_hook, 0x2544, 0x71b5);
-  CYC(0x71b5, 0x71b7); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x71b7, 0x71b9); A = 0x01;
-  CYC(0x71b9, 0x71ba); mem_wr(gb, DE, A);
+  CYC(b_+101, b_+104); SET_HL(wTmpcfc0_genericCutscene_state);
+  CYC(b_+104, b_+106); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+106, b_+108); goto runScriptAndAnimate; } // jr z
+  CYC(b_+106, b_+108);
+  CYC(b_+108, b_+111); SET_HL((SYM(interactionCoded8__subid1Script) + 6)); // mainScripts.symmetryNpcSubid8And9Script_afterTuniNutRestored
+  CALL_C(b_+111, interactionSetScript_hook, SYM(interactionSetScript), b_+114);
+  CYC(b_+114, b_+116); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+116, b_+118); A = 0x01;
+  CYC(b_+118, b_+119); mem_wr(gb, DE, A);
 
 runScriptAndAnimate: // interactionCodebf@runScriptAndAnimate
-  CALL_C(0x71ba, interactionRunScript_hook, 0x2552, 0x71bd);
-  CYC(0x71bd, 0x71c0); npcFaceLinkAndAnimate_hook(gb); return; // jp
+  CALL_C(b_+119, interactionRunScript_hook, SYM(interactionRunScript), b_+122);
+  CYC(b_+122, SYM(interactionCodec1)); npcFaceLinkAndAnimate_hook(gb); return; // jp
 }

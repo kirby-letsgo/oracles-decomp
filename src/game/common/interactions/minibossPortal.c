@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0a, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0a, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode7e), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode7e), (from), (to), true)
 
 static uint16_t interactionCode7e_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -52,226 +52,227 @@ static void interactionCode7e_addDoubleIndexToHl_from_rst(GB *gb, uint16_t retur
 
 // INTERAC_MINIBOSS_PORTAL
 void interactionCode7e_hook(GB *gb) {
+  BASE(interactionCode7e);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4452, 0x4454); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x4454, 0x4455); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x4455, 0x4456); push_effect(gb, 0x4456);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = interactionCode7e_jump_table(gb);
-    if (target == 0x445a) goto subid00;
+    if (target == b_+8) goto subid00;
     goto subid01;
   }
 
 subid00:
-  CYC(0x445a, 0x445c); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x445c, 0x445d); A = mem_rd(gb, DE);
+  CYC(b_+8, b_+10); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+10, b_+11); A = mem_rd(gb, DE);
   {
-    CYC(0x445d, 0x445e); push_effect(gb, 0x445e);
+    CYC(b_+11, b_+12); push_effect(gb, b_+12);
     uint16_t target = interactionCode7e_jump_table(gb);
-    if (target == 0x4466) goto minibossState0;
-    if (target == 0x4498) goto state1;
-    if (target == 0x44cc) goto state2;
+    if (target == b_+20) goto minibossState0;
+    if (target == b_+70) goto state1;
+    if (target == b_+122) goto state2;
     goto minibossState3;
   }
 
 minibossState0:
-  CYC(0x4466, 0x4469); A = W8(wDungeonIndex);
-  CYC(0x4469, 0x446c); SET_HL(0x4507); // interactionCode7e@dungeonRoomTable
-  CYC(0x446c, 0x446d); interactionCode7e_addDoubleIndexToHl_from_rst(gb, 0x446d);
-  CYC(0x446d, 0x446e); C = mem_rd(gb, HL);
-  CYC(0x446e, 0x4471); A = W8(wActiveGroup);
-  CYC(0x4471, 0x4474); SET_HL(0x09cc); // flagLocationGroupTable
-  CYC(0x4474, 0x4475); interactionCode7e_addAToHl_from_rst(gb, 0x4475);
-  CYC(0x4475, 0x4476); H = mem_rd(gb, HL);
-  CYC(0x4476, 0x4477); L = C;
-  CYC(0x4477, 0x4478); A = mem_rd(gb, HL);
-  CYC(0x4478, 0x447a); alu_and(gb, 0x80);
-  if (F & FZ) { CYCT(0x447a, 0x447d); interactionDelete_hook(gb); return; } // jp z
-  CYC(0x447a, 0x447d);
-  CYC(0x447d, 0x447f); C = 0x57;
-  CALL_C(0x447f, objectSetShortPosition_hook, 0x20c3, 0x4482);
+  CYC(b_+20, b_+23); A = W8(wDungeonIndex);
+  CYC(b_+23, b_+26); SET_HL(b_+181); // interactionCode7e@dungeonRoomTable
+  CYC(b_+26, b_+27); interactionCode7e_addDoubleIndexToHl_from_rst(gb, b_+27);
+  CYC(b_+27, b_+28); C = mem_rd(gb, HL);
+  CYC(b_+28, b_+31); A = W8(wActiveGroup);
+  CYC(b_+31, b_+34); SET_HL(SYM(flagLocationGroupTable)); // flagLocationGroupTable
+  CYC(b_+34, b_+35); interactionCode7e_addAToHl_from_rst(gb, b_+35);
+  CYC(b_+35, b_+36); H = mem_rd(gb, HL);
+  CYC(b_+36, b_+37); L = C;
+  CYC(b_+37, b_+38); A = mem_rd(gb, HL);
+  CYC(b_+38, b_+40); alu_and(gb, 0x80);
+  if (F & FZ) { CYCT(b_+40, b_+43); interactionDelete_hook(gb); return; } // jp z
+  CYC(b_+40, b_+43);
+  CYC(b_+43, b_+45); C = 0x57;
+  CALL_C(b_+45, objectSetShortPosition_hook, SYM(objectSetShortPosition), b_+48);
 
 commonState0:
-  CALL_C(0x4482, interactionInitGraphics_hook, 0x15fb, 0x4485);
-  CYC(0x4485, 0x4487); A = 0x03;
-  CALL_C(0x4487, objectSetCollideRadius_hook, 0x24a1, 0x448a);
-  CALL_C(0x448a, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, 0x1c28, 0x448d);
-  CYC(0x448d, 0x448f); A = 0x01;
-  if (!(F & FC)) { CYCT(0x448f, 0x4491); goto afterIncA; } // jr nc
-  CYC(0x448f, 0x4491);
-  CYC(0x4491, 0x4492); A = alu_inc8(gb, A);
+  CALL_C(b_+48, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+51);
+  CYC(b_+51, b_+53); A = 0x03;
+  CALL_C(b_+53, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+56);
+  CALL_C(b_+56, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing), b_+59);
+  CYC(b_+59, b_+61); A = 0x01;
+  if (!(F & FC)) { CYCT(b_+61, b_+63); goto afterIncA; } // jr nc
+  CYC(b_+61, b_+63);
+  CYC(b_+63, b_+64); A = alu_inc8(gb, A);
 
 afterIncA:
-  CYC(0x4492, 0x4494); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4494, 0x4495); mem_wr(gb, DE, A);
-  CYC(0x4495, 0x4498); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+64, b_+66); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+66, b_+67); mem_wr(gb, DE, A);
+  CYC(b_+67, b_+70); objectSetVisible83_hook(gb); return; // jp
 
 state1:
-  CALL_C(0x4498, interactionAnimate_hook, 0x261b, 0x449b);
-  CALL_C(0x449b, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, 0x1c28, 0x449e);
-  if (!(F & FC)) { RET_TAKEN(0x449e); return; } // ret nc
-  CYC(0x449e, 0x449f);
-  CYC(0x449f, 0x44a2); A = W8(w1Link_id);
-  CYC(0x44a2, 0x44a3); alu_or(gb, A);
-  if (F & FZ) CALL_C_CC(0x44a3, checkLinkCollisionsEnabled_hook, 0x1d32, 0x44a6); else CYC(0x44a3, 0x44a6); // call z
-  if (!(F & FC)) { RET_TAKEN(0x44a6); return; } // ret nc
-  CYC(0x44a6, 0x44a7);
-  CALL_C(0x44a7, resetLinkInvincibility_hook, 0x2ba9, 0x44aa);
-  CYC(0x44aa, 0x44ac); A = 0x03;
-  CYC(0x44ac, 0x44ae); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x44ae, 0x44af); mem_wr(gb, DE, A);
-  CYC(0x44af, 0x44b2); W8(wLinkCanPassNpcs) = A;
-  CYC(0x44b2, 0x44b4); A = 0x30;
-  CYC(0x44b4, 0x44b6); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x44b6, 0x44b7); mem_wr(gb, DE, A);
-  CALL_C(0x44b7, setLinkForceStateToState08_hook, 0x2aad, 0x44ba);
-  CYC(0x44ba, 0x44bd); SET_HL(w1Link_visible);
-  CYC(0x44bd, 0x44bf); mem_wr(gb, HL, 0x82);
-  CALL_C(0x44bf, objectCopyPosition_hook, 0x2242, 0x44c2);
-  CYC(0x44c2, 0x44c4); A = 0x01;
-  CYC(0x44c4, 0x44c7); W8(wDisabledObjects) = A;
-  CYC(0x44c7, 0x44c9); A = 0x8d; // SND_TELEPORT
-  CYC(0x44c9, 0x44cc); playSound_b00_hook(gb); return; // jp
+  CALL_C(b_+70, interactionAnimate_hook, SYM(interactionAnimate), b_+73);
+  CALL_C(b_+73, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing), b_+76);
+  if (!(F & FC)) { RET_TAKEN(b_+76); return; } // ret nc
+  CYC(b_+76, b_+77);
+  CYC(b_+77, b_+80); A = W8(w1Link_id);
+  CYC(b_+80, b_+81); alu_or(gb, A);
+  if (F & FZ) CALL_C_CC(b_+81, checkLinkCollisionsEnabled_hook, SYM(checkLinkCollisionsEnabled), b_+84); else CYC(b_+81, b_+84); // call z
+  if (!(F & FC)) { RET_TAKEN(b_+84); return; } // ret nc
+  CYC(b_+84, b_+85);
+  CALL_C(b_+85, resetLinkInvincibility_hook, SYM(resetLinkInvincibility), b_+88);
+  CYC(b_+88, b_+90); A = 0x03;
+  CYC(b_+90, b_+92); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+92, b_+93); mem_wr(gb, DE, A);
+  CYC(b_+93, b_+96); W8(wLinkCanPassNpcs) = A;
+  CYC(b_+96, b_+98); A = 0x30;
+  CYC(b_+98, b_+100); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+100, b_+101); mem_wr(gb, DE, A);
+  CALL_C(b_+101, setLinkForceStateToState08_hook, SYM(setLinkForceStateToState08), b_+104);
+  CYC(b_+104, b_+107); SET_HL(w1Link_visible);
+  CYC(b_+107, b_+109); mem_wr(gb, HL, 0x82);
+  CALL_C(b_+109, objectCopyPosition_hook, SYM(objectCopyPosition), b_+112);
+  CYC(b_+112, b_+114); A = 0x01;
+  CYC(b_+114, b_+117); W8(wDisabledObjects) = A;
+  CYC(b_+117, b_+119); A = 0x8d; // SND_TELEPORT
+  CYC(b_+119, b_+122); playSound_b00_hook(gb); return; // jp
 
 state2:
-  CALL_C(0x44cc, interactionAnimate_hook, 0x261b, 0x44cf);
-  CALL_C(0x44cf, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, 0x1c28, 0x44d2);
-  if (F & FC) { RET_TAKEN(0x44d2); return; } // ret c
-  CYC(0x44d2, 0x44d3);
-  CYC(0x44d3, 0x44d5); A = 0x01;
-  CYC(0x44d5, 0x44d7); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x44d7, 0x44d8); mem_wr(gb, DE, A);
-  RET(0x44d8); return; // ret
+  CALL_C(b_+122, interactionAnimate_hook, SYM(interactionAnimate), b_+125);
+  CALL_C(b_+125, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing), b_+128);
+  if (F & FC) { RET_TAKEN(b_+128); return; } // ret c
+  CYC(b_+128, b_+129);
+  CYC(b_+129, b_+131); A = 0x01;
+  CYC(b_+131, b_+133); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+133, b_+134); mem_wr(gb, DE, A);
+  RET(b_+134); return; // ret
 
 minibossState3:
-  CYC(0x44d9, 0x44dc); SET_HL(w1Link);
-  CALL_C(0x44dc, objectCopyPosition_hook, 0x2242, 0x44df);
-  CYC(0x44df, 0x44e2); push_effect(gb, 0x44e2); goto spinLink;
+  CYC(b_+135, b_+138); SET_HL(w1Link);
+  CALL_C(b_+138, objectCopyPosition_hook, SYM(objectCopyPosition), b_+141);
+  CYC(b_+141, b_+144); push_effect(gb, b_+144); goto spinLink;
 afterSpin1:
-  if (!(F & FZ)) { RET_TAKEN(0x44e2); return; } // ret nz
-  CYC(0x44e2, 0x44e3);
-  CYC(0x44e3, 0x44e6); A = W8(wDungeonIndex);
-  CYC(0x44e6, 0x44e9); SET_HL(0x4507); // interactionCode7e@dungeonRoomTable
-  CYC(0x44e9, 0x44ea); interactionCode7e_addDoubleIndexToHl_from_rst(gb, 0x44ea);
-  CYC(0x44ea, 0x44eb); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x44eb, 0x44ec); C = mem_rd(gb, HL);
-  CYC(0x44ec, 0x44ed); B = A;
-  CYC(0x44ed, 0x44f0); SET_HL(wWarpDestGroup);
-  CYC(0x44f0, 0x44f3); A = W8(wActiveGroup);
-  CYC(0x44f3, 0x44f5); alu_or(gb, 0x80);
-  CYC(0x44f5, 0x44f6); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x44f6, 0x44f9); A = W8(wActiveRoom);
-  CYC(0x44f9, 0x44fa); alu_cp(gb, B);
-  if (!(F & FZ)) { CYCT(0x44fa, 0x44fc); goto afterRoomCheck; } // jr nz
-  CYC(0x44fa, 0x44fc);
-  CYC(0x44fc, 0x44fd); B = C;
+  if (!(F & FZ)) { RET_TAKEN(b_+144); return; } // ret nz
+  CYC(b_+144, b_+145);
+  CYC(b_+145, b_+148); A = W8(wDungeonIndex);
+  CYC(b_+148, b_+151); SET_HL(b_+181); // interactionCode7e@dungeonRoomTable
+  CYC(b_+151, b_+152); interactionCode7e_addDoubleIndexToHl_from_rst(gb, b_+152);
+  CYC(b_+152, b_+153); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+153, b_+154); C = mem_rd(gb, HL);
+  CYC(b_+154, b_+155); B = A;
+  CYC(b_+155, b_+158); SET_HL(wWarpDestGroup);
+  CYC(b_+158, b_+161); A = W8(wActiveGroup);
+  CYC(b_+161, b_+163); alu_or(gb, 0x80);
+  CYC(b_+163, b_+164); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+164, b_+167); A = W8(wActiveRoom);
+  CYC(b_+167, b_+168); alu_cp(gb, B);
+  if (!(F & FZ)) { CYCT(b_+168, b_+170); goto afterRoomCheck; } // jr nz
+  CYC(b_+168, b_+170);
+  CYC(b_+170, b_+171); B = C;
 
 afterRoomCheck:
-  CYC(0x44fd, 0x44fe); A = B;
-  CYC(0x44fe, 0x44ff); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x44ff, 0x4500); alu_xor(gb, A);
-  CYC(0x4500, 0x4501); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x4501, 0x4503); mem_wr(gb, HL, 0x57);
-  CYC(0x4503, 0x4504); L = alu_inc8(gb, L);
-  CYC(0x4504, 0x4506); mem_wr(gb, HL, 0x03);
-  RET(0x4506); return; // ret
+  CYC(b_+171, b_+172); A = B;
+  CYC(b_+172, b_+173); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+173, b_+174); alu_xor(gb, A);
+  CYC(b_+174, b_+175); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+175, b_+177); mem_wr(gb, HL, 0x57);
+  CYC(b_+177, b_+178); L = alu_inc8(gb, L);
+  CYC(b_+178, b_+180); mem_wr(gb, HL, 0x03);
+  RET(b_+180); return; // ret
 
 subid01:
-  CYC(0x4536, 0x4538); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4538, 0x4539); A = mem_rd(gb, DE);
+  CYC(b_+228, b_+230); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+230, b_+231); A = mem_rd(gb, DE);
   {
-    CYC(0x4539, 0x453a); push_effect(gb, 0x453a);
+    CYC(b_+231, b_+232); push_effect(gb, b_+232);
     uint16_t target = interactionCode7e_jump_table(gb);
-    if (target == 0x4542) goto herosCaveState0;
-    if (target == 0x4498) goto state1;
-    if (target == 0x44cc) goto state2;
+    if (target == b_+240) goto herosCaveState0;
+    if (target == b_+70) goto state1;
+    if (target == b_+122) goto state2;
     goto herosCaveState3;
   }
 
 herosCaveState0:
-  CALL_C(0x4542, interactionDeleteAndRetIfEnabled02_hook, 0x26ec, 0x4545);
-  CYC(0x4545, 0x4547); E = INTERACTION_BASE + OBJ_XH;
-  CYC(0x4547, 0x4548); A = mem_rd(gb, DE);
-  CYC(0x4548, 0x454a); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x454a, 0x454b); mem_wr(gb, DE, A);
-  CYC(0x454b, 0x454d); alu_bit(gb, 7, A);
-  if (F & FZ) { CYCT(0x454d, 0x454f); goto afterRoomFlagCheck; } // jr z
-  CYC(0x454d, 0x454f);
-  CALL_C(0x454f, getThisRoomFlags_hook, 0x197d, 0x4552);
-  CYC(0x4552, 0x4554); alu_and(gb, 0x20);
-  if (F & FZ) { RET_TAKEN(0x4554); return; } // ret z
-  CYC(0x4554, 0x4555);
+  CALL_C(b_+240, interactionDeleteAndRetIfEnabled02_hook, SYM(interactionDeleteAndRetIfEnabled02), b_+243);
+  CYC(b_+243, b_+245); E = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+245, b_+246); A = mem_rd(gb, DE);
+  CYC(b_+246, b_+248); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+248, b_+249); mem_wr(gb, DE, A);
+  CYC(b_+249, b_+251); alu_bit(gb, 7, A);
+  if (F & FZ) { CYCT(b_+251, b_+253); goto afterRoomFlagCheck; } // jr z
+  CYC(b_+251, b_+253);
+  CALL_C(b_+253, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+256);
+  CYC(b_+256, b_+258); alu_and(gb, 0x20);
+  if (F & FZ) { RET_TAKEN(b_+258); return; } // ret z
+  CYC(b_+258, b_+259);
 
 afterRoomFlagCheck:
-  CYC(0x4555, 0x4556); H = D;
-  CYC(0x4556, 0x4558); E = INTERACTION_BASE + OBJ_YH;
-  CYC(0x4558, 0x4559); L = E;
-  CYC(0x4559, 0x455a); A = mem_rd(gb, DE);
-  CALL_C(0x455a, setShortPosition_hook, 0x20b8, 0x455d);
-  CYC(0x455d, 0x4560); goto commonState0; // jp
+  CYC(b_+259, b_+260); H = D;
+  CYC(b_+260, b_+262); E = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+262, b_+263); L = E;
+  CYC(b_+263, b_+264); A = mem_rd(gb, DE);
+  CALL_C(b_+264, setShortPosition_hook, SYM(setShortPosition), b_+267);
+  CYC(b_+267, b_+270); goto commonState0; // jp
 
 herosCaveState3:
-  CYC(0x4560, 0x4563); push_effect(gb, 0x4563); goto spinLink;
+  CYC(b_+270, b_+273); push_effect(gb, b_+273); goto spinLink;
 afterSpin2:
-  if (!(F & FZ)) { RET_TAKEN(0x4563); return; } // ret nz
-  CYC(0x4563, 0x4564);
-  CYC(0x4564, 0x4566); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x4566, 0x4567); A = mem_rd(gb, DE);
-  CYC(0x4567, 0x4569); alu_and(gb, 0x0f);
-  CYC(0x4569, 0x456c); push_effect(gb, 0x456c); goto initHerosCaveWarp;
+  if (!(F & FZ)) { RET_TAKEN(b_+273); return; } // ret nz
+  CYC(b_+273, b_+274);
+  CYC(b_+274, b_+276); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+276, b_+277); A = mem_rd(gb, DE);
+  CYC(b_+277, b_+279); alu_and(gb, 0x0f);
+  CYC(b_+279, b_+282); push_effect(gb, b_+282); goto initHerosCaveWarp;
 afterInitWarp:
-  CYC(0x456c, 0x456e); A = 0x84;
-  CYC(0x456e, 0x4571); W8(wWarpDestGroup) = A;
-  RET(0x4571); return; // ret
+  CYC(b_+282, b_+284); A = 0x84;
+  CYC(b_+284, b_+287); W8(wWarpDestGroup) = A;
+  RET(b_+287); return; // ret
 
 // interactionCode7e@spinLink: reached by two genuine calls, from @minibossState3's return
 // address 0x44e2 above and @herosCaveState3's return address 0x4563 above; never separately
 // hooked. Has both a literal ret exit and a tail-jump-into-external-hook exit, so every exit
 // needs both callers' resume checks.
 spinLink:
-  CALL_C(0x4519, resetLinkInvincibility_hook, 0x2ba9, 0x451c);
-  CALL_C(0x451c, interactionAnimate_hook, 0x261b, 0x451f);
-  CYC(0x451f, 0x4522); A = W8(wLinkDeathTrigger);
-  CYC(0x4522, 0x4523); alu_or(gb, A);
+  CALL_C(b_+199, resetLinkInvincibility_hook, SYM(resetLinkInvincibility), b_+202);
+  CALL_C(b_+202, interactionAnimate_hook, SYM(interactionAnimate), b_+205);
+  CYC(b_+205, b_+208); A = W8(wLinkDeathTrigger);
+  CYC(b_+208, b_+209); alu_or(gb, A);
   if (!(F & FZ)) {
-    RET_TAKEN(0x4523);
-    if (gb->pc == 0x44e2 && gb->sp == sp0_) goto afterSpin1;
-    if (gb->pc == 0x4563 && gb->sp == sp0_) goto afterSpin2;
+    RET_TAKEN(b_+209);
+    if (gb->pc == b_+144 && gb->sp == sp0_) goto afterSpin1;
+    if (gb->pc == b_+273 && gb->sp == sp0_) goto afterSpin2;
     return;
   } // ret nz
-  CYC(0x4523, 0x4524);
-  CYC(0x4524, 0x4527); A = W8(wFrameCounter);
-  CYC(0x4527, 0x4529); alu_and(gb, 0x03);
-  if (!(F & FZ)) { CYCT(0x4529, 0x452b); goto afterDirUpdate; } // jr nz
-  CYC(0x4529, 0x452b);
-  CYC(0x452b, 0x452e); SET_HL(w1Link_direction);
-  CYC(0x452e, 0x452f); A = mem_rd(gb, HL);
-  CYC(0x452f, 0x4530); A = alu_inc8(gb, A);
-  CYC(0x4530, 0x4532); alu_and(gb, 0x03);
-  CYC(0x4532, 0x4533); mem_wr(gb, HL, A);
+  CYC(b_+209, b_+210);
+  CYC(b_+210, b_+213); A = W8(wFrameCounter);
+  CYC(b_+213, b_+215); alu_and(gb, 0x03);
+  if (!(F & FZ)) { CYCT(b_+215, b_+217); goto afterDirUpdate; } // jr nz
+  CYC(b_+215, b_+217);
+  CYC(b_+217, b_+220); SET_HL(w1Link_direction);
+  CYC(b_+220, b_+221); A = mem_rd(gb, HL);
+  CYC(b_+221, b_+222); A = alu_inc8(gb, A);
+  CYC(b_+222, b_+224); alu_and(gb, 0x03);
+  CYC(b_+224, b_+225); mem_wr(gb, HL, A);
 
 afterDirUpdate:
-  CYC(0x4533, 0x4536); interactionDecCounter1_hook(gb); // jp
-  if (gb->pc == 0x44e2 && gb->sp == sp0_) goto afterSpin1;
-  if (gb->pc == 0x4563 && gb->sp == sp0_) goto afterSpin2;
+  CYC(b_+225, b_+228); interactionDecCounter1_hook(gb); // jp
+  if (gb->pc == b_+144 && gb->sp == sp0_) goto afterSpin1;
+  if (gb->pc == b_+273 && gb->sp == sp0_) goto afterSpin2;
   return;
 
 // interactionCode7e@initHerosCaveWarp: reached by one genuine call, from @herosCaveState3's
 // return address 0x456c above; never separately hooked.
 initHerosCaveWarp:
-  CYC(0x4572, 0x4575); SET_HL(0x458d); // interactionCode7e@herosCaveWarps
-  CYC(0x4575, 0x4576); interactionCode7e_addDoubleIndexToHl_from_rst(gb, 0x4576);
-  CYC(0x4576, 0x4577); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x4577, 0x457a); W8(wWarpDestRoom) = A;
-  CYC(0x457a, 0x457b); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x457b, 0x457e); W8(wWarpDestPos) = A;
-  CYC(0x457e, 0x4580); A = 0x85;
-  CYC(0x4580, 0x4583); W8(wWarpDestGroup) = A;
-  CYC(0x4583, 0x4584); alu_xor(gb, A);
-  CYC(0x4584, 0x4587); W8(wWarpTransition) = A;
-  CYC(0x4587, 0x4589); A = 0x03;
-  CYC(0x4589, 0x458c); W8(wWarpTransition2) = A;
-  RET(0x458c);
-  if (gb->pc == 0x456c && gb->sp == sp0_) goto afterInitWarp;
+  CYC(b_+288, b_+291); SET_HL(b_+315); // interactionCode7e@herosCaveWarps
+  CYC(b_+291, b_+292); interactionCode7e_addDoubleIndexToHl_from_rst(gb, b_+292);
+  CYC(b_+292, b_+293); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+293, b_+296); W8(wWarpDestRoom) = A;
+  CYC(b_+296, b_+297); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+297, b_+300); W8(wWarpDestPos) = A;
+  CYC(b_+300, b_+302); A = 0x85;
+  CYC(b_+302, b_+305); W8(wWarpDestGroup) = A;
+  CYC(b_+305, b_+306); alu_xor(gb, A);
+  CYC(b_+306, b_+309); W8(wWarpTransition) = A;
+  CYC(b_+309, b_+311); A = 0x03;
+  CYC(b_+311, b_+314); W8(wWarpTransition2) = A;
+  RET(b_+314);
+  if (gb->pc == b_+282 && gb->sp == sp0_) goto afterInitWarp;
   return;
 }

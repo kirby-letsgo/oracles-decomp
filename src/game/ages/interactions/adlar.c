@@ -3,66 +3,69 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode29), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode29), (from), (to), true)
 
-#define adlarScript_bank0c 0x4cef
+#define adlarScript_bank0c SYM(adlarScript)
 
 // @state1
 static void adlar_state1(GB *gb, uint16_t sp0_) {
-  CALL_C(0x5448, interactionRunScript_hook, 0x2552, 0x544b);
-  CYC(0x544b, 0x544e); interactionAnimateAsNpc_hook(gb);
+  BASE(interactionCode29);
+  CALL_C(b_+5, interactionRunScript_hook, SYM(interactionRunScript), b_+8);
+  CYC(b_+8, b_+11); interactionAnimateAsNpc_hook(gb);
 }
 
 // @state0: init. Decide on a value to write to var38; this will affect the script.
 static void adlar_state0(GB *gb, uint16_t sp0_) {
-  CALL_C(0x544e, interactionInitGraphics_hook, 0x15fb, 0x5451);
-  CALL_C(0x5451, interactionIncState_hook, 0x23e0, 0x5454);
-  CYC(0x5454, 0x5456); A = 0x14; // GLOBALFLAG_FINISHEDGAME
-  CALL_C(0x5456, checkGlobalFlag_hook, 0x31f3, 0x5459);
-  CYC(0x5459, 0x545b); A = 0x04;
+  BASE(interactionCode29);
+  CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
+  CALL_C(b_+14, interactionIncState_hook, SYM(interactionIncState), b_+17);
+  CYC(b_+17, b_+19); A = 0x14; // GLOBALFLAG_FINISHEDGAME
+  CALL_C(b_+19, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+22);
+  CYC(b_+22, b_+24); A = 0x04;
   if (!(F & FZ)) {
-    CYCT(0x545b, 0x545d); goto setVar38;
+    CYCT(b_+24, b_+26); goto setVar38;
   }
-  CYC(0x545b, 0x545d);
-  CYC(0x545d, 0x5460); SET_HL(wGroup4RoomFlags + 0xfc);
-  CYC(0x5460, 0x5462); alu_bit(gb, 7, mem_rd(gb, HL));
-  CYC(0x5462, 0x5464); A = 0x03;
+  CYC(b_+24, b_+26);
+  CYC(b_+26, b_+29); SET_HL(wGroup4RoomFlags + 0xfc);
+  CYC(b_+29, b_+31); alu_bit(gb, 7, mem_rd(gb, HL));
+  CYC(b_+31, b_+33); A = 0x03;
   if (!(F & FZ)) {
-    CYCT(0x5464, 0x5466); goto setVar38;
+    CYCT(b_+33, b_+35); goto setVar38;
   }
-  CYC(0x5464, 0x5466);
-  CYC(0x5466, 0x5468); A = 0x11; // GLOBALFLAG_SAVED_NAYRU
-  CALL_C(0x5468, checkGlobalFlag_hook, 0x31f3, 0x546b);
-  CYC(0x546b, 0x546d); A = 0x02;
+  CYC(b_+33, b_+35);
+  CYC(b_+35, b_+37); A = 0x11; // GLOBALFLAG_SAVED_NAYRU
+  CALL_C(b_+37, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+40);
+  CYC(b_+40, b_+42); A = 0x02;
   if (!(F & FZ)) {
-    CYCT(0x546d, 0x546f); goto setVar38;
+    CYCT(b_+42, b_+44); goto setVar38;
   }
-  CYC(0x546d, 0x546f);
-  CALL_C(0x546f, getThisRoomFlags_hook, 0x197d, 0x5472);
-  CYC(0x5472, 0x5474); alu_bit(gb, 6, mem_rd(gb, HL));
-  CYC(0x5474, 0x5476); A = 0x01;
+  CYC(b_+42, b_+44);
+  CALL_C(b_+44, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+47);
+  CYC(b_+47, b_+49); alu_bit(gb, 6, mem_rd(gb, HL));
+  CYC(b_+49, b_+51); A = 0x01;
   if (!(F & FZ)) {
-    CYCT(0x5476, 0x5478); goto setVar38;
+    CYCT(b_+51, b_+53); goto setVar38;
   }
-  CYC(0x5476, 0x5478);
-  CYC(0x5478, 0x5479); alu_xor(gb, A);
+  CYC(b_+51, b_+53);
+  CYC(b_+53, b_+54); alu_xor(gb, A);
 
 setVar38:
-  CYC(0x5479, 0x547b); E = INTERACTION_BASE + OBJ_VAR38;
-  CYC(0x547b, 0x547c); mem_wr(gb, DE, A);
-  CALL_C(0x547c, objectSetVisiblec2_hook, 0x1e45, 0x547f);
-  CYC(0x547f, 0x5482); SET_HL(adlarScript_bank0c);
-  CYC(0x5482, 0x5485); interactionSetScript_hook(gb);
+  CYC(b_+54, b_+56); E = INTERACTION_BASE + OBJ_VAR38;
+  CYC(b_+56, b_+57); mem_wr(gb, DE, A);
+  CALL_C(b_+57, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+60);
+  CYC(b_+60, b_+63); SET_HL(adlarScript_bank0c);
+  CYC(b_+63, SYM(interactionCode2a)); interactionSetScript_hook(gb);
 }
 
 // INTERAC_ADLAR
 void interactionCode29_hook(GB *gb) {
+  BASE(interactionCode29);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x5443, checkInteractionState_hook, 0x23fe, 0x5446);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
   if (F & FZ) {
-    CYCT(0x5446, 0x5448); adlar_state0(gb, sp0_); return;
+    CYCT(b_+3, b_+5); adlar_state0(gb, sp0_); return;
   }
-  CYC(0x5446, 0x5448);
+  CYC(b_+3, b_+5);
   adlar_state1(gb, sp0_);
 }

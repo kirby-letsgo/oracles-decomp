@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode18), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode18), (from), (to), true)
 
 static uint16_t overworldKeySprite_jumpTable(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -26,48 +26,49 @@ static uint16_t overworldKeySprite_jumpTable(GB *gb) {
 
 // INTERAC_OVERWORLD_KEY_SPRITE: key sprite that pops up out of the ground on the overworld.
 void interactionCode18_hook(GB *gb) {
+  BASE(interactionCode18);
   uint16_t sp0_ = gb->sp;
-  CYC(0x468c, 0x468e); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x468e, 0x468f); A = mem_rd(gb, DE);
-  CYC(0x468f, 0x4690); push_effect(gb, 0x4690);
-  switch (overworldKeySprite_jumpTable(gb)) {
-    case 0x4696: goto state0;
-    case 0x46a8: goto state1;
-    case 0x46bb: goto state2;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (overworldKeySprite_jumpTable(gb));
+    if (jt_ == b_+10) { goto state0; }
+    else if (jt_ == b_+28) { goto state1; }
+    else if (jt_ == b_+47) { goto state2; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 state0:
-  CALL_C(0x4696, interactionIncState_hook, 0x23e0, 0x4699);
-  CYC(0x4699, 0x469c); SET_BC(0xfe00);
-  CALL_C(0x469c, objectSetSpeedZ_hook, 0x239d, 0x469f);
-  CALL_C(0x469f, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x46a2);
-  CALL_C(0x46a2, interactionInitGraphics_hook, 0x15fb, 0x46a5);
-  CYC(0x46a5, 0x46a8); objectSetVisible80_hook(gb);
+  CALL_C(b_+10, interactionIncState_hook, SYM(interactionIncState), b_+13);
+  CYC(b_+13, b_+16); SET_BC(0xfe00);
+  CALL_C(b_+16, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+19);
+  CALL_C(b_+19, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+22);
+  CALL_C(b_+22, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+25);
+  CYC(b_+25, b_+28); objectSetVisible80_hook(gb);
   return;
 
 state1:
   // Decrease speedZ, wait for it to stop moving up
-  CYC(0x46a8, 0x46aa); C = 0x28;
-  CALL_C(0x46aa, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x46ad);
-  CYC(0x46ad, 0x46af); E = INTERACTION_BASE + OBJ_SPEED_Z + 1;
-  CYC(0x46af, 0x46b0); A = mem_rd(gb, DE);
-  CYC(0x46b0, 0x46b2); alu_bit(gb, 7, A);
+  CYC(b_+28, b_+30); C = 0x28;
+  CALL_C(b_+30, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+33);
+  CYC(b_+33, b_+35); E = INTERACTION_BASE + OBJ_SPEED_Z + 1;
+  CYC(b_+35, b_+36); A = mem_rd(gb, DE);
+  CYC(b_+36, b_+38); alu_bit(gb, 7, A);
   if (!(F & FZ)) {
-    CYCT(0x46b2, 0x46b3); ret_effect(gb); return;
+    CYCT(b_+38, b_+39); ret_effect(gb); return;
   }
-  CYC(0x46b2, 0x46b3);
-  CYC(0x46b3, 0x46b5); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x46b5, 0x46b7); A = 0x3c;
-  CYC(0x46b7, 0x46b8); mem_wr(gb, DE, A);
-  CYC(0x46b8, 0x46bb); interactionIncState_hook(gb);
+  CYC(b_+38, b_+39);
+  CYC(b_+39, b_+41); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+41, b_+43); A = 0x3c;
+  CYC(b_+43, b_+44); mem_wr(gb, DE, A);
+  CYC(b_+44, b_+47); interactionIncState_hook(gb);
   return;
 
 state2:
-  CALL_C(0x46bb, interactionDecCounter1_hook, 0x23cc, 0x46be);
+  CALL_C(b_+47, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+50);
   if (!(F & FZ)) {
-    CYCT(0x46be, 0x46bf); ret_effect(gb); return;
+    CYCT(b_+50, b_+51); ret_effect(gb); return;
   }
-  CYC(0x46be, 0x46bf);
-  CYC(0x46bf, 0x46c2); interactionDelete_hook(gb);
+  CYC(b_+50, b_+51);
+  CYC(b_+51, SYM(interactionCode1c)); interactionDelete_hook(gb);
 }

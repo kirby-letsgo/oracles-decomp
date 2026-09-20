@@ -3,52 +3,53 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode04), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode04), (from), (to), true)
 
 void partCode04_hook(GB *gb) {
+  BASE(partCode04);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x44cc, 0x44ce); E = 0xc4; // Part.state
-  CYC(0x44ce, 0x44cf); A = mem_rd(gb, DE);
-  CYC(0x44cf, 0x44d0); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x44d0, 0x44d2); goto state0; } // jr z
-  CYC(0x44d0, 0x44d2);
+  CYC(b_+0, b_+2); E = 0xc4; // Part.state
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+4, b_+6); goto state0; } // jr z
+  CYC(b_+4, b_+6);
 
-  CYC(0x44d2, 0x44d4); E = 0xe1; // Part.animParameter
-  CYC(0x44d4, 0x44d5); A = mem_rd(gb, DE);
-  CYC(0x44d5, 0x44d6); A = alu_inc8(gb, A);
-  if (!(F & FZ)) { CYCT(0x44d6, 0x44d9); partAnimate_hook(gb); return; } // jp nz
-  CYC(0x44d6, 0x44d9);
+  CYC(b_+6, b_+8); E = 0xe1; // Part.animParameter
+  CYC(b_+8, b_+9); A = mem_rd(gb, DE);
+  CYC(b_+9, b_+10); A = alu_inc8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+10, b_+13); partAnimate_hook(gb); return; } // jp nz
+  CYC(b_+10, b_+13);
 
-  CALL_C(0x44d9, decNumEnemies_hook, 0x24b3, 0x44dc);
-  if (!(F & FZ)) { CYCT(0x44dc, 0x44de); goto delete; } // jr nz
-  CYC(0x44dc, 0x44de);
-  CYC(0x44de, 0x44e0); E = 0xc2; // Part.subid
-  CYC(0x44e0, 0x44e1); A = mem_rd(gb, DE);
-  CYC(0x44e1, 0x44e2); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x44e2, 0x44e4); goto delete; } // jr z
-  CYC(0x44e2, 0x44e4);
-  CYC(0x44e4, 0x44e5); alu_xor(gb, A);
-  CALL_C(0x44e5, decideItemDrop_hook, 0x16eb, 0x44e8);
-  if (F & FZ) { CYCT(0x44e8, 0x44ea); goto delete; } // jr z
-  CYC(0x44e8, 0x44ea);
-  CYC(0x44ea, 0x44ec); B = 0x01; // PART_ITEM_DROP
-  CYC(0x44ec, 0x44ef); objectReplaceWithID_hook(gb); return; // jp
+  CALL_C(b_+13, decNumEnemies_hook, SYM(decNumEnemies), b_+16);
+  if (!(F & FZ)) { CYCT(b_+16, b_+18); goto delete; } // jr nz
+  CYC(b_+16, b_+18);
+  CYC(b_+18, b_+20); E = 0xc2; // Part.subid
+  CYC(b_+20, b_+21); A = mem_rd(gb, DE);
+  CYC(b_+21, b_+22); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+22, b_+24); goto delete; } // jr z
+  CYC(b_+22, b_+24);
+  CYC(b_+24, b_+25); alu_xor(gb, A);
+  CALL_C(b_+25, decideItemDrop_hook, SYM(decideItemDrop), b_+28);
+  if (F & FZ) { CYCT(b_+28, b_+30); goto delete; } // jr z
+  CYC(b_+28, b_+30);
+  CYC(b_+30, b_+32); B = 0x01; // PART_ITEM_DROP
+  CYC(b_+32, b_+35); objectReplaceWithID_hook(gb); return; // jp
 
 delete:
-  CYC(0x44ef, 0x44f2); partDelete_hook(gb); return; // jp
+  CYC(b_+35, b_+38); partDelete_hook(gb); return; // jp
 
 state0:
-  CYC(0x44f2, 0x44f3); A = alu_inc8(gb, A);
-  CYC(0x44f3, 0x44f4); mem_wr(gb, DE, A); // [state] = 1
-  CYC(0x44f4, 0x44f6); E = 0xc2; // Part.subid
-  CYC(0x44f6, 0x44f7); A = mem_rd(gb, DE);
-  CYC(0x44f7, 0x44f8); alu_or(gb, A);
-  CYC(0x44f8, 0x44fa); A = 0x79; // SND_BIG_EXPLOSION
+  CYC(b_+38, b_+39); A = alu_inc8(gb, A);
+  CYC(b_+39, b_+40); mem_wr(gb, DE, A); // [state] = 1
+  CYC(b_+40, b_+42); E = 0xc2; // Part.subid
+  CYC(b_+42, b_+43); A = mem_rd(gb, DE);
+  CYC(b_+43, b_+44); alu_or(gb, A);
+  CYC(b_+44, b_+46); A = 0x79; // SND_BIG_EXPLOSION
   if (!(F & FZ)) {
-    CALL_C_CC(0x44fa, playSound_b00_hook, 0x0c98, 0x44fd);
+    CALL_C_CC(b_+46, playSound_b00_hook, SYM(playSound_b00), b_+49);
   } else {
-    CYC(0x44fa, 0x44fd);
+    CYC(b_+46, b_+49);
   }
-  CYC(0x44fd, 0x4500); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+49, SYM(partCode05)); objectSetVisible80_hook(gb); return; // jp
 }

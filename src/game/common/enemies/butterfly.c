@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0e, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0e, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode37), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode37), (from), (to), true)
 
 static uint16_t butterfly_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -28,38 +28,39 @@ static uint16_t butterfly_jump_table(GB *gb) {
 // ENEMY_BUTTERFLY
 // ==================================================================================================
 void enemyCode37_hook(GB *gb) {
+  BASE(enemyCode37);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4fd9, 0x4fdb); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x4fdb, 0x4fdc); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x4fdc, 0x4fdd); push_effect(gb, 0x4fdd);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = butterfly_jump_table(gb);
-    if (target == 0x4fe1) goto state0;
-    if (target == 0x4fee) goto state1;
+    if (target == b_+8) goto state0;
+    if (target == b_+21) goto state1;
     HANDOFF(target);
   }
 
 state0:
-  CYC(0x4fe1, 0x4fe2); H = D;
-  CYC(0x4fe2, 0x4fe3); L = E;
-  CYC(0x4fe3, 0x4fe4); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [state]
-  CYC(0x4fe4, 0x4fe6); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x4fe6, 0x4fe8); mem_wr(gb, HL, 0x0a); // SPEED_40
-  CALL_C(0x4fe8, ecom_setRandomAngle_b0e_hook, 0x43cf, 0x4feb);
-  CYC(0x4feb, 0x4fee); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+8, b_+9); H = D;
+  CYC(b_+9, b_+10); L = E;
+  CYC(b_+10, b_+11); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [state]
+  CYC(b_+11, b_+13); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+13, b_+15); mem_wr(gb, HL, 0x0a); // SPEED_40
+  CALL_C(b_+15, ecom_setRandomAngle_b0e_hook, SYM(ecom_setRandomAngle_b0e), b_+18);
+  CYC(b_+18, b_+21); objectSetVisible81_hook(gb); return; // jp
 
 state1:
-  CYC(0x4fee, 0x4ff1); SET_BC(0x1f1f);
-  CALL_C(0x4ff1, ecom_randomBitwiseAndBCE_b0e_hook, 0x434f, 0x4ff4);
-  CYC(0x4ff4, 0x4ff5); alu_or(gb, B);
-  if (!(F & FZ)) { CYCT(0x4ff5, 0x4ff7); goto L_4ffb; } // jr nz
-  CYC(0x4ff5, 0x4ff7);
-  CYC(0x4ff7, 0x4ff8); H = D;
-  CYC(0x4ff8, 0x4ffa); L = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x4ffa, 0x4ffb); mem_wr(gb, HL, C);
+  CYC(b_+21, b_+24); SET_BC((SYM(pushDirectionData) + 26));
+  CALL_C(b_+24, ecom_randomBitwiseAndBCE_b0e_hook, SYM(ecom_randomBitwiseAndBCE_b0e), b_+27);
+  CYC(b_+27, b_+28); alu_or(gb, B);
+  if (!(F & FZ)) { CYCT(b_+28, b_+30); goto L_4ffb; } // jr nz
+  CYC(b_+28, b_+30);
+  CYC(b_+30, b_+31); H = D;
+  CYC(b_+31, b_+33); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+33, b_+34); mem_wr(gb, HL, C);
 
 L_4ffb:
-  CALL_C(0x4ffb, objectApplySpeed_hook, 0x201d, 0x4ffe);
-  CALL_C(0x4ffe, ecom_bounceOffScreenBoundary_b0e_hook, 0x42e5, 0x5001);
-  CYC(0x5001, 0x5004); enemyAnimate_hook(gb); return; // jp
+  CALL_C(b_+34, objectApplySpeed_hook, SYM(objectApplySpeed), b_+37);
+  CALL_C(b_+37, ecom_bounceOffScreenBoundary_b0e_hook, SYM(ecom_bounceOffScreenBoundary_b0e), b_+40);
+  CYC(b_+40, SYM(enemyCode38)); enemyAnimate_hook(gb); return; // jp
 }

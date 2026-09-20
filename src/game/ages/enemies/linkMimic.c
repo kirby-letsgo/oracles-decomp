@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0e, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0e, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode64), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode64), (from), (to), true)
 
 void linkMimic_state8_hook(GB *gb);
 void armMimic_uninitialized_hook(GB *gb);
@@ -36,46 +36,48 @@ static uint16_t linkMimic_jump_table(GB *gb) {
 // Shares code with ENEMY_ARM_MIMIC (armMimic.c).
 // ==================================================================================================
 void enemyCode64_hook(GB *gb) {
+  BASE(enemyCode64);
   uint16_t sp0_ = gb->sp;
-  if (F & FZ) { CYCT(0x60fa, 0x60fc); goto normalStatus; } // jr z
-  CYC(0x60fa, 0x60fc);
-  CYC(0x60fc, 0x60fe); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(0x60fe); return; } // ret c
-  CYC(0x60fe, 0x60ff);
-  if (F & FZ) { CYCT(0x60ff, 0x6102); enemyDie_hook(gb); return; } // jp z
-  CYC(0x60ff, 0x6102);
-  CYC(0x6102, 0x6103); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(0x6103, 0x6106); ecom_updateKnockback_b0e_hook(gb); return; } // jp nz
-  CYC(0x6103, 0x6106);
-  RET(0x6106); return; // ret
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+4); return; } // ret c
+  CYC(b_+4, b_+5);
+  if (F & FZ) { CYCT(b_+5, b_+8); enemyDie_hook(gb); return; } // jp z
+  CYC(b_+5, b_+8);
+  CYC(b_+8, b_+9); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+9, b_+12); ecom_updateKnockback_b0e_hook(gb); return; } // jp nz
+  CYC(b_+9, b_+12);
+  RET(b_+12); return; // ret
 
 normalStatus:
-  CYC(0x6107, 0x6109); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6109, 0x610a); A = mem_rd(gb, DE);
+  CYC(b_+13, b_+15); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+15, b_+16); A = mem_rd(gb, DE);
   {
-    CYC(0x610a, 0x610b); push_effect(gb, 0x610b);
+    CYC(b_+16, b_+17); push_effect(gb, b_+17);
     uint16_t target = linkMimic_jump_table(gb);
-    if (target == 0x611d) goto state_uninitialized;
-    if (target == 0x6173) { armMimic_state_stub_hook(gb); return; }
-    if (target == 0x6167) { armMimic_state_switchHook_hook(gb); return; }
-    if (target == 0x44ac) { ecom_blownByGaleSeedState_b0e_hook(gb); return; }
-    if (target == 0x6128) { linkMimic_state8_hook(gb); return; }
+    if (target == b_+35) goto state_uninitialized;
+    if (target == SYM(armMimic_state_stub)) { armMimic_state_stub_hook(gb); return; }
+    if (target == SYM(armMimic_state_switchHook)) { armMimic_state_switchHook_hook(gb); return; }
+    if (target == SYM(ecom_blownByGaleSeedState_b0e)) { ecom_blownByGaleSeedState_b0e_hook(gb); return; }
+    if (target == SYM(linkMimic_state8)) { linkMimic_state8_hook(gb); return; }
     HANDOFF(target);
   }
 
 state_uninitialized:
-  CYC(0x611d, 0x611f); A = 0x82; // PALH_82
-  CALL_C(0x611f, loadPaletteHeader_hook, 0x050b, 0x6122);
-  CALL_C(0x6122, armMimic_uninitialized_hook, 0x6155, 0x6125);
-  CYC(0x6125, 0x6128); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+35, b_+37); A = 0x82; // PALH_82
+  CALL_C(b_+37, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+40);
+  CALL_C(b_+40, armMimic_uninitialized_hook, SYM(armMimic_uninitialized), b_+43);
+  CYC(b_+43, SYM(linkMimic_state8)); objectSetVisible83_hook(gb); return; // jp
 }
 
 // 0e:6128, bare global; jump-table target from enemyCode64. Falls into (via unconditional jr)
 // armMimic_state8.
 void linkMimic_state8_hook(GB *gb) {
-  CYC(0x6128, 0x612b); A = mem_rd(gb, wDisabledObjects);
-  CYC(0x612b, 0x612c); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x612c); return; } // ret nz
-  CYC(0x612c, 0x612d);
-  CYC(0x612d, 0x612f); armMimic_state8_hook(gb); return; // jr
+  BASE(linkMimic_state8);
+  CYC(b_+0, b_+3); A = mem_rd(gb, wDisabledObjects);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+4); return; } // ret nz
+  CYC(b_+4, b_+5);
+  CYC(b_+5, SYM(enemyCode4e)); armMimic_state8_hook(gb); return; // jr
 }

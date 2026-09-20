@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x06, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x06, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(parentItemCode_punch), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(parentItemCode_punch), (from), (to), true)
 
 static uint16_t other_swords_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -23,92 +23,97 @@ static uint16_t other_swords_jump_table(GB *gb) {
 }
 
 static void other_swords_state1(GB *gb) {
-  CYC(0x4b0c, 0x4b0e); E = 0x21;
-  CYC(0x4b0e, 0x4b0f); A = mem_rd(gb, DE);
-  CYC(0x4b0f, 0x4b10); alu_rlca(gb);
-  if (!(F & FC)) { CYCT(0x4b10, 0x4b13); specialObjectAnimate_optimized_hook(gb); }
-  else { CYC(0x4b10, 0x4b13); CYC(0x4b13, 0x4b16); clearParentItem_hook(gb); }
+  BASE(parentItemCode_punch);
+  CYC(b_+70, b_+72); E = 0x21;
+  CYC(b_+72, b_+73); A = mem_rd(gb, DE);
+  CYC(b_+73, b_+74); alu_rlca(gb);
+  if (!(F & FC)) { CYCT(b_+74, b_+77); specialObjectAnimate_optimized_hook(gb); }
+  else { CYC(b_+74, b_+77); CYC(b_+77, SYM(parentItemCode_switchHook)); clearParentItem_hook(gb); }
 }
 
 void parentItemCode_foolsOre_hook(GB *gb) {
+  BASE(parentItemCode_foolsOre);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4ab0, 0x4ab2); E = 0x04;
-  CYC(0x4ab2, 0x4ab3); A = mem_rd(gb, DE);
-  CYC(0x4ab3, 0x4ab4); push_effect(gb, 0x4ab4);
-  switch (other_swords_jump_table(gb)) {
-    case 0x4ab8:
-      CYC(0x4ab8, 0x4aba); E = 0x00;
-      CYC(0x4aba, 0x4abc); A = 0xff;
-      CYC(0x4abc, 0x4abd); mem_wr(gb, DE, A);
-      CALL_C(0x4abd, updateLinkDirectionFromAngle_hook, 0x2b64, 0x4ac0);
-      CALL_C(0x4ac0, parentItemLoadAnimationAndIncState_hook, 0x5378, 0x4ac3);
-      CYC(0x4ac3, 0x4ac6); itemCreateChild_hook(gb); return;
-    case 0x4b0c: other_swords_state1(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x04;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (other_swords_jump_table(gb));
+    if (jt_ == b_+8) {
+      CYC(b_+8, b_+10); E = 0x00;
+      CYC(b_+10, b_+12); A = 0xff;
+      CYC(b_+12, b_+13); mem_wr(gb, DE, A);
+      CALL_C(b_+13, updateLinkDirectionFromAngle_hook, SYM(updateLinkDirectionFromAngle), b_+16);
+      CALL_C(b_+16, parentItemLoadAnimationAndIncState_hook, SYM(parentItemLoadAnimationAndIncState), b_+19);
+      CYC(b_+19, SYM(parentItemCode_punch)); itemCreateChild_hook(gb); return;
+    }
+    else if (jt_ == SYM(parentItemCode_punch__state1)) { other_swords_state1(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void parentItemCode_rodOfSeasons_hook(GB *gb) {
+  BASE(parentItemCode_rodOfSeasons);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x4aa7, clearParentItemIfCantUseSword_hook, 0x549e, 0x4aaa);
-  CALL_C(0x4aaa, isLinkUnderwater_hook, 0x54d2, 0x4aad);
-  if (!(F & FZ)) { CYCT(0x4aad, 0x4ab0); clearParentItem_hook(gb); return; }
-  CYC(0x4aad, 0x4ab0);
+  CALL_C(b_+0, clearParentItemIfCantUseSword_hook, SYM(clearParentItemIfCantUseSword), b_+3);
+  CALL_C(b_+3, isLinkUnderwater_hook, SYM(isLinkUnderwater), b_+6);
+  if (!(F & FZ)) { CYCT(b_+6, SYM(parentItemCode_foolsOre)); clearParentItem_hook(gb); return; }
+  CYC(b_+6, SYM(parentItemCode_foolsOre));
   parentItemCode_foolsOre_hook(gb);
 }
 
 void parentItemCode_punch_hook(GB *gb) {
+  BASE(parentItemCode_punch);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4ac6, 0x4ac8); E = 0x04;
-  CYC(0x4ac8, 0x4ac9); A = mem_rd(gb, DE);
-  CYC(0x4ac9, 0x4aca); push_effect(gb, 0x4aca);
-  switch (other_swords_jump_table(gb)) {
-    case 0x4ace: goto state0;
-    case 0x4b0c: other_swords_state1(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x04;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (other_swords_jump_table(gb));
+    if (jt_ == b_+8) { goto state0; }
+    else if (jt_ == b_+70) { other_swords_state1(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 state0:
-  CYC(0x4ace, 0x4ad0); E = 0x00;
-  CYC(0x4ad0, 0x4ad2); A = 0xff;
-  CYC(0x4ad2, 0x4ad3); mem_wr(gb, DE, A);
-  CALL_C(0x4ad3, updateLinkDirectionFromAngle_hook, 0x2b64, 0x4ad6);
-  CALL_C(0x4ad6, parentItemLoadAnimationAndIncState_hook, 0x5378, 0x4ad9);
-  CALL_C(0x4ad9, itemCreateChild_hook, 0x53dd, 0x4adc);
-  CYC(0x4adc, 0x4adf); A = W8(wActiveRing);
-  CYC(0x4adf, 0x4ae1); alu_cp(gb, 0x0b);
-  if (F & FZ) { CYCT(0x4ae1, 0x4ae3); goto experts_ring; }
-  CYC(0x4ae1, 0x4ae3);
-  CALL_C(0x4ae3, isLinkUnderwater_hook, 0x54d2, 0x4ae6);
-  if (F & FZ) { CYCT(0x4ae6, 0x4ae7); ret_effect(gb); return; }
-  CYC(0x4ae6, 0x4ae7);
-  CYC(0x4ae7, 0x4ae9); A = 0x37;
-  CYC(0x4ae9, 0x4aec); specialObjectSetAnimationWithLinkData_hook(gb); return;
+  CYC(b_+8, b_+10); E = 0x00;
+  CYC(b_+10, b_+12); A = 0xff;
+  CYC(b_+12, b_+13); mem_wr(gb, DE, A);
+  CALL_C(b_+13, updateLinkDirectionFromAngle_hook, SYM(updateLinkDirectionFromAngle), b_+16);
+  CALL_C(b_+16, parentItemLoadAnimationAndIncState_hook, SYM(parentItemLoadAnimationAndIncState), b_+19);
+  CALL_C(b_+19, itemCreateChild_hook, SYM(itemCreateChild), b_+22);
+  CYC(b_+22, b_+25); A = W8(wActiveRing);
+  CYC(b_+25, b_+27); alu_cp(gb, 0x0b);
+  if (F & FZ) { CYCT(b_+27, b_+29); goto experts_ring; }
+  CYC(b_+27, b_+29);
+  CALL_C(b_+29, isLinkUnderwater_hook, SYM(isLinkUnderwater), b_+32);
+  if (F & FZ) { CYCT(b_+32, b_+33); ret_effect(gb); return; }
+  CYC(b_+32, b_+33);
+  CYC(b_+33, b_+35); A = 0x37;
+  CYC(b_+35, b_+38); specialObjectSetAnimationWithLinkData_hook(gb); return;
 
 experts_ring:
-  CYC(0x4aec, 0x4aee); L = 0x02;
-  CYC(0x4aee, 0x4aef); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x4aef, 0x4af1); C = 0x34;
-  CYC(0x4af1, 0x4af4); A = W8(wLinkObjectIndex);
-  CYC(0x4af4, 0x4af5); alu_rrca(gb);
-  if (!(F & FC)) { CYCT(0x4af5, 0x4af7); goto not_riding; }
-  CYC(0x4af5, 0x4af7);
-  CYC(0x4af7, 0x4afa); A = W8(w1Companion_id);
-  CYC(0x4afa, 0x4afc); alu_cp(gb, 0x13);
-  if (F & FZ) CYCT(0x4afc, 0x4afe);
+  CYC(b_+38, b_+40); L = 0x02;
+  CYC(b_+40, b_+41); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+41, b_+43); C = 0x34;
+  CYC(b_+43, b_+46); A = W8(wLinkObjectIndex);
+  CYC(b_+46, b_+47); alu_rrca(gb);
+  if (!(F & FC)) { CYCT(b_+47, b_+49); goto not_riding; }
+  CYC(b_+47, b_+49);
+  CYC(b_+49, b_+52); A = W8(w1Companion_id);
+  CYC(b_+52, b_+54); alu_cp(gb, 0x13);
+  if (F & FZ) CYCT(b_+54, b_+56);
   else {
-    CYC(0x4afc, 0x4afe);
-    CYC(0x4afe, 0x4aff); C = alu_inc8(gb, C);
-    CYC(0x4aff, 0x4b01);
+    CYC(b_+54, b_+56);
+    CYC(b_+56, b_+57); C = alu_inc8(gb, C);
+    CYC(b_+57, b_+59);
   }
   goto set_animation;
 
 not_riding:
-  CALL_C(0x4b01, isLinkUnderwater_hook, 0x54d2, 0x4b04);
-  if (F & FZ) CYCT(0x4b04, 0x4b06);
-  else { CYC(0x4b04, 0x4b06); CYC(0x4b06, 0x4b08); C = 0x36; }
+  CALL_C(b_+59, isLinkUnderwater_hook, SYM(isLinkUnderwater), b_+62);
+  if (F & FZ) CYCT(b_+62, b_+64);
+  else { CYC(b_+62, b_+64); CYC(b_+64, b_+66); C = 0x36; }
 
 set_animation:
-  CYC(0x4b08, 0x4b09); A = C;
-  CYC(0x4b09, 0x4b0c); specialObjectSetAnimationWithLinkData_hook(gb);
+  CYC(b_+66, b_+67); A = C;
+  CYC(b_+67, b_+70); specialObjectSetAnimationWithLinkData_hook(gb);
 }

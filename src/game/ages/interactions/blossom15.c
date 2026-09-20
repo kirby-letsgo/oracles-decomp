@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(setNextChildStage), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(setNextChildStage), (from), (to), true)
 
 void setNextChildStage_hook(GB *gb);
 void setc6e2Bit_hook(GB *gb);
@@ -15,83 +15,90 @@ void blossom_decideInitialChildStatus_hook(GB *gb);
 void blossom_openNameEntryMenu_hook(GB *gb);
 
 void setNextChildStage_hook(GB *gb) {
-  CYC(0x4fe1, 0x4fe4); SET_HL(0xc6e1);
-  CYC(0x4fe4, 0x4fe5); mem_wr(gb, HL, A);
-  RET(0x4fe5);
+  BASE(setNextChildStage);
+  CYC(b_+0, b_+3); SET_HL(wNextChildStage);
+  CYC(b_+3, b_+4); mem_wr(gb, HL, A);
+  RET(b_+4);
 }
 
 void setc6e2Bit_hook(GB *gb) {
-  CYC(0x4fe6, 0x4fe9); SET_HL(0xc6e2);
-  CYC(0x4fe9, 0x4fec); setFlag_hook(gb);
+  BASE(setc6e2Bit);
+  CYC(b_+0, b_+3); SET_HL(wc6e2);
+  CYC(b_+3, SYM(checkc6e2BitSet)); setFlag_hook(gb);
 }
 
 void checkc6e2BitSet_hook(GB *gb) {
+  BASE(checkc6e2BitSet);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4fec, 0x4fef); SET_HL(0xc6e2);
-  CALL_C(0x4fef, checkFlag_hook, 0x0205, 0x4ff2);
-  CYC(0x4ff2, 0x4ff4); A = 0x01;
+  CYC(b_+0, b_+3); SET_HL(wc6e2);
+  CALL_C(b_+3, checkFlag_hook, SYM(checkFlag), b_+6);
+  CYC(b_+6, b_+8); A = 0x01;
   if (!(F & FZ)) {
-    CYCT(0x4ff4, 0x4ff6);
+    CYCT(b_+8, b_+10);
     goto setResult;
   }
-  CYC(0x4ff4, 0x4ff6);
-  CYC(0x4ff6, 0x4ff7); alu_xor(gb, A);
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+11); alu_xor(gb, A);
 
 setResult:
-  CYC(0x4ff7, 0x4ff9); E = INTERACTION_BASE + OBJ_VAR3B;
-  CYC(0x4ff9, 0x4ffa); mem_wr(gb, DE, A);
-  RET(0x4ffa);
+  CYC(b_+11, b_+13); E = INTERACTION_BASE + OBJ_VAR3B;
+  CYC(b_+13, b_+14); mem_wr(gb, DE, A);
+  RET(b_+14);
 }
 
 void blossom_checkHasRupees_hook(GB *gb) {
+  BASE(blossom_checkHasRupees);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4ffb, cpRupeeValue_hook, 0x1765, 0x4ffe);
-  CYC(0x4ffe, 0x5000); E = INTERACTION_BASE + OBJ_VAR3C;
-  CYC(0x5000, 0x5001); mem_wr(gb, DE, A);
-  RET(0x5001);
+  CALL_C(b_+0, cpRupeeValue_hook, SYM(cpRupeeValue), b_+3);
+  CYC(b_+3, b_+5); E = INTERACTION_BASE + OBJ_VAR3C;
+  CYC(b_+5, b_+6); mem_wr(gb, DE, A);
+  RET(b_+6);
 }
 
 void blossom_addValueToChildStatus_hook(GB *gb) {
-  CYC(0x5002, 0x5005); SET_HL(0xc60f);
-  CYC(0x5005, 0x5006); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x5006, 0x5007); mem_wr(gb, HL, A);
-  RET(0x5007);
+  BASE(blossom_addValueToChildStatus);
+  CYC(b_+0, b_+3); SET_HL(wChildStatus);
+  CYC(b_+3, b_+4); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+4, b_+5); mem_wr(gb, HL, A);
+  RET(b_+5);
 }
 
 void blossom_decideInitialChildStatus_hook(GB *gb) {
-  CYC(0x5008, 0x500b); SET_HL(0xc609);
-  CYC(0x500b, 0x500d); B = 0x00;
+  BASE(blossom_decideInitialChildStatus);
+  CYC(b_+0, b_+3); SET_HL(wKidName);
+  CYC(b_+3, b_+5); B = 0x00;
 
 nextChar:
-  CYC(0x500d, 0x500e); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x500e, 0x500f); alu_or(gb, A);
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+6, b_+7); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x500f, 0x5011);
+    CYCT(b_+7, b_+9);
     goto parsedName;
   }
-  CYC(0x500f, 0x5011);
-  CYC(0x5011, 0x5013); alu_and(gb, 0x0f);
-  CYC(0x5013, 0x5014); alu_add(gb, B);
-  CYC(0x5014, 0x5015); B = A;
-  CYC(0x5015, 0x5017);
+  CYC(b_+7, b_+9);
+  CYC(b_+9, b_+11); alu_and(gb, 0x0f);
+  CYC(b_+11, b_+12); alu_add(gb, B);
+  CYC(b_+12, b_+13); B = A;
+  CYC(b_+13, b_+15);
   goto nextChar;
 
 parsedName:
-  CYC(0x5017, 0x5018); A = B;
+  CYC(b_+15, b_+16); A = B;
 
 reduceLoop:
-  CYC(0x5018, 0x501a); alu_sub(gb, 0x03);
+  CYC(b_+16, b_+18); alu_sub(gb, 0x03);
   if (!(F & FC)) {
-    CYCT(0x501a, 0x501c);
+    CYCT(b_+18, b_+20);
     goto reduceLoop;
   }
-  CYC(0x501a, 0x501c);
-  CYC(0x501c, 0x501e); alu_add(gb, 0x04);
-  CYC(0x501e, 0x5021); mem_wr(gb, 0xc60f, A);
-  RET(0x5021);
+  CYC(b_+18, b_+20);
+  CYC(b_+20, b_+22); alu_add(gb, 0x04);
+  CYC(b_+22, b_+25); mem_wr(gb, wChildStatus, A);
+  RET(b_+25);
 }
 
 void blossom_openNameEntryMenu_hook(GB *gb) {
-  CYC(0x5022, 0x5024); A = 0x07;
-  CYC(0x5024, 0x5027); openMenu_hook(gb);
+  BASE(blossom_openNameEntryMenu);
+  CYC(b_+0, b_+2); A = 0x07;
+  CYC(b_+2, SYM(veranFaceCutsceneScript_b15)); openMenu_hook(gb);
 }

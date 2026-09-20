@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0e, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0e, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode3f), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode3f), (from), (to), true)
 
 void giantGhiniChild_state_stub_hook(GB *gb);
 void giantGhiniChild_state_uninitialized_hook(GB *gb);
@@ -49,248 +49,257 @@ static void giantGhiniChild_addDoubleIndexToHl_from_rst(GB *gb, uint16_t return_
 // ENEMY_GIANT_GHINI_CHILD
 // ==================================================================================================
 void enemyCode3f_hook(GB *gb) {
+  BASE(enemyCode3f);
   uint16_t sp0_ = gb->sp;
-  if (F & FZ) { CYCT(0x6d4f, 0x6d51); goto normalStatus; } // jr z
-  CYC(0x6d4f, 0x6d51);
-  CYC(0x6d51, 0x6d53); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(0x6d53); return; } // ret c
-  CYC(0x6d53, 0x6d54);
-  if (F & FZ) { CYCT(0x6d54, 0x6d56); goto dead; } // jr z
-  CYC(0x6d54, 0x6d56);
-  CYC(0x6d56, 0x6d57); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(0x6d57, 0x6d5a); ecom_updateKnockbackNoSolidity_b0e_hook(gb); return; } // jp nz
-  CYC(0x6d57, 0x6d5a);
-  CYC(0x6d5a, 0x6d5c); E = ENEMY_BASE + OBJ_VAR2A;
-  CYC(0x6d5c, 0x6d5d); A = mem_rd(gb, DE);
-  CYC(0x6d5d, 0x6d5f); alu_cp(gb, 0x80); // $80|ITEMCOLLISION_LINK
-  if (!(F & FZ)) { CYCT(0x6d5f, 0x6d61); goto normalStatus; } // jr nz
-  CYC(0x6d5f, 0x6d61);
-  CYC(0x6d61, 0x6d62); H = D;
-  CYC(0x6d62, 0x6d64); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6d64, 0x6d66); mem_wr(gb, HL, 0x0b);
-  CYC(0x6d66, 0x6d68); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x6d68, 0x6d6a); mem_wr(gb, HL, 120);
-  CYC(0x6d6a, 0x6d6c); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
-  CYC(0x6d6c, 0x6d6e); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
-  CYC(0x6d6e, 0x6d70); L = ENEMY_BASE + OBJ_Z + 1; // Enemy.zh
-  CYC(0x6d70, 0x6d72); mem_wr(gb, HL, 0x00);
-  CYC(0x6d72, 0x6d74); L = ENEMY_BASE + OBJ_RELATED1 + 1; // Enemy.relatedObj1+1
-  CYC(0x6d74, 0x6d75); H = mem_rd(gb, HL);
-  CYC(0x6d75, 0x6d77); L = ENEMY_BASE + 0x32; // Enemy.var32
-  CYC(0x6d77, 0x6d79); mem_wr(gb, HL, 0x01);
-  CYC(0x6d79, 0x6d7b); goto normalStatus; // jr
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+4); return; } // ret c
+  CYC(b_+4, b_+5);
+  if (F & FZ) { CYCT(b_+5, b_+7); goto dead; } // jr z
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+8); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+8, b_+11); ecom_updateKnockbackNoSolidity_b0e_hook(gb); return; } // jp nz
+  CYC(b_+8, b_+11);
+  CYC(b_+11, b_+13); E = ENEMY_BASE + OBJ_VAR2A;
+  CYC(b_+13, b_+14); A = mem_rd(gb, DE);
+  CYC(b_+14, b_+16); alu_cp(gb, 0x80); // $80|ITEMCOLLISION_LINK
+  if (!(F & FZ)) { CYCT(b_+16, b_+18); goto normalStatus; } // jr nz
+  CYC(b_+16, b_+18);
+  CYC(b_+18, b_+19); H = D;
+  CYC(b_+19, b_+21); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+21, b_+23); mem_wr(gb, HL, 0x0b);
+  CYC(b_+23, b_+25); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+25, b_+27); mem_wr(gb, HL, 120);
+  CYC(b_+27, b_+29); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
+  CYC(b_+29, b_+31); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
+  CYC(b_+31, b_+33); L = ENEMY_BASE + OBJ_Z + 1; // Enemy.zh
+  CYC(b_+33, b_+35); mem_wr(gb, HL, 0x00);
+  CYC(b_+35, b_+37); L = ENEMY_BASE + OBJ_RELATED1 + 1; // Enemy.relatedObj1+1
+  CYC(b_+37, b_+38); H = mem_rd(gb, HL);
+  CYC(b_+38, b_+40); L = ENEMY_BASE + 0x32; // Enemy.var32
+  CYC(b_+40, b_+42); mem_wr(gb, HL, 0x01);
+  CYC(b_+42, b_+44); goto normalStatus; // jr
 
 dead:
-  CYC(0x6d7b, 0x6d7d); E = ENEMY_BASE + OBJ_RELATED1 + 1; // Enemy.relatedObj1+1
-  CYC(0x6d7d, 0x6d7e); A = mem_rd(gb, DE);
-  CYC(0x6d7e, 0x6d7f); H = A;
-  CYC(0x6d7f, 0x6d81); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x6d81, 0x6d82); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x6d82, 0x6d85); enemyDie_hook(gb); return; // jp
+  CYC(b_+44, b_+46); E = ENEMY_BASE + OBJ_RELATED1 + 1; // Enemy.relatedObj1+1
+  CYC(b_+46, b_+47); A = mem_rd(gb, DE);
+  CYC(b_+47, b_+48); H = A;
+  CYC(b_+48, b_+50); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+50, b_+51); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+51, b_+54); enemyDie_hook(gb); return; // jp
 
 normalStatus:
-  CYC(0x6d85, 0x6d87); E = ENEMY_BASE + OBJ_RELATED1 + 1; // Enemy.relatedObj1+1
-  CYC(0x6d87, 0x6d88); A = mem_rd(gb, DE);
-  CYC(0x6d88, 0x6d89); H = A;
-  CYC(0x6d89, 0x6d8b); L = ENEMY_BASE + OBJ_HEALTH;
-  CYC(0x6d8b, 0x6d8c); A = mem_rd(gb, HL);
-  CYC(0x6d8c, 0x6d8d); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x6d8d, 0x6d8f); goto dead; } // jr z
-  CYC(0x6d8d, 0x6d8f);
-  CYC(0x6d8f, 0x6d91); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6d91, 0x6d92); A = mem_rd(gb, DE);
+  CYC(b_+54, b_+56); E = ENEMY_BASE + OBJ_RELATED1 + 1; // Enemy.relatedObj1+1
+  CYC(b_+56, b_+57); A = mem_rd(gb, DE);
+  CYC(b_+57, b_+58); H = A;
+  CYC(b_+58, b_+60); L = ENEMY_BASE + OBJ_HEALTH;
+  CYC(b_+60, b_+61); A = mem_rd(gb, HL);
+  CYC(b_+61, b_+62); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+62, b_+64); goto dead; } // jr z
+  CYC(b_+62, b_+64);
+  CYC(b_+64, b_+66); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+66, b_+67); A = mem_rd(gb, DE);
   {
-    CYC(0x6d92, 0x6d93); push_effect(gb, 0x6d93);
+    CYC(b_+67, b_+68); push_effect(gb, b_+68);
     uint16_t target = giantGhiniChild_jump_table(gb);
-    if (target == 0x6dae) { giantGhiniChild_state_uninitialized_hook(gb); return; }
-    if (target == 0x6dad) { giantGhiniChild_state_stub_hook(gb); return; }
-    if (target == 0x6ddf) { giantGhiniChild_state8_hook(gb); return; }
-    if (target == 0x6df8) { giantGhiniChild_state9_hook(gb); return; }
-    if (target == 0x6e0d) { giantGhiniChild_stateA_hook(gb); return; }
-    if (target == 0x6e1f) { giantGhiniChild_stateB_hook(gb); return; }
-    if (target == 0x6e6c) { giantGhiniChild_stateC_hook(gb); return; }
+    if (target == SYM(giantGhiniChild_state_uninitialized)) { giantGhiniChild_state_uninitialized_hook(gb); return; }
+    if (target == SYM(giantGhiniChild_state_stub)) { giantGhiniChild_state_stub_hook(gb); return; }
+    if (target == SYM(giantGhiniChild_state8)) { giantGhiniChild_state8_hook(gb); return; }
+    if (target == SYM(giantGhiniChild_state9)) { giantGhiniChild_state9_hook(gb); return; }
+    if (target == SYM(giantGhiniChild_stateA)) { giantGhiniChild_stateA_hook(gb); return; }
+    if (target == SYM(giantGhiniChild_stateB)) { giantGhiniChild_stateB_hook(gb); return; }
+    if (target == SYM(giantGhiniChild_stateC)) { giantGhiniChild_stateC_hook(gb); return; }
     HANDOFF(target);
   }
 }
 
 // 0e:6dad, bare global; jump-table target from enemyCode3f.
 void giantGhiniChild_state_stub_hook(GB *gb) {
-  RET(0x6dad); return; // ret
+  BASE(giantGhiniChild_state_stub);
+  RET(b_+0); return; // ret
 }
 
 // 0e:6dae, bare global; jump-table target from enemyCode3f.
 void giantGhiniChild_state_uninitialized_hook(GB *gb) {
+  BASE(giantGhiniChild_state_uninitialized);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6dae, 0x6db0); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x6db0, 0x6db1); A = mem_rd(gb, DE);
-  CYC(0x6db1, 0x6db3); alu_and(gb, 0x7f);
-  CYC(0x6db3, 0x6db4); A = alu_dec8(gb, A);
-  CYC(0x6db4, 0x6db7); SET_HL(0x6e86); // giantGhiniChild_spawnOffsets
-  CYC(0x6db7, 0x6db8); giantGhiniChild_addDoubleIndexToHl_from_rst(gb, 0x6db8);
-  CYC(0x6db8, 0x6dba); E = ENEMY_BASE + OBJ_YH;
-  CYC(0x6dba, 0x6dbb); A = mem_rd(gb, DE);
-  CYC(0x6dbb, 0x6dbc); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x6dbc, 0x6dbd); mem_wr(gb, DE, A);
-  CYC(0x6dbd, 0x6dbe); SET_HL(HL + 1); // inc hl
-  CYC(0x6dbe, 0x6dc0); E = ENEMY_BASE + OBJ_XH;
-  CYC(0x6dc0, 0x6dc1); A = mem_rd(gb, DE);
-  CYC(0x6dc1, 0x6dc2); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x6dc2, 0x6dc3); mem_wr(gb, DE, A);
-  CYC(0x6dc3, 0x6dc5); A = 0x1e; // SPEED_c0
-  CALL_C(0x6dc5, ecom_setSpeedAndState8_b0e_hook, 0x4364, 0x6dc8);
-  CYC(0x6dc8, 0x6dca); L = ENEMY_BASE + OBJ_Z + 1; // Enemy.zh
-  CYC(0x6dca, 0x6dcc); mem_wr(gb, HL, 0xfc);
-  CYC(0x6dcc, 0x6dce); L = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x6dce, 0x6dcf); A = mem_rd(gb, HL);
-  CYC(0x6dcf, 0x6dd0); alu_rlca(gb);
-  if (F & FC) { RET_TAKEN(0x6dd0); return; } // ret c
-  CYC(0x6dd0, 0x6dd1);
-  CYC(0x6dd1, 0x6dd3); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6dd3, 0x6dd5); mem_wr(gb, HL, 0x09);
-  CYC(0x6dd5, 0x6dd7); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x6dd7, 0x6dd9); mem_wr(gb, HL, 30);
-  CALL_C(0x6dd9, objectSetVisiblec1_hook, 0x1e3c, 0x6ddc);
-  CYC(0x6ddc, 0x6ddf); objectCreatePuff_hook(gb); return; // jp
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); alu_and(gb, 0x7f);
+  CYC(b_+5, b_+6); A = alu_dec8(gb, A);
+  CYC(b_+6, b_+9); SET_HL(SYM(giantGhiniChild_spawnOffsets)); // giantGhiniChild_spawnOffsets
+  CYC(b_+9, b_+10); giantGhiniChild_addDoubleIndexToHl_from_rst(gb, b_+10);
+  CYC(b_+10, b_+12); E = ENEMY_BASE + OBJ_YH;
+  CYC(b_+12, b_+13); A = mem_rd(gb, DE);
+  CYC(b_+13, b_+14); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+14, b_+15); mem_wr(gb, DE, A);
+  CYC(b_+15, b_+16); SET_HL(HL + 1); // inc hl
+  CYC(b_+16, b_+18); E = ENEMY_BASE + OBJ_XH;
+  CYC(b_+18, b_+19); A = mem_rd(gb, DE);
+  CYC(b_+19, b_+20); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+20, b_+21); mem_wr(gb, DE, A);
+  CYC(b_+21, b_+23); A = 0x1e; // SPEED_c0
+  CALL_C(b_+23, ecom_setSpeedAndState8_b0e_hook, SYM(ecom_setSpeedAndState8_b0e), b_+26);
+  CYC(b_+26, b_+28); L = ENEMY_BASE + OBJ_Z + 1; // Enemy.zh
+  CYC(b_+28, b_+30); mem_wr(gb, HL, 0xfc);
+  CYC(b_+30, b_+32); L = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+32, b_+33); A = mem_rd(gb, HL);
+  CYC(b_+33, b_+34); alu_rlca(gb);
+  if (F & FC) { RET_TAKEN(b_+34); return; } // ret c
+  CYC(b_+34, b_+35);
+  CYC(b_+35, b_+37); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+37, b_+39); mem_wr(gb, HL, 0x09);
+  CYC(b_+39, b_+41); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+41, b_+43); mem_wr(gb, HL, 30);
+  CALL_C(b_+43, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+46);
+  CYC(b_+46, SYM(giantGhiniChild_state8)); objectCreatePuff_hook(gb); return; // jp
 }
 
 // 0e:6ddf, bare global; jump-table target from enemyCode3f. Waiting for battle to start.
 void giantGhiniChild_state8_hook(GB *gb) {
+  BASE(giantGhiniChild_state8);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6ddf, 0x6de1); E = ENEMY_BASE + OBJ_RELATED1 + 1; // Enemy.relatedObj1+1
-  CYC(0x6de1, 0x6de2); A = mem_rd(gb, DE);
-  CYC(0x6de2, 0x6de3); H = A;
-  CYC(0x6de3, 0x6de5); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6de5, 0x6de6); A = mem_rd(gb, HL);
-  CYC(0x6de6, 0x6de8); alu_cp(gb, 0x09);
-  if (F & FC) { CYCT(0x6de8, 0x6dea); goto battleNotStartedYet; } // jr c
-  CYC(0x6de8, 0x6dea);
-  CALL_C(0x6dea, giantGhiniChild_gotoStateA_hook, 0x6dfc, 0x6ded);
-  CYC(0x6ded, 0x6df0); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_RELATED1 + 1; // Enemy.relatedObj1+1
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); H = A;
+  CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+6, b_+7); A = mem_rd(gb, HL);
+  CYC(b_+7, b_+9); alu_cp(gb, 0x09);
+  if (F & FC) { CYCT(b_+9, b_+11); goto battleNotStartedYet; } // jr c
+  CYC(b_+9, b_+11);
+  CALL_C(b_+11, giantGhiniChild_gotoStateA_hook, SYM(giantGhiniChild_gotoStateA), b_+14);
+  CYC(b_+14, b_+17); objectSetVisiblec1_hook(gb); return; // jp
 
 battleNotStartedYet:
-  CYC(0x6df0, 0x6df2); L = ENEMY_BASE + OBJ_VISIBLE;
-  CYC(0x6df2, 0x6df3); E = L;
-  CYC(0x6df3, 0x6df4); A = mem_rd(gb, HL);
-  CYC(0x6df4, 0x6df6); alu_or(gb, 0x40);
-  CYC(0x6df6, 0x6df7); mem_wr(gb, DE, A);
-  RET(0x6df7); return; // ret
+  CYC(b_+17, b_+19); L = ENEMY_BASE + OBJ_VISIBLE;
+  CYC(b_+19, b_+20); E = L;
+  CYC(b_+20, b_+21); A = mem_rd(gb, HL);
+  CYC(b_+21, b_+23); alu_or(gb, 0x40);
+  CYC(b_+23, b_+24); mem_wr(gb, DE, A);
+  RET(b_+24); return; // ret
 }
 
 // 0e:6df8, bare global; jump-table target from enemyCode3f. Just spawned in, will charge
 // after [counter1] frames. Falls through into giantGhiniChild_gotoStateA.
 void giantGhiniChild_state9_hook(GB *gb) {
+  BASE(giantGhiniChild_state9);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6df8, ecom_decCounter1_b0e_hook, 0x439a, 0x6dfb);
-  if (!(F & FZ)) { RET_TAKEN(0x6dfb); return; } // ret nz
-  CYC(0x6dfb, 0x6dfc);
+  CALL_C(b_+0, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; } // ret nz
+  CYC(b_+3, SYM(giantGhiniChild_gotoStateA));
   giantGhiniChild_gotoStateA_hook(gb); return; // fallthrough
 }
 
 // 0e:6dfc, bare global; called from giantGhiniChild_state8, also falls into from
 // giantGhiniChild_state9.
 void giantGhiniChild_gotoStateA_hook(GB *gb) {
+  BASE(giantGhiniChild_gotoStateA);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6dfc, 0x6dfe); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6dfe, 0x6e00); A = 0x0a;
-  CYC(0x6e00, 0x6e01); mem_wr(gb, DE, A);
-  CYC(0x6e01, 0x6e03); E = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x6e03, 0x6e05); A = 0x05;
-  CYC(0x6e05, 0x6e06); mem_wr(gb, DE, A);
-  CALL_C(0x6e06, objectGetAngleTowardLink_hook, 0x1e9c, 0x6e09);
-  CYC(0x6e09, 0x6e0b); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x6e0b, 0x6e0c); mem_wr(gb, DE, A);
-  RET(0x6e0c); return; // ret
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+2, b_+4); A = 0x0a;
+  CYC(b_+4, b_+5); mem_wr(gb, DE, A);
+  CYC(b_+5, b_+7); E = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+7, b_+9); A = 0x05;
+  CYC(b_+9, b_+10); mem_wr(gb, DE, A);
+  CALL_C(b_+10, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+13);
+  CYC(b_+13, b_+15); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+15, b_+16); mem_wr(gb, DE, A);
+  RET(b_+16); return; // ret
 }
 
 // 0e:6e0d, bare global; jump-table target from enemyCode3f. Charging at Link.
 void giantGhiniChild_stateA_hook(GB *gb) {
+  BASE(giantGhiniChild_stateA);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6e0d, enemyAnimate_hook, 0x2818, 0x6e10);
-  CALL_C(0x6e10, objectApplySpeed_hook, 0x201d, 0x6e13);
-  CALL_C(0x6e13, ecom_decCounter1_b0e_hook, 0x439a, 0x6e16);
-  if (!(F & FZ)) { RET_TAKEN(0x6e16); return; } // ret nz
-  CYC(0x6e16, 0x6e17);
-  CYC(0x6e17, 0x6e19); mem_wr(gb, HL, 0x05); // [counter1]
-  CALL_C(0x6e19, objectGetAngleTowardLink_hook, 0x1e9c, 0x6e1c);
-  CYC(0x6e1c, 0x6e1f); objectNudgeAngleTowards_hook(gb); return; // jp
+  CALL_C(b_+0, enemyAnimate_hook, SYM(enemyAnimate), b_+3);
+  CALL_C(b_+3, objectApplySpeed_hook, SYM(objectApplySpeed), b_+6);
+  CALL_C(b_+6, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+9);
+  if (!(F & FZ)) { RET_TAKEN(b_+9); return; } // ret nz
+  CYC(b_+9, b_+10);
+  CYC(b_+10, b_+12); mem_wr(gb, HL, 0x05); // [counter1]
+  CALL_C(b_+12, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+15);
+  CYC(b_+15, SYM(giantGhiniChild_stateB)); objectNudgeAngleTowards_hook(gb); return; // jp
 }
 
 // 0e:6e1f, bare global; jump-table target from enemyCode3f. Attached to Link.
 void giantGhiniChild_stateB_hook(GB *gb) {
+  BASE(giantGhiniChild_stateB);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6e1f, enemyAnimate_hook, 0x2818, 0x6e22);
-  CYC(0x6e22, 0x6e25); A = mem_rd(gb, w1Link + OBJ_YH);
-  CYC(0x6e25, 0x6e27); E = ENEMY_BASE + OBJ_YH;
-  CYC(0x6e27, 0x6e28); mem_wr(gb, DE, A);
-  CYC(0x6e28, 0x6e2b); A = mem_rd(gb, w1Link + OBJ_XH);
-  CYC(0x6e2b, 0x6e2d); E = ENEMY_BASE + OBJ_XH;
-  CYC(0x6e2d, 0x6e2e); mem_wr(gb, DE, A);
-  CALL_C(0x6e2e, ecom_decCounter1_b0e_hook, 0x439a, 0x6e31);
-  if (F & FZ) { CYCT(0x6e31, 0x6e33); goto detach; } // jr z
-  CYC(0x6e31, 0x6e33);
-  CYC(0x6e33, 0x6e36); A = mem_rd(gb, wGameKeysJustPressed);
-  CYC(0x6e36, 0x6e37); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x6e37, 0x6e39); goto adjustVisibility; } // jr z
-  CYC(0x6e37, 0x6e39);
-  CYC(0x6e39, 0x6e3a); A = mem_rd(gb, HL);
-  CYC(0x6e3a, 0x6e3c); alu_sub(gb, 0x03); // BTN_A|BTN_B
-  if (F & FC) { CYCT(0x6e3c, 0x6e3e); goto storeCounter1; } // jr nc
-  CYC(0x6e3c, 0x6e3e);
-  CYC(0x6e3e, 0x6e40); A = 0x01;
+  CALL_C(b_+0, enemyAnimate_hook, SYM(enemyAnimate), b_+3);
+  CYC(b_+3, b_+6); A = mem_rd(gb, w1Link + OBJ_YH);
+  CYC(b_+6, b_+8); E = ENEMY_BASE + OBJ_YH;
+  CYC(b_+8, b_+9); mem_wr(gb, DE, A);
+  CYC(b_+9, b_+12); A = mem_rd(gb, w1Link + OBJ_XH);
+  CYC(b_+12, b_+14); E = ENEMY_BASE + OBJ_XH;
+  CYC(b_+14, b_+15); mem_wr(gb, DE, A);
+  CALL_C(b_+15, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+18);
+  if (F & FZ) { CYCT(b_+18, b_+20); goto detach; } // jr z
+  CYC(b_+18, b_+20);
+  CYC(b_+20, b_+23); A = mem_rd(gb, wGameKeysJustPressed);
+  CYC(b_+23, b_+24); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+24, b_+26); goto adjustVisibility; } // jr z
+  CYC(b_+24, b_+26);
+  CYC(b_+26, b_+27); A = mem_rd(gb, HL);
+  CYC(b_+27, b_+29); alu_sub(gb, 0x03); // BTN_A|BTN_B
+  if (F & FC) { CYCT(b_+29, b_+31); goto storeCounter1; } // jr nc
+  CYC(b_+29, b_+31);
+  CYC(b_+31, b_+33); A = 0x01;
 
 storeCounter1:
-  CYC(0x6e40, 0x6e41); mem_wr(gb, HL, A);
+  CYC(b_+33, b_+34); mem_wr(gb, HL, A);
 
 adjustVisibility:
-  CYC(0x6e41, 0x6e42); A = mem_rd(gb, HL);
-  CYC(0x6e42, 0x6e44); alu_and(gb, 0x03);
-  if (!(F & FZ)) { CYCT(0x6e44, 0x6e46); goto slowLink; } // jr nz
-  CYC(0x6e44, 0x6e46);
-  CYC(0x6e46, 0x6e48); L = ENEMY_BASE + OBJ_VISIBLE;
-  CYC(0x6e48, 0x6e49); A = mem_rd(gb, HL);
-  CYC(0x6e49, 0x6e4b); alu_xor(gb, 0x80);
-  CYC(0x6e4b, 0x6e4c); mem_wr(gb, HL, A);
+  CYC(b_+34, b_+35); A = mem_rd(gb, HL);
+  CYC(b_+35, b_+37); alu_and(gb, 0x03);
+  if (!(F & FZ)) { CYCT(b_+37, b_+39); goto slowLink; } // jr nz
+  CYC(b_+37, b_+39);
+  CYC(b_+39, b_+41); L = ENEMY_BASE + OBJ_VISIBLE;
+  CYC(b_+41, b_+42); A = mem_rd(gb, HL);
+  CYC(b_+42, b_+44); alu_xor(gb, 0x80);
+  CYC(b_+44, b_+45); mem_wr(gb, HL, A);
 
 slowLink:
-  CYC(0x6e4c, 0x6e4f); SET_HL(wccd8);
-  CYC(0x6e4f, 0x6e51); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 5))); // set 5,(hl)
-  CYC(0x6e51, 0x6e54); A = mem_rd(gb, wFrameCounter);
-  CYC(0x6e54, 0x6e55); alu_rrca(gb);
-  if (!(F & FC)) { RET_TAKEN(0x6e55); return; } // ret nc
-  CYC(0x6e55, 0x6e56);
-  CYC(0x6e56, 0x6e59); SET_HL(wLinkImmobilized);
-  CYC(0x6e59, 0x6e5b); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 5))); // set 5,(hl)
-  RET(0x6e5b); return; // ret
+  CYC(b_+45, b_+48); SET_HL(wccd8);
+  CYC(b_+48, b_+50); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 5))); // set 5,(hl)
+  CYC(b_+50, b_+53); A = mem_rd(gb, wFrameCounter);
+  CYC(b_+53, b_+54); alu_rrca(gb);
+  if (!(F & FC)) { RET_TAKEN(b_+54); return; } // ret nc
+  CYC(b_+54, b_+55);
+  CYC(b_+55, b_+58); SET_HL(wLinkImmobilized);
+  CYC(b_+58, b_+60); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 5))); // set 5,(hl)
+  RET(b_+60); return; // ret
 
 detach:
-  CYC(0x6e5c, 0x6e5e); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6e5e, 0x6e60); mem_wr(gb, HL, 0x0c);
-  CYC(0x6e60, 0x6e62); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x6e62, 0x6e64); mem_wr(gb, HL, 0x3c); // 60
-  CYC(0x6e64, 0x6e66); L = ENEMY_BASE + OBJ_RELATED1 + 1; // Enemy.relatedObj1+1
-  CYC(0x6e66, 0x6e67); H = mem_rd(gb, HL);
-  CYC(0x6e67, 0x6e69); L = ENEMY_BASE + 0x32; // Enemy.var32
-  CYC(0x6e69, 0x6e6b); mem_wr(gb, HL, 0x00);
-  RET(0x6e6b); return; // ret
+  CYC(b_+61, b_+63); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+63, b_+65); mem_wr(gb, HL, 0x0c);
+  CYC(b_+65, b_+67); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+67, b_+69); mem_wr(gb, HL, 0x3c); // 60
+  CYC(b_+69, b_+71); L = ENEMY_BASE + OBJ_RELATED1 + 1; // Enemy.relatedObj1+1
+  CYC(b_+71, b_+72); H = mem_rd(gb, HL);
+  CYC(b_+72, b_+74); L = ENEMY_BASE + 0x32; // Enemy.var32
+  CYC(b_+74, b_+76); mem_wr(gb, HL, 0x00);
+  RET(b_+76); return; // ret
 }
 
 // 0e:6e6c, bare global; jump-table target from enemyCode3f. Just detached from Link, fading
 // away.
 void giantGhiniChild_stateC_hook(GB *gb) {
+  BASE(giantGhiniChild_stateC);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6e6c, enemyAnimate_hook, 0x2818, 0x6e6f);
-  CYC(0x6e6f, 0x6e71); E = ENEMY_BASE + OBJ_VISIBLE;
-  CYC(0x6e71, 0x6e72); A = mem_rd(gb, DE);
-  CYC(0x6e72, 0x6e74); alu_xor(gb, 0x80);
-  CYC(0x6e74, 0x6e75); mem_wr(gb, DE, A);
-  CALL_C(0x6e75, ecom_decCounter1_b0e_hook, 0x439a, 0x6e78);
-  if (!(F & FZ)) { RET_TAKEN(0x6e78); return; } // ret nz
-  CYC(0x6e78, 0x6e79);
-  CYC(0x6e79, 0x6e7b); E = ENEMY_BASE + OBJ_RELATED1 + 1; // Enemy.relatedObj1+1
-  CYC(0x6e7b, 0x6e7c); A = mem_rd(gb, DE);
-  CYC(0x6e7c, 0x6e7d); H = A;
-  CYC(0x6e7d, 0x6e7f); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x6e7f, 0x6e80); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CALL_C(0x6e80, decNumEnemies_hook, 0x24b3, 0x6e83);
-  CYC(0x6e83, 0x6e86); enemyDelete_hook(gb); return; // jp
+  CALL_C(b_+0, enemyAnimate_hook, SYM(enemyAnimate), b_+3);
+  CYC(b_+3, b_+5); E = ENEMY_BASE + OBJ_VISIBLE;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+8); alu_xor(gb, 0x80);
+  CYC(b_+8, b_+9); mem_wr(gb, DE, A);
+  CALL_C(b_+9, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+12);
+  if (!(F & FZ)) { RET_TAKEN(b_+12); return; } // ret nz
+  CYC(b_+12, b_+13);
+  CYC(b_+13, b_+15); E = ENEMY_BASE + OBJ_RELATED1 + 1; // Enemy.relatedObj1+1
+  CYC(b_+15, b_+16); A = mem_rd(gb, DE);
+  CYC(b_+16, b_+17); H = A;
+  CYC(b_+17, b_+19); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+19, b_+20); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CALL_C(b_+20, decNumEnemies_hook, SYM(decNumEnemies), b_+23);
+  CYC(b_+23, SYM(giantGhiniChild_spawnOffsets)); enemyDelete_hook(gb); return; // jp
 }

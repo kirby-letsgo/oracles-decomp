@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0f, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0f, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode7c), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode7c), (from), (to), true)
 
 void enemyCode7c_hook(GB *gb);
 
@@ -46,20 +46,21 @@ static uint16_t enemyCode7c_jump_table(GB *gb) {
 // ==================================================================================================
 
 void enemyCode7c_hook(GB *gb) {
+  BASE(enemyCode7c);
   uint16_t sp0_ = gb->sp;
-  if (F & FZ) { CYCT(0x7085, 0x7087); goto normalStatus; } // jr z
-  CYC(0x7085, 0x7087);
-  CYC(0x7087, 0x7089); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(0x7089); return; } // ret c
-  CYC(0x7089, 0x708a);
-  if (!(F & FZ)) { CYCT(0x708a, 0x708c); goto normalStatus; } // jr nz
-  CYC(0x708a, 0x708c);
-  CYC(0x708c, 0x708f); enemyBoss_dead_b0f_hook(gb); return; // jp
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+4); return; } // ret c
+  CYC(b_+4, b_+5);
+  if (!(F & FZ)) { CYCT(b_+5, b_+7); goto normalStatus; } // jr nz
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+10); enemyBoss_dead_b0f_hook(gb); return; // jp
 
 normalStatus:
-  CYC(0x708f, 0x7091); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x7091, 0x7092); A = mem_rd(gb, DE);
-  CYC(0x7092, 0x7093); push_effect(gb, 0x7093);
+  CYC(b_+10, b_+12); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+12, b_+13); A = mem_rd(gb, DE);
+  CYC(b_+13, b_+14); push_effect(gb, b_+14);
   {
     uint16_t target = enemyCode7c_jump_table(gb);
     HANDOFF(target);

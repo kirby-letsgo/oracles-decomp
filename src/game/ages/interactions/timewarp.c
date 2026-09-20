@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x10, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x10, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(timewarp_animate), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(timewarp_animate), (from), (to), true)
 
 // object_code/ages/interactions/timewarp.s (INTERAC_TIMEWARP), bank $10.
 
@@ -41,323 +41,340 @@ static void timewarp_addAToHl_from_rst(GB *gb, uint16_t return_address) {
 }
 
 void timewarp_animate_hook(GB *gb) {
+  BASE(timewarp_animate);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x7b60, interactionAnimate_hook, 0x261b, 0x7b63);
-  CYC(0x7b63, 0x7b65); E = INTERACTION_BASE + OBJ_ANIM_PARAMETER;
-  CYC(0x7b65, 0x7b66); A = mem_rd(gb, DE);
-  CYC(0x7b66, 0x7b67); A = alu_inc8(gb, A);
-  RET(0x7b67); return;
+  CALL_C(b_+0, interactionAnimate_hook, SYM(interactionAnimate), b_+3);
+  CYC(b_+3, b_+5); E = INTERACTION_BASE + OBJ_ANIM_PARAMETER;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+7); A = alu_inc8(gb, A);
+  RET(b_+7); return;
 }
 
 void timewarp_common_state0_hook(GB *gb) {
+  BASE(timewarp_common_state0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x7a14, interactionInitGraphics_hook, 0x15fb, 0x7a17);
-  CALL_C(0x7a17, interactionIncState_hook, 0x23e0, 0x7a1a);
-  CYC(0x7a1a, 0x7a1c); L = INTERACTION_BASE + OBJ_YH;
-  CYC(0x7a1c, 0x7a1e); A = mem_rd(gb, 0xffb0);
-  CYC(0x7a1e, 0x7a20); alu_add(gb, 0x08);
-  CYC(0x7a20, 0x7a21); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x7a21, 0x7a22); L = alu_inc8(gb, L);
-  CYC(0x7a22, 0x7a24); A = mem_rd(gb, 0xffb1);
-  CYC(0x7a24, 0x7a25); mem_wr(gb, HL, A);
-  CYC(0x7a25, 0x7a28);
+  CALL_C(b_+0, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+3);
+  CALL_C(b_+3, interactionIncState_hook, SYM(interactionIncState), b_+6);
+  CYC(b_+6, b_+8); L = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+8, b_+10); A = mem_rd(gb, hEnemyTargetY);
+  CYC(b_+10, b_+12); alu_add(gb, 0x08);
+  CYC(b_+12, b_+13); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+13, b_+14); L = alu_inc8(gb, L);
+  CYC(b_+14, b_+16); A = mem_rd(gb, hEnemyTargetX);
+  CYC(b_+16, b_+17); mem_wr(gb, HL, A);
+  CYC(b_+17, SYM(timewarp_subid0_state1));
   objectSetVisible83_hook(gb);
 }
 
 void timewarp_spawnChild_hook(GB *gb) {
+  BASE(timewarp_spawnChild);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x7a36, getFreeInteractionSlot_hook, 0x3aef, 0x7a39);
-  if (!(F & FZ)) { RET_TAKEN(0x7a39); return; }
-  CYC(0x7a39, 0x7a3a);
-  CYC(0x7a3a, 0x7a3c); mem_wr(gb, HL, 0xdd);
-  CYC(0x7a3c, 0x7a3d); L = alu_inc8(gb, L);
-  CYC(0x7a3d, 0x7a3e); mem_wr(gb, HL, B);
-  CYC(0x7a3e, 0x7a3f); L = alu_inc8(gb, L);
-  CYC(0x7a3f, 0x7a40); E = L;
-  CYC(0x7a40, 0x7a41); A = mem_rd(gb, DE);
-  CYC(0x7a41, 0x7a42); mem_wr(gb, HL, A);
-  CYC(0x7a42, 0x7a44); E = INTERACTION_BASE + OBJ_RELATED2;
-  CYC(0x7a44, 0x7a46); A = 0x40;
-  CYC(0x7a46, 0x7a47); mem_wr(gb, DE, A);
-  CYC(0x7a47, 0x7a48); E = alu_inc8(gb, E);
-  CYC(0x7a48, 0x7a49); A = H;
-  CYC(0x7a49, 0x7a4a); mem_wr(gb, DE, A);
-  CYC(0x7a4a, 0x7a4d); SET_BC(0xf800);
-  CYC(0x7a4d, 0x7a50);
+  CALL_C(b_+0, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; }
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+6); mem_wr(gb, HL, 0xdd);
+  CYC(b_+6, b_+7); L = alu_inc8(gb, L);
+  CYC(b_+7, b_+8); mem_wr(gb, HL, B);
+  CYC(b_+8, b_+9); L = alu_inc8(gb, L);
+  CYC(b_+9, b_+10); E = L;
+  CYC(b_+10, b_+11); A = mem_rd(gb, DE);
+  CYC(b_+11, b_+12); mem_wr(gb, HL, A);
+  CYC(b_+12, b_+14); E = INTERACTION_BASE + OBJ_RELATED2;
+  CYC(b_+14, b_+16); A = 0x40;
+  CYC(b_+16, b_+17); mem_wr(gb, DE, A);
+  CYC(b_+17, b_+18); E = alu_inc8(gb, E);
+  CYC(b_+18, b_+19); A = H;
+  CYC(b_+19, b_+20); mem_wr(gb, DE, A);
+  CYC(b_+20, b_+23); SET_BC(0xf800);
+  CYC(b_+23, SYM(timewarp_subid0_state2));
   objectCopyPositionWithOffset_hook(gb);
 }
 
 void timewarp_animateUntilFinished_hook(GB *gb) {
+  BASE(timewarp_animateUntilFinished);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x7aaf, timewarp_animate_hook, 0x7b60, 0x7ab2);
-  if (!(F & FZ)) { RET_TAKEN(0x7ab2); return; }
-  CYC(0x7ab2, 0x7ab3);
-  CYC(0x7ab3, 0x7ab6);
+  CALL_C(b_+0, timewarp_animate_hook, SYM(timewarp_animate), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; }
+  CYC(b_+3, b_+4);
+  CYC(b_+4, SYM(timewarp_subid1));
   interactionDelete_hook(gb);
 }
 
 void timewarp_subid0_state1_hook(GB *gb) {
+  BASE(timewarp_subid0_state1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x7a28, timewarp_animate_hook, 0x7b60, 0x7a2b);
+  CALL_C(b_+0, timewarp_animate_hook, SYM(timewarp_animate), b_+3);
   if (F & FZ) {
-    CYCT(0x7a2b, 0x7a2e);
+    CYCT(b_+3, b_+6);
     interactionIncState_hook(gb);
     return;
   }
-  CYC(0x7a2b, 0x7a2e);
-  CYC(0x7a2e, 0x7a2f); A = alu_dec8(gb, A);
+  CYC(b_+3, b_+6);
+  CYC(b_+6, b_+7); A = alu_dec8(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x7a2f, 0x7a32);
+    CYCT(b_+7, b_+10);
     goto spawnChild;
   }
-  CYC(0x7a2f, 0x7a32);
-  RET(0x7a31); return;
+  CYC(b_+7, b_+10);
+  RET(b_+9); return;
 spawnChild:
-  CYC(0x7a32, 0x7a33); alu_xor(gb, A);
-  CYC(0x7a33, 0x7a34); mem_wr(gb, DE, A);
-  CYC(0x7a34, 0x7a36); B = 0x03;
+  CYC(b_+10, b_+11); alu_xor(gb, A);
+  CYC(b_+11, b_+12); mem_wr(gb, DE, A);
+  CYC(b_+12, SYM(timewarp_spawnChild)); B = 0x03;
   timewarp_spawnChild_hook(gb);
 }
 
 void timewarp_subid0_state2_hook(GB *gb) {
+  BASE(timewarp_subid0_state2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x7a50, interactionDecCounter1_hook, 0x23cc, 0x7a53);
+  CALL_C(b_+0, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+3);
   if (F & FZ) {
-    CYCT(0x7a53, 0x7a55);
+    CYCT(b_+3, b_+5);
     goto counterReached0;
   }
-  CYC(0x7a53, 0x7a55);
-  CYC(0x7a55, 0x7a56); A = mem_rd(gb, HL);
-  CYC(0x7a56, 0x7a58); alu_cp(gb, 0x24);
-  if (F & FC) { RET_TAKEN(0x7a58); return; }
-  CYC(0x7a58, 0x7a59);
-  CYC(0x7a59, 0x7a5b); alu_and(gb, 0x07);
-  if (!(F & FZ)) { RET_TAKEN(0x7a5b); return; }
-  CYC(0x7a5b, 0x7a5c);
-  CYC(0x7a5c, 0x7a5d); A = mem_rd(gb, HL);
-  CYC(0x7a5d, 0x7a5f); alu_and(gb, 0x38);
-  CYC(0x7a5f, 0x7a60); alu_rrca(gb);
-  CYC(0x7a60, 0x7a63); SET_HL(0x7a8f);
-  CYC(0x7a63, 0x7a64);
-  timewarp_addAToHl_from_rst(gb, 0x7a64);
-  CYC(0x7a64, 0x7a65); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x7a65, 0x7a66); B = A;
-  CYC(0x7a66, 0x7a67); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x7a67, 0x7a68); C = A;
-  CYC(0x7a68, 0x7a69); E = mem_rd(gb, HL);
-  CALL_C(0x7a69, getFreePartSlot_hook, 0x3e8e, 0x7a6c);
-  if (!(F & FZ)) { RET_TAKEN(0x7a6c); return; }
-  CYC(0x7a6c, 0x7a6d);
-  CYC(0x7a6d, 0x7a6f); mem_wr(gb, HL, 0x2b);
-  CYC(0x7a6f, 0x7a70); L = alu_inc8(gb, L);
-  CYC(0x7a70, 0x7a71); mem_wr(gb, HL, E);
-  CYC(0x7a71, 0x7a73); E = INTERACTION_BASE + OBJ_RELATED2 + 1;
-  CYC(0x7a73, 0x7a74); A = mem_rd(gb, DE);
-  CYC(0x7a74, 0x7a76); L = PART_BASE + OBJ_RELATED1 + 1;
-  CYC(0x7a76, 0x7a77); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(0x7a77, 0x7a79); mem_wr(gb, HL, 0x40);
-  CYC(0x7a79, 0x7a7b); L = PART_BASE + OBJ_SPEED;
-  CYC(0x7a7b, 0x7a7c); mem_wr(gb, HL, B);
-  CYC(0x7a7c, 0x7a7e); B = 0x00;
-  CYC(0x7a7e, 0x7a81);
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL);
+  CYC(b_+6, b_+8); alu_cp(gb, 0x24);
+  if (F & FC) { RET_TAKEN(b_+8); return; }
+  CYC(b_+8, b_+9);
+  CYC(b_+9, b_+11); alu_and(gb, 0x07);
+  if (!(F & FZ)) { RET_TAKEN(b_+11); return; }
+  CYC(b_+11, b_+12);
+  CYC(b_+12, b_+13); A = mem_rd(gb, HL);
+  CYC(b_+13, b_+15); alu_and(gb, 0x38);
+  CYC(b_+15, b_+16); alu_rrca(gb);
+  CYC(b_+16, b_+19); SET_HL(b_+63);
+  CYC(b_+19, b_+20);
+  timewarp_addAToHl_from_rst(gb, b_+20);
+  CYC(b_+20, b_+21); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+21, b_+22); B = A;
+  CYC(b_+22, b_+23); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+23, b_+24); C = A;
+  CYC(b_+24, b_+25); E = mem_rd(gb, HL);
+  CALL_C(b_+25, getFreePartSlot_hook, SYM(getFreePartSlot), b_+28);
+  if (!(F & FZ)) { RET_TAKEN(b_+28); return; }
+  CYC(b_+28, b_+29);
+  CYC(b_+29, b_+31); mem_wr(gb, HL, 0x2b);
+  CYC(b_+31, b_+32); L = alu_inc8(gb, L);
+  CYC(b_+32, b_+33); mem_wr(gb, HL, E);
+  CYC(b_+33, b_+35); E = INTERACTION_BASE + OBJ_RELATED2 + 1;
+  CYC(b_+35, b_+36); A = mem_rd(gb, DE);
+  CYC(b_+36, b_+38); L = PART_BASE + OBJ_RELATED1 + 1;
+  CYC(b_+38, b_+39); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+39, b_+41); mem_wr(gb, HL, 0x40);
+  CYC(b_+41, b_+43); L = PART_BASE + OBJ_SPEED;
+  CYC(b_+43, b_+44); mem_wr(gb, HL, B);
+  CYC(b_+44, b_+46); B = 0x00;
+  CYC(b_+46, b_+49);
   objectCopyPositionWithOffset_hook(gb);
   return;
 counterReached0:
-  CYC(0x7a81, 0x7a83); A = 0x01;
-  CALL_C(0x7a83, interactionSetAnimation_hook, 0x262e, 0x7a86);
-  CYC(0x7a86, 0x7a88); A = 0x04;
-  CALL_C(0x7a88, objectGetRelatedObject2Var_hook, 0x2164, 0x7a8b);
-  CYC(0x7a8b, 0x7a8c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x7a8c, 0x7a8f);
+  CYC(b_+49, b_+51); A = 0x01;
+  CALL_C(b_+51, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+54);
+  CYC(b_+54, b_+56); A = 0x04;
+  CALL_C(b_+56, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+59);
+  CYC(b_+59, b_+60); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+60, b_+63);
   interactionIncState_hook(gb);
 }
 
 void timewarp_subid1_state1_hook(GB *gb) {
+  BASE(timewarp_subid1_state1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x7ac0, timewarp_animate_hook, 0x7b60, 0x7ac3);
+  CALL_C(b_+0, timewarp_animate_hook, SYM(timewarp_animate), b_+3);
   if (F & FZ) {
-    CYCT(0x7ac3, 0x7ac5);
+    CYCT(b_+3, b_+5);
     goto afterAnimate;
   }
-  CYC(0x7ac3, 0x7ac5);
-  CYC(0x7ac5, 0x7ac6); A = alu_dec8(gb, A);
-  if (F & FZ) { RET_TAKEN(0x7ac6); return; }
-  CYC(0x7ac6, 0x7ac7);
-  CYC(0x7ac7, 0x7ac8); alu_xor(gb, A);
-  CYC(0x7ac8, 0x7ac9); mem_wr(gb, DE, A);
-  CYC(0x7ac9, 0x7acb); B = 0x04;
-  CYC(0x7acb, 0x7ace);
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+6); A = alu_dec8(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+6); return; }
+  CYC(b_+6, b_+7);
+  CYC(b_+7, b_+8); alu_xor(gb, A);
+  CYC(b_+8, b_+9); mem_wr(gb, DE, A);
+  CYC(b_+9, b_+11); B = 0x04;
+  CYC(b_+11, b_+14);
   timewarp_spawnChild_hook(gb);
   return;
 afterAnimate:
-  CYC(0x7ace, 0x7ad0); A = 0x04;
-  CALL_C(0x7ad0, objectGetRelatedObject2Var_hook, 0x2164, 0x7ad3);
-  CYC(0x7ad3, 0x7ad4); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CALL_C(0x7ad4, interactionIncState_hook, 0x23e0, 0x7ad7);
-  CYC(0x7ad7, 0x7ad9); A = 0x01;
-  CYC(0x7ad9, 0x7adc);
+  CYC(b_+14, b_+16); A = 0x04;
+  CALL_C(b_+16, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+19);
+  CYC(b_+19, b_+20); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CALL_C(b_+20, interactionIncState_hook, SYM(interactionIncState), b_+23);
+  CYC(b_+23, b_+25); A = 0x01;
+  CYC(b_+25, SYM(timewarp_subid2));
   interactionSetAnimation_hook(gb);
 }
 
 void itemwarp_subid3Or4_state0_hook(GB *gb) {
+  BASE(itemwarp_subid3Or4_state0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x7b28, 0x7b2a); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x7b2a, 0x7b2b); A = mem_rd(gb, DE);
-  CYC(0x7b2b, 0x7b2d); alu_add(gb, 0xc0);
-  CALL_C(0x7b2d, loadPaletteHeader_hook, 0x050b, 0x7b30);
-  CALL_C(0x7b30, interactionInitGraphics_hook, 0x15fb, 0x7b33);
-  CALL_C(0x7b33, interactionIncState_hook, 0x23e0, 0x7b36);
-  CYC(0x7b36, 0x7b39);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); alu_add(gb, 0xc0);
+  CALL_C(b_+5, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+8);
+  CALL_C(b_+8, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+11);
+  CALL_C(b_+11, interactionIncState_hook, SYM(interactionIncState), b_+14);
+  CYC(b_+14, SYM(timewarp_subid3_state1));
   objectSetVisible82_hook(gb);
 }
 
 void timewarp_subid3_state1_hook(GB *gb) {
+  BASE(timewarp_subid3_state1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x7b39, timewarp_animate_hook, 0x7b60, 0x7b3c);
-  if (!(F & FZ)) { RET_TAKEN(0x7b3c); return; }
-  CYC(0x7b3c, 0x7b3d);
-  CYC(0x7b3d, 0x7b3f); A = 0x03;
-  CALL_C(0x7b3f, interactionSetAnimation_hook, 0x262e, 0x7b42);
-  CYC(0x7b42, 0x7b45);
+  CALL_C(b_+0, timewarp_animate_hook, SYM(timewarp_animate), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; }
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+6); A = 0x03;
+  CALL_C(b_+6, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+9);
+  CYC(b_+9, SYM(timewarp_subid3Or4_state3));
   interactionIncState_hook(gb);
 }
 
 void timewarp_subid3Or4_state3_hook(GB *gb) {
+  BASE(timewarp_subid3Or4_state3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x7b45, interactionIncState_hook, 0x23e0, 0x7b48);
-  CYC(0x7b48, 0x7b4a); A = 0x04;
-  CYC(0x7b4a, 0x7b4d);
+  CALL_C(b_+0, interactionIncState_hook, SYM(interactionIncState), b_+3);
+  CYC(b_+3, b_+5); A = 0x04;
+  CYC(b_+5, SYM(timewarp_subid3Or4_state4));
   interactionSetAnimation_hook(gb);
 }
 
 void timewarp_subid3Or4_state4_hook(GB *gb) {
+  BASE(timewarp_subid3Or4_state4);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x7b4d, timewarp_animate_hook, 0x7b60, 0x7b50);
-  if (!(F & FZ)) { RET_TAKEN(0x7b50); return; }
-  CYC(0x7b50, 0x7b51);
-  CYC(0x7b51, 0x7b54);
+  CALL_C(b_+0, timewarp_animate_hook, SYM(timewarp_animate), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; }
+  CYC(b_+3, b_+4);
+  CYC(b_+4, SYM(timewarp_subid4));
   interactionDelete_hook(gb);
 }
 
 void timewarp_subid0_hook(GB *gb) {
+  BASE(timewarp_subid0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x7a08, 0x7a0a); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x7a0a, 0x7a0b); A = mem_rd(gb, DE);
-  CYC(0x7a0b, 0x7a0c); push_effect(gb, 0x7a0c);
-  switch (timewarp_jump_table(gb)) {
-    case 0x7a14: timewarp_common_state0_hook(gb); return;
-    case 0x7a28: timewarp_subid0_state1_hook(gb); return;
-    case 0x7a50: timewarp_subid0_state2_hook(gb); return;
-    case 0x7aaf: timewarp_animateUntilFinished_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (timewarp_jump_table(gb));
+    if (jt_ == SYM(timewarp_common_state0)) { timewarp_common_state0_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid0_state1)) { timewarp_subid0_state1_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid0_state2)) { timewarp_subid0_state2_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_animateUntilFinished)) { timewarp_animateUntilFinished_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void timewarp_subid1_hook(GB *gb) {
+  BASE(timewarp_subid1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x7ab6, 0x7ab8); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x7ab8, 0x7ab9); A = mem_rd(gb, DE);
-  CYC(0x7ab9, 0x7aba); push_effect(gb, 0x7aba);
-  switch (timewarp_jump_table(gb)) {
-    case 0x7a14: timewarp_common_state0_hook(gb); return;
-    case 0x7ac0: timewarp_subid1_state1_hook(gb); return;
-    case 0x7aaf: timewarp_animateUntilFinished_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (timewarp_jump_table(gb));
+    if (jt_ == SYM(timewarp_common_state0)) { timewarp_common_state0_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid1_state1)) { timewarp_subid1_state1_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_animateUntilFinished)) { timewarp_animateUntilFinished_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void timewarp_subid2_hook(GB *gb) {
+  BASE(timewarp_subid2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x7adc, 0x7ade); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x7ade, 0x7adf); A = mem_rd(gb, DE);
-  CYC(0x7adf, 0x7ae0); push_effect(gb, 0x7ae0);
-  switch (timewarp_jump_table(gb)) {
-    case 0x7ae6: goto state0;
-    case 0x7af7: goto state1;
-    case 0x7afe: goto state2;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (timewarp_jump_table(gb));
+    if (jt_ == b_+10) { goto state0; }
+    else if (jt_ == b_+27) { goto state1; }
+    else if (jt_ == b_+34) { goto state2; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 state0:
-  CALL_C(0x7ae6, interactionInitGraphics_hook, 0x15fb, 0x7ae9);
-  CALL_C(0x7ae9, interactionIncState_hook, 0x23e0, 0x7aec);
-  CYC(0x7aec, 0x7aee); L = INTERACTION_BASE + OBJ_SPEED_TMP;
-  CYC(0x7aee, 0x7af0); mem_wr(gb, HL, 0xfc);
-  CYC(0x7af0, 0x7af2); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x7af2, 0x7af4); mem_wr(gb, HL, 0x06);
-  CYC(0x7af4, 0x7af7);
+  CALL_C(b_+10, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+13);
+  CALL_C(b_+13, interactionIncState_hook, SYM(interactionIncState), b_+16);
+  CYC(b_+16, b_+18); L = INTERACTION_BASE + OBJ_SPEED_TMP;
+  CYC(b_+18, b_+20); mem_wr(gb, HL, 0xfc);
+  CYC(b_+20, b_+22); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+22, b_+24); mem_wr(gb, HL, 0x06);
+  CYC(b_+24, b_+27);
   objectSetVisible81_hook(gb);
   return;
 state1:
-  CALL_C(0x7af7, timewarp_animate_hook, 0x7b60, 0x7afa);
-  if (!(F & FZ)) { RET_TAKEN(0x7afa); return; }
-  CYC(0x7afa, 0x7afb);
-  CYC(0x7afb, 0x7afe);
+  CALL_C(b_+27, timewarp_animate_hook, SYM(timewarp_animate), b_+30);
+  if (!(F & FZ)) { RET_TAKEN(b_+30); return; }
+  CYC(b_+30, b_+31);
+  CYC(b_+31, b_+34);
   interactionIncState_hook(gb);
   return;
 state2:
-  CALL_C(0x7afe, objectApplyComponentSpeed_hook, 0x2008, 0x7b01);
-  CYC(0x7b01, 0x7b03); E = INTERACTION_BASE + OBJ_YH;
-  CYC(0x7b03, 0x7b04); A = mem_rd(gb, DE);
-  CYC(0x7b04, 0x7b06); alu_cp(gb, 0xf0);
+  CALL_C(b_+34, objectApplyComponentSpeed_hook, SYM(objectApplyComponentSpeed), b_+37);
+  CYC(b_+37, b_+39); E = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+39, b_+40); A = mem_rd(gb, DE);
+  CYC(b_+40, b_+42); alu_cp(gb, 0xf0);
   if (!(F & FC)) {
-    CYCT(0x7b06, 0x7b09);
+    CYCT(b_+42, b_+45);
     interactionDelete_hook(gb);
     return;
   }
-  CYC(0x7b06, 0x7b09);
-  CALL_C(0x7b09, interactionDecCounter1_hook, 0x23cc, 0x7b0c);
-  if (!(F & FZ)) { RET_TAKEN(0x7b0c); return; }
-  CYC(0x7b0c, 0x7b0d);
-  CYC(0x7b0d, 0x7b0f); mem_wr(gb, HL, 0x06);
-  CYC(0x7b0f, 0x7b12); SET_BC(0x8401);
-  CALL_C(0x7b12, objectCreateInteraction_hook, 0x24c5, 0x7b15);
-  if (!(F & FZ)) { RET_TAKEN(0x7b15); return; }
-  CYC(0x7b15, 0x7b16);
-  CYC(0x7b16, 0x7b18); L = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x7b18, 0x7b19); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  RET(0x7b19); return;
+  CYC(b_+42, b_+45);
+  CALL_C(b_+45, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+48);
+  if (!(F & FZ)) { RET_TAKEN(b_+48); return; }
+  CYC(b_+48, b_+49);
+  CYC(b_+49, b_+51); mem_wr(gb, HL, 0x06);
+  CYC(b_+51, b_+54); SET_BC(0x8401);
+  CALL_C(b_+54, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+57);
+  if (!(F & FZ)) { RET_TAKEN(b_+57); return; }
+  CYC(b_+57, b_+58);
+  CYC(b_+58, b_+60); L = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+60, b_+61); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  RET(b_+61); return;
 }
 
 void timewarp_subid3_hook(GB *gb) {
+  BASE(timewarp_subid3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x7b1a, 0x7b1c); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x7b1c, 0x7b1d); A = mem_rd(gb, DE);
-  CYC(0x7b1d, 0x7b1e); push_effect(gb, 0x7b1e);
-  switch (timewarp_jump_table(gb)) {
-    case 0x7b28: itemwarp_subid3Or4_state0_hook(gb); return;
-    case 0x7b39: timewarp_subid3_state1_hook(gb); return;
-    case 0x261b: interactionAnimate_hook(gb); return;
-    case 0x7b45: timewarp_subid3Or4_state3_hook(gb); return;
-    case 0x7b4d: timewarp_subid3Or4_state4_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (timewarp_jump_table(gb));
+    if (jt_ == SYM(itemwarp_subid3Or4_state0)) { itemwarp_subid3Or4_state0_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid3_state1)) { timewarp_subid3_state1_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid3Or4_state3)) { timewarp_subid3Or4_state3_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid3Or4_state4)) { timewarp_subid3Or4_state4_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void timewarp_subid4_hook(GB *gb) {
+  BASE(timewarp_subid4);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x7b54, 0x7b56); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x7b56, 0x7b57); A = mem_rd(gb, DE);
-  CYC(0x7b57, 0x7b58); push_effect(gb, 0x7b58);
-  switch (timewarp_jump_table(gb)) {
-    case 0x7b28: itemwarp_subid3Or4_state0_hook(gb); return;
-    case 0x261b: interactionAnimate_hook(gb); return;
-    case 0x7b45: timewarp_subid3Or4_state3_hook(gb); return;
-    case 0x7b4d: timewarp_subid3Or4_state4_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (timewarp_jump_table(gb));
+    if (jt_ == SYM(itemwarp_subid3Or4_state0)) { itemwarp_subid3Or4_state0_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid3Or4_state3)) { timewarp_subid3Or4_state3_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid3Or4_state4)) { timewarp_subid3Or4_state4_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void interactionCodedd_hook(GB *gb) {
+  BASE(interactionCodedd);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x79fa, 0x79fc); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x79fc, 0x79fd); A = mem_rd(gb, DE);
-  CYC(0x79fd, 0x79fe); push_effect(gb, 0x79fe);
-  switch (timewarp_jump_table(gb)) {
-    case 0x7a08: timewarp_subid0_hook(gb); return;
-    case 0x7ab6: timewarp_subid1_hook(gb); return;
-    case 0x7adc: timewarp_subid2_hook(gb); return;
-    case 0x7b1a: timewarp_subid3_hook(gb); return;
-    case 0x7b54: timewarp_subid4_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (timewarp_jump_table(gb));
+    if (jt_ == SYM(timewarp_subid0)) { timewarp_subid0_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid1)) { timewarp_subid1_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid2)) { timewarp_subid2_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid3)) { timewarp_subid3_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid4)) { timewarp_subid4_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }

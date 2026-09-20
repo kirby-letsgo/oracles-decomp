@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(kingMoblinDefeated_setGoronDirection), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(kingMoblinDefeated_setGoronDirection), (from), (to), true)
 
 static void kingMoblinDefeated_add_double_index(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -18,22 +18,24 @@ static void kingMoblinDefeated_add_double_index(GB *gb, uint16_t return_address)
 }
 
 void kingMoblinDefeated_setGoronDirection_hook(GB *gb) {
-  CYC(0x6f13, 0x6f16); SET_HL(0x6f1f);
-  CYC(0x6f16, 0x6f17); kingMoblinDefeated_add_double_index(gb, 0x6f17);
-  CYC(0x6f17, 0x6f19); E = 0x49;
-  CYC(0x6f19, 0x6f1a); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x6f1a, 0x6f1b); mem_wr(gb, DE, A);
-  CYC(0x6f1b, 0x6f1c); A = mem_rd(gb, HL);
-  CYC(0x6f1c, 0x6f1f); interactionSetAnimation_hook(gb);
+  BASE(kingMoblinDefeated_setGoronDirection);
+  CYC(b_+0, b_+3); SET_HL(b_+12);
+  CYC(b_+3, b_+4); kingMoblinDefeated_add_double_index(gb, b_+4);
+  CYC(b_+4, b_+6); E = 0x49;
+  CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+7, b_+8); mem_wr(gb, DE, A);
+  CYC(b_+8, b_+9); A = mem_rd(gb, HL);
+  CYC(b_+9, b_+12); interactionSetAnimation_hook(gb);
 }
 
 void kingMoblinDefeated_spawnInteraction8a_hook(GB *gb) {
+  BASE(kingMoblinDefeated_spawnInteraction8a);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6f27, getFreeInteractionSlot_hook, 0x3aef, 0x6f2a);
-  if (!(F & FZ)) { RET_TAKEN(0x6f2a); return; }
-  CYC(0x6f2a, 0x6f2b);
-  CYC(0x6f2b, 0x6f2d); mem_wr(gb, HL, 0x8a);
-  CYC(0x6f2d, 0x6f2f); L = 0x43;
-  CYC(0x6f2f, 0x6f31); mem_wr(gb, HL, 0x06);
-  CYC(0x6f31, 0x6f32); ret_effect(gb);
+  CALL_C(b_+0, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; }
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+6); mem_wr(gb, HL, 0x8a);
+  CYC(b_+6, b_+8); L = 0x43;
+  CYC(b_+8, b_+10); mem_wr(gb, HL, 0x06);
+  CYC(b_+10, SYM(ghiniHarassingMoosh_beginCircularMovement)); ret_effect(gb);
 }

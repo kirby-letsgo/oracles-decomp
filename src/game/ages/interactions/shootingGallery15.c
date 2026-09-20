@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(shootingGallery_cpScore), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(shootingGallery_cpScore), (from), (to), true)
 
 void shootingGallery_cpScore_hook(GB *gb);
 void shootingGallery_equipSword_hook(GB *gb);
@@ -63,291 +63,323 @@ static void shootingGallery_addDoubleIndexToHl_from_rst(GB *gb, uint16_t return_
 }
 
 static void shootingGallery_cpScoreImpl(GB *gb, uint16_t sp0_) {
-  CYC(0x5074, 0x5077); SET_HL(0x508b);
-  CYC(0x5077, 0x5078); shootingGallery_addDoubleIndexToHl_from_rst(gb, 0x5078);
-  CYC(0x5078, 0x5079); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x5079, 0x507a); B = mem_rd(gb, HL);
-  CYC(0x507a, 0x507b); C = A;
-  CYC(0x507b, 0x507e); SET_HL(wTextNumberSubstitution);
-  CYC(0x507e, 0x507f); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x507f, 0x5080); H = mem_rd(gb, HL);
-  CYC(0x5080, 0x5081); L = A;
-  CALL_C(0x5081, compareHlToBc_hook, 0x01d6, 0x5084);
-  CYC(0x5084, 0x5085); A = alu_inc8(gb, A);
+  BASE(shootingGallery_cpScore);
+  CYC(b_+6, b_+9); SET_HL(b_+29);
+  CYC(b_+9, b_+10); shootingGallery_addDoubleIndexToHl_from_rst(gb, b_+10);
+  CYC(b_+10, b_+11); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+11, b_+12); B = mem_rd(gb, HL);
+  CYC(b_+12, b_+13); C = A;
+  CYC(b_+13, b_+16); SET_HL(wTextNumberSubstitution);
+  CYC(b_+16, b_+17); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+17, b_+18); H = mem_rd(gb, HL);
+  CYC(b_+18, b_+19); L = A;
+  CALL_C(b_+19, compareHlToBc_hook, SYM(compareHlToBc), b_+22);
+  CYC(b_+22, b_+23); A = alu_inc8(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x5085, 0x5087);
+    CYCT(b_+23, b_+25);
     goto notEqual;
   }
-  CYC(0x5085, 0x5087);
-  CYC(0x5087, 0x5088); A = alu_inc8(gb, A);
-  RET(0x5088);
+  CYC(b_+23, b_+25);
+  CYC(b_+25, b_+26); A = alu_inc8(gb, A);
+  RET(b_+26);
   return;
 
 notEqual:
-  CYC(0x5089, 0x508a); alu_xor(gb, A);
-  RET(0x508a);
+  CYC(b_+27, b_+28); alu_xor(gb, A);
+  RET(b_+28);
 }
 
 void shootingGallery_cpScore_hook(GB *gb) {
+  BASE(shootingGallery_cpScore);
   uint16_t sp0_ = gb->sp;
-  CYC(0x506e, 0x5071); push_effect(gb, 0x5071); shootingGallery_cpScoreImpl(gb, sp0_);
-  CYC(0x5071, 0x5074); writeFlagsTocddb_hook(gb);
+  CYC(b_+0, b_+3); push_effect(gb, b_+3); shootingGallery_cpScoreImpl(gb, sp0_);
+  CYC(b_+3, b_+6); writeFlagsTocddb_hook(gb);
 }
 
 void shootingGallery_equipSword_hook(GB *gb) {
-  CYC(0x509d, 0x50a0); SET_HL(hFF8A);
-  CYC(0x50a0, 0x50a3); A = mem_rd(gb, wInventoryA);
-  CYC(0x50a3, 0x50a5); alu_cp(gb, 0x05);
+  BASE(shootingGallery_equipSword);
+  CYC(b_+0, b_+3); SET_HL(hFF8A);
+  CYC(b_+3, b_+6); A = mem_rd(gb, wInventoryA);
+  CYC(b_+6, b_+8); alu_cp(gb, 0x05);
   if (!(F & FZ)) {
-    CYCT(0x50a5, 0x50a7);
+    CYCT(b_+8, b_+10);
     goto equipOnB;
   }
-  CYC(0x50a5, 0x50a7);
-  CYC(0x50a7, 0x50a8); alu_xor(gb, A);
-  CYC(0x50a8, 0x50a9); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x50a9, 0x50ab); A = 0x05;
-  CYC(0x50ab, 0x50ac); mem_wr(gb, HL, A);
-  CYC(0x50ac, 0x50ae);
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+11); alu_xor(gb, A);
+  CYC(b_+11, b_+12); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+12, b_+14); A = 0x05;
+  CYC(b_+14, b_+15); mem_wr(gb, HL, A);
+  CYC(b_+15, b_+17);
   shootingGallery_changeEquips_hook(gb);
   return;
 
 equipOnB:
-  CYC(0x50ae, 0x50b0); A = 0x05;
-  CYC(0x50b0, 0x50b1); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x50b1, 0x50b2); alu_xor(gb, A);
-  CYC(0x50b2, 0x50b3); mem_wr(gb, HL, A);
-  CYC(0x50b3, 0x50b5);
+  CYC(b_+17, b_+19); A = 0x05;
+  CYC(b_+19, b_+20); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+20, b_+21); alu_xor(gb, A);
+  CYC(b_+21, b_+22); mem_wr(gb, HL, A);
+  CYC(b_+22, SYM(shootingGallery_equipBiggoronSword));
   shootingGallery_changeEquips_hook(gb);
 }
 
 void shootingGallery_equipBiggoronSword_hook(GB *gb) {
-  CYC(0x50b5, 0x50b8); SET_HL(hFF8A);
-  CYC(0x50b8, 0x50ba); A = 0x0c;
-  CYC(0x50ba, 0x50bb); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x50bb, 0x50bc); mem_wr(gb, HL, A);
+  BASE(shootingGallery_equipBiggoronSword);
+  CYC(b_+0, b_+3); SET_HL(hFF8A);
+  CYC(b_+3, b_+5); A = 0x0c;
+  CYC(b_+5, b_+6); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+6, SYM(shootingGallery_changeEquips)); mem_wr(gb, HL, A);
   shootingGallery_changeEquips_hook(gb);
 }
 
 void shootingGallery_changeEquips_hook(GB *gb) {
-  CYC(0x50bc, 0x50bf); SET_BC(wInventoryB);
-  CYC(0x50bf, 0x50c2); SET_HL(wTmpcfc0_shootingGallery_savedBItem);
-  CYC(0x50c2, 0x50c3); A = mem_rd(gb, BC);
-  CYC(0x50c3, 0x50c4); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x50c4, 0x50c6); A = hram_rd(gb, 0x8a);
-  CYC(0x50c6, 0x50c7); mem_wr(gb, BC, A);
-  CYC(0x50c7, 0x50c8); C = alu_inc8(gb, C);
-  CYC(0x50c8, 0x50c9); A = mem_rd(gb, BC);
-  CYC(0x50c9, 0x50ca); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x50ca, 0x50cc); A = hram_rd(gb, 0x8b);
-  CYC(0x50cc, 0x50cd); mem_wr(gb, BC, A);
-  CYC(0x50cd, 0x50cf); A = 0xff;
-  CYC(0x50cf, 0x50d2); mem_wr(gb, wStatusBarNeedsRefresh, A);
-  RET(0x50d2);
+  BASE(shootingGallery_changeEquips);
+  CYC(b_+0, b_+3); SET_BC(wInventoryB);
+  CYC(b_+3, b_+6); SET_HL(wTmpcfc0_shootingGallery_savedBItem);
+  CYC(b_+6, b_+7); A = mem_rd(gb, BC);
+  CYC(b_+7, b_+8); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+8, b_+10); A = hram_rd(gb, 0x8a);
+  CYC(b_+10, b_+11); mem_wr(gb, BC, A);
+  CYC(b_+11, b_+12); C = alu_inc8(gb, C);
+  CYC(b_+12, b_+13); A = mem_rd(gb, BC);
+  CYC(b_+13, b_+14); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+14, b_+16); A = hram_rd(gb, 0x8b);
+  CYC(b_+16, b_+17); mem_wr(gb, BC, A);
+  CYC(b_+17, b_+19); A = 0xff;
+  CYC(b_+19, b_+22); mem_wr(gb, wStatusBarNeedsRefresh, A);
+  RET(b_+22);
 }
 
 void shootingGallery_restoreEquips_hook(GB *gb) {
-  CYC(0x50d3, 0x50d6); SET_BC(wInventoryB);
-  CYC(0x50d6, 0x50d9); SET_HL(wTmpcfc0_shootingGallery_savedBItem);
-  CYC(0x50d9, 0x50da); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x50da, 0x50db); mem_wr(gb, BC, A);
-  CYC(0x50db, 0x50dc); C = alu_inc8(gb, C);
-  CYC(0x50dc, 0x50dd); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x50dd, 0x50de); mem_wr(gb, BC, A);
-  CYC(0x50de, 0x50e0); A = 0xff;
-  CYC(0x50e0, 0x50e3); mem_wr(gb, wStatusBarNeedsRefresh, A);
-  RET(0x50e3);
+  BASE(shootingGallery_restoreEquips);
+  CYC(b_+0, b_+3); SET_BC(wInventoryB);
+  CYC(b_+3, b_+6); SET_HL(wTmpcfc0_shootingGallery_savedBItem);
+  CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+7, b_+8); mem_wr(gb, BC, A);
+  CYC(b_+8, b_+9); C = alu_inc8(gb, C);
+  CYC(b_+9, b_+10); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+10, b_+11); mem_wr(gb, BC, A);
+  CYC(b_+11, b_+13); A = 0xff;
+  CYC(b_+13, b_+16); mem_wr(gb, wStatusBarNeedsRefresh, A);
+  RET(b_+16);
 }
 
 void func_50e4_hook(GB *gb) {
-  CYC(0x50e4, 0x50e7); A = mem_rd(gb, w1Link_yh);
-  CYC(0x50e7, 0x50e8); B = A;
-  CYC(0x50e8, 0x50eb); A = mem_rd(gb, w1Link_xh);
-  CYC(0x50eb, 0x50ec); C = A;
-  CYC(0x50ec, 0x50ee); A = 0x6e;
-  CYC(0x50ee, 0x50f1); createEnergySwirlGoingIn_hook(gb);
+  BASE(func_50e4);
+  CYC(b_+0, b_+3); A = mem_rd(gb, w1Link_yh);
+  CYC(b_+3, b_+4); B = A;
+  CYC(b_+4, b_+7); A = mem_rd(gb, w1Link_xh);
+  CYC(b_+7, b_+8); C = A;
+  CYC(b_+8, b_+10); A = 0x6e;
+  CYC(b_+10, SYM(createSparkle)); createEnergySwirlGoingIn_hook(gb);
 }
 
 void createSparkle_hook(GB *gb) {
-  CYC(0x50f1, 0x50f3); B = 0x84;
-  CYC(0x50f3, 0x50f6); objectCreateInteractionWithSubid00_hook(gb);
+  BASE(createSparkle);
+  CYC(b_+0, b_+2); B = 0x84;
+  CYC(b_+2, SYM(shootingGallery_removeAllTargets_b15)); objectCreateInteractionWithSubid00_hook(gb);
 }
 
 void shootingGallery_removeAllTargets_b15_hook(GB *gb) {
-  CYC(0x50f6, 0x50f9); SET_HL(0x57bd);
-  CYC(0x50f9, 0x50fb); E = 0x08;
-  CYC(0x50fb, 0x50fe); interBankCall_hook(gb);
+  BASE(shootingGallery_removeAllTargets_b15);
+  CYC(b_+0, b_+3); SET_HL((SYM(ralphSubid0cScript__landed_b15) + 7));
+  CYC(b_+3, b_+5); E = 0x08;
+  CYC(b_+5, SYM(shootingGallery_setEntranceTiles)); interBankCall_hook(gb);
 }
 
 void shootingGallery_setEntranceTiles_hook(GB *gb) {
+  BASE(shootingGallery_setEntranceTiles);
   uint16_t sp0_ = gb->sp;
-  CYC(0x50fe, 0x5101); SET_HL(0x5111);
-  CYC(0x5101, 0x5102); shootingGallery_addAToHl_from_rst(gb, 0x5102);
-  CYC(0x5102, 0x5104); C = 0x74;
+  CYC(b_+0, b_+3); SET_HL(b_+19);
+  CYC(b_+3, b_+4); shootingGallery_addAToHl_from_rst(gb, b_+4);
+  CYC(b_+4, b_+6); C = 0x74;
 
 loop:
-  CYC(0x5104, 0x5105); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x5105, 0x5106); push_effect(gb, HL);
-  CALL_C(0x5106, setTile_hook, 0x3a9c, 0x5109);
-  CYC(0x5109, 0x510a); SET_HL(pop_effect(gb));
-  CYC(0x510a, 0x510b); C = alu_inc8(gb, C);
-  CYC(0x510b, 0x510c); A = C;
-  CYC(0x510c, 0x510e); alu_cp(gb, 0x76);
+  CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+7, b_+8); push_effect(gb, HL);
+  CALL_C(b_+8, setTile_hook, SYM(setTile), b_+11);
+  CYC(b_+11, b_+12); SET_HL(pop_effect(gb));
+  CYC(b_+12, b_+13); C = alu_inc8(gb, C);
+  CYC(b_+13, b_+14); A = C;
+  CYC(b_+14, b_+16); alu_cp(gb, 0x76);
   if (!(F & FZ)) {
-    CYCT(0x510e, 0x5110);
+    CYCT(b_+16, b_+18);
     goto loop;
   }
-  CYC(0x510e, 0x5110);
-  RET(0x5110);
+  CYC(b_+16, b_+18);
+  RET(b_+18);
 }
 
 void shootingGallery_checkLinkHasRupees_hook(GB *gb) {
+  BASE(shootingGallery_checkLinkHasRupees);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x5115, cpRupeeValue_hook, 0x1765, 0x5118);
+  CALL_C(b_+0, cpRupeeValue_hook, SYM(cpRupeeValue), SYM(writeFlagsTocddb));
   writeFlagsTocddb_hook(gb);
 }
 
 void writeFlagsTocddb_hook(GB *gb) {
-  CYC(0x5118, 0x5119); push_effect(gb, AF);
-  CYC(0x5119, 0x511a); SET_BC(pop_effect(gb));
-  CYC(0x511a, 0x511b); A = C;
-  CYC(0x511b, 0x511e); mem_wr(gb, wcddb, A);
-  RET(0x511e);
+  BASE(writeFlagsTocddb);
+  CYC(b_+0, b_+1); push_effect(gb, AF);
+  CYC(b_+1, b_+2); SET_BC(pop_effect(gb));
+  CYC(b_+2, b_+3); A = C;
+  CYC(b_+3, b_+6); mem_wr(gb, wcddb, A);
+  RET(b_+6);
 }
 
 void giveRupees_hook(GB *gb) {
-  CYC(0x511f, 0x5120); C = A;
-  CYC(0x5120, 0x5122); A = 0x28;
-  CYC(0x5122, 0x5125); giveTreasure_hook(gb);
+  BASE(giveRupees);
+  CYC(b_+0, b_+1); C = A;
+  CYC(b_+1, b_+3); A = 0x28;
+  CYC(b_+3, SYM(giveHealthRefill)); giveTreasure_hook(gb);
 }
 
 static void shootingGallery_giveHealthFromC(GB *gb) {
-  CYC(0x512e, 0x5130); A = 0x29;
-  CYC(0x5130, 0x5133); giveTreasure_hook(gb);
+  BASE(giveHealth);
+  CYC(b_+1, b_+3); A = 0x29;
+  CYC(b_+3, SYM(giveRingAToLink)); giveTreasure_hook(gb);
 }
 
 void giveHealthRefill_hook(GB *gb) {
-  CYC(0x5125, 0x5127); C = 0x40;
-  CYC(0x5127, 0x5129);
+  BASE(giveHealthRefill);
+  CYC(b_+0, b_+2); C = 0x40;
+  CYC(b_+2, SYM(shootingGallery_giveOneHeart));
   shootingGallery_giveHealthFromC(gb);
 }
 
 void shootingGallery_giveOneHeart_hook(GB *gb) {
-  CYC(0x5129, 0x512b); C = 0x04;
-  CYC(0x512b, 0x512d);
+  BASE(shootingGallery_giveOneHeart);
+  CYC(b_+0, b_+2); C = 0x04;
+  CYC(b_+2, SYM(giveHealth));
   shootingGallery_giveHealthFromC(gb);
 }
 
 void giveHealth_hook(GB *gb) {
-  CYC(0x512d, 0x512e); C = A;
+  BASE(giveHealth);
+  CYC(b_+0, b_+1); C = A;
   shootingGallery_giveHealthFromC(gb);
 }
 
 void giveRingAToLink_hook(GB *gb) {
-  CYC(0x5133, 0x5134); B = A;
-  CYC(0x5134, 0x5136); C = 0x00;
-  CYC(0x5136, 0x5139); giveRingToLink_hook(gb);
+  BASE(giveRingAToLink);
+  CYC(b_+0, b_+1); B = A;
+  CYC(b_+1, b_+3); C = 0x00;
+  CYC(b_+3, SYM(shootingGallery_giveRandomRingToLink)); giveRingToLink_hook(gb);
 }
 
 void shootingGallery_giveRandomRingToLink_hook(GB *gb) {
+  BASE(shootingGallery_giveRandomRingToLink);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x5139, getRandomNumber_hook, 0x043e, 0x513c);
-  CYC(0x513c, 0x513e); alu_and(gb, 0x0f);
-  CYC(0x513e, 0x5141); SET_HL(0x5145);
-  CYC(0x5141, 0x5142); shootingGallery_addAToHl_from_rst(gb, 0x5142);
-  CYC(0x5142, 0x5143); A = mem_rd(gb, HL);
-  CYC(0x5143, 0x5145);
+  CALL_C(b_+0, getRandomNumber_hook, SYM(getRandomNumber), b_+3);
+  CYC(b_+3, b_+5); alu_and(gb, 0x0f);
+  CYC(b_+5, b_+8); SET_HL(b_+12);
+  CYC(b_+8, b_+9); shootingGallery_addAToHl_from_rst(gb, b_+9);
+  CYC(b_+9, b_+10); A = mem_rd(gb, HL);
+  CYC(b_+10, b_+12);
   giveRingAToLink_hook(gb);
 }
 
 void forceLinkDirection_hook(GB *gb) {
-  CYC(0x5155, 0x5158); SET_HL(w1Link_direction);
-  CYC(0x5158, 0x5159); mem_wr(gb, HL, A);
-  CYC(0x5159, 0x515c); setLinkForceStateToState08_hook(gb);
+  BASE(forceLinkDirection);
+  CYC(b_+0, b_+3); SET_HL(w1Link_direction);
+  CYC(b_+3, b_+4); mem_wr(gb, HL, A);
+  CYC(b_+4, SYM(shootingGallery_initLinkPosition)); setLinkForceStateToState08_hook(gb);
 }
 
 static void shootingGallery_setLinkPositionTail(GB *gb) {
-  CYC(0x516f, 0x5172); SET_HL(w1Link_yh);
-  CYC(0x5172, 0x5173); mem_wr(gb, HL, B);
-  CYC(0x5173, 0x5175); L = 0x0d;
-  CYC(0x5175, 0x5176); mem_wr(gb, HL, C);
+  BASE(shootingGallery_initLinkPositionAfterBiggoronGame);
+  CYC(b_+5, b_+8); SET_HL(w1Link_yh);
+  CYC(b_+8, b_+9); mem_wr(gb, HL, B);
+  CYC(b_+9, b_+11); L = 0x0d;
+  CYC(b_+11, SYM(setLinkToState08AndSetDirection)); mem_wr(gb, HL, C);
   setLinkToState08AndSetDirection_hook(gb);
 }
 
 void shootingGallery_initLinkPosition_hook(GB *gb) {
-  CYC(0x515c, 0x515e); A = 0x00;
-  CYC(0x515e, 0x5161); SET_BC(0x6050);
-  CYC(0x5161, 0x5163);
+  BASE(shootingGallery_initLinkPosition);
+  CYC(b_+0, b_+2); A = 0x00;
+  CYC(b_+2, b_+5); SET_BC((SYM(hardhatWorkerSubid03Script_b15) + 2));
+  CYC(b_+5, SYM(shootingGallery_initLinkPositionAfterGame));
   shootingGallery_setLinkPositionTail(gb);
 }
 
 void shootingGallery_initLinkPositionAfterGame_hook(GB *gb) {
-  CYC(0x5163, 0x5165); A = 0x01;
-  CYC(0x5165, 0x5168); SET_BC(0x6868);
-  CYC(0x5168, 0x516a);
+  BASE(shootingGallery_initLinkPositionAfterGame);
+  CYC(b_+0, b_+2); A = 0x01;
+  CYC(b_+2, b_+5); SET_BC((SYM(goron_targetCarts_reloadCrystalsInFirstRoom__nextCrystal) + 3));
+  CYC(b_+5, SYM(shootingGallery_initLinkPositionAfterBiggoronGame));
   shootingGallery_setLinkPositionTail(gb);
 }
 
 void shootingGallery_initLinkPositionAfterBiggoronGame_hook(GB *gb) {
-  CYC(0x516a, 0x516c); A = 0x03;
-  CYC(0x516c, 0x516f); SET_BC(0x6838);
+  BASE(shootingGallery_initLinkPositionAfterBiggoronGame);
+  CYC(b_+0, b_+2); A = 0x03;
+  CYC(b_+2, b_+5); SET_BC((SYM(goron_targetCarts_restoreInventory) + 24));
   shootingGallery_setLinkPositionTail(gb);
 }
 
 void setLinkToState08AndSetDirection_hook(GB *gb) {
-  CYC(0x5176, 0x5179); SET_HL(w1Link_direction);
-  CYC(0x5179, 0x517a); mem_wr(gb, HL, A);
+  BASE(setLinkToState08AndSetDirection);
+  CYC(b_+0, b_+3); SET_HL(w1Link_direction);
+  CYC(b_+3, SYM(setLinkToState08)); mem_wr(gb, HL, A);
   setLinkToState08_hook(gb);
 }
 
 void setLinkToState08_hook(GB *gb) {
+  BASE(setLinkToState08);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x517a, putLinkOnGround_hook, 0x2a8c, 0x517d);
-  CYC(0x517d, 0x5180); setLinkForceStateToState08_hook(gb);
+  CALL_C(b_+0, putLinkOnGround_hook, SYM(putLinkOnGround), b_+3);
+  CYC(b_+3, SYM(checkIsLinkedGameForScript)); setLinkForceStateToState08_hook(gb);
 }
 
 void checkIsLinkedGameForScript_hook(GB *gb) {
+  BASE(checkIsLinkedGameForScript);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x5180, checkIsLinkedGame_hook, 0x1992, 0x5183);
-  CYC(0x5183, 0x5186); writeFlagsTocddb_hook(gb);
+  CALL_C(b_+0, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+3);
+  CYC(b_+3, SYM(shootingGallery_checkIsNotLinkedGame)); writeFlagsTocddb_hook(gb);
 }
 
 void shootingGallery_checkIsNotLinkedGame_hook(GB *gb) {
+  BASE(shootingGallery_checkIsNotLinkedGame);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x5186, checkIsLinkedGame_hook, 0x1992, 0x5189);
-  CALL_C(0x5189, writeFlagsTocddb_hook, 0x5118, 0x518c);
-  CYC(0x518c, 0x518d); alu_cpl(gb);
-  CYC(0x518d, 0x5190); mem_wr(gb, wcddb, A);
-  RET(0x5190);
+  CALL_C(b_+0, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+3);
+  CALL_C(b_+3, writeFlagsTocddb_hook, SYM(writeFlagsTocddb), b_+6);
+  CYC(b_+6, b_+7); alu_cpl(gb);
+  CYC(b_+7, b_+10); mem_wr(gb, wcddb, A);
+  RET(b_+10);
 }
 
 void beginJump_hook(GB *gb) {
-  CYC(0x5191, 0x5192); H = D;
-  CYC(0x5192, 0x5194); L = INTERACTION_BASE + OBJ_SPEED_Z;
-  CYC(0x5194, 0x5196); mem_wr(gb, HL, 0x00);
-  CYC(0x5196, 0x5197); SET_HL(HL + 1);
-  CYC(0x5197, 0x5199); mem_wr(gb, HL, 0xfe);
-  CYC(0x5199, 0x519b); A = 0x53;
-  CYC(0x519b, 0x519e); playSound_b00_hook(gb);
+  BASE(beginJump);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_SPEED_Z;
+  CYC(b_+3, b_+5); mem_wr(gb, HL, 0x00);
+  CYC(b_+5, b_+6); SET_HL(HL + 1);
+  CYC(b_+6, b_+8); mem_wr(gb, HL, 0xfe);
+  CYC(b_+8, b_+10); A = 0x53;
+  CYC(b_+10, SYM(updateGravity)); playSound_b00_hook(gb);
 }
 
 void updateGravity_hook(GB *gb) {
+  BASE(updateGravity);
   uint16_t sp0_ = gb->sp;
-  CYC(0x519e, 0x51a0); C = 0x30;
-  CALL_C(0x51a0, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x51a3);
-  CYC(0x51a3, 0x51a6); writeFlagsTocddb_hook(gb);
+  CYC(b_+0, b_+2); C = 0x30;
+  CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
+  CYC(b_+5, SYM(addToccd4)); writeFlagsTocddb_hook(gb);
 }
 
 void addToccd4_hook(GB *gb) {
-  CYC(0x51a6, 0x51a9); SET_HL(wShootingGalleryHitTargets);
-  CYC(0x51a9, 0x51ab);
-  CYC(0x51ae, 0x51af); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x51af, 0x51b0); mem_wr(gb, HL, A);
-  RET(0x51b0);
+  BASE(addTocfc0);
+  CYC(SYM(addToccd4), (SYM(addToccd4) + 3)); SET_HL(wShootingGalleryHitTargets);
+  CYC((SYM(addToccd4) + 3), b_+0);
+  CYC(b_+3, b_+4); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+4, b_+5); mem_wr(gb, HL, A);
+  RET(b_+5);
 }
 
 void addTocfc0_hook(GB *gb) {
-  CYC(0x51ab, 0x51ae); SET_HL(wTmpcfc0);
-  CYC(0x51ae, 0x51af); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x51af, 0x51b0); mem_wr(gb, HL, A);
-  RET(0x51b0);
+  BASE(addTocfc0);
+  CYC(b_+0, b_+3); SET_HL(wTmpcfc0);
+  CYC(b_+3, b_+4); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+4, b_+5); mem_wr(gb, HL, A);
+  RET(b_+5);
 }

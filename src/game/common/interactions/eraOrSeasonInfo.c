@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x10, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x10, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodee0), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodee0), (from), (to), true)
 
 // object_code/common/interactions/eraOrSeasonInfo.s (INTERAC_ERA_OR_SEASON_INFO), bank $10.
 
@@ -27,67 +27,68 @@ static uint16_t interactionCodee0_jump_table(GB *gb) {
 }
 
 void interactionCodee0_hook(GB *gb) {
+  BASE(interactionCodee0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6f00, 0x6f02); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x6f02, 0x6f03); A = mem_rd(gb, DE);
-  CYC(0x6f03, 0x6f04); push_effect(gb, 0x6f04);
-  switch (interactionCodee0_jump_table(gb)) {
-    case 0x6f0c: goto state0;
-    case 0x6f29: goto state1;
-    case 0x6f3a: goto state2;
-    case 0x6f45: goto state3;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (interactionCodee0_jump_table(gb));
+    if (jt_ == b_+12) { goto state0; }
+    else if (jt_ == b_+41) { goto state1; }
+    else if (jt_ == b_+58) { goto state2; }
+    else if (jt_ == b_+69) { goto state3; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 state0:
-  CYC(0x6f0c, 0x6f0e); A = 0x01;
-  CYC(0x6f0e, 0x6f0f); mem_wr(gb, DE, A);
-  CYC(0x6f0f, 0x6f12); A = W8(wTilesetFlags);
-  CYC(0x6f12, 0x6f14); alu_and(gb, 0x80);
-  CYC(0x6f14, 0x6f15); alu_rlca(gb);
-  CYC(0x6f15, 0x6f17); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x6f17, 0x6f18); mem_wr(gb, DE, A);
-  CALL_C(0x6f18, interactionInitGraphics_hook, 0x15fb, 0x6f1b);
-  CALL_C(0x6f1b, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x6f1e);
-  CYC(0x6f1e, 0x6f20); L = INTERACTION_BASE + OBJ_YH;
-  CYC(0x6f20, 0x6f22); mem_wr(gb, HL, 0x0a);
-  CYC(0x6f22, 0x6f24); L = INTERACTION_BASE + OBJ_XH;
-  CYC(0x6f24, 0x6f26); mem_wr(gb, HL, 0xb0);
-  CYC(0x6f26, 0x6f29);
+  CYC(b_+12, b_+14); A = 0x01;
+  CYC(b_+14, b_+15); mem_wr(gb, DE, A);
+  CYC(b_+15, b_+18); A = W8(wTilesetFlags);
+  CYC(b_+18, b_+20); alu_and(gb, 0x80);
+  CYC(b_+20, b_+21); alu_rlca(gb);
+  CYC(b_+21, b_+23); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+23, b_+24); mem_wr(gb, DE, A);
+  CALL_C(b_+24, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+27);
+  CALL_C(b_+27, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+30);
+  CYC(b_+30, b_+32); L = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+32, b_+34); mem_wr(gb, HL, 0x0a);
+  CYC(b_+34, b_+36); L = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+36, b_+38); mem_wr(gb, HL, 0xb0);
+  CYC(b_+38, b_+41);
   objectSetVisible80_hook(gb);
   return;
 state1:
-  CYC(0x6f29, 0x6f2a); H = D;
-  CYC(0x6f2a, 0x6f2c); L = INTERACTION_BASE + OBJ_XH;
-  CYC(0x6f2c, 0x6f2d); A = mem_rd(gb, HL);
-  CYC(0x6f2d, 0x6f2f); alu_sub(gb, 0x04);
-  CYC(0x6f2f, 0x6f30); mem_wr(gb, HL, A);
-  CYC(0x6f30, 0x6f32); alu_cp(gb, 0x10);
-  if (!(F & FZ)) { RET_TAKEN(0x6f32); return; }
-  CYC(0x6f32, 0x6f33);
-  CYC(0x6f33, 0x6f34); L = E;
-  CYC(0x6f34, 0x6f35); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6f35, 0x6f37); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x6f37, 0x6f39); mem_wr(gb, HL, 0x28);
-  RET(0x6f39); return;
+  CYC(b_+41, b_+42); H = D;
+  CYC(b_+42, b_+44); L = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+44, b_+45); A = mem_rd(gb, HL);
+  CYC(b_+45, b_+47); alu_sub(gb, 0x04);
+  CYC(b_+47, b_+48); mem_wr(gb, HL, A);
+  CYC(b_+48, b_+50); alu_cp(gb, 0x10);
+  if (!(F & FZ)) { RET_TAKEN(b_+50); return; }
+  CYC(b_+50, b_+51);
+  CYC(b_+51, b_+52); L = E;
+  CYC(b_+52, b_+53); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+53, b_+55); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+55, b_+57); mem_wr(gb, HL, 0x28);
+  RET(b_+57); return;
 state2:
-  CALL_C(0x6f3a, interactionDecCounter1_hook, 0x23cc, 0x6f3d);
-  if (!(F & FZ)) { RET_TAKEN(0x6f3d); return; }
-  CYC(0x6f3d, 0x6f3e);
-  CYC(0x6f3e, 0x6f3f); L = E;
-  CYC(0x6f3f, 0x6f40); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6f40, 0x6f42); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x6f42, 0x6f44); mem_wr(gb, HL, 0x06);
-  RET(0x6f44); return;
+  CALL_C(b_+58, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+61);
+  if (!(F & FZ)) { RET_TAKEN(b_+61); return; }
+  CYC(b_+61, b_+62);
+  CYC(b_+62, b_+63); L = E;
+  CYC(b_+63, b_+64); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+64, b_+66); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+66, b_+68); mem_wr(gb, HL, 0x06);
+  RET(b_+68); return;
 state3:
-  CYC(0x6f45, 0x6f46); H = D;
-  CYC(0x6f46, 0x6f48); L = INTERACTION_BASE + OBJ_XH;
-  CYC(0x6f48, 0x6f49); A = mem_rd(gb, HL);
-  CYC(0x6f49, 0x6f4b); alu_sub(gb, 0x06);
-  CYC(0x6f4b, 0x6f4c); mem_wr(gb, HL, A);
-  CYC(0x6f4c, 0x6f4e); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x6f4e, 0x6f4f); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  if (!(F & FZ)) { RET_TAKEN(0x6f4f); return; }
-  CYC(0x6f4f, 0x6f50);
-  CYC(0x6f50, 0x6f53);
+  CYC(b_+69, b_+70); H = D;
+  CYC(b_+70, b_+72); L = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+72, b_+73); A = mem_rd(gb, HL);
+  CYC(b_+73, b_+75); alu_sub(gb, 0x06);
+  CYC(b_+75, b_+76); mem_wr(gb, HL, A);
+  CYC(b_+76, b_+78); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+78, b_+79); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { RET_TAKEN(b_+79); return; }
+  CYC(b_+79, b_+80);
+  CYC(b_+80, SYM(interactionCodee2));
   interactionDelete_hook(gb);
 }

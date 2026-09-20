@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0e, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0e, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode53), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode53), (from), (to), true)
 
 void dragonfly_state0_hook(GB *gb);
 void dragonfly_state1_hook(GB *gb);
@@ -51,192 +51,201 @@ static void dragonfly_addAToHl_from_rst(GB *gb, uint16_t return_address) {
 // ENEMY_DRAGONFLY
 // ==================================================================================================
 void enemyCode53_hook(GB *gb) {
+  BASE(enemyCode53);
   uint16_t sp0_ = gb->sp;
-  CYC(0x669e, 0x66a0); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x66a0, 0x66a1); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x66a1, 0x66a2); push_effect(gb, 0x66a2);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = dragonfly_jump_table(gb);
-    if (target == 0x66ae) { dragonfly_state0_hook(gb); return; }
-    if (target == 0x66bf) { dragonfly_state1_hook(gb); return; }
-    if (target == 0x6705) { dragonfly_state2_hook(gb); return; }
-    if (target == 0x6719) { dragonfly_state3_hook(gb); return; }
-    if (target == 0x6740) { dragonfly_state4_hook(gb); return; }
-    if (target == 0x675b) { dragonfly_state5_hook(gb); return; }
+    if (target == SYM(dragonfly_state0)) { dragonfly_state0_hook(gb); return; }
+    if (target == SYM(dragonfly_state1)) { dragonfly_state1_hook(gb); return; }
+    if (target == SYM(dragonfly_state2)) { dragonfly_state2_hook(gb); return; }
+    if (target == SYM(dragonfly_state3)) { dragonfly_state3_hook(gb); return; }
+    if (target == SYM(dragonfly_state4)) { dragonfly_state4_hook(gb); return; }
+    if (target == SYM(dragonfly_state5)) { dragonfly_state5_hook(gb); return; }
     HANDOFF(target);
   }
 }
 
 // 0e:66ae, bare global; jump-table target from enemyCode53. Initialization.
 void dragonfly_state0_hook(GB *gb) {
-  CYC(0x66ae, 0x66af); H = D;
-  CYC(0x66af, 0x66b0); L = E;
-  CYC(0x66b0, 0x66b1); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(0x66b1, 0x66b3); L = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x66b3, 0x66b4); A = mem_rd(gb, HL);
-  CYC(0x66b4, 0x66b6); L = ENEMY_BASE + OBJ_OAM_FLAGS_BACKUP;
-  CYC(0x66b6, 0x66b7); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x66b7, 0x66b8); mem_wr(gb, HL, A);
-  CYC(0x66b8, 0x66ba); L = ENEMY_BASE + OBJ_Z + 1; // Enemy.zh
-  CYC(0x66ba, 0x66bc); mem_wr(gb, HL, 0xf8); // -$08
-  CYC(0x66bc, 0x66bf); objectSetVisiblec1_hook(gb); return; // jp
+  BASE(dragonfly_state0);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+2); L = E;
+  CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL);
+  CYC(b_+6, b_+8); L = ENEMY_BASE + OBJ_OAM_FLAGS_BACKUP;
+  CYC(b_+8, b_+9); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+9, b_+10); mem_wr(gb, HL, A);
+  CYC(b_+10, b_+12); L = ENEMY_BASE + OBJ_Z + 1; // Enemy.zh
+  CYC(b_+12, b_+14); mem_wr(gb, HL, 0xf8); // -$08
+  CYC(b_+14, SYM(dragonfly_state1)); objectSetVisiblec1_hook(gb); return; // jp
 }
 
 // 0e:66bf, bare global; jump-table target from enemyCode53. Choosing new direction to move in.
 void dragonfly_state1_hook(GB *gb) {
+  BASE(dragonfly_state1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x66bf, 0x66c0); H = D;
-  CYC(0x66c0, 0x66c1); L = E;
-  CYC(0x66c1, 0x66c2); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(0x66c2, 0x66c4); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x66c4, 0x66c6); mem_wr(gb, HL, 0x03);
-  CYC(0x66c6, 0x66c8); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x66c8, 0x66ca); mem_wr(gb, HL, 0x50); // SPEED_200
-  CALL_C(0x66ca, getRandomNumber_noPreserveVars_hook, 0x0453, 0x66cd);
-  CYC(0x66cd, 0x66cf); alu_and(gb, 0x06);
-  CYC(0x66cf, 0x66d0); C = A;
-  CYC(0x66d0, 0x66d2); B = 0x00;
-  CYC(0x66d2, 0x66d4); E = ENEMY_BASE + OBJ_YH;
-  CYC(0x66d4, 0x66d5); A = mem_rd(gb, DE);
-  CYC(0x66d5, 0x66d7); alu_cp(gb, 0x40); // (SMALL_ROOM_HEIGHT/2)<<4
-  if (F & FC) { CYCT(0x66d7, 0x66d9); goto checkX; } // jr c
-  CYC(0x66d7, 0x66d9);
-  CYC(0x66d9, 0x66da); B = alu_inc8(gb, B);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+2); L = E;
+  CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 0x03);
+  CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+9, b_+11); mem_wr(gb, HL, 0x50); // SPEED_200
+  CALL_C(b_+11, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+14);
+  CYC(b_+14, b_+16); alu_and(gb, 0x06);
+  CYC(b_+16, b_+17); C = A;
+  CYC(b_+17, b_+19); B = 0x00;
+  CYC(b_+19, b_+21); E = ENEMY_BASE + OBJ_YH;
+  CYC(b_+21, b_+22); A = mem_rd(gb, DE);
+  CYC(b_+22, b_+24); alu_cp(gb, 0x40); // (SMALL_ROOM_HEIGHT/2)<<4
+  if (F & FC) { CYCT(b_+24, b_+26); goto checkX; } // jr c
+  CYC(b_+24, b_+26);
+  CYC(b_+26, b_+27); B = alu_inc8(gb, B);
 
 checkX:
-  CYC(0x66da, 0x66dc); E = ENEMY_BASE + OBJ_XH;
-  CYC(0x66dc, 0x66dd); A = mem_rd(gb, DE);
-  CYC(0x66dd, 0x66df); alu_cp(gb, 0x50); // (SMALL_ROOM_WIDTH/2)<<4
-  if (F & FC) { CYCT(0x66df, 0x66e1); goto haveQuadrant; } // jr c
-  CYC(0x66df, 0x66e1);
-  CYC(0x66e1, 0x66e3); B = (uint8_t)(B | (1 << 1)); // set 1,b
+  CYC(b_+27, b_+29); E = ENEMY_BASE + OBJ_XH;
+  CYC(b_+29, b_+30); A = mem_rd(gb, DE);
+  CYC(b_+30, b_+32); alu_cp(gb, 0x50); // (SMALL_ROOM_WIDTH/2)<<4
+  if (F & FC) { CYCT(b_+32, b_+34); goto haveQuadrant; } // jr c
+  CYC(b_+32, b_+34);
+  CYC(b_+34, b_+36); B = (uint8_t)(B | (1 << 1)); // set 1,b
 
 haveQuadrant:
-  CYC(0x66e3, 0x66e4); A = B;
-  CYC(0x66e4, 0x66e7); SET_HL(0x6701); // @angleVals
-  CYC(0x66e7, 0x66e8); dragonfly_addAToHl_from_rst(gb, 0x66e8);
-  CYC(0x66e8, 0x66e9); A = mem_rd(gb, HL);
-  CYC(0x66e9, 0x66ea); alu_add(gb, C);
-  CYC(0x66ea, 0x66ec); alu_and(gb, 0x1f);
-  CYC(0x66ec, 0x66ee); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x66ee, 0x66ef); mem_wr(gb, DE, A);
-  CYC(0x66ef, 0x66f1); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x66f1, 0x66f2); A = mem_rd(gb, DE);
-  CYC(0x66f2, 0x66f3); B = A;
-  CYC(0x66f3, 0x66f5); alu_and(gb, 0x0f);
-  if (F & FZ) { RET_TAKEN(0x66f5); return; } // ret z
-  CYC(0x66f5, 0x66f6);
-  CYC(0x66f6, 0x66f7); A = B;
-  CYC(0x66f7, 0x66f9); alu_cp(gb, 0x10);
-  CYC(0x66f9, 0x66fb); A = 0x01;
-  if (F & FC) { CYCT(0x66fb, 0x66fd); goto setAnimation; } // jr c
-  CYC(0x66fb, 0x66fd);
-  CYC(0x66fd, 0x66fe); A = alu_dec8(gb, A);
+  CYC(b_+36, b_+37); A = B;
+  CYC(b_+37, b_+40); SET_HL(b_+66); // @angleVals
+  CYC(b_+40, b_+41); dragonfly_addAToHl_from_rst(gb, b_+41);
+  CYC(b_+41, b_+42); A = mem_rd(gb, HL);
+  CYC(b_+42, b_+43); alu_add(gb, C);
+  CYC(b_+43, b_+45); alu_and(gb, 0x1f);
+  CYC(b_+45, b_+47); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+47, b_+48); mem_wr(gb, DE, A);
+  CYC(b_+48, b_+50); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+50, b_+51); A = mem_rd(gb, DE);
+  CYC(b_+51, b_+52); B = A;
+  CYC(b_+52, b_+54); alu_and(gb, 0x0f);
+  if (F & FZ) { RET_TAKEN(b_+54); return; } // ret z
+  CYC(b_+54, b_+55);
+  CYC(b_+55, b_+56); A = B;
+  CYC(b_+56, b_+58); alu_cp(gb, 0x10);
+  CYC(b_+58, b_+60); A = 0x01;
+  if (F & FC) { CYCT(b_+60, b_+62); goto setAnimation; } // jr c
+  CYC(b_+60, b_+62);
+  CYC(b_+62, b_+63); A = alu_dec8(gb, A);
 
 setAnimation:
-  CYC(0x66fe, 0x6701); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+63, b_+66); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:6705, bare global; jump-table target from enemyCode53. Move in given direction for 3
 // frames at SPEED_200. Falls through into dragonfly_animate.
 void dragonfly_state2_hook(GB *gb) {
+  BASE(dragonfly_state2);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6705, dragonfly_applySpeed_hook, 0x6765, 0x6708);
-  if (!(F & FZ)) { CYCT(0x6708, 0x670a); goto nextState; } // jr nz
-  CYC(0x6708, 0x670a);
-  CALL_C(0x670a, ecom_decCounter1_b0e_hook, 0x439a, 0x670d);
-  if (!(F & FZ)) { CYCT(0x670d, 0x670f); dragonfly_animate_hook(gb); return; } // jr nz
-  CYC(0x670d, 0x670f);
+  CALL_C(b_+0, dragonfly_applySpeed_hook, SYM(dragonfly_applySpeed), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); goto nextState; } // jr nz
+  CYC(b_+3, b_+5);
+  CALL_C(b_+5, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+8);
+  if (!(F & FZ)) { CYCT(b_+8, b_+10); dragonfly_animate_hook(gb); return; } // jr nz
+  CYC(b_+8, b_+10);
 
 nextState:
-  CALL_C(0x670f, ecom_incState_b0e_hook, 0x4000, 0x6712);
-  CYC(0x6712, 0x6714); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x6714, 0x6716); mem_wr(gb, HL, 0x0c);
+  CALL_C(b_+10, ecom_incState_b0e_hook, SYM(ecom_incState_b0e), b_+13);
+  CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+15, SYM(dragonfly_animate)); mem_wr(gb, HL, 0x0c);
   dragonfly_animate_hook(gb); return; // fallthrough
 }
 
 // 0e:6716, bare global; falls into from dragonfly_state2, also reached by genuine jp/jr from
 // dragonfly_state3/dragonfly_state4/dragonfly_state5.
 void dragonfly_animate_hook(GB *gb) {
-  CYC(0x6716, 0x6719); enemyAnimate_hook(gb); return; // jp
+  BASE(dragonfly_animate);
+  CYC(b_+0, SYM(dragonfly_state3)); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:6719, bare global; jump-table target from enemyCode53. Slowing down over 12 frames,
 // eventually reaching SPEED_140.
 void dragonfly_state3_hook(GB *gb) {
+  BASE(dragonfly_state3);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6719, dragonfly_applySpeed_hook, 0x6765, 0x671c);
-  if (!(F & FZ)) { CYCT(0x671c, 0x671e); goto nextState; } // jr nz
-  CYC(0x671c, 0x671e);
-  CALL_C(0x671e, ecom_decCounter1_b0e_hook, 0x439a, 0x6721);
-  if (F & FZ) { CYCT(0x6721, 0x6723); goto nextState; } // jr z
-  CYC(0x6721, 0x6723);
-  CYC(0x6723, 0x6724); A = mem_rd(gb, HL); // [counter1]
-  CYC(0x6724, 0x6725); alu_rrca(gb);
-  if (!(F & FC)) { CYCT(0x6725, 0x6727); dragonfly_animate_hook(gb); return; } // jr nc
-  CYC(0x6725, 0x6727);
-  CYC(0x6727, 0x6729); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x6729, 0x672a); A = mem_rd(gb, HL);
-  CYC(0x672a, 0x672c); alu_sub(gb, 0x05); // SPEED_20
-  CYC(0x672c, 0x672d); mem_wr(gb, HL, A);
-  CYC(0x672d, 0x672f); dragonfly_animate_hook(gb); return; // jr
+  CALL_C(b_+0, dragonfly_applySpeed_hook, SYM(dragonfly_applySpeed), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); goto nextState; } // jr nz
+  CYC(b_+3, b_+5);
+  CALL_C(b_+5, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+8);
+  if (F & FZ) { CYCT(b_+8, b_+10); goto nextState; } // jr z
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+11); A = mem_rd(gb, HL); // [counter1]
+  CYC(b_+11, b_+12); alu_rrca(gb);
+  if (!(F & FC)) { CYCT(b_+12, b_+14); dragonfly_animate_hook(gb); return; } // jr nc
+  CYC(b_+12, b_+14);
+  CYC(b_+14, b_+16); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+16, b_+17); A = mem_rd(gb, HL);
+  CYC(b_+17, b_+19); alu_sub(gb, 0x05); // SPEED_20
+  CYC(b_+19, b_+20); mem_wr(gb, HL, A);
+  CYC(b_+20, b_+22); dragonfly_animate_hook(gb); return; // jr
 
 nextState:
-  CYC(0x672f, 0x6731); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6731, 0x6733); A = 0x04;
-  CYC(0x6733, 0x6734); mem_wr(gb, DE, A);
-  CALL_C(0x6734, getRandomNumber_noPreserveVars_hook, 0x0453, 0x6737);
-  CYC(0x6737, 0x6739); alu_and(gb, 0x07);
-  CYC(0x6739, 0x673b); alu_add(gb, 0x18);
-  CYC(0x673b, 0x673d); E = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x673d, 0x673e); mem_wr(gb, DE, A);
-  CYC(0x673e, 0x6740); dragonfly_animate_hook(gb); return; // jr
+  CYC(b_+22, b_+24); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+24, b_+26); A = 0x04;
+  CYC(b_+26, b_+27); mem_wr(gb, DE, A);
+  CALL_C(b_+27, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+30);
+  CYC(b_+30, b_+32); alu_and(gb, 0x07);
+  CYC(b_+32, b_+34); alu_add(gb, 0x18);
+  CYC(b_+34, b_+36); E = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+36, b_+37); mem_wr(gb, DE, A);
+  CYC(b_+37, SYM(dragonfly_state4)); dragonfly_animate_hook(gb); return; // jr
 }
 
 // 0e:6740, bare global; jump-table target from enemyCode53. Moving at SPEED_140 for between
 // 24-31 frames.
 void dragonfly_state4_hook(GB *gb) {
+  BASE(dragonfly_state4);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6740, dragonfly_applySpeed_hook, 0x6765, 0x6743);
-  if (!(F & FZ)) { CYCT(0x6743, 0x6745); goto nextState; } // jr nz
-  CYC(0x6743, 0x6745);
-  CALL_C(0x6745, ecom_decCounter1_b0e_hook, 0x439a, 0x6748);
-  if (!(F & FZ)) { CYCT(0x6748, 0x674a); dragonfly_animate_hook(gb); return; } // jr nz
-  CYC(0x6748, 0x674a);
+  CALL_C(b_+0, dragonfly_applySpeed_hook, SYM(dragonfly_applySpeed), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); goto nextState; } // jr nz
+  CYC(b_+3, b_+5);
+  CALL_C(b_+5, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+8);
+  if (!(F & FZ)) { CYCT(b_+8, b_+10); dragonfly_animate_hook(gb); return; } // jr nz
+  CYC(b_+8, b_+10);
 
 nextState:
-  CALL_C(0x674a, getRandomNumber_noPreserveVars_hook, 0x0453, 0x674d);
-  CYC(0x674d, 0x674f); alu_and(gb, 0x7f);
-  CYC(0x674f, 0x6751); alu_add(gb, 0x20);
-  CYC(0x6751, 0x6753); E = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x6753, 0x6754); mem_wr(gb, DE, A);
-  CYC(0x6754, 0x6756); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6756, 0x6758); A = 0x05;
-  CYC(0x6758, 0x6759); mem_wr(gb, DE, A);
-  CYC(0x6759, 0x675b); dragonfly_animate_hook(gb); return; // jr
+  CALL_C(b_+10, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+13);
+  CYC(b_+13, b_+15); alu_and(gb, 0x7f);
+  CYC(b_+15, b_+17); alu_add(gb, 0x20);
+  CYC(b_+17, b_+19); E = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+19, b_+20); mem_wr(gb, DE, A);
+  CYC(b_+20, b_+22); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+22, b_+24); A = 0x05;
+  CYC(b_+24, b_+25); mem_wr(gb, DE, A);
+  CYC(b_+25, SYM(dragonfly_state5)); dragonfly_animate_hook(gb); return; // jr
 }
 
 // 0e:675b, bare global; jump-table target from enemyCode53. Holding still for [counter1]
 // frames.
 void dragonfly_state5_hook(GB *gb) {
+  BASE(dragonfly_state5);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x675b, ecom_decCounter1_b0e_hook, 0x439a, 0x675e);
-  if (!(F & FZ)) { CYCT(0x675e, 0x6760); dragonfly_animate_hook(gb); return; } // jr nz
-  CYC(0x675e, 0x6760);
-  CYC(0x6760, 0x6761); L = E;
-  CYC(0x6761, 0x6763); mem_wr(gb, HL, 0x01); // [state]
-  CYC(0x6763, 0x6765); dragonfly_animate_hook(gb); return; // jr
+  CALL_C(b_+0, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); dragonfly_animate_hook(gb); return; } // jr nz
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+6); L = E;
+  CYC(b_+6, b_+8); mem_wr(gb, HL, 0x01); // [state]
+  CYC(b_+8, SYM(dragonfly_applySpeed)); dragonfly_animate_hook(gb); return; // jr
 }
 
 // 0e:6765, bare global; called from dragonfly_state2/dragonfly_state3/dragonfly_state4.
 // @return zflag nz if touched a wall
 void dragonfly_applySpeed_hook(GB *gb) {
+  BASE(dragonfly_applySpeed);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6765, 0x6767); A = 0x02; // Only screen boundaries count as walls
-  CALL_C(0x6767, ecom_getSideviewAdjacentWallsBitset_b0e_hook, 0x420b, 0x676a);
-  if (!(F & FZ)) { RET_TAKEN(0x676a); return; } // ret nz
-  CYC(0x676a, 0x676b);
-  CALL_C(0x676b, objectApplySpeed_hook, 0x201d, 0x676e);
-  CYC(0x676e, 0x676f); alu_xor(gb, A);
-  RET(0x676f); return; // ret
+  CYC(b_+0, b_+2); A = 0x02; // Only screen boundaries count as walls
+  CALL_C(b_+2, ecom_getSideviewAdjacentWallsBitset_b0e_hook, SYM(ecom_getSideviewAdjacentWallsBitset_b0e), b_+5);
+  if (!(F & FZ)) { RET_TAKEN(b_+5); return; } // ret nz
+  CYC(b_+5, b_+6);
+  CALL_C(b_+6, objectApplySpeed_hook, SYM(objectApplySpeed), b_+9);
+  CYC(b_+9, b_+10); alu_xor(gb, A);
+  RET(b_+10); return; // ret
 }

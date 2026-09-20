@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x09, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x09, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(impaNpc_determineTextAndPositionInHouse), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(impaNpc_determineTextAndPositionInHouse), (from), (to), true)
 
 static uint16_t impa_npc_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -34,267 +34,285 @@ void impaNpc_faceLinkIfClose_hook(GB *gb);
 void getImpaNpcState_hook(GB *gb);
 
 static void impa_set_text_and_position(GB *gb) {
-  CYC(0x64d4, 0x64d6); E = INTERACTION_BASE + OBJ_TEXT_ID;
-  CYC(0x64d6, 0x64d7); mem_wr(gb, DE, A);
-  CYC(0x64d7, 0x64d9); E = INTERACTION_BASE + OBJ_YH;
-  CYC(0x64d9, 0x64da); A = B;
-  CYC(0x64da, 0x64db); mem_wr(gb, DE, A);
-  CYC(0x64db, 0x64dd); E = INTERACTION_BASE + OBJ_XH;
-  CYC(0x64dd, 0x64de); A = C;
-  CYC(0x64de, 0x64df); mem_wr(gb, DE, A);
-  CYC(0x64df, 0x64e1); E = INTERACTION_BASE + OBJ_VAR38;
-  CYC(0x64e1, 0x64e3); A = 2;
-  CYC(0x64e3, 0x64e4); mem_wr(gb, DE, A);
-  CYC(0x64e4, 0x64e7); SET_HL(0x45f0);
-  CYC(0x64e7, 0x64e8); alu_xor(gb, A);
-  CYC(0x64e8, 0x64e9); ret_effect(gb);
+  BASE(impaNpc_determineTextAndPositionInHouse);
+  CYC(b_+83, b_+85); E = INTERACTION_BASE + OBJ_TEXT_ID;
+  CYC(b_+85, b_+86); mem_wr(gb, DE, A);
+  CYC(b_+86, b_+88); E = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+88, b_+89); A = B;
+  CYC(b_+89, b_+90); mem_wr(gb, DE, A);
+  CYC(b_+90, b_+92); E = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+92, b_+93); A = C;
+  CYC(b_+93, b_+94); mem_wr(gb, DE, A);
+  CYC(b_+94, b_+96); E = INTERACTION_BASE + OBJ_VAR38;
+  CYC(b_+96, b_+98); A = 2;
+  CYC(b_+98, b_+99); mem_wr(gb, DE, A);
+  CYC(b_+99, b_+102); SET_HL((SYM(interactionCode4a__initSubid09) + 17));
+  CYC(b_+102, b_+103); alu_xor(gb, A);
+  CYC(b_+103, SYM(impaNpc_subid01)); ret_effect(gb);
 }
 
 void interactionCode4f_hook(GB *gb) {
+  BASE(interactionCode4f);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x642e, 0x6430); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x6430, 0x6431); A = mem_rd(gb, DE);
-  CYC(0x6431, 0x6432); push_effect(gb, 0x6432);
-  switch (impa_npc_jump_table(gb)) {
-    case 0x643a: impaNpc_subid00_hook(gb); return;
-    case 0x64e9: impaNpc_subid01_hook(gb); return;
-    case 0x650e: impaNpc_subid02_hook(gb); return;
-    case 0x6529: impaNpc_subid03_hook(gb); return;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (impa_npc_jump_table(gb));
+    if (jt_ == SYM(impaNpc_subid00)) { impaNpc_subid00_hook(gb); return; }
+    else if (jt_ == SYM(impaNpc_subid01)) { impaNpc_subid01_hook(gb); return; }
+    else if (jt_ == SYM(impaNpc_subid02)) { impaNpc_subid02_hook(gb); return; }
+    else if (jt_ == SYM(impaNpc_subid03)) { impaNpc_subid03_hook(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 }
 
 void impaNpc_subid00_hook(GB *gb) {
+  BASE(impaNpc_subid00);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x643a, checkInteractionState_hook, 0x23fe, 0x643d);
-  if (F & FZ) { CYCT(0x643d, 0x643f); goto state0; }
-  CYC(0x643d, 0x643f);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
+  if (F & FZ) { CYCT(b_+3, b_+5); goto state0; }
+  CYC(b_+3, b_+5);
 state1:
-  CALL_C(0x643f, interactionRunScript_hook, 0x2552, 0x6442);
-  CYC(0x6442, 0x6444); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x6444, 0x6445); A = mem_rd(gb, DE);
-  CYC(0x6445, 0x6446); A = alu_dec8(gb, A);
-  if (F & FZ) { CYCT(0x6446, 0x6448); goto animate; }
-  CYC(0x6446, 0x6448);
-  CYC(0x6448, 0x644a); alu_cp(gb, 9);
-  if (!(F & FZ)) CALL_C_CC(0x644a, impaNpc_faceLinkIfClose_hook, 0x653b, 0x644d);
-  else CYC(0x644a, 0x644d);
+  CALL_C(b_+5, interactionRunScript_hook, SYM(interactionRunScript), b_+8);
+  CYC(b_+8, b_+10); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+10, b_+11); A = mem_rd(gb, DE);
+  CYC(b_+11, b_+12); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(b_+12, b_+14); goto animate; }
+  CYC(b_+12, b_+14);
+  CYC(b_+14, b_+16); alu_cp(gb, 9);
+  if (!(F & FZ)) CALL_C_CC(b_+16, impaNpc_faceLinkIfClose_hook, SYM(impaNpc_faceLinkIfClose), b_+19);
+  else CYC(b_+16, b_+19);
 animate:
-  CYC(0x644d, 0x6450); interactionAnimateAsNpc_hook(gb);
+  CYC(b_+19, b_+22); interactionAnimateAsNpc_hook(gb);
   return;
 state0:
-  CYC(0x6450, 0x6453); SET_HL(wRoomLayout + 0x22);
-  CYC(0x6453, 0x6455); mem_wr(gb, HL, 0x45);
-  CALL_C(0x6455, getImpaNpcState_hook, 0x655a, 0x6458);
-  CYC(0x6458, 0x645a); alu_bit(gb, 7, B);
-  if (!(F & FZ)) { CYCT(0x645a, 0x645d); interactionDelete_hook(gb); return; }
-  CYC(0x645a, 0x645d);
-  CALL_C(0x645d, checkIsLinkedGame_hook, 0x1992, 0x6460);
-  if (F & FZ) { CYCT(0x6460, 0x6462); goto choose; }
-  CYC(0x6460, 0x6462);
-  CYC(0x6462, 0x6464); A = 9;
+  CYC(b_+22, b_+25); SET_HL(wRoomLayout + 0x22);
+  CYC(b_+25, b_+27); mem_wr(gb, HL, 0x45);
+  CALL_C(b_+27, getImpaNpcState_hook, SYM(getImpaNpcState), b_+30);
+  CYC(b_+30, b_+32); alu_bit(gb, 7, B);
+  if (!(F & FZ)) { CYCT(b_+32, b_+35); interactionDelete_hook(gb); return; }
+  CYC(b_+32, b_+35);
+  CALL_C(b_+35, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+38);
+  if (F & FZ) { CYCT(b_+38, b_+40); goto choose; }
+  CYC(b_+38, b_+40);
+  CYC(b_+40, b_+42); A = 9;
 choose:
-  CYC(0x6464, 0x6465); alu_add(gb, B);
-  CALL_C(0x6465, impaNpc_determineTextAndPositionInHouse_hook, 0x6481, 0x6468);
+  CYC(b_+42, b_+43); alu_add(gb, B);
+  CALL_C(b_+43, impaNpc_determineTextAndPositionInHouse_hook, SYM(impaNpc_determineTextAndPositionInHouse), SYM(impaNpc_setScriptAndInitialize));
   impaNpc_setScriptAndInitialize_hook(gb);
 }
 
 void impaNpc_setScriptAndInitialize_hook(GB *gb) {
+  BASE(impaNpc_setScriptAndInitialize);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6468, interactionSetScript_hook, 0x2544, 0x646b);
-  CALL_C(0x646b, interactionInitGraphics_hook, 0x15fb, 0x646e);
-  CALL_C(0x646e, interactionIncState_hook, 0x23e0, 0x6471);
-  CYC(0x6471, 0x6473); L = INTERACTION_BASE + OBJ_TEXT_ID + 1;
-  CYC(0x6473, 0x6475); mem_wr(gb, HL, 1);
-  CALL_C(0x6475, objectMarkSolidPosition_hook, 0x24f0, 0x6478);
-  CYC(0x6478, 0x647a); E = INTERACTION_BASE + OBJ_VAR38;
-  CYC(0x647a, 0x647b); A = mem_rd(gb, DE);
-  CALL_C(0x647b, interactionSetAnimation_hook, 0x262e, 0x647e);
-  CYC(0x647e, 0x6481); objectSetVisiblec2_hook(gb);
+  CALL_C(b_+0, interactionSetScript_hook, SYM(interactionSetScript), b_+3);
+  CALL_C(b_+3, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+6);
+  CALL_C(b_+6, interactionIncState_hook, SYM(interactionIncState), b_+9);
+  CYC(b_+9, b_+11); L = INTERACTION_BASE + OBJ_TEXT_ID + 1;
+  CYC(b_+11, b_+13); mem_wr(gb, HL, 1);
+  CALL_C(b_+13, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+16);
+  CYC(b_+16, b_+18); E = INTERACTION_BASE + OBJ_VAR38;
+  CYC(b_+18, b_+19); A = mem_rd(gb, DE);
+  CALL_C(b_+19, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+22);
+  CYC(b_+22, SYM(impaNpc_determineTextAndPositionInHouse)); objectSetVisiblec2_hook(gb);
 }
 
 void impaNpc_determineTextAndPositionInHouse_hook(GB *gb) {
+  BASE(impaNpc_determineTextAndPositionInHouse);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6481, 0x6483); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x6483, 0x6484); mem_wr(gb, DE, A);
-  CYC(0x6484, 0x6485); push_effect(gb, 0x6485);
-  switch (impa_npc_jump_table(gb)) {
-    case 0x64a9:
-      CYC(0x64a9, 0x64aa); SET_HL(pop_effect(gb));
-      CYC(0x64aa, 0x64ad); interactionDelete_hook(gb);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+2, b_+3); mem_wr(gb, DE, A);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (impa_npc_jump_table(gb));
+    if (jt_ == b_+40) {
+      CYC(b_+40, b_+41); SET_HL(pop_effect(gb));
+      CYC(b_+41, b_+44); interactionDelete_hook(gb);
       return;
-    case 0x64ad:
-      CYC(0x64ad, 0x64b0); SET_BC(0x3838);
-      CYC(0x64b0, 0x64b2); A = 0x20;
-      CYC(0x64b2, 0x64b4); impa_set_text_and_position(gb);
+    }
+    else if (jt_ == b_+44) {
+      CYC(b_+44, b_+47); SET_BC((SYM(loadTilesetUniqueGfx) + 16));
+      CYC(b_+47, b_+49); A = 0x20;
+      CYC(b_+49, b_+51); impa_set_text_and_position(gb);
       return;
-    case 0x64b4:
-      CYC(0x64b4, 0x64b7); SET_BC(0x4828);
-      CYC(0x64b7, 0x64b9); A = 0x21;
-      CYC(0x64b9, 0x64bc); push_effect(gb, 0x64bc); impa_set_text_and_position(gb);
-      CYC(0x64bc, 0x64bd); mem_wr(gb, DE, A);
-      CYC(0x64bd, 0x64c0); SET_HL(0x64e1);
-      CYC(0x64c0, 0x64c1); ret_effect(gb);
+    }
+    else if (jt_ == b_+51) {
+      CYC(b_+51, b_+54); SET_BC((SYM(interactionCode50__state1) + 7));
+      CYC(b_+54, b_+56); A = 0x21;
+      CYC(b_+56, b_+59); push_effect(gb, b_+59); impa_set_text_and_position(gb);
+      CYC(b_+59, b_+60); mem_wr(gb, DE, A);
+      CYC(b_+60, b_+63); SET_HL(b_+96);
+      CYC(b_+63, b_+64); ret_effect(gb);
       return;
-    case 0x64c1:
-      CYC(0x64c1, 0x64c4); SET_BC(0x2868);
-      CYC(0x64c4, 0x64c6); A = 0x22;
-      CYC(0x64c6, 0x64c8); impa_set_text_and_position(gb);
+    }
+    else if (jt_ == b_+64) {
+      CYC(b_+64, b_+67); SET_BC((SYM(_enemyNextAnimationFrame) + 36));
+      CYC(b_+67, b_+69); A = 0x22;
+      CYC(b_+69, b_+71); impa_set_text_and_position(gb);
       return;
-    case 0x64c8:
-      CYC(0x64c8, 0x64cb); SET_BC(0x2868);
-      CYC(0x64cb, 0x64cd); A = 0x2c;
-      CYC(0x64cd, 0x64cf); impa_set_text_and_position(gb);
+    }
+    else if (jt_ == b_+71) {
+      CYC(b_+71, b_+74); SET_BC((SYM(_enemyNextAnimationFrame) + 36));
+      CYC(b_+74, b_+76); A = 0x2c;
+      CYC(b_+76, b_+78); impa_set_text_and_position(gb);
       return;
-    case 0x64cf:
-      CYC(0x64cf, 0x64d2); SET_BC(0x2868);
-      CYC(0x64d2, 0x64d4); A = 0x23;
+    }
+    else if (jt_ == b_+78) {
+      CYC(b_+78, b_+81); SET_BC((SYM(_enemyNextAnimationFrame) + 36));
+      CYC(b_+81, b_+83); A = 0x23;
       impa_set_text_and_position(gb);
       return;
-    default: HANDOFF(HL);
-  }
+    }
+    else { HANDOFF(HL); }
+  } while (0);
 }
 
 void impaNpc_subid01_hook(GB *gb) {
+  BASE(impaNpc_subid01);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x64e9, checkInteractionState_hook, 0x23fe, 0x64ec);
-  if (!(F & FZ)) { CYCT(0x64ec, 0x64ee); impaNpc_runScriptAndFaceLink_hook(gb); return; }
-  CYC(0x64ec, 0x64ee);
-  CALL_C(0x64ee, getImpaNpcState_hook, 0x655a, 0x64f1);
-  CYC(0x64f1, 0x64f2); A = B;
-  CYC(0x64f2, 0x64f4); alu_cp(gb, 7);
-  if (!(F & FZ)) { CYCT(0x64f4, 0x64f7); interactionDelete_hook(gb); return; }
-  CYC(0x64f4, 0x64f7);
-  CALL_C(0x64f7, checkIsLinkedGame_hook, 0x1992, 0x64fa);
-  CYC(0x64fa, 0x64fc); A = 0x2b;
-  if (F & FZ) { CYCT(0x64fc, 0x64fe); impaNpc_setTextIndexAndLoadGenericNpcScript_hook(gb); return; }
-  CYC(0x64fc, 0x64fe);
-  CYC(0x64fe, 0x6500); A = 0x2e;
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); impaNpc_runScriptAndFaceLink_hook(gb); return; }
+  CYC(b_+3, b_+5);
+  CALL_C(b_+5, getImpaNpcState_hook, SYM(getImpaNpcState), b_+8);
+  CYC(b_+8, b_+9); A = B;
+  CYC(b_+9, b_+11); alu_cp(gb, 7);
+  if (!(F & FZ)) { CYCT(b_+11, b_+14); interactionDelete_hook(gb); return; }
+  CYC(b_+11, b_+14);
+  CALL_C(b_+14, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+17);
+  CYC(b_+17, b_+19); A = 0x2b;
+  if (F & FZ) { CYCT(b_+19, b_+21); impaNpc_setTextIndexAndLoadGenericNpcScript_hook(gb); return; }
+  CYC(b_+19, b_+21);
+  CYC(b_+21, SYM(impaNpc_setTextIndexAndLoadGenericNpcScript)); A = 0x2e;
   impaNpc_setTextIndexAndLoadGenericNpcScript_hook(gb);
 }
 
 void impaNpc_setTextIndexAndLoadGenericNpcScript_hook(GB *gb) {
+  BASE(impaNpc_setTextIndexAndLoadGenericNpcScript);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6500, 0x6502); E = INTERACTION_BASE + OBJ_TEXT_ID;
-  CYC(0x6502, 0x6503); mem_wr(gb, DE, A);
-  CYC(0x6503, 0x6505); E = INTERACTION_BASE + OBJ_VAR38;
-  CYC(0x6505, 0x6507); A = 2;
-  CYC(0x6507, 0x6508); mem_wr(gb, DE, A);
-  CYC(0x6508, 0x650b); SET_HL(0x45f0);
-  CYC(0x650b, 0x650e); impaNpc_setScriptAndInitialize_hook(gb);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_TEXT_ID;
+  CYC(b_+2, b_+3); mem_wr(gb, DE, A);
+  CYC(b_+3, b_+5); E = INTERACTION_BASE + OBJ_VAR38;
+  CYC(b_+5, b_+7); A = 2;
+  CYC(b_+7, b_+8); mem_wr(gb, DE, A);
+  CYC(b_+8, b_+11); SET_HL((SYM(interactionCode4a__initSubid09) + 17));
+  CYC(b_+11, SYM(impaNpc_subid02)); impaNpc_setScriptAndInitialize_hook(gb);
 }
 
 void impaNpc_subid02_hook(GB *gb) {
+  BASE(impaNpc_subid02);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x650e, checkInteractionState_hook, 0x23fe, 0x6511);
-  if (!(F & FZ)) { CYCT(0x6511, 0x6513); impaNpc_runScriptAndFaceLink_hook(gb); return; }
-  CYC(0x6511, 0x6513);
-  CALL_C(0x6513, getImpaNpcState_hook, 0x655a, 0x6516);
-  CYC(0x6516, 0x6517); A = B;
-  CYC(0x6517, 0x6519); alu_cp(gb, 8);
-  if (!(F & FZ)) { CYCT(0x6519, 0x651c); interactionDelete_hook(gb); return; }
-  CYC(0x6519, 0x651c);
-  CYC(0x651c, 0x651e); A = 0x2f;
-  CYC(0x651e, 0x6520); impaNpc_setTextIndexAndLoadGenericNpcScript_hook(gb);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); impaNpc_runScriptAndFaceLink_hook(gb); return; }
+  CYC(b_+3, b_+5);
+  CALL_C(b_+5, getImpaNpcState_hook, SYM(getImpaNpcState), b_+8);
+  CYC(b_+8, b_+9); A = B;
+  CYC(b_+9, b_+11); alu_cp(gb, 8);
+  if (!(F & FZ)) { CYCT(b_+11, b_+14); interactionDelete_hook(gb); return; }
+  CYC(b_+11, b_+14);
+  CYC(b_+14, b_+16); A = 0x2f;
+  CYC(b_+16, SYM(impaNpc_runScriptAndFaceLink)); impaNpc_setTextIndexAndLoadGenericNpcScript_hook(gb);
 }
 
 void impaNpc_runScriptAndFaceLink_hook(GB *gb) {
+  BASE(impaNpc_runScriptAndFaceLink);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6520, interactionRunScript_hook, 0x2552, 0x6523);
-  CALL_C(0x6523, impaNpc_faceLinkIfClose_hook, 0x653b, 0x6526);
-  CYC(0x6526, 0x6529); interactionAnimateAsNpc_hook(gb);
+  CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
+  CALL_C(b_+3, impaNpc_faceLinkIfClose_hook, SYM(impaNpc_faceLinkIfClose), b_+6);
+  CYC(b_+6, SYM(impaNpc_subid03)); interactionAnimateAsNpc_hook(gb);
 }
 
 void impaNpc_subid03_hook(GB *gb) {
+  BASE(impaNpc_subid03);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x6529, checkInteractionState_hook, 0x23fe, 0x652c);
-  if (!(F & FZ)) { CYCT(0x652c, 0x652e); impaNpc_runScriptAndFaceLink_hook(gb); return; }
-  CYC(0x652c, 0x652e);
-  CALL_C(0x652e, getImpaNpcState_hook, 0x655a, 0x6531);
-  CYC(0x6531, 0x6532); A = B;
-  CYC(0x6532, 0x6534); alu_cp(gb, 6);
-  if (!(F & FZ)) { CYCT(0x6534, 0x6537); interactionDelete_hook(gb); return; }
-  CYC(0x6534, 0x6537);
-  CYC(0x6537, 0x6539); A = 0x23;
-  CYC(0x6539, 0x653b); impaNpc_setTextIndexAndLoadGenericNpcScript_hook(gb);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); impaNpc_runScriptAndFaceLink_hook(gb); return; }
+  CYC(b_+3, b_+5);
+  CALL_C(b_+5, getImpaNpcState_hook, SYM(getImpaNpcState), b_+8);
+  CYC(b_+8, b_+9); A = B;
+  CYC(b_+9, b_+11); alu_cp(gb, 6);
+  if (!(F & FZ)) { CYCT(b_+11, b_+14); interactionDelete_hook(gb); return; }
+  CYC(b_+11, b_+14);
+  CYC(b_+14, b_+16); A = 0x23;
+  CYC(b_+16, SYM(impaNpc_faceLinkIfClose)); impaNpc_setTextIndexAndLoadGenericNpcScript_hook(gb);
 }
 
 void impaNpc_faceLinkIfClose_hook(GB *gb) {
+  BASE(impaNpc_faceLinkIfClose);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x653b, 0x653d); C = 0x28;
-  CALL_C(0x653d, objectCheckLinkWithinDistance_hook, 0x1fa2, 0x6540);
-  if (!(F & FC)) { CYCT(0x6540, 0x6542); goto no_change; }
-  CYC(0x6540, 0x6542);
-  CALL_C(0x6542, objectGetAngleTowardEnemyTarget_hook, 0x1e94, 0x6545);
-  CYC(0x6545, 0x6547); alu_add(gb, 4);
-  CYC(0x6547, 0x6549); alu_and(gb, 0x18);
-  CYC(0x6549, 0x654b); A = alu_swap(gb, A);
-  CYC(0x654b, 0x654c); alu_rlca(gb);
-  CYC(0x654c, 0x654e); goto update;
+  CYC(b_+0, b_+2); C = 0x28;
+  CALL_C(b_+2, objectCheckLinkWithinDistance_hook, SYM(objectCheckLinkWithinDistance), b_+5);
+  if (!(F & FC)) { CYCT(b_+5, b_+7); goto no_change; }
+  CYC(b_+5, b_+7);
+  CALL_C(b_+7, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+10);
+  CYC(b_+10, b_+12); alu_add(gb, 4);
+  CYC(b_+12, b_+14); alu_and(gb, 0x18);
+  CYC(b_+14, b_+16); A = alu_swap(gb, A);
+  CYC(b_+16, b_+17); alu_rlca(gb);
+  CYC(b_+17, b_+19); goto update;
 no_change:
-  CYC(0x654e, 0x6550); E = INTERACTION_BASE + OBJ_VAR38;
-  CYC(0x6550, 0x6551); A = mem_rd(gb, DE);
+  CYC(b_+19, b_+21); E = INTERACTION_BASE + OBJ_VAR38;
+  CYC(b_+21, b_+22); A = mem_rd(gb, DE);
 update:
-  CYC(0x6551, 0x6552); H = D;
-  CYC(0x6552, 0x6554); L = INTERACTION_BASE + OBJ_DIRECTION;
-  CYC(0x6554, 0x6555); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(0x6555, 0x6556); ret_effect(gb); return; }
-  CYC(0x6555, 0x6556);
-  CYC(0x6556, 0x6557); mem_wr(gb, HL, A);
-  CYC(0x6557, 0x655a); interactionSetAnimation_hook(gb);
+  CYC(b_+22, b_+23); H = D;
+  CYC(b_+23, b_+25); L = INTERACTION_BASE + OBJ_DIRECTION;
+  CYC(b_+25, b_+26); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+26, b_+27); ret_effect(gb); return; }
+  CYC(b_+26, b_+27);
+  CYC(b_+27, b_+28); mem_wr(gb, HL, A);
+  CYC(b_+28, SYM(getImpaNpcState)); interactionSetAnimation_hook(gb);
 }
 
 void getImpaNpcState_hook(GB *gb) {
+  BASE(getImpaNpcState);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x655a, 0x655c); A = 0x14;
-  CALL_C(0x655c, checkGlobalFlag_hook, 0x31f3, 0x655f);
-  CYC(0x655f, 0x6561); B = 0xff;
-  if (!(F & FZ)) { CYCT(0x6561, 0x6562); ret_effect(gb); return; }
-  CYC(0x6561, 0x6562);
-  CYC(0x6562, 0x6563); B = alu_inc8(gb, B);
-  CYC(0x6563, 0x6566); A = mem_rd(gb, wGroup0RoomFlags + 0x83);
-  CYC(0x6566, 0x6567); alu_rlca(gb);
-  if (!(F & FC)) { CYCT(0x6567, 0x6568); ret_effect(gb); return; }
-  CYC(0x6567, 0x6568);
-  CYC(0x6568, 0x656a); A = 0x11;
-  CALL_C(0x656a, checkTreasureObtained_hook, 0x1748, 0x656d);
-  CYC(0x656d, 0x656f); B = 1;
-  if (!(F & FC)) { CYCT(0x656f, 0x6570); ret_effect(gb); return; }
-  CYC(0x656f, 0x6570);
-  CYC(0x6570, 0x6572); A = 0x11;
-  CALL_C(0x6572, checkGlobalFlag_hook, 0x31f3, 0x6575);
-  if (!(F & FZ)) { CYCT(0x6575, 0x6577); goto saved_nayru; }
-  CYC(0x6575, 0x6577);
-  CYC(0x6577, 0x6579); A = 0x38;
-  CALL_C(0x6579, checkGlobalFlag_hook, 0x31f3, 0x657c);
-  CYC(0x657c, 0x657e); B = 4;
-  if (!(F & FZ)) { CYCT(0x657e, 0x657f); ret_effect(gb); return; }
-  CYC(0x657e, 0x657f);
-  CYC(0x657f, 0x6581); A = 0x40;
-  CALL_C(0x6581, checkTreasureObtained_hook, 0x1748, 0x6584);
-  CYC(0x6584, 0x6586); alu_bit(gb, 2, A);
-  CYC(0x6586, 0x6588); B = 2;
-  if (F & FZ) { CYCT(0x6588, 0x6589); ret_effect(gb); return; }
-  CYC(0x6588, 0x6589);
-  CYC(0x6589, 0x658a); B = alu_inc8(gb, B);
-  CYC(0x658a, 0x658b); ret_effect(gb);
+  CYC(b_+0, b_+2); A = 0x14;
+  CALL_C(b_+2, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+5);
+  CYC(b_+5, b_+7); B = 0xff;
+  if (!(F & FZ)) { CYCT(b_+7, b_+8); ret_effect(gb); return; }
+  CYC(b_+7, b_+8);
+  CYC(b_+8, b_+9); B = alu_inc8(gb, B);
+  CYC(b_+9, b_+12); A = mem_rd(gb, wGroup0RoomFlags + 0x83);
+  CYC(b_+12, b_+13); alu_rlca(gb);
+  if (!(F & FC)) { CYCT(b_+13, b_+14); ret_effect(gb); return; }
+  CYC(b_+13, b_+14);
+  CYC(b_+14, b_+16); A = 0x11;
+  CALL_C(b_+16, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+19);
+  CYC(b_+19, b_+21); B = 1;
+  if (!(F & FC)) { CYCT(b_+21, b_+22); ret_effect(gb); return; }
+  CYC(b_+21, b_+22);
+  CYC(b_+22, b_+24); A = 0x11;
+  CALL_C(b_+24, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+27);
+  if (!(F & FZ)) { CYCT(b_+27, b_+29); goto saved_nayru; }
+  CYC(b_+27, b_+29);
+  CYC(b_+29, b_+31); A = 0x38;
+  CALL_C(b_+31, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+34);
+  CYC(b_+34, b_+36); B = 4;
+  if (!(F & FZ)) { CYCT(b_+36, b_+37); ret_effect(gb); return; }
+  CYC(b_+36, b_+37);
+  CYC(b_+37, b_+39); A = 0x40;
+  CALL_C(b_+39, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+42);
+  CYC(b_+42, b_+44); alu_bit(gb, 2, A);
+  CYC(b_+44, b_+46); B = 2;
+  if (F & FZ) { CYCT(b_+46, b_+47); ret_effect(gb); return; }
+  CYC(b_+46, b_+47);
+  CYC(b_+47, b_+48); B = alu_inc8(gb, B);
+  CYC(b_+48, b_+49); ret_effect(gb);
   return;
 saved_nayru:
-  CYC(0x658b, 0x658d); A = 0x36;
-  CALL_C(0x658d, checkTreasureObtained_hook, 0x1748, 0x6590);
-  CYC(0x6590, 0x6592); B = 5;
-  if (!(F & FC)) { CYCT(0x6592, 0x6593); ret_effect(gb); return; }
-  CYC(0x6592, 0x6593);
-  CYC(0x6593, 0x6595); A = 0x33;
-  CALL_C(0x6595, checkGlobalFlag_hook, 0x31f3, 0x6598);
-  CYC(0x6598, 0x659a); B = 6;
-  if (F & FZ) { CYCT(0x659a, 0x659b); ret_effect(gb); return; }
-  CYC(0x659a, 0x659b);
-  CYC(0x659b, 0x659d); A = 0x3a;
-  CALL_C(0x659d, checkGlobalFlag_hook, 0x31f3, 0x65a0);
-  CYC(0x65a0, 0x65a2); B = 7;
-  if (F & FZ) { CYCT(0x65a2, 0x65a3); ret_effect(gb); return; }
-  CYC(0x65a2, 0x65a3);
-  CYC(0x65a3, 0x65a4); B = alu_inc8(gb, B);
-  CYC(0x65a4, 0x65a5); ret_effect(gb);
+  CYC(b_+49, b_+51); A = 0x36;
+  CALL_C(b_+51, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+54);
+  CYC(b_+54, b_+56); B = 5;
+  if (!(F & FC)) { CYCT(b_+56, b_+57); ret_effect(gb); return; }
+  CYC(b_+56, b_+57);
+  CYC(b_+57, b_+59); A = 0x33;
+  CALL_C(b_+59, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+62);
+  CYC(b_+62, b_+64); B = 6;
+  if (F & FZ) { CYCT(b_+64, b_+65); ret_effect(gb); return; }
+  CYC(b_+64, b_+65);
+  CYC(b_+65, b_+67); A = 0x3a;
+  CALL_C(b_+67, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+70);
+  CYC(b_+70, b_+72); B = 7;
+  if (F & FZ) { CYCT(b_+72, b_+73); ret_effect(gb); return; }
+  CYC(b_+72, b_+73);
+  CYC(b_+73, b_+74); B = alu_inc8(gb, B);
+  CYC(b_+74, SYM(interactionCode51)); ret_effect(gb);
 }

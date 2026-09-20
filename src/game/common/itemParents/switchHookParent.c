@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x06, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x06, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(parentItemCode_switchHook), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(parentItemCode_switchHook), (from), (to), true)
 
 static uint16_t switch_hook_parent_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A); burn_rom(gb, 0, 1, 2, false); SET_HL(pop_effect(gb));
@@ -15,28 +15,33 @@ static uint16_t switch_hook_parent_jump_table(GB *gb) {
 }
 
 void parentItemCode_switchHook_hook(GB *gb) {
+  BASE(parentItemCode_switchHook);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4b16,0x4b18); E=4; CYC(0x4b18,0x4b19); A=mem_rd(gb,DE); CYC(0x4b19,0x4b1a); push_effect(gb,0x4b1a);
-  switch (switch_hook_parent_jump_table(gb)) { case 0x4b1e: break; case 0x4b4c: goto state1; default: hook_continue(gb,HL,sp0_); return; }
-  CYC(0x4b1e,0x4b21); A=W8(wLinkObjectIndex); CYC(0x4b21,0x4b22); alu_rrca(gb);
-  if (F&FC) { CYCT(0x4b22,0x4b25); clearParentItem_hook(gb); return; } CYC(0x4b22,0x4b25);
-  CYC(0x4b25,0x4b28); A=W8(wLinkInAir); CYC(0x4b28,0x4b29); alu_or(gb,A);
-  if (!(F&FZ)) { CYCT(0x4b29,0x4b2c); clearParentItem_hook(gb); return; } CYC(0x4b29,0x4b2c);
-  CALL_C(0x4b2c,isLinkInHole_hook,0x54d8,0x4b2f); if (F&FC) { CYCT(0x4b2f,0x4b32); clearParentItem_hook(gb); return; } CYC(0x4b2f,0x4b32);
-  CALL_C(0x4b32,updateLinkDirectionFromAngle_hook,0x2b64,0x4b35);
-  CALL_C(0x4b35,clearVariousLinkVariables_hook,0x2c9b,0x4b38);
-  CYC(0x4b38,0x4b39); H=D; CYC(0x4b39,0x4b3b); L=0; CYC(0x4b3b,0x4b3d); mem_wr(gb,HL,0xff);
-  CALL_C(0x4b3d,parentItemLoadAnimationAndIncState_hook,0x5378,0x4b40);
-  CALL_C(0x4b40,itemCreateChild_hook,0x53dd,0x4b43);
-  CALL_C(0x4b43,isLinkUnderwater_hook,0x54d2,0x4b46);
-  if (F&FZ) { CYCT(0x4b46,0x4b47); ret_effect(gb); return; } CYC(0x4b46,0x4b47);
-  CYC(0x4b47,0x4b49); A=0x2e; CYC(0x4b49,0x4b4c); specialObjectSetAnimationWithLinkData_hook(gb); return;
+  CYC(b_+0,b_+2); E=4; CYC(b_+2,b_+3); A=mem_rd(gb,DE); CYC(b_+3,b_+4); push_effect(gb,b_+4);
+  do { uint16_t jt_ = (switch_hook_parent_jump_table(gb));
+    if (jt_ == b_+8) { break; }
+    else if (jt_ == b_+54) { goto state1; }
+    else { hook_continue(gb,HL,sp0_); return; }
+  } while (0);
+  CYC(b_+8,b_+11); A=W8(wLinkObjectIndex); CYC(b_+11,b_+12); alu_rrca(gb);
+  if (F&FC) { CYCT(b_+12,b_+15); clearParentItem_hook(gb); return; } CYC(b_+12,b_+15);
+  CYC(b_+15,b_+18); A=W8(wLinkInAir); CYC(b_+18,b_+19); alu_or(gb,A);
+  if (!(F&FZ)) { CYCT(b_+19,b_+22); clearParentItem_hook(gb); return; } CYC(b_+19,b_+22);
+  CALL_C(b_+22,isLinkInHole_hook,SYM(isLinkInHole),b_+25); if (F&FC) { CYCT(b_+25,b_+28); clearParentItem_hook(gb); return; } CYC(b_+25,b_+28);
+  CALL_C(b_+28,updateLinkDirectionFromAngle_hook,SYM(updateLinkDirectionFromAngle),b_+31);
+  CALL_C(b_+31,clearVariousLinkVariables_hook,SYM(clearVariousLinkVariables),b_+34);
+  CYC(b_+34,b_+35); H=D; CYC(b_+35,b_+37); L=0; CYC(b_+37,b_+39); mem_wr(gb,HL,0xff);
+  CALL_C(b_+39,parentItemLoadAnimationAndIncState_hook,SYM(parentItemLoadAnimationAndIncState),b_+42);
+  CALL_C(b_+42,itemCreateChild_hook,SYM(itemCreateChild),b_+45);
+  CALL_C(b_+45,isLinkUnderwater_hook,SYM(isLinkUnderwater),b_+48);
+  if (F&FZ) { CYCT(b_+48,b_+49); ret_effect(gb); return; } CYC(b_+48,b_+49);
+  CYC(b_+49,b_+51); A=0x2e; CYC(b_+51,b_+54); specialObjectSetAnimationWithLinkData_hook(gb); return;
 state1:
-  CYC(0x4b4c,0x4b4f); A=W8(w1WeaponItem_var2f); CYC(0x4b4f,0x4b50); alu_or(gb,A);
-  if (F&FZ) { CYCT(0x4b50,0x4b53); clearParentItem_hook(gb); return; } CYC(0x4b50,0x4b53);
-  CYC(0x4b53,0x4b56); W8(wDisallowMountingCompanion)=A;
-  CALL_C(0x4b56,clearVariousLinkVariables_hook,0x2c9b,0x4b59);
-  CYC(0x4b59,0x4b5c); SET_HL(w1Link_var2a); CYC(0x4b5c,0x4b5d); A=mem_rd(gb,HL); CYC(0x4b5d,0x4b5f); L=(uint8_t)w1Link_knockbackCounter; CYC(0x4b5f,0x4b60); alu_or(gb,mem_rd(gb,HL));
-  if (F&FZ) { CYCT(0x4b60,0x4b61); ret_effect(gb); return; } CYC(0x4b60,0x4b61);
-  CYC(0x4b61,0x4b64); SET_HL(w1WeaponItem_var2f); CYC(0x4b64,0x4b66); mem_wr(gb,HL,mem_rd(gb,HL)|(1<<5)); CYC(0x4b66,0x4b67); ret_effect(gb);
+  CYC(b_+54,b_+57); A=W8(w1WeaponItem_var2f); CYC(b_+57,b_+58); alu_or(gb,A);
+  if (F&FZ) { CYCT(b_+58,b_+61); clearParentItem_hook(gb); return; } CYC(b_+58,b_+61);
+  CYC(b_+61,b_+64); W8(wDisallowMountingCompanion)=A;
+  CALL_C(b_+64,clearVariousLinkVariables_hook,SYM(clearVariousLinkVariables),b_+67);
+  CYC(b_+67,b_+70); SET_HL(w1Link_var2a); CYC(b_+70,b_+71); A=mem_rd(gb,HL); CYC(b_+71,b_+73); L=(uint8_t)w1Link_knockbackCounter; CYC(b_+73,b_+74); alu_or(gb,mem_rd(gb,HL));
+  if (F&FZ) { CYCT(b_+74,b_+75); ret_effect(gb); return; } CYC(b_+74,b_+75);
+  CYC(b_+75,b_+78); SET_HL(w1WeaponItem_var2f); CYC(b_+78,b_+80); mem_wr(gb,HL,mem_rd(gb,HL)|(1<<5)); CYC(b_+80,SYM(parentItemCode_caneOfSomaria)); ret_effect(gb);
 }

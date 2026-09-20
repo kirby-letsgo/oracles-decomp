@@ -3,17 +3,17 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(impaOctorokCode), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(impaOctorokCode), (from), (to), true)
 
 // Each animation faces a different direction (indexed by var03).
-#define interactionCode32_animations_bank08 0x6047
+#define interactionCode32_animations_bank08 SYM(interactionCode32__animations)
 // b0 = counter1, b1 = angle, per var03.
-#define impaOctorokCode_countersAndAngles_bank08 0x60be
+#define impaOctorokCode_countersAndAngles_bank08 SYM(impaOctorokCode__countersAndAngles)
 // Three (identical, do-nothing) script pointers indexed by var03.
-#define impaOctorokScriptTable_bank08 0x60df
+#define impaOctorokScriptTable_bank08 SYM(impaOctorokScriptTable)
 // mainScripts.greatFairyOctorokScript (bank $0c).
-#define greatFairyOctorokScript_bank0c 0x5308
+#define greatFairyOctorokScript_bank0c SYM(greatFairyOctorokScript)
 
 static uint16_t fakeOctorok_jumpTable(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -59,187 +59,190 @@ static void fakeOctorok_addDoubleIndex(GB *gb, uint16_t return_address) {
 // Subid 0: one of Impa's octoroks. Runs a (do-nothing) script and, once $cfd0 is set,
 // walks off-screen and deletes itself.
 void impaOctorokCode_hook(GB *gb) {
+  BASE(impaOctorokCode);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x607e, interactionAnimate_hook, 0x261b, 0x6081);
-  CYC(0x6081, 0x6083); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x6083, 0x6084); A = mem_rd(gb, DE);
-  CYC(0x6084, 0x6085); push_effect(gb, 0x6085);
-  switch (fakeOctorok_jumpTable(gb)) {
-    case 0x608d: goto substate0;
-    case 0x609b: goto substate1;
-    case 0x60c4: goto substate2;
-    case 0x60d3: goto substate3;
-    default: HANDOFF(HL);
-  }
+  CALL_C(b_+0, interactionAnimate_hook, SYM(interactionAnimate), b_+3);
+  CYC(b_+3, b_+5); E = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+7); push_effect(gb, b_+7);
+  do { uint16_t jt_ = (fakeOctorok_jumpTable(gb));
+    if (jt_ == b_+15) { goto substate0; }
+    else if (jt_ == b_+29) { goto substate1; }
+    else if (jt_ == b_+70) { goto substate2; }
+    else if (jt_ == b_+85) { goto substate3; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 substate0:
-  CYC(0x608d, 0x6090); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfd0);
-  CYC(0x6090, 0x6092); alu_cp(gb, 0x01);
+  CYC(b_+15, b_+18); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfd0);
+  CYC(b_+18, b_+20); alu_cp(gb, 0x01);
   if (!(F & FZ)) {
-    CYCT(0x6092, 0x6093); ret_effect(gb); return;
+    CYCT(b_+20, b_+21); ret_effect(gb); return;
   }
-  CYC(0x6092, 0x6093);
-  CALL_C(0x6093, interactionIncSubstate_hook, 0x23e5, 0x6096);
-  CYC(0x6096, 0x6098); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x6098, 0x609a); mem_wr(gb, HL, 0x14);
-  CYC(0x609a, 0x609b); ret_effect(gb);
+  CYC(b_+20, b_+21);
+  CALL_C(b_+21, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+24);
+  CYC(b_+24, b_+26); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+26, b_+28); mem_wr(gb, HL, 0x14);
+  CYC(b_+28, b_+29); ret_effect(gb);
   return;
 
 substate1:
-  CALL_C(0x609b, interactionDecCounter1_hook, 0x23cc, 0x609e);
+  CALL_C(b_+29, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+32);
   if (!(F & FZ)) {
-    CYCT(0x609e, 0x609f); ret_effect(gb); return;
+    CYCT(b_+32, b_+33); ret_effect(gb); return;
   }
-  CYC(0x609e, 0x609f);
-  CALL_C(0x609f, interactionIncSubstate_hook, 0x23e5, 0x60a2);
-  CYC(0x60a2, 0x60a4); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x60a4, 0x60a6); mem_wr(gb, HL, 0x78); // SPEED_300
-  CYC(0x60a6, 0x60a8); L = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x60a8, 0x60a9); A = mem_rd(gb, HL);
-  CYC(0x60a9, 0x60ac); SET_BC(impaOctorokCode_countersAndAngles_bank08);
-  CALL_C(0x60ac, addDoubleIndexToBc_hook, 0x007e, 0x60af);
-  CYC(0x60af, 0x60b0); A = mem_rd(gb, BC);
-  CYC(0x60b0, 0x60b2); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x60b2, 0x60b3); mem_wr(gb, HL, A);
-  CYC(0x60b3, 0x60b4); SET_BC(BC + 1);
-  CYC(0x60b4, 0x60b5); A = mem_rd(gb, BC);
-  CYC(0x60b5, 0x60b7); L = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x60b7, 0x60b8); mem_wr(gb, HL, A);
-  CYC(0x60b8, 0x60ba); A = alu_swap(gb, A);
-  CYC(0x60ba, 0x60bb); alu_rlca(gb);
-  CYC(0x60bb, 0x60be); interactionSetAnimation_hook(gb);
+  CYC(b_+32, b_+33);
+  CALL_C(b_+33, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+36);
+  CYC(b_+36, b_+38); L = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+38, b_+40); mem_wr(gb, HL, 0x78); // SPEED_300
+  CYC(b_+40, b_+42); L = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+42, b_+43); A = mem_rd(gb, HL);
+  CYC(b_+43, b_+46); SET_BC(impaOctorokCode_countersAndAngles_bank08);
+  CALL_C(b_+46, addDoubleIndexToBc_hook, 0x007e, b_+49);
+  CYC(b_+49, b_+50); A = mem_rd(gb, BC);
+  CYC(b_+50, b_+52); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+52, b_+53); mem_wr(gb, HL, A);
+  CYC(b_+53, b_+54); SET_BC(BC + 1);
+  CYC(b_+54, b_+55); A = mem_rd(gb, BC);
+  CYC(b_+55, b_+57); L = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+57, b_+58); mem_wr(gb, HL, A);
+  CYC(b_+58, b_+60); A = alu_swap(gb, A);
+  CYC(b_+60, b_+61); alu_rlca(gb);
+  CYC(b_+61, b_+64); interactionSetAnimation_hook(gb);
   return;
 
 substate2:
-  CALL_C(0x60c4, interactionAnimate2Times_hook, 0x2752, 0x60c7);
-  CALL_C(0x60c7, interactionDecCounter1_hook, 0x23cc, 0x60ca);
+  CALL_C(b_+70, interactionAnimate2Times_hook, SYM(interactionAnimate2Times), b_+73);
+  CALL_C(b_+73, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+76);
   if (!(F & FZ)) {
-    CYCT(0x60ca, 0x60cb); ret_effect(gb); return;
+    CYCT(b_+76, b_+77); ret_effect(gb); return;
   }
-  CYC(0x60ca, 0x60cb);
-  CYC(0x60cb, 0x60cd); A = 0x51; // SND_THROW
-  CALL_C(0x60cd, playSound_b00_hook, 0x0c98, 0x60d0);
-  CYC(0x60d0, 0x60d3); interactionIncSubstate_hook(gb);
+  CYC(b_+76, b_+77);
+  CYC(b_+77, b_+79); A = 0x51; // SND_THROW
+  CALL_C(b_+79, playSound_b00_hook, SYM(playSound_b00), b_+82);
+  CYC(b_+82, b_+85); interactionIncSubstate_hook(gb);
   return;
 
 substate3:
-  CALL_C(0x60d3, objectCheckWithinScreenBoundary_hook, 0x2184, 0x60d6);
+  CALL_C(b_+85, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+88);
   if (!(F & FC)) {
-    CYCT(0x60d6, 0x60d9); interactionDelete_hook(gb); return;
+    CYCT(b_+88, b_+91); interactionDelete_hook(gb); return;
   }
-  CYC(0x60d6, 0x60d9);
-  CALL_C(0x60d9, interactionAnimate2Times_hook, 0x2752, 0x60dc);
-  CYC(0x60dc, 0x60df); objectApplySpeed_hook(gb);
+  CYC(b_+88, b_+91);
+  CALL_C(b_+91, interactionAnimate2Times_hook, SYM(interactionAnimate2Times), b_+94);
+  CYC(b_+94, SYM(impaOctorokScriptTable)); objectApplySpeed_hook(gb);
 }
 
 // Subids 1-2: the great fairy disguised as an octorok. Runs the script; once it ends
 // (fairy powder used) it sinks into the ground and spawns the real great fairy.
 void greatFairyOctorokCode_hook(GB *gb) {
+  BASE(greatFairyOctorokCode);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x60e5, npcFaceLinkAndAnimate_hook, 0x26a9, 0x60e8);
-  CALL_C(0x60e8, interactionRunScript_hook, 0x2552, 0x60eb);
+  CALL_C(b_+0, npcFaceLinkAndAnimate_hook, SYM(npcFaceLinkAndAnimate), b_+3);
+  CALL_C(b_+3, interactionRunScript_hook, SYM(interactionRunScript), b_+6);
   if (!(F & FC)) {
-    CYCT(0x60eb, 0x60ec); ret_effect(gb); return;
+    CYCT(b_+6, b_+7); ret_effect(gb); return;
   }
-  CYC(0x60eb, 0x60ec);
-  CYC(0x60ec, 0x60ed); alu_xor(gb, A);
-  CALL_C(0x60ed, objectUpdateSpeedZ_hook, 0x1f45, 0x60f0);
-  CYC(0x60f0, 0x60f2); E = INTERACTION_BASE + OBJ_ZH;
-  CYC(0x60f2, 0x60f3); A = mem_rd(gb, DE);
-  CYC(0x60f3, 0x60f5); alu_cp(gb, 0xf0);
+  CYC(b_+6, b_+7);
+  CYC(b_+7, b_+8); alu_xor(gb, A);
+  CALL_C(b_+8, objectUpdateSpeedZ_hook, SYM(objectUpdateSpeedZ), b_+11);
+  CYC(b_+11, b_+13); E = INTERACTION_BASE + OBJ_ZH;
+  CYC(b_+13, b_+14); A = mem_rd(gb, DE);
+  CYC(b_+14, b_+16); alu_cp(gb, 0xf0);
   if (!(F & FZ)) {
-    CYCT(0x60f5, 0x60f6); ret_effect(gb); return;
+    CYCT(b_+16, b_+17); ret_effect(gb); return;
   }
-  CYC(0x60f5, 0x60f6);
-  CYC(0x60f6, 0x60f9); SET_BC(0xd501); // INTERAC_GREAT_FAIRY, subid 1
-  CALL_C(0x60f9, objectCreateInteraction_hook, 0x24c5, 0x60fc);
-  CYC(0x60fc, 0x60fe); A = 0x51; // TREASURE_FAIRY_POWDER
-  CALL_C(0x60fe, loseTreasure_hook, 0x1733, 0x6101);
-  CYC(0x6101, 0x6104); interactionDelete_hook(gb);
+  CYC(b_+16, b_+17);
+  CYC(b_+17, b_+20); SET_BC(w1ParentItem5_id); // INTERAC_GREAT_FAIRY, subid 1
+  CALL_C(b_+20, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+23);
+  CYC(b_+23, b_+25); A = 0x51; // TREASURE_FAIRY_POWDER
+  CALL_C(b_+25, loseTreasure_hook, SYM(loseTreasure), b_+28);
+  CYC(b_+28, SYM(interactionCode33)); interactionDelete_hook(gb);
 }
 
 // INTERAC_FAKE_OCTOROK: Impa's octoroks (subid 0) and the great fairy octorok (subids 1-2).
 void interactionCode32_hook(GB *gb) {
+  BASE(interactionCode32);
   uint16_t sp0_ = gb->sp;
-  CYC(0x600d, 0x600f); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x600f, 0x6010); A = mem_rd(gb, DE);
-  CYC(0x6010, 0x6011); push_effect(gb, 0x6011);
-  switch (fakeOctorok_jumpTable(gb)) {
-    case 0x6015: goto state0;
-    case 0x6074: goto state1;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (fakeOctorok_jumpTable(gb));
+    if (jt_ == b_+8) { goto state0; }
+    else if (jt_ == b_+103) { goto state1; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 state0:
-  CYC(0x6015, 0x6017); A = 0x01;
-  CYC(0x6017, 0x6018); mem_wr(gb, DE, A);
-  CALL_C(0x6018, interactionInitGraphics_hook, 0x15fb, 0x601b);
-  CYC(0x601b, 0x601d); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x601d, 0x601e); A = mem_rd(gb, DE);
-  CYC(0x601e, 0x601f); push_effect(gb, 0x601f);
-  switch (fakeOctorok_jumpTable(gb)) {
-    case 0x6025: goto init0;
-    case 0x606e: goto init1;
-    case 0x604a: goto init2;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+8, b_+10); A = 0x01;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
+  CYC(b_+14, b_+16); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+16, b_+17); A = mem_rd(gb, DE);
+  CYC(b_+17, b_+18); push_effect(gb, b_+18);
+  do { uint16_t jt_ = (fakeOctorok_jumpTable(gb));
+    if (jt_ == b_+24) { goto init0; }
+    else if (jt_ == b_+97) { goto init1; }
+    else if (jt_ == b_+61) { goto init2; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 init0:
-  CALL_C(0x6025, getThisRoomFlags_hook, 0x197d, 0x6028);
-  CYC(0x6028, 0x602a); alu_bit(gb, 6, A);
+  CALL_C(b_+24, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+27);
+  CYC(b_+27, b_+29); alu_bit(gb, 6, A);
   if (!(F & FZ)) {
-    CYCT(0x602a, 0x602d); interactionDelete_hook(gb); return;
+    CYCT(b_+29, b_+32); interactionDelete_hook(gb); return;
   }
-  CYC(0x602a, 0x602d);
-  CALL_C(0x602d, objectSetVisible82_hook, 0x1e69, 0x6030);
-  CYC(0x6030, 0x6032); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x6032, 0x6033); A = mem_rd(gb, DE);
-  CYC(0x6033, 0x6034); B = A;
-  CYC(0x6034, 0x6037); SET_HL(impaOctorokScriptTable_bank08);
-  CYC(0x6037, 0x6038); fakeOctorok_addDoubleIndex(gb, 0x6038);
-  CYC(0x6038, 0x6039); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x6039, 0x603a); H = mem_rd(gb, HL);
-  CYC(0x603a, 0x603b); L = A;
-  CALL_C(0x603b, interactionSetScript_hook, 0x2544, 0x603e);
-  CYC(0x603e, 0x603f); A = B;
-  CYC(0x603f, 0x6042); SET_HL(interactionCode32_animations_bank08);
-  CYC(0x6042, 0x6043); push_effect(gb, 0x6043); fakeOctorok_addAToHl(gb);
-  CYC(0x6043, 0x6044); A = mem_rd(gb, HL);
-  CYC(0x6044, 0x6047); interactionSetAnimation_hook(gb);
+  CYC(b_+29, b_+32);
+  CALL_C(b_+32, objectSetVisible82_hook, SYM(objectSetVisible82), b_+35);
+  CYC(b_+35, b_+37); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+37, b_+38); A = mem_rd(gb, DE);
+  CYC(b_+38, b_+39); B = A;
+  CYC(b_+39, b_+42); SET_HL(impaOctorokScriptTable_bank08);
+  CYC(b_+42, b_+43); fakeOctorok_addDoubleIndex(gb, b_+43);
+  CYC(b_+43, b_+44); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+44, b_+45); H = mem_rd(gb, HL);
+  CYC(b_+45, b_+46); L = A;
+  CALL_C(b_+46, interactionSetScript_hook, SYM(interactionSetScript), b_+49);
+  CYC(b_+49, b_+50); A = B;
+  CYC(b_+50, b_+53); SET_HL(interactionCode32_animations_bank08);
+  CYC(b_+53, b_+54); push_effect(gb, b_+54); fakeOctorok_addAToHl(gb);
+  CYC(b_+54, b_+55); A = mem_rd(gb, HL);
+  CYC(b_+55, b_+58); interactionSetAnimation_hook(gb);
   return;
 
 init2:
-  CYC(0x604a, 0x604c); A = 0x30; // GLOBALFLAG_WATER_POLLUTION_FIXED
-  CALL_C(0x604c, checkGlobalFlag_hook, 0x31f3, 0x604f);
+  CYC(b_+61, b_+63); A = 0x30; // GLOBALFLAG_WATER_POLLUTION_FIXED
+  CALL_C(b_+63, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+66);
   if (F & FZ) {
-    CYCT(0x604f, 0x6051); goto notFixed;
+    CYCT(b_+66, b_+68); goto notFixed;
   }
-  CYC(0x604f, 0x6051);
-  CYC(0x6051, 0x6053); A = 0x38; // ENEMY_GREAT_FAIRY
-  CALL_C(0x6053, getFreeEnemySlot_hook, 0x2e27, 0x6056);
-  CYC(0x6056, 0x6058); mem_wr(gb, HL, 0x38);
-  CALL_C(0x6058, objectCopyPosition_hook, 0x2242, 0x605b);
-  CYC(0x605b, 0x605e); interactionDelete_hook(gb);
+  CYC(b_+66, b_+68);
+  CYC(b_+68, b_+70); A = 0x38; // ENEMY_GREAT_FAIRY
+  CALL_C(b_+70, getFreeEnemySlot_hook, SYM(getFreeEnemySlot), b_+73);
+  CYC(b_+73, b_+75); mem_wr(gb, HL, 0x38);
+  CALL_C(b_+75, objectCopyPosition_hook, SYM(objectCopyPosition), b_+78);
+  CYC(b_+78, b_+81); interactionDelete_hook(gb);
   return;
 notFixed:
-  CYC(0x605e, 0x6061); SET_BC(0xff80);
-  CALL_C(0x6061, objectSetSpeedZ_hook, 0x239d, 0x6064);
-  CYC(0x6064, 0x6066); A = 0x41; // >TX_4100
-  CALL_C(0x6066, interactionSetHighTextIndex_hook, 0x253b, 0x6069);
-  CYC(0x6069, 0x606c); SET_HL(greatFairyOctorokScript_bank0c);
-  CYC(0x606c, 0x606e);
+  CYC(b_+81, b_+84); SET_BC(hOamFunc);
+  CALL_C(b_+84, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+87);
+  CYC(b_+87, b_+89); A = 0x41; // >TX_4100
+  CALL_C(b_+89, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+92);
+  CYC(b_+92, b_+95); SET_HL(greatFairyOctorokScript_bank0c);
+  CYC(b_+95, b_+97);
 
 init1:
-  CALL_C(0x606e, interactionSetScript_hook, 0x2544, 0x6071);
-  CALL_C(0x6071, objectSetVisiblec0_hook, 0x1e33, 0x6074);
+  CALL_C(b_+97, interactionSetScript_hook, SYM(interactionSetScript), b_+100);
+  CALL_C(b_+100, objectSetVisiblec0_hook, SYM(objectSetVisiblec0), b_+103);
 
 state1:
-  CYC(0x6074, 0x6076); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x6076, 0x6077); A = mem_rd(gb, DE);
-  CYC(0x6077, 0x6078); push_effect(gb, 0x6078);
-  switch (fakeOctorok_jumpTable(gb)) {
-    case 0x607e: impaOctorokCode_hook(gb); return;
-    case 0x60e5: greatFairyOctorokCode_hook(gb); return;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+103, b_+105); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+105, b_+106); A = mem_rd(gb, DE);
+  CYC(b_+106, b_+107); push_effect(gb, b_+107);
+  do { uint16_t jt_ = (fakeOctorok_jumpTable(gb));
+    if (jt_ == SYM(impaOctorokCode)) { impaOctorokCode_hook(gb); return; }
+    else if (jt_ == SYM(greatFairyOctorokCode)) { greatFairyOctorokCode_hook(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 }

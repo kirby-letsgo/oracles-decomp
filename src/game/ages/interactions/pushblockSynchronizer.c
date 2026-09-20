@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodebd), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodebd), (from), (to), true)
 
 // ref/oracles-disasm/object_code/ages/interactions/pushblockSynchronizer.s (interactionCodebd /
 // INTERAC_PUSHBLOCK_SYNCHRONIZER), bank 0x0b.
@@ -32,84 +32,86 @@ static uint16_t interactionCodebd_jump_table(GB *gb) {
 // own boundary is correct and safe (matches src/game/ball.c's func_6b00 precedent). It uses
 // CALL_C internally so it takes sp0_.
 static void interactionCodebd_pushBlockAt(GB *gb, uint16_t sp0_) {
-  CYC(0x709e, 0x709f); push_effect(gb, HL); // push hl
-  CYC(0x709f, 0x70a1); A = H8(hFF8B);
-  CYC(0x70a1, 0x70a3); alu_cp(gb, 0xda); // TILEINDEX_SOMARIA_BLOCK
-  if (F & FZ) { CYCT(0x70a3, 0x70a5); goto ret_label; } // jr z
-  CYC(0x70a3, 0x70a5);
-  CYC(0x70a5, 0x70a6); A = L;
-  CYC(0x70a6, 0x70a8); H8(hFF8D) = A;
-  CYC(0x70a8, 0x70a9); H = D;
-  CYC(0x70a9, 0x70ab); L = INTERACTION_BASE + OBJ_YH;
-  CALL_C(0x70ab, setShortPosition_hook, 0x20b8, 0x70ae);
-  CYC(0x70ae, 0x70b0); L = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x70b0, 0x70b3); A = W8(wBlockPushAngle);
-  CYC(0x70b3, 0x70b5); alu_and(gb, 0x1f);
-  CYC(0x70b5, 0x70b6); mem_wr(gb, HL, A);
-  CALL_C(0x70b6, interactionCheckAdjacentTileIsSolid_hook, 0x271d, 0x70b9);
-  if (!(F & FZ)) { CYCT(0x70b9, 0x70bb); goto ret_label; } // jr nz
-  CYC(0x70b9, 0x70bb);
-  CALL_C(0x70bb, getFreeInteractionSlot_hook, 0x3aef, 0x70be);
-  if (!(F & FZ)) { CYCT(0x70be, 0x70c0); goto ret_label; } // jr nz
-  CYC(0x70be, 0x70c0);
-  CYC(0x70c0, 0x70c2); mem_wr(gb, HL, 0x14); // INTERAC_PUSHBLOCK
-  CYC(0x70c2, 0x70c4); L = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x70c4, 0x70c5); E = L;
-  CYC(0x70c5, 0x70c6); A = mem_rd(gb, DE);
-  CYC(0x70c6, 0x70c7); mem_wr(gb, HL, A);
-  CYC(0x70c7, 0x70ca); SET_BC(0xfe00); // -$02, $00
-  CALL_C(0x70ca, objectCopyPositionWithOffset_hook, 0x225a, 0x70cd);
-  CYC(0x70cd, 0x70cf); L = 0x70; // Interaction.var30
-  CYC(0x70cf, 0x70d1); A = H8(hFF8D);
-  CYC(0x70d1, 0x70d2); mem_wr(gb, HL, A);
+  BASE(interactionCodebd);
+  CYC(b_+49, b_+50); push_effect(gb, HL); // push hl
+  CYC(b_+50, b_+52); A = H8(hFF8B);
+  CYC(b_+52, b_+54); alu_cp(gb, 0xda); // TILEINDEX_SOMARIA_BLOCK
+  if (F & FZ) { CYCT(b_+54, b_+56); goto ret_label; } // jr z
+  CYC(b_+54, b_+56);
+  CYC(b_+56, b_+57); A = L;
+  CYC(b_+57, b_+59); H8(hFF8D) = A;
+  CYC(b_+59, b_+60); H = D;
+  CYC(b_+60, b_+62); L = INTERACTION_BASE + OBJ_YH;
+  CALL_C(b_+62, setShortPosition_hook, SYM(setShortPosition), b_+65);
+  CYC(b_+65, b_+67); L = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+67, b_+70); A = W8(wBlockPushAngle);
+  CYC(b_+70, b_+72); alu_and(gb, 0x1f);
+  CYC(b_+72, b_+73); mem_wr(gb, HL, A);
+  CALL_C(b_+73, interactionCheckAdjacentTileIsSolid_hook, SYM(interactionCheckAdjacentTileIsSolid), b_+76);
+  if (!(F & FZ)) { CYCT(b_+76, b_+78); goto ret_label; } // jr nz
+  CYC(b_+76, b_+78);
+  CALL_C(b_+78, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+81);
+  if (!(F & FZ)) { CYCT(b_+81, b_+83); goto ret_label; } // jr nz
+  CYC(b_+81, b_+83);
+  CYC(b_+83, b_+85); mem_wr(gb, HL, 0x14); // INTERAC_PUSHBLOCK
+  CYC(b_+85, b_+87); L = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+87, b_+88); E = L;
+  CYC(b_+88, b_+89); A = mem_rd(gb, DE);
+  CYC(b_+89, b_+90); mem_wr(gb, HL, A);
+  CYC(b_+90, b_+93); SET_BC(0xfe00); // -$02, $00
+  CALL_C(b_+93, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+96);
+  CYC(b_+96, b_+98); L = 0x70; // Interaction.var30
+  CYC(b_+98, b_+100); A = H8(hFF8D);
+  CYC(b_+100, b_+101); mem_wr(gb, HL, A);
 
 ret_label: // interactionCodebd@return
-  CYC(0x70d2, 0x70d3); SET_HL(pop_effect(gb)); // pop hl
-  CYC(0x70d3, 0x70d4); L = alu_dec8(gb, L);
-  CYC(0x70d4, 0x70d5); return; // ret
+  CYC(b_+101, b_+102); SET_HL(pop_effect(gb)); // pop hl
+  CYC(b_+102, b_+103); L = alu_dec8(gb, L);
+  CYC(b_+103, SYM(interactionCodebe)); return; // ret
 }
 
 // ==================================================================================================
 // INTERAC_PUSHBLOCK_SYNCHRONIZER
 // ==================================================================================================
 void interactionCodebd_hook(GB *gb) {
+  BASE(interactionCodebd);
   uint16_t sp0_ = gb->sp;
-  CYC(0x706d, 0x706f); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x706f, 0x7070); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x7070, 0x7071); push_effect(gb, 0x7071);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = interactionCodebd_jump_table(gb);
-    if (target == 0x23e0) { interactionIncState_hook(gb); return; } // state list's 1st entry jumps straight into interactionIncState
-    if (target == 0x7098) goto state2;
+    if (target == SYM(interactionIncState)) { interactionIncState_hook(gb); return; } // state list's 1st entry jumps straight into interactionIncState
+    if (target == b_+43) goto state2;
     // target == 0x7077 falls through to state1
   }
 
   // interactionCodebd@state1
-  CYC(0x7077, 0x707a); A = W8(w1ReservedInteraction1_enabled);
-  CYC(0x707a, 0x707b); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x707b, 0x707c); ret_effect(gb); return; } // ret z
-  CYC(0x707b, 0x707c);
-  CYC(0x707c, 0x707f); A = W8(w1ReservedInteraction1_var31); // Tile index of block being pushed
-  CYC(0x707f, 0x7081); H8(hFF8B) = A;
-  CALL_C(0x7081, findTileInRoom_hook, 0x15cc, 0x7084);
-  if (!(F & FZ)) { CYCT(0x7084, 0x7086); goto incState; } // jr nz
-  CYC(0x7084, 0x7086);
-  CYC(0x7086, 0x7089); interactionCodebd_pushBlockAt(gb, sp0_); // call
+  CYC(b_+10, b_+13); A = W8(w1ReservedInteraction1_enabled);
+  CYC(b_+13, b_+14); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+14, b_+15); ret_effect(gb); return; } // ret z
+  CYC(b_+14, b_+15);
+  CYC(b_+15, b_+18); A = W8(w1ReservedInteraction1_var31); // Tile index of block being pushed
+  CYC(b_+18, b_+20); H8(hFF8B) = A;
+  CALL_C(b_+20, findTileInRoom_hook, SYM(findTileInRoom), b_+23);
+  if (!(F & FZ)) { CYCT(b_+23, b_+25); goto incState; } // jr nz
+  CYC(b_+23, b_+25);
+  CYC(b_+25, b_+28); interactionCodebd_pushBlockAt(gb, sp0_); // call
 
 l7089:
-  CYC(0x7089, 0x708b); A = H8(hFF8B);
-  CALL_C(0x708b, backwardsSearch_hook, 0x15d0, 0x708e);
-  if (!(F & FZ)) { CYCT(0x708e, 0x7090); goto incState; } // jr nz
-  CYC(0x708e, 0x7090);
-  CYC(0x7090, 0x7093); interactionCodebd_pushBlockAt(gb, sp0_); // call
-  CYC(0x7093, 0x7095); goto l7089; // jr
+  CYC(b_+28, b_+30); A = H8(hFF8B);
+  CALL_C(b_+30, backwardsSearch_hook, SYM(backwardsSearch), b_+33);
+  if (!(F & FZ)) { CYCT(b_+33, b_+35); goto incState; } // jr nz
+  CYC(b_+33, b_+35);
+  CYC(b_+35, b_+38); interactionCodebd_pushBlockAt(gb, sp0_); // call
+  CYC(b_+38, b_+40); goto l7089; // jr
 
 incState: // interactionCodebd@incState
-  CYC(0x7095, 0x7098); interactionIncState_hook(gb); return; // jp
+  CYC(b_+40, b_+43); interactionIncState_hook(gb); return; // jp
 
 state2: // interactionCodebd@state2
-  CYC(0x7098, 0x709a); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x709a, 0x709c); A = 0x01;
-  CYC(0x709c, 0x709d); mem_wr(gb, DE, A);
-  CYC(0x709d, 0x709e); ret_effect(gb); return; // ret
+  CYC(b_+43, b_+45); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+45, b_+47); A = 0x01;
+  CYC(b_+47, b_+48); mem_wr(gb, DE, A);
+  CYC(b_+48, b_+49); ret_effect(gb); return; // ret
 }

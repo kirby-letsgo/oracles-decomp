@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(introObject_applySpeed), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(introObject_applySpeed), (from), (to), true)
 
 static uint16_t titlescreen_clouds_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -34,109 +34,116 @@ static void titlescreen_clouds_add_double_index(GB *gb, uint16_t return_address)
 }
 
 void introObject_applySpeed_hook(GB *gb) {
+  BASE(introObject_applySpeed);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4ca1, 0x4ca2); H = D;
-  CYC(0x4ca2, 0x4ca4); L = 0x49;
-  CYC(0x4ca4, 0x4ca5); C = mem_rd(gb, HL);
-  CYC(0x4ca5, 0x4ca7); L = 0x50;
-  CYC(0x4ca7, 0x4ca8); B = mem_rd(gb, HL);
-  CALL_C(0x4ca8, getPositionOffsetForVelocity_hook, 0x2041, 0x4cab);
-  if (F & FZ) { CYCT(0x4cab, 0x4cac); ret_effect(gb); return; }
-  CYC(0x4cab, 0x4cac);
-  CYC(0x4cac, 0x4cae); E = 0x76;
-  CYC(0x4cae, 0x4caf); A = mem_rd(gb, DE);
-  CYC(0x4caf, 0x4cb0); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x4cb0, 0x4cb1); mem_wr(gb, DE, A);
-  CYC(0x4cb1, 0x4cb2); E = alu_inc8(gb, E);
-  CYC(0x4cb2, 0x4cb3); L = alu_inc8(gb, L);
-  CYC(0x4cb3, 0x4cb4); A = mem_rd(gb, DE);
-  CYC(0x4cb4, 0x4cb5); alu_adc(gb, mem_rd(gb, HL));
-  CYC(0x4cb5, 0x4cb6); mem_wr(gb, DE, A);
-  CYC(0x4cb6, 0x4cb8); E = 0x4c;
-  CYC(0x4cb8, 0x4cb9); L = alu_inc8(gb, L);
-  CYC(0x4cb9, 0x4cba); A = mem_rd(gb, DE);
-  CYC(0x4cba, 0x4cbb); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x4cbb, 0x4cbc); mem_wr(gb, DE, A);
-  CYC(0x4cbc, 0x4cbd); E = alu_inc8(gb, E);
-  CYC(0x4cbd, 0x4cbe); L = alu_inc8(gb, L);
-  CYC(0x4cbe, 0x4cbf); A = mem_rd(gb, DE);
-  CYC(0x4cbf, 0x4cc0); alu_adc(gb, mem_rd(gb, HL));
-  CYC(0x4cc0, 0x4cc1); mem_wr(gb, DE, A);
-  CYC(0x4cc1, 0x4cc2); ret_effect(gb);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = 0x49;
+  CYC(b_+3, b_+4); C = mem_rd(gb, HL);
+  CYC(b_+4, b_+6); L = 0x50;
+  CYC(b_+6, b_+7); B = mem_rd(gb, HL);
+  CALL_C(b_+7, getPositionOffsetForVelocity_hook, SYM(getPositionOffsetForVelocity), b_+10);
+  if (F & FZ) { CYCT(b_+10, b_+11); ret_effect(gb); return; }
+  CYC(b_+10, b_+11);
+  CYC(b_+11, b_+13); E = 0x76;
+  CYC(b_+13, b_+14); A = mem_rd(gb, DE);
+  CYC(b_+14, b_+15); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+15, b_+16); mem_wr(gb, DE, A);
+  CYC(b_+16, b_+17); E = alu_inc8(gb, E);
+  CYC(b_+17, b_+18); L = alu_inc8(gb, L);
+  CYC(b_+18, b_+19); A = mem_rd(gb, DE);
+  CYC(b_+19, b_+20); alu_adc(gb, mem_rd(gb, HL));
+  CYC(b_+20, b_+21); mem_wr(gb, DE, A);
+  CYC(b_+21, b_+23); E = 0x4c;
+  CYC(b_+23, b_+24); L = alu_inc8(gb, L);
+  CYC(b_+24, b_+25); A = mem_rd(gb, DE);
+  CYC(b_+25, b_+26); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+26, b_+27); mem_wr(gb, DE, A);
+  CYC(b_+27, b_+28); E = alu_inc8(gb, E);
+  CYC(b_+28, b_+29); L = alu_inc8(gb, L);
+  CYC(b_+29, b_+30); A = mem_rd(gb, DE);
+  CYC(b_+30, b_+31); alu_adc(gb, mem_rd(gb, HL));
+  CYC(b_+31, b_+32); mem_wr(gb, DE, A);
+  CYC(b_+32, SYM(interactionCoded3)); ret_effect(gb);
 }
 
 void interactionCoded2__afterCall4c5b_hook(GB *gb) {
-  CYC(0x4c5b, 0x4c5d); E = 0x42;
-  CYC(0x4c5d, 0x4c5e); A = mem_rd(gb, DE);
-  CYC(0x4c5e, 0x4c61); SET_HL(0x4c76);
-  CYC(0x4c61, 0x4c62); titlescreen_clouds_add_double_index(gb, 0x4c62);
-  CYC(0x4c62, 0x4c63); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4c63, 0x4c64); B = mem_rd(gb, HL);
-  CYC(0x4c64, 0x4c65); H = D;
-  CYC(0x4c65, 0x4c67); L = 0x77;
-  CYC(0x4c67, 0x4c68); mem_wr(gb, HL, A);
-  CYC(0x4c68, 0x4c6a); L = 0x4b;
-  CYC(0x4c6a, 0x4c6b); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x4c6b, 0x4c6c); L = alu_inc8(gb, L);
-  CYC(0x4c6c, 0x4c6d); mem_wr(gb, HL, B);
-  CYC(0x4c6d, 0x4c6f); L = 0x49;
-  CYC(0x4c6f, 0x4c71); mem_wr(gb, HL, 0x10);
-  CYC(0x4c71, 0x4c73); L = 0x50;
-  CYC(0x4c73, 0x4c75); mem_wr(gb, HL, 5);
-  CYC(0x4c75, 0x4c76); ret_effect(gb);
+  BASE(interactionCoded2);
+  CYC(b_+14, b_+16); E = 0x42;
+  CYC(b_+16, b_+17); A = mem_rd(gb, DE);
+  CYC(b_+17, b_+20); SET_HL(b_+41);
+  CYC(b_+20, b_+21); titlescreen_clouds_add_double_index(gb, b_+21);
+  CYC(b_+21, b_+22); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+22, b_+23); B = mem_rd(gb, HL);
+  CYC(b_+23, b_+24); H = D;
+  CYC(b_+24, b_+26); L = 0x77;
+  CYC(b_+26, b_+27); mem_wr(gb, HL, A);
+  CYC(b_+27, b_+29); L = 0x4b;
+  CYC(b_+29, b_+30); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+30, b_+31); L = alu_inc8(gb, L);
+  CYC(b_+31, b_+32); mem_wr(gb, HL, B);
+  CYC(b_+32, b_+34); L = 0x49;
+  CYC(b_+34, b_+36); mem_wr(gb, HL, 0x10);
+  CYC(b_+36, b_+38); L = 0x50;
+  CYC(b_+38, b_+40); mem_wr(gb, HL, 5);
+  CYC(b_+40, b_+41); ret_effect(gb);
 }
 
 void interactionCoded2__state0_hook(GB *gb) {
+  BASE(interactionCoded2);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4c55, 0x4c57); A = 1;
-  CYC(0x4c57, 0x4c58); mem_wr(gb, DE, A);
-  CALL_C(0x4c58, interactionInitGraphics_hook, 0x15fb, 0x4c5b);
+  CYC(b_+8, b_+10); A = 1;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
   interactionCoded2__afterCall4c5b_hook(gb);
 }
 
 void interactionCoded2__substate1_hook(GB *gb) {
-  CYC(0x4c9b, 0x4c9e); A = mem_rd(gb, wGfxRegs1_SCY);
-  CYC(0x4c9e, 0x4ca0); alu_cp(gb, 0x88);
-  if (F & FZ) { CYCT(0x4ca0, 0x4ca1); ret_effect(gb); return; }
-  CYC(0x4ca0, 0x4ca1);
+  BASE(interactionCoded2);
+  CYC(b_+78, b_+81); A = mem_rd(gb, wGfxRegs1_SCY);
+  CYC(b_+81, b_+83); alu_cp(gb, 0x88);
+  if (F & FZ) { CYCT(b_+83, SYM(introObject_applySpeed)); ret_effect(gb); return; }
+  CYC(b_+83, SYM(introObject_applySpeed));
   introObject_applySpeed_hook(gb);
 }
 
 void interactionCoded2__substate0_hook(GB *gb) {
+  BASE(interactionCoded2);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4c8f, 0x4c92); A = mem_rd(gb, wGfxRegs1_SCY);
-  CYC(0x4c92, 0x4c94); alu_cp(gb, 0xe0);
-  if (!(F & FZ)) { CYCT(0x4c94, 0x4c95); ret_effect(gb); return; }
-  CYC(0x4c94, 0x4c95);
-  CALL_C(0x4c95, interactionIncSubstate_hook, 0x23e5, 0x4c98);
-  CALL_C(0x4c98, objectSetVisible82_hook, 0x1e69, 0x4c9b);
+  CYC(b_+66, b_+69); A = mem_rd(gb, wGfxRegs1_SCY);
+  CYC(b_+69, b_+71); alu_cp(gb, 0xe0);
+  if (!(F & FZ)) { CYCT(b_+71, b_+72); ret_effect(gb); return; }
+  CYC(b_+71, b_+72);
+  CALL_C(b_+72, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+75);
+  CALL_C(b_+75, objectSetVisible82_hook, SYM(objectSetVisible82), b_+78);
   interactionCoded2__substate1_hook(gb);
 }
 
 void interactionCoded2__state1_hook(GB *gb) {
+  BASE(interactionCoded2);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4c7e, 0x4c81); A = mem_rd(gb, wGfxRegs1_SCY);
-  CYC(0x4c81, 0x4c82); B = A;
-  CYC(0x4c82, 0x4c84); E = 0x77;
-  CYC(0x4c84, 0x4c85); A = mem_rd(gb, DE);
-  CYC(0x4c85, 0x4c86); alu_sub(gb, B);
-  CYC(0x4c86, 0x4c87); E = alu_inc8(gb, E);
-  CYC(0x4c87, 0x4c89); E = 0x4b;
-  CYC(0x4c89, 0x4c8a); mem_wr(gb, DE, A);
-  CALL_C(0x4c8a, checkInteractionSubstate_hook, 0x2403, 0x4c8d);
-  if (!(F & FZ)) { CYCT(0x4c8d, 0x4c8f); interactionCoded2__substate1_hook(gb); return; }
-  CYC(0x4c8d, 0x4c8f);
+  CYC(b_+49, b_+52); A = mem_rd(gb, wGfxRegs1_SCY);
+  CYC(b_+52, b_+53); B = A;
+  CYC(b_+53, b_+55); E = 0x77;
+  CYC(b_+55, b_+56); A = mem_rd(gb, DE);
+  CYC(b_+56, b_+57); alu_sub(gb, B);
+  CYC(b_+57, b_+58); E = alu_inc8(gb, E);
+  CYC(b_+58, b_+60); E = 0x4b;
+  CYC(b_+60, b_+61); mem_wr(gb, DE, A);
+  CALL_C(b_+61, checkInteractionSubstate_hook, SYM(checkInteractionSubstate), b_+64);
+  if (!(F & FZ)) { CYCT(b_+64, b_+66); interactionCoded2__substate1_hook(gb); return; }
+  CYC(b_+64, b_+66);
   interactionCoded2__substate0_hook(gb);
 }
 
 void interactionCoded2_hook(GB *gb) {
+  BASE(interactionCoded2);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4c4d, 0x4c4f); E = 0x44;
-  CYC(0x4c4f, 0x4c50); A = mem_rd(gb, DE);
-  CYC(0x4c50, 0x4c51); push_effect(gb, 0x4c51);
-  switch (titlescreen_clouds_jump_table(gb)) {
-    case 0x4c55: interactionCoded2__state0_hook(gb); return;
-    case 0x4c7e: interactionCoded2__state1_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x44;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (titlescreen_clouds_jump_table(gb));
+    if (jt_ == b_+8) { interactionCoded2__state0_hook(gb); return; }
+    else if (jt_ == b_+49) { interactionCoded2__state1_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }

@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0d, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0d, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode21), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode21), (from), (to), true)
 
 void arrowDarknut_state_uninitialized_hook(GB *gb);
 void arrowDarknut_state_9_hook(GB *gb);
@@ -37,98 +37,104 @@ static uint16_t enemyCode21_jump_table(GB *gb) {
 // ENEMY_ARROW_DARKNUT
 // ==================================================================================================
 void enemyCode21_hook(GB *gb) {
+  BASE(enemyCode21);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4a02, ecom_checkHazards_b0d_hook, 0x4051, 0x4a05);
-  if (F & FZ) { CYCT(0x4a05, 0x4a07); goto normalStatus; } // jr z
-  CYC(0x4a05, 0x4a07);
-  CYC(0x4a07, 0x4a09); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(0x4a09); return; } // ret c
-  CYC(0x4a09, 0x4a0a);
-  if (F & FZ) { CYCT(0x4a0a, 0x4a0d); enemyDie_hook(gb); return; } // jp z
-  CYC(0x4a0a, 0x4a0d);
-  CYC(0x4a0d, 0x4a0e); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(0x4a0e, 0x4a11); ecom_updateKnockbackAndCheckHazards_b0d_hook(gb); return; } // jp nz
-  CYC(0x4a0e, 0x4a11);
-  RET(0x4a11); return; // ret
+  CALL_C(b_+0, ecom_checkHazards_b0d_hook, SYM(ecom_checkHazards_b0d), b_+3);
+  if (F & FZ) { CYCT(b_+3, b_+5); goto normalStatus; } // jr z
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+7); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+7); return; } // ret c
+  CYC(b_+7, b_+8);
+  if (F & FZ) { CYCT(b_+8, b_+11); enemyDie_hook(gb); return; } // jp z
+  CYC(b_+8, b_+11);
+  CYC(b_+11, b_+12); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+12, b_+15); ecom_updateKnockbackAndCheckHazards_b0d_hook(gb); return; } // jp nz
+  CYC(b_+12, b_+15);
+  RET(b_+15); return; // ret
 
 normalStatus:
-  CYC(0x4a12, 0x4a14); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x4a14, 0x4a15); A = mem_rd(gb, DE);
+  CYC(b_+16, b_+18); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+18, b_+19); A = mem_rd(gb, DE);
   {
-    CYC(0x4a15, 0x4a16); push_effect(gb, 0x4a16);
+    CYC(b_+19, b_+20); push_effect(gb, b_+20);
     uint16_t target = enemyCode21_jump_table(gb);
-    if (target == 0x4a2a) { arrowDarknut_state_uninitialized_hook(gb); return; }
-    if (target == 0x49e1) { moblin_state_stub_hook(gb); return; }
-    if (target == 0x49d5) { moblin_state_switchHook_hook(gb); return; }
-    if (target == 0x49e2) { moblin_state_8_hook(gb); return; }
-    if (target == 0x4a38) { arrowDarknut_state_9_hook(gb); return; }
+    if (target == SYM(arrowDarknut_state_uninitialized)) { arrowDarknut_state_uninitialized_hook(gb); return; }
+    if (target == SYM(moblin_state_stub)) { moblin_state_stub_hook(gb); return; }
+    if (target == SYM(moblin_state_switchHook)) { moblin_state_switchHook_hook(gb); return; }
+    if (target == SYM(moblin_state_8)) { moblin_state_8_hook(gb); return; }
+    if (target == SYM(arrowDarknut_state_9)) { arrowDarknut_state_9_hook(gb); return; }
     HANDOFF(target);
   }
 }
 
 // 0d:4a2a, bare global (also a jump-table target from moblin's dispatcher).
 void arrowDarknut_state_uninitialized_hook(GB *gb) {
+  BASE(arrowDarknut_state_uninitialized);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4a2a, 0x4a2c); E = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x4a2c, 0x4a2e); A = 0x14; // SPEED_80
-  CYC(0x4a2e, 0x4a2f); mem_wr(gb, DE, A);
-  CALL_C(0x4a2f, ecom_setRandomCardinalAngle_b0d_hook, 0x43c6, 0x4a32);
-  CALL_C(0x4a32, arrowDarknut_setState8WithRandomAngleAndCounter_hook, 0x4a5a, 0x4a35);
-  CYC(0x4a35, 0x4a38); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+2, b_+4); A = 0x14; // SPEED_80
+  CYC(b_+4, b_+5); mem_wr(gb, DE, A);
+  CALL_C(b_+5, ecom_setRandomCardinalAngle_b0d_hook, SYM(ecom_setRandomCardinalAngle_b0d), b_+8);
+  CALL_C(b_+8, arrowDarknut_setState8WithRandomAngleAndCounter_hook, SYM(arrowDarknut_setState8WithRandomAngleAndCounter), b_+11);
+  CYC(b_+11, SYM(arrowDarknut_state_9)); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 // 0d:4a38, bare global (also a jump-table target from moblin's dispatcher).
 void arrowDarknut_state_9_hook(GB *gb) {
+  BASE(arrowDarknut_state_9);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4a38, ecom_decCounter1_b0d_hook, 0x439a, 0x4a3b);
-  if (!(F & FZ)) { RET_TAKEN(0x4a3b); return; } // ret nz
-  CYC(0x4a3b, 0x4a3c);
-  CALL_C(0x4a3c, arrowDarknut_chooseAngle_hook, 0x4a6c, 0x4a3f);
-  CALL_C(0x4a3f, arrowDarknut_setState8WithRandomAngleAndCounter_hook, 0x4a5a, 0x4a42);
+  CALL_C(b_+0, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; } // ret nz
+  CYC(b_+3, b_+4);
+  CALL_C(b_+4, arrowDarknut_chooseAngle_hook, SYM(arrowDarknut_chooseAngle), b_+7);
+  CALL_C(b_+7, arrowDarknut_setState8WithRandomAngleAndCounter_hook, SYM(arrowDarknut_setState8WithRandomAngleAndCounter), SYM(arrowDarknut_fireArrowEveryOtherTime));
   arrowDarknut_fireArrowEveryOtherTime_hook(gb); return; // fallthrough
 }
 
 // 0d:4a42, bare global; also used by moblin's state 9 (see moblinsAndShroudedStalfos.c).
 void arrowDarknut_fireArrowEveryOtherTime_hook(GB *gb) {
+  BASE(arrowDarknut_fireArrowEveryOtherTime);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4a42, 0x4a43); H = D;
-  CYC(0x4a43, 0x4a45); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x4a45, 0x4a46); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x4a46, 0x4a48); alu_bit(gb, 0, mem_rd(gb, HL));
-  if (F & FZ) { RET_TAKEN(0x4a48); return; } // ret z
-  CYC(0x4a48, 0x4a49);
-  CALL_C(0x4a49, objectGetAngleTowardEnemyTarget_hook, 0x1e94, 0x4a4c);
-  CYC(0x4a4c, 0x4a4e); alu_add(gb, 0x04);
-  CYC(0x4a4e, 0x4a50); alu_and(gb, 0x18);
-  CYC(0x4a50, 0x4a51); H = D;
-  CYC(0x4a51, 0x4a53); L = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x4a53, 0x4a54); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { RET_TAKEN(0x4a54); return; } // ret nz
-  CYC(0x4a54, 0x4a55);
-  CYC(0x4a55, 0x4a57); B = 0x1a; // PART_ENEMY_ARROW
-  CYC(0x4a57, 0x4a5a); ecom_spawnProjectile_b0d_hook(gb); return; // jp
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+3, b_+4); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+4, b_+6); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (F & FZ) { RET_TAKEN(b_+6); return; } // ret z
+  CYC(b_+6, b_+7);
+  CALL_C(b_+7, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+10);
+  CYC(b_+10, b_+12); alu_add(gb, 0x04);
+  CYC(b_+12, b_+14); alu_and(gb, 0x18);
+  CYC(b_+14, b_+15); H = D;
+  CYC(b_+15, b_+17); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+17, b_+18); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { RET_TAKEN(b_+18); return; } // ret nz
+  CYC(b_+18, b_+19);
+  CYC(b_+19, b_+21); B = 0x1a; // PART_ENEMY_ARROW
+  CYC(b_+21, SYM(arrowDarknut_setState8WithRandomAngleAndCounter)); ecom_spawnProjectile_b0d_hook(gb); return; // jp
 }
 
 // 0d:4a5a, bare global; sets random angle and counter, and goes to state 8.
 void arrowDarknut_setState8WithRandomAngleAndCounter_hook(GB *gb) {
+  BASE(arrowDarknut_setState8WithRandomAngleAndCounter);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4a5a, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4a5d);
-  CYC(0x4a5d, 0x4a5f); alu_and(gb, 0x3f);
-  CYC(0x4a5f, 0x4a61); alu_add(gb, 0x30);
-  CYC(0x4a61, 0x4a62); H = D;
-  CYC(0x4a62, 0x4a64); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x4a64, 0x4a65); mem_wr(gb, HL, A);
-  CYC(0x4a65, 0x4a67); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x4a67, 0x4a69); mem_wr(gb, HL, 0x08);
-  CYC(0x4a69, 0x4a6c); ecom_updateAnimationFromAngle_b0d_hook(gb); return; // jp
+  CALL_C(b_+0, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+3);
+  CYC(b_+3, b_+5); alu_and(gb, 0x3f);
+  CYC(b_+5, b_+7); alu_add(gb, 0x30);
+  CYC(b_+7, b_+8); H = D;
+  CYC(b_+8, b_+10); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+10, b_+11); mem_wr(gb, HL, A);
+  CYC(b_+11, b_+13); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+13, b_+15); mem_wr(gb, HL, 0x08);
+  CYC(b_+15, SYM(arrowDarknut_chooseAngle)); ecom_updateAnimationFromAngle_b0d_hook(gb); return; // jp
 }
 
 // 0d:4a6c, bare global.
 void arrowDarknut_chooseAngle_hook(GB *gb) {
+  BASE(arrowDarknut_chooseAngle);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4a6c, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4a6f);
-  CYC(0x4a6f, 0x4a71); alu_and(gb, 0x03);
-  if (F & FZ) { CYCT(0x4a71, 0x4a74); ecom_updateCardinalAngleTowardTarget_b0d_hook(gb); return; } // jp z
-  CYC(0x4a71, 0x4a74);
-  CYC(0x4a74, 0x4a77); ecom_setRandomCardinalAngle_b0d_hook(gb); return; // jp
+  CALL_C(b_+0, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+3);
+  CYC(b_+3, b_+5); alu_and(gb, 0x03);
+  if (F & FZ) { CYCT(b_+5, b_+8); ecom_updateCardinalAngleTowardTarget_b0d_hook(gb); return; } // jp z
+  CYC(b_+5, b_+8);
+  CYC(b_+8, SYM(enemyCode0d)); ecom_setRandomCardinalAngle_b0d_hook(gb); return; // jp
 }

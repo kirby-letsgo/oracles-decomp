@@ -3,60 +3,65 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(miscPuzzles_drawCrownDungeonOpeningFrame3), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(miscPuzzles_drawCrownDungeonOpeningFrame3), (from), (to), true)
 
 static void miscPuzzles_crownDungeonSpawnPuff(GB *gb, uint16_t sp0_) {
-  CALL_C(0x740b, getFreeInteractionSlot_hook, 0x3aef, 0x740e);
-  if (!(F & FZ)) { RET_TAKEN(0x740e); return; }
-  CYC(0x740e, 0x740f);
-  CYC(0x740f, 0x7411); mem_wr(gb, HL, 0x05);
-  CYC(0x7411, 0x7412); L = alu_inc8(gb, L);
-  CYC(0x7412, 0x7414); mem_wr(gb, HL, 0x81);
-  CYC(0x7414, 0x7416); L = 0x4b;
-  CYC(0x7416, 0x7417); mem_wr(gb, HL, B);
-  CYC(0x7417, 0x7419); L = 0x4d;
-  CYC(0x7419, 0x741a); mem_wr(gb, HL, C);
-  CYC(0x741a, 0x741b); ret_effect(gb);
+  BASE(miscPuzzles_drawCrownDungeonOpeningFrame3);
+  CALL_C(b_+46, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+49);
+  if (!(F & FZ)) { RET_TAKEN(b_+49); return; }
+  CYC(b_+49, b_+50);
+  CYC(b_+50, b_+52); mem_wr(gb, HL, 0x05);
+  CYC(b_+52, b_+53); L = alu_inc8(gb, L);
+  CYC(b_+53, b_+55); mem_wr(gb, HL, 0x81);
+  CYC(b_+55, b_+57); L = 0x4b;
+  CYC(b_+57, b_+58); mem_wr(gb, HL, B);
+  CYC(b_+58, b_+60); L = 0x4d;
+  CYC(b_+60, b_+61); mem_wr(gb, HL, C);
+  CYC(b_+61, SYM(objectWritePositionTocfd5)); ret_effect(gb);
 }
 
 static void miscPuzzles_crownDungeonOpeningBody(GB *gb, uint16_t sp0_) {
-  CYC(0x73df, 0x73e0); push_effect(gb, DE);
-  CYC(0x73e0, 0x73e3); SET_HL(0x7b83);
-  CYC(0x73e3, 0x73e5); E = 0x02;
-  CALL_C(0x73e5, interBankCall_hook, 0x008a, 0x73e8);
-  CALL_C(0x73e8, reloadTileMap_hook, 0x12fc, 0x73eb);
-  CYC(0x73eb, 0x73ec); SET_DE(pop_effect(gb));
-  CYC(0x73ec, 0x73ee); A = 0x0f;
-  CALL_C(0x73ee, setScreenShakeCounter_hook, 0x24bb, 0x73f1);
-  CYC(0x73f1, 0x73f3); A = 0x70;
-  CALL_C(0x73f3, playSound_b00_hook, 0x0c98, 0x73f6);
-  CYC(0x73f6, 0x73f9); SET_BC(0x2060);
-  CYC(0x73f9, 0x73fc); push_effect(gb, 0x73fc); miscPuzzles_crownDungeonSpawnPuff(gb, sp0_);
-  CYC(0x73fc, 0x73ff); SET_BC(0x2070);
-  CYC(0x73ff, 0x7402); push_effect(gb, 0x7402); miscPuzzles_crownDungeonSpawnPuff(gb, sp0_);
-  CYC(0x7402, 0x7405); SET_BC(0x2080);
-  CYC(0x7405, 0x7408); push_effect(gb, 0x7408); miscPuzzles_crownDungeonSpawnPuff(gb, sp0_);
-  CYC(0x7408, 0x740b); SET_BC(0x2090);
+  BASE(miscPuzzles_drawCrownDungeonOpeningFrame3);
+  CYC(b_+2, b_+3); push_effect(gb, DE);
+  CYC(b_+3, b_+6); SET_HL((SYM(interactiondc_removeGraveyardGateTiles1) + 16));
+  CYC(b_+6, b_+8); E = 0x02;
+  CALL_C(b_+8, interBankCall_hook, 0x008a, b_+11);
+  CALL_C(b_+11, reloadTileMap_hook, SYM(reloadTileMap), b_+14);
+  CYC(b_+14, b_+15); SET_DE(pop_effect(gb));
+  CYC(b_+15, b_+17); A = 0x0f;
+  CALL_C(b_+17, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+20);
+  CYC(b_+20, b_+22); A = 0x70;
+  CALL_C(b_+22, playSound_b00_hook, SYM(playSound_b00), b_+25);
+  CYC(b_+25, b_+28); SET_BC((SYM(getPositionOffsetForVelocity) + 31));
+  CYC(b_+28, b_+31); push_effect(gb, b_+31); miscPuzzles_crownDungeonSpawnPuff(gb, sp0_);
+  CYC(b_+31, b_+34); SET_BC((SYM(getPositionOffsetForVelocity) + 47));
+  CYC(b_+34, b_+37); push_effect(gb, b_+37); miscPuzzles_crownDungeonSpawnPuff(gb, sp0_);
+  CYC(b_+37, b_+40); SET_BC((SYM(getPositionOffsetForVelocity) + 63));
+  CYC(b_+40, b_+43); push_effect(gb, b_+43); miscPuzzles_crownDungeonSpawnPuff(gb, sp0_);
+  CYC(b_+43, b_+46); SET_BC((SYM(objectGetPosition) + 6));
   miscPuzzles_crownDungeonSpawnPuff(gb, sp0_);
 }
 
 void miscPuzzles_drawCrownDungeonOpeningFrame1_hook(GB *gb) {
+  BASE(miscPuzzles_drawCrownDungeonOpeningFrame1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x73d5, 0x73d7); C = 0x00;
-  CYC(0x73d7, 0x73d9);
+  CYC(b_+0, b_+2); C = 0x00;
+  CYC(b_+2, SYM(miscPuzzles_drawCrownDungeonOpeningFrame2));
   miscPuzzles_crownDungeonOpeningBody(gb, sp0_);
 }
 
 void miscPuzzles_drawCrownDungeonOpeningFrame2_hook(GB *gb) {
+  BASE(miscPuzzles_drawCrownDungeonOpeningFrame2);
   uint16_t sp0_ = gb->sp;
-  CYC(0x73d9, 0x73db); C = 0x01;
-  CYC(0x73db, 0x73dd);
+  CYC(b_+0, b_+2); C = 0x01;
+  CYC(b_+2, SYM(miscPuzzles_drawCrownDungeonOpeningFrame3));
   miscPuzzles_crownDungeonOpeningBody(gb, sp0_);
 }
 
 void miscPuzzles_drawCrownDungeonOpeningFrame3_hook(GB *gb) {
+  BASE(miscPuzzles_drawCrownDungeonOpeningFrame3);
   uint16_t sp0_ = gb->sp;
-  CYC(0x73dd, 0x73df); C = 0x02;
+  CYC(b_+0, b_+2); C = 0x02;
   miscPuzzles_crownDungeonOpeningBody(gb, sp0_);
 }

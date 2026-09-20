@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x39, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x39, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(setChannelWaitCounter), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(setChannelWaitCounter), (from), (to), true)
 
 void getNextChannelByte_hook(GB *gb);
 void isWaveChannelUnavailable_hook(GB *gb);
@@ -36,1064 +36,1085 @@ void writeIndexedHighRamAndIncrement_hook(GB *gb);
 
 // Read a byte, set the channel wait counter to the value
 void setChannelWaitCounter_hook(GB *gb) {
+  BASE(setChannelWaitCounter);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x45f7, getNextChannelByte_hook, 0x4366, 0x45fa);
-  CYC(0x45fa, 0x45fb); A = alu_dec8(gb, A);
-  CYC(0x45fb, 0x45fe); SET_HL(wChannelWaitCounters);
-  CYC(0x45fe, 0x45ff); push_effect(gb, AF);
-  CYC(0x45ff, 0x4602); A = W8(wSoundChannel);
-  CYC(0x4602, 0x4603); E = A;
-  CYC(0x4603, 0x4605); D = 0x00;
-  CYC(0x4605, 0x4606); alu_add_hl(gb, DE);
-  CYC(0x4606, 0x4607); SET_AF(pop_effect(gb));
-  CYC(0x4607, 0x4608); mem_wr(gb, HL, A);
-  RET(0x4608);
+  CALL_C(b_+0, getNextChannelByte_hook, SYM(getNextChannelByte), b_+3);
+  CYC(b_+3, b_+4); A = alu_dec8(gb, A);
+  CYC(b_+4, b_+7); SET_HL(wChannelWaitCounters);
+  CYC(b_+7, b_+8); push_effect(gb, AF);
+  CYC(b_+8, b_+11); A = W8(wSoundChannel);
+  CYC(b_+11, b_+12); E = A;
+  CYC(b_+12, b_+14); D = 0x00;
+  CYC(b_+14, b_+15); alu_add_hl(gb, DE);
+  CYC(b_+15, b_+16); SET_AF(pop_effect(gb));
+  CYC(b_+16, b_+17); mem_wr(gb, HL, A);
+  RET(b_+17);
 }
 
 // Determines the time to wait until the envelope with sweep pace c is
 // expected to have reached the volume level in b
 void getWaitTimeForEnvelope_hook(GB *gb) {
-  CYC(0x4609, 0x460c); SET_HL(0x4ad0);
-  CYC(0x460c, 0x460d); A = B;
-  CYC(0x460d, 0x460f); A = alu_sla(gb, A);
-  CYC(0x460f, 0x4611); A = alu_sla(gb, A);
-  CYC(0x4611, 0x4613); A = alu_sla(gb, A);
-  CYC(0x4613, 0x4614); alu_add(gb, C);
-  CYC(0x4614, 0x4616); D = 0x00;
-  CYC(0x4616, 0x4617); E = A;
-  CYC(0x4617, 0x4618); alu_add_hl(gb, DE);
-  CYC(0x4618, 0x4619); A = mem_rd(gb, HL);
-  RET(0x4619);
+  BASE(getWaitTimeForEnvelope);
+  CYC(b_+0, b_+3); SET_HL(SYM(envelopeWaitTable));
+  CYC(b_+3, b_+4); A = B;
+  CYC(b_+4, b_+6); A = alu_sla(gb, A);
+  CYC(b_+6, b_+8); A = alu_sla(gb, A);
+  CYC(b_+8, b_+10); A = alu_sla(gb, A);
+  CYC(b_+10, b_+11); alu_add(gb, C);
+  CYC(b_+11, b_+13); D = 0x00;
+  CYC(b_+13, b_+14); E = A;
+  CYC(b_+14, b_+15); alu_add_hl(gb, DE);
+  CYC(b_+15, b_+16); A = mem_rd(gb, HL);
+  RET(b_+16);
 }
 
 // Sends wSoundFrequency to given value plus value in table at wChannelPitchShift.
 void setSoundFrequency_hook(GB *gb) {
+  BASE(setSoundFrequency);
   uint16_t sp0_ = gb->sp;
-  CYC(0x461a, 0x461b); push_effect(gb, HL);
-  CYC(0x461b, 0x461e); SET_HL(wChannelPitchShift);
-  CYC(0x461e, 0x4621); A = W8(wSoundChannel);
-  CYC(0x4621, 0x4622); E = A;
-  CYC(0x4622, 0x4624); D = 0x00;
-  CYC(0x4624, 0x4625); alu_add_hl(gb, DE);
-  CYC(0x4625, 0x4626); A = mem_rd(gb, HL);
-  CYC(0x4626, 0x4627); D = A;
-  CYC(0x4627, 0x4629); D = alu_sla(gb, D);
-  if (F & FC) { CYCT(0x4629, 0x462b); goto negOffset; } // jr c
-  CYC(0x4629, 0x462b);
-  CYC(0x462b, 0x462d); D = 0x00;
-  CYC(0x462d, 0x462f); goto haveOffset; // jr
+  CYC(b_+0, b_+1); push_effect(gb, HL);
+  CYC(b_+1, b_+4); SET_HL(wChannelPitchShift);
+  CYC(b_+4, b_+7); A = W8(wSoundChannel);
+  CYC(b_+7, b_+8); E = A;
+  CYC(b_+8, b_+10); D = 0x00;
+  CYC(b_+10, b_+11); alu_add_hl(gb, DE);
+  CYC(b_+11, b_+12); A = mem_rd(gb, HL);
+  CYC(b_+12, b_+13); D = A;
+  CYC(b_+13, b_+15); D = alu_sla(gb, D);
+  if (F & FC) { CYCT(b_+15, b_+17); goto negOffset; } // jr c
+  CYC(b_+15, b_+17);
+  CYC(b_+17, b_+19); D = 0x00;
+  CYC(b_+19, b_+21); goto haveOffset; // jr
 negOffset:
-  CYC(0x462f, 0x4631); D = 0xff;
+  CYC(b_+21, b_+23); D = 0xff;
 haveOffset:
-  CYC(0x4631, 0x4632); E = A;
-  CYC(0x4632, 0x4633); SET_HL(pop_effect(gb));
-  CYC(0x4633, 0x4634); alu_add_hl(gb, DE);
-  CYC(0x4634, 0x4637); A = W8(wSoundChannel);
-  CYC(0x4637, 0x4639); A = alu_sla(gb, A);
-  CYC(0x4639, 0x463a); B = A;
-  CYC(0x463a, 0x463b); A = L;
-  CYC(0x463b, 0x463d); C = 0xf2;
-  CALL_C(0x463d, writeIndexedHighRamAndIncrement_hook, 0x4d25, 0x4640);
-  CYC(0x4640, 0x4641); A = H;
-  CYC(0x4641, 0x4642); mem_wr(gb, 0xff00 | C, A);
-  CYC(0x4642, 0x4643); C = alu_inc8(gb, C);
-  CYC(0x4643, 0x4644); A = L;
-  CYC(0x4644, 0x4647); W8(wSoundFrequencyL) = A;
-  CYC(0x4647, 0x4648); A = H;
-  CYC(0x4648, 0x464b); W8(wSoundFrequencyH) = A;
-  RET(0x464b);
+  CYC(b_+23, b_+24); E = A;
+  CYC(b_+24, b_+25); SET_HL(pop_effect(gb));
+  CYC(b_+25, b_+26); alu_add_hl(gb, DE);
+  CYC(b_+26, b_+29); A = W8(wSoundChannel);
+  CYC(b_+29, b_+31); A = alu_sla(gb, A);
+  CYC(b_+31, b_+32); B = A;
+  CYC(b_+32, b_+33); A = L;
+  CYC(b_+33, b_+35); C = 0xf2;
+  CALL_C(b_+35, writeIndexedHighRamAndIncrement_hook, SYM(writeIndexedHighRamAndIncrement), b_+38);
+  CYC(b_+38, b_+39); A = H;
+  CYC(b_+39, b_+40); mem_wr(gb, 0xff00 | C, A);
+  CYC(b_+40, b_+41); C = alu_inc8(gb, C);
+  CYC(b_+41, b_+42); A = L;
+  CYC(b_+42, b_+45); W8(wSoundFrequencyL) = A;
+  CYC(b_+45, b_+46); A = H;
+  CYC(b_+46, b_+49); W8(wSoundFrequencyH) = A;
+  RET(b_+49);
 }
 
 // Handles envelopes for square channels, and redirects channel 4 to updateChannel4Volume
 void handleEnvelopes_hook(GB *gb) {
+  BASE(handleEnvelopes);
   uint16_t sp0_ = gb->sp;
-  CYC(0x464c, 0x464f); A = W8(wSoundChannel);
-  CYC(0x464f, 0x4651); alu_cp(gb, 0x04);
-  if (!(F & FZ)) { CYCT(0x4651, 0x4653); goto notChannel4; } // jr nz
-  CYC(0x4651, 0x4653);
-  CYC(0x4653, 0x4656); updateChannel4Volume_hook(gb); return; // jp
+  CYC(b_+0, b_+3); A = W8(wSoundChannel);
+  CYC(b_+3, b_+5); alu_cp(gb, 0x04);
+  if (!(F & FZ)) { CYCT(b_+5, b_+7); goto notChannel4; } // jr nz
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+10); updateChannel4Volume_hook(gb); return; // jp
 notChannel4:
-  CYC(0x4656, 0x4659); SET_HL(wChannelEnvelopeStates);
-  CYC(0x4659, 0x465c); A = W8(wSoundChannel);
-  CYC(0x465c, 0x465d); E = A;
-  CYC(0x465d, 0x465f); D = 0x00;
-  CYC(0x465f, 0x4660); alu_add_hl(gb, DE);
-  CYC(0x4660, 0x4661); A = mem_rd(gb, HL);
-  CYC(0x4661, 0x4663); alu_cp(gb, 0x00);
-  if (F & FZ) { CYCT(0x4663, 0x4665); goto checkEnvelopeRequested; } // jr z
-  CYC(0x4663, 0x4665);
-  CYC(0x4665, 0x4667); alu_cp(gb, 0x01);
-  if (F & FZ) { CYCT(0x4667, 0x4669); goto waitForNoteStartEnvelope; } // jr z
-  CYC(0x4667, 0x4669);
-  CYC(0x4669, 0x466b); A = 0x00;
-  CYC(0x466b, 0x466e); W8(wSoundCmdEnvelope) = A;
-  RET(0x466e);
+  CYC(b_+10, b_+13); SET_HL(wChannelEnvelopeStates);
+  CYC(b_+13, b_+16); A = W8(wSoundChannel);
+  CYC(b_+16, b_+17); E = A;
+  CYC(b_+17, b_+19); D = 0x00;
+  CYC(b_+19, b_+20); alu_add_hl(gb, DE);
+  CYC(b_+20, b_+21); A = mem_rd(gb, HL);
+  CYC(b_+21, b_+23); alu_cp(gb, 0x00);
+  if (F & FZ) { CYCT(b_+23, b_+25); goto checkEnvelopeRequested; } // jr z
+  CYC(b_+23, b_+25);
+  CYC(b_+25, b_+27); alu_cp(gb, 0x01);
+  if (F & FZ) { CYCT(b_+27, b_+29); goto waitForNoteStartEnvelope; } // jr z
+  CYC(b_+27, b_+29);
+  CYC(b_+29, b_+31); A = 0x00;
+  CYC(b_+31, b_+34); W8(wSoundCmdEnvelope) = A;
+  RET(b_+34);
   return;
 checkEnvelopeRequested:
-  CYC(0x466f, 0x4672); SET_HL(wChannelEnvelopes);
-  CYC(0x4672, 0x4675); A = W8(wSoundChannel);
-  CYC(0x4675, 0x4676); E = A;
-  CYC(0x4676, 0x4678); D = 0x00;
-  CYC(0x4678, 0x4679); alu_add_hl(gb, DE);
-  CYC(0x4679, 0x467a); A = mem_rd(gb, HL);
-  CYC(0x467a, 0x467c); alu_cp(gb, 0x00);
-  if (F & FZ) { CYCT(0x467c, 0x467e); goto checkAndStartNoteEndEnvelope; } // jr z
-  CYC(0x467c, 0x467e);
-  CYC(0x467e, 0x467f); C = A;
-  CYC(0x467f, 0x4681); alu_or(gb, 0x18);
-  CYC(0x4681, 0x4684); W8(wSoundCmdEnvelope) = A;
-  CYC(0x4684, 0x4685); push_effect(gb, BC);
-  CALL_C(0x4685, getChannelVolume_hook, 0x4783, 0x4688);
-  CYC(0x4688, 0x4689); SET_BC(pop_effect(gb));
-  CYC(0x4689, 0x468a); B = A;
-  CALL_C(0x468a, getWaitTimeForEnvelope_hook, 0x4609, 0x468d);
-  CYC(0x468d, 0x4690); SET_HL(wChannelEnvelopeWaitCounters);
-  CYC(0x4690, 0x4691); push_effect(gb, AF);
-  CYC(0x4691, 0x4694); A = W8(wSoundChannel);
-  CYC(0x4694, 0x4695); E = A;
-  CYC(0x4695, 0x4697); D = 0x00;
-  CYC(0x4697, 0x4698); alu_add_hl(gb, DE);
-  CYC(0x4698, 0x4699); SET_AF(pop_effect(gb));
-  CYC(0x4699, 0x469a); mem_wr(gb, HL, A);
-  CYC(0x469a, 0x469c); A = 0x01;
-  CYC(0x469c, 0x469f); SET_HL(wChannelEnvelopeStates);
-  CYC(0x469f, 0x46a0); push_effect(gb, AF);
-  CYC(0x46a0, 0x46a3); A = W8(wSoundChannel);
-  CYC(0x46a3, 0x46a4); E = A;
-  CYC(0x46a4, 0x46a6); D = 0x00;
-  CYC(0x46a6, 0x46a7); alu_add_hl(gb, DE);
-  CYC(0x46a7, 0x46a8); SET_AF(pop_effect(gb));
-  CYC(0x46a8, 0x46a9); mem_wr(gb, HL, A);
-  CYC(0x46a9, 0x46ac); updateSquareChannelVolume_hook(gb); return; // jp
+  CYC(b_+35, b_+38); SET_HL(wChannelEnvelopes);
+  CYC(b_+38, b_+41); A = W8(wSoundChannel);
+  CYC(b_+41, b_+42); E = A;
+  CYC(b_+42, b_+44); D = 0x00;
+  CYC(b_+44, b_+45); alu_add_hl(gb, DE);
+  CYC(b_+45, b_+46); A = mem_rd(gb, HL);
+  CYC(b_+46, b_+48); alu_cp(gb, 0x00);
+  if (F & FZ) { CYCT(b_+48, b_+50); goto checkAndStartNoteEndEnvelope; } // jr z
+  CYC(b_+48, b_+50);
+  CYC(b_+50, b_+51); C = A;
+  CYC(b_+51, b_+53); alu_or(gb, 0x18);
+  CYC(b_+53, b_+56); W8(wSoundCmdEnvelope) = A;
+  CYC(b_+56, b_+57); push_effect(gb, BC);
+  CALL_C(b_+57, getChannelVolume_hook, SYM(getChannelVolume), b_+60);
+  CYC(b_+60, b_+61); SET_BC(pop_effect(gb));
+  CYC(b_+61, b_+62); B = A;
+  CALL_C(b_+62, getWaitTimeForEnvelope_hook, SYM(getWaitTimeForEnvelope), b_+65);
+  CYC(b_+65, b_+68); SET_HL(wChannelEnvelopeWaitCounters);
+  CYC(b_+68, b_+69); push_effect(gb, AF);
+  CYC(b_+69, b_+72); A = W8(wSoundChannel);
+  CYC(b_+72, b_+73); E = A;
+  CYC(b_+73, b_+75); D = 0x00;
+  CYC(b_+75, b_+76); alu_add_hl(gb, DE);
+  CYC(b_+76, b_+77); SET_AF(pop_effect(gb));
+  CYC(b_+77, b_+78); mem_wr(gb, HL, A);
+  CYC(b_+78, b_+80); A = 0x01;
+  CYC(b_+80, b_+83); SET_HL(wChannelEnvelopeStates);
+  CYC(b_+83, b_+84); push_effect(gb, AF);
+  CYC(b_+84, b_+87); A = W8(wSoundChannel);
+  CYC(b_+87, b_+88); E = A;
+  CYC(b_+88, b_+90); D = 0x00;
+  CYC(b_+90, b_+91); alu_add_hl(gb, DE);
+  CYC(b_+91, b_+92); SET_AF(pop_effect(gb));
+  CYC(b_+92, b_+93); mem_wr(gb, HL, A);
+  CYC(b_+93, b_+96); updateSquareChannelVolume_hook(gb); return; // jp
 waitForNoteStartEnvelope:
-  CYC(0x46ac, 0x46af); SET_HL(wChannelEnvelopeWaitCounters);
-  CYC(0x46af, 0x46b2); A = W8(wSoundChannel);
-  CYC(0x46b2, 0x46b3); E = A;
-  CYC(0x46b3, 0x46b5); D = 0x00;
-  CYC(0x46b5, 0x46b6); alu_add_hl(gb, DE);
-  CYC(0x46b6, 0x46b7); A = mem_rd(gb, HL);
-  CYC(0x46b7, 0x46b9); alu_cp(gb, 0x00);
-  if (F & FZ) { CYCT(0x46b9, 0x46bb); goto checkAndStartNoteEndEnvelope; } // jr z
-  CYC(0x46b9, 0x46bb);
-  CYC(0x46bb, 0x46be); SET_HL(wChannelEnvelopeWaitCounters);
-  CYC(0x46be, 0x46c1); A = W8(wSoundChannel);
-  CYC(0x46c1, 0x46c2); E = A;
-  CYC(0x46c2, 0x46c4); D = 0x00;
-  CYC(0x46c4, 0x46c5); alu_add_hl(gb, DE);
-  CYC(0x46c5, 0x46c6); A = mem_rd(gb, HL);
-  CYC(0x46c6, 0x46c7); A = alu_dec8(gb, A);
-  CYC(0x46c7, 0x46c8); mem_wr(gb, HL, A);
-  CYC(0x46c8, 0x46ca); A = 0x00;
-  CYC(0x46ca, 0x46cd); W8(wSoundCmdEnvelope) = A;
-  RET(0x46cd);
+  CYC(b_+96, b_+99); SET_HL(wChannelEnvelopeWaitCounters);
+  CYC(b_+99, b_+102); A = W8(wSoundChannel);
+  CYC(b_+102, b_+103); E = A;
+  CYC(b_+103, b_+105); D = 0x00;
+  CYC(b_+105, b_+106); alu_add_hl(gb, DE);
+  CYC(b_+106, b_+107); A = mem_rd(gb, HL);
+  CYC(b_+107, b_+109); alu_cp(gb, 0x00);
+  if (F & FZ) { CYCT(b_+109, b_+111); goto checkAndStartNoteEndEnvelope; } // jr z
+  CYC(b_+109, b_+111);
+  CYC(b_+111, b_+114); SET_HL(wChannelEnvelopeWaitCounters);
+  CYC(b_+114, b_+117); A = W8(wSoundChannel);
+  CYC(b_+117, b_+118); E = A;
+  CYC(b_+118, b_+120); D = 0x00;
+  CYC(b_+120, b_+121); alu_add_hl(gb, DE);
+  CYC(b_+121, b_+122); A = mem_rd(gb, HL);
+  CYC(b_+122, b_+123); A = alu_dec8(gb, A);
+  CYC(b_+123, b_+124); mem_wr(gb, HL, A);
+  CYC(b_+124, b_+126); A = 0x00;
+  CYC(b_+126, b_+129); W8(wSoundCmdEnvelope) = A;
+  RET(b_+129);
   return;
 checkAndStartNoteEndEnvelope:
-  CYC(0x46ce, 0x46d1); SET_HL(wChannelEnvelopes2);
-  CYC(0x46d1, 0x46d4); A = W8(wSoundChannel);
-  CYC(0x46d4, 0x46d5); E = A;
-  CYC(0x46d5, 0x46d7); D = 0x00;
-  CYC(0x46d7, 0x46d8); alu_add_hl(gb, DE);
-  CYC(0x46d8, 0x46d9); A = mem_rd(gb, HL);
-  CYC(0x46d9, 0x46db); alu_cp(gb, 0x00);
-  if (!(F & FZ)) { CYCT(0x46db, 0x46dd); goto notZeroEnvelope2; } // jr nz
-  CYC(0x46db, 0x46dd);
-  CYC(0x46dd, 0x46df); A = 0x02;
-  CYC(0x46df, 0x46e1); goto haveEnvelopeState; // jr
+  CYC(b_+130, b_+133); SET_HL(wChannelEnvelopes2);
+  CYC(b_+133, b_+136); A = W8(wSoundChannel);
+  CYC(b_+136, b_+137); E = A;
+  CYC(b_+137, b_+139); D = 0x00;
+  CYC(b_+139, b_+140); alu_add_hl(gb, DE);
+  CYC(b_+140, b_+141); A = mem_rd(gb, HL);
+  CYC(b_+141, b_+143); alu_cp(gb, 0x00);
+  if (!(F & FZ)) { CYCT(b_+143, b_+145); goto notZeroEnvelope2; } // jr nz
+  CYC(b_+143, b_+145);
+  CYC(b_+145, b_+147); A = 0x02;
+  CYC(b_+147, b_+149); goto haveEnvelopeState; // jr
 notZeroEnvelope2:
-  CYC(0x46e1, 0x46e3); A = 0x03;
+  CYC(b_+149, b_+151); A = 0x03;
 haveEnvelopeState:
-  CYC(0x46e3, 0x46e6); SET_HL(wChannelEnvelopeStates);
-  CYC(0x46e6, 0x46e7); push_effect(gb, AF);
-  CYC(0x46e7, 0x46ea); A = W8(wSoundChannel);
-  CYC(0x46ea, 0x46eb); E = A;
-  CYC(0x46eb, 0x46ed); D = 0x00;
-  CYC(0x46ed, 0x46ee); alu_add_hl(gb, DE);
-  CYC(0x46ee, 0x46ef); SET_AF(pop_effect(gb));
-  CYC(0x46ef, 0x46f0); mem_wr(gb, HL, A);
-  CALL_C(0x46f0, getChannelVolume_hook, 0x4783, 0x46f3);
-  CYC(0x46f3, 0x46f5); A = alu_sla(gb, A);
-  CYC(0x46f5, 0x46f7); A = alu_sla(gb, A);
-  CYC(0x46f7, 0x46f9); A = alu_sla(gb, A);
-  CYC(0x46f9, 0x46fb); A = alu_sla(gb, A);
-  CYC(0x46fb, 0x46fe); W8(wSoundCmdEnvelope) = A;
-  CYC(0x46fe, 0x4701); SET_HL(wChannelEnvelopes2);
-  CYC(0x4701, 0x4704); A = W8(wSoundChannel);
-  CYC(0x4704, 0x4705); E = A;
-  CYC(0x4705, 0x4707); D = 0x00;
-  CYC(0x4707, 0x4708); alu_add_hl(gb, DE);
-  CYC(0x4708, 0x4709); A = mem_rd(gb, HL);
-  CYC(0x4709, 0x470a); C = A;
-  CYC(0x470a, 0x470d); A = W8(wSoundCmdEnvelope);
-  CYC(0x470d, 0x470e); alu_or(gb, C);
-  CYC(0x470e, 0x4711); W8(wSoundCmdEnvelope) = A;
-  CYC(0x4711, 0x4714); updateSquareChannelVolume_hook(gb); return; // jp
+  CYC(b_+151, b_+154); SET_HL(wChannelEnvelopeStates);
+  CYC(b_+154, b_+155); push_effect(gb, AF);
+  CYC(b_+155, b_+158); A = W8(wSoundChannel);
+  CYC(b_+158, b_+159); E = A;
+  CYC(b_+159, b_+161); D = 0x00;
+  CYC(b_+161, b_+162); alu_add_hl(gb, DE);
+  CYC(b_+162, b_+163); SET_AF(pop_effect(gb));
+  CYC(b_+163, b_+164); mem_wr(gb, HL, A);
+  CALL_C(b_+164, getChannelVolume_hook, SYM(getChannelVolume), b_+167);
+  CYC(b_+167, b_+169); A = alu_sla(gb, A);
+  CYC(b_+169, b_+171); A = alu_sla(gb, A);
+  CYC(b_+171, b_+173); A = alu_sla(gb, A);
+  CYC(b_+173, b_+175); A = alu_sla(gb, A);
+  CYC(b_+175, b_+178); W8(wSoundCmdEnvelope) = A;
+  CYC(b_+178, b_+181); SET_HL(wChannelEnvelopes2);
+  CYC(b_+181, b_+184); A = W8(wSoundChannel);
+  CYC(b_+184, b_+185); E = A;
+  CYC(b_+185, b_+187); D = 0x00;
+  CYC(b_+187, b_+188); alu_add_hl(gb, DE);
+  CYC(b_+188, b_+189); A = mem_rd(gb, HL);
+  CYC(b_+189, b_+190); C = A;
+  CYC(b_+190, b_+193); A = W8(wSoundCmdEnvelope);
+  CYC(b_+193, b_+194); alu_or(gb, C);
+  CYC(b_+194, b_+197); W8(wSoundCmdEnvelope) = A;
+  CYC(b_+197, SYM(updateSquareChannelVolume)); updateSquareChannelVolume_hook(gb); return; // jp
 }
 
 void updateSquareChannelVolume_hook(GB *gb) {
+  BASE(updateSquareChannelVolume);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4714, 0x4717); A = W8(wSoundChannel);
-  CYC(0x4717, 0x4719); alu_cp(gb, 0x02);
-  if (!(F & FC)) { CYCT(0x4719, 0x471b); goto setVolume; } // jr nc
-  CYC(0x4719, 0x471b);
-  CYC(0x471b, 0x471e); A = W8(wMusicVolume);
-  CYC(0x471e, 0x4720); alu_cp(gb, 0x00);
-  if (F & FZ) { CYCT(0x4720, 0x4722); goto doRet; } // jr z
-  CYC(0x4720, 0x4722);
-  CYC(0x4722, 0x4725); A = W8(wSoundChannel);
-  CYC(0x4725, 0x4726); A = alu_inc8(gb, A);
-  CYC(0x4726, 0x4727); A = alu_inc8(gb, A);
-  CYC(0x4727, 0x4728); E = A;
-  CYC(0x4728, 0x472b); SET_HL(wChannelsEnabled);
-  CYC(0x472b, 0x472d); D = 0x00;
-  CYC(0x472d, 0x472e); alu_add_hl(gb, DE);
-  CYC(0x472e, 0x472f); A = mem_rd(gb, HL);
-  CYC(0x472f, 0x4731); alu_cp(gb, 0x00);
-  if (F & FZ) { CYCT(0x4731, 0x4733); goto setVolume; } // jr z
-  CYC(0x4731, 0x4733);
+  CYC(b_+0, b_+3); A = W8(wSoundChannel);
+  CYC(b_+3, b_+5); alu_cp(gb, 0x02);
+  if (!(F & FC)) { CYCT(b_+5, b_+7); goto setVolume; } // jr nc
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+10); A = W8(wMusicVolume);
+  CYC(b_+10, b_+12); alu_cp(gb, 0x00);
+  if (F & FZ) { CYCT(b_+12, b_+14); goto doRet; } // jr z
+  CYC(b_+12, b_+14);
+  CYC(b_+14, b_+17); A = W8(wSoundChannel);
+  CYC(b_+17, b_+18); A = alu_inc8(gb, A);
+  CYC(b_+18, b_+19); A = alu_inc8(gb, A);
+  CYC(b_+19, b_+20); E = A;
+  CYC(b_+20, b_+23); SET_HL(wChannelsEnabled);
+  CYC(b_+23, b_+25); D = 0x00;
+  CYC(b_+25, b_+26); alu_add_hl(gb, DE);
+  CYC(b_+26, b_+27); A = mem_rd(gb, HL);
+  CYC(b_+27, b_+29); alu_cp(gb, 0x00);
+  if (F & FZ) { CYCT(b_+29, b_+31); goto setVolume; } // jr z
+  CYC(b_+29, b_+31);
 doRet:
-  RET(0x4733);
+  RET(b_+31);
   return;
 setVolume:
-  CYC(0x4734, 0x4737); A = W8(wSoundChannel);
-  CYC(0x4737, 0x4739); alu_and(gb, 0x01);
-  if (!(F & FZ)) { CYCT(0x4739, 0x473b); goto sweepDone; } // jr nz
-  CYC(0x4739, 0x473b);
-  CYC(0x473b, 0x473d); A = 0x08;
-  CYC(0x473d, 0x473f); mem_wr(gb, 0xff10, A);
+  CYC(b_+32, b_+35); A = W8(wSoundChannel);
+  CYC(b_+35, b_+37); alu_and(gb, 0x01);
+  if (!(F & FZ)) { CYCT(b_+37, b_+39); goto sweepDone; } // jr nz
+  CYC(b_+37, b_+39);
+  CYC(b_+39, b_+41); A = 0x08;
+  CYC(b_+41, b_+43); mem_wr(gb, 0xff10, A);
 sweepDone:
-  CYC(0x473f, 0x4742); A = W8(wSoundChannel);
-  CYC(0x4742, 0x4744); alu_and(gb, 0x01);
-  CYC(0x4744, 0x4745); B = A;
-  CYC(0x4745, 0x4747); A = alu_sla(gb, A);
-  CYC(0x4747, 0x4749); A = alu_sla(gb, A);
-  CYC(0x4749, 0x474a); alu_add(gb, B);
-  CYC(0x474a, 0x474b); B = A;
-  CYC(0x474b, 0x474e); A = W8(wSoundCmdEnvelope);
-  CYC(0x474e, 0x4750); C = 0x12;
-  CALL_C(0x4750, writeIndexedHighRamAndIncrement_hook, 0x4d25, 0x4753);
-  CYC(0x4753, 0x4756); SET_HL(wChannelFrequencyModeAndLengthTimerEnabled);
-  CYC(0x4756, 0x4759); A = W8(wSoundChannel);
-  CYC(0x4759, 0x475a); E = A;
-  CYC(0x475a, 0x475c); D = 0x00;
-  CYC(0x475c, 0x475d); alu_add_hl(gb, DE);
-  CYC(0x475d, 0x475e); A = mem_rd(gb, HL);
-  CYC(0x475e, 0x4760); alu_and(gb, 0x40);
-  CYC(0x4760, 0x4762); alu_or(gb, 0x80);
-  CYC(0x4762, 0x4765); W8(wSoundCmdEnvelope) = A;
-  RET(0x4765);
+  CYC(b_+43, b_+46); A = W8(wSoundChannel);
+  CYC(b_+46, b_+48); alu_and(gb, 0x01);
+  CYC(b_+48, b_+49); B = A;
+  CYC(b_+49, b_+51); A = alu_sla(gb, A);
+  CYC(b_+51, b_+53); A = alu_sla(gb, A);
+  CYC(b_+53, b_+54); alu_add(gb, B);
+  CYC(b_+54, b_+55); B = A;
+  CYC(b_+55, b_+58); A = W8(wSoundCmdEnvelope);
+  CYC(b_+58, b_+60); C = 0x12;
+  CALL_C(b_+60, writeIndexedHighRamAndIncrement_hook, SYM(writeIndexedHighRamAndIncrement), b_+63);
+  CYC(b_+63, b_+66); SET_HL(wChannelFrequencyModeAndLengthTimerEnabled);
+  CYC(b_+66, b_+69); A = W8(wSoundChannel);
+  CYC(b_+69, b_+70); E = A;
+  CYC(b_+70, b_+72); D = 0x00;
+  CYC(b_+72, b_+73); alu_add_hl(gb, DE);
+  CYC(b_+73, b_+74); A = mem_rd(gb, HL);
+  CYC(b_+74, b_+76); alu_and(gb, 0x40);
+  CYC(b_+76, b_+78); alu_or(gb, 0x80);
+  CYC(b_+78, b_+81); W8(wSoundCmdEnvelope) = A;
+  RET(b_+81);
 }
 
 // Updates wWaveChannelVolume+4 and, if changed, writes to R_NR32 if possible
 void updateChannel4Volume_hook(GB *gb) {
+  BASE(updateChannel4Volume);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4766, getWaveChannelVolume_hook, 0x489e, 0x4769);
-  CYC(0x4769, 0x476a); B = A;
-  CYC(0x476a, 0x476d); A = mem_rd(gb, wWaveChannelVolume + 4);
-  CYC(0x476d, 0x476e); alu_cp(gb, B);
-  if (F & FZ) { CYCT(0x476e, 0x4770); goto ret4; } // jr z
-  CYC(0x476e, 0x4770);
-  CALL_C(0x4770, getWaveChannelVolume_hook, 0x489e, 0x4773);
-  CYC(0x4773, 0x4776); mem_wr(gb, wWaveChannelVolume + 4, A);
-  CALL_C(0x4776, isWaveChannelUnavailable_hook, 0x434b, 0x4779);
-  CYC(0x4779, 0x477b); alu_cp(gb, 0x00);
-  if (!(F & FZ)) { CYCT(0x477b, 0x477d); goto ret4; } // jr nz
-  CYC(0x477b, 0x477d);
-  CYC(0x477d, 0x4780); A = mem_rd(gb, wWaveChannelVolume + 4);
-  CYC(0x4780, 0x4782); mem_wr(gb, 0xff1c, A);
+  CALL_C(b_+0, getWaveChannelVolume_hook, SYM(getWaveChannelVolume), b_+3);
+  CYC(b_+3, b_+4); B = A;
+  CYC(b_+4, b_+7); A = mem_rd(gb, wWaveChannelVolume + 4);
+  CYC(b_+7, b_+8); alu_cp(gb, B);
+  if (F & FZ) { CYCT(b_+8, b_+10); goto ret4; } // jr z
+  CYC(b_+8, b_+10);
+  CALL_C(b_+10, getWaveChannelVolume_hook, SYM(getWaveChannelVolume), b_+13);
+  CYC(b_+13, b_+16); mem_wr(gb, wWaveChannelVolume + 4, A);
+  CALL_C(b_+16, isWaveChannelUnavailable_hook, SYM(isWaveChannelUnavailable), b_+19);
+  CYC(b_+19, b_+21); alu_cp(gb, 0x00);
+  if (!(F & FZ)) { CYCT(b_+21, b_+23); goto ret4; } // jr nz
+  CYC(b_+21, b_+23);
+  CYC(b_+23, b_+26); A = mem_rd(gb, wWaveChannelVolume + 4);
+  CYC(b_+26, b_+28); mem_wr(gb, 0xff1c, A);
 ret4:
-  RET(0x4782);
+  RET(b_+28);
 }
 
 // Shared tail of getChannelVolume, reached directly by a real ROM `call $478c`
 // from standardCmdChannel6 (NOT independently hooked).
 static void getChannelVolume_fullVolume(GB *gb) {
-  CYC(0x479b, 0x479e); SET_HL(wChannelVolumes);
-  CYC(0x479e, 0x47a1); A = W8(wSoundChannel);
-  CYC(0x47a1, 0x47a2); E = A;
-  CYC(0x47a2, 0x47a4); D = 0x00;
-  CYC(0x47a4, 0x47a5); alu_add_hl(gb, DE);
-  CYC(0x47a5, 0x47a6); A = mem_rd(gb, HL);
-  RET(0x47a6);
+  BASE(getChannelVolume);
+  CYC(b_+24, b_+27); SET_HL(wChannelVolumes);
+  CYC(b_+27, b_+30); A = W8(wSoundChannel);
+  CYC(b_+30, b_+31); E = A;
+  CYC(b_+31, b_+33); D = 0x00;
+  CYC(b_+33, b_+34); alu_add_hl(gb, DE);
+  CYC(b_+34, b_+35); A = mem_rd(gb, HL);
+  RET(b_+35);
 }
 
 static void getChannelVolume_affectedByMusicVolume(GB *gb) {
-  CYC(0x478c, 0x478f); A = W8(wMusicVolume);
-  CYC(0x478f, 0x4791); alu_cp(gb, 0x00);
-  if (F & FZ) { CYCT(0x4791, 0x4793); goto muted; } // jr z
-  CYC(0x4791, 0x4793);
-  CYC(0x4793, 0x4795); alu_cp(gb, 0x01);
-  if (F & FZ) { CYCT(0x4795, 0x4797); goto quarterVolume; } // jr z
-  CYC(0x4795, 0x4797);
-  CYC(0x4797, 0x4799); alu_cp(gb, 0x02);
-  if (F & FZ) { CYCT(0x4799, 0x479b); goto halfVolume; } // jr z
-  CYC(0x4799, 0x479b);
+  BASE(getChannelVolume);
+  CYC(b_+9, b_+12); A = W8(wMusicVolume);
+  CYC(b_+12, b_+14); alu_cp(gb, 0x00);
+  if (F & FZ) { CYCT(b_+14, b_+16); goto muted; } // jr z
+  CYC(b_+14, b_+16);
+  CYC(b_+16, b_+18); alu_cp(gb, 0x01);
+  if (F & FZ) { CYCT(b_+18, b_+20); goto quarterVolume; } // jr z
+  CYC(b_+18, b_+20);
+  CYC(b_+20, b_+22); alu_cp(gb, 0x02);
+  if (F & FZ) { CYCT(b_+22, b_+24); goto halfVolume; } // jr z
+  CYC(b_+22, b_+24);
   getChannelVolume_fullVolume(gb);
   return;
 halfVolume:
-  CYC(0x47a7, 0x47aa); SET_HL(wChannelVolumes);
-  CYC(0x47aa, 0x47ad); A = W8(wSoundChannel);
-  CYC(0x47ad, 0x47ae); E = A;
-  CYC(0x47ae, 0x47b0); D = 0x00;
-  CYC(0x47b0, 0x47b1); alu_add_hl(gb, DE);
-  CYC(0x47b1, 0x47b2); A = mem_rd(gb, HL);
-  CYC(0x47b2, 0x47b4); A = alu_srl(gb, A);
-  RET(0x47b4);
+  CYC(b_+36, b_+39); SET_HL(wChannelVolumes);
+  CYC(b_+39, b_+42); A = W8(wSoundChannel);
+  CYC(b_+42, b_+43); E = A;
+  CYC(b_+43, b_+45); D = 0x00;
+  CYC(b_+45, b_+46); alu_add_hl(gb, DE);
+  CYC(b_+46, b_+47); A = mem_rd(gb, HL);
+  CYC(b_+47, b_+49); A = alu_srl(gb, A);
+  RET(b_+49);
   return;
 quarterVolume:
-  CYC(0x47b5, 0x47b8); SET_HL(wChannelVolumes);
-  CYC(0x47b8, 0x47bb); A = W8(wSoundChannel);
-  CYC(0x47bb, 0x47bc); E = A;
-  CYC(0x47bc, 0x47be); D = 0x00;
-  CYC(0x47be, 0x47bf); alu_add_hl(gb, DE);
-  CYC(0x47bf, 0x47c0); A = mem_rd(gb, HL);
-  CYC(0x47c0, 0x47c2); A = alu_srl(gb, A);
-  CYC(0x47c2, 0x47c4); A = alu_srl(gb, A);
-  RET(0x47c4);
+  CYC(b_+50, b_+53); SET_HL(wChannelVolumes);
+  CYC(b_+53, b_+56); A = W8(wSoundChannel);
+  CYC(b_+56, b_+57); E = A;
+  CYC(b_+57, b_+59); D = 0x00;
+  CYC(b_+59, b_+60); alu_add_hl(gb, DE);
+  CYC(b_+60, b_+61); A = mem_rd(gb, HL);
+  CYC(b_+61, b_+63); A = alu_srl(gb, A);
+  CYC(b_+63, b_+65); A = alu_srl(gb, A);
+  RET(b_+65);
   return;
 muted:
-  CYC(0x47c5, 0x47c7); A = 0x00;
-  RET(0x47c7);
+  CYC(b_+66, b_+68); A = 0x00;
+  RET(b_+68);
 }
 
 // Intended for use with square and noise channels, but not used by channel 7.
 // Channel 6 uses @affectedByMusicVolume as entry point.
 void getChannelVolume_hook(GB *gb) {
-  CYC(0x4783, 0x4786); A = W8(wSoundChannel);
-  CYC(0x4786, 0x4787); alu_scf(gb);
-  CYC(0x4787, 0x4788); alu_ccf(gb);
-  CYC(0x4788, 0x478a); alu_cp(gb, 0x02);
-  if (!(F & FC)) { CYCT(0x478a, 0x478c); getChannelVolume_fullVolume(gb); return; } // jr nc
-  CYC(0x478a, 0x478c);
+  BASE(getChannelVolume);
+  CYC(b_+0, b_+3); A = W8(wSoundChannel);
+  CYC(b_+3, b_+4); alu_scf(gb);
+  CYC(b_+4, b_+5); alu_ccf(gb);
+  CYC(b_+5, b_+7); alu_cp(gb, 0x02);
+  if (!(F & FC)) { CYCT(b_+7, b_+9); getChannelVolume_fullVolume(gb); return; } // jr nc
+  CYC(b_+7, b_+9);
   getChannelVolume_affectedByMusicVolume(gb);
 }
 
 void standardCmdChannels4To5_hook(GB *gb) {
+  BASE(standardCmdChannels4To5);
   uint16_t sp0_ = gb->sp;
-  CYC(0x47c8, 0x47cb); SET_HL(wChannelFrequencyModeAndLengthTimerEnabled);
-  CYC(0x47cb, 0x47ce); A = W8(wSoundChannel);
-  CYC(0x47ce, 0x47cf); E = A;
-  CYC(0x47cf, 0x47d1); D = 0x00;
-  CYC(0x47d1, 0x47d2); alu_add_hl(gb, DE);
-  CYC(0x47d2, 0x47d3); A = mem_rd(gb, HL);
-  CYC(0x47d3, 0x47d5); alu_cp(gb, 0x00);
-  if (F & FZ) { CYCT(0x47d5, 0x47d7); goto freqOrCmd; } // jr z
-  CYC(0x47d5, 0x47d7);
-  CALL_C(0x47d7, getNextChannelByte_hook, 0x4366, 0x47da);
-  CYC(0x47da, 0x47db); L = A;
-  CYC(0x47db, 0x47de); A = W8(wSoundCmd);
-  CYC(0x47de, 0x47df); H = A;
-  CYC(0x47df, 0x47e2); goto arbitraryFrequency; // jp
+  CYC(b_+0, b_+3); SET_HL(wChannelFrequencyModeAndLengthTimerEnabled);
+  CYC(b_+3, b_+6); A = W8(wSoundChannel);
+  CYC(b_+6, b_+7); E = A;
+  CYC(b_+7, b_+9); D = 0x00;
+  CYC(b_+9, b_+10); alu_add_hl(gb, DE);
+  CYC(b_+10, b_+11); A = mem_rd(gb, HL);
+  CYC(b_+11, b_+13); alu_cp(gb, 0x00);
+  if (F & FZ) { CYCT(b_+13, b_+15); goto freqOrCmd; } // jr z
+  CYC(b_+13, b_+15);
+  CALL_C(b_+15, getNextChannelByte_hook, SYM(getNextChannelByte), b_+18);
+  CYC(b_+18, b_+19); L = A;
+  CYC(b_+19, b_+22); A = W8(wSoundCmd);
+  CYC(b_+22, b_+23); H = A;
+  CYC(b_+23, b_+26); goto arbitraryFrequency; // jp
 freqOrCmd:
-  CYC(0x47e2, 0x47e5); A = W8(wSoundCmd);
-  CYC(0x47e5, 0x47e6); alu_scf(gb);
-  CYC(0x47e6, 0x47e7); alu_ccf(gb);
-  CYC(0x47e7, 0x47e9); alu_cp(gb, 0x60);
-  if (!(F & FZ)) { CYCT(0x47e9, 0x47eb); goto freqCommand; } // jr nz
-  CYC(0x47e9, 0x47eb);
-  CYC(0x47eb, 0x47ed); A = 0x01;
-  CYC(0x47ed, 0x47f0); SET_HL(wChannelIsPlayingRest);
-  CYC(0x47f0, 0x47f1); push_effect(gb, AF);
-  CYC(0x47f1, 0x47f4); A = W8(wSoundChannel);
-  CYC(0x47f4, 0x47f5); E = A;
-  CYC(0x47f5, 0x47f7); D = 0x00;
-  CYC(0x47f7, 0x47f8); alu_add_hl(gb, DE);
-  CYC(0x47f8, 0x47f9); SET_AF(pop_effect(gb));
-  CYC(0x47f9, 0x47fa); mem_wr(gb, HL, A);
-  CALL_C(0x47fa, getWaveChannelVolume_hook, 0x489e, 0x47fd);
-  CYC(0x47fd, 0x4800); SET_HL(wWaveChannelVolume);
-  CYC(0x4800, 0x4801); push_effect(gb, AF);
-  CYC(0x4801, 0x4804); A = W8(wSoundChannel);
-  CYC(0x4804, 0x4805); E = A;
-  CYC(0x4805, 0x4807); D = 0x00;
-  CYC(0x4807, 0x4808); alu_add_hl(gb, DE);
-  CYC(0x4808, 0x4809); SET_AF(pop_effect(gb));
-  CYC(0x4809, 0x480a); mem_wr(gb, HL, A);
-  CALL_C(0x480a, isWaveChannelUnavailable_hook, 0x434b, 0x480d);
-  CYC(0x480d, 0x480f); alu_cp(gb, 0x00);
-  if (!(F & FZ)) { CYCT(0x480f, 0x4811); goto waitCmd60; } // jr nz
-  CYC(0x480f, 0x4811);
-  CYC(0x4811, 0x4814); SET_HL(wWaveChannelVolume);
-  CYC(0x4814, 0x4817); A = W8(wSoundChannel);
-  CYC(0x4817, 0x4818); E = A;
-  CYC(0x4818, 0x481a); D = 0x00;
-  CYC(0x481a, 0x481b); alu_add_hl(gb, DE);
-  CYC(0x481b, 0x481c); A = mem_rd(gb, HL);
-  CYC(0x481c, 0x481e); mem_wr(gb, 0xff1c, A);
+  CYC(b_+26, b_+29); A = W8(wSoundCmd);
+  CYC(b_+29, b_+30); alu_scf(gb);
+  CYC(b_+30, b_+31); alu_ccf(gb);
+  CYC(b_+31, b_+33); alu_cp(gb, 0x60);
+  if (!(F & FZ)) { CYCT(b_+33, b_+35); goto freqCommand; } // jr nz
+  CYC(b_+33, b_+35);
+  CYC(b_+35, b_+37); A = 0x01;
+  CYC(b_+37, b_+40); SET_HL(wChannelIsPlayingRest);
+  CYC(b_+40, b_+41); push_effect(gb, AF);
+  CYC(b_+41, b_+44); A = W8(wSoundChannel);
+  CYC(b_+44, b_+45); E = A;
+  CYC(b_+45, b_+47); D = 0x00;
+  CYC(b_+47, b_+48); alu_add_hl(gb, DE);
+  CYC(b_+48, b_+49); SET_AF(pop_effect(gb));
+  CYC(b_+49, b_+50); mem_wr(gb, HL, A);
+  CALL_C(b_+50, getWaveChannelVolume_hook, SYM(getWaveChannelVolume), b_+53);
+  CYC(b_+53, b_+56); SET_HL(wWaveChannelVolume);
+  CYC(b_+56, b_+57); push_effect(gb, AF);
+  CYC(b_+57, b_+60); A = W8(wSoundChannel);
+  CYC(b_+60, b_+61); E = A;
+  CYC(b_+61, b_+63); D = 0x00;
+  CYC(b_+63, b_+64); alu_add_hl(gb, DE);
+  CYC(b_+64, b_+65); SET_AF(pop_effect(gb));
+  CYC(b_+65, b_+66); mem_wr(gb, HL, A);
+  CALL_C(b_+66, isWaveChannelUnavailable_hook, SYM(isWaveChannelUnavailable), b_+69);
+  CYC(b_+69, b_+71); alu_cp(gb, 0x00);
+  if (!(F & FZ)) { CYCT(b_+71, b_+73); goto waitCmd60; } // jr nz
+  CYC(b_+71, b_+73);
+  CYC(b_+73, b_+76); SET_HL(wWaveChannelVolume);
+  CYC(b_+76, b_+79); A = W8(wSoundChannel);
+  CYC(b_+79, b_+80); E = A;
+  CYC(b_+80, b_+82); D = 0x00;
+  CYC(b_+82, b_+83); alu_add_hl(gb, DE);
+  CYC(b_+83, b_+84); A = mem_rd(gb, HL);
+  CYC(b_+84, b_+86); mem_wr(gb, 0xff1c, A);
 waitCmd60:
-  CYC(0x481e, 0x4821); setChannelWaitCounter_hook(gb); return; // jp
+  CYC(b_+86, b_+89); setChannelWaitCounter_hook(gb); return; // jp
 freqCommand:
-  CYC(0x4821, 0x4823); A = 0x00;
-  CYC(0x4823, 0x4826); SET_HL(wChannelIsPlayingRest);
-  CYC(0x4826, 0x4827); push_effect(gb, AF);
-  CYC(0x4827, 0x482a); A = W8(wSoundChannel);
-  CYC(0x482a, 0x482b); E = A;
-  CYC(0x482b, 0x482d); D = 0x00;
-  CYC(0x482d, 0x482e); alu_add_hl(gb, DE);
-  CYC(0x482e, 0x482f); SET_AF(pop_effect(gb));
-  CYC(0x482f, 0x4830); mem_wr(gb, HL, A);
-  CYC(0x4830, 0x4833); A = W8(wSoundCmd);
-  CYC(0x4833, 0x4836); SET_HL(0x4a22);
-  CALL_C(0x4836, readWordFromTable_hook, 0x4d19, 0x4839);
+  CYC(b_+89, b_+91); A = 0x00;
+  CYC(b_+91, b_+94); SET_HL(wChannelIsPlayingRest);
+  CYC(b_+94, b_+95); push_effect(gb, AF);
+  CYC(b_+95, b_+98); A = W8(wSoundChannel);
+  CYC(b_+98, b_+99); E = A;
+  CYC(b_+99, b_+101); D = 0x00;
+  CYC(b_+101, b_+102); alu_add_hl(gb, DE);
+  CYC(b_+102, b_+103); SET_AF(pop_effect(gb));
+  CYC(b_+103, b_+104); mem_wr(gb, HL, A);
+  CYC(b_+104, b_+107); A = W8(wSoundCmd);
+  CYC(b_+107, b_+110); SET_HL(SYM(soundFrequencyTable));
+  CALL_C(b_+110, readWordFromTable_hook, SYM(readWordFromTable), b_+113);
 arbitraryFrequency:
-  CALL_C(0x4839, setSoundFrequency_hook, 0x461a, 0x483c);
-  CYC(0x483c, 0x483e); A = 0x00;
-  CYC(0x483e, 0x4841); SET_HL(wChannelVibratoActive);
-  CYC(0x4841, 0x4842); push_effect(gb, AF);
-  CYC(0x4842, 0x4845); A = W8(wSoundChannel);
-  CYC(0x4845, 0x4846); E = A;
-  CYC(0x4846, 0x4848); D = 0x00;
-  CYC(0x4848, 0x4849); alu_add_hl(gb, DE);
-  CYC(0x4849, 0x484a); SET_AF(pop_effect(gb));
-  CYC(0x484a, 0x484b); mem_wr(gb, HL, A);
-  CYC(0x484b, 0x484d); A = 0x00;
-  CYC(0x484d, 0x4850); SET_HL(wChannelVibratos);
-  CYC(0x4850, 0x4853); A = W8(wSoundChannel);
-  CYC(0x4853, 0x4854); E = A;
-  CYC(0x4854, 0x4856); D = 0x00;
-  CYC(0x4856, 0x4857); alu_add_hl(gb, DE);
-  CYC(0x4857, 0x4858); A = mem_rd(gb, HL);
-  CYC(0x4858, 0x485a); alu_and(gb, 0xf0);
-  CYC(0x485a, 0x485c); A = alu_srl(gb, A);
-  CYC(0x485c, 0x485e); A = alu_srl(gb, A);
-  CYC(0x485e, 0x4860); A = alu_srl(gb, A);
-  CYC(0x4860, 0x4863); SET_HL(wChannelVibratoCounters);
-  CYC(0x4863, 0x4864); push_effect(gb, AF);
-  CYC(0x4864, 0x4867); A = W8(wSoundChannel);
-  CYC(0x4867, 0x4868); E = A;
-  CYC(0x4868, 0x486a); D = 0x00;
-  CYC(0x486a, 0x486b); alu_add_hl(gb, DE);
-  CYC(0x486b, 0x486c); SET_AF(pop_effect(gb));
-  CYC(0x486c, 0x486d); mem_wr(gb, HL, A);
-  CALL_C(0x486d, getWaveChannelVolume_hook, 0x489e, 0x4870);
-  CYC(0x4870, 0x4873); SET_HL(wWaveChannelVolume);
-  CYC(0x4873, 0x4874); push_effect(gb, AF);
-  CYC(0x4874, 0x4877); A = W8(wSoundChannel);
-  CYC(0x4877, 0x4878); E = A;
-  CYC(0x4878, 0x487a); D = 0x00;
-  CYC(0x487a, 0x487b); alu_add_hl(gb, DE);
-  CYC(0x487b, 0x487c); SET_AF(pop_effect(gb));
-  CYC(0x487c, 0x487d); mem_wr(gb, HL, A);
-  CALL_C(0x487d, isWaveChannelUnavailable_hook, 0x434b, 0x4880);
-  CYC(0x4880, 0x4882); alu_cp(gb, 0x00);
-  if (!(F & FZ)) { CYCT(0x4882, 0x4884); goto waitFreq; } // jr nz
-  CYC(0x4882, 0x4884);
-  CYC(0x4884, 0x4887); SET_HL(wWaveChannelVolume);
-  CYC(0x4887, 0x488a); A = W8(wSoundChannel);
-  CYC(0x488a, 0x488b); E = A;
-  CYC(0x488b, 0x488d); D = 0x00;
-  CYC(0x488d, 0x488e); alu_add_hl(gb, DE);
-  CYC(0x488e, 0x488f); A = mem_rd(gb, HL);
-  CYC(0x488f, 0x4891); mem_wr(gb, 0xff1c, A);
-  CYC(0x4891, 0x4894); A = W8(wSoundFrequencyL);
-  CYC(0x4894, 0x4896); mem_wr(gb, 0xff1d, A);
-  CYC(0x4896, 0x4899); A = W8(wSoundFrequencyH);
-  CYC(0x4899, 0x489b); mem_wr(gb, 0xff1e, A);
+  CALL_C(b_+113, setSoundFrequency_hook, SYM(setSoundFrequency), b_+116);
+  CYC(b_+116, b_+118); A = 0x00;
+  CYC(b_+118, b_+121); SET_HL(wChannelVibratoActive);
+  CYC(b_+121, b_+122); push_effect(gb, AF);
+  CYC(b_+122, b_+125); A = W8(wSoundChannel);
+  CYC(b_+125, b_+126); E = A;
+  CYC(b_+126, b_+128); D = 0x00;
+  CYC(b_+128, b_+129); alu_add_hl(gb, DE);
+  CYC(b_+129, b_+130); SET_AF(pop_effect(gb));
+  CYC(b_+130, b_+131); mem_wr(gb, HL, A);
+  CYC(b_+131, b_+133); A = 0x00;
+  CYC(b_+133, b_+136); SET_HL(wChannelVibratos);
+  CYC(b_+136, b_+139); A = W8(wSoundChannel);
+  CYC(b_+139, b_+140); E = A;
+  CYC(b_+140, b_+142); D = 0x00;
+  CYC(b_+142, b_+143); alu_add_hl(gb, DE);
+  CYC(b_+143, b_+144); A = mem_rd(gb, HL);
+  CYC(b_+144, b_+146); alu_and(gb, 0xf0);
+  CYC(b_+146, b_+148); A = alu_srl(gb, A);
+  CYC(b_+148, b_+150); A = alu_srl(gb, A);
+  CYC(b_+150, b_+152); A = alu_srl(gb, A);
+  CYC(b_+152, b_+155); SET_HL(wChannelVibratoCounters);
+  CYC(b_+155, b_+156); push_effect(gb, AF);
+  CYC(b_+156, b_+159); A = W8(wSoundChannel);
+  CYC(b_+159, b_+160); E = A;
+  CYC(b_+160, b_+162); D = 0x00;
+  CYC(b_+162, b_+163); alu_add_hl(gb, DE);
+  CYC(b_+163, b_+164); SET_AF(pop_effect(gb));
+  CYC(b_+164, b_+165); mem_wr(gb, HL, A);
+  CALL_C(b_+165, getWaveChannelVolume_hook, SYM(getWaveChannelVolume), b_+168);
+  CYC(b_+168, b_+171); SET_HL(wWaveChannelVolume);
+  CYC(b_+171, b_+172); push_effect(gb, AF);
+  CYC(b_+172, b_+175); A = W8(wSoundChannel);
+  CYC(b_+175, b_+176); E = A;
+  CYC(b_+176, b_+178); D = 0x00;
+  CYC(b_+178, b_+179); alu_add_hl(gb, DE);
+  CYC(b_+179, b_+180); SET_AF(pop_effect(gb));
+  CYC(b_+180, b_+181); mem_wr(gb, HL, A);
+  CALL_C(b_+181, isWaveChannelUnavailable_hook, SYM(isWaveChannelUnavailable), b_+184);
+  CYC(b_+184, b_+186); alu_cp(gb, 0x00);
+  if (!(F & FZ)) { CYCT(b_+186, b_+188); goto waitFreq; } // jr nz
+  CYC(b_+186, b_+188);
+  CYC(b_+188, b_+191); SET_HL(wWaveChannelVolume);
+  CYC(b_+191, b_+194); A = W8(wSoundChannel);
+  CYC(b_+194, b_+195); E = A;
+  CYC(b_+195, b_+197); D = 0x00;
+  CYC(b_+197, b_+198); alu_add_hl(gb, DE);
+  CYC(b_+198, b_+199); A = mem_rd(gb, HL);
+  CYC(b_+199, b_+201); mem_wr(gb, 0xff1c, A);
+  CYC(b_+201, b_+204); A = W8(wSoundFrequencyL);
+  CYC(b_+204, b_+206); mem_wr(gb, 0xff1d, A);
+  CYC(b_+206, b_+209); A = W8(wSoundFrequencyH);
+  CYC(b_+209, b_+211); mem_wr(gb, 0xff1e, A);
 waitFreq:
-  CYC(0x489b, 0x489e); setChannelWaitCounter_hook(gb); return; // jp
+  CYC(b_+211, SYM(getWaveChannelVolume)); setChannelWaitCounter_hook(gb); return; // jp
 }
 
 // @param[out] a Volume of channel wSoundChannel dependent of wMusicVolume,
 // in a form that can be written to NR32.
 void getWaveChannelVolume_hook(GB *gb) {
-  CYC(0x489e, 0x48a1); SET_HL(wChannelIsPlayingRest);
-  CYC(0x48a1, 0x48a4); A = W8(wSoundChannel);
-  CYC(0x48a4, 0x48a5); E = A;
-  CYC(0x48a5, 0x48a7); D = 0x00;
-  CYC(0x48a7, 0x48a8); alu_add_hl(gb, DE);
-  CYC(0x48a8, 0x48a9); A = mem_rd(gb, HL);
-  CYC(0x48a9, 0x48ab); alu_cp(gb, 0x00);
-  if (!(F & FZ)) { CYCT(0x48ab, 0x48ad); goto mute; } // jr nz
-  CYC(0x48ab, 0x48ad);
-  CYC(0x48ad, 0x48b0); A = W8(wSoundChannel);
-  CYC(0x48b0, 0x48b2); alu_cp(gb, 0x05);
-  if (!(F & FC)) { CYCT(0x48b2, 0x48b4); goto fullVolume; } // jr nc
-  CYC(0x48b2, 0x48b4);
-  CYC(0x48b4, 0x48b7); A = W8(wMusicVolume);
-  CYC(0x48b7, 0x48b9); alu_cp(gb, 0x00);
-  if (F & FZ) { CYCT(0x48b9, 0x48bb); goto mute; } // jr z
-  CYC(0x48b9, 0x48bb);
-  CYC(0x48bb, 0x48bd); alu_cp(gb, 0x01);
-  if (F & FZ) { CYCT(0x48bd, 0x48bf); goto quarterVolume; } // jr z
-  CYC(0x48bd, 0x48bf);
-  CYC(0x48bf, 0x48c1); alu_cp(gb, 0x02);
-  if (F & FZ) { CYCT(0x48c1, 0x48c3); goto halfVolume; } // jr z
-  CYC(0x48c1, 0x48c3);
+  BASE(getWaveChannelVolume);
+  CYC(b_+0, b_+3); SET_HL(wChannelIsPlayingRest);
+  CYC(b_+3, b_+6); A = W8(wSoundChannel);
+  CYC(b_+6, b_+7); E = A;
+  CYC(b_+7, b_+9); D = 0x00;
+  CYC(b_+9, b_+10); alu_add_hl(gb, DE);
+  CYC(b_+10, b_+11); A = mem_rd(gb, HL);
+  CYC(b_+11, b_+13); alu_cp(gb, 0x00);
+  if (!(F & FZ)) { CYCT(b_+13, b_+15); goto mute; } // jr nz
+  CYC(b_+13, b_+15);
+  CYC(b_+15, b_+18); A = W8(wSoundChannel);
+  CYC(b_+18, b_+20); alu_cp(gb, 0x05);
+  if (!(F & FC)) { CYCT(b_+20, b_+22); goto fullVolume; } // jr nc
+  CYC(b_+20, b_+22);
+  CYC(b_+22, b_+25); A = W8(wMusicVolume);
+  CYC(b_+25, b_+27); alu_cp(gb, 0x00);
+  if (F & FZ) { CYCT(b_+27, b_+29); goto mute; } // jr z
+  CYC(b_+27, b_+29);
+  CYC(b_+29, b_+31); alu_cp(gb, 0x01);
+  if (F & FZ) { CYCT(b_+31, b_+33); goto quarterVolume; } // jr z
+  CYC(b_+31, b_+33);
+  CYC(b_+33, b_+35); alu_cp(gb, 0x02);
+  if (F & FZ) { CYCT(b_+35, b_+37); goto halfVolume; } // jr z
+  CYC(b_+35, b_+37);
 fullVolume:
-  CYC(0x48c3, 0x48c5); A = 0x20;
-  RET(0x48c5);
+  CYC(b_+37, b_+39); A = 0x20;
+  RET(b_+39);
   return;
 halfVolume:
-  CYC(0x48c6, 0x48c8); A = 0x40;
-  RET(0x48c8);
+  CYC(b_+40, b_+42); A = 0x40;
+  RET(b_+42);
   return;
 quarterVolume:
-  CYC(0x48c9, 0x48cb); A = 0x60;
-  RET(0x48cb);
+  CYC(b_+43, b_+45); A = 0x60;
+  RET(b_+45);
   return;
 mute:
-  CYC(0x48cc, 0x48ce); A = 0x00;
-  RET(0x48ce);
+  CYC(b_+46, b_+48); A = 0x00;
+  RET(b_+48);
 }
 
 void standardCmdChannel6_hook(GB *gb) {
-  CYC(0x48cf, 0x48d2); A = W8(wSoundCmd);
-  CYC(0x48d2, 0x48d3); C = A;
-  CYC(0x48d3, 0x48d6); SET_DE(0x4d38);
+  BASE(standardCmdChannel6);
+  CYC(b_+0, b_+3); A = W8(wSoundCmd);
+  CYC(b_+3, b_+4); C = A;
+  CYC(b_+4, b_+7); SET_DE(SYM(nonExistentFunction));
 loop:
-  CYC(0x48d6, 0x48d7); A = mem_rd(gb, DE);
-  CYC(0x48d7, 0x48d8); SET_DE(DE + 1);
-  CYC(0x48d8, 0x48da); alu_cp(gb, 0xff);
-  if (F & FZ) { CYCT(0x48da, 0x48dc); goto wait; } // jr z
-  CYC(0x48da, 0x48dc);
-  CYC(0x48dc, 0x48dd); alu_cp(gb, C);
-  if (F & FZ) { CYCT(0x48dd, 0x48df); goto found; } // jr z
-  CYC(0x48dd, 0x48df);
-  CYC(0x48df, 0x48e0); SET_DE(DE + 1);
-  CYC(0x48e0, 0x48e1); SET_DE(DE + 1);
-  CYC(0x48e1, 0x48e3); goto loop; // jr
+  CYC(b_+7, b_+8); A = mem_rd(gb, DE);
+  CYC(b_+8, b_+9); SET_DE(DE + 1);
+  CYC(b_+9, b_+11); alu_cp(gb, 0xff);
+  if (F & FZ) { CYCT(b_+11, b_+13); goto wait; } // jr z
+  CYC(b_+11, b_+13);
+  CYC(b_+13, b_+14); alu_cp(gb, C);
+  if (F & FZ) { CYCT(b_+14, b_+16); goto found; } // jr z
+  CYC(b_+14, b_+16);
+  CYC(b_+16, b_+17); SET_DE(DE + 1);
+  CYC(b_+17, b_+18); SET_DE(DE + 1);
+  CYC(b_+18, b_+20); goto loop; // jr
 found:
-  CYC(0x48e3, 0x48e4); A = mem_rd(gb, DE);
-  CYC(0x48e4, 0x48e5); L = A;
-  CYC(0x48e5, 0x48e6); SET_DE(DE + 1);
-  CYC(0x48e6, 0x48e7); A = mem_rd(gb, DE);
-  CYC(0x48e7, 0x48e8); H = A;
-  CYC(0x48e8, 0x48eb); A = mem_rd(gb, wChannelsEnabled + 7);
-  CYC(0x48eb, 0x48ed); alu_cp(gb, 0x00);
-  if (!(F & FZ)) { CYCT(0x48ed, 0x48ef); goto wait; } // jr nz
-  CYC(0x48ed, 0x48ef);
-  CYC(0x48ef, 0x48f0); push_effect(gb, HL);
-  CYC(0x48f0, 0x48f3);
-  push_effect(gb, 0x48f3);
+  CYC(b_+20, b_+21); A = mem_rd(gb, DE);
+  CYC(b_+21, b_+22); L = A;
+  CYC(b_+22, b_+23); SET_DE(DE + 1);
+  CYC(b_+23, b_+24); A = mem_rd(gb, DE);
+  CYC(b_+24, b_+25); H = A;
+  CYC(b_+25, b_+28); A = mem_rd(gb, wChannelsEnabled + 7);
+  CYC(b_+28, b_+30); alu_cp(gb, 0x00);
+  if (!(F & FZ)) { CYCT(b_+30, b_+32); goto wait; } // jr nz
+  CYC(b_+30, b_+32);
+  CYC(b_+32, b_+33); push_effect(gb, HL);
+  CYC(b_+33, b_+36);
+  push_effect(gb, b_+36);
   getChannelVolume_affectedByMusicVolume(gb);
-  CYC(0x48f3, 0x48f4); SET_HL(pop_effect(gb));
-  CYC(0x48f4, 0x48f6); A = alu_sla(gb, A);
-  CYC(0x48f6, 0x48f8); A = alu_sla(gb, A);
-  CYC(0x48f8, 0x48fa); A = alu_sla(gb, A);
-  CYC(0x48fa, 0x48fc); A = alu_sla(gb, A);
-  CYC(0x48fc, 0x48fd); alu_or(gb, L);
-  CYC(0x48fd, 0x48ff); mem_wr(gb, 0xff21, A);
-  CYC(0x48ff, 0x4900); A = H;
-  CYC(0x4900, 0x4902); mem_wr(gb, 0xff22, A);
-  CYC(0x4902, 0x4904); A = 0x80;
-  CYC(0x4904, 0x4906); mem_wr(gb, 0xff23, A);
+  CYC(b_+36, b_+37); SET_HL(pop_effect(gb));
+  CYC(b_+37, b_+39); A = alu_sla(gb, A);
+  CYC(b_+39, b_+41); A = alu_sla(gb, A);
+  CYC(b_+41, b_+43); A = alu_sla(gb, A);
+  CYC(b_+43, b_+45); A = alu_sla(gb, A);
+  CYC(b_+45, b_+46); alu_or(gb, L);
+  CYC(b_+46, b_+48); mem_wr(gb, 0xff21, A);
+  CYC(b_+48, b_+49); A = H;
+  CYC(b_+49, b_+51); mem_wr(gb, 0xff22, A);
+  CYC(b_+51, b_+53); A = 0x80;
+  CYC(b_+53, b_+55); mem_wr(gb, 0xff23, A);
 wait:
-  CYC(0x4906, 0x4909); setChannelWaitCounter_hook(gb); return; // jp
+  CYC(b_+55, SYM(standardCmdChannel7)); setChannelWaitCounter_hook(gb); return; // jp
 }
 
 void standardCmdChannel7_hook(GB *gb) {
-  CYC(0x4909, 0x490c); A = W8(wSoundCmd);
-  CYC(0x490c, 0x490e); mem_wr(gb, 0xff22, A);
-  CYC(0x490e, 0x4910); A = 0x00;
-  CYC(0x4910, 0x4912); mem_wr(gb, 0xff20, A);
-  CYC(0x4912, 0x4915); A = W8(wChannel7TriggerOnNextSound);
-  CYC(0x4915, 0x4917); alu_cp(gb, 0x00);
-  if (F & FZ) { CYCT(0x4917, 0x4919); goto skipTrigger; } // jr z
-  CYC(0x4917, 0x4919);
-  CYC(0x4919, 0x491b); mem_wr(gb, 0xff23, A);
+  BASE(standardCmdChannel7);
+  CYC(b_+0, b_+3); A = W8(wSoundCmd);
+  CYC(b_+3, b_+5); mem_wr(gb, 0xff22, A);
+  CYC(b_+5, b_+7); A = 0x00;
+  CYC(b_+7, b_+9); mem_wr(gb, 0xff20, A);
+  CYC(b_+9, b_+12); A = W8(wChannel7TriggerOnNextSound);
+  CYC(b_+12, b_+14); alu_cp(gb, 0x00);
+  if (F & FZ) { CYCT(b_+14, b_+16); goto skipTrigger; } // jr z
+  CYC(b_+14, b_+16);
+  CYC(b_+16, b_+18); mem_wr(gb, 0xff23, A);
 skipTrigger:
-  CYC(0x491b, 0x491d); A = 0x00;
-  CYC(0x491d, 0x4920); W8(wChannel7TriggerOnNextSound) = A;
-  CYC(0x4920, 0x4923); setChannelWaitCounter_hook(gb); return; // jp
+  CYC(b_+18, b_+20); A = 0x00;
+  CYC(b_+20, b_+23); W8(wChannel7TriggerOnNextSound) = A;
+  CYC(b_+23, SYM(channelCmdff)); setChannelWaitCounter_hook(gb); return; // jp
 }
 
 // Disables and silences the current channel
 void channelCmdff_hook(GB *gb) {
-  CYC(0x4923, 0x4925); A = 0x00;
-  CYC(0x4925, 0x4928); SET_HL(wChannelsEnabled);
-  CYC(0x4928, 0x4929); push_effect(gb, AF);
-  CYC(0x4929, 0x492c); A = W8(wSoundChannel);
-  CYC(0x492c, 0x492d); E = A;
-  CYC(0x492d, 0x492f); D = 0x00;
-  CYC(0x492f, 0x4930); alu_add_hl(gb, DE);
-  CYC(0x4930, 0x4931); SET_AF(pop_effect(gb));
-  CYC(0x4931, 0x4932); mem_wr(gb, HL, A);
+  BASE(channelCmdff);
+  CYC(b_+0, b_+2); A = 0x00;
+  CYC(b_+2, b_+5); SET_HL(wChannelsEnabled);
+  CYC(b_+5, b_+6); push_effect(gb, AF);
+  CYC(b_+6, b_+9); A = W8(wSoundChannel);
+  CYC(b_+9, b_+10); E = A;
+  CYC(b_+10, b_+12); D = 0x00;
+  CYC(b_+12, b_+13); alu_add_hl(gb, DE);
+  CYC(b_+13, b_+14); SET_AF(pop_effect(gb));
+  CYC(b_+14, SYM(silencePlayedSound)); mem_wr(gb, HL, A);
   silencePlayedSound_hook(gb);
 }
 
 // Ensures no sound is audible on the current channel by setting the volume
 // to $0 or turning off the wave channel DAC.
 void silencePlayedSound_hook(GB *gb) {
+  BASE(silencePlayedSound);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4932, 0x4935); A = W8(wSoundChannel);
-  CYC(0x4935, 0x4938); SET_HL(0x493c);
-  CALL_C(0x4938, readWordFromTable_hook, 0x4d19, 0x493b);
-  CYC(0x493b, 0x493c);
-  switch (HL) {
-    case 0x494c: goto musicSquareChannel;
-    case 0x495e: goto sfxSquareChannel;
-    case 0x498a: goto musicWaveChannel;
-    case 0x4996: goto sfxWaveChannel;
-    case 0x49b8: goto noiseChannel;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+3); A = W8(wSoundChannel);
+  CYC(b_+3, b_+6); SET_HL(b_+10);
+  CALL_C(b_+6, readWordFromTable_hook, SYM(readWordFromTable), b_+9);
+  CYC(b_+9, b_+10);
+  do { uint16_t jt_ = (HL);
+    if (jt_ == b_+26) { goto musicSquareChannel; }
+    else if (jt_ == b_+44) { goto sfxSquareChannel; }
+    else if (jt_ == b_+88) { goto musicWaveChannel; }
+    else if (jt_ == b_+100) { goto sfxWaveChannel; }
+    else if (jt_ == b_+134) { goto noiseChannel; }
+    else { HANDOFF(HL); }
+  } while (0);
 musicSquareChannel:
   // Only update if the corresponding sfx channel is not enabled
-  CYC(0x494c, 0x494f); A = W8(wSoundChannel);
-  CYC(0x494f, 0x4950); A = alu_inc8(gb, A);
-  CYC(0x4950, 0x4951); A = alu_inc8(gb, A);
-  CYC(0x4951, 0x4952); E = A;
-  CYC(0x4952, 0x4955); SET_HL(wChannelsEnabled);
-  CYC(0x4955, 0x4957); D = 0x00;
-  CYC(0x4957, 0x4958); alu_add_hl(gb, DE);
-  CYC(0x4958, 0x4959); A = mem_rd(gb, HL);
-  CYC(0x4959, 0x495b); alu_cp(gb, 0x00);
-  if (F & FZ) { CYCT(0x495b, 0x495d); goto silenceSharedTail; } // jr z
-  CYC(0x495b, 0x495d);
-  RET(0x495d);
+  CYC(b_+26, b_+29); A = W8(wSoundChannel);
+  CYC(b_+29, b_+30); A = alu_inc8(gb, A);
+  CYC(b_+30, b_+31); A = alu_inc8(gb, A);
+  CYC(b_+31, b_+32); E = A;
+  CYC(b_+32, b_+35); SET_HL(wChannelsEnabled);
+  CYC(b_+35, b_+37); D = 0x00;
+  CYC(b_+37, b_+38); alu_add_hl(gb, DE);
+  CYC(b_+38, b_+39); A = mem_rd(gb, HL);
+  CYC(b_+39, b_+41); alu_cp(gb, 0x00);
+  if (F & FZ) { CYCT(b_+41, b_+43); goto silenceSharedTail; } // jr z
+  CYC(b_+41, b_+43);
+  RET(b_+43);
   return;
 sfxSquareChannel:
-  CYC(0x495e, 0x4961); A = W8(wSoundChannel);
-  CYC(0x4961, 0x4962); A = alu_dec8(gb, A);
-  CYC(0x4962, 0x4963); A = alu_dec8(gb, A);
-  CYC(0x4963, 0x4964); E = A;
-  CYC(0x4964, 0x4967); SET_HL(wChannelsEnabled);
-  CYC(0x4967, 0x4969); D = 0x00;
-  CYC(0x4969, 0x496a); alu_add_hl(gb, DE);
-  CYC(0x496a, 0x496b); A = mem_rd(gb, HL);
-  CYC(0x496b, 0x496d); alu_cp(gb, 0x00);
-  if (F & FZ) { CYCT(0x496d, 0x496f); } else { CYC(0x496d, 0x496f); } // jr z
+  CYC(b_+44, b_+47); A = W8(wSoundChannel);
+  CYC(b_+47, b_+48); A = alu_dec8(gb, A);
+  CYC(b_+48, b_+49); A = alu_dec8(gb, A);
+  CYC(b_+49, b_+50); E = A;
+  CYC(b_+50, b_+53); SET_HL(wChannelsEnabled);
+  CYC(b_+53, b_+55); D = 0x00;
+  CYC(b_+55, b_+56); alu_add_hl(gb, DE);
+  CYC(b_+56, b_+57); A = mem_rd(gb, HL);
+  CYC(b_+57, b_+59); alu_cp(gb, 0x00);
+  if (F & FZ) { CYCT(b_+59, b_+61); } else { CYC(b_+59, b_+61); } // jr z
   goto silenceSharedTail;
 silenceSharedTail:
   // If an envelope is active that decreases volume over time, allow the
   // sound to keep playing.
-  CYC(0x496f, 0x4972); SET_HL(wChannelEnvelopeStates);
-  CYC(0x4972, 0x4975); A = W8(wSoundChannel);
-  CYC(0x4975, 0x4976); E = A;
-  CYC(0x4976, 0x4978); D = 0x00;
-  CYC(0x4978, 0x4979); alu_add_hl(gb, DE);
-  CYC(0x4979, 0x497a); A = mem_rd(gb, HL);
-  CYC(0x497a, 0x497c); alu_cp(gb, 0x03);
-  if (!(F & FZ)) { CYCT(0x497c, 0x497e); goto silenceAndUpdate; } // jr nz
-  CYC(0x497c, 0x497e);
-  RET(0x497e);
+  CYC(b_+61, b_+64); SET_HL(wChannelEnvelopeStates);
+  CYC(b_+64, b_+67); A = W8(wSoundChannel);
+  CYC(b_+67, b_+68); E = A;
+  CYC(b_+68, b_+70); D = 0x00;
+  CYC(b_+70, b_+71); alu_add_hl(gb, DE);
+  CYC(b_+71, b_+72); A = mem_rd(gb, HL);
+  CYC(b_+72, b_+74); alu_cp(gb, 0x03);
+  if (!(F & FZ)) { CYCT(b_+74, b_+76); goto silenceAndUpdate; } // jr nz
+  CYC(b_+74, b_+76);
+  RET(b_+76);
   return;
 silenceAndUpdate:
-  CYC(0x497f, 0x4981); A = 0x08;
-  CYC(0x4981, 0x4984); W8(wSoundCmdEnvelope) = A;
-  CALL_C(0x4984, updateSquareChannelVolume_hook, 0x4714, 0x4987);
-  CYC(0x4987, 0x498a); updatePlayedFrequency_hook(gb); return; // jp
+  CYC(b_+77, b_+79); A = 0x08;
+  CYC(b_+79, b_+82); W8(wSoundCmdEnvelope) = A;
+  CALL_C(b_+82, updateSquareChannelVolume_hook, SYM(updateSquareChannelVolume), b_+85);
+  CYC(b_+85, b_+88); updatePlayedFrequency_hook(gb); return; // jp
 musicWaveChannel:
-  CALL_C(0x498a, isWaveChannelUnavailable_hook, 0x434b, 0x498d);
-  CYC(0x498d, 0x498f); alu_cp(gb, 0x00);
-  if (!(F & FZ)) { CYCT(0x498f, 0x4991); goto musicWaveChannelRet; } // jr nz
-  CYC(0x498f, 0x4991);
-  CYC(0x4991, 0x4993); A = 0x00;
-  CYC(0x4993, 0x4995); mem_wr(gb, 0xff1a, A);
+  CALL_C(b_+88, isWaveChannelUnavailable_hook, SYM(isWaveChannelUnavailable), b_+91);
+  CYC(b_+91, b_+93); alu_cp(gb, 0x00);
+  if (!(F & FZ)) { CYCT(b_+93, b_+95); goto musicWaveChannelRet; } // jr nz
+  CYC(b_+93, b_+95);
+  CYC(b_+95, b_+97); A = 0x00;
+  CYC(b_+97, b_+99); mem_wr(gb, 0xff1a, A);
 musicWaveChannelRet:
-  RET(0x4995);
+  RET(b_+99);
   return;
 sfxWaveChannel:
-  CYC(0x4996, 0x4999); A = mem_rd(gb, wChannelsEnabled + 4);
-  CYC(0x4999, 0x499b); alu_cp(gb, 0x00);
-  if (F & FZ) { CYCT(0x499b, 0x499d); goto sfxWaveChannelDisable; } // jr z
-  CYC(0x499b, 0x499d);
-  CYC(0x499d, 0x499f); A = 0x04;
-  CYC(0x499f, 0x49a0); E = A;
-  CYC(0x49a0, 0x49a3); SET_HL(wChannelDutyCycles);
-  CYC(0x49a3, 0x49a5); D = 0x00;
-  CYC(0x49a5, 0x49a6); alu_add_hl(gb, DE);
-  CYC(0x49a6, 0x49a7); A = mem_rd(gb, HL);
-  CYC(0x49a7, 0x49aa); W8(wWaveformIndex) = A;
-  CALL_C(0x49aa, setWaveform_hook, 0x49c1, 0x49ad);
-  CYC(0x49ad, 0x49b0); A = mem_rd(gb, wWaveChannelVolume + 4);
-  CYC(0x49b0, 0x49b2); mem_wr(gb, 0xff1c, A);
-  RET(0x49b2);
+  CYC(b_+100, b_+103); A = mem_rd(gb, wChannelsEnabled + 4);
+  CYC(b_+103, b_+105); alu_cp(gb, 0x00);
+  if (F & FZ) { CYCT(b_+105, b_+107); goto sfxWaveChannelDisable; } // jr z
+  CYC(b_+105, b_+107);
+  CYC(b_+107, b_+109); A = 0x04;
+  CYC(b_+109, b_+110); E = A;
+  CYC(b_+110, b_+113); SET_HL(wChannelDutyCycles);
+  CYC(b_+113, b_+115); D = 0x00;
+  CYC(b_+115, b_+116); alu_add_hl(gb, DE);
+  CYC(b_+116, b_+117); A = mem_rd(gb, HL);
+  CYC(b_+117, b_+120); W8(wWaveformIndex) = A;
+  CALL_C(b_+120, setWaveform_hook, SYM(setWaveform), b_+123);
+  CYC(b_+123, b_+126); A = mem_rd(gb, wWaveChannelVolume + 4);
+  CYC(b_+126, b_+128); mem_wr(gb, 0xff1c, A);
+  RET(b_+128);
   return;
 sfxWaveChannelDisable:
-  CYC(0x49b3, 0x49b5); A = 0x00;
-  CYC(0x49b5, 0x49b7); mem_wr(gb, 0xff1a, A);
-  RET(0x49b7);
+  CYC(b_+129, b_+131); A = 0x00;
+  CYC(b_+131, b_+133); mem_wr(gb, 0xff1a, A);
+  RET(b_+133);
   return;
 noiseChannel:
-  CYC(0x49b8, 0x49ba); A = 0x08;
-  CYC(0x49ba, 0x49bc); mem_wr(gb, 0xff21, A);
-  CYC(0x49bc, 0x49be); A = 0x80;
-  CYC(0x49be, 0x49c0); mem_wr(gb, 0xff23, A);
-  RET(0x49c0);
+  CYC(b_+134, b_+136); A = 0x08;
+  CYC(b_+136, b_+138); mem_wr(gb, 0xff21, A);
+  CYC(b_+138, b_+140); A = 0x80;
+  CYC(b_+140, b_+142); mem_wr(gb, 0xff23, A);
+  RET(b_+142);
 }
 
 void setWaveform_hook(GB *gb) {
+  BASE(setWaveform);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x49c1, isWaveChannelUnavailable_hook, 0x434b, 0x49c4);
-  CYC(0x49c4, 0x49c6); alu_cp(gb, 0x00);
-  if (F & FZ) { CYCT(0x49c6, 0x49c8); goto waitLoop; } // jr z
-  CYC(0x49c6, 0x49c8);
-  RET(0x49c8);
+  CALL_C(b_+0, isWaveChannelUnavailable_hook, SYM(isWaveChannelUnavailable), b_+3);
+  CYC(b_+3, b_+5); alu_cp(gb, 0x00);
+  if (F & FZ) { CYCT(b_+5, b_+7); goto waitLoop; } // jr z
+  CYC(b_+5, b_+7);
+  RET(b_+7);
   return;
 waitLoop:
-  CYC(0x49c9, 0x49cb); A = 0x00;
-  CYC(0x49cb, 0x49cd); mem_wr(gb, 0xff1a, A);
-  CYC(0x49cd, 0x49cf); A = mem_rd(gb, 0xff26);
-  CYC(0x49cf, 0x49d1); alu_and(gb, 0x04);
-  if (!(F & FZ)) { CYCT(0x49d1, 0x49d3); goto waitLoop; } // jr nz
-  CYC(0x49d1, 0x49d3);
-  CYC(0x49d3, 0x49d6); A = W8(wWaveformIndex);
-  CYC(0x49d6, 0x49d9); SET_HL(0x4d60);
-  CALL_C(0x49d9, readWordFromTable_hook, 0x4d19, 0x49dc);
-  CYC(0x49dc, 0x49de); C = 0x10;
-  CYC(0x49de, 0x49e1); SET_DE(0xff30);
+  CYC(b_+8, b_+10); A = 0x00;
+  CYC(b_+10, b_+12); mem_wr(gb, 0xff1a, A);
+  CYC(b_+12, b_+14); A = mem_rd(gb, 0xff26);
+  CYC(b_+14, b_+16); alu_and(gb, 0x04);
+  if (!(F & FZ)) { CYCT(b_+16, b_+18); goto waitLoop; } // jr nz
+  CYC(b_+16, b_+18);
+  CYC(b_+18, b_+21); A = W8(wWaveformIndex);
+  CYC(b_+21, b_+24); SET_HL(SYM(waveformTable));
+  CALL_C(b_+24, readWordFromTable_hook, SYM(readWordFromTable), b_+27);
+  CYC(b_+27, b_+29); C = 0x10;
+  CYC(b_+29, b_+32); SET_DE(0xff30);
 copyLoop:
-  CYC(0x49e1, 0x49e2); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x49e2, 0x49e3); mem_wr(gb, DE, A);
-  CYC(0x49e3, 0x49e4); SET_DE(DE + 1);
-  CYC(0x49e4, 0x49e5); C = alu_dec8(gb, C);
-  if (!(F & FZ)) { CYCT(0x49e5, 0x49e7); goto copyLoop; } // jr nz
-  CYC(0x49e5, 0x49e7);
+  CYC(b_+32, b_+33); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+33, b_+34); mem_wr(gb, DE, A);
+  CYC(b_+34, b_+35); SET_DE(DE + 1);
+  CYC(b_+35, b_+36); C = alu_dec8(gb, C);
+  if (!(F & FZ)) { CYCT(b_+36, b_+38); goto copyLoop; } // jr nz
+  CYC(b_+36, b_+38);
 triggerWait:
-  CYC(0x49e7, 0x49e9); A = 0x80;
-  CYC(0x49e9, 0x49eb); mem_wr(gb, 0xff1a, A);
-  CYC(0x49eb, 0x49ed); A = mem_rd(gb, 0xff1a);
-  CYC(0x49ed, 0x49ef); alu_and(gb, 0x80);
-  if (F & FZ) { CYCT(0x49ef, 0x49f1); goto triggerWait; } // jr z
-  CYC(0x49ef, 0x49f1);
-  CYC(0x49f1, 0x49f3); A = 0x80;
-  CYC(0x49f3, 0x49f5); mem_wr(gb, 0xff1e, A);
-  RET(0x49f5);
+  CYC(b_+38, b_+40); A = 0x80;
+  CYC(b_+40, b_+42); mem_wr(gb, 0xff1a, A);
+  CYC(b_+42, b_+44); A = mem_rd(gb, 0xff1a);
+  CYC(b_+44, b_+46); alu_and(gb, 0x80);
+  if (F & FZ) { CYCT(b_+46, b_+48); goto triggerWait; } // jr z
+  CYC(b_+46, b_+48);
+  CYC(b_+48, b_+50); A = 0x80;
+  CYC(b_+50, b_+52); mem_wr(gb, 0xff1e, A);
+  RET(b_+52);
 }
 
 // Jump to word from argument
 void channelCmdfe_hook(GB *gb) {
+  BASE(channelCmdfe);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x49f6, getNextChannelByte_hook, 0x4366, 0x49f9);
-  CYC(0x49f9, 0x49fa); L = A;
-  CALL_C(0x49fa, getNextChannelByte_hook, 0x4366, 0x49fd);
-  CYC(0x49fd, 0x49fe); H = A;
-  CYC(0x49fe, 0x4a01); A = W8(wSoundChannel);
-  CYC(0x4a01, 0x4a03); A = alu_sla(gb, A);
-  CYC(0x4a03, 0x4a04); B = A;
-  CYC(0x4a04, 0x4a05); A = L;
-  CYC(0x4a05, 0x4a07); C = 0xe2;
-  CALL_C(0x4a07, writeIndexedHighRamAndIncrement_hook, 0x4d25, 0x4a0a);
-  CYC(0x4a0a, 0x4a0b); A = H;
-  CYC(0x4a0b, 0x4a0c); mem_wr(gb, 0xff00 | C, A);
-  CYC(0x4a0c, 0x4a0d); C = alu_inc8(gb, C);
-  CYC(0x4a0d, 0x4a10); doNextChannelCommand_hook(gb); return; // jp
+  CALL_C(b_+0, getNextChannelByte_hook, SYM(getNextChannelByte), b_+3);
+  CYC(b_+3, b_+4); L = A;
+  CALL_C(b_+4, getNextChannelByte_hook, SYM(getNextChannelByte), b_+7);
+  CYC(b_+7, b_+8); H = A;
+  CYC(b_+8, b_+11); A = W8(wSoundChannel);
+  CYC(b_+11, b_+13); A = alu_sla(gb, A);
+  CYC(b_+13, b_+14); B = A;
+  CYC(b_+14, b_+15); A = L;
+  CYC(b_+15, b_+17); C = 0xe2;
+  CALL_C(b_+17, writeIndexedHighRamAndIncrement_hook, SYM(writeIndexedHighRamAndIncrement), b_+20);
+  CYC(b_+20, b_+21); A = H;
+  CYC(b_+21, b_+22); mem_wr(gb, 0xff00 | C, A);
+  CYC(b_+22, b_+23); C = alu_inc8(gb, C);
+  CYC(b_+23, SYM(multiplyHlByA)); doNextChannelCommand_hook(gb); return; // jp
 }
 
 void multiplyHlByA_hook(GB *gb) {
-  CYC(0x4a10, 0x4a12); alu_cp(gb, 0x00);
-  if (!(F & FZ)) { CYCT(0x4a12, 0x4a14); goto nonzero; } // jr nz
-  CYC(0x4a12, 0x4a14);
-  CYC(0x4a14, 0x4a17); SET_HL(0x0000);
-  RET(0x4a17);
+  BASE(multiplyHlByA);
+  CYC(b_+0, b_+2); alu_cp(gb, 0x00);
+  if (!(F & FZ)) { CYCT(b_+2, b_+4); goto nonzero; } // jr nz
+  CYC(b_+2, b_+4);
+  CYC(b_+4, b_+7); SET_HL(0x0000);
+  RET(b_+7);
   return;
 nonzero:
-  CYC(0x4a18, 0x4a19); E = L;
-  CYC(0x4a19, 0x4a1a); D = H;
+  CYC(b_+8, b_+9); E = L;
+  CYC(b_+9, b_+10); D = H;
 loop:
-  CYC(0x4a1a, 0x4a1b); A = alu_dec8(gb, A);
-  if (F & FZ) { CYCT(0x4a1b, 0x4a1d); goto done; } // jr z
-  CYC(0x4a1b, 0x4a1d);
-  CYC(0x4a1d, 0x4a1e); alu_add_hl(gb, DE);
-  CYC(0x4a1e, 0x4a21); goto loop; // jp
+  CYC(b_+10, b_+11); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(b_+11, b_+13); goto done; } // jr z
+  CYC(b_+11, b_+13);
+  CYC(b_+13, b_+14); alu_add_hl(gb, DE);
+  CYC(b_+14, b_+17); goto loop; // jp
 done:
-  RET(0x4a21);
+  RET(b_+17);
 }
 
 // @param a The sound to play.
 void playSound_b39_hook(GB *gb) {
+  BASE(playSound_b39);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4b50, 0x4b51); push_effect(gb, BC);
-  CYC(0x4b51, 0x4b52); push_effect(gb, DE);
-  CYC(0x4b52, 0x4b53); push_effect(gb, HL);
-  CYC(0x4b53, 0x4b56); W8(wSoundTmp) = A;
-  CYC(0x4b56, 0x4b58); alu_cp(gb, 0x00);
-  if (!(F & FZ)) { CYCT(0x4b58, 0x4b5a); goto dispatch; } // jr nz
-  CYC(0x4b58, 0x4b5a);
-  CYC(0x4b5a, 0x4b5d); goto playSoundEnd; // jp
+  CYC(b_+0, b_+1); push_effect(gb, BC);
+  CYC(b_+1, b_+2); push_effect(gb, DE);
+  CYC(b_+2, b_+3); push_effect(gb, HL);
+  CYC(b_+3, b_+6); W8(wSoundTmp) = A;
+  CYC(b_+6, b_+8); alu_cp(gb, 0x00);
+  if (!(F & FZ)) { CYCT(b_+8, b_+10); goto dispatch; } // jr nz
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+13); goto playSoundEnd; // jp
 dispatch:
-  CYC(0x4b5d, 0x4b5f); alu_cp(gb, 0xf0);
-  if (F & FZ) { CYCT(0x4b5f, 0x4b61); goto sndf0; } // jr z
-  CYC(0x4b5f, 0x4b61);
-  CYC(0x4b61, 0x4b63); alu_cp(gb, 0xf1);
-  if (F & FZ) { CYCT(0x4b63, 0x4b65); goto sndf1; } // jr z
-  CYC(0x4b63, 0x4b65);
-  CYC(0x4b65, 0x4b67); alu_cp(gb, 0xf5);
-  if (F & FZ) { CYCT(0x4b67, 0x4b69); goto sndf5; } // jr z
-  CYC(0x4b67, 0x4b69);
-  CYC(0x4b69, 0x4b6b); alu_cp(gb, 0xf6);
-  if (F & FZ) { CYCT(0x4b6b, 0x4b6d); goto sndf6; } // jr z
-  CYC(0x4b6b, 0x4b6d);
-  CYC(0x4b6d, 0x4b6f); alu_cp(gb, 0xf7);
-  if (F & FZ) { CYCT(0x4b6f, 0x4b71); goto sndf7; } // jr z
-  CYC(0x4b6f, 0x4b71);
-  CYC(0x4b71, 0x4b73); alu_cp(gb, 0xf8);
-  if (F & FZ) { CYCT(0x4b73, 0x4b75); goto sndf8; } // jr z
-  CYC(0x4b73, 0x4b75);
-  CYC(0x4b75, 0x4b77); alu_cp(gb, 0xf9);
-  if (F & FZ) { CYCT(0x4b77, 0x4b79); goto sndf9; } // jr z
-  CYC(0x4b77, 0x4b79);
-  CYC(0x4b79, 0x4b7b); alu_cp(gb, 0xfa);
-  if (F & FZ) { CYCT(0x4b7b, 0x4b7d); goto sndfa; } // jr z
-  CYC(0x4b7b, 0x4b7d);
-  CYC(0x4b7d, 0x4b7f); alu_cp(gb, 0xfb);
-  if (F & FZ) { CYCT(0x4b7f, 0x4b81); goto sndfb; } // jr z
-  CYC(0x4b7f, 0x4b81);
-  CYC(0x4b81, 0x4b83); alu_cp(gb, 0xfc);
-  if (F & FZ) { CYCT(0x4b83, 0x4b85); goto sndfc; } // jr z
-  CYC(0x4b83, 0x4b85);
-  CYC(0x4b85, 0x4b87); goto normalSound; // jr
+  CYC(b_+13, b_+15); alu_cp(gb, 0xf0);
+  if (F & FZ) { CYCT(b_+15, b_+17); goto sndf0; } // jr z
+  CYC(b_+15, b_+17);
+  CYC(b_+17, b_+19); alu_cp(gb, 0xf1);
+  if (F & FZ) { CYCT(b_+19, b_+21); goto sndf1; } // jr z
+  CYC(b_+19, b_+21);
+  CYC(b_+21, b_+23); alu_cp(gb, 0xf5);
+  if (F & FZ) { CYCT(b_+23, b_+25); goto sndf5; } // jr z
+  CYC(b_+23, b_+25);
+  CYC(b_+25, b_+27); alu_cp(gb, 0xf6);
+  if (F & FZ) { CYCT(b_+27, b_+29); goto sndf6; } // jr z
+  CYC(b_+27, b_+29);
+  CYC(b_+29, b_+31); alu_cp(gb, 0xf7);
+  if (F & FZ) { CYCT(b_+31, b_+33); goto sndf7; } // jr z
+  CYC(b_+31, b_+33);
+  CYC(b_+33, b_+35); alu_cp(gb, 0xf8);
+  if (F & FZ) { CYCT(b_+35, b_+37); goto sndf8; } // jr z
+  CYC(b_+35, b_+37);
+  CYC(b_+37, b_+39); alu_cp(gb, 0xf9);
+  if (F & FZ) { CYCT(b_+39, b_+41); goto sndf9; } // jr z
+  CYC(b_+39, b_+41);
+  CYC(b_+41, b_+43); alu_cp(gb, 0xfa);
+  if (F & FZ) { CYCT(b_+43, b_+45); goto sndfa; } // jr z
+  CYC(b_+43, b_+45);
+  CYC(b_+45, b_+47); alu_cp(gb, 0xfb);
+  if (F & FZ) { CYCT(b_+47, b_+49); goto sndfb; } // jr z
+  CYC(b_+47, b_+49);
+  CYC(b_+49, b_+51); alu_cp(gb, 0xfc);
+  if (F & FZ) { CYCT(b_+51, b_+53); goto sndfc; } // jr z
+  CYC(b_+51, b_+53);
+  CYC(b_+53, b_+55); goto normalSound; // jr
 sndf0:
-  CYC(0x4b87, 0x4b89); A = 0xde; // stop music
-  CYC(0x4b89, 0x4b8c); W8(wSoundTmp) = A;
-  CYC(0x4b8c, 0x4b8e); goto normalSound; // jr
+  CYC(b_+55, b_+57); A = 0xde; // stop music
+  CYC(b_+57, b_+60); W8(wSoundTmp) = A;
+  CYC(b_+60, b_+62); goto normalSound; // jr
 sndf1:
-  CALL_C(0x4b8e, stopSfx_hook, 0x40ca, 0x4b91);
-  CYC(0x4b91, 0x4b94); goto playSoundEnd; // jp
+  CALL_C(b_+62, stopSfx_hook, SYM(stopSfx), b_+65);
+  CYC(b_+65, b_+68); goto playSoundEnd; // jp
 sndf5:
-  CALL_C(0x4b94, silenceAllChannels_hook, 0x40b9, 0x4b97);
-  CYC(0x4b97, 0x4b99); A = 0x01;
-  CYC(0x4b99, 0x4b9c); W8(wSoundDisabled) = A;
-  CYC(0x4b9c, 0x4b9f); goto setVolumeAndEnd; // jp
+  CALL_C(b_+68, silenceAllChannels_hook, SYM(silenceAllChannels), b_+71);
+  CYC(b_+71, b_+73); A = 0x01;
+  CYC(b_+73, b_+76); W8(wSoundDisabled) = A;
+  CYC(b_+76, b_+79); goto setVolumeAndEnd; // jp
 sndf6:
-  CYC(0x4b9f, 0x4ba1); A = 0x00;
-  CYC(0x4ba1, 0x4ba4); W8(wSoundDisabled) = A;
-  CYC(0x4ba4, 0x4ba7); goto setVolumeAndEnd; // jp
+  CYC(b_+79, b_+81); A = 0x00;
+  CYC(b_+81, b_+84); W8(wSoundDisabled) = A;
+  CYC(b_+84, b_+87); goto setVolumeAndEnd; // jp
 sndfa:
-  CYC(0x4ba7, 0x4ba9); A = 0x07;
-  CYC(0x4ba9, 0x4bab); goto fadeSpeedSet; // jr
+  CYC(b_+87, b_+89); A = 0x07;
+  CYC(b_+89, b_+91); goto fadeSpeedSet; // jr
 sndfb:
-  CYC(0x4bab, 0x4bad); A = 0x0f;
-  CYC(0x4bad, 0x4baf); goto fadeSpeedSet; // jr
+  CYC(b_+91, b_+93); A = 0x0f;
+  CYC(b_+93, b_+95); goto fadeSpeedSet; // jr
 sndfc:
-  CYC(0x4baf, 0x4bb1); A = 0x1f;
+  CYC(b_+95, b_+97); A = 0x1f;
 fadeSpeedSet:
-  CYC(0x4bb1, 0x4bb4); W8(wSoundFadeSpeed) = A;
-  CYC(0x4bb4, 0x4bb6); A = 0x00;
-  CYC(0x4bb6, 0x4bb9); W8(wSoundFadeCounter) = A;
-  CYC(0x4bb9, 0x4bbb); A = 0x01;
-  CYC(0x4bbb, 0x4bbe); W8(wSoundFadeDirection) = A;
-  CYC(0x4bbe, 0x4bc0); A = 0x77;
-  CYC(0x4bc0, 0x4bc3); W8(wSoundVolume) = A;
-  CYC(0x4bc3, 0x4bc6); goto playSoundEnd; // jp
+  CYC(b_+97, b_+100); W8(wSoundFadeSpeed) = A;
+  CYC(b_+100, b_+102); A = 0x00;
+  CYC(b_+102, b_+105); W8(wSoundFadeCounter) = A;
+  CYC(b_+105, b_+107); A = 0x01;
+  CYC(b_+107, b_+110); W8(wSoundFadeDirection) = A;
+  CYC(b_+110, b_+112); A = 0x77;
+  CYC(b_+112, b_+115); W8(wSoundVolume) = A;
+  CYC(b_+115, b_+118); goto playSoundEnd; // jp
 sndf7:
-  CYC(0x4bc6, 0x4bc8); A = 0x03;
-  CYC(0x4bc8, 0x4bca); goto fadeInSet; // jr
+  CYC(b_+118, b_+120); A = 0x03;
+  CYC(b_+120, b_+122); goto fadeInSet; // jr
 sndf8:
-  CYC(0x4bca, 0x4bcc); A = 0x07;
-  CYC(0x4bcc, 0x4bce); goto fadeInSet; // jr
+  CYC(b_+122, b_+124); A = 0x07;
+  CYC(b_+124, b_+126); goto fadeInSet; // jr
 sndf9:
-  CYC(0x4bce, 0x4bd0); A = 0x0f;
+  CYC(b_+126, b_+128); A = 0x0f;
 fadeInSet:
-  CYC(0x4bd0, 0x4bd3); W8(wSoundFadeSpeed) = A;
-  CYC(0x4bd3, 0x4bd5); A = 0x00;
-  CYC(0x4bd5, 0x4bd8); W8(wSoundFadeCounter) = A;
-  CYC(0x4bd8, 0x4bda); A = 0x0a;
-  CYC(0x4bda, 0x4bdd); W8(wSoundFadeDirection) = A;
-  CYC(0x4bdd, 0x4bdf); A = 0x00;
-  CYC(0x4bdf, 0x4be2); W8(wSoundVolume) = A;
-  CYC(0x4be2, 0x4be5); goto playSoundEnd; // jp
+  CYC(b_+128, b_+131); W8(wSoundFadeSpeed) = A;
+  CYC(b_+131, b_+133); A = 0x00;
+  CYC(b_+133, b_+136); W8(wSoundFadeCounter) = A;
+  CYC(b_+136, b_+138); A = 0x0a;
+  CYC(b_+138, b_+141); W8(wSoundFadeDirection) = A;
+  CYC(b_+141, b_+143); A = 0x00;
+  CYC(b_+143, b_+146); W8(wSoundVolume) = A;
+  CYC(b_+146, b_+149); goto playSoundEnd; // jp
 normalSound:
-  CYC(0x4be5, 0x4be7); A = 0x00;
-  CYC(0x4be7, 0x4bea); W8(wSoundFadeDirection) = A;
-  CYC(0x4bea, 0x4bed); A = W8(wSoundTmp);
-  CYC(0x4bed, 0x4bef); D = 0x00;
-  CYC(0x4bef, 0x4bf0); E = A;
-  CYC(0x4bf0, 0x4bf2); H = 0x00;
-  CYC(0x4bf2, 0x4bf3); L = A;
-  CYC(0x4bf3, 0x4bf5); L = alu_sla(gb, L);
-  CYC(0x4bf5, 0x4bf7); H = alu_rl(gb, H);
-  CYC(0x4bf7, 0x4bf8); alu_add_hl(gb, DE);
-  CYC(0x4bf8, 0x4bf9); D = H;
-  CYC(0x4bf9, 0x4bfa); E = L;
-  CYC(0x4bfa, 0x4bfd); SET_HL(0x5748);
-  CYC(0x4bfd, 0x4bfe); alu_add_hl(gb, DE);
-  CYC(0x4bfe, 0x4bff); A = mem_rd(gb, HL);
-  CYC(0x4bff, 0x4c01); alu_and(gb, 0x80);
-  if (F & FZ) { CYCT(0x4c01, 0x4c03); goto skipWeirdCall; } // jr z
-  CYC(0x4c01, 0x4c03);
-  CALL_ROM(0x4c03, 0x4d38);
-  CYC(0x4c06, 0x4c09); goto setVolumeAndEnd; // jp
+  CYC(b_+149, b_+151); A = 0x00;
+  CYC(b_+151, b_+154); W8(wSoundFadeDirection) = A;
+  CYC(b_+154, b_+157); A = W8(wSoundTmp);
+  CYC(b_+157, b_+159); D = 0x00;
+  CYC(b_+159, b_+160); E = A;
+  CYC(b_+160, b_+162); H = 0x00;
+  CYC(b_+162, b_+163); L = A;
+  CYC(b_+163, b_+165); L = alu_sla(gb, L);
+  CYC(b_+165, b_+167); H = alu_rl(gb, H);
+  CYC(b_+167, b_+168); alu_add_hl(gb, DE);
+  CYC(b_+168, b_+169); D = H;
+  CYC(b_+169, b_+170); E = L;
+  CYC(b_+170, b_+173); SET_HL(SYM(soundPointers));
+  CYC(b_+173, b_+174); alu_add_hl(gb, DE);
+  CYC(b_+174, b_+175); A = mem_rd(gb, HL);
+  CYC(b_+175, b_+177); alu_and(gb, 0x80);
+  if (F & FZ) { CYCT(b_+177, b_+179); goto skipWeirdCall; } // jr z
+  CYC(b_+177, b_+179);
+  CALL_ROM(b_+179, SYM(nonExistentFunction));
+  CYC(b_+182, b_+185); goto setVolumeAndEnd; // jp
 skipWeirdCall:
-  CYC(0x4c09, 0x4c0a); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4c0a, 0x4c0b); C = A;
-  CYC(0x4c0b, 0x4c0d); A = H8(hSoundDataBaseBank);
-  CYC(0x4c0d, 0x4c0e); alu_add(gb, C);
-  CYC(0x4c0e, 0x4c11); W8(wLoadingSoundBank) = A;
-  CYC(0x4c11, 0x4c12); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4c12, 0x4c13); C = A;
-  CYC(0x4c13, 0x4c14); A = mem_rd(gb, HL);
-  CYC(0x4c14, 0x4c15); B = A;
-  CYC(0x4c15, 0x4c16); L = C;
-  CYC(0x4c16, 0x4c17); H = B;
+  CYC(b_+185, b_+186); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+186, b_+187); C = A;
+  CYC(b_+187, b_+189); A = H8(hSoundDataBaseBank);
+  CYC(b_+189, b_+190); alu_add(gb, C);
+  CYC(b_+190, b_+193); W8(wLoadingSoundBank) = A;
+  CYC(b_+193, b_+194); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+194, b_+195); C = A;
+  CYC(b_+195, b_+196); A = mem_rd(gb, HL);
+  CYC(b_+196, b_+197); B = A;
+  CYC(b_+197, b_+198); L = C;
+  CYC(b_+198, b_+199); H = B;
 nextSoundChannel:
-  CYC(0x4c17, 0x4c19); A = H8(hSoundDataBaseBank);
-  CALL_C(0x4c19, wMusicReadFunction_hook, 0xc000, 0x4c1c);
-  CYC(0x4c1c, 0x4c1e); alu_cp(gb, 0xff);
-  if (!(F & FZ)) { CYCT(0x4c1e, 0x4c20); goto haveChannelByte; } // jr nz
-  CYC(0x4c1e, 0x4c20);
-  CYC(0x4c20, 0x4c23); goto setVolumeAndEnd; // jp
+  CYC(b_+199, b_+201); A = H8(hSoundDataBaseBank);
+  CALL_C(b_+201, wMusicReadFunction_hook, wMusicReadFunction, b_+204);
+  CYC(b_+204, b_+206); alu_cp(gb, 0xff);
+  if (!(F & FZ)) { CYCT(b_+206, b_+208); goto haveChannelByte; } // jr nz
+  CYC(b_+206, b_+208);
+  CYC(b_+208, b_+211); goto setVolumeAndEnd; // jp
 haveChannelByte:
-  CYC(0x4c23, 0x4c26); W8(wSoundTmp) = A;
-  CYC(0x4c26, 0x4c28); alu_and(gb, 0xf0);
-  CYC(0x4c28, 0x4c2a); A = alu_swap(gb, A);
-  CYC(0x4c2a, 0x4c2b); A = alu_inc8(gb, A);
-  CYC(0x4c2b, 0x4c2e); W8(wSoundChannelValue) = A;
-  CYC(0x4c2e, 0x4c31); A = W8(wSoundTmp);
-  CYC(0x4c31, 0x4c33); alu_and(gb, 0x0f);
-  CYC(0x4c33, 0x4c36); W8(wSoundTmp) = A;
-  CYC(0x4c36, 0x4c37); E = A;
-  CYC(0x4c37, 0x4c38); push_effect(gb, HL);
-  CYC(0x4c38, 0x4c3b); SET_HL(wChannelsEnabled);
-  CYC(0x4c3b, 0x4c3d); D = 0x00;
-  CYC(0x4c3d, 0x4c3e); alu_add_hl(gb, DE);
-  CYC(0x4c3e, 0x4c3f); A = mem_rd(gb, HL);
-  CYC(0x4c3f, 0x4c40); SET_HL(pop_effect(gb));
-  CYC(0x4c40, 0x4c41); C = A;
-  CYC(0x4c41, 0x4c44); A = W8(wSoundChannelValue);
-  CYC(0x4c44, 0x4c45); alu_cp(gb, C);
-  if (!(F & FC)) { CYCT(0x4c45, 0x4c47); goto channelSlotFound; } // jr nc
-  CYC(0x4c45, 0x4c47);
-  CYC(0x4c47, 0x4c48); SET_HL(HL + 1);
-  CYC(0x4c48, 0x4c49); SET_HL(HL + 1);
-  CYC(0x4c49, 0x4c4c); goto nextSoundChannel; // jp
+  CYC(b_+211, b_+214); W8(wSoundTmp) = A;
+  CYC(b_+214, b_+216); alu_and(gb, 0xf0);
+  CYC(b_+216, b_+218); A = alu_swap(gb, A);
+  CYC(b_+218, b_+219); A = alu_inc8(gb, A);
+  CYC(b_+219, b_+222); W8(wSoundChannelValue) = A;
+  CYC(b_+222, b_+225); A = W8(wSoundTmp);
+  CYC(b_+225, b_+227); alu_and(gb, 0x0f);
+  CYC(b_+227, b_+230); W8(wSoundTmp) = A;
+  CYC(b_+230, b_+231); E = A;
+  CYC(b_+231, b_+232); push_effect(gb, HL);
+  CYC(b_+232, b_+235); SET_HL(wChannelsEnabled);
+  CYC(b_+235, b_+237); D = 0x00;
+  CYC(b_+237, b_+238); alu_add_hl(gb, DE);
+  CYC(b_+238, b_+239); A = mem_rd(gb, HL);
+  CYC(b_+239, b_+240); SET_HL(pop_effect(gb));
+  CYC(b_+240, b_+241); C = A;
+  CYC(b_+241, b_+244); A = W8(wSoundChannelValue);
+  CYC(b_+244, b_+245); alu_cp(gb, C);
+  if (!(F & FC)) { CYCT(b_+245, b_+247); goto channelSlotFound; } // jr nc
+  CYC(b_+245, b_+247);
+  CYC(b_+247, b_+248); SET_HL(HL + 1);
+  CYC(b_+248, b_+249); SET_HL(HL + 1);
+  CYC(b_+249, b_+252); goto nextSoundChannel; // jp
 channelSlotFound:
-  CYC(0x4c4c, 0x4c4d); push_effect(gb, HL);
-  CYC(0x4c4d, 0x4c50); A = W8(wSoundTmp);
-  CYC(0x4c50, 0x4c51); E = A;
-  CYC(0x4c51, 0x4c54); A = W8(wSoundChannelValue);
-  CYC(0x4c54, 0x4c57); SET_HL(wChannelsEnabled);
-  CYC(0x4c57, 0x4c59); D = 0x00;
-  CYC(0x4c59, 0x4c5a); alu_add_hl(gb, DE);
-  CYC(0x4c5a, 0x4c5b); mem_wr(gb, HL, A);
-  CYC(0x4c5b, 0x4c5d); A = 0x08;
-  CYC(0x4c5d, 0x4c60); SET_HL(wChannelVolumes);
-  CYC(0x4c60, 0x4c62); D = 0x00;
-  CYC(0x4c62, 0x4c63); alu_add_hl(gb, DE);
-  CYC(0x4c63, 0x4c64); mem_wr(gb, HL, A);
-  CYC(0x4c64, 0x4c66); A = 0x00;
-  CYC(0x4c66, 0x4c69); SET_HL(wChannelWaitCounters);
-  CYC(0x4c69, 0x4c6b); D = 0x00;
-  CYC(0x4c6b, 0x4c6c); alu_add_hl(gb, DE);
-  CYC(0x4c6c, 0x4c6d); mem_wr(gb, HL, A);
-  CYC(0x4c6d, 0x4c70); A = W8(wSoundTmp);
-  CYC(0x4c70, 0x4c72); alu_cp(gb, 0x00);
-  if (F & FZ) { CYCT(0x4c72, 0x4c74); goto squareChannel; } // jr z
-  CYC(0x4c72, 0x4c74);
-  CYC(0x4c74, 0x4c76); alu_cp(gb, 0x01);
-  if (F & FZ) { CYCT(0x4c76, 0x4c78); goto squareChannel; } // jr z
-  CYC(0x4c76, 0x4c78);
-  CYC(0x4c78, 0x4c7a); alu_cp(gb, 0x02);
-  if (F & FZ) { CYCT(0x4c7a, 0x4c7c); goto squareChannel; } // jr z
-  CYC(0x4c7a, 0x4c7c);
-  CYC(0x4c7c, 0x4c7e); alu_cp(gb, 0x03);
-  if (F & FZ) { CYCT(0x4c7e, 0x4c80); goto squareChannel; } // jr z
-  CYC(0x4c7e, 0x4c80);
-  CYC(0x4c80, 0x4c82); alu_cp(gb, 0x04);
-  if (F & FZ) { CYCT(0x4c82, 0x4c84); goto waveChannel; } // jr z
-  CYC(0x4c82, 0x4c84);
-  CYC(0x4c84, 0x4c86); alu_cp(gb, 0x05);
-  if (F & FZ) { CYCT(0x4c86, 0x4c88); goto waveChannel; } // jr z
-  CYC(0x4c86, 0x4c88);
-  CYC(0x4c88, 0x4c8a); goto writeChannelPtrs; // jr
+  CYC(b_+252, b_+253); push_effect(gb, HL);
+  CYC(b_+253, b_+256); A = W8(wSoundTmp);
+  CYC(b_+256, b_+257); E = A;
+  CYC(b_+257, b_+260); A = W8(wSoundChannelValue);
+  CYC(b_+260, b_+263); SET_HL(wChannelsEnabled);
+  CYC(b_+263, b_+265); D = 0x00;
+  CYC(b_+265, b_+266); alu_add_hl(gb, DE);
+  CYC(b_+266, b_+267); mem_wr(gb, HL, A);
+  CYC(b_+267, b_+269); A = 0x08;
+  CYC(b_+269, b_+272); SET_HL(wChannelVolumes);
+  CYC(b_+272, b_+274); D = 0x00;
+  CYC(b_+274, b_+275); alu_add_hl(gb, DE);
+  CYC(b_+275, b_+276); mem_wr(gb, HL, A);
+  CYC(b_+276, b_+278); A = 0x00;
+  CYC(b_+278, b_+281); SET_HL(wChannelWaitCounters);
+  CYC(b_+281, b_+283); D = 0x00;
+  CYC(b_+283, b_+284); alu_add_hl(gb, DE);
+  CYC(b_+284, b_+285); mem_wr(gb, HL, A);
+  CYC(b_+285, b_+288); A = W8(wSoundTmp);
+  CYC(b_+288, b_+290); alu_cp(gb, 0x00);
+  if (F & FZ) { CYCT(b_+290, b_+292); goto squareChannel; } // jr z
+  CYC(b_+290, b_+292);
+  CYC(b_+292, b_+294); alu_cp(gb, 0x01);
+  if (F & FZ) { CYCT(b_+294, b_+296); goto squareChannel; } // jr z
+  CYC(b_+294, b_+296);
+  CYC(b_+296, b_+298); alu_cp(gb, 0x02);
+  if (F & FZ) { CYCT(b_+298, b_+300); goto squareChannel; } // jr z
+  CYC(b_+298, b_+300);
+  CYC(b_+300, b_+302); alu_cp(gb, 0x03);
+  if (F & FZ) { CYCT(b_+302, b_+304); goto squareChannel; } // jr z
+  CYC(b_+302, b_+304);
+  CYC(b_+304, b_+306); alu_cp(gb, 0x04);
+  if (F & FZ) { CYCT(b_+306, b_+308); goto waveChannel; } // jr z
+  CYC(b_+306, b_+308);
+  CYC(b_+308, b_+310); alu_cp(gb, 0x05);
+  if (F & FZ) { CYCT(b_+310, b_+312); goto waveChannel; } // jr z
+  CYC(b_+310, b_+312);
+  CYC(b_+312, b_+314); goto writeChannelPtrs; // jr
 waveChannel:
-  CYC(0x4c8a, 0x4c8d); A = W8(wSoundTmp);
-  CYC(0x4c8d, 0x4c8e); E = A;
-  CYC(0x4c8e, 0x4c90); A = 0x00;
-  CYC(0x4c90, 0x4c93); SET_HL(wChannelVibratos);
-  CYC(0x4c93, 0x4c95); D = 0x00;
-  CYC(0x4c95, 0x4c96); alu_add_hl(gb, DE);
-  CYC(0x4c96, 0x4c97); mem_wr(gb, HL, A);
-  CYC(0x4c97, 0x4c9a); SET_HL(wChannelSweep);
-  CYC(0x4c9a, 0x4c9c); D = 0x00;
-  CYC(0x4c9c, 0x4c9d); alu_add_hl(gb, DE);
-  CYC(0x4c9d, 0x4c9e); mem_wr(gb, HL, A);
-  CYC(0x4c9e, 0x4ca1); SET_HL(wChannelPitchShift);
-  CYC(0x4ca1, 0x4ca3); D = 0x00;
-  CYC(0x4ca3, 0x4ca4); alu_add_hl(gb, DE);
-  CYC(0x4ca4, 0x4ca5); mem_wr(gb, HL, A);
-  CYC(0x4ca5, 0x4ca8); SET_HL(wChannelFrequencyModeAndLengthTimerEnabled);
-  CYC(0x4ca8, 0x4caa); D = 0x00;
-  CYC(0x4caa, 0x4cab); alu_add_hl(gb, DE);
-  CYC(0x4cab, 0x4cac); mem_wr(gb, HL, A);
-  CYC(0x4cac, 0x4cae); goto writeChannelPtrs; // jr
+  CYC(b_+314, b_+317); A = W8(wSoundTmp);
+  CYC(b_+317, b_+318); E = A;
+  CYC(b_+318, b_+320); A = 0x00;
+  CYC(b_+320, b_+323); SET_HL(wChannelVibratos);
+  CYC(b_+323, b_+325); D = 0x00;
+  CYC(b_+325, b_+326); alu_add_hl(gb, DE);
+  CYC(b_+326, b_+327); mem_wr(gb, HL, A);
+  CYC(b_+327, b_+330); SET_HL(wChannelSweep);
+  CYC(b_+330, b_+332); D = 0x00;
+  CYC(b_+332, b_+333); alu_add_hl(gb, DE);
+  CYC(b_+333, b_+334); mem_wr(gb, HL, A);
+  CYC(b_+334, b_+337); SET_HL(wChannelPitchShift);
+  CYC(b_+337, b_+339); D = 0x00;
+  CYC(b_+339, b_+340); alu_add_hl(gb, DE);
+  CYC(b_+340, b_+341); mem_wr(gb, HL, A);
+  CYC(b_+341, b_+344); SET_HL(wChannelFrequencyModeAndLengthTimerEnabled);
+  CYC(b_+344, b_+346); D = 0x00;
+  CYC(b_+346, b_+347); alu_add_hl(gb, DE);
+  CYC(b_+347, b_+348); mem_wr(gb, HL, A);
+  CYC(b_+348, b_+350); goto writeChannelPtrs; // jr
 squareChannel:
-  CYC(0x4cae, 0x4cb1); A = W8(wSoundTmp);
-  CYC(0x4cb1, 0x4cb2); E = A;
-  CYC(0x4cb2, 0x4cb4); A = 0x00;
-  CYC(0x4cb4, 0x4cb7); SET_HL(wChannelEnvelopes);
-  CYC(0x4cb7, 0x4cb9); D = 0x00;
-  CYC(0x4cb9, 0x4cba); alu_add_hl(gb, DE);
-  CYC(0x4cba, 0x4cbb); mem_wr(gb, HL, A);
-  CYC(0x4cbb, 0x4cbe); SET_HL(wChannelEnvelopes2);
-  CYC(0x4cbe, 0x4cc0); D = 0x00;
-  CYC(0x4cc0, 0x4cc1); alu_add_hl(gb, DE);
-  CYC(0x4cc1, 0x4cc2); mem_wr(gb, HL, A);
-  CYC(0x4cc2, 0x4cc5); SET_HL(wChannelDutyCycles);
-  CYC(0x4cc5, 0x4cc7); D = 0x00;
-  CYC(0x4cc7, 0x4cc8); alu_add_hl(gb, DE);
-  CYC(0x4cc8, 0x4cc9); mem_wr(gb, HL, A);
-  CYC(0x4cc9, 0x4ccc); SET_HL(wChannelVibratos);
-  CYC(0x4ccc, 0x4cce); D = 0x00;
-  CYC(0x4cce, 0x4ccf); alu_add_hl(gb, DE);
-  CYC(0x4ccf, 0x4cd0); mem_wr(gb, HL, A);
-  CYC(0x4cd0, 0x4cd3); SET_HL(wChannelSweep);
-  CYC(0x4cd3, 0x4cd5); D = 0x00;
-  CYC(0x4cd5, 0x4cd6); alu_add_hl(gb, DE);
-  CYC(0x4cd6, 0x4cd7); mem_wr(gb, HL, A);
-  CYC(0x4cd7, 0x4cda); SET_HL(wChannelPitchShift);
-  CYC(0x4cda, 0x4cdc); D = 0x00;
-  CYC(0x4cdc, 0x4cdd); alu_add_hl(gb, DE);
-  CYC(0x4cdd, 0x4cde); mem_wr(gb, HL, A);
-  CYC(0x4cde, 0x4ce1); SET_HL(wChannelFrequencyModeAndLengthTimerEnabled);
-  CYC(0x4ce1, 0x4ce3); D = 0x00;
-  CYC(0x4ce3, 0x4ce4); alu_add_hl(gb, DE);
-  CYC(0x4ce4, 0x4ce5); mem_wr(gb, HL, A);
+  CYC(b_+350, b_+353); A = W8(wSoundTmp);
+  CYC(b_+353, b_+354); E = A;
+  CYC(b_+354, b_+356); A = 0x00;
+  CYC(b_+356, b_+359); SET_HL(wChannelEnvelopes);
+  CYC(b_+359, b_+361); D = 0x00;
+  CYC(b_+361, b_+362); alu_add_hl(gb, DE);
+  CYC(b_+362, b_+363); mem_wr(gb, HL, A);
+  CYC(b_+363, b_+366); SET_HL(wChannelEnvelopes2);
+  CYC(b_+366, b_+368); D = 0x00;
+  CYC(b_+368, b_+369); alu_add_hl(gb, DE);
+  CYC(b_+369, b_+370); mem_wr(gb, HL, A);
+  CYC(b_+370, b_+373); SET_HL(wChannelDutyCycles);
+  CYC(b_+373, b_+375); D = 0x00;
+  CYC(b_+375, b_+376); alu_add_hl(gb, DE);
+  CYC(b_+376, b_+377); mem_wr(gb, HL, A);
+  CYC(b_+377, b_+380); SET_HL(wChannelVibratos);
+  CYC(b_+380, b_+382); D = 0x00;
+  CYC(b_+382, b_+383); alu_add_hl(gb, DE);
+  CYC(b_+383, b_+384); mem_wr(gb, HL, A);
+  CYC(b_+384, b_+387); SET_HL(wChannelSweep);
+  CYC(b_+387, b_+389); D = 0x00;
+  CYC(b_+389, b_+390); alu_add_hl(gb, DE);
+  CYC(b_+390, b_+391); mem_wr(gb, HL, A);
+  CYC(b_+391, b_+394); SET_HL(wChannelPitchShift);
+  CYC(b_+394, b_+396); D = 0x00;
+  CYC(b_+396, b_+397); alu_add_hl(gb, DE);
+  CYC(b_+397, b_+398); mem_wr(gb, HL, A);
+  CYC(b_+398, b_+401); SET_HL(wChannelFrequencyModeAndLengthTimerEnabled);
+  CYC(b_+401, b_+403); D = 0x00;
+  CYC(b_+403, b_+404); alu_add_hl(gb, DE);
+  CYC(b_+404, b_+405); mem_wr(gb, HL, A);
 writeChannelPtrs:
-  CYC(0x4ce5, 0x4ce6); SET_HL(pop_effect(gb));
-  CYC(0x4ce6, 0x4ce9); A = W8(wSoundTmp);
-  CYC(0x4ce9, 0x4cea); B = A;
-  CYC(0x4cea, 0x4ced); A = W8(wLoadingSoundBank);
-  CYC(0x4ced, 0x4cef); C = 0xda;
-  CALL_C(0x4cef, writeIndexedHighRamAndIncrement_hook, 0x4d25, 0x4cf2);
-  CYC(0x4cf2, 0x4cf5); A = W8(wSoundTmp);
-  CYC(0x4cf5, 0x4cf7); A = alu_sla(gb, A);
-  CYC(0x4cf7, 0x4cf8); B = A;
-  CYC(0x4cf8, 0x4cf9); push_effect(gb, BC);
-  CYC(0x4cf9, 0x4cfb); A = H8(hSoundDataBaseBank);
-  CALL_C(0x4cfb, wMusicReadFunction_hook, 0xc000, 0x4cfe);
-  CYC(0x4cfe, 0x4cff); SET_BC(pop_effect(gb));
-  CYC(0x4cff, 0x4d01); C = 0xe2;
-  CALL_C(0x4d01, writeIndexedHighRamAndIncrement_hook, 0x4d25, 0x4d04);
-  CYC(0x4d04, 0x4d05); push_effect(gb, BC);
-  CYC(0x4d05, 0x4d07); A = H8(hSoundDataBaseBank);
-  CALL_C(0x4d07, wMusicReadFunction_hook, 0xc000, 0x4d0a);
-  CYC(0x4d0a, 0x4d0b); SET_BC(pop_effect(gb));
-  CYC(0x4d0b, 0x4d0c); mem_wr(gb, 0xff00 | C, A);
-  CYC(0x4d0c, 0x4d0d); C = alu_inc8(gb, C);
-  CYC(0x4d0d, 0x4d10); goto nextSoundChannel; // jp
+  CYC(b_+405, b_+406); SET_HL(pop_effect(gb));
+  CYC(b_+406, b_+409); A = W8(wSoundTmp);
+  CYC(b_+409, b_+410); B = A;
+  CYC(b_+410, b_+413); A = W8(wLoadingSoundBank);
+  CYC(b_+413, b_+415); C = 0xda;
+  CALL_C(b_+415, writeIndexedHighRamAndIncrement_hook, SYM(writeIndexedHighRamAndIncrement), b_+418);
+  CYC(b_+418, b_+421); A = W8(wSoundTmp);
+  CYC(b_+421, b_+423); A = alu_sla(gb, A);
+  CYC(b_+423, b_+424); B = A;
+  CYC(b_+424, b_+425); push_effect(gb, BC);
+  CYC(b_+425, b_+427); A = H8(hSoundDataBaseBank);
+  CALL_C(b_+427, wMusicReadFunction_hook, wMusicReadFunction, b_+430);
+  CYC(b_+430, b_+431); SET_BC(pop_effect(gb));
+  CYC(b_+431, b_+433); C = 0xe2;
+  CALL_C(b_+433, writeIndexedHighRamAndIncrement_hook, SYM(writeIndexedHighRamAndIncrement), b_+436);
+  CYC(b_+436, b_+437); push_effect(gb, BC);
+  CYC(b_+437, b_+439); A = H8(hSoundDataBaseBank);
+  CALL_C(b_+439, wMusicReadFunction_hook, wMusicReadFunction, b_+442);
+  CYC(b_+442, b_+443); SET_BC(pop_effect(gb));
+  CYC(b_+443, b_+444); mem_wr(gb, 0xff00 | C, A);
+  CYC(b_+444, b_+445); C = alu_inc8(gb, C);
+  CYC(b_+445, b_+448); goto nextSoundChannel; // jp
 setVolumeAndEnd:
-  CYC(0x4d10, 0x4d12); A = 0x77;
-  CYC(0x4d12, 0x4d15); W8(wSoundVolume) = A;
+  CYC(b_+448, b_+450); A = 0x77;
+  CYC(b_+450, b_+453); W8(wSoundVolume) = A;
 playSoundEnd:
-  CYC(0x4d15, 0x4d16); SET_HL(pop_effect(gb));
-  CYC(0x4d16, 0x4d17); SET_DE(pop_effect(gb));
-  CYC(0x4d17, 0x4d18); SET_BC(pop_effect(gb));
-  RET(0x4d18);
+  CYC(b_+453, b_+454); SET_HL(pop_effect(gb));
+  CYC(b_+454, b_+455); SET_DE(pop_effect(gb));
+  CYC(b_+455, b_+456); SET_BC(pop_effect(gb));
+  RET(b_+456);
 }
 
 // Reads a word at hl+a*2 into de and hl. Index can't be higher than $7f.
 void readWordFromTable_hook(GB *gb) {
-  CYC(0x4d19, 0x4d1b); A = alu_sla(gb, A);
-  CYC(0x4d1b, 0x4d1d); D = 0x00;
-  CYC(0x4d1d, 0x4d1e); E = A;
-  CYC(0x4d1e, 0x4d1f); alu_add_hl(gb, DE);
-  CYC(0x4d1f, 0x4d20); E = mem_rd(gb, HL);
-  CYC(0x4d20, 0x4d21); SET_HL(HL + 1);
-  CYC(0x4d21, 0x4d22); D = mem_rd(gb, HL);
-  CYC(0x4d22, 0x4d23); H = D;
-  CYC(0x4d23, 0x4d24); L = E;
-  RET(0x4d24);
+  BASE(readWordFromTable);
+  CYC(b_+0, b_+2); A = alu_sla(gb, A);
+  CYC(b_+2, b_+4); D = 0x00;
+  CYC(b_+4, b_+5); E = A;
+  CYC(b_+5, b_+6); alu_add_hl(gb, DE);
+  CYC(b_+6, b_+7); E = mem_rd(gb, HL);
+  CYC(b_+7, b_+8); SET_HL(HL + 1);
+  CYC(b_+8, b_+9); D = mem_rd(gb, HL);
+  CYC(b_+9, b_+10); H = D;
+  CYC(b_+10, b_+11); L = E;
+  RET(b_+11);
 }
 
 // Adds b to c, writes a to ($ff00+c), increments c.
 void writeIndexedHighRamAndIncrement_hook(GB *gb) {
-  CYC(0x4d25, 0x4d26); push_effect(gb, AF);
-  CYC(0x4d26, 0x4d27); A = B;
-  CYC(0x4d27, 0x4d28); alu_add(gb, C);
-  CYC(0x4d28, 0x4d29); C = A;
-  CYC(0x4d29, 0x4d2a); SET_AF(pop_effect(gb));
-  CYC(0x4d2a, 0x4d2b); mem_wr(gb, 0xff00 | C, A);
-  CYC(0x4d2b, 0x4d2c); C = alu_inc8(gb, C);
-  RET(0x4d2c);
+  BASE(writeIndexedHighRamAndIncrement);
+  CYC(b_+0, b_+1); push_effect(gb, AF);
+  CYC(b_+1, b_+2); A = B;
+  CYC(b_+2, b_+3); alu_add(gb, C);
+  CYC(b_+3, b_+4); C = A;
+  CYC(b_+4, b_+5); SET_AF(pop_effect(gb));
+  CYC(b_+5, b_+6); mem_wr(gb, 0xff00 | C, A);
+  CYC(b_+6, b_+7); C = alu_inc8(gb, C);
+  RET(b_+7);
 }

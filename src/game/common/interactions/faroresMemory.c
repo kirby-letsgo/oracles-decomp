@@ -3,37 +3,38 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode1c), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode1c), (from), (to), true)
 
-#define faroresMemoryScript_bank0c 0x469c
+#define faroresMemoryScript_bank0c SYM(faroresMemoryScript)
 
 // INTERAC_FARORES_MEMORY: Farore's secret book; only exists once the game has been finished
 // or in a linked game.
 void interactionCode1c_hook(GB *gb) {
+  BASE(interactionCode1c);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x46c2, checkInteractionState_hook, 0x23fe, 0x46c5);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
   if (!(F & FZ)) {
-    CYCT(0x46c5, 0x46c8); interactionRunScript_hook(gb); return;
+    CYCT(b_+3, b_+6); interactionRunScript_hook(gb); return;
   }
-  CYC(0x46c5, 0x46c8);
+  CYC(b_+3, b_+6);
 
-  CYC(0x46c8, 0x46ca); A = 0x14; // GLOBALFLAG_FINISHEDGAME
-  CALL_C(0x46ca, checkGlobalFlag_hook, 0x31f3, 0x46cd);
+  CYC(b_+6, b_+8); A = 0x14; // GLOBALFLAG_FINISHEDGAME
+  CALL_C(b_+8, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+11);
   if (!(F & FZ)) {
-    CYCT(0x46cd, 0x46cf); goto init;
+    CYCT(b_+11, b_+13); goto init;
   }
-  CYC(0x46cd, 0x46cf);
-  CALL_C(0x46cf, checkIsLinkedGame_hook, 0x1992, 0x46d2);
+  CYC(b_+11, b_+13);
+  CALL_C(b_+13, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+16);
   if (F & FZ) {
-    CYCT(0x46d2, 0x46d5); interactionDelete_hook(gb); return;
+    CYCT(b_+16, b_+19); interactionDelete_hook(gb); return;
   }
-  CYC(0x46d2, 0x46d5);
+  CYC(b_+16, b_+19);
 
 init:
-  CALL_C(0x46d5, interactionInitGraphics_hook, 0x15fb, 0x46d8);
-  CALL_C(0x46d8, objectSetVisible83_hook, 0x1e72, 0x46db);
-  CYC(0x46db, 0x46de); SET_HL(faroresMemoryScript_bank0c);
-  CALL_C(0x46de, interactionSetScript_hook, 0x2544, 0x46e1);
-  CYC(0x46e1, 0x46e4); interactionIncState_hook(gb);
+  CALL_C(b_+19, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+22);
+  CALL_C(b_+22, objectSetVisible83_hook, SYM(objectSetVisible83), b_+25);
+  CYC(b_+25, b_+28); SET_HL(faroresMemoryScript_bank0c);
+  CALL_C(b_+28, interactionSetScript_hook, SYM(interactionSetScript), b_+31);
+  CYC(b_+31, SYM(interactionCode1e)); interactionIncState_hook(gb);
 }

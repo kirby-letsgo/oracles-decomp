@@ -3,10 +3,10 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode14), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode14), (from), (to), true)
 
-#define pushableTilePropertiesTable_bank08 0x452d
+#define pushableTilePropertiesTable_bank08 SYM(pushableTilePropertiesTable)
 
 #define OBJ_VAR30 0x30
 #define OBJ_VAR31 0x31
@@ -46,232 +46,239 @@ static void pushblock_addAToHl(GB *gb) {
 
 // interactionCode14@updateZPositionForButton: raise z by 2 pixels when sitting on an unpressed button.
 static void pushblock_updateZPositionForButton(GB *gb, uint16_t sp0_) {
-  CYC(0x44ca, 0x44cd); A = mem_rd(gb, wTilesetFlags);
-  CYC(0x44cd, 0x44cf); alu_and(gb, 0x18);
+  BASE(interactionCode14);
+  CYC(b_+154, b_+157); A = mem_rd(gb, wTilesetFlags);
+  CYC(b_+157, b_+159); alu_and(gb, 0x18);
   if (F & FZ) {
-    CYCT(0x44cf, 0x44d0); ret_effect(gb); return;
+    CYCT(b_+159, b_+160); ret_effect(gb); return;
   }
-  CYC(0x44cf, 0x44d0);
-  CALL_C(0x44d0, objectGetShortPosition_hook, 0x2096, 0x44d3);
-  CYC(0x44d3, 0x44d4); C = A;
-  CYC(0x44d4, 0x44d6); B = wRoomLayout >> 8;
-  CYC(0x44d6, 0x44d7); A = mem_rd(gb, BC);
-  CYC(0x44d7, 0x44d9); alu_cp(gb, TILEINDEX_BUTTON);
-  CYC(0x44d9, 0x44db); A = 0xfe;
+  CYC(b_+159, b_+160);
+  CALL_C(b_+160, objectGetShortPosition_hook, SYM(objectGetShortPosition), b_+163);
+  CYC(b_+163, b_+164); C = A;
+  CYC(b_+164, b_+166); B = wRoomLayout >> 8;
+  CYC(b_+166, b_+167); A = mem_rd(gb, BC);
+  CYC(b_+167, b_+169); alu_cp(gb, TILEINDEX_BUTTON);
+  CYC(b_+169, b_+171); A = 0xfe;
   if (F & FZ) {
-    CYCT(0x44db, 0x44dd);
+    CYCT(b_+171, b_+173);
   } else {
-    CYC(0x44db, 0x44dd);
-    CYC(0x44dd, 0x44de); alu_xor(gb, A);
+    CYC(b_+171, b_+173);
+    CYC(b_+173, b_+174); alu_xor(gb, A);
   }
-  CYC(0x44de, 0x44e0); E = INTERACTION_BASE + OBJ_ZH;
-  CYC(0x44e0, 0x44e1); mem_wr(gb, DE, A);
-  CYC(0x44e1, 0x44e2); ret_effect(gb);
+  CYC(b_+174, b_+176); E = INTERACTION_BASE + OBJ_ZH;
+  CYC(b_+176, b_+177); mem_wr(gb, DE, A);
+  CYC(b_+177, b_+178); ret_effect(gb);
 }
 
 // interactionCode14@replaceTileUnderneathBlock: restore the ground tile at var30 (from the room
 // layout buffer if non-solid, else var32). Tails into setTile, whose ret pops our return address.
 static void pushblock_replaceTileUnderneathBlock(GB *gb, uint16_t sp0_) {
-  CYC(0x44e2, 0x44e4); E = INTERACTION_BASE + OBJ_VAR30;
-  CYC(0x44e4, 0x44e5); A = mem_rd(gb, DE);
-  CYC(0x44e5, 0x44e6); C = A;
-  CALL_C(0x44e6, getTileIndexFromRoomLayoutBuffer_paramC_hook, 0x15d8, 0x44e9);
+  BASE(interactionCode14);
+  CYC(b_+178, b_+180); E = INTERACTION_BASE + OBJ_VAR30;
+  CYC(b_+180, b_+181); A = mem_rd(gb, DE);
+  CYC(b_+181, b_+182); C = A;
+  CALL_C(b_+182, getTileIndexFromRoomLayoutBuffer_paramC_hook, SYM(getTileIndexFromRoomLayoutBuffer_paramC), b_+185);
   if (!(F & FC)) {
-    CYCT(0x44e9, 0x44ec); setTile_hook(gb); return;
+    CYCT(b_+185, b_+188); setTile_hook(gb); return;
   }
-  CYC(0x44e9, 0x44ec);
-  CYC(0x44ec, 0x44ee); E = INTERACTION_BASE + OBJ_VAR32;
-  CYC(0x44ee, 0x44ef); A = mem_rd(gb, DE);
-  CYC(0x44ef, 0x44f2); setTile_hook(gb);
+  CYC(b_+185, b_+188);
+  CYC(b_+188, b_+190); E = INTERACTION_BASE + OBJ_VAR32;
+  CYC(b_+190, b_+191); A = mem_rd(gb, DE);
+  CYC(b_+191, b_+194); setTile_hook(gb);
 }
 
 // interactionCode14@checkRotatingCubePermitsPushing: carry set means this block may not be pushed.
 static void pushblock_checkRotatingCubePermitsPushing(GB *gb) {
-  CYC(0x44f2, 0x44f5); A = mem_rd(gb, wRotatingCubePos);
-  CYC(0x44f5, 0x44f6); alu_or(gb, A);
+  BASE(interactionCode14);
+  CYC(b_+194, b_+197); A = mem_rd(gb, wRotatingCubePos);
+  CYC(b_+197, b_+198); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x44f6, 0x44f7); ret_effect(gb); return;
+    CYCT(b_+198, b_+199); ret_effect(gb); return;
   }
-  CYC(0x44f6, 0x44f7);
-  CYC(0x44f7, 0x44fa); A = mem_rd(gb, wRotatingCubeColor);
-  CYC(0x44fa, 0x44fc); alu_bit(gb, 7, A);
+  CYC(b_+198, b_+199);
+  CYC(b_+199, b_+202); A = mem_rd(gb, wRotatingCubeColor);
+  CYC(b_+202, b_+204); alu_bit(gb, 7, A);
   if (F & FZ) {
-    CYCT(0x44fc, 0x44fe); goto deny;
+    CYCT(b_+204, b_+206); goto deny;
   }
-  CYC(0x44fc, 0x44fe);
-  CYC(0x44fe, 0x4500); alu_and(gb, 0x7f);
-  CYC(0x4500, 0x4501); B = A;
-  CYC(0x4501, 0x4503); E = INTERACTION_BASE + OBJ_VAR31;
-  CYC(0x4503, 0x4504); A = mem_rd(gb, DE);
-  CYC(0x4504, 0x4506); alu_sub(gb, TILEINDEX_RED_PUSHABLE_BLOCK);
-  CYC(0x4506, 0x4507); alu_cp(gb, B);
+  CYC(b_+204, b_+206);
+  CYC(b_+206, b_+208); alu_and(gb, 0x7f);
+  CYC(b_+208, b_+209); B = A;
+  CYC(b_+209, b_+211); E = INTERACTION_BASE + OBJ_VAR31;
+  CYC(b_+211, b_+212); A = mem_rd(gb, DE);
+  CYC(b_+212, b_+214); alu_sub(gb, TILEINDEX_RED_PUSHABLE_BLOCK);
+  CYC(b_+214, b_+215); alu_cp(gb, B);
   if (F & FZ) {
-    CYCT(0x4507, 0x4508); ret_effect(gb); return;
+    CYCT(b_+215, b_+216); ret_effect(gb); return;
   }
-  CYC(0x4507, 0x4508);
+  CYC(b_+215, b_+216);
 deny:
-  CYC(0x4508, 0x4509); alu_scf(gb);
-  CYC(0x4509, 0x450a); ret_effect(gb);
+  CYC(b_+216, b_+217); alu_scf(gb);
+  CYC(b_+217, b_+218); ret_effect(gb);
 }
 
 // interactionCode14@loadPushableTileProperties: look up var31 in the pushable tile table for the
 // active collision set and copy its 4 bytes into var31-var34.
 static void pushblock_loadPushableTileProperties(GB *gb) {
-  CYC(0x450a, 0x450d); A = mem_rd(gb, wActiveCollisions);
-  CYC(0x450d, 0x4510); SET_HL(pushableTilePropertiesTable_bank08);
-  CYC(0x4510, 0x4511); push_effect(gb, 0x4511); pushblock_addAToHl(gb);
-  CYC(0x4511, 0x4512); A = mem_rd(gb, HL);
-  CYC(0x4512, 0x4513); push_effect(gb, 0x4513); pushblock_addAToHl(gb);
-  CYC(0x4513, 0x4515); E = INTERACTION_BASE + OBJ_VAR31;
-  CYC(0x4515, 0x4516); A = mem_rd(gb, DE);
-  CYC(0x4516, 0x4517); B = A;
+  BASE(interactionCode14);
+  CYC(b_+218, b_+221); A = mem_rd(gb, wActiveCollisions);
+  CYC(b_+221, b_+224); SET_HL(pushableTilePropertiesTable_bank08);
+  CYC(b_+224, b_+225); push_effect(gb, b_+225); pushblock_addAToHl(gb);
+  CYC(b_+225, b_+226); A = mem_rd(gb, HL);
+  CYC(b_+226, b_+227); push_effect(gb, b_+227); pushblock_addAToHl(gb);
+  CYC(b_+227, b_+229); E = INTERACTION_BASE + OBJ_VAR31;
+  CYC(b_+229, b_+230); A = mem_rd(gb, DE);
+  CYC(b_+230, b_+231); B = A;
 search:
-  CYC(0x4517, 0x4518); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4518, 0x4519); alu_or(gb, A);
+  CYC(b_+231, b_+232); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+232, b_+233); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x4519, 0x451a); ret_effect(gb); return;
+    CYCT(b_+233, b_+234); ret_effect(gb); return;
   }
-  CYC(0x4519, 0x451a);
-  CYC(0x451a, 0x451b); alu_cp(gb, B);
+  CYC(b_+233, b_+234);
+  CYC(b_+234, b_+235); alu_cp(gb, B);
   if (F & FZ) {
-    CYCT(0x451b, 0x451d); goto match;
+    CYCT(b_+235, b_+237); goto match;
   }
-  CYC(0x451b, 0x451d);
-  CYC(0x451d, 0x451e); SET_HL(HL + 1);
-  CYC(0x451e, 0x451f); SET_HL(HL + 1);
-  CYC(0x451f, 0x4520); SET_HL(HL + 1);
-  CYC(0x4520, 0x4522); goto search;
+  CYC(b_+235, b_+237);
+  CYC(b_+237, b_+238); SET_HL(HL + 1);
+  CYC(b_+238, b_+239); SET_HL(HL + 1);
+  CYC(b_+239, b_+240); SET_HL(HL + 1);
+  CYC(b_+240, b_+242); goto search;
 match:
-  CYC(0x4522, 0x4523); mem_wr(gb, DE, A);
-  CYC(0x4523, 0x4524); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4524, 0x4525); E = alu_inc8(gb, E);
-  CYC(0x4525, 0x4526); mem_wr(gb, DE, A);
-  CYC(0x4526, 0x4527); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4527, 0x4528); E = alu_inc8(gb, E);
-  CYC(0x4528, 0x4529); mem_wr(gb, DE, A);
-  CYC(0x4529, 0x452a); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x452a, 0x452b); E = alu_inc8(gb, E);
-  CYC(0x452b, 0x452c); mem_wr(gb, DE, A);
-  CYC(0x452c, 0x452d); ret_effect(gb);
+  CYC(b_+242, b_+243); mem_wr(gb, DE, A);
+  CYC(b_+243, b_+244); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+244, b_+245); E = alu_inc8(gb, E);
+  CYC(b_+245, b_+246); mem_wr(gb, DE, A);
+  CYC(b_+246, b_+247); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+247, b_+248); E = alu_inc8(gb, E);
+  CYC(b_+248, b_+249); mem_wr(gb, DE, A);
+  CYC(b_+249, b_+250); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+250, b_+251); E = alu_inc8(gb, E);
+  CYC(b_+251, b_+252); mem_wr(gb, DE, A);
+  CYC(b_+252, SYM(pushableTilePropertiesTable)); ret_effect(gb);
 }
 
 // interactionCode14@state1 (also reached by fallthrough from state0): move the block, and once
 // counter1 expires (@func_449d) settle it and delete self.
 static void pushblock_state1(GB *gb, uint16_t sp0_) {
-  CYC(0x4490, 0x4493); push_effect(gb, 0x4493); pushblock_updateZPositionForButton(gb, sp0_);
-  CALL_C(0x4493, objectApplySpeed_hook, 0x201d, 0x4496);
-  CALL_C(0x4496, objectPreventLinkFromPassing_hook, 0x2680, 0x4499);
-  CALL_C(0x4499, interactionDecCounter1_hook, 0x23cc, 0x449c);
+  BASE(interactionCode14);
+  CYC(b_+96, b_+99); push_effect(gb, b_+99); pushblock_updateZPositionForButton(gb, sp0_);
+  CALL_C(b_+99, objectApplySpeed_hook, SYM(objectApplySpeed), b_+102);
+  CALL_C(b_+102, objectPreventLinkFromPassing_hook, SYM(objectPreventLinkFromPassing), b_+105);
+  CALL_C(b_+105, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+108);
   if (!(F & FZ)) {
-    CYCT(0x449c, 0x449d); ret_effect(gb); return;
+    CYCT(b_+108, b_+109); ret_effect(gb); return;
   }
-  CYC(0x449c, 0x449d);
-  CALL_C(0x449d, objectReplaceWithAnimationIfOnHazard_hook, 0x2225, 0x44a0);
+  CYC(b_+108, b_+109);
+  CALL_C(b_+109, objectReplaceWithAnimationIfOnHazard_hook, SYM(objectReplaceWithAnimationIfOnHazard), b_+112);
   if (F & FC) {
-    CYCT(0x44a0, 0x44a3); interactionDelete_hook(gb); return;
+    CYCT(b_+112, b_+115); interactionDelete_hook(gb); return;
   }
-  CYC(0x44a0, 0x44a3);
-  CALL_C(0x44a3, objectGetShortPosition_hook, 0x2096, 0x44a6);
-  CYC(0x44a6, 0x44a8); E = INTERACTION_BASE + OBJ_VAR30;
-  CYC(0x44a8, 0x44a9); mem_wr(gb, DE, A);
-  CYC(0x44a9, 0x44ab); E = INTERACTION_BASE + OBJ_VAR33;
-  CYC(0x44ab, 0x44ac); A = mem_rd(gb, DE);
-  CYC(0x44ac, 0x44ad); alu_or(gb, A);
+  CYC(b_+112, b_+115);
+  CALL_C(b_+115, objectGetShortPosition_hook, SYM(objectGetShortPosition), b_+118);
+  CYC(b_+118, b_+120); E = INTERACTION_BASE + OBJ_VAR30;
+  CYC(b_+120, b_+121); mem_wr(gb, DE, A);
+  CYC(b_+121, b_+123); E = INTERACTION_BASE + OBJ_VAR33;
+  CYC(b_+123, b_+124); A = mem_rd(gb, DE);
+  CYC(b_+124, b_+125); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x44ad, 0x44af); goto checkSound;
+    CYCT(b_+125, b_+127); goto checkSound;
   }
-  CYC(0x44ad, 0x44af);
-  CYC(0x44af, 0x44b0); B = A;
-  CYC(0x44b0, 0x44b2); E = INTERACTION_BASE + OBJ_VAR30;
-  CYC(0x44b2, 0x44b3); A = mem_rd(gb, DE);
-  CYC(0x44b3, 0x44b4); C = A;
-  CYC(0x44b4, 0x44b5); A = B;
-  CALL_C(0x44b5, setTile_hook, 0x3a9c, 0x44b8);
+  CYC(b_+125, b_+127);
+  CYC(b_+127, b_+128); B = A;
+  CYC(b_+128, b_+130); E = INTERACTION_BASE + OBJ_VAR30;
+  CYC(b_+130, b_+131); A = mem_rd(gb, DE);
+  CYC(b_+131, b_+132); C = A;
+  CYC(b_+132, b_+133); A = B;
+  CALL_C(b_+133, setTile_hook, SYM(setTile), b_+136);
 checkSound:
-  CYC(0x44b8, 0x44ba); E = INTERACTION_BASE + OBJ_VAR34;
-  CYC(0x44ba, 0x44bb); A = mem_rd(gb, DE);
-  CYC(0x44bb, 0x44bc); alu_rlca(gb);
+  CYC(b_+136, b_+138); E = INTERACTION_BASE + OBJ_VAR34;
+  CYC(b_+138, b_+139); A = mem_rd(gb, DE);
+  CYC(b_+139, b_+140); alu_rlca(gb);
   if (!(F & FC)) {
-    CYCT(0x44bc, 0x44be); goto delete;
+    CYCT(b_+140, b_+142); goto delete;
   }
-  CYC(0x44bc, 0x44be);
-  CYC(0x44be, 0x44bf); alu_xor(gb, A);
-  CYC(0x44bf, 0x44c2); mem_wr(gb, wDisabledObjects, A);
-  CYC(0x44c2, 0x44c4); A = 0x4d;
-  CALL_C(0x44c4, playSound_b00_hook, 0x0c98, 0x44c7);
+  CYC(b_+140, b_+142);
+  CYC(b_+142, b_+143); alu_xor(gb, A);
+  CYC(b_+143, b_+146); mem_wr(gb, wDisabledObjects, A);
+  CYC(b_+146, b_+148); A = 0x4d;
+  CALL_C(b_+148, playSound_b00_hook, SYM(playSound_b00), b_+151);
 delete:
-  CYC(0x44c7, 0x44ca); interactionDelete_hook(gb);
+  CYC(b_+151, b_+154); interactionDelete_hook(gb);
 }
 
 // interactionCode14@state0: block just pushed. Falls through into state1.
 static void pushblock_state0(GB *gb, uint16_t sp0_) {
-  CYC(0x4438, 0x443a); A = 0x01;
-  CYC(0x443a, 0x443b); mem_wr(gb, DE, A);
-  CALL_C(0x443b, interactionInitGraphics_hook, 0x15fb, 0x443e);
-  CYC(0x443e, 0x4440); E = INTERACTION_BASE + OBJ_VAR30;
-  CYC(0x4440, 0x4441); A = mem_rd(gb, DE);
-  CYC(0x4441, 0x4442); C = A;
-  CYC(0x4442, 0x4444); B = wRoomLayout >> 8;
-  CYC(0x4444, 0x4445); A = mem_rd(gb, BC);
-  CYC(0x4445, 0x4447); E = INTERACTION_BASE + OBJ_VAR31;
-  CYC(0x4447, 0x4448); mem_wr(gb, DE, A);
-  CALL_C(0x4448, objectMimicBgTile_hook, 0x233b, 0x444b);
-  CYC(0x444b, 0x444e); push_effect(gb, 0x444e); pushblock_checkRotatingCubePermitsPushing(gb);
+  BASE(interactionCode14);
+  CYC(b_+8, b_+10); A = 0x01;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
+  CYC(b_+14, b_+16); E = INTERACTION_BASE + OBJ_VAR30;
+  CYC(b_+16, b_+17); A = mem_rd(gb, DE);
+  CYC(b_+17, b_+18); C = A;
+  CYC(b_+18, b_+20); B = wRoomLayout >> 8;
+  CYC(b_+20, b_+21); A = mem_rd(gb, BC);
+  CYC(b_+21, b_+23); E = INTERACTION_BASE + OBJ_VAR31;
+  CYC(b_+23, b_+24); mem_wr(gb, DE, A);
+  CALL_C(b_+24, objectMimicBgTile_hook, SYM(objectMimicBgTile), b_+27);
+  CYC(b_+27, b_+30); push_effect(gb, b_+30); pushblock_checkRotatingCubePermitsPushing(gb);
   if (F & FC) {
-    CYCT(0x444e, 0x4451); interactionDelete_hook(gb); return;
+    CYCT(b_+30, b_+33); interactionDelete_hook(gb); return;
   }
-  CYC(0x444e, 0x4451);
-  CYC(0x4451, 0x4453); A = 0x06;
-  CALL_C(0x4453, objectSetCollideRadius_hook, 0x24a1, 0x4456);
-  CYC(0x4456, 0x4459); push_effect(gb, 0x4459); pushblock_loadPushableTileProperties(gb);
-  CYC(0x4459, 0x445a); H = D;
-  CYC(0x445a, 0x445c); L = INTERACTION_BASE + OBJ_VAR34;
-  CYC(0x445c, 0x445e); alu_bit(gb, 2, mem_rd(gb, HL));
-  CYC(0x445e, 0x4460); A = 0x01;
+  CYC(b_+30, b_+33);
+  CYC(b_+33, b_+35); A = 0x06;
+  CALL_C(b_+35, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+38);
+  CYC(b_+38, b_+41); push_effect(gb, b_+41); pushblock_loadPushableTileProperties(gb);
+  CYC(b_+41, b_+42); H = D;
+  CYC(b_+42, b_+44); L = INTERACTION_BASE + OBJ_VAR34;
+  CYC(b_+44, b_+46); alu_bit(gb, 2, mem_rd(gb, HL));
+  CYC(b_+46, b_+48); A = 0x01;
   if (!(F & FZ)) {
-    CALL_C_CC(0x4460, interactionSetAnimation_hook, 0x262e, 0x4463);
+    CALL_C_CC(b_+48, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+51);
   } else {
-    CYC(0x4460, 0x4463);
+    CYC(b_+48, b_+51);
   }
-  CYC(0x4463, 0x4464); H = D;
-  CYC(0x4464, 0x4467); SET_BC(0x1420);
-  CYC(0x4467, 0x446a); A = mem_rd(gb, wBraceletLevel);
-  CYC(0x446a, 0x446c); alu_cp(gb, 0x02);
+  CYC(b_+51, b_+52); H = D;
+  CYC(b_+52, b_+55); SET_BC((SYM(setTileWithoutGfxReload) + 4));
+  CYC(b_+55, b_+58); A = mem_rd(gb, wBraceletLevel);
+  CYC(b_+58, b_+60); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
-    CYCT(0x446c, 0x446e); goto setSpeed;
+    CYCT(b_+60, b_+62); goto setSpeed;
   }
-  CYC(0x446c, 0x446e);
-  CYC(0x446e, 0x4470); L = INTERACTION_BASE + OBJ_VAR34;
-  CYC(0x4470, 0x4472); alu_bit(gb, 5, mem_rd(gb, HL));
+  CYC(b_+60, b_+62);
+  CYC(b_+62, b_+64); L = INTERACTION_BASE + OBJ_VAR34;
+  CYC(b_+64, b_+66); alu_bit(gb, 5, mem_rd(gb, HL));
   if (!(F & FZ)) {
-    CYCT(0x4472, 0x4474); goto setSpeed;
+    CYCT(b_+66, b_+68); goto setSpeed;
   }
-  CYC(0x4472, 0x4474);
-  CYC(0x4474, 0x4477); SET_BC(0x1e15);
+  CYC(b_+66, b_+68);
+  CYC(b_+68, b_+71); SET_BC((SYM(findByteInGroupTable) + 6));
 setSpeed:
-  CYC(0x4477, 0x4479); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x4479, 0x447a); mem_wr(gb, HL, B);
-  CYC(0x447a, 0x447c); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x447c, 0x447d); mem_wr(gb, HL, C);
-  CYC(0x447d, 0x447f); L = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x447f, 0x4480); A = mem_rd(gb, HL);
-  CYC(0x4480, 0x4482); alu_or(gb, 0x80);
-  CYC(0x4482, 0x4485); mem_wr(gb, wBlockPushAngle, A);
-  CYC(0x4485, 0x4488); push_effect(gb, 0x4488); pushblock_replaceTileUnderneathBlock(gb, sp0_);
-  CALL_C(0x4488, objectSetVisible82_hook, 0x1e69, 0x448b);
-  CYC(0x448b, 0x448d); A = 0x71;
-  CALL_C(0x448d, playSound_b00_hook, 0x0c98, 0x4490);
+  CYC(b_+71, b_+73); L = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+73, b_+74); mem_wr(gb, HL, B);
+  CYC(b_+74, b_+76); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+76, b_+77); mem_wr(gb, HL, C);
+  CYC(b_+77, b_+79); L = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+79, b_+80); A = mem_rd(gb, HL);
+  CYC(b_+80, b_+82); alu_or(gb, 0x80);
+  CYC(b_+82, b_+85); mem_wr(gb, wBlockPushAngle, A);
+  CYC(b_+85, b_+88); push_effect(gb, b_+88); pushblock_replaceTileUnderneathBlock(gb, sp0_);
+  CALL_C(b_+88, objectSetVisible82_hook, SYM(objectSetVisible82), b_+91);
+  CYC(b_+91, b_+93); A = 0x71;
+  CALL_C(b_+93, playSound_b00_hook, SYM(playSound_b00), b_+96);
   pushblock_state1(gb, sp0_);
 }
 
 void interactionCode14_hook(GB *gb) {
+  BASE(interactionCode14);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4430, 0x4432); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4432, 0x4433); A = mem_rd(gb, DE);
-  CYC(0x4433, 0x4434); push_effect(gb, 0x4434);
-  switch (pushblock_jumpTable(gb)) {
-    case 0x4438: pushblock_state0(gb, sp0_); return;
-    case 0x4490: pushblock_state1(gb, sp0_); return;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (pushblock_jumpTable(gb));
+    if (jt_ == b_+8) { pushblock_state0(gb, sp0_); return; }
+    else if (jt_ == b_+96) { pushblock_state1(gb, sp0_); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 }

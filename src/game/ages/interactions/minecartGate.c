@@ -3,12 +3,12 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode1b), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode1b), (from), (to), true)
 
 // 3 bytes per [var30] value: two collision bytes for the gate's tile pair, then the offset
 // of the tile whose collision is set to $5e (closed) or $00 (open).
-#define minecartGateCollisions_bank08 0x4ae7
+#define minecartGateCollisions_bank08 SYM(interactionCode1b__collisions)
 
 #define OBJ_VAR30 0x30
 
@@ -36,160 +36,167 @@ static uint16_t minecartGate_jumpTable(GB *gb) {
 // (bit 0 set if the gate is open) and updates the tile collisions to match. Reached by a
 // `call` from state 0 and by a `jp` from states 1/2.
 static void minecartGate_setAnimationAndUpdateCollisions(GB *gb, uint16_t sp0_) {
-  CYC(0x4aab, 0x4aae); A = mem_rd(gb, wSwitchState);
-  CYC(0x4aae, 0x4aaf); B = A;
-  CYC(0x4aaf, 0x4ab1); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x4ab1, 0x4ab2); A = mem_rd(gb, DE);
-  CYC(0x4ab2, 0x4ab3); alu_and(gb, B);
-  CYC(0x4ab3, 0x4ab5); C = 0x00;
+  BASE(interactionCode1b);
+  CYC(b_+60, b_+63); A = mem_rd(gb, wSwitchState);
+  CYC(b_+63, b_+64); B = A;
+  CYC(b_+64, b_+66); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+66, b_+67); A = mem_rd(gb, DE);
+  CYC(b_+67, b_+68); alu_and(gb, B);
+  CYC(b_+68, b_+70); C = 0x00;
   if (!(F & FZ)) {
-    CYCT(0x4ab5, 0x4ab7);
+    CYCT(b_+70, b_+72);
   } else {
-    CYC(0x4ab5, 0x4ab7);
-    CYC(0x4ab7, 0x4ab9); C = 0x01;
+    CYC(b_+70, b_+72);
+    CYC(b_+72, b_+74); C = 0x01;
   }
-  CYC(0x4ab9, 0x4aba); E = alu_dec8(gb, E);
-  CYC(0x4aba, 0x4abb); A = mem_rd(gb, DE); // subid: 0 facing left, 2 facing right
-  CYC(0x4abb, 0x4abc); alu_or(gb, C);
-  CYC(0x4abc, 0x4abe); E = INTERACTION_BASE + OBJ_VAR30;
-  CYC(0x4abe, 0x4abf); mem_wr(gb, DE, A);
-  CALL_C(0x4abf, interactionSetAnimation_hook, 0x262e, 0x4ac2);
-  CALL_C(0x4ac2, objectGetTileAtPosition_hook, 0x1444, 0x4ac5);
-  CYC(0x4ac5, 0x4ac6); H = alu_dec8(gb, H); // h now points to wRoomCollisions
-  CYC(0x4ac6, 0x4ac7); L = alu_dec8(gb, L);
+  CYC(b_+74, b_+75); E = alu_dec8(gb, E);
+  CYC(b_+75, b_+76); A = mem_rd(gb, DE); // subid: 0 facing left, 2 facing right
+  CYC(b_+76, b_+77); alu_or(gb, C);
+  CYC(b_+77, b_+79); E = INTERACTION_BASE + OBJ_VAR30;
+  CYC(b_+79, b_+80); mem_wr(gb, DE, A);
+  CALL_C(b_+80, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+83);
+  CALL_C(b_+83, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+86);
+  CYC(b_+86, b_+87); H = alu_dec8(gb, H); // h now points to wRoomCollisions
+  CYC(b_+87, b_+88); L = alu_dec8(gb, L);
   // a = [var30]*3
-  CYC(0x4ac7, 0x4ac9); E = INTERACTION_BASE + OBJ_VAR30;
-  CYC(0x4ac9, 0x4aca); A = mem_rd(gb, DE);
-  CYC(0x4aca, 0x4acb); B = A;
-  CYC(0x4acb, 0x4acc); alu_add(gb, A);
-  CYC(0x4acc, 0x4acd); alu_add(gb, B);
-  CYC(0x4acd, 0x4ad0); SET_BC(minecartGateCollisions_bank08);
-  CALL_C(0x4ad0, addAToBc_hook, 0x006d, 0x4ad3);
-  CYC(0x4ad3, 0x4ad4); A = mem_rd(gb, BC);
-  CYC(0x4ad4, 0x4ad5); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x4ad5, 0x4ad6); SET_BC(BC + 1);
-  CYC(0x4ad6, 0x4ad7); A = mem_rd(gb, BC);
-  CYC(0x4ad7, 0x4ad8); mem_wr(gb, HL, A);
-  CYC(0x4ad8, 0x4ad9); SET_BC(BC + 1);
-  CYC(0x4ad9, 0x4ada); A = mem_rd(gb, BC);
-  CYC(0x4ada, 0x4adb); alu_add(gb, L);
-  CYC(0x4adb, 0x4adc); L = A;
-  CYC(0x4adc, 0x4add); H = alu_inc8(gb, H);
-  CYC(0x4add, 0x4ade); A = mem_rd(gb, DE);
-  CYC(0x4ade, 0x4adf); alu_rrca(gb);
+  CYC(b_+88, b_+90); E = INTERACTION_BASE + OBJ_VAR30;
+  CYC(b_+90, b_+91); A = mem_rd(gb, DE);
+  CYC(b_+91, b_+92); B = A;
+  CYC(b_+92, b_+93); alu_add(gb, A);
+  CYC(b_+93, b_+94); alu_add(gb, B);
+  CYC(b_+94, b_+97); SET_BC(minecartGateCollisions_bank08);
+  CALL_C(b_+97, addAToBc_hook, 0x006d, b_+100);
+  CYC(b_+100, b_+101); A = mem_rd(gb, BC);
+  CYC(b_+101, b_+102); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+102, b_+103); SET_BC(BC + 1);
+  CYC(b_+103, b_+104); A = mem_rd(gb, BC);
+  CYC(b_+104, b_+105); mem_wr(gb, HL, A);
+  CYC(b_+105, b_+106); SET_BC(BC + 1);
+  CYC(b_+106, b_+107); A = mem_rd(gb, BC);
+  CYC(b_+107, b_+108); alu_add(gb, L);
+  CYC(b_+108, b_+109); L = A;
+  CYC(b_+109, b_+110); H = alu_inc8(gb, H);
+  CYC(b_+110, b_+111); A = mem_rd(gb, DE);
+  CYC(b_+111, b_+112); alu_rrca(gb);
   if (F & FC) {
-    CYCT(0x4adf, 0x4ae1); goto open;
+    CYCT(b_+112, b_+114); goto open;
   }
-  CYC(0x4adf, 0x4ae1);
-  CYC(0x4ae1, 0x4ae3); mem_wr(gb, HL, 0x5e);
-  CYC(0x4ae3, 0x4ae4); ret_effect(gb);
+  CYC(b_+112, b_+114);
+  CYC(b_+114, b_+116); mem_wr(gb, HL, 0x5e);
+  CYC(b_+116, b_+117); ret_effect(gb);
   return;
 open:
-  CYC(0x4ae4, 0x4ae6); mem_wr(gb, HL, 0x00);
-  CYC(0x4ae6, 0x4ae7); ret_effect(gb);
+  CYC(b_+117, b_+119); mem_wr(gb, HL, 0x00);
+  CYC(b_+119, b_+120); ret_effect(gb);
 }
 
 // @state0: init. Subid bits 4-7 become the gate direction; bits 0-2 select the switch bit
 // (var03) that controls it.
 static void minecartGate_state0(GB *gb, uint16_t sp0_) {
-  CYC(0x4a7b, 0x4a7d); A = 0x01;
-  CYC(0x4a7d, 0x4a7e); mem_wr(gb, DE, A);
-  CYC(0x4a7e, 0x4a80); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x4a80, 0x4a81); A = mem_rd(gb, DE);
-  CYC(0x4a81, 0x4a82); B = A;
-  CYC(0x4a82, 0x4a84); A = alu_swap(gb, A);
-  CYC(0x4a84, 0x4a86); alu_and(gb, 0x0f);
-  CYC(0x4a86, 0x4a87); mem_wr(gb, DE, A);
-  CYC(0x4a87, 0x4a88); A = B;
-  CYC(0x4a88, 0x4a8a); alu_and(gb, 0x07);
-  CYC(0x4a8a, 0x4a8d); SET_HL(bitTable);
-  CYC(0x4a8d, 0x4a8e); alu_add(gb, L);
-  CYC(0x4a8e, 0x4a8f); L = A;
-  CYC(0x4a8f, 0x4a90); E = alu_inc8(gb, E);
-  CYC(0x4a90, 0x4a91); A = mem_rd(gb, HL);
-  CYC(0x4a91, 0x4a92); mem_wr(gb, DE, A);
-  CALL_C(0x4a92, interactionInitGraphics_hook, 0x15fb, 0x4a95);
-  CALL_C(0x4a95, objectSetVisible82_hook, 0x1e69, 0x4a98);
-  CYC(0x4a98, 0x4a9b); push_effect(gb, 0x4a9b); minecartGate_setAnimationAndUpdateCollisions(gb, sp0_);
-  CYC(0x4a9b, 0x4a9d); E = INTERACTION_BASE + OBJ_VAR30;
-  CYC(0x4a9d, 0x4a9e); A = mem_rd(gb, DE);
-  CYC(0x4a9e, 0x4a9f); B = A;
-  CYC(0x4a9f, 0x4aa1); alu_and(gb, 0x01);
-  CYC(0x4aa1, 0x4aa2); A = alu_inc8(gb, A);
-  CYC(0x4aa2, 0x4aa4); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4aa4, 0x4aa5); mem_wr(gb, DE, A);
-  CYC(0x4aa5, 0x4aa6); A = B;
-  CYC(0x4aa6, 0x4aa8); alu_xor(gb, 0x01);
-  CYC(0x4aa8, 0x4aab); interactionSetAnimation_hook(gb);
+  BASE(interactionCode1b);
+  CYC(b_+12, b_+14); A = 0x01;
+  CYC(b_+14, b_+15); mem_wr(gb, DE, A);
+  CYC(b_+15, b_+17); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+17, b_+18); A = mem_rd(gb, DE);
+  CYC(b_+18, b_+19); B = A;
+  CYC(b_+19, b_+21); A = alu_swap(gb, A);
+  CYC(b_+21, b_+23); alu_and(gb, 0x0f);
+  CYC(b_+23, b_+24); mem_wr(gb, DE, A);
+  CYC(b_+24, b_+25); A = B;
+  CYC(b_+25, b_+27); alu_and(gb, 0x07);
+  CYC(b_+27, b_+30); SET_HL(bitTable);
+  CYC(b_+30, b_+31); alu_add(gb, L);
+  CYC(b_+31, b_+32); L = A;
+  CYC(b_+32, b_+33); E = alu_inc8(gb, E);
+  CYC(b_+33, b_+34); A = mem_rd(gb, HL);
+  CYC(b_+34, b_+35); mem_wr(gb, DE, A);
+  CALL_C(b_+35, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+38);
+  CALL_C(b_+38, objectSetVisible82_hook, SYM(objectSetVisible82), b_+41);
+  CYC(b_+41, b_+44); push_effect(gb, b_+44); minecartGate_setAnimationAndUpdateCollisions(gb, sp0_);
+  CYC(b_+44, b_+46); E = INTERACTION_BASE + OBJ_VAR30;
+  CYC(b_+46, b_+47); A = mem_rd(gb, DE);
+  CYC(b_+47, b_+48); B = A;
+  CYC(b_+48, b_+50); alu_and(gb, 0x01);
+  CYC(b_+50, b_+51); A = alu_inc8(gb, A);
+  CYC(b_+51, b_+53); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+53, b_+54); mem_wr(gb, DE, A);
+  CYC(b_+54, b_+55); A = B;
+  CYC(b_+55, b_+57); alu_xor(gb, 0x01);
+  CYC(b_+57, b_+60); interactionSetAnimation_hook(gb);
 }
 
 // Shared tail of states 1 and 2: if the gate's switch bit matches (A was inverted for
 // state 1), go to state 3 and start opening/closing.
 static void minecartGate_checkSwitch(GB *gb, uint16_t sp0_) {
-  CYC(0x4b02, 0x4b03); B = A;
-  CYC(0x4b03, 0x4b05); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x4b05, 0x4b06); A = mem_rd(gb, DE);
-  CYC(0x4b06, 0x4b07); alu_and(gb, B);
+  BASE(interactionCode1b);
+  CYC(b_+147, b_+148); B = A;
+  CYC(b_+148, b_+150); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+150, b_+151); A = mem_rd(gb, DE);
+  CYC(b_+151, b_+152); alu_and(gb, B);
   if (F & FZ) {
-    CYCT(0x4b07, 0x4b08); ret_effect(gb); return;
+    CYCT(b_+152, b_+153); ret_effect(gb); return;
   }
-  CYC(0x4b07, 0x4b08);
-  CYC(0x4b08, 0x4b0a); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4b0a, 0x4b0c); A = 0x03;
-  CYC(0x4b0c, 0x4b0d); mem_wr(gb, DE, A);
-  CYC(0x4b0d, 0x4b0f); A = SND_OPEN_GATE;
-  CALL_C(0x4b0f, playSound_b00_hook, 0x0c98, 0x4b12);
-  CYC(0x4b12, 0x4b15);
+  CYC(b_+152, b_+153);
+  CYC(b_+153, b_+155); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+155, b_+157); A = 0x03;
+  CYC(b_+157, b_+158); mem_wr(gb, DE, A);
+  CYC(b_+158, b_+160); A = SND_OPEN_GATE;
+  CALL_C(b_+160, playSound_b00_hook, SYM(playSound_b00), b_+163);
+  CYC(b_+163, b_+166);
   minecartGate_setAnimationAndUpdateCollisions(gb, sp0_);
 }
 
 // @state1: waiting for the switch to be pressed
 static void minecartGate_state1(GB *gb, uint16_t sp0_) {
-  CALL_C(0x4af3, objectSetPriorityRelativeToLink_hook, 0x22dc, 0x4af6);
-  CYC(0x4af6, 0x4af9); A = mem_rd(gb, wSwitchState);
-  CYC(0x4af9, 0x4afa); alu_cpl(gb);
-  CYC(0x4afa, 0x4afc);
+  BASE(interactionCode1b);
+  CALL_C(b_+132, objectSetPriorityRelativeToLink_hook, SYM(objectSetPriorityRelativeToLink), b_+135);
+  CYC(b_+135, b_+138); A = mem_rd(gb, wSwitchState);
+  CYC(b_+138, b_+139); alu_cpl(gb);
+  CYC(b_+139, b_+141);
   minecartGate_checkSwitch(gb, sp0_);
 }
 
 // @state2: waiting for the switch to be released
 static void minecartGate_state2(GB *gb, uint16_t sp0_) {
-  CALL_C(0x4afc, objectSetPriorityRelativeToLink_hook, 0x22dc, 0x4aff);
-  CYC(0x4aff, 0x4b02); A = mem_rd(gb, wSwitchState);
+  BASE(interactionCode1b);
+  CALL_C(b_+141, objectSetPriorityRelativeToLink_hook, SYM(objectSetPriorityRelativeToLink), b_+144);
+  CYC(b_+144, b_+147); A = mem_rd(gb, wSwitchState);
   minecartGate_checkSwitch(gb, sp0_);
 }
 
 // @state3: in the process of opening or closing
 static void minecartGate_state3(GB *gb, uint16_t sp0_) {
-  CALL_C(0x4b15, interactionAnimate_hook, 0x261b, 0x4b18);
-  CALL_C(0x4b18, objectSetPriorityRelativeToLink_hook, 0x22dc, 0x4b1b);
-  CYC(0x4b1b, 0x4b1d); E = INTERACTION_BASE + OBJ_ANIM_PARAMETER;
-  CYC(0x4b1d, 0x4b1e); A = mem_rd(gb, DE);
-  CYC(0x4b1e, 0x4b1f); A = alu_inc8(gb, A);
+  BASE(interactionCode1b);
+  CALL_C(b_+166, interactionAnimate_hook, SYM(interactionAnimate), b_+169);
+  CALL_C(b_+169, objectSetPriorityRelativeToLink_hook, SYM(objectSetPriorityRelativeToLink), b_+172);
+  CYC(b_+172, b_+174); E = INTERACTION_BASE + OBJ_ANIM_PARAMETER;
+  CYC(b_+174, b_+175); A = mem_rd(gb, DE);
+  CYC(b_+175, b_+176); A = alu_inc8(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x4b1f, 0x4b20); ret_effect(gb); return;
+    CYCT(b_+176, b_+177); ret_effect(gb); return;
   }
-  CYC(0x4b1f, 0x4b20);
-  CYC(0x4b20, 0x4b22); E = INTERACTION_BASE + OBJ_VAR30;
-  CYC(0x4b22, 0x4b23); A = mem_rd(gb, DE);
-  CYC(0x4b23, 0x4b25); alu_and(gb, 0x01);
-  CYC(0x4b25, 0x4b26); A = alu_inc8(gb, A);
-  CYC(0x4b26, 0x4b28); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4b28, 0x4b29); mem_wr(gb, DE, A);
-  CYC(0x4b29, 0x4b2a); ret_effect(gb);
+  CYC(b_+176, b_+177);
+  CYC(b_+177, b_+179); E = INTERACTION_BASE + OBJ_VAR30;
+  CYC(b_+179, b_+180); A = mem_rd(gb, DE);
+  CYC(b_+180, b_+182); alu_and(gb, 0x01);
+  CYC(b_+182, b_+183); A = alu_inc8(gb, A);
+  CYC(b_+183, b_+185); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+185, b_+186); mem_wr(gb, DE, A);
+  CYC(b_+186, SYM(interactionCode1f)); ret_effect(gb);
 }
 
 // INTERAC_MINECART_GATE: a gate across the minecart track, opened/closed by a switch.
 void interactionCode1b_hook(GB *gb) {
+  BASE(interactionCode1b);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4a6f, 0x4a71); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4a71, 0x4a72); A = mem_rd(gb, DE);
-  CYC(0x4a72, 0x4a73); push_effect(gb, 0x4a73);
-  switch (minecartGate_jumpTable(gb)) {
-    case 0x4a7b: minecartGate_state0(gb, sp0_); return;
-    case 0x4af3: minecartGate_state1(gb, sp0_); return;
-    case 0x4afc: minecartGate_state2(gb, sp0_); return;
-    case 0x4b15: minecartGate_state3(gb, sp0_); return;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (minecartGate_jumpTable(gb));
+    if (jt_ == b_+12) { minecartGate_state0(gb, sp0_); return; }
+    else if (jt_ == b_+132) { minecartGate_state1(gb, sp0_); return; }
+    else if (jt_ == b_+141) { minecartGate_state2(gb, sp0_); return; }
+    else if (jt_ == b_+166) { minecartGate_state3(gb, sp0_); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 }

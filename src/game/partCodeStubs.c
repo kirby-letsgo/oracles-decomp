@@ -3,13 +3,15 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode00), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode00), (from), (to), true)
 
 void partCodeNil_hook(GB *gb) {
-  RET(0x5f55); return; // ret
+  BASE(partCodeNil);
+  RET(b_+0); return; // ret
 }
 
 void partCode00_hook(GB *gb) {
-  CYC(0x5f56, 0x5f59); partDelete_hook(gb); return; // jp
+  BASE(partCode00);
+  CYC(b_+0, SYM(partCode16)); partDelete_hook(gb); return; // jp
 }

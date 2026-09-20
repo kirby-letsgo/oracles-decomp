@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0a, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0a, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode76), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode76), (from), (to), true)
 
 static uint16_t interactionCode76_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -26,197 +26,198 @@ static uint16_t interactionCode76_jump_table(GB *gb) {
 
 // INTERAC_MAKU_GATE_OPENING
 void interactionCode76_hook(GB *gb) {
+  BASE(interactionCode76);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5f02, 0x5f04); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x5f04, 0x5f05); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x5f05, 0x5f06); push_effect(gb, 0x5f06);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     interactionCode76_jump_table(gb); // subid0 and subid1 both target 0x5f0a
   }
 
   // interactionCode76@subid0 / @subid1
-  CYC(0x5f0a, 0x5f0c); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x5f0c, 0x5f0d); A = mem_rd(gb, DE);
+  CYC(b_+8, b_+10); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+10, b_+11); A = mem_rd(gb, DE);
   {
-    CYC(0x5f0d, 0x5f0e); push_effect(gb, 0x5f0e);
+    CYC(b_+11, b_+12); push_effect(gb, b_+12);
     uint16_t target = interactionCode76_jump_table(gb);
-    if (target == 0x5f3d) goto state1;
-    if (target == 0x5f59) goto state2;
-    if (target == 0x5f75) goto state3;
+    if (target == b_+59) goto state1;
+    if (target == b_+87) goto state2;
+    if (target == b_+115) goto state3;
   }
 
   // interactionCode76@state0
-  CYC(0x5f16, 0x5f17); H = D;
-  CYC(0x5f17, 0x5f19); L = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x5f19, 0x5f1a); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
-  CYC(0x5f1a, 0x5f1c); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x5f1c, 0x5f1e); mem_wr(gb, HL, 30);
-  CYC(0x5f1e, 0x5f20); L = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x5f20, 0x5f21); A = mem_rd(gb, HL);
-  CYC(0x5f21, 0x5f22); alu_or(gb, A);
-  CYC(0x5f22, 0x5f25); SET_HL(0x5f90); // @frame0And1_subid0
-  if (F & FZ) { CYCT(0x5f25, 0x5f27); goto l5f2a; } // jr z
-  CYC(0x5f25, 0x5f27);
-  CYC(0x5f27, 0x5f2a); SET_HL(0x5f99); // @frame0And1_subid1
+  CYC(b_+20, b_+21); H = D;
+  CYC(b_+21, b_+23); L = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+23, b_+24); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
+  CYC(b_+24, b_+26); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+26, b_+28); mem_wr(gb, HL, 30);
+  CYC(b_+28, b_+30); L = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+30, b_+31); A = mem_rd(gb, HL);
+  CYC(b_+31, b_+32); alu_or(gb, A);
+  CYC(b_+32, b_+35); SET_HL(b_+142); // @frame0And1_subid0
+  if (F & FZ) { CYCT(b_+35, b_+37); goto l5f2a; } // jr z
+  CYC(b_+35, b_+37);
+  CYC(b_+37, b_+40); SET_HL(b_+151); // @frame0And1_subid1
 
 l5f2a:
-  CYC(0x5f2a, 0x5f2d); push_effect(gb, 0x5f2d); goto loadInterleavedTiles; // call
+  CYC(b_+40, b_+43); push_effect(gb, b_+43); goto loadInterleavedTiles; // call
 after1_loadInterleavedTiles:
-  CYC(0x5f2d, 0x5f30); SET_BC(0x5fab); // @frame0_poof
-  CYC(0x5f30, 0x5f33); push_effect(gb, 0x5f33); goto loadPoofs; // call
+  CYC(b_+43, b_+46); SET_BC(b_+169); // @frame0_poof
+  CYC(b_+46, b_+49); push_effect(gb, b_+49); goto loadPoofs; // call
 after1_loadPoofs:
   // falls through into shakeScreen (no push_effect for this path)
 
 shakeScreen:
-  CYC(0x5f33, 0x5f35); A = 0x06;
-  CALL_C(0x5f35, setScreenShakeCounter_hook, 0x24bb, 0x5f38);
-  CYC(0x5f38, 0x5f3a); A = 0x70; // SND_DOORCLOSE
-  CYC(0x5f3a, 0x5f3d); playSound_b00_hook(gb);
-  if (gb->pc == 0x5f50 && gb->sp == sp0_) goto after1_shakeScreen;
-  if (gb->pc == 0x5f6c && gb->sp == sp0_) goto after2_shakeScreen;
-  if (gb->pc == 0x5f88 && gb->sp == sp0_) goto after3_shakeScreen;
+  CYC(b_+49, b_+51); A = 0x06;
+  CALL_C(b_+51, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+54);
+  CYC(b_+54, b_+56); A = 0x70; // SND_DOORCLOSE
+  CYC(b_+56, b_+59); playSound_b00_hook(gb);
+  if (gb->pc == b_+78 && gb->sp == sp0_) goto after1_shakeScreen;
+  if (gb->pc == b_+106 && gb->sp == sp0_) goto after2_shakeScreen;
+  if (gb->pc == b_+134 && gb->sp == sp0_) goto after3_shakeScreen;
   return; // jp
 
 state1:
-  CALL_C(0x5f3d, interactionDecCounter1_hook, 0x23cc, 0x5f40);
-  if (!(F & FZ)) { RET_TAKEN(0x5f40); return; } // ret nz
-  CYC(0x5f40, 0x5f41);
-  CYC(0x5f41, 0x5f44); SET_HL(0x5f90); // @frame0And1_subid0
-  CYC(0x5f44, 0x5f47); push_effect(gb, 0x5f47); goto loadTiles; // call
+  CALL_C(b_+59, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+62);
+  if (!(F & FZ)) { RET_TAKEN(b_+62); return; } // ret nz
+  CYC(b_+62, b_+63);
+  CYC(b_+63, b_+66); SET_HL(b_+142); // @frame0And1_subid0
+  CYC(b_+66, b_+69); push_effect(gb, b_+69); goto loadTiles; // call
 after1_loadTiles:
-  CYC(0x5f47, 0x5f4a); SET_BC(0x5fb4); // @frame1_poof
-  CYC(0x5f4a, 0x5f4d); push_effect(gb, 0x5f4d); goto loadPoofs; // call
+  CYC(b_+69, b_+72); SET_BC(b_+178); // @frame1_poof
+  CYC(b_+72, b_+75); push_effect(gb, b_+75); goto loadPoofs; // call
 after2_loadPoofs:
-  CYC(0x5f4d, 0x5f50); push_effect(gb, 0x5f50); goto shakeScreen; // call
+  CYC(b_+75, b_+78); push_effect(gb, b_+78); goto shakeScreen; // call
 after1_shakeScreen:
-  CYC(0x5f50, 0x5f51); H = D;
-  CYC(0x5f51, 0x5f53); L = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x5f53, 0x5f54); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
-  CYC(0x5f54, 0x5f56); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x5f56, 0x5f58); mem_wr(gb, HL, 30);
-  RET(0x5f58); return; // ret
+  CYC(b_+78, b_+79); H = D;
+  CYC(b_+79, b_+81); L = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+81, b_+82); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
+  CYC(b_+82, b_+84); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+84, b_+86); mem_wr(gb, HL, 30);
+  RET(b_+86); return; // ret
 
 state2:
-  CALL_C(0x5f59, interactionDecCounter1_hook, 0x23cc, 0x5f5c);
-  if (!(F & FZ)) { RET_TAKEN(0x5f5c); return; } // ret nz
-  CYC(0x5f5c, 0x5f5d);
-  CYC(0x5f5d, 0x5f60); SET_HL(0x5fa2); // @frame2And3
-  CYC(0x5f60, 0x5f63); push_effect(gb, 0x5f63); goto loadInterleavedTiles; // call
+  CALL_C(b_+87, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+90);
+  if (!(F & FZ)) { RET_TAKEN(b_+90); return; } // ret nz
+  CYC(b_+90, b_+91);
+  CYC(b_+91, b_+94); SET_HL(b_+160); // @frame2And3
+  CYC(b_+94, b_+97); push_effect(gb, b_+97); goto loadInterleavedTiles; // call
 after2_loadInterleavedTiles:
-  CYC(0x5f63, 0x5f66); SET_BC(0x5fbd); // @frame2_poof
-  CYC(0x5f66, 0x5f69); push_effect(gb, 0x5f69); goto loadPoofs; // call
+  CYC(b_+97, b_+100); SET_BC(b_+187); // @frame2_poof
+  CYC(b_+100, b_+103); push_effect(gb, b_+103); goto loadPoofs; // call
 after3_loadPoofs:
-  CYC(0x5f69, 0x5f6c); push_effect(gb, 0x5f6c); goto shakeScreen; // call
+  CYC(b_+103, b_+106); push_effect(gb, b_+106); goto shakeScreen; // call
 after2_shakeScreen:
-  CYC(0x5f6c, 0x5f6d); H = D;
-  CYC(0x5f6d, 0x5f6f); L = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x5f6f, 0x5f70); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
-  CYC(0x5f70, 0x5f72); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x5f72, 0x5f74); mem_wr(gb, HL, 30);
-  RET(0x5f74); return; // ret
+  CYC(b_+106, b_+107); H = D;
+  CYC(b_+107, b_+109); L = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+109, b_+110); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
+  CYC(b_+110, b_+112); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+112, b_+114); mem_wr(gb, HL, 30);
+  RET(b_+114); return; // ret
 
 state3:
-  CALL_C(0x5f75, interactionDecCounter1_hook, 0x23cc, 0x5f78);
-  if (!(F & FZ)) { RET_TAKEN(0x5f78); return; } // ret nz
-  CYC(0x5f78, 0x5f79);
-  CYC(0x5f79, 0x5f7c); SET_HL(0x5fa2); // @frame2And3
-  CYC(0x5f7c, 0x5f7f); push_effect(gb, 0x5f7f); goto loadTiles; // call
+  CALL_C(b_+115, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+118);
+  if (!(F & FZ)) { RET_TAKEN(b_+118); return; } // ret nz
+  CYC(b_+118, b_+119);
+  CYC(b_+119, b_+122); SET_HL(b_+160); // @frame2And3
+  CYC(b_+122, b_+125); push_effect(gb, b_+125); goto loadTiles; // call
 after2_loadTiles:
-  CYC(0x5f7f, 0x5f82); SET_BC(0x5fc6); // @frame3_poof
-  CYC(0x5f82, 0x5f85); push_effect(gb, 0x5f85); goto loadPoofs; // call
+  CYC(b_+125, b_+128); SET_BC(b_+196); // @frame3_poof
+  CYC(b_+128, b_+131); push_effect(gb, b_+131); goto loadPoofs; // call
 after4_loadPoofs:
-  CYC(0x5f85, 0x5f88); push_effect(gb, 0x5f88); goto shakeScreen; // call
+  CYC(b_+131, b_+134); push_effect(gb, b_+134); goto shakeScreen; // call
 after3_shakeScreen:
-  CALL_C(0x5f88, getThisRoomFlags_hook, 0x197d, 0x5f8b);
-  CYC(0x5f8b, 0x5f8d); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80); // set 7,(hl)
-  CYC(0x5f8d, 0x5f90); interactionDelete_hook(gb); return; // jp
+  CALL_C(b_+134, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+137);
+  CYC(b_+137, b_+139); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80); // set 7,(hl)
+  CYC(b_+139, b_+142); interactionDelete_hook(gb); return; // jp
 
 // @param hl Pointer to data
 loadInterleavedTiles:
-  CYC(0x5fcf, 0x5fd0); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x5fd0, 0x5fd1); B = A;
+  CYC(b_+205, b_+206); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+206, b_+207); B = A;
 
 next_loadInterleavedTiles:
-  CYC(0x5fd1, 0x5fd2); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x5fd2, 0x5fd4); H8(hFF8C) = A;
-  CYC(0x5fd4, 0x5fd5); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x5fd5, 0x5fd7); H8(hFF8F) = A;
-  CYC(0x5fd7, 0x5fd8); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x5fd8, 0x5fda); H8(hFF8E) = A;
-  CYC(0x5fda, 0x5fdb); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x5fdb, 0x5fdc); push_effect(gb, HL);
-  CYC(0x5fdc, 0x5fdd); push_effect(gb, BC);
-  CALL_C(0x5fdd, setInterleavedTile_hook, 0x3acf, 0x5fe0);
-  CYC(0x5fe0, 0x5fe1); SET_BC(pop_effect(gb));
-  CYC(0x5fe1, 0x5fe2); SET_HL(pop_effect(gb));
-  CYC(0x5fe2, 0x5fe3); B = alu_dec8(gb, B);
-  if (!(F & FZ)) { CYCT(0x5fe3, 0x5fe5); goto next_loadInterleavedTiles; } // jr nz
-  CYC(0x5fe3, 0x5fe5);
-  RET(0x5fe5);
-  if (gb->pc == 0x5f2d && gb->sp == sp0_) goto after1_loadInterleavedTiles;
-  if (gb->pc == 0x5f63 && gb->sp == sp0_) goto after2_loadInterleavedTiles;
+  CYC(b_+207, b_+208); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+208, b_+210); H8(hFF8C) = A;
+  CYC(b_+210, b_+211); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+211, b_+213); H8(hFF8F) = A;
+  CYC(b_+213, b_+214); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+214, b_+216); H8(hFF8E) = A;
+  CYC(b_+216, b_+217); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+217, b_+218); push_effect(gb, HL);
+  CYC(b_+218, b_+219); push_effect(gb, BC);
+  CALL_C(b_+219, setInterleavedTile_hook, SYM(setInterleavedTile), b_+222);
+  CYC(b_+222, b_+223); SET_BC(pop_effect(gb));
+  CYC(b_+223, b_+224); SET_HL(pop_effect(gb));
+  CYC(b_+224, b_+225); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(b_+225, b_+227); goto next_loadInterleavedTiles; } // jr nz
+  CYC(b_+225, b_+227);
+  RET(b_+227);
+  if (gb->pc == b_+43 && gb->sp == sp0_) goto after1_loadInterleavedTiles;
+  if (gb->pc == b_+97 && gb->sp == sp0_) goto after2_loadInterleavedTiles;
   return; // ret
 
 // @param hl Pointer to data
 loadTiles:
-  CYC(0x5fe6, 0x5fe7); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x5fe7, 0x5fe8); B = A;
+  CYC(b_+228, b_+229); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+229, b_+230); B = A;
 
 next_loadTiles:
-  CYC(0x5fe8, 0x5fe9); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x5fe9, 0x5fea); C = A;
-  CYC(0x5fea, 0x5feb); A = mem_rd(gb, HL); // ld a,(hl)
-  CYC(0x5feb, 0x5fec); push_effect(gb, HL);
-  CYC(0x5fec, 0x5fed); push_effect(gb, BC);
-  CALL_C(0x5fed, setTile_hook, 0x3a9c, 0x5ff0);
-  CYC(0x5ff0, 0x5ff1); SET_BC(pop_effect(gb));
-  CYC(0x5ff1, 0x5ff2); SET_HL(pop_effect(gb));
-  CYC(0x5ff2, 0x5ff3); SET_HL(HL + 1); // inc hl
-  CYC(0x5ff3, 0x5ff4); SET_HL(HL + 1); // inc hl
-  CYC(0x5ff4, 0x5ff5); SET_HL(HL + 1); // inc hl
-  CYC(0x5ff5, 0x5ff6); B = alu_dec8(gb, B);
-  if (!(F & FZ)) { CYCT(0x5ff6, 0x5ff8); goto next_loadTiles; } // jr nz
-  CYC(0x5ff6, 0x5ff8);
-  RET(0x5ff8);
-  if (gb->pc == 0x5f47 && gb->sp == sp0_) goto after1_loadTiles;
-  if (gb->pc == 0x5f7f && gb->sp == sp0_) goto after2_loadTiles;
+  CYC(b_+230, b_+231); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+231, b_+232); C = A;
+  CYC(b_+232, b_+233); A = mem_rd(gb, HL); // ld a,(hl)
+  CYC(b_+233, b_+234); push_effect(gb, HL);
+  CYC(b_+234, b_+235); push_effect(gb, BC);
+  CALL_C(b_+235, setTile_hook, SYM(setTile), b_+238);
+  CYC(b_+238, b_+239); SET_BC(pop_effect(gb));
+  CYC(b_+239, b_+240); SET_HL(pop_effect(gb));
+  CYC(b_+240, b_+241); SET_HL(HL + 1); // inc hl
+  CYC(b_+241, b_+242); SET_HL(HL + 1); // inc hl
+  CYC(b_+242, b_+243); SET_HL(HL + 1); // inc hl
+  CYC(b_+243, b_+244); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(b_+244, b_+246); goto next_loadTiles; } // jr nz
+  CYC(b_+244, b_+246);
+  RET(b_+246);
+  if (gb->pc == b_+69 && gb->sp == sp0_) goto after1_loadTiles;
+  if (gb->pc == b_+125 && gb->sp == sp0_) goto after2_loadTiles;
   return; // ret
 
 // @param bc Pointer to poof position data
 loadPoofs:
-  CYC(0x5ff9, 0x5ffa); A = mem_rd(gb, BC);
-  CYC(0x5ffa, 0x5ffb); SET_BC(BC + 1); // inc bc
+  CYC(b_+247, b_+248); A = mem_rd(gb, BC);
+  CYC(b_+248, b_+249); SET_BC(BC + 1); // inc bc
 
 next_loadPoofs:
-  CYC(0x5ffb, 0x5ffd); H8(hFF8B) = A;
-  CALL_C(0x5ffd, getFreeInteractionSlot_hook, 0x3aef, 0x6000);
+  CYC(b_+249, b_+251); H8(hFF8B) = A;
+  CALL_C(b_+251, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+254);
   if (!(F & FZ)) {
-    RET_TAKEN(0x6000);
-    if (gb->pc == 0x5f33 && gb->sp == sp0_) goto after1_loadPoofs;
-    if (gb->pc == 0x5f4d && gb->sp == sp0_) goto after2_loadPoofs;
-    if (gb->pc == 0x5f69 && gb->sp == sp0_) goto after3_loadPoofs;
-    if (gb->pc == 0x5f85 && gb->sp == sp0_) goto after4_loadPoofs;
+    RET_TAKEN(b_+254);
+    if (gb->pc == b_+49 && gb->sp == sp0_) goto after1_loadPoofs;
+    if (gb->pc == b_+75 && gb->sp == sp0_) goto after2_loadPoofs;
+    if (gb->pc == b_+103 && gb->sp == sp0_) goto after3_loadPoofs;
+    if (gb->pc == b_+131 && gb->sp == sp0_) goto after4_loadPoofs;
     return;
   } // ret nz
-  CYC(0x6000, 0x6001);
-  CYC(0x6001, 0x6003); mem_wr(gb, HL, 0x05); // INTERAC_PUFF
-  CYC(0x6003, 0x6005); L = INTERACTION_BASE + OBJ_YH;
-  CYC(0x6005, 0x6006); A = mem_rd(gb, BC);
-  CYC(0x6006, 0x6007); mem_wr(gb, HL, A);
-  CYC(0x6007, 0x6008); SET_BC(BC + 1); // inc bc
-  CYC(0x6008, 0x600a); L = INTERACTION_BASE + OBJ_XH;
-  CYC(0x600a, 0x600b); A = mem_rd(gb, BC);
-  CYC(0x600b, 0x600c); mem_wr(gb, HL, A);
-  CYC(0x600c, 0x600d); SET_BC(BC + 1); // inc bc
-  CYC(0x600d, 0x600f); A = H8(hFF8B);
-  CYC(0x600f, 0x6010); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(0x6010, 0x6012); goto next_loadPoofs; } // jr nz
-  CYC(0x6010, 0x6012);
-  CYC(0x6012, 0x6014); A = 0x73; // SND_KILLENEMY
-  CYC(0x6014, 0x6017); playSound_b00_hook(gb);
-  if (gb->pc == 0x5f33 && gb->sp == sp0_) goto after1_loadPoofs;
-  if (gb->pc == 0x5f4d && gb->sp == sp0_) goto after2_loadPoofs;
-  if (gb->pc == 0x5f69 && gb->sp == sp0_) goto after3_loadPoofs;
-  if (gb->pc == 0x5f85 && gb->sp == sp0_) goto after4_loadPoofs;
+  CYC(b_+254, b_+255);
+  CYC(b_+255, b_+257); mem_wr(gb, HL, 0x05); // INTERAC_PUFF
+  CYC(b_+257, b_+259); L = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+259, b_+260); A = mem_rd(gb, BC);
+  CYC(b_+260, b_+261); mem_wr(gb, HL, A);
+  CYC(b_+261, b_+262); SET_BC(BC + 1); // inc bc
+  CYC(b_+262, b_+264); L = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+264, b_+265); A = mem_rd(gb, BC);
+  CYC(b_+265, b_+266); mem_wr(gb, HL, A);
+  CYC(b_+266, b_+267); SET_BC(BC + 1); // inc bc
+  CYC(b_+267, b_+269); A = H8(hFF8B);
+  CYC(b_+269, b_+270); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+270, b_+272); goto next_loadPoofs; } // jr nz
+  CYC(b_+270, b_+272);
+  CYC(b_+272, b_+274); A = 0x73; // SND_KILLENEMY
+  CYC(b_+274, SYM(interactionCode77)); playSound_b00_hook(gb);
+  if (gb->pc == b_+49 && gb->sp == sp0_) goto after1_loadPoofs;
+  if (gb->pc == b_+75 && gb->sp == sp0_) goto after2_loadPoofs;
+  if (gb->pc == b_+103 && gb->sp == sp0_) goto after3_loadPoofs;
+  if (gb->pc == b_+131 && gb->sp == sp0_) goto after4_loadPoofs;
   return; // jp
 }

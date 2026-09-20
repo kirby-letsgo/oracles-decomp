@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0e, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0e, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode54), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode54), (from), (to), true)
 
 void enemyCode54_hook(GB *gb);
 void ambiGuard_tossesLinkOut_hook(GB *gb);
@@ -78,171 +78,181 @@ static uint16_t ambiGuard_jump_table(GB *gb) {
 //          PART_DETECTION_HELPER.)
 // ==================================================================================================
 void enemyCode54_hook(GB *gb) {
+  BASE(enemyCode54);
   uint16_t sp0_ = gb->sp;
-  if (F & FZ) { CYCT(0x709e, 0x70a0); goto normalStatus; } // jr z
-  CYC(0x709e, 0x70a0);
-  CYC(0x70a0, 0x70a2); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(0x70a2); return; } // ret c
-  CYC(0x70a2, 0x70a3);
-  if (F & FZ) { CYCT(0x70a3, 0x70a6); ambiGuard_noHealth_hook(gb); return; } // jp z
-  CYC(0x70a3, 0x70a6);
-  CYC(0x70a6, 0x70a7); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(0x70a7, 0x70aa); ecom_updateKnockback_b0e_hook(gb); return; } // jp nz
-  CYC(0x70a7, 0x70aa);
-  CALL_C(0x70aa, ambiGuard_collisionOccured_hook, 0x7357, 0x70ad);
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+4); return; } // ret c
+  CYC(b_+4, b_+5);
+  if (F & FZ) { CYCT(b_+5, b_+8); ambiGuard_noHealth_hook(gb); return; } // jp z
+  CYC(b_+5, b_+8);
+  CYC(b_+8, b_+9); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+9, b_+12); ecom_updateKnockback_b0e_hook(gb); return; } // jp nz
+  CYC(b_+9, b_+12);
+  CALL_C(b_+12, ambiGuard_collisionOccured_hook, SYM(ambiGuard_collisionOccured), b_+15);
 
 normalStatus:
-  CYC(0x70ad, 0x70af); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x70af, 0x70b0); A = mem_rd(gb, DE);
-  CYC(0x70b0, 0x70b1); alu_rlca(gb);
-  if (F & FC) { CYCT(0x70b1, 0x70b4); ambiGuard_attacksLink_hook(gb); return; } // jp c
-  CYC(0x70b1, 0x70b4);
+  CYC(b_+15, b_+17); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+17, b_+18); A = mem_rd(gb, DE);
+  CYC(b_+18, b_+19); alu_rlca(gb);
+  if (F & FC) { CYCT(b_+19, SYM(ambiGuard_tossesLinkOut)); ambiGuard_attacksLink_hook(gb); return; } // jp c
+  CYC(b_+19, SYM(ambiGuard_tossesLinkOut));
   ambiGuard_tossesLinkOut_hook(gb); return; // fallthrough
 }
 
 // 0e:70b4, bare global; falls into from enemyCode54. Subids $00-$7f.
 void ambiGuard_tossesLinkOut_hook(GB *gb) {
+  BASE(ambiGuard_tossesLinkOut);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x70b4, ambiGuard_checkSpottedLink_hook, 0x72b5, 0x70b7);
-  CALL_C(0x70b7, ambiGuard_checkAlertTrigger_hook, 0x7269, 0x70ba);
-  CYC(0x70ba, 0x70bc); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x70bc, 0x70bd); A = mem_rd(gb, DE);
+  CALL_C(b_+0, ambiGuard_checkSpottedLink_hook, SYM(ambiGuard_checkSpottedLink), b_+3);
+  CALL_C(b_+3, ambiGuard_checkAlertTrigger_hook, SYM(ambiGuard_checkAlertTrigger), b_+6);
+  CYC(b_+6, b_+8); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+8, b_+9); A = mem_rd(gb, DE);
   {
-    CYC(0x70bd, 0x70be); push_effect(gb, 0x70be);
+    CYC(b_+9, b_+10); push_effect(gb, b_+10);
     uint16_t target = ambiGuard_jump_table(gb);
-    if (target == 0x70e2) { ambiGuard_tossesLinkOut_uninitialized_hook(gb); return; }
-    if (target == 0x7105) { ambiGuard_state_stub_hook(gb); return; }
-    if (target == 0x70f2) { ambiGuard_state_galeSeed_hook(gb); return; }
-    if (target == 0x7106) { ambiGuard_state8_hook(gb); return; }
-    if (target == 0x7119) { ambiGuard_state9_hook(gb); return; }
-    if (target == 0x712c) { ambiGuard_stateA_hook(gb); return; }
-    if (target == 0x713f) { ambiGuard_stateB_hook(gb); return; }
-    if (target == 0x7152) { ambiGuard_stateC_hook(gb); return; }
-    if (target == 0x715b) { ambiGuard_stateD_hook(gb); return; }
-    if (target == 0x7171) { ambiGuard_tossesLinkOut_stateF_hook(gb); return; }
-    if (target == 0x7180) { ambiGuard_tossesLinkOut_state10_hook(gb); return; }
-    if (target == 0x7196) { ambiGuard_tossesLinkOut_state11_hook(gb); return; }
+    if (target == SYM(ambiGuard_tossesLinkOut_uninitialized)) { ambiGuard_tossesLinkOut_uninitialized_hook(gb); return; }
+    if (target == SYM(ambiGuard_state_stub)) { ambiGuard_state_stub_hook(gb); return; }
+    if (target == SYM(ambiGuard_state_galeSeed)) { ambiGuard_state_galeSeed_hook(gb); return; }
+    if (target == SYM(ambiGuard_state8)) { ambiGuard_state8_hook(gb); return; }
+    if (target == SYM(ambiGuard_state9)) { ambiGuard_state9_hook(gb); return; }
+    if (target == SYM(ambiGuard_stateA)) { ambiGuard_stateA_hook(gb); return; }
+    if (target == SYM(ambiGuard_stateB)) { ambiGuard_stateB_hook(gb); return; }
+    if (target == SYM(ambiGuard_stateC)) { ambiGuard_stateC_hook(gb); return; }
+    if (target == SYM(ambiGuard_stateD)) { ambiGuard_stateD_hook(gb); return; }
+    if (target == SYM(ambiGuard_tossesLinkOut_stateF)) { ambiGuard_tossesLinkOut_stateF_hook(gb); return; }
+    if (target == SYM(ambiGuard_tossesLinkOut_state10)) { ambiGuard_tossesLinkOut_state10_hook(gb); return; }
+    if (target == SYM(ambiGuard_tossesLinkOut_state11)) { ambiGuard_tossesLinkOut_state11_hook(gb); return; }
     HANDOFF(target);
   }
 }
 
 // 0e:70e2, bare global; jump-table target from ambiGuard_tossesLinkOut.
 void ambiGuard_tossesLinkOut_uninitialized_hook(GB *gb) {
+  BASE(ambiGuard_tossesLinkOut_uninitialized);
   uint16_t sp0_ = gb->sp;
-  CYC(0x70e2, 0x70e5); SET_HL(0x73f2); // ambiGuard_tossesLinkOut_scriptTable
-  CALL_C(0x70e5, objectLoadMovementScript_hook, 0x3035, 0x70e8);
-  CALL_C(0x70e8, ambiGuard_commonInitialization_hook, 0x7228, 0x70eb);
-  if (!(F & FZ)) { RET_TAKEN(0x70eb); return; } // ret nz
-  CYC(0x70eb, 0x70ec);
-  CYC(0x70ec, 0x70ee); E = ENEMY_BASE + OBJ_DIRECTION;
-  CYC(0x70ee, 0x70ef); A = mem_rd(gb, DE);
-  CYC(0x70ef, 0x70f2); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+0, b_+3); SET_HL(SYM(ambiGuard_tossesLinkOut_scriptTable)); // ambiGuard_tossesLinkOut_scriptTable
+  CALL_C(b_+3, objectLoadMovementScript_hook, SYM(objectLoadMovementScript), b_+6);
+  CALL_C(b_+6, ambiGuard_commonInitialization_hook, SYM(ambiGuard_commonInitialization), b_+9);
+  if (!(F & FZ)) { RET_TAKEN(b_+9); return; } // ret nz
+  CYC(b_+9, b_+10);
+  CYC(b_+10, b_+12); E = ENEMY_BASE + OBJ_DIRECTION;
+  CYC(b_+12, b_+13); A = mem_rd(gb, DE);
+  CYC(b_+13, SYM(ambiGuard_state_galeSeed)); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:70f2, bare global; jump-table target from ambiGuard_tossesLinkOut/ambiGuard_attacksLink.
 // NOTE: Guards don't seem to react to gale seeds? Is this unused?
 void ambiGuard_state_galeSeed_hook(GB *gb) {
+  BASE(ambiGuard_state_galeSeed);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x70f2, ecom_galeSeedEffect_b0e_hook, 0x447b, 0x70f5);
-  if (F & FC) { RET_TAKEN(0x70f5); return; } // ret c
-  CYC(0x70f5, 0x70f6);
-  CYC(0x70f6, 0x70f8); E = ENEMY_BASE + OBJ_VAR34;
-  CYC(0x70f8, 0x70f9); A = mem_rd(gb, DE);
-  CYC(0x70f9, 0x70fa); alu_or(gb, A);
-  CYC(0x70fa, 0x70fc); E = ENEMY_BASE + OBJ_VAR35;
-  if (F & FZ) { CALL_C_CC(0x70fc, ambiGuard_alertAllGuards_hook, 0x7292, 0x70ff); } else { CYC(0x70fc, 0x70ff); } // call z
-  CALL_C(0x70ff, decNumEnemies_hook, 0x24b3, 0x7102);
-  CYC(0x7102, 0x7105); enemyDelete_hook(gb); return; // jp
+  CALL_C(b_+0, ecom_galeSeedEffect_b0e_hook, SYM(ecom_galeSeedEffect_b0e), b_+3);
+  if (F & FC) { RET_TAKEN(b_+3); return; } // ret c
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+6); E = ENEMY_BASE + OBJ_VAR34;
+  CYC(b_+6, b_+7); A = mem_rd(gb, DE);
+  CYC(b_+7, b_+8); alu_or(gb, A);
+  CYC(b_+8, b_+10); E = ENEMY_BASE + OBJ_VAR35;
+  if (F & FZ) { CALL_C_CC(b_+10, ambiGuard_alertAllGuards_hook, SYM(ambiGuard_alertAllGuards), b_+13); } else { CYC(b_+10, b_+13); } // call z
+  CALL_C(b_+13, decNumEnemies_hook, SYM(decNumEnemies), b_+16);
+  CYC(b_+16, SYM(ambiGuard_state_stub)); enemyDelete_hook(gb); return; // jp
 }
 
 // 0e:7105, bare global; jump-table target from ambiGuard_tossesLinkOut/ambiGuard_attacksLink.
 void ambiGuard_state_stub_hook(GB *gb) {
-  RET(0x7105); return; // ret
+  BASE(ambiGuard_state_stub);
+  RET(b_+0); return; // ret
 }
 
 // 0e:7106, bare global; jump-table target from ambiGuard_tossesLinkOut/ambiGuard_attacksLink.
 // Moving up.
 void ambiGuard_state8_hook(GB *gb) {
+  BASE(ambiGuard_state8);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7106, 0x7108); E = ENEMY_BASE + OBJ_VAR32;
-  CYC(0x7108, 0x7109); A = mem_rd(gb, DE);
-  CYC(0x7109, 0x710a); H = D;
-  CYC(0x710a, 0x710c); L = ENEMY_BASE + OBJ_YH;
-  CYC(0x710c, 0x710d); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FC)) { CYCT(0x710d, 0x710f); goto reachedDestination8; } // jr nc
-  CALL_C(0x710f, objectApplySpeed_hook, 0x201d, 0x7112);
-  CYC(0x7112, 0x7114); ambiGuard_animate_hook(gb); return; // jr
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_VAR32;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); H = D;
+  CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_YH;
+  CYC(b_+6, b_+7); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(b_+7, b_+9); goto reachedDestination8; } // jr nc
+  CALL_C(b_+9, objectApplySpeed_hook, SYM(objectApplySpeed), b_+12);
+  CYC(b_+12, b_+14); ambiGuard_animate_hook(gb); return; // jr
 
 reachedDestination8:
-  CYC(0x7114, 0x7115); A = mem_rd(gb, DE);
-  CYC(0x7115, 0x7116); mem_wr(gb, HL, A);
-  CYC(0x7116, 0x7119); ambiGuard_runMovementScript_hook(gb); return; // jp
+  CYC(b_+14, b_+15); A = mem_rd(gb, DE);
+  CYC(b_+15, b_+16); mem_wr(gb, HL, A);
+  CYC(b_+16, SYM(ambiGuard_state9)); ambiGuard_runMovementScript_hook(gb); return; // jp
 }
 
 // 0e:7119, bare global; jump-table target from ambiGuard_tossesLinkOut/ambiGuard_attacksLink.
 // Moving right.
 void ambiGuard_state9_hook(GB *gb) {
+  BASE(ambiGuard_state9);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7119, 0x711b); E = ENEMY_BASE + OBJ_XH;
-  CYC(0x711b, 0x711c); A = mem_rd(gb, DE);
-  CYC(0x711c, 0x711d); H = D;
-  CYC(0x711d, 0x711f); L = ENEMY_BASE + OBJ_VAR33;
-  CYC(0x711f, 0x7120); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FC)) { CYCT(0x7120, 0x7122); goto reachedDestination9; } // jr nc
-  CALL_C(0x7122, objectApplySpeed_hook, 0x201d, 0x7125);
-  CYC(0x7125, 0x7127); ambiGuard_animate_hook(gb); return; // jr
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_XH;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); H = D;
+  CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_VAR33;
+  CYC(b_+6, b_+7); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(b_+7, b_+9); goto reachedDestination9; } // jr nc
+  CALL_C(b_+9, objectApplySpeed_hook, SYM(objectApplySpeed), b_+12);
+  CYC(b_+12, b_+14); ambiGuard_animate_hook(gb); return; // jr
 
 reachedDestination9:
-  CYC(0x7127, 0x7128); A = mem_rd(gb, HL);
-  CYC(0x7128, 0x7129); mem_wr(gb, DE, A);
-  CYC(0x7129, 0x712c); ambiGuard_runMovementScript_hook(gb); return; // jp
+  CYC(b_+14, b_+15); A = mem_rd(gb, HL);
+  CYC(b_+15, b_+16); mem_wr(gb, DE, A);
+  CYC(b_+16, SYM(ambiGuard_stateA)); ambiGuard_runMovementScript_hook(gb); return; // jp
 }
 
 // 0e:712c, bare global; jump-table target from ambiGuard_tossesLinkOut/ambiGuard_attacksLink.
 // Moving down.
 void ambiGuard_stateA_hook(GB *gb) {
+  BASE(ambiGuard_stateA);
   uint16_t sp0_ = gb->sp;
-  CYC(0x712c, 0x712e); E = ENEMY_BASE + OBJ_YH;
-  CYC(0x712e, 0x712f); A = mem_rd(gb, DE);
-  CYC(0x712f, 0x7130); H = D;
-  CYC(0x7130, 0x7132); L = ENEMY_BASE + OBJ_VAR32;
-  CYC(0x7132, 0x7133); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FC)) { CYCT(0x7133, 0x7135); goto reachedDestinationA; } // jr nc
-  CALL_C(0x7135, objectApplySpeed_hook, 0x201d, 0x7138);
-  CYC(0x7138, 0x713a); ambiGuard_animate_hook(gb); return; // jr
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_YH;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); H = D;
+  CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_VAR32;
+  CYC(b_+6, b_+7); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(b_+7, b_+9); goto reachedDestinationA; } // jr nc
+  CALL_C(b_+9, objectApplySpeed_hook, SYM(objectApplySpeed), b_+12);
+  CYC(b_+12, b_+14); ambiGuard_animate_hook(gb); return; // jr
 
 reachedDestinationA:
-  CYC(0x713a, 0x713b); A = mem_rd(gb, HL);
-  CYC(0x713b, 0x713c); mem_wr(gb, DE, A);
-  CYC(0x713c, 0x713f); ambiGuard_runMovementScript_hook(gb); return; // jp
+  CYC(b_+14, b_+15); A = mem_rd(gb, HL);
+  CYC(b_+15, b_+16); mem_wr(gb, DE, A);
+  CYC(b_+16, SYM(ambiGuard_stateB)); ambiGuard_runMovementScript_hook(gb); return; // jp
 }
 
 // 0e:713f, bare global; jump-table target from ambiGuard_tossesLinkOut/ambiGuard_attacksLink.
 // Moving left.
 void ambiGuard_stateB_hook(GB *gb) {
+  BASE(ambiGuard_stateB);
   uint16_t sp0_ = gb->sp;
-  CYC(0x713f, 0x7141); E = ENEMY_BASE + OBJ_VAR33;
-  CYC(0x7141, 0x7142); A = mem_rd(gb, DE);
-  CYC(0x7142, 0x7143); H = D;
-  CYC(0x7143, 0x7145); L = ENEMY_BASE + OBJ_XH;
-  CYC(0x7145, 0x7146); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FC)) { CYCT(0x7146, 0x7148); goto reachedDestinationB; } // jr nc
-  CALL_C(0x7148, objectApplySpeed_hook, 0x201d, 0x714b);
-  CYC(0x714b, 0x714d); ambiGuard_animate_hook(gb); return; // jr
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_VAR33;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); H = D;
+  CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_XH;
+  CYC(b_+6, b_+7); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(b_+7, b_+9); goto reachedDestinationB; } // jr nc
+  CALL_C(b_+9, objectApplySpeed_hook, SYM(objectApplySpeed), b_+12);
+  CYC(b_+12, b_+14); ambiGuard_animate_hook(gb); return; // jr
 
 reachedDestinationB:
-  CYC(0x714d, 0x714e); A = mem_rd(gb, DE);
-  CYC(0x714e, 0x714f); mem_wr(gb, HL, A);
-  CYC(0x714f, 0x7152); ambiGuard_runMovementScript_hook(gb); return; // jp
+  CYC(b_+14, b_+15); A = mem_rd(gb, DE);
+  CYC(b_+15, b_+16); mem_wr(gb, HL, A);
+  CYC(b_+16, SYM(ambiGuard_stateC)); ambiGuard_runMovementScript_hook(gb); return; // jp
 }
 
 // 0e:7152, bare global; jump-table target from ambiGuard_tossesLinkOut/ambiGuard_attacksLink
 // (also as ambiGuard_stateE, an identical entry further down the same jump table). Waiting.
 void ambiGuard_stateC_hook(GB *gb) {
+  BASE(ambiGuard_stateC);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7152, ecom_decCounter1_b0e_hook, 0x439a, 0x7155);
-  if (F & FZ) { CYCT(0x7155, 0x7158); ambiGuard_runMovementScript_hook(gb); return; } // jp z
-  CYC(0x7155, 0x7158);
+  CALL_C(b_+0, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+3);
+  if (F & FZ) { CYCT(b_+3, SYM(ambiGuard_animate)); ambiGuard_runMovementScript_hook(gb); return; } // jp z
+  CYC(b_+3, SYM(ambiGuard_animate));
   ambiGuard_animate_hook(gb); return; // fallthrough
 }
 
@@ -255,182 +265,193 @@ void ambiGuard_stateE_hook(GB *gb) {
 // 0e:7158, bare global; falls into from ambiGuard_stateC/E, also reached via tail-jump from
 // ambiGuard_state8/9/A/B.
 void ambiGuard_animate_hook(GB *gb) {
-  CYC(0x7158, 0x715b); enemyAnimate_hook(gb); return; // jp
+  BASE(ambiGuard_animate);
+  CYC(b_+0, SYM(ambiGuard_stateD)); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:715b, bare global; jump-table target from ambiGuard_tossesLinkOut/ambiGuard_attacksLink.
 // Standing in place for [counter1] frames, then turn the other way for 30 frames, then
 // resume movement.
 void ambiGuard_stateD_hook(GB *gb) {
+  BASE(ambiGuard_stateD);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x715b, ecom_decCounter1_b0e_hook, 0x439a, 0x715e);
-  if (!(F & FZ)) { RET_TAKEN(0x715e); return; } // ret nz
-  CYC(0x715e, 0x715f);
-  CYC(0x715f, 0x7160); L = E;
-  CYC(0x7160, 0x7161); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(0x7161, 0x7163); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x7163, 0x7165); mem_wr(gb, HL, 0x1e); // 30
-  CYC(0x7165, 0x7167); L = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x7167, 0x7168); A = mem_rd(gb, HL);
-  CYC(0x7168, 0x716a); alu_xor(gb, 0x10);
-  CYC(0x716a, 0x716b); mem_wr(gb, HL, A);
-  CYC(0x716b, 0x716d); A = alu_swap(gb, A);
-  CYC(0x716d, 0x716e); alu_rlca(gb);
-  CYC(0x716e, 0x7171); enemySetAnimation_hook(gb); return; // jp
+  CALL_C(b_+0, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; } // ret nz
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+5); L = E;
+  CYC(b_+5, b_+6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+6, b_+8); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+8, b_+10); mem_wr(gb, HL, 0x1e); // 30
+  CYC(b_+10, b_+12); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+12, b_+13); A = mem_rd(gb, HL);
+  CYC(b_+13, b_+15); alu_xor(gb, 0x10);
+  CYC(b_+15, b_+16); mem_wr(gb, HL, A);
+  CYC(b_+16, b_+18); A = alu_swap(gb, A);
+  CYC(b_+18, b_+19); alu_rlca(gb);
+  CYC(b_+19, SYM(ambiGuard_tossesLinkOut_stateF)); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:7171, bare global; jump-table target from ambiGuard_tossesLinkOut. Begin moving toward
 // Link after noticing him.
 void ambiGuard_tossesLinkOut_stateF_hook(GB *gb) {
+  BASE(ambiGuard_tossesLinkOut_stateF);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7171, 0x7172); H = D;
-  CYC(0x7172, 0x7173); L = E;
-  CYC(0x7173, 0x7174); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(0x7174, 0x7176); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x7176, 0x7178); mem_wr(gb, HL, 0x5a); // 90
-  CALL_C(0x7178, ambiGuard_turnToFaceLink_hook, 0x720f, 0x717b);
-  CYC(0x717b, 0x717d); A = 0xcc; // SND_WHISTLE
-  CYC(0x717d, 0x7180); playSound_b00_hook(gb); return; // jp
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+2); L = E;
+  CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 0x5a); // 90
+  CALL_C(b_+7, ambiGuard_turnToFaceLink_hook, SYM(ambiGuard_turnToFaceLink), b_+10);
+  CYC(b_+10, b_+12); A = 0xcc; // SND_WHISTLE
+  CYC(b_+12, SYM(ambiGuard_tossesLinkOut_state10)); playSound_b00_hook(gb); return; // jp
 }
 
 // 0e:7180, bare global; jump-table target from ambiGuard_tossesLinkOut. Moving toward Link
 // until the screen fades out and Link gets booted out.
 void ambiGuard_tossesLinkOut_state10_hook(GB *gb) {
+  BASE(ambiGuard_tossesLinkOut_state10);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7180, enemyAnimate_hook, 0x2818, 0x7183);
-  CALL_C(0x7183, ecom_decCounter1_b0e_hook, 0x439a, 0x7186);
-  if (F & FZ) { CYCT(0x7186, 0x7188); goto boot; } // jr z
-  CYC(0x7186, 0x7188);
-  CYC(0x7188, 0x718a); C = 0x18;
-  CALL_C(0x718a, objectCheckLinkWithinDistance_hook, 0x1fa2, 0x718d);
-  if (!(F & FC)) { CYCT(0x718d, 0x7190); ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook(gb); return; } // jp nc
-  CYC(0x718d, 0x7190);
+  CALL_C(b_+0, enemyAnimate_hook, SYM(enemyAnimate), b_+3);
+  CALL_C(b_+3, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+6);
+  if (F & FZ) { CYCT(b_+6, b_+8); goto boot; } // jr z
+  CYC(b_+6, b_+8);
+  CYC(b_+8, b_+10); C = 0x18;
+  CALL_C(b_+10, objectCheckLinkWithinDistance_hook, SYM(objectCheckLinkWithinDistance), b_+13);
+  if (!(F & FC)) { CYCT(b_+13, b_+16); ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook(gb); return; } // jp nc
+  CYC(b_+13, b_+16);
 
 boot:
-  CYC(0x7190, 0x7192); A = 0x14; // CUTSCENE_BOOTED_FROM_PALACE
-  CYC(0x7192, 0x7195); mem_wr(gb, wCutsceneTrigger, A);
-  RET(0x7195); return; // ret
+  CYC(b_+16, b_+18); A = 0x14; // CUTSCENE_BOOTED_FROM_PALACE
+  CYC(b_+18, b_+21); mem_wr(gb, wCutsceneTrigger, A);
+  RET(b_+21); return; // ret
 }
 
 // 0e:7196, bare global; jump-table target from ambiGuard_tossesLinkOut.
 void ambiGuard_tossesLinkOut_state11_hook(GB *gb) {
-  RET(0x7196); return; // ret
+  BASE(ambiGuard_tossesLinkOut_state11);
+  RET(b_+0); return; // ret
 }
 
 // 0e:7197, bare global; jump-table target from enemyCode54.
 void ambiGuard_attacksLink_hook(GB *gb) {
+  BASE(ambiGuard_attacksLink);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7197, ambiGuard_checkSpottedLink_hook, 0x72b5, 0x719a);
-  CALL_C(0x719a, ambiGuard_checkAlertTrigger_hook, 0x7269, 0x719d);
-  CYC(0x719d, 0x719f); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x719f, 0x71a0); A = mem_rd(gb, DE);
+  CALL_C(b_+0, ambiGuard_checkSpottedLink_hook, SYM(ambiGuard_checkSpottedLink), b_+3);
+  CALL_C(b_+3, ambiGuard_checkAlertTrigger_hook, SYM(ambiGuard_checkAlertTrigger), b_+6);
+  CYC(b_+6, b_+8); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+8, b_+9); A = mem_rd(gb, DE);
   {
-    CYC(0x71a0, 0x71a1); push_effect(gb, 0x71a1);
+    CYC(b_+9, b_+10); push_effect(gb, b_+10);
     uint16_t target = ambiGuard_jump_table(gb);
-    if (target == 0x71c5) { ambiGuard_attacksLink_state_uninitialized_hook(gb); return; }
-    if (target == 0x7105) { ambiGuard_state_stub_hook(gb); return; }
-    if (target == 0x70f2) { ambiGuard_state_galeSeed_hook(gb); return; }
-    if (target == 0x7106) { ambiGuard_state8_hook(gb); return; }
-    if (target == 0x7119) { ambiGuard_state9_hook(gb); return; }
-    if (target == 0x712c) { ambiGuard_stateA_hook(gb); return; }
-    if (target == 0x713f) { ambiGuard_stateB_hook(gb); return; }
-    if (target == 0x7152) { ambiGuard_stateC_hook(gb); return; }
-    if (target == 0x715b) { ambiGuard_stateD_hook(gb); return; }
-    if (target == 0x71df) { ambiGuard_attacksLink_stateF_hook(gb); return; }
-    if (target == 0x71ef) { ambiGuard_attacksLink_state10_hook(gb); return; }
-    if (target == 0x7218) { ambiGuard_attacksLink_state11_hook(gb); return; }
+    if (target == SYM(ambiGuard_attacksLink_state_uninitialized)) { ambiGuard_attacksLink_state_uninitialized_hook(gb); return; }
+    if (target == SYM(ambiGuard_state_stub)) { ambiGuard_state_stub_hook(gb); return; }
+    if (target == SYM(ambiGuard_state_galeSeed)) { ambiGuard_state_galeSeed_hook(gb); return; }
+    if (target == SYM(ambiGuard_state8)) { ambiGuard_state8_hook(gb); return; }
+    if (target == SYM(ambiGuard_state9)) { ambiGuard_state9_hook(gb); return; }
+    if (target == SYM(ambiGuard_stateA)) { ambiGuard_stateA_hook(gb); return; }
+    if (target == SYM(ambiGuard_stateB)) { ambiGuard_stateB_hook(gb); return; }
+    if (target == SYM(ambiGuard_stateC)) { ambiGuard_stateC_hook(gb); return; }
+    if (target == SYM(ambiGuard_stateD)) { ambiGuard_stateD_hook(gb); return; }
+    if (target == SYM(ambiGuard_attacksLink_stateF)) { ambiGuard_attacksLink_stateF_hook(gb); return; }
+    if (target == SYM(ambiGuard_attacksLink_state10)) { ambiGuard_attacksLink_state10_hook(gb); return; }
+    if (target == SYM(ambiGuard_attacksLink_state11)) { ambiGuard_attacksLink_state11_hook(gb); return; }
     HANDOFF(target);
   }
 }
 
 // 0e:71c5, bare global; jump-table target from ambiGuard_attacksLink.
 void ambiGuard_attacksLink_state_uninitialized_hook(GB *gb) {
+  BASE(ambiGuard_attacksLink_state_uninitialized);
   uint16_t sp0_ = gb->sp;
-  CYC(0x71c5, 0x71c6); H = D;
-  CYC(0x71c6, 0x71c8); L = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x71c8, 0x71ca); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
-  CYC(0x71ca, 0x71cd); SET_HL(0x7505); // ambiGuard_attacksLink_scriptTable
-  CALL_C(0x71cd, objectLoadMovementScript_hook, 0x3035, 0x71d0);
-  CYC(0x71d0, 0x71d1); H = D;
-  CYC(0x71d1, 0x71d3); L = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x71d3, 0x71d5); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
-  CALL_C(0x71d5, ambiGuard_commonInitialization_hook, 0x7228, 0x71d8);
-  if (!(F & FZ)) { RET_TAKEN(0x71d8); return; } // ret nz
-  CYC(0x71d8, 0x71d9);
-  CYC(0x71d9, 0x71db); E = ENEMY_BASE + OBJ_DIRECTION;
-  CYC(0x71db, 0x71dc); A = mem_rd(gb, DE);
-  CYC(0x71dc, 0x71df); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+3, b_+5); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
+  CYC(b_+5, b_+8); SET_HL(SYM(ambiGuard_attacksLink_scriptTable)); // ambiGuard_attacksLink_scriptTable
+  CALL_C(b_+8, objectLoadMovementScript_hook, SYM(objectLoadMovementScript), b_+11);
+  CYC(b_+11, b_+12); H = D;
+  CYC(b_+12, b_+14); L = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+14, b_+16); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
+  CALL_C(b_+16, ambiGuard_commonInitialization_hook, SYM(ambiGuard_commonInitialization), b_+19);
+  if (!(F & FZ)) { RET_TAKEN(b_+19); return; } // ret nz
+  CYC(b_+19, b_+20);
+  CYC(b_+20, b_+22); E = ENEMY_BASE + OBJ_DIRECTION;
+  CYC(b_+22, b_+23); A = mem_rd(gb, DE);
+  CYC(b_+23, SYM(ambiGuard_attacksLink_stateF)); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:71df, bare global; jump-table target from ambiGuard_attacksLink. Just noticed Link.
 void ambiGuard_attacksLink_stateF_hook(GB *gb) {
+  BASE(ambiGuard_attacksLink_stateF);
   uint16_t sp0_ = gb->sp;
-  CYC(0x71df, 0x71e0); H = D;
-  CYC(0x71e0, 0x71e1); L = E;
-  CYC(0x71e1, 0x71e2); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(0x71e2, 0x71e4); L = ENEMY_BASE + OBJ_COUNTER2;
-  CYC(0x71e4, 0x71e5); A = mem_rd(gb, HL);
-  CYC(0x71e5, 0x71e6); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x71e6, 0x71e8); goto haveCounter2; } // jr nz
-  CYC(0x71e6, 0x71e8);
-  CYC(0x71e8, 0x71ea); mem_wr(gb, HL, 0x3c); // 60
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+2); L = E;
+  CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_COUNTER2;
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL);
+  CYC(b_+6, b_+7); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+7, b_+9); goto haveCounter2; } // jr nz
+  CYC(b_+7, b_+9);
+  CYC(b_+9, b_+11); mem_wr(gb, HL, 0x3c); // 60
 
 haveCounter2:
-  CALL_C(0x71ea, ambiGuard_createExclamationMark_hook, 0x734f, 0x71ed);
-  CYC(0x71ed, 0x71ef); ambiGuard_turnToFaceLink_hook(gb); return; // jr
+  CALL_C(b_+11, ambiGuard_createExclamationMark_hook, SYM(ambiGuard_createExclamationMark), b_+14);
+  CYC(b_+14, SYM(ambiGuard_attacksLink_state10)); ambiGuard_turnToFaceLink_hook(gb); return; // jr
 }
 
 // 0e:71ef, bare global; jump-table target from ambiGuard_attacksLink. Looking at Link;
 // counting down until he starts chasing him.
 void ambiGuard_attacksLink_state10_hook(GB *gb) {
+  BASE(ambiGuard_attacksLink_state10);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x71ef, ecom_decCounter2_b0e_hook, 0x43a3, 0x71f2);
-  if (F & FZ) { CYCT(0x71f2, 0x71f4); goto beginChasing; } // jr z
-  CYC(0x71f2, 0x71f4);
-  CYC(0x71f4, 0x71f5); A = mem_rd(gb, HL);
-  CYC(0x71f5, 0x71f7); alu_cp(gb, 0x3c); // 60
-  if (!(F & FZ)) { RET_TAKEN(0x71f7); return; } // ret nz
-  CYC(0x71f7, 0x71f8);
-  CYC(0x71f8, 0x71fa); A = 0xcc; // SND_WHISTLE
-  CALL_C(0x71fa, playSound_b00_hook, 0x0c98, 0x71fd);
-  CYC(0x71fd, 0x71ff); E = ENEMY_BASE + OBJ_VAR34;
-  CYC(0x71ff, 0x7202); ambiGuard_alertAllGuards_hook(gb); return; // jp
+  CALL_C(b_+0, ecom_decCounter2_b0e_hook, SYM(ecom_decCounter2_b0e), b_+3);
+  if (F & FZ) { CYCT(b_+3, b_+5); goto beginChasing; } // jr z
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL);
+  CYC(b_+6, b_+8); alu_cp(gb, 0x3c); // 60
+  if (!(F & FZ)) { RET_TAKEN(b_+8); return; } // ret nz
+  CYC(b_+8, b_+9);
+  CYC(b_+9, b_+11); A = 0xcc; // SND_WHISTLE
+  CALL_C(b_+11, playSound_b00_hook, SYM(playSound_b00), b_+14);
+  CYC(b_+14, b_+16); E = ENEMY_BASE + OBJ_VAR34;
+  CYC(b_+16, b_+19); ambiGuard_alertAllGuards_hook(gb); return; // jp
 
 beginChasing:
-  CYC(0x7202, 0x7203); L = alu_dec8(gb, L);
-  CYC(0x7203, 0x7205); mem_wr(gb, HL, 0x14); // [counter1] = 20
-  CYC(0x7205, 0x7206); L = E;
-  CYC(0x7206, 0x7207); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(0x7207, 0x7209); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x7209, 0x720b); mem_wr(gb, HL, 0x3c); // SPEED_180
-  CYC(0x720b, 0x720d); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
-  CYC(0x720d, 0x720f); mem_wr(gb, HL, 0x3d); // ENEMYCOLLISION_AMBI_GUARD_CHASING_LINK
+  CYC(b_+19, b_+20); L = alu_dec8(gb, L);
+  CYC(b_+20, b_+22); mem_wr(gb, HL, 0x14); // [counter1] = 20
+  CYC(b_+22, b_+23); L = E;
+  CYC(b_+23, b_+24); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+24, b_+26); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+26, b_+28); mem_wr(gb, HL, 0x3c); // SPEED_180
+  CYC(b_+28, b_+30); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
+  CYC(b_+30, SYM(ambiGuard_turnToFaceLink)); mem_wr(gb, HL, 0x3d); // ENEMYCOLLISION_AMBI_GUARD_CHASING_LINK
   ambiGuard_turnToFaceLink_hook(gb); return; // fallthrough
 }
 
 // 0e:720f, bare global; falls into from ambiGuard_attacksLink_state10, also called from
 // several other states.
 void ambiGuard_turnToFaceLink_hook(GB *gb) {
+  BASE(ambiGuard_turnToFaceLink);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x720f, ecom_updateCardinalAngleTowardTarget_b0e_hook, 0x43b4, 0x7212);
-  CYC(0x7212, 0x7214); A = alu_swap(gb, A);
-  CYC(0x7214, 0x7215); alu_rlca(gb);
-  CYC(0x7215, 0x7218); enemySetAnimation_hook(gb); return; // jp
+  CALL_C(b_+0, ecom_updateCardinalAngleTowardTarget_b0e_hook, SYM(ecom_updateCardinalAngleTowardTarget_b0e), b_+3);
+  CYC(b_+3, b_+5); A = alu_swap(gb, A);
+  CYC(b_+5, b_+6); alu_rlca(gb);
+  CYC(b_+6, SYM(ambiGuard_attacksLink_state11)); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:7218, bare global; jump-table target from ambiGuard_attacksLink. Currently chasing
 // Link.
 void ambiGuard_attacksLink_state11_hook(GB *gb) {
+  BASE(ambiGuard_attacksLink_state11);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7218, ecom_decCounter1_b0e_hook, 0x439a, 0x721b);
-  if (!(F & FZ)) { CYCT(0x721b, 0x721d); goto stillChasing; } // jr nz
-  CYC(0x721b, 0x721d);
-  CYC(0x721d, 0x721f); mem_wr(gb, HL, 0x14); // [counter1] = 20
-  CALL_C(0x721f, ambiGuard_turnToFaceLink_hook, 0x720f, 0x7222);
+  CALL_C(b_+0, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); goto stillChasing; } // jr nz
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 0x14); // [counter1] = 20
+  CALL_C(b_+7, ambiGuard_turnToFaceLink_hook, SYM(ambiGuard_turnToFaceLink), b_+10);
 
 stillChasing:
-  CALL_C(0x7222, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, 0x4156, 0x7225);
-  CYC(0x7225, 0x7228); enemyAnimate_hook(gb); return; // jp
+  CALL_C(b_+10, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0e), b_+13);
+  CYC(b_+13, SYM(ambiGuard_commonInitialization)); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:7228, bare global; called from ambiGuard_tossesLinkOut_uninitialized and
@@ -438,56 +459,58 @@ stillChasing:
 // spawns PART_DETECTION_HELPER.
 // @param[out] zflag nz if caller should return immediately (deleted self)
 void ambiGuard_commonInitialization_hook(GB *gb) {
+  BASE(ambiGuard_commonInitialization);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7228, 0x722b); SET_HL(wGroup4RoomFlags + 0xfc);
-  CYC(0x722b, 0x722d); alu_bit(gb, 7, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(0x722d, 0x722f); goto notDefeated; } // jr z
-  CALL_C(0x722f, enemyDelete_hook, 0x2e47, 0x7232);
-  CYC(0x7232, 0x7233); alu_or(gb, D);
-  RET(0x7233); return; // ret
+  CYC(b_+0, b_+3); SET_HL(wGroup4RoomFlags + 0xfc);
+  CYC(b_+3, b_+5); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+5, b_+7); goto notDefeated; } // jr z
+  CALL_C(b_+7, enemyDelete_hook, SYM(enemyDelete), b_+10);
+  CYC(b_+10, b_+11); alu_or(gb, D);
+  RET(b_+11); return; // ret
 
 notDefeated:
-  CALL_C(0x7234, getFreePartSlot_hook, 0x3e8e, 0x7237);
-  if (!(F & FZ)) { CYCT(0x7237, 0x7239); goto noFreeSlot; } // jr nz
-  CYC(0x7237, 0x7239);
-  CYC(0x7239, 0x723b); mem_wr(gb, HL, 0x0e); // PART_DETECTION_HELPER
-  CYC(0x723b, 0x723d); L = PART_BASE + OBJ_RELATED1;
-  CYC(0x723d, 0x723f); A = 0x80; // Enemy.start == ENEMY_BASE
-  CYC(0x723f, 0x7240); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x7240, 0x7241); mem_wr(gb, HL, D);
-  CYC(0x7241, 0x7243); E = ENEMY_BASE + OBJ_RELATED2;
-  CYC(0x7243, 0x7245); A = 0xc0; // Part.start == PART_BASE
-  CYC(0x7245, 0x7246); mem_wr(gb, DE, A);
-  CYC(0x7246, 0x7247); E = alu_inc8(gb, E);
-  CYC(0x7247, 0x7248); A = H;
-  CYC(0x7248, 0x7249); mem_wr(gb, DE, A);
-  CYC(0x7249, 0x724a); H = D;
-  CYC(0x724a, 0x724c); L = ENEMY_BASE + OBJ_DIRECTION;
-  CYC(0x724c, 0x724d); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x724d, 0x724f); A = alu_swap(gb, A);
-  CYC(0x724f, 0x7250); alu_rrca(gb);
-  CYC(0x7250, 0x7251); mem_wr(gb, HL, A);
-  CALL_C(0x7251, objectSetVisiblec2_hook, 0x1e45, 0x7254);
-  CYC(0x7254, 0x7255); alu_xor(gb, A);
-  RET(0x7255); return; // ret
+  CALL_C(b_+12, getFreePartSlot_hook, SYM(getFreePartSlot), b_+15);
+  if (!(F & FZ)) { CYCT(b_+15, b_+17); goto noFreeSlot; } // jr nz
+  CYC(b_+15, b_+17);
+  CYC(b_+17, b_+19); mem_wr(gb, HL, 0x0e); // PART_DETECTION_HELPER
+  CYC(b_+19, b_+21); L = PART_BASE + OBJ_RELATED1;
+  CYC(b_+21, b_+23); A = 0x80; // Enemy.start == ENEMY_BASE
+  CYC(b_+23, b_+24); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+24, b_+25); mem_wr(gb, HL, D);
+  CYC(b_+25, b_+27); E = ENEMY_BASE + OBJ_RELATED2;
+  CYC(b_+27, b_+29); A = 0xc0; // Part.start == PART_BASE
+  CYC(b_+29, b_+30); mem_wr(gb, DE, A);
+  CYC(b_+30, b_+31); E = alu_inc8(gb, E);
+  CYC(b_+31, b_+32); A = H;
+  CYC(b_+32, b_+33); mem_wr(gb, DE, A);
+  CYC(b_+33, b_+34); H = D;
+  CYC(b_+34, b_+36); L = ENEMY_BASE + OBJ_DIRECTION;
+  CYC(b_+36, b_+37); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+37, b_+39); A = alu_swap(gb, A);
+  CYC(b_+39, b_+40); alu_rrca(gb);
+  CYC(b_+40, b_+41); mem_wr(gb, HL, A);
+  CALL_C(b_+41, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+44);
+  CYC(b_+44, b_+45); alu_xor(gb, A);
+  RET(b_+45); return; // ret
 
 noFreeSlot:
-  CYC(0x7256, 0x7258); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x7258, 0x7259); alu_xor(gb, A);
-  CYC(0x7259, 0x725a); mem_wr(gb, DE, A);
-  RET(0x725a); return; // ret
+  CYC(b_+46, b_+48); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+48, b_+49); alu_xor(gb, A);
+  CYC(b_+49, b_+50); mem_wr(gb, DE, A);
+  RET(b_+50); return; // ret
 }
 
 // 0e:725b, bare global; called from several states after a movement script step.
 void ambiGuard_runMovementScript_hook(GB *gb) {
+  BASE(ambiGuard_runMovementScript);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x725b, objectRunMovementScript_hook, 0x3049, 0x725e);
-  CYC(0x725e, 0x7260); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x7260, 0x7261); A = mem_rd(gb, DE);
-  CYC(0x7261, 0x7263); alu_and(gb, 0x18);
-  CYC(0x7263, 0x7265); A = alu_swap(gb, A);
-  CYC(0x7265, 0x7266); alu_rlca(gb);
-  CYC(0x7266, 0x7269); enemySetAnimation_hook(gb); return; // jp
+  CALL_C(b_+0, objectRunMovementScript_hook, SYM(objectRunMovementScript), b_+3);
+  CYC(b_+3, b_+5); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+8); alu_and(gb, 0x18);
+  CYC(b_+8, b_+10); A = alu_swap(gb, A);
+  CYC(b_+10, b_+11); alu_rlca(gb);
+  CYC(b_+11, SYM(ambiGuard_checkAlertTrigger)); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:7269, bare global; called from ambiGuard_tossesLinkOut and ambiGuard_attacksLink. When
@@ -496,40 +519,41 @@ void ambiGuard_runMovementScript_hook(GB *gb) {
 // alerted this way. As long as var36 is nonzero, this "returns from caller" (discards the
 // return address).
 void ambiGuard_checkAlertTrigger_hook(GB *gb) {
+  BASE(ambiGuard_checkAlertTrigger);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7269, 0x726a); H = D;
-  CYC(0x726a, 0x726c); L = ENEMY_BASE + OBJ_VAR36;
-  CYC(0x726c, 0x726d); A = mem_rd(gb, HL);
-  CYC(0x726d, 0x726e); alu_or(gb, A);
-  if (F & FZ) { RET_TAKEN(0x726e); return; } // ret z
-  CYC(0x726e, 0x726f);
-  SET_BC(POP(0x726f)); // pop bc -- discard caller's return address
-  CYC(0x7270, 0x7271); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x7271, 0x7272); A = mem_rd(gb, HL);
-  CYC(0x7272, 0x7273); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(0x7273, 0x7275); goto stillCountingDown; } // jr nz
-  CYC(0x7273, 0x7275);
-  CYC(0x7275, 0x7277); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x7277, 0x7278); A = mem_rd(gb, HL);
-  CYC(0x7278, 0x727a); alu_sub(gb, 0x08);
-  CYC(0x727a, 0x727c); alu_cp(gb, 0x04);
-  if (!(F & FC)) { RET_TAKEN(0x727c); return; } // ret nc
-  CYC(0x727c, 0x727d);
-  CYC(0x727d, 0x727e); B = A;
-  CYC(0x727e, 0x7280); A = alu_swap(gb, A);
-  CYC(0x7280, 0x7281); alu_rrca(gb);
-  CYC(0x7281, 0x7283); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x7283, 0x7284); mem_wr(gb, DE, A);
-  CYC(0x7284, 0x7285); A = B;
-  CYC(0x7285, 0x7288); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = ENEMY_BASE + OBJ_VAR36;
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
+  CYC(b_+4, b_+5); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+5); return; } // ret z
+  CYC(b_+5, b_+6);
+  SET_BC(POP(b_+6)); // pop bc -- discard caller's return address
+  CYC(b_+7, b_+8); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+8, b_+9); A = mem_rd(gb, HL);
+  CYC(b_+9, b_+10); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+10, b_+12); goto stillCountingDown; } // jr nz
+  CYC(b_+10, b_+12);
+  CYC(b_+12, b_+14); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+14, b_+15); A = mem_rd(gb, HL);
+  CYC(b_+15, b_+17); alu_sub(gb, 0x08);
+  CYC(b_+17, b_+19); alu_cp(gb, 0x04);
+  if (!(F & FC)) { RET_TAKEN(b_+19); return; } // ret nc
+  CYC(b_+19, b_+20);
+  CYC(b_+20, b_+21); B = A;
+  CYC(b_+21, b_+23); A = alu_swap(gb, A);
+  CYC(b_+23, b_+24); alu_rrca(gb);
+  CYC(b_+24, b_+26); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+26, b_+27); mem_wr(gb, DE, A);
+  CYC(b_+27, b_+28); A = B;
+  CYC(b_+28, b_+31); enemySetAnimation_hook(gb); return; // jp
 
 stillCountingDown:
-  CYC(0x7288, 0x728a); alu_cp(gb, 0x3b); // 59
-  if (!(F & FZ)) { RET_TAKEN(0x728a); return; } // ret nz
-  CYC(0x728a, 0x728b);
-  CYC(0x728b, 0x728d); A = 0xce; // SND_MAKU_TREE_PAST
-  CALL_C(0x728d, playSound_b00_hook, 0x0c98, 0x7290);
-  CYC(0x7290, 0x7292); E = ENEMY_BASE + OBJ_VAR35;
+  CYC(b_+31, b_+33); alu_cp(gb, 0x3b); // 59
+  if (!(F & FZ)) { RET_TAKEN(b_+33); return; } // ret nz
+  CYC(b_+33, b_+34);
+  CYC(b_+34, b_+36); A = 0xce; // SND_MAKU_TREE_PAST
+  CALL_C(b_+36, playSound_b00_hook, SYM(playSound_b00), b_+39);
+  CYC(b_+39, SYM(ambiGuard_alertAllGuards)); E = ENEMY_BASE + OBJ_VAR35;
   ambiGuard_alertAllGuards_hook(gb); return; // fallthrough
 }
 
@@ -538,204 +562,208 @@ stillCountingDown:
 // @param de Variable to set on the guards. "var34" to alert them to Link immediately,
 //           "var35" to make them patrol faster.
 void ambiGuard_alertAllGuards_hook(GB *gb) {
+  BASE(ambiGuard_alertAllGuards);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7292, 0x7295); SET_HL(0xd080); // FIRST_ENEMY_INDEX,Enemy.enabled
+  CYC(b_+0, b_+3); SET_HL((w1ReservedInteraction0_var3f + 1)); // FIRST_ENEMY_INDEX,Enemy.enabled
 
 nextGuard:
-  CYC(0x7295, 0x7297); L = ENEMY_BASE + OBJ_ID;
-  CYC(0x7297, 0x7298); A = mem_rd(gb, HL);
-  CYC(0x7298, 0x729a); alu_cp(gb, 0x54); // ENEMY_AMBI_GUARD
-  if (!(F & FZ)) { CYCT(0x729a, 0x729c); goto nextEnemy; } // jr nz
-  CYC(0x729a, 0x729c);
-  CYC(0x729c, 0x729d); A = H;
-  CYC(0x729d, 0x729e); alu_cp(gb, D);
-  if (F & FZ) { CYCT(0x729e, 0x72a0); goto nextEnemy; } // jr z
-  CYC(0x729e, 0x72a0);
-  CYC(0x72a0, 0x72a1); L = E;
-  CYC(0x72a1, 0x72a2); A = mem_rd(gb, HL);
-  CYC(0x72a2, 0x72a3); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x72a3, 0x72a5); goto nextEnemy; } // jr nz
-  CYC(0x72a3, 0x72a5);
-  CYC(0x72a5, 0x72a6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x72a6, 0x72a8); alu_bit(gb, 0, L);
-  if (F & FZ) { CYCT(0x72a8, 0x72aa); goto nextEnemy; } // jr z
-  CYC(0x72a8, 0x72aa);
-  CYC(0x72aa, 0x72ac); L = ENEMY_BASE + OBJ_VAR36;
-  CYC(0x72ac, 0x72ae); mem_wr(gb, HL, 0x3c); // 60
+  CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_ID;
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL);
+  CYC(b_+6, b_+8); alu_cp(gb, 0x54); // ENEMY_AMBI_GUARD
+  if (!(F & FZ)) { CYCT(b_+8, b_+10); goto nextEnemy; } // jr nz
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+11); A = H;
+  CYC(b_+11, b_+12); alu_cp(gb, D);
+  if (F & FZ) { CYCT(b_+12, b_+14); goto nextEnemy; } // jr z
+  CYC(b_+12, b_+14);
+  CYC(b_+14, b_+15); L = E;
+  CYC(b_+15, b_+16); A = mem_rd(gb, HL);
+  CYC(b_+16, b_+17); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+17, b_+19); goto nextEnemy; } // jr nz
+  CYC(b_+17, b_+19);
+  CYC(b_+19, b_+20); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+20, b_+22); alu_bit(gb, 0, L);
+  if (F & FZ) { CYCT(b_+22, b_+24); goto nextEnemy; } // jr z
+  CYC(b_+22, b_+24);
+  CYC(b_+24, b_+26); L = ENEMY_BASE + OBJ_VAR36;
+  CYC(b_+26, b_+28); mem_wr(gb, HL, 0x3c); // 60
 
 nextEnemy:
-  CYC(0x72ae, 0x72af); H = alu_inc8(gb, H);
-  CYC(0x72af, 0x72b0); A = H;
-  CYC(0x72b0, 0x72b2); alu_cp(gb, 0xe0); // LAST_ENEMY_INDEX+1
-  if (F & FC) { CYCT(0x72b2, 0x72b4); goto nextGuard; } // jr c
-  CYC(0x72b2, 0x72b4);
-  RET(0x72b4); return; // ret
+  CYC(b_+28, b_+29); H = alu_inc8(gb, H);
+  CYC(b_+29, b_+30); A = H;
+  CYC(b_+30, b_+32); alu_cp(gb, 0xe0); // LAST_ENEMY_INDEX+1
+  if (F & FC) { CYCT(b_+32, b_+34); goto nextGuard; } // jr c
+  CYC(b_+32, b_+34);
+  RET(b_+34); return; // ret
 }
 
 // 0e:72b5, bare global; called from ambiGuard_tossesLinkOut and ambiGuard_attacksLink.
 // Checks for spotting Link, among other things.
 void ambiGuard_checkSpottedLink_hook(GB *gb) {
+  BASE(ambiGuard_checkSpottedLink);
   uint16_t sp0_ = gb->sp;
-  CYC(0x72b5, 0x72b8); A = mem_rd(gb, wScentSeedActive);
-  CYC(0x72b8, 0x72b9); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x72b9, 0x72bb); goto scentSeed; } // jr nz
+  CYC(b_+0, b_+3); A = mem_rd(gb, wScentSeedActive);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+4, b_+6); goto scentSeed; } // jr nz
 
 normalCheck:
-  CYC(0x72b9, 0x72bb);
-  CYC(0x72bb, 0x72be); A = mem_rd(gb, wLinkPlayingInstrument);
-  CYC(0x72be, 0x72bf); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x72bf, 0x72c1); goto faceLink; } // jr nz
-  CYC(0x72bf, 0x72c1);
-  CYC(0x72c1, 0x72c3); E = ENEMY_BASE + OBJ_VAR3A;
-  CYC(0x72c3, 0x72c4); A = mem_rd(gb, DE);
-  CYC(0x72c4, 0x72c5); A = alu_inc8(gb, A);
-  if (!(F & FZ)) { CYCT(0x72c5, 0x72c7); goto commonUpdate; } // jr nz
-  CYC(0x72c5, 0x72c7);
-  CYC(0x72c7, 0x72c8); mem_wr(gb, DE, A); // [var3a] = 0
-  CYC(0x72c8, 0x72ca); A = 0x0b; // Object.yh
-  CALL_C(0x72ca, objectGetRelatedObject2Var_hook, 0x2164, 0x72cd);
-  CYC(0x72cd, 0x72ce); B = mem_rd(gb, HL);
-  CYC(0x72ce, 0x72d0); L = 0x0d; // Object.xh
-  CYC(0x72d0, 0x72d1); C = mem_rd(gb, HL);
-  CALL_C(0x72d1, objectGetRelativeAngle_hook, 0x1ea4, 0x72d4);
-  CYC(0x72d4, 0x72d6); goto alertGuardToMoveFast; // jr
+  CYC(b_+4, b_+6);
+  CYC(b_+6, b_+9); A = mem_rd(gb, wLinkPlayingInstrument);
+  CYC(b_+9, b_+10); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+10, b_+12); goto faceLink; } // jr nz
+  CYC(b_+10, b_+12);
+  CYC(b_+12, b_+14); E = ENEMY_BASE + OBJ_VAR3A;
+  CYC(b_+14, b_+15); A = mem_rd(gb, DE);
+  CYC(b_+15, b_+16); A = alu_inc8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+16, b_+18); goto commonUpdate; } // jr nz
+  CYC(b_+16, b_+18);
+  CYC(b_+18, b_+19); mem_wr(gb, DE, A); // [var3a] = 0
+  CYC(b_+19, b_+21); A = 0x0b; // Object.yh
+  CALL_C(b_+21, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+24);
+  CYC(b_+24, b_+25); B = mem_rd(gb, HL);
+  CYC(b_+25, b_+27); L = 0x0d; // Object.xh
+  CYC(b_+27, b_+28); C = mem_rd(gb, HL);
+  CALL_C(b_+28, objectGetRelativeAngle_hook, SYM(objectGetRelativeAngle), b_+31);
+  CYC(b_+31, b_+33); goto alertGuardToMoveFast; // jr
 
 scentSeed:
-  CYC(0x72d6, 0x72d7); H = D;
-  CYC(0x72d7, 0x72d9); L = ENEMY_BASE + OBJ_VAR37;
-  CYC(0x72d9, 0x72da); A = mem_rd(gb, HL);
-  CYC(0x72da, 0x72db); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x72db, 0x72dd); goto noticedScentSeed; } // jr z
-  CYC(0x72db, 0x72dd);
-  CYC(0x72dd, 0x72e0); A = mem_rd(gb, wFrameCounter);
-  CYC(0x72e0, 0x72e1); alu_rrca(gb);
-  if (F & FC) { CYCT(0x72e1, 0x72e3); goto normalCheck; } // jr c
-  CYC(0x72e1, 0x72e3);
-  CYC(0x72e3, 0x72e4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x72e4, 0x72e6); goto normalCheck; // jr
+  CYC(b_+33, b_+34); H = D;
+  CYC(b_+34, b_+36); L = ENEMY_BASE + OBJ_VAR37;
+  CYC(b_+36, b_+37); A = mem_rd(gb, HL);
+  CYC(b_+37, b_+38); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+38, b_+40); goto noticedScentSeed; } // jr z
+  CYC(b_+38, b_+40);
+  CYC(b_+40, b_+43); A = mem_rd(gb, wFrameCounter);
+  CYC(b_+43, b_+44); alu_rrca(gb);
+  if (F & FC) { CYCT(b_+44, b_+46); goto normalCheck; } // jr c
+  CYC(b_+44, b_+46);
+  CYC(b_+46, b_+47); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+47, b_+49); goto normalCheck; // jr
 
 noticedScentSeed:
-  CYC(0x72e6, 0x72e8); mem_wr(gb, HL, 0x96); // [var37] = 150
+  CYC(b_+49, b_+51); mem_wr(gb, HL, 0x96); // [var37] = 150
 
 faceLink:
-  CALL_C(0x72e8, objectGetAngleTowardEnemyTarget_hook, 0x1e94, 0x72eb);
+  CALL_C(b_+51, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+54);
 
 alertGuardToMoveFast:
-  CYC(0x72eb, 0x72ec); H = D;
-  CYC(0x72ec, 0x72ee); L = ENEMY_BASE + OBJ_VAR35;
-  CYC(0x72ee, 0x72ef); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x72ef, 0x72f0); L = alu_inc8(gb, L);
-  CYC(0x72f0, 0x72f2); mem_wr(gb, HL, 0x3c); // [var36] = 60
-  CALL_C(0x72f2, ambiGuard_setAngle_hook, 0x7376, 0x72f5);
+  CYC(b_+54, b_+55); H = D;
+  CYC(b_+55, b_+57); L = ENEMY_BASE + OBJ_VAR35;
+  CYC(b_+57, b_+58); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+58, b_+59); L = alu_inc8(gb, L);
+  CYC(b_+59, b_+61); mem_wr(gb, HL, 0x3c); // [var36] = 60
+  CALL_C(b_+61, ambiGuard_setAngle_hook, SYM(ambiGuard_setAngle), b_+64);
 
 commonUpdate:
-  CYC(0x72f5, 0x72f6); H = D;
-  CYC(0x72f6, 0x72f8); L = ENEMY_BASE + OBJ_VAR3B;
-  CYC(0x72f8, 0x72f9); A = mem_rd(gb, HL);
-  CYC(0x72f9, 0x72fb); mem_wr(gb, HL, 0x00);
-  CYC(0x72fb, 0x72fc); A = alu_inc8(gb, A);
-  if (!(F & FZ)) { CYCT(0x72fc, 0x72fe); goto checkNoticed; } // jr nz
-  CYC(0x72fc, 0x72fe);
-  CYC(0x72fe, 0x7300); L = ENEMY_BASE + OBJ_VAR34;
-  CYC(0x7300, 0x7301); A = mem_rd(gb, HL);
-  CYC(0x7301, 0x7302); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x7302, 0x7304); goto checkNoticed; } // jr nz
-  CYC(0x7302, 0x7304);
-  CYC(0x7304, 0x7305); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [var34]
-  CALL_C(0x7305, ambiGuard_setCounter2ForAttackingTypeOnly_hook, 0x7388, 0x7308);
+  CYC(b_+64, b_+65); H = D;
+  CYC(b_+65, b_+67); L = ENEMY_BASE + OBJ_VAR3B;
+  CYC(b_+67, b_+68); A = mem_rd(gb, HL);
+  CYC(b_+68, b_+70); mem_wr(gb, HL, 0x00);
+  CYC(b_+70, b_+71); A = alu_inc8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+71, b_+73); goto checkNoticed; } // jr nz
+  CYC(b_+71, b_+73);
+  CYC(b_+73, b_+75); L = ENEMY_BASE + OBJ_VAR34;
+  CYC(b_+75, b_+76); A = mem_rd(gb, HL);
+  CYC(b_+76, b_+77); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+77, b_+79); goto checkNoticed; } // jr nz
+  CYC(b_+77, b_+79);
+  CYC(b_+79, b_+80); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [var34]
+  CALL_C(b_+80, ambiGuard_setCounter2ForAttackingTypeOnly_hook, SYM(ambiGuard_setCounter2ForAttackingTypeOnly), b_+83);
 
 checkNoticed:
-  CYC(0x7308, 0x730a); E = ENEMY_BASE + OBJ_VAR34;
-  CYC(0x730a, 0x730b); A = mem_rd(gb, DE);
-  CYC(0x730b, 0x730c); alu_rrca(gb);
-  if (!(F & FC)) { CYCT(0x730c, 0x730e); goto haventSeenLinkYet; } // jr nc
-  CYC(0x730c, 0x730e);
-  CYC(0x730e, 0x730f); alu_rrca(gb);
-  if (F & FC) { RET_TAKEN(0x730f); return; } // ret c
-  CYC(0x730f, 0x7310);
-  CYC(0x7310, 0x7312); L = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x7312, 0x7314); alu_bit(gb, 7, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(0x7314, 0x7316); goto noticedLink; } // jr nz
-  CYC(0x7314, 0x7316);
-  CALL_C(0x7316, checkLinkCollisionsEnabled_hook, 0x1d32, 0x7319);
-  if (!(F & FC)) { RET_TAKEN(0x7319); return; } // ret nc
-  CYC(0x7319, 0x731a);
-  CYC(0x731a, 0x731d); A = mem_rd(gb, w1Link + OBJ_ZH);
-  CYC(0x731d, 0x731e); alu_rlca(gb);
-  if (F & FC) { RET_TAKEN(0x731e); return; } // ret c
-  CYC(0x731e, 0x731f);
-  CYC(0x731f, 0x7321); A = 0x80;
-  CYC(0x7321, 0x7324); mem_wr(gb, wMenuDisabled, A);
-  CYC(0x7324, 0x7326); A = 0x21; // DISABLE_COMPANION|DISABLE_LINK
-  CYC(0x7326, 0x7329); mem_wr(gb, wDisabledObjects, A);
-  CYC(0x7329, 0x732c); mem_wr(gb, wDisableScreenTransitions, A);
-  CYC(0x732c, 0x732e); E = ENEMY_BASE + OBJ_VAR36;
-  CYC(0x732e, 0x7330); A = 0x3c; // 60
-  CYC(0x7330, 0x7331); mem_wr(gb, DE, A);
-  CALL_C(0x7331, ambiGuard_createExclamationMark_hook, 0x734f, 0x7334);
+  CYC(b_+83, b_+85); E = ENEMY_BASE + OBJ_VAR34;
+  CYC(b_+85, b_+86); A = mem_rd(gb, DE);
+  CYC(b_+86, b_+87); alu_rrca(gb);
+  if (!(F & FC)) { CYCT(b_+87, b_+89); goto haventSeenLinkYet; } // jr nc
+  CYC(b_+87, b_+89);
+  CYC(b_+89, b_+90); alu_rrca(gb);
+  if (F & FC) { RET_TAKEN(b_+90); return; } // ret c
+  CYC(b_+90, b_+91);
+  CYC(b_+91, b_+93); L = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+93, b_+95); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+95, b_+97); goto noticedLink; } // jr nz
+  CYC(b_+95, b_+97);
+  CALL_C(b_+97, checkLinkCollisionsEnabled_hook, SYM(checkLinkCollisionsEnabled), b_+100);
+  if (!(F & FC)) { RET_TAKEN(b_+100); return; } // ret nc
+  CYC(b_+100, b_+101);
+  CYC(b_+101, b_+104); A = mem_rd(gb, w1Link + OBJ_ZH);
+  CYC(b_+104, b_+105); alu_rlca(gb);
+  if (F & FC) { RET_TAKEN(b_+105); return; } // ret c
+  CYC(b_+105, b_+106);
+  CYC(b_+106, b_+108); A = 0x80;
+  CYC(b_+108, b_+111); mem_wr(gb, wMenuDisabled, A);
+  CYC(b_+111, b_+113); A = 0x21; // DISABLE_COMPANION|DISABLE_LINK
+  CYC(b_+113, b_+116); mem_wr(gb, wDisabledObjects, A);
+  CYC(b_+116, b_+119); mem_wr(gb, wDisableScreenTransitions, A);
+  CYC(b_+119, b_+121); E = ENEMY_BASE + OBJ_VAR36;
+  CYC(b_+121, b_+123); A = 0x3c; // 60
+  CYC(b_+123, b_+124); mem_wr(gb, DE, A);
+  CALL_C(b_+124, ambiGuard_createExclamationMark_hook, SYM(ambiGuard_createExclamationMark), b_+127);
 
 noticedLink:
-  CYC(0x7334, 0x7335); H = D;
-  CYC(0x7335, 0x7337); L = ENEMY_BASE + OBJ_VAR34;
-  CYC(0x7337, 0x7339); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1))); // set 1,(hl)
-  CYC(0x7339, 0x733b); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x733b, 0x733d); mem_wr(gb, HL, 0x0f);
-  CYC(0x733d, 0x733f); A = 0x29; // Object.health
-  CALL_C(0x733f, objectGetRelatedObject2Var_hook, 0x2164, 0x7342);
-  CYC(0x7342, 0x7344); mem_wr(gb, HL, 0x00);
-  RET(0x7344); return; // ret
+  CYC(b_+127, b_+128); H = D;
+  CYC(b_+128, b_+130); L = ENEMY_BASE + OBJ_VAR34;
+  CYC(b_+130, b_+132); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1))); // set 1,(hl)
+  CYC(b_+132, b_+134); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+134, b_+136); mem_wr(gb, HL, 0x0f);
+  CYC(b_+136, b_+138); A = 0x29; // Object.health
+  CALL_C(b_+138, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+141);
+  CYC(b_+141, b_+143); mem_wr(gb, HL, 0x00);
+  RET(b_+143); return; // ret
 
 haventSeenLinkYet:
-  CYC(0x7345, 0x7346); E = alu_inc8(gb, E);
-  CYC(0x7346, 0x7347); A = mem_rd(gb, DE); // [var35]
-  CYC(0x7347, 0x7348); alu_rrca(gb);
-  if (!(F & FC)) { RET_TAKEN(0x7348); return; } // ret nc
-  CYC(0x7348, 0x7349);
-  CYC(0x7349, 0x734a); alu_xor(gb, A);
-  CYC(0x734a, 0x734b); mem_wr(gb, DE, A);
-  CYC(0x734b, 0x734d); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x734d, 0x734f); mem_wr(gb, HL, 0x32); // SPEED_140
+  CYC(b_+144, b_+145); E = alu_inc8(gb, E);
+  CYC(b_+145, b_+146); A = mem_rd(gb, DE); // [var35]
+  CYC(b_+146, b_+147); alu_rrca(gb);
+  if (!(F & FC)) { RET_TAKEN(b_+147); return; } // ret nc
+  CYC(b_+147, b_+148);
+  CYC(b_+148, b_+149); alu_xor(gb, A);
+  CYC(b_+149, b_+150); mem_wr(gb, DE, A);
+  CYC(b_+150, b_+152); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+152, SYM(ambiGuard_createExclamationMark)); mem_wr(gb, HL, 0x32); // SPEED_140
   ambiGuard_createExclamationMark_hook(gb); return; // fallthrough
 }
 
 // 0e:734f, bare global; falls into from ambiGuard_checkSpottedLink, also called from
 // several other states.
 void ambiGuard_createExclamationMark_hook(GB *gb) {
+  BASE(ambiGuard_createExclamationMark);
   uint16_t sp0_ = gb->sp;
-  CYC(0x734f, 0x7351); A = 0x2d;
-  CYC(0x7351, 0x7354); SET_BC(0xf408);
-  CYC(0x7354, 0x7357); objectCreateExclamationMark_hook(gb); return; // jp
+  CYC(b_+0, b_+2); A = 0x2d;
+  CYC(b_+2, b_+5); SET_BC(0xf408);
+  CYC(b_+5, SYM(ambiGuard_collisionOccured)); objectCreateExclamationMark_hook(gb); return; // jp
 }
 
 // 0e:7357, bare global; called from enemyCode54.
 void ambiGuard_collisionOccured_hook(GB *gb) {
+  BASE(ambiGuard_collisionOccured);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7357, 0x7359); E = ENEMY_BASE + OBJ_VAR34;
-  CYC(0x7359, 0x735a); A = mem_rd(gb, DE);
-  CYC(0x735a, 0x735b); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x735b); return; } // ret nz
-  CYC(0x735b, 0x735c);
-  CYC(0x735c, 0x735d); H = D;
-  CYC(0x735d, 0x735f); L = ENEMY_BASE + OBJ_VAR2A;
-  CYC(0x735f, 0x7360); A = mem_rd(gb, HL);
-  CYC(0x7360, 0x7362); alu_cp(gb, 0x92); // collisions up to & including ITEMCOLLISION_11 are direct attacks
-  if (F & FC) { CYCT(0x7362, 0x7364); ambiGuard_directAttackOccurred_hook(gb); return; } // jr c
-  CYC(0x7362, 0x7364);
-  CYC(0x7364, 0x7366); alu_cp(gb, 0x9e); // $80|ITEMCOLLISION_GALE_SEED
-  if (F & FZ) { RET_TAKEN(0x7366); return; } // ret z
-  CYC(0x7366, 0x7367);
-  CYC(0x7367, 0x7368); H = D;
-  CYC(0x7368, 0x736a); L = ENEMY_BASE + OBJ_VAR35;
-  CYC(0x736a, 0x736b); A = mem_rd(gb, HL);
-  CYC(0x736b, 0x736c); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x736c); return; } // ret nz
-  CYC(0x736c, 0x736d);
-  CYC(0x736d, 0x736e); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [var35] = 1
-  CYC(0x736e, 0x736f); L = alu_inc8(gb, L);
-  CYC(0x736f, 0x7371); mem_wr(gb, HL, 0x5a); // [var36] = 90
-  CYC(0x7371, 0x7373); L = ENEMY_BASE + OBJ_KNOCKBACK_ANGLE;
-  CYC(0x7373, 0x7374); A = mem_rd(gb, HL);
-  CYC(0x7374, 0x7376); alu_xor(gb, 0x10);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_VAR34;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+4); return; } // ret nz
+  CYC(b_+4, b_+5);
+  CYC(b_+5, b_+6); H = D;
+  CYC(b_+6, b_+8); L = ENEMY_BASE + OBJ_VAR2A;
+  CYC(b_+8, b_+9); A = mem_rd(gb, HL);
+  CYC(b_+9, b_+11); alu_cp(gb, 0x92); // collisions up to & including ITEMCOLLISION_11 are direct attacks
+  if (F & FC) { CYCT(b_+11, b_+13); ambiGuard_directAttackOccurred_hook(gb); return; } // jr c
+  CYC(b_+11, b_+13);
+  CYC(b_+13, b_+15); alu_cp(gb, 0x9e); // $80|ITEMCOLLISION_GALE_SEED
+  if (F & FZ) { RET_TAKEN(b_+15); return; } // ret z
+  CYC(b_+15, b_+16);
+  CYC(b_+16, b_+17); H = D;
+  CYC(b_+17, b_+19); L = ENEMY_BASE + OBJ_VAR35;
+  CYC(b_+19, b_+20); A = mem_rd(gb, HL);
+  CYC(b_+20, b_+21); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+21); return; } // ret nz
+  CYC(b_+21, b_+22);
+  CYC(b_+22, b_+23); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [var35] = 1
+  CYC(b_+23, b_+24); L = alu_inc8(gb, L);
+  CYC(b_+24, b_+26); mem_wr(gb, HL, 0x5a); // [var36] = 90
+  CYC(b_+26, b_+28); L = ENEMY_BASE + OBJ_KNOCKBACK_ANGLE;
+  CYC(b_+28, b_+29); A = mem_rd(gb, HL);
+  CYC(b_+29, SYM(ambiGuard_setAngle)); alu_xor(gb, 0x10);
   ambiGuard_setAngle_hook(gb); return; // fallthrough
 }
 
@@ -743,23 +771,25 @@ void ambiGuard_collisionOccured_hook(GB *gb) {
 // ambiGuard_checkSpottedLink.
 // @param a Angle
 void ambiGuard_setAngle_hook(GB *gb) {
+  BASE(ambiGuard_setAngle);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x7376, 0x7378); alu_add(gb, 0x04);
-  CYC(0x7378, 0x737a); alu_and(gb, 0x18);
-  CYC(0x737a, 0x737c); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x737c, 0x737d); mem_wr(gb, DE, A);
-  CYC(0x737d, 0x737f); A = alu_swap(gb, A);
-  CYC(0x737f, 0x7380); alu_rlca(gb);
-  CYC(0x7380, 0x7383); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+0, b_+2); alu_add(gb, 0x04);
+  CYC(b_+2, b_+4); alu_and(gb, 0x18);
+  CYC(b_+4, b_+6); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+6, b_+7); mem_wr(gb, DE, A);
+  CYC(b_+7, b_+9); A = alu_swap(gb, A);
+  CYC(b_+9, b_+10); alu_rlca(gb);
+  CYC(b_+10, SYM(ambiGuard_directAttackOccurred)); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:7383, bare global; falls into from ambiGuard_collisionOccured. A collision with one of
 // Link's direct attacks (sword, fist, etc) occurred; the guard notices Link right away.
 void ambiGuard_directAttackOccurred_hook(GB *gb) {
+  BASE(ambiGuard_directAttackOccurred);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7383, 0x7385); E = ENEMY_BASE + OBJ_VAR34;
-  CYC(0x7385, 0x7387); A = 0x01;
-  CYC(0x7387, 0x7388); mem_wr(gb, DE, A);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_VAR34;
+  CYC(b_+2, b_+4); A = 0x01;
+  CYC(b_+4, SYM(ambiGuard_setCounter2ForAttackingTypeOnly)); mem_wr(gb, DE, A);
   ambiGuard_setCounter2ForAttackingTypeOnly_hook(gb); return; // fallthrough
 }
 
@@ -767,86 +797,88 @@ void ambiGuard_directAttackOccurred_hook(GB *gb) {
 // ambiGuard_checkSpottedLink. Does some initialization for "attacking Link" type only, when
 // they just notice Link.
 void ambiGuard_setCounter2ForAttackingTypeOnly_hook(GB *gb) {
+  BASE(ambiGuard_setCounter2ForAttackingTypeOnly);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x7388, 0x738a); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x738a, 0x738b); A = mem_rd(gb, DE);
-  CYC(0x738b, 0x738c); alu_rlca(gb);
-  if (!(F & FC)) { RET_TAKEN(0x738c); return; } // ret nc
-  CYC(0x738c, 0x738d);
-  CYC(0x738d, 0x738f); E = ENEMY_BASE + OBJ_COUNTER2;
-  CYC(0x738f, 0x7391); A = 0x5a; // 90
-  CYC(0x7391, 0x7392); mem_wr(gb, DE, A);
-  CYC(0x7392, 0x7394); E = ENEMY_BASE + OBJ_VAR36;
-  CYC(0x7394, 0x7395); alu_xor(gb, A);
-  CYC(0x7395, 0x7396); mem_wr(gb, DE, A);
-  RET(0x7396); return; // ret
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_rlca(gb);
+  if (!(F & FC)) { RET_TAKEN(b_+4); return; } // ret nc
+  CYC(b_+4, b_+5);
+  CYC(b_+5, b_+7); E = ENEMY_BASE + OBJ_COUNTER2;
+  CYC(b_+7, b_+9); A = 0x5a; // 90
+  CYC(b_+9, b_+10); mem_wr(gb, DE, A);
+  CYC(b_+10, b_+12); E = ENEMY_BASE + OBJ_VAR36;
+  CYC(b_+12, b_+13); alu_xor(gb, A);
+  CYC(b_+13, b_+14); mem_wr(gb, DE, A);
+  RET(b_+14); return; // ret
 }
 
 // 0e:7397, bare global; called from enemyCode54. Scampering away when health is 0.
 void ambiGuard_noHealth_hook(GB *gb) {
+  BASE(ambiGuard_noHealth);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7397, 0x7399); E = ENEMY_BASE + OBJ_SUBSTATE;
-  CYC(0x7399, 0x739a); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x739a, 0x739b); push_effect(gb, 0x739b);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = ambiGuard_jump_table(gb);
-    if (target == 0x73a1) goto substate0;
-    if (target == 0x73ab) goto substate1;
-    if (target == 0x73cf) goto substate2;
+    if (target == b_+10) goto substate0;
+    if (target == b_+20) goto substate1;
+    if (target == b_+56) goto substate2;
     HANDOFF(target);
   }
 
 substate0:
-  CYC(0x73a1, 0x73a2); H = D;
-  CYC(0x73a2, 0x73a3); L = E;
-  CYC(0x73a3, 0x73a4); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [substate]
-  CYC(0x73a4, 0x73a6); L = ENEMY_BASE + OBJ_SPEED_Z;
-  CYC(0x73a6, 0x73a8); A = 0x00;
-  CYC(0x73a8, 0x73a9); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x73a9, 0x73ab); mem_wr(gb, HL, 0xff);
+  CYC(b_+10, b_+11); H = D;
+  CYC(b_+11, b_+12); L = E;
+  CYC(b_+12, b_+13); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [substate]
+  CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_SPEED_Z;
+  CYC(b_+15, b_+17); A = 0x00;
+  CYC(b_+17, b_+18); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+18, b_+20); mem_wr(gb, HL, 0xff);
 
 substate1:
-  CYC(0x73ab, 0x73ad); C = 0x20;
-  CALL_C(0x73ad, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x73b0);
-  if (!(F & FZ)) { RET_TAKEN(0x73b0); return; } // ret nz
-  CYC(0x73b0, 0x73b1);
-  CYC(0x73b1, 0x73b3); L = ENEMY_BASE + OBJ_SUBSTATE;
-  CYC(0x73b3, 0x73b4); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x73b4, 0x73b6); L = ENEMY_BASE + OBJ_SPEED_Z;
-  CYC(0x73b6, 0x73b8); A = 0x40;
-  CYC(0x73b8, 0x73b9); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a -- speedZ = -$1c0
-  CYC(0x73b9, 0x73bb); mem_wr(gb, HL, 0xfe);
-  CYC(0x73bb, 0x73bd); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x73bd, 0x73bf); mem_wr(gb, HL, 0x32); // SPEED_140
-  CYC(0x73bf, 0x73c1); L = ENEMY_BASE + OBJ_KNOCKBACK_ANGLE;
-  CYC(0x73c1, 0x73c2); A = mem_rd(gb, HL);
-  CYC(0x73c2, 0x73c4); L = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x73c4, 0x73c5); mem_wr(gb, HL, A);
-  CYC(0x73c5, 0x73c7); alu_add(gb, 0x04);
-  CYC(0x73c7, 0x73c9); alu_and(gb, 0x18);
-  CYC(0x73c9, 0x73cb); A = alu_swap(gb, A);
-  CYC(0x73cb, 0x73cc); alu_rlca(gb);
-  CYC(0x73cc, 0x73cf); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+20, b_+22); C = 0x20;
+  CALL_C(b_+22, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+25);
+  if (!(F & FZ)) { RET_TAKEN(b_+25); return; } // ret nz
+  CYC(b_+25, b_+26);
+  CYC(b_+26, b_+28); L = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+28, b_+29); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+29, b_+31); L = ENEMY_BASE + OBJ_SPEED_Z;
+  CYC(b_+31, b_+33); A = 0x40;
+  CYC(b_+33, b_+34); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a -- speedZ = -$1c0
+  CYC(b_+34, b_+36); mem_wr(gb, HL, 0xfe);
+  CYC(b_+36, b_+38); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+38, b_+40); mem_wr(gb, HL, 0x32); // SPEED_140
+  CYC(b_+40, b_+42); L = ENEMY_BASE + OBJ_KNOCKBACK_ANGLE;
+  CYC(b_+42, b_+43); A = mem_rd(gb, HL);
+  CYC(b_+43, b_+45); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+45, b_+46); mem_wr(gb, HL, A);
+  CYC(b_+46, b_+48); alu_add(gb, 0x04);
+  CYC(b_+48, b_+50); alu_and(gb, 0x18);
+  CYC(b_+50, b_+52); A = alu_swap(gb, A);
+  CYC(b_+52, b_+53); alu_rlca(gb);
+  CYC(b_+53, b_+56); enemySetAnimation_hook(gb); return; // jp
 
 substate2:
-  CYC(0x73cf, 0x73d1); E = ENEMY_BASE + OBJ_YH;
-  CYC(0x73d1, 0x73d2); A = mem_rd(gb, DE);
-  CYC(0x73d2, 0x73d4); alu_cp(gb, 0xb0); // LARGE_ROOM_HEIGHT<<4
-  if (!(F & FC)) { CYCT(0x73d4, 0x73d7); enemyDelete_hook(gb); return; } // jp nc
-  CYC(0x73d4, 0x73d7);
-  CYC(0x73d7, 0x73d9); E = ENEMY_BASE + OBJ_XH;
-  CYC(0x73d9, 0x73da); A = mem_rd(gb, DE);
-  CYC(0x73da, 0x73dc); alu_cp(gb, 0xf0); // LARGE_ROOM_WIDTH<<4
-  if (!(F & FC)) { CYCT(0x73dc, 0x73df); enemyDelete_hook(gb); return; } // jp nc
-  CYC(0x73dc, 0x73df);
-  CALL_C(0x73df, objectApplySpeed_hook, 0x201d, 0x73e2);
-  CYC(0x73e2, 0x73e4); C = 0x20;
-  CALL_C(0x73e4, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x73e7);
-  if (!(F & FZ)) { CYCT(0x73e7, 0x73ea); enemyAnimate_hook(gb); return; } // jp nz
-  CYC(0x73e7, 0x73ea);
-  CYC(0x73ea, 0x73ec); L = ENEMY_BASE + OBJ_SPEED_Z;
-  CYC(0x73ec, 0x73ee); A = 0x40;
-  CYC(0x73ee, 0x73ef); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a -- speedZ = -$1c0
-  CYC(0x73ef, 0x73f1); mem_wr(gb, HL, 0xfe);
-  RET(0x73f1); return; // ret
+  CYC(b_+56, b_+58); E = ENEMY_BASE + OBJ_YH;
+  CYC(b_+58, b_+59); A = mem_rd(gb, DE);
+  CYC(b_+59, b_+61); alu_cp(gb, 0xb0); // LARGE_ROOM_HEIGHT<<4
+  if (!(F & FC)) { CYCT(b_+61, b_+64); enemyDelete_hook(gb); return; } // jp nc
+  CYC(b_+61, b_+64);
+  CYC(b_+64, b_+66); E = ENEMY_BASE + OBJ_XH;
+  CYC(b_+66, b_+67); A = mem_rd(gb, DE);
+  CYC(b_+67, b_+69); alu_cp(gb, 0xf0); // LARGE_ROOM_WIDTH<<4
+  if (!(F & FC)) { CYCT(b_+69, b_+72); enemyDelete_hook(gb); return; } // jp nc
+  CYC(b_+69, b_+72);
+  CALL_C(b_+72, objectApplySpeed_hook, SYM(objectApplySpeed), b_+75);
+  CYC(b_+75, b_+77); C = 0x20;
+  CALL_C(b_+77, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+80);
+  if (!(F & FZ)) { CYCT(b_+80, b_+83); enemyAnimate_hook(gb); return; } // jp nz
+  CYC(b_+80, b_+83);
+  CYC(b_+83, b_+85); L = ENEMY_BASE + OBJ_SPEED_Z;
+  CYC(b_+85, b_+87); A = 0x40;
+  CYC(b_+87, b_+88); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a -- speedZ = -$1c0
+  CYC(b_+88, b_+90); mem_wr(gb, HL, 0xfe);
+  RET(b_+90); return; // ret
 }

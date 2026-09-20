@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode11), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode11), (from), (to), true)
 
 static uint16_t volcanoRock_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -51,254 +51,265 @@ void volcanoRock_subid0_setSpeedFromAngle_hook(GB *gb);
 void volcanoRock_setCollisionSize_hook(GB *gb);
 
 void partCode11_hook(GB *gb) {
+  BASE(partCode11);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x4ae7, 0x4ae9); E = 0xc2; // Part.subid
-  CYC(0x4ae9, 0x4aea); A = mem_rd(gb, DE);
-  CYC(0x4aea, 0x4aec); E = 0xc4; // Part.state
+  CYC(b_+0, b_+2); E = 0xc2; // Part.subid
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); E = 0xc4; // Part.state
   {
-    CYC(0x4aec, 0x4aed); push_effect(gb, 0x4aed);
+    CYC(b_+5, b_+6); push_effect(gb, b_+6);
     uint16_t target = volcanoRock_jump_table(gb);
-    if (target == 0x4af3) { volcanoRock_subid0_hook(gb); return; }
-    if (target == 0x4b2e) { volcanoRock_subid1_hook(gb); return; }
+    if (target == SYM(volcanoRock_subid0)) { volcanoRock_subid0_hook(gb); return; }
+    if (target == SYM(volcanoRock_subid1)) { volcanoRock_subid1_hook(gb); return; }
     volcanoRock_subid2_hook(gb); return;
   }
 }
 
 void volcanoRock_subid0_hook(GB *gb) {
+  BASE(volcanoRock_subid0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x4af3, 0x4af4); A = mem_rd(gb, DE);
-  CYC(0x4af4, 0x4af5); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x4af5, 0x4af7); goto state0; } // jr z
-  CYC(0x4af5, 0x4af7);
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);
+  CYC(b_+1, b_+2); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+2, b_+4); goto state0; } // jr z
+  CYC(b_+2, b_+4);
 
-  CYC(0x4af7, 0x4af9); C = 0x16;
-  CALL_C(0x4af9, objectUpdateSpeedZAndBounce_hook, 0x2370, 0x4afc);
-  if (F & FC) { CYCT(0x4afc, 0x4aff); partDelete_hook(gb); return; } // jp c
-  CYC(0x4afc, 0x4aff);
-  if (!(F & FZ)) { CYCT(0x4aff, 0x4b02); objectApplySpeed_hook(gb); return; } // jp nz
-  CYC(0x4aff, 0x4b02);
-  CALL_C(0x4b02, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4b05);
-  CYC(0x4b05, 0x4b07); alu_and(gb, 0x03);
-  CYC(0x4b07, 0x4b08); A = alu_dec8(gb, A);
-  if (F & FZ) { RET_TAKEN(0x4b08); return; } // ret z
-  CYC(0x4b08, 0x4b09);
-  CYC(0x4b09, 0x4b0a); B = A;
-  CYC(0x4b0a, 0x4b0c); E = 0xc9; // Part.angle
-  CYC(0x4b0c, 0x4b0d); A = mem_rd(gb, DE);
-  CYC(0x4b0d, 0x4b0e); alu_add(gb, B);
-  CYC(0x4b0e, 0x4b10); alu_and(gb, 0x1f);
+  CYC(b_+4, b_+6); C = 0x16;
+  CALL_C(b_+6, objectUpdateSpeedZAndBounce_hook, SYM(objectUpdateSpeedZAndBounce), b_+9);
+  if (F & FC) { CYCT(b_+9, b_+12); partDelete_hook(gb); return; } // jp c
+  CYC(b_+9, b_+12);
+  if (!(F & FZ)) { CYCT(b_+12, b_+15); objectApplySpeed_hook(gb); return; } // jp nz
+  CYC(b_+12, b_+15);
+  CALL_C(b_+15, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+18);
+  CYC(b_+18, b_+20); alu_and(gb, 0x03);
+  CYC(b_+20, b_+21); A = alu_dec8(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+21); return; } // ret z
+  CYC(b_+21, b_+22);
+  CYC(b_+22, b_+23); B = A;
+  CYC(b_+23, b_+25); E = 0xc9; // Part.angle
+  CYC(b_+25, b_+26); A = mem_rd(gb, DE);
+  CYC(b_+26, b_+27); alu_add(gb, B);
+  CYC(b_+27, b_+29); alu_and(gb, 0x1f);
 
 setAngleAndSpeed:
-  CYC(0x4b10, 0x4b11); mem_wr(gb, DE, A);
-  CYC(0x4b11, 0x4b14); volcanoRock_subid0_setSpeedFromAngle_hook(gb); return; // jp
+  CYC(b_+29, b_+30); mem_wr(gb, DE, A);
+  CYC(b_+30, b_+33); volcanoRock_subid0_setSpeedFromAngle_hook(gb); return; // jp
 
 state0:
-  CYC(0x4b14, 0x4b17); SET_BC(0xfd80); // -0x280
-  CALL_C(0x4b17, objectSetSpeedZ_hook, 0x239d, 0x4b1a);
-  CYC(0x4b1a, 0x4b1b); L = E; // Part.state
-  CYC(0x4b1b, 0x4b1c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x4b1c, 0x4b1e); L = 0xe4; // Part.collisionType
-  CYC(0x4b1e, 0x4b20); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  CALL_C(0x4b20, objectSetVisible80_hook, 0x1e57, 0x4b23);
-  CALL_C(0x4b23, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4b26);
-  CYC(0x4b26, 0x4b28); alu_and(gb, 0x0f);
-  CYC(0x4b28, 0x4b2a); alu_add(gb, 0x08);
-  CYC(0x4b2a, 0x4b2c); E = 0xc9; // Part.angle
-  CYC(0x4b2c, 0x4b2e); goto setAngleAndSpeed; // jr
+  CYC(b_+33, b_+36); SET_BC(0xfd80); // -0x280
+  CALL_C(b_+36, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+39);
+  CYC(b_+39, b_+40); L = E; // Part.state
+  CYC(b_+40, b_+41); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+41, b_+43); L = 0xe4; // Part.collisionType
+  CYC(b_+43, b_+45); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
+  CALL_C(b_+45, objectSetVisible80_hook, SYM(objectSetVisible80), b_+48);
+  CALL_C(b_+48, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+51);
+  CYC(b_+51, b_+53); alu_and(gb, 0x0f);
+  CYC(b_+53, b_+55); alu_add(gb, 0x08);
+  CYC(b_+55, b_+57); E = 0xc9; // Part.angle
+  CYC(b_+57, SYM(volcanoRock_subid1)); goto setAngleAndSpeed; // jr
 }
 
 void volcanoRock_subid1_hook(GB *gb) {
+  BASE(volcanoRock_subid1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x4b2e, 0x4b2f); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   {
-    CYC(0x4b2f, 0x4b30); push_effect(gb, 0x4b30);
+    CYC(b_+1, b_+2); push_effect(gb, b_+2);
     uint16_t target = volcanoRock_jump_table(gb);
-    if (target == 0x4b3c) goto substate0;
-    if (target == 0x4b66) goto substate1;
-    if (target == 0x4b82) { volcanoRock_common_substate2_hook(gb); return; }
-    if (target == 0x4b8d) { volcanoRock_common_substate3_hook(gb); return; }
-    if (target == 0x4ba8) { volcanoRock_common_substate4_hook(gb); return; }
+    if (target == b_+14) goto substate0;
+    if (target == b_+56) goto substate1;
+    if (target == SYM(volcanoRock_common_substate2)) { volcanoRock_common_substate2_hook(gb); return; }
+    if (target == SYM(volcanoRock_common_substate3)) { volcanoRock_common_substate3_hook(gb); return; }
+    if (target == SYM(volcanoRock_common_substate4)) { volcanoRock_common_substate4_hook(gb); return; }
     volcanoRock_common_substate5_hook(gb); return;
   }
 
 substate0:
-  CYC(0x4b3c, 0x4b3d); H = D;
-  CYC(0x4b3d, 0x4b3e); L = E; // Part.state
-  CYC(0x4b3e, 0x4b3f); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x4b3f, 0x4b41); L = 0xe4; // Part.collisionType
-  CYC(0x4b41, 0x4b43); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  CYC(0x4b43, 0x4b45); L = 0xe6; // Part.collisionRadiusY
-  CYC(0x4b45, 0x4b46); A = mem_rd(gb, HL);
-  CYC(0x4b46, 0x4b47); alu_add(gb, A);
-  CYC(0x4b47, 0x4b48); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x4b48, 0x4b49); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x4b49, 0x4b4b); mem_wr(gb, HL, alu_sla(gb, mem_rd(gb, HL)));
-  CYC(0x4b4b, 0x4b4d); L = 0xd0; // Part.speed
-  CYC(0x4b4d, 0x4b4f); mem_wr(gb, HL, 0x05); // SPEED_20
-  CYC(0x4b4f, 0x4b51); L = 0xd4; // Part.speedZ
-  CYC(0x4b51, 0x4b53); A = 0x00;
-  CYC(0x4b53, 0x4b54); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x4b54, 0x4b56); mem_wr(gb, HL, 0xfc);
-  CALL_C(0x4b56, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4b59);
-  CYC(0x4b59, 0x4b5b); alu_and(gb, 0x1f);
-  CYC(0x4b5b, 0x4b5d); E = 0xc9; // Part.angle
-  CYC(0x4b5d, 0x4b5e); mem_wr(gb, DE, A);
-  CYC(0x4b5e, 0x4b60); A = 0x01;
-  CALL_C(0x4b60, partSetAnimation_hook, 0x2988, 0x4b63);
-  CYC(0x4b63, 0x4b66); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+14, b_+15); H = D;
+  CYC(b_+15, b_+16); L = E; // Part.state
+  CYC(b_+16, b_+17); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+17, b_+19); L = 0xe4; // Part.collisionType
+  CYC(b_+19, b_+21); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
+  CYC(b_+21, b_+23); L = 0xe6; // Part.collisionRadiusY
+  CYC(b_+23, b_+24); A = mem_rd(gb, HL);
+  CYC(b_+24, b_+25); alu_add(gb, A);
+  CYC(b_+25, b_+26); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+26, b_+27); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+27, b_+29); mem_wr(gb, HL, alu_sla(gb, mem_rd(gb, HL)));
+  CYC(b_+29, b_+31); L = 0xd0; // Part.speed
+  CYC(b_+31, b_+33); mem_wr(gb, HL, 0x05); // SPEED_20
+  CYC(b_+33, b_+35); L = 0xd4; // Part.speedZ
+  CYC(b_+35, b_+37); A = 0x00;
+  CYC(b_+37, b_+38); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+38, b_+40); mem_wr(gb, HL, 0xfc);
+  CALL_C(b_+40, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+43);
+  CYC(b_+43, b_+45); alu_and(gb, 0x1f);
+  CYC(b_+45, b_+47); E = 0xc9; // Part.angle
+  CYC(b_+47, b_+48); mem_wr(gb, DE, A);
+  CYC(b_+48, b_+50); A = 0x01;
+  CALL_C(b_+50, partSetAnimation_hook, SYM(partSetAnimation), b_+53);
+  CYC(b_+53, b_+56); objectSetVisible80_hook(gb); return; // jp
 
 substate1:
-  CYC(0x4b66, 0x4b67); H = D;
-  CYC(0x4b67, 0x4b69); L = 0xcb; // Part.yh
-  CYC(0x4b69, 0x4b6b); E = 0xcf; // Part.zh
-  CYC(0x4b6b, 0x4b6c); A = mem_rd(gb, DE);
-  CYC(0x4b6c, 0x4b6d); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x4b6d, 0x4b6f); alu_add(gb, 0x08);
-  CYC(0x4b6f, 0x4b71); alu_cp(gb, 0xf8);
-  CYC(0x4b71, 0x4b73); C = 0x10;
-  if (F & FC) { CYCT(0x4b73, 0x4b76); objectUpdateSpeedZ_paramC_hook(gb); return; } // jp c
-  CYC(0x4b73, 0x4b76);
-  CYC(0x4b76, 0x4b78); L = 0xc4; // Part.state
-  CYC(0x4b78, 0x4b79); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x4b79, 0x4b7b); L = 0xc6; // Part.counter1
-  CYC(0x4b7b, 0x4b7d); mem_wr(gb, HL, 0x1e);
-  CALL_C(0x4b7d, objectSetInvisible_hook, 0x1e7b, 0x4b80);
-  CYC(0x4b80, 0x4b82); volcanoRock_setRandomPosition_hook(gb); return; // jr
+  CYC(b_+56, b_+57); H = D;
+  CYC(b_+57, b_+59); L = 0xcb; // Part.yh
+  CYC(b_+59, b_+61); E = 0xcf; // Part.zh
+  CYC(b_+61, b_+62); A = mem_rd(gb, DE);
+  CYC(b_+62, b_+63); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+63, b_+65); alu_add(gb, 0x08);
+  CYC(b_+65, b_+67); alu_cp(gb, 0xf8);
+  CYC(b_+67, b_+69); C = 0x10;
+  if (F & FC) { CYCT(b_+69, b_+72); objectUpdateSpeedZ_paramC_hook(gb); return; } // jp c
+  CYC(b_+69, b_+72);
+  CYC(b_+72, b_+74); L = 0xc4; // Part.state
+  CYC(b_+74, b_+75); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+75, b_+77); L = 0xc6; // Part.counter1
+  CYC(b_+77, b_+79); mem_wr(gb, HL, 0x1e);
+  CALL_C(b_+79, objectSetInvisible_hook, SYM(objectSetInvisible), b_+82);
+  CYC(b_+82, SYM(volcanoRock_common_substate2)); volcanoRock_setRandomPosition_hook(gb); return; // jr
 }
 
 void volcanoRock_common_substate2_hook(GB *gb) {
+  BASE(volcanoRock_common_substate2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x4b82, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x4b85);
-  if (!(F & FZ)) { RET_TAKEN(0x4b85); return; } // ret nz
-  CYC(0x4b85, 0x4b86);
-  CYC(0x4b86, 0x4b88); mem_wr(gb, HL, 0x10); // Part.counter1
-  CYC(0x4b88, 0x4b89); L = E; // Part.substate
-  CYC(0x4b89, 0x4b8a); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x4b8a, 0x4b8d); objectSetVisiblec0_hook(gb); return; // jp
+  CALL_C(b_+0, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; } // ret nz
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+6); mem_wr(gb, HL, 0x10); // Part.counter1
+  CYC(b_+6, b_+7); L = E; // Part.substate
+  CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+8, SYM(volcanoRock_common_substate3)); objectSetVisiblec0_hook(gb); return; // jp
 }
 
 void volcanoRock_common_substate3_hook(GB *gb) {
+  BASE(volcanoRock_common_substate3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x4b8d, partAnimate_hook, 0x2978, 0x4b90);
-  CYC(0x4b90, 0x4b91); H = D;
-  CYC(0x4b91, 0x4b93); L = 0xcf; // Part.zh
-  CYC(0x4b93, 0x4b94); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x4b94, 0x4b95); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  if (!(F & FZ)) { RET_TAKEN(0x4b95); return; } // ret nz
-  CYC(0x4b95, 0x4b96);
-  CALL_C(0x4b96, objectReplaceWithAnimationIfOnHazard_hook, 0x2225, 0x4b99);
-  if (F & FC) { CYCT(0x4b99, 0x4b9c); partDelete_hook(gb); return; } // jp c
-  CYC(0x4b99, 0x4b9c);
-  CYC(0x4b9c, 0x4b9d); H = D;
-  CYC(0x4b9d, 0x4b9f); L = 0xc4; // Part.state
-  CYC(0x4b9f, 0x4ba0); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x4ba0, 0x4ba2); L = 0xd4; // Part.speedZ
-  CYC(0x4ba2, 0x4ba3); alu_xor(gb, A);
-  CYC(0x4ba3, 0x4ba4); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x4ba4, 0x4ba5); mem_wr(gb, HL, A);
-  CYC(0x4ba5, 0x4ba8); objectSetVisible82_hook(gb); return; // jp
+  CALL_C(b_+0, partAnimate_hook, SYM(partAnimate), b_+3);
+  CYC(b_+3, b_+4); H = D;
+  CYC(b_+4, b_+6); L = 0xcf; // Part.zh
+  CYC(b_+6, b_+7); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { RET_TAKEN(b_+8); return; } // ret nz
+  CYC(b_+8, b_+9);
+  CALL_C(b_+9, objectReplaceWithAnimationIfOnHazard_hook, SYM(objectReplaceWithAnimationIfOnHazard), b_+12);
+  if (F & FC) { CYCT(b_+12, b_+15); partDelete_hook(gb); return; } // jp c
+  CYC(b_+12, b_+15);
+  CYC(b_+15, b_+16); H = D;
+  CYC(b_+16, b_+18); L = 0xc4; // Part.state
+  CYC(b_+18, b_+19); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+19, b_+21); L = 0xd4; // Part.speedZ
+  CYC(b_+21, b_+22); alu_xor(gb, A);
+  CYC(b_+22, b_+23); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+23, b_+24); mem_wr(gb, HL, A);
+  CYC(b_+24, SYM(volcanoRock_common_substate4)); objectSetVisible82_hook(gb); return; // jp
 }
 
 void volcanoRock_common_substate4_hook(GB *gb) {
+  BASE(volcanoRock_common_substate4);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x4ba8, partAnimate_hook, 0x2978, 0x4bab);
-  CYC(0x4bab, 0x4bad); C = 0x16;
-  CALL_C(0x4bad, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x4bb0);
-  if (!(F & FZ)) { CYCT(0x4bb0, 0x4bb3); objectApplySpeed_hook(gb); return; } // jp nz
-  CYC(0x4bb0, 0x4bb3);
-  CYC(0x4bb3, 0x4bb5); L = 0xc4; // Part.state
-  CYC(0x4bb5, 0x4bb6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x4bb6, 0x4bb8); L = 0xdd; // Part.oamTileIndexBase
-  CYC(0x4bb8, 0x4bba); mem_wr(gb, HL, 0x26);
-  CYC(0x4bba, 0x4bbc); A = 0x03;
-  CALL_C(0x4bbc, partSetAnimation_hook, 0x2988, 0x4bbf);
-  CYC(0x4bbf, 0x4bc1); A = 0x81; // SND_STRONG_POUND
-  CYC(0x4bc1, 0x4bc4); playSound_b00_hook(gb); return; // jp
+  CALL_C(b_+0, partAnimate_hook, SYM(partAnimate), b_+3);
+  CYC(b_+3, b_+5); C = 0x16;
+  CALL_C(b_+5, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+8);
+  if (!(F & FZ)) { CYCT(b_+8, b_+11); objectApplySpeed_hook(gb); return; } // jp nz
+  CYC(b_+8, b_+11);
+  CYC(b_+11, b_+13); L = 0xc4; // Part.state
+  CYC(b_+13, b_+14); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+14, b_+16); L = 0xdd; // Part.oamTileIndexBase
+  CYC(b_+16, b_+18); mem_wr(gb, HL, 0x26);
+  CYC(b_+18, b_+20); A = 0x03;
+  CALL_C(b_+20, partSetAnimation_hook, SYM(partSetAnimation), b_+23);
+  CYC(b_+23, b_+25); A = 0x81; // SND_STRONG_POUND
+  CYC(b_+25, SYM(volcanoRock_common_substate5)); playSound_b00_hook(gb); return; // jp
 }
 
 void volcanoRock_common_substate5_hook(GB *gb) {
+  BASE(volcanoRock_common_substate5);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x4bc4, 0x4bc6); E = 0xe1; // Part.animParameter
-  CYC(0x4bc6, 0x4bc7); A = mem_rd(gb, DE);
-  CYC(0x4bc7, 0x4bc8); A = alu_inc8(gb, A);
-  if (F & FZ) { CYCT(0x4bc8, 0x4bcb); partDelete_hook(gb); return; } // jp z
-  CYC(0x4bc8, 0x4bcb);
-  CALL_C(0x4bcb, volcanoRock_setCollisionSize_hook, 0x4c1c, 0x4bce);
-  CYC(0x4bce, 0x4bd1); partAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+2); E = 0xe1; // Part.animParameter
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); A = alu_inc8(gb, A);
+  if (F & FZ) { CYCT(b_+4, b_+7); partDelete_hook(gb); return; } // jp z
+  CYC(b_+4, b_+7);
+  CALL_C(b_+7, volcanoRock_setCollisionSize_hook, SYM(volcanoRock_setCollisionSize), b_+10);
+  CYC(b_+10, SYM(volcanoRock_subid2)); partAnimate_hook(gb); return; // jp
 }
 
 void volcanoRock_subid2_hook(GB *gb) {
-  CYC(0x4bd1, 0x4bd2); A = mem_rd(gb, DE);
+  BASE(volcanoRock_subid2);
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   {
-    CYC(0x4bd2, 0x4bd3); push_effect(gb, 0x4bd3);
+    CYC(b_+1, b_+2); push_effect(gb, b_+2);
     uint16_t target = volcanoRock_jump_table(gb);
-    if (target == 0x4bdd) goto substate0;
-    if (target == 0x4b82) { volcanoRock_common_substate2_hook(gb); return; }
-    if (target == 0x4b8d) { volcanoRock_common_substate3_hook(gb); return; }
-    if (target == 0x4ba8) { volcanoRock_common_substate4_hook(gb); return; }
+    if (target == b_+12) goto substate0;
+    if (target == SYM(volcanoRock_common_substate2)) { volcanoRock_common_substate2_hook(gb); return; }
+    if (target == SYM(volcanoRock_common_substate3)) { volcanoRock_common_substate3_hook(gb); return; }
+    if (target == SYM(volcanoRock_common_substate4)) { volcanoRock_common_substate4_hook(gb); return; }
     volcanoRock_common_substate5_hook(gb); return;
   }
 
 substate0:
-  CYC(0x4bdd, 0x4bdf); A = 0x01;
-  CYC(0x4bdf, 0x4be0); mem_wr(gb, DE, A);
+  CYC(b_+12, b_+14); A = 0x01;
+  CYC(b_+14, SYM(volcanoRock_setRandomPosition)); mem_wr(gb, DE, A);
   volcanoRock_setRandomPosition_hook(gb); // falls through
 }
 
 void volcanoRock_setRandomPosition_hook(GB *gb) {
+  BASE(volcanoRock_setRandomPosition);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x4be0, getRandomNumber_noPreserveVars_hook, 0x0453, 0x4be3);
-  CYC(0x4be3, 0x4be4); B = A;
-  CYC(0x4be4, 0x4be7); SET_HL(0xffaa); // hCameraY
-  CYC(0x4be7, 0x4be9); E = 0xcb; // Part.yh
-  CYC(0x4be9, 0x4beb); alu_and(gb, 0x70);
-  CYC(0x4beb, 0x4bed); alu_add(gb, 0x08);
-  CYC(0x4bed, 0x4bee); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x4bee, 0x4bef); mem_wr(gb, DE, A);
-  CYC(0x4bef, 0x4bf0); alu_cpl(gb);
-  CYC(0x4bf0, 0x4bf1); A = alu_inc8(gb, A);
-  CYC(0x4bf1, 0x4bf3); alu_and(gb, 0xfe);
-  CYC(0x4bf3, 0x4bf5); E = 0xcf; // Part.zh
-  CYC(0x4bf5, 0x4bf6); mem_wr(gb, DE, A);
-  CYC(0x4bf6, 0x4bf8); L = 0xac; // <hCameraX
-  CYC(0x4bf8, 0x4bfa); E = 0xcd; // Part.xh
-  CYC(0x4bfa, 0x4bfb); A = B;
-  CYC(0x4bfb, 0x4bfd); alu_and(gb, 0x07);
-  CYC(0x4bfd, 0x4bfe); A = alu_inc8(gb, A);
-  CYC(0x4bfe, 0x4c00); A = alu_swap(gb, A);
-  CYC(0x4c00, 0x4c02); alu_add(gb, 0x08);
-  CYC(0x4c02, 0x4c03); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x4c03, 0x4c04); mem_wr(gb, DE, A);
-  CYC(0x4c04, 0x4c06); A = 0x02;
-  CYC(0x4c06, 0x4c09); partSetAnimation_hook(gb); return; // jp
+  CALL_C(b_+0, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+3);
+  CYC(b_+3, b_+4); B = A;
+  CYC(b_+4, b_+7); SET_HL(hCameraY); // hCameraY
+  CYC(b_+7, b_+9); E = 0xcb; // Part.yh
+  CYC(b_+9, b_+11); alu_and(gb, 0x70);
+  CYC(b_+11, b_+13); alu_add(gb, 0x08);
+  CYC(b_+13, b_+14); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+14, b_+15); mem_wr(gb, DE, A);
+  CYC(b_+15, b_+16); alu_cpl(gb);
+  CYC(b_+16, b_+17); A = alu_inc8(gb, A);
+  CYC(b_+17, b_+19); alu_and(gb, 0xfe);
+  CYC(b_+19, b_+21); E = 0xcf; // Part.zh
+  CYC(b_+21, b_+22); mem_wr(gb, DE, A);
+  CYC(b_+22, b_+24); L = 0xac; // <hCameraX
+  CYC(b_+24, b_+26); E = 0xcd; // Part.xh
+  CYC(b_+26, b_+27); A = B;
+  CYC(b_+27, b_+29); alu_and(gb, 0x07);
+  CYC(b_+29, b_+30); A = alu_inc8(gb, A);
+  CYC(b_+30, b_+32); A = alu_swap(gb, A);
+  CYC(b_+32, b_+34); alu_add(gb, 0x08);
+  CYC(b_+34, b_+35); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+35, b_+36); mem_wr(gb, DE, A);
+  CYC(b_+36, b_+38); A = 0x02;
+  CYC(b_+38, SYM(volcanoRock_subid0_setSpeedFromAngle)); partSetAnimation_hook(gb); return; // jp
 }
 
 void volcanoRock_subid0_setSpeedFromAngle_hook(GB *gb) {
-  CYC(0x4c09, 0x4c0b); B = 0x14; // SPEED_80
-  CYC(0x4c0b, 0x4c0d); alu_cp(gb, 0x0d);
-  if (F & FC) { CYCT(0x4c0d, 0x4c0f); goto setSpeed; } // jr c
-  CYC(0x4c0d, 0x4c0f);
-  CYC(0x4c0f, 0x4c11); B = 0x0a; // SPEED_40
-  CYC(0x4c11, 0x4c13); alu_cp(gb, 0x14);
-  if (F & FC) { CYCT(0x4c13, 0x4c15); goto setSpeed; } // jr c
-  CYC(0x4c13, 0x4c15);
-  CYC(0x4c15, 0x4c17); B = 0x14; // SPEED_80
+  BASE(volcanoRock_subid0_setSpeedFromAngle);
+  CYC(b_+0, b_+2); B = 0x14; // SPEED_80
+  CYC(b_+2, b_+4); alu_cp(gb, 0x0d);
+  if (F & FC) { CYCT(b_+4, b_+6); goto setSpeed; } // jr c
+  CYC(b_+4, b_+6);
+  CYC(b_+6, b_+8); B = 0x0a; // SPEED_40
+  CYC(b_+8, b_+10); alu_cp(gb, 0x14);
+  if (F & FC) { CYCT(b_+10, b_+12); goto setSpeed; } // jr c
+  CYC(b_+10, b_+12);
+  CYC(b_+12, b_+14); B = 0x14; // SPEED_80
 setSpeed:
-  CYC(0x4c17, 0x4c18); A = B;
-  CYC(0x4c18, 0x4c1a); E = 0xd0; // Part.speed
-  CYC(0x4c1a, 0x4c1b); mem_wr(gb, DE, A);
-  RET(0x4c1b); return; // ret
+  CYC(b_+14, b_+15); A = B;
+  CYC(b_+15, b_+17); E = 0xd0; // Part.speed
+  CYC(b_+17, b_+18); mem_wr(gb, DE, A);
+  RET(b_+18); return; // ret
 }
 
 void volcanoRock_setCollisionSize_hook(GB *gb) {
-  CYC(0x4c1c, 0x4c1d); A = alu_dec8(gb, A);
-  CYC(0x4c1d, 0x4c20); SET_HL(0x4c29); // @data
-  CYC(0x4c20, 0x4c21); volcanoRock_addAToHl_from_rst(gb, 0x4c21);
-  CYC(0x4c21, 0x4c23); E = 0xe6; // Part.collisionRadiusY
-  CYC(0x4c23, 0x4c24); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4c24, 0x4c25); mem_wr(gb, DE, A);
-  CYC(0x4c25, 0x4c26); E = alu_inc8(gb, E);
-  CYC(0x4c26, 0x4c27); A = mem_rd(gb, HL);
-  CYC(0x4c27, 0x4c28); mem_wr(gb, DE, A);
-  RET(0x4c28); return; // ret
+  BASE(volcanoRock_setCollisionSize);
+  CYC(b_+0, b_+1); A = alu_dec8(gb, A);
+  CYC(b_+1, b_+4); SET_HL(b_+13); // @data
+  CYC(b_+4, b_+5); volcanoRock_addAToHl_from_rst(gb, b_+5);
+  CYC(b_+5, b_+7); E = 0xe6; // Part.collisionRadiusY
+  CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+8, b_+9); mem_wr(gb, DE, A);
+  CYC(b_+9, b_+10); E = alu_inc8(gb, E);
+  CYC(b_+10, b_+11); A = mem_rd(gb, HL);
+  CYC(b_+11, b_+12); mem_wr(gb, DE, A);
+  RET(b_+12); return; // ret
 }

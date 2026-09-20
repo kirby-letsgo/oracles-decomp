@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x12, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x12, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(checkLinkCanSurface_isUnderwater), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(checkLinkCanSurface_isUnderwater), (from), (to), true)
 
 static void underwater_add_double_index_to_hl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -18,137 +18,138 @@ static void underwater_add_double_index_to_hl_from_rst(GB *gb, uint16_t return_a
 }
 
 void checkLinkCanSurface_isUnderwater_hook(GB *gb) {
+  BASE(checkLinkCanSurface_isUnderwater);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x78e4, 0x78e7); A = W8(wActiveGroup);
-  CYC(0x78e7, 0x78ea); SET_HL(0x795e);
-  CYC(0x78ea, 0x78eb); underwater_add_double_index_to_hl_from_rst(gb, 0x78eb);
-  CYC(0x78eb, 0x78ec); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x78ec, 0x78ed); H = mem_rd(gb, HL);
-  CYC(0x78ed, 0x78ee); L = A;
-  CYC(0x78ee, 0x78f1); A = W8(wActiveRoom);
-  CYC(0x78f1, 0x78f2); B = A;
+  CYC(b_+0, b_+3); A = W8(wActiveGroup);
+  CYC(b_+3, b_+6); SET_HL(SYM(underWaterSurfaceTable));
+  CYC(b_+6, b_+7); underwater_add_double_index_to_hl_from_rst(gb, b_+7);
+  CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+8, b_+9); H = mem_rd(gb, HL);
+  CYC(b_+9, b_+10); L = A;
+  CYC(b_+10, b_+13); A = W8(wActiveRoom);
+  CYC(b_+13, b_+14); B = A;
 
   for (;;) {
-    CYC(0x78f2, 0x78f3); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(0x78f3, 0x78f4); alu_or(gb, A);
+    CYC(b_+14, b_+15); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+15, b_+16); alu_or(gb, A);
     if (F & FZ) {
-      CYCT(0x78f4, 0x78f6);
+      CYCT(b_+16, b_+18);
       goto no_room_entry;
     }
-    CYC(0x78f4, 0x78f6);
-    CYC(0x78f6, 0x78f7); alu_cp(gb, B);
+    CYC(b_+16, b_+18);
+    CYC(b_+18, b_+19); alu_cp(gb, B);
     if (F & FZ) {
-      CYCT(0x78f7, 0x78f9);
+      CYCT(b_+19, b_+21);
       break;
     }
-    CYC(0x78f7, 0x78f9);
-    CYC(0x78f9, 0x78fa); SET_HL(HL + 1);
-    CYC(0x78fa, 0x78fb); SET_HL(HL + 1);
-    CYC(0x78fb, 0x78fd);
+    CYC(b_+19, b_+21);
+    CYC(b_+21, b_+22); SET_HL(HL + 1);
+    CYC(b_+22, b_+23); SET_HL(HL + 1);
+    CYC(b_+23, b_+25);
   }
 
-  CYC(0x78fd, 0x78fe); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x78fe, 0x78ff); H = mem_rd(gb, HL);
-  CYC(0x78ff, 0x7900); L = A;
-  CYC(0x7900, 0x7903); A = W8(wTilesetFlags);
-  CYC(0x7903, 0x7905); alu_and(gb, 0x01);
+  CYC(b_+25, b_+26); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+26, b_+27); H = mem_rd(gb, HL);
+  CYC(b_+27, b_+28); L = A;
+  CYC(b_+28, b_+31); A = W8(wTilesetFlags);
+  CYC(b_+31, b_+33); alu_and(gb, 0x01);
   if (F & FZ) {
-    CYCT(0x7905, 0x7907);
+    CYCT(b_+33, b_+35);
     goto check_jabu;
   }
-  CYC(0x7905, 0x7907);
-  CYC(0x7907, 0x7908); B = mem_rd(gb, HL);
-  CYC(0x7908, 0x7909); A = B;
-  CYC(0x7909, 0x790b); alu_and(gb, 0x03);
+  CYC(b_+33, b_+35);
+  CYC(b_+35, b_+36); B = mem_rd(gb, HL);
+  CYC(b_+36, b_+37); A = B;
+  CYC(b_+37, b_+39); alu_and(gb, 0x03);
   if (F & FZ) {
-    CYCT(0x790b, 0x790d);
+    CYCT(b_+39, b_+41);
     goto check_tile;
   }
-  CYC(0x790b, 0x790d);
-  CYC(0x790d, 0x790e); push_effect(gb, HL);
-  CYC(0x790e, 0x7910); A = 0x30;
-  CALL_C(0x7910, checkGlobalFlag_hook, 0x31f3, 0x7913);
-  CYC(0x7913, 0x7914); SET_HL(pop_effect(gb));
+  CYC(b_+39, b_+41);
+  CYC(b_+41, b_+42); push_effect(gb, HL);
+  CYC(b_+42, b_+44); A = 0x30;
+  CALL_C(b_+44, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+47);
+  CYC(b_+47, b_+48); SET_HL(pop_effect(gb));
   if (F & FZ) {
-    CYCT(0x7914, 0x7916);
+    CYCT(b_+48, b_+50);
     goto check_tile;
   }
-  CYC(0x7914, 0x7916);
-  CYC(0x7916, 0x7918); alu_bit(gb, 0, B);
+  CYC(b_+48, b_+50);
+  CYC(b_+50, b_+52); alu_bit(gb, 0, B);
   if (!(F & FZ)) {
-    CYCT(0x7918, 0x791a);
+    CYCT(b_+52, b_+54);
     goto no_room_entry;
   }
-  CYC(0x7918, 0x791a);
-  CYC(0x791a, 0x791c); A = 0x08;
-  CYC(0x791c, 0x791d); underwater_add_double_index_to_hl_from_rst(gb, 0x791d);
-  CYC(0x791d, 0x791f);
+  CYC(b_+52, b_+54);
+  CYC(b_+54, b_+56); A = 0x08;
+  CYC(b_+56, b_+57); underwater_add_double_index_to_hl_from_rst(gb, b_+57);
+  CYC(b_+57, b_+59);
   goto check_tile;
 
 check_jabu:
-  CYC(0x791f, 0x7922); A = W8(wDungeonIndex);
-  CYC(0x7922, 0x7924); alu_cp(gb, 0x07);
+  CYC(b_+59, b_+62); A = W8(wDungeonIndex);
+  CYC(b_+62, b_+64); alu_cp(gb, 0x07);
   if (!(F & FZ)) {
-    CYCT(0x7924, 0x7926);
+    CYCT(b_+64, b_+66);
     goto check_tile;
   }
-  CYC(0x7924, 0x7926);
-  CYC(0x7926, 0x7929); A = W8(wJabuWaterLevel);
-  CYC(0x7929, 0x792b); alu_and(gb, 0x03);
-  CYC(0x792b, 0x792d); alu_cp(gb, 0x02);
+  CYC(b_+64, b_+66);
+  CYC(b_+66, b_+69); A = W8(wJabuWaterLevel);
+  CYC(b_+69, b_+71); alu_and(gb, 0x03);
+  CYC(b_+71, b_+73); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
-    CYCT(0x792d, 0x792f);
+    CYCT(b_+73, b_+75);
     goto check_tile;
   }
-  CYC(0x792d, 0x792f);
-  CYC(0x792f, 0x7932); A = W8(wActiveRoom);
-  CYC(0x7932, 0x7934); alu_cp(gb, 0x4c);
+  CYC(b_+73, b_+75);
+  CYC(b_+75, b_+78); A = W8(wActiveRoom);
+  CYC(b_+78, b_+80); alu_cp(gb, 0x4c);
   if (F & FZ) {
-    CYCT(0x7934, 0x7936);
+    CYCT(b_+80, b_+82);
     goto jabu_adjustment;
   }
-  CYC(0x7934, 0x7936);
-  CYC(0x7936, 0x7938); alu_cp(gb, 0x4d);
+  CYC(b_+80, b_+82);
+  CYC(b_+82, b_+84); alu_cp(gb, 0x4d);
   if (!(F & FZ)) {
-    CYCT(0x7938, 0x793a);
+    CYCT(b_+84, b_+86);
     goto check_tile;
   }
-  CYC(0x7938, 0x793a);
+  CYC(b_+84, b_+86);
 
 jabu_adjustment:
-  CYC(0x793a, 0x793c); A = 0x0b;
-  CYC(0x793c, 0x793d); underwater_add_double_index_to_hl_from_rst(gb, 0x793d);
+  CYC(b_+86, b_+88); A = 0x0b;
+  CYC(b_+88, b_+89); underwater_add_double_index_to_hl_from_rst(gb, b_+89);
 
 check_tile:
-  CYC(0x793d, 0x7940); A = W8(wActiveTilePos);
-  CYC(0x7940, 0x7941); B = A;
-  CYC(0x7941, 0x7943); A = alu_swap(gb, A);
-  CYC(0x7943, 0x7945); alu_and(gb, 0x0f);
-  CYC(0x7945, 0x7946); underwater_add_double_index_to_hl_from_rst(gb, 0x7946);
-  CYC(0x7946, 0x7947); A = B;
-  CYC(0x7947, 0x7949); alu_and(gb, 0x0f);
-  CYC(0x7949, 0x794b); alu_xor(gb, 0x0f);
-  CALL_C(0x794b, checkFlag_hook, 0x0205, 0x794e);
+  CYC(b_+89, b_+92); A = W8(wActiveTilePos);
+  CYC(b_+92, b_+93); B = A;
+  CYC(b_+93, b_+95); A = alu_swap(gb, A);
+  CYC(b_+95, b_+97); alu_and(gb, 0x0f);
+  CYC(b_+97, b_+98); underwater_add_double_index_to_hl_from_rst(gb, b_+98);
+  CYC(b_+98, b_+99); A = B;
+  CYC(b_+99, b_+101); alu_and(gb, 0x0f);
+  CYC(b_+101, b_+103); alu_xor(gb, 0x0f);
+  CALL_C(b_+103, checkFlag_hook, SYM(checkFlag), b_+106);
   if (!(F & FZ)) {
-    CYCT(0x794e, 0x7950);
+    CYCT(b_+106, b_+108);
     goto done;
   }
-  CYC(0x794e, 0x7950);
-  CYC(0x7950, 0x7951); alu_scf(gb);
-  CYC(0x7951, 0x7953);
+  CYC(b_+106, b_+108);
+  CYC(b_+108, b_+109); alu_scf(gb);
+  CYC(b_+109, b_+111);
   goto done;
 
 no_room_entry:
-  CYC(0x7953, 0x7956); A = W8(wTilesetFlags);
-  CYC(0x7956, 0x7958); alu_and(gb, 0x01);
+  CYC(b_+111, b_+114); A = W8(wTilesetFlags);
+  CYC(b_+114, b_+116); alu_and(gb, 0x01);
   if (F & FZ) {
-    CYCT(0x7958, 0x795a);
+    CYCT(b_+116, b_+118);
     goto done;
   }
-  CYC(0x7958, 0x795a);
-  CYC(0x795a, 0x795b); alu_scf(gb);
+  CYC(b_+116, b_+118);
+  CYC(b_+118, b_+119); alu_scf(gb);
 
 done:
-  CYC(0x795b, 0x795d); C = alu_rl(gb, C);
-  CYC(0x795d, 0x795e); ret_effect(gb);
+  CYC(b_+119, b_+121); C = alu_rl(gb, C);
+  CYC(b_+121, SYM(underWaterSurfaceTable)); ret_effect(gb);
 }

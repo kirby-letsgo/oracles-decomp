@@ -3,29 +3,30 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(poe_decCounterAndFlickerVisibility), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(poe_decCounterAndFlickerVisibility), (from), (to), true)
 
 void writeFlagsTocddb_hook(GB *gb);
 
 // ref/oracles-disasm/scripts/ages/scriptHelper.s (INTERAC_POE), bank 0x15.
 
 void poe_decCounterAndFlickerVisibility_hook(GB *gb) {
+  BASE(poe_decCounterAndFlickerVisibility);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6131, 0x6132); H = D;
-  CYC(0x6132, 0x6134); L = INTERACTION_BASE + OBJ_VAR3E;
-  CYC(0x6134, 0x6135); A = mem_rd(gb, HL);
-  CYC(0x6135, 0x6136); alu_or(gb, A);
-  CALL_C(0x6136, writeFlagsTocddb_hook, 0x5118, 0x6139);
-  if (F & FZ) { CYCT(0x6139, 0x613b); goto set_visible; } // jr z
-  CYC(0x6139, 0x613b);
-  CYC(0x613b, 0x613c); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x613c, 0x613f); A = mem_rd(gb, wFrameCounter);
-  CYC(0x613f, 0x6140); alu_rrca(gb);
-  CYC(0x6140, 0x6141); alu_rrca(gb);
-  if (!(F & FC)) { CYCT(0x6141, 0x6144); objectSetInvisible_hook(gb); return; } // jp nc
-  CYC(0x6141, 0x6144);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR3E;
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
+  CYC(b_+4, b_+5); alu_or(gb, A);
+  CALL_C(b_+5, writeFlagsTocddb_hook, SYM(writeFlagsTocddb), b_+8);
+  if (F & FZ) { CYCT(b_+8, b_+10); goto set_visible; } // jr z
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+11); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+11, b_+14); A = mem_rd(gb, wFrameCounter);
+  CYC(b_+14, b_+15); alu_rrca(gb);
+  CYC(b_+15, b_+16); alu_rrca(gb);
+  if (!(F & FC)) { CYCT(b_+16, b_+19); objectSetInvisible_hook(gb); return; } // jp nc
+  CYC(b_+16, b_+19);
 
 set_visible:
-  CYC(0x6144, 0x6147); objectSetVisible_hook(gb); return; // jp
+  CYC(b_+19, SYM(poeScript_b15)); objectSetVisible_hook(gb); return; // jp
 }

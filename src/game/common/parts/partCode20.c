@@ -3,26 +3,27 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode20), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode20), (from), (to), true)
 
 void partCode20_hook(GB *gb) {
+  BASE(partCode20);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x537c, 0x537e); E = 0xc4; // Part.state
-  CYC(0x537e, 0x537f); A = mem_rd(gb, DE);
-  CYC(0x537f, 0x5380); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x5380, 0x5382); goto state0; } // jr z
-  CYC(0x5380, 0x5382);
-  CALL_C(0x5382, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x5385);
-  if (F & FZ) { CYCT(0x5385, 0x5388); partDelete_hook(gb); return; } // jp z
-  CYC(0x5385, 0x5388);
-  CYC(0x5388, 0x538b); partAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+2); E = 0xc4; // Part.state
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+4, b_+6); goto state0; } // jr z
+  CYC(b_+4, b_+6);
+  CALL_C(b_+6, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+9);
+  if (F & FZ) { CYCT(b_+9, b_+12); partDelete_hook(gb); return; } // jp z
+  CYC(b_+9, b_+12);
+  CYC(b_+12, b_+15); partAnimate_hook(gb); return; // jp
 
 state0:
-  CYC(0x538b, 0x538c); H = D;
-  CYC(0x538c, 0x538d); L = E;
-  CYC(0x538d, 0x538e); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x538e, 0x5390); L = 0xc6; // Part.counter1
-  CYC(0x5390, 0x5392); mem_wr(gb, HL, 0xb4);
-  CYC(0x5392, 0x5395); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+15, b_+16); H = D;
+  CYC(b_+16, b_+17); L = E;
+  CYC(b_+17, b_+18); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+18, b_+20); L = 0xc6; // Part.counter1
+  CYC(b_+20, b_+22); mem_wr(gb, HL, 0xb4);
+  CYC(b_+22, SYM(partCode21)); objectSetVisible82_hook(gb); return; // jp
 }

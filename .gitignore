@@ -9,3 +9,4 @@ build-quirk/
 CLAUDE.md
 .cache
 Testing
+__pycache__/

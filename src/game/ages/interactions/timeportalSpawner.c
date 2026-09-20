@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x10, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x10, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodee1), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodee1), (from), (to), true)
 
 // object_code/ages/interactions/timeportalSpawner.s (INTERAC_TIMEPORTAL_SPAWNER), bank $10.
 
@@ -29,140 +29,142 @@ static uint16_t timeportalSpawner_jump_table(GB *gb) {
 }
 
 void interactionCodee1_hook(GB *gb) {
+  BASE(interactionCodee1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x7d02, 0x7d04); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x7d04, 0x7d05); A = mem_rd(gb, DE);
-  CYC(0x7d05, 0x7d06); push_effect(gb, 0x7d06);
-  switch (timeportalSpawner_jump_table(gb)) {
-    case 0x7d0e: goto state3;
-    case 0x7d3d: goto state0;
-    case 0x7d88: goto state1;
-    case 0x7d96: goto state2;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (timeportalSpawner_jump_table(gb));
+    if (jt_ == b_+12) { goto state3; }
+    else if (jt_ == b_+59) { goto state0; }
+    else if (jt_ == b_+134) { goto state1; }
+    else if (jt_ == b_+148) { goto state2; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 state3:
-  CALL_C(0x7d0e, objectSetVisible83_hook, 0x1e72, 0x7d11);
-  CYC(0x7d11, 0x7d13); B = 0x01;
-  CALL_C(0x7d13, objectFlickerVisibility_hook, 0x24e6, 0x7d16);
-  CALL_C(0x7d16, interactionAnimate_hook, 0x261b, 0x7d19);
-  CYC(0x7d19, 0x7d1c); push_effect(gb, 0x7d1c);
+  CALL_C(b_+12, objectSetVisible83_hook, SYM(objectSetVisible83), b_+15);
+  CYC(b_+15, b_+17); B = 0x01;
+  CALL_C(b_+17, objectFlickerVisibility_hook, SYM(objectFlickerVisibility), b_+20);
+  CALL_C(b_+20, interactionAnimate_hook, SYM(interactionAnimate), b_+23);
+  CYC(b_+23, b_+26); push_effect(gb, b_+26);
   markSpotDiscovered_hook(gb);
-  CYC(0x7d1c, 0x7d1f); A = mem_rd(gb, 0xcc2c);
-  CYC(0x7d1f, 0x7d20); alu_rrca(gb);
-  if (F & FC) { RET_TAKEN(0x7d20); return; }
-  CYC(0x7d20, 0x7d21);
-  CALL_C(0x7d21, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, 0x1c28, 0x7d24);
-  if (!(F & FC)) { RET_TAKEN(0x7d24); return; }
-  CYC(0x7d24, 0x7d25);
-  CALL_C(0x7d25, checkLinkCollisionsEnabled_hook, 0x1d32, 0x7d28);
-  if (!(F & FC)) { RET_TAKEN(0x7d28); return; }
-  CYC(0x7d28, 0x7d29);
-  CYC(0x7d29, 0x7d2b); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7d2b, 0x7d2c); A = mem_rd(gb, DE);
-  CYC(0x7d2c, 0x7d2e); alu_bit(gb, 6, A);
+  CYC(b_+26, b_+29); A = mem_rd(gb, wLinkObjectIndex);
+  CYC(b_+29, b_+30); alu_rrca(gb);
+  if (F & FC) { RET_TAKEN(b_+30); return; }
+  CYC(b_+30, b_+31);
+  CALL_C(b_+31, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing), b_+34);
+  if (!(F & FC)) { RET_TAKEN(b_+34); return; }
+  CYC(b_+34, b_+35);
+  CALL_C(b_+35, checkLinkCollisionsEnabled_hook, SYM(checkLinkCollisionsEnabled), b_+38);
+  if (!(F & FC)) { RET_TAKEN(b_+38); return; }
+  CYC(b_+38, b_+39);
+  CYC(b_+39, b_+41); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+41, b_+42); A = mem_rd(gb, DE);
+  CYC(b_+42, b_+44); alu_bit(gb, 6, A);
   if (F & FZ) {
-    CYCT(0x7d2e, 0x7d30);
+    CYCT(b_+44, b_+46);
     goto interBankToBeginTimewarp;
   }
-  CYC(0x7d2e, 0x7d30);
-  CALL_C(0x7d30, getThisRoomFlags_hook, 0x197d, 0x7d33);
-  CYC(0x7d33, 0x7d35); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1)));
+  CYC(b_+44, b_+46);
+  CALL_C(b_+46, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+49);
+  CYC(b_+49, b_+51); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1)));
 interBankToBeginTimewarp:
-  CYC(0x7d35, 0x7d38); SET_HL(0x7bce);
-  CYC(0x7d38, 0x7d3a); E = 0x10;
-  CYC(0x7d3a, 0x7d3d);
+  CYC(b_+51, b_+54); SET_HL(SYM(interactionBeginTimewarp));
+  CYC(b_+54, b_+56); E = 0x10;
+  CYC(b_+56, b_+59);
   interBankCall_hook(gb);
   return;
 state0:
-  CYC(0x7d3d, 0x7d3f); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7d3f, 0x7d40); A = mem_rd(gb, DE);
-  CYC(0x7d40, 0x7d42); alu_and(gb, 0x0f);
-  CYC(0x7d42, 0x7d43); push_effect(gb, 0x7d43);
-  switch (timeportalSpawner_jump_table(gb)) {
-    case 0x7d49: goto subid1Init;
-    case 0x7d52: goto subid2Init;
-    case 0x7d5e: goto commonInit;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+59, b_+61); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+61, b_+62); A = mem_rd(gb, DE);
+  CYC(b_+62, b_+64); alu_and(gb, 0x0f);
+  CYC(b_+64, b_+65); push_effect(gb, b_+65);
+  do { uint16_t jt_ = (timeportalSpawner_jump_table(gb));
+    if (jt_ == b_+71) { goto subid1Init; }
+    else if (jt_ == b_+80) { goto subid2Init; }
+    else if (jt_ == b_+92) { goto commonInit; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 subid1Init:
-  CYC(0x7d49, 0x7d4b); A = 0x12;
-  CALL_C(0x7d4b, checkGlobalFlag_hook, 0x31f3, 0x7d4e);
+  CYC(b_+71, b_+73); A = 0x12;
+  CALL_C(b_+73, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+76);
   if (!(F & FZ)) {
-    CYCT(0x7d4e, 0x7d50);
+    CYCT(b_+76, b_+78);
     goto commonInit;
   }
-  CYC(0x7d4e, 0x7d50);
-  CYC(0x7d50, 0x7d52);
+  CYC(b_+76, b_+78);
+  CYC(b_+78, b_+80);
   goto setSubidBit7;
 subid2Init:
-  CYC(0x7d52, 0x7d54); A = 0x19;
-  CALL_C(0x7d54, checkTreasureObtained_hook, 0x1748, 0x7d57);
+  CYC(b_+80, b_+82); A = 0x19;
+  CALL_C(b_+82, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+85);
   if (F & FC) {
-    CYCT(0x7d57, 0x7d59);
+    CYCT(b_+85, b_+87);
     goto commonInit;
   }
-  CYC(0x7d57, 0x7d59);
+  CYC(b_+85, b_+87);
 setSubidBit7:
-  CYC(0x7d59, 0x7d5a); H = D;
-  CYC(0x7d5a, 0x7d5c); L = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7d5c, 0x7d5e); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
+  CYC(b_+87, b_+88); H = D;
+  CYC(b_+88, b_+90); L = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+90, b_+92); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
 commonInit:
-  CALL_C(0x7d5e, objectGetTileAtPosition_hook, 0x1444, 0x7d61);
-  CYC(0x7d61, 0x7d63); alu_cp(gb, 0xd7);
-  if (!(F & FZ)) { RET_TAKEN(0x7d63); return; }
-  CYC(0x7d63, 0x7d64);
-  CALL_C(0x7d64, interactionInitGraphics_hook, 0x15fb, 0x7d67);
-  CALL_C(0x7d67, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x7d6a);
-  CYC(0x7d6a, 0x7d6c); A = 0x02;
-  CALL_C(0x7d6c, objectSetCollideRadius_hook, 0x24a1, 0x7d6f);
-  CYC(0x7d6f, 0x7d71); L = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7d71, 0x7d72); B = mem_rd(gb, HL);
-  CYC(0x7d72, 0x7d74); alu_bit(gb, 6, B);
+  CALL_C(b_+92, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+95);
+  CYC(b_+95, b_+97); alu_cp(gb, 0xd7);
+  if (!(F & FZ)) { RET_TAKEN(b_+97); return; }
+  CYC(b_+97, b_+98);
+  CALL_C(b_+98, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+101);
+  CALL_C(b_+101, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+104);
+  CYC(b_+104, b_+106); A = 0x02;
+  CALL_C(b_+106, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+109);
+  CYC(b_+109, b_+111); L = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+111, b_+112); B = mem_rd(gb, HL);
+  CYC(b_+112, b_+114); alu_bit(gb, 6, B);
   if (F & FZ) {
-    CYCT(0x7d74, 0x7d76);
+    CYCT(b_+114, b_+116);
     goto afterRoomFlagCheck;
   }
-  CYC(0x7d74, 0x7d76);
-  CALL_C(0x7d76, getThisRoomFlags_hook, 0x197d, 0x7d79);
-  CYC(0x7d79, 0x7d7b); alu_and(gb, 0x02);
+  CYC(b_+114, b_+116);
+  CALL_C(b_+116, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+119);
+  CYC(b_+119, b_+121); alu_and(gb, 0x02);
   if (!(F & FZ)) {
-    CYCT(0x7d7b, 0x7d7d);
+    CYCT(b_+121, b_+123);
     goto afterRoomFlagCheck;
   }
-  CYC(0x7d7b, 0x7d7d);
-  CYC(0x7d7d, 0x7d7f); B = (uint8_t)(B | (1 << 7));
+  CYC(b_+121, b_+123);
+  CYC(b_+123, b_+125); B = (uint8_t)(B | (1 << 7));
 afterRoomFlagCheck:
-  CALL_C(0x7d7f, interactionIncState_hook, 0x23e0, 0x7d82);
-  CYC(0x7d82, 0x7d84); alu_bit(gb, 7, B);
-  if (F & FZ) { RET_TAKEN(0x7d84); return; }
-  CYC(0x7d84, 0x7d85);
-  CYC(0x7d85, 0x7d87); mem_wr(gb, HL, 0x03);
-  RET(0x7d87); return;
+  CALL_C(b_+125, interactionIncState_hook, SYM(interactionIncState), b_+128);
+  CYC(b_+128, b_+130); alu_bit(gb, 7, B);
+  if (F & FZ) { RET_TAKEN(b_+130); return; }
+  CYC(b_+130, b_+131);
+  CYC(b_+131, b_+133); mem_wr(gb, HL, 0x03);
+  RET(b_+133); return;
 state1:
-  CYC(0x7d88, 0x7d8b); A = mem_rd(gb, 0xcc8d);
-  CYC(0x7d8b, 0x7d8c); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x7d8c); return; }
-  CYC(0x7d8c, 0x7d8d);
-  CALL_C(0x7d8d, interactionIncState_hook, 0x23e0, 0x7d90);
-  CALL_C(0x7d90, getThisRoomFlags_hook, 0x197d, 0x7d93);
-  CYC(0x7d93, 0x7d95); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 3)));
-  RET(0x7d95); return;
+  CYC(b_+134, b_+137); A = mem_rd(gb, wLinkPlayingInstrument);
+  CYC(b_+137, b_+138); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+138); return; }
+  CYC(b_+138, b_+139);
+  CALL_C(b_+139, interactionIncState_hook, SYM(interactionIncState), b_+142);
+  CALL_C(b_+142, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+145);
+  CYC(b_+145, b_+147); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 3)));
+  RET(b_+147); return;
 state2:
-  CYC(0x7d96, 0x7d99); A = mem_rd(gb, 0xcc8d);
-  CYC(0x7d99, 0x7d9a); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x7d9a); return; }
-  CYC(0x7d9a, 0x7d9b);
-  CYC(0x7d9b, 0x7d9d); A = 0xf1;
-  CALL_C(0x7d9d, playSound_b00_hook, 0x0c98, 0x7da0);
-  CYC(0x7da0, 0x7da2); A = 0x8d;
-  CALL_C(0x7da2, playSound_b00_hook, 0x0c98, 0x7da5);
-  CYC(0x7da5, 0x7da8);
+  CYC(b_+148, b_+151); A = mem_rd(gb, wLinkPlayingInstrument);
+  CYC(b_+151, b_+152); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+152); return; }
+  CYC(b_+152, b_+153);
+  CYC(b_+153, b_+155); A = 0xf1;
+  CALL_C(b_+155, playSound_b00_hook, SYM(playSound_b00), b_+158);
+  CYC(b_+158, b_+160); A = 0x8d;
+  CALL_C(b_+160, playSound_b00_hook, SYM(playSound_b00), b_+163);
+  CYC(b_+163, SYM(interactionCodee3));
   interactionIncState_hook(gb);
 }
 
 void markSpotDiscovered_hook(GB *gb) {
+  BASE(interactionCodee1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x7d90, getThisRoomFlags_hook, 0x197d, 0x7d93);
-  CYC(0x7d93, 0x7d95); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 3)));
-  RET(0x7d95); return;
+  CALL_C(b_+142, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+145);
+  CYC(b_+145, b_+147); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 3)));
+  RET(b_+147); return;
 }

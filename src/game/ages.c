@@ -3,10 +3,10 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x16, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x16, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(loadD6ChangingFloorPatternToBigBuffer), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(loadD6ChangingFloorPatternToBigBuffer), (from), (to), true)
 
-#define changingFloorData_bank16 0x578a
+#define changingFloorData_bank16 SYM(loadD6ChangingFloorPatternToBigBuffer__changingFloorData)
 
 static void ages_add_double_index(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -20,28 +20,29 @@ static void ages_add_double_index(GB *gb, uint16_t return_address) {
 }
 
 void loadD6ChangingFloorPatternToBigBuffer_hook(GB *gb) {
+  BASE(loadD6ChangingFloorPatternToBigBuffer);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5766, 0x5767); A = B;
-  CYC(0x5767, 0x5768); alu_add(gb, A);
-  CYC(0x5768, 0x576b); SET_HL(changingFloorData_bank16);
-  CYC(0x576b, 0x576c); ages_add_double_index(gb, 0x576c);
-  CYC(0x576c, 0x576d); push_effect(gb, HL);
-  CYC(0x576d, 0x576e); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x576e, 0x576f); D = mem_rd(gb, HL);
-  CYC(0x576f, 0x5770); E = A;
-  CYC(0x5770, 0x5772); B = 0x41;
-  CYC(0x5772, 0x5775); SET_HL(wBigBuffer);
-  CALL_C(0x5775, copyMemoryReverse_hook, 0x047f, 0x5778);
-  CYC(0x5778, 0x5779); SET_HL(pop_effect(gb));
-  CYC(0x5779, 0x577a); SET_HL(HL + 1);
-  CYC(0x577a, 0x577b); SET_HL(HL + 1);
-  CYC(0x577b, 0x577c); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x577c, 0x577d); D = mem_rd(gb, HL);
-  CYC(0x577d, 0x577e); E = A;
-  CYC(0x577e, 0x5780); B = 0x41;
-  CYC(0x5780, 0x5783); SET_HL(wBigBuffer + 0x80);
-  CALL_C(0x5783, copyMemoryReverse_hook, 0x047f, 0x5786);
-  CYC(0x5786, 0x5788); A = H8(hActiveObject);
-  CYC(0x5788, 0x5789); D = A;
-  CYC(0x5789, 0x578a); ret_effect(gb);
+  CYC(b_+0, b_+1); A = B;
+  CYC(b_+1, b_+2); alu_add(gb, A);
+  CYC(b_+2, b_+5); SET_HL(changingFloorData_bank16);
+  CYC(b_+5, b_+6); ages_add_double_index(gb, b_+6);
+  CYC(b_+6, b_+7); push_effect(gb, HL);
+  CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+8, b_+9); D = mem_rd(gb, HL);
+  CYC(b_+9, b_+10); E = A;
+  CYC(b_+10, b_+12); B = 0x41;
+  CYC(b_+12, b_+15); SET_HL(wBigBuffer);
+  CALL_C(b_+15, copyMemoryReverse_hook, SYM(copyMemoryReverse), b_+18);
+  CYC(b_+18, b_+19); SET_HL(pop_effect(gb));
+  CYC(b_+19, b_+20); SET_HL(HL + 1);
+  CYC(b_+20, b_+21); SET_HL(HL + 1);
+  CYC(b_+21, b_+22); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+22, b_+23); D = mem_rd(gb, HL);
+  CYC(b_+23, b_+24); E = A;
+  CYC(b_+24, b_+26); B = 0x41;
+  CYC(b_+26, b_+29); SET_HL(wBigBuffer + 0x80);
+  CALL_C(b_+29, copyMemoryReverse_hook, SYM(copyMemoryReverse), b_+32);
+  CYC(b_+32, b_+34); A = H8(hActiveObject);
+  CYC(b_+34, b_+35); D = A;
+  CYC(b_+35, b_+36); ret_effect(gb);
 }

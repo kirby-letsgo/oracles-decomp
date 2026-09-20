@@ -3,35 +3,36 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(greatFairyOctorok_createMagicPowderAnimation), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(greatFairyOctorok_createMagicPowderAnimation), (from), (to), true)
 
 void greatFairyOctorok_createMagicPowderAnimation_hook(GB *gb);
 
 void greatFairyOctorok_createMagicPowderAnimation_hook(GB *gb) {
+  BASE(greatFairyOctorok_createMagicPowderAnimation);
   uint16_t sp0_ = gb->sp;
-  CYC(0x543a, 0x543c); A = 0x83;
-  CALL_C(0x543c, playSound_b00_hook, 0x0c98, 0x543f);
-  CYC(0x543f, 0x5442); SET_BC(0x00f8);
+  CYC(b_+0, b_+2); A = 0x83;
+  CALL_C(b_+2, playSound_b00_hook, SYM(playSound_b00), b_+5);
+  CYC(b_+5, b_+8); SET_BC(0x00f8);
 
 next:
-  CALL_C(0x5442, getFreePartSlot_hook, 0x3e8e, 0x5445);
+  CALL_C(b_+8, getFreePartSlot_hook, SYM(getFreePartSlot), b_+11);
   if (!(F & FZ)) {
-    RET_TAKEN(0x5445); return;
+    RET_TAKEN(b_+11); return;
   }
-  CYC(0x5445, 0x5446);
-  CYC(0x5446, 0x5448); mem_wr(gb, HL, 0x26);
-  CYC(0x5448, 0x544a); L = 0xc3;
-  CYC(0x544a, 0x544b); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CALL_C(0x544b, objectCopyPositionWithOffset_hook, 0x225a, 0x544e);
-  CYC(0x544e, 0x544f); A = C;
-  CYC(0x544f, 0x5451); alu_add(gb, 0x08);
-  CYC(0x5451, 0x5452); C = A;
-  CYC(0x5452, 0x5454); alu_cp(gb, 0x18);
+  CYC(b_+11, b_+12);
+  CYC(b_+12, b_+14); mem_wr(gb, HL, 0x26);
+  CYC(b_+14, b_+16); L = 0xc3;
+  CYC(b_+16, b_+17); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CALL_C(b_+17, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+20);
+  CYC(b_+20, b_+21); A = C;
+  CYC(b_+21, b_+23); alu_add(gb, 0x08);
+  CYC(b_+23, b_+24); C = A;
+  CYC(b_+24, b_+26); alu_cp(gb, 0x18);
   if (!(F & FZ)) {
-    CYCT(0x5454, 0x5456);
+    CYCT(b_+26, b_+28);
     goto next;
   }
-  CYC(0x5454, 0x5456);
-  RET(0x5456);
+  CYC(b_+26, b_+28);
+  RET(b_+28);
 }

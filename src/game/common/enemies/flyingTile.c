@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0e, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0e, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(flyingTile_state_spawner), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(flyingTile_state_spawner), (from), (to), true)
 
 void flyingTile_state_uninitialized_hook(GB *gb);
 void flyingTile_state_spawner_hook(GB *gb);
@@ -66,13 +66,14 @@ static void flyingTile_addDoubleIndexToHl_from_rst(GB *gb, uint16_t return_addre
 // reached by genuine call/ret from substate1.
 // @param hl Address to save to var30/var31
 static void flyingTile_saveTileDataAddress(GB *gb) {
-  CYC(0x65ca, 0x65cc); E = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x65cc, 0x65cd); A = L;
-  CYC(0x65cd, 0x65ce); mem_wr(gb, DE, A);
-  CYC(0x65ce, 0x65cf); E = alu_inc8(gb, E);
-  CYC(0x65cf, 0x65d0); A = H;
-  CYC(0x65d0, 0x65d1); mem_wr(gb, DE, A);
-  CYC(0x65d1, 0x65d2);
+  BASE(flyingTile_state_spawner);
+  CYC(b_+27, b_+29); E = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+29, b_+30); A = L;
+  CYC(b_+30, b_+31); mem_wr(gb, DE, A);
+  CYC(b_+31, b_+32); E = alu_inc8(gb, E);
+  CYC(b_+32, b_+33); A = H;
+  CYC(b_+33, b_+34); mem_wr(gb, DE, A);
+  CYC(b_+34, b_+35);
 }
 
 // ==================================================================================================
@@ -82,205 +83,217 @@ static void flyingTile_saveTileDataAddress(GB *gb) {
 //   var30/var31: Pointer to current address in flyingTile_layoutData
 // ==================================================================================================
 void enemyCode52_hook(GB *gb) {
+  BASE(enemyCode52);
   uint16_t sp0_ = gb->sp;
-  if (F & FZ) { CYCT(0x657c, 0x657e); goto normalStatus; } // jr z
-  CYC(0x657c, 0x657e);
-  CYC(0x657e, 0x6580); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(0x6580); return; } // ret c
-  CYC(0x6580, 0x6581);
-  CYC(0x6581, 0x6584); flyingTile_dead_hook(gb); return; // jp
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+4); return; } // ret c
+  CYC(b_+4, b_+5);
+  CYC(b_+5, b_+8); flyingTile_dead_hook(gb); return; // jp
 
 normalStatus:
-  CYC(0x6584, 0x6586); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6586, 0x6587); A = mem_rd(gb, DE);
+  CYC(b_+8, b_+10); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+10, b_+11); A = mem_rd(gb, DE);
   {
-    CYC(0x6587, 0x6588); push_effect(gb, 0x6588);
+    CYC(b_+11, b_+12); push_effect(gb, b_+12);
     uint16_t target = flyingTile_jump_table(gb);
-    if (target == 0x65a0) { flyingTile_state_uninitialized_hook(gb); return; }
-    if (target == 0x65af) { flyingTile_state_spawner_hook(gb); return; }
-    if (target == 0x65fc) { flyingTile_state_stub_hook(gb); return; }
-    if (target == 0x65fd) { flyingTile_state8_hook(gb); return; }
-    if (target == 0x660a) { flyingTile_state9_hook(gb); return; }
-    if (target == 0x6622) { flyingTile_stateA_hook(gb); return; }
-    if (target == 0x662e) { flyingTile_stateB_hook(gb); return; }
+    if (target == SYM(flyingTile_state_uninitialized)) { flyingTile_state_uninitialized_hook(gb); return; }
+    if (target == SYM(flyingTile_state_spawner)) { flyingTile_state_spawner_hook(gb); return; }
+    if (target == SYM(flyingTile_state_stub)) { flyingTile_state_stub_hook(gb); return; }
+    if (target == SYM(flyingTile_state8)) { flyingTile_state8_hook(gb); return; }
+    if (target == SYM(flyingTile_state9)) { flyingTile_state9_hook(gb); return; }
+    if (target == SYM(flyingTile_stateA)) { flyingTile_stateA_hook(gb); return; }
+    if (target == SYM(flyingTile_stateB)) { flyingTile_stateB_hook(gb); return; }
     HANDOFF(target);
   }
 }
 
 // 0e:65a0, bare global; jump-table target from enemyCode52.
 void flyingTile_state_uninitialized_hook(GB *gb) {
-  CYC(0x65a0, 0x65a2); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x65a2, 0x65a3); A = mem_rd(gb, DE);
-  CYC(0x65a3, 0x65a4); alu_rlca(gb);
-  CYC(0x65a4, 0x65a6); A = 0x46; // SPEED_1c0
-  if (F & FC) { CYCT(0x65a6, 0x65a9); ecom_setSpeedAndState8_b0e_hook(gb); return; } // jp c
-  CYC(0x65a6, 0x65a9);
-  CYC(0x65a9, 0x65ab); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x65ab, 0x65ad); A = 0x01;
-  CYC(0x65ad, 0x65ae); mem_wr(gb, DE, A);
-  RET(0x65ae); return; // ret
+  BASE(flyingTile_state_uninitialized);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_rlca(gb);
+  CYC(b_+4, b_+6); A = 0x46; // SPEED_1c0
+  if (F & FC) { CYCT(b_+6, b_+9); ecom_setSpeedAndState8_b0e_hook(gb); return; } // jp c
+  CYC(b_+6, b_+9);
+  CYC(b_+9, b_+11); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+11, b_+13); A = 0x01;
+  CYC(b_+13, b_+14); mem_wr(gb, DE, A);
+  RET(b_+14); return; // ret
 }
 
 // 0e:65af, bare global; jump-table target from enemyCode52.
 void flyingTile_state_spawner_hook(GB *gb) {
+  BASE(flyingTile_state_spawner);
   uint16_t sp0_ = gb->sp;
-  CYC(0x65af, 0x65b0); E = alu_inc8(gb, E);
-  CYC(0x65b0, 0x65b1); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+1); E = alu_inc8(gb, E);
+  CYC(b_+1, b_+2); A = mem_rd(gb, DE);
   {
-    CYC(0x65b1, 0x65b2); push_effect(gb, 0x65b2);
+    CYC(b_+2, b_+3); push_effect(gb, b_+3);
     uint16_t target = flyingTile_jump_table(gb);
-    if (target == 0x65b6) goto substate0;
-    if (target == 0x65d2) goto substate1;
+    if (target == b_+7) goto substate0;
+    if (target == b_+35) goto substate1;
     HANDOFF(target);
   }
 
 substate0:
-  CYC(0x65b6, 0x65b7); H = D;
-  CYC(0x65b7, 0x65b8); L = E;
-  CYC(0x65b8, 0x65b9); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [substate]
-  CYC(0x65b9, 0x65ba); L = alu_inc8(gb, L);
-  CYC(0x65ba, 0x65bc); mem_wr(gb, HL, 0x78); // [counter1] = 120
-  CYC(0x65bc, 0x65be); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x65be, 0x65bf); A = mem_rd(gb, DE);
-  CYC(0x65bf, 0x65c2); SET_HL(0x6657); // flyingTile_layoutData
-  CYC(0x65c2, 0x65c3); flyingTile_addDoubleIndexToHl_from_rst(gb, 0x65c3);
-  CYC(0x65c3, 0x65c4); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x65c4, 0x65c5); H = mem_rd(gb, HL);
-  CYC(0x65c5, 0x65c6); L = A;
-  CYC(0x65c6, 0x65c8); E = ENEMY_BASE + 0x03; // Enemy.var03
-  CYC(0x65c8, 0x65c9); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x65c9, 0x65ca); mem_wr(gb, DE, A);
+  CYC(b_+7, b_+8); H = D;
+  CYC(b_+8, b_+9); L = E;
+  CYC(b_+9, b_+10); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [substate]
+  CYC(b_+10, b_+11); L = alu_inc8(gb, L);
+  CYC(b_+11, b_+13); mem_wr(gb, HL, 0x78); // [counter1] = 120
+  CYC(b_+13, b_+15); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+15, b_+16); A = mem_rd(gb, DE);
+  CYC(b_+16, b_+19); SET_HL(SYM(flyingTile_layoutData)); // flyingTile_layoutData
+  CYC(b_+19, b_+20); flyingTile_addDoubleIndexToHl_from_rst(gb, b_+20);
+  CYC(b_+20, b_+21); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+21, b_+22); H = mem_rd(gb, HL);
+  CYC(b_+22, b_+23); L = A;
+  CYC(b_+23, b_+25); E = ENEMY_BASE + 0x03; // Enemy.var03
+  CYC(b_+25, b_+26); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+26, b_+27); mem_wr(gb, DE, A);
   flyingTile_saveTileDataAddress(gb); return; // fallthrough
 
 substate1:
-  CALL_C(0x65d2, ecom_decCounter1_b0e_hook, 0x439a, 0x65d5);
-  if (!(F & FZ)) { RET_TAKEN(0x65d5); return; } // ret nz
-  CYC(0x65d5, 0x65d6);
-  CYC(0x65d6, 0x65d8); mem_wr(gb, HL, 0x3c); // [counter1] = 60
-  CYC(0x65d8, 0x65da); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x65da, 0x65db); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x65db, 0x65dc); H = mem_rd(gb, HL);
-  CYC(0x65dc, 0x65dd); L = A;
-  CYC(0x65dd, 0x65de); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x65de, 0x65df); C = A;
-  PUSH(0x65df, HL);
-  CYC(0x65e0, 0x65e3); flyingTile_saveTileDataAddress(gb);
-  CYC(0x65e3, 0x65e5); B = 0x52; // ENEMY_FLYING_TILE
-  CALL_C(0x65e5, ecom_spawnEnemyWithSubid01_b0e_hook, 0x4373, 0x65e8);
-  if (!(F & FZ)) { CYCT(0x65e8, 0x65ea); goto childDone; } // jr nz
-  CYC(0x65e8, 0x65ea);
-  CYC(0x65ea, 0x65ec); L = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x65ec, 0x65ee); E = ENEMY_BASE + 0x03; // Enemy.var03
-  CYC(0x65ee, 0x65ef); A = mem_rd(gb, DE);
-  CYC(0x65ef, 0x65f0); mem_wr(gb, HL, A);
-  CYC(0x65f0, 0x65f2); L = ENEMY_BASE + OBJ_YH;
-  CALL_C(0x65f2, setShortPosition_paramC_hook, 0x20b9, 0x65f5);
+  CALL_C(b_+35, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+38);
+  if (!(F & FZ)) { RET_TAKEN(b_+38); return; } // ret nz
+  CYC(b_+38, b_+39);
+  CYC(b_+39, b_+41); mem_wr(gb, HL, 0x3c); // [counter1] = 60
+  CYC(b_+41, b_+43); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+43, b_+44); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+44, b_+45); H = mem_rd(gb, HL);
+  CYC(b_+45, b_+46); L = A;
+  CYC(b_+46, b_+47); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+47, b_+48); C = A;
+  PUSH(b_+48, HL);
+  CYC(b_+49, b_+52); flyingTile_saveTileDataAddress(gb);
+  CYC(b_+52, b_+54); B = 0x52; // ENEMY_FLYING_TILE
+  CALL_C(b_+54, ecom_spawnEnemyWithSubid01_b0e_hook, SYM(ecom_spawnEnemyWithSubid01_b0e), b_+57);
+  if (!(F & FZ)) { CYCT(b_+57, b_+59); goto childDone; } // jr nz
+  CYC(b_+57, b_+59);
+  CYC(b_+59, b_+61); L = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+61, b_+63); E = ENEMY_BASE + 0x03; // Enemy.var03
+  CYC(b_+63, b_+64); A = mem_rd(gb, DE);
+  CYC(b_+64, b_+65); mem_wr(gb, HL, A);
+  CYC(b_+65, b_+67); L = ENEMY_BASE + OBJ_YH;
+  CALL_C(b_+67, setShortPosition_paramC_hook, SYM(setShortPosition_paramC), b_+70);
 
 childDone:
-  SET_HL(POP(0x65f5));
-  CYC(0x65f6, 0x65f7); A = mem_rd(gb, HL);
-  CYC(0x65f7, 0x65f8); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x65f8); return; } // ret nz
-  CYC(0x65f8, 0x65f9);
-  CYC(0x65f9, 0x65fc); flyingTile_delete_hook(gb); return; // jp
+  SET_HL(POP(b_+70));
+  CYC(b_+71, b_+72); A = mem_rd(gb, HL);
+  CYC(b_+72, b_+73); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+73); return; } // ret nz
+  CYC(b_+73, b_+74);
+  CYC(b_+74, SYM(flyingTile_state_stub)); flyingTile_delete_hook(gb); return; // jp
 }
 
 // 0e:65fc, bare global; jump-table target from enemyCode52.
 void flyingTile_state_stub_hook(GB *gb) {
-  RET(0x65fc); return; // ret
+  BASE(flyingTile_state_stub);
+  RET(b_+0); return; // ret
 }
 
 // 0e:65fd, bare global; jump-table target from enemyCode52. Initialization of actual flying
 // tile (not spawner).
 void flyingTile_state8_hook(GB *gb) {
+  BASE(flyingTile_state8);
   uint16_t sp0_ = gb->sp;
-  CYC(0x65fd, 0x65fe); H = D;
-  CYC(0x65fe, 0x65ff); L = E;
-  CYC(0x65ff, 0x6600); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(0x6600, 0x6602); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
-  CYC(0x6602, 0x6604); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
-  CALL_C(0x6604, flyingTile_overwriteTileHere_hook, 0x6641, 0x6607);
-  CYC(0x6607, 0x660a); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+2); L = E;
+  CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
+  CYC(b_+5, b_+7); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
+  CALL_C(b_+7, flyingTile_overwriteTileHere_hook, SYM(flyingTile_overwriteTileHere), b_+10);
+  CYC(b_+10, SYM(flyingTile_state9)); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 // 0e:660a, bare global; jump-table target from enemyCode52. Moving up before charging at
 // Link. Falls through into flyingTile_animate.
 void flyingTile_state9_hook(GB *gb) {
-  CYC(0x660a, 0x660b); H = D;
-  CYC(0x660b, 0x660d); L = ENEMY_BASE + OBJ_Z;
-  CYC(0x660d, 0x660e); A = mem_rd(gb, HL);
-  CYC(0x660e, 0x6610); alu_sub(gb, 0x80); // <($0080)
-  CYC(0x6610, 0x6611); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x6611, 0x6612); A = mem_rd(gb, HL);
-  CYC(0x6612, 0x6614); alu_sbc(gb, 0x00); // >($0080)
-  CYC(0x6614, 0x6615); mem_wr(gb, HL, A);
-  CYC(0x6615, 0x6617); alu_cp(gb, 0xfd);
-  if (F & FC) { CYCT(0x6617, 0x6619); flyingTile_animate_hook(gb); return; } // jr nc
-  CYC(0x6617, 0x6619);
-  CYC(0x6619, 0x661a); L = E;
-  CYC(0x661a, 0x661b); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(0x661b, 0x661d); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x661d, 0x661f); mem_wr(gb, HL, 0x0f);
+  BASE(flyingTile_state9);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = ENEMY_BASE + OBJ_Z;
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
+  CYC(b_+4, b_+6); alu_sub(gb, 0x80); // <($0080)
+  CYC(b_+6, b_+7); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+7, b_+8); A = mem_rd(gb, HL);
+  CYC(b_+8, b_+10); alu_sbc(gb, 0x00); // >($0080)
+  CYC(b_+10, b_+11); mem_wr(gb, HL, A);
+  CYC(b_+11, b_+13); alu_cp(gb, 0xfd);
+  if (F & FC) { CYCT(b_+13, b_+15); flyingTile_animate_hook(gb); return; } // jr nc
+  CYC(b_+13, b_+15);
+  CYC(b_+15, b_+16); L = E;
+  CYC(b_+16, b_+17); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+17, b_+19); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+19, SYM(flyingTile_animate)); mem_wr(gb, HL, 0x0f);
   flyingTile_animate_hook(gb); return; // fallthrough
 }
 
 // 0e:661f, bare global; falls into from flyingTile_state9, also reached by genuine jp/jr from
 // flyingTile_stateA/flyingTile_stateB.
 void flyingTile_animate_hook(GB *gb) {
-  CYC(0x661f, 0x6622); enemyAnimate_hook(gb); return; // jp
+  BASE(flyingTile_animate);
+  CYC(b_+0, SYM(flyingTile_stateA)); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:6622, bare global; jump-table target from enemyCode52. Staying in place for [counter1]
 // frames before charging Link.
 void flyingTile_stateA_hook(GB *gb) {
+  BASE(flyingTile_stateA);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6622, ecom_decCounter1_b0e_hook, 0x439a, 0x6625);
-  if (!(F & FZ)) { CYCT(0x6625, 0x6627); flyingTile_animate_hook(gb); return; } // jr nz
-  CYC(0x6625, 0x6627);
-  CYC(0x6627, 0x6628); L = E;
-  CYC(0x6628, 0x6629); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CALL_C(0x6629, ecom_updateAngleTowardTarget_b0e_hook, 0x43bf, 0x662c);
-  CYC(0x662c, 0x662e); flyingTile_animate_hook(gb); return; // jr
+  CALL_C(b_+0, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); flyingTile_animate_hook(gb); return; } // jr nz
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+6); L = E;
+  CYC(b_+6, b_+7); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CALL_C(b_+7, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+10);
+  CYC(b_+10, SYM(flyingTile_stateB)); flyingTile_animate_hook(gb); return; // jr
 }
 
 // 0e:662e, bare global; jump-table target from enemyCode52. Charging at Link. Falls through
 // into flyingTile_dead.
 void flyingTile_stateB_hook(GB *gb) {
+  BASE(flyingTile_stateB);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x662e, objectApplySpeed_hook, 0x201d, 0x6631);
-  CALL_C(0x6631, objectCheckTileCollision_allowHoles_hook, 0x14c7, 0x6634);
-  if (!(F & FC)) { CYCT(0x6634, 0x6636); flyingTile_animate_hook(gb); return; } // jr nc
-  CYC(0x6634, 0x6636);
+  CALL_C(b_+0, objectApplySpeed_hook, SYM(objectApplySpeed), b_+3);
+  CALL_C(b_+3, objectCheckTileCollision_allowHoles_hook, SYM(objectCheckTileCollision_allowHoles), b_+6);
+  if (!(F & FC)) { CYCT(b_+6, SYM(flyingTile_dead)); flyingTile_animate_hook(gb); return; } // jr nc
+  CYC(b_+6, SYM(flyingTile_dead));
   flyingTile_dead_hook(gb); return; // fallthrough
 }
 
 // 0e:6636, bare global; called from enemyCode52, also falls into from flyingTile_stateB.
 void flyingTile_dead_hook(GB *gb) {
+  BASE(flyingTile_dead);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6636, 0x6638); B = 0x06; // INTERAC_ROCKDEBRIS
-  CALL_C(0x6638, objectCreateInteractionWithSubid00_hook, 0x24c3, 0x663b);
+  CYC(b_+0, b_+2); B = 0x06; // INTERAC_ROCKDEBRIS
+  CALL_C(b_+2, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), SYM(flyingTile_delete));
   flyingTile_delete_hook(gb); return; // fallthrough
 }
 
 // 0e:663b, bare global; called from flyingTile_state_spawner, also falls into from
 // flyingTile_dead.
 void flyingTile_delete_hook(GB *gb) {
+  BASE(flyingTile_delete);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x663b, decNumEnemies_hook, 0x24b3, 0x663e);
-  CYC(0x663e, 0x6641); enemyDelete_hook(gb); return; // jp
+  CALL_C(b_+0, decNumEnemies_hook, SYM(decNumEnemies), b_+3);
+  CYC(b_+3, SYM(flyingTile_overwriteTileHere)); enemyDelete_hook(gb); return; // jp
 }
 
 // 0e:6641, bare global; called from flyingTile_state8. Overwrites the tile at this position
 // with whatever it should become after a flying tile is created there (depends on subid).
 void flyingTile_overwriteTileHere_hook(GB *gb) {
+  BASE(flyingTile_overwriteTileHere);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6641, objectGetShortPosition_hook, 0x2096, 0x6644);
-  CYC(0x6644, 0x6645); C = A;
-  CYC(0x6645, 0x6647); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x6647, 0x6648); A = mem_rd(gb, DE);
-  CYC(0x6648, 0x664a); alu_and(gb, 0x0f);
-  CYC(0x664a, 0x664d); SET_HL(0x6652); // @tileReplacements
-  CYC(0x664d, 0x664e); flyingTile_addAToHl_from_rst(gb, 0x664e);
-  CYC(0x664e, 0x664f); A = mem_rd(gb, HL);
-  CYC(0x664f, 0x6652); setTile_hook(gb); return; // jp
+  CALL_C(b_+0, objectGetShortPosition_hook, SYM(objectGetShortPosition), b_+3);
+  CYC(b_+3, b_+4); C = A;
+  CYC(b_+4, b_+6); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+6, b_+7); A = mem_rd(gb, DE);
+  CYC(b_+7, b_+9); alu_and(gb, 0x0f);
+  CYC(b_+9, b_+12); SET_HL(b_+17); // @tileReplacements
+  CYC(b_+12, b_+13); flyingTile_addAToHl_from_rst(gb, b_+13);
+  CYC(b_+13, b_+14); A = mem_rd(gb, HL);
+  CYC(b_+14, b_+17); setTile_hook(gb); return; // jp
 }

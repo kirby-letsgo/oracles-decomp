@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodec1), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodec1), (from), (to), true)
 
 static uint16_t c1_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -23,114 +23,125 @@ static uint16_t c1_jump_table(GB *gb) {
 }
 
 void interactionCodec1__afterCall71ce_hook(GB *gb) {
-  CYC(0x71ce, 0x71cf); H = D;
-  CYC(0x71cf, 0x71d1); L = 0x46;
-  CYC(0x71d1, 0x71d3); mem_wr(gb, HL, 0x86);
-  CYC(0x71d3, 0x71d4); L = alu_inc8(gb, L);
-  CYC(0x71d4, 0x71d6); mem_wr(gb, HL, 1);
-  CYC(0x71d6, 0x71d8); L = 0x76;
-  CYC(0x71d8, 0x71da); mem_wr(gb, HL, 6);
-  CYC(0x71da, 0x71dc); L = 0x49;
-  CYC(0x71dc, 0x71de); mem_wr(gb, HL, 0x15);
-  CYC(0x71de, 0x71e0); L = 0x50;
-  CYC(0x71e0, 0x71e2); mem_wr(gb, HL, 0x78);
-  CYC(0x71e2, 0x71e5); objectSetVisible82_hook(gb);
+  BASE(interactionCodec1);
+  CYC(b_+14, b_+15); H = D;
+  CYC(b_+15, b_+17); L = 0x46;
+  CYC(b_+17, b_+19); mem_wr(gb, HL, 0x86);
+  CYC(b_+19, b_+20); L = alu_inc8(gb, L);
+  CYC(b_+20, b_+22); mem_wr(gb, HL, 1);
+  CYC(b_+22, b_+24); L = 0x76;
+  CYC(b_+24, b_+26); mem_wr(gb, HL, 6);
+  CYC(b_+26, b_+28); L = 0x49;
+  CYC(b_+28, b_+30); mem_wr(gb, HL, 0x15);
+  CYC(b_+30, b_+32); L = 0x50;
+  CYC(b_+32, b_+34); mem_wr(gb, HL, 0x78);
+  CYC(b_+34, b_+37); objectSetVisible82_hook(gb);
 }
 
 void interactionCodec1__state0_hook(GB *gb) {
+  BASE(interactionCodec1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x71c8, 0x71ca); A = 1;
-  CYC(0x71ca, 0x71cb); mem_wr(gb, DE, A);
-  CALL_C(0x71cb, interactionInitGraphics_hook, 0x15fb, 0x71ce);
+  CYC(b_+8, b_+10); A = 1;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
   interactionCodec1__afterCall71ce_hook(gb);
 }
 
 void interactionCodec1__ret_hook(GB *gb) {
-  CYC(0x7223, 0x7224); ret_effect(gb);
+  BASE(interactionCodec1);
+  CYC(b_+99, b_+100); ret_effect(gb);
 }
 
 void interactionCodec1__updateSparkles_hook(GB *gb) {
-  CYC(0x722f, 0x7230); H = D;
-  CYC(0x7230, 0x7232); L = 0x76;
-  CYC(0x7232, 0x7233); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  if (!(F & FZ)) { CYCT(0x7233, 0x7234); ret_effect(gb); return; }
-  CYC(0x7233, 0x7234);
-  CYC(0x7234, 0x7236); mem_wr(gb, HL, 6);
-  CYC(0x7236, 0x7239); SET_BC(0x8409);
-  CYC(0x7239, 0x723c); objectCreateInteraction_hook(gb);
+  BASE(interactionCodec1);
+  CYC(b_+111, b_+112); H = D;
+  CYC(b_+112, b_+114); L = 0x76;
+  CYC(b_+114, b_+115); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(b_+115, b_+116); ret_effect(gb); return; }
+  CYC(b_+115, b_+116);
+  CYC(b_+116, b_+118); mem_wr(gb, HL, 6);
+  CYC(b_+118, b_+121); SET_BC(0x8409);
+  CYC(b_+121, SYM(interactionCodec2)); objectCreateInteraction_hook(gb);
 }
 
 void interactionCodec1__updateMovementAndSparkles_hook(GB *gb) {
+  BASE(interactionCodec1);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x721a, interactionCodec1__updateSparkles_hook, 0x722f, 0x721d);
-  CALL_C(0x721d, objectApplySpeed_hook, 0x201d, 0x7220);
-  CYC(0x7220, 0x7223); interactionDecCounter1_hook(gb);
+  CALL_C(b_+90, interactionCodec1__updateSparkles_hook, b_+111, b_+93);
+  CALL_C(b_+93, objectApplySpeed_hook, SYM(objectApplySpeed), b_+96);
+  CYC(b_+96, b_+99); interactionDecCounter1_hook(gb);
 }
 
 void interactionCodec1__substate0_hook(GB *gb) {
+  BASE(interactionCodec1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x71ef, 0x71f0); H = D;
-  CYC(0x71f0, 0x71f2); L = 0x46;
-  CALL_C(0x71f2, decHlRef16WithCap_hook, 0x0237, 0x71f5);
-  if (!(F & FZ)) { CYCT(0x71f5, 0x71f6); ret_effect(gb); return; }
-  CYC(0x71f5, 0x71f6);
-  CYC(0x71f6, 0x71f8); L = 0x46;
-  CYC(0x71f8, 0x71fa); mem_wr(gb, HL, 0x28);
-  CYC(0x71fa, 0x71fd); interactionIncSubstate_hook(gb);
+  CYC(b_+47, b_+48); H = D;
+  CYC(b_+48, b_+50); L = 0x46;
+  CALL_C(b_+50, decHlRef16WithCap_hook, SYM(decHlRef16WithCap), b_+53);
+  if (!(F & FZ)) { CYCT(b_+53, b_+54); ret_effect(gb); return; }
+  CYC(b_+53, b_+54);
+  CYC(b_+54, b_+56); L = 0x46;
+  CYC(b_+56, b_+58); mem_wr(gb, HL, 0x28);
+  CYC(b_+58, b_+61); interactionIncSubstate_hook(gb);
 }
 
 void interactionCodec1__substate1_hook(GB *gb) {
+  BASE(interactionCodec1);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x71fd, interactionCodec1__updateMovementAndSparkles_hook, 0x721a, 0x7200);
-  if (!(F & FZ)) { CYCT(0x7200, 0x7202); interactionCodec1__ret_hook(gb); return; }
-  CYC(0x7200, 0x7202);
-  CYC(0x7202, 0x7204); L = 0x60;
-  CYC(0x7204, 0x7206); mem_wr(gb, HL, 1);
-  CYC(0x7206, 0x7209); interactionIncSubstate_hook(gb);
+  CALL_C(b_+61, interactionCodec1__updateMovementAndSparkles_hook, b_+90, b_+64);
+  if (!(F & FZ)) { CYCT(b_+64, b_+66); interactionCodec1__ret_hook(gb); return; }
+  CYC(b_+64, b_+66);
+  CYC(b_+66, b_+68); L = 0x60;
+  CYC(b_+68, b_+70); mem_wr(gb, HL, 1);
+  CYC(b_+70, b_+73); interactionIncSubstate_hook(gb);
 }
 
 void interactionCodec1__substate2_hook(GB *gb) {
+  BASE(interactionCodec1);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7209, interactionAnimate_hook, 0x261b, 0x720c);
-  CALL_C(0x720c, interactionCodec1__updateSparkles_hook, 0x722f, 0x720f);
-  CALL_C(0x720f, objectApplySpeed_hook, 0x201d, 0x7212);
-  CYC(0x7212, 0x7214); E = 0x61;
-  CYC(0x7214, 0x7215); A = mem_rd(gb, DE);
-  CYC(0x7215, 0x7216); A = alu_inc8(gb, A);
-  if (F & FZ) { CYCT(0x7216, 0x7219); interactionDelete_hook(gb); return; }
-  CYC(0x7216, 0x7219);
-  CYC(0x7219, 0x721a); ret_effect(gb);
+  CALL_C(b_+73, interactionAnimate_hook, SYM(interactionAnimate), b_+76);
+  CALL_C(b_+76, interactionCodec1__updateSparkles_hook, b_+111, b_+79);
+  CALL_C(b_+79, objectApplySpeed_hook, SYM(objectApplySpeed), b_+82);
+  CYC(b_+82, b_+84); E = 0x61;
+  CYC(b_+84, b_+85); A = mem_rd(gb, DE);
+  CYC(b_+85, b_+86); A = alu_inc8(gb, A);
+  if (F & FZ) { CYCT(b_+86, b_+89); interactionDelete_hook(gb); return; }
+  CYC(b_+86, b_+89);
+  CYC(b_+89, b_+90); ret_effect(gb);
 }
 
 void interactionCodec1__state1_hook(GB *gb) {
+  BASE(interactionCodec1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x71e5, 0x71e7); E = 0x45;
-  CYC(0x71e7, 0x71e8); A = mem_rd(gb, DE);
-  CYC(0x71e8, 0x71e9); push_effect(gb, 0x71e9);
-  switch (c1_jump_table(gb)) {
-    case 0x71ef: interactionCodec1__substate0_hook(gb); return;
-    case 0x71fd: interactionCodec1__substate1_hook(gb); return;
-    case 0x7209: interactionCodec1__substate2_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+37, b_+39); E = 0x45;
+  CYC(b_+39, b_+40); A = mem_rd(gb, DE);
+  CYC(b_+40, b_+41); push_effect(gb, b_+41);
+  do { uint16_t jt_ = (c1_jump_table(gb));
+    if (jt_ == b_+47) { interactionCodec1__substate0_hook(gb); return; }
+    else if (jt_ == b_+61) { interactionCodec1__substate1_hook(gb); return; }
+    else if (jt_ == b_+73) { interactionCodec1__substate2_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void interactionCodec1__func_7224_hook(GB *gb) {
-  CYC(0x7224, 0x7227); A = mem_rd(gb, wFrameCounter);
-  CYC(0x7227, 0x7229); alu_and(gb, 1);
-  if (F & FZ) { CYCT(0x7229, 0x722c); objectSetInvisible_hook(gb); return; }
-  CYC(0x7229, 0x722c);
-  CYC(0x722c, 0x722f); objectSetVisible_hook(gb);
+  BASE(interactionCodec1);
+  CYC(b_+100, b_+103); A = mem_rd(gb, wFrameCounter);
+  CYC(b_+103, b_+105); alu_and(gb, 1);
+  if (F & FZ) { CYCT(b_+105, b_+108); objectSetInvisible_hook(gb); return; }
+  CYC(b_+105, b_+108);
+  CYC(b_+108, b_+111); objectSetVisible_hook(gb);
 }
 
 void interactionCodec1_hook(GB *gb) {
+  BASE(interactionCodec1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x71c0, 0x71c2); E = 0x44;
-  CYC(0x71c2, 0x71c3); A = mem_rd(gb, DE);
-  CYC(0x71c3, 0x71c4); push_effect(gb, 0x71c4);
-  switch (c1_jump_table(gb)) {
-    case 0x71c8: interactionCodec1__state0_hook(gb); return;
-    case 0x71e5: interactionCodec1__state1_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x44;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (c1_jump_table(gb));
+    if (jt_ == b_+8) { interactionCodec1__state0_hook(gb); return; }
+    else if (jt_ == b_+37) { interactionCodec1__state1_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }

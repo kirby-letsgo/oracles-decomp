@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodedb), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodedb), (from), (to), true)
 
 static uint16_t interactionCodedb_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -30,10 +30,11 @@ static uint16_t interactionCodedb_jump_table(GB *gb) {
 // from @state1's "not enough slates" path and from @placeSlate (no push there, so ret_effect()
 // pops whatever the real stack already holds -- the original caller of the whole hook).
 static void interactionCodedb_resetCounter(GB *gb) {
-  CYC(0x7f7e, 0x7f80); E = INTERACTION_BASE + OBJ_VAR3F;
-  CYC(0x7f80, 0x7f82); A = 0x0a;
-  CYC(0x7f82, 0x7f83); mem_wr(gb, DE, A);
-  RET(0x7f83); return;
+  BASE(interactionCodedb);
+  CYC(b_+65, b_+67); E = INTERACTION_BASE + OBJ_VAR3F;
+  CYC(b_+67, b_+69); A = 0x0a;
+  CYC(b_+69, b_+70); mem_wr(gb, DE, A);
+  RET(b_+70); return;
 }
 
 // ==================================================================================================
@@ -43,70 +44,71 @@ static void interactionCodedb_resetCounter(GB *gb) {
 //   var3f: Counter to push against this object until the slate will be placed
 // ==================================================================================================
 void interactionCodedb_hook(GB *gb) {
+  BASE(interactionCodedb);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7f3d, 0x7f3f); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x7f3f, 0x7f40); A = mem_rd(gb, DE);
-  CYC(0x7f40, 0x7f41); push_effect(gb, 0x7f41);
-  switch (interactionCodedb_jump_table(gb)) {
-    case 0x7f47: goto state0;
-    case 0x7f60: goto state1;
-    case 0x7f9a: goto state2;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (interactionCodedb_jump_table(gb));
+    if (jt_ == b_+10) { goto state0; }
+    else if (jt_ == b_+35) { goto state1; }
+    else if (jt_ == b_+93) { goto state2; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 state0:
   // Check if slate already placed
-  CYC(0x7f47, 0x7f49); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7f49, 0x7f4a); A = mem_rd(gb, DE);
-  CYC(0x7f4a, 0x7f4d); SET_BC(0x00f8); // bitTable
-  CYC(0x7f4d, 0x7f4e); alu_add(gb, C);
-  CYC(0x7f4e, 0x7f4f); C = A;
-  CALL_C(0x7f4f, getThisRoomFlags_hook, 0x197d, 0x7f52);
-  CYC(0x7f52, 0x7f53); A = mem_rd(gb, BC);
-  CYC(0x7f53, 0x7f54); alu_and(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(0x7f54, 0x7f57); interactionDelete_hook(gb); return; } // jp nz
-  CYC(0x7f54, 0x7f57);
-  CYC(0x7f57, 0x7f5a); SET_HL(0x7f5a); // mainScripts.slateSlotScript
-  CALL_C(0x7f5a, interactionSetScript_hook, 0x2544, 0x7f5d);
-  CYC(0x7f5d, 0x7f60); interactionIncState_hook(gb); return; // jp
+  CYC(b_+10, b_+12); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+12, b_+13); A = mem_rd(gb, DE);
+  CYC(b_+13, b_+16); SET_BC(0x00f8); // bitTable
+  CYC(b_+16, b_+17); alu_add(gb, C);
+  CYC(b_+17, b_+18); C = A;
+  CALL_C(b_+18, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+21);
+  CYC(b_+21, b_+22); A = mem_rd(gb, BC);
+  CYC(b_+22, b_+23); alu_and(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+23, b_+26); interactionDelete_hook(gb); return; } // jp nz
+  CYC(b_+23, b_+26);
+  CYC(b_+26, b_+29); SET_HL(b_+29); // mainScripts.slateSlotScript
+  CALL_C(b_+29, interactionSetScript_hook, SYM(interactionSetScript), b_+32);
+  CYC(b_+32, b_+35); interactionIncState_hook(gb); return; // jp
 
 state1:
-  CALL_C(0x7f60, objectCheckCollidedWithLink_notDead_hook, 0x1c2e, 0x7f63);
-  if (!(F & FC)) CALL_C_CC(0x7f63, interactionCodedb_resetCounter, 0x7f7e, 0x7f66); else CYC(0x7f63, 0x7f66); // call nc
-  CALL_C(0x7f66, objectCheckLinkPushingAgainstCenter_hook, 0x2707, 0x7f69);
-  if (!(F & FC)) CALL_C_CC(0x7f69, interactionCodedb_resetCounter, 0x7f7e, 0x7f6c); else CYC(0x7f69, 0x7f6c); // call nc
-  CYC(0x7f6c, 0x7f6d); H = D;
-  CYC(0x7f6d, 0x7f6f); L = INTERACTION_BASE + OBJ_VAR3F;
-  CYC(0x7f6f, 0x7f70); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)
-  if (!(F & FZ)) { CYCT(0x7f70, 0x7f72); goto state2; } // jr nz
-  CYC(0x7f70, 0x7f72);
+  CALL_C(b_+35, objectCheckCollidedWithLink_notDead_hook, SYM(objectCheckCollidedWithLink_notDead), b_+38);
+  if (!(F & FC)) CALL_C_CC(b_+38, interactionCodedb_resetCounter, b_+65, b_+41); else CYC(b_+38, b_+41); // call nc
+  CALL_C(b_+41, objectCheckLinkPushingAgainstCenter_hook, SYM(objectCheckLinkPushingAgainstCenter), b_+44);
+  if (!(F & FC)) CALL_C_CC(b_+44, interactionCodedb_resetCounter, b_+65, b_+47); else CYC(b_+44, b_+47); // call nc
+  CYC(b_+47, b_+48); H = D;
+  CYC(b_+48, b_+50); L = INTERACTION_BASE + OBJ_VAR3F;
+  CYC(b_+50, b_+51); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)
+  if (!(F & FZ)) { CYCT(b_+51, b_+53); goto state2; } // jr nz
+  CYC(b_+51, b_+53);
 
   // Time to place the slate, if available
-  CYC(0x7f72, 0x7f75); A = mem_rd(gb, wNumSlates);
-  CYC(0x7f75, 0x7f76); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x7f76, 0x7f78); goto placeSlate; } // jr nz
-  CYC(0x7f76, 0x7f78);
+  CYC(b_+53, b_+56); A = mem_rd(gb, wNumSlates);
+  CYC(b_+56, b_+57); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+57, b_+59); goto placeSlate; } // jr nz
+  CYC(b_+57, b_+59);
 
   // Not enough slates
-  CYC(0x7f78, 0x7f7b); SET_BC(0x5111); // TX_5111
-  CALL_C(0x7f7b, showText_hook, 0x1872, 0x7f7e);
+  CYC(b_+59, b_+62); SET_BC((SYM(interactionCode9a__initialize) + 15)); // TX_5111
+  CALL_C(b_+62, showText_hook, SYM(showText), b_+65);
   interactionCodedb_resetCounter(gb); return; // falls through into @resetCounter
 
 placeSlate:
-  CALL_C(0x7f84, checkLinkVulnerable_hook, 0x1d28, 0x7f87);
-  if (!(F & FC)) { CYCT(0x7f87, 0x7f89); interactionCodedb_resetCounter(gb); return; } // jr nc
-  CYC(0x7f87, 0x7f89);
-  CYC(0x7f89, 0x7f8b); A = 0x81; // DISABLE_ALL_BUT_INTERACTIONS | DISABLE_LINK
-  CYC(0x7f8b, 0x7f8e); mem_wr(gb, wDisabledObjects, A);
-  CYC(0x7f8e, 0x7f91); mem_wr(gb, wMenuDisabled, A);
-  CYC(0x7f91, 0x7f94); SET_HL(0x7f5d); // mainScripts.slateSlotScript_placeSlate
-  CALL_C(0x7f94, interactionSetScript_hook, 0x2544, 0x7f97);
-  CALL_C(0x7f97, interactionIncState_hook, 0x23e0, 0x7f9a);
+  CALL_C(b_+71, checkLinkVulnerable_hook, SYM(checkLinkVulnerable), b_+74);
+  if (!(F & FC)) { CYCT(b_+74, b_+76); interactionCodedb_resetCounter(gb); return; } // jr nc
+  CYC(b_+74, b_+76);
+  CYC(b_+76, b_+78); A = 0x81; // DISABLE_ALL_BUT_INTERACTIONS | DISABLE_LINK
+  CYC(b_+78, b_+81); mem_wr(gb, wDisabledObjects, A);
+  CYC(b_+81, b_+84); mem_wr(gb, wMenuDisabled, A);
+  CYC(b_+84, b_+87); SET_HL(b_+32); // mainScripts.slateSlotScript_placeSlate
+  CALL_C(b_+87, interactionSetScript_hook, SYM(interactionSetScript), b_+90);
+  CALL_C(b_+90, interactionIncState_hook, SYM(interactionIncState), b_+93);
   // falls through into @state2
 
 state2:
-  CALL_C(0x7f9a, interactionRunScript_hook, 0x2552, 0x7f9d);
-  if (!(F & FC)) { CYCT(0x7f9d, 0x7f9e); ret_effect(gb); return; } // ret nc
-  CYC(0x7f9d, 0x7f9e);
-  CYC(0x7f9e, 0x7fa1); interactionDelete_hook(gb); return; // jp
+  CALL_C(b_+93, interactionRunScript_hook, SYM(interactionRunScript), b_+96);
+  if (!(F & FC)) { CYCT(b_+96, b_+97); ret_effect(gb); return; } // ret nc
+  CYC(b_+96, b_+97);
+  CYC(b_+97, SYM(func_7fa1)); interactionDelete_hook(gb); return; // jp
 }

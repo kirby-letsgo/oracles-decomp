@@ -3,162 +3,165 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode09), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode09), (from), (to), true)
 
 void partCode09_hook(GB *gb);
 void button_state0_hook(GB *gb);
 void button_updateTileBeforeDeletion_hook(GB *gb);
 
 void partCode09_hook(GB *gb) {
+  BASE(partCode09);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x4724, 0x4726); E = 0xc4; // Part.state
-  CYC(0x4726, 0x4727); A = mem_rd(gb, DE);
-  CYC(0x4727, 0x4728); alu_or(gb, A);
+  CYC(b_+0, b_+2); E = 0xc4; // Part.state
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x4728, 0x472b); // call z
+    CYCT(b_+4, b_+7); // call z
     button_state0_hook(gb);
   } else {
-    CYC(0x4728, 0x472b);
+    CYC(b_+4, b_+7);
   }
 
-  CYC(0x472b, 0x472e); A = mem_rd(gb, 0xccb1); // wccb1
-  CYC(0x472e, 0x472f); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x472f); return; } // ret nz
-  CYC(0x472f, 0x4730);
-  CYC(0x4730, 0x4733); SET_HL(0xd000); // w1Link
-  CALL_C(0x4733, checkObjectsCollided_hook, 0x1d5a, 0x4736);
-  if (F & FC) { CYCT(0x4736, 0x4738); goto linkTouchedButton; } // jr c
-  CYC(0x4736, 0x4738);
-  CALL_C(0x4738, objectGetTileAtPosition_hook, 0x1444, 0x473b);
-  CYC(0x473b, 0x473d); alu_sub(gb, 0x0c); // TILEINDEX_BUTTON
-  CYC(0x473d, 0x473f); alu_cp(gb, 0x02);
-  if (!(F & FC)) { CYCT(0x473f, 0x4741); goto somethingOnButton; } // jr nc
-  CYC(0x473f, 0x4741);
-  CALL_C(0x4741, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x4744);
-  if (!(F & FZ)) { RET_TAKEN(0x4744); return; } // ret nz
-  CYC(0x4744, 0x4745);
-  CYC(0x4745, 0x4747); L = 0xf0; // Part.var30
-  CYC(0x4747, 0x4749); alu_bit(gb, 0, mem_rd(gb, HL));
-  if (F & FZ) { RET_TAKEN(0x4749); return; } // ret z
-  CYC(0x4749, 0x474a);
-  CYC(0x474a, 0x474c); E = 0xf0; // Part.var30
-  CYC(0x474c, 0x474d); A = mem_rd(gb, DE);
-  CYC(0x474d, 0x474e); alu_or(gb, A);
-  if (F & FZ) { RET_TAKEN(0x474e); return; } // ret z
-  CYC(0x474e, 0x474f);
-  CALL_C(0x474f, objectGetShortPosition_hook, 0x2096, 0x4752);
-  CYC(0x4752, 0x4753); C = A;
-  CYC(0x4753, 0x4755); A = 0x0c; // TILEINDEX_BUTTON
-  CALL_C(0x4755, setTile_hook, 0x3a9c, 0x4758);
-  CYC(0x4758, 0x475a); E = 0xc3; // Part.var03
-  CYC(0x475a, 0x475b); A = mem_rd(gb, DE);
-  CYC(0x475b, 0x475e); SET_HL(0xcca0); // wActiveTriggers
-  CALL_C(0x475e, unsetFlag_hook, 0x0218, 0x4761);
-  CYC(0x4761, 0x4763); E = 0xf0; // Part.var30
-  CYC(0x4763, 0x4764); alu_xor(gb, A);
-  CYC(0x4764, 0x4765); mem_wr(gb, DE, A);
-  CYC(0x4765, 0x4767); A = 0x87; // SND_SPLASH
-  CYC(0x4767, 0x476a); playSound_b00_hook(gb); return; // jp
+  CYC(b_+7, b_+10); A = mem_rd(gb, wccb1); // wccb1
+  CYC(b_+10, b_+11); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+11); return; } // ret nz
+  CYC(b_+11, b_+12);
+  CYC(b_+12, b_+15); SET_HL(w1Link); // w1Link
+  CALL_C(b_+15, checkObjectsCollided_hook, SYM(checkObjectsCollided), b_+18);
+  if (F & FC) { CYCT(b_+18, b_+20); goto linkTouchedButton; } // jr c
+  CYC(b_+18, b_+20);
+  CALL_C(b_+20, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+23);
+  CYC(b_+23, b_+25); alu_sub(gb, 0x0c); // TILEINDEX_BUTTON
+  CYC(b_+25, b_+27); alu_cp(gb, 0x02);
+  if (!(F & FC)) { CYCT(b_+27, b_+29); goto somethingOnButton; } // jr nc
+  CYC(b_+27, b_+29);
+  CALL_C(b_+29, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+32);
+  if (!(F & FZ)) { RET_TAKEN(b_+32); return; } // ret nz
+  CYC(b_+32, b_+33);
+  CYC(b_+33, b_+35); L = 0xf0; // Part.var30
+  CYC(b_+35, b_+37); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (F & FZ) { RET_TAKEN(b_+37); return; } // ret z
+  CYC(b_+37, b_+38);
+  CYC(b_+38, b_+40); E = 0xf0; // Part.var30
+  CYC(b_+40, b_+41); A = mem_rd(gb, DE);
+  CYC(b_+41, b_+42); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+42); return; } // ret z
+  CYC(b_+42, b_+43);
+  CALL_C(b_+43, objectGetShortPosition_hook, SYM(objectGetShortPosition), b_+46);
+  CYC(b_+46, b_+47); C = A;
+  CYC(b_+47, b_+49); A = 0x0c; // TILEINDEX_BUTTON
+  CALL_C(b_+49, setTile_hook, SYM(setTile), b_+52);
+  CYC(b_+52, b_+54); E = 0xc3; // Part.var03
+  CYC(b_+54, b_+55); A = mem_rd(gb, DE);
+  CYC(b_+55, b_+58); SET_HL(wActiveTriggers); // wActiveTriggers
+  CALL_C(b_+58, unsetFlag_hook, SYM(unsetFlag), b_+61);
+  CYC(b_+61, b_+63); E = 0xf0; // Part.var30
+  CYC(b_+63, b_+64); alu_xor(gb, A);
+  CYC(b_+64, b_+65); mem_wr(gb, DE, A);
+  CYC(b_+65, b_+67); A = 0x87; // SND_SPLASH
+  CYC(b_+67, b_+70); playSound_b00_hook(gb); return; // jp
 
 somethingOnButton:
-  CYC(0x476a, 0x476b); H = D;
-  CYC(0x476b, 0x476d); L = 0xc2; // Part.subid
-  CYC(0x476d, 0x476f); alu_bit(gb, 7, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(0x476f, 0x4771); goto delete; } // jr z
-  CYC(0x476f, 0x4771);
-  CYC(0x4771, 0x4773); L = 0xf0; // Part.var30
-  CYC(0x4773, 0x4775); alu_bit(gb, 0, mem_rd(gb, HL));
-  if (!(F & FZ)) { RET_TAKEN(0x4775); return; } // ret nz
-  CYC(0x4775, 0x4776);
-  CYC(0x4776, 0x4778); L = 0xc6; // Part.counter1
-  CYC(0x4778, 0x477a); mem_wr(gb, HL, 0x1c);
-  CALL_C(0x477a, objectGetShortPosition_hook, 0x2096, 0x477d);
-  CYC(0x477d, 0x477e); C = A;
-  CYC(0x477e, 0x4780); B = 0x0d; // TILEINDEX_PRESSED_BUTTON
-  CALL_C(0x4780, setTileInRoomLayoutBuffer_hook, 0x1426, 0x4783);
-  CYC(0x4783, 0x4785); goto setTriggerAndPlaySound; // jr
+  CYC(b_+70, b_+71); H = D;
+  CYC(b_+71, b_+73); L = 0xc2; // Part.subid
+  CYC(b_+73, b_+75); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+75, b_+77); goto delete; } // jr z
+  CYC(b_+75, b_+77);
+  CYC(b_+77, b_+79); L = 0xf0; // Part.var30
+  CYC(b_+79, b_+81); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (!(F & FZ)) { RET_TAKEN(b_+81); return; } // ret nz
+  CYC(b_+81, b_+82);
+  CYC(b_+82, b_+84); L = 0xc6; // Part.counter1
+  CYC(b_+84, b_+86); mem_wr(gb, HL, 0x1c);
+  CALL_C(b_+86, objectGetShortPosition_hook, SYM(objectGetShortPosition), b_+89);
+  CYC(b_+89, b_+90); C = A;
+  CYC(b_+90, b_+92); B = 0x0d; // TILEINDEX_PRESSED_BUTTON
+  CALL_C(b_+92, setTileInRoomLayoutBuffer_hook, SYM(setTileInRoomLayoutBuffer), b_+95);
+  CYC(b_+95, b_+97); goto setTriggerAndPlaySound; // jr
 
 delete:
-  CYC(0x4785, 0x4788); push_effect(gb, 0x4788); button_updateTileBeforeDeletion_hook(gb);
-  CYC(0x4788, 0x478b); partDelete_hook(gb); return; // jp
+  CYC(b_+97, b_+100); push_effect(gb, b_+100); button_updateTileBeforeDeletion_hook(gb);
+  CYC(b_+100, b_+103); partDelete_hook(gb); return; // jp
 
 linkTouchedButton:
-  CYC(0x478b, 0x478e); A = mem_rd(gb, 0xd00f); // w1Link.zh
-  CYC(0x478e, 0x478f); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x478f); return; } // ret nz
-  CYC(0x478f, 0x4790);
+  CYC(b_+103, b_+106); A = mem_rd(gb, w1Link_zh); // w1Link.zh
+  CYC(b_+106, b_+107); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+107); return; } // ret nz
+  CYC(b_+107, b_+108);
 
-  CYC(0x4790, 0x4792); E = 0xc2; // Part.subid
-  CYC(0x4792, 0x4793); A = mem_rd(gb, DE);
-  CYC(0x4793, 0x4794); alu_rlca(gb);
-  if (!(F & FC)) { CYCT(0x4794, 0x4796); goto delete; } // jr nc
-  CYC(0x4794, 0x4796);
+  CYC(b_+108, b_+110); E = 0xc2; // Part.subid
+  CYC(b_+110, b_+111); A = mem_rd(gb, DE);
+  CYC(b_+111, b_+112); alu_rlca(gb);
+  if (!(F & FC)) { CYCT(b_+112, b_+114); goto delete; } // jr nc
+  CYC(b_+112, b_+114);
 
-  CYC(0x4796, 0x4798); E = 0xf0; // Part.var30
-  CYC(0x4798, 0x4799); A = mem_rd(gb, DE);
-  CYC(0x4799, 0x479a); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x479a); return; } // ret nz
-  CYC(0x479a, 0x479b);
-  CALL_C(0x479b, objectGetShortPosition_hook, 0x2096, 0x479e);
-  CYC(0x479e, 0x479f); C = A;
-  CYC(0x479f, 0x47a1); A = 0x0d; // TILEINDEX_PRESSED_BUTTON
-  CALL_C(0x47a1, setTile_hook, 0x3a9c, 0x47a4);
+  CYC(b_+114, b_+116); E = 0xf0; // Part.var30
+  CYC(b_+116, b_+117); A = mem_rd(gb, DE);
+  CYC(b_+117, b_+118); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+118); return; } // ret nz
+  CYC(b_+118, b_+119);
+  CALL_C(b_+119, objectGetShortPosition_hook, SYM(objectGetShortPosition), b_+122);
+  CYC(b_+122, b_+123); C = A;
+  CYC(b_+123, b_+125); A = 0x0d; // TILEINDEX_PRESSED_BUTTON
+  CALL_C(b_+125, setTile_hook, SYM(setTile), b_+128);
 
 setTriggerAndPlaySound:
-  CYC(0x47a4, 0x47a6); E = 0xc3; // Part.var03
-  CYC(0x47a6, 0x47a7); A = mem_rd(gb, DE);
-  CYC(0x47a7, 0x47aa); SET_HL(0xcca0); // wActiveTriggers
-  CALL_C(0x47aa, setFlag_hook, 0x020e, 0x47ad);
-  CYC(0x47ad, 0x47af); E = 0xf0; // Part.var30
-  CYC(0x47af, 0x47b1); A = 0x01;
-  CYC(0x47b1, 0x47b2); mem_wr(gb, DE, A);
-  CYC(0x47b2, 0x47b4); A = 0x87; // SND_SPLASH
-  CYC(0x47b4, 0x47b7); playSound_b00_hook(gb); return; // jp
+  CYC(b_+128, b_+130); E = 0xc3; // Part.var03
+  CYC(b_+130, b_+131); A = mem_rd(gb, DE);
+  CYC(b_+131, b_+134); SET_HL(wActiveTriggers); // wActiveTriggers
+  CALL_C(b_+134, setFlag_hook, SYM(setFlag), b_+137);
+  CYC(b_+137, b_+139); E = 0xf0; // Part.var30
+  CYC(b_+139, b_+141); A = 0x01;
+  CYC(b_+141, b_+142); mem_wr(gb, DE, A);
+  CYC(b_+142, b_+144); A = 0x87; // SND_SPLASH
+  CYC(b_+144, b_+147); playSound_b00_hook(gb); return; // jp
 }
 
 void button_state0_hook(GB *gb) {
-  CYC(0x47c9, 0x47ca); H = D;
-  CYC(0x47ca, 0x47cb); L = E;
-  CYC(0x47cb, 0x47cc); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = 1
-  CYC(0x47cc, 0x47ce); L = 0xc2; // Part.subid
-  CYC(0x47ce, 0x47cf); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x47cf, 0x47d1); alu_and(gb, 0x07);
-  CYC(0x47d1, 0x47d2); mem_wr(gb, HL, A); SET_HL(HL - 1); // [var03]
-  CYC(0x47d2, 0x47d3); return; // ret
+  BASE(partCode09);
+  CYC(b_+165, b_+166); H = D;
+  CYC(b_+166, b_+167); L = E;
+  CYC(b_+167, b_+168); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = 1
+  CYC(b_+168, b_+170); L = 0xc2; // Part.subid
+  CYC(b_+170, b_+171); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+171, b_+173); alu_and(gb, 0x07);
+  CYC(b_+173, b_+174); mem_wr(gb, HL, A); SET_HL(HL - 1); // [var03]
+  CYC(b_+174, SYM(partCode0b)); return; // ret
 }
 
 void button_updateTileBeforeDeletion_hook(GB *gb) {
+  BASE(partCode09);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x47b7, objectGetShortPosition_hook, 0x2096, 0x47ba);
-  CYC(0x47ba, 0x47bb); C = A;
-  CYC(0x47bb, 0x47bd); B = 0x0d; // TILEINDEX_PRESSED_BUTTON
-  CALL_C(0x47bd, setTileInRoomLayoutBuffer_hook, 0x1426, 0x47c0);
-  CALL_C(0x47c0, objectGetTileAtPosition_hook, 0x1444, 0x47c3);
-  CYC(0x47c3, 0x47c5); alu_cp(gb, 0x0c); // TILEINDEX_BUTTON
-  if (F & FZ) { CYCT(0x47c5, 0x47c7); goto dupCheckButtonPushed; } // jr z
-  CYC(0x47c5, 0x47c7);
-  CYC(0x47c7, 0x47c9); goto dupSetTriggerAndPlaySound; // jr
+  CALL_C(b_+147, objectGetShortPosition_hook, SYM(objectGetShortPosition), b_+150);
+  CYC(b_+150, b_+151); C = A;
+  CYC(b_+151, b_+153); B = 0x0d; // TILEINDEX_PRESSED_BUTTON
+  CALL_C(b_+153, setTileInRoomLayoutBuffer_hook, SYM(setTileInRoomLayoutBuffer), b_+156);
+  CALL_C(b_+156, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+159);
+  CYC(b_+159, b_+161); alu_cp(gb, 0x0c); // TILEINDEX_BUTTON
+  if (F & FZ) { CYCT(b_+161, b_+163); goto dupCheckButtonPushed; } // jr z
+  CYC(b_+161, b_+163);
+  CYC(b_+163, b_+165); goto dupSetTriggerAndPlaySound; // jr
 
 dupCheckButtonPushed:
-  CYC(0x4796, 0x4798); E = 0xf0; // Part.var30
-  CYC(0x4798, 0x4799); A = mem_rd(gb, DE);
-  CYC(0x4799, 0x479a); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x479a); return; } // ret nz
-  CYC(0x479a, 0x479b);
-  CALL_C(0x479b, objectGetShortPosition_hook, 0x2096, 0x479e);
-  CYC(0x479e, 0x479f); C = A;
-  CYC(0x479f, 0x47a1); A = 0x0d; // TILEINDEX_PRESSED_BUTTON
-  CALL_C(0x47a1, setTile_hook, 0x3a9c, 0x47a4);
+  CYC(b_+114, b_+116); E = 0xf0; // Part.var30
+  CYC(b_+116, b_+117); A = mem_rd(gb, DE);
+  CYC(b_+117, b_+118); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+118); return; } // ret nz
+  CYC(b_+118, b_+119);
+  CALL_C(b_+119, objectGetShortPosition_hook, SYM(objectGetShortPosition), b_+122);
+  CYC(b_+122, b_+123); C = A;
+  CYC(b_+123, b_+125); A = 0x0d; // TILEINDEX_PRESSED_BUTTON
+  CALL_C(b_+125, setTile_hook, SYM(setTile), b_+128);
 
 dupSetTriggerAndPlaySound:
-  CYC(0x47a4, 0x47a6); E = 0xc3; // Part.var03
-  CYC(0x47a6, 0x47a7); A = mem_rd(gb, DE);
-  CYC(0x47a7, 0x47aa); SET_HL(0xcca0); // wActiveTriggers
-  CALL_C(0x47aa, setFlag_hook, 0x020e, 0x47ad);
-  CYC(0x47ad, 0x47af); E = 0xf0; // Part.var30
-  CYC(0x47af, 0x47b1); A = 0x01;
-  CYC(0x47b1, 0x47b2); mem_wr(gb, DE, A);
-  CYC(0x47b2, 0x47b4); A = 0x87; // SND_SPLASH
-  CYC(0x47b4, 0x47b7); playSound_b00_hook(gb); return; // jp
+  CYC(b_+128, b_+130); E = 0xc3; // Part.var03
+  CYC(b_+130, b_+131); A = mem_rd(gb, DE);
+  CYC(b_+131, b_+134); SET_HL(wActiveTriggers); // wActiveTriggers
+  CALL_C(b_+134, setFlag_hook, SYM(setFlag), b_+137);
+  CYC(b_+137, b_+139); E = 0xf0; // Part.var30
+  CYC(b_+139, b_+141); A = 0x01;
+  CYC(b_+141, b_+142); mem_wr(gb, DE, A);
+  CYC(b_+142, b_+144); A = 0x87; // SND_SPLASH
+  CYC(b_+144, b_+147); playSound_b00_hook(gb); return; // jp
 }

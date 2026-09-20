@@ -3,60 +3,64 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodeb1), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodeb1), (from), (to), true)
 
 void interactionCodeb1_hook(GB *gb) {
+  BASE(interactionCodeb1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6771, 0x6774); SET_HL(0x7b60);
-  CYC(0x6774, 0x6776); E = 0x3f;
-  CYC(0x6776, 0x6779); interBankCall_hook(gb); return;
+  CYC(b_+0, b_+3); SET_HL((SYM(interactiond7_makuSeed__state4Substate1) + 5));
+  CYC(b_+3, b_+5); E = 0x3f;
+  CYC(b_+5, SYM(interactionCodeb2)); interBankCall_hook(gb); return;
 }
 
 void interactionCodeb2__state0_hook(GB *gb) {
+  BASE(interactionCodeb2);
   uint16_t sp0_ = gb->sp;
-  CYC(0x67b5, 0x67b6); A = alu_inc8(gb, A);
-  CYC(0x67b6, 0x67b8); mem_wr(gb, DE, A);
-  CYC(0x67b7, 0x67bb); mem_wr(gb, 0xcc94, A);
-  CYC(0x67ba, 0x67bd); SET_HL(0x67ee);
-  CYC(0x67bd, 0x67c1); interactionSetMiniScript_hook(gb); return;
+  CYC(b_+60, b_+61); A = alu_inc8(gb, A);
+  CYC(b_+61, b_+63); mem_wr(gb, DE, A);
+  CYC(b_+62, b_+66); mem_wr(gb, wScreenShakeMagnitude, A);
+  CYC(b_+65, b_+68); SET_HL(b_+117);
+  CYC(b_+68, b_+72); interactionSetMiniScript_hook(gb); return;
 }
 
 void interactionCodeb2__state1_hook(GB *gb) {
+  BASE(interactionCodeb2);
   uint16_t sp0_ = gb->sp;
-  CYC(0x677e, 0x6781); A = mem_rd(gb, 0xcc00);
-  CYC(0x6781, 0x6783); alu_and(gb, 0x0f);
-  CYC(0x6783, 0x6785); A = 0xb3;
-  if (F & FZ) CALL_C_CC(0x6785, playSound_b00_hook, 0x0c98, 0x6788); else CYC(0x6785, 0x6788);
-  CYC(0x6788, 0x678b); A = mem_rd(gb, 0xcd18);
-  CYC(0x678b, 0x678c); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x678c, 0x678e); goto update; }
-  CYC(0x678c, 0x678e); A = mem_rd(gb, 0xcd19);
-  CYC(0x6791, 0x6792); alu_or(gb, A);
-  if (F & FZ) CALL_ROM_CC(0x6792, 0x67c0); else CYC(0x6792, 0x6795);
+  CYC(b_+5, b_+8); A = mem_rd(gb, wFrameCounter);
+  CYC(b_+8, b_+10); alu_and(gb, 0x0f);
+  CYC(b_+10, b_+12); A = 0xb3;
+  if (F & FZ) CALL_C_CC(b_+12, playSound_b00_hook, SYM(playSound_b00), b_+15); else CYC(b_+12, b_+15);
+  CYC(b_+15, b_+18); A = mem_rd(gb, wScreenShakeCounterY);
+  CYC(b_+18, b_+19); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+19, b_+21); goto update; }
+  CYC(b_+19, b_+21); A = mem_rd(gb, wScreenShakeCounterX);
+  CYC(b_+24, b_+25); alu_or(gb, A);
+  if (F & FZ) CALL_ROM_CC(b_+25, b_+71); else CYC(b_+25, b_+28);
 update:
-  CALL_C(0x6795, interactionDecCounter1_hook, 0x23cc, 0x6798);
-  if (!(F & FZ)) { CYCT(0x6798, 0x6799); ret_effect(gb); return; }
-  CALL_ROM(0x6799, 0x67e1);
-  CYC(0x679c, 0x679e); C = 0x0f;
-  CALL_C(0x679e, getRandomNumber_hook, 0x043e, 0x67a1);
-  CYC(0x67a1, 0x67a2); alu_and(gb, C);
-  CYC(0x67a2, 0x67a4); C = alu_srl(gb, C);
-  CYC(0x67a4, 0x67a5); C = alu_inc8(gb, C);
-  CYC(0x67a5, 0x67a6); alu_sub(gb, C);
-  CYC(0x67a6, 0x67a7); C = A;
-  CALL_C(0x67a7, getFreePartSlot_hook, 0x3e8e, 0x67aa);
-  if (!(F & FZ)) { CYCT(0x67aa, 0x67ab); ret_effect(gb); return; }
-  CYC(0x67ab, 0x67ae); mem_wr(gb, HL, 0x11);
-  CYC(0x67ad, 0x67ae); L = alu_inc8(gb, L);
-  CYC(0x67ae, 0x67b1); mem_wr(gb, HL, 1);
-  CYC(0x67b0, 0x67b2); B = 0;
-  CYC(0x67b2, 0x67b5); objectCopyPositionWithOffset_hook(gb); return;
+  CALL_C(b_+28, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+31);
+  if (!(F & FZ)) { CYCT(b_+31, b_+32); ret_effect(gb); return; }
+  CALL_ROM(b_+32, b_+104);
+  CYC(b_+35, b_+37); C = 0x0f;
+  CALL_C(b_+37, getRandomNumber_hook, SYM(getRandomNumber), b_+40);
+  CYC(b_+40, b_+41); alu_and(gb, C);
+  CYC(b_+41, b_+43); C = alu_srl(gb, C);
+  CYC(b_+43, b_+44); C = alu_inc8(gb, C);
+  CYC(b_+44, b_+45); alu_sub(gb, C);
+  CYC(b_+45, b_+46); C = A;
+  CALL_C(b_+46, getFreePartSlot_hook, SYM(getFreePartSlot), b_+49);
+  if (!(F & FZ)) { CYCT(b_+49, b_+50); ret_effect(gb); return; }
+  CYC(b_+50, b_+53); mem_wr(gb, HL, 0x11);
+  CYC(b_+52, b_+53); L = alu_inc8(gb, L);
+  CYC(b_+53, b_+56); mem_wr(gb, HL, 1);
+  CYC(b_+55, b_+57); B = 0;
+  CYC(b_+57, b_+60); objectCopyPositionWithOffset_hook(gb); return;
 }
 
 void interactionCodeb2_hook(GB *gb) {
+  BASE(interactionCodeb2);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6779, checkInteractionState_hook, 0x23fe, 0x677c);
-  if (F & FZ) { CYCT(0x677c, 0x677e); interactionCodeb2__state0_hook(gb); return; }
-  CYC(0x677c, 0x677e); interactionCodeb2__state1_hook(gb);
+  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
+  if (F & FZ) { CYCT(b_+3, b_+5); interactionCodeb2__state0_hook(gb); return; }
+  CYC(b_+3, b_+5); interactionCodeb2__state1_hook(gb);
 }

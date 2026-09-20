@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0d, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0d, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode2c), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode2c), (from), (to), true)
 
 static uint16_t enemyCode2c_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -41,143 +41,153 @@ void cheepCheep_subid01_state8_hook(GB *gb);
 //   var03: How far to travel (copied to counter1)
 // ==================================================================================================
 void enemyCode2c_hook(GB *gb) {
+  BASE(enemyCode2c);
   uint16_t sp0_ = gb->sp;
-  if (F & FZ) { CYCT(0x64f8, 0x64fa); goto normalStatus; } // jr z
-  CYC(0x64f8, 0x64fa);
-  CYC(0x64fa, 0x64fc); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { CYCT(0x64fc, 0x64fd); ret_effect(gb); return; } // ret c
-  CYC(0x64fc, 0x64fd);
-  if (F & FZ) { CYCT(0x64fd, 0x6500); enemyDie_hook(gb); return; } // jp z
-  CYC(0x64fd, 0x6500);
-  CYC(0x6500, 0x6501); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(0x6501, 0x6504); ecom_updateKnockback_b0d_hook(gb); return; } // jp nz
-  CYC(0x6501, 0x6504);
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { CYCT(b_+4, b_+5); ret_effect(gb); return; } // ret c
+  CYC(b_+4, b_+5);
+  if (F & FZ) { CYCT(b_+5, b_+8); enemyDie_hook(gb); return; } // jp z
+  CYC(b_+5, b_+8);
+  CYC(b_+8, b_+9); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+9, b_+12); ecom_updateKnockback_b0d_hook(gb); return; } // jp nz
+  CYC(b_+9, b_+12);
 
 normalStatus:
-  CALL_C(0x6504, ecom_getSubidAndCpStateTo08_b0d_hook, 0x4426, 0x6507);
-  if (!(F & FC)) { CYCT(0x6507, 0x6509); goto normalState; } // jr nc
-  CYC(0x6507, 0x6509);
-  CYC(0x6509, 0x650a); push_effect(gb, 0x650a);
+  CALL_C(b_+12, ecom_getSubidAndCpStateTo08_b0d_hook, SYM(ecom_getSubidAndCpStateTo08_b0d), b_+15);
+  if (!(F & FC)) { CYCT(b_+15, b_+17); goto normalState; } // jr nc
+  CYC(b_+15, b_+17);
+  CYC(b_+17, b_+18); push_effect(gb, b_+18);
   {
     uint16_t target = enemyCode2c_jump_table(gb);
-    if (target == 0x6520) { cheepCheep_state_uninitialized_hook(gb); return; }
-    if (target == 0x44ac) { ecom_blownByGaleSeedState_b0d_hook(gb); return; }
+    if (target == SYM(cheepCheep_state_uninitialized)) { cheepCheep_state_uninitialized_hook(gb); return; }
+    if (target == SYM(ecom_blownByGaleSeedState_b0d)) { ecom_blownByGaleSeedState_b0d_hook(gb); return; }
     cheepCheep_state_stub_hook(gb); return; // states 1-4, 6, 7 all target 0x6528
   }
 
 normalState:
-  CYC(0x651a, 0x651b); A = B;
-  CYC(0x651b, 0x651c); push_effect(gb, 0x651c);
+  CYC(b_+34, b_+35); A = B;
+  CYC(b_+35, b_+36); push_effect(gb, b_+36);
   {
     uint16_t target = enemyCode2c_jump_table(gb);
-    if (target == 0x656b) { cheepCheep_subid01_hook(gb); return; }
+    if (target == SYM(cheepCheep_subid01)) { cheepCheep_subid01_hook(gb); return; }
     cheepCheep_subid00_hook(gb); return; // target == 0x6529
   }
 }
 
 void cheepCheep_state_uninitialized_hook(GB *gb) {
+  BASE(cheepCheep_state_uninitialized);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6520, 0x6522); A = 0x14; // SPEED_80
-  CALL_C(0x6522, ecom_setSpeedAndState8_b0d_hook, 0x4364, 0x6525);
-  CYC(0x6525, 0x6528); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+0, b_+2); A = 0x14; // SPEED_80
+  CALL_C(b_+2, ecom_setSpeedAndState8_b0d_hook, SYM(ecom_setSpeedAndState8_b0d), b_+5);
+  CYC(b_+5, SYM(cheepCheep_state_stub)); objectSetVisible82_hook(gb); return; // jp
 }
 
 void cheepCheep_state_stub_hook(GB *gb) {
-  RET(0x6528); return;
+  BASE(cheepCheep_state_stub);
+  RET(b_+0); return;
 }
 
 void cheepCheep_subid00_hook(GB *gb) {
-  CYC(0x6529, 0x652a); A = mem_rd(gb, DE);
-  CYC(0x652a, 0x652c); alu_sub(gb, 0x08);
-  CYC(0x652c, 0x652d); push_effect(gb, 0x652d);
+  BASE(cheepCheep_subid00);
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);
+  CYC(b_+1, b_+3); alu_sub(gb, 0x08);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
   {
     uint16_t target = enemyCode2c_jump_table(gb);
-    if (target == 0x6543) { cheepCheep_state9_hook(gb); return; }
-    if (target == 0x6552) { cheepCheep_stateA_hook(gb); return; }
+    if (target == SYM(cheepCheep_state9)) { cheepCheep_state9_hook(gb); return; }
+    if (target == SYM(cheepCheep_stateA)) { cheepCheep_stateA_hook(gb); return; }
     cheepCheep_subid00_state8_hook(gb); return; // target == 0x6533
   }
 }
 
 // Initialize angle (left), counter1.
 void cheepCheep_subid00_state8_hook(GB *gb) {
-  CYC(0x6533, 0x6534); H = D;
-  CYC(0x6534, 0x6535); L = E;
-  CYC(0x6535, 0x6536); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
-  CYC(0x6536, 0x6538); L = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x6538, 0x653a); mem_wr(gb, HL, 0x18); // ANGLE_LEFT
-  CYC(0x653a, 0x653c); L = ENEMY_BASE + OBJ_VAR03;
-  CYC(0x653c, 0x653d); A = mem_rd(gb, HL);
-  CYC(0x653d, 0x653e); alu_add(gb, A);
-  CYC(0x653e, 0x653f); mem_wr(gb, HL, A);
-  CYC(0x653f, 0x6541); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x6541, 0x6542); mem_wr(gb, HL, A);
-  RET(0x6542); return;
+  BASE(cheepCheep_subid00_state8);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+2); L = E;
+  CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
+  CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 0x18); // ANGLE_LEFT
+  CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_VAR03;
+  CYC(b_+9, b_+10); A = mem_rd(gb, HL);
+  CYC(b_+10, b_+11); alu_add(gb, A);
+  CYC(b_+11, b_+12); mem_wr(gb, HL, A);
+  CYC(b_+12, b_+14); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+14, b_+15); mem_wr(gb, HL, A);
+  RET(b_+15); return;
 }
 
 // Moving until counter1 expires
 void cheepCheep_state9_hook(GB *gb) {
+  BASE(cheepCheep_state9);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6543, ecom_decCounter1_b0d_hook, 0x439a, 0x6546);
-  if (!(F & FZ)) { CYCT(0x6546, 0x6548); goto applySpeed; } // jr nz
-  CYC(0x6546, 0x6548);
-  CYC(0x6548, 0x654a); mem_wr(gb, HL, 60);
-  CYC(0x654a, 0x654b); L = E;
-  CYC(0x654b, 0x654c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
+  CALL_C(b_+0, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); goto applySpeed; } // jr nz
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 60);
+  CYC(b_+7, b_+8); L = E;
+  CYC(b_+8, b_+9); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
 
 applySpeed:
-  CALL_C(0x654c, objectApplySpeed_hook, 0x201d, 0x654f);
+  CALL_C(b_+9, objectApplySpeed_hook, SYM(objectApplySpeed), SYM(cheepCheep_animate));
   cheepCheep_animate_hook(gb); return; // falls through
 }
 
 void cheepCheep_animate_hook(GB *gb) {
-  CYC(0x654f, 0x6552); enemyAnimate_hook(gb); return; // jp
+  BASE(cheepCheep_animate);
+  CYC(b_+0, SYM(cheepCheep_stateA)); enemyAnimate_hook(gb); return; // jp
 }
 
 // Waiting for 60 frames, then reverse direction
 void cheepCheep_stateA_hook(GB *gb) {
+  BASE(cheepCheep_stateA);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6552, ecom_decCounter1_b0d_hook, 0x439a, 0x6555);
-  if (!(F & FZ)) { CYCT(0x6555, 0x6557); cheepCheep_animate_hook(gb); return; } // jr nz
-  CYC(0x6555, 0x6557);
-  CYC(0x6557, 0x6559); E = ENEMY_BASE + OBJ_VAR03;
-  CYC(0x6559, 0x655a); A = mem_rd(gb, DE);
-  CYC(0x655a, 0x655b); mem_wr(gb, HL, A); // [counter1] = [var03]
-  CYC(0x655b, 0x655d); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x655d, 0x655e); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x655e, 0x6560); L = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x6560, 0x6561); A = mem_rd(gb, HL);
-  CYC(0x6561, 0x6563); alu_xor(gb, 0x10);
-  CYC(0x6563, 0x6564); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(0x6564, 0x6565); A = mem_rd(gb, HL);
-  CYC(0x6565, 0x6567); alu_xor(gb, 0x01);
-  CYC(0x6567, 0x6568); mem_wr(gb, HL, A);
-  CYC(0x6568, 0x656b); enemySetAnimation_hook(gb); return; // jp
+  CALL_C(b_+0, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); cheepCheep_animate_hook(gb); return; } // jr nz
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+7); E = ENEMY_BASE + OBJ_VAR03;
+  CYC(b_+7, b_+8); A = mem_rd(gb, DE);
+  CYC(b_+8, b_+9); mem_wr(gb, HL, A); // [counter1] = [var03]
+  CYC(b_+9, b_+11); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+11, b_+12); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+12, b_+14); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+14, b_+15); A = mem_rd(gb, HL);
+  CYC(b_+15, b_+17); alu_xor(gb, 0x10);
+  CYC(b_+17, b_+18); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+18, b_+19); A = mem_rd(gb, HL);
+  CYC(b_+19, b_+21); alu_xor(gb, 0x01);
+  CYC(b_+21, b_+22); mem_wr(gb, HL, A);
+  CYC(b_+22, SYM(cheepCheep_subid01)); enemySetAnimation_hook(gb); return; // jp
 }
 
 void cheepCheep_subid01_hook(GB *gb) {
-  CYC(0x656b, 0x656c); A = mem_rd(gb, DE);
-  CYC(0x656c, 0x656e); alu_sub(gb, 0x08);
-  CYC(0x656e, 0x656f); push_effect(gb, 0x656f);
+  BASE(cheepCheep_subid01);
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);
+  CYC(b_+1, b_+3); alu_sub(gb, 0x08);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
   {
     uint16_t target = enemyCode2c_jump_table(gb);
-    if (target == 0x6543) { cheepCheep_state9_hook(gb); return; }
-    if (target == 0x6552) { cheepCheep_stateA_hook(gb); return; }
+    if (target == SYM(cheepCheep_state9)) { cheepCheep_state9_hook(gb); return; }
+    if (target == SYM(cheepCheep_stateA)) { cheepCheep_stateA_hook(gb); return; }
     cheepCheep_subid01_state8_hook(gb); return; // target == 0x6575
   }
 }
 
 // Initialize angle (down), counter1.
 void cheepCheep_subid01_state8_hook(GB *gb) {
-  CYC(0x6575, 0x6576); H = D;
-  CYC(0x6576, 0x6577); L = E;
-  CYC(0x6577, 0x6578); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
-  CYC(0x6578, 0x657a); L = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x657a, 0x657c); mem_wr(gb, HL, 0x10); // ANGLE_DOWN
-  CYC(0x657c, 0x657e); L = ENEMY_BASE + OBJ_VAR03;
-  CYC(0x657e, 0x657f); A = mem_rd(gb, HL);
-  CYC(0x657f, 0x6580); alu_add(gb, A);
-  CYC(0x6580, 0x6581); mem_wr(gb, HL, A);
-  CYC(0x6581, 0x6583); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x6583, 0x6584); mem_wr(gb, HL, A);
-  RET(0x6584); return;
+  BASE(cheepCheep_subid01_state8);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+2); L = E;
+  CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
+  CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 0x10); // ANGLE_DOWN
+  CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_VAR03;
+  CYC(b_+9, b_+10); A = mem_rd(gb, HL);
+  CYC(b_+10, b_+11); alu_add(gb, A);
+  CYC(b_+11, b_+12); mem_wr(gb, HL, A);
+  CYC(b_+12, b_+14); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+14, b_+15); mem_wr(gb, HL, A);
+  RET(b_+15); return;
 }

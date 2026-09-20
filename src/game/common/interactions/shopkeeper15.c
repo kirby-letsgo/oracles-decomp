@@ -3,12 +3,13 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(shopkeeper_take10Rupees), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(shopkeeper_take10Rupees), (from), (to), true)
 
 void shopkeeper_take10Rupees_hook(GB *gb);
 
 void shopkeeper_take10Rupees_hook(GB *gb) {
-  CYC(0x411c, 0x411e); A = 0x04;
-  CYC(0x411e, 0x4121); removeRupeeValue_hook(gb);
+  BASE(shopkeeper_take10Rupees);
+  CYC(b_+0, b_+2); A = 0x04;
+  CYC(b_+2, SYM(movingPlatform_loadScript)); removeRupeeValue_hook(gb);
 }

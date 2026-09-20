@@ -3,31 +3,32 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode2f), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode2f), (from), (to), true)
 
 // INTERAC_PLAY_NAYRU_MUSIC: starts Nayru's song at half volume until the intro is done,
 // then deletes itself.
 void interactionCode2f_hook(GB *gb) {
+  BASE(interactionCode2f);
   uint16_t sp0_ = gb->sp;
-  CYC(0x55fe, 0x5600); A = 0x0a; // GLOBALFLAG_INTRO_DONE
-  CALL_C(0x5600, checkGlobalFlag_hook, 0x31f3, 0x5603);
+  CYC(b_+0, b_+2); A = 0x0a; // GLOBALFLAG_INTRO_DONE
+  CALL_C(b_+2, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+5);
   if (!(F & FZ)) {
-    CYCT(0x5603, 0x5606); interactionDelete_hook(gb); return;
+    CYCT(b_+5, b_+8); interactionDelete_hook(gb); return;
   }
-  CYC(0x5603, 0x5606);
-  CYC(0x5606, 0x5609); SET_HL(wActiveMusic);
-  CYC(0x5609, 0x560b); A = 0x08; // MUS_NAYRU
-  CYC(0x560b, 0x560c); alu_cp(gb, mem_rd(gb, HL));
+  CYC(b_+5, b_+8);
+  CYC(b_+8, b_+11); SET_HL(wActiveMusic);
+  CYC(b_+11, b_+13); A = 0x08; // MUS_NAYRU
+  CYC(b_+13, b_+14); alu_cp(gb, mem_rd(gb, HL));
   if (F & FZ) {
-    CYCT(0x560c, 0x560e); goto setVolume;
+    CYCT(b_+14, b_+16); goto setVolume;
   }
-  CYC(0x560c, 0x560e);
-  CYC(0x560e, 0x560f); mem_wr(gb, HL, A);
-  CALL_C(0x560f, playSound_b00_hook, 0x0c98, 0x5612);
+  CYC(b_+14, b_+16);
+  CYC(b_+16, b_+17); mem_wr(gb, HL, A);
+  CALL_C(b_+17, playSound_b00_hook, SYM(playSound_b00), b_+20);
 
 setVolume:
-  CYC(0x5612, 0x5614); A = 0x02;
-  CALL_C(0x5614, setMusicVolume_hook, 0x0cad, 0x5617);
-  CYC(0x5617, 0x561a); interactionDelete_hook(gb);
+  CYC(b_+20, b_+22); A = 0x02;
+  CALL_C(b_+22, setMusicVolume_hook, SYM(setMusicVolume), b_+25);
+  CYC(b_+25, SYM(interactionCode30)); interactionDelete_hook(gb);
 }

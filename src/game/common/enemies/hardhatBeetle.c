@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0e, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0e, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode4d), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode4d), (from), (to), true)
 
 static uint16_t hardhatBeetle_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -32,46 +32,47 @@ static uint16_t hardhatBeetle_jump_table(GB *gb) {
 // (ages only) shares its entire routine with ENEMY_HARDHAT_BEETLE.
 // ==================================================================================================
 void enemyCode4d_hook(GB *gb) {
+  BASE(enemyCode4d);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x60bb, ecom_checkHazards_b0e_hook, 0x4051, 0x60be);
-  if (F & FZ) { CYCT(0x60be, 0x60c0); goto normalStatus; } // jr z
-  CYC(0x60be, 0x60c0);
-  CYC(0x60c0, 0x60c2); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(0x60c2); return; } // ret c
-  CYC(0x60c2, 0x60c3);
-  if (F & FZ) { CYCT(0x60c3, 0x60c6); enemyDie_hook(gb); return; } // jp z
-  CYC(0x60c3, 0x60c6);
-  CYC(0x60c6, 0x60c7); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(0x60c7, 0x60ca); ecom_updateKnockbackAndCheckHazards_b0e_hook(gb); return; } // jp nz
-  CYC(0x60c7, 0x60ca);
-  RET(0x60ca); return; // ret
+  CALL_C(b_+0, ecom_checkHazards_b0e_hook, SYM(ecom_checkHazards_b0e), b_+3);
+  if (F & FZ) { CYCT(b_+3, b_+5); goto normalStatus; } // jr z
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+7); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+7); return; } // ret c
+  CYC(b_+7, b_+8);
+  if (F & FZ) { CYCT(b_+8, b_+11); enemyDie_hook(gb); return; } // jp z
+  CYC(b_+8, b_+11);
+  CYC(b_+11, b_+12); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+12, b_+15); ecom_updateKnockbackAndCheckHazards_b0e_hook(gb); return; } // jp nz
+  CYC(b_+12, b_+15);
+  RET(b_+15); return; // ret
 
 normalStatus:
-  CYC(0x60cb, 0x60cd); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x60cd, 0x60ce); A = mem_rd(gb, DE);
+  CYC(b_+16, b_+18); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+18, b_+19); A = mem_rd(gb, DE);
   {
-    CYC(0x60ce, 0x60cf); push_effect(gb, 0x60cf);
+    CYC(b_+19, b_+20); push_effect(gb, b_+20);
     uint16_t target = hardhatBeetle_jump_table(gb);
-    if (target == 0x60e1) goto state_uninitialized;
-    if (target == 0x60f0) { RET(0x60f0); return; } // ret (state_stub)
-    if (target == 0x44ac) { ecom_blownByGaleSeedState_b0e_hook(gb); return; }
-    if (target == 0x60f1) goto state8;
+    if (target == b_+38) goto state_uninitialized;
+    if (target == b_+53) { RET(b_+53); return; } // ret (state_stub)
+    if (target == SYM(ecom_blownByGaleSeedState_b0e)) { ecom_blownByGaleSeedState_b0e_hook(gb); return; }
+    if (target == b_+54) goto state8;
     HANDOFF(target);
   }
 
 state_uninitialized:
-  CYC(0x60e1, 0x60e3); E = ENEMY_BASE + OBJ_ID;
-  CYC(0x60e3, 0x60e4); A = mem_rd(gb, DE);
-  CYC(0x60e4, 0x60e6); alu_cp(gb, 0x5f); // ENEMY_HARMLESS_HARDHAT_BEETLE
-  CYC(0x60e6, 0x60e8); A = 0x8d; // PALH_8d
-  if (F & FZ) CALL_C_CC(0x60e8, loadPaletteHeader_hook, 0x050b, 0x60eb); else CYC(0x60e8, 0x60eb); // call z
-  CYC(0x60eb, 0x60ed); A = 0x0f; // SPEED_60
-  CYC(0x60ed, 0x60f0); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
+  CYC(b_+38, b_+40); E = ENEMY_BASE + OBJ_ID;
+  CYC(b_+40, b_+41); A = mem_rd(gb, DE);
+  CYC(b_+41, b_+43); alu_cp(gb, 0x5f); // ENEMY_HARMLESS_HARDHAT_BEETLE
+  CYC(b_+43, b_+45); A = 0x8d; // PALH_8d
+  if (F & FZ) CALL_C_CC(b_+45, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+48); else CYC(b_+45, b_+48); // call z
+  CYC(b_+48, b_+50); A = 0x0f; // SPEED_60
+  CYC(b_+50, b_+53); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
 
 state8:
-  CALL_C(0x60f1, ecom_updateAngleTowardTarget_b0e_hook, 0x43bf, 0x60f4);
-  CALL_C(0x60f4, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, 0x4156, 0x60f7);
-  CYC(0x60f7, 0x60fa); enemyAnimate_hook(gb); return; // jp
+  CALL_C(b_+54, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+57);
+  CALL_C(b_+57, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0e), b_+60);
+  CYC(b_+60, SYM(enemyCode64)); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:60bb, alias of enemyCode4d (ENEMY_HARMLESS_HARDHAT_BEETLE, ages only): identical bytes at

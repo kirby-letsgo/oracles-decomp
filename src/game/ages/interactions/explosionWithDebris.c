@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode99), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode99), (from), (to), true)
 
 static uint16_t interactionCode99_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -39,136 +39,137 @@ static void interactionCode99_add_double_index_from_rst(GB *gb, uint16_t return_
 // INTERAC_EXPLOSION_WITH_DEBRIS
 // ==================================================================================================
 void interactionCode99_hook(GB *gb) {
+  BASE(interactionCode99);
   uint16_t sp0_ = gb->sp;
-  CYC(0x501c, 0x501e); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x501e, 0x501f); A = mem_rd(gb, DE);
-  CYC(0x501f, 0x5020); push_effect(gb, 0x5020);
-  switch (interactionCode99_jump_table(gb)) {
-    case 0x5024: goto state0;
-    case 0x508e: goto state1;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (interactionCode99_jump_table(gb));
+    if (jt_ == b_+8) { goto state0; }
+    else if (jt_ == b_+114) { goto state1; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 state0:
-  CYC(0x5024, 0x5026); A = 0x01;
-  CYC(0x5026, 0x5027); mem_wr(gb, DE, A);
-  CALL_C(0x5027, interactionInitGraphics_hook, 0x15fb, 0x502a);
-  CALL_C(0x502a, objectSetVisible81_hook, 0x1e60, 0x502d);
-  CYC(0x502d, 0x502f); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x502f, 0x5030); A = mem_rd(gb, DE);
-  CYC(0x5030, 0x5031); push_effect(gb, 0x5031);
-  switch (interactionCode99_jump_table(gb)) {
-    case 0x5037: goto initSubid00;
-    case 0x5062: goto initSubid01;
-    case 0x505a: goto initSubid02;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+8, b_+10); A = 0x01;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
+  CALL_C(b_+14, objectSetVisible81_hook, SYM(objectSetVisible81), b_+17);
+  CYC(b_+17, b_+19); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+19, b_+20); A = mem_rd(gb, DE);
+  CYC(b_+20, b_+21); push_effect(gb, b_+21);
+  do { uint16_t jt_ = (interactionCode99_jump_table(gb));
+    if (jt_ == b_+27) { goto initSubid00; }
+    else if (jt_ == b_+70) { goto initSubid01; }
+    else if (jt_ == b_+62) { goto initSubid02; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 initSubid00:
-  CYC(0x5037, 0x5038); E = alu_inc8(gb, E);
-  CYC(0x5038, 0x5039); A = mem_rd(gb, DE);
-  CYC(0x5039, 0x503a); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x503a, 0x503b); ret_effect(gb); return; } // ret z
-  CYC(0x503a, 0x503b);
-  CALL_C(0x503b, getRandomNumber_noPreserveVars_hook, 0x0453, 0x503e);
-  CYC(0x503e, 0x5040); alu_and(gb, 0x03);
-  CYC(0x5040, 0x5043); SET_HL(0x50cf); // @subid0Positions
-  CYC(0x5043, 0x5044); interactionCode99_add_double_index_from_rst(gb, 0x5044);
-  CALL_C(0x5044, getRandomNumber_hook, 0x043e, 0x5047);
-  CYC(0x5047, 0x5049); alu_and(gb, 0x07);
-  CYC(0x5049, 0x504b); alu_sub(gb, 0x03);
-  CYC(0x504b, 0x504c); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x504c, 0x504d); B = A;
-  CYC(0x504d, 0x504e); SET_HL(HL + 1);
-  CALL_C(0x504e, getRandomNumber_hook, 0x043e, 0x5051);
-  CYC(0x5051, 0x5053); alu_and(gb, 0x07);
-  CYC(0x5053, 0x5055); alu_sub(gb, 0x03);
-  CYC(0x5055, 0x5056); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x5056, 0x5057); C = A;
-  CYC(0x5057, 0x505a); interactionSetPosition_hook(gb); return; // jp
+  CYC(b_+27, b_+28); E = alu_inc8(gb, E);
+  CYC(b_+28, b_+29); A = mem_rd(gb, DE);
+  CYC(b_+29, b_+30); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+30, b_+31); ret_effect(gb); return; } // ret z
+  CYC(b_+30, b_+31);
+  CALL_C(b_+31, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+34);
+  CYC(b_+34, b_+36); alu_and(gb, 0x03);
+  CYC(b_+36, b_+39); SET_HL(b_+179); // @subid0Positions
+  CYC(b_+39, b_+40); interactionCode99_add_double_index_from_rst(gb, b_+40);
+  CALL_C(b_+40, getRandomNumber_hook, SYM(getRandomNumber), b_+43);
+  CYC(b_+43, b_+45); alu_and(gb, 0x07);
+  CYC(b_+45, b_+47); alu_sub(gb, 0x03);
+  CYC(b_+47, b_+48); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+48, b_+49); B = A;
+  CYC(b_+49, b_+50); SET_HL(HL + 1);
+  CALL_C(b_+50, getRandomNumber_hook, SYM(getRandomNumber), b_+53);
+  CYC(b_+53, b_+55); alu_and(gb, 0x07);
+  CYC(b_+55, b_+57); alu_sub(gb, 0x03);
+  CYC(b_+57, b_+58); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+58, b_+59); C = A;
+  CYC(b_+59, b_+62); interactionSetPosition_hook(gb); return; // jp
 
 initSubid02:
-  CYC(0x505a, 0x505c); E = INTERACTION_BASE + OBJ_VAR38;
-  CYC(0x505c, 0x505d); A = mem_rd(gb, DE);
-  CYC(0x505d, 0x505f); A = (uint8_t)(A & ~(1 << 6));
-  CYC(0x505f, 0x5061); E = INTERACTION_BASE + OBJ_VISIBLE;
-  CYC(0x5061, 0x5062); mem_wr(gb, DE, A);
+  CYC(b_+62, b_+64); E = INTERACTION_BASE + OBJ_VAR38;
+  CYC(b_+64, b_+65); A = mem_rd(gb, DE);
+  CYC(b_+65, b_+67); A = (uint8_t)(A & ~(1 << 6));
+  CYC(b_+67, b_+69); E = INTERACTION_BASE + OBJ_VISIBLE;
+  CYC(b_+69, b_+70); mem_wr(gb, DE, A);
 
 initSubid01:
-  CALL_C(0x5062, getRandomNumber_noPreserveVars_hook, 0x0453, 0x5065);
-  CYC(0x5065, 0x5067); alu_and(gb, 0x03);
-  CYC(0x5067, 0x5069); alu_add(gb, 0x02);
-  CYC(0x5069, 0x506a); C = A;
-  CYC(0x506a, 0x506b); H = D;
-  CYC(0x506b, 0x506d); L = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x506d, 0x506e); A = mem_rd(gb, HL);
-  CYC(0x506e, 0x506f); alu_add(gb, A);
-  CYC(0x506f, 0x5070); alu_add(gb, A);
-  CYC(0x5070, 0x5071); alu_add(gb, A);
-  CYC(0x5071, 0x5072); alu_add(gb, C);
-  CYC(0x5072, 0x5074); alu_and(gb, 0x1f);
-  CYC(0x5074, 0x5076); L = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x5076, 0x5077); mem_wr(gb, HL, A);
-  CALL_C(0x5077, getRandomNumber_hook, 0x043e, 0x507a);
-  CYC(0x507a, 0x507c); alu_and(gb, 0x03);
-  CYC(0x507c, 0x507f); SET_BC(0x50bf); // @subid1And2Speeds
-  CALL_C(0x507f, addAToBc_hook, 0x006d, 0x5082);
-  CYC(0x5082, 0x5083); A = mem_rd(gb, BC);
-  CYC(0x5083, 0x5085); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x5085, 0x5086); mem_wr(gb, HL, A);
-  CYC(0x5086, 0x5088); L = INTERACTION_BASE + OBJ_SPEED_Z;
-  CYC(0x5088, 0x508a); mem_wr(gb, HL, 0x80);
-  CYC(0x508a, 0x508b); L = alu_inc8(gb, L);
-  CYC(0x508b, 0x508d); mem_wr(gb, HL, 0xfe);
-  RET(0x508d); return;
+  CALL_C(b_+70, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+73);
+  CYC(b_+73, b_+75); alu_and(gb, 0x03);
+  CYC(b_+75, b_+77); alu_add(gb, 0x02);
+  CYC(b_+77, b_+78); C = A;
+  CYC(b_+78, b_+79); H = D;
+  CYC(b_+79, b_+81); L = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+81, b_+82); A = mem_rd(gb, HL);
+  CYC(b_+82, b_+83); alu_add(gb, A);
+  CYC(b_+83, b_+84); alu_add(gb, A);
+  CYC(b_+84, b_+85); alu_add(gb, A);
+  CYC(b_+85, b_+86); alu_add(gb, C);
+  CYC(b_+86, b_+88); alu_and(gb, 0x1f);
+  CYC(b_+88, b_+90); L = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+90, b_+91); mem_wr(gb, HL, A);
+  CALL_C(b_+91, getRandomNumber_hook, SYM(getRandomNumber), b_+94);
+  CYC(b_+94, b_+96); alu_and(gb, 0x03);
+  CYC(b_+96, b_+99); SET_BC(b_+163); // @subid1And2Speeds
+  CALL_C(b_+99, addAToBc_hook, 0x006d, b_+102);
+  CYC(b_+102, b_+103); A = mem_rd(gb, BC);
+  CYC(b_+103, b_+105); L = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+105, b_+106); mem_wr(gb, HL, A);
+  CYC(b_+106, b_+108); L = INTERACTION_BASE + OBJ_SPEED_Z;
+  CYC(b_+108, b_+110); mem_wr(gb, HL, 0x80);
+  CYC(b_+110, b_+111); L = alu_inc8(gb, L);
+  CYC(b_+111, b_+113); mem_wr(gb, HL, 0xfe);
+  RET(b_+113); return;
 
 state1:
-  CYC(0x508e, 0x5090); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x5090, 0x5091); A = mem_rd(gb, DE);
-  CYC(0x5091, 0x5092); push_effect(gb, 0x5092);
-  switch (interactionCode99_jump_table(gb)) {
-    case 0x5098: goto runSubid0;
-    case 0x50c3: goto runSubid1Or2;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+114, b_+116); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+116, b_+117); A = mem_rd(gb, DE);
+  CYC(b_+117, b_+118); push_effect(gb, b_+118);
+  do { uint16_t jt_ = (interactionCode99_jump_table(gb));
+    if (jt_ == b_+124) { goto runSubid0; }
+    else if (jt_ == b_+167) { goto runSubid1Or2; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 runSubid0:
-  CALL_C(0x5098, interactionAnimate_hook, 0x261b, 0x509b);
-  CYC(0x509b, 0x509d); E = INTERACTION_BASE + OBJ_ANIM_PARAMETER;
-  CYC(0x509d, 0x509e); A = mem_rd(gb, DE);
-  CYC(0x509e, 0x509f); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x509f, 0x50a0); ret_effect(gb); return; } // ret z
-  CYC(0x509f, 0x50a0);
-  CYC(0x50a0, 0x50a1); A = alu_inc8(gb, A);
-  if (F & FZ) { CYCT(0x50a1, 0x50a4); interactionDelete_hook(gb); return; } // jp z
-  CYC(0x50a1, 0x50a4);
-  CYC(0x50a4, 0x50a5); alu_xor(gb, A);
-  CYC(0x50a5, 0x50a6); mem_wr(gb, DE, A);
-  CYC(0x50a6, 0x50a8); hram_wr(gb, 0x8b, A);
-  CYC(0x50a8, 0x50aa); hram_wr(gb, 0x8d, A);
-  CYC(0x50aa, 0x50ac); hram_wr(gb, 0x8c, A);
-  CYC(0x50ac, 0x50ae); B = 0x04;
+  CALL_C(b_+124, interactionAnimate_hook, SYM(interactionAnimate), b_+127);
+  CYC(b_+127, b_+129); E = INTERACTION_BASE + OBJ_ANIM_PARAMETER;
+  CYC(b_+129, b_+130); A = mem_rd(gb, DE);
+  CYC(b_+130, b_+131); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+131, b_+132); ret_effect(gb); return; } // ret z
+  CYC(b_+131, b_+132);
+  CYC(b_+132, b_+133); A = alu_inc8(gb, A);
+  if (F & FZ) { CYCT(b_+133, b_+136); interactionDelete_hook(gb); return; } // jp z
+  CYC(b_+133, b_+136);
+  CYC(b_+136, b_+137); alu_xor(gb, A);
+  CYC(b_+137, b_+138); mem_wr(gb, DE, A);
+  CYC(b_+138, b_+140); hram_wr(gb, 0x8b, A);
+  CYC(b_+140, b_+142); hram_wr(gb, 0x8d, A);
+  CYC(b_+142, b_+144); hram_wr(gb, 0x8c, A);
+  CYC(b_+144, b_+146); B = 0x04;
 
 spawnDebrisLoop:
-  CALL_C(0x50ae, getFreeInteractionSlot_hook, 0x3aef, 0x50b1);
-  if (!(F & FZ)) { CYCT(0x50b1, 0x50b2); ret_effect(gb); return; } // ret nz
-  CYC(0x50b1, 0x50b2);
-  CYC(0x50b2, 0x50b4); mem_wr(gb, HL, 0x99); // INTERAC_EXPLOSION_WITH_DEBRIS
-  CYC(0x50b4, 0x50b5); L = alu_inc8(gb, L);
-  CYC(0x50b5, 0x50b6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x50b6, 0x50b7); L = alu_inc8(gb, L);
-  CYC(0x50b7, 0x50b8); mem_wr(gb, HL, B);
-  CALL_C(0x50b8, objectCopyPosition_hook, 0x2242, 0x50bb);
-  CYC(0x50bb, 0x50bc); B = alu_dec8(gb, B);
-  if (!(F & FZ)) { CYCT(0x50bc, 0x50be); goto spawnDebrisLoop; } // jr nz
-  CYC(0x50bc, 0x50be);
-  RET(0x50be); return;
+  CALL_C(b_+146, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+149);
+  if (!(F & FZ)) { CYCT(b_+149, b_+150); ret_effect(gb); return; } // ret nz
+  CYC(b_+149, b_+150);
+  CYC(b_+150, b_+152); mem_wr(gb, HL, 0x99); // INTERAC_EXPLOSION_WITH_DEBRIS
+  CYC(b_+152, b_+153); L = alu_inc8(gb, L);
+  CYC(b_+153, b_+154); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+154, b_+155); L = alu_inc8(gb, L);
+  CYC(b_+155, b_+156); mem_wr(gb, HL, B);
+  CALL_C(b_+156, objectCopyPosition_hook, SYM(objectCopyPosition), b_+159);
+  CYC(b_+159, b_+160); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(b_+160, b_+162); goto spawnDebrisLoop; } // jr nz
+  CYC(b_+160, b_+162);
+  RET(b_+162); return;
 
 runSubid1Or2:
-  CALL_C(0x50c3, objectApplySpeed_hook, 0x201d, 0x50c6);
-  CYC(0x50c6, 0x50c8); C = 0x28;
-  CALL_C(0x50c8, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x50cb);
-  if (F & FZ) { CYCT(0x50cb, 0x50ce); interactionDelete_hook(gb); return; } // jp z
-  CYC(0x50cb, 0x50ce);
-  RET(0x50ce); return;
+  CALL_C(b_+167, objectApplySpeed_hook, SYM(objectApplySpeed), b_+170);
+  CYC(b_+170, b_+172); C = 0x28;
+  CALL_C(b_+172, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+175);
+  if (F & FZ) { CYCT(b_+175, b_+178); interactionDelete_hook(gb); return; } // jp z
+  CYC(b_+175, b_+178);
+  RET(b_+178); return;
 }

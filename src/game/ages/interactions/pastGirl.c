@@ -3,13 +3,13 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode38), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode38), (from), (to), true)
 
 // interactionCode38@scriptTable: one mainScripts.pastGirlScript_* pointer per game
 // progress value returned by getGameProgress_2.
-#define interactionCode38_scriptTable_bank08 0x7431
-#define getGameProgress_2_bank09 0x5559
+#define interactionCode38_scriptTable_bank08 SYM(interactionCode38__scriptTable)
+#define getGameProgress_2_bank09 SYM(getGameProgress_2)
 
 static uint16_t pastGirl_jumpTable(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -42,68 +42,69 @@ static void pastGirl_addDoubleIndex(GB *gb, uint16_t return_address) {
 
 // INTERAC_PAST_GIRL: the girl in the past whose script depends on game progress.
 void interactionCode38_hook(GB *gb) {
+  BASE(interactionCode38);
   uint16_t sp0_ = gb->sp;
-  CYC(0x73e6, 0x73e8); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x73e8, 0x73e9); A = mem_rd(gb, DE);
-  CYC(0x73e9, 0x73ea); push_effect(gb, 0x73ea);
-  switch (pastGirl_jumpTable(gb)) {
-    case 0x73ee: goto state0;
-    case 0x7425: goto state1;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (pastGirl_jumpTable(gb));
+    if (jt_ == b_+8) { goto state0; }
+    else if (jt_ == b_+63) { goto state1; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 state0:
-  CYC(0x73ee, 0x73f0); A = 0x01;
-  CYC(0x73f0, 0x73f1); mem_wr(gb, DE, A);
-  CALL_C(0x73f1, interactionInitGraphics_hook, 0x15fb, 0x73f4);
-  CALL_C(0x73f4, objectSetVisiblec2_hook, 0x1e45, 0x73f7);
-  CYC(0x73f7, 0x73f9); A = 0x1a; // >TX_1a00
-  CALL_C(0x73f9, interactionSetHighTextIndex_hook, 0x253b, 0x73fc);
-  CYC(0x73fc, 0x73fe); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x73fe, 0x73ff); A = mem_rd(gb, DE);
-  CYC(0x73ff, 0x7400); push_effect(gb, 0x7400);
-  switch (pastGirl_jumpTable(gb)) {
-    case 0x7402: goto subid0Init;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+8, b_+10); A = 0x01;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
+  CALL_C(b_+14, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+17);
+  CYC(b_+17, b_+19); A = 0x1a; // >TX_1a00
+  CALL_C(b_+19, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+22);
+  CYC(b_+22, b_+24); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+24, b_+25); A = mem_rd(gb, DE);
+  CYC(b_+25, b_+26); push_effect(gb, b_+26);
+  do { uint16_t jt_ = (pastGirl_jumpTable(gb));
+    if (jt_ == b_+28) { goto subid0Init; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 subid0Init:
   // callab agesInteractionsBank09.getGameProgress_2
-  CYC(0x7402, 0x7405); SET_HL(getGameProgress_2_bank09);
-  CYC(0x7405, 0x7407); E = 0x09;
-  CALL_C(0x7407, interBankCall_hook, 0x008a, 0x740a);
+  CYC(b_+28, b_+31); SET_HL(getGameProgress_2_bank09);
+  CYC(b_+31, b_+33); E = 0x09;
+  CALL_C(b_+33, interBankCall_hook, 0x008a, b_+36);
   // NPC doesn't exist between beating d2 and saving Nayru
-  CYC(0x740a, 0x740b); A = B;
-  CYC(0x740b, 0x740d); alu_cp(gb, 0x01);
+  CYC(b_+36, b_+37); A = B;
+  CYC(b_+37, b_+39); alu_cp(gb, 0x01);
   if (F & FZ) {
-    CYCT(0x740d, 0x7410); interactionDelete_hook(gb); return;
+    CYCT(b_+39, b_+42); interactionDelete_hook(gb); return;
   }
-  CYC(0x740d, 0x7410);
-  CYC(0x7410, 0x7412); alu_cp(gb, 0x02);
+  CYC(b_+39, b_+42);
+  CYC(b_+42, b_+44); alu_cp(gb, 0x02);
   if (F & FZ) {
-    CYCT(0x7412, 0x7415); interactionDelete_hook(gb); return;
+    CYCT(b_+44, b_+47); interactionDelete_hook(gb); return;
   }
-  CYC(0x7412, 0x7415);
-  CYC(0x7415, 0x7416); A = B;
-  CYC(0x7416, 0x7419); SET_HL(interactionCode38_scriptTable_bank08);
-  CYC(0x7419, 0x741a); pastGirl_addDoubleIndex(gb, 0x741a);
-  CYC(0x741a, 0x741b); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x741b, 0x741c); H = mem_rd(gb, HL);
-  CYC(0x741c, 0x741d); L = A;
-  CALL_C(0x741d, interactionSetScript_hook, 0x2544, 0x7420);
-  CALL_C(0x7420, objectMarkSolidPosition_hook, 0x24f0, 0x7423);
-  CYC(0x7423, 0x7425);
+  CYC(b_+44, b_+47);
+  CYC(b_+47, b_+48); A = B;
+  CYC(b_+48, b_+51); SET_HL(interactionCode38_scriptTable_bank08);
+  CYC(b_+51, b_+52); pastGirl_addDoubleIndex(gb, b_+52);
+  CYC(b_+52, b_+53); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+53, b_+54); H = mem_rd(gb, HL);
+  CYC(b_+54, b_+55); L = A;
+  CALL_C(b_+55, interactionSetScript_hook, SYM(interactionSetScript), b_+58);
+  CALL_C(b_+58, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+61);
+  CYC(b_+61, b_+63);
 
 state1:
-  CYC(0x7425, 0x7427); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7427, 0x7428); A = mem_rd(gb, DE);
-  CYC(0x7428, 0x7429); push_effect(gb, 0x7429);
-  switch (pastGirl_jumpTable(gb)) {
-    case 0x742b: goto subid0;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+63, b_+65); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+65, b_+66); A = mem_rd(gb, DE);
+  CYC(b_+66, b_+67); push_effect(gb, b_+67);
+  do { uint16_t jt_ = (pastGirl_jumpTable(gb));
+    if (jt_ == b_+69) { goto subid0; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 subid0:
-  CALL_C(0x742b, interactionRunScript_hook, 0x2552, 0x742e);
-  CYC(0x742e, 0x7431); interactionAnimateAsNpc_hook(gb);
+  CALL_C(b_+69, interactionRunScript_hook, SYM(interactionRunScript), b_+72);
+  CYC(b_+72, b_+75); interactionAnimateAsNpc_hook(gb);
 }

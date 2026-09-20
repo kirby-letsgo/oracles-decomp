@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x07, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x07, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode2a), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode2a), (from), (to), true)
 
 static uint16_t ricky_tornado_jump_table(GB *gb) {
   burn_rom(gb, 0, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -35,51 +35,52 @@ static void ricky_tornado_add_double_index(GB *gb) {
 }
 
 void itemCode2a_hook(GB *gb) {
+  BASE(itemCode2a);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5b00, 0x5b02); E = 0x04;
-  CYC(0x5b02, 0x5b03); A = mem_rd(gb, DE);
-  CYC(0x5b03, 0x5b04); push_effect(gb, 0x5b04);
-  switch (ricky_tornado_jump_table(gb)) {
-    case 0x5b08: break;
-    case 0x5b3c: goto state1;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = 0x04;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (ricky_tornado_jump_table(gb));
+    if (jt_ == b_+8) { break; }
+    else if (jt_ == b_+60) { goto state1; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
-  CALL_C(0x5b08, itemIncState_hook, 0x23ea, 0x5b0b);
-  CYC(0x5b0b, 0x5b0d); L = 0x10;
-  CYC(0x5b0d, 0x5b0f); mem_wr(gb, HL, 0x78);
-  CYC(0x5b0f, 0x5b12); A = W8(w1Companion_direction);
-  CYC(0x5b12, 0x5b13); C = A;
-  CYC(0x5b13, 0x5b15); A = alu_swap(gb, A);
-  CYC(0x5b15, 0x5b16); alu_rrca(gb);
-  CYC(0x5b16, 0x5b18); L = 0x09;
-  CYC(0x5b18, 0x5b19); mem_wr(gb, HL, A);
-  CYC(0x5b19, 0x5b1a); A = C;
-  CYC(0x5b1a, 0x5b1d); SET_HL(0x5b34);
-  CYC(0x5b1d, 0x5b1e); push_effect(gb, 0x5b1e); ricky_tornado_add_double_index(gb);
-  CYC(0x5b1e, 0x5b1f); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x5b1f, 0x5b20); C = mem_rd(gb, HL);
-  CYC(0x5b20, 0x5b21); B = A;
-  CYC(0x5b21, 0x5b24); SET_HL(w1Companion_yh);
-  CALL_C(0x5b24, objectTakePositionWithOffset_hook, 0x2277, 0x5b27);
-  CYC(0x5b27, 0x5b29); alu_sub(gb, 0x02);
-  CYC(0x5b29, 0x5b2a); mem_wr(gb, DE, A);
-  CALL_C(0x5b2a, itemLoadAttributesAndGraphics_hook, 0x4993, 0x5b2d);
-  CYC(0x5b2d, 0x5b2e); alu_xor(gb, A);
-  CALL_C(0x5b2e, itemSetAnimation_hook, 0x49e2, 0x5b31);
-  CYC(0x5b31, 0x5b34); objectSetVisiblec1_hook(gb);
+  CALL_C(b_+8, itemIncState_hook, SYM(itemIncState), b_+11);
+  CYC(b_+11, b_+13); L = 0x10;
+  CYC(b_+13, b_+15); mem_wr(gb, HL, 0x78);
+  CYC(b_+15, b_+18); A = W8(w1Companion_direction);
+  CYC(b_+18, b_+19); C = A;
+  CYC(b_+19, b_+21); A = alu_swap(gb, A);
+  CYC(b_+21, b_+22); alu_rrca(gb);
+  CYC(b_+22, b_+24); L = 0x09;
+  CYC(b_+24, b_+25); mem_wr(gb, HL, A);
+  CYC(b_+25, b_+26); A = C;
+  CYC(b_+26, b_+29); SET_HL(b_+52);
+  CYC(b_+29, b_+30); push_effect(gb, b_+30); ricky_tornado_add_double_index(gb);
+  CYC(b_+30, b_+31); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+31, b_+32); C = mem_rd(gb, HL);
+  CYC(b_+32, b_+33); B = A;
+  CYC(b_+33, b_+36); SET_HL(w1Companion_yh);
+  CALL_C(b_+36, objectTakePositionWithOffset_hook, SYM(objectTakePositionWithOffset), b_+39);
+  CYC(b_+39, b_+41); alu_sub(gb, 0x02);
+  CYC(b_+41, b_+42); mem_wr(gb, DE, A);
+  CALL_C(b_+42, itemLoadAttributesAndGraphics_hook, SYM(itemLoadAttributesAndGraphics), b_+45);
+  CYC(b_+45, b_+46); alu_xor(gb, A);
+  CALL_C(b_+46, itemSetAnimation_hook, SYM(itemSetAnimation), b_+49);
+  CYC(b_+49, b_+52); objectSetVisiblec1_hook(gb);
   return;
 
 state1:
-  CALL_C(0x5b3c, objectApplySpeed_hook, 0x201d, 0x5b3f);
-  CYC(0x5b3f, 0x5b41); A = 0x01;
-  CALL_C(0x5b41, itemTryToBreakTile_hook, 0x2bef, 0x5b44);
-  CALL_C(0x5b44, objectGetTileCollisions_hook, 0x14ad, 0x5b47);
-  CYC(0x5b47, 0x5b49); alu_and(gb, 0x0f);
-  CYC(0x5b49, 0x5b4b); alu_cp(gb, 0x0f);
+  CALL_C(b_+60, objectApplySpeed_hook, SYM(objectApplySpeed), b_+63);
+  CYC(b_+63, b_+65); A = 0x01;
+  CALL_C(b_+65, itemTryToBreakTile_hook, SYM(itemTryToBreakTile), b_+68);
+  CALL_C(b_+68, objectGetTileCollisions_hook, SYM(objectGetTileCollisions), b_+71);
+  CYC(b_+71, b_+73); alu_and(gb, 0x0f);
+  CYC(b_+73, b_+75); alu_cp(gb, 0x0f);
   if (F & FZ) {
-    CYCT(0x5b4b, 0x5b4e); itemDelete_hook(gb); return;
+    CYCT(b_+75, b_+78); itemDelete_hook(gb); return;
   }
-  CYC(0x5b4b, 0x5b4e);
-  CYC(0x5b4e, 0x5b51); itemAnimate_hook(gb);
+  CYC(b_+75, b_+78);
+  CYC(b_+78, SYM(itemCode29)); itemAnimate_hook(gb);
 }

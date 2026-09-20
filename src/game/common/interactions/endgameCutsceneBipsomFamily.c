@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodea7), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodea7), (from), (to), true)
 
 static uint16_t interactionCodea7_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -28,94 +28,95 @@ static uint16_t interactionCodea7_jump_table(GB *gb) {
 // INTERAC_ENDGAME_CUTSCENE_BIPSOM_FAMILY
 // ==================================================================================================
 void interactionCodea7_hook(GB *gb) {
+  BASE(interactionCodea7);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5dcb, 0x5dcd); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x5dcd, 0x5dce); A = mem_rd(gb, DE);
-  CYC(0x5dce, 0x5dcf); push_effect(gb, 0x5dcf);
-  switch (interactionCodea7_jump_table(gb)) {
-    case 0x5dd3: goto state0;
-    case 0x5e10: goto state1;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (interactionCodea7_jump_table(gb));
+    if (jt_ == b_+8) { goto state0; }
+    else if (jt_ == b_+69) { goto state1; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 state0:
-  CYC(0x5dd3, 0x5dd5); A = 0x01;
-  CYC(0x5dd5, 0x5dd6); mem_wr(gb, DE, A); // [state]
-  CALL_C(0x5dd6, interactionInitGraphics_hook, 0x15fb, 0x5dd9);
-  CALL_C(0x5dd9, objectSetVisible82_hook, 0x1e69, 0x5ddc);
-  CYC(0x5ddc, 0x5dde); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x5dde, 0x5ddf); A = mem_rd(gb, DE);
-  CYC(0x5ddf, 0x5de1); alu_cp(gb, 0x02);
-  if (!(F & FZ)) { CYCT(0x5de1, 0x5de2); ret_effect(gb); return; } // ret nz
-  CYC(0x5de1, 0x5de2);
-  CYC(0x5de2, 0x5de5); A = mem_rd(gb, wChildStage);
-  CYC(0x5de5, 0x5de7); alu_cp(gb, 0x04);
-  if (F & FC) { CYCT(0x5de7, 0x5de8); ret_effect(gb); return; } // ret c
-  CYC(0x5de7, 0x5de8);
-  CYC(0x5de8, 0x5dea); A = 0x04;
-  CALL_C(0x5dea, interactionSetAnimation_hook, 0x262e, 0x5ded);
-  CALL_C(0x5ded, getFreeInteractionSlot_hook, 0x3aef, 0x5df0);
-  if (!(F & FZ)) { CYCT(0x5df0, 0x5df1); ret_effect(gb); return; } // ret nz
-  CYC(0x5df0, 0x5df1);
-  CYC(0x5df1, 0x5df3); mem_wr(gb, HL, 0x35); // INTERAC_CHILD
-  CYC(0x5df3, 0x5df4); L = alu_inc8(gb, L);
-  CYC(0x5df4, 0x5df7); A = mem_rd(gb, wChildStage);
-  CYC(0x5df7, 0x5df9); B = 0x00;
-  CYC(0x5df9, 0x5dfb); alu_cp(gb, 0x07);
-  if (F & FC) { CYCT(0x5dfb, 0x5dfd); goto l_5dff; } // jr c
-  CYC(0x5dfb, 0x5dfd);
-  CYC(0x5dfd, 0x5dff); B = 0x03;
+  CYC(b_+8, b_+10); A = 0x01;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A); // [state]
+  CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
+  CALL_C(b_+14, objectSetVisible82_hook, SYM(objectSetVisible82), b_+17);
+  CYC(b_+17, b_+19); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+19, b_+20); A = mem_rd(gb, DE);
+  CYC(b_+20, b_+22); alu_cp(gb, 0x02);
+  if (!(F & FZ)) { CYCT(b_+22, b_+23); ret_effect(gb); return; } // ret nz
+  CYC(b_+22, b_+23);
+  CYC(b_+23, b_+26); A = mem_rd(gb, wChildStage);
+  CYC(b_+26, b_+28); alu_cp(gb, 0x04);
+  if (F & FC) { CYCT(b_+28, b_+29); ret_effect(gb); return; } // ret c
+  CYC(b_+28, b_+29);
+  CYC(b_+29, b_+31); A = 0x04;
+  CALL_C(b_+31, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+34);
+  CALL_C(b_+34, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+37);
+  if (!(F & FZ)) { CYCT(b_+37, b_+38); ret_effect(gb); return; } // ret nz
+  CYC(b_+37, b_+38);
+  CYC(b_+38, b_+40); mem_wr(gb, HL, 0x35); // INTERAC_CHILD
+  CYC(b_+40, b_+41); L = alu_inc8(gb, L);
+  CYC(b_+41, b_+44); A = mem_rd(gb, wChildStage);
+  CYC(b_+44, b_+46); B = 0x00;
+  CYC(b_+46, b_+48); alu_cp(gb, 0x07);
+  if (F & FC) { CYCT(b_+48, b_+50); goto l_5dff; } // jr c
+  CYC(b_+48, b_+50);
+  CYC(b_+50, b_+52); B = 0x03;
 
 l_5dff:
-  CYC(0x5dff, 0x5e02); A = mem_rd(gb, wChildPersonality);
-  CYC(0x5e02, 0x5e03); alu_add(gb, B);
-  CYC(0x5e03, 0x5e04); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a ; [child.subid]
-  CYC(0x5e04, 0x5e06); alu_add(gb, 0x16);
-  CYC(0x5e06, 0x5e07); mem_wr(gb, HL, A);
-  CYC(0x5e07, 0x5e09); L = INTERACTION_BASE + OBJ_YH;
-  CYC(0x5e09, 0x5e0b); mem_wr(gb, HL, 0x38);
-  CYC(0x5e0b, 0x5e0c); L = alu_inc8(gb, L);
-  CYC(0x5e0c, 0x5e0d); L = alu_inc8(gb, L);
-  CYC(0x5e0d, 0x5e0f); mem_wr(gb, HL, 0x28);
-  RET(0x5e0f); return;
+  CYC(b_+52, b_+55); A = mem_rd(gb, wChildPersonality);
+  CYC(b_+55, b_+56); alu_add(gb, B);
+  CYC(b_+56, b_+57); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a ; [child.subid]
+  CYC(b_+57, b_+59); alu_add(gb, 0x16);
+  CYC(b_+59, b_+60); mem_wr(gb, HL, A);
+  CYC(b_+60, b_+62); L = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+62, b_+64); mem_wr(gb, HL, 0x38);
+  CYC(b_+64, b_+65); L = alu_inc8(gb, L);
+  CYC(b_+65, b_+66); L = alu_inc8(gb, L);
+  CYC(b_+66, b_+68); mem_wr(gb, HL, 0x28);
+  RET(b_+68); return;
 
 state1:
-  CYC(0x5e10, 0x5e12); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x5e12, 0x5e13); A = mem_rd(gb, DE);
-  CYC(0x5e13, 0x5e14); push_effect(gb, 0x5e14);
-  switch (interactionCodea7_jump_table(gb)) {
-    case 0x5e1a: goto substate0;
-    case 0x5e2c: goto substate1;
-    case 0x5e3a: goto substate2;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+69, b_+71); E = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+71, b_+72); A = mem_rd(gb, DE);
+  CYC(b_+72, b_+73); push_effect(gb, b_+73);
+  do { uint16_t jt_ = (interactionCodea7_jump_table(gb));
+    if (jt_ == b_+79) { goto substate0; }
+    else if (jt_ == b_+97) { goto substate1; }
+    else if (jt_ == b_+111) { goto substate2; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 substate0:
-  CYC(0x5e1a, 0x5e1d); A = mem_rd(gb, wTmpcfc0_genericCutscene_state);
-  CYC(0x5e1d, 0x5e1e); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x5e1e, 0x5e20); goto l_5e29; } // jr z
-  CYC(0x5e1e, 0x5e20);
-  CALL_C(0x5e20, interactionIncSubstate_hook, 0x23e5, 0x5e23);
-  CYC(0x5e23, 0x5e26); SET_BC(0xff00); // -$100
-  CALL_C(0x5e26, objectSetSpeedZ_hook, 0x239d, 0x5e29);
+  CYC(b_+79, b_+82); A = mem_rd(gb, wTmpcfc0_genericCutscene_state);
+  CYC(b_+82, b_+83); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+83, b_+85); goto l_5e29; } // jr z
+  CYC(b_+83, b_+85);
+  CALL_C(b_+85, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+88);
+  CYC(b_+88, b_+91); SET_BC(0xff00); // -$100
+  CALL_C(b_+91, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+94);
 
 l_5e29:
-  CYC(0x5e29, 0x5e2c); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+94, b_+97); interactionAnimate_hook(gb); return; // jp
 
 substate1:
-  CYC(0x5e2c, 0x5e2e); C = 0x20;
-  CALL_C(0x5e2e, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x5e31);
-  if (!(F & FZ)) { CYCT(0x5e31, 0x5e32); ret_effect(gb); return; } // ret nz
-  CYC(0x5e31, 0x5e32);
-  CALL_C(0x5e32, interactionIncSubstate_hook, 0x23e5, 0x5e35);
-  CYC(0x5e35, 0x5e37); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x5e37, 0x5e39); mem_wr(gb, HL, 0x0a);
-  RET(0x5e39); return;
+  CYC(b_+97, b_+99); C = 0x20;
+  CALL_C(b_+99, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+102);
+  if (!(F & FZ)) { CYCT(b_+102, b_+103); ret_effect(gb); return; } // ret nz
+  CYC(b_+102, b_+103);
+  CALL_C(b_+103, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+106);
+  CYC(b_+106, b_+108); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+108, b_+110); mem_wr(gb, HL, 0x0a);
+  RET(b_+110); return;
 
 substate2:
-  CALL_C(0x5e3a, interactionDecCounter1_hook, 0x23cc, 0x5e3d);
-  if (!(F & FZ)) { CYCT(0x5e3d, 0x5e3e); ret_effect(gb); return; } // ret nz
-  CYC(0x5e3d, 0x5e3e);
-  CYC(0x5e3e, 0x5e40); A = 0x03;
-  CYC(0x5e40, 0x5e43); interactionSetAnimation_hook(gb); return; // jp
+  CALL_C(b_+111, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+114);
+  if (!(F & FZ)) { CYCT(b_+114, b_+115); ret_effect(gb); return; } // ret nz
+  CYC(b_+114, b_+115);
+  CYC(b_+115, b_+117); A = 0x03;
+  CYC(b_+117, SYM(interactionCodea8)); interactionSetAnimation_hook(gb); return; // jp
 }

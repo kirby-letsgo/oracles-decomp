@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x10, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x10, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodee5), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodee5), (from), (to), true)
 
 // object_code/common/interactions/ringHelpBook.s (INTERAC_RING_HELP_BOOK), bank $10.
 
@@ -27,64 +27,66 @@ static uint16_t interactionCodee5_jump_table(GB *gb) {
 }
 
 void interactionCodee5__runState_hook(GB *gb) {
+  BASE(interactionCodee5);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x7063, 0x7065); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x7065, 0x7066); A = mem_rd(gb, DE);
-  CYC(0x7066, 0x7067); push_effect(gb, 0x7067);
-  switch (interactionCodee5_jump_table(gb)) {
-    case 0x706b: goto state0;
-    case 0x7097: goto state1;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+22, b_+24); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+24, b_+25); A = mem_rd(gb, DE);
+  CYC(b_+25, b_+26); push_effect(gb, b_+26);
+  do { uint16_t jt_ = (interactionCodee5_jump_table(gb));
+    if (jt_ == b_+30) { goto state0; }
+    else if (jt_ == b_+74) { goto state1; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 state0:
-  CALL_C(0x706b, interactionInitGraphics_hook, 0x15fb, 0x706e);
-  CYC(0x706e, 0x7070); A = 0x30;
-  CALL_C(0x7070, interactionSetHighTextIndex_hook, 0x253b, 0x7073);
-  CALL_C(0x7073, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x7076);
-  CALL_C(0x7076, interactionIncState_hook, 0x23e0, 0x7079);
-  CYC(0x7079, 0x707b); A = 0x06;
-  CALL_C(0x707b, objectSetCollideRadius_hook, 0x24a1, 0x707e);
-  CYC(0x707e, 0x7080); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7080, 0x7081); A = mem_rd(gb, DE);
-  CYC(0x7081, 0x7084); SET_HL(0x4b44);
-  CYC(0x7084, 0x7085); alu_or(gb, A);
+  CALL_C(b_+30, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+33);
+  CYC(b_+33, b_+35); A = 0x30;
+  CALL_C(b_+35, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+38);
+  CALL_C(b_+38, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+41);
+  CALL_C(b_+41, interactionIncState_hook, SYM(interactionIncState), b_+44);
+  CYC(b_+44, b_+46); A = 0x06;
+  CALL_C(b_+46, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+49);
+  CYC(b_+49, b_+51); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+51, b_+52); A = mem_rd(gb, DE);
+  CYC(b_+52, b_+55); SET_HL((SYM(twinrova_state8) + 44));
+  CYC(b_+55, b_+56); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x7085, 0x7087);
+    CYCT(b_+56, b_+58);
     goto setScript;
   }
-  CYC(0x7085, 0x7087);
-  CYC(0x7087, 0x7089); E = INTERACTION_BASE + OBJ_OAM_FLAGS;
-  CYC(0x7089, 0x708a); A = mem_rd(gb, DE);
-  CYC(0x708a, 0x708b); A = alu_inc8(gb, A);
-  CYC(0x708b, 0x708c); mem_wr(gb, DE, A);
-  CYC(0x708c, 0x708f); SET_HL(0x4b35);
+  CYC(b_+56, b_+58);
+  CYC(b_+58, b_+60); E = INTERACTION_BASE + OBJ_OAM_FLAGS;
+  CYC(b_+60, b_+61); A = mem_rd(gb, DE);
+  CYC(b_+61, b_+62); A = alu_inc8(gb, A);
+  CYC(b_+62, b_+63); mem_wr(gb, DE, A);
+  CYC(b_+63, b_+66); SET_HL((SYM(twinrova_state8) + 29));
 setScript:
-  CALL_C(0x708f, interactionSetScript_hook, 0x2544, 0x7092);
-  CYC(0x7092, 0x7094); E = INTERACTION_BASE + OBJ_PRESSED_A_BUTTON;
-  CYC(0x7094, 0x7097);
+  CALL_C(b_+66, interactionSetScript_hook, SYM(interactionSetScript), b_+69);
+  CYC(b_+69, b_+71); E = INTERACTION_BASE + OBJ_PRESSED_A_BUTTON;
+  CYC(b_+71, b_+74);
   objectAddToAButtonSensitiveObjectList_hook(gb);
   return;
 state1:
-  CYC(0x7097, 0x709a);
+  CYC(b_+74, SYM(templeIntro_simulatedInput));
   interactionRunScript_hook(gb);
 }
 
 void interactionCodee5_hook(GB *gb) {
+  BASE(interactionCodee5);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x704d, 0x7050); A = W8(wOamEnd);
-  CYC(0x7050, 0x7051); alu_or(gb, A);
+  CYC(b_+0, b_+3); A = W8(wOamEnd);
+  CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x7051, 0x7053);
+    CYCT(b_+4, b_+6);
     goto doneTextFlagSetup;
   }
-  CYC(0x7051, 0x7053);
-  CYC(0x7053, 0x7055); A = 0x02;
-  CYC(0x7055, 0x7058); W8(wTextboxPosition) = A;
-  CYC(0x7058, 0x705a); A = 0x08;
-  CYC(0x705a, 0x705d); W8(wTextboxFlags) = A;
+  CYC(b_+4, b_+6);
+  CYC(b_+6, b_+8); A = 0x02;
+  CYC(b_+8, b_+11); W8(wTextboxPosition) = A;
+  CYC(b_+11, b_+13); A = 0x08;
+  CYC(b_+13, b_+16); W8(wTextboxFlags) = A;
 doneTextFlagSetup:
-  CYC(0x705d, 0x7060); push_effect(gb, 0x7060);
+  CYC(b_+16, b_+19); push_effect(gb, b_+19);
   interactionCodee5__runState_hook(gb);
-  CYC(0x7060, 0x7063);
+  CYC(b_+19, b_+22);
   objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
 }

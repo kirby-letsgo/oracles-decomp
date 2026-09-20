@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode0c), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode0c), (from), (to), true)
 
 static void bridgeSpawner_addDoubleIndexToHl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
@@ -22,70 +22,72 @@ void partCode0c_hook(GB *gb);
 void bridgeSpawner_state0_hook(GB *gb);
 
 void partCode0c_hook(GB *gb) {
+  BASE(partCode0c);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x485b, 0x485d); E = 0xc4; // Part.state
-  CYC(0x485d, 0x485e); A = mem_rd(gb, DE);
-  CYC(0x485e, 0x485f); alu_or(gb, A);
+  CYC(b_+0, b_+2); E = 0xc4; // Part.state
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x485f, 0x4862); // call z
+    CYCT(b_+4, b_+7); // call z
     bridgeSpawner_state0_hook(gb);
   } else {
-    CYC(0x485f, 0x4862);
+    CYC(b_+4, b_+7);
   }
-  CALL_C(0x4862, partCommon_decCounter1IfNonzero_hook, 0x40a7, 0x4865);
-  if (!(F & FZ)) { RET_TAKEN(0x4865); return; } // ret nz
-  CYC(0x4865, 0x4866);
-  CYC(0x4866, 0x4868); L = 0xc9; // Part.angle
-  CYC(0x4868, 0x4869); A = mem_rd(gb, HL);
-  CYC(0x4869, 0x486c); SET_HL(0x48a4); // @tileValues
-  CYC(0x486c, 0x486d); bridgeSpawner_addDoubleIndexToHl_from_rst(gb, 0x486d);
-  CYC(0x486d, 0x486f); E = 0xc7; // Part.counter2
-  CYC(0x486f, 0x4870); A = mem_rd(gb, DE);
-  CYC(0x4870, 0x4871); alu_rrca(gb);
-  CYC(0x4871, 0x4872); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  if (!(F & FC)) { CYCT(0x4872, 0x4874); goto L_4875; } // jr nc
-  CYC(0x4872, 0x4874);
-  CYC(0x4874, 0x4875); A = mem_rd(gb, HL);
+  CALL_C(b_+7, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+10);
+  if (!(F & FZ)) { RET_TAKEN(b_+10); return; } // ret nz
+  CYC(b_+10, b_+11);
+  CYC(b_+11, b_+13); L = 0xc9; // Part.angle
+  CYC(b_+13, b_+14); A = mem_rd(gb, HL);
+  CYC(b_+14, b_+17); SET_HL(b_+73); // @tileValues
+  CYC(b_+17, b_+18); bridgeSpawner_addDoubleIndexToHl_from_rst(gb, b_+18);
+  CYC(b_+18, b_+20); E = 0xc7; // Part.counter2
+  CYC(b_+20, b_+21); A = mem_rd(gb, DE);
+  CYC(b_+21, b_+22); alu_rrca(gb);
+  CYC(b_+22, b_+23); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  if (!(F & FC)) { CYCT(b_+23, b_+25); goto L_4875; } // jr nc
+  CYC(b_+23, b_+25);
+  CYC(b_+25, b_+26); A = mem_rd(gb, HL);
 
 L_4875:
-  CYC(0x4875, 0x4876); B = A;
-  CYC(0x4876, 0x4878); E = 0xcb; // Part.yh
-  CYC(0x4878, 0x4879); A = mem_rd(gb, DE);
-  CYC(0x4879, 0x487a); C = A;
-  CYC(0x487a, 0x487b); push_effect(gb, BC);
-  CALL_C(0x487b, setTileInRoomLayoutBuffer_hook, 0x1426, 0x487e);
-  CYC(0x487e, 0x487f); SET_BC(pop_effect(gb));
-  CYC(0x487f, 0x4880); A = B;
-  CALL_C(0x4880, setTile_hook, 0x3a9c, 0x4883);
-  CYC(0x4883, 0x4885); A = 0x70; // SND_DOORCLOSE
-  CALL_C(0x4885, playSound_b00_hook, 0x0c98, 0x4888);
-  CYC(0x4888, 0x4889); H = D;
-  CYC(0x4889, 0x488b); L = 0xc6; // Part.counter1
-  CYC(0x488b, 0x488d); mem_wr(gb, HL, 0x08);
-  CYC(0x488d, 0x488e); L = alu_inc8(gb, L);
-  CYC(0x488e, 0x488f); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // [counter2]
-  if (F & FZ) { CYCT(0x488f, 0x4892); partDelete_hook(gb); return; } // jp z
-  CYC(0x488f, 0x4892);
-  CYC(0x4892, 0x4893); A = mem_rd(gb, HL); // [counter1]
-  CYC(0x4893, 0x4894); alu_rrca(gb);
-  if (F & FC) { RET_TAKEN(0x4894); return; } // ret c
-  CYC(0x4894, 0x4895);
-  CYC(0x4895, 0x4897); L = 0xc9; // Part.angle
-  CYC(0x4897, 0x4898); A = mem_rd(gb, HL);
-  CYC(0x4898, 0x489b); SET_BC(0x48ac); // @directionVals
-  CALL_C(0x489b, addAToBc_hook, 0x006d, 0x489e);
-  CYC(0x489e, 0x489f); A = mem_rd(gb, BC);
-  CYC(0x489f, 0x48a1); L = 0xcb; // Part.yh
-  CYC(0x48a1, 0x48a2); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x48a2, 0x48a3); mem_wr(gb, HL, A);
-  RET(0x48a3); return; // ret
+  CYC(b_+26, b_+27); B = A;
+  CYC(b_+27, b_+29); E = 0xcb; // Part.yh
+  CYC(b_+29, b_+30); A = mem_rd(gb, DE);
+  CYC(b_+30, b_+31); C = A;
+  CYC(b_+31, b_+32); push_effect(gb, BC);
+  CALL_C(b_+32, setTileInRoomLayoutBuffer_hook, SYM(setTileInRoomLayoutBuffer), b_+35);
+  CYC(b_+35, b_+36); SET_BC(pop_effect(gb));
+  CYC(b_+36, b_+37); A = B;
+  CALL_C(b_+37, setTile_hook, SYM(setTile), b_+40);
+  CYC(b_+40, b_+42); A = 0x70; // SND_DOORCLOSE
+  CALL_C(b_+42, playSound_b00_hook, SYM(playSound_b00), b_+45);
+  CYC(b_+45, b_+46); H = D;
+  CYC(b_+46, b_+48); L = 0xc6; // Part.counter1
+  CYC(b_+48, b_+50); mem_wr(gb, HL, 0x08);
+  CYC(b_+50, b_+51); L = alu_inc8(gb, L);
+  CYC(b_+51, b_+52); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // [counter2]
+  if (F & FZ) { CYCT(b_+52, b_+55); partDelete_hook(gb); return; } // jp z
+  CYC(b_+52, b_+55);
+  CYC(b_+55, b_+56); A = mem_rd(gb, HL); // [counter1]
+  CYC(b_+56, b_+57); alu_rrca(gb);
+  if (F & FC) { RET_TAKEN(b_+57); return; } // ret c
+  CYC(b_+57, b_+58);
+  CYC(b_+58, b_+60); L = 0xc9; // Part.angle
+  CYC(b_+60, b_+61); A = mem_rd(gb, HL);
+  CYC(b_+61, b_+64); SET_BC(b_+81); // @directionVals
+  CALL_C(b_+64, addAToBc_hook, 0x006d, b_+67);
+  CYC(b_+67, b_+68); A = mem_rd(gb, BC);
+  CYC(b_+68, b_+70); L = 0xcb; // Part.yh
+  CYC(b_+70, b_+71); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+71, b_+72); mem_wr(gb, HL, A);
+  RET(b_+72); return; // ret
 }
 
 void bridgeSpawner_state0_hook(GB *gb) {
-  CYC(0x48b0, 0x48b1); H = D;
-  CYC(0x48b1, 0x48b2); L = E;
-  CYC(0x48b2, 0x48b3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = 1
-  CYC(0x48b3, 0x48b5); L = 0xc6; // Part.counter1
-  CYC(0x48b5, 0x48b7); mem_wr(gb, HL, 0x08);
-  CYC(0x48b7, 0x48b8); return; // ret
+  BASE(partCode0c);
+  CYC(b_+85, b_+86); H = D;
+  CYC(b_+86, b_+87); L = E;
+  CYC(b_+87, b_+88); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = 1
+  CYC(b_+88, b_+90); L = 0xc6; // Part.counter1
+  CYC(b_+90, b_+92); mem_wr(gb, HL, 0x08);
+  CYC(b_+92, SYM(partCode0e)); return; // ret
 }

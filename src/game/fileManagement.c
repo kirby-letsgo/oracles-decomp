@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x07, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x07, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(fileManagementFunction), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(fileManagementFunction), (from), (to), true)
 
 void clearFileAtHl_hook(GB *gb);
 void fileManagementFunction_hook(GB *gb);
@@ -68,194 +68,206 @@ static void add_double_index_to_hl_from_rst(GB *gb) {
 }
 
 void fileManagementFunction_hook(GB *gb) {
+  BASE(fileManagementFunction);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4000, 0x4001); A = C;
-  CYC(0x4001, 0x4002); push_effect(gb, 0x4002);
-  switch (jump_table_from_rst(gb)) {
-    case 0x400a: initializeFile_b07_hook(gb); return;
-    case 0x4059: saveFile_b07_hook(gb); return;
-    case 0x4085: loadFile_b07_hook(gb); return;
-    case 0x409e: eraseFile_b07_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+1); A = C;
+  CYC(b_+1, b_+2); push_effect(gb, b_+2);
+  do { uint16_t jt_ = (jump_table_from_rst(gb));
+    if (jt_ == SYM(initializeFile_b07)) { initializeFile_b07_hook(gb); return; }
+    else if (jt_ == SYM(saveFile_b07)) { saveFile_b07_hook(gb); return; }
+    else if (jt_ == SYM(loadFile_b07)) { loadFile_b07_hook(gb); return; }
+    else if (jt_ == SYM(eraseFile_b07)) { eraseFile_b07_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void initializeFile_b07_hook(GB *gb) {
+  BASE(initializeFile_b07);
   uint16_t sp0_ = gb->sp;
-  CYC(0x400a, 0x400d); SET_HL(0x418a);
-  CALL_C(0x400d, initializeFileVariables_hook, 0x4176, 0x4010);
-  CYC(0x4010, 0x4013); SET_HL(wFileIsHeroGame);
-  CYC(0x4013, 0x4014); A = mem_rd(gb, HL); SET_HL(HL - 1);
-  CYC(0x4014, 0x4015); alu_add(gb, A);
-  CYC(0x4015, 0x4016); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x4016, 0x4017); push_effect(gb, AF);
-  CYC(0x4017, 0x401a); SET_HL(0x4182);
-  CYC(0x401a, 0x401b); push_effect(gb, 0x401b);
+  CYC(b_+0, b_+3); SET_HL(SYM(initialFileVariables));
+  CALL_C(b_+3, initializeFileVariables_hook, SYM(initializeFileVariables), b_+6);
+  CYC(b_+6, b_+9); SET_HL(wFileIsHeroGame);
+  CYC(b_+9, b_+10); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(b_+10, b_+11); alu_add(gb, A);
+  CYC(b_+11, b_+12); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+12, b_+13); push_effect(gb, AF);
+  CYC(b_+13, b_+16); SET_HL(SYM(initialFileVariablesTable));
+  CYC(b_+16, b_+17); push_effect(gb, b_+17);
   add_double_index_to_hl_from_rst(gb);
-  CYC(0x401b, 0x401c); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x401c, 0x401d); H = mem_rd(gb, HL);
-  CYC(0x401d, 0x401e); L = A;
-  CALL_C(0x401e, initializeFileVariables_hook, 0x4176, 0x4021);
-  CYC(0x4021, 0x4022); SET_AF(pop_effect(gb));
-  CYC(0x4022, 0x4023); C = A;
-  CYC(0x4023, 0x4026); SET_HL(wUnappraisedRings);
-  CYC(0x4026, 0x4028); B = 0x40;
-  CYC(0x4028, 0x402a); A = 0xff;
-  CALL_C(0x402a, fillMemory_hook, 0x0470, 0x402d);
-  CYC(0x402d, 0x4030); SET_HL(wRingBoxContents);
-  CYC(0x4030, 0x4032); B = 0x06;
-  CYC(0x4032, 0x4034); A = 0xff;
-  CALL_C(0x4034, fillMemory_hook, 0x0470, 0x4037);
-  CYC(0x4037, 0x4038); A = C;
-  CYC(0x4038, 0x403a); alu_cp(gb, 0x02);
+  CYC(b_+17, b_+18); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+18, b_+19); H = mem_rd(gb, HL);
+  CYC(b_+19, b_+20); L = A;
+  CALL_C(b_+20, initializeFileVariables_hook, SYM(initializeFileVariables), b_+23);
+  CYC(b_+23, b_+24); SET_AF(pop_effect(gb));
+  CYC(b_+24, b_+25); C = A;
+  CYC(b_+25, b_+28); SET_HL(wUnappraisedRings);
+  CYC(b_+28, b_+30); B = 0x40;
+  CYC(b_+30, b_+32); A = 0xff;
+  CALL_C(b_+32, fillMemory_hook, SYM(fillMemory), b_+35);
+  CYC(b_+35, b_+38); SET_HL(wRingBoxContents);
+  CYC(b_+38, b_+40); B = 0x06;
+  CYC(b_+40, b_+42); A = 0xff;
+  CALL_C(b_+42, fillMemory_hook, SYM(fillMemory), b_+45);
+  CYC(b_+45, b_+46); A = C;
+  CYC(b_+46, b_+48); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
-    CYCT(0x403a, 0x403c);
+    CYCT(b_+48, b_+50);
   } else {
-    CYC(0x403a, 0x403c);
-    CYC(0x403c, 0x403f); SET_HL(wObtainedTreasureFlags);
-    CYC(0x403f, 0x4041); A = 0x2d;
-    CALL_C(0x4041, setFlag_hook, 0x020e, 0x4044);
-    CYC(0x4044, 0x4046); A = 0x76;
-    CYC(0x4046, 0x4049); mem_wr(gb, wUnappraisedRings, A);
+    CYC(b_+48, b_+50);
+    CYC(b_+50, b_+53); SET_HL(wObtainedTreasureFlags);
+    CYC(b_+53, b_+55); A = 0x2d;
+    CALL_C(b_+55, setFlag_hook, SYM(setFlag), b_+58);
+    CYC(b_+58, b_+60); A = 0x76;
+    CYC(b_+60, b_+63); mem_wr(gb, wUnappraisedRings, A);
   }
-  CYC(0x4049, 0x404c); SET_HL(0x415c);
-  CYC(0x404c, 0x404e); E = 0x0b;
-  CALL_C(0x404e, interBankCall_hook, 0x008a, 0x4051);
-  CYC(0x4051, 0x4054); SET_HL(0x69dd);
-  CYC(0x4054, 0x4056); E = 0x04;
-  CALL_C(0x4056, interBankCall_hook, 0x008a, 0x4059);
+  CYC(b_+63, b_+66); SET_HL((SYM(getFileAddress2) + 1));
+  CYC(b_+66, b_+68); E = 0x0b;
+  CALL_C(b_+68, interBankCall_hook, 0x008a, b_+71);
+  CYC(b_+71, b_+74); SET_HL((SYM(enemyActiveCollisions) + 59));
+  CYC(b_+74, b_+76); E = 0x04;
+  CALL_C(b_+76, interBankCall_hook, 0x008a, SYM(saveFile_b07));
   saveFile_b07_hook(gb);
 }
 
 void saveFile_b07_hook(GB *gb) {
+  BASE(saveFile_b07);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4059, 0x405c); SET_HL(wWhichGame);
-  CYC(0x405c, 0x405e); mem_wr(gb, HL, 0x01);
-  CYC(0x405e, 0x4061); SET_HL(wSavefileString);
-  CYC(0x4061, 0x4064); SET_DE(0x41c9);
-  CYC(0x4064, 0x4066); B = 0x08;
-  CALL_C(0x4066, copyMemoryReverse_hook, 0x047f, 0x4069);
-  CYC(0x4069, 0x406b); L = (uint8_t)wFileStart;
-  CALL_C(0x406b, calculateFileChecksum_hook, 0x4140, 0x406e);
-  CYC(0x406e, 0x406f); mem_wr(gb, HL, E);
-  CYC(0x406f, 0x4070); L = alu_inc8(gb, L);
-  CYC(0x4070, 0x4071); mem_wr(gb, HL, D);
-  CYC(0x4071, 0x4073); L = (uint8_t)wFileStart;
-  CALL_C(0x4073, getFileAddress1_hook, 0x4157, 0x4076);
-  CYC(0x4076, 0x4077); E = C;
-  CYC(0x4077, 0x4078); D = B;
-  CALL_C(0x4078, copyFileFromHlToDe_hook, 0x40fe, 0x407b);
-  CALL_C(0x407b, getFileAddress2_hook, 0x415b, 0x407e);
-  CYC(0x407e, 0x407f); E = C;
-  CYC(0x407f, 0x4080); D = B;
-  CALL_C(0x4080, copyFileFromHlToDe_hook, 0x40fe, 0x4083);
-  CYC(0x4083, 0x4085);
+  CYC(b_+0, b_+3); SET_HL(wWhichGame);
+  CYC(b_+3, b_+5); mem_wr(gb, HL, 0x01);
+  CYC(b_+5, b_+8); SET_HL(wSavefileString);
+  CYC(b_+8, b_+11); SET_DE(SYM(saveVerificationString));
+  CYC(b_+11, b_+13); B = 0x08;
+  CALL_C(b_+13, copyMemoryReverse_hook, SYM(copyMemoryReverse), b_+16);
+  CYC(b_+16, b_+18); L = (uint8_t)wFileStart;
+  CALL_C(b_+18, calculateFileChecksum_hook, SYM(calculateFileChecksum), b_+21);
+  CYC(b_+21, b_+22); mem_wr(gb, HL, E);
+  CYC(b_+22, b_+23); L = alu_inc8(gb, L);
+  CYC(b_+23, b_+24); mem_wr(gb, HL, D);
+  CYC(b_+24, b_+26); L = (uint8_t)wFileStart;
+  CALL_C(b_+26, getFileAddress1_hook, SYM(getFileAddress1), b_+29);
+  CYC(b_+29, b_+30); E = C;
+  CYC(b_+30, b_+31); D = B;
+  CALL_C(b_+31, copyFileFromHlToDe_hook, SYM(copyFileFromHlToDe), b_+34);
+  CALL_C(b_+34, getFileAddress2_hook, SYM(getFileAddress2), b_+37);
+  CYC(b_+37, b_+38); E = C;
+  CYC(b_+38, b_+39); D = B;
+  CALL_C(b_+39, copyFileFromHlToDe_hook, SYM(copyFileFromHlToDe), b_+42);
+  CYC(b_+42, SYM(loadFile_b07));
   verifyFileCopies_hook(gb);
 }
 
 void loadFile_b07_hook(GB *gb) {
+  BASE(loadFile_b07);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4085, verifyFileCopies_hook, 0x40bc, 0x4088);
-  CYC(0x4088, 0x4089); push_effect(gb, AF);
-  CYC(0x4089, 0x408a); alu_or(gb, A);
+  CALL_C(b_+0, verifyFileCopies_hook, SYM(verifyFileCopies), b_+3);
+  CYC(b_+3, b_+4); push_effect(gb, AF);
+  CYC(b_+4, b_+5); alu_or(gb, A);
   if (F & FZ) {
-    CYC(0x408a, 0x408c);
-    CALL_C(0x408c, getFileAddress1_hook, 0x4157, 0x408f);
-    CYC(0x408f, 0x4091);
+    CYC(b_+5, b_+7);
+    CALL_C(b_+7, getFileAddress1_hook, SYM(getFileAddress1), b_+10);
+    CYC(b_+10, b_+12);
   } else {
-    CYCT(0x408a, 0x408c);
-    CALL_C(0x4091, getFileAddress2_hook, 0x415b, 0x4094);
+    CYCT(b_+5, b_+7);
+    CALL_C(b_+12, getFileAddress2_hook, SYM(getFileAddress2), b_+15);
   }
-  CYC(0x4094, 0x4095); L = C;
-  CYC(0x4095, 0x4096); H = B;
-  CYC(0x4096, 0x4099); SET_DE(wFileStart);
-  CALL_C(0x4099, copyFileFromHlToDe_hook, 0x40fe, 0x409c);
-  CYC(0x409c, 0x409d); SET_AF(pop_effect(gb));
-  CYC(0x409d, 0x409e); ret_effect(gb);
+  CYC(b_+15, b_+16); L = C;
+  CYC(b_+16, b_+17); H = B;
+  CYC(b_+17, b_+20); SET_DE(wFileStart);
+  CALL_C(b_+20, copyFileFromHlToDe_hook, SYM(copyFileFromHlToDe), b_+23);
+  CYC(b_+23, b_+24); SET_AF(pop_effect(gb));
+  CYC(b_+24, SYM(eraseFile_b07)); ret_effect(gb);
 }
 
 void eraseFile_b07_hook(GB *gb) {
+  BASE(eraseFile_b07);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x409e, getFileAddress1_hook, 0x4157, 0x40a1);
-  CALL_C(0x40a1, eraseFile__clearFile_b07_hook, 0x40a7, 0x40a4);
-  CALL_C(0x40a4, getFileAddress2_hook, 0x415b, 0x40a7);
+  CALL_C(b_+0, getFileAddress1_hook, SYM(getFileAddress1), b_+3);
+  CALL_C(b_+3, eraseFile__clearFile_b07_hook, b_+9, b_+6);
+  CALL_C(b_+6, getFileAddress2_hook, SYM(getFileAddress2), b_+9);
   eraseFile__clearFile_b07_hook(gb);
 }
 
 void eraseFile__clearFile_b07_hook(GB *gb) {
+  BASE(eraseFile_b07);
   uint16_t sp0_ = gb->sp;
-  CYC(0x40a7, 0x40a9); A = 0x0a;
-  CYC(0x40a9, 0x40ac); mem_wr(gb, 0x1111, A);
-  CYC(0x40ac, 0x40ad); L = C;
-  CYC(0x40ad, 0x40ae); H = B;
-  CALL_C(0x40ae, clearFileAtHl_hook, 0x40b6, 0x40b1);
-  CYC(0x40b1, 0x40b2); alu_xor(gb, A);
-  CYC(0x40b2, 0x40b5); mem_wr(gb, 0x1111, A);
-  CYC(0x40b5, 0x40b6); ret_effect(gb);
+  CYC(b_+9, b_+11); A = 0x0a;
+  CYC(b_+11, b_+14); mem_wr(gb, (SYM(setDeathRespawnPoint) + 17), A);
+  CYC(b_+14, b_+15); L = C;
+  CYC(b_+15, b_+16); H = B;
+  CALL_C(b_+16, clearFileAtHl_hook, SYM(clearFileAtHl), b_+19);
+  CYC(b_+19, b_+20); alu_xor(gb, A);
+  CYC(b_+20, b_+23); mem_wr(gb, (SYM(setDeathRespawnPoint) + 17), A);
+  CYC(b_+23, SYM(clearFileAtHl)); ret_effect(gb);
 }
 
 void clearFileAtHl_hook(GB *gb) {
-  CYC(0x40b6, 0x40b9); SET_BC(0x0550);
-  CYC(0x40b9, 0x40bc);
+  BASE(clearFileAtHl);
+  CYC(b_+0, b_+3); SET_BC((SYM(loadPaletteHeader) + 69));
+  CYC(b_+3, SYM(verifyFileCopies));
   clearMemoryBc_hook(gb);
 }
 
 static void verify_file_copies_both_valid(GB *gb) {
-  CYC(0x40e9, 0x40ea); alu_xor(gb, A);
-  CYC(0x40ea, 0x40eb); ret_effect(gb);
+  BASE(verifyFileCopies);
+  CYC(b_+45, b_+46); alu_xor(gb, A);
+  CYC(b_+46, b_+47); ret_effect(gb);
 }
 
 static void verify_file_copies_copy2_invalid(GB *gb, uint16_t sp0_) {
-  CALL_C(0x40dc, getFileAddress2_hook, 0x415b, 0x40df);
-  CYC(0x40df, 0x40e0); E = C;
-  CYC(0x40e0, 0x40e1); D = B;
-  CALL_C(0x40e1, getFileAddress1_hook, 0x4157, 0x40e4);
-  CYC(0x40e4, 0x40e5); L = C;
-  CYC(0x40e5, 0x40e6); H = B;
-  CALL_C(0x40e6, copyFileFromHlToDe_hook, 0x40fe, 0x40e9);
+  BASE(verifyFileCopies);
+  CALL_C(b_+32, getFileAddress2_hook, SYM(getFileAddress2), b_+35);
+  CYC(b_+35, b_+36); E = C;
+  CYC(b_+36, b_+37); D = B;
+  CALL_C(b_+37, getFileAddress1_hook, SYM(getFileAddress1), b_+40);
+  CYC(b_+40, b_+41); L = C;
+  CYC(b_+41, b_+42); H = B;
+  CALL_C(b_+42, copyFileFromHlToDe_hook, SYM(copyFileFromHlToDe), b_+45);
   verify_file_copies_both_valid(gb);
 }
 
 static void verify_file_copies_copy1_invalid(GB *gb, uint16_t sp0_) {
-  CALL_C(0x40eb, getFileAddress1_hook, 0x4157, 0x40ee);
-  CYC(0x40ee, 0x40ef); E = C;
-  CYC(0x40ef, 0x40f0); D = B;
-  CALL_C(0x40f0, getFileAddress2_hook, 0x415b, 0x40f3);
-  CYC(0x40f3, 0x40f4); L = C;
-  CYC(0x40f4, 0x40f5); H = B;
-  CALL_C(0x40f5, copyFileFromHlToDe_hook, 0x40fe, 0x40f8);
-  CYC(0x40f8, 0x40fa); A = 0x01;
-  CYC(0x40fa, 0x40fb); ret_effect(gb);
+  BASE(verifyFileCopies);
+  CALL_C(b_+47, getFileAddress1_hook, SYM(getFileAddress1), b_+50);
+  CYC(b_+50, b_+51); E = C;
+  CYC(b_+51, b_+52); D = B;
+  CALL_C(b_+52, getFileAddress2_hook, SYM(getFileAddress2), b_+55);
+  CYC(b_+55, b_+56); L = C;
+  CYC(b_+56, b_+57); H = B;
+  CALL_C(b_+57, copyFileFromHlToDe_hook, SYM(copyFileFromHlToDe), b_+60);
+  CYC(b_+60, b_+62); A = 0x01;
+  CYC(b_+62, b_+63); ret_effect(gb);
 }
 
 static void verify_file_copies_both_invalid(GB *gb) {
-  CYC(0x40fb, 0x40fd); A = 0xff;
-  CYC(0x40fd, 0x40fe); ret_effect(gb);
+  BASE(verifyFileCopies);
+  CYC(b_+63, b_+65); A = 0xff;
+  CYC(b_+65, SYM(copyFileFromHlToDe)); ret_effect(gb);
 }
 
 void verifyFileCopies_hook(GB *gb) {
+  BASE(verifyFileCopies);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x40bc, getFileAddress2_hook, 0x415b, 0x40bf);
-  CYC(0x40bf, 0x40c0); L = C;
-  CYC(0x40c0, 0x40c1); H = B;
-  CALL_C(0x40c1, verifyFileAtHl_hook, 0x4110, 0x40c4);
-  CYC(0x40c4, 0x40c6); alu_and(gb, 0x01);
-  CYC(0x40c6, 0x40c7); push_effect(gb, AF);
-  CALL_C(0x40c7, getFileAddress1_hook, 0x4157, 0x40ca);
-  CYC(0x40ca, 0x40cb); L = C;
-  CYC(0x40cb, 0x40cc); H = B;
-  CALL_C(0x40cc, verifyFileAtHl_hook, 0x4110, 0x40cf);
-  CYC(0x40cf, 0x40d0); SET_BC(pop_effect(gb));
-  CYC(0x40d0, 0x40d2); B = alu_rl(gb, B);
-  CYC(0x40d2, 0x40d3); A = B;
-  CYC(0x40d3, 0x40d4); push_effect(gb, 0x40d4);
-  switch (jump_table_from_rst(gb)) {
-    case 0x40dc: verify_file_copies_copy2_invalid(gb, sp0_); return;
-    case 0x40e9: verify_file_copies_both_valid(gb); return;
-    case 0x40eb: verify_file_copies_copy1_invalid(gb, sp0_); return;
-    case 0x40fb: verify_file_copies_both_invalid(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CALL_C(b_+0, getFileAddress2_hook, SYM(getFileAddress2), b_+3);
+  CYC(b_+3, b_+4); L = C;
+  CYC(b_+4, b_+5); H = B;
+  CALL_C(b_+5, verifyFileAtHl_hook, SYM(verifyFileAtHl), b_+8);
+  CYC(b_+8, b_+10); alu_and(gb, 0x01);
+  CYC(b_+10, b_+11); push_effect(gb, AF);
+  CALL_C(b_+11, getFileAddress1_hook, SYM(getFileAddress1), b_+14);
+  CYC(b_+14, b_+15); L = C;
+  CYC(b_+15, b_+16); H = B;
+  CALL_C(b_+16, verifyFileAtHl_hook, SYM(verifyFileAtHl), b_+19);
+  CYC(b_+19, b_+20); SET_BC(pop_effect(gb));
+  CYC(b_+20, b_+22); B = alu_rl(gb, B);
+  CYC(b_+22, b_+23); A = B;
+  CYC(b_+23, b_+24); push_effect(gb, b_+24);
+  do { uint16_t jt_ = (jump_table_from_rst(gb));
+    if (jt_ == b_+32) { verify_file_copies_copy2_invalid(gb, sp0_); return; }
+    else if (jt_ == b_+45) { verify_file_copies_both_valid(gb); return; }
+    else if (jt_ == b_+47) { verify_file_copies_copy1_invalid(gb, sp0_); return; }
+    else if (jt_ == b_+63) { verify_file_copies_both_invalid(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void verifyFileCopies__copy2Invalid_hook(GB *gb) {
@@ -277,83 +289,88 @@ void verifyFileCopies__bothCopiesInvalid_hook(GB *gb) {
 }
 
 void copyFileFromHlToDe_hook(GB *gb) {
+  BASE(copyFileFromHlToDe);
   uint16_t sp0_ = gb->sp;
-  CYC(0x40fe, 0x40ff); push_effect(gb, HL);
-  CYC(0x40ff, 0x4101); A = 0x0a;
-  CYC(0x4101, 0x4104); mem_wr(gb, 0x1111, A);
-  CYC(0x4104, 0x4107); SET_BC(0x0550);
-  CALL_C(0x4107, copyMemoryBc_hook, 0x0496, 0x410a);
-  CYC(0x410a, 0x410b); alu_xor(gb, A);
-  CYC(0x410b, 0x410e); mem_wr(gb, 0x1111, A);
-  CYC(0x410e, 0x410f); SET_HL(pop_effect(gb));
-  CYC(0x410f, 0x4110); ret_effect(gb);
+  CYC(b_+0, b_+1); push_effect(gb, HL);
+  CYC(b_+1, b_+3); A = 0x0a;
+  CYC(b_+3, b_+6); mem_wr(gb, (SYM(setDeathRespawnPoint) + 17), A);
+  CYC(b_+6, b_+9); SET_BC((SYM(loadPaletteHeader) + 69));
+  CALL_C(b_+9, copyMemoryBc_hook, SYM(copyMemoryBc), b_+12);
+  CYC(b_+12, b_+13); alu_xor(gb, A);
+  CYC(b_+13, b_+16); mem_wr(gb, (SYM(setDeathRespawnPoint) + 17), A);
+  CYC(b_+16, b_+17); SET_HL(pop_effect(gb));
+  CYC(b_+17, SYM(verifyFileAtHl)); ret_effect(gb);
 }
 
 static void verify_file_done(GB *gb) {
-  CYC(0x412f, 0x4130); alu_xor(gb, A);
-  CYC(0x4130, 0x4133); mem_wr(gb, 0x1111, A);
-  CYC(0x4133, 0x4134); SET_HL(pop_effect(gb));
-  CYC(0x4134, 0x4135); A = B;
-  CYC(0x4135, 0x4136); alu_rrca(gb);
-  CYC(0x4136, 0x4137); ret_effect(gb);
+  BASE(verifyFileAtHl);
+  CYC(b_+31, b_+32); alu_xor(gb, A);
+  CYC(b_+32, b_+35); mem_wr(gb, (SYM(setDeathRespawnPoint) + 17), A);
+  CYC(b_+35, b_+36); SET_HL(pop_effect(gb));
+  CYC(b_+36, b_+37); A = B;
+  CYC(b_+37, b_+38); alu_rrca(gb);
+  CYC(b_+38, b_+39); ret_effect(gb);
 }
 
 static void verify_file_failed(GB *gb, uint16_t sp0_) {
-  CYC(0x4137, 0x4138); SET_HL(pop_effect(gb));
-  CYC(0x4138, 0x4139); push_effect(gb, HL);
-  CALL_C(0x4139, clearFileAtHl_hook, 0x40b6, 0x413c);
-  CYC(0x413c, 0x413e); B = 0xff;
-  CYC(0x413e, 0x4140);
+  BASE(verifyFileAtHl);
+  CYC(b_+39, b_+40); SET_HL(pop_effect(gb));
+  CYC(b_+40, b_+41); push_effect(gb, HL);
+  CALL_C(b_+41, clearFileAtHl_hook, SYM(clearFileAtHl), b_+44);
+  CYC(b_+44, b_+46); B = 0xff;
+  CYC(b_+46, SYM(calculateFileChecksum));
   verify_file_done(gb);
 }
 
 static void verify_file_characters(GB *gb, uint16_t sp0_) {
+  BASE(verifyFileAtHl);
   for (;;) {
-    CYC(0x4126, 0x4127); A = mem_rd(gb, DE);
-    CYC(0x4127, 0x4128); alu_cp(gb, mem_rd(gb, HL));
+    CYC(b_+22, b_+23); A = mem_rd(gb, DE);
+    CYC(b_+23, b_+24); alu_cp(gb, mem_rd(gb, HL));
     if (!(F & FZ)) {
-      CYCT(0x4128, 0x412a);
+      CYCT(b_+24, b_+26);
       verify_file_failed(gb, sp0_);
       return;
     }
-    CYC(0x4128, 0x412a);
-    CYC(0x412a, 0x412b); SET_DE(DE + 1);
-    CYC(0x412b, 0x412c); SET_HL(HL + 1);
-    CYC(0x412c, 0x412d); B = alu_dec8(gb, B);
+    CYC(b_+24, b_+26);
+    CYC(b_+26, b_+27); SET_DE(DE + 1);
+    CYC(b_+27, b_+28); SET_HL(HL + 1);
+    CYC(b_+28, b_+29); B = alu_dec8(gb, B);
     if (!(F & FZ)) {
-      CYCT(0x412d, 0x412f);
+      CYCT(b_+29, b_+31);
       continue;
     }
-    CYC(0x412d, 0x412f);
+    CYC(b_+29, b_+31);
     verify_file_done(gb);
     return;
   }
 }
 
 void verifyFileAtHl_hook(GB *gb) {
+  BASE(verifyFileAtHl);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4110, 0x4111); push_effect(gb, HL);
-  CYC(0x4111, 0x4113); A = 0x0a;
-  CYC(0x4113, 0x4116); mem_wr(gb, 0x1111, A);
-  CALL_C(0x4116, calculateFileChecksum_hook, 0x4140, 0x4119);
-  CYC(0x4119, 0x411a); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x411a, 0x411b); alu_cp(gb, E);
+  CYC(b_+0, b_+1); push_effect(gb, HL);
+  CYC(b_+1, b_+3); A = 0x0a;
+  CYC(b_+3, b_+6); mem_wr(gb, (SYM(setDeathRespawnPoint) + 17), A);
+  CALL_C(b_+6, calculateFileChecksum_hook, SYM(calculateFileChecksum), b_+9);
+  CYC(b_+9, b_+10); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+10, b_+11); alu_cp(gb, E);
   if (!(F & FZ)) {
-    CYCT(0x411b, 0x411d);
+    CYCT(b_+11, b_+13);
     verify_file_failed(gb, sp0_);
     return;
   }
-  CYC(0x411b, 0x411d);
-  CYC(0x411d, 0x411e); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x411e, 0x411f); alu_cp(gb, D);
+  CYC(b_+11, b_+13);
+  CYC(b_+13, b_+14); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+14, b_+15); alu_cp(gb, D);
   if (!(F & FZ)) {
-    CYCT(0x411f, 0x4121);
+    CYCT(b_+15, b_+17);
     verify_file_failed(gb, sp0_);
     return;
   }
-  CYC(0x411f, 0x4121);
-  CYC(0x4121, 0x4124); SET_DE(0x41c9);
-  CYC(0x4124, 0x4126); B = 0x08;
+  CYC(b_+15, b_+17);
+  CYC(b_+17, b_+20); SET_DE(SYM(saveVerificationString));
+  CYC(b_+20, b_+22); B = 0x08;
   verify_file_characters(gb, sp0_);
 }
 
@@ -372,72 +389,77 @@ void verifyFileAtHl__verifyFailed_hook(GB *gb) {
 }
 
 void calculateFileChecksum_hook(GB *gb) {
-  CYC(0x4140, 0x4141); push_effect(gb, HL);
-  CYC(0x4141, 0x4143); A = 0x02;
-  CYC(0x4143, 0x4144); push_effect(gb, 0x4144);
+  BASE(calculateFileChecksum);
+  CYC(b_+0, b_+1); push_effect(gb, HL);
+  CYC(b_+1, b_+3); A = 0x02;
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
   add_a_to_hl_from_rst(gb);
-  CYC(0x4144, 0x4147); SET_BC(0x02a7);
-  CYC(0x4147, 0x414a); SET_DE(0x0000);
+  CYC(b_+4, b_+7); SET_BC((SYM(getInputWithAutofire) + 19));
+  CYC(b_+7, b_+10); SET_DE(0x0000);
   for (;;) {
-    CYC(0x414a, 0x414b); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(0x414b, 0x414c); alu_add(gb, E);
-    CYC(0x414c, 0x414d); E = A;
-    CYC(0x414d, 0x414e); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(0x414e, 0x414f); alu_adc(gb, D);
-    CYC(0x414f, 0x4150); D = A;
-    CYC(0x4150, 0x4151); SET_BC(BC - 1);
-    CYC(0x4151, 0x4152); A = B;
-    CYC(0x4152, 0x4153); alu_or(gb, C);
+    CYC(b_+10, b_+11); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+11, b_+12); alu_add(gb, E);
+    CYC(b_+12, b_+13); E = A;
+    CYC(b_+13, b_+14); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+14, b_+15); alu_adc(gb, D);
+    CYC(b_+15, b_+16); D = A;
+    CYC(b_+16, b_+17); SET_BC(BC - 1);
+    CYC(b_+17, b_+18); A = B;
+    CYC(b_+18, b_+19); alu_or(gb, C);
     if (BC) {
-      CYCT(0x4153, 0x4155);
+      CYCT(b_+19, b_+21);
       continue;
     }
-    CYC(0x4153, 0x4155);
+    CYC(b_+19, b_+21);
     break;
   }
-  CYC(0x4155, 0x4156); SET_HL(pop_effect(gb));
-  CYC(0x4156, 0x4157); ret_effect(gb);
+  CYC(b_+21, b_+22); SET_HL(pop_effect(gb));
+  CYC(b_+22, SYM(getFileAddress1)); ret_effect(gb);
 }
 
 static void get_file_address(GB *gb) {
-  CYC(0x415d, 0x415e); push_effect(gb, HL);
-  CYC(0x415e, 0x4160); A = H8(hActiveFileSlot);
-  CYC(0x4160, 0x4161); alu_add(gb, C);
-  CYC(0x4161, 0x4164); SET_HL(0x416a);
-  CYC(0x4164, 0x4165); push_effect(gb, 0x4165);
+  BASE(getFileAddress2);
+  CYC(b_+2, b_+3); push_effect(gb, HL);
+  CYC(b_+3, b_+5); A = H8(hActiveFileSlot);
+  CYC(b_+5, b_+6); alu_add(gb, C);
+  CYC(b_+6, b_+9); SET_HL(b_+15);
+  CYC(b_+9, b_+10); push_effect(gb, b_+10);
   add_double_index_to_hl_from_rst(gb);
-  CYC(0x4165, 0x4166); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4166, 0x4167); B = mem_rd(gb, HL);
-  CYC(0x4167, 0x4168); C = A;
-  CYC(0x4168, 0x4169); SET_HL(pop_effect(gb));
-  CYC(0x4169, 0x416a); ret_effect(gb);
+  CYC(b_+10, b_+11); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+11, b_+12); B = mem_rd(gb, HL);
+  CYC(b_+12, b_+13); C = A;
+  CYC(b_+13, b_+14); SET_HL(pop_effect(gb));
+  CYC(b_+14, b_+15); ret_effect(gb);
 }
 
 void getFileAddress1_hook(GB *gb) {
-  CYC(0x4157, 0x4159); C = 0x00;
-  CYC(0x4159, 0x415b);
+  BASE(getFileAddress1);
+  CYC(b_+0, b_+2); C = 0x00;
+  CYC(b_+2, SYM(getFileAddress2));
   get_file_address(gb);
 }
 
 void getFileAddress2_hook(GB *gb) {
-  CYC(0x415b, 0x415d); C = 0x03;
+  BASE(getFileAddress2);
+  CYC(b_+0, b_+2); C = 0x03;
   get_file_address(gb);
 }
 
 void initializeFileVariables_hook(GB *gb) {
-  CYC(0x4176, 0x4178); D = 0xc6;
+  BASE(initializeFileVariables);
+  CYC(b_+0, b_+2); D = 0xc6;
   for (;;) {
-    CYC(0x4178, 0x4179); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(0x4179, 0x417a); alu_or(gb, A);
+    CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+3, b_+4); alu_or(gb, A);
     if (F & FZ) {
-      CYCT(0x417a, 0x417c);
+      CYCT(b_+4, b_+6);
       break;
     }
-    CYC(0x417a, 0x417c);
-    CYC(0x417c, 0x417d); E = A;
-    CYC(0x417d, 0x417e); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(0x417e, 0x417f); mem_wr(gb, DE, A);
-    CYC(0x417f, 0x4181);
+    CYC(b_+4, b_+6);
+    CYC(b_+6, b_+7); E = A;
+    CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+8, b_+9); mem_wr(gb, DE, A);
+    CYC(b_+9, b_+11);
   }
-  CYC(0x4181, 0x4182); ret_effect(gb);
+  CYC(b_+11, SYM(initialFileVariablesTable)); ret_effect(gb);
 }

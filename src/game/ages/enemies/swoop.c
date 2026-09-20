@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0f, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0f, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode71), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode71), (from), (to), true)
 
 void swoop_state_uninitialized_hook(GB *gb);
 void swoop_state_stub_hook(GB *gb);
@@ -63,493 +63,509 @@ static void swoop_addAToHl_from_rst(GB *gb, uint16_t return_address) {
 //   var32/var33: Target stomp position (long-form)
 // ==================================================================================================
 void enemyCode71_hook(GB *gb) {
+  BASE(enemyCode71);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  if (F & FZ) { CYCT(0x4742, 0x4744); goto normalStatus; } // jr z
-  CYC(0x4742, 0x4744);
-  CYC(0x4744, 0x4746); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(0x4746); return; } // ret c
-  CYC(0x4746, 0x4747);
-  if (!(F & FZ)) { CYCT(0x4747, 0x474a); goto normalStatus; } // jp nz
-  CYC(0x4747, 0x474a);
-  CYC(0x474a, 0x474d);
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+4); return; } // ret c
+  CYC(b_+4, b_+5);
+  if (!(F & FZ)) { CYCT(b_+5, b_+8); goto normalStatus; } // jp nz
+  CYC(b_+5, b_+8);
+  CYC(b_+8, b_+11);
   enemyBoss_dead_b0f_hook(gb); return; // jp
 
 normalStatus:
-  CYC(0x474d, 0x474f); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x474f, 0x4750); A = mem_rd(gb, DE);
+  CYC(b_+11, b_+13); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+13, b_+14); A = mem_rd(gb, DE);
   {
-    CYC(0x4750, 0x4751); push_effect(gb, 0x4751);
+    CYC(b_+14, b_+15); push_effect(gb, b_+15);
     uint16_t target = swoop_jump_table(gb);
-    if (target == 0x4769) { swoop_state_uninitialized_hook(gb); return; }
-    if (target == 0x477a) { swoop_state_stub_hook(gb); return; }
-    if (target == 0x477b) { swoop_state8_hook(gb); return; }
-    if (target == 0x47fe) { swoop_state9_hook(gb); return; }
-    if (target == 0x4837) { swoop_stateA_hook(gb); return; }
-    if (target == 0x4874) { swoop_stateB_hook(gb); return; }
+    if (target == SYM(swoop_state_uninitialized)) { swoop_state_uninitialized_hook(gb); return; }
+    if (target == SYM(swoop_state_stub)) { swoop_state_stub_hook(gb); return; }
+    if (target == SYM(swoop_state8)) { swoop_state8_hook(gb); return; }
+    if (target == SYM(swoop_state9)) { swoop_state9_hook(gb); return; }
+    if (target == SYM(swoop_stateA)) { swoop_stateA_hook(gb); return; }
+    if (target == SYM(swoop_stateB)) { swoop_stateB_hook(gb); return; }
     HANDOFF(target);
   }
 }
 
 void swoop_state_uninitialized_hook(GB *gb) {
+  BASE(swoop_state_uninitialized);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x4769, 0x476b); A = 0x71; // ENEMY_SWOOP
-  CYC(0x476b, 0x476d); B = 0x00;
-  CALL_C(0x476d, enemyBoss_initializeRoom_b0f_hook, 0x4546, 0x4770);
-  CALL_C(0x4770, ecom_setSpeedAndState8_b0f_hook, 0x4364, 0x4773);
-  CYC(0x4773, 0x4775); B = 0x01;
-  CYC(0x4775, 0x4777); C = 0x08;
-  CYC(0x4777, 0x477a);
+  CYC(b_+0, b_+2); A = 0x71; // ENEMY_SWOOP
+  CYC(b_+2, b_+4); B = 0x00;
+  CALL_C(b_+4, enemyBoss_initializeRoom_b0f_hook, SYM(enemyBoss_initializeRoom_b0f), b_+7);
+  CALL_C(b_+7, ecom_setSpeedAndState8_b0f_hook, SYM(ecom_setSpeedAndState8_b0f), b_+10);
+  CYC(b_+10, b_+12); B = 0x01;
+  CYC(b_+12, b_+14); C = 0x08;
+  CYC(b_+14, SYM(swoop_state_stub));
   enemyBoss_spawnShadow_b0f_hook(gb); return; // jp
 }
 
 void swoop_state_stub_hook(GB *gb) {
-  RET(0x477a); return; // ret
+  BASE(swoop_state_stub);
+  RET(b_+0); return; // ret
 }
 
 // Spawning in before the fight starts
 void swoop_state8_hook(GB *gb) {
+  BASE(swoop_state8);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x477b, 0x477d); E = ENEMY_BASE + OBJ_SUBSTATE;
-  CYC(0x477d, 0x477e); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x477e, 0x477f); push_effect(gb, 0x477f);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = swoop_jump_table(gb);
-    if (target == 0x4787) goto substate0;
-    if (target == 0x47ad) goto substate1;
-    if (target == 0x47e1) goto substate2;
-    if (target == 0x47ed) goto substate3;
+    if (target == b_+12) goto substate0;
+    if (target == b_+50) goto substate1;
+    if (target == b_+102) goto substate2;
+    if (target == b_+114) goto substate3;
     HANDOFF(target);
   }
 
 substate0:
-  CYC(0x4787, 0x4789); A = 0x01; // DISABLE_LINK
-  CYC(0x4789, 0x478c); W8(wDisabledObjects) = A;
-  CYC(0x478c, 0x478f); W8(wMenuDisabled) = A;
+  CYC(b_+12, b_+14); A = 0x01; // DISABLE_LINK
+  CYC(b_+14, b_+17); W8(wDisabledObjects) = A;
+  CYC(b_+17, b_+20); W8(wMenuDisabled) = A;
 
   // Wait for door to close
-  CYC(0x478f, 0x4792); A = W8(wcc93);
-  CYC(0x4792, 0x4793); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x4793); return; } // ret nz
-  CYC(0x4793, 0x4794);
-  CALL_C(0x4794, ecom_incSubstate_b0f_hook, 0x4005, 0x4797);
-  CYC(0x4797, 0x4799); C = 0x08;
-  CALL_C(0x4799, ecom_setZAboveScreen_b0f_hook, 0x4446, 0x479c);
-  CYC(0x479c, 0x479e); E = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x479e, 0x47a0); A = 0x3c;
-  CYC(0x47a0, 0x47a1); mem_wr(gb, DE, A);
-  CYC(0x47a1, 0x47a2); E = alu_inc8(gb, E);
-  CYC(0x47a2, 0x47a4); A = 0x02;
-  CYC(0x47a4, 0x47a5); mem_wr(gb, DE, A); // [counter2]
-  CALL_C(0x47a5, objectSetVisible82_hook, 0x1e69, 0x47a8);
-  CYC(0x47a8, 0x47aa); A = 0x02;
-  CYC(0x47aa, 0x47ad);
+  CYC(b_+20, b_+23); A = W8(wcc93);
+  CYC(b_+23, b_+24); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+24); return; } // ret nz
+  CYC(b_+24, b_+25);
+  CALL_C(b_+25, ecom_incSubstate_b0f_hook, SYM(ecom_incSubstate_b0f), b_+28);
+  CYC(b_+28, b_+30); C = 0x08;
+  CALL_C(b_+30, ecom_setZAboveScreen_b0f_hook, SYM(ecom_setZAboveScreen_b0f), b_+33);
+  CYC(b_+33, b_+35); E = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+35, b_+37); A = 0x3c;
+  CYC(b_+37, b_+38); mem_wr(gb, DE, A);
+  CYC(b_+38, b_+39); E = alu_inc8(gb, E);
+  CYC(b_+39, b_+41); A = 0x02;
+  CYC(b_+41, b_+42); mem_wr(gb, DE, A); // [counter2]
+  CALL_C(b_+42, objectSetVisible82_hook, SYM(objectSetVisible82), b_+45);
+  CYC(b_+45, b_+47); A = 0x02;
+  CYC(b_+47, b_+50);
   enemySetAnimation_hook(gb); return; // jp
 
 // Falling to ground
 substate1:
-  CYC(0x47ad, 0x47af); C = 0x10;
-  CALL_C(0x47af, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x47b2);
-  if (!(F & FZ)) { RET_TAKEN(0x47b2); return; } // ret nz
-  CYC(0x47b2, 0x47b3);
-  CYC(0x47b3, 0x47b5); E = ENEMY_BASE + OBJ_COUNTER2;
-  CYC(0x47b5, 0x47b6); A = mem_rd(gb, DE);
-  CYC(0x47b6, 0x47b7); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x47b7, 0x47b9); goto doneBouncing; } // jr z
-  CYC(0x47b7, 0x47b9);
-  CYC(0x47b9, 0x47ba); A = alu_dec8(gb, A);
-  CYC(0x47ba, 0x47bb); mem_wr(gb, DE, A);
-  if (!(F & FZ)) { CYCT(0x47bb, 0x47bd); goto bounceAgain; } // jr nz
-  CYC(0x47bb, 0x47bd);
-  CYC(0x47bd, 0x47bf); A = 0x00;
-  CALL_C(0x47bf, enemySetAnimation_hook, 0x282b, 0x47c2);
-  CYC(0x47c2, 0x47c4);
+  CYC(b_+50, b_+52); C = 0x10;
+  CALL_C(b_+52, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+55);
+  if (!(F & FZ)) { RET_TAKEN(b_+55); return; } // ret nz
+  CYC(b_+55, b_+56);
+  CYC(b_+56, b_+58); E = ENEMY_BASE + OBJ_COUNTER2;
+  CYC(b_+58, b_+59); A = mem_rd(gb, DE);
+  CYC(b_+59, b_+60); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+60, b_+62); goto doneBouncing; } // jr z
+  CYC(b_+60, b_+62);
+  CYC(b_+62, b_+63); A = alu_dec8(gb, A);
+  CYC(b_+63, b_+64); mem_wr(gb, DE, A);
+  if (!(F & FZ)) { CYCT(b_+64, b_+66); goto bounceAgain; } // jr nz
+  CYC(b_+64, b_+66);
+  CYC(b_+66, b_+68); A = 0x00;
+  CALL_C(b_+68, enemySetAnimation_hook, SYM(enemySetAnimation), b_+71);
+  CYC(b_+71, b_+73);
   goto doneBouncing; // jr
 
 bounceAgain:
-  CYC(0x47c4, 0x47c7); SET_BC(0xfe80);
-  CALL_C(0x47c7, objectSetSpeedZ_hook, 0x239d, 0x47ca);
-  CYC(0x47ca, 0x47cc); A = 0x0a;
-  CALL_C(0x47cc, setScreenShakeCounter_hook, 0x24bb, 0x47cf);
-  CYC(0x47cf, 0x47d1); A = 0x70; // SND_DOORCLOSE
-  CYC(0x47d1, 0x47d4);
+  CYC(b_+73, b_+76); SET_BC(0xfe80);
+  CALL_C(b_+76, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+79);
+  CYC(b_+79, b_+81); A = 0x0a;
+  CALL_C(b_+81, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+84);
+  CYC(b_+84, b_+86); A = 0x70; // SND_DOORCLOSE
+  CYC(b_+86, b_+89);
   playSound_b00_hook(gb); return; // jp
 
 doneBouncing:
-  CALL_C(0x47d4, ecom_decCounter1_b0f_hook, 0x439a, 0x47d7);
-  if (!(F & FZ)) { RET_TAKEN(0x47d7); return; } // ret nz
-  CYC(0x47d7, 0x47d8);
-  CYC(0x47d8, 0x47db); SET_BC(0x2f00); // TX_2f00
-  CALL_C(0x47db, showText_hook, 0x1872, 0x47de);
-  CYC(0x47de, 0x47e1);
+  CALL_C(b_+89, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+92);
+  if (!(F & FZ)) { RET_TAKEN(b_+92); return; } // ret nz
+  CYC(b_+92, b_+93);
+  CYC(b_+93, b_+96); SET_BC(SYM(updateEnemies__next)); // TX_2f00
+  CALL_C(b_+96, showText_hook, SYM(showText), b_+99);
+  CYC(b_+99, b_+102);
   ecom_incSubstate_b0f_hook(gb); return; // jp
 
 substate2:
-  CALL_C(0x47e1, retIfTextIsActive_hook, 0x1859, 0x47e4);
-  CALL_C(0x47e4, enemyBoss_beginMiniboss_b0f_hook, 0x4580, 0x47e7);
-  CALL_C(0x47e7, ecom_incSubstate_b0f_hook, 0x4005, 0x47ea);
-  CYC(0x47ea, 0x47ed);
+  CALL_C(b_+102, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+105);
+  CALL_C(b_+105, enemyBoss_beginMiniboss_b0f_hook, SYM(enemyBoss_beginMiniboss_b0f), b_+108);
+  CALL_C(b_+108, ecom_incSubstate_b0f_hook, SYM(ecom_incSubstate_b0f), b_+111);
+  CYC(b_+111, b_+114);
   swoop_beginFlyingUp_hook(gb); return; // jp
 
 substate3:
-  CALL_C(0x47ed, swoop_state9_hook, 0x47fe, 0x47f0);
-  CYC(0x47f0, 0x47f2); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x47f2, 0x47f3); A = mem_rd(gb, DE);
-  CYC(0x47f3, 0x47f5); alu_cp(gb, 0x0a);
-  if (!(F & FZ)) { RET_TAKEN(0x47f5); return; } // ret nz
-  CYC(0x47f5, 0x47f6);
-  CYC(0x47f6, 0x47f7); alu_xor(gb, A);
-  CYC(0x47f7, 0x47fa); W8(wDisabledObjects) = A;
-  CYC(0x47fa, 0x47fd); W8(wMenuDisabled) = A;
-  RET(0x47fd); return; // ret
+  CALL_C(b_+114, swoop_state9_hook, SYM(swoop_state9), b_+117);
+  CYC(b_+117, b_+119); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+119, b_+120); A = mem_rd(gb, DE);
+  CYC(b_+120, b_+122); alu_cp(gb, 0x0a);
+  if (!(F & FZ)) { RET_TAKEN(b_+122); return; } // ret nz
+  CYC(b_+122, b_+123);
+  CYC(b_+123, b_+124); alu_xor(gb, A);
+  CYC(b_+124, b_+127); W8(wDisabledObjects) = A;
+  CYC(b_+127, b_+130); W8(wMenuDisabled) = A;
+  RET(b_+130); return; // ret
 }
 
 // Flying upward
 void swoop_state9_hook(GB *gb) {
+  BASE(swoop_state9);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x47fe, swoop_animate_hook, 0x4999, 0x4801);
-  CYC(0x4801, 0x4802); A = mem_rd(gb, DE);
-  CYC(0x4802, 0x4803); alu_or(gb, A);
-  CYC(0x4803, 0x4806); SET_BC(0xff00);
-  if (!(F & FZ)) { CALL_C_CC(0x4806, objectSetSpeedZ_hook, 0x239d, 0x4809); } else { CYC(0x4806, 0x4809); } // call nz
-  CYC(0x4809, 0x480b); C = 0x08;
-  CALL_C(0x480b, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x480e);
-  CALL_C(0x480e, ecom_decCounter2_b0f_hook, 0x43a3, 0x4811);
-  if (!(F & FZ)) { RET_TAKEN(0x4811); return; } // ret nz
-  CYC(0x4811, 0x4812);
-  CALL_C(0x4812, ecom_decCounter1_b0f_hook, 0x439a, 0x4815);
-  if (!(F & FZ)) { CYCT(0x4815, 0x4818); swoop_flyFurtherUp_hook(gb); return; } // jp nz
-  CYC(0x4815, 0x4818);
-  CYC(0x4818, 0x481a); mem_wr(gb, HL, 0x3c); // [counter1]
-  CYC(0x481a, 0x481c); A = 0x0a;
-  CYC(0x481c, 0x481e); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x481e, 0x481f); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x481f, 0x4821); mem_wr(gb, HL, 0x00); // [substate]
-  CALL_C(0x4821, swoop_getAngerLevel_hook, 0x495e, 0x4824);
-  CYC(0x4824, 0x4827); SET_HL(0x49a9); // swoop_framesBeforeAttacking
-  CYC(0x4827, 0x4828); swoop_addAToHl_from_rst(gb, 0x4828);
-  CYC(0x4828, 0x4829); A = mem_rd(gb, HL);
-  CYC(0x4829, 0x482b); E = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x482b, 0x482c); mem_wr(gb, DE, A);
-  CALL_C(0x482c, objectGetAngleTowardLink_hook, 0x1e9c, 0x482f);
-  CYC(0x482f, 0x4831); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x4831, 0x4832); mem_wr(gb, DE, A);
-  CYC(0x4832, 0x4834); A = 0x00;
-  CYC(0x4834, 0x4837);
+  CALL_C(b_+0, swoop_animate_hook, SYM(swoop_animate), b_+3);
+  CYC(b_+3, b_+4); A = mem_rd(gb, DE);
+  CYC(b_+4, b_+5); alu_or(gb, A);
+  CYC(b_+5, b_+8); SET_BC(0xff00);
+  if (!(F & FZ)) { CALL_C_CC(b_+8, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+11); } else { CYC(b_+8, b_+11); } // call nz
+  CYC(b_+11, b_+13); C = 0x08;
+  CALL_C(b_+13, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+16);
+  CALL_C(b_+16, ecom_decCounter2_b0f_hook, SYM(ecom_decCounter2_b0f), b_+19);
+  if (!(F & FZ)) { RET_TAKEN(b_+19); return; } // ret nz
+  CYC(b_+19, b_+20);
+  CALL_C(b_+20, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+23);
+  if (!(F & FZ)) { CYCT(b_+23, b_+26); swoop_flyFurtherUp_hook(gb); return; } // jp nz
+  CYC(b_+23, b_+26);
+  CYC(b_+26, b_+28); mem_wr(gb, HL, 0x3c); // [counter1]
+  CYC(b_+28, b_+30); A = 0x0a;
+  CYC(b_+30, b_+32); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+32, b_+33); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+33, b_+35); mem_wr(gb, HL, 0x00); // [substate]
+  CALL_C(b_+35, swoop_getAngerLevel_hook, SYM(swoop_getAngerLevel), b_+38);
+  CYC(b_+38, b_+41); SET_HL(SYM(swoop_framesBeforeAttacking)); // swoop_framesBeforeAttacking
+  CYC(b_+41, b_+42); swoop_addAToHl_from_rst(gb, b_+42);
+  CYC(b_+42, b_+43); A = mem_rd(gb, HL);
+  CYC(b_+43, b_+45); E = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+45, b_+46); mem_wr(gb, DE, A);
+  CALL_C(b_+46, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+49);
+  CYC(b_+49, b_+51); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+51, b_+52); mem_wr(gb, DE, A);
+  CYC(b_+52, b_+54); A = 0x00;
+  CYC(b_+54, SYM(swoop_stateA));
   enemySetAnimation_hook(gb); return; // jp
 }
 
 // Flying around, getting closer to Link before stomping
 void swoop_stateA_hook(GB *gb) {
+  BASE(swoop_stateA);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x4837, swoop_animate_hook, 0x4999, 0x483a);
-  CALL_C(0x483a, swoop_getAngerLevel_hook, 0x495e, 0x483d);
-  CYC(0x483d, 0x4840); SET_HL(0x49a6); // swoop_speedVals
-  CYC(0x4840, 0x4841); swoop_addAToHl_from_rst(gb, 0x4841);
-  CYC(0x4841, 0x4842); A = mem_rd(gb, HL);
-  CYC(0x4842, 0x4844); E = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x4844, 0x4845); mem_wr(gb, DE, A);
-  CYC(0x4845, 0x4847); E = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x4847, 0x4848); A = mem_rd(gb, DE);
-  CYC(0x4848, 0x4849); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x4849, 0x484b); goto checkDistance; } // jr z
-  CYC(0x4849, 0x484b);
-  CYC(0x484b, 0x484c); A = alu_dec8(gb, A);
-  CYC(0x484c, 0x484d); mem_wr(gb, DE, A);
-  if (!(F & FZ)) { CYCT(0x484d, 0x484f); goto updatePosition; } // jr nz
-  CYC(0x484d, 0x484f);
+  CALL_C(b_+0, swoop_animate_hook, SYM(swoop_animate), b_+3);
+  CALL_C(b_+3, swoop_getAngerLevel_hook, SYM(swoop_getAngerLevel), b_+6);
+  CYC(b_+6, b_+9); SET_HL(SYM(swoop_speedVals)); // swoop_speedVals
+  CYC(b_+9, b_+10); swoop_addAToHl_from_rst(gb, b_+10);
+  CYC(b_+10, b_+11); A = mem_rd(gb, HL);
+  CYC(b_+11, b_+13); E = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+13, b_+14); mem_wr(gb, DE, A);
+  CYC(b_+14, b_+16); E = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+16, b_+17); A = mem_rd(gb, DE);
+  CYC(b_+17, b_+18); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+18, b_+20); goto checkDistance; } // jr z
+  CYC(b_+18, b_+20);
+  CYC(b_+20, b_+21); A = alu_dec8(gb, A);
+  CYC(b_+21, b_+22); mem_wr(gb, DE, A);
+  if (!(F & FZ)) { CYCT(b_+22, b_+24); goto updatePosition; } // jr nz
+  CYC(b_+22, b_+24);
 
 checkDistance:
-  CYC(0x484f, 0x4851); C = 0x30;
-  CALL_C(0x4851, objectCheckLinkWithinDistance_hook, 0x1fa2, 0x4854);
-  if (!(F & FC)) { CYCT(0x4854, 0x4856); goto updatePosition; } // jr nc
-  CYC(0x4854, 0x4856);
-  CALL_C(0x4856, ecom_incState_b0f_hook, 0x4000, 0x4859);
-  CYC(0x4859, 0x485a); L = alu_inc8(gb, L);
-  CYC(0x485a, 0x485c); mem_wr(gb, HL, 0x00); // [substate]
-  CYC(0x485c, 0x485e); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x485e, 0x4860); mem_wr(gb, HL, 0x1e);
-  RET(0x4860); return; // ret
+  CYC(b_+24, b_+26); C = 0x30;
+  CALL_C(b_+26, objectCheckLinkWithinDistance_hook, SYM(objectCheckLinkWithinDistance), b_+29);
+  if (!(F & FC)) { CYCT(b_+29, b_+31); goto updatePosition; } // jr nc
+  CYC(b_+29, b_+31);
+  CALL_C(b_+31, ecom_incState_b0f_hook, SYM(ecom_incState_b0f), b_+34);
+  CYC(b_+34, b_+35); L = alu_inc8(gb, L);
+  CYC(b_+35, b_+37); mem_wr(gb, HL, 0x00); // [substate]
+  CYC(b_+37, b_+39); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+39, b_+41); mem_wr(gb, HL, 0x1e);
+  RET(b_+41); return; // ret
 
 updatePosition:
-  CALL_C(0x4861, ecom_decCounter1_b0f_hook, 0x439a, 0x4864);
-  if (!(F & FZ)) { CYCT(0x4864, 0x4866); goto applyVelocity; } // jr nz
-  CALL_C(0x4866, objectGetAngleTowardLink_hook, 0x1e9c, 0x4869);
-  CYC(0x4869, 0x486b); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x486b, 0x486c); mem_wr(gb, DE, A);
-  CYC(0x486c, 0x486e); E = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x486e, 0x4870); A = 0x3c;
-  CYC(0x4870, 0x4871); mem_wr(gb, DE, A);
+  CALL_C(b_+42, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+45);
+  if (!(F & FZ)) { CYCT(b_+45, b_+47); goto applyVelocity; } // jr nz
+  CALL_C(b_+47, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+50);
+  CYC(b_+50, b_+52); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+52, b_+53); mem_wr(gb, DE, A);
+  CYC(b_+53, b_+55); E = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+55, b_+57); A = 0x3c;
+  CYC(b_+57, b_+58); mem_wr(gb, DE, A);
 
 applyVelocity:
-  CYC(0x4871, 0x4874);
+  CYC(b_+58, SYM(swoop_stateB));
   ecom_applyVelocityForSideviewEnemy_b0f_hook(gb); return; // jp
 }
 
 // Stomping
 void swoop_stateB_hook(GB *gb) {
+  BASE(swoop_stateB);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x4874, 0x4876); E = ENEMY_BASE + OBJ_SUBSTATE;
-  CYC(0x4876, 0x4877); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x4877, 0x4878); push_effect(gb, 0x4878);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = swoop_jump_table(gb);
-    if (target == 0x4880) goto substate0;
-    if (target == 0x48c8) goto substate1;
-    if (target == 0x4917) { swoop_stomp_substate2_hook(gb); return; }
-    if (target == 0x4947) { swoop_stomp_substate3_hook(gb); return; }
+    if (target == b_+12) goto substate0;
+    if (target == b_+84) goto substate1;
+    if (target == SYM(swoop_stomp_substate2)) { swoop_stomp_substate2_hook(gb); return; }
+    if (target == SYM(swoop_stomp_substate3)) { swoop_stomp_substate3_hook(gb); return; }
     HANDOFF(target);
   }
 
 // Flapping wings quickly, telegraphing stomp is about to begin
 substate0:
-  CALL_C(0x4880, swoop_animate_hook, 0x4999, 0x4883);
-  CALL_C(0x4883, swoop_animate_hook, 0x4999, 0x4886);
-  CALL_C(0x4886, ecom_decCounter1_b0f_hook, 0x439a, 0x4889);
-  if (F & FZ) { CYCT(0x4889, 0x488b); goto beginStomp; } // jr z
-  CYC(0x4889, 0x488b);
-  CYC(0x488b, 0x488c); A = mem_rd(gb, HL); // [counter1]
-  CYC(0x488c, 0x488e); alu_cp(gb, 0x0a);
-  if (!(F & FZ)) { RET_TAKEN(0x488e); return; } // ret nz
-  CYC(0x488e, 0x488f);
+  CALL_C(b_+12, swoop_animate_hook, SYM(swoop_animate), b_+15);
+  CALL_C(b_+15, swoop_animate_hook, SYM(swoop_animate), b_+18);
+  CALL_C(b_+18, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+21);
+  if (F & FZ) { CYCT(b_+21, b_+23); goto beginStomp; } // jr z
+  CYC(b_+21, b_+23);
+  CYC(b_+23, b_+24); A = mem_rd(gb, HL); // [counter1]
+  CYC(b_+24, b_+26); alu_cp(gb, 0x0a);
+  if (!(F & FZ)) { RET_TAKEN(b_+26); return; } // ret nz
+  CYC(b_+26, b_+27);
 
   // Decide on target position to stomp at, store in var31
-  CYC(0x488f, 0x4892); SET_HL(w1Link_yh);
-  CYC(0x4892, 0x4893); B = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x4893, 0x4894); L = alu_inc8(gb, L);
-  CYC(0x4894, 0x4895); C = mem_rd(gb, HL); // [w1Link.xh]
-  CALL_C(0x4895, getTileAtPosition_hook, 0x1447, 0x4899);
-  CYC(0x4899, 0x489a); A = L;
-  CYC(0x489a, 0x489c); E = ENEMY_BASE + 0x31; // Enemy.var31
-  CYC(0x489c, 0x489d); mem_wr(gb, DE, A);
+  CYC(b_+27, b_+30); SET_HL(w1Link_yh);
+  CYC(b_+30, b_+31); B = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+31, b_+32); L = alu_inc8(gb, L);
+  CYC(b_+32, b_+33); C = mem_rd(gb, HL); // [w1Link.xh]
+  CALL_C(b_+33, getTileAtPosition_hook, SYM(getTileAtPosition), b_+37);
+  CYC(b_+37, b_+38); A = L;
+  CYC(b_+38, b_+40); E = ENEMY_BASE + 0x31; // Enemy.var31
+  CYC(b_+40, b_+41); mem_wr(gb, DE, A);
 
   // Convert to long-form, store in var32/var33
-  CALL_C(0x489d, convertShortToLongPosition_hook, 0x20cb, 0x48a0);
-  CYC(0x48a0, 0x48a2); E = ENEMY_BASE + 0x32; // Enemy.var32
-  CYC(0x48a2, 0x48a3); A = B;
-  CYC(0x48a3, 0x48a5); alu_and(gb, 0xf0);
-  CYC(0x48a5, 0x48a6); mem_wr(gb, DE, A);
-  CYC(0x48a6, 0x48a7); E = alu_inc8(gb, E);
-  CYC(0x48a7, 0x48a8); A = C;
-  CYC(0x48a8, 0x48a9); mem_wr(gb, DE, A);
+  CALL_C(b_+41, convertShortToLongPosition_hook, SYM(convertShortToLongPosition), b_+44);
+  CYC(b_+44, b_+46); E = ENEMY_BASE + 0x32; // Enemy.var32
+  CYC(b_+46, b_+47); A = B;
+  CYC(b_+47, b_+49); alu_and(gb, 0xf0);
+  CYC(b_+49, b_+50); mem_wr(gb, DE, A);
+  CYC(b_+50, b_+51); E = alu_inc8(gb, E);
+  CYC(b_+51, b_+52); A = C;
+  CYC(b_+52, b_+53); mem_wr(gb, DE, A);
 
   // Get angle toward stomp position
-  CYC(0x48a9, 0x48ab); E = ENEMY_BASE + OBJ_YH;
-  CALL_C(0x48ab, objectGetRelativeAngle_hook, 0x1ea4, 0x48ae);
-  CYC(0x48ae, 0x48b0); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x48b0, 0x48b1); mem_wr(gb, DE, A);
-  RET(0x48b1); return; // ret
+  CYC(b_+53, b_+55); E = ENEMY_BASE + OBJ_YH;
+  CALL_C(b_+55, objectGetRelativeAngle_hook, SYM(objectGetRelativeAngle), b_+58);
+  CYC(b_+58, b_+60); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+60, b_+61); mem_wr(gb, DE, A);
+  RET(b_+61); return; // ret
 
 beginStomp:
-  CALL_C(0x48b2, ecom_incSubstate_b0f_hook, 0x4005, 0x48b5);
-  CYC(0x48b5, 0x48b7); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x48b7, 0x48b9); mem_wr(gb, HL, 0x50); // SPEED_200
-  CYC(0x48b9, 0x48bb); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
-  CYC(0x48bb, 0x48bd); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
-  CYC(0x48bd, 0x48c0); SET_BC(0x0000);
-  CALL_C(0x48c0, objectSetSpeedZ_hook, 0x239d, 0x48c3);
-  CYC(0x48c3, 0x48c5); A = 0x02;
-  CYC(0x48c5, 0x48c8);
+  CALL_C(b_+62, ecom_incSubstate_b0f_hook, SYM(ecom_incSubstate_b0f), b_+65);
+  CYC(b_+65, b_+67); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+67, b_+69); mem_wr(gb, HL, 0x50); // SPEED_200
+  CYC(b_+69, b_+71); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
+  CYC(b_+71, b_+73); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
+  CYC(b_+73, b_+76); SET_BC(0x0000);
+  CALL_C(b_+76, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+79);
+  CYC(b_+79, b_+81); A = 0x02;
+  CYC(b_+81, b_+84);
   enemySetAnimation_hook(gb); return; // jp
 
 // Moving toward stomp position while falling to ground
 substate1:
   // Get target stomp position
-  CYC(0x48c8, 0x48c9); H = D;
-  CYC(0x48c9, 0x48cb); L = ENEMY_BASE + 0x32; // Enemy.var32
-  CYC(0x48cb, 0x48cc); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x48cc, 0x48cd); C = mem_rd(gb, HL);
-  CYC(0x48cd, 0x48ce); B = A;
+  CYC(b_+84, b_+85); H = D;
+  CYC(b_+85, b_+87); L = ENEMY_BASE + 0x32; // Enemy.var32
+  CYC(b_+87, b_+88); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+88, b_+89); C = mem_rd(gb, HL);
+  CYC(b_+89, b_+90); B = A;
 
   // Compare with current position
-  CYC(0x48ce, 0x48d0); E = ENEMY_BASE + OBJ_YH;
-  CYC(0x48d0, 0x48d1); L = E;
-  CYC(0x48d1, 0x48d2); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x48d2, 0x48d4); alu_and(gb, 0xfe);
-  CYC(0x48d4, 0x48d5); alu_cp(gb, B);
-  if (!(F & FZ)) { CYCT(0x48d5, 0x48d7); goto mustMove; } // jr nz
-  CYC(0x48d5, 0x48d7);
-  CYC(0x48d7, 0x48d8); L = alu_inc8(gb, L);
-  CYC(0x48d8, 0x48d9); A = mem_rd(gb, HL);
-  CYC(0x48d9, 0x48db); alu_and(gb, 0xfe);
-  CYC(0x48db, 0x48dc); alu_cp(gb, C);
-  if (F & FZ) { CYCT(0x48dc, 0x48de); goto reachedStompTarget; } // jr z
-  CYC(0x48dc, 0x48de);
+  CYC(b_+90, b_+92); E = ENEMY_BASE + OBJ_YH;
+  CYC(b_+92, b_+93); L = E;
+  CYC(b_+93, b_+94); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+94, b_+96); alu_and(gb, 0xfe);
+  CYC(b_+96, b_+97); alu_cp(gb, B);
+  if (!(F & FZ)) { CYCT(b_+97, b_+99); goto mustMove; } // jr nz
+  CYC(b_+97, b_+99);
+  CYC(b_+99, b_+100); L = alu_inc8(gb, L);
+  CYC(b_+100, b_+101); A = mem_rd(gb, HL);
+  CYC(b_+101, b_+103); alu_and(gb, 0xfe);
+  CYC(b_+103, b_+104); alu_cp(gb, C);
+  if (F & FZ) { CYCT(b_+104, b_+106); goto reachedStompTarget; } // jr z
+  CYC(b_+104, b_+106);
 
 mustMove:
-  CALL_C(0x48de, objectGetRelativeAngle_hook, 0x1ea4, 0x48e1);
-  CYC(0x48e1, 0x48e3); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x48e3, 0x48e4); mem_wr(gb, DE, A);
-  CALL_C(0x48e4, ecom_applyVelocityForSideviewEnemy_b0f_hook, 0x4153, 0x48e7);
+  CALL_C(b_+106, objectGetRelativeAngle_hook, SYM(objectGetRelativeAngle), b_+109);
+  CYC(b_+109, b_+111); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+111, b_+112); mem_wr(gb, DE, A);
+  CALL_C(b_+112, ecom_applyVelocityForSideviewEnemy_b0f_hook, SYM(ecom_applyVelocityForSideviewEnemy_b0f), b_+115);
 
 reachedStompTarget:
-  CYC(0x48e7, 0x48e9); C = 0x10;
-  CALL_C(0x48e9, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x48ec);
-  if (!(F & FZ)) { RET_TAKEN(0x48ec); return; } // ret nz
-  CYC(0x48ec, 0x48ed);
+  CYC(b_+115, b_+117); C = 0x10;
+  CALL_C(b_+117, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+120);
+  if (!(F & FZ)) { RET_TAKEN(b_+120); return; } // ret nz
+  CYC(b_+120, b_+121);
 
   // Hit the ground.
-  CALL_C(0x48ed, swoop_hitGround_hook, 0x496f, 0x48f0);
-  CALL_C(0x48f0, ecom_incSubstate_b0f_hook, 0x4005, 0x48f3);
-  CYC(0x48f3, 0x48f5); E = ENEMY_BASE + OBJ_HEALTH;
-  CYC(0x48f5, 0x48f6); A = mem_rd(gb, DE);
-  CYC(0x48f6, 0x48f8); alu_cp(gb, 0x0a);
-  if (!(F & FC)) { CYCT(0x48f8, 0x48fa); swoop_setVisible_hook(gb); return; } // jr nc
-  CYC(0x48f8, 0x48fa);
+  CALL_C(b_+121, swoop_hitGround_hook, SYM(swoop_hitGround), b_+124);
+  CALL_C(b_+124, ecom_incSubstate_b0f_hook, SYM(ecom_incSubstate_b0f), b_+127);
+  CYC(b_+127, b_+129); E = ENEMY_BASE + OBJ_HEALTH;
+  CYC(b_+129, b_+130); A = mem_rd(gb, DE);
+  CYC(b_+130, b_+132); alu_cp(gb, 0x0a);
+  if (!(F & FC)) { CYCT(b_+132, b_+134); swoop_setVisible_hook(gb); return; } // jr nc
+  CYC(b_+132, b_+134);
 
   // Health is low; will bounce either 2 or 3 times.
-  CYC(0x48fa, 0x48fb); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [substate] = 3
+  CYC(b_+134, b_+135); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [substate] = 3
 
   // [counter1] = number of bounces
-  CALL_C(0x48fb, getRandomNumber_hook, 0x043e, 0x48fe);
-  CYC(0x48fe, 0x4900); alu_and(gb, 0x01);
-  CYC(0x4900, 0x4901); A = alu_inc8(gb, A);
-  CYC(0x4901, 0x4903); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x4903, 0x4904); mem_wr(gb, HL, A);
-  CYC(0x4904, 0x4906); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x4906, 0x4908); mem_wr(gb, HL, 0x28); // SPEED_100
-  CALL_C(0x4908, objectGetAngleTowardLink_hook, 0x1e9c, 0x490b);
-  CYC(0x490b, 0x490d); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x490d, 0x490e); mem_wr(gb, DE, A);
+  CALL_C(b_+135, getRandomNumber_hook, SYM(getRandomNumber), b_+138);
+  CYC(b_+138, b_+140); alu_and(gb, 0x01);
+  CYC(b_+140, b_+141); A = alu_inc8(gb, A);
+  CYC(b_+141, b_+143); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+143, b_+144); mem_wr(gb, HL, A);
+  CYC(b_+144, b_+146); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+146, b_+148); mem_wr(gb, HL, 0x28); // SPEED_100
+  CALL_C(b_+148, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+151);
+  CYC(b_+151, b_+153); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+153, SYM(swoop_setSpeedZForBounce)); mem_wr(gb, DE, A);
   swoop_setSpeedZForBounce_hook(gb); return; // fallthrough
 }
 
 void swoop_setSpeedZForBounce_hook(GB *gb) {
-  CYC(0x490e, 0x4911); SET_BC(0xff00);
-  CYC(0x4911, 0x4914);
+  BASE(swoop_setSpeedZForBounce);
+  CYC(b_+0, b_+3); SET_BC(0xff00);
+  CYC(b_+3, SYM(swoop_setVisible));
   objectSetSpeedZ_hook(gb); return; // jp
 }
 
 void swoop_setVisible_hook(GB *gb) {
-  CYC(0x4914, 0x4917);
+  BASE(swoop_setVisible);
+  CYC(b_+0, SYM(swoop_stomp_substate2));
   objectSetVisible82_hook(gb); return; // jp
 }
 
 // Completed stomp, about to fly back up.
 void swoop_stomp_substate2_hook(GB *gb) {
+  BASE(swoop_stomp_substate2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x4917, swoop_animate_hook, 0x4999, 0x491a);
+  CALL_C(b_+0, swoop_animate_hook, SYM(swoop_animate), b_+3);
 
   // Wait until animation signals to fly up again, or Link attacks
-  CYC(0x491a, 0x491c); E = ENEMY_BASE + OBJ_INVINCIBILITY_COUNTER;
-  CYC(0x491c, 0x491d); A = mem_rd(gb, DE);
-  CYC(0x491d, 0x491f); alu_and(gb, 0x7f);
-  if (!(F & FZ)) { CYCT(0x491f, 0x4921); goto flyBackUp; } // jr nz
-  CYC(0x491f, 0x4921);
-  CYC(0x4921, 0x4923); E = ENEMY_BASE + OBJ_ANIM_PARAMETER;
-  CYC(0x4923, 0x4924); A = mem_rd(gb, DE);
-  CYC(0x4924, 0x4925); alu_or(gb, A);
-  if (F & FZ) { RET_TAKEN(0x4925); return; } // ret z
-  CYC(0x4925, 0x4926);
+  CYC(b_+3, b_+5); E = ENEMY_BASE + OBJ_INVINCIBILITY_COUNTER;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+8); alu_and(gb, 0x7f);
+  if (!(F & FZ)) { CYCT(b_+8, b_+10); goto flyBackUp; } // jr nz
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+12); E = ENEMY_BASE + OBJ_ANIM_PARAMETER;
+  CYC(b_+12, b_+13); A = mem_rd(gb, DE);
+  CYC(b_+13, b_+14); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+14); return; } // ret z
+  CYC(b_+14, b_+15);
 
 flyBackUp:
-  CYC(0x4926, 0x4929); SET_BC(0x0000);
-  CALL_C(0x4929, objectSetSpeedZ_hook, 0x239d, 0x492c);
-  CYC(0x492c, 0x492e); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x492e, 0x4930); A = 0x09;
-  CYC(0x4930, 0x4931); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x4931, 0x4933); mem_wr(gb, HL, 0x00); // [substate]
-  CYC(0x4933, 0x4935); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
-  CYC(0x4935, 0x4937); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
+  CYC(b_+15, b_+18); SET_BC(0x0000);
+  CALL_C(b_+18, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+21);
+  CYC(b_+21, b_+23); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+23, b_+25); A = 0x09;
+  CYC(b_+25, b_+26); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+26, b_+28); mem_wr(gb, HL, 0x00); // [substate]
+  CYC(b_+28, b_+30); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
+  CYC(b_+30, SYM(swoop_beginFlyingUp)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
   swoop_beginFlyingUp_hook(gb); return; // fallthrough
 }
 
 void swoop_beginFlyingUp_hook(GB *gb) {
-  CYC(0x4937, 0x4939); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x4939, 0x493b); mem_wr(gb, HL, 0x03); // 3 flaps before he goes to next state
+  BASE(swoop_beginFlyingUp);
+  CYC(b_+0, b_+2); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+2, SYM(swoop_flyFurtherUp)); mem_wr(gb, HL, 0x03); // 3 flaps before he goes to next state
   swoop_flyFurtherUp_hook(gb); return; // fallthrough
 }
 
 void swoop_flyFurtherUp_hook(GB *gb) {
+  BASE(swoop_flyFurtherUp);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x493b, 0x493d); L = ENEMY_BASE + OBJ_COUNTER2;
-  CYC(0x493d, 0x493f); mem_wr(gb, HL, 0x30); // $30 frames per wing flap
-  CALL_C(0x493f, objectSetVisible80_hook, 0x1e57, 0x4942);
-  CYC(0x4942, 0x4944); A = 0x03;
-  CYC(0x4944, 0x4947);
+  CYC(b_+0, b_+2); L = ENEMY_BASE + OBJ_COUNTER2;
+  CYC(b_+2, b_+4); mem_wr(gb, HL, 0x30); // $30 frames per wing flap
+  CALL_C(b_+4, objectSetVisible80_hook, SYM(objectSetVisible80), b_+7);
+  CYC(b_+7, b_+9); A = 0x03;
+  CYC(b_+9, SYM(swoop_stomp_substate3));
   enemySetAnimation_hook(gb); return; // jp
 }
 
 // Bouncing
 void swoop_stomp_substate3_hook(GB *gb) {
+  BASE(swoop_stomp_substate3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x4947, ecom_applyVelocityForSideviewEnemy_b0f_hook, 0x4153, 0x494a);
-  CYC(0x494a, 0x494c); C = 0x10;
-  CALL_C(0x494c, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x494f);
-  if (!(F & FZ)) { RET_TAKEN(0x494f); return; } // ret nz
-  CYC(0x494f, 0x4950);
-  CALL_C(0x4950, swoop_hitGround_hook, 0x496f, 0x4953);
-  CALL_C(0x4953, ecom_decCounter1_b0f_hook, 0x439a, 0x4956);
-  if (!(F & FZ)) { CYCT(0x4956, 0x4958); swoop_setSpeedZForBounce_hook(gb); return; } // jr nz
-  CYC(0x4956, 0x4958);
-  CYC(0x4958, 0x495a); L = ENEMY_BASE + OBJ_SUBSTATE;
-  CYC(0x495a, 0x495b); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x495b, 0x495e);
+  CALL_C(b_+0, ecom_applyVelocityForSideviewEnemy_b0f_hook, SYM(ecom_applyVelocityForSideviewEnemy_b0f), b_+3);
+  CYC(b_+3, b_+5); C = 0x10;
+  CALL_C(b_+5, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+8);
+  if (!(F & FZ)) { RET_TAKEN(b_+8); return; } // ret nz
+  CYC(b_+8, b_+9);
+  CALL_C(b_+9, swoop_hitGround_hook, SYM(swoop_hitGround), b_+12);
+  CALL_C(b_+12, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+15);
+  if (!(F & FZ)) { CYCT(b_+15, b_+17); swoop_setSpeedZForBounce_hook(gb); return; } // jr nz
+  CYC(b_+15, b_+17);
+  CYC(b_+17, b_+19); L = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+19, b_+20); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+20, SYM(swoop_getAngerLevel));
   objectSetVisible82_hook(gb); return; // jp
 }
 
 // @param[out] a Value from 0-2
 void swoop_getAngerLevel_hook(GB *gb) {
+  BASE(swoop_getAngerLevel);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x495e, 0x4960); B = 0x00;
-  CYC(0x4960, 0x4962); E = ENEMY_BASE + OBJ_HEALTH;
-  CYC(0x4962, 0x4963); A = mem_rd(gb, DE);
-  CYC(0x4963, 0x4965); alu_cp(gb, 0x0a);
-  if (!(F & FC)) { CYCT(0x4965, 0x4967); goto haveAnger; } // jr nc
-  CYC(0x4965, 0x4967);
-  CYC(0x4967, 0x4968); B = alu_inc8(gb, B);
-  CYC(0x4968, 0x496a); alu_cp(gb, 0x06);
-  if (!(F & FC)) { CYCT(0x496a, 0x496c); goto haveAnger; } // jr nc
-  CYC(0x496a, 0x496c);
-  CYC(0x496c, 0x496d); B = alu_inc8(gb, B);
+  CYC(b_+0, b_+2); B = 0x00;
+  CYC(b_+2, b_+4); E = ENEMY_BASE + OBJ_HEALTH;
+  CYC(b_+4, b_+5); A = mem_rd(gb, DE);
+  CYC(b_+5, b_+7); alu_cp(gb, 0x0a);
+  if (!(F & FC)) { CYCT(b_+7, b_+9); goto haveAnger; } // jr nc
+  CYC(b_+7, b_+9);
+  CYC(b_+9, b_+10); B = alu_inc8(gb, B);
+  CYC(b_+10, b_+12); alu_cp(gb, 0x06);
+  if (!(F & FC)) { CYCT(b_+12, b_+14); goto haveAnger; } // jr nc
+  CYC(b_+12, b_+14);
+  CYC(b_+14, b_+15); B = alu_inc8(gb, B);
 
 haveAnger:
-  CYC(0x496d, 0x496e); A = B;
-  RET(0x496e); return; // ret
+  CYC(b_+15, b_+16); A = B;
+  RET(b_+16); return; // ret
 }
 
 void swoop_hitGround_hook(GB *gb) {
+  BASE(swoop_hitGround);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x496f, 0x4971); A = 0x30;
-  CALL_C(0x4971, setScreenShakeCounter_hook, 0x24bb, 0x4974);
-  CYC(0x4974, 0x4976); A = 0x70; // SND_DOORCLOSE
-  CALL_C(0x4976, playSound_b00_hook, 0x0c98, 0x4979);
+  CYC(b_+0, b_+2); A = 0x30;
+  CALL_C(b_+2, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+5);
+  CYC(b_+5, b_+7); A = 0x70; // SND_DOORCLOSE
+  CALL_C(b_+7, playSound_b00_hook, SYM(playSound_b00), b_+10);
 
   // Replace tile at this position if it's of the appropriate type, and not solid.
-  CYC(0x4979, 0x497c); SET_BC(0x0500);
-  CALL_C(0x497c, objectGetRelativeTile_hook, 0x1435, 0x497f);
-  CYC(0x497f, 0x4980); C = L;
-  CYC(0x4980, 0x4982); H = 0xce; // >wRoomCollisions
-  CYC(0x4982, 0x4983); A = mem_rd(gb, HL);
-  CYC(0x4983, 0x4985); alu_cp(gb, 0x0f);
-  if (F & FZ) { RET_TAKEN(0x4985); return; } // ret z
-  CYC(0x4985, 0x4986);
+  CYC(b_+10, b_+13); SET_BC((SYM(initializeVramMap1) + 19));
+  CALL_C(b_+13, objectGetRelativeTile_hook, SYM(objectGetRelativeTile), b_+16);
+  CYC(b_+16, b_+17); C = L;
+  CYC(b_+17, b_+19); H = 0xce; // >wRoomCollisions
+  CYC(b_+19, b_+20); A = mem_rd(gb, HL);
+  CYC(b_+20, b_+22); alu_cp(gb, 0x0f);
+  if (F & FZ) { RET_TAKEN(b_+22); return; } // ret z
+  CYC(b_+22, b_+23);
 
-  CYC(0x4986, 0x4988); H = 0xcf; // >wRoomLayout
-  CYC(0x4988, 0x4989); A = mem_rd(gb, HL);
-  CYC(0x4989, 0x498b); alu_cp(gb, 0xa2);
-  if (F & FZ) { RET_TAKEN(0x498b); return; } // ret z
-  CYC(0x498b, 0x498c);
-  CYC(0x498c, 0x498e); alu_cp(gb, 0x48);
-  if (F & FZ) { RET_TAKEN(0x498e); return; } // ret z
-  CYC(0x498e, 0x498f);
+  CYC(b_+23, b_+25); H = 0xcf; // >wRoomLayout
+  CYC(b_+25, b_+26); A = mem_rd(gb, HL);
+  CYC(b_+26, b_+28); alu_cp(gb, 0xa2);
+  if (F & FZ) { RET_TAKEN(b_+28); return; } // ret z
+  CYC(b_+28, b_+29);
+  CYC(b_+29, b_+31); alu_cp(gb, 0x48);
+  if (F & FZ) { RET_TAKEN(b_+31); return; } // ret z
+  CYC(b_+31, b_+32);
 
-  CYC(0x498f, 0x4991); A = 0x48;
-  CALL_C(0x4991, setTile_hook, 0x3a9c, 0x4994);
-  CYC(0x4994, 0x4996); B = 0x06; // INTERAC_ROCKDEBRIS
-  CYC(0x4996, 0x4999);
+  CYC(b_+32, b_+34); A = 0x48;
+  CALL_C(b_+34, setTile_hook, SYM(setTile), b_+37);
+  CYC(b_+37, b_+39); B = 0x06; // INTERAC_ROCKDEBRIS
+  CYC(b_+39, SYM(swoop_animate));
   objectCreateInteractionWithSubid00_hook(gb); return; // jp
 }
 
 // @param[out] de animParameter (if nonzero, just flapped wings)
 void swoop_animate_hook(GB *gb) {
+  BASE(swoop_animate);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x4999, enemyAnimate_hook, 0x2818, 0x499c);
-  CYC(0x499c, 0x499e); E = ENEMY_BASE + OBJ_ANIM_PARAMETER;
-  CYC(0x499e, 0x499f); A = mem_rd(gb, DE);
-  CYC(0x499f, 0x49a0); alu_or(gb, A);
-  if (F & FZ) { RET_TAKEN(0x49a0); return; } // ret z
-  CYC(0x49a0, 0x49a1);
-  CYC(0x49a1, 0x49a3); A = 0x53; // SND_JUMP
-  CYC(0x49a3, 0x49a6);
+  CALL_C(b_+0, enemyAnimate_hook, SYM(enemyAnimate), b_+3);
+  CYC(b_+3, b_+5); E = ENEMY_BASE + OBJ_ANIM_PARAMETER;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+7); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+7); return; } // ret z
+  CYC(b_+7, b_+8);
+  CYC(b_+8, b_+10); A = 0x53; // SND_JUMP
+  CYC(b_+10, SYM(swoop_speedVals));
   playSound_b00_hook(gb); return; // jp
 }

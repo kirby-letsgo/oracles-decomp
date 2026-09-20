@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode24), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode24), (from), (to), true)
 
 static uint16_t triggerTranslator_jumpTable(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -27,84 +27,89 @@ static uint16_t triggerTranslator_jumpTable(GB *gb) {
 // @label_08_081: C holds a source bitmask; copy bit (subid >> 4) of it into the same bit of
 // wActiveTriggers.
 static void triggerTranslator_setTriggerBitFromC(GB *gb) {
-  CYC(0x52da, 0x52dc); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x52dc, 0x52dd); A = mem_rd(gb, DE);
-  CYC(0x52dd, 0x52df); A = alu_swap(gb, A);
-  CYC(0x52df, 0x52e1); alu_and(gb, 0x07);
-  CYC(0x52e1, 0x52e4); SET_HL(bitTable);
-  CYC(0x52e4, 0x52e5); alu_add(gb, L);
-  CYC(0x52e5, 0x52e6); L = A;
-  CYC(0x52e6, 0x52e7); A = C;
-  CYC(0x52e7, 0x52e8); alu_and(gb, mem_rd(gb, HL));
-  CYC(0x52e8, 0x52e9); B = A;
-  CYC(0x52e9, 0x52ea); A = mem_rd(gb, HL);
-  CYC(0x52ea, 0x52eb); alu_cpl(gb);
-  CYC(0x52eb, 0x52ec); C = A;
-  CYC(0x52ec, 0x52ef); A = mem_rd(gb, wActiveTriggers);
-  CYC(0x52ef, 0x52f0); alu_and(gb, C);
-  CYC(0x52f0, 0x52f1); alu_or(gb, B);
-  CYC(0x52f1, 0x52f4); mem_wr(gb, wActiveTriggers, A);
-  CYC(0x52f4, 0x52f5); ret_effect(gb);
+  BASE(interactionCode24);
+  CYC(b_+19, b_+21); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+21, b_+22); A = mem_rd(gb, DE);
+  CYC(b_+22, b_+24); A = alu_swap(gb, A);
+  CYC(b_+24, b_+26); alu_and(gb, 0x07);
+  CYC(b_+26, b_+29); SET_HL(bitTable);
+  CYC(b_+29, b_+30); alu_add(gb, L);
+  CYC(b_+30, b_+31); L = A;
+  CYC(b_+31, b_+32); A = C;
+  CYC(b_+32, b_+33); alu_and(gb, mem_rd(gb, HL));
+  CYC(b_+33, b_+34); B = A;
+  CYC(b_+34, b_+35); A = mem_rd(gb, HL);
+  CYC(b_+35, b_+36); alu_cpl(gb);
+  CYC(b_+36, b_+37); C = A;
+  CYC(b_+37, b_+40); A = mem_rd(gb, wActiveTriggers);
+  CYC(b_+40, b_+41); alu_and(gb, C);
+  CYC(b_+41, b_+42); alu_or(gb, B);
+  CYC(b_+42, b_+45); mem_wr(gb, wActiveTriggers, A);
+  CYC(b_+45, b_+46); ret_effect(gb);
 }
 
 // Subid 0: control a bit in wActiveTriggers based on wToggleBlocksState.
 static void triggerTranslator_subid0(GB *gb) {
-  CYC(0x52d6, 0x52d9); A = mem_rd(gb, wToggleBlocksState);
-  CYC(0x52d9, 0x52da); C = A;
+  BASE(interactionCode24);
+  CYC(b_+15, b_+18); A = mem_rd(gb, wToggleBlocksState);
+  CYC(b_+18, b_+19); C = A;
   triggerTranslator_setTriggerBitFromC(gb);
 }
 
 // Subid 1: control a bit in wActiveTriggers based on wSwitchState.
 static void triggerTranslator_subid1(GB *gb) {
-  CYC(0x52f5, 0x52f8); A = mem_rd(gb, wSwitchState);
-  CYC(0x52f8, 0x52f9); C = A;
-  CYC(0x52f9, 0x52fb);
+  BASE(interactionCode24);
+  CYC(b_+46, b_+49); A = mem_rd(gb, wSwitchState);
+  CYC(b_+49, b_+50); C = A;
+  CYC(b_+50, b_+52);
   triggerTranslator_setTriggerBitFromC(gb);
 }
 
 // Subid 2: set the trigger bits in xh if [wNumTorchesLit] == yh, clear them otherwise.
 static void triggerTranslator_subid2(GB *gb) {
-  CYC(0x52fb, 0x52fd); E = INTERACTION_BASE + OBJ_YH;
-  CYC(0x52fd, 0x52fe); A = mem_rd(gb, DE);
-  CYC(0x52fe, 0x52ff); B = A;
-  CYC(0x52ff, 0x5301); E = INTERACTION_BASE + OBJ_XH;
-  CYC(0x5301, 0x5302); A = mem_rd(gb, DE);
-  CYC(0x5302, 0x5303); C = A;
-  CYC(0x5303, 0x5306); A = mem_rd(gb, wNumTorchesLit);
-  CYC(0x5306, 0x5307); alu_cp(gb, B);
+  BASE(interactionCode24);
+  CYC(b_+52, b_+54); E = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+54, b_+55); A = mem_rd(gb, DE);
+  CYC(b_+55, b_+56); B = A;
+  CYC(b_+56, b_+58); E = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+58, b_+59); A = mem_rd(gb, DE);
+  CYC(b_+59, b_+60); C = A;
+  CYC(b_+60, b_+63); A = mem_rd(gb, wNumTorchesLit);
+  CYC(b_+63, b_+64); alu_cp(gb, B);
   if (!(F & FZ)) {
-    CYCT(0x5307, 0x5309); goto clearBits;
+    CYCT(b_+64, b_+66); goto clearBits;
   }
-  CYC(0x5307, 0x5309);
-  CYC(0x5309, 0x530c); A = mem_rd(gb, wActiveTriggers);
-  CYC(0x530c, 0x530d); alu_or(gb, C);
-  CYC(0x530d, 0x5310); mem_wr(gb, wActiveTriggers, A);
-  CYC(0x5310, 0x5311); ret_effect(gb);
+  CYC(b_+64, b_+66);
+  CYC(b_+66, b_+69); A = mem_rd(gb, wActiveTriggers);
+  CYC(b_+69, b_+70); alu_or(gb, C);
+  CYC(b_+70, b_+73); mem_wr(gb, wActiveTriggers, A);
+  CYC(b_+73, b_+74); ret_effect(gb);
   return;
 
 clearBits:
-  CYC(0x5311, 0x5312); A = C;
-  CYC(0x5312, 0x5313); alu_cpl(gb);
-  CYC(0x5313, 0x5314); C = A;
-  CYC(0x5314, 0x5317); A = mem_rd(gb, wActiveTriggers);
-  CYC(0x5317, 0x5318); alu_and(gb, C);
-  CYC(0x5318, 0x531b); mem_wr(gb, wActiveTriggers, A);
-  CYC(0x531b, 0x531c); ret_effect(gb);
+  CYC(b_+74, b_+75); A = C;
+  CYC(b_+75, b_+76); alu_cpl(gb);
+  CYC(b_+76, b_+77); C = A;
+  CYC(b_+77, b_+80); A = mem_rd(gb, wActiveTriggers);
+  CYC(b_+80, b_+81); alu_and(gb, C);
+  CYC(b_+81, b_+84); mem_wr(gb, wActiveTriggers, A);
+  CYC(b_+84, SYM(interactionCode25)); ret_effect(gb);
 }
 
 // INTERAC_TRIGGER_TRANSLATOR: mirrors some game state (toggle blocks, switches, lit
 // torches) into bits of wActiveTriggers.
 void interactionCode24_hook(GB *gb) {
+  BASE(interactionCode24);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x52c7, interactionDeleteAndRetIfEnabled02_hook, 0x26ec, 0x52ca);
-  CYC(0x52ca, 0x52cc); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x52cc, 0x52cd); A = mem_rd(gb, DE);
-  CYC(0x52cd, 0x52cf); alu_and(gb, 0x0f);
-  CYC(0x52cf, 0x52d0); push_effect(gb, 0x52d0);
-  switch (triggerTranslator_jumpTable(gb)) {
-    case 0x52d6: triggerTranslator_subid0(gb); return;
-    case 0x52f5: triggerTranslator_subid1(gb); return;
-    case 0x52fb: triggerTranslator_subid2(gb); return;
-    default: HANDOFF(HL);
-  }
+  CALL_C(b_+0, interactionDeleteAndRetIfEnabled02_hook, SYM(interactionDeleteAndRetIfEnabled02), b_+3);
+  CYC(b_+3, b_+5); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+8); alu_and(gb, 0x0f);
+  CYC(b_+8, b_+9); push_effect(gb, b_+9);
+  do { uint16_t jt_ = (triggerTranslator_jumpTable(gb));
+    if (jt_ == b_+15) { triggerTranslator_subid0(gb); return; }
+    else if (jt_ == b_+46) { triggerTranslator_subid1(gb); return; }
+    else if (jt_ == b_+52) { triggerTranslator_subid2(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 }

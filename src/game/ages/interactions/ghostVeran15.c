@@ -3,18 +3,19 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(ghostVeranApplySpeedUntilVar38Zero), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(ghostVeranApplySpeedUntilVar38Zero), (from), (to), true)
 
 // ref/oracles-disasm/scripts/ages/scriptHelper.s (INTERAC_VERAN_GHOST), bank 0x15.
 
 void ghostVeranApplySpeedUntilVar38Zero_hook(GB *gb) {
+  BASE(ghostVeranApplySpeedUntilVar38Zero);
   uint16_t sp0_ = gb->sp;
-  CYC(0x593b, 0x593c); H = D;
-  CYC(0x593c, 0x593e); L = INTERACTION_BASE + OBJ_VAR38;
-  CYC(0x593e, 0x593f); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  if (F & FZ) { RET_TAKEN(0x593f); return; }
-  CYC(0x593f, 0x5940);
-  CALL_C(0x5940, objectApplySpeed_hook, 0x201d, 0x5943);
-  CYC(0x5943, 0x5946); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR38;
+  CYC(b_+3, b_+4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (F & FZ) { RET_TAKEN(b_+4); return; }
+  CYC(b_+4, b_+5);
+  CALL_C(b_+5, objectApplySpeed_hook, SYM(objectApplySpeed), b_+8);
+  CYC(b_+8, SYM(ghostVeranSubid0Script_part1_b15)); objectApplySpeed_hook(gb); return; // jp
 }

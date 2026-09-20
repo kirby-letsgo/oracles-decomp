@@ -3,174 +3,190 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x01, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x01, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(cutscene06), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(cutscene06), (from), (to), true)
 
 void cutscene_endgameTail_hook(GB *gb);
 void func_5d5d_hook(GB *gb);
 
 void cutscene06_hook(GB *gb) {
+  BASE(cutscene06);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5d4e, refreshLoadedTreeGfx_hook, 0x1613, 0x5d51);
-  CYC(0x5d51, 0x5d53); C = 0x00;
-  CYC(0x5d53, 0x5d56); SET_HL(0x6306);
-  CYC(0x5d56, 0x5d58); E = 0x03;
-  CYC(0x5d58, 0x5d5b);
+  CALL_C(b_+0, refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+3);
+  CYC(b_+3, b_+5); C = 0x00;
+  CYC(b_+5, b_+8); SET_HL((SYM(checkLinkCanStandOnTile) + 29));
+  CYC(b_+8, b_+10); E = 0x03;
+  CYC(b_+10, SYM(cutscene07));
   interBankCall_hook(gb);
 }
 
 void cutscene07_hook(GB *gb) {
-  CYC(0x5d5b, 0x5d5d); C = 0x01;
+  BASE(cutscene07);
+  CYC(b_+0, SYM(func_5d5d)); C = 0x01;
   func_5d5d_hook(gb);
 }
 
 void func_5d5d_hook(GB *gb) {
-  CYC(0x5d5d, 0x5d60); A = mem_rd(gb, wWarpTransition2);
-  CYC(0x5d60, 0x5d61); alu_or(gb, A);
+  BASE(func_5d5d);
+  CYC(b_+0, b_+3); A = mem_rd(gb, wWarpTransition2);
+  CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x5d61, 0x5d64);
+    CYCT(b_+4, b_+7);
     applyWarpTransition2_hook(gb);
     return;
   }
-  CYC(0x5d61, 0x5d64);
-  CYC(0x5d64, 0x5d67); SET_HL(0x6306);
-  CYC(0x5d67, 0x5d69); E = 0x03;
-  CYC(0x5d69, 0x5d6c);
+  CYC(b_+4, b_+7);
+  CYC(b_+7, b_+10); SET_HL((SYM(checkLinkCanStandOnTile) + 29));
+  CYC(b_+10, b_+12); E = 0x03;
+  CYC(b_+12, SYM(cutscene08));
   interBankCall_hook(gb);
 }
 
 void cutscene08_hook(GB *gb) {
-  CYC(0x5d6c, 0x5d6e); C = 0x02;
-  CYC(0x5d6e, 0x5d70);
+  BASE(cutscene08);
+  CYC(b_+0, b_+2); C = 0x02;
+  CYC(b_+2, SYM(cutscene0c));
   func_5d5d_hook(gb);
 }
 
 void cutscene0c_hook(GB *gb) {
+  BASE(cutscene0c);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5d70, refreshLoadedTreeGfx_hook, 0x1613, 0x5d73);
-  CYC(0x5d73, 0x5d75); C = 0x03;
-  CYC(0x5d75, 0x5d77);
+  CALL_C(b_+0, refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+3);
+  CYC(b_+3, b_+5); C = 0x03;
+  CYC(b_+5, SYM(cutscene09));
   func_5d5d_hook(gb);
 }
 
 void cutscene09_hook(GB *gb) {
+  BASE(cutscene09);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5d77, refreshLoadedTreeGfx_hook, 0x1613, 0x5d7a);
-  CYC(0x5d7a, 0x5d7d); A = W8(wCutsceneTrigger);
-  CYC(0x5d7d, 0x5d7e); alu_or(gb, A);
+  CALL_C(b_+0, refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+3);
+  CYC(b_+3, b_+6); A = W8(wCutsceneTrigger);
+  CYC(b_+6, b_+7); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x5d7e, 0x5d81);
+    CYCT(b_+7, b_+10);
     setCutsceneIndexIfCutsceneTriggerSet_hook(gb);
     return;
   }
-  CYC(0x5d7e, 0x5d81);
-  CYC(0x5d81, 0x5d83); E = 0x00;
+  CYC(b_+7, b_+10);
+  CYC(b_+10, b_+12); E = 0x00;
   cutscene_endgameTail_hook(gb);
 }
 
 void cutscene_endgameTail_hook(GB *gb) {
+  BASE(cutscene09);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5d83, endgameCutsceneHandler_hook, 0x306c, 0x5d86);
-  CYC(0x5d86, 0x5d89); A = W8(wWarpTransition2);
-  CYC(0x5d89, 0x5d8a); alu_or(gb, A);
+  CALL_C(b_+12, endgameCutsceneHandler_hook, SYM(endgameCutsceneHandler), b_+15);
+  CYC(b_+15, b_+18); A = W8(wWarpTransition2);
+  CYC(b_+18, b_+19); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x5d8a, 0x5d8b);
+    CYCT(b_+19, b_+20);
     ret_effect(gb);
     return;
   }
-  CYC(0x5d8a, 0x5d8b);
-  CYC(0x5d8b, 0x5d8e);
+  CYC(b_+19, b_+20);
+  CYC(b_+20, SYM(cutscene0f));
   applyWarpTransition2_hook(gb);
 }
 
 void cutscene0f_hook(GB *gb) {
+  BASE(cutscene0f);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5d8e, refreshLoadedTreeGfx_hook, 0x1613, 0x5d91);
-  CYC(0x5d91, 0x5d93); E = 0x02;
-  CYC(0x5d93, 0x5d96);
+  CALL_C(b_+0, refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+3);
+  CYC(b_+3, b_+5); E = 0x02;
+  CYC(b_+5, SYM(cutscene0a));
   endgameCutsceneHandler_hook(gb);
 }
 
 void cutscene0a_hook(GB *gb) {
-  CYC(0x5d96, 0x5d98); E = 0x01;
-  CYC(0x5d98, 0x5d9b);
+  BASE(cutscene0a);
+  CYC(b_+0, b_+2); E = 0x01;
+  CYC(b_+2, SYM(cutscene20));
   endgameCutsceneHandler_hook(gb);
 }
 
 void cutscene20_hook(GB *gb) {
+  BASE(cutscene20);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5d9b, refreshLoadedTreeGfx_hook, 0x1613, 0x5d9e);
-  CYC(0x5d9e, 0x5da0); E = 0x03;
-  CYC(0x5da0, 0x5da2);
+  CALL_C(b_+0, refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+3);
+  CYC(b_+3, b_+5); E = 0x03;
+  CYC(b_+5, SYM(cutscene0d));
   cutscene_endgameTail_hook(gb);
 }
 
 void cutscene0d_hook(GB *gb) {
+  BASE(cutscene0d);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5da2, refreshLoadedTreeGfx_hook, 0x1613, 0x5da5);
-  CYC(0x5da5, 0x5da7); C = 0x06;
-  CYC(0x5da7, 0x5daa); SET_HL(0x6306);
-  CYC(0x5daa, 0x5dac); E = 0x03;
-  CYC(0x5dac, 0x5daf);
+  CALL_C(b_+0, refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+3);
+  CYC(b_+3, b_+5); C = 0x06;
+  CYC(b_+5, b_+8); SET_HL((SYM(checkLinkCanStandOnTile) + 29));
+  CYC(b_+8, b_+10); E = 0x03;
+  CYC(b_+10, SYM(cutscene0e));
   interBankCall_hook(gb);
 }
 
 void cutscene0e_hook(GB *gb) {
+  BASE(cutscene0e);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5daf, refreshLoadedTreeGfx_hook, 0x1613, 0x5db2);
-  CYC(0x5db2, 0x5db5); A = W8(wWarpTransition2);
-  CYC(0x5db5, 0x5db6); alu_or(gb, A);
+  CALL_C(b_+0, refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+3);
+  CYC(b_+3, b_+6); A = W8(wWarpTransition2);
+  CYC(b_+6, b_+7); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x5db6, 0x5db8);
+    CYCT(b_+7, b_+9);
     applyWarpTransition2_hook(gb);
     return;
   }
-  CYC(0x5db6, 0x5db8);
-  CYC(0x5db8, 0x5dba); C = 0x05;
-  CYC(0x5dba, 0x5dbd); SET_HL(0x6306);
-  CYC(0x5dbd, 0x5dbf); E = 0x03;
-  CYC(0x5dbf, 0x5dc2);
+  CYC(b_+7, b_+9);
+  CYC(b_+9, b_+11); C = 0x05;
+  CYC(b_+11, b_+14); SET_HL((SYM(checkLinkCanStandOnTile) + 29));
+  CYC(b_+14, b_+16); E = 0x03;
+  CYC(b_+16, SYM(cutscene21));
   interBankCall_hook(gb);
 }
 
 void cutscene21_hook(GB *gb) {
-  CYC(0x5dc2, 0x5dc5); A = W8(wCutsceneTrigger);
-  CYC(0x5dc5, 0x5dc6); alu_or(gb, A);
+  BASE(cutscene21);
+  CYC(b_+0, b_+3); A = W8(wCutsceneTrigger);
+  CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x5dc6, 0x5dc9);
+    CYCT(b_+4, b_+7);
     setCutsceneIndexIfCutsceneTriggerSet_hook(gb);
     return;
   }
-  CYC(0x5dc6, 0x5dc9);
-  CYC(0x5dc9, 0x5dcb); C = 0x07;
-  CYC(0x5dcb, 0x5dcd);
+  CYC(b_+4, b_+7);
+  CYC(b_+7, b_+9); C = 0x07;
+  CYC(b_+9, SYM(cutscene10));
   func_5d5d_hook(gb);
 }
 
 void cutscene10_hook(GB *gb) {
-  CYC(0x5dcd, 0x5dcf); C = 0x04;
-  CYC(0x5dcf, 0x5dd1);
+  BASE(cutscene10);
+  CYC(b_+0, b_+2); C = 0x04;
+  CYC(b_+2, SYM(cutscene11));
   func_5d5d_hook(gb);
 }
 
 void cutscene11_hook(GB *gb) {
+  BASE(cutscene11);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5dd1, func_3ed0_hook, 0x3ed0, 0x5dd4);
-  CYC(0x5dd4, 0x5dd7);
+  CALL_C(b_+0, func_3ed0_hook, SYM(func_3ed0), b_+3);
+  CYC(b_+3, SYM(cutscene12));
   func_5d41_hook(gb);
 }
 
 void cutscene12_hook(GB *gb) {
+  BASE(cutscene12);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5dd7, 0x5dda); A = mem_rd(gb, wCutsceneTrigger);
-  CYC(0x5dda, 0x5ddb); alu_or(gb, A);
+  CYC(b_+0, b_+3); A = mem_rd(gb, wCutsceneTrigger);
+  CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x5ddb, 0x5dde);
+    CYCT(b_+4, b_+7);
     setCutsceneIndexIfCutsceneTriggerSet_hook(gb);
     return;
   }
-  CYC(0x5ddb, 0x5dde);
-  CALL_C(0x5dde, func_3ee4_hook, 0x3ee4, 0x5de1);
-  CYC(0x5de1, 0x5de4);
+  CYC(b_+4, b_+7);
+  CALL_C(b_+7, func_3ee4_hook, SYM(func_3ee4), b_+10);
+  CYC(b_+10, SYM(cutscene16));
   func_5d41_hook(gb);
 }

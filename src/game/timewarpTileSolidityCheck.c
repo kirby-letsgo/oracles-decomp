@@ -3,82 +3,85 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x01, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x01, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(checkSolidObjectAtWarpDestPos), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(checkSolidObjectAtWarpDestPos), (from), (to), true)
 
 void checkSolidObjectAtWarpDestPos_hook(GB *gb) {
+  BASE(checkSolidObjectAtWarpDestPos);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x62c4, 0x62c6); A = 0x02;
-  CYC(0x62c6, 0x62c8); hram_wr(gb, IO_SVBK - 0xff00, A);
-  CYC(0x62c8, 0x62cb); A = W8(wWarpDestPos);
-  CYC(0x62cb, 0x62ce); SET_HL(w2SolidObjectPositions);
-  CALL_C(0x62ce, checkFlag_hook, 0x0205, 0x62d1);
-  CYC(0x62d1, 0x62d3); C = 0x00;
+  CYC(b_+0, b_+2); A = 0x02;
+  CYC(b_+2, b_+4); hram_wr(gb, IO_SVBK - 0xff00, A);
+  CYC(b_+4, b_+7); A = W8(wWarpDestPos);
+  CYC(b_+7, b_+10); SET_HL(w2SolidObjectPositions);
+  CALL_C(b_+10, checkFlag_hook, SYM(checkFlag), b_+13);
+  CYC(b_+13, b_+15); C = 0x00;
   if (F & FZ) {
-    CYCT(0x62d3, 0x62d5);
+    CYCT(b_+15, b_+17);
   } else {
-    CYC(0x62d3, 0x62d5);
-    CYC(0x62d5, 0x62d6); C = alu_inc8(gb, C);
+    CYC(b_+15, b_+17);
+    CYC(b_+17, b_+18); C = alu_inc8(gb, C);
   }
-  CYC(0x62d6, 0x62d7); alu_xor(gb, A);
-  CYC(0x62d7, 0x62d9); hram_wr(gb, IO_SVBK - 0xff00, A);
-  CYC(0x62d9, 0x62da); ret_effect(gb);
+  CYC(b_+18, b_+19); alu_xor(gb, A);
+  CYC(b_+19, b_+21); hram_wr(gb, IO_SVBK - 0xff00, A);
+  CYC(b_+21, SYM(clearSolidObjectPositions)); ret_effect(gb);
 }
 
 void clearSolidObjectPositions_hook(GB *gb) {
+  BASE(clearSolidObjectPositions);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x62da, 0x62dc); A = 0x02;
-  CYC(0x62dc, 0x62de); hram_wr(gb, IO_SVBK - 0xff00, A);
-  CYC(0x62de, 0x62e0); B = 0x10;
-  CYC(0x62e0, 0x62e3); SET_HL(w2SolidObjectPositions);
-  CALL_C(0x62e3, clearMemory_hook, 0x046f, 0x62e6);
-  CYC(0x62e6, 0x62e8); hram_wr(gb, IO_SVBK - 0xff00, A);
-  CYC(0x62e8, 0x62e9); ret_effect(gb);
+  CYC(b_+0, b_+2); A = 0x02;
+  CYC(b_+2, b_+4); hram_wr(gb, IO_SVBK - 0xff00, A);
+  CYC(b_+4, b_+6); B = 0x10;
+  CYC(b_+6, b_+9); SET_HL(w2SolidObjectPositions);
+  CALL_C(b_+9, clearMemory_hook, SYM(clearMemory), b_+12);
+  CYC(b_+12, b_+14); hram_wr(gb, IO_SVBK - 0xff00, A);
+  CYC(b_+14, SYM(checkLinkCanStandOnTile)); ret_effect(gb);
 }
 
 void checkLinkCanStandOnTile_hook(GB *gb) {
+  BASE(checkLinkCanStandOnTile);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x62e9, 0x62ec); A = W8(w1Link_yh);
-  CYC(0x62ec, 0x62ed); B = A;
-  CYC(0x62ed, 0x62f0); A = W8(w1Link_xh);
-  CYC(0x62f0, 0x62f1); C = A;
-  CYC(0x62f1, 0x62f4); SET_HL(0x5e92);
-  CYC(0x62f4, 0x62f6); E = 0x05;
-  CALL_C(0x62f6, interBankCall_hook, 0x008a, 0x62f9);
-  CYC(0x62f9, 0x62fb); B = alu_rl(gb, B);
+  CYC(b_+0, b_+3); A = W8(w1Link_yh);
+  CYC(b_+3, b_+4); B = A;
+  CYC(b_+4, b_+7); A = W8(w1Link_xh);
+  CYC(b_+7, b_+8); C = A;
+  CYC(b_+8, b_+11); SET_HL((SYM(checkDisplayEraOrSeasonInfo) + 21));
+  CYC(b_+11, b_+13); E = 0x05;
+  CALL_C(b_+13, interBankCall_hook, 0x008a, b_+16);
+  CYC(b_+16, b_+18); B = alu_rl(gb, B);
   if (F & FC) {
-    CYCT(0x62fb, 0x62fd);
+    CYCT(b_+18, b_+20);
     goto invalid_tile;
   }
-  CYC(0x62fb, 0x62fd);
-  CALL_C(0x62fd, objectGetTileAtPosition_hook, 0x1444, 0x6300);
-  CYC(0x6300, 0x6301); E = mem_rd(gb, HL);
-  CYC(0x6301, 0x6304); SET_HL(0x6317);
-  CALL_C(0x6304, lookupKey_hook, 0x1e06, 0x6307);
+  CYC(b_+18, b_+20);
+  CALL_C(b_+20, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+23);
+  CYC(b_+23, b_+24); E = mem_rd(gb, HL);
+  CYC(b_+24, b_+27); SET_HL(SYM(invalidTimewarpTileList));
+  CALL_C(b_+27, lookupKey_hook, SYM(lookupKey), b_+30);
   if (F & FC) {
-    CYCT(0x6307, 0x6309);
+    CYCT(b_+30, b_+32);
   } else {
-    CYC(0x6307, 0x6309);
-    CYC(0x6309, 0x630b); C = 0x00;
-    CYC(0x630b, 0x630c); ret_effect(gb);
+    CYC(b_+30, b_+32);
+    CYC(b_+32, b_+34); C = 0x00;
+    CYC(b_+34, b_+35); ret_effect(gb);
     return;
   }
-  CYC(0x630c, 0x630d); alu_or(gb, A);
-  CYC(0x630d, 0x630f); A = 0x4a;
+  CYC(b_+35, b_+36); alu_or(gb, A);
+  CYC(b_+36, b_+38); A = 0x4a;
   if (!(F & FZ)) {
-    CALL_C_CC(0x630f, checkTreasureObtained_hook, 0x1748, 0x6312);
+    CALL_C_CC(b_+38, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+41);
   } else {
-    CYC(0x630f, 0x6312);
+    CYC(b_+38, b_+41);
   }
   if (F & FC) {
-    CYCT(0x6312, 0x6314);
-    CYC(0x6309, 0x630b); C = 0x00;
-    CYC(0x630b, 0x630c); ret_effect(gb);
+    CYCT(b_+41, b_+43);
+    CYC(b_+32, b_+34); C = 0x00;
+    CYC(b_+34, b_+35); ret_effect(gb);
     return;
   }
-  CYC(0x6312, 0x6314);
+  CYC(b_+41, b_+43);
 
 invalid_tile:
-  CYC(0x6314, 0x6316); C = 0x01;
-  CYC(0x6316, 0x6317); ret_effect(gb);
+  CYC(b_+43, b_+45); C = 0x01;
+  CYC(b_+45, SYM(invalidTimewarpTileList)); ret_effect(gb);
 }

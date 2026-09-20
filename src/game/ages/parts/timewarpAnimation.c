@@ -3,46 +3,47 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x11, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x11, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(partCode2b), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(partCode2b), (from), (to), true)
 
 void partCode2b_hook(GB *gb) {
+  BASE(partCode2b);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6124, 0x6126); E = 0xc4; // Part.state
-  CYC(0x6126, 0x6127); A = mem_rd(gb, DE);
-  CYC(0x6127, 0x6128); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x6128, 0x612a); goto state1; } // jr nz
-  CYC(0x6128, 0x612a);
-  CYC(0x612a, 0x612b); A = alu_inc8(gb, A);
-  CYC(0x612b, 0x612c); mem_wr(gb, DE, A);
-  CYC(0x612c, 0x612d); H = D;
-  CYC(0x612d, 0x612f); L = 0xc0;
-  CYC(0x612f, 0x6131); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
+  CYC(b_+0, b_+2); E = 0xc4; // Part.state
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+4, b_+6); goto state1; } // jr nz
+  CYC(b_+4, b_+6);
+  CYC(b_+6, b_+7); A = alu_inc8(gb, A);
+  CYC(b_+7, b_+8); mem_wr(gb, DE, A);
+  CYC(b_+8, b_+9); H = D;
+  CYC(b_+9, b_+11); L = 0xc0;
+  CYC(b_+11, b_+13); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
 
 state1:
-  CALL_C(0x6131, objectApplySpeed_hook, 0x201d, 0x6134);
-  CYC(0x6134, 0x6136); E = 0xcb; // Part.yh
-  CYC(0x6136, 0x6137); A = mem_rd(gb, DE);
-  CYC(0x6137, 0x6139); alu_add(gb, 0x04);
-  CYC(0x6139, 0x613b); alu_cp(gb, 0xf4);
-  if (!(F & FC)) { CYCT(0x613b, 0x613e); partDelete_hook(gb); return; } // jp nc
-  CYC(0x613b, 0x613e);
-  CYC(0x613e, 0x6140); A = 0x04;
-  CALL_C(0x6140, objectGetRelatedObject1Var_hook, 0x2160, 0x6143);
-  CYC(0x6143, 0x6144); A = mem_rd(gb, HL);
-  CYC(0x6144, 0x6146); alu_cp(gb, 0x03);
-  CYC(0x6146, 0x6148); E = 0xc2; // Part.subid
-  CYC(0x6148, 0x6149); A = mem_rd(gb, DE);
-  if (F & FC) { CYCT(0x6149, 0x614b); goto relatedObj1_stateLessThan3; } // jr c
-  CYC(0x6149, 0x614b);
-  CYC(0x614b, 0x614d); alu_bit(gb, 1, A);
-  if (!(F & FZ)) { CYCT(0x614d, 0x6150); partDelete_hook(gb); return; } // jp nz
+  CALL_C(b_+13, objectApplySpeed_hook, SYM(objectApplySpeed), b_+16);
+  CYC(b_+16, b_+18); E = 0xcb; // Part.yh
+  CYC(b_+18, b_+19); A = mem_rd(gb, DE);
+  CYC(b_+19, b_+21); alu_add(gb, 0x04);
+  CYC(b_+21, b_+23); alu_cp(gb, 0xf4);
+  if (!(F & FC)) { CYCT(b_+23, b_+26); partDelete_hook(gb); return; } // jp nc
+  CYC(b_+23, b_+26);
+  CYC(b_+26, b_+28); A = 0x04;
+  CALL_C(b_+28, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+31);
+  CYC(b_+31, b_+32); A = mem_rd(gb, HL);
+  CYC(b_+32, b_+34); alu_cp(gb, 0x03);
+  CYC(b_+34, b_+36); E = 0xc2; // Part.subid
+  CYC(b_+36, b_+37); A = mem_rd(gb, DE);
+  if (F & FC) { CYCT(b_+37, b_+39); goto relatedObj1_stateLessThan3; } // jr c
+  CYC(b_+37, b_+39);
+  CYC(b_+39, b_+41); alu_bit(gb, 1, A);
+  if (!(F & FZ)) { CYCT(b_+41, b_+44); partDelete_hook(gb); return; } // jp nz
 
 relatedObj1_stateLessThan3:
-  CYC(0x6150, 0x6152); L = 0x61;
-  CYC(0x6152, 0x6153); alu_xor(gb, mem_rd(gb, HL));
-  CYC(0x6153, 0x6154); alu_rrca(gb);
-  if (F & FC) { CYCT(0x6154, 0x6157); objectSetInvisible_hook(gb); return; } // jp c
-  CYC(0x6154, 0x6157);
-  CYC(0x6157, 0x615a); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+44, b_+46); L = 0x61;
+  CYC(b_+46, b_+47); alu_xor(gb, mem_rd(gb, HL));
+  CYC(b_+47, b_+48); alu_rrca(gb);
+  if (F & FC) { CYCT(b_+48, b_+51); objectSetInvisible_hook(gb); return; } // jp c
+  CYC(b_+48, b_+51);
+  CYC(b_+51, SYM(partCode2c)); objectSetVisible83_hook(gb); return; // jp
 }

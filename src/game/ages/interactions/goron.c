@@ -3,10 +3,10 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x09, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x09, (from), (to), true)
-#define CYC15(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT15(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode66), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode66), (from), (to), true)
+#define CYC15(from, to) burn_rom(gb, SYMBANK(goronDance_clearVariables), (from), (to), false)
+#define CYCT15(from, to) burn_rom(gb, SYMBANK(goronDance_giveRandomRingPrize), (from), (to), true)
 #define CALL_C15(a, fn, target, ra) do { CYC15((a), (a) + 3); CALL_C_((a), fn, (target), (ra)); } while (0)
 
 void goron_setLinkPositionAndDirection_hook(GB *gb);
@@ -114,515 +114,543 @@ static void goron_add_a_to_hl(GB *gb, uint16_t return_address) {
 }
 
 void interactionCode66_hook(GB *gb) {
+  BASE(interactionCode66);
   uint16_t sp0_ = gb->sp;
-  CYC(0x754e, 0x7550); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7550, 0x7551); A = mem_rd(gb, DE);
-  CYC(0x7551, 0x7552); push_effect(gb, 0x7552);
-  switch (goron_jump_table(gb)) {
-    case 0x7574: goronSubid00_hook(gb); return;
-	case 0x776b: goronSubid01_hook(gb); return;
-    case 0x77b5: goronSubid02_hook(gb); return;
-    case 0x7807: goronSubid03_hook(gb); return;
-    case 0x781b: goronSubid05_hook(gb); return;
-    case 0x7828: goronSubid06_hook(gb); return;
-    case 0x784c: goronSubid07_hook(gb); return;
-    case 0x7867: goronSubid09_hook(gb); return;
-    case 0x789a: goronSubid0b_hook(gb); return;
-    case 0x78b2: goronSubid0f_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, (SYM(patch_upstairsRepairSwordScript_body__saidYes1) + 3));
+  do { uint16_t jt_ = (goron_jump_table(gb));
+    if (jt_ == (SYM(patch_downstairsScript_body__npcLoop) + 12)) { goronSubid00_hook(gb); return; }
+    else if (jt_ == (SYM(zeldaSubid01Script_body) + 16)) { goronSubid01_hook(gb); return; }
+    else if (jt_ == (SYM(zeldaSubid05Script_body) + 2)) { goronSubid02_hook(gb); return; }
+    else if (jt_ == (SYM(symmetryNpc_setRoomFlagIfTalkedToRightSister) + 5)) { goronSubid03_hook(gb); return; }
+    else if (jt_ == (SYM(symmetryNpc_getTuniNutStateForSister) + 14)) { goronSubid05_hook(gb); return; }
+    else if (jt_ == (SYM(symmetryNpc_getTuniNutStateForSister) + 27)) { goronSubid06_hook(gb); return; }
+    else if (jt_ == (SYM(symmetryNpcSubid8And9Script_b15) + 3)) { goronSubid07_hook(gb); return; }
+    else if (jt_ == (SYM(symmetryNpcSubid8And9Script__saidYes_b15) + 2)) { goronSubid09_hook(gb); return; }
+    else if (jt_ == (SYM(symmetryNpcSubid8And9Script__postgameLoop_b15) + 9)) { goronSubid0b_hook(gb); return; }
+    else if (jt_ == (SYM(symmetryNpcSubid8And9Script__validSecret_b15) + 3)) { goronSubid0f_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void goronDance_updateFrameCounter_hook(GB *gb) {
+  BASE(goronDance_updateFrameCounter);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(0x78d0, 0x78d3); A = W8(wTmpcfc0_goronDance_linkStartedDance);
-  CYC(0x78d3, 0x78d4); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x78d4, 0x78d5); ret_effect(gb); return; }
-  CYC(0x78d4, 0x78d5);
-  CYC(0x78d5, 0x78d8); SET_HL(wTmpcfc0_goronDance_frameCounter);
-  CYC(0x78d8, 0x78db); incHlRef16WithCap_hook(gb);
+  CYC(b_+0, b_+3); A = W8(wTmpcfc0_goronDance_linkStartedDance);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
+  CYC(b_+4, b_+5);
+  CYC(b_+5, b_+8); SET_HL(wTmpcfc0_goronDance_frameCounter);
+  CYC(b_+8, SYM(goronDance_initNextRound)); incHlRef16WithCap_hook(gb);
 }
 
 void goronDance_initNextRound_hook(GB *gb) {
+  BASE(goronDance_initNextRound);
   uint16_t sp0_ = gb->sp;
-  CYC(0x78db, 0x78de); A = W8(wTmpcfc0_goronDance_remainingRounds);
-  CYC(0x78de, 0x78df); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x78df, 0x78e1); goronDance_clearDanceVariables_hook(gb); return; }
-  CYC(0x78df, 0x78e1);
-  CYC(0x78e1, 0x78e4); SET_HL(0x5793);
-  CYC(0x78e4, 0x78e6); E = 0x08;
-  CALL_C(0x78e6, interBankCall_hook, 0x008a, 0x78e9);
+  CYC(b_+0, b_+3); A = W8(wTmpcfc0_goronDance_remainingRounds);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+4, b_+6); goronDance_clearDanceVariables_hook(gb); return; }
+  CYC(b_+4, b_+6);
+  CYC(b_+6, b_+9); SET_HL((SYM(ralphSubid0cScript_b15) + 21));
+  CYC(b_+9, b_+11); E = 0x08;
+  CALL_C((SYM(symmetryNpcSubid6And7Script__talkedToSisters_b15) + 1), interBankCall_hook, 0x008a, (SYM(symmetryNpcSubid6And7Script__talkedToSisters_b15) + 4));
   goronDance_clearDanceVariables_hook(gb);
 }
 
 void goronDance_clearDanceVariables_hook(GB *gb) {
-  CYC(0x78e9, 0x78ea); alu_xor(gb, A);
-  CYC(0x78ea, 0x78ed); W8(wTmpcfc0_goronDance_linkJumping) = A;
-  CYC(0x78ed, 0x78f0); W8(wTmpcfc0_goronDance_linkStartedDance) = A;
-  CYC(0x78f0, 0x78f3); W8(wTmpcfc0_goronDance_frameCounter) = A;
-  CYC(0x78f3, 0x78f6); mem_wr(gb, wTmpcfc0_goronDance_frameCounter + 1, A);
-  CYC(0x78f6, 0x78f9); W8(wTmpcfc0_goronDance_currentMove) = A;
-  CYC(0x78f9, 0x78fc); W8(wTmpcfc0_goronDance_consecutiveBPressCounter) = A;
-  CYC(0x78fc, 0x78ff); W8(wTmpcfc0_goronDance_cfd9) = A;
-  CYC(0x78ff, 0x7902); W8(wTmpcfc0_goronDance_beat) = A;
-  CYC(0x7902, 0x7903); ret_effect(gb);
+  BASE(goronDance_clearDanceVariables);
+  CYC(b_+0, b_+1); alu_xor(gb, A);
+  CYC(b_+1, b_+4); W8(wTmpcfc0_goronDance_linkJumping) = A;
+  CYC(b_+4, b_+7); W8(wTmpcfc0_goronDance_linkStartedDance) = A;
+  CYC(b_+7, b_+10); W8(wTmpcfc0_goronDance_frameCounter) = A;
+  CYC(b_+10, b_+13); mem_wr(gb, wTmpcfc0_goronDance_frameCounter + 1, A);
+  CYC(b_+13, b_+16); W8(wTmpcfc0_goronDance_currentMove) = A;
+  CYC(b_+16, b_+19); W8(wTmpcfc0_goronDance_consecutiveBPressCounter) = A;
+  CYC(b_+19, b_+22); W8(wTmpcfc0_goronDance_cfd9) = A;
+  CYC(b_+22, b_+25); W8(wTmpcfc0_goronDance_beat) = A;
+  CYC(b_+25, SYM(goronDance_checkLinkInput)); ret_effect(gb);
 }
 
 void goronDance_getCurrentAndNeededFrameCounts_hook(GB *gb) {
+  BASE(goronDance_getCurrentAndNeededFrameCounts);
   uint16_t sp0_ = gb->sp;
-  CYC(0x79ed, 0x79f0); A = W8(wTmpcfc0_goronDance_beat);
-  CYC(0x79f0, 0x79f1); push_effect(gb, AF);
-  CALL_C(0x79f1, multiplyABy4_hook, 0x01c3, 0x79f4);
-  CYC(0x79f4, 0x79f5); L = C;
-  CYC(0x79f5, 0x79f6); H = B;
-  CYC(0x79f6, 0x79f7); SET_AF(pop_effect(gb));
-  CALL_C(0x79f7, multiplyABy16_hook, 0x01ac, 0x79fa);
-  CYC(0x79fa, 0x79fb); alu_add_hl(gb, BC);
-  CYC(0x79fb, 0x79fe); A = W8(wTmpcfc0_goronDance_frameCounter);
-  CYC(0x79fe, 0x79ff); C = A;
-  CYC(0x79ff, 0x7a02); A = mem_rd(gb, wTmpcfc0_goronDance_frameCounter + 1);
-  CYC(0x7a02, 0x7a03); B = A;
-  CYC(0x7a03, 0x7a04); ret_effect(gb);
+  CYC(b_+0, b_+3); A = W8(wTmpcfc0_goronDance_beat);
+  CYC(b_+3, b_+4); push_effect(gb, AF);
+  CALL_C((SYM(troySubid0Script__validSecret_b15) + 6), multiplyABy4_hook, SYM(multiplyABy4), (SYM(troySubid0Script__alreadyBeganSecret_b15) + 2));
+  CYC(b_+7, b_+8); L = C;
+  CYC(b_+8, b_+9); H = B;
+  CYC(b_+9, b_+10); SET_AF(pop_effect(gb));
+  CALL_C((SYM(troySubid0Script__askToBeginGame_b15) + 2), multiplyABy16_hook, SYM(multiplyABy16), (SYM(troySubid0Script__askToBeginGame_b15) + 5));
+  CYC(b_+13, b_+14); alu_add_hl(gb, BC);
+  CYC(b_+14, b_+17); A = W8(wTmpcfc0_goronDance_frameCounter);
+  CYC(b_+17, b_+18); C = A;
+  CYC(b_+18, b_+21); A = mem_rd(gb, wTmpcfc0_goronDance_frameCounter + 1);
+  CYC(b_+21, b_+22); B = A;
+  CYC(b_+22, SYM(goronDance_playMoveSound)); ret_effect(gb);
 }
 
 void goronDance_checkInputNotTooEarlyOrLate_hook(GB *gb) {
+  BASE(goronDance_checkInputNotTooEarlyOrLate);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x79ac, goronDance_getCurrentAndNeededFrameCounts_hook, 0x79ed, 0x79af);
-  CYC(0x79af, 0x79b1); A = 8;
-  CYC(0x79b1, 0x79b2); goron_add_a_to_hl(gb, 0x79b2);
-  CYC(0x79b2, 0x79b4); A = 8;
-  CALL_C(0x79b4, addAToBc_hook, 0x006d, 0x79b7);
-  CYC(0x79b7, 0x79b8); push_effect(gb, BC);
-  CYC(0x79b8, 0x79ba); B = 0xff;
-  CYC(0x79ba, 0x79bc); C = 0xf8;
-  CYC(0x79bc, 0x79bd); alu_add_hl(gb, BC);
-  CYC(0x79bd, 0x79be); SET_BC(pop_effect(gb));
-  CALL_C(0x79be, compareHlToBc_hook, 0x01d6, 0x79c1);
-  CYC(0x79c1, 0x79c3); alu_cp(gb, 1);
-  if (F & FZ) { CYCT(0x79c3, 0x79c5); goto too_early; }
-  CYC(0x79c3, 0x79c5);
-  CYC(0x79c5, 0x79c7); A = 0x10;
-  CYC(0x79c7, 0x79c8); goron_add_a_to_hl(gb, 0x79c8);
-  CALL_C(0x79c8, compareHlToBc_hook, 0x01d6, 0x79cb);
-  CYC(0x79cb, 0x79cd); alu_cp(gb, 0xff);
-  if (F & FZ) { CYCT(0x79cd, 0x79cf); goto too_late; }
-  CYC(0x79cd, 0x79cf); ret_effect(gb); return;
+  CALL_C((SYM(troy_chooseRandomAnimalText) + 5), goronDance_getCurrentAndNeededFrameCounts_hook, SYM(goronDance_getCurrentAndNeededFrameCounts), (SYM(troy_chooseRandomAnimalText) + 8));
+  CYC(b_+3, b_+5); A = 8;
+  CYC(b_+5, b_+6); goron_add_a_to_hl(gb, SYM(troySubid0Script_b15));
+  CYC(b_+6, b_+8); A = 8;
+  CALL_C((SYM(troySubid0Script_b15) + 2), addAToBc_hook, 0x006d, SYM(troySubid0Script__postgame_b15));
+  CYC(b_+11, b_+12); push_effect(gb, BC);
+  CYC(b_+12, b_+14); B = 0xff;
+  CYC(b_+14, b_+16); C = 0xf8;
+  CYC(b_+16, b_+17); alu_add_hl(gb, BC);
+  CYC(b_+17, b_+18); SET_BC(pop_effect(gb));
+  CALL_C((SYM(troySubid0Script__loop_b15) + 6), compareHlToBc_hook, SYM(compareHlToBc), (SYM(troySubid0Script__loop_b15) + 9));
+  CYC(b_+21, b_+23); alu_cp(gb, 1);
+  if (F & FZ) { CYCT(b_+23, b_+25); goto too_early; }
+  CYC(b_+23, b_+25);
+  CYC(b_+25, b_+27); A = 0x10;
+  CYC(b_+27, b_+28); goron_add_a_to_hl(gb, (SYM(troySubid0Script__loop_b15) + 16));
+  CALL_C((SYM(troySubid0Script__loop_b15) + 16), compareHlToBc_hook, SYM(compareHlToBc), (SYM(troySubid0Script__haventStartedGameYet_b15) + 1));
+  CYC(b_+31, b_+33); alu_cp(gb, 0xff);
+  if (F & FZ) { CYCT(b_+33, b_+35); goto too_late; }
+  CYC(b_+33, b_+35); ret_effect(gb); return;
 too_early:
-  CYC(0x79d0, 0x79d2); A = 0;
-  CYC(0x79d2, 0x79d5); W8(wTmpcfc0_goronDance_failureType) = A;
-  CYC(0x79d5, 0x79d6); ret_effect(gb); return;
+  CYC(b_+36, b_+38); A = 0;
+  CYC(b_+38, b_+41); W8(wTmpcfc0_goronDance_failureType) = A;
+  CYC(b_+41, b_+42); ret_effect(gb); return;
 too_late:
-  CYC(0x79d6, 0x79d8); A = 1;
-  CYC(0x79d8, 0x79db); W8(wTmpcfc0_goronDance_failureType) = A;
-  CYC(0x79db, 0x79dc); ret_effect(gb);
+  CYC(b_+42, b_+44); A = 1;
+  CYC(b_+44, b_+47); W8(wTmpcfc0_goronDance_failureType) = A;
+  CYC(b_+47, SYM(goronDance_checkTooLateToInput)); ret_effect(gb);
 }
 
 void goronDance_checkTooLateToInput_hook(GB *gb) {
+  BASE(goronDance_checkTooLateToInput);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x79dc, goronDance_getCurrentAndNeededFrameCounts_hook, 0x79ed, 0x79df);
-  CYC(0x79df, 0x79e1); A = 8;
-  CYC(0x79e1, 0x79e2); goron_add_a_to_hl(gb, 0x79e2);
-  CYC(0x79e2, 0x79e4);
-  CALL_C(0x79e7, compareHlToBc_hook, 0x01d6, 0x79ea);
-  CYC(0x79ea, 0x79ec); alu_cp(gb, 0xff);
-  CYC(0x79ec, 0x79ed); ret_effect(gb);
+  CALL_C(SYM(troySubid0Script__askForSecret_b15), goronDance_getCurrentAndNeededFrameCounts_hook, SYM(goronDance_getCurrentAndNeededFrameCounts), (SYM(troySubid0Script__askForSecret_b15) + 3));
+  CYC(b_+3, b_+5); A = 8;
+  CYC(b_+5, b_+6); goron_add_a_to_hl(gb, (SYM(troySubid0Script__askForSecret_b15) + 6));
+  CYC(b_+6, SYM(goronDance_checkExactInputTimePassed));
+  CALL_C((SYM(troySubid0Script__askForSecret_b15) + 11), compareHlToBc_hook, SYM(compareHlToBc), (SYM(troySubid0Script__askForSecret_b15) + 14));
+  CYC((SYM(goronDance_checkExactInputTimePassed) + 6), (SYM(goronDance_checkExactInputTimePassed) + 8)); alu_cp(gb, 0xff);
+  CYC((SYM(goronDance_checkExactInputTimePassed) + 8), SYM(goronDance_getCurrentAndNeededFrameCounts)); ret_effect(gb);
 }
 
 void goronDance_checkExactInputTimePassed_hook(GB *gb) {
+  BASE(troySubid0Script_b15);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x79e4, goronDance_getCurrentAndNeededFrameCounts_hook, 0x79ed, 0x79e7);
-  CALL_C(0x79e7, compareHlToBc_hook, 0x01d6, 0x79ea);
-  CYC(0x79ea, 0x79ec); alu_cp(gb, 0xff);
-  CYC(0x79ec, 0x79ed); ret_effect(gb);
+  CALL_C(b_+50, goronDance_getCurrentAndNeededFrameCounts_hook, SYM(goronDance_getCurrentAndNeededFrameCounts), b_+53);
+  CALL_C(b_+53, compareHlToBc_hook, SYM(compareHlToBc), b_+56);
+  CYC((SYM(goronDance_checkExactInputTimePassed) + 6), (SYM(goronDance_checkExactInputTimePassed) + 8)); alu_cp(gb, 0xff);
+  CYC((SYM(goronDance_checkExactInputTimePassed) + 8), SYM(goronDance_getCurrentAndNeededFrameCounts)); ret_effect(gb);
 }
 
 void goronDance_playMoveSound_hook(GB *gb) {
+  BASE(goronDance_playMoveSound);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(0x7a04, 0x7a07); A = W8(wTmpcfc0_goronDance_currentMove);
-  CYC(0x7a07, 0x7a09); alu_bit(gb, 7, A);
-  if (!(F & FZ)) { CYCT(0x7a09, 0x7a0a); ret_effect(gb); return; }
-  CYC(0x7a09, 0x7a0a);
-  CYC(0x7a0a, 0x7a0c); alu_cp(gb, 0);
-  if (F & FZ) { CYCT(0x7a0c, 0x7a0d); ret_effect(gb); return; }
-  CYC(0x7a0c, 0x7a0d);
-  CYC(0x7a0d, 0x7a0f); alu_cp(gb, 2);
-  if (F & FZ) { CYCT(0x7a0f, 0x7a11); A = 0xcd; CYC(0x7a16, 0x7a1b); playSound_b00_hook(gb); return; }
-  CYC(0x7a0f, 0x7a11);
-  CYC(0x7a11, 0x7a13); A = 0xc8;
-  CYC(0x7a13, 0x7a16); playSound_b00_hook(gb);
+  CYC(b_+0, b_+3); A = W8(wTmpcfc0_goronDance_currentMove);
+  CYC(b_+3, b_+5); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+8); alu_cp(gb, 0);
+  if (F & FZ) { CYCT(b_+8, b_+9); ret_effect(gb); return; }
+  CYC(b_+8, b_+9);
+  CYC(b_+9, b_+11); alu_cp(gb, 2);
+  if (F & FZ) { CYCT(b_+11, b_+13); A = 0xcd; CYC(b_+18, SYM(goronDance_incBeat)); playSound_b00_hook(gb); return; }
+  CYC(b_+11, b_+13);
+  CYC(b_+13, b_+15); A = 0xc8;
+  CYC(b_+15, b_+18); playSound_b00_hook(gb);
 }
 
 void goronDance_incBeat_hook(GB *gb) {
-  CYC(0x7a1b, 0x7a1e); SET_HL(wTmpcfc0_goronDance_beat);
-  CYC(0x7a1e, 0x7a1f); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x7a1f, 0x7a20); ret_effect(gb);
+  BASE(goronDance_incBeat);
+  CYC(b_+0, b_+3); SET_HL(wTmpcfc0_goronDance_beat);
+  CYC(b_+3, b_+4); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+4, SYM(goronDance_getNextMove)); ret_effect(gb);
 }
 
 void goronDance_getNextMove_hook(GB *gb) {
-  CYC(0x7a20, 0x7a23); A = W8(wTmpcfc0_goronDance_danceLevel);
-  CYC(0x7a23, 0x7a26); SET_HL(0x7aea);
-  CYC(0x7a26, 0x7a27); goron_add_double_index(gb, 0x7a27);
-  CYC(0x7a27, 0x7a28); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x7a28, 0x7a29); H = mem_rd(gb, HL);
-  CYC(0x7a29, 0x7a2a); L = A;
-  CYC(0x7a2a, 0x7a2d); A = W8(wTmpcfc0_goronDance_dancePattern);
-  CYC(0x7a2d, 0x7a2f); A = alu_swap(gb, A);
-  CYC(0x7a2f, 0x7a30); B = A;
-  CYC(0x7a30, 0x7a33); A = W8(wTmpcfc0_goronDance_beat);
-  CYC(0x7a33, 0x7a34); alu_add(gb, B);
-  CYC(0x7a34, 0x7a35); goron_add_a_to_hl(gb, 0x7a35);
-  CYC(0x7a35, 0x7a36); A = mem_rd(gb, HL);
-  CYC(0x7a36, 0x7a39); W8(wTmpcfc0_goronDance_currentMove) = A;
-  CYC(0x7a39, 0x7a3b); alu_bit(gb, 7, A);
-  CYC(0x7a3b, 0x7a3c); ret_effect(gb);
+  BASE(goronDance_getNextMove);
+  CYC(b_+0, b_+3); A = W8(wTmpcfc0_goronDance_danceLevel);
+  CYC(b_+3, b_+6); SET_HL((SYM(plenSubid0Script__loop_b15) + 15));
+  CYC(b_+6, b_+7); goron_add_double_index(gb, (SYM(troySubid0Script__giveReward_b15) + 1));
+  CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+8, b_+9); H = mem_rd(gb, HL);
+  CYC(b_+9, b_+10); L = A;
+  CYC(b_+10, b_+13); A = W8(wTmpcfc0_goronDance_dancePattern);
+  CYC(b_+13, b_+15); A = alu_swap(gb, A);
+  CYC(b_+15, b_+16); B = A;
+  CYC(b_+16, b_+19); A = W8(wTmpcfc0_goronDance_beat);
+  CYC(b_+19, b_+20); alu_add(gb, B);
+  CYC(b_+20, b_+21); goron_add_a_to_hl(gb, (SYM(troySubid0Script__alreadyDoneSecret_b15) + 5));
+  CYC(b_+21, b_+22); A = mem_rd(gb, HL);
+  CYC(b_+22, b_+25); W8(wTmpcfc0_goronDance_currentMove) = A;
+  CYC(b_+25, b_+27); alu_bit(gb, 7, A);
+  CYC(b_+27, SYM(goronDance_updateConsecutiveBPressCounter)); ret_effect(gb);
 }
 
 void goronDance_updateConsecutiveBPressCounter_hook(GB *gb) {
-  CYC(0x7a3c, 0x7a3f); SET_HL(wTmpcfc0_goronDance_consecutiveBPressCounter);
-  CYC(0x7a3f, 0x7a42); A = W8(wTmpcfc0_goronDance_currentMove);
-  CYC(0x7a42, 0x7a44); alu_cp(gb, 2);
-  if (F & FZ) { CYCT(0x7a44, 0x7a46); CYC(0x7a49, 0x7a4a); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); CYC(0x7a4a, 0x7a4b); ret_effect(gb); return; }
-  CYC(0x7a44, 0x7a46);
-  CYC(0x7a46, 0x7a48); mem_wr(gb, HL, 0);
-  CYC(0x7a48, 0x7a49); ret_effect(gb);
+  BASE(goronDance_updateConsecutiveBPressCounter);
+  CYC(b_+0, b_+3); SET_HL(wTmpcfc0_goronDance_consecutiveBPressCounter);
+  CYC(b_+3, b_+6); A = W8(wTmpcfc0_goronDance_currentMove);
+  CYC(b_+6, b_+8); alu_cp(gb, 2);
+  if (F & FZ) { CYCT(b_+8, b_+10); CYC(b_+13, b_+14); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); CYC(b_+14, SYM(goronDance_updateLinkAndBackupDancerAnimation)); ret_effect(gb); return; }
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+12); mem_wr(gb, HL, 0);
+  CYC(b_+12, b_+13); ret_effect(gb);
 }
 
 void goronDance_turnLinkToDirection_hook(GB *gb) {
-  CYC(0x7a72, 0x7a75); SET_HL(w1Link_direction);
-  CYC(0x7a75, 0x7a76); mem_wr(gb, HL, A);
-  CYC(0x7a76, 0x7a78); A = 0x10;
-  CYC(0x7a78, 0x7a7b); W8(wcc50) = A;
-  CYC(0x7a7b, 0x7a7c); alu_or(gb, D);
-  CYC(0x7a7c, 0x7a7d); ret_effect(gb);
+  BASE(goronDance_turnLinkToDirection);
+  CYC(b_+0, b_+3); SET_HL(w1Link_direction);
+  CYC(b_+3, b_+4); mem_wr(gb, HL, A);
+  CYC(b_+4, b_+6); A = 0x10;
+  CYC(b_+6, b_+9); W8(wcc50) = A;
+  CYC(b_+9, b_+10); alu_or(gb, D);
+  CYC(b_+10, SYM(goronDance_linkBButtonAnimations)); ret_effect(gb);
 }
 
 void goronDance_updateBackupDancerAnimation_hook(GB *gb) {
+  BASE(goronDance_updateBackupDancerAnimation);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7a83, checkIsLinkedGame_hook, 0x1992, 0x7a86);
-  if (F & FZ) { CYCT(0x7a86, 0x7a88); goto gorons; }
-  CYC(0x7a86, 0x7a88);
-  CYC(0x7a88, 0x7a8b); A = W8(wTilesetFlags);
-  CYC(0x7a8b, 0x7a8d); alu_and(gb, 0x80);
-  if (F & FZ) { CYCT(0x7a8d, 0x7a8f); goto gorons; }
-  CYC(0x7a8d, 0x7a8f);
-  CYC(0x7a8f, 0x7a92); A = W8(wTmpcfc0_goronDance_currentMove);
-  CYC(0x7a92, 0x7a94); alu_cp(gb, 1);
-  if (!(F & FZ)) { CYCT(0x7a94, 0x7a96); goto subrosian_b; }
-  CYC(0x7a94, 0x7a96);
-  CYC(0x7a96, 0x7a98); A = 6;
-  CYC(0x7a98, 0x7a9a); goto set_animation;
+  CALL_C(SYM(linkedNpc_checkShouldSpawn__checkd2_2), checkIsLinkedGame_hook, SYM(checkIsLinkedGame), (SYM(linkedNpc_checkShouldSpawn__checkd2_2) + 3));
+  if (F & FZ) { CYCT(b_+3, b_+5); goto gorons; }
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+8); A = W8(wTilesetFlags);
+  CYC(b_+8, b_+10); alu_and(gb, 0x80);
+  if (F & FZ) { CYCT(b_+10, b_+12); goto gorons; }
+  CYC(b_+10, b_+12);
+  CYC(b_+12, b_+15); A = W8(wTmpcfc0_goronDance_currentMove);
+  CYC(b_+15, b_+17); alu_cp(gb, 1);
+  if (!(F & FZ)) { CYCT(b_+17, b_+19); goto subrosian_b; }
+  CYC(b_+17, b_+19);
+  CYC(b_+19, b_+21); A = 6;
+  CYC(b_+21, b_+23); goto set_animation;
 subrosian_b:
-  CYC(0x7a9a, 0x7a9d); A = W8(wTmpcfc0_goronDance_consecutiveBPressCounter);
-  CYC(0x7a9d, 0x7aa0); SET_HL(0x7ac9);
-  CYC(0x7aa0, 0x7aa1); goron_add_a_to_hl(gb, 0x7aa1);
-  CYC(0x7aa1, 0x7aa2); A = mem_rd(gb, HL);
-  CYC(0x7aa2, 0x7aa4); alu_cp(gb, 0x50);
-  if (F & FZ) { CYCT(0x7aa4, 0x7aa5); ret_effect(gb); return; }
-  CYC(0x7aa4, 0x7aa5);
-  CYC(0x7aa5, 0x7aa8); W8(wTmpcfc0_goronDance_danceAnimation) = A;
-  CYC(0x7aa8, 0x7aa9); ret_effect(gb); return;
+  CYC(b_+23, b_+26); A = W8(wTmpcfc0_goronDance_consecutiveBPressCounter);
+  CYC(b_+26, b_+29); SET_HL((SYM(linkedNpc_calcLowTextIndex) + 12));
+  CYC(b_+29, b_+30); goron_add_a_to_hl(gb, (SYM(linkedNpc_checkHasExtraTextBox__data) + 9));
+  CYC(b_+30, b_+31); A = mem_rd(gb, HL);
+  CYC(b_+31, b_+33); alu_cp(gb, 0x50);
+  if (F & FZ) { CYCT(b_+33, b_+34); ret_effect(gb); return; }
+  CYC(b_+33, b_+34);
+  CYC(b_+34, b_+37); W8(wTmpcfc0_goronDance_danceAnimation) = A;
+  CYC(b_+37, b_+38); ret_effect(gb); return;
 gorons:
-  CYC(0x7aa9, 0x7aac); A = W8(wTmpcfc0_goronDance_currentMove);
-  CYC(0x7aac, 0x7aae); alu_cp(gb, 1);
-  if (!(F & FZ)) { CYCT(0x7aae, 0x7ab0); goto goron_b; }
-  CYC(0x7aae, 0x7ab0);
-  CYC(0x7ab0, 0x7ab2); A = 6;
-  CYC(0x7ab2, 0x7ab4); goto set_animation;
+  CYC(b_+38, b_+41); A = W8(wTmpcfc0_goronDance_currentMove);
+  CYC(b_+41, b_+43); alu_cp(gb, 1);
+  if (!(F & FZ)) { CYCT(b_+43, b_+45); goto goron_b; }
+  CYC(b_+43, b_+45);
+  CYC(b_+45, b_+47); A = 6;
+  CYC(b_+47, b_+49); goto set_animation;
 goron_b:
-  CYC(0x7ab4, 0x7ab7); A = W8(wTmpcfc0_goronDance_consecutiveBPressCounter);
-  CYC(0x7ab7, 0x7aba); SET_HL(0x7ac3);
-  CYC(0x7aba, 0x7abb); goron_add_a_to_hl(gb, 0x7abb);
-  CYC(0x7abb, 0x7abc); A = mem_rd(gb, HL);
-  CYC(0x7abc, 0x7abe); alu_cp(gb, 0x50);
-  if (F & FZ) { CYCT(0x7abe, 0x7abf); ret_effect(gb); return; }
-  CYC(0x7abe, 0x7abf);
+  CYC(b_+49, b_+52); A = W8(wTmpcfc0_goronDance_consecutiveBPressCounter);
+  CYC(b_+52, b_+55); SET_HL((SYM(linkedNpc_calcLowTextIndex) + 6));
+  CYC(b_+55, b_+56); goron_add_a_to_hl(gb, (SYM(linkedNpc_initHighTextIndex) + 3));
+  CYC(b_+56, b_+57); A = mem_rd(gb, HL);
+  CYC(b_+57, b_+59); alu_cp(gb, 0x50);
+  if (F & FZ) { CYCT(b_+59, b_+60); ret_effect(gb); return; }
+  CYC(b_+59, b_+60);
 set_animation:
-  CYC(0x7abf, 0x7ac2); W8(wTmpcfc0_goronDance_danceAnimation) = A;
-  CYC(0x7ac2, 0x7ac3); ret_effect(gb);
+  CYC(b_+60, b_+63); W8(wTmpcfc0_goronDance_danceAnimation) = A;
+  CYC(b_+63, SYM(goronDance_goronBAnimations)); ret_effect(gb);
 }
 
 void goronDance_updateLinkAndBackupDancerAnimation_hook(GB *gb) {
+  BASE(goronDance_updateLinkAndBackupDancerAnimation);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7a4b, goronDance_updateBackupDancerAnimation_hook, 0x7a83, 0x7a4e);
-  CYC(0x7a4e, 0x7a51); A = W8(wTmpcfc0_goronDance_currentMove);
-  CYC(0x7a51, 0x7a53); alu_cp(gb, 1);
-  if (!(F & FZ)) { CYCT(0x7a53, 0x7a55); goto b_button; }
-  CYC(0x7a53, 0x7a55);
-  CYC(0x7a55, 0x7a57); A = 8;
-  CYC(0x7a57, 0x7a5a); W8(wcc50) = A;
-  CYC(0x7a5a, 0x7a5b); alu_or(gb, D);
-  CYC(0x7a5b, 0x7a5c); ret_effect(gb); return;
+  CALL_C((SYM(troySubid1Script__loop_b15) + 14), goronDance_updateBackupDancerAnimation_hook, SYM(goronDance_updateBackupDancerAnimation), (SYM(troySubid1Script__loop_b15) + 17));
+  CYC(b_+3, b_+6); A = W8(wTmpcfc0_goronDance_currentMove);
+  CYC(b_+6, b_+8); alu_cp(gb, 1);
+  if (!(F & FZ)) { CYCT(b_+8, b_+10); goto b_button; }
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+12); A = 8;
+  CYC(b_+12, b_+15); W8(wcc50) = A;
+  CYC(b_+15, b_+16); alu_or(gb, D);
+  CYC(b_+16, b_+17); ret_effect(gb); return;
 b_button:
-  CYC(0x7a5c, 0x7a5f); A = W8(wTmpcfc0_goronDance_consecutiveBPressCounter);
-  CYC(0x7a5f, 0x7a62); SET_HL(0x7a7d);
-  CYC(0x7a62, 0x7a63); goron_add_a_to_hl(gb, 0x7a63);
-  CYC(0x7a63, 0x7a64); A = mem_rd(gb, HL);
-  CYC(0x7a64, 0x7a66); alu_cp(gb, 0x50);
-  if (F & FZ) { CYCT(0x7a66, 0x7a67); ret_effect(gb); return; }
-  CYC(0x7a66, 0x7a67);
-  CYC(0x7a67, 0x7a69); alu_cp(gb, 4);
-  if (!(F & FZ)) { CYCT(0x7a69, 0x7a6b); goronDance_turnLinkToDirection_hook(gb); return; }
-  CYC(0x7a69, 0x7a6b);
-  CYC(0x7a6b, 0x7a6d); A = 0x0e;
-  CYC(0x7a6d, 0x7a70); W8(wcc50) = A;
-  CYC(0x7a70, 0x7a71); alu_or(gb, D);
-  CYC(0x7a71, 0x7a72); ret_effect(gb);
+  CYC(b_+17, b_+20); A = W8(wTmpcfc0_goronDance_consecutiveBPressCounter);
+  CYC(b_+20, b_+23); SET_HL((SYM(linkedNpc_checkShouldSpawn__checkd1) + 4));
+  CYC(b_+23, b_+24); goron_add_a_to_hl(gb, (SYM(linkedNpc_checkShouldSpawn) + 15));
+  CYC(b_+24, b_+25); A = mem_rd(gb, HL);
+  CYC(b_+25, b_+27); alu_cp(gb, 0x50);
+  if (F & FZ) { CYCT(b_+27, b_+28); ret_effect(gb); return; }
+  CYC(b_+27, b_+28);
+  CYC(b_+28, b_+30); alu_cp(gb, 4);
+  if (!(F & FZ)) { CYCT(b_+30, b_+32); goronDance_turnLinkToDirection_hook(gb); return; }
+  CYC(b_+30, b_+32);
+  CYC(b_+32, b_+34); A = 0x0e;
+  CYC(b_+34, b_+37); W8(wcc50) = A;
+  CYC(b_+37, b_+38); alu_or(gb, D);
+  CYC(b_+38, SYM(goronDance_turnLinkToDirection)); ret_effect(gb);
 }
 
 void goronDance_updateGracefulGoronAnimation_hook(GB *gb) {
+  BASE(goronDance_updateGracefulGoronAnimation);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7acf, 0x7ad2); A = W8(wTmpcfc0_goronDance_currentMove);
-  CYC(0x7ad2, 0x7ad4); alu_cp(gb, 1);
-  if (!(F & FZ)) { CYCT(0x7ad4, 0x7ad6); goto b_button; }
-  CYC(0x7ad4, 0x7ad6);
-  CYC(0x7ad6, 0x7ad8); A = 6;
-  CYC(0x7ad8, 0x7ada); goto set_animation;
+  CYC(b_+0, b_+3); A = W8(wTmpcfc0_goronDance_currentMove);
+  CYC(b_+3, b_+5); alu_cp(gb, 1);
+  if (!(F & FZ)) { CYCT(b_+5, b_+7); goto b_button; }
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+9); A = 6;
+  CYC(b_+9, b_+11); goto set_animation;
 b_button:
-  CYC(0x7ada, 0x7add); A = W8(wTmpcfc0_goronDance_consecutiveBPressCounter);
-  CYC(0x7add, 0x7ae0); SET_HL(0x7ac3);
-  CYC(0x7ae0, 0x7ae1); goron_add_a_to_hl(gb, 0x7ae1);
-  CYC(0x7ae1, 0x7ae2); A = mem_rd(gb, HL);
-  CYC(0x7ae2, 0x7ae4); alu_cp(gb, 0x50);
-  if (F & FZ) { CYCT(0x7ae4, 0x7ae5); ret_effect(gb); return; }
-  CYC(0x7ae4, 0x7ae5);
+  CYC(b_+11, b_+14); A = W8(wTmpcfc0_goronDance_consecutiveBPressCounter);
+  CYC(b_+14, b_+17); SET_HL((SYM(linkedNpc_calcLowTextIndex) + 6));
+  CYC(b_+17, b_+18); goron_add_a_to_hl(gb, (SYM(plenSubid0Script__loop_b15) + 6));
+  CYC(b_+18, b_+19); A = mem_rd(gb, HL);
+  CYC(b_+19, b_+21); alu_cp(gb, 0x50);
+  if (F & FZ) { CYCT(b_+21, b_+22); ret_effect(gb); return; }
+  CYC(b_+21, b_+22);
 set_animation:
-  CALL_C(0x7ae5, interactionSetAnimation_hook, 0x262e, 0x7ae8);
-  CYC(0x7ae8, 0x7ae9); alu_or(gb, D);
-  CYC(0x7ae9, 0x7aea); ret_effect(gb);
+  CALL_C((SYM(plenSubid0Script__loop_b15) + 10), interactionSetAnimation_hook, SYM(interactionSetAnimation), (SYM(plenSubid0Script__loop_b15) + 13));
+  CYC(b_+25, b_+26); alu_or(gb, D);
+  CYC(b_+26, SYM(goronDance_sequenceData)); ret_effect(gb);
 }
 
 static void goron_dance_made_mistake(GB *gb, uint16_t sp0_) {
-  CYC(0x7940, 0x7941); H = D;
-  CYC(0x7941, 0x7943); L = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x7943, 0x7945); mem_wr(gb, HL, 4);
-  CYC(0x7945, 0x7947); L = INTERACTION_BASE + OBJ_VAR3F;
-  CYC(0x7947, 0x7949); mem_wr(gb, HL, 0);
-  CYC(0x7949, 0x794b); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x794b, 0x794d); mem_wr(gb, HL, 30);
-  CYC(0x794d, 0x794f); A = 0x5a;
-  CALL_C(0x794f, playSound_b00_hook, 0x0c98, 0x7952);
-  CYC(0x7952, 0x7954); A = 2;
-  CYC(0x7954, 0x7957); W8(wcc50) = A;
-  CALL_C(0x7957, checkIsLinkedGame_hook, 0x1992, 0x795a);
-  if (F & FZ) { CYCT(0x795a, 0x795c); goto gorons; }
-  CYC(0x795a, 0x795c);
-  CYC(0x795c, 0x795f); A = W8(wTilesetFlags);
-  CYC(0x795f, 0x7961); alu_and(gb, 0x80);
-  if (F & FZ) { CYCT(0x7961, 0x7963); goto gorons; }
-  CYC(0x7961, 0x7963);
-  CYC(0x7963, 0x7965); A = 2;
-  CYC(0x7965, 0x7968); W8(wTmpcfc0_goronDance_danceAnimation) = A;
-  CYC(0x7968, 0x7969); ret_effect(gb); return;
+  BASE(goronDance_checkLinkInput);
+  CYC(b_+61, b_+62); H = D;
+  CYC(b_+62, b_+64); L = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+64, b_+66); mem_wr(gb, HL, 4);
+  CYC(b_+66, b_+68); L = INTERACTION_BASE + OBJ_VAR3F;
+  CYC(b_+68, b_+70); mem_wr(gb, HL, 0);
+  CYC(b_+70, b_+72); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+72, b_+74); mem_wr(gb, HL, 30);
+  CYC(b_+74, b_+76); A = 0x5a;
+  CALL_C((SYM(pirateCaptainScript__loop_b15) + 6), playSound_b00_hook, SYM(playSound_b00), (SYM(pirateCaptainScript__loop_b15) + 9));
+  CYC(b_+79, b_+81); A = 2;
+  CYC(b_+81, b_+84); W8(wcc50) = A;
+  CALL_C((SYM(pirateCaptainScript__gaveZoraScale_b15) + 1), checkIsLinkedGame_hook, SYM(checkIsLinkedGame), (SYM(pirateCaptainScript__gaveZoraScale_b15) + 4));
+  if (F & FZ) { CYCT(b_+87, b_+89); goto gorons; }
+  CYC(b_+87, b_+89);
+  CYC(b_+89, b_+92); A = W8(wTilesetFlags);
+  CYC(b_+92, b_+94); alu_and(gb, 0x80);
+  if (F & FZ) { CYCT(b_+94, b_+96); goto gorons; }
+  CYC(b_+94, b_+96);
+  CYC(b_+96, b_+98); A = 2;
+  CYC(b_+98, b_+101); W8(wTmpcfc0_goronDance_danceAnimation) = A;
+  CYC(b_+101, b_+102); ret_effect(gb); return;
 gorons:
-  CYC(0x7969, 0x796b); A = 4;
-  CYC(0x796b, 0x796e); W8(wTmpcfc0_goronDance_danceAnimation) = A;
-  CYC(0x796e, 0x796f); ret_effect(gb);
+  CYC(b_+102, b_+104); A = 4;
+  CYC(b_+104, b_+107); W8(wTmpcfc0_goronDance_danceAnimation) = A;
+  CYC(b_+107, b_+108); ret_effect(gb);
 }
 
 void goronDance_checkLinkInput_hook(GB *gb) {
+  BASE(goronDance_checkLinkInput);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7903, goronDance_getNextMove_hook, 0x7a20, 0x7906);
-  CYC(0x7906, 0x7908); alu_cp(gb, 0);
-  if (F & FZ) { CYCT(0x7908, 0x790a); goto rest; }
-  CYC(0x7908, 0x790a);
-  CALL_C(0x790a, goronDance_checkTooLateToInput_hook, 0x79dc, 0x790d);
-  if (F & FZ) { CYCT(0x790d, 0x790f); goto too_late; }
-  CYC(0x790d, 0x790f);
-  CYC(0x790f, 0x7912); A = W8(wGameKeysJustPressed);
-  CYC(0x7912, 0x7914); alu_and(gb, 3);
-  if (F & FZ) { CYCT(0x7914, 0x7915); ret_effect(gb); return; }
-  CYC(0x7914, 0x7915);
-  CYC(0x7915, 0x7916); B = A;
-  CYC(0x7916, 0x7919); W8(wTmpcfc0_goronDance_linkStartedDance) = A;
-  CYC(0x7919, 0x791c); A = W8(wTmpcfc0_goronDance_currentMove);
-  CYC(0x791c, 0x791d); alu_cp(gb, B);
-  if (!(F & FZ)) { CYCT(0x791d, 0x791f); goto wrong_move; }
-  CYC(0x791d, 0x791f);
-  CALL_C(0x791f, goronDance_checkInputNotTooEarlyOrLate_hook, 0x79ac, 0x7922);
-  if (F & FZ) { CYCT(0x7922, 0x7924); goron_dance_made_mistake(gb, sp0_); return; }
-  CYC(0x7922, 0x7924);
-  CYC(0x7924, 0x7927); goto do_dance_move;
+  CALL_C((SYM(symmetryNpcSubid6And7Script__brotherWithTuniNut_b15) + 6), goronDance_getNextMove_hook, SYM(goronDance_getNextMove), (SYM(symmetryNpcSubid6And7Script__brotherWithTuniNut_b15) + 9));
+  CYC(b_+3, b_+5); alu_cp(gb, 0);
+  if (F & FZ) { CYCT(b_+5, b_+7); goto rest; }
+  CYC(b_+5, b_+7);
+  CALL_C((SYM(symmetryNpcSubid6And7Script__nutNotRepaired_b15) + 1), goronDance_checkTooLateToInput_hook, SYM(goronDance_checkTooLateToInput), SYM(symmetryNpcSubid6And7Script__dontHaveNut_b15));
+  if (F & FZ) { CYCT(b_+10, b_+12); goto too_late; }
+  CYC(b_+10, b_+12);
+  CYC(b_+12, b_+15); A = W8(wGameKeysJustPressed);
+  CYC(b_+15, b_+17); alu_and(gb, 3);
+  if (F & FZ) { CYCT(b_+17, b_+18); ret_effect(gb); return; }
+  CYC(b_+17, b_+18);
+  CYC(b_+18, b_+19); B = A;
+  CYC(b_+19, b_+22); W8(wTmpcfc0_goronDance_linkStartedDance) = A;
+  CYC(b_+22, b_+25); A = W8(wTmpcfc0_goronDance_currentMove);
+  CYC(b_+25, b_+26); alu_cp(gb, B);
+  if (!(F & FZ)) { CYCT(b_+26, b_+28); goto wrong_move; }
+  CYC(b_+26, b_+28);
+  CALL_C((SYM(symmetryNpcSubid6And7Script__respondToQuestion_b15) + 3), goronDance_checkInputNotTooEarlyOrLate_hook, SYM(goronDance_checkInputNotTooEarlyOrLate), (SYM(symmetryNpcSubid6And7Script__respondToQuestion_b15) + 6));
+  if (F & FZ) { CYCT(b_+31, b_+33); goron_dance_made_mistake(gb, sp0_); return; }
+  CYC(b_+31, b_+33);
+  CYC(b_+33, b_+36); goto do_dance_move;
 rest:
-  CALL_C(0x7927, goronDance_checkExactInputTimePassed_hook, 0x79e4, 0x792a);
-  if (F & FZ) { CYCT(0x792a, 0x792c); goto do_dance_move; }
-  CYC(0x792a, 0x792c);
-  CYC(0x792c, 0x792f); A = W8(wGameKeysJustPressed);
-  CYC(0x792f, 0x7931); alu_and(gb, 3);
-  if (!(F & FZ)) { CYCT(0x7931, 0x7933); goto wrong_move; }
-  CYC(0x7931, 0x7933);
-  CYC(0x7933, 0x7934); ret_effect(gb); return;
+  CALL_C((SYM(symmetryNpcSubid6And7Script__giveTuniNut_b15) + 2), goronDance_checkExactInputTimePassed_hook, SYM(goronDance_checkExactInputTimePassed), (SYM(symmetryNpcSubid6And7Script__giveTuniNut_b15) + 5));
+  if (F & FZ) { CYCT(b_+39, b_+41); goto do_dance_move; }
+  CYC(b_+39, b_+41);
+  CYC(b_+41, b_+44); A = W8(wGameKeysJustPressed);
+  CYC(b_+44, b_+46); alu_and(gb, 3);
+  if (!(F & FZ)) { CYCT(b_+46, b_+48); goto wrong_move; }
+  CYC(b_+46, b_+48);
+  CYC(b_+48, b_+49); ret_effect(gb); return;
 too_late:
-  CYC(0x7934, 0x7936); A = 1;
-  CYC(0x7936, 0x7939); W8(wTmpcfc0_goronDance_failureType) = A;
-  CYC(0x7939, 0x793b); goto made_mistake;
+  CYC(b_+49, b_+51); A = 1;
+  CYC(b_+51, b_+54); W8(wTmpcfc0_goronDance_failureType) = A;
+  CYC(b_+54, b_+56); goto made_mistake;
 wrong_move:
-  CYC(0x793b, 0x793d); A = 2;
-  CYC(0x793d, 0x7940); W8(wTmpcfc0_goronDance_failureType) = A;
+  CYC(b_+56, b_+58); A = 2;
+  CYC(b_+58, b_+61); W8(wTmpcfc0_goronDance_failureType) = A;
 made_mistake:
   goron_dance_made_mistake(gb, sp0_); return;
 do_dance_move:
-  CALL_C(0x796f, goronDance_updateConsecutiveBPressCounter_hook, 0x7a3c, 0x7972);
-  CALL_C(0x7972, goronDance_updateLinkAndBackupDancerAnimation_hook, 0x7a4b, 0x7975);
-  if (F & FZ) { CYCT(0x7975, 0x7977); goto jump; }
-  CYC(0x7975, 0x7977);
-  CALL_C(0x7977, goronDance_playMoveSound_hook, 0x7a04, 0x797a);
-  CALL_C(0x797a, goronDance_incBeat_hook, 0x7a1b, 0x797d);
-  CALL_C(0x797d, goronDance_getNextMove_hook, 0x7a20, 0x7980);
-  if (!(F & FZ)) { CYCT(0x7980, 0x7982); goto round_finished; }
-  CYC(0x7980, 0x7982);
-  CYC(0x7982, 0x7983); ret_effect(gb); return;
+  CALL_C((SYM(pirateCaptainScript__gaveZoraScale_b15) + 25), goronDance_updateConsecutiveBPressCounter_hook, SYM(goronDance_updateConsecutiveBPressCounter), SYM(pirate_openEyeballCave));
+  CALL_C(SYM(pirate_openEyeballCave), goronDance_updateLinkAndBackupDancerAnimation_hook, SYM(goronDance_updateLinkAndBackupDancerAnimation), (SYM(pirate_openEyeballCave) + 3));
+  if (F & FZ) { CYCT(b_+114, b_+116); goto jump; }
+  CYC(b_+114, b_+116);
+  CALL_C((SYM(pirate_openEyeballCave) + 5), goronDance_playMoveSound_hook, SYM(goronDance_playMoveSound), (SYM(pirate_openEyeballCave) + 8));
+  CALL_C((SYM(pirate_openEyeballCave) + 8), goronDance_incBeat_hook, SYM(goronDance_incBeat), (SYM(pirate_openEyeballCave) + 11));
+  CALL_C((SYM(pirate_openEyeballCave) + 11), goronDance_getNextMove_hook, SYM(goronDance_getNextMove), (SYM(pirate_openEyeballCave) + 14));
+  if (!(F & FZ)) { CYCT(b_+125, b_+127); goto round_finished; }
+  CYC(b_+125, b_+127);
+  CYC(b_+127, b_+128); ret_effect(gb); return;
 jump:
-  CALL_C(0x7983, goronDance_incBeat_hook, 0x7a1b, 0x7986);
-  CALL_C(0x7986, goronDance_getNextMove_hook, 0x7a20, 0x7989);
-  CALL_C(0x7989, getFreeInteractionSlot_hook, 0x3aef, 0x798c);
-  if (!(F & FZ)) { CYCT(0x798c, 0x798d); ret_effect(gb); return; }
-  CYC(0x798c, 0x798d);
-  CYC(0x798d, 0x798f); mem_wr(gb, HL, 0x66);
-  CYC(0x798f, 0x7990); L = alu_inc8(gb, L);
-  CYC(0x7990, 0x7992); mem_wr(gb, HL, 2);
-  CYC(0x7992, 0x7994); A = 1;
-  CYC(0x7994, 0x7997); W8(wTmpcfc0_goronDance_linkJumping) = A;
-  CYC(0x7997, 0x799a); interactionIncSubstate_hook(gb); return;
+  CALL_C((SYM(pirate_openEyeballCave) + 17), goronDance_incBeat_hook, SYM(goronDance_incBeat), (SYM(pirate_openEyeballCave) + 20));
+  CALL_C((SYM(pirate_openEyeballCave) + 20), goronDance_getNextMove_hook, SYM(goronDance_getNextMove), (SYM(pirate_openEyeballCave) + 23));
+  CALL_C((SYM(pirate_openEyeballCave) + 23), getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), (SYM(pirate_openEyeballCave) + 26));
+  if (!(F & FZ)) { CYCT(b_+137, b_+138); ret_effect(gb); return; }
+  CYC(b_+137, b_+138);
+  CYC(b_+138, b_+140); mem_wr(gb, HL, 0x66);
+  CYC(b_+140, b_+141); L = alu_inc8(gb, L);
+  CYC(b_+141, b_+143); mem_wr(gb, HL, 2);
+  CYC(b_+143, b_+145); A = 1;
+  CYC(b_+145, b_+148); W8(wTmpcfc0_goronDance_linkJumping) = A;
+  CYC(b_+148, b_+151); interactionIncSubstate_hook(gb); return;
 round_finished:
-  CYC(0x799a, 0x799b); alu_xor(gb, A);
-  CYC(0x799b, 0x799e); W8(wTmpcfc0_goronDance_cfd9) = A;
-  CYC(0x799e, 0x79a1); SET_HL(wTmpcfc0_goronDance_roundIndex);
-  CYC(0x79a1, 0x79a2); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x79a2, 0x79a3); H = D;
-  CYC(0x79a3, 0x79a5); L = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x79a5, 0x79a7); mem_wr(gb, HL, 3);
-  CYC(0x79a7, 0x79a9); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x79a9, 0x79ab); mem_wr(gb, HL, 30);
-  CYC(0x79ab, 0x79ac); ret_effect(gb);
+  CYC(b_+151, b_+152); alu_xor(gb, A);
+  CYC(b_+152, b_+155); W8(wTmpcfc0_goronDance_cfd9) = A;
+  CYC(b_+155, b_+158); SET_HL(wTmpcfc0_goronDance_roundIndex);
+  CYC(b_+158, b_+159); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+159, b_+160); H = D;
+  CYC(b_+160, b_+162); L = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+162, b_+164); mem_wr(gb, HL, 3);
+  CYC(b_+164, b_+166); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+166, b_+168); mem_wr(gb, HL, 30);
+  CYC(b_+168, SYM(goronDance_checkInputNotTooEarlyOrLate)); ret_effect(gb);
 }
 
 void goronSubid02_hook(GB *gb) {
+  BASE(goronSubid02);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x77b5, checkInteractionState_hook, 0x23fe, 0x77b8);
-  if (!(F & FZ)) { CYCT(0x77b8, 0x77ba); goto state1; }
-  CYC(0x77b8, 0x77ba);
-  CALL_C(0x77ba, objectSetInvisible_hook, 0x1e7b, 0x77bd);
-  CALL_C(0x77bd, interactionIncState_hook, 0x23e0, 0x77c0);
-  CYC(0x77c0, 0x77c2); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x77c2, 0x77c4); mem_wr(gb, HL, 0x28);
-  CYC(0x77c4, 0x77c6); L = INTERACTION_BASE + OBJ_SPEED_Z;
-  CYC(0x77c6, 0x77c8); mem_wr(gb, HL, 0);
-  CYC(0x77c8, 0x77c9); SET_HL(HL + 1);
-  CYC(0x77c9, 0x77cb); mem_wr(gb, HL, 0xfe);
-  CYC(0x77cb, 0x77cd); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x77cd, 0x77cf); mem_wr(gb, HL, 20);
-  CYC(0x77cf, 0x77d2); SET_HL(w1Link_yh);
-  CALL_C(0x77d2, objectTakePosition_hook, 0x2274, 0x77d5);
-  CYC(0x77d5, 0x77d7); A = 0;
-  CYC(0x77d7, 0x77da); W8(wTmpcfc0_goronDance_danceAnimation) = A;
-  CALL_C(0x77da, goronDance_turnLinkToDirection_hook, 0x7a72, 0x77dd);
-  CYC(0x77dd, 0x77df); A = 0xcd;
-  CALL_C(0x77df, playSound_b00_hook, 0x0c98, 0x77e2);
+  CALL_C((SYM(zeldaSubid05Script_body) + 2), checkInteractionState_hook, SYM(checkInteractionState), (SYM(zeldaSubid05Script_body) + 5));
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); goto state1; }
+  CYC(b_+3, b_+5);
+  CALL_C((SYM(zeldaSubid05Script_body) + 7), objectSetInvisible_hook, SYM(objectSetInvisible), (SYM(zeldaSubid05Script_body) + 10));
+  CALL_C((SYM(zeldaSubid05Script_body) + 10), interactionIncState_hook, SYM(interactionIncState), (SYM(zeldaSubid05Script_body) + 13));
+  CYC(b_+11, b_+13); L = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+13, b_+15); mem_wr(gb, HL, 0x28);
+  CYC(b_+15, b_+17); L = INTERACTION_BASE + OBJ_SPEED_Z;
+  CYC(b_+17, b_+19); mem_wr(gb, HL, 0);
+  CYC(b_+19, b_+20); SET_HL(HL + 1);
+  CYC(b_+20, b_+22); mem_wr(gb, HL, 0xfe);
+  CYC(b_+22, b_+24); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+24, b_+26); mem_wr(gb, HL, 20);
+  CYC(b_+26, b_+29); SET_HL(w1Link_yh);
+  CALL_C((SYM(zeldaSubid05Script_body) + 31), objectTakePosition_hook, SYM(objectTakePosition), (SYM(zeldaSubid05Script_body) + 34));
+  CYC(b_+32, b_+34); A = 0;
+  CYC(b_+34, b_+37); W8(wTmpcfc0_goronDance_danceAnimation) = A;
+  CALL_C((SYM(zeldaSubid05Script_body) + 39), goronDance_turnLinkToDirection_hook, SYM(goronDance_turnLinkToDirection), (SYM(zeldaSubid05Script_body) + 42));
+  CYC(b_+40, b_+42); A = 0xcd;
+  CALL_C((SYM(twinrovaInCutsceneScript_body) + 1), playSound_b00_hook, SYM(playSound_b00), (SYM(twinrovaInCutsceneScript_body) + 4));
 state1:
-  CYC(0x77e2, 0x77e4); C = 0x40;
-  CALL_C(0x77e4, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x77e7);
-  if (F & FZ) { CYCT(0x77e7, 0x77e9); goto landed; }
-  CYC(0x77e7, 0x77e9);
-  CYC(0x77e9, 0x77ec); SET_HL(w1Link_yh);
-  CALL_C(0x77ec, objectCopyPosition_hook, 0x2242, 0x77ef);
-  CYC(0x77ef, 0x77f0); H = D;
-  CYC(0x77f0, 0x77f2); L = INTERACTION_BASE + OBJ_SPEED_Z + 1;
-  CYC(0x77f2, 0x77f3); A = mem_rd(gb, HL); SET_HL(HL - 1);
-  CYC(0x77f3, 0x77f4); alu_or(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(0x77f4, 0x77f5); ret_effect(gb); return; }
-  CYC(0x77f4, 0x77f5);
-  CYC(0x77f5, 0x77f7); A = 2;
-  CYC(0x77f7, 0x77fa); goronDance_turnLinkToDirection_hook(gb);
+  CYC(b_+45, b_+47); C = 0x40;
+  CALL_C((SYM(twinrovaInCutsceneScript_body) + 6), objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), (SYM(vire_activateMusic) + 1));
+  if (F & FZ) { CYCT(b_+50, b_+52); goto landed; }
+  CYC(b_+50, b_+52);
+  CYC(b_+52, b_+55); SET_HL(w1Link_yh);
+  CALL_C((SYM(vire_activateMusic) + 6), objectCopyPosition_hook, SYM(objectCopyPosition), SYM(symmetryNpc_getTuniNutState));
+  CYC(b_+58, b_+59); H = D;
+  CYC(b_+59, b_+61); L = INTERACTION_BASE + OBJ_SPEED_Z + 1;
+  CYC(b_+61, b_+62); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(b_+62, b_+63); alu_or(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+63, b_+64); ret_effect(gb); return; }
+  CYC(b_+63, b_+64);
+  CYC(b_+64, b_+66); A = 2;
+  CYC(b_+66, b_+69); goronDance_turnLinkToDirection_hook(gb);
   return;
 landed:
-  CYC(0x77fa, 0x77fd); SET_HL(w1Link_yh);
-  CALL_C(0x77fd, objectCopyPosition_hook, 0x2242, 0x7800);
-  CYC(0x7800, 0x7801); alu_xor(gb, A);
-  CYC(0x7801, 0x7804); W8(wTmpcfc0_goronDance_linkJumping) = A;
-  CYC(0x7804, 0x7807); interactionDelete_hook(gb);
+  CYC(b_+69, b_+72); SET_HL(w1Link_yh);
+  CALL_C((SYM(symmetryNpc_getTuniNutState) + 14), objectCopyPosition_hook, SYM(objectCopyPosition), (SYM(symmetryNpc_getTuniNutState) + 17));
+  CYC(b_+75, b_+76); alu_xor(gb, A);
+  CYC(b_+76, b_+79); W8(wTmpcfc0_goronDance_linkJumping) = A;
+  CYC(b_+79, SYM(goronSubid03)); interactionDelete_hook(gb);
 }
 
 static void goron_run_script_and_delete(GB *gb, uint16_t sp0_) {
-  CALL_C(0x7857, interactionRunScript_hook, 0x2552, 0x785a);
-  if (F & FC) { CYCT(0x785a, 0x785d); interactionDelete_hook(gb); return; }
-  CYC(0x785a, 0x785d); goron_faceLinkAndAnimateIfNotNapping_hook(gb);
+  BASE(symmetryNpcSubid8And9Script_b15);
+  CALL_C(b_+14, interactionRunScript_hook, SYM(interactionRunScript), b_+17);
+  if (F & FC) { CYCT((SYM(goron_runScriptAndDeleteWhenFinished) + 3), SYM(goron_faceLinkAndAnimateIfNotNapping)); interactionDelete_hook(gb); return; }
+  CYC((SYM(goron_runScriptAndDeleteWhenFinished) + 3), SYM(goron_faceLinkAndAnimateIfNotNapping)); goron_faceLinkAndAnimateIfNotNapping_hook(gb);
 }
 
 void goronSubid04__afterCall780f_hook(GB *gb) {
+  BASE(goronSubid03);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x780f, interactionRunScript_hook, 0x2552, 0x7812);
-  CALL_C(0x7812, interactionRunScript_hook, 0x2552, 0x7815);
-  if (F & FC) { CYCT(0x7815, 0x7818); interactionDelete_hook(gb); return; }
-  CYC(0x7815, 0x7818); CYC(0x7818, 0x781b); interactionAnimateAsNpc_hook(gb);
+  CALL_C((SYM(symmetryNpc_getTuniNutStateForSister) + 2), interactionRunScript_hook, SYM(interactionRunScript), (SYM(symmetryNpc_getTuniNutStateForSister) + 5));
+  CALL_C((SYM(symmetryNpc_getTuniNutStateForSister) + 5), interactionRunScript_hook, SYM(interactionRunScript), (SYM(symmetryNpc_getTuniNutStateForSister) + 8));
+  if (F & FC) { CYCT(b_+14, b_+17); interactionDelete_hook(gb); return; }
+  CYC(b_+14, b_+17); CYC(b_+17, SYM(goronSubid05)); interactionAnimateAsNpc_hook(gb);
 }
 
 void goronSubid03_hook(GB *gb) {
+  BASE(goronSubid03);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7807, checkInteractionState_hook, 0x23fe, 0x780a);
-  if (!(F & FZ)) { CYCT(0x780a, 0x780c); CALL_C(0x7812, interactionRunScript_hook, 0x2552, 0x7815); if (F & FC) { CYCT(0x7815, 0x7818); interactionDelete_hook(gb); return; } CYC(0x7815, 0x7818); CYC(0x7818, 0x781b); interactionAnimateAsNpc_hook(gb); return; }
-  CYC(0x780a, 0x780c);
-  CALL_C(0x780c, goron_loadScriptAndInitGraphics_hook, 0x7d78, 0x780f);
+  CALL_C((SYM(symmetryNpc_setRoomFlagIfTalkedToRightSister) + 5), checkInteractionState_hook, SYM(checkInteractionState), (SYM(symmetryNpc_setRoomFlagIfTalkedToRightSister) + 8));
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); CALL_C((SYM(symmetryNpc_getTuniNutStateForSister) + 5), interactionRunScript_hook, SYM(interactionRunScript), (SYM(symmetryNpc_getTuniNutStateForSister) + 8)); if (F & FC) { CYCT(b_+14, b_+17); interactionDelete_hook(gb); return; } CYC(b_+14, b_+17); CYC(b_+17, SYM(goronSubid05)); interactionAnimateAsNpc_hook(gb); return; }
+  CYC(b_+3, b_+5);
+  CALL_C((SYM(symmetryNpc_setRoomFlagIfTalkedToRightSister) + 10), goron_loadScriptAndInitGraphics_hook, SYM(goron_loadScriptAndInitGraphics), (SYM(symmetryNpc_getTuniNutStateForSister) + 2));
   goronSubid04__afterCall780f_hook(gb);
 }
 
 void goronSubid05_hook(GB *gb) {
+  BASE(goronSubid05);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x781b, checkInteractionState_hook, 0x23fe, 0x781e);
-  if (!(F & FZ)) { CYCT(0x781e, 0x7820); CYC(0x7826, 0x7828); goron_runScriptAndDeleteWhenFinished_hook(gb); return; }
-  CYC(0x781e, 0x7820);
-  CALL_C(0x7820, goron_loadScriptFromTableAndInitGraphics_hook, 0x7d7d, 0x7823);
+  CALL_C((SYM(symmetryNpc_getTuniNutStateForSister) + 14), checkInteractionState_hook, SYM(checkInteractionState), (SYM(symmetryNpc_getTuniNutStateForSister) + 17));
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); CYC(b_+11, SYM(goronSubid06)); goron_runScriptAndDeleteWhenFinished_hook(gb); return; }
+  CYC(b_+3, b_+5);
+  CALL_C((SYM(symmetryNpc_getTuniNutStateForSister) + 19), goron_loadScriptFromTableAndInitGraphics_hook, SYM(goron_loadScriptFromTableAndInitGraphics), (SYM(symmetryNpc_getTuniNutStateForSister) + 22));
   goronSubid05__afterCall7823_hook(gb);
 }
 
 void goronSubid05__afterCall7823_hook(GB *gb) {
+  BASE(symmetryNpc_getTuniNutStateForSister);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7823, interactionRunScript_hook, 0x2552, 0x7826);
-  CYC(0x7826, 0x7828); goron_runScriptAndDeleteWhenFinished_hook(gb);
+  CALL_C(b_+22, interactionRunScript_hook, SYM(interactionRunScript), b_+25);
+  CYC(SYM(goronSubid05__state1), SYM(goronSubid06)); goron_runScriptAndDeleteWhenFinished_hook(gb);
 }
 
 void goronSubid06_hook(GB *gb) {
+  BASE(goronSubid06);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7828, checkInteractionState_hook, 0x23fe, 0x782b);
-  if (!(F & FZ)) { CYCT(0x782b, 0x782d); CYC(0x784a, 0x784c); goron_runScriptAndDeleteWhenFinished_hook(gb); return; }
-  CYC(0x782b, 0x782d);
-  CALL_C(0x782d, goron_loadScriptFromTableAndInitGraphics_hook, 0x7d7d, 0x7830);
+  CALL_C((SYM(symmetryNpc_getTuniNutStateForSister) + 27), checkInteractionState_hook, SYM(checkInteractionState), (SYM(symmetryNpc_getTuniNutStateForSister) + 30));
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); CYC(b_+34, SYM(goronSubid07)); goron_runScriptAndDeleteWhenFinished_hook(gb); return; }
+  CYC(b_+3, b_+5);
+  CALL_C((SYM(symmetryNpc_getUpgradeCapacityForText) + 1), goron_loadScriptFromTableAndInitGraphics_hook, SYM(goron_loadScriptFromTableAndInitGraphics), (SYM(symmetryNpc_getUpgradeCapacityForText) + 4));
   goronSubid06__afterCall7830_hook(gb);
 }
 
 void goronSubid06__afterCall7830_hook(GB *gb) {
+  BASE(goronSubid06);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7830, 0x7832); L = INTERACTION_BASE + OBJ_VAR3E;
-  CYC(0x7832, 0x7834); mem_wr(gb, HL, 10);
-  CYC(0x7834, 0x7836); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x7836, 0x7837); A = mem_rd(gb, DE);
-  CYC(0x7837, 0x7838); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x7838, 0x783a); goto clear; }
-  CYC(0x7838, 0x783a);
-  CYC(0x783a, 0x783d); W8(wTmpcfc0_goronCutscenes_elderVar_cfdd) = A;
-  CYC(0x783d, 0x783f); goto run;
+  CYC(b_+8, b_+10); L = INTERACTION_BASE + OBJ_VAR3E;
+  CYC(b_+10, b_+12); mem_wr(gb, HL, 10);
+  CYC(b_+12, b_+14); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+14, b_+15); A = mem_rd(gb, DE);
+  CYC(b_+15, b_+16); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+16, b_+18); goto clear; }
+  CYC(b_+16, b_+18);
+  CYC(b_+18, b_+21); W8(wTmpcfc0_goronCutscenes_elderVar_cfdd) = A;
+  CYC(b_+21, b_+23); goto run;
 clear:
-  CYC(0x783f, 0x7841); B = 0x20;
-  CYC(0x7841, 0x7844); SET_HL(wTmpcfc0_goronCutscenes);
-  CALL_C(0x7844, clearMemory_hook, 0x046f, 0x7847);
+  CYC(b_+23, b_+25); B = 0x20;
+  CYC(b_+25, b_+28); SET_HL(wTmpcfc0_goronCutscenes);
+  CALL_C((SYM(symmetryNpc_getUpgradeCapacityForText__haveRingBox) + 13), clearMemory_hook, SYM(clearMemory), (SYM(symmetryNpc_getUpgradeCapacityForText__haveRingBox) + 16));
 run:
-  CALL_C(0x7847, interactionRunScript_hook, 0x2552, 0x784a);
-  CYC(0x784a, 0x784c); goron_runScriptAndDeleteWhenFinished_hook(gb);
+  CALL_C((SYM(symmetryNpc_getUpgradeCapacityForText__haveRingBox) + 16), interactionRunScript_hook, SYM(interactionRunScript), (SYM(symmetryNpcSubid8And9Script_b15) + 1));
+  CYC(b_+34, SYM(goronSubid07)); goron_runScriptAndDeleteWhenFinished_hook(gb);
 }
 
 void goronSubid07_hook(GB *gb) {
+  BASE(symmetryNpcSubid8And9Script_b15);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x784c, checkInteractionState_hook, 0x23fe, 0x784f);
-  if (!(F & FZ)) { CYCT(0x784f, 0x7851); goron_runScriptAndDeleteWhenFinished_hook(gb); return; }
-  CYC(0x784f, 0x7851);
-  CALL_C(0x7851, goron_loadScriptAndInitGraphics_hook, 0x7d78, 0x7854);
+  CALL_C(b_+3, checkInteractionState_hook, SYM(checkInteractionState), b_+6);
+  if (!(F & FZ)) { CYCT((SYM(goronSubid07) + 3), (SYM(goronSubid07) + 5)); goron_runScriptAndDeleteWhenFinished_hook(gb); return; }
+  CYC((SYM(goronSubid07) + 3), (SYM(goronSubid07) + 5));
+  CALL_C(b_+8, goron_loadScriptAndInitGraphics_hook, SYM(goron_loadScriptAndInitGraphics), b_+11);
   goronSubid10__afterCall7854_hook(gb);
 }
 
 void goronSubid10__afterCall7854_hook(GB *gb) {
+  BASE(symmetryNpcSubid8And9Script_b15);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7854, interactionRunScript_hook, 0x2552, 0x7857);
+  CALL_C(b_+11, interactionRunScript_hook, SYM(interactionRunScript), b_+14);
   goron_runScriptAndDeleteWhenFinished_hook(gb);
 }
 
@@ -632,709 +660,750 @@ void goron_runScriptAndDeleteWhenFinished_hook(GB *gb) {
 }
 
 void goron_faceLinkAndAnimateIfNotNapping_hook(GB *gb) {
+  BASE(goron_faceLinkAndAnimateIfNotNapping);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(0x785d, 0x785f); E = INTERACTION_BASE + OBJ_VAR3F;
-  CYC(0x785f, 0x7860); A = mem_rd(gb, DE);
-  CYC(0x7860, 0x7861); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x7861, 0x7864); npcFaceLinkAndAnimate_hook(gb); return; }
-  CYC(0x7861, 0x7864); CYC(0x7864, 0x7867); interactionAnimateAsNpc_hook(gb);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_VAR3F;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+4, b_+7); npcFaceLinkAndAnimate_hook(gb); return; }
+  CYC(b_+4, b_+7); CYC(b_+7, SYM(goronSubid09)); interactionAnimateAsNpc_hook(gb);
 }
 
 void goronSubid09__afterCall7875_hook(GB *gb) {
+  BASE(goronSubid09);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7875, 0x7876); alu_xor(gb, A);
-  CYC(0x7876, 0x7879); W8(wTmpcfc0_targetCarts_cfdf) = A;
-  CYC(0x7879, 0x787c); W8(wTmpcfc0_targetCarts_beginGameTrigger) = A;
-  CALL_C(0x787c, getThisRoomFlags_hook, 0x197d, 0x787f);
-  CYC(0x787f, 0x7881); alu_bit(gb, 7, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(0x7881, 0x7883); goto run; }
-  CYC(0x7881, 0x7883);
-  CYC(0x7883, 0x7886); SET_HL(0x6851);
-  CYC(0x7886, 0x7888); E = 0x15;
-  CALL_C(0x7888, interBankCall_hook, 0x008a, 0x788b);
+  CYC(b_+14, b_+15); alu_xor(gb, A);
+  CYC(b_+15, b_+18); W8(wTmpcfc0_targetCarts_cfdf) = A;
+  CYC(b_+18, b_+21); W8(wTmpcfc0_targetCarts_beginGameTrigger) = A;
+  CALL_C((SYM(symmetryNpcSubid8And9Script__script15_7879_b15) + 3), getThisRoomFlags_hook, SYM(getThisRoomFlags), (SYM(symmetryNpcSubid8And9Script__script15_7879_b15) + 6));
+  CYC(b_+24, b_+26); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+26, b_+28); goto run; }
+  CYC(b_+26, b_+28);
+  CYC(b_+28, b_+31); SET_HL(SYM(goron_targetCarts_reloadCrystalsInFirstRoom));
+  CYC(b_+31, b_+33); E = 0x15;
+  CALL_C(SYM(symmetryNpcSubid8And9Script__sister1_b15), interBankCall_hook, 0x008a, (SYM(symmetryNpcSubid8And9Script__sister2_b15) + 1));
 run:
-  CALL_C(0x788b, interactionRunScript_hook, 0x2552, 0x788e);
-  CYC(0x788e, 0x7890); CYC(0x7898, 0x789a); goron_runScriptAndDeleteWhenFinished_hook(gb);
+  CALL_C((SYM(symmetryNpcSubid8And9Script__sister2_b15) + 1), interactionRunScript_hook, SYM(interactionRunScript), SYM(symmetryNpcSubid8And9Script__sister2Unused_b15));
+  CYC(b_+39, b_+41); CYC(b_+49, SYM(goronSubid0b)); goron_runScriptAndDeleteWhenFinished_hook(gb);
 }
 
 void goronSubid09__afterCall7893_hook(GB *gb) {
+  BASE(goronSubid09);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7893, interactionRunScript_hook, 0x2552, 0x7896);
-  CYC(0x7896, 0x7898); CYC(0x7898, 0x789a); goron_runScriptAndDeleteWhenFinished_hook(gb);
+  CALL_C((SYM(symmetryNpcSubid8And9Script__postgameLoop_b15) + 2), interactionRunScript_hook, SYM(interactionRunScript), (SYM(symmetryNpcSubid8And9Script__postgameLoop_b15) + 5));
+  CYC(b_+47, b_+49); CYC(b_+49, SYM(goronSubid0b)); goron_runScriptAndDeleteWhenFinished_hook(gb);
 }
 
 void goronSubid09_hook(GB *gb) {
+  BASE(goronSubid09);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7867, checkInteractionState_hook, 0x23fe, 0x786a);
-  if (!(F & FZ)) { CYCT(0x786a, 0x786c); CYC(0x7898, 0x789a); goron_runScriptAndDeleteWhenFinished_hook(gb); return; }
-  CYC(0x786a, 0x786c);
-  CYC(0x786c, 0x786e); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x786e, 0x786f); A = mem_rd(gb, DE);
-  CYC(0x786f, 0x7870); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x7870, 0x7872); goto right; }
-  CYC(0x7870, 0x7872);
-  CALL_C(0x7872, goron_loadScriptFromTableAndInitGraphics_hook, 0x7d7d, 0x7875);
+  CALL_C((SYM(symmetryNpcSubid8And9Script__saidYes_b15) + 2), checkInteractionState_hook, SYM(checkInteractionState), (SYM(symmetryNpcSubid8And9Script__saidYes_b15) + 5));
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); CYC(b_+49, SYM(goronSubid0b)); goron_runScriptAndDeleteWhenFinished_hook(gb); return; }
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+7); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+7, b_+8); A = mem_rd(gb, DE);
+  CYC(b_+8, b_+9); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+9, b_+11); goto right; }
+  CYC(b_+9, b_+11);
+  CALL_C((SYM(symmetryNpcSubid8And9Script__repeat_b15) + 6), goron_loadScriptFromTableAndInitGraphics_hook, SYM(goron_loadScriptFromTableAndInitGraphics), (SYM(symmetryNpcSubid8And9Script__almostDoneTalking_b15) + 1));
   goronSubid09__afterCall7875_hook(gb); return;
 right:
-  CALL_C(0x7890, goron_loadScriptFromTableAndInitGraphics_hook, 0x7d7d, 0x7893);
+  CALL_C(SYM(symmetryNpcSubid8And9Script__postgame_b15), goron_loadScriptFromTableAndInitGraphics_hook, SYM(goron_loadScriptFromTableAndInitGraphics), (SYM(symmetryNpcSubid8And9Script__postgameLoop_b15) + 2));
   goronSubid09__afterCall7893_hook(gb);
 }
 
 void goronSubid0b__afterCall78a2_hook(GB *gb) {
+  BASE(goronSubid0b);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x78a2, interactionRunScript_hook, 0x2552, 0x78a5);
-  CALL_C(0x78a5, interactionRunScript_hook, 0x2552, 0x78a8);
-  if (F & FC) { CYCT(0x78a8, 0x78ab); interactionDelete_hook(gb); return; }
-  CYC(0x78a8, 0x78ab);
-  CYC(0x78ab, 0x78ad); E = INTERACTION_BASE + OBJ_VAR3E;
-  CYC(0x78ad, 0x78ae); A = mem_rd(gb, DE);
-  CYC(0x78ae, 0x78af); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x78af, 0x78b0); ret_effect(gb); return; }
-  CYC(0x78af, 0x78b0); CYC(0x78b0, 0x78b2); goron_faceLinkAndAnimateIfNotNapping_hook(gb);
+  CALL_C(SYM(symmetryNpcSubid8And9Script__askForSecret_b15), interactionRunScript_hook, SYM(interactionRunScript), (SYM(symmetryNpcSubid8And9Script__askForSecret_b15) + 3));
+  CALL_C((SYM(symmetryNpcSubid8And9Script__askForSecret_b15) + 3), interactionRunScript_hook, SYM(interactionRunScript), (SYM(symmetryNpcSubid8And9Script__askForSecret_b15) + 6));
+  if (F & FC) { CYCT(b_+14, b_+17); interactionDelete_hook(gb); return; }
+  CYC(b_+14, b_+17);
+  CYC(b_+17, b_+19); E = INTERACTION_BASE + OBJ_VAR3E;
+  CYC(b_+19, b_+20); A = mem_rd(gb, DE);
+  CYC(b_+20, b_+21); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+21, b_+22); ret_effect(gb); return; }
+  CYC(b_+21, b_+22); CYC(b_+22, SYM(goronSubid0f)); goron_faceLinkAndAnimateIfNotNapping_hook(gb);
 }
 
 void goronSubid0b_hook(GB *gb) {
+  BASE(symmetryNpcSubid8And9Script_b15);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x789a, checkInteractionState_hook, 0x23fe, 0x789d);
-  if (!(F & FZ)) { CYCT(0x789d, 0x789f); goronSubid0b__afterCall78a2_hook(gb); return; }
-  CYC(0x789d, 0x789f);
-  CALL_C(0x789f, goron_loadScriptFromTableAndInitGraphics_hook, 0x7d7d, 0x78a2);
+  CALL_C(b_+81, checkInteractionState_hook, SYM(checkInteractionState), b_+84);
+  if (!(F & FZ)) { CYCT((SYM(goronSubid0b) + 3), SYM(goronSubid0b__state0)); goronSubid0b__afterCall78a2_hook(gb); return; }
+  CYC((SYM(goronSubid0b) + 3), SYM(goronSubid0b__state0));
+  CALL_C(b_+86, goron_loadScriptFromTableAndInitGraphics_hook, SYM(goron_loadScriptFromTableAndInitGraphics), b_+89);
   goronSubid0b__afterCall78a2_hook(gb);
 }
 
 void goronSubid0f__afterCall78ba_hook(GB *gb) {
+  BASE(goronSubid0f);
   uint16_t sp0_ = gb->sp;
-  CYC(0x78ba, 0x78bc); L = INTERACTION_BASE + OBJ_VAR3F;
-  CYC(0x78bc, 0x78be); mem_wr(gb, HL, 8);
-  CYC(0x78be, 0x78c1); SET_HL(0x7ed9);
-  CALL_C(0x78c1, interactionSetScript_hook, 0x2544, 0x78c4);
-  CALL_C(0x78c4, interactionRunScript_hook, 0x2552, 0x78c7);
-  CALL_C(0x78c7, interactionRunScript_hook, 0x2552, 0x78ca);
-  if (F & FC) { CYCT(0x78ca, 0x78cd); interactionDelete_hook(gb); return; }
-  CYC(0x78ca, 0x78cd); CYC(0x78cd, 0x78d0); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+8, b_+10); L = INTERACTION_BASE + OBJ_VAR3F;
+  CYC(b_+10, b_+12); mem_wr(gb, HL, 8);
+  CYC(b_+12, b_+15); SET_HL((SYM(interactiondc_spawnPuff) + 747));
+  CALL_C(SYM(symmetryNpcSubid8And9Script__determineLevelToGive_b15), interactionSetScript_hook, SYM(interactionSetScript), (SYM(symmetryNpcSubid8And9Script__determineLevelToGive_b15) + 3));
+  CALL_C((SYM(symmetryNpcSubid8And9Script__determineLevelToGive_b15) + 3), interactionRunScript_hook, SYM(interactionRunScript), (SYM(symmetryNpcSubid8And9Script__determineLevelToGive_b15) + 6));
+  CALL_C((SYM(symmetryNpcSubid8And9Script__determineLevelToGive_b15) + 6), interactionRunScript_hook, SYM(interactionRunScript), (SYM(symmetryNpcSubid8And9Script__determineLevelToGive_b15) + 9));
+  if (F & FC) { CYCT(b_+24, b_+27); interactionDelete_hook(gb); return; }
+  CYC(b_+24, b_+27); CYC(b_+27, SYM(goronDance_updateFrameCounter)); npcFaceLinkAndAnimate_hook(gb);
 }
 
 void goronSubid0f_hook(GB *gb) {
+  BASE(goronSubid0f);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x78b2, checkInteractionState_hook, 0x23fe, 0x78b5);
-  if (!(F & FZ)) { CYCT(0x78b5, 0x78b7); CALL_C(0x78c7, interactionRunScript_hook, 0x2552, 0x78ca); if (F & FC) { CYCT(0x78ca, 0x78cd); interactionDelete_hook(gb); return; } CYC(0x78ca, 0x78cd); CYC(0x78cd, 0x78d0); npcFaceLinkAndAnimate_hook(gb); return; }
-  CYC(0x78b5, 0x78b7);
-  CALL_C(0x78b7, goron_initGraphicsAndIncState_hook, 0x7d72, 0x78ba);
+  CALL_C((SYM(symmetryNpcSubid8And9Script__validSecret_b15) + 3), checkInteractionState_hook, SYM(checkInteractionState), (SYM(symmetryNpcSubid8And9Script__validSecret_b15) + 6));
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); CALL_C((SYM(symmetryNpcSubid8And9Script__determineLevelToGive_b15) + 6), interactionRunScript_hook, SYM(interactionRunScript), (SYM(symmetryNpcSubid8And9Script__determineLevelToGive_b15) + 9)); if (F & FC) { CYCT(b_+24, b_+27); interactionDelete_hook(gb); return; } CYC(b_+24, b_+27); CYC(b_+27, SYM(goronDance_updateFrameCounter)); npcFaceLinkAndAnimate_hook(gb); return; }
+  CYC(b_+3, b_+5);
+  CALL_C((SYM(symmetryNpcSubid8And9Script__validSecret_b15) + 8), goron_initGraphicsAndIncState_hook, SYM(goron_initGraphicsAndIncState), (SYM(symmetryNpcSubid8And9Script__validSecret_b15) + 11));
   goronSubid0f__afterCall78ba_hook(gb);
 }
 
 void goron_initGraphicsAndIncState_hook(GB *gb) {
+  BASE(interactiondc_spawnPuff);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7d72, goron_initGraphics_hook, 0x7d82, 0x7d75);
+  CALL_C(b_+388, goron_initGraphics_hook, SYM(goron_initGraphics), b_+391);
   goron_initGraphicsAndIncState__afterCall7d75_hook(gb);
 }
 
 void goron_initGraphicsAndIncState__afterCall7d75_hook(GB *gb) {
+  BASE(goron_initGraphicsAndIncState);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(0x7d75, 0x7d78); interactionIncState_hook(gb);
+  CYC(b_+3, SYM(goron_loadScriptAndInitGraphics)); interactionIncState_hook(gb);
 }
 
 void goron_loadScriptAndInitGraphics_hook(GB *gb) {
+  BASE(interactiondc_spawnPuff);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7d78, goron_initGraphics_hook, 0x7d82, 0x7d7b);
+  CALL_C(b_+394, goron_initGraphics_hook, SYM(goron_initGraphics), b_+397);
   goron_loadScriptAndInitGraphics__afterCall7d7b_hook(gb);
 }
 
 void goron_loadScriptAndInitGraphics__afterCall7d7b_hook(GB *gb) {
+  BASE(goron_loadScriptAndInitGraphics);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(0x7d7b, 0x7d7d); goron_loadScript_hook(gb);
+  CYC(b_+3, SYM(goron_loadScriptFromTableAndInitGraphics)); goron_loadScript_hook(gb);
 }
 
 void goron_loadScriptFromTableAndInitGraphics_hook(GB *gb) {
+  BASE(interactiondc_spawnPuff);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7d7d, goron_initGraphics_hook, 0x7d82, 0x7d80);
+  CALL_C(b_+399, goron_initGraphics_hook, SYM(goron_initGraphics), b_+402);
   goron_loadScriptFromTableAndInitGraphics__afterCall7d80_hook(gb);
 }
 
 void goron_loadScriptFromTableAndInitGraphics__afterCall7d80_hook(GB *gb) {
+  BASE(goron_loadScriptFromTableAndInitGraphics);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(0x7d80, 0x7d82); goron_loadScriptFromTable_hook(gb);
+  CYC(b_+3, SYM(goron_initGraphics)); goron_loadScriptFromTable_hook(gb);
 }
 
 void goron_initGraphics_hook(GB *gb) {
+  BASE(interactiondc_spawnPuff);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7d82, interactionLoadExtraGraphics_hook, 0x2781, 0x7d85);
-  CYC(0x7d85, 0x7d88); interactionInitGraphics_hook(gb);
+  CALL_C(b_+404, interactionLoadExtraGraphics_hook, SYM(interactionLoadExtraGraphics), b_+407);
+  CYC((SYM(goron_initGraphics) + 3), SYM(goron_loadScript)); interactionInitGraphics_hook(gb);
 }
 
 void goron_loadScript_hook(GB *gb) {
+  BASE(goron_loadScript);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7d88, 0x7d8a); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7d8a, 0x7d8b); A = mem_rd(gb, DE);
-  CYC(0x7d8b, 0x7d8e); SET_HL(0x7dae);
-  CYC(0x7d8e, 0x7d8f); goron_add_double_index(gb, 0x7d8f);
-  CYC(0x7d8f, 0x7d90); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x7d90, 0x7d91); H = mem_rd(gb, HL);
-  CYC(0x7d91, 0x7d92); L = A;
-  CALL_C(0x7d92, interactionSetScript_hook, 0x2544, 0x7d95);
-  CYC(0x7d95, 0x7d98); interactionIncState_hook(gb);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+6); SET_HL((SYM(interactiondc_spawnPuff) + 448));
+  CYC(b_+6, b_+7); goron_add_double_index(gb, (SYM(interactiondc_spawnPuff) + 417));
+  CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+8, b_+9); H = mem_rd(gb, HL);
+  CYC(b_+9, b_+10); L = A;
+  CALL_C((SYM(interactiondc_spawnPuff) + 420), interactionSetScript_hook, SYM(interactionSetScript), (SYM(interactiondc_spawnPuff) + 423));
+  CYC(b_+13, SYM(goron_loadScriptFromTable)); interactionIncState_hook(gb);
 }
 
 void goron_loadScriptFromTable_hook(GB *gb) {
+  BASE(goron_loadScriptFromTable);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7d98, 0x7d9a); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7d9a, 0x7d9b); A = mem_rd(gb, DE);
-  CYC(0x7d9b, 0x7d9e); SET_HL(0x7dae);
-  CYC(0x7d9e, 0x7d9f); goron_add_double_index(gb, 0x7d9f);
-  CYC(0x7d9f, 0x7da0); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x7da0, 0x7da1); H = mem_rd(gb, HL);
-  CYC(0x7da1, 0x7da2); L = A;
-  CYC(0x7da2, 0x7da3); E = alu_inc8(gb, E);
-  CYC(0x7da3, 0x7da4); A = mem_rd(gb, DE);
-  CYC(0x7da4, 0x7da5); goron_add_double_index(gb, 0x7da5);
-  CYC(0x7da5, 0x7da6); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x7da6, 0x7da7); H = mem_rd(gb, HL);
-  CYC(0x7da7, 0x7da8); L = A;
-  CALL_C(0x7da8, interactionSetScript_hook, 0x2544, 0x7dab);
-  CYC(0x7dab, 0x7dae); interactionIncState_hook(gb);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+6); SET_HL((SYM(interactiondc_spawnPuff) + 448));
+  CYC(b_+6, b_+7); goron_add_double_index(gb, (SYM(interactiondc_spawnPuff) + 433));
+  CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+8, b_+9); H = mem_rd(gb, HL);
+  CYC(b_+9, b_+10); L = A;
+  CYC(b_+10, b_+11); E = alu_inc8(gb, E);
+  CYC(b_+11, b_+12); A = mem_rd(gb, DE);
+  CYC(b_+12, b_+13); goron_add_double_index(gb, (SYM(interactiondc_spawnPuff) + 439));
+  CYC(b_+13, b_+14); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+14, b_+15); H = mem_rd(gb, HL);
+  CYC(b_+15, b_+16); L = A;
+  CALL_C((SYM(interactiondc_spawnPuff) + 442), interactionSetScript_hook, SYM(interactionSetScript), (SYM(interactiondc_spawnPuff) + 445));
+  CYC(b_+19, SYM(goron_scriptTable)); interactionIncState_hook(gb);
 }
 
 static void goron_subid01_face_down(GB *gb, uint16_t sp0_) {
-  CYC(0x777b, 0x777d); A = 2;
-  CALL_C(0x777d, interactionSetAnimation_hook, 0x262e, 0x7780);
+  BASE(goronSubid01);
+  CYC(b_+16, b_+18); A = 2;
+  CALL_C((SYM(zeldaSubid01Script_body) + 34), interactionSetAnimation_hook, SYM(interactionSetAnimation), (SYM(zeldaSubid01Script_body) + 37));
 }
 
 void goronSubid01__afterCall7778_hook(GB *gb) {
+  BASE(zeldaSubid01Script_body);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7778, goron_loadScript_hook, 0x7d88, 0x777b);
+  CALL_C(b_+29, goron_loadScript_hook, SYM(goron_loadScript), b_+32);
   goron_subid01_face_down(gb, sp0_);
 }
 
 void goronSubid01_hook(GB *gb) {
+  BASE(goronSubid01);
   uint16_t sp0_ = gb->sp;
-  CYC(0x776b, 0x776d); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x776d, 0x776e); A = mem_rd(gb, DE);
-  CYC(0x776e, 0x776f); push_effect(gb, 0x776f);
-  switch (goron_jump_table(gb)) {
-    case 0x7775: goto state0;
-    case 0x7780: goto state1;
-    case 0x7794: goto state2;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, (SYM(zeldaSubid01Script_body) + 20));
+  do { uint16_t jt_ = (goron_jump_table(gb));
+    if (jt_ == (SYM(zeldaSubid01Script_body) + 26)) { goto state0; }
+    else if (jt_ == (SYM(zeldaSubid01Script_body) + 37)) { goto state1; }
+    else if (jt_ == (SYM(zeldaSubid03Script_body) + 1)) { goto state2; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 state0:
-  CALL_C(0x7775, interactionInitGraphics_hook, 0x15fb, 0x7778);
+  CALL_C((SYM(zeldaSubid01Script_body) + 26), interactionInitGraphics_hook, SYM(interactionInitGraphics), (SYM(zeldaSubid01Script_body) + 29));
   goronSubid01__afterCall7778_hook(gb);
   return;
 state1:
-  CYC(0x7780, 0x7783); A = W8(wTmpcfc0_goronDance_linkStartedDance);
-  CYC(0x7783, 0x7784); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x7784, 0x7786); goto goto_state2; }
-  CYC(0x7784, 0x7786);
-  CALL_C(0x7786, interactionRunScript_hook, 0x2552, 0x7789);
-  if (F & FC) { CYCT(0x7789, 0x778c); interactionDelete_hook(gb); return; }
-  CYC(0x7789, 0x778c); CYC(0x778c, 0x778f); npcFaceLinkAndAnimate_hook(gb); return;
+  CYC(b_+21, b_+24); A = W8(wTmpcfc0_goronDance_linkStartedDance);
+  CYC(b_+24, b_+25); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+25, b_+27); goto goto_state2; }
+  CYC(b_+25, b_+27);
+  CALL_C((SYM(zeldaSubid02Script_body) + 5), interactionRunScript_hook, SYM(interactionRunScript), (SYM(zeldaSubid02Script_body) + 8));
+  if (F & FC) { CYCT(b_+30, b_+33); interactionDelete_hook(gb); return; }
+  CYC(b_+30, b_+33); CYC(b_+33, b_+36); npcFaceLinkAndAnimate_hook(gb); return;
 goto_state2:
-  CALL_C(0x778f, interactionIncState_hook, 0x23e0, 0x7792);
-  CYC(0x7792, 0x7794); goto update_animation;
+  CALL_C((SYM(zeldaSubid02Script_body) + 14), interactionIncState_hook, SYM(interactionIncState), (SYM(zeldaSubid02Script_body) + 17));
+  CYC(b_+39, b_+41); goto update_animation;
 state2:
-  CYC(0x7794, 0x7797); A = W8(wTmpcfc0_goronDance_linkStartedDance);
-  CYC(0x7797, 0x7798); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x7798, 0x779a); goto goto_state1; }
-  CYC(0x7798, 0x779a);
+  CYC(b_+41, b_+44); A = W8(wTmpcfc0_goronDance_linkStartedDance);
+  CYC(b_+44, b_+45); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+45, b_+47); goto goto_state1; }
+  CYC(b_+45, b_+47);
 update_animation:
-  CYC(0x779a, 0x779d); SET_HL(w1Link_yh + 3);
-  CYC(0x779d, 0x779f); E = INTERACTION_BASE + OBJ_Z;
-  CYC(0x779f, 0x77a0); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x77a0, 0x77a1); mem_wr(gb, DE, A);
-  CYC(0x77a1, 0x77a2); E = alu_inc8(gb, E);
-  CYC(0x77a2, 0x77a3); A = mem_rd(gb, HL);
-  CYC(0x77a3, 0x77a4); mem_wr(gb, DE, A);
-  CYC(0x77a4, 0x77a7); A = W8(wTmpcfc0_goronDance_danceAnimation);
-  CALL_C(0x77a7, interactionSetAnimation_hook, 0x262e, 0x77aa);
-  CYC(0x77aa, 0x77ad); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return;
+  CYC(b_+47, b_+50); SET_HL(w1Link_yh + 3);
+  CYC(b_+50, b_+52); E = INTERACTION_BASE + OBJ_Z;
+  CYC(b_+52, b_+53); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+53, b_+54); mem_wr(gb, DE, A);
+  CYC(b_+54, b_+55); E = alu_inc8(gb, E);
+  CYC(b_+55, b_+56); A = mem_rd(gb, HL);
+  CYC(b_+56, b_+57); mem_wr(gb, DE, A);
+  CYC(b_+57, b_+60); A = W8(wTmpcfc0_goronDance_danceAnimation);
+  CALL_C((SYM(zeldaSubid03Script_body) + 20), interactionSetAnimation_hook, SYM(interactionSetAnimation), (SYM(zeldaSubid03Script_body) + 23));
+  CYC(b_+63, b_+66); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return;
 goto_state1:
-  CYC(0x77ad, 0x77ae); H = D;
-  CYC(0x77ae, 0x77b0); L = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x77b0, 0x77b2); mem_wr(gb, HL, 1);
-  CYC(0x77b2, 0x77b5); goron_subid01_face_down(gb, sp0_);
+  CYC(b_+66, b_+67); H = D;
+  CYC(b_+67, b_+69); L = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+69, b_+71); mem_wr(gb, HL, 1);
+  CYC(b_+71, SYM(goronSubid02)); goron_subid01_face_down(gb, sp0_);
 }
 
 static void goron_subid00_push_link_away(GB *gb) {
-  CYC(0x762a, 0x762d); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb);
+  BASE(goronSubid00);
+  CYC(b_+182, b_+185); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb);
 }
 
 static void goron_subid00_select_script(GB *gb, uint16_t address, uint16_t return_address, uint16_t sp0_) {
-  CYC(address, address + 3); SET_HL(0x7de8);
+  BASE(interactionSetScript);
+  CYC(address, address + 3); SET_HL((SYM(interactiondc_spawnPuff) + 506));
   CYC(address + 3, address + 4); goron_add_double_index(gb, address + 4);
   CYC(address + 4, address + 5); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(address + 5, address + 6); H = mem_rd(gb, HL);
   CYC(address + 6, address + 7); L = A;
-  CALL_C(address + 7, interactionSetScript_hook, 0x2544, return_address);
+  CALL_C(address + 7, interactionSetScript_hook, b_+0, return_address);
 }
 
 static void goron_subid00_reset_dance(GB *gb) {
-  CYC(0x773b, 0x773c); alu_xor(gb, A);
-  CYC(0x773c, 0x773f); W8(wTmpcfc0_goronDance_linkStartedDance) = A;
-  CYC(0x773f, 0x7741); A = 2;
-  CYC(0x7741, 0x7744); W8(wTmpcfc0_goronDance_danceAnimation) = A;
-  CYC(0x7744, 0x7747); goronDance_turnLinkToDirection_hook(gb);
+  BASE(goronSubid00);
+  CYC(b_+455, b_+456); alu_xor(gb, A);
+  CYC(b_+456, b_+459); W8(wTmpcfc0_goronDance_linkStartedDance) = A;
+  CYC(b_+459, b_+461); A = 2;
+  CYC(b_+461, b_+464); W8(wTmpcfc0_goronDance_danceAnimation) = A;
+  CYC(b_+464, b_+467); goronDance_turnLinkToDirection_hook(gb);
 }
 
 static void goron_subid00_next_round(GB *gb) {
-  CYC(0x7721, 0x7722); H = D;
-  CYC(0x7722, 0x7724); L = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x7724, 0x7726); mem_wr(gb, HL, 2);
-  CYC(0x7726, 0x7727); L = alu_inc8(gb, L);
-  CYC(0x7727, 0x7729); mem_wr(gb, HL, 0);
-  CYC(0x7729, 0x772b); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x772b, 0x772d); mem_wr(gb, HL, 30);
-  CYC(0x772d, 0x772f); goron_subid00_reset_dance(gb);
+  BASE(goronSubid00);
+  CYC(b_+429, b_+430); H = D;
+  CYC(b_+430, b_+432); L = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+432, b_+434); mem_wr(gb, HL, 2);
+  CYC(b_+434, b_+435); L = alu_inc8(gb, L);
+  CYC(b_+435, b_+437); mem_wr(gb, HL, 0);
+  CYC(b_+437, b_+439); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+439, b_+441); mem_wr(gb, HL, 30);
+  CYC(b_+441, b_+443); goron_subid00_reset_dance(gb);
 }
 
 static void goron_subid00_end_dance(GB *gb) {
-  CYC(0x772f, 0x7730); H = D;
-  CYC(0x7730, 0x7732); L = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x7732, 0x7734); mem_wr(gb, HL, 4);
-  CYC(0x7734, 0x7735); L = alu_inc8(gb, L);
-  CYC(0x7735, 0x7737); mem_wr(gb, HL, 0);
-  CYC(0x7737, 0x7739); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x7739, 0x773b); mem_wr(gb, HL, 60);
+  BASE(goronSubid00);
+  CYC(b_+443, b_+444); H = D;
+  CYC(b_+444, b_+446); L = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+446, b_+448); mem_wr(gb, HL, 4);
+  CYC(b_+448, b_+449); L = alu_inc8(gb, L);
+  CYC(b_+449, b_+451); mem_wr(gb, HL, 0);
+  CYC(b_+451, b_+453); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+453, b_+455); mem_wr(gb, HL, 60);
   goron_subid00_reset_dance(gb);
 }
 
 static void goron_subid00_run(GB *gb, uint16_t entry, uint16_t sp0_) {
-  switch (entry) {
-    case 0x7585: goto after_graphics;
-    case 0x75c0: goto state1;
-    case 0x75df: goto state2;
-    case 0x768a: goto state3;
-    case 0x7747: goto state4;
-    default: hook_continue(gb, entry, sp0_); return;
-  }
+  BASE(goronSubid00);
+  do { uint16_t jt_ = (entry);
+    if (jt_ == (SYM(patch_downstairsScript_body__saidNo) + 4)) { goto after_graphics; }
+    else if (jt_ == (SYM(carpenter_subid00Script_body__npcLoop) + 12)) { goto state1; }
+    else if (jt_ == (SYM(carpenter_subid00Script_body__repeatExplanation) + 10)) { goto state2; }
+    else if (jt_ == (SYM(tokkayScript_justHeardTune_body) + 28)) { goto state3; }
+    else if (jt_ == (SYM(zelda_warpOutOfVireMinigame) + 14)) { goto state4; }
+    else { hook_continue(gb, entry, sp0_); return; }
+  } while (0);
 after_graphics:
-  CYC(0x7585, 0x7588); A = W8(wTilesetFlags);
-  CYC(0x7588, 0x758a); alu_and(gb, 0x80);
-  CYC(0x758a, 0x758c); A = 1;
-  if (F & FZ) { CYCT(0x758c, 0x758e); goto set_palette; }
-  CYC(0x758c, 0x758e); CYC(0x758e, 0x7590); A = 2;
+  CYC(b_+17, b_+20); A = W8(wTilesetFlags);
+  CYC(b_+20, b_+22); alu_and(gb, 0x80);
+  CYC(b_+22, b_+24); A = 1;
+  if (F & FZ) { CYCT(b_+24, b_+26); goto set_palette; }
+  CYC(b_+24, b_+26); CYC(b_+26, b_+28); A = 2;
 set_palette:
-  CYC(0x7590, 0x7592); E = INTERACTION_BASE + OBJ_OAM_FLAGS;
-  CYC(0x7592, 0x7593); mem_wr(gb, DE, A);
-  CYC(0x7593, 0x7596); SET_HL(0x7818);
-  CALL_C(0x7596, checkIsLinkedGame_hook, 0x1992, 0x7599);
-  if (F & FZ) { CYCT(0x7599, 0x759b); goto load_dancers; }
-  CYC(0x7599, 0x759b);
-  CYC(0x759b, 0x759e); A = W8(wTilesetFlags);
-  CYC(0x759e, 0x75a0); alu_and(gb, 0x80);
-  if (F & FZ) { CYCT(0x75a0, 0x75a2); goto load_dancers; }
-  CYC(0x75a0, 0x75a2); CYC(0x75a2, 0x75a5); SET_HL(0x7844);
+  CYC(b_+28, b_+30); E = INTERACTION_BASE + OBJ_OAM_FLAGS;
+  CYC(b_+30, b_+31); mem_wr(gb, DE, A);
+  CYC(b_+31, b_+34); SET_HL((SYM(symmetryNpc_getTuniNutStateForSister) + 11));
+  CALL_C((SYM(moblin_spawnEnemyHere) + 4), checkIsLinkedGame_hook, SYM(checkIsLinkedGame), (SYM(moblin_spawnEnemyHere) + 7));
+  if (F & FZ) { CYCT(b_+37, b_+39); goto load_dancers; }
+  CYC(b_+37, b_+39);
+  CYC(b_+39, b_+42); A = W8(wTilesetFlags);
+  CYC(b_+42, b_+44); alu_and(gb, 0x80);
+  if (F & FZ) { CYCT(b_+44, b_+46); goto load_dancers; }
+  CYC(b_+44, b_+46); CYC(b_+46, b_+49); SET_HL((SYM(symmetryNpc_getUpgradeCapacityForText__haveRingBox) + 13));
 load_dancers:
-  CALL_C(0x75a5, parseGivenObjectData_b00_hook, 0x3171, 0x75a8);
-  CYC(0x75a8, 0x75aa); B = 0x20;
-  CYC(0x75aa, 0x75ad); SET_HL(wTmpcfc0_goronDance);
-  CALL_C(0x75ad, clearMemory_hook, 0x046f, 0x75b0);
-  CYC(0x75b0, 0x75b2); A = 2;
-  CYC(0x75b2, 0x75b5); W8(wTmpcfc0_goronDance_danceAnimation) = A;
-  CYC(0x75b5, 0x75b6); alu_xor(gb, A);
-  goron_subid00_select_script(gb, 0x75b6, 0x75c0, sp0_);
+  CALL_C((SYM(carpenter_buildBridgeColumn) + 10), parseGivenObjectData_b00_hook, SYM(parseGivenObjectData_b00), (SYM(carpenter_buildBridgeColumn) + 13));
+  CYC(b_+52, b_+54); B = 0x20;
+  CYC(b_+54, b_+57); SET_HL(wTmpcfc0_goronDance);
+  CALL_C((SYM(carpenter_buildBridgeColumn) + 18), clearMemory_hook, SYM(clearMemory), (SYM(carpenter_buildBridgeColumn) + 21));
+  CYC(b_+60, b_+62); A = 2;
+  CYC(b_+62, b_+65); W8(wTmpcfc0_goronDance_danceAnimation) = A;
+  CYC(b_+65, b_+66); alu_xor(gb, A);
+  goron_subid00_select_script(gb, (SYM(carpenter_subid00Script_body__npcLoop) + 2), (SYM(carpenter_subid00Script_body__npcLoop) + 12), sp0_);
 state1:
-  CALL_C(0x75c0, interactionRunScript_hook, 0x2552, 0x75c3);
-  if (F & FC) { CYCT(0x75c3, 0x75c6); goto script_done; }
-  CYC(0x75c3, 0x75c6); CYC(0x75c6, 0x75c9); npcFaceLinkAndAnimate_hook(gb); return;
+  CALL_C((SYM(carpenter_subid00Script_body__npcLoop) + 12), interactionRunScript_hook, SYM(interactionRunScript), SYM(carpenter_subid00Script_body__haveFlute));
+  if (F & FC) { CYCT(b_+79, b_+82); goto script_done; }
+  CYC(b_+79, b_+82); CYC(b_+82, b_+85); npcFaceLinkAndAnimate_hook(gb); return;
 script_done:
-  CYC(0x75c9, 0x75cb); B = 10;
-  CYC(0x75cb, 0x75ce); SET_HL(0x5786);
-  CYC(0x75ce, 0x75d0); E = 8;
-  CALL_C(0x75d0, interBankCall_hook, 0x008a, 0x75d3);
-  CYC(0x75d3, 0x75d5); A = 2;
-  CYC(0x75d5, 0x75d8); W8(wTmpcfc0_goronDance_danceAnimation) = A;
-  CALL_C(0x75d8, interactionIncState_hook, 0x23e0, 0x75db);
-  CYC(0x75db, 0x75dd); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x75dd, 0x75df); mem_wr(gb, HL, 30);
+  CYC(b_+85, b_+87); B = 10;
+  CYC(b_+87, b_+90); SET_HL((SYM(ralphSubid0cScript_b15) + 8));
+  CYC(b_+90, b_+92); E = 8;
+  CALL_C((SYM(carpenter_subid00Script_body__haveFlute) + 13), interBankCall_hook, 0x008a, SYM(carpenter_subid00Script_body__agreedToHelp));
+  CYC(b_+95, b_+97); A = 2;
+  CYC(b_+97, b_+100); W8(wTmpcfc0_goronDance_danceAnimation) = A;
+  CALL_C((SYM(carpenter_subid00Script_body__repeatExplanation) + 3), interactionIncState_hook, SYM(interactionIncState), (SYM(carpenter_subid00Script_body__repeatExplanation) + 6));
+  CYC(b_+103, b_+105); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+105, b_+107); mem_wr(gb, HL, 30);
 state2:
-  CYC(0x75df, 0x75e1); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x75e1, 0x75e2); A = mem_rd(gb, DE);
-  CYC(0x75e2, 0x75e3); push_effect(gb, 0x75e3);
-  switch (goron_jump_table(gb)) {
-    case 0x75ed: goto state2_wait;
-    case 0x7602: goto state2_start;
-    case 0x760d: goto state2_beat;
-    case 0x7659: goto state2_jump;
-    case 0x767c: goto state2_finished;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+107, b_+109); E = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+109, b_+110); A = mem_rd(gb, DE);
+  CYC(b_+110, b_+111); push_effect(gb, SYM(carpenter_subid00Script_body__alreadyAgreedToSearch));
+  do { uint16_t jt_ = (goron_jump_table(gb));
+    if (jt_ == (SYM(raftwreckCutsceneScript_body) + 6)) { goto state2_wait; }
+    else if (jt_ == (SYM(raftwreckCutsceneScript_body) + 27)) { goto state2_start; }
+    else if (jt_ == (SYM(raftwreckCutsceneScript_body) + 38)) { goto state2_beat; }
+    else if (jt_ == (SYM(tokkey_jump) + 5)) { goto state2_jump; }
+    else if (jt_ == (SYM(tokkayScript_justHeardTune_body) + 14)) { goto state2_finished; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 state2_wait:
-  CALL_C(0x75ed, interactionDecCounter1_hook, 0x23cc, 0x75f0);
-  if (!(F & FZ)) { CYCT(0x75f0, 0x75f3); goron_subid00_push_link_away(gb); return; }
-  CYC(0x75f0, 0x75f3);
-  CALL_C(0x75f3, interactionIncSubstate_hook, 0x23e5, 0x75f6);
-  CYC(0x75f6, 0x75f8); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x75f8, 0x75fa); mem_wr(gb, HL, 90);
-  CYC(0x75fa, 0x75fc); A = 0xcc;
-  CALL_C(0x75fc, playSound_b00_hook, 0x0c98, 0x75ff);
-  CALL_C(0x75ff, goronDance_initNextRound_hook, 0x78db, 0x7602);
+  CALL_C((SYM(raftwreckCutsceneScript_body) + 6), interactionDecCounter1_hook, SYM(interactionDecCounter1), (SYM(raftwreckCutsceneScript_body) + 9));
+  if (!(F & FZ)) { CYCT(b_+124, b_+127); goron_subid00_push_link_away(gb); return; }
+  CYC(b_+124, b_+127);
+  CALL_C((SYM(raftwreckCutsceneScript_body) + 12), interactionIncSubstate_hook, SYM(interactionIncSubstate), (SYM(raftwreckCutsceneScript_body) + 15));
+  CYC(b_+130, b_+132); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+132, b_+134); mem_wr(gb, HL, 90);
+  CYC(b_+134, b_+136); A = 0xcc;
+  CALL_C((SYM(raftwreckCutsceneScript_body) + 21), playSound_b00_hook, SYM(playSound_b00), (SYM(raftwreckCutsceneScript_body) + 24));
+  CALL_C((SYM(raftwreckCutsceneScript_body) + 24), goronDance_initNextRound_hook, SYM(goronDance_initNextRound), (SYM(raftwreckCutsceneScript_body) + 27));
 state2_start:
-  CALL_C(0x7602, interactionDecCounter1_hook, 0x23cc, 0x7605);
-  if (!(F & FZ)) { CYCT(0x7605, 0x7608); goron_subid00_push_link_away(gb); return; }
-  CYC(0x7605, 0x7608);
-  CALL_C(0x7608, interactionIncSubstate_hook, 0x23e5, 0x760b);
-  CYC(0x760b, 0x760d); goto next_move;
+  CALL_C((SYM(raftwreckCutsceneScript_body) + 27), interactionDecCounter1_hook, SYM(interactionDecCounter1), (SYM(raftwreckCutsceneScript_body) + 30));
+  if (!(F & FZ)) { CYCT(b_+145, b_+148); goron_subid00_push_link_away(gb); return; }
+  CYC(b_+145, b_+148);
+  CALL_C((SYM(raftwreckCutsceneScript_body) + 33), interactionIncSubstate_hook, SYM(interactionIncSubstate), (SYM(raftwreckCutsceneScript_body) + 36));
+  CYC(b_+151, b_+153); goto next_move;
 state2_beat:
-  CALL_C(0x760d, interactionDecCounter1_hook, 0x23cc, 0x7610);
-  if (!(F & FZ)) { CYCT(0x7610, 0x7612); goron_subid00_push_link_away(gb); return; }
-  CYC(0x7610, 0x7612);
-  CALL_C(0x7612, goronDance_incBeat_hook, 0x7a1b, 0x7615);
+  CALL_C((SYM(raftwreckCutsceneScript_body) + 38), interactionDecCounter1_hook, SYM(interactionDecCounter1), (SYM(raftwreckCutsceneScript_body) + 41));
+  if (!(F & FZ)) { CYCT(b_+156, b_+158); goron_subid00_push_link_away(gb); return; }
+  CYC(b_+156, b_+158);
+  CALL_C((SYM(raftwreckCutsceneScript_body) + 43), goronDance_incBeat_hook, SYM(goronDance_incBeat), (SYM(raftwreckCutsceneScript_body) + 46));
 next_move:
-  CALL_C(0x7615, goronDance_getNextMove_hook, 0x7a20, 0x7618);
-  if (!(F & FZ)) { CYCT(0x7618, 0x761a); goto demonstration_finished; }
-  CYC(0x7618, 0x761a);
-  CALL_C(0x761a, goronDance_updateConsecutiveBPressCounter_hook, 0x7a3c, 0x761d);
-  CALL_C(0x761d, goronDance_updateGracefulGoronAnimation_hook, 0x7acf, 0x7620);
-  if (F & FZ) { CYCT(0x7620, 0x7622); goto jump; }
-  CYC(0x7620, 0x7622);
-  CALL_C(0x7622, goronDance_playMoveSound_hook, 0x7a04, 0x7625);
-  CYC(0x7625, 0x7626); H = D;
-  CYC(0x7626, 0x7628); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x7628, 0x762a); mem_wr(gb, HL, 20);
+  CALL_C((SYM(raftwreckCutsceneScript_body) + 46), goronDance_getNextMove_hook, SYM(goronDance_getNextMove), (SYM(raftwreckCutsceneScript_body) + 49));
+  if (!(F & FZ)) { CYCT(b_+164, b_+166); goto demonstration_finished; }
+  CYC(b_+164, b_+166);
+  CALL_C((SYM(raftwreckCutsceneScript_body) + 51), goronDance_updateConsecutiveBPressCounter_hook, SYM(goronDance_updateConsecutiveBPressCounter), (SYM(raftwreckCutsceneScript_body) + 54));
+  CALL_C((SYM(raftwreckCutsceneScript_body) + 54), goronDance_updateGracefulGoronAnimation_hook, SYM(goronDance_updateGracefulGoronAnimation), (SYM(raftwreckCutsceneScript_body) + 57));
+  if (F & FZ) { CYCT(b_+172, b_+174); goto jump; }
+  CYC(b_+172, b_+174);
+  CALL_C((SYM(raftwreckCutsceneScript_body) + 59), goronDance_playMoveSound_hook, SYM(goronDance_playMoveSound), (SYM(raftwreckCutsceneScript_body) + 62));
+  CYC(b_+177, b_+178); H = D;
+  CYC(b_+178, b_+180); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+180, b_+182); mem_wr(gb, HL, 20);
   goron_subid00_push_link_away(gb); return;
 jump:
-  CYC(0x762d, 0x762e); H = D;
-  CYC(0x762e, 0x7630); L = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x7630, 0x7632); mem_wr(gb, HL, 3);
-  CYC(0x7632, 0x7634); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x7634, 0x7636); mem_wr(gb, HL, 0x28);
-  CYC(0x7636, 0x7638); L = INTERACTION_BASE + OBJ_SPEED_Z;
-  CYC(0x7638, 0x763a); mem_wr(gb, HL, 0);
-  CYC(0x763a, 0x763b); SET_HL(HL + 1);
-  CYC(0x763b, 0x763d); mem_wr(gb, HL, 0xfe);
-  CYC(0x763d, 0x763f); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x763f, 0x7641); mem_wr(gb, HL, 20);
-  CYC(0x7641, 0x7643); A = 0xcd;
-  CALL_C(0x7643, playSound_b00_hook, 0x0c98, 0x7646);
-  CYC(0x7646, 0x7649); goron_subid00_push_link_away(gb); return;
+  CYC(b_+185, b_+186); H = D;
+  CYC(b_+186, b_+188); L = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+188, b_+190); mem_wr(gb, HL, 3);
+  CYC(b_+190, b_+192); L = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+192, b_+194); mem_wr(gb, HL, 0x28);
+  CYC(b_+194, b_+196); L = INTERACTION_BASE + OBJ_SPEED_Z;
+  CYC(b_+196, b_+198); mem_wr(gb, HL, 0);
+  CYC(b_+198, b_+199); SET_HL(HL + 1);
+  CYC(b_+199, b_+201); mem_wr(gb, HL, 0xfe);
+  CYC(b_+201, b_+203); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+203, b_+205); mem_wr(gb, HL, 20);
+  CYC(b_+205, b_+207); A = 0xcd;
+  CALL_C((SYM(raftwreckCutsceneScript_body) + 92), playSound_b00_hook, SYM(playSound_b00), (SYM(raftwreckCutsceneScript_body) + 95));
+  CYC(b_+210, b_+213); goron_subid00_push_link_away(gb); return;
 demonstration_finished:
-  CYC(0x7649, 0x764a); H = D;
-  CYC(0x764a, 0x764c); L = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x764c, 0x764e); mem_wr(gb, HL, 4);
-  CYC(0x764e, 0x7650); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x7650, 0x7652); mem_wr(gb, HL, 60);
-  CYC(0x7652, 0x7654); A = 2;
-  CALL_C(0x7654, interactionSetAnimation_hook, 0x262e, 0x7657);
-  CYC(0x7657, 0x7659); goron_subid00_push_link_away(gb); return;
+  CYC(b_+213, b_+214); H = D;
+  CYC(b_+214, b_+216); L = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+216, b_+218); mem_wr(gb, HL, 4);
+  CYC(b_+218, b_+220); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+220, b_+222); mem_wr(gb, HL, 60);
+  CYC(b_+222, b_+224); A = 2;
+  CALL_C(SYM(tokkey_jump), interactionSetAnimation_hook, SYM(interactionSetAnimation), (SYM(tokkey_jump) + 3));
+  CYC(b_+227, b_+229); goron_subid00_push_link_away(gb); return;
 state2_jump:
-  CALL_C(0x7659, interactionDecCounter1_hook, 0x23cc, 0x765c);
-  CYC(0x765c, 0x765e); C = 0x40;
-  CALL_C(0x765e, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x7661);
-  if (F & FZ) { CYCT(0x7661, 0x7663); goto landed; }
-  CYC(0x7661, 0x7663);
-  CYC(0x7663, 0x7664); H = D;
-  CYC(0x7664, 0x7666); L = INTERACTION_BASE + OBJ_SPEED_Z + 1;
-  CYC(0x7666, 0x7667); A = mem_rd(gb, HL); SET_HL(HL - 1);
-  CYC(0x7667, 0x7668); alu_or(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(0x7668, 0x766a); goron_subid00_push_link_away(gb); return; }
-  CYC(0x7668, 0x766a);
-  CYC(0x766a, 0x766c); A = 2;
-  CYC(0x766c, 0x766f); W8(wTmpcfc0_goronDance_danceAnimation) = A;
-  CALL_C(0x766f, interactionSetAnimation_hook, 0x262e, 0x7672);
-  CYC(0x7672, 0x7674); goron_subid00_push_link_away(gb); return;
+  CALL_C((SYM(tokkey_jump) + 5), interactionDecCounter1_hook, SYM(interactionDecCounter1), (SYM(tokkey_centerLinkOnTile) + 2));
+  CYC(b_+232, b_+234); C = 0x40;
+  CALL_C((SYM(tokkey_centerLinkOnTile) + 4), objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), (SYM(tokkey_centerLinkOnTile) + 7));
+  if (F & FZ) { CYCT(b_+237, b_+239); goto landed; }
+  CYC(b_+237, b_+239);
+  CYC(b_+239, b_+240); H = D;
+  CYC(b_+240, b_+242); L = INTERACTION_BASE + OBJ_SPEED_Z + 1;
+  CYC(b_+242, b_+243); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(b_+243, b_+244); alu_or(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+244, b_+246); goron_subid00_push_link_away(gb); return; }
+  CYC(b_+244, b_+246);
+  CYC(b_+246, b_+248); A = 2;
+  CYC(b_+248, b_+251); W8(wTmpcfc0_goronDance_danceAnimation) = A;
+  CALL_C((SYM(tokkayScript_justHeardTune_body) + 1), interactionSetAnimation_hook, SYM(interactionSetAnimation), (SYM(tokkayScript_justHeardTune_body) + 4));
+  CYC(b_+254, b_+256); goron_subid00_push_link_away(gb); return;
 landed:
-  CYC(0x7674, 0x7675); H = D;
-  CYC(0x7675, 0x7677); L = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x7677, 0x7679); mem_wr(gb, HL, 2);
-  CYC(0x7679, 0x767c); goto state2_beat;
+  CYC(b_+256, b_+257); H = D;
+  CYC(b_+257, b_+259); L = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+259, b_+261); mem_wr(gb, HL, 2);
+  CYC(b_+261, b_+264); goto state2_beat;
 state2_finished:
-  CALL_C(0x767c, interactionDecCounter1_hook, 0x23cc, 0x767f);
-  if (!(F & FZ)) { CYCT(0x767f, 0x7681); goron_subid00_push_link_away(gb); return; }
-  CYC(0x767f, 0x7681);
-  CALL_C(0x7681, interactionIncState_hook, 0x23e0, 0x7684);
-  CYC(0x7684, 0x7686); L = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x7686, 0x7688); mem_wr(gb, HL, 0);
-  CYC(0x7688, 0x768a); goron_subid00_push_link_away(gb); return;
+  CALL_C((SYM(tokkayScript_justHeardTune_body) + 14), interactionDecCounter1_hook, SYM(interactionDecCounter1), (SYM(tokkayScript_justHeardTune_body) + 17));
+  if (!(F & FZ)) { CYCT(b_+267, b_+269); goron_subid00_push_link_away(gb); return; }
+  CYC(b_+267, b_+269);
+  CALL_C((SYM(tokkayScript_justHeardTune_body) + 19), interactionIncState_hook, SYM(interactionIncState), (SYM(tokkayScript_justHeardTune_body) + 22));
+  CYC(b_+272, b_+274); L = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+274, b_+276); mem_wr(gb, HL, 0);
+  CYC(b_+276, b_+278); goron_subid00_push_link_away(gb); return;
 state3:
-  CYC(0x768a, 0x768c); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x768c, 0x768d); A = mem_rd(gb, DE);
-  CYC(0x768d, 0x768e); push_effect(gb, 0x768e);
-  switch (goron_jump_table(gb)) {
-    case 0x7698: goto state3_start;
-    case 0x76ae: goto state3_input;
-    case 0x76b7: goto state3_landing;
-    case 0x76c8: goto state3_round_end;
-    case 0x76e1: goto state3_failed;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+278, b_+280); E = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+280, b_+281); A = mem_rd(gb, DE);
+  CYC(b_+281, b_+282); push_effect(gb, (SYM(tokkayScript_justHeardTune_body) + 32));
+  do { uint16_t jt_ = (goron_jump_table(gb));
+    if (jt_ == (SYM(tokkayScript_justHeardTune_body) + 42)) { goto state3_start; }
+    else if (jt_ == (SYM(tokkayScript_justHeardTune_body) + 64)) { goto state3_input; }
+    else if (jt_ == (SYM(tokkayScript_justHeardTune_body) + 73)) { goto state3_landing; }
+    else if (jt_ == (SYM(tokkayScript_justHeardTune_body) + 90)) { goto state3_round_end; }
+    else if (jt_ == (SYM(zora_createExclamationMark) + 3)) { goto state3_failed; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 state3_start:
-  CALL_C(0x7698, interactionIncSubstate_hook, 0x23e5, 0x769b);
-  CALL_C(0x769b, goronDance_clearDanceVariables_hook, 0x78e9, 0x769e);
-  CYC(0x769e, 0x76a0); A = 0xcc;
-  CALL_C(0x76a0, playSound_b00_hook, 0x0c98, 0x76a3);
-  CYC(0x76a3, 0x76a5); A = 2;
-  CYC(0x76a5, 0x76a8); W8(wTmpcfc0_goronDance_danceAnimation) = A;
-  CALL_C(0x76a8, goronDance_turnLinkToDirection_hook, 0x7a72, 0x76ab);
-  CYC(0x76ab, 0x76ae); goron_subid00_push_link_away(gb); return;
+  CALL_C((SYM(tokkayScript_justHeardTune_body) + 42), interactionIncSubstate_hook, SYM(interactionIncSubstate), (SYM(tokkayScript_justHeardTune_body) + 45));
+  CALL_C((SYM(tokkayScript_justHeardTune_body) + 45), goronDance_clearDanceVariables_hook, SYM(goronDance_clearDanceVariables), (SYM(tokkayScript_justHeardTune_body) + 48));
+  CYC(b_+298, b_+300); A = 0xcc;
+  CALL_C((SYM(tokkayScript_justHeardTune_body) + 50), playSound_b00_hook, SYM(playSound_b00), (SYM(tokkayScript_justHeardTune_body) + 53));
+  CYC(b_+303, b_+305); A = 2;
+  CYC(b_+305, b_+308); W8(wTmpcfc0_goronDance_danceAnimation) = A;
+  CALL_C((SYM(tokkayScript_justHeardTune_body) + 58), goronDance_turnLinkToDirection_hook, SYM(goronDance_turnLinkToDirection), (SYM(tokkayScript_justHeardTune_body) + 61));
+  CYC(b_+311, b_+314); goron_subid00_push_link_away(gb); return;
 state3_input:
-  CALL_C(0x76ae, goronDance_updateFrameCounter_hook, 0x78d0, 0x76b1);
-  CALL_C(0x76b1, goronDance_checkLinkInput_hook, 0x7903, 0x76b4);
-  CYC(0x76b4, 0x76b7); goron_subid00_push_link_away(gb); return;
+  CALL_C((SYM(tokkayScript_justHeardTune_body) + 64), goronDance_updateFrameCounter_hook, SYM(goronDance_updateFrameCounter), (SYM(tokkayScript_justHeardTune_body) + 67));
+  CALL_C((SYM(tokkayScript_justHeardTune_body) + 67), goronDance_checkLinkInput_hook, SYM(goronDance_checkLinkInput), (SYM(tokkayScript_justHeardTune_body) + 70));
+  CYC(b_+320, b_+323); goron_subid00_push_link_away(gb); return;
 state3_landing:
-  CALL_C(0x76b7, goronDance_updateFrameCounter_hook, 0x78d0, 0x76ba);
-  CYC(0x76ba, 0x76bd); A = W8(wTmpcfc0_goronDance_linkJumping);
-  CYC(0x76bd, 0x76be); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x76be, 0x76c1); goron_subid00_push_link_away(gb); return; }
-  CYC(0x76be, 0x76c1);
-  CYC(0x76c1, 0x76c2); H = D;
-  CYC(0x76c2, 0x76c4); L = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x76c4, 0x76c5); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x76c5, 0x76c8); goron_subid00_push_link_away(gb); return;
+  CALL_C((SYM(tokkayScript_justHeardTune_body) + 73), goronDance_updateFrameCounter_hook, SYM(goronDance_updateFrameCounter), (SYM(tokkayScript_justHeardTune_body) + 76));
+  CYC(b_+326, b_+329); A = W8(wTmpcfc0_goronDance_linkJumping);
+  CYC(b_+329, b_+330); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+330, b_+333); goron_subid00_push_link_away(gb); return; }
+  CYC(b_+330, b_+333);
+  CYC(b_+333, b_+334); H = D;
+  CYC(b_+334, b_+336); L = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+336, b_+337); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+337, b_+340); goron_subid00_push_link_away(gb); return;
 state3_round_end:
-  CALL_C(0x76c8, interactionDecCounter1_hook, 0x23cc, 0x76cb);
-  if (!(F & FZ)) { CYCT(0x76cb, 0x76ce); goron_subid00_push_link_away(gb); return; }
-  CYC(0x76cb, 0x76ce);
-  CYC(0x76ce, 0x76d1); A = W8(wTmpcfc0_goronDance_roundIndex);
-  CYC(0x76d1, 0x76d3); alu_cp(gb, 8);
-  if (F & FZ) { CYCT(0x76d3, 0x76d5); goto end_dance; }
-  CYC(0x76d3, 0x76d5);
+  CALL_C((SYM(tokkayScript_justHeardTune_body) + 90), interactionDecCounter1_hook, SYM(interactionDecCounter1), (SYM(tokkayScript_justHeardTune_body) + 93));
+  if (!(F & FZ)) { CYCT(b_+343, b_+346); goron_subid00_push_link_away(gb); return; }
+  CYC(b_+343, b_+346);
+  CYC(b_+346, b_+349); A = W8(wTmpcfc0_goronDance_roundIndex);
+  CYC(b_+349, b_+351); alu_cp(gb, 8);
+  if (F & FZ) { CYCT(b_+351, b_+353); goto end_dance; }
+  CYC(b_+351, b_+353);
 next_round:
-  CYC(0x76d5, 0x76d8); push_effect(gb, 0x76d8); goron_subid00_next_round(gb); return;
+  CYC(b_+353, b_+356); push_effect(gb, (SYM(tokkayScript_justHeardTune_body) + 106)); goron_subid00_next_round(gb); return;
 end_dance:
-  CYC(0x76db, 0x76de); push_effect(gb, 0x76de); goron_subid00_end_dance(gb); return;
+  CYC(b_+359, b_+362); push_effect(gb, SYM(zora_createExclamationMark)); goron_subid00_end_dance(gb); return;
 state3_failed:
-  CYC(0x76e1, 0x76e3); E = INTERACTION_BASE + OBJ_VAR3F;
-  CYC(0x76e3, 0x76e4); A = mem_rd(gb, DE);
-  CYC(0x76e4, 0x76e5); push_effect(gb, 0x76e5);
-  switch (goron_jump_table(gb)) {
-    case 0x76e9: goto initialize_failed_script;
-    case 0x7718: goto run_failed_script;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+365, b_+367); E = INTERACTION_BASE + OBJ_VAR3F;
+  CYC(b_+367, b_+368); A = mem_rd(gb, DE);
+  CYC(b_+368, b_+369); push_effect(gb, (SYM(zora_createExclamationMark) + 7));
+  do { uint16_t jt_ = (goron_jump_table(gb));
+    if (jt_ == (SYM(zora_beginJump) + 3)) { goto initialize_failed_script; }
+    else if (jt_ == (SYM(zora_checkIsLinkedGame) + 10)) { goto run_failed_script; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 initialize_failed_script:
-  CALL_C(0x76e9, interactionDecCounter1_hook, 0x23cc, 0x76ec);
-  if (!(F & FZ)) { CYCT(0x76ec, 0x76ef); goron_subid00_push_link_away(gb); return; }
-  CYC(0x76ec, 0x76ef);
-  CYC(0x76ef, 0x76f1); A = 1;
-  CYC(0x76f1, 0x76f4); W8(wTmpcfc0_goronDance_cfd9) = A;
-  CYC(0x76f4, 0x76f7); SET_HL(wTmpcfc0_goronDance_roundIndex);
-  CYC(0x76f7, 0x76f8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x76f8, 0x76fb); SET_HL(wTmpcfc0_goronDance_numFailedRounds);
-  CYC(0x76fb, 0x76fc); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x76fc, 0x76fd); A = mem_rd(gb, HL);
-  CYC(0x76fd, 0x76ff); alu_cp(gb, 3);
-  if (F & FZ) { CYCT(0x76ff, 0x7701); goto set_failed_script; }
-  CYC(0x76ff, 0x7701);
-  CYC(0x7701, 0x7704); A = W8(wTmpcfc0_goronDance_roundIndex);
-  CYC(0x7704, 0x7706); alu_cp(gb, 8);
-  if (F & FZ) { CYCT(0x7706, 0x7708); goto end_dance; }
-  CYC(0x7706, 0x7708);
+  CALL_C((SYM(zora_beginJump) + 3), interactionDecCounter1_hook, SYM(interactionDecCounter1), SYM(zora_makeLinkFaceDown));
+  if (!(F & FZ)) { CYCT(b_+376, b_+379); goron_subid00_push_link_away(gb); return; }
+  CYC(b_+376, b_+379);
+  CYC(b_+379, b_+381); A = 1;
+  CYC(b_+381, b_+384); W8(wTmpcfc0_goronDance_cfd9) = A;
+  CYC(b_+384, b_+387); SET_HL(wTmpcfc0_goronDance_roundIndex);
+  CYC(b_+387, b_+388); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+388, b_+391); SET_HL(wTmpcfc0_goronDance_numFailedRounds);
+  CYC(b_+391, b_+392); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+392, b_+393); A = mem_rd(gb, HL);
+  CYC(b_+393, b_+395); alu_cp(gb, 3);
+  if (F & FZ) { CYCT(b_+395, b_+397); goto set_failed_script; }
+  CYC(b_+395, b_+397);
+  CYC(b_+397, b_+400); A = W8(wTmpcfc0_goronDance_roundIndex);
+  CYC(b_+400, b_+402); alu_cp(gb, 8);
+  if (F & FZ) { CYCT(b_+402, b_+404); goto end_dance; }
+  CYC(b_+402, b_+404);
 set_failed_script:
-  CYC(0x7708, 0x7709); H = D;
-  CYC(0x7709, 0x770b); L = INTERACTION_BASE + OBJ_VAR3F;
-  CYC(0x770b, 0x770c); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x770c, 0x770e); A = 1;
-  goron_subid00_select_script(gb, 0x770e, 0x7718, sp0_);
+  CYC(b_+404, b_+405); H = D;
+  CYC(b_+405, b_+407); L = INTERACTION_BASE + OBJ_VAR3F;
+  CYC(b_+407, b_+408); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+408, b_+410); A = 1;
+  goron_subid00_select_script(gb, SYM(zora_checkIsLinkedGame), (SYM(zora_checkIsLinkedGame) + 10), sp0_);
 run_failed_script:
-  CALL_C(0x7718, interactionRunScript_hook, 0x2552, 0x771b);
-  if (!(F & FC)) { CYCT(0x771b, 0x771e); goron_subid00_push_link_away(gb); return; }
-  CYC(0x771b, 0x771e); CYC(0x771e, 0x7721); goto next_round;
+  CALL_C((SYM(zora_checkIsLinkedGame) + 10), interactionRunScript_hook, SYM(interactionRunScript), (SYM(zora_createExclamationMarkToTheRight) + 1));
+  if (!(F & FC)) { CYCT(b_+423, b_+426); goron_subid00_push_link_away(gb); return; }
+  CYC(b_+423, b_+426); CYC(b_+426, b_+429); goto next_round;
 state4:
-  CYC(0x7747, 0x7749); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x7749, 0x774a); A = mem_rd(gb, DE);
-  CYC(0x774a, 0x774b); push_effect(gb, 0x774b);
-  switch (goron_jump_table(gb)) {
-    case 0x774f: goto state4_start;
-    case 0x7762: goto state4_script;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+467, b_+469); E = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+469, b_+470); A = mem_rd(gb, DE);
+  CYC(b_+470, b_+471); push_effect(gb, (SYM(zelda_warpOutOfVireMinigame) + 18));
+  do { uint16_t jt_ = (goron_jump_table(gb));
+    if (jt_ == (SYM(zelda_warpOutOfVireMinigame) + 22)) { goto state4_start; }
+    else if (jt_ == (SYM(zeldaSubid01Script_body) + 7)) { goto state4_script; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 state4_start:
-  CALL_C(0x774f, interactionIncSubstate_hook, 0x23e5, 0x7752);
-  CYC(0x7752, 0x7753); alu_xor(gb, A);
-  CYC(0x7753, 0x7756); W8(wTmpcfc0_goronDance_linkStartedDance) = A;
-  CYC(0x7756, 0x7758); A = 2;
-  goron_subid00_select_script(gb, 0x7758, 0x7762, sp0_);
+  CALL_C((SYM(zelda_warpOutOfVireMinigame) + 22), interactionIncSubstate_hook, SYM(interactionIncSubstate), (SYM(zelda_warpOutOfVireMinigame__warpDest) + 2));
+  CYC(b_+478, b_+479); alu_xor(gb, A);
+  CYC(b_+479, b_+482); W8(wTmpcfc0_goronDance_linkStartedDance) = A;
+  CYC(b_+482, b_+484); A = 2;
+  goron_subid00_select_script(gb, (SYM(zelda_giveBlueJoyRing) + 3), (SYM(zeldaSubid01Script_body) + 7), sp0_);
 state4_script:
-  CALL_C(0x7762, interactionRunScript_hook, 0x2552, 0x7765);
-  if (!(F & FC)) { CYCT(0x7765, 0x7768); goron_subid00_push_link_away(gb); return; }
-  CYC(0x7765, 0x7768); CYC(0x7768, 0x776b); goron_subid00_push_link_away(gb);
+  CALL_C((SYM(zeldaSubid01Script_body) + 7), interactionRunScript_hook, SYM(interactionRunScript), (SYM(zeldaSubid01Script_body) + 10));
+  if (!(F & FC)) { CYCT(b_+497, b_+500); goron_subid00_push_link_away(gb); return; }
+  CYC(b_+497, b_+500); CYC(b_+500, SYM(goronSubid01)); goron_subid00_push_link_away(gb);
 }
 
 void goronSubid00__afterCall7585_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
-  goron_subid00_run(gb, 0x7585, sp0_);
+  goron_subid00_run(gb, (SYM(patch_downstairsScript_body__saidNo) + 4), sp0_);
 }
 
 void goronSubid00_hook(GB *gb) {
+  BASE(goronSubid00);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7574, 0x7576); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x7576, 0x7577); A = mem_rd(gb, DE);
-  CYC(0x7577, 0x7578); push_effect(gb, 0x7578);
-  switch (goron_jump_table(gb)) {
-    case 0x7582:
-      CALL_C(0x7582, goron_initGraphicsAndIncState_hook, 0x7d72, 0x7585);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, (SYM(patch_downstairsScript_body__npcLoop) + 16));
+  do { uint16_t jt_ = (goron_jump_table(gb));
+    if (jt_ == (SYM(patch_downstairsScript_body__saidNo) + 1)) {
+      CALL_C((SYM(patch_downstairsScript_body__saidNo) + 1), goron_initGraphicsAndIncState_hook, SYM(goron_initGraphicsAndIncState), (SYM(patch_downstairsScript_body__saidNo) + 4));
       goronSubid00__afterCall7585_hook(gb);
       return;
-    case 0x75c0: goron_subid00_run(gb, 0x75c0, sp0_); return;
-    case 0x75df: goron_subid00_run(gb, 0x75df, sp0_); return;
-    case 0x768a: goron_subid00_run(gb, 0x768a, sp0_); return;
-    case 0x7747: goron_subid00_run(gb, 0x7747, sp0_); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+    }
+    else if (jt_ == (SYM(carpenter_subid00Script_body__npcLoop) + 12)) { goron_subid00_run(gb, (SYM(carpenter_subid00Script_body__npcLoop) + 12), sp0_); return; }
+    else if (jt_ == (SYM(carpenter_subid00Script_body__repeatExplanation) + 10)) { goron_subid00_run(gb, (SYM(carpenter_subid00Script_body__repeatExplanation) + 10), sp0_); return; }
+    else if (jt_ == (SYM(tokkayScript_justHeardTune_body) + 28)) { goron_subid00_run(gb, (SYM(tokkayScript_justHeardTune_body) + 28), sp0_); return; }
+    else if (jt_ == (SYM(zelda_warpOutOfVireMinigame) + 14)) { goron_subid00_run(gb, (SYM(zelda_warpOutOfVireMinigame) + 14), sp0_); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void goronDance_clearVariables_hook(GB *gb) {
+  BASE(goronDance_clearVariables);
   uint16_t sp0_ = gb->sp;
-  CYC15(0x62ef, 0x62f1); B = 0x20;
-  CYC15(0x62f1, 0x62f4); SET_HL(wTmpcfc0_goronDance);
-  CALL_C15(0x62f4, clearMemory_hook, 0x046f, 0x62f7);
-  CYC15(0x62f7, 0x62f9); A = 2;
-  CYC15(0x62f9, 0x62fc); W8(wTmpcfc0_goronDance_danceAnimation) = A;
-  CYC15(0x62fc, 0x62ff); SET_HL(w1Link_yh - 3);
-  CYC15(0x62ff, 0x6301); mem_wr(gb, HL, 2);
-  CYC15(0x6301, 0x6302); H = D;
-  CYC15(0x6302, 0x6304); L = INTERACTION_BASE + OBJ_STATE;
-  CYC15(0x6304, 0x6306); mem_wr(gb, HL, 1);
-  CYC15(0x6306, 0x6307); L = alu_inc8(gb, L);
-  CYC15(0x6307, 0x6309); mem_wr(gb, HL, 0);
-  CYC15(0x6309, 0x630a); ret_effect(gb);
+  CYC15(b_+0, b_+2); B = 0x20;
+  CYC15(b_+2, b_+5); SET_HL(wTmpcfc0_goronDance);
+  CALL_C15(b_+5, clearMemory_hook, SYM(clearMemory), b_+8);
+  CYC15(b_+8, b_+10); A = 2;
+  CYC15(b_+10, b_+13); W8(wTmpcfc0_goronDance_danceAnimation) = A;
+  CYC15(b_+13, b_+16); SET_HL(w1Link_yh - 3);
+  CYC15(b_+16, b_+18); mem_wr(gb, HL, 2);
+  CYC15(b_+18, b_+19); H = D;
+  CYC15(b_+19, b_+21); L = INTERACTION_BASE + OBJ_STATE;
+  CYC15(b_+21, b_+23); mem_wr(gb, HL, 1);
+  CYC15(b_+23, b_+24); L = alu_inc8(gb, L);
+  CYC15(b_+24, b_+26); mem_wr(gb, HL, 0);
+  CYC15(b_+26, SYM(goronDance_restartGame)); ret_effect(gb);
 }
 
 void goronDance_restartGame_hook(GB *gb) {
+  BASE(goronDance_restartGame);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC15(0x630a, 0x630b); alu_xor(gb, A);
-  CYC15(0x630b, 0x630e); W8(wTmpcfc0_goronDance_roundIndex) = A;
-  CYC15(0x630e, 0x6311); W8(wTmpcfc0_goronDance_numFailedRounds) = A;
-  CYC15(0x6311, 0x6314); SET_HL(w1Link_yh - 3);
-  CYC15(0x6314, 0x6316); mem_wr(gb, HL, 2);
-  CYC15(0x6316, 0x6318); B = 10;
-  CYC15(0x6318, 0x631b); SET_HL(0x5786);
-  CYC15(0x631b, 0x631d); E = 8;
-  CYC15(0x631d, 0x6320); interBankCall_hook(gb);
+  CYC15(b_+0, b_+1); alu_xor(gb, A);
+  CYC15(b_+1, b_+4); W8(wTmpcfc0_goronDance_roundIndex) = A;
+  CYC15(b_+4, b_+7); W8(wTmpcfc0_goronDance_numFailedRounds) = A;
+  CYC15(b_+7, b_+10); SET_HL(w1Link_yh - 3);
+  CYC15(b_+10, b_+12); mem_wr(gb, HL, 2);
+  CYC15(b_+12, b_+14); B = 10;
+  CYC15(b_+14, b_+17); SET_HL((SYM(ralphSubid0cScript_b15) + 8));
+  CYC15(b_+17, b_+19); E = 8;
+  CYC15(b_+19, SYM(goron_checkInPresent)); interBankCall_hook(gb);
 }
 
 void goronDance_initLinkPosition_hook(GB *gb) {
+  BASE(goronDance_initLinkPosition);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC15(0x6331, 0x6333); A = 2;
-  CYC15(0x6333, 0x6336); SET_BC(0x5c50);
-  CYC15(0x6336, 0x6338); goron_setLinkPositionAndDirection_hook(gb);
+  CYC15(b_+0, b_+2); A = 2;
+  CYC15(b_+2, b_+5); SET_BC((SYM(tokayExplainingVinesScript__npcLoop_b15) + 15));
+  CYC15(b_+5, SYM(goron_targetCarts_setLinkPositionToCartPlatform)); goron_setLinkPositionAndDirection_hook(gb);
 }
 
 void goronDance_checkNumFailedRounds_hook(GB *gb) {
+  BASE(goronDance_checkNumFailedRounds);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC15(0x635b, 0x635e); A = W8(wTmpcfc0_goronDance_numFailedRounds);
-  CYC15(0x635e, 0x635f); B = A;
-  CYC15(0x635f, 0x6361); A = 8;
-  CYC15(0x6361, 0x6362); alu_sub(gb, B);
-  CYC15(0x6362, 0x6365); SET_HL(wTextNumberSubstitution);
-  CYC15(0x6365, 0x6366); mem_wr(gb, HL, A);
-  CYC15(0x6366, 0x6367); SET_HL(HL + 1);
-  CYC15(0x6367, 0x6369); mem_wr(gb, HL, 0);
-  CYC15(0x6369, 0x636c); A = W8(wTmpcfc0_goronDance_numFailedRounds);
-  CYC15(0x636c, 0x636d); alu_or(gb, A);
-  CYC15(0x636d, 0x6370); writeFlagsTocddb_hook(gb);
+  CYC15(b_+0, b_+3); A = W8(wTmpcfc0_goronDance_numFailedRounds);
+  CYC15(b_+3, b_+4); B = A;
+  CYC15(b_+4, b_+6); A = 8;
+  CYC15(b_+6, b_+7); alu_sub(gb, B);
+  CYC15(b_+7, b_+10); SET_HL(wTextNumberSubstitution);
+  CYC15(b_+10, b_+11); mem_wr(gb, HL, A);
+  CYC15(b_+11, b_+12); SET_HL(HL + 1);
+  CYC15(b_+12, b_+14); mem_wr(gb, HL, 0);
+  CYC15(b_+14, b_+17); A = W8(wTmpcfc0_goronDance_numFailedRounds);
+  CYC15(b_+17, b_+18); alu_or(gb, A);
+  CYC15(b_+18, SYM(goronDance_giveRandomRingPrize)); writeFlagsTocddb_hook(gb);
 }
 
 void goronDance_giveRandomRingPrize_hook(GB *gb) {
+  BASE(goronDance_giveRandomRingPrize);
   uint16_t sp0_ = gb->sp;
-  CYC15(0x6370, 0x6373); A = W8(wTilesetFlags);
-  CYC15(0x6373, 0x6375); alu_and(gb, 0x80);
-  if (!(F & FZ)) { CYCT15(0x6375, 0x6377); goto past; }
-  CYC15(0x6375, 0x6377);
-  CYC15(0x6377, 0x6379); B = 2;
-  CYC15(0x6379, 0x637b); goto give_ring;
+  CYC15(b_+0, b_+3); A = W8(wTilesetFlags);
+  CYC15(b_+3, b_+5); alu_and(gb, 0x80);
+  if (!(F & FZ)) { CYCT15(b_+5, b_+7); goto past; }
+  CYC15(b_+5, b_+7);
+  CYC15(b_+7, b_+9); B = 2;
+  CYC15(b_+9, b_+11); goto give_ring;
 past:
-  CYC15(0x637b, 0x637d); B = 0;
-  CYC15(0x637d, 0x6380); A = W8(wTmpcfc0_goronDance_danceLevel);
-  CYC15(0x6380, 0x6382); alu_cp(gb, 0);
-  if (F & FZ) { CYCT15(0x6382, 0x6384); goto give_ring; }
-  CYC15(0x6382, 0x6384);
-  CYC15(0x6384, 0x6386); B = 2;
+  CYC15(b_+11, b_+13); B = 0;
+  CYC15(b_+13, b_+16); A = W8(wTmpcfc0_goronDance_danceLevel);
+  CYC15(b_+16, b_+18); alu_cp(gb, 0);
+  if (F & FZ) { CYCT15(b_+18, b_+20); goto give_ring; }
+  CYC15(b_+18, b_+20);
+  CYC15(b_+20, b_+22); B = 2;
 give_ring:
-  CALL_C15(0x6386, getRandomNumber_hook, 0x043e, 0x6389);
-  CYC15(0x6389, 0x638b); alu_and(gb, 1);
-  CYC15(0x638b, 0x638c); alu_add(gb, B);
-  CYC15(0x638c, 0x638f); SET_HL(0x6394);
-  CYC15(0x638f, 0x6390); goron_add_a_to_hl(gb, 0x6390);
-  CYC15(0x6390, 0x6391); A = mem_rd(gb, HL);
-  CYC15(0x6391, 0x6394); giveRingAToLink_hook(gb);
+  CALL_C15(b_+22, getRandomNumber_hook, SYM(getRandomNumber), b_+25);
+  CYC15(b_+25, b_+27); alu_and(gb, 1);
+  CYC15(b_+27, b_+28); alu_add(gb, B);
+  CYC15(b_+28, b_+31); SET_HL(b_+36);
+  CYC15(b_+31, b_+32); goron_add_a_to_hl(gb, b_+32);
+  CYC15(b_+32, b_+33); A = mem_rd(gb, HL);
+  CYC15(b_+33, b_+36); giveRingAToLink_hook(gb);
 }
 
 void goronElder_lookingUpAnimation_hook(GB *gb) {
+  BASE(goronElder_lookingUpAnimation);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC15(0x7341, 0x7342); H = D;
-  CYC15(0x7342, 0x7344); L = INTERACTION_BASE + OBJ_VAR3F;
-  CYC15(0x7344, 0x7346); mem_wr(gb, HL, 1);
-  CYC15(0x7346, 0x7348); A = 4;
-  CYC15(0x7348, 0x734b); interactionSetAnimation_hook(gb);
+  CYC15(b_+0, b_+1); H = D;
+  CYC15(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR3F;
+  CYC15(b_+3, b_+5); mem_wr(gb, HL, 1);
+  CYC15(b_+5, b_+7); A = 4;
+  CYC15(b_+7, SYM(goronElder_normalAnimation)); interactionSetAnimation_hook(gb);
 }
 
 void goronElder_normalAnimation_hook(GB *gb) {
+  BASE(goronElder_normalAnimation);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC15(0x734b, 0x734c); H = D;
-  CYC15(0x734c, 0x734e); L = INTERACTION_BASE + OBJ_VAR3F;
-  CYC15(0x734e, 0x7350); mem_wr(gb, HL, 0);
-  CYC15(0x7350, 0x7352); A = 2;
-  CYC15(0x7352, 0x7355); interactionSetAnimation_hook(gb);
+  CYC15(b_+0, b_+1); H = D;
+  CYC15(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR3F;
+  CYC15(b_+3, b_+5); mem_wr(gb, HL, 0);
+  CYC15(b_+5, b_+7); A = 2;
+  CYC15(b_+7, SYM(goronElderScript_subid00_body)); interactionSetAnimation_hook(gb);
 }
 
 void goron_beginWalkingLeft_hook(GB *gb) {
+  BASE(goron_beginWalkingLeft);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC15(0x6523, 0x6524); H = D;
-  CYC15(0x6524, 0x6526); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC15(0x6526, 0x6528); mem_wr(gb, HL, 0x14);
-  CYC15(0x6528, 0x652a); L = INTERACTION_BASE + OBJ_ANGLE;
-  CYC15(0x652a, 0x652c); mem_wr(gb, HL, 0x18);
-  CYC15(0x652c, 0x652e); L = INTERACTION_BASE + OBJ_COUNTER2;
-  CYC15(0x652e, 0x6530); mem_wr(gb, HL, 0x40);
-  CYC15(0x6530, 0x6531); L = alu_inc8(gb, L);
-  CYC15(0x6531, 0x6533); mem_wr(gb, HL, 0);
-  CYC15(0x6533, 0x6535); L = INTERACTION_BASE + OBJ_VAR3F;
-  CYC15(0x6535, 0x6537); mem_wr(gb, HL, 1);
-  CYC15(0x6537, 0x6539); A = 3;
-  CYC15(0x6539, 0x653b); E = INTERACTION_BASE + OBJ_VAR3E;
-  CYC15(0x653b, 0x653c); mem_wr(gb, DE, A);
-  CYC15(0x653c, 0x653f); interactionSetAnimation_hook(gb);
+  CYC15(b_+0, b_+1); H = D;
+  CYC15(b_+1, b_+3); L = INTERACTION_BASE + OBJ_SPEED;
+  CYC15(b_+3, b_+5); mem_wr(gb, HL, 0x14);
+  CYC15(b_+5, b_+7); L = INTERACTION_BASE + OBJ_ANGLE;
+  CYC15(b_+7, b_+9); mem_wr(gb, HL, 0x18);
+  CYC15(b_+9, b_+11); L = INTERACTION_BASE + OBJ_COUNTER2;
+  CYC15(b_+11, b_+13); mem_wr(gb, HL, 0x40);
+  CYC15(b_+13, b_+14); L = alu_inc8(gb, L);
+  CYC15(b_+14, b_+16); mem_wr(gb, HL, 0);
+  CYC15(b_+16, b_+18); L = INTERACTION_BASE + OBJ_VAR3F;
+  CYC15(b_+18, b_+20); mem_wr(gb, HL, 1);
+  CYC15(b_+20, b_+22); A = 3;
+  CYC15(b_+22, b_+24); E = INTERACTION_BASE + OBJ_VAR3E;
+  CYC15(b_+24, b_+25); mem_wr(gb, DE, A);
+  CYC15(b_+25, SYM(goron_reverseWalkingDirection)); interactionSetAnimation_hook(gb);
 }
 
 void goron_checkEnoughTimePassed_hook(GB *gb) {
+  BASE(goron_checkEnoughTimePassed);
   uint16_t sp0_ = gb->sp;
-  CYC15(0x6689, 0x668c); A = W8(wSeedTreeRefilledBitset);
-  CYC15(0x668c, 0x668d); A = (uint8_t)~A;
-  CYC15(0x668d, 0x668f); alu_bit(gb, 0, A);
-  CALL_C15(0x668f, writeFlagsTocddb_hook, 0x5118, 0x6692);
+  CYC15(b_+0, b_+3); A = W8(wSeedTreeRefilledBitset);
+  CYC15(b_+3, b_+4); A = (uint8_t)~A;
+  CYC15(b_+4, b_+6); alu_bit(gb, 0, A);
+  CALL_C15(b_+6, writeFlagsTocddb_hook, SYM(writeFlagsTocddb), SYM(goron_clearRefillBit));
   goron_clearRefillBit_hook(gb);
 }
 
 void goron_clearRefillBit_hook(GB *gb) {
+  BASE(goron_clearRefillBit);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC15(0x6692, 0x6695); SET_HL(wSeedTreeRefilledBitset);
-  CYC15(0x6695, 0x6697); mem_wr(gb, HL, mem_rd(gb, HL) & 0xfe);
-  CYC15(0x6697, 0x6698); ret_effect(gb);
+  CYC15(b_+0, b_+3); SET_HL(wSeedTreeRefilledBitset);
+  CYC15(b_+3, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) & 0xfe);
+  CYC15(b_+5, SYM(goron_targetCarts_spawnPrize)); ret_effect(gb);
 }
 
 void goron_checkInPast_hook(GB *gb) {
+  BASE(goron_checkInPast);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC15(0x6328, 0x632b); A = W8(wTilesetFlags);
-  CYC15(0x632b, 0x632c); A = (uint8_t)~A;
-  CYC15(0x632c, 0x632e); alu_and(gb, 0x80);
-  CYC15(0x632e, 0x6331); writeFlagsTocddb_hook(gb);
+  CYC15(b_+0, b_+3); A = W8(wTilesetFlags);
+  CYC15(b_+3, b_+4); A = (uint8_t)~A;
+  CYC15(b_+4, b_+6); alu_and(gb, 0x80);
+  CYC15(b_+6, SYM(goronDance_initLinkPosition)); writeFlagsTocddb_hook(gb);
 }
 
 void goron_checkInPresent_hook(GB *gb) {
+  BASE(goron_checkInPresent);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC15(0x6320, 0x6323); A = W8(wTilesetFlags);
-  CYC15(0x6323, 0x6325); alu_and(gb, 0x80);
-  CYC15(0x6325, 0x6328); writeFlagsTocddb_hook(gb);
+  CYC15(b_+0, b_+3); A = W8(wTilesetFlags);
+  CYC15(b_+3, b_+5); alu_and(gb, 0x80);
+  CYC15(b_+5, SYM(goron_checkInPast)); writeFlagsTocddb_hook(gb);
 }
 
 void goron_checkLinkInAir_hook(GB *gb) {
+  BASE(goron_checkLinkInAir);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC15(0x67c5, 0x67c8); A = W8(wLinkInAir);
-  CYC15(0x67c8, 0x67c9); alu_or(gb, A);
-  CYC15(0x67c9, 0x67cc); writeFlagsTocddb_hook(gb);
+  CYC15(b_+0, b_+3); A = W8(wLinkInAir);
+  CYC15(b_+3, b_+4); alu_or(gb, A);
+  CYC15(b_+4, SYM(goron_targetCarts_setupNumTargetsHitText)); writeFlagsTocddb_hook(gb);
 }

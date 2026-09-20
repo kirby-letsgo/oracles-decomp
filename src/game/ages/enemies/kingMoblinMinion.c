@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0e, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0e, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode56), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode56), (from), (to), true)
 
 void enemyCode56_hook(GB *gb);
 
@@ -12,7 +12,8 @@ void enemyCode56_hook(GB *gb);
 // ENEMY_KING_MOBLIN_MINION
 // ==================================================================================================
 void enemyCode56_hook(GB *gb) {
-  CYC(0x76f2, 0x76f5); SET_HL(0x6c8e); // bank10.enemyCode56_body
-  CYC(0x76f5, 0x76f7); E = 0x10;
-  CYC(0x76f7, 0x76fa); interBankCall_hook(gb); return; // jp
+  BASE(enemyCode56);
+  CYC(b_+0, b_+3); SET_HL((SYM(bari_subid0_state8__dontShockYet) + 5)); // bank10.enemyCode56_body
+  CYC(b_+3, b_+5); E = 0x10;
+  CYC(b_+5, SYM(enemyCode61)); interBankCall_hook(gb); return; // jp
 }

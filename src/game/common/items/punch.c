@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x07, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x07, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode00), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode00), (from), (to), true)
 
 static uint16_t punch_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -24,45 +24,48 @@ static uint16_t punch_jump_table(GB *gb) {
 }
 
 static void punch_body(GB *gb, uint16_t sp0_) {
-  CYC(0x5f2a, 0x5f2c); E = 0x04;
-  CYC(0x5f2c, 0x5f2d); A = mem_rd(gb, DE);
-  CYC(0x5f2d, 0x5f2e); push_effect(gb, 0x5f2e);
-  switch (punch_jump_table(gb)) {
-    case 0x5f32:
-      CALL_C(0x5f32, itemLoadAttributesAndGraphics_hook, 0x4993, 0x5f35);
-      CYC(0x5f35, 0x5f37); C = 0xa6;
-      CALL_C(0x5f37, itemIncState_hook, 0x23ea, 0x5f3a);
-      CYC(0x5f3a, 0x5f3c); L = 0x06;
-      CYC(0x5f3c, 0x5f3e); mem_wr(gb, HL, 0x04);
-      CYC(0x5f3e, 0x5f40); L = 0x02;
-      CYC(0x5f40, 0x5f42); alu_bit(gb, 0, mem_rd(gb, HL));
+  BASE(itemCode00);
+  CYC(b_+0, b_+2); E = 0x04;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (punch_jump_table(gb));
+    if (jt_ == b_+8) {
+      CALL_C(b_+8, itemLoadAttributesAndGraphics_hook, SYM(itemLoadAttributesAndGraphics), b_+11);
+      CYC(b_+11, b_+13); C = 0xa6;
+      CALL_C(b_+13, itemIncState_hook, SYM(itemIncState), b_+16);
+      CYC(b_+16, b_+18); L = 0x06;
+      CYC(b_+18, b_+20); mem_wr(gb, HL, 0x04);
+      CYC(b_+20, b_+22); L = 0x02;
+      CYC(b_+22, b_+24); alu_bit(gb, 0, mem_rd(gb, HL));
       if (F & FZ) {
-        CYCT(0x5f42, 0x5f44);
+        CYCT(b_+24, b_+26);
       } else {
-        CYC(0x5f42, 0x5f44);
-        CYC(0x5f44, 0x5f46); L = 0x26;
-        CYC(0x5f46, 0x5f48); A = 0x06;
-        CYC(0x5f48, 0x5f49); mem_wr(gb, HL, A); SET_HL(HL + 1);
-        CYC(0x5f49, 0x5f4a); mem_wr(gb, HL, A); SET_HL(HL + 1);
-        CYC(0x5f4a, 0x5f4b); A = mem_rd(gb, HL);
-        CYC(0x5f4b, 0x5f4d); alu_add(gb, 0xfd);
-        CYC(0x5f4d, 0x5f4e); mem_wr(gb, HL, A);
-        CYC(0x5f4e, 0x5f50); L = 0x24;
-        CYC(0x5f50, 0x5f51); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-        CALL_C(0x5f51, tryBreakTileWithExpertsRing_hook, 0x618a, 0x5f54);
-        CYC(0x5f54, 0x5f56); C = 0x6f;
+        CYC(b_+24, b_+26);
+        CYC(b_+26, b_+28); L = 0x26;
+        CYC(b_+28, b_+30); A = 0x06;
+        CYC(b_+30, b_+31); mem_wr(gb, HL, A); SET_HL(HL + 1);
+        CYC(b_+31, b_+32); mem_wr(gb, HL, A); SET_HL(HL + 1);
+        CYC(b_+32, b_+33); A = mem_rd(gb, HL);
+        CYC(b_+33, b_+35); alu_add(gb, 0xfd);
+        CYC(b_+35, b_+36); mem_wr(gb, HL, A);
+        CYC(b_+36, b_+38); L = 0x24;
+        CYC(b_+38, b_+39); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+        CALL_C(b_+39, tryBreakTileWithExpertsRing_hook, SYM(tryBreakTileWithExpertsRing), b_+42);
+        CYC(b_+42, b_+44); C = 0x6f;
       }
-      CYC(0x5f56, 0x5f57); A = C;
-      CYC(0x5f57, 0x5f5a); playSound_b00_hook(gb); return;
-    case 0x5f5a:
-      CALL_C(0x5f5a, itemDecCounter1_hook, 0x23d6, 0x5f5d);
+      CYC(b_+44, b_+45); A = C;
+      CYC(b_+45, b_+48); playSound_b00_hook(gb); return;
+    }
+    else if (jt_ == b_+48) {
+      CALL_C(b_+48, itemDecCounter1_hook, SYM(itemDecCounter1), b_+51);
       if (F & FZ) {
-        CYCT(0x5f5d, 0x5f60); itemDelete_hook(gb); return;
+        CYCT(b_+51, b_+54); itemDelete_hook(gb); return;
       }
-      CYC(0x5f5d, 0x5f60);
-      CYC(0x5f60, 0x5f61); ret_effect(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+      CYC(b_+51, b_+54);
+      CYC(b_+54, SYM(itemCode27)); ret_effect(gb); return;
+    }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
 
 void itemCode00_hook(GB *gb) {

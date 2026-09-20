@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x07, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x07, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(itemCode27), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(itemCode27), (from), (to), true)
 
 static uint16_t sword_beam_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -24,75 +24,78 @@ static uint16_t sword_beam_jump_table(GB *gb) {
 }
 
 void itemCode27_hook(GB *gb) {
+  BASE(itemCode27);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5f61, 0x5f63); E = 0x04;
-  CYC(0x5f63, 0x5f64); A = mem_rd(gb, DE);
-  CYC(0x5f64, 0x5f65); push_effect(gb, 0x5f65);
-  switch (sword_beam_jump_table(gb)) {
-    case 0x5f69:
-      CYC(0x5f69, 0x5f6c); SET_HL(0x5f8d);
-      CALL_C(0x5f6c, applyOffsetTableHL_hook, 0x4a36, 0x5f6f);
-      CALL_C(0x5f6f, itemLoadAttributesAndGraphics_hook, 0x4993, 0x5f72);
-      CALL_C(0x5f72, itemIncState_hook, 0x23ea, 0x5f75);
-      CYC(0x5f75, 0x5f77); L = 0x10;
-      CYC(0x5f77, 0x5f79); mem_wr(gb, HL, 0x78);
-      CYC(0x5f79, 0x5f7b); L = 0x08;
-      CYC(0x5f7b, 0x5f7c); A = mem_rd(gb, HL); SET_HL(HL + 1);
-      CYC(0x5f7c, 0x5f7d); C = A;
-      CYC(0x5f7d, 0x5f7f); A = alu_swap(gb, A);
-      CYC(0x5f7f, 0x5f80); alu_rrca(gb);
-      CYC(0x5f80, 0x5f81); mem_wr(gb, HL, A);
-      CYC(0x5f81, 0x5f82); A = C;
-      CALL_C(0x5f82, itemSetAnimation_hook, 0x49e2, 0x5f85);
-      CALL_C(0x5f85, objectSetVisible81_hook, 0x1e60, 0x5f88);
-      CYC(0x5f88, 0x5f8a); A = 0x5d;
-      CYC(0x5f8a, 0x5f8d); playSound_b00_hook(gb); return;
-    case 0x5f99:
-      CALL_C(0x5f99, itemUpdateDamageToApply_hook, 0x49c8, 0x5f9c);
+  CYC(b_+0, b_+2); E = 0x04;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (sword_beam_jump_table(gb));
+    if (jt_ == b_+8) {
+      CYC(b_+8, b_+11); SET_HL(b_+44);
+      CALL_C(b_+11, applyOffsetTableHL_hook, SYM(applyOffsetTableHL), b_+14);
+      CALL_C(b_+14, itemLoadAttributesAndGraphics_hook, SYM(itemLoadAttributesAndGraphics), b_+17);
+      CALL_C(b_+17, itemIncState_hook, SYM(itemIncState), b_+20);
+      CYC(b_+20, b_+22); L = 0x10;
+      CYC(b_+22, b_+24); mem_wr(gb, HL, 0x78);
+      CYC(b_+24, b_+26); L = 0x08;
+      CYC(b_+26, b_+27); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+27, b_+28); C = A;
+      CYC(b_+28, b_+30); A = alu_swap(gb, A);
+      CYC(b_+30, b_+31); alu_rrca(gb);
+      CYC(b_+31, b_+32); mem_wr(gb, HL, A);
+      CYC(b_+32, b_+33); A = C;
+      CALL_C(b_+33, itemSetAnimation_hook, SYM(itemSetAnimation), b_+36);
+      CALL_C(b_+36, objectSetVisible81_hook, SYM(objectSetVisible81), b_+39);
+      CYC(b_+39, b_+41); A = 0x5d;
+      CYC(b_+41, b_+44); playSound_b00_hook(gb); return;
+    }
+    else if (jt_ == b_+56) {
+      CALL_C(b_+56, itemUpdateDamageToApply_hook, SYM(itemUpdateDamageToApply), b_+59);
       if (!(F & FZ)) {
-        CYCT(0x5f9c, 0x5f9e);
+        CYCT(b_+59, b_+61);
         goto collision;
       }
-      CYC(0x5f9c, 0x5f9e);
-      CALL_C(0x5f9e, objectApplySpeed_hook, 0x201d, 0x5fa1);
-      CALL_C(0x5fa1, objectCheckTileCollision_allowHoles_hook, 0x14c7, 0x5fa4);
+      CYC(b_+59, b_+61);
+      CALL_C(b_+61, objectApplySpeed_hook, SYM(objectApplySpeed), b_+64);
+      CALL_C(b_+64, objectCheckTileCollision_allowHoles_hook, SYM(objectCheckTileCollision_allowHoles), b_+67);
       if (!(F & FC)) {
-        CYCT(0x5fa4, 0x5fa6);
+        CYCT(b_+67, b_+69);
         goto no_collision;
       }
-      CYC(0x5fa4, 0x5fa6);
-      CALL_C(0x5fa6, itemCheckCanPassSolidTile_hook, 0x4b95, 0x5fa9);
+      CYC(b_+67, b_+69);
+      CALL_C(b_+69, itemCheckCanPassSolidTile_hook, SYM(itemCheckCanPassSolidTile), b_+72);
       if (!(F & FZ)) {
-        CYCT(0x5fa9, 0x5fab);
+        CYCT(b_+72, b_+74);
         goto collision;
       }
-      CYC(0x5fa9, 0x5fab);
+      CYC(b_+72, b_+74);
 
 no_collision:
-      CYC(0x5fab, 0x5fae); A = W8(wFrameCounter);
-      CYC(0x5fae, 0x5fb0); alu_and(gb, 0x03);
+      CYC(b_+74, b_+77); A = W8(wFrameCounter);
+      CYC(b_+77, b_+79); alu_and(gb, 0x03);
       if (!(F & FZ)) {
-        CYCT(0x5fb0, 0x5fb2);
+        CYCT(b_+79, b_+81);
       } else {
-        CYC(0x5fb0, 0x5fb2);
-        CYC(0x5fb2, 0x5fb3); H = D;
-        CYC(0x5fb3, 0x5fb5); L = 0x1b;
-        CYC(0x5fb5, 0x5fb6); A = mem_rd(gb, HL);
-        CYC(0x5fb6, 0x5fb8); alu_xor(gb, 0x01);
-        CYC(0x5fb8, 0x5fb9); mem_wr(gb, HL, A); SET_HL(HL + 1);
-        CYC(0x5fb9, 0x5fba); mem_wr(gb, HL, A); SET_HL(HL + 1);
+        CYC(b_+79, b_+81);
+        CYC(b_+81, b_+82); H = D;
+        CYC(b_+82, b_+84); L = 0x1b;
+        CYC(b_+84, b_+85); A = mem_rd(gb, HL);
+        CYC(b_+85, b_+87); alu_xor(gb, 0x01);
+        CYC(b_+87, b_+88); mem_wr(gb, HL, A); SET_HL(HL + 1);
+        CYC(b_+88, b_+89); mem_wr(gb, HL, A); SET_HL(HL + 1);
       }
-      CALL_C(0x5fba, objectCheckWithinScreenBoundary_hook, 0x2184, 0x5fbd);
+      CALL_C(b_+89, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+92);
       if (F & FC) {
-        CYCT(0x5fbd, 0x5fbe); ret_effect(gb); return;
+        CYCT(b_+92, b_+93); ret_effect(gb); return;
       }
-      CYC(0x5fbd, 0x5fbe);
-      CYC(0x5fbe, 0x5fc1); itemDelete_hook(gb); return;
+      CYC(b_+92, b_+93);
+      CYC(b_+93, b_+96); itemDelete_hook(gb); return;
 
 collision:
-      CYC(0x5fc1, 0x5fc4); SET_BC(0x0781);
-      CALL_C(0x5fc4, objectCreateInteraction_hook, 0x24c5, 0x5fc7);
-      CYC(0x5fc7, 0x5fca); itemDelete_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+      CYC(b_+96, b_+99); SET_BC((SYM(_adjustHLSequential) + 11));
+      CALL_C(b_+99, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+102);
+      CYC(b_+102, SYM(updateSwingableItemAnimation)); itemDelete_hook(gb); return;
+    }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }

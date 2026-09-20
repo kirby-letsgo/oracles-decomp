@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodecc), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodecc), (from), (to), true)
 
 static uint16_t interactionCodecc_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -37,17 +37,18 @@ static void interactionCodecc_addDoubleIndexToHl_from_rst(GB *gb, uint16_t retur
 
 // 0b:7804, called once from interactionCodecc@state0.
 void interactionCodecc_initialize_hook(GB *gb) {
+  BASE(interactionCodecc);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x7804, interactionInitGraphics_hook, 0x15fb, 0x7807);
-  CYC(0x7807, 0x7809); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7809, 0x780a); A = mem_rd(gb, DE);
-  CYC(0x780a, 0x780d); SET_HL(0x7817); // interactionCodecc@scriptTable
-  CYC(0x780d, 0x780e); interactionCodecc_addDoubleIndexToHl_from_rst(gb, 0x780e);
-  CYC(0x780e, 0x780f); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x780f, 0x7810); H = mem_rd(gb, HL);
-  CYC(0x7810, 0x7811); L = A;
-  CALL_C(0x7811, interactionSetScript_hook, 0x2544, 0x7814);
-  CYC(0x7814, 0x7817); interactionIncState_hook(gb); return; // jp
+  CALL_C(b_+32, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+35);
+  CYC(b_+35, b_+37); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+37, b_+38); A = mem_rd(gb, DE);
+  CYC(b_+38, b_+41); SET_HL(b_+51); // interactionCodecc@scriptTable
+  CYC(b_+41, b_+42); interactionCodecc_addDoubleIndexToHl_from_rst(gb, b_+42);
+  CYC(b_+42, b_+43); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+43, b_+44); H = mem_rd(gb, HL);
+  CYC(b_+44, b_+45); L = A;
+  CALL_C(b_+45, interactionSetScript_hook, SYM(interactionSetScript), b_+48);
+  CYC(b_+48, b_+51); interactionIncState_hook(gb); return; // jp
 }
 
 // 0b:77fe, unused/unreachable (no label in the disassembly source, but the raw ROM bytes at
@@ -55,36 +56,38 @@ void interactionCodecc_initialize_hook(GB *gb) {
 // explicitly-labeled "Unused" routines, e.g. interactionCodeca_func_7781_hook in troy.c and
 // interactionCodecb_func_77c7_hook in linkedGameGhini.c. Zero incoming references anywhere.
 void interactionCodecc_unusedBytes_77fe_hook(GB *gb) {
+  BASE(interactionCodecc);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x77fe, interactionInitGraphics_hook, 0x15fb, 0x7801);
-  CYC(0x7801, 0x7804); interactionIncState_hook(gb); return; // jp
+  CALL_C(b_+26, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+29);
+  CYC(b_+29, b_+32); interactionIncState_hook(gb); return; // jp
 }
 
 // ==================================================================================================
 // INTERAC_PLEN
 // ==================================================================================================
 void interactionCodecc_hook(GB *gb) {
+  BASE(interactionCodecc);
   uint16_t sp0_ = gb->sp;
-  CYC(0x77e4, 0x77e6); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x77e6, 0x77e7); A = mem_rd(gb, DE);
-  CYC(0x77e7, 0x77e8); push_effect(gb, 0x77e8);
-  switch (interactionCodecc_jump_table(gb)) {
-    case 0x77ea: goto subid0;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (interactionCodecc_jump_table(gb));
+    if (jt_ == b_+6) { goto subid0; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 subid0:
-  CALL_C(0x77ea, checkInteractionState_hook, 0x23fe, 0x77ed);
-  if (!(F & FZ)) { CYCT(0x77ed, 0x77ef); goto state1; } // jr nz
-  CYC(0x77ed, 0x77ef);
+  CALL_C(b_+6, checkInteractionState_hook, SYM(checkInteractionState), b_+9);
+  if (!(F & FZ)) { CYCT(b_+9, b_+11); goto state1; } // jr nz
+  CYC(b_+9, b_+11);
 
   // interactionCodecc@state0 (0x77ef): reached solely by fallthrough, never a jump target.
-  CALL_C(0x77ef, interactionCodecc_initialize_hook, 0x7804, 0x77f2);
-  CALL_C(0x77f2, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x77f5);
+  CALL_C(b_+11, interactionCodecc_initialize_hook, b_+32, b_+14);
+  CALL_C(b_+14, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+17);
 
 state1:
-  CALL_C(0x77f5, interactionRunScript_hook, 0x2552, 0x77f8);
-  if (F & FC) { CYCT(0x77f8, 0x77fb); interactionDelete_hook(gb); return; } // jp c
-  CYC(0x77f8, 0x77fb);
-  CYC(0x77fb, 0x77fe); interactionAnimateAsNpc_hook(gb); return; // jp
+  CALL_C(b_+17, interactionRunScript_hook, SYM(interactionRunScript), b_+20);
+  if (F & FC) { CYCT(b_+20, b_+23); interactionDelete_hook(gb); return; } // jp c
+  CYC(b_+20, b_+23);
+  CYC(b_+23, b_+26); interactionAnimateAsNpc_hook(gb); return; // jp
 }

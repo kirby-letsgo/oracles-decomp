@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0d, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0d, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode11), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode11), (from), (to), true)
 
 static uint16_t enemyCode11_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -66,249 +66,259 @@ void eyesoarChild_state10_hook(GB *gb);
 // See also ENEMY_EYESOAR variables.
 // ==================================================================================================
 void enemyCode11_hook(GB *gb) {
+  BASE(enemyCode11);
   uint16_t sp0_ = gb->sp;
-  if (F & FZ) { CYCT(0x6925, 0x6927); goto normalStatus; } // jr z
-  CYC(0x6925, 0x6927);
-  CYC(0x6927, 0x6929); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { CYCT(0x6929, 0x692a); ret_effect(gb); return; } // ret c
-  CYC(0x6929, 0x692a);
-  if (!(F & FZ)) { CYCT(0x692a, 0x692c); goto normalStatus; } // jr nz
-  CYC(0x692a, 0x692c);
-  CYC(0x692c, 0x692e); A = OBJ_HEALTH; // Object.health
-  CALL_C(0x692e, objectGetRelatedObject1Var_hook, 0x2160, 0x6931);
-  CYC(0x6931, 0x6932); A = mem_rd(gb, HL);
-  CYC(0x6932, 0x6933); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x6933, 0x6936); enemyDie_uncounted_hook(gb); return; } // jp z
-  CYC(0x6933, 0x6936);
-  CALL_C(0x6936, objectCreatePuff_hook, 0x24c1, 0x6939);
-  CYC(0x6939, 0x693a); H = D;
-  CYC(0x693a, 0x693c); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x693c, 0x693e); mem_wr(gb, HL, 0x0c);
-  CYC(0x693e, 0x6940); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x6940, 0x6942); mem_wr(gb, HL, 30);
-  CYC(0x6942, 0x6944); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x6944, 0x6946); mem_wr(gb, HL, 0x00);
-  CYC(0x6946, 0x6948); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
-  CYC(0x6948, 0x694a); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
-  CYC(0x694a, 0x694c); L = ENEMY_BASE + OBJ_HEALTH;
-  CYC(0x694c, 0x694e); mem_wr(gb, HL, 0x04);
-  CALL_C(0x694e, objectSetInvisible_hook, 0x1e7b, 0x6951);
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { CYCT(b_+4, b_+5); ret_effect(gb); return; } // ret c
+  CYC(b_+4, b_+5);
+  if (!(F & FZ)) { CYCT(b_+5, b_+7); goto normalStatus; } // jr nz
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+9); A = OBJ_HEALTH; // Object.health
+  CALL_C(b_+9, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+12);
+  CYC(b_+12, b_+13); A = mem_rd(gb, HL);
+  CYC(b_+13, b_+14); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+14, b_+17); enemyDie_uncounted_hook(gb); return; } // jp z
+  CYC(b_+14, b_+17);
+  CALL_C(b_+17, objectCreatePuff_hook, SYM(objectCreatePuff), b_+20);
+  CYC(b_+20, b_+21); H = D;
+  CYC(b_+21, b_+23); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+23, b_+25); mem_wr(gb, HL, 0x0c);
+  CYC(b_+25, b_+27); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+27, b_+29); mem_wr(gb, HL, 30);
+  CYC(b_+29, b_+31); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+31, b_+33); mem_wr(gb, HL, 0x00);
+  CYC(b_+33, b_+35); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
+  CYC(b_+35, b_+37); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
+  CYC(b_+37, b_+39); L = ENEMY_BASE + OBJ_HEALTH;
+  CYC(b_+39, b_+41); mem_wr(gb, HL, 0x04);
+  CALL_C(b_+41, objectSetInvisible_hook, SYM(objectSetInvisible), b_+44);
 
 normalStatus:
-  CYC(0x6951, 0x6953); A = OBJ_VAR39; // Object.var39
-  CALL_C(0x6953, objectGetRelatedObject1Var_hook, 0x2160, 0x6956);
-  CYC(0x6956, 0x6958); alu_bit(gb, 1, mem_rd(gb, HL));
-  CYC(0x6958, 0x6959); B = H;
-  CYC(0x6959, 0x695b); E = ENEMY_BASE + OBJ_STATE;
-  if (F & FZ) { CYCT(0x695b, 0x695d); goto runState; } // jr z
-  CYC(0x695b, 0x695d);
-  CYC(0x695d, 0x695e); A = mem_rd(gb, DE);
-  CYC(0x695e, 0x6960); alu_cp(gb, 0x0f);
-  if (!(F & FC)) { CYCT(0x6960, 0x6962); goto runState; } // jr nc
-  CYC(0x6960, 0x6962);
-  CYC(0x6962, 0x6964); alu_cp(gb, 0x0c);
-  CYC(0x6964, 0x6965); H = D;
-  if (F & FZ) { CYCT(0x6965, 0x6967); goto afterState15Setup; } // jr z
-  CYC(0x6965, 0x6967);
-  CYC(0x6967, 0x6968); L = E;
-  CYC(0x6968, 0x696a); mem_wr(gb, HL, 0x0f); // [state]
-  CYC(0x696a, 0x696c); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x696c, 0x696e); mem_wr(gb, HL, 240);
+  CYC(b_+44, b_+46); A = OBJ_VAR39; // Object.var39
+  CALL_C(b_+46, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+49);
+  CYC(b_+49, b_+51); alu_bit(gb, 1, mem_rd(gb, HL));
+  CYC(b_+51, b_+52); B = H;
+  CYC(b_+52, b_+54); E = ENEMY_BASE + OBJ_STATE;
+  if (F & FZ) { CYCT(b_+54, b_+56); goto runState; } // jr z
+  CYC(b_+54, b_+56);
+  CYC(b_+56, b_+57); A = mem_rd(gb, DE);
+  CYC(b_+57, b_+59); alu_cp(gb, 0x0f);
+  if (!(F & FC)) { CYCT(b_+59, b_+61); goto runState; } // jr nc
+  CYC(b_+59, b_+61);
+  CYC(b_+61, b_+63); alu_cp(gb, 0x0c);
+  CYC(b_+63, b_+64); H = D;
+  if (F & FZ) { CYCT(b_+64, b_+66); goto afterState15Setup; } // jr z
+  CYC(b_+64, b_+66);
+  CYC(b_+66, b_+67); L = E;
+  CYC(b_+67, b_+69); mem_wr(gb, HL, 0x0f); // [state]
+  CYC(b_+69, b_+71); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+71, b_+73); mem_wr(gb, HL, 240);
 
 afterState15Setup:
-  CYC(0x696e, 0x6970); L = ENEMY_BASE + 0x31; // Enemy.var31
-  CYC(0x6970, 0x6972); mem_wr(gb, HL, 24);
+  CYC(b_+73, b_+75); L = ENEMY_BASE + 0x31; // Enemy.var31
+  CYC(b_+75, b_+77); mem_wr(gb, HL, 24);
 
 runState:
   // Note: b == parent (ENEMY_EYESOAR), used in some of the states below.
-  CYC(0x6972, 0x6973); A = mem_rd(gb, DE);
-  CYC(0x6973, 0x6974); push_effect(gb, 0x6974);
+  CYC(b_+77, b_+78); A = mem_rd(gb, DE);
+  CYC(b_+78, b_+79); push_effect(gb, b_+79);
   {
     uint16_t target = enemyCode11_jump_table(gb);
-    if (target == 0x69c1) { eyesoarChild_state8_hook(gb); return; }
-    if (target == 0x69d7) { eyesoarChild_state9_hook(gb); return; }
-    if (target == 0x69f1) { eyesoarChild_stateA_hook(gb); return; }
-    if (target == 0x6a20) { eyesoarChild_stateB_hook(gb); return; }
-    if (target == 0x6a3f) { eyesoarChild_stateC_hook(gb); return; }
-    if (target == 0x6a6b) { eyesoarChild_stateD_hook(gb); return; }
-    if (target == 0x6a7f) { eyesoarChild_stateE_hook(gb); return; }
-    if (target == 0x6a8d) { eyesoarChild_stateF_hook(gb); return; }
-    if (target == 0x6abe) { eyesoarChild_state10_hook(gb); return; }
-    if (target == 0x6996) { eyesoarChild_state_uninitialized_hook(gb); return; }
+    if (target == SYM(eyesoarChild_state8)) { eyesoarChild_state8_hook(gb); return; }
+    if (target == SYM(eyesoarChild_state9)) { eyesoarChild_state9_hook(gb); return; }
+    if (target == SYM(eyesoarChild_stateA)) { eyesoarChild_stateA_hook(gb); return; }
+    if (target == SYM(eyesoarChild_stateB)) { eyesoarChild_stateB_hook(gb); return; }
+    if (target == SYM(eyesoarChild_stateC)) { eyesoarChild_stateC_hook(gb); return; }
+    if (target == SYM(eyesoarChild_stateD)) { eyesoarChild_stateD_hook(gb); return; }
+    if (target == SYM(eyesoarChild_stateE)) { eyesoarChild_stateE_hook(gb); return; }
+    if (target == SYM(eyesoarChild_stateF)) { eyesoarChild_stateF_hook(gb); return; }
+    if (target == SYM(eyesoarChild_state10)) { eyesoarChild_state10_hook(gb); return; }
+    if (target == SYM(eyesoarChild_state_uninitialized)) { eyesoarChild_state_uninitialized_hook(gb); return; }
     eyesoarChild_state_stub_hook(gb); return; // states 1-7 all target 0x69c0
   }
 }
 
 void eyesoarChild_state_uninitialized_hook(GB *gb) {
+  BASE(eyesoarChild_state_uninitialized);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6996, 0x6998); A = OBJ_YH; // Object.yh
-  CALL_C(0x6998, objectGetRelatedObject1Var_hook, 0x2160, 0x699b);
-  CYC(0x699b, 0x699c); B = mem_rd(gb, HL);
-  CYC(0x699c, 0x699e); L = ENEMY_BASE + OBJ_XH;
-  CYC(0x699e, 0x699f); C = mem_rd(gb, HL);
-  CYC(0x699f, 0x69a1); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x69a1, 0x69a2); A = mem_rd(gb, DE);
-  CYC(0x69a2, 0x69a5); SET_HL(0x69bc); // @initialAnglesForSubids
-  CYC(0x69a5, 0x69a6); eyesoarChild_addAToHl_from_rst(gb, 0x69a6);
-  CYC(0x69a6, 0x69a8); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x69a8, 0x69a9); A = mem_rd(gb, HL);
-  CYC(0x69a9, 0x69aa); mem_wr(gb, DE, A);
-  CYC(0x69aa, 0x69ac); E = ENEMY_BASE + 0x32; // Enemy.var32
-  CYC(0x69ac, 0x69ad); mem_wr(gb, DE, A);
-  CYC(0x69ad, 0x69af); A = 0x18;
-  CALL_C(0x69af, objectSetPositionInCircleArc_hook, 0x210e, 0x69b2);
-  CYC(0x69b2, 0x69b4); E = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x69b4, 0x69b6); A = 90;
-  CYC(0x69b6, 0x69b7); mem_wr(gb, DE, A);
-  CYC(0x69b7, 0x69b9); A = 0x28; // SPEED_100
-  CYC(0x69b9, 0x69bc); ecom_setSpeedAndState8_b0d_hook(gb); return; // jp
+  CYC(b_+0, b_+2); A = OBJ_YH; // Object.yh
+  CALL_C(b_+2, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+5);
+  CYC(b_+5, b_+6); B = mem_rd(gb, HL);
+  CYC(b_+6, b_+8); L = ENEMY_BASE + OBJ_XH;
+  CYC(b_+8, b_+9); C = mem_rd(gb, HL);
+  CYC(b_+9, b_+11); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+11, b_+12); A = mem_rd(gb, DE);
+  CYC(b_+12, b_+15); SET_HL(b_+38); // @initialAnglesForSubids
+  CYC(b_+15, b_+16); eyesoarChild_addAToHl_from_rst(gb, b_+16);
+  CYC(b_+16, b_+18); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+18, b_+19); A = mem_rd(gb, HL);
+  CYC(b_+19, b_+20); mem_wr(gb, DE, A);
+  CYC(b_+20, b_+22); E = ENEMY_BASE + 0x32; // Enemy.var32
+  CYC(b_+22, b_+23); mem_wr(gb, DE, A);
+  CYC(b_+23, b_+25); A = 0x18;
+  CALL_C(b_+25, objectSetPositionInCircleArc_hook, SYM(objectSetPositionInCircleArc), b_+28);
+  CYC(b_+28, b_+30); E = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+30, b_+32); A = 90;
+  CYC(b_+32, b_+33); mem_wr(gb, DE, A);
+  CYC(b_+33, b_+35); A = 0x28; // SPEED_100
+  CYC(b_+35, b_+38); ecom_setSpeedAndState8_b0d_hook(gb); return; // jp
 }
 
 // eyesoarChild_state_uninitialized@initialAnglesForSubids (0d:69bc-69bf): pure data
 // (ANGLE_UP/RIGHT/DOWN/LEFT), read only through the addAToHl indexing above.
 
 void eyesoarChild_state_stub_hook(GB *gb) {
-  RET(0x69c0); return;
+  BASE(eyesoarChild_state_stub);
+  RET(b_+0); return;
 }
 
 // Wait for [counter1] frames before becoming visible
 void eyesoarChild_state8_hook(GB *gb) {
+  BASE(eyesoarChild_state8);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x69c1, ecom_decCounter1_b0d_hook, 0x439a, 0x69c4);
-  if (!(F & FZ)) { CYCT(0x69c4, 0x69c5); ret_effect(gb); return; } // ret nz
-  CYC(0x69c4, 0x69c5);
-  CYC(0x69c5, 0x69c8); SET_BC(0x0b02); // INTERAC_0b, $02
-  CALL_C(0x69c8, objectCreateInteraction_hook, 0x24c5, 0x69cb);
-  if (!(F & FZ)) { CYCT(0x69cb, 0x69cc); ret_effect(gb); return; } // ret nz
-  CYC(0x69cb, 0x69cc);
-  CYC(0x69cc, 0x69ce); E = ENEMY_BASE + OBJ_RELATED2;
-  CYC(0x69ce, 0x69d0); A = INTERACTION_BASE; // Interaction.start
-  CYC(0x69d0, 0x69d1); mem_wr(gb, DE, A);
-  CYC(0x69d1, 0x69d2); E = alu_inc8(gb, E);
-  CYC(0x69d2, 0x69d3); A = H;
-  CYC(0x69d3, 0x69d4); mem_wr(gb, DE, A);
-  CYC(0x69d4, 0x69d7); ecom_incState_b0d_hook(gb); return; // jp
+  CALL_C(b_+0, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+4); ret_effect(gb); return; } // ret nz
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+7); SET_BC((SYM(vblankDmaFunction) + 23)); // INTERAC_0b, $02
+  CALL_C(b_+7, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+10);
+  if (!(F & FZ)) { CYCT(b_+10, b_+11); ret_effect(gb); return; } // ret nz
+  CYC(b_+10, b_+11);
+  CYC(b_+11, b_+13); E = ENEMY_BASE + OBJ_RELATED2;
+  CYC(b_+13, b_+15); A = INTERACTION_BASE; // Interaction.start
+  CYC(b_+15, b_+16); mem_wr(gb, DE, A);
+  CYC(b_+16, b_+17); E = alu_inc8(gb, E);
+  CYC(b_+17, b_+18); A = H;
+  CYC(b_+18, b_+19); mem_wr(gb, DE, A);
+  CYC(b_+19, SYM(eyesoarChild_state9)); ecom_incState_b0d_hook(gb); return; // jp
 }
 
 void eyesoarChild_state9_hook(GB *gb) {
+  BASE(eyesoarChild_state9);
   uint16_t sp0_ = gb->sp;
-  CYC(0x69d7, 0x69d9); A = OBJ_ANIM_PARAMETER; // Object.animParameter
-  CALL_C(0x69d9, objectGetRelatedObject2Var_hook, 0x2164, 0x69dc);
-  CYC(0x69dc, 0x69de); alu_bit(gb, 7, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(0x69de, 0x69df); ret_effect(gb); return; } // ret z
-  CYC(0x69de, 0x69df);
-  CALL_C(0x69df, ecom_incState_b0d_hook, 0x4000, 0x69e2);
-  CYC(0x69e2, 0x69e4); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x69e4, 0x69e6); mem_wr(gb, HL, 240);
-  CYC(0x69e6, 0x69e8); L = ENEMY_BASE + OBJ_ZH;
-  CYC(0x69e8, 0x69ea); mem_wr(gb, HL, 0xfe);
-  CYC(0x69ea, 0x69ec); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x69ec, 0x69ee); mem_wr(gb, HL, 0x18);
-  CYC(0x69ee, 0x69f1); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+0, b_+2); A = OBJ_ANIM_PARAMETER; // Object.animParameter
+  CALL_C(b_+2, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+5);
+  CYC(b_+5, b_+7); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+7, b_+8); ret_effect(gb); return; } // ret z
+  CYC(b_+7, b_+8);
+  CALL_C(b_+8, ecom_incState_b0d_hook, SYM(ecom_incState_b0d), b_+11);
+  CYC(b_+11, b_+13); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+13, b_+15); mem_wr(gb, HL, 240);
+  CYC(b_+15, b_+17); L = ENEMY_BASE + OBJ_ZH;
+  CYC(b_+17, b_+19); mem_wr(gb, HL, 0xfe);
+  CYC(b_+19, b_+21); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+21, b_+23); mem_wr(gb, HL, 0x18);
+  CYC(b_+23, SYM(eyesoarChild_stateA)); objectSetVisiblec2_hook(gb); return; // jp
 }
 
 // Moving around Eyesoar in a circle
 void eyesoarChild_stateA_hook(GB *gb) {
-  CYC(0x69f1, 0x69f2); H = B;
-  CYC(0x69f2, 0x69f4); L = ENEMY_BASE + 0x39; // Enemy.var39 (parent, h==b)
-  CYC(0x69f4, 0x69f6); alu_bit(gb, 2, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(0x69f6, 0x69f8); eyesoarChild_updatePosition_hook(gb); return; } // jr z
-  CYC(0x69f6, 0x69f8);
-  CYC(0x69f8, 0x69fa); L = ENEMY_BASE + 0x38; // Enemy.var38 (parent)
-  CYC(0x69fa, 0x69fb); A = mem_rd(gb, HL);
-  CYC(0x69fb, 0x69fd); alu_and(gb, 0xf8);
-  CYC(0x69fd, 0x69ff); E = ENEMY_BASE + 0x31; // Enemy.var31
-  CYC(0x69ff, 0x6a00); mem_wr(gb, DE, A);
-  CYC(0x6a00, 0x6a02); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6a02, 0x6a04); A = 0x0b;
-  CYC(0x6a04, 0x6a05); mem_wr(gb, DE, A);
+  BASE(eyesoarChild_stateA);
+  CYC(b_+0, b_+1); H = B;
+  CYC(b_+1, b_+3); L = ENEMY_BASE + 0x39; // Enemy.var39 (parent, h==b)
+  CYC(b_+3, b_+5); alu_bit(gb, 2, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+5, b_+7); eyesoarChild_updatePosition_hook(gb); return; } // jr z
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+9); L = ENEMY_BASE + 0x38; // Enemy.var38 (parent)
+  CYC(b_+9, b_+10); A = mem_rd(gb, HL);
+  CYC(b_+10, b_+12); alu_and(gb, 0xf8);
+  CYC(b_+12, b_+14); E = ENEMY_BASE + 0x31; // Enemy.var31
+  CYC(b_+14, b_+15); mem_wr(gb, DE, A);
+  CYC(b_+15, b_+17); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+17, b_+19); A = 0x0b;
+  CYC(b_+19, SYM(eyesoarChild_updatePosition)); mem_wr(gb, DE, A);
   eyesoarChild_updatePosition_hook(gb); return; // falls through
 }
 
 void eyesoarChild_updatePosition_hook(GB *gb) {
+  BASE(eyesoarChild_updatePosition);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6a05, 0x6a07); L = ENEMY_BASE + OBJ_YH;
-  CYC(0x6a07, 0x6a08); B = mem_rd(gb, HL);
-  CYC(0x6a08, 0x6a0a); L = ENEMY_BASE + OBJ_XH;
-  CYC(0x6a0a, 0x6a0b); C = mem_rd(gb, HL);
+  CYC(b_+0, b_+2); L = ENEMY_BASE + OBJ_YH;
+  CYC(b_+2, b_+3); B = mem_rd(gb, HL);
+  CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_XH;
+  CYC(b_+5, b_+6); C = mem_rd(gb, HL);
   // [this.var32] += [parent.var3b] (update angle by rotation speed)
-  CYC(0x6a0b, 0x6a0d); L = ENEMY_BASE + 0x3b; // Enemy.var3b (parent, h==b)
-  CYC(0x6a0d, 0x6a0f); E = ENEMY_BASE + 0x32; // Enemy.var32
-  CYC(0x6a0f, 0x6a10); A = mem_rd(gb, DE);
-  CYC(0x6a10, 0x6a11); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x6a11, 0x6a13); alu_and(gb, 0x1f);
-  CYC(0x6a13, 0x6a15); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x6a15, 0x6a16); mem_wr(gb, DE, A);
-  CYC(0x6a16, 0x6a17); H = D;
-  CYC(0x6a17, 0x6a19); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x6a19, 0x6a1a); A = mem_rd(gb, HL);
-  CALL_C(0x6a1a, objectSetPositionInCircleArc_hook, 0x210e, 0x6a1d);
-  CYC(0x6a1d, 0x6a20); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+6, b_+8); L = ENEMY_BASE + 0x3b; // Enemy.var3b (parent, h==b)
+  CYC(b_+8, b_+10); E = ENEMY_BASE + 0x32; // Enemy.var32
+  CYC(b_+10, b_+11); A = mem_rd(gb, DE);
+  CYC(b_+11, b_+12); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+12, b_+14); alu_and(gb, 0x1f);
+  CYC(b_+14, b_+16); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+16, b_+17); mem_wr(gb, DE, A);
+  CYC(b_+17, b_+18); H = D;
+  CYC(b_+18, b_+20); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+20, b_+21); A = mem_rd(gb, HL);
+  CALL_C(b_+21, objectSetPositionInCircleArc_hook, SYM(objectSetPositionInCircleArc), b_+24);
+  CYC(b_+24, SYM(eyesoarChild_stateB)); enemyAnimate_hook(gb); return; // jp
 }
 
 void eyesoarChild_stateB_hook(GB *gb) {
+  BASE(eyesoarChild_stateB);
   uint16_t sp0_ = gb->sp;
   // Check if we're the correct distance away
-  CYC(0x6a20, 0x6a21); H = D;
-  CYC(0x6a21, 0x6a23); L = ENEMY_BASE + 0x31; // Enemy.var31
-  CYC(0x6a23, 0x6a24); A = mem_rd(gb, HL); SET_HL(HL - 1);
-  CYC(0x6a24, 0x6a25); alu_cp(gb, mem_rd(gb, HL)); // [var30]
-  if (!(F & FZ)) { CYCT(0x6a25, 0x6a27); eyesoarChild_incOrDecHL_hook(gb); return; } // jr nz
-  CYC(0x6a25, 0x6a27);
-  CYC(0x6a27, 0x6a28); L = E;
-  CYC(0x6a28, 0x6a29); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = ENEMY_BASE + 0x31; // Enemy.var31
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(b_+4, b_+5); alu_cp(gb, mem_rd(gb, HL)); // [var30]
+  if (!(F & FZ)) { CYCT(b_+5, b_+7); eyesoarChild_incOrDecHL_hook(gb); return; } // jr nz
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+8); L = E;
+  CYC(b_+8, b_+9); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // [state]
   // Mark flag in parent indicating we're in position
-  CYC(0x6a29, 0x6a2a); H = B;
-  CYC(0x6a2a, 0x6a2c); L = ENEMY_BASE + 0x3a; // Enemy.var3a
-  CYC(0x6a2c, 0x6a2e); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x6a2e, 0x6a2f); A = mem_rd(gb, DE);
-  CALL_C(0x6a2f, setFlag_hook, 0x020e, 0x6a32);
-  CYC(0x6a32, 0x6a34); eyesoarChild_updatePosition_hook(gb); return; // jr
+  CYC(b_+9, b_+10); H = B;
+  CYC(b_+10, b_+12); L = ENEMY_BASE + 0x3a; // Enemy.var3a
+  CYC(b_+12, b_+14); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+14, b_+15); A = mem_rd(gb, DE);
+  CALL_C(b_+15, setFlag_hook, SYM(setFlag), b_+18);
+  CYC(b_+18, SYM(eyesoarChild_incOrDecHL)); eyesoarChild_updatePosition_hook(gb); return; // jr
 }
 
 void eyesoarChild_incOrDecHL_hook(GB *gb) {
-  CYC(0x6a34, 0x6a36); A = 0x01;
-  if (!(F & FC)) { CYCT(0x6a36, 0x6a38); goto addAndStore; } // jr nc
-  CYC(0x6a36, 0x6a38);
-  CYC(0x6a38, 0x6a3a); A = 0xff;
+  BASE(eyesoarChild_incOrDecHL);
+  CYC(b_+0, b_+2); A = 0x01;
+  if (!(F & FC)) { CYCT(b_+2, b_+4); goto addAndStore; } // jr nc
+  CYC(b_+2, b_+4);
+  CYC(b_+4, b_+6); A = 0xff;
 
 addAndStore:
-  CYC(0x6a3a, 0x6a3b); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x6a3b, 0x6a3c); mem_wr(gb, HL, A);
-  CYC(0x6a3c, 0x6a3d); H = B;
-  CYC(0x6a3d, 0x6a3f); eyesoarChild_updatePosition_hook(gb); return; // jr
+  CYC(b_+6, b_+7); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+7, b_+8); mem_wr(gb, HL, A);
+  CYC(b_+8, b_+9); H = B;
+  CYC(b_+9, SYM(eyesoarChild_stateC)); eyesoarChild_updatePosition_hook(gb); return; // jr
 }
 
 // Was just "killed"; waiting a bit before reappearing
 void eyesoarChild_stateC_hook(GB *gb) {
+  BASE(eyesoarChild_stateC);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6a3f, 0x6a40); H = B;
-  CYC(0x6a40, 0x6a42); L = ENEMY_BASE + 0x39; // Enemy.var39 (parent, h==b)
-  CYC(0x6a42, 0x6a44); alu_bit(gb, 0, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(0x6a44, 0x6a46); goto stillInvisible; } // jr nz
-  CYC(0x6a44, 0x6a46);
-  CALL_C(0x6a46, ecom_decCounter1_b0d_hook, 0x439a, 0x6a49);
-  if (!(F & FZ)) { CYCT(0x6a49, 0x6a4b); goto stillInvisible; } // jr nz
-  CYC(0x6a49, 0x6a4b);
-  CYC(0x6a4b, 0x6a4c); L = E;
-  CYC(0x6a4c, 0x6a4d); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(0x6a4d, 0x6a4f); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
-  CYC(0x6a4f, 0x6a51); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  CALL_C(0x6a51, objectSetVisiblec2_hook, 0x1e45, 0x6a54);
-  CYC(0x6a54, 0x6a55); H = B;
-  CYC(0x6a55, 0x6a57); eyesoarChild_updatePosition_hook(gb); return; // jr
+  CYC(b_+0, b_+1); H = B;
+  CYC(b_+1, b_+3); L = ENEMY_BASE + 0x39; // Enemy.var39 (parent, h==b)
+  CYC(b_+3, b_+5); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+5, b_+7); goto stillInvisible; } // jr nz
+  CYC(b_+5, b_+7);
+  CALL_C(b_+7, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+10);
+  if (!(F & FZ)) { CYCT(b_+10, b_+12); goto stillInvisible; } // jr nz
+  CYC(b_+10, b_+12);
+  CYC(b_+12, b_+13); L = E;
+  CYC(b_+13, b_+14); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+14, b_+16); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
+  CYC(b_+16, b_+18); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
+  CALL_C(b_+18, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+21);
+  CYC(b_+21, b_+22); H = B;
+  CYC(b_+22, b_+24); eyesoarChild_updatePosition_hook(gb); return; // jr
 
 stillInvisible:
-  CYC(0x6a57, 0x6a58); H = B;
-  CYC(0x6a58, 0x6a5a); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x6a5a, 0x6a5b); A = mem_rd(gb, DE);
-  CYC(0x6a5b, 0x6a5e); SET_BC(0x6a67); // @data
-  CALL_C(0x6a5e, addAToBc_hook, 0x006d, 0x6a61);
-  CYC(0x6a61, 0x6a62); A = mem_rd(gb, BC);
-  CYC(0x6a62, 0x6a64); L = ENEMY_BASE + 0x3a; // Enemy.var3a (parent, h==b)
-  CYC(0x6a64, 0x6a65); alu_or(gb, mem_rd(gb, HL));
-  CYC(0x6a65, 0x6a66); mem_wr(gb, HL, A);
-  RET(0x6a66); return;
+  CYC(b_+24, b_+25); H = B;
+  CYC(b_+25, b_+27); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+27, b_+28); A = mem_rd(gb, DE);
+  CYC(b_+28, b_+31); SET_BC(b_+40); // @data
+  CALL_C(b_+31, addAToBc_hook, 0x006d, b_+34);
+  CYC(b_+34, b_+35); A = mem_rd(gb, BC);
+  CYC(b_+35, b_+37); L = ENEMY_BASE + 0x3a; // Enemy.var3a (parent, h==b)
+  CYC(b_+37, b_+38); alu_or(gb, mem_rd(gb, HL));
+  CYC(b_+38, b_+39); mem_wr(gb, HL, A);
+  RET(b_+39); return;
 }
 
 // eyesoarChild_stateC@data (0d:6a67-6a6a): pure data ($11 $22 $44 $88), read only through
@@ -316,132 +326,137 @@ stillInvisible:
 
 // Just reappeared
 void eyesoarChild_stateD_hook(GB *gb) {
+  BASE(eyesoarChild_stateD);
   // Update position relative to eyesoar
-  CYC(0x6a6b, 0x6a6c); H = B;
-  CYC(0x6a6c, 0x6a6e); L = ENEMY_BASE + 0x38; // Enemy.var38 (parent, h==b)
-  CYC(0x6a6e, 0x6a6f); A = mem_rd(gb, HL);
-  CYC(0x6a6f, 0x6a71); alu_and(gb, 0xf8);
-  CYC(0x6a71, 0x6a72); H = D;
-  CYC(0x6a72, 0x6a74); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x6a74, 0x6a75); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(0x6a75, 0x6a77); eyesoarChild_incOrDecHL_hook(gb); return; } // jr nz
-  CYC(0x6a75, 0x6a77);
+  CYC(b_+0, b_+1); H = B;
+  CYC(b_+1, b_+3); L = ENEMY_BASE + 0x38; // Enemy.var38 (parent, h==b)
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
+  CYC(b_+4, b_+6); alu_and(gb, 0xf8);
+  CYC(b_+6, b_+7); H = D;
+  CYC(b_+7, b_+9); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+9, b_+10); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+10, b_+12); eyesoarChild_incOrDecHL_hook(gb); return; } // jr nz
+  CYC(b_+10, b_+12);
   // Reached desired position, go back to state $0a
-  CYC(0x6a77, 0x6a79); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6a79, 0x6a7b); mem_wr(gb, HL, 0x0a);
-  CYC(0x6a7b, 0x6a7c); H = B;
-  CYC(0x6a7c, 0x6a7f); eyesoarChild_updatePosition_hook(gb); return; // jp
+  CYC(b_+12, b_+14); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+14, b_+16); mem_wr(gb, HL, 0x0a);
+  CYC(b_+16, b_+17); H = B;
+  CYC(b_+17, SYM(eyesoarChild_stateE)); eyesoarChild_updatePosition_hook(gb); return; // jp
 }
 
 void eyesoarChild_stateE_hook(GB *gb) {
-  CYC(0x6a7f, 0x6a80); H = B;
-  CYC(0x6a80, 0x6a82); L = ENEMY_BASE + 0x39; // Enemy.var39 (parent, h==b)
-  CYC(0x6a82, 0x6a84); alu_bit(gb, 4, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(0x6a84, 0x6a87); eyesoarChild_updatePosition_hook(gb); return; } // jp nz
-  CYC(0x6a84, 0x6a87);
-  CYC(0x6a87, 0x6a89); A = 0x0b;
-  CYC(0x6a89, 0x6a8a); mem_wr(gb, DE, A); // [state]
-  CYC(0x6a8a, 0x6a8d); eyesoarChild_updatePosition_hook(gb); return; // jp
+  BASE(eyesoarChild_stateE);
+  CYC(b_+0, b_+1); H = B;
+  CYC(b_+1, b_+3); L = ENEMY_BASE + 0x39; // Enemy.var39 (parent, h==b)
+  CYC(b_+3, b_+5); alu_bit(gb, 4, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+5, b_+8); eyesoarChild_updatePosition_hook(gb); return; } // jp nz
+  CYC(b_+5, b_+8);
+  CYC(b_+8, b_+10); A = 0x0b;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A); // [state]
+  CYC(b_+11, SYM(eyesoarChild_stateF)); eyesoarChild_updatePosition_hook(gb); return; // jp
 }
 
 // Moving around randomly
 void eyesoarChild_stateF_hook(GB *gb) {
+  BASE(eyesoarChild_stateF);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6a8d, 0x6a8e); H = B;
-  CYC(0x6a8e, 0x6a90); L = ENEMY_BASE + 0x39; // Enemy.var39 (parent, h==b)
-  CYC(0x6a90, 0x6a92); alu_bit(gb, 3, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(0x6a92, 0x6a94); goto stillMovingRandomly; } // jr nz
-  CYC(0x6a92, 0x6a94);
+  CYC(b_+0, b_+1); H = B;
+  CYC(b_+1, b_+3); L = ENEMY_BASE + 0x39; // Enemy.var39 (parent, h==b)
+  CYC(b_+3, b_+5); alu_bit(gb, 3, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+5, b_+7); goto stillMovingRandomly; } // jr nz
+  CYC(b_+5, b_+7);
   // Calculate the angle relative to Eyesoar it should move to
-  CYC(0x6a94, 0x6a96); L = ENEMY_BASE + 0x3b; // Enemy.var3b (parent, h==b)
-  CYC(0x6a96, 0x6a98); E = ENEMY_BASE + 0x32; // Enemy.var32
-  CYC(0x6a98, 0x6a99); A = mem_rd(gb, DE);
-  CYC(0x6a99, 0x6a9a); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x6a9a, 0x6a9c); alu_and(gb, 0x1f);
-  CYC(0x6a9c, 0x6a9e); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x6a9e, 0x6a9f); mem_wr(gb, DE, A);
-  CALL_C(0x6a9f, ecom_incState_b0d_hook, 0x4000, 0x6aa2);
+  CYC(b_+7, b_+9); L = ENEMY_BASE + 0x3b; // Enemy.var3b (parent, h==b)
+  CYC(b_+9, b_+11); E = ENEMY_BASE + 0x32; // Enemy.var32
+  CYC(b_+11, b_+12); A = mem_rd(gb, DE);
+  CYC(b_+12, b_+13); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+13, b_+15); alu_and(gb, 0x1f);
+  CYC(b_+15, b_+17); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+17, b_+18); mem_wr(gb, DE, A);
+  CALL_C(b_+18, ecom_incState_b0d_hook, SYM(ecom_incState_b0d), b_+21);
   // $18 units away from Eyesoar
-  CYC(0x6aa2, 0x6aa4); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x6aa4, 0x6aa6); mem_wr(gb, HL, 0x18);
-  CYC(0x6aa6, 0x6aa8); eyesoarChild_animate_hook(gb); return; // jr
+  CYC(b_+21, b_+23); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+23, b_+25); mem_wr(gb, HL, 0x18);
+  CYC(b_+25, b_+27); eyesoarChild_animate_hook(gb); return; // jr
 
 stillMovingRandomly:
-  CYC(0x6aa8, 0x6aab); A = W8(wFrameCounter);
-  CYC(0x6aab, 0x6aad); alu_and(gb, 0x0f);
-  if (!(F & FZ)) { CYCT(0x6aad, 0x6aaf); goto applySpeed; } // jr nz
-  CYC(0x6aad, 0x6aaf);
-  CALL_C(0x6aaf, objectGetAngleTowardEnemyTarget_hook, 0x1e94, 0x6ab2);
-  CALL_C(0x6ab2, objectNudgeAngleTowards_hook, 0x1fd4, 0x6ab5);
+  CYC(b_+27, b_+30); A = W8(wFrameCounter);
+  CYC(b_+30, b_+32); alu_and(gb, 0x0f);
+  if (!(F & FZ)) { CYCT(b_+32, b_+34); goto applySpeed; } // jr nz
+  CYC(b_+32, b_+34);
+  CALL_C(b_+34, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+37);
+  CALL_C(b_+37, objectNudgeAngleTowards_hook, SYM(objectNudgeAngleTowards), b_+40);
 
 applySpeed:
-  CALL_C(0x6ab5, objectApplySpeed_hook, 0x201d, 0x6ab8);
-  CALL_C(0x6ab8, ecom_bounceOffScreenBoundary_b0d_hook, 0x42e5, 0x6abb);
+  CALL_C(b_+40, objectApplySpeed_hook, SYM(objectApplySpeed), b_+43);
+  CALL_C(b_+43, ecom_bounceOffScreenBoundary_b0d_hook, SYM(ecom_bounceOffScreenBoundary_b0d), SYM(eyesoarChild_animate));
   eyesoarChild_animate_hook(gb); return; // falls through
 }
 
 void eyesoarChild_animate_hook(GB *gb) {
-  CYC(0x6abb, 0x6abe); enemyAnimate_hook(gb); return; // jp
+  BASE(eyesoarChild_animate);
+  CYC(b_+0, SYM(eyesoarChild_state10)); enemyAnimate_hook(gb); return; // jp
 }
 
 // Moving back toward Eyesoar
 void eyesoarChild_state10_hook(GB *gb) {
+  BASE(eyesoarChild_state10);
   uint16_t sp0_ = gb->sp;
   // Load into wTmpcec0 the position offset relative to Eyesoar where we should be moving to
-  CYC(0x6abe, 0x6abf); H = B;
-  CYC(0x6abf, 0x6ac1); L = ENEMY_BASE + 0x3b; // Enemy.var3b (parent, h==b)
-  CYC(0x6ac1, 0x6ac2); A = mem_rd(gb, HL);
-  CYC(0x6ac2, 0x6ac4); E = ENEMY_BASE + 0x32; // Enemy.var32
-  CYC(0x6ac4, 0x6ac5); A = mem_rd(gb, DE);
-  CYC(0x6ac5, 0x6ac6); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x6ac6, 0x6ac8); alu_and(gb, 0x1f);
-  CYC(0x6ac8, 0x6ac9); C = A;
-  CYC(0x6ac9, 0x6acb); A = 0x18;
-  CYC(0x6acb, 0x6acd); B = 0x28; // SPEED_100
-  CALL_C(0x6acd, getScaledPositionOffsetForVelocity_hook, 0x212a, 0x6ad0);
+  CYC(b_+0, b_+1); H = B;
+  CYC(b_+1, b_+3); L = ENEMY_BASE + 0x3b; // Enemy.var3b (parent, h==b)
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
+  CYC(b_+4, b_+6); E = ENEMY_BASE + 0x32; // Enemy.var32
+  CYC(b_+6, b_+7); A = mem_rd(gb, DE);
+  CYC(b_+7, b_+8); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+8, b_+10); alu_and(gb, 0x1f);
+  CYC(b_+10, b_+11); C = A;
+  CYC(b_+11, b_+13); A = 0x18;
+  CYC(b_+13, b_+15); B = 0x28; // SPEED_100
+  CALL_C(b_+15, getScaledPositionOffsetForVelocity_hook, SYM(getScaledPositionOffsetForVelocity), b_+18);
   // Get parent.position + offset in bc
-  CYC(0x6ad0, 0x6ad2); A = OBJ_YH; // Object.yh
-  CALL_C(0x6ad2, objectGetRelatedObject1Var_hook, 0x2160, 0x6ad5);
-  CYC(0x6ad5, 0x6ad8); A = mem_rd(gb, wTmpcec0 + 1);
-  CYC(0x6ad8, 0x6ad9); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x6ad9, 0x6ada); B = A;
-  CYC(0x6ada, 0x6adc); L = ENEMY_BASE + OBJ_XH;
-  CYC(0x6adc, 0x6adf); A = mem_rd(gb, wTmpcec0 + 3);
-  CYC(0x6adf, 0x6ae0); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x6ae0, 0x6ae1); C = A;
+  CYC(b_+18, b_+20); A = OBJ_YH; // Object.yh
+  CALL_C(b_+20, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+23);
+  CYC(b_+23, b_+26); A = mem_rd(gb, wTmpcec0 + 1);
+  CYC(b_+26, b_+27); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+27, b_+28); B = A;
+  CYC(b_+28, b_+30); L = ENEMY_BASE + OBJ_XH;
+  CYC(b_+30, b_+33); A = mem_rd(gb, wTmpcec0 + 3);
+  CYC(b_+33, b_+34); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+34, b_+35); C = A;
   // Store current position
-  CYC(0x6ae1, 0x6ae2); E = L;
-  CYC(0x6ae2, 0x6ae3); A = mem_rd(gb, DE);
-  CYC(0x6ae3, 0x6ae5); hram_wr(gb, 0x8e, A);
-  CYC(0x6ae5, 0x6ae7); E = ENEMY_BASE + OBJ_YH;
-  CYC(0x6ae7, 0x6ae8); A = mem_rd(gb, DE);
-  CYC(0x6ae8, 0x6aea); hram_wr(gb, 0x8f, A);
+  CYC(b_+35, b_+36); E = L;
+  CYC(b_+36, b_+37); A = mem_rd(gb, DE);
+  CYC(b_+37, b_+39); hram_wr(gb, 0x8e, A);
+  CYC(b_+39, b_+41); E = ENEMY_BASE + OBJ_YH;
+  CYC(b_+41, b_+42); A = mem_rd(gb, DE);
+  CYC(b_+42, b_+44); hram_wr(gb, 0x8f, A);
   // Check if we've reached the target position
-  CYC(0x6aea, 0x6aeb); alu_cp(gb, B);
-  if (!(F & FZ)) { CYCT(0x6aeb, 0x6aed); goto moveToward; } // jr nz
-  CYC(0x6aeb, 0x6aed);
-  CYC(0x6aed, 0x6aef); A = hram_rd(gb, 0x8e);
-  CYC(0x6aef, 0x6af0); alu_cp(gb, C);
-  if (F & FZ) { CYCT(0x6af0, 0x6af2); goto reachedTargetPosition; } // jr z
-  CYC(0x6af0, 0x6af2);
+  CYC(b_+44, b_+45); alu_cp(gb, B);
+  if (!(F & FZ)) { CYCT(b_+45, b_+47); goto moveToward; } // jr nz
+  CYC(b_+45, b_+47);
+  CYC(b_+47, b_+49); A = hram_rd(gb, 0x8e);
+  CYC(b_+49, b_+50); alu_cp(gb, C);
+  if (F & FZ) { CYCT(b_+50, b_+52); goto reachedTargetPosition; } // jr z
+  CYC(b_+50, b_+52);
 
 moveToward:
-  CALL_C(0x6af2, ecom_moveTowardPosition_b0d_hook, 0x4430, 0x6af5);
-  CYC(0x6af5, 0x6af7); eyesoarChild_animate_hook(gb); return; // jr
+  CALL_C(b_+52, ecom_moveTowardPosition_b0d_hook, SYM(ecom_moveTowardPosition_b0d), b_+55);
+  CYC(b_+55, b_+57); eyesoarChild_animate_hook(gb); return; // jr
 
 reachedTargetPosition:
   // Wait for signal to change state
-  CYC(0x6af7, 0x6af9); L = ENEMY_BASE + 0x39; // Enemy.var39
-  CYC(0x6af9, 0x6afb); alu_bit(gb, 1, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(0x6afb, 0x6afc); ret_effect(gb); return; } // ret nz
-  CYC(0x6afb, 0x6afc);
-  CYC(0x6afc, 0x6afe); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6afe, 0x6b00); A = 0x0e;
-  CYC(0x6b00, 0x6b01); mem_wr(gb, DE, A);
+  CYC(b_+57, b_+59); L = ENEMY_BASE + 0x39; // Enemy.var39
+  CYC(b_+59, b_+61); alu_bit(gb, 1, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+61, b_+62); ret_effect(gb); return; } // ret nz
+  CYC(b_+61, b_+62);
+  CYC(b_+62, b_+64); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+64, b_+66); A = 0x0e;
+  CYC(b_+66, b_+67); mem_wr(gb, DE, A);
   // Set flag in parent's var3a indicating we're good to go?
-  CYC(0x6b01, 0x6b03); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x6b03, 0x6b04); A = mem_rd(gb, DE);
-  CYC(0x6b04, 0x6b06); alu_add(gb, 0x04);
-  CYC(0x6b06, 0x6b08); L = ENEMY_BASE + 0x3a; // Enemy.var3a (parent, h==b)
-  CYC(0x6b08, 0x6b0b); setFlag_hook(gb); return; // jp
+  CYC(b_+67, b_+69); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+69, b_+70); A = mem_rd(gb, DE);
+  CYC(b_+70, b_+72); alu_add(gb, 0x04);
+  CYC(b_+72, b_+74); L = ENEMY_BASE + 0x3a; // Enemy.var3a (parent, h==b)
+  CYC(b_+74, SYM(enemyCode1c)); setFlag_hook(gb); return; // jp
 }

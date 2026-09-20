@@ -3,35 +3,35 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(nayruState0), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(nayruState0), (from), (to), true)
 
 // nayruSubid00@swayHorizontally@xOffsets: $ff $ff $ff $00 $01 $01 $01 $00
-#define nayruSwayXOffsets_bank08 0x6b0e
+#define nayruSwayXOffsets_bank08 SYM(nayruSubid00__swayHorizontally__xOffsets)
 
 // mainScripts.* (bank $0c), objectData.* (bank $12) and scriptHelp.* (bank $15), referenced
 // by address only.
-#define genericNpcScript_bank0c 0x45f0
-#define nayruScript00_part1_bank0c 0x565a
-#define nayruScript00_part2_bank0c 0x56b5
-#define nayruScript01_bank0c 0x56cf
-#define nayruScript02_part1_bank0c 0x56d3
-#define nayruScript02_part2_bank0c 0x56e8
-#define nayruScript02_part3_bank0c 0x56ec
-#define nayruScript03_bank0c 0x571a
-#define nayruScript04_part1_bank0c 0x571e
-#define nayruScript04_part2_bank0c 0x573e
-#define nayruScript05_bank0c 0x574e
-#define nayruScript07_bank0c 0x5760
-#define nayruScript08_bank0c 0x5764
-#define nayruScript09_bank0c 0x5787
-#define nayruScript0a_bank0c 0x57a3
-#define nayruScript10_bank0c 0x57e0
-#define nayruScript11_bank0c 0x57e4
-#define nayruScript13_bank0c 0x57e8
-#define ambisPalaceEntranceGuards_bank12 0x77fa
-#define turnToFaceSomething_bank15 0x5613
-#define objectWritePositionTocfd5_bank15 0x741b
+#define genericNpcScript_bank0c SYM(genericNpcScript)
+#define nayruScript00_part1_bank0c SYM(nayruScript00_part1)
+#define nayruScript00_part2_bank0c SYM(nayruScript00_part2)
+#define nayruScript01_bank0c SYM(nayruScript01_b0c)
+#define nayruScript02_part1_bank0c SYM(nayruScript02_part1)
+#define nayruScript02_part2_bank0c SYM(nayruScript02_part2_b0c)
+#define nayruScript02_part3_bank0c SYM(nayruScript02_part3)
+#define nayruScript03_bank0c SYM(nayruScript03_b0c)
+#define nayruScript04_part1_bank0c SYM(nayruScript04_part1)
+#define nayruScript04_part2_bank0c SYM(nayruScript04_part2)
+#define nayruScript05_bank0c SYM(nayruScript05)
+#define nayruScript07_bank0c SYM(nayruScript07_b0c)
+#define nayruScript08_bank0c SYM(nayruScript08)
+#define nayruScript09_bank0c SYM(nayruScript09)
+#define nayruScript0a_bank0c SYM(nayruScript0a)
+#define nayruScript10_bank0c SYM(nayruScript10_b0c)
+#define nayruScript11_bank0c SYM(nayruScript11_b0c)
+#define nayruScript13_bank0c SYM(nayruScript13_b0c)
+#define ambisPalaceEntranceGuards_bank12 SYM(ambisPalaceEntranceGuards)
+#define turnToFaceSomething_bank15 SYM(turnToFaceSomething)
+#define objectWritePositionTocfd5_bank15 SYM(objectWritePositionTocfd5)
 
 void nayruState0_hook(GB *gb);
 void nayruState0__init0e_hook(GB *gb);
@@ -90,426 +90,437 @@ static void nayru_addAToHl(GB *gb) {
 // nayruState0@loadEvilPalette: load the possessed version of her palette into palette 6.
 // Reached by a static `call` from @init00 and by fallthrough from @init0e.
 static void nayru_loadEvilPalette(GB *gb) {
-  CYC(0x68e9, 0x68eb); A = 0x97; // PALH_97
-  CYC(0x68eb, 0x68ee); loadPaletteHeader_hook(gb);
+  BASE(nayruState0);
+  CYC(b_+102, b_+104); A = 0x97; // PALH_97
+  CYC(b_+104, b_+107); loadPaletteHeader_hook(gb);
 }
 
 // nayruState0@setSingingAnimation: tail shared by @init00 (fallthrough) and @init13 (`jp`).
 static void nayru_setSingingAnimation(GB *gb, uint16_t sp0_) {
-  CYC(0x68cb, 0x68cd); A = 0x04;
-  CALL_C(0x68cd, interactionSetAnimation_hook, 0x262e, 0x68d0);
-  CYC(0x68d0, 0x68d3); interactionLoadExtraGraphics_hook(gb);
+  BASE(nayruState0);
+  CYC(b_+72, b_+74); A = 0x04;
+  CALL_C(b_+74, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+77);
+  CYC(b_+77, b_+80); interactionLoadExtraGraphics_hook(gb);
 }
 
 // nayruState0@init0e: also called from ambi subids 4 and 5 through interBankCall (to
 // initialize possessed palettes), so it must stay hookable.
 void nayruState0__init0e_hook(GB *gb) {
-  CYC(0x68e4, 0x68e6); A = 0x06;
-  CYC(0x68e6, 0x68e8); E = INTERACTION_BASE + OBJ_OAM_FLAGS;
-  CYC(0x68e8, 0x68e9); mem_wr(gb, DE, A);
+  BASE(nayruState0);
+  CYC(b_+97, b_+99); A = 0x06;
+  CYC(b_+99, b_+101); E = INTERACTION_BASE + OBJ_OAM_FLAGS;
+  CYC(b_+101, b_+102); mem_wr(gb, DE, A);
   nayru_loadEvilPalette(gb);
 }
 
 // nayruState0@init03: reached from the init table, from @init04's `jr nz` and by fallthrough.
 static void nayru_init03(GB *gb) {
-  CYC(0x6929, 0x692a); alu_xor(gb, A);
-  CYC(0x692a, 0x692d); interactionSetAnimation_hook(gb);
+  BASE(nayruState0);
+  CYC(b_+166, b_+167); alu_xor(gb, A);
+  CYC(b_+167, b_+170); interactionSetAnimation_hook(gb);
 }
 
 // nayruState0@runGenericNpc: A = low byte of the text ID (high byte TX_1d00).
 static void nayru_runGenericNpc(GB *gb) {
-  CYC(0x699a, 0x699c); E = INTERACTION_BASE + OBJ_TEXT_ID;
-  CYC(0x699c, 0x699d); mem_wr(gb, DE, A);
-  CYC(0x699d, 0x699e); E = alu_inc8(gb, E);
-  CYC(0x699e, 0x69a0); A = 0x1d;
-  CYC(0x69a0, 0x69a1); mem_wr(gb, DE, A);
-  CYC(0x69a1, 0x69a4); SET_HL(genericNpcScript_bank0c);
-  CYC(0x69a4, 0x69a7); interactionSetScript_hook(gb);
+  BASE(nayruState0);
+  CYC(b_+279, b_+281); E = INTERACTION_BASE + OBJ_TEXT_ID;
+  CYC(b_+281, b_+282); mem_wr(gb, DE, A);
+  CYC(b_+282, b_+283); E = alu_inc8(gb, E);
+  CYC(b_+283, b_+285); A = 0x1d;
+  CYC(b_+285, b_+286); mem_wr(gb, DE, A);
+  CYC(b_+286, b_+289); SET_HL(genericNpcScript_bank0c);
+  CYC(b_+289, b_+292); interactionSetScript_hook(gb);
 }
 
 // nayruState0@initSubid: per-subid initialization. Reached only by a static `call` from
 // nayruState0.
 static void nayru_initSubid(GB *gb, uint16_t sp0_) {
-  CYC(0x6897, 0x6899); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x6899, 0x689a); A = mem_rd(gb, DE);
-  CYC(0x689a, 0x689b); push_effect(gb, 0x689b);
-  switch (nayru_jumpTable(gb)) {
-    case 0x68c3: goto init00;
-    case 0x68d3: goto init01;
-    case 0x68ee: goto init02;
-    case 0x6929: nayru_init03(gb); return;
-    case 0x690e: goto init04;
-    case 0x692d: goto init05;
-    case 0x693b: goto init06;
-    case 0x6940: goto init07;
-    case 0x694b: goto init08;
-    case 0x6959: goto init09;
-    case 0x695f: goto init0a;
-    case 0x6980: goto init0b;
-    case 0x69a7: goto init0c;
-    case 0x69c3: goto init0d;
-    case 0x68e4: nayruState0__init0e_hook(gb); return;
-    case 0x69d7: goto init0f;
-    case 0x69f3: goto init10;
-    case 0x6a03: goto init11;
-    case 0x6a1a: goto init12;
-    case 0x6a23: goto init13;
-    default: HANDOFF(HL);
-  }
+  BASE(nayruState0);
+  CYC(b_+20, b_+22); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+22, b_+23); A = mem_rd(gb, DE);
+  CYC(b_+23, b_+24); push_effect(gb, b_+24);
+  do { uint16_t jt_ = (nayru_jumpTable(gb));
+    if (jt_ == b_+64) { goto init00; }
+    else if (jt_ == b_+80) { goto init01; }
+    else if (jt_ == b_+107) { goto init02; }
+    else if (jt_ == b_+166) { nayru_init03(gb); return; }
+    else if (jt_ == b_+139) { goto init04; }
+    else if (jt_ == b_+170) { goto init05; }
+    else if (jt_ == b_+184) { goto init06; }
+    else if (jt_ == b_+189) { goto init07; }
+    else if (jt_ == b_+200) { goto init08; }
+    else if (jt_ == b_+214) { goto init09; }
+    else if (jt_ == b_+220) { goto init0a; }
+    else if (jt_ == b_+253) { goto init0b; }
+    else if (jt_ == b_+292) { goto init0c; }
+    else if (jt_ == b_+320) { goto init0d; }
+    else if (jt_ == b_+97) { nayruState0__init0e_hook(gb); return; }
+    else if (jt_ == b_+340) { goto init0f; }
+    else if (jt_ == b_+368) { goto init10; }
+    else if (jt_ == b_+384) { goto init11; }
+    else if (jt_ == b_+407) { goto init12; }
+    else if (jt_ == b_+416) { goto init13; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 init00:
-  CYC(0x68c3, 0x68c5); A = 0x03;
-  CALL_C(0x68c5, setMusicVolume_hook, 0x0cad, 0x68c8);
-  CYC(0x68c8, 0x68cb); push_effect(gb, 0x68cb); nayru_loadEvilPalette(gb);
+  CYC(b_+64, b_+66); A = 0x03;
+  CALL_C(b_+66, setMusicVolume_hook, SYM(setMusicVolume), b_+69);
+  CYC(b_+69, b_+72); push_effect(gb, b_+72); nayru_loadEvilPalette(gb);
   nayru_setSingingAnimation(gb, sp0_);
   return;
 
 init01:
-  CYC(0x68d3, 0x68d5); A = 0x0b; // GLOBALFLAG_0b
-  CALL_C(0x68d5, checkGlobalFlag_hook, 0x31f3, 0x68d8);
+  CYC(b_+80, b_+82); A = 0x0b; // GLOBALFLAG_0b
+  CALL_C(b_+82, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+85);
   if (!(F & FZ)) {
-    CYCT(0x68d8, 0x68db); interactionDelete_hook(gb); return;
+    CYCT(b_+85, b_+88); interactionDelete_hook(gb); return;
   }
-  CYC(0x68d8, 0x68db);
-  CALL_C(0x68db, objectSetInvisible_hook, 0x1e7b, 0x68de);
-  CYC(0x68de, 0x68e1); SET_HL(nayruScript01_bank0c);
-  CALL_C(0x68e1, interactionSetScript_hook, 0x2544, 0x68e4);
+  CYC(b_+85, b_+88);
+  CALL_C(b_+88, objectSetInvisible_hook, SYM(objectSetInvisible), b_+91);
+  CYC(b_+91, b_+94); SET_HL(nayruScript01_bank0c);
+  CALL_C(b_+94, interactionSetScript_hook, SYM(interactionSetScript), b_+97);
   nayruState0__init0e_hook(gb);
   return;
 
 init02:
-  CYC(0x68ee, 0x68f1); A = mem_rd(gb, wTmpcfc0 + 0x10);
-  CYC(0x68f1, 0x68f3); alu_cp(gb, 0x03);
+  CYC(b_+107, b_+110); A = mem_rd(gb, wTmpcfc0 + 0x10);
+  CYC(b_+110, b_+112); alu_cp(gb, 0x03);
   if (F & FZ) {
-    CYCT(0x68f3, 0x68f5); goto init02_part2;
+    CYCT(b_+112, b_+114); goto init02_part2;
   }
-  CYC(0x68f3, 0x68f5);
-  CYC(0x68f5, 0x68f7); A = 0x05;
-  CALL_C(0x68f7, interactionSetAnimation_hook, 0x262e, 0x68fa);
-  CYC(0x68fa, 0x68fd); SET_HL(nayruScript02_part1_bank0c);
-  CALL_C(0x68fd, interactionSetScript_hook, 0x2544, 0x6900);
-  CYC(0x6900, 0x6903); objectSetInvisible_hook(gb);
+  CYC(b_+112, b_+114);
+  CYC(b_+114, b_+116); A = 0x05;
+  CALL_C(b_+116, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+119);
+  CYC(b_+119, b_+122); SET_HL(nayruScript02_part1_bank0c);
+  CALL_C(b_+122, interactionSetScript_hook, SYM(interactionSetScript), b_+125);
+  CYC(b_+125, b_+128); objectSetInvisible_hook(gb);
   return;
 init02_part2:
-  CYC(0x6903, 0x6905); A = 0x02;
-  CALL_C(0x6905, interactionSetAnimation_hook, 0x262e, 0x6908);
-  CYC(0x6908, 0x690b); SET_HL(nayruScript02_part2_bank0c);
-  CYC(0x690b, 0x690e); interactionSetScript_hook(gb);
+  CYC(b_+128, b_+130); A = 0x02;
+  CALL_C(b_+130, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+133);
+  CYC(b_+133, b_+136); SET_HL(nayruScript02_part2_bank0c);
+  CYC(b_+136, b_+139); interactionSetScript_hook(gb);
   return;
 
 init04:
-  CYC(0x690e, 0x6911); SET_HL(nayruScript04_part1_bank0c);
-  CYC(0x6911, 0x6914); A = mem_rd(gb, wTmpcfc0 + 0x10);
-  CYC(0x6914, 0x6916); alu_cp(gb, 0x0b);
+  CYC(b_+139, b_+142); SET_HL(nayruScript04_part1_bank0c);
+  CYC(b_+142, b_+145); A = mem_rd(gb, wTmpcfc0 + 0x10);
+  CYC(b_+145, b_+147); alu_cp(gb, 0x0b);
   if (!(F & FZ)) {
-    CYCT(0x6916, 0x6918); goto init04_setScript;
+    CYCT(b_+147, b_+149); goto init04_setScript;
   }
-  CYC(0x6916, 0x6918);
-  CYC(0x6918, 0x691b); SET_BC(0x4840);
-  CALL_C(0x691b, interactionSetPosition_hook, 0x2773, 0x691e);
-  CALL_C(0x691e, checkIsLinkedGame_hook, 0x1992, 0x6921);
+  CYC(b_+147, b_+149);
+  CYC(b_+149, b_+152); SET_BC((SYM(interactionCode1e__scriptSubidTable) + 8));
+  CALL_C(b_+152, interactionSetPosition_hook, SYM(interactionSetPosition), b_+155);
+  CALL_C(b_+155, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+158);
   if (!(F & FZ)) {
-    CYCT(0x6921, 0x6923); nayru_init03(gb); return;
+    CYCT(b_+158, b_+160); nayru_init03(gb); return;
   }
-  CYC(0x6921, 0x6923);
-  CYC(0x6923, 0x6926); SET_HL(nayruScript04_part2_bank0c);
+  CYC(b_+158, b_+160);
+  CYC(b_+160, b_+163); SET_HL(nayruScript04_part2_bank0c);
 init04_setScript:
-  CALL_C(0x6926, interactionSetScript_hook, 0x2544, 0x6929);
+  CALL_C(b_+163, interactionSetScript_hook, SYM(interactionSetScript), b_+166);
   nayru_init03(gb);
   return;
 
 init05:
-  CYC(0x692d, 0x692f); A = 0x05;
-  CALL_C(0x692f, interactionSetAnimation_hook, 0x262e, 0x6932);
-  CYC(0x6932, 0x6935); SET_HL(nayruScript05_bank0c);
-  CALL_C(0x6935, interactionSetScript_hook, 0x2544, 0x6938);
-  CYC(0x6938, 0x693b); objectSetInvisible_hook(gb);
+  CYC(b_+170, b_+172); A = 0x05;
+  CALL_C(b_+172, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+175);
+  CYC(b_+175, b_+178); SET_HL(nayruScript05_bank0c);
+  CALL_C(b_+178, interactionSetScript_hook, SYM(interactionSetScript), b_+181);
+  CYC(b_+181, b_+184); objectSetInvisible_hook(gb);
   return;
 
 init06:
-  CYC(0x693b, 0x693d); A = 0x07;
-  CYC(0x693d, 0x6940); interactionSetAnimation_hook(gb);
+  CYC(b_+184, b_+186); A = 0x07;
+  CYC(b_+186, b_+189); interactionSetAnimation_hook(gb);
   return;
 
 init07:
-  CYC(0x6940, 0x6942); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x6942, 0x6944); A = 0x1e;
-  CYC(0x6944, 0x6945); mem_wr(gb, DE, A);
-  CALL_C(0x6945, interactionLoadExtraGraphics_hook, 0x2781, 0x6948);
-  CYC(0x6948, 0x694b); interactionSetAlwaysUpdateBit_hook(gb);
+  CYC(b_+189, b_+191); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+191, b_+193); A = 0x1e;
+  CYC(b_+193, b_+194); mem_wr(gb, DE, A);
+  CALL_C(b_+194, interactionLoadExtraGraphics_hook, SYM(interactionLoadExtraGraphics), b_+197);
+  CYC(b_+197, b_+200); interactionSetAlwaysUpdateBit_hook(gb);
   return;
 
 init08:
-  CYC(0x694b, 0x694e); SET_HL(nayruScript08_bank0c);
-  CALL_C(0x694e, interactionSetScript_hook, 0x2544, 0x6951);
-  CALL_C(0x6951, objectSetVisible82_hook, 0x1e69, 0x6954);
-  CYC(0x6954, 0x6956); A = 0x03;
-  CYC(0x6956, 0x6959); interactionSetAnimation_hook(gb);
+  CYC(b_+200, b_+203); SET_HL(nayruScript08_bank0c);
+  CALL_C(b_+203, interactionSetScript_hook, SYM(interactionSetScript), b_+206);
+  CALL_C(b_+206, objectSetVisible82_hook, SYM(objectSetVisible82), b_+209);
+  CYC(b_+209, b_+211); A = 0x03;
+  CYC(b_+211, b_+214); interactionSetAnimation_hook(gb);
   return;
 
 init09:
-  CYC(0x6959, 0x695c); SET_HL(nayruScript09_bank0c);
-  CYC(0x695c, 0x695f); interactionSetScript_hook(gb);
+  CYC(b_+214, b_+217); SET_HL(nayruScript09_bank0c);
+  CYC(b_+217, b_+220); interactionSetScript_hook(gb);
   return;
 
 init0a:
-  CALL_C(0x695f, checkIsLinkedGame_hook, 0x1992, 0x6962);
+  CALL_C(b_+220, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+223);
   if (F & FZ) {
-    CYCT(0x6962, 0x6965); interactionDelete_hook(gb); return;
+    CYCT(b_+223, b_+226); interactionDelete_hook(gb); return;
   }
-  CYC(0x6962, 0x6965);
-  CYC(0x6965, 0x6967); A = 0x36; // TREASURE_MAKU_SEED
-  CALL_C(0x6967, checkTreasureObtained_hook, 0x1748, 0x696a);
+  CYC(b_+223, b_+226);
+  CYC(b_+226, b_+228); A = 0x36; // TREASURE_MAKU_SEED
+  CALL_C(b_+228, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+231);
   if (!(F & FC)) {
-    CYCT(0x696a, 0x696d); interactionDelete_hook(gb); return;
+    CYCT(b_+231, b_+234); interactionDelete_hook(gb); return;
   }
-  CYC(0x696a, 0x696d);
-  CYC(0x696d, 0x696f); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
-  CALL_C(0x696f, checkGlobalFlag_hook, 0x31f3, 0x6972);
+  CYC(b_+231, b_+234);
+  CYC(b_+234, b_+236); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
+  CALL_C(b_+236, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+239);
   if (!(F & FZ)) {
-    CYCT(0x6972, 0x6975); interactionDelete_hook(gb); return;
+    CYCT(b_+239, b_+242); interactionDelete_hook(gb); return;
   }
-  CYC(0x6972, 0x6975);
-  CYC(0x6975, 0x6977); A = 0x01;
-  CALL_C(0x6977, interactionSetAnimation_hook, 0x262e, 0x697a);
-  CYC(0x697a, 0x697d); SET_HL(nayruScript0a_bank0c);
-  CYC(0x697d, 0x6980); interactionSetScript_hook(gb);
+  CYC(b_+239, b_+242);
+  CYC(b_+242, b_+244); A = 0x01;
+  CALL_C(b_+244, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+247);
+  CYC(b_+247, b_+250); SET_HL(nayruScript0a_bank0c);
+  CYC(b_+250, b_+253); interactionSetScript_hook(gb);
   return;
 
 init0b:
-  CYC(0x6980, 0x6982); A = 0x14; // GLOBALFLAG_FINISHEDGAME
-  CALL_C(0x6982, checkGlobalFlag_hook, 0x31f3, 0x6985);
+  CYC(b_+253, b_+255); A = 0x14; // GLOBALFLAG_FINISHEDGAME
+  CALL_C(b_+255, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+258);
   if (!(F & FZ)) {
-    CYCT(0x6985, 0x6988); interactionDelete_hook(gb); return;
+    CYCT(b_+258, b_+261); interactionDelete_hook(gb); return;
   }
-  CYC(0x6985, 0x6988);
-  CYC(0x6988, 0x698a); A = 0x11; // GLOBALFLAG_SAVED_NAYRU
-  CALL_C(0x698a, checkGlobalFlag_hook, 0x31f3, 0x698d);
+  CYC(b_+258, b_+261);
+  CYC(b_+261, b_+263); A = 0x11; // GLOBALFLAG_SAVED_NAYRU
+  CALL_C(b_+263, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+266);
   if (F & FZ) {
-    CYCT(0x698d, 0x6990); interactionDelete_hook(gb); return;
+    CYCT(b_+266, b_+269); interactionDelete_hook(gb); return;
   }
-  CYC(0x698d, 0x6990);
-  CYC(0x6990, 0x6992); A = 0x36; // TREASURE_MAKU_SEED
-  CALL_C(0x6992, checkTreasureObtained_hook, 0x1748, 0x6995);
+  CYC(b_+266, b_+269);
+  CYC(b_+269, b_+271); A = 0x36; // TREASURE_MAKU_SEED
+  CALL_C(b_+271, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+274);
   if (F & FC) {
-    CYCT(0x6995, 0x6998); interactionDelete_hook(gb); return;
+    CYCT(b_+274, b_+277); interactionDelete_hook(gb); return;
   }
-  CYC(0x6995, 0x6998);
-  CYC(0x6998, 0x699a); A = 0x14; // <TX_1d14
+  CYC(b_+274, b_+277);
+  CYC(b_+277, b_+279); A = 0x14; // <TX_1d14
   nayru_runGenericNpc(gb);
   return;
 
 init0c:
-  CYC(0x69a7, 0x69a9); A = 0x14; // GLOBALFLAG_FINISHEDGAME
-  CALL_C(0x69a9, checkGlobalFlag_hook, 0x31f3, 0x69ac);
+  CYC(b_+292, b_+294); A = 0x14; // GLOBALFLAG_FINISHEDGAME
+  CALL_C(b_+294, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+297);
   if (!(F & FZ)) {
-    CYCT(0x69ac, 0x69af); interactionDelete_hook(gb); return;
+    CYCT(b_+297, b_+300); interactionDelete_hook(gb); return;
   }
-  CYC(0x69ac, 0x69af);
-  CYC(0x69af, 0x69b1); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
-  CALL_C(0x69b1, checkGlobalFlag_hook, 0x31f3, 0x69b4);
+  CYC(b_+297, b_+300);
+  CYC(b_+300, b_+302); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
+  CALL_C(b_+302, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+305);
   if (F & FZ) {
-    CYCT(0x69b4, 0x69b7); interactionDelete_hook(gb); return;
+    CYCT(b_+305, b_+308); interactionDelete_hook(gb); return;
   }
-  CYC(0x69b4, 0x69b7);
-  CYC(0x69b7, 0x69b9); A = 0x3a; // GLOBALFLAG_FLAME_OF_DESPAIR_LIT
-  CALL_C(0x69b9, checkGlobalFlag_hook, 0x31f3, 0x69bc);
+  CYC(b_+305, b_+308);
+  CYC(b_+308, b_+310); A = 0x3a; // GLOBALFLAG_FLAME_OF_DESPAIR_LIT
+  CALL_C(b_+310, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+313);
   if (!(F & FZ)) {
-    CYCT(0x69bc, 0x69bf); interactionDelete_hook(gb); return;
+    CYCT(b_+313, b_+316); interactionDelete_hook(gb); return;
   }
-  CYC(0x69bc, 0x69bf);
-  CYC(0x69bf, 0x69c1); A = 0x15; // <TX_1d15
-  CYC(0x69c1, 0x69c3); nayru_runGenericNpc(gb);
+  CYC(b_+313, b_+316);
+  CYC(b_+316, b_+318); A = 0x15; // <TX_1d15
+  CYC(b_+318, b_+320); nayru_runGenericNpc(gb);
   return;
 
 init0d:
-  CYC(0x69c3, 0x69c5); A = 0x3a; // GLOBALFLAG_FLAME_OF_DESPAIR_LIT
-  CALL_C(0x69c5, checkGlobalFlag_hook, 0x31f3, 0x69c8);
+  CYC(b_+320, b_+322); A = 0x3a; // GLOBALFLAG_FLAME_OF_DESPAIR_LIT
+  CALL_C(b_+322, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+325);
   if (F & FZ) {
-    CYCT(0x69c8, 0x69cb); interactionDelete_hook(gb); return;
+    CYCT(b_+325, b_+328); interactionDelete_hook(gb); return;
   }
-  CYC(0x69c8, 0x69cb);
-  CYC(0x69cb, 0x69cd); A = 0x14; // GLOBALFLAG_FINISHEDGAME
-  CALL_C(0x69cd, checkGlobalFlag_hook, 0x31f3, 0x69d0);
+  CYC(b_+325, b_+328);
+  CYC(b_+328, b_+330); A = 0x14; // GLOBALFLAG_FINISHEDGAME
+  CALL_C(b_+330, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+333);
   if (!(F & FZ)) {
-    CYCT(0x69d0, 0x69d3); interactionDelete_hook(gb); return;
+    CYCT(b_+333, b_+336); interactionDelete_hook(gb); return;
   }
-  CYC(0x69d0, 0x69d3);
-  CYC(0x69d3, 0x69d5); A = 0x17; // <TX_1d17
-  CYC(0x69d5, 0x69d7); nayru_runGenericNpc(gb);
+  CYC(b_+333, b_+336);
+  CYC(b_+336, b_+338); A = 0x17; // <TX_1d17
+  CYC(b_+338, b_+340); nayru_runGenericNpc(gb);
   return;
 
 init0f:
-  CYC(0x69d7, 0x69d9); A = 0x36; // TREASURE_MAKU_SEED
-  CALL_C(0x69d9, checkTreasureObtained_hook, 0x1748, 0x69dc);
+  CYC(b_+340, b_+342); A = 0x36; // TREASURE_MAKU_SEED
+  CALL_C(b_+342, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+345);
   if (!(F & FC)) {
-    CYCT(0x69dc, 0x69df); interactionDelete_hook(gb); return;
+    CYCT(b_+345, b_+348); interactionDelete_hook(gb); return;
   }
-  CYC(0x69dc, 0x69df);
-  CYC(0x69df, 0x69e1); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
-  CALL_C(0x69e1, checkGlobalFlag_hook, 0x31f3, 0x69e4);
+  CYC(b_+345, b_+348);
+  CYC(b_+348, b_+350); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
+  CALL_C(b_+350, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+353);
   if (!(F & FZ)) {
-    CYCT(0x69e4, 0x69e7); interactionDelete_hook(gb); return;
+    CYCT(b_+353, b_+356); interactionDelete_hook(gb); return;
   }
-  CYC(0x69e4, 0x69e7);
-  CALL_C(0x69e7, checkIsLinkedGame_hook, 0x1992, 0x69ea);
-  CYC(0x69ea, 0x69ec); C = 0x32;
+  CYC(b_+353, b_+356);
+  CALL_C(b_+356, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+359);
+  CYC(b_+359, b_+361); C = 0x32;
   if (!(F & FZ)) {
-    CALL_C_CC(0x69ec, objectSetShortPosition_hook, 0x20c3, 0x69ef);
+    CALL_C_CC(b_+361, objectSetShortPosition_hook, SYM(objectSetShortPosition), b_+364);
   } else {
-    CYC(0x69ec, 0x69ef);
+    CYC(b_+361, b_+364);
   }
-  CYC(0x69ef, 0x69f1); A = 0x20; // <TX_1d20
-  CYC(0x69f1, 0x69f3); nayru_runGenericNpc(gb);
+  CYC(b_+364, b_+366); A = 0x20; // <TX_1d20
+  CYC(b_+366, b_+368); nayru_runGenericNpc(gb);
   return;
 
 init10:
-  CYC(0x69f3, 0x69f5); A = 0x1d; // >TX_1d00
-  CALL_C(0x69f5, interactionSetHighTextIndex_hook, 0x253b, 0x69f8);
-  CYC(0x69f8, 0x69fa); E = INTERACTION_BASE + OBJ_VAR3F;
-  CYC(0x69fa, 0x69fc); A = 0xff;
-  CYC(0x69fc, 0x69fd); mem_wr(gb, DE, A);
-  CYC(0x69fd, 0x6a00); SET_HL(nayruScript10_bank0c);
-  CYC(0x6a00, 0x6a03); interactionSetScript_hook(gb);
+  CYC(b_+368, b_+370); A = 0x1d; // >TX_1d00
+  CALL_C(b_+370, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+373);
+  CYC(b_+373, b_+375); E = INTERACTION_BASE + OBJ_VAR3F;
+  CYC(b_+375, b_+377); A = 0xff;
+  CYC(b_+377, b_+378); mem_wr(gb, DE, A);
+  CYC(b_+378, b_+381); SET_HL(nayruScript10_bank0c);
+  CYC(b_+381, b_+384); interactionSetScript_hook(gb);
   return;
 
 init11:
-  CYC(0x6a03, 0x6a04); alu_xor(gb, A);
-  CALL_C(0x6a04, interactionSetAnimation_hook, 0x262e, 0x6a07);
+  CYC(b_+384, b_+385); alu_xor(gb, A);
+  CALL_C(b_+385, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+388);
   // callab scriptHelp.objectWritePositionTocfd5
-  CYC(0x6a07, 0x6a0a); SET_HL(objectWritePositionTocfd5_bank15);
-  CYC(0x6a0a, 0x6a0c); E = 0x15;
-  CALL_C(0x6a0c, interBankCall_hook, 0x008a, 0x6a0f);
-  CYC(0x6a0f, 0x6a11); A = 0x1d; // >TX_1d00
-  CALL_C(0x6a11, interactionSetHighTextIndex_hook, 0x253b, 0x6a14);
-  CYC(0x6a14, 0x6a17); SET_HL(nayruScript11_bank0c);
-  CYC(0x6a17, 0x6a1a); interactionSetScript_hook(gb);
+  CYC(b_+388, b_+391); SET_HL(objectWritePositionTocfd5_bank15);
+  CYC(b_+391, b_+393); E = 0x15;
+  CALL_C(b_+393, interBankCall_hook, 0x008a, b_+396);
+  CYC(b_+396, b_+398); A = 0x1d; // >TX_1d00
+  CALL_C(b_+398, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+401);
+  CYC(b_+401, b_+404); SET_HL(nayruScript11_bank0c);
+  CYC(b_+404, b_+407); interactionSetScript_hook(gb);
   return;
 
 init12:
-  CALL_C(0x6a1a, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x6a1d);
-  CYC(0x6a1d, 0x6a20); SET_BC(0x4870);
-  CYC(0x6a20, 0x6a23); interactionSetPosition_hook(gb);
+  CALL_C(b_+407, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+410);
+  CYC(b_+410, b_+413); SET_BC((SYM(interactionCode15__subid00) + 1));
+  CYC(b_+413, b_+416); interactionSetPosition_hook(gb);
   return;
 
 init13:
-  CYC(0x6a23, 0x6a25); A = 0x14; // GLOBALFLAG_FINISHEDGAME
-  CALL_C(0x6a25, checkGlobalFlag_hook, 0x31f3, 0x6a28);
+  CYC(b_+416, b_+418); A = 0x14; // GLOBALFLAG_FINISHEDGAME
+  CALL_C(b_+418, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+421);
   if (F & FZ) {
-    CYCT(0x6a28, 0x6a2b); interactionDelete_hook(gb); return;
+    CYCT(b_+421, b_+424); interactionDelete_hook(gb); return;
   }
-  CYC(0x6a28, 0x6a2b);
-  CYC(0x6a2b, 0x6a2e); SET_HL(nayruScript13_bank0c);
-  CALL_C(0x6a2e, interactionSetScript_hook, 0x2544, 0x6a31);
-  CYC(0x6a31, 0x6a33); A = 0x1d; // >TX_1d00
-  CALL_C(0x6a33, interactionSetHighTextIndex_hook, 0x253b, 0x6a36);
-  CYC(0x6a36, 0x6a38); A = 0x03; // MUS_OVERWORLD
-  CYC(0x6a38, 0x6a3b); mem_wr(gb, wActiveMusic2, A);
-  CYC(0x6a3b, 0x6a3d); A = 0xff;
-  CYC(0x6a3d, 0x6a40); mem_wr(gb, wActiveMusic, A);
-  CYC(0x6a40, 0x6a43); nayru_setSingingAnimation(gb, sp0_);
+  CYC(b_+421, b_+424);
+  CYC(b_+424, b_+427); SET_HL(nayruScript13_bank0c);
+  CALL_C(b_+427, interactionSetScript_hook, SYM(interactionSetScript), b_+430);
+  CYC(b_+430, b_+432); A = 0x1d; // >TX_1d00
+  CALL_C(b_+432, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+435);
+  CYC(b_+435, b_+437); A = 0x03; // MUS_OVERWORLD
+  CYC(b_+437, b_+440); mem_wr(gb, wActiveMusic2, A);
+  CYC(b_+440, b_+442); A = 0xff;
+  CYC(b_+442, b_+445); mem_wr(gb, wActiveMusic, A);
+  CYC(b_+445, SYM(nayruState1)); nayru_setSingingAnimation(gb, sp0_);
 }
 
 // nayruSubid00@createMusicNotes: spawn a floating music note when the animation signals
 // one (animParameter). Also called from subids 2, 7 and $13 in this file.
 static void nayru_createMusicNotes(GB *gb) {
-  CYC(0x6aa1, 0x6aa2); H = D;
-  CYC(0x6aa2, 0x6aa4); L = INTERACTION_BASE + OBJ_ANIM_PARAMETER;
-  CYC(0x6aa4, 0x6aa5); A = mem_rd(gb, HL);
-  CYC(0x6aa5, 0x6aa6); alu_or(gb, A);
+  BASE(nayruSubid00);
+  CYC(b_+50, b_+51); H = D;
+  CYC(b_+51, b_+53); L = INTERACTION_BASE + OBJ_ANIM_PARAMETER;
+  CYC(b_+53, b_+54); A = mem_rd(gb, HL);
+  CYC(b_+54, b_+55); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x6aa6, 0x6aa7); ret_effect(gb); return;
+    CYCT(b_+55, b_+56); ret_effect(gb); return;
   }
-  CYC(0x6aa6, 0x6aa7);
-  CYC(0x6aa7, 0x6aa9); mem_wr(gb, HL, 0x00);
-  CYC(0x6aa9, 0x6aaa); A = alu_dec8(gb, A);
-  CYC(0x6aaa, 0x6aac); C = 0xfa; // -6
+  CYC(b_+55, b_+56);
+  CYC(b_+56, b_+58); mem_wr(gb, HL, 0x00);
+  CYC(b_+58, b_+59); A = alu_dec8(gb, A);
+  CYC(b_+59, b_+61); C = 0xfa; // -6
   if (F & FZ) {
-    CYCT(0x6aac, 0x6aae);
+    CYCT(b_+61, b_+63);
   } else {
-    CYC(0x6aac, 0x6aae);
-    CYC(0x6aae, 0x6ab0); C = 0x08;
+    CYC(b_+61, b_+63);
+    CYC(b_+63, b_+65); C = 0x08;
   }
-  CYC(0x6ab0, 0x6ab2); B = 0xfc;
-  CYC(0x6ab2, 0x6ab5); objectCreateFloatingMusicNote_hook(gb);
+  CYC(b_+65, b_+67); B = 0xfc;
+  CYC(b_+67, b_+70); objectCreateFloatingMusicNote_hook(gb);
 }
 
 // nayruSubid00@swayHorizontally: 3 pixels left, 3 pixels right, repeat. Reached only by a
 // static `call nz` from subid 0 substate 1.
 static void nayru_swayHorizontally(GB *gb) {
-  CYC(0x6af4, 0x6af7); A = mem_rd(gb, wFrameCounter);
-  CYC(0x6af7, 0x6af9); alu_and(gb, 0x07);
+  BASE(nayruSubid00);
+  CYC(b_+133, b_+136); A = mem_rd(gb, wFrameCounter);
+  CYC(b_+136, b_+138); alu_and(gb, 0x07);
   if (!(F & FZ)) {
-    CYCT(0x6af9, 0x6afa); ret_effect(gb); return;
+    CYCT(b_+138, b_+139); ret_effect(gb); return;
   }
-  CYC(0x6af9, 0x6afa);
-  CYC(0x6afa, 0x6afd); A = mem_rd(gb, wFrameCounter);
-  CYC(0x6afd, 0x6aff); alu_and(gb, 0x38);
-  CYC(0x6aff, 0x6b01); A = alu_swap(gb, A);
-  CYC(0x6b01, 0x6b02); alu_rlca(gb);
-  CYC(0x6b02, 0x6b05); SET_HL(nayruSwayXOffsets_bank08);
-  CYC(0x6b05, 0x6b06); push_effect(gb, 0x6b06); nayru_addAToHl(gb);
-  CYC(0x6b06, 0x6b08); E = INTERACTION_BASE + OBJ_XH;
-  CYC(0x6b08, 0x6b09); A = mem_rd(gb, HL);
-  CYC(0x6b09, 0x6b0a); B = A;
-  CYC(0x6b0a, 0x6b0b); A = mem_rd(gb, DE);
-  CYC(0x6b0b, 0x6b0c); alu_add(gb, B);
-  CYC(0x6b0c, 0x6b0d); mem_wr(gb, DE, A);
-  CYC(0x6b0d, 0x6b0e); ret_effect(gb);
+  CYC(b_+138, b_+139);
+  CYC(b_+139, b_+142); A = mem_rd(gb, wFrameCounter);
+  CYC(b_+142, b_+144); alu_and(gb, 0x38);
+  CYC(b_+144, b_+146); A = alu_swap(gb, A);
+  CYC(b_+146, b_+147); alu_rlca(gb);
+  CYC(b_+147, b_+150); SET_HL(nayruSwayXOffsets_bank08);
+  CYC(b_+150, b_+151); push_effect(gb, b_+151); nayru_addAToHl(gb);
+  CYC(b_+151, b_+153); E = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+153, b_+154); A = mem_rd(gb, HL);
+  CYC(b_+154, b_+155); B = A;
+  CYC(b_+155, b_+156); A = mem_rd(gb, DE);
+  CYC(b_+156, b_+157); alu_add(gb, B);
+  CYC(b_+157, b_+158); mem_wr(gb, DE, A);
+  CYC(b_+158, b_+159); ret_effect(gb);
 }
 
 // INTERAC_NAYRU
 void interactionCode36_hook(GB *gb) {
+  BASE(interactionCode36);
   uint16_t sp0_ = gb->sp;
-  CYC(0x687b, 0x687d); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x687d, 0x687e); A = mem_rd(gb, DE);
-  CYC(0x687e, 0x687f); push_effect(gb, 0x687f);
-  switch (nayru_jumpTable(gb)) {
-    case 0x6883: nayruState0_hook(gb); return;
-    case 0x6a43: nayruState1_hook(gb); return;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (nayru_jumpTable(gb));
+    if (jt_ == SYM(nayruState0)) { nayruState0_hook(gb); return; }
+    else if (jt_ == SYM(nayruState1)) { nayruState1_hook(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 }
 
 void nayruState0_hook(GB *gb) {
+  BASE(nayruState0);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6883, 0x6885); A = 0x01;
-  CYC(0x6885, 0x6886); mem_wr(gb, DE, A);
-  CALL_C(0x6886, interactionInitGraphics_hook, 0x15fb, 0x6889);
-  CALL_C(0x6889, objectSetVisiblec2_hook, 0x1e45, 0x688c);
-  CYC(0x688c, 0x688f); push_effect(gb, 0x688f); nayru_initSubid(gb, sp0_);
-  CYC(0x688f, 0x6891); E = INTERACTION_BASE + OBJ_ENABLED;
-  CYC(0x6891, 0x6892); A = mem_rd(gb, DE);
-  CYC(0x6892, 0x6893); alu_or(gb, A);
+  CYC(b_+0, b_+2); A = 0x01;
+  CYC(b_+2, b_+3); mem_wr(gb, DE, A);
+  CALL_C(b_+3, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+6);
+  CALL_C(b_+6, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+9);
+  CYC(b_+9, b_+12); push_effect(gb, b_+12); nayru_initSubid(gb, sp0_);
+  CYC(b_+12, b_+14); E = INTERACTION_BASE + OBJ_ENABLED;
+  CYC(b_+14, b_+15); A = mem_rd(gb, DE);
+  CYC(b_+15, b_+16); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x6893, 0x6896); objectMarkSolidPosition_hook(gb); return;
+    CYCT(b_+16, b_+19); objectMarkSolidPosition_hook(gb); return;
   }
-  CYC(0x6893, 0x6896);
-  CYC(0x6896, 0x6897); ret_effect(gb);
+  CYC(b_+16, b_+19);
+  CYC(b_+19, b_+20); ret_effect(gb);
 }
 
 void nayruState1_hook(GB *gb) {
+  BASE(nayruState1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6a43, 0x6a45); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x6a45, 0x6a46); A = mem_rd(gb, DE);
-  CYC(0x6a46, 0x6a47); push_effect(gb, 0x6a47);
-  switch (nayru_jumpTable(gb)) {
-    case 0x6a6f: nayruSubid00_hook(gb); return;
-    case 0x6b9b: nayruSubid01_hook(gb); return;
-    case 0x6bce: nayruSubid02_hook(gb); return;
-    case 0x6c2e: nayruSubid03_hook(gb); return;
-    case 0x6c59: nayruSubid04_hook(gb); return;
-    case 0x6c71: nayruSubid05_hook(gb); return;
-    case 0x6cd4: nayruSubid07_hook(gb); return;
-    case 0x6bf2: nayruAnimateAndRunScript_hook(gb); return;
-    case 0x6d3a: nayruSubid09_hook(gb); return;
-    case 0x6d67: nayruSubid0a_hook(gb); return;
-    case 0x6d34: nayruAsNpc_hook(gb); return;
-    case 0x261b: interactionAnimate_hook(gb); return;
-    case 0x6d4d: nayruSubid10_hook(gb); return;
-    case 0x6d6e: nayruSubid13_hook(gb); return;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (nayru_jumpTable(gb));
+    if (jt_ == SYM(nayruSubid00)) { nayruSubid00_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid01)) { nayruSubid01_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid02)) { nayruSubid02_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid03)) { nayruSubid03_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid04)) { nayruSubid04_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid05)) { nayruSubid05_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid07)) { nayruSubid07_hook(gb); return; }
+    else if (jt_ == SYM(nayruAnimateAndRunScript)) { nayruAnimateAndRunScript_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid09)) { nayruSubid09_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid0a)) { nayruSubid0a_hook(gb); return; }
+    else if (jt_ == SYM(nayruAsNpc)) { nayruAsNpc_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid10)) { nayruSubid10_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid13)) { nayruSubid13_hook(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 }
 
 // Subid $00: cutscene at the beginning of the game (Nayru talks, gets possessed, goes back
@@ -520,695 +531,715 @@ void nayruState1_hook(GB *gb) {
 //   var3a/3b: Number of frames to stay in her "unpossessed" (var3a) or "possessed" (var3b)
 //             palette.
 void nayruSubid00_hook(GB *gb) {
+  BASE(nayruSubid00);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6a6f, 0x6a71); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x6a71, 0x6a72); A = mem_rd(gb, DE);
-  CYC(0x6a72, 0x6a73); push_effect(gb, 0x6a73);
-  switch (nayru_jumpTable(gb)) {
-    case 0x6a85: goto substate0;
-    case 0x6ab5: goto substate1;
-    case 0x6b16: goto substate2;
-    case 0x6b1d: goto substate3;
-    case 0x6b2b: goto substate4;
-    case 0x6b45: goto substate5;
-    case 0x6b60: goto substate6;
-    case 0x6b6d: goto substate7;
-    case 0x6b86: goto substate8;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (nayru_jumpTable(gb));
+    if (jt_ == b_+22) { goto substate0; }
+    else if (jt_ == b_+70) { goto substate1; }
+    else if (jt_ == b_+167) { goto substate2; }
+    else if (jt_ == b_+174) { goto substate3; }
+    else if (jt_ == b_+188) { goto substate4; }
+    else if (jt_ == b_+214) { goto substate5; }
+    else if (jt_ == b_+241) { goto substate6; }
+    else if (jt_ == b_+254) { goto substate7; }
+    else if (jt_ == b_+279) { goto substate8; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 substate0:
   // Waiting for Link to approach (signal in $cfd0)
-  CALL_C(0x6a85, interactionAnimate_hook, 0x261b, 0x6a88);
-  CYC(0x6a88, 0x6a8b); A = mem_rd(gb, wTmpcfc0 + 0x10);
-  CYC(0x6a8b, 0x6a8d); alu_cp(gb, 0x09);
+  CALL_C(b_+22, interactionAnimate_hook, SYM(interactionAnimate), b_+25);
+  CYC(b_+25, b_+28); A = mem_rd(gb, wTmpcfc0 + 0x10);
+  CYC(b_+28, b_+30); alu_cp(gb, 0x09);
   if (!(F & FZ)) {
-    CYCT(0x6a8d, 0x6a90); nayru_createMusicNotes(gb); return;
+    CYCT(b_+30, b_+33); nayru_createMusicNotes(gb); return;
   }
-  CYC(0x6a8d, 0x6a90);
-  CALL_C(0x6a90, interactionIncSubstate_hook, 0x23e5, 0x6a93);
-  CYC(0x6a93, 0x6a95); A = 0x0f;
-  CYC(0x6a95, 0x6a97); L = INTERACTION_BASE + OBJ_VAR39;
-  CYC(0x6a97, 0x6a98); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x6a98, 0x6a99); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(0x6a99, 0x6a9b); mem_wr(gb, HL, 0x01);
-  CYC(0x6a9b, 0x6a9e); SET_HL(nayruScript00_part1_bank0c);
-  CYC(0x6a9e, 0x6aa1); interactionSetScript_hook(gb);
+  CYC(b_+30, b_+33);
+  CALL_C(b_+33, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+36);
+  CYC(b_+36, b_+38); A = 0x0f;
+  CYC(b_+38, b_+40); L = INTERACTION_BASE + OBJ_VAR39;
+  CYC(b_+40, b_+41); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+41, b_+42); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+42, b_+44); mem_wr(gb, HL, 0x01);
+  CYC(b_+44, b_+47); SET_HL(nayruScript00_part1_bank0c);
+  CYC(b_+47, b_+50); interactionSetScript_hook(gb);
   return;
 
 substate1:
   // Palette is flickering while being possessed
-  CALL_C(0x6ab5, interactionAnimate_hook, 0x261b, 0x6ab8);
-  CALL_C(0x6ab8, interactionRunScript_hook, 0x2552, 0x6abb);
-  CYC(0x6abb, 0x6abe); A = mem_rd(gb, wTmpcfc0 + 0x10);
-  CYC(0x6abe, 0x6ac0); alu_cp(gb, 0x16);
+  CALL_C(b_+70, interactionAnimate_hook, SYM(interactionAnimate), b_+73);
+  CALL_C(b_+73, interactionRunScript_hook, SYM(interactionRunScript), b_+76);
+  CYC(b_+76, b_+79); A = mem_rd(gb, wTmpcfc0 + 0x10);
+  CYC(b_+79, b_+81); alu_cp(gb, 0x16);
   if (!(F & FZ)) {
-    CYCT(0x6ac0, 0x6ac1); ret_effect(gb); return;
+    CYCT(b_+81, b_+82); ret_effect(gb); return;
   }
-  CYC(0x6ac0, 0x6ac1);
+  CYC(b_+81, b_+82);
   // Sway horizontally while moving
-  CYC(0x6ac1, 0x6ac3); E = INTERACTION_BASE + OBJ_COUNTER2;
-  CYC(0x6ac3, 0x6ac4); A = mem_rd(gb, DE);
-  CYC(0x6ac4, 0x6ac5); alu_or(gb, A);
+  CYC(b_+82, b_+84); E = INTERACTION_BASE + OBJ_COUNTER2;
+  CYC(b_+84, b_+85); A = mem_rd(gb, DE);
+  CYC(b_+85, b_+86); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x6ac5, 0x6ac8); push_effect(gb, 0x6ac8); nayru_swayHorizontally(gb);
+    CYCT(b_+86, b_+89); push_effect(gb, b_+89); nayru_swayHorizontally(gb);
   } else {
-    CYC(0x6ac5, 0x6ac8);
+    CYC(b_+86, b_+89);
   }
   // Flip the OAM flags when var39 reaches 0
-  CYC(0x6ac8, 0x6ac9); H = D;
-  CYC(0x6ac9, 0x6acb); L = INTERACTION_BASE + OBJ_VAR39;
-  CYC(0x6acb, 0x6acc); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+89, b_+90); H = D;
+  CYC(b_+90, b_+92); L = INTERACTION_BASE + OBJ_VAR39;
+  CYC(b_+92, b_+93); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) {
-    CYCT(0x6acc, 0x6acd); ret_effect(gb); return;
+    CYCT(b_+93, b_+94); ret_effect(gb); return;
   }
-  CYC(0x6acc, 0x6acd);
-  CYC(0x6acd, 0x6acf); L = INTERACTION_BASE + OBJ_OAM_FLAGS;
-  CYC(0x6acf, 0x6ad0); A = mem_rd(gb, HL);
-  CYC(0x6ad0, 0x6ad1); A = alu_dec8(gb, A);
-  CYC(0x6ad1, 0x6ad3); alu_xor(gb, 0x05);
-  CYC(0x6ad3, 0x6ad4); A = alu_inc8(gb, A);
-  CYC(0x6ad4, 0x6ad5); mem_wr(gb, HL, A);
-  CALL_C(0x6ad5, nayruUpdatePossessionPaletteDurations_hook, 0x6c85, 0x6ad8);
+  CYC(b_+93, b_+94);
+  CYC(b_+94, b_+96); L = INTERACTION_BASE + OBJ_OAM_FLAGS;
+  CYC(b_+96, b_+97); A = mem_rd(gb, HL);
+  CYC(b_+97, b_+98); A = alu_dec8(gb, A);
+  CYC(b_+98, b_+100); alu_xor(gb, 0x05);
+  CYC(b_+100, b_+101); A = alu_inc8(gb, A);
+  CYC(b_+101, b_+102); mem_wr(gb, HL, A);
+  CALL_C(b_+102, nayruUpdatePossessionPaletteDurations_hook, SYM(nayruUpdatePossessionPaletteDurations), b_+105);
   if (!(F & FZ)) {
-    CYCT(0x6ad8, 0x6ada); goto substate1_stillFlickering;
+    CYCT(b_+105, b_+107); goto substate1_stillFlickering;
   }
-  CYC(0x6ad8, 0x6ada);
+  CYC(b_+105, b_+107);
   // Done flickering with possession
-  CALL_C(0x6ada, interactionIncSubstate_hook, 0x23e5, 0x6add);
-  CYC(0x6add, 0x6adf); L = INTERACTION_BASE + OBJ_OAM_FLAGS;
-  CYC(0x6adf, 0x6ae1); mem_wr(gb, HL, 0x06);
-  CYC(0x6ae1, 0x6ae2); ret_effect(gb);
+  CALL_C(b_+107, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+110);
+  CYC(b_+110, b_+112); L = INTERACTION_BASE + OBJ_OAM_FLAGS;
+  CYC(b_+112, b_+114); mem_wr(gb, HL, 0x06);
+  CYC(b_+114, b_+115); ret_effect(gb);
   return;
 substate1_stillFlickering:
-  CYC(0x6ae2, 0x6ae4); L = INTERACTION_BASE + OBJ_VAR3A;
-  CYC(0x6ae4, 0x6ae5); B = mem_rd(gb, HL);
-  CYC(0x6ae5, 0x6ae6); L = alu_inc8(gb, L);
-  CYC(0x6ae6, 0x6ae7); C = mem_rd(gb, HL);
-  CYC(0x6ae7, 0x6ae9); L = INTERACTION_BASE + OBJ_OAM_FLAGS;
-  CYC(0x6ae9, 0x6aea); A = mem_rd(gb, HL);
-  CYC(0x6aea, 0x6aec); alu_cp(gb, 0x06);
-  CYC(0x6aec, 0x6aed); A = B;
+  CYC(b_+115, b_+117); L = INTERACTION_BASE + OBJ_VAR3A;
+  CYC(b_+117, b_+118); B = mem_rd(gb, HL);
+  CYC(b_+118, b_+119); L = alu_inc8(gb, L);
+  CYC(b_+119, b_+120); C = mem_rd(gb, HL);
+  CYC(b_+120, b_+122); L = INTERACTION_BASE + OBJ_OAM_FLAGS;
+  CYC(b_+122, b_+123); A = mem_rd(gb, HL);
+  CYC(b_+123, b_+125); alu_cp(gb, 0x06);
+  CYC(b_+125, b_+126); A = B;
   if (!(F & FZ)) {
-    CYCT(0x6aed, 0x6aef);
+    CYCT(b_+126, b_+128);
   } else {
-    CYC(0x6aed, 0x6aef);
-    CYC(0x6aef, 0x6af0); A = C;
+    CYC(b_+126, b_+128);
+    CYC(b_+128, b_+129); A = C;
   }
-  CYC(0x6af0, 0x6af2); L = INTERACTION_BASE + OBJ_VAR39;
-  CYC(0x6af2, 0x6af3); mem_wr(gb, HL, A);
-  CYC(0x6af3, 0x6af4); ret_effect(gb);
+  CYC(b_+129, b_+131); L = INTERACTION_BASE + OBJ_VAR39;
+  CYC(b_+131, b_+132); mem_wr(gb, HL, A);
+  CYC(b_+132, b_+133); ret_effect(gb);
   return;
 
 substate2:
   // Waiting for script to end
-  CALL_C(0x6b16, interactionRunScript_hook, 0x2552, 0x6b19);
+  CALL_C(b_+167, interactionRunScript_hook, SYM(interactionRunScript), b_+170);
   if (!(F & FC)) {
-    CYCT(0x6b19, 0x6b1a); ret_effect(gb); return;
+    CYCT(b_+170, b_+171); ret_effect(gb); return;
   }
-  CYC(0x6b19, 0x6b1a);
-  CYC(0x6b1a, 0x6b1d); interactionIncSubstate_hook(gb);
+  CYC(b_+170, b_+171);
+  CYC(b_+171, b_+174); interactionIncSubstate_hook(gb);
   return;
 
 substate3:
-  CYC(0x6b1d, 0x6b20); A = mem_rd(gb, wTmpcfc0 + 0x10);
-  CYC(0x6b20, 0x6b22); alu_cp(gb, 0x1a);
+  CYC(b_+174, b_+177); A = mem_rd(gb, wTmpcfc0 + 0x10);
+  CYC(b_+177, b_+179); alu_cp(gb, 0x1a);
   if (!(F & FZ)) {
-    CYCT(0x6b22, 0x6b23); ret_effect(gb); return;
+    CYCT(b_+179, b_+180); ret_effect(gb); return;
   }
-  CYC(0x6b22, 0x6b23);
-  CALL_C(0x6b23, interactionIncSubstate_hook, 0x23e5, 0x6b26);
-  CYC(0x6b26, 0x6b28); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x6b28, 0x6b2a); mem_wr(gb, HL, 60);
-  CYC(0x6b2a, 0x6b2b); ret_effect(gb);
+  CYC(b_+179, b_+180);
+  CALL_C(b_+180, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+183);
+  CYC(b_+183, b_+185); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+185, b_+187); mem_wr(gb, HL, 60);
+  CYC(b_+187, b_+188); ret_effect(gb);
   return;
 
 substate4:
   // Waiting 60 frames before jumping
-  CALL_C(0x6b2b, interactionAnimate_hook, 0x261b, 0x6b2e);
-  CALL_C(0x6b2e, interactionDecCounter1_hook, 0x23cc, 0x6b31);
+  CALL_C(b_+188, interactionAnimate_hook, SYM(interactionAnimate), b_+191);
+  CALL_C(b_+191, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+194);
   if (!(F & FZ)) {
-    CYCT(0x6b31, 0x6b32); ret_effect(gb); return;
+    CYCT(b_+194, b_+195); ret_effect(gb); return;
   }
-  CYC(0x6b31, 0x6b32);
-  CALL_C(0x6b32, interactionIncSubstate_hook, 0x23e5, 0x6b35);
-  CYC(0x6b35, 0x6b38); SET_BC(0xfc00); // -$400
-  CALL_C(0x6b38, objectSetSpeedZ_hook, 0x239d, 0x6b3b);
-  CYC(0x6b3b, 0x6b3d); A = 0x6b; // SND_SWORDSPIN
-  CALL_C(0x6b3d, playSound_b00_hook, 0x0c98, 0x6b40);
-  CYC(0x6b40, 0x6b42); A = 0x05;
-  CYC(0x6b42, 0x6b45); interactionSetAnimation_hook(gb);
+  CYC(b_+194, b_+195);
+  CALL_C(b_+195, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+198);
+  CYC(b_+198, b_+201); SET_BC(0xfc00); // -$400
+  CALL_C(b_+201, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+204);
+  CYC(b_+204, b_+206); A = 0x6b; // SND_SWORDSPIN
+  CALL_C(b_+206, playSound_b00_hook, SYM(playSound_b00), b_+209);
+  CYC(b_+209, b_+211); A = 0x05;
+  CYC(b_+211, b_+214); interactionSetAnimation_hook(gb);
   return;
 
 substate5:
   // Jumping until off-screen
-  CYC(0x6b45, 0x6b46); alu_xor(gb, A);
-  CALL_C(0x6b46, objectUpdateSpeedZ_hook, 0x1f45, 0x6b49);
-  CYC(0x6b49, 0x6b4b); E = INTERACTION_BASE + OBJ_ZH;
-  CYC(0x6b4b, 0x6b4c); A = mem_rd(gb, DE);
-  CYC(0x6b4c, 0x6b4e); alu_cp(gb, 0x80);
+  CYC(b_+214, b_+215); alu_xor(gb, A);
+  CALL_C(b_+215, objectUpdateSpeedZ_hook, SYM(objectUpdateSpeedZ), b_+218);
+  CYC(b_+218, b_+220); E = INTERACTION_BASE + OBJ_ZH;
+  CYC(b_+220, b_+221); A = mem_rd(gb, DE);
+  CYC(b_+221, b_+223); alu_cp(gb, 0x80);
   if (!(F & FC)) {
-    CYCT(0x6b4e, 0x6b4f); ret_effect(gb); return;
+    CYCT(b_+223, b_+224); ret_effect(gb); return;
   }
-  CYC(0x6b4e, 0x6b4f);
+  CYC(b_+223, b_+224);
   // Set position to land at
-  CYC(0x6b4f, 0x6b52); SET_BC(0x3828);
-  CALL_C(0x6b52, interactionSetPosition_hook, 0x2773, 0x6b55);
-  CYC(0x6b55, 0x6b57); L = INTERACTION_BASE + OBJ_ZH;
-  CYC(0x6b57, 0x6b59); mem_wr(gb, HL, 0x80);
-  CYC(0x6b59, 0x6b5b); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x6b5b, 0x6b5d); mem_wr(gb, HL, 0x1e);
-  CYC(0x6b5d, 0x6b60); interactionIncSubstate_hook(gb);
+  CYC(b_+224, b_+227); SET_BC(SYM(loadTilesetUniqueGfx));
+  CALL_C(b_+227, interactionSetPosition_hook, SYM(interactionSetPosition), b_+230);
+  CYC(b_+230, b_+232); L = INTERACTION_BASE + OBJ_ZH;
+  CYC(b_+232, b_+234); mem_wr(gb, HL, 0x80);
+  CYC(b_+234, b_+236); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+236, b_+238); mem_wr(gb, HL, 0x1e);
+  CYC(b_+238, b_+241); interactionIncSubstate_hook(gb);
   return;
 
 substate6:
   // Brief delay before falling back down
-  CALL_C(0x6b60, interactionDecCounter1_hook, 0x23cc, 0x6b63);
+  CALL_C(b_+241, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+244);
   if (!(F & FZ)) {
-    CYCT(0x6b63, 0x6b64); ret_effect(gb); return;
+    CYCT(b_+244, b_+245); ret_effect(gb); return;
   }
-  CYC(0x6b63, 0x6b64);
-  CALL_C(0x6b64, interactionIncSubstate_hook, 0x23e5, 0x6b67);
-  CYC(0x6b67, 0x6b6a); SET_BC(0x0040);
-  CYC(0x6b6a, 0x6b6d); objectSetSpeedZ_hook(gb);
+  CYC(b_+244, b_+245);
+  CALL_C(b_+245, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+248);
+  CYC(b_+248, b_+251); SET_BC(0x0040);
+  CYC(b_+251, b_+254); objectSetSpeedZ_hook(gb);
   return;
 
 substate7:
   // Falling back down
-  CYC(0x6b6d, 0x6b6f); C = 0x20;
-  CALL_C(0x6b6f, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x6b72);
+  CYC(b_+254, b_+256); C = 0x20;
+  CALL_C(b_+256, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+259);
   if (!(F & FZ)) {
-    CYCT(0x6b72, 0x6b73); ret_effect(gb); return;
+    CYCT(b_+259, b_+260); ret_effect(gb); return;
   }
-  CYC(0x6b72, 0x6b73);
-  CYC(0x6b73, 0x6b75); A = 0x1b;
-  CYC(0x6b75, 0x6b78); mem_wr(gb, wTmpcfc0 + 0x10, A);
+  CYC(b_+259, b_+260);
+  CYC(b_+260, b_+262); A = 0x1b;
+  CYC(b_+262, b_+265); mem_wr(gb, wTmpcfc0 + 0x10, A);
   // Start next script
-  CYC(0x6b78, 0x6b7b); SET_HL(nayruScript00_part2_bank0c);
-  CALL_C(0x6b7b, interactionSetScript_hook, 0x2544, 0x6b7e);
-  CYC(0x6b7e, 0x6b80); A = 0x6a; // SND_SLASH
-  CALL_C(0x6b80, playSound_b00_hook, 0x0c98, 0x6b83);
-  CYC(0x6b83, 0x6b86); interactionIncSubstate_hook(gb);
+  CYC(b_+265, b_+268); SET_HL(nayruScript00_part2_bank0c);
+  CALL_C(b_+268, interactionSetScript_hook, SYM(interactionSetScript), b_+271);
+  CYC(b_+271, b_+273); A = 0x6a; // SND_SLASH
+  CALL_C(b_+273, playSound_b00_hook, SYM(playSound_b00), b_+276);
+  CYC(b_+276, b_+279); interactionIncSubstate_hook(gb);
   return;
 
 substate8:
   // Next script running; make Nayru transparent when signal is given. Delete self when
   // the script finishes.
-  CALL_C(0x6b86, interactionAnimate_hook, 0x261b, 0x6b89);
-  CALL_C(0x6b89, interactionRunScript_hook, 0x2552, 0x6b8c);
+  CALL_C(b_+279, interactionAnimate_hook, SYM(interactionAnimate), b_+282);
+  CALL_C(b_+282, interactionRunScript_hook, SYM(interactionRunScript), b_+285);
   if (!(F & FC)) {
-    CYCT(0x6b8c, 0x6b8e); goto substate8_scriptRunning;
+    CYCT(b_+285, b_+287); goto substate8_scriptRunning;
   }
-  CYC(0x6b8c, 0x6b8e);
-  CYC(0x6b8e, 0x6b91); interactionDelete_hook(gb);
+  CYC(b_+285, b_+287);
+  CYC(b_+287, b_+290); interactionDelete_hook(gb);
   return;
 substate8_scriptRunning:
-  CYC(0x6b91, 0x6b93); E = INTERACTION_BASE + OBJ_VAR3D;
-  CYC(0x6b93, 0x6b94); A = mem_rd(gb, DE);
-  CYC(0x6b94, 0x6b95); alu_or(gb, A);
+  CYC(b_+290, b_+292); E = INTERACTION_BASE + OBJ_VAR3D;
+  CYC(b_+292, b_+293); A = mem_rd(gb, DE);
+  CYC(b_+293, b_+294); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x6b95, 0x6b96); ret_effect(gb); return;
+    CYCT(b_+294, b_+295); ret_effect(gb); return;
   }
-  CYC(0x6b95, 0x6b96);
-  CYC(0x6b96, 0x6b98); B = 0x01;
-  CYC(0x6b98, 0x6b9b); objectFlickerVisibility_hook(gb);
+  CYC(b_+294, b_+295);
+  CYC(b_+295, b_+297); B = 0x01;
+  CYC(b_+297, SYM(nayruSubid01)); objectFlickerVisibility_hook(gb);
 }
 
 // Subid $01: Cutscene in Ambi's palace after getting bombs. When the script finishes, load
 // the next room.
 void nayruSubid01_hook(GB *gb) {
+  BASE(nayruSubid01);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6b9b, nayruAnimateAndRunScript_hook, 0x6bf2, 0x6b9e);
+  CALL_C(b_+0, nayruAnimateAndRunScript_hook, SYM(nayruAnimateAndRunScript), b_+3);
   if (!(F & FC)) {
-    CYCT(0x6b9e, 0x6b9f); ret_effect(gb); return;
+    CYCT(b_+3, b_+4); ret_effect(gb); return;
   }
-  CYC(0x6b9e, 0x6b9f);
-  CYC(0x6b9f, 0x6ba0); push_effect(gb, DE);
-  CYC(0x6ba0, 0x6ba3); SET_BC(0x0146);
-  CALL_C(0x6ba3, disableLcdAndLoadRoom_hook, 0x30b0, 0x6ba6);
-  CALL_C(0x6ba6, resetCamera_hook, 0x12ce, 0x6ba9);
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+5); push_effect(gb, DE);
+  CYC(b_+5, b_+8); SET_BC(0x0146);
+  CALL_C(b_+8, disableLcdAndLoadRoom_hook, SYM(disableLcdAndLoadRoom), b_+11);
+  CALL_C(b_+11, resetCamera_hook, SYM(resetCamera), b_+14);
   // disableLcdAndLoadRoom doesn't load the room's objects, so load the guards here
-  CYC(0x6ba9, 0x6bac); SET_HL(ambisPalaceEntranceGuards_bank12);
-  CALL_C(0x6bac, parseGivenObjectData_b00_hook, 0x3171, 0x6baf);
+  CYC(b_+14, b_+17); SET_HL(ambisPalaceEntranceGuards_bank12);
+  CALL_C(b_+17, parseGivenObjectData_b00_hook, SYM(parseGivenObjectData_b00), b_+20);
   // Re-initialize the link object
-  CYC(0x6baf, 0x6bb2); SET_HL(w1Link_enabled);
-  CYC(0x6bb2, 0x6bb4); mem_wr(gb, HL, 0x03);
-  CYC(0x6bb4, 0x6bb6); L = (uint8_t)w1Link_yh;
-  CYC(0x6bb6, 0x6bb8); mem_wr(gb, HL, 0x38);
-  CYC(0x6bb8, 0x6bba); L = (uint8_t)w1Link_xh;
-  CYC(0x6bba, 0x6bbc); mem_wr(gb, HL, 0x50);
+  CYC(b_+20, b_+23); SET_HL(w1Link_enabled);
+  CYC(b_+23, b_+25); mem_wr(gb, HL, 0x03);
+  CYC(b_+25, b_+27); L = (uint8_t)w1Link_yh;
+  CYC(b_+27, b_+29); mem_wr(gb, HL, 0x38);
+  CYC(b_+29, b_+31); L = (uint8_t)w1Link_xh;
+  CYC(b_+31, b_+33); mem_wr(gb, HL, 0x50);
   // Re-enable the LCD
-  CYC(0x6bbc, 0x6bbe); A = 0x02;
-  CALL_C(0x6bbe, loadGfxRegisterStateIndex_hook, 0x02ea, 0x6bc1);
-  CYC(0x6bc1, 0x6bc2); SET_DE(pop_effect(gb));
-  CYC(0x6bc2, 0x6bc5); A = mem_rd(gb, wActiveMusic2);
-  CYC(0x6bc5, 0x6bc8); mem_wr(gb, wActiveMusic, A);
-  CALL_C(0x6bc8, playSound_b00_hook, 0x0c98, 0x6bcb);
-  CYC(0x6bcb, 0x6bce); clearPaletteFadeVariablesAndRefreshPalettes_hook(gb);
+  CYC(b_+33, b_+35); A = 0x02;
+  CALL_C(b_+35, loadGfxRegisterStateIndex_hook, SYM(loadGfxRegisterStateIndex), b_+38);
+  CYC(b_+38, b_+39); SET_DE(pop_effect(gb));
+  CYC(b_+39, b_+42); A = mem_rd(gb, wActiveMusic2);
+  CYC(b_+42, b_+45); mem_wr(gb, wActiveMusic, A);
+  CALL_C(b_+45, playSound_b00_hook, SYM(playSound_b00), b_+48);
+  CYC(b_+48, SYM(nayruSubid02)); clearPaletteFadeVariablesAndRefreshPalettes_hook(gb);
 }
 
 // Subid $02: Cutscene on maku tree screen after being saved
 void nayruSubid02_hook(GB *gb) {
+  BASE(nayruSubid02);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6bce, 0x6bd0); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x6bd0, 0x6bd1); A = mem_rd(gb, DE);
-  CYC(0x6bd1, 0x6bd2); push_effect(gb, 0x6bd2);
-  switch (nayru_jumpTable(gb)) {
-    case 0x6bd8: nayruSubid02Substate0_hook(gb); return;
-    case 0x6bf8: nayruSubid02Substate1_hook(gb); return;
-    case 0x6c27: nayruSubid02Substate2_hook(gb); return;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (nayru_jumpTable(gb));
+    if (jt_ == SYM(nayruSubid02Substate0)) { nayruSubid02Substate0_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid02Substate1)) { nayruSubid02Substate1_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid02Substate2)) { nayruSubid02Substate2_hook(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 }
 
 // Also called by Ralph in the same cutscene. Falls through into nayruAnimateAndRunScript.
 void nayruSubid02Substate0_hook(GB *gb) {
+  BASE(nayruSubid02Substate0);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6bd8, 0x6bdb); A = mem_rd(gb, wTmpcfc0 + 0x10);
-  CYC(0x6bdb, 0x6bdd); alu_cp(gb, 0x07);
+  CYC(b_+0, b_+3); A = mem_rd(gb, wTmpcfc0 + 0x10);
+  CYC(b_+3, b_+5); alu_cp(gb, 0x07);
   if (!(F & FZ)) {
-    CYCT(0x6bdd, 0x6bdf); goto createNotes;
+    CYCT(b_+5, b_+7); goto createNotes;
   }
-  CYC(0x6bdd, 0x6bdf);
+  CYC(b_+5, b_+7);
   // Signal received: choose direction randomly (left/right) and go to substate 1
-  CALL_C(0x6bdf, getRandomNumber_hook, 0x043e, 0x6be2);
-  CYC(0x6be2, 0x6be4); alu_and(gb, 0x02);
-  CYC(0x6be4, 0x6be6); alu_or(gb, 0x01);
-  CYC(0x6be6, 0x6be8); E = INTERACTION_BASE + OBJ_DIRECTION;
-  CYC(0x6be8, 0x6be9); mem_wr(gb, DE, A);
-  CALL_C(0x6be9, nayruSetCounter1Randomly_hook, 0x6c1a, 0x6bec);
-  CYC(0x6bec, 0x6bef); interactionIncSubstate_hook(gb);
+  CALL_C(b_+7, getRandomNumber_hook, SYM(getRandomNumber), b_+10);
+  CYC(b_+10, b_+12); alu_and(gb, 0x02);
+  CYC(b_+12, b_+14); alu_or(gb, 0x01);
+  CYC(b_+14, b_+16); E = INTERACTION_BASE + OBJ_DIRECTION;
+  CYC(b_+16, b_+17); mem_wr(gb, DE, A);
+  CALL_C(b_+17, nayruSetCounter1Randomly_hook, SYM(nayruSetCounter1Randomly), b_+20);
+  CYC(b_+20, b_+23); interactionIncSubstate_hook(gb);
   return;
 
 createNotes:
-  CYC(0x6bef, 0x6bf2); push_effect(gb, 0x6bf2); nayru_createMusicNotes(gb);
+  CYC(b_+23, SYM(nayruAnimateAndRunScript)); push_effect(gb, SYM(nayruAnimateAndRunScript)); nayru_createMusicNotes(gb);
   nayruAnimateAndRunScript_hook(gb);
 }
 
 void nayruAnimateAndRunScript_hook(GB *gb) {
+  BASE(nayruAnimateAndRunScript);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6bf2, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x6bf5);
-  CYC(0x6bf5, 0x6bf8); interactionRunScript_hook(gb);
+  CALL_C(b_+0, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+3);
+  CYC(b_+3, SYM(nayruSubid02Substate1)); interactionRunScript_hook(gb);
 }
 
 void nayruSubid02Substate1_hook(GB *gb) {
+  BASE(nayruSubid02Substate1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6bf8, 0x6bfb); A = mem_rd(gb, wTmpcfc0 + 0x10);
-  CYC(0x6bfb, 0x6bfd); alu_cp(gb, 0x08);
+  CYC(b_+0, b_+3); A = mem_rd(gb, wTmpcfc0 + 0x10);
+  CYC(b_+3, b_+5); alu_cp(gb, 0x08);
   if (!(F & FZ)) {
-    CYCT(0x6bfd, 0x6bff); nayruFlipDirectionAtRandomIntervals_hook(gb); return;
+    CYCT(b_+5, b_+7); nayruFlipDirectionAtRandomIntervals_hook(gb); return;
   }
-  CYC(0x6bfd, 0x6bff);
-  CALL_C(0x6bff, interactionIncSubstate_hook, 0x23e5, 0x6c02);
-  CYC(0x6c02, 0x6c05); SET_HL(nayruScript02_part3_bank0c);
-  CALL_C(0x6c05, interactionSetScript_hook, 0x2544, 0x6c08);
-  CYC(0x6c08, 0x6c0a); A = 0x01;
-  CYC(0x6c0a, 0x6c0d); interactionSetAnimation_hook(gb);
+  CYC(b_+5, b_+7);
+  CALL_C(b_+7, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+10);
+  CYC(b_+10, b_+13); SET_HL(nayruScript02_part3_bank0c);
+  CALL_C(b_+13, interactionSetScript_hook, SYM(interactionSetScript), b_+16);
+  CYC(b_+16, b_+18); A = 0x01;
+  CYC(b_+18, SYM(nayruFlipDirectionAtRandomIntervals)); interactionSetAnimation_hook(gb);
 }
 
 // Also called by Ralph in the same cutscene. Falls through into nayruSetCounter1Randomly.
 void nayruFlipDirectionAtRandomIntervals_hook(GB *gb) {
+  BASE(nayruFlipDirectionAtRandomIntervals);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6c0d, interactionDecCounter1_hook, 0x23cc, 0x6c10);
+  CALL_C(b_+0, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+3);
   if (!(F & FZ)) {
-    CYCT(0x6c10, 0x6c11); ret_effect(gb); return;
+    CYCT(b_+3, b_+4); ret_effect(gb); return;
   }
-  CYC(0x6c10, 0x6c11);
-  CYC(0x6c11, 0x6c13); L = INTERACTION_BASE + OBJ_DIRECTION;
-  CYC(0x6c13, 0x6c14); A = mem_rd(gb, HL);
-  CYC(0x6c14, 0x6c16); alu_xor(gb, 0x02);
-  CYC(0x6c16, 0x6c17); mem_wr(gb, HL, A);
-  CALL_C(0x6c17, interactionSetAnimation_hook, 0x262e, 0x6c1a);
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+6); L = INTERACTION_BASE + OBJ_DIRECTION;
+  CYC(b_+6, b_+7); A = mem_rd(gb, HL);
+  CYC(b_+7, b_+9); alu_xor(gb, 0x02);
+  CYC(b_+9, b_+10); mem_wr(gb, HL, A);
+  CALL_C(b_+10, interactionSetAnimation_hook, SYM(interactionSetAnimation), SYM(nayruSetCounter1Randomly));
   nayruSetCounter1Randomly_hook(gb);
 }
 
 void nayruSetCounter1Randomly_hook(GB *gb) {
+  BASE(nayruSetCounter1Randomly);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6c1a, getRandomNumber_noPreserveVars_hook, 0x0453, 0x6c1d);
-  CYC(0x6c1d, 0x6c1f); alu_and(gb, 0x03);
-  CYC(0x6c1f, 0x6c20); alu_add(gb, A);
-  CYC(0x6c20, 0x6c21); alu_add(gb, A);
-  CYC(0x6c21, 0x6c23); alu_add(gb, 0x10);
-  CYC(0x6c23, 0x6c25); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x6c25, 0x6c26); mem_wr(gb, DE, A);
-  CYC(0x6c26, 0x6c27); ret_effect(gb);
+  CALL_C(b_+0, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+3);
+  CYC(b_+3, b_+5); alu_and(gb, 0x03);
+  CYC(b_+5, b_+6); alu_add(gb, A);
+  CYC(b_+6, b_+7); alu_add(gb, A);
+  CYC(b_+7, b_+9); alu_add(gb, 0x10);
+  CYC(b_+9, b_+11); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+11, b_+12); mem_wr(gb, DE, A);
+  CYC(b_+12, SYM(nayruSubid02Substate2)); ret_effect(gb);
 }
 
 void nayruSubid02Substate2_hook(GB *gb) {
+  BASE(nayruSubid02Substate2);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6c27, nayruAnimateAndRunScript_hook, 0x6bf2, 0x6c2a);
+  CALL_C(b_+0, nayruAnimateAndRunScript_hook, SYM(nayruAnimateAndRunScript), b_+3);
   if (!(F & FC)) {
-    CYCT(0x6c2a, 0x6c2b); ret_effect(gb); return;
+    CYCT(b_+3, b_+4); ret_effect(gb); return;
   }
-  CYC(0x6c2a, 0x6c2b);
-  CYC(0x6c2b, 0x6c2e); interactionDelete_hook(gb);
+  CYC(b_+3, b_+4);
+  CYC(b_+4, SYM(nayruSubid03)); interactionDelete_hook(gb);
 }
 
 // Subid $03: Cutscene with Nayru and Ralph when Link exits the black tower
 void nayruSubid03_hook(GB *gb) {
+  BASE(nayruSubid03);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6c2e, interactionAnimateBasedOnSpeed_hook, 0x2758, 0x6c31);
-  CYC(0x6c31, 0x6c33); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x6c33, 0x6c34); A = mem_rd(gb, DE);
-  CYC(0x6c34, 0x6c35); push_effect(gb, 0x6c35);
-  switch (nayru_jumpTable(gb)) {
-    case 0x6c3b: goto substate0;
-    case 0x6c47: goto substate1;
-    case 0x6c56: goto substate2;
-    default: HANDOFF(HL);
-  }
+  CALL_C(b_+0, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+3);
+  CYC(b_+3, b_+5); E = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+7); push_effect(gb, b_+7);
+  do { uint16_t jt_ = (nayru_jumpTable(gb));
+    if (jt_ == b_+13) { goto substate0; }
+    else if (jt_ == b_+25) { goto substate1; }
+    else if (jt_ == b_+40) { goto substate2; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 substate0:
-  CYC(0x6c3b, 0x6c3e); A = mem_rd(gb, wTmpcfc0 + 0x10);
-  CYC(0x6c3e, 0x6c40); alu_cp(gb, 0x01);
+  CYC(b_+13, b_+16); A = mem_rd(gb, wTmpcfc0 + 0x10);
+  CYC(b_+16, b_+18); alu_cp(gb, 0x01);
   if (!(F & FZ)) {
-    CYCT(0x6c40, 0x6c41); ret_effect(gb); return;
+    CYCT(b_+18, b_+19); ret_effect(gb); return;
   }
-  CYC(0x6c40, 0x6c41);
-  CALL_C(0x6c41, startJump_hook, 0x73db, 0x6c44);
-  CYC(0x6c44, 0x6c47); interactionIncSubstate_hook(gb);
+  CYC(b_+18, b_+19);
+  CALL_C(b_+19, startJump_hook, SYM(startJump), b_+22);
+  CYC(b_+22, b_+25); interactionIncSubstate_hook(gb);
   return;
 
 substate1:
-  CYC(0x6c47, 0x6c49); C = 0x24;
-  CALL_C(0x6c49, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x6c4c);
+  CYC(b_+25, b_+27); C = 0x24;
+  CALL_C(b_+27, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+30);
   if (!(F & FZ)) {
-    CYCT(0x6c4c, 0x6c4d); ret_effect(gb); return;
+    CYCT(b_+30, b_+31); ret_effect(gb); return;
   }
-  CYC(0x6c4c, 0x6c4d);
-  CYC(0x6c4d, 0x6c50); SET_HL(nayruScript03_bank0c);
-  CALL_C(0x6c50, interactionSetScript_hook, 0x2544, 0x6c53);
-  CYC(0x6c53, 0x6c56); interactionIncSubstate_hook(gb);
+  CYC(b_+30, b_+31);
+  CYC(b_+31, b_+34); SET_HL(nayruScript03_bank0c);
+  CALL_C(b_+34, interactionSetScript_hook, SYM(interactionSetScript), b_+37);
+  CYC(b_+37, b_+40); interactionIncSubstate_hook(gb);
   return;
 
 substate2:
-  CYC(0x6c56, 0x6c59); interactionRunScript_hook(gb);
+  CYC(b_+40, SYM(nayruSubid04)); interactionRunScript_hook(gb);
 }
 
 // Subid $04: Cutscene at end of game with Ambi and her guards
 void nayruSubid04_hook(GB *gb) {
+  BASE(nayruSubid04);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6c59, checkIsLinkedGame_hook, 0x1992, 0x6c5c);
+  CALL_C(b_+0, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+3);
   if (F & FZ) {
-    CYCT(0x6c5c, 0x6c5f); nayruAnimateAndRunScript_hook(gb); return;
+    CYCT(b_+3, b_+6); nayruAnimateAndRunScript_hook(gb); return;
   }
-  CYC(0x6c5c, 0x6c5f);
-  CYC(0x6c5f, 0x6c62); A = mem_rd(gb, wTmpcfc0 + 0x10);
-  CYC(0x6c62, 0x6c64); alu_cp(gb, 0x0b);
+  CYC(b_+3, b_+6);
+  CYC(b_+6, b_+9); A = mem_rd(gb, wTmpcfc0 + 0x10);
+  CYC(b_+9, b_+11); alu_cp(gb, 0x0b);
   if (F & FC) {
-    CYCT(0x6c64, 0x6c66); nayruAnimateAndRunScript_hook(gb); return;
+    CYCT(b_+11, b_+13); nayruAnimateAndRunScript_hook(gb); return;
   }
-  CYC(0x6c64, 0x6c66);
-  CALL_C(0x6c66, interactionAnimate_hook, 0x261b, 0x6c69);
+  CYC(b_+11, b_+13);
+  CALL_C(b_+13, interactionAnimate_hook, SYM(interactionAnimate), b_+16);
   // jpab scriptHelp.turnToFaceSomething
-  CYC(0x6c69, 0x6c6c); SET_HL(turnToFaceSomething_bank15);
-  CYC(0x6c6c, 0x6c6e); E = 0x15;
-  CYC(0x6c6e, 0x6c71); interBankCall_hook(gb);
+  CYC(b_+16, b_+19); SET_HL(turnToFaceSomething_bank15);
+  CYC(b_+19, b_+21); E = 0x15;
+  CYC(b_+21, SYM(nayruSubid05)); interBankCall_hook(gb);
 }
 
 // Subid $05: ?
 void nayruSubid05_hook(GB *gb) {
+  BASE(nayruSubid05);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6c71, nayruAnimateAndRunScript_hook, 0x6bf2, 0x6c74);
-  CYC(0x6c74, 0x6c77); A = mem_rd(gb, wTmpcfc0);
-  CYC(0x6c77, 0x6c79); alu_cp(gb, 0x03);
+  CALL_C(b_+0, nayruAnimateAndRunScript_hook, SYM(nayruAnimateAndRunScript), b_+3);
+  CYC(b_+3, b_+6); A = mem_rd(gb, wTmpcfc0);
+  CYC(b_+6, b_+8); alu_cp(gb, 0x03);
   if (F & FC) {
-    CYCT(0x6c79, 0x6c7a); ret_effect(gb); return;
+    CYCT(b_+8, b_+9); ret_effect(gb); return;
   }
-  CYC(0x6c79, 0x6c7a);
-  CYC(0x6c7a, 0x6c7c); alu_cp(gb, 0x05);
+  CYC(b_+8, b_+9);
+  CYC(b_+9, b_+11); alu_cp(gb, 0x05);
   if (!(F & FC)) {
-    CYCT(0x6c7c, 0x6c7d); ret_effect(gb); return;
+    CYCT(b_+11, b_+12); ret_effect(gb); return;
   }
-  CYC(0x6c7c, 0x6c7d);
+  CYC(b_+11, b_+12);
   // jpab scriptHelp.turnToFaceSomething
-  CYC(0x6c7d, 0x6c80); SET_HL(turnToFaceSomething_bank15);
-  CYC(0x6c80, 0x6c82); E = 0x15;
-  CYC(0x6c82, 0x6c85); interBankCall_hook(gb);
+  CYC(b_+12, b_+15); SET_HL(turnToFaceSomething_bank15);
+  CYC(b_+15, b_+17); E = 0x15;
+  CYC(b_+17, SYM(nayruUpdatePossessionPaletteDurations)); interBankCall_hook(gb);
 }
 
 // For Nayru subid 0 (getting possessed cutscene), this updates var3a, var3b representing
 // how long Nayru's palette should be "normal" or "possessed".
 // @param[out] zflag Set when Nayru is fully possessed
 void nayruUpdatePossessionPaletteDurations_hook(GB *gb) {
+  BASE(nayruUpdatePossessionPaletteDurations);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6c85, 0x6c88); A = mem_rd(gb, wFrameCounter);
-  CYC(0x6c88, 0x6c8a); alu_and(gb, 0x01);
+  CYC(b_+0, b_+3); A = mem_rd(gb, wFrameCounter);
+  CYC(b_+3, b_+5); alu_and(gb, 0x01);
   if (!(F & FZ)) {
-    CYCT(0x6c8a, 0x6c8b); ret_effect(gb); return;
+    CYCT(b_+5, b_+6); ret_effect(gb); return;
   }
-  CYC(0x6c8a, 0x6c8b);
-  CYC(0x6c8b, 0x6c8d); E = INTERACTION_BASE + OBJ_VAR38;
-  CYC(0x6c8d, 0x6c8e); A = mem_rd(gb, DE);
-  CYC(0x6c8e, 0x6c8f); push_effect(gb, 0x6c8f);
-  switch (nayru_jumpTable(gb)) {
-    case 0x6c99: goto var38_0;
-    case 0x6ca6: goto var38_1;
-    case 0x6cb6: goto var38_2;
-    case 0x6cbd: goto var38_3;
-    case 0x6cc9: goto var38_4;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+8); E = INTERACTION_BASE + OBJ_VAR38;
+  CYC(b_+8, b_+9); A = mem_rd(gb, DE);
+  CYC(b_+9, b_+10); push_effect(gb, b_+10);
+  do { uint16_t jt_ = (nayru_jumpTable(gb));
+    if (jt_ == b_+20) { goto var38_0; }
+    else if (jt_ == b_+33) { goto var38_1; }
+    else if (jt_ == b_+49) { goto var38_2; }
+    else if (jt_ == b_+56) { goto var38_3; }
+    else if (jt_ == b_+68) { goto var38_4; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 var38_0:
   // Decrement var3a (unpossessed palette duration), increment var3b (possessed palette
   // duration) until the two are equal, then increment var38.
-  CYC(0x6c99, 0x6c9a); H = D;
-  CYC(0x6c9a, 0x6c9c); L = INTERACTION_BASE + OBJ_VAR3A;
-  CYC(0x6c9c, 0x6c9d); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x6c9d, 0x6c9e); L = alu_inc8(gb, L);
-  CYC(0x6c9e, 0x6c9f); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6c9f, 0x6ca0); A = mem_rd(gb, HL); SET_HL(HL - 1);
-  CYC(0x6ca0, 0x6ca1); alu_cp(gb, mem_rd(gb, HL));
+  CYC(b_+20, b_+21); H = D;
+  CYC(b_+21, b_+23); L = INTERACTION_BASE + OBJ_VAR3A;
+  CYC(b_+23, b_+24); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+24, b_+25); L = alu_inc8(gb, L);
+  CYC(b_+25, b_+26); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+26, b_+27); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(b_+27, b_+28); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FZ)) {
-    CYCT(0x6ca1, 0x6ca2); ret_effect(gb); return;
+    CYCT(b_+28, b_+29); ret_effect(gb); return;
   }
-  CYC(0x6ca1, 0x6ca2);
+  CYC(b_+28, b_+29);
 
 incVar38:
-  CYC(0x6ca2, 0x6ca4); L = INTERACTION_BASE + OBJ_VAR38;
-  CYC(0x6ca4, 0x6ca5); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6ca5, 0x6ca6); ret_effect(gb);
+  CYC(b_+29, b_+31); L = INTERACTION_BASE + OBJ_VAR38;
+  CYC(b_+31, b_+32); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+32, b_+33); ret_effect(gb);
   return;
 
 var38_1:
   // Decrement both var3a and var3b until they're both 2
-  CYC(0x6ca6, 0x6ca7); H = D;
-  CYC(0x6ca7, 0x6ca9); L = INTERACTION_BASE + OBJ_VAR3A;
-  CYC(0x6ca9, 0x6caa); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x6caa, 0x6cab); L = alu_inc8(gb, L);
-  CYC(0x6cab, 0x6cac); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x6cac, 0x6cad); A = mem_rd(gb, HL);
-  CYC(0x6cad, 0x6caf); alu_cp(gb, 0x02);
+  CYC(b_+33, b_+34); H = D;
+  CYC(b_+34, b_+36); L = INTERACTION_BASE + OBJ_VAR3A;
+  CYC(b_+36, b_+37); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+37, b_+38); L = alu_inc8(gb, L);
+  CYC(b_+38, b_+39); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+39, b_+40); A = mem_rd(gb, HL);
+  CYC(b_+40, b_+42); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
-    CYCT(0x6caf, 0x6cb0); ret_effect(gb); return;
+    CYCT(b_+42, b_+43); ret_effect(gb); return;
   }
-  CYC(0x6caf, 0x6cb0);
-  CYC(0x6cb0, 0x6cb2); L = INTERACTION_BASE + OBJ_VAR3C;
-  CYC(0x6cb2, 0x6cb4); mem_wr(gb, HL, 0x10);
-  CYC(0x6cb4, 0x6cb6); goto incVar38;
+  CYC(b_+42, b_+43);
+  CYC(b_+43, b_+45); L = INTERACTION_BASE + OBJ_VAR3C;
+  CYC(b_+45, b_+47); mem_wr(gb, HL, 0x10);
+  CYC(b_+47, b_+49); goto incVar38;
 
 var38_2:
   // Wait 32 frames
-  CYC(0x6cb6, 0x6cb7); H = D;
-  CYC(0x6cb7, 0x6cb9); L = INTERACTION_BASE + OBJ_VAR3C;
-  CYC(0x6cb9, 0x6cba); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+49, b_+50); H = D;
+  CYC(b_+50, b_+52); L = INTERACTION_BASE + OBJ_VAR3C;
+  CYC(b_+52, b_+53); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) {
-    CYCT(0x6cba, 0x6cbb); ret_effect(gb); return;
+    CYCT(b_+53, b_+54); ret_effect(gb); return;
   }
-  CYC(0x6cba, 0x6cbb);
-  CYC(0x6cbb, 0x6cbd); goto incVar38;
+  CYC(b_+53, b_+54);
+  CYC(b_+54, b_+56); goto incVar38;
 
 var38_3:
   // Increment both var3a and var3b until they're both 8
-  CYC(0x6cbd, 0x6cbe); H = D;
-  CYC(0x6cbe, 0x6cc0); L = INTERACTION_BASE + OBJ_VAR3A;
-  CYC(0x6cc0, 0x6cc1); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6cc1, 0x6cc2); L = alu_inc8(gb, L);
-  CYC(0x6cc2, 0x6cc3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6cc3, 0x6cc4); A = mem_rd(gb, HL);
-  CYC(0x6cc4, 0x6cc6); alu_cp(gb, 0x08);
+  CYC(b_+56, b_+57); H = D;
+  CYC(b_+57, b_+59); L = INTERACTION_BASE + OBJ_VAR3A;
+  CYC(b_+59, b_+60); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+60, b_+61); L = alu_inc8(gb, L);
+  CYC(b_+61, b_+62); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+62, b_+63); A = mem_rd(gb, HL);
+  CYC(b_+63, b_+65); alu_cp(gb, 0x08);
   if (!(F & FZ)) {
-    CYCT(0x6cc6, 0x6cc7); ret_effect(gb); return;
+    CYCT(b_+65, b_+66); ret_effect(gb); return;
   }
-  CYC(0x6cc6, 0x6cc7);
-  CYC(0x6cc7, 0x6cc9); goto incVar38;
+  CYC(b_+65, b_+66);
+  CYC(b_+66, b_+68); goto incVar38;
 
 var38_4:
   // Decrement var3a, increment var3b until it's 16
-  CYC(0x6cc9, 0x6cca); H = D;
-  CYC(0x6cca, 0x6ccc); L = INTERACTION_BASE + OBJ_VAR3A;
-  CYC(0x6ccc, 0x6ccd); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(0x6ccd, 0x6cce); L = alu_inc8(gb, L);
-  CYC(0x6cce, 0x6ccf); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6ccf, 0x6cd0); A = mem_rd(gb, HL);
-  CYC(0x6cd0, 0x6cd2); alu_cp(gb, 0x10);
+  CYC(b_+68, b_+69); H = D;
+  CYC(b_+69, b_+71); L = INTERACTION_BASE + OBJ_VAR3A;
+  CYC(b_+71, b_+72); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+72, b_+73); L = alu_inc8(gb, L);
+  CYC(b_+73, b_+74); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+74, b_+75); A = mem_rd(gb, HL);
+  CYC(b_+75, b_+77); alu_cp(gb, 0x10);
   if (!(F & FZ)) {
-    CYCT(0x6cd2, 0x6cd3); ret_effect(gb); return;
+    CYCT(b_+77, b_+78); ret_effect(gb); return;
   }
-  CYC(0x6cd2, 0x6cd3);
-  CYC(0x6cd3, 0x6cd4); ret_effect(gb);
+  CYC(b_+77, b_+78);
+  CYC(b_+78, SYM(nayruSubid07)); ret_effect(gb);
 }
 
 // Subid $07: Cutscene with the vision of Nayru teaching you Tune of Echoes
 void nayruSubid07_hook(GB *gb) {
+  BASE(nayruSubid07);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6cd4, checkInteractionSubstate_hook, 0x2403, 0x6cd7);
+  CALL_C(b_+0, checkInteractionSubstate_hook, SYM(checkInteractionSubstate), b_+3);
   if (!(F & FZ)) {
-    CYCT(0x6cd7, 0x6cd9); goto substate1;
+    CYCT(b_+3, b_+5); goto substate1;
   }
-  CYC(0x6cd7, 0x6cd9);
+  CYC(b_+3, b_+5);
 
   // @substate0
-  CALL_C(0x6cd9, interactionDecCounter1_hook, 0x23cc, 0x6cdc);
+  CALL_C(b_+5, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+8);
   if (F & FZ) {
-    CYCT(0x6cdc, 0x6cde); goto substate0_counterDone;
+    CYCT(b_+8, b_+10); goto substate0_counterDone;
   }
-  CYC(0x6cdc, 0x6cde);
-  CYC(0x6cde, 0x6ce0); L = INTERACTION_BASE + OBJ_VISIBLE;
-  CYC(0x6ce0, 0x6ce1); A = mem_rd(gb, HL);
-  CYC(0x6ce1, 0x6ce3); alu_xor(gb, 0x80);
-  CYC(0x6ce3, 0x6ce4); mem_wr(gb, HL, A);
-  CYC(0x6ce4, 0x6ce5); ret_effect(gb);
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+12); L = INTERACTION_BASE + OBJ_VISIBLE;
+  CYC(b_+12, b_+13); A = mem_rd(gb, HL);
+  CYC(b_+13, b_+15); alu_xor(gb, 0x80);
+  CYC(b_+15, b_+16); mem_wr(gb, HL, A);
+  CYC(b_+16, b_+17); ret_effect(gb);
   return;
 substate0_counterDone:
-  CYC(0x6ce5, 0x6ce6); alu_xor(gb, A);
-  CYC(0x6ce6, 0x6ce9); mem_wr(gb, wTmpcfc0, A);
-  CALL_C(0x6ce9, interactionIncSubstate_hook, 0x23e5, 0x6cec);
-  CALL_C(0x6cec, objectSetVisible82_hook, 0x1e69, 0x6cef);
-  CYC(0x6cef, 0x6cf1); A = 0x08; // MUS_NAYRU
-  CYC(0x6cf1, 0x6cf4); mem_wr(gb, wActiveMusic, A);
-  CALL_C(0x6cf4, playSound_b00_hook, 0x0c98, 0x6cf7);
-  CYC(0x6cf7, 0x6cfa); SET_HL(nayruScript07_bank0c);
-  CYC(0x6cfa, 0x6cfd); interactionSetScript_hook(gb);
+  CYC(b_+17, b_+18); alu_xor(gb, A);
+  CYC(b_+18, b_+21); mem_wr(gb, wTmpcfc0, A);
+  CALL_C(b_+21, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+24);
+  CALL_C(b_+24, objectSetVisible82_hook, SYM(objectSetVisible82), b_+27);
+  CYC(b_+27, b_+29); A = 0x08; // MUS_NAYRU
+  CYC(b_+29, b_+32); mem_wr(gb, wActiveMusic, A);
+  CALL_C(b_+32, playSound_b00_hook, SYM(playSound_b00), b_+35);
+  CYC(b_+35, b_+38); SET_HL(nayruScript07_bank0c);
+  CYC(b_+38, b_+41); interactionSetScript_hook(gb);
   return;
 
 substate1:
-  CALL_C(0x6cfd, interactionRunScript_hook, 0x2552, 0x6d00);
+  CALL_C(b_+41, interactionRunScript_hook, SYM(interactionRunScript), b_+44);
   if (F & FC) {
-    CYCT(0x6d00, 0x6d02); goto scriptDone;
+    CYCT(b_+44, b_+46); goto scriptDone;
   }
-  CYC(0x6d00, 0x6d02);
-  CYC(0x6d02, 0x6d05); A = mem_rd(gb, wTmpcfc0);
-  CYC(0x6d05, 0x6d06); alu_rrca(gb);
+  CYC(b_+44, b_+46);
+  CYC(b_+46, b_+49); A = mem_rd(gb, wTmpcfc0);
+  CYC(b_+49, b_+50); alu_rrca(gb);
   if (F & FC) {
-    CYCT(0x6d06, 0x6d07); ret_effect(gb); return;
+    CYCT(b_+50, b_+51); ret_effect(gb); return;
   }
-  CYC(0x6d06, 0x6d07);
-  CYC(0x6d07, 0x6d09); E = INTERACTION_BASE + OBJ_DIRECTION;
-  CYC(0x6d09, 0x6d0a); A = mem_rd(gb, DE);
-  CYC(0x6d0a, 0x6d0c); alu_cp(gb, 0x07);
+  CYC(b_+50, b_+51);
+  CYC(b_+51, b_+53); E = INTERACTION_BASE + OBJ_DIRECTION;
+  CYC(b_+53, b_+54); A = mem_rd(gb, DE);
+  CYC(b_+54, b_+56); alu_cp(gb, 0x07);
   if (F & FZ) {
-    CYCT(0x6d0c, 0x6d0f); push_effect(gb, 0x6d0f); nayru_createMusicNotes(gb);
+    CYCT(b_+56, b_+59); push_effect(gb, b_+59); nayru_createMusicNotes(gb);
   } else {
-    CYC(0x6d0c, 0x6d0f);
+    CYC(b_+56, b_+59);
   }
-  CYC(0x6d0f, 0x6d12); interactionAnimate_hook(gb);
+  CYC(b_+59, b_+62); interactionAnimate_hook(gb);
   return;
 
 scriptDone:
-  CYC(0x6d12, 0x6d15); A = mem_rd(gb, wTextIsActive);
-  CYC(0x6d15, 0x6d16); alu_or(gb, A);
+  CYC(b_+62, b_+65); A = mem_rd(gb, wTextIsActive);
+  CYC(b_+65, b_+66); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x6d16, 0x6d17); ret_effect(gb); return;
+    CYCT(b_+66, b_+67); ret_effect(gb); return;
   }
-  CYC(0x6d16, 0x6d17);
+  CYC(b_+66, b_+67);
   // Re-enable objects, menus
-  CYC(0x6d17, 0x6d1a); mem_wr(gb, wDisabledObjects, A);
-  CYC(0x6d1a, 0x6d1d); mem_wr(gb, wMenuDisabled, A);
-  CYC(0x6d1d, 0x6d20); A = mem_rd(gb, wActiveMusic2);
-  CYC(0x6d20, 0x6d23); mem_wr(gb, wActiveMusic, A);
-  CALL_C(0x6d23, playSound_b00_hook, 0x0c98, 0x6d26);
-  CYC(0x6d26, 0x6d28); A = 0x04;
-  CALL_C(0x6d28, fadeinFromWhiteWithDelay_hook, 0x3284, 0x6d2b);
-  CALL_C(0x6d2b, showStatusBar_hook, 0x1aa4, 0x6d2e);
-  CYC(0x6d2e, 0x6d30); A = H8(hActiveObject);
-  CYC(0x6d30, 0x6d31); D = A;
-  CYC(0x6d31, 0x6d34); interactionDelete_hook(gb);
+  CYC(b_+67, b_+70); mem_wr(gb, wDisabledObjects, A);
+  CYC(b_+70, b_+73); mem_wr(gb, wMenuDisabled, A);
+  CYC(b_+73, b_+76); A = mem_rd(gb, wActiveMusic2);
+  CYC(b_+76, b_+79); mem_wr(gb, wActiveMusic, A);
+  CALL_C(b_+79, playSound_b00_hook, SYM(playSound_b00), b_+82);
+  CYC(b_+82, b_+84); A = 0x04;
+  CALL_C(b_+84, fadeinFromWhiteWithDelay_hook, SYM(fadeinFromWhiteWithDelay), b_+87);
+  CALL_C(b_+87, showStatusBar_hook, SYM(showStatusBar), b_+90);
+  CYC(b_+90, b_+92); A = H8(hActiveObject);
+  CYC(b_+92, b_+93); D = A;
+  CYC(b_+93, SYM(nayruAsNpc)); interactionDelete_hook(gb);
 }
 
 void nayruAsNpc_hook(GB *gb) {
+  BASE(nayruAsNpc);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6d34, interactionRunScript_hook, 0x2552, 0x6d37);
-  CYC(0x6d37, 0x6d3a); npcFaceLinkAndAnimate_hook(gb);
+  CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
+  CYC(b_+3, SYM(nayruSubid09)); npcFaceLinkAndAnimate_hook(gb);
 }
 
 // Subid $09: Cutscene where Ralph's heritage is revealed (unlinked?)
 void nayruSubid09_hook(GB *gb) {
+  BASE(nayruSubid09);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6d3a, nayruAnimateAndRunScript_hook, 0x6bf2, 0x6d3d);
+  CALL_C(b_+0, nayruAnimateAndRunScript_hook, SYM(nayruAnimateAndRunScript), b_+3);
   if (!(F & FC)) {
-    CYCT(0x6d3d, 0x6d3e); ret_effect(gb); return;
+    CYCT(b_+3, b_+4); ret_effect(gb); return;
   }
-  CYC(0x6d3d, 0x6d3e);
-  CYC(0x6d3e, 0x6d3f); alu_xor(gb, A);
-  CYC(0x6d3f, 0x6d42); mem_wr(gb, wDisabledObjects, A);
-  CYC(0x6d42, 0x6d45); mem_wr(gb, wMenuDisabled, A);
-  CYC(0x6d45, 0x6d47); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
-  CALL_C(0x6d47, setGlobalFlag_hook, 0x31f9, 0x6d4a);
-  CYC(0x6d4a, 0x6d4d); interactionDelete_hook(gb);
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+5); alu_xor(gb, A);
+  CYC(b_+5, b_+8); mem_wr(gb, wDisabledObjects, A);
+  CYC(b_+8, b_+11); mem_wr(gb, wMenuDisabled, A);
+  CYC(b_+11, b_+13); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
+  CALL_C(b_+13, setGlobalFlag_hook, SYM(setGlobalFlag), b_+16);
+  CYC(b_+16, SYM(nayruSubid10)); interactionDelete_hook(gb);
 }
 
 // Subid $10: Cutscene in black tower where Nayru/Ralph meet you to try to escape. Falls
 // through into nayruSubid0a.
 void nayruSubid10_hook(GB *gb) {
+  BASE(nayruSubid10);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6d4d, 0x6d50); A = mem_rd(gb, wScreenShakeCounterY);
-  CYC(0x6d50, 0x6d52); alu_cp(gb, 0x5a);
+  CYC(b_+0, b_+3); A = mem_rd(gb, wScreenShakeCounterY);
+  CYC(b_+3, b_+5); alu_cp(gb, 0x5a);
   if (!(F & FC)) {
-    CYCT(0x6d52, 0x6d54); nayruSubid0a_hook(gb); return;
+    CYCT(b_+5, b_+7); nayruSubid0a_hook(gb); return;
   }
-  CYC(0x6d52, 0x6d54);
-  CYC(0x6d54, 0x6d55); alu_or(gb, A);
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+8); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x6d55, 0x6d57); nayruSubid0a_hook(gb); return;
+    CYCT(b_+8, b_+10); nayruSubid0a_hook(gb); return;
   }
-  CYC(0x6d55, 0x6d57);
-  CYC(0x6d57, 0x6d5a); A = W8(w1Link_direction);
-  CYC(0x6d5a, 0x6d5b); A = alu_dec8(gb, A);
-  CYC(0x6d5b, 0x6d5d); alu_and(gb, 0x03);
-  CYC(0x6d5d, 0x6d5e); H = D;
-  CYC(0x6d5e, 0x6d60); L = INTERACTION_BASE + OBJ_VAR3F;
-  CYC(0x6d60, 0x6d61); alu_cp(gb, mem_rd(gb, HL));
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+13); A = W8(w1Link_direction);
+  CYC(b_+13, b_+14); A = alu_dec8(gb, A);
+  CYC(b_+14, b_+16); alu_and(gb, 0x03);
+  CYC(b_+16, b_+17); H = D;
+  CYC(b_+17, b_+19); L = INTERACTION_BASE + OBJ_VAR3F;
+  CYC(b_+19, b_+20); alu_cp(gb, mem_rd(gb, HL));
   if (F & FZ) {
-    CYCT(0x6d61, 0x6d63); nayruSubid0a_hook(gb); return;
+    CYCT(b_+20, b_+22); nayruSubid0a_hook(gb); return;
   }
-  CYC(0x6d61, 0x6d63);
-  CYC(0x6d63, 0x6d64); mem_wr(gb, HL, A);
-  CALL_C(0x6d64, interactionSetAnimation_hook, 0x262e, 0x6d67);
+  CYC(b_+20, b_+22);
+  CYC(b_+22, b_+23); mem_wr(gb, HL, A);
+  CALL_C(b_+23, interactionSetAnimation_hook, SYM(interactionSetAnimation), SYM(nayruSubid0a));
   nayruSubid0a_hook(gb);
 }
 
 // Subid $0a: Cutscene where Ralph's heritage is revealed (linked?)
 void nayruSubid0a_hook(GB *gb) {
+  BASE(nayruSubid0a);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6d67, nayruAnimateAndRunScript_hook, 0x6bf2, 0x6d6a);
+  CALL_C(b_+0, nayruAnimateAndRunScript_hook, SYM(nayruAnimateAndRunScript), b_+3);
   if (!(F & FC)) {
-    CYCT(0x6d6a, 0x6d6b); ret_effect(gb); return;
+    CYCT(b_+3, b_+4); ret_effect(gb); return;
   }
-  CYC(0x6d6a, 0x6d6b);
-  CYC(0x6d6b, 0x6d6e); interactionDelete_hook(gb);
+  CYC(b_+3, b_+4);
+  CYC(b_+4, SYM(nayruSubid13)); interactionDelete_hook(gb);
 }
 
 // Subid $13: NPC after completing game (singing to animals). Falls through into
 // nayruRunScriptWithConditionalAnimation.
 void nayruSubid13_hook(GB *gb) {
-  CYC(0x6d6e, 0x6d71); push_effect(gb, 0x6d71); nayru_createMusicNotes(gb);
+  BASE(nayruRunScriptWithConditionalAnimation);
+  CYC(SYM(nayruSubid13), b_+0); push_effect(gb, b_+0); nayru_createMusicNotes(gb);
   nayruRunScriptWithConditionalAnimation_hook(gb);
 }
 
 // This is called by Ralph as well.
 void nayruRunScriptWithConditionalAnimation_hook(GB *gb) {
+  BASE(nayruRunScriptWithConditionalAnimation);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x6d71, interactionRunScript_hook, 0x2552, 0x6d74);
-  CYC(0x6d74, 0x6d76); E = INTERACTION_BASE + OBJ_VAR39;
-  CYC(0x6d76, 0x6d77); A = mem_rd(gb, DE);
-  CYC(0x6d77, 0x6d78); alu_or(gb, A);
+  CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
+  CYC(b_+3, b_+5); E = INTERACTION_BASE + OBJ_VAR39;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+7); alu_or(gb, A);
   if (F & FZ) {
-    CALL_C_CC(0x6d78, interactionAnimate_hook, 0x261b, 0x6d7b);
+    CALL_C_CC(b_+7, interactionAnimate_hook, SYM(interactionAnimate), b_+10);
   } else {
-    CYC(0x6d78, 0x6d7b);
+    CYC(b_+7, b_+10);
   }
-  CALL_C(0x6d7b, objectPreventLinkFromPassing_hook, 0x2680, 0x6d7e);
-  CYC(0x6d7e, 0x6d81); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
+  CALL_C(b_+10, objectPreventLinkFromPassing_hook, SYM(objectPreventLinkFromPassing), b_+13);
+  CYC(b_+13, SYM(interactionCode37)); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
 }

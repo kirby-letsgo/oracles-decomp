@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(setTrigger2IfTriggers0And1Set), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(setTrigger2IfTriggers0And1Set), (from), (to), true)
 
 void setTrigger2IfTriggers0And1Set_hook(GB *gb);
 void makeTorchesLightable_hook(GB *gb);
@@ -17,103 +17,112 @@ void moonlitGrotto_enableControlAfterBreakingCrystal_hook(GB *gb);
 void label_15_031_hook(GB *gb);
 
 void setTrigger2IfTriggers0And1Set_hook(GB *gb) {
-  CYC(0x4f3b, 0x4f3e); SET_HL(wActiveTriggers);
-  CYC(0x4f3e, 0x4f3f); A = mem_rd(gb, HL);
-  CYC(0x4f3f, 0x4f41); alu_and(gb, 0x03);
-  CYC(0x4f41, 0x4f43); alu_cp(gb, 0x03);
+  BASE(setTrigger2IfTriggers0And1Set);
+  CYC(b_+0, b_+3); SET_HL(wActiveTriggers);
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
+  CYC(b_+4, b_+6); alu_and(gb, 0x03);
+  CYC(b_+6, b_+8); alu_cp(gb, 0x03);
   if (!(F & FZ)) {
-    CYCT(0x4f43, 0x4f45);
+    CYCT(b_+8, b_+10);
     goto notSet;
   }
-  CYC(0x4f43, 0x4f45);
-  CYC(0x4f45, 0x4f47); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 2));
-  RET(0x4f47);
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+12); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 2));
+  RET(b_+12);
   return;
 
 notSet:
-  CYC(0x4f48, 0x4f4a); mem_wr(gb, HL, mem_rd(gb, HL) & ~(1 << 2));
-  RET(0x4f4a);
+  CYC(b_+13, b_+15); mem_wr(gb, HL, mem_rd(gb, HL) & ~(1 << 2));
+  RET(b_+15);
 }
 
 void makeTorchesLightable_hook(GB *gb) {
+  BASE(makeTorchesLightable);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4f4b, getFreeInteractionSlot_hook, 0x3aef, 0x4f4e);
+  CALL_C(b_+0, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+3);
   if (!(F & FZ)) {
-    RET_TAKEN(0x4f4e); return;
+    RET_TAKEN(b_+3); return;
   }
-  CYC(0x4f4e, 0x4f4f);
-  CYC(0x4f4f, 0x4f51); mem_wr(gb, HL, 0xc7);
-  CYC(0x4f51, 0x4f52); L = alu_inc8(gb, L);
-  CYC(0x4f52, 0x4f54); mem_wr(gb, HL, 0x08);
-  CYC(0x4f54, 0x4f56); L = 0x4b;
-  CYC(0x4f56, 0x4f58); mem_wr(gb, HL, 0x06);
-  CYC(0x4f58, 0x4f5a); L = 0x4d;
-  CYC(0x4f5a, 0x4f5c); mem_wr(gb, HL, 0x10);
-  RET(0x4f5c);
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+6); mem_wr(gb, HL, 0xc7);
+  CYC(b_+6, b_+7); L = alu_inc8(gb, L);
+  CYC(b_+7, b_+9); mem_wr(gb, HL, 0x08);
+  CYC(b_+9, b_+11); L = 0x4b;
+  CYC(b_+11, b_+13); mem_wr(gb, HL, 0x06);
+  CYC(b_+13, b_+15); L = 0x4d;
+  CYC(b_+15, b_+17); mem_wr(gb, HL, 0x10);
+  RET(b_+17);
 }
 
 void func_4f5d_hook(GB *gb) {
+  BASE(func_4f5d);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4f5d, getThisRoomFlags_hook, 0x197d, 0x4f60);
-  CYC(0x4f60, 0x4f62); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 7));
-  CYC(0x4f62, 0x4f64); A = 0x4d;
-  CYC(0x4f64, 0x4f67); playSound_b00_hook(gb);
+  CALL_C(b_+0, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+3);
+  CYC(b_+3, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 7));
+  CYC(b_+5, b_+7); A = 0x4d;
+  CYC(b_+7, SYM(spawnBridge)); playSound_b00_hook(gb);
 }
 
 void spawnBridge_hook(GB *gb) {
+  BASE(spawnBridge);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4f67, getFreePartSlot_hook, 0x3e8e, 0x4f6a);
+  CALL_C(b_+0, getFreePartSlot_hook, SYM(getFreePartSlot), b_+3);
   if (!(F & FZ)) {
-    RET_TAKEN(0x4f6a); return;
+    RET_TAKEN(b_+3); return;
   }
-  CYC(0x4f6a, 0x4f6b);
-  CYC(0x4f6b, 0x4f6d); mem_wr(gb, HL, 0x0c);
-  CYC(0x4f6d, 0x4f6f); L = 0xc7;
-  CYC(0x4f6f, 0x4f70); mem_wr(gb, HL, B);
-  CYC(0x4f70, 0x4f72); L = 0xc9;
-  CYC(0x4f72, 0x4f73); mem_wr(gb, HL, C);
-  CYC(0x4f73, 0x4f75); L = 0xcb;
-  CYC(0x4f75, 0x4f76); mem_wr(gb, HL, E);
-  RET(0x4f76);
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+6); mem_wr(gb, HL, 0x0c);
+  CYC(b_+6, b_+8); L = 0xc7;
+  CYC(b_+8, b_+9); mem_wr(gb, HL, B);
+  CYC(b_+9, b_+11); L = 0xc9;
+  CYC(b_+11, b_+12); mem_wr(gb, HL, C);
+  CYC(b_+12, b_+14); L = 0xcb;
+  CYC(b_+14, b_+15); mem_wr(gb, HL, E);
+  RET(b_+15);
 }
 
 void mermaidsCave_spawnBridge_room38_hook(GB *gb) {
+  BASE(mermaidsCave_spawnBridge_room38);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4f77, getThisRoomFlags_hook, 0x197d, 0x4f7a);
-  CYC(0x4f7a, 0x4f7c); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 6));
-  CYC(0x4f7c, 0x4f7e); A = 0x4d;
-  CALL_C(0x4f7e, playSound_b00_hook, 0x0c98, 0x4f81);
-  CYC(0x4f81, 0x4f84); SET_BC(0x0800);
-  CYC(0x4f84, 0x4f86); E = 0x69;
-  CYC(0x4f86, 0x4f89); spawnBridge_hook(gb);
+  CALL_C(b_+0, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+3);
+  CYC(b_+3, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 6));
+  CYC(b_+5, b_+7); A = 0x4d;
+  CALL_C(b_+7, playSound_b00_hook, SYM(playSound_b00), b_+10);
+  CYC(b_+10, b_+13); SET_BC((SYM(loadTilesetHlpr) + 2));
+  CYC(b_+13, b_+15); E = 0x69;
+  CYC(b_+15, SYM(herosCave_spawnBridge_roomc9)); spawnBridge_hook(gb);
 }
 
 void herosCave_spawnBridge_roomc9_hook(GB *gb) {
+  BASE(herosCave_spawnBridge_roomc9);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4f89, getThisRoomFlags_hook, 0x197d, 0x4f8c);
-  CYC(0x4f8c, 0x4f8e); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 6));
-  CYC(0x4f8e, 0x4f90); A = 0x4d;
-  CALL_C(0x4f90, playSound_b00_hook, 0x0c98, 0x4f93);
-  CYC(0x4f93, 0x4f96); SET_BC(0x0803);
-  CYC(0x4f96, 0x4f98); E = 0x2a;
-  CYC(0x4f98, 0x4f9b); spawnBridge_hook(gb);
+  CALL_C(b_+0, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+3);
+  CYC(b_+3, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 6));
+  CYC(b_+5, b_+7); A = 0x4d;
+  CALL_C(b_+7, playSound_b00_hook, SYM(playSound_b00), b_+10);
+  CYC(b_+10, b_+13); SET_BC((SYM(loadTilesetHlpr) + 5));
+  CYC(b_+13, b_+15); E = 0x2a;
+  CYC(b_+15, SYM(ancientTomb_startWallRetractionCutscene)); spawnBridge_hook(gb);
 }
 
 void ancientTomb_startWallRetractionCutscene_hook(GB *gb) {
-  CYC(0x4f9b, 0x4f9d); A = 0x0b;
-  CYC(0x4f9d, 0x4fa0); mem_wr(gb, 0xcc04, A);
-  CYC(0x4fa0, 0x4fa3); resetLinkInvincibility_hook(gb);
+  BASE(ancientTomb_startWallRetractionCutscene);
+  CYC(b_+0, b_+2); A = 0x0b;
+  CYC(b_+2, b_+5); mem_wr(gb, wCutsceneTrigger, A);
+  CYC(b_+5, SYM(moonlitGrotto_enableControlAfterBreakingCrystal)); resetLinkInvincibility_hook(gb);
 }
 
 void moonlitGrotto_enableControlAfterBreakingCrystal_hook(GB *gb) {
-  CYC(0x4fa3, 0x4fa4); alu_xor(gb, A);
-  CYC(0x4fa4, 0x4fa7); mem_wr(gb, 0xcc8a, A);
-  CYC(0x4fa7, 0x4faa); mem_wr(gb, 0xcc02, A);
+  BASE(moonlitGrotto_enableControlAfterBreakingCrystal);
+  CYC(b_+0, b_+1); alu_xor(gb, A);
+  CYC(b_+1, b_+4); mem_wr(gb, wDisabledObjects, A);
+  CYC(b_+4, SYM(label_15_031)); mem_wr(gb, wMenuDisabled, A);
   label_15_031_hook(gb);
 }
 
 void label_15_031_hook(GB *gb) {
-  CYC(0x4faa, 0x4fad); mem_wr(gb, 0xcc91, A);
-  CYC(0x4fad, 0x4fb0); mem_wr(gb, 0xcc90, A);
-  RET(0x4fb0);
+  BASE(label_15_031);
+  CYC(b_+0, b_+3); mem_wr(gb, wDisableScreenTransitions, A);
+  CYC(b_+3, b_+6); mem_wr(gb, wDisableWarpTiles, A);
+  RET(b_+6);
 }

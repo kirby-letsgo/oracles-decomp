@@ -3,65 +3,68 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x15, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x15, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(soldierSetSimulatedInputToEscortLink), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(soldierSetSimulatedInputToEscortLink), (from), (to), true)
 
 // ref/oracles-disasm/scripts/ages/scriptHelper.s (INTERAC_SOLDIER), bank 0x15.
 
 void soldierSetSimulatedInputToEscortLink_hook(GB *gb) {
+  BASE(soldierSetSimulatedInputToEscortLink);
   uint16_t sp0_ = gb->sp;
-  CYC(0x59f3, 0x59f4); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x59f4, 0x59f6); goto exit_palace; } // jr nz
-  CYC(0x59f4, 0x59f6);
-  CYC(0x59f6, 0x59f9); A = W8(w1Link_xh);
-  CYC(0x59f9, 0x59fb); B = 0x60;
-  CYC(0x59fb, 0x59fd); alu_sub(gb, 0x50);
-  if (!(F & FC)) { CYCT(0x59fd, 0x59ff); goto have_x_delta; } // jr nc
-  CYC(0x59fd, 0x59ff);
-  CYC(0x59ff, 0x5a00); alu_cpl(gb);
-  CYC(0x5a00, 0x5a01); A = alu_inc8(gb, A);
-  CYC(0x5a01, 0x5a03); B = 0x50;
+  CYC(b_+0, b_+1); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+1, b_+3); goto exit_palace; } // jr nz
+  CYC(b_+1, b_+3);
+  CYC(b_+3, b_+6); A = W8(w1Link_xh);
+  CYC(b_+6, b_+8); B = 0x60;
+  CYC(b_+8, b_+10); alu_sub(gb, 0x50);
+  if (!(F & FC)) { CYCT(b_+10, b_+12); goto have_x_delta; } // jr nc
+  CYC(b_+10, b_+12);
+  CYC(b_+12, b_+13); alu_cpl(gb);
+  CYC(b_+13, b_+14); A = alu_inc8(gb, A);
+  CYC(b_+14, b_+16); B = 0x50;
 
 have_x_delta:
-  CYC(0x5a03, 0x5a04); C = A;
-  CYC(0x5a04, 0x5a05); push_effect(gb, DE);
-  CYC(0x5a05, 0x5a08); SET_HL(0x51e8); // agesInteractionsBank09.linkEnterPalaceSimulatedInput
-  CYC(0x5a08, 0x5a0a); A = 0x09; // :agesInteractionsBank09.linkEnterPalaceSimulatedInput
-  CALL_C(0x5a0a, setSimulatedInputAddress_hook, 0x2a1d, 0x5a0d);
-  CYC(0x5a0d, 0x5a0e); SET_DE(pop_effect(gb));
-  CYC(0x5a0e, 0x5a0f); A = C;
-  CYC(0x5a0f, 0x5a10); alu_rra(gb);
-  CYC(0x5a10, 0x5a11); alu_add(gb, C);
-  CYC(0x5a11, 0x5a14); mem_wr(gb, wSimulatedInputCounter, A);
-  CYC(0x5a14, 0x5a15); A = B;
-  CYC(0x5a15, 0x5a18); mem_wr(gb, wSimulatedInputValue, A);
-  CYC(0x5a18, 0x5a19); alu_xor(gb, A);
-  CYC(0x5a19, 0x5a1c); mem_wr(gb, wDisabledObjects, A);
-  RET(0x5a1c); return;
+  CYC(b_+16, b_+17); C = A;
+  CYC(b_+17, b_+18); push_effect(gb, DE);
+  CYC(b_+18, b_+21); SET_HL((SYM(shootingGalleryScript_humanNpc_gameDone__checkScoreForFluteGame_b15) + 6)); // agesInteractionsBank09.linkEnterPalaceSimulatedInput
+  CYC(b_+21, b_+23); A = 0x09; // :agesInteractionsBank09.linkEnterPalaceSimulatedInput
+  CALL_C(b_+23, setSimulatedInputAddress_hook, SYM(setSimulatedInputAddress), b_+26);
+  CYC(b_+26, b_+27); SET_DE(pop_effect(gb));
+  CYC(b_+27, b_+28); A = C;
+  CYC(b_+28, b_+29); alu_rra(gb);
+  CYC(b_+29, b_+30); alu_add(gb, C);
+  CYC(b_+30, b_+33); mem_wr(gb, wSimulatedInputCounter, A);
+  CYC(b_+33, b_+34); A = B;
+  CYC(b_+34, b_+37); mem_wr(gb, wSimulatedInputValue, A);
+  CYC(b_+37, b_+38); alu_xor(gb, A);
+  CYC(b_+38, b_+41); mem_wr(gb, wDisabledObjects, A);
+  RET(b_+41); return;
 
 exit_palace:
-  CYC(0x5a1d, 0x5a1e); push_effect(gb, DE);
-  CYC(0x5a1e, 0x5a21); SET_HL(0x51ed); // agesInteractionsBank09.linkExitPalaceSimulatedInput
-  CYC(0x5a21, 0x5a23); A = 0x09; // :agesInteractionsBank09.linkExitPalaceSimulatedInput
-  CALL_C(0x5a23, setSimulatedInputAddress_hook, 0x2a1d, 0x5a26);
-  CYC(0x5a26, 0x5a27); SET_DE(pop_effect(gb));
-  RET(0x5a27); return;
+  CYC(b_+42, b_+43); push_effect(gb, DE);
+  CYC(b_+43, b_+46); SET_HL((SYM(shootingGalleryScript_humanNpc_gameDone__checkScoreForFluteGame_b15) + 11)); // agesInteractionsBank09.linkExitPalaceSimulatedInput
+  CYC(b_+46, b_+48); A = 0x09; // :agesInteractionsBank09.linkExitPalaceSimulatedInput
+  CALL_C(b_+48, setSimulatedInputAddress_hook, SYM(setSimulatedInputAddress), b_+51);
+  CYC(b_+51, b_+52); SET_DE(pop_effect(gb));
+  RET(b_+52); return;
 }
 
 void soldierGiveMysterySeeds_hook(GB *gb) {
+  BASE(soldierGiveMysterySeeds);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(0x5a28, 0x5a2a); A = 0x24; // TREASURE_MYSTERY_SEEDS
-  CYC(0x5a2a, 0x5a2c); C = 0x00;
-  CYC(0x5a2c, 0x5a2f); giveTreasure_hook(gb); return; // jp
+  CYC(b_+0, b_+2); A = 0x24; // TREASURE_MYSTERY_SEEDS
+  CYC(b_+2, b_+4); C = 0x00;
+  CYC(b_+4, SYM(soldierUpdateMinimap)); giveTreasure_hook(gb); return; // jp
 }
 
 void soldierUpdateMinimap_hook(GB *gb) {
+  BASE(soldierUpdateMinimap);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(0x5a2f, 0x5a32); SET_HL(0x5945); // bank1.checkUpdateDungeonMinimap
-  CYC(0x5a32, 0x5a34); E = 0x01; // target bank
-  CYC(0x5a34, 0x5a37); interBankCall_hook(gb); return; // jp
+  CYC(b_+0, b_+3); SET_HL((SYM(ghostVeranApplySpeedUntilVar38Zero) + 10)); // bank1.checkUpdateDungeonMinimap
+  CYC(b_+3, b_+5); E = 0x01; // target bank
+  CYC(b_+5, SYM(soldierGetRandomVar32Val)); interBankCall_hook(gb); return; // jp
 }
 
 static void soldier15_addAToHl_from_rst(GB *gb, uint16_t return_address) {
@@ -78,33 +81,35 @@ static void soldier15_addAToHl_from_rst(GB *gb, uint16_t return_address) {
 }
 
 void soldierGetRandomVar32Val_hook(GB *gb) {
+  BASE(soldierGetRandomVar32Val);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CALL_C(0x5a37, getRandomNumber_hook, 0x043e, 0x5a3a);
-  CYC(0x5a3a, 0x5a3c); alu_and(gb, 0x03);
-  CYC(0x5a3c, 0x5a3f); SET_HL(0x5a49); // @data
-  CYC(0x5a3f, 0x5a40); soldier15_addAToHl_from_rst(gb, 0x5a40);
-  CYC(0x5a40, 0x5a41); A = mem_rd(gb, HL);
-  CYC(0x5a41, 0x5a43); E = INTERACTION_BASE + OBJ_VAR32;
-  CYC(0x5a43, 0x5a44); mem_wr(gb, DE, A);
-  CYC(0x5a44, 0x5a46); A = 0x59;
-  CYC(0x5a46, 0x5a47); E = alu_inc8(gb, E);
-  CYC(0x5a47, 0x5a48); mem_wr(gb, DE, A);
-  RET(0x5a48); return;
+  CALL_C(b_+0, getRandomNumber_hook, SYM(getRandomNumber), b_+3);
+  CYC(b_+3, b_+5); alu_and(gb, 0x03);
+  CYC(b_+5, b_+8); SET_HL(b_+18); // @data
+  CYC(b_+8, b_+9); soldier15_addAToHl_from_rst(gb, b_+9);
+  CYC(b_+9, b_+10); A = mem_rd(gb, HL);
+  CYC(b_+10, b_+12); E = INTERACTION_BASE + OBJ_VAR32;
+  CYC(b_+12, b_+13); mem_wr(gb, DE, A);
+  CYC(b_+13, b_+15); A = 0x59;
+  CYC(b_+15, b_+16); E = alu_inc8(gb, E);
+  CYC(b_+16, b_+17); mem_wr(gb, DE, A);
+  RET(b_+17); return;
 }
 
 void soldierSetTextToShow_hook(GB *gb) {
+  BASE(soldierSetTextToShow);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(0x5a4d, 0x5a4f); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(0x5a4f, 0x5a50); A = mem_rd(gb, DE);
-  CYC(0x5a50, 0x5a53); SET_HL(0x5a5d); // @soldierTextIndices
-  CYC(0x5a53, 0x5a54); soldier15_addAToHl_from_rst(gb, 0x5a54);
-  CYC(0x5a54, 0x5a55); A = mem_rd(gb, HL);
-  CYC(0x5a55, 0x5a57); E = INTERACTION_BASE + OBJ_TEXT_ID;
-  CYC(0x5a57, 0x5a58); mem_wr(gb, DE, A);
-  CYC(0x5a58, 0x5a5a); A = 0x59; // >TX_5900
-  CYC(0x5a5a, 0x5a5b); E = alu_inc8(gb, E);
-  CYC(0x5a5b, 0x5a5c); mem_wr(gb, DE, A);
-  RET(0x5a5c); return;
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+6); SET_HL(b_+16); // @soldierTextIndices
+  CYC(b_+6, b_+7); soldier15_addAToHl_from_rst(gb, b_+7);
+  CYC(b_+7, b_+8); A = mem_rd(gb, HL);
+  CYC(b_+8, b_+10); E = INTERACTION_BASE + OBJ_TEXT_ID;
+  CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+  CYC(b_+11, b_+13); A = 0x59; // >TX_5900
+  CYC(b_+13, b_+14); E = alu_inc8(gb, E);
+  CYC(b_+14, b_+15); mem_wr(gb, DE, A);
+  RET(b_+15); return;
 }

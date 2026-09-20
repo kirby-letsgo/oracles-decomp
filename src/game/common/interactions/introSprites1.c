@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x09, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x09, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(introSpriteFunc_461a), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(introSpriteFunc_461a), (from), (to), true)
 
 void interactionCode4a_hook(GB *gb);
 void introSpriteIncStateAndLoadGraphics_hook(GB *gb);
@@ -47,358 +47,369 @@ static void introSprites1_addDoubleIndex(GB *gb, uint16_t returnAddress) {
 }
 
 void introSprite_addRandomVariance_hook(GB *gb) {
+  BASE(introSpriteFunc_461a);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4656, 0x4657); B = A;
-  CALL_C(0x4657, getRandomNumber_hook, 0x043e, 0x465a);
-  CYC(0x465a, 0x465c); alu_and(gb, 3);
-  CYC(0x465c, 0x465e); alu_sub(gb, 2);
-  CYC(0x465e, 0x465f); alu_add(gb, B);
-  CYC(0x465f, 0x4660); ret_effect(gb);
+  CYC(b_+60, b_+61); B = A;
+  CALL_C(b_+61, getRandomNumber_hook, SYM(getRandomNumber), b_+64);
+  CYC(b_+64, b_+66); alu_and(gb, 3);
+  CYC(b_+66, b_+68); alu_sub(gb, 2);
+  CYC(b_+68, b_+69); alu_add(gb, B);
+  CYC(b_+69, b_+70); ret_effect(gb);
 }
 
 void interactionCode4a_hook(GB *gb) {
+  BASE(interactionCode4a);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4591, 0x4593); E = 0x44;
-  CYC(0x4593, 0x4594); A = mem_rd(gb, DE);
-  CYC(0x4594, 0x4595); push_effect(gb, 0x4595);
-  switch (introSprites1_jumpTable(gb)) {
-    case 0x4599: goto state0;
-    case 0x467e: introSpritesState1_hook(gb); return;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = 0x44;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (introSprites1_jumpTable(gb));
+    if (jt_ == b_+8) { goto state0; }
+    else if (jt_ == SYM(introSpritesState1)) { introSpritesState1_hook(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 state0:
-  CALL_C(0x4599, introSpriteIncStateAndLoadGraphics_hook, 0x4613, 0x459c);
-  CYC(0x459c, 0x459e); E = 0x42;
-  CYC(0x459e, 0x459f); A = mem_rd(gb, DE);
-  CYC(0x459f, 0x45a0); push_effect(gb, 0x45a0);
-  switch (introSprites1_jumpTable(gb)) {
-    case 0x45b6: goto initTriforce;
-    case 0x45cc: goto initMovingSprite;
-    case 0x45df: goto initTree;
-    case 0x460c: goto initGlow;
-    case 0x4613: introSpriteIncStateAndLoadGraphics_hook(gb); return;
-    case 0x1e69: objectSetVisible82_hook(gb); return;
-    default: HANDOFF(HL);
-  }
+  CALL_C(b_+8, introSpriteIncStateAndLoadGraphics_hook, SYM(introSpriteIncStateAndLoadGraphics), b_+11);
+  CYC(b_+11, b_+13); E = 0x42;
+  CYC(b_+13, b_+14); A = mem_rd(gb, DE);
+  CYC(b_+14, b_+15); push_effect(gb, b_+15);
+  do { uint16_t jt_ = (introSprites1_jumpTable(gb));
+    if (jt_ == b_+37) { goto initTriforce; }
+    else if (jt_ == b_+59) { goto initMovingSprite; }
+    else if (jt_ == b_+78) { goto initTree; }
+    else if (jt_ == b_+123) { goto initGlow; }
+    else if (jt_ == SYM(introSpriteIncStateAndLoadGraphics)) { introSpriteIncStateAndLoadGraphics_hook(gb); return; }
+    else if (jt_ == SYM(objectSetVisible82)) { objectSetVisible82_hook(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 initTriforce:
-  CALL_C(0x45b6, getFreeInteractionSlot_hook, 0x3aef, 0x45b9);
-  if (!(F & FZ)) { CYCT(0x45b9, 0x45bb); goto makeVisible82; }
-  CYC(0x45b9, 0x45bb);
-  CYC(0x45bb, 0x45bd); mem_wr(gb, HL, 0x4a);
-  CYC(0x45bd, 0x45be); L = alu_inc8(gb, L);
-  CYC(0x45be, 0x45c0); mem_wr(gb, HL, 4);
-  CYC(0x45c0, 0x45c1); L = alu_inc8(gb, L);
-  CYC(0x45c1, 0x45c3); E = 0x42;
-  CYC(0x45c3, 0x45c4); A = mem_rd(gb, DE);
-  CYC(0x45c4, 0x45c5); A = alu_inc8(gb, A);
-  CYC(0x45c5, 0x45c6); mem_wr(gb, HL, A);
-  CALL_C(0x45c6, introSpriteSetChildRelatedObject1ToSelf_hook, 0x4794, 0x45c9);
+  CALL_C(b_+37, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+40);
+  if (!(F & FZ)) { CYCT(b_+40, b_+42); goto makeVisible82; }
+  CYC(b_+40, b_+42);
+  CYC(b_+42, b_+44); mem_wr(gb, HL, 0x4a);
+  CYC(b_+44, b_+45); L = alu_inc8(gb, L);
+  CYC(b_+45, b_+47); mem_wr(gb, HL, 4);
+  CYC(b_+47, b_+48); L = alu_inc8(gb, L);
+  CYC(b_+48, b_+50); E = 0x42;
+  CYC(b_+50, b_+51); A = mem_rd(gb, DE);
+  CYC(b_+51, b_+52); A = alu_inc8(gb, A);
+  CYC(b_+52, b_+53); mem_wr(gb, HL, A);
+  CALL_C(b_+53, introSpriteSetChildRelatedObject1ToSelf_hook, SYM(introSpriteSetChildRelatedObject1ToSelf), b_+56);
 makeVisible82:
-  CYC(0x45c9, 0x45cc); objectSetVisible82_hook(gb);
+  CYC(b_+56, b_+59); objectSetVisible82_hook(gb);
   return;
 
 initMovingSprite:
-  CYC(0x45cc, 0x45ce); E = 0x43;
-  CYC(0x45ce, 0x45cf); A = mem_rd(gb, DE);
-  CYC(0x45cf, 0x45d0); alu_add(gb, A);
-  CYC(0x45d0, 0x45d1); alu_add(gb, A);
-  CYC(0x45d1, 0x45d2); H = D;
-  CYC(0x45d2, 0x45d4); L = 0x60;
-  CYC(0x45d4, 0x45d5); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x45d5, 0x45d6); mem_wr(gb, HL, A);
-  CALL_C(0x45d6, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x45d9);
-  CALL_C(0x45d9, introSpriteFunc_461a_hook, 0x461a, 0x45dc);
-  CYC(0x45dc, 0x45df); objectSetVisible80_hook(gb);
+  CYC(b_+59, b_+61); E = 0x43;
+  CYC(b_+61, b_+62); A = mem_rd(gb, DE);
+  CYC(b_+62, b_+63); alu_add(gb, A);
+  CYC(b_+63, b_+64); alu_add(gb, A);
+  CYC(b_+64, b_+65); H = D;
+  CYC(b_+65, b_+67); L = 0x60;
+  CYC(b_+67, b_+68); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+68, b_+69); mem_wr(gb, HL, A);
+  CALL_C(b_+69, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+72);
+  CALL_C(b_+72, introSpriteFunc_461a_hook, SYM(introSpriteFunc_461a), b_+75);
+  CYC(b_+75, b_+78); objectSetVisible80_hook(gb);
   return;
 
 initTree:
-  CYC(0x45df, 0x45e1); E = 0x43;
-  CYC(0x45e1, 0x45e2); A = mem_rd(gb, DE);
-  CYC(0x45e2, 0x45e5); SET_HL(0x4606);
-  CYC(0x45e5, 0x45e6); introSprites1_addDoubleIndex(gb, 0x45e6);
-  CYC(0x45e6, 0x45e7); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x45e7, 0x45e9); E = 0x4b;
-  CYC(0x45e9, 0x45ea); mem_wr(gb, DE, A);
-  CYC(0x45ea, 0x45eb); E = alu_inc8(gb, E);
-  CYC(0x45eb, 0x45ec); E = alu_inc8(gb, E);
-  CYC(0x45ec, 0x45ed); A = mem_rd(gb, HL);
-  CYC(0x45ed, 0x45ee); mem_wr(gb, DE, A);
-  CYC(0x45ee, 0x45f0); B = 3;
+  CYC(b_+78, b_+80); E = 0x43;
+  CYC(b_+80, b_+81); A = mem_rd(gb, DE);
+  CYC(b_+81, b_+84); SET_HL(b_+117);
+  CYC(b_+84, b_+85); introSprites1_addDoubleIndex(gb, b_+85);
+  CYC(b_+85, b_+86); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+86, b_+88); E = 0x4b;
+  CYC(b_+88, b_+89); mem_wr(gb, DE, A);
+  CYC(b_+89, b_+90); E = alu_inc8(gb, E);
+  CYC(b_+90, b_+91); E = alu_inc8(gb, E);
+  CYC(b_+91, b_+92); A = mem_rd(gb, HL);
+  CYC(b_+92, b_+93); mem_wr(gb, DE, A);
+  CYC(b_+93, b_+95); B = 3;
 spawnTreeBranches:
-  CALL_C(0x45f0, getFreeInteractionSlot_hook, 0x3aef, 0x45f3);
-  if (!(F & FZ)) { CYCT(0x45f3, 0x45f5); goto treeVisible82; }
-  CYC(0x45f3, 0x45f5);
-  CYC(0x45f5, 0x45f7); mem_wr(gb, HL, 0x4a);
-  CYC(0x45f7, 0x45f8); L = alu_inc8(gb, L);
-  CYC(0x45f8, 0x45fa); mem_wr(gb, HL, 0x0a);
-  CYC(0x45fa, 0x45fb); L = alu_inc8(gb, L);
-  CYC(0x45fb, 0x45fc); mem_wr(gb, HL, B);
-  CYC(0x45fc, 0x45fd); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CALL_C(0x45fd, introSpriteSetChildRelatedObject1ToSelf_hook, 0x4794, 0x4600);
-  CYC(0x4600, 0x4601); B = alu_dec8(gb, B);
-  if (!(F & FZ)) { CYCT(0x4601, 0x4603); goto spawnTreeBranches; }
-  CYC(0x4601, 0x4603);
+  CALL_C(b_+95, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+98);
+  if (!(F & FZ)) { CYCT(b_+98, b_+100); goto treeVisible82; }
+  CYC(b_+98, b_+100);
+  CYC(b_+100, b_+102); mem_wr(gb, HL, 0x4a);
+  CYC(b_+102, b_+103); L = alu_inc8(gb, L);
+  CYC(b_+103, b_+105); mem_wr(gb, HL, 0x0a);
+  CYC(b_+105, b_+106); L = alu_inc8(gb, L);
+  CYC(b_+106, b_+107); mem_wr(gb, HL, B);
+  CYC(b_+107, b_+108); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CALL_C(b_+108, introSpriteSetChildRelatedObject1ToSelf_hook, SYM(introSpriteSetChildRelatedObject1ToSelf), b_+111);
+  CYC(b_+111, b_+112); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(b_+112, b_+114); goto spawnTreeBranches; }
+  CYC(b_+112, b_+114);
 treeVisible82:
-  CYC(0x4603, 0x4606); objectSetVisible82_hook(gb);
+  CYC(b_+114, b_+117); objectSetVisible82_hook(gb);
   return;
 
 initGlow:
-  CALL_C(0x460c, objectSetVisible83_hook, 0x1e72, 0x460f);
-  CYC(0x460f, 0x4611); alu_xor(gb, 0x80);
-  CYC(0x4611, 0x4612); mem_wr(gb, DE, A);
-  CYC(0x4612, 0x4613); ret_effect(gb);
+  CALL_C(b_+123, objectSetVisible83_hook, SYM(objectSetVisible83), b_+126);
+  CYC(b_+126, b_+128); alu_xor(gb, 0x80);
+  CYC(b_+128, b_+129); mem_wr(gb, DE, A);
+  CYC(b_+129, SYM(introSpriteIncStateAndLoadGraphics)); ret_effect(gb);
 }
 
 void introSpriteIncStateAndLoadGraphics_hook(GB *gb) {
-  CYC(0x4613, 0x4614); H = D;
-  CYC(0x4614, 0x4616); L = 0x44;
-  CYC(0x4616, 0x4617); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x4617, 0x461a); interactionInitGraphics_hook(gb);
+  BASE(introSpriteIncStateAndLoadGraphics);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = 0x44;
+  CYC(b_+3, b_+4); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+4, SYM(introSpriteFunc_461a)); interactionInitGraphics_hook(gb);
 }
 
 void introSpriteFunc_461a_hook(GB *gb) {
+  BASE(introSpriteFunc_461a);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x461a, objectGetRelatedObject1Var_hook, 0x2160, 0x461d);
-  CALL_C(0x461d, objectTakePosition_hook, 0x2274, 0x4620);
-  CYC(0x4620, 0x4621); push_effect(gb, BC);
-  CYC(0x4621, 0x4623); E = 0x42;
-  CYC(0x4623, 0x4624); A = mem_rd(gb, DE);
-  CYC(0x4624, 0x4627); SET_HL(0x4660);
-  CYC(0x4627, 0x4629); alu_cp(gb, 3);
+  CALL_C(b_+0, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+3);
+  CALL_C(b_+3, objectTakePosition_hook, SYM(objectTakePosition), b_+6);
+  CYC(b_+6, b_+7); push_effect(gb, BC);
+  CYC(b_+7, b_+9); E = 0x42;
+  CYC(b_+9, b_+10); A = mem_rd(gb, DE);
+  CYC(b_+10, b_+13); SET_HL(b_+70);
+  CYC(b_+13, b_+15); alu_cp(gb, 3);
   if (F & FZ) {
-    CYCT(0x4629, 0x462b);
+    CYCT(b_+15, b_+17);
   } else {
-    CYC(0x4629, 0x462b);
-    CYC(0x462b, 0x462d); alu_cp(gb, 0x0a);
+    CYC(b_+15, b_+17);
+    CYC(b_+17, b_+19); alu_cp(gb, 0x0a);
     if (F & FZ) {
-      CYCT(0x462d, 0x462f);
+      CYCT(b_+19, b_+21);
     } else {
-      CYC(0x462d, 0x462f);
-      CYC(0x462f, 0x4632); SET_HL(0x4666);
-      CYC(0x4632, 0x4634); E = 0x47;
-      CYC(0x4634, 0x4635); A = mem_rd(gb, DE);
-      CYC(0x4635, 0x4636); A = alu_inc8(gb, A);
-      CYC(0x4636, 0x4637); mem_wr(gb, DE, A);
-      CYC(0x4637, 0x4639); alu_and(gb, 3);
-      CYC(0x4639, 0x463a); C = A;
-      CYC(0x463a, 0x463b); alu_add(gb, A);
-      CYC(0x463b, 0x463c); alu_add(gb, C);
-      CYC(0x463c, 0x463d); introSprites1_addDoubleIndex(gb, 0x463d);
+      CYC(b_+19, b_+21);
+      CYC(b_+21, b_+24); SET_HL(b_+76);
+      CYC(b_+24, b_+26); E = 0x47;
+      CYC(b_+26, b_+27); A = mem_rd(gb, DE);
+      CYC(b_+27, b_+28); A = alu_inc8(gb, A);
+      CYC(b_+28, b_+29); mem_wr(gb, DE, A);
+      CYC(b_+29, b_+31); alu_and(gb, 3);
+      CYC(b_+31, b_+32); C = A;
+      CYC(b_+32, b_+33); alu_add(gb, A);
+      CYC(b_+33, b_+34); alu_add(gb, C);
+      CYC(b_+34, b_+35); introSprites1_addDoubleIndex(gb, b_+35);
     }
   }
-  CYC(0x463d, 0x463f); E = 0x43;
-  CYC(0x463f, 0x4640); A = mem_rd(gb, DE);
-  CYC(0x4640, 0x4641); introSprites1_addDoubleIndex(gb, 0x4641);
-  CYC(0x4641, 0x4642); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4642, 0x4645); push_effect(gb, 0x4645); introSprite_addRandomVariance_hook(gb);
-  CYC(0x4645, 0x4646); B = A;
-  CYC(0x4646, 0x4648); E = 0x4b;
-  CYC(0x4648, 0x4649); A = mem_rd(gb, DE);
-  CYC(0x4649, 0x464a); alu_add(gb, B);
-  CYC(0x464a, 0x464b); mem_wr(gb, DE, A);
-  CYC(0x464b, 0x464c); A = mem_rd(gb, HL);
-  CYC(0x464c, 0x464f); push_effect(gb, 0x464f); introSprite_addRandomVariance_hook(gb);
-  CYC(0x464f, 0x4650); H = D;
-  CYC(0x4650, 0x4652); L = 0x4d;
-  CYC(0x4652, 0x4653); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x4653, 0x4654); mem_wr(gb, HL, A);
-  CYC(0x4654, 0x4655); SET_BC(pop_effect(gb));
-  CYC(0x4655, 0x4656); ret_effect(gb);
+  CYC(b_+35, b_+37); E = 0x43;
+  CYC(b_+37, b_+38); A = mem_rd(gb, DE);
+  CYC(b_+38, b_+39); introSprites1_addDoubleIndex(gb, b_+39);
+  CYC(b_+39, b_+40); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+40, b_+43); push_effect(gb, b_+43); introSprite_addRandomVariance_hook(gb);
+  CYC(b_+43, b_+44); B = A;
+  CYC(b_+44, b_+46); E = 0x4b;
+  CYC(b_+46, b_+47); A = mem_rd(gb, DE);
+  CYC(b_+47, b_+48); alu_add(gb, B);
+  CYC(b_+48, b_+49); mem_wr(gb, DE, A);
+  CYC(b_+49, b_+50); A = mem_rd(gb, HL);
+  CYC(b_+50, b_+53); push_effect(gb, b_+53); introSprite_addRandomVariance_hook(gb);
+  CYC(b_+53, b_+54); H = D;
+  CYC(b_+54, b_+56); L = 0x4d;
+  CYC(b_+56, b_+57); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+57, b_+58); mem_wr(gb, HL, A);
+  CYC(b_+58, b_+59); SET_BC(pop_effect(gb));
+  CYC(b_+59, b_+60); ret_effect(gb);
 }
 
 void introSpritesState1_hook(GB *gb) {
+  BASE(introSpritesState1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x467e, 0x4680); E = 0x42;
-  CYC(0x4680, 0x4681); A = mem_rd(gb, DE);
-  CYC(0x4681, 0x4683); alu_cp(gb, 5);
+  CYC(b_+0, b_+2); E = 0x42;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); alu_cp(gb, 5);
   if (!(F & FC)) {
-    CYCT(0x4683, 0x4685);
+    CYCT(b_+5, b_+7);
   } else {
-    CYC(0x4683, 0x4685);
-    CYC(0x4685, 0x4688); A = W8(wIntro_triforceState);
-    CYC(0x4688, 0x468a); alu_cp(gb, 4);
-    if (F & FZ) { CYCT(0x468a, 0x468d); interactionDelete_hook(gb); return; }
-    CYC(0x468a, 0x468d);
+    CYC(b_+5, b_+7);
+    CYC(b_+7, b_+10); A = W8(wIntro_triforceState);
+    CYC(b_+10, b_+12); alu_cp(gb, 4);
+    if (F & FZ) { CYCT(b_+12, b_+15); interactionDelete_hook(gb); return; }
+    CYC(b_+12, b_+15);
   }
-  CYC(0x468d, 0x468e); A = mem_rd(gb, DE);
-  CYC(0x468e, 0x468f); push_effect(gb, 0x468f);
-  switch (introSprites1_jumpTable(gb)) {
-    case 0x46a5: introSpriteTriforceSubid_hook(gb); return;
-    case 0x475f: introSpriteRunTriforceGlowSubid_hook(gb); return;
-    case 0x4769: introSpriteRunSubid04_hook(gb); return;
-    case 0x474d: introSpriteRunSubid07_hook(gb); return;
-    case 0x4785: introSpriteRunSubid08_hook(gb); return;
-    case 0x261b: interactionAnimate_hook(gb); return;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+15, b_+16); A = mem_rd(gb, DE);
+  CYC(b_+16, b_+17); push_effect(gb, b_+17);
+  do { uint16_t jt_ = (introSprites1_jumpTable(gb));
+    if (jt_ == SYM(introSpriteTriforceSubid)) { introSpriteTriforceSubid_hook(gb); return; }
+    else if (jt_ == SYM(introSpriteRunTriforceGlowSubid)) { introSpriteRunTriforceGlowSubid_hook(gb); return; }
+    else if (jt_ == SYM(introSpriteRunSubid04)) { introSpriteRunSubid04_hook(gb); return; }
+    else if (jt_ == SYM(introSpriteRunSubid07)) { introSpriteRunSubid07_hook(gb); return; }
+    else if (jt_ == SYM(introSpriteRunSubid08)) { introSpriteRunSubid08_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 }
 
 void introSpriteTriforceSubid_hook(GB *gb) {
+  BASE(introSpriteTriforceSubid);
   uint16_t sp0_ = gb->sp;
-  CYC(0x46a5, 0x46a7); E = 0x45;
-  CYC(0x46a7, 0x46a8); A = mem_rd(gb, DE);
-  CYC(0x46a8, 0x46a9); push_effect(gb, 0x46a9);
-  switch (introSprites1_jumpTable(gb)) {
-    case 0x46b5: goto substate0;
-    case 0x46d1: goto substate1;
-    case 0x4703: goto substate2;
-    case 0x4719: goto substate3;
-    case 0x4739: goto substate4;
-    case 0x261b: interactionAnimate_hook(gb); return;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = 0x45;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (introSprites1_jumpTable(gb));
+    if (jt_ == b_+16) { goto substate0; }
+    else if (jt_ == b_+44) { goto substate1; }
+    else if (jt_ == b_+94) { goto substate2; }
+    else if (jt_ == b_+116) { goto substate3; }
+    else if (jt_ == b_+148) { goto substate4; }
+    else if (jt_ == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 substate0:
-  CYC(0x46b5, 0x46b8); A = W8(wIntro_triforceState);
-  CYC(0x46b8, 0x46ba); alu_cp(gb, 1);
-  if (!(F & FZ)) { CYCT(0x46ba, 0x46bd); interactionAnimate_hook(gb); return; }
-  CYC(0x46ba, 0x46bd);
-  CYC(0x46bd, 0x46bf); B = 0;
-  CYC(0x46bf, 0x46c1); E = 0x42;
-  CYC(0x46c1, 0x46c2); A = mem_rd(gb, DE);
-  CYC(0x46c2, 0x46c4); alu_cp(gb, 1);
-  if (F & FZ) { CYCT(0x46c4, 0x46c6); } else { CYC(0x46c4, 0x46c6); CYC(0x46c6, 0x46c8); B = 0x0a; }
-  CALL_C(0x46c8, func_2d48_hook, 0x2d48, 0x46cb);
-  CALL_C(0x46cb, interactionIncSubstate_hook, 0x23e5, 0x46ce);
-  CYC(0x46ce, 0x46d0); L = 0x46;
-  CYC(0x46d0, 0x46d1); mem_wr(gb, HL, B);
+  CYC(b_+16, b_+19); A = W8(wIntro_triforceState);
+  CYC(b_+19, b_+21); alu_cp(gb, 1);
+  if (!(F & FZ)) { CYCT(b_+21, b_+24); interactionAnimate_hook(gb); return; }
+  CYC(b_+21, b_+24);
+  CYC(b_+24, b_+26); B = 0;
+  CYC(b_+26, b_+28); E = 0x42;
+  CYC(b_+28, b_+29); A = mem_rd(gb, DE);
+  CYC(b_+29, b_+31); alu_cp(gb, 1);
+  if (F & FZ) { CYCT(b_+31, b_+33); } else { CYC(b_+31, b_+33); CYC(b_+33, b_+35); B = 0x0a; }
+  CALL_C(b_+35, func_2d48_hook, SYM(func_2d48), b_+38);
+  CALL_C(b_+38, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+41);
+  CYC(b_+41, b_+43); L = 0x46;
+  CYC(b_+43, b_+44); mem_wr(gb, HL, B);
 
 substate1:
-  CALL_C(0x46d1, interactionDecCounter1_hook, 0x23cc, 0x46d4);
-  if (!(F & FZ)) { CYCT(0x46d4, 0x46d7); interactionAnimate_hook(gb); return; }
-  CYC(0x46d4, 0x46d7);
-  CYC(0x46d7, 0x46d9); L = 0x42;
-  CYC(0x46d9, 0x46da); A = mem_rd(gb, HL);
-  CYC(0x46da, 0x46dc); alu_cp(gb, 1);
-  if (!(F & FZ)) { CYCT(0x46dc, 0x46de); goto centerPiece; }
-  CYC(0x46dc, 0x46de);
-  CYC(0x46de, 0x46e0); L = 0x49;
-  CYC(0x46e0, 0x46e2); mem_wr(gb, HL, 0);
-  CYC(0x46e2, 0x46e4); L = 0x50;
-  CYC(0x46e4, 0x46e6); mem_wr(gb, HL, 5);
-  CYC(0x46e6, 0x46e8); B = 1;
-  CYC(0x46e8, 0x46ea); goto afterAngle;
+  CALL_C(b_+44, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+47);
+  if (!(F & FZ)) { CYCT(b_+47, b_+50); interactionAnimate_hook(gb); return; }
+  CYC(b_+47, b_+50);
+  CYC(b_+50, b_+52); L = 0x42;
+  CYC(b_+52, b_+53); A = mem_rd(gb, HL);
+  CYC(b_+53, b_+55); alu_cp(gb, 1);
+  if (!(F & FZ)) { CYCT(b_+55, b_+57); goto centerPiece; }
+  CYC(b_+55, b_+57);
+  CYC(b_+57, b_+59); L = 0x49;
+  CYC(b_+59, b_+61); mem_wr(gb, HL, 0);
+  CYC(b_+61, b_+63); L = 0x50;
+  CYC(b_+63, b_+65); mem_wr(gb, HL, 5);
+  CYC(b_+65, b_+67); B = 1;
+  CYC(b_+67, b_+69); goto afterAngle;
 
 centerPiece:
-  CYC(0x46ea, 0x46eb); alu_or(gb, A);
-  CYC(0x46eb, 0x46ed); A = 0x18;
-  if (F & FZ) { CYCT(0x46ed, 0x46ef); } else { CYC(0x46ed, 0x46ef); CYC(0x46ef, 0x46f1); A = 8; }
-  CYC(0x46f1, 0x46f3); L = 0x49;
-  CYC(0x46f3, 0x46f4); mem_wr(gb, HL, A);
-  CYC(0x46f4, 0x46f6); L = 0x50;
-  CYC(0x46f6, 0x46f8); mem_wr(gb, HL, 5);
-  CYC(0x46f8, 0x46fa); B = 0x0b;
+  CYC(b_+69, b_+70); alu_or(gb, A);
+  CYC(b_+70, b_+72); A = 0x18;
+  if (F & FZ) { CYCT(b_+72, b_+74); } else { CYC(b_+72, b_+74); CYC(b_+74, b_+76); A = 8; }
+  CYC(b_+76, b_+78); L = 0x49;
+  CYC(b_+78, b_+79); mem_wr(gb, HL, A);
+  CYC(b_+79, b_+81); L = 0x50;
+  CYC(b_+81, b_+83); mem_wr(gb, HL, 5);
+  CYC(b_+83, b_+85); B = 0x0b;
 
 afterAngle:
-  CALL_C(0x46fa, func_2d48_hook, 0x2d48, 0x46fd);
-  CALL_C(0x46fd, interactionIncSubstate_hook, 0x23e5, 0x4700);
-  CYC(0x4700, 0x4702); L = 0x46;
-  CYC(0x4702, 0x4703); mem_wr(gb, HL, B);
+  CALL_C(b_+85, func_2d48_hook, SYM(func_2d48), b_+88);
+  CALL_C(b_+88, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+91);
+  CYC(b_+91, b_+93); L = 0x46;
+  CYC(b_+93, b_+94); mem_wr(gb, HL, B);
 
 substate2:
-  CALL_C(0x4703, interactionDecCounter1_hook, 0x23cc, 0x4706);
-  if (!(F & FZ)) { CYCT(0x4706, 0x4708); goto applySpeed; }
-  CYC(0x4706, 0x4708);
-  CYC(0x4708, 0x470a); B = 2;
-  CALL_C(0x470a, func_2d48_hook, 0x2d48, 0x470d);
-  CALL_C(0x470d, interactionIncSubstate_hook, 0x23e5, 0x4710);
-  CYC(0x4710, 0x4712); L = 0x46;
-  CYC(0x4712, 0x4713); mem_wr(gb, HL, B);
+  CALL_C(b_+94, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+97);
+  if (!(F & FZ)) { CYCT(b_+97, b_+99); goto applySpeed; }
+  CYC(b_+97, b_+99);
+  CYC(b_+99, b_+101); B = 2;
+  CALL_C(b_+101, func_2d48_hook, SYM(func_2d48), b_+104);
+  CALL_C(b_+104, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+107);
+  CYC(b_+107, b_+109); L = 0x46;
+  CYC(b_+109, b_+110); mem_wr(gb, HL, B);
 applySpeed:
-  CALL_C(0x4713, objectApplySpeed_hook, 0x201d, 0x4716);
-  CYC(0x4716, 0x4719); interactionAnimate_hook(gb);
+  CALL_C(b_+110, objectApplySpeed_hook, SYM(objectApplySpeed), b_+113);
+  CYC(b_+113, b_+116); interactionAnimate_hook(gb);
   return;
 
 substate3:
-  CALL_C(0x4719, interactionDecCounter1_hook, 0x23cc, 0x471c);
-  if (!(F & FZ)) { CYCT(0x471c, 0x471f); interactionAnimate_hook(gb); return; }
-  CYC(0x471c, 0x471f);
-  CYC(0x471f, 0x4721); B = 3;
-  CALL_C(0x4721, func_2d48_hook, 0x2d48, 0x4724);
-  CALL_C(0x4724, interactionIncSubstate_hook, 0x23e5, 0x4727);
-  CYC(0x4727, 0x4729); L = 0x46;
-  CYC(0x4729, 0x472a); mem_wr(gb, HL, B);
-  CYC(0x472a, 0x472c); E = 0x42;
-  CYC(0x472c, 0x472d); A = mem_rd(gb, DE);
-  CYC(0x472d, 0x472f); alu_cp(gb, 1);
-  if (F & FZ) { CYCT(0x472f, 0x4731); CYC(0x4734, 0x4736); A = 0x5c; CYC(0x4736, 0x4739); playSound_b00_hook(gb); return; }
-  CYC(0x472f, 0x4731);
-  CYC(0x4731, 0x4734); interactionIncSubstate_hook(gb);
+  CALL_C(b_+116, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+119);
+  if (!(F & FZ)) { CYCT(b_+119, b_+122); interactionAnimate_hook(gb); return; }
+  CYC(b_+119, b_+122);
+  CYC(b_+122, b_+124); B = 3;
+  CALL_C(b_+124, func_2d48_hook, SYM(func_2d48), b_+127);
+  CALL_C(b_+127, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+130);
+  CYC(b_+130, b_+132); L = 0x46;
+  CYC(b_+132, b_+133); mem_wr(gb, HL, B);
+  CYC(b_+133, b_+135); E = 0x42;
+  CYC(b_+135, b_+136); A = mem_rd(gb, DE);
+  CYC(b_+136, b_+138); alu_cp(gb, 1);
+  if (F & FZ) { CYCT(b_+138, b_+140); CYC(b_+143, b_+145); A = 0x5c; CYC(b_+145, b_+148); playSound_b00_hook(gb); return; }
+  CYC(b_+138, b_+140);
+  CYC(b_+140, b_+143); interactionIncSubstate_hook(gb);
   return;
 
 substate4:
-  CALL_C(0x4739, interactionAnimate_hook, 0x261b, 0x473c);
-  CALL_C(0x473c, interactionDecCounter1_hook, 0x23cc, 0x473f);
-  if (!(F & FZ)) { CYCT(0x473f, 0x4740); ret_effect(gb); return; }
-  CYC(0x473f, 0x4740);
-  CALL_C(0x4740, interactionIncSubstate_hook, 0x23e5, 0x4743);
-  CYC(0x4743, 0x4745); A = 2;
-  CYC(0x4745, 0x4748); W8(wIntro_triforceState) = A;
-  CYC(0x4748, 0x474a); A = 0x7c;
-  CYC(0x474a, 0x474d); playSound_b00_hook(gb);
+  CALL_C(b_+148, interactionAnimate_hook, SYM(interactionAnimate), b_+151);
+  CALL_C(b_+151, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+154);
+  if (!(F & FZ)) { CYCT(b_+154, b_+155); ret_effect(gb); return; }
+  CYC(b_+154, b_+155);
+  CALL_C(b_+155, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+158);
+  CYC(b_+158, b_+160); A = 2;
+  CYC(b_+160, b_+163); W8(wIntro_triforceState) = A;
+  CYC(b_+163, b_+165); A = 0x7c;
+  CYC(b_+165, SYM(introSpriteRunSubid07)); playSound_b00_hook(gb);
 }
 
 void introSpriteRunSubid07_hook(GB *gb) {
+  BASE(introSpriteRunSubid07);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x474d, objectSetVisible_hook, 0x1e84, 0x4750);
-  CYC(0x4750, 0x4752); E = 0x43;
-  CYC(0x4752, 0x4753); A = mem_rd(gb, DE);
-  CYC(0x4753, 0x4755); alu_and(gb, 1);
-  CYC(0x4755, 0x4756); B = A;
-  CYC(0x4756, 0x4759); A = W8(wIntro_frameCounter);
-  CYC(0x4759, 0x475b); alu_and(gb, 1);
-  CYC(0x475b, 0x475c); alu_xor(gb, B);
-  if (F & FZ) CALL_C_CC(0x475c, objectSetInvisible_hook, 0x1e7b, 0x475f); else CYC(0x475c, 0x475f);
+  CALL_C(b_+0, objectSetVisible_hook, SYM(objectSetVisible), b_+3);
+  CYC(b_+3, b_+5); E = 0x43;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+8); alu_and(gb, 1);
+  CYC(b_+8, b_+9); B = A;
+  CYC(b_+9, b_+12); A = W8(wIntro_frameCounter);
+  CYC(b_+12, b_+14); alu_and(gb, 1);
+  CYC(b_+14, b_+15); alu_xor(gb, B);
+  if (F & FZ) CALL_C_CC(b_+15, objectSetInvisible_hook, SYM(objectSetInvisible), SYM(introSpriteRunTriforceGlowSubid)); else CYC(b_+15, SYM(introSpriteRunTriforceGlowSubid));
   introSpriteRunTriforceGlowSubid_hook(gb);
 }
 
 void introSpriteRunTriforceGlowSubid_hook(GB *gb) {
+  BASE(introSpriteRunTriforceGlowSubid);
   uint16_t sp0_ = gb->sp;
-  CYC(0x475f, 0x4761); E = 0x61;
-  CYC(0x4761, 0x4762); A = mem_rd(gb, DE);
-  CYC(0x4762, 0x4763); A = alu_inc8(gb, A);
-  if (F & FZ) CALL_C_CC(0x4763, introSpriteFunc_461a_hook, 0x461a, 0x4766); else CYC(0x4763, 0x4766);
-  CYC(0x4766, 0x4769); interactionAnimate_hook(gb);
+  CYC(b_+0, b_+2); E = 0x61;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); A = alu_inc8(gb, A);
+  if (F & FZ) CALL_C_CC(b_+4, introSpriteFunc_461a_hook, SYM(introSpriteFunc_461a), b_+7); else CYC(b_+4, b_+7);
+  CYC(b_+7, SYM(introSpriteRunSubid04)); interactionAnimate_hook(gb);
 }
 
 void introSpriteRunSubid04_hook(GB *gb) {
+  BASE(introSpriteRunSubid04);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x4769, interactionAnimate_hook, 0x261b, 0x476c);
-  CYC(0x476c, 0x476e); A = 0;
-  CALL_C(0x476e, objectGetRelatedObject1Var_hook, 0x2160, 0x4771);
-  CALL_C(0x4771, objectTakePosition_hook, 0x2274, 0x4774);
-  CYC(0x4774, 0x4776); E = 0x43;
-  CYC(0x4776, 0x4777); A = mem_rd(gb, DE);
-  CYC(0x4777, 0x4778); H = D;
-  CYC(0x4778, 0x477a); L = 0x60;
-  CYC(0x477a, 0x477b); alu_cp(gb, mem_rd(gb, HL));
-  CYC(0x477b, 0x477d); L = 0x5a;
-  if (!(F & FZ)) { CYCT(0x477d, 0x477f); CYC(0x4782, 0x4784); mem_wr(gb, HL, mem_rd(gb, HL) & 0x7f); CYC(0x4784, 0x4785); ret_effect(gb); return; }
-  CYC(0x477d, 0x477f);
-  CYC(0x477f, 0x4781); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
-  CYC(0x4781, 0x4782); ret_effect(gb);
+  CALL_C(b_+0, interactionAnimate_hook, SYM(interactionAnimate), b_+3);
+  CYC(b_+3, b_+5); A = 0;
+  CALL_C(b_+5, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+8);
+  CALL_C(b_+8, objectTakePosition_hook, SYM(objectTakePosition), b_+11);
+  CYC(b_+11, b_+13); E = 0x43;
+  CYC(b_+13, b_+14); A = mem_rd(gb, DE);
+  CYC(b_+14, b_+15); H = D;
+  CYC(b_+15, b_+17); L = 0x60;
+  CYC(b_+17, b_+18); alu_cp(gb, mem_rd(gb, HL));
+  CYC(b_+18, b_+20); L = 0x5a;
+  if (!(F & FZ)) { CYCT(b_+20, b_+22); CYC(b_+25, b_+27); mem_wr(gb, HL, mem_rd(gb, HL) & 0x7f); CYC(b_+27, SYM(introSpriteRunSubid08)); ret_effect(gb); return; }
+  CYC(b_+20, b_+22);
+  CYC(b_+22, b_+24); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
+  CYC(b_+24, b_+25); ret_effect(gb);
 }
 
 void introSpriteRunSubid08_hook(GB *gb) {
-  CYC(0x4785, 0x4788); A = W8(wGfxRegs1_SCY);
-  CYC(0x4788, 0x4789); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x4789, 0x478c); interactionDelete_hook(gb); return; }
-  CYC(0x4789, 0x478c);
-  CYC(0x478c, 0x478d); B = A;
-  CYC(0x478d, 0x478f); E = 0x4a;
-  CYC(0x478f, 0x4790); A = mem_rd(gb, DE);
-  CYC(0x4790, 0x4791); alu_sub(gb, B);
-  CYC(0x4791, 0x4792); E = alu_inc8(gb, E);
-  CYC(0x4792, 0x4793); mem_wr(gb, DE, A);
-  CYC(0x4793, 0x4794); ret_effect(gb);
+  BASE(introSpriteRunSubid08);
+  CYC(b_+0, b_+3); A = W8(wGfxRegs1_SCY);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+4, b_+7); interactionDelete_hook(gb); return; }
+  CYC(b_+4, b_+7);
+  CYC(b_+7, b_+8); B = A;
+  CYC(b_+8, b_+10); E = 0x4a;
+  CYC(b_+10, b_+11); A = mem_rd(gb, DE);
+  CYC(b_+11, b_+12); alu_sub(gb, B);
+  CYC(b_+12, b_+13); E = alu_inc8(gb, E);
+  CYC(b_+13, b_+14); mem_wr(gb, DE, A);
+  CYC(b_+14, SYM(introSpriteSetChildRelatedObject1ToSelf)); ret_effect(gb);
 }
 
 void introSpriteSetChildRelatedObject1ToSelf_hook(GB *gb) {
-  CYC(0x4794, 0x4796); L = 0x56;
-  CYC(0x4796, 0x4798); mem_wr(gb, HL, 0x40);
-  CYC(0x4798, 0x4799); L = alu_inc8(gb, L);
-  CYC(0x4799, 0x479a); mem_wr(gb, HL, D);
-  CYC(0x479a, 0x479b); ret_effect(gb);
+  BASE(introSpriteSetChildRelatedObject1ToSelf);
+  CYC(b_+0, b_+2); L = 0x56;
+  CYC(b_+2, b_+4); mem_wr(gb, HL, 0x40);
+  CYC(b_+4, b_+5); L = alu_inc8(gb, L);
+  CYC(b_+5, b_+6); mem_wr(gb, HL, D);
+  CYC(b_+6, SYM(interactionCode50)); ret_effect(gb);
 }

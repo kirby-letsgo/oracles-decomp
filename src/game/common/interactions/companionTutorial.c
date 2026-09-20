@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCoded0), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCoded0), (from), (to), true)
 
 static uint16_t interactionCoded0_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -54,47 +54,49 @@ static void interactionCoded0_addDoubleIndex(GB *gb, uint16_t return_address) {
 // interactionCoded0@cpYToCompanion (0b:4bee): true local, called (real `call`) twice from
 // @setFlagAndDeleteWhenCompanionIsAbove and @setFlagAndDeleteWhenCompanionIsBelowOrRight.
 static void interactionCoded0_cpYToCompanion(GB *gb) {
-  CYC(0x4bee, 0x4bf0); E = INTERACTION_BASE + OBJ_YH;
-  CYC(0x4bf0, 0x4bf1); A = mem_rd(gb, DE);
-  CYC(0x4bf1, 0x4bf4); SET_HL(w1Companion_yh);
-  CYC(0x4bf4, 0x4bf5); alu_cp(gb, mem_rd(gb, HL));
-  RET(0x4bf5); return;
+  BASE(interactionCoded0);
+  CYC(b_+186, b_+188); E = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+188, b_+189); A = mem_rd(gb, DE);
+  CYC(b_+189, b_+192); SET_HL(w1Companion_yh);
+  CYC(b_+192, b_+193); alu_cp(gb, mem_rd(gb, HL));
+  RET(b_+193); return;
 }
 
 // interactionCoded0@checkLinkInXRange (0b:4bf6): true local, called (real `call`) once from
 // @setFlagAndDeleteWhenCompanionIsAboveAndLinkInXRange.
 // @param[out] zflag z if Link is within a certain range of X-positions for certain rooms?
 static void interactionCoded0_checkLinkInXRange(GB *gb) {
-  CYC(0x4bf6, 0x4bf9); A = mem_rd(gb, wActiveRoom);
-  CYC(0x4bf9, 0x4bfc); SET_HL(0x4c18); // @rooms
-  CYC(0x4bfc, 0x4bfe); B = 0x00;
+  BASE(interactionCoded0);
+  CYC(b_+194, b_+197); A = mem_rd(gb, wActiveRoom);
+  CYC(b_+197, b_+200); SET_HL(b_+228); // @rooms
+  CYC(b_+200, b_+202); B = 0x00;
 
 roomLoop:
-  CYC(0x4bfe, 0x4bff); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(0x4bff, 0x4c01); goto foundRoom; } // jr z
-  CYC(0x4bff, 0x4c01);
-  CYC(0x4c01, 0x4c02); B = alu_inc8(gb, B);
-  CYC(0x4c02, 0x4c03); SET_HL(HL + 1);
-  CYC(0x4c03, 0x4c05); goto roomLoop; // jr $4bfe
+  CYC(b_+202, b_+203); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+203, b_+205); goto foundRoom; } // jr z
+  CYC(b_+203, b_+205);
+  CYC(b_+205, b_+206); B = alu_inc8(gb, B);
+  CYC(b_+206, b_+207); SET_HL(HL + 1);
+  CYC(b_+207, b_+209); goto roomLoop; // jr $4bfe
 
 foundRoom:
-  CYC(0x4c05, 0x4c06); A = B;
-  CYC(0x4c06, 0x4c09); SET_HL(0x4c1b); // @xRanges
-  CYC(0x4c09, 0x4c0a); interactionCoded0_addDoubleIndex(gb, 0x4c0a);
-  CYC(0x4c0a, 0x4c0d); A = mem_rd(gb, w1Link_xh);
-  CYC(0x4c0d, 0x4c0e); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FC) { CYCT(0x4c0e, 0x4c10); goto notInRange; } // jr c
-  CYC(0x4c0e, 0x4c10);
-  CYC(0x4c10, 0x4c11); SET_HL(HL + 1);
-  CYC(0x4c11, 0x4c12); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FC)) { CYCT(0x4c12, 0x4c14); goto notInRange; } // jr nc
-  CYC(0x4c12, 0x4c14);
-  CYC(0x4c14, 0x4c15); alu_xor(gb, A);
-  RET(0x4c15); return;
+  CYC(b_+209, b_+210); A = B;
+  CYC(b_+210, b_+213); SET_HL(b_+231); // @xRanges
+  CYC(b_+213, b_+214); interactionCoded0_addDoubleIndex(gb, b_+214);
+  CYC(b_+214, b_+217); A = mem_rd(gb, w1Link_xh);
+  CYC(b_+217, b_+218); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) { CYCT(b_+218, b_+220); goto notInRange; } // jr c
+  CYC(b_+218, b_+220);
+  CYC(b_+220, b_+221); SET_HL(HL + 1);
+  CYC(b_+221, b_+222); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(b_+222, b_+224); goto notInRange; } // jr nc
+  CYC(b_+222, b_+224);
+  CYC(b_+224, b_+225); alu_xor(gb, A);
+  RET(b_+225); return;
 
 notInRange:
-  CYC(0x4c16, 0x4c17); alu_or(gb, D);
-  RET(0x4c17); return;
+  CYC(b_+226, b_+227); alu_or(gb, D);
+  RET(b_+227); return;
 }
 
 // ==================================================================================================
@@ -107,164 +109,165 @@ notInRange:
 // @setFlagAndDeleteWhenCompanionIsAbove; ported below for completeness even though unreachable.
 // ==================================================================================================
 void interactionCoded0_hook(GB *gb) {
+  BASE(interactionCoded0);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4b34, 0x4b36); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4b36, 0x4b37); A = mem_rd(gb, DE);
-  CYC(0x4b37, 0x4b38); push_effect(gb, 0x4b38);
-  switch (interactionCoded0_jump_table(gb)) {
-    case 0x4b3e: goto state0;
-    case 0x4b42: goto state1;
-    case 0x4b97: goto state2;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (interactionCoded0_jump_table(gb));
+    if (jt_ == b_+10) { goto state0; }
+    else if (jt_ == b_+14) { goto state1; }
+    else if (jt_ == b_+99) { goto state2; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 state0:
-  CYC(0x4b3e, 0x4b40); A = 0x01;
-  CYC(0x4b40, 0x4b41); mem_wr(gb, DE, A);
-  RET(0x4b41); return;
+  CYC(b_+10, b_+12); A = 0x01;
+  CYC(b_+12, b_+13); mem_wr(gb, DE, A);
+  RET(b_+13); return;
 
 state1:
-  CYC(0x4b42, 0x4b44); A = 0x02;
-  CYC(0x4b44, 0x4b45); mem_wr(gb, DE, A);
-  CYC(0x4b45, 0x4b48); A = mem_rd(gb, w1Companion_enabled);
-  CYC(0x4b48, 0x4b49); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x4b49, 0x4b4b); goto deleteIfSubid2Or5; } // jr z
-  CYC(0x4b49, 0x4b4b);
+  CYC(b_+14, b_+16); A = 0x02;
+  CYC(b_+16, b_+17); mem_wr(gb, DE, A);
+  CYC(b_+17, b_+20); A = mem_rd(gb, w1Companion_enabled);
+  CYC(b_+20, b_+21); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+21, b_+23); goto deleteIfSubid2Or5; } // jr z
+  CYC(b_+21, b_+23);
 
   // Verify that the correct companion is on-screen, otherwise delete self
-  CYC(0x4b4b, 0x4b4d); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x4b4d, 0x4b4e); A = mem_rd(gb, DE);
-  CYC(0x4b4e, 0x4b50); A = alu_srl(gb, A);
-  CYC(0x4b50, 0x4b52); alu_add(gb, 0x0b); // SPECIALOBJECT_FIRST_COMPANION
-  CYC(0x4b52, 0x4b54); alu_cp(gb, 0x0e); // SPECIALOBJECT_LAST_COMPANION+1
-  if (F & FC) { CYCT(0x4b54, 0x4b56); goto afterMoosh; } // jr c
-  CYC(0x4b54, 0x4b56);
-  CYC(0x4b56, 0x4b58); A = 0x0d; // SPECIALOBJECT_MOOSH
+  CYC(b_+23, b_+25); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+25, b_+26); A = mem_rd(gb, DE);
+  CYC(b_+26, b_+28); A = alu_srl(gb, A);
+  CYC(b_+28, b_+30); alu_add(gb, 0x0b); // SPECIALOBJECT_FIRST_COMPANION
+  CYC(b_+30, b_+32); alu_cp(gb, 0x0e); // SPECIALOBJECT_LAST_COMPANION+1
+  if (F & FC) { CYCT(b_+32, b_+34); goto afterMoosh; } // jr c
+  CYC(b_+32, b_+34);
+  CYC(b_+34, b_+36); A = 0x0d; // SPECIALOBJECT_MOOSH
 
 afterMoosh:
-  CYC(0x4b58, 0x4b5b); SET_HL(w1Companion_id);
-  CYC(0x4b5b, 0x4b5c); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(0x4b5c, 0x4b5e); goto delete; } // jr nz
+  CYC(b_+36, b_+39); SET_HL(w1Companion_id);
+  CYC(b_+39, b_+40); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+40, b_+42); goto delete; } // jr nz
 
   // Delete self if tutorial text was already shown
-  CYC(0x4b5c, 0x4b5e);
-  CYC(0x4b5e, 0x4b5f); A = mem_rd(gb, DE);
-  CYC(0x4b5f, 0x4b62); SET_HL(0x4c2d); // @flagNumbers
-  CYC(0x4b62, 0x4b63); interactionCoded0_addAToHl(gb, 0x4b63);
-  CYC(0x4b63, 0x4b64); A = mem_rd(gb, HL);
-  CYC(0x4b64, 0x4b67); SET_HL(wCompanionTutorialTextShown);
-  CALL_C(0x4b67, checkFlag_hook, 0x0205, 0x4b6a);
-  if (!(F & FZ)) { CYCT(0x4b6a, 0x4b6c); goto delete; } // jr nz
-  CYC(0x4b6a, 0x4b6c);
+  CYC(b_+40, b_+42);
+  CYC(b_+42, b_+43); A = mem_rd(gb, DE);
+  CYC(b_+43, b_+46); SET_HL(b_+249); // @flagNumbers
+  CYC(b_+46, b_+47); interactionCoded0_addAToHl(gb, b_+47);
+  CYC(b_+47, b_+48); A = mem_rd(gb, HL);
+  CYC(b_+48, b_+51); SET_HL(wCompanionTutorialTextShown);
+  CALL_C(b_+51, checkFlag_hook, SYM(checkFlag), b_+54);
+  if (!(F & FZ)) { CYCT(b_+54, b_+56); goto delete; } // jr nz
+  CYC(b_+54, b_+56);
 
   // Check whether to dismount? (subid 2 only)
-  CYC(0x4b6c, 0x4b6d); A = mem_rd(gb, DE);
-  CYC(0x4b6d, 0x4b6f); alu_cp(gb, 0x02);
-  if (!(F & FZ)) { CYCT(0x4b6f, 0x4b71); goto afterDismountCheck; } // jr nz
-  CYC(0x4b6f, 0x4b71);
-  CYC(0x4b71, 0x4b74); A = mem_rd(gb, wLinkObjectIndex);
-  CYC(0x4b74, 0x4b75); alu_rra(gb);
-  CYC(0x4b75, 0x4b76); A = mem_rd(gb, DE);
-  if (!(F & FC)) { CYCT(0x4b76, 0x4b78); goto afterDismountCheck; } // jr nc
-  CYC(0x4b76, 0x4b78);
-  CYC(0x4b78, 0x4b7b); mem_wr(gb, wForceCompanionDismount, A);
+  CYC(b_+56, b_+57); A = mem_rd(gb, DE);
+  CYC(b_+57, b_+59); alu_cp(gb, 0x02);
+  if (!(F & FZ)) { CYCT(b_+59, b_+61); goto afterDismountCheck; } // jr nz
+  CYC(b_+59, b_+61);
+  CYC(b_+61, b_+64); A = mem_rd(gb, wLinkObjectIndex);
+  CYC(b_+64, b_+65); alu_rra(gb);
+  CYC(b_+65, b_+66); A = mem_rd(gb, DE);
+  if (!(F & FC)) { CYCT(b_+66, b_+68); goto afterDismountCheck; } // jr nc
+  CYC(b_+66, b_+68);
+  CYC(b_+68, b_+71); mem_wr(gb, wForceCompanionDismount, A);
 
 afterDismountCheck:
-  CYC(0x4b7b, 0x4b7e); SET_HL(0x4c21); // @tutorialTextToShow
-  CYC(0x4b7e, 0x4b7f); interactionCoded0_addDoubleIndex(gb, 0x4b7f);
-  CYC(0x4b7f, 0x4b80); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x4b80, 0x4b81); C = A;
-  CYC(0x4b81, 0x4b82); B = mem_rd(gb, HL);
-  CYC(0x4b82, 0x4b85); A = mem_rd(gb, wLinkObjectIndex);
-  CYC(0x4b85, 0x4b87); alu_bit(gb, 0, A);
-  if (!(F & FZ)) CALL_C_CC(0x4b87, showText_hook, 0x1872, 0x4b8a); else CYC(0x4b87, 0x4b8a); // call nz
+  CYC(b_+71, b_+74); SET_HL(b_+237); // @tutorialTextToShow
+  CYC(b_+74, b_+75); interactionCoded0_addDoubleIndex(gb, b_+75);
+  CYC(b_+75, b_+76); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+76, b_+77); C = A;
+  CYC(b_+77, b_+78); B = mem_rd(gb, HL);
+  CYC(b_+78, b_+81); A = mem_rd(gb, wLinkObjectIndex);
+  CYC(b_+81, b_+83); alu_bit(gb, 0, A);
+  if (!(F & FZ)) CALL_C_CC(b_+83, showText_hook, SYM(showText), b_+86); else CYC(b_+83, b_+86); // call nz
 
 deleteIfSubid2Or5:
-  CYC(0x4b8a, 0x4b8c); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x4b8c, 0x4b8d); A = mem_rd(gb, DE);
-  CYC(0x4b8d, 0x4b8f); alu_cp(gb, 0x02);
-  if (F & FZ) { CYCT(0x4b8f, 0x4b91); goto delete; } // jr z
-  CYC(0x4b8f, 0x4b91);
-  CYC(0x4b91, 0x4b93); alu_cp(gb, 0x05);
-  if (!(F & FZ)) { CYCT(0x4b93, 0x4b94); ret_effect(gb); return; } // ret nz
-  CYC(0x4b93, 0x4b94);
+  CYC(b_+86, b_+88); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+88, b_+89); A = mem_rd(gb, DE);
+  CYC(b_+89, b_+91); alu_cp(gb, 0x02);
+  if (F & FZ) { CYCT(b_+91, b_+93); goto delete; } // jr z
+  CYC(b_+91, b_+93);
+  CYC(b_+93, b_+95); alu_cp(gb, 0x05);
+  if (!(F & FZ)) { CYCT(b_+95, b_+96); ret_effect(gb); return; } // ret nz
+  CYC(b_+95, b_+96);
 
 delete:
-  CYC(0x4b94, 0x4b97); interactionDelete_hook(gb); return; // jp
+  CYC(b_+96, b_+99); interactionDelete_hook(gb); return; // jp
 
 state2:
-  CYC(0x4b97, 0x4b9a); A = mem_rd(gb, w1Companion_enabled);
-  CYC(0x4b9a, 0x4b9b); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x4b9b, 0x4b9c); ret_effect(gb); return; } // ret z
-  CYC(0x4b9b, 0x4b9c);
-  CYC(0x4b9c, 0x4b9e); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x4b9e, 0x4b9f); A = mem_rd(gb, DE);
-  CYC(0x4b9f, 0x4ba0); push_effect(gb, 0x4ba0);
-  switch (interactionCoded0_jump_table(gb)) {
-    case 0x4bdf: goto setFlagAndDeleteWhenCompanionIsBelowOrRight;
-    case 0x4bbb: goto setFlagAndDeleteWhenCompanionIsAbove;
-    case 0x4bac: goto setFlagAndDeleteWhenCompanionIsBelow;
-    case 0x4bcf: goto setFlagAndDeleteWhenCompanionIsAboveAndLinkInXRange;
-    case 0x4bd5: goto setFlagAndDeleteWhenCompanionIsLeft;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+99, b_+102); A = mem_rd(gb, w1Companion_enabled);
+  CYC(b_+102, b_+103); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+103, b_+104); ret_effect(gb); return; } // ret z
+  CYC(b_+103, b_+104);
+  CYC(b_+104, b_+106); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+106, b_+107); A = mem_rd(gb, DE);
+  CYC(b_+107, b_+108); push_effect(gb, b_+108);
+  do { uint16_t jt_ = (interactionCoded0_jump_table(gb));
+    if (jt_ == b_+171) { goto setFlagAndDeleteWhenCompanionIsBelowOrRight; }
+    else if (jt_ == b_+135) { goto setFlagAndDeleteWhenCompanionIsAbove; }
+    else if (jt_ == b_+120) { goto setFlagAndDeleteWhenCompanionIsBelow; }
+    else if (jt_ == b_+155) { goto setFlagAndDeleteWhenCompanionIsAboveAndLinkInXRange; }
+    else if (jt_ == b_+161) { goto setFlagAndDeleteWhenCompanionIsLeft; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 setFlagAndDeleteWhenCompanionIsBelow:
-  CYC(0x4bac, 0x4bae); E = INTERACTION_BASE + OBJ_YH;
-  CYC(0x4bae, 0x4baf); A = mem_rd(gb, DE);
-  CYC(0x4baf, 0x4bb2); SET_HL(w1Companion_yh);
-  CYC(0x4bb2, 0x4bb3); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FC)) { CYCT(0x4bb3, 0x4bb4); ret_effect(gb); return; } // ret nc
-  CYC(0x4bb3, 0x4bb4);
-  CYC(0x4bb4, 0x4bb6); goto setFlagAndDelete; // jr $4bbf
+  CYC(b_+120, b_+122); E = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+122, b_+123); A = mem_rd(gb, DE);
+  CYC(b_+123, b_+126); SET_HL(w1Companion_yh);
+  CYC(b_+126, b_+127); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(b_+127, b_+128); ret_effect(gb); return; } // ret nc
+  CYC(b_+127, b_+128);
+  CYC(b_+128, b_+130); goto setFlagAndDelete; // jr $4bbf
 
   // setFlagAndDeleteWhenCompanionIsAboveAndVar38NonZero (0b:4bb6): dead in ages, falls through.
-  CYC(0x4bb6, 0x4bb9); A = mem_rd(gb, w1Companion_var38);
-  CYC(0x4bb9, 0x4bba); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x4bba, 0x4bbb); ret_effect(gb); return; } // ret z
-  CYC(0x4bba, 0x4bbb);
+  CYC(b_+130, b_+133); A = mem_rd(gb, w1Companion_var38);
+  CYC(b_+133, b_+134); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+134, b_+135); ret_effect(gb); return; } // ret z
+  CYC(b_+134, b_+135);
 
 setFlagAndDeleteWhenCompanionIsAbove:
-  CALL_C(0x4bbb, interactionCoded0_cpYToCompanion, 0x4bee, 0x4bbe);
-  if (F & FC) { CYCT(0x4bbe, 0x4bbf); ret_effect(gb); return; } // ret c
-  CYC(0x4bbe, 0x4bbf);
+  CALL_C(b_+135, interactionCoded0_cpYToCompanion, b_+186, b_+138);
+  if (F & FC) { CYCT(b_+138, b_+139); ret_effect(gb); return; } // ret c
+  CYC(b_+138, b_+139);
 
 setFlagAndDelete:
-  CYC(0x4bbf, 0x4bc1); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x4bc1, 0x4bc2); A = mem_rd(gb, DE);
-  CYC(0x4bc2, 0x4bc5); SET_HL(0x4c2d); // @flagNumbers
-  CYC(0x4bc5, 0x4bc6); interactionCoded0_addAToHl(gb, 0x4bc6);
-  CYC(0x4bc6, 0x4bc7); A = mem_rd(gb, HL);
-  CYC(0x4bc7, 0x4bca); SET_HL(wCompanionTutorialTextShown);
-  CALL_C(0x4bca, setFlag_hook, 0x020e, 0x4bcd);
+  CYC(b_+139, b_+141); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+141, b_+142); A = mem_rd(gb, DE);
+  CYC(b_+142, b_+145); SET_HL(b_+249); // @flagNumbers
+  CYC(b_+145, b_+146); interactionCoded0_addAToHl(gb, b_+146);
+  CYC(b_+146, b_+147); A = mem_rd(gb, HL);
+  CYC(b_+147, b_+150); SET_HL(wCompanionTutorialTextShown);
+  CALL_C(b_+150, setFlag_hook, SYM(setFlag), b_+153);
 
   // goToDelete (falls through, never a goto target)
-  CYC(0x4bcd, 0x4bcf); goto delete; // jr $4b94
+  CYC(b_+153, b_+155); goto delete; // jr $4b94
 
 setFlagAndDeleteWhenCompanionIsAboveAndLinkInXRange:
-  CALL_C(0x4bcf, interactionCoded0_checkLinkInXRange, 0x4bf6, 0x4bd2);
-  if (!(F & FZ)) { CYCT(0x4bd2, 0x4bd3); ret_effect(gb); return; } // ret nz
-  CYC(0x4bd2, 0x4bd3);
-  CYC(0x4bd3, 0x4bd5); goto setFlagAndDeleteWhenCompanionIsAbove; // jr $4bbb
+  CALL_C(b_+155, interactionCoded0_checkLinkInXRange, b_+194, b_+158);
+  if (!(F & FZ)) { CYCT(b_+158, b_+159); ret_effect(gb); return; } // ret nz
+  CYC(b_+158, b_+159);
+  CYC(b_+159, b_+161); goto setFlagAndDeleteWhenCompanionIsAbove; // jr $4bbb
 
 setFlagAndDeleteWhenCompanionIsLeft:
-  CYC(0x4bd5, 0x4bd7); E = INTERACTION_BASE + OBJ_XH;
-  CYC(0x4bd7, 0x4bd8); A = mem_rd(gb, DE);
-  CYC(0x4bd8, 0x4bdb); SET_HL(w1Companion_xh);
-  CYC(0x4bdb, 0x4bdc); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FC)) { CYCT(0x4bdc, 0x4bdd); ret_effect(gb); return; } // ret nc
-  CYC(0x4bdc, 0x4bdd);
-  CYC(0x4bdd, 0x4bdf); goto setFlagAndDelete; // jr $4bbf
+  CYC(b_+161, b_+163); E = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+163, b_+164); A = mem_rd(gb, DE);
+  CYC(b_+164, b_+167); SET_HL(w1Companion_xh);
+  CYC(b_+167, b_+168); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(b_+168, b_+169); ret_effect(gb); return; } // ret nc
+  CYC(b_+168, b_+169);
+  CYC(b_+169, b_+171); goto setFlagAndDelete; // jr $4bbf
 
 setFlagAndDeleteWhenCompanionIsBelowOrRight:
-  CALL_C(0x4bdf, interactionCoded0_cpYToCompanion, 0x4bee, 0x4be2);
-  if (F & FC) { CYCT(0x4be2, 0x4be4); goto setFlagAndDelete; } // jr c
-  CYC(0x4be2, 0x4be4);
-  CYC(0x4be4, 0x4be6); E = INTERACTION_BASE + OBJ_XH;
-  CYC(0x4be6, 0x4be7); A = mem_rd(gb, DE);
-  CYC(0x4be7, 0x4bea); SET_HL(w1Companion_xh);
-  CYC(0x4bea, 0x4beb); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FC) { CYCT(0x4beb, 0x4bec); ret_effect(gb); return; } // ret c
-  CYC(0x4beb, 0x4bec);
-  CYC(0x4bec, 0x4bee); goto setFlagAndDelete; // jr $4bbf
+  CALL_C(b_+171, interactionCoded0_cpYToCompanion, b_+186, b_+174);
+  if (F & FC) { CYCT(b_+174, b_+176); goto setFlagAndDelete; } // jr c
+  CYC(b_+174, b_+176);
+  CYC(b_+176, b_+178); E = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+178, b_+179); A = mem_rd(gb, DE);
+  CYC(b_+179, b_+182); SET_HL(w1Companion_xh);
+  CYC(b_+182, b_+183); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) { CYCT(b_+183, b_+184); ret_effect(gb); return; } // ret c
+  CYC(b_+183, b_+184);
+  CYC(b_+184, b_+186); goto setFlagAndDelete; // jr $4bbf
 }

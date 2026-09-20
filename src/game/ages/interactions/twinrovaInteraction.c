@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0a, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0a, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode93), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode93), (from), (to), true)
 
 // ref/oracles-disasm/object_code/ages/interactions/twinrova.s (INTERAC_TWINROVA), bank 0x0a.
 // This is a DIFFERENT, unrelated source file from object_code/common/enemies/twinrova.s
@@ -63,151 +63,159 @@ void func_0a_7877_hook(GB *gb);
 //   var3a: Index for "loadAngleAndCounterPreset" function
 // ==================================================================================================
 void interactionCode93_hook(GB *gb) {
+  BASE(interactionCode93);
   uint16_t sp0_ = gb->sp;
-  CYC(0x75fc, 0x75fe); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x75fe, 0x75ff); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x75ff, 0x7600); push_effect(gb, 0x7600);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = twinrova_jump_table(gb);
-    if (target == 0x77af) { twinrova_state1_hook(gb); return; }
+    if (target == SYM(twinrova_state1)) { twinrova_state1_hook(gb); return; }
     // target == 0x7604 falls through to state0
   }
 
   // interactionCode93@state0
-  CYC(0x7604, 0x7606); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x7606, 0x7607); A = mem_rd(gb, DE);
-  CYC(0x7607, 0x7609); alu_cp(gb, 0x02);
-  if (!(F & FC)) { CYCT(0x7609, 0x760b); goto subid2AndUp; } // jr nc
-  CYC(0x7609, 0x760b);
+  CYC(b_+8, b_+10); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+10, b_+11); A = mem_rd(gb, DE);
+  CYC(b_+11, b_+13); alu_cp(gb, 0x02);
+  if (!(F & FC)) { CYCT(b_+13, b_+15); goto subid2AndUp; } // jr nc
+  CYC(b_+13, b_+15);
 
   // interactionCode93@subid0Or1
-  CYC(0x760b, 0x760e); A = W8(wTmpcfc0_genericCutscene_cfd0);
-  CYC(0x760e, 0x7610); alu_cp(gb, 0x08);
-  if (!(F & FZ)) { RET_TAKEN(0x7610); return; } // ret nz
-  CYC(0x7610, 0x7611);
-  CALL_C(0x7611, twinrova_loadGfx_hook, 0x763d, 0x7614);
-  CYC(0x7614, 0x7616); goto afterLoadGfx; // jr
+  CYC(b_+15, b_+18); A = W8(wTmpcfc0_genericCutscene_cfd0);
+  CYC(b_+18, b_+20); alu_cp(gb, 0x08);
+  if (!(F & FZ)) { RET_TAKEN(b_+20); return; } // ret nz
+  CYC(b_+20, b_+21);
+  CALL_C(b_+21, twinrova_loadGfx_hook, SYM(twinrova_loadGfx), b_+24);
+  CYC(b_+24, b_+26); goto afterLoadGfx; // jr
 
 subid2AndUp:
-  CYC(0x7616, 0x7618); alu_cp(gb, 0x06);
-  if (!(F & FZ)) { CALL_C_CC(0x7618, interactionLoadExtraGraphics_hook, 0x2781, 0x761b); } else CYC(0x7618, 0x761b); // call nz
+  CYC(b_+26, b_+28); alu_cp(gb, 0x06);
+  if (!(F & FZ)) { CALL_C_CC(b_+28, interactionLoadExtraGraphics_hook, SYM(interactionLoadExtraGraphics), b_+31); } else CYC(b_+28, b_+31); // call nz
 
 afterLoadGfx:
-  CALL_C(0x761b, interactionIncState_hook, 0x23e0, 0x761e);
-  CALL_C(0x761e, interactionInitGraphics_hook, 0x15fb, 0x7621);
-  CALL_C(0x7621, objectSetVisiblec1_hook, 0x1e3c, 0x7624);
-  CYC(0x7624, 0x7626); A = 0x28; // >TX_2800
-  CALL_C(0x7626, interactionSetHighTextIndex_hook, 0x253b, 0x7629);
-  CYC(0x7629, 0x762b); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x762b, 0x762c); A = mem_rd(gb, DE);
+  CALL_C(b_+31, interactionIncState_hook, SYM(interactionIncState), b_+34);
+  CALL_C(b_+34, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+37);
+  CALL_C(b_+37, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+40);
+  CYC(b_+40, b_+42); A = 0x28; // >TX_2800
+  CALL_C(b_+42, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+45);
+  CYC(b_+45, b_+47); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+47, b_+48); A = mem_rd(gb, DE);
   {
-    CYC(0x762c, 0x762d); push_effect(gb, 0x762d);
+    CYC(b_+48, b_+49); push_effect(gb, b_+49);
     uint16_t target = twinrova_jump_table(gb);
-    if (target == 0x76e3) { twinrova_initOtherHalf_hook(gb); return; }
-    if (target == 0x765f) { twinrova_initSubid02_hook(gb); return; }
-    if (target == 0x7670) { twinrova_initSubid04_hook(gb); return; }
-    if (target == 0x7652) { twinrova_initSubid06_hook(gb); return; }
+    if (target == SYM(twinrova_initOtherHalf)) { twinrova_initOtherHalf_hook(gb); return; }
+    if (target == SYM(twinrova_initSubid02)) { twinrova_initSubid02_hook(gb); return; }
+    if (target == SYM(twinrova_initSubid04)) { twinrova_initSubid04_hook(gb); return; }
+    if (target == SYM(twinrova_initSubid06)) { twinrova_initSubid06_hook(gb); return; }
     twinrova_initSubid00_hook(gb); return; // target == 0x7675
   }
 }
 
 void twinrova_loadGfx_hook(GB *gb) {
+  BASE(twinrova_loadGfx);
   uint16_t sp0_ = gb->sp;
-  CYC(0x763d, 0x7640); SET_HL(wLoadedObjectGfx + 10);
-  CYC(0x7640, 0x7642); B = 0x03;
-  CYC(0x7642, 0x7644); A = 0x2c; // AGES_OBJ_GFXH_2c
+  CYC(b_+0, b_+3); SET_HL(wLoadedObjectGfx + 10);
+  CYC(b_+3, b_+5); B = 0x03;
+  CYC(b_+5, b_+7); A = 0x2c; // AGES_OBJ_GFXH_2c
 
 loop:
-  CYC(0x7644, 0x7645); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x7645, 0x7646); A = alu_inc8(gb, A);
-  CYC(0x7646, 0x7648); mem_wr(gb, HL, 0x01);
-  CYC(0x7648, 0x7649); L = alu_inc8(gb, L);
-  CYC(0x7649, 0x764a); B = alu_dec8(gb, B);
-  if (!(F & FZ)) { CYCT(0x764a, 0x764c); goto loop; } // jr nz
-  CYC(0x764a, 0x764c);
-  CYC(0x764c, 0x764d); push_effect(gb, DE); // push de
-  CALL_C(0x764d, reloadObjectGfx_b00_hook, 0x1630, 0x7650);
-  CYC(0x7650, 0x7651); SET_DE(pop_effect(gb)); // pop de
-  RET(0x7651); return;
+  CYC(b_+7, b_+8); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+8, b_+9); A = alu_inc8(gb, A);
+  CYC(b_+9, b_+11); mem_wr(gb, HL, 0x01);
+  CYC(b_+11, b_+12); L = alu_inc8(gb, L);
+  CYC(b_+12, b_+13); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(b_+13, b_+15); goto loop; } // jr nz
+  CYC(b_+13, b_+15);
+  CYC(b_+15, b_+16); push_effect(gb, DE); // push de
+  CALL_C(b_+16, reloadObjectGfx_b00_hook, SYM(reloadObjectGfx_b00), b_+19);
+  CYC(b_+19, b_+20); SET_DE(pop_effect(gb)); // pop de
+  RET(b_+20); return;
 }
 
 void twinrova_initSubid06_hook(GB *gb) {
+  BASE(twinrova_initSubid06);
   uint16_t sp0_ = gb->sp;
-  CYC(0x7652, 0x7653); H = D;
-  CYC(0x7653, 0x7655); L = INTERACTION_BASE + OBJ_VAR3A;
-  CYC(0x7655, 0x7657); mem_wr(gb, HL, 0x00);
-  CALL_C(0x7657, twinrova_loadScript_hook, 0x785c, 0x765a);
-  CYC(0x765a, 0x765d); SET_BC(0x4234);
-  CYC(0x765d, 0x765f); twinrova_genericInitialize_hook(gb); return; // jr
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR3A;
+  CYC(b_+3, b_+5); mem_wr(gb, HL, 0x00);
+  CALL_C(b_+5, twinrova_loadScript_hook, SYM(twinrova_loadScript), b_+8);
+  CYC(b_+8, b_+11); SET_BC((SYM(interactionCode7a__updateLinkPositionWhileRollerMoving) + 30));
+  CYC(b_+11, SYM(twinrova_initSubid02)); twinrova_genericInitialize_hook(gb); return; // jr
 }
 
 void twinrova_initSubid02_hook(GB *gb) {
+  BASE(twinrova_initSubid02);
   uint16_t sp0_ = gb->sp;
-  CYC(0x765f, 0x7660); H = D;
-  CYC(0x7660, 0x7662); L = INTERACTION_BASE + OBJ_VAR3A;
-  CYC(0x7662, 0x7664); mem_wr(gb, HL, 0x04);
-  CYC(0x7664, 0x7666); L = INTERACTION_BASE + OBJ_VAR38;
-  CYC(0x7666, 0x7668); mem_wr(gb, HL, 0x02);
-  CALL_C(0x7668, objectSetInvisible_hook, 0x1e7b, 0x766b);
-  CYC(0x766b, 0x766e); SET_BC(0x3850);
-  CYC(0x766e, 0x7670); twinrova_genericInitialize_hook(gb); return; // jr
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR3A;
+  CYC(b_+3, b_+5); mem_wr(gb, HL, 0x04);
+  CYC(b_+5, b_+7); L = INTERACTION_BASE + OBJ_VAR38;
+  CYC(b_+7, b_+9); mem_wr(gb, HL, 0x02);
+  CALL_C(b_+9, objectSetInvisible_hook, SYM(objectSetInvisible), b_+12);
+  CYC(b_+12, b_+15); SET_BC((SYM(loadUniqueGfxHeaderEntry) + 13));
+  CYC(b_+15, SYM(twinrova_initSubid04)); twinrova_genericInitialize_hook(gb); return; // jr
 }
 
 void twinrova_initSubid04_hook(GB *gb) {
-  CYC(0x7670, 0x7671); H = D;
-  CYC(0x7671, 0x7673); L = INTERACTION_BASE + OBJ_VAR38;
-  CYC(0x7673, 0x7675); mem_wr(gb, HL, 0x1e);
+  BASE(twinrova_initSubid04);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR38;
+  CYC(b_+3, SYM(twinrova_initSubid00)); mem_wr(gb, HL, 0x1e);
   twinrova_initSubid00_hook(gb); return; // falls through
 }
 
 void twinrova_initSubid00_hook(GB *gb) {
-  CYC(0x7675, 0x7676); H = D;
-  CYC(0x7676, 0x7678); L = INTERACTION_BASE + OBJ_VAR3A;
-  CYC(0x7678, 0x767a); mem_wr(gb, HL, 0x00);
-  CYC(0x767a, 0x767d); SET_BC(0xf888);
+  BASE(twinrova_initSubid00);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR3A;
+  CYC(b_+3, b_+5); mem_wr(gb, HL, 0x00);
+  CYC(b_+5, SYM(twinrova_genericInitialize)); SET_BC(0xf888);
   twinrova_genericInitialize_hook(gb); return; // falls through
 }
 
 void twinrova_genericInitialize_hook(GB *gb) {
+  BASE(twinrova_genericInitialize);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x767d, interactionSetPosition_hook, 0x2773, 0x7680);
-  CALL_C(0x7680, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x7683);
-  CYC(0x7683, 0x7685); L = INTERACTION_BASE + OBJ_OAM_FLAGS;
-  CYC(0x7685, 0x7687); mem_wr(gb, HL, 0x02);
-  CYC(0x7687, 0x7689); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x7689, 0x768b); mem_wr(gb, HL, 0x50); // SPEED_200
-  CYC(0x768b, 0x768d); L = INTERACTION_BASE + OBJ_ZH;
-  CYC(0x768d, 0x768f); mem_wr(gb, HL, 0xf8); // -0x08
+  CALL_C(b_+0, interactionSetPosition_hook, SYM(interactionSetPosition), b_+3);
+  CALL_C(b_+3, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+6);
+  CYC(b_+6, b_+8); L = INTERACTION_BASE + OBJ_OAM_FLAGS;
+  CYC(b_+8, b_+10); mem_wr(gb, HL, 0x02);
+  CYC(b_+10, b_+12); L = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+12, b_+14); mem_wr(gb, HL, 0x50); // SPEED_200
+  CYC(b_+14, b_+16); L = INTERACTION_BASE + OBJ_ZH;
+  CYC(b_+16, b_+18); mem_wr(gb, HL, 0xf8); // -0x08
 
   // Spawn the other half (subid+1)
-  CALL_C(0x768f, getFreeInteractionSlot_hook, 0x3aef, 0x7692);
-  if (!(F & FZ)) { CYCT(0x7692, 0x7694); goto afterSpawn; } // jr nz
-  CYC(0x7692, 0x7694);
-  CYC(0x7694, 0x7696); mem_wr(gb, HL, 0x93); // INTERAC_TWINROVA
-  CYC(0x7696, 0x7697); L = alu_inc8(gb, L);
-  CYC(0x7697, 0x7698); E = L;
-  CYC(0x7698, 0x7699); A = mem_rd(gb, DE);
-  CYC(0x7699, 0x769a); A = alu_inc8(gb, A);
-  CYC(0x769a, 0x769b); mem_wr(gb, HL, A);
-  CYC(0x769b, 0x769d); L = INTERACTION_BASE + OBJ_RELATED1;
-  CYC(0x769d, 0x769f); mem_wr(gb, HL, INTERACTION_BASE); // Interaction.start
-  CYC(0x769f, 0x76a0); L = alu_inc8(gb, L);
-  CYC(0x76a0, 0x76a1); mem_wr(gb, HL, D);
+  CALL_C(b_+18, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+21);
+  if (!(F & FZ)) { CYCT(b_+21, b_+23); goto afterSpawn; } // jr nz
+  CYC(b_+21, b_+23);
+  CYC(b_+23, b_+25); mem_wr(gb, HL, 0x93); // INTERAC_TWINROVA
+  CYC(b_+25, b_+26); L = alu_inc8(gb, L);
+  CYC(b_+26, b_+27); E = L;
+  CYC(b_+27, b_+28); A = mem_rd(gb, DE);
+  CYC(b_+28, b_+29); A = alu_inc8(gb, A);
+  CYC(b_+29, b_+30); mem_wr(gb, HL, A);
+  CYC(b_+30, b_+32); L = INTERACTION_BASE + OBJ_RELATED1;
+  CYC(b_+32, b_+34); mem_wr(gb, HL, INTERACTION_BASE); // Interaction.start
+  CYC(b_+34, b_+35); L = alu_inc8(gb, L);
+  CYC(b_+35, b_+36); mem_wr(gb, HL, D);
 
 afterSpawn:
-  CALL_C(0x76a1, twinrova_loadAngleAndCounterPreset_hook, 0x76b4, 0x76a4);
-  CALL_C(0x76a4, twinrova_updateDirectionFromAngle_hook, 0x76d4, 0x76a7);
-  CYC(0x76a7, 0x76a9); A = 0xbb; // SND_BEAM2
-  CALL_C(0x76a9, playSound_b00_hook, 0x0c98, 0x76ac);
-  CYC(0x76ac, 0x76af); SET_HL(0x741b); // scriptHelp.objectWritePositionTocfd5
-  CYC(0x76af, 0x76b1); E = 0x15; // bank of scriptHelp
-  CYC(0x76b1, 0x76b4); interBankCall_hook(gb); return; // jp
+  CALL_C(b_+36, twinrova_loadAngleAndCounterPreset_hook, SYM(twinrova_loadAngleAndCounterPreset), b_+39);
+  CALL_C(b_+39, twinrova_updateDirectionFromAngle_hook, SYM(twinrova_updateDirectionFromAngle), b_+42);
+  CYC(b_+42, b_+44); A = 0xbb; // SND_BEAM2
+  CALL_C(b_+44, playSound_b00_hook, SYM(playSound_b00), b_+47);
+  CYC(b_+47, b_+50); SET_HL((SYM(interactionCode92) + 8)); // scriptHelp.objectWritePositionTocfd5
+  CYC(b_+50, b_+52); E = 0x15; // bank of scriptHelp
+  CYC(b_+52, SYM(twinrova_loadAngleAndCounterPreset)); interBankCall_hook(gb); return; // jp
 }
 
 void twinrova_loadAngleAndCounterPreset_hook(GB *gb) {
-  CYC(0x76b4, 0x76b6); E = INTERACTION_BASE + OBJ_VAR3A;
-  CYC(0x76b6, 0x76b7); A = mem_rd(gb, DE);
-  CYC(0x76b7, 0x76b8); B = A;
+  BASE(twinrova_loadAngleAndCounterPreset);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_VAR3A;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, SYM(loadAngleAndCounterPreset)); B = A;
   loadAngleAndCounterPreset_hook(gb); return; // falls through
 }
 
@@ -217,94 +225,98 @@ void twinrova_loadAngleAndCounterPreset_hook(GB *gb) {
 // table -- 6 pointers plus data0-data5 byte pairs -- referenced here only by address, not
 // modeled as C.
 void loadAngleAndCounterPreset_hook(GB *gb) {
-  CYC(0x76b8, 0x76b9); A = B;
-  CYC(0x76b9, 0x76bc); SET_HL(0x771d); // presetInteractionAnglesAndCounters
-  CYC(0x76bc, 0x76bd); twinrova_addDoubleIndexToHl_from_rst(gb, 0x76bd);
-  CYC(0x76bd, 0x76be); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x76be, 0x76bf); H = mem_rd(gb, HL);
-  CYC(0x76bf, 0x76c0); L = A;
-  CYC(0x76c0, 0x76c2); E = INTERACTION_BASE + OBJ_COUNTER2;
-  CYC(0x76c2, 0x76c3); A = mem_rd(gb, DE);
-  CYC(0x76c3, 0x76c4); twinrova_addDoubleIndexToHl_from_rst(gb, 0x76c4);
-  CYC(0x76c4, 0x76c5); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x76c5, 0x76c7); E = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x76c7, 0x76c8); mem_wr(gb, DE, A);
-  CYC(0x76c8, 0x76c9); A = mem_rd(gb, HL);
-  CYC(0x76c9, 0x76ca); alu_or(gb, A);
-  CYC(0x76ca, 0x76cb); B = A;
-  if (F & FZ) { RET_TAKEN(0x76cb); return; } // ret z
-  CYC(0x76cb, 0x76cc);
-  CYC(0x76cc, 0x76cd); H = D;
-  CYC(0x76cd, 0x76cf); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x76cf, 0x76d0); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x76d0, 0x76d1); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
-  CYC(0x76d1, 0x76d3); alu_or(gb, 0x01);
-  RET(0x76d3); return;
+  BASE(loadAngleAndCounterPreset);
+  CYC(b_+0, b_+1); A = B;
+  CYC(b_+1, b_+4); SET_HL(SYM(presetInteractionAnglesAndCounters)); // presetInteractionAnglesAndCounters
+  CYC(b_+4, b_+5); twinrova_addDoubleIndexToHl_from_rst(gb, b_+5);
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+6, b_+7); H = mem_rd(gb, HL);
+  CYC(b_+7, b_+8); L = A;
+  CYC(b_+8, b_+10); E = INTERACTION_BASE + OBJ_COUNTER2;
+  CYC(b_+10, b_+11); A = mem_rd(gb, DE);
+  CYC(b_+11, b_+12); twinrova_addDoubleIndexToHl_from_rst(gb, b_+12);
+  CYC(b_+12, b_+13); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+13, b_+15); E = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+15, b_+16); mem_wr(gb, DE, A);
+  CYC(b_+16, b_+17); A = mem_rd(gb, HL);
+  CYC(b_+17, b_+18); alu_or(gb, A);
+  CYC(b_+18, b_+19); B = A;
+  if (F & FZ) { RET_TAKEN(b_+19); return; } // ret z
+  CYC(b_+19, b_+20);
+  CYC(b_+20, b_+21); H = D;
+  CYC(b_+21, b_+23); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+23, b_+24); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+24, b_+25); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
+  CYC(b_+25, b_+27); alu_or(gb, 0x01);
+  RET(b_+27); return;
 }
 
 void twinrova_updateDirectionFromAngle_hook(GB *gb) {
+  BASE(twinrova_updateDirectionFromAngle);
   uint16_t sp0_ = gb->sp;
-  CYC(0x76d4, 0x76d6); E = INTERACTION_BASE + OBJ_ANGLE;
-  CALL_C(0x76d6, convertAngleDeToDirection_hook, 0x26f8, 0x76d9);
-  CYC(0x76d9, 0x76db); alu_and(gb, 0x03);
-  CYC(0x76db, 0x76dd); L = INTERACTION_BASE + OBJ_DIRECTION;
-  CYC(0x76dd, 0x76de); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FZ) { RET_TAKEN(0x76de); return; } // ret z
-  CYC(0x76de, 0x76df);
-  CYC(0x76df, 0x76e0); mem_wr(gb, HL, A);
-  CYC(0x76e0, 0x76e3); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_ANGLE;
+  CALL_C(b_+2, convertAngleDeToDirection_hook, SYM(convertAngleDeToDirection), b_+5);
+  CYC(b_+5, b_+7); alu_and(gb, 0x03);
+  CYC(b_+7, b_+9); L = INTERACTION_BASE + OBJ_DIRECTION;
+  CYC(b_+9, b_+10); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { RET_TAKEN(b_+10); return; } // ret z
+  CYC(b_+10, b_+11);
+  CYC(b_+11, b_+12); mem_wr(gb, HL, A);
+  CYC(b_+12, SYM(twinrova_initOtherHalf)); interactionSetAnimation_hook(gb); return; // jp
 }
 
 // Initialize odd subids (the half of twinrova that just follows along)
 void twinrova_initOtherHalf_hook(GB *gb) {
+  BASE(twinrova_initOtherHalf);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x76e3, interactionSetAlwaysUpdateBit_hook, 0x2701, 0x76e6);
-  CYC(0x76e6, 0x76e8); L = INTERACTION_BASE + OBJ_OAM_FLAGS;
-  CYC(0x76e8, 0x76ea); mem_wr(gb, HL, 0x01);
+  CALL_C(b_+0, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+3);
+  CYC(b_+3, b_+5); L = INTERACTION_BASE + OBJ_OAM_FLAGS;
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 0x01);
 
   // Copy position & stuff from other half, inverted if necessary
-  CYC(0x76ea, 0x76ec); A = OBJ_ENABLED;
-  CALL_C(0x76ec, objectGetRelatedObject1Var_hook, 0x2160, 0x76ef);
+  CYC(b_+7, b_+9); A = OBJ_ENABLED;
+  CALL_C(b_+9, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), SYM(twinrova_takeInvertedPositionFromObject));
   twinrova_takeInvertedPositionFromObject_hook(gb); return; // falls through
 }
 
 // @param h Object to copy visibility, direction, position from
 void twinrova_takeInvertedPositionFromObject_hook(GB *gb) {
+  BASE(twinrova_takeInvertedPositionFromObject);
   uint16_t sp0_ = gb->sp;
-  CYC(0x76ef, 0x76f1); L = INTERACTION_BASE + OBJ_VISIBLE;
-  CYC(0x76f1, 0x76f2); E = L;
-  CYC(0x76f2, 0x76f3); A = mem_rd(gb, HL);
-  CYC(0x76f3, 0x76f4); mem_wr(gb, DE, A);
-  CALL_C(0x76f4, objectTakePosition_hook, 0x2274, 0x76f7);
-  CYC(0x76f7, 0x76f9); L = INTERACTION_BASE + OBJ_XH;
-  CYC(0x76f9, 0x76fa); B = mem_rd(gb, HL);
-  CYC(0x76fa, 0x76fc); A = 0x50;
-  CYC(0x76fc, 0x76fd); alu_sub(gb, B);
-  CYC(0x76fd, 0x76ff); alu_add(gb, 0x50);
-  CYC(0x76ff, 0x7701); E = INTERACTION_BASE + OBJ_XH;
-  CYC(0x7701, 0x7702); mem_wr(gb, DE, A);
-  CYC(0x7702, 0x7704); L = INTERACTION_BASE + OBJ_DIRECTION;
-  CYC(0x7704, 0x7705); A = mem_rd(gb, HL);
-  CYC(0x7705, 0x7706); B = A;
-  CYC(0x7706, 0x7708); alu_and(gb, 0x01);
-  if (F & FZ) { CYCT(0x7708, 0x770a); goto setDirection; } // jr z
-  CYC(0x7708, 0x770a);
-  CYC(0x770a, 0x770b); A = B;
-  CYC(0x770b, 0x770d); B = 0x01;
-  CYC(0x770d, 0x770f); alu_cp(gb, 0x03);
-  if (F & FZ) { CYCT(0x770f, 0x7711); goto setDirection; } // jr z
-  CYC(0x770f, 0x7711);
-  CYC(0x7711, 0x7713); B = 0x03;
+  CYC(b_+0, b_+2); L = INTERACTION_BASE + OBJ_VISIBLE;
+  CYC(b_+2, b_+3); E = L;
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
+  CYC(b_+4, b_+5); mem_wr(gb, DE, A);
+  CALL_C(b_+5, objectTakePosition_hook, SYM(objectTakePosition), b_+8);
+  CYC(b_+8, b_+10); L = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+10, b_+11); B = mem_rd(gb, HL);
+  CYC(b_+11, b_+13); A = 0x50;
+  CYC(b_+13, b_+14); alu_sub(gb, B);
+  CYC(b_+14, b_+16); alu_add(gb, 0x50);
+  CYC(b_+16, b_+18); E = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+18, b_+19); mem_wr(gb, DE, A);
+  CYC(b_+19, b_+21); L = INTERACTION_BASE + OBJ_DIRECTION;
+  CYC(b_+21, b_+22); A = mem_rd(gb, HL);
+  CYC(b_+22, b_+23); B = A;
+  CYC(b_+23, b_+25); alu_and(gb, 0x01);
+  if (F & FZ) { CYCT(b_+25, b_+27); goto setDirection; } // jr z
+  CYC(b_+25, b_+27);
+  CYC(b_+27, b_+28); A = B;
+  CYC(b_+28, b_+30); B = 0x01;
+  CYC(b_+30, b_+32); alu_cp(gb, 0x03);
+  if (F & FZ) { CYCT(b_+32, b_+34); goto setDirection; } // jr z
+  CYC(b_+32, b_+34);
+  CYC(b_+34, b_+36); B = 0x03;
 
 setDirection:
-  CYC(0x7713, 0x7714); A = B;
-  CYC(0x7714, 0x7715); H = D;
-  CYC(0x7715, 0x7717); L = INTERACTION_BASE + OBJ_DIRECTION;
-  CYC(0x7717, 0x7718); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FZ) { RET_TAKEN(0x7718); return; } // ret z
-  CYC(0x7718, 0x7719);
-  CYC(0x7719, 0x771a); mem_wr(gb, HL, A);
-  CYC(0x771a, 0x771d); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+36, b_+37); A = B;
+  CYC(b_+37, b_+38); H = D;
+  CYC(b_+38, b_+40); L = INTERACTION_BASE + OBJ_DIRECTION;
+  CYC(b_+40, b_+41); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { RET_TAKEN(b_+41); return; } // ret z
+  CYC(b_+41, b_+42);
+  CYC(b_+42, b_+43); mem_wr(gb, HL, A);
+  CYC(b_+43, SYM(presetInteractionAnglesAndCounters)); interactionSetAnimation_hook(gb); return; // jp
 }
 
 // presetInteractionAnglesAndCounters (0a:771d): pure ROM data, not ported as code -- 6
@@ -312,133 +324,136 @@ setDirection:
 // only via SET_HL(0x771d) in loadAngleAndCounterPreset_hook above.
 
 void twinrova_state1_hook(GB *gb) {
+  BASE(twinrova_state1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x77af, 0x77b1); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x77b1, 0x77b2); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   {
-    CYC(0x77b2, 0x77b3); push_effect(gb, 0x77b3);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = twinrova_jump_table(gb);
-    if (target == 0x782d) goto runOtherHalf;
-    if (target == 0x783d) goto runSubid02;
-    if (target == 0x7854) goto runSubid06;
+    if (target == b_+126) goto runOtherHalf;
+    if (target == b_+142) goto runSubid02;
+    if (target == b_+165) goto runSubid06;
     // target == 0x77c3 falls through to runSubid00
   }
 
   // twinrova_state1@runSubid00
-  CYC(0x77c3, 0x77c5); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x77c5, 0x77c6); A = mem_rd(gb, DE);
+  CYC(b_+20, b_+22); E = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+22, b_+23); A = mem_rd(gb, DE);
   {
-    CYC(0x77c6, 0x77c7); push_effect(gb, 0x77c7);
+    CYC(b_+23, b_+24); push_effect(gb, b_+24);
     uint16_t target = twinrova_jump_table(gb);
-    if (target == 0x77ea) goto subid00State1;
-    if (target == 0x780e) goto subid00State2;
+    if (target == b_+59) goto subid00State1;
+    if (target == b_+95) goto subid00State2;
     // target == 0x77cd falls through to subid00State0
   }
 
 subid00State0:
-  CYC(0x77cd, 0x77d0); SET_HL(0x741b); // scriptHelp.objectWritePositionTocfd5
-  CYC(0x77d0, 0x77d2); E = 0x15; // bank of scriptHelp
-  CALL_C(0x77d2, interBankCall_hook, 0x008a, 0x77d5);
-  CALL_C(0x77d5, interactionAnimate_hook, 0x261b, 0x77d8);
-  CALL_C(0x77d8, objectApplySpeed_hook, 0x201d, 0x77db);
-  CALL_C(0x77db, interactionDecCounter1_hook, 0x23cc, 0x77de);
-  if (F & FZ) { CALL_C_CC(0x77de, twinrova_loadAngleAndCounterPreset_hook, 0x76b4, 0x77e1); } else CYC(0x77de, 0x77e1); // call z
-  if (!(F & FZ)) { CYCT(0x77e1, 0x77e4); twinrova_updateDirectionFromAngle_hook(gb); return; } // jp nz
-  CYC(0x77e1, 0x77e4);
-  CALL_C(0x77e4, interactionIncSubstate_hook, 0x23e5, 0x77e7);
-  CYC(0x77e7, 0x77ea); twinrova_loadScript_hook(gb); return; // jp
+  CYC(b_+30, b_+33); SET_HL((SYM(interactionCode92) + 8)); // scriptHelp.objectWritePositionTocfd5
+  CYC(b_+33, b_+35); E = 0x15; // bank of scriptHelp
+  CALL_C(b_+35, interBankCall_hook, 0x008a, b_+38);
+  CALL_C(b_+38, interactionAnimate_hook, SYM(interactionAnimate), b_+41);
+  CALL_C(b_+41, objectApplySpeed_hook, SYM(objectApplySpeed), b_+44);
+  CALL_C(b_+44, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+47);
+  if (F & FZ) { CALL_C_CC(b_+47, twinrova_loadAngleAndCounterPreset_hook, SYM(twinrova_loadAngleAndCounterPreset), b_+50); } else CYC(b_+47, b_+50); // call z
+  if (!(F & FZ)) { CYCT(b_+50, b_+53); twinrova_updateDirectionFromAngle_hook(gb); return; } // jp nz
+  CYC(b_+50, b_+53);
+  CALL_C(b_+53, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+56);
+  CYC(b_+56, b_+59); twinrova_loadScript_hook(gb); return; // jp
 
 subid00State1:
-  CALL_C(0x77ea, interactionAnimate_hook, 0x261b, 0x77ed);
-  CALL_C(0x77ed, objectOscillateZ_hook, 0x27a0, 0x77f0);
-  CALL_C(0x77f0, interactionRunScript_hook, 0x2552, 0x77f3);
-  if (!(F & FC)) { RET_TAKEN(0x77f3); return; } // ret nc
-  CYC(0x77f3, 0x77f4);
-  CYC(0x77f4, 0x77f6); A = 0xbb; // SND_BEAM2
-  CALL_C(0x77f6, playSound_b00_hook, 0x0c98, 0x77f9);
-  CYC(0x77f9, 0x77fc); SET_HL(0x741b); // scriptHelp.objectWritePositionTocfd5
-  CYC(0x77fc, 0x77fe); E = 0x15; // bank of scriptHelp
-  CALL_C(0x77fe, interBankCall_hook, 0x008a, 0x7801);
-  CALL_C(0x7801, interactionIncSubstate_hook, 0x23e5, 0x7804);
-  CYC(0x7804, 0x7806); L = INTERACTION_BASE + OBJ_COUNTER2;
-  CYC(0x7806, 0x7808); mem_wr(gb, HL, 0x00);
-  CYC(0x7808, 0x780a); L = INTERACTION_BASE + OBJ_VAR3A;
-  CYC(0x780a, 0x780b); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
-  CYC(0x780b, 0x780e); twinrova_loadAngleAndCounterPreset_hook(gb); return; // jp
+  CALL_C(b_+59, interactionAnimate_hook, SYM(interactionAnimate), b_+62);
+  CALL_C(b_+62, objectOscillateZ_hook, SYM(objectOscillateZ), b_+65);
+  CALL_C(b_+65, interactionRunScript_hook, SYM(interactionRunScript), b_+68);
+  if (!(F & FC)) { RET_TAKEN(b_+68); return; } // ret nc
+  CYC(b_+68, b_+69);
+  CYC(b_+69, b_+71); A = 0xbb; // SND_BEAM2
+  CALL_C(b_+71, playSound_b00_hook, SYM(playSound_b00), b_+74);
+  CYC(b_+74, b_+77); SET_HL((SYM(interactionCode92) + 8)); // scriptHelp.objectWritePositionTocfd5
+  CYC(b_+77, b_+79); E = 0x15; // bank of scriptHelp
+  CALL_C(b_+79, interBankCall_hook, 0x008a, b_+82);
+  CALL_C(b_+82, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+85);
+  CYC(b_+85, b_+87); L = INTERACTION_BASE + OBJ_COUNTER2;
+  CYC(b_+87, b_+89); mem_wr(gb, HL, 0x00);
+  CYC(b_+89, b_+91); L = INTERACTION_BASE + OBJ_VAR3A;
+  CYC(b_+91, b_+92); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
+  CYC(b_+92, b_+95); twinrova_loadAngleAndCounterPreset_hook(gb); return; // jp
 
 subid00State2:
-  CYC(0x780e, 0x7811); SET_HL(0x741b); // scriptHelp.objectWritePositionTocfd5
-  CYC(0x7811, 0x7813); E = 0x15; // bank of scriptHelp
-  CALL_C(0x7813, interBankCall_hook, 0x008a, 0x7816);
-  CALL_C(0x7816, interactionAnimate_hook, 0x261b, 0x7819);
-  CALL_C(0x7819, objectApplySpeed_hook, 0x201d, 0x781c);
-  CALL_C(0x781c, interactionDecCounter1_hook, 0x23cc, 0x781f);
-  if (F & FZ) { CALL_C_CC(0x781f, twinrova_loadAngleAndCounterPreset_hook, 0x76b4, 0x7822); } else CYC(0x781f, 0x7822); // call z
-  if (!(F & FZ)) { CYCT(0x7822, 0x7825); twinrova_updateDirectionFromAngle_hook(gb); return; } // jp nz
-  CYC(0x7822, 0x7825);
-  CYC(0x7825, 0x7827); A = 0x09;
-  CYC(0x7827, 0x782a); W8(wTmpcfc0_genericCutscene_cfd0) = A;
-  CYC(0x782a, 0x782d); interactionDelete_hook(gb); return; // jp
+  CYC(b_+95, b_+98); SET_HL((SYM(interactionCode92) + 8)); // scriptHelp.objectWritePositionTocfd5
+  CYC(b_+98, b_+100); E = 0x15; // bank of scriptHelp
+  CALL_C(b_+100, interBankCall_hook, 0x008a, b_+103);
+  CALL_C(b_+103, interactionAnimate_hook, SYM(interactionAnimate), b_+106);
+  CALL_C(b_+106, objectApplySpeed_hook, SYM(objectApplySpeed), b_+109);
+  CALL_C(b_+109, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+112);
+  if (F & FZ) { CALL_C_CC(b_+112, twinrova_loadAngleAndCounterPreset_hook, SYM(twinrova_loadAngleAndCounterPreset), b_+115); } else CYC(b_+112, b_+115); // call z
+  if (!(F & FZ)) { CYCT(b_+115, b_+118); twinrova_updateDirectionFromAngle_hook(gb); return; } // jp nz
+  CYC(b_+115, b_+118);
+  CYC(b_+118, b_+120); A = 0x09;
+  CYC(b_+120, b_+123); W8(wTmpcfc0_genericCutscene_cfd0) = A;
+  CYC(b_+123, b_+126); interactionDelete_hook(gb); return; // jp
 
 runOtherHalf:
-  CALL_C(0x782d, interactionAnimate_hook, 0x261b, 0x7830);
-  CYC(0x7830, 0x7832); A = OBJ_ENABLED;
-  CALL_C(0x7832, objectGetRelatedObject1Var_hook, 0x2160, 0x7835);
-  CYC(0x7835, 0x7836); A = mem_rd(gb, HL);
-  CYC(0x7836, 0x7837); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x7837, 0x783a); interactionDelete_hook(gb); return; } // jp z
-  CYC(0x7837, 0x783a);
-  CYC(0x783a, 0x783d); twinrova_takeInvertedPositionFromObject_hook(gb); return; // jp
+  CALL_C(b_+126, interactionAnimate_hook, SYM(interactionAnimate), b_+129);
+  CYC(b_+129, b_+131); A = OBJ_ENABLED;
+  CALL_C(b_+131, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+134);
+  CYC(b_+134, b_+135); A = mem_rd(gb, HL);
+  CYC(b_+135, b_+136); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+136, b_+139); interactionDelete_hook(gb); return; } // jp z
+  CYC(b_+136, b_+139);
+  CYC(b_+139, b_+142); twinrova_takeInvertedPositionFromObject_hook(gb); return; // jp
 
 runSubid02: // also runSubid04 (same address; both subid values reuse this dispatch)
-  CYC(0x783d, 0x783f); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x783f, 0x7840); A = mem_rd(gb, DE);
+  CYC(b_+142, b_+144); E = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+144, b_+145); A = mem_rd(gb, DE);
   {
-    CYC(0x7840, 0x7841); push_effect(gb, 0x7841);
+    CYC(b_+145, b_+146); push_effect(gb, b_+146);
     uint16_t target = twinrova_jump_table(gb);
-    if (target == 0x77cd) goto subid00State0;
-    if (target == 0x77ea) goto subid00State1;
-    if (target == 0x780e) goto subid00State2;
+    if (target == b_+30) goto subid00State0;
+    if (target == b_+59) goto subid00State1;
+    if (target == b_+95) goto subid00State2;
     // target == 0x7849 falls through to subid02State0
   }
 
   // twinrova_state1@subid02State0
-  CYC(0x7849, 0x784a); H = D;
-  CYC(0x784a, 0x784c); L = INTERACTION_BASE + OBJ_VAR38;
-  CYC(0x784c, 0x784d); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x784d); return; } // ret nz
-  CYC(0x784d, 0x784e);
-  CALL_C(0x784e, objectSetVisiblec1_hook, 0x1e3c, 0x7851);
-  CYC(0x7851, 0x7854); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+154, b_+155); H = D;
+  CYC(b_+155, b_+157); L = INTERACTION_BASE + OBJ_VAR38;
+  CYC(b_+157, b_+158); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)
+  if (!(F & FZ)) { RET_TAKEN(b_+158); return; } // ret nz
+  CYC(b_+158, b_+159);
+  CALL_C(b_+159, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+162);
+  CYC(b_+162, b_+165); interactionIncSubstate_hook(gb); return; // jp
 
 runSubid06:
-  CYC(0x7854, 0x7856); E = INTERACTION_BASE + OBJ_SUBSTATE;
-  CYC(0x7856, 0x7857); A = mem_rd(gb, DE);
-  CYC(0x7857, 0x7858); push_effect(gb, 0x7858);
+  CYC(b_+165, b_+167); E = INTERACTION_BASE + OBJ_SUBSTATE;
+  CYC(b_+167, b_+168); A = mem_rd(gb, DE);
+  CYC(b_+168, b_+169); push_effect(gb, b_+169);
   {
     uint16_t target = twinrova_jump_table(gb);
-    if (target == 0x780e) goto subid00State2;
+    if (target == b_+95) goto subid00State2;
     goto subid00State1; // target == 0x77ea
   }
 }
 
 void twinrova_loadScript_hook(GB *gb) {
-  CYC(0x785c, 0x785e); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x785e, 0x785f); A = mem_rd(gb, DE);
-  CYC(0x785f, 0x7862); SET_HL(0x7869); // @scriptTable
-  CYC(0x7862, 0x7863); twinrova_addDoubleIndexToHl_from_rst(gb, 0x7863);
-  CYC(0x7863, 0x7864); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x7864, 0x7865); H = mem_rd(gb, HL);
-  CYC(0x7865, 0x7866); L = A;
-  CYC(0x7866, 0x7869); interactionSetScript_hook(gb); return; // jp
+  BASE(twinrova_loadScript);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+6); SET_HL(b_+13); // @scriptTable
+  CYC(b_+6, b_+7); twinrova_addDoubleIndexToHl_from_rst(gb, b_+7);
+  CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+8, b_+9); H = mem_rd(gb, HL);
+  CYC(b_+9, b_+10); L = A;
+  CYC(b_+10, b_+13); interactionSetScript_hook(gb); return; // jp
 }
 
 // Gets a position stored in wTmpcfc0_genericCutscene_cfd5/cfd6
 // @param[out] bc Position
 void func_0a_7877_hook(GB *gb) {
-  CYC(0x7877, 0x787a); SET_HL(wTmpcfc0_genericCutscene_cfd5);
-  CYC(0x787a, 0x787b); B = mem_rd(gb, HL);
-  CYC(0x787b, 0x787c); L = alu_inc8(gb, L);
-  CYC(0x787c, 0x787d); C = mem_rd(gb, HL);
-  RET(0x787d); return;
+  BASE(func_0a_7877);
+  CYC(b_+0, b_+3); SET_HL(wTmpcfc0_genericCutscene_cfd5);
+  CYC(b_+3, b_+4); B = mem_rd(gb, HL);
+  CYC(b_+4, b_+5); L = alu_inc8(gb, L);
+  CYC(b_+5, b_+6); C = mem_rd(gb, HL);
+  RET(b_+6); return;
 }

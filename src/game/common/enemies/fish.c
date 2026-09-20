@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0d, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0d, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode1e), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode1e), (from), (to), true)
 
 void fish_state_uninitialized_hook(GB *gb);
 void fish_state_stub_hook(GB *gb);
@@ -58,181 +58,187 @@ static void fish_addAToHl_from_rst(GB *gb, uint16_t return_address) {
 //   var30: Current animation index
 // ==================================================================================================
 void enemyCode1e_hook(GB *gb) {
+  BASE(enemyCode1e);
   uint16_t sp0_ = gb->sp;
-  if (F & FZ) { CYCT(0x5a6c, 0x5a6e); goto normalStatus; } // jr z
-  CYC(0x5a6c, 0x5a6e);
-  CYC(0x5a6e, 0x5a70); alu_sub(gb, 0x03);
-  if (F & FC) { CYCT(0x5a70, 0x5a72); goto stunned; } // jr c
-  CYC(0x5a70, 0x5a72);
-  if (F & FZ) { CYCT(0x5a72, 0x5a75); enemyDie_hook(gb); return; } // jp z
-  CYC(0x5a72, 0x5a75);
-  CYC(0x5a75, 0x5a76); A = alu_dec8(gb, A);
-  if (F & FZ) { RET_TAKEN(0x5a76); return; } // ret z
-  CYC(0x5a76, 0x5a77);
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03);
+  if (F & FC) { CYCT(b_+4, b_+6); goto stunned; } // jr c
+  CYC(b_+4, b_+6);
+  if (F & FZ) { CYCT(b_+6, b_+9); enemyDie_hook(gb); return; } // jp z
+  CYC(b_+6, b_+9);
+  CYC(b_+9, b_+10); A = alu_dec8(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+10); return; } // ret z
+  CYC(b_+10, b_+11);
 
   // ENEMYSTATUS_KNOCKBACK
-  CYC(0x5a77, 0x5a79); E = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x5a79, 0x5a7b); A = 0x50; // SPEED_200
-  CYC(0x5a7b, 0x5a7c); mem_wr(gb, DE, A);
-  CALL_C(0x5a7c, fish_getAdjacentWallsBitsetForKnockback_hook, 0x5bbb, 0x5a7f);
-  CYC(0x5a7f, 0x5a81); E = ENEMY_BASE + OBJ_KNOCKBACK_ANGLE;
-  CALL_C(0x5a81, ecom_applyVelocityGivenAdjacentWalls_b0d_hook, 0x415b, 0x5a84);
-  CYC(0x5a84, 0x5a86); E = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x5a86, 0x5a88); A = 0x1e; // SPEED_c0
-  CYC(0x5a88, 0x5a89); mem_wr(gb, DE, A);
-  RET(0x5a89); return; // ret
+  CYC(b_+11, b_+13); E = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+13, b_+15); A = 0x50; // SPEED_200
+  CYC(b_+15, b_+16); mem_wr(gb, DE, A);
+  CALL_C(b_+16, fish_getAdjacentWallsBitsetForKnockback_hook, SYM(fish_getAdjacentWallsBitsetForKnockback), b_+19);
+  CYC(b_+19, b_+21); E = ENEMY_BASE + OBJ_KNOCKBACK_ANGLE;
+  CALL_C(b_+21, ecom_applyVelocityGivenAdjacentWalls_b0d_hook, SYM(ecom_applyVelocityGivenAdjacentWalls_b0d), b_+24);
+  CYC(b_+24, b_+26); E = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+26, b_+28); A = 0x1e; // SPEED_c0
+  CYC(b_+28, b_+29); mem_wr(gb, DE, A);
+  RET(b_+29); return; // ret
 
 stunned:
-  CYC(0x5a8a, 0x5a8c); E = ENEMY_BASE + OBJ_ZH;
-  CYC(0x5a8c, 0x5a8d); A = mem_rd(gb, DE);
-  CYC(0x5a8d, 0x5a8f); alu_cp(gb, 0x02);
-  if (F & FZ) { RET_TAKEN(0x5a8f); return; } // ret z
-  CYC(0x5a8f, 0x5a90);
-  CYC(0x5a90, 0x5a91); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x5a91); return; } // ret nz
-  CYC(0x5a91, 0x5a92);
-  CYC(0x5a92, 0x5a95); fish_enterWater_hook(gb); return; // jp
+  CYC(b_+30, b_+32); E = ENEMY_BASE + OBJ_ZH;
+  CYC(b_+32, b_+33); A = mem_rd(gb, DE);
+  CYC(b_+33, b_+35); alu_cp(gb, 0x02);
+  if (F & FZ) { RET_TAKEN(b_+35); return; } // ret z
+  CYC(b_+35, b_+36);
+  CYC(b_+36, b_+37); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+37); return; } // ret nz
+  CYC(b_+37, b_+38);
+  CYC(b_+38, b_+41); fish_enterWater_hook(gb); return; // jp
 
 normalStatus:
-  CALL_C(0x5a95, ecom_getSubidAndCpStateTo08_b0d_hook, 0x4426, 0x5a98);
-  if (!(F & FC)) { CYCT(0x5a98, 0x5a9a); goto normalState; } // jr nc
-  CYC(0x5a98, 0x5a9a);
+  CALL_C(b_+41, ecom_getSubidAndCpStateTo08_b0d_hook, SYM(ecom_getSubidAndCpStateTo08_b0d), b_+44);
+  if (!(F & FC)) { CYCT(b_+44, b_+46); goto normalState; } // jr nc
+  CYC(b_+44, b_+46);
   {
-    CYC(0x5a9a, 0x5a9b); push_effect(gb, 0x5a9b);
+    CYC(b_+46, b_+47); push_effect(gb, b_+47);
     uint16_t target = fish_jump_table(gb);
-    if (target == 0x5ab1) { fish_state_uninitialized_hook(gb); return; }
-    if (target == 0x5ac7) { fish_state_stub_hook(gb); return; }
-    if (target == 0x44ac) { ecom_blownByGaleSeedState_b0d_hook(gb); return; }
+    if (target == SYM(fish_state_uninitialized)) { fish_state_uninitialized_hook(gb); return; }
+    if (target == SYM(fish_state_stub)) { fish_state_stub_hook(gb); return; }
+    if (target == SYM(ecom_blownByGaleSeedState_b0d)) { ecom_blownByGaleSeedState_b0d_hook(gb); return; }
     HANDOFF(target);
   }
 
 normalState:
-  CYC(0x5aab, 0x5aac); A = B;
+  CYC(b_+63, b_+64); A = B;
   {
-    CYC(0x5aac, 0x5aad); push_effect(gb, 0x5aad);
+    CYC(b_+64, b_+65); push_effect(gb, b_+65);
     uint16_t target = fish_jump_table(gb);
-    if (target == 0x5ac8) { fish_subid00_hook(gb); return; }
-    if (target == 0x5b3c) { fish_subid01_hook(gb); return; }
+    if (target == SYM(fish_subid00)) { fish_subid00_hook(gb); return; }
+    if (target == SYM(fish_subid01)) { fish_subid01_hook(gb); return; }
     HANDOFF(target);
   }
 }
 
 // 0d:5ab1, bare global; jump-table target from enemyCode1e.
 void fish_state_uninitialized_hook(GB *gb) {
+  BASE(fish_state_uninitialized);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5ab1, 0x5ab3); A = 0x14; // SPEED_80
-  CALL_C(0x5ab3, ecom_setSpeedAndState8_b0d_hook, 0x4364, 0x5ab6);
-  CALL_C(0x5ab6, objectSetVisible83_hook, 0x1e72, 0x5ab9);
-  CYC(0x5ab9, 0x5abb); L = ENEMY_BASE + OBJ_ZH;
-  CYC(0x5abb, 0x5abd); mem_wr(gb, HL, 0x02);
-  CYC(0x5abd, 0x5abf); L = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x5abf, 0x5ac1); mem_wr(gb, HL, 0x08); // ANGLE_RIGHT
-  CALL_C(0x5ac1, fish_setRandomCounter1_hook, 0x5ba9, 0x5ac4);
-  CYC(0x5ac4, 0x5ac7); fish_updateAnimationFromAngle_hook(gb); return; // jp
+  CYC(b_+0, b_+2); A = 0x14; // SPEED_80
+  CALL_C(b_+2, ecom_setSpeedAndState8_b0d_hook, SYM(ecom_setSpeedAndState8_b0d), b_+5);
+  CALL_C(b_+5, objectSetVisible83_hook, SYM(objectSetVisible83), b_+8);
+  CYC(b_+8, b_+10); L = ENEMY_BASE + OBJ_ZH;
+  CYC(b_+10, b_+12); mem_wr(gb, HL, 0x02);
+  CYC(b_+12, b_+14); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+14, b_+16); mem_wr(gb, HL, 0x08); // ANGLE_RIGHT
+  CALL_C(b_+16, fish_setRandomCounter1_hook, SYM(fish_setRandomCounter1), b_+19);
+  CYC(b_+19, SYM(fish_state_stub)); fish_updateAnimationFromAngle_hook(gb); return; // jp
 }
 
 // 0d:5ac7, bare global; jump-table target from enemyCode1e.
 void fish_state_stub_hook(GB *gb) {
-  RET(0x5ac7); return; // ret
+  BASE(fish_state_stub);
+  RET(b_+0); return; // ret
 }
 
 // 0d:5ac8, bare global; jump-table target from enemyCode1e@normalState. Internal @state8/
 // @leapOutOfWater/@state9 are @-local (no separate registration), handled via goto.
 void fish_subid00_hook(GB *gb) {
+  BASE(fish_subid00);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5ac8, 0x5ac9); A = mem_rd(gb, DE);
-  CYC(0x5ac9, 0x5acb); alu_sub(gb, 0x08);
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);
+  CYC(b_+1, b_+3); alu_sub(gb, 0x08);
   {
-    CYC(0x5acb, 0x5acc); push_effect(gb, 0x5acc);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = fish_jump_table(gb);
-    if (target == 0x5ad0) goto state8;
-    if (target == 0x5b03) goto state9;
+    if (target == b_+8) goto state8;
+    if (target == b_+59) goto state9;
     HANDOFF(target);
   }
 
 state8:
-  CYC(0x5ad0, 0x5ad3); A = mem_rd(gb, wScentSeedActive);
-  CYC(0x5ad3, 0x5ad4); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x5ad4, 0x5ad6); goto afterScentCheck; } // jr nz
-  CYC(0x5ad4, 0x5ad6);
-  CALL_C(0x5ad6, ecom_decCounter1_b0d_hook, 0x439a, 0x5ad9);
-  if (F & FZ) { CYCT(0x5ad9, 0x5adb); goto leapOutOfWater; } // jr z
-  CYC(0x5ad9, 0x5adb);
+  CYC(b_+8, b_+11); A = mem_rd(gb, wScentSeedActive);
+  CYC(b_+11, b_+12); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+12, b_+14); goto afterScentCheck; } // jr nz
+  CYC(b_+12, b_+14);
+  CALL_C(b_+14, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+17);
+  if (F & FZ) { CYCT(b_+17, b_+19); goto leapOutOfWater; } // jr z
+  CYC(b_+17, b_+19);
 
 afterScentCheck:
-  CALL_C(0x5adb, fish_updatePosition_hook, 0x5b79, 0x5ade);
-  CYC(0x5ade, 0x5ae1); fish_checkReverseAngle_hook(gb); return; // jp
+  CALL_C(b_+19, fish_updatePosition_hook, SYM(fish_updatePosition), b_+22);
+  CYC(b_+22, b_+25); fish_checkReverseAngle_hook(gb); return; // jp
 
 leapOutOfWater:
-  CYC(0x5ae1, 0x5ae2); L = E;
-  CYC(0x5ae2, 0x5ae3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
-  CYC(0x5ae3, 0x5ae5); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
-  CYC(0x5ae5, 0x5ae7); mem_wr(gb, HL, 0x14); // ENEMYCOLLISION_SWITCHHOOK_DAMAGE_ENEMY
-  CYC(0x5ae7, 0x5ae9); L = ENEMY_BASE + OBJ_ZH;
-  CYC(0x5ae9, 0x5aeb); mem_wr(gb, HL, 0x00);
-  CYC(0x5aeb, 0x5aed); L = ENEMY_BASE + OBJ_SPEED_Z;
-  CYC(0x5aed, 0x5aef); A = 0x80; // <(-$180)
-  CYC(0x5aef, 0x5af0); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi
-  CYC(0x5af0, 0x5af2); mem_wr(gb, HL, 0xfe); // >(-$180)
-  CYC(0x5af2, 0x5af4); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x5af4, 0x5af6); mem_wr(gb, HL, 0x1e); // SPEED_c0
-  CYC(0x5af6, 0x5af8); B = 0x03; // INTERAC_SPLASH
-  CALL_C(0x5af8, objectCreateInteractionWithSubid00_hook, 0x24c3, 0x5afb);
-  CALL_C(0x5afb, objectSetVisiblec1_hook, 0x1e3c, 0x5afe);
-  CYC(0x5afe, 0x5b00); B = 0x00;
-  CYC(0x5b00, 0x5b03); fish_setAnimation_hook(gb); return; // jp
+  CYC(b_+25, b_+26); L = E;
+  CYC(b_+26, b_+27); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
+  CYC(b_+27, b_+29); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
+  CYC(b_+29, b_+31); mem_wr(gb, HL, 0x14); // ENEMYCOLLISION_SWITCHHOOK_DAMAGE_ENEMY
+  CYC(b_+31, b_+33); L = ENEMY_BASE + OBJ_ZH;
+  CYC(b_+33, b_+35); mem_wr(gb, HL, 0x00);
+  CYC(b_+35, b_+37); L = ENEMY_BASE + OBJ_SPEED_Z;
+  CYC(b_+37, b_+39); A = 0x80; // <(-$180)
+  CYC(b_+39, b_+40); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi
+  CYC(b_+40, b_+42); mem_wr(gb, HL, 0xfe); // >(-$180)
+  CYC(b_+42, b_+44); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+44, b_+46); mem_wr(gb, HL, 0x1e); // SPEED_c0
+  CYC(b_+46, b_+48); B = 0x03; // INTERAC_SPLASH
+  CALL_C(b_+48, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+51);
+  CALL_C(b_+51, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+54);
+  CYC(b_+54, b_+56); B = 0x00;
+  CYC(b_+56, b_+59); fish_setAnimation_hook(gb); return; // jp
 
 state9:
-  CYC(0x5b03, 0x5b05); C = 0x10;
-  CALL_C(0x5b05, objectUpdateSpeedZ_paramC_hook, 0x1f46, 0x5b08);
-  if (F & FZ) { CYCT(0x5b08, 0x5b0a); fish_enterWater_hook(gb); return; } // jr z
-  CYC(0x5b08, 0x5b0a);
-  CYC(0x5b0a, 0x5b0c); L = ENEMY_BASE + OBJ_SPEED_Z;
-  CYC(0x5b0c, 0x5b0d); A = mem_rd(gb, HL);
-  CYC(0x5b0d, 0x5b0e); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x5b0e, 0x5b10); goto state9UpdatePosition; } // jr nz
-  CYC(0x5b0e, 0x5b10);
-  CYC(0x5b10, 0x5b11); L = alu_inc8(gb, L);
-  CYC(0x5b11, 0x5b12); A = mem_rd(gb, HL);
-  CYC(0x5b12, 0x5b13); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(0x5b13, 0x5b15); goto state9UpdatePosition; } // jr nz
-  CYC(0x5b13, 0x5b15);
-  CYC(0x5b15, 0x5b17); B = 0x01;
-  CALL_C(0x5b17, fish_setAnimation_hook, 0x5b62, 0x5b1a);
+  CYC(b_+59, b_+61); C = 0x10;
+  CALL_C(b_+61, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+64);
+  if (F & FZ) { CYCT(b_+64, b_+66); fish_enterWater_hook(gb); return; } // jr z
+  CYC(b_+64, b_+66);
+  CYC(b_+66, b_+68); L = ENEMY_BASE + OBJ_SPEED_Z;
+  CYC(b_+68, b_+69); A = mem_rd(gb, HL);
+  CYC(b_+69, b_+70); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+70, b_+72); goto state9UpdatePosition; } // jr nz
+  CYC(b_+70, b_+72);
+  CYC(b_+72, b_+73); L = alu_inc8(gb, L);
+  CYC(b_+73, b_+74); A = mem_rd(gb, HL);
+  CYC(b_+74, b_+75); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+75, b_+77); goto state9UpdatePosition; } // jr nz
+  CYC(b_+75, b_+77);
+  CYC(b_+77, b_+79); B = 0x01;
+  CALL_C(b_+79, fish_setAnimation_hook, SYM(fish_setAnimation), b_+82);
 
 state9UpdatePosition:
-  CYC(0x5b1a, 0x5b1d); fish_updatePosition_hook(gb); return; // jp
+  CYC(b_+82, SYM(fish_enterWater)); fish_updatePosition_hook(gb); return; // jp
 }
 
 // 0d:5b1d, bare global; called from enemyCode1e and fish_subid00.
 void fish_enterWater_hook(GB *gb) {
+  BASE(fish_enterWater);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5b1d, 0x5b1e); H = D;
-  CYC(0x5b1e, 0x5b20); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
-  CYC(0x5b20, 0x5b22); mem_wr(gb, HL, 0x04); // ENEMYCOLLISION_PODOBOO
-  CYC(0x5b22, 0x5b24); L = ENEMY_BASE + OBJ_ZH;
-  CYC(0x5b24, 0x5b26); mem_wr(gb, HL, 0x02);
-  CYC(0x5b26, 0x5b28); L = ENEMY_BASE + OBJ_STATE;
-  CYC(0x5b28, 0x5b2a); mem_wr(gb, HL, 0x08);
-  CYC(0x5b2a, 0x5b2c); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(0x5b2c, 0x5b2e); mem_wr(gb, HL, 0x14); // SPEED_80
-  CALL_C(0x5b2e, fish_setRandomCounter1_hook, 0x5ba9, 0x5b31);
-  CYC(0x5b31, 0x5b33); B = 0x03; // INTERAC_SPLASH
-  CALL_C(0x5b33, objectCreateInteractionWithSubid00_hook, 0x24c3, 0x5b36);
-  CALL_C(0x5b36, objectSetVisible83_hook, 0x1e72, 0x5b39);
-  CYC(0x5b39, 0x5b3c); fish_updateAnimationFromAngle_hook(gb); return; // jp
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
+  CYC(b_+3, b_+5); mem_wr(gb, HL, 0x04); // ENEMYCOLLISION_PODOBOO
+  CYC(b_+5, b_+7); L = ENEMY_BASE + OBJ_ZH;
+  CYC(b_+7, b_+9); mem_wr(gb, HL, 0x02);
+  CYC(b_+9, b_+11); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+11, b_+13); mem_wr(gb, HL, 0x08);
+  CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+15, b_+17); mem_wr(gb, HL, 0x14); // SPEED_80
+  CALL_C(b_+17, fish_setRandomCounter1_hook, SYM(fish_setRandomCounter1), b_+20);
+  CYC(b_+20, b_+22); B = 0x03; // INTERAC_SPLASH
+  CALL_C(b_+22, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+25);
+  CALL_C(b_+25, objectSetVisible83_hook, SYM(objectSetVisible83), b_+28);
+  CYC(b_+28, SYM(fish_subid01)); fish_updateAnimationFromAngle_hook(gb); return; // jp
 }
 
 // 0d:5b3c, bare global; jump-table target from enemyCode1e@normalState. Internal @state8
 // is @-local (no separate registration).
 void fish_subid01_hook(GB *gb) {
+  BASE(fish_subid01);
   uint16_t sp0_ = gb->sp;
-  CYC(0x5b3c, 0x5b3d); A = mem_rd(gb, DE);
-  CYC(0x5b3d, 0x5b3f); alu_sub(gb, 0x08);
+  CYC(b_+0, b_+1); A = mem_rd(gb, DE);
+  CYC(b_+1, b_+3); alu_sub(gb, 0x08);
   {
-    CYC(0x5b3f, 0x5b40); push_effect(gb, 0x5b40);
+    CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = fish_jump_table(gb);
-    if (target == 0x5b42) { RET(0x5b42); return; }
+    if (target == b_+6) { RET(b_+6); return; }
     HANDOFF(target);
   }
 }
@@ -241,106 +247,111 @@ void fish_subid01_hook(GB *gb) {
 // fish_updateAnimationFromAngle.
 // @param cflag c if we were able to move
 void fish_checkReverseAngle_hook(GB *gb) {
+  BASE(fish_checkReverseAngle);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  if (F & FC) { RET_TAKEN(0x5b43); return; } // ret c
-  CYC(0x5b43, 0x5b44);
-  CYC(0x5b44, 0x5b46); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x5b46, 0x5b47); A = mem_rd(gb, DE);
-  CYC(0x5b47, 0x5b49); alu_xor(gb, 0x10);
-  CYC(0x5b49, 0x5b4a); mem_wr(gb, DE, A);
+  if (F & FC) { RET_TAKEN(b_+0); return; } // ret c
+  CYC(b_+0, b_+1);
+  CYC(b_+1, b_+3); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+3, b_+4); A = mem_rd(gb, DE);
+  CYC(b_+4, b_+6); alu_xor(gb, 0x10);
+  CYC(b_+6, SYM(fish_updateAnimationFromAngle)); mem_wr(gb, DE, A);
   fish_updateAnimationFromAngle_hook(gb); return; // fallthrough
 }
 
 // 0d:5b4a, bare global; called from fish_enterWater and fish_state_uninitialized, also
 // falls into from fish_checkReverseAngle.
 void fish_updateAnimationFromAngle_hook(GB *gb) {
+  BASE(fish_updateAnimationFromAngle);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5b4a, 0x5b4c); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x5b4c, 0x5b4d); A = mem_rd(gb, DE);
-  CYC(0x5b4d, 0x5b4f); A = alu_swap(gb, A);
-  CYC(0x5b4f, 0x5b50); alu_rlca(gb);
-  CYC(0x5b50, 0x5b53); SET_HL(0x5b5e); // @animations
-  CYC(0x5b53, 0x5b54); fish_addAToHl_from_rst(gb, 0x5b54);
-  CYC(0x5b54, 0x5b55); A = mem_rd(gb, HL);
-  CYC(0x5b55, 0x5b56); H = D;
-  CYC(0x5b56, 0x5b58); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x5b58, 0x5b59); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FZ) { RET_TAKEN(0x5b59); return; } // ret z
-  CYC(0x5b59, 0x5b5a);
-  CYC(0x5b5a, 0x5b5b); mem_wr(gb, HL, A);
-  CYC(0x5b5b, 0x5b5e); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); A = alu_swap(gb, A);
+  CYC(b_+5, b_+6); alu_rlca(gb);
+  CYC(b_+6, b_+9); SET_HL(b_+20); // @animations
+  CYC(b_+9, b_+10); fish_addAToHl_from_rst(gb, b_+10);
+  CYC(b_+10, b_+11); A = mem_rd(gb, HL);
+  CYC(b_+11, b_+12); H = D;
+  CYC(b_+12, b_+14); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+14, b_+15); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { RET_TAKEN(b_+15); return; } // ret z
+  CYC(b_+15, b_+16);
+  CYC(b_+16, b_+17); mem_wr(gb, HL, A);
+  CYC(b_+17, b_+20); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0d:5b62, bare global; called from fish_subid00. Sets animation (3 or 5 is added to value
 // passed if we're moving right or left).
 // @param b Value to add to animation index
 void fish_setAnimation_hook(GB *gb) {
+  BASE(fish_setAnimation);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5b62, 0x5b64); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x5b64, 0x5b65); A = mem_rd(gb, DE);
-  CYC(0x5b65, 0x5b67); A = alu_swap(gb, A);
-  CYC(0x5b67, 0x5b69); alu_and(gb, 0x01);
-  CYC(0x5b69, 0x5b6b); A = 0x03;
-  if (!(F & FZ)) { CYCT(0x5b6b, 0x5b6d); goto addOffset; } // jr nz
-  CYC(0x5b6b, 0x5b6d);
-  CYC(0x5b6d, 0x5b6f); A = 0x05;
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); A = alu_swap(gb, A);
+  CYC(b_+5, b_+7); alu_and(gb, 0x01);
+  CYC(b_+7, b_+9); A = 0x03;
+  if (!(F & FZ)) { CYCT(b_+9, b_+11); goto addOffset; } // jr nz
+  CYC(b_+9, b_+11);
+  CYC(b_+11, b_+13); A = 0x05;
 
 addOffset:
-  CYC(0x5b6f, 0x5b70); alu_add(gb, B);
-  CYC(0x5b70, 0x5b71); H = D;
-  CYC(0x5b71, 0x5b73); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x5b73, 0x5b74); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FZ) { RET_TAKEN(0x5b74); return; } // ret z
-  CYC(0x5b74, 0x5b75);
-  CYC(0x5b75, 0x5b76); mem_wr(gb, HL, A);
-  CYC(0x5b76, 0x5b79); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+13, b_+14); alu_add(gb, B);
+  CYC(b_+14, b_+15); H = D;
+  CYC(b_+15, b_+17); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+17, b_+18); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { RET_TAKEN(b_+18); return; } // ret z
+  CYC(b_+18, b_+19);
+  CYC(b_+19, b_+20); mem_wr(gb, HL, A);
+  CYC(b_+20, SYM(fish_updatePosition)); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0d:5b79, bare global; called from fish_subid00.
 // @param[out] cflag c if we were able to move (tile in front of us is traversable)
 void fish_updatePosition_hook(GB *gb) {
+  BASE(fish_updatePosition);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5b79, 0x5b7b); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(0x5b7b, 0x5b7c); A = mem_rd(gb, DE);
-  CYC(0x5b7c, 0x5b7d); alu_rrca(gb);
-  CYC(0x5b7d, 0x5b7e); alu_rrca(gb);
-  CYC(0x5b7e, 0x5b81); SET_HL(0x5ba1); // @directionOffsets
-  CYC(0x5b81, 0x5b82); fish_addAToHl_from_rst(gb, 0x5b82);
-  CYC(0x5b82, 0x5b84); E = ENEMY_BASE + OBJ_YH;
-  CYC(0x5b84, 0x5b85); A = mem_rd(gb, DE);
-  CYC(0x5b85, 0x5b86); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x5b86, 0x5b88); alu_and(gb, 0xf0);
-  CYC(0x5b88, 0x5b89); C = A;
-  CYC(0x5b89, 0x5b8a); SET_HL(HL + 1); // inc hl
-  CYC(0x5b8a, 0x5b8c); E = ENEMY_BASE + OBJ_XH;
-  CYC(0x5b8c, 0x5b8d); A = mem_rd(gb, DE);
-  CYC(0x5b8d, 0x5b8e); alu_add(gb, mem_rd(gb, HL));
-  CYC(0x5b8e, 0x5b90); alu_and(gb, 0xf0);
-  CYC(0x5b90, 0x5b92); A = alu_swap(gb, A);
-  CYC(0x5b92, 0x5b93); alu_or(gb, C);
-  CYC(0x5b93, 0x5b94); C = A;
-  CYC(0x5b94, 0x5b96); B = 0xcf; // >wRoomLayout
-  CYC(0x5b96, 0x5b97); A = mem_rd(gb, BC);
-  CYC(0x5b97, 0x5b99); alu_sub(gb, 0xf9); // TILEINDEX_PUDDLE
-  CYC(0x5b99, 0x5b9b); alu_cp(gb, 0x05); // TILEINDEX_FD-TILEINDEX_PUDDLE+1
-  if (!(F & FC)) { RET_TAKEN(0x5b9b); return; } // ret nc
-  CYC(0x5b9b, 0x5b9c);
-  CALL_C(0x5b9c, objectApplySpeed_hook, 0x201d, 0x5b9f);
-  CYC(0x5b9f, 0x5ba0); alu_scf(gb);
-  RET(0x5ba0); return; // ret
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_rrca(gb);
+  CYC(b_+4, b_+5); alu_rrca(gb);
+  CYC(b_+5, b_+8); SET_HL(b_+40); // @directionOffsets
+  CYC(b_+8, b_+9); fish_addAToHl_from_rst(gb, b_+9);
+  CYC(b_+9, b_+11); E = ENEMY_BASE + OBJ_YH;
+  CYC(b_+11, b_+12); A = mem_rd(gb, DE);
+  CYC(b_+12, b_+13); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+13, b_+15); alu_and(gb, 0xf0);
+  CYC(b_+15, b_+16); C = A;
+  CYC(b_+16, b_+17); SET_HL(HL + 1); // inc hl
+  CYC(b_+17, b_+19); E = ENEMY_BASE + OBJ_XH;
+  CYC(b_+19, b_+20); A = mem_rd(gb, DE);
+  CYC(b_+20, b_+21); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+21, b_+23); alu_and(gb, 0xf0);
+  CYC(b_+23, b_+25); A = alu_swap(gb, A);
+  CYC(b_+25, b_+26); alu_or(gb, C);
+  CYC(b_+26, b_+27); C = A;
+  CYC(b_+27, b_+29); B = 0xcf; // >wRoomLayout
+  CYC(b_+29, b_+30); A = mem_rd(gb, BC);
+  CYC(b_+30, b_+32); alu_sub(gb, 0xf9); // TILEINDEX_PUDDLE
+  CYC(b_+32, b_+34); alu_cp(gb, 0x05); // TILEINDEX_FD-TILEINDEX_PUDDLE+1
+  if (!(F & FC)) { RET_TAKEN(b_+34); return; } // ret nc
+  CYC(b_+34, b_+35);
+  CALL_C(b_+35, objectApplySpeed_hook, SYM(objectApplySpeed), b_+38);
+  CYC(b_+38, b_+39); alu_scf(gb);
+  RET(b_+39); return; // ret
 }
 
 // 0d:5ba9, bare global; called from fish_enterWater and fish_state_uninitialized.
 void fish_setRandomCounter1_hook(GB *gb) {
+  BASE(fish_setRandomCounter1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(0x5ba9, getRandomNumber_noPreserveVars_hook, 0x0453, 0x5bac);
-  CYC(0x5bac, 0x5bae); alu_and(gb, 0x03);
-  CYC(0x5bae, 0x5bb1); SET_HL(0x5bb7); // @counter1Vals
-  CYC(0x5bb1, 0x5bb2); fish_addAToHl_from_rst(gb, 0x5bb2);
-  CYC(0x5bb2, 0x5bb4); E = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x5bb4, 0x5bb5); A = mem_rd(gb, HL);
-  CYC(0x5bb5, 0x5bb6); mem_wr(gb, DE, A);
-  RET(0x5bb6); return; // ret
+  CALL_C(b_+0, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+3);
+  CYC(b_+3, b_+5); alu_and(gb, 0x03);
+  CYC(b_+5, b_+8); SET_HL(b_+14); // @counter1Vals
+  CYC(b_+8, b_+9); fish_addAToHl_from_rst(gb, b_+9);
+  CYC(b_+9, b_+11); E = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+11, b_+12); A = mem_rd(gb, HL);
+  CYC(b_+12, b_+13); mem_wr(gb, DE, A);
+  RET(b_+13); return; // ret
 }
 
 // 0d:5bbb, bare global; called from enemyCode1e. Gets the "adjacent walls bitset" for the
@@ -348,45 +359,46 @@ void fish_setRandomCounter1_hook(GB *gb) {
 // waterTektite_getAdjacentWallsBitsetGivenAngle.
 // @param[out] hFF8B Bitset of adjacent walls
 void fish_getAdjacentWallsBitsetForKnockback_hook(GB *gb) {
+  BASE(fish_getAdjacentWallsBitsetForKnockback);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x5bbb, 0x5bbd); E = ENEMY_BASE + OBJ_KNOCKBACK_ANGLE;
-  CYC(0x5bbd, 0x5bbe); A = mem_rd(gb, DE);
-  CALL_C(0x5bbe, ecom_getAdjacentWallTableOffset_b0d_hook, 0x4253, 0x5bc1);
-  CYC(0x5bc1, 0x5bc2); H = D;
-  CYC(0x5bc2, 0x5bc4); L = ENEMY_BASE + OBJ_YH;
-  CYC(0x5bc4, 0x5bc5); B = mem_rd(gb, HL);
-  CYC(0x5bc5, 0x5bc7); L = ENEMY_BASE + OBJ_XH;
-  CYC(0x5bc7, 0x5bc8); C = mem_rd(gb, HL);
-  CYC(0x5bc8, 0x5bcb); SET_HL(0x425e); // ecom_sideviewAdjacentWallOffsetTable
-  CYC(0x5bcb, 0x5bcc); fish_addAToHl_from_rst(gb, 0x5bcc);
-  CYC(0x5bcc, 0x5bce); A = 0x10;
-  CYC(0x5bce, 0x5bd0); H8(hFF8B) = A;
-  CYC(0x5bd0, 0x5bd2); D = 0xcf; // >wRoomLayout
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_KNOCKBACK_ANGLE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CALL_C(b_+3, ecom_getAdjacentWallTableOffset_b0d_hook, SYM(ecom_getAdjacentWallTableOffset_b0d), b_+6);
+  CYC(b_+6, b_+7); H = D;
+  CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_YH;
+  CYC(b_+9, b_+10); B = mem_rd(gb, HL);
+  CYC(b_+10, b_+12); L = ENEMY_BASE + OBJ_XH;
+  CYC(b_+12, b_+13); C = mem_rd(gb, HL);
+  CYC(b_+13, b_+16); SET_HL(SYM(ecom_sideviewAdjacentWallOffsetTable_b0d)); // ecom_sideviewAdjacentWallOffsetTable
+  CYC(b_+16, b_+17); fish_addAToHl_from_rst(gb, b_+17);
+  CYC(b_+17, b_+19); A = 0x10;
+  CYC(b_+19, b_+21); H8(hFF8B) = A;
+  CYC(b_+21, b_+23); D = 0xcf; // >wRoomLayout
 
 scanWall:
-  CYC(0x5bd2, 0x5bd3); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi
-  CYC(0x5bd3, 0x5bd4); alu_add(gb, B);
-  CYC(0x5bd4, 0x5bd5); B = A;
-  CYC(0x5bd5, 0x5bd7); alu_and(gb, 0xf0);
-  CYC(0x5bd7, 0x5bd8); E = A;
-  CYC(0x5bd8, 0x5bd9); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi
-  CYC(0x5bd9, 0x5bda); alu_add(gb, C);
-  CYC(0x5bda, 0x5bdb); C = A;
-  CYC(0x5bdb, 0x5bdd); alu_and(gb, 0xf0);
-  CYC(0x5bdd, 0x5bdf); A = alu_swap(gb, A);
-  CYC(0x5bdf, 0x5be0); alu_or(gb, E);
-  CYC(0x5be0, 0x5be1); E = A;
-  CYC(0x5be1, 0x5be2); A = mem_rd(gb, DE);
-  CYC(0x5be2, 0x5be4); alu_sub(gb, 0xf9); // TILEINDEX_PUDDLE
-  CYC(0x5be4, 0x5be6); alu_cp(gb, 0x05); // TILEINDEX_FD-TILEINDEX_PUDDLE+1
-  CYC(0x5be6, 0x5be8); A = H8(hFF8B);
-  CYC(0x5be8, 0x5be9); alu_rla(gb);
-  CYC(0x5be9, 0x5beb); H8(hFF8B) = A;
-  if (!(F & FC)) { CYCT(0x5beb, 0x5bed); goto scanWall; } // jr nc
-  CYC(0x5beb, 0x5bed);
-  CYC(0x5bed, 0x5bef); alu_xor(gb, 0x0f);
-  CYC(0x5bef, 0x5bf1); H8(hFF8B) = A;
-  CYC(0x5bf1, 0x5bf3); A = H8(hActiveObject);
-  CYC(0x5bf3, 0x5bf4); D = A;
-  RET(0x5bf4); return; // ret
+  CYC(b_+23, b_+24); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi
+  CYC(b_+24, b_+25); alu_add(gb, B);
+  CYC(b_+25, b_+26); B = A;
+  CYC(b_+26, b_+28); alu_and(gb, 0xf0);
+  CYC(b_+28, b_+29); E = A;
+  CYC(b_+29, b_+30); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi
+  CYC(b_+30, b_+31); alu_add(gb, C);
+  CYC(b_+31, b_+32); C = A;
+  CYC(b_+32, b_+34); alu_and(gb, 0xf0);
+  CYC(b_+34, b_+36); A = alu_swap(gb, A);
+  CYC(b_+36, b_+37); alu_or(gb, E);
+  CYC(b_+37, b_+38); E = A;
+  CYC(b_+38, b_+39); A = mem_rd(gb, DE);
+  CYC(b_+39, b_+41); alu_sub(gb, 0xf9); // TILEINDEX_PUDDLE
+  CYC(b_+41, b_+43); alu_cp(gb, 0x05); // TILEINDEX_FD-TILEINDEX_PUDDLE+1
+  CYC(b_+43, b_+45); A = H8(hFF8B);
+  CYC(b_+45, b_+46); alu_rla(gb);
+  CYC(b_+46, b_+48); H8(hFF8B) = A;
+  if (!(F & FC)) { CYCT(b_+48, b_+50); goto scanWall; } // jr nc
+  CYC(b_+48, b_+50);
+  CYC(b_+50, b_+52); alu_xor(gb, 0x0f);
+  CYC(b_+52, b_+54); H8(hFF8B) = A;
+  CYC(b_+54, b_+56); A = H8(hActiveObject);
+  CYC(b_+56, b_+57); D = A;
+  RET(b_+57); return; // ret
 }

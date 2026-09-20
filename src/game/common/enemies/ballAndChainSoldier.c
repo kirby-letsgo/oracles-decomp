@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0e, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0e, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode4b), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode4b), (from), (to), true)
 
 void ballAndChain_state_uninitialized_hook(GB *gb);
 void ballAndChain_state_switchHook_hook(GB *gb);
@@ -47,185 +47,195 @@ static uint16_t ballAndChain_jump_table(GB *gb) {
 //   var31: State to return to after switch hook is used on enemy
 // ==================================================================================================
 void enemyCode4b_hook(GB *gb) {
+  BASE(enemyCode4b);
   uint16_t sp0_ = gb->sp;
-  if (F & FZ) { CYCT(0x5ff4, 0x5ff6); goto normalStatus; } // jr z
-  CYC(0x5ff4, 0x5ff6);
-  CYC(0x5ff6, 0x5ff8); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(0x5ff8); return; } // ret c
-  CYC(0x5ff8, 0x5ff9);
-  if (!(F & FZ)) { CYCT(0x5ff9, 0x5ffb); goto normalStatus; } // jr nz
-  CYC(0x5ff9, 0x5ffb);
-  CYC(0x5ffb, 0x5ffe); enemyDie_hook(gb); return; // jp
+  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+4); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+4); return; } // ret c
+  CYC(b_+4, b_+5);
+  if (!(F & FZ)) { CYCT(b_+5, b_+7); goto normalStatus; } // jr nz
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+10); enemyDie_hook(gb); return; // jp
 
 normalStatus:
-  CALL_C(0x5ffe, ecom_checkHazards_b0e_hook, 0x4051, 0x6001);
-  CYC(0x6001, 0x6003); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6003, 0x6004); A = mem_rd(gb, DE);
+  CALL_C(b_+10, ecom_checkHazards_b0e_hook, SYM(ecom_checkHazards_b0e), b_+13);
+  CYC(b_+13, b_+15); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+15, b_+16); A = mem_rd(gb, DE);
   {
-    CYC(0x6004, 0x6005); push_effect(gb, 0x6005);
+    CYC(b_+16, b_+17); push_effect(gb, b_+17);
     uint16_t target = ballAndChain_jump_table(gb);
-    if (target == 0x601b) { ballAndChain_state_uninitialized_hook(gb); return; }
-    if (target == 0x603c) { ballAndChain_state_stub_hook(gb); return; }
-    if (target == 0x6029) { ballAndChain_state_switchHook_hook(gb); return; }
-    if (target == 0x603d) { ballAndChain_state8_hook(gb); return; }
-    if (target == 0x605f) { ballAndChain_state9_hook(gb); return; }
-    if (target == 0x606e) { ballAndChain_stateA_hook(gb); return; }
+    if (target == SYM(ballAndChain_state_uninitialized)) { ballAndChain_state_uninitialized_hook(gb); return; }
+    if (target == SYM(ballAndChain_state_stub)) { ballAndChain_state_stub_hook(gb); return; }
+    if (target == SYM(ballAndChain_state_switchHook)) { ballAndChain_state_switchHook_hook(gb); return; }
+    if (target == SYM(ballAndChain_state8)) { ballAndChain_state8_hook(gb); return; }
+    if (target == SYM(ballAndChain_state9)) { ballAndChain_state9_hook(gb); return; }
+    if (target == SYM(ballAndChain_stateA)) { ballAndChain_stateA_hook(gb); return; }
     HANDOFF(target);
   }
 }
 
 // 0e:601b, bare global; jump-table target from enemyCode4b.
 void ballAndChain_state_uninitialized_hook(GB *gb) {
+  BASE(ballAndChain_state_uninitialized);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x601b, ballAndChain_spawnSpikedBall_hook, 0x6095, 0x601e);
-  if (!(F & FZ)) { RET_TAKEN(0x601e); return; } // ret nz
-  CYC(0x601e, 0x601f);
-  CYC(0x601f, 0x6021); A = 0x0f; // SPEED_60
-  CALL_C(0x6021, ecom_setSpeedAndState8AndVisible_b0e_hook, 0x435e, 0x6024);
-  CYC(0x6024, 0x6026); L = ENEMY_BASE + 0x31; // Enemy.var31
-  CYC(0x6026, 0x6028); mem_wr(gb, HL, 0x08);
-  RET(0x6028); return; // ret
+  CALL_C(b_+0, ballAndChain_spawnSpikedBall_hook, SYM(ballAndChain_spawnSpikedBall), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; } // ret nz
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+6); A = 0x0f; // SPEED_60
+  CALL_C(b_+6, ecom_setSpeedAndState8AndVisible_b0e_hook, SYM(ecom_setSpeedAndState8AndVisible_b0e), b_+9);
+  CYC(b_+9, b_+11); L = ENEMY_BASE + 0x31; // Enemy.var31
+  CYC(b_+11, b_+13); mem_wr(gb, HL, 0x08);
+  RET(b_+13); return; // ret
 }
 
 // 0e:6029, bare global; jump-table target from enemyCode4b.
 void ballAndChain_state_switchHook_hook(GB *gb) {
+  BASE(ballAndChain_state_switchHook);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6029, 0x602a); E = alu_inc8(gb, E);
-  CYC(0x602a, 0x602b); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+1); E = alu_inc8(gb, E);
+  CYC(b_+1, b_+2); A = mem_rd(gb, DE);
   {
-    CYC(0x602b, 0x602c); push_effect(gb, 0x602c);
+    CYC(b_+2, b_+3); push_effect(gb, b_+3);
     uint16_t target = ballAndChain_jump_table(gb);
-    if (target == 0x4005) { ecom_incSubstate_b0e_hook(gb); return; }
-    if (target == 0x6034) { RET(0x6034); return; } // ret (substate1/substate2)
-    if (target == 0x6035) goto substate3;
+    if (target == SYM(ecom_incSubstate_b0e)) { ecom_incSubstate_b0e_hook(gb); return; }
+    if (target == b_+11) { RET(b_+11); return; } // ret (substate1/substate2)
+    if (target == b_+12) goto substate3;
     HANDOFF(target);
   }
 
 substate3:
-  CYC(0x6035, 0x6037); E = ENEMY_BASE + 0x31; // Enemy.var31
-  CYC(0x6037, 0x6038); A = mem_rd(gb, DE);
-  CYC(0x6038, 0x6039); B = A;
-  CYC(0x6039, 0x603c); ecom_fallToGroundAndSetState_b0e_hook(gb); return; // jp
+  CYC(b_+12, b_+14); E = ENEMY_BASE + 0x31; // Enemy.var31
+  CYC(b_+14, b_+15); A = mem_rd(gb, DE);
+  CYC(b_+15, b_+16); B = A;
+  CYC(b_+16, SYM(ballAndChain_state_stub)); ecom_fallToGroundAndSetState_b0e_hook(gb); return; // jp
 }
 
 // 0e:603c, bare global; jump-table target from enemyCode4b.
 void ballAndChain_state_stub_hook(GB *gb) {
-  RET(0x603c); return; // ret
+  BASE(ballAndChain_state_stub);
+  RET(b_+0); return; // ret
 }
 
 // 0e:603d, bare global; jump-table target from enemyCode4b. Waiting for Link to be close
 // enough to attack.
 void ballAndChain_state8_hook(GB *gb) {
+  BASE(ballAndChain_state8);
   uint16_t sp0_ = gb->sp;
-  CYC(0x603d, 0x603f); C = 0x38;
-  CALL_C(0x603f, objectCheckLinkWithinDistance_hook, 0x1fa2, 0x6042);
-  if (!(F & FC)) { CYCT(0x6042, 0x6044); goto moveTowardLink; } // jr nc
-  CYC(0x6042, 0x6044);
-  CALL_C(0x6044, ecom_incState_b0e_hook, 0x4000, 0x6047);
-  CALL_C(0x6047, ballAndChain_setDefaultState_hook, 0x60b6, 0x604a);
-  CYC(0x604a, 0x604c); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x604c, 0x604e); mem_wr(gb, HL, 90);
-  CYC(0x604e, 0x6050); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x6050, 0x6051); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(0x6051, 0x6053); A = 0x01;
-  CYC(0x6053, 0x6056); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+0, b_+2); C = 0x38;
+  CALL_C(b_+2, objectCheckLinkWithinDistance_hook, SYM(objectCheckLinkWithinDistance), b_+5);
+  if (!(F & FC)) { CYCT(b_+5, b_+7); goto moveTowardLink; } // jr nc
+  CYC(b_+5, b_+7);
+  CALL_C(b_+7, ecom_incState_b0e_hook, SYM(ecom_incState_b0e), b_+10);
+  CALL_C(b_+10, ballAndChain_setDefaultState_hook, SYM(ballAndChain_setDefaultState), b_+13);
+  CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+15, b_+17); mem_wr(gb, HL, 90);
+  CYC(b_+17, b_+19); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+19, b_+20); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+20, b_+22); A = 0x01;
+  CYC(b_+22, b_+25); enemySetAnimation_hook(gb); return; // jp
 
 moveTowardLink:
-  CALL_C(0x6056, ecom_updateAngleTowardTarget_b0e_hook, 0x43bf, 0x6059);
-  CALL_C(0x6059, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, 0x4156, 0x605c);
+  CALL_C(b_+25, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+28);
+  CALL_C(b_+28, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0e), SYM(ballAndChain_animate));
   ballAndChain_animate_hook(gb); return; // fallthrough
 }
 
 // 0e:605c, bare global; falls into from ballAndChain_state8, also reached by genuine jr from
 // ballAndChain_state9.
 void ballAndChain_animate_hook(GB *gb) {
-  CYC(0x605c, 0x605f); enemyAnimate_hook(gb); return; // jp
+  BASE(ballAndChain_animate);
+  CYC(b_+0, SYM(ballAndChain_state9)); enemyAnimate_hook(gb); return; // jp
 }
 
 // 0e:605f, bare global; jump-table target from enemyCode4b. Spinning up ball for [counter1]
 // frames before attacking.
 void ballAndChain_state9_hook(GB *gb) {
+  BASE(ballAndChain_state9);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x605f, ecom_decCounter1_b0e_hook, 0x439a, 0x6062);
-  if (!(F & FZ)) { CYCT(0x6062, 0x6064); ballAndChain_animate_hook(gb); return; } // jr nz
-  CYC(0x6062, 0x6064);
-  CYC(0x6064, 0x6065); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [counter1]++
-  CYC(0x6065, 0x6066); L = E;
-  CYC(0x6066, 0x6067); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
-  CALL_C(0x6067, ballAndChain_setDefaultState_hook, 0x60b6, 0x606a);
-  CYC(0x606a, 0x606c); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x606c, 0x606d); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  RET(0x606d); return; // ret
+  CALL_C(b_+0, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); ballAndChain_animate_hook(gb); return; } // jr nz
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [counter1]++
+  CYC(b_+6, b_+7); L = E;
+  CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
+  CALL_C(b_+8, ballAndChain_setDefaultState_hook, SYM(ballAndChain_setDefaultState), b_+11);
+  CYC(b_+11, b_+13); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+13, b_+14); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  RET(b_+14); return; // ret
 }
 
 // 0e:606e, bare global; jump-table target from enemyCode4b. Waiting for PART_SPIKED_BALL to
 // set this object's counter1 to 0 (signalling the throw is done).
 void ballAndChain_stateA_hook(GB *gb) {
+  BASE(ballAndChain_stateA);
   uint16_t sp0_ = gb->sp;
-  CYC(0x606e, 0x6070); E = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x6070, 0x6071); A = mem_rd(gb, DE);
-  CYC(0x6071, 0x6072); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x6072); return; } // ret nz
-  CYC(0x6072, 0x6073);
-  CYC(0x6073, 0x6075); C = 0x38;
-  CALL_C(0x6075, objectCheckLinkWithinDistance_hook, 0x1fa2, 0x6078);
-  CYC(0x6078, 0x6079); H = D;
-  CYC(0x6079, 0x607b); L = ENEMY_BASE + OBJ_STATE;
-  if (!(F & FC)) { CYCT(0x607b, 0x607d); goto gotoState8; } // jr nc
-  CYC(0x607b, 0x607d);
-  CYC(0x607d, 0x607e); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // [state]--
-  CALL_C(0x607e, ballAndChain_setDefaultState_hook, 0x60b6, 0x6081);
-  CYC(0x6081, 0x6083); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x6083, 0x6085); mem_wr(gb, HL, 90);
-  CYC(0x6085, 0x6087); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x6087, 0x6088); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  RET(0x6088); return; // ret
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+4); return; } // ret nz
+  CYC(b_+4, b_+5);
+  CYC(b_+5, b_+7); C = 0x38;
+  CALL_C(b_+7, objectCheckLinkWithinDistance_hook, SYM(objectCheckLinkWithinDistance), b_+10);
+  CYC(b_+10, b_+11); H = D;
+  CYC(b_+11, b_+13); L = ENEMY_BASE + OBJ_STATE;
+  if (!(F & FC)) { CYCT(b_+13, b_+15); goto gotoState8; } // jr nc
+  CYC(b_+13, b_+15);
+  CYC(b_+15, b_+16); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // [state]--
+  CALL_C(b_+16, ballAndChain_setDefaultState_hook, SYM(ballAndChain_setDefaultState), b_+19);
+  CYC(b_+19, b_+21); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+21, b_+23); mem_wr(gb, HL, 90);
+  CYC(b_+23, b_+25); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+25, b_+26); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  RET(b_+26); return; // ret
 
 gotoState8:
-  CYC(0x6089, 0x608b); mem_wr(gb, HL, 0x08); // [state]
-  CALL_C(0x608b, ballAndChain_setDefaultState_hook, 0x60b6, 0x608e);
-  CYC(0x608e, 0x6090); L = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(0x6090, 0x6091); alu_xor(gb, A);
-  CYC(0x6091, 0x6092); mem_wr(gb, HL, A);
-  CYC(0x6092, 0x6095); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+27, b_+29); mem_wr(gb, HL, 0x08); // [state]
+  CALL_C(b_+29, ballAndChain_setDefaultState_hook, SYM(ballAndChain_setDefaultState), b_+32);
+  CYC(b_+32, b_+34); L = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+34, b_+35); alu_xor(gb, A);
+  CYC(b_+35, b_+36); mem_wr(gb, HL, A);
+  CYC(b_+36, SYM(ballAndChain_spawnSpikedBall)); enemySetAnimation_hook(gb); return; // jp
 }
 
 // 0e:6095, bare global; called from ballAndChain_state_uninitialized.
 // @return zflag z if spawned successfully
 void ballAndChain_spawnSpikedBall_hook(GB *gb) {
+  BASE(ballAndChain_spawnSpikedBall);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6095, 0x6097); B = 0x04;
-  CALL_C(0x6097, checkBEnemySlotsAvailable_hook, 0x20f7, 0x609a);
-  if (!(F & FZ)) { RET_TAKEN(0x609a); return; } // ret nz
-  CYC(0x609a, 0x609b);
-  CYC(0x609b, 0x609d); B = 0x2a; // PART_SPIKED_BALL
-  CALL_C(0x609d, ecom_spawnProjectile_b0e_hook, 0x437c, 0x60a0);
-  CYC(0x60a0, 0x60a1); C = H;
-  CYC(0x60a1, 0x60a3); E = 0x01;
+  CYC(b_+0, b_+2); B = 0x04;
+  CALL_C(b_+2, checkBEnemySlotsAvailable_hook, SYM(checkBEnemySlotsAvailable), b_+5);
+  if (!(F & FZ)) { RET_TAKEN(b_+5); return; } // ret nz
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+8); B = 0x2a; // PART_SPIKED_BALL
+  CALL_C(b_+8, ecom_spawnProjectile_b0e_hook, SYM(ecom_spawnProjectile_b0e), b_+11);
+  CYC(b_+11, b_+12); C = H;
+  CYC(b_+12, b_+14); E = 0x01;
 
 nextChain:
-  CALL_C(0x60a3, getFreePartSlot_hook, 0x3e8e, 0x60a6);
-  CYC(0x60a6, 0x60a7); mem_wr(gb, HL, B);
-  CYC(0x60a7, 0x60a8); L = alu_inc8(gb, L);
-  CYC(0x60a8, 0x60a9); mem_wr(gb, HL, E);
-  CYC(0x60a9, 0x60ab); L = PART_BASE + OBJ_RELATED1;
-  CYC(0x60ab, 0x60ad); A = PART_BASE; // Part.start
-  CYC(0x60ad, 0x60ae); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x60ae, 0x60af); mem_wr(gb, HL, C);
-  CYC(0x60af, 0x60b0); E = alu_inc8(gb, E);
-  CYC(0x60b0, 0x60b1); A = E;
-  CYC(0x60b1, 0x60b3); alu_cp(gb, 0x04);
-  if (!(F & FZ)) { CYCT(0x60b3, 0x60b5); goto nextChain; } // jr nz
-  CYC(0x60b3, 0x60b5);
-  RET(0x60b5); return; // ret
+  CALL_C(b_+14, getFreePartSlot_hook, SYM(getFreePartSlot), b_+17);
+  CYC(b_+17, b_+18); mem_wr(gb, HL, B);
+  CYC(b_+18, b_+19); L = alu_inc8(gb, L);
+  CYC(b_+19, b_+20); mem_wr(gb, HL, E);
+  CYC(b_+20, b_+22); L = PART_BASE + OBJ_RELATED1;
+  CYC(b_+22, b_+24); A = PART_BASE; // Part.start
+  CYC(b_+24, b_+25); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+25, b_+26); mem_wr(gb, HL, C);
+  CYC(b_+26, b_+27); E = alu_inc8(gb, E);
+  CYC(b_+27, b_+28); A = E;
+  CYC(b_+28, b_+30); alu_cp(gb, 0x04);
+  if (!(F & FZ)) { CYCT(b_+30, b_+32); goto nextChain; } // jr nz
+  CYC(b_+30, b_+32);
+  RET(b_+32); return; // ret
 }
 
 // 0e:60b6, bare global; called from ballAndChain_state8, ballAndChain_state9,
 // ballAndChain_stateA. Sets state the enemy will return to after switch hook is used on it.
 // @param hl Pointer to state
 void ballAndChain_setDefaultState_hook(GB *gb) {
-  CYC(0x60b6, 0x60b7); A = mem_rd(gb, HL);
-  CYC(0x60b7, 0x60b9); L = ENEMY_BASE + 0x31; // Enemy.var31
-  CYC(0x60b9, 0x60ba); mem_wr(gb, HL, A);
-  RET(0x60ba); return; // ret
+  BASE(ballAndChain_setDefaultState);
+  CYC(b_+0, b_+1); A = mem_rd(gb, HL);
+  CYC(b_+1, b_+3); L = ENEMY_BASE + 0x31; // Enemy.var31
+  CYC(b_+3, b_+4); mem_wr(gb, HL, A);
+  RET(b_+4); return; // ret
 }

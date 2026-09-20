@@ -3,13 +3,13 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x08, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x08, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCode11), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCode11), (from), (to), true)
 
 // objectData.objectData_faroreSparkle (bank $12 object data, referenced by address only).
-#define objectData_faroreSparkle_bank12 0x4000
+#define objectData_faroreSparkle_bank12 SYM(objectData_faroreSparkle)
 // interac11_subid01@initialAngles: 8 bytes indexed by the sparkle's subid high nibble.
-#define initialAngles_bank08 0x427d
+#define initialAngles_bank08 SYM(interac11_subid01__initialAngles)
 
 // The parent (subid 0) talks to the sparkles through two raw wTmpcfc0 bytes:
 // $cfd8 = sparkle distance from the circle center, $cfd9 = "start flying away" signal.
@@ -50,258 +50,262 @@ static void faroreMakeChest_addAToHl(GB *gb) {
 }
 
 void interactionCode11_hook(GB *gb) {
+  BASE(interactionCode11);
   uint16_t sp0_ = gb->sp;
-  CYC(0x418c, 0x418e); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x418e, 0x418f); A = mem_rd(gb, DE);
-  CYC(0x418f, 0x4191); alu_and(gb, 0x0f);
-  CYC(0x4191, 0x4192); push_effect(gb, 0x4192);
-  switch (faroreMakeChest_jumpTable(gb)) {
-    case 0x4196: interac11_subid00_hook(gb); return;
-    case 0x424f: interac11_subid01_hook(gb); return;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); alu_and(gb, 0x0f);
+  CYC(b_+5, b_+6); push_effect(gb, b_+6);
+  do { uint16_t jt_ = (faroreMakeChest_jumpTable(gb));
+    if (jt_ == SYM(interac11_subid00)) { interac11_subid00_hook(gb); return; }
+    else if (jt_ == SYM(interac11_subid01)) { interac11_subid01_hook(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
 }
 
 void interac11_subid00_hook(GB *gb) {
+  BASE(interac11_subid00);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4196, 0x4198); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4198, 0x4199); A = mem_rd(gb, DE);
-  CYC(0x4199, 0x419a); push_effect(gb, 0x419a);
-  switch (faroreMakeChest_jumpTable(gb)) {
-    case 0x41b0: goto state0;
-    case 0x41c7: goto state1;
-    case 0x41d6: goto state2;
-    case 0x41df: goto state3;
-    case 0x41e8: goto state4;
-    case 0x41fb: goto state5;
-    case 0x421f: goto state678;
-    case 0x4230: goto state9;
-    case 0x423b: goto stateA;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (faroreMakeChest_jumpTable(gb));
+    if (jt_ == b_+26) { goto state0; }
+    else if (jt_ == b_+49) { goto state1; }
+    else if (jt_ == b_+64) { goto state2; }
+    else if (jt_ == b_+73) { goto state3; }
+    else if (jt_ == b_+82) { goto state4; }
+    else if (jt_ == b_+101) { goto state5; }
+    else if (jt_ == b_+137) { goto state678; }
+    else if (jt_ == b_+154) { goto state9; }
+    else if (jt_ == b_+165) { goto stateA; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 state0:
-  CYC(0x41b0, 0x41b2); A = 0x30;
-  CYC(0x41b2, 0x41b5); mem_wr(gb, faroreSparkleRadius, A);
-  CYC(0x41b5, 0x41b6); alu_xor(gb, A);
-  CYC(0x41b6, 0x41b9); mem_wr(gb, faroreSparkleFlyAway, A);
-  CALL_C(0x41b9, setCameraFocusedObject_hook, 0x12e5, 0x41bc);
-  CYC(0x41bc, 0x41be); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x41be, 0x41c0); A = 0x5a;
-  CYC(0x41c0, 0x41c1); mem_wr(gb, DE, A);
-  CALL_C(0x41c1, darkenRoomLightly_hook, 0x32f8, 0x41c4);
-  CYC(0x41c4, 0x41c7); interactionIncState_hook(gb);
+  CYC(b_+26, b_+28); A = 0x30;
+  CYC(b_+28, b_+31); mem_wr(gb, faroreSparkleRadius, A);
+  CYC(b_+31, b_+32); alu_xor(gb, A);
+  CYC(b_+32, b_+35); mem_wr(gb, faroreSparkleFlyAway, A);
+  CALL_C(b_+35, setCameraFocusedObject_hook, SYM(setCameraFocusedObject), b_+38);
+  CYC(b_+38, b_+40); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+40, b_+42); A = 0x5a;
+  CYC(b_+42, b_+43); mem_wr(gb, DE, A);
+  CALL_C(b_+43, darkenRoomLightly_hook, SYM(darkenRoomLightly), b_+46);
+  CYC(b_+46, b_+49); interactionIncState_hook(gb);
   return;
 
 state1:
-  CALL_C(0x41c7, interactionDecCounter1_hook, 0x23cc, 0x41ca);
+  CALL_C(b_+49, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+52);
   if (!(F & FZ)) {
-    CYCT(0x41ca, 0x41cb); ret_effect(gb); return;
+    CYCT(b_+52, b_+53); ret_effect(gb); return;
   }
-  CYC(0x41ca, 0x41cb);
-  CYC(0x41cb, 0x41cd); mem_wr(gb, HL, 0x30);
-  CYC(0x41cd, 0x41d0); SET_HL(objectData_faroreSparkle_bank12);
-  CALL_C(0x41d0, parseGivenObjectData_b00_hook, 0x3171, 0x41d3);
-  CYC(0x41d3, 0x41d6); interactionIncState_hook(gb);
+  CYC(b_+52, b_+53);
+  CYC(b_+53, b_+55); mem_wr(gb, HL, 0x30);
+  CYC(b_+55, b_+58); SET_HL(objectData_faroreSparkle_bank12);
+  CALL_C(b_+58, parseGivenObjectData_b00_hook, SYM(parseGivenObjectData_b00), b_+61);
+  CYC(b_+61, b_+64); interactionIncState_hook(gb);
   return;
 
 state2:
-  CALL_C(0x41d6, interactionDecCounter1_hook, 0x23cc, 0x41d9);
+  CALL_C(b_+64, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+67);
   if (!(F & FZ)) {
-    CYCT(0x41d9, 0x41da); ret_effect(gb); return;
+    CYCT(b_+67, b_+68); ret_effect(gb); return;
   }
-  CYC(0x41d9, 0x41da);
-  CYC(0x41da, 0x41dc); mem_wr(gb, HL, 0x1e);
-  CYC(0x41dc, 0x41df); interactionIncState_hook(gb);
+  CYC(b_+67, b_+68);
+  CYC(b_+68, b_+70); mem_wr(gb, HL, 0x1e);
+  CYC(b_+70, b_+73); interactionIncState_hook(gb);
   return;
 
 state3:
-  CALL_C(0x41df, interactionDecCounter1_hook, 0x23cc, 0x41e2);
+  CALL_C(b_+73, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+76);
   if (!(F & FZ)) {
-    CYCT(0x41e2, 0x41e3); ret_effect(gb); return;
+    CYCT(b_+76, b_+77); ret_effect(gb); return;
   }
-  CYC(0x41e2, 0x41e3);
-  CYC(0x41e3, 0x41e5); mem_wr(gb, HL, 0x50);
-  CYC(0x41e5, 0x41e8); interactionIncState_hook(gb);
+  CYC(b_+76, b_+77);
+  CYC(b_+77, b_+79); mem_wr(gb, HL, 0x50);
+  CYC(b_+79, b_+82); interactionIncState_hook(gb);
   return;
 
 state4:
-  CYC(0x41e8, 0x41eb); A = mem_rd(gb, wFrameCounter);
-  CYC(0x41eb, 0x41ec); alu_rrca(gb);
+  CYC(b_+82, b_+85); A = mem_rd(gb, wFrameCounter);
+  CYC(b_+85, b_+86); alu_rrca(gb);
   if (F & FC) {
-    CYCT(0x41ec, 0x41ee);
+    CYCT(b_+86, b_+88);
   } else {
-    CYC(0x41ec, 0x41ee);
-    CYC(0x41ee, 0x41f1); SET_HL(faroreSparkleRadius);
-    CYC(0x41f1, 0x41f2); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+    CYC(b_+86, b_+88);
+    CYC(b_+88, b_+91); SET_HL(faroreSparkleRadius);
+    CYC(b_+91, b_+92); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   }
-  CALL_C(0x41f2, interactionDecCounter1_hook, 0x23cc, 0x41f5);
+  CALL_C(b_+92, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+95);
   if (!(F & FZ)) {
-    CYCT(0x41f5, 0x41f6); ret_effect(gb); return;
+    CYCT(b_+95, b_+96); ret_effect(gb); return;
   }
-  CYC(0x41f5, 0x41f6);
-  CYC(0x41f6, 0x41f8); mem_wr(gb, HL, 0x28);
-  CYC(0x41f8, 0x41fb); interactionIncState_hook(gb);
+  CYC(b_+95, b_+96);
+  CYC(b_+96, b_+98); mem_wr(gb, HL, 0x28);
+  CYC(b_+98, b_+101); interactionIncState_hook(gb);
   return;
 
 state5:
-  CALL_C(0x41fb, interactionDecCounter1_hook, 0x23cc, 0x41fe);
+  CALL_C(b_+101, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+104);
   if (!(F & FZ)) {
-    CYCT(0x41fe, 0x41ff); ret_effect(gb); return;
+    CYCT(b_+104, b_+105); ret_effect(gb); return;
   }
-  CYC(0x41fe, 0x41ff);
-  CYC(0x41ff, 0x4201); mem_wr(gb, HL, 0x08);
-  CYC(0x4201, 0x4203); A = 0x01;
-  CYC(0x4203, 0x4206); mem_wr(gb, faroreSparkleFlyAway, A);
-  CYC(0x4206, 0x4209); SET_BC(0x840c);
-  CALL_C(0x4209, objectCreateInteraction_hook, 0x24c5, 0x420c);
-  CYC(0x420c, 0x420e); L = INTERACTION_BASE + OBJ_RELATED1;
-  CYC(0x420e, 0x4210); mem_wr(gb, HL, INTERACTION_BASE);
-  CYC(0x4210, 0x4211); L = alu_inc8(gb, L);
-  CYC(0x4211, 0x4212); mem_wr(gb, HL, D);
-  CALL_C(0x4212, objectCreatePuff_hook, 0x24c1, 0x4215);
-  CYC(0x4215, 0x4217); A = 0xf1;
-  CYC(0x4217, 0x4219); C = 0x75;
-  CALL_C(0x4219, setTile_hook, 0x3a9c, 0x421c);
-  CYC(0x421c, 0x421f); interactionIncState_hook(gb);
+  CYC(b_+104, b_+105);
+  CYC(b_+105, b_+107); mem_wr(gb, HL, 0x08);
+  CYC(b_+107, b_+109); A = 0x01;
+  CYC(b_+109, b_+112); mem_wr(gb, faroreSparkleFlyAway, A);
+  CYC(b_+112, b_+115); SET_BC(0x840c);
+  CALL_C(b_+115, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+118);
+  CYC(b_+118, b_+120); L = INTERACTION_BASE + OBJ_RELATED1;
+  CYC(b_+120, b_+122); mem_wr(gb, HL, INTERACTION_BASE);
+  CYC(b_+122, b_+123); L = alu_inc8(gb, L);
+  CYC(b_+123, b_+124); mem_wr(gb, HL, D);
+  CALL_C(b_+124, objectCreatePuff_hook, SYM(objectCreatePuff), b_+127);
+  CYC(b_+127, b_+129); A = 0xf1;
+  CYC(b_+129, b_+131); C = 0x75;
+  CALL_C(b_+131, setTile_hook, SYM(setTile), b_+134);
+  CYC(b_+134, b_+137); interactionIncState_hook(gb);
   return;
 
 state678:
-  CALL_C(0x421f, interactionDecCounter1_hook, 0x23cc, 0x4222);
+  CALL_C(b_+137, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+140);
   if (!(F & FZ)) {
-    CYCT(0x4222, 0x4223); ret_effect(gb); return;
+    CYCT(b_+140, b_+141); ret_effect(gb); return;
   }
-  CYC(0x4222, 0x4223);
-  CYC(0x4223, 0x4225); mem_wr(gb, HL, 0x10);
-  CALL_C(0x4225, fadeinFromWhite_hook, 0x3299, 0x4228);
+  CYC(b_+140, b_+141);
+  CYC(b_+141, b_+143); mem_wr(gb, HL, 0x10);
+  CALL_C(b_+143, fadeinFromWhite_hook, SYM(fadeinFromWhite), b_+146);
 
 playFadeoutSound:
-  CYC(0x4228, 0x422a); A = 0xb4;
-  CALL_C(0x422a, playSound_b00_hook, 0x0c98, 0x422d);
-  CYC(0x422d, 0x4230); interactionIncState_hook(gb);
+  CYC(b_+146, b_+148); A = 0xb4;
+  CALL_C(b_+148, playSound_b00_hook, SYM(playSound_b00), b_+151);
+  CYC(b_+151, b_+154); interactionIncState_hook(gb);
   return;
 
 state9:
-  CALL_C(0x4230, interactionDecCounter1_hook, 0x23cc, 0x4233);
+  CALL_C(b_+154, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+157);
   if (!(F & FZ)) {
-    CYCT(0x4233, 0x4234); ret_effect(gb); return;
+    CYCT(b_+157, b_+158); ret_effect(gb); return;
   }
-  CYC(0x4233, 0x4234);
-  CYC(0x4234, 0x4236); A = 0x04;
-  CALL_C(0x4236, fadeinFromWhiteWithDelay_hook, 0x3284, 0x4239);
-  CYC(0x4239, 0x423b); goto playFadeoutSound;
+  CYC(b_+157, b_+158);
+  CYC(b_+158, b_+160); A = 0x04;
+  CALL_C(b_+160, fadeinFromWhiteWithDelay_hook, SYM(fadeinFromWhiteWithDelay), b_+163);
+  CYC(b_+163, b_+165); goto playFadeoutSound;
 
 stateA:
-  CYC(0x423b, 0x423e); A = mem_rd(gb, wPaletteThread_mode);
-  CYC(0x423e, 0x423f); alu_or(gb, A);
+  CYC(b_+165, b_+168); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(b_+168, b_+169); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(0x423f, 0x4240); ret_effect(gb); return;
+    CYCT(b_+169, b_+170); ret_effect(gb); return;
   }
-  CYC(0x423f, 0x4240);
-  CYC(0x4240, 0x4242); A = 0x01;
-  CYC(0x4242, 0x4245); mem_wr(gb, wTmpcfc0, A);
-  CYC(0x4245, 0x4246); alu_xor(gb, A);
-  CYC(0x4246, 0x4249); mem_wr(gb, wPaletteThread_parameter, A);
-  CALL_C(0x4249, setCameraFocusedObjectToLink_hook, 0x12f0, 0x424c);
-  CYC(0x424c, 0x424f); interactionDelete_hook(gb);
+  CYC(b_+169, b_+170);
+  CYC(b_+170, b_+172); A = 0x01;
+  CYC(b_+172, b_+175); mem_wr(gb, wTmpcfc0, A);
+  CYC(b_+175, b_+176); alu_xor(gb, A);
+  CYC(b_+176, b_+179); mem_wr(gb, wPaletteThread_parameter, A);
+  CALL_C(b_+179, setCameraFocusedObjectToLink_hook, SYM(setCameraFocusedObjectToLink), b_+182);
+  CYC(b_+182, SYM(interac11_subid01)); interactionDelete_hook(gb);
 }
 
 // interac11_subid01@interac11_updateSparkle: rotate the sparkle around the circle center
 // at the radius given by the parent. Reached only by a static `call` from subid 1 state 2;
 // not independently hookable.
 static void faroreMakeChest_updateSparkle(GB *gb, uint16_t sp0_) {
-  CYC(0x42af, 0x42b2); A = mem_rd(gb, wFrameCounter);
-  CYC(0x42b2, 0x42b3); alu_rrca(gb);
+  BASE(interac11_subid01);
+  CYC(b_+96, b_+99); A = mem_rd(gb, wFrameCounter);
+  CYC(b_+99, b_+100); alu_rrca(gb);
   if (F & FC) {
-    CYCT(0x42b3, 0x42b5);
+    CYCT(b_+100, b_+102);
   } else {
-    CYC(0x42b3, 0x42b5);
-    CYC(0x42b5, 0x42b6); H = D;
-    CYC(0x42b6, 0x42b8); L = INTERACTION_BASE + OBJ_ANGLE;
-    CYC(0x42b8, 0x42b9); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-    CYC(0x42b9, 0x42ba); A = mem_rd(gb, HL);
-    CYC(0x42ba, 0x42bc); alu_and(gb, 0x1f);
-    CYC(0x42bc, 0x42bd); mem_wr(gb, HL, A);
-    CYC(0x42bd, 0x42bf); A = 0xc9;
+    CYC(b_+100, b_+102);
+    CYC(b_+102, b_+103); H = D;
+    CYC(b_+103, b_+105); L = INTERACTION_BASE + OBJ_ANGLE;
+    CYC(b_+105, b_+106); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+    CYC(b_+106, b_+107); A = mem_rd(gb, HL);
+    CYC(b_+107, b_+109); alu_and(gb, 0x1f);
+    CYC(b_+109, b_+110); mem_wr(gb, HL, A);
+    CYC(b_+110, b_+112); A = 0xc9;
     if (F & FZ) {
-      CALL_C_CC(0x42bf, playSound_b00_hook, 0x0c98, 0x42c2);
+      CALL_C_CC(b_+112, playSound_b00_hook, SYM(playSound_b00), b_+115);
     } else {
-      CYC(0x42bf, 0x42c2);
+      CYC(b_+112, b_+115);
     }
   }
-  CYC(0x42c2, 0x42c4); E = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x42c4, 0x42c7); SET_BC(0x7858);
-  CYC(0x42c7, 0x42ca); A = mem_rd(gb, faroreSparkleRadius);
-  CALL_C(0x42ca, objectSetPositionInCircleArc_hook, 0x210e, 0x42cd);
-  CYC(0x42cd, 0x42d0); interactionAnimate_hook(gb);
+  CYC(b_+115, b_+117); E = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+117, b_+120); SET_BC((SYM(interactionCode3b__runSubid00__substate2) + 16));
+  CYC(b_+120, b_+123); A = mem_rd(gb, faroreSparkleRadius);
+  CALL_C(b_+123, objectSetPositionInCircleArc_hook, SYM(objectSetPositionInCircleArc), b_+126);
+  CYC(b_+126, SYM(interactionCode12)); interactionAnimate_hook(gb);
 }
 
 void interac11_subid01_hook(GB *gb) {
+  BASE(interac11_subid01);
   uint16_t sp0_ = gb->sp;
-  CYC(0x424f, 0x4251); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x4251, 0x4252); A = mem_rd(gb, DE);
-  CYC(0x4252, 0x4253); push_effect(gb, 0x4253);
-  switch (faroreMakeChest_jumpTable(gb)) {
-    case 0x425b: goto state0;
-    case 0x4285: goto state1;
-    case 0x4292: goto state2;
-    case 0x42a2: goto state3;
-    default: HANDOFF(HL);
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (faroreMakeChest_jumpTable(gb));
+    if (jt_ == b_+12) { goto state0; }
+    else if (jt_ == b_+54) { goto state1; }
+    else if (jt_ == b_+67) { goto state2; }
+    else if (jt_ == b_+83) { goto state3; }
+    else { HANDOFF(HL); }
+  } while (0);
 
 state0:
-  CYC(0x425b, 0x425d); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x425d, 0x425e); A = mem_rd(gb, DE);
-  CYC(0x425e, 0x4260); A = alu_swap(gb, A);
-  CYC(0x4260, 0x4262); alu_and(gb, 0x0f);
-  CYC(0x4262, 0x4265); SET_HL(initialAngles_bank08);
-  CYC(0x4265, 0x4266); push_effect(gb, 0x4266); faroreMakeChest_addAToHl(gb);
-  CYC(0x4266, 0x4267); A = mem_rd(gb, HL);
-  CYC(0x4267, 0x4269); E = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x4269, 0x426a); mem_wr(gb, DE, A);
-  CYC(0x426a, 0x426c); E = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x426c, 0x426e); A = 0x28;
-  CYC(0x426e, 0x426f); mem_wr(gb, DE, A);
-  CYC(0x426f, 0x4271); E = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(0x4271, 0x4273); A = 0x30;
-  CYC(0x4273, 0x4274); mem_wr(gb, DE, A);
-  CALL_C(0x4274, interactionInitGraphics_hook, 0x15fb, 0x4277);
-  CALL_C(0x4277, objectSetVisible80_hook, 0x1e57, 0x427a);
-  CYC(0x427a, 0x427d); interactionIncState_hook(gb);
+  CYC(b_+12, b_+14); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+14, b_+15); A = mem_rd(gb, DE);
+  CYC(b_+15, b_+17); A = alu_swap(gb, A);
+  CYC(b_+17, b_+19); alu_and(gb, 0x0f);
+  CYC(b_+19, b_+22); SET_HL(initialAngles_bank08);
+  CYC(b_+22, b_+23); push_effect(gb, b_+23); faroreMakeChest_addAToHl(gb);
+  CYC(b_+23, b_+24); A = mem_rd(gb, HL);
+  CYC(b_+24, b_+26); E = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+26, b_+27); mem_wr(gb, DE, A);
+  CYC(b_+27, b_+29); E = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+29, b_+31); A = 0x28;
+  CYC(b_+31, b_+32); mem_wr(gb, DE, A);
+  CYC(b_+32, b_+34); E = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+34, b_+36); A = 0x30;
+  CYC(b_+36, b_+37); mem_wr(gb, DE, A);
+  CALL_C(b_+37, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+40);
+  CALL_C(b_+40, objectSetVisible80_hook, SYM(objectSetVisible80), b_+43);
+  CYC(b_+43, b_+46); interactionIncState_hook(gb);
   return;
 
 state1:
-  CALL_C(0x4285, objectApplySpeed_hook, 0x201d, 0x4288);
-  CALL_C(0x4288, interactionAnimate_hook, 0x261b, 0x428b);
-  CALL_C(0x428b, interactionDecCounter1_hook, 0x23cc, 0x428e);
+  CALL_C(b_+54, objectApplySpeed_hook, SYM(objectApplySpeed), b_+57);
+  CALL_C(b_+57, interactionAnimate_hook, SYM(interactionAnimate), b_+60);
+  CALL_C(b_+60, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+63);
   if (!(F & FZ)) {
-    CYCT(0x428e, 0x428f); ret_effect(gb); return;
+    CYCT(b_+63, b_+64); ret_effect(gb); return;
   }
-  CYC(0x428e, 0x428f);
-  CYC(0x428f, 0x4292); interactionIncState_hook(gb);
+  CYC(b_+63, b_+64);
+  CYC(b_+64, b_+67); interactionIncState_hook(gb);
   return;
 
 state2:
-  CYC(0x4292, 0x4295); push_effect(gb, 0x4295); faroreMakeChest_updateSparkle(gb, sp0_);
-  CYC(0x4295, 0x4298); A = mem_rd(gb, faroreSparkleFlyAway);
-  CYC(0x4298, 0x4299); alu_or(gb, A);
+  CYC(b_+67, b_+70); push_effect(gb, b_+70); faroreMakeChest_updateSparkle(gb, sp0_);
+  CYC(b_+70, b_+73); A = mem_rd(gb, faroreSparkleFlyAway);
+  CYC(b_+73, b_+74); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(0x4299, 0x429a); ret_effect(gb); return;
+    CYCT(b_+74, b_+75); ret_effect(gb); return;
   }
-  CYC(0x4299, 0x429a);
-  CYC(0x429a, 0x429c); E = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x429c, 0x429e); A = 0x50;
-  CYC(0x429e, 0x429f); mem_wr(gb, DE, A);
-  CYC(0x429f, 0x42a2); interactionIncState_hook(gb);
+  CYC(b_+74, b_+75);
+  CYC(b_+75, b_+77); E = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+77, b_+79); A = 0x50;
+  CYC(b_+79, b_+80); mem_wr(gb, DE, A);
+  CYC(b_+80, b_+83); interactionIncState_hook(gb);
   return;
 
 state3:
-  CALL_C(0x42a2, objectApplySpeed_hook, 0x201d, 0x42a5);
-  CALL_C(0x42a5, interactionAnimate_hook, 0x261b, 0x42a8);
-  CALL_C(0x42a8, objectCheckWithinScreenBoundary_hook, 0x2184, 0x42ab);
+  CALL_C(b_+83, objectApplySpeed_hook, SYM(objectApplySpeed), b_+86);
+  CALL_C(b_+86, interactionAnimate_hook, SYM(interactionAnimate), b_+89);
+  CALL_C(b_+89, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+92);
   if (F & FC) {
-    CYCT(0x42ab, 0x42ac); ret_effect(gb); return;
+    CYCT(b_+92, b_+93); ret_effect(gb); return;
   }
-  CYC(0x42ab, 0x42ac);
-  CYC(0x42ac, 0x42af); interactionDelete_hook(gb);
+  CYC(b_+92, b_+93);
+  CYC(b_+93, b_+96); interactionDelete_hook(gb);
 }

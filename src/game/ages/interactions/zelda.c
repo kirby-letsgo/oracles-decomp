@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(zelda_loadScript), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(zelda_loadScript), (from), (to), true)
 
 static uint16_t interactionCodead_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -37,176 +37,179 @@ static void interactionCodead_addDoubleIndex(GB *gb, uint16_t return_address) {
 
 // 0b:63ba, called from zelda_state0@commonInit.
 void zelda_loadScript_hook(GB *gb) {
-  CYC(0x63ba, 0x63bc); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x63bc, 0x63bd); A = mem_rd(gb, DE);
-  CYC(0x63bd, 0x63c0); SET_HL(0x63c7); // @scriptTable
-  CYC(0x63c0, 0x63c1); interactionCodead_addDoubleIndex(gb, 0x63c1);
-  CYC(0x63c1, 0x63c2); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x63c2, 0x63c3); H = mem_rd(gb, HL);
-  CYC(0x63c3, 0x63c4); L = A;
-  CYC(0x63c4, 0x63c7); interactionSetScript_hook(gb); return; // jp
+  BASE(zelda_loadScript);
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+6); SET_HL(b_+13); // @scriptTable
+  CYC(b_+6, b_+7); interactionCodead_addDoubleIndex(gb, b_+7);
+  CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+8, b_+9); H = mem_rd(gb, HL);
+  CYC(b_+9, b_+10); L = A;
+  CYC(b_+10, b_+13); interactionSetScript_hook(gb); return; // jp
 }
 
 // 0b:6381, falls into from zelda_state0@commonInit's own tail call chain (see below).
 void zelda_state1_hook(GB *gb) {
+  BASE(zelda_state1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6381, 0x6383); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x6383, 0x6384); A = mem_rd(gb, DE);
-  CYC(0x6384, 0x6385); push_effect(gb, 0x6385);
-  switch (interactionCodead_jump_table(gb)) {
-    case 0x639b: goto animateAndRunScript;
-    case 0x63a1: goto runSubid2;
-    case 0x63ab: goto runSubid4;
-    case 0x63b4: goto faceLinkAndRunScript;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (interactionCodead_jump_table(gb));
+    if (jt_ == b_+26) { goto animateAndRunScript; }
+    else if (jt_ == b_+32) { goto runSubid2; }
+    else if (jt_ == b_+42) { goto runSubid4; }
+    else if (jt_ == b_+51) { goto faceLinkAndRunScript; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 animateAndRunScript:
-  CALL_C(0x639b, interactionAnimate_hook, 0x261b, 0x639e);
-  CYC(0x639e, 0x63a1); interactionRunScript_hook(gb); return; // jp
+  CALL_C(b_+26, interactionAnimate_hook, SYM(interactionAnimate), b_+29);
+  CYC(b_+29, b_+32); interactionRunScript_hook(gb); return; // jp
 
 runSubid2:
-  CYC(0x63a1, 0x63a3); E = INTERACTION_BASE + OBJ_VAR39;
-  CYC(0x63a3, 0x63a4); A = mem_rd(gb, DE);
-  CYC(0x63a4, 0x63a5); alu_or(gb, A);
-  if (F & FZ) { CALL_C_CC(0x63a5, interactionAnimate_hook, 0x261b, 0x63a8); } else { CYC(0x63a5, 0x63a8); } // call z
-  CYC(0x63a8, 0x63ab); interactionRunScript_hook(gb); return; // jp
+  CYC(b_+32, b_+34); E = INTERACTION_BASE + OBJ_VAR39;
+  CYC(b_+34, b_+35); A = mem_rd(gb, DE);
+  CYC(b_+35, b_+36); alu_or(gb, A);
+  if (F & FZ) { CALL_C_CC(b_+36, interactionAnimate_hook, SYM(interactionAnimate), b_+39); } else { CYC(b_+36, b_+39); } // call z
+  CYC(b_+39, b_+42); interactionRunScript_hook(gb); return; // jp
 
 runSubid4:
-  CALL_C(0x63ab, interactionRunScript_hook, 0x2552, 0x63ae);
-  if (!(F & FC)) { CYCT(0x63ae, 0x63b1); interactionAnimateBasedOnSpeed_hook(gb); return; } // jp nc
-  CYC(0x63ae, 0x63b1);
-  CYC(0x63b1, 0x63b4); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; // jp
+  CALL_C(b_+42, interactionRunScript_hook, SYM(interactionRunScript), b_+45);
+  if (!(F & FC)) { CYCT(b_+45, b_+48); interactionAnimateBasedOnSpeed_hook(gb); return; } // jp nc
+  CYC(b_+45, b_+48);
+  CYC(b_+48, b_+51); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; // jp
 
 faceLinkAndRunScript:
-  CALL_C(0x63b4, interactionRunScript_hook, 0x2552, 0x63b7);
-  CYC(0x63b7, 0x63ba); npcFaceLinkAndAnimate_hook(gb); return; // jp
+  CALL_C(b_+51, interactionRunScript_hook, SYM(interactionRunScript), b_+54);
+  CYC(b_+54, SYM(zelda_loadScript)); npcFaceLinkAndAnimate_hook(gb); return; // jp
 }
 
 // 0b:62b1, called from interactionCodead@state0 (top-level jump table).
 void zelda_state0_hook(GB *gb) {
+  BASE(zelda_state0);
   uint16_t sp0_ = gb->sp;
-  CYC(0x62b1, 0x62b3); A = 0x01;
-  CYC(0x62b3, 0x62b4); mem_wr(gb, DE, A); // [state]
-  CALL_C(0x62b4, interactionInitGraphics_hook, 0x15fb, 0x62b7);
-  CALL_C(0x62b7, objectSetVisiblec2_hook, 0x1e45, 0x62ba);
-  CYC(0x62ba, 0x62bc); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(0x62bc, 0x62bd); A = mem_rd(gb, DE);
-  CYC(0x62bd, 0x62be); push_effect(gb, 0x62be);
-  switch (interactionCodead_jump_table(gb)) {
-    case 0x6360: goto initSubid00;
-    case 0x637e: goto commonInit;
-    case 0x62f6: goto initSubid03;
-    case 0x62d4: goto initSubid04;
-    case 0x637b: goto commonInitWithExtraGraphics;
-    case 0x6304: goto initSubid07;
-    case 0x632c: goto initSubid08;
-    case 0x6346: goto initSubid0a;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); A = 0x01;
+  CYC(b_+2, b_+3); mem_wr(gb, DE, A); // [state]
+  CALL_C(b_+3, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+6);
+  CALL_C(b_+6, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+9);
+  CYC(b_+9, b_+11); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+11, b_+12); A = mem_rd(gb, DE);
+  CYC(b_+12, b_+13); push_effect(gb, b_+13);
+  do { uint16_t jt_ = (interactionCodead_jump_table(gb));
+    if (jt_ == b_+175) { goto initSubid00; }
+    else if (jt_ == b_+205) { goto commonInit; }
+    else if (jt_ == b_+69) { goto initSubid03; }
+    else if (jt_ == b_+35) { goto initSubid04; }
+    else if (jt_ == b_+202) { goto commonInitWithExtraGraphics; }
+    else if (jt_ == b_+83) { goto initSubid07; }
+    else if (jt_ == b_+123) { goto initSubid08; }
+    else if (jt_ == b_+149) { goto initSubid0a; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 
 initSubid04:
-  CALL_C(0x62d4, checkIsLinkedGame_hook, 0x1992, 0x62d7);
-  if (F & FZ) { CYCT(0x62d7, 0x62da); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp z
-  CYC(0x62d7, 0x62da);
-  CYC(0x62da, 0x62dc); A = 0x36; // TREASURE_MAKU_SEED
-  CALL_C(0x62dc, checkTreasureObtained_hook, 0x1748, 0x62df);
-  if (!(F & FC)) { CYCT(0x62df, 0x62e2); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp nc
-  CYC(0x62df, 0x62e2);
-  CYC(0x62e2, 0x62e4); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
-  CALL_C(0x62e4, checkGlobalFlag_hook, 0x31f3, 0x62e7);
-  if (!(F & FZ)) { CYCT(0x62e7, 0x62ea); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp nz
-  CYC(0x62e7, 0x62ea);
-  CYC(0x62ea, 0x62eb); H = D;
-  CYC(0x62eb, 0x62ed); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC(0x62ed, 0x62ef); mem_wr(gb, HL, 0x28); // SPEED_100
-  CYC(0x62ef, 0x62f1); L = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(0x62f1, 0x62f3); mem_wr(gb, HL, 0x08);
-  CYC(0x62f3, 0x62f6); goto commonInit; // jp
+  CALL_C(b_+35, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+38);
+  if (F & FZ) { CYCT(b_+38, b_+41); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp z
+  CYC(b_+38, b_+41);
+  CYC(b_+41, b_+43); A = 0x36; // TREASURE_MAKU_SEED
+  CALL_C(b_+43, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+46);
+  if (!(F & FC)) { CYCT(b_+46, b_+49); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp nc
+  CYC(b_+46, b_+49);
+  CYC(b_+49, b_+51); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
+  CALL_C(b_+51, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+54);
+  if (!(F & FZ)) { CYCT(b_+54, b_+57); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp nz
+  CYC(b_+54, b_+57);
+  CYC(b_+57, b_+58); H = D;
+  CYC(b_+58, b_+60); L = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+60, b_+62); mem_wr(gb, HL, 0x28); // SPEED_100
+  CYC(b_+62, b_+64); L = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+64, b_+66); mem_wr(gb, HL, 0x08);
+  CYC(b_+66, b_+69); goto commonInit; // jp
 
 initSubid03:
-  CYC(0x62f6, 0x62f9); SET_BC(0x4820);
-  CALL_C(0x62f9, interactionSetPosition_hook, 0x2773, 0x62fc);
-  CYC(0x62fc, 0x62fe); A = 0x01;
-  CALL_C(0x62fe, interactionSetAnimation_hook, 0x262e, 0x6301);
-  CYC(0x6301, 0x6304); goto commonInit; // jp
+  CYC(b_+69, b_+72); SET_BC((SYM(interactionCodeb6__treeDisappearanceFrames) + 2));
+  CALL_C(b_+72, interactionSetPosition_hook, SYM(interactionSetPosition), b_+75);
+  CYC(b_+75, b_+77); A = 0x01;
+  CALL_C(b_+77, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+80);
+  CYC(b_+80, b_+83); goto commonInit; // jp
 
 initSubid07:
-  CYC(0x6304, 0x6306); A = 0x38; // GLOBALFLAG_GOT_RING_FROM_ZELDA
-  CALL_C(0x6306, checkGlobalFlag_hook, 0x31f3, 0x6309);
-  if (F & FZ) { CYCT(0x6309, 0x630c); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp z
-  CYC(0x6309, 0x630c);
-  CYC(0x630c, 0x630e); A = 0x36; // TREASURE_MAKU_SEED
-  CALL_C(0x630e, checkTreasureObtained_hook, 0x1748, 0x6311);
-  if (F & FC) { CYCT(0x6311, 0x6314); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp c
-  CYC(0x6311, 0x6314);
-  CYC(0x6314, 0x6316); A = 0x11; // GLOBALFLAG_SAVED_NAYRU
-  CALL_C(0x6316, checkGlobalFlag_hook, 0x31f3, 0x6319);
-  CYC(0x6319, 0x631b); A = 0x06; // <TX_0606
-  if (!(F & FZ)) { CYCT(0x631b, 0x631d); goto actAsGenericNpc; } // jr nz
-  CYC(0x631b, 0x631d);
-  CYC(0x631d, 0x631f); A = 0x05; // <TX_0605
+  CYC(b_+83, b_+85); A = 0x38; // GLOBALFLAG_GOT_RING_FROM_ZELDA
+  CALL_C(b_+85, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+88);
+  if (F & FZ) { CYCT(b_+88, b_+91); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp z
+  CYC(b_+88, b_+91);
+  CYC(b_+91, b_+93); A = 0x36; // TREASURE_MAKU_SEED
+  CALL_C(b_+93, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+96);
+  if (F & FC) { CYCT(b_+96, b_+99); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp c
+  CYC(b_+96, b_+99);
+  CYC(b_+99, b_+101); A = 0x11; // GLOBALFLAG_SAVED_NAYRU
+  CALL_C(b_+101, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+104);
+  CYC(b_+104, b_+106); A = 0x06; // <TX_0606
+  if (!(F & FZ)) { CYCT(b_+106, b_+108); goto actAsGenericNpc; } // jr nz
+  CYC(b_+106, b_+108);
+  CYC(b_+108, b_+110); A = 0x05; // <TX_0605
 
 actAsGenericNpc:
-  CYC(0x631f, 0x6321); E = INTERACTION_BASE + OBJ_TEXT_ID;
-  CYC(0x6321, 0x6322); mem_wr(gb, DE, A);
-  CYC(0x6322, 0x6323); E = alu_inc8(gb, E);
-  CYC(0x6323, 0x6325); A = 0x06; // >TX_0600
-  CYC(0x6325, 0x6326); mem_wr(gb, DE, A);
-  CYC(0x6326, 0x6329); SET_HL(0x45f0); // mainScripts.genericNpcScript
-  CYC(0x6329, 0x632c); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+110, b_+112); E = INTERACTION_BASE + OBJ_TEXT_ID;
+  CYC(b_+112, b_+113); mem_wr(gb, DE, A);
+  CYC(b_+113, b_+114); E = alu_inc8(gb, E);
+  CYC(b_+114, b_+116); A = 0x06; // >TX_0600
+  CYC(b_+116, b_+117); mem_wr(gb, DE, A);
+  CYC(b_+117, b_+120); SET_HL((SYM(interactionCodeb6__state6) + 40)); // mainScripts.genericNpcScript
+  CYC(b_+120, b_+123); interactionSetScript_hook(gb); return; // jp
 
 initSubid08:
-  CALL_C(0x632c, checkIsLinkedGame_hook, 0x1992, 0x632f);
-  if (F & FZ) { CYCT(0x632f, 0x6332); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp z
-  CYC(0x632f, 0x6332);
-  CYC(0x6332, 0x6334); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
-  CALL_C(0x6334, checkGlobalFlag_hook, 0x31f3, 0x6337);
-  if (F & FZ) { CYCT(0x6337, 0x633a); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp z
-  CYC(0x6337, 0x633a);
-  CYC(0x633a, 0x633c); A = 0x3a; // GLOBALFLAG_FLAME_OF_DESPAIR_LIT
-  CALL_C(0x633c, checkGlobalFlag_hook, 0x31f3, 0x633f);
-  if (!(F & FZ)) { CYCT(0x633f, 0x6342); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp nz
-  CYC(0x633f, 0x6342);
-  CYC(0x6342, 0x6344); A = 0x0b; // <TX_060b
-  CYCT(0x6344, 0x6346); goto actAsGenericNpc; // jr
+  CALL_C(b_+123, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+126);
+  if (F & FZ) { CYCT(b_+126, b_+129); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp z
+  CYC(b_+126, b_+129);
+  CYC(b_+129, b_+131); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
+  CALL_C(b_+131, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+134);
+  if (F & FZ) { CYCT(b_+134, b_+137); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp z
+  CYC(b_+134, b_+137);
+  CYC(b_+137, b_+139); A = 0x3a; // GLOBALFLAG_FLAME_OF_DESPAIR_LIT
+  CALL_C(b_+139, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+142);
+  if (!(F & FZ)) { CYCT(b_+142, b_+145); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp nz
+  CYC(b_+142, b_+145);
+  CYC(b_+145, b_+147); A = 0x0b; // <TX_060b
+  CYCT(b_+147, b_+149); goto actAsGenericNpc; // jr
 
 initSubid0a:
-  CALL_C(0x6346, checkIsLinkedGame_hook, 0x1992, 0x6349);
-  if (F & FZ) { CYCT(0x6349, 0x634c); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp z
-  CYC(0x6349, 0x634c);
-  CYC(0x634c, 0x634e); A = 0x36; // TREASURE_MAKU_SEED
-  CALL_C(0x634e, checkTreasureObtained_hook, 0x1748, 0x6351);
-  if (!(F & FC)) { CYCT(0x6351, 0x6354); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp nc
-  CYC(0x6351, 0x6354);
-  CYC(0x6354, 0x6356); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
-  CALL_C(0x6356, checkGlobalFlag_hook, 0x31f3, 0x6359);
-  if (!(F & FZ)) { CYCT(0x6359, 0x635c); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp nz
-  CYC(0x6359, 0x635c);
-  CYC(0x635c, 0x635e); A = 0x0a; // <TX_060a
-  CYCT(0x635e, 0x6360); goto actAsGenericNpc; // jr
+  CALL_C(b_+149, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+152);
+  if (F & FZ) { CYCT(b_+152, b_+155); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp z
+  CYC(b_+152, b_+155);
+  CYC(b_+155, b_+157); A = 0x36; // TREASURE_MAKU_SEED
+  CALL_C(b_+157, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+160);
+  if (!(F & FC)) { CYCT(b_+160, b_+163); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp nc
+  CYC(b_+160, b_+163);
+  CYC(b_+163, b_+165); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
+  CALL_C(b_+165, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+168);
+  if (!(F & FZ)) { CYCT(b_+168, b_+171); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp nz
+  CYC(b_+168, b_+171);
+  CYC(b_+171, b_+173); A = 0x0a; // <TX_060a
+  CYCT(b_+173, b_+175); goto actAsGenericNpc; // jr
 
 initSubid00:
-  CALL_C(0x6360, getThisRoomFlags_hook, 0x197d, 0x6363);
-  CYC(0x6363, 0x6365); alu_bit(gb, 7, A);
-  if (F & FZ) { CYCT(0x6365, 0x6367); goto commonInitWithExtraGraphics; } // jr z
-  CYC(0x6365, 0x6367);
-  CYC(0x6367, 0x6369); A = 0x01;
-  CYC(0x6369, 0x636c); mem_wr(gb, wDisableScreenTransitions, A);
-  CYC(0x636c, 0x636f); A = mem_rd(gb, wActiveMusic);
-  CYC(0x636f, 0x6370); alu_or(gb, A);
-  if (F & FZ) { CYCT(0x6370, 0x6372); goto commonInitWithExtraGraphics; } // jr z
-  CYC(0x6370, 0x6372);
-  CYC(0x6372, 0x6373); alu_xor(gb, A);
-  CYC(0x6373, 0x6376); mem_wr(gb, wActiveMusic, A);
-  CYC(0x6376, 0x6378); A = 0x38; // MUS_ZELDA_SAVED
-  CALL_C(0x6378, playSound_b00_hook, 0x0c98, 0x637b);
+  CALL_C(b_+175, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+178);
+  CYC(b_+178, b_+180); alu_bit(gb, 7, A);
+  if (F & FZ) { CYCT(b_+180, b_+182); goto commonInitWithExtraGraphics; } // jr z
+  CYC(b_+180, b_+182);
+  CYC(b_+182, b_+184); A = 0x01;
+  CYC(b_+184, b_+187); mem_wr(gb, wDisableScreenTransitions, A);
+  CYC(b_+187, b_+190); A = mem_rd(gb, wActiveMusic);
+  CYC(b_+190, b_+191); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+191, b_+193); goto commonInitWithExtraGraphics; } // jr z
+  CYC(b_+191, b_+193);
+  CYC(b_+193, b_+194); alu_xor(gb, A);
+  CYC(b_+194, b_+197); mem_wr(gb, wActiveMusic, A);
+  CYC(b_+197, b_+199); A = 0x38; // MUS_ZELDA_SAVED
+  CALL_C(b_+199, playSound_b00_hook, SYM(playSound_b00), b_+202);
 
 commonInitWithExtraGraphics:
-  CALL_C(0x637b, interactionLoadExtraGraphics_hook, 0x2781, 0x637e);
+  CALL_C(b_+202, interactionLoadExtraGraphics_hook, SYM(interactionLoadExtraGraphics), b_+205);
 
 commonInit:
-  CALL_C(0x637e, zelda_loadScript_hook, 0x63ba, 0x6381);
+  CALL_C(b_+205, zelda_loadScript_hook, SYM(zelda_loadScript), SYM(zelda_state1));
   zelda_state1_hook(gb); return;
 }
 
@@ -214,13 +217,14 @@ commonInit:
 // INTERAC_ZELDA
 // ==================================================================================================
 void interactionCodead_hook(GB *gb) {
+  BASE(interactionCodead);
   uint16_t sp0_ = gb->sp;
-  CYC(0x62a9, 0x62ab); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(0x62ab, 0x62ac); A = mem_rd(gb, DE);
-  CYC(0x62ac, 0x62ad); push_effect(gb, 0x62ad);
-  switch (interactionCodead_jump_table(gb)) {
-    case 0x62b1: zelda_state0_hook(gb); return;
-    case 0x6381: zelda_state1_hook(gb); return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (interactionCodead_jump_table(gb));
+    if (jt_ == SYM(zelda_state0)) { zelda_state0_hook(gb); return; }
+    else if (jt_ == SYM(zelda_state1)) { zelda_state1_hook(gb); return; }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }

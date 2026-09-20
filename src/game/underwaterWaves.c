@@ -3,84 +3,87 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x01, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x01, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(checkInitUnderwaterWaves), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(checkInitUnderwaterWaves), (from), (to), true)
 
 void checkUpdateUnderwaterWaves_hook(GB *gb);
 
 void checkInitUnderwaterWaves_hook(GB *gb) {
+  BASE(checkInitUnderwaterWaves);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x626e, 0x6271); A = W8(wTilesetFlags);
-  CYC(0x6271, 0x6273); alu_and(gb, 0x40);
+  CYC(b_+0, b_+3); A = W8(wTilesetFlags);
+  CYC(b_+3, b_+5); alu_and(gb, 0x40);
   if (F & FZ) {
-    CYCT(0x6273, 0x6274); ret_effect(gb);
+    CYCT(b_+5, b_+6); ret_effect(gb);
     return;
   }
-  CYC(0x6273, 0x6274);
-  CYC(0x6274, 0x6276); A = 0x10;
-  CYC(0x6276, 0x6279); W8(wGfxRegs2_LYC) = A;
-  CYC(0x6279, 0x627b); A = 0x02;
-  CYC(0x627b, 0x627d); hram_wr(gb, 0x9d, A);
-  CYC(0x627d, 0x627f); A = 0x02;
-  CALL_C(0x627f, initWaveScrollValues_hook, 0x1384, 0x6282);
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+8); A = 0x10;
+  CYC(b_+8, b_+11); W8(wGfxRegs2_LYC) = A;
+  CYC(b_+11, b_+13); A = 0x02;
+  CYC(b_+13, b_+15); hram_wr(gb, 0x9d, A);
+  CYC(b_+15, b_+17); A = 0x02;
+  CALL_C(b_+17, initWaveScrollValues_hook, SYM(initWaveScrollValues), SYM(checkUpdateUnderwaterWaves));
   checkUpdateUnderwaterWaves_hook(gb);
 }
 
 void checkUpdateUnderwaterWaves_hook(GB *gb) {
+  BASE(checkUpdateUnderwaterWaves);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x6282, 0x6285); A = W8(wTilesetFlags);
-  CYC(0x6285, 0x6287); alu_and(gb, 0x40);
+  CYC(b_+0, b_+3); A = W8(wTilesetFlags);
+  CYC(b_+3, b_+5); alu_and(gb, 0x40);
   if (F & FZ) {
-    CYCT(0x6287, 0x6288); ret_effect(gb);
+    CYCT(b_+5, b_+6); ret_effect(gb);
     return;
   }
-  CYC(0x6287, 0x6288);
-  CYC(0x6288, 0x628a); A = 0x02;
-  CYC(0x628a, 0x628c); hram_wr(gb, 0x70, A);
-  CYC(0x628c, 0x628f); A = W8(wGfxRegs2_SCX);
-  CYC(0x628f, 0x6290); C = A;
-  CYC(0x6290, 0x6293); A = W8(wFrameCounter);
-  CYC(0x6293, 0x6294); B = A;
-  CYC(0x6294, 0x6297); A = W8(wGfxRegs2_SCY);
-  CYC(0x6297, 0x6298); alu_add(gb, B);
-  CYC(0x6298, 0x629a); alu_and(gb, 0x7f);
-  CYC(0x629a, 0x629d); SET_DE(w2WaveScrollValues);
-  CALL_C(0x629d, addAToDe_hook, 0x0068, 0x62a0);
-  CYC(0x62a0, 0x62a3); SET_HL(wBigBuffer + 0x10);
-  CYC(0x62a3, 0x62a5); B = 0x80;
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+8); A = 0x02;
+  CYC(b_+8, b_+10); hram_wr(gb, 0x70, A);
+  CYC(b_+10, b_+13); A = W8(wGfxRegs2_SCX);
+  CYC(b_+13, b_+14); C = A;
+  CYC(b_+14, b_+17); A = W8(wFrameCounter);
+  CYC(b_+17, b_+18); B = A;
+  CYC(b_+18, b_+21); A = W8(wGfxRegs2_SCY);
+  CYC(b_+21, b_+22); alu_add(gb, B);
+  CYC(b_+22, b_+24); alu_and(gb, 0x7f);
+  CYC(b_+24, b_+27); SET_DE(w2WaveScrollValues);
+  CALL_C(b_+27, addAToDe_hook, 0x0068, b_+30);
+  CYC(b_+30, b_+33); SET_HL(wBigBuffer + 0x10);
+  CYC(b_+33, b_+35); B = 0x80;
   for (;;) {
-    CYC(0x62a5, 0x62a6); A = mem_rd(gb, DE);
-    CYC(0x62a6, 0x62a7); alu_add(gb, C);
-    CYC(0x62a7, 0x62a8); mem_wr(gb, HL, A); SET_HL(HL + 1);
-    CYC(0x62a8, 0x62a9); A = E;
-    CYC(0x62a9, 0x62aa); A = alu_inc8(gb, A);
-    CYC(0x62aa, 0x62ac); alu_and(gb, 0x7f);
-    CYC(0x62ac, 0x62ad); E = A;
-    CYC(0x62ad, 0x62ae); B = alu_dec8(gb, B);
+    CYC(b_+35, b_+36); A = mem_rd(gb, DE);
+    CYC(b_+36, b_+37); alu_add(gb, C);
+    CYC(b_+37, b_+38); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(b_+38, b_+39); A = E;
+    CYC(b_+39, b_+40); A = alu_inc8(gb, A);
+    CYC(b_+40, b_+42); alu_and(gb, 0x7f);
+    CYC(b_+42, b_+43); E = A;
+    CYC(b_+43, b_+44); B = alu_dec8(gb, B);
     if (!(F & FZ)) {
-      CYCT(0x62ae, 0x62b0);
+      CYCT(b_+44, b_+46);
       continue;
     }
-    CYC(0x62ae, 0x62b0);
+    CYC(b_+44, b_+46);
     break;
   }
-  CYC(0x62b0, 0x62b1); alu_xor(gb, A);
-  CYC(0x62b1, 0x62b3); hram_wr(gb, 0x70, A);
-  CYC(0x62b3, 0x62b4); ret_effect(gb);
+  CYC(b_+46, b_+47); alu_xor(gb, A);
+  CYC(b_+47, b_+49); hram_wr(gb, 0x70, A);
+  CYC(b_+49, SYM(checkDisableUnderwaterWaves)); ret_effect(gb);
 }
 
 void checkDisableUnderwaterWaves_hook(GB *gb) {
+  BASE(checkDisableUnderwaterWaves);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(0x62b4, 0x62b7); A = W8(wTilesetFlags);
-  CYC(0x62b7, 0x62b9); alu_and(gb, 0x40);
+  CYC(b_+0, b_+3); A = W8(wTilesetFlags);
+  CYC(b_+3, b_+5); alu_and(gb, 0x40);
   if (F & FZ) {
-    CYCT(0x62b9, 0x62ba); ret_effect(gb);
+    CYCT(b_+5, b_+6); ret_effect(gb);
     return;
   }
-  CYC(0x62b9, 0x62ba);
-  CYC(0x62ba, 0x62bc); A = 0x03;
-  CYC(0x62bc, 0x62be); hram_wr(gb, 0x9d, A);
-  CYC(0x62be, 0x62c0); A = 0xc7;
-  CYC(0x62c0, 0x62c3); W8(wGfxRegs2_LYC) = A;
-  CYC(0x62c3, 0x62c4); ret_effect(gb);
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+8); A = 0x03;
+  CYC(b_+8, b_+10); hram_wr(gb, 0x9d, A);
+  CYC(b_+10, b_+12); A = 0xc7;
+  CYC(b_+12, b_+15); W8(wGfxRegs2_LYC) = A;
+  CYC(b_+15, SYM(checkSolidObjectAtWarpDestPos)); ret_effect(gb);
 }

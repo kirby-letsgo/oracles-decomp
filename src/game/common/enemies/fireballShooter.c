@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0e, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0e, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(enemyCode50), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(enemyCode50), (from), (to), true)
 
 void fireballShooter_state_uninitialized_hook(GB *gb);
 void fireballShooter_state1_hook(GB *gb);
@@ -49,150 +49,157 @@ static void fireballShooter_addAToHl_from_rst(GB *gb, uint16_t return_address) {
 // ENEMY_FIREBALL_SHOOTER
 // ==================================================================================================
 void enemyCode50_hook(GB *gb) {
+  BASE(enemyCode50);
   uint16_t sp0_ = gb->sp;
-  CYC(0x633a, 0x633b); A = alu_dec8(gb, A);
-  if (F & FZ) { RET_TAKEN(0x633b); return; } // ret z
-  CYC(0x633b, 0x633c);
-  CYC(0x633c, 0x633d); A = alu_dec8(gb, A);
-  if (F & FZ) { RET_TAKEN(0x633d); return; } // ret z
-  CYC(0x633d, 0x633e);
-  CYC(0x633e, 0x6340); E = ENEMY_BASE + OBJ_STATE;
-  CYC(0x6340, 0x6341); A = mem_rd(gb, DE);
+  CYC(b_+0, b_+1); A = alu_dec8(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+1); return; } // ret z
+  CYC(b_+1, b_+2);
+  CYC(b_+2, b_+3); A = alu_dec8(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+3); return; } // ret z
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+6); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+6, b_+7); A = mem_rd(gb, DE);
   {
-    CYC(0x6341, 0x6342); push_effect(gb, 0x6342);
+    CYC(b_+7, b_+8); push_effect(gb, b_+8);
     uint16_t target = fireballShooter_jump_table(gb);
-    if (target == 0x6356) { fireballShooter_state_uninitialized_hook(gb); return; }
-    if (target == 0x6362) { fireballShooter_state1_hook(gb); return; }
-    if (target == 0x63a3) { fireballShooter_state_stub_hook(gb); return; }
-    if (target == 0x63a4) { fireballShooter_state8_hook(gb); return; }
-    if (target == 0x63b3) { fireballShooter_state9_hook(gb); return; }
+    if (target == SYM(fireballShooter_state_uninitialized)) { fireballShooter_state_uninitialized_hook(gb); return; }
+    if (target == SYM(fireballShooter_state1)) { fireballShooter_state1_hook(gb); return; }
+    if (target == SYM(fireballShooter_state_stub)) { fireballShooter_state_stub_hook(gb); return; }
+    if (target == SYM(fireballShooter_state8)) { fireballShooter_state8_hook(gb); return; }
+    if (target == SYM(fireballShooter_state9)) { fireballShooter_state9_hook(gb); return; }
     HANDOFF(target);
   }
 }
 
 // 0e:6356, bare global; jump-table target from enemyCode50.
 void fireballShooter_state_uninitialized_hook(GB *gb) {
-  CYC(0x6356, 0x6357); H = D;
-  CYC(0x6357, 0x6358); L = E;
-  CYC(0x6358, 0x6359); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(0x6359, 0x635b); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x635b, 0x635c); A = mem_rd(gb, DE);
-  CYC(0x635c, 0x635e); alu_bit(gb, 7, A);
-  if (F & FZ) { RET_TAKEN(0x635e); return; } // ret z
-  CYC(0x635e, 0x635f);
-  CYC(0x635f, 0x6361); mem_wr(gb, HL, 0x08); // [state]
-  RET(0x6361); return; // ret
+  BASE(fireballShooter_state_uninitialized);
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+2); L = E;
+  CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+3, b_+5); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+8); alu_bit(gb, 7, A);
+  if (F & FZ) { RET_TAKEN(b_+8); return; } // ret z
+  CYC(b_+8, b_+9);
+  CYC(b_+9, b_+11); mem_wr(gb, HL, 0x08); // [state]
+  RET(b_+11); return; // ret
 }
 
 // 0e:6362, bare global; jump-table target from enemyCode50. "Spawner"; spawns shooters at each
 // appropriate tile index, then deletes self.
 void fireballShooter_state1_hook(GB *gb) {
+  BASE(fireballShooter_state1);
   uint16_t sp0_ = gb->sp;
-  CYC(0x6362, 0x6363); alu_xor(gb, A);
-  CYC(0x6363, 0x6365); hram_wr(gb, (uint8_t)hFF8D, A);
-  CYC(0x6365, 0x6367); E = ENEMY_BASE + OBJ_YH;
-  CYC(0x6367, 0x6368); A = mem_rd(gb, DE);
-  CYC(0x6368, 0x6369); C = A;
-  CYC(0x6369, 0x636c); SET_HL(wRoomLayout);
-  CYC(0x636c, 0x636e); B = 0xb0; // LARGE_ROOM_HEIGHT<<4
+  CYC(b_+0, b_+1); alu_xor(gb, A);
+  CYC(b_+1, b_+3); hram_wr(gb, (uint8_t)hFF8D, A);
+  CYC(b_+3, b_+5); E = ENEMY_BASE + OBJ_YH;
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+7); C = A;
+  CYC(b_+7, b_+10); SET_HL(wRoomLayout);
+  CYC(b_+10, b_+12); B = 0xb0; // LARGE_ROOM_HEIGHT<<4
 
 nextTile:
-  CYC(0x636e, 0x636f); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(0x636f, 0x6370); alu_cp(gb, C);
-  if (!(F & FZ)) { CYCT(0x6370, 0x6372); goto notThisTile; } // jr nz
-  CYC(0x6370, 0x6372);
-  PUSH(0x6372, BC);
-  PUSH(0x6373, HL);
-  CYC(0x6374, 0x6375); C = L;
-  CYC(0x6375, 0x6376); C = alu_dec8(gb, C);
-  CYC(0x6376, 0x6378); B = 0x50; // ENEMY_FIREBALL_SHOOTER
-  CALL_C(0x6378, ecom_spawnUncountedEnemyWithSubid01_b0e_hook, 0x436d, 0x637b);
-  if (!(F & FZ)) { CYCT(0x637b, 0x637d); goto delete; } // jr nz
-  CYC(0x637b, 0x637d);
-  CYC(0x637d, 0x637e); E = L;
-  CYC(0x637e, 0x637f); A = mem_rd(gb, DE);
-  CYC(0x637f, 0x6381); A = (uint8_t)(A | (1 << 7)); // set 7,a
-  CYC(0x6381, 0x6382); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x6382, 0x6384); A = hram_rd(gb, (uint8_t)hFF8D);
-  CYC(0x6384, 0x6385); A = alu_inc8(gb, A);
-  CYC(0x6385, 0x6387); alu_and(gb, 0x03);
-  CYC(0x6387, 0x6389); hram_wr(gb, (uint8_t)hFF8D, A);
-  CYC(0x6389, 0x638a); mem_wr(gb, HL, A);
-  CYC(0x638a, 0x638b); A = C;
-  CYC(0x638b, 0x638d); alu_and(gb, 0xf0);
-  CYC(0x638d, 0x638f); alu_add(gb, 0x06);
-  CYC(0x638f, 0x6391); L = ENEMY_BASE + OBJ_YH;
-  CYC(0x6391, 0x6392); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(0x6392, 0x6393); A = C;
-  CYC(0x6393, 0x6395); alu_and(gb, 0x0f);
-  CYC(0x6395, 0x6397); A = alu_swap(gb, A);
-  CYC(0x6397, 0x6399); alu_add(gb, 0x08);
-  CYC(0x6399, 0x639a); L = alu_inc8(gb, L);
-  CYC(0x639a, 0x639b); mem_wr(gb, HL, A);
-  SET_HL(POP(0x639b));
-  SET_BC(POP(0x639c));
+  CYC(b_+12, b_+13); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+13, b_+14); alu_cp(gb, C);
+  if (!(F & FZ)) { CYCT(b_+14, b_+16); goto notThisTile; } // jr nz
+  CYC(b_+14, b_+16);
+  PUSH(b_+16, BC);
+  PUSH(b_+17, HL);
+  CYC(b_+18, b_+19); C = L;
+  CYC(b_+19, b_+20); C = alu_dec8(gb, C);
+  CYC(b_+20, b_+22); B = 0x50; // ENEMY_FIREBALL_SHOOTER
+  CALL_C(b_+22, ecom_spawnUncountedEnemyWithSubid01_b0e_hook, SYM(ecom_spawnUncountedEnemyWithSubid01_b0e), b_+25);
+  if (!(F & FZ)) { CYCT(b_+25, b_+27); goto delete; } // jr nz
+  CYC(b_+25, b_+27);
+  CYC(b_+27, b_+28); E = L;
+  CYC(b_+28, b_+29); A = mem_rd(gb, DE);
+  CYC(b_+29, b_+31); A = (uint8_t)(A | (1 << 7)); // set 7,a
+  CYC(b_+31, b_+32); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+32, b_+34); A = hram_rd(gb, (uint8_t)hFF8D);
+  CYC(b_+34, b_+35); A = alu_inc8(gb, A);
+  CYC(b_+35, b_+37); alu_and(gb, 0x03);
+  CYC(b_+37, b_+39); hram_wr(gb, (uint8_t)hFF8D, A);
+  CYC(b_+39, b_+40); mem_wr(gb, HL, A);
+  CYC(b_+40, b_+41); A = C;
+  CYC(b_+41, b_+43); alu_and(gb, 0xf0);
+  CYC(b_+43, b_+45); alu_add(gb, 0x06);
+  CYC(b_+45, b_+47); L = ENEMY_BASE + OBJ_YH;
+  CYC(b_+47, b_+48); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+48, b_+49); A = C;
+  CYC(b_+49, b_+51); alu_and(gb, 0x0f);
+  CYC(b_+51, b_+53); A = alu_swap(gb, A);
+  CYC(b_+53, b_+55); alu_add(gb, 0x08);
+  CYC(b_+55, b_+56); L = alu_inc8(gb, L);
+  CYC(b_+56, b_+57); mem_wr(gb, HL, A);
+  SET_HL(POP(b_+57));
+  SET_BC(POP(b_+58));
 
 notThisTile:
-  CYC(0x639d, 0x639e); B = alu_dec8(gb, B);
-  if (!(F & FZ)) { CYCT(0x639e, 0x63a0); goto nextTile; } // jr nz
-  CYC(0x639e, 0x63a0);
+  CYC(b_+59, b_+60); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(b_+60, b_+62); goto nextTile; } // jr nz
+  CYC(b_+60, b_+62);
 
 delete:
-  CYC(0x63a0, 0x63a3); enemyDelete_hook(gb); return; // jp
+  CYC(b_+62, SYM(fireballShooter_state_stub)); enemyDelete_hook(gb); return; // jp
 }
 
 // 0e:63a3, bare global; jump-table target from enemyCode50.
 void fireballShooter_state_stub_hook(GB *gb) {
-  RET(0x63a3); return; // ret
+  BASE(fireballShooter_state_stub);
+  RET(b_+0); return; // ret
 }
 
 // 0e:63a4, bare global; jump-table target from enemyCode50. Initialization for "actual"
 // shooter (not spawner).
 void fireballShooter_state8_hook(GB *gb) {
-  CYC(0x63a4, 0x63a6); A = 0x09;
-  CYC(0x63a6, 0x63a7); mem_wr(gb, DE, A); // [state] = 9
-  CYC(0x63a7, 0x63a9); E = ENEMY_BASE + 0x03; // Enemy.var03
-  CYC(0x63a9, 0x63aa); A = mem_rd(gb, DE);
-  CYC(0x63aa, 0x63ad); SET_HL(0x63d0); // fireballShooter_timingOffsets
-  CYC(0x63ad, 0x63ae); fireballShooter_addAToHl_from_rst(gb, 0x63ae);
-  CYC(0x63ae, 0x63b0); E = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x63b0, 0x63b1); A = mem_rd(gb, HL);
-  CYC(0x63b1, 0x63b2); mem_wr(gb, DE, A);
-  RET(0x63b2); return; // ret
+  BASE(fireballShooter_state8);
+  CYC(b_+0, b_+2); A = 0x09;
+  CYC(b_+2, b_+3); mem_wr(gb, DE, A); // [state] = 9
+  CYC(b_+3, b_+5); E = ENEMY_BASE + 0x03; // Enemy.var03
+  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
+  CYC(b_+6, b_+9); SET_HL(SYM(fireballShooter_timingOffsets)); // fireballShooter_timingOffsets
+  CYC(b_+9, b_+10); fireballShooter_addAToHl_from_rst(gb, b_+10);
+  CYC(b_+10, b_+12); E = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+12, b_+13); A = mem_rd(gb, HL);
+  CYC(b_+13, b_+14); mem_wr(gb, DE, A);
+  RET(b_+14); return; // ret
 }
 
 // 0e:63b3, bare global; jump-table target from enemyCode50. Main state for actual shooter.
 void fireballShooter_state9_hook(GB *gb) {
+  BASE(fireballShooter_state9);
   uint16_t sp0_ = gb->sp;
-  CALL_C(0x63b3, fireballShooter_checkAllEnemiesKilled_hook, 0x63d4, 0x63b6);
-  CYC(0x63b6, 0x63b8); C = 0x24;
-  CALL_C(0x63b8, objectCheckLinkWithinDistance_hook, 0x1fa2, 0x63bb);
-  if (F & FC) { RET_TAKEN(0x63bb); return; } // ret c
-  CYC(0x63bb, 0x63bc);
-  CALL_C(0x63bc, ecom_decCounter1_b0e_hook, 0x439a, 0x63bf);
-  if (!(F & FZ)) { RET_TAKEN(0x63bf); return; } // ret nz
-  CYC(0x63bf, 0x63c0);
-  CYC(0x63c0, 0x63c2); B = 0x31; // PART_GOPONGA_PROJECTILE
-  CALL_C(0x63c2, ecom_spawnProjectile_b0e_hook, 0x437c, 0x63c5);
-  CALL_C(0x63c5, getRandomNumber_noPreserveVars_hook, 0x0453, 0x63c8);
-  CYC(0x63c8, 0x63ca); alu_and(gb, 0x07);
-  CYC(0x63ca, 0x63cc); alu_add(gb, 0xc0);
-  CYC(0x63cc, 0x63ce); E = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(0x63ce, 0x63cf); mem_wr(gb, DE, A);
-  RET(0x63cf); return; // ret
+  CALL_C(b_+0, fireballShooter_checkAllEnemiesKilled_hook, SYM(fireballShooter_checkAllEnemiesKilled), b_+3);
+  CYC(b_+3, b_+5); C = 0x24;
+  CALL_C(b_+5, objectCheckLinkWithinDistance_hook, SYM(objectCheckLinkWithinDistance), b_+8);
+  if (F & FC) { RET_TAKEN(b_+8); return; } // ret c
+  CYC(b_+8, b_+9);
+  CALL_C(b_+9, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+12);
+  if (!(F & FZ)) { RET_TAKEN(b_+12); return; } // ret nz
+  CYC(b_+12, b_+13);
+  CYC(b_+13, b_+15); B = 0x31; // PART_GOPONGA_PROJECTILE
+  CALL_C(b_+15, ecom_spawnProjectile_b0e_hook, SYM(ecom_spawnProjectile_b0e), b_+18);
+  CALL_C(b_+18, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+21);
+  CYC(b_+21, b_+23); alu_and(gb, 0x07);
+  CYC(b_+23, b_+25); alu_add(gb, 0xc0);
+  CYC(b_+25, b_+27); E = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+27, b_+28); mem_wr(gb, DE, A);
+  RET(b_+28); return; // ret
 }
 
 // 0e:63d4, bare global; called from fireballShooter_state9. For subid $81 only, this deletes
 // itself when all enemies are killed.
 void fireballShooter_checkAllEnemiesKilled_hook(GB *gb) {
-  CYC(0x63d4, 0x63d6); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(0x63d6, 0x63d7); A = mem_rd(gb, DE);
-  CYC(0x63d7, 0x63d9); alu_cp(gb, 0x81);
-  if (!(F & FZ)) { RET_TAKEN(0x63d9); return; } // ret nz
-  CYC(0x63d9, 0x63da);
-  CYC(0x63da, 0x63dd); A = mem_rd(gb, wNumEnemies);
-  CYC(0x63dd, 0x63de); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(0x63de); return; } // ret nz
-  CYC(0x63de, 0x63df);
-  CYC(0x63df, 0x63e2); enemyDelete_hook(gb); return; // jp
+  BASE(fireballShooter_checkAllEnemiesKilled);
+  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+5); alu_cp(gb, 0x81);
+  if (!(F & FZ)) { RET_TAKEN(b_+5); return; } // ret nz
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+9); A = mem_rd(gb, wNumEnemies);
+  CYC(b_+9, b_+10); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+10); return; } // ret nz
+  CYC(b_+10, b_+11);
+  CYC(b_+11, SYM(enemyCode51)); enemyDelete_hook(gb); return; // jp
 }

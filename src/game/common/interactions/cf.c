@@ -3,8 +3,8 @@
 
 #undef CYC
 #undef CYCT
-#define CYC(from, to) burn_rom(gb, 0x0b, (from), (to), false)
-#define CYCT(from, to) burn_rom(gb, 0x0b, (from), (to), true)
+#define CYC(from, to) burn_rom(gb, SYMBANK(interactionCodecf), (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, SYMBANK(interactionCodecf), (from), (to), true)
 
 static uint16_t cf_jump_table(GB *gb) {
   burn_rom(gb, 0, 0, 1, false); alu_add(gb, A);
@@ -35,36 +35,40 @@ static void cf_add_double_index(GB *gb) {
 }
 
 void interactionCodecf__afterCall4b19_hook(GB *gb) {
-  CYC(0x4b19, 0x4b1b); E = 0x42;
-  CYC(0x4b1b, 0x4b1c); A = mem_rd(gb, DE);
-  CYC(0x4b1c, 0x4b1f); SET_HL(0x4b2b);
-  CYC(0x4b1f, 0x4b20); push_effect(gb, 0x4b20);
+  BASE(interactionCodecf);
+  CYC(b_+14, b_+16); E = 0x42;
+  CYC(b_+16, b_+17); A = mem_rd(gb, DE);
+  CYC(b_+17, b_+20); SET_HL(b_+32);
+  CYC(b_+20, b_+21); push_effect(gb, b_+21);
   cf_add_double_index(gb);
-  CYC(0x4b20, 0x4b21); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(0x4b21, 0x4b23); E = 0x4b;
-  CYC(0x4b23, 0x4b24); mem_wr(gb, DE, A);
-  CYC(0x4b24, 0x4b25); E = alu_inc8(gb, E);
-  CYC(0x4b25, 0x4b26); E = alu_inc8(gb, E);
-  CYC(0x4b26, 0x4b27); A = mem_rd(gb, HL);
-  CYC(0x4b27, 0x4b28); mem_wr(gb, DE, A);
-  CYC(0x4b28, 0x4b2b); objectSetVisible82_hook(gb);
+  CYC(b_+21, b_+22); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+22, b_+24); E = 0x4b;
+  CYC(b_+24, b_+25); mem_wr(gb, DE, A);
+  CYC(b_+25, b_+26); E = alu_inc8(gb, E);
+  CYC(b_+26, b_+27); E = alu_inc8(gb, E);
+  CYC(b_+27, b_+28); A = mem_rd(gb, HL);
+  CYC(b_+28, b_+29); mem_wr(gb, DE, A);
+  CYC(b_+29, b_+32); objectSetVisible82_hook(gb);
 }
 
 void interactionCodecf_hook(GB *gb) {
+  BASE(interactionCodecf);
   uint16_t sp0_ = gb->sp;
-  CYC(0x4b0b, 0x4b0d); E = 0x44;
-  CYC(0x4b0d, 0x4b0e); A = mem_rd(gb, DE);
-  CYC(0x4b0e, 0x4b0f); push_effect(gb, 0x4b0f);
-  switch (cf_jump_table(gb)) {
-    case 0x4b13:
-      CYC(0x4b13, 0x4b15); A = 1;
-      CYC(0x4b15, 0x4b16); mem_wr(gb, DE, A);
-      CALL_C(0x4b16, interactionInitGraphics_hook, 0x15fb, 0x4b19);
+  CYC(b_+0, b_+2); E = 0x44;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (cf_jump_table(gb));
+    if (jt_ == b_+8) {
+      CYC(b_+8, b_+10); A = 1;
+      CYC(b_+10, b_+11); mem_wr(gb, DE, A);
+      CALL_C(b_+11, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+14);
       interactionCodecf__afterCall4b19_hook(gb);
       return;
-    case 0x4b31:
-      CYC(0x4b31, 0x4b34); interactionAnimate_hook(gb);
+    }
+    else if (jt_ == b_+38) {
+      CYC(b_+38, SYM(interactionCoded0)); interactionAnimate_hook(gb);
       return;
-    default: hook_continue(gb, HL, sp0_); return;
-  }
+    }
+    else { hook_continue(gb, HL, sp0_); return; }
+  } while (0);
 }
