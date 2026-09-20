@@ -17,6 +17,11 @@ to record a playthrough on our own core: `oracles ROM roms/cgb_boot.bin --record
 boots exactly like the headless runner (AGB patch, `gbhawk-wram0.txt`, fresh SRAM), writes the
 file every 60 seconds and on quit, and fast-forwards through an existing file before appending.
 
+`seasons-play.inputs` is a playthrough recorded with `oracles --record` on 2026-09-20 (33,337
+frames: file creation, the intro, the first area); `seasons-play.ref` is the interpreter's state
+every 60 frames on it, and `tests/test_tas.c` replays it with hooks on. Extend it by running the
+same `--record` command again (it resumes), then re-record the `.ref` with `--no-hooks`.
+
 `seasons-noinput.ref` is the interpreter's (`--no-hooks`) state every 60 frames for a 30,000-frame
 run of the Seasons ROM with no input (logos, title, attract demo); `tests/test_tas.c` replays it
 with hooks on, so it checks the hooks that run under Seasons against the interpreter, not the

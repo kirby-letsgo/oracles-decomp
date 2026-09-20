@@ -164,7 +164,7 @@ void interactionCodeac__gotoNextState_hook(GB *gb) {
 }
 
 static void bipin_need_essences(GB *gb, uint16_t from, uint8_t amount) {
-  BANKOF(label_0b_006);
+  BANKOF(decideInitialChildPersonality);
   CYC(from, from + 2); E = 0x78;
   CYC(from + 2, from + 4); A = mem_rd(gb, DE);
   CYC(from + 4, from + 6); alu_cp(gb, amount);

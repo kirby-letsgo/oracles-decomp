@@ -38,15 +38,19 @@ def main():
         for line in open(path, errors='replace'):
             m = FUNC.match(line)
             if m:
-                cur = (path, m.group(1)); callees[cur] = set(); burns[cur] = set(); continue
-            if line.startswith('}'): cur = None; continue
+                cur = (path, m.group(1)); callees[cur] = set(); burns[cur] = set()
+                line = line[m.end():]
+            elif line.startswith('}'): cur = None; continue
             if cur is None: continue
             code = line.split('//')[0]
+            if m and code.count('}') > code.count('{'): oneliner = True
+            else: oneliner = False
             for c in CALL.findall(code): callees[cur].add(c)
             for args in EXEC.findall(code):
                 for lab in re.findall(r'\bSYM\((\w+)\)', args): burns[cur].add(lab)
                 bm = re.match(r'\s*(\w+)\)', args)
                 if bm and 'BASE(' in code: burns[cur].add(bm.group(1))
+            if oneliner: cur = None
     by_name = defaultdict(list)
     for (path, fn) in callees: by_name[fn].append(path)
 
@@ -62,9 +66,13 @@ def main():
             if cand in verdict: return verdict[cand]
         return None
 
+    seasons_names = set(rom_labels(seasons_sym))
+    unpairable = re.compile(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)')
+
     def label_verdict(sid):
-        base = re.sub(r'_b[0-9a-f]{2}$', '', sid.split('__')[0])
-        return verdict.get(base)
+        name = re.sub(r'_b[0-9a-f]{2}$', '', sid).replace('__', '@')
+        if unpairable.match(name) or name not in seasons_names: return 'AGES_ONLY'
+        return verdict.get(name.split('@')[0])
 
     eligible = {}
     for key, fn in ((k, k[1]) for k in callees):
@@ -105,7 +113,7 @@ def main():
         a_inst = ages.get(parent, [])
         rank = [b for b, a in a_inst].index(bank) if bank in [b for b, a in a_inst] else 0
         s_inst = seasons.get(name, [])
-        if re.match(r'^(_label_[0-9a-f]{2}_\d+|func_[0-9a-f]{2}_[0-9a-f]{4}|label_[0-9a-f]{2}_\d+)', parent): s_inst = []
+        if re.match(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)', parent): s_inst = []
         if len(s_inst) == len(a_inst) and s_inst: s = s_inst[rank]
         elif len(s_inst) == 1: s = s_inst[0]
         else: skipped['no seasons label'] += 1; continue

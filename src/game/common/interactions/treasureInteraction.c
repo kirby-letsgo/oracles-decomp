@@ -48,7 +48,7 @@ L_49a1:
   CYC(b_+48,b_+49); A = mem_rd(gb, DE);
   CYC(b_+49,b_+50); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+50,b_+50+1);ret_effect(gb); return; } CYC(b_+50,b_+51);
-  CYC(b_+51,b_+54); if (hook_enabled_at(SYM(objectSetVisiblec2))) { objectSetVisiblec2_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec2));
+  CYC(b_+51,b_+54); if (hook_enabled_at(gb, SYM(objectSetVisiblec2))) { objectSetVisiblec2_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec2));
 L_49a9:
   CYC(b_+54,b_+56); E = 0x71;
   CYC(b_+56,b_+57); A = mem_rd(gb, DE);
@@ -74,7 +74,7 @@ L_49bb:
   CYC(b_+78,b_+80); mem_wr(gb, HL, 0x00);
   CALL_C(b_+80, interactionCode60__checkLinkTouched_hook, b_+789, b_+83);
   if ((F & FC)) { CYCT(b_+83,b_+86); goto L_4a50; } CYC(b_+83,b_+86);
-  CYC(b_+86,b_+89); if (hook_enabled_at(SYM(objectSetVisiblec2))) { objectSetVisiblec2_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec2));
+  CYC(b_+86,b_+89); if (hook_enabled_at(gb, SYM(objectSetVisiblec2))) { objectSetVisiblec2_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec2));
 L_49cc:
   CYC(b_+89,b_+91); E = 0x45;
   CYC(b_+91,b_+92); A = mem_rd(gb, DE);
@@ -111,7 +111,7 @@ L_49ee:
   CYC(b_+127,b_+129); L = 0x46;
   CYC(b_+129,b_+131); mem_wr(gb, HL, 0x28);
   CYC(b_+131,b_+133); A = 0x4d;
-  CYC(b_+133,b_+136); if (hook_enabled_at(SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));
+  CYC(b_+133,b_+136); if (hook_enabled_at(gb, SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));
 L_49fb:
   CALL_C(b_+136, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+139);
   if (!(F & FZ)) { CYCT(b_+139,b_+140);ret_effect(gb); return; } CYC(b_+139,b_+140);
@@ -137,14 +137,14 @@ L_4a14:
   if (!(F & FC)) { CYCT(b_+178,b_+180); goto L_4a2d; } CYC(b_+178,b_+180);
   CYC(b_+180,b_+181); A = alu_dec8(gb, A);
   if ((F & FZ)) { CYCT(b_+181,b_+183); goto L_4a62; } CYC(b_+181,b_+183);
-  CYC(b_+183,b_+186); if (hook_enabled_at(SYM(objectReplaceWithFallingDownHoleInteraction))) { objectReplaceWithFallingDownHoleInteraction_hook(gb); return; } HANDOFF(SYM(objectReplaceWithFallingDownHoleInteraction));
+  CYC(b_+183,b_+186); if (hook_enabled_at(gb, SYM(objectReplaceWithFallingDownHoleInteraction))) { objectReplaceWithFallingDownHoleInteraction_hook(gb); return; } HANDOFF(SYM(objectReplaceWithFallingDownHoleInteraction));
 L_4a2d:
   CYC(b_+186,b_+188); A = 0x77;
   CALL_C(b_+188, playSound_b00_hook, SYM(playSound_b00), b_+191);
   CALL_C(b_+191, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+194);
   if ((F & FZ)) { CYCT(b_+194,b_+196); goto L_4a3d; } CYC(b_+194,b_+196);
   CYC(b_+196,b_+199); SET_BC(0xff56);
-  CYC(b_+199,b_+202); if (hook_enabled_at(SYM(objectSetSpeedZ))) { objectSetSpeedZ_hook(gb); return; } HANDOFF(SYM(objectSetSpeedZ));
+  CYC(b_+199,b_+202); if (hook_enabled_at(gb, SYM(objectSetSpeedZ))) { objectSetSpeedZ_hook(gb); return; } HANDOFF(SYM(objectSetSpeedZ));
 L_4a3d:
   CALL_C(b_+202, objectSetVisible_hook, SYM(objectSetVisible), b_+205);
   CALL_C(b_+205, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+208);
@@ -152,8 +152,8 @@ L_4a3d:
   CYC(b_+210,b_+212); goto L_4a55;
 L_4a47:
   CALL_C(b_+212, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+215);
-  if (!(F & FC)) { CYCT(b_+215,b_+218); if (hook_enabled_at(SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible)); } CYC(b_+215,b_+218);
-  CYC(b_+218,b_+221); if (hook_enabled_at(SYM(objectSetVisible))) { objectSetVisible_hook(gb); return; } HANDOFF(SYM(objectSetVisible));
+  if (!(F & FC)) { CYCT(b_+215,b_+218); if (hook_enabled_at(gb, SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible)); } CYC(b_+215,b_+218);
+  CYC(b_+218,b_+221); if (hook_enabled_at(gb, SYM(objectSetVisible))) { objectSetVisible_hook(gb); return; } HANDOFF(SYM(objectSetVisible));
 L_4a50:
   CALL_C(b_+221, interactionCode60__giveTreasure_hook, b_+703, b_+224);
   CYC(b_+224,b_+226); A = 0x03;
@@ -166,7 +166,7 @@ L_4a55:
   CYC(b_+232,b_+234); L = 0x4e;
   CYC(b_+234,b_+235); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+235,b_+236); mem_wr(gb, HL, A);
-  CYC(b_+236,b_+239); if (hook_enabled_at(SYM(interactionSetAlwaysUpdateBit))) { interactionSetAlwaysUpdateBit_hook(gb); return; } HANDOFF(SYM(interactionSetAlwaysUpdateBit));
+  CYC(b_+236,b_+239); if (hook_enabled_at(gb, SYM(interactionSetAlwaysUpdateBit))) { interactionSetAlwaysUpdateBit_hook(gb); return; } HANDOFF(SYM(interactionSetAlwaysUpdateBit));
 L_4a62:
   CYC(b_+239,b_+240); H = D;
   CYC(b_+240,b_+242); L = 0x70;
@@ -181,7 +181,7 @@ L_4a62:
   CYC(b_+251,b_+253); L = 0x5a;
   CYC(b_+253,b_+255); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
   CYC(b_+255,b_+257); B = 0x03;
-  CYC(b_+257,b_+260); if (hook_enabled_at(SYM(objectCreateInteractionWithSubid00))) { objectCreateInteractionWithSubid00_hook(gb); return; } HANDOFF(SYM(objectCreateInteractionWithSubid00));
+  CYC(b_+257,b_+260); if (hook_enabled_at(gb, SYM(objectCreateInteractionWithSubid00))) { objectCreateInteractionWithSubid00_hook(gb); return; } HANDOFF(SYM(objectCreateInteractionWithSubid00));
 L_4a77:
   CYC(b_+260,b_+262); A = 0x80;
   CYC(b_+262,b_+265); mem_wr(gb, wForceLinkPushAnimation, A);
@@ -206,7 +206,7 @@ L_4a86:
   CYC(b_+286,b_+288); mem_wr(gb, HL, 0x0a);
   CYC(b_+288,b_+290); L = 0x46;
   CYC(b_+290,b_+292); mem_wr(gb, HL, 0x20);
-  CYC(b_+292,b_+295); if (hook_enabled_at(SYM(objectSetVisible80))) { objectSetVisible80_hook(gb); return; } HANDOFF(SYM(objectSetVisible80));
+  CYC(b_+292,b_+295); if (hook_enabled_at(gb, SYM(objectSetVisible80))) { objectSetVisible80_hook(gb); return; } HANDOFF(SYM(objectSetVisible80));
 L_4a9a:
   CALL_C(b_+295, objectApplySpeed_hook, SYM(objectApplySpeed), b_+298);
   CALL_C(b_+298, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+301);
@@ -228,7 +228,7 @@ L_4ab0:
   CYC(b_+327,b_+329); E = 0x79;
   CYC(b_+329,b_+330); A = mem_rd(gb, DE);
   CYC(b_+330,b_+333); mem_wr(gb, wDisabledObjects, A);
-  CYC(b_+333,b_+336); if (hook_enabled_at(SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete));
+  CYC(b_+333,b_+336); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete));
 L_4ac3:
   CYC(b_+336,b_+338); E = 0x45;
   CYC(b_+338,b_+339); A = mem_rd(gb, DE);
@@ -258,7 +258,7 @@ L_4ada:
   CYC(b_+372,b_+375); SET_BC(0x8100);
   CALL_C(b_+375, interactionCode60__setLinkAnimationAndDeleteIfTextClosed_hook, b_+556, b_+378);
   CYC(b_+378,b_+380); A = 0x4c;
-  CYC(b_+380,b_+383); if (hook_enabled_at(SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));
+  CYC(b_+380,b_+383); if (hook_enabled_at(gb, SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));
 L_4af2:
   CYC(b_+383,b_+386); A = mem_rd(gb, wOamEnd);
   CYC(b_+386,b_+388); alu_and(gb, 0x7f);
@@ -266,7 +266,7 @@ L_4af2:
   CYC(b_+389,b_+390); alu_xor(gb, A);
   CYC(b_+390,b_+393); mem_wr(gb, wDisableLinkCollisionsAndMenu, A);
   CYC(b_+393,b_+396); mem_wr(gb, wDisabledObjects, A);
-  CYC(b_+396,b_+399); if (hook_enabled_at(SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete));
+  CYC(b_+396,b_+399); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete));
 L_4b02:
   CALL_C(b_+399, interactionCode60__checkLinkTouched_hook, b_+789, b_+402);
   if (!(F & FC)) { CYCT(b_+402,b_+402+1);ret_effect(gb); return; } CYC(b_+402,b_+403);
@@ -301,7 +301,7 @@ L_4b26:
 L_4b30:
   CYC(b_+445,b_+448); A = mem_rd(gb, wScreenVariables);
   CYC(b_+448,b_+450); alu_and(gb, 0x0c);
-  if (!(F & FZ)) { CYCT(b_+450,b_+453); if (hook_enabled_at(SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+450,b_+453);
+  if (!(F & FZ)) { CYCT(b_+450,b_+453); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+450,b_+453);
   CYC(b_+453,b_+456); A = mem_rd(gb, wccaa);
   CYC(b_+456,b_+457); A = alu_inc8(gb, A);
   if (!(F & FZ)) { CYCT(b_+457,b_+457+1);ret_effect(gb); return; } CYC(b_+457,b_+458);
@@ -316,7 +316,7 @@ L_4b30:
   CYC(b_+475,b_+476); mem_wr(gb, HL, A);
   CYC(b_+476,b_+478); L = 0x50;
   CYC(b_+478,b_+480); mem_wr(gb, HL, 0x14);
-  CYC(b_+480,b_+483); if (hook_enabled_at(SYM(objectSetVisiblec2))) { objectSetVisiblec2_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec2));
+  CYC(b_+480,b_+483); if (hook_enabled_at(gb, SYM(objectSetVisiblec2))) { objectSetVisiblec2_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec2));
 L_4b56:
   CALL_C(b_+483, objectCheckTileCollision_allowHoles_hook, SYM(objectCheckTileCollision_allowHoles), b_+486);
   if (!(F & FC)) { CALL_C_CC(b_+486, objectApplySpeed_hook, SYM(objectApplySpeed), b_+489); } else CYC(b_+486,b_+489);
@@ -326,7 +326,7 @@ L_4b56:
   CYC(b_+495,b_+495+1);push_effect(gb,AF);
   CALL_C(b_+496, objectReplaceWithAnimationIfOnHazard_hook, SYM(objectReplaceWithAnimationIfOnHazard), b_+499);
   CYC(b_+499,b_+499+1);SET_BC(pop_effect(gb));
-  if ((F & FC)) { CYCT(b_+500,b_+503); if (hook_enabled_at(SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+500,b_+503);
+  if ((F & FC)) { CYCT(b_+500,b_+503); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+500,b_+503);
   CYC(b_+503,b_+505); A = 0x77;
   CALL_C(b_+505, playSound_b00_hook, SYM(playSound_b00), b_+508);
   CYC(b_+508,b_+510); alu_bit(gb, 4, C);
@@ -381,7 +381,7 @@ L_4bbd:
   CYC(b_+592,b_+594); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 0)));
   CYC(b_+594,b_+596); A = 0x0f;
   CYC(b_+596,b_+599); mem_wr(gb, wInstrumentsDisabledCounter, A);
-  CYC(b_+599,b_+602); if (hook_enabled_at(SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete));
+  CYC(b_+599,b_+602); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete));
 L_4bcd:
   CYC(b_+602,b_+604); A = 0x78;
   CYC(b_+604,b_+607); mem_wr(gb, wInstrumentsDisabledCounter, A);
@@ -409,7 +409,7 @@ L_4bde:
   CYC(b_+631,b_+633); A = 0xff;
   CALL_C(b_+633, setLinkForceStateToState08_withParam_hook, SYM(setLinkForceStateToState08_withParam), b_+636);
   CYC(b_+636,b_+639); SET_HL(wLinkForceState);
-  CYC(b_+639,b_+642); if (hook_enabled_at(SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible));
+  CYC(b_+639,b_+642); if (hook_enabled_at(gb, SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible));
 L_4bf5:
   CALL_C(b_+642, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+645);
   if (!(F & FZ)) { CYCT(b_+645,b_+645+1);ret_effect(gb); return; } CYC(b_+645,b_+646);
@@ -436,12 +436,12 @@ L_4c02:
   CALL_C(b_+684, objectSetVisible80_hook, SYM(objectSetVisible80), b_+687);
   CALL_C(b_+687, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+690);
   CYC(b_+690,b_+692); A = 0xab;
-  CYC(b_+692,b_+695); if (hook_enabled_at(SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));
+  CYC(b_+692,b_+695); if (hook_enabled_at(gb, SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));
 L_4c2a:
   CYC(b_+695,b_+698); A = mem_rd(gb, wDisabledObjects);
   CYC(b_+698,b_+699); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+699,b_+700);ret_effect(gb); return; } CYC(b_+699,b_+700);
-  CYC(b_+700,b_+703); if (hook_enabled_at(SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete));
+  CYC(b_+700,b_+703); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete));
 }
 
 void interactionCode60__giveTreasure_hook(GB *gb) {
@@ -525,7 +525,7 @@ L_4c9d:
   CYC(b_+816,b_+818); E = 0x6a;
   CYC(b_+818,b_+819); A = mem_rd(gb, DE);
   CYC(b_+819,b_+820); alu_or(gb, A);
-  if ((F & FZ)) { CYCT(b_+820,b_+823); if (hook_enabled_at(SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing))) { objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook(gb); return; } HANDOFF(SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing)); } CYC(b_+820,b_+823);
+  if ((F & FZ)) { CYCT(b_+820,b_+823); if (hook_enabled_at(gb, SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing))) { objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook(gb); return; } HANDOFF(SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing)); } CYC(b_+820,b_+823);
   CYC(b_+823,b_+824); alu_scf(gb);
   CYC(b_+824,b_+824+1);ret_effect(gb); return;
 L_4cac:

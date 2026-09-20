@@ -10393,7 +10393,7 @@ static bool decompress_call_hook(GB *gb, void (*fn)(GB *), uint16_t target,
                                  uint16_t ra, uint16_t sp0_) {
   push_effect(gb, (uint16_t)(ra));
   uint16_t sp_ = cpu_sp(gb);
-  if (hook_in_verify || !hook_enabled_at(target)) asm_call(gb, target, ra);
+  if (hook_in_verify || !hook_enabled_at(gb, target)) asm_call(gb, target, ra);
   else {
     fn(gb);
     if (!(cpu_pc(gb) == ra && cpu_sp(gb) == (uint16_t)(sp_ + 2))) {

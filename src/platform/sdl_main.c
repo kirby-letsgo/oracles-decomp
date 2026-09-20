@@ -4,11 +4,11 @@
 #include "platform/png.h"
 #include "platform/render.h"
 #include "platform/setup.h"
+#include "hooks/hooks.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 static uint8_t live_joy;
-static uint8_t live_input(void *ctx, uint64_t frame) { (void)ctx; (void)frame; return live_joy; }
 
 static uint8_t *read_all(const char *path, size_t *size);
 
@@ -32,6 +32,20 @@ static void rec_load_existing(void) {
   rec_resume = rec_len;
   free(d);
   fprintf(stderr, "resuming: replaying %llu recorded frames first\n", (unsigned long long)rec_resume);
+}
+
+static void rec_set(uint64_t frame, uint8_t joy) {
+  while (rec_len <= frame) rec_push(0);
+  rec_buf[frame] = joy;
+}
+
+// The core indexes inputs by its own frame counter (boot frames included), so the recording is
+// keyed by that and not by the render loop's iteration count.
+static uint8_t live_input(void *ctx, uint64_t frame) {
+  (void)ctx;
+  if (frame < rec_resume) return rec_buf[frame];
+  if (rec_path) rec_set(frame, live_joy);
+  return live_joy;
 }
 
 static void rec_write(void) {
@@ -119,6 +133,7 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--init-ram")) { init_ram = argv[++i]; }
   }
   if (rec_path && !init_ram) init_ram = "tas/gbhawk-wram0.txt";
+  if (rec_path) hook_mode = HOOK_MODE_OFF;
   size_t rom_size, boot_size;
   uint8_t *rom = read_all(argv[1], &rom_size);
   if (!rom) { fprintf(stderr, "cannot read %s\n", argv[1]); return 2; }
@@ -171,16 +186,14 @@ int main(int argc, char **argv) {
       case SDL_EVENT_GAMEPAD_BUTTON_UP: live_joy &= ~pad_bit(ev.gbutton.button); break;
       }
     }
-    bool fast_forward = frames < rec_resume;
+    bool fast_forward = GRID_FRAME(gb->cycles) < rec_resume;
     if (!fast_forward && audio && SDL_GetAudioStreamQueued(audio) > AUDIO_TARGET_BYTES) { SDL_Delay(1); continue; }
-    if (fast_forward) live_joy = rec_buf[frames];
-    else if (rec_path) rec_push(live_joy);
     gb_run_frame(gb);
     frames++;
     if (rec_path && !fast_forward && frames % 3600 == 0) rec_write();
     uint32_t n = apu_read_samples(&gb->apu, samples, APU_RING);
     if (fast_forward) {
-      if (frames == rec_resume) { live_joy = 0; fprintf(stderr, "resumed at frame %llu, recording live\n", (unsigned long long)frames); }
+      if (GRID_FRAME(gb->cycles) >= rec_resume) { live_joy = 0; fprintf(stderr, "resumed at frame %llu, recording live\n", (unsigned long long)rec_resume); }
       else if (frames % 600) continue;
     }
     if (audio && !fast_forward) SDL_PutAudioStreamData(audio, samples, n * 4);

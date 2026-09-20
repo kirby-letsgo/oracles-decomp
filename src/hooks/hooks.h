@@ -23,7 +23,7 @@ extern bool hook_verify_abort;
 
 void hooks_init(void);
 bool hook_dispatch(GB *gb);
-bool hook_enabled_at(uint16_t addr);
+bool hook_enabled_at(const GB *gb, uint16_t addr);
 void gb_burn(GB *gb, int mcycles);
 void gb_burn_nb(GB *gb, int mcycles);
 void hooks_report(void);

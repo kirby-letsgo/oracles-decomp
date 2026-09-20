@@ -221,7 +221,7 @@ class Symbolizer:
             for i in range(s, e): base_of_line[i] = base
             base_decl[s] = base
 
-        singles = [b for b in base_decl.values() if not re.search(r'_b[0-9a-f]{2}$', b)]
+        singles = [b for b in base_decl.values() if not re.search(r'_b[0-9a-f]{2}$', b) and not re.match(r'^(_?label_[0-9a-f]{2}_|func_[0-9a-f]{2}_)', b)]
         fallback = singles[0] if singles else next(iter(base_decl.values()), None)
         needs_bankof = set()
         if define_lines and fallback:

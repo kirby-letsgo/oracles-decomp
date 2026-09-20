@@ -25,7 +25,7 @@ for line in open('src/hooks/syms_used.txt'):
     a_inst = ages.get(parent, [])
     rank = [b for b, a in a_inst].index(bank) if bank in [b for b, a in a_inst] else 0
     s_inst = seasons.get(name, [])
-    if re.match(r'^(_label_[0-9a-f]{2}_\d+|func_[0-9a-f]{2}_[0-9a-f]{4}|label_[0-9a-f]{2}_\d+)', parent): s_inst = []
+    if re.match(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)', parent): s_inst = []
     if len(s_inst) == len(a_inst) and s_inst: s = s_inst[rank]
     elif len(s_inst) == 1: s = s_inst[0]
     elif s_inst and len(s_inst) == len(seasons.get(parent, [])) and rank < len(s_inst): s = s_inst[rank]

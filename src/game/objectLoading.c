@@ -131,7 +131,7 @@ void assignRandomPositionToEnemy_hook(GB *gb) {
   CYC(b_+13, b_+16); L = 0x8b;
   CALL_C(b_+16, setShortPosition_paramC_hook, SYM(setShortPosition_paramC), b_+19);
   CYC(b_+19, b_+20); alu_xor(gb, A);
-  ret_effect(gb);
+  RET(b_+20);
 }
 
 void checkEnemyKilled_hook(GB *gb) {

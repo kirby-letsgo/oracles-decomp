@@ -205,7 +205,14 @@ static void verify(GB *gb, Hook *h) {
   verify_depth--;
 }
 
-bool hook_enabled_at(uint16_t addr) { if (!inited) hooks_init(); return first_at[addr] >= 0; }
+bool hook_enabled_at(const GB *gb, uint16_t addr) {
+  if (!inited) hooks_init();
+  int i = first_at[addr];
+  if (i < 0) return false;
+  for (; i < (int)NHOOKS && hooks[i].addr == addr; i++)
+    if ((addr < 0x4000 || addr >= 0x8000 || hooks[i].bank == gb->rom_bank) && first_at[hooks[i].addr] >= 0) return true;
+  return false;
+}
 
 bool hook_dispatch(GB *gb) {
   if (hook_mode == HOOK_MODE_OFF) return false;

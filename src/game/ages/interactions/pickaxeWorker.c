@@ -64,7 +64,7 @@ L_693f:
   CALL_C(b_+20, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+23);
 L_6942:
   CALL_C(b_+23, interactionRunScript_hook, SYM(interactionRunScript), b_+26);
-  if ((F & FC)) { CYCT(b_+26, b_+29); if (hook_enabled_at(SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+26, b_+29);
+  if ((F & FC)) { CYCT(b_+26, b_+29); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+26, b_+29);
   CALL_C(b_+29, interactionAnimateAsNpc_hook, SYM(interactionAnimateAsNpc), b_+32);
   CYC(b_+32, b_+34); E = 0x61;
   CYC(b_+34, b_+35); A = mem_rd(gb, DE);
@@ -117,7 +117,7 @@ L_6983:
   CYC(b_+106, b_+107); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+107, b_+108); H = mem_rd(gb, HL);
   CYC(b_+108, b_+109); L = A;
-  CYC(b_+109, b_+112); if (hook_enabled_at(SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
+  CYC(b_+109, b_+112); if (hook_enabled_at(gb, SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
 L_699b:
   CALL_C(b_+112, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+115);
   CALL_C(b_+115, interactionRunScript_hook, SYM(interactionRunScript), b_+118);
@@ -153,8 +153,8 @@ L_69cb:
   CYC(b_+160, b_+162); L = 0x4b;
   CYC(b_+162, b_+163); A = mem_rd(gb, HL);
   CYC(b_+163, b_+165); alu_cp(gb, 0x50);
-  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
-  CYC(b_+168, b_+171); if (hook_enabled_at(SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
+  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(gb, SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
+  CYC(b_+168, b_+171); if (hook_enabled_at(gb, SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
 L_69d6:
   CALL_C(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+183, b_+174);
   if (!(F & FC)) { CYCT(b_+174, b_+175); ret_effect(gb); return; } CYC(b_+174, b_+175);
@@ -167,14 +167,14 @@ L_69e2:
   CYC(b_+185, b_+186); A = mem_rd(gb, DE);
   CYC(b_+186, b_+187); alu_or(gb, A);
   if ((F & FZ)) { CALL_C_CC(b_+187, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+190); } else CYC(b_+187, b_+190);
-  CYC(b_+190, b_+193); if (hook_enabled_at(SYM(interactionRunScript))) { interactionRunScript_hook(gb); return; } HANDOFF(SYM(interactionRunScript));
+  CYC(b_+190, b_+193); if (hook_enabled_at(gb, SYM(interactionRunScript))) { interactionRunScript_hook(gb); return; } HANDOFF(SYM(interactionRunScript));
 L_69ec:
   CALL_C(b_+193, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+196);
   CALL_C(b_+196, objectApplySpeed_hook, SYM(objectApplySpeed), b_+199);
   CALL_C(b_+199, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+202);
   if (!(F & FZ)) { CYCT(b_+202, b_+203); ret_effect(gb); return; } CYC(b_+202, b_+203);
   CALL_C(b_+203, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+206);
-  CYC(b_+206, b_+209); if (hook_enabled_at(SYM(fadeoutToWhite))) { fadeoutToWhite_hook(gb); return; } HANDOFF(SYM(fadeoutToWhite));
+  CYC(b_+206, b_+209); if (hook_enabled_at(gb, SYM(fadeoutToWhite))) { fadeoutToWhite_hook(gb); return; } HANDOFF(SYM(fadeoutToWhite));
 L_69fc:
   CYC(b_+209, b_+212); A = mem_rd(gb, wPaletteThread_mode);
   CYC(b_+212, b_+213); alu_or(gb, A);
@@ -208,7 +208,7 @@ L_69fc:
   CYC(b_+273, b_+274); H = mem_rd(gb, HL);
   CYC(b_+274, b_+275); L = A;
   CALL_C(b_+275, interactionSetScript_hook, SYM(interactionSetScript), b_+278);
-  CYC(b_+278, b_+281); if (hook_enabled_at(SYM(fadeinFromWhite))) { fadeinFromWhite_hook(gb); return; } HANDOFF(SYM(fadeinFromWhite));
+  CYC(b_+278, b_+281); if (hook_enabled_at(gb, SYM(fadeinFromWhite))) { fadeinFromWhite_hook(gb); return; } HANDOFF(SYM(fadeinFromWhite));
 L_6a44:
   CALL_C(b_+281, checkInteractionState_hook, SYM(checkInteractionState), b_+284);
   if (!(F & FZ)) { CYCT(b_+284, b_+286); goto L_6a4c; } CYC(b_+284, b_+286);
@@ -244,7 +244,7 @@ L_6a5f:
   CYC(b_+335, b_+336); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+336, b_+337); H = mem_rd(gb, HL);
   CYC(b_+337, b_+338); L = A;
-  CYC(b_+338, b_+341); if (hook_enabled_at(SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
+  CYC(b_+338, b_+341); if (hook_enabled_at(gb, SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
 L_6aa4:
   CYC(b_+377, b_+378); C = A;
   CYC(b_+378, b_+380); B = 0x02;
@@ -298,7 +298,7 @@ L_693f:
   CALL_C(b_+20, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+23);
 L_6942:
   CALL_C(b_+23, interactionRunScript_hook, SYM(interactionRunScript), b_+26);
-  if ((F & FC)) { CYCT(b_+26, b_+29); if (hook_enabled_at(SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+26, b_+29);
+  if ((F & FC)) { CYCT(b_+26, b_+29); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+26, b_+29);
   CALL_C(b_+29, interactionAnimateAsNpc_hook, SYM(interactionAnimateAsNpc), b_+32);
   CYC(b_+32, b_+34); E = 0x61;
   CYC(b_+34, b_+35); A = mem_rd(gb, DE);
@@ -361,7 +361,7 @@ L_693f:
   CALL_C(b_+20, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+23);
 L_6942:
   CALL_C(b_+23, interactionRunScript_hook, SYM(interactionRunScript), b_+26);
-  if ((F & FC)) { CYCT(b_+26, b_+29); if (hook_enabled_at(SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+26, b_+29);
+  if ((F & FC)) { CYCT(b_+26, b_+29); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+26, b_+29);
   CALL_C(b_+29, interactionAnimateAsNpc_hook, SYM(interactionAnimateAsNpc), b_+32);
   CYC(b_+32, b_+34); E = 0x61;
   CYC(b_+34, b_+35); A = mem_rd(gb, DE);
@@ -422,7 +422,7 @@ L_693f:
   CALL_C(b_+20, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+23);
 L_6942:
   CALL_C(b_+23, interactionRunScript_hook, SYM(interactionRunScript), b_+26);
-  if ((F & FC)) { CYCT(b_+26, b_+29); if (hook_enabled_at(SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+26, b_+29);
+  if ((F & FC)) { CYCT(b_+26, b_+29); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+26, b_+29);
   CALL_C(b_+29, interactionAnimateAsNpc_hook, SYM(interactionAnimateAsNpc), b_+32);
   CYC(b_+32, b_+34); E = 0x61;
   CYC(b_+34, b_+35); A = mem_rd(gb, DE);
@@ -481,7 +481,7 @@ void interactionCode57__subid03__state1_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6942:
   CALL_C(b_+23, interactionRunScript_hook, SYM(interactionRunScript), b_+26);
-  if ((F & FC)) { CYCT(b_+26, b_+29); if (hook_enabled_at(SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+26, b_+29);
+  if ((F & FC)) { CYCT(b_+26, b_+29); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+26, b_+29);
   CALL_C(b_+29, interactionAnimateAsNpc_hook, SYM(interactionAnimateAsNpc), b_+32);
   CYC(b_+32, b_+34); E = 0x61;
   CYC(b_+34, b_+35); A = mem_rd(gb, DE);
@@ -578,7 +578,7 @@ L_6983:
   CYC(b_+106, b_+107); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+107, b_+108); H = mem_rd(gb, HL);
   CYC(b_+108, b_+109); L = A;
-  CYC(b_+109, b_+112); if (hook_enabled_at(SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
+  CYC(b_+109, b_+112); if (hook_enabled_at(gb, SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
 L_699b:
   CALL_C(b_+112, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+115);
   CALL_C(b_+115, interactionRunScript_hook, SYM(interactionRunScript), b_+118);
@@ -614,8 +614,8 @@ L_69cb:
   CYC(b_+160, b_+162); L = 0x4b;
   CYC(b_+162, b_+163); A = mem_rd(gb, HL);
   CYC(b_+163, b_+165); alu_cp(gb, 0x50);
-  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
-  CYC(b_+168, b_+171); if (hook_enabled_at(SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
+  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(gb, SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
+  CYC(b_+168, b_+171); if (hook_enabled_at(gb, SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
 L_69d6:
   CALL_C(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+183, b_+174);
   if (!(F & FC)) { CYCT(b_+174, b_+175); ret_effect(gb); return; } CYC(b_+174, b_+175);
@@ -628,14 +628,14 @@ L_69e2:
   CYC(b_+185, b_+186); A = mem_rd(gb, DE);
   CYC(b_+186, b_+187); alu_or(gb, A);
   if ((F & FZ)) { CALL_C_CC(b_+187, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+190); } else CYC(b_+187, b_+190);
-  CYC(b_+190, b_+193); if (hook_enabled_at(SYM(interactionRunScript))) { interactionRunScript_hook(gb); return; } HANDOFF(SYM(interactionRunScript));
+  CYC(b_+190, b_+193); if (hook_enabled_at(gb, SYM(interactionRunScript))) { interactionRunScript_hook(gb); return; } HANDOFF(SYM(interactionRunScript));
 L_69ec:
   CALL_C(b_+193, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+196);
   CALL_C(b_+196, objectApplySpeed_hook, SYM(objectApplySpeed), b_+199);
   CALL_C(b_+199, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+202);
   if (!(F & FZ)) { CYCT(b_+202, b_+203); ret_effect(gb); return; } CYC(b_+202, b_+203);
   CALL_C(b_+203, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+206);
-  CYC(b_+206, b_+209); if (hook_enabled_at(SYM(fadeoutToWhite))) { fadeoutToWhite_hook(gb); return; } HANDOFF(SYM(fadeoutToWhite));
+  CYC(b_+206, b_+209); if (hook_enabled_at(gb, SYM(fadeoutToWhite))) { fadeoutToWhite_hook(gb); return; } HANDOFF(SYM(fadeoutToWhite));
 L_69fc:
   CYC(b_+209, b_+212); A = mem_rd(gb, wPaletteThread_mode);
   CYC(b_+212, b_+213); alu_or(gb, A);
@@ -669,7 +669,7 @@ L_69fc:
   CYC(b_+273, b_+274); H = mem_rd(gb, HL);
   CYC(b_+274, b_+275); L = A;
   CALL_C(b_+275, interactionSetScript_hook, SYM(interactionSetScript), b_+278);
-  CYC(b_+278, b_+281); if (hook_enabled_at(SYM(fadeinFromWhite))) { fadeinFromWhite_hook(gb); return; } HANDOFF(SYM(fadeinFromWhite));
+  CYC(b_+278, b_+281); if (hook_enabled_at(gb, SYM(fadeinFromWhite))) { fadeinFromWhite_hook(gb); return; } HANDOFF(SYM(fadeinFromWhite));
 }
 
 void interactionCode57__subid1And2State0_hook(GB *gb) {
@@ -712,7 +712,7 @@ L_6983:
   CYC(b_+106, b_+107); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+107, b_+108); H = mem_rd(gb, HL);
   CYC(b_+108, b_+109); L = A;
-  CYC(b_+109, b_+112); if (hook_enabled_at(SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
+  CYC(b_+109, b_+112); if (hook_enabled_at(gb, SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
 L_699b:
   CALL_C(b_+112, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+115);
   CALL_C(b_+115, interactionRunScript_hook, SYM(interactionRunScript), b_+118);
@@ -748,8 +748,8 @@ L_69cb:
   CYC(b_+160, b_+162); L = 0x4b;
   CYC(b_+162, b_+163); A = mem_rd(gb, HL);
   CYC(b_+163, b_+165); alu_cp(gb, 0x50);
-  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
-  CYC(b_+168, b_+171); if (hook_enabled_at(SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
+  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(gb, SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
+  CYC(b_+168, b_+171); if (hook_enabled_at(gb, SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
 L_69d6:
   CALL_C(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+183, b_+174);
   if (!(F & FC)) { CYCT(b_+174, b_+175); ret_effect(gb); return; } CYC(b_+174, b_+175);
@@ -762,14 +762,14 @@ L_69e2:
   CYC(b_+185, b_+186); A = mem_rd(gb, DE);
   CYC(b_+186, b_+187); alu_or(gb, A);
   if ((F & FZ)) { CALL_C_CC(b_+187, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+190); } else CYC(b_+187, b_+190);
-  CYC(b_+190, b_+193); if (hook_enabled_at(SYM(interactionRunScript))) { interactionRunScript_hook(gb); return; } HANDOFF(SYM(interactionRunScript));
+  CYC(b_+190, b_+193); if (hook_enabled_at(gb, SYM(interactionRunScript))) { interactionRunScript_hook(gb); return; } HANDOFF(SYM(interactionRunScript));
 L_69ec:
   CALL_C(b_+193, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+196);
   CALL_C(b_+196, objectApplySpeed_hook, SYM(objectApplySpeed), b_+199);
   CALL_C(b_+199, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+202);
   if (!(F & FZ)) { CYCT(b_+202, b_+203); ret_effect(gb); return; } CYC(b_+202, b_+203);
   CALL_C(b_+203, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+206);
-  CYC(b_+206, b_+209); if (hook_enabled_at(SYM(fadeoutToWhite))) { fadeoutToWhite_hook(gb); return; } HANDOFF(SYM(fadeoutToWhite));
+  CYC(b_+206, b_+209); if (hook_enabled_at(gb, SYM(fadeoutToWhite))) { fadeoutToWhite_hook(gb); return; } HANDOFF(SYM(fadeoutToWhite));
 L_69fc:
   CYC(b_+209, b_+212); A = mem_rd(gb, wPaletteThread_mode);
   CYC(b_+212, b_+213); alu_or(gb, A);
@@ -803,7 +803,7 @@ L_69fc:
   CYC(b_+273, b_+274); H = mem_rd(gb, HL);
   CYC(b_+274, b_+275); L = A;
   CALL_C(b_+275, interactionSetScript_hook, SYM(interactionSetScript), b_+278);
-  CYC(b_+278, b_+281); if (hook_enabled_at(SYM(fadeinFromWhite))) { fadeinFromWhite_hook(gb); return; } HANDOFF(SYM(fadeinFromWhite));
+  CYC(b_+278, b_+281); if (hook_enabled_at(gb, SYM(fadeinFromWhite))) { fadeinFromWhite_hook(gb); return; } HANDOFF(SYM(fadeinFromWhite));
 }
 
 void interactionCode57__subid1State1_hook(GB *gb) {
@@ -835,7 +835,7 @@ L_6983:
   CYC(b_+106, b_+107); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+107, b_+108); H = mem_rd(gb, HL);
   CYC(b_+108, b_+109); L = A;
-  CYC(b_+109, b_+112); if (hook_enabled_at(SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
+  CYC(b_+109, b_+112); if (hook_enabled_at(gb, SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
 L_699b:
   CALL_C(b_+112, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+115);
   CALL_C(b_+115, interactionRunScript_hook, SYM(interactionRunScript), b_+118);
@@ -871,8 +871,8 @@ L_69cb:
   CYC(b_+160, b_+162); L = 0x4b;
   CYC(b_+162, b_+163); A = mem_rd(gb, HL);
   CYC(b_+163, b_+165); alu_cp(gb, 0x50);
-  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
-  CYC(b_+168, b_+171); if (hook_enabled_at(SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
+  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(gb, SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
+  CYC(b_+168, b_+171); if (hook_enabled_at(gb, SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
 L_69d6:
   CALL_C(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+183, b_+174);
   if (!(F & FC)) { CYCT(b_+174, b_+175); ret_effect(gb); return; } CYC(b_+174, b_+175);
@@ -885,14 +885,14 @@ L_69e2:
   CYC(b_+185, b_+186); A = mem_rd(gb, DE);
   CYC(b_+186, b_+187); alu_or(gb, A);
   if ((F & FZ)) { CALL_C_CC(b_+187, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+190); } else CYC(b_+187, b_+190);
-  CYC(b_+190, b_+193); if (hook_enabled_at(SYM(interactionRunScript))) { interactionRunScript_hook(gb); return; } HANDOFF(SYM(interactionRunScript));
+  CYC(b_+190, b_+193); if (hook_enabled_at(gb, SYM(interactionRunScript))) { interactionRunScript_hook(gb); return; } HANDOFF(SYM(interactionRunScript));
 L_69ec:
   CALL_C(b_+193, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+196);
   CALL_C(b_+196, objectApplySpeed_hook, SYM(objectApplySpeed), b_+199);
   CALL_C(b_+199, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+202);
   if (!(F & FZ)) { CYCT(b_+202, b_+203); ret_effect(gb); return; } CYC(b_+202, b_+203);
   CALL_C(b_+203, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+206);
-  CYC(b_+206, b_+209); if (hook_enabled_at(SYM(fadeoutToWhite))) { fadeoutToWhite_hook(gb); return; } HANDOFF(SYM(fadeoutToWhite));
+  CYC(b_+206, b_+209); if (hook_enabled_at(gb, SYM(fadeoutToWhite))) { fadeoutToWhite_hook(gb); return; } HANDOFF(SYM(fadeoutToWhite));
 L_69fc:
   CYC(b_+209, b_+212); A = mem_rd(gb, wPaletteThread_mode);
   CYC(b_+212, b_+213); alu_or(gb, A);
@@ -926,7 +926,7 @@ L_69fc:
   CYC(b_+273, b_+274); H = mem_rd(gb, HL);
   CYC(b_+274, b_+275); L = A;
   CALL_C(b_+275, interactionSetScript_hook, SYM(interactionSetScript), b_+278);
-  CYC(b_+278, b_+281); if (hook_enabled_at(SYM(fadeinFromWhite))) { fadeinFromWhite_hook(gb); return; } HANDOFF(SYM(fadeinFromWhite));
+  CYC(b_+278, b_+281); if (hook_enabled_at(gb, SYM(fadeinFromWhite))) { fadeinFromWhite_hook(gb); return; } HANDOFF(SYM(fadeinFromWhite));
 }
 
 void interactionCode57__subid1And2Substate0_hook(GB *gb) {
@@ -946,7 +946,7 @@ L_6983:
   CYC(b_+106, b_+107); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+107, b_+108); H = mem_rd(gb, HL);
   CYC(b_+108, b_+109); L = A;
-  CYC(b_+109, b_+112); if (hook_enabled_at(SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
+  CYC(b_+109, b_+112); if (hook_enabled_at(gb, SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
 L_699b:
   CALL_C(b_+112, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+115);
   CALL_C(b_+115, interactionRunScript_hook, SYM(interactionRunScript), b_+118);
@@ -982,8 +982,8 @@ L_69cb:
   CYC(b_+160, b_+162); L = 0x4b;
   CYC(b_+162, b_+163); A = mem_rd(gb, HL);
   CYC(b_+163, b_+165); alu_cp(gb, 0x50);
-  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
-  CYC(b_+168, b_+171); if (hook_enabled_at(SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
+  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(gb, SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
+  CYC(b_+168, b_+171); if (hook_enabled_at(gb, SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
 }
 
 void interactionCode57__label_09_221_hook(GB *gb) {
@@ -1024,8 +1024,8 @@ L_69cb:
   CYC(b_+160, b_+162); L = 0x4b;
   CYC(b_+162, b_+163); A = mem_rd(gb, HL);
   CYC(b_+163, b_+165); alu_cp(gb, 0x50);
-  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
-  CYC(b_+168, b_+171); if (hook_enabled_at(SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
+  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(gb, SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
+  CYC(b_+168, b_+171); if (hook_enabled_at(gb, SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
 }
 
 void interactionCode57__nextObject_hook(GB *gb) {
@@ -1056,8 +1056,8 @@ L_69cb:
   CYC(b_+160, b_+162); L = 0x4b;
   CYC(b_+162, b_+163); A = mem_rd(gb, HL);
   CYC(b_+163, b_+165); alu_cp(gb, 0x50);
-  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
-  CYC(b_+168, b_+171); if (hook_enabled_at(SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
+  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(gb, SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
+  CYC(b_+168, b_+171); if (hook_enabled_at(gb, SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
 }
 
 void interactionCode57__doneSpawningObjects_hook(GB *gb) {
@@ -1067,8 +1067,8 @@ L_69cb:
   CYC(b_+160, b_+162); L = 0x4b;
   CYC(b_+162, b_+163); A = mem_rd(gb, HL);
   CYC(b_+163, b_+165); alu_cp(gb, 0x50);
-  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
-  CYC(b_+168, b_+171); if (hook_enabled_at(SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
+  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(gb, SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
+  CYC(b_+168, b_+171); if (hook_enabled_at(gb, SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
 }
 
 void interactionCode57__subid1Substate1_hook(GB *gb) {
@@ -1091,7 +1091,7 @@ L_69e2:
   CYC(b_+185, b_+186); A = mem_rd(gb, DE);
   CYC(b_+186, b_+187); alu_or(gb, A);
   if ((F & FZ)) { CALL_C_CC(b_+187, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+190); } else CYC(b_+187, b_+190);
-  CYC(b_+190, b_+193); if (hook_enabled_at(SYM(interactionRunScript))) { interactionRunScript_hook(gb); return; } HANDOFF(SYM(interactionRunScript));
+  CYC(b_+190, b_+193); if (hook_enabled_at(gb, SYM(interactionRunScript))) { interactionRunScript_hook(gb); return; } HANDOFF(SYM(interactionRunScript));
 }
 
 void interactionCode57__subid1Substate2_hook(GB *gb) {
@@ -1103,7 +1103,7 @@ L_69ec:
   CALL_C(b_+199, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+202);
   if (!(F & FZ)) { CYCT(b_+202, b_+203); ret_effect(gb); return; } CYC(b_+202, b_+203);
   CALL_C(b_+203, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+206);
-  CYC(b_+206, b_+209); if (hook_enabled_at(SYM(fadeoutToWhite))) { fadeoutToWhite_hook(gb); return; } HANDOFF(SYM(fadeoutToWhite));
+  CYC(b_+206, b_+209); if (hook_enabled_at(gb, SYM(fadeoutToWhite))) { fadeoutToWhite_hook(gb); return; } HANDOFF(SYM(fadeoutToWhite));
 }
 
 void interactionCode57__subid1Substate3_hook(GB *gb) {
@@ -1142,7 +1142,7 @@ L_69fc:
   CYC(b_+273, b_+274); H = mem_rd(gb, HL);
   CYC(b_+274, b_+275); L = A;
   CALL_C(b_+275, interactionSetScript_hook, SYM(interactionSetScript), b_+278);
-  CYC(b_+278, b_+281); if (hook_enabled_at(SYM(fadeinFromWhite))) { fadeinFromWhite_hook(gb); return; } HANDOFF(SYM(fadeinFromWhite));
+  CYC(b_+278, b_+281); if (hook_enabled_at(gb, SYM(fadeinFromWhite))) { fadeinFromWhite_hook(gb); return; } HANDOFF(SYM(fadeinFromWhite));
 }
 
 void interactionCode57__subid02_hook(GB *gb) {
@@ -1186,7 +1186,7 @@ L_6983:
   CYC(b_+106, b_+107); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+107, b_+108); H = mem_rd(gb, HL);
   CYC(b_+108, b_+109); L = A;
-  CYC(b_+109, b_+112); if (hook_enabled_at(SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
+  CYC(b_+109, b_+112); if (hook_enabled_at(gb, SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
 L_699b:
   CALL_C(b_+112, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+115);
   CALL_C(b_+115, interactionRunScript_hook, SYM(interactionRunScript), b_+118);
@@ -1222,8 +1222,8 @@ L_69cb:
   CYC(b_+160, b_+162); L = 0x4b;
   CYC(b_+162, b_+163); A = mem_rd(gb, HL);
   CYC(b_+163, b_+165); alu_cp(gb, 0x50);
-  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
-  CYC(b_+168, b_+171); if (hook_enabled_at(SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
+  if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(gb, SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
+  CYC(b_+168, b_+171); if (hook_enabled_at(gb, SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
 L_69d6:
   CALL_C(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+183, b_+174);
   if (!(F & FC)) { CYCT(b_+174, b_+175); ret_effect(gb); return; } CYC(b_+174, b_+175);
@@ -1236,14 +1236,14 @@ L_69e2:
   CYC(b_+185, b_+186); A = mem_rd(gb, DE);
   CYC(b_+186, b_+187); alu_or(gb, A);
   if ((F & FZ)) { CALL_C_CC(b_+187, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+190); } else CYC(b_+187, b_+190);
-  CYC(b_+190, b_+193); if (hook_enabled_at(SYM(interactionRunScript))) { interactionRunScript_hook(gb); return; } HANDOFF(SYM(interactionRunScript));
+  CYC(b_+190, b_+193); if (hook_enabled_at(gb, SYM(interactionRunScript))) { interactionRunScript_hook(gb); return; } HANDOFF(SYM(interactionRunScript));
 L_69ec:
   CALL_C(b_+193, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+196);
   CALL_C(b_+196, objectApplySpeed_hook, SYM(objectApplySpeed), b_+199);
   CALL_C(b_+199, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+202);
   if (!(F & FZ)) { CYCT(b_+202, b_+203); ret_effect(gb); return; } CYC(b_+202, b_+203);
   CALL_C(b_+203, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+206);
-  CYC(b_+206, b_+209); if (hook_enabled_at(SYM(fadeoutToWhite))) { fadeoutToWhite_hook(gb); return; } HANDOFF(SYM(fadeoutToWhite));
+  CYC(b_+206, b_+209); if (hook_enabled_at(gb, SYM(fadeoutToWhite))) { fadeoutToWhite_hook(gb); return; } HANDOFF(SYM(fadeoutToWhite));
 L_69fc:
   CYC(b_+209, b_+212); A = mem_rd(gb, wPaletteThread_mode);
   CYC(b_+212, b_+213); alu_or(gb, A);
@@ -1277,7 +1277,7 @@ L_69fc:
   CYC(b_+273, b_+274); H = mem_rd(gb, HL);
   CYC(b_+274, b_+275); L = A;
   CALL_C(b_+275, interactionSetScript_hook, SYM(interactionSetScript), b_+278);
-  CYC(b_+278, b_+281); if (hook_enabled_at(SYM(fadeinFromWhite))) { fadeinFromWhite_hook(gb); return; } HANDOFF(SYM(fadeinFromWhite));
+  CYC(b_+278, b_+281); if (hook_enabled_at(gb, SYM(fadeinFromWhite))) { fadeinFromWhite_hook(gb); return; } HANDOFF(SYM(fadeinFromWhite));
 L_6a44:
   CALL_C(b_+281, checkInteractionState_hook, SYM(checkInteractionState), b_+284);
   if (!(F & FZ)) { CYCT(b_+284, b_+286); goto L_6a4c; } CYC(b_+284, b_+286);
@@ -1313,7 +1313,7 @@ L_6a5f:
   CYC(b_+335, b_+336); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+336, b_+337); H = mem_rd(gb, HL);
   CYC(b_+337, b_+338); L = A;
-  CYC(b_+338, b_+341); if (hook_enabled_at(SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
+  CYC(b_+338, b_+341); if (hook_enabled_at(gb, SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
 }
 
 void interactionCode57__subid2Substate1_hook(GB *gb) {
@@ -1339,7 +1339,7 @@ L_6a5f:
   CYC(b_+335, b_+336); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+336, b_+337); H = mem_rd(gb, HL);
   CYC(b_+337, b_+338); L = A;
-  CYC(b_+338, b_+341); if (hook_enabled_at(SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
+  CYC(b_+338, b_+341); if (hook_enabled_at(gb, SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
 }
 
 void interactionCode57__subid2Substate2_hook(GB *gb) {
@@ -1361,7 +1361,7 @@ L_6a5f:
   CYC(b_+335, b_+336); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+336, b_+337); H = mem_rd(gb, HL);
   CYC(b_+337, b_+338); L = A;
-  CYC(b_+338, b_+341); if (hook_enabled_at(SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
+  CYC(b_+338, b_+341); if (hook_enabled_at(gb, SYM(interactionSetScript))) { interactionSetScript_hook(gb); return; } HANDOFF(SYM(interactionSetScript));
 }
 
 void interactionCode57__unusedFunc_6a80_hook(GB *gb) {
@@ -1370,7 +1370,7 @@ void interactionCode57__unusedFunc_6a80_hook(GB *gb) {
 L_6a80:
   CALL_C(b_+341, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+344);
   CALL_C(b_+344, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+347);
-  CYC(b_+347, b_+350); if (hook_enabled_at(SYM(interactionIncState))) { interactionIncState_hook(gb); return; } HANDOFF(SYM(interactionIncState));
+  CYC(b_+347, b_+350); if (hook_enabled_at(gb, SYM(interactionIncState))) { interactionIncState_hook(gb); return; } HANDOFF(SYM(interactionIncState));
 }
 
 void interactionCode57__loadScriptAndInitGraphics_hook(GB *gb) {
@@ -1390,7 +1390,7 @@ L_6a89:
   CYC(b_+369, b_+370); H = mem_rd(gb, HL);
   CYC(b_+370, b_+371); L = A;
   CALL_C(b_+371, interactionSetScript_hook, SYM(interactionSetScript), b_+374);
-  CYC(b_+374, b_+377); if (hook_enabled_at(SYM(interactionIncState))) { interactionIncState_hook(gb); return; } HANDOFF(SYM(interactionIncState));
+  CYC(b_+374, b_+377); if (hook_enabled_at(gb, SYM(interactionIncState))) { interactionIncState_hook(gb); return; } HANDOFF(SYM(interactionIncState));
 }
 
 void interactionCode57__createDirtChips_hook(GB *gb) {

@@ -72,15 +72,17 @@ static void full_tas_matches_reference(void) {
   fclose(ref); free(gb); free(rom); free(boot); tas_free(&t);
 }
 
-static void seasons_demo_matches_reference(void) {
+static void seasons_run(const char *inputs, const char *ref_path, uint64_t frames, const char *what) {
   const char *rom_path = GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc";
   size_t n, bn;
   uint8_t *rom = oracles_read_file(rom_path, &n);
   if (!rom) SKIP("Seasons ROM not present");
   uint8_t *boot = oracles_read_file(GAME_ROM_DIR "/cgb_boot.bin", &bn);
   if (!boot) SKIP("cgb_boot.bin not present");
-  FILE *ref = fopen(TAS_DIR "/seasons-noinput.ref", "r");
-  if (!ref) SKIP("seasons-noinput.ref missing");
+  FILE *ref = fopen(ref_path, "r");
+  if (!ref) SKIP("reference missing");
+  Tas t = {0};
+  if (inputs && !tas_load(&t, inputs)) SKIP("inputs missing");
   GB *gb = calloc(1, sizeof *gb);
   gb_init(gb);
   ASSERT(gb_load_rom(gb, rom, n));
@@ -90,10 +92,20 @@ static void seasons_demo_matches_reference(void) {
   gb_reset(gb);
   RefCheck rc = {ref, 0, 0, false, 0};
   rc.have = fscanf(ref, "%llu %llx", &rc.f, &rc.want) == 2;
+  if (inputs) { gb->input_at = tas_cb; gb->input_ctx = &t; }
   gb->frame_cb = ref_cb; gb->frame_ctx = &rc;
-  for (uint64_t i = 0; i < 30000 && !rc.mismatch; i++) gb_run_frame(gb);
-  if (rc.mismatch) { fprintf(stderr, "seasons state mismatch at frame %llu\n", rc.mismatch); ASSERT(0); }
+  for (uint64_t i = 0; i < frames && !rc.mismatch; i++) gb_run_frame(gb);
+  if (rc.mismatch) { fprintf(stderr, "seasons %s state mismatch at frame %llu\n", what, rc.mismatch); ASSERT(0); }
   fclose(ref); free(gb); free(rom); free(boot);
+  if (inputs) tas_free(&t);
 }
 
-int main(void) { RUN(inputs_file_loads); RUN(frame_grid_is_70224_cycles); RUN(full_tas_matches_reference); RUN(seasons_demo_matches_reference); return 0; }
+static void seasons_play_matches_reference(void) {
+  seasons_run(TAS_DIR "/seasons-play.inputs", TAS_DIR "/seasons-play.ref", 33337, "playthrough");
+}
+
+static void seasons_demo_matches_reference(void) {
+  seasons_run(NULL, TAS_DIR "/seasons-noinput.ref", 30000, "demo");
+}
+
+int main(void) { RUN(inputs_file_loads); RUN(frame_grid_is_70224_cycles); RUN(full_tas_matches_reference); RUN(seasons_demo_matches_reference); RUN(seasons_play_matches_reference); return 0; }

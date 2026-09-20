@@ -51,7 +51,7 @@ static void bank4_add_a_to_hl(GB *gb, uint16_t return_address) {
 }
 
 static void b4_vblank_function(GB *gb, uint16_t base, uint8_t column) {
-  BANKOF(label_04_033);
+  BANKOF(findWarpSourceAndDest);
   CYC(base, base + 1); H = B;
   CYC(base + 1, base + 2); L = E;
   CYC(base + 2, base + 4); B = 0x04;
