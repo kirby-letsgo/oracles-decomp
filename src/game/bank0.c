@@ -8682,6 +8682,109 @@ void copyTextCharacterGfx_hook(GB *gb) {
   ret_effect(gb);
 }
 
+// retrieveTextCharacter@func_18fd: copies one 1bpp font tile at hl to bc as 2bpp in the colour
+// wTextGfxColorIndex selects. gfx_font_start+$140, the heart, is $4860 in both games and is
+// always drawn in colour 1.
+static void retrieve_text_character_tile(GB *gb) {
+  BASE(retrieveTextCharacter__func_18fd);
+  E = 0x10;
+  A = H;
+  alu_cp(gb, 0x48);
+  CYC(b_+0, b_+5);
+  if (!(F & FZ)) CYCT(b_+5, b_+7);
+  else {
+    CYC(b_+5, b_+7);
+    A = L;
+    alu_cp(gb, 0x60);
+    CYC(b_+7, b_+10);
+    if (F & FZ) { CYCT(b_+10, b_+12); goto color1; }
+    CYC(b_+10, b_+12);
+  }
+  CYC(b_+12, b_+15); A = mem_rd(gb, wTextGfxColorIndex);
+  alu_and(gb, 0x0f);
+  alu_or(gb, A);
+  CYC(b_+15, b_+18);
+  if (F & FZ) { CYCT(b_+18, b_+20); goto color0; }
+  CYC(b_+18, b_+20);
+  A = alu_dec8(gb, A);
+  CYC(b_+20, b_+21);
+  if (F & FZ) { CYCT(b_+21, b_+23); goto color1; }
+  CYC(b_+21, b_+23);
+  A = alu_dec8(gb, A);
+  CYC(b_+23, b_+24);
+  if (F & FZ) { CYCT(b_+24, b_+26); goto color2; }
+  CYC(b_+24, b_+26);
+  E = 0x20;
+  CYC(b_+26, b_+28);
+  for (;;) {
+    CYC(b_+28, b_+29); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+29, b_+30); mem_wr(gb, BC, A);
+    SET_BC(BC + 1);
+    E = alu_dec8(gb, E);
+    CYC(b_+30, b_+32);
+    if (!(F & FZ)) { CYCT(b_+32, b_+34); continue; }
+    CYC(b_+32, b_+34);
+    break;
+  }
+  CYC(b_+34, b_+37); A = mem_rd(gb, wTextGfxColorIndex);
+  alu_and(gb, 0xf0);
+  alu_swap_a(gb);
+  CYC(b_+37, b_+41);
+  CYC(b_+41, b_+44); mem_wr(gb, wTextGfxColorIndex, A);
+  CYC(b_+44, b_+45);
+  return;
+color0:
+  for (;;) {
+    CYC(b_+45, b_+46); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+46, b_+47); mem_wr(gb, BC, A);
+    C = alu_inc8(gb, C);
+    CYC(b_+47, b_+48);
+    CYC(b_+48, b_+49); mem_wr(gb, BC, A);
+    SET_BC(BC + 1);
+    E = alu_dec8(gb, E);
+    CYC(b_+49, b_+51);
+    if (!(F & FZ)) { CYCT(b_+51, b_+53); continue; }
+    CYC(b_+51, b_+53);
+    break;
+  }
+  CYC(b_+53, b_+54);
+  return;
+color1:
+  for (;;) {
+    A = 0xff;
+    CYC(b_+54, b_+56);
+    CYC(b_+56, b_+57); mem_wr(gb, BC, A);
+    C = alu_inc8(gb, C);
+    CYC(b_+57, b_+58);
+    CYC(b_+58, b_+59); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+59, b_+60); mem_wr(gb, BC, A);
+    SET_BC(BC + 1);
+    E = alu_dec8(gb, E);
+    CYC(b_+60, b_+62);
+    if (!(F & FZ)) { CYCT(b_+62, b_+64); continue; }
+    CYC(b_+62, b_+64);
+    break;
+  }
+  CYC(b_+64, b_+65);
+  return;
+color2:
+  for (;;) {
+    CYC(b_+65, b_+66); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+66, b_+67); mem_wr(gb, BC, A);
+    C = alu_inc8(gb, C);
+    A = 0xff;
+    CYC(b_+67, b_+70);
+    CYC(b_+70, b_+71); mem_wr(gb, BC, A);
+    SET_BC(BC + 1);
+    E = alu_dec8(gb, E);
+    CYC(b_+71, b_+73);
+    if (!(F & FZ)) { CYCT(b_+73, b_+75); continue; }
+    CYC(b_+73, b_+75);
+    break;
+  }
+  CYC(b_+75, b_+76);
+}
+
 void retrieveTextCharacter_hook(GB *gb) {
   BASE(retrieveTextCharacter);
   uint16_t hl = HL, de = DE, bc = BC;
@@ -8699,7 +8802,8 @@ void retrieveTextCharacter_hook(GB *gb) {
   A = 0x1c;
   CYC(b_+15, b_+22); H8(hRomBank) = A;
   CYC(b_+22, b_+25); mem_wr(gb, MBC_ROM_BANK, A);
-  CALL_ROM(b_+25, ROM_retrieveTextCharacter_func_18fd);
+  CYC(b_+25, b_+28);
+  retrieve_text_character_tile(gb);
   A = 0x3f;
   CYC(b_+28, b_+32); H8(hRomBank) = A;
   CYC(b_+32, b_+35); mem_wr(gb, MBC_ROM_BANK, A);
@@ -10933,6 +11037,115 @@ void func_0eda_hook(GB *gb) {
   ret_effect(gb);
 }
 
+// drawAllSpritesUnconditionally@drawObject: hl points into wObjectsToDraw; wRamFunction is one
+// of the two _getObjectPositionOnScreen variants. The OAM data bank is BASE_OAM_DATA_BANK in the
+// disassembly, the bank that holds the item OAM data in both games.
+static void draw_object(GB *gb) {
+  BASE(drawAllSpritesUnconditionally__drawObject);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); push_effect(gb, HL);
+  L = alu_inc8(gb, L);
+  CYC(b_+1, b_+3); H = mem_rd(gb, HL);
+  L = A;
+  CYC(b_+3, b_+4);
+  CALL_C(b_+4, wRamFunction, wRamFunctionAddr, b_+7);
+  if (!(F & FC)) { CYCT(b_+7, b_+9); goto ret; }
+  CYC(b_+7, b_+9);
+  CYC(b_+9, b_+10); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+10, b_+12); H8(hFF8F) = A;
+  CYC(b_+12, b_+13); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+13, b_+15); H8(hFF8E) = A;
+  CYC(b_+15, b_+16); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+16, b_+17); H = mem_rd(gb, HL);
+  L = A;
+  A = H;
+  alu_and(gb, 0xc0);
+  alu_rlca(gb);
+  alu_rlca(gb);
+  alu_add(gb, SYMBANK(itemOamData4cf40));
+  CYC(b_+17, b_+25);
+  CYC(b_+25, b_+27); H8(hRomBank) = A;
+  CYC(b_+27, b_+30); mem_wr(gb, MBC_ROM_BANK, A);
+  H = (uint8_t)((H | 0x40) & 0x7f);
+  CYC(b_+30, b_+34);
+  CYC(b_+34, b_+35); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  alu_or(gb, A);
+  CYC(b_+35, b_+36);
+  if (F & FZ) { CYCT(b_+36, b_+38); goto ret; }
+  CYC(b_+36, b_+38);
+  C = A;
+  CYC(b_+38, b_+39);
+  CYC(b_+39, b_+41); A = H8(hOamTail);
+  E = A;
+  A = wOamEnd & 0xff;
+  alu_sub(gb, E);
+  CYC(b_+41, b_+45);
+  if (F & FZ) { CYCT(b_+45, b_+47); goto ret; }
+  CYC(b_+45, b_+47);
+  alu_rrca(gb);
+  alu_rrca(gb);
+  B = A;
+  D = wOam >> 8;
+  CYC(b_+47, b_+52);
+  for (;;) {
+    CYC(b_+52, b_+54); A = H8(hFF8C);
+    CYC(b_+54, b_+55); alu_add(gb, mem_rd(gb, HL));
+    SET_HL(HL + 1);
+    alu_cp(gb, 0xa0);
+    CYC(b_+55, b_+58);
+    if (!(F & FC)) { CYCT(b_+58, b_+60); goto skipSprite; }
+    CYC(b_+58, b_+60);
+    CYC(b_+60, b_+61); mem_wr(gb, DE, A);
+    CYC(b_+61, b_+63); A = H8(hFF8D);
+    CYC(b_+63, b_+64); alu_add(gb, mem_rd(gb, HL));
+    alu_cp(gb, 0xa8);
+    CYC(b_+64, b_+66);
+    if (!(F & FC)) { CYCT(b_+66, b_+68); goto skipSprite; }
+    CYC(b_+66, b_+68);
+    E = alu_inc8(gb, E);
+    CYC(b_+68, b_+69);
+    CYC(b_+69, b_+70); mem_wr(gb, DE, A);
+    SET_HL(HL + 1);
+    E = alu_inc8(gb, E);
+    CYC(b_+70, b_+72);
+    CYC(b_+72, b_+74); A = H8(hFF8E);
+    CYC(b_+74, b_+75); alu_add(gb, mem_rd(gb, HL));
+    CYC(b_+75, b_+76); mem_wr(gb, DE, A);
+    SET_HL(HL + 1);
+    E = alu_inc8(gb, E);
+    CYC(b_+76, b_+78);
+    CYC(b_+78, b_+80); A = H8(hFF8F);
+    CYC(b_+80, b_+81); alu_xor(gb, mem_rd(gb, HL));
+    CYC(b_+81, b_+82); mem_wr(gb, DE, A);
+    SET_HL(HL + 1);
+    E = alu_inc8(gb, E);
+    B = alu_dec8(gb, B);
+    CYC(b_+82, b_+85);
+    if (F & FZ) { CYCT(b_+85, b_+87); break; }
+    CYC(b_+85, b_+87);
+    C = alu_dec8(gb, C);
+    CYC(b_+87, b_+88);
+    if (!(F & FZ)) { CYCT(b_+88, b_+90); continue; }
+    CYC(b_+88, b_+90);
+    break;
+  skipSprite:
+    SET_HL(HL + 3);
+    C = alu_dec8(gb, C);
+    CYC(b_+97, b_+101);
+    if (!(F & FZ)) { CYCT(b_+101, b_+103); continue; }
+    CYC(b_+101, b_+103);
+    CYCT(b_+103, b_+105);
+    break;
+  }
+  A = E;
+  CYC(b_+90, b_+91);
+  CYC(b_+91, b_+93); H8(hOamTail) = A;
+ret:
+  CYC(b_+93, b_+94); SET_HL(pop_effect(gb));
+  CYC(b_+94, b_+96); mem_wr(gb, HL, 0x00);
+  CYC(b_+96, b_+97);
+}
+
 static void draw_object_terrain_effects(GB *gb) {
   BASE(_drawObjectTerrainEffects);
   CYC(b_+0, b_+3); A = W8(wTilesetFlags);
@@ -11176,7 +11389,7 @@ static void draw_all_sprites_unconditionally(GB *gb) {
     CYC(b_+130, b_+131); A = mem_rd(gb, HL);
     alu_or(gb, A);
     CYC(b_+131, b_+132);
-    if (!(F & FZ)) CALL_ROM_CC(b_+132, ROM_drawAllSprites_drawObject);
+    if (!(F & FZ)) { CYCT(b_+132, b_+135); draw_object(gb); }
     else CYC(b_+132, b_+135);
     L = alu_inc8(gb, L);
     L = alu_inc8(gb, L);

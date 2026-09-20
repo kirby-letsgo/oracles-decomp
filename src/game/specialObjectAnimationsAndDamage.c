@@ -471,6 +471,173 @@ zero:
   ret_effect(gb);
 }
 
+// func_4553@getLinkWalkingAnimation's underwater preamble exists only in Ages, where the label
+// sits 23 bytes before @notUnderwater; in Seasons the two labels coincide and this burns nothing.
+// *found is set when the preamble jumped to @animationFound, cleared when it fell into @notUnderwater.
+static void link_walking_animation_underwater(GB *gb, bool *found) {
+  BASE(func_4553__getLinkWalkingAnimation);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  *found = false;
+  if (b_ == SYM(func_4553__notUnderwater)) return;
+  CYC(b_+0, b_+2); C = 0x0a;
+  CYC(b_+2, b_+5); A = mem_rd(gb, wTilesetFlags);
+  alu_and(gb, 0x40);
+  CYC(b_+5, b_+7);
+  if (F & FZ) { CYCT(b_+7, b_+9); return; }
+  CYC(b_+7, b_+9);
+  *found = true;
+  CALL_C(b_+9, checkLinkPushingAgainstWall_hook, SYM(checkLinkPushingAgainstWall), b_+12);
+  if (!(F & FC)) { CYCT(b_+12, b_+15); return; }
+  CYC(b_+12, b_+15);
+  CYC(b_+15, b_+18); A = mem_rd(gb, w1Link_direction);
+  CYC(b_+18, b_+21); mem_wr(gb, wLinkPushingDirection, A);
+  CYCT(b_+21, b_+23);
+}
+
+static void get_link_walking_animation(GB *gb) {
+  bool found;
+  link_walking_animation_underwater(gb, &found);
+  BASE(func_4553__notUnderwater);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  if (found) goto animationFound;
+  CYC(b_+0, b_+2); C = 0x00;
+  CYC(b_+2, b_+5); A = mem_rd(gb, wLinkGrabState);
+  alu_bit(gb, 6, A);
+  CYC(b_+5, b_+7);
+  if (!(F & FZ)) { CYCT(b_+7, b_+8); return; }
+  CYC(b_+7, b_+8);
+  alu_or(gb, A);
+  CYC(b_+8, b_+9);
+  if (F & FZ) CYCT(b_+9, b_+11);
+  else {
+    CYC(b_+9, b_+11);
+    C = 0x02;
+    CYC(b_+11, b_+13);
+  }
+  CYC(b_+13, b_+16); A = mem_rd(gb, wLinkObjectIndex);
+  alu_rrca(gb);
+  CYC(b_+16, b_+17);
+  if (!(F & FC)) CYCT(b_+17, b_+19);
+  else {
+    CYC(b_+17, b_+19);
+    CYC(b_+19, b_+22); A = mem_rd(gb, w1Companion_id);
+    alu_cp(gb, 0x0a);
+    CYC(b_+22, b_+24);
+    if (!(F & FZ)) CYCT(b_+24, b_+26);
+    else {
+      CYC(b_+24, b_+26);
+      C = alu_inc8(gb, C);
+      CYC(b_+26, b_+27);
+    }
+  }
+  A = C;
+  alu_or(gb, A);
+  CYC(b_+27, b_+29);
+  if (!(F & FZ)) { CYCT(b_+29, b_+31); goto animationFound; }
+  CYC(b_+29, b_+31);
+  CYC(b_+31, b_+34); A = mem_rd(gb, wMagnetGloveState);
+  alu_or(gb, A);
+  CYC(b_+34, b_+35);
+  if (!(F & FZ)) {
+    CYC(b_+35, b_+37);
+    C = 0x09;
+    CYC(b_+37, b_+39);
+    CYCT(b_+39, b_+41);
+    goto animationFound;
+  }
+  CYCT(b_+35, b_+37);
+  CYC(b_+41, b_+44); A = mem_rd(gb, wUsingShield);
+  alu_or(gb, A);
+  CYC(b_+44, b_+45);
+  if (!(F & FZ)) {
+    CYC(b_+45, b_+47);
+    C = 0x07;
+    alu_cp(gb, 0x02);
+    CYC(b_+47, b_+51);
+    if (F & FC) { CYCT(b_+51, b_+53); goto animationFound; }
+    CYC(b_+51, b_+53);
+    C = alu_inc8(gb, C);
+    CYC(b_+53, b_+54);
+    CYCT(b_+54, b_+56);
+    goto animationFound;
+  }
+  CYCT(b_+45, b_+47);
+  CYC(b_+56, b_+59); A = mem_rd(gb, wLinkTurningDisabled);
+  alu_or(gb, A);
+  CYC(b_+59, b_+60);
+  if (!(F & FZ)) { CYCT(b_+60, b_+62); goto standingAnimation; }
+  CYC(b_+60, b_+62);
+  CYC(b_+62, b_+65); A = mem_rd(gb, wForceLinkPushAnimation);
+  A = alu_dec8(gb, A);
+  CYC(b_+65, b_+66);
+  if (F & FZ) { CYCT(b_+66, b_+68); goto pushingAnimation; }
+  CYC(b_+66, b_+68);
+  CYC(b_+68, b_+71); A = mem_rd(gb, wForceLinkPushAnimation);
+  alu_rlca(gb);
+  CYC(b_+71, b_+72);
+  if (F & FC) { CYCT(b_+72, b_+74); goto standingAnimation; }
+  CYC(b_+72, b_+74);
+  CYC(b_+74, b_+77); A = mem_rd(gb, wLinkClimbingVine);
+  L = A;
+  CYC(b_+77, b_+78);
+  CYC(b_+78, b_+81); A = mem_rd(gb, wTextIsActive);
+  alu_or(gb, L);
+  CYC(b_+81, b_+82);
+  if (!(F & FZ)) { CYCT(b_+82, b_+84); goto standingAnimation; }
+  CYC(b_+82, b_+84);
+  CALL_C(b_+84, checkLinkPushingAgainstWall_hook, SYM(checkLinkPushingAgainstWall), b_+87);
+  if (!(F & FC)) { CYCT(b_+87, b_+89); goto standingAnimation; }
+  CYC(b_+87, b_+89);
+pushingAnimation:
+  CYC(b_+89, b_+92); A = mem_rd(gb, w1Link_direction);
+  CYC(b_+92, b_+95); mem_wr(gb, wLinkPushingDirection, A);
+  C = 0x04;
+  CYC(b_+95, b_+97);
+  CYCT(b_+97, b_+99);
+  goto animationFound;
+standingAnimation:
+  CYC(b_+99, b_+102); A = mem_rd(gb, wInventoryA);
+  alu_cp(gb, 0x01);
+  CYC(b_+102, b_+104);
+  if (F & FZ) CYCT(b_+104, b_+106);
+  else {
+    CYC(b_+104, b_+106);
+    CYC(b_+106, b_+109); A = mem_rd(gb, wInventoryB);
+    alu_cp(gb, 0x01);
+    CYC(b_+109, b_+111);
+    if (!(F & FZ)) { CYCT(b_+111, b_+113); goto animationFound; }
+    CYC(b_+111, b_+113);
+  }
+  C = 0x05;
+  CYC(b_+113, b_+115);
+  CYC(b_+115, b_+118); A = mem_rd(gb, wShieldLevel);
+  alu_cp(gb, 0x01);
+  CYC(b_+118, b_+120);
+  if (F & FZ) CYCT(b_+120, b_+122);
+  else {
+    CYC(b_+120, b_+122);
+    C = 0x06;
+    CYC(b_+122, b_+124);
+  }
+animationFound:
+  CYC(b_+124, b_+127); A = mem_rd(gb, wLinkClimbingVine);
+  alu_or(gb, A);
+  CYC(b_+127, b_+128);
+  if (F & FZ) CYCT(b_+128, b_+130);
+  else {
+    CYC(b_+128, b_+130);
+    alu_xor(gb, A);
+    CYC(b_+130, b_+131);
+    CYC(b_+131, b_+134); mem_wr(gb, w1Link_direction, A);
+  }
+  A = C;
+  alu_add(gb, A);
+  alu_add(gb, A);
+  CYC(b_+134, b_+137);
+  CYC(b_+137, b_+140); mem_wr(gb, w1Link_var34, A);
+  CYC(b_+140, b_+141);
+}
+
 void func_4553_hook(GB *gb) {
   BASE(func_4553);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -514,7 +681,8 @@ scan:
   CYC(b_+45, b_+47); alu_cp(gb, 0x10);
   if (!(F & FZ)) { CYCT(b_+47, b_+48); ret_effect(gb); return; }
   CYC(b_+47, b_+48);
-  CALL_ROM(b_+48, b_+54);
+  CYC(b_+48, b_+51);
+  get_link_walking_animation(gb);
   CYC(b_+51, b_+52); alu_add(gb, B);
   CYC(b_+52, b_+53); B = A;
   CYC(b_+53, b_+54);

@@ -3482,6 +3482,7 @@ func_4493__positionOffsets func_4493@positionOffsets 01:449e
 func_44ac func_44ac 16:44ac
 func_4553 func_4553 06:4553
 func_4553__getLinkWalkingAnimation func_4553@getLinkWalkingAnimation 06:4589
+func_4553__notUnderwater func_4553@notUnderwater 06:45a0
 func_46ca func_46ca 01:46ca
 func_46ff func_46ff 01:46ff
 func_47fc func_47fc 01:47fc
@@ -7410,6 +7411,7 @@ itemMakeInteractionForBreakableTile itemMakeInteractionForBreakableTile 06:4809
 itemMergeZPositionIfSidescrollingArea itemMergeZPositionIfSidescrollingArea 07:4a4f
 itemMimicBgTile itemMimicBgTile 07:628e
 itemNextAnimationFrame itemNextAnimationFrame 07:49f1
+itemOamData4cf40 itemOamData4cf40 13:4f40
 itemOamDataTable itemOamDataTable 07:66c3
 itemPassableCliffTilesTable itemPassableCliffTilesTable 07:4c50
 itemPassableTilesTable itemPassableTilesTable 07:4cc9
