@@ -2153,10 +2153,207 @@ void minimapPopupType_makuTree_hook(GB *gb) {
   CYC(b_+17, b_+18); ret_effect(gb);
 }
 
+// maupMenu_drawPopup@checkPopupExists: z set when neither popup slot holds a value.
+static void maup_popup_check_exists(GB *gb) {
+  BASE(maupMenu_drawPopup__updatePopupVariables);
+  H = D;
+  L = wMapMenu_popup1 & 0xff;
+  CYC(b_+110, b_+113);
+  CYC(b_+113, b_+114); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+114, b_+115); alu_or(gb, mem_rd(gb, HL));
+  CYC(b_+115, b_+116);
+}
+
+// maupMenu_drawPopup@updatePopupVariables and its four states; the caller pushed the return
+// address the state's ret pops.
+static void maup_update_popup_variables(GB *gb) {
+  BASE(maupMenu_drawPopup__updatePopupVariables);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  SET_DE(wMapMenu_popupState);
+  CYC(b_+0, b_+3);
+  CYC(b_+3, b_+4); A = mem_rd(gb, DE);
+  CYC(b_+4, b_+5); push_effect(gb, b_+5);
+  do { uint16_t jt_ = (function_caller_jump_table(gb));
+    if (jt_ == b_+13) { goto state0; }
+    else if (jt_ == b_+42) { goto state1; }
+    else if (jt_ == b_+68) { goto state2; }
+    else if (jt_ == b_+95) { goto state3; }
+    else { HANDOFF(jt_); }
+  } while (0);
+state0:
+  CYC(b_+13, b_+16);
+  maup_popup_check_exists(gb);
+  if (F & FZ) { CYCT(b_+16, b_+18); goto resetPopup; }
+  CYC(b_+16, b_+18);
+  A = 0x01;
+  CYC(b_+18, b_+20);
+  CYC(b_+20, b_+21); mem_wr(gb, DE, A);
+  E = wMapMenu_popupSize & 0xff;
+  CYC(b_+21, b_+23);
+  CYC(b_+23, b_+24); mem_wr(gb, DE, A);
+  E = wTmpcbba & 0xff;
+  A = alu_inc8(gb, A);
+  CYC(b_+24, b_+27);
+  CYC(b_+27, b_+28); mem_wr(gb, DE, A);
+  CYC(b_+28, b_+29); ret_effect(gb);
+  return;
+resetPopup:
+  alu_xor(gb, A);
+  SET_HL(wMapMenu_popupState);
+  CYC(b_+29, b_+33);
+  CYC(b_+33, b_+34); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+34, b_+35); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  L = wMapMenu_popupSize & 0xff;
+  CYC(b_+35, b_+37);
+  CYC(b_+37, b_+38); mem_wr(gb, HL, A);
+  L = wTmpcbc0 & 0xff;
+  CYC(b_+38, b_+40);
+  CYC(b_+40, b_+41); mem_wr(gb, HL, A);
+  CYC(b_+41, b_+42); ret_effect(gb);
+  return;
+state1:
+  CYC(b_+42, b_+45);
+  maup_popup_check_exists(gb);
+  if (F & FZ) { CYCT(b_+45, b_+47); goto gotoState3; }
+  CYC(b_+45, b_+47);
+  L = wTmpcbba & 0xff;
+  CYC(b_+47, b_+49);
+  CYC(b_+49, b_+50); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(b_+50, b_+51); ret_effect(gb); return; }
+  CYC(b_+50, b_+51);
+  CYC(b_+51, b_+53); mem_wr(gb, HL, 0x02);
+  L = wMapMenu_popupSize & 0xff;
+  CYC(b_+53, b_+55);
+  CYC(b_+55, b_+56); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+56, b_+57); A = mem_rd(gb, HL);
+  alu_cp(gb, 0x04);
+  CYC(b_+57, b_+59);
+  if (F & FC) { CYCT(b_+59, b_+60); ret_effect(gb); return; }
+  CYC(b_+59, b_+60);
+  L = wTmpcbba & 0xff;
+  CYC(b_+60, b_+62);
+  CYC(b_+62, b_+64); mem_wr(gb, HL, 0x18);
+  L = wMapMenu_popupState & 0xff;
+  CYC(b_+64, b_+66);
+  CYC(b_+66, b_+68); mem_wr(gb, HL, 0x02);
+state2:
+  CYC(b_+68, b_+71);
+  maup_popup_check_exists(gb);
+  if (F & FZ) { CYCT(b_+71, b_+73); goto gotoState3; }
+  CYC(b_+71, b_+73);
+  L = wTmpcbba & 0xff;
+  CYC(b_+73, b_+75);
+  CYC(b_+75, b_+76); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(b_+76, b_+77); ret_effect(gb); return; }
+  CYC(b_+76, b_+77);
+  CYC(b_+77, b_+79); mem_wr(gb, HL, 0x18);
+  L = wTmpcbc0 & 0xff;
+  CYC(b_+79, b_+81);
+  CYC(b_+81, b_+82); A = mem_rd(gb, HL);
+  alu_xor(gb, 0x01);
+  CYC(b_+82, b_+84);
+  CYC(b_+84, b_+85); mem_wr(gb, HL, A);
+  CYC(b_+85, b_+86); ret_effect(gb);
+  return;
+gotoState3:
+  H = D;
+  L = wMapMenu_popupState & 0xff;
+  CYC(b_+86, b_+89);
+  CYC(b_+89, b_+91); mem_wr(gb, HL, 0x03);
+  L = wTmpcbba & 0xff;
+  CYC(b_+91, b_+93);
+  CYC(b_+93, b_+95); mem_wr(gb, HL, 0x01);
+state3:
+  H = D;
+  L = wTmpcbba & 0xff;
+  CYC(b_+95, b_+98);
+  CYC(b_+98, b_+99); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(b_+99, b_+100); ret_effect(gb); return; }
+  CYC(b_+99, b_+100);
+  CYC(b_+100, b_+102); mem_wr(gb, HL, 0x02);
+  L = wMapMenu_popupSize & 0xff;
+  CYC(b_+102, b_+104);
+  CYC(b_+104, b_+105); A = mem_rd(gb, HL);
+  A = alu_dec8(gb, A);
+  CYC(b_+105, b_+106);
+  CYC(b_+106, b_+107); mem_wr(gb, HL, A);
+  if (!(F & FZ)) { CYCT(b_+107, b_+108); ret_effect(gb); return; }
+  CYC(b_+107, b_+108);
+  CYCT(b_+108, b_+110);
+  goto resetPopup;
+}
+
+// runInventoryMenu@inventoryMenuStates, runRingMenu@runStateCode and
+// secretListMenu_printSecret@getSecretText: jump tables the caller pushed a return address for.
+static void run_inventory_menu_states(GB *gb) {
+  BASE(runInventoryMenu__inventoryMenuStates);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+3); A = mem_rd(gb, wMenuActiveState);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (function_caller_jump_table(gb));
+    if (jt_ == SYM(inventoryMenuState0)) { inventoryMenuState0_hook(gb); return; }
+    else if (jt_ == SYM(inventoryMenuState1)) { inventoryMenuState1_hook(gb); return; }
+    else if (jt_ == SYM(inventoryMenuState2)) { inventoryMenuState2_hook(gb); return; }
+    else if (jt_ == SYM(inventoryMenuState3)) { inventoryMenuState3_hook(gb); return; }
+    else { HANDOFF(jt_); }
+  } while (0);
+}
+
+static void run_ring_menu_state_code(GB *gb) {
+  BASE(runRingMenu__runStateCode);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+3); A = mem_rd(gb, wMenuActiveState);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (function_caller_jump_table(gb));
+    if (jt_ == SYM(ringMenu_state0)) { ringMenu_state0_hook(gb); return; }
+    else if (jt_ == SYM(ringMenu_state1)) { ringMenu_state1_hook(gb); return; }
+    else if (jt_ == SYM(ringMenu_state2)) { ringMenu_state2_hook(gb); return; }
+    else { HANDOFF(jt_); }
+  } while (0);
+}
+
+static void secret_list_get_secret_text(GB *gb) {
+  BASE(secretListMenu_printSecret__getSecretText);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  A = B;
+  CYC(b_+0, b_+1);
+  CYC(b_+1, b_+2); push_effect(gb, b_+2);
+  do { uint16_t jt_ = (function_caller_jump_table(gb));
+    if (jt_ == b_+10) {
+      SET_HL(SYM(generateGameTransferSecret));
+      E = SYMBANK(generateGameTransferSecret);
+      CYC(b_+10, b_+15);
+      CYC(b_+15, b_+18);
+      interBankCall_hook(gb);
+      return;
+    }
+    else if (jt_ == b_+18) {
+      SET_BC(0x0002);
+      CYC(b_+18, b_+21);
+      CYC(b_+21, b_+24);
+      secretFunctionCaller_hook(gb);
+      return;
+    }
+    else if (jt_ == b_+24) {
+      A = C;
+      CYC(b_+24, b_+25);
+      CYC(b_+25, b_+28); mem_wr(gb, wShortSecretIndex, A);
+      C = B;
+      B = 0x00;
+      CYC(b_+28, b_+31);
+      CYC(b_+31, b_+34);
+      secretFunctionCaller_hook(gb);
+      return;
+    }
+    else { HANDOFF(jt_); }
+  } while (0);
+}
+
 void maupMenu_drawPopup_hook(GB *gb) {
   BASE(maupMenu_drawPopup);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_ROM(b_+0, b_+49);
+  CYC(b_+0, b_+3); push_effect(gb, b_+3);
+  maup_update_popup_variables(gb);
   CYC(b_+3, b_+6); SET_HL(wFileSelect_cursorOffset);
   CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+7, b_+8); C = mem_rd(gb, HL);
@@ -5337,7 +5534,8 @@ void runInventoryMenu_hook(GB *gb) {
   CYC(b_+5, b_+7); H8(hOamTail) = A;
   CYC(b_+7, b_+9); A = 0x04;
   CYC(b_+9, b_+11); hram_wr(gb, R_SVBK, A);
-  CALL_ROM(b_+11, b_+23);
+  CYC(b_+11, b_+14); push_effect(gb, b_+14);
+  run_inventory_menu_states(gb);
   CALL_C(b_+14, inventoryMenuDrawSprites_hook, SYM(inventoryMenuDrawSprites), b_+17);
   CYC(b_+17, b_+18); alu_xor(gb, A);
   CYC(b_+18, b_+20); hram_wr(gb, R_SVBK, A);
@@ -5753,7 +5951,8 @@ void runRingMenu_hook(GB *gb) {
   CYC(b_+10, b_+12); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
   CYC(b_+12, b_+14); A = 0x04;
   CYC(b_+14, b_+16); hram_wr(gb, R_SVBK, A);
-  CALL_ROM(b_+16, b_+27);
+  CYC(b_+16, b_+19); push_effect(gb, b_+19);
+  run_ring_menu_state_code(gb);
   CYC(b_+19, b_+22); A = W8(wRingMenu_mode);
   CYC(b_+22, b_+23); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+23, b_+24); ret_effect(gb); return; }
@@ -6331,7 +6530,8 @@ restart:
   CYC(b_+45, b_+48); W8(wFileSelect_fontXor) = A;
   if (F & FZ) { CYCT(b_+48, b_+50); goto restart; }
   CYC(b_+48, b_+50);
-  CALL_ROM(b_+50, b_+69);
+  CYC(b_+50, b_+53); push_effect(gb, b_+53);
+  secret_list_get_secret_text(gb);
   CYC(b_+53, b_+56); SET_HL(w7SecretText1);
   CYC(b_+56, b_+59); SET_DE(w7d800);
   CYC(b_+59, b_+61); B = 0x18;

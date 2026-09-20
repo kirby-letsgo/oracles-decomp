@@ -35,6 +35,44 @@ static void dust_set_oam_tile_from_animation(GB *gb) {
   CYC(b_+131, b_+132); ret_effect(gb);
 }
 
+// itemCode1a@initializeNextDustCloud: when subid bit 0 is set, arms the next cloud (var30..var33)
+// at Link's position unless the current one (var34) is still active. Identical in both games.
+static void dust_initialize_next_cloud(GB *gb) {
+  BASE(itemCode1a__initializeNextDustCloud);
+  H = D;
+  L = OBJ_SUBID;
+  CYC(b_+0, b_+3);
+  CYC(b_+3, b_+5); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+8); mem_wr(gb, HL, 0x00);
+  L = OBJ_USE_TEXT_ID;
+  CYC(b_+8, b_+10);
+  CYC(b_+10, b_+12); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) CYCT(b_+12, b_+14);
+  else {
+    CYC(b_+12, b_+14);
+    L = OBJ_VAR34;
+    CYC(b_+14, b_+16);
+    CYC(b_+16, b_+18); alu_bit(gb, 7, mem_rd(gb, HL));
+    if (!(F & FZ)) { CYCT(b_+18, b_+19); ret_effect(gb); return; }
+    CYC(b_+18, b_+19);
+  }
+  A = 0x80;
+  CYC(b_+19, b_+21);
+  CYC(b_+21, b_+22); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  alu_xor(gb, A);
+  CYC(b_+22, b_+23);
+  CYC(b_+23, b_+24); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+24, b_+27); A = mem_rd(gb, w1Link_yh);
+  alu_add(gb, 0x05);
+  CYC(b_+27, b_+29);
+  CYC(b_+29, b_+30); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+30, b_+33); A = mem_rd(gb, w1Link_xh);
+  CYC(b_+33, b_+34); mem_wr(gb, HL, A);
+  CYC(b_+34, b_+35); ret_effect(gb);
+}
+
 void itemCode1a_hook(GB *gb) {
   BASE(itemCode1a);
   uint16_t sp0_ = gb->sp;
@@ -82,7 +120,7 @@ void itemCode1a_hook(GB *gb) {
         CYCT(b_+64, b_+67); itemDelete_hook(gb); return;
       }
       CYC(b_+64, b_+67);
-      CALL_ROM(b_+67, b_+140);
+      CYC(b_+67, b_+70); push_effect(gb, b_+70); dust_initialize_next_cloud(gb);
       CALL_C(b_+70, itemDecCounter1_hook, SYM(itemDecCounter1), b_+73);
       CYC(b_+73, b_+75); alu_bit(gb, 0, mem_rd(gb, HL));
       CYC(b_+75, b_+77); L = 0x30;

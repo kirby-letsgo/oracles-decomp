@@ -1076,12 +1076,329 @@ load_palette:
   CYC(b_+214, b_+217); loadPaletteHeader_hook(gb);
 }
 
+// handleTextControlCode's handlers. On entry the stack holds bc, hl and the return address the
+// caller pushed; each handler pops what the assembly pops and ends in ret_effect or in the hook
+// it tail-jumps to.
+static void text_cc_pop_bc_and_ret(GB *gb) {
+  BASE(handleTextControlCode__popBcAndRet);
+  CYC(b_+0, b_+1); SET_BC(pop_effect(gb));
+  CYC(b_+1, b_+2); ret_effect(gb);
+}
+
+static void text_cc_0(GB *gb) {
+  BASE(handleTextControlCode__controlCode0);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CYC(b_+1, b_+2); SET_BC(pop_effect(gb));
+  CALL_C(b_+2, popFromTextStack_hook, SYM(popFromTextStack), b_+5);
+  A = H;
+  alu_or(gb, A);
+  CYC(b_+5, b_+7);
+  if (!(F & FZ)) { CYCT(b_+7, b_+8); ret_effect(gb); return; }
+  CYC(b_+7, b_+8);
+  CYC(b_+8, b_+11); mem_wr(gb, w7TextStatus, A);
+  CYC(b_+11, b_+12); ret_effect(gb);
+}
+
+static void text_cc_1(GB *gb) {
+  BASE(handleTextControlCode__controlCode1);
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CYC(b_+1, b_+2); SET_BC(pop_effect(gb));
+  A = 0x01;
+  CYC(b_+2, b_+4);
+  CYC(b_+4, b_+7); mem_wr(gb, w7TextStatus, A);
+  CYC(b_+7, b_+8); ret_effect(gb);
+}
+
+static void text_cc_6(GB *gb) {
+  BASE(handleTextControlCode__controlCode6);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CALL_C(b_+1, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+4);
+  B = A;
+  alu_cp(gb, 0x80);
+  CYC(b_+4, b_+7);
+  if (F & FC) {
+    CYCT(b_+7, b_+9);
+    A = 0x01;
+    CYC(b_+30, b_+32);
+    CYC(b_+32, b_+35); mem_wr(gb, w7TextGfxSource, A);
+    A = B;
+    CYC(b_+35, b_+36);
+  } else {
+    CYC(b_+7, b_+9);
+    CYC(b_+9, b_+12); A = mem_rd(gb, wTextGfxColorIndex);
+    alu_swap_a(gb);
+    alu_or(gb, 0x03);
+    CYC(b_+12, b_+16);
+    CYC(b_+16, b_+19); mem_wr(gb, wTextGfxColorIndex, A);
+    A = 0x02;
+    CYC(b_+19, b_+21);
+    CYC(b_+21, b_+24); mem_wr(gb, w7TextGfxSource, A);
+    A = B;
+    alu_sub(gb, 0x80);
+    alu_add(gb, A);
+    CYC(b_+24, b_+28);
+    CYCT(b_+28, b_+30);
+  }
+  CYC(b_+36, b_+37); SET_BC(pop_effect(gb));
+  CYC(b_+37, b_+38); push_effect(gb, AF);
+  A = 0x06;
+  CYC(b_+38, b_+40);
+  CALL_C(b_+40, setLineTextBuffers_hook, SYM(setLineTextBuffers), b_+43);
+  CYC(b_+43, b_+44); SET_AF(pop_effect(gb));
+  CYC(b_+44, b_+47);
+  retrieveTextCharacter_hook(gb);
+}
+
+// @controlCode2..5 select dictionary a and share this tail (from @controlCode5+2).
+static void text_cc_dictionary_tail(GB *gb) {
+  BASE(handleTextControlCode__controlCode5);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+2, b_+4); H8(hFF8B) = A;
+  CYC(b_+4, b_+5); SET_HL(pop_effect(gb));
+  CALL_C(b_+5, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+8);
+  CYC(b_+8, b_+11); mem_wr(gb, wTextIndexL, A);
+  CALL_C(b_+11, pushToTextStack_hook, SYM(pushToTextStack), b_+14);
+  CYC(b_+14, b_+16); A = H8(hFF8B);
+  CYC(b_+16, b_+19); mem_wr(gb, wTextIndexH, A);
+  CALL_C(b_+19, getTextAddress_hook, SYM(getTextAddress), b_+22);
+  CYCT(b_+22, b_+24);
+  text_cc_pop_bc_and_ret(gb);
+}
+
+static void text_cc_2(GB *gb) {
+  BASE(handleTextControlCode__controlCode2);
+  alu_xor(gb, A);
+  CYC(b_+0, b_+1);
+  CYCT(b_+1, b_+3);
+  text_cc_dictionary_tail(gb);
+}
+
+static void text_cc_3(GB *gb) {
+  BASE(handleTextControlCode__controlCode3);
+  A = 0x01;
+  CYC(b_+0, b_+2);
+  CYCT(b_+2, b_+4);
+  text_cc_dictionary_tail(gb);
+}
+
+static void text_cc_4(GB *gb) {
+  BASE(handleTextControlCode__controlCode4);
+  A = 0x02;
+  CYC(b_+0, b_+2);
+  CYCT(b_+2, b_+4);
+  text_cc_dictionary_tail(gb);
+}
+
+static void text_cc_5(GB *gb) {
+  BASE(handleTextControlCode__controlCode5);
+  A = 0x03;
+  CYC(b_+0, b_+2);
+  text_cc_dictionary_tail(gb);
+}
+
+static void text_cc_f(GB *gb) {
+  BASE(handleTextControlCode__controlCodeF);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CALL_C(b_+1, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+4);
+  alu_cp(gb, 0xfc);
+  CYC(b_+4, b_+6);
+  if (F & FC) CYCT(b_+6, b_+8);
+  else {
+    CYC(b_+6, b_+8);
+    CYC(b_+8, b_+9); push_effect(gb, HL);
+    alu_cpl(gb);
+    SET_HL(wTextSubstitutions);
+    CYC(b_+9, b_+13);
+    CYC(b_+13, b_+14); push_effect(gb, b_+14); add_a_to_hl(gb);
+    CYC(b_+14, b_+15); A = mem_rd(gb, HL);
+    CYC(b_+15, b_+16); SET_HL(pop_effect(gb));
+  }
+  CYC(b_+16, b_+19); mem_wr(gb, wTextIndexL, A);
+  CYC(b_+19, b_+22); A = mem_rd(gb, wTextIndexH_backup);
+  CYC(b_+22, b_+25); mem_wr(gb, wTextIndexH, A);
+  CALL_C(b_+25, pushToTextStack_hook, SYM(pushToTextStack), b_+28);
+  CALL_C(b_+28, checkInitialTextCommands_hook, SYM(checkInitialTextCommands), b_+31);
+  CYCT(b_+31, b_+33);
+  text_cc_pop_bc_and_ret(gb);
+}
+
+static void text_cc_7(GB *gb) {
+  BASE(handleTextControlCode__controlCode7);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CALL_C(b_+1, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+4);
+  CYC(b_+4, b_+7); mem_wr(gb, wTextIndexL, A);
+  CALL_C(b_+7, checkInitialTextCommands_hook, SYM(checkInitialTextCommands), b_+10);
+  CYCT(b_+10, b_+12);
+  text_cc_pop_bc_and_ret(gb);
+}
+
+static void text_cc_8(GB *gb) {
+  BASE(handleTextControlCode__controlCode8);
+  CYC(b_+0, b_+3); A = mem_rd(gb, w7d0c1);
+  alu_or(gb, 0x10);
+  CYC(b_+3, b_+5);
+  CYC(b_+5, b_+8); mem_wr(gb, w7d0c1, A);
+  alu_xor(gb, A);
+  CYC(b_+8, b_+9);
+  CYC(b_+9, b_+12); mem_wr(gb, w7TextStatus, A);
+  CYC(b_+12, b_+13); SET_HL(pop_effect(gb));
+  CYCT(b_+13, b_+15);
+  text_cc_pop_bc_and_ret(gb);
+}
+
+static void text_cc_9(GB *gb) {
+  BASE(handleTextControlCode__controlCode9);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CYC(b_+1, b_+4); A = mem_rd(gb, wTextboxFlags);
+  alu_rrca(gb);
+  CYC(b_+4, b_+5);
+  if (F & FC) {
+    CYCT(b_+5, b_+7);
+    CALL_C(b_+36, incHlAndUpdateBank_hook, SYM(incHlAndUpdateBank), b_+39);
+    text_cc_pop_bc_and_ret(gb);
+    return;
+  }
+  CYC(b_+5, b_+7);
+  CALL_C(b_+7, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+10);
+  alu_bit(gb, 7, A);
+  CYC(b_+10, b_+12);
+  if (!(F & FZ)) {
+    CYCT(b_+12, b_+14);
+    CYC(b_+31, b_+34); mem_wr(gb, w7TextAttribute, A);
+    CYCT(b_+34, b_+36);
+    text_cc_pop_bc_and_ret(gb);
+    return;
+  }
+  CYC(b_+12, b_+14);
+  SET_BC(SYM(handleTextControlCode__textColorData));
+  CYC(b_+14, b_+17);
+  CALL_C(b_+17, addDoubleIndexToBc_hook, SYM(addDoubleIndexToBc), b_+20);
+  CYC(b_+20, b_+21); A = mem_rd(gb, BC);
+  CYC(b_+21, b_+24); mem_wr(gb, w7TextAttribute, A);
+  SET_BC(BC + 1);
+  CYC(b_+24, b_+25);
+  CYC(b_+25, b_+26); A = mem_rd(gb, BC);
+  CYC(b_+26, b_+29); mem_wr(gb, wTextGfxColorIndex, A);
+  CYC(b_+29, b_+30); SET_BC(pop_effect(gb));
+  CYC(b_+30, b_+31); ret_effect(gb);
+}
+
+static void text_cc_a(GB *gb) {
+  BASE(handleTextControlCode__controlCodeA);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CYC(b_+1, b_+2); SET_BC(pop_effect(gb));
+  CALL_C(b_+2, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+5);
+  CYC(b_+5, b_+6); push_effect(gb, HL);
+  SET_HL(SYM(nameAddressTable));
+  CYC(b_+6, b_+9);
+  CYC(b_+9, b_+10); add_double_index_to_hl(gb, b_+10);
+  CYC(b_+10, b_+11); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+11, b_+12); H = mem_rd(gb, HL);
+  L = A;
+  CYC(b_+12, b_+13);
+  for (;;) {
+    CYC(b_+13, b_+14); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    alu_or(gb, A);
+    CYC(b_+14, b_+15);
+    if (F & FZ) { CYCT(b_+15, b_+17); break; }
+    CYC(b_+15, b_+17);
+    CALL_C(b_+17, setLineTextBuffers_hook, SYM(setLineTextBuffers), b_+20);
+    CALL_C(b_+20, retrieveTextCharacter_hook, SYM(retrieveTextCharacter), b_+23);
+    CYCT(b_+23, b_+25);
+  }
+  CYC(b_+25, b_+26); SET_HL(pop_effect(gb));
+  CYC(b_+26, b_+27); ret_effect(gb);
+}
+
+static void text_cc_e(GB *gb) {
+  BASE(handleTextControlCode__controlCodeE);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CALL_C(b_+1, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+4);
+  CYC(b_+4, b_+7); mem_wr(gb, w7SoundEffect, A);
+  CYCT(b_+7, b_+9);
+  text_cc_pop_bc_and_ret(gb);
+}
+
+static void text_cc_b(GB *gb) {
+  BASE(handleTextControlCode__controlCodeB);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CALL_C(b_+1, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+4);
+  CYC(b_+4, b_+7); mem_wr(gb, w7TextSound, A);
+  CYCT(b_+7, b_+9);
+  text_cc_pop_bc_and_ret(gb);
+}
+
+static void text_cc_d(GB *gb) {
+  BASE(handleTextControlCode__controlCodeD);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CALL_C(b_+1, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+4);
+  CYC(b_+4, b_+7); mem_wr(gb, w7TextboxTimer, A);
+  CYCT(b_+7, b_+9);
+  text_cc_pop_bc_and_ret(gb);
+}
+
+static void text_cc_c(GB *gb) {
+  BASE(handleTextControlCode__controlCodeC);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CALL_C(b_+1, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+4);
+  CYC(b_+4, b_+5); push_effect(gb, HL);
+  B = A;
+  alu_and(gb, 0x03);
+  C = A;
+  A = B;
+  alu_swap_a(gb);
+  alu_rlca(gb);
+  alu_and(gb, 0x1f);
+  CYC(b_+5, b_+15);
+  CYC(b_+15, b_+16); push_effect(gb, b_+16);
+  do { uint16_t jt_ = (textbox_jump_table(gb));
+    if (jt_ == SYM(textControlCodeC_0)) { textControlCodeC_0_hook(gb); return; }
+    else if (jt_ == SYM(textControlCodeC_1)) { textControlCodeC_1_hook(gb); return; }
+    else if (jt_ == SYM(textControlCodeC_2)) { textControlCodeC_2_hook(gb); return; }
+    else if (jt_ == SYM(textControlCodeC_3)) { textControlCodeC_3_hook(gb); return; }
+    else if (jt_ == SYM(textControlCodeC_ret)) { textControlCodeC_ret_hook(gb); return; }
+    else if (jt_ == SYM(textControlCodeC_5)) { textControlCodeC_5_hook(gb); return; }
+    else if (jt_ == SYM(textControlCodeC_6)) { textControlCodeC_6_hook(gb); return; }
+    else if (jt_ == SYM(textControlCodeC_7)) { textControlCodeC_7_hook(gb); return; }
+    else { HANDOFF(jt_); }
+  } while (0);
+}
+
 void handleTextControlCode_hook(GB *gb) {
   BASE(handleTextControlCode);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   CYC(b_+0, b_+1); push_effect(gb, BC);
   CYC(b_+1, b_+2); push_effect(gb, HL);
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
-  hook_handoff(gb, textbox_jump_table(gb));
+  do { uint16_t jt_ = (textbox_jump_table(gb));
+    if (jt_ == SYM(handleTextControlCode__controlCode0)) { text_cc_0(gb); return; }
+    else if (jt_ == SYM(handleTextControlCode__controlCode1)) { text_cc_1(gb); return; }
+    else if (jt_ == SYM(handleTextControlCode__controlCode2)) { text_cc_2(gb); return; }
+    else if (jt_ == SYM(handleTextControlCode__controlCode3)) { text_cc_3(gb); return; }
+    else if (jt_ == SYM(handleTextControlCode__controlCode4)) { text_cc_4(gb); return; }
+    else if (jt_ == SYM(handleTextControlCode__controlCode5)) { text_cc_5(gb); return; }
+    else if (jt_ == SYM(handleTextControlCode__controlCode6)) { text_cc_6(gb); return; }
+    else if (jt_ == SYM(handleTextControlCode__controlCode7)) { text_cc_7(gb); return; }
+    else if (jt_ == SYM(handleTextControlCode__controlCode8)) { text_cc_8(gb); return; }
+    else if (jt_ == SYM(handleTextControlCode__controlCode9)) { text_cc_9(gb); return; }
+    else if (jt_ == SYM(handleTextControlCode__controlCodeA)) { text_cc_a(gb); return; }
+    else if (jt_ == SYM(handleTextControlCode__controlCodeB)) { text_cc_b(gb); return; }
+    else if (jt_ == SYM(handleTextControlCode__controlCodeC)) { text_cc_c(gb); return; }
+    else if (jt_ == SYM(handleTextControlCode__controlCodeD)) { text_cc_d(gb); return; }
+    else if (jt_ == SYM(handleTextControlCode__controlCodeE)) { text_cc_e(gb); return; }
+    else if (jt_ == SYM(handleTextControlCode__controlCodeF)) { text_cc_f(gb); return; }
+    else { HANDOFF(jt_); }
+  } while (0);
 }
 
 static void add_double_index_to_hl(GB *gb, uint16_t return_address) {
@@ -1505,6 +1822,124 @@ no_extra:
   CYC(b_+95, b_+96); ret_effect(gb);
 }
 
+// doInventoryTextFirstPass@controlCode and its handlers: advance e by the number of characters
+// a control code produces, reading the text stream the way the second pass does. Each handler
+// ends in the routine that pops the return address the caller pushed.
+static void inventory_text_cc_dictionary(GB *gb) {
+  BASE(doInventoryTextFirstPass__dictionary);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CALL_C(b_+1, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+4);
+  CYC(b_+4, b_+7); mem_wr(gb, wTextIndexL, A);
+  CALL_C(b_+7, pushToTextStack_hook, SYM(pushToTextStack), b_+10);
+  A = B;
+  CYC(b_+10, b_+11);
+  CYC(b_+11, b_+14); mem_wr(gb, wTextIndexH, A);
+  CYC(b_+14, b_+17);
+  getTextAddress_hook(gb);
+}
+
+static void inventory_text_cc_nil(GB *gb) {
+  BASE(doInventoryTextFirstPass__controlCodeNil);
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CYC(b_+1, b_+4);
+  incHlAndUpdateBank_hook(gb);
+}
+
+static void inventory_text_cc_6(GB *gb) {
+  BASE(doInventoryTextFirstPass__controlCode6);
+  E = alu_inc8(gb, E);
+  CYC(b_+0, b_+1);
+  inventory_text_cc_nil(gb);
+}
+
+static void inventory_text_cc_7(GB *gb) {
+  BASE(doInventoryTextFirstPass__controlCode7);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CALL_C(b_+1, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+4);
+  CYC(b_+4, b_+7); mem_wr(gb, wTextIndexL, A);
+  CYC(b_+7, b_+10);
+  checkInitialTextCommands_hook(gb);
+}
+
+static void inventory_text_cc_8(GB *gb) {
+  BASE(doInventoryTextFirstPass__controlCode8);
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CYC(b_+1, b_+2);
+  ret_effect(gb);
+}
+
+static void inventory_text_cc_a(GB *gb) {
+  BASE(doInventoryTextFirstPass__controlCodeA);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CALL_C(b_+1, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+4);
+  CYC(b_+4, b_+5); push_effect(gb, HL);
+  SET_HL(SYM(nameAddressTable));
+  CYC(b_+5, b_+8);
+  CYC(b_+8, b_+9); add_double_index_to_hl(gb, b_+9);
+  CYC(b_+9, b_+10); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+10, b_+11); H = mem_rd(gb, HL);
+  L = A;
+  CYC(b_+11, b_+12);
+  for (;;) {
+    CYC(b_+12, b_+13); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    alu_or(gb, A);
+    CYC(b_+13, b_+14);
+    if (F & FZ) { CYCT(b_+14, b_+16); break; }
+    CYC(b_+14, b_+16);
+    E = alu_inc8(gb, E);
+    CYC(b_+16, b_+17);
+    CYCT(b_+17, b_+19);
+  }
+  inventory_text_cc_8(gb);
+}
+
+static void inventory_text_cc_f(GB *gb) {
+  BASE(doInventoryTextFirstPass__controlCodeF);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CALL_C(b_+1, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+4);
+  alu_cp(gb, 0xfc);
+  CYC(b_+4, b_+6);
+  if (F & FC) CYCT(b_+6, b_+8);
+  else {
+    CYC(b_+6, b_+8);
+    CYC(b_+8, b_+9); push_effect(gb, HL);
+    alu_cpl(gb);
+    SET_HL(wTextSubstitutions);
+    CYC(b_+9, b_+13);
+    CYC(b_+13, b_+14); push_effect(gb, b_+14); add_a_to_hl(gb);
+    CYC(b_+14, b_+15); A = mem_rd(gb, HL);
+    CYC(b_+15, b_+16); SET_HL(pop_effect(gb));
+  }
+  CYC(b_+16, b_+19); mem_wr(gb, wTextIndexL, A);
+  CALL_C(b_+19, pushToTextStack_hook, SYM(pushToTextStack), b_+22);
+  CYC(b_+22, b_+25);
+  checkInitialTextCommands_hook(gb);
+}
+
+static void inventory_text_control_code(GB *gb) {
+  BASE(doInventoryTextFirstPass__controlCode);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  alu_sub(gb, 0x02);
+  B = A;
+  CYC(b_+0, b_+3);
+  CYC(b_+3, b_+4); push_effect(gb, HL);
+  CYC(b_+4, b_+5); push_effect(gb, b_+5);
+  do { uint16_t jt_ = (textbox_jump_table(gb));
+    if (jt_ == SYM(doInventoryTextFirstPass__dictionary)) { inventory_text_cc_dictionary(gb); return; }
+    else if (jt_ == SYM(doInventoryTextFirstPass__controlCode6)) { inventory_text_cc_6(gb); return; }
+    else if (jt_ == SYM(doInventoryTextFirstPass__controlCode7)) { inventory_text_cc_7(gb); return; }
+    else if (jt_ == SYM(doInventoryTextFirstPass__controlCode8)) { inventory_text_cc_8(gb); return; }
+    else if (jt_ == SYM(doInventoryTextFirstPass__controlCodeNil)) { inventory_text_cc_nil(gb); return; }
+    else if (jt_ == SYM(doInventoryTextFirstPass__controlCodeA)) { inventory_text_cc_a(gb); return; }
+    else if (jt_ == SYM(doInventoryTextFirstPass__controlCodeF)) { inventory_text_cc_f(gb); return; }
+    else { HANDOFF(jt_); }
+  } while (0);
+}
+
 void doInventoryTextFirstPass_hook(GB *gb) {
   BASE(doInventoryTextFirstPass);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1529,7 +1964,8 @@ void doInventoryTextFirstPass_hook(GB *gb) {
     CYC(b_+26, b_+28); alu_cp(gb, 0x10);
     if (!(F & FC)) { CYCT(b_+28, b_+30); goto not_control; }
     CYC(b_+28, b_+30);
-    CALL_ROM(b_+30, b_+114);
+    CYC(b_+30, b_+33); push_effect(gb, b_+33);
+    inventory_text_control_code(gb);
     CYC(b_+33, b_+35);
     continue;
 null_terminator:

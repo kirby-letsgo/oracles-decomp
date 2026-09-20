@@ -131,16 +131,101 @@ void getAdjustedRoomGroup_hook(GB *gb) {
   CYC(b_+16, b_+17); ret_effect(gb);
 }
 
+// checkTilesetOverride@checkMakuTreeSaved: carry set when room $38 of group 0 must use the
+// saved-Maku-Tree tileset (hFF8D bumped by two).
+static void check_tileset_override_maku_tree_saved(GB *gb) {
+  BASE(checkTilesetOverride__checkMakuTreeSaved);
+  CYC(b_+0, b_+3); A = mem_rd(gb, wActiveGroup);
+  alu_or(gb, A);
+  CYC(b_+3, b_+4);
+  if (!(F & FZ)) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
+  CYC(b_+4, b_+5);
+  CYC(b_+5, b_+8); A = mem_rd(gb, wActiveRoom);
+  alu_cp(gb, 0x38);
+  CYC(b_+8, b_+10);
+  if (!(F & FZ)) { CYCT(b_+10, b_+12); goto noChange; }
+  CYC(b_+10, b_+12);
+  CYC(b_+12, b_+15); A = mem_rd(gb, wGroup1RoomFlags + 0x48);
+  alu_and(gb, 0x01);
+  CYC(b_+15, b_+17);
+  if (F & FZ) { CYCT(b_+17, b_+18); ret_effect(gb); return; }
+  CYC(b_+17, b_+18);
+  SET_HL(hFF8D);
+  CYC(b_+18, b_+21);
+  CYC(b_+21, b_+22); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+22, b_+23); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  alu_scf(gb);
+  CYC(b_+23, b_+24);
+  CYC(b_+24, b_+25); ret_effect(gb);
+  return;
+noChange:
+  alu_xor(gb, A);
+  CYC(b_+25, b_+26);
+  CYC(b_+26, b_+27); ret_effect(gb);
+}
+
+// checkTilesetOverride@checkJabuFlooded: carry set when the current Jabu-Jabu floor is under
+// water for the current water level (hFF8D bumped by one).
+static void check_tileset_override_jabu_flooded(GB *gb) {
+  BASE(checkTilesetOverride__checkJabuFlooded);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+3); A = mem_rd(gb, wDungeonIndex);
+  alu_cp(gb, 0x07);
+  CYC(b_+3, b_+5);
+  if (!(F & FZ)) { CYCT(b_+5, b_+7); goto noChange; }
+  CYC(b_+5, b_+7);
+  CYC(b_+7, b_+10); A = mem_rd(gb, wTilesetFlags);
+  alu_and(gb, 0x20);
+  CYC(b_+10, b_+12);
+  if (!(F & FZ)) { CYCT(b_+12, b_+14); goto noChange; }
+  CYC(b_+12, b_+14);
+  A = 0x11;
+  CYC(b_+14, b_+16);
+  CYC(b_+16, b_+19); mem_wr(gb, wDungeonFirstLayout, A);
+  SET_HL(SYM(findActiveRoomInDungeonLayoutWithPointlessBankSwitch));
+  E = SYMBANK(findActiveRoomInDungeonLayoutWithPointlessBankSwitch);
+  CYC(b_+19, b_+24);
+  CALL_C(b_+24, interBankCall_hook, ROM_interBankCall, b_+27);
+  CYC(b_+27, b_+30); A = mem_rd(gb, wJabuWaterLevel);
+  alu_and(gb, 0x07);
+  SET_HL(b_+56);
+  CYC(b_+30, b_+35);
+  CYC(b_+35, b_+36); load_tileset_add_a_to_hl_from_rst(gb, b_+36);
+  CYC(b_+36, b_+39); A = mem_rd(gb, wDungeonFloor);
+  SET_BC(bitTable);
+  alu_add(gb, C);
+  C = A;
+  CYC(b_+39, b_+44);
+  CYC(b_+44, b_+45); A = mem_rd(gb, BC);
+  CYC(b_+45, b_+46); alu_and(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+46, b_+47); ret_effect(gb); return; }
+  CYC(b_+46, b_+47);
+  CYC(b_+47, b_+49); A = H8(hFF8D);
+  A = alu_inc8(gb, A);
+  CYC(b_+49, b_+50);
+  CYC(b_+50, b_+52); H8(hFF8D) = A;
+  alu_scf(gb);
+  CYC(b_+52, b_+53);
+  CYC(b_+53, b_+54); ret_effect(gb);
+  return;
+noChange:
+  alu_xor(gb, A);
+  CYC(b_+54, b_+55);
+  CYC(b_+55, b_+56); ret_effect(gb);
+}
+
 void checkTilesetOverride_hook(GB *gb) {
   BASE(checkTilesetOverride);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_ROM(b_+0, b_+38);
+  CYC(b_+0, b_+3); push_effect(gb, b_+3);
+  check_tileset_override_maku_tree_saved(gb);
   if (F & FC) {
     CYCT(b_+3, b_+4); ret_effect(gb);
     return;
   }
   CYC(b_+3, b_+4);
-  CALL_ROM(b_+4, b_+65);
+  CYC(b_+4, b_+7); push_effect(gb, b_+7);
+  check_tileset_override_jabu_flooded(gb);
   if (F & FC) {
     CYCT(b_+7, b_+8); ret_effect(gb);
     return;
