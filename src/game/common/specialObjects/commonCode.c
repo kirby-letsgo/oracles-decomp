@@ -1642,6 +1642,21 @@ void companionFlashFromChargingAnimation_hook(GB *gb) {
   CYC(b_+15, b_+16); ret_effect(gb);
 }
 
+// companionCheckMountingComplete@nudgeLinkTowardCompanion: steps the coordinate at hl toward
+// the companion, direction from the carry the caller's compare left.
+static void companion_nudge_link_toward_companion(GB *gb) {
+  BASE(companionCheckMountingComplete__nudgeLinkTowardCompanion);
+  if (F & FC) {
+    CYCT(b_+0, b_+2);
+    CYC(b_+4, b_+5); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+    CYC(b_+5, b_+6); ret_effect(gb);
+    return;
+  }
+  CYC(b_+0, b_+2);
+  CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+3, b_+4); ret_effect(gb);
+}
+
 void companionCheckMountingComplete_hook(GB *gb) {
   BASE(companionCheckMountingComplete);
   CYC(b_+0, b_+3); A = W8(wDisallowMountingCompanion);
@@ -1684,7 +1699,8 @@ continue_mounting:
   CYC(b_+41, b_+42); A = mem_rd(gb, DE);
   CYC(b_+42, b_+43); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FZ)) {
-    CALL_ROM_CC(b_+43, b_+67);
+    CYCT(b_+43, b_+46); push_effect(gb, b_+46);
+    companion_nudge_link_toward_companion(gb);
   } else {
     CYC(b_+43, b_+46);
   }
@@ -1693,7 +1709,8 @@ continue_mounting:
   CYC(b_+49, b_+50); A = mem_rd(gb, DE);
   CYC(b_+50, b_+51); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FZ)) {
-    CALL_ROM_CC(b_+51, b_+67);
+    CYCT(b_+51, b_+54); push_effect(gb, b_+54);
+    companion_nudge_link_toward_companion(gb);
   } else {
     CYC(b_+51, b_+54);
   }

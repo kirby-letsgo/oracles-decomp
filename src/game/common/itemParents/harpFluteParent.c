@@ -35,6 +35,24 @@ static void harp_parent_add_a_to_hl(GB *gb) {
   }
 }
 
+// parentItemCode_flute@getSelectedSongAddr (at +231, no symbol of its own): hl = wFluteIcon
+// with z set for the flute, wSelectedHarpSong otherwise. Ages instruction stream; the routine
+// is not hooked under Seasons.
+static void flute_get_selected_song_addr(GB *gb) {
+  BASE(parentItemCode_flute);
+  SET_HL(wFluteIcon);
+  E = OBJ_ID;
+  CYC(b_+231, b_+236);
+  CYC(b_+236, b_+237); A = mem_rd(gb, DE);
+  alu_cp(gb, 0x0e);
+  CYC(b_+237, b_+239);
+  if (F & FZ) { CYCT(b_+239, b_+240); ret_effect(gb); return; }
+  CYC(b_+239, b_+240);
+  L = wSelectedHarpSong & 0xff;
+  CYC(b_+240, b_+242);
+  CYC(b_+242, b_+243); ret_effect(gb);
+}
+
 void parentItemCode_flute_hook(GB *gb) {
   BASE(parentItemCode_flute);
   uint16_t sp0_ = gb->sp;
@@ -67,7 +85,7 @@ state0:
   CYC(b_+40, b_+43); W8(wDisabledObjects) = A;
   CALL_C(b_+43, parentItemLoadAnimationAndIncState_hook, SYM(parentItemLoadAnimationAndIncState), b_+46);
   CYC(b_+46, b_+48); B = 0x00;
-  CALL_ROM(b_+48, b_+231);
+  CYC(b_+48, b_+51); push_effect(gb, b_+51); flute_get_selected_song_addr(gb);
   if (F & FZ) CYCT(b_+51, b_+53);
   else { CYC(b_+51, b_+53); CYC(b_+53, b_+55); B = 0x03; }
   CYC(b_+55, b_+56); A = mem_rd(gb, HL);
@@ -99,7 +117,7 @@ state1:
     CYC(b_+100, b_+101); SET_DE(pop_effect(gb));
   }
   CALL_C(b_+101, specialObjectAnimate_optimized_hook, SYM(specialObjectAnimate_optimized), b_+104);
-  CALL_ROM(b_+104, b_+231);
+  CYC(b_+104, b_+107); push_effect(gb, b_+107); flute_get_selected_song_addr(gb);
   CYC(b_+107, b_+109); A = 0xff;
   if (F & FZ) CYCT(b_+109, b_+111);
   else { CYC(b_+109, b_+111); CYC(b_+111, b_+112); A = mem_rd(gb, HL); }
@@ -121,7 +139,7 @@ state1:
   CYC(b_+132, b_+133);
   CYC(b_+133, b_+136); SET_HL(w1Link_collisionType);
   CYC(b_+136, b_+138); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
-  CALL_ROM(b_+138, b_+231);
+  CYC(b_+138, b_+141); push_effect(gb, b_+141); flute_get_selected_song_addr(gb);
   if (!(F & FZ)) { CYCT(b_+141, b_+143); goto harp; }
   CYC(b_+141, b_+143);
   CYC(b_+143, b_+146); SET_BC((SYM(specialObject0bOamDataPointers) + 32));

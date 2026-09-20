@@ -24,6 +24,56 @@ void interactionCodeb2__state0_hook(GB *gb) {
   CYC(b_+68, b_+72); interactionSetMiniScript_hook(gb); return;
 }
 
+// interactionCodeb2@setRandomCounter1: counter1 = (random & var30) + var31.
+static void volcano_set_random_counter1(GB *gb) {
+  BASE(interactionCodeb2__setRandomCounter1);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CALL_C(b_+0, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+3);
+  H = D;
+  L = INTERACTION_BASE + OBJ_USE_TEXT_ID;
+  CYC(b_+3, b_+6);
+  CYC(b_+6, b_+7); alu_and(gb, mem_rd(gb, HL));
+  L = alu_inc8(gb, L);
+  CYC(b_+7, b_+8);
+  CYC(b_+8, b_+9); alu_add(gb, mem_rd(gb, HL));
+  L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+9, b_+11);
+  CYC(b_+11, b_+12); mem_wr(gb, HL, A);
+  CYC(b_+12, b_+13); ret_effect(gb);
+}
+
+// interactionCodeb2@runScript: reads the next screen-shake entry from the mini script,
+// restarting it at $ff, then falls into @setRandomCounter1.
+static void volcano_run_script(GB *gb) {
+  BASE(interactionCodeb2__runScript);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  for (;;) {
+    CALL_C(b_+0, interactionGetMiniScript_hook, SYM(interactionGetMiniScript), b_+3);
+    CYC(b_+3, b_+4); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    alu_cp(gb, 0xff);
+    CYC(b_+4, b_+6);
+    if (!(F & FZ)) { CYCT(b_+6, b_+8); break; }
+    CYC(b_+6, b_+8);
+    SET_HL(SYM(interactionCodeb2__script));
+    CYC(b_+8, b_+11);
+    CALL_C(b_+11, interactionSetMiniScript_hook, SYM(interactionSetMiniScript), b_+14);
+    CYCT(b_+14, b_+16);
+  }
+  CYC(b_+16, b_+19); mem_wr(gb, wScreenShakeCounterY, A);
+  CYC(b_+19, b_+20); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+20, b_+23); mem_wr(gb, wScreenShakeCounterX, A);
+  E = INTERACTION_BASE + OBJ_USE_TEXT_ID;
+  CYC(b_+23, b_+25);
+  CYC(b_+25, b_+26); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+26, b_+27); mem_wr(gb, DE, A);
+  E = alu_inc8(gb, E);
+  CYC(b_+27, b_+28);
+  CYC(b_+28, b_+29); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+29, b_+30); mem_wr(gb, DE, A);
+  CALL_C(b_+30, interactionSetMiniScript_hook, SYM(interactionSetMiniScript), b_+33);
+  volcano_set_random_counter1(gb);
+}
+
 void interactionCodeb2__state1_hook(GB *gb) {
   BASE(interactionCodeb2);
   uint16_t sp0_ = gb->sp;
@@ -36,11 +86,11 @@ void interactionCodeb2__state1_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+19, b_+21); goto update; }
   CYC(b_+19, b_+21); A = mem_rd(gb, wScreenShakeCounterX);
   CYC(b_+24, b_+25); alu_or(gb, A);
-  if (F & FZ) CALL_ROM_CC(b_+25, b_+71); else CYC(b_+25, b_+28);
+  if (F & FZ) { CYCT(b_+25, b_+28); push_effect(gb, b_+28); volcano_run_script(gb); } else CYC(b_+25, b_+28);
 update:
   CALL_C(b_+28, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+31);
   if (!(F & FZ)) { CYCT(b_+31, b_+32); ret_effect(gb); return; }
-  CALL_ROM(b_+32, b_+104);
+  CYC(b_+32, b_+35); push_effect(gb, b_+35); volcano_set_random_counter1(gb);
   CYC(b_+35, b_+37); C = 0x0f;
   CALL_C(b_+37, getRandomNumber_hook, SYM(getRandomNumber), b_+40);
   CYC(b_+40, b_+41); alu_and(gb, C);
