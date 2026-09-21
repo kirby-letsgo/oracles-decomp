@@ -1017,7 +1017,7 @@ void cutscene13_hook(GB *gb) {
 }
 
 void tilesetLayoutGroup33_hook(GB *gb) {
-  cutscene13_hook(gb);
+  TAIL(cutscene13);
 }
 
 void cutscene14_hook(GB *gb) {

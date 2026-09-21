@@ -28,7 +28,6 @@ void bear_state0__initSubid01_hook(GB *gb);
 void bear_state0__initSubid02_hook(GB *gb);
 void bear_state0__var03IsNonzero_hook(GB *gb);
 void bear_state0__chooseTextID_hook(GB *gb);
-void bear_state0__textIDs_hook(GB *gb);
 void bear_state1_hook(GB *gb);
 void bear_state1__runSubid00_hook(GB *gb);
 void bear_state1__substate0_hook(GB *gb);
@@ -229,16 +228,6 @@ L_6dbb:
   CYC(b_+128, b_+129); E = alu_inc8(gb, E);
   CYC(b_+129, b_+130); mem_wr(gb, DE, A);
   CYC(b_+130, b_+131); ret_effect(gb); return;
-}
-
-void bear_state0__textIDs_hook(GB *gb) {
-  BASE(bear_state0);
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6dc8:
-  CYC(b_+131, b_+132); mem_wr(gb, DE, A);
-  CYC(b_+132, b_+133); SET_DE(DE + 1);
-  CYC(b_+133, b_+134); D = alu_inc8(gb, D);
-  TAIL(bear_state1);
 }
 
 void bear_state1_hook(GB *gb) {

@@ -651,7 +651,6 @@
 00:0925 startGame__afterSp0925_hook H
 00:0998 _countdownToRunThread__afterSp0998_hook -
 00:09aa _initializeThread__afterSp09aa_hook -
-00:2d27 intro_cinematic__afterCall2d27_hook -
 00:0100 romEntry_hook -
 06:4000 interactWithTileBeforeLink_b06_hook -
 06:46bb linkApplyDamage_b06_hook -
@@ -819,7 +818,6 @@
 3f:43d3 partLoadGraphicsAndProperties__afterCall43d3_hook -
 3f:440e interactionLoadGraphics__afterCall440e_hook -
 3f:442c itemLoadGraphics__afterCall442c_hook -
-3f:4143 agesFunc_3f_4133__afterCall4143_hook H
 3f:4252 updateTileIndexBaseForAllObjects__afterCall4252_hook -
 3f:4372 enemyLoadGraphicsAndProperties__afterCall4372_hook -
 3f:4270 findIndexInLoadedObjectGfx_hook -
@@ -1012,9 +1010,6 @@
 3f:7b71 tuniNut_state0__afterCall7b71_hook -
 3f:72f9 interactionCode39_body__afterCall72f9_hook -
 3f:7cce func_7cc7__afterCall7cce_hook -
-3f:4124 resumeThreadNextFrameIfLcdIsOn__afterCall4124_hook -
-3f:41ad refreshObjectGfx_body__afterCall41ad_hook H
-3f:41d2 refreshObjectGfx_body__afterCall41d2_hook H
 3f:41f0 loadObjectGfxHeaderToSlot4_body__afterCall41f0_hook H
 01:4910 makeActiveObjectFollowLink_b01_hook -
 01:401b screenTransitionState0_hook -
@@ -1513,7 +1508,6 @@
 02:4d29 fileSelectDrawLink_hook -
 02:4107 copyTextCharactersFromSecretTextTable_hook -
 02:410e copyTextCharactersFromHlUntilNull_hook -
-02:41a4 fileSelectMode1__afterCall_hook -
 02:41aa fileSelectMode1__subModes_hook -
 02:4149 func_02_4149_hook -
 02:4185 fileSelectMode0_hook -
@@ -4897,7 +4891,6 @@
 39:456b standardSoundCmd__cmd60_hook -
 39:45a0 standardSoundCmd__cmd61_hook -
 39:45a3 standardSoundCmd__cmdFrequency_hook -
-39:4533 standardSoundCmd__table_hook -
 39:434a updatePlayedFrequency__ret_hook -
 39:4306 updatePlayedFrequency__square_hook -
 39:4339 updatePlayedFrequency__wave_hook -
@@ -5197,7 +5190,6 @@
 09:6d63 bear_state0__initSubid00_hook -
 09:6d76 bear_state0__initSubid01_hook -
 09:6d77 bear_state0__initSubid02_hook -
-09:6dc8 bear_state0__textIDs_hook -
 09:6da8 bear_state0__var03IsNonzero_hook -
 09:6dd5 bear_state1__runSubid00_hook -
 09:6e4c bear_state1__runSubid02_hook -
@@ -5483,10 +5475,8 @@
 0b:41a0 childSetVar38ToNumEssencesObtained_hook -
 0b:41b5 spawnBipinBlossomFamilyObjects_hook -
 0b:4050 interactionCode9f__state0_hook -
-0b:405b interactionCode9f__afterCall405b_hook -
 0b:405e interactionCode9f__state1_hook -
 0b:409d interactionCodea0__state0_hook -
-0b:40a6 interactionCodea0__afterCall40a6_hook -
 0b:40bf interactionCodea0__state1_hook -
 0b:4008 interactionCode98__state0_hook -
 0b:401e interactionCode98__state1_hook -

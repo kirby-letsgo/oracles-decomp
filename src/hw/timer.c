@@ -1,4 +1,4 @@
-#include "gb.h"
+#include "core/gb.h"
 
 static const int tac_bit[4] = {9, 3, 5, 7};
 

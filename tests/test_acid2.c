@@ -1,6 +1,6 @@
 #include "unit.h"
 #include "core/gb.h"
-#include "platform/render.h"
+#include "hw/render.h"
 #include "platform/png.h"
 
 static void acid2_matches_reference(void) {

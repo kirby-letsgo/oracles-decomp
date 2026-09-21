@@ -1,4 +1,4 @@
-#include "platform/render.h"
+#include "hw/render.h"
 #include "core/gb.h"
 #include <string.h>
 

@@ -448,6 +448,61 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-22: merged Fable's step 1 close-out (`56311f5`, `335f36b`, below): one conflict in
+  `extra_seasons.sym` (its `romEntry` next to my kernel resume points), generated files
+  regenerated, audits clean. Ages 6,849 hooks, Seasons 3,551. Also this session:
+  `updateStatusBar_body`, `screenTransitionState2`, `cutscene01`, `linkApplyTileTypes`,
+  `loadTilesetLayout`, `checkItemUsed`, `updateEnemy`, `checkLinkJumpingOffCliff`,
+  `checkTileWarps`, `specialObjectUpdateAdjacentWallsBitset` run under Seasons (offset tables
+  with anchors, `ofsmap` folds a routine's call-only locals into its table and pairs jump
+  tables inside an edited block, `gameconst` audits mapped routines' locals and entry points);
+  `cutscene13` was hooked under the coinciding `tilesetLayoutGroup33` data label and is named
+  right; the kernel's five resume points exist for Seasons (`extra_seasons.sym`).
+  Playthrough interpreter share 9.9M to 4.1M instructions. Gates: ctest 9/9, whole movie, Ages
+  verify 30k, Seasons playthrough `VERIFY_ALL` 0 failures, lint 0.
+
+- 2026-09-21 (evening): milestone 5 step 1, the rest, on `worktree-m5-step0` over main `c98b94f`
+  (merged, regenerated, audits clean). Two small commits first: the eight dead `__afterCall`
+  hooks are static tail helpers now (unregistered), and `tas/ages-boot.state` has a header
+  (`ORCLBOOT`, version, sizeof GB) so a stale file is refused with a message. Then, in the order
+  agreed, with one deviation: **decyc became a cycle table.** Rewriting 110k `CYC` sites into
+  `T(n)` needed a parallel generated source tree and hand changes at about 180 parameterized
+  helper sites, for no gain the runtime needs yet; instead `cyctab_build` (in `cyc.c`) makes a
+  byte-per-ROM-address table (length, cycles, taken extra, unconditional-jump flag) from the
+  original bytes at load time and `burn_rom` walks it when `gb->cyctab` is set. Same
+  per-instruction granularity, same code path, no ROM code bytes needed afterwards; a `T(n)` pass
+  stays available for Tier 2 block coalescing. `src/rt/mem.c` was not written: `bus_read` already
+  is the decode and the native build needs the MBC bank register for data reads, so "minus MBC"
+  has nothing to hold. `src/hw/`: `ppu.c`, `timer.c`, `apu.c/h`, `render.c/h` moved there and
+  `bus.c`'s IO register file and DMA engines became `hw/io.c` and `hw/dma.c` (`hw/hw.h`); `bus.c`
+  keeps the address decode and MBC. Dispatch tables: `gen_hooks.py`'s `table.h`/`table_seasons.h`
+  plus `first_at[]` in `hooks.c` already are the native dispatch table (fatal on a miss in
+  `rt/native.c`), so nothing was added. Assets v1: `tools/codemap.py` follows every hook entry
+  with `transliterate.py`'s `routine_body` and emits per-game code ranges into
+  `src/assets/codemap.c` (Ages 203,138 bytes in 2,062 ranges; Seasons 92,203 in 1,084);
+  `src/assets/assets.c` zeroes them (`assets_zero_code`) and builds a bitmap
+  (`assets_code_bits`) that makes `bus_read` abort on a data read of a mapped byte
+  (`CODEMAP_LOG=1` collects instead of aborting). The native runner zeroes by default
+  (`--keep-code`, `--check-code-reads`), `test_native_tas` and the lockstep tool's native side
+  always run zeroed (`LOCKSTEP_KEEP_CODE`). Bytes the game reads as data although they are
+  instructions, found by collecting over the whole movie: the RAM-copy relocations in
+  `extra.sym` (kept automatically), the 256-byte `scriptCmd_loadScript` copy that runs past
+  short scripts into the bank-15 helpers that follow them (now a static rule over both games'
+  `loadscript` targets: 84 Ages, 54 Seasons), the sound engine's `noiseFrequencyTable` (named
+  `nonExistentFunction` in the sym; `label` entry in `src/assets/keep_code.txt`), and three
+  single-byte game quirks (`loadAnimationData` with an out-of-table index, an intro table
+  overrunning by one byte) as raw `ages` offsets there. Two data labels that had bogus hook
+  bodies (`standardSoundCmd__table`, `bear_state0__textIDs`, from the 178-locals batch) are
+  unregistered and deleted. Seasons natively: `romEntry` and the five kernel `__afterSp`
+  re-entry labels are in `extra_seasons.sym` now, so Seasons boots natively to `init` (03:4071),
+  which is not hooked for Seasons; native Seasons waits for step 3 parity, and its
+  `keep_code.txt` entries will be collected then (`tas/seasons-boot.state` is recorded). Gates:
+  native whole movie with code zeroed clean against `ages.ref` (state `9b56735914ee6c8b`),
+  lockstep whole movie with the native side zeroed: no divergence, whole-movie emulator TAS,
+  `ctest` 9/9, Ages 30k and Seasons playthrough verify 0 failures, lint and the four audits
+  clean. Hooks: Ages 6,849, Seasons 3,530. Step 1 is done except a versioned boot-state format
+  beyond the header; step 5 (the cut and the shipped app) is next.
+
 - 2026-09-21 (night): merged Fable's fibers and `tools/lockstep_native.c` (`f5c9337`, below):
   no conflicts, generated files regenerated, every audit clean. Seasons 3,525 hooks (the
   kernel hooks all eligible). Gates: ctest 9/9, whole movie, Ages verify 30k, Seasons

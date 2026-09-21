@@ -19,7 +19,7 @@ void copyTextCharactersFromHl_hook(GB *gb);
 void b2_fileSelectScreen_hook(GB *gb);
 void fileSelectMode0_hook(GB *gb);
 void fileSelectMode1_hook(GB *gb);
-void fileSelectMode1__afterCall_hook(GB *gb);
+static void file_select_mode1_after_41a4(GB *gb);
 void fileSelectMode1__subModes_hook(GB *gb);
 void runBank2Function_hook(GB *gb);
 void menuStateFadeOutOfMenu_hook(GB *gb);
@@ -10348,12 +10348,12 @@ void fileSelectMode1_hook(GB *gb) {
   BASE(fileSelectMode1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, fileSelectMode1__subModes_hook, b_+9, b_+3);
-  fileSelectMode1__afterCall_hook(gb);
+  file_select_mode1_after_41a4(gb);
 }
 
-void fileSelectMode1__afterCall_hook(GB *gb) {
+static void file_select_mode1_after_41a4(GB *gb) {
   BASE(fileSelectMode1);
-  uint16_t sp0_ = gb->sp; (void)sp0_;
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   CALL_C(b_+3, fileSelectDrawAcornCursor_hook, SYM(fileSelectDrawAcornCursor), b_+6);
   CYC(b_+6, b_+9); TAIL(fileSelectDrawLink);
 }

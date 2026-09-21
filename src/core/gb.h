@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "apu.h"
+#include "hw/apu.h"
 
 enum {
   R_P1 = 0x00, R_SB = 0x01, R_SC = 0x02, R_DIV = 0x04, R_TIMA = 0x05, R_TMA = 0x06, R_TAC = 0x07,
@@ -108,6 +108,7 @@ typedef struct GB {
   DispatchRing *ring;
   uint64_t trace_lo, trace_hi;
   struct Fibers *fib;
+  const uint8_t *cyctab, *code_bits;
 } GB;
 
 void gb_init(GB *gb);

@@ -6,8 +6,11 @@
 // usage: lockstep-native ROM BOOT INIT_RAM INPUTS MAX_FRAMES [REPORT_FROM]
 //   NATIVE_TRACE=a-b   print every dispatch of both sides in frames a..b (REF/NAT prefixed)
 //   LOCKSTEP_PERTURB=f flip one WRAM bit on the native side at grid frame f (self-test of the report)
+//   LOCKSTEP_KEEP_CODE leave the native side's ROM code bytes in place (default: zeroed, reads of them fatal)
 #include "core/gb.h"
 #include "hooks/hooks.h"
+#include "game/game.h"
+#include "assets/assets.h"
 #include "platform/setup.h"
 #include "platform/tas.h"
 #include <stdio.h>
@@ -68,7 +71,9 @@ int main(int argc, char **argv) {
 
   GB *ref = calloc(1, sizeof *ref), *nat = calloc(1, sizeof *nat);
   gb_init(ref); gb_init(nat);
-  if (!gb_load_rom(ref, rom, rom_size) || !gb_load_rom(nat, rom, rom_size)) { fprintf(stderr, "unsupported ROM\n"); return 2; }
+  uint8_t *nat_rom = malloc(rom_size);
+  memcpy(nat_rom, rom, rom_size);
+  if (!gb_load_rom(ref, rom, rom_size) || !gb_load_rom(nat, nat_rom, rom_size)) { fprintf(stderr, "unsupported ROM\n"); return 2; }
   gb_set_boot_rom(ref, boot, boot_size);
   if (!oracles_load_init_ram(ref, argv[3])) { fprintf(stderr, "cannot read %s\n", argv[3]); return 2; }
   hooks_init();
@@ -76,6 +81,8 @@ int main(int argc, char **argv) {
   gb_reset(nat);
   nat->step = native_gb_step;
   nat->native = true;
+  nat->cyctab = cyctab_alloc(nat_rom, rom_size);
+  if (!getenv("LOCKSTEP_KEEP_CODE")) { nat->code_bits = assets_code_bits(nat_rom, rom_size); assets_zero_code(nat_rom, rom_size); }
   oracles_copy_state(nat, ref);
   ref->ring = calloc(1, sizeof *ref->ring); nat->ring = calloc(1, sizeof *nat->ring);
   ref->trace_lo = nat->trace_lo = trace_lo; ref->trace_hi = nat->trace_hi = trace_hi;

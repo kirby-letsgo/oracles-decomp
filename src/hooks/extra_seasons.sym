@@ -7,6 +7,7 @@
 00:ff80 hramOamDmaFunction = 03:4091
 00:c000 wMusicReadFunction = 39:404b
 00:c4b7 wRamFunction extern
+00:0100 romEntry
 # the kernel's resume points, at the same offset into the same routine as in Ages
 00:016c resetGame__afterSp016c
 00:08f6 _nextThread__afterSp091a

@@ -19,7 +19,7 @@ static void refresh_dirty_palettes_next_palette(GB *gb);
 static void refresh_dirty_palettes_gba_brighten_palette(GB *gb);
 static void add_a_to_hl_from_rst(GB *gb, uint16_t return_address);
 static void refresh_object_gfx_next_extra(GB *gb, uint16_t sp0_);
-void refreshObjectGfx_body__afterCall41d2_hook(GB *gb);
+static void refresh_object_gfx_after_41d2(GB *gb);
 
 void initGbaModePaletteData_hook(GB *gb) {
   BASE(initGbaModePaletteData);
@@ -601,7 +601,7 @@ void itemGetObjectGfxIndex_hook(GB *gb) {
   CYC(b_+11, b_+12); ret_effect(gb);
 }
 
-void resumeThreadNextFrameIfLcdIsOn__afterCall4124_hook(GB *gb) {
+static void resume_if_lcd_on_after_4124(GB *gb) {
   BASE(resumeThreadNextFrameIfLcdIsOn);
   CYC(b_+7, b_+8); ret_effect(gb);
 }
@@ -616,7 +616,7 @@ void resumeThreadNextFrameIfLcdIsOn_hook(GB *gb) {
   }
   CYC(b_+3, b_+4);
   CALL_C(b_+4, resumeThreadNextFrameAndSaveBank_hook, SYM(resumeThreadNextFrameAndSaveBank), b_+7);
-  resumeThreadNextFrameIfLcdIsOn__afterCall4124_hook(gb);
+  resume_if_lcd_on_after_4124(gb);
 }
 
 void reloadObjectGfx_b3f_hook(GB *gb) {
@@ -639,9 +639,9 @@ void reloadObjectGfx_b3f_hook(GB *gb) {
   TAIL(agesFunc_3f_4133);
 }
 
-void agesFunc_3f_4133__afterCall4143_hook(GB *gb) {
+static void ages_func_3f_4133_after_4143(GB *gb) {
   BASE(agesFunc_3f_4133);
-  uint16_t sp0_ = gb->sp;
+  uint16_t sp0_ = cpu_sp(gb);
   for (;;) {
     CYC(b_+16, b_+17); L = alu_inc8(gb, L);
     CYC(b_+17, b_+18); mem_wr(gb, HL, D);
@@ -688,7 +688,7 @@ void agesFunc_3f_4133_hook(GB *gb) {
     CALL_C(b_+10, insertIndexIntoLoadedObjectGfx_hook, SYM(insertIndexIntoLoadedObjectGfx), b_+13);
     CALL_C(b_+13, resumeThreadNextFrameIfLcdIsOn_hook, SYM(resumeThreadNextFrameIfLcdIsOn), b_+16);
   }
-  agesFunc_3f_4133__afterCall4143_hook(gb);
+  ages_func_3f_4133_after_4143(gb);
 }
 
 static void refresh_object_gfx_next_extra(GB *gb, uint16_t sp0_) {
@@ -715,12 +715,12 @@ static void refresh_object_gfx_next_extra(GB *gb, uint16_t sp0_) {
     CYC(b_+122, b_+123); SET_DE(pop_effect(gb));
   }
   CALL_C(b_+123, updateTileIndexBaseForAllObjects_hook, SYM(updateTileIndexBaseForAllObjects), b_+126);
-  refreshObjectGfx_body__afterCall41d2_hook(gb);
+  refresh_object_gfx_after_41d2(gb);
 }
 
-void refreshObjectGfx_body__afterCall41d2_hook(GB *gb) {
+static void refresh_object_gfx_after_41d2(GB *gb) {
   BASE(refreshObjectGfx_body);
-  uint16_t sp0_ = gb->sp;
+  uint16_t sp0_ = cpu_sp(gb);
   CYC(b_+126, b_+128); D = 0x00;
   CYC(b_+128, b_+131); SET_HL((SYM(objectGfxHeaderTable) + 1));
   CYC(b_+131, b_+132); alu_add_hl(gb, DE);
@@ -741,9 +741,9 @@ void refreshObjectGfx_body__afterCall41d2_hook(GB *gb) {
   CYC(b_+149, b_+152); TAIL(incLoadedObjectGfxIndex);
 }
 
-void refreshObjectGfx_body__afterCall41ad_hook(GB *gb) {
+static void refresh_object_gfx_after_41ad(GB *gb) {
   BASE(refreshObjectGfx_body);
-  uint16_t sp0_ = gb->sp;
+  uint16_t sp0_ = cpu_sp(gb);
   CYC(b_+89, b_+90); A = E;
   CALL_C(b_+90, findIndexInLoadedObjectGfx_hook, SYM(findIndexInLoadedObjectGfx), b_+93);
   CYC(b_+93, b_+94); A = L;
@@ -814,7 +814,7 @@ void refreshObjectGfx_body_hook(GB *gb) {
   }
   CALL_C(b_+83, addIndexToLoadedObjectGfx_hook, SYM(addIndexToLoadedObjectGfx), b_+86);
   CALL_C(b_+86, resumeThreadNextFrameIfLcdIsOn_hook, SYM(resumeThreadNextFrameIfLcdIsOn), b_+89);
-  refreshObjectGfx_body__afterCall41ad_hook(gb);
+  refresh_object_gfx_after_41ad(gb);
 }
 
 void loadObjectGfxHeaderToSlot4_body__afterCall41f0_hook(GB *gb) {

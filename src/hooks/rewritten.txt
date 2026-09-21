@@ -2182,7 +2182,6 @@ copyTextCharactersFromHl
 b2_fileSelectScreen
 fileSelectMode0
 fileSelectMode1
-fileSelectMode1__afterCall
 fileSelectMode1__subModes
 fileSelectMode5
 fileSelectMode5__mode5States
@@ -2587,7 +2586,6 @@ introCinematic_preTitlescreen_state0
 introCinematic_preTitlescreen_state0__afterCall52da
 introCinematic_preTitlescreen_state3
 intro_gotoTitlescreen__afterCall4d09
-intro_cinematic__afterCall2d27
 endgameCutsceneHandler_20
 endgameCutsceneHandler_20__afterCall5857
 endgameCutsceneHandler_20__runStates
@@ -2789,7 +2787,6 @@ collisionEffect3b
 collisionEffect3e
 collisionEffect3f
 agesFunc_3f_4133
-agesFunc_3f_4133__afterCall4143
 updateTileIndexBaseForAllObjects
 updateTileIndexBaseForAllObjects__afterCall4252
 enemyLoadGraphicsAndProperties
@@ -2823,11 +2820,8 @@ itemIndexToBit
 parentItemCheckButtonPressed
 andHlWithGameKeysPressed
 resumeThreadNextFrameIfLcdIsOn
-resumeThreadNextFrameIfLcdIsOn__afterCall4124
 reloadObjectGfx_b3f
 refreshObjectGfx_body
-refreshObjectGfx_body__afterCall41ad
-refreshObjectGfx_body__afterCall41d2
 loadObjectGfxHeaderToSlot4_body
 loadObjectGfxHeaderToSlot4_body__afterCall41f0
 itemTransferKnockbackToLink
@@ -4523,11 +4517,9 @@ childSetVar38ToNumEssencesObtained
 spawnBipinBlossomFamilyObjects
 interactionCode9f
 interactionCode9f__state0
-interactionCode9f__afterCall405b
 interactionCode9f__state1
 interactionCodea0
 interactionCodea0__state0
-interactionCodea0__afterCall40a6
 interactionCodea0__state1
 interactionCode98
 interactionCode98__state0
@@ -6734,7 +6726,6 @@ bear_state0__initSubid
 bear_state0__initSubid00
 bear_state0__initSubid01
 bear_state0__initSubid02
-bear_state0__textIDs
 bear_state0__var03IsNonzero
 bear_state1__runSubid00
 bear_state1__runSubid02
@@ -6839,7 +6830,6 @@ standardSoundCmd__channel0To3
 standardSoundCmd__cmd60
 standardSoundCmd__cmd61
 standardSoundCmd__cmdFrequency
-standardSoundCmd__table
 twinrova_checkFireProjectile__spawnProjectile
 updatePlayedFrequency__ret
 updatePlayedFrequency__square

@@ -656,7 +656,6 @@
 02:4244 fileSelectMode1__back
 02:424c fileSelectMode1__leftOrRight
 02:425a fileSelectMode1__textSpeedMenu_addCursorToOam
-02:41a4 fileSelectMode1__afterCall
 02:41aa fileSelectMode1__subModes
 02:50ca menuStateFadeOutOfMenu__afterCall
 02:510d reloadGraphicsOnExitMenu_body__afterCall
@@ -870,7 +869,6 @@
 01:7f1d cutscene1f__afterCall7f1d
 03:4d09 intro_gotoTitlescreen__afterCall4d09
 03:52da introCinematic_preTitlescreen_state0__afterCall52da
-00:2d27 intro_cinematic__afterCall2d27
 03:5857 endgameCutsceneHandler_20__afterCall5857
 03:585a endgameCutsceneHandler_20__runStates
 03:588d endgameCutsceneHandler_20__state0
@@ -920,12 +918,8 @@
 3f:43d3 partLoadGraphicsAndProperties__afterCall43d3
 3f:440e interactionLoadGraphics__afterCall440e
 3f:442c itemLoadGraphics__afterCall442c
-3f:4143 agesFunc_3f_4133__afterCall4143
 3f:4252 updateTileIndexBaseForAllObjects__afterCall4252
 3f:4372 enemyLoadGraphicsAndProperties__afterCall4372
-3f:4124 resumeThreadNextFrameIfLcdIsOn__afterCall4124
-3f:41ad refreshObjectGfx_body__afterCall41ad
-3f:41d2 refreshObjectGfx_body__afterCall41d2
 3f:41f0 loadObjectGfxHeaderToSlot4_body__afterCall41f0
 3f:7825 interactionCode4b_body__afterCall7825
 3f:7b71 tuniNut_state0__afterCall7b71
@@ -966,10 +960,8 @@
 0b:414c interactionCodeac__need4Essences
 0b:4154 interactionCodeac__need6Essences
 0b:4050 interactionCode9f__state0
-0b:405b interactionCode9f__afterCall405b
 0b:405e interactionCode9f__state1
 0b:409d interactionCodea0__state0
-0b:40a6 interactionCodea0__afterCall40a6
 0b:40bf interactionCodea0__state1
 0b:4008 interactionCode98__state0
 0b:401e interactionCode98__state1
@@ -1046,7 +1038,6 @@
 09:6d63 bear_state0__initSubid00
 09:6d76 bear_state0__initSubid01
 09:6d77 bear_state0__initSubid02
-09:6dc8 bear_state0__textIDs
 09:6da8 bear_state0__var03IsNonzero
 09:6dd5 bear_state1__runSubid00
 09:6e4c bear_state1__runSubid02
@@ -1151,7 +1142,6 @@
 39:456b standardSoundCmd__cmd60
 39:45a0 standardSoundCmd__cmd61
 39:45a3 standardSoundCmd__cmdFrequency
-39:4533 standardSoundCmd__table
 10:4eb2 twinrova_checkFireProjectile__spawnProjectile
 39:434a updatePlayedFrequency__ret
 39:4306 updatePlayedFrequency__square

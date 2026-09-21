@@ -70,7 +70,44 @@ static int insn_cycles(uint8_t op, uint8_t op2, bool taken) {
   return 4;
 }
 
+// One byte per ROM address: instruction length, cycles, the extra cycles when a conditional
+// branch is taken, and whether the instruction is an unconditional jump. Built from the ROM
+// before its code bytes go away, so the native build burns exactly what the ROM walk burns.
+void cyctab_build(uint8_t *tab, const uint8_t *rom, size_t size) {
+  for (size_t off = 0; off < size; off++) {
+    uint8_t op = rom[off], op2 = off + 1 < size ? rom[off + 1] : 0;
+    int len = insn_len(op), c = insn_cycles(op, op2, false), ct = insn_cycles(op, op2, true);
+    bool jump = op == 0x18 || op == 0xc3 || op == 0xc9 || op == 0xd9 || op == 0xe9;
+    tab[off] = (uint8_t)((len - 1) | ((c > 6 ? 7 : c) << 2) | ((ct - c) << 5) | (jump ? 0x80 : 0));
+  }
+}
+
+uint8_t *cyctab_alloc(const uint8_t *rom, size_t size) {
+  uint8_t *tab = malloc(size);
+  cyctab_build(tab, rom, size);
+  return tab;
+}
+
+static void burn_tab(GB *gb, int bank, uint16_t from, uint16_t to, bool last_taken) {
+  uint16_t a = from;
+  while (a < to) {
+    size_t off = a < 0x4000 ? a : (size_t)bank * 0x4000 + (a - 0x4000);
+    uint8_t e = off < gb->rom_size ? gb->cyctab[off] : 0x04;
+    int len = (e & 3) + 1, c = (e >> 2) & 7;
+    if (c == 7) c = 32771;
+    bool last = (uint16_t)(a + len) >= to;
+    if (!last && (e & 0x80)) {
+      fprintf(stderr, "burn_rom: range %02x:%04x-%04x runs past an unconditional jump at %04x\n", bank, from, to, a);
+      exit(4);
+    }
+    gb->hook_pc = a;
+    gb_burn(gb, c + ((last_taken && last) ? (e >> 5) & 3 : 0));
+    a = (uint16_t)(a + len);
+  }
+}
+
 void burn_rom(GB *gb, int bank, uint16_t from, uint16_t to, bool last_taken) {
+  if (gb->cyctab) { burn_tab(gb, bank, from, to, last_taken); return; }
   uint16_t a = from;
   while (a < to) {
     uint8_t op = rom_byte(gb, bank, a), op2 = rom_byte(gb, bank, a + 1);

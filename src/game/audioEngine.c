@@ -62,7 +62,6 @@ void cmdVolume__next_hook(GB *gb);
 void channelCmdf6_hook(GB *gb);
 void channelCmdf6__wave_hook(GB *gb);
 void standardSoundCmd_hook(GB *gb);
-void standardSoundCmd__table_hook(GB *gb);
 void standardSoundCmd__channel0To3_hook(GB *gb);
 void standardSoundCmd__cmd60_hook(GB *gb);
 void standardSoundCmd__cmd61_hook(GB *gb);
@@ -1293,29 +1292,6 @@ void standardSoundCmd_hook(GB *gb) {
 // decoded exactly as real hardware would if control ever reached here as code (it never
 // does in practice: standardSoundCmd only ever indexes into this table, it doesn't jump to
 // its start).
-void standardSoundCmd__table_hook(GB *gb) {
-  BASE(standardSoundCmd);
-  uint16_t sp0_ = gb->sp;
-  CYC(b_+10, b_+11); B = E; // ld b,e
-  CYC(b_+11, b_+12); B = L; // ld b,l
-  CYC(b_+12, b_+13); B = E;
-  CYC(b_+13, b_+14); B = L;
-  CYC(b_+14, b_+15); B = E;
-  CYC(b_+15, b_+16); B = L;
-  CYC(b_+16, b_+17); B = E;
-  CYC(b_+17, b_+18); B = L;
-  if (F & FZ) { RET_TAKEN(b_+18); return; } // ret z
-  CYC(b_+18, b_+19);
-  CYC(b_+19, b_+20); B = A;
-  if (F & FZ) { RET_TAKEN(b_+20); return; } // ret z
-  CYC(b_+20, b_+21);
-  CYC(b_+21, b_+22); B = A;
-  CALL_ASM_RST(b_+22, 0x0008, b_+23);
-  CYC(b_+23, b_+24); C = B;
-  CYC(b_+24, b_+25); alu_add_hl(gb, BC);
-  CYC(b_+25, b_+26); C = C;
-  TAIL(standardSoundCmd__channel0To3); // fallthrough
-}
 
 // 39:4543, @-local sub-label of standardSoundCmd.
 void standardSoundCmd__channel0To3_hook(GB *gb) {

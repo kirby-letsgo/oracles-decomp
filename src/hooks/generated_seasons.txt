@@ -8,6 +8,7 @@
 00:007e addDoubleIndexToBc_hook -
 00:008a interBankCall_hook -
 00:00a0 jpHl_hook -
+00:0100 romEntry_hook -
 00:0150 begin_hook -
 00:0169 resetGame_hook -
 00:016c resetGame__afterSp016c_hook -
@@ -3378,7 +3379,6 @@
 39:44ea channelCmdf6_hook -
 39:4510 channelCmdf6__wave_hook -
 39:4529 standardSoundCmd_hook -
-39:4533 standardSoundCmd__table_hook -
 39:4543 standardSoundCmd__channel0To3_hook -
 39:456b standardSoundCmd__cmd60_hook -
 39:45a0 standardSoundCmd__cmd61_hook -
