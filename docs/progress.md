@@ -448,6 +448,61 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-21 (night): merged Fable's fibers and `tools/lockstep_native.c` (`f5c9337`, below):
+  no conflicts, generated files regenerated, every audit clean. Seasons 3,525 hooks (the
+  kernel hooks all eligible). Gates: ctest 9/9, whole movie, Ages verify 30k, Seasons
+  playthrough `VERIFY_ALL` 0 failures, lint 0. Also this session: `ofsmap` tables carry
+  starts and ends (`O(n)`/`OE(n)`: a range end or return address is the end of the aligned
+  instruction before it, so a Seasons insertion no longer conflicts), alignment anchors
+  (`NAME AGES=SEASONS` in `ofs_routines.txt`), Seasons-only WRAM names in `ram.h`
+  (`wInBoxingMatch`), `extra_seasons.sym` for the vectors and RAM code (`hramOamDmaFunction`,
+  the OAM DMA wait loop, was 12% of the Seasons interpreter time), `updateItems` through a
+  jump-table-masked CALL_L check, `loadTilesetLayout`, `checkItemUsed`. Seasons playthrough
+  interpreter share: 64.7M to 9.9M instructions.
+
+- 2026-09-21 (later): milestone 5 step 4, fibers, plus `tools/lockstep_native.c`, on
+  `worktree-m5-step0` over main `cbc0692` (merged; generated files regenerated; audits clean).
+  Lockstep first, as required: `lockstep-native ROM BOOT INIT_RAM INPUTS FRAMES` runs the
+  reference (interpreter, hooks on) and the native engine in one process, seeds the native side
+  from the reference's post-boot state (`oracles_copy_state`), compares the masked sample image
+  every frame and prints the first differing byte with both sides' last 64 dispatch records;
+  `NATIVE_TRACE=a-b` logs every dispatch of both sides in a frame range, `LOCKSTEP_PERTURB=f`
+  flips a WRAM bit at grid frame f as a self-test of the report. To make two engines coexist:
+  `cpu_common.c` now holds the interrupt entry, the speed switch and the debug counters (shared
+  by `cpu.c` and `rt/native.c`), `GB.step` is the engine's step function (`gb.c`, `hooks.c`,
+  `ram_code.c` and the runner call it), `GB.native` replaces the `hook_native` global, and
+  `GB.ring`/`trace_lo/hi` carry the dispatch ring. Whole movie: no divergence on the trampoline
+  build (both end in `e4703a3010641e15`). Then fibers (design note
+  `specs/2026-09-21-m5-fibers-design.md`): `src/rt/fibers.c` gives each of the four game threads
+  a 1 MB mmap stack with a guard page and a 20-line arm64/x86_64 context switch (naked functions,
+  no ucontext); the kernel stays on the primary stack. `_countdownToRunThread`/`_initializeThread`
+  call `fiber_run` and, when the thread comes back, return to the dispatcher with
+  `pc = _nextThread+3` (that return is what keeps the kernel's C stack flat, so the depth-24
+  unwind and the `sp_loads` unwinds in `hook_continue`/`asm_call` are verify-mode only now);
+  `resumeThreadInAFrames` yields with `fiber_back` and, on resume, burns the `pop bc/de/hl; ret`
+  tail on its own stack; `stubThreadStart`/`restartThisThread` exit through `_nextThread_hook`;
+  `resetGame` from a thread returns `FIBER_RESET` to the kernel, which drops all fibers and
+  longjmps as before. The emulated stacks and every push/pop are unchanged, so the RAM image is
+  byte-identical and no reference was re-recorded. Verify mode keeps the trampoline: under
+  `HOOK_MODE_VERIFY` the fiber primitives degrade to `hook_handoff`, so `--verify-hooks-continue`
+  is unchanged (Ages 30k and Seasons playthrough: 0 failures). `hooks.c` keeps `depth` and the
+  `setjmp` stack per native stack (`hook_ctx_switch`). Deleted: the seven `__afterCall` thread
+  resume hooks from the trampoline pass; `transliterate.py` only emits resume tails with
+  `--resume-tails`, so `gen_bank*.c` are gone again (Ages hooks 6,859; Seasons 3,500, all 14
+  kernel hooks eligible). In a whole-movie native trace the only synthetic entries dispatched are
+  the kernel's own `resetGame__afterSp016c` (17), `startGame__afterSp0925` (17) and
+  `_nextThread__afterSp091a` (once per thread switch), which are the kernel's re-entry points by
+  design; every other `__afterSp`/`__afterCall` hook reports "never called" and the pre-existing
+  hand-written ones (`intro_cinematic__afterCall2d27`, `interactionCode9f__afterCall405b`,
+  `interactionCodea0__afterCall40a6`, `resumeThreadNextFrameIfLcdIsOn__afterCall4124`,
+  `agesFunc_3f_4133__afterCall4143`, `fileSelectMode1__afterCall`, `refreshObjectGfx_body__afterCall41ad/41d2`)
+  can go in a later cleanup. `tas/ages-boot.state` is a raw `GB` struct and was re-recorded after
+  the struct grew; a versioned format is still open. Gates: `ctest` 9/9 (incl. `native_tas` and
+  both Seasons refs), native whole movie clean against `ages.ref`, lockstep whole movie
+  (see the session report for the fiber run), whole-movie emulator TAS, lint and the four audits
+  clean. Next in step 1: `tools/decyc.py`, `src/rt/mem.c`, the `src/hw/` split, dispatch-table
+  generation, `tools/codemap.py`/assets v1.
+
 - 2026-09-21 (evening): DIFFERENT routines start running under Seasons: `tools/ofsmap.py`
   aligns the two instruction streams and gives a routine a per-game offset table
   (`src/game/ofs.c`, `b_+O(N)`), so one C serves both games once the Ages-only and Seasons-only
