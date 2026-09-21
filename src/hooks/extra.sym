@@ -1039,12 +1039,6 @@
 0b:6996 interactionCodeb4__state4
 0b:69ce interactionCodeb4__func_69ce
 00:0100 romEntry
-00:33cd mainThreadStart__afterCall33cd
-00:339f paletteFadeThreadStart__afterCall339f
-00:18cb textThreadStart__afterCall18cb
-00:1b2a thread_1b10__afterCall1b2a
-00:1a2c fileSelectThreadStart__afterCall1a2c
-00:2d18 introThreadStart__afterCall2d18
 10:7417 agesFunc_10_7298__substate8
 10:7476 agesFunc_10_7298__substateB
 09:6dbb bear_state0__chooseTextID
@@ -1176,4 +1170,3 @@
 39:41be updateSound__ret
 39:4174 updateSound__stopSound
 39:417f updateSound__updateChannels
-00:08f6 resumeThreadNextFrameAndSaveBank__afterCall08f6

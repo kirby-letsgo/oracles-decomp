@@ -47,19 +47,28 @@ bool oracles_save_boot_state(const GB *gb, const char *path) {
   return n == sizeof *gb;
 }
 
-bool oracles_load_boot_state(GB *gb, const char *path) {
-  FILE *f = fopen(path, "rb");
-  if (!f) return false;
+void oracles_copy_state(GB *gb, const GB *src) {
   GB keep = *gb;
-  size_t n = fread(gb, 1, sizeof *gb, f);
-  fclose(f);
-  if (n != sizeof *gb) { *gb = keep; return false; }
+  *gb = *src;
   gb->rom = keep.rom; gb->rom_size = keep.rom_size;
   gb->boot = NULL; gb->boot_size = 0; gb->boot_mapped = false;
   gb->samples = keep.samples; gb->sample = &gb->samples[0];
+  gb->sample_head = gb->sample_count = 0;
   gb->serial_out = keep.serial_out; gb->serial_ctx = keep.serial_ctx;
   gb->input_at = keep.input_at; gb->input_ctx = keep.input_ctx;
   gb->frame_cb = keep.frame_cb; gb->frame_ctx = keep.frame_ctx;
+  gb->step = keep.step; gb->native = keep.native; gb->ring = keep.ring; gb->fib = keep.fib;
+  gb->trace_lo = keep.trace_lo; gb->trace_hi = keep.trace_hi;
   gb->hooks_checked = false;
-  return true;
+}
+
+bool oracles_load_boot_state(GB *gb, const char *path) {
+  FILE *f = fopen(path, "rb");
+  if (!f) return false;
+  GB *tmp = malloc(sizeof *tmp);
+  size_t n = fread(tmp, 1, sizeof *tmp, f);
+  fclose(f);
+  if (n == sizeof *tmp) oracles_copy_state(gb, tmp);
+  free(tmp);
+  return n == sizeof *tmp;
 }

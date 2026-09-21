@@ -383,6 +383,8 @@ static inline uint16_t rd16(GB *gb, uint16_t a) { return (uint16_t)(mem_rd(gb, a
 static inline void wr16(GB *gb, uint16_t a, uint16_t v) { mem_wr(gb, a, (uint8_t)v); mem_wr(gb, a + 1, v >> 8); }
 static inline uint16_t cpu_sp(GB *gb) { return gb->sp; }
 static inline uint16_t cpu_pc(GB *gb) { return gb->pc; }
+static inline void cpu_set_pc(GB *gb, uint16_t v) { gb->pc = v; }
+static inline void cpu_load_sp(GB *gb, uint16_t v) { gb->sp = v; gb->sp_loads++; }
 static inline int bitlen8(uint8_t v) { int n = 0; while (v) { n++; v >>= 1; } return n; }
 static inline int popcount8(uint8_t v) { int n = 0; while (v) { n += v & 1; v >>= 1; } return n; }
 

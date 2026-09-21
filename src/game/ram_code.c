@@ -7,7 +7,7 @@ void wRamFunction(GB *gb) {
     int saved = hook_mode;
     hook_mode = HOOK_MODE_OFF;
     gb->pc = 0xc4b7;
-    gb_step(gb);
+    gb->step(gb);
     hook_mode = saved;
     return;
   }

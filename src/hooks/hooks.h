@@ -1,6 +1,7 @@
 #pragma once
 #include "core/gb.h"
 #include <stdbool.h>
+#include <setjmp.h>
 
 typedef void (*HookFn)(GB *gb);
 
@@ -20,7 +21,6 @@ extern int hook_in_verify;
 extern int hook_suppress_interrupts;
 extern uint64_t hook_verify_failures;
 extern bool hook_verify_abort;
-extern bool hook_native;
 
 void hooks_init(void);
 bool hook_dispatch(GB *gb);
@@ -31,3 +31,8 @@ void hooks_report(void);
 void hook_handoff(GB *gb, uint16_t pc);
 int hook_halt(GB *gb, uint16_t next);
 void hook_continue(GB *gb, uint16_t pc, uint16_t sp0);
+
+// The per-native-stack part of the dispatcher state (src/rt/fibers.c swaps it at every switch).
+typedef struct { int depth, jmp_depth; jmp_buf *jmp; } HookCtx;
+void hook_ctx_init(HookCtx *c);
+void hook_ctx_switch(HookCtx *save, const HookCtx *load);

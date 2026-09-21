@@ -5,7 +5,7 @@
 #include "hash.h"
 #include <string.h>
 
-void gb_init(GB *gb) { memset(gb, 0, sizeof *gb); gb->samples = calloc(16, sizeof *gb->samples); }
+void gb_init(GB *gb) { memset(gb, 0, sizeof *gb); gb->samples = calloc(16, sizeof *gb->samples); gb->step = gb_step; }
 
 bool gb_load_rom(GB *gb, const uint8_t *rom, size_t size) {
   if (size < 0x8000 || (size & 0x3fff)) return false;
@@ -56,10 +56,16 @@ void gb_reset(GB *gb) {
   void *serial_ctx = gb->serial_ctx;
   static uint8_t saved_wram[8][4096], saved_hram[127];
   GBSample *samples = gb->samples;
+  void (*step)(GB *) = gb->step;
+  DispatchRing *ring = gb->ring;
+  struct Fibers *fib = gb->fib;
+  uint64_t trace_lo = gb->trace_lo, trace_hi = gb->trace_hi;
   bool keep_ram = gb->init_ram_loaded;
   if (keep_ram) { memcpy(saved_wram, gb->wram, sizeof saved_wram); memcpy(saved_hram, gb->hram, sizeof saved_hram); }
   memset(gb, 0, sizeof *gb);
   gb->samples = samples ? samples : calloc(16, sizeof *gb->samples);
+  gb->step = step ? step : gb_step;
+  gb->ring = ring; gb->trace_lo = trace_lo; gb->trace_hi = trace_hi; gb->fib = fib;
   gb->next_sample_at = UINT64_MAX;
   if (keep_ram) { memcpy(gb->wram, saved_wram, sizeof saved_wram); memcpy(gb->hram, saved_hram, sizeof saved_hram); }
   gb->init_ram_loaded = keep_ram;
@@ -79,7 +85,7 @@ void gb_reset(GB *gb) {
       static const char *ba = NULL; static bool ba_init = false; static uint8_t seen[65536];
       if (!ba_init) { ba = getenv("BOOT_ANCHORS"); ba_init = true; }
       if (ba && !seen[gb->pc]) { const char *q = ba; while (*q) { if (gb->pc == strtol(q, NULL, 16)) { seen[gb->pc] = 1; printf("BOOTANCHOR %04x %llu\n", gb->pc, (unsigned long long)gb->mcycles); break; } while (*q && *q != ' ') q++; while (*q == ' ') q++; } }
-      gb_step(gb);
+      gb->step(gb);
     }
     gb->b = 0x01;
   } else {
@@ -130,14 +136,14 @@ void gb_tick(GB *gb) {
 }
 
 void gb_run_cycles(GB *gb, uint64_t target) {
-  while (gb->cycles < target && !gb->hung) gb_step(gb);
+  while (gb->cycles < target && !gb->hung) gb->step(gb);
 }
 
 int64_t gb_grid_offset = GRID_OFFSET;
 uint8_t gb_input_now(GB *gb) { return gb->input_at ? gb->input_at(gb->input_ctx, GRID_FRAME(gb->cycles)) : gb->joy; }
 
 uint64_t gb_run_frame(GB *gb) {
-  while (gb->sample_count == 0 && !gb->hung) gb_step(gb);
+  while (gb->sample_count == 0 && !gb->hung) gb->step(gb);
   if (gb->sample_count == 0) return GRID_FRAME(gb->cycles);
   gb->sample = &gb->samples[gb->sample_head];
   gb->sample_head = (gb->sample_head + 1) % 16;
@@ -150,7 +156,7 @@ void gb_run_until_vblank(GB *gb) {
   bool lcd_on = gb->io[R_LCDC] & 0x80;
   uint64_t limit = gb->cycles + (lcd_on ? FRAME_CYCLES * 2 : FRAME_CYCLES);
   gb->frame_ready = false;
-  while (!gb->frame_ready && gb->cycles < limit && !gb->hung) gb_step(gb);
+  while (!gb->frame_ready && gb->cycles < limit && !gb->hung) gb->step(gb);
 }
 
 uint64_t gb_state_hash(const GB *gb) {

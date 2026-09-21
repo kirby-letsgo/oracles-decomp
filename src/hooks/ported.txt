@@ -6577,12 +6577,6 @@ octogon_subid0AboveWater_stateA
 octogon_subid0AboveWater_stateB
 smog_state8_subid2
 romEntry
-mainThreadStart__afterCall33cd
-paletteFadeThreadStart__afterCall339f
-textThreadStart__afterCall18cb
-thread_1b10__afterCall1b2a
-fileSelectThreadStart__afterCall1a2c
-introThreadStart__afterCall2d18
 FFBE_00
 agesFunc_10_7298__substate8
 agesFunc_10_7298__substateB
@@ -6760,4 +6754,3 @@ updateSound__ret
 updateSound__stopSound
 updateSound__updateChannels
 vblankFunctionsStart
-resumeThreadNextFrameAndSaveBank__afterCall08f6

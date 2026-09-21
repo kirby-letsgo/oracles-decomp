@@ -252,7 +252,7 @@ int main(int argc, char **argv) {
           for (int k = 0; k < 40; k++) { uint32_t best = 0; int bi = -1; for (int a = 0; a < 65536; a++) if (stretch_hist[a] > best) { best = stretch_hist[a]; bi = a; } if (bi < 0) break; printf(" %04x:%u", bi, best); stretch_hist[bi] = 0; }
           printf("\n");
         }
-        gb_step(gb);
+        gb->step(gb);
       }
       continue;
     }
@@ -274,7 +274,7 @@ int main(int argc, char **argv) {
         if (!gb->halted && getenv("TRACE_PC_SEQ") && !hist[pc] && (gb->cycles - start) / 2 >= (uint64_t)atoll(getenv("TRACE_PC_SEQ")))
           printf("%llu SEQ %04x %llu bank %u\n", (unsigned long long)(frame + input_offset), pc, (unsigned long long)((gb->cycles - start) / 2), gb->rom_bank);
         if (!gb->halted) hist[pc]++;
-        gb_step(gb);
+        gb->step(gb);
       }
       printf("%llu HIST instr=%llu\n", (unsigned long long)(frame + input_offset), (unsigned long long)(dbg_instr_count - instr0));
       for (int k = 0; k < 48; k++) {

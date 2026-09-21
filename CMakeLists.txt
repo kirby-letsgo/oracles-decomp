@@ -14,6 +14,7 @@ file(GLOB_RECURSE ORACLES_GAME_SRC CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/src/ga
 set(ORACLES_SHARED_SRC ${ORACLES_GAME_SRC}
   src/core/gb.c
   src/core/bus.c
+  src/core/cpu_common.c
   src/core/timer.c
   src/core/ppu.c
   src/core/apu.c
@@ -24,6 +25,7 @@ set(ORACLES_SHARED_SRC ${ORACLES_GAME_SRC}
   src/platform/tas.c
   src/platform/setup.c
   src/hooks/hooks.c
+  src/rt/fibers.c
 )
 add_library(oraclescore STATIC ${ORACLES_SHARED_SRC} src/core/cpu.c)
 target_include_directories(oraclescore PUBLIC src)
@@ -35,6 +37,8 @@ target_link_libraries(oracles-run oraclescore)
 add_executable(oracles-native-run src/platform/headless.c)
 target_link_libraries(oracles-native-run oraclesnative)
 add_custom_target(oracles-ref DEPENDS oracles-run)
+add_executable(lockstep-native tools/lockstep_native.c tools/lockstep_native_engine.c)
+target_link_libraries(lockstep-native oraclescore)
 
 if(ORACLES_SDL)
   find_package(SDL3 CONFIG QUIET)

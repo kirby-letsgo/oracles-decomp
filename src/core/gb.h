@@ -39,6 +39,9 @@ typedef struct {
   bool joy_latched, joy_read;
 } GBSample;
 
+typedef struct { uint16_t bank, addr; const char *name; uint64_t mcycles; } DispatchRec;
+typedef struct { DispatchRec r[64]; unsigned n; } DispatchRing;
+
 typedef struct GB {
   uint8_t a, f, b, c, d, e, h, l;
   uint16_t sp, pc;
@@ -100,6 +103,11 @@ typedef struct GB {
   const GBSample *sample;
   void (*frame_cb)(struct GB *gb, const GBSample *sample, void *ctx);
   void *frame_ctx;
+  void (*step)(struct GB *gb);
+  bool native;
+  DispatchRing *ring;
+  uint64_t trace_lo, trace_hi;
+  struct Fibers *fib;
 } GB;
 
 void gb_init(GB *gb);

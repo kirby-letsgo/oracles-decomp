@@ -23,8 +23,15 @@ static Hook *hooks = hooks_ages;
 static size_t NHOOKS = sizeof hooks_ages / sizeof hooks_ages[0];
 static int16_t first_at[65536];
 static int depth;
-static jmp_buf hook_jmp[128];
+static jmp_buf hook_jmp_main[128];
+static jmp_buf *hook_jmp = hook_jmp_main;
 static int hook_jmp_depth;
+
+void hook_ctx_init(HookCtx *c) { c->depth = c->jmp_depth = 0; c->jmp = calloc(128, sizeof(jmp_buf)); }
+void hook_ctx_switch(HookCtx *save, const HookCtx *load) {
+  save->depth = depth; save->jmp_depth = hook_jmp_depth; save->jmp = hook_jmp;
+  depth = load->depth; hook_jmp_depth = load->jmp_depth; hook_jmp = load->jmp;
+}
 
 void hook_handoff(GB *gb, uint16_t pc) {
   gb->pc = pc;
@@ -77,7 +84,7 @@ void gb_burn_nb(GB *gb, int mcycles) { for (int i = 0; i < mcycles; i++) gb_tick
 static void run_interrupt(GB *gb) {
   uint16_t sp0 = gb->sp;
   cpu_dispatch_interrupt(gb);
-  while (gb->sp < sp0 && !gb->hung) gb_step(gb);
+  while (gb->sp < sp0 && !gb->hung) gb->step(gb);
   if (gb->hdma_chunk_pending) { gb->hdma_chunk_pending = false; bus_hdma_chunk(gb); }
 }
 
@@ -177,8 +184,8 @@ static void verify(GB *gb, Hook *h) {
   uint16_t ret_pc = (uint16_t)(bus_read(gb, sp0) | (bus_read(gb, sp0 + 1) << 8));
   bool returned = after_c.pc == ret_pc && after_c.sp == sp0 + 2;
   uint64_t guard = 0;
-  if (returned) { do { gb_step(gb); } while (!(gb->pc == ret_pc && gb->sp == sp0 + 2) && !gb->hung && guard++ < 50000000ULL); }
-  else { while (gb->mcycles - c0 < cyc_c && !gb->hung) gb_step(gb); }
+  if (returned) { do { gb->step(gb); } while (!(gb->pc == ret_pc && gb->sp == sp0 + 2) && !gb->hung && guard++ < 50000000ULL); }
+  else { while (gb->mcycles - c0 < cyc_c && !gb->hung) gb->step(gb); }
   hook_mode = saved;
   hook_suppress_interrupts--;
   uint64_t cyc_asm = gb->mcycles - c0;
@@ -228,6 +235,8 @@ bool hook_dispatch(GB *gb) {
   else if (hook_mode == HOOK_MODE_VERIFY && (verify_all || h->calls <= 4 || h->calls % 256 == 0 || verify_depth == 0)) { verify(gb, h); return true; }
   static int hooklog = -1; if (hooklog < 0) hooklog = getenv("HOOKLOG") != NULL;
   if (hooklog) fprintf(stderr, "HOOK> %s mc %llu frame %llu sp %04x ime %d\n", h->name, (unsigned long long)gb->mcycles, (unsigned long long)GRID_FRAME(gb->cycles), gb->sp, gb->ime);
+  if (gb->ring) { DispatchRec *r = &gb->ring->r[gb->ring->n++ % 64]; r->bank = h->bank; r->addr = h->addr; r->name = h->name; r->mcycles = gb->mcycles; }
+  if (gb->trace_hi) { uint64_t fr = GRID_FRAME(gb->cycles); if (fr >= gb->trace_lo && fr <= gb->trace_hi) fprintf(stderr, "%s %02x:%04x %s mc %llu frame %llu sp %04x\n", gb->native ? "NAT" : "REF", h->bank, h->addr, h->name, (unsigned long long)gb->mcycles, (unsigned long long)fr, gb->sp); }
   int depth0 = depth;
   depth++;
   if (hook_jmp_depth < 128) { hook_jmp_depth++; if (setjmp(hook_jmp[hook_jmp_depth - 1]) == 0) h->fn(gb); hook_jmp_depth--; } else h->fn(gb);
@@ -256,14 +265,12 @@ void asm_call(GB *gb, uint16_t target, uint16_t ret_addr) {
   uint32_t sl0 = gb->sp_loads;
   depth--;
   while (!(gb->pc == ret_addr && gb->sp == (uint16_t)(sp0 + 2)) && !gb->hung) {
-    if (gb->sp_loads != sl0 || ((uint16_t)(gb->sp - sp0) > 2 && (uint16_t)(gb->sp - sp0) < 0x8000)) { depth++; hook_handoff(gb, gb->pc); }
-    gb_step(gb);
+    if ((hook_mode == HOOK_MODE_VERIFY && gb->sp_loads != sl0) || ((uint16_t)(gb->sp - sp0) > 2 && (uint16_t)(gb->sp - sp0) < 0x8000)) { depth++; hook_handoff(gb, gb->pc); }
+    gb->step(gb);
   }
   depth++;
   if (hooklog) fprintf(stderr, "ASM< %04x mc %llu sp %04x ime %d\n", target, (unsigned long long)gb->mcycles, gb->sp, gb->ime);
 }
-
-bool hook_native;
 
 void hook_continue(GB *gb, uint16_t pc, uint16_t sp0) {
   uint16_t ret_addr = (uint16_t)(bus_read(gb, sp0) | (bus_read(gb, sp0 + 1) << 8));
@@ -271,14 +278,14 @@ void hook_continue(GB *gb, uint16_t pc, uint16_t sp0) {
   gb->pc = pc;
   depth--;
   while (!(gb->pc == ret_addr && gb->sp == (uint16_t)(sp0 + 2)) && !gb->hung) {
-    if (gb->sp_loads != sl0 || ((uint16_t)(gb->sp - sp0) > 2 && (uint16_t)(gb->sp - sp0) < 0x8000) || (gb->sp == sp0 && depth > 24 && !hook_native && lookup(gb, gb->pc))) { depth++; hook_handoff(gb, gb->pc); depth--; break; }
-    gb_step(gb);
+    if ((hook_mode == HOOK_MODE_VERIFY && (gb->sp_loads != sl0 || (gb->sp == sp0 && depth > 24 && lookup(gb, gb->pc)))) || ((uint16_t)(gb->sp - sp0) > 2 && (uint16_t)(gb->sp - sp0) < 0x8000)) { depth++; hook_handoff(gb, gb->pc); depth--; break; }
+    gb->step(gb);
   }
   depth++;
 }
 
 void asm_continue(GB *gb, uint16_t ret_addr, uint16_t sp0) {
   depth--;
-  while (!(gb->pc == ret_addr && gb->sp == sp0 + 2) && !gb->hung) gb_step(gb);
+  while (!(gb->pc == ret_addr && gb->sp == sp0 + 2) && !gb->hung) gb->step(gb);
   depth++;
 }

@@ -6,6 +6,8 @@ Every instruction becomes `I(addr, cycles); effect;`. Jumps inside the routine b
 calls to ported routines become CALL(...), everything else falls back to the interpreter.
 """
 import glob, re, sys
+RESUME_TAILS = '--resume-tails' in sys.argv
+sys.argv = [a for a in sys.argv if a != '--resume-tails']
 rom = open(sys.argv[1], 'rb').read()
 labels, by_addr, local_by_addr, instances = {}, {}, {}, {}
 for line in open(sys.argv[2]):
@@ -366,7 +368,7 @@ if names and names[0] == '--out':
         return found
     for n in names:
         for (b, a) in instances.get(n, []):
-            if (b, a) in externs: continue
+            if (b, a) in externs or (not RESUME_TAILS and (n in rewritten or cname_at(b, a) in rewritten)): continue
             discover_resume(n, b, a)
     owner = {}
     for n in names:
@@ -402,6 +404,7 @@ if names and names[0] == '--out':
                 # addresses: the yield discards its C frames, so nothing else can run them.
                 # Those tails call the routine's own @-locals, which the hand-written C reaches
                 # only as static helpers, so every local that is a call target is generated too.
+                if not RESUME_TAILS: continue
                 body = routine_body(b, a)
                 called = set(info[0] for ia, m, ln, cy, kind, info in body if kind in ('call', 'callcc'))
                 tails = [(la, ln) for la, ln in locals_of.get((b, n), []) if (b, la) in resume_points]
@@ -438,13 +441,13 @@ if names and names[0] == '--out':
         for n, b, a in items:
             if n in rewritten or cname_at(b, a) in rewritten: generated.append((b, a, cname_at(b, a) + '_hook', 'H' if (n in rewritten_noverify or cname_at(b, a) in rewritten_noverify) else '-')); continue
             if (b, a) in externs: generated.append((b, a, cname_at(b, a), '-')); continue
-            if '@' in n and is_rewritten_parent(n): pending.extend(discover_resume(n.split('@')[0], b, a))
+            if RESUME_TAILS and '@' in n and is_rewritten_parent(n): pending.extend(discover_resume(n.split('@')[0], b, a))
             code = gen(n, b, a)
             if code: bank_bodies[bank].append(code); generated.append((b, a, cname_at(b, a), gen.flags)); pending.extend(gen.targets)
     # Generated code that lands on an @-local of a rewritten routine (a jump-table case, a
     # fallthrough, a call) has no C for it: the hand-written file keeps those as static helpers.
     # Generate every such local, to a fixed point, so the dispatcher always finds an entry.
-    while pending:
+    while pending and RESUME_TAILS:
         tb, t = pending.pop()
         if (tb, t) in entries or (tb, t) in by_addr or (tb, t) not in local_by_addr or t >= 0x8000: continue
         ln = local_by_addr[(tb, t)]
