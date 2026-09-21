@@ -23,15 +23,14 @@ static void ref_cb(GB *gb, const GBSample *sm, void *ctx) {
 // The native build has no interpreter, so it cannot run the CGB boot ROM: it starts from the
 // post-boot state that oracles-run --boot-state-out recorded (tas/ages-boot.state) and must then
 // produce the same state hashes as the emulator-hosted build.
-static void native_full_tas_matches_reference(void) {
-  const char *rom_path = GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc";
+static void native_run(const char *rom_path, const char *inputs, const char *ref_path, const char *state_path, uint64_t frames) {
   size_t n;
   uint8_t *rom = oracles_read_file(rom_path, &n);
-  if (!rom) SKIP("Ages ROM not present");
+  if (!rom) SKIP("ROM not present");
   Tas t;
-  if (!tas_load(&t, TAS_DIR "/ages-consoleverified.inputs")) SKIP("inputs missing");
-  FILE *ref = fopen(TAS_DIR "/ages.ref", "r");
-  if (!ref) SKIP("ages.ref missing");
+  if (!tas_load(&t, inputs)) SKIP("inputs missing");
+  FILE *ref = fopen(ref_path, "r");
+  if (!ref) SKIP("reference missing");
   GB *gb = calloc(1, sizeof *gb);
   gb_init(gb);
   ASSERT(gb_load_rom(gb, rom, n));
@@ -39,9 +38,10 @@ static void native_full_tas_matches_reference(void) {
   gb->code_bits = assets_code_bits(rom, n);
   assets_zero_code(rom, n);
   gb_reset(gb);
-  if (!oracles_load_boot_state(gb, TAS_DIR "/ages-boot.state")) SKIP("ages-boot.state missing");
-  const char *limit_env = getenv("TAS_FRAMES");
-  uint64_t limit = limit_env ? strtoull(limit_env, NULL, 10) : 20000;
+  if (!oracles_load_boot_state(gb, state_path)) SKIP("boot state missing");
+  const char *limit_env = getenv("TAS_FRAMES");     // lifts the Ages default; a whole-movie value must not outrun the Seasons reference
+  uint64_t limit = frames;
+  if (limit_env && frames == 20000) limit = strtoull(limit_env, NULL, 10);
   RefCheck rc = {ref, 0, 0, false, 0};
   rc.have = fscanf(ref, "%llu %llx", &rc.f, &rc.want) == 2;
   gb->input_at = tas_cb; gb->input_ctx = &t;
@@ -52,4 +52,13 @@ static void native_full_tas_matches_reference(void) {
   fclose(ref); free(gb); free(rom); tas_free(&t);
 }
 
-int main(void) { RUN(native_full_tas_matches_reference); return 0; }
+static void native_full_tas_matches_reference(void) {
+  native_run(GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc", TAS_DIR "/ages-consoleverified.inputs", TAS_DIR "/ages.ref", TAS_DIR "/ages-boot.state", 20000);
+}
+
+// Seasons: the recorded playthrough, whole (33,337 frames), on the same binary
+static void native_seasons_play_matches_reference(void) {
+  native_run(GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc", TAS_DIR "/seasons-play.inputs", TAS_DIR "/seasons-play.ref", TAS_DIR "/seasons-boot.state", 33337);
+}
+
+int main(void) { RUN(native_full_tas_matches_reference); RUN(native_seasons_play_matches_reference); return 0; }

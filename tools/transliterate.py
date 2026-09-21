@@ -24,6 +24,7 @@ for line in open(sys.argv[2]):
         if (b, a) not in instances[n]: instances[n].append((b, a))
 relocs = []
 externs = set()
+extra_names = set()
 import os as _os
 for extra_path in (['src/hooks/extra_seasons.sym', 'src/hooks/alias_seasons.sym'] if SEASONS else ['src/hooks/extra.sym']):
     if not _os.path.exists(extra_path): continue
@@ -32,7 +33,7 @@ for extra_path in (['src/hooks/extra_seasons.sym', 'src/hooks/alias_seasons.sym'
         m = re.match(r'([0-9a-f]{2}):([0-9a-f]{4}) (\S+)(?: = ([0-9a-f]{2}):([0-9a-f]{4})| (extern))?$', line)
         if not m: continue
         b, a, n = int(m.group(1), 16), int(m.group(2), 16), m.group(3)
-        labels.setdefault(n, (b, a)); by_addr.setdefault((b, a), n); instances.setdefault(n, [(b, a)])
+        labels.setdefault(n, (b, a)); by_addr.setdefault((b, a), n); instances.setdefault(n, [(b, a)]); extra_names.add(n)
         if m.group(4): relocs.append((a, a + 0x80, int(m.group(4), 16), int(m.group(5), 16)))
         if m.group(6): externs.add((b, a))
 def in_reloc(a): return any(lo <= a < hi for lo, hi, sb, sa in relocs)
@@ -359,7 +360,11 @@ def gen(name, bank=None, start=None):
 
 if names and names[0] == '--out':
     outdir = names[1]
-    names = [l.split('#')[0].strip() for l in open(sys.argv[3])] if sys.argv[3] != '-' else sorted(n for n in instances if '@' not in n)
+    if sys.argv[3] != '-': names = [l.split('#')[0].strip() for l in open(sys.argv[3])]
+    else:
+        # every routine the disassembly sources spell as code (tools/label_kinds.py), plus the extra labels
+        code_labels = set(l.strip() for l in open('src/hooks/seasons_code_labels.txt') if l.strip() and not l.startswith('#')) if _os.path.exists('src/hooks/seasons_code_labels.txt') else set(instances)
+        names = sorted(n for n in instances if '@' not in n and (n in code_labels or any(inst in shared_hooks or inst in externs for inst in instances[n]) or n in extra_names))
     names = [n for n in names if n]
     import collections, os
     by_bank = collections.OrderedDict()
@@ -401,9 +406,31 @@ if names and names[0] == '--out':
                 if o and o[1] != info[0]:
                     local_by_addr[(tb, info[0])] = f'{o[0]}@jump{info[0]:04x}'
                     if is_rewritten(o[0], tb, o[1]): print(f'warning: {n} jumps into rewritten {o[0]} at {info[0]:04x} (interpreted)', file=sys.stderr)
+    # Seasons: a @local that no jump, call, jump table or fallthrough reaches is data (a table
+    # inside the routine), not code to generate; the code map would otherwise zero it
+    code_targets = set()
+    if SEASONS:
+        def targets_of(b, a):
+            body = routine_body(b, a)
+            banks_at = infer_banks(b, body)
+            for ia, m, ln, cy, kind, info in body:
+                if kind in ('jp', 'jpcc', 'call', 'callcc'):
+                    tb = target_bank(b, info[0])
+                    if tb is None: tb = banks_at.get(ia)
+                    if tb is not None: code_targets.add((tb, info[0]))
+                elif kind == 'jumptable': code_targets.update((b, t) for t in info[0])
+                if kind not in ('ret', 'reti', 'jp', 'jphl', 'jumptable', 'unsupported', 'spload'): code_targets.add((b, ia + ln))
+        for n in names:
+            for (b, a) in instances.get(n, []):
+                if (b, a) not in externs: targets_of(b, a)
+        done = set()
+        while True:     # locals reached by code are code: their bodies reach more
+            new_locals = [(lb, la) for (lb, la) in local_by_addr if (lb, la) in code_targets and (lb, la) not in by_addr and (lb, la) not in done]
+            if not new_locals: break
+            for lb, la in new_locals: done.add((lb, la)); targets_of(lb, la)
     locals_of = collections.defaultdict(list)
     for (lb, la), ln in local_by_addr.items():
-        if (lb, la) not in by_addr: locals_of[(lb, ln.split('@')[0])].append((la, ln))
+        if (lb, la) not in by_addr and (not SEASONS or (lb, la) in code_targets): locals_of[(lb, ln.split('@')[0])].append((la, ln))
     items_by_bank = collections.OrderedDict()
     seen_addrs = set()
     for n in names:

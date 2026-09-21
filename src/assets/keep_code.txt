@@ -7,3 +7,4 @@ label nonExistentFunction   # noiseFrequencyTable: sound engine table after writ
 ages 000d5f-000d60          # loadAnimationData with an out-of-table animation index reads addSpritesToOam+1 (frame 16613)
 ages 01058f-010590          # same read lands on b4VBlankFunction30+2b
 ages 00d3ba-00d3bb          # introCinematic_preTitlescreen_state3's table overruns by one byte into introCinematic_inTemple_updateCamera (frame 54761)
+seasons 00d336-00d337       # the same one-byte overrun in Seasons (frame 4986 of the demo run)

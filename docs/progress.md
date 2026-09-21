@@ -448,6 +448,20 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-23: **Seasons boots and plays natively**: `oracles-native-run` (no interpreter linked,
+  code bytes zeroed, data reads of code fatal) runs the playthrough and the demo to the same
+  final states as the emulator build; `test_native_tas` now has `native_seasons_play_matches_reference`.
+  What it took: the generated tree had transliterated every plain label, data included, and
+  the code map then zeroed tables the game reads (`gbaModePaletteData`, `silencePlayedSound@table`,
+  the door-controller scripts). `tools/label_kinds.py` classifies a symbol file's labels from
+  the disassembly sources (code/, object_code/ and scriptHelper.s with an instruction after the
+  label are code; `.db`, script macros and the data trees are data), the generator takes those
+  plus the locals that code reaches (7,393 generated routines, was 14,769), `codemap.py` maps
+  Seasons from the shared and generated lists in Seasons mode, `keep_code.txt` gained the
+  Seasons twin of the intro table overrun. Seasons table 10,959 hooks. Gates: ctest 9/9,
+  whole movie, Ages verify 30k, Seasons playthrough `VERIFY_ALL`, native Ages whole movie and
+  native Seasons playthrough, lint 0.
+
 - 2026-09-22 (night): **Seasons: 0 interpreted instructions** on the playthrough and on the
   demo run. The generated tree now covers the @locals of shared routines that no shared hook
   spells (`updateTextbox@checkShouldExit`, `loadTreasureDisplayData@getTableIndices`; 14,769
