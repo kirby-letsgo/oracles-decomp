@@ -797,38 +797,49 @@ void noWarpInitiated_hook(GB *gb) {
 
 static void check_tile_warps_initiate(GB *gb, uint16_t sp0_) {
   BASE(checkTileWarps);
-  CYC(b_+38, b_+41); SET_HL((SYM(screenTransitionState5Substate1__state2) + 14));
-  CYC(b_+41, b_+43); E = 0x04;
-  CALL_C(b_+43, interBankCall_hook, 0x008a, b_+46);
-  CYC(b_+46, b_+49); initiateWarp_hook(gb);
+  CYC(b_+O(38), b_+OE(41)); SET_HL(SYM(findWarpSourceAndDest));
+  CYC(b_+O(41), b_+OE(43)); E = 0x04;
+  CALL_C(b_+O(43), interBankCall_hook, 0x008a, b_+OE(46));
+  CYC(b_+O(46), b_+OE(49)); initiateWarp_hook(gb);
 }
 
 static void check_tile_warps_multi_tile_door(GB *gb, uint16_t sp0_) {
   BASE(checkTileWarps);
-  CYC(b_+65, b_+67); A = mem_rd(gb, hFF8D);
-  CYC(b_+67, b_+68); C = A;
-  CYC(b_+68, b_+70); B = 0xce;
-  CYC(b_+70, b_+71); A = mem_rd(gb, BC);
-  CYC(b_+71, b_+72); alu_or(gb, A);
-  CYC(b_+72, b_+74); B = 0x02;
-  if (!(F & FZ)) {
-    CYCT(b_+74, b_+76);
+  CYC(b_+O(65), b_+OE(67)); A = mem_rd(gb, hFF8D);
+  CYC(b_+O(67), b_+OE(68)); C = A;
+  CYC(b_+O(68), b_+OE(70)); B = 0xce;
+  CYC(b_+O(70), b_+OE(71)); A = mem_rd(gb, BC);
+  if (game_seasons) {       // the door is two tiles wide unless it is a $0c-type tile
+    CYC(b_+S(91), b_+S(93)); alu_cp(gb, 0x0c);
+    CYC(b_+S(93), b_+S(95)); B = 0x02;
+    if (F & FZ) {
+      CYCT(b_+S(95), b_+S(97));
+    } else {
+      CYC(b_+S(95), b_+S(97));
+      CYC(b_+S(97), b_+S(99)); B = 0x04;
+    }
   } else {
-    CYC(b_+74, b_+76);
-    CYC(b_+76, b_+78); B = 0x04;
+    CYC(b_+O(71), b_+OE(72)); alu_or(gb, A);
+    CYC(b_+O(72), b_+OE(74)); B = 0x02;
+    if (!(F & FZ)) {
+      CYCT(b_+O(74), b_+OE(76));
+    } else {
+      CYC(b_+O(74), b_+OE(76));
+      CYC(b_+O(76), b_+OE(78)); B = 0x04;
+    }
   }
-  CYC(b_+78, b_+81); SET_HL(w1Link_yh);
-  CYC(b_+81, b_+82); A = mem_rd(gb, HL);
-  CYC(b_+82, b_+83); alu_add(gb, B);
-  CYC(b_+83, b_+85); alu_and(gb, 0x0f);
-  CYC(b_+85, b_+87); alu_sub(gb, 0x04);
-  CYC(b_+87, b_+89); alu_cp(gb, 0x0a);
+  CYC(b_+O(78), b_+OE(81)); SET_HL(w1Link_yh);
+  CYC(b_+O(81), b_+OE(82)); A = mem_rd(gb, HL);
+  CYC(b_+O(82), b_+OE(83)); alu_add(gb, B);
+  CYC(b_+O(83), b_+OE(85)); alu_and(gb, 0x0f);
+  CYC(b_+O(85), b_+OE(87)); alu_sub(gb, 0x04);
+  CYC(b_+O(87), b_+OE(89)); alu_cp(gb, 0x0a);
   if (!(F & FC)) {
-    CYCT(b_+89, b_+90); ret_effect(gb);
+    CYCT(b_+O(89), b_+OE(90)); ret_effect(gb);
     return;
   }
-  CYC(b_+89, b_+90);
-  CYC(b_+90, b_+92);
+  CYC(b_+O(89), b_+OE(90));
+  CYC(b_+O(90), b_+OE(92));
   check_tile_warps_initiate(gb, sp0_);
 }
 
@@ -863,51 +874,69 @@ static void check_tile_warps_adjacent(GB *gb) {
 void checkTileWarps_hook(GB *gb) {
   BASE(checkTileWarps);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); A = W8(wLinkObjectIndex);
-  CYC(b_+3, b_+4); H = A;
-  CYC(b_+4, b_+6); L = 0x0f;
-  CYC(b_+6, b_+7); A = mem_rd(gb, HL);
-  CYC(b_+7, b_+8); alu_or(gb, A);
+  CYC(b_+O(0), b_+OE(3)); A = W8(wLinkObjectIndex);
+  CYC(b_+O(3), b_+OE(4)); H = A;
+  CYC(b_+O(4), b_+OE(6)); L = 0x0f;
+  CYC(b_+O(6), b_+OE(7)); A = mem_rd(gb, HL);
+  CYC(b_+O(7), b_+OE(8)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+8, b_+9); ret_effect(gb);
+    CYCT(b_+O(8), b_+OE(9)); ret_effect(gb);
     return;
   }
-  CYC(b_+8, b_+9);
-  CYC(b_+9, b_+12); A = W8(wMenuDisabled);
-  CYC(b_+12, b_+13); alu_or(gb, A);
+  CYC(b_+O(8), b_+OE(9));
+  CYC(b_+O(9), b_+OE(12)); A = W8(wMenuDisabled);
+  CYC(b_+O(12), b_+OE(13)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+13, b_+15);
+    CYCT(b_+O(13), b_+OE(15));
     TAIL(noWarpInitiated);
   }
-  CYC(b_+13, b_+15);
-  CYC(b_+15, b_+17); A = mem_rd(gb, hFF8C);
-  CALL_C(b_+17, checkTileIsWarpTile_hook, SYM(checkTileIsWarpTile), b_+20);
+  CYC(b_+O(13), b_+OE(15));
+  CYC(b_+O(15), b_+OE(17)); A = mem_rd(gb, hFF8C);
+  CALL_C(b_+O(17), checkTileIsWarpTile_hook, SYM(checkTileIsWarpTile), b_+OE(20));
   if (!(F & FC)) {
-    CYCT(b_+20, b_+22);
+    CYCT(b_+O(20), b_+OE(22));
     TAIL(noWarpInitiated);
   }
-  CYC(b_+20, b_+22);
-  CYC(b_+22, b_+25); A = W8(wLinkGrabState);
-  CYC(b_+25, b_+26); alu_or(gb, A);
+  CYC(b_+O(20), b_+OE(22));
+  if (game_seasons) {       // warp tile type 1 (a Subrosia portal): warp at once, dropping everything held
+    CYC(b_+S(22), b_+S(23)); A = alu_dec8(gb, A);
+    if (F & FZ) {
+      CYCT(b_+S(23), b_+S(25));
+      CYC(b_+S(52), b_+S(55)); SET_HL(w1Link_zh);
+      CYC(b_+S(55), b_+S(56)); A = mem_rd(gb, HL);
+      CYC(b_+S(56), b_+S(57)); alu_or(gb, A);
+      if (!(F & FZ)) { CYCT(b_+S(57), b_+S(58)); ret_effect(gb); return; }
+      CYC(b_+S(57), b_+S(58));
+      CALL_C(b_+S(58), clearAllParentItems_hook, SYM(clearAllParentItems), b_+S(61));
+      CALL_C(b_+S(61), dropLinkHeldItem_hook, SYM(dropLinkHeldItem), b_+S(64));
+      CALL_C(b_+S(64), resetLinkInvincibility_hook, SYM(resetLinkInvincibility), b_+S(67));
+      CYCT(b_+S(67), b_+S(69));
+      check_tile_warps_initiate(gb, sp0_);
+      return;
+    }
+    CYC(b_+S(23), b_+S(25));
+  }
+  CYC(b_+O(22), b_+OE(25)); A = W8(wLinkGrabState);
+  CYC(b_+O(25), b_+OE(26)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+26, b_+28);
+    CYCT(b_+O(26), b_+OE(28));
     TAIL(noWarpInitiated);
   }
-  CYC(b_+26, b_+28);
-  CYC(b_+28, b_+31); push_effect(gb, b_+31);
+  CYC(b_+O(26), b_+OE(28));
+  CYC(b_+O(28), b_+OE(31)); push_effect(gb, b_+OE(31));
   check_tile_warps_adjacent(gb);
   if (F & FC) {
-    CYCT(b_+31, b_+33);
+    CYCT(b_+O(31), b_+OE(33));
     check_tile_warps_multi_tile_door(gb, sp0_);
     return;
   }
-  CYC(b_+31, b_+33);
-  CALL_C(b_+33, checkLinkCloseEnoughToWarpTileCenter_hook, SYM(checkLinkCloseEnoughToWarpTileCenter), b_+36);
+  CYC(b_+O(31), b_+OE(33));
+  CALL_C(b_+O(33), checkLinkCloseEnoughToWarpTileCenter_hook, SYM(checkLinkCloseEnoughToWarpTileCenter), b_+OE(36));
   if (!(F & FC)) {
-    CYCT(b_+36, b_+38);
+    CYCT(b_+O(36), b_+OE(38));
     TAIL(noWarpInitiated);
   }
-  CYC(b_+36, b_+38);
+  CYC(b_+O(36), b_+OE(38));
   check_tile_warps_initiate(gb, sp0_);
 }
 

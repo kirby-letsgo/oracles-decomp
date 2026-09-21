@@ -9558,6 +9558,41 @@ void updateEnemy_hook(GB *gb) {
   E = 0x81;
   CYC(b_+3, b_+6); A = mem_rd(gb, DE);
   B = 0x0f;
+  if (game_seasons) {       // enemy code banks $0f/$0e/$0d/$0c by id, the table in bank 0 at $2f16
+    alu_cp(gb, 0x08);
+    if (F & FC) CYCT(b_+S(6), b_+S(12));
+    else {
+      CYC(b_+S(6), b_+S(12));
+      B = alu_dec8(gb, B);
+      alu_cp(gb, 0x70);
+      if (!(F & FC)) CYCT(b_+S(12), b_+S(17));
+      else {
+        CYC(b_+S(12), b_+S(17));
+        B = alu_dec8(gb, B);
+        alu_cp(gb, 0x30);
+        if (!(F & FC)) CYCT(b_+S(17), b_+S(22));
+        else { CYC(b_+S(17), b_+S(23)); B = alu_dec8(gb, B); }
+      }
+    }
+    E = A;
+    A = B;
+    CYC(b_+S(23), b_+S(27)); H8(hRomBank) = A;
+    CYC(b_+S(27), b_+S(30)); mem_wr(gb, MBC_ROM_BANK, A);
+    A = E;
+    alu_add(gb, A);
+    alu_add(gb, 0x16);
+    L = A;
+    A = 0x00;
+    alu_adc(gb, 0x2f);
+    H = A;
+    CYC(b_+S(30), b_+S(41)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+S(41), b_+S(42)); H = mem_rd(gb, HL);
+    L = A;
+    A = C;
+    alu_or(gb, A);
+    CYC(b_+S(42), b_+S(46));
+    HANDOFF(HL);
+  }
   alu_cp(gb, 0x70);
   if (!(F & FC)) CYCT(b_+6, b_+12);
   else {

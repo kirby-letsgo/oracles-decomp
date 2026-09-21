@@ -3,6 +3,8 @@ applyRoomSpecificTileChanges
 applyRoomSpecificTileChangesAfterGfxLoad
 calculateAdjacentWallsBitset
 checkItemUsed 7=13
+checkLinkJumpingOffCliff
+checkTileWarps
 cutscene01
 drawAllSpritesUnconditionally
 drawAllSpritesUnconditionally@drawObject

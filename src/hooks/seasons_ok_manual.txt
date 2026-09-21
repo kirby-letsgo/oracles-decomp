@@ -25,3 +25,5 @@ screenTransitionState2@transitionLeft
 screenTransitionState2@transitionRight
 screenTransitionState2@transition
 screenTransitionState2@checkCanTransitionOverWater
+updateEnemy                      # Seasons body written out under if (game_seasons)
+specialObjectUpdateAdjacentWallsBitset   # Seasons body written out under if (game_seasons)

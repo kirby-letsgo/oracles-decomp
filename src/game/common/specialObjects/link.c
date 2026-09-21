@@ -1136,44 +1136,65 @@ static void link_check_cliff_tile(GB *gb) {
 void checkLinkJumpingOffCliff_hook(GB *gb) {
   BASE(checkLinkJumpingOffCliff);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); A = mem_rd(gb, wLinkAngle);
-  CYC(b_+3, b_+4); C = A;
-  CYC(b_+4, b_+6); alu_and(gb, 0xe7);
-  if (!(F & FZ)) { CYCT(b_+6, b_+7); ret_effect(gb); return; } CYC(b_+6, b_+7);
-  CYC(b_+7, b_+8); H = D;
-  CYC(b_+8, b_+10); L = 0x09;
-  CYC(b_+10, b_+11); alu_xor(gb, C);
-  CYC(b_+11, b_+12); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(b_+12, b_+13); ret_effect(gb); return; } CYC(b_+12, b_+13);
-  CYC(b_+13, b_+14); alu_add(gb, A);
-  CYC(b_+14, b_+16); A = alu_swap(gb, A);
-  CYC(b_+16, b_+17); C = A;
-  CYC(b_+17, b_+18); alu_add(gb, A);
-  CYC(b_+18, b_+19); alu_add(gb, A);
-  CYC(b_+19, b_+20); alu_add(gb, C);
-  CYC(b_+20, b_+23); SET_HL(b_+93);
-  CYC(b_+23, b_+24); link_add_a_to_hl(gb, b_+24);
-  CYC(b_+24, b_+26); E = 0x33;
-  CYC(b_+26, b_+27); A = mem_rd(gb, DE);
-  CYC(b_+27, b_+28); alu_and(gb, mem_rd(gb, HL));
-  CYC(b_+28, b_+29); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(b_+29, b_+30); ret_effect(gb); return; } CYC(b_+29, b_+30);
-  CYC(b_+30, b_+33);
+  if (game_seasons) {       // no cliff jumps from a hole tile
+    CYC(b_+S(0), b_+S(3)); A = W8(wActiveTileType);
+    CYC(b_+S(3), b_+S(5)); alu_cp(gb, 0x08);
+    if (F & FZ) { CYCT(b_+S(5), b_+S(6)); ret_effect(gb); return; }
+    CYC(b_+S(5), b_+S(6));
+  }
+  CYC(b_+O(0), b_+OE(3)); A = mem_rd(gb, wLinkAngle);
+  CYC(b_+O(3), b_+OE(4)); C = A;
+  CYC(b_+O(4), b_+OE(6)); alu_and(gb, 0xe7);
+  if (!(F & FZ)) { CYCT(b_+O(6), b_+OE(7)); ret_effect(gb); return; } CYC(b_+O(6), b_+OE(7));
+  CYC(b_+O(7), b_+OE(8)); H = D;
+  CYC(b_+O(8), b_+OE(10)); L = 0x09;
+  CYC(b_+O(10), b_+OE(11)); alu_xor(gb, C);
+  CYC(b_+O(11), b_+OE(12)); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+O(12), b_+OE(13)); ret_effect(gb); return; } CYC(b_+O(12), b_+OE(13));
+  CYC(b_+O(13), b_+OE(14)); alu_add(gb, A);
+  CYC(b_+O(14), b_+OE(16)); A = alu_swap(gb, A);
+  CYC(b_+O(16), b_+OE(17)); C = A;
+  CYC(b_+O(17), b_+OE(18)); alu_add(gb, A);
+  CYC(b_+O(18), b_+OE(19)); alu_add(gb, A);
+  CYC(b_+O(19), b_+OE(20)); alu_add(gb, C);
+  CYC(b_+O(20), b_+OE(23)); SET_HL(b_+O(93));
+  CYC(b_+O(23), b_+OE(24)); link_add_a_to_hl(gb, b_+O(24));
+  CYC(b_+O(24), b_+OE(26)); E = 0x33;
+  CYC(b_+O(26), b_+OE(27)); A = mem_rd(gb, DE);
+  CYC(b_+O(27), b_+OE(28)); alu_and(gb, mem_rd(gb, HL));
+  CYC(b_+O(28), b_+OE(29)); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+O(29), b_+OE(30)); ret_effect(gb); return; } CYC(b_+O(29), b_+OE(30));
+  CYC(b_+O(30), b_+OE(33));
   link_check_cliff_tile(gb);
-  if (!(F & FC)) { CYCT(b_+33, b_+34); ret_effect(gb); return; } CYC(b_+33, b_+34);
-  CYC(b_+34, b_+37);
+  if (!(F & FC)) { CYCT(b_+O(33), b_+OE(34)); ret_effect(gb); return; } CYC(b_+O(33), b_+OE(34));
+  CYC(b_+O(34), b_+OE(37));
   link_check_cliff_tile(gb);
-  if (!(F & FC)) { CYCT(b_+37, b_+38); ret_effect(gb); return; } CYC(b_+37, b_+38);
-  CYC(b_+38, b_+40); A = 0x81;
-  CYC(b_+40, b_+43); mem_wr(gb, wLinkInAir, A);
-  CYC(b_+43, b_+46); SET_BC(0xfe40);
-  CALL_C(b_+46, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+49);
-  CYC(b_+49, b_+51); L = 0x2d;
-  CYC(b_+51, b_+53); mem_wr(gb, HL, 0x00);
-  CYC(b_+53, b_+54); SET_HL(pop_effect(gb));
-  CYC(b_+54, b_+56); A = 0x12;
-  CALL_C(b_+56, linkSetState_hook, SYM(linkSetState), b_+59);
-  CYC(b_+59, b_+61); TAIL(linkState12);
+  if (!(F & FC)) { CYCT(b_+O(37), b_+OE(38)); ret_effect(gb); return; } CYC(b_+O(37), b_+OE(38));
+  CYC(b_+O(38), b_+OE(40)); A = 0x81;
+  CYC(b_+O(40), b_+OE(43)); mem_wr(gb, wLinkInAir, A);
+  CYC(b_+O(43), b_+OE(46)); SET_BC(0xfe40);
+  CALL_C(b_+O(46), objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+OE(49));
+  CYC(b_+O(49), b_+OE(51)); L = 0x2d;
+  CYC(b_+O(51), b_+OE(53)); mem_wr(gb, HL, 0x00);
+  if (game_seasons) {       // jumping off a cliff onto a tree stump: land at once
+    CYC(b_+S(59), b_+S(61)); A = H8(hFF8B);
+    CYC(b_+S(61), b_+S(63)); alu_cp(gb, 0x05);
+    if (F & FZ) { CYCT(b_+S(63), b_+S(65)); goto stump; }
+    CYC(b_+S(63), b_+S(65));
+    CYC(b_+S(65), b_+S(67)); alu_cp(gb, 0x06);
+    if (F & FZ) {
+      CYCT(b_+S(67), b_+S(69));
+stump:
+      CYC(b_+S(77), b_+S(79)); L = 0x10;
+      CYC(b_+S(79), b_+S(81)); mem_wr(gb, HL, 0x32);
+      RET(b_+S(81)); return;
+    }
+    CYC(b_+S(67), b_+S(69));
+  }
+  CYC(b_+O(53), b_+OE(54)); SET_HL(pop_effect(gb));
+  CYC(b_+O(54), b_+OE(56)); A = 0x12;
+  CALL_C(b_+O(56), linkSetState_hook, SYM(linkSetState), b_+OE(59));
+  CYC(b_+O(59), b_+OE(61)); TAIL(linkState12);
 }
 
 void specialObjectSetPositionToVar38IfSet_hook(GB *gb) {
@@ -4595,6 +4616,26 @@ void specialObjectUpdateAdjacentWallsBitset_hook(GB *gb) {
   CYC(b_+7, b_+8); alu_rrca(gb);
   if (F & FC) { CYCT(b_+8, b_+9); ret_effect(gb); return; }
   CYC(b_+8, b_+9);
+  if (game_seasons) {       // a hole tile counts as walls all round; no remap table
+    CYC(b_+S(9), b_+S(12)); A = W8(wActiveTileType);
+    CYC(b_+S(12), b_+S(14)); alu_sub(gb, 0x08);
+    if (F & FZ) {
+      CYC(b_+S(14), b_+S(16));
+      CYC(b_+S(16), b_+S(17)); A = alu_dec8(gb, A);
+      CYCT(b_+S(17), b_+S(19));
+    } else {
+      CYCT(b_+S(14), b_+S(16));
+      CYC(b_+S(19), b_+S(20)); H = D;
+      CYC(b_+S(20), b_+S(22)); L = 0x0b;
+      CYC(b_+S(22), b_+S(23)); B = mem_rd(gb, HL);
+      CYC(b_+S(23), b_+S(25)); L = 0x0d;
+      CYC(b_+S(25), b_+S(26)); C = mem_rd(gb, HL);
+      CALL_C(b_+S(26), calculateAdjacentWallsBitset_hook, SYM(calculateAdjacentWallsBitset), b_+S(29));
+    }
+    CYC(b_+S(29), b_+S(31)); E = 0x33;
+    CYC(b_+S(31), b_+S(32)); mem_wr(gb, DE, A);
+    RET(b_+S(32)); return;
+  }
   CYC(b_+9, b_+10); H = D;
   CYC(b_+10, b_+12); L = 0x0b;
   CYC(b_+12, b_+13); B = mem_rd(gb, HL);

@@ -301,6 +301,7 @@ twinrova_state8
 twinrova_state9
 twinrova_stateE
 updateAllObjects
+updateEnemy
 updateHeartRingCounter
 updateSpecialObjects@updateSpecialObject
 updateStatusBar_body@biggoronSword
