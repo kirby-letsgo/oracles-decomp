@@ -535,6 +535,7 @@
 00:359c setEnemyTargetToLinkPosition_hook -
 00:3600 loadAnimationData_hook -
 00:3663 getIndexOfGashaSpotInRoom_hook -
+00:36b7 loadTilesetLayout_hook -
 00:3716 loadUniqueGfxHeader_hook -
 00:376c updateTilesetUniqueGfx_hook -
 00:379c uniqueGfxFunc_380b_hook -
@@ -700,6 +701,8 @@
 01:5782 func_593a_hook -
 01:57b1 runGameLogic_hook -
 01:5892 loadingRoom_hook -
+01:58f9 standardGameState_hook -
+01:5980 cutscene01_hook -
 01:5a58 func_5c6b_hook -
 01:5a6f setEnteredWarpPosition_hook -
 01:5bb5 func_5d31_hook -
@@ -1327,6 +1330,7 @@
 05:422e linkApplyDamage_b5_hook -
 05:4237 updateLinkInvincibilityCounter_hook -
 05:4256 sidescrollUpdateActiveTile_hook -
+05:4275 linkApplyTileTypes_hook -
 05:43e3 linkAdjustAngleInSidescrollingArea_hook -
 05:43e5 linkAdjustGivenAngleInSidescrollingArea_hook -
 05:4418 companionPreventLinkFromPassing_noExtraChecks_hook -

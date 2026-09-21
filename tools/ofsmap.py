@@ -72,13 +72,18 @@ def align(A, S, a, s, anchors=()):
                             la, ls = A.labels[ml.group(1)], S.labels[ml.group(1)]
                             put(la[1] - a[1], ls[1] - s[1])
                     elif u != v: consts.append((ia[0] - a[1], ia[3], u, v))
-        elif tag == 'replace' and i2 - i1 == j2 - j1 and all(ba[x][2] == 'jumptable' and bs[y][2] == 'jumptable' for x, y in zip(range(i1, i2), range(j1, j2))):
-            # jump tables with different entries: the C dispatches whatever the ROM holds
-            for x, y in zip(range(i1, i2), range(j1, j2)):
-                aligned.append((x, y))
-                ia, is_ = ba[x], bs[y]
-                put(ia[0] - a[1], is_[0] - s[1])
-                put(ia[0] + ia[1] - a[1], is_[0] + is_[1] - s[1], ends)
+        elif tag == 'replace' and any(ba[x][2] == 'jumptable' for x in range(i1, i2)) and any(bs[y][2] == 'jumptable' for y in range(j1, j2)):
+            # jump tables with different entries: the C dispatches whatever the ROM holds; the
+            # tables pair up, whatever else the block holds is per-game
+            x = next(x for x in range(i1, i2) if ba[x][2] == 'jumptable'); y = next(y for y in range(j1, j2) if bs[y][2] == 'jumptable')
+            aligned.append((x, y))
+            ia, is_ = ba[x], bs[y]
+            put(ia[0] - a[1], is_[0] - s[1])
+            put(ia[0] + ia[1] - a[1], is_[0] + is_[1] - s[1], ends)
+            for x2 in range(i1, i2):
+                if x2 != x: ages_only.append((ba[x2][0] - a[1], na[x2][1]))
+            for y2 in range(j1, j2):
+                if y2 != y: seasons_only.append((bs[y2][0] - s[1], ns[y2][1]))
         else:
             for x in range(i1, i2): ages_only.append((ba[x][0] - a[1], na[x][1]))
             for y in range(j1, j2): seasons_only.append((bs[y][0] - s[1], ns[y][1]))
@@ -90,6 +95,27 @@ def align(A, S, a, s, anchors=()):
     align.ends = {k: ends.get(k, pairs.get(k)) for k in set(pairs) | set(ends)}
     matched = sum(i2 - i1 for tag, i1, i2, j1, j2 in opcodes if tag == 'equal')
     return pairs, ages_only, seasons_only, consts, 2.0 * matched / max(1, len(ta) + len(ts))
+
+
+def align_all(A, S, bare, a, s, anchors=()):
+    """The routine and its call-only @locals aligned together: pairs/ends relative to the
+    routine's base, and one (ages body, seasons body, aligned index pairs, ages delta, seasons
+    delta) per segment."""
+    pairs, ages_only, seasons_only, consts, ratio = align(A, S, a, s, anchors)
+    ends = dict(align.ends)
+    segments = [(A.body(*a), S.body(*s), list(align.aligned), 0, 0, align.conflicts, ages_only, seasons_only, consts, ratio, bare)]
+    covered = {x[0] for x in A.body(*a)}
+    for ln, (lb, la) in sorted(A.labels.items(), key=lambda kv: kv[1]):
+        if not ln.startswith(bare + '@') or lb != a[0] or la in covered or ln not in S.labels: continue
+        sl = S.labels[ln]
+        if sl[0] != s[0] or not (0 <= la - a[1] < 0x400) or not (0 <= sl[1] - s[1] < 0x400): continue
+        da, ds = la - a[1], sl[1] - s[1]
+        lp, lao, lso, lc, lr = align(A, S, (lb, la), sl, [(x - da, y - ds) for x, y in anchors if x >= da])
+        covered |= {x[0] for x in A.body(lb, la)}
+        for k, v in lp.items(): pairs.setdefault(k + da, v + ds)
+        for k, v in align.ends.items(): ends.setdefault(k + da, v + ds)
+        segments.append((A.body(lb, la), S.body(*sl), list(align.aligned), da, ds, align.conflicts, lao, lso, lc, lr, ln))
+    return pairs, ends, segments
 
 
 def main():
@@ -125,29 +151,15 @@ def main():
         a = insts[0]
         s = pairs_all.get((bare,) + a)
         if not s: print(f'{name}: no Seasons pair'); continue
-        pairs, ages_only, seasons_only, consts, ratio = align(A, S, a, s, anchors.get(name, ()))
-        ends = dict(align.ends)
-        for k, v1, v2 in align.conflicts: print(f'   {name}: +{k} aligns with both Seasons +{v1} and +{v2}: add an anchor (NAME:AGES=SEASONS)')
-        if report or not apply:
-            print(f'== {name} ages {a[0]:02x}:{a[1]:04x} seasons {s[0]:02x}:{s[1]:04x} ratio {ratio:.2f}, {len(pairs)} offsets mapped' + (f', anchors {anchors[name]}' if anchors.get(name) else ''))
-            for off, text in ages_only: print(f'   ages only    +{off:<4} {text}')
-            for off, text in seasons_only: print(f'   seasons only +{off:<4} {text}   (Seasons offset)')
-            for off, tmpl, u, v in consts: print(f'   constant     +{off:<4} {tmpl % u} -> {v}')
-        # @locals of this routine that its flow does not reach (called ones): same table
-        covered = {x[0] for x in A.body(*a)}
-        for ln, (lb, la) in sorted(A.labels.items(), key=lambda kv: kv[1]):
-            if not ln.startswith(bare + '@') or lb != a[0] or la in covered or ln not in S.labels: continue
-            sl = S.labels[ln]
-            if sl[0] != s[0] or not (0 <= la - a[1] < 0x400) or not (0 <= sl[1] - s[1] < 0x400): continue
-            lp, lao, lso, lc, lr = align(A, S, (lb, la), sl, [(x - (la - a[1]), y - (sl[1] - s[1])) for x, y in anchors.get(name, ()) if x >= la - a[1]])
-            covered |= {x[0] for x in A.body(lb, la)}
-            for k, v in lp.items(): pairs.setdefault(k + la - a[1], v + sl[1] - s[1])
-            for k, v in align.ends.items(): ends.setdefault(k + la - a[1], v + sl[1] - s[1])
+        pairs, ends, segments = align_all(A, S, bare, a, s, anchors.get(name, ()))
+        for ba_, bs_, al_, da, ds, conflicts, ages_only, seasons_only, consts, ratio, ln in segments:
+            for k, v1, v2 in conflicts: print(f'   {name}: +{k + da} aligns with both Seasons +{v1 + ds} and +{v2 + ds}: add an anchor (NAME:AGES=SEASONS)')
             if report or not apply:
-                print(f'   + {ln} ages +{la - a[1]} seasons +{sl[1] - s[1]} ratio {lr:.2f}')
-                for off, text in lao: print(f'   ages only    +{off + la - a[1]:<4} {text}')
-                for off, text in lso: print(f'   seasons only +{off + sl[1] - s[1]:<4} {text}   (Seasons offset)')
-                for off, tmpl, u, v in lc: print(f'   constant     +{off + la - a[1]:<4} {tmpl % u} -> {v}')
+                if da == 0: print(f'== {name} ages {a[0]:02x}:{a[1]:04x} seasons {s[0]:02x}:{s[1]:04x} ratio {ratio:.2f}, {len(pairs)} offsets mapped' + (f', anchors {anchors[name]}' if anchors.get(name) else ''))
+                else: print(f'   + {ln} ages +{da} seasons +{ds} ratio {ratio:.2f}')
+                for off, text in ages_only: print(f'   ages only    +{off + da:<4} {text}')
+                for off, text in seasons_only: print(f'   seasons only +{off + ds:<4} {text}   (Seasons offset)')
+                for off, tmpl, u, v in consts: print(f'   constant     +{off + da:<4} {tmpl % u} -> {v}')
         size = max(pairs) + 1 if pairs else 0
         tables[name] = (size, pairs, ends)
     if not apply: return

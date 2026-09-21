@@ -978,9 +978,9 @@ void checkTileIsWarpTile_hook(GB *gb) {
 }
 
 void cutscene13_hook(GB *gb) {
-  BASE(tilesetLayoutGroup33);
+  BASE(cutscene13);     // shares its address with the tilesetLayoutGroup33 data label in Ages
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); SET_HL((SYM(func_60e9) + 26));
+  CYC(b_+0, b_+3); SET_HL(SYM(func_03_6103));
   CYC(b_+3, b_+5); E = 0x03;
   CALL_C(b_+5, interBankCall_hook, 0x008a, b_+8);
   CALL_C(b_+8, refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+11);
@@ -2868,7 +2868,7 @@ void screen_transition_state2_body_hook(GB *gb) {
     else if (jt_ == b_+O(78)) { goto transition_left; }
     else if (jt_ == b_+O(86)) { goto transition_right; }
     else if (jt_ == b_+O(91)) { goto transition; }
-    else if (!game_seasons && jt_ == b_+O(185)) { goto done_boundary_checks; }
+    else if (!game_seasons && jt_ == b_+185) { goto done_boundary_checks; }
     else if (jt_ == b_+O(209)) { goto start_transition; }
   } while (0);
   if (entry == b_+O(0)) {
@@ -4981,7 +4981,7 @@ void standardGameState_hook(GB *gb) {
     else if (jt_ == SYM(cutscene10) && hook_enabled_at(gb, SYM(cutscene10))) { cutscene10_hook(gb); return; }
     else if (jt_ == SYM(cutscene11) && hook_enabled_at(gb, SYM(cutscene11))) { cutscene11_hook(gb); return; }
     else if (jt_ == SYM(cutscene12) && hook_enabled_at(gb, SYM(cutscene12))) { cutscene12_hook(gb); return; }
-    else if (jt_ == SYM(tilesetLayoutGroup33)) { cutscene13_hook(gb); return; }
+    else if (jt_ == SYM(cutscene13) && hook_enabled_at(gb, SYM(cutscene13))) { cutscene13_hook(gb); return; }
     else if (jt_ == SYM(cutscene14) && hook_enabled_at(gb, SYM(cutscene14))) { cutscene14_hook(gb); return; }
     else if (jt_ == SYM(cutscene15) && hook_enabled_at(gb, SYM(cutscene15))) { cutscene15_hook(gb); return; }
     else if (jt_ == SYM(cutscene16) && hook_enabled_at(gb, SYM(cutscene16))) { cutscene16_hook(gb); return; }
@@ -5048,76 +5048,89 @@ void cutscene00__afterCall5b4e_hook(GB *gb) { cutscene00_after_object_gfx(gb, gb
 
 static void cutscene01_after_initialize_room(GB *gb, uint16_t sp0_) {
   BASE(cutscene01);
+  AGES_ONLY();
   (void)sp0_;
   CYC(b_+112, b_+115); checkPlayRoomMusic_hook(gb);
 }
 
 static void cutscene01_after_tree_gfx(GB *gb, uint16_t sp0_) {
   BASE(cutscene01);
-  CALL_C(b_+3, updateLinkBeingShocked_hook, SYM(updateLinkBeingShocked), b_+6);
-  CALL_C(b_+6, updateMenus_hook, SYM(updateMenus), b_+9);
-  if (!(F & FZ)) { CYCT(b_+9, b_+10); ret_effect(gb); return; }
-  CYC(b_+9, b_+10);
-  CALL_C(b_+10, updatePirateShip_hook, SYM(updatePirateShip), b_+13);
-  CALL_C(b_+13, updateAllObjects_hook, SYM(updateAllObjects), b_+16);
-  CALL_C(b_+16, checkUpdateUnderwaterWaves_hook, SYM(checkUpdateUnderwaterWaves), b_+19);
-  CYC(b_+19, b_+22); SET_HL((SYM(tilesetLayoutGroup13) + 12));
-  CYC(b_+22, b_+24); E = 0x02;
-  CALL_C(b_+24, interBankCall_hook, 0x008a, b_+27);
-  CALL_C(b_+27, updateStatusBar_hook, SYM(updateStatusBar), b_+30);
-  CALL_C(b_+30, checkUpdateToggleBlocks_hook, SYM(checkUpdateToggleBlocks), b_+33);
-  CYC(b_+33, b_+36); A = W8(wCutsceneTrigger);
-  CYC(b_+36, b_+37); alu_or(gb, A);
+  CALL_C(b_+O(3), updateLinkBeingShocked_hook, SYM(updateLinkBeingShocked), b_+OE(6));
+  CALL_C(b_+O(6), updateMenus_hook, SYM(updateMenus), b_+OE(9));
+  if (!(F & FZ)) { CYCT(b_+O(9), b_+OE(10)); ret_effect(gb); return; }
+  CYC(b_+O(9), b_+OE(10));
+  if (!game_seasons) CALL_C(b_+O(10), updatePirateShip_hook, SYM(updatePirateShip), b_+OE(13));
+  CALL_C(b_+O(13), updateAllObjects_hook, SYM(updateAllObjects), b_+OE(16));
+  if (!game_seasons) {      // underwater waves and the bank 2 tile animation: Ages only
+    CALL_C(b_+16, checkUpdateUnderwaterWaves_hook, SYM(checkUpdateUnderwaterWaves), b_+19);
+    CYC(b_+19, b_+22); SET_HL(SYM(func_02_7a3a));
+    CYC(b_+22, b_+24); E = 0x02;
+    CALL_C(b_+24, interBankCall_hook, 0x008a, b_+27);
+  }
+  CALL_C(b_+O(27), updateStatusBar_hook, SYM(updateStatusBar), b_+OE(30));
+  if (!game_seasons) CALL_C(b_+O(30), checkUpdateToggleBlocks_hook, SYM(checkUpdateToggleBlocks), b_+OE(33));
+  CYC(b_+O(33), b_+OE(36)); A = W8(wCutsceneTrigger);
+  CYC(b_+O(36), b_+OE(37)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+37, b_+40);
+    CYCT(b_+O(37), b_+OE(40));
     TAIL(setCutsceneIndexIfCutsceneTriggerSet);
   }
-  CYC(b_+37, b_+40);
-  CALL_C(b_+40, func_60e9_hook, SYM(func_60e9), b_+43);
-  CYC(b_+43, b_+46); A = W8(wWarpTransition2);
-  CYC(b_+46, b_+47); alu_or(gb, A);
+  CYC(b_+O(37), b_+OE(40));
+  CALL_C(b_+O(40), func_60e9_hook, SYM(func_60e9), b_+OE(43));
+  CYC(b_+O(43), b_+OE(46)); A = W8(wWarpTransition2);
+  CYC(b_+O(46), b_+OE(47)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+47, b_+50);
+    CYCT(b_+O(47), b_+OE(50));
     TAIL(applyWarpTransition2);
   }
-  CYC(b_+47, b_+50);
-  CALL_C(b_+50, getNextActiveRoom_hook, SYM(getNextActiveRoom), b_+53);
+  CYC(b_+O(47), b_+OE(50));
+  if (game_seasons) {       // a pending warp (set while the season changed) fades out first
+    CYC(b_+S(33), b_+S(36)); A = W8(wWarpDestVariablesEnd);
+    CYC(b_+S(36), b_+S(37)); alu_or(gb, A);
+    if (!(F & FZ)) { CYCT(b_+S(37), b_+S(40)); TAIL(triggerFadeoutTransition); }
+    CYC(b_+S(37), b_+S(40));
+  }
+  CALL_C(b_+O(50), getNextActiveRoom_hook, SYM(getNextActiveRoom), b_+OE(53));
   if (!(F & FC)) {
-    CYCT(b_+53, b_+56);
+    CYCT(b_+O(53), b_+OE(56));
     TAIL(checkEnemyAndPartCollisionsIfTextInactive);
   }
-  CYC(b_+53, b_+56);
-  CALL_C(b_+56, checkDisableUnderwaterWaves_hook, SYM(checkDisableUnderwaterWaves), b_+59);
-  CALL_C(b_+59, updateSeedTreeRefillData_hook, SYM(updateSeedTreeRefillData), b_+62);
-  CYC(b_+62, b_+64); A = 0x05;
-  CALL_C(b_+64, addToGashaMaturity_hook, SYM(addToGashaMaturity), b_+67);
-  CALL_C(b_+67, func_49c9_hook, SYM(func_49c9), b_+70);
-  CALL_C(b_+70, setObjectsEnabledTo2_hook, SYM(setObjectsEnabledTo2), b_+73);
-  CALL_C(b_+73, loadScreenMusic_hook, SYM(loadScreenMusic), b_+76);
-  CALL_C(b_+76, loadTilesetData_hook, SYM(loadTilesetData), b_+79);
-  CALL_C(b_+79, checkRoomPack_hook, SYM(checkRoomPack), b_+82);
+  CYC(b_+O(53), b_+OE(56));
+  if (!game_seasons) CALL_C(b_+O(56), checkDisableUnderwaterWaves_hook, SYM(checkDisableUnderwaterWaves), b_+OE(59));
+  CALL_C(b_+O(59), updateSeedTreeRefillData_hook, SYM(updateSeedTreeRefillData), b_+OE(62));
+  CYC(b_+O(62), b_+OE(64)); A = 0x05;
+  CALL_C(b_+O(64), addToGashaMaturity_hook, SYM(addToGashaMaturity), b_+OE(67));
+  CALL_C(b_+O(67), func_49c9_hook, SYM(func_49c9), b_+OE(70));
+  CALL_C(b_+O(70), setObjectsEnabledTo2_hook, SYM(setObjectsEnabledTo2), b_+OE(73));
+  CALL_C(b_+O(73), loadScreenMusic_hook, SYM(loadScreenMusic), b_+OE(76));
+  CALL_C(b_+O(76), loadTilesetData_hook, SYM(loadTilesetData), b_+OE(79));
+  CALL_C(b_+O(79), checkRoomPack_hook, SYM(checkRoomPack), b_+OE(82));
   if (!(F & FZ)) {
-    CYCT(b_+82, b_+85);
+    CYCT(b_+O(82), b_+OE(85));
     TAIL(triggerFadeoutTransition);
   }
-  CYC(b_+82, b_+85);
-  CYC(b_+85, b_+88); A = W8(wActiveRoom);
-  CYC(b_+88, b_+91); W8(wLoadingRoom) = A;
-  CYC(b_+91, b_+93); A = 0x08;
-  CYC(b_+93, b_+96); W8(wScrollMode) = A;
-  CYC(b_+96, b_+97); alu_xor(gb, A);
-  CYC(b_+97, b_+100); mem_wr(gb, wThreadStateBuffer + 0x0f, A);
-  CALL_C(b_+100, loadTilesetAndRoomLayout_hook, SYM(loadTilesetAndRoomLayout), b_+103);
-  CALL_C(b_+103, loadRoomCollisions_hook, SYM(loadRoomCollisions), b_+106);
-  CALL_C(b_+106, generateVramTilesWithRoomChanges_hook, SYM(generateVramTilesWithRoomChanges), b_+109);
-  CALL_C(b_+109, initializeRoom_hook, SYM(initializeRoom), b_+112);
-  cutscene01_after_initialize_room(gb, sp0_);
+  CYC(b_+O(82), b_+OE(85));
+  if (game_seasons) CALL_C(b_+S(72), checkPlayRoomMusic_hook, SYM(checkPlayRoomMusic), b_+S(75));
+  CYC(b_+O(85), b_+OE(88)); A = W8(wActiveRoom);
+  CYC(b_+O(88), b_+OE(91)); W8(wLoadingRoom) = A;
+  CYC(b_+O(91), b_+OE(93)); A = 0x08;
+  CYC(b_+O(93), b_+OE(96)); W8(wScrollMode) = A;
+  CYC(b_+O(96), b_+OE(97)); alu_xor(gb, A);
+  CYC(b_+O(97), b_+OE(100)); mem_wr(gb, wThreadStateBuffer + 0x0f, A);
+  CALL_C(b_+O(100), loadTilesetAndRoomLayout_hook, SYM(loadTilesetAndRoomLayout), b_+OE(103));
+  CALL_C(b_+O(103), loadRoomCollisions_hook, SYM(loadRoomCollisions), b_+OE(106));
+  CALL_C(b_+O(106), generateVramTilesWithRoomChanges_hook, SYM(generateVramTilesWithRoomChanges), b_+OE(109));
+  if (game_seasons) { CYC(b_+S(99), b_+S(102)); TAIL(initializeRoom); }
+  if (!game_seasons) {
+    CALL_C(b_+109, initializeRoom_hook, SYM(initializeRoom), b_+112);
+    cutscene01_after_initialize_room(gb, sp0_);
+  }
 }
 
 void cutscene01_hook(GB *gb) {
   BASE(cutscene01);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+0, refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+3);
+  CALL_C(b_+O(0), refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+OE(3));
   cutscene01_after_tree_gfx(gb, sp0_);
 }
 

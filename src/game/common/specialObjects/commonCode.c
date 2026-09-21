@@ -202,317 +202,341 @@ void sidescrollUpdateActiveTile_hook(GB *gb) {
 
 static void link_apply_tile_types_adjust_conveyor(GB *gb) {
   BASE(linkApplyTileTypes);
-  CYC(b_+306, b_+308); A = 0x01;
-  CYC(b_+308, b_+311); W8(wcc92) = A;
-  CYC(b_+311, b_+314); A = W8(wActiveTileType);
-  CYC(b_+314, b_+315); alu_sub(gb, C);
-  CYC(b_+315, b_+318); SET_HL(b_+323);
-  CYC(b_+318, b_+319); common_code_add_a_to_hl(gb, b_+319);
-  CYC(b_+319, b_+320); C = mem_rd(gb, HL);
-  CYC(b_+320, b_+323);
+  CYC(b_+O(306), b_+OE(308)); A = 0x01;
+  CYC(b_+O(308), b_+OE(311)); W8(wcc92) = A;
+  CYC(b_+O(311), b_+OE(314)); A = W8(wActiveTileType);
+  CYC(b_+O(314), b_+OE(315)); alu_sub(gb, C);
+  CYC(b_+O(315), b_+OE(318)); SET_HL(b_+O(323));
+  CYC(b_+O(318), b_+OE(319)); common_code_add_a_to_hl(gb, b_+O(319));
+  CYC(b_+O(319), b_+OE(320)); C = mem_rd(gb, HL);
+  CYC(b_+O(320), b_+OE(323));
   specialObjectUpdatePositionGivenVelocity_hook(gb);
 }
 
 void linkApplyTileTypes_hook(GB *gb) {
   BASE(linkApplyTileTypes);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+1); alu_xor(gb, A);
-  CYC(b_+1, b_+4); W8(wIsTileSlippery) = A;
-  CYC(b_+4, b_+7); A = W8(wLinkInAir);
-  CYC(b_+7, b_+8); alu_or(gb, A);
+  CYC(b_+O(0), b_+OE(1)); alu_xor(gb, A);
+  CYC(b_+O(1), b_+OE(4)); W8(wIsTileSlippery) = A;
+  CYC(b_+O(4), b_+OE(7)); A = W8(wLinkInAir);
+  CYC(b_+O(7), b_+OE(8)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+8, b_+11);
+    CYCT(b_+O(8), b_+OE(11));
     goto normal;
   }
-  CYC(b_+8, b_+11);
-  CYC(b_+11, b_+14); W8(wLinkRaisedFloorOffset) = A;
-  CYC(b_+14, b_+17); push_effect(gb, b_+17);
-  CYC(b_+335, b_+338); SET_BC(0x0500);
-  CALL_C(b_+338, objectGetRelativeTile_hook, SYM(objectGetRelativeTile), b_+341);
-  CYC(b_+341, b_+342); C = A;
-  CYC(b_+342, b_+343); B = L;
-  CYC(b_+343, b_+346); SET_HL(wActiveTilePos);
-  CYC(b_+346, b_+347); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+347, b_+348); alu_cp(gb, B);
+  CYC(b_+O(8), b_+OE(11));
+  if (!game_seasons) { CYC(b_+11, b_+14); W8(wLinkRaisedFloorOffset) = A; }
+  CYC(b_+O(14), b_+OE(17)); push_effect(gb, b_+OE(17));
+  CYC(b_+O(335), b_+OE(338)); SET_BC(0x0500);
+  CALL_C(b_+O(338), objectGetRelativeTile_hook, SYM(objectGetRelativeTile), b_+OE(341));
+  CYC(b_+O(341), b_+OE(342)); C = A;
+  CYC(b_+O(342), b_+OE(343)); B = L;
+  CYC(b_+O(343), b_+OE(346)); SET_HL(wActiveTilePos);
+  CYC(b_+O(346), b_+OE(347)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(347), b_+OE(348)); alu_cp(gb, B);
   if (!(F & FZ)) {
-    CYCT(b_+348, b_+350);
+    CYCT(b_+O(348), b_+OE(350));
     goto update_active_tile;
   }
-  CYC(b_+348, b_+350);
-  CYC(b_+350, b_+351); A = mem_rd(gb, HL);
-  CYC(b_+351, b_+352); alu_cp(gb, C);
+  CYC(b_+O(348), b_+OE(350));
+  CYC(b_+O(350), b_+OE(351)); A = mem_rd(gb, HL);
+  CYC(b_+O(351), b_+OE(352)); alu_cp(gb, C);
   if (F & FZ) {
-    CYCT(b_+352, b_+354);
+    CYCT(b_+O(352), b_+OE(354));
     goto increment_standing_counter;
   }
-  CYC(b_+352, b_+354);
+  CYC(b_+O(352), b_+OE(354));
 
 update_active_tile:
-  CYC(b_+354, b_+356); L = 0x99;
-  CYC(b_+356, b_+357); A = mem_rd(gb, HL);
-  CYC(b_+357, b_+358); mem_wr(gb, HL, B);
-  CYC(b_+358, b_+359); B = A;
-  CYC(b_+359, b_+360); L = alu_inc8(gb, L);
-  CYC(b_+360, b_+361); mem_wr(gb, HL, C);
-  CYC(b_+361, b_+362); L = alu_inc8(gb, L);
-  CYC(b_+362, b_+364); mem_wr(gb, HL, 0x00);
+  CYC(b_+O(354), b_+OE(356)); L = GV(0x99, 0xb3);
+  CYC(b_+O(356), b_+OE(357)); A = mem_rd(gb, HL);
+  CYC(b_+O(357), b_+OE(358)); mem_wr(gb, HL, B);
+  CYC(b_+O(358), b_+OE(359)); B = A;
+  CYC(b_+O(359), b_+OE(360)); L = alu_inc8(gb, L);
+  CYC(b_+O(360), b_+OE(361)); mem_wr(gb, HL, C);
+  CYC(b_+O(361), b_+OE(362)); L = alu_inc8(gb, L);
+  CYC(b_+O(362), b_+OE(364)); mem_wr(gb, HL, 0x00);
 
 increment_standing_counter:
-  CYC(b_+364, b_+366); L = 0x9b;
-  CYC(b_+366, b_+367); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+367, b_+368); L = alu_inc8(gb, L);
-  CYC(b_+368, b_+369); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+369, b_+370); mem_wr(gb, HL, A);
-  CYC(b_+370, b_+371); A = C;
-  CYC(b_+371, b_+374); SET_HL(SYM(tileTypesTable));
-  CYC(b_+374, b_+377);
+  CYC(b_+O(364), b_+OE(366)); L = GV(0x9b, 0xb5);
+  CYC(b_+O(366), b_+OE(367)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+O(367), b_+OE(368)); L = alu_inc8(gb, L);
+  CYC(b_+O(368), b_+OE(369)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(369), b_+OE(370)); mem_wr(gb, HL, A);
+  CYC(b_+O(370), b_+OE(371)); A = C;
+  CYC(b_+O(371), b_+OE(374)); SET_HL(SYM(tileTypesTable));
+  CYC(b_+O(374), b_+OE(377));
   lookupCollisionTable_hook(gb);
-  CYC(b_+17, b_+20); W8(wActiveTileType) = A;
-  CYC(b_+20, b_+21); push_effect(gb, b_+21);
+  CYC(b_+O(17), b_+OE(20)); W8(wActiveTileType) = A;
+  CYC(b_+O(20), b_+OE(21)); push_effect(gb, b_+OE(21));
   do { uint16_t jt_ = (common_code_jump_table(gb));
-    if (jt_ == b_+71) { goto raisable_floor; }
-    else if (jt_ == b_+76) { goto normal; }
-    else if (jt_ == b_+87) { goto puddle; }
-    else if (jt_ == b_+107) { goto stump; }
-    else if (jt_ == b_+118) { goto vines; }
-    else if (jt_ == b_+126) { goto not_swimming; }
-    else if (jt_ == b_+131) { goto cracked_floor; }
-    else if (jt_ == b_+158) { goto hole; }
-    else if (jt_ == b_+207) { goto ice; }
-    else if (jt_ == b_+221) { goto cracked_ice; }
-    else if (jt_ == b_+222) { goto swimming; }
-    else if (jt_ == b_+257) { goto lava; }
-    else if (jt_ == b_+288) { goto conveyor; }
-    else if (jt_ == b_+327) { goto current; }
+    if (!game_seasons && jt_ == b_+71) { goto raisable_floor; }
+    else if (jt_ == b_+O(76)) { goto normal; }
+    else if (jt_ == b_+O(87)) { goto puddle; }
+    else if (jt_ == b_+O(107)) { goto stump; }
+    else if (jt_ == b_+O(118)) { goto vines; }
+    else if (jt_ == b_+O(126)) { goto not_swimming; }
+    else if (jt_ == b_+O(131)) { goto cracked_floor; }
+    else if (jt_ == b_+O(158)) { goto hole; }
+    else if (jt_ == b_+O(207)) { goto ice; }
+    else if (!game_seasons && jt_ == b_+221) { goto cracked_ice; }
+    else if (game_seasons && jt_ == b_+S(200)) { goto cracked_ice; }
+    else if (jt_ == b_+O(222)) { goto swimming; }
+    else if ((!game_seasons && jt_ == b_+257) || (game_seasons && jt_ == b_+S(245))) { goto lava; }
+    else if (jt_ == b_+O(288)) { goto conveyor; }
+    else if (jt_ == b_+O(327)) { goto current; }
     else if (jt_ == SYM(dealSpikeDamageToLink) && hook_enabled_at(gb, SYM(dealSpikeDamageToLink))) { dealSpikeDamageToLink_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
 raisable_floor:
-  CYC(b_+71, b_+73); A = 0xfd;
-  CYC(b_+73, b_+76); W8(wLinkRaisedFloorOffset) = A;
+  if (!game_seasons) {
+    CYC(b_+71, b_+73); A = 0xfd;
+    CYC(b_+73, b_+76); W8(wLinkRaisedFloorOffset) = A;
+  }
 
 normal:
-  CYC(b_+76, b_+77); alu_xor(gb, A);
-  CYC(b_+77, b_+80); W8(wActiveTileType) = A;
-  CYC(b_+80, b_+83); W8(wStandingOnTileCounter) = A;
-  CYC(b_+83, b_+86); W8(wLinkSwimmingState) = A;
-  CYC(b_+86, b_+87); ret_effect(gb);
+  CYC(b_+O(76), b_+OE(77)); alu_xor(gb, A);
+  CYC(b_+O(77), b_+OE(80)); W8(wActiveTileType) = A;
+  CYC(b_+O(80), b_+OE(83)); W8(wStandingOnTileCounter) = A;
+  CYC(b_+O(83), b_+OE(86)); W8(wLinkSwimmingState) = A;
+  CYC(b_+O(86), b_+OE(87)); ret_effect(gb);
   return;
 
 puddle:
-  CYC(b_+87, b_+88); H = D;
-  CYC(b_+88, b_+90); L = 0x21;
-  CYC(b_+90, b_+92); alu_bit(gb, 5, mem_rd(gb, HL));
+  CYC(b_+O(87), b_+OE(88)); H = D;
+  CYC(b_+O(88), b_+OE(90)); L = 0x21;
+  CYC(b_+O(90), b_+OE(92)); alu_bit(gb, 5, mem_rd(gb, HL));
   if (F & FZ) {
-    CYCT(b_+92, b_+94);
+    CYCT(b_+O(92), b_+OE(94));
     goto normal;
   }
-  CYC(b_+92, b_+94);
-  CYC(b_+94, b_+96); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 5)));
-  CYC(b_+96, b_+99); A = W8(wLinkImmobilized);
-  CYC(b_+99, b_+100); alu_or(gb, A);
-  CYC(b_+100, b_+102); A = 0x87;
+  CYC(b_+O(92), b_+OE(94));
+  CYC(b_+O(94), b_+OE(96)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 5)));
+  CYC(b_+O(96), b_+OE(99)); A = W8(wLinkImmobilized);
+  CYC(b_+O(99), b_+OE(100)); alu_or(gb, A);
+  CYC(b_+O(100), b_+OE(102)); A = 0x87;
   if (F & FZ) {
-    CALL_C_CC(b_+102, playSound_b00_hook, SYM(playSound_b00), b_+105);
+    CALL_C_CC(b_+O(102), playSound_b00_hook, SYM(playSound_b00), b_+OE(105));
   } else {
-    CYC(b_+102, b_+105);
+    CYC(b_+O(102), b_+OE(105));
   }
-  CYC(b_+105, b_+107);
+  CYC(b_+O(105), b_+OE(107));
   goto normal;
 
 stump:
-  CYC(b_+107, b_+108); H = D;
-  CYC(b_+108, b_+110); L = 0x33;
-  CYC(b_+110, b_+112); mem_wr(gb, HL, 0xff);
-  CYC(b_+112, b_+114); L = 0x24;
-  CYC(b_+114, b_+116); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
-  CYC(b_+116, b_+118);
+  CYC(b_+O(107), b_+OE(108)); H = D;
+  CYC(b_+O(108), b_+OE(110)); L = 0x33;
+  CYC(b_+O(110), b_+OE(112)); mem_wr(gb, HL, 0xff);
+  CYC(b_+O(112), b_+OE(114)); L = 0x24;
+  CYC(b_+O(114), b_+OE(116)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
+  CYC(b_+O(116), b_+OE(118));
   goto not_swimming;
 
 vines:
-  CALL_C(b_+118, dropLinkHeldItem_hook, SYM(dropLinkHeldItem), b_+121);
-  CYC(b_+121, b_+123); A = 0xff;
-  CYC(b_+123, b_+126); W8(wLinkClimbingVine) = A;
+  CALL_C(b_+O(118), dropLinkHeldItem_hook, SYM(dropLinkHeldItem), b_+OE(121));
+  CYC(b_+O(121), b_+OE(123)); A = 0xff;
+  CYC(b_+O(123), b_+OE(126)); W8(wLinkClimbingVine) = A;
 
 not_swimming:
-  CYC(b_+126, b_+127); alu_xor(gb, A);
-  CYC(b_+127, b_+130); W8(wLinkSwimmingState) = A;
-  CYC(b_+130, b_+131); ret_effect(gb);
+  CYC(b_+O(126), b_+OE(127)); alu_xor(gb, A);
+  CYC(b_+O(127), b_+OE(130)); W8(wLinkSwimmingState) = A;
+  CYC(b_+O(130), b_+OE(131)); ret_effect(gb);
   return;
 
 cracked_floor:
-  CYC(b_+131, b_+133); A = 0x22;
-  CALL_C(b_+133, cpActiveRing_hook, SYM(cpActiveRing), b_+136);
+  CYC(b_+O(131), b_+OE(133)); A = 0x22;
+  CALL_C(b_+O(133), cpActiveRing_hook, SYM(cpActiveRing), b_+OE(136));
   if (F & FZ) {
-    CYCT(b_+136, b_+138);
+    CYCT(b_+O(136), b_+OE(138));
     goto normal;
   }
-  CYC(b_+136, b_+138);
-  CYC(b_+138, b_+141); A = W8(wStandingOnTileCounter);
-  CYC(b_+141, b_+143); alu_cp(gb, 0x20);
+  CYC(b_+O(136), b_+OE(138));
+  CYC(b_+O(138), b_+OE(141)); A = W8(wStandingOnTileCounter);
+  CYC(b_+O(141), b_+OE(143)); alu_cp(gb, 0x20);
   if (F & FC) {
-    CYCT(b_+143, b_+145);
+    CYCT(b_+O(143), b_+OE(145));
     goto not_swimming;
   }
-  CYC(b_+143, b_+145);
-  CYC(b_+145, b_+148); A = W8(wActiveTilePos);
-  CYC(b_+148, b_+149); C = A;
-  CYC(b_+149, b_+151); A = 0xf3;
-  CALL_C(b_+151, breakCrackedFloor_hook, SYM(breakCrackedFloor), b_+154);
-  CYC(b_+154, b_+155); alu_xor(gb, A);
-  CYC(b_+155, b_+158); W8(wStandingOnTileCounter) = A;
+  CYC(b_+O(143), b_+OE(145));
+  CYC(b_+O(145), b_+OE(148)); A = W8(wActiveTilePos);
+  CYC(b_+O(148), b_+OE(149)); C = A;
+  CYC(b_+O(149), b_+OE(151)); A = 0xf3;
+  CALL_C(b_+O(151), breakCrackedFloor_hook, SYM(breakCrackedFloor), b_+OE(154));
+  CYC(b_+O(154), b_+OE(155)); alu_xor(gb, A);
+  CYC(b_+O(155), b_+OE(158)); W8(wStandingOnTileCounter) = A;
 
 hole:
-  CYC(b_+158, b_+161); A = W8(wTilesetFlags);
-  CYC(b_+161, b_+163); alu_and(gb, 0x40);
+  if (!game_seasons) {      // no holes in sidescrolling areas: Ages only
+    CYC(b_+158, b_+161); A = W8(wTilesetFlags);
+    CYC(b_+161, b_+163); alu_and(gb, 0x40);
+    if (!(F & FZ)) {
+      CYCT(b_+163, b_+165);
+      goto normal;
+    }
+    CYC(b_+163, b_+165);
+  }
+  CYC(b_+O(165), b_+OE(166)); alu_xor(gb, A);
+  CYC(b_+O(166), b_+OE(169)); W8(wLinkSwimmingState) = A;
+  CYC(b_+O(169), b_+OE(172)); A = W8(wLinkRidingObject);
+  CYC(b_+O(172), b_+OE(173)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+163, b_+165);
+    CYCT(b_+O(173), b_+OE(175));
     goto normal;
   }
-  CYC(b_+163, b_+165);
-  CYC(b_+165, b_+166); alu_xor(gb, A);
-  CYC(b_+166, b_+169); W8(wLinkSwimmingState) = A;
-  CYC(b_+169, b_+172); A = W8(wLinkRidingObject);
-  CYC(b_+172, b_+173); alu_or(gb, A);
+  CYC(b_+O(173), b_+OE(175));
+  CYC(b_+O(175), b_+OE(178)); A = W8(wMagnetGloveState);
+  CYC(b_+O(178), b_+OE(180)); alu_bit(gb, 6, A);
   if (!(F & FZ)) {
-    CYCT(b_+173, b_+175);
+    CYCT(b_+O(180), b_+OE(182));
     goto normal;
   }
-  CYC(b_+173, b_+175);
-  CYC(b_+175, b_+178); A = W8(wMagnetGloveState);
-  CYC(b_+178, b_+180); alu_bit(gb, 6, A);
+  CYC(b_+O(180), b_+OE(182));
+  CYC(b_+O(182), b_+OE(185)); SET_HL(wLastActiveTileType);
+  CYC(b_+O(185), b_+OE(186)); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(b_+O(186), b_+OE(187)); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FZ)) {
-    CYCT(b_+180, b_+182);
-    goto normal;
-  }
-  CYC(b_+180, b_+182);
-  CYC(b_+182, b_+185); SET_HL(wLastActiveTileType);
-  CYC(b_+185, b_+186); A = mem_rd(gb, HL); SET_HL(HL - 1);
-  CYC(b_+186, b_+187); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) {
-    CYCT(b_+187, b_+189);
+    CYCT(b_+O(187), b_+OE(189));
     goto pull_into_hole;
   }
-  CYC(b_+187, b_+189);
-  CYC(b_+189, b_+191); L = 0x99;
-  CYC(b_+191, b_+192); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+192, b_+193); alu_cp(gb, B);
+  CYC(b_+O(187), b_+OE(189));
+  CYC(b_+O(189), b_+OE(191)); L = GV(0x99, 0xb3);
+  CYC(b_+O(191), b_+OE(192)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(192), b_+OE(193)); alu_cp(gb, B);
   if (F & FZ) {
-    CYCT(b_+193, b_+195);
+    CYCT(b_+O(193), b_+OE(195));
     goto pull_into_hole;
   }
-  CYC(b_+193, b_+195);
-  CYC(b_+195, b_+196); L = alu_inc8(gb, L);
-  CYC(b_+196, b_+198); A = 0x0e;
-  CYC(b_+198, b_+199); mem_wr(gb, HL, A);
+  CYC(b_+O(193), b_+OE(195));
+  CYC(b_+O(195), b_+OE(196)); L = alu_inc8(gb, L);
+  CYC(b_+O(196), b_+OE(198)); A = 0x0e;
+  CYC(b_+O(198), b_+OE(199)); mem_wr(gb, HL, A);
 
 pull_into_hole:
-  CYC(b_+199, b_+201); A = 0x80;
-  CYC(b_+201, b_+204); W8(wcc92) = A;
-  CYC(b_+204, b_+207);
+  CYC(b_+O(199), b_+OE(201)); A = 0x80;
+  CYC(b_+O(201), b_+OE(204)); W8(wcc92) = A;
+  CYC(b_+O(204), b_+OE(207));
   TAIL(linkPullIntoHole);
 
 ice:
-  CYC(b_+207, b_+209); A = 0x21;
-  CALL_C(b_+209, cpActiveRing_hook, SYM(cpActiveRing), b_+212);
+  CYC(b_+O(207), b_+OE(209)); A = 0x21;
+  CALL_C(b_+O(209), cpActiveRing_hook, SYM(cpActiveRing), b_+OE(212));
   if (F & FZ) {
-    CYCT(b_+212, b_+214);
+    CYCT(b_+O(212), b_+OE(214));
     goto not_swimming;
   }
-  CYC(b_+212, b_+214);
-  CYC(b_+214, b_+217); SET_HL(wIsTileSlippery);
-  CYC(b_+217, b_+219); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));
-  CYC(b_+219, b_+221);
+  CYC(b_+O(212), b_+OE(214));
+  CYC(b_+O(214), b_+OE(217)); SET_HL(wIsTileSlippery);
+  CYC(b_+O(217), b_+OE(219)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));
+  CYC(b_+O(219), b_+OE(221));
   goto not_swimming;
 
 cracked_ice:
-  CYC(b_+221, b_+222); ret_effect(gb);
-  return;
+  if (!game_seasons) { CYC(b_+221, b_+222); ret_effect(gb); return; }
+  CYC(b_+S(200), b_+S(203)); A = W8(wStandingOnTileCounter);     // Seasons: the ice breaks after a while
+  CYC(b_+S(203), b_+S(205)); alu_cp(gb, 0x20);
+  if (F & FC) { CYCT(b_+S(205), b_+S(207)); goto ice; }
+  CYC(b_+S(205), b_+S(207));
+  CYC(b_+S(207), b_+S(210)); A = W8(wActiveTilePos);
+  CYC(b_+S(210), b_+S(211)); C = A;
+  CYC(b_+S(211), b_+S(213)); A = 0xfd;
+  CALL_C(b_+S(213), setTile_hook, SYM(setTile), b_+S(216));
 
 swimming:
-  CYC(b_+222, b_+225); A = W8(wLinkRidingObject);
-  CYC(b_+225, b_+226); alu_or(gb, A);
+  CYC(b_+O(222), b_+OE(225)); A = W8(wLinkRidingObject);
+  CYC(b_+O(225), b_+OE(226)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+226, b_+229);
+    CYCT(b_+O(226), b_+OE(229));
     goto normal;
   }
-  CYC(b_+226, b_+229);
-  CYC(b_+229, b_+232); A = W8(wLinkSwimmingState);
-  CYC(b_+232, b_+233); alu_or(gb, A);
+  CYC(b_+O(226), b_+OE(229));
+  CYC(b_+O(229), b_+OE(232)); A = W8(wLinkSwimmingState);
+  CYC(b_+O(232), b_+OE(233)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+233, b_+234); ret_effect(gb); return;
+    CYCT(b_+O(233), b_+OE(234)); ret_effect(gb); return;
   }
-  CYC(b_+233, b_+234);
-  CYC(b_+234, b_+237); A = mem_rd(gb, w1Link_var2f);
-  CYC(b_+237, b_+239); alu_bit(gb, 7, A);
-  if (!(F & FZ)) {
-    CYCT(b_+239, b_+240); ret_effect(gb); return;
+  CYC(b_+O(233), b_+OE(234));
+  if (!game_seasons) {      // mermaid suit: Ages only
+    CYC(b_+234, b_+237); A = mem_rd(gb, w1Link_var2f);
+    CYC(b_+237, b_+239); alu_bit(gb, 7, A);
+    if (!(F & FZ)) {
+      CYCT(b_+239, b_+240); ret_effect(gb); return;
+    }
+    CYC(b_+239, b_+240);
   }
-  CYC(b_+239, b_+240);
-  CYC(b_+240, b_+241); alu_xor(gb, A);
-  CYC(b_+241, b_+243); E = 0x35;
-  CYC(b_+243, b_+244); mem_wr(gb, DE, A);
-  CYC(b_+244, b_+246); E = 0x2d;
-  CYC(b_+246, b_+247); mem_wr(gb, DE, A);
-  CYC(b_+247, b_+248); A = alu_inc8(gb, A);
-  CYC(b_+248, b_+251); W8(wLinkSwimmingState) = A;
-  CYC(b_+251, b_+253); A = 0x80;
-  CYC(b_+253, b_+256); W8(wcc92) = A;
-  CYC(b_+256, b_+257); ret_effect(gb);
+  CYC(b_+O(240), b_+OE(241)); alu_xor(gb, A);
+  CYC(b_+O(241), b_+OE(243)); E = 0x35;
+  CYC(b_+O(243), b_+OE(244)); mem_wr(gb, DE, A);
+  CYC(b_+O(244), b_+OE(246)); E = 0x2d;
+  CYC(b_+O(246), b_+OE(247)); mem_wr(gb, DE, A);
+  CYC(b_+O(247), b_+OE(248)); A = alu_inc8(gb, A);
+  CYC(b_+O(248), b_+OE(251)); W8(wLinkSwimmingState) = A;
+  CYC(b_+O(251), b_+OE(253)); A = 0x80;
+  CYC(b_+O(253), b_+OE(256)); W8(wcc92) = A;
+  CYC(b_+O(256), b_+OE(257)); ret_effect(gb);
   return;
 
 lava:
-  CYC(b_+257, b_+260); A = W8(wLinkRidingObject);
-  CYC(b_+260, b_+261); alu_or(gb, A);
-  if (!(F & FZ)) {
-    CYCT(b_+261, b_+264);
-    goto normal;
+  if (!game_seasons) {
+    CYC(b_+257, b_+260); A = W8(wLinkRidingObject);
+    CYC(b_+260, b_+261); alu_or(gb, A);
+    if (!(F & FZ)) {
+      CYCT(b_+261, b_+264);
+      goto normal;
+    }
+    CYC(b_+261, b_+264);
+  } else {                  // the magnet gloves hold Link above lava
+    CYC(b_+S(245), b_+S(248)); A = W8(wMagnetGloveState);
+    CYC(b_+S(248), b_+S(250)); alu_bit(gb, 6, A);
+    if (!(F & FZ)) {
+      CYCT(b_+S(250), b_+S(253));
+      goto normal;
+    }
+    CYC(b_+S(250), b_+S(253));
   }
-  CYC(b_+261, b_+264);
-  CYC(b_+264, b_+266); A = 0x80;
-  CYC(b_+266, b_+269); W8(wcc92) = A;
-  CYC(b_+269, b_+271); E = 0x2d;
-  CYC(b_+271, b_+272); alu_xor(gb, A);
-  CYC(b_+272, b_+273); mem_wr(gb, DE, A);
-  CYC(b_+273, b_+276); A = W8(wLinkSwimmingState);
-  CYC(b_+276, b_+277); alu_or(gb, A);
+  CYC(b_+O(264), b_+OE(266)); A = 0x80;
+  CYC(b_+O(266), b_+OE(269)); W8(wcc92) = A;
+  CYC(b_+O(269), b_+OE(271)); E = 0x2d;
+  CYC(b_+O(271), b_+OE(272)); alu_xor(gb, A);
+  CYC(b_+O(272), b_+OE(273)); mem_wr(gb, DE, A);
+  CYC(b_+O(273), b_+OE(276)); A = W8(wLinkSwimmingState);
+  CYC(b_+O(276), b_+OE(277)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+277, b_+278); ret_effect(gb); return;
+    CYCT(b_+O(277), b_+OE(278)); ret_effect(gb); return;
   }
-  CYC(b_+277, b_+278);
-  CYC(b_+278, b_+279); alu_xor(gb, A);
-  CYC(b_+279, b_+281); E = 0x35;
-  CYC(b_+281, b_+282); mem_wr(gb, DE, A);
-  CYC(b_+282, b_+284); A = 0x41;
-  CYC(b_+284, b_+287); W8(wLinkSwimmingState) = A;
-  CYC(b_+287, b_+288); ret_effect(gb);
+  CYC(b_+O(277), b_+OE(278));
+  CYC(b_+O(278), b_+OE(279)); alu_xor(gb, A);
+  CYC(b_+O(279), b_+OE(281)); E = 0x35;
+  CYC(b_+O(281), b_+OE(282)); mem_wr(gb, DE, A);
+  CYC(b_+O(282), b_+OE(284)); A = 0x41;
+  CYC(b_+O(284), b_+OE(287)); W8(wLinkSwimmingState) = A;
+  CYC(b_+O(287), b_+OE(288)); ret_effect(gb);
   return;
 
 conveyor:
-  CYC(b_+288, b_+291); A = W8(wLinkRidingObject);
-  CYC(b_+291, b_+292); alu_or(gb, A);
+  CYC(b_+O(288), b_+OE(291)); A = W8(wLinkRidingObject);
+  CYC(b_+O(291), b_+OE(292)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+292, b_+295);
+    CYCT(b_+O(292), b_+OE(295));
     goto normal;
   }
-  CYC(b_+292, b_+295);
-  CYC(b_+295, b_+297); A = 0x23;
-  CALL_C(b_+297, cpActiveRing_hook, SYM(cpActiveRing), b_+300);
+  CYC(b_+O(292), b_+OE(295));
+  CYC(b_+O(295), b_+OE(297)); A = 0x23;
+  CALL_C(b_+O(297), cpActiveRing_hook, SYM(cpActiveRing), b_+OE(300));
   if (F & FZ) {
-    CYCT(b_+300, b_+303);
+    CYCT(b_+O(300), b_+OE(303));
     goto normal;
   }
-  CYC(b_+300, b_+303);
-  CYC(b_+303, b_+306); SET_BC(0x1409);
+  CYC(b_+O(300), b_+OE(303));
+  CYC(b_+O(303), b_+OE(306)); SET_BC(0x1409);
   link_apply_tile_types_adjust_conveyor(gb);
   return;
 
 current:
-  CYC(b_+327, b_+330); SET_BC(0x1e12);
-  CYC(b_+330, b_+333); push_effect(gb, b_+333);
+  CYC(b_+O(327), b_+OE(330)); SET_BC(0x1e12);
+  CYC(b_+O(330), b_+OE(333)); push_effect(gb, b_+OE(333));
   link_apply_tile_types_adjust_conveyor(gb);
-  CYC(b_+333, b_+335);
+  CYC(b_+O(333), b_+OE(335));
   goto swimming;
 }
 

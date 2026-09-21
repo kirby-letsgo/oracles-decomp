@@ -1482,6 +1482,7 @@ enum {
   S_cutscene10,
   S_cutscene11,
   S_cutscene12,
+  S_cutscene13,
   S_cutscene14,
   S_cutscene15,
   S_cutscene15__func_4c03,

@@ -4983,7 +4983,7 @@ write_sprites:
 void updateStatusBar_body__biggoronSword_hook(GB *gb) {
   BASE(updateStatusBar_body);
   CYC(b_+O(291), b_+OE(294)); SET_HL(wOam);
-  CYC(b_+O(294), b_+OE(297)); SET_DE(GV(GV(GV(b_+O(302), 0x528d), 0x528d), 0x528d));
+  CYC(b_+O(294), b_+OE(297)); SET_DE(b_+O(302));
   CYC(b_+O(297), b_+OE(299)); B = 0x10;
   CYC(b_+O(299), b_+OE(302)); TAIL(copyMemoryReverse);
 }

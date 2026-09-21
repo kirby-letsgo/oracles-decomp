@@ -3,6 +3,7 @@ applyRoomSpecificTileChanges
 applyRoomSpecificTileChangesAfterGfxLoad
 calculateAdjacentWallsBitset
 checkItemUsed 7=13
+cutscene01
 drawAllSpritesUnconditionally
 drawAllSpritesUnconditionally@drawObject
 endgameCutsceneHandler_body
@@ -14,6 +15,7 @@ interactionCode71
 interactionCodedc
 introCinematic_inTemple
 introCinematic_ridingHorse
+linkApplyTileTypes 233=227 234=228
 linkState01 149=148
 loadTilesetLayout
 paletteFadeHandler

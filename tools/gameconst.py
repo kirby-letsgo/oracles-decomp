@@ -121,13 +121,18 @@ class Tool:
         base_sid = self.sid_for(parent, ab)
         self.base_sid = base_sid
         an = self.A.body(ab, aa); sn = self.S.body(sb, sa)
-        if name in self.ofs_routines:       # per-game offsets: audit the aligned instructions only
-            from ofsmap import align
-            self.cur_ofs = align(self.A, self.S, (ab, aa), (sb, sa), self.ofs_anchors.get(name, ()))[0]
-            self.cur_ofs_end = dict(align.ends)
-            pairs_ = [(an[x], sn[y]) for x, y in align.aligned]
+        if name in self.ofs_routines:       # per-game offsets: audit the aligned instructions only (call-only @locals too)
+            from ofsmap import align_all
+            self.cur_ofs, self.cur_ofs_end, segments = align_all(self.A, self.S, name, (ab, aa), (sb, sa), self.ofs_anchors.get(name, ()))
+            pairs_ = [(ba_[x], bs_[y]) for ba_, bs_, al_, da, ds, *_ in segments for x, y in al_]
         elif len(an) != len(sn): self.report.append(f'{name}: shape differs'); return False
-        else: pairs_ = list(zip(an, sn)); self.cur_ofs, self.cur_ofs_end = {}, {}
+        else:
+            pairs_ = list(zip(an, sn)); self.cur_ofs, self.cur_ofs_end = {}, {}
+            if parent != name and parent in self.ofs_routines:      # an entry point of a mapped routine: its C uses O()
+                from ofsmap import align_all
+                pa = [x for x in self.A.instances.get(parent, []) if x[0] == ab] or [self.A.labels[parent]]
+                ps = [x for x in self.S.instances.get(parent, []) if x[0] == sb] or [self.S.labels[parent]]
+                self.cur_ofs, self.cur_ofs_end, _ = align_all(self.A, self.S, parent, pa[0], ps[0], self.ofs_anchors.get(parent, ()))
         funcs = self.funcs.get(base_sid)
         if not funcs: self.report.append(f'{name}: no C function with BASE({base_sid})'); return False
         ok = True
@@ -269,6 +274,7 @@ class Tool:
                     both = sorted(na & ns)
                     if len(both) == 1 and both[0] in self.syms: shared = both[0]
                 new = code[:st] + (f'{lead}SYM({shared})' if shared else f'{lead}GV({ex.strip()}, {sval})') + code[en:]
+                if os.environ.get('GCDEBUG'): print(f'WRAP {name} +{off} {f}:{i + 1} {ex.strip()!r} -> ages {self.eval_expr(ex, 0, b0)} seasons {self.eval_expr(ex, 1, b1)} want {v2} cur_ofs={len(self.cur_ofs)}')
                 if apply: lines[i] = new + lines[i][len(code):]
                 self.changed[f] += 1
                 return True

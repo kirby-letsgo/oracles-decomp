@@ -1478,6 +1478,7 @@ cutscene0f cutscene0f 01:5d8e
 cutscene10 cutscene10 01:5dcd
 cutscene11 cutscene11 01:5dd1
 cutscene12 cutscene12 01:5dd7
+cutscene13 cutscene13 01:7b6e
 cutscene14 cutscene14 01:7b7c
 cutscene15 cutscene15 01:4bf0
 cutscene15__func_4c03 cutscene15@func_4c03 01:4c03

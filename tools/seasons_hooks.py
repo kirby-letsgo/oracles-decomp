@@ -62,7 +62,7 @@ def main():
             verdict[n] = verdict[n.replace('@', '__')] = 'IDENTICAL'
 
     # C call graph: function name -> callees, per file (static helpers are file-local)
-    callees, burns, local_calls, tails = {}, {}, {}, {}
+    callees, burns, local_calls, tails, ages_only_funcs = {}, {}, {}, {}, set()
     EXEC = re.compile(r'\b(?:CYCT?[0-9a-f]*|burn_rom|RET|RET_TAKEN|RETI|I|push_effect|BASE)\(([^;]*)')
     for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
         if os.path.basename(path).startswith('gen_') or os.path.basename(path) == 'syms.c': continue
@@ -75,6 +75,7 @@ def main():
             elif line.startswith('}'): cur = None; continue
             if cur is None: continue
             code = line.split('//')[0]
+            if 'AGES_ONLY()' in code: ages_only_funcs.add(cur)
             if m and code.count('}') > code.count('{'): oneliner = True
             else: oneliner = False
             guarded = set(re.findall(r'hook_enabled_at\(gb, SYM\((\w+)\)\)', code)) | set(re.findall(r'\bTAIL\((\w+)\)', code))
@@ -91,6 +92,8 @@ def main():
                 bm = re.match(r'\s*(\w+)\)', args)
                 if bm and 'BASE(' in code: burns[cur].add(bm.group(1))
             if oneliner: cur = None
+    for key in ages_only_funcs:      # a function that returns at once under Seasons: nothing it does counts
+        callees[key], burns[key], local_calls[key], tails[key] = set(), set(), set(), set()
     by_name = defaultdict(list)
     for (path, fn) in callees: by_name[fn].append(path)
 
@@ -108,7 +111,7 @@ def main():
 
     seasons_names = set(rom_labels(seasons_sym))
     from symfiles import pair_instances
-    from routine_equiv import Game, mask_jumptables
+    from routine_equiv import Game, mask_jumptables, reconcile
     pairs = pair_instances(ages_rom, ages_sym, seasons_rom, seasons_sym)
     A, S = Game(ages_rom, ages_sym), Game(seasons_rom, seasons_sym)
     ages_labels = rom_labels(ages_sym)
@@ -125,7 +128,9 @@ def main():
             s_ = pairs.get((name,) + a)
             if s_ is None: v = 'AGES_ONLY'; break
             try:
-                if A.normalized(a[0], a[1])[0] != S.normalized(s_[0], s_[1])[0]: v = 'DIFFERENT'; break
+                an, ash = A.normalized(a[0], a[1]); sn, ssh = S.normalized(s_[0], s_[1])
+                if an != sn and ash == ssh: an, sn = reconcile(an, sn, A, S)
+                if an != sn: v = 'DIFFERENT'; break
             except Exception: v = 'DIFFERENT'; break
         local_cache[name] = v
         return v
@@ -149,7 +154,9 @@ def main():
             ta = A.rd(a[0], a[1] + off + 1) | (A.rd(a[0], a[1] + off + 2) << 8)
             ts = S.rd(s_[0], s_[1] + off + 1) | (S.rd(s_[0], s_[1] + off + 2) << 8)
             try:
-                if mask_jumptables(A.normalized(a[0], ta)[0]) != mask_jumptables(S.normalized(s_[0], ts)[0]): return False
+                an, ash = A.normalized(a[0], ta); sn, ssh = S.normalized(s_[0], ts)
+                if an != sn and ash == ssh: an, sn = reconcile(an, sn, A, S)
+                if mask_jumptables(an) != mask_jumptables(sn): return False
             except Exception: return False
         return bool(ages_labels.get(base))
 
