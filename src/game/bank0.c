@@ -4093,7 +4093,7 @@ void checkEnemyAndPartCollisionsIfTextInactive_hook(GB *gb) {
   CYC(SYM(checkEnemyAndPartCollisionsIfTextInactive), (SYM(checkEnemyAndPartCollisionsIfTextInactive) + 3));
   CYC(b_+0, b_+3); A = W8(wTextIsActive);
   alu_or(gb, A);
-  if (!(F & FZ)) { CYC(b_+3, b_+5); SET_AF(0x1dea); CYC(b_+5, b_+7); ret_effect(gb); return; }
+  if (!(F & FZ)) { CYC(b_+3, b_+5); SET_AF((uint16_t)(SYM(checkEnemyAndPartCollisionsIfTextInactive) + 3)); CYC(b_+5, b_+7); ret_effect(gb); return; }
   CYCT(b_+3, b_+5);
   bank_push(gb, (SYM(checkEnemyAndPartCollisionsIfTextInactive) + 3), 0x07);
   CALL_C((SYM(checkEnemyAndPartCollisionsIfTextInactive) + 13), checkEnemyAndPartCollisions_hook,

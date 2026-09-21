@@ -49,10 +49,12 @@ class Game:
         if a >= 0x8000: return 0
         return self.rom[(bank * 0x4000 + (a - 0x4000)) if a >= 0x4000 else a]
 
-    def rom_sym(self, bank, t):
-        """label+offset for a ROM address, resolved in the bank the code would land in."""
+    def rom_sym(self, bank, t, hint=None):
+        """label+offset for a ROM address, resolved in the bank the code would land in (for bank 0
+        code, the bank the routine last switched to when known, else the one bank with a label)."""
         tb = 0 if t < 0x4000 else bank
         if tb == 0 and t >= 0x4000:
+            if hint is not None and (hint, t) in self.by_addr: return self.by_addr[(hint, t)]
             hits = [b for b in self.sorted_by_bank if b != 0 and (b, t) in self.by_addr]
             return self.by_addr[(hits[0], t)] if len(hits) == 1 else f'${t:04x}'
         addrs = self.sorted_by_bank.get(tb, [])
@@ -169,7 +171,12 @@ class Game:
         addrs = set(a for a, *_ in insns)
         lo = min(addrs)
         out, shape = [], []
-        for a, ln, kind, tmpl, ops in insns:
+        hint, last_imm = None, None
+        ibc = self.labels.get('interBankCall', (0, -1))[1]
+        for i, (a, ln, kind, tmpl, ops) in enumerate(insns):
+            if tmpl == 'ld a,%s' and ops and ops[0][0] == 'imm': last_imm = ops[0][1]
+            elif tmpl in ('ld (%s),a', 'ldh (%s),a') and ops and ops[0][1] in (0x2222, 0xff97): hint = last_imm
+            elif tmpl == 'ld e,%s' and ops and ops[0][0] == 'imm' and any(x[2] == 'call' and x[4] and x[4][0][1] == ibc for x in insns[i + 1:i + 4]): hint = ops[0][1]
             syms = []
             for k, v in ops:
                 if k == 'imm': syms.append(f'${v:02x}')
@@ -177,7 +184,7 @@ class Game:
                 elif k == 'ram' and 0x0000 <= v < 0x8000 and not (0x0150 <= v < 0x4000 and tmpl.startswith('ld a,(')): syms.append(f'${v:04x}')   # MBC register writes
                 elif v in addrs or (k != 'any' and lo <= v < lo + 0x200 and any(x <= v < x + l for x, l, *_ in insns)):
                     syms.append(f'@{v - start:+d}')
-                else: syms.append(self.rom_sym(bank, v))
+                else: syms.append(self.rom_sym(bank, v, hint))
             out.append((a - start, tmpl % tuple(syms) if syms else tmpl))
             shape.append((a - start, tmpl))
         return out, shape
