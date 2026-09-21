@@ -6727,12 +6727,6 @@ zora_setLinkDirectionRight
 zora_setLinkDirectionUp
 zora_waitForLinkToMoveDown
 romEntry
-mainThreadStart__afterCall33cd
-paletteFadeThreadStart__afterCall339f
-textThreadStart__afterCall18cb
-thread_1b10__afterCall1b2a
-fileSelectThreadStart__afterCall1a2c
-introThreadStart__afterCall2d18
 agesFunc_10_7298__substate8
 agesFunc_10_7298__substateB
 bear_state0__chooseTextID
@@ -6864,4 +6858,3 @@ updateSound__nextChannel
 updateSound__ret
 updateSound__stopSound
 updateSound__updateChannels
-resumeThreadNextFrameAndSaveBank__afterCall08f6

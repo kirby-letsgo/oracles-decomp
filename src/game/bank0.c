@@ -1,5 +1,11 @@
 #include "game/game.h"
+#include "rt/fibers.h"
 #include "game/gen.h"
+
+static void thread_yield(GB *gb);
+static void thread_resume_pops(GB *gb);
+static void kernel_run_thread(GB *gb, void (*start)(GB *), uint16_t fallback);
+static void thread_start(GB *gb);
 
 void loadDungeonLayout_b01_hook(GB *gb);
 void paletteFadeHandler_hook(GB *gb);
@@ -12894,7 +12900,6 @@ static void resume_thread_restore_bank(GB *gb) {
   ret_effect(gb);
 }
 
-void resumeThreadNextFrameAndSaveBank__afterCall08f6_hook(GB *gb) { resume_thread_restore_bank(gb); }
 
 void resumeThreadNextFrame_hook(GB *gb) {
   BASE(resumeThreadNextFrame);
@@ -12926,7 +12931,7 @@ void resumeThreadInAFrames_hook(GB *gb) {
   CYC(b_+19, b_+20); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+20, b_+22); A = mem_rd(gb, hFF93);
   CYC(b_+22, b_+23); mem_wr(gb, HL, A);
-  TAIL(_nextThread);
+  thread_yield(gb);
 }
 
 void writeToSC_hook(GB *gb) {
@@ -13659,6 +13664,9 @@ void resetGame__afterSp016c_hook(GB *gb) {
 void resetGame_hook(GB *gb) {
   BASE(resetGame);
   CYC(b_+0, b_+3); gb->sp = wMainStackTop; gb->sp_loads++;
+  gb->pc = b_+3;
+  if (fiber_in_thread(gb)) { fiber_back(gb, FIBER_RESET); return; }
+  fibers_reset(gb);
   hook_handoff(gb, b_+3);
 }
 
@@ -13673,10 +13681,51 @@ void _nextThread__afterSp091a_hook(GB *gb) {
   TAIL(_mainLoop_nextThread);
 }
 
+// A thread leaves for good (stubThreadStart, restartThisThread): the kernel continues at +3.
 void _nextThread_hook(GB *gb) {
   BASE(_nextThread);
   CYC(b_+0, b_+3); gb->sp = wMainStackTop; gb->sp_loads++;
-  hook_handoff(gb, b_+3);
+  gb->pc = b_+3;
+  fiber_back(gb, FIBER_EXIT);
+}
+
+// A thread yields: it comes back here when _countdownToRunThread resumes it, and then runs that
+// routine's tail (pop bc/de/hl, ret) on its own stack.
+static void thread_yield(GB *gb) {
+  BASE(_nextThread);
+  CYC(b_+0, b_+3); cpu_load_sp(gb, wMainStackTop);
+  cpu_set_pc(gb, b_+3);
+  fiber_back(gb, FIBER_YIELD);
+  thread_resume_pops(gb);
+}
+
+static void thread_resume_pops(GB *gb) {
+  BASE(_countdownToRunThread);
+  CYC(b_+13, b_+14); SET_BC(pop_effect(gb));
+  CYC(b_+14, b_+15); SET_DE(pop_effect(gb));
+  CYC(b_+15, b_+16); SET_HL(pop_effect(gb));
+  CYC(b_+16, b_+17);
+  ret_effect(gb);
+}
+
+// The kernel side of a switch: run the active thread until it yields or ends; a reset request
+// from the thread unwinds the kernel to the dispatcher at the address the thread chose.
+static void kernel_run_thread(GB *gb, void (*start)(GB *), uint16_t fallback) {
+  int n = (uint8_t)(H8(hActiveThread) - (wThreadStateBuffer & 0xff)) / 8;
+  int r = fiber_run(gb, n, start, fallback);
+  if (r == FIBER_RESET) { fibers_reset(gb); hook_handoff(gb, cpu_pc(gb)); return; }
+  cpu_set_pc(gb, SYM(_nextThread) + 3);
+}
+
+static void thread_start(GB *gb) {
+  BASE(_initializeThread);
+  CYC(b_+14, b_+15); push_effect(gb, BC);
+  CYC(b_+15, b_+16);
+  ret_effect(gb);
+  for (;;) {
+    if (gb->hung) fiber_back(gb, FIBER_EXIT);
+    gb->step(gb);
+  }
 }
 
 void startGame__afterSp0925_hook(GB *gb) {
@@ -13704,6 +13753,7 @@ void startGame__afterSp0925_hook(GB *gb) {
 void startGame_hook(GB *gb) {
   BASE(startGame);
   CYC(b_+0, b_+3); gb->sp = wMainStackTop; gb->sp_loads++;
+  fibers_reset(gb);
   hook_handoff(gb, b_+3);
 }
 
@@ -13821,7 +13871,7 @@ void _mainLoop_nextThread_hook(GB *gb) {
     break;
   }
   CYCT(b_+52, b_+54);
-  TAIL(_mainLoop);
+  gb->pc = SYM(_mainLoop);
 }
 
 void _countdownToRunThread__afterSp0998_hook(GB *gb) {
@@ -13856,7 +13906,7 @@ void _countdownToRunThread_hook(GB *gb) {
   CYC(b_+11, b_+12);
   gb->sp = HL; gb->sp_loads++;
   CYC(b_+12, b_+13);
-  hook_handoff(gb, b_+13);
+  kernel_run_thread(gb, NULL, b_+13);
 }
 
 void _initializeThread__afterSp09aa_hook(GB *gb) {
@@ -13893,7 +13943,7 @@ void _initializeThread_hook(GB *gb) {
   CYC(b_+12, b_+13);
   gb->sp = HL; gb->sp_loads++;
   CYC(b_+13, b_+14);
-  hook_handoff(gb, b_+14);
+  kernel_run_thread(gb, thread_start, b_+14);
 }
 
 static void text_thread_loop(GB *gb);
@@ -14127,44 +14177,6 @@ void wMusicReadFunction_hook(GB *gb) {
   RET((wMusicReadFunction + 15)); return;
 }
 
-// Thread entry wrappers and resume points. A thread yields inside resumeThreadNextFrame (an
-// ld sp hand-off that discards the C frames), and comes back by returning to the jr that closes
-// its loop; these hooks sit at those return addresses and re-enter the loop.
 void introThreadStart_hook(GB *gb) { intro_thread_loop(gb); }
 void paletteFadeThreadStart_hook(GB *gb) { palette_fade_thread_loop(gb); }
 
-void mainThreadStart__afterCall33cd_hook(GB *gb) {
-  BASE(mainThreadStart);
-  CYCT(b_+44, b_+46);
-  main_thread_loop(gb);
-}
-
-void paletteFadeThreadStart__afterCall339f_hook(GB *gb) {
-  BASE(paletteFadeThreadStart);
-  CYCT(b_+27, b_+29);
-  palette_fade_thread_loop(gb);
-}
-
-void textThreadStart__afterCall18cb_hook(GB *gb) {
-  BASE(textThreadStart);
-  CYCT(b_+43, b_+45);
-  text_thread_loop(gb);
-}
-
-void thread_1b10__afterCall1b2a_hook(GB *gb) {
-  BASE(thread_1b10);
-  CYCT(b_+26, b_+28);
-  thread_1b10_loop(gb);
-}
-
-void fileSelectThreadStart__afterCall1a2c_hook(GB *gb) {
-  BASE(fileSelectThreadStart);
-  CYCT(b_+21, b_+23);
-  file_select_thread_loop(gb);
-}
-
-void introThreadStart__afterCall2d18_hook(GB *gb) {
-  BASE(introThreadStart);
-  CYCT(b_+17, b_+19);
-  intro_thread_loop(gb);
-}

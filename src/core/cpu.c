@@ -124,15 +124,6 @@ static void cb(GB *gb) {
   else set_r(gb, z, v | (1 << y));
 }
 
-void gb_speed_switch(GB *gb) {
-  gb->speed_armed = false;
-  gb->double_speed = !gb->double_speed;
-  timer_write_div(gb);
-  ppu_tick(gb, 12);
-  int stall = 32769;
-  for (int i = 0; i < stall; i++) gb_tick(gb);
-}
-
 static void stop(GB *gb) {
   fetch(gb);
   if (!gb->speed_armed) { gb->halted = true; return; }
@@ -265,23 +256,8 @@ static void execute(GB *gb, uint8_t op) {
 
 #include <stdio.h>
 #include <stdlib.h>
-uint64_t dbg_instr_count, dbg_int_count[5];
-uint32_t *dbg_pc_hist;
-int dbg_log_ints;
-void cpu_dispatch_interrupt(GB *gb) {
-  uint8_t pending = gb->ie & gb->io[R_IF] & 0x1f;
-  gb_tick(gb);
-  gb_tick(gb);
-  gb->ime = false;
-  int i = 0;
-  while (!(pending & (1 << i))) i++;
-  gb->io[R_IF] &= ~(1 << i);
-  dbg_int_count[i]++;
-  if (dbg_log_ints) printf("INT %d mc %llu frame %llu pc %04x sp %04x\n", i, (unsigned long long)gb->mcycles, (unsigned long long)GRID_FRAME(gb->cycles), gb->pc, gb->sp);
-  push(gb, gb->pc);
-  gb->pc = 0x40 + i * 8;
-}
-
+extern uint64_t dbg_instr_count, dbg_int_count[5];
+extern uint32_t *dbg_pc_hist;
 extern uint64_t dbg_vbl_step, dbg_vbl_step_halted;
 void gb_step(GB *gb) {
   if (gb->hdma_chunk_pending) { gb->hdma_chunk_pending = false; bus_hdma_chunk(gb); }
