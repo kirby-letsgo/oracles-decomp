@@ -1,9 +1,11 @@
 #include "core/gb.h"
 #include "core/sha1.h"
 #include "platform/png.h"
-#include "platform/render.h"
+#include "hw/render.h"
 #include "platform/tas.h"
 #include "platform/setup.h"
+#include "game/game.h"
+#include "assets/assets.h"
 #include "hooks/hooks.h"
 #include "core/hash.h"
 #include <stdio.h>
@@ -150,6 +152,17 @@ int main(int argc, char **argv) {
   GB *gb = calloc(1, sizeof *gb);
   gb_init(gb);
   if (!gb_load_rom(gb, rom, rom_size)) { fprintf(stderr, "unsupported ROM\n"); return 2; }
+#ifdef ORACLES_NATIVE
+  bool cyctab = !arg_flag(argc, argv, "--no-cyctab"), zero_code = !arg_flag(argc, argv, "--keep-code");
+#else
+  bool cyctab = arg_flag(argc, argv, "--cyctab"), zero_code = arg_flag(argc, argv, "--zero-code");
+#endif
+  if (cyctab) gb->cyctab = cyctab_alloc(rom, rom_size);
+  if (zero_code || arg_flag(argc, argv, "--check-code-reads")) gb->code_bits = assets_code_bits(rom, rom_size);
+  if (zero_code) {
+    if (!cyctab) { fprintf(stderr, "--zero-code needs the cycle table\n"); return 2; }
+    fprintf(stderr, "assets: zeroed %zu code bytes\n", assets_zero_code(rom, rom_size));
+  }
   const char *boot_path = arg_value(argc, argv, "--boot");
   if (boot_path) {
     uint8_t *boot = oracles_read_file(boot_path, &boot_size);

@@ -1,0 +1,9 @@
+# Instruction bytes the game reads as data, kept in the assets image. One range per line:
+#   ages|seasons|both  START-END   (ROM offsets, hex, END exclusive)
+# The RAM = ROM relocations in src/hooks/extra.sym are kept automatically. A data read of a
+# mapped byte aborts the native runner with `rom_rd: data read of code byte`; add the range here
+# and rerun tools/codemap.py.
+label nonExistentFunction   # noiseFrequencyTable: sound engine table after writeIndexedHighRamAndIncrement (sym also names it nonExistentFunction)
+ages 000d5f-000d60          # loadAnimationData with an out-of-table animation index reads addSpritesToOam+1 (frame 16613)
+ages 01058f-010590          # same read lands on b4VBlankFunction30+2b
+ages 00d3ba-00d3bb          # introCinematic_preTitlescreen_state3's table overruns by one byte into introCinematic_inTemple_updateCamera (frame 54761)

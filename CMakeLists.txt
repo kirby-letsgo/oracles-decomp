@@ -15,17 +15,21 @@ set(ORACLES_SHARED_SRC ${ORACLES_GAME_SRC}
   src/core/gb.c
   src/core/bus.c
   src/core/cpu_common.c
-  src/core/timer.c
-  src/core/ppu.c
-  src/core/apu.c
+  src/hw/timer.c
+  src/hw/ppu.c
+  src/hw/apu.c
+  src/hw/dma.c
+  src/hw/io.c
   src/core/sha1.c
   src/core/hash.c
-  src/platform/render.c
+  src/hw/render.c
   src/platform/png.c
   src/platform/tas.c
   src/platform/setup.c
   src/hooks/hooks.c
   src/rt/fibers.c
+  src/assets/assets.c
+  src/assets/codemap.c
 )
 add_library(oraclescore STATIC ${ORACLES_SHARED_SRC} src/core/cpu.c)
 target_include_directories(oraclescore PUBLIC src)
@@ -36,6 +40,7 @@ add_executable(oracles-run src/platform/headless.c)
 target_link_libraries(oracles-run oraclescore)
 add_executable(oracles-native-run src/platform/headless.c)
 target_link_libraries(oracles-native-run oraclesnative)
+target_compile_definitions(oracles-native-run PRIVATE ORACLES_NATIVE=1)
 add_custom_target(oracles-ref DEPENDS oracles-run)
 add_executable(lockstep-native tools/lockstep_native.c tools/lockstep_native_engine.c)
 target_link_libraries(lockstep-native oraclescore)

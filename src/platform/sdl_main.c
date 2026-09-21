@@ -2,7 +2,7 @@
 #include <SDL3/SDL_main.h>
 #include "core/gb.h"
 #include "platform/png.h"
-#include "platform/render.h"
+#include "hw/render.h"
 #include "platform/setup.h"
 #include "hooks/hooks.h"
 #include <stdio.h>

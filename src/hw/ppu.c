@@ -1,4 +1,4 @@
-#include "gb.h"
+#include "core/gb.h"
 
 static void set_mode(GB *gb, uint8_t mode) {
   gb->ppu_mode = mode;

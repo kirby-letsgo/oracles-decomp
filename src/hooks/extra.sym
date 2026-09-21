@@ -1038,7 +1038,6 @@
 09:6d63 bear_state0__initSubid00
 09:6d76 bear_state0__initSubid01
 09:6d77 bear_state0__initSubid02
-09:6dc8 bear_state0__textIDs
 09:6da8 bear_state0__var03IsNonzero
 09:6dd5 bear_state1__runSubid00
 09:6e4c bear_state1__runSubid02
@@ -1143,7 +1142,6 @@
 39:456b standardSoundCmd__cmd60
 39:45a0 standardSoundCmd__cmd61
 39:45a3 standardSoundCmd__cmdFrequency
-39:4533 standardSoundCmd__table
 10:4eb2 twinrova_checkFireProjectile__spawnProjectile
 39:434a updatePlayedFrequency__ret
 39:4306 updatePlayedFrequency__square

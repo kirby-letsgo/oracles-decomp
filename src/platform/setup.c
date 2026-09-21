@@ -65,7 +65,7 @@ void oracles_copy_state(GB *gb, const GB *src) {
   gb->serial_out = keep.serial_out; gb->serial_ctx = keep.serial_ctx;
   gb->input_at = keep.input_at; gb->input_ctx = keep.input_ctx;
   gb->frame_cb = keep.frame_cb; gb->frame_ctx = keep.frame_ctx;
-  gb->step = keep.step; gb->native = keep.native; gb->ring = keep.ring; gb->fib = keep.fib;
+  gb->step = keep.step; gb->native = keep.native; gb->ring = keep.ring; gb->fib = keep.fib; gb->cyctab = keep.cyctab; gb->code_bits = keep.code_bits;
   gb->trace_lo = keep.trace_lo; gb->trace_hi = keep.trace_hi;
   gb->hooks_checked = false;
 }

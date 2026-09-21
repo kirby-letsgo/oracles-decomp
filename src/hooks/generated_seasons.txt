@@ -8,8 +8,10 @@
 00:007e addDoubleIndexToBc_hook -
 00:008a interBankCall_hook -
 00:00a0 jpHl_hook -
+00:0100 romEntry_hook -
 00:0150 begin_hook -
 00:0169 resetGame_hook -
+00:016c resetGame__afterSp016c_hook -
 00:0176 getNumSetBits_hook -
 00:0181 addDecimalToHlRef_hook -
 00:018f subDecimalFromHlRef_hook -
@@ -92,11 +94,15 @@
 00:08da resumeThreadNextFrame_hook -
 00:08dc resumeThreadInAFrames_hook -
 00:08f3 _nextThread_hook -
+00:08f6 _nextThread__afterSp091a_hook H
 00:08fe startGame_hook -
+00:0901 startGame__afterSp0925_hook H
 00:090f _mainLoop_hook H
 00:0931 _mainLoop_nextThread_hook H
 00:0967 _countdownToRunThread_hook -
+00:0974 _countdownToRunThread__afterSp0998_hook -
 00:0978 _initializeThread_hook -
+00:0986 _initializeThread__afterSp09aa_hook -
 00:09b0 initializeFile_b00_hook -
 00:09b4 saveFile_b00_hook -
 00:09b8 loadFile_b00_hook -
@@ -3352,7 +3358,6 @@
 39:44ea channelCmdf6_hook -
 39:4510 channelCmdf6__wave_hook -
 39:4529 standardSoundCmd_hook -
-39:4533 standardSoundCmd__table_hook -
 39:4543 standardSoundCmd__channel0To3_hook -
 39:456b standardSoundCmd__cmd60_hook -
 39:45a0 standardSoundCmd__cmd61_hook -

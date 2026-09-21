@@ -3,6 +3,8 @@
 #include "platform/tas.h"
 #include "platform/setup.h"
 #include "hooks/hooks.h"
+#include "game/game.h"
+#include "assets/assets.h"
 #include <stdlib.h>
 
 static uint8_t tas_cb(void *ctx, uint64_t frame) { return tas_input_at((const Tas *)ctx, frame); }
@@ -33,6 +35,9 @@ static void native_full_tas_matches_reference(void) {
   GB *gb = calloc(1, sizeof *gb);
   gb_init(gb);
   ASSERT(gb_load_rom(gb, rom, n));
+  gb->cyctab = cyctab_alloc(rom, n);
+  gb->code_bits = assets_code_bits(rom, n);
+  assets_zero_code(rom, n);
   gb_reset(gb);
   if (!oracles_load_boot_state(gb, TAS_DIR "/ages-boot.state")) SKIP("ages-boot.state missing");
   const char *limit_env = getenv("TAS_FRAMES");

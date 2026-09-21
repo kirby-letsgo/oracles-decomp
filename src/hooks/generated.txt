@@ -4891,7 +4891,6 @@
 39:456b standardSoundCmd__cmd60_hook -
 39:45a0 standardSoundCmd__cmd61_hook -
 39:45a3 standardSoundCmd__cmdFrequency_hook -
-39:4533 standardSoundCmd__table_hook -
 39:434a updatePlayedFrequency__ret_hook -
 39:4306 updatePlayedFrequency__square_hook -
 39:4339 updatePlayedFrequency__wave_hook -
@@ -5191,7 +5190,6 @@
 09:6d63 bear_state0__initSubid00_hook -
 09:6d76 bear_state0__initSubid01_hook -
 09:6d77 bear_state0__initSubid02_hook -
-09:6dc8 bear_state0__textIDs_hook -
 09:6da8 bear_state0__var03IsNonzero_hook -
 09:6dd5 bear_state1__runSubid00_hook -
 09:6e4c bear_state1__runSubid02_hook -

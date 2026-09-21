@@ -59,13 +59,14 @@ void gb_reset(GB *gb) {
   void (*step)(GB *) = gb->step;
   DispatchRing *ring = gb->ring;
   struct Fibers *fib = gb->fib;
+  const uint8_t *cyctab = gb->cyctab, *code_bits = gb->code_bits;
   uint64_t trace_lo = gb->trace_lo, trace_hi = gb->trace_hi;
   bool keep_ram = gb->init_ram_loaded;
   if (keep_ram) { memcpy(saved_wram, gb->wram, sizeof saved_wram); memcpy(saved_hram, gb->hram, sizeof saved_hram); }
   memset(gb, 0, sizeof *gb);
   gb->samples = samples ? samples : calloc(16, sizeof *gb->samples);
   gb->step = step ? step : gb_step;
-  gb->ring = ring; gb->trace_lo = trace_lo; gb->trace_hi = trace_hi; gb->fib = fib;
+  gb->ring = ring; gb->trace_lo = trace_lo; gb->trace_hi = trace_hi; gb->fib = fib; gb->cyctab = cyctab; gb->code_bits = code_bits;
   gb->next_sample_at = UINT64_MAX;
   if (keep_ram) { memcpy(gb->wram, saved_wram, sizeof saved_wram); memcpy(gb->hram, saved_hram, sizeof saved_hram); }
   gb->init_ram_loaded = keep_ram;

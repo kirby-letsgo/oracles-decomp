@@ -6578,7 +6578,6 @@ bear_state0__initSubid
 bear_state0__initSubid00
 bear_state0__initSubid01
 bear_state0__initSubid02
-bear_state0__textIDs
 bear_state0__var03IsNonzero
 bear_state1__runSubid00
 bear_state1__runSubid02
@@ -6719,7 +6718,6 @@ standardSoundCmd__channel0To3
 standardSoundCmd__cmd60
 standardSoundCmd__cmd61
 standardSoundCmd__cmdFrequency
-standardSoundCmd__table
 tilesetLayoutGroup33
 tokayRunSubid00
 tokayRunSubid06
