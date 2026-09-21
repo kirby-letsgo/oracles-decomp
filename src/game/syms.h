@@ -13483,6 +13483,9 @@ enum {
   S_func_5723,
   S_loadDinsTroupeTileChanges,
   S_getLinkedHerosCaveSideEntranceRoom,
+  S_checkHoronVillageNPCShouldBeSeen_body,
+  S_checkNPCStage,
+  S_conditionalHoronNPCLookupTable,
   SYM_COUNT
 };
 enum {

@@ -13479,3 +13479,6 @@ func_572c func_572c -
 func_5723 func_5723 -
 loadDinsTroupeTileChanges loadDinsTroupeTileChanges -
 getLinkedHerosCaveSideEntranceRoom getLinkedHerosCaveSideEntranceRoom -
+checkHoronVillageNPCShouldBeSeen_body checkHoronVillageNPCShouldBeSeen_body -
+checkNPCStage checkNPCStage -
+conditionalHoronNPCLookupTable conditionalHoronNPCLookupTable -

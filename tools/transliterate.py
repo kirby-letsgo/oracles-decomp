@@ -442,6 +442,11 @@ if names and names[0] == '--out':
             if is_rewritten(n, b, a):
                 entries[(b, a)] = shared_hooks[(b, a)] if (b, a) in shared_hooks else cname_at(b, a) + '_hook'
                 items_by_bank.setdefault(b, []).append((n, b, a))
+                if SEASONS and (b, a) not in shared_hooks:     # @locals the hand file hooks itself (listed as parent@local)
+                    for la, ln in sorted(locals_of.get((b, n), [])):
+                        if ln in rewritten_seasons and (b, la) not in entries:
+                            entries[(b, la)] = cname_at(b, la) + '_hook'
+                            items_by_bank[b].append((ln, b, la))
                 if (b, a) in shared_hooks:     # a shared routine's @locals that no shared hook covers are generated
                     for la, ln in sorted(locals_of.get((b, n), [])):
                         if (b, la) in shared_hooks or (b, la) in entries or not body_ok(b, la): continue
@@ -497,6 +502,14 @@ if names and names[0] == '--out':
             if RESUME_TAILS and '@' in n and is_rewritten_parent(n): pending.extend(discover_resume(n.split('@')[0], b, a))
             code = gen(n, b, a)
             if code: bank_bodies[bank].append(code); generated.append((b, a, cname_at(b, a), gen.flags)); pending.extend(gen.targets)
+    if SEASONS and not RESUME_TAILS:
+        # A local of a hand-rewritten routine that generated code calls or jumps to has no entry
+        # unless the hand file hooks it (a parent@local line in rewritten_seasons.txt); the native
+        # build has no interpreter to fall back on there.
+        for tb, t in sorted(set(pending), key=lambda x: (x[0] if x[0] is not None else -1, x[1])):
+            if (tb, t) in entries or (tb, t) in by_addr or (tb, t) not in local_by_addr or t >= 0x8000: continue
+            ln = local_by_addr[(tb, t)]
+            if is_rewritten_parent(ln): print(f'warning: {ln} is reached from generated code but has no hook: add it to rewritten_seasons.txt and hook it by hand', file=sys.stderr)
     # Generated code that lands on an @-local of a rewritten routine (a jump-table case, a
     # fallthrough, a call) has no C for it: the hand-written file keeps those as static helpers.
     # Generate every such local, to a fixed point, so the dispatcher always finds an entry.
