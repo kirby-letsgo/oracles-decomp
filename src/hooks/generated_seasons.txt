@@ -219,7 +219,6 @@
 00:17b9 getRandomRingOfGivenTier_hook -
 00:17e5 refillSeedSatchel_hook -
 00:17fa addToGashaMaturity_hook -
-00:180b makeActiveObjectFollowLink_b00_hook -
 00:181f clearFollowingLinkObject_hook -
 00:1826 stopTextThread_hook -
 00:1832 retIfTextIsActive_hook -
@@ -549,6 +548,7 @@
 00:37b9 loadTilesetUniqueGfx_hook -
 00:37d4 loadUniqueGfxHeaderEntry_hook -
 00:381a loadTilesetData_hook -
+00:3894 loadRoomLayout_hook -
 00:3a4a setHlToTileMappingDataPlusATimes8_hook -
 00:3a52 setTile_hook -
 00:3a7c setInterleavedTile_hook -
@@ -1764,7 +1764,6 @@
 07:4a37 itemMergeZPositionIfSidescrollingArea_hook -
 07:4a4a itemUpdateSpeedZAndCheckHazards_hook -
 07:4a6b bombPullTowardPoint_hook -
-07:4a8d itemUpdateThrowingVertically_hook -
 07:4b24 itemUpdateThrowingVerticallyAndCheckHazards_hook -
 07:4b69 objectCreateClinkInteraction_hook -
 07:4b6e cpRelatedObject1ID_hook -
@@ -3471,6 +3470,14 @@
 3f:4b4e updateTextbox_hook -
 3f:4ba9 updateTextbox__textOption_hook -
 3f:4bb5 updateTextbox__inventoryText_hook -
+3f:4bc7 standardTextState0_hook -
+3f:4bd3 standardTextState1_hook -
+3f:4be5 standardTextState2_hook -
+3f:4c16 standardTextState3_hook -
+3f:4c43 standardTextState6_hook -
+3f:4c49 standardTextState7_hook -
+3f:4c52 standardTextState8_hook -
+3f:4cf0 standardTextState10_hook -
 3f:4cf7 textOptionCode_hook -
 3f:4d0b textOptionCode__state01_hook -
 3f:4d15 textOptionCode__state02_hook -

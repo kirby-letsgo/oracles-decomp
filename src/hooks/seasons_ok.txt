@@ -202,6 +202,7 @@ loadEquippedItemSpriteData
 loadGfxHeader
 loadPaletteHeader
 loadRoomLayout
+loadRoomLayout@loadLayoutData
 loadStaticObjects
 mapGetRoomText__specialCode2
 mapGetRoomText__specialCode3
@@ -304,8 +305,6 @@ updateStatusBar_body@biggoronSword
 updateStatusBar_body@updateHeartDisplay
 updateStatusBar_body@updateRupeeDisplay
 updateSwingableItemAnimation
-updateTextbox__standardText
-updateTextbox__updateText
 vasu_giveRingBox
 vire_mainForm_stateF
 volcanoRock_setRandomPosition

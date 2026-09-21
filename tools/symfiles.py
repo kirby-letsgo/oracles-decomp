@@ -42,13 +42,14 @@ def extra_labels(sym):
     """[(bank, addr, name, source (bank, addr) or None, extern)] from the extra file."""
     import os
     out = []
-    path = extra_sym_for(sym)
-    if not os.path.exists(path): return out
-    for line in open(path):
-        line = line.split('#')[0].strip()
-        m = re.match(r'([0-9a-f]{2}):([0-9a-f]{4}) (\S+)(?: = ([0-9a-f]{2}):([0-9a-f]{4})| (extern))?$', line)
-        if not m: continue
-        out.append((int(m.group(1), 16), int(m.group(2), 16), m.group(3), (int(m.group(4), 16), int(m.group(5), 16)) if m.group(4) else None, bool(m.group(6))))
+    paths = [extra_sym_for(sym)] + (['src/hooks/alias_seasons.sym'] if 'seasons' in sym else [])
+    for path in paths:
+        if not os.path.exists(path): continue
+        for line in open(path):
+            line = line.split('#')[0].strip()
+            m = re.match(r'([0-9a-f]{2}):([0-9a-f]{4}) (\S+)(?: = ([0-9a-f]{2}):([0-9a-f]{4})| (extern))?$', line)
+            if not m: continue
+            out.append((int(m.group(1), 16), int(m.group(2), 16), m.group(3), (int(m.group(4), 16), int(m.group(5), 16)) if m.group(4) else None, bool(m.group(6))))
     return out
 
 
