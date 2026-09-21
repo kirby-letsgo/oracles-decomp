@@ -24237,13 +24237,6 @@ void s_staticGashaSeed(GB *gb) {
   I(0x660b, 4); s_misc1_spawnTreasureBCifRoomFlagBit5NotSet(gb); return;  // jp $6384
 }
 
-// 09:6381
-void s_staticHeartPiece(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6381, 3); SET_BC(0x2b00);  // ld bc,$2b00
-  s_misc1_spawnTreasureBCifRoomFlagBit5NotSet(gb); return;  // fallthrough
-}
-
 // 09:658c
 void s_stolenFeatherGottenHandler(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -24774,39 +24767,6 @@ void s_tarmEscapedLostWoods(GB *gb) {
   I(0x633d, 2); A = 0x4d;  // ld a,$4d
   CALL(0x633f, playSound_b00_hook, 0x0c74, 0x6342);  // call $0c74
   I(0x6342, 4); if (hook_is(gb, 0x3ad9, interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(0x3ad9);  // jp $3ad9
-}
-
-// 09:6614
-void s_tickTockSecretEntrance(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6614, checkInteractionState_hook, 0x23b9, 0x6617);  // call $23b9
-  if (!(F & FZ)) { I(0x6617, 3); goto L_6629; } I(0x6617, 2);  // jr nz,$6629
-  CALL(0x6619, objectGetTileAtPosition_hook, 0x1432, 0x661c);  // call $1432
-  I(0x661c, 2); alu_cp(gb, 0x04);  // cp $04
-  if (!(F & FZ)) { RET_TAKEN(0x661e); return; } I(0x661e, 2);  // ret nz
-  I(0x661f, 1); A = L;  // ld a,l
-  I(0x6620, 4); mem_wr(gb, 0xccc5, A);  // ld ($ccc5),a
-  I(0x6623, 2); E = 0x44;  // ld e,$44
-  I(0x6625, 2); A = 0x01;  // ld a,$01
-  I(0x6627, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x6628); return;  // ret
-L_6629:
-  CALL(0x6629, returnIfScrollMode01Unset_hook, 0x268f, 0x662c);  // call $268f
-  CALL(0x662c, objectGetTileAtPosition_hook, 0x1432, 0x662f);  // call $1432
-  I(0x662f, 2); alu_cp(gb, 0x04);  // cp $04
-  if ((F & FZ)) { RET_TAKEN(0x6631); return; } I(0x6631, 2);  // ret z
-  s_setEnteredWarpSetStairsPlaySolvedSound(gb); return;  // fallthrough
-}
-
-// 09:6629
-void s_tickTockSecretEntrance__state1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6629:
-  CALL(0x6629, returnIfScrollMode01Unset_hook, 0x268f, 0x662c);  // call $268f
-  CALL(0x662c, objectGetTileAtPosition_hook, 0x1432, 0x662f);  // call $1432
-  I(0x662f, 2); alu_cp(gb, 0x04);  // cp $04
-  if ((F & FZ)) { RET_TAKEN(0x6631); return; } I(0x6631, 2);  // ret z
-  s_setEnteredWarpSetStairsPlaySolvedSound(gb); return;  // fallthrough
 }
 
 // 09:6559

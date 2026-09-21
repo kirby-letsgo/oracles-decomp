@@ -1909,7 +1909,7 @@ void s_roomTileChangesAfterLoad07(GB *gb) {
 L_6a02:
   I(0x6a02, 3); SET_HL(0x6a0e);  // ld hl,$6a0e
   CALL(0x6a05, drawRectangleToVramTiles_hook, 0x6a66, 0x6a08);  // call $6a66
-  s_roomTileChangesAfterLoad0f(gb); return;  // fallthrough
+  if (hook_is(gb, 0x6a08, s_roomTileChangesAfterLoad0f_hook)) { s_roomTileChangesAfterLoad0f_hook(gb); return; } HANDOFF(0x6a08);  // fallthrough
 }
 
 // 04:6a02
@@ -1918,7 +1918,7 @@ void s_roomTileChangesAfterLoad07__afterCall6a02(GB *gb) {
 L_6a02:
   I(0x6a02, 3); SET_HL(0x6a0e);  // ld hl,$6a0e
   CALL(0x6a05, drawRectangleToVramTiles_hook, 0x6a66, 0x6a08);  // call $6a66
-  s_roomTileChangesAfterLoad0f(gb); return;  // fallthrough
+  if (hook_is(gb, 0x6a08, s_roomTileChangesAfterLoad0f_hook)) { s_roomTileChangesAfterLoad0f_hook(gb); return; } HANDOFF(0x6a08);  // fallthrough
 }
 
 // 04:6a1a
@@ -1996,29 +1996,6 @@ void s_roomTileChangesAfterLoad0d__afterCall67ee(GB *gb) {
 L_67ee:
   I(0x67ee, 3); SET_HL(0x67f4);  // ld hl,$67f4
   I(0x67f1, 4); if (hook_is(gb, 0x6a66, drawRectangleToVramTiles_hook)) { drawRectangleToVramTiles_hook(gb); return; } HANDOFF(0x6a66);  // jp $6a66
-}
-
-// 04:6962
-void s_roomTileChangesAfterLoad0e(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6962, 2); A = 0x0a;  // ld a,$0a
-  CALL(0x6964, checkGlobalFlag_hook, 0x30c7, 0x6967);  // call $30c7
-  if (!(F & FZ)) { RET_TAKEN(0x6967); return; } I(0x6967, 2);  // ret nz
-  I(0x6968, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
-  I(0x696a, 1); C = A;  // ld c,a
-  I(0x696b, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  I(0x696d, 1); B = A;  // ld b,a
-  PUSH(0x696e, BC);  // push bc
-  I(0x696f, 3); SET_DE(0x6975);  // ld de,$6975
-  I(0x6972, 4); s_loadDinsTroupeTileChanges(gb); return;  // jp $68d1
-}
-
-// 04:6a08
-void s_roomTileChangesAfterLoad0f(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6a08, 2); A = 0x01;  // ld a,$01
-  I(0x6a0a, 4); mem_wr(gb, 0xccf4, A);  // ld ($ccf4),a
-  RET(0x6a0d); return;  // ret
 }
 
 // 04:64b2
@@ -2268,59 +2245,6 @@ L_6496:
   I(0x64a0, 3); SET_HL(0x64aa);  // ld hl,$64aa
 L_64a3:
   I(0x64a3, 4); if (hook_is(gb, 0x669d, fillRectInRoomLayout_hook)) { fillRectInRoomLayout_hook(gb); return; } HANDOFF(0x669d);  // jp $669d
-}
-
-// 04:6195
-void s_tileReplacement_group0Mapc5(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6195, 3); A = mem_rd(gb, 0xff96);  // ldh a,($ff96)
-  I(0x6197, 1); alu_rlca(gb);  // rlca
-  if (!(F & FC)) { RET_TAKEN(0x6198); return; } I(0x6198, 2);  // ret nc
-  I(0x6199, 3); SET_HL(0xcf14);  // ld hl,$cf14
-  I(0x619c, 3); mem_wr(gb, HL, 0xea);  // ld (hl),$ea
-  RET(0x619e); return;  // ret
-}
-
-// 04:619f
-void s_tileReplacement_group0Mapd9(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x619f, getThisRoomFlags_hook, 0x1956, 0x61a2);  // call $1956
-  I(0x61a2, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if ((F & FZ)) { RET_TAKEN(0x61a4); return; } I(0x61a4, 2);  // ret z
-  I(0x61a5, 3); SET_HL(0xcf14);  // ld hl,$cf14
-  I(0x61a8, 2); A = 0xbf;  // ld a,$bf
-  I(0x61aa, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x61ab, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x61ac, 2); L = 0x24;  // ld l,$24
-  I(0x61ae, 2); A = 0xa9;  // ld a,$a9
-  I(0x61b0, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x61b1, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x61b2, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x61b3); return;  // ret
-}
-
-// 04:61d2
-void s_tileReplacement_group0Mape4(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x61d2, getThisRoomFlags_hook, 0x1956, 0x61d5);  // call $1956
-  I(0x61d5, 2); alu_and(gb, 0x40);  // and $40
-  if ((F & FZ)) { I(0x61d7, 3); goto L_61df; } I(0x61d7, 2);  // jr z,$61df
-  I(0x61d9, 3); SET_HL(0xcf77);  // ld hl,$cf77
-  I(0x61dc, 3); mem_wr(gb, HL, 0xa1);  // ld (hl),$a1
-  RET(0x61de); return;  // ret
-L_61df:
-  I(0x61df, 3); SET_HL(0x61ee);  // ld hl,$61ee
-  I(0x61e2, 2); D = 0xcf;  // ld d,$cf
-L_61e4:
-  I(0x61e4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x61e5, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x61e6); return; } I(0x61e6, 2);  // ret z
-  I(0x61e7, 1); E = A;  // ld e,a
-  I(0x61e8, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x61e9, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x61ea, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x61eb, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x61ec, 3); goto L_61e4;  // jr $61e4
 }
 
 // 04:65c3
