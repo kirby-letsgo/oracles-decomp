@@ -11863,7 +11863,7 @@ void linkState07_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (rst_jump_table(gb));
     if (jt_ == b_+10) { linkState07__substate0_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectAnimate) && hook_enabled_at(gb, SYM(specialObjectAnimate))) { specialObjectAnimate_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectAnimate) && hook_is(gb, SYM(specialObjectAnimate), specialObjectAnimate_hook)) { specialObjectAnimate_hook(gb); return; }
     else if (jt_ == b_+33) { linkState07__substate2_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
@@ -12004,6 +12004,24 @@ static void room_layout_load_data(GB *gb) {
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   CYC(b_+0, b_+1); push_effect(gb, DE);
   CYC(b_+1, b_+3); A = H8(hFF8C);
+  if (game_seasons) {       // a pointer past the bank moves to the next bank once, in hFF8C itself
+    alu_bit(gb, 7, H);
+    CYC(b_+S(3), b_+S(5));
+    if (F & FZ) CYCT(b_+S(5), b_+S(7));
+    else {
+      CYC(b_+S(5), b_+S(7));
+      A = H;
+      alu_xor(gb, 0xc0);
+      H = A;
+      CYC(b_+S(7), b_+S(11));
+      CYC(b_+S(11), b_+S(13)); A = H8(hFF8C);
+      A = alu_inc8(gb, A);
+      CYC(b_+S(13), b_+S(16)); H8(hFF8C) = A;
+    }
+    CYC(b_+S(16), b_+S(18)); H8(hRomBank) = A;
+    CYC(b_+S(18), b_+S(21)); mem_wr(gb, MBC_ROM_BANK, A);
+    goto read_layout;
+  }
   E = A;
   CYC(b_+3, b_+4);
   for (;;) {
@@ -12022,6 +12040,7 @@ static void room_layout_load_data(GB *gb) {
   CYC(b_+15, b_+16);
   CYC(b_+16, b_+18); H8(hRomBank) = A;
   CYC(b_+18, b_+21); mem_wr(gb, MBC_ROM_BANK, A);
+read_layout:
   B = 0xb0;
   SET_DE(wRoomCollisions);
   CYC(b_+21, b_+26);

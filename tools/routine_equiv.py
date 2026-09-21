@@ -43,7 +43,9 @@ class Game:
         self.extra_names = set()        # never end a body: most are resume points inside a routine
         from symfiles import extra_labels
         for b, a, n, src, ext in extra_labels(sym_path):
-            self.labels.setdefault(n, (b, a)); self.by_addr.setdefault((b, a), n); self.extra_names.add(n)
+            self.labels.setdefault(n, (b, a))
+            if '__' in n: self.by_addr.setdefault((b, a), n); self.extra_names.add(n)    # a C spelling of an @local or a resume point
+            else: self.by_addr[(b, a)] = n            # a routine of its own (vectors, RAM code, an alias for a plain Ages label)
             if '@' not in n and '__' not in n:      # `parent__local` names are C spellings of @locals
                 self.instances.setdefault(n, [])
                 if (b, a) not in self.instances[n]: self.instances[n].append((b, a))
@@ -282,6 +284,9 @@ def main():
         s_insts = seasons.instances.get(bare) or ([seasons.labels[bare]] if bare in seasons.labels else None)
         if re.match(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)', bare.split('@')[0]):
             s_insts = [pairs[(bare,) + a] for a in insts if (bare,) + a in pairs] or None
+        elif s_insts and len(s_insts) > 1:      # copies in several banks: the paired copy only
+            paired = [pairs[(bare,) + a] for a in insts if (bare,) + a in pairs]
+            if paired: s_insts = paired
         if not s_insts:
             results[n] = ('AGES_ONLY', '', 0)
             continue

@@ -52,6 +52,7 @@ class Tool:
             self.file_macros[f] = {m.group(1): m.group(2) for m in re.finditer(r'^#define (\w+) ((?:0x[0-9a-f]+|SYM\(\w+\)|\d+)(?: [+-] (?:0x[0-9a-f]+|\d+))?)\s*$', text, re.M)}
         # BASE label -> list of (file, start_line, end_line)
         self.funcs = defaultdict(list)
+        self.func_base = {}
         for f, lines in self.files.items():
             start = None
             for i, l in enumerate(lines):
@@ -61,6 +62,8 @@ class Tool:
                     j = i
                     while j < len(lines) and lines[j] != '}': j += 1
                     self.funcs[m.group(1)].append((f, start, j))
+                    fm = re.match(r'^(?:static )?\w+ \*?(\w+)\(', lines[start])
+                    if fm: self.func_base[fm.group(1)] = (m.group(1), f, start, j)     # function name -> its BASE label
         self.changed = defaultdict(int)
         self.report = []
         self.cur_file = None
@@ -121,9 +124,10 @@ class Tool:
         base_sid = self.sid_for(parent, ab)
         self.base_sid = base_sid
         an = self.A.body(ab, aa); sn = self.S.body(sb, sa)
-        if name in self.ofs_routines:       # per-game offsets: audit the aligned instructions only (call-only @locals too)
+        ofs_key = name if name in self.ofs_routines else f'{name}_b{ab:02x}' if f'{name}_b{ab:02x}' in self.ofs_routines else None
+        if ofs_key:       # per-game offsets: audit the aligned instructions only (call-only @locals too)
             from ofsmap import align_all
-            self.cur_ofs, self.cur_ofs_end, segments = align_all(self.A, self.S, name, (ab, aa), (sb, sa), self.ofs_anchors.get(name, ()))
+            self.cur_ofs, self.cur_ofs_end, segments = align_all(self.A, self.S, name, (ab, aa), (sb, sa), self.ofs_anchors.get(ofs_key, ()))
             pairs_ = [(ba_[x], bs_[y]) for ba_, bs_, al_, da, ds, *_ in segments for x, y in al_]
         elif len(an) != len(sn): self.report.append(f'{name}: shape differs'); return False
         else:
@@ -134,6 +138,12 @@ class Tool:
                 ps = [x for x in self.S.instances.get(parent, []) if x[0] == sb] or [self.S.labels[parent]]
                 self.cur_ofs, self.cur_ofs_end, _ = align_all(self.A, self.S, parent, pa[0], ps[0], self.ofs_anchors.get(parent, ()))
         funcs = self.funcs.get(base_sid)
+        if not funcs and base_sid + '_hook' in self.func_base:
+            # the hook's C burns from another routine's base (an entry point spelled as a routine)
+            other, f, st, en = self.func_base[base_sid + '_hook']
+            if other in self.syms:
+                base_sid = other; pbase = self.syms[other][0] & 0xffff; self.base_sid = other
+                funcs = self.funcs.get(other)
         if not funcs: self.report.append(f'{name}: no C function with BASE({base_sid})'); return False
         ok = True
         for (a1, l1, k1, t1, o1), (a2, l2, k2, t2, o2) in pairs_:
@@ -328,7 +338,7 @@ def main():
             if m and len(ainst) > 1: ainst = [x for x in ainst if x[0] == int(m.group(1), 16)]
         if not ainst: continue
         ab, aa = ainst[0]; sb, sa = int(where[:2], 16), int(where[3:], 16)
-        tool.auditing = v in ('IDENTICAL', 'JT_ONLY') and bare not in tool.ofs_routines
+        tool.auditing = v in ('IDENTICAL', 'JT_ONLY') and bare not in tool.ofs_routines and n.replace('__', '@') not in tool.ofs_routines
         if tool.process(bare, ab, aa, sb, sa, apply) and v == 'SAME_SHAPE': ok_names.append(n)
     if apply:
         for f, lines in tool.files.items():

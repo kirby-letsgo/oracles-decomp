@@ -78,7 +78,7 @@ def main():
             if 'AGES_ONLY()' in code: ages_only_funcs.add(cur)
             if m and code.count('}') > code.count('{'): oneliner = True
             else: oneliner = False
-            guarded = set(re.findall(r'hook_enabled_at\(gb, SYM\((\w+)\)\)', code)) | set(re.findall(r'\bTAIL\((\w+)\)', code))
+            guarded = set(re.findall(r'hook_(?:enabled_at|is)\(gb, SYM\((\w+)\)', code)) | set(re.findall(r'\bTAIL\((\w+)\)', code))
             for c in CALL.findall(code):
                 if c.endswith('_hook') and c[:-5] in guarded: continue
                 callees[cur].add(c)

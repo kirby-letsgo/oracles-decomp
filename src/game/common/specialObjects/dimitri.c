@@ -87,20 +87,20 @@ void specialObjectCode_dimitri__runState_hook(GB *gb) {
   CYC(b_+18, b_+19); A = mem_rd(gb, DE);
   CYC(b_+19, b_+20); push_effect(gb, b_+20);
   do { uint16_t jt_ = (dimitri_jump_table(gb));
-    if (jt_ == SYM(dimitriState0) && hook_enabled_at(gb, SYM(dimitriState0))) { dimitriState0_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState1) && hook_enabled_at(gb, SYM(dimitriState1))) { dimitriState1_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState2) && hook_enabled_at(gb, SYM(dimitriState2))) { dimitriState2_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState3) && hook_enabled_at(gb, SYM(dimitriState3))) { dimitriState3_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState4) && hook_enabled_at(gb, SYM(dimitriState4))) { dimitriState4_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState5) && hook_enabled_at(gb, SYM(dimitriState5))) { dimitriState5_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState6) && hook_enabled_at(gb, SYM(dimitriState6))) { dimitriState6_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState7) && hook_enabled_at(gb, SYM(dimitriState7))) { dimitriState7_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState8) && hook_enabled_at(gb, SYM(dimitriState8))) { dimitriState8_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState9) && hook_enabled_at(gb, SYM(dimitriState9))) { dimitriState9_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateA) && hook_enabled_at(gb, SYM(dimitriStateA))) { dimitriStateA_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateB) && hook_enabled_at(gb, SYM(dimitriStateB))) { dimitriStateB_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateC) && hook_enabled_at(gb, SYM(dimitriStateC))) { dimitriStateC_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateD) && hook_enabled_at(gb, SYM(dimitriStateD))) { dimitriStateD_hook(gb); return; }
+    if (jt_ == SYM(dimitriState0) && hook_is(gb, SYM(dimitriState0), dimitriState0_hook)) { dimitriState0_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState1) && hook_is(gb, SYM(dimitriState1), dimitriState1_hook)) { dimitriState1_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState2) && hook_is(gb, SYM(dimitriState2), dimitriState2_hook)) { dimitriState2_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState3) && hook_is(gb, SYM(dimitriState3), dimitriState3_hook)) { dimitriState3_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState4) && hook_is(gb, SYM(dimitriState4), dimitriState4_hook)) { dimitriState4_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState5) && hook_is(gb, SYM(dimitriState5), dimitriState5_hook)) { dimitriState5_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState6) && hook_is(gb, SYM(dimitriState6), dimitriState6_hook)) { dimitriState6_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState7) && hook_is(gb, SYM(dimitriState7), dimitriState7_hook)) { dimitriState7_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState8) && hook_is(gb, SYM(dimitriState8), dimitriState8_hook)) { dimitriState8_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState9) && hook_is(gb, SYM(dimitriState9), dimitriState9_hook)) { dimitriState9_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateA) && hook_is(gb, SYM(dimitriStateA), dimitriStateA_hook)) { dimitriStateA_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateB) && hook_is(gb, SYM(dimitriStateB), dimitriStateB_hook)) { dimitriStateB_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateC) && hook_is(gb, SYM(dimitriStateC), dimitriStateC_hook)) { dimitriStateC_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateD) && hook_is(gb, SYM(dimitriStateD), dimitriStateD_hook)) { dimitriStateD_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -230,10 +230,10 @@ void dimitriState2_hook(GB *gb) {
   CYC(b_+1, b_+2); A = mem_rd(gb, DE);
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (dimitri_jump_table(gb));
-    if (jt_ == SYM(dimitriState2Substate0) && hook_enabled_at(gb, SYM(dimitriState2Substate0))) { dimitriState2Substate0_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState2Substate1) && hook_enabled_at(gb, SYM(dimitriState2Substate1))) { dimitriState2Substate1_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState2Substate2) && hook_enabled_at(gb, SYM(dimitriState2Substate2))) { dimitriState2Substate2_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState2Substate3) && hook_enabled_at(gb, SYM(dimitriState2Substate3))) { dimitriState2Substate3_hook(gb); return; }
+    if (jt_ == SYM(dimitriState2Substate0) && hook_is(gb, SYM(dimitriState2Substate0), dimitriState2Substate0_hook)) { dimitriState2Substate0_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState2Substate1) && hook_is(gb, SYM(dimitriState2Substate1), dimitriState2Substate1_hook)) { dimitriState2Substate1_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState2Substate2) && hook_is(gb, SYM(dimitriState2Substate2), dimitriState2Substate2_hook)) { dimitriState2Substate2_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState2Substate3) && hook_is(gb, SYM(dimitriState2Substate3), dimitriState2Substate3_hook)) { dimitriState2Substate3_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -1033,11 +1033,11 @@ void dimitriStateA_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (dimitri_jump_table(gb));
-    if (jt_ == SYM(dimitriStateASubstate0) && hook_enabled_at(gb, SYM(dimitriStateASubstate0))) { dimitriStateASubstate0_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateASubstate1) && hook_enabled_at(gb, SYM(dimitriStateASubstate1))) { dimitriStateASubstate1_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateASubstate2) && hook_enabled_at(gb, SYM(dimitriStateASubstate2))) { dimitriStateASubstate2_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateASubstate3) && hook_enabled_at(gb, SYM(dimitriStateASubstate3))) { dimitriStateASubstate3_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateASubstate4) && hook_enabled_at(gb, SYM(dimitriStateASubstate4))) { dimitriStateASubstate4_hook(gb); return; }
+    if (jt_ == SYM(dimitriStateASubstate0) && hook_is(gb, SYM(dimitriStateASubstate0), dimitriStateASubstate0_hook)) { dimitriStateASubstate0_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateASubstate1) && hook_is(gb, SYM(dimitriStateASubstate1), dimitriStateASubstate1_hook)) { dimitriStateASubstate1_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateASubstate2) && hook_is(gb, SYM(dimitriStateASubstate2), dimitriStateASubstate2_hook)) { dimitriStateASubstate2_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateASubstate3) && hook_is(gb, SYM(dimitriStateASubstate3), dimitriStateASubstate3_hook)) { dimitriStateASubstate3_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateASubstate4) && hook_is(gb, SYM(dimitriStateASubstate4), dimitriStateASubstate4_hook)) { dimitriStateASubstate4_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

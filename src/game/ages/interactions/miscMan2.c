@@ -55,19 +55,19 @@ L_5492:
   if (!(F & FZ)) { CYCT(b_+17, b_+19); goto L_54a2; } CYC(b_+17, b_+19);
   CYC(b_+19, b_+21); A = 0x14;
   CALL_C(b_+21, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+24);
-  if (!(F & FZ)) { CYCT(b_+24, b_+27); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+24, b_+27);
+  if (!(F & FZ)) { CYCT(b_+24, b_+27); if (hook_is(gb, SYM(interactionDelete), interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+24, b_+27);
   CALL_L(b_+27, interactionCode44__initGraphicsIncStateAndLoadScript_hook, b_+30);
 L_54a2:
   CALL_C(b_+30, interactionRunScript_hook, SYM(interactionRunScript), b_+33);
-  if ((F & FC)) { CYCT(b_+33, b_+36); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+33, b_+36);
-  CYC(b_+36, b_+39); if (hook_enabled_at(gb, SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
+  if ((F & FC)) { CYCT(b_+33, b_+36); if (hook_is(gb, SYM(interactionDelete), interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+33, b_+36);
+  CYC(b_+36, b_+39); if (hook_is(gb, SYM(interactionAnimateAsNpc), interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
 L_54ab:
   CALL_C(b_+39, checkInteractionState_hook, SYM(checkInteractionState), b_+42);
   if (!(F & FZ)) { CYCT(b_+42, b_+44); goto L_54b3; } CYC(b_+42, b_+44);
   CALL_L(b_+44, interactionCode44__initGraphicsIncStateAndLoadScript_hook, b_+47);
 L_54b3:
   CALL_C(b_+47, interactionRunScript_hook, SYM(interactionRunScript), b_+50);
-  CYC(b_+50, b_+53); if (hook_enabled_at(gb, SYM(interactionAnimateBasedOnSpeed))) { interactionAnimateBasedOnSpeed_hook(gb); return; } HANDOFF(SYM(interactionAnimateBasedOnSpeed));
+  CYC(b_+50, b_+53); if (hook_is(gb, SYM(interactionAnimateBasedOnSpeed), interactionAnimateBasedOnSpeed_hook)) { interactionAnimateBasedOnSpeed_hook(gb); return; } HANDOFF(SYM(interactionAnimateBasedOnSpeed));
 L_54b9:
   CALL_C(b_+53, checkInteractionState_hook, SYM(checkInteractionState), b_+56);
   if (!(F & FZ)) { CYCT(b_+56, b_+58); goto L_54d9; } CYC(b_+56, b_+58);
@@ -75,7 +75,7 @@ L_54b9:
   CYC(b_+61, b_+63); C = 0x02;
   CYC(b_+63, b_+65); A = 0x06;
   CALL_C(b_+65, checkNpcShouldExistAtGameStage_body_hook, SYM(checkNpcShouldExistAtGameStage_body), b_+68);
-  if (!(F & FZ)) { CYCT(b_+68, b_+71); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+68, b_+71);
+  if (!(F & FZ)) { CYCT(b_+68, b_+71); if (hook_is(gb, SYM(interactionDelete), interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+68, b_+71);
   CYC(b_+71, b_+72); A = B;
   CYC(b_+72, b_+75); SET_HL(SYM(lynnaMan2ScriptTable));
   CYC(b_+75, b_+76); push_effect(gb, b_+76);
@@ -87,14 +87,14 @@ L_54b9:
   CALL_L(b_+82, interactionCode44__initGraphicsAndIncState_hook, b_+85);
 L_54d9:
   CALL_C(b_+85, interactionRunScript_hook, SYM(interactionRunScript), b_+88);
-  CYC(b_+88, b_+91); if (hook_enabled_at(gb, SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
+  CYC(b_+88, b_+91); if (hook_is(gb, SYM(interactionAnimateAsNpc), interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
 L_54df:
   CALL_C(b_+91, checkInteractionState_hook, SYM(checkInteractionState), b_+94);
   if (!(F & FZ)) { CYCT(b_+94, b_+96); goto L_5506; } CYC(b_+94, b_+96);
   CALL_C(b_+96, getGameProgress_2_hook, SYM(getGameProgress_2), b_+99);
   CYC(b_+99, b_+100); A = B;
   CYC(b_+100, b_+102); alu_cp(gb, 0x03);
-  if ((F & FZ)) { CYCT(b_+102, b_+105); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+102, b_+105);
+  if ((F & FZ)) { CYCT(b_+102, b_+105); if (hook_is(gb, SYM(interactionDelete), interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+102, b_+105);
   CYC(b_+105, b_+107); alu_cp(gb, 0x06);
   if (!(F & FZ)) { CYCT(b_+107, b_+109); goto L_54f9; } CYC(b_+107, b_+109);
   CYC(b_+109, b_+112); SET_BC(SYM(interactionCode48__initSubid0d));
@@ -111,7 +111,7 @@ L_54f9:
   CALL_L(b_+127, interactionCode44__initGraphicsAndIncState_hook, b_+130);
 L_5506:
   CALL_C(b_+130, interactionRunScript_hook, SYM(interactionRunScript), b_+133);
-  CYC(b_+133, b_+136); if (hook_enabled_at(gb, SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
+  CYC(b_+133, b_+136); if (hook_is(gb, SYM(interactionAnimateAsNpc), interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
 }
 
 void interactionCode44__subid0_hook(GB *gb) {
@@ -122,12 +122,12 @@ L_5492:
   if (!(F & FZ)) { CYCT(b_+17, b_+19); goto L_54a2; } CYC(b_+17, b_+19);
   CYC(b_+19, b_+21); A = 0x14;
   CALL_C(b_+21, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+24);
-  if (!(F & FZ)) { CYCT(b_+24, b_+27); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+24, b_+27);
+  if (!(F & FZ)) { CYCT(b_+24, b_+27); if (hook_is(gb, SYM(interactionDelete), interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+24, b_+27);
   CALL_L(b_+27, interactionCode44__initGraphicsIncStateAndLoadScript_hook, b_+30);
 L_54a2:
   CALL_C(b_+30, interactionRunScript_hook, SYM(interactionRunScript), b_+33);
-  if ((F & FC)) { CYCT(b_+33, b_+36); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+33, b_+36);
-  CYC(b_+36, b_+39); if (hook_enabled_at(gb, SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
+  if ((F & FC)) { CYCT(b_+33, b_+36); if (hook_is(gb, SYM(interactionDelete), interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+33, b_+36);
+  CYC(b_+36, b_+39); if (hook_is(gb, SYM(interactionAnimateAsNpc), interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
 }
 
 void interactionCode44__subid0__initialized_hook(GB *gb) {
@@ -135,8 +135,8 @@ void interactionCode44__subid0__initialized_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_54a2:
   CALL_C(b_+30, interactionRunScript_hook, SYM(interactionRunScript), b_+33);
-  if ((F & FC)) { CYCT(b_+33, b_+36); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+33, b_+36);
-  CYC(b_+36, b_+39); if (hook_enabled_at(gb, SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
+  if ((F & FC)) { CYCT(b_+33, b_+36); if (hook_is(gb, SYM(interactionDelete), interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+33, b_+36);
+  CYC(b_+36, b_+39); if (hook_is(gb, SYM(interactionAnimateAsNpc), interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
 }
 
 void interactionCode44__subid1_hook(GB *gb) {
@@ -148,7 +148,7 @@ L_54ab:
   CALL_L(b_+44, interactionCode44__initGraphicsIncStateAndLoadScript_hook, b_+47);
 L_54b3:
   CALL_C(b_+47, interactionRunScript_hook, SYM(interactionRunScript), b_+50);
-  CYC(b_+50, b_+53); if (hook_enabled_at(gb, SYM(interactionAnimateBasedOnSpeed))) { interactionAnimateBasedOnSpeed_hook(gb); return; } HANDOFF(SYM(interactionAnimateBasedOnSpeed));
+  CYC(b_+50, b_+53); if (hook_is(gb, SYM(interactionAnimateBasedOnSpeed), interactionAnimateBasedOnSpeed_hook)) { interactionAnimateBasedOnSpeed_hook(gb); return; } HANDOFF(SYM(interactionAnimateBasedOnSpeed));
 }
 
 void interactionCode44__afterCall54b3_hook(GB *gb) {
@@ -156,7 +156,7 @@ void interactionCode44__afterCall54b3_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_54b3:
   CALL_C(b_+47, interactionRunScript_hook, SYM(interactionRunScript), b_+50);
-  CYC(b_+50, b_+53); if (hook_enabled_at(gb, SYM(interactionAnimateBasedOnSpeed))) { interactionAnimateBasedOnSpeed_hook(gb); return; } HANDOFF(SYM(interactionAnimateBasedOnSpeed));
+  CYC(b_+50, b_+53); if (hook_is(gb, SYM(interactionAnimateBasedOnSpeed), interactionAnimateBasedOnSpeed_hook)) { interactionAnimateBasedOnSpeed_hook(gb); return; } HANDOFF(SYM(interactionAnimateBasedOnSpeed));
 }
 
 void interactionCode44__subid2_hook(GB *gb) {
@@ -169,7 +169,7 @@ L_54b9:
   CYC(b_+61, b_+63); C = 0x02;
   CYC(b_+63, b_+65); A = 0x06;
   CALL_C(b_+65, checkNpcShouldExistAtGameStage_body_hook, SYM(checkNpcShouldExistAtGameStage_body), b_+68);
-  if (!(F & FZ)) { CYCT(b_+68, b_+71); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+68, b_+71);
+  if (!(F & FZ)) { CYCT(b_+68, b_+71); if (hook_is(gb, SYM(interactionDelete), interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+68, b_+71);
   CYC(b_+71, b_+72); A = B;
   CYC(b_+72, b_+75); SET_HL(SYM(lynnaMan2ScriptTable));
   CYC(b_+75, b_+76); push_effect(gb, b_+76);
@@ -181,7 +181,7 @@ L_54b9:
   CALL_L(b_+82, interactionCode44__initGraphicsAndIncState_hook, b_+85);
 L_54d9:
   CALL_C(b_+85, interactionRunScript_hook, SYM(interactionRunScript), b_+88);
-  CYC(b_+88, b_+91); if (hook_enabled_at(gb, SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
+  CYC(b_+88, b_+91); if (hook_is(gb, SYM(interactionAnimateAsNpc), interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
 }
 
 void interactionCode44__subid3__initialized_hook(GB *gb) {
@@ -189,7 +189,7 @@ void interactionCode44__subid3__initialized_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_54d9:
   CALL_C(b_+85, interactionRunScript_hook, SYM(interactionRunScript), b_+88);
-  CYC(b_+88, b_+91); if (hook_enabled_at(gb, SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
+  CYC(b_+88, b_+91); if (hook_is(gb, SYM(interactionAnimateAsNpc), interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
 }
 
 void interactionCode44__subid4_hook(GB *gb) {
@@ -201,7 +201,7 @@ L_54df:
   CALL_C(b_+96, getGameProgress_2_hook, SYM(getGameProgress_2), b_+99);
   CYC(b_+99, b_+100); A = B;
   CYC(b_+100, b_+102); alu_cp(gb, 0x03);
-  if ((F & FZ)) { CYCT(b_+102, b_+105); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+102, b_+105);
+  if ((F & FZ)) { CYCT(b_+102, b_+105); if (hook_is(gb, SYM(interactionDelete), interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+102, b_+105);
   CYC(b_+105, b_+107); alu_cp(gb, 0x06);
   if (!(F & FZ)) { CYCT(b_+107, b_+109); goto L_54f9; } CYC(b_+107, b_+109);
   CYC(b_+109, b_+112); SET_BC(SYM(interactionCode48__initSubid0d));
@@ -218,7 +218,7 @@ L_54f9:
   CALL_L(b_+127, interactionCode44__initGraphicsAndIncState_hook, b_+130);
 L_5506:
   CALL_C(b_+130, interactionRunScript_hook, SYM(interactionRunScript), b_+133);
-  CYC(b_+133, b_+136); if (hook_enabled_at(gb, SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
+  CYC(b_+133, b_+136); if (hook_is(gb, SYM(interactionAnimateAsNpc), interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
 }
 
 void interactionCode44__subid4__initialized_hook(GB *gb) {
@@ -226,7 +226,7 @@ void interactionCode44__subid4__initialized_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5506:
   CALL_C(b_+130, interactionRunScript_hook, SYM(interactionRunScript), b_+133);
-  CYC(b_+133, b_+136); if (hook_enabled_at(gb, SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
+  CYC(b_+133, b_+136); if (hook_is(gb, SYM(interactionAnimateAsNpc), interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
 }
 
 void interactionCode44__initGraphicsAndIncState_hook(GB *gb) {
@@ -235,7 +235,7 @@ void interactionCode44__initGraphicsAndIncState_hook(GB *gb) {
 L_550c:
   CALL_C(b_+136, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+139);
   CALL_C(b_+139, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+142);
-  CYC(b_+142, b_+145); if (hook_enabled_at(gb, SYM(interactionIncState))) { interactionIncState_hook(gb); return; } HANDOFF(SYM(interactionIncState));
+  CYC(b_+142, b_+145); if (hook_is(gb, SYM(interactionIncState), interactionIncState_hook)) { interactionIncState_hook(gb); return; } HANDOFF(SYM(interactionIncState));
 }
 
 void interactionCode44__initGraphicsIncStateAndLoadScript_hook(GB *gb) {
@@ -253,7 +253,7 @@ L_5515:
   CYC(b_+159, b_+160); H = mem_rd(gb, HL);
   CYC(b_+160, b_+161); L = A;
   CALL_C(b_+161, interactionSetScript_hook, SYM(interactionSetScript), b_+164);
-  CYC(b_+164, b_+167); if (hook_enabled_at(gb, SYM(interactionIncState))) { interactionIncState_hook(gb); return; } HANDOFF(SYM(interactionIncState));
+  CYC(b_+164, b_+167); if (hook_is(gb, SYM(interactionIncState), interactionIncState_hook)) { interactionIncState_hook(gb); return; } HANDOFF(SYM(interactionIncState));
 }
 
 void getGameProgress_1_hook(GB *gb) {
@@ -358,7 +358,7 @@ void unusedFunc5598_hook(GB *gb) {
   CYC(b_+6, b_+7); H = mem_rd(gb, HL);
   CYC(b_+7, b_+8); L = A;
   CALL_C(b_+8, interactionSetScript_hook, SYM(interactionSetScript), b_+11);
-  CYC(b_+11, b_+14); if (hook_enabled_at(gb, SYM(interactionIncState))) { interactionIncState_hook(gb); return; } HANDOFF(SYM(interactionIncState));
+  CYC(b_+11, b_+14); if (hook_is(gb, SYM(interactionIncState), interactionIncState_hook)) { interactionIncState_hook(gb); return; } HANDOFF(SYM(interactionIncState));
 }
 
 void checkNpcShouldExistAtGameStage_body_hook(GB *gb) {

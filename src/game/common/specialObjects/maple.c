@@ -108,19 +108,19 @@ void specialObjectCode_maple_hook(GB *gb) {
   CYC(b_+5, b_+6); A = mem_rd(gb, DE);
   CYC(b_+6, b_+7); push_effect(gb, b_+7);
   do { uint16_t jt_ = (maple_jump_table(gb));
-    if (jt_ == SYM(mapleState0) && hook_enabled_at(gb, SYM(mapleState0))) { mapleState0_hook(gb); return; }
-    else if (jt_ == SYM(mapleState1) && hook_enabled_at(gb, SYM(mapleState1))) { mapleState1_hook(gb); return; }
-    else if (jt_ == SYM(mapleState2) && hook_enabled_at(gb, SYM(mapleState2))) { mapleState2_hook(gb); return; }
-    else if (jt_ == SYM(mapleState3) && hook_enabled_at(gb, SYM(mapleState3))) { mapleState3_hook(gb); return; }
-    else if (jt_ == SYM(mapleState4) && hook_enabled_at(gb, SYM(mapleState4))) { mapleState4_hook(gb); return; }
-    else if (jt_ == SYM(mapleState5) && hook_enabled_at(gb, SYM(mapleState5))) { mapleState5_hook(gb); return; }
-    else if (jt_ == SYM(mapleState6) && hook_enabled_at(gb, SYM(mapleState6))) { mapleState6_hook(gb); return; }
-    else if (jt_ == SYM(mapleState7) && hook_enabled_at(gb, SYM(mapleState7))) { mapleState7_hook(gb); return; }
-    else if (jt_ == SYM(mapleState8) && hook_enabled_at(gb, SYM(mapleState8))) { mapleState8_hook(gb); return; }
-    else if (jt_ == SYM(mapleState9) && hook_enabled_at(gb, SYM(mapleState9))) { mapleState9_hook(gb); return; }
-    else if (jt_ == SYM(mapleStateA) && hook_enabled_at(gb, SYM(mapleStateA))) { mapleStateA_hook(gb); return; }
-    else if (jt_ == SYM(mapleStateB) && hook_enabled_at(gb, SYM(mapleStateB))) { mapleStateB_hook(gb); return; }
-    else if (jt_ == SYM(mapleStateC) && hook_enabled_at(gb, SYM(mapleStateC))) { mapleStateC_hook(gb); return; }
+    if (jt_ == SYM(mapleState0) && hook_is(gb, SYM(mapleState0), mapleState0_hook)) { mapleState0_hook(gb); return; }
+    else if (jt_ == SYM(mapleState1) && hook_is(gb, SYM(mapleState1), mapleState1_hook)) { mapleState1_hook(gb); return; }
+    else if (jt_ == SYM(mapleState2) && hook_is(gb, SYM(mapleState2), mapleState2_hook)) { mapleState2_hook(gb); return; }
+    else if (jt_ == SYM(mapleState3) && hook_is(gb, SYM(mapleState3), mapleState3_hook)) { mapleState3_hook(gb); return; }
+    else if (jt_ == SYM(mapleState4) && hook_is(gb, SYM(mapleState4), mapleState4_hook)) { mapleState4_hook(gb); return; }
+    else if (jt_ == SYM(mapleState5) && hook_is(gb, SYM(mapleState5), mapleState5_hook)) { mapleState5_hook(gb); return; }
+    else if (jt_ == SYM(mapleState6) && hook_is(gb, SYM(mapleState6), mapleState6_hook)) { mapleState6_hook(gb); return; }
+    else if (jt_ == SYM(mapleState7) && hook_is(gb, SYM(mapleState7), mapleState7_hook)) { mapleState7_hook(gb); return; }
+    else if (jt_ == SYM(mapleState8) && hook_is(gb, SYM(mapleState8), mapleState8_hook)) { mapleState8_hook(gb); return; }
+    else if (jt_ == SYM(mapleState9) && hook_is(gb, SYM(mapleState9), mapleState9_hook)) { mapleState9_hook(gb); return; }
+    else if (jt_ == SYM(mapleStateA) && hook_is(gb, SYM(mapleStateA), mapleStateA_hook)) { mapleStateA_hook(gb); return; }
+    else if (jt_ == SYM(mapleStateB) && hook_is(gb, SYM(mapleStateB), mapleStateB_hook)) { mapleStateB_hook(gb); return; }
+    else if (jt_ == SYM(mapleStateC) && hook_is(gb, SYM(mapleStateC), mapleStateC_hook)) { mapleStateC_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

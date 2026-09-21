@@ -42,8 +42,14 @@ def align(A, S, a, s, anchors=()):
         m = re.match(pat, norm_line)
         return list(m.groups()) if m else []
     ka = [key(A, i, None) for i in ba]; ks = [key(S, i, None) for i in bs]
-    ta = [(i[3], tuple('@' if re.match(r'^@[+-]\d+$', t) else 'imm' if re.match(r'^\$[0-9a-f]{2}$', t) else t for t in op_texts(n[1], i[3]))) for i, n in zip(ba, na)]
-    ts = [(i[3], tuple('@' if re.match(r'^@[+-]\d+$', t) else 'imm' if re.match(r'^\$[0-9a-f]{2}$', t) else t for t in op_texts(n[1], i[3]))) for i, n in zip(bs, ns)]
+    def akey(i, n):
+        # relative targets, 8-bit immediates and 16-bit immediates (`ld rr,nn`: a constant as often
+        # as an address) do not decide the alignment; they come out as constants to fix
+        texts = op_texts(n[1], i[3])
+        kinds = [k for k, v in i[4]]
+        return i[3], tuple('@' if re.match(r'^@[+-]\d+$', t) else 'imm' if re.match(r'^\$[0-9a-f]{2}$', t) or (k == 'any' and not t.startswith('w')) else t for t, k in zip(texts, kinds))
+    ta = [akey(i, n) for i, n in zip(ba, na)]
+    ts = [akey(i, n) for i, n in zip(bs, ns)]
     opcodes = []
     cuts = [(0, 0)] + [(next((i for i, x in enumerate(ba) if x[0] - a[1] >= ao), len(ba)), next((j for j, y in enumerate(bs) if y[0] - s[1] >= so), len(bs))) for ao, so in sorted(anchors)] + [(len(ba), len(bs))]
     for (i0, j0), (i1_, j1_) in zip(cuts, cuts[1:]):

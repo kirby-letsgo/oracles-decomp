@@ -1009,11 +1009,11 @@ void linkUpdateSwimming_hook(GB *gb) {
   CYC(b_+8, b_+10); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 4)));
   CYC(b_+10, b_+11); push_effect(gb, b_+11);
   do { uint16_t jt_ = (link_jump_table(gb));
-    if (jt_ == SYM(initLinkState) && hook_enabled_at(gb, SYM(initLinkState))) { initLinkState_hook(gb); return; }
-    else if (jt_ == SYM(overworldSwimmingState1) && hook_enabled_at(gb, SYM(overworldSwimmingState1))) { overworldSwimmingState1_hook(gb); return; }
-    else if (jt_ == SYM(overworldSwimmingState2) && hook_enabled_at(gb, SYM(overworldSwimmingState2))) { overworldSwimmingState2_hook(gb); return; }
-    else if (jt_ == SYM(overworldSwimmingState3) && hook_enabled_at(gb, SYM(overworldSwimmingState3))) { overworldSwimmingState3_hook(gb); return; }
-    else if (jt_ == SYM(linkUpdateDrowning) && hook_enabled_at(gb, SYM(linkUpdateDrowning))) { linkUpdateDrowning_hook(gb); return; }
+    if (jt_ == SYM(initLinkState) && hook_is(gb, SYM(initLinkState), initLinkState_hook)) { initLinkState_hook(gb); return; }
+    else if (jt_ == SYM(overworldSwimmingState1) && hook_is(gb, SYM(overworldSwimmingState1), overworldSwimmingState1_hook)) { overworldSwimmingState1_hook(gb); return; }
+    else if (jt_ == SYM(overworldSwimmingState2) && hook_is(gb, SYM(overworldSwimmingState2), overworldSwimmingState2_hook)) { overworldSwimmingState2_hook(gb); return; }
+    else if (jt_ == SYM(overworldSwimmingState3) && hook_is(gb, SYM(overworldSwimmingState3), overworldSwimmingState3_hook)) { overworldSwimmingState3_hook(gb); return; }
+    else if (jt_ == SYM(linkUpdateDrowning) && hook_is(gb, SYM(linkUpdateDrowning), linkUpdateDrowning_hook)) { linkUpdateDrowning_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -1466,7 +1466,7 @@ void linkUpdateSwimming_sidescroll_hook(GB *gb) {
     if (jt_ == b_+21) { goto L_5870; }
     else if (jt_ == b_+24) { goto L_5873; }
     else if (jt_ == b_+69) { goto L_58a0; }
-    else if (jt_ == SYM(linkUpdateDrowning) && hook_enabled_at(gb, SYM(linkUpdateDrowning))) { linkUpdateDrowning_hook(gb); return; }
+    else if (jt_ == SYM(linkUpdateDrowning) && hook_is(gb, SYM(linkUpdateDrowning), linkUpdateDrowning_hook)) { linkUpdateDrowning_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 L_5870:
@@ -2137,9 +2137,9 @@ void warpTransition5_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (link_jump_table(gb));
-    if (jt_ == SYM(warpTransition5_00) && hook_enabled_at(gb, SYM(warpTransition5_00))) { warpTransition5_00_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition5_01) && hook_enabled_at(gb, SYM(warpTransition5_01))) { warpTransition5_01_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition5_02) && hook_enabled_at(gb, SYM(warpTransition5_02))) { warpTransition5_02_hook(gb); return; }
+    if (jt_ == SYM(warpTransition5_00) && hook_is(gb, SYM(warpTransition5_00), warpTransition5_00_hook)) { warpTransition5_00_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition5_01) && hook_is(gb, SYM(warpTransition5_01), warpTransition5_01_hook)) { warpTransition5_01_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition5_02) && hook_is(gb, SYM(warpTransition5_02), warpTransition5_02_hook)) { warpTransition5_02_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -2458,20 +2458,20 @@ void linkState0a_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x0f);
   CYC(b_+5, b_+6); push_effect(gb, b_+6);
   do { uint16_t jt_ = (link_jump_table(gb));
-    if (jt_ == SYM(warpTransition0) && hook_enabled_at(gb, SYM(warpTransition0))) { warpTransition0_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition1) && hook_enabled_at(gb, SYM(warpTransition1))) { warpTransition1_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition2) && hook_enabled_at(gb, SYM(warpTransition2))) { warpTransition2_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition3) && hook_enabled_at(gb, SYM(warpTransition3))) { warpTransition3_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition4) && hook_enabled_at(gb, SYM(warpTransition4))) { warpTransition4_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition5) && hook_enabled_at(gb, SYM(warpTransition5))) { warpTransition5_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition6) && hook_enabled_at(gb, SYM(warpTransition6))) { warpTransition6_hook(gb); return; }
-    else if (jt_ == SYM(warpTransitionA) && hook_enabled_at(gb, SYM(warpTransitionA))) { warpTransitionA_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition8) && hook_enabled_at(gb, SYM(warpTransition8))) { warpTransition8_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition9) && hook_enabled_at(gb, SYM(warpTransition9))) { warpTransition9_hook(gb); return; }
-    else if (jt_ == SYM(warpTransitionB) && hook_enabled_at(gb, SYM(warpTransitionB))) { warpTransitionB_hook(gb); return; }
-    else if (jt_ == SYM(warpTransitionC) && hook_enabled_at(gb, SYM(warpTransitionC))) { warpTransitionC_hook(gb); return; }
-    else if (jt_ == SYM(warpTransitionE) && hook_enabled_at(gb, SYM(warpTransitionE))) { warpTransitionE_hook(gb); return; }
-    else if (jt_ == SYM(warpTransitionF) && hook_enabled_at(gb, SYM(warpTransitionF))) { warpTransitionF_hook(gb); return; }
+    if (jt_ == SYM(warpTransition0) && hook_is(gb, SYM(warpTransition0), warpTransition0_hook)) { warpTransition0_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition1) && hook_is(gb, SYM(warpTransition1), warpTransition1_hook)) { warpTransition1_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition2) && hook_is(gb, SYM(warpTransition2), warpTransition2_hook)) { warpTransition2_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition3) && hook_is(gb, SYM(warpTransition3), warpTransition3_hook)) { warpTransition3_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition4) && hook_is(gb, SYM(warpTransition4), warpTransition4_hook)) { warpTransition4_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition5) && hook_is(gb, SYM(warpTransition5), warpTransition5_hook)) { warpTransition5_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition6) && hook_is(gb, SYM(warpTransition6), warpTransition6_hook)) { warpTransition6_hook(gb); return; }
+    else if (jt_ == SYM(warpTransitionA) && hook_is(gb, SYM(warpTransitionA), warpTransitionA_hook)) { warpTransitionA_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition8) && hook_is(gb, SYM(warpTransition8), warpTransition8_hook)) { warpTransition8_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition9) && hook_is(gb, SYM(warpTransition9), warpTransition9_hook)) { warpTransition9_hook(gb); return; }
+    else if (jt_ == SYM(warpTransitionB) && hook_is(gb, SYM(warpTransitionB), warpTransitionB_hook)) { warpTransitionB_hook(gb); return; }
+    else if (jt_ == SYM(warpTransitionC) && hook_is(gb, SYM(warpTransitionC), warpTransitionC_hook)) { warpTransitionC_hook(gb); return; }
+    else if (jt_ == SYM(warpTransitionE) && hook_is(gb, SYM(warpTransitionE), warpTransitionE_hook)) { warpTransitionE_hook(gb); return; }
+    else if (jt_ == SYM(warpTransitionF) && hook_is(gb, SYM(warpTransitionF), warpTransitionF_hook)) { warpTransitionF_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -3606,26 +3606,26 @@ void specialObjectCode_link_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (link_jump_table(gb));
-    if (jt_ == SYM(linkState00) && hook_enabled_at(gb, SYM(linkState00))) { linkState00_hook(gb); return; }
-    else if (jt_ == SYM(linkState01) && hook_enabled_at(gb, SYM(linkState01))) { linkState01_hook(gb); return; }
-    else if (jt_ == SYM(linkState02) && hook_enabled_at(gb, SYM(linkState02))) { linkState02_hook(gb); return; }
-    else if (jt_ == SYM(linkState03) && hook_enabled_at(gb, SYM(linkState03))) { linkState03_hook(gb); return; }
-    else if (jt_ == SYM(linkState04) && hook_enabled_at(gb, SYM(linkState04))) { linkState04_hook(gb); return; }
-    else if (jt_ == SYM(linkState05) && hook_enabled_at(gb, SYM(linkState05))) { linkState05_hook(gb); return; }
-    else if (jt_ == SYM(linkState06) && hook_enabled_at(gb, SYM(linkState06))) { linkState06_hook(gb); return; }
-    else if (jt_ == SYM(linkState07) && hook_enabled_at(gb, SYM(linkState07))) { linkState07_hook(gb); return; }
-    else if (jt_ == SYM(linkState08) && hook_enabled_at(gb, SYM(linkState08))) { linkState08_hook(gb); return; }
-    else if (jt_ == SYM(linkState09) && hook_enabled_at(gb, SYM(linkState09))) { linkState09_hook(gb); return; }
+    if (jt_ == SYM(linkState00) && hook_is(gb, SYM(linkState00), linkState00_hook)) { linkState00_hook(gb); return; }
+    else if (jt_ == SYM(linkState01) && hook_is(gb, SYM(linkState01), linkState01_hook)) { linkState01_hook(gb); return; }
+    else if (jt_ == SYM(linkState02) && hook_is(gb, SYM(linkState02), linkState02_hook)) { linkState02_hook(gb); return; }
+    else if (jt_ == SYM(linkState03) && hook_is(gb, SYM(linkState03), linkState03_hook)) { linkState03_hook(gb); return; }
+    else if (jt_ == SYM(linkState04) && hook_is(gb, SYM(linkState04), linkState04_hook)) { linkState04_hook(gb); return; }
+    else if (jt_ == SYM(linkState05) && hook_is(gb, SYM(linkState05), linkState05_hook)) { linkState05_hook(gb); return; }
+    else if (jt_ == SYM(linkState06) && hook_is(gb, SYM(linkState06), linkState06_hook)) { linkState06_hook(gb); return; }
+    else if (jt_ == SYM(linkState07) && hook_is(gb, SYM(linkState07), linkState07_hook)) { linkState07_hook(gb); return; }
+    else if (jt_ == SYM(linkState08) && hook_is(gb, SYM(linkState08), linkState08_hook)) { linkState08_hook(gb); return; }
+    else if (jt_ == SYM(linkState09) && hook_is(gb, SYM(linkState09), linkState09_hook)) { linkState09_hook(gb); return; }
     else if (jt_ == (SYM(linkState00) + 28)) { linkState0a_hook(gb); return; }
-    else if (jt_ == SYM(linkState0b) && hook_enabled_at(gb, SYM(linkState0b))) { linkState0b_hook(gb); return; }
-    else if (jt_ == SYM(linkState0c) && hook_enabled_at(gb, SYM(linkState0c))) { linkState0c_hook(gb); return; }
-    else if (jt_ == SYM(linkState0d) && hook_enabled_at(gb, SYM(linkState0d))) { linkState0d_hook(gb); return; }
-    else if (jt_ == SYM(linkState0e) && hook_enabled_at(gb, SYM(linkState0e))) { linkState0e_hook(gb); return; }
-    else if (jt_ == SYM(linkState0f) && hook_enabled_at(gb, SYM(linkState0f))) { linkState0f_hook(gb); return; }
-    else if (jt_ == SYM(linkState11) && hook_enabled_at(gb, SYM(linkState11))) { linkState11_hook(gb); return; }
-    else if (jt_ == SYM(linkState12) && hook_enabled_at(gb, SYM(linkState12))) { linkState12_hook(gb); return; }
-    else if (jt_ == SYM(linkState13) && hook_enabled_at(gb, SYM(linkState13))) { linkState13_hook(gb); return; }
-    else if (jt_ == SYM(linkState14) && hook_enabled_at(gb, SYM(linkState14))) { linkState14_hook(gb); return; }
+    else if (jt_ == SYM(linkState0b) && hook_is(gb, SYM(linkState0b), linkState0b_hook)) { linkState0b_hook(gb); return; }
+    else if (jt_ == SYM(linkState0c) && hook_is(gb, SYM(linkState0c), linkState0c_hook)) { linkState0c_hook(gb); return; }
+    else if (jt_ == SYM(linkState0d) && hook_is(gb, SYM(linkState0d), linkState0d_hook)) { linkState0d_hook(gb); return; }
+    else if (jt_ == SYM(linkState0e) && hook_is(gb, SYM(linkState0e), linkState0e_hook)) { linkState0e_hook(gb); return; }
+    else if (jt_ == SYM(linkState0f) && hook_is(gb, SYM(linkState0f), linkState0f_hook)) { linkState0f_hook(gb); return; }
+    else if (jt_ == SYM(linkState11) && hook_is(gb, SYM(linkState11), linkState11_hook)) { linkState11_hook(gb); return; }
+    else if (jt_ == SYM(linkState12) && hook_is(gb, SYM(linkState12), linkState12_hook)) { linkState12_hook(gb); return; }
+    else if (jt_ == SYM(linkState13) && hook_is(gb, SYM(linkState13), linkState13_hook)) { linkState13_hook(gb); return; }
+    else if (jt_ == SYM(linkState14) && hook_is(gb, SYM(linkState14), linkState14_hook)) { linkState14_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -3975,7 +3975,7 @@ void linkState0d_hook(GB *gb) {
   CYC(b_+8, b_+9); push_effect(gb, b_+9);
   do { uint16_t jt_ = (link_jump_table(gb));
     if (jt_ == b_+19) { goto substate0; }
-    else if (jt_ == SYM(updateLinkDamageTaken) && hook_enabled_at(gb, SYM(updateLinkDamageTaken))) { updateLinkDamageTaken_hook(gb); return; }
+    else if (jt_ == SYM(updateLinkDamageTaken) && hook_is(gb, SYM(updateLinkDamageTaken), updateLinkDamageTaken_hook)) { updateLinkDamageTaken_hook(gb); return; }
     else if (jt_ == b_+32) { goto substate2; }
     else if (jt_ == b_+62) { goto substate3; }
     else if (jt_ == b_+81) { goto substate4; }

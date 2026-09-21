@@ -150,17 +150,17 @@ void applyRoomSpecificTileChangesAfterGfxLoad_hook(GB *gb) {
   CYC(b_+O(9), b_+OE(10));
   CYC(b_+O(10), b_+OE(11)); push_effect(gb, b_+OE(11));
   do { uint16_t jt_ = (room_gfx_jump_table(gb));
-    if (jt_ == SYM(roomTileChangesAfterLoad00) && hook_enabled_at(gb, SYM(roomTileChangesAfterLoad00))) { roomTileChangesAfterLoad00_hook(gb); return; }
-    else if (jt_ == SYM(roomTileChangesAfterLoad01) && hook_enabled_at(gb, SYM(roomTileChangesAfterLoad01))) { roomTileChangesAfterLoad01_hook(gb); return; }
-    else if (jt_ == SYM(roomTileChangesAfterLoad02) && hook_enabled_at(gb, SYM(roomTileChangesAfterLoad02))) { roomTileChangesAfterLoad02_hook(gb); return; }
-    else if (jt_ == SYM(roomTileChangesAfterLoad03) && hook_enabled_at(gb, SYM(roomTileChangesAfterLoad03))) { roomTileChangesAfterLoad03_hook(gb); return; }
-    else if (jt_ == SYM(roomTileChangesAfterLoad04) && hook_enabled_at(gb, SYM(roomTileChangesAfterLoad04))) { roomTileChangesAfterLoad04_hook(gb); return; }
-    else if (jt_ == SYM(roomTileChangesAfterLoad05) && hook_enabled_at(gb, SYM(roomTileChangesAfterLoad05))) { roomTileChangesAfterLoad05_hook(gb); return; }
-    else if (jt_ == SYM(roomTileChangesAfterLoad06) && hook_enabled_at(gb, SYM(roomTileChangesAfterLoad06))) { roomTileChangesAfterLoad06_hook(gb); return; }
-    else if (jt_ == SYM(roomTileChangesAfterLoad07) && hook_enabled_at(gb, SYM(roomTileChangesAfterLoad07))) { roomTileChangesAfterLoad07_hook(gb); return; }
-    else if (jt_ == SYM(roomTileChangesAfterLoad08) && hook_enabled_at(gb, SYM(roomTileChangesAfterLoad08))) { roomTileChangesAfterLoad08_hook(gb); return; }
-    else if (jt_ == SYM(roomTileChangesAfterLoad09) && hook_enabled_at(gb, SYM(roomTileChangesAfterLoad09))) { roomTileChangesAfterLoad09_hook(gb); return; }
-    else if (jt_ == SYM(roomTileChangesAfterLoad0a) && hook_enabled_at(gb, SYM(roomTileChangesAfterLoad0a))) { roomTileChangesAfterLoad0a_hook(gb); return; }
+    if (jt_ == SYM(roomTileChangesAfterLoad00) && hook_is(gb, SYM(roomTileChangesAfterLoad00), roomTileChangesAfterLoad00_hook)) { roomTileChangesAfterLoad00_hook(gb); return; }
+    else if (jt_ == SYM(roomTileChangesAfterLoad01) && hook_is(gb, SYM(roomTileChangesAfterLoad01), roomTileChangesAfterLoad01_hook)) { roomTileChangesAfterLoad01_hook(gb); return; }
+    else if (jt_ == SYM(roomTileChangesAfterLoad02) && hook_is(gb, SYM(roomTileChangesAfterLoad02), roomTileChangesAfterLoad02_hook)) { roomTileChangesAfterLoad02_hook(gb); return; }
+    else if (jt_ == SYM(roomTileChangesAfterLoad03) && hook_is(gb, SYM(roomTileChangesAfterLoad03), roomTileChangesAfterLoad03_hook)) { roomTileChangesAfterLoad03_hook(gb); return; }
+    else if (jt_ == SYM(roomTileChangesAfterLoad04) && hook_is(gb, SYM(roomTileChangesAfterLoad04), roomTileChangesAfterLoad04_hook)) { roomTileChangesAfterLoad04_hook(gb); return; }
+    else if (jt_ == SYM(roomTileChangesAfterLoad05) && hook_is(gb, SYM(roomTileChangesAfterLoad05), roomTileChangesAfterLoad05_hook)) { roomTileChangesAfterLoad05_hook(gb); return; }
+    else if (jt_ == SYM(roomTileChangesAfterLoad06) && hook_is(gb, SYM(roomTileChangesAfterLoad06), roomTileChangesAfterLoad06_hook)) { roomTileChangesAfterLoad06_hook(gb); return; }
+    else if (jt_ == SYM(roomTileChangesAfterLoad07) && hook_is(gb, SYM(roomTileChangesAfterLoad07), roomTileChangesAfterLoad07_hook)) { roomTileChangesAfterLoad07_hook(gb); return; }
+    else if (jt_ == SYM(roomTileChangesAfterLoad08) && hook_is(gb, SYM(roomTileChangesAfterLoad08), roomTileChangesAfterLoad08_hook)) { roomTileChangesAfterLoad08_hook(gb); return; }
+    else if (jt_ == SYM(roomTileChangesAfterLoad09) && hook_is(gb, SYM(roomTileChangesAfterLoad09), roomTileChangesAfterLoad09_hook)) { roomTileChangesAfterLoad09_hook(gb); return; }
+    else if (jt_ == SYM(roomTileChangesAfterLoad0a) && hook_is(gb, SYM(roomTileChangesAfterLoad0a), roomTileChangesAfterLoad0a_hook)) { roomTileChangesAfterLoad0a_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

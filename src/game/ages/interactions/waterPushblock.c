@@ -159,7 +159,7 @@ subid0:
     else if (jt_ == b_+55) { goto state1; }
     else if (jt_ == b_+140) { goto state2; }
     else if (jt_ == b_+155) { goto subid0State3; }
-    else if (jt_ == SYM(objectPreventLinkFromPassing) && hook_enabled_at(gb, SYM(objectPreventLinkFromPassing))) { objectPreventLinkFromPassing_hook(gb); return; }
+    else if (jt_ == SYM(objectPreventLinkFromPassing) && hook_is(gb, SYM(objectPreventLinkFromPassing), objectPreventLinkFromPassing_hook)) { objectPreventLinkFromPassing_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
@@ -396,7 +396,7 @@ subid1:
     else if (jt_ == b_+55) { goto state1; }
     else if (jt_ == b_+140) { goto state2; }
     else if (jt_ == b_+465) { goto subid1State3; }
-    else if (jt_ == SYM(objectPreventLinkFromPassing) && hook_enabled_at(gb, SYM(objectPreventLinkFromPassing))) { objectPreventLinkFromPassing_hook(gb); return; }
+    else if (jt_ == SYM(objectPreventLinkFromPassing) && hook_is(gb, SYM(objectPreventLinkFromPassing), objectPreventLinkFromPassing_hook)) { objectPreventLinkFromPassing_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 

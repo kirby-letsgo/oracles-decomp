@@ -344,144 +344,153 @@ check_item:
 void checkUseItems_b06_hook(GB *gb) {
   BASE(checkUseItems_b06);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+1); alu_xor(gb, A);
-  CYC(b_+1, b_+4); W8(wUsingShield) = A;
-  CYC(b_+4, b_+7); SET_HL(wSwordDisabledCounter);
-  CYC(b_+7, b_+8); A = mem_rd(gb, HL);
-  CYC(b_+8, b_+9); alu_or(gb, A);
+  CYC(b_+O(0), b_+OE(1)); alu_xor(gb, A);
+  CYC(b_+O(1), b_+OE(4)); W8(wUsingShield) = A;
+  CYC(b_+O(4), b_+OE(7)); SET_HL(wSwordDisabledCounter);
+  CYC(b_+O(7), b_+OE(8)); A = mem_rd(gb, HL);
+  CYC(b_+O(8), b_+OE(9)); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+9, b_+11);
+    CYCT(b_+O(9), b_+OE(11));
   } else {
-    CYC(b_+9, b_+11);
-    CYC(b_+11, b_+12); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+    CYC(b_+O(9), b_+OE(11));
+    CYC(b_+O(11), b_+OE(12)); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   }
-  CYC(b_+12, b_+15); SET_HL(wLinkUsingItem1);
-  CYC(b_+15, b_+16); A = mem_rd(gb, HL);
-  CYC(b_+16, b_+18); alu_and(gb, 0x0f);
-  CYC(b_+18, b_+19); mem_wr(gb, HL, A);
-  CYC(b_+19, b_+22); A = W8(wcc63);
-  CYC(b_+22, b_+23); alu_rlca(gb);
+  CYC(b_+O(12), b_+OE(15)); SET_HL(wLinkUsingItem1);
+  CYC(b_+O(15), b_+OE(16)); A = mem_rd(gb, HL);
+  CYC(b_+O(16), b_+OE(18)); alu_and(gb, 0x0f);
+  CYC(b_+O(18), b_+OE(19)); mem_wr(gb, HL, A);
+  CYC(b_+O(19), b_+OE(22)); A = W8(wcc63);
+  CYC(b_+O(22), b_+OE(23)); alu_rlca(gb);
   if (F & FC) {
-    CYCT(b_+23, b_+25); goto items_disabled;
+    CYCT(b_+O(23), b_+OE(25)); goto items_disabled;
   }
-  CYC(b_+23, b_+25);
-  CYC(b_+25, b_+28); A = W8(wInShop);
-  CYC(b_+28, b_+29); alu_or(gb, A);
+  CYC(b_+O(23), b_+OE(25));
+  CYC(b_+O(25), b_+OE(28)); A = W8(wInShop);
+  CYC(b_+O(28), b_+OE(29)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+29, b_+32); TAIL(checkShopInput);
+    CYCT(b_+O(29), b_+OE(32)); TAIL(checkShopInput);
   }
-  CYC(b_+29, b_+32);
-  CYC(b_+32, b_+35); A = W8(wcc95);
-  CYC(b_+35, b_+36); B = A;
-  CYC(b_+36, b_+39); A = W8(wLinkInAir);
-  CYC(b_+39, b_+40); alu_or(gb, B);
-  CYC(b_+40, b_+41); alu_rlca(gb);
+  CYC(b_+O(29), b_+OE(32));
+  CYC(b_+O(32), b_+OE(35)); A = W8(wcc95);
+  CYC(b_+O(35), b_+OE(36)); B = A;
+  CYC(b_+O(36), b_+OE(39)); A = W8(wLinkInAir);
+  CYC(b_+O(39), b_+OE(40)); alu_or(gb, B);
+  CYC(b_+O(40), b_+OE(41)); alu_rlca(gb);
   if (F & FC) {
-    CYCT(b_+41, b_+43); goto update_parent_items;
+    CYCT(b_+O(41), b_+OE(43)); goto update_parent_items;
   }
-  CYC(b_+41, b_+43);
-  CYC(b_+43, b_+46); A = W8(wccd8);
-  CYC(b_+46, b_+47); B = A;
-  CYC(b_+47, b_+50); A = W8(wLinkGrabState);
-  CYC(b_+50, b_+51); alu_or(gb, B);
+  CYC(b_+O(41), b_+OE(43));
+  CYC(b_+O(43), b_+OE(46)); A = W8(wccd8);
+  CYC(b_+O(46), b_+OE(47)); B = A;
+  CYC(b_+O(47), b_+OE(50)); A = W8(wLinkGrabState);
+  CYC(b_+O(50), b_+OE(51)); alu_or(gb, B);
   if (!(F & FZ)) {
-    CYCT(b_+51, b_+53); goto update_parent_items;
+    CYCT(b_+O(51), b_+OE(53)); goto update_parent_items;
   }
-  CYC(b_+51, b_+53);
-  CYC(b_+53, b_+56); A = W8(wLinkClimbingVine);
-  CYC(b_+56, b_+57); A = alu_inc8(gb, A);
+  CYC(b_+O(51), b_+OE(53));
+  CYC(b_+O(53), b_+OE(56)); A = W8(wLinkClimbingVine);
+  CYC(b_+O(56), b_+OE(57)); A = alu_inc8(gb, A);
   if (F & FZ) {
-    CYCT(b_+57, b_+59); goto update_parent_items;
+    CYCT(b_+O(57), b_+OE(59)); goto update_parent_items;
   }
-  CYC(b_+57, b_+59);
-  CYC(b_+59, b_+62); A = W8(wTilesetFlags);
-  CYC(b_+62, b_+64); alu_bit(gb, 5, A);
+  CYC(b_+O(57), b_+OE(59));
+  CYC(b_+O(59), b_+OE(62)); A = W8(wTilesetFlags);
+  CYC(b_+O(62), b_+OE(64)); alu_bit(gb, 5, A);
   if (!(F & FZ)) {
-    CYCT(b_+64, b_+66); goto sidescroll;
+    CYCT(b_+O(64), b_+OE(66)); goto sidescroll;
   }
-  CYC(b_+64, b_+66);
-  CYC(b_+66, b_+68); alu_bit(gb, 6, A);
-  if (F & FZ) {
-    CYCT(b_+68, b_+70); goto normal;
+  CYC(b_+O(64), b_+OE(66));
+  if (!game_seasons) {      // underwater: only the A button item (the mermaid suit's)
+    CYC(b_+66, b_+68); alu_bit(gb, 6, A);
+    if (F & FZ) {
+      CYCT(b_+68, b_+70); goto normal;
+    }
+    CYC(b_+68, b_+70);
+    CYC(b_+70, b_+73); SET_DE(0x0189);
+    CALL_C(b_+73, checkItemUsed_hook, SYM(checkItemUsed), b_+76);
+    CYC(b_+76, b_+78); goto update_parent_items;
   }
-  CYC(b_+68, b_+70);
-  CYC(b_+70, b_+73); SET_DE(0x0189);
-  CALL_C(b_+73, checkItemUsed_hook, SYM(checkItemUsed), b_+76);
-  CYC(b_+76, b_+78); goto update_parent_items;
 
 normal:
-  CYC(b_+78, b_+81); A = W8(wLinkSwimmingState);
-  CYC(b_+81, b_+82); alu_or(gb, A);
+  CYC(b_+O(78), b_+OE(81)); A = W8(wLinkSwimmingState);
+  CYC(b_+O(81), b_+OE(82)); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+82, b_+84); goto check_ab;
+    CYCT(b_+O(82), b_+OE(84)); goto check_ab;
   }
-  CYC(b_+82, b_+84);
-  CYC(b_+84, b_+86); goto update_parent_items;
+  CYC(b_+O(82), b_+OE(84));
+  CYC(b_+O(84), b_+OE(86)); goto update_parent_items;
 
 sidescroll:
-  CYC(b_+86, b_+89); A = W8(wLinkSwimmingState);
-  CYC(b_+89, b_+90); alu_or(gb, A);
-  if (F & FZ) {
-    CYCT(b_+90, b_+92); goto check_ab;
+  CYC(b_+O(86), b_+OE(89)); A = W8(wLinkSwimmingState);
+  CYC(b_+O(89), b_+OE(90)); alu_or(gb, A);
+  if (game_seasons) {       // swimming in a sidescrolling area: only the B button item
+    if (!(F & FZ)) { CYCT(b_+S(78), b_+S(80)); goto check_b; }
+    CYC(b_+S(78), b_+S(80));
+    goto check_ab;
   }
-  CYC(b_+90, b_+92);
-  CYC(b_+92, b_+95); SET_HL(w1Link_var2f);
-  CYC(b_+95, b_+97); alu_bit(gb, 7, mem_rd(gb, HL));
-  if (F & FZ) {
-    CYCT(b_+97, b_+99); goto check_b;
+  if (!game_seasons) {      // the mermaid suit allows both buttons while swimming
+    if (F & FZ) {
+      CYCT(b_+90, b_+92); goto check_ab;
+    }
+    CYC(b_+90, b_+92);
+    CYC(b_+92, b_+95); SET_HL(w1Link_var2f);
+    CYC(b_+95, b_+97); alu_bit(gb, 7, mem_rd(gb, HL));
+    if (F & FZ) {
+      CYCT(b_+97, b_+99); goto check_b;
+    }
+    CYC(b_+97, b_+99);
   }
-  CYC(b_+97, b_+99);
 
 check_ab:
-  CYC(b_+99, b_+102); SET_DE(0x0189);
-  CALL_C(b_+102, checkItemUsed_hook, SYM(checkItemUsed), b_+105);
+  CYC(b_+O(99), b_+OE(102)); SET_DE(GV(0x0189, 0x0181));
+  CALL_C(b_+O(102), checkItemUsed_hook, SYM(checkItemUsed), b_+OE(105));
 
 check_b:
-  CYC(b_+105, b_+108); SET_DE(0x0288);
-  CALL_C(b_+108, checkItemUsed_hook, SYM(checkItemUsed), b_+111);
+  CYC(b_+O(105), b_+OE(108)); SET_DE(GV(0x0288, 0x0280));
+  CALL_C(b_+O(108), checkItemUsed_hook, SYM(checkItemUsed), b_+OE(111));
 
 update_parent_items:
-  CYC(b_+111, b_+114); SET_DE(w1ParentItem2);
+  CYC(b_+O(111), b_+OE(114)); SET_DE(w1ParentItem2);
   do {
-    CYC(b_+114, b_+116); E = 0x00;
-    CYC(b_+116, b_+117); A = mem_rd(gb, DE);
-    CYC(b_+117, b_+118); alu_or(gb, A);
+    CYC(b_+O(114), b_+OE(116)); E = 0x00;
+    CYC(b_+O(116), b_+OE(117)); A = mem_rd(gb, DE);
+    CYC(b_+O(117), b_+OE(118)); alu_or(gb, A);
     if (!(F & FZ)) {
-      CALL_C_CC(b_+118, parentItemUpdate_hook, SYM(parentItemUpdate), b_+121);
+      CALL_C_CC(b_+O(118), parentItemUpdate_hook, SYM(parentItemUpdate), b_+OE(121));
     } else {
-      CYC(b_+118, b_+121);
+      CYC(b_+O(118), b_+OE(121));
     }
-    CYC(b_+121, b_+122); D = alu_inc8(gb, D);
-    CYC(b_+122, b_+123); A = D;
-    CYC(b_+123, b_+125); alu_cp(gb, 0xd6);
+    CYC(b_+O(121), b_+OE(122)); D = alu_inc8(gb, D);
+    CYC(b_+O(122), b_+OE(123)); A = D;
+    CYC(b_+O(123), b_+OE(125)); alu_cp(gb, 0xd6);
     if (F & FC) {
-      CYCT(b_+125, b_+127);
+      CYCT(b_+O(125), b_+OE(127));
     } else {
-      CYC(b_+125, b_+127);
+      CYC(b_+O(125), b_+OE(127));
       break;
     }
   } while (1);
-  CYC(b_+127, b_+128); alu_xor(gb, A);
-  CYC(b_+128, b_+130); H8(hActiveObjectType) = A;
-  CYC(b_+130, b_+132); D = 0xd0;
-  CYC(b_+132, b_+133); A = D;
-  CYC(b_+133, b_+135); H8(hActiveObject) = A;
-  CYC(b_+135, b_+136); ret_effect(gb); return;
+  CYC(b_+O(127), b_+OE(128)); alu_xor(gb, A);
+  CYC(b_+O(128), b_+OE(130)); H8(hActiveObjectType) = A;
+  CYC(b_+O(130), b_+OE(132)); D = 0xd0;
+  CYC(b_+O(132), b_+OE(133)); A = D;
+  CYC(b_+O(133), b_+OE(135)); H8(hActiveObject) = A;
+  CYC(b_+O(135), b_+OE(136)); ret_effect(gb); return;
 
 items_disabled:
-  CYC(b_+136, b_+138); alu_cp(gb, 0xff);
+  CYC(b_+O(136), b_+OE(138)); alu_cp(gb, 0xff);
   if (!(F & FZ)) {
-    CYCT(b_+138, b_+140); goto update_parent_items;
+    CYCT(b_+O(138), b_+OE(140)); goto update_parent_items;
   }
-  CYC(b_+138, b_+140);
-  CALL_C(b_+140, clearAllParentItems_body_hook, SYM(clearAllParentItems_body), b_+143);
-  CYC(b_+143, b_+146); SET_HL(w1ParentItem2);
-  CYC(b_+146, b_+149); SET_DE(0xff05);
-  CYC(b_+149, b_+151); C = 0xf1;
-  CALL_C(b_+151, initializeParentItem_hook, SYM(initializeParentItem), b_+154);
-  CYC(b_+154, b_+156); A = 0x80;
-  CYC(b_+156, b_+159); W8(wcc63) = A;
-  CYC(b_+159, b_+161); goto update_parent_items;
+  CYC(b_+O(138), b_+OE(140));
+  CALL_C(b_+O(140), clearAllParentItems_body_hook, SYM(clearAllParentItems_body), b_+OE(143));
+  CYC(b_+O(143), b_+OE(146)); SET_HL(w1ParentItem2);
+  CYC(b_+O(146), b_+OE(149)); SET_DE(0xff05);
+  CYC(b_+O(149), b_+OE(151)); C = 0xf1;
+  CALL_C(b_+O(151), initializeParentItem_hook, SYM(initializeParentItem), b_+OE(154));
+  CYC(b_+O(154), b_+OE(156)); A = 0x80;
+  CYC(b_+O(156), b_+OE(159)); W8(wcc63) = A;
+  CYC(b_+O(159), b_+OE(161)); goto update_parent_items;
 }
 
 void functionCaller_b06_hook(GB *gb) {
@@ -490,9 +499,9 @@ void functionCaller_b06_hook(GB *gb) {
   CYC(b_+0, b_+1); A = C;
   CYC(b_+1, b_+2); parent_item_jump_table_from_rst(gb, b_+2);
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(clearAllParentItems_body) && hook_enabled_at(gb, SYM(clearAllParentItems_body))) { clearAllParentItems_body_hook(gb); return; }
-    else if (jt_ == SYM(updateParentItemButtonAssignment_body) && hook_enabled_at(gb, SYM(updateParentItemButtonAssignment_body))) { updateParentItemButtonAssignment_body_hook(gb); return; }
-    else if (jt_ == SYM(checkUseItems_b06) && hook_enabled_at(gb, SYM(checkUseItems_b06))) { checkUseItems_b06_hook(gb); return; }
+    if (jt_ == SYM(clearAllParentItems_body) && hook_is(gb, SYM(clearAllParentItems_body), clearAllParentItems_body_hook)) { clearAllParentItems_body_hook(gb); return; }
+    else if (jt_ == SYM(updateParentItemButtonAssignment_body) && hook_is(gb, SYM(updateParentItemButtonAssignment_body), updateParentItemButtonAssignment_body_hook)) { updateParentItemButtonAssignment_body_hook(gb); return; }
+    else if (jt_ == SYM(checkUseItems_b06) && hook_is(gb, SYM(checkUseItems_b06), checkUseItems_b06_hook)) { checkUseItems_b06_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

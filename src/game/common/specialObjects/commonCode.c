@@ -285,7 +285,7 @@ increment_standing_counter:
     else if ((!game_seasons && jt_ == b_+257) || (game_seasons && jt_ == b_+S(245))) { goto lava; }
     else if (jt_ == b_+O(288)) { goto conveyor; }
     else if (jt_ == b_+O(327)) { goto current; }
-    else if (jt_ == SYM(dealSpikeDamageToLink) && hook_enabled_at(gb, SYM(dealSpikeDamageToLink))) { dealSpikeDamageToLink_hook(gb); return; }
+    else if (jt_ == SYM(dealSpikeDamageToLink) && hook_is(gb, SYM(dealSpikeDamageToLink), dealSpikeDamageToLink_hook)) { dealSpikeDamageToLink_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 

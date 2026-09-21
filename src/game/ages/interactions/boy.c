@@ -418,7 +418,7 @@ void interactionCode3c_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (boy_jumpTable(gb));
     if (jt_ == b_+8) { goto state0; }
-    else if (jt_ == SYM(boyState1) && hook_enabled_at(gb, SYM(boyState1))) { boyState1_hook(gb); return; }
+    else if (jt_ == SYM(boyState1) && hook_is(gb, SYM(boyState1), boyState1_hook)) { boyState1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -445,21 +445,21 @@ void boyState1_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (boy_jumpTable(gb));
-    if (jt_ == SYM(boyRunSubid00) && hook_enabled_at(gb, SYM(boyRunSubid00))) { boyRunSubid00_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid01) && hook_enabled_at(gb, SYM(boyRunSubid01))) { boyRunSubid01_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid02) && hook_enabled_at(gb, SYM(boyRunSubid02))) { boyRunSubid02_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid03) && hook_enabled_at(gb, SYM(boyRunSubid03))) { boyRunSubid03_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid04) && hook_enabled_at(gb, SYM(boyRunSubid04))) { boyRunSubid04_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid05) && hook_enabled_at(gb, SYM(boyRunSubid05))) { boyRunSubid05_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid06) && hook_enabled_at(gb, SYM(boyRunSubid06))) { boyRunSubid06_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid07) && hook_enabled_at(gb, SYM(boyRunSubid07))) { boyRunSubid07_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid08) && hook_enabled_at(gb, SYM(boyRunSubid08))) { boyRunSubid08_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid0a) && hook_enabled_at(gb, SYM(boyRunSubid0a))) { boyRunSubid0a_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid0b) && hook_enabled_at(gb, SYM(boyRunSubid0b))) { boyRunSubid0b_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid0c) && hook_enabled_at(gb, SYM(boyRunSubid0c))) { boyRunSubid0c_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid0d) && hook_enabled_at(gb, SYM(boyRunSubid0d))) { boyRunSubid0d_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid0e) && hook_enabled_at(gb, SYM(boyRunSubid0e))) { boyRunSubid0e_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid0f) && hook_enabled_at(gb, SYM(boyRunSubid0f))) { boyRunSubid0f_hook(gb); return; }
+    if (jt_ == SYM(boyRunSubid00) && hook_is(gb, SYM(boyRunSubid00), boyRunSubid00_hook)) { boyRunSubid00_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid01) && hook_is(gb, SYM(boyRunSubid01), boyRunSubid01_hook)) { boyRunSubid01_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid02) && hook_is(gb, SYM(boyRunSubid02), boyRunSubid02_hook)) { boyRunSubid02_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid03) && hook_is(gb, SYM(boyRunSubid03), boyRunSubid03_hook)) { boyRunSubid03_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid04) && hook_is(gb, SYM(boyRunSubid04), boyRunSubid04_hook)) { boyRunSubid04_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid05) && hook_is(gb, SYM(boyRunSubid05), boyRunSubid05_hook)) { boyRunSubid05_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid06) && hook_is(gb, SYM(boyRunSubid06), boyRunSubid06_hook)) { boyRunSubid06_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid07) && hook_is(gb, SYM(boyRunSubid07), boyRunSubid07_hook)) { boyRunSubid07_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid08) && hook_is(gb, SYM(boyRunSubid08), boyRunSubid08_hook)) { boyRunSubid08_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid0a) && hook_is(gb, SYM(boyRunSubid0a), boyRunSubid0a_hook)) { boyRunSubid0a_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid0b) && hook_is(gb, SYM(boyRunSubid0b), boyRunSubid0b_hook)) { boyRunSubid0b_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid0c) && hook_is(gb, SYM(boyRunSubid0c), boyRunSubid0c_hook)) { boyRunSubid0c_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid0d) && hook_is(gb, SYM(boyRunSubid0d), boyRunSubid0d_hook)) { boyRunSubid0d_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid0e) && hook_is(gb, SYM(boyRunSubid0e), boyRunSubid0e_hook)) { boyRunSubid0e_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid0f) && hook_is(gb, SYM(boyRunSubid0f), boyRunSubid0f_hook)) { boyRunSubid0f_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -659,7 +659,7 @@ void boyRunSubid04_hook(GB *gb) {
   do { uint16_t jt_ = (boy_jumpTable(gb));
     if (jt_ == b_+10) { goto substate0; }
     else if (jt_ == b_+23) { goto substate1; }
-    else if (jt_ == SYM(boyRunSubid03) && hook_enabled_at(gb, SYM(boyRunSubid03))) { boyRunSubid03_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid03) && hook_is(gb, SYM(boyRunSubid03), boyRunSubid03_hook)) { boyRunSubid03_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -695,8 +695,8 @@ void boyRunSubid05_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (boy_jumpTable(gb));
     if (jt_ == b_+10) { goto substate0; }
-    else if (jt_ == SYM(childSubid05Substate1) && hook_enabled_at(gb, SYM(childSubid05Substate1))) { childSubid05Substate1_hook(gb); return; }
-    else if (jt_ == SYM(childAnimateIfVar39IsZeroAndRunScript) && hook_enabled_at(gb, SYM(childAnimateIfVar39IsZeroAndRunScript))) { childAnimateIfVar39IsZeroAndRunScript_hook(gb); return; }
+    else if (jt_ == SYM(childSubid05Substate1) && hook_is(gb, SYM(childSubid05Substate1), childSubid05Substate1_hook)) { childSubid05Substate1_hook(gb); return; }
+    else if (jt_ == SYM(childAnimateIfVar39IsZeroAndRunScript) && hook_is(gb, SYM(childAnimateIfVar39IsZeroAndRunScript), childAnimateIfVar39IsZeroAndRunScript_hook)) { childAnimateIfVar39IsZeroAndRunScript_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -1104,7 +1104,7 @@ void boyRunSubid0c_hook(GB *gb) {
     else if (jt_ == b_+58) { goto substate2; }
     else if (jt_ == b_+77) { goto substate3; }
     else if (jt_ == b_+86) { goto substate4; }
-    else if (jt_ == SYM(childAnimateIfVar39IsZeroAndRunScript) && hook_enabled_at(gb, SYM(childAnimateIfVar39IsZeroAndRunScript))) { childAnimateIfVar39IsZeroAndRunScript_hook(gb); return; }
+    else if (jt_ == SYM(childAnimateIfVar39IsZeroAndRunScript) && hook_is(gb, SYM(childAnimateIfVar39IsZeroAndRunScript), childAnimateIfVar39IsZeroAndRunScript_hook)) { childAnimateIfVar39IsZeroAndRunScript_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 

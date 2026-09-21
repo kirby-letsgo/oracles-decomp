@@ -38,9 +38,9 @@ void interactionCodeb8_hook(GB *gb) {
   CYC(b_+0, b_+2); E = 0x42;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4); do { uint16_t jt_ = (vire_jump_table(gb));
-    if (jt_ == SYM(vire_subid0) && hook_enabled_at(gb, SYM(vire_subid0))) { vire_subid0_hook(gb); return; }
-    else if (jt_ == SYM(vire_subid1) && hook_enabled_at(gb, SYM(vire_subid1))) { vire_subid1_hook(gb); return; }
-    else if (jt_ == SYM(vire_subid2) && hook_enabled_at(gb, SYM(vire_subid2))) { vire_subid2_hook(gb); return; }
+    if (jt_ == SYM(vire_subid0) && hook_is(gb, SYM(vire_subid0), vire_subid0_hook)) { vire_subid0_hook(gb); return; }
+    else if (jt_ == SYM(vire_subid1) && hook_is(gb, SYM(vire_subid1), vire_subid1_hook)) { vire_subid1_hook(gb); return; }
+    else if (jt_ == SYM(vire_subid2) && hook_is(gb, SYM(vire_subid2), vire_subid2_hook)) { vire_subid2_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

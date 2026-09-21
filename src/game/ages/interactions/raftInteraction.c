@@ -49,7 +49,7 @@ void interactionCodee6_hook(GB *gb) {
   do { uint16_t jt_ = (raftInteraction_jump_table(gb));
     if (jt_ == b_+10) { goto state0; }
     else if (jt_ == b_+78) { goto state1; }
-    else if (jt_ == SYM(interactionDelete) && hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; }
+    else if (jt_ == SYM(interactionDelete) && hook_is(gb, SYM(interactionDelete), interactionDelete_hook)) { interactionDelete_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 

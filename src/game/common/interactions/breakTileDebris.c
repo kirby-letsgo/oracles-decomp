@@ -126,10 +126,10 @@ state0:
   CYC(b_+45, b_+46); A = E;
   CYC(b_+46, b_+47); push_effect(gb, b_+47);
   do { uint16_t jt_ = (breakTileDebris_jumpTable(gb));
-    if (jt_ == SYM(objectSetVisible80) && hook_enabled_at(gb, SYM(objectSetVisible80))) { objectSetVisible80_hook(gb); return; }
-    else if (jt_ == SYM(objectSetVisible81) && hook_enabled_at(gb, SYM(objectSetVisible81))) { objectSetVisible81_hook(gb); return; }
-    else if (jt_ == SYM(objectSetVisible82) && hook_enabled_at(gb, SYM(objectSetVisible82))) { objectSetVisible82_hook(gb); return; }
-    else if (jt_ == SYM(objectSetVisible83) && hook_enabled_at(gb, SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; }
+    if (jt_ == SYM(objectSetVisible80) && hook_is(gb, SYM(objectSetVisible80), objectSetVisible80_hook)) { objectSetVisible80_hook(gb); return; }
+    else if (jt_ == SYM(objectSetVisible81) && hook_is(gb, SYM(objectSetVisible81), objectSetVisible81_hook)) { objectSetVisible81_hook(gb); return; }
+    else if (jt_ == SYM(objectSetVisible82) && hook_is(gb, SYM(objectSetVisible82), objectSetVisible82_hook)) { objectSetVisible82_hook(gb); return; }
+    else if (jt_ == SYM(objectSetVisible83) && hook_is(gb, SYM(objectSetVisible83), objectSetVisible83_hook)) { objectSetVisible83_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 

@@ -448,6 +448,23 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-22 (later): **Seasons runs the whole playthrough in C.** `tools/transliterate.py
+  --game=seasons` generates cycle-exact C for every Seasons routine that has no shared hook
+  (`src/game/seasons/gen_bankXX.c`, 12,501 routines under `s_` names, calling the shared hooks
+  by name and falling back to the interpreter like the Ages transliteration did in milestone
+  2); the Seasons table is the shared list plus the generated one (16,067 hooks). This exposed a
+  rule the direct calls had been getting away with: `CALL_C`/`TAIL`/guarded jump-table branches
+  ran a routine's Ages C whenever *some* hook was enabled at its address, and under Seasons that
+  hook may now be the generated routine; `hook_is(gb, addr, fn)` replaces `hook_enabled_at` at
+  every direct-call site (74 files, `guard_tailcalls.py` emits it) so the C runs only when it
+  is what the table would dispatch. Also: `tools/gen_aliases.py` names labels the two symbol
+  files spell differently (`standardTextStateN` and the like, case aside), `checkUseItems`
+  and `loadRoomLayout@loadLayoutData` by hand, `routine_equiv` rates a multi-bank copy against
+  its paired copy, `gameconst` follows a hook to the base label its C burns from. Playthrough
+  interpreter share: 64.7M instructions this morning, 149k now (two data-labelled code regions
+  and the text/treasure tails). Gates: Ages ctest 9/9, whole movie, verify 30k; Seasons
+  playthrough `--ref-check` and `VERIFY_ALL` 0 failures; lint 0.
+
 - 2026-09-22: merged Fable's step 1 close-out (`56311f5`, `335f36b`, below): one conflict in
   `extra_seasons.sym` (its `romEntry` next to my kernel resume points), generated files
   regenerated, audits clean. Ages 6,849 hooks, Seasons 3,551. Also this session:

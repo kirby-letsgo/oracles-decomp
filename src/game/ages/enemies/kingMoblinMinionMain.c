@@ -58,17 +58,17 @@ void enemyCode56_body_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (kingMoblinMinion_jump_table(gb));
-    if (jt_ == SYM(kingMoblinMinion_state0) && hook_enabled_at(gb, SYM(kingMoblinMinion_state0))) { kingMoblinMinion_state0_hook(gb); return; }
-    else if (jt_ == SYM(enemyAnimate) && hook_enabled_at(gb, SYM(enemyAnimate))) { enemyAnimate_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state2) && hook_enabled_at(gb, SYM(kingMoblinMinion_state2))) { kingMoblinMinion_state2_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state3) && hook_enabled_at(gb, SYM(kingMoblinMinion_state3))) { kingMoblinMinion_state3_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state4) && hook_enabled_at(gb, SYM(kingMoblinMinion_state4))) { kingMoblinMinion_state4_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state5) && hook_enabled_at(gb, SYM(kingMoblinMinion_state5))) { kingMoblinMinion_state5_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state6) && hook_enabled_at(gb, SYM(kingMoblinMinion_state6))) { kingMoblinMinion_state6_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state7) && hook_enabled_at(gb, SYM(kingMoblinMinion_state7))) { kingMoblinMinion_state7_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state8) && hook_enabled_at(gb, SYM(kingMoblinMinion_state8))) { kingMoblinMinion_state8_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state9) && hook_enabled_at(gb, SYM(kingMoblinMinion_state9))) { kingMoblinMinion_state9_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_stateA) && hook_enabled_at(gb, SYM(kingMoblinMinion_stateA))) { kingMoblinMinion_stateA_hook(gb); return; }
+    if (jt_ == SYM(kingMoblinMinion_state0) && hook_is(gb, SYM(kingMoblinMinion_state0), kingMoblinMinion_state0_hook)) { kingMoblinMinion_state0_hook(gb); return; }
+    else if (jt_ == SYM(enemyAnimate) && hook_is(gb, SYM(enemyAnimate), enemyAnimate_hook)) { enemyAnimate_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state2) && hook_is(gb, SYM(kingMoblinMinion_state2), kingMoblinMinion_state2_hook)) { kingMoblinMinion_state2_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state3) && hook_is(gb, SYM(kingMoblinMinion_state3), kingMoblinMinion_state3_hook)) { kingMoblinMinion_state3_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state4) && hook_is(gb, SYM(kingMoblinMinion_state4), kingMoblinMinion_state4_hook)) { kingMoblinMinion_state4_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state5) && hook_is(gb, SYM(kingMoblinMinion_state5), kingMoblinMinion_state5_hook)) { kingMoblinMinion_state5_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state6) && hook_is(gb, SYM(kingMoblinMinion_state6), kingMoblinMinion_state6_hook)) { kingMoblinMinion_state6_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state7) && hook_is(gb, SYM(kingMoblinMinion_state7), kingMoblinMinion_state7_hook)) { kingMoblinMinion_state7_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state8) && hook_is(gb, SYM(kingMoblinMinion_state8), kingMoblinMinion_state8_hook)) { kingMoblinMinion_state8_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state9) && hook_is(gb, SYM(kingMoblinMinion_state9), kingMoblinMinion_state9_hook)) { kingMoblinMinion_state9_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_stateA) && hook_is(gb, SYM(kingMoblinMinion_stateA), kingMoblinMinion_stateA_hook)) { kingMoblinMinion_stateA_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

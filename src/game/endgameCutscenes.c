@@ -2700,8 +2700,8 @@ void endgameCutsceneHandler_09_hook(GB *gb) {
   CYC(b_+3, b_+4); A = mem_rd(gb, DE);
   CYC(b_+4, b_+5); push_effect(gb, b_+5);
   do { uint16_t jt_ = (endgame_jump_table(gb));
-    if (jt_ == SYM(endgameCutsceneHandler_09_stage0) && hook_enabled_at(gb, SYM(endgameCutsceneHandler_09_stage0))) { endgameCutsceneHandler_09_stage0_hook(gb); return; }
-    else if (jt_ == SYM(endgameCutsceneHandler_09_stage1) && hook_enabled_at(gb, SYM(endgameCutsceneHandler_09_stage1))) { endgameCutsceneHandler_09_stage1_hook(gb); return; }
+    if (jt_ == SYM(endgameCutsceneHandler_09_stage0) && hook_is(gb, SYM(endgameCutsceneHandler_09_stage0), endgameCutsceneHandler_09_stage0_hook)) { endgameCutsceneHandler_09_stage0_hook(gb); return; }
+    else if (jt_ == SYM(endgameCutsceneHandler_09_stage1) && hook_is(gb, SYM(endgameCutsceneHandler_09_stage1), endgameCutsceneHandler_09_stage1_hook)) { endgameCutsceneHandler_09_stage1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

@@ -254,10 +254,10 @@ void timewarp_subid0_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (timewarp_jump_table(gb));
-    if (jt_ == SYM(timewarp_common_state0) && hook_enabled_at(gb, SYM(timewarp_common_state0))) { timewarp_common_state0_hook(gb); return; }
-    else if (jt_ == SYM(timewarp_subid0_state1) && hook_enabled_at(gb, SYM(timewarp_subid0_state1))) { timewarp_subid0_state1_hook(gb); return; }
-    else if (jt_ == SYM(timewarp_subid0_state2) && hook_enabled_at(gb, SYM(timewarp_subid0_state2))) { timewarp_subid0_state2_hook(gb); return; }
-    else if (jt_ == SYM(timewarp_animateUntilFinished) && hook_enabled_at(gb, SYM(timewarp_animateUntilFinished))) { timewarp_animateUntilFinished_hook(gb); return; }
+    if (jt_ == SYM(timewarp_common_state0) && hook_is(gb, SYM(timewarp_common_state0), timewarp_common_state0_hook)) { timewarp_common_state0_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid0_state1) && hook_is(gb, SYM(timewarp_subid0_state1), timewarp_subid0_state1_hook)) { timewarp_subid0_state1_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid0_state2) && hook_is(gb, SYM(timewarp_subid0_state2), timewarp_subid0_state2_hook)) { timewarp_subid0_state2_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_animateUntilFinished) && hook_is(gb, SYM(timewarp_animateUntilFinished), timewarp_animateUntilFinished_hook)) { timewarp_animateUntilFinished_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -269,9 +269,9 @@ void timewarp_subid1_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (timewarp_jump_table(gb));
-    if (jt_ == SYM(timewarp_common_state0) && hook_enabled_at(gb, SYM(timewarp_common_state0))) { timewarp_common_state0_hook(gb); return; }
-    else if (jt_ == SYM(timewarp_subid1_state1) && hook_enabled_at(gb, SYM(timewarp_subid1_state1))) { timewarp_subid1_state1_hook(gb); return; }
-    else if (jt_ == SYM(timewarp_animateUntilFinished) && hook_enabled_at(gb, SYM(timewarp_animateUntilFinished))) { timewarp_animateUntilFinished_hook(gb); return; }
+    if (jt_ == SYM(timewarp_common_state0) && hook_is(gb, SYM(timewarp_common_state0), timewarp_common_state0_hook)) { timewarp_common_state0_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid1_state1) && hook_is(gb, SYM(timewarp_subid1_state1), timewarp_subid1_state1_hook)) { timewarp_subid1_state1_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_animateUntilFinished) && hook_is(gb, SYM(timewarp_animateUntilFinished), timewarp_animateUntilFinished_hook)) { timewarp_animateUntilFinished_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -333,11 +333,11 @@ void timewarp_subid3_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (timewarp_jump_table(gb));
-    if (jt_ == SYM(itemwarp_subid3Or4_state0) && hook_enabled_at(gb, SYM(itemwarp_subid3Or4_state0))) { itemwarp_subid3Or4_state0_hook(gb); return; }
-    else if (jt_ == SYM(timewarp_subid3_state1) && hook_enabled_at(gb, SYM(timewarp_subid3_state1))) { timewarp_subid3_state1_hook(gb); return; }
-    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
-    else if (jt_ == SYM(timewarp_subid3Or4_state3) && hook_enabled_at(gb, SYM(timewarp_subid3Or4_state3))) { timewarp_subid3Or4_state3_hook(gb); return; }
-    else if (jt_ == SYM(timewarp_subid3Or4_state4) && hook_enabled_at(gb, SYM(timewarp_subid3Or4_state4))) { timewarp_subid3Or4_state4_hook(gb); return; }
+    if (jt_ == SYM(itemwarp_subid3Or4_state0) && hook_is(gb, SYM(itemwarp_subid3Or4_state0), itemwarp_subid3Or4_state0_hook)) { itemwarp_subid3Or4_state0_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid3_state1) && hook_is(gb, SYM(timewarp_subid3_state1), timewarp_subid3_state1_hook)) { timewarp_subid3_state1_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_is(gb, SYM(interactionAnimate), interactionAnimate_hook)) { interactionAnimate_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid3Or4_state3) && hook_is(gb, SYM(timewarp_subid3Or4_state3), timewarp_subid3Or4_state3_hook)) { timewarp_subid3Or4_state3_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid3Or4_state4) && hook_is(gb, SYM(timewarp_subid3Or4_state4), timewarp_subid3Or4_state4_hook)) { timewarp_subid3Or4_state4_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -349,10 +349,10 @@ void timewarp_subid4_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (timewarp_jump_table(gb));
-    if (jt_ == SYM(itemwarp_subid3Or4_state0) && hook_enabled_at(gb, SYM(itemwarp_subid3Or4_state0))) { itemwarp_subid3Or4_state0_hook(gb); return; }
-    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
-    else if (jt_ == SYM(timewarp_subid3Or4_state3) && hook_enabled_at(gb, SYM(timewarp_subid3Or4_state3))) { timewarp_subid3Or4_state3_hook(gb); return; }
-    else if (jt_ == SYM(timewarp_subid3Or4_state4) && hook_enabled_at(gb, SYM(timewarp_subid3Or4_state4))) { timewarp_subid3Or4_state4_hook(gb); return; }
+    if (jt_ == SYM(itemwarp_subid3Or4_state0) && hook_is(gb, SYM(itemwarp_subid3Or4_state0), itemwarp_subid3Or4_state0_hook)) { itemwarp_subid3Or4_state0_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_is(gb, SYM(interactionAnimate), interactionAnimate_hook)) { interactionAnimate_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid3Or4_state3) && hook_is(gb, SYM(timewarp_subid3Or4_state3), timewarp_subid3Or4_state3_hook)) { timewarp_subid3Or4_state3_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid3Or4_state4) && hook_is(gb, SYM(timewarp_subid3Or4_state4), timewarp_subid3Or4_state4_hook)) { timewarp_subid3Or4_state4_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -364,11 +364,11 @@ void interactionCodedd_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (timewarp_jump_table(gb));
-    if (jt_ == SYM(timewarp_subid0) && hook_enabled_at(gb, SYM(timewarp_subid0))) { timewarp_subid0_hook(gb); return; }
-    else if (jt_ == SYM(timewarp_subid1) && hook_enabled_at(gb, SYM(timewarp_subid1))) { timewarp_subid1_hook(gb); return; }
-    else if (jt_ == SYM(timewarp_subid2) && hook_enabled_at(gb, SYM(timewarp_subid2))) { timewarp_subid2_hook(gb); return; }
-    else if (jt_ == SYM(timewarp_subid3) && hook_enabled_at(gb, SYM(timewarp_subid3))) { timewarp_subid3_hook(gb); return; }
-    else if (jt_ == SYM(timewarp_subid4) && hook_enabled_at(gb, SYM(timewarp_subid4))) { timewarp_subid4_hook(gb); return; }
+    if (jt_ == SYM(timewarp_subid0) && hook_is(gb, SYM(timewarp_subid0), timewarp_subid0_hook)) { timewarp_subid0_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid1) && hook_is(gb, SYM(timewarp_subid1), timewarp_subid1_hook)) { timewarp_subid1_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid2) && hook_is(gb, SYM(timewarp_subid2), timewarp_subid2_hook)) { timewarp_subid2_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid3) && hook_is(gb, SYM(timewarp_subid3), timewarp_subid3_hook)) { timewarp_subid3_hook(gb); return; }
+    else if (jt_ == SYM(timewarp_subid4) && hook_is(gb, SYM(timewarp_subid4), timewarp_subid4_hook)) { timewarp_subid4_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

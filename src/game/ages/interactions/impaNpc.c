@@ -58,10 +58,10 @@ void interactionCode4f_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (impa_npc_jump_table(gb));
-    if (jt_ == SYM(impaNpc_subid00) && hook_enabled_at(gb, SYM(impaNpc_subid00))) { impaNpc_subid00_hook(gb); return; }
-    else if (jt_ == SYM(impaNpc_subid01) && hook_enabled_at(gb, SYM(impaNpc_subid01))) { impaNpc_subid01_hook(gb); return; }
-    else if (jt_ == SYM(impaNpc_subid02) && hook_enabled_at(gb, SYM(impaNpc_subid02))) { impaNpc_subid02_hook(gb); return; }
-    else if (jt_ == SYM(impaNpc_subid03) && hook_enabled_at(gb, SYM(impaNpc_subid03))) { impaNpc_subid03_hook(gb); return; }
+    if (jt_ == SYM(impaNpc_subid00) && hook_is(gb, SYM(impaNpc_subid00), impaNpc_subid00_hook)) { impaNpc_subid00_hook(gb); return; }
+    else if (jt_ == SYM(impaNpc_subid01) && hook_is(gb, SYM(impaNpc_subid01), impaNpc_subid01_hook)) { impaNpc_subid01_hook(gb); return; }
+    else if (jt_ == SYM(impaNpc_subid02) && hook_is(gb, SYM(impaNpc_subid02), impaNpc_subid02_hook)) { impaNpc_subid02_hook(gb); return; }
+    else if (jt_ == SYM(impaNpc_subid03) && hook_is(gb, SYM(impaNpc_subid03), impaNpc_subid03_hook)) { impaNpc_subid03_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

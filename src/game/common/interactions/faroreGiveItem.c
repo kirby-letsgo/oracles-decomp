@@ -406,9 +406,9 @@ void interactionCoded9_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (interactiond9_jump_table(gb));
-    if (jt_ == SYM(interactiond9_state0) && hook_enabled_at(gb, SYM(interactiond9_state0))) { interactiond9_state0_hook(gb); return; }
-    else if (jt_ == SYM(interactiond9_state1) && hook_enabled_at(gb, SYM(interactiond9_state1))) { interactiond9_state1_hook(gb); return; }
-    else if (jt_ == SYM(interactiond9_state2) && hook_enabled_at(gb, SYM(interactiond9_state2))) { interactiond9_state2_hook(gb); return; }
+    if (jt_ == SYM(interactiond9_state0) && hook_is(gb, SYM(interactiond9_state0), interactiond9_state0_hook)) { interactiond9_state0_hook(gb); return; }
+    else if (jt_ == SYM(interactiond9_state1) && hook_is(gb, SYM(interactiond9_state1), interactiond9_state1_hook)) { interactiond9_state1_hook(gb); return; }
+    else if (jt_ == SYM(interactiond9_state2) && hook_is(gb, SYM(interactiond9_state2), interactiond9_state2_hook)) { interactiond9_state2_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

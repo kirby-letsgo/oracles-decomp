@@ -37,17 +37,17 @@ void parseGivenObjectData_b12_hook(GB *gb) {
   burn_rom(gb, 0, 0x0009, 0x000a, false); L = A;
   burn_rom(gb, 0, 0x000a, 0x000b, false);
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(objectDataOp0) && hook_enabled_at(gb, SYM(objectDataOp0))) { objectDataOp0_hook(gb); return; }
-    else if (jt_ == SYM(objectDataOp1) && hook_enabled_at(gb, SYM(objectDataOp1))) { objectDataOp1_hook(gb); return; }
-    else if (jt_ == SYM(objectDataOp2) && hook_enabled_at(gb, SYM(objectDataOp2))) { objectDataOp2_hook(gb); return; }
-    else if (jt_ == SYM(objectDataOp3) && hook_enabled_at(gb, SYM(objectDataOp3))) { objectDataOp3_hook(gb); return; }
-    else if (jt_ == SYM(objectDataOp4) && hook_enabled_at(gb, SYM(objectDataOp4))) { objectDataOp4_hook(gb); return; }
-    else if (jt_ == SYM(objectDataOp5) && hook_enabled_at(gb, SYM(objectDataOp5))) { objectDataOp5_hook(gb); return; }
-    else if (jt_ == SYM(objectDataOp6) && hook_enabled_at(gb, SYM(objectDataOp6))) { objectDataOp6_hook(gb); return; }
-    else if (jt_ == SYM(objectDataOp7) && hook_enabled_at(gb, SYM(objectDataOp7))) { objectDataOp7_hook(gb); return; }
-    else if (jt_ == SYM(objectDataOp8) && hook_enabled_at(gb, SYM(objectDataOp8))) { objectDataOp8_hook(gb); return; }
-    else if (jt_ == SYM(objectDataOp9) && hook_enabled_at(gb, SYM(objectDataOp9))) { objectDataOp9_hook(gb); return; }
-    else if (jt_ == SYM(objectDataOpA) && hook_enabled_at(gb, SYM(objectDataOpA))) { objectDataOpA_hook(gb); return; }
+    if (jt_ == SYM(objectDataOp0) && hook_is(gb, SYM(objectDataOp0), objectDataOp0_hook)) { objectDataOp0_hook(gb); return; }
+    else if (jt_ == SYM(objectDataOp1) && hook_is(gb, SYM(objectDataOp1), objectDataOp1_hook)) { objectDataOp1_hook(gb); return; }
+    else if (jt_ == SYM(objectDataOp2) && hook_is(gb, SYM(objectDataOp2), objectDataOp2_hook)) { objectDataOp2_hook(gb); return; }
+    else if (jt_ == SYM(objectDataOp3) && hook_is(gb, SYM(objectDataOp3), objectDataOp3_hook)) { objectDataOp3_hook(gb); return; }
+    else if (jt_ == SYM(objectDataOp4) && hook_is(gb, SYM(objectDataOp4), objectDataOp4_hook)) { objectDataOp4_hook(gb); return; }
+    else if (jt_ == SYM(objectDataOp5) && hook_is(gb, SYM(objectDataOp5), objectDataOp5_hook)) { objectDataOp5_hook(gb); return; }
+    else if (jt_ == SYM(objectDataOp6) && hook_is(gb, SYM(objectDataOp6), objectDataOp6_hook)) { objectDataOp6_hook(gb); return; }
+    else if (jt_ == SYM(objectDataOp7) && hook_is(gb, SYM(objectDataOp7), objectDataOp7_hook)) { objectDataOp7_hook(gb); return; }
+    else if (jt_ == SYM(objectDataOp8) && hook_is(gb, SYM(objectDataOp8), objectDataOp8_hook)) { objectDataOp8_hook(gb); return; }
+    else if (jt_ == SYM(objectDataOp9) && hook_is(gb, SYM(objectDataOp9), objectDataOp9_hook)) { objectDataOp9_hook(gb); return; }
+    else if (jt_ == SYM(objectDataOpA) && hook_is(gb, SYM(objectDataOpA), objectDataOpA_hook)) { objectDataOpA_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -542,9 +542,9 @@ static void object_data_op9_allocate(GB *gb) {
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
   do { uint16_t jt_ = (object_loading_jump_table(gb));
-    if (jt_ == SYM(getFreeInteractionSlot) && hook_enabled_at(gb, SYM(getFreeInteractionSlot))) { getFreeInteractionSlot_hook(gb); return; }
-    else if (jt_ == SYM(getFreeEnemySlot_uncounted) && hook_enabled_at(gb, SYM(getFreeEnemySlot_uncounted))) { getFreeEnemySlot_uncounted_hook(gb); return; }
-    else if (jt_ == SYM(getFreePartSlot) && hook_enabled_at(gb, SYM(getFreePartSlot))) { getFreePartSlot_hook(gb); return; }
+    if (jt_ == SYM(getFreeInteractionSlot) && hook_is(gb, SYM(getFreeInteractionSlot), getFreeInteractionSlot_hook)) { getFreeInteractionSlot_hook(gb); return; }
+    else if (jt_ == SYM(getFreeEnemySlot_uncounted) && hook_is(gb, SYM(getFreeEnemySlot_uncounted), getFreeEnemySlot_uncounted_hook)) { getFreeEnemySlot_uncounted_hook(gb); return; }
+    else if (jt_ == SYM(getFreePartSlot) && hook_is(gb, SYM(getFreePartSlot), getFreePartSlot_hook)) { getFreePartSlot_hook(gb); return; }
     else { HANDOFF(jt_); }
   } while (0);
 }

@@ -175,7 +175,7 @@ state1:
     else if (jt_ == b_+125) { goto substate3; }
     else if (jt_ == b_+148) { goto substate4; }
     else if (jt_ == b_+162) { goto substate5; }
-    else if (jt_ == SYM(linkCutscene0_substate6) && hook_enabled_at(gb, SYM(linkCutscene0_substate6))) { linkCutscene0_substate6_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene0_substate6) && hook_is(gb, SYM(linkCutscene0_substate6), linkCutscene0_substate6_hook)) { linkCutscene0_substate6_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
@@ -744,7 +744,7 @@ state1:
     else if (jt_ == b_+72) { goto substate1; }
     else if (jt_ == b_+93) { goto substate2; }
     else if (jt_ == b_+110) { goto substate3; }
-    else if (jt_ == SYM(linkCutsceneRet) && hook_enabled_at(gb, SYM(linkCutsceneRet))) { linkCutsceneRet_hook(gb); return; }
+    else if (jt_ == SYM(linkCutsceneRet) && hook_is(gb, SYM(linkCutsceneRet), linkCutsceneRet_hook)) { linkCutsceneRet_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
@@ -1526,7 +1526,7 @@ void linkCutsceneC_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (link_cutscene_jump_table(gb));
     if (jt_ == b_+8) { goto state0; }
-    else if (jt_ == SYM(linkCutsceneRet) && hook_enabled_at(gb, SYM(linkCutsceneRet))) { linkCutsceneRet_hook(gb); return; }
+    else if (jt_ == SYM(linkCutsceneRet) && hook_is(gb, SYM(linkCutsceneRet), linkCutsceneRet_hook)) { linkCutsceneRet_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
@@ -1549,19 +1549,19 @@ void specialObjectCode_linkInCutscene_b06_hook(GB *gb) {
   CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
   CYC(b_+O(3), b_+OE(4)); push_effect(gb, b_+OE(4));
   do { uint16_t jt_ = (link_cutscene_jump_table(gb));
-    if (jt_ == SYM(linkCutscene0) && hook_enabled_at(gb, SYM(linkCutscene0))) { linkCutscene0_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene1) && hook_enabled_at(gb, SYM(linkCutscene1))) { linkCutscene1_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene2) && hook_enabled_at(gb, SYM(linkCutscene2))) { linkCutscene2_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene3) && hook_enabled_at(gb, SYM(linkCutscene3))) { linkCutscene3_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene4) && hook_enabled_at(gb, SYM(linkCutscene4))) { linkCutscene4_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene5) && hook_enabled_at(gb, SYM(linkCutscene5))) { linkCutscene5_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene6) && hook_enabled_at(gb, SYM(linkCutscene6))) { linkCutscene6_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene7) && hook_enabled_at(gb, SYM(linkCutscene7))) { linkCutscene7_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene8) && hook_enabled_at(gb, SYM(linkCutscene8))) { linkCutscene8_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene9) && hook_enabled_at(gb, SYM(linkCutscene9))) { linkCutscene9_hook(gb); return; }
-    else if (jt_ == SYM(linkCutsceneA) && hook_enabled_at(gb, SYM(linkCutsceneA))) { linkCutsceneA_hook(gb); return; }
-    else if (jt_ == SYM(linkCutsceneB) && hook_enabled_at(gb, SYM(linkCutsceneB))) { linkCutsceneB_hook(gb); return; }
-    else if (jt_ == SYM(linkCutsceneC) && hook_enabled_at(gb, SYM(linkCutsceneC))) { linkCutsceneC_hook(gb); return; }
+    if (jt_ == SYM(linkCutscene0) && hook_is(gb, SYM(linkCutscene0), linkCutscene0_hook)) { linkCutscene0_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene1) && hook_is(gb, SYM(linkCutscene1), linkCutscene1_hook)) { linkCutscene1_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene2) && hook_is(gb, SYM(linkCutscene2), linkCutscene2_hook)) { linkCutscene2_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene3) && hook_is(gb, SYM(linkCutscene3), linkCutscene3_hook)) { linkCutscene3_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene4) && hook_is(gb, SYM(linkCutscene4), linkCutscene4_hook)) { linkCutscene4_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene5) && hook_is(gb, SYM(linkCutscene5), linkCutscene5_hook)) { linkCutscene5_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene6) && hook_is(gb, SYM(linkCutscene6), linkCutscene6_hook)) { linkCutscene6_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene7) && hook_is(gb, SYM(linkCutscene7), linkCutscene7_hook)) { linkCutscene7_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene8) && hook_is(gb, SYM(linkCutscene8), linkCutscene8_hook)) { linkCutscene8_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene9) && hook_is(gb, SYM(linkCutscene9), linkCutscene9_hook)) { linkCutscene9_hook(gb); return; }
+    else if (jt_ == SYM(linkCutsceneA) && hook_is(gb, SYM(linkCutsceneA), linkCutsceneA_hook)) { linkCutsceneA_hook(gb); return; }
+    else if (jt_ == SYM(linkCutsceneB) && hook_is(gb, SYM(linkCutsceneB), linkCutsceneB_hook)) { linkCutsceneB_hook(gb); return; }
+    else if (jt_ == SYM(linkCutsceneC) && hook_is(gb, SYM(linkCutsceneC), linkCutsceneC_hook)) { linkCutsceneC_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

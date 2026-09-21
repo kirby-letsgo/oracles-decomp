@@ -52,11 +52,11 @@ void interactionCode4e_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (subrosian_jump_table(gb));
-    if (jt_ == SYM(subrosian_subid00) && hook_enabled_at(gb, SYM(subrosian_subid00))) { subrosian_subid00_hook(gb); return; }
-    else if (jt_ == SYM(subrosian_subid01) && hook_enabled_at(gb, SYM(subrosian_subid01))) { subrosian_subid01_hook(gb); return; }
-    else if (jt_ == SYM(subrosian_subid02) && hook_enabled_at(gb, SYM(subrosian_subid02))) { subrosian_subid02_hook(gb); return; }
-    else if (jt_ == SYM(subrosian_subid03) && hook_enabled_at(gb, SYM(subrosian_subid03))) { subrosian_subid03_hook(gb); return; }
-    else if (jt_ == SYM(subrosian_subid04) && hook_enabled_at(gb, SYM(subrosian_subid04))) { subrosian_subid04_hook(gb); return; }
+    if (jt_ == SYM(subrosian_subid00) && hook_is(gb, SYM(subrosian_subid00), subrosian_subid00_hook)) { subrosian_subid00_hook(gb); return; }
+    else if (jt_ == SYM(subrosian_subid01) && hook_is(gb, SYM(subrosian_subid01), subrosian_subid01_hook)) { subrosian_subid01_hook(gb); return; }
+    else if (jt_ == SYM(subrosian_subid02) && hook_is(gb, SYM(subrosian_subid02), subrosian_subid02_hook)) { subrosian_subid02_hook(gb); return; }
+    else if (jt_ == SYM(subrosian_subid03) && hook_is(gb, SYM(subrosian_subid03), subrosian_subid03_hook)) { subrosian_subid03_hook(gb); return; }
+    else if (jt_ == SYM(subrosian_subid04) && hook_is(gb, SYM(subrosian_subid04), subrosian_subid04_hook)) { subrosian_subid04_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

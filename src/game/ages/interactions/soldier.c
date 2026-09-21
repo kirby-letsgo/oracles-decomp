@@ -70,18 +70,18 @@ void interactionCode40_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (soldier_jump_table(gb));
-    if (jt_ == SYM(soldierSubid00) && hook_enabled_at(gb, SYM(soldierSubid00))) { soldierSubid00_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid02) && hook_enabled_at(gb, SYM(soldierSubid02))) { soldierSubid02_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid03) && hook_enabled_at(gb, SYM(soldierSubid03))) { soldierSubid03_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid04) && hook_enabled_at(gb, SYM(soldierSubid04))) { soldierSubid04_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid05) && hook_enabled_at(gb, SYM(soldierSubid05))) { soldierSubid05_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid06) && hook_enabled_at(gb, SYM(soldierSubid06))) { soldierSubid06_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid07) && hook_enabled_at(gb, SYM(soldierSubid07))) { soldierSubid07_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid08) && hook_enabled_at(gb, SYM(soldierSubid08))) { soldierSubid08_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid0a) && hook_enabled_at(gb, SYM(soldierSubid0a))) { soldierSubid0a_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid0b) && hook_enabled_at(gb, SYM(soldierSubid0b))) { soldierSubid0b_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid0c) && hook_enabled_at(gb, SYM(soldierSubid0c))) { soldierSubid0c_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid0d) && hook_enabled_at(gb, SYM(soldierSubid0d))) { soldierSubid0d_hook(gb); return; }
+    if (jt_ == SYM(soldierSubid00) && hook_is(gb, SYM(soldierSubid00), soldierSubid00_hook)) { soldierSubid00_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid02) && hook_is(gb, SYM(soldierSubid02), soldierSubid02_hook)) { soldierSubid02_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid03) && hook_is(gb, SYM(soldierSubid03), soldierSubid03_hook)) { soldierSubid03_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid04) && hook_is(gb, SYM(soldierSubid04), soldierSubid04_hook)) { soldierSubid04_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid05) && hook_is(gb, SYM(soldierSubid05), soldierSubid05_hook)) { soldierSubid05_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid06) && hook_is(gb, SYM(soldierSubid06), soldierSubid06_hook)) { soldierSubid06_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid07) && hook_is(gb, SYM(soldierSubid07), soldierSubid07_hook)) { soldierSubid07_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid08) && hook_is(gb, SYM(soldierSubid08), soldierSubid08_hook)) { soldierSubid08_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid0a) && hook_is(gb, SYM(soldierSubid0a), soldierSubid0a_hook)) { soldierSubid0a_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid0b) && hook_is(gb, SYM(soldierSubid0b), soldierSubid0b_hook)) { soldierSubid0b_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid0c) && hook_is(gb, SYM(soldierSubid0c), soldierSubid0c_hook)) { soldierSubid0c_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid0d) && hook_is(gb, SYM(soldierSubid0d), soldierSubid0d_hook)) { soldierSubid0d_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -167,11 +167,11 @@ state1:
   CYC(b_+32, b_+33); A = mem_rd(gb, DE);
   CYC(b_+33, b_+34); push_effect(gb, b_+34);
   do { uint16_t jt_ = (soldier_jump_table(gb));
-    if (jt_ == SYM(soldierSubid04Substate0) && hook_enabled_at(gb, SYM(soldierSubid04Substate0))) { soldierSubid04Substate0_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid04Substate1) && hook_enabled_at(gb, SYM(soldierSubid04Substate1))) { soldierSubid04Substate1_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid04Substate2) && hook_enabled_at(gb, SYM(soldierSubid04Substate2))) { soldierSubid04Substate2_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid04Substate3) && hook_enabled_at(gb, SYM(soldierSubid04Substate3))) { soldierSubid04Substate3_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid04Substate4) && hook_enabled_at(gb, SYM(soldierSubid04Substate4))) { soldierSubid04Substate4_hook(gb); return; }
+    if (jt_ == SYM(soldierSubid04Substate0) && hook_is(gb, SYM(soldierSubid04Substate0), soldierSubid04Substate0_hook)) { soldierSubid04Substate0_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid04Substate1) && hook_is(gb, SYM(soldierSubid04Substate1), soldierSubid04Substate1_hook)) { soldierSubid04Substate1_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid04Substate2) && hook_is(gb, SYM(soldierSubid04Substate2), soldierSubid04Substate2_hook)) { soldierSubid04Substate2_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid04Substate3) && hook_is(gb, SYM(soldierSubid04Substate3), soldierSubid04Substate3_hook)) { soldierSubid04Substate3_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid04Substate4) && hook_is(gb, SYM(soldierSubid04Substate4), soldierSubid04Substate4_hook)) { soldierSubid04Substate4_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

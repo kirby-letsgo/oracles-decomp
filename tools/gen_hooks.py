@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Generate src/hooks/table.h from the disassembly symbol file and the list of ported routines.
 
-usage: tools/gen_hooks.py [ref/oracles-disasm/ages.sym] [src/hooks/ported.txt] [src/hooks/table.h]
+usage: tools/gen_hooks.py [ref/oracles-disasm/ages.sym] [src/hooks/generated.txt[+more.txt]] [src/hooks/table.h]
 ported.txt: one routine name per line, '#' comments allowed.
 """
 import re, sys
 sym = sys.argv[1] if len(sys.argv) > 1 else 'ref/oracles-disasm/ages.sym'
-ported = sys.argv[2] if len(sys.argv) > 2 else 'src/hooks/generated.txt'
+ported = sys.argv[2] if len(sys.argv) > 2 else 'src/hooks/generated.txt'     # several lists: a+b
 out = sys.argv[3] if len(sys.argv) > 3 else 'src/hooks/table.h'
 labels = {}
 in_labels = False
@@ -21,7 +21,8 @@ for line in open(sym):
     if m:
         labels.setdefault(m.group(3), (int(m.group(1), 16), int(m.group(2), 16)))
 rows = []
-for l in open(ported):
+import itertools, os
+for l in itertools.chain.from_iterable(open(f) for f in ported.split('+') if os.path.exists(f)):
     l = l.split('#')[0].strip()
     if not l: continue
     m = re.match(r'([0-9a-f]{2}):([0-9a-f]{4}) (\S+)(?: (\S+))?$', l)

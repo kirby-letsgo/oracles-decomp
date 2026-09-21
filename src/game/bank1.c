@@ -1435,8 +1435,8 @@ void func_60e9_hook(GB *gb) {
   CYC(b_+70, b_+73); A = mem_rd(gb, wActiveGroup);
   CYC(b_+73, b_+74); bank1_jump_table_from_rst(gb, b_+74);
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(checkWarpsTopDown) && hook_enabled_at(gb, SYM(checkWarpsTopDown))) { checkWarpsTopDown_hook(gb); return; }
-    else if (jt_ == SYM(checkWarpsSidescrolling) && hook_enabled_at(gb, SYM(checkWarpsSidescrolling))) { checkWarpsSidescrolling_hook(gb); return; }
+    if (jt_ == SYM(checkWarpsTopDown) && hook_is(gb, SYM(checkWarpsTopDown), checkWarpsTopDown_hook)) { checkWarpsTopDown_hook(gb); return; }
+    else if (jt_ == SYM(checkWarpsSidescrolling) && hook_is(gb, SYM(checkWarpsSidescrolling), checkWarpsSidescrolling_hook)) { checkWarpsSidescrolling_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -2724,12 +2724,12 @@ void func_400b_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wScreenTransitionState);
   CYC(b_+3, b_+4); bank1_jump_table_from_rst(gb, b_+4);
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(screenTransitionState0) && hook_enabled_at(gb, SYM(screenTransitionState0))) { screenTransitionState0_hook(gb); return; }
-    else if (jt_ == SYM(screenTransitionState1) && hook_enabled_at(gb, SYM(screenTransitionState1))) { screenTransitionState1_hook(gb); return; }
-    else if (jt_ == SYM(screenTransitionState2) && hook_enabled_at(gb, SYM(screenTransitionState2))) { screenTransitionState2_hook(gb); return; }
-    else if (jt_ == SYM(screenTransitionState3) && hook_enabled_at(gb, SYM(screenTransitionState3))) { screenTransitionState3_hook(gb); return; }
-    else if (jt_ == SYM(screenTransitionState4) && hook_enabled_at(gb, SYM(screenTransitionState4))) { screenTransitionState4_hook(gb); return; }
-    else if (jt_ == SYM(screenTransitionState5) && hook_enabled_at(gb, SYM(screenTransitionState5))) { screenTransitionState5_hook(gb); return; }
+    if (jt_ == SYM(screenTransitionState0) && hook_is(gb, SYM(screenTransitionState0), screenTransitionState0_hook)) { screenTransitionState0_hook(gb); return; }
+    else if (jt_ == SYM(screenTransitionState1) && hook_is(gb, SYM(screenTransitionState1), screenTransitionState1_hook)) { screenTransitionState1_hook(gb); return; }
+    else if (jt_ == SYM(screenTransitionState2) && hook_is(gb, SYM(screenTransitionState2), screenTransitionState2_hook)) { screenTransitionState2_hook(gb); return; }
+    else if (jt_ == SYM(screenTransitionState3) && hook_is(gb, SYM(screenTransitionState3), screenTransitionState3_hook)) { screenTransitionState3_hook(gb); return; }
+    else if (jt_ == SYM(screenTransitionState4) && hook_is(gb, SYM(screenTransitionState4), screenTransitionState4_hook)) { screenTransitionState4_hook(gb); return; }
+    else if (jt_ == SYM(screenTransitionState5) && hook_is(gb, SYM(screenTransitionState5), screenTransitionState5_hook)) { screenTransitionState5_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -2801,7 +2801,7 @@ void screen_transition_state1_body_hook(GB *gb) {
       if (jt_ == b_+19) { entry = b_+19; break; }
       else if (jt_ == b_+44) { entry = b_+44; break; }
       else if (jt_ == b_+76) { entry = b_+76; break; }
-      else if (jt_ == SYM(setScreenTransitionState02) && hook_enabled_at(gb, SYM(setScreenTransitionState02))) { setScreenTransitionState02_hook(gb); return; }
+      else if (jt_ == SYM(setScreenTransitionState02) && hook_is(gb, SYM(setScreenTransitionState02), setScreenTransitionState02_hook)) { setScreenTransitionState02_hook(gb); return; }
       else { HANDOFF(HL); }
     } while (0);
   }
@@ -3349,9 +3349,9 @@ void screenTransitionState5_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wScreenTransitionState2);
   CYC(b_+3, b_+4); bank1_jump_table_from_rst(gb, b_+4);
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(screenTransitionState5Substate0) && hook_enabled_at(gb, SYM(screenTransitionState5Substate0))) { screenTransitionState5Substate0_hook(gb); return; }
-    else if (jt_ == SYM(screenTransitionState5Substate1) && hook_enabled_at(gb, SYM(screenTransitionState5Substate1))) { screenTransitionState5Substate1_hook(gb); return; }
-    else if (jt_ == SYM(screenTransitionState5Substate2) && hook_enabled_at(gb, SYM(screenTransitionState5Substate2))) { screenTransitionState5Substate2_hook(gb); return; }
+    if (jt_ == SYM(screenTransitionState5Substate0) && hook_is(gb, SYM(screenTransitionState5Substate0), screenTransitionState5Substate0_hook)) { screenTransitionState5Substate0_hook(gb); return; }
+    else if (jt_ == SYM(screenTransitionState5Substate1) && hook_is(gb, SYM(screenTransitionState5Substate1), screenTransitionState5Substate1_hook)) { screenTransitionState5Substate1_hook(gb); return; }
+    else if (jt_ == SYM(screenTransitionState5Substate2) && hook_is(gb, SYM(screenTransitionState5Substate2), screenTransitionState5Substate2_hook)) { screenTransitionState5Substate2_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -4678,21 +4678,21 @@ void paletteFadeHandler_hook(GB *gb) {
   CYC(b_+O(0), b_+OE(3)); A = W8(wPaletteThread_mode);
   CYC(b_+O(3), b_+OE(4)); bank1_jump_table_from_rst(gb, b_+OE(4));
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(paletteFadeHandler09) && hook_enabled_at(gb, SYM(paletteFadeHandler09))) { paletteFadeHandler09_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler01) && hook_enabled_at(gb, SYM(paletteFadeHandler01))) { paletteFadeHandler01_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler00) && hook_enabled_at(gb, SYM(paletteFadeHandler00))) { paletteFadeHandler00_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler0a) && hook_enabled_at(gb, SYM(paletteFadeHandler0a))) { paletteFadeHandler0a_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler02) && hook_enabled_at(gb, SYM(paletteFadeHandler02))) { paletteFadeHandler02_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler0b) && hook_enabled_at(gb, SYM(paletteFadeHandler0b))) { paletteFadeHandler0b_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler03) && hook_enabled_at(gb, SYM(paletteFadeHandler03))) { paletteFadeHandler03_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler0c) && hook_enabled_at(gb, SYM(paletteFadeHandler0c))) { paletteFadeHandler0c_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler04) && hook_enabled_at(gb, SYM(paletteFadeHandler04))) { paletteFadeHandler04_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler0d) && hook_enabled_at(gb, SYM(paletteFadeHandler0d))) { paletteFadeHandler0d_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler05) && hook_enabled_at(gb, SYM(paletteFadeHandler05))) { paletteFadeHandler05_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler0e) && hook_enabled_at(gb, SYM(paletteFadeHandler0e))) { paletteFadeHandler0e_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler06) && hook_enabled_at(gb, SYM(paletteFadeHandler06))) { paletteFadeHandler06_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler07) && hook_enabled_at(gb, SYM(paletteFadeHandler07))) { paletteFadeHandler07_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler08) && hook_enabled_at(gb, SYM(paletteFadeHandler08))) { paletteFadeHandler08_hook(gb); return; }
+    if (jt_ == SYM(paletteFadeHandler09) && hook_is(gb, SYM(paletteFadeHandler09), paletteFadeHandler09_hook)) { paletteFadeHandler09_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler01) && hook_is(gb, SYM(paletteFadeHandler01), paletteFadeHandler01_hook)) { paletteFadeHandler01_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler00) && hook_is(gb, SYM(paletteFadeHandler00), paletteFadeHandler00_hook)) { paletteFadeHandler00_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler0a) && hook_is(gb, SYM(paletteFadeHandler0a), paletteFadeHandler0a_hook)) { paletteFadeHandler0a_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler02) && hook_is(gb, SYM(paletteFadeHandler02), paletteFadeHandler02_hook)) { paletteFadeHandler02_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler0b) && hook_is(gb, SYM(paletteFadeHandler0b), paletteFadeHandler0b_hook)) { paletteFadeHandler0b_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler03) && hook_is(gb, SYM(paletteFadeHandler03), paletteFadeHandler03_hook)) { paletteFadeHandler03_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler0c) && hook_is(gb, SYM(paletteFadeHandler0c), paletteFadeHandler0c_hook)) { paletteFadeHandler0c_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler04) && hook_is(gb, SYM(paletteFadeHandler04), paletteFadeHandler04_hook)) { paletteFadeHandler04_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler0d) && hook_is(gb, SYM(paletteFadeHandler0d), paletteFadeHandler0d_hook)) { paletteFadeHandler0d_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler05) && hook_is(gb, SYM(paletteFadeHandler05), paletteFadeHandler05_hook)) { paletteFadeHandler05_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler0e) && hook_is(gb, SYM(paletteFadeHandler0e), paletteFadeHandler0e_hook)) { paletteFadeHandler0e_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler06) && hook_is(gb, SYM(paletteFadeHandler06), paletteFadeHandler06_hook)) { paletteFadeHandler06_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler07) && hook_is(gb, SYM(paletteFadeHandler07), paletteFadeHandler07_hook)) { paletteFadeHandler07_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler08) && hook_is(gb, SYM(paletteFadeHandler08), paletteFadeHandler08_hook)) { paletteFadeHandler08_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -4760,10 +4760,10 @@ void runGameLogic_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wThreadStateBuffer + 0x0e);
   CYC(b_+3, b_+4); bank1_jump_table_from_rst(gb, b_+4);
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(initializeGame) && hook_enabled_at(gb, SYM(initializeGame))) { initializeGame_hook(gb); return; }
-    else if (jt_ == SYM(loadingRoom) && hook_enabled_at(gb, SYM(loadingRoom))) { loadingRoom_hook(gb); return; }
-    else if (jt_ == SYM(standardGameState) && hook_enabled_at(gb, SYM(standardGameState))) { standardGameState_hook(gb); return; }
-    else if (jt_ == SYM(linkSummonedCutscene) && hook_enabled_at(gb, SYM(linkSummonedCutscene))) { linkSummonedCutscene_hook(gb); return; }
+    if (jt_ == SYM(initializeGame) && hook_is(gb, SYM(initializeGame), initializeGame_hook)) { initializeGame_hook(gb); return; }
+    else if (jt_ == SYM(loadingRoom) && hook_is(gb, SYM(loadingRoom), loadingRoom_hook)) { loadingRoom_hook(gb); return; }
+    else if (jt_ == SYM(standardGameState) && hook_is(gb, SYM(standardGameState), standardGameState_hook)) { standardGameState_hook(gb); return; }
+    else if (jt_ == SYM(linkSummonedCutscene) && hook_is(gb, SYM(linkSummonedCutscene), linkSummonedCutscene_hook)) { linkSummonedCutscene_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -4991,40 +4991,40 @@ void standardGameState_hook(GB *gb) {
   CYC(b_+O(34), b_+OE(37)); A = mem_rd(gb, wThreadStateBuffer + 0x0f);
   CYC(b_+O(37), b_+OE(38)); bank1_jump_table_from_rst(gb, b_+OE(38));
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(cutscene00) && hook_enabled_at(gb, SYM(cutscene00))) { cutscene00_hook(gb); return; }
-    else if (jt_ == SYM(cutscene01) && hook_enabled_at(gb, SYM(cutscene01))) { cutscene01_hook(gb); return; }
-    else if (jt_ == SYM(cutscene02) && hook_enabled_at(gb, SYM(cutscene02))) { cutscene02_hook(gb); return; }
-    else if (jt_ == SYM(cutscene03) && hook_enabled_at(gb, SYM(cutscene03))) { cutscene03_hook(gb); return; }
-    else if (jt_ == SYM(cutscene04) && hook_enabled_at(gb, SYM(cutscene04))) { cutscene04_hook(gb); return; }
-    else if (jt_ == SYM(cutscene05) && hook_enabled_at(gb, SYM(cutscene05))) { cutscene05_hook(gb); return; }
-    else if (jt_ == SYM(cutscene06) && hook_enabled_at(gb, SYM(cutscene06))) { cutscene06_hook(gb); return; }
-    else if (jt_ == SYM(cutscene07) && hook_enabled_at(gb, SYM(cutscene07))) { cutscene07_hook(gb); return; }
-    else if (jt_ == SYM(cutscene08) && hook_enabled_at(gb, SYM(cutscene08))) { cutscene08_hook(gb); return; }
-    else if (jt_ == SYM(cutscene09) && hook_enabled_at(gb, SYM(cutscene09))) { cutscene09_hook(gb); return; }
-    else if (jt_ == SYM(cutscene0a) && hook_enabled_at(gb, SYM(cutscene0a))) { cutscene0a_hook(gb); return; }
-    else if (jt_ == SYM(cutscene0b) && hook_enabled_at(gb, SYM(cutscene0b))) { cutscene0b_hook(gb); return; }
-    else if (jt_ == SYM(cutscene0c) && hook_enabled_at(gb, SYM(cutscene0c))) { cutscene0c_hook(gb); return; }
-    else if (jt_ == SYM(cutscene0d) && hook_enabled_at(gb, SYM(cutscene0d))) { cutscene0d_hook(gb); return; }
-    else if (jt_ == SYM(cutscene0e) && hook_enabled_at(gb, SYM(cutscene0e))) { cutscene0e_hook(gb); return; }
-    else if (jt_ == SYM(cutscene0f) && hook_enabled_at(gb, SYM(cutscene0f))) { cutscene0f_hook(gb); return; }
-    else if (jt_ == SYM(cutscene10) && hook_enabled_at(gb, SYM(cutscene10))) { cutscene10_hook(gb); return; }
-    else if (jt_ == SYM(cutscene11) && hook_enabled_at(gb, SYM(cutscene11))) { cutscene11_hook(gb); return; }
-    else if (jt_ == SYM(cutscene12) && hook_enabled_at(gb, SYM(cutscene12))) { cutscene12_hook(gb); return; }
-    else if (jt_ == SYM(cutscene13) && hook_enabled_at(gb, SYM(cutscene13))) { cutscene13_hook(gb); return; }
-    else if (jt_ == SYM(cutscene14) && hook_enabled_at(gb, SYM(cutscene14))) { cutscene14_hook(gb); return; }
-    else if (jt_ == SYM(cutscene15) && hook_enabled_at(gb, SYM(cutscene15))) { cutscene15_hook(gb); return; }
-    else if (jt_ == SYM(cutscene16) && hook_enabled_at(gb, SYM(cutscene16))) { cutscene16_hook(gb); return; }
-    else if (jt_ == SYM(cutscene17) && hook_enabled_at(gb, SYM(cutscene17))) { cutscene17_hook(gb); return; }
-    else if (jt_ == SYM(cutscene18) && hook_enabled_at(gb, SYM(cutscene18))) { cutscene18_hook(gb); return; }
-    else if (jt_ == SYM(cutscene19) && hook_enabled_at(gb, SYM(cutscene19))) { cutscene19_hook(gb); return; }
-    else if (jt_ == SYM(cutscene1a) && hook_enabled_at(gb, SYM(cutscene1a))) { cutscene1a_hook(gb); return; }
-    else if (jt_ == SYM(cutscene1b) && hook_enabled_at(gb, SYM(cutscene1b))) { cutscene1b_hook(gb); return; }
-    else if (jt_ == SYM(cutscene1c) && hook_enabled_at(gb, SYM(cutscene1c))) { cutscene1c_hook(gb); return; }
-    else if (jt_ == SYM(cutscene1d) && hook_enabled_at(gb, SYM(cutscene1d))) { cutscene1d_hook(gb); return; }
-    else if (jt_ == SYM(cutscene1e) && hook_enabled_at(gb, SYM(cutscene1e))) { cutscene1e_hook(gb); return; }
-    else if (jt_ == SYM(cutscene1f) && hook_enabled_at(gb, SYM(cutscene1f))) { cutscene1f_hook(gb); return; }
-    else if (jt_ == SYM(cutscene20) && hook_enabled_at(gb, SYM(cutscene20))) { cutscene20_hook(gb); return; }
-    else if (jt_ == SYM(cutscene21) && hook_enabled_at(gb, SYM(cutscene21))) { cutscene21_hook(gb); return; }
+    if (jt_ == SYM(cutscene00) && hook_is(gb, SYM(cutscene00), cutscene00_hook)) { cutscene00_hook(gb); return; }
+    else if (jt_ == SYM(cutscene01) && hook_is(gb, SYM(cutscene01), cutscene01_hook)) { cutscene01_hook(gb); return; }
+    else if (jt_ == SYM(cutscene02) && hook_is(gb, SYM(cutscene02), cutscene02_hook)) { cutscene02_hook(gb); return; }
+    else if (jt_ == SYM(cutscene03) && hook_is(gb, SYM(cutscene03), cutscene03_hook)) { cutscene03_hook(gb); return; }
+    else if (jt_ == SYM(cutscene04) && hook_is(gb, SYM(cutscene04), cutscene04_hook)) { cutscene04_hook(gb); return; }
+    else if (jt_ == SYM(cutscene05) && hook_is(gb, SYM(cutscene05), cutscene05_hook)) { cutscene05_hook(gb); return; }
+    else if (jt_ == SYM(cutscene06) && hook_is(gb, SYM(cutscene06), cutscene06_hook)) { cutscene06_hook(gb); return; }
+    else if (jt_ == SYM(cutscene07) && hook_is(gb, SYM(cutscene07), cutscene07_hook)) { cutscene07_hook(gb); return; }
+    else if (jt_ == SYM(cutscene08) && hook_is(gb, SYM(cutscene08), cutscene08_hook)) { cutscene08_hook(gb); return; }
+    else if (jt_ == SYM(cutscene09) && hook_is(gb, SYM(cutscene09), cutscene09_hook)) { cutscene09_hook(gb); return; }
+    else if (jt_ == SYM(cutscene0a) && hook_is(gb, SYM(cutscene0a), cutscene0a_hook)) { cutscene0a_hook(gb); return; }
+    else if (jt_ == SYM(cutscene0b) && hook_is(gb, SYM(cutscene0b), cutscene0b_hook)) { cutscene0b_hook(gb); return; }
+    else if (jt_ == SYM(cutscene0c) && hook_is(gb, SYM(cutscene0c), cutscene0c_hook)) { cutscene0c_hook(gb); return; }
+    else if (jt_ == SYM(cutscene0d) && hook_is(gb, SYM(cutscene0d), cutscene0d_hook)) { cutscene0d_hook(gb); return; }
+    else if (jt_ == SYM(cutscene0e) && hook_is(gb, SYM(cutscene0e), cutscene0e_hook)) { cutscene0e_hook(gb); return; }
+    else if (jt_ == SYM(cutscene0f) && hook_is(gb, SYM(cutscene0f), cutscene0f_hook)) { cutscene0f_hook(gb); return; }
+    else if (jt_ == SYM(cutscene10) && hook_is(gb, SYM(cutscene10), cutscene10_hook)) { cutscene10_hook(gb); return; }
+    else if (jt_ == SYM(cutscene11) && hook_is(gb, SYM(cutscene11), cutscene11_hook)) { cutscene11_hook(gb); return; }
+    else if (jt_ == SYM(cutscene12) && hook_is(gb, SYM(cutscene12), cutscene12_hook)) { cutscene12_hook(gb); return; }
+    else if (jt_ == SYM(cutscene13) && hook_is(gb, SYM(cutscene13), cutscene13_hook)) { cutscene13_hook(gb); return; }
+    else if (jt_ == SYM(cutscene14) && hook_is(gb, SYM(cutscene14), cutscene14_hook)) { cutscene14_hook(gb); return; }
+    else if (jt_ == SYM(cutscene15) && hook_is(gb, SYM(cutscene15), cutscene15_hook)) { cutscene15_hook(gb); return; }
+    else if (jt_ == SYM(cutscene16) && hook_is(gb, SYM(cutscene16), cutscene16_hook)) { cutscene16_hook(gb); return; }
+    else if (jt_ == SYM(cutscene17) && hook_is(gb, SYM(cutscene17), cutscene17_hook)) { cutscene17_hook(gb); return; }
+    else if (jt_ == SYM(cutscene18) && hook_is(gb, SYM(cutscene18), cutscene18_hook)) { cutscene18_hook(gb); return; }
+    else if (jt_ == SYM(cutscene19) && hook_is(gb, SYM(cutscene19), cutscene19_hook)) { cutscene19_hook(gb); return; }
+    else if (jt_ == SYM(cutscene1a) && hook_is(gb, SYM(cutscene1a), cutscene1a_hook)) { cutscene1a_hook(gb); return; }
+    else if (jt_ == SYM(cutscene1b) && hook_is(gb, SYM(cutscene1b), cutscene1b_hook)) { cutscene1b_hook(gb); return; }
+    else if (jt_ == SYM(cutscene1c) && hook_is(gb, SYM(cutscene1c), cutscene1c_hook)) { cutscene1c_hook(gb); return; }
+    else if (jt_ == SYM(cutscene1d) && hook_is(gb, SYM(cutscene1d), cutscene1d_hook)) { cutscene1d_hook(gb); return; }
+    else if (jt_ == SYM(cutscene1e) && hook_is(gb, SYM(cutscene1e), cutscene1e_hook)) { cutscene1e_hook(gb); return; }
+    else if (jt_ == SYM(cutscene1f) && hook_is(gb, SYM(cutscene1f), cutscene1f_hook)) { cutscene1f_hook(gb); return; }
+    else if (jt_ == SYM(cutscene20) && hook_is(gb, SYM(cutscene20), cutscene20_hook)) { cutscene20_hook(gb); return; }
+    else if (jt_ == SYM(cutscene21) && hook_is(gb, SYM(cutscene21), cutscene21_hook)) { cutscene21_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
