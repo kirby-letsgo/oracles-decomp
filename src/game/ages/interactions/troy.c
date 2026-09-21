@@ -79,7 +79,7 @@ subid0:
   CALL_C(b_+8, checkInteractionState_hook, SYM(checkInteractionState), b_+11);
   if (!(F & FZ)) { CYCT(b_+11, b_+13); goto state1; } // jr nz
   CYC(b_+11, b_+13);
-  CALL_C(b_+13, interactionCodeca_initialize_hook, b_+48, b_+16);
+  CALL_L(b_+13, interactionCodeca_initialize_hook, b_+16);
   CYC(b_+16, b_+19); A = mem_rd(gb, wScreenTransitionDirection);
   CYC(b_+19, b_+20); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+20, b_+22); goto state1; } // jr nz

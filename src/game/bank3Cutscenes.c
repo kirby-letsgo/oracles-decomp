@@ -1082,7 +1082,7 @@ void introCinematic_ridingHorse_drawTempleSprites_hook(GB *gb);
 void introCinematic_ridingHorse_state4_hook(GB *gb) {
   BASE(introCinematic_ridingHorse_state4);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(b_+0, introCinematic_ridingHorse_state4__drawLinkOnHorseAndScrollScreen_hook, b_+44, b_+3);
+  CALL_L(b_+0, introCinematic_ridingHorse_state4__drawLinkOnHorseAndScrollScreen_hook, b_+3);
   CYC(b_+3, b_+6); SET_HL(wTmpcbb3);
   CALL_C(b_+6, decHlRef16WithCap_hook, SYM(decHlRef16WithCap), b_+9);
   if (!(F & FZ)) {

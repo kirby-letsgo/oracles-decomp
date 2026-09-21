@@ -228,7 +228,7 @@ setFlagAndDeleteWhenCompanionIsBelow:
   CYC(b_+134, b_+135);
 
 setFlagAndDeleteWhenCompanionIsAbove:
-  CALL_C(b_+135, interactionCoded0_cpYToCompanion, b_+186, b_+138);
+  CALL_L(b_+135, interactionCoded0_cpYToCompanion, b_+138);
   if (F & FC) { CYCT(b_+138, b_+139); ret_effect(gb); return; } // ret c
   CYC(b_+138, b_+139);
 
@@ -245,7 +245,7 @@ setFlagAndDelete:
   CYC(b_+153, b_+155); goto delete; // jr $4b94
 
 setFlagAndDeleteWhenCompanionIsAboveAndLinkInXRange:
-  CALL_C(b_+155, interactionCoded0_checkLinkInXRange, b_+194, b_+158);
+  CALL_L(b_+155, interactionCoded0_checkLinkInXRange, b_+158);
   if (!(F & FZ)) { CYCT(b_+158, b_+159); ret_effect(gb); return; } // ret nz
   CYC(b_+158, b_+159);
   CYC(b_+159, b_+161); goto setFlagAndDeleteWhenCompanionIsAbove; // jr $4bbb
@@ -260,7 +260,7 @@ setFlagAndDeleteWhenCompanionIsLeft:
   CYC(b_+169, b_+171); goto setFlagAndDelete; // jr $4bbf
 
 setFlagAndDeleteWhenCompanionIsBelowOrRight:
-  CALL_C(b_+171, interactionCoded0_cpYToCompanion, b_+186, b_+174);
+  CALL_L(b_+171, interactionCoded0_cpYToCompanion, b_+174);
   if (F & FC) { CYCT(b_+174, b_+176); goto setFlagAndDelete; } // jr c
   CYC(b_+174, b_+176);
   CYC(b_+176, b_+178); E = INTERACTION_BASE + OBJ_XH;

@@ -8821,16 +8821,18 @@ void retrieveTextCharacter_hook(GB *gb) {
 // indirect jumps and the cross-bank call trampoline
 
 void jpHl_hook(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(0x00a0, 0x00a1);
-  hook_handoff(gb, HL);
+  HANDOFF(HL);
 }
 
 void jpBc_hook(GB *gb) {
   BASE(jpBc);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   L = C;
   H = B;
   CYC(b_+0, b_+3);
-  hook_handoff(gb, HL);
+  HANDOFF(HL);
 }
 
 void interBankCall_hook(GB *gb) {
@@ -9544,6 +9546,7 @@ void updateEnemies_hook(GB *gb) {
 
 void updateEnemy_hook(GB *gb) {
   BASE(updateEnemy);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_ROM(b_+0, ROM_enemyStandardUpdate);
   E = 0x81;
   CYC(b_+3, b_+6); A = mem_rd(gb, DE);
@@ -9578,7 +9581,7 @@ void updateEnemy_hook(GB *gb) {
   A = C;
   alu_or(gb, A);
   CYC(b_+42, b_+45);
-  hook_handoff(gb, HL);
+  HANDOFF(HL);
 }
 
 static void update_interactions_if_state_is_zero(GB *gb) {
@@ -9662,6 +9665,7 @@ void updateInteractions_hook(GB *gb) {
 
 void updateInteraction_hook(GB *gb) {
   BASE(updateInteraction);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   E = 0x41;
   CYC(b_+0, b_+3); A = mem_rd(gb, DE);
   B = 0x08;
@@ -9697,7 +9701,7 @@ void updateInteraction_hook(GB *gb) {
   CYC(b_+38, b_+39); H = mem_rd(gb, HL);
   L = A;
   CYC(b_+39, b_+41);
-  hook_handoff(gb, HL);
+  HANDOFF(HL);
 }
 
 void load_link_and_companion_animation_frame_hook(GB *gb) {

@@ -466,6 +466,22 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   palettes and banks. Gates: Ages ctest 8/8, whole movie clean, Seasons demo and playthrough
   clean, `VERIFY_ALL` on the playthrough 0 failures apart from the lcdInterrupt skew, lint 0.
 
+- 2026-09-20 (night): milestone 5 plan step 1 item 7b, batch 7 (class C), commit `d185ce0` on
+  `worktree-m5-step0` on top of main `e93deeb` (merged, generated files regenerated with
+  `transliterate.py`, `gen_hooks.py`, `seasons_hooks.py`, `gen_syms.py`; tree matched main byte
+  for byte afterwards). Two mechanisms were leaving code in the interpreter: a `CALL_C` whose
+  target is a local label with a C body but no hook entry falls through to `asm_call`, and the
+  `jp hl` dispatchers ended in `hook_handoff` (longjmp), which discarded their callers' loops.
+  `CALL_L`/`CALL_L_CC` in `game.h` are `CALL_C` without the hook-table test; a script rewrote
+  the 159 such sites (list produced statically from the C, the symbol file and `table.h`).
+  `updateEnemy`, `updateInteraction`, `jpHl`, `jpBc` and the item dispatcher now use `HANDOFF`.
+  Gates as before, all green; Seasons hooks 2,406 unchanged (2,857 after the merge with the guarded-tail-call table: `seasons_hooks.py` now compares the call target's body for every `CALL_L` site and drops the six whose local differs in Seasons, `updateItems`' item trampoline among them). Interpreted instructions per movie
+  3,896,076 to 3,801,186. Of the remainder, 3.75M is the six thread loops and about 45k is
+  loop tails after a thread switch inside an interaction (about 870 occurrences per movie in
+  each of `updateInteractions`, `checkSpawnTimeportalInteraction`, `_updateEnemiesIfStateIsZero`
+  and `_updateInteractionsIfStateIsZero`); both are class B and end with fibers. The RST vectors
+  (587) and a long tail of one-off routine tails make up the rest. Class A and class C are done.
+
 - 2026-09-20 (late): milestone 5 plan step 1 item 7b, batches 2 to 6, worktree branch
   `worktree-m5-step0` (commits `6a092d6`, `e9804b0`, `4a6528f`, `6c1a76b`, `badecee` on top of
   main `ed9f340`, merged with main first and generated files regenerated, never merged by hand).

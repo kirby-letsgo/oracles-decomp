@@ -56,7 +56,7 @@ L_5492:
   CYC(b_+19, b_+21); A = 0x14;
   CALL_C(b_+21, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+24);
   if (!(F & FZ)) { CYCT(b_+24, b_+27); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+24, b_+27);
-  CALL_C(b_+27, interactionCode44__initGraphicsIncStateAndLoadScript_hook, b_+145, b_+30);
+  CALL_L(b_+27, interactionCode44__initGraphicsIncStateAndLoadScript_hook, b_+30);
 L_54a2:
   CALL_C(b_+30, interactionRunScript_hook, SYM(interactionRunScript), b_+33);
   if ((F & FC)) { CYCT(b_+33, b_+36); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+33, b_+36);
@@ -64,7 +64,7 @@ L_54a2:
 L_54ab:
   CALL_C(b_+39, checkInteractionState_hook, SYM(checkInteractionState), b_+42);
   if (!(F & FZ)) { CYCT(b_+42, b_+44); goto L_54b3; } CYC(b_+42, b_+44);
-  CALL_C(b_+44, interactionCode44__initGraphicsIncStateAndLoadScript_hook, b_+145, b_+47);
+  CALL_L(b_+44, interactionCode44__initGraphicsIncStateAndLoadScript_hook, b_+47);
 L_54b3:
   CALL_C(b_+47, interactionRunScript_hook, SYM(interactionRunScript), b_+50);
   CYC(b_+50, b_+53); if (hook_enabled_at(gb, SYM(interactionAnimateBasedOnSpeed))) { interactionAnimateBasedOnSpeed_hook(gb); return; } HANDOFF(SYM(interactionAnimateBasedOnSpeed));
@@ -84,7 +84,7 @@ L_54b9:
   CYC(b_+77, b_+78); H = mem_rd(gb, HL);
   CYC(b_+78, b_+79); L = A;
   CALL_C(b_+79, interactionSetScript_hook, SYM(interactionSetScript), b_+82);
-  CALL_C(b_+82, interactionCode44__initGraphicsAndIncState_hook, b_+136, b_+85);
+  CALL_L(b_+82, interactionCode44__initGraphicsAndIncState_hook, b_+85);
 L_54d9:
   CALL_C(b_+85, interactionRunScript_hook, SYM(interactionRunScript), b_+88);
   CYC(b_+88, b_+91); if (hook_enabled_at(gb, SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
@@ -108,7 +108,7 @@ L_54f9:
   CYC(b_+122, b_+123); H = mem_rd(gb, HL);
   CYC(b_+123, b_+124); L = A;
   CALL_C(b_+124, interactionSetScript_hook, SYM(interactionSetScript), b_+127);
-  CALL_C(b_+127, interactionCode44__initGraphicsAndIncState_hook, b_+136, b_+130);
+  CALL_L(b_+127, interactionCode44__initGraphicsAndIncState_hook, b_+130);
 L_5506:
   CALL_C(b_+130, interactionRunScript_hook, SYM(interactionRunScript), b_+133);
   CYC(b_+133, b_+136); if (hook_enabled_at(gb, SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
@@ -123,7 +123,7 @@ L_5492:
   CYC(b_+19, b_+21); A = 0x14;
   CALL_C(b_+21, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+24);
   if (!(F & FZ)) { CYCT(b_+24, b_+27); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+24, b_+27);
-  CALL_C(b_+27, interactionCode44__initGraphicsIncStateAndLoadScript_hook, b_+145, b_+30);
+  CALL_L(b_+27, interactionCode44__initGraphicsIncStateAndLoadScript_hook, b_+30);
 L_54a2:
   CALL_C(b_+30, interactionRunScript_hook, SYM(interactionRunScript), b_+33);
   if ((F & FC)) { CYCT(b_+33, b_+36); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete)); } CYC(b_+33, b_+36);
@@ -145,7 +145,7 @@ void interactionCode44__subid1_hook(GB *gb) {
 L_54ab:
   CALL_C(b_+39, checkInteractionState_hook, SYM(checkInteractionState), b_+42);
   if (!(F & FZ)) { CYCT(b_+42, b_+44); goto L_54b3; } CYC(b_+42, b_+44);
-  CALL_C(b_+44, interactionCode44__initGraphicsIncStateAndLoadScript_hook, b_+145, b_+47);
+  CALL_L(b_+44, interactionCode44__initGraphicsIncStateAndLoadScript_hook, b_+47);
 L_54b3:
   CALL_C(b_+47, interactionRunScript_hook, SYM(interactionRunScript), b_+50);
   CYC(b_+50, b_+53); if (hook_enabled_at(gb, SYM(interactionAnimateBasedOnSpeed))) { interactionAnimateBasedOnSpeed_hook(gb); return; } HANDOFF(SYM(interactionAnimateBasedOnSpeed));
@@ -178,7 +178,7 @@ L_54b9:
   CYC(b_+77, b_+78); H = mem_rd(gb, HL);
   CYC(b_+78, b_+79); L = A;
   CALL_C(b_+79, interactionSetScript_hook, SYM(interactionSetScript), b_+82);
-  CALL_C(b_+82, interactionCode44__initGraphicsAndIncState_hook, b_+136, b_+85);
+  CALL_L(b_+82, interactionCode44__initGraphicsAndIncState_hook, b_+85);
 L_54d9:
   CALL_C(b_+85, interactionRunScript_hook, SYM(interactionRunScript), b_+88);
   CYC(b_+88, b_+91); if (hook_enabled_at(gb, SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));
@@ -215,7 +215,7 @@ L_54f9:
   CYC(b_+122, b_+123); H = mem_rd(gb, HL);
   CYC(b_+123, b_+124); L = A;
   CALL_C(b_+124, interactionSetScript_hook, SYM(interactionSetScript), b_+127);
-  CALL_C(b_+127, interactionCode44__initGraphicsAndIncState_hook, b_+136, b_+130);
+  CALL_L(b_+127, interactionCode44__initGraphicsAndIncState_hook, b_+130);
 L_5506:
   CALL_C(b_+130, interactionRunScript_hook, SYM(interactionRunScript), b_+133);
   CYC(b_+133, b_+136); if (hook_enabled_at(gb, SYM(interactionAnimateAsNpc))) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(SYM(interactionAnimateAsNpc));

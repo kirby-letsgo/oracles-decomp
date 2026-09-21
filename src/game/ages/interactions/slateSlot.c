@@ -74,9 +74,9 @@ state0:
 
 state1:
   CALL_C(b_+35, objectCheckCollidedWithLink_notDead_hook, SYM(objectCheckCollidedWithLink_notDead), b_+38);
-  if (!(F & FC)) CALL_C_CC(b_+38, interactionCodedb_resetCounter, b_+65, b_+41); else CYC(b_+38, b_+41); // call nc
+  if (!(F & FC)) CALL_L_CC(b_+38, interactionCodedb_resetCounter, b_+41); else CYC(b_+38, b_+41); // call nc
   CALL_C(b_+41, objectCheckLinkPushingAgainstCenter_hook, SYM(objectCheckLinkPushingAgainstCenter), b_+44);
-  if (!(F & FC)) CALL_C_CC(b_+44, interactionCodedb_resetCounter, b_+65, b_+47); else CYC(b_+44, b_+47); // call nc
+  if (!(F & FC)) CALL_L_CC(b_+44, interactionCodedb_resetCounter, b_+47); else CYC(b_+44, b_+47); // call nc
   CYC(b_+47, b_+48); H = D;
   CYC(b_+48, b_+50); L = INTERACTION_BASE + OBJ_VAR3F;
   CYC(b_+50, b_+51); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)

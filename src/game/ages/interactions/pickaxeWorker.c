@@ -59,7 +59,7 @@ L_6937:
   CALL_C(b_+12, checkInteractionState_hook, SYM(checkInteractionState), b_+15);
   if (!(F & FZ)) { CYCT(b_+15, b_+17); goto L_6942; } CYC(b_+15, b_+17);
 L_693c:
-  CALL_C(b_+17, interactionCode57__loadScriptAndInitGraphics_hook, b_+350, b_+20);
+  CALL_L(b_+17, interactionCode57__loadScriptAndInitGraphics_hook, b_+20);
 L_693f:
   CALL_C(b_+20, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+23);
 L_6942:
@@ -90,7 +90,7 @@ L_6965:
 L_696f:
   CYC(b_+68, b_+70); E = 0x78;
   CYC(b_+70, b_+71); mem_wr(gb, DE, A);
-  CALL_C(b_+71, interactionCode57__loadScriptAndInitGraphics_hook, b_+350, b_+74);
+  CALL_L(b_+71, interactionCode57__loadScriptAndInitGraphics_hook, b_+74);
 L_6975:
   CYC(b_+74, b_+76); E = 0x45;
   CYC(b_+76, b_+77); A = mem_rd(gb, DE);
@@ -156,7 +156,7 @@ L_69cb:
   if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(gb, SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
   CYC(b_+168, b_+171); if (hook_enabled_at(gb, SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
 L_69d6:
-  CALL_C(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+183, b_+174);
+  CALL_L(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+174);
   if (!(F & FC)) { CYCT(b_+174, b_+175); ret_effect(gb); return; } CYC(b_+174, b_+175);
   CALL_C(b_+175, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+178);
   CYC(b_+178, b_+180); L = 0x46;
@@ -225,7 +225,7 @@ L_6a4c:
     else { HANDOFF(HL); }
   } while (0);
 L_6a58:
-  CALL_C(b_+301, interactionCode57__updateAnimationAndRunScript_hook, b_+183, b_+304);
+  CALL_L(b_+301, interactionCode57__updateAnimationAndRunScript_hook, b_+304);
   if (!(F & FC)) { CYCT(b_+304, b_+305); ret_effect(gb); return; } CYC(b_+304, b_+305);
   CALL_C(b_+305, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+308);
 L_6a5f:
@@ -293,7 +293,7 @@ L_6937:
   CALL_C(b_+12, checkInteractionState_hook, SYM(checkInteractionState), b_+15);
   if (!(F & FZ)) { CYCT(b_+15, b_+17); goto L_6942; } CYC(b_+15, b_+17);
 L_693c:
-  CALL_C(b_+17, interactionCode57__loadScriptAndInitGraphics_hook, b_+350, b_+20);
+  CALL_L(b_+17, interactionCode57__loadScriptAndInitGraphics_hook, b_+20);
 L_693f:
   CALL_C(b_+20, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+23);
 L_6942:
@@ -356,7 +356,7 @@ void interactionCode57__subid03__state0_hook(GB *gb) {
   BASE(interactionCode57);
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_693c:
-  CALL_C(b_+17, interactionCode57__loadScriptAndInitGraphics_hook, b_+350, b_+20);
+  CALL_L(b_+17, interactionCode57__loadScriptAndInitGraphics_hook, b_+20);
 L_693f:
   CALL_C(b_+20, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+23);
 L_6942:
@@ -551,7 +551,7 @@ L_6965:
 L_696f:
   CYC(b_+68, b_+70); E = 0x78;
   CYC(b_+70, b_+71); mem_wr(gb, DE, A);
-  CALL_C(b_+71, interactionCode57__loadScriptAndInitGraphics_hook, b_+350, b_+74);
+  CALL_L(b_+71, interactionCode57__loadScriptAndInitGraphics_hook, b_+74);
 L_6975:
   CYC(b_+74, b_+76); E = 0x45;
   CYC(b_+76, b_+77); A = mem_rd(gb, DE);
@@ -617,7 +617,7 @@ L_69cb:
   if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(gb, SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
   CYC(b_+168, b_+171); if (hook_enabled_at(gb, SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
 L_69d6:
-  CALL_C(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+183, b_+174);
+  CALL_L(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+174);
   if (!(F & FC)) { CYCT(b_+174, b_+175); ret_effect(gb); return; } CYC(b_+174, b_+175);
   CALL_C(b_+175, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+178);
   CYC(b_+178, b_+180); L = 0x46;
@@ -685,7 +685,7 @@ L_6965:
 L_696f:
   CYC(b_+68, b_+70); E = 0x78;
   CYC(b_+70, b_+71); mem_wr(gb, DE, A);
-  CALL_C(b_+71, interactionCode57__loadScriptAndInitGraphics_hook, b_+350, b_+74);
+  CALL_L(b_+71, interactionCode57__loadScriptAndInitGraphics_hook, b_+74);
 L_6975:
   CYC(b_+74, b_+76); E = 0x45;
   CYC(b_+76, b_+77); A = mem_rd(gb, DE);
@@ -751,7 +751,7 @@ L_69cb:
   if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(gb, SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
   CYC(b_+168, b_+171); if (hook_enabled_at(gb, SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
 L_69d6:
-  CALL_C(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+183, b_+174);
+  CALL_L(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+174);
   if (!(F & FC)) { CYCT(b_+174, b_+175); ret_effect(gb); return; } CYC(b_+174, b_+175);
   CALL_C(b_+175, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+178);
   CYC(b_+178, b_+180); L = 0x46;
@@ -874,7 +874,7 @@ L_69cb:
   if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(gb, SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
   CYC(b_+168, b_+171); if (hook_enabled_at(gb, SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
 L_69d6:
-  CALL_C(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+183, b_+174);
+  CALL_L(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+174);
   if (!(F & FC)) { CYCT(b_+174, b_+175); ret_effect(gb); return; } CYC(b_+174, b_+175);
   CALL_C(b_+175, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+178);
   CYC(b_+178, b_+180); L = 0x46;
@@ -1075,7 +1075,7 @@ void interactionCode57__subid1Substate1_hook(GB *gb) {
   BASE(interactionCode57);
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_69d6:
-  CALL_C(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+183, b_+174);
+  CALL_L(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+174);
   if (!(F & FC)) { CYCT(b_+174, b_+175); ret_effect(gb); return; } CYC(b_+174, b_+175);
   CALL_C(b_+175, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+178);
   CYC(b_+178, b_+180); L = 0x46;
@@ -1159,7 +1159,7 @@ L_6965:
 L_696f:
   CYC(b_+68, b_+70); E = 0x78;
   CYC(b_+70, b_+71); mem_wr(gb, DE, A);
-  CALL_C(b_+71, interactionCode57__loadScriptAndInitGraphics_hook, b_+350, b_+74);
+  CALL_L(b_+71, interactionCode57__loadScriptAndInitGraphics_hook, b_+74);
 L_6975:
   CYC(b_+74, b_+76); E = 0x45;
   CYC(b_+76, b_+77); A = mem_rd(gb, DE);
@@ -1225,7 +1225,7 @@ L_69cb:
   if (!(F & FC)) { CYCT(b_+165, b_+168); if (hook_enabled_at(gb, SYM(objectSetVisiblec1))) { objectSetVisiblec1_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec1)); } CYC(b_+165, b_+168);
   CYC(b_+168, b_+171); if (hook_enabled_at(gb, SYM(objectSetVisiblec3))) { objectSetVisiblec3_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec3));
 L_69d6:
-  CALL_C(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+183, b_+174);
+  CALL_L(b_+171, interactionCode57__updateAnimationAndRunScript_hook, b_+174);
   if (!(F & FC)) { CYCT(b_+174, b_+175); ret_effect(gb); return; } CYC(b_+174, b_+175);
   CALL_C(b_+175, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+178);
   CYC(b_+178, b_+180); L = 0x46;
@@ -1294,7 +1294,7 @@ L_6a4c:
     else { HANDOFF(HL); }
   } while (0);
 L_6a58:
-  CALL_C(b_+301, interactionCode57__updateAnimationAndRunScript_hook, b_+183, b_+304);
+  CALL_L(b_+301, interactionCode57__updateAnimationAndRunScript_hook, b_+304);
   if (!(F & FC)) { CYCT(b_+304, b_+305); ret_effect(gb); return; } CYC(b_+304, b_+305);
   CALL_C(b_+305, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+308);
 L_6a5f:
@@ -1320,7 +1320,7 @@ void interactionCode57__subid2Substate1_hook(GB *gb) {
   BASE(interactionCode57);
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6a58:
-  CALL_C(b_+301, interactionCode57__updateAnimationAndRunScript_hook, b_+183, b_+304);
+  CALL_L(b_+301, interactionCode57__updateAnimationAndRunScript_hook, b_+304);
   if (!(F & FC)) { CYCT(b_+304, b_+305); ret_effect(gb); return; } CYC(b_+304, b_+305);
   CALL_C(b_+305, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+308);
 L_6a5f:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check every CALL_C / CALL_C_CC site against the ROM: a conditional call opcode (c4/cc/d4/dc)
+"""Check every CALL_C / CALL_C_CC / CALL_L / CALL_L_CC site against the ROM: a conditional call opcode (c4/cc/d4/dc)
 must use CALL_C_CC (taken: 6 cycles), an unconditional one (cd) CALL_C.
 
 usage: tools/audit_calls.py ROM SYM [--fix]
@@ -12,7 +12,7 @@ rom = open(sys.argv[1], 'rb').read()
 labels = rom_labels(sys.argv[2])
 fix = '--fix' in sys.argv
 def byte(bank, addr): return rom[(bank * 0x4000 + (addr & 0x3fff)) if addr >= 0x4000 else addr]
-SITE = re.compile(r'\b(CALL_C|CALL_C_CC)\(\s*(b_\+(\d+)|\(SYM\((\w+)\) \+ (\d+)\)|SYM\((\w+)\)|b_)\s*,')
+SITE = re.compile(r'\b(CALL_C|CALL_C_CC|CALL_L|CALL_L_CC)\(\s*(b_\+(\d+)|\(SYM\((\w+)\) \+ (\d+)\)|SYM\((\w+)\)|b_)\s*,')
 bad = 0
 for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
     if os.path.basename(path).startswith('gen_'): continue
@@ -32,7 +32,8 @@ for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
             if lab is None or lab not in labels: continue
             bank, addr = labels[lab][0]
             op = byte(bank, addr + off)
-            want = 'CALL_C_CC' if op in (0xc4, 0xcc, 0xd4, 0xdc) else 'CALL_C' if op == 0xcd else None
+            fam = 'CALL_L' if kind.startswith('CALL_L') else 'CALL_C'
+            want = fam + '_CC' if op in (0xc4, 0xcc, 0xd4, 0xdc) else fam if op == 0xcd else None
             if want is None or want == kind: continue
             bad += 1
             print(f'{path}: {lab}+{off} ({bank:02x}:{addr + off:04x}) op {op:02x} uses {kind}, want {want}')

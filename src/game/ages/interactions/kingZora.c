@@ -138,7 +138,7 @@ subid0State0:
   CALL_C(b_+24, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+27);
   if (F & FZ) { CYCT(b_+27, b_+30); interactionDelete_hook(gb); return; } // jp z
   CYC(b_+27, b_+30);
-  CALL_C(b_+30, interactionCode9c_choosePresentKingZoraScript_hook, b_+91, b_+33);
+  CALL_L(b_+30, interactionCode9c_choosePresentKingZoraScript_hook, b_+33);
 
 setScriptAndInit:
   CALL_C(b_+33, interactionSetScript_hook, SYM(interactionSetScript), b_+36);
@@ -156,7 +156,7 @@ subid1:
   CYC(b_+59, b_+60); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+60, b_+62); goto state1; } // jr nz
   CYC(b_+60, b_+62);
-  CALL_C(b_+62, interactionCode9c_choosePastKingZoraScript_hook, b_+165, b_+65);
+  CALL_L(b_+62, interactionCode9c_choosePastKingZoraScript_hook, b_+65);
   CYC(b_+65, b_+67); goto setScriptAndInit; // jr
 
 subid2:

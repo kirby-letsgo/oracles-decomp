@@ -47,7 +47,7 @@ state0:
   CALL_C(b_+46, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+49);
   CYC(b_+49, b_+51); E = INTERACTION_BASE + OBJ_SUBID;
   CYC(b_+51, b_+52); A = mem_rd(gb, DE);
-  CYC(b_+52, b_+55); SET_HL((SYM(twinrova_state8) + 44));
+  CYC(b_+52, b_+55); SET_HL(GV((SYM(twinrova_state8) + 44), 0x4b48));
   CYC(b_+55, b_+56); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+56, b_+58);
@@ -58,7 +58,7 @@ state0:
   CYC(b_+60, b_+61); A = mem_rd(gb, DE);
   CYC(b_+61, b_+62); A = alu_inc8(gb, A);
   CYC(b_+62, b_+63); mem_wr(gb, DE, A);
-  CYC(b_+63, b_+66); SET_HL((SYM(twinrova_state8) + 29));
+  CYC(b_+63, b_+66); SET_HL(GV((SYM(twinrova_state8) + 29), 0x4b39));
 setScript:
   CALL_C(b_+66, interactionSetScript_hook, SYM(interactionSetScript), b_+69);
   CYC(b_+69, b_+71); E = INTERACTION_BASE + OBJ_PRESSED_A_BUTTON;

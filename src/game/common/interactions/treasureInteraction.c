@@ -72,7 +72,7 @@ L_49bb:
   CYC(b_+75,b_+77); mem_wr(gb, HL, 0x02);
   CYC(b_+77,b_+78); L = alu_inc8(gb, L);
   CYC(b_+78,b_+80); mem_wr(gb, HL, 0x00);
-  CALL_C(b_+80, interactionCode60__checkLinkTouched_hook, b_+789, b_+83);
+  CALL_L(b_+80, interactionCode60__checkLinkTouched_hook, b_+83);
   if ((F & FC)) { CYCT(b_+83,b_+86); goto L_4a50; } CYC(b_+83,b_+86);
   CYC(b_+86,b_+89); if (hook_enabled_at(gb, SYM(objectSetVisiblec2))) { objectSetVisiblec2_hook(gb); return; } HANDOFF(SYM(objectSetVisiblec2));
 L_49cc:
@@ -127,9 +127,9 @@ L_49fb:
   CALL_C(b_+155, objectSetVisiblec0_hook, SYM(objectSetVisiblec0), b_+158);
   CYC(b_+158,b_+161); goto L_4a47;
 L_4a14:
-  CALL_C(b_+161, interactionCode60__checkLinkTouched_hook, b_+789, b_+164);
+  CALL_L(b_+161, interactionCode60__checkLinkTouched_hook, b_+164);
   if ((F & FC)) { CYCT(b_+164,b_+166); goto L_4a50; } CYC(b_+164,b_+166);
-  CALL_C(b_+166, interactionCode60__setVisibleIfWithinScreenBoundary_hook, b_+212, b_+169);
+  CALL_L(b_+166, interactionCode60__setVisibleIfWithinScreenBoundary_hook, b_+169);
   CYC(b_+169,b_+171); C = 0x10;
   CALL_C(b_+171, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+174);
   if (!(F & FZ)) { CYCT(b_+174,b_+174+1);ret_effect(gb); return; } CYC(b_+174,b_+175);
@@ -155,7 +155,7 @@ L_4a47:
   if (!(F & FC)) { CYCT(b_+215,b_+218); if (hook_enabled_at(gb, SYM(objectSetInvisible))) { objectSetInvisible_hook(gb); return; } HANDOFF(SYM(objectSetInvisible)); } CYC(b_+215,b_+218);
   CYC(b_+218,b_+221); if (hook_enabled_at(gb, SYM(objectSetVisible))) { objectSetVisible_hook(gb); return; } HANDOFF(SYM(objectSetVisible));
 L_4a50:
-  CALL_C(b_+221, interactionCode60__giveTreasure_hook, b_+703, b_+224);
+  CALL_L(b_+221, interactionCode60__giveTreasure_hook, b_+224);
   CYC(b_+224,b_+226); A = 0x03;
 L_4a55:
   CYC(b_+226,b_+227); H = D;
@@ -216,7 +216,7 @@ L_4a9a:
   CYC(b_+305,b_+307); L = 0x79;
   CYC(b_+307,b_+308); A = mem_rd(gb, HL);
   CYC(b_+308,b_+309); alu_or(gb, A);
-  if ((F & FZ)) { CALL_C_CC(b_+309, interactionCode60__giveTreasure_hook, b_+703, b_+312); } else CYC(b_+309,b_+312);
+  if ((F & FZ)) { CALL_L_CC(b_+309, interactionCode60__giveTreasure_hook, b_+312); } else CYC(b_+309,b_+312);
   CYC(b_+312,b_+314); A = 0x4c;
   CALL_C(b_+314, playSound_b00_hook, SYM(playSound_b00), b_+317);
 L_4ab0:
@@ -254,9 +254,9 @@ L_4ada:
   if (!(F & FZ)) { CYCT(b_+362,b_+362+1);ret_effect(gb); return; } CYC(b_+362,b_+363);
   CALL_C(b_+363, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+366);
   CALL_C(b_+366, objectSetVisible80_hook, SYM(objectSetVisible80), b_+369);
-  CALL_C(b_+369, interactionCode60__giveTreasure_hook, b_+703, b_+372);
+  CALL_L(b_+369, interactionCode60__giveTreasure_hook, b_+372);
   CYC(b_+372,b_+375); SET_BC(0x8100);
-  CALL_C(b_+375, interactionCode60__setLinkAnimationAndDeleteIfTextClosed_hook, b_+556, b_+378);
+  CALL_L(b_+375, interactionCode60__setLinkAnimationAndDeleteIfTextClosed_hook, b_+378);
   CYC(b_+378,b_+380); A = 0x4c;
   CYC(b_+380,b_+383); if (hook_enabled_at(gb, SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));
 L_4af2:
@@ -268,13 +268,13 @@ L_4af2:
   CYC(b_+393,b_+396); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+396,b_+399); if (hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; } HANDOFF(SYM(interactionDelete));
 L_4b02:
-  CALL_C(b_+399, interactionCode60__checkLinkTouched_hook, b_+789, b_+402);
+  CALL_L(b_+399, interactionCode60__checkLinkTouched_hook, b_+402);
   if (!(F & FC)) { CYCT(b_+402,b_+402+1);ret_effect(gb); return; } CYC(b_+402,b_+403);
   CYC(b_+403,b_+406); A = mem_rd(gb, wLinkSwimmingState);
   CYC(b_+406,b_+408); alu_bit(gb, 7, A);
   if ((F & FZ)) { CYCT(b_+408,b_+408+1);ret_effect(gb); return; } CYC(b_+408,b_+409);
   CALL_C(b_+409, objectSetVisible82_hook, SYM(objectSetVisible82), b_+412);
-  CALL_C(b_+412, interactionCode60__giveTreasure_hook, b_+703, b_+415);
+  CALL_L(b_+412, interactionCode60__giveTreasure_hook, b_+415);
   CYC(b_+415,b_+417); A = 0x4c;
   CALL_C(b_+417, playSound_b00_hook, SYM(playSound_b00), b_+420);
   CYC(b_+420,b_+422); A = 0x03;
@@ -334,7 +334,7 @@ L_4b56:
   CYC(b_+511,b_+514); goto L_4a3d;
 L_4b75:
   CALL_C(b_+514, returnIfScrollMode01Unset_hook, SYM(returnIfScrollMode01Unset), b_+517);
-  CALL_C(b_+517, interactionCode60__checkLinkTouched_hook, b_+789, b_+520);
+  CALL_L(b_+517, interactionCode60__checkLinkTouched_hook, b_+520);
   if (!(F & FC)) { CYCT(b_+520,b_+520+1);ret_effect(gb); return; } CYC(b_+520,b_+521);
   CYC(b_+521,b_+524); goto L_4a50;
 L_4b7f:

@@ -110,7 +110,7 @@ void interactionCoded8_toggleLavaSource_hook(GB *gb) {
 setOrUnsetLavaSource:
   CYC(b_+87, b_+88); A = B;
   CYC(b_+88, b_+90); mem_wr(gb, hFF8D, A); // ldh ($ff8d),a
-  CALL_C(b_+90, interactionCoded8_updateTile_hook, b_+105, b_+93);
+  CALL_L(b_+90, interactionCoded8_updateTile_hook, b_+93);
 
 tileLoop:
   CYC(b_+93, b_+94); L = alu_inc8(gb, L);
@@ -119,7 +119,7 @@ tileLoop:
   CYC(b_+97, b_+99); alu_cp(gb, 0x0c);
   if (!(F & FC)) { CYCT(b_+99, b_+100); ret_effect(gb); return; } // ret nc
   CYC(b_+99, b_+100);
-  CALL_C(b_+100, interactionCoded8_updateTile_hook, b_+105, b_+103);
+  CALL_L(b_+100, interactionCoded8_updateTile_hook, b_+103);
   CYC(b_+103, b_+105); goto tileLoop; // jr $7cc2
 }
 
@@ -167,7 +167,7 @@ state1:
   CYC(b_+47, b_+49); mem_wr(gb, HL, 30);
   CYC(b_+49, b_+51); A = 0x4d; // SND_SOLVEPUZZLE
   CALL_C(b_+51, playSound_b00_hook, SYM(playSound_b00), b_+54);
-  CALL_C(b_+54, interactionCoded8_loadScriptForSubid, b_+116, b_+57);
+  CALL_L(b_+54, interactionCoded8_loadScriptForSubid, b_+57);
   // falls through into @toggleLavaSource
   interactionCoded8_toggleLavaSource_hook(gb); return;
 
@@ -206,8 +206,8 @@ state3:
   if (!(F & FZ)) { CYCT(b_+166, b_+167); ret_effect(gb); return; } // ret nz
   CYC(b_+166, b_+167);
   CALL_C(b_+167, interactionIncState_hook, SYM(interactionIncState), b_+170);
-  CALL_C(b_+170, interactionCoded8_loadScriptForSubid, b_+116, b_+173);
-  CALL_C(b_+173, interactionCoded8_toggleLavaSource_hook, b_+57, b_+176);
+  CALL_L(b_+170, interactionCoded8_loadScriptForSubid, b_+173);
+  CALL_L(b_+173, interactionCoded8_toggleLavaSource_hook, b_+176);
   CYC(b_+176, b_+178); A = 0x70; // SND_DOORCLOSE
   CYC(b_+178, b_+181); TAIL(playSound_b00); // jp
 

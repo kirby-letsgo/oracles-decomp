@@ -506,7 +506,7 @@ void bladeTrap_checkObstructionsToTarget_hook(GB *gb) {
 
 getDirectionOffset:
   CYC(b_+24, b_+26); L = ENEMY_BASE + OBJ_ANGLE;
-  CALL_C(b_+26, bladeTrap_checkObstructionsToTarget_getNumTilesToTarget, b_+74, b_+29);
+  CALL_L(b_+26, bladeTrap_checkObstructionsToTarget_getNumTilesToTarget, b_+29);
   CYC(b_+29, b_+30); A = mem_rd(gb, HL);
   CYC(b_+30, b_+31); alu_rrca(gb);
   CYC(b_+31, b_+32); alu_rrca(gb);
@@ -519,7 +519,7 @@ getDirectionOffset:
   CYC(b_+40, b_+42); D = 0xce; // >wRoomCollisions
 
 checkNextTile:
-  CALL_C(b_+42, bladeTrap_checkObstructionsToTarget_checkNextTileSolid, b_+56, b_+45);
+  CALL_L(b_+42, bladeTrap_checkObstructionsToTarget_checkNextTileSolid, b_+45);
   if (!(F & FZ)) { CYCT(b_+45, b_+47); goto doneChecking; } // jr nz
   CYC(b_+45, b_+47);
   CYC(b_+47, b_+49); A = mem_rd(gb, hFF8B);

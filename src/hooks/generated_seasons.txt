@@ -1059,7 +1059,6 @@
 05:4948 companionForceMount_hook -
 05:495b companionDecCounter1_hook -
 05:496f specialObjectCode_link_hook -
-05:499d linkState00_hook -
 05:49df linkState0a_hook -
 05:4a05 warpTransition0_hook -
 05:4a08 warpTransitionA_hook -
@@ -1115,7 +1114,6 @@
 05:5f42 specialObjectSetVar37AndVar38_hook -
 05:5f48 specialObjectSetAngleRelativeToVar38_hook -
 05:5f6b specialObjectSetPositionToVar38IfSet_hook -
-05:628b specialObjectCode_linkRidingAnimal_hook -
 05:62dc specialObjectCode_minecart_b05_hook -
 05:62e4 specialObjectCode_maple_hook -
 05:637f mapleState1_hook -
@@ -1346,7 +1344,6 @@
 07:479f func_07_47b7_hook -
 07:47c7 applyDamageToLink_paramE_hook -
 07:47c8 applyDamageToLink_hook -
-07:485a updateItems_hook -
 07:4902 updateItemsPost_hook -
 07:4917 itemCodeNilPost_hook -
 07:4918 updateItemPost_hook -
@@ -1711,7 +1708,6 @@
 0c:51ac spark_getTileOffset_hook -
 0c:51bf spark_checkWallInDirection_hook -
 0c:51f3 enemyCode14_hook -
-0c:5354 enemyCode15_hook -
 0c:53ba enemyCode16_hook -
 0c:54d1 ghini_subid00_hook -
 0c:558e ghini_subid02_hook -
@@ -2221,7 +2217,6 @@
 0d:6747 dragonfly_state4_hook -
 0d:6762 dragonfly_state5_hook -
 0d:676c dragonfly_applySpeed_hook -
-0d:6777 enemyCode58_hook -
 0d:6866 enemyCode59_hook -
 0d:6980 twinrovaIce_bounceOffShield_hook -
 0d:6a5f enemyCode60_hook -
@@ -2790,7 +2785,6 @@
 3f:44a8 loseTreasure_helper_hook -
 3f:44c8 giveTreasure_body_hook -
 3f:44f0 giveTreasure_body__findItemInTable_hook -
-3f:4501 giveTreasure_body__giveTreasure_hook -
 3f:456f giveTreasure_body__modeb_hook -
 3f:4576 giveTreasure_body__mode8_hook -
 3f:4581 giveTreasure_body__mode5_hook -

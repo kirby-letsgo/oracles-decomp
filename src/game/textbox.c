@@ -2719,17 +2719,17 @@ select_heart_piece:
 void func_53eb_dmaHeartPieceDisplay_hook(GB *gb) {
   BASE(func_53eb);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+142, b_+145); SET_HL((SYM(handleTextControlCode__controlCode6) + 2));
+  CYC(b_+142, b_+145); SET_HL(0x5720);
   CYC(b_+145, b_+148); SET_DE(0x95d0);
   CYC(b_+148, b_+151); SET_BC(0x001c);
   CALL_C(b_+151, queueDmaTransfer_hook, SYM(queueDmaTransfer), b_+154);
-  CYC(b_+154, b_+157); SET_HL((SYM(handleTextControlCode__tradeItem) + 9));
+  CYC(b_+154, b_+157); SET_HL(0x5730);
   CYC(b_+157, b_+159); E = 0xf0;
   CALL_C(b_+159, queueDmaTransfer_hook, SYM(queueDmaTransfer), b_+162);
-  CYC(b_+162, b_+165); SET_HL((SYM(handleTextControlCode__kanji) + 4));
+  CYC(b_+162, b_+165); SET_HL(0x5740);
   CYC(b_+165, b_+168); SET_DE(0x97c0);
   CALL_C(b_+168, queueDmaTransfer_hook, SYM(queueDmaTransfer), b_+171);
-  CYC(b_+171, b_+174); SET_HL(SYM(handleTextControlCode__controlCode3));
+  CYC(b_+171, b_+174); SET_HL(0x5750);
   CYC(b_+174, b_+176); E = 0xe0;
   CYC(b_+176, b_+179); queueDmaTransfer_hook(gb);
 }

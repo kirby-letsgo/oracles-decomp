@@ -72,7 +72,7 @@ void interactionCodea2_hook(GB *gb) {
   } while (0);
 
 state0To7:
-  CYC(b_+33, b_+36); SET_HL((SYM(interactionCoded8__subid5Script) + 27)); // bank0e.movingSidescrollConveyorScriptTable
+  CYC(b_+33, b_+36); SET_HL(GV((SYM(interactionCoded8__subid5Script) + 27), 0x7b2f)); // bank0e.movingSidescrollConveyorScriptTable
   CALL_C(b_+36, objectLoadMovementScript_hook, SYM(objectLoadMovementScript), b_+39);
   CALL_C(b_+39, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+42);
   CYC(b_+42, b_+43); H = D;

@@ -108,7 +108,7 @@ state0:
   CYC(b_+38, b_+40); E = INTERACTION_BASE + OBJ_VAR38;
   CYC(b_+40, b_+41); mem_wr(gb, DE, A);
   CALL_C(b_+41, objectSetVisible82_hook, SYM(objectSetVisible82), b_+44);
-  CALL_C(b_+44, interactionCodea6_createSparkle_hook, b_+140, b_+47);
+  CALL_L(b_+44, interactionCodea6_createSparkle_hook, b_+47);
   // falls through into @state1 (also a direct jump-table target)
 
 state1:

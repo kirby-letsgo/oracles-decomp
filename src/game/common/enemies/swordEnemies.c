@@ -78,7 +78,7 @@ void enemyCode3d_hook(GB *gb) {
   BASE(enemyCode3d);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, ecom_checkHazards_b0e_hook, SYM(ecom_checkHazards_b0e), b_+3);
-  CALL_C(b_+3, enemyCode3d_runState_hook, b_+9, b_+6);
+  CALL_L(b_+3, enemyCode3d_runState_hook, b_+6);
   CYC(b_+6, b_+9); TAIL(swordEnemy_updateEnemyCollisionMode); // jp
 }
 
@@ -291,7 +291,7 @@ void enemyCode48_hook(GB *gb) {
   BASE(enemyCode48);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, ecom_checkHazards_b0e_hook, GV(SYM(ecom_checkHazards_b0e), 0x4446), b_+3);
-  CALL_C(b_+3, enemyCode48_runState_hook, b_+9, b_+6);
+  CALL_L(b_+3, enemyCode48_runState_hook, b_+6);
   CYC(b_+6, b_+9); TAIL(swordDarknut_updateEnemyCollisionMode); // jp
 }
 
@@ -451,7 +451,7 @@ void swordEnemy_chooseRandomAngleAndCounter1_hook(GB *gb) {
   CYC(b_+8, b_+10); A = 0x50;
   CYC(b_+10, b_+11); alu_add(gb, B);
   CYC(b_+11, b_+12); mem_wr(gb, DE, A);
-  CALL_C(b_+12, swordEnemy_chooseRandomAngleAndCounter1_chooseAngle_hook, b_+18, b_+15);
+  CALL_L(b_+12, swordEnemy_chooseRandomAngleAndCounter1_chooseAngle_hook, b_+15);
   CYC(b_+15, b_+18); TAIL(ecom_updateAnimationFromAngle_b0e); // jp
 }
 

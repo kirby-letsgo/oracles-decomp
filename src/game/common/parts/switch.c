@@ -65,7 +65,7 @@ L_453c:
   CYC(b_+60, b_+63); TAIL(setTile); // jp
 
 flipOverworldSwitch:
-  CYC(b_+63, b_+65); A = 0x9f; // TILEINDEX_OVERWORLD_SWITCH_ON
+  CYC(b_+63, b_+65); A = GV(0x9f, 0xb0); // TILEINDEX_OVERWORLD_SWITCH_ON
   CALL_C(b_+65, setTile_hook, SYM(setTile), b_+68);
   CYC(b_+68, b_+70); B = 0xcf; // >wRoomLayout
   CYC(b_+70, b_+71); alu_xor(gb, A);

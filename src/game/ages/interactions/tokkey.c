@@ -105,7 +105,7 @@ runScript:
   CYC(b_+93, b_+96); TAIL(npcFaceLinkAndAnimate); // jp
 
 state2:
-  CALL_C(b_+96, interactionCode9d_checkCreateMusicNote_hook, b_+134, b_+99);
+  CALL_L(b_+96, interactionCode9d_checkCreateMusicNote_hook, b_+99);
   CALL_C(b_+99, interactionAnimate_hook, SYM(interactionAnimate), b_+102);
   // falls through into @state4 (also a direct jump-table target)
 
@@ -115,7 +115,7 @@ state4:
   CYC(b_+107, b_+110); TAIL(objectUpdateSpeedZ_paramC); // jp
 
 state3:
-  CALL_C(b_+110, interactionCode9d_checkCreateMusicNote_hook, b_+134, b_+113);
+  CALL_L(b_+110, interactionCode9d_checkCreateMusicNote_hook, b_+113);
   CALL_C(b_+113, interactionRunScript_hook, SYM(interactionRunScript), b_+116);
   CALL_C(b_+116, interactionAnimate_hook, SYM(interactionAnimate), b_+119);
   CALL_C(b_+119, interactionAnimate_hook, SYM(interactionAnimate), b_+122);

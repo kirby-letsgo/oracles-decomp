@@ -28,10 +28,10 @@ void initializeAnimations_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
   CYC(b_+5, b_+6);
   CALL_C(b_+6, loadAnimationData_hook, SYM(loadAnimationData), b_+9);
-  CALL_C(b_+9, initializeAnimations__locFunc_hook, b_+25, b_+12);
+  CALL_L(b_+9, initializeAnimations__locFunc_hook, b_+12);
   CYC(b_+12, b_+15); SET_HL(wAnimationState);
   CYC(b_+15, b_+17); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x80));
-  CALL_C(b_+17, initializeAnimations__locFunc_hook, b_+25, b_+20);
+  CALL_L(b_+17, initializeAnimations__locFunc_hook, b_+20);
   CYC(b_+20, b_+23); SET_HL(wAnimationState);
   CYC(b_+23, b_+25); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x80));
   initializeAnimations__locFunc_hook(gb);

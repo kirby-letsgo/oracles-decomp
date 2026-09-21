@@ -78,7 +78,7 @@ void interactionCodea1_hook(GB *gb) {
   } while (0);
 
 state0To7:
-  CYC(b_+27, b_+30); SET_HL((SYM(interactionCoded8__subid4Script) + 51)); // bank0e.movingSidescrollPlatformScriptTable
+  CYC(b_+27, b_+30); SET_HL(GV((SYM(interactionCoded8__subid4Script) + 51), 0x7a3c)); // bank0e.movingSidescrollPlatformScriptTable
   CALL_C(b_+30, objectLoadMovementScript_hook, SYM(objectLoadMovementScript), b_+33);
   CALL_C(b_+33, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+36);
   CYC(b_+36, b_+38); E = INTERACTION_BASE + OBJ_DIRECTION;

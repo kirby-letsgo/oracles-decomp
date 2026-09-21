@@ -34,7 +34,7 @@ def main():
             if n and verdict.get(n) == 'SAME_SHAPE': verdict[n] = 'IDENTICAL'
 
     # C call graph: function name -> callees, per file (static helpers are file-local)
-    callees, burns = {}, {}
+    callees, burns, local_calls = {}, {}, {}
     EXEC = re.compile(r'\b(?:CYCT?[0-9a-f]*|burn_rom|RET|RET_TAKEN|RETI|I|push_effect|BASE)\(([^;]*)')
     for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
         if os.path.basename(path).startswith('gen_') or os.path.basename(path) == 'syms.c': continue
@@ -42,7 +42,7 @@ def main():
         for line in open(path, errors='replace'):
             m = FUNC.match(line)
             if m:
-                cur = (path, m.group(1)); callees[cur] = set(); burns[cur] = set()
+                cur = (path, m.group(1)); callees[cur] = set(); burns[cur] = set(); local_calls[cur] = set()
                 line = line[m.end():]
             elif line.startswith('}'): cur = None; continue
             if cur is None: continue
@@ -53,7 +53,9 @@ def main():
             for c in CALL.findall(code):
                 if c.endswith('_hook') and c[:-5] in guarded: continue
                 callees[cur].add(c)
-            for c in re.findall(r'\bCALL_L(?:_CC)?\(b_\+\d+, (\w+),', code): callees[cur].add(c)   # CALL_L calls fn unconditionally
+            # CALL_L runs the call target's C unconditionally: that target's body must match too
+            for off, lab, loff in re.findall(r'\bCALL_L(?:_CC)?\((?:b_\+(\d+)|\(SYM\((\w+)\) \+ (\d+)\)), \w+,', code):
+                local_calls[cur].add((lab or None, int(off or loff)))
             for args in EXEC.findall(code):
                 for lab in re.findall(r'\bSYM\((\w+)\)', args): burns[cur].add(lab)
                 bm = re.match(r'\s*(\w+)\)', args)
@@ -82,12 +84,36 @@ def main():
         if unpairable.match(name) or name not in seasons_names: return 'AGES_ONLY'
         return verdict.get(name.split('@')[0])
 
+    from symfiles import pair_instances
+    from routine_equiv import Game
+    pairs = pair_instances(ages_rom, ages_sym, seasons_rom, seasons_sym)
+    A, S = Game(ages_rom, ages_sym), Game(seasons_rom, seasons_sym)
+    ages_labels = rom_labels(ages_sym)
+
+    def local_call_ok(base, off):
+        """The bodies at the call target of the `call` at base+off are identical in both games."""
+        for a in ages_labels.get(base, []):
+            s_ = pairs.get((base,) + a)
+            if s_ is None: return False
+            for g, (bank, addr) in ((A, a), (S, s_)):
+                if g.rd(bank, addr + off) not in (0xcd, 0xc4, 0xcc, 0xd4, 0xdc): return False
+            ta = A.rd(a[0], a[1] + off + 1) | (A.rd(a[0], a[1] + off + 2) << 8)
+            ts = S.rd(s_[0], s_[1] + off + 1) | (S.rd(s_[0], s_[1] + off + 2) << 8)
+            try:
+                if A.normalized(a[0], ta)[0] != S.normalized(s_[0], ts)[0]: return False
+            except Exception: return False
+        return bool(ages_labels.get(base))
+
     eligible = {}
     for key, fn in ((k, k[1]) for k in callees):
         ok = hook_verdict(fn) == 'IDENTICAL' if fn.endswith('_hook') else True
         for lab in burns[key]:
             v = label_verdict(lab)
             if v is not None and v != 'IDENTICAL': ok = False
+        base_labels = [l for l in burns[key] if l in ages_labels]
+        for lab, off in local_calls[key]:
+            base = lab or (base_labels[0] if len(base_labels) == 1 else None)
+            if base is None or not local_call_ok(base, off): ok = False
         eligible[key] = ok
     changed = True
     while changed:
@@ -103,9 +129,7 @@ def main():
                 if not ok:
                     eligible[key] = False; changed = True; break
 
-    ages, seasons = rom_labels(ages_sym), rom_labels(seasons_sym)
-    from symfiles import pair_instances
-    pairs = pair_instances(ages_rom, ages_sym, seasons_rom, seasons_sym)
+    ages, seasons = ages_labels, rom_labels(seasons_sym)
     rows, skipped = [], defaultdict(int)
     for l in open('src/hooks/generated.txt'):
         p = l.split()

@@ -233,7 +233,7 @@ static void faroreMakeChest_updateSparkle(GB *gb, uint16_t sp0_) {
     }
   }
   CYC(b_+115, b_+117); E = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(b_+117, b_+120); SET_BC((SYM(interactionCode3b__runSubid00__substate2) + 16));
+  CYC(b_+117, b_+120); SET_BC(0x7858);
   CYC(b_+120, b_+123); A = mem_rd(gb, faroreSparkleRadius);
   CALL_C(b_+123, objectSetPositionInCircleArc_hook, SYM(objectSetPositionInCircleArc), b_+126);
   CYC(b_+126, b_+129); interactionAnimate_hook(gb);

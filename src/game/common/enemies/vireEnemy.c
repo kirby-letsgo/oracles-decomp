@@ -784,7 +784,7 @@ substate1:
   CALL_C(b_+46, objectCreatePuff_hook, SYM(objectCreatePuff), b_+49);
   CYC(b_+49, b_+51); B = 0x75; // ENEMY_VIRE
   CALL_C(b_+51, ecom_spawnUncountedEnemyWithSubid01_b0f_hook, SYM(ecom_spawnUncountedEnemyWithSubid01_b0f), b_+54);
-  CALL_C(b_+54, vire_mainForm_stateF_initBat_hook, b_+61, b_+57);
+  CALL_L(b_+54, vire_mainForm_stateF_initBat_hook, b_+57);
   CALL_C(b_+57, ecom_spawnUncountedEnemyWithSubid01_b0f_hook, SYM(ecom_spawnUncountedEnemyWithSubid01_b0f), b_+60);
   CYC(b_+60, b_+61); A = alu_inc8(gb, A);
   vire_mainForm_stateF_initBat_hook(gb); return; // fallthrough

@@ -101,9 +101,9 @@ state_stub:
   RET(b_+62); return; // ret
 
 state8:
-  CALL_C(b_+63, enemyCode15_checkCenteredOnTile, b_+91, b_+66);
-  if (F & FZ) { CALL_C_CC(b_+66, enemyCode15_chooseNewDirection_hook, b_+78, b_+69); } else { CYC(b_+66, b_+69); } // call z
+  CALL_L(b_+63, enemyCode15_checkCenteredOnTile, b_+66);
+  if (F & FZ) { CALL_L_CC(b_+66, enemyCode15_chooseNewDirection_hook, b_+69); } else { CYC(b_+66, b_+69); } // call z
   CALL_C(b_+69, ecom_applyVelocityForSideviewEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0d), b_+72);
-  if (F & FZ) { CALL_C_CC(b_+72, enemyCode15_chooseNewDirection_hook, b_+78, b_+75); } else { CYC(b_+72, b_+75); } // call z
+  if (F & FZ) { CALL_L_CC(b_+72, enemyCode15_chooseNewDirection_hook, b_+75); } else { CYC(b_+72, b_+75); } // call z
   CYC(b_+75, b_+78); TAIL(enemyAnimate); // jp
 }

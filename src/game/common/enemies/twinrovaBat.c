@@ -81,7 +81,7 @@ state0:
   CYC(b_+62, b_+65); TAIL(objectSetVisible82); // jp
 
 state1:
-  CALL_C(b_+65, enemyCode5e_updateOamFlags_hook, b_+105, b_+68);
+  CALL_L(b_+65, enemyCode5e_updateOamFlags_hook, b_+68);
   CALL_C(b_+68, ecom_decCounter2_b0e_hook, SYM(ecom_decCounter2_b0e), b_+71);
   if (!(F & FZ)) { CYCT(b_+71, b_+73); goto animate; } // jr nz
   CYC(b_+71, b_+73);
@@ -90,10 +90,10 @@ state1:
   CALL_C(b_+75, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+78);
 
 state2:
-  CALL_C(b_+78, enemyCode5e_checkInBounds_hook, b_+93, b_+81);
+  CALL_L(b_+78, enemyCode5e_checkInBounds_hook, b_+81);
   if (!(F & FC)) { CYCT(b_+81, b_+84); enemyDelete_hook(gb); return; } // jp nc
   CYC(b_+81, b_+84);
-  CALL_C(b_+84, enemyCode5e_updateOamFlags_hook, b_+105, b_+87);
+  CALL_L(b_+84, enemyCode5e_updateOamFlags_hook, b_+87);
   CALL_C(b_+87, objectApplySpeed_hook, SYM(objectApplySpeed), b_+90);
 
 animate:

@@ -59,7 +59,7 @@ void interactionCodecb_hook(GB *gb) {
   CYC(b_+3, b_+5);
 
   // interactionCodecb@state0 (0x77a3): reached solely by fallthrough, never a jump target.
-  CALL_C(b_+5, interactionCodecb_initialize_hook, b_+32, b_+8);
+  CALL_L(b_+5, interactionCodecb_initialize_hook, b_+8);
   CYC(b_+8, b_+9); H = D;
   CYC(b_+9, b_+11); L = INTERACTION_BASE + OBJ_OAM_FLAGS;
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x02);

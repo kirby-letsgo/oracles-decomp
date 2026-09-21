@@ -59,9 +59,9 @@ void enemyCode5a_hook(GB *gb) {
   CYC(b_+47, b_+49); alu_and(gb, 0x0f);
   CYC(b_+49, b_+51); hram_wr(gb, (uint8_t)hFF8B, A);
   CYC(b_+51, b_+52); alu_xor(gb, A);
-  CALL_C(b_+52, enemyCode5a_addSeed_hook, b_+62, b_+55);
+  CALL_L(b_+52, enemyCode5a_addSeed_hook, b_+55);
   CYC(b_+55, b_+57); A = 0x01;
-  CALL_C(b_+57, enemyCode5a_addSeed_hook, b_+62, b_+60);
+  CALL_L(b_+57, enemyCode5a_addSeed_hook, b_+60);
   CYC(b_+60, b_+62); A = 0x02;
   enemyCode5a_addSeed_hook(gb); return; // fallthrough
 
