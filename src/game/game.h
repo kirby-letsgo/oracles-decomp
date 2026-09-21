@@ -370,6 +370,7 @@ void burn_store_sp(GB *gb, uint16_t a, uint16_t addr);
 // a `jp` into another routine: its C if that routine is hooked in the running game, else the interpreter
 #define TAIL(l) do { if (hook_is(gb, SYM(l), l##_hook)) { l##_hook(gb); return; } hook_continue(gb, SYM(l), gb->sp); return; } while (0)
 #define TAIL_S(l) do { if (hook_is(gb, SYM(l), s_##l##_hook)) { s_##l##_hook(gb); return; } hook_continue(gb, SYM(l), gb->sp); return; } while (0)
+#define TAIL_SG(l) do { if (hook_is(gb, SYM(l), s_##l)) { s_##l(gb); return; } hook_continue(gb, SYM(l), gb->sp); return; } while (0)
 // a `jp` whose target is a different routine in each game; the Seasons one runs interpreted
 #define TAIL_GV(a, s) do { if (game_seasons) { hook_continue(gb, SYM(s), gb->sp); return; } TAIL(a); } while (0)
 #define CALL_C(a, fn, target, ra) do { CYC((a), (a) + 3); CALL_C_((a), fn, (target), (ra)); } while (0)

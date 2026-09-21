@@ -850,3 +850,546 @@ load_regs:
   CYC(b_+43, b_+45); mem_wr(gb, hCameraX, A);
   RET(b_+45); return;
 }
+
+// The temple sinking (CUTSCENE_S_TEMPLE_SINKING): the temple falls into the earth in three
+// scenes with the screen shaking, then Din's castle scene again, then the game starts from the
+// death-respawn preset. wTmpcbb4/5/6 drive the shake and scene timers, wTmpcbb8/9/a the flashing
+// palette rotation, wTmpcbbb the scene index and wTmpcfc0+$13 the explosion stage; the gfx
+// registers are parked in wGfxRegs4 across the scene switches.
+#define wGameState (wThreadStateBuffer + 0x0e)
+
+static void intro_add_a_to_hl(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, false);
+    burn_rom(gb, 0x00, 0x0013, 0x0014, false); H = alu_inc8(gb, H);
+    burn_rom(gb, 0x00, 0x0014, 0x0015, false);
+  } else {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, true);
+  }
+  ret_effect(gb);
+}
+
+void s_cutsceneTempleSinking_hook(GB *gb) {
+  BASE(cutsceneTempleSinking);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+3); SET_DE(wCutsceneState);
+  CYC(b_+3, b_+4); A = mem_rd(gb, DE);
+  CYC(b_+4, b_+5); push_effect(gb, b_+5);
+  do { uint16_t jt_ = (intro_jump_table(gb));
+    if (jt_ == SYM(cutscene08Func0) && hook_is(gb, SYM(cutscene08Func0), s_cutscene08Func0_hook)) { s_cutscene08Func0_hook(gb); return; }
+    else if (jt_ == SYM(cutscene08Func1) && hook_is(gb, SYM(cutscene08Func1), s_cutscene08Func1_hook)) { s_cutscene08Func1_hook(gb); return; }
+    else if (jt_ == SYM(cutscene08Func2) && hook_is(gb, SYM(cutscene08Func2), s_cutscene08Func2_hook)) { s_cutscene08Func2_hook(gb); return; }
+    else if (jt_ == SYM(cutscene08Func3) && hook_is(gb, SYM(cutscene08Func3), s_cutscene08Func3_hook)) { s_cutscene08Func3_hook(gb); return; }
+    else if (jt_ == SYM(cutscene08Func4) && hook_is(gb, SYM(cutscene08Func4), s_cutscene08Func4_hook)) { s_cutscene08Func4_hook(gb); return; }
+    else if (jt_ == SYM(cutscene08Func5) && hook_is(gb, SYM(cutscene08Func5), s_cutscene08Func5_hook)) { s_cutscene08Func5_hook(gb); return; }
+    else if (jt_ == SYM(cutscene08Func6) && hook_is(gb, SYM(cutscene08Func6), s_cutscene08Func6_hook)) { s_cutscene08Func6_hook(gb); return; }
+    else if (jt_ == SYM(cutscene08Func7) && hook_is(gb, SYM(cutscene08Func7), s_cutscene08Func7_hook)) { s_cutscene08Func7_hook(gb); return; }
+    else if (jt_ == SYM(cutscene08Func8) && hook_is(gb, SYM(cutscene08Func8), s_cutscene08Func8_hook)) { s_cutscene08Func8_hook(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
+}
+
+void s_cutscene08Func0_hook(GB *gb) {
+  BASE(cutscene08Func0);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+3); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+4); return; }
+  CYC(b_+4, b_+5);
+  CYC(b_+5, b_+7); A = 0x01;
+  CYC(b_+7, b_+8); mem_wr(gb, DE, A);
+  CYC(b_+8, b_+10); B = 0x02;
+  for (;;) {
+    CALL_C(b_+10, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+13);
+    if (!(F & FZ)) { CYCT(b_+13, b_+15); break; }
+    CYC(b_+13, b_+15);
+    CYC(b_+15, b_+17); mem_wr(gb, HL, 0x77); // INTERAC_77
+    CYC(b_+17, b_+18); L = alu_inc8(gb, L);
+    CYC(b_+18, b_+19); B = alu_dec8(gb, B);
+    CYC(b_+19, b_+20); mem_wr(gb, HL, B);
+    if (!(F & FZ)) { CYCT(b_+20, b_+22); continue; }
+    CYC(b_+20, b_+22);
+    break;
+  }
+  CALL_C(b_+22, disableLcd_hook, SYM(disableLcd), b_+25);
+  CYC(b_+25, b_+27); A = 0x24; // GFXH_TEMPLEFALL_SCENE1
+  CALL_C(b_+27, loadGfxHeader_hook, SYM(loadGfxHeader), b_+30);
+  CYC(b_+30, b_+32); A = 0x98; // PALH_SEASONS_98
+  CALL_C(b_+32, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+35);
+  CYC(b_+35, b_+37); A = 0x0e;
+  CALL_C(b_+37, loadGfxRegisterStateIndex_hook, SYM(loadGfxRegisterStateIndex), b_+40);
+  CYC(b_+40, b_+43); SET_HL(wGfxRegs1_SCY);
+  CYC(b_+43, b_+44); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+44, b_+46); mem_wr(gb, hCameraY, A);
+  CYC(b_+46, b_+47); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+47, b_+49); mem_wr(gb, hCameraX, A);
+  CYC(b_+49, b_+52); SET_DE(wTmpcbb6);
+  CYC(b_+52, b_+53); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+53, b_+54); mem_wr(gb, DE, A);
+  CYC(b_+54, b_+55); SET_DE(DE + 1);
+  CYC(b_+55, b_+56); A = mem_rd(gb, HL);
+  CYC(b_+56, b_+57); mem_wr(gb, DE, A);
+  CYC(b_+57, b_+60); SET_HL(wTmpcbb3);
+  CYC(b_+60, b_+62); mem_wr(gb, HL, 0x3c);
+  CYC(b_+62, b_+63); alu_xor(gb, A);
+  CYC(b_+63, b_+66); SET_HL(wTmpcfc0 + 0x13);
+  CYC(b_+66, b_+67); mem_wr(gb, HL, A);
+  CALL_C(b_+67, s_seasonsFunc_03_79db_hook, SYM(seasonsFunc_03_79db), b_+70);
+  CYC(b_+70, b_+72); A = 0x21; // MUS_DISASTER
+  CALL_C(b_+72, playSound_b00_hook, SYM(playSound_b00), b_+75);
+  CYC(b_+75, b_+78);
+  TAIL(fadeinFromWhite);
+}
+
+void s_cutscene08Func1_hook(GB *gb) {
+  BASE(cutscene08Func1);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+3); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+4, b_+7); TAIL_S(seasonsFunc_03_7827); }
+  CYC(b_+4, b_+7);
+  CALL_C(b_+7, decCbb3_hook, SYM(decCbb3), b_+10);
+  if (!(F & FZ)) { CYCT(b_+10, b_+12); TAIL_S(seasonsFunc_03_7827); }
+  CYC(b_+10, b_+12);
+  CYC(b_+12, b_+14); B = 0x05;
+  for (;;) {
+    CALL_C(b_+14, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+17);
+    if (!(F & FZ)) { CYCT(b_+17, b_+19); break; }
+    CYC(b_+17, b_+19);
+    CYC(b_+19, b_+21); mem_wr(gb, HL, 0x86); // INTERAC_TEMPLE_SINKING_EXPLOSION
+    CYC(b_+21, b_+22); L = alu_inc8(gb, L);
+    CYC(b_+22, b_+23); B = alu_dec8(gb, B);
+    CYC(b_+23, b_+24); A = B;
+    CYC(b_+24, b_+25); mem_wr(gb, HL, A);
+    if (!(F & FZ)) { CYCT(b_+25, b_+27); continue; }
+    CYC(b_+25, b_+27);
+    break;
+  }
+  CYC(b_+27, b_+30); SET_HL(wTmpcbb3);
+  CYC(b_+30, b_+32); mem_wr(gb, HL, 0xb4);
+  CYC(b_+32, b_+33); SET_HL(HL + 1);
+  CYC(b_+33, b_+35); mem_wr(gb, HL, 0x00);
+  CALL_C(b_+35, s_incCutsceneState2_hook, SYM(incCutsceneState2), b_+38);
+  TAIL_S(seasonsFunc_03_7827);
+}
+
+void s_seasonsFunc_03_7827_hook(GB *gb) {
+  BASE(seasonsFunc_03_7827);
+  CYC(b_+0, b_+3);
+  TAIL_S(seasonsFunc_03_7981);
+}
+
+void s_cutscene08Func2_hook(GB *gb) {
+  BASE(cutscene08Func2);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(b_+0, decCbb3_hook, SYM(decCbb3), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); goto shake; }
+  CYC(b_+3, b_+5);
+  CALL_C(b_+5, s_seasonsFunc_03_7a01_hook, SYM(seasonsFunc_03_7a01), b_+8);
+  CYC(b_+8, b_+9); alu_xor(gb, A);
+  CYC(b_+9, b_+12); SET_HL(wTmpcbb4);
+  CYC(b_+12, b_+13); mem_wr(gb, HL, A);
+  CALL_C(b_+13, s_seasonsFunc_03_7917_hook, SYM(seasonsFunc_03_7917), b_+16);
+  CYC(b_+16, b_+19); SET_HL(wTmpcfc0 + 0x13);
+  CYC(b_+19, b_+20); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+20, b_+22); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
+  CYC(b_+22, b_+25);
+  TAIL_S(incCutsceneState2);
+shake:
+  CALL_C(b_+25, s_seasonsFunc_03_7909_hook, SYM(seasonsFunc_03_7909), b_+28);
+  CYC(b_+28, b_+31);
+  TAIL_S(seasonsFunc_03_7981);
+}
+
+void s_cutscene08Func3_hook(GB *gb) {
+  BASE(cutscene08Func3);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(b_+0, s_seasonsFunc_03_7981_hook, SYM(seasonsFunc_03_7981), b_+3);
+  CALL_C(b_+3, decCbb3_hook, SYM(decCbb3), b_+6);
+  if (!(F & FZ)) { RET_TAKEN(b_+6); return; }
+  CYC(b_+6, b_+7);
+  CYC(b_+7, b_+8); L = alu_inc8(gb, L);
+  CYC(b_+8, b_+9); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+9, b_+10); A = mem_rd(gb, HL);
+  CYC(b_+10, b_+12); alu_cp(gb, 0x03);
+  if (F & FZ) { CYCT(b_+12, b_+14); goto last_scene; }
+  CYC(b_+12, b_+14);
+  CYC(b_+14, b_+17); SET_HL(wTmpcfc0 + 0x13);
+  CYC(b_+17, b_+18); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+18, b_+21);
+  TAIL_S(seasonsFunc_03_7917);
+last_scene:
+  CALL_C(b_+21, disableLcd_hook, SYM(disableLcd), b_+24);
+  CYC(b_+24, b_+26); A = 0x24; // GFXH_TEMPLEFALL_SCENE1
+  CALL_C(b_+26, loadGfxHeader_hook, SYM(loadGfxHeader), b_+29);
+  CYC(b_+29, b_+31); A = 0x98; // PALH_SEASONS_98
+  CALL_C(b_+31, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+34);
+  CALL_C(b_+34, s_seasonsFunc_03_7a17_hook, SYM(seasonsFunc_03_7a17), b_+37);
+  CYC(b_+37, b_+40); SET_HL(wTmpcbb3);
+  CYC(b_+40, b_+42); mem_wr(gb, HL, 0x78);
+  CYC(b_+42, b_+43); L = alu_inc8(gb, L);
+  CYC(b_+43, b_+45); mem_wr(gb, HL, 0x00);
+  CYC(b_+45, b_+48); SET_HL(wTmpcfc0 + 0x13);
+  CYC(b_+48, b_+49); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+49, b_+51); mem_wr(gb, HL, mem_rd(gb, HL) & 0x7f);
+  CYC(b_+51, b_+54);
+  TAIL_S(incCutsceneState2);
+}
+
+void s_cutscene08Func4_hook(GB *gb) {
+  BASE(cutscene08Func4);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(b_+0, decCbb3_hook, SYM(decCbb3), b_+3);
+  if (!(F & FZ)) { CYCT(b_+3, b_+5); goto shake; }
+  CYC(b_+3, b_+5);
+  CALL_C(b_+5, disableLcd_hook, SYM(disableLcd), b_+8);
+  CYC(b_+8, b_+10); A = 0x03;
+  CYC(b_+10, b_+11); L = alu_inc8(gb, L);
+  CYC(b_+11, b_+12); mem_wr(gb, HL, A);
+  CALL_C(b_+12, s_seasonsFunc_03_7917_hook, SYM(seasonsFunc_03_7917), b_+15);
+  CYC(b_+15, b_+18); SET_HL(wTmpcfc0 + 0x13);
+  CYC(b_+18, b_+20); mem_wr(gb, HL, 0xff);
+  CALL_C(b_+20, s_incCutsceneState2_hook, SYM(incCutsceneState2), b_+23);
+  CYC(b_+23, b_+26); SET_HL(wTmpcbba);
+  CYC(b_+26, b_+28); mem_wr(gb, HL, 0x02);
+  CYC(b_+28, b_+31); SET_HL(wTmpcbb8);
+  CYC(b_+31, b_+34);
+  TAIL_S(seasonsFunc_03_7a3b);
+shake:
+  CALL_C(b_+34, s_seasonsFunc_03_7909_hook, SYM(seasonsFunc_03_7909), b_+37);
+  CYC(b_+37, b_+40);
+  TAIL_S(seasonsFunc_03_7981);
+}
+
+void s_cutscene08Func5_hook(GB *gb) {
+  BASE(cutscene08Func5);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(b_+0, s_seasonsFunc_03_7981_hook, SYM(seasonsFunc_03_7981), b_+3);
+  CALL_C(b_+3, s_seasonsFunc_03_7a2e_hook, SYM(seasonsFunc_03_7a2e), b_+6);
+  CALL_C(b_+6, decCbb3_hook, SYM(decCbb3), b_+9);
+  if (!(F & FZ)) { RET_TAKEN(b_+9); return; }
+  CYC(b_+9, b_+10);
+  CYC(b_+10, b_+11); L = alu_inc8(gb, L);
+  CYC(b_+11, b_+12); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+12, b_+13); A = mem_rd(gb, HL);
+  CYC(b_+13, b_+15); alu_cp(gb, 0x06);
+  if (F & FZ) { CYCT(b_+15, b_+17); goto castle; }
+  CYC(b_+15, b_+17);
+  CYC(b_+17, b_+20);
+  TAIL_S(seasonsFunc_03_7917);
+castle:
+  CYC(b_+20, b_+23); SET_HL(wTmpcbb3);
+  CYC(b_+23, b_+25); mem_wr(gb, HL, 0x3c);
+  CALL_C(b_+25, reloadObjectGfx_b00_hook, SYM(reloadObjectGfx_b00), b_+28);
+  CYC(b_+28, b_+30); A = 0x07;
+  CYC(b_+30, b_+32); B = 0x01;
+  CALL_C(b_+32, s_seasonsFunc_03_7aa9_hook, SYM(seasonsFunc_03_7aa9), b_+35);
+  CALL_C(b_+35, clearPaletteFadeVariablesAndRefreshPalettes_hook, SYM(clearPaletteFadeVariablesAndRefreshPalettes), b_+38);
+  CYC(b_+38, b_+41);
+  TAIL_S(incCutsceneState2);
+}
+
+void s_cutscene08Func6_hook(GB *gb) {
+  BASE(cutscene08Func6);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(b_+0, decCbb3_hook, SYM(decCbb3), b_+3);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; }
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+6); A = 0x01;
+  CYC(b_+6, b_+9); mem_wr(gb, wMenuDisabled, A);
+  CYC(b_+9, b_+12); SET_BC(0x1e04); // TX_1e04
+  CALL_C(b_+12, showText_hook, SYM(showText), b_+15);
+  CYC(b_+15, b_+18);
+  TAIL_S(incCutsceneState2);
+}
+
+void s_cutscene08Func7_hook(GB *gb) {
+  BASE(cutscene08Func7);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(b_+0, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+3);
+  CALL_C(b_+3, s_incCutsceneState2_hook, SYM(incCutsceneState2), b_+6);
+  CYC(b_+6, b_+9); SET_HL(wTmpcbb3);
+  CYC(b_+9, b_+11); mem_wr(gb, HL, 0x5a);
+  CYC(b_+11, b_+14);
+  TAIL(fadeoutToBlack);
+}
+
+void s_cutscene08Func8_hook(GB *gb) {
+  BASE(cutscene08Func8);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+3); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+4); return; }
+  CYC(b_+4, b_+5);
+  CALL_C(b_+5, decCbb3_hook, SYM(decCbb3), b_+8);
+  if (!(F & FZ)) { RET_TAKEN(b_+8); return; }
+  CYC(b_+8, b_+9);
+  CYC(b_+9, b_+10); alu_xor(gb, A);
+  CYC(b_+10, b_+13); mem_wr(gb, wGameState, A);
+  CYC(b_+13, b_+16); mem_wr(gb, wThreadStateBuffer + 0x0f, A); // wCutsceneIndex
+  CYC(b_+16, b_+17); C = A;
+  CYC(b_+17, b_+20); SET_HL(SYM(loadDeathRespawnBufferPreset)); // jpab bank1.loadDeathRespawnBufferPreset
+  CYC(b_+20, b_+22); E = 0x01;
+  CYC(b_+22, b_+25);
+  TAIL(interBankCall);
+}
+
+// The shake counter: every 7th call bumps wTmpcbb6 (the vertical scroll base).
+void s_seasonsFunc_03_7909_hook(GB *gb) {
+  BASE(seasonsFunc_03_7909);
+  CYC(b_+0, b_+3); SET_HL(wTmpcbb4);
+  CYC(b_+3, b_+4); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+4, b_+5); A = mem_rd(gb, HL);
+  CYC(b_+5, b_+7); alu_sub(gb, 0x07);
+  if (!(F & FZ)) { RET_TAKEN(b_+7); return; }
+  CYC(b_+7, b_+8);
+  CYC(b_+8, b_+9); mem_wr(gb, HL, A);
+  CYC(b_+9, b_+12); SET_HL(wTmpcbb6);
+  CYC(b_+12, b_+13); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  RET(b_+13); return;
+}
+
+// Loads temple-fall scene a (0..5): scenes 3 and up first load a room with its season from
+// seasonsTable_03_797b and the uncompressed gfx, then the scene gfx header, its palette from
+// seasonsTable_03_7972, and for scenes 3 and up the palette rotation base from
+// seasonsTable_03_7978.
+void s_seasonsFunc_03_7917_hook(GB *gb) {
+  BASE(seasonsFunc_03_7917);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+3); mem_wr(gb, wTmpcbbb, A);
+  CYC(b_+3, b_+6); SET_HL(wTmpcbb3);
+  CYC(b_+6, b_+8); mem_wr(gb, HL, 0x5a);
+  CALL_C(b_+8, disableLcd_hook, SYM(disableLcd), b_+11);
+  CYC(b_+11, b_+14); A = mem_rd(gb, wTmpcbbb);
+  CYC(b_+14, b_+16); alu_cp(gb, 0x03);
+  if (F & FC) { CYCT(b_+16, b_+18); goto scene_gfx; }
+  CYC(b_+16, b_+18);
+  CYC(b_+18, b_+20); alu_sub(gb, 0x03);
+  CYC(b_+20, b_+23); SET_HL(b_+100); // seasonsTable_03_797b
+  CYC(b_+23, b_+24); intro_add_double_index(gb, b_+24);
+  CYC(b_+24, b_+26); B = 0x00;
+  CYC(b_+26, b_+27); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+27, b_+28); C = mem_rd(gb, HL);
+  CALL_C(b_+28, forceLoadRoom_hook, SYM(forceLoadRoom), b_+31);
+  CYC(b_+31, b_+33); B = 0x31;
+  CYC(b_+33, b_+36); A = mem_rd(gb, wTmpcbbb);
+  CYC(b_+36, b_+38); alu_cp(gb, 0x05);
+  if (!(F & FZ)) { CYCT(b_+38, b_+40); goto uncompressed; }
+  CYC(b_+38, b_+40);
+  CYC(b_+40, b_+42); B = 0x0f; // UNCMP_GFXH_0f
+uncompressed:
+  CYC(b_+42, b_+43); A = B;
+  CALL_C(b_+43, loadUncompressedGfxHeader_hook, SYM(loadUncompressedGfxHeader), b_+46);
+  CYC(b_+46, b_+49); A = mem_rd(gb, wTmpcbbb);
+scene_gfx:
+  CYC(b_+49, b_+51); alu_add(gb, 0x25); // GFXH_TEMPLEFALL_SCENE2
+  CALL_C(b_+51, loadGfxHeader_hook, SYM(loadGfxHeader), b_+54);
+  CYC(b_+54, b_+57); A = mem_rd(gb, wTmpcbbb);
+  CYC(b_+57, b_+60); SET_HL(b_+91); // seasonsTable_03_7972
+  CYC(b_+60, b_+61); intro_add_a_to_hl(gb, b_+61);
+  CYC(b_+61, b_+62); A = mem_rd(gb, HL);
+  CALL_C(b_+62, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+65);
+  CYC(b_+65, b_+67); A = 0x0f; // PALH_0f
+  CALL_C(b_+67, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+70);
+  CYC(b_+70, b_+72); A = 0x04;
+  CALL_C(b_+72, loadGfxRegisterStateIndex_hook, SYM(loadGfxRegisterStateIndex), b_+75);
+  CYC(b_+75, b_+78); A = mem_rd(gb, wTmpcbbb);
+  CYC(b_+78, b_+80); alu_sub(gb, 0x03);
+  if (F & FC) { RET_TAKEN(b_+80); return; }
+  CYC(b_+80, b_+81);
+  CYC(b_+81, b_+84); SET_HL(b_+97); // seasonsTable_03_7978
+  CYC(b_+84, b_+85); intro_add_a_to_hl(gb, b_+85);
+  CYC(b_+85, b_+86); A = mem_rd(gb, HL);
+  CYC(b_+86, b_+89); SET_DE(wTmpcbb9);
+  CYC(b_+89, b_+90); mem_wr(gb, DE, A);
+  RET(b_+90); return;
+}
+
+// The shake: rumble every 16 frames, count wTmpcbb4 down through the two phases of
+// wTmpcbb5, and jitter SCY and WINY by a random entry of the phase's row in
+// seasonsTable_03_79e9.
+void s_seasonsFunc_03_7981_hook(GB *gb) {
+  BASE(seasonsFunc_03_7981);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(b_+0, s_seasonsFunc_03_79bb_hook, SYM(seasonsFunc_03_79bb), b_+3);
+  CYC(b_+3, b_+6); SET_HL(wFrameCounter);
+  CYC(b_+6, b_+7); A = mem_rd(gb, HL);
+  CYC(b_+7, b_+9); alu_and(gb, 0x0f);
+  CYC(b_+9, b_+11); A = 0xb8; // SND_RUMBLE2
+  if (F & FZ) CALL_C_CC(b_+11, playSound_b00_hook, SYM(playSound_b00), b_+14);
+  else CYC(b_+11, b_+14);
+  CYC(b_+14, b_+17); SET_DE(wTmpcbb5);
+  CYC(b_+17, b_+18); A = mem_rd(gb, DE);
+  CYC(b_+18, b_+20); alu_cp(gb, 0x02);
+  if (F & FZ) { CYCT(b_+20, b_+22); goto jitter; }
+  CYC(b_+20, b_+22);
+  CYC(b_+22, b_+25); SET_HL(wTmpcbb4);
+  CYC(b_+25, b_+26); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { CYCT(b_+26, b_+28); goto jitter; }
+  CYC(b_+26, b_+28);
+  CYC(b_+28, b_+29); A = alu_inc8(gb, A);
+  CYC(b_+29, b_+30); mem_wr(gb, DE, A);
+  CALL_C(b_+30, s_seasonsFunc_03_79db_hook, SYM(seasonsFunc_03_79db), b_+33);
+jitter:
+  CYC(b_+33, b_+34); alu_add(gb, A);
+  CYC(b_+34, b_+35); alu_add(gb, A);
+  CYC(b_+35, b_+38); SET_HL(b_+104); // seasonsTable_03_79e9
+  CYC(b_+38, b_+39); intro_add_double_index(gb, b_+39);
+  CYC(b_+39, b_+41); B = 0x00;
+  CALL_C(b_+41, s_seasonsFunc_03_79af_hook, SYM(seasonsFunc_03_79af), b_+44);
+  CYC(b_+44, b_+46); B = 0x01;
+  TAIL_S(seasonsFunc_03_79af);
+}
+
+// b=0: jitter SCY; b=1: jitter WINY. Both take the random entry from the table at hl.
+void s_seasonsFunc_03_79af_hook(GB *gb) {
+  BASE(seasonsFunc_03_79af);
+  CYC(b_+0, b_+3); SET_DE(wGfxRegs1_SCY);
+  CYC(b_+3, b_+4); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(b_+4, b_+6); goto go; }
+  CYC(b_+4, b_+6);
+  CYC(b_+6, b_+9); SET_DE(wGfxRegs1_WINY);
+go:
+  CYC(b_+9, b_+12);
+  TAIL_S(seasonsFunc_03_79cd);
+}
+
+// Resets the scroll registers from the camera and the scene's base scroll in wTmpcbb6/7.
+void s_seasonsFunc_03_79bb_hook(GB *gb) {
+  BASE(seasonsFunc_03_79bb);
+  CYC(b_+0, b_+3); SET_HL(wGfxRegs1_SCY);
+  CYC(b_+3, b_+5); A = mem_rd(gb, hCameraY);
+  CYC(b_+5, b_+6); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+6, b_+8); A = mem_rd(gb, hCameraX);
+  CYC(b_+8, b_+9); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+9, b_+12); SET_DE(wTmpcbb6);
+  CYC(b_+12, b_+13); A = mem_rd(gb, DE);
+  CYC(b_+13, b_+14); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+14, b_+15); SET_DE(DE + 1);
+  CYC(b_+15, b_+16); A = mem_rd(gb, DE);
+  CYC(b_+16, b_+17); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  RET(b_+17); return;
+}
+
+// Adds a random one of the 8 bytes at hl to (de).
+void s_seasonsFunc_03_79cd_hook(GB *gb) {
+  BASE(seasonsFunc_03_79cd);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+1); push_effect(gb, HL);
+  CALL_C(b_+1, getRandomNumber_hook, SYM(getRandomNumber), b_+4);
+  CYC(b_+4, b_+6); alu_and(gb, 0x07);
+  CYC(b_+6, b_+7); intro_add_a_to_hl(gb, b_+7);
+  CYC(b_+7, b_+8); A = mem_rd(gb, HL);
+  CYC(b_+8, b_+9); B = A;
+  CYC(b_+9, b_+10); A = mem_rd(gb, DE);
+  CYC(b_+10, b_+11); alu_add(gb, B);
+  CYC(b_+11, b_+12); mem_wr(gb, DE, A);
+  CYC(b_+12, b_+13); SET_HL(pop_effect(gb));
+  RET(b_+13); return;
+}
+
+// Sets the shake phase timer wTmpcbb4 for phase a from seasonsTable_03_79e7; keeps a.
+void s_seasonsFunc_03_79db_hook(GB *gb) {
+  BASE(seasonsFunc_03_79db);
+  CYC(b_+0, b_+1); B = A;
+  CYC(b_+1, b_+4); SET_HL(b_+12); // seasonsTable_03_79e7
+  CYC(b_+4, b_+5); intro_add_a_to_hl(gb, b_+5);
+  CYC(b_+5, b_+6); A = mem_rd(gb, HL);
+  CYC(b_+6, b_+9); SET_HL(wTmpcbb4);
+  CYC(b_+9, b_+10); mem_wr(gb, HL, A);
+  CYC(b_+10, b_+11); A = B;
+  RET(b_+11); return;
+}
+
+// Parks wGfxRegs1 (12 bytes) in wGfxRegs4 and clears the OAM.
+void s_seasonsFunc_03_7a01_hook(GB *gb) {
+  BASE(seasonsFunc_03_7a01);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+3); SET_HL(wGfxRegs4);
+  CYC(b_+3, b_+6); SET_DE(wGfxRegs1);
+  CYC(b_+6, b_+8); B = 0x0c;
+  for (;;) {
+    CYC(b_+8, b_+9); A = mem_rd(gb, DE);
+    CYC(b_+9, b_+10); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(b_+10, b_+11); E = alu_inc8(gb, E);
+    CYC(b_+11, b_+12); B = alu_dec8(gb, B);
+    if (!(F & FZ)) { CYCT(b_+12, b_+14); continue; }
+    CYC(b_+12, b_+14);
+    break;
+  }
+  CALL_C(b_+14, clearOam_hook, SYM(clearOam), b_+17);
+  CYC(b_+17, b_+19); A = 0x10;
+  CYC(b_+19, b_+21); mem_wr(gb, hOamTail, A);
+  RET(b_+21); return;
+}
+
+// Restores wGfxRegs1 from wGfxRegs4 and applies LCDC at once.
+void s_seasonsFunc_03_7a17_hook(GB *gb) {
+  BASE(seasonsFunc_03_7a17);
+  CYC(b_+0, b_+3); SET_HL(wGfxRegs4);
+  CYC(b_+3, b_+6); SET_DE(wGfxRegs1);
+  CYC(b_+6, b_+8); B = 0x0c;
+  for (;;) {
+    CYC(b_+8, b_+9); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+9, b_+10); mem_wr(gb, DE, A);
+    CYC(b_+10, b_+11); E = alu_inc8(gb, E);
+    CYC(b_+11, b_+12); B = alu_dec8(gb, B);
+    if (!(F & FZ)) { CYCT(b_+12, b_+14); continue; }
+    CYC(b_+12, b_+14);
+    break;
+  }
+  CYC(b_+14, b_+17); A = mem_rd(gb, wGfxRegs1_LCDC);
+  CYC(b_+17, b_+20); mem_wr(gb, wGfxRegsFinal_LCDC, A);
+  CYC(b_+20, b_+22); mem_wr(gb, IO_LCDC, A);
+  RET(b_+22); return;
+}
+
+// Every other call, counts wTmpcbb8 down; at zero rotates the flashing palette (next routine),
+// otherwise refreshes it in place.
+void s_seasonsFunc_03_7a2e_hook(GB *gb) {
+  BASE(seasonsFunc_03_7a2e);
+  CYC(b_+0, b_+3); SET_HL(wTmpcbba);
+  CYC(b_+3, b_+4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { RET_TAKEN(b_+4); return; }
+  CYC(b_+4, b_+5);
+  CYC(b_+5, b_+7); mem_wr(gb, HL, 0x02);
+  CYC(b_+7, b_+10); SET_HL(wTmpcbb8);
+  CYC(b_+10, b_+11); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) {
+    CYCT(b_+11, b_+13);
+    CYC((SYM(seasonsFunc_03_7a3b) + 32), (SYM(seasonsFunc_03_7a3b) + 35));
+    TAIL_SG(func_35ec);
+  }
+  CYC(b_+11, b_+13);
+  TAIL_S(seasonsFunc_03_7a3b);
+}
+
+// Next palette of the four in seasonsTable_03_7a5e into the tileset palette buffer, then the
+// palette thread refreshes it.
+void s_seasonsFunc_03_7a3b_hook(GB *gb) {
+  BASE(seasonsFunc_03_7a3b);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+2); mem_wr(gb, HL, 0x1f);
+  CYC(b_+2, b_+5); SET_HL(wTmpcbb9);
+  CYC(b_+5, b_+6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+6, b_+7); A = mem_rd(gb, HL);
+  CYC(b_+7, b_+9); alu_and(gb, 0x03);
+  CYC(b_+9, b_+10); mem_wr(gb, HL, A);
+  CYC(b_+10, b_+13); SET_HL(b_+35); // seasonsTable_03_7a5e
+  CYC(b_+13, b_+14); intro_add_double_index(gb, b_+14);
+  CYC(b_+14, b_+15); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+15, b_+16); H = mem_rd(gb, HL);
+  CYC(b_+16, b_+17); L = A;
+  CYC(b_+17, b_+18); B = H;
+  CYC(b_+18, b_+19); C = L;
+  CYC(b_+19, b_+22); SET_HL(w2TilesetBgPalettes + 0x10);
+  CALL_C(b_+22, func_13c6_hook, SYM(func_13c6), b_+25);
+  CYC(b_+25, b_+26); alu_xor(gb, A);
+  CYC(b_+26, b_+29); mem_wr(gb, wPaletteThread_mode, A);
+  CYC(b_+29, b_+32); SET_HL(wTmpcbb8);
+  CYC(b_+32, b_+35);
+  TAIL_SG(func_35ec);
+}
