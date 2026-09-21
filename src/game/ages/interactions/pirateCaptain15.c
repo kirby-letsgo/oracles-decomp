@@ -15,5 +15,5 @@ void pirateCaptain_warpOut_hook(GB *gb) {
   CYC(b_+6, b_+8);
   CYC(b_+8, b_+11); SET_HL(b_+19);
 doWarp:
-  CYC(b_+11, b_+14); setWarpDestVariables_hook(gb);
+  CYC(b_+11, b_+14); TAIL(setWarpDestVariables);
 }

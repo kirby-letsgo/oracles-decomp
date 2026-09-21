@@ -732,7 +732,7 @@ state1:
 
 state2:
   CALL_C(b_+47, setCameraFocusedObjectToLink_hook, SYM(setCameraFocusedObjectToLink), b_+50);
-  CYC(b_+50, b_+53); itemDelete_hook(gb);
+  CYC(b_+50, b_+53); TAIL(itemDelete);
 }
 
 void func_5af5_hook(GB *gb) {

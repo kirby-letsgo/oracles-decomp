@@ -108,7 +108,7 @@ void cutscene02_hook(GB *gb) {
   BASE(cutscene02);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, cutscene02__handleRaisingFloorsCutscene_hook, b_+19, b_+3);
-  CYC(b_+3, b_+6); updateAllObjects_hook(gb);
+  CYC(b_+3, b_+6); TAIL(updateAllObjects);
 }
 
 void cutscene02__func_7c86_hook(GB *gb) {
@@ -133,13 +133,14 @@ void cutscene02__func_7c8e_hook(GB *gb) {
 
 void cutscene02__handleRaisingFloorsCutscene_hook(GB *gb) {
   BASE(cutscene02);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+19, b_+22); A = mem_rd(gb, wCutsceneState);
   CYC(b_+22, b_+23); cutscenes2_jump_table_from_rst(gb, b_+23);
   do { uint16_t jt_ = (HL);
     if (jt_ == b_+29) { cutscene02__state0_hook(gb); return; }
     else if (jt_ == b_+61) { cutscene02__state1_hook(gb); return; }
     else if (jt_ == b_+73) { cutscene02__state2_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -190,7 +191,7 @@ void cutscene02__state2_hook(GB *gb) {
   CYC(b_+98, b_+101); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+101, b_+103); A = 0x01;
   CYC(b_+103, b_+106); mem_wr(gb, (wThreadStateBuffer + 15), A);
-  CYC(b_+106, b_+109); updateLastToggleBlocksState_hook(gb);
+  CYC(b_+106, b_+109); TAIL(updateLastToggleBlocksState);
 }
 
 void cutscene02__func_7ced_hook(GB *gb) {

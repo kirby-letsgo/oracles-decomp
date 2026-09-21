@@ -51,6 +51,7 @@ static void add_double_index_to_hl_from_rst(GB *gb, uint16_t return_address) {
 // 0c:4000
 void runScriptCommand_hook(GB *gb) {
   BASE(runScriptCommand);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); alu_bit(gb, 7, A);
   if (F & FZ) {
     CYCT(b_+2, b_+5);
@@ -60,7 +61,7 @@ void runScriptCommand_hook(GB *gb) {
   CYC(b_+5, b_+6); push_effect(gb, HL);
   CYC(b_+6, b_+8); alu_and(gb, 0x7f);
   CYC(b_+8, b_+9); push_effect(gb, b_+9);
-  hook_handoff(gb, script_jump_table(gb));
+  HANDOFF(script_jump_table(gb));
 }
 
 // 0c:4103
@@ -162,7 +163,7 @@ void scriptCmd_showPasswordScreen_hook(GB *gb) {
   do { uint16_t jt_ = (script_jump_table(gb));
     if (jt_ == b_+22) { scriptCmd_showPasswordScreen_askForSecret(gb, sp0_); return; }
     else if (jt_ == b_+30) { scriptCmd_showPasswordScreen_generateSecret(gb, sp0_); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -203,7 +204,7 @@ void scriptCmd_enableMenu_hook(GB *gb) {
   BASE(scriptCmd_enableMenu);
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+4); W8(wMenuDisabled) = A;
-  CYC(b_+4, b_+6); scriptFunc_popHlAndInc_hook(gb);
+  CYC(b_+4, b_+6); TAIL(scriptFunc_popHlAndInc);
 }
 
 void scriptCmd_setLinkCantMoveTo91_hook(GB *gb) {
@@ -223,13 +224,13 @@ void scriptFunc_setLinkCantMove_hook(GB *gb) {
 void scriptCmd_setLinkCantMoveTo00_hook(GB *gb) {
   BASE(scriptCmd_setLinkCantMoveTo00);
   CYC(b_+0, b_+1); alu_xor(gb, A);
-  CYC(b_+1, b_+3); scriptFunc_setLinkCantMove_hook(gb);
+  CYC(b_+1, b_+3); TAIL(scriptFunc_setLinkCantMove);
 }
 
 void scriptCmd_setLinkCantMoveTo11_hook(GB *gb) {
   BASE(scriptCmd_setLinkCantMoveTo11);
   CYC(b_+0, b_+2); A = 0x11;
-  CYC(b_+2, b_+4); scriptFunc_setLinkCantMove_hook(gb);
+  CYC(b_+2, b_+4); TAIL(scriptFunc_setLinkCantMove);
 }
 
 void func_0c_4177_hook(GB *gb) {
@@ -276,7 +277,7 @@ void scriptCmd_setSubstate_hook(GB *gb) {
   CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
   CYC(b_+1, b_+2); SET_HL(HL + 1);
   CYC(b_+2, b_+4); E = 0x45;
-  CYC(b_+4, b_+6); scriptFunc_setState_hook(gb);
+  CYC(b_+4, b_+6); TAIL(scriptFunc_setState);
 }
 
 static void scriptCmd_jump_far(GB *gb) {
@@ -383,7 +384,7 @@ void scriptCmd_spawnEnemy_hook(GB *gb) {
   CYC(b_+9, b_+11);
   CYC(b_+11, b_+13); A = 0x8b;
   CALL_C(b_+13, scriptFunc_initializeObject_hook, SYM(scriptFunc_initializeObject), b_+16);
-  CYC(b_+16, b_+18); scriptFunc_restoreActiveObject_hook(gb);
+  CYC(b_+16, b_+18); TAIL(scriptFunc_restoreActiveObject);
 }
 
 // 0c:41f4
@@ -427,7 +428,7 @@ void scriptCmd_jumpTable_memoryAddress_hook(GB *gb) {
   CYC(b_+5, b_+6); B = A;
   CYC(b_+6, b_+7); A = mem_rd(gb, BC);
   CYC(b_+7, b_+8); add_double_index_to_hl_from_rst(gb, b_+8);
-  CYC(b_+8, b_+11); scriptFunc_jump_hook(gb);
+  CYC(b_+8, b_+11); TAIL(scriptFunc_jump);
 }
 
 void scriptCmd_setCoords_hook(GB *gb) {
@@ -596,7 +597,7 @@ void scriptCmd_turnToFaceLink_hook(GB *gb) {
   CYC(b_+7, b_+9); A = alu_swap(gb, A);
   CYC(b_+9, b_+10); alu_rlca(gb);
   CALL_C(b_+10, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+13);
-  CYC(b_+13, b_+16); scriptFunc_popHlAndInc_hook(gb);
+  CYC(b_+13, b_+16); TAIL(scriptFunc_popHlAndInc);
 }
 
 void scriptCmd_setAngleAndExtra_hook(GB *gb) {
@@ -843,7 +844,7 @@ void scriptCmd_jumpIfNoEnemies_hook(GB *gb) {
   }
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+9); SET_HL(HL + 1);
-  CYC(b_+9, b_+12); scriptFunc_jump_hook(gb);
+  CYC(b_+9, b_+12); TAIL(scriptFunc_jump);
 }
 
 void scriptCmd_jumpIfC6xxSet_hook(GB *gb) {
@@ -861,7 +862,7 @@ void scriptCmd_jumpIfC6xxSet_hook(GB *gb) {
   }
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+12); SET_HL(HL + 1);
-  CYC(b_+12, b_+15); scriptFunc_jump_hook(gb);
+  CYC(b_+12, b_+15); TAIL(scriptFunc_jump);
 }
 
 void scriptCmd_playSound_hook(GB *gb) {
@@ -905,7 +906,7 @@ void scriptCmd_jumpIfLinkVariableNe_hook(GB *gb) {
   }
   CYC(b_+8, b_+10);
   CYC(b_+10, b_+11); SET_HL(HL + 1);
-  CYC(b_+11, b_+14); scriptFunc_jump_hook(gb);
+  CYC(b_+11, b_+14); TAIL(scriptFunc_jump);
 }
 
 static void scriptCmd_compareMemoryThenJump(GB *gb) {
@@ -1102,7 +1103,7 @@ create_link_item:
   CYC(b_+35, b_+36); mem_wr(gb, DE, A);
   CYC(b_+36, b_+39); SET_DE(w1Link_yh);
   CALL_C(b_+39, objectCopyPosition_rawAddress_hook, SYM(objectCopyPosition_rawAddress), b_+42);
-  CYC(b_+42, b_+45); scriptFunc_restoreActiveObject_hook(gb);
+  CYC(b_+42, b_+45); TAIL(scriptFunc_restoreActiveObject);
 }
 
 void scriptCmd_df_hook(GB *gb) {
@@ -1255,14 +1256,14 @@ void scriptCmd_jumpIfCBA5Eq_hook(GB *gb) {
     return;
   }
   CYC(b_+6, b_+8);
-  CYC(b_+8, b_+11); scriptFunc_add3ToHl_scf_hook(gb);
+  CYC(b_+8, b_+11); TAIL(scriptFunc_add3ToHl_scf);
 }
 
 void scriptCmd_jumpRandom_hook(GB *gb) {
   BASE(scriptCmd_jumpRandom);
   CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
   CYC(b_+1, b_+2); SET_HL(HL + 1);
-  CYC(b_+2, b_+5); scriptFunc_jump_scf_hook(gb);
+  CYC(b_+2, b_+5); TAIL(scriptFunc_jump_scf);
 }
 
 // 0c:44c3
@@ -1274,7 +1275,7 @@ void scriptCmd_jumpTable_hook(GB *gb) {
   CYC(b_+3, b_+4); E = A;
   CYC(b_+4, b_+5); A = mem_rd(gb, DE);
   CYC(b_+5, b_+6); add_double_index_to_hl_from_rst(gb, b_+6);
-  CYC(b_+6, b_+9); scriptFunc_jump_hook(gb);
+  CYC(b_+6, b_+9); TAIL(scriptFunc_jump);
 }
 
 void scriptCmd_jumpIfMemorySet_hook(GB *gb) {
@@ -1293,7 +1294,7 @@ void scriptCmd_jumpIfMemorySet_hook(GB *gb) {
   }
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+12); SET_HL(HL + 1);
-  CYC(b_+12, b_+15); scriptFunc_jump_scf_hook(gb);
+  CYC(b_+12, b_+15); TAIL(scriptFunc_jump_scf);
 }
 
 void scriptCmd_writeC6xx_hook(GB *gb) {
@@ -1655,5 +1656,5 @@ void scriptCmd_delay_hook(GB *gb) {
   CYC(b_+4, b_+7); SET_BC(b_+14);
   CALL_C(b_+7, addAToBc_hook, 0x006d, b_+10);
   CYC(b_+10, b_+11); A = mem_rd(gb, BC);
-  CYC(b_+11, b_+14); scriptFunc_4310_hook(gb);
+  CYC(b_+11, b_+14); TAIL(scriptFunc_4310);
 }

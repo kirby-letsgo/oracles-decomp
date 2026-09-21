@@ -106,5 +106,5 @@ state1:
 
 subid0:
   CALL_C(b_+69, interactionRunScript_hook, SYM(interactionRunScript), b_+72);
-  CYC(b_+72, b_+75); interactionAnimateAsNpc_hook(gb);
+  CYC(b_+72, b_+75); TAIL(interactionAnimateAsNpc);
 }

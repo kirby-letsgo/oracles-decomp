@@ -53,5 +53,5 @@ void interactionCode2e_hook(GB *gb) {
 
 state1:
   CALL_C(b_+37, interactionRunScript_hook, SYM(interactionRunScript), b_+40);
-  CYC(b_+40, b_+43); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+40, b_+43); TAIL(npcFaceLinkAndAnimate);
 }

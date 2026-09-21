@@ -40,5 +40,5 @@ state1:
     CYCT(b_+38, b_+39); ret_effect(gb); return;
   }
   CYC(b_+38, b_+39);
-  CYC(b_+39, b_+42); itemDelete_hook(gb);
+  CYC(b_+39, b_+42); TAIL(itemDelete);
 }

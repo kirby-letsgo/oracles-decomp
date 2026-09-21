@@ -212,7 +212,7 @@ L_4376:
   CYC(b_+154, b_+155); A = mem_rd(gb, DE);
   CYC(b_+155, b_+156); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CALL_C(b_+156, objectSetVisible83_hook, SYM(objectSetVisible83), b_+159);
-  CYC(b_+159, b_+161); shopItemUpdateRupeeDisplay_hook(gb);
+  CYC(b_+159, b_+161); TAIL(shopItemUpdateRupeeDisplay);
 }
 
 void shopItemState5_hook(GB *gb) {
@@ -229,7 +229,7 @@ void shopItemPopStackAndDeleteSelf_hook(GB *gb) {
   BASE(shopItemPopStackAndDeleteSelf);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); SET_AF(pop_effect(gb));
-  CYC(b_+1, b_+4); interactionDelete_hook(gb);
+  CYC(b_+1, b_+4); TAIL(interactionDelete);
 }
 
 void shopItemState2_hook(GB *gb) {
@@ -312,7 +312,7 @@ void shopItemState4_hook(GB *gb) {
   CYC(b_+17, b_+19); mem_wr(gb, HL, 1);
   CALL_C(b_+19, shopItemUpdateRupeeDisplay_hook, SYM(shopItemUpdateRupeeDisplay), b_+22);
   CALL_C(b_+22, objectSetVisible83_hook, SYM(objectSetVisible83), b_+25);
-  CYC(b_+25, b_+28); dropLinkHeldItem_hook(gb);
+  CYC(b_+25, b_+28); TAIL(dropLinkHeldItem);
 }
 
 void shopItemClearRupeeDisplay_hook(GB *gb) {

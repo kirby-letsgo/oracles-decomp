@@ -279,7 +279,7 @@ void partCode01__getRelatedObj1ID_hook(GB *gb) {
   CYC(b_+242, b_+243); A = mem_rd(gb, HL);
   CYC(b_+243, b_+245); E = 0xf0; // Part.var30
   CYC(b_+245, b_+246); mem_wr(gb, DE, A);
-  CYC(b_+246, b_+249); objectSetVisible80_hook(gb); // jp, real ret happens inside its chain
+  CYC(b_+246, b_+249); TAIL(objectSetVisible80);// jp, real ret happens inside its chain
 }
 
 void partCode01__checkCollidedWithLink_hook(GB *gb) {
@@ -307,7 +307,7 @@ void partCode01__linkCollectedItem_hook(GB *gb) {
   CYC(b_+265, b_+267); E = 0xc2; // Part.subid
   CYC(b_+267, b_+268); A = mem_rd(gb, DE);
   CYC(b_+268, b_+269); alu_add(gb, A);
-  CYC(b_+269, b_+272); SET_HL(b_+315); // @itemDropTreasureTable
+  CYC(b_+269, b_+272); SET_HL(GV(b_+315, 0x425b)); // @itemDropTreasureTable
   CYC(b_+272, b_+273); itemDrop_addDoubleIndexToHl_from_rst(gb, b_+273);
   CYC(b_+273, b_+274); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+274, b_+275); alu_or(gb, A);

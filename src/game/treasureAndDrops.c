@@ -632,7 +632,7 @@ void giveTreasure_body__modeb_hook(GB *gb) {
   BASE(giveTreasure_body);
   CYC(b_+161, b_+162); A = C;
   CYC(b_+162, b_+165); SET_HL(wUpgradesObtained);
-  CYC(b_+165, b_+168); setFlag_hook(gb);
+  CYC(b_+165, b_+168); TAIL(setFlag);
 }
 
 void giveTreasure_body__mode8_hook(GB *gb) {
@@ -662,7 +662,7 @@ void giveTreasure_body__mode1_hook(GB *gb) {
   CYC(b_+186, b_+187); A = C;
   CYC(b_+187, b_+188); H = D;
   CYC(b_+188, b_+189); L = E;
-  CYC(b_+189, b_+192); setFlag_hook(gb);
+  CYC(b_+189, b_+192); TAIL(setFlag);
 }
 
 void giveTreasure_body__mode6_hook(GB *gb) {
@@ -819,7 +819,7 @@ void giveTreasure_body__modee_hook(GB *gb) {
   CYC(b_+303, b_+304); A = B;
   CYC(b_+304, b_+305); mem_wr(gb, DE, A);
   CYC(b_+305, b_+307); A = 0x61;
-  CYC(b_+307, b_+310); playSound_b00_hook(gb);
+  CYC(b_+307, b_+310); TAIL(playSound_b00);
 }
 
 void giveTreasure_body__modef_hook(GB *gb) {
@@ -856,7 +856,7 @@ void giveTreasure_body__mode9_hook(GB *gb) {
   }
   CYC(b_+347, b_+348); A = C;
   CYC(b_+348, b_+351); mem_wr(gb, wUnappraisedRingsEnd - 1, A);
-  CYC(b_+351, b_+353); realignUnappraisedRings_hook(gb);
+  CYC(b_+351, b_+353); TAIL(realignUnappraisedRings);
 }
 
 void giveTreasure_body__removeOneDuplicateRing_hook(GB *gb) {

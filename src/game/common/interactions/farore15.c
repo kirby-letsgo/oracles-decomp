@@ -108,7 +108,7 @@ void faroreShowTextForSecretHint_hook(GB *gb) {
   CYC(b_+5, b_+7); alu_add(gb, 0x0f);
   CYC(b_+7, b_+8); C = A;
   CYC(b_+8, b_+10); B = 0x55;
-  CYC(b_+10, b_+13); showText_hook(gb);
+  CYC(b_+10, b_+13); TAIL(showText);
 }
 
 void faroreSpawnSecretChest_hook(GB *gb) {
@@ -126,7 +126,7 @@ void faroreSpawnSecretChest_hook(GB *gb) {
   CYC(b_+12, b_+13); mem_wr(gb, HL, A);
   CYC(b_+13, b_+15); L = 0x4b;
   CYC(b_+15, b_+17); C = 0x75;
-  CYC(b_+17, b_+20); setShortPosition_paramC_hook(gb);
+  CYC(b_+17, b_+20); TAIL(setShortPosition_paramC);
 }
 
 void faroreGenerateGameTransferSecret_hook(GB *gb) {

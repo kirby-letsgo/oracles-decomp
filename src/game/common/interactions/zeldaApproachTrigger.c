@@ -32,7 +32,7 @@ void interactionCodeda__state0_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+16, b_+19); interactionDelete_hook(gb); return; }
   CYC(b_+16, b_+19);
   CYC(b_+19, b_+21); A = 0xac;
-  CYC(b_+21, b_+24); loadPaletteHeader_hook(gb);
+  CYC(b_+21, b_+24); TAIL(loadPaletteHeader);
 }
 
 void interactionCodeda__state1_hook(GB *gb) {

@@ -40,7 +40,7 @@ void hardhat_worker_load_script_and_init_graphics_hook(GB *gb) {
   CYC(b_+160, b_+161); H = mem_rd(gb, HL);
   CYC(b_+161, b_+162); L = A;
   CALL_C(b_+162, interactionSetScript_hook, SYM(interactionSetScript), b_+165);
-  CYC(b_+165, b_+168); interactionIncState_hook(gb);
+  CYC(b_+165, b_+168); TAIL(interactionIncState);
 }
 
 void interactionCode58_hook(GB *gb) {

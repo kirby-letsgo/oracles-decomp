@@ -128,7 +128,7 @@ void verifyTilesAndDropSmallKey_hook(GB *gb) {
     CYCT(b_+3, b_+4); ret_effect(gb); return;
   }
   CYC(b_+3, b_+4);
-  CYC(b_+4, b_+7); spawnSmallKeyFromCeiling_hook(gb);
+  CYC(b_+4, b_+7); TAIL(spawnSmallKeyFromCeiling);
 }
 
 // D2: Verify a floor tile is red to open a door
@@ -241,7 +241,7 @@ void interaction21_subid05_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionDeleteAndRetIfItemFlagSet_hook, SYM(interactionDeleteAndRetIfItemFlagSet), b_+3);
   CYC(b_+3, b_+6); SET_HL(interaction21_subid05_tileData_bank08);
-  CYC(b_+6, b_+9); verifyTilesAndDropSmallKey_hook(gb);
+  CYC(b_+6, b_+9); TAIL(verifyTilesAndDropSmallKey);
 }
 
 // d2: Set trigger 0 when the colored flames are lit red.
@@ -325,7 +325,7 @@ void interaction21_subid08_hook(GB *gb) {
     CYCT(b_+11, b_+13); TAIL(setSwitch);
   }
   CYC(b_+11, b_+13);
-  CYC(b_+13, b_+15); unsetSwitch_hook(gb);
+  CYC(b_+13, b_+15); TAIL(unsetSwitch);
 }
 
 // d3: Drop a small key when 3 blocks have been pushed.
@@ -334,7 +334,7 @@ void interaction21_subid09_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionDeleteAndRetIfItemFlagSet_hook, SYM(interactionDeleteAndRetIfItemFlagSet), b_+3);
   CYC(b_+3, b_+6); SET_HL(interaction21_subid09_tileData_bank08);
-  CYC(b_+6, b_+9); verifyTilesAndDropSmallKey_hook(gb);
+  CYC(b_+6, b_+9); TAIL(verifyTilesAndDropSmallKey);
 }
 
 // d3: When an orb is hit, spawn an armos, as well as interaction which will spawn a chest
@@ -366,7 +366,7 @@ initialized:
   CYC(b_+30, b_+33); mem_wr(gb, wcca2, A);
   CYC(b_+33, b_+36); SET_HL(moonlitGrotto_onOrbActivation_bank12);
   CALL_C(b_+36, parseGivenObjectData_b00_hook, SYM(parseGivenObjectData_b00), b_+39);
-  CYC(b_+39, b_+42); interactionDelete_hook(gb);
+  CYC(b_+39, b_+42); TAIL(interactionDelete);
 }
 
 // Unused? A chest appears when 4 torches in a diamond formation are lit?
@@ -430,7 +430,7 @@ initialized:
   CYC(b_+72, b_+74); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
   CYC(b_+74, b_+76); A = 0x01;
   CYC(b_+76, b_+79); mem_wr(gb, wActiveTriggers, A);
-  CYC(b_+79, b_+82); interactionDelete_hook(gb);
+  CYC(b_+79, b_+82); TAIL(interactionDelete);
 }
 
 // d3: 4 armos spawn when trigger 0 is activated.
@@ -446,7 +446,7 @@ void interaction21_subid0c_hook(GB *gb) {
   CYC(b_+5, b_+8); mem_wr(gb, wcca2, A);
   CYC(b_+8, b_+11); SET_HL(moonlitGrotto_onArmosSwitchPressed_bank12);
   CALL_C(b_+11, parseGivenObjectData_b00_hook, SYM(parseGivenObjectData_b00), b_+14);
-  CYC(b_+14, b_+17); interactionDelete_hook(gb);
+  CYC(b_+14, b_+17); TAIL(interactionDelete);
 }
 
 // d3: Crystal breakage handler
@@ -549,7 +549,7 @@ void interaction21_subid0e_hook(GB *gb) {
     CYCT(b_+9, b_+10); ret_effect(gb); return;
   }
   CYC(b_+9, b_+10);
-  CYC(b_+10, b_+13); spawnSmallKeyFromCeiling_hook(gb);
+  CYC(b_+10, b_+13); TAIL(spawnSmallKeyFromCeiling);
 }
 
 // d4: A door opens when a certain floor pattern is achieved
@@ -577,7 +577,7 @@ void interaction21_subid10_hook(GB *gb) {
   CALL_C(b_+0, interactionDeleteAndRetIfEnabled02_hook, SYM(interactionDeleteAndRetIfEnabled02), b_+3);
   CALL_C(b_+3, interactionDeleteAndRetIfItemFlagSet_hook, SYM(interactionDeleteAndRetIfItemFlagSet), b_+6);
   CYC(b_+6, b_+9); SET_HL(interaction21_subid10_tileData_bank08);
-  CYC(b_+9, b_+12); verifyTilesAndDropSmallKey_hook(gb);
+  CYC(b_+9, b_+12); TAIL(verifyTilesAndDropSmallKey);
 }
 
 // Tile-filling puzzle: when all the blue turns red, a chest will spawn here. Falls through
@@ -606,7 +606,7 @@ void spawnChestAndDeleteSelf_hook(GB *gb) {
   CYC(b_+9, b_+11); A = 0xf1; // TILEINDEX_CHEST
   CALL_C(b_+11, setTile_hook, SYM(setTile), b_+14);
   CALL_C(b_+14, objectCreatePuff_hook, SYM(objectCreatePuff), b_+17);
-  CYC(b_+17, b_+20); interactionDelete_hook(gb);
+  CYC(b_+17, b_+20); TAIL(interactionDelete);
 }
 
 // d4: A chest spawns here when the torches light up with the color blue.
@@ -626,7 +626,7 @@ void interaction21_subid12_hook(GB *gb) {
     CYCT(b_+13, b_+14); ret_effect(gb); return;
   }
   CYC(b_+13, b_+14);
-  CYC(b_+14, b_+16); spawnChestAndDeleteSelf_hook(gb);
+  CYC(b_+14, b_+16); TAIL(spawnChestAndDeleteSelf);
 }
 
 // d5: A chest spawns here when all the spaces around the owl statue are filled.
@@ -667,7 +667,7 @@ void interaction21_subid14_hook(GB *gb) {
     CYCT(b_+12, b_+13); ret_effect(gb); return;
   }
   CYC(b_+12, b_+13);
-  CYC(b_+13, b_+16); spawnChestAndDeleteSelf_hook(gb);
+  CYC(b_+13, b_+16); TAIL(spawnChestAndDeleteSelf);
 }
 
 // d5: Cane of Somaria chest spawns here when blocks are pushed into a pattern
@@ -682,7 +682,7 @@ void interaction21_subid15_hook(GB *gb) {
     CYCT(b_+12, b_+13); ret_effect(gb); return;
   }
   CYC(b_+12, b_+13);
-  CYC(b_+13, b_+16); spawnChestAndDeleteSelf_hook(gb);
+  CYC(b_+13, b_+16); TAIL(spawnChestAndDeleteSelf);
 }
 
 // d5: Sets floor tiles to show a pattern when a switch is held down.
@@ -730,7 +730,7 @@ state0:
 
   CYC(b_+54, b_+56); C = 0x7b;
   CYC(b_+56, b_+58); A = 0xaf;
-  CYC(b_+58, b_+60); setTileWithPuff_hook(gb);
+  CYC(b_+58, b_+60); TAIL(setTileWithPuff);
 }
 
 // Falls through into setTileWithPuff.
@@ -759,7 +759,7 @@ void createPuffAt_hook(GB *gb) {
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+6); mem_wr(gb, HL, 0x05); // INTERAC_PUFF
   CYC(b_+6, b_+8); L = INTERACTION_BASE + OBJ_YH;
-  CYC(b_+8, b_+11); setShortPosition_paramC_hook(gb);
+  CYC(b_+8, b_+11); TAIL(setShortPosition_paramC);
 }
 
 void interaction21_subid16_state1_hook(GB *gb) {
@@ -851,7 +851,7 @@ triggerInactive:
   CYC(b_+63, b_+65); mem_wr(gb, 0xff70, A); // R_SVBK
   CYC(b_+65, b_+66); A = L;
   CALL_C(b_+66, setTile_hook, SYM(setTile), b_+69);
-  CYC(b_+69, b_+72); createPuffAt_hook(gb);
+  CYC(b_+69, b_+72); TAIL(createPuffAt);
 }
 
 // d3: Calculate the value for [wSwitchState] based on which crystals are broken.
@@ -900,7 +900,7 @@ void interaction21_subid18_hook(GB *gb) {
   CYC(b_+37, b_+40); A = mem_rd(gb, wSwitchState);
   CYC(b_+40, b_+41); alu_or(gb, B);
   CYC(b_+41, b_+44); mem_wr(gb, wSwitchState, A);
-  CYC(b_+44, b_+47); interactionDelete_hook(gb);
+  CYC(b_+44, b_+47); TAIL(interactionDelete);
 }
 
 // Deletes the interaction and returns to the caller's caller if this room's item flag is
@@ -915,7 +915,7 @@ void interactionDeleteAndRetIfItemFlagSet_hook(GB *gb) {
   }
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+7); SET_HL(pop_effect(gb));
-  CYC(b_+7, b_+10); interactionDelete_hook(gb);
+  CYC(b_+7, b_+10); TAIL(interactionDelete);
 }
 
 void spawnSmallKeyFromCeiling_hook(GB *gb) {
@@ -928,7 +928,7 @@ void spawnSmallKeyFromCeiling_hook(GB *gb) {
   }
   CYC(b_+6, b_+7);
   CALL_C(b_+7, objectCopyPosition_hook, SYM(objectCopyPosition), b_+10);
-  CYC(b_+10, b_+13); interactionDelete_hook(gb);
+  CYC(b_+10, b_+13); TAIL(interactionDelete);
 }
 
 // Verifies that certain tiles in the room layout equal specified values.

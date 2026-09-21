@@ -683,5 +683,5 @@ state9:
   CYC(b_+415, b_+417);
   // Final phase completed
   CALL_C(b_+417, decNumEnemies_hook, SYM(decNumEnemies), b_+420);
-  CYC(b_+420, b_+423); interactionDelete_hook(gb);
+  CYC(b_+420, b_+423); TAIL(interactionDelete);
 }

@@ -102,7 +102,7 @@ void soldierSubid00_hook(GB *gb) {
   CYC(b_+18, b_+19); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+19, b_+22); interactionDelete_hook(gb); return; }
   CYC(b_+19, b_+22);
-  CYC(b_+22, b_+24); soldierSubid0c_hook(gb);
+  CYC(b_+22, b_+24); TAIL(soldierSubid0c);
 }
 
 void soldierSubid0c_hook(GB *gb) {
@@ -139,7 +139,7 @@ void soldierSubid03_hook(GB *gb) {
   if (!(F & FC)) { CYCT(b_+8, b_+11); interactionDelete_hook(gb); return; }
   CYC(b_+8, b_+11);
   CALL_C(b_+11, soldierInitGraphicsAndLoadScript_hook, SYM(soldierInitGraphicsAndLoadScript), b_+14);
-  CYC(b_+14, b_+17); objectSetVisible82_hook(gb);
+  CYC(b_+14, b_+17); TAIL(objectSetVisible82);
 }
 
 void soldierSubid04_hook(GB *gb) {
@@ -186,14 +186,14 @@ void soldierSubid04Substate0_hook(GB *gb) {
   CYC(b_+10, b_+12); L = 0x46;
   CYC(b_+12, b_+14); mem_wr(gb, HL, 0x1e);
   CYC(b_+14, b_+15); alu_xor(gb, A);
-  CYC(b_+15, b_+18); interactionSetAnimation_hook(gb);
+  CYC(b_+15, b_+18); TAIL(interactionSetAnimation);
 }
 
 void soldierUpdateAnimationAndRunScript_hook(GB *gb) {
   BASE(soldierUpdateAnimationAndRunScript);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+3);
-  CYC(b_+3, b_+6); interactionRunScript_hook(gb);
+  CYC(b_+3, b_+6); TAIL(interactionRunScript);
 }
 
 void soldierSubid04Substate1_hook(GB *gb) {
@@ -206,7 +206,7 @@ void soldierSubid04Substate1_hook(GB *gb) {
   CYC(b_+10, b_+13); SET_BC(0xfe40);
   CALL_C(b_+13, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+16);
   CYC(b_+16, b_+18); A = 0x53;
-  CYC(b_+18, b_+21); playSound_b00_hook(gb);
+  CYC(b_+18, b_+21); TAIL(playSound_b00);
 }
 
 void soldierSubid04Substate2_hook(GB *gb) {
@@ -219,7 +219,7 @@ void soldierSubid04Substate2_hook(GB *gb) {
   CYC(b_+9, b_+11); L = 0x46;
   CYC(b_+11, b_+13); mem_wr(gb, HL, 8);
   CYC(b_+13, b_+15); A = 2;
-  CYC(b_+15, b_+18); interactionSetAnimation_hook(gb);
+  CYC(b_+15, b_+18); TAIL(interactionSetAnimation);
 }
 
 void soldierSubid04Substate3_hook(GB *gb) {
@@ -231,7 +231,7 @@ void soldierSubid04Substate3_hook(GB *gb) {
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0x10);
   CYC(b_+8, b_+10); L = 0x50;
   CYC(b_+10, b_+12); mem_wr(gb, HL, 0x50);
-  CYC(b_+12, b_+15); interactionIncSubstate_hook(gb);
+  CYC(b_+12, b_+15); TAIL(interactionIncSubstate);
 }
 
 void soldierSubid04Substate4_hook(GB *gb) {
@@ -240,7 +240,7 @@ void soldierSubid04Substate4_hook(GB *gb) {
   CALL_C(b_+0, objectApplySpeed_hook, SYM(objectApplySpeed), b_+3);
   CALL_C(b_+3, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+6);
   if (!(F & FC)) { CYCT(b_+6, b_+9); interactionDelete_hook(gb); return; } CYC(b_+6, b_+9);
-  CYC(b_+9, b_+12); interactionAnimateBasedOnSpeed_hook(gb);
+  CYC(b_+9, b_+12); TAIL(interactionAnimateBasedOnSpeed);
 }
 
 void soldierSubid05_hook(GB *gb) {
@@ -271,7 +271,7 @@ L_50b0:
   CYC(b_+51, b_+53); E = 0x50;
   CYC(b_+53, b_+54); mem_wr(gb, DE, A);
   CALL_C(b_+54, interactionRunScript_hook, SYM(interactionRunScript), b_+57);
-  CYC(b_+57, b_+60); interactionAnimate2Times_hook(gb);
+  CYC(b_+57, b_+60); TAIL(interactionAnimate2Times);
 }
 
 void soldierSubid06_hook(GB *gb) {
@@ -300,7 +300,7 @@ state1:
   CYC(b_+46, b_+49); mem_wr(gb, wDisabledObjects, A);
   CALL_C(b_+49, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+52);
 update:
-  CYC(b_+52, b_+55); soldierUpdateAnimationAndRunScript_hook(gb);
+  CYC(b_+52, b_+55); TAIL(soldierUpdateAnimationAndRunScript);
 }
 
 void soldierSubid07_hook(GB *gb) {
@@ -314,7 +314,7 @@ void soldierSubid07_hook(GB *gb) {
   CYC(b_+14, b_+17); TAIL(objectSetVisible82);
 state1:
   CALL_C(b_+17, interactionRunScript_hook, SYM(interactionRunScript), b_+20);
-  CYC(b_+20, b_+23); interactionAnimateAsNpc_hook(gb);
+  CYC(b_+20, b_+23); TAIL(interactionAnimateAsNpc);
 }
 
 void soldierSubid08_hook(GB *gb) {
@@ -330,7 +330,7 @@ state1:
   CYC(b_+15, b_+18); SET_HL((SYM(checkNpcShouldExistAtGameStage_body__data5__subid2) + 3));
   CYC(b_+18, b_+20); E = 0x15;
   CALL_C(b_+20, interBankCall_hook, 0x008a, b_+23);
-  CYC(b_+23, b_+26); interactionAnimate_hook(gb);
+  CYC(b_+23, b_+26); TAIL(interactionAnimate);
 }
 
 void soldierSubid0a_hook(GB *gb) {
@@ -349,7 +349,7 @@ state1:
   CYC(b_+22, b_+25); SET_HL(wcc05);
   CYC(b_+25, b_+27); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 2));
   CYC(b_+27, b_+30); SET_HL(b_+33);
-  CYC(b_+30, b_+33); setWarpDestVariables_hook(gb);
+  CYC(b_+30, b_+33); TAIL(setWarpDestVariables);
 }
 
 void soldierSubid0b_hook(GB *gb) {
@@ -368,7 +368,7 @@ void soldierSubid0b_hook(GB *gb) {
   CYC(b_+27, b_+29); mem_wr(gb, HL, 2);
   CYC(b_+29, b_+31); A = 1;
   CALL_C(b_+31, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+34);
-  CYC(b_+34, b_+37); objectSetVisible82_hook(gb);
+  CYC(b_+34, b_+37); TAIL(objectSetVisible82);
 }
 
 void soldierSubid0d_hook(GB *gb) {
@@ -411,7 +411,7 @@ L_51bc:
   CYC(b_+83, b_+84); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+84, b_+87); npcFaceLinkAndAnimate_hook(gb); return; } CYC(b_+84, b_+87);
   CALL_C(b_+87, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+90);
-  CYC(b_+90, b_+93); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb);
+  CYC(b_+90, b_+93); TAIL(interactionPushLinkAwayAndUpdateDrawPriority);
 }
 
 void soldierInitGraphics_hook(GB *gb) {
@@ -419,7 +419,7 @@ void soldierInitGraphics_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+3);
   CALL_C(b_+3, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+6);
-  CYC(b_+6, b_+9); interactionIncState_hook(gb);
+  CYC(b_+6, b_+9); TAIL(interactionIncState);
 }
 
 void soldierInitGraphicsAndLoadScript_hook(GB *gb) {
@@ -435,7 +435,7 @@ void soldierInitGraphicsAndLoadScript_hook(GB *gb) {
   CYC(b_+14, b_+15); H = mem_rd(gb, HL);
   CYC(b_+15, b_+16); L = A;
   CALL_C(b_+16, interactionSetScript_hook, SYM(interactionSetScript), b_+19);
-  CYC(b_+19, b_+22); interactionIncState_hook(gb);
+  CYC(b_+19, b_+22); TAIL(interactionIncState);
 }
 
 void soldierCheckBeatD6_hook(GB *gb) {
@@ -468,7 +468,7 @@ void label_09_092_hook(GB *gb) {
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
   if (F & FC) { CYCT(b_+3, b_+6); interactionDelete_hook(gb); return; }
   CYC(b_+3, b_+6);
-  CYC(b_+6, b_+9); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+6, b_+9); TAIL(npcFaceLinkAndAnimate);
 }
 
 void label_09_093_hook(GB *gb) {
@@ -493,12 +493,12 @@ void label_09_093_hook(GB *gb) {
 void label_09_094_hook(GB *gb) {
   BASE(label_09_094);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); objectPreventLinkFromPassing_hook(gb);
+  CYC(b_+0, b_+3); TAIL(objectPreventLinkFromPassing);
 }
 
 void label_09_095_hook(GB *gb) {
   BASE(label_09_095);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
-  CYC(b_+3, b_+6); interactionAnimate_hook(gb);
+  CYC(b_+3, b_+6); TAIL(interactionAnimate);
 }

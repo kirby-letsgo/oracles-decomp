@@ -19,5 +19,5 @@ void gameCompleteDialog_markGameAsComplete_hook(GB *gb) {
   CYC(b_+13, b_+15); A = 0x8c;
   CYC(b_+15, b_+18); mem_wr(gb, wMakuMapTextPast, A);
   CYC(b_+18, b_+20); A = 0x14;
-  CYC(b_+20, b_+23); setGlobalFlag_hook(gb);
+  CYC(b_+20, b_+23); TAIL(setGlobalFlag);
 }

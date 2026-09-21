@@ -40,13 +40,13 @@ void vasu_openRingMenu_hook(GB *gb) {
   CYC(b_+3, b_+5); A = 0x01;
   CYC(b_+5, b_+8); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+8, b_+10); A = 0x04;
-  CYC(b_+10, b_+13); openMenu_hook(gb);
+  CYC(b_+10, b_+13); TAIL(openMenu);
 }
 
 void redSnake_openSecretInputMenu_hook(GB *gb) {
   BASE(redSnake_openSecretInputMenu);
   CYC(b_+0, b_+2); A = 0x02;
-  CYC(b_+2, b_+5); openSecretInputMenu_hook(gb);
+  CYC(b_+2, b_+5); TAIL(openSecretInputMenu);
 }
 
 void redSnake_generateRingSecret_hook(GB *gb) {
@@ -55,7 +55,7 @@ void redSnake_generateRingSecret_hook(GB *gb) {
   CYC(b_+0, b_+2); A = GV(0x28, 0x31);
   CALL_C(b_+2, setGlobalFlag_hook, SYM(setGlobalFlag), b_+5);
   CYC(b_+5, b_+8); SET_BC(0x0002);
-  CYC(b_+8, b_+11); secretFunctionCaller_hook(gb);
+  CYC(b_+8, b_+11); TAIL(secretFunctionCaller);
 }
 
 static void vasu_checkFlagSet(GB *gb, uint16_t sp0_) {

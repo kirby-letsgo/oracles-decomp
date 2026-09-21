@@ -26,41 +26,41 @@ void makuTree_setAnimation_hook(GB *gb) {
   BASE(makuTree_setAnimation);
   CYC(b_+0, b_+2); E = 0x7b;
   CYC(b_+2, b_+3); mem_wr(gb, DE, A);
-  CYC(b_+3, b_+6); interactionSetAnimation_hook(gb);
+  CYC(b_+3, b_+6); TAIL(interactionSetAnimation);
 }
 
 void makuTree_showTextWithOffsetAndUpdateMapText_hook(GB *gb) {
   BASE(makuTree_showTextWithOffsetAndUpdateMapText);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, makuTree_func_70a2_hook, SYM(makuTree_func_70a2), b_+3);
-  CYC(b_+3, b_+5); label_15_203_hook(gb);
+  CYC(b_+3, b_+5); TAIL(label_15_203);
 }
 
 void makuTree_showTextWithOffset_hook(GB *gb) {
   BASE(makuTree_showTextWithOffset);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, makuTree_func_709c_hook, SYM(makuTree_func_709c), b_+3);
-  CYC(b_+3, b_+5); label_15_203_hook(gb);
+  CYC(b_+3, b_+5); TAIL(label_15_203);
 }
 
 void makuTree_showTextAndUpdateMapText_hook(GB *gb) {
   BASE(makuTree_showTextAndUpdateMapText);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, makuTree_checkLinkedAndUpdateMapText_hook, SYM(makuTree_checkLinkedAndUpdateMapText), b_+3);
-  CYC(b_+3, b_+5); label_15_203_hook(gb);
+  CYC(b_+3, b_+5); TAIL(label_15_203);
 }
 
 void makuTree_showText_hook(GB *gb) {
   BASE(makuTree_showText);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, makuTree_modifyTextIndexForLinked_hook, SYM(makuTree_modifyTextIndexForLinked), b_+3);
-  CYC(b_+3, b_+6); label_15_203_hook(gb);
+  CYC(b_+3, b_+6); TAIL(label_15_203);
 }
 
 void label_15_203_hook(GB *gb) {
   BASE(label_15_203);
   CYC(b_+0, b_+2); B = 0x05;
-  CYC(b_+2, b_+5); showText_hook(gb);
+  CYC(b_+2, b_+5); TAIL(showText);
 }
 
 void makuTree_func_709c_hook(GB *gb) {
@@ -68,7 +68,7 @@ void makuTree_func_709c_hook(GB *gb) {
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = 0x7f;
   CYC(b_+3, b_+4); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+4, b_+6); makuTree_modifyTextIndexForLinked_hook(gb);
+  CYC(b_+4, b_+6); TAIL(makuTree_modifyTextIndexForLinked);
 }
 
 void makuTree_func_70a2_hook(GB *gb) {
@@ -172,7 +172,7 @@ void makuTree_checkSpawnSeedSatchel_hook(GB *gb) {
 void makuTree_spawnMakuSeed_hook(GB *gb) {
   BASE(makuTree_spawnMakuSeed);
   CYC(b_+0, b_+3); SET_BC(0xa600);
-  CYC(b_+3, b_+6); objectCreateInteraction_hook(gb);
+  CYC(b_+3, b_+6); TAIL(objectCreateInteraction);
 }
 
 void makuTree_chooseTextAfterSeeingTwinrova_hook(GB *gb) {

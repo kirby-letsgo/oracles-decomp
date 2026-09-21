@@ -36,7 +36,7 @@ void runRoomSpecificCode_hook(GB *gb) {
   }
   CYC(b_+9, b_+10);
   CYC(b_+10, b_+11); push_effect(gb, b_+11);
-  hook_handoff(gb, room_specific_code_jump_table(gb));
+  HANDOFF(room_specific_code_jump_table(gb));
 }
 
 void roomSpecificCode0_hook(GB *gb) {
@@ -51,7 +51,7 @@ void roomSpecificCode0_hook(GB *gb) {
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+9); SET_HL(wTmpcfc0_fairyHideAndSeek_active);
   CYC(b_+9, b_+11); B = 0x10;
-  CYC(b_+11, b_+14); clearMemory_hook(gb);
+  CYC(b_+11, b_+14); TAIL(clearMemory);
 }
 
 void room_specific_code_create_spinner_hook(GB *gb) {

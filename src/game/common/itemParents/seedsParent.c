@@ -59,7 +59,7 @@ void clearSelfIfNoSeeds_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+14, b_+15); ret_effect(gb); return; }
   CYC(b_+14, b_+15);
   CYC(b_+15, b_+16); SET_HL(pop_effect(gb));
-  CYC(b_+16, b_+19); clearParentItem_hook(gb);
+  CYC(b_+16, b_+19); TAIL(clearParentItem);
 }
 
 void parentItemCode_satchel_hook(GB *gb) {
@@ -121,7 +121,7 @@ pegasus:
   CYC(b_+80, b_+82); mem_wr(gb, HL, 0x1a);
 
 clear:
-  CYC(b_+82, b_+85); clearParentItem_hook(gb);
+  CYC(b_+82, b_+85); TAIL(clearParentItem);
 }
 
 void parentItemCode_slingshot_hook(GB *gb) {

@@ -156,7 +156,7 @@ void forestFairy_loadMovementPreset_hook(GB *gb) {
   CYC(b_+62, b_+63); mem_wr(gb, DE, A);
   CYC(b_+63, b_+65); E = 0x48;
   CYC(b_+65, b_+66); A = mem_rd(gb, DE);
-  CYC(b_+66, b_+69); interactionSetAnimation_hook(gb);
+  CYC(b_+66, b_+69); TAIL(interactionSetAnimation);
 }
 
 void forestFairy_subid00State1_hook(GB *gb) {
@@ -271,7 +271,7 @@ void forestFairy_subid00State2_hook(GB *gb) {
   return;
 delete:
   CALL_C(b_+22, objectCreatePuff_hook, SYM(objectCreatePuff), b_+25);
-  CYC(b_+25, b_+27); interactionDelete_hook(gb);
+  CYC(b_+25, b_+27); TAIL(interactionDelete);
 }
 
 void forestFairy_subid00State3_hook(GB *gb) {
@@ -293,13 +293,13 @@ void forestFairy_subid00State3_hook(GB *gb) {
 done:
   CYC(b_+18, b_+21); SET_HL(wTmpcfc0_fairyHideAndSeek_cfd2);
   CYC(b_+21, b_+22); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(SYM(forestFairy_deleteSelf), (SYM(forestFairy_deleteSelf) + 3)); interactionDelete_hook(gb);
+  CYC(SYM(forestFairy_deleteSelf), (SYM(forestFairy_deleteSelf) + 3)); TAIL(interactionDelete);
 }
 
 void forestFairy_deleteSelf_hook(GB *gb) {
   BASE(forestFairy_deleteSelf);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); interactionDelete_hook(gb);
+  CYC(b_+0, b_+3); TAIL(interactionDelete);
 }
 
 void forestFairy_initCollisionRadiusAndSetZAndIncState_hook(GB *gb) {
@@ -312,13 +312,13 @@ void forestFairy_initCollisionRadiusAndSetZAndIncState_hook(GB *gb) {
   CYC(b_+8, b_+9); mem_wr(gb, HL, A);
   CYC(b_+9, b_+11); L = 0x4f;
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0xfc);
-  CYC(b_+13, b_+16); objectSetVisiblec1_hook(gb);
+  CYC(b_+13, b_+16); TAIL(objectSetVisiblec1);
 }
 
 void forestFairy_subid02_hook(GB *gb) {
   BASE(forestFairy_subid02);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); interactionDelete_hook(gb);
+  CYC(b_+0, b_+3); TAIL(interactionDelete);
 }
 
 void forestFairy_subid03_hook(GB *gb) {
@@ -403,7 +403,7 @@ void forestFairy_subid03State2_hook(GB *gb) {
     }
     CYCT(b_+34, b_+36);
   } else CYCT(b_+20, b_+22);
-  CYC(b_+43, b_+46); forestFairy_updateMovement_hook(gb);
+  CYC(b_+43, b_+46); TAIL(forestFairy_updateMovement);
 }
 
 void forestFairy_subid03State3_hook(GB *gb) {
@@ -440,7 +440,7 @@ void forestFairy_subid04State1_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+4, b_+7); forestFairy_animate_hook(gb); return; }
   CYC(b_+4, b_+7);
   CALL_C(b_+7, interactionIncState_hook, SYM(interactionIncState), b_+10);
-  CYC(b_+10, b_+13); forestFairy_loadMovementPreset_hook(gb);
+  CYC(b_+10, b_+13); TAIL(forestFairy_loadMovementPreset);
 }
 
 void forestFairy_subid01_hook(GB *gb) {
@@ -528,7 +528,7 @@ void forestFairy_initNpcFromData_hook(GB *gb) {
   CYC(b_+37, b_+39); mem_wr(gb, HL, 0x11);
   CYC(b_+39, b_+42); SET_HL((SYM(ambi_runSubid05) + 11));
   CALL_C(b_+42, interactionSetScript_hook, SYM(interactionSetScript), b_+45);
-  CYC(b_+45, b_+48); objectSetVisiblec1_hook(gb);
+  CYC(b_+45, b_+48); TAIL(objectSetVisiblec1);
 }
 
 void forestFairy_standardUpdate_hook(GB *gb) {
@@ -536,7 +536,7 @@ void forestFairy_standardUpdate_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
   CALL_C(b_+3, interactionAnimate_hook, SYM(interactionAnimate), b_+6);
-  CYC(b_+6, b_+9); objectPreventLinkFromPassing_hook(gb);
+  CYC(b_+6, b_+9); TAIL(objectPreventLinkFromPassing);
 }
 
 void forestFairy_subid05_hook(GB *gb) {
@@ -592,7 +592,7 @@ void forestFairy_subid08_hook(GB *gb) {
   CYC(b_+40, b_+42); alu_sub(gb, 8);
   CYC(b_+42, b_+45); SET_HL(b_+49);
   CYC(b_+45, b_+46); forest_fairy_add_double_index(gb, b_+46);
-  CYC(b_+46, b_+49); forestFairy_initNpcFromData_hook(gb);
+  CYC(b_+46, b_+49); TAIL(forestFairy_initNpcFromData);
 }
 
 void forestFairy_subid0b_hook(GB *gb) {
@@ -616,7 +616,7 @@ void forestFairy_subid0b_hook(GB *gb) {
   CYC(b_+31, b_+32); mem_wr(gb, HL, A);
   CYC(b_+32, b_+35); SET_HL((SYM(ambi_runSubid05__data) + 4));
   CALL_C(b_+35, interactionSetScript_hook, SYM(interactionSetScript), b_+38);
-  CYC(b_+38, b_+41); objectSetVisiblec1_hook(gb);
+  CYC(b_+38, b_+41); TAIL(objectSetVisiblec1);
 }
 
 void forestFairy_subid0c_hook(GB *gb) {
@@ -640,7 +640,7 @@ void forestFairy_standardUpdate_2_hook(GB *gb) {
   CYC(b_+13, b_+15); alu_sub(gb, 0x0c);
   CYC(b_+15, b_+18); SET_HL(b_+22);
   CYC(b_+18, b_+19); forest_fairy_add_double_index(gb, b_+19);
-  CYC(b_+19, b_+22); forestFairy_initNpcFromData_hook(gb);
+  CYC(b_+19, b_+22); TAIL(forestFairy_initNpcFromData);
 }
 
 void forestFairy_subid0e_hook(GB *gb) {
@@ -666,5 +666,5 @@ void forestFairy_subid0e_hook(GB *gb) {
   CYC(b_+32, b_+34); alu_sub(gb, 0x0e);
   CYC(b_+34, b_+37); SET_HL(b_+41);
   CYC(b_+37, b_+38); forest_fairy_add_double_index(gb, b_+38);
-  CYC(b_+38, b_+41); forestFairy_initNpcFromData_hook(gb);
+  CYC(b_+38, b_+41); TAIL(forestFairy_initNpcFromData);
 }

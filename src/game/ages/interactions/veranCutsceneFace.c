@@ -70,5 +70,5 @@ state1:
   CALL_C(b_+41, setWarpDestVariables_hook, SYM(setWarpDestVariables), b_+44);
   CYC(b_+44, b_+45); alu_xor(gb, A);
   CYC(b_+45, b_+48); mem_wr(gb, wcc50, A);
-  CYC(b_+48, b_+51); interactionIncState_hook(gb);
+  CYC(b_+48, b_+51); TAIL(interactionIncState);
 }

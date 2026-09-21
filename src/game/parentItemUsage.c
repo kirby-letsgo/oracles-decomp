@@ -87,7 +87,7 @@ void clearParentItem_hook(GB *gb) {
   CALL_C(b_+3, itemEnableLinkTurning_hook, SYM(itemEnableLinkTurning), b_+6);
   CALL_C(b_+6, itemEnableLinkMovement_hook, SYM(itemEnableLinkMovement), b_+9);
   CYC(b_+9, b_+11); E = 0x00;
-  CYC(b_+11, b_+14); objectDelete_de_hook(gb);
+  CYC(b_+11, b_+14); TAIL(objectDelete_de);
 }
 
 void clearParentItemH_hook(GB *gb) {

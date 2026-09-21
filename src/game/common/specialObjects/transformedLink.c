@@ -323,5 +323,5 @@ animate_if_pegasus_seeds_active:
   }
   CYC(b_+319, b_+321);
   CYC(b_+321, b_+322); alu_xor(gb, A);
-  CYC(b_+322, b_+325); specialObjectSetAnimation_hook(gb);
+  CYC(b_+322, b_+325); TAIL(specialObjectSetAnimation);
 }

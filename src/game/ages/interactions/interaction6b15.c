@@ -27,7 +27,7 @@ void interaction6b_loadMoblinsAttackingMakuSprout_hook(GB *gb) {
   BASE(interaction6b_loadMoblinsAttackingMakuSprout);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL((SYM(symmetryNpcSubid8And9Script__askForSecret_b15) + 7));
-  CYC(b_+3, b_+6); parseGivenObjectData_b00_hook(gb);
+  CYC(b_+3, b_+6); TAIL(parseGivenObjectData_b00);
 }
 
 void interaction6b_layoutSwapMakuTreeRooms_hook(GB *gb) {
@@ -51,7 +51,7 @@ void interaction6b_isLinkAtScreenEdge_hook(GB *gb) {
   CYC(b_+10, b_+11); alu_xor(gb, A);
 L_6ba0:
   CYC(b_+11, b_+12); alu_or(gb, A);
-  CYC(b_+12, b_+15); writeFlagsTocddb_hook(gb);
+  CYC(b_+12, b_+15); TAIL(writeFlagsTocddb);
 }
 
 void moveLinkToPosition_hook(GB *gb) {
@@ -73,7 +73,7 @@ void interaction6b_checkGotBombsFromAmbi_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, (wGroup0RoomFlags + 131));
   CYC(b_+3, b_+5); alu_bit(gb, 7, A);
-  CYC(b_+5, b_+8); writeFlagsTocddb_hook(gb);
+  CYC(b_+5, b_+8); TAIL(writeFlagsTocddb);
 }
 
 void interaction6b_checkLinkCanCollect_hook(GB *gb) {

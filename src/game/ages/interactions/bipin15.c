@@ -30,5 +30,5 @@ void bipin_showText_subid1To9_hook(GB *gb) {
   CYC(b_+6, b_+7); bipin_addAToHl_from_rst(gb, b_+7);
   CYC(b_+7, b_+9); B = 0x43;
   CYC(b_+9, b_+10); C = mem_rd(gb, HL);
-  CYC(b_+10, b_+13); showText_hook(gb);
+  CYC(b_+10, b_+13); TAIL(showText);
 }

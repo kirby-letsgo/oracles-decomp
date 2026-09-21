@@ -218,7 +218,7 @@ def switches_threads(tb, t, seen=()):
     if (tb, t) in _switches: return _switches[(tb, t)]
     if (tb, t) in externs or (tb, t) in seen or t >= 0x8000: return False
     body = routine_body(tb, t)
-    r = any(k == 'spload' for _, _, _, _, k, _ in body)
+    r = any(k in ('spload', 'jphl', 'jumptable') or (k == 'jp' and info[0] == 0x00c4) or (k == 'call' and info[0] in (0x00c4, 0xc4b7)) for _, _, _, _, k, info in body)
     if not r:
         addrs = set(a for a, *_ in body)
         for a, m, ln, cy, k, info in body:
@@ -247,6 +247,7 @@ def gen(name, bank=None, start=None):
     for a, m, ln, cy, kind, info in insns:
         if kind in ('jp', 'jpcc', 'callcc') and info[0] in addrs: jump_targets.add(info[0])
         if kind == 'jumptable': jump_targets.update(t for t in info[0] if t in addrs)
+    gen.targets = set()
     out = Out()
     out.lines.append(f'// {bank:02x}:{start:04x}')
     out.lines.append(f'void {cname_at(bank, start)}(GB *gb) {{')
@@ -284,7 +285,8 @@ def gen(name, bank=None, start=None):
                 tb = target_bank(bank, t)
                 if tb is None: tb = banks_at.get(a)
                 tn = by_addr.get((tb, t)) or local_by_addr.get((tb, t))
-                if (tb, t) in entries and entries[(tb, t)].endswith('_hook'): jump = f'if (hook_enabled_at(0x{t:04x})) {{ {entries[(tb, t)]}(gb); return; }} HANDOFF(0x{t:04x});'
+                gen.targets.add((tb, t))
+                if (tb, t) in entries and entries[(tb, t)].endswith('_hook'): jump = f'if (hook_enabled_at(gb, 0x{t:04x})) {{ {entries[(tb, t)]}(gb); return; }} HANDOFF(0x{t:04x});'
                 elif (tb, t) in entries: jump = f'{entries[(tb, t)]}(gb); return;'
                 else: jump = f'HANDOFF(0x{t:04x}); /* {tn or "unported"} */'
             if cond is None:
@@ -297,6 +299,7 @@ def gen(name, bank=None, start=None):
             if tb is None: tb = banks_at.get(a)
             tn = by_addr.get((tb, t)) or local_by_addr.get((tb, t))
             ra = a + ln
+            gen.targets.add((tb, t))
             if (tb, t) in entries: c = f'CALL(0x{a:04x}, {entries[(tb, t)]}, 0x{t:04x}, 0x{ra:04x});'
             else: c = f'CALL_ASM(0x{a:04x}, 0x{t:04x}, 0x{ra:04x}); /* {tn or "unported"} */'
             if cond is None: out.emit(c + com)
@@ -308,6 +311,7 @@ def gen(name, bank=None, start=None):
             out.emit('if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }')
             out.emit('I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);')
             cases = ' '.join(f'case 0x{t:04x}: goto L_{t:04x};' for t in sorted(set(t for t in table if t in addrs)))
+            gen.targets.update((bank, t) for t in table if t not in addrs)
             out.emit(f'switch (HL) {{ {cases} default: HANDOFF(HL); }}')
         elif kind == 'rst':
             ra = a + ln
@@ -330,7 +334,8 @@ def gen(name, bank=None, start=None):
         nxt_a = a + ln
         if falls and nxt_a not in addrs:
             nn = by_addr.get((bank, nxt_a)) or local_by_addr.get((bank, nxt_a))
-            if (bank, nxt_a) in entries and entries[(bank, nxt_a)].endswith('_hook'): out.emit(f'if (hook_enabled_at(0x{nxt_a:04x})) {{ {entries[(bank, nxt_a)]}(gb); return; }} HANDOFF(0x{nxt_a:04x});  // fallthrough')
+            gen.targets.add((bank, nxt_a))
+            if (bank, nxt_a) in entries and entries[(bank, nxt_a)].endswith('_hook'): out.emit(f'if (hook_enabled_at(gb, 0x{nxt_a:04x})) {{ {entries[(bank, nxt_a)]}(gb); return; }} HANDOFF(0x{nxt_a:04x});  // fallthrough')
             elif (bank, nxt_a) in entries: out.emit(f'{entries[(bank, nxt_a)]}(gb); return;  // fallthrough')
             else: out.emit(f'HANDOFF(0x{nxt_a:04x});  // fallthrough to {nn or "unlabeled"}')
     out.lines.append('}')
@@ -347,17 +352,22 @@ if names and names[0] == '--out':
     for n in missing: print(f'warning: unknown routine {n} (skipped)', file=sys.stderr)
     names = list(dict.fromkeys(n for n in names if n in labels))
     ported = set(n for n in ported if n in labels and not has_unsupported(n))
+    resume_points = set()
+    def discover_resume(n, b, a):
+        body = routine_body(b, a)
+        banks_at = infer_banks(b, body)
+        found = []
+        for ia, m, ln, cy, kind, info in body:
+            if kind == 'spload' and (b, ia + ln) not in by_addr: local_by_addr.setdefault((b, ia + ln), f'{n}@afterSp{ia + ln:04x}'); resume_points.add((b, ia + ln)); found.append((b, ia + ln))
+            if kind in ('call', 'callcc'):
+                tb = target_bank(b, info[0])
+                if tb is None: tb = banks_at.get(ia)
+                if tb is not None and switches_threads(tb, info[0]) and (b, ia + ln) not in by_addr: local_by_addr.setdefault((b, ia + ln), f'{n}@afterCall{ia + ln:04x}'); resume_points.add((b, ia + ln)); found.append((b, ia + ln))
+        return found
     for n in names:
         for (b, a) in instances.get(n, []):
-            if (b, a) in externs or n in rewritten or cname_at(b, a) in rewritten: continue
-            body = routine_body(b, a)
-            banks_at = infer_banks(b, body)
-            for ia, m, ln, cy, kind, info in body:
-                if kind == 'spload' and (b, ia + ln) not in by_addr: local_by_addr.setdefault((b, ia + ln), f'{n}@afterSp{ia + ln:04x}')
-                if kind in ('call', 'callcc'):
-                    tb = target_bank(b, info[0])
-                    if tb is None: tb = banks_at.get(ia)
-                    if tb is not None and switches_threads(tb, info[0]) and (b, ia + ln) not in by_addr: local_by_addr.setdefault((b, ia + ln), f'{n}@afterCall{ia + ln:04x}')
+            if (b, a) in externs: continue
+            discover_resume(n, b, a)
     owner = {}
     for n in names:
         for (b, a) in instances.get(n, []):
@@ -388,6 +398,20 @@ if names and names[0] == '--out':
             if n in rewritten or cname_at(b, a) in rewritten:
                 entries[(b, a)] = cname_at(b, a) + '_hook'
                 items_by_bank.setdefault(b, []).append((n, b, a))
+                # A rewritten routine still gets generated resume tails at its post-yield return
+                # addresses: the yield discards its C frames, so nothing else can run them.
+                # Those tails call the routine's own @-locals, which the hand-written C reaches
+                # only as static helpers, so every local that is a call target is generated too.
+                body = routine_body(b, a)
+                called = set(info[0] for ia, m, ln, cy, kind, info in body if kind in ('call', 'callcc'))
+                tails = [(la, ln) for la, ln in locals_of.get((b, n), []) if (b, la) in resume_points]
+                tails += [(la, ln) for (lb, la), ln in local_by_addr.items() if lb == b and la in called and ln.split('@')[0] == n and (b, la) not in by_addr]
+                for la, ln in sorted(set(tails)):
+                    if cname_at(b, la) in rewritten: continue
+                    if not body_ok(b, la): print(f'warning: {ln} skipped (unsupported)', file=sys.stderr); continue
+                    if (b, la) in entries: continue
+                    entries[(b, la)] = cname_at(b, la)
+                    items_by_bank[b].append((ln, b, la))
                 continue
             if body_ok(b, a): entries[(b, a)] = cname_at(b, a)
             items_by_bank.setdefault(b, []).append((n, b, a))
@@ -403,15 +427,35 @@ if names and names[0] == '--out':
     generated = []
     by_bank = items_by_bank
     bank_outputs = {}
+    bank_bodies = collections.defaultdict(list)
+    pending = []
+    def is_rewritten_parent(ln):
+        parent = ln.split('@')[0]
+        if parent not in labels: return False
+        pb, pa = labels[parent]
+        return parent in rewritten or cname_at(pb, pa) in rewritten
     for bank, items in by_bank.items():
-        bodies = []
         for n, b, a in items:
             if n in rewritten or cname_at(b, a) in rewritten: generated.append((b, a, cname_at(b, a) + '_hook', 'H' if (n in rewritten_noverify or cname_at(b, a) in rewritten_noverify) else '-')); continue
             if (b, a) in externs: generated.append((b, a, cname_at(b, a), '-')); continue
+            if '@' in n and is_rewritten_parent(n): pending.extend(discover_resume(n.split('@')[0], b, a))
             code = gen(n, b, a)
-            if code: bodies.append(code); generated.append((b, a, cname_at(b, a), gen.flags))
-        if bodies:
-            bank_outputs[os.path.join(outdir, f'gen_bank{bank:02x}.c')] = bodies
+            if code: bank_bodies[bank].append(code); generated.append((b, a, cname_at(b, a), gen.flags)); pending.extend(gen.targets)
+    # Generated code that lands on an @-local of a rewritten routine (a jump-table case, a
+    # fallthrough, a call) has no C for it: the hand-written file keeps those as static helpers.
+    # Generate every such local, to a fixed point, so the dispatcher always finds an entry.
+    while pending:
+        tb, t = pending.pop()
+        if (tb, t) in entries or (tb, t) in by_addr or (tb, t) not in local_by_addr or t >= 0x8000: continue
+        ln = local_by_addr[(tb, t)]
+        if not is_rewritten_parent(ln) or cname_at(tb, t) in rewritten: continue
+        if not body_ok(tb, t): print(f'warning: {ln} skipped (unsupported)', file=sys.stderr); continue
+        entries[(tb, t)] = cname_at(tb, t)
+        pending.extend(discover_resume(ln.split('@')[0], tb, t))
+        code = gen(ln, tb, t)
+        if code: bank_bodies[tb].append(code); generated.append((tb, t, cname_at(tb, t), gen.flags)); pending.extend(gen.targets)
+    for bank, bodies in bank_bodies.items():
+        bank_outputs[os.path.join(outdir, f'gen_bank{bank:02x}.c')] = bodies
     for path in glob.glob(os.path.join(outdir, 'gen_bank[0-9a-f][0-9a-f].c')):
         if path not in bank_outputs: os.remove(path)
     for path, bodies in bank_outputs.items():

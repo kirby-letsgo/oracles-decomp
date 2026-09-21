@@ -78,5 +78,5 @@ subid1:
   CYC(b_+40, b_+43); push_effect(gb, b_+43); mustache_man_init(gb, sp0_);
 run1:
   CALL_C(b_+43, interactionRunScript_hook, SYM(interactionRunScript), b_+46);
-  CYC(b_+46, b_+49); interactionAnimateAsNpc_hook(gb);
+  CYC(b_+46, b_+49); TAIL(interactionAnimateAsNpc);
 }

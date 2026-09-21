@@ -48,7 +48,7 @@ void interactionCode98__state0_hook(GB *gb) {
   CYC(b_+21, b_+22); A = mem_rd(gb, DE);
   CYC(b_+22, b_+24);
   CALL_C(b_+24, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+27);
-  CYC(b_+27, b_+30); objectSetVisible81_hook(gb);
+  CYC(b_+27, b_+30); TAIL(objectSetVisible81);
 }
 
 void interactionCode98__state1_hook(GB *gb) {

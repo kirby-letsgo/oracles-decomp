@@ -121,7 +121,7 @@ void checkTileAfterNext_hook(GB *gb) {
 void jumpToShowInfoText_hook(GB *gb) {
   BASE(jumpToShowInfoText);
   CYC(b_+0, b_+2); A = 0x08;
-  CYC(b_+2, b_+5); showInfoTextForTile_hook(gb);
+  CYC(b_+2, b_+5); TAIL(showInfoTextForTile);
 }
 
 void createKeySpriteInteraction_hook(GB *gb) {
@@ -138,7 +138,7 @@ void createKeySpriteInteraction_hook(GB *gb) {
   CYC(b_+9, b_+10); mem_wr(gb, HL, A);
   CYC(b_+10, b_+12); A = H8(hFF8D);
   CYC(b_+12, b_+14); L = 0x4b;
-  CYC(b_+14, b_+17); setShortPosition_hook(gb);
+  CYC(b_+14, b_+17); TAIL(setShortPosition);
 }
 
 void nextToSubrosiaKeydoor_hook(GB *gb) {
@@ -658,7 +658,7 @@ somaria_block:
 
 end:
   CYC(b_+108, b_+109); alu_xor(gb, A);
-  CYC(b_+109, b_+112); resetPushingAgainstTileCounter_hook(gb);
+  CYC(b_+109, b_+112); TAIL(resetPushingAgainstTileCounter);
 }
 
 void nextToKeyBlock_hook(GB *gb) {
@@ -699,7 +699,7 @@ void nextToKeyBlock_hook(GB *gb) {
 
 finish:
   CYC(b_+50, b_+51); alu_xor(gb, A);
-  CYC(b_+51, b_+53); resetPushingAgainstTileCounter_hook(gb);
+  CYC(b_+51, b_+53); TAIL(resetPushingAgainstTileCounter);
 }
 
 void nextToKeyDoor_hook(GB *gb) {
@@ -767,7 +767,7 @@ no_key:
   }
   CYC(b_+63, b_+66);
   CYC(b_+66, b_+67); alu_xor(gb, A);
-  CYC(b_+67, b_+70); showInfoTextForTile_hook(gb);
+  CYC(b_+67, b_+70); TAIL(showInfoTextForTile);
 }
 
 void nextToOverworldKeyhole_hook(GB *gb) {

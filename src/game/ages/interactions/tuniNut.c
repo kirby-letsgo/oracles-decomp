@@ -112,5 +112,5 @@ void interactionCodeb2_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
   if (F & FZ) { CYCT(b_+3, b_+5); interactionCodeb2__state0_hook(gb); return; }
-  CYC(b_+3, b_+5); interactionCodeb2__state1_hook(gb);
+  CYC(b_+3, b_+5); TAIL(interactionCodeb2__state1);
 }

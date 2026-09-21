@@ -171,5 +171,5 @@ checkId:
   } else {
     CYCT(b_+113, b_+115);
   }
-  CYC(b_+123, b_+126); interactionAnimate_hook(gb);
+  CYC(b_+123, b_+126); TAIL(interactionAnimate);
 }

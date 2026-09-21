@@ -28,7 +28,7 @@ void interactiondc_removeGraveyardGateTiles1_hook(GB *gb) {
   CYC(b_+34, b_+37); SET_BC((SYM(group2ObjectDataTable) + 261));
   CALL_C(b_+37, interactiondc_spawnPuff_hook, SYM(interactiondc_spawnPuff), b_+40);
   CYC(b_+40, b_+43); SET_BC((SYM(group2ObjectDataTable) + 277));
-  CYC(b_+43, b_+46); interactiondc_spawnPuff_hook(gb);
+  CYC(b_+43, b_+46); TAIL(interactiondc_spawnPuff);
 }
 
 void interactiondc_removeGraveyardGateTiles2_hook(GB *gb) {
@@ -51,7 +51,7 @@ void interactiondc_removeGraveyardGateTiles2_hook(GB *gb) {
   CYC(b_+33, b_+36); SET_BC((SYM(group2ObjectDataTable) + 245));
   CALL_C(b_+36, interactiondc_spawnPuff_hook, SYM(interactiondc_spawnPuff), b_+39);
   CYC(b_+39, b_+42); SET_BC((SYM(group2ObjectDataTable) + 293));
-  CYC(b_+42, b_+45); interactiondc_spawnPuff_hook(gb);
+  CYC(b_+42, b_+45); TAIL(interactiondc_spawnPuff);
 }
 
 void interactiondc_7bde_hook(GB *gb) {

@@ -47,7 +47,7 @@ L_6cb3:
   CYC(b_+17, b_+18); fairyHidingMinigame_addAToHl_from_rst(gb, b_+18);
   CYC(b_+18, b_+19); C = mem_rd(gb, HL);
   CYC(b_+19, b_+21); B = 0x11;
-  CYC(b_+21, b_+24); showText_hook(gb);
+  CYC(b_+21, b_+24); TAIL(showText);
 }
 
 void fairyHidingMinigame_moveLinkBackLeft_hook(GB *gb) {

@@ -30,5 +30,5 @@ void interactionCode2f_hook(GB *gb) {
 setVolume:
   CYC(b_+20, b_+22); A = 0x02;
   CALL_C(b_+22, setMusicVolume_hook, SYM(setMusicVolume), b_+25);
-  CYC(b_+25, b_+28); interactionDelete_hook(gb);
+  CYC(b_+25, b_+28); TAIL(interactionDelete);
 }

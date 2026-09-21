@@ -82,5 +82,5 @@ state1:
     CYCT(b_+75, b_+78); TAIL(itemDelete);
   }
   CYC(b_+75, b_+78);
-  CYC(b_+78, b_+81); itemAnimate_hook(gb);
+  CYC(b_+78, b_+81); TAIL(itemAnimate);
 }

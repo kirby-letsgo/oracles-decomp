@@ -179,7 +179,7 @@ state2:
   CYC(b_+110, b_+112);
 
 delete:
-  CYC(b_+112, b_+115); interactionDelete_hook(gb);
+  CYC(b_+112, b_+115); TAIL(interactionDelete);
 }
 
 void clearFallDownHoleEventBuffer_hook(GB *gb) {
@@ -187,5 +187,5 @@ void clearFallDownHoleEventBuffer_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(wTmpcfc0_fallDownHoleEvent_cfd8);
   CYC(b_+3, b_+5); B = 0x08;
   CYC(b_+5, b_+7); A = 0xff;
-  CYC(b_+7, b_+10); fillMemory_hook(gb);
+  CYC(b_+7, b_+10); TAIL(fillMemory);
 }

@@ -263,7 +263,7 @@ void runVeranGhostSubid1_hook(GB *gb) {
     if (F & FC) { CYCT(b_+9, b_+12); interactionDelete_hook(gb); return; }
     CYC(b_+9, b_+12);
   } else CYCT(b_+4, b_+6);
-  CYC(b_+12, b_+15); interactionAnimate_hook(gb);
+  CYC(b_+12, b_+15); TAIL(interactionAnimate);
 }
 
 void runVeranGhostSubid2_hook(GB *gb) {

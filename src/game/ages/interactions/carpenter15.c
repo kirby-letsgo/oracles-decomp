@@ -20,5 +20,5 @@ void carpenter_buildBridgeColumn_hook(GB *gb) {
   CYC(b_+15, b_+18); SET_HL(wTmpcfc0_carpenterSearch_cfd0);
   CYC(b_+18, b_+19); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+19, b_+21); A = 0x70;
-  CYC(b_+21, b_+24); playSound_b00_hook(gb);
+  CYC(b_+21, b_+24); TAIL(playSound_b00);
 }

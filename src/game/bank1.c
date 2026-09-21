@@ -496,7 +496,7 @@ void updateActiveRoom_hook(GB *gb) {
     CYC(b_+17, b_+19);
   }
   CYC(b_+36, b_+39); W8(wActiveRoom) = A;
-  CYC(b_+39, b_+42); setVisitedRoomFlag_hook(gb);
+  CYC(b_+39, b_+42); TAIL(setVisitedRoomFlag);
 }
 
 void getNextActiveRoom_hook(GB *gb) {
@@ -518,7 +518,7 @@ void getNextActiveRoom_hook(GB *gb) {
   }
   CYC(b_+15, b_+17);
   CYC(b_+17, b_+18); bank1_jump_table_from_rst(gb, b_+18);
-  hook_handoff(gb, HL);
+  HANDOFF(HL);
 }
 
 void screenTransitionStandard_hook(GB *gb) {
@@ -614,7 +614,7 @@ void screenTransitionEyePuzzle_hook(GB *gb) {
       return;
     }
     else {
-      hook_handoff(gb, target);
+      HANDOFF(target);
       return;
     }
   } while (0);
@@ -968,13 +968,13 @@ void checkScreenEdgeWarps_hook(GB *gb) {
     TAIL(noWarpInitiated);
   }
   CYC(b_+18, b_+21);
-  CYC(b_+21, b_+24); warpInitiated_hook(gb);
+  CYC(b_+21, b_+24); TAIL(warpInitiated);
 }
 
 void checkTileIsWarpTile_hook(GB *gb) {
   BASE(checkTileIsWarpTile);
   CYC(b_+0, b_+3); SET_HL(SYM(warpTileTable));
-  CYC(b_+3, b_+6); lookupCollisionTable_hook(gb);
+  CYC(b_+3, b_+6); TAIL(lookupCollisionTable);
 }
 
 void cutscene13_hook(GB *gb) {
@@ -984,7 +984,7 @@ void cutscene13_hook(GB *gb) {
   CYC(b_+3, b_+5); E = 0x03;
   CALL_C(b_+5, interBankCall_hook, 0x008a, b_+8);
   CALL_C(b_+8, refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+11);
-  CYC(b_+11, b_+14); updateAllObjects_hook(gb);
+  CYC(b_+11, b_+14); TAIL(updateAllObjects);
 }
 
 void tilesetLayoutGroup33_hook(GB *gb) {
@@ -999,25 +999,26 @@ void cutscene14_hook(GB *gb) {
   CALL_C(b_+5, interBankCall_hook, 0x008a, b_+8);
   CALL_C(b_+8, refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+11);
   CALL_C(b_+11, updateAllObjects_hook, SYM(updateAllObjects), b_+14);
-  CYC(b_+14, b_+17); updateStatusBar_hook(gb);
+  CYC(b_+14, b_+17); TAIL(updateStatusBar);
 }
 
 void linkSummonedCutscene_hook(GB *gb) {
   BASE(linkSummonedCutscene);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, func_7b93_hook, SYM(func_7b93), b_+3);
-  CYC(b_+3, b_+6); updateAllObjects_hook(gb);
+  CYC(b_+3, b_+6); TAIL(updateAllObjects);
 }
 
 void func_7b93_hook(GB *gb) {
   BASE(func_7b93);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, (wThreadStateBuffer + 15));
   CYC(b_+3, b_+4); bank1_jump_table_from_rst(gb, b_+4);
   do { uint16_t jt_ = (HL);
     if (jt_ == b_+10) { func_7b93__state0_hook(gb); return; }
     else if (jt_ == b_+81) { func_7b93__state1_hook(gb); return; }
     else if (jt_ == b_+110) { func_7b93__state2_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -1050,7 +1051,7 @@ void func_7b93__state0_hook(GB *gb) {
   CYC(b_+71, b_+73); A = 0x95;
   CALL_C(b_+73, playSound_b00_hook, SYM(playSound_b00), b_+76);
   CYC(b_+76, b_+78); A = 0xff;
-  CYC(b_+78, b_+81); initWaveScrollValues_hook(gb);
+  CYC(b_+78, b_+81); TAIL(initWaveScrollValues);
 }
 
 void func_7b93__state1_hook(GB *gb) {
@@ -1143,18 +1144,19 @@ void func_7b93__substate2_hook(GB *gb) {
   CYC(b_+199, b_+202); W8(wDisabledObjects) = A;
   CYC(b_+202, b_+204); A = 0x21;
   CALL_C(b_+204, setGlobalFlag_hook, SYM(setGlobalFlag), b_+207);
-  CYC(b_+207, b_+210); initializeRoom_hook(gb);
+  CYC(b_+207, b_+210); TAIL(initializeRoom);
 }
 
 void func_7b93__state2_hook(GB *gb) {
   BASE(func_7b93);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+110, b_+113); A = W8(wGenericCutscene_cbb3);
   CYC(b_+113, b_+114); bank1_jump_table_from_rst(gb, b_+114);
   do { uint16_t jt_ = (HL);
     if (jt_ == b_+120) { func_7b93__substate0_hook(gb); return; }
     else if (jt_ == b_+160) { func_7b93__substate1_hook(gb); return; }
     else if (jt_ == b_+190) { func_7b93__substate2_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -1406,7 +1408,7 @@ void func_60e9_hook(GB *gb) {
   do { uint16_t jt_ = (HL);
     if (jt_ == SYM(checkWarpsTopDown) && hook_enabled_at(gb, SYM(checkWarpsTopDown))) { checkWarpsTopDown_hook(gb); return; }
     else if (jt_ == SYM(checkWarpsSidescrolling) && hook_enabled_at(gb, SYM(checkWarpsSidescrolling))) { checkWarpsSidescrolling_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -1605,7 +1607,7 @@ void paletteThread_stop_hook(GB *gb) {
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+4); mem_wr(gb, wPaletteThread_updateRate, A);
   CYC(b_+4, b_+7); mem_wr(gb, wPaletteThread_mode, A);
-  CYC(b_+7, b_+10); clearPaletteFadeVariables_hook(gb);
+  CYC(b_+7, b_+10); TAIL(clearPaletteFadeVariables);
 }
 
 void paletteThread_refreshPalettesAndStop_hook(GB *gb) {
@@ -1613,7 +1615,7 @@ void paletteThread_refreshPalettesAndStop_hook(GB *gb) {
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+4); mem_wr(gb, wPaletteThread_updateRate, A);
   CYC(b_+4, b_+7); mem_wr(gb, wPaletteThread_mode, A);
-  CYC(b_+7, b_+10); clearPaletteFadeVariablesAndRefreshPalettes_hook(gb);
+  CYC(b_+7, b_+10); TAIL(clearPaletteFadeVariablesAndRefreshPalettes);
 }
 
 void paletteFadeHandler0d_hook(GB *gb) {
@@ -1652,7 +1654,7 @@ void paletteFadeHandler05_hook(GB *gb) {
   CYC(b_+19, b_+21);
   CYC(b_+21, b_+24); mem_wr(gb, (wThreadStateBuffer + 31), A);
   CYC(b_+24, b_+25); C = A;
-  CYC(b_+25, b_+28); updateFadingPalettes_hook(gb);
+  CYC(b_+25, b_+28); TAIL(updateFadingPalettes);
 }
 
 void paletteFadeHandler0e_hook(GB *gb) {
@@ -1693,7 +1695,7 @@ void paletteFadeHandler06_hook(GB *gb) {
   CYC(b_+25, b_+27); alu_sub(gb, 0x1f);
   CYC(b_+27, b_+30); mem_wr(gb, (wThreadStateBuffer + 31), A);
   CYC(b_+30, b_+31); C = A;
-  CYC(b_+31, b_+34); updateFadingPalettes_hook(gb);
+  CYC(b_+31, b_+34); TAIL(updateFadingPalettes);
 }
 
 void paletteFadeHandler07_hook(GB *gb) {
@@ -1732,7 +1734,7 @@ void paletteFadeHandler07_hook(GB *gb) {
     TAIL(darkenRoom);
   }
   CYC(b_+41, b_+44);
-  CYC(b_+44, b_+47); darkenRoomLightly_hook(gb);
+  CYC(b_+44, b_+47); TAIL(darkenRoomLightly);
 }
 
 void palette_fade_handler08_body_hook(GB *gb) {
@@ -1782,7 +1784,7 @@ void paletteFadeHandler08__seasonsFunc_01_5816_hook(GB *gb) {
 
 void paletteFadeHandler08__stop_hook(GB *gb) {
   BASE(paletteFadeHandler08);
-  CYC(b_+41, b_+44); paletteThread_stop_hook(gb);
+  CYC(b_+41, b_+44); TAIL(paletteThread_stop);
 }
 
 static void palette_thread_calculate_next_color(GB *gb) {
@@ -2689,6 +2691,7 @@ void setObjectsEnabledTo2_hlpr_hook(GB *gb) {
 
 void func_400b_hook(GB *gb) {
   BASE(func_400b);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wScreenTransitionState);
   CYC(b_+3, b_+4); bank1_jump_table_from_rst(gb, b_+4);
   do { uint16_t jt_ = (HL);
@@ -2698,7 +2701,7 @@ void func_400b_hook(GB *gb) {
     else if (jt_ == SYM(screenTransitionState3) && hook_enabled_at(gb, SYM(screenTransitionState3))) { screenTransitionState3_hook(gb); return; }
     else if (jt_ == SYM(screenTransitionState4) && hook_enabled_at(gb, SYM(screenTransitionState4))) { screenTransitionState4_hook(gb); return; }
     else if (jt_ == SYM(screenTransitionState5) && hook_enabled_at(gb, SYM(screenTransitionState5))) { screenTransitionState5_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -2752,7 +2755,7 @@ void initializeRoomBoundaryAndLoadAnimations_hook(GB *gb) {
   CYC(b_+60, b_+61); alu_add(gb, A);
   CYC(b_+61, b_+64); mem_wr(gb, wMaxCameraX, A);
   CALL_C(b_+64, calculateRoomEdge_hook, SYM(calculateRoomEdge), b_+67);
-  CYC(b_+67, b_+70); loadTilesetAnimation_hook(gb);
+  CYC(b_+67, b_+70); TAIL(loadTilesetAnimation);
 }
 
 void screen_transition_state1_body_hook(GB *gb) {
@@ -2770,7 +2773,7 @@ void screen_transition_state1_body_hook(GB *gb) {
       else if (jt_ == b_+44) { entry = b_+44; break; }
       else if (jt_ == b_+76) { entry = b_+76; break; }
       else if (jt_ == SYM(setScreenTransitionState02) && hook_enabled_at(gb, SYM(setScreenTransitionState02))) { setScreenTransitionState02_hook(gb); return; }
-      else { hook_handoff(gb, HL); return; }
+      else { HANDOFF(HL); }
     } while (0);
   }
   if (entry == b_+19) {
@@ -2835,7 +2838,7 @@ queue_row:
   CYC(b_+119, b_+120); E = B;
   CALL_C(b_+120, func_46ca_hook, SYM(func_46ca), b_+123);
   CYC(b_+123, b_+125); A = hram_rd(gb, hFF8B & 0xff);
-  CYC(b_+125, b_+128); addFunctionsToVBlankQueue_hook(gb);
+  CYC(b_+125, b_+128); TAIL(addFunctionsToVBlankQueue);
 }
 
 void screenTransitionState1_hook(GB *gb) { gb->hook_pc = SYM(screenTransitionState1); screen_transition_state1_body_hook(gb); }
@@ -3132,7 +3135,7 @@ void updateCameraPosition__updateComponent_hook(GB *gb) {
   if (F & FC) { CYCT(b_+73, b_+75); CYC(b_+78, b_+79); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); updateCameraPosition__smBit7_hook(gb); return; }
   CYC(b_+73, b_+75);
   CYC(b_+75, b_+76); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+76, b_+78); updateCameraPosition__smBit7_hook(gb);
+  CYC(b_+76, b_+78); TAIL(updateCameraPosition__smBit7);
 }
 
 void updateCameraPosition__smBit7_hook(GB *gb) {
@@ -3282,7 +3285,7 @@ void checkDarkenRoom_hook(GB *gb) {
   CYC(b_+12, b_+14); alu_bit(gb, 7, A);
   if (F & FZ) { CYCT(b_+14, b_+15); ret_effect(gb); return; }
   CYC(b_+14, b_+15);
-  CYC(b_+15, b_+18); darkenRoom_hook(gb);
+  CYC(b_+15, b_+18); TAIL(darkenRoom);
 }
 
 void screenTransitionState4_hook(GB *gb) {
@@ -3309,13 +3312,14 @@ void screenTransitionState4_hook(GB *gb) {
 
 void screenTransitionState5_hook(GB *gb) {
   BASE(screenTransitionState5);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wScreenTransitionState2);
   CYC(b_+3, b_+4); bank1_jump_table_from_rst(gb, b_+4);
   do { uint16_t jt_ = (HL);
     if (jt_ == SYM(screenTransitionState5Substate0) && hook_enabled_at(gb, SYM(screenTransitionState5Substate0))) { screenTransitionState5Substate0_hook(gb); return; }
     else if (jt_ == SYM(screenTransitionState5Substate1) && hook_enabled_at(gb, SYM(screenTransitionState5Substate1))) { screenTransitionState5Substate1_hook(gb); return; }
     else if (jt_ == SYM(screenTransitionState5Substate2) && hook_enabled_at(gb, SYM(screenTransitionState5Substate2))) { screenTransitionState5Substate2_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -3354,7 +3358,7 @@ void screenTransitionState5Substate0_hook(GB *gb) {
   CYC(b_+55, b_+58); A = mem_rd(gb, wScreenTransitionDirection);
   CYC(b_+58, b_+60); alu_and(gb, 0x01);
   if (F & FZ) { CYCT(b_+60, b_+62); screenTransitionState5Substate0__vertical_hook(gb); return; }
-  CYC(b_+60, b_+62); screenTransitionState5Substate0__horizontal_hook(gb);
+  CYC(b_+60, b_+62); TAIL(screenTransitionState5Substate0__horizontal);
 }
 
 void screenTransitionState5Substate0__horizontal_hook(GB *gb) {
@@ -3487,7 +3491,7 @@ void label_01_037_hook(GB *gb) {
   CYC(b_+56, b_+58); A = 0x01;
   CYC(b_+58, b_+61); mem_wr(gb, wLoadedTreeGfxIndex, A);
   CALL_C(b_+61, calculateCameraPosition_hook, SYM(calculateCameraPosition), b_+64);
-  CYC(b_+64, b_+67); updateGfxRegs2Scroll_hook(gb);
+  CYC(b_+64, b_+67); TAIL(updateGfxRegs2Scroll);
 }
 
 void func_4493_hook(GB *gb) {
@@ -3496,7 +3500,7 @@ void func_4493_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wScreenTransitionDirection);
   CYC(b_+3, b_+6); SET_DE(b_+11);
   CALL_C(b_+6, addDoubleIndexToDe_hook, 0x0072, b_+9);
-  CYC(b_+9, b_+11); label_01_037_hook(gb);
+  CYC(b_+9, b_+11); TAIL(label_01_037);
 }
 
 void resetFollowingLinkObjectPosition_hook(GB *gb) {
@@ -3554,6 +3558,7 @@ void resetFollowingLinkObjectPosition_hook(GB *gb) {
 
 void screenTransitionState5Substate2_hook(GB *gb) {
   BASE(screenTransitionState5Substate2);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wScreenTransitionState3);
   CYC(b_+3, b_+4); bank1_jump_table_from_rst(gb, b_+4);
   do { uint16_t jt_ = (HL);
@@ -3563,7 +3568,7 @@ void screenTransitionState5Substate2_hook(GB *gb) {
     else if (jt_ == b_+76) { screenTransitionState5Substate2__state3_hook(gb); return; }
     else if (jt_ == b_+95) { screenTransitionState5Substate2__state4_hook(gb); return; }
     else if (jt_ == b_+109) { screenTransitionState5Substate2__state5_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -3586,7 +3591,7 @@ void screenTransitionState5Substate2__state1_hook(GB *gb) {
   BASE(screenTransitionState5Substate2);
   CYC(b_+38, b_+40); A = 0x02;
   CYC(b_+40, b_+43); mem_wr(gb, wScreenTransitionState3, A);
-  CYC(b_+43, b_+46); screenTransitionState5Substate2__drawNextRow_hook(gb);
+  CYC(b_+43, b_+46); TAIL(screenTransitionState5Substate2__drawNextRow);
 }
 
 void screenTransitionState5Substate2__state2_hook(GB *gb) {
@@ -3669,7 +3674,7 @@ void screenTransitionState5Substate2__state5_hook(GB *gb) {
   CYC(b_+148, b_+151); A = mem_rd(gb, wScreenOffsetX);
   CYC(b_+151, b_+152); alu_add(gb, B);
   CYC(b_+152, b_+155); mem_wr(gb, wScreenOffsetX, A);
-  CYC(b_+155, b_+158); finishScrollingTransition_hook(gb);
+  CYC(b_+155, b_+158); TAIL(finishScrollingTransition);
 }
 
 void screenTransitionState5Substate2__drawNextRow_hook(GB *gb) {
@@ -3685,6 +3690,7 @@ void screenTransitionState5Substate2__drawNextRow_hook(GB *gb) {
 
 void screenTransitionState5Substate1_hook(GB *gb) {
   BASE(screenTransitionState5Substate1);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wScreenTransitionState3);
   CYC(b_+3, b_+4); bank1_jump_table_from_rst(gb, b_+4);
   do { uint16_t jt_ = (HL);
@@ -3694,7 +3700,7 @@ void screenTransitionState5Substate1_hook(GB *gb) {
     else if (jt_ == b_+76) { screenTransitionState5Substate1__state3_hook(gb); return; }
     else if (jt_ == b_+95) { screenTransitionState5Substate1__state4_hook(gb); return; }
     else if (jt_ == b_+109) { screenTransitionState5Substate1__state5_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -3717,7 +3723,7 @@ void screenTransitionState5Substate1__state1_hook(GB *gb) {
   BASE(screenTransitionState5Substate1);
   CYC(b_+38, b_+40); A = 0x02;
   CYC(b_+40, b_+43); mem_wr(gb, wScreenTransitionState3, A);
-  CYC(b_+43, b_+46); screenTransitionState5Substate1__drawNextRow_hook(gb);
+  CYC(b_+43, b_+46); TAIL(screenTransitionState5Substate1__drawNextRow);
 }
 
 void screenTransitionState5Substate1__state2_hook(GB *gb) {
@@ -3797,7 +3803,7 @@ void screenTransitionState5Substate1__state5_hook(GB *gb) {
   CYC(b_+149, b_+152); A = mem_rd(gb, wScreenOffsetY);
   CYC(b_+152, b_+153); alu_add(gb, B);
   CYC(b_+153, b_+156); mem_wr(gb, wScreenOffsetY, A);
-  CYC(b_+156, b_+159); finishScrollingTransition_hook(gb);
+  CYC(b_+156, b_+159); TAIL(finishScrollingTransition);
 }
 
 void screenTransitionState5Substate1__drawNextRow_hook(GB *gb) {
@@ -3810,7 +3816,7 @@ void screenTransitionState5Substate1__drawNextRow_hook(GB *gb) {
   CALL_C(b_+176, screenTransitionState5Substate1__queueRowDmaTransfer_hook, b_+187, b_+179);
   CYC(b_+179, b_+181); C = 0x00;
   CALL_C(b_+181, screenTransitionState5Substate1__queueRowDmaTransfer_hook, b_+187, b_+184);
-  CYC(b_+184, b_+187); incrementScreenScrollRowVars_hook(gb);
+  CYC(b_+184, b_+187); TAIL(incrementScreenScrollRowVars);
 }
 
 void screenTransitionState5Substate1__queueRowDmaTransfer_hook(GB *gb) {
@@ -3834,7 +3840,7 @@ void screenTransitionState5Substate1__queueRowDmaTransfer_hook(GB *gb) {
   if (!(F & FC)) CYCT(b_+212, b_+214);
   else { CYC(b_+212, b_+214); CYC(b_+214, b_+216); L = 0x60; }
   CYC(b_+216, b_+218); B = 0x01;
-  CYC(b_+218, b_+221); queueDmaTransfer_hook(gb);
+  CYC(b_+218, b_+221); TAIL(queueDmaTransfer);
 }
 
 void clearObjectsWithEnabled2_hook(GB *gb) {
@@ -3846,28 +3852,28 @@ void clearObjectsWithEnabled2_hook(GB *gb) {
   CALL_C(b_+9, clearItemsWithEnabled2_hook, SYM(clearItemsWithEnabled2), b_+12);
   CYC(b_+12, b_+15); SET_HL(w1Link);
   CYC(b_+15, b_+17); C = 0xd2;
-  CYC(b_+17, b_+19); clearObjectsWithEnabled2_hlpr_hook(gb);
+  CYC(b_+17, b_+19); TAIL(clearObjectsWithEnabled2_hlpr);
 }
 
 void clearItemsWithEnabled2_hook(GB *gb) {
   BASE(clearItemsWithEnabled2);
   CYC(b_+0, b_+3); SET_HL(w1WeaponItem);
   CYC(b_+3, b_+5); C = 0xe0;
-  CYC(b_+5, b_+7); clearObjectsWithEnabled2_hlpr_hook(gb);
+  CYC(b_+5, b_+7); TAIL(clearObjectsWithEnabled2_hlpr);
 }
 
 void clearInteractionsWithEnabled2_hook(GB *gb) {
   BASE(clearInteractionsWithEnabled2);
   CYC(b_+0, b_+3); SET_HL(w1ReservedInteraction0);
   CYC(b_+3, b_+5); C = 0xe0;
-  CYC(b_+5, b_+7); clearObjectsWithEnabled2_hlpr_hook(gb);
+  CYC(b_+5, b_+7); TAIL(clearObjectsWithEnabled2_hlpr);
 }
 
 void clearEnemiesWithEnabled2_hook(GB *gb) {
   BASE(clearEnemiesWithEnabled2);
   CYC(b_+0, b_+3); SET_HL(ENEMY_SLOTS);
   CYC(b_+3, b_+5); C = 0xe0;
-  CYC(b_+5, b_+7); clearObjectsWithEnabled2_hlpr_hook(gb);
+  CYC(b_+5, b_+7); TAIL(clearObjectsWithEnabled2_hlpr);
 }
 
 void clearPartsWithEnabled2_hook(GB *gb) {
@@ -3928,17 +3934,18 @@ void playCompassSoundIfKeyInRoom_hook(GB *gb) {
   CYC(b_+31, b_+33);
   CYC(b_+33, b_+35); alu_cp(gb, 0x10);
   if (!(F & FZ)) { CYCT(b_+35, b_+36); ret_effect(gb); return; }
-  CYC(b_+35, b_+36); playCompassSoundIfKeyInRoom__playSound_hook(gb);
+  CYC(b_+35, b_+36); TAIL(playCompassSoundIfKeyInRoom__playSound);
 }
 
 void playCompassSoundIfKeyInRoom__playSound_hook(GB *gb) {
   BASE(playCompassSoundIfKeyInRoom);
   CYC(b_+36, b_+38); A = 0xa2;
-  CYC(b_+38, b_+41); playSound_b00_hook(gb);
+  CYC(b_+38, b_+41); TAIL(playSound_b00);
 }
 
 void updateLinkBeingShocked_hook(GB *gb) {
   BASE(updateLinkBeingShocked);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_DE(wIsLinkBeingShocked);
   CYC(b_+3, b_+4); A = mem_rd(gb, DE);
   CYC(b_+4, b_+5); bank1_jump_table_from_rst(gb, b_+5);
@@ -3946,7 +3953,7 @@ void updateLinkBeingShocked_hook(GB *gb) {
     if (jt_ == b_+11) { updateLinkBeingShocked__val00_hook(gb); return; }
     else if (jt_ == b_+12) { updateLinkBeingShocked__val01_hook(gb); return; }
     else if (jt_ == b_+38) { updateLinkBeingShocked__val02_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -3971,7 +3978,7 @@ void updateLinkBeingShocked__val01_hook(GB *gb) {
   CYC(b_+29, b_+30); mem_wr(gb, HL, A);
   CYC(b_+30, b_+33); SET_HL(wDisableLinkCollisionsAndMenu);
   CYC(b_+33, b_+35); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x01));
-  CYC(b_+35, b_+38); copyW2TilesetBgPalettesToW4PaletteData_hook(gb);
+  CYC(b_+35, b_+38); TAIL(copyW2TilesetBgPalettesToW4PaletteData);
 }
 
 void updateLinkBeingShocked__val02_hook(GB *gb) {
@@ -4006,7 +4013,7 @@ void updateLinkBeingShocked__val02_hook(GB *gb) {
   CYC(b_+53, b_+55); A = 0x08;
   CALL_C(b_+55, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+58);
   CYC(b_+58, b_+60); A = 0x0c;
-  CYC(b_+60, b_+63); loadPaletteHeader_hook(gb);
+  CYC(b_+60, b_+63); TAIL(loadPaletteHeader);
 }
 
 void initiateFallDownHoleWarp_hook(GB *gb) {
@@ -4031,6 +4038,7 @@ void initiateFallDownHoleWarp_hook(GB *gb) {
 
 void cutscene17_hook(GB *gb) {
   BASE(cutscene17);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wCutsceneState);
   CYC(b_+3, b_+4); bank1_jump_table_from_rst(gb, b_+4);
   do { uint16_t jt_ = (HL);
@@ -4039,7 +4047,7 @@ void cutscene17_hook(GB *gb) {
     else if (jt_ == b_+91) { cutscene17__state2_hook(gb); return; }
     else if (jt_ == b_+144) { cutscene17__state3_hook(gb); return; }
     else if (jt_ == b_+173) { cutscene17__state4_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -4086,7 +4094,7 @@ void cutscene17__state0_hook(GB *gb) {
   CYC(b_+56, b_+59); mem_wr(gb, wGenericCutscene_cbb7, A);
   CALL_C(b_+59, initWaveScrollValuesForEverySecondLine_hook, SYM(initWaveScrollValuesForEverySecondLine), b_+62);
   CYC(b_+62, b_+64); A = 0xb9;
-  CYC(b_+64, b_+67); playSound_b00_hook(gb);
+  CYC(b_+64, b_+67); TAIL(playSound_b00);
 }
 
 void cutscene17__state1_hook(GB *gb) {
@@ -4186,7 +4194,7 @@ void cutscene17__state4_hook(GB *gb) {
   CYC(b_+210, b_+212); A = 0xf1;
   CALL_C(b_+212, playSound_b00_hook, SYM(playSound_b00), b_+215);
   CYC(b_+215, b_+217); A = 0xb4;
-  CYC(b_+217, b_+220); playSound_b00_hook(gb);
+  CYC(b_+217, b_+220); TAIL(playSound_b00);
 }
 
 void initWaveScrollValuesForEverySecondLine_hook(GB *gb) {
@@ -4212,13 +4220,14 @@ void initWaveScrollValuesForEverySecondLine_hook(GB *gb) {
 
 void cutscene15__update_hook(GB *gb) {
   BASE(cutscene15);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+9, b_+12); A = mem_rd(gb, wCutsceneState);
   CYC(b_+12, b_+13); bank1_jump_table_from_rst(gb, b_+13);
   do { uint16_t jt_ = (HL);
     if (jt_ == b_+32) { cutscene15__state0_hook(gb); return; }
     else if (jt_ == b_+54) { cutscene15__state1_hook(gb); return; }
     else if (jt_ == b_+257) { cutscene15__state2_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -4255,13 +4264,14 @@ void cutscene15__state0_hook(GB *gb) {
 
 void cutscene15__state1_hook(GB *gb) {
   BASE(cutscene15);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+54, b_+57); A = mem_rd(gb, wGenericCutscene_cbb3);
   CYC(b_+57, b_+58); bank1_jump_table_from_rst(gb, b_+58);
   do { uint16_t jt_ = (HL);
     if (jt_ == b_+64) { cutscene15__state1__substate0_hook(gb); return; }
     else if (jt_ == b_+112) { cutscene15__state1__substate1_hook(gb); return; }
-    else if (jt_ == b_+132) { hook_handoff(gb, HL); return; }
-    else { hook_handoff(gb, HL); return; }
+    else if (jt_ == b_+132) { HANDOFF(HL); }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -4277,7 +4287,7 @@ void cutscene15__state1__substate0_hook(GB *gb) {
   CYC(b_+78, b_+81); mem_wr(gb, wGfxRegs2_LYC, A);
   CYC(b_+81, b_+83); A = 0x02;
   CYC(b_+83, b_+85); hram_wr(gb, hNextLcdInterruptBehaviour & 0xff, A);
-  CYC(b_+85, b_+88); cutscene15__incTmpcbb3_hook(gb);
+  CYC(b_+85, b_+88); TAIL(cutscene15__incTmpcbb3);
 }
 
 void cutscene15__state1__initWaveScrollValuesInverted_hook(GB *gb) {
@@ -4314,11 +4324,12 @@ void cutscene15__state1__substate1_hook(GB *gb) {
   if (!(F & FZ)) CALL_C_CC(b_+123, cutscene15__state1__initWaveScrollValuesInverted_hook, b_+88, b_+126);
   else CYC(b_+123, b_+126);
   CYC(b_+126, b_+129); A = mem_rd(gb, wGenericCutscene_cbbb);
-  CYC(b_+129, b_+132); loadBigBufferScrollValues_hook(gb);
+  CYC(b_+129, b_+132); TAIL(loadBigBufferScrollValues);
 }
 
 void cutscene15__state2_hook(GB *gb) {
   BASE(cutscene15);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+257, b_+260); A = mem_rd(gb, wGenericCutscene_cbb3);
   CYC(b_+260, b_+261); bank1_jump_table_from_rst(gb, b_+261);
   if (HL == b_+112) {
@@ -4327,7 +4338,7 @@ void cutscene15__state2_hook(GB *gb) {
   if (HL == b_+265) {
     TAIL(cutscene15__state2__substate1);
   }
-  hook_handoff(gb, HL);
+  HANDOFF(HL);
 }
 
 void cutscene15__state2__substate1_hook(GB *gb) {
@@ -4343,7 +4354,7 @@ void cutscene15__state2__substate1_hook(GB *gb) {
   CYC(b_+284, b_+286); A = 0x01;
   CYC(b_+286, b_+289); mem_wr(gb, wScrollMode, A);
   CYC(b_+289, b_+291); A = 0xf1;
-  CYC(b_+291, b_+294); playSound_b00_hook(gb);
+  CYC(b_+291, b_+294); TAIL(playSound_b00);
 }
 
 static void load_dungeon_layout_b01(GB *gb, uint16_t entry, uint16_t sp0_) {
@@ -4420,7 +4431,7 @@ void clearDungeonLayout_hook(GB *gb) {
   BASE(clearDungeonLayout);
   CYC(b_+0, b_+3); SET_HL(w2DungeonLayout);
   CYC(b_+3, b_+6); SET_BC(0x0200);
-  CYC(b_+6, b_+9); clearMemoryBc_hook(gb);
+  CYC(b_+6, b_+9); TAIL(clearMemoryBc);
 }
 
 static void find_active_room_in_dungeon_layout(GB *gb, uint16_t entry, uint16_t sp0_) {
@@ -4523,7 +4534,7 @@ void checkBrightenRoom_hook(GB *gb) {
   CYC(b_+18, b_+19); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+19, b_+20); ret_effect(gb); return; }
   CYC(b_+19, b_+20);
-  CYC(b_+20, b_+23); brightenRoom_hook(gb);
+  CYC(b_+20, b_+23); TAIL(brightenRoom);
 }
 
 static void check_play_room_music(GB *gb, uint16_t entry, uint16_t sp0_) {
@@ -4571,7 +4582,7 @@ void func_593a_hook(GB *gb) {
   CALL_C(b_+0, updateLinkLocalRespawnPosition_hook, SYM(updateLinkLocalRespawnPosition), b_+3);
   CALL_C(b_+3, loadCommonGraphics_hook, SYM(loadCommonGraphics), b_+6);
   CYC(b_+6, b_+8); A = 0x02;
-  CYC(b_+8, b_+11); loadGfxRegisterStateIndex_hook(gb);
+  CYC(b_+8, b_+11); TAIL(loadGfxRegisterStateIndex);
 }
 
 static void func_5cfe(GB *gb, uint16_t entry, uint16_t sp0_) {
@@ -4630,6 +4641,7 @@ void setEnteredWarpPosition_hook(GB *gb) {
 
 void paletteFadeHandler_hook(GB *gb) {
   BASE(paletteFadeHandler);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = W8(wPaletteThread_mode);
   CYC(b_+3, b_+4); bank1_jump_table_from_rst(gb, b_+4);
   do { uint16_t jt_ = (HL);
@@ -4648,7 +4660,7 @@ void paletteFadeHandler_hook(GB *gb) {
     else if (jt_ == SYM(paletteFadeHandler06) && hook_enabled_at(gb, SYM(paletteFadeHandler06))) { paletteFadeHandler06_hook(gb); return; }
     else if (jt_ == SYM(paletteFadeHandler07) && hook_enabled_at(gb, SYM(paletteFadeHandler07))) { paletteFadeHandler07_hook(gb); return; }
     else if (jt_ == SYM(paletteFadeHandler08) && hook_enabled_at(gb, SYM(paletteFadeHandler08))) { paletteFadeHandler08_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -4674,12 +4686,13 @@ void updateFadingPalettes_hook(GB *gb) {
 
 void checkLockBG7Color3ToBlack_hook(GB *gb) {
   BASE(checkLockBG7Color3ToBlack);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = W8(wLockBG7Color3ToBlack);
   CYC(b_+3, b_+4); bank1_jump_table_from_rst(gb, b_+4);
   do { uint16_t jt_ = (HL);
     if (jt_ == b_+8) { checkLockBG7Color3ToBlack__thing1_hook(gb); return; }
     else if (jt_ == b_+15) { checkLockBG7Color3ToBlack__thing0_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -5285,7 +5298,7 @@ void cutscene15_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, cutscene15__update_hook, b_+9, b_+3);
   CALL_C(b_+3, updateStatusBar_hook, SYM(updateStatusBar), b_+6);
-  CYC(b_+6, b_+9); updateSpecialObjectsAndInteractions_hook(gb);
+  CYC(b_+6, b_+9); TAIL(updateSpecialObjectsAndInteractions);
 }
 
 static void cutscene15_substate2_after_room(GB *gb, uint16_t sp0_) {
@@ -5378,7 +5391,7 @@ void cutscene19_hook(GB *gb) { cutscene18_19(gb, SYM(cutscene19), gb->sp); }
 
 void cutscene18__afterCall4d27_hook(GB *gb) {
   BASE(cutscene19);
-  CYC(b_+13, b_+16); updateAllObjects_hook(gb);
+  CYC(b_+13, b_+16); TAIL(updateAllObjects);
 }
 
 static void func_5d31_after_tree_gfx(GB *gb, uint16_t sp0_) {

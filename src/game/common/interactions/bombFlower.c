@@ -10,5 +10,5 @@
 // leaving a single unconditional delete.
 void interactionCode6f_hook(GB *gb) {
   BASE(interactionCode6f);
-  CYC(b_+0, b_+3); interactionDelete_hook(gb); // jp
+  CYC(b_+0, b_+3); TAIL(interactionDelete);// jp
 }

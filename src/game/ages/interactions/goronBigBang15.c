@@ -97,7 +97,7 @@ void goron_bigBang_hideSelf_hook(GB *gb) {
   CYC(b_+6, b_+8); L = 0x66;
   CYC(b_+8, b_+9); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+9, b_+10); mem_wr(gb, HL, A);
-  CYC(b_+10, b_+13); objectSetInvisible_hook(gb);
+  CYC(b_+10, b_+13); TAIL(objectSetInvisible);
 }
 
 void goron_bigBang_unhideSelf_hook(GB *gb) {
@@ -110,7 +110,7 @@ void goron_bigBang_unhideSelf_hook(GB *gb) {
   CYC(b_+7, b_+9); L = 0x66;
   CYC(b_+9, b_+10); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+10, b_+11); mem_wr(gb, HL, A);
-  CYC(b_+11, b_+14); objectSetVisible_hook(gb);
+  CYC(b_+11, b_+14); TAIL(objectSetVisible);
 }
 
 void goron_bigBang_checkLinkHitByBomb_hook(GB *gb) {
@@ -222,7 +222,7 @@ void goron_bigBang_loadMinigameLayout1_topHalf_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(SYM(goron_bigBang_minigameLayout1_topHalf));
   CYC(b_+3, b_+5); C = 0x11;
-  CYC(b_+5, b_+7); goron_bigBang_loadRoomLayout_hook(gb);
+  CYC(b_+5, b_+7); TAIL(goron_bigBang_loadRoomLayout);
 }
 
 void goron_bigBang_loadMinigameLayout1_bottomHalf_hook(GB *gb) {
@@ -230,7 +230,7 @@ void goron_bigBang_loadMinigameLayout1_bottomHalf_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(SYM(goron_bigBang_minigameLayout1_bottomHalf));
   CYC(b_+3, b_+5); C = 0x41;
-  CYC(b_+5, b_+7); goron_bigBang_loadRoomLayout_hook(gb);
+  CYC(b_+5, b_+7); TAIL(goron_bigBang_loadRoomLayout);
 }
 
 void goron_bigBang_loadMinigameLayout2_topHalf_hook(GB *gb) {
@@ -238,7 +238,7 @@ void goron_bigBang_loadMinigameLayout2_topHalf_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(SYM(goron_bigBang_minigameLayout2_topHalf));
   CYC(b_+3, b_+5); C = 0x11;
-  CYC(b_+5, b_+7); goron_bigBang_loadRoomLayout_hook(gb);
+  CYC(b_+5, b_+7); TAIL(goron_bigBang_loadRoomLayout);
 }
 
 void goron_bigBang_loadMinigameLayout2_bottomHalf_hook(GB *gb) {
@@ -246,7 +246,7 @@ void goron_bigBang_loadMinigameLayout2_bottomHalf_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(SYM(goron_bigBang_minigameLayout2_bottomHalf));
   CYC(b_+3, b_+5); C = 0x41;
-  CYC(b_+5, b_+7); goron_bigBang_loadRoomLayout_hook(gb);
+  CYC(b_+5, b_+7); TAIL(goron_bigBang_loadRoomLayout);
 }
 
 void goron_bigBang_loadNormalRoomLayout_topHalf_hook(GB *gb) {
@@ -254,7 +254,7 @@ void goron_bigBang_loadNormalRoomLayout_topHalf_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(SYM(goron_bigBang_normalRoomLayout));
   CYC(b_+3, b_+5); C = 0x11;
-  CYC(b_+5, b_+7); goron_bigBang_loadRoomLayout_hook(gb);
+  CYC(b_+5, b_+7); TAIL(goron_bigBang_loadRoomLayout);
 }
 
 void goron_bigBang_loadNormalRoomLayout_bottomHalf_hook(GB *gb) {

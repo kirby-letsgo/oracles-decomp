@@ -39,7 +39,7 @@ void turnToFaceSomethingAtInterval_hook(GB *gb) {
   }
   CYC(b_+24, b_+25);
   CYC(b_+25, b_+26); mem_wr(gb, HL, A);
-  CYC(b_+26, b_+29); interactionSetAnimation_hook(gb);
+  CYC(b_+26, b_+29); TAIL(interactionSetAnimation);
 }
 
 void setLinkAnimation_hook(GB *gb) {

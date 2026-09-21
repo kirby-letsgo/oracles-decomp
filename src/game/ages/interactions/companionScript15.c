@@ -25,7 +25,7 @@ void companionScript_makeExclamationMark_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_BC(0xf000);
   CYC(b_+3, b_+5); A = 0x1e;
-  CYC(b_+5, b_+8); objectCreateExclamationMark_hook(gb);
+  CYC(b_+5, b_+8); TAIL(objectCreateExclamationMark);
 }
 
 void companionScript_writeAngleTowardLinkToCompanionVar3f_hook(GB *gb) {
@@ -44,7 +44,7 @@ void companionScript_restoreMusic_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wActiveMusic2);
   CYC(b_+3, b_+6); mem_wr(gb, wActiveMusic, A);
-  CYC(b_+6, b_+9); playSound_b00_hook(gb);
+  CYC(b_+6, b_+9); TAIL(playSound_b00);
 }
 
 void companionScript_spawnFairyAfterFindingCompanionInForest_hook(GB *gb) {
@@ -61,12 +61,12 @@ void companionScript_warpOutOfForest_hook(GB *gb) {
   BASE(companionScript_warpOutOfForest);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(b_+6);
-  CYC(b_+3, b_+6); setWarpDestVariables_hook(gb);
+  CYC(b_+3, b_+6); TAIL(setWarpDestVariables);
 }
 
 void companionScript_loseRickyGloves_hook(GB *gb) {
   BASE(companionScript_loseRickyGloves);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); A = 0x48;
-  CYC(b_+2, b_+5); loseTreasure_hook(gb);
+  CYC(b_+2, b_+5); TAIL(loseTreasure);
 }

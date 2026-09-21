@@ -20,6 +20,7 @@ extern int hook_in_verify;
 extern int hook_suppress_interrupts;
 extern uint64_t hook_verify_failures;
 extern bool hook_verify_abort;
+extern bool hook_native;
 
 void hooks_init(void);
 bool hook_dispatch(GB *gb);

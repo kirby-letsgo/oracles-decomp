@@ -37,7 +37,7 @@ static void banana_add_a_to_hl(GB *gb, uint16_t return_address) {
 
 void interactionCodec0__afterCall48c6_hook(GB *gb) {
   BASE(interactionCodec0);
-  CYC(b_+14, b_+17); objectSetVisible80_hook(gb);
+  CYC(b_+14, b_+17); TAIL(objectSetVisible80);
 }
 
 void interactionCodec0__state0_hook(GB *gb) {
@@ -57,7 +57,7 @@ void interactionCodec0__updatePosition_hook(GB *gb) {
   CYC(b_+69, b_+71); B = 0;
   CYC(b_+71, b_+72); C = mem_rd(gb, HL);
   CYC(b_+72, b_+73); SET_HL(pop_effect(gb));
-  CYC(b_+73, b_+76); objectTakePositionWithOffset_hook(gb);
+  CYC(b_+73, b_+76); TAIL(objectTakePositionWithOffset);
 }
 
 void interactionCodec0__state1_hook(GB *gb) {

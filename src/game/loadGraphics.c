@@ -669,7 +669,7 @@ void agesFunc_3f_4133__afterCall4143_hook(GB *gb) {
   CYC(b_+24, b_+27); SET_HL(wLoadedTreeGfxIndex + 1);
   CYC(b_+27, b_+28); E = mem_rd(gb, HL);
   CYC(b_+28, b_+30); mem_wr(gb, HL, 0x00);
-  CYC(b_+30, b_+33); loadTreeGfx_body_hook(gb);
+  CYC(b_+30, b_+33); TAIL(loadTreeGfx_body);
 }
 
 void agesFunc_3f_4133_hook(GB *gb) {
@@ -738,7 +738,7 @@ void refreshObjectGfx_body__afterCall41d2_hook(GB *gb) {
   CYC(b_+142, b_+143); alu_xor(gb, A);
   CYC(b_+143, b_+146); W8(wEnemyIDToLoadExtraGfx) = A;
   CYC(b_+146, b_+149); W8(wInteractionIDToLoadExtraGfx) = A;
-  CYC(b_+149, b_+152); incLoadedObjectGfxIndex_hook(gb);
+  CYC(b_+149, b_+152); TAIL(incLoadedObjectGfxIndex);
 }
 
 void refreshObjectGfx_body__afterCall41ad_hook(GB *gb) {
@@ -844,7 +844,7 @@ void loadTreeGfx_body_hook(GB *gb) {
   }
   CYC(b_+5, b_+6);
   CALL_C(b_+6, insertIndexIntoLoadedObjectGfx_hook, SYM(insertIndexIntoLoadedObjectGfx), b_+9);
-  CYC(b_+9, b_+12); resumeThreadNextFrameIfLcdIsOn_hook(gb);
+  CYC(b_+9, b_+12); TAIL(resumeThreadNextFrameIfLcdIsOn);
 }
 
 void updateTileIndexBaseForAllObjects__afterCall4252_hook(GB *gb) {
@@ -996,7 +996,7 @@ void enemyLoadGraphicsAndProperties__afterCall4372_hook(GB *gb) {
   CYC(b_+91, b_+92); E = alu_dec8(gb, E);
   CYC(b_+92, b_+93); mem_wr(gb, DE, A);
   CYC(b_+93, b_+94); alu_xor(gb, A);
-  CYC(b_+94, b_+97); enemySetAnimation_hook(gb);
+  CYC(b_+94, b_+97); TAIL(enemySetAnimation);
 }
 
 void enemyLoadGraphicsAndProperties_hook(GB *gb) {
@@ -1055,7 +1055,7 @@ void partLoadGraphicsAndProperties__afterCall43d3_hook(GB *gb) {
   CYC(b_+53, b_+54); E = alu_dec8(gb, E);
   CYC(b_+54, b_+55); mem_wr(gb, DE, A);
   CYC(b_+55, b_+56); alu_xor(gb, A);
-  CYC(b_+56, b_+59); partSetAnimation_hook(gb);
+  CYC(b_+56, b_+59); TAIL(partSetAnimation);
 }
 
 void partLoadGraphicsAndProperties_hook(GB *gb) {

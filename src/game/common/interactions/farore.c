@@ -60,5 +60,5 @@ state1:
   CYC(b_+43, b_+46); SET_BC(0x1406);
   CALL_C(b_+46, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+49);
   CALL_C(b_+49, interactionRunScript_hook, SYM(interactionRunScript), b_+52);
-  CYC(b_+52, b_+55); interactionAnimate_hook(gb);
+  CYC(b_+52, b_+55); TAIL(interactionAnimate);
 }

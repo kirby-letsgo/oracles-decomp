@@ -129,7 +129,7 @@ void replaceBreakableTileOverLinkTimeWarpingIn_hook(GB *gb) {
   CYC(b_+7, b_+8);
   CYC(b_+8, b_+11); A = W8(wWarpDestPos);
   CYC(b_+11, b_+12); C = A;
-  CYC(b_+12, b_+14); removeBreakableTileForTimeWarp_hook(gb);
+  CYC(b_+12, b_+14); TAIL(removeBreakableTileForTimeWarp);
 }
 
 void replacePollutionWithWaterIfPollutionFixed_hook(GB *gb) {
@@ -157,7 +157,7 @@ void replacePollutionWithWaterIfPollutionFixed_hook(GB *gb) {
     CYC(b_+17, b_+19);
     CYC(b_+19, b_+22); SET_DE(b_+27);
   }
-  CYC(b_+22, b_+24); replaceTiles_hook(gb);
+  CYC(b_+22, b_+24); TAIL(replaceTiles);
 }
 
 void replaceTiles_hook(GB *gb) {
@@ -257,5 +257,5 @@ void applyStandardTileSubstitutions__locFunc_hook(GB *gb) {
   CYC(b_+57, b_+58); L = A;
   CYC(b_+58, b_+59); E = L;
   CYC(b_+59, b_+60); D = H;
-  CYC(b_+60, b_+62); replaceTiles_hook(gb);
+  CYC(b_+60, b_+62); TAIL(replaceTiles);
 }

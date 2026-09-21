@@ -499,5 +499,5 @@ state3:
   }
   CYC(b_+288, b_+291);
   CYC(b_+291, b_+293); A = 0x04;
-  CYC(b_+293, b_+296); itemSetState_hook(gb);
+  CYC(b_+293, b_+296); TAIL(itemSetState);
 }

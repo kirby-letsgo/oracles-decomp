@@ -27,7 +27,7 @@ void interactionCodebb__afterCall6dd1_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+14, b_+17); SET_HL((SYM(interactionCoded8__subid0Script) + 58));
   CALL_C(b_+17, interactionSetScript_hook, SYM(interactionSetScript), b_+20);
-  CYC(b_+20, b_+23); objectSetVisible82_hook(gb);
+  CYC(b_+20, b_+23); TAIL(objectSetVisible82);
 }
 
 void interactionCodebb__state0_hook(GB *gb) {
@@ -50,7 +50,7 @@ void interactionCodebb__state1_hook(GB *gb) {
   CALL_C(b_+33, interactionRunScript_hook, SYM(interactionRunScript), b_+36);
   if (!(F & FC)) { CYCT(b_+36, b_+37); ret_effect(gb); return; }
   CYC(b_+36, b_+37);
-  CYC(b_+37, b_+40); interactionDelete_hook(gb);
+  CYC(b_+37, b_+40); TAIL(interactionDelete);
 }
 
 void interactionCodebb_hook(GB *gb) {

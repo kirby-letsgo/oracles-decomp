@@ -25,7 +25,7 @@ void kingMoblinDefeated_setGoronDirection_hook(GB *gb) {
   CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+7, b_+8); mem_wr(gb, DE, A);
   CYC(b_+8, b_+9); A = mem_rd(gb, HL);
-  CYC(b_+9, b_+12); interactionSetAnimation_hook(gb);
+  CYC(b_+9, b_+12); TAIL(interactionSetAnimation);
 }
 
 void kingMoblinDefeated_spawnInteraction8a_hook(GB *gb) {

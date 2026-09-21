@@ -115,5 +115,5 @@ not_riding:
 
 set_animation:
   CYC(b_+66, b_+67); A = C;
-  CYC(b_+67, b_+70); specialObjectSetAnimationWithLinkData_hook(gb);
+  CYC(b_+67, b_+70); TAIL(specialObjectSetAnimationWithLinkData);
 }

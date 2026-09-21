@@ -182,10 +182,10 @@ void interactionCode5f_hook(GB *gb) {
   CYC(b_+3, b_+5); E = 9;
   CALL_C(b_+5, interBankCall_hook, 0x008a, b_+8);
   CALL_C(b_+8, interactionCode5f__runState_hook, b_+14, b_+11);
-  CYC(b_+11, b_+14); interactionAnimateAsNpc_hook(gb);
+  CYC(b_+11, b_+14); TAIL(interactionAnimateAsNpc);
 }
 
 void interactionCode5f__afterCall6ea1_hook(GB *gb) {
   BASE(interactionCode5f);
-  CYC(b_+11, b_+14); interactionAnimateAsNpc_hook(gb);
+  CYC(b_+11, b_+14); TAIL(interactionAnimateAsNpc);
 }

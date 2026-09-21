@@ -43,7 +43,7 @@ void objectCreateFloatingImage_hook(GB *gb) {
   CYC(b_+9, b_+10); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+10, b_+12); A = H8(hFF8B);
   CYC(b_+12, b_+13); mem_wr(gb, HL, A);
-  CYC(b_+13, b_+16); objectCopyPositionWithOffset_hook(gb);
+  CYC(b_+13, b_+16); TAIL(objectCopyPositionWithOffset);
 }
 
 static uint16_t exclamation_jump_table(GB *gb) {
@@ -66,7 +66,7 @@ static uint16_t exclamation_jump_table(GB *gb) {
 
 void interactionCode9f__afterCall405b_hook(GB *gb) {
   BASE(interactionCode9f);
-  CYC(b_+19, b_+22); objectSetVisible80_hook(gb);
+  CYC(b_+19, b_+22); TAIL(objectSetVisible80);
 }
 
 void interactionCode9f__state0_hook(GB *gb) {
@@ -98,7 +98,7 @@ void interactionCode9f__state1_hook(GB *gb) {
     return;
   }
   CYC(b_+31, b_+34);
-  CYC(b_+34, b_+37); interactionDelete_hook(gb);
+  CYC(b_+34, b_+37); TAIL(interactionDelete);
 }
 
 void interactionCode9f_hook(GB *gb) {

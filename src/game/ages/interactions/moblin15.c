@@ -13,5 +13,5 @@ void moblin_spawnEnemyHere_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; }
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+6); mem_wr(gb, HL, 0x20);
-  CYC(b_+6, b_+9); objectCopyPosition_hook(gb);
+  CYC(b_+6, b_+9); TAIL(objectCopyPosition);
 }

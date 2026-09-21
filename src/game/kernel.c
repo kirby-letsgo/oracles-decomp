@@ -25,3 +25,9 @@ L_4084:
   I(0x408e, 3); mem_wr(gb, 0xffff, A);
   RET(0x4090); return;
 }
+
+void romEntry_hook(GB *gb) {
+  I(0x0100, 1);
+  I(0x0101, 4);
+  begin_hook(gb);
+}

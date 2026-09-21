@@ -44,5 +44,5 @@ void interactionCode53_hook(GB *gb) {
   CALL_C(b_+8, interactionRunScript_hook, SYM(interactionRunScript), b_+11);
   if (F & FC) { CYCT(b_+11, b_+14); interactionDelete_hook(gb); return; }
   CYC(b_+11, b_+14);
-  CYC(b_+14, b_+17); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+14, b_+17); TAIL(npcFaceLinkAndAnimate);
 }

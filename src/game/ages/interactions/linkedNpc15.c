@@ -72,7 +72,7 @@ checkd2_2:
   CYC(b_+49, b_+52); TAIL(checkEssenceNotObtained);
 always:
   CYC(b_+52, b_+53); alu_or(gb, D);
-  CYC(b_+53, b_+56); writeFlagsTocddb_hook(gb);
+  CYC(b_+53, b_+56); TAIL(writeFlagsTocddb);
 }
 
 void linkedNpc_checkHasExtraTextBox_hook(GB *gb) {
@@ -83,7 +83,7 @@ void linkedNpc_checkHasExtraTextBox_hook(GB *gb) {
   CYC(b_+6, b_+7); linkedNpc_add_a_to_hl(gb, b_+7);
   CYC(b_+7, b_+8); A = mem_rd(gb, HL);
   CYC(b_+8, b_+9); alu_or(gb, A);
-  CYC(b_+9, b_+12); writeFlagsTocddb_hook(gb);
+  CYC(b_+9, b_+12); TAIL(writeFlagsTocddb);
 }
 
 void linkedNpc_generateSecret_hook(GB *gb) {
@@ -99,13 +99,13 @@ void linkedNpc_generateSecret_hook(GB *gb) {
   CYC(b_+12, b_+13); alu_add(gb, B);
   CYC(b_+13, b_+16); mem_wr(gb, wShortSecretIndex, A);
   CYC(b_+16, b_+19); SET_BC(0x0003);
-  CYC(b_+19, b_+22); secretFunctionCaller_hook(gb);
+  CYC(b_+19, b_+22); TAIL(secretFunctionCaller);
 }
 
 void linkedNpc_initHighTextIndex_hook(GB *gb) {
   BASE(linkedNpc_initHighTextIndex);
   CYC(b_+0, b_+2); A = 0x4d;
-  CYC(b_+2, b_+5); interactionSetHighTextIndex_hook(gb);
+  CYC(b_+2, b_+5); TAIL(interactionSetHighTextIndex);
 }
 
 void linkedNpc_calcLowTextIndex_hook(GB *gb) {

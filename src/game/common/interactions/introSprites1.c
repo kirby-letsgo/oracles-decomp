@@ -158,7 +158,7 @@ void introSpriteIncStateAndLoadGraphics_hook(GB *gb) {
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = 0x44;
   CYC(b_+3, b_+4); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+4, b_+7); interactionInitGraphics_hook(gb);
+  CYC(b_+4, b_+7); TAIL(interactionInitGraphics);
 }
 
 void introSpriteFunc_461a_hook(GB *gb) {
@@ -343,7 +343,7 @@ substate4:
   CYC(b_+158, b_+160); A = 2;
   CYC(b_+160, b_+163); W8(wIntro_triforceState) = A;
   CYC(b_+163, b_+165); A = 0x7c;
-  CYC(b_+165, b_+168); playSound_b00_hook(gb);
+  CYC(b_+165, b_+168); TAIL(playSound_b00);
 }
 
 void introSpriteRunSubid07_hook(GB *gb) {
@@ -368,7 +368,7 @@ void introSpriteRunTriforceGlowSubid_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); A = alu_inc8(gb, A);
   if (F & FZ) CALL_C_CC(b_+4, introSpriteFunc_461a_hook, SYM(introSpriteFunc_461a), b_+7); else CYC(b_+4, b_+7);
-  CYC(b_+7, b_+10); interactionAnimate_hook(gb);
+  CYC(b_+7, b_+10); TAIL(interactionAnimate);
 }
 
 void introSpriteRunSubid04_hook(GB *gb) {

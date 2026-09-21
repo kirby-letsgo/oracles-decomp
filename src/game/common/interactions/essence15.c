@@ -14,7 +14,7 @@ void essence_createEnergySwirl_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+138, objectGetPosition_hook, SYM(objectGetPosition), b_+141);
   CYC(b_+141, b_+143); A = 0xff;
-  CYC(b_+143, b_+146); createEnergySwirlGoingIn_hook(gb);
+  CYC(b_+143, b_+146); TAIL(createEnergySwirlGoingIn);
 }
 
 void essence_stopEnergySwirl_hook(GB *gb) {

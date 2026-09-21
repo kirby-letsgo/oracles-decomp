@@ -69,7 +69,7 @@ void zora_commonInit__afterCall60d7_hook(GB *gb) {
   CALL_C(b_+6, interactionIncState_hook, SYM(interactionIncState), b_+9);
   CYC(b_+9, b_+11); L = INTERACTION_BASE + OBJ_TEXT_ID + 1;
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x34);
-  CYC(b_+13, b_+16); objectSetVisiblec2_hook(gb);
+  CYC(b_+13, b_+16); TAIL(objectSetVisiblec2);
 }
 
 void zora_commonInit_hook(GB *gb) {
@@ -255,7 +255,7 @@ state0:
   }
   CYC(b_+37, b_+39);
   CYC(b_+39, b_+42); SET_HL(SYM(interactiond7_essence__playCirclingSound));
-  CYC(b_+42, b_+44); zora_commonInitWithScript_hook(gb);
+  CYC(b_+42, b_+44); TAIL(zora_commonInitWithScript);
 }
 
 void zora_subid12__afterCall6193_hook(GB *gb) {
@@ -358,7 +358,7 @@ state2:
     CYCT(b_+108, b_+111); TAIL(interactionDelete);
   }
   CYC(b_+108, b_+111);
-  CYC(b_+111, b_+114); interactionAnimate_hook(gb);
+  CYC(b_+111, b_+114); TAIL(interactionAnimate);
 }
 
 void zora_subid0E__afterCall6206_hook(GB *gb) {
@@ -383,7 +383,7 @@ set_text_id:
   CALL_C(b_+36, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+39);
   CALL_C(b_+39, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+42);
   CYC(b_+42, b_+45); SET_HL((SYM(interactiond7_updateSmallSparkles) + 18));
-  CYC(b_+45, b_+48); interactionSetScript_hook(gb);
+  CYC(b_+45, b_+48); TAIL(interactionSetScript);
 }
 
 void zora_subid0E_hook(GB *gb) {
@@ -429,7 +429,7 @@ select_text:
   CYC(b_+37, b_+38); A = mem_rd(gb, HL);
   CYC(b_+38, b_+39); mem_wr(gb, DE, A);
   CYC(b_+39, b_+42); SET_HL((SYM(interactionCodeb6__state6) + 40));
-  CYC(b_+42, b_+45); interactionSetScript_hook(gb);
+  CYC(b_+42, b_+45); TAIL(interactionSetScript);
 }
 
 void zora_subid1B_hook(GB *gb) {

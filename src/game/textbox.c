@@ -917,7 +917,7 @@ clear_textbox_wram:
   CYC(b_+28, b_+31); SET_HL(w1Link);
   CYC(b_+31, b_+34); SET_BC(0x0460);
   CALL_C(b_+34, clearMemoryBc_hook, SYM(clearMemoryBc), b_+37);
-  CYC(b_+37, b_+40); initTextboxStuff_hook(gb);
+  CYC(b_+37, b_+40); TAIL(initTextboxStuff);
 }
 
 void initTextboxStuff_hook(GB *gb) {
@@ -1061,7 +1061,7 @@ set_textbox_width:
   CYC(b_+209, b_+212); W8(w7TextAttribute) = A;
   CYC(b_+212, b_+214); A = 0x0d;
 load_palette:
-  CYC(b_+214, b_+217); loadPaletteHeader_hook(gb);
+  CYC(b_+214, b_+217); TAIL(loadPaletteHeader);
 }
 
 // handleTextControlCode's handlers. On entry the stack holds bc, hl and the return address the
@@ -2025,7 +2025,7 @@ void dmaTextboxMap_func_hook(GB *gb) {
   CYC(b_+31, b_+32); SET_HL(pop_effect(gb));
   CYC(b_+32, b_+33); E = alu_inc8(gb, E);
   CYC(b_+33, b_+34); H = alu_inc8(gb, H);
-  CYC(b_+34, b_+37); queueDmaTransfer_hook(gb);
+  CYC(b_+34, b_+37); TAIL(queueDmaTransfer);
 }
 
 void dmaTextboxMap_hook(GB *gb) {
@@ -2353,7 +2353,7 @@ check_input:
   CYC(b_+20, b_+22); mem_wr(gb, HL, mem_rd(gb, HL) & ~0x02);
   CYC(b_+22, b_+23); SET_HL(pop_effect(gb));
   CYC(b_+23, b_+25); A = 0x89;
-  CYC(b_+25, b_+28); playSound_b00_hook(gb);
+  CYC(b_+25, b_+28); TAIL(playSound_b00);
 }
 
 void label_3f_157_hook(GB *gb) {
@@ -2466,7 +2466,7 @@ queue_dma:
   CYC(b_+56, b_+57); D = A;
   CYC(b_+57, b_+58); E = B;
   CYC(b_+58, b_+61); SET_BC(0x0107);
-  CYC(b_+61, b_+64); queueDmaTransfer_hook(gb);
+  CYC(b_+61, b_+64); TAIL(queueDmaTransfer);
 }
 
 void clearTopRowOfTextMap_func_hook(GB *gb) {
@@ -2617,7 +2617,7 @@ void func_53dd_hook(GB *gb) {
   CYC(b_+3, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) & ~0x02);
   CALL_C(b_+5, saveTilesUnderTextbox_hook, SYM(saveTilesUnderTextbox), b_+8);
   CALL_C(b_+8, initTextboxMapping_hook, SYM(initTextboxMapping), b_+11);
-  CYC(b_+11, b_+14); dmaTextboxMap_hook(gb);
+  CYC(b_+11, b_+14); TAIL(dmaTextboxMap);
 }
 
 void func_53eb_hook(GB *gb) {
@@ -2731,7 +2731,7 @@ void func_53eb_dmaHeartPieceDisplay_hook(GB *gb) {
   CALL_C(b_+168, queueDmaTransfer_hook, SYM(queueDmaTransfer), b_+171);
   CYC(b_+171, b_+174); SET_HL(0x5750);
   CYC(b_+174, b_+176); E = 0xe0;
-  CYC(b_+176, b_+179); queueDmaTransfer_hook(gb);
+  CYC(b_+176, b_+179); TAIL(queueDmaTransfer);
 }
 
 void shiftTextGfxBufferLeft_hook(GB *gb) {
@@ -2907,7 +2907,7 @@ void textOptionCode_checkDirectionButtons_hook(GB *gb) {
   CALL_C(b_+11, removeCursorFromSelectedTextPosition_hook, SYM(removeCursorFromSelectedTextPosition), b_+14);
   CYC(b_+14, b_+17); push_effect(gb, b_+17);
   textOptionCode_checkDirectionButtons_updateSelectedTextOption_hook(gb);
-  CYC(b_+17, b_+19); updateSelectedTextPositionAndDmaTextboxMap_hook(gb);
+  CYC(b_+17, b_+19); TAIL(updateSelectedTextPositionAndDmaTextboxMap);
 }
 
 void textOptionCode_checkDirectionButtons_updateSelectedTextOption_hook(GB *gb) {
@@ -2968,7 +2968,7 @@ void updateSelectedTextPositionAndDmaTextboxMap_hook(GB *gb) {
   BASE(updateSelectedTextPositionAndDmaTextboxMap);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, updateSelectedTextPosition_hook, SYM(updateSelectedTextPosition), b_+3);
-  CYC(b_+3, b_+6); dmaTextboxMap_hook(gb);
+  CYC(b_+3, b_+6); TAIL(dmaTextboxMap);
 }
 
 void textOptionCode_checkBButton_hook(GB *gb) {
@@ -3130,14 +3130,14 @@ void textControlCodeC_0_hook(GB *gb) {
   add_a_to_hl(gb);
   CYC(b_+11, b_+12); A = mem_rd(gb, HL);
   CYC(b_+12, b_+15); mem_wr(gb, w7CharacterDisplayLength, A);
-  CYC(b_+15, b_+17); textControlCodeC_ret_hook(gb);
+  CYC(b_+15, b_+17); TAIL(textControlCodeC_ret);
 }
 
 void textControlCodeC_7_hook(GB *gb) {
   BASE(textControlCodeC_7);
   CYC(b_+0, b_+2); A = 0x78;
   CYC(b_+2, b_+5); mem_wr(gb, w7TextSlowdownTimer, A);
-  CYC(b_+5, b_+7); textControlCodeC_ret_hook(gb);
+  CYC(b_+5, b_+7); TAIL(textControlCodeC_ret);
 }
 
 void textControlCodeC_5_hook(GB *gb) {
@@ -3203,7 +3203,7 @@ void textControlCodeC_1_drawDigit_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+35, b_+37); alu_add(gb, 0x30);
   CALL_C(b_+37, setLineTextBuffers_hook, SYM(setLineTextBuffers), b_+40);
-  CYC(b_+40, b_+43); retrieveTextCharacter_hook(gb);
+  CYC(b_+40, b_+43); TAIL(retrieveTextCharacter);
 }
 
 static void textControlCodeC_2_getNextTextboxOptionPosition(GB *gb) {
@@ -3240,5 +3240,5 @@ void textControlCodeC_2_hook(GB *gb) {
   CYC(b_+19, b_+20); SET_BC(pop_effect(gb));
   CYC(b_+20, b_+22); A = 0x20;
   CALL_C(b_+22, setLineTextBuffers_hook, SYM(setLineTextBuffers), b_+25);
-  CYC(b_+25, b_+28); retrieveTextCharacter_hook(gb);
+  CYC(b_+25, b_+28); TAIL(retrieveTextCharacter);
 }

@@ -22,14 +22,14 @@ void tokayShopItem_giveFeatherAndLoseShovel_hook(GB *gb) {
   BASE(tokayShopItem_giveFeatherAndLoseShovel);
   CYC(b_+0, b_+2); C = 0x02;
   CYC(b_+2, b_+4); A = 0x15;
-  CYC(b_+4, b_+6); tokayShopItem_giveAndLoseTreasure_hook(gb);
+  CYC(b_+4, b_+6); TAIL(tokayShopItem_giveAndLoseTreasure);
 }
 
 void tokayShopItem_giveBraceletAndLoseShovel_hook(GB *gb) {
   BASE(tokayShopItem_giveBraceletAndLoseShovel);
   CYC(b_+0, b_+2); C = 0x03;
   CYC(b_+2, b_+4); A = 0x15;
-  CYC(b_+4, b_+6); tokayShopItem_giveAndLoseTreasure_hook(gb);
+  CYC(b_+4, b_+6); TAIL(tokayShopItem_giveAndLoseTreasure);
 }
 
 static void tokayShopItem_finishGiveShovel(GB *gb) {
@@ -75,13 +75,13 @@ void tokayShopItem_giveShieldToLink_hook(GB *gb) {
   CYC(b_+7, b_+8); A = mem_rd(gb, DE);
   CYC(b_+8, b_+10); alu_sub(gb, 0x04);
   CYC(b_+10, b_+11); C = A;
-  CYC(b_+11, b_+13); tokayShopItem_createTreasureAtLink_hook(gb);
+  CYC(b_+11, b_+13); TAIL(tokayShopItem_createTreasureAtLink);
 }
 
 void tokayShopItem_giveBraceletToLink_hook(GB *gb) {
   BASE(tokayShopItem_giveBraceletToLink);
   CYC(b_+0, b_+2); C = 0x03;
-  CYC(b_+2, b_+4); tokayShopItem_createTreasureAtLink_hook(gb);
+  CYC(b_+2, b_+4); TAIL(tokayShopItem_createTreasureAtLink);
 }
 
 void tokayShopItem_giveFeatherToLink_hook(GB *gb) {

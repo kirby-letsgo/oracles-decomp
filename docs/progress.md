@@ -448,6 +448,53 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-21: merged Fable's native runtime skeleton (`bc55b55`, below) into main. The merge
+  only conflicted on `table_seasons.h`; every generated file was regenerated (`guard_tailcalls`
+  guarded 1,069 new tail sites in the registered locals, `audit_calls`/`audit_burns`/`audit_cyc`
+  clean, `gen_syms`, `gameconst`, `gen_hooks` for both games, `seasons_hooks`): Ages 8,637 hooks,
+  Seasons 3,500 (the 1,773 generated `gen_bank*.c` resume tails are Ages-only by construction).
+  Gates: ctest 9/9 with `native_tas`, whole movie, Ages verify 30k, Seasons playthrough
+  `VERIFY_ALL` 0 failures, lint 0.
+
+- 2026-09-21: milestone 5 plan step 1, native runtime skeleton (items 1 to 6, first cut) on
+  `worktree-m5-step0` on top of main `9f10425`. The native build links every game and core file
+  except `src/core/cpu.c`; `src/rt/native.c` replaces it with a `gb_step` that dispatches the hook
+  at `pc` and stops with `native: no code at BB:AAAA` otherwise (same interrupt dispatch, halt and
+  speed-switch code, so the timer/PPU/APU model is shared byte for byte). CMake: `oraclescore`
+  (emulator) and `oraclesnative` share `ORACLES_SHARED_SRC`; targets `oracles-native-run`
+  (headless runner, same options) and `test_native_tas` (ctest `native_tas`). The boot ROM cannot
+  run natively, so `oracles-run --boot-state-out tas/ages-boot.state` records the post-boot GB
+  struct after one frame and `--boot-state FILE` / `oracles_load_boot_state` restore it (ROM,
+  callbacks and sample buffer re-attached). First native movie pass: `oracles-native-run ...
+  --frames 289518 --ref-check tas/ages.ref` is clean and ends in the same state
+  (`e4703a3010641e15`) as the emulator build; `test_native_tas` (20k frames) passes. What it took,
+  in order of discovery: (1) `romEntry_hook` at 00:0100 (the warm-reset path); (2) the six thread
+  loops split into static loop functions with `<thread>__afterCallXXXX_hook` resume hooks at the
+  return address of their yield, plus `resumeThreadNextFrameAndSaveBank__afterCall08f6`; (3) 178
+  hand-written local-label hooks (`parent__local_hook` bodies) that were never registered: now in
+  `extra.sym`/`ported.txt`/`rewritten.txt`, so `TAIL(local)` finds them; (4) `stopTextThread`'s
+  `hook_handoff(threadStop)` is `TAIL(threadStop)`, and the 127 remaining hand-written
+  `hook_handoff(gb, X)` tail dispatches (jump-table `jp hl` in bank1/2/3 menus and cutscenes,
+  scripting, lcd interrupt, `putLinkOnGround`) are `HANDOFF(X)` (`hook_continue`, frames kept);
+  only the true `ld sp` thread switches and the halt-bug path still longjmp; (5) the depth-24
+  unwind in `hook_continue` is off under `hook_native` (set by a constructor in `native.c`), since
+  it hands the caller's continuation to an interpreter that is not there; (6) the transliterator
+  now emits resume tails for rewritten routines too: `@afterCallXXXX`/`@afterSpXXXX` hooks at
+  every return address after a call into a routine that may switch threads (`jp hl`,
+  `rst_jumpTable` and `interBankCall` callees count as "may", since their targets are dynamic),
+  tracked by address so a symbol-file name at the same address (`@next`) no longer hides one, plus
+  every `@`-local of a rewritten routine that generated code reaches (call target, jump-table
+  case, fallthrough) to a fixed point, with resume discovery inside those locals as well. The
+  generated tails live in `src/game/gen_bank*.c` again (23 files, 1.7 MB); the stale one-argument
+  `hook_enabled_at` in `asm.h`'s `CALL` and in the generator was fixed on the way. Ages hooks
+  6,734 to 8,637 (1,717 of them generated tails and locals); Seasons 2,897. Gates: 30k
+  `--verify-hooks-continue` 0 failures, `ctest` 9/9 including `native_tas`, `lint_game.py` 0,
+  `guard_tailcalls.py` and `audit_calls.py` nothing to change, whole-movie emulator TAS test and
+  the Seasons refs (see the session's final report for the last two). Still open in step 1:
+  `tools/decyc.py`, `src/rt/mem.c`, the `src/hw/` split, dispatch-table generation,
+  `tools/codemap.py`/assets v1, `tools/lockstep_native.c`; fibers next (plan step 4), which
+  retire the generated resume tails and the `afterCall` hooks.
+
 - 2026-09-21 (later): Seasons hooks 3,212 to 3,429. `tools/seasons_hooks.py --why` prints, for
   every identical routine still out, the chain of reasons (`calls x <- burns y (DIFFERENT)`).
   Two classes fixed: a static helper named `*_hook` (`special_object_set_animation_hook`) has no

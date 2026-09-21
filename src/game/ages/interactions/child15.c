@@ -60,7 +60,7 @@ void child_playMusic_hook(GB *gb) {
 
 playHigh:
   CYC(b_+11, b_+13); A = 0x4a;
-  CYC(b_+13, b_+16); playSound_b00_hook(gb);
+  CYC(b_+13, b_+16); TAIL(playSound_b00);
 }
 
 static void child_giveHealthFromC(GB *gb) {
@@ -86,5 +86,5 @@ void child_giveRupees_hook(GB *gb) {
   BASE(child_giveRupees);
   CYC(b_+0, b_+1); C = A;
   CYC(b_+1, b_+3); A = 0x28;
-  CYC(b_+3, b_+6); giveTreasure_hook(gb);
+  CYC(b_+3, b_+6); TAIL(giveTreasure);
 }

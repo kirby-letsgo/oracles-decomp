@@ -168,6 +168,8 @@ int main(int argc, char **argv) {
   if (arg_flag(argc, argv, "--log-lcdc")) dbg_log_lcdc = 1;
   if (init_ram && !oracles_load_init_ram(gb, init_ram)) { fprintf(stderr, "cannot read %s\n", init_ram); return 2; }
   gb_reset(gb);
+  if ((p = arg_value(argc, argv, "--boot-state")) && !oracles_load_boot_state(gb, p)) { fprintf(stderr, "cannot read %s\n", p); return 2; }
+  if ((p = arg_value(argc, argv, "--boot-state-out")) && !oracles_save_boot_state(gb, p)) { fprintf(stderr, "cannot write %s\n", p); return 2; }
   if ((p = arg_value(argc, argv, "--boot-ly"))) {
     int ly = atoi(p);
     gb->io[R_LY] = ly;

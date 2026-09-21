@@ -73,7 +73,7 @@ void updatePirateShip_hook(GB *gb) {
   CALL_C(b_+9, updatePirateShipChangedTile_hook, SYM(updatePirateShipChangedTile), b_+12);
   CALL_C(b_+12, updatePirateShipAngle_hook, SYM(updatePirateShipAngle), b_+15);
   CALL_C(b_+15, updatePirateShipPosition_hook, SYM(updatePirateShipPosition), b_+18);
-  CYC(b_+18, b_+21); updatePirateShipRoom_hook(gb);
+  CYC(b_+18, b_+21); TAIL(updatePirateShipRoom);
 }
 
 void checkLoadPirateShip_hook(GB *gb) {
@@ -215,6 +215,7 @@ void updatePirateShipPosition_hook(GB *gb) {
 
 void updatePirateShipRoom_hook(GB *gb) {
   BASE(updatePirateShipRoom);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = W8(wPirateShipAngle);
   CYC(b_+3, b_+5); alu_and(gb, 0x03);
   CYC(b_+5, b_+6); push_effect(gb, b_+6);
@@ -251,7 +252,7 @@ void updatePirateShipRoom_hook(GB *gb) {
       return;
     }
     else {
-      hook_handoff(gb, HL);
+      HANDOFF(HL);
       return;
     }
   } while (0);

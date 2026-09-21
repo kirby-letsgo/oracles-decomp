@@ -99,5 +99,5 @@ void parentItemCode_shield_hook(GB *gb) {
 delete_self:
   CYC(b_+34, b_+35); alu_xor(gb, A);
   CYC(b_+35, b_+38); W8(wUsingShield) = A;
-  CYC(b_+38, b_+41); clearParentItem_hook(gb);
+  CYC(b_+38, b_+41); TAIL(clearParentItem);
 }

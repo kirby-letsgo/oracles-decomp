@@ -77,7 +77,7 @@ void specialObjectCode_dimitri_hook(GB *gb) {
   CALL_C(b_+6, specialObjectCode_dimitri__runState_hook, b_+16, b_+9);
   CYC(b_+9, b_+10); alu_xor(gb, A);
   CYC(b_+10, b_+13); W8(wDimitriHitNpc) = A;
-  CYC(b_+13, b_+16); companionCheckEnableTerrainEffects_hook(gb);
+  CYC(b_+13, b_+16); TAIL(companionCheckEnableTerrainEffects);
 }
 
 void specialObjectCode_dimitri__runState_hook(GB *gb) {
@@ -162,7 +162,7 @@ set_animation:
   CALL_C(b_+62, companionSetAnimation_hook, SYM(companionSetAnimation), b_+65);
 
 set_visible:
-  CYC(b_+65, b_+68); objectSetVisible81_hook(gb);
+  CYC(b_+65, b_+68); TAIL(objectSetVisible81);
 }
 
 void dimitriState1_hook(GB *gb) {
@@ -220,7 +220,7 @@ after_landing:
     TAIL(dimitriCheckAddToGrabbableObjectBuffer);
   }
   CYC(b_+57, b_+60);
-  CYC(b_+60, b_+63); companionTryToMount_hook(gb);
+  CYC(b_+60, b_+63); TAIL(companionTryToMount);
 }
 
 void dimitriState2_hook(GB *gb) {
@@ -255,7 +255,7 @@ void dimitriState2Substate0_hook(GB *gb) {
   CYC(b_+24, b_+27); SET_HL(wCompanionTutorialTextShown);
   CALL_C(b_+27, setFlag_hook, SYM(setFlag), b_+30);
   CYC(b_+30, b_+32); C = 0x18;
-  CYC(b_+32, b_+35); companionSetAnimation_hook(gb);
+  CYC(b_+32, b_+35); TAIL(companionSetAnimation);
 }
 
 void dimitriState2Substate1_hook(GB *gb) {
@@ -498,7 +498,7 @@ on_hazard:
   CYC(b_+166, b_+167); E = alu_dec8(gb, E);
   CYC(b_+167, b_+168); mem_wr(gb, DE, A);
   CYC(b_+168, b_+170); C = 0x00;
-  CYC(b_+170, b_+173); companionSetAnimation_hook(gb);
+  CYC(b_+170, b_+173); TAIL(companionSetAnimation);
 }
 
 void dimitriState2Substate3_hook(GB *gb) {
@@ -540,7 +540,7 @@ void dimitriFunc_756d_hook(GB *gb) {
   CYC(b_+8, b_+9); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+9, b_+11); mem_wr(gb, HL, 0x00);
   CYC(b_+11, b_+13); C = 0x1c;
-  CYC(b_+13, b_+16); companionSetAnimation_hook(gb);
+  CYC(b_+13, b_+16); TAIL(companionSetAnimation);
 }
 
 void dimitriState3_hook(GB *gb) {
@@ -551,7 +551,7 @@ void dimitriState3_hook(GB *gb) {
   CYC(b_+3, b_+4);
   CALL_C(b_+4, companionFinalizeMounting_hook, SYM(companionFinalizeMounting), b_+7);
   CYC(b_+7, b_+9); C = 0x00;
-  CYC(b_+9, b_+12); companionSetAnimation_hook(gb);
+  CYC(b_+9, b_+12); TAIL(companionSetAnimation);
 }
 
 void dimitriState4_hook(GB *gb) {
@@ -578,7 +578,7 @@ animate:
   if (!(F & FC)) { CYCT(b_+23, b_+24); ret_effect(gb); return; }
   CYC(b_+23, b_+24);
   CYC(b_+24, b_+26); C = 0x00;
-  CYC(b_+26, b_+29); companionUpdateDirectionAndSetAnimation_hook(gb);
+  CYC(b_+26, b_+29); TAIL(companionUpdateDirectionAndSetAnimation);
 }
 
 void dimitriState5_hook(GB *gb) {
@@ -784,7 +784,7 @@ void dimitriGotoEatingState_hook(GB *gb) {
   CYC(b_+33, b_+36); SET_BC(0x2b00);
   CALL_C(b_+36, companionCreateWeaponItem_hook, SYM(companionCreateWeaponItem), b_+39);
   CYC(b_+39, b_+41); A = 0xc4;
-  CYC(b_+41, b_+44); playSound_b00_hook(gb);
+  CYC(b_+41, b_+44); TAIL(playSound_b00);
 }
 
 void dimitriState6_hook(GB *gb) {
@@ -867,7 +867,7 @@ stopped:
   CYC(b_+17, b_+18); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+18, b_+19); ret_effect(gb); return; }
   CYC(b_+18, b_+19);
-  CYC(b_+19, b_+22); dimitriLandOnGroundAndGotoState5_hook(gb);
+  CYC(b_+19, b_+22); TAIL(dimitriLandOnGroundAndGotoState5);
 }
 
 void dimitriState8_hook(GB *gb) {
@@ -934,7 +934,7 @@ substate2:
   CALL_C(b_+79, companionDecCounter1IfNonzero_hook, SYM(companionDecCounter1IfNonzero), b_+82);
   if (!(F & FZ)) { CYCT(b_+82, b_+83); ret_effect(gb); return; }
   CYC(b_+82, b_+83);
-  CYC(b_+83, b_+85); dimitriLandOnGroundAndGotoState5_hook(gb);
+  CYC(b_+83, b_+85); TAIL(dimitriLandOnGroundAndGotoState5);
 }
 
 void dimitriStateB_hook(GB *gb) {
@@ -988,7 +988,7 @@ parameter1:
   CYC(b_+37, b_+39); E = 0x03;
   CYC(b_+39, b_+40); alu_xor(gb, A);
   CYC(b_+40, b_+41); mem_wr(gb, DE, A);
-  CYC(b_+41, b_+44); dimitriState0_hook(gb);
+  CYC(b_+41, b_+44); TAIL(dimitriState0);
 }
 
 void dimitriStateD_hook(GB *gb) {
@@ -1023,7 +1023,7 @@ void dimitriLandOnGroundAndGotoState5_hook(GB *gb) {
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+4); W8(wLinkInAir) = A;
   CYC(b_+4, b_+6); C = 0x00;
-  CYC(b_+6, b_+9); companionSetAnimationAndGotoState5_hook(gb);
+  CYC(b_+6, b_+9); TAIL(companionSetAnimationAndGotoState5);
 }
 
 void dimitriStateA_hook(GB *gb) {
@@ -1074,7 +1074,7 @@ update:
   CYC(b_+38, b_+41); W8(wStatusBarNeedsRefresh) = A;
   CYC(b_+41, b_+43); C = 0x1c;
   CALL_C(b_+43, companionSetAnimation_hook, SYM(companionSetAnimation), b_+46);
-  CYC(b_+46, b_+49); companionForceMount_hook(gb);
+  CYC(b_+46, b_+49); TAIL(companionForceMount);
 }
 
 void dimitriStateASubstate1_hook(GB *gb) {
@@ -1084,7 +1084,7 @@ void dimitriStateASubstate1_hook(GB *gb) {
   CALL_C(b_+2, objectRemoveFromAButtonSensitiveObjectList_hook, SYM(objectRemoveFromAButtonSensitiveObjectList), b_+5);
   CYC(b_+5, b_+7); C = 0x1c;
   CALL_C(b_+7, companionSetAnimation_hook, SYM(companionSetAnimation), b_+10);
-  CYC(b_+10, b_+13); companionForceMount_hook(gb);
+  CYC(b_+10, b_+13); TAIL(companionForceMount);
 }
 
 void dimitriStateASubstate3_hook(GB *gb) {
@@ -1102,7 +1102,7 @@ void dimitriStateASubstate3_hook(GB *gb) {
   CYC(b_+16, b_+18); A = 0x04;
   CYC(b_+18, b_+19); mem_wr(gb, DE, A);
   CYC(b_+19, b_+21); A = 0xc4;
-  CYC(b_+21, b_+24); playSound_b00_hook(gb);
+  CYC(b_+21, b_+24); TAIL(playSound_b00);
 }
 
 void dimitriStateASubstate4_hook(GB *gb) {
@@ -1119,7 +1119,7 @@ void dimitriStateASubstate4_hook(GB *gb) {
   CYC(b_+13, b_+16); W8(wDisabledObjects) = A;
   CYC(b_+16, b_+19); W8(wMenuDisabled) = A;
   CYC(b_+19, b_+22); W8(wUseSimulatedInput) = A;
-  CYC(b_+22, b_+25); itemDelete_hook(gb);
+  CYC(b_+22, b_+25); TAIL(itemDelete);
 }
 
 void dimitriStateASubstate2_hook(GB *gb) {

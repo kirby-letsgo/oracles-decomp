@@ -65,5 +65,5 @@ initialized:
   CYC(b_+26, b_+29);
   CALL_C(b_+29, objectSetVisible_hook, SYM(objectSetVisible), b_+32);
   CYC(b_+32, b_+35); push_effect(gb, b_+35); coloredCubeFlame_updateColor(gb);
-  CYC(b_+35, b_+38); interactionAnimate_hook(gb);
+  CYC(b_+35, b_+38); TAIL(interactionAnimate);
 }

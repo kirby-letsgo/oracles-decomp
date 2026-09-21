@@ -47,7 +47,7 @@ void goron_putLinkInState08_hook(GB *gb) {
   BASE(goron_putLinkInState08);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, putLinkOnGround_hook, SYM(putLinkOnGround), b_+3);
-  CYC(b_+3, b_+6); setLinkForceStateToState08_hook(gb);
+  CYC(b_+3, b_+6); TAIL(setLinkForceStateToState08);
 }
 
 static void goron_showText_differentForPresent_add20(GB *gb, uint16_t return_address) {
@@ -68,7 +68,7 @@ void goron_showText_differentForPresent_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+6, b_+9); goron_showText_differentForPresent_add20(gb, b_+9); }
   else CYC(b_+6, b_+9);
   CYC(b_+9, b_+11); B = 0x24;
-  CYC(b_+11, b_+14); showText_hook(gb);
+  CYC(b_+11, b_+14); TAIL(showText);
 }
 
 void goron_decideTextToShow_differentForLinkedInPast_hook(GB *gb) {
@@ -122,7 +122,7 @@ void goron_showText_differentForPast_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+6, b_+9); goron_showText_differentForPast_add0c(gb, b_+9); }
   else CYC(b_+6, b_+9);
   CYC(b_+9, b_+11); B = 0x24;
-  CYC(b_+11, b_+14); showText_hook(gb);
+  CYC(b_+11, b_+14); TAIL(showText);
 }
 
 void goron_showTextForGoronWorriedAboutElder_hook(GB *gb) {
@@ -139,7 +139,7 @@ L_63ee:
   CYC(b_+11, b_+13); C = 0x7a;
 L_63f0:
   CYC(b_+13, b_+15); B = 0x24;
-  CYC(b_+15, b_+18); showText_hook(gb);
+  CYC(b_+15, b_+18); TAIL(showText);
 }
 
 void goron_showTextForSubid05_hook(GB *gb) {
@@ -172,7 +172,7 @@ showTextTail:
   CYC(b_+30, b_+31); goron_addAToHl_from_rst(gb, b_+31);
   CYC(b_+31, b_+33); B = 0x24;
   CYC(b_+33, b_+34); C = mem_rd(gb, HL);
-  CYC(b_+34, b_+37); showText_hook(gb);
+  CYC(b_+34, b_+37); TAIL(showText);
 }
 
 static void goron_determineTextForGenericNpc_getGameState(GB *gb, uint16_t return_address, uint16_t sp0_) {
@@ -278,7 +278,7 @@ void goron_checkShouldBeNapping_hook(GB *gb) {
   CYC(b_+9, b_+10); alu_ccf(gb);
   CALL_C(b_+10, writeFlagsTocddb_hook, SYM(writeFlagsTocddb), b_+13);
   CYC(b_+13, b_+16); SET_BC(0x0606);
-  CYC(b_+16, b_+19); objectSetCollideRadii_hook(gb);
+  CYC(b_+16, b_+19); TAIL(objectSetCollideRadii);
 }
 
 void goron_faceDown_hook(GB *gb) {
@@ -292,7 +292,7 @@ void goron_faceDown_hook(GB *gb) {
   CYC(b_+9, b_+11); L = 0x7f;
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x00);
   CYC(b_+13, b_+15); A = 0x02;
-  CYC(b_+15, b_+18); interactionSetAnimation_hook(gb);
+  CYC(b_+15, b_+18); TAIL(interactionSetAnimation);
 }
 
 void goron_setAnimation_hook(GB *gb) {
@@ -301,7 +301,7 @@ void goron_setAnimation_hook(GB *gb) {
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = 0x7f;
   CYC(b_+3, b_+5); mem_wr(gb, HL, 0x01);
-  CYC(b_+5, b_+8); interactionSetAnimation_hook(gb);
+  CYC(b_+5, b_+8); TAIL(interactionSetAnimation);
 }
 
 void goron_reverseWalkingDirection_hook(GB *gb) {
@@ -320,7 +320,7 @@ void goron_reverseWalkingDirection_hook(GB *gb) {
   CYC(b_+16, b_+17); A = mem_rd(gb, HL);
   CYC(b_+17, b_+19); alu_xor(gb, 0x02);
   CYC(b_+19, b_+20); mem_wr(gb, HL, A);
-  CYC(b_+20, b_+23); interactionSetAnimation_hook(gb);
+  CYC(b_+20, b_+23); TAIL(interactionSetAnimation);
 }
 
 void goron_refreshWalkingAnimation_hook(GB *gb) {
@@ -328,7 +328,7 @@ void goron_refreshWalkingAnimation_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); E = 0x7e;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, b_+6); interactionSetAnimation_hook(gb);
+  CYC(b_+3, b_+6); TAIL(interactionSetAnimation);
 }
 
 void goron_setSpeedToMoveDown_hook(GB *gb) {
@@ -340,7 +340,7 @@ void goron_setSpeedToMoveDown_hook(GB *gb) {
   CYC(b_+5, b_+7); L = 0x49;
   CYC(b_+7, b_+9); mem_wr(gb, HL, 0x10);
   CYC(b_+9, b_+11); A = 0x02;
-  CYC(b_+11, b_+14); goron_setAnimation_hook(gb);
+  CYC(b_+11, b_+14); TAIL(goron_setAnimation);
 }
 
 static void goron_cpLinkY_writeResult(GB *gb) {
@@ -430,7 +430,7 @@ void goron_decMovementCounter_hook(GB *gb) {
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = 0x7c;
   CALL_C(b_+3, decHlRef16WithCap_hook, SYM(decHlRef16WithCap), b_+6);
-  CYC(b_+6, b_+9); writeFlagsTocddb_hook(gb);
+  CYC(b_+6, b_+9); TAIL(writeFlagsTocddb);
 }
 
 void goron_initCountersForBombFlowerExplosion_hook(GB *gb) {
@@ -458,14 +458,14 @@ void goron_countdownToPlayRockSoundAndShakeScreen_hook(GB *gb) {
   CYC(b_+7, b_+9); A = 0xa5;
   CALL_C(b_+9, playSound_b00_hook, SYM(playSound_b00), b_+12);
   CYC(b_+12, b_+14); A = 0x04;
-  CYC(b_+14, b_+17); setScreenShakeCounter_hook(gb);
+  CYC(b_+14, b_+17); TAIL(setScreenShakeCounter);
 }
 
 void goron_createFallingRockSpawner_hook(GB *gb) {
   BASE(goron_createFallingRockSpawner);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); B = 0x92;
-  CYC(b_+2, b_+5); objectCreateInteractionWithSubid00_hook(gb);
+  CYC(b_+2, b_+5); TAIL(objectCreateInteractionWithSubid00);
 }
 
 static void goron_clearRockBarrier_clearRow_body(GB *gb, uint16_t sp0_) {
@@ -589,7 +589,7 @@ popAndDontGiveItems:
 
 dontGiveItems:
   CYC(b_+51, b_+52); alu_or(gb, D);
-  CYC(b_+52, b_+55); writeFlagsTocddb_hook(gb);
+  CYC(b_+52, b_+55); TAIL(writeFlagsTocddb);
 }
 
 void goron_deleteTreasure_hook(GB *gb) {
@@ -634,7 +634,7 @@ void goron_checkLinkNotInAir_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wLinkInAir);
   CYC(b_+3, b_+5); alu_bit(gb, 7, A);
-  CYC(b_+5, b_+8); writeFlagsTocddb_hook(gb);
+  CYC(b_+5, b_+8); TAIL(writeFlagsTocddb);
 }
 
 void goron_checkGracefulGoronQuestStatus_hook(GB *gb) {
@@ -728,5 +728,5 @@ present:
   CYC(b_+77, b_+78); alu_add(gb, B);
   CYC(b_+78, b_+80); B = 0x31;
   CYC(b_+80, b_+81); C = A;
-  CYC(b_+81, b_+84); showText_hook(gb);
+  CYC(b_+81, b_+84); TAIL(showText);
 }

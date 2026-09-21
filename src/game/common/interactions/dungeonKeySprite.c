@@ -78,5 +78,5 @@ state2:
   }
   CYC(b_+60, b_+61);
   CYC(b_+61, b_+63); mem_wr(gb, HL, 0x0f);
-  CYC(b_+63, b_+66); interactionDelete_hook(gb);
+  CYC(b_+63, b_+66); TAIL(interactionDelete);
 }

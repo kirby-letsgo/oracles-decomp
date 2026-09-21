@@ -69,7 +69,7 @@ void seedItemDelete_hook(GB *gb) {
   CYC(b_+13, b_+14); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
 
 delete_item:
-  CYC(b_+14, b_+17); itemDelete_hook(gb);
+  CYC(b_+14, b_+17); TAIL(itemDelete);
 }
 
 void seedItemState3_hook(GB *gb) {
@@ -145,7 +145,7 @@ break_tile:
   CALL_C(b_+45, itemTryToBreakTile_hook, SYM(itemTryToBreakTile), b_+48);
 
 delete_self:
-  CYC(b_+48, b_+51); seedItemDelete_hook(gb);
+  CYC(b_+48, b_+51); TAIL(seedItemDelete);
 }
 
 void seedUpdateAnimation_hook(GB *gb) {
@@ -162,7 +162,7 @@ void seedUpdateAnimation_hook(GB *gb) {
     CYCT(b_+11, b_+12); ret_effect(gb); return;
   }
   CYC(b_+11, b_+12);
-  CYC(b_+12, b_+15); seedItemDelete_hook(gb);
+  CYC(b_+12, b_+15); TAIL(seedItemDelete);
 }
 
 void seedItemState2_hook(GB *gb) {
@@ -225,7 +225,7 @@ void scentSeedSmell_hook(GB *gb) {
     TAIL(seedItemDelete);
   }
   CYC(b_+44, b_+47);
-  CYC(b_+47, b_+50); itemUpdateSpeedZAndCheckHazards_hook(gb);
+  CYC(b_+47, b_+50); TAIL(itemUpdateSpeedZAndCheckHazards);
 }
 
 void galeSeedUpdateAnimationAndCounter_hook(GB *gb) {

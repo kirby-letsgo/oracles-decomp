@@ -776,7 +776,7 @@ substate1:
     CYCT(b_+35, b_+37); TAIL(interactionOscillateXRandomly);
   }
   CYC(b_+35, b_+37);
-  CYC(b_+37, b_+40); interactionIncSubstate_hook(gb);
+  CYC(b_+37, b_+40); TAIL(interactionIncSubstate);
 }
 
 // Uses var3d as the interaction's "base" position, and randomly shifts this position left
@@ -810,7 +810,7 @@ void impaSubid1Substate2_hook(GB *gb) {
     CYCT(b_+10, b_+13); TAIL(interactionAnimate2Times);
   }
   CYC(b_+10, b_+13);
-  CYC(b_+13, b_+16); interactionAnimate_hook(gb);
+  CYC(b_+13, b_+16); TAIL(interactionAnimate);
 }
 
 // Impa in the credits cutscene
@@ -871,14 +871,14 @@ substate2:
   CYC(b_+65, b_+68); push_effect(gb, b_+68); impaInCutscene_loadScript(gb);
   CYC(b_+68, b_+70); A = 0x01;
   CYC(b_+70, b_+73); mem_wr(gb, wTmpcfc0, A);
-  CYC(b_+73, b_+76); fadeinFromWhite_hook(gb);
+  CYC(b_+73, b_+76); TAIL(fadeinFromWhite);
 }
 
 void impaAnimateAndRunScript_hook(GB *gb) {
   BASE(impaAnimateAndRunScript);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+3);
-  CYC(b_+3, b_+6); interactionRunScript_hook(gb);
+  CYC(b_+3, b_+6); TAIL(interactionRunScript);
 }
 
 // Falls through into impaSetVisibleAndJump.
@@ -903,7 +903,7 @@ void impaSetVisibleAndJump_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+3);
   CYC(b_+3, b_+6); SET_BC(0xfe80); // -$180
-  CYC(b_+6, b_+9); objectSetSpeedZ_hook(gb);
+  CYC(b_+6, b_+9); TAIL(objectSetSpeedZ);
 }
 
 void impaSubid2Substate5_hook(GB *gb) {
@@ -924,7 +924,7 @@ void impaSubid2Substate5_hook(GB *gb) {
   CYC(b_+14, b_+15); H = D;
   CYC(b_+15, b_+17); L = INTERACTION_BASE + OBJ_VAR38;
   CYC(b_+17, b_+19); mem_wr(gb, HL, 0x10);
-  CYC(b_+19, b_+22); interactionIncSubstate_hook(gb);
+  CYC(b_+19, b_+22); TAIL(interactionIncSubstate);
 }
 
 void impaSubid2Substate6_hook(GB *gb) {
@@ -964,7 +964,7 @@ nextState:
   CYC(b_+29, b_+31); mem_wr(gb, HL, 0x00);
   CYC(b_+31, b_+33); A = 0x02;
   CYC(b_+33, b_+36); mem_wr(gb, wTmpcfc0, A);
-  CYC(b_+36, b_+39); interactionIncSubstate_hook(gb);
+  CYC(b_+36, b_+39); TAIL(interactionIncSubstate);
 }
 
 void impaSubid2Substate7_hook(GB *gb) {
@@ -1227,7 +1227,7 @@ void impaSubid7_hook(GB *gb) {
     CYCT(b_+24, b_+27); TAIL(interactionAnimate);
   }
   CYC(b_+24, b_+27);
-  CYC(b_+27, b_+30); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+27, b_+30); TAIL(npcFaceLinkAndAnimate);
 }
 
 void impaSubid8_hook(GB *gb) {
@@ -1258,7 +1258,7 @@ void impaSubid9_hook(GB *gb) {
   CALL_C(b_+11, interBankCall_hook, 0x008a, b_+14);
 
 animateAndRunScript:
-  CYC(b_+14, b_+17); impaAnimateAndRunScript_hook(gb);
+  CYC(b_+14, b_+17); TAIL(impaAnimateAndRunScript);
 }
 
 // checkObjectIsCloseToPosition@checkComponent: reached by a static `call` from
@@ -1316,7 +1316,7 @@ void impaUpdateAnimationIfDirectionChanged_hook(GB *gb) {
   }
   CYC(b_+7, b_+8);
   CYC(b_+8, b_+9); mem_wr(gb, HL, A);
-  CYC(b_+9, b_+12); interactionSetAnimation_hook(gb);
+  CYC(b_+9, b_+12); TAIL(interactionSetAnimation);
 }
 
 // @param[out] cflag c if Link has approached the stone to trigger Impa's reaction
@@ -1407,5 +1407,5 @@ checkX:
 showText:
   CYC(b_+29, b_+30); mem_wr(gb, HL, B);
   CYC(b_+30, b_+33); SET_BC(0x010a); // TX_010a
-  CYC(b_+33, b_+36); showText_hook(gb);
+  CYC(b_+33, b_+36); TAIL(showText);
 }

@@ -10,5 +10,5 @@ void makuSprout_setAnimation_hook(GB *gb) {
   BASE(makuSprout_setAnimation);
   CYC(b_+0, b_+2); E = 0x7b;
   CYC(b_+2, b_+3); mem_wr(gb, DE, A);
-  CYC(b_+3, b_+6); interactionSetAnimation_hook(gb);
+  CYC(b_+3, b_+6); TAIL(interactionSetAnimation);
 }

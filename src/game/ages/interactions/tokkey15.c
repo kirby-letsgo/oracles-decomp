@@ -9,7 +9,7 @@
 void tokkey_jump_hook(GB *gb) {
   BASE(tokkey_jump);
   CYC(b_+0, b_+3); SET_BC(0xfe60);
-  CYC(b_+3, b_+6); objectSetSpeedZ_hook(gb);
+  CYC(b_+3, b_+6); TAIL(objectSetSpeedZ);
 }
 
 void tokkey_centerLinkOnTile_hook(GB *gb) {

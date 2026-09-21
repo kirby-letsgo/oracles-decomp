@@ -428,5 +428,5 @@ initialized:
   CYC(b_+121, b_+122); mem_wr(gb, DE, A);
   CYC(b_+122, b_+123); A = mem_rd(gb, HL);
   CALL_C(b_+123, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+126);
-  CYC(b_+126, b_+129); objectSetVisible83_hook(gb);
+  CYC(b_+126, b_+129); TAIL(objectSetVisible83);
 }

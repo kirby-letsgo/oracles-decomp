@@ -364,7 +364,7 @@ singerMovement:
 
 runScriptAndUpdateAnimation:
   CALL_C(b_+174, interactionRunScript_hook, SYM(interactionRunScript), b_+177);
-  CYC(b_+177, b_+180); childUpdateAnimationAndSolidity_hook(gb);
+  CYC(b_+177, b_+180); TAIL(childUpdateAnimationAndSolidity);
 }
 
 // Falls through into childUpdateSolidityAndVisibility.
@@ -397,7 +397,7 @@ void childUpdateSolidityAndVisibility_hook(GB *gb) {
 
 lightSolidity:
   CALL_C(b_+18, objectPushLinkAwayOnCollision_hook, SYM(objectPushLinkAwayOnCollision), b_+21);
-  CYC(b_+21, b_+24); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
+  CYC(b_+21, b_+24); TAIL(objectSetPriorityRelativeToLink_withTerrainEffects);
 }
 
 // Writes the "base" animation index to var37 based on subid (personality type).
@@ -459,7 +459,7 @@ void childFlipAnimation_hook(GB *gb) {
   CYC(b_+5, b_+6); mem_wr(gb, HL, A);
   CYC(b_+6, b_+8); L = INTERACTION_BASE + OBJ_VAR37;
   CYC(b_+8, b_+9); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+9, b_+12); interactionSetAnimation_hook(gb);
+  CYC(b_+9, b_+12); TAIL(interactionSetAnimation);
 }
 
 // Bounces between x=$14 and x=$3b, flipping the angle horizontally.
@@ -480,7 +480,7 @@ void childUpdateUnknownMovement_hook(GB *gb) {
   CYC(b_+14, b_+15); A = mem_rd(gb, HL);
   CYC(b_+15, b_+17); alu_xor(gb, 0x10);
   CYC(b_+17, b_+18); mem_wr(gb, HL, A);
-  CYC(b_+18, b_+20); childFlipAnimation_hook(gb);
+  CYC(b_+18, b_+20); TAIL(childFlipAnimation);
 }
 
 // "Shy" personality: runs to the next position when Link approaches.
@@ -515,7 +515,7 @@ substate1:
   CYC(b_+24, b_+25); H = D;
   CYC(b_+25, b_+27); L = INTERACTION_BASE + OBJ_SUBSTATE;
   CYC(b_+27, b_+29); mem_wr(gb, HL, 0x00);
-  CYC(b_+29, b_+32); childIncPositionIndex_hook(gb);
+  CYC(b_+29, b_+32); TAIL(childIncPositionIndex);
 }
 
 // Sets the angle toward position list entry var3c, then applies speed.
@@ -541,7 +541,7 @@ void childUpdateAngleAndApplySpeed_hook(GB *gb) {
   CALL_C(b_+19, objectGetRelativeAngle_hook, SYM(objectGetRelativeAngle), b_+22);
   CYC(b_+22, b_+24); E = INTERACTION_BASE + OBJ_ANGLE;
   CYC(b_+24, b_+25); mem_wr(gb, DE, A);
-  CYC(b_+25, b_+28); objectApplySpeed_hook(gb);
+  CYC(b_+25, b_+28); TAIL(objectApplySpeed);
 }
 
 // @param[out] cflag Set if within 1 pixel of position list entry var3c on both axes.
@@ -599,7 +599,7 @@ void childCheckAnimationDirectionChanged_hook(GB *gb) {
   CYC(b_+17, b_+18); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+18, b_+20); L = INTERACTION_BASE + OBJ_VAR37;
   CYC(b_+20, b_+21); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+21, b_+24); interactionSetAnimation_hook(gb);
+  CYC(b_+21, b_+24); TAIL(interactionSetAnimation);
 }
 
 // var3c++, wrapping to 0 once it passes var3d.

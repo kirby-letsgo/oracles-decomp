@@ -539,7 +539,7 @@ substate3:
     CYCT(b_+88, b_+91); TAIL(interactionDelete);
   }
   CYC(b_+88, b_+91);
-  CYC(b_+91, b_+94); objectApplySpeed_hook(gb);
+  CYC(b_+91, b_+94); TAIL(objectApplySpeed);
 }
 
 // Kid turning to stone cutscene
@@ -619,7 +619,7 @@ void boyRunSubid02_hook(GB *gb) {
   BASE(boyRunSubid02);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
-  CYC(b_+3, b_+6); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+3, b_+6); TAIL(npcFaceLinkAndAnimate);
 }
 
 // Cutscene where kids talk about how they're scared of a ghost (red kid). Also a substate 2
@@ -646,7 +646,7 @@ void boyRunSubid03_hook(GB *gb) {
   CYC(b_+18, b_+21); mem_wr(gb, wMenuDisabled, A);
   CALL_C(b_+21, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+24);
   CYC(b_+24, b_+26); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 6));
-  CYC(b_+26, b_+29); interactionDelete_hook(gb);
+  CYC(b_+26, b_+29); TAIL(interactionDelete);
 }
 
 // Cutscene where kids talk about how they're scared of a ghost (green kid)
@@ -682,7 +682,7 @@ substate1:
   }
   CYC(b_+28, b_+29);
   CALL_C(b_+29, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+32);
-  CYC(b_+32, b_+35); boyLoadScript_hook(gb);
+  CYC(b_+32, b_+35); TAIL(boyLoadScript);
 }
 
 // Cutscene where kid is restored from stone. Substate 0 falls through into
@@ -718,7 +718,7 @@ void setCounter1To120AndPlaySoundEffectAndIncSubstate_hook(GB *gb) {
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);
   CYC(b_+5, b_+7); A = 0x5c; // SND_ENERGYTHING
   CALL_C(b_+7, playSound_b00_hook, SYM(playSound_b00), b_+10);
-  CYC(b_+10, b_+13); interactionIncSubstate_hook(gb);
+  CYC(b_+10, b_+13); TAIL(interactionIncSubstate);
 }
 
 void childSubid05Substate1_hook(GB *gb) {
@@ -732,7 +732,7 @@ void childSubid05Substate1_hook(GB *gb) {
   CALL_C(b_+5, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+8);
   CYC(b_+8, b_+10); L = INTERACTION_BASE + OBJ_OAM_FLAGS;
   CYC(b_+10, b_+12); mem_wr(gb, HL, 0x02);
-  CYC(b_+12, b_+15); boyLoadScript_hook(gb);
+  CYC(b_+12, b_+15); TAIL(boyLoadScript);
 }
 
 // Called from other interactions as well?
@@ -762,7 +762,7 @@ void childAnimateIfVar39IsZeroAndRunScript_hook(GB *gb) {
   } else {
     CYC(b_+4, b_+7);
   }
-  CYC(b_+7, b_+10); interactionRunScript_hook(gb);
+  CYC(b_+7, b_+10); TAIL(interactionRunScript);
 }
 
 // Cutscene where kid sees his dad turn to stone
@@ -775,7 +775,7 @@ void boyRunSubid06_hook(GB *gb) {
   } else {
     CYC(b_+3, b_+6);
   }
-  CYC(b_+6, b_+9); interactionRunScript_hook(gb);
+  CYC(b_+6, b_+9); TAIL(interactionRunScript);
 }
 
 // Depressed kid in trade sequence
@@ -791,7 +791,7 @@ void boyRunSubid07_hook(GB *gb) {
   }
   CYC(b_+7, b_+10);
   CALL_C(b_+10, interactionAnimate_hook, SYM(interactionAnimate), b_+13);
-  CYC(b_+13, b_+16); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
+  CYC(b_+13, b_+16); TAIL(objectSetPriorityRelativeToLink_withTerrainEffects);
 }
 
 // Subids $08/$09 (and $0a's movement data): kid who runs around in a pattern.
@@ -1080,7 +1080,7 @@ void boyRunSubid0a_hook(GB *gb) {
   BASE(boyRunSubid0a);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionAnimate_hook, SYM(interactionAnimate), b_+3);
-  CYC(b_+3, b_+6); childAnimateIfVar39IsZeroAndRunScript_hook(gb);
+  CYC(b_+3, b_+6); TAIL(childAnimateIfVar39IsZeroAndRunScript);
 }
 
 // NPC in eyeglasses library present
@@ -1088,7 +1088,7 @@ void boyRunSubid0b_hook(GB *gb) {
   BASE(boyRunSubid0b);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
-  CYC(b_+3, b_+6); interactionAnimateAsNpc_hook(gb);
+  CYC(b_+3, b_+6); TAIL(interactionAnimateAsNpc);
 }
 
 // Cutscene where kid's dad gets restored from stone
@@ -1169,7 +1169,7 @@ substate4:
     CYCT(b_+92, b_+93); ret_effect(gb); return;
   }
   CYC(b_+92, b_+93);
-  CYC(b_+93, b_+96); interactionIncSubstate_hook(gb);
+  CYC(b_+93, b_+96); TAIL(interactionIncSubstate);
 }
 
 // Kid with grandma who's either stone or was restored from stone
@@ -1184,7 +1184,7 @@ void boyRunSubid0d_hook(GB *gb) {
   }
   CYC(b_+4, b_+7);
   CALL_C(b_+7, interactionRunScript_hook, SYM(interactionRunScript), b_+10);
-  CYC(b_+10, b_+13); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+10, b_+13); TAIL(npcFaceLinkAndAnimate);
 }
 
 // NPC playing catch with dad, or standing next to his stone dad
@@ -1217,7 +1217,7 @@ pushLinkAway:
   CYC(b_+25, b_+27); B = 0x25; // >TX_2500
   CYC(b_+27, b_+29); L = INTERACTION_BASE + OBJ_TEXT_ID;
   CYC(b_+29, b_+30); C = mem_rd(gb, HL);
-  CYC(b_+30, b_+33); showText_hook(gb);
+  CYC(b_+30, b_+33); TAIL(showText);
 }
 
 // Subid $0f: cutscene where kid runs away? Subid $10: kid listening to Nayru postgame.
@@ -1230,14 +1230,14 @@ void boyRunSubid0f_hook(GB *gb) {
   }
   CYC(b_+3, b_+6);
   CALL_C(b_+6, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+9);
-  CYC(b_+9, b_+12); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb);
+  CYC(b_+9, b_+12); TAIL(interactionPushLinkAwayAndUpdateDrawPriority);
 }
 
 // Load palette used for turning npcs to stone?
 void loadStoneNpcPalette_hook(GB *gb) {
   BASE(loadStoneNpcPalette);
   CYC(b_+0, b_+2); A = 0xa2; // PALH_a2
-  CYC(b_+2, b_+5); loadPaletteHeader_hook(gb);
+  CYC(b_+2, b_+5); TAIL(loadPaletteHeader);
 }
 
 // Falls through into boyStartHop when landed.
@@ -1256,7 +1256,7 @@ void boyUpdateGravityAndHopWhenLanded_hook(GB *gb) {
 void boyStartHop_hook(GB *gb) {
   BASE(boyStartHop);
   CYC(b_+0, b_+3); SET_BC(0xff20); // -$e0
-  CYC(b_+3, b_+6); objectSetSpeedZ_hook(gb);
+  CYC(b_+3, b_+6); TAIL(objectSetSpeedZ);
 }
 
 // Load a script for INTERAC_BOY.
@@ -1269,5 +1269,5 @@ void boyLoadScript_hook(GB *gb) {
   CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+8, b_+9); H = mem_rd(gb, HL);
   CYC(b_+9, b_+10); L = A;
-  CYC(b_+10, b_+13); interactionSetScript_hook(gb);
+  CYC(b_+10, b_+13); TAIL(interactionSetScript);
 }

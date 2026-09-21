@@ -493,7 +493,7 @@ void interactionCode48_hook(GB *gb) {
   CYC(b_+27, b_+28); A = mem_rd(gb, DE);
   CYC(b_+28, b_+29); alu_or(gb, A);
   if (F & FZ) { CYC(b_+29, b_+32); RET(b_+32); return; }
-  CYCT(b_+29, b_+32); objectMarkSolidPosition_hook(gb);
+  CYCT(b_+29, b_+32); TAIL(objectMarkSolidPosition);
 }
 
 void tokayState1_hook(GB *gb) {
@@ -618,7 +618,7 @@ void tokayThief_countdownToStealNextItem_hook(GB *gb) {
 lose:
   CALL_C(b_+33, loseTreasure_hook, SYM(loseTreasure), b_+36);
   CYC(b_+36, b_+38); A = 0x75;
-  CYC(b_+38, b_+41); playSound_b00_hook(gb);
+  CYC(b_+38, b_+41); TAIL(playSound_b00);
 }
 
 void tokayThiefSubstate1_hook(GB *gb) {
@@ -632,7 +632,7 @@ void tokayThiefSubstate1_hook(GB *gb) {
   CYC(b_+9, b_+11); alu_add(gb, 0x14);
   CYC(b_+11, b_+13); L = 0x46;
   CYC(b_+13, b_+14); mem_wr(gb, HL, A);
-  CYC(b_+14, b_+17); interactionIncSubstate_hook(gb);
+  CYC(b_+14, b_+17); TAIL(interactionIncSubstate);
 }
 
 void tokayThiefSubstate2_hook(GB *gb) {
@@ -661,7 +661,7 @@ void tokayThief_jump_hook(GB *gb) {
   CYC(b_+18, b_+19); mem_wr(gb, DE, A);
   CALL_C(b_+19, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+22);
   CYC(b_+22, b_+24); A = 0x53;
-  CYC(b_+24, b_+27); playSound_b00_hook(gb);
+  CYC(b_+24, b_+27); TAIL(playSound_b00);
 }
 
 void tokayThiefSubstate3_hook(GB *gb) {
@@ -674,7 +674,7 @@ void tokayThiefSubstate3_hook(GB *gb) {
   CYC(b_+11, b_+13); L = 0x46;
   CYC(b_+13, b_+15); mem_wr(gb, HL, 6);
   CYC(b_+15, b_+17); A = 5;
-  CYC(b_+17, b_+20); interactionSetAnimation_hook(gb);
+  CYC(b_+17, b_+20); TAIL(interactionSetAnimation);
 }
 
 void tokayThiefSubstate4_hook(GB *gb) {
@@ -682,7 +682,7 @@ void tokayThiefSubstate4_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+3);
   if (!(F & FZ)) { CYCT(b_+3, b_+4); ret_effect(gb); return; } CYC(b_+3, b_+4);
-  CYC(b_+4, b_+6); tokayThief_jump_hook(gb);
+  CYC(b_+4, b_+6); TAIL(tokayThief_jump);
 }
 
 void tokayThiefSubstate5_hook(GB *gb) {
@@ -718,7 +718,7 @@ void tokayThiefSubstate6_hook(GB *gb) {
   CYC(b_+22, b_+25); mem_wr(gb, wActiveMusic, A);
   CALL_C(b_+25, playSound_b00_hook, SYM(playSound_b00), b_+28);
   CALL_C(b_+28, setDeathRespawnPoint_hook, SYM(setDeathRespawnPoint), b_+31);
-  CYC(b_+31, b_+34); interactionDelete_hook(gb);
+  CYC(b_+31, b_+34); TAIL(interactionDelete);
 }
 
 void tokayRunSubid05_hook(GB *gb) {
@@ -732,7 +732,7 @@ void tokayRunSubid05_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+10, b_+13); npcFaceLinkAndAnimate_hook(gb); return; } CYC(b_+10, b_+13);
   CALL_C(b_+13, tokayRunStinkBagCutscene_hook, SYM(tokayRunStinkBagCutscene), b_+16);
   CALL_C(b_+16, interactionAnimate_hook, SYM(interactionAnimate), b_+19);
-  CYC(b_+19, b_+22); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
+  CYC(b_+19, b_+22); TAIL(objectSetPriorityRelativeToLink_withTerrainEffects);
 }
 
 void tokayRunSubid06_hook(GB *gb) {
@@ -743,7 +743,7 @@ void tokayRunSubid06_hook(GB *gb) {
   CYC(b_+5, b_+6); A = mem_rd(gb, DE);
   CYC(b_+6, b_+7); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+7, b_+10); interactionAnimateAsNpc_hook(gb); return; }
-  CYC(b_+7, b_+10); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+7, b_+10); TAIL(npcFaceLinkAndAnimate);
 }
 
 void tokayRunSubid0b_hook(GB *gb) {
@@ -751,7 +751,7 @@ void tokayRunSubid0b_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
   if (F & FC) { CYCT(b_+3, b_+6); interactionDelete_hook(gb); return; }
-  CYC(b_+3, b_+6); interactionAnimateBasedOnSpeed_hook(gb);
+  CYC(b_+3, b_+6); TAIL(interactionAnimateBasedOnSpeed);
 }
 
 void tokayRunSubid0c_hook(GB *gb) {
@@ -800,7 +800,7 @@ void wildTokayParticipantSubstate2_hook(GB *gb) {
   CYC(b_+38, b_+40); alu_cp(gb, 2);
   if (F & FZ) { CYC(b_+40, b_+42); CYC(b_+42, b_+44); A = 1; CYC(b_+44, b_+47); mem_wr(gb, wTmpcfc0_genericCutscene_cfde, A); }
   else CYCT(b_+40, b_+42);
-  CYC(b_+47, b_+50); interactionDelete_hook(gb);
+  CYC(b_+47, b_+50); TAIL(interactionDelete);
 }
 
 void wildTokayParticipant_checkGrabMeat_hook(GB *gb) {
@@ -869,7 +869,7 @@ void wildTokayParticipantSubstate1_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+3);
   if (!(F & FZ)) { CYCT(b_+3, b_+4); ret_effect(gb); return; } CYC(b_+3, b_+4);
-  CYC(b_+4, b_+7); interactionIncSubstate_hook(gb);
+  CYC(b_+4, b_+7); TAIL(interactionIncSubstate);
 }
 
 void tokayRunSubid0d_hook(GB *gb) {
@@ -931,7 +931,7 @@ void tokayRunSubid10_hook(GB *gb) {
   CYCT(b_+5, b_+7);
   CALL_C((SYM(tokayRunSubid0e) + 3), interactionRunScript_hook, SYM(interactionRunScript), (SYM(tokayRunSubid0e) + 6));
   if (!(F & FC)) { CYCT((SYM(tokayRunSubid0e) + 6), (SYM(tokayRunSubid0e) + 7)); ret_effect(gb); return; } CYC((SYM(tokayRunSubid0e) + 6), (SYM(tokayRunSubid0e) + 7));
-  CYC((SYM(tokayRunSubid0e) + 7), (SYM(tokayRunSubid0e) + 10)); interactionDelete_hook(gb);
+  CYC((SYM(tokayRunSubid0e) + 7), (SYM(tokayRunSubid0e) + 10)); TAIL(interactionDelete);
 }
 
 void tokayRunSubid0e_hook(GB *gb) {
@@ -940,7 +940,7 @@ void tokayRunSubid0e_hook(GB *gb) {
   CALL_C(b_+0, interactionAnimateAsNpc_hook, SYM(interactionAnimateAsNpc), b_+3);
   CALL_C(b_+3, interactionRunScript_hook, SYM(interactionRunScript), b_+6);
   if (!(F & FC)) { CYCT(b_+6, b_+7); ret_effect(gb); return; } CYC(b_+6, b_+7);
-  CYC(b_+7, b_+10); interactionDelete_hook(gb);
+  CYC(b_+7, b_+10); TAIL(interactionDelete);
 }
 
 void tokayRunSubid1e_hook(GB *gb) {
@@ -957,14 +957,14 @@ void tokayRunSubid1e_hook(GB *gb) {
   if (!(F & FC)) { CYCT(b_+21, b_+22); ret_effect(gb); return; } CYC(b_+21, b_+22);
   CYC(b_+22, b_+24); E = 0x71;
   CYC(b_+24, b_+25); mem_wr(gb, DE, A);
-  CYC(b_+25, b_+28); interactionRunScript_hook(gb);
+  CYC(b_+25, b_+28); TAIL(interactionRunScript);
 }
 
 void tokayRunSubid12_hook(GB *gb) {
   BASE(tokayRunSubid12);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
-  CYC(b_+3, b_+6); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+3, b_+6); TAIL(npcFaceLinkAndAnimate);
 }
 
 void tokayRunSubid1a_hook(GB *gb) {
@@ -973,7 +973,7 @@ void tokayRunSubid1a_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wTmpcfc0_wildTokay_inPresent);
   CYC(b_+3, b_+4); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+4, b_+5); ret_effect(gb); return; } CYC(b_+4, b_+5);
-  CYC(b_+5, b_+8); interactionDelete_hook(gb);
+  CYC(b_+5, b_+8); TAIL(interactionDelete);
 }
 
 // tokayRunStinkBagCutscene@initJumpVariables: loads angle, speedZ and gravity for jump var3b
@@ -1049,5 +1049,5 @@ void tokayLoadScript_hook(GB *gb) {
   CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+8, b_+9); H = mem_rd(gb, HL);
   CYC(b_+9, b_+10); L = A;
-  CYC(b_+10, b_+13); interactionSetScript_hook(gb);
+  CYC(b_+10, b_+13); TAIL(interactionSetScript);
 }

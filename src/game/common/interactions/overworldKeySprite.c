@@ -70,5 +70,5 @@ state2:
     CYCT(b_+50, b_+51); ret_effect(gb); return;
   }
   CYC(b_+50, b_+51);
-  CYC(b_+51, b_+54); interactionDelete_hook(gb);
+  CYC(b_+51, b_+54); TAIL(interactionDelete);
 }

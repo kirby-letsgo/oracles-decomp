@@ -74,5 +74,5 @@ swallow:
   CYC(b_+41, b_+44); W8(w1Companion_var35) = A;
 
 delete_self:
-  CYC(b_+44, b_+47); itemDelete_hook(gb);
+  CYC(b_+44, b_+47); TAIL(itemDelete);
 }

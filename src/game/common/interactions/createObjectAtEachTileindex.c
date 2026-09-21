@@ -93,5 +93,5 @@ loop:
     CYCT(b_+16, b_+18); goto loop;
   }
   CYC(b_+16, b_+18);
-  CYC(b_+18, b_+21); interactionDelete_hook(gb);
+  CYC(b_+18, b_+21); TAIL(interactionDelete);
 }

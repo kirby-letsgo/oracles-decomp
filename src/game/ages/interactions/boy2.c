@@ -209,5 +209,5 @@ subid3_state0:
   CYC(b_+165, b_+167); mem_wr(gb, HL, 0x78);
   CYC(b_+167, b_+169); L = INTERACTION_BASE + OBJ_OAM_FLAGS;
   CYC(b_+169, b_+171); mem_wr(gb, HL, 0x02);
-  CYC(b_+171, b_+174); objectSetVisiblec1_hook(gb);
+  CYC(b_+171, b_+174); TAIL(objectSetVisiblec1);
 }

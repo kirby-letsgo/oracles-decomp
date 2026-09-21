@@ -48,7 +48,7 @@ void interactionCodecf__afterCall4b19_hook(GB *gb) {
   CYC(b_+26, b_+27); E = alu_inc8(gb, E);
   CYC(b_+27, b_+28); A = mem_rd(gb, HL);
   CYC(b_+28, b_+29); mem_wr(gb, DE, A);
-  CYC(b_+29, b_+32); objectSetVisible82_hook(gb);
+  CYC(b_+29, b_+32); TAIL(objectSetVisible82);
 }
 
 void interactionCodecf_hook(GB *gb) {

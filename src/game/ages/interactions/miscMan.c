@@ -113,5 +113,5 @@ subid_nonzero:
   CYC(b_+89, b_+92); push_effect(gb, b_+92); misc_man_init(gb, sp0_);
 initialized_nonzero:
   CALL_C(b_+92, interactionRunScript_hook, SYM(interactionRunScript), b_+95);
-  CYC(b_+95, b_+98); interactionAnimateAsNpc_hook(gb);
+  CYC(b_+95, b_+98); TAIL(interactionAnimateAsNpc);
 }

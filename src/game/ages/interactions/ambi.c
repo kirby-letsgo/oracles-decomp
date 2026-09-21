@@ -218,7 +218,7 @@ void ambi_updateAnimationAndRunScript_hook(GB *gb) {
   BASE(ambi_updateAnimationAndRunScript);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionAnimate_hook, SYM(interactionAnimate), b_+3);
-  CYC(b_+3, b_+6); interactionRunScript_hook(gb);
+  CYC(b_+3, b_+6); TAIL(interactionRunScript);
 }
 
 void ambi_runSubid01_hook(GB *gb) {
@@ -305,7 +305,7 @@ substate1:
   CYC(b_+28, b_+29);
   CALL_C(b_+29, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+32);
   CYC(b_+32, b_+35); SET_BC((SYM(soldierSubid04Substate1) + 5));
-  CYC(b_+35, b_+38); interactionSetPosition_hook(gb);
+  CYC(b_+35, b_+38); TAIL(interactionSetPosition);
 }
 
 void ambi_runSubid03_hook(GB *gb) {
@@ -378,7 +378,7 @@ substate3:
   CYC(b_+89, b_+90);
   CYC(b_+90, b_+92); A = 2;
   CYC(b_+92, b_+95); W8(wTmpcfc0_genericCutscene_cfd0) = A;
-  CYC(b_+95, b_+98); interactionIncSubstate_hook(gb);
+  CYC(b_+95, b_+98); TAIL(interactionIncSubstate);
 }
 
 void ambi_runSubid04_hook(GB *gb) {
@@ -413,7 +413,7 @@ substate1:
   CYC(b_+33, b_+34);
   CYC(b_+34, b_+36); A = 3;
   CYC(b_+36, b_+39); W8(wTmpcfc0_genericCutscene_cfd0) = A;
-  CYC(b_+39, b_+42); interactionIncSubstate_hook(gb);
+  CYC(b_+39, b_+42); TAIL(interactionIncSubstate);
 }
 
 void ambi_runSubid05_hook(GB *gb) {
@@ -437,7 +437,7 @@ void ambi_runSubid06_hook(GB *gb) {
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+8); A = 1;
   CYC(b_+8, b_+11); W8(wLoadedTreeGfxIndex) = A;
-  CYC(b_+11, b_+14); interactionDelete_hook(gb);
+  CYC(b_+11, b_+14); TAIL(interactionDelete);
 }
 
 void ambi_runSubid08_hook(GB *gb) {
@@ -450,14 +450,14 @@ void ambi_runSubid08_hook(GB *gb) {
   CYC(b_+6, b_+9); W8(wTmpcbb8) = A;
   CYC(b_+9, b_+11); A = 8;
   CYC(b_+11, b_+14); W8(wCutsceneTrigger) = A;
-  CYC(b_+14, b_+17); interactionDelete_hook(gb);
+  CYC(b_+14, b_+17); TAIL(interactionDelete);
 }
 
 void ambi_runSubid0a_hook(GB *gb) {
   BASE(ambi_runSubid0a);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, npcFaceLinkAndAnimate_hook, SYM(npcFaceLinkAndAnimate), b_+3);
-  CYC(b_+3, b_+6); interactionRunScript_hook(gb);
+  CYC(b_+3, b_+6); TAIL(interactionRunScript);
 }
 
 void ambi_loadScript_hook(GB *gb) {
@@ -470,5 +470,5 @@ void ambi_loadScript_hook(GB *gb) {
   CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+8, b_+9); H = mem_rd(gb, HL);
   CYC(b_+9, b_+10); L = A;
-  CYC(b_+10, b_+13); interactionSetScript_hook(gb);
+  CYC(b_+10, b_+13); TAIL(interactionSetScript);
 }

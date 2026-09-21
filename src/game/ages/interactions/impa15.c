@@ -53,5 +53,5 @@ void impa_restoreNormalSpriteSheet_hook(GB *gb) {
 void impa_showZeldaKidnappedTextNonExitable_hook(GB *gb) {
   BASE(impa_showZeldaKidnappedTextNonExitable);
   CYC(b_+0, b_+3); SET_BC(0x0131);
-  CYC(b_+3, b_+6); showTextNonExitable_hook(gb);
+  CYC(b_+3, b_+6); TAIL(showTextNonExitable);
 }

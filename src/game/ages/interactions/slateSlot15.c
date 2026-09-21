@@ -68,5 +68,5 @@ void slateSlot_placeSlate_hook(GB *gb) {
   CYC(b_+53, b_+54); A = mem_rd(gb, HL);
   CYC(b_+54, b_+55); C = A;
   CYC(b_+55, b_+57); A = 0x09;
-  CYC(b_+57, b_+60); setTile_hook(gb);
+  CYC(b_+57, b_+60); TAIL(setTile);
 }

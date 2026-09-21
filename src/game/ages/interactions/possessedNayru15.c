@@ -27,5 +27,5 @@ void possessedNayru_makeExclamationMark_hook(GB *gb) {
   CALL_C(b_+2, playSound_b00_hook, SYM(playSound_b00), b_+5);
   CYC(b_+5, b_+7); A = 0x18;
   CYC(b_+7, b_+10); SET_BC(0xf408);
-  CYC(b_+10, b_+13); objectCreateExclamationMark_hook(gb);
+  CYC(b_+10, b_+13); TAIL(objectCreateExclamationMark);
 }

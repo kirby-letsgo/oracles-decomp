@@ -237,7 +237,7 @@ void fake_roomTileChangesAfterLoad04_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(wInShop);
   CYC(b_+3, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) | 0x02);
   CYC(b_+5, b_+7); A = 0x03;
-  CYC(b_+7, b_+10); loadObjectGfx2_hook(gb);
+  CYC(b_+7, b_+10); TAIL(loadObjectGfx2);
 }
 
 void fake_checkLoadPastSignAndChestGfx_hook(GB *gb) {

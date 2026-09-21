@@ -91,7 +91,7 @@ set_script:
   CALL_C(b_+49, interactionSetScript_hook, SYM(interactionSetScript), b_+52);
 state1:
   CALL_C(b_+52, interactionRunScript_hook, SYM(interactionRunScript), b_+55);
-  CYC(b_+55, b_+58); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+55, b_+58); TAIL(npcFaceLinkAndAnimate);
 }
 
 void subrosian_subid01_hook(GB *gb) {
@@ -114,7 +114,7 @@ state1:
   CALL_C(b_+11, interactionRunScript_hook, SYM(interactionRunScript), b_+14);
   if (F & FC) { CYCT(b_+14, b_+17); interactionDelete_hook(gb); return; }
   CYC(b_+14, b_+17);
-  CYC(b_+17, b_+20); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+17, b_+20); TAIL(npcFaceLinkAndAnimate);
 }
 
 void subrosian_subid03_hook(GB *gb) {
@@ -135,7 +135,7 @@ state1:
   CALL_C(b_+22, interactionRunScript_hook, SYM(interactionRunScript), b_+25);
   if (F & FC) { CYCT(b_+25, b_+28); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; }
   CYC(b_+25, b_+28);
-  CYC(b_+28, b_+31); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+28, b_+31); TAIL(npcFaceLinkAndAnimate);
 }
 
 void subrosian_subid04_hook(GB *gb) {
@@ -155,7 +155,7 @@ state1:
   CALL_C(b_+22, interactionRunScript_hook, SYM(interactionRunScript), b_+25);
   if (F & FC) { CYCT(b_+25, b_+28); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; }
   CYC(b_+25, b_+28);
-  CYC(b_+28, b_+31); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+28, b_+31); TAIL(npcFaceLinkAndAnimate);
 }
 
 void subrosian_initGraphicsAndIncState_hook(GB *gb) {
@@ -163,7 +163,7 @@ void subrosian_initGraphicsAndIncState_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+3);
   CALL_C(b_+3, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+6);
-  CYC(b_+6, b_+9); interactionIncState_hook(gb);
+  CYC(b_+6, b_+9); TAIL(interactionIncState);
 }
 
 void subrosian_unused_63ec_hook(GB *gb) {
@@ -171,7 +171,7 @@ void subrosian_unused_63ec_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+3);
   CALL_C(b_+3, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+6);
-  CYC(b_+6, b_+8); subrosian_loadScript_hook(gb);
+  CYC(b_+6, b_+8); TAIL(subrosian_loadScript);
 }
 
 void subrosian_initSubid02_hook(GB *gb) {
@@ -179,7 +179,7 @@ void subrosian_initSubid02_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+3);
   CALL_C(b_+3, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+6);
-  CYC(b_+6, b_+8); subrosian_loadScriptIndex_hook(gb);
+  CYC(b_+6, b_+8); TAIL(subrosian_loadScriptIndex);
 }
 
 void subrosian_loadScript_hook(GB *gb) {
@@ -187,7 +187,7 @@ void subrosian_loadScript_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, subrosian_getScriptPtr_hook, SYM(subrosian_getScriptPtr), b_+3);
   CALL_C(b_+3, interactionSetScript_hook, SYM(interactionSetScript), b_+6);
-  CYC(b_+6, b_+9); interactionIncState_hook(gb);
+  CYC(b_+6, b_+9); TAIL(interactionIncState);
 }
 
 void subrosian_loadScriptIndex_hook(GB *gb) {
@@ -201,7 +201,7 @@ void subrosian_loadScriptIndex_hook(GB *gb) {
   CYC(b_+7, b_+8); H = mem_rd(gb, HL);
   CYC(b_+8, b_+9); L = A;
   CALL_C(b_+9, interactionSetScript_hook, SYM(interactionSetScript), b_+12);
-  CYC(b_+12, b_+15); interactionIncState_hook(gb);
+  CYC(b_+12, b_+15); TAIL(interactionIncState);
 }
 
 void subrosian_getScriptPtr_hook(GB *gb) {

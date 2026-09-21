@@ -36,5 +36,5 @@ init:
   CALL_C(b_+22, objectSetVisible83_hook, SYM(objectSetVisible83), b_+25);
   CYC(b_+25, b_+28); SET_HL(faroresMemoryScript_bank0c);
   CALL_C(b_+28, interactionSetScript_hook, SYM(interactionSetScript), b_+31);
-  CYC(b_+31, b_+34); interactionIncState_hook(gb);
+  CYC(b_+31, b_+34); TAIL(interactionIncState);
 }

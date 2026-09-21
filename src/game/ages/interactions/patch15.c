@@ -20,7 +20,7 @@ void patch_jump_hook(GB *gb) {
   CYC(b_+13, b_+16); mem_wr(gb, wMenuDisabled, A);
   CYC(b_+16, b_+19); mem_wr(gb, wOamEnd, A);
   CYC(b_+19, b_+21); A = 0x8f;
-  CYC(b_+21, b_+24); playSound_b00_hook(gb);
+  CYC(b_+21, b_+24); TAIL(playSound_b00);
 }
 
 void patch_updateTextSubstitution_hook(GB *gb) {
@@ -71,7 +71,7 @@ void patch_moveLinkPositionAtMinigameEnd_hook(GB *gb) {
   CYC(b_+21, b_+22); mem_wr(gb, HL, A);
   CYC(b_+22, b_+23); A = alu_inc8(gb, A);
   CYC(b_+23, b_+26); mem_wr(gb, wTmpcfc0_bigBangGame_prizeIndex, A);
-  CYC(b_+26, b_+29); resetCamera_hook(gb);
+  CYC(b_+26, b_+29); TAIL(resetCamera);
 }
 
 void patch_turnToFaceLink_hook(GB *gb) {
@@ -84,5 +84,5 @@ void patch_turnToFaceLink_hook(GB *gb) {
   CYC(b_+9, b_+10); alu_rlca(gb);
   CYC(b_+10, b_+12); E = 0x48;
   CYC(b_+12, b_+13); mem_wr(gb, HL, A);
-  CYC(b_+13, b_+16); interactionSetAnimation_hook(gb);
+  CYC(b_+13, b_+16); TAIL(interactionSetAnimation);
 }

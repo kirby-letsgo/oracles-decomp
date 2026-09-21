@@ -36,7 +36,7 @@ static void link_ship_add_a_to_hl(GB *gb) {
 
 void interactionCoded4__afterCall4d97_hook(GB *gb) {
   BASE(interactionCoded4);
-  CYC(b_+32, b_+35); objectSetVisible82_hook(gb);
+  CYC(b_+32, b_+35); TAIL(objectSetVisible82);
 }
 
 void interactionCoded4__state0_hook(GB *gb) {

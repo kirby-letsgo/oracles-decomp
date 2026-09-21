@@ -205,7 +205,7 @@ stateA:
   CYC(b_+175, b_+176); alu_xor(gb, A);
   CYC(b_+176, b_+179); mem_wr(gb, wPaletteThread_parameter, A);
   CALL_C(b_+179, setCameraFocusedObjectToLink_hook, SYM(setCameraFocusedObjectToLink), b_+182);
-  CYC(b_+182, b_+185); interactionDelete_hook(gb);
+  CYC(b_+182, b_+185); TAIL(interactionDelete);
 }
 
 // interac11_subid01@interac11_updateSparkle: rotate the sparkle around the circle center
@@ -307,5 +307,5 @@ state3:
     CYCT(b_+92, b_+93); ret_effect(gb); return;
   }
   CYC(b_+92, b_+93);
-  CYC(b_+93, b_+96); interactionDelete_hook(gb);
+  CYC(b_+93, b_+96); TAIL(interactionDelete);
 }

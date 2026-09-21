@@ -114,7 +114,7 @@ void impaNpc_setScriptAndInitialize_hook(GB *gb) {
   CYC(b_+16, b_+18); E = INTERACTION_BASE + OBJ_VAR38;
   CYC(b_+18, b_+19); A = mem_rd(gb, DE);
   CALL_C(b_+19, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+22);
-  CYC(b_+22, b_+25); objectSetVisiblec2_hook(gb);
+  CYC(b_+22, b_+25); TAIL(objectSetVisiblec2);
 }
 
 void impaNpc_determineTextAndPositionInHouse_hook(GB *gb) {
@@ -194,7 +194,7 @@ void impaNpc_setTextIndexAndLoadGenericNpcScript_hook(GB *gb) {
   CYC(b_+5, b_+7); A = 2;
   CYC(b_+7, b_+8); mem_wr(gb, DE, A);
   CYC(b_+8, b_+11); SET_HL((SYM(interactionCode4a__initSubid09) + 17));
-  CYC(b_+11, b_+14); impaNpc_setScriptAndInitialize_hook(gb);
+  CYC(b_+11, b_+14); TAIL(impaNpc_setScriptAndInitialize);
 }
 
 void impaNpc_subid02_hook(GB *gb) {
@@ -209,7 +209,7 @@ void impaNpc_subid02_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+11, b_+14); interactionDelete_hook(gb); return; }
   CYC(b_+11, b_+14);
   CYC(b_+14, b_+16); A = 0x2f;
-  CYC(b_+16, b_+18); impaNpc_setTextIndexAndLoadGenericNpcScript_hook(gb);
+  CYC(b_+16, b_+18); TAIL(impaNpc_setTextIndexAndLoadGenericNpcScript);
 }
 
 void impaNpc_runScriptAndFaceLink_hook(GB *gb) {
@@ -217,7 +217,7 @@ void impaNpc_runScriptAndFaceLink_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
   CALL_C(b_+3, impaNpc_faceLinkIfClose_hook, SYM(impaNpc_faceLinkIfClose), b_+6);
-  CYC(b_+6, b_+9); interactionAnimateAsNpc_hook(gb);
+  CYC(b_+6, b_+9); TAIL(interactionAnimateAsNpc);
 }
 
 void impaNpc_subid03_hook(GB *gb) {
@@ -232,7 +232,7 @@ void impaNpc_subid03_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+11, b_+14); interactionDelete_hook(gb); return; }
   CYC(b_+11, b_+14);
   CYC(b_+14, b_+16); A = 0x23;
-  CYC(b_+16, b_+18); impaNpc_setTextIndexAndLoadGenericNpcScript_hook(gb);
+  CYC(b_+16, b_+18); TAIL(impaNpc_setTextIndexAndLoadGenericNpcScript);
 }
 
 void impaNpc_faceLinkIfClose_hook(GB *gb) {
@@ -258,7 +258,7 @@ update:
   if (F & FZ) { CYCT(b_+26, b_+27); ret_effect(gb); return; }
   CYC(b_+26, b_+27);
   CYC(b_+27, b_+28); mem_wr(gb, HL, A);
-  CYC(b_+28, b_+31); interactionSetAnimation_hook(gb);
+  CYC(b_+28, b_+31); TAIL(interactionSetAnimation);
 }
 
 void getImpaNpcState_hook(GB *gb) {

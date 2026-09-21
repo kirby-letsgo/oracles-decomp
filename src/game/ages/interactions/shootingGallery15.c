@@ -93,7 +93,7 @@ void shootingGallery_cpScore_hook(GB *gb) {
   BASE(shootingGallery_cpScore);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+3); push_effect(gb, b_+3); shootingGallery_cpScoreImpl(gb, sp0_);
-  CYC(b_+3, b_+6); writeFlagsTocddb_hook(gb);
+  CYC(b_+3, b_+6); TAIL(writeFlagsTocddb);
 }
 
 void shootingGallery_equipSword_hook(GB *gb) {
@@ -170,13 +170,13 @@ void func_50e4_hook(GB *gb) {
   CYC(b_+4, b_+7); A = mem_rd(gb, w1Link_xh);
   CYC(b_+7, b_+8); C = A;
   CYC(b_+8, b_+10); A = 0x6e;
-  CYC(b_+10, b_+13); createEnergySwirlGoingIn_hook(gb);
+  CYC(b_+10, b_+13); TAIL(createEnergySwirlGoingIn);
 }
 
 void createSparkle_hook(GB *gb) {
   BASE(createSparkle);
   CYC(b_+0, b_+2); B = 0x84;
-  CYC(b_+2, b_+5); objectCreateInteractionWithSubid00_hook(gb);
+  CYC(b_+2, b_+5); TAIL(objectCreateInteractionWithSubid00);
 }
 
 void shootingGallery_removeAllTargets_b15_hook(GB *gb) {
@@ -229,7 +229,7 @@ void giveRupees_hook(GB *gb) {
   BASE(giveRupees);
   CYC(b_+0, b_+1); C = A;
   CYC(b_+1, b_+3); A = 0x28;
-  CYC(b_+3, b_+6); giveTreasure_hook(gb);
+  CYC(b_+3, b_+6); TAIL(giveTreasure);
 }
 
 static void shootingGallery_giveHealthFromC(GB *gb) {
@@ -262,7 +262,7 @@ void giveRingAToLink_hook(GB *gb) {
   BASE(giveRingAToLink);
   CYC(b_+0, b_+1); B = A;
   CYC(b_+1, b_+3); C = 0x00;
-  CYC(b_+3, b_+6); giveRingToLink_hook(gb);
+  CYC(b_+3, b_+6); TAIL(giveRingToLink);
 }
 
 void shootingGallery_giveRandomRingToLink_hook(GB *gb) {
@@ -281,7 +281,7 @@ void forceLinkDirection_hook(GB *gb) {
   BASE(forceLinkDirection);
   CYC(b_+0, b_+3); SET_HL(w1Link_direction);
   CYC(b_+3, b_+4); mem_wr(gb, HL, A);
-  CYC(b_+4, b_+7); setLinkForceStateToState08_hook(gb);
+  CYC(b_+4, b_+7); TAIL(setLinkForceStateToState08);
 }
 
 static void shootingGallery_setLinkPositionTail(GB *gb) {
@@ -327,14 +327,14 @@ void setLinkToState08_hook(GB *gb) {
   BASE(setLinkToState08);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, putLinkOnGround_hook, SYM(putLinkOnGround), b_+3);
-  CYC(b_+3, b_+6); setLinkForceStateToState08_hook(gb);
+  CYC(b_+3, b_+6); TAIL(setLinkForceStateToState08);
 }
 
 void checkIsLinkedGameForScript_hook(GB *gb) {
   BASE(checkIsLinkedGameForScript);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+3);
-  CYC(b_+3, b_+6); writeFlagsTocddb_hook(gb);
+  CYC(b_+3, b_+6); TAIL(writeFlagsTocddb);
 }
 
 void shootingGallery_checkIsNotLinkedGame_hook(GB *gb) {
@@ -355,7 +355,7 @@ void beginJump_hook(GB *gb) {
   CYC(b_+5, b_+6); SET_HL(HL + 1);
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0xfe);
   CYC(b_+8, b_+10); A = 0x53;
-  CYC(b_+10, b_+13); playSound_b00_hook(gb);
+  CYC(b_+10, b_+13); TAIL(playSound_b00);
 }
 
 void updateGravity_hook(GB *gb) {
@@ -363,7 +363,7 @@ void updateGravity_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); C = 0x30;
   CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
-  CYC(b_+5, b_+8); writeFlagsTocddb_hook(gb);
+  CYC(b_+5, b_+8); TAIL(writeFlagsTocddb);
 }
 
 void addToccd4_hook(GB *gb) {

@@ -539,7 +539,7 @@ void interactionCode60__setVisibleIfWithinScreenBoundary_hook(GB *gb) {
   CALL_C(b_+212, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+215);
   if (!(F & FC)) { CYCT(b_+215, b_+218); objectSetInvisible_hook(gb); return; }
   CYC(b_+215, b_+218);
-  CYC(b_+218, b_+221); objectSetVisible_hook(gb);
+  CYC(b_+218, b_+221); TAIL(objectSetVisible);
 }
 
 void interactionCode60__setLinkAnimationAndDeleteIfTextClosed_hook(GB *gb) {
@@ -562,5 +562,5 @@ void interactionCode60__setLinkAnimationAndDeleteIfTextClosed_hook(GB *gb) {
   CYC(b_+592, b_+594); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~1));
   CYC(b_+594, b_+596); A = 0x0f;
   CYC(b_+596, b_+599); mem_wr(gb, wInstrumentsDisabledCounter, A);
-  CYC(b_+599, b_+602); interactionDelete_hook(gb);
+  CYC(b_+599, b_+602); TAIL(interactionDelete);
 }

@@ -62,7 +62,7 @@ void label_07_227_hook(GB *gb) {
   CYC(b_+31, b_+32); mem_wr(gb, DE, A);
   CYC(b_+32, b_+33); A = mem_rd(gb, HL);
   CYC(b_+33, b_+35); alu_and(gb, 0x07);
-  CYC(b_+35, b_+38); itemSetAnimation_hook(gb);
+  CYC(b_+35, b_+38); TAIL(itemSetAnimation);
 }
 
 void updateSwingableItemAnimation_hook(GB *gb) {

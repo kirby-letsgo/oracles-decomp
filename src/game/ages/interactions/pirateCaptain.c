@@ -20,7 +20,7 @@ void pirate_captain_state0_tail_hook(GB *gb) {
   }
   CYC(b_+30, b_+33); SET_HL((SYM(interactionCoded8__subid1Script) + 24));
   CALL_C(b_+33, interactionSetScript_hook, SYM(interactionSetScript), b_+36);
-  CYC(b_+36, b_+39); interactionIncState_hook(gb);
+  CYC(b_+36, b_+39); TAIL(interactionIncState);
 }
 
 void interactionCodec3__afterCall7354_hook(GB *gb) {
@@ -45,5 +45,5 @@ void interactionCodec3_hook(GB *gb) {
   CYC(b_+3, b_+5);
   CALL_C(b_+5, objectPreventLinkFromPassing_hook, SYM(objectPreventLinkFromPassing), b_+8);
   CALL_C(b_+8, interactionRunScript_hook, SYM(interactionRunScript), b_+11);
-  CYC(b_+11, b_+14); interactionAnimate_hook(gb);
+  CYC(b_+11, b_+14); TAIL(interactionAnimate);
 }

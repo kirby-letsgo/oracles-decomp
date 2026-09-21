@@ -72,7 +72,7 @@ void bombUpgradeFairy_loseAllBombs_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0x01;
   CYC(b_+2, b_+5); mem_wr(gb, wNumBombs, A);
   CALL_C(b_+5, decNumBombs_hook, SYM(decNumBombs), b_+8);
-  CYC(b_+8, b_+10); bombUpgradeFairy_linkCollapsed_hook(gb);
+  CYC(b_+8, b_+10); TAIL(bombUpgradeFairy_linkCollapsed);
 }
 
 void bombUpgradeFairy_giveBombUpgrade_hook(GB *gb) {
@@ -81,7 +81,7 @@ void bombUpgradeFairy_giveBombUpgrade_hook(GB *gb) {
   CYC(b_+3, b_+6); mem_wr(gb, wMaxBombs, A);
   CYC(b_+6, b_+7); C = A;
   CYC(b_+7, b_+9); A = 0x03;
-  CYC(b_+9, b_+12); giveTreasure_hook(gb);
+  CYC(b_+9, b_+12); TAIL(giveTreasure);
 }
 
 void bombUpgradeFairy_fadeinFromWhite_hook(GB *gb) {
@@ -89,11 +89,11 @@ void bombUpgradeFairy_fadeinFromWhite_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0xff;
   CYC(b_+2, b_+5); mem_wr(gb, wTmpcfc0_armosStatue_killedArmosPositions, A);
   CYC(b_+5, b_+7); A = 0x04;
-  CYC(b_+7, b_+10); fadeinFromWhiteWithDelay_hook(gb);
+  CYC(b_+7, b_+10); TAIL(fadeinFromWhiteWithDelay);
 }
 
 void bombUpgradeFairy_setGlobalFlag_hook(GB *gb) {
   BASE(bombUpgradeFairy_setGlobalFlag);
   CYC(b_+0, b_+2); A = 0x1c;
-  CYC(b_+2, b_+5); setGlobalFlag_hook(gb);
+  CYC(b_+2, b_+5); TAIL(setGlobalFlag);
 }

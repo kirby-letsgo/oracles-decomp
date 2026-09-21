@@ -63,7 +63,7 @@ void linkCutscene_animateAndDecCounter1_hook(GB *gb) {
   BASE(linkCutscene_animateAndDecCounter1);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+3);
-  CYC(b_+3, b_+6); itemDecCounter1_hook(gb);
+  CYC(b_+3, b_+6); TAIL(itemDecCounter1);
 }
 
 void linkCutscene_oscillateZ_hook(GB *gb) {
@@ -86,7 +86,7 @@ void linkCutscene_oscillateZ_hook(GB *gb) {
     CYC(b_+21, b_+22); alu_add(gb, B);
     CYC(b_+22, b_+23); mem_wr(gb, DE, A);
   }
-  CYC(b_+23, b_+26); specialObjectAnimate_hook(gb);
+  CYC(b_+23, b_+26); TAIL(specialObjectAnimate);
 }
 
 void linkCutscene_oscillateZ_1_hook(GB *gb) {
@@ -98,7 +98,7 @@ void linkCutscene_oscillateZ_1_hook(GB *gb) {
 void linkCutscene_oscillateZ_2_hook(GB *gb) {
   BASE(linkCutscene_oscillateZ_2);
   CYC(b_+0, b_+3); SET_HL(SYM(linkCutscene_zOscillation2));
-  CYC(b_+3, b_+6); linkCutscene_oscillateZ_hook(gb);
+  CYC(b_+3, b_+6); TAIL(linkCutscene_oscillateZ);
 }
 
 void linkCutscene_createGlowingOrb_hook(GB *gb) {
@@ -117,7 +117,7 @@ void linkCutscene_createGlowingOrb_hook(GB *gb) {
   }
   CALL_C(b_+14, itemIncSubstate_hook, SYM(itemIncSubstate), b_+17);
   CYC(b_+17, b_+19); A = 0x05;
-  CYC(b_+19, b_+22); specialObjectSetAnimation_hook(gb);
+  CYC(b_+19, b_+22); TAIL(specialObjectSetAnimation);
 }
 
 void linkCutscene0_substate6_hook(GB *gb) {

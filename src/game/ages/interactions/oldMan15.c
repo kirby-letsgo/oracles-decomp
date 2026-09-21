@@ -45,7 +45,7 @@ void oldMan_takeRupees_hook(GB *gb) {
   CYC(b_+15, b_+18); SET_HL(SYM(oldMan_rupeeValues));
   CYC(b_+18, b_+19); oldMan_addAToHl_from_rst(gb, b_+19);
   CYC(b_+19, b_+20); A = mem_rd(gb, HL);
-  CYC(b_+20, b_+23); removeRupeeValue_hook(gb);
+  CYC(b_+20, b_+23); TAIL(removeRupeeValue);
 }
 
 void oldMan_giveRupees_hook(GB *gb) {
@@ -56,7 +56,7 @@ void oldMan_giveRupees_hook(GB *gb) {
   CYC(b_+6, b_+7); oldMan_addAToHl_from_rst(gb, b_+7);
   CYC(b_+7, b_+8); C = mem_rd(gb, HL);
   CYC(b_+8, b_+10); A = 0x28;
-  CYC(b_+10, b_+13); giveTreasure_hook(gb);
+  CYC(b_+10, b_+13); TAIL(giveTreasure);
 }
 
 void oldManGiveShieldUpgradeToLink_hook(GB *gb) {

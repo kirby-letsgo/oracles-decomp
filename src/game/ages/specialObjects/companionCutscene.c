@@ -62,7 +62,7 @@ void rickyCutsceneJump_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_BC(0xfe00);
   CALL_C(b_+3, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+6);
   CYC(b_+6, b_+8); A = 0x02;
-  CYC(b_+8, b_+11); specialObjectSetAnimation_hook(gb);
+  CYC(b_+8, b_+11); TAIL(specialObjectSetAnimation);
 }
 
 void companionCutsceneInitOam_hook(GB *gb) {
@@ -73,7 +73,7 @@ void companionCutsceneInitOam_hook(GB *gb) {
   CYC(b_+3, b_+6); SET_HL((SYM(nextToKeyDoor) + 49));
   CYC(b_+6, b_+8); E = 0x05;
   CALL_C(b_+8, interBankCall_hook, 0x008a, b_+11);
-  CYC(b_+11, b_+14); objectSetVisiblec0_hook(gb);
+  CYC(b_+11, b_+14); TAIL(objectSetVisiblec0);
 }
 
 void companionCutsceneFunc_7081_hook(GB *gb) {
@@ -92,7 +92,7 @@ void companionCutsceneFunc_7081_hook(GB *gb) {
   CYC(b_+16, b_+17); mem_wr(gb, HL, A);
   CYC(b_+17, b_+19); L = 0x36;
   CYC(b_+19, b_+20); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+20, b_+23); specialObjectSetAnimation_hook(gb);
+  CYC(b_+20, b_+23); TAIL(specialObjectSetAnimation);
 }
 
 void companionCutsceneDecAngle_hook(GB *gb) {
@@ -742,5 +742,5 @@ substate3:
   }
   CYC(b_+144, b_+146);
   CYC(b_+146, b_+148); C = 0x02;
-  CYC(b_+148, b_+151); objectUpdateSpeedZ_paramC_hook(gb);
+  CYC(b_+148, b_+151); TAIL(objectUpdateSpeedZ_paramC);
 }

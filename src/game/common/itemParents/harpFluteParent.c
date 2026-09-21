@@ -193,5 +193,5 @@ tune_ages:
   CYC(b_+212, b_+215); W8(wDisableLinkCollisionsAndMenu) = A;
   CYC(b_+215, b_+218); W8(wcde0) = A;
   CALL_C(b_+218, clearAllItemsAndPutLinkOnGround_hook, SYM(clearAllItemsAndPutLinkOnGround), b_+221);
-  CYC(b_+221, b_+224); specialObjectAnimate_optimized_hook(gb);
+  CYC(b_+221, b_+224); TAIL(specialObjectAnimate_optimized);
 }

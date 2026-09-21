@@ -360,5 +360,5 @@ state5:
   if (!(F & FZ)) { CYCT(b_+301, b_+303); goto update_animation; }
   CYC(b_+301, b_+303);
   CYC(b_+303, b_+306); push_effect(gb, b_+306); seasonsFairyCreatePuff(gb);
-  CYC(b_+306, b_+309); interactionDelete_hook(gb);
+  CYC(b_+306, b_+309); TAIL(interactionDelete);
 }

@@ -21,5 +21,5 @@ void pirate_openEyeballCave_hook(GB *gb) {
   CYC(b_+19, b_+21); A = 0x70;
   CALL_C(b_+21, playSound_b00_hook, SYM(playSound_b00), b_+24);
   CYC(b_+24, b_+27); SET_BC(0x0500);
-  CYC(b_+27, b_+30); objectCreateInteraction_hook(gb);
+  CYC(b_+27, b_+30); TAIL(objectCreateInteraction);
 }

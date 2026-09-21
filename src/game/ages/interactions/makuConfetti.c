@@ -310,7 +310,7 @@ positive_x:
 invert_direction:
   CYC(b_+286, b_+288); alu_xor(gb, 1);
   CYC(b_+288, b_+289); mem_wr(gb, HL, A);
-  CYC(b_+289, b_+292); interactionSetAnimation_hook(gb);
+  CYC(b_+289, b_+292); TAIL(interactionSetAnimation);
 }
 
 void makuConfetti_subid1_hook(GB *gb) {
@@ -418,7 +418,7 @@ state2:
   CYC(b_+170, b_+172); alu_bit(gb, 7, A);
   if (!(F & FZ)) { CYCT(b_+172, b_+175); interactionDelete_hook(gb); return; }
   CYC(b_+172, b_+175);
-  CYC(b_+175, b_+178); objectApplyComponentSpeed_hook(gb);
+  CYC(b_+175, b_+178); TAIL(objectApplyComponentSpeed);
 }
 
 void makuConfetti_updateSpeedY_hook(GB *gb) {

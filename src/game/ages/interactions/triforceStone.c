@@ -239,5 +239,5 @@ state0:
   CALL_C(b_+30, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+33);
   CYC(b_+33, b_+35); A = 0x98; // PALH_98
   CALL_C(b_+35, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+38);
-  CYC(b_+38, b_+41); objectSetVisible83_hook(gb);
+  CYC(b_+38, b_+41); TAIL(objectSetVisible83);
 }

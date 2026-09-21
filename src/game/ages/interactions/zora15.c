@@ -10,20 +10,20 @@ void zora_createExclamationMark_hook(GB *gb) {
   BASE(zora_createExclamationMark);
   CYC(b_+0, b_+3); SET_BC(0xf200);
   CYC(b_+3, b_+5); A = 0x1e;
-  CYC(b_+5, b_+8); objectCreateExclamationMark_hook(gb);
+  CYC(b_+5, b_+8); TAIL(objectCreateExclamationMark);
 }
 
 void zora_beginJump_hook(GB *gb) {
   BASE(zora_beginJump);
   CYC(b_+0, b_+3); SET_BC(0xff00);
-  CYC(b_+3, b_+6); objectSetSpeedZ_hook(gb);
+  CYC(b_+3, b_+6); TAIL(objectSetSpeedZ);
 }
 
 void zora_makeLinkFaceDown_hook(GB *gb) {
   BASE(zora_makeLinkFaceDown);
   CYC(b_+0, b_+2); A = 0x02;
   CYC(b_+2, b_+5); mem_wr(gb, w1Link_direction, A);
-  CYC(b_+5, b_+8); clearAllParentItems_hook(gb);
+  CYC(b_+5, b_+8); TAIL(clearAllParentItems);
 }
 
 void zora_moveToLinksXPosition_hook(GB *gb) {
@@ -71,7 +71,7 @@ void zora_createExclamationMarkToTheRight_hook(GB *gb) {
   CALL_C(b_+2, playSound_b00_hook, SYM(playSound_b00), b_+5);
   CYC(b_+5, b_+7); A = 0x2d;
   CYC(b_+7, b_+10); SET_BC(0xf808);
-  CYC(b_+10, b_+13); objectCreateExclamationMark_hook(gb);
+  CYC(b_+10, b_+13); TAIL(objectCreateExclamationMark);
 }
 
 static void zora_setLinkDirection(GB *gb) {

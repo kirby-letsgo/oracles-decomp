@@ -26,7 +26,7 @@ void nayruSavedCutscene_createEnergySwirl_hook(GB *gb) {
   CYC(b_+4, b_+6); L = 0x4d;
   CYC(b_+6, b_+7); C = mem_rd(gb, HL);
   CYC(b_+7, b_+9); A = 0xff;
-  CYC(b_+9, b_+12); createEnergySwirlGoingIn_hook(gb);
+  CYC(b_+9, b_+12); TAIL(createEnergySwirlGoingIn);
 }
 
 void nayruSavedCutscene_spawnGuardIndex_hook(GB *gb) {
@@ -82,7 +82,7 @@ void nayruSavedCutscene_setAnimationAtAddress_hook(GB *gb) {
   BASE(nayruSavedCutscene_setAnimationAtAddress);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); A = mem_rd(gb, HL);
-  CYC(b_+1, b_+4); interactionSetAnimation_hook(gb);
+  CYC(b_+1, b_+4); TAIL(interactionSetAnimation);
 }
 
 void nayruSavedCutscene_loadGuardAngleToMoveTowardCenter_hook(GB *gb) {
@@ -95,7 +95,7 @@ void nayruSavedCutscene_loadGuardAngleToMoveTowardCenter_hook(GB *gb) {
   CYC(b_+7, b_+8); A = mem_rd(gb, DE);
   CYC(b_+8, b_+11); SET_HL(b_+14);
   CYC(b_+11, b_+12); nayruSavedCutscene_addDoubleIndexToHl_from_rst(gb, b_+12);
-  CYC(b_+12, b_+14); nayruSavedCutscene_setAngleAndAnimationAtAddress_hook(gb);
+  CYC(b_+12, b_+14); TAIL(nayruSavedCutscene_setAngleAndAnimationAtAddress);
 }
 
 static void nayruSavedCutscene_addAToHl_from_rst(GB *gb, uint16_t return_address) {
@@ -114,5 +114,5 @@ void nayruSavedCutscene_loadGuardAnimation_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+6); SET_HL(b_+9);
   CYC(b_+6, b_+7); nayruSavedCutscene_addAToHl_from_rst(gb, b_+7);
-  CYC(b_+7, b_+9); nayruSavedCutscene_setAnimationAtAddress_hook(gb);
+  CYC(b_+7, b_+9); TAIL(nayruSavedCutscene_setAnimationAtAddress);
 }

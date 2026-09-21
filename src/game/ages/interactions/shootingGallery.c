@@ -185,7 +185,7 @@ updateAnimation:
     CYCT(b_+62, b_+65); TAIL(interactionAnimateAsNpc);
   }
   CYC(b_+62, b_+65);
-  CYC(b_+65, b_+68); npcFaceLinkAndAnimate_hook(gb);
+  CYC(b_+65, b_+68); TAIL(npcFaceLinkAndAnimate);
 }
 
 // Interaction $30, subid $03 runs the shooting gallery game. It cycles through states
@@ -385,7 +385,7 @@ gameOver:
   CYC(b_+250, b_+253); mem_wr(gb, wTmpcfc0_shootingGallery_gameStatus, A);
   CYC(b_+253, b_+254); alu_xor(gb, A);
   CYC(b_+254, b_+257); mem_wr(gb, wTmpcfc0_shootingGallery_disableGoronNpcs, A);
-  CYC(b_+257, b_+260); interactionDelete_hook(gb);
+  CYC(b_+257, b_+260); TAIL(interactionDelete);
 }
 
 // Fill wShootingGalleryTileLayoutsToShow with 0..B-1 and set remainingRounds = B.
@@ -478,7 +478,7 @@ subid1:
   return;
 subid2:
   CYC(b_+24, b_+27); SET_BC(shootingGallery_targetPositions_biggoron_bank08);
-  CYC(b_+27, b_+29); shootingGallery_setTiles_hook(gb);
+  CYC(b_+27, b_+29); TAIL(shootingGallery_setTiles);
 }
 
 // Choose one of the 10 target layouts (never the same one twice) and load its tiles.
@@ -618,7 +618,7 @@ void shootingGallery_createBallHere_hook(GB *gb) {
   }
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+6); mem_wr(gb, HL, PART_BALL);
-  CYC(b_+6, b_+9); objectCopyPosition_hook(gb);
+  CYC(b_+6, b_+9); TAIL(objectCopyPosition);
 }
 
 // Add (or, when bit 0 of the score entry is set, subtract) the score for hit index A.
@@ -639,5 +639,5 @@ void shootingGallery_addValueToScore_hook(GB *gb) {
   return;
 subtract:
   CYC(b_+17, b_+19); C = (uint8_t)(C & ~(1 << 0));
-  CYC(b_+19, b_+22); subDecimalFromHlRef_hook(gb);
+  CYC(b_+19, b_+22); TAIL(subDecimalFromHlRef);
 }

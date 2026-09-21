@@ -130,7 +130,7 @@ substate3:
   }
   CYC(b_+88, b_+91);
   CALL_C(b_+91, interactionAnimate2Times_hook, SYM(interactionAnimate2Times), b_+94);
-  CYC(b_+94, b_+97); objectApplySpeed_hook(gb);
+  CYC(b_+94, b_+97); TAIL(objectApplySpeed);
 }
 
 // Subids 1-2: the great fairy disguised as an octorok. Runs the script; once it ends
@@ -157,7 +157,7 @@ void greatFairyOctorokCode_hook(GB *gb) {
   CALL_C(b_+20, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+23);
   CYC(b_+23, b_+25); A = 0x51; // TREASURE_FAIRY_POWDER
   CALL_C(b_+25, loseTreasure_hook, SYM(loseTreasure), b_+28);
-  CYC(b_+28, b_+31); interactionDelete_hook(gb);
+  CYC(b_+28, b_+31); TAIL(interactionDelete);
 }
 
 // INTERAC_FAKE_OCTOROK: Impa's octoroks (subid 0) and the great fairy octorok (subids 1-2).

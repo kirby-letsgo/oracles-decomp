@@ -38,3 +38,28 @@ bool oracles_load_init_ram(GB *gb, const char *path) {
   gb->init_ram_loaded = true;
   return true;
 }
+
+bool oracles_save_boot_state(const GB *gb, const char *path) {
+  FILE *f = fopen(path, "wb");
+  if (!f) return false;
+  size_t n = fwrite(gb, 1, sizeof *gb, f);
+  fclose(f);
+  return n == sizeof *gb;
+}
+
+bool oracles_load_boot_state(GB *gb, const char *path) {
+  FILE *f = fopen(path, "rb");
+  if (!f) return false;
+  GB keep = *gb;
+  size_t n = fread(gb, 1, sizeof *gb, f);
+  fclose(f);
+  if (n != sizeof *gb) { *gb = keep; return false; }
+  gb->rom = keep.rom; gb->rom_size = keep.rom_size;
+  gb->boot = NULL; gb->boot_size = 0; gb->boot_mapped = false;
+  gb->samples = keep.samples; gb->sample = &gb->samples[0];
+  gb->serial_out = keep.serial_out; gb->serial_ctx = keep.serial_ctx;
+  gb->input_at = keep.input_at; gb->input_ctx = keep.input_ctx;
+  gb->frame_cb = keep.frame_cb; gb->frame_ctx = keep.frame_ctx;
+  gb->hooks_checked = false;
+  return true;
+}

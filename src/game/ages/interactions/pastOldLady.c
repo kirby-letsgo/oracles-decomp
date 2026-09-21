@@ -111,5 +111,5 @@ subid1:
 
 run1:
   CALL_C(b_+67, interactionRunScript_hook, SYM(interactionRunScript), b_+70);
-  CYC(b_+70, b_+73); interactionAnimateAsNpc_hook(gb);
+  CYC(b_+70, b_+73); TAIL(interactionAnimateAsNpc);
 }

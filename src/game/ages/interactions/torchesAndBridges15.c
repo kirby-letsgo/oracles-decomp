@@ -60,7 +60,7 @@ void func_4f5d_hook(GB *gb) {
   CALL_C(b_+0, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+3);
   CYC(b_+3, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 7));
   CYC(b_+5, b_+7); A = 0x4d;
-  CYC(b_+7, b_+10); playSound_b00_hook(gb);
+  CYC(b_+7, b_+10); TAIL(playSound_b00);
 }
 
 void spawnBridge_hook(GB *gb) {
@@ -90,7 +90,7 @@ void mermaidsCave_spawnBridge_room38_hook(GB *gb) {
   CALL_C(b_+7, playSound_b00_hook, SYM(playSound_b00), b_+10);
   CYC(b_+10, b_+13); SET_BC(0x0800);
   CYC(b_+13, b_+15); E = 0x69;
-  CYC(b_+15, b_+18); spawnBridge_hook(gb);
+  CYC(b_+15, b_+18); TAIL(spawnBridge);
 }
 
 void herosCave_spawnBridge_roomc9_hook(GB *gb) {
@@ -102,14 +102,14 @@ void herosCave_spawnBridge_roomc9_hook(GB *gb) {
   CALL_C(b_+7, playSound_b00_hook, SYM(playSound_b00), b_+10);
   CYC(b_+10, b_+13); SET_BC(0x0803);
   CYC(b_+13, b_+15); E = 0x2a;
-  CYC(b_+15, b_+18); spawnBridge_hook(gb);
+  CYC(b_+15, b_+18); TAIL(spawnBridge);
 }
 
 void ancientTomb_startWallRetractionCutscene_hook(GB *gb) {
   BASE(ancientTomb_startWallRetractionCutscene);
   CYC(b_+0, b_+2); A = 0x0b;
   CYC(b_+2, b_+5); mem_wr(gb, wCutsceneTrigger, A);
-  CYC(b_+5, b_+8); resetLinkInvincibility_hook(gb);
+  CYC(b_+5, b_+8); TAIL(resetLinkInvincibility);
 }
 
 void moonlitGrotto_enableControlAfterBreakingCrystal_hook(GB *gb) {

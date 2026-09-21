@@ -131,5 +131,5 @@ counterDone:
   CYC(b_+107, b_+108);
   CYC(b_+108, b_+110); A = 0x08;
   CYC(b_+110, b_+113); mem_wr(gb, wTmpcbb5, A);
-  CYC(b_+113, b_+116); interactionDelete_hook(gb);
+  CYC(b_+113, b_+116); TAIL(interactionDelete);
 }

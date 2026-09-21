@@ -24,7 +24,7 @@ void setNextChildStage_hook(GB *gb) {
 void setc6e2Bit_hook(GB *gb) {
   BASE(setc6e2Bit);
   CYC(b_+0, b_+3); SET_HL(wc6e2);
-  CYC(b_+3, b_+6); setFlag_hook(gb);
+  CYC(b_+3, b_+6); TAIL(setFlag);
 }
 
 void checkc6e2BitSet_hook(GB *gb) {
@@ -100,5 +100,5 @@ reduceLoop:
 void blossom_openNameEntryMenu_hook(GB *gb) {
   BASE(blossom_openNameEntryMenu);
   CYC(b_+0, b_+2); A = 0x07;
-  CYC(b_+2, b_+5); openMenu_hook(gb);
+  CYC(b_+2, b_+5); TAIL(openMenu);
 }

@@ -17,11 +17,11 @@ void zelda_warpOutOfVireMinigame_hook(GB *gb) {
   CYC(b_+12, b_+14); A = 0x3c;
   CALL_C(b_+14, setGlobalFlag_hook, SYM(setGlobalFlag), b_+17);
   CYC(b_+17, b_+20); SET_HL(b_+23);
-  CYC(b_+20, b_+23); setWarpDestVariables_hook(gb);
+  CYC(b_+20, b_+23); TAIL(setWarpDestVariables);
 }
 
 void zelda_giveBlueJoyRing_hook(GB *gb) {
   BASE(zelda_giveBlueJoyRing);
   CYC(b_+0, b_+3); SET_BC(0x2500);
-  CYC(b_+3, b_+6); giveRingToLink_hook(gb);
+  CYC(b_+3, b_+6); TAIL(giveRingToLink);
 }

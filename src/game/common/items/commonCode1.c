@@ -120,7 +120,7 @@ void itemAnimate_hook(GB *gb) {
   }
   CYC(b_+4, b_+5);
   CYC(b_+5, b_+7); L = 0x22;
-  CYC(b_+7, b_+9); itemNextAnimationFrame_hook(gb);
+  CYC(b_+7, b_+9); TAIL(itemNextAnimationFrame);
 }
 
 void itemSetAnimation_hook(GB *gb) {
@@ -606,7 +606,7 @@ create_hole_animation:
 void objectCreateClinkInteraction_hook(GB *gb) {
   BASE(objectCreateClinkInteraction);
   CYC(b_+0, b_+2); B = 0x07;
-  CYC(b_+2, b_+5); objectCreateInteractionWithSubid00_hook(gb);
+  CYC(b_+2, b_+5); TAIL(objectCreateInteractionWithSubid00);
 }
 
 void cpRelatedObject1ID_hook(GB *gb) {

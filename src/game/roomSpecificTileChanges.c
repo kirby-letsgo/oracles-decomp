@@ -49,7 +49,7 @@ void applyRoomSpecificTileChanges_hook(GB *gb) {
   }
   CYC(b_+9, b_+10);
   CYC(b_+10, b_+11); push_effect(gb, b_+11);
-  hook_handoff(gb, room_tile_changes_jump_table(gb));
+  HANDOFF(room_tile_changes_jump_table(gb));
 }
 
 static void add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
@@ -125,7 +125,7 @@ fill_with_ice:
 fill_with_lava:
   CYC(b_+49, b_+52); W8(wTwinrovaTileReplacementMode) = A;
   CYC(b_+52, b_+54); A = 0xb8;
-  CYC(b_+54, b_+57); loadGfxHeader_hook(gb);
+  CYC(b_+54, b_+57); TAIL(loadGfxHeader);
 }
 
 void tileReplacement_group4Map1b_hook(GB *gb) {
@@ -181,7 +181,7 @@ void tileReplacement_group4Mapc9_hook(GB *gb) {
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+9); SET_HL(wRoomLayout + 0x27);
   CYC(b_+9, b_+11); A = 0x6d;
-  CYC(b_+11, b_+14); set4Bytes_hook(gb);
+  CYC(b_+11, b_+14); TAIL(set4Bytes);
 }
 
 void tileReplacement_group4Mapc7_hook(GB *gb) {
@@ -227,7 +227,7 @@ void tileReplacement_group4Map4c_hook(GB *gb) {
   CYC(b_+17, b_+18); mem_wr(gb, HL, A);
   CYC(b_+18, b_+20); L = 0x76;
   CYC(b_+20, b_+22); A = 0xf4;
-  CYC(b_+22, b_+25); set4Bytes_hook(gb);
+  CYC(b_+22, b_+25); TAIL(set4Bytes);
 }
 
 void tileReplacement_group4Map4e_hook(GB *gb) {
@@ -270,7 +270,7 @@ void tileReplacement_group4Map59_hook(GB *gb) {
   }
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+9); SET_DE(b_+12);
-  CYC(b_+9, b_+12); replaceTiles_hook(gb);
+  CYC(b_+9, b_+12); TAIL(replaceTiles);
 }
 
 void tileReplacement_group4Map60_hook(GB *gb) {
@@ -372,7 +372,7 @@ void tileReplacement_group0Map48_hook(GB *gb) {
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+9); SET_HL(wRoomLayout + 0x03);
   CYC(b_+9, b_+11); A = 0x3a;
-  CYC(b_+11, b_+14); set4Bytes_hook(gb);
+  CYC(b_+11, b_+14); TAIL(set4Bytes);
 }
 
 void tileReplacement_group5Map38_hook(GB *gb) {
@@ -403,7 +403,7 @@ void tileReplacement_group5Map25And43_common_hook(GB *gb) {
   CYC(b_+13, b_+16); SET_HL(b_+25);
   CALL_C(b_+16, fillRectInRoomLayout_hook, SYM(fillRectInRoomLayout), b_+19);
   CYC(b_+19, b_+22); SET_HL(b_+29);
-  CYC(b_+22, b_+25); fillRectInRoomLayout_hook(gb);
+  CYC(b_+22, b_+25); TAIL(fillRectInRoomLayout);
 }
 
 void tileReplacement_group5Map25_hook(GB *gb) {
@@ -456,7 +456,7 @@ void tileReplacement_group5Map95_hook(GB *gb) {
   CYC(b_+14, b_+17); SET_HL(b_+26);
   CALL_C(b_+17, fillRectInRoomLayout_hook, SYM(fillRectInRoomLayout), b_+20);
   CYC(b_+20, b_+23); SET_HL(b_+30);
-  CYC(b_+23, b_+26); fillRectInRoomLayout_hook(gb);
+  CYC(b_+23, b_+26); TAIL(fillRectInRoomLayout);
 }
 
 void tileReplacement_group5Map4c_hook(GB *gb) {
@@ -486,7 +486,7 @@ void tileReplacement_group5Map4d_hook(GB *gb) {
   }
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+9); SET_HL(b_+12);
-  CYC(b_+9, b_+12); fillRectInRoomLayout_hook(gb);
+  CYC(b_+9, b_+12); TAIL(fillRectInRoomLayout);
 }
 
 void tileReplacement_group5Map5c_hook(GB *gb) {
@@ -502,7 +502,7 @@ void tileReplacement_group5Map5c_hook(GB *gb) {
   }
   CYC(b_+10, b_+11);
   CYC(b_+11, b_+14); SET_DE(b_+17);
-  CYC(b_+14, b_+17); drawRectInRoomLayout_hook(gb);
+  CYC(b_+14, b_+17); TAIL(drawRectInRoomLayout);
 }
 
 void tileReplacement_group5Map5d_hook(GB *gb) {
@@ -518,7 +518,7 @@ void tileReplacement_group5Map5d_hook(GB *gb) {
   }
   CYC(b_+10, b_+11);
   CYC(b_+11, b_+14); SET_DE(b_+17);
-  CYC(b_+14, b_+17); drawRectInRoomLayout_hook(gb);
+  CYC(b_+14, b_+17); TAIL(drawRectInRoomLayout);
 }
 
 void tileReplacement_group7Map4a_hook(GB *gb) {
@@ -532,7 +532,7 @@ void tileReplacement_group7Map4a_hook(GB *gb) {
   }
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+9); SET_HL(b_+12);
-  CYC(b_+9, b_+12); fillRectInRoomLayout_hook(gb);
+  CYC(b_+9, b_+12); TAIL(fillRectInRoomLayout);
 }
 
 void tileReplacement_group0Map5c_hook(GB *gb) {
@@ -549,7 +549,7 @@ void tileReplacement_group0Map5c_hook(GB *gb) {
   CYC(b_+9, b_+11); A = 0x3a;
   CYC(b_+11, b_+12); mem_wr(gb, HL, A);
   CYC(b_+12, b_+14); L = 0x43;
-  CYC(b_+14, b_+17); set3Bytes_hook(gb);
+  CYC(b_+14, b_+17); TAIL(set3Bytes);
 }
 
 void tileReplacement_group0Map73_hook(GB *gb) {
@@ -607,7 +607,7 @@ void tileReplacement_group0Map2c_hook(GB *gb) {
   CYC(b_+6, b_+9);
   CYC(b_+9, b_+11); L = 0x06;
   CYC(b_+11, b_+14); SET_DE(b_+17);
-  CYC(b_+14, b_+17); replaceVineTiles_hook(gb);
+  CYC(b_+14, b_+17); TAIL(replaceVineTiles);
 }
 
 void tileReplacement_group0Map1c_hook(GB *gb) {
@@ -622,7 +622,7 @@ void tileReplacement_group0Map1c_hook(GB *gb) {
   CYC(b_+6, b_+7);
   CYC(b_+7, b_+9); L = 0x66;
   CYC(b_+9, b_+12); SET_DE(b_+15);
-  CYC(b_+12, b_+15); replaceVineTiles_hook(gb);
+  CYC(b_+12, b_+15); TAIL(replaceVineTiles);
 }
 
 void tileReplacement_group0Mapba_hook(GB *gb) {
@@ -655,7 +655,7 @@ void tileReplacement_group0Mapaa_hook(GB *gb) {
   CYC(b_+6, b_+7);
   CYC(b_+7, b_+9); L = 0x77;
   CYC(b_+9, b_+12); SET_DE(b_+15);
-  CYC(b_+12, b_+15); replaceVineTiles_hook(gb);
+  CYC(b_+12, b_+15); TAIL(replaceVineTiles);
 }
 
 void tileReplacement_group0Mapcc_hook(GB *gb) {
@@ -670,7 +670,7 @@ void tileReplacement_group0Mapcc_hook(GB *gb) {
   CYC(b_+6, b_+9);
   CYC(b_+9, b_+11); L = 0x00;
   CYC(b_+11, b_+14); SET_DE(b_+17);
-  CYC(b_+14, b_+17); replaceVineTiles_hook(gb);
+  CYC(b_+14, b_+17); TAIL(replaceVineTiles);
 }
 
 void tileReplacement_group0Mapbc_hook(GB *gb) {
@@ -685,7 +685,7 @@ void tileReplacement_group0Mapbc_hook(GB *gb) {
   CYC(b_+6, b_+7);
   CYC(b_+7, b_+9); L = 0x70;
   CYC(b_+9, b_+12); SET_DE(b_+15);
-  CYC(b_+12, b_+15); replaceVineTiles_hook(gb);
+  CYC(b_+12, b_+15); TAIL(replaceVineTiles);
 }
 
 void tileReplacement_group0Mapda_hook(GB *gb) {
@@ -700,7 +700,7 @@ void tileReplacement_group0Mapda_hook(GB *gb) {
   CYC(b_+6, b_+9);
   CYC(b_+9, b_+11); L = 0x07;
   CYC(b_+11, b_+14); SET_DE(b_+17);
-  CYC(b_+14, b_+17); replaceVineTiles_hook(gb);
+  CYC(b_+14, b_+17); TAIL(replaceVineTiles);
 }
 
 void tileReplacement_group0Mapca_hook(GB *gb) {
@@ -715,7 +715,7 @@ void tileReplacement_group0Mapca_hook(GB *gb) {
   CYC(b_+6, b_+7);
   CYC(b_+7, b_+9); L = 0x77;
   CYC(b_+9, b_+12); SET_DE(b_+15);
-  CYC(b_+12, b_+15); replaceVineTiles_hook(gb);
+  CYC(b_+12, b_+15); TAIL(replaceVineTiles);
 }
 
 void tileReplacement_group0Map61_hook(GB *gb) {
@@ -879,7 +879,7 @@ void initializeVinePositions_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(wGroup1RoomFlags + 0xf0);
   CYC(b_+3, b_+6); SET_DE(b_+11);
   CYC(b_+6, b_+8); B = 0x06;
-  CYC(b_+8, b_+11); copyMemoryReverse_hook(gb);
+  CYC(b_+8, b_+11); TAIL(copyMemoryReverse);
 }
 
 void tileReplacement_group0Map54_hook(GB *gb) {
@@ -1102,7 +1102,7 @@ void tileReplacement_group5Mape3_hook(GB *gb) {
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+9); SET_HL(wRoomLayout + 0x26);
   CYC(b_+9, b_+11); A = 0x6d;
-  CYC(b_+11, b_+13); set3Bytes_hook(gb);
+  CYC(b_+11, b_+13); TAIL(set3Bytes);
 }
 
 void tileReplacement_group2Map90_hook(GB *gb) {
@@ -1116,7 +1116,7 @@ void tileReplacement_group2Map90_hook(GB *gb) {
   }
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+9); SET_DE(b_+12);
-  CYC(b_+9, b_+12); drawRectInRoomLayout_hook(gb);
+  CYC(b_+9, b_+12); TAIL(drawRectInRoomLayout);
 }
 
 void tileReplacement_group1Map8c_hook(GB *gb) {
@@ -1160,7 +1160,7 @@ void tileReplacement_group2Map9e_hook(GB *gb) {
   CYC(b_+13, b_+15); A = 0x6d;
   CALL_C(b_+15, set3Bytes_hook, SYM(set3Bytes), b_+18);
   CYC(b_+18, b_+19); L = alu_inc8(gb, L);
-  CYC(b_+19, b_+22); set3Bytes_hook(gb);
+  CYC(b_+19, b_+22); TAIL(set3Bytes);
 }
 
 void tileReplacement_group0Mape0_hook(GB *gb) {
@@ -1213,7 +1213,7 @@ void tileReplacement_group0Mape1_hook(GB *gb) {
   }
   CYC(b_+15, b_+16);
   CYC(b_+16, b_+18); L = 0x53;
-  CYC(b_+18, b_+20); setTileToDoor_hook(gb);
+  CYC(b_+18, b_+20); TAIL(setTileToDoor);
 }
 
 void tileReplacement_group0Mape2_hook(GB *gb) {
@@ -1263,7 +1263,7 @@ void tileReplacement_group4Mapea_hook(GB *gb) {
   CYC(b_+33, b_+35); L = 0x53;
   CALL_C(b_+35, set3Bytes_hook, SYM(set3Bytes), b_+38);
   CYC(b_+38, b_+40); L = 0x59;
-  CYC(b_+40, b_+43); set3Bytes_hook(gb);
+  CYC(b_+40, b_+43); TAIL(set3Bytes);
 }
 
 void tileReplacement_group0Map98_hook(GB *gb) {

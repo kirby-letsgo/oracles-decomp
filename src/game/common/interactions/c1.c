@@ -35,7 +35,7 @@ void interactionCodec1__afterCall71ce_hook(GB *gb) {
   CYC(b_+28, b_+30); mem_wr(gb, HL, 0x15);
   CYC(b_+30, b_+32); L = 0x50;
   CYC(b_+32, b_+34); mem_wr(gb, HL, 0x78);
-  CYC(b_+34, b_+37); objectSetVisible82_hook(gb);
+  CYC(b_+34, b_+37); TAIL(objectSetVisible82);
 }
 
 void interactionCodec1__state0_hook(GB *gb) {
@@ -61,7 +61,7 @@ void interactionCodec1__updateSparkles_hook(GB *gb) {
   CYC(b_+115, b_+116);
   CYC(b_+116, b_+118); mem_wr(gb, HL, 6);
   CYC(b_+118, b_+121); SET_BC(GV(0x8409, 0x8405));
-  CYC(b_+121, b_+124); objectCreateInteraction_hook(gb);
+  CYC(b_+121, b_+124); TAIL(objectCreateInteraction);
 }
 
 void interactionCodec1__updateMovementAndSparkles_hook(GB *gb) {
@@ -69,7 +69,7 @@ void interactionCodec1__updateMovementAndSparkles_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+90, interactionCodec1__updateSparkles_hook, b_+111, b_+93);
   CALL_C(b_+93, objectApplySpeed_hook, SYM(objectApplySpeed), b_+96);
-  CYC(b_+96, b_+99); interactionDecCounter1_hook(gb);
+  CYC(b_+96, b_+99); TAIL(interactionDecCounter1);
 }
 
 void interactionCodec1__substate0_hook(GB *gb) {
@@ -82,7 +82,7 @@ void interactionCodec1__substate0_hook(GB *gb) {
   CYC(b_+53, b_+54);
   CYC(b_+54, b_+56); L = 0x46;
   CYC(b_+56, b_+58); mem_wr(gb, HL, 0x28);
-  CYC(b_+58, b_+61); interactionIncSubstate_hook(gb);
+  CYC(b_+58, b_+61); TAIL(interactionIncSubstate);
 }
 
 void interactionCodec1__substate1_hook(GB *gb) {
@@ -93,7 +93,7 @@ void interactionCodec1__substate1_hook(GB *gb) {
   CYC(b_+64, b_+66);
   CYC(b_+66, b_+68); L = 0x60;
   CYC(b_+68, b_+70); mem_wr(gb, HL, 1);
-  CYC(b_+70, b_+73); interactionIncSubstate_hook(gb);
+  CYC(b_+70, b_+73); TAIL(interactionIncSubstate);
 }
 
 void interactionCodec1__substate2_hook(GB *gb) {
@@ -130,7 +130,7 @@ void interactionCodec1__func_7224_hook(GB *gb) {
   CYC(b_+103, b_+105); alu_and(gb, 1);
   if (F & FZ) { CYCT(b_+105, b_+108); objectSetInvisible_hook(gb); return; }
   CYC(b_+105, b_+108);
-  CYC(b_+108, b_+111); objectSetVisible_hook(gb);
+  CYC(b_+108, b_+111); TAIL(objectSetVisible);
 }
 
 void interactionCodec1_hook(GB *gb) {

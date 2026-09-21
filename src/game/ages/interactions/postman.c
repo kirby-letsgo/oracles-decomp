@@ -51,5 +51,5 @@ void interactionCode55_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+18, b_+21); npcFaceLinkAndAnimate_hook(gb); return; }
   CYC(b_+18, b_+21);
   CALL_C(b_+21, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+24);
-  CYC(b_+24, b_+27); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
+  CYC(b_+24, b_+27); TAIL(objectSetPriorityRelativeToLink_withTerrainEffects);
 }

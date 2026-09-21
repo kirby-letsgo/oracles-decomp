@@ -98,7 +98,7 @@ state1:
   if (F & FC) { CYCT(b_+51, b_+54); interactionDelete_hook(gb); return; }
   CYC(b_+51, b_+54);
   CALL_C(b_+54, interactionAnimate_hook, SYM(interactionAnimate), b_+57);
-  CYC(b_+57, b_+60); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
+  CYC(b_+57, b_+60); TAIL(objectSetPriorityRelativeToLink_withTerrainEffects);
 }
 
 void dog_subid01_hook(GB *gb) {
@@ -227,7 +227,7 @@ minor2:
   CYC(b_+193, b_+196); SET_HL(b_+204);
   CALL_C(b_+196, setWarpDestVariables_hook, SYM(setWarpDestVariables), b_+199);
   CYC(b_+199, b_+201); A = 0x8d;
-  CYC(b_+201, b_+204); playSound_b00_hook(gb);
+  CYC(b_+201, b_+204); TAIL(playSound_b00);
 }
 
 void dog_initGraphicsLoadScriptAndIncState_hook(GB *gb) {
@@ -243,7 +243,7 @@ void dog_initGraphicsLoadScriptAndIncState_hook(GB *gb) {
   CYC(b_+14, b_+15); H = mem_rd(gb, HL);
   CYC(b_+15, b_+16); L = A;
   CALL_C(b_+16, interactionSetScript_hook, SYM(interactionSetScript), b_+19);
-  CYC(b_+19, b_+22); interactionIncState_hook(gb);
+  CYC(b_+19, b_+22); TAIL(interactionIncState);
 }
 
 void dog_moveTowardTargetPosition_hook(GB *gb) {
@@ -268,7 +268,7 @@ void dog_moveTowardTargetPosition_hook(GB *gb) {
   CALL_C(b_+19, objectGetRelativeAngle_hook, SYM(objectGetRelativeAngle), b_+22);
   CYC(b_+22, b_+24); E = INTERACTION_BASE + OBJ_ANGLE;
   CYC(b_+24, b_+25); mem_wr(gb, DE, A);
-  CYC(b_+25, b_+28); objectApplySpeed_hook(gb);
+  CYC(b_+25, b_+28); TAIL(objectApplySpeed);
 }
 
 void dog_checkCloseToTargetPosition_hook(GB *gb) {
@@ -306,7 +306,7 @@ void dog_updateDirection_hook(GB *gb) {
   CYC(b_+13, b_+14);
   CYC(b_+14, b_+15); mem_wr(gb, HL, A);
   CYC(b_+15, b_+17); alu_add(gb, 2);
-  CYC(b_+17, b_+20); interactionSetAnimation_hook(gb);
+  CYC(b_+17, b_+20); TAIL(interactionSetAnimation);
 }
 
 void dog_incTargetPositionIndex_hook(GB *gb) {

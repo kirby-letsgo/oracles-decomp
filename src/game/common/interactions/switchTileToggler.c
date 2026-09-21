@@ -83,5 +83,5 @@ afterTileOffset:
   CYC(b_+44, b_+45); A = mem_rd(gb, DE);
   CYC(b_+45, b_+46); C = A;
   CYC(b_+46, b_+47); A = mem_rd(gb, HL);
-  CYC(b_+47, b_+50); setTile_hook(gb); // jp
+  CYC(b_+47, b_+50); TAIL(setTile);// jp
 }

@@ -143,7 +143,7 @@ void goronDance_updateFrameCounter_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
   CYC(b_+4, b_+5);
   CYC(b_+5, b_+8); SET_HL(wTmpcfc0_goronDance_frameCounter);
-  CYC(b_+8, b_+11); incHlRef16WithCap_hook(gb);
+  CYC(b_+8, b_+11); TAIL(incHlRef16WithCap);
 }
 
 void goronDance_initNextRound_hook(GB *gb) {
@@ -260,7 +260,7 @@ void goronDance_playMoveSound_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+11, b_+13); A = 0xcd; CYC(b_+18, b_+23); playSound_b00_hook(gb); return; }
   CYC(b_+11, b_+13);
   CYC(b_+13, b_+15); A = 0xc8;
-  CYC(b_+15, b_+18); playSound_b00_hook(gb);
+  CYC(b_+15, b_+18); TAIL(playSound_b00);
 }
 
 void goronDance_incBeat_hook(GB *gb) {
@@ -560,7 +560,7 @@ landed:
   CALL_C(b_+72, objectCopyPosition_hook, SYM(objectCopyPosition), b_+75);
   CYC(b_+75, b_+76); alu_xor(gb, A);
   CYC(b_+76, b_+79); W8(wTmpcfc0_goronDance_linkJumping) = A;
-  CYC(b_+79, b_+82); interactionDelete_hook(gb);
+  CYC(b_+79, b_+82); TAIL(interactionDelete);
 }
 
 static void goron_run_script_and_delete(GB *gb, uint16_t sp0_) {
@@ -603,7 +603,7 @@ void goronSubid05__afterCall7823_hook(GB *gb) {
   BASE(goronSubid05);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+8, interactionRunScript_hook, SYM(interactionRunScript), b_+11);
-  CYC(b_+11, b_+13); goron_runScriptAndDeleteWhenFinished_hook(gb);
+  CYC(b_+11, b_+13); TAIL(goron_runScriptAndDeleteWhenFinished);
 }
 
 void goronSubid06_hook(GB *gb) {
@@ -634,7 +634,7 @@ clear:
   CALL_C(b_+28, clearMemory_hook, SYM(clearMemory), b_+31);
 run:
   CALL_C(b_+31, interactionRunScript_hook, SYM(interactionRunScript), b_+34);
-  CYC(b_+34, b_+36); goron_runScriptAndDeleteWhenFinished_hook(gb);
+  CYC(b_+34, b_+36); TAIL(goron_runScriptAndDeleteWhenFinished);
 }
 
 void goronSubid07_hook(GB *gb) {
@@ -771,7 +771,7 @@ void goron_initGraphicsAndIncState__afterCall7d75_hook(GB *gb) {
   BASE(goron_initGraphicsAndIncState);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(b_+3, b_+6); interactionIncState_hook(gb);
+  CYC(b_+3, b_+6); TAIL(interactionIncState);
 }
 
 void goron_loadScriptAndInitGraphics_hook(GB *gb) {
@@ -785,7 +785,7 @@ void goron_loadScriptAndInitGraphics__afterCall7d7b_hook(GB *gb) {
   BASE(goron_loadScriptAndInitGraphics);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(b_+3, b_+5); goron_loadScript_hook(gb);
+  CYC(b_+3, b_+5); TAIL(goron_loadScript);
 }
 
 void goron_loadScriptFromTableAndInitGraphics_hook(GB *gb) {
@@ -799,14 +799,14 @@ void goron_loadScriptFromTableAndInitGraphics__afterCall7d80_hook(GB *gb) {
   BASE(goron_loadScriptFromTableAndInitGraphics);
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
-  CYC(b_+3, b_+5); goron_loadScriptFromTable_hook(gb);
+  CYC(b_+3, b_+5); TAIL(goron_loadScriptFromTable);
 }
 
 void goron_initGraphics_hook(GB *gb) {
   BASE(goron_initGraphics);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionLoadExtraGraphics_hook, SYM(interactionLoadExtraGraphics), b_+3);
-  CYC(b_+3, b_+6); interactionInitGraphics_hook(gb);
+  CYC(b_+3, b_+6); TAIL(interactionInitGraphics);
 }
 
 void goron_loadScript_hook(GB *gb) {
@@ -820,7 +820,7 @@ void goron_loadScript_hook(GB *gb) {
   CYC(b_+8, b_+9); H = mem_rd(gb, HL);
   CYC(b_+9, b_+10); L = A;
   CALL_C(b_+10, interactionSetScript_hook, SYM(interactionSetScript), b_+13);
-  CYC(b_+13, b_+16); interactionIncState_hook(gb);
+  CYC(b_+13, b_+16); TAIL(interactionIncState);
 }
 
 void goron_loadScriptFromTable_hook(GB *gb) {
@@ -840,7 +840,7 @@ void goron_loadScriptFromTable_hook(GB *gb) {
   CYC(b_+14, b_+15); H = mem_rd(gb, HL);
   CYC(b_+15, b_+16); L = A;
   CALL_C(b_+16, interactionSetScript_hook, SYM(interactionSetScript), b_+19);
-  CYC(b_+19, b_+22); interactionIncState_hook(gb);
+  CYC(b_+19, b_+22); TAIL(interactionIncState);
 }
 
 static void goron_subid01_face_down(GB *gb, uint16_t sp0_) {

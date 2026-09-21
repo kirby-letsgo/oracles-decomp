@@ -237,7 +237,7 @@ void func_410d_hook(GB *gb) {
     else if (jt_ == b_+57) { goto moosh; }
     else if (jt_ == b_+155) { goto minecart; }
     else if (jt_ == b_+196) { goto raft; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 invalid:
   CYC(b_+33, b_+34); ret_effect(gb); return;

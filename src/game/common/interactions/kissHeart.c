@@ -26,7 +26,7 @@ static uint16_t kiss_heart_jump_table(GB *gb) {
 
 void interactionCodeb7__afterCall48b5_hook(GB *gb) {
   BASE(interactionCodeb7);
-  CYC(b_+14, b_+17); objectSetVisible82_hook(gb);
+  CYC(b_+14, b_+17); TAIL(objectSetVisible82);
 }
 
 void interactionCodeb7_hook(GB *gb) {

@@ -177,7 +177,7 @@ not_underwater:
   CYC(b_+87, b_+89); alu_add(gb, 0x04);
 
 set_animation:
-  CYC(b_+89, b_+92); specialObjectSetAnimationWithLinkData_hook(gb);
+  CYC(b_+89, b_+92); TAIL(specialObjectSetAnimationWithLinkData);
 }
 
 void itemCreateChildIfDoesntExistAlready_hook(GB *gb) {
@@ -194,7 +194,7 @@ void itemCreateChildAndDeleteOnFailure_hook(GB *gb) {
     CYCT(b_+3, b_+4); ret_effect(gb); return;
   }
   CYC(b_+3, b_+4);
-  CYC(b_+4, b_+7); clearParentItem_hook(gb);
+  CYC(b_+4, b_+7); TAIL(clearParentItem);
 }
 
 void itemCreateChild_hook(GB *gb) {
@@ -470,7 +470,7 @@ cant_use_sword:
   CYC(b_+30, b_+31); SET_AF(pop_effect(gb));
   CYC(b_+31, b_+32); alu_xor(gb, A);
   CYC(b_+32, b_+35); W8(wcc63) = A;
-  CYC(b_+35, b_+38); clearParentItem_hook(gb);
+  CYC(b_+35, b_+38); TAIL(clearParentItem);
 }
 
 void checkLinkOnGround_hook(GB *gb) {
@@ -488,7 +488,7 @@ void checkLinkOnGround_hook(GB *gb) {
     CYCT(b_+11, b_+12); ret_effect(gb); return;
   }
   CYC(b_+11, b_+12);
-  CYC(b_+12, b_+14); isLinkUnderwater_hook(gb);
+  CYC(b_+12, b_+14); TAIL(isLinkUnderwater);
 }
 
 void isLinkUnderwater_hook(GB *gb) {

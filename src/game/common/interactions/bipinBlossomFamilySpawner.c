@@ -293,5 +293,5 @@ void interactionCodeac_hook(GB *gb) {
   CALL_C(b_+14, spawnBipinBlossomFamilyObjects_hook, SYM(spawnBipinBlossomFamilyObjects), b_+17);
   CYC(b_+17, b_+20); SET_HL(wSeedTreeRefilledBitset);
   CYC(b_+20, b_+22); mem_wr(gb, HL, mem_rd(gb, HL) & ~0x02);
-  CYC(b_+22, b_+25); interactionDelete_hook(gb);
+  CYC(b_+22, b_+25); TAIL(interactionDelete);
 }
