@@ -88,4 +88,26 @@ def pair_instances(ages_rom, ages_sym, seasons_rom, seasons_sym):
             cand = [s for s in sinst if s[0] == sb] if sb is not None else []
             if not cand and len(sinst) == len(ainst): cand = [sinst[ainst.index(a)]]
             if cand: pairs[(name,) + a] = cand[0]
+    # unnamed code (`_label_XX_N`, `label_XX_N`: numbered per game, so never by name): paired
+    # through the references of paired routines whose bodies have the same shape
+    votes = {}
+    for (name, ab, aa), (sb, sa) in list(pairs.items()):
+        if '@' in name or UNNAMED.match(name): continue
+        try: ba, bs = A.body(ab, aa), S.body(sb, sa)
+        except Exception: continue
+        if len(ba) != len(bs): continue
+        for (xa, la, ka, ta, oa), (xs, ls, ks, ts, os_) in zip(ba, bs):
+            if ta != ts or len(oa) != len(os_): continue
+            for (k1, v1), (k2, v2) in zip(oa, os_):
+                if k1 != 'rom' or v1 >= 0x8000 or v2 >= 0x8000: continue
+                tba, tbs = (0 if v1 < 0x4000 else ab), (0 if v2 < 0x4000 else sb)
+                na, ns = A.by_addr.get((tba, v1)), S.by_addr.get((tbs, v2))
+                if na and ns and UNNAMED.match(na) and UNNAMED.match(ns):
+                    votes.setdefault((na, tba, v1), {}).setdefault((tbs, v2), 0)
+                    votes[(na, tba, v1)][(tbs, v2)] += 1
+    for key, cands in votes.items():
+        if len(cands) == 1 and key not in pairs: pairs[key] = next(iter(cands))
     return pairs
+
+
+UNNAMED = re.compile(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)$')

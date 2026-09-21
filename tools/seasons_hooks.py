@@ -104,7 +104,8 @@ def main():
 
     def label_verdict(sid):
         name = re.sub(r'_b[0-9a-f]{2}$', '', sid).replace('__', '@')
-        if unpairable.match(name) or name not in seasons_names: return 'AGES_ONLY'
+        if unpairable.match(name): return local_verdict(name) if name in ages_labels else 'AGES_ONLY'
+        if name not in seasons_names: return 'AGES_ONLY'
         if name in verdict: return verdict[name]
         if '@' in name and name in ages_labels: return local_verdict(name)
         return verdict.get(name.split('@')[0])
@@ -124,18 +125,21 @@ def main():
             except Exception: return False
         return bool(ages_labels.get(base))
 
-    eligible = {}
+    real_hooks = set(l.split()[1] for l in open('src/hooks/generated.txt') if len(l.split()) >= 2)
+    eligible, why = {}, {}
     for key, fn in ((k, k[1]) for k in callees):
-        ok = hook_verdict(fn) == 'IDENTICAL' if fn.endswith('_hook') else True
+        # a hook entry needs its routine identical; a helper (even one named *_hook) is judged by what it burns
+        ok = hook_verdict(fn) == 'IDENTICAL' if fn in real_hooks else True
+        if not ok: why[key] = f'routine {hook_verdict(fn)}'
         for lab in burns[key]:
             v = label_verdict(lab)
-            if v is not None and v != 'IDENTICAL': ok = False
+            if v is not None and v != 'IDENTICAL': ok = False; why.setdefault(key, f'burns {lab} ({v})')
         for lab in tails[key]:
-            if label_verdict(lab) == 'AGES_ONLY': ok = False
+            if label_verdict(lab) == 'AGES_ONLY': ok = False; why.setdefault(key, f'TAIL({lab}) has no Seasons address')
         base_labels = [l for l in burns[key] if l in ages_labels]
         for lab, off in local_calls[key]:
             base = lab or (base_labels[0] if len(base_labels) == 1 else None)
-            if base is None or not local_call_ok(base, off): ok = False
+            if base is None or not local_call_ok(base, off): ok = False; why.setdefault(key, f'CALL_L target at {base}+{off} differs')
         eligible[key] = ok
     changed = True
     while changed:
@@ -149,7 +153,21 @@ def main():
                     ok = any(eligible.get((p, c), False) for p in by_name.get(c, [])) if by_name.get(c) else False
                 else: ok = True   # engine/core helpers (mem_rd, alu_*, push_effect...) are game-neutral
                 if not ok:
-                    eligible[key] = False; changed = True; break
+                    eligible[key] = False; changed = True; why[key] = f'calls {c}'; break
+    if '--why' in sys.argv:
+        # identical routines that are still out, with the reason (a callee's own reason is chased)
+        def root(key, seen=()):
+            r = why.get(key, '?')
+            m = re.match(r'calls (\w+)', r)
+            if m and key not in seen:
+                for p in by_name.get(m.group(1), []) or [key[0]]:
+                    k2 = (p, m.group(1))
+                    if k2 in why: return f'{r} <- ' + root(k2, seen + (key,))
+            return r
+        for key in sorted(callees):
+            fn = key[1]
+            if fn.endswith('_hook') and not eligible[key] and hook_verdict(fn) == 'IDENTICAL':
+                print(f'{fn}: {root(key)}')
 
     ages, seasons = ages_labels, rom_labels(seasons_sym)
     rows, skipped = [], defaultdict(int)
@@ -166,7 +184,7 @@ def main():
         if not name: skipped['no label'] += 1; continue
         name = name[0]
         parent = name.split('@')[0]
-        s = None if unpairable.match(parent) else pairs.get((name, bank, addr))
+        s = pairs.get((name, bank, addr))
         if s is None: skipped['no seasons label'] += 1; continue
         rows.append((s[0], s[1], fn, flags))
     rows.sort()

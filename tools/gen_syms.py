@@ -30,7 +30,7 @@ for line in open('src/hooks/syms_used.txt'):
         continue
     bank, addr = int(ba[:2], 16), int(ba[3:], 16)
     parent = name.split('@')[0]
-    s = None if re.match(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)', parent) else pairs.get((name, bank, addr))
+    s = pairs.get((name, bank, addr))     # unnamed code pairs only through references (symfiles.pair_instances)
     if s is None: missing.append(sid)
     rows.append((sid, (bank << 16) | addr, POISON if s is None else (s[0] << 16) | s[1]))
 

@@ -201,8 +201,10 @@ class Game:
         return out, shape
 
 
-def reconcile(an, sn, ages, seasons):
-    """Resolve `$xxxx` operands on either side through the other side's label (Game.peer_sym)."""
+def reconcile(an, sn, ages, seasons, unnamed_pairs=None):
+    """Resolve `$xxxx` operands on either side through the other side's label (Game.peer_sym), and
+    unnamed labels (`_label_XX_N`) through the pairs symfiles inferred from references."""
+    unnamed_pairs = unnamed_pairs or {}
     out_a, out_s = [], []
     for (oa, ta), (os_, ts) in zip(an, sn):
         if ta != ts:
@@ -214,6 +216,7 @@ def reconcile(an, sn, ages, seasons):
                     if len(xa) == len(xs):
                         xa = [ages.peer_sym(x, y) for x, y in zip(xa, xs)]
                         xs = [seasons.peer_sym(y, x) for x, y in zip(xa, xs)]
+                        xs = [x if unnamed_pairs.get(x.split('+')[0]) == y.split('+')[0] and x.split('+')[1:] == y.split('+')[1:] else y for x, y in zip(xa, xs)]
                         wa[i], ws[i] = ','.join(xa), ','.join(xs)
                 ta, ts = ' '.join(wa), ' '.join(ws)
         out_a.append((oa, ta)); out_s.append((os_, ts))
@@ -229,6 +232,11 @@ def main():
     if '--by-file' in args:
         by_file = True; args.remove('--by-file')
     ages, seasons = Game(args[0], args[1]), Game(args[2], args[3])
+    from symfiles import pair_instances, UNNAMED
+    pairs = pair_instances(args[0], args[1], args[2], args[3])
+    unnamed_pairs = {}      # ages unnamed label -> seasons unnamed label, for reconcile()
+    for (n, b, a), (sb, sa) in pairs.items():
+        if UNNAMED.match(n) and (sb, sa) in seasons.by_addr: unnamed_pairs[n] = seasons.by_addr[(sb, sa)]
     if '--diff' in args:
         n = args[args.index('--diff') + 1].replace('__', '@')
         for g, label in ((ages, 'ages'), (seasons, 'seasons')):
@@ -252,7 +260,8 @@ def main():
             if bare in ages.labels: insts = [ages.labels[bare]]
         if not insts: continue
         s_insts = seasons.instances.get(bare) or ([seasons.labels[bare]] if bare in seasons.labels else None)
-        if re.match(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)', bare.split('@')[0]): s_insts = None
+        if re.match(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)', bare.split('@')[0]):
+            s_insts = [pairs[(bare,) + a] for a in insts if (bare,) + a in pairs] or None
         if not s_insts:
             results[n] = ('AGES_ONLY', '', 0)
             continue
@@ -262,7 +271,7 @@ def main():
             best = None
             for (sb, sa) in s_insts:
                 sn, ssh = seasons.normalized(sb, sa)
-                if an != sn and ash == ssh: an, sn = reconcile(an, sn, ages, seasons)
+                if an != sn and ash == ssh: an, sn = reconcile(an, sn, ages, seasons, unnamed_pairs)
                 if an == sn: best = ('IDENTICAL', f'{sb:02x}:{sa:04x}'); break
                 if ash == ssh:
                     diffs = sum(1 for x, y in zip(an, sn) if x != y)

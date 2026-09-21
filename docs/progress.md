@@ -448,6 +448,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-21 (later): Seasons hooks 3,212 to 3,429. `tools/seasons_hooks.py --why` prints, for
+  every identical routine still out, the chain of reasons (`calls x <- burns y (DIFFERENT)`).
+  Two classes fixed: a static helper named `*_hook` (`special_object_set_animation_hook`) has no
+  routine of its own and is now judged by what it burns instead of failing outright (+126); the
+  unnamed code labels (`_label_XX_N`, `label_XX_N`, numbered per game so never pairable by name)
+  are paired through the references of paired routines with the same shape
+  (`symfiles.pair_instances`, 39 pairs: `showText`'s `_label_00_203` body among them), and
+  `routine_equiv` treats such a pair as the same name (+40 IDENTICAL, `gen_syms` fills their
+  Seasons addresses). Gates as before, all green.
+
 - 2026-09-21: Seasons hooks 3,002 to 3,212 and the SAME_SHAPE list closed (313 of 315 resolved;
   `cutscene11` calls routines that only Seasons names, `func_39_400c` is garbage code).
   `routine_equiv` resolves a bank-0 routine's cross-bank references through the bank it switched
