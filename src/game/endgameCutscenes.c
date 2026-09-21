@@ -1142,14 +1142,14 @@ void endgameCutsceneHandler_0a__state2_hook(GB *gb) {
   BASE(endgameCutsceneHandler_0a);
   CYC(b_+453, b_+456); SET_HL((SYM(wallRetraction_dungeon8__cbb3_01) + 45));
   CYC(b_+456, b_+458); E = 0x10;
-  CYC(b_+458, b_+461); interBankCall_hook(gb);
+  CYC(b_+458, b_+461); TAIL(interBankCall);
 }
 
 void endgameCutsceneHandler_0a__state3_hook(GB *gb) {
   BASE(endgameCutsceneHandler_0a);
   CYC(b_+461, b_+464); SET_HL((SYM(func_03_7244__state0) + 72));
   CYC(b_+464, b_+466); E = 0x10;
-  CYC(b_+466, b_+469); interBankCall_hook(gb);
+  CYC(b_+466, b_+469); TAIL(interBankCall);
 }
 
 void endgameCutsceneHandler_09_stage0__updateExplosionSoundsAndScreenShake_hook(GB *gb) {

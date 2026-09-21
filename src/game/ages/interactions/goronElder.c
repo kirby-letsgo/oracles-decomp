@@ -72,7 +72,7 @@ subid2:
   CYC(b_+39, b_+42);
   CYC(b_+42, b_+45); SET_HL((SYM(interaction6e_subid02__state1) + 12)); // agesInteractionsBank08.shootingGalleryNpc
   CYC(b_+45, b_+47); E = 0x08;
-  CYC(b_+47, b_+50); interBankCall_hook(gb); return; // jp
+  CYC(b_+47, b_+50); TAIL(interBankCall); // jp
 
 // interactionCode8b@loadScriptAndInitGraphics
 loadScriptAndInitGraphics:

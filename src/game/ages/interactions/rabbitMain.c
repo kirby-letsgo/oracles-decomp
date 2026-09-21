@@ -333,8 +333,7 @@ static void rabbit_subid3_substate1(GB *gb, uint16_t sp0_) {
     CYC(b_+36, b_+39); SET_HL((SYM(tuniNut_state0) + 2));
     CYC(b_+39, b_+41); E = 0x08;
     CYC(b_+41, b_+44);
-    interBankCall_hook(gb);
-    return;
+    TAIL(interBankCall);
   }
   CYCT(b_+34, b_+36);
   CALL_C(b_+44, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+47);
@@ -433,7 +432,7 @@ static void rabbit_subid4_substate0(GB *gb, uint16_t sp0_) {
   }
   CYC(b_+39, b_+40);
   CYC(b_+40, b_+43);
-  interactionIncSubstate_hook(gb);
+  TAIL(interactionIncSubstate);
 }
 
 static void rabbit_subid4_substate1(GB *gb, uint16_t sp0_) {
@@ -448,7 +447,7 @@ static void rabbit_subid4_substate1(GB *gb, uint16_t sp0_) {
   CYC(b_+49, b_+50); H = D;
   CYC(b_+50, b_+52); L = 0x45;
   CYC(b_+52, b_+53); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  rabbitJump_hook(gb);
+  TAIL(rabbitJump);
 }
 
 static void rabbit_subid5_ret(GB *gb) {
@@ -577,7 +576,7 @@ static void rabbit_subid5_substate0(GB *gb, uint16_t sp0_) {
   CALL_C(b_+76, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+79);
   CYC(b_+79, b_+81); A = 0xc1;
   CYC(b_+81, b_+84);
-  playSound_b00_hook(gb);
+  TAIL(playSound_b00);
 }
 
 static void rabbit_subid5_substate4(GB *gb, uint16_t sp0_) {

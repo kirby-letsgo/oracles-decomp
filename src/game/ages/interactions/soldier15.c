@@ -64,7 +64,7 @@ void soldierUpdateMinimap_hook(GB *gb) {
   (void)sp0_;
   CYC(b_+0, b_+3); SET_HL((SYM(ghostVeranApplySpeedUntilVar38Zero) + 10)); // bank1.checkUpdateDungeonMinimap
   CYC(b_+3, b_+5); E = 0x01; // target bank
-  CYC(b_+5, b_+8); interBankCall_hook(gb); return; // jp
+  CYC(b_+5, b_+8); TAIL(interBankCall); // jp
 }
 
 static void soldier15_addAToHl_from_rst(GB *gb, uint16_t return_address) {

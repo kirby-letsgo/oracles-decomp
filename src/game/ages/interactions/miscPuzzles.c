@@ -210,7 +210,7 @@ state3:
   CYC(b_+100, b_+103); W8(wActiveTriggers) = A;
   CYC(b_+103, b_+106); SET_HL((SYM(interaction6b_subid05__substate1) + 32)); // agesInteractionsBank08.spawnChestAndDeleteSelf
   CYC(b_+106, b_+108); E = 0x08; // bank of agesInteractionsBank08
-  CYC(b_+108, b_+111); interBankCall_hook(gb); return; // jp
+  CYC(b_+108, b_+111); TAIL(interBankCall); // jp
 
 alreadyOpened:
   CYC(b_+111, b_+113); A = 0x01;
@@ -230,7 +230,7 @@ void miscPuzzles_subid01_hook(GB *gb) {
   CYC(b_+12, b_+13);
   CYC(b_+13, b_+16); SET_HL((SYM(interaction6b_subid05__substate1) + 32)); // agesInteractionsBank08.spawnChestAndDeleteSelf
   CYC(b_+16, b_+18); E = 0x08; // bank of agesInteractionsBank08
-  CYC(b_+18, b_+21); interBankCall_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(interBankCall); // jp
 }
 
 // Spot to put a rolling colored block on in present d6
@@ -273,7 +273,7 @@ void miscPuzzles_subid03_hook(GB *gb) {
   CYC(b_+12, b_+13);
   CYC(b_+13, b_+16); SET_HL((SYM(interaction6b_subid05__substate1) + 32)); // agesInteractionsBank08.spawnChestAndDeleteSelf
   CYC(b_+16, b_+18); E = 0x08; // bank of agesInteractionsBank08
-  CYC(b_+18, b_+21); interBankCall_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(interBankCall); // jp
 }
 
 // @param hl Pointer to data. First byte is a tile index; then an arbitrary
@@ -1297,7 +1297,7 @@ void miscPuzzles_subid1a_hook(GB *gb) {
   CYC(b_+12, b_+13);
   CYC(b_+13, b_+16); SET_HL((SYM(interaction6b_subid05__substate1) + 32)); // agesInteractionsBank08.spawnChestAndDeleteSelf
   CYC(b_+16, b_+18); E = 0x08;
-  CYC(b_+18, b_+21); interBankCall_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(interBankCall); // jp
 }
 
 // Subids $1b-$1d: Spawn gasha seeds at the top of the maku tree at specific times.

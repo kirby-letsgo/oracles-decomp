@@ -133,5 +133,5 @@ void faroreGenerateGameTransferSecret_hook(GB *gb) {
   BASE(faroreGenerateGameTransferSecret);
   CYC(b_+0, b_+3); SET_HL(0x481b);
   CYC(b_+3, b_+5); E = 0x03;
-  CYC(b_+5, b_+8); interBankCall_hook(gb);
+  CYC(b_+5, b_+8); TAIL(interBankCall);
 }

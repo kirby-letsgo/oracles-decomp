@@ -37,7 +37,7 @@ void oscillateXRandomly_hook(GB *gb) {
   (void)sp0_;
   CYC(b_+0, b_+3); SET_HL((SYM(oldManScript_givesShieldUpgrade__validSecret_b15) + 16)); // agesInteractionsBank08.interactionOscillateXRandomly
   CYC(b_+3, b_+5); E = 0x08; // target bank
-  CYC(b_+5, b_+8); interBankCall_hook(gb); return; // jp
+  CYC(b_+5, b_+8); TAIL(interBankCall); // jp
 }
 
 // Forces the next animation frame to be loaded; does something with var38 and cfd3.

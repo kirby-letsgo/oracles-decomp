@@ -372,5 +372,5 @@ saveRaftPosition:
   CYC(b_+346, b_+347); mem_wr(gb, BC, A);
   CYC(b_+347, b_+350); SET_HL((SYM(linkUpdateDamageToApplyForRings) + 20));
   CYC(b_+350, b_+352); E = 0x05;
-  CYC(b_+352, b_+355); interBankCall_hook(gb);
+  CYC(b_+352, b_+355); TAIL(interBankCall);
 }

@@ -17,7 +17,7 @@ void cutscene06_hook(GB *gb) {
   CYC(b_+5, b_+8); SET_HL((SYM(checkLinkCanStandOnTile) + 29));
   CYC(b_+8, b_+10); E = 0x03;
   CYC(b_+10, b_+13);
-  interBankCall_hook(gb);
+  TAIL(interBankCall);
 }
 
 void cutscene07_hook(GB *gb) {
@@ -38,7 +38,7 @@ void func_5d5d_hook(GB *gb) {
   CYC(b_+7, b_+10); SET_HL((SYM(checkLinkCanStandOnTile) + 29));
   CYC(b_+10, b_+12); E = 0x03;
   CYC(b_+12, b_+15);
-  interBankCall_hook(gb);
+  TAIL(interBankCall);
 }
 
 void cutscene08_hook(GB *gb) {
@@ -121,7 +121,7 @@ void cutscene0d_hook(GB *gb) {
   CYC(b_+5, b_+8); SET_HL((SYM(checkLinkCanStandOnTile) + 29));
   CYC(b_+8, b_+10); E = 0x03;
   CYC(b_+10, b_+13);
-  interBankCall_hook(gb);
+  TAIL(interBankCall);
 }
 
 void cutscene0e_hook(GB *gb) {
@@ -139,7 +139,7 @@ void cutscene0e_hook(GB *gb) {
   CYC(b_+11, b_+14); SET_HL((SYM(checkLinkCanStandOnTile) + 29));
   CYC(b_+14, b_+16); E = 0x03;
   CYC(b_+16, b_+19);
-  interBankCall_hook(gb);
+  TAIL(interBankCall);
 }
 
 void cutscene21_hook(GB *gb) {

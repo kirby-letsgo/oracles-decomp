@@ -531,7 +531,7 @@ void veranPossessionBoss_nayruAmbi_state13_hook(GB *gb) {
   CALL_C(b_+5, ecom_incState_b0e_hook, SYM(ecom_incState_b0e), b_+8);
   CYC(b_+8, b_+11); SET_HL(SYM(clearAllItemsAndPutLinkOnGround)); // clearAllItemsAndPutLinkOnGround
   CYC(b_+11, b_+13); E = 0x00;
-  CYC(b_+13, b_+16); interBankCall_hook(gb); return; // jp
+  CYC(b_+13, b_+16); TAIL(interBankCall); // jp
 }
 
 // 0e:7911, bare global; jump-table target from veranPossessionBoss_subid0. Deletes all

@@ -11,7 +11,7 @@ void interactionCodeb1_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+3); SET_HL((SYM(interactiond7_makuSeed__state4Substate1) + 5));
   CYC(b_+3, b_+5); E = 0x3f;
-  CYC(b_+5, b_+8); interBankCall_hook(gb); return;
+  CYC(b_+5, b_+8); TAIL(interBankCall);
 }
 
 void interactionCodeb2__state0_hook(GB *gb) {

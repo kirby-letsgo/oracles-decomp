@@ -82,7 +82,7 @@ void itemLoadAttributesAndGraphics_hook(GB *gb) {
   CALL_C(b_+36, itemSetVar3cToFF_hook, SYM(itemSetVar3cToFF), b_+39);
   CYC(b_+39, b_+42); SET_HL(0x4422);
   CYC(b_+42, b_+44); E = 0x3f;
-  CYC(b_+44, b_+47); interBankCall_hook(gb);
+  CYC(b_+44, b_+47); TAIL(interBankCall);
 }
 
 void itemSetVar3cToFF_hook(GB *gb) {
