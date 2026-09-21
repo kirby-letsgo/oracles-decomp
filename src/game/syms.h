@@ -13437,6 +13437,23 @@ enum {
   S_dinImprisonedScript_OnoxExplainsMotive,
   S_dinImprisonedScript_OnoxSaysComeIfYouDare,
   S_dinImprisonedScript_OnoxSendsTempleDown,
+  S_dinState0,
+  S_dinState1,
+  S_dinState1_subid0,
+  S_dinState1_subid2,
+  S_dinState1_subid3,
+  S_dinState1_subid4,
+  S_dinState1_subid6,
+  S_dinState1_subid7,
+  S_dinState1_subid8,
+  S_dinState1_subid9,
+  S_seasonsFunc_0a_6710,
+  S_seasonsFunc_0a_6717,
+  S_dinScript_subid2Init,
+  S_dinScript_subid4Init,
+  S_dinScript_stubInit,
+  S_dinScript_subid8Init,
+  S_dinScript_discoverLinkCollapsed,
   SYM_COUNT
 };
 enum {

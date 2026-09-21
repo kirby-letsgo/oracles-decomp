@@ -85,3 +85,15 @@ cutscene0eFunc7
 seasonsFunc_03_7db8
 interactionCode4f_state0
 interactionCode4f_state1
+dinState0
+dinState1
+dinState1_subid0
+dinState1_subid2
+dinState1_subid3
+dinState1_subid4
+dinState1_subid6
+dinState1_subid7
+dinState1_subid8
+dinState1_subid9
+seasonsFunc_0a_6710
+seasonsFunc_0a_6717
