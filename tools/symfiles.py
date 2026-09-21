@@ -135,3 +135,50 @@ def pair_instances(ages_rom, ages_sym, seasons_rom, seasons_sym):
 
 
 UNNAMED = re.compile(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)$')
+
+
+def seasons_code(lines):
+    """For each C source line, the part that runs under Seasons: text inside
+    `if (!game_seasons) { ... }` blocks, the else branch of `if (game_seasons) { ... } else {`,
+    and one-line `if (!game_seasons) ...;` / `!game_seasons && ...` conditions is blanked."""
+    out, ages_depth, seasons_depth = [], 0, 0
+    for line in lines:
+        code = line.split('//')[0]
+        keep = ''
+        if ages_depth:
+            j = 0
+            while j < len(code) and ages_depth:
+                if code[j] == '{': ages_depth += 1
+                elif code[j] == '}': ages_depth -= 1
+                j += 1
+            if ages_depth: out.append(''); continue
+            code = code[j:]
+        if re.search(r'!game_seasons\s*&&', code) or re.search(r'if \(!game_seasons\)\s*[^{\s]', code):
+            out.append(''); continue
+        if seasons_depth:
+            j = 0
+            while j < len(code) and seasons_depth:
+                if code[j] == '{': seasons_depth += 1
+                elif code[j] == '}': seasons_depth -= 1
+                j += 1
+            if not seasons_depth and re.match(r'\s*else\s*\{', code[j:]):
+                ages_depth = 1; out.append(code[:j]); continue
+        m3 = re.search(r'if \(game_seasons\)\s*\{', code)
+        if m3:
+            j = m3.end(); seasons_depth = 1
+            while j < len(code) and seasons_depth:
+                if code[j] == '{': seasons_depth += 1
+                elif code[j] == '}': seasons_depth -= 1
+                j += 1
+            if not seasons_depth and re.match(r'\s*else\s*\{', code[j:]):
+                ages_depth = 1; out.append(code[:j]); continue
+        m2 = re.search(r'if \(!game_seasons\)\s*\{', code)
+        if m2:
+            j = m2.end(); ages_depth = 1
+            while j < len(code) and ages_depth:
+                if code[j] == '{': ages_depth += 1
+                elif code[j] == '}': ages_depth -= 1
+                j += 1
+            out.append(code[:m2.start()] + (code[j:] if not ages_depth else '')); continue
+        out.append(code)
+    return out

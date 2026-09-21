@@ -2,29 +2,6 @@
 #include "game/asm.h"
 #include "game/seasons/gen.h"
 
-// 11:5993
-void s_checkSkipPointer(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5993, 4); A = mem_rd(gb, 0xcc9f);  // ld a,($cc9f)
-  I(0x5996, 2); alu_bit(gb, 7, A);  // bit 7,a
-  if ((F & FZ)) { I(0x5998, 3); goto L_59a8; } I(0x5998, 2);  // jr z,$59a8
-  I(0x599a, 2); alu_and(gb, 0x03);  // and $03
-  I(0x599c, 1); B = A;  // ld b,a
-  I(0x599d, 1); alu_xor(gb, A);  // xor a
-  I(0x599e, 4); mem_wr(gb, 0xcc9f, A);  // ld ($cc9f),a
-  I(0x59a1, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x59a4, 1); alu_cp(gb, B);  // cp b
-  if ((F & FZ)) { RET_TAKEN(0x59a5); return; } I(0x59a5, 2);  // ret z
-L_59a6:
-  I(0x59a6, 1); alu_or(gb, D);  // or d
-  RET(0x59a7); return;  // ret
-L_59a8:
-  I(0x59a8, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x59a9, 3); goto L_59a6; } I(0x59a9, 2);  // jr z,$59a6
-  I(0x59ab, 1); alu_xor(gb, A);  // xor a
-  RET(0x59ac); return;  // ret
-}
-
 // 11:593b
 void s_objectDataOp0__nextOpcode(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -166,9 +143,9 @@ void s_parseObjectData(GB *gb) {
   I(0x58bc, 3); SET_HL(0xcec0);  // ld hl,$cec0
   I(0x58bf, 2); B = 0x20;  // ld b,$20
   CALL(0x58c1, clearMemory_hook, 0x044b, 0x58c4);  // call $044b
-  CALL(0x58c4, s_addRoomToEnemiesKilledList_b00, 0x30de, 0x58c7);  // call $30de
+  CALL(0x58c4, addRoomToEnemiesKilledList_b00_hook, 0x30de, 0x58c7);  // call $30de
 L_58c7:
-  CALL(0x58c7, s_generateRandomBuffer_b00, 0x30ed, 0x58ca);  // call $30ed
+  CALL(0x58c7, generateRandomBuffer_b00_hook, 0x30ed, 0x58ca);  // call $30ed
 L_58ca:
   I(0x58ca, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
   I(0x58cd, 3); SET_HL(0x5b3b);  // ld hl,$5b3b
@@ -192,7 +169,7 @@ L_58ca:
 void s_parseObjectData__afterCall58c7(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_58c7:
-  CALL(0x58c7, s_generateRandomBuffer_b00, 0x30ed, 0x58ca);  // call $30ed
+  CALL(0x58c7, generateRandomBuffer_b00_hook, 0x30ed, 0x58ca);  // call $30ed
 L_58ca:
   I(0x58ca, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
   I(0x58cd, 3); SET_HL(0x5b3b);  // ld hl,$5b3b

@@ -5,29 +5,43 @@ applyRoomSpecificTileChanges
 applyRoomSpecificTileChangesAfterGfxLoad
 braceletCheckBreakable
 calculateAdjacentWallsBitset
+checkAndDecKeyCount
 checkItemUsed 7=13
 checkLinkJumpingOffCliff
+checkLinkOnGround
+checkSkipPointer
 checkTileWarps
 checkUseItems_b06
+companionCheckMountingComplete
 cutscene01
+cutscene09
 decideItemDrop_body
+dragonfly_state0
 drawAllSpritesUnconditionally
 drawAllSpritesUnconditionally@drawObject
 endgameCutsceneHandler_body
+enemyBoss_initializeRoomWithoutExtraGfx_b0f
+enemyBoss_initializeRoomWithoutExtraGfx_b10
+enemyCode37
 enemyCode79
 functionCaller_b02
+initializeFile_b07
 interactionCode0f
 interactionCode60
 interactionCode6b
 interactionCode6c
 interactionCode71
+interactionCodeb5
 interactionCodedc
 interactionCodee0
 introCinematic_inTemple
 introCinematic_ridingHorse
 inventoryMenuState3
+itemInitializeFromLinkPosition
 linkApplyTileTypes 233=227 234=228
 linkState01 149=148
+linkedNpc_calcLowTextIndex
+loadItemIconGfx
 loadScreenMusic
 loadScreenMusicAndSetRoomPack
 loadTilesetAndRoomLayout
@@ -37,6 +51,8 @@ paletteFadeHandler
 parentItemCode_foolsOre
 parentItemCode_punch
 parseGivenObjectData_b12
+partCode09
+partCode13
 rickyStateA
 screenTransitionState2
 specialObjectCode_linkInCutscene_b06

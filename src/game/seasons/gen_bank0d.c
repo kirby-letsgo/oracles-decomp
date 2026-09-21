@@ -496,25 +496,6 @@ L_4e50:
   I(0x4e61, 4); if (hook_is(gb, 0x1e03, objectSetVisiblec2_hook)) { objectSetVisiblec2_hook(gb); return; } HANDOFF(0x1e03);  // jp $1e03
 }
 
-// 0d:66ad
-void s_dragonfly_state0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x66ad, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
-  I(0x66b0, 2); alu_cp(gb, 0x02);  // cp $02
-  if (!(F & FZ)) { I(0x66b2, 4); if (hook_is(gb, 0x2e28, enemyDelete_hook)) { enemyDelete_hook(gb); return; } HANDOFF(0x2e28); } I(0x66b2, 3);  // jp nz,$2e28
-  I(0x66b5, 1); H = D;  // ld h,d
-  I(0x66b6, 1); L = E;  // ld l,e
-  I(0x66b7, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x66b8, 2); L = 0x82;  // ld l,$82
-  I(0x66ba, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x66bb, 2); L = 0x9b;  // ld l,$9b
-  I(0x66bd, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x66be, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x66bf, 2); L = 0x8f;  // ld l,$8f
-  I(0x66c1, 3); mem_wr(gb, HL, 0xf8);  // ld (hl),$f8
-  I(0x66c3, 4); if (hook_is(gb, 0x1dfa, objectSetVisiblec1_hook)) { objectSetVisiblec1_hook(gb); return; } HANDOFF(0x1dfa);  // jp $1dfa
-}
-
 // 0d:6716
 void s_dragonfly_state2__nextState(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1443,41 +1424,6 @@ L_4dd3:
   if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) {  default: HANDOFF(HL); }
-}
-
-// 0d:4ff8
-void s_enemyCode37(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4ff8, 2); E = 0x84;  // ld e,$84
-  I(0x4ffa, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x4ffb, 0x4ffc);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x5000: goto L_5000; case 0x5014: goto L_5014; default: HANDOFF(HL); }
-L_5000:
-  I(0x5000, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
-  I(0x5003, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x5004, 4); if (hook_is(gb, 0x2e28, enemyDelete_hook)) { enemyDelete_hook(gb); return; } HANDOFF(0x2e28); } I(0x5004, 3);  // jp nz,$2e28
-  I(0x5007, 1); H = D;  // ld h,d
-  I(0x5008, 1); L = E;  // ld l,e
-  I(0x5009, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x500a, 2); L = 0x90;  // ld l,$90
-  I(0x500c, 3); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
-  CALL(0x500e, ecom_setRandomAngle_b0e_hook, 0x43cf, 0x5011);  // call $43cf
-  I(0x5011, 4); if (hook_is(gb, 0x1e1e, objectSetVisible81_hook)) { objectSetVisible81_hook(gb); return; } HANDOFF(0x1e1e);  // jp $1e1e
-L_5014:
-  I(0x5014, 3); SET_BC(0x1f1f);  // ld bc,$1f1f
-  CALL(0x5017, ecom_randomBitwiseAndBCE_b0e_hook, 0x434f, 0x501a);  // call $434f
-  I(0x501a, 1); alu_or(gb, B);  // or b
-  if (!(F & FZ)) { I(0x501b, 3); goto L_5021; } I(0x501b, 2);  // jr nz,$5021
-  I(0x501d, 1); H = D;  // ld h,d
-  I(0x501e, 2); L = 0x89;  // ld l,$89
-  I(0x5020, 2); mem_wr(gb, HL, C);  // ld (hl),c
-L_5021:
-  CALL(0x5021, objectApplySpeed_hook, 0x1fdb, 0x5024);  // call $1fdb
-  CALL(0x5024, ecom_bounceOffScreenBoundary_b0e_hook, 0x42e5, 0x5027);  // call $42e5
-  I(0x5027, 4); if (hook_is(gb, 0x275f, enemyAnimate_hook)) { enemyAnimate_hook(gb); return; } HANDOFF(0x275f);  // jp $275f
 }
 
 // 0d:5000
@@ -2815,18 +2761,6 @@ L_656a:
   I(0x656a, 2); E = 0x84;  // ld e,$84
   I(0x656c, 2); A = mem_rd(gb, DE);  // ld a,(de)
   RST_PUSH(0x656d, 0x656e);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
-// 0d:669d
-void s_enemyCode53(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x669d, 2); E = 0x84;  // ld e,$84
-  I(0x669f, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x66a0, 0x66a1);  // rst $00 (jump table)
   I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
   if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
@@ -5743,7 +5677,7 @@ L_6875:
   I(0x688f, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x6890, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x6891, objectCopyPosition_hook, 0x21fd, 0x6894);  // call $21fd
-  CALL(0x6894, s_markEnemyAsKilledInRoom_b00, 0x30e3, 0x6897);  // call $30e3
+  CALL(0x6894, markEnemyAsKilledInRoom_b00_hook, 0x30e3, 0x6897);  // call $30e3
   I(0x6897, 4); if (hook_is(gb, 0x2e28, enemyDelete_hook)) { enemyDelete_hook(gb); return; } HANDOFF(0x2e28);  // jp $2e28
 }
 
@@ -5768,7 +5702,7 @@ L_6875:
   I(0x688f, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x6890, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x6891, objectCopyPosition_hook, 0x21fd, 0x6894);  // call $21fd
-  CALL(0x6894, s_markEnemyAsKilledInRoom_b00, 0x30e3, 0x6897);  // call $30e3
+  CALL(0x6894, markEnemyAsKilledInRoom_b00_hook, 0x30e3, 0x6897);  // call $30e3
   I(0x6897, 4); if (hook_is(gb, 0x2e28, enemyDelete_hook)) { enemyDelete_hook(gb); return; } HANDOFF(0x2e28);  // jp $2e28
 }
 
@@ -8191,7 +8125,7 @@ void s_floormaster_state1__delete(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4bcc:
   CALL(0x4bcc, decNumEnemies_hook, 0x249f, 0x4bcf);  // call $249f
-  CALL(0x4bcf, s_markEnemyAsKilledInRoom_b00, 0x30e3, 0x4bd2);  // call $30e3
+  CALL(0x4bcf, markEnemyAsKilledInRoom_b00_hook, 0x30e3, 0x4bd2);  // call $30e3
   I(0x4bd2, 4); if (hook_is(gb, 0x2e28, enemyDelete_hook)) { enemyDelete_hook(gb); return; } HANDOFF(0x2e28);  // jp $2e28
 }
 

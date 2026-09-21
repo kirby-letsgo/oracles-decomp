@@ -14,7 +14,7 @@ import glob, os, re, subprocess, sys
 from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from symfiles import rom_labels
+from symfiles import rom_labels, seasons_code
 
 FUNC = re.compile(r'^(?:static )?(?:void|uint16_t|uint8_t|bool|int|unsigned) \*?(\w+)\([^)]*\)\s*\{')
 CALL = re.compile(r'\b(\w+)\(gb[,)]')
@@ -60,6 +60,11 @@ def main():
             if not n: continue
             if (n + '!') in safe_jt: print(f'{path}: {n} dispatches a jump table without a fallback, left out'); continue
             verdict[n] = verdict[n.replace('@', '__')] = 'IDENTICAL'
+            if path.endswith('ofs_routines.txt'):      # the edited C covers the routine's @locals too
+                for loc in [k for k in verdict if k.startswith((n + '@', n + '__'))]:
+                    loc = loc.replace('__', '@')
+                    if (loc + '!') in safe_jt: continue
+                    verdict[loc] = verdict[loc.replace('@', '__')] = 'IDENTICAL'
 
     # C call graph: function name -> callees, per file (static helpers are file-local)
     callees, burns, local_calls, tails, ages_only_funcs = {}, {}, {}, {}, set()
@@ -67,14 +72,15 @@ def main():
     for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
         if os.path.basename(path).startswith('gen_') or os.path.basename(path) == 'syms.c': continue
         cur = None
-        for line in open(path, errors='replace'):
+        src = open(path, errors='replace').read().split('\n')
+        for line, scode in zip(src, seasons_code(src)):
             m = FUNC.match(line)
             if m:
                 cur = (path, m.group(1)); callees[cur] = set(); burns[cur] = set(); local_calls[cur] = set(); tails[cur] = set()
                 line = line[m.end():]
             elif line.startswith('}'): cur = None; continue
             if cur is None: continue
-            code = line.split('//')[0]
+            code = scode[m.end():] if m else scode
             if 'AGES_ONLY()' in code: ages_only_funcs.add(cur)
             if m and code.count('}') > code.count('{'): oneliner = True
             else: oneliner = False

@@ -30,37 +30,43 @@ static uint16_t butterfly_jump_table(GB *gb) {
 void enemyCode37_hook(GB *gb) {
   BASE(enemyCode37);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_STATE;
-  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+O(0), b_+OE(2)); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
   {
-    CYC(b_+3, b_+4); push_effect(gb, b_+4);
+    CYC(b_+O(3), b_+OE(4)); push_effect(gb, b_+OE(4));
     uint16_t target = butterfly_jump_table(gb);
-    if (target == b_+8) goto state0;
-    if (target == b_+21) goto state1;
+    if (target == b_+O(8)) goto state0;
+    if (target == b_+O(21)) goto state1;
     HANDOFF(target);
   }
 
 state0:
-  CYC(b_+8, b_+9); H = D;
-  CYC(b_+9, b_+10); L = E;
-  CYC(b_+10, b_+11); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [state]
-  CYC(b_+11, b_+13); L = ENEMY_BASE + OBJ_SPEED;
-  CYC(b_+13, b_+15); mem_wr(gb, HL, 0x0a); // SPEED_40
-  CALL_C(b_+15, ecom_setRandomAngle_b0e_hook, SYM(ecom_setRandomAngle_b0e), b_+18);
-  CYC(b_+18, b_+21); TAIL(objectSetVisible81); // jp
+  if (game_seasons) {
+    CYC(b_+S(8), b_+S(11)); A = W8(wRoomStateModifier);
+    CYC(b_+S(11), b_+S(12)); alu_or(gb, A);
+    if (!(F & FZ)) { CYCT(b_+S(12), b_+S(15)); TAIL(enemyDelete); }
+    CYC(b_+S(12), b_+S(15));
+  }
+  CYC(b_+O(8), b_+OE(9)); H = D;
+  CYC(b_+O(9), b_+OE(10)); L = E;
+  CYC(b_+O(10), b_+OE(11)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [state]
+  CYC(b_+O(11), b_+OE(13)); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+O(13), b_+OE(15)); mem_wr(gb, HL, 0x0a); // SPEED_40
+  CALL_C(b_+O(15), ecom_setRandomAngle_b0e_hook, SYM(ecom_setRandomAngle_b0e), b_+OE(18));
+  CYC(b_+O(18), b_+OE(21)); TAIL(objectSetVisible81); // jp
 
 state1:
-  CYC(b_+21, b_+24); SET_BC(0x1f1f);
-  CALL_C(b_+24, ecom_randomBitwiseAndBCE_b0e_hook, SYM(ecom_randomBitwiseAndBCE_b0e), b_+27);
-  CYC(b_+27, b_+28); alu_or(gb, B);
-  if (!(F & FZ)) { CYCT(b_+28, b_+30); goto L_4ffb; } // jr nz
-  CYC(b_+28, b_+30);
-  CYC(b_+30, b_+31); H = D;
-  CYC(b_+31, b_+33); L = ENEMY_BASE + OBJ_ANGLE;
-  CYC(b_+33, b_+34); mem_wr(gb, HL, C);
+  CYC(b_+O(21), b_+OE(24)); SET_BC(0x1f1f);
+  CALL_C(b_+O(24), ecom_randomBitwiseAndBCE_b0e_hook, SYM(ecom_randomBitwiseAndBCE_b0e), b_+OE(27));
+  CYC(b_+O(27), b_+OE(28)); alu_or(gb, B);
+  if (!(F & FZ)) { CYCT(b_+O(28), b_+OE(30)); goto L_4ffb; } // jr nz
+  CYC(b_+O(28), b_+OE(30));
+  CYC(b_+O(30), b_+OE(31)); H = D;
+  CYC(b_+O(31), b_+OE(33)); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+O(33), b_+OE(34)); mem_wr(gb, HL, C);
 
 L_4ffb:
-  CALL_C(b_+34, objectApplySpeed_hook, SYM(objectApplySpeed), b_+37);
-  CALL_C(b_+37, ecom_bounceOffScreenBoundary_b0e_hook, SYM(ecom_bounceOffScreenBoundary_b0e), b_+40);
-  CYC(b_+40, b_+43); TAIL(enemyAnimate); // jp
+  CALL_C(b_+O(34), objectApplySpeed_hook, SYM(objectApplySpeed), b_+OE(37));
+  CALL_C(b_+O(37), ecom_bounceOffScreenBoundary_b0e_hook, SYM(ecom_bounceOffScreenBoundary_b0e), b_+OE(40));
+  CYC(b_+O(40), b_+OE(43)); TAIL(enemyAnimate); // jp
 }

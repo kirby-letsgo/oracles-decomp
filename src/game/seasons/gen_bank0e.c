@@ -3117,7 +3117,7 @@ L_4526:
   I(0x4536, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x4537, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x4538, objectCopyPosition_hook, 0x21fd, 0x453b);  // call $21fd
-  CALL(0x453b, s_markEnemyAsKilledInRoom_b00, 0x30e3, 0x453e);  // call $30e3
+  CALL(0x453b, markEnemyAsKilledInRoom_b00_hook, 0x30e3, 0x453e);  // call $30e3
   I(0x453e, 2); E = 0x81;  // ld e,$81
   I(0x4540, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x4541, 2); alu_sub(gb, 0x08);  // sub $08
@@ -3128,35 +3128,6 @@ L_4526:
   CALL(0x454d, playSound_b00_hook, 0x0c74, 0x4550);  // call $0c74
 L_4550:
   I(0x4550, 4); if (hook_is(gb, 0x2e28, enemyDelete_hook)) { enemyDelete_hook(gb); return; } HANDOFF(0x2e28);  // jp $2e28
-}
-
-// 0e:4571
-void s_enemyBoss_initializeRoomWithoutExtraGfx_b0e(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4571, 3); A = mem_rd(gb, 0xffad);  // ldh a,($ffad)
-  I(0x4573, 1); D = A;  // ld d,a
-  I(0x4574, 2); A = 0xf0;  // ld a,$f0
-  CALL(0x4576, playSound_b00_hook, 0x0c74, 0x4579);  // call $0c74
-  I(0x4579, 1); alu_xor(gb, A);  // xor a
-  I(0x457a, 4); mem_wr(gb, 0xcbca, A);  // ld ($cbca),a
-  I(0x457d, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x457e, 4); mem_wr(gb, 0xcc51, A);  // ld ($cc51),a
-  I(0x4581, 3); SET_HL(0xccad);  // ld hl,$ccad
-  I(0x4584, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  I(0x4586, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
-  I(0x4589, 2); alu_and(gb, 0x01);  // and $01
-  if (!(F & FZ)) { RET_TAKEN(0x458b); return; } I(0x458b, 2);  // ret nz
-  I(0x458c, 2); A = 0x0b;  // ld a,$0b
-  I(0x458e, 4); mem_wr(gb, 0xcc6a, A);  // ld ($cc6a),a
-  I(0x4591, 2); A = 0x1a;  // ld a,$1a
-  I(0x4593, 4); mem_wr(gb, 0xcc6c, A);  // ld ($cc6c),a
-  I(0x4596, 3); SET_HL(0xd008);  // ld hl,$d008
-  I(0x4599, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x459c, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x459d, 2); A = alu_swap(gb, A);  // swap a
-  I(0x459f, 1); alu_rrca(gb);  // rrca
-  I(0x45a0, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x45a1); return;  // ret
 }
 
 // 0e:45a2
@@ -23140,7 +23111,7 @@ L_59a6:
   I(0x59b3, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x59b4, vire_checkOffScreen_hook, 0x5b11, 0x59b7);  // call $5b11
   if ((F & FC)) { I(0x59b7, 4); if (hook_is(gb, 0x1fdb, objectApplySpeed_hook)) { objectApplySpeed_hook(gb); return; } HANDOFF(0x1fdb); } I(0x59b7, 3);  // jp c,$1fdb
-  CALL(0x59ba, s_markEnemyAsKilledInRoom_b00, 0x30e3, 0x59bd);  // call $30e3
+  CALL(0x59ba, markEnemyAsKilledInRoom_b00_hook, 0x30e3, 0x59bd);  // call $30e3
   CALL(0x59bd, decNumEnemies_hook, 0x249f, 0x59c0);  // call $249f
   I(0x59c0, 4); A = mem_rd(gb, 0xcc62);  // ld a,($cc62)
   I(0x59c3, 4); mem_wr(gb, 0xcc51, A);  // ld ($cc51),a
@@ -23182,7 +23153,7 @@ L_59a6:
   I(0x59b3, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x59b4, vire_checkOffScreen_hook, 0x5b11, 0x59b7);  // call $5b11
   if ((F & FC)) { I(0x59b7, 4); if (hook_is(gb, 0x1fdb, objectApplySpeed_hook)) { objectApplySpeed_hook(gb); return; } HANDOFF(0x1fdb); } I(0x59b7, 3);  // jp c,$1fdb
-  CALL(0x59ba, s_markEnemyAsKilledInRoom_b00, 0x30e3, 0x59bd);  // call $30e3
+  CALL(0x59ba, markEnemyAsKilledInRoom_b00_hook, 0x30e3, 0x59bd);  // call $30e3
   CALL(0x59bd, decNumEnemies_hook, 0x249f, 0x59c0);  // call $249f
   I(0x59c0, 4); A = mem_rd(gb, 0xcc62);  // ld a,($cc62)
   I(0x59c3, 4); mem_wr(gb, 0xcc51, A);  // ld ($cc51),a

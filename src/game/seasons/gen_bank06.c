@@ -31,35 +31,6 @@ void s_animateRelatedObj2(GB *gb) {
   RET(0x71a3); return;  // ret
 }
 
-// 06:433b
-void s_checkAndDecKeyCount(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x433b, 2); A = 0x0b;  // ld a,$0b
-  CALL(0x433d, checkGlobalFlag_hook, 0x30c7, 0x4340);  // call $30c7
-  if (!(F & FZ)) { RET_TAKEN(0x4340); return; } I(0x4340, 2);  // ret nz
-  I(0x4341, 4); A = mem_rd(gb, 0xcc55);  // ld a,($cc55)
-  I(0x4344, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { RET_TAKEN(0x4346); return; } I(0x4346, 2);  // ret z
-  I(0x4347, 1); A = B;  // ld a,b
-  I(0x4348, 2); alu_cp(gb, 0x40);  // cp $40
-  I(0x434a, 2); H = 0xc6;  // ld h,$c6
-  I(0x434c, 4); A = mem_rd(gb, 0xcc55);  // ld a,($cc55)
-  if (!(F & FC)) { I(0x434f, 3); goto L_435f; } I(0x434f, 2);  // jr nc,$435f
-  I(0x4351, 2); alu_add(gb, 0x6e);  // add $6e
-  I(0x4353, 1); L = A;  // ld l,a
-  I(0x4354, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4355, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x4356); return; } I(0x4356, 2);  // ret z
-  I(0x4357, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  I(0x4358, 3); SET_HL(0xcbea);  // ld hl,$cbea
-  I(0x435b, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 4)));  // set 4,(hl)
-  I(0x435d, 1); alu_or(gb, H);  // or h
-  RET(0x435e); return;  // ret
-L_435f:
-  I(0x435f, 2); L = 0x7a;  // ld l,$7a
-  I(0x4361, 4); if (hook_is(gb, 0x0205, checkFlag_hook)) { checkFlag_hook(gb); return; } HANDOFF(0x0205);  // jp $0205
-}
-
 // 06:435f
 void s_checkAndDecKeyCount__bossKeyDoor(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -164,18 +135,6 @@ L_4911:
   CALL(0x4921, chooseParentItemSlot_hook, 0x4931, 0x4924);  // call $4931
   if (!(F & FZ)) { RET_TAKEN(0x4924); return; } I(0x4924, 2);  // ret nz
   if (hook_is(gb, 0x4925, initializeParentItem_hook)) { initializeParentItem_hook(gb); return; } HANDOFF(0x4925);  // fallthrough
-}
-
-// 06:5416
-void s_checkLinkOnGround(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5416, 4); A = mem_rd(gb, 0xcc48);  // ld a,($cc48)
-  I(0x5419, 2); alu_and(gb, 0x01);  // and $01
-  if (!(F & FZ)) { RET_TAKEN(0x541b); return; } I(0x541b, 2);  // ret nz
-  I(0x541c, 3); SET_HL(0xcc77);  // ld hl,$cc77
-  I(0x541f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x5420, 2); alu_or(gb, mem_rd(gb, HL));  // or (hl)
-  RET(0x5421); return;  // ret
 }
 
 // 06:52da
@@ -4027,7 +3986,7 @@ L_73bd:
   CALL(0x73bd, linkCutscene_initOam_setVisible_incState_hook, 0x7381, 0x73c0);  // call $7381
 L_73c0:
   PUSH(0x73c0, DE);  // push de
-  CALL(0x73c1, s_clearItems, 0x3566, 0x73c4);  // call $3566
+  CALL(0x73c1, clearItems_hook, 0x3566, 0x73c4);  // call $3566
   SET_DE(POP(0x73c4));  // pop de
   I(0x73c5, 2); A = 0x13;  // ld a,$13
   I(0x73c7, 4); if (hook_is(gb, 0x2a51, specialObjectSetAnimation_hook)) { specialObjectSetAnimation_hook(gb); return; } HANDOFF(0x2a51);  // jp $2a51
@@ -4112,7 +4071,7 @@ L_73bd:
   CALL(0x73bd, linkCutscene_initOam_setVisible_incState_hook, 0x7381, 0x73c0);  // call $7381
 L_73c0:
   PUSH(0x73c0, DE);  // push de
-  CALL(0x73c1, s_clearItems, 0x3566, 0x73c4);  // call $3566
+  CALL(0x73c1, clearItems_hook, 0x3566, 0x73c4);  // call $3566
   SET_DE(POP(0x73c4));  // pop de
   I(0x73c5, 2); A = 0x13;  // ld a,$13
   I(0x73c7, 4); if (hook_is(gb, 0x2a51, specialObjectSetAnimation_hook)) { specialObjectSetAnimation_hook(gb); return; } HANDOFF(0x2a51);  // jp $2a51
@@ -4123,7 +4082,7 @@ void s_linkCutscene9__afterCall73c0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_73c0:
   PUSH(0x73c0, DE);  // push de
-  CALL(0x73c1, s_clearItems, 0x3566, 0x73c4);  // call $3566
+  CALL(0x73c1, clearItems_hook, 0x3566, 0x73c4);  // call $3566
   SET_DE(POP(0x73c4));  // pop de
   I(0x73c5, 2); A = 0x13;  // ld a,$13
   I(0x73c7, 4); if (hook_is(gb, 0x2a51, specialObjectSetAnimation_hook)) { specialObjectSetAnimation_hook(gb); return; } HANDOFF(0x2a51);  // jp $2a51
@@ -6309,7 +6268,7 @@ void s_parentItemCode_bracelet(GB *gb) {
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x4f36: goto L_4f36; case 0x4f77: goto L_4f77; case 0x4ffc: goto L_4ffc; case 0x503f: goto L_503f; case 0x50cc: goto L_50cc; case 0x5111: goto L_5111; default: HANDOFF(HL); }
 L_4f36:
-  CALL(0x4f36, s_checkLinkOnGround, 0x5416, 0x4f39);  // call $5416
+  CALL(0x4f36, checkLinkOnGround_hook, 0x5416, 0x4f39);  // call $5416
   if (!(F & FZ)) { I(0x4f39, 4); if (hook_is(gb, 0x49e7, clearParentItem_hook)) { clearParentItem_hook(gb); return; } HANDOFF(0x49e7); } I(0x4f39, 3);  // jp nz,$49e7
   I(0x4f3c, 4); A = mem_rd(gb, 0xccb6);  // ld a,($ccb6)
   I(0x4f3f, 2); alu_cp(gb, 0x08);  // cp $08
@@ -6553,7 +6512,7 @@ L_5111:
 void s_parentItemCode_bracelet__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4f36:
-  CALL(0x4f36, s_checkLinkOnGround, 0x5416, 0x4f39);  // call $5416
+  CALL(0x4f36, checkLinkOnGround_hook, 0x5416, 0x4f39);  // call $5416
   if (!(F & FZ)) { I(0x4f39, 4); if (hook_is(gb, 0x49e7, clearParentItem_hook)) { clearParentItem_hook(gb); return; } HANDOFF(0x49e7); } I(0x4f39, 3);  // jp nz,$49e7
   I(0x4f3c, 4); A = mem_rd(gb, 0xccb6);  // ld a,($ccb6)
   I(0x4f3f, 2); alu_cp(gb, 0x08);  // cp $08
@@ -7515,7 +7474,7 @@ void s_parentItemCode_flute(GB *gb) {
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x4c8b: goto L_4c8b; case 0x4cc4: goto L_4cc4; default: HANDOFF(HL); }
 L_4c8b:
-  CALL(0x4c8b, s_checkLinkOnGround, 0x5416, 0x4c8e);  // call $5416
+  CALL(0x4c8b, checkLinkOnGround_hook, 0x5416, 0x4c8e);  // call $5416
   if (!(F & FZ)) { I(0x4c8e, 4); if (hook_is(gb, 0x49e7, clearParentItem_hook)) { clearParentItem_hook(gb); return; } HANDOFF(0x49e7); } I(0x4c8e, 3);  // jp nz,$49e7
   I(0x4c91, 4); A = mem_rd(gb, 0xcc85);  // ld a,($cc85)
   I(0x4c94, 1); alu_or(gb, A);  // or a
@@ -8258,7 +8217,7 @@ L_4a3e:
 void s_parentItemCode_shovel__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4dd9:
-  CALL(0x4dd9, s_checkLinkOnGround, 0x5416, 0x4ddc);  // call $5416
+  CALL(0x4dd9, checkLinkOnGround_hook, 0x5416, 0x4ddc);  // call $5416
   if (!(F & FZ)) { I(0x4ddc, 4); if (hook_is(gb, 0x49e7, clearParentItem_hook)) { clearParentItem_hook(gb); return; } HANDOFF(0x49e7); } I(0x4ddc, 3);  // jp nz,$49e7
   I(0x4ddf, 4); s_parentItemLoadAnimationAndIncState(gb); return;  // jp $52e2
 }

@@ -8172,7 +8172,7 @@ void s_wallmaster_state1__delete(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_61d9:
   CALL(0x61d9, decNumEnemies_hook, 0x249f, 0x61dc);  // call $249f
-  CALL(0x61dc, s_markEnemyAsKilledInRoom_b00, 0x30e3, 0x61df);  // call $30e3
+  CALL(0x61dc, markEnemyAsKilledInRoom_b00_hook, 0x30e3, 0x61df);  // call $30e3
   I(0x61df, 4); if (hook_is(gb, 0x2e28, enemyDelete_hook)) { enemyDelete_hook(gb); return; } HANDOFF(0x2e28);  // jp $2e28
 }
 

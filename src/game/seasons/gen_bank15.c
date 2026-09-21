@@ -464,7 +464,7 @@ void s_blainoScript_clearItemsAndPegasusSeeds(GB *gb) {
   CALL(0x5c40, clearAllParentItems_hook, 0x2b57, 0x5c43);  // call $2b57
 L_5c43:
   CALL(0x5c43, dropLinkHeldItem_hook, 0x2b8a, 0x5c46);  // call $2b8a
-  I(0x5c46, 4); s_clearItems(gb); return;  // jp $3566
+  I(0x5c46, 4); if (hook_is(gb, 0x3566, clearItems_hook)) { clearItems_hook(gb); return; } HANDOFF(0x3566);  // jp $3566
 }
 
 // 15:5c43
@@ -472,7 +472,7 @@ void s_blainoScript_clearItemsAndPegasusSeeds__afterCall5c43(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5c43:
   CALL(0x5c43, dropLinkHeldItem_hook, 0x2b8a, 0x5c46);  // call $2b8a
-  I(0x5c46, 4); s_clearItems(gb); return;  // jp $3566
+  I(0x5c46, 4); if (hook_is(gb, 0x3566, clearItems_hook)) { clearItems_hook(gb); return; } HANDOFF(0x3566);  // jp $3566
 }
 
 // 15:5c36
@@ -512,7 +512,7 @@ L_5c0b:
 void s_blainoScript_setBlainoPosition(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x5c80, DE);  // push de
-  CALL(0x5c81, s_clearEnemies, 0x3578, 0x5c84);  // call $3578
+  CALL(0x5c81, clearEnemies_hook, 0x3578, 0x5c84);  // call $3578
   SET_DE(POP(0x5c84));  // pop de
   I(0x5c85, 3); SET_BC(0x4040);  // ld bc,$4040
   CALL(0x5c88, s_spawnBlainoAtPosition, 0x5c9e, 0x5c8b);  // call $5c9e
@@ -1294,7 +1294,7 @@ void s_goldenCaveSubrosian_emptyLinksItemsAndSetPosition(GB *gb) {
   CALL(0x64d1, clearAllParentItems_hook, 0x2b57, 0x64d4);  // call $2b57
 L_64d4:
   CALL(0x64d4, dropLinkHeldItem_hook, 0x2b8a, 0x64d7);  // call $2b8a
-  CALL(0x64d7, s_clearItems, 0x3566, 0x64da);  // call $3566
+  CALL(0x64d7, clearItems_hook, 0x3566, 0x64da);  // call $3566
   CALL(0x64da, setLinkForceStateToState08_hook, 0x29f4, 0x64dd);  // call $29f4
   I(0x64dd, 3); SET_HL(0xd008);  // ld hl,$d008
   I(0x64e0, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
@@ -1306,7 +1306,7 @@ void s_goldenCaveSubrosian_emptyLinksItemsAndSetPosition__afterCall64d4(GB *gb) 
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_64d4:
   CALL(0x64d4, dropLinkHeldItem_hook, 0x2b8a, 0x64d7);  // call $2b8a
-  CALL(0x64d7, s_clearItems, 0x3566, 0x64da);  // call $3566
+  CALL(0x64d7, clearItems_hook, 0x3566, 0x64da);  // call $3566
   CALL(0x64da, setLinkForceStateToState08_hook, 0x29f4, 0x64dd);  // call $29f4
   I(0x64dd, 3); SET_HL(0xd008);  // ld hl,$d008
   I(0x64e0, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
@@ -5824,7 +5824,7 @@ L_70e4:
   CALL(0x70e5, interactionIncSubstate_hook, 0x23a0, 0x70e8);  // call $23a0
   I(0x70e8, 2); L = 0x47;  // ld l,$47
   I(0x70ea, 3); mem_wr(gb, HL, 0x14);  // ld (hl),$14
-  I(0x70ec, 4); s_brightenRoom(gb); return;  // jp $31fb
+  I(0x70ec, 4); if (hook_is(gb, 0x31fb, brightenRoom_hook)) { brightenRoom_hook(gb); return; } HANDOFF(0x31fb);  // jp $31fb
 L_70ef:
   I(0x70ef, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x70f2, 1); alu_or(gb, A);  // or a
@@ -6034,7 +6034,7 @@ L_70e4:
   CALL(0x70e5, interactionIncSubstate_hook, 0x23a0, 0x70e8);  // call $23a0
   I(0x70e8, 2); L = 0x47;  // ld l,$47
   I(0x70ea, 3); mem_wr(gb, HL, 0x14);  // ld (hl),$14
-  I(0x70ec, 4); s_brightenRoom(gb); return;  // jp $31fb
+  I(0x70ec, 4); if (hook_is(gb, 0x31fb, brightenRoom_hook)) { brightenRoom_hook(gb); return; } HANDOFF(0x31fb);  // jp $31fb
 L_70ef:
   I(0x70ef, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
   I(0x70f2, 1); alu_or(gb, A);  // or a
@@ -6198,7 +6198,7 @@ L_70e4:
   CALL(0x70e5, interactionIncSubstate_hook, 0x23a0, 0x70e8);  // call $23a0
   I(0x70e8, 2); L = 0x47;  // ld l,$47
   I(0x70ea, 3); mem_wr(gb, HL, 0x14);  // ld (hl),$14
-  I(0x70ec, 4); s_brightenRoom(gb); return;  // jp $31fb
+  I(0x70ec, 4); if (hook_is(gb, 0x31fb, brightenRoom_hook)) { brightenRoom_hook(gb); return; } HANDOFF(0x31fb);  // jp $31fb
 }
 
 // 15:70e4
@@ -6209,7 +6209,7 @@ L_70e4:
   CALL(0x70e5, interactionIncSubstate_hook, 0x23a0, 0x70e8);  // call $23a0
   I(0x70e8, 2); L = 0x47;  // ld l,$47
   I(0x70ea, 3); mem_wr(gb, HL, 0x14);  // ld (hl),$14
-  I(0x70ec, 4); s_brightenRoom(gb); return;  // jp $31fb
+  I(0x70ec, 4); if (hook_is(gb, 0x31fb, brightenRoom_hook)) { brightenRoom_hook(gb); return; } HANDOFF(0x31fb);  // jp $31fb
 }
 
 // 15:70ef
@@ -6926,23 +6926,6 @@ void s_linkedHerosCaveOldMan_takeRupees(GB *gb) {
   RET(0x6f5d); return;  // ret
 }
 
-// 15:591d
-void s_linkedNpc_calcLowTextIndex(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x591d, 2); alu_add(gb, 0x00);  // add $00
-  I(0x591f, 1); C = A;  // ld c,a
-  I(0x5920, 2); E = 0x7e;  // ld e,$7e
-  I(0x5922, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5923, 1); B = A;  // ld b,a
-  I(0x5924, 1); alu_add(gb, A);  // add a
-  I(0x5925, 1); alu_add(gb, B);  // add b
-  I(0x5926, 1); alu_add(gb, A);  // add a
-  I(0x5927, 1); alu_add(gb, C);  // add c
-  I(0x5928, 2); E = 0x72;  // ld e,$72
-  I(0x592a, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x592b); return;  // ret
-}
-
 // 15:58f0
 void s_linkedNpc_checkSecretBegun(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -6965,7 +6948,7 @@ void s_linkedNpc_initHighTextIndex(GB *gb) {
   I(0x5917, 2); A = 0x53;  // ld a,$53
   CALL(0x5919, interactionSetHighTextIndex_hook, 0x24f5, 0x591c);  // call $24f5
   I(0x591c, 1); A = C;  // ld a,c
-  s_linkedNpc_calcLowTextIndex(gb); return;  // fallthrough
+  if (hook_is(gb, 0x591d, linkedNpc_calcLowTextIndex_hook)) { linkedNpc_calcLowTextIndex_hook(gb); return; } HANDOFF(0x591d);  // fallthrough
 }
 
 // 15:63c1
@@ -9298,7 +9281,7 @@ L_6337:
 // 15:6334
 void s_seasonsFunc_15_6334(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6334, s_brightenRoom, 0x31fb, 0x6337);  // call $31fb
+  CALL(0x6334, brightenRoom_hook, 0x31fb, 0x6337);  // call $31fb
   I(0x6337, 1); alu_xor(gb, A);  // xor a
   I(0x6338, 4); mem_wr(gb, 0xc4b2, A);  // ld ($c4b2),a
   I(0x633b, 4); mem_wr(gb, 0xc4b4, A);  // ld ($c4b4),a
@@ -9470,9 +9453,9 @@ void s_seasonsFunc_15_645d(GB *gb) {
 void s_seasonsFunc_15_6464(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   PUSH(0x6464, DE);  // push de
-  CALL(0x6465, s_clearEnemies, 0x3578, 0x6468);  // call $3578
-  CALL(0x6468, s_clearItems, 0x3566, 0x646b);  // call $3566
-  CALL(0x646b, s_clearParts, 0x358a, 0x646e);  // call $358a
+  CALL(0x6465, clearEnemies_hook, 0x3578, 0x6468);  // call $3578
+  CALL(0x6468, clearItems_hook, 0x3566, 0x646b);  // call $3566
+  CALL(0x646b, clearParts_hook, 0x358a, 0x646e);  // call $358a
   SET_DE(POP(0x646e));  // pop de
   I(0x646f, 1); alu_xor(gb, A);  // xor a
   I(0x6470, 4); mem_wr(gb, 0xcc30, A);  // ld ($cc30),a

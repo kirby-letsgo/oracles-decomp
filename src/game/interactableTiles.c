@@ -314,35 +314,42 @@ not_pushing:
 
 void checkAndDecKeyCount_hook(GB *gb) {
   BASE(checkAndDecKeyCount);
-  CYC(b_+0, b_+3); A = W8(wDungeonIndex);
-  CYC(b_+3, b_+5); alu_cp(gb, 0xff);
-  if (F & FZ) {
-    CYCT(b_+5, b_+6); ret_effect(gb); return;
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  if (game_seasons) {
+    CYC(b_+S(0), b_+S(2)); A = 0x0b;
+    CALL_C(b_+S(2), checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+S(5));
+    if (!(F & FZ)) { CYCT(b_+S(5), b_+S(6)); ret_effect(gb); return; }
+    CYC(b_+S(5), b_+S(6));
   }
-  CYC(b_+5, b_+6);
-  CYC(b_+6, b_+7); A = B;
-  CYC(b_+7, b_+9); alu_cp(gb, 0x40);
-  CYC(b_+9, b_+11); H = 0xc6;
-  CYC(b_+11, b_+14); A = W8(wDungeonIndex);
+  CYC(b_+O(0), b_+OE(3)); A = W8(wDungeonIndex);
+  CYC(b_+O(3), b_+OE(5)); alu_cp(gb, 0xff);
+  if (F & FZ) {
+    CYCT(b_+O(5), b_+OE(6)); ret_effect(gb); return;
+  }
+  CYC(b_+O(5), b_+OE(6));
+  CYC(b_+O(6), b_+OE(7)); A = B;
+  CYC(b_+O(7), b_+OE(9)); alu_cp(gb, 0x40);
+  CYC(b_+O(9), b_+OE(11)); H = 0xc6;
+  CYC(b_+O(11), b_+OE(14)); A = W8(wDungeonIndex);
   if (!(F & FC)) {
-    CYCT(b_+14, b_+16);
-    CYC(b_+30, b_+32); L = 0x82;
-    CYC(b_+32, b_+35); TAIL(checkFlag);
+    CYCT(b_+O(14), b_+OE(16));
+    CYC(b_+O(30), b_+OE(32)); L = GV(0x82, 0x7a);
+    CYC(b_+O(32), b_+OE(35)); TAIL(checkFlag);
   }
-  CYC(b_+14, b_+16);
-  CYC(b_+16, b_+18); alu_add(gb, 0x72);
-  CYC(b_+18, b_+19); L = A;
-  CYC(b_+19, b_+20); A = mem_rd(gb, HL);
-  CYC(b_+20, b_+21); alu_or(gb, A);
+  CYC(b_+O(14), b_+OE(16));
+  CYC(b_+O(16), b_+OE(18)); alu_add(gb, GV(0x72, 0x6e));
+  CYC(b_+O(18), b_+OE(19)); L = A;
+  CYC(b_+O(19), b_+OE(20)); A = mem_rd(gb, HL);
+  CYC(b_+O(20), b_+OE(21)); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+21, b_+22); ret_effect(gb); return;
+    CYCT(b_+O(21), b_+OE(22)); ret_effect(gb); return;
   }
-  CYC(b_+21, b_+22);
-  CYC(b_+22, b_+23); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+23, b_+26); SET_HL(wStatusBarNeedsRefresh);
-  CYC(b_+26, b_+28); mem_wr(gb, HL, mem_rd(gb, HL) | 0x10);
-  CYC(b_+28, b_+29); alu_or(gb, H);
-  CYC(b_+29, b_+30); ret_effect(gb);
+  CYC(b_+O(21), b_+OE(22));
+  CYC(b_+O(22), b_+OE(23)); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+O(23), b_+OE(26)); SET_HL(wStatusBarNeedsRefresh);
+  CYC(b_+O(26), b_+OE(28)); mem_wr(gb, HL, mem_rd(gb, HL) | 0x10);
+  CYC(b_+O(28), b_+OE(29)); alu_or(gb, H);
+  CYC(b_+O(29), b_+OE(30)); ret_effect(gb);
 }
 
 static void facing_bottom_abort(GB *gb) {

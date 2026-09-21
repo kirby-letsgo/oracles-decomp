@@ -2,6 +2,7 @@ _enemyNextAnimationFrame
 _interactionActuallyRunScript
 _interactionNextAnimationFrame
 _partNextAnimationFrame
+addRoomToEnemiesKilledList_b00
 addRoomToEnemiesKilledList_b02
 addTreasureToInventory
 addTreasureToInventory__addToInventory
@@ -12,6 +13,8 @@ armos_subid00_stateA
 armos_subid01_stateA
 beetle_chooseRandomAngleAndCounter1
 bombUpdateThrowingVerticallyAndCheckDelete
+brightenRoom
+brightenRoomLightly
 buzzblob_state8
 checkAdvanceShopVisited
 checkGrabbableObjects
@@ -21,8 +24,13 @@ checkLockBG7Color3ToBlack
 checkLockBG7Color3ToBlack__thing1
 checkMoblinsKeepDestroyed
 checkTileAtPositionIsWater
+clearDynamicInteractions
+clearEnemies
+clearEnemiesKilledList_b00
 clearFileAtHl
+clearItems
 clearMemoryOnScreenReload
+clearParts
 clearStaticObjects
 clearVram
 clearWramBank1
@@ -111,6 +119,7 @@ faroreCheckSecretValidity
 faroreGenerateGameTransferSecret
 fileSelectDrawLink
 fileSelectDrawLinkInOtherGame
+findFreeStaticObjectSlot
 findIndexInLoadedObjectGfx
 findUnusedIndexInLoadedObjectGfx
 fireKeese_moveTowardCenterIfOutOfBounds
@@ -125,6 +134,7 @@ func_02_5afc
 func_0eda
 func_11_5e8a
 func_2d48
+func_3211
 func_39_400c
 func_4553@getLinkWalkingAnimation
 func_49c9
@@ -134,11 +144,13 @@ gameLink_getFile3
 ganon_decideTeleportLocationAndCounter
 ganon_state6
 ganon_state_uninitialized
+generateRandomBuffer_b00
 generateSecret__determineXorCipher
 getChestData
 getEntryFromObjectTable1
 getIndexOfGashaSpotInRoom
 getLinkWarpQuadrant
+getRandomPositionForEnemy_b00
 getRingTiles
 ghini_chooseTargetPosition
 ghini_subid00
@@ -182,7 +194,9 @@ inventoryMenuState1__equipItem
 inventoryMenuState1__equipItem__equipBiggoron
 inventoryMenuState1__equipItem__putItemInFirstBlankSlot
 inventoryMenuState1__equipItem__unequipBiggoron
+inventoryMenuState3@subState0
 inventoryMenuState3@subState1
+inventoryMenuState3@subState2
 ironMask_updateCollisionsFromLinkRelativeAngle
 itemCode27
 itemLoadAttributesAndGraphics
@@ -214,6 +228,7 @@ mapMenu_drawSprites
 mapleSpawnItemDrops
 mapleState0
 mapleState2
+markEnemyAsKilledInRoom_b00
 markLoadedObjectGfxUsed
 mergedTwinrova_deathCutscene
 mergedTwinrova_lavaRoom_stateE

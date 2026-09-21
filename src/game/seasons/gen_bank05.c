@@ -394,47 +394,6 @@ L_474e:
   RET(0x4770); return;  // ret
 }
 
-// 05:4878
-void s_companionCheckMountingComplete(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4878, 4); A = mem_rd(gb, 0xd004);  // ld a,($d004)
-  I(0x487b, 2); alu_cp(gb, 0x01);  // cp $01
-  if (!(F & FZ)) { I(0x487d, 3); goto L_4885; } I(0x487d, 2);  // jr nz,$4885
-  I(0x487f, 4); A = mem_rd(gb, 0xcc75);  // ld a,($cc75)
-  I(0x4882, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4883, 3); goto L_4896; } I(0x4883, 2);  // jr z,$4896
-L_4885:
-  I(0x4885, 1); alu_xor(gb, A);  // xor a
-  I(0x4886, 4); mem_wr(gb, 0xccaa, A);  // ld ($ccaa),a
-  I(0x4889, 4); mem_wr(gb, 0xcc88, A);  // ld ($cc88),a
-  I(0x488c, 4); mem_wr(gb, 0xccab, A);  // ld ($ccab),a
-  I(0x488f, 2); A = 0x01;  // ld a,$01
-  I(0x4891, 2); E = 0x04;  // ld e,$04
-  I(0x4893, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4894, 1); alu_or(gb, D);  // or d
-  RET(0x4895); return;  // ret
-L_4896:
-  I(0x4896, 3); SET_HL(0xd00b);  // ld hl,$d00b
-  I(0x4899, 2); E = 0x0b;  // ld e,$0b
-  I(0x489b, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x489c, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if (!(F & FZ)) { CALL(0x489d, s_companionCheckMountingComplete__nudgeLinkTowardCompanion, 0x48b5, 0x48a0); } else I(0x489d, 3);  // call nz,$48b5
-  I(0x48a0, 2); E = 0x0d;  // ld e,$0d
-  I(0x48a2, 1); L = E;  // ld l,e
-  I(0x48a3, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x48a4, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if (!(F & FZ)) { CALL(0x48a5, s_companionCheckMountingComplete__nudgeLinkTowardCompanion, 0x48b5, 0x48a8); } else I(0x48a5, 3);  // call nz,$48b5
-  I(0x48a8, 2); L = 0x15;  // ld l,$15
-  I(0x48aa, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
-  if (!(F & FZ)) { RET_TAKEN(0x48ac); return; } I(0x48ac, 2);  // ret nz
-  I(0x48ad, 2); L = 0x0f;  // ld l,$0f
-  I(0x48af, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x48b0, 2); alu_cp(gb, 0xfc);  // cp $fc
-  if ((F & FC)) { RET_TAKEN(0x48b2); return; } I(0x48b2, 2);  // ret c
-  I(0x48b3, 1); alu_xor(gb, A);  // xor a
-  RET(0x48b4); return;  // ret
-}
-
 // 05:4885
 void s_companionCheckMountingComplete__stopMounting(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -4665,7 +4624,7 @@ L_5259:
 L_525e:
   RET(0x525e); return;  // ret
 L_525f:
-  I(0x525f, 4); s_brightenRoom(gb); return;  // jp $31fb
+  I(0x525f, 4); if (hook_is(gb, 0x31fb, brightenRoom_hook)) { brightenRoom_hook(gb); return; } HANDOFF(0x31fb);  // jp $31fb
 L_5262:
   I(0x5262, 3); SET_BC(0xfe80);  // ld bc,$fe80
   CALL(0x5265, objectSetSpeedZ_hook, 0x2358, 0x5268);  // call $2358
@@ -4712,7 +4671,7 @@ L_525e:
 void s_linkState05__animParameter3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_525f:
-  I(0x525f, 4); s_brightenRoom(gb); return;  // jp $31fb
+  I(0x525f, 4); if (hook_is(gb, 0x31fb, brightenRoom_hook)) { brightenRoom_hook(gb); return; } HANDOFF(0x31fb);  // jp $31fb
 }
 
 // 05:5262

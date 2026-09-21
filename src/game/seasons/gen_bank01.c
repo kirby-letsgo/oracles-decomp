@@ -578,7 +578,7 @@ L_5a12:
   I(0x5a1c, 4); mem_wr(gb, 0xcc65, A);  // ld ($cc65),a
   I(0x5a1f, 4); A = mem_rd(gb, 0xcc55);  // ld a,($cc55)
   I(0x5a22, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { CALL(0x5a24, s_clearEnemiesKilledList_b00, 0x30d9, 0x5a27); } else I(0x5a24, 3);  // call z,$30d9
+  if ((F & FZ)) { CALL(0x5a24, clearEnemiesKilledList_b00_hook, 0x30d9, 0x5a27); } else I(0x5a24, 3);  // call z,$30d9
   s_func_5c18(gb); return;  // fallthrough
 }
 
@@ -599,7 +599,7 @@ L_5a12:
   I(0x5a1c, 4); mem_wr(gb, 0xcc65, A);  // ld ($cc65),a
   I(0x5a1f, 4); A = mem_rd(gb, 0xcc55);  // ld a,($cc55)
   I(0x5a22, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { CALL(0x5a24, s_clearEnemiesKilledList_b00, 0x30d9, 0x5a27); } else I(0x5a24, 3);  // call z,$30d9
+  if ((F & FZ)) { CALL(0x5a24, clearEnemiesKilledList_b00_hook, 0x30d9, 0x5a27); } else I(0x5a24, 3);  // call z,$30d9
   s_func_5c18(gb); return;  // fallthrough
 }
 
@@ -616,7 +616,7 @@ L_5a12:
   I(0x5a1c, 4); mem_wr(gb, 0xcc65, A);  // ld ($cc65),a
   I(0x5a1f, 4); A = mem_rd(gb, 0xcc55);  // ld a,($cc55)
   I(0x5a22, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { CALL(0x5a24, s_clearEnemiesKilledList_b00, 0x30d9, 0x5a27); } else I(0x5a24, 3);  // call z,$30d9
+  if ((F & FZ)) { CALL(0x5a24, clearEnemiesKilledList_b00_hook, 0x30d9, 0x5a27); } else I(0x5a24, 3);  // call z,$30d9
   s_func_5c18(gb); return;  // fallthrough
 }
 
@@ -631,7 +631,7 @@ L_5a12:
   I(0x5a1c, 4); mem_wr(gb, 0xcc65, A);  // ld ($cc65),a
   I(0x5a1f, 4); A = mem_rd(gb, 0xcc55);  // ld a,($cc55)
   I(0x5a22, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { CALL(0x5a24, s_clearEnemiesKilledList_b00, 0x30d9, 0x5a27); } else I(0x5a24, 3);  // call z,$30d9
+  if ((F & FZ)) { CALL(0x5a24, clearEnemiesKilledList_b00_hook, 0x30d9, 0x5a27); } else I(0x5a24, 3);  // call z,$30d9
   s_func_5c18(gb); return;  // fallthrough
 }
 
@@ -656,9 +656,9 @@ void s_cutscene04(GB *gb) {
 L_5aab:
   CALL(0x5aab, setInteractionsEnabledTo2_hook, 0x497e, 0x5aae);  // call $497e
   CALL(0x5aae, clearObjectsWithEnabled2_hook, 0x49a4, 0x5ab1);  // call $49a4
-  CALL(0x5ab1, s_clearItems, 0x3566, 0x5ab4);  // call $3566
-  CALL(0x5ab4, s_clearEnemies, 0x3578, 0x5ab7);  // call $3578
-  CALL(0x5ab7, s_clearParts, 0x358a, 0x5aba);  // call $358a
+  CALL(0x5ab1, clearItems_hook, 0x3566, 0x5ab4);  // call $3566
+  CALL(0x5ab4, clearEnemies_hook, 0x3578, 0x5ab7);  // call $3578
+  CALL(0x5ab7, clearParts_hook, 0x358a, 0x5aba);  // call $358a
   CALL(0x5aba, clearReservedInteraction0_hook, 0x3544, 0x5abd);  // call $3544
   CALL(0x5abd, clearScreenVariables_hook, 0x3528, 0x5ac0);  // call $3528
   CALL(0x5ac0, clearMemoryOnScreenReload_hook, 0x493c, 0x5ac3);  // call $493c
@@ -708,9 +708,9 @@ void s_cutscene05(GB *gb) {
   CALL(0x5aa8, s_func_5cfe, 0x5adb, 0x5aab);  // call $5adb
   CALL(0x5aab, setInteractionsEnabledTo2_hook, 0x497e, 0x5aae);  // call $497e
   CALL(0x5aae, clearObjectsWithEnabled2_hook, 0x49a4, 0x5ab1);  // call $49a4
-  CALL(0x5ab1, s_clearItems, 0x3566, 0x5ab4);  // call $3566
-  CALL(0x5ab4, s_clearEnemies, 0x3578, 0x5ab7);  // call $3578
-  CALL(0x5ab7, s_clearParts, 0x358a, 0x5aba);  // call $358a
+  CALL(0x5ab1, clearItems_hook, 0x3566, 0x5ab4);  // call $3566
+  CALL(0x5ab4, clearEnemies_hook, 0x3578, 0x5ab7);  // call $3578
+  CALL(0x5ab7, clearParts_hook, 0x358a, 0x5aba);  // call $358a
   CALL(0x5aba, clearReservedInteraction0_hook, 0x3544, 0x5abd);  // call $3544
   CALL(0x5abd, clearScreenVariables_hook, 0x3528, 0x5ac0);  // call $3528
   CALL(0x5ac0, clearMemoryOnScreenReload_hook, 0x493c, 0x5ac3);  // call $493c
@@ -774,43 +774,6 @@ void s_cutscene08__afterCall5be7(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5be7:
   I(0x5be7, 4); if (hook_is(gb, 0x3445, updateInteractionsAndDrawAllSprites_hook)) { updateInteractionsAndDrawAllSprites_hook(gb); return; } HANDOFF(0x3445);  // jp $3445
-}
-
-// 01:5bea
-void s_cutscene09(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5bea, refreshLoadedTreeGfx_hook, 0x1601, 0x5bed);  // call $1601
-L_5bed:
-  I(0x5bed, 2); E = 0x00;  // ld e,$00
-  CALL(0x5bef, endgameCutsceneHandler_hook, 0x2db1, 0x5bf2);  // call $2db1
-L_5bf2:
-  I(0x5bf2, 4); A = mem_rd(gb, 0xcc67);  // ld a,($cc67)
-  I(0x5bf5, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x5bf6); return; } I(0x5bf6, 2);  // ret z
-  I(0x5bf7, 4); if (hook_is(gb, 0x5c85, applyWarpTransition2_hook)) { applyWarpTransition2_hook(gb); return; } HANDOFF(0x5c85);  // jp $5c85
-}
-
-// 01:5bed
-void s_cutscene09__afterCall5bed(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5bed:
-  I(0x5bed, 2); E = 0x00;  // ld e,$00
-  CALL(0x5bef, endgameCutsceneHandler_hook, 0x2db1, 0x5bf2);  // call $2db1
-L_5bf2:
-  I(0x5bf2, 4); A = mem_rd(gb, 0xcc67);  // ld a,($cc67)
-  I(0x5bf5, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x5bf6); return; } I(0x5bf6, 2);  // ret z
-  I(0x5bf7, 4); if (hook_is(gb, 0x5c85, applyWarpTransition2_hook)) { applyWarpTransition2_hook(gb); return; } HANDOFF(0x5c85);  // jp $5c85
-}
-
-// 01:5bf2
-void s_cutscene09__afterCall5bf2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5bf2:
-  I(0x5bf2, 4); A = mem_rd(gb, 0xcc67);  // ld a,($cc67)
-  I(0x5bf5, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x5bf6); return; } I(0x5bf6, 2);  // ret z
-  I(0x5bf7, 4); if (hook_is(gb, 0x5c85, applyWarpTransition2_hook)) { applyWarpTransition2_hook(gb); return; } HANDOFF(0x5c85);  // jp $5c85
 }
 
 // 01:5c07
@@ -1778,7 +1741,7 @@ L_4c0f:
   CALL(0x4c30, s_loadTilesetGraphics, 0x3737, 0x4c33);  // call $3737
   CALL(0x4c33, loadDungeonLayout_hook, 0x2cfd, 0x4c36);  // call $2cfd
   CALL(0x4c36, s_func_131f, 0x12dd, 0x4c39);  // call $12dd
-  CALL(0x4c39, s_clearEnemiesKilledList_b00, 0x30d9, 0x4c3c);  // call $30d9
+  CALL(0x4c39, clearEnemiesKilledList_b00_hook, 0x30d9, 0x4c3c);  // call $30d9
   CALL(0x4c3c, func_5c6b_hook, 0x5a58, 0x4c3f);  // call $5a58
   I(0x4c3f, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
   I(0x4c42, 2); alu_cp(gb, 0x03);  // cp $03
@@ -1888,7 +1851,7 @@ L_4c0f:
   CALL(0x4c30, s_loadTilesetGraphics, 0x3737, 0x4c33);  // call $3737
   CALL(0x4c33, loadDungeonLayout_hook, 0x2cfd, 0x4c36);  // call $2cfd
   CALL(0x4c36, s_func_131f, 0x12dd, 0x4c39);  // call $12dd
-  CALL(0x4c39, s_clearEnemiesKilledList_b00, 0x30d9, 0x4c3c);  // call $30d9
+  CALL(0x4c39, clearEnemiesKilledList_b00_hook, 0x30d9, 0x4c3c);  // call $30d9
   CALL(0x4c3c, func_5c6b_hook, 0x5a58, 0x4c3f);  // call $5a58
   I(0x4c3f, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
   I(0x4c42, 2); alu_cp(gb, 0x03);  // cp $03
@@ -1946,7 +1909,7 @@ L_4c0f:
   CALL(0x4c30, s_loadTilesetGraphics, 0x3737, 0x4c33);  // call $3737
   CALL(0x4c33, loadDungeonLayout_hook, 0x2cfd, 0x4c36);  // call $2cfd
   CALL(0x4c36, s_func_131f, 0x12dd, 0x4c39);  // call $12dd
-  CALL(0x4c39, s_clearEnemiesKilledList_b00, 0x30d9, 0x4c3c);  // call $30d9
+  CALL(0x4c39, clearEnemiesKilledList_b00_hook, 0x30d9, 0x4c3c);  // call $30d9
   CALL(0x4c3c, func_5c6b_hook, 0x5a58, 0x4c3f);  // call $5a58
   I(0x4c3f, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
   I(0x4c42, 2); alu_cp(gb, 0x03);  // cp $03
@@ -2063,7 +2026,7 @@ void s_func_5a60(GB *gb) {
   CALL(0x58a6, initializeVramMaps_hook, 0x04a9, 0x58a9);  // call $04a9
   CALL(0x58a9, clearMemoryOnScreenReload_hook, 0x493c, 0x58ac);  // call $493c
   CALL(0x58ac, clearScreenVariables_hook, 0x3528, 0x58af);  // call $3528
-  CALL(0x58af, s_clearEnemiesKilledList_b00, 0x30d9, 0x58b2);  // call $30d9
+  CALL(0x58af, clearEnemiesKilledList_b00_hook, 0x30d9, 0x58b2);  // call $30d9
 L_58b2:
   CALL(0x58b2, clearAllParentItems_hook, 0x2b57, 0x58b5);  // call $2b57
 L_58b5:

@@ -475,20 +475,21 @@ cant_use_sword:
 
 void checkLinkOnGround_hook(GB *gb) {
   BASE(checkLinkOnGround);
-  CYC(b_+0, b_+3); A = W8(wLinkObjectIndex);
-  CYC(b_+3, b_+5); alu_and(gb, 0x01);
+  CYC(b_+O(0), b_+OE(3)); A = W8(wLinkObjectIndex);
+  CYC(b_+O(3), b_+OE(5)); alu_and(gb, 0x01);
   if (!(F & FZ)) {
-    CYCT(b_+5, b_+6); ret_effect(gb); return;
+    CYCT(b_+O(5), b_+OE(6)); ret_effect(gb); return;
   }
-  CYC(b_+5, b_+6);
-  CYC(b_+6, b_+9); SET_HL(wLinkInAir);
-  CYC(b_+9, b_+10); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+10, b_+11); alu_or(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) {
-    CYCT(b_+11, b_+12); ret_effect(gb); return;
+  CYC(b_+O(5), b_+OE(6));
+  CYC(b_+O(6), b_+OE(9)); SET_HL(wLinkInAir);
+  CYC(b_+O(9), b_+OE(10)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(10), b_+OE(11)); alu_or(gb, mem_rd(gb, HL));
+  if (game_seasons) { CYC(b_+S(11), b_+S(12)); ret_effect(gb); return; }
+  if (!game_seasons) {
+    if (!(F & FZ)) { CYCT(b_+11, b_+12); ret_effect(gb); return; }
+    CYC(b_+11, b_+12);
+    CYC(b_+12, b_+14); TAIL(isLinkUnderwater);
   }
-  CYC(b_+11, b_+12);
-  CYC(b_+12, b_+14); TAIL(isLinkUnderwater);
 }
 
 void isLinkUnderwater_hook(GB *gb) {

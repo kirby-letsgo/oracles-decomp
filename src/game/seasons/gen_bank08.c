@@ -2825,7 +2825,7 @@ L_4447:
   I(0x4466, 2); alu_and(gb, 0x01);  // and $01
   CALL(0x4468, interactionSetAnimation_hook, 0x25cb, 0x446b);  // call $25cb
   CALL(0x446b, objectDeleteRelatedObj1AsStaticObject_hook, 0x308c, 0x446e);  // call $308c
-  CALL(0x446e, s_findFreeStaticObjectSlot, 0x307e, 0x4471);  // call $307e
+  CALL(0x446e, findFreeStaticObjectSlot_hook, 0x307e, 0x4471);  // call $307e
   I(0x4471, 2); A = 0x03;  // ld a,$03
   if ((F & FZ)) { CALL(0x4473, objectSaveAsStaticObject_hook, 0x30a3, 0x4476); } else I(0x4473, 3);  // call z,$30a3
 L_4476:

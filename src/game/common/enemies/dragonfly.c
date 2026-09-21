@@ -71,17 +71,23 @@ void enemyCode53_hook(GB *gb) {
 // 0e:66ae, bare global; jump-table target from enemyCode53. Initialization.
 void dragonfly_state0_hook(GB *gb) {
   BASE(dragonfly_state0);
-  CYC(b_+0, b_+1); H = D;
-  CYC(b_+1, b_+2); L = E;
-  CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_SUBID;
-  CYC(b_+5, b_+6); A = mem_rd(gb, HL);
-  CYC(b_+6, b_+8); L = ENEMY_BASE + OBJ_OAM_FLAGS_BACKUP;
-  CYC(b_+8, b_+9); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(b_+9, b_+10); mem_wr(gb, HL, A);
-  CYC(b_+10, b_+12); L = ENEMY_BASE + OBJ_Z + 1; // Enemy.zh
-  CYC(b_+12, b_+14); mem_wr(gb, HL, 0xf8); // -$08
-  CYC(b_+14, b_+17); TAIL(objectSetVisiblec1); // jp
+  if (game_seasons) {
+    CYC(b_+S(0), b_+S(3)); A = W8(wRoomStateModifier);
+    CYC(b_+S(3), b_+S(5)); alu_cp(gb, 0x02);
+    if (!(F & FZ)) { CYCT(b_+S(5), b_+S(8)); TAIL(enemyDelete); }
+    CYC(b_+S(5), b_+S(8));
+  }
+  CYC(b_+O(0), b_+OE(1)); H = D;
+  CYC(b_+O(1), b_+OE(2)); L = E;
+  CYC(b_+O(2), b_+OE(3)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
+  CYC(b_+O(3), b_+OE(5)); L = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+O(5), b_+OE(6)); A = mem_rd(gb, HL);
+  CYC(b_+O(6), b_+OE(8)); L = ENEMY_BASE + OBJ_OAM_FLAGS_BACKUP;
+  CYC(b_+O(8), b_+OE(9)); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+O(9), b_+OE(10)); mem_wr(gb, HL, A);
+  CYC(b_+O(10), b_+OE(12)); L = ENEMY_BASE + OBJ_Z + 1; // Enemy.zh
+  CYC(b_+O(12), b_+OE(14)); mem_wr(gb, HL, 0xf8); // -$08
+  CYC(b_+O(14), b_+OE(17)); TAIL(objectSetVisiblec1); // jp
 }
 
 // 0e:66bf, bare global; jump-table target from enemyCode53. Choosing new direction to move in.

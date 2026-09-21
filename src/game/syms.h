@@ -11800,6 +11800,7 @@ enum {
   S_spinner_subid02__state0,
   S_spinner_subid02__state1,
   S_spinner_updateLinkPosition,
+  S_spr_item_icons_1,
   S_stalfos_beginJumpAnimation,
   S_stalfos_checkJumpAwayFromLink,
   S_stalfos_checkSubid3StompsLink,

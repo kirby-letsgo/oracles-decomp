@@ -28,8 +28,19 @@ screenTransitionState2@checkCanTransitionOverWater
 updateEnemy                      # Seasons body written out under if (game_seasons)
 specialObjectUpdateAdjacentWallsBitset   # Seasons body written out under if (game_seasons)
 loadRoomLayout@loadLayoutData   # Seasons body written out under if (game_seasons)
-interactionCode60@giveTreasure   # entry points into interactionCode60 (ofs_routines.txt)
-interactionCode60@checkLinkTouched
 inventoryMenuState3@subState1
 inventoryMenuState3@subState0
 inventoryMenuState3@subState2   # jp to a shared local at a per-game distance (TAIL)
+clearDynamicInteractions   # clear_object_slots skips Seasons' extra byte by hand
+clearItems
+clearEnemies
+clearParts
+findFreeStaticObjectSlot   # Seasons loop written out under if (game_seasons)
+brightenRoom   # Seasons body written out (brighten_room_seasons)
+brightenRoomLightly
+func_3211   # bank2_function_caller: Seasons `jp ++` and its own shared body address
+clearEnemiesKilledList_b00
+addRoomToEnemiesKilledList_b00
+markEnemyAsKilledInRoom_b00
+generateRandomBuffer_b00
+getRandomPositionForEnemy_b00

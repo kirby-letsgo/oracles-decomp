@@ -506,11 +506,18 @@
 00:3048 parseGivenObjectData_b00_hook -
 00:3060 loadStaticObjects_hook -
 00:3076 clearStaticObjects_hook -
+00:307e findFreeStaticObjectSlot_hook -
 00:308c objectDeleteRelatedObj1AsStaticObject_hook -
 00:30a3 objectSaveAsStaticObject_hook -
 00:30c7 checkGlobalFlag_hook -
 00:30cd setGlobalFlag_hook -
 00:30d3 unsetGlobalFlag_hook -
+00:30d9 clearEnemiesKilledList_b00_hook -
+00:30de addRoomToEnemiesKilledList_b00_hook -
+00:30e3 markEnemyAsKilledInRoom_b00_hook -
+00:30e8 func_3211_hook -
+00:30ed generateRandomBuffer_b00_hook -
+00:30f2 getRandomPositionForEnemy_b00_hook -
 00:3110 clearPaletteFadeVariablesAndRefreshPalettes_hook -
 00:3116 clearPaletteFadeVariables_hook -
 00:312f fadeoutToWhiteWithDelay_hook -
@@ -530,6 +537,8 @@
 00:31d4 darkenRoom_hook -
 00:31d6 _darkenRoomHelper_hook -
 00:31de _setDarkeningVariables_hook -
+00:31f7 brightenRoomLightly_hook -
+00:31fb brightenRoom_hook -
 00:3204 fastFadeinFromWhiteToRoom_hook -
 00:3212 fadeinFromWhiteToRoom_hook -
 00:3217 startFadeBetweenTwoPalettes_hook -
@@ -548,6 +557,10 @@
 00:353c clearLinkObject_hook -
 00:3544 clearReservedInteraction0_hook -
 00:354c clearReservedInteraction1_hook -
+00:3554 clearDynamicInteractions_hook -
+00:3566 clearItems_hook -
+00:3578 clearEnemies_hook -
+00:358a clearParts_hook -
 00:359c setEnemyTargetToLinkPosition_hook -
 00:3600 loadAnimationData_hook -
 00:3663 getIndexOfGashaSpotInRoom_hook -
@@ -725,6 +738,7 @@
 01:5a6f setEnteredWarpPosition_hook -
 01:5bb5 func_5d31_hook -
 01:5bc5 func_5d41_hook -
+01:5bea cutscene09_hook -
 01:5bfa cutscene0f_hook -
 01:5c02 cutscene0a_hook -
 01:5c43 cutscene16_hook -
@@ -936,6 +950,9 @@
 02:545d drawHeartDisplay__partiallyFilledHeart_hook -
 02:546b drawHeartDisplay__unfilledHearts_hook -
 02:5475 drawHeartDisplay__fillBlankSpace_hook -
+02:5480 loadItemIconGfx_hook -
+02:5489 loadItemIconGfx__func_hook -
+02:5499 loadItemIconGfx__clear_hook -
 02:54a2 loadStatusBarMap_hook -
 02:54d8 runInventoryMenu_hook -
 02:54ef runInventoryMenu__inventoryMenuStates_hook -
@@ -1385,6 +1402,7 @@
 05:4845 companionRetIfInactiveWithoutStateCheck_hook -
 05:485a companionSetAnimationToVar3f_hook -
 05:4865 companionFlashFromChargingAnimation_hook -
+05:4878 companionCheckMountingComplete_hook -
 05:48ef companionSetPriorityRelativeToLink_hook -
 05:48f8 companionDecCounter1ToJumpDownCliff_hook -
 05:4917 companionDecCounter1IfNonzero_hook -
@@ -1604,6 +1622,7 @@
 06:42ae nextToTileWithInfoText_hook -
 06:42e6 showInfoTextForTile_hook -
 06:4314 specialObjectCheckPushingAgainstTile_hook -
+06:433b checkAndDecKeyCount_hook -
 06:4364 specialObjectGetTileInFront_hook -
 06:436b specialObjectGetTileAtOffset_hook -
 06:4389 checkTileAfterNext_hook -
@@ -1657,6 +1676,7 @@
 06:53e8 parentItemCheckButtonPressed_hook -
 06:53eb andHlWithGameKeysPressed_hook -
 06:53f0 clearParentItemIfCantUseSword_hook -
+06:5416 checkLinkOnGround_hook -
 06:5422 isLinkInHole_hook -
 06:5429 updateGrabbedObjectPosition_hook -
 06:5588 specialObjectCode_minecart_b06_hook -
@@ -1670,6 +1690,7 @@
 06:7381 linkCutscene_initOam_setVisible_incState_hook -
 06:74e8 linkCutscene_oscillateZ_2_hook -
 07:4000 fileManagementFunction_hook -
+07:400a initializeFile_b07_hook -
 07:4051 saveFile_b07_hook -
 07:407d loadFile_b07_hook -
 07:4096 eraseFile_b07_hook -
@@ -1824,6 +1845,7 @@
 07:54db explosionTryToBreakNextTile_hook -
 07:5642 itemCheckWithinRangeOfLink_hook -
 07:5655 itemCode2a_hook -
+07:5a8c itemCode28_hook -
 07:5b1f itemCode15_hook -
 07:5b8a itemCode1d_hook -
 07:5b9a itemCode1dPost_hook -
@@ -1840,6 +1862,7 @@
 07:5e2e itemCode0cPost_hook -
 07:5e43 itemCode04Post_hook -
 07:5e58 itemSetPositionInSwordArc_hook -
+07:5e5a itemInitializeFromLinkPosition_hook -
 07:5f09 tryBreakTileWithExpertsRing_hook -
 07:5f12 tryBreakTileWithSword_calculateLevel_hook -
 07:5f1c tryBreakTileWithSword_hook -
@@ -1978,6 +2001,12 @@
 0a:6c6f creditsTextHorizontal_6559_hook -
 0a:6c91 horizontalCreditsText_var03Nonzero_hook -
 0a:6d5a interactionCodeaf_hook -
+0a:7329 interactionCodeb5_hook -
+0a:7331 interactionCodeb5__state0_hook -
+0a:7355 interactionCodeb5__state1_hook -
+0a:735f interactionCodeb5__substate0_hook -
+0a:7375 interactionCodeb5__substate1_hook -
+0a:7397 interactionCodeb5__substate2_hook -
 0a:743c interactionCodeb9_hook -
 0a:7962 interactionCodec1_hook -
 0a:796a interactionCodec1__state0_hook -
@@ -2530,6 +2559,7 @@
 0d:4f96 cucco_attacked_hook -
 0d:4fbb cucco_hitWithMysterySeed_hook -
 0d:4fe6 cucco_playChickenSoundEvery32Frames_hook -
+0d:4ff8 enemyCode37_hook -
 0d:502a enemyCode38_hook -
 0d:5042 greatFairy_state_uninitialized_hook -
 0d:504a greatFairy_state1_hook -
@@ -2746,6 +2776,8 @@
 0d:661c flyingTile_dead_hook -
 0d:6621 flyingTile_delete_hook -
 0d:6627 flyingTile_overwriteTileHere_hook -
+0d:669d enemyCode53_hook -
+0d:66ad dragonfly_state0_hook -
 0d:66c6 dragonfly_state1_hook -
 0d:670c dragonfly_state2_hook -
 0d:671d dragonfly_animate_hook -
@@ -2830,6 +2862,7 @@
 0e:450f enemyBoss_dead_b0f_hook -
 0e:4553 enemyBoss_spawnShadow_b0f_hook -
 0e:4565 enemyBoss_initializeRoom_b0f_hook -
+0e:4571 enemyBoss_initializeRoomWithoutExtraGfx_b10_hook -
 0e:564a vire_state_uninitialized_hook -
 0e:565c vire_state_stub_hook -
 0e:570b vire_mainForm_state9_hook -
@@ -2923,6 +2956,7 @@
 0f:450f enemyBoss_dead_b10_hook -
 0f:4553 enemyBoss_spawnShadow_b10_hook -
 0f:4565 enemyBoss_initializeRoom_b10_hook -
+0f:4571 enemyBoss_initializeRoomWithoutExtraGfx_b0f_hook -
 0f:45a2 enemyCode01_hook -
 0f:45ff enemyCode01__normalStatus_hook -
 0f:462b mergedTwinrova_state_uninitialized_hook -
@@ -3111,6 +3145,8 @@
 10:4558 partCode05_hook -
 10:45a8 partCode06_hook -
 10:469a partCode07_hook -
+10:4700 partCode08_hook -
+10:477c partCode09_hook -
 10:4833 partCode0b_hook -
 10:48bb partCode0c_hook -
 10:4918 partCode0e_hook -
@@ -3223,6 +3259,7 @@
 11:5969 skipToOpEnd_2byte_hook -
 11:5974 objectDataOp2_hook -
 11:5986 skipToOpEnd_4byte_hook -
+11:5993 checkSkipPointer_hook -
 11:59ad skipPointer_hook -
 11:59b2 parsePointer_hook -
 11:59bd objectDataOp3_hook -
@@ -3339,6 +3376,7 @@
 15:588d blossom_decideInitialChildStatus_hook -
 15:58a7 blossom_openNameEntryMenu_hook -
 15:5900 linkedNpc_generateSecret_hook -
+15:591d linkedNpc_calcLowTextIndex_hook -
 15:598e child_addValueToChildStatus_hook -
 15:5994 child_checkHasRupees_hook -
 15:599b child_setStage8ResponseToSelectedTextOption_hook -

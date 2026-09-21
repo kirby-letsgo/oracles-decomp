@@ -311,7 +311,6 @@
 15:64b9 s_linkedGhini_setVisible -
 15:6f14 s_linkedHerosCaveOldMan_spawnChests -
 15:6f49 s_linkedHerosCaveOldMan_takeRupees -
-15:591d s_linkedNpc_calcLowTextIndex -
 15:58f0 s_linkedNpc_checkSecretBegun -
 15:5916 s_linkedNpc_initHighTextIndex -
 15:63c1 s_linkedScript_giveRing -
@@ -511,16 +510,12 @@
 00:31db s__label_331c -
 00:2e7f s__updateEnemiesIfStateIsZero__next L
 00:3b02 s__updateInteractionsIfStateIsZero__next L
-00:30de s_addRoomToEnemiesKilledList_b00 -
-00:3105 s_addRoomToEnemiesKilledList__afterCall3105_b00 L
 00:0d48 s_addSpritesToOam_withOffset__next L
 00:0d65 s_addSpritesToOam_withOffset__decCounter L
 00:0d6b s_addSpritesToOam_withOffset__end L
 00:0d6e s_addSpritesToOam_withOffset__skip3Bytes L
 00:0d6f s_addSpritesToOam_withOffset__skip2Bytes L
 00:32be s_applyWarpDest -
-00:31fb s_brightenRoom -
-00:31f7 s_brightenRoomLightly -
 00:20b8 s_checkBEnemySlotsAvailable__nextSlot L
 00:20c2 s_checkBEnemySlotsAvailable__checkSlotAvailable L
 00:3d3d s_checkGotMakuSeedDidNotSeeZeldaKidnapped -
@@ -535,11 +530,6 @@
 00:198a s_clearAllItemsAndPutLinkOnGround__afterCall198a L
 00:1994 s_clearAllItemsAndPutLinkOnGround__nextItem L
 00:1995 s_clearAllItemsAndPutLinkOnGround__notSomariaBlock L
-00:3554 s_clearDynamicInteractions -
-00:3578 s_clearEnemies -
-00:30d9 s_clearEnemiesKilledList_b00 -
-00:3566 s_clearItems -
-00:358a s_clearParts -
 00:1734 s_cpOreChunkValue -
 00:3d30 s_createSokraSnore -
 00:0d95 s_drawAllSpritesUnconditionally__loop L
@@ -558,7 +548,6 @@
 00:288a s_enemyStandardUpdate__stunned L
 00:28b7 s_enemyStandardUpdate__reachedGround L
 00:28bc s_enemyStandardUpdate__ret02 L
-00:307e s_findFreeStaticObjectSlot -
 00:3346 s_flameOfDestructionsCutsceneCaller -
 00:3353 s_flameOfDestructionsCutsceneCaller__afterCall3353 L
 00:369b s_forceLoadRoom -
@@ -571,19 +560,16 @@
 00:1324 s_func_1383 -
 00:1357 s_func_1383__afterCall1357 L
 00:1360 s_func_1383__afterCall1360 L
-00:30e8 s_func_3211 -
 00:3460 s_func_3539 -
 00:346d s_func_3539__afterCall346d L
 00:3477 s_func_3539__afterCall3477 L
 00:3481 s_func_3539__afterCall3481 L
 00:35ec s_func_35ec -
-00:30ed s_generateRandomBuffer_b00 -
 00:3a06 s_generateVramTilesWithRoomChanges -
 00:10c4 s_getChestData__chestNotFound L
 00:10c7 s_getChestData__end L
 00:3e8f s_getLinkedHerosCaveSideEntranceRoom -
 00:203f s_getPositionOffsetForVelocity__invalid L
-00:30f2 s_getRandomPositionForEnemy_b00 -
 00:20f1 s_getScaledPositionOffsetForVelocity__scaleComponent L
 00:29c1 s_getSimulatedInput__returnInput L
 00:3e3e s_getSunkenCityNPCVisibleSubId_caller -
@@ -634,7 +620,6 @@
 00:3810 s_loadUniqueGfxHeaderEntry__loadPaletteIndex L
 00:324e s_mainThreadStart__mainThread L
 00:180b s_makeActiveObjectFollowLink_b00 -
-00:30e3 s_markEnemyAsKilledInRoom_b00 -
 00:35b8 s_multiIntroCutsceneCaller -
 00:35c5 s_multiIntroCutsceneCaller__afterCall35c5 L
 00:2646 s_npcFaceLinkAndAnimate -
@@ -1469,9 +1454,6 @@
 01:5bdf s_cutscene07__afterCall5bdf L
 01:5be2 s_cutscene08 -
 01:5be7 s_cutscene08__afterCall5be7 L
-01:5bea s_cutscene09 -
-01:5bed s_cutscene09__afterCall5bed L
-01:5bf2 s_cutscene09__afterCall5bf2 L
 01:5c07 s_cutscene0b -
 01:5c0f s_cutscene0b__afterCall5c0f L
 01:5c11 s_cutscene0c -
@@ -1675,7 +1657,6 @@
 3f:421c s_updateTileIndexBaseForAllObjects__nextPart L
 3f:422e s_updateTileIndexBaseForAllObjects__nextInteraction L
 3f:4240 s_updateTileIndexBaseForAllObjects__nextItem L
-11:5993 s_checkSkipPointer -
 11:593b s_objectDataOp0__nextOpcode L
 11:59f7 s_objectDataOp6__nextRandomEnemy L
 11:5a3b s_objectDataOp7__nextSpecificEnemy L
@@ -1805,11 +1786,9 @@
 10:468e s_partCode06__gotoState1IfTileAtRelatedObjPositionIsNotLit L
 10:46e2 s_partCode07__setAnim L
 10:46f2 s_partCode07__initialize L
-10:4700 s_partCode08 -
 10:4712 s_partCode08__state1 L
 10:4734 s_partCode08__spawnLightableTorch L
 10:475c s_partCode08__state0 L
-10:477c s_partCode09 -
 10:4783 s_partCode09__state1 L
 10:47ca s_partCode09__somethingOnButton L
 10:47e5 s_partCode09__delete L
@@ -2360,7 +2339,6 @@
 0e:4446 s_ecom_seasonsFunc_4446_b0e -
 0e:43f9 s_ecom_updateAnimationFromAngle__setAnimation_b0e L
 0e:4526 s_enemyBoss_dead__alreadyPlayedDeathSound_b0e L
-0e:4571 s_enemyBoss_initializeRoomWithoutExtraGfx_b0e -
 0e:45a2 s_enemyCode70 -
 0e:45ae s_enemyCode70__normalStatus L
 0e:45ca s_enemyCode70__state0 L
@@ -3364,13 +3342,11 @@
 03:71e4 s_zeldaKidnappedFlashFadeoutToWhite__func5 L
 06:74ee s_angleToY48X50 -
 06:719a s_animateRelatedObj2 -
-06:433b s_checkAndDecKeyCount -
 06:435f s_checkAndDecKeyCount__bossKeyDoor L
 06:7501 s_checkCloseToY48X50 -
 06:490a s_checkItemUsed__punch L
 06:490f s_checkItemUsed__forcePunch L
 06:4911 s_checkItemUsed__checkItem L
-06:5416 s_checkLinkOnGround -
 06:52da s_checkNoOtherParentItemsInUse__nextItem L
 06:48a7 s_checkUseItems__normal_b06 L
 06:48af s_checkUseItems__sidescroll_b06 L
@@ -3695,7 +3671,6 @@
 05:48ea s_companionCheckEnableTerrainEffects__enableTerrainEffects L
 05:474c s_companionCheckHopDownCliff__vineTop L
 05:474e s_companionCheckHopDownCliff__cliffTile L
-05:4878 s_companionCheckMountingComplete -
 05:4885 s_companionCheckMountingComplete__stopMounting L
 05:4896 s_companionCheckMountingComplete__continue L
 05:48b5 s_companionCheckMountingComplete__nudgeLinkTowardCompanion L
@@ -5043,7 +5018,6 @@
 07:4fbf s_galeSeedTryToWarpLink__afterCall4fbf L
 07:4fc2 s_galeSeedTryToWarpLink__flickerAndCopyPositionToLink L
 07:4fd2 s_galeSeedTryToWarpLink__substate3 L
-07:400a s_initializeFile_b07 -
 07:6196 s_itemBeginThrow__clearItemSpeed L
 07:5fc8 s_itemCalculateSwordDamage__nextRing L
 07:5fd2 s_itemCalculateSwordDamage__noRingModifier L
@@ -5140,8 +5114,6 @@
 07:5d1d s_itemCode27__state1 L
 07:5d2f s_itemCode27__noCollision L
 07:5d45 s_itemCode27__collision L
-07:5a8c s_itemCode28 -
-07:5a9c s_itemCode28__afterCall5a9c L
 07:5aab s_itemCode28__calculatePosition L
 07:5ad4 s_itemCode28__tryToBreakTiles L
 07:5ae1 s_itemCode28__nextTile L
@@ -5187,7 +5159,6 @@
 07:5011 s_itemCode2b__swallow L
 07:5016 s_itemCode2b__delete L
 07:5019 s_itemCode2b__calcPosition L
-07:5e5a s_itemInitializeFromLinkPosition -
 07:4c19 s_itemUpdateConveyorBelt__ret L
 07:61db s_itemUpdateThrowingLaterally__weight3 L
 07:6201 s_itemUpdateThrowingLaterally__collision L
@@ -5268,7 +5239,6 @@
 0d:4e2a s_cucco_state_grabbed__holding L
 0d:4e3e s_cucco_state_grabbed__checkOutOfScreenBounds L
 0d:4e50 s_cucco_state_grabbed__landed L
-0d:66ad s_dragonfly_state0 -
 0d:6716 s_dragonfly_state2__nextState L
 0d:6736 s_dragonfly_state3__nextState L
 0d:6751 s_dragonfly_state4__nextState L
@@ -5308,7 +5278,6 @@
 0d:4b5e s_enemyCode35__dead L
 0d:4b6a s_enemyCode35__normalStatus L
 0d:4dd3 s_enemyCode36__normalStatus L
-0d:4ff8 s_enemyCode37 -
 0d:5000 s_enemyCode37__state0 L
 0d:5014 s_enemyCode37__state1 L
 0d:51ad s_enemyCode39__normalStatus L
@@ -5367,7 +5336,6 @@
 0d:6402 s_enemyCode51__normalStatus L
 0d:6418 s_enemyCode51__normalState L
 0d:656a s_enemyCode52__normalStatus L
-0d:669d s_enemyCode53 -
 0d:7099 s_enemyCode54 -
 0d:70dd s_enemyCode54__normalStatus L
 0d:7112 s_enemyCode54__state0 L
@@ -6053,9 +6021,6 @@
 02:5127 s_loadCommonGraphics_body -
 02:5147 s_loadCommonGraphics_body__loadMoneyGraphic L
 02:5156 s_loadCommonGraphics_body__updateDisplayedMoney L
-02:5480 s_loadItemIconGfx -
-02:5489 s_loadItemIconGfx__func L
-02:5499 s_loadItemIconGfx__clear L
 02:5f8d s_loadMinimapDisplayRoom -
 02:5fa0 s_loadMinimapDisplayRoom__overworld L
 02:5fa9 s_loadMinimapDisplayRoom__makuTree L
@@ -6647,12 +6612,6 @@
 0a:7019 s_interactionCodeb3__state1 L
 0a:701c s_interactionCodeb3__afterCall701c L
 0a:702a s_interactionCodeb4 -
-0a:7329 s_interactionCodeb5 -
-0a:7331 s_interactionCodeb5__state0 L
-0a:7355 s_interactionCodeb5__state1 L
-0a:735f s_interactionCodeb5__substate0 L
-0a:7375 s_interactionCodeb5__substate1 L
-0a:7397 s_interactionCodeb5__substate2 L
 0a:469d s_interactionCodeb6 -
 0a:46b1 s_interactionCodeb6__state0 L
 0a:46d9 s_interactionCodeb6__unearthed L
@@ -6957,7 +6916,6 @@
 0f:4446 s_ecom_seasonsFunc_4446_b0f -
 0f:43f9 s_ecom_updateAnimationFromAngle__setAnimation_b0f L
 0f:4526 s_enemyBoss_dead__alreadyPlayedDeathSound_b0f L
-0f:4571 s_enemyBoss_initializeRoomWithoutExtraGfx_b0f -
 0f:45cb s_enemyCode01__collisionOccurred L
 0f:4625 s_enemyCode01__stateCOrHigher L
 0f:5835 s_enemyCode02 -

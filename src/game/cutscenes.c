@@ -60,31 +60,33 @@ void cutscene0c_hook(GB *gb) {
 void cutscene09_hook(GB *gb) {
   BASE(cutscene09);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(b_+0, refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+3);
-  CYC(b_+3, b_+6); A = W8(wCutsceneTrigger);
-  CYC(b_+6, b_+7); alu_or(gb, A);
-  if (!(F & FZ)) {
-    CYCT(b_+7, b_+10);
-    TAIL(setCutsceneIndexIfCutsceneTriggerSet);
+  CALL_C(b_+O(0), refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+OE(3));
+  if (!game_seasons) {
+    CYC(b_+3, b_+6); A = W8(wCutsceneTrigger);
+    CYC(b_+6, b_+7); alu_or(gb, A);
+    if (!(F & FZ)) {
+      CYCT(b_+7, b_+10);
+      TAIL(setCutsceneIndexIfCutsceneTriggerSet);
+    }
+    CYC(b_+7, b_+10);
   }
-  CYC(b_+7, b_+10);
-  CYC(b_+10, b_+12); E = 0x00;
+  CYC(b_+O(10), b_+OE(12)); E = 0x00;
   cutscene_endgameTail_hook(gb);
 }
 
 void cutscene_endgameTail_hook(GB *gb) {
   BASE(cutscene09);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(b_+12, endgameCutsceneHandler_hook, SYM(endgameCutsceneHandler), b_+15);
-  CYC(b_+15, b_+18); A = W8(wWarpTransition2);
-  CYC(b_+18, b_+19); alu_or(gb, A);
+  CALL_C(b_+O(12), endgameCutsceneHandler_hook, SYM(endgameCutsceneHandler), b_+OE(15));
+  CYC(b_+O(15), b_+OE(18)); A = W8(wWarpTransition2);
+  CYC(b_+O(18), b_+OE(19)); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+19, b_+20);
+    CYCT(b_+O(19), b_+OE(20));
     ret_effect(gb);
     return;
   }
-  CYC(b_+19, b_+20);
-  CYC(b_+20, b_+23);
+  CYC(b_+O(19), b_+OE(20));
+  CYC(b_+O(20), b_+OE(23));
   TAIL(applyWarpTransition2);
 }
 

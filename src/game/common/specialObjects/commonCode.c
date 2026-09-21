@@ -1678,72 +1678,74 @@ static void companion_nudge_link_toward_companion(GB *gb) {
 
 void companionCheckMountingComplete_hook(GB *gb) {
   BASE(companionCheckMountingComplete);
-  CYC(b_+0, b_+3); A = W8(wDisallowMountingCompanion);
-  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (!game_seasons) {
+    CYC(b_+0, b_+3); A = W8(wDisallowMountingCompanion);
+    CYC(b_+3, b_+4); alu_or(gb, A);
+    if (!(F & FZ)) {
+      CYCT(b_+4, b_+6);
+      goto stop_mounting;
+    }
+    CYC(b_+4, b_+6);
+  }
+  CYC(b_+O(6), b_+OE(9)); A = W8(w1Link_state);
+  CYC(b_+O(9), b_+OE(11)); alu_cp(gb, 0x01);
   if (!(F & FZ)) {
-    CYCT(b_+4, b_+6);
+    CYCT(b_+O(11), b_+OE(13));
     goto stop_mounting;
   }
-  CYC(b_+4, b_+6);
-  CYC(b_+6, b_+9); A = W8(w1Link_state);
-  CYC(b_+9, b_+11); alu_cp(gb, 0x01);
-  if (!(F & FZ)) {
-    CYCT(b_+11, b_+13);
-    goto stop_mounting;
-  }
-  CYC(b_+11, b_+13);
-  CYC(b_+13, b_+16); A = W8(wLinkGrabState);
-  CYC(b_+16, b_+17); alu_or(gb, A);
+  CYC(b_+O(11), b_+OE(13));
+  CYC(b_+O(13), b_+OE(16)); A = W8(wLinkGrabState);
+  CYC(b_+O(16), b_+OE(17)); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+17, b_+19);
+    CYCT(b_+O(17), b_+OE(19));
     goto continue_mounting;
   }
-  CYC(b_+17, b_+19);
+  CYC(b_+O(17), b_+OE(19));
 
 stop_mounting:
-  CYC(b_+19, b_+20); alu_xor(gb, A);
-  CYC(b_+20, b_+23); W8(wDisableWarpTiles) = A;
-  CYC(b_+23, b_+26); W8(wWarpsDisabled) = A;
-  CYC(b_+26, b_+29); W8(wDisableScreenTransitions) = A;
-  CYC(b_+29, b_+31); A = 0x01;
-  CYC(b_+31, b_+33); E = 0x04;
-  CYC(b_+33, b_+34); mem_wr(gb, DE, A);
-  CYC(b_+34, b_+35); alu_or(gb, D);
-  CYC(b_+35, b_+36); ret_effect(gb);
+  CYC(b_+O(19), b_+OE(20)); alu_xor(gb, A);
+  CYC(b_+O(20), b_+OE(23)); W8(wDisableWarpTiles) = A;
+  CYC(b_+O(23), b_+OE(26)); W8(wWarpsDisabled) = A;
+  CYC(b_+O(26), b_+OE(29)); W8(wDisableScreenTransitions) = A;
+  CYC(b_+O(29), b_+OE(31)); A = 0x01;
+  CYC(b_+O(31), b_+OE(33)); E = 0x04;
+  CYC(b_+O(33), b_+OE(34)); mem_wr(gb, DE, A);
+  CYC(b_+O(34), b_+OE(35)); alu_or(gb, D);
+  CYC(b_+O(35), b_+OE(36)); ret_effect(gb);
   return;
 
 continue_mounting:
-  CYC(b_+36, b_+39); SET_HL(w1Link_yh);
-  CYC(b_+39, b_+41); E = 0x0b;
-  CYC(b_+41, b_+42); A = mem_rd(gb, DE);
-  CYC(b_+42, b_+43); alu_cp(gb, mem_rd(gb, HL));
+  CYC(b_+O(36), b_+OE(39)); SET_HL(w1Link_yh);
+  CYC(b_+O(39), b_+OE(41)); E = 0x0b;
+  CYC(b_+O(41), b_+OE(42)); A = mem_rd(gb, DE);
+  CYC(b_+O(42), b_+OE(43)); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FZ)) {
-    CYCT(b_+43, b_+46); push_effect(gb, b_+46);
+    CYCT(b_+O(43), b_+OE(46)); push_effect(gb, b_+OE(46));
     companion_nudge_link_toward_companion(gb);
   } else {
-    CYC(b_+43, b_+46);
+    CYC(b_+O(43), b_+OE(46));
   }
-  CYC(b_+46, b_+48); E = 0x0d;
-  CYC(b_+48, b_+49); L = E;
-  CYC(b_+49, b_+50); A = mem_rd(gb, DE);
-  CYC(b_+50, b_+51); alu_cp(gb, mem_rd(gb, HL));
+  CYC(b_+O(46), b_+OE(48)); E = 0x0d;
+  CYC(b_+O(48), b_+OE(49)); L = E;
+  CYC(b_+O(49), b_+OE(50)); A = mem_rd(gb, DE);
+  CYC(b_+O(50), b_+OE(51)); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FZ)) {
-    CYCT(b_+51, b_+54); push_effect(gb, b_+54);
+    CYCT(b_+O(51), b_+OE(54)); push_effect(gb, b_+OE(54));
     companion_nudge_link_toward_companion(gb);
   } else {
-    CYC(b_+51, b_+54);
+    CYC(b_+O(51), b_+OE(54));
   }
-  CYC(b_+54, b_+56); L = 0x15;
-  CYC(b_+56, b_+58); alu_bit(gb, 7, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(b_+58, b_+59); ret_effect(gb); return; }
-  CYC(b_+58, b_+59);
-  CYC(b_+59, b_+61); L = 0x0f;
-  CYC(b_+61, b_+62); A = mem_rd(gb, HL);
-  CYC(b_+62, b_+64); alu_cp(gb, 0xfc);
-  if (F & FC) { CYCT(b_+64, b_+65); ret_effect(gb); return; }
-  CYC(b_+64, b_+65);
-  CYC(b_+65, b_+66); alu_xor(gb, A);
-  CYC(b_+66, b_+67); ret_effect(gb);
+  CYC(b_+O(54), b_+OE(56)); L = 0x15;
+  CYC(b_+O(56), b_+OE(58)); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+O(58), b_+OE(59)); ret_effect(gb); return; }
+  CYC(b_+O(58), b_+OE(59));
+  CYC(b_+O(59), b_+OE(61)); L = 0x0f;
+  CYC(b_+O(61), b_+OE(62)); A = mem_rd(gb, HL);
+  CYC(b_+O(62), b_+OE(64)); alu_cp(gb, 0xfc);
+  if (F & FC) { CYCT(b_+O(64), b_+OE(65)); ret_effect(gb); return; }
+  CYC(b_+O(64), b_+OE(65));
+  CYC(b_+O(65), b_+OE(66)); alu_xor(gb, A);
+  CYC(b_+O(66), b_+OE(67)); ret_effect(gb);
 }
 
 void companionCheckEnableTerrainEffects_hook(GB *gb) {

@@ -3400,7 +3400,7 @@ L_4526:
   I(0x4536, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x4537, 2); mem_wr(gb, HL, A);  // ld (hl),a
   CALL(0x4538, objectCopyPosition_hook, 0x21fd, 0x453b);  // call $21fd
-  CALL(0x453b, s_markEnemyAsKilledInRoom_b00, 0x30e3, 0x453e);  // call $30e3
+  CALL(0x453b, markEnemyAsKilledInRoom_b00_hook, 0x30e3, 0x453e);  // call $30e3
   I(0x453e, 2); E = 0x81;  // ld e,$81
   I(0x4540, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x4541, 2); alu_sub(gb, 0x08);  // sub $08
@@ -3411,35 +3411,6 @@ L_4526:
   CALL(0x454d, playSound_b00_hook, 0x0c74, 0x4550);  // call $0c74
 L_4550:
   I(0x4550, 4); if (hook_is(gb, 0x2e28, enemyDelete_hook)) { enemyDelete_hook(gb); return; } HANDOFF(0x2e28);  // jp $2e28
-}
-
-// 0f:4571
-void s_enemyBoss_initializeRoomWithoutExtraGfx_b0f(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4571, 3); A = mem_rd(gb, 0xffad);  // ldh a,($ffad)
-  I(0x4573, 1); D = A;  // ld d,a
-  I(0x4574, 2); A = 0xf0;  // ld a,$f0
-  CALL(0x4576, playSound_b00_hook, 0x0c74, 0x4579);  // call $0c74
-  I(0x4579, 1); alu_xor(gb, A);  // xor a
-  I(0x457a, 4); mem_wr(gb, 0xcbca, A);  // ld ($cbca),a
-  I(0x457d, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x457e, 4); mem_wr(gb, 0xcc51, A);  // ld ($cc51),a
-  I(0x4581, 3); SET_HL(0xccad);  // ld hl,$ccad
-  I(0x4584, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  I(0x4586, 4); A = mem_rd(gb, 0xcd00);  // ld a,($cd00)
-  I(0x4589, 2); alu_and(gb, 0x01);  // and $01
-  if (!(F & FZ)) { RET_TAKEN(0x458b); return; } I(0x458b, 2);  // ret nz
-  I(0x458c, 2); A = 0x0b;  // ld a,$0b
-  I(0x458e, 4); mem_wr(gb, 0xcc6a, A);  // ld ($cc6a),a
-  I(0x4591, 2); A = 0x1a;  // ld a,$1a
-  I(0x4593, 4); mem_wr(gb, 0xcc6c, A);  // ld ($cc6c),a
-  I(0x4596, 3); SET_HL(0xd008);  // ld hl,$d008
-  I(0x4599, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x459c, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x459d, 2); A = alu_swap(gb, A);  // swap a
-  I(0x459f, 1); alu_rrca(gb);  // rrca
-  I(0x45a0, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  RET(0x45a1); return;  // ret
 }
 
 // 0f:45cb
@@ -10284,9 +10255,9 @@ L_7c1e:
   I(0x7c27, 2); E = 0x7c;  // ld e,$7c
   I(0x7c29, 2); mem_wr(gb, DE, A);  // ld (de),a
   PUSH(0x7c2a, DE);  // push de
-  CALL(0x7c2b, s_clearEnemies, 0x3578, 0x7c2e);  // call $3578
-  CALL(0x7c2e, s_clearItems, 0x3566, 0x7c31);  // call $3566
-  CALL(0x7c31, s_clearParts, 0x358a, 0x7c34);  // call $358a
+  CALL(0x7c2b, clearEnemies_hook, 0x3578, 0x7c2e);  // call $3578
+  CALL(0x7c2e, clearItems_hook, 0x3566, 0x7c31);  // call $3566
+  CALL(0x7c31, clearParts_hook, 0x358a, 0x7c34);  // call $358a
   SET_DE(POP(0x7c34));  // pop de
   I(0x7c35, 1); alu_xor(gb, A);  // xor a
   I(0x7c36, 4); mem_wr(gb, 0xcc30, A);  // ld ($cc30),a
@@ -10533,9 +10504,9 @@ L_7c1f:
   I(0x7c27, 2); E = 0x7c;  // ld e,$7c
   I(0x7c29, 2); mem_wr(gb, DE, A);  // ld (de),a
   PUSH(0x7c2a, DE);  // push de
-  CALL(0x7c2b, s_clearEnemies, 0x3578, 0x7c2e);  // call $3578
-  CALL(0x7c2e, s_clearItems, 0x3566, 0x7c31);  // call $3566
-  CALL(0x7c31, s_clearParts, 0x358a, 0x7c34);  // call $358a
+  CALL(0x7c2b, clearEnemies_hook, 0x3578, 0x7c2e);  // call $3578
+  CALL(0x7c2e, clearItems_hook, 0x3566, 0x7c31);  // call $3566
+  CALL(0x7c31, clearParts_hook, 0x358a, 0x7c34);  // call $358a
   SET_DE(POP(0x7c34));  // pop de
   I(0x7c35, 1); alu_xor(gb, A);  // xor a
   I(0x7c36, 4); mem_wr(gb, 0xcc30, A);  // ld ($cc30),a
@@ -18275,7 +18246,7 @@ L_7009:
 L_702d:
   RET(0x702d); return;  // ret
 L_702e:
-  CALL(0x702e, s_clearEnemies, 0x3578, 0x7031);  // call $3578
+  CALL(0x702e, clearEnemies_hook, 0x3578, 0x7031);  // call $3578
   CALL(0x7031, getFreeEnemySlot_hook, 0x2e08, 0x7034);  // call $2e08
   I(0x7034, 3); mem_wr(gb, HL, 0x05);  // ld (hl),$05
   I(0x7036, 3); SET_HL(0xcfca);  // ld hl,$cfca
@@ -18500,7 +18471,7 @@ L_702d:
 void s_seasonsFunc_0f_6f75__state2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_702e:
-  CALL(0x702e, s_clearEnemies, 0x3578, 0x7031);  // call $3578
+  CALL(0x702e, clearEnemies_hook, 0x3578, 0x7031);  // call $3578
   CALL(0x7031, getFreeEnemySlot_hook, 0x2e08, 0x7034);  // call $2e08
   I(0x7034, 3); mem_wr(gb, HL, 0x05);  // ld (hl),$05
   I(0x7036, 3); SET_HL(0xcfca);  // ld hl,$cfca

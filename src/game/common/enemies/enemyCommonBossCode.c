@@ -116,29 +116,33 @@ skipScreenVarStore:
 void enemyBoss_initializeRoomWithoutExtraGfx_b10_hook(GB *gb) {
   BASE(enemyBoss_initializeRoomWithoutExtraGfx_b10);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+2); A = 0xf0;
-  CALL_C(b_+2, playSound_b00_hook, SYM(playSound_b00), b_+5);
-  CYC(b_+5, b_+6); alu_xor(gb, A);
-  CYC(b_+6, b_+9); W8(wDisableLinkCollisionsAndMenu) = A;
-  CYC(b_+9, b_+10); A = alu_dec8(gb, A);
-  CYC(b_+10, b_+13); W8(wActiveMusic) = A;
-  CYC(b_+13, b_+16); SET_HL(wcc93);
-  CYC(b_+16, b_+18); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  CYC(b_+18, b_+21); A = W8(wScreenVariables);
-  CYC(b_+21, b_+23); alu_and(gb, 0x01);
-  if (!(F & FZ)) { RET_TAKEN(b_+23); return; }
-  CYC(b_+23, b_+24);
-  CYC(b_+24, b_+26); A = 0x0b;
-  CYC(b_+26, b_+29); W8(wLinkForceState) = A;
-  CYC(b_+29, b_+31); A = 0x16;
-  CYC(b_+31, b_+34); W8(wLinkStateParameter) = A;
-  CYC(b_+34, b_+37); SET_HL(w1Link_direction);
-  CYC(b_+37, b_+40); A = W8(wScreenTransitionDirection);
-  CYC(b_+40, b_+41); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+41, b_+43); A = alu_swap(gb, A);
-  CYC(b_+43, b_+44); alu_rrca(gb);
-  CYC(b_+44, b_+45); mem_wr(gb, HL, A);
-  RET(b_+45); return;
+  if (game_seasons) {
+    CYC(b_+S(0), b_+S(2)); A = H8(hActiveObject);
+    CYC(b_+S(2), b_+S(3)); D = A;
+  }
+  CYC(b_+O(0), b_+OE(2)); A = 0xf0;
+  CALL_C(b_+O(2), playSound_b00_hook, SYM(playSound_b00), b_+OE(5));
+  CYC(b_+O(5), b_+OE(6)); alu_xor(gb, A);
+  CYC(b_+O(6), b_+OE(9)); W8(wDisableLinkCollisionsAndMenu) = A;
+  CYC(b_+O(9), b_+OE(10)); A = alu_dec8(gb, A);
+  CYC(b_+O(10), b_+OE(13)); W8(wActiveMusic) = A;
+  CYC(b_+O(13), b_+OE(16)); SET_HL(wcc93);
+  CYC(b_+O(16), b_+OE(18)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
+  CYC(b_+O(18), b_+OE(21)); A = W8(wScreenVariables);
+  CYC(b_+O(21), b_+OE(23)); alu_and(gb, 0x01);
+  if (!(F & FZ)) { RET_TAKEN(b_+O(23)); return; }
+  CYC(b_+O(23), b_+OE(24));
+  CYC(b_+O(24), b_+OE(26)); A = 0x0b;
+  CYC(b_+O(26), b_+OE(29)); W8(wLinkForceState) = A;
+  CYC(b_+O(29), b_+OE(31)); A = GV(0x16, 0x1a);
+  CYC(b_+O(31), b_+OE(34)); W8(wLinkStateParameter) = A;
+  CYC(b_+O(34), b_+OE(37)); SET_HL(w1Link_direction);
+  CYC(b_+O(37), b_+OE(40)); A = W8(wScreenTransitionDirection);
+  CYC(b_+O(40), b_+OE(41)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(41), b_+OE(43)); A = alu_swap(gb, A);
+  CYC(b_+O(43), b_+OE(44)); alu_rrca(gb);
+  CYC(b_+O(44), b_+OE(45)); mem_wr(gb, HL, A);
+  RET(b_+O(45)); return;
 }
 
 void enemyBoss_beginMiniboss_b10_hook(GB *gb) {

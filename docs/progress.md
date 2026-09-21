@@ -448,6 +448,24 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-21 (later): DIFFERENT batch 4, 62 routines in `ofs_routines.txt` plus hand-written
+  Seasons bodies in `seasons_ok_manual.txt`: clearEnemies/Items/Parts/DynamicInteractions
+  (`clear_object_slots` skips Seasons' extra byte), findFreeStaticObjectSlot (Seasons loop written
+  out), func_5a60, kingMoblinBomb_explode/state2, linkCutscene0, scriptCmd_loadScript,
+  brightenRoom/brightenRoomLightly (`brighten_room_seasons`), the six `bank2_function_caller`
+  wrappers (Seasons `jp ++`, shared body at getRandomPositionForEnemy+5, bank `GV(0x02, 0x10)`),
+  enemyBoss_initializeRoomWithoutExtraGfx_b0f/b10, partCode13, linkedNpc_calcLowTextIndex,
+  checkLinkOnGround, checkSkipPointer, cutscene09, dragonfly_state0, enemyCode37,
+  itemInitializeFromLinkPosition, companionCheckMountingComplete, initializeFile_b07 (two
+  symbolizer mislabels fixed: initializeChildOnGameStart, initializeVinePositions),
+  checkAndDecKeyCount, partCode09 (Seasons companion collision), loadItemIconGfx
+  (`spr_item_icons_1`, bank via SYMBANK), interactionCodeb5. Tooling: `seasons_hooks.py` reads
+  the C through `symfiles.seasons_code` (Ages-only blocks are invisible, so a TAIL inside
+  `if (!game_seasons)` no longer disqualifies) and accepts the `@locals` of every routine in
+  `ofs_routines.txt`. Shared Seasons hooks 3,598 -> 3,636, table 10,944. Gates: ctest 10/10,
+  whole movie, Ages verify 30k 0 failures, Seasons playthrough `OFS_TRAP=1 VERIFY_ALL=1` 0
+  failures, native both, lint 0.
+
 - 2026-09-21: DIFFERENT batch 3, 46 routines in `ofs_routines.txt`: decideItemDrop_body,
   inventoryMenuState3 (subStates 0/2 in `seasons_ok_manual.txt`: an equal-valued literal and a
   TAIL to a local at a per-game distance), parentItemCode_foolsOre and parentItemCode_punch

@@ -4928,8 +4928,10 @@ void func_5a60_hook(GB *gb) {
   CALL_C(b_+21, loadScreenMusicAndSetRoomPack_hook, SYM(loadScreenMusicAndSetRoomPack), b_+24);
   CALL_C(b_+24, loadTilesetData_hook, SYM(loadTilesetData), b_+27);
   CALL_C(b_+27, loadTilesetGraphics_hook, SYM(loadTilesetGraphics), b_+30);
-  CYC(b_+30, b_+33); A = W8(wLoadingRoomPack);
-  CYC(b_+33, b_+36); W8(wRoomPack) = A;
+  if (!game_seasons) {
+    CYC(b_+30, b_+33); A = W8(wLoadingRoomPack);
+    CYC(b_+33, b_+36); W8(wRoomPack) = A;
+  }
   CALL_C(b_+36, loadDungeonLayout_hook, SYM(loadDungeonLayout), b_+39);
   CYC(b_+39, b_+41); A = 0x02;
   CYC(b_+41, b_+44); mem_wr(gb, wThreadStateBuffer + 0x0e, A);

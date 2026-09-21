@@ -140,6 +140,10 @@ void kingMoblinBomb_explode_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); L = 0xc4; // Part.state
   CYC(b_+2, b_+4); mem_wr(gb, HL, 0x05);
+  if (game_seasons) {
+    CYC(b_+S(4), b_+S(6)); L = 0xe4;
+    CYC(b_+S(6), b_+S(8)); mem_wr(gb, HL, mem_rd(gb, HL) & 0x7f);
+  }
   CYC(b_+4, b_+6); L = 0xdb; // Part.oamFlagsBackup
   CYC(b_+6, b_+8); A = 0x0a;
   CYC(b_+8, b_+9); mem_wr(gb, HL, A); SET_HL(HL + 1);
@@ -173,6 +177,7 @@ justGrabbed:
   CYC(b_+13, b_+14); mem_wr(gb, DE, A); // Part.substate
   CYC(b_+14, b_+15); alu_xor(gb, A);
   CYC(b_+15, b_+18); mem_wr(gb, wLinkGrabState2, A); // wLinkGrabState2
+  if (game_seasons) { CYC(b_+S(18), b_+S(21)); TAIL(objectSetVisiblec1); }
   CALL_C(b_+18, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+21);
 
 beingHeld:

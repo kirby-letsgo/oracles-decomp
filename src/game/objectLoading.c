@@ -212,33 +212,35 @@ void skipToOpEnd_4byte_hook(GB *gb) {
 
 void checkSkipPointer_hook(GB *gb) {
   BASE(checkSkipPointer);
-  CYC(b_+0, b_+3); A = W8(wcc05);
-  CYC(b_+3, b_+5); alu_bit(gb, 1, A);
-  if (F & FZ) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
-  CYC(b_+5, b_+6);
-  CYC(b_+6, b_+9); A = W8(wcc85);
-  CYC(b_+9, b_+11); alu_bit(gb, 7, A);
+  if (!game_seasons) {
+    CYC(b_+0, b_+3); A = W8(wcc05);
+    CYC(b_+3, b_+5); alu_bit(gb, 1, A);
+    if (F & FZ) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
+    CYC(b_+5, b_+6);
+  }
+  CYC(b_+O(6), b_+OE(9)); A = W8(wcc85);
+  CYC(b_+O(9), b_+OE(11)); alu_bit(gb, 7, A);
   if (F & FZ) {
-    CYCT(b_+11, b_+13);
-    CYC(b_+27, b_+28); alu_or(gb, A);
-    if (F & FZ) { CYCT(b_+28, b_+30); goto done; }
-    CYC(b_+28, b_+30);
-    CYC(b_+30, b_+31); alu_xor(gb, A);
-    CYC(b_+31, b_+32); ret_effect(gb);
+    CYCT(b_+O(11), b_+OE(13));
+    CYC(b_+O(27), b_+OE(28)); alu_or(gb, A);
+    if (F & FZ) { CYCT(b_+O(28), b_+OE(30)); goto done; }
+    CYC(b_+O(28), b_+OE(30));
+    CYC(b_+O(30), b_+OE(31)); alu_xor(gb, A);
+    CYC(b_+O(31), b_+OE(32)); ret_effect(gb);
     return;
   }
-  CYC(b_+11, b_+13);
-  CYC(b_+13, b_+15); alu_and(gb, 0x03);
-  CYC(b_+15, b_+16); B = A;
-  CYC(b_+16, b_+17); alu_xor(gb, A);
-  CYC(b_+17, b_+20); W8(wcc85) = A;
-  CYC(b_+20, b_+23); A = W8(wScreenTransitionDirection);
-  CYC(b_+23, b_+24); alu_cp(gb, B);
-  if (F & FZ) { CYCT(b_+24, b_+25); ret_effect(gb); return; }
-  CYC(b_+24, b_+25);
+  CYC(b_+O(11), b_+OE(13));
+  CYC(b_+O(13), b_+OE(15)); alu_and(gb, 0x03);
+  CYC(b_+O(15), b_+OE(16)); B = A;
+  CYC(b_+O(16), b_+OE(17)); alu_xor(gb, A);
+  CYC(b_+O(17), b_+OE(20)); W8(wcc85) = A;
+  CYC(b_+O(20), b_+OE(23)); A = W8(wScreenTransitionDirection);
+  CYC(b_+O(23), b_+OE(24)); alu_cp(gb, B);
+  if (F & FZ) { CYCT(b_+O(24), b_+OE(25)); ret_effect(gb); return; }
+  CYC(b_+O(24), b_+OE(25));
 done:
-  CYC(b_+25, b_+26); alu_or(gb, D);
-  CYC(b_+26, b_+27);
+  CYC(b_+O(25), b_+OE(26)); alu_or(gb, D);
+  CYC(b_+O(26), b_+OE(27));
   ret_effect(gb);
 }
 

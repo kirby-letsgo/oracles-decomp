@@ -263,27 +263,29 @@ void itemSetPositionInSwordArc_hook(GB *gb) {
 
 void itemInitializeFromLinkPosition_hook(GB *gb) {
   BASE(itemInitializeFromLinkPosition);
-  CYC(b_+0, b_+2); E = 0x26;
-  CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+3, b_+4); mem_wr(gb, DE, A);
-  CYC(b_+4, b_+5); E = alu_inc8(gb, E);
-  CYC(b_+5, b_+6); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+6, b_+7); mem_wr(gb, DE, A);
-  CYC(b_+7, b_+10); A = W8(wLinkRaisedFloorOffset);
-  CYC(b_+10, b_+11); B = A;
-  CYC(b_+11, b_+14); A = W8(w1Link_yh);
-  CYC(b_+14, b_+15); alu_add(gb, B);
-  CYC(b_+15, b_+16); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+16, b_+18); E = 0x0b;
-  CYC(b_+18, b_+19); mem_wr(gb, DE, A);
-  CYC(b_+19, b_+20); SET_HL(HL + 1);
-  CYC(b_+20, b_+22); E = 0x0d;
-  CYC(b_+22, b_+25); A = W8(w1Link_xh);
-  CYC(b_+25, b_+26); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+26, b_+27); mem_wr(gb, DE, A);
-  CYC(b_+27, b_+30); A = W8(w1Link_zh);
-  CYC(b_+30, b_+32); E = 0x0f;
-  CYC(b_+32, b_+34); alu_sub(gb, 0x02);
-  CYC(b_+34, b_+35); mem_wr(gb, DE, A);
-  CYC(b_+35, b_+36); ret_effect(gb);
+  CYC(b_+O(0), b_+OE(2)); E = 0x26;
+  CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(3), b_+OE(4)); mem_wr(gb, DE, A);
+  CYC(b_+O(4), b_+OE(5)); E = alu_inc8(gb, E);
+  CYC(b_+O(5), b_+OE(6)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(6), b_+OE(7)); mem_wr(gb, DE, A);
+  if (!game_seasons) {
+    CYC(b_+7, b_+10); A = W8(wLinkRaisedFloorOffset);
+    CYC(b_+10, b_+11); B = A;
+  }
+  CYC(b_+O(11), b_+OE(14)); A = W8(w1Link_yh);
+  if (!game_seasons) CYC(b_+14, b_+15); alu_add(gb, B);
+  CYC(b_+O(15), b_+OE(16)); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+O(16), b_+OE(18)); E = 0x0b;
+  CYC(b_+O(18), b_+OE(19)); mem_wr(gb, DE, A);
+  CYC(b_+O(19), b_+OE(20)); SET_HL(HL + 1);
+  CYC(b_+O(20), b_+OE(22)); E = 0x0d;
+  CYC(b_+O(22), b_+OE(25)); A = W8(w1Link_xh);
+  CYC(b_+O(25), b_+OE(26)); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+O(26), b_+OE(27)); mem_wr(gb, DE, A);
+  CYC(b_+O(27), b_+OE(30)); A = W8(w1Link_zh);
+  CYC(b_+O(30), b_+OE(32)); E = 0x0f;
+  CYC(b_+O(32), b_+OE(34)); alu_sub(gb, 0x02);
+  CYC(b_+O(34), b_+OE(35)); mem_wr(gb, DE, A);
+  CYC(b_+O(35), b_+OE(36)); ret_effect(gb);
 }

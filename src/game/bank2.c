@@ -5450,39 +5450,41 @@ void drawHeartDisplay__fillBlankSpace_hook(GB *gb) {
 void loadItemIconGfx_hook(GB *gb) {
   BASE(loadItemIconGfx);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+2); D = (uint8_t)(w4ItemIconGfx >> 8);
-  CYC(b_+2, b_+3); push_effect(gb, BC);
-  CYC(b_+3, b_+4); A = B;
-  CALL_C(b_+4, loadItemIconGfx__func_hook, b_+9, b_+7);
-  CYC(b_+7, b_+8); SET_BC(pop_effect(gb));
-  CYC(b_+8, b_+9); A = C;
+  CYC(b_+O(0), b_+OE(2)); D = (uint8_t)(w4ItemIconGfx >> 8);
+  CYC(b_+O(2), b_+OE(3)); push_effect(gb, BC);
+  CYC(b_+O(3), b_+OE(4)); A = B;
+  CALL_C(b_+O(4), loadItemIconGfx__func_hook, b_+O(9), b_+OE(7));
+  CYC(b_+O(7), b_+OE(8)); SET_BC(pop_effect(gb));
+  CYC(b_+O(8), b_+OE(9)); A = C;
   TAIL(loadItemIconGfx__func);
 }
 
 void loadItemIconGfx__func_hook(GB *gb) {
   BASE(loadItemIconGfx);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+9, b_+10); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+10, b_+12); loadItemIconGfx__clear_hook(gb); return; }
-  CYC(b_+10, b_+12);
-  CYC(b_+12, b_+14); alu_cp(gb, 0xa3);
-  if (F & FC) CYCT(b_+14, b_+16);
-  else { CYC(b_+14, b_+16); CYC(b_+16, b_+18); alu_add(gb, 0x02); }
-  CYC(b_+18, b_+19); alu_add(gb, A);
-  CALL_C(b_+19, multiplyABy16_hook, SYM(multiplyABy16), b_+22);
-  CYC(b_+22, b_+25); SET_HL(SYM(checkDisplayDmgModeScreen));
-  CYC(b_+25, b_+26); alu_add_hl(gb, BC);
-  CYC(b_+26, b_+28); B = 0x19;
-  CYC(b_+28, b_+31); TAIL(copy20BytesFromBank);
+  CYC(b_+O(9), b_+OE(10)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(10), b_+OE(12)); loadItemIconGfx__clear_hook(gb); return; }
+  CYC(b_+O(10), b_+OE(12));
+  if (!game_seasons) {
+    CYC(b_+12, b_+14); alu_cp(gb, 0xa3);
+    if (F & FC) CYCT(b_+14, b_+16);
+    else { CYC(b_+14, b_+16); CYC(b_+16, b_+18); alu_add(gb, 0x02); }
+  }
+  CYC(b_+O(18), b_+OE(19)); alu_add(gb, A);
+  CALL_C(b_+O(19), multiplyABy16_hook, SYM(multiplyABy16), b_+OE(22));
+  CYC(b_+O(22), b_+OE(25)); SET_HL(SYM(spr_item_icons_1));
+  CYC(b_+O(GV(0x19, 0x1b)), b_+OE(26)); alu_add_hl(gb, BC);
+  CYC(b_+O(26), b_+OE(28)); B = SYMBANK(spr_item_icons_1);
+  CYC(b_+O(28), b_+OE(31)); TAIL(copy20BytesFromBank);
 }
 
 void loadItemIconGfx__clear_hook(GB *gb) {
   BASE(loadItemIconGfx);
-  CYC(b_+31, b_+32); H = D;
-  CYC(b_+32, b_+33); L = E;
-  CYC(b_+33, b_+35); B = 0x20;
-  CYC(b_+35, b_+37); A = 0xff;
-  CYC(b_+37, b_+40); TAIL(fillMemory);
+  CYC(b_+O(31), b_+OE(32)); H = D;
+  CYC(b_+O(32), b_+OE(33)); L = E;
+  CYC(b_+O(33), b_+OE(35)); B = 0x20;
+  CYC(b_+O(35), b_+OE(37)); A = 0xff;
+  CYC(b_+O(37), b_+OE(40)); TAIL(fillMemory);
 }
 
 void loadStatusBarMap_hook(GB *gb) {

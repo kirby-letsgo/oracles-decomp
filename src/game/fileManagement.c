@@ -84,48 +84,50 @@ void fileManagementFunction_hook(GB *gb) {
 void initializeFile_b07_hook(GB *gb) {
   BASE(initializeFile_b07);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); SET_HL(SYM(initialFileVariables));
-  CALL_C(b_+3, initializeFileVariables_hook, SYM(initializeFileVariables), b_+6);
-  CYC(b_+6, b_+9); SET_HL(wFileIsHeroGame);
-  CYC(b_+9, b_+10); A = mem_rd(gb, HL); SET_HL(HL - 1);
-  CYC(b_+10, b_+11); alu_add(gb, A);
-  CYC(b_+11, b_+12); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+12, b_+13); push_effect(gb, AF);
-  CYC(b_+13, b_+16); SET_HL(SYM(initialFileVariablesTable));
-  CYC(b_+16, b_+17); push_effect(gb, b_+17);
+  CYC(b_+O(0), b_+OE(3)); SET_HL(SYM(initialFileVariables));
+  CALL_C(b_+O(3), initializeFileVariables_hook, SYM(initializeFileVariables), b_+OE(6));
+  CYC(b_+O(6), b_+OE(9)); SET_HL(wFileIsHeroGame);
+  CYC(b_+O(9), b_+OE(10)); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(b_+O(10), b_+OE(11)); alu_add(gb, A);
+  CYC(b_+O(11), b_+OE(12)); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+O(12), b_+OE(13)); push_effect(gb, AF);
+  CYC(b_+O(13), b_+OE(16)); SET_HL(SYM(initialFileVariablesTable));
+  CYC(b_+O(16), b_+OE(17)); push_effect(gb, b_+OE(17));
   add_double_index_to_hl_from_rst(gb);
-  CYC(b_+17, b_+18); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+18, b_+19); H = mem_rd(gb, HL);
-  CYC(b_+19, b_+20); L = A;
-  CALL_C(b_+20, initializeFileVariables_hook, SYM(initializeFileVariables), b_+23);
-  CYC(b_+23, b_+24); SET_AF(pop_effect(gb));
-  CYC(b_+24, b_+25); C = A;
-  CYC(b_+25, b_+28); SET_HL(wUnappraisedRings);
-  CYC(b_+28, b_+30); B = 0x40;
-  CYC(b_+30, b_+32); A = 0xff;
-  CALL_C(b_+32, fillMemory_hook, SYM(fillMemory), b_+35);
-  CYC(b_+35, b_+38); SET_HL(wRingBoxContents);
-  CYC(b_+38, b_+40); B = 0x06;
-  CYC(b_+40, b_+42); A = 0xff;
-  CALL_C(b_+42, fillMemory_hook, SYM(fillMemory), b_+45);
-  CYC(b_+45, b_+46); A = C;
-  CYC(b_+46, b_+48); alu_cp(gb, 0x02);
+  CYC(b_+O(17), b_+OE(18)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(18), b_+OE(19)); H = mem_rd(gb, HL);
+  CYC(b_+O(19), b_+OE(20)); L = A;
+  CALL_C(b_+O(20), initializeFileVariables_hook, SYM(initializeFileVariables), b_+OE(23));
+  CYC(b_+O(23), b_+OE(24)); SET_AF(pop_effect(gb));
+  CYC(b_+O(24), b_+OE(25)); C = A;
+  CYC(b_+O(25), b_+OE(28)); SET_HL(wUnappraisedRings);
+  CYC(b_+O(28), b_+OE(30)); B = 0x40;
+  CYC(b_+O(30), b_+OE(32)); A = 0xff;
+  CALL_C(b_+O(32), fillMemory_hook, SYM(fillMemory), b_+OE(35));
+  CYC(b_+O(35), b_+OE(38)); SET_HL(wRingBoxContents);
+  CYC(b_+O(38), b_+OE(40)); B = 0x06;
+  CYC(b_+O(40), b_+OE(42)); A = 0xff;
+  CALL_C(b_+O(42), fillMemory_hook, SYM(fillMemory), b_+OE(45));
+  CYC(b_+O(45), b_+OE(46)); A = C;
+  CYC(b_+O(46), b_+OE(48)); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
-    CYCT(b_+48, b_+50);
+    CYCT(b_+O(48), b_+OE(50));
   } else {
-    CYC(b_+48, b_+50);
-    CYC(b_+50, b_+53); SET_HL(wObtainedTreasureFlags);
-    CYC(b_+53, b_+55); A = 0x2d;
-    CALL_C(b_+55, setFlag_hook, SYM(setFlag), b_+58);
-    CYC(b_+58, b_+60); A = 0x76;
-    CYC(b_+60, b_+63); mem_wr(gb, wUnappraisedRings, A);
+    CYC(b_+O(48), b_+OE(50));
+    CYC(b_+O(50), b_+OE(53)); SET_HL(wObtainedTreasureFlags);
+    CYC(b_+O(53), b_+OE(55)); A = 0x2d;
+    CALL_C(b_+O(55), setFlag_hook, SYM(setFlag), b_+OE(58));
+    CYC(b_+O(58), b_+OE(60)); A = 0x76;
+    CYC(b_+O(60), b_+OE(63)); mem_wr(gb, wUnappraisedRings, A);
   }
-  CYC(b_+63, b_+66); SET_HL((SYM(getFileAddress2) + 1));
-  CYC(b_+66, b_+68); E = 0x0b;
-  CALL_C(b_+68, interBankCall_hook, 0x008a, b_+71);
-  CYC(b_+71, b_+74); SET_HL((SYM(enemyActiveCollisions) + 59));
-  CYC(b_+74, b_+76); E = 0x04;
-  CALL_C(b_+76, interBankCall_hook, 0x008a, SYM(saveFile_b07));
+  CYC(b_+O(63), b_+OE(66)); SET_HL(SYM(initializeChildOnGameStart));
+  CYC(b_+O(66), b_+OE(68)); E = GV(0x0b, 0x0a);
+  CALL_C(b_+O(68), interBankCall_hook, 0x008a, b_+OE(71));
+  if (!game_seasons) {
+    CYC(b_+71, b_+74); SET_HL(SYM(initializeVinePositions));
+    CYC(b_+74, b_+76); E = 0x04;
+    CALL_C(b_+76, interBankCall_hook, 0x008a, SYM(saveFile_b07));
+  }
   TAIL(saveFile_b07);
 }
 

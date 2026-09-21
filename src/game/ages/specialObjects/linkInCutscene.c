@@ -266,7 +266,7 @@ substate3:
   CYC(b_+142, b_+143); mem_wr(gb, DE, A);
 oscillate:
   CYC(b_+143, b_+146); SET_HL(linkCutscene0OscillationData_bank06);
-  CYC(b_+146, b_+148);
+  if (game_seasons) CYC(b_+S(146), b_+S(149)); else CYC(b_+146, b_+148);
   TAIL(linkCutscene_oscillateZ);
 
 substate4:

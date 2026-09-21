@@ -11796,6 +11796,7 @@ spinner_subid02 spinner_subid02 0a:43ac
 spinner_subid02__state0 spinner_subid02@state0 0a:43b4
 spinner_subid02__state1 spinner_subid02@state1 0a:43c6
 spinner_updateLinkPosition spinner_updateLinkPosition 0a:43e7
+spr_item_icons_1 spr_item_icons_1 19:4000
 stalfos_beginJumpAnimation stalfos_beginJumpAnimation 0e:46ec
 stalfos_checkJumpAwayFromLink stalfos_checkJumpAwayFromLink 0e:46f9
 stalfos_checkSubid3StompsLink stalfos_checkSubid3StompsLink 0e:46ce

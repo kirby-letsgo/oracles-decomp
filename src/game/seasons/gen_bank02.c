@@ -2407,63 +2407,6 @@ L_5169:
   I(0x5170, 4); if (hook_is(gb, 0x1a37, checkReloadStatusBarGraphics_hook)) { checkReloadStatusBarGraphics_hook(gb); return; } HANDOFF(0x1a37);  // jp $1a37
 }
 
-// 02:5480
-void s_loadItemIconGfx(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5480, 2); D = 0xd6;  // ld d,$d6
-  PUSH(0x5482, BC);  // push bc
-  I(0x5483, 1); A = B;  // ld a,b
-  CALL(0x5484, s_loadItemIconGfx__func, 0x5489, 0x5487);  // call $5489
-  SET_BC(POP(0x5487));  // pop bc
-  I(0x5488, 1); A = C;  // ld a,c
-L_5489:
-  I(0x5489, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x548a, 3); goto L_5499; } I(0x548a, 2);  // jr z,$5499
-  I(0x548c, 1); alu_add(gb, A);  // add a
-  CALL(0x548d, multiplyABy16_hook, 0x01ac, 0x5490);  // call $01ac
-  I(0x5490, 3); SET_HL(0x7620);  // ld hl,$7620
-  I(0x5493, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x5494, 2); B = 0x1b;  // ld b,$1b
-  I(0x5496, 4); if (hook_is(gb, 0x1a49, copy20BytesFromBank_hook)) { copy20BytesFromBank_hook(gb); return; } HANDOFF(0x1a49);  // jp $1a49
-L_5499:
-  I(0x5499, 1); H = D;  // ld h,d
-  I(0x549a, 1); L = E;  // ld l,e
-  I(0x549b, 2); B = 0x20;  // ld b,$20
-  I(0x549d, 2); A = 0xff;  // ld a,$ff
-  I(0x549f, 4); if (hook_is(gb, 0x044c, fillMemory_hook)) { fillMemory_hook(gb); return; } HANDOFF(0x044c);  // jp $044c
-}
-
-// 02:5489
-void s_loadItemIconGfx__func(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5489:
-  I(0x5489, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x548a, 3); goto L_5499; } I(0x548a, 2);  // jr z,$5499
-  I(0x548c, 1); alu_add(gb, A);  // add a
-  CALL(0x548d, multiplyABy16_hook, 0x01ac, 0x5490);  // call $01ac
-  I(0x5490, 3); SET_HL(0x7620);  // ld hl,$7620
-  I(0x5493, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x5494, 2); B = 0x1b;  // ld b,$1b
-  I(0x5496, 4); if (hook_is(gb, 0x1a49, copy20BytesFromBank_hook)) { copy20BytesFromBank_hook(gb); return; } HANDOFF(0x1a49);  // jp $1a49
-L_5499:
-  I(0x5499, 1); H = D;  // ld h,d
-  I(0x549a, 1); L = E;  // ld l,e
-  I(0x549b, 2); B = 0x20;  // ld b,$20
-  I(0x549d, 2); A = 0xff;  // ld a,$ff
-  I(0x549f, 4); if (hook_is(gb, 0x044c, fillMemory_hook)) { fillMemory_hook(gb); return; } HANDOFF(0x044c);  // jp $044c
-}
-
-// 02:5499
-void s_loadItemIconGfx__clear(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5499:
-  I(0x5499, 1); H = D;  // ld h,d
-  I(0x549a, 1); L = E;  // ld l,e
-  I(0x549b, 2); B = 0x20;  // ld b,$20
-  I(0x549d, 2); A = 0xff;  // ld a,$ff
-  I(0x549f, 4); if (hook_is(gb, 0x044c, fillMemory_hook)) { fillMemory_hook(gb); return; } HANDOFF(0x044c);  // jp $044c
-}
-
 // 02:5f8d
 void s_loadMinimapDisplayRoom(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

@@ -5702,6 +5702,25 @@ void enemyReplaceWithID_hook(GB *gb) {
 void findFreeStaticObjectSlot_hook(GB *gb) {
   BASE(findFreeStaticObjectSlot);
   SET_HL(wStaticObjects);
+  if (game_seasons) {
+    CYC(b_+S(0), b_+S(3));
+    for (;;) {
+      CYC(b_+S(3), b_+S(4)); A = mem_rd(gb, HL);
+      alu_or(gb, A);
+      if (F & FZ) { CYCT(b_+S(4), b_+S(6)); break; }
+      CYC(b_+S(4), b_+S(6));
+      A = 0x08;
+      alu_add(gb, L);
+      L = A;
+      if (!(F & FZ)) { CYCT(b_+S(6), b_+S(12)); continue; }
+      CYC(b_+S(6), b_+S(12));
+      alu_or(gb, H);
+      CYC(b_+S(12), b_+S(14));
+      break;
+    }
+    ret_effect(gb);
+    return;
+  }
   B = 0x08;
   CYC(b_+0, b_+5);
   for (;;) {
@@ -6314,6 +6333,7 @@ void darkenRoomWithSpeed_hook(GB *gb) {
 }
 
 static void brighten_room_helper(GB *gb) {
+  AGES_ONLY();
   BASE(_brightenRoomHelper);
   CYC(b_+0, b_+3);
   set_darkening_variables(gb);
@@ -6323,8 +6343,25 @@ static void brighten_room_helper(GB *gb) {
 }
 
 void _brightenRoomHelper_hook(GB *gb) { brighten_room_helper(gb); ret_effect(gb); }
-void brightenRoom_hook(GB *gb) {BASE(brightenRoom); B = 0x00; A = 0x01; CYC(b_+0, b_+4); brighten_room_helper(gb); ret_effect(gb); }
-void brightenRoomLightly_hook(GB *gb) {BASE(brightenRoomLightly); B = 0xf7; A = 0x01; CYC(b_+0, b_+6); brighten_room_helper(gb); ret_effect(gb); }
+static void brighten_room_seasons(GB *gb) {
+  BASE(brightenRoom);
+  A = 0x06;
+  CYC(b_+S(2), b_+S(7)); W8(wPaletteThread_mode) = A;
+  CYC(b_+S(7), b_+S(9));
+  CYC(SYM(_darkenRoomHelper) + 5, SYM(_darkenRoomHelper) + 8); A = W8(wPaletteThread_parameter);
+  set_darkening_variables(gb);
+}
+
+void brightenRoom_hook(GB *gb) {
+  BASE(brightenRoom);
+  if (game_seasons) { B = 0x00; CYC(b_+S(0), b_+S(2)); brighten_room_seasons(gb); ret_effect(gb); return; }
+  B = 0x00; A = 0x01; CYC(b_+0, b_+4); brighten_room_helper(gb); ret_effect(gb);
+}
+void brightenRoomLightly_hook(GB *gb) {
+  BASE(brightenRoomLightly);
+  if (game_seasons) { B = 0xf7; CYC(b_+S(0), b_+S(4)); brighten_room_seasons(gb); ret_effect(gb); return; }
+  B = 0xf7; A = 0x01; CYC(b_+0, b_+6); brighten_room_helper(gb); ret_effect(gb);
+}
 void brightenRoomWithSpeed_hook(GB *gb) {BASE(brightenRoomWithSpeed); B = 0x00; CYC(b_+0, b_+4); brighten_room_helper(gb); ret_effect(gb); }
 
 static void fadein_to_room_tail(GB *gb) {
@@ -6862,19 +6899,20 @@ void clearReservedInteraction0_hook(GB *gb) {
 }
 
 static void clear_object_slots(GB *gb, uint16_t base, uint16_t first) {
+  const int s = game_seasons ? 1 : 0;      // Seasons spells `ld l,e` as `ld l,<low byte>`
   SET_DE(first);
   CYC(base, base + 3);
   for (;;) {
     H = D;
     L = E;
     B = 0x40;
-    CYC(base + 3, base + 10);
+    CYC(base + 3, base + 10 + s);
     clear_block(gb, HL, 0x40);
     D = alu_inc8(gb, D);
     A = D;
     alu_cp(gb, 0xe0);
-    if (F & FC) { CYCT(base + 10, base + 16); continue; }
-    CYC(base + 10, base + 17);
+    if (F & FC) { CYCT(base + 10 + s, base + 16 + s); continue; }
+    CYC(base + 10 + s, base + 17 + s);
     break;
   }
 }
@@ -9247,18 +9285,21 @@ void enemyCodeNil_hook(GB *gb) {
 }
 
 static void bank2_function_caller(GB *gb, uint16_t a, uint8_t h, uint16_t sp0_) {
-  BASE(checkSpawnTimeportalInteraction_b00);
+  BASE(getRandomPositionForEnemy_b00);
+  const uint16_t body = GV(SYM(checkSpawnTimeportalInteraction_b00) + 2, b_+5);
   H = h;
-  if (a != b_+0) CYC(a, a + 4); else CYC(a, a + 2);
+  if (game_seasons) CYC(a, a + 5);
+  else if (a != SYM(checkSpawnTimeportalInteraction_b00)) CYC(a, a + 4);
+  else CYC(a, a + 2);
   L = A;
-  CYC(b_+2, b_+3);
-  bank_push(gb, b_+3, 0x02);
-  CALL_C(b_+13, functionCaller_b02_hook, SYM(functionCaller_b02), b_+16);
+  CYC(body, body + 1);
+  bank_push(gb, body + 1, GV(0x02, 0x10));
+  CALL_C(body + 11, functionCaller_b02_hook, SYM(functionCaller_b02), body + 14);
   C = alu_rl(gb, C);
-  CYC(b_+16, b_+18);
-  bank_pop(gb, b_+18);
+  CYC(body + 14, body + 16);
+  bank_pop(gb, body + 16);
   C = alu_srl(gb, C);
-  CYC(b_+24, b_+27);
+  CYC(body + 22, body + 25);
   ret_effect(gb);
 }
 
@@ -11804,10 +11845,10 @@ void scriptCmd_loadScript_hook(GB *gb) {
   E = A;
   CYC(b_+3, b_+5); A = mem_rd(gb, HL); SET_HL(HL + 1);
   C = A;
-  CYC(b_+5, b_+8); H8(hScriptAddressL) = A;
+  if (!game_seasons) { CYC(b_+5, b_+8); H8(hScriptAddressL) = A; }
   CYC(b_+8, b_+9); A = mem_rd(gb, HL); SET_HL(HL + 1);
   B = A;
-  CYC(b_+9, b_+12); H8(hScriptAddressH) = A;
+  if (!game_seasons) { CYC(b_+9, b_+12); H8(hScriptAddressH) = A; }
   CYC(b_+12, b_+14); A = H8(hRomBank);
   CYC(b_+14, b_+15); push_effect(gb, AF);
   A = E;

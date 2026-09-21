@@ -110,16 +110,21 @@ void linkedNpc_initHighTextIndex_hook(GB *gb) {
 
 void linkedNpc_calcLowTextIndex_hook(GB *gb) {
   BASE(linkedNpc_calcLowTextIndex);
-  CYC(b_+0, b_+2); alu_add(gb, 0x00);
-  CYC(b_+2, b_+3); C = A;
-  CYC(b_+3, b_+5); E = 0x7f;
-  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
-  CYC(b_+6, b_+7); B = A;
-  CYC(b_+7, b_+8); alu_add(gb, A);
-  CYC(b_+8, b_+9); alu_add(gb, A);
-  CYC(b_+9, b_+10); alu_add(gb, B);
-  CYC(b_+10, b_+11); alu_add(gb, C);
-  CYC(b_+11, b_+13); E = 0x72;
-  CYC(b_+13, b_+14); mem_wr(gb, DE, A);
-  CYC(b_+14, b_+15); ret_effect(gb);
+  CYC(b_+O(0), b_+OE(2)); alu_add(gb, 0x00);
+  CYC(b_+O(2), b_+OE(3)); C = A;
+  CYC(b_+O(3), b_+OE(5)); E = GV(0x7f, 0x7e);
+  CYC(b_+O(5), b_+OE(6)); A = mem_rd(gb, DE);
+  CYC(b_+O(6), b_+OE(7)); B = A;
+  CYC(b_+O(7), b_+OE(8)); alu_add(gb, A);
+  if (game_seasons) {
+    CYC(b_+S(8), b_+S(9)); alu_add(gb, B);
+    CYC(b_+S(9), b_+S(10)); alu_add(gb, A);
+  } else {
+    CYC(b_+8, b_+9); alu_add(gb, A);
+    CYC(b_+9, b_+10); alu_add(gb, B);
+  }
+  CYC(b_+O(10), b_+OE(11)); alu_add(gb, C);
+  CYC(b_+O(11), b_+OE(13)); E = 0x72;
+  CYC(b_+O(13), b_+OE(14)); mem_wr(gb, DE, A);
+  CYC(b_+O(14), b_+OE(15)); ret_effect(gb);
 }
