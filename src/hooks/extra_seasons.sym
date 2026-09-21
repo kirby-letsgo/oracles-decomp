@@ -14,3 +14,4 @@
 00:0901 startGame__afterSp0925
 00:0974 _countdownToRunThread__afterSp0998
 00:0986 _initializeThread__afterSp09aa
+03:4071 setCpuToDoubleSpeed extern

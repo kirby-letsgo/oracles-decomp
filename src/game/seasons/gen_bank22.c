@@ -79,7 +79,7 @@ L_4120:
   I(0x4120, 3); goto L_40e2;  // jr $40e2
 L_4127:
   I(0x4127, 2); alu_add_hl(gb, DE);  // add hl,de
-  if ((F & FZ)) { I(0x4128, 4); HANDOFF(0x3252); /* mainThreadStart@jump3252 */ } I(0x4128, 3);  // jp z,$3252
+  if ((F & FZ)) { I(0x4128, 4); s_mainThreadStart__jump3252(gb); return; } I(0x4128, 3);  // jp z,$3252
   HANDOFF(0x412b);  // fallthrough to room00cd
 }
 
@@ -4061,7 +4061,7 @@ void s_room0180(GB *gb) {
   if (!(F & FZ)) { CALL_ASM(0x69b1, 0x0a11, 0x69b4); /* unported */ } else I(0x69b1, 3);  // call nz,$0a11
 L_69b4:
   I(0x69b4, 1); D = D;  // ld d,d
-  if (!(F & FZ)) { I(0x69b5, 4); HANDOFF(0x0904); /* startGame__afterSp0925@jump0904 */ } I(0x69b5, 3);  // jp nz,$0904
+  if (!(F & FZ)) { I(0x69b5, 4); s_startGame__afterSp0925__jump0904(gb); return; } I(0x69b5, 3);  // jp nz,$0904
   I(0x69b8, 1); alu_rrca(gb);  // rrca
   I(0x69b9, 3); SET_DE(0x0f11);  // ld de,$0f11
   I(0x69bc, 1); D = D;  // ld d,d
@@ -4082,7 +4082,7 @@ void s_room0180__afterCall69b4(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_69b4:
   I(0x69b4, 1); D = D;  // ld d,d
-  if (!(F & FZ)) { I(0x69b5, 4); HANDOFF(0x0904); /* startGame__afterSp0925@jump0904 */ } I(0x69b5, 3);  // jp nz,$0904
+  if (!(F & FZ)) { I(0x69b5, 4); s_startGame__afterSp0925__jump0904(gb); return; } I(0x69b5, 3);  // jp nz,$0904
   I(0x69b8, 1); alu_rrca(gb);  // rrca
   I(0x69b9, 3); SET_DE(0x0f11);  // ld de,$0f11
   I(0x69bc, 1); D = D;  // ld d,d
@@ -5623,7 +5623,7 @@ void s_room01ca(GB *gb) {
   I(0x7d6f, 1); alu_add(gb, C);  // add c
   if ((F & FZ)) { I(0x7d70, 4); HANDOFF(0x3804); /* unported */ } I(0x7d70, 3);  // jp z,$3804
   I(0x7d73, 1); B = alu_inc8(gb, B);  // inc b
-  if ((F & FZ)) { I(0x7d74, 4); HANDOFF(0x1aca); /* copy8BytesFromRingMapToCec0@jump1aca */ } I(0x7d74, 3);  // jp z,$1aca
+  if ((F & FZ)) { I(0x7d74, 4); s_copy8BytesFromRingMapToCec0__jump1aca(gb); return; } I(0x7d74, 3);  // jp z,$1aca
   I(0x7d77, 2); SET_DE(DE - 1);  // dec de
   I(0x7d78, 1); D = alu_inc8(gb, D);  // inc d
   I(0x7d79, 2); D = 0xf8;  // ld d,$f8
@@ -5678,7 +5678,7 @@ L_7e0a:
   if (!(F & FC)) { I(0x7e0d, 3); goto L_7e07; } I(0x7e0d, 2);  // jr nc,$7e07
   I(0x7e0f, 3); alu_ld_hl_sp(gb, 0xf8);  // ld hl,sp+$f8
   I(0x7e11, 2); alu_add_hl(gb, DE);  // add hl,de
-  if ((F & FZ)) { I(0x7e12, 4); HANDOFF(0x3252); /* mainThreadStart@jump3252 */ } I(0x7e12, 3);  // jp z,$3252
+  if ((F & FZ)) { I(0x7e12, 4); s_mainThreadStart__jump3252(gb); return; } I(0x7e12, 3);  // jp z,$3252
   s_room01cd(gb); return;  // fallthrough
 }
 

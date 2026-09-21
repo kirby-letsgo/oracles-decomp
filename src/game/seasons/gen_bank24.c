@@ -5421,7 +5421,7 @@ void s_room0380(GB *gb) {
   if (!(F & FZ)) { CALL_ASM(0x64b0, 0x0a11, 0x64b3); /* unported */ } else I(0x64b0, 3);  // call nz,$0a11
 L_64b3:
   I(0x64b3, 1); D = D;  // ld d,d
-  if (!(F & FZ)) { I(0x64b4, 4); HANDOFF(0x0904); /* startGame__afterSp0925@jump0904 */ } I(0x64b4, 3);  // jp nz,$0904
+  if (!(F & FZ)) { I(0x64b4, 4); s_startGame__afterSp0925__jump0904(gb); return; } I(0x64b4, 3);  // jp nz,$0904
   I(0x64b7, 1); alu_rrca(gb);  // rrca
   I(0x64b8, 3); SET_DE(0x0f11);  // ld de,$0f11
   I(0x64bb, 1); D = D;  // ld d,d
@@ -5442,7 +5442,7 @@ void s_room0380__afterCall64b3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_64b3:
   I(0x64b3, 1); D = D;  // ld d,d
-  if (!(F & FZ)) { I(0x64b4, 4); HANDOFF(0x0904); /* startGame__afterSp0925@jump0904 */ } I(0x64b4, 3);  // jp nz,$0904
+  if (!(F & FZ)) { I(0x64b4, 4); s_startGame__afterSp0925__jump0904(gb); return; } I(0x64b4, 3);  // jp nz,$0904
   I(0x64b7, 1); alu_rrca(gb);  // rrca
   I(0x64b8, 3); SET_DE(0x0f11);  // ld de,$0f11
   I(0x64bb, 1); D = D;  // ld d,d
@@ -5774,7 +5774,7 @@ L_68d1:
   I(0x68df, 3); SET_BC(0x1901);  // ld bc,$1901
   I(0x68e2, 1); alu_add(gb, B);  // add b
   I(0x68e3, 1); alu_add(gb, C);  // add c
-  if ((F & FZ)) { I(0x68e4, 4); HANDOFF(0x0e18); /* drawAllSpritesUnconditionally@jump0e18 */ } I(0x68e4, 3);  // jp z,$0e18
+  if ((F & FZ)) { I(0x68e4, 4); s_drawAllSpritesUnconditionally__jump0e18(gb); return; } I(0x68e4, 3);  // jp z,$0e18
   I(0x68e7, 3); SET_BC(0x1b1b);  // ld bc,$1b1b
   I(0x68ea, 3); SET_BC(0x7019);  // ld bc,$7019
   I(0x68ed, 2); mem_wr(gb, HL, B);  // ld (hl),b
@@ -5895,7 +5895,7 @@ void s_room0390(GB *gb) {
   goto L_68f7;
 L_68e3:
   I(0x68e3, 1); alu_add(gb, C);  // add c
-  if ((F & FZ)) { I(0x68e4, 4); HANDOFF(0x0e18); /* drawAllSpritesUnconditionally@jump0e18 */ } I(0x68e4, 3);  // jp z,$0e18
+  if ((F & FZ)) { I(0x68e4, 4); s_drawAllSpritesUnconditionally__jump0e18(gb); return; } I(0x68e4, 3);  // jp z,$0e18
   I(0x68e7, 3); SET_BC(0x1b1b);  // ld bc,$1b1b
   I(0x68ea, 3); SET_BC(0x7019);  // ld bc,$7019
   I(0x68ed, 2); mem_wr(gb, HL, B);  // ld (hl),b
@@ -6935,7 +6935,7 @@ L_7888:
   I(0x7888, 3); goto L_784a;  // jr $784a
 L_788f:
   I(0x788f, 2); alu_add_hl(gb, DE);  // add hl,de
-  if ((F & FZ)) { I(0x7890, 4); HANDOFF(0x3252); /* mainThreadStart@jump3252 */ } I(0x7890, 3);  // jp z,$3252
+  if ((F & FZ)) { I(0x7890, 4); s_mainThreadStart__jump3252(gb); return; } I(0x7890, 3);  // jp z,$3252
   HANDOFF(0x7893);  // fallthrough to room03cd
 }
 

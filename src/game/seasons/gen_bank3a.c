@@ -949,7 +949,7 @@ void s_musTwinrovaChannel6(GB *gb) {
 // 3a:4529
 void s_musice8526(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  if ((F & FC)) { I(0x4529, 4); HANDOFF(0x01e0); /* compareHlToBc@jump01e0 */ } I(0x4529, 3);  // jp c,$01e0
+  if ((F & FC)) { I(0x4529, 4); s_compareHlToBc__jump01e0(gb); return; } I(0x4529, 3);  // jp c,$01e0
   I(0x452c, 2); D = 0x0c;  // ld d,$0c
   I(0x452e, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   I(0x452f, 3); goto L_4553;  // jr $4553
@@ -979,7 +979,7 @@ L_45b4:
   if (!(F & FC)) { CALL_ASM(0x45bb, 0x032e, 0x45be); /* unported */ } else I(0x45bb, 3);  // call nc,$032e
 L_45be:
   I(0x45be, 3); mem_wr(gb, 0xff00, A);  // ldh ($ff00),a
-  if (!(F & FC)) { I(0x45c0, 4); HANDOFF(0x062e); /* loadGfxHeader@jump062e */ } I(0x45c0, 3);  // jp nc,$062e
+  if (!(F & FC)) { I(0x45c0, 4); s_loadGfxHeader__jump062e(gb); return; } I(0x45c0, 3);  // jp nc,$062e
   if ((F & FC)) { RET_TAKEN(0x45c3); return; } I(0x45c3, 2);  // ret c
   I(0x45c4, 2); L = 0x03;  // ld l,$03
   I(0x45c6, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
@@ -1051,7 +1051,7 @@ L_4613:
   I(0x464e, 1); L = alu_dec8(gb, L);  // dec l
   I(0x464f, 4); mem_wr(gb, 0x2dd4, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x2dd5, gb->sp >> 8);  // ld ($2dd4),sp
   I(0x4652, 1); B = alu_inc8(gb, B);  // inc b
-  if ((F & FC)) { I(0x4653, 4); HANDOFF(0x01e0); /* compareHlToBc@jump01e0 */ } I(0x4653, 3);  // jp c,$01e0
+  if ((F & FC)) { I(0x4653, 4); s_compareHlToBc__jump01e0(gb); return; } I(0x4653, 3);  // jp c,$01e0
   I(0x4656, 3); SET_DE(0xda06);  // ld de,$da06
   I(0x4659, 3); SET_DE(0xda06);  // ld de,$da06
   I(0x465c, 3); SET_DE(0xda06);  // ld de,$da06
@@ -1083,7 +1083,7 @@ L_45b4:
   if (!(F & FC)) { CALL_ASM(0x45bb, 0x032e, 0x45be); /* unported */ } else I(0x45bb, 3);  // call nc,$032e
 L_45be:
   I(0x45be, 3); mem_wr(gb, 0xff00, A);  // ldh ($ff00),a
-  if (!(F & FC)) { I(0x45c0, 4); HANDOFF(0x062e); /* loadGfxHeader@jump062e */ } I(0x45c0, 3);  // jp nc,$062e
+  if (!(F & FC)) { I(0x45c0, 4); s_loadGfxHeader__jump062e(gb); return; } I(0x45c0, 3);  // jp nc,$062e
   if ((F & FC)) { RET_TAKEN(0x45c3); return; } I(0x45c3, 2);  // ret c
   I(0x45c4, 2); L = 0x03;  // ld l,$03
   I(0x45c6, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
@@ -1155,7 +1155,7 @@ L_4613:
   I(0x464e, 1); L = alu_dec8(gb, L);  // dec l
   I(0x464f, 4); mem_wr(gb, 0x2dd4, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x2dd5, gb->sp >> 8);  // ld ($2dd4),sp
   I(0x4652, 1); B = alu_inc8(gb, B);  // inc b
-  if ((F & FC)) { I(0x4653, 4); HANDOFF(0x01e0); /* compareHlToBc@jump01e0 */ } I(0x4653, 3);  // jp c,$01e0
+  if ((F & FC)) { I(0x4653, 4); s_compareHlToBc__jump01e0(gb); return; } I(0x4653, 3);  // jp c,$01e0
   I(0x4656, 3); SET_DE(0xda06);  // ld de,$da06
   I(0x4659, 3); SET_DE(0xda06);  // ld de,$da06
   I(0x465c, 3); SET_DE(0xda06);  // ld de,$da06
@@ -1182,7 +1182,7 @@ void s_musice8526__afterCall45be(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_45be:
   I(0x45be, 3); mem_wr(gb, 0xff00, A);  // ldh ($ff00),a
-  if (!(F & FC)) { I(0x45c0, 4); HANDOFF(0x062e); /* loadGfxHeader@jump062e */ } I(0x45c0, 3);  // jp nc,$062e
+  if (!(F & FC)) { I(0x45c0, 4); s_loadGfxHeader__jump062e(gb); return; } I(0x45c0, 3);  // jp nc,$062e
   if ((F & FC)) { RET_TAKEN(0x45c3); return; } I(0x45c3, 2);  // ret c
   I(0x45c4, 2); L = 0x03;  // ld l,$03
   I(0x45c6, 3); mem_wr(gb, 0xff01, A);  // ldh ($ff01),a
@@ -1254,7 +1254,7 @@ L_4613:
   I(0x464e, 1); L = alu_dec8(gb, L);  // dec l
   I(0x464f, 4); mem_wr(gb, 0x2dd4, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x2dd5, gb->sp >> 8);  // ld ($2dd4),sp
   I(0x4652, 1); B = alu_inc8(gb, B);  // inc b
-  if ((F & FC)) { I(0x4653, 4); HANDOFF(0x01e0); /* compareHlToBc@jump01e0 */ } I(0x4653, 3);  // jp c,$01e0
+  if ((F & FC)) { I(0x4653, 4); s_compareHlToBc__jump01e0(gb); return; } I(0x4653, 3);  // jp c,$01e0
   I(0x4656, 3); SET_DE(0xda06);  // ld de,$da06
   I(0x4659, 3); SET_DE(0xda06);  // ld de,$da06
   I(0x465c, 3); SET_DE(0xda06);  // ld de,$da06
@@ -1346,7 +1346,7 @@ L_4613:
   I(0x464e, 1); L = alu_dec8(gb, L);  // dec l
   I(0x464f, 4); mem_wr(gb, 0x2dd4, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x2dd5, gb->sp >> 8);  // ld ($2dd4),sp
   I(0x4652, 1); B = alu_inc8(gb, B);  // inc b
-  if ((F & FC)) { I(0x4653, 4); HANDOFF(0x01e0); /* compareHlToBc@jump01e0 */ } I(0x4653, 3);  // jp c,$01e0
+  if ((F & FC)) { I(0x4653, 4); s_compareHlToBc__jump01e0(gb); return; } I(0x4653, 3);  // jp c,$01e0
   I(0x4656, 3); SET_DE(0xda06);  // ld de,$da06
   I(0x4659, 3); SET_DE(0xda06);  // ld de,$da06
   I(0x465c, 3); SET_DE(0xda06);  // ld de,$da06
@@ -1433,7 +1433,7 @@ L_4613:
   I(0x464e, 1); L = alu_dec8(gb, L);  // dec l
   I(0x464f, 4); mem_wr(gb, 0x2dd4, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x2dd5, gb->sp >> 8);  // ld ($2dd4),sp
   I(0x4652, 1); B = alu_inc8(gb, B);  // inc b
-  if ((F & FC)) { I(0x4653, 4); HANDOFF(0x01e0); /* compareHlToBc@jump01e0 */ } I(0x4653, 3);  // jp c,$01e0
+  if ((F & FC)) { I(0x4653, 4); s_compareHlToBc__jump01e0(gb); return; } I(0x4653, 3);  // jp c,$01e0
   I(0x4656, 3); SET_DE(0xda06);  // ld de,$da06
   I(0x4659, 3); SET_DE(0xda06);  // ld de,$da06
   I(0x465c, 3); SET_DE(0xda06);  // ld de,$da06
@@ -1810,7 +1810,7 @@ void s_musice9124(GB *gb) {
   I(0x513b, 2); alu_add_hl(gb, BC);  // add hl,bc
   I(0x513c, 1); H = B;  // ld h,b
   I(0x513d, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FC)) { I(0x513e, 4); HANDOFF(0x093b); /* _mainLoop_nextThread@jump093b */ } I(0x513e, 3);  // jp nc,$093b
+  if (!(F & FC)) { I(0x513e, 4); s__mainLoop_nextThread__jump093b(gb); return; } I(0x513e, 3);  // jp nc,$093b
   I(0x5141, 1); H = B;  // ld h,b
   I(0x5142, 1); H = alu_inc8(gb, H);  // inc h
   if ((F & FC)) { RET_TAKEN(0x5143); return; } I(0x5143, 2);  // ret c
@@ -1869,7 +1869,7 @@ void s_musice9124(GB *gb) {
   I(0x517a, 2); alu_add_hl(gb, BC);  // add hl,bc
   I(0x517b, 1); H = B;  // ld h,b
   I(0x517c, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FC)) { I(0x517d, 4); HANDOFF(0x094c); /* _mainLoop_nextThread@jump094c */ } I(0x517d, 3);  // jp nc,$094c
+  if (!(F & FC)) { I(0x517d, 4); s__mainLoop_nextThread__jump094c(gb); return; } I(0x517d, 3);  // jp nc,$094c
   I(0x5180, 1); H = B;  // ld h,b
   I(0x5181, 1); B = alu_inc8(gb, B);  // inc b
   SET_DE(POP(0x5182));  // pop de
@@ -1944,7 +1944,7 @@ void s_musice9124(GB *gb) {
   I(0x51cb, 2); alu_add_hl(gb, BC);  // add hl,bc
   I(0x51cc, 1); H = B;  // ld h,b
   I(0x51cd, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FC)) { I(0x51ce, 4); HANDOFF(0x0948); /* _mainLoop_nextThread@jump0948 */ } I(0x51ce, 3);  // jp nc,$0948
+  if (!(F & FC)) { I(0x51ce, 4); s__mainLoop_nextThread__jump0948(gb); return; } I(0x51ce, 3);  // jp nc,$0948
   I(0x51d1, 1); H = B;  // ld h,b
   I(0x51d2, 1); B = alu_inc8(gb, B);  // inc b
   SET_DE(POP(0x51d3));  // pop de
@@ -2039,7 +2039,7 @@ void s_musice9124(GB *gb) {
   I(0x522e, 2); alu_add_hl(gb, BC);  // add hl,bc
   I(0x522f, 1); H = B;  // ld h,b
   I(0x5230, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FC)) { I(0x5231, 4); HANDOFF(0x0946); /* _mainLoop_nextThread@jump0946 */ } I(0x5231, 3);  // jp nc,$0946
+  if (!(F & FC)) { I(0x5231, 4); s__mainLoop_nextThread__jump0946(gb); return; } I(0x5231, 3);  // jp nc,$0946
   I(0x5234, 1); H = B;  // ld h,b
   I(0x5235, 1); H = alu_inc8(gb, H);  // inc h
   if ((F & FC)) { RET_TAKEN(0x5236); return; } I(0x5236, 2);  // ret c
@@ -3807,7 +3807,7 @@ void s_sndFluteRickyChannel2(GB *gb) {
   I(0x662c, 2); alu_or(gb, 0x02);  // or $02
   I(0x662e, 1); H = B;  // ld h,b
   I(0x662f, 1); alu_rra(gb);  // rra
-  if (!(F & FC)) { I(0x6630, 4); HANDOFF(0x053c); /* loadPaletteHeader@jump053c */ } I(0x6630, 3);  // jp nc,$053c
+  if (!(F & FC)) { I(0x6630, 4); s_loadPaletteHeader__jump053c(gb); return; } I(0x6630, 3);  // jp nc,$053c
   I(0x6633, 1); B = C;  // ld b,c
   I(0x6634, 1); B = alu_inc8(gb, B);  // inc b
   I(0x6635, 1); B = E;  // ld b,e

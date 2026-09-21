@@ -94,7 +94,7 @@ void s_flg_templefall_scene7(GB *gb) {
   I(0x6b29, 2); SET_BC(BC - 1);  // dec bc
   I(0x6b2a, 2); A = mem_rd(gb, BC);  // ld a,(bc)
   I(0x6b2b, 2); SET_HL(HL - 1);  // dec hl
-  I(0x6b2c, 4); HANDOFF(0x2e20); /* getFreeEnemySlot_uncounted@jump2e20 */  // jp $2e20
+  I(0x6b2c, 4); s_getFreeEnemySlot_uncounted__jump2e20(gb); return;  // jp $2e20
 }
 
 // 33:4e70

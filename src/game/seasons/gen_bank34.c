@@ -131,7 +131,7 @@ L_4b9f:
   I(0x4bb8, 3); SET_HL(0x8f77);  // ld hl,$8f77
   I(0x4bbb, 3); SET_HL(0xc73b);  // ld hl,$c73b
   I(0x4bbe, 1); alu_ccf(gb);  // ccf
-  I(0x4bbf, 4); HANDOFF(0x1d02); /* checkLinkCollisionsEnabled@jump1d02 */  // jp $1d02
+  I(0x4bbf, 4); s_checkLinkCollisionsEnabled__jump1d02(gb); return;  // jp $1d02
 L_5501:
   if (!(F & FC)) { I(0x5501, 4); HANDOFF(0xd4d3); /* unported */ } I(0x5501, 3);  // jp nc,$d4d3
   I(0x5504, 1);  // nop
@@ -176,7 +176,7 @@ L_4b9f:
   I(0x4bb8, 3); SET_HL(0x8f77);  // ld hl,$8f77
   I(0x4bbb, 3); SET_HL(0xc73b);  // ld hl,$c73b
   I(0x4bbe, 1); alu_ccf(gb);  // ccf
-  I(0x4bbf, 4); HANDOFF(0x1d02); /* checkLinkCollisionsEnabled@jump1d02 */  // jp $1d02
+  I(0x4bbf, 4); s_checkLinkCollisionsEnabled__jump1d02(gb); return;  // jp $1d02
 L_5501:
   if (!(F & FC)) { I(0x5501, 4); HANDOFF(0xd4d3); /* unported */ } I(0x5501, 3);  // jp nc,$d4d3
   I(0x5504, 1);  // nop

@@ -55,6 +55,139 @@ void s_bank3Cutscene_state0(GB *gb) {
   RET(0x6e2e); return;  // ret
 }
 
+// 03:49e7
+void s_convertSecretBufferToText__nextGroup(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_49e7:
+  I(0x49e7, 2); A = mem_rd(gb, BC);  // ld a,(bc)
+  I(0x49e8, 2); alu_and(gb, 0x0f);  // and $0f
+  if ((F & FZ)) { RET_TAKEN(0x49ea); return; } I(0x49ea, 2);  // ret z
+  PUSH(0x49eb, BC);  // push bc
+  I(0x49ec, 1); B = A;  // ld b,a
+L_49ed:
+  I(0x49ed, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  PUSH(0x49ee, HL);  // push hl
+  I(0x49ef, 3); SET_HL(0x00a1);  // ld hl,$00a1
+  RST_PUSH(0x49f2, 0x49f3);  // rst $10 (addAToHl)
+  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
+  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
+  I(0x49f3, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  SET_HL(POP(0x49f4));  // pop hl
+  I(0x49f5, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x49f6, 2); SET_DE(DE + 1);  // inc de
+  I(0x49f7, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x49f8, 3); goto L_49ed; } I(0x49f8, 2);  // jr nz,$49ed
+  SET_BC(POP(0x49fa));  // pop bc
+  I(0x49fb, 2); A = mem_rd(gb, BC);  // ld a,(bc)
+  I(0x49fc, 2); alu_and(gb, 0xf0);  // and $f0
+  I(0x49fe, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x49ff, 2); SET_BC(BC + 1);  // inc bc
+  I(0x4a00, 3); goto L_49e7;  // jr $49e7
+}
+
+// 03:49ed
+void s_convertSecretBufferToText__nextSymbol(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  goto L_49ed;
+L_49e7:
+  I(0x49e7, 2); A = mem_rd(gb, BC);  // ld a,(bc)
+  I(0x49e8, 2); alu_and(gb, 0x0f);  // and $0f
+  if ((F & FZ)) { RET_TAKEN(0x49ea); return; } I(0x49ea, 2);  // ret z
+  PUSH(0x49eb, BC);  // push bc
+  I(0x49ec, 1); B = A;  // ld b,a
+L_49ed:
+  I(0x49ed, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  PUSH(0x49ee, HL);  // push hl
+  I(0x49ef, 3); SET_HL(0x00a1);  // ld hl,$00a1
+  RST_PUSH(0x49f2, 0x49f3);  // rst $10 (addAToHl)
+  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
+  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
+  I(0x49f3, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  SET_HL(POP(0x49f4));  // pop hl
+  I(0x49f5, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x49f6, 2); SET_DE(DE + 1);  // inc de
+  I(0x49f7, 1); B = alu_dec8(gb, B);  // dec b
+  if (!(F & FZ)) { I(0x49f8, 3); goto L_49ed; } I(0x49f8, 2);  // jr nz,$49ed
+  SET_BC(POP(0x49fa));  // pop bc
+  I(0x49fb, 2); A = mem_rd(gb, BC);  // ld a,(bc)
+  I(0x49fc, 2); alu_and(gb, 0xf0);  // and $f0
+  I(0x49fe, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
+  I(0x49ff, 2); SET_BC(BC + 1);  // inc bc
+  I(0x4a00, 3); goto L_49e7;  // jr $49e7
+}
+
+// 03:4a02
+void s_convertSecretBufferToText__secretSpacingData(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_4a02:
+  I(0x4a02, 2); A = mem_rd(gb, BC);  // ld a,(bc)
+  I(0x4a03, 1); C = D;  // ld c,d
+  I(0x4a04, 2); A = mem_rd(gb, BC);  // ld a,(bc)
+  I(0x4a05, 1); C = D;  // ld c,d
+  I(0x4a06, 1); alu_rrca(gb);  // rrca
+  I(0x4a07, 1); C = D;  // ld c,d
+  I(0x4a08, 2); SET_DE(DE + 1);  // inc de
+  I(0x4a09, 1); C = D;  // ld c,d
+L_4a0a:
+  I(0x4a0a, 1); H = alu_dec8(gb, H);  // dec h
+  I(0x4a0b, 1); B = alu_dec8(gb, B);  // dec b
+  I(0x4a0c, 1); H = alu_dec8(gb, H);  // dec h
+  I(0x4a0d, 1); B = alu_dec8(gb, B);  // dec b
+  I(0x4a0e, 1);  // nop
+L_4a0f:
+  I(0x4a0f, 1); H = alu_dec8(gb, H);  // dec h
+  I(0x4a10, 1); B = alu_dec8(gb, B);  // dec b
+  I(0x4a11, 1); H = alu_dec8(gb, H);  // dec h
+  I(0x4a12, 1);  // nop
+L_4a13:
+  I(0x4a13, 1); B = alu_dec8(gb, B);  // dec b
+  I(0x4a14, 1);  // nop
+  if (hook_is(gb, 0x4a15, loadSecretBufferFromText_hook)) { loadSecretBufferFromText_hook(gb); return; } HANDOFF(0x4a15);  // fallthrough
+}
+
+// 03:4a0a
+void s_convertSecretBufferToText__entry0(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_4a0a:
+  I(0x4a0a, 1); H = alu_dec8(gb, H);  // dec h
+  I(0x4a0b, 1); B = alu_dec8(gb, B);  // dec b
+  I(0x4a0c, 1); H = alu_dec8(gb, H);  // dec h
+  I(0x4a0d, 1); B = alu_dec8(gb, B);  // dec b
+  I(0x4a0e, 1);  // nop
+L_4a0f:
+  I(0x4a0f, 1); H = alu_dec8(gb, H);  // dec h
+  I(0x4a10, 1); B = alu_dec8(gb, B);  // dec b
+  I(0x4a11, 1); H = alu_dec8(gb, H);  // dec h
+  I(0x4a12, 1);  // nop
+L_4a13:
+  I(0x4a13, 1); B = alu_dec8(gb, B);  // dec b
+  I(0x4a14, 1);  // nop
+  if (hook_is(gb, 0x4a15, loadSecretBufferFromText_hook)) { loadSecretBufferFromText_hook(gb); return; } HANDOFF(0x4a15);  // fallthrough
+}
+
+// 03:4a0f
+void s_convertSecretBufferToText__entry2(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_4a0f:
+  I(0x4a0f, 1); H = alu_dec8(gb, H);  // dec h
+  I(0x4a10, 1); B = alu_dec8(gb, B);  // dec b
+  I(0x4a11, 1); H = alu_dec8(gb, H);  // dec h
+  I(0x4a12, 1);  // nop
+L_4a13:
+  I(0x4a13, 1); B = alu_dec8(gb, B);  // dec b
+  I(0x4a14, 1);  // nop
+  if (hook_is(gb, 0x4a15, loadSecretBufferFromText_hook)) { loadSecretBufferFromText_hook(gb); return; } HANDOFF(0x4a15);  // fallthrough
+}
+
+// 03:4a13
+void s_convertSecretBufferToText__entry3(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_4a13:
+  I(0x4a13, 1); B = alu_dec8(gb, B);  // dec b
+  I(0x4a14, 1);  // nop
+  if (hook_is(gb, 0x4a15, loadSecretBufferFromText_hook)) { loadSecretBufferFromText_hook(gb); return; } HANDOFF(0x4a15);  // fallthrough
+}
+
 // 03:7340
 void s_cutscene06Func0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -9673,6 +9806,17 @@ L_6f54:
   s_zeldaAndVillagersCutscene_state1(gb); return;  // fallthrough
 }
 
+// 03:4ad6
+void s_getNumCharactersForSecretType__lengths(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_4ad6:
+  I(0x4ad6, 1); D = alu_inc8(gb, D);  // inc d
+  I(0x4ad7, 1); D = alu_inc8(gb, D);  // inc d
+  I(0x4ad8, 1); alu_rrca(gb);  // rrca
+  I(0x4ad9, 1); B = alu_dec8(gb, B);  // dec b
+  HANDOFF(0x4ada);  // fallthrough to secretXorCipher
+}
+
 // 03:6815
 void s_incCbb3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -9736,6 +9880,17 @@ void s_introCinematic_inTemple_state1_5(GB *gb) {
   I(0x50fb, 4); if (hook_is(gb, 0x4d33, intro_incState_hook)) { intro_incState_hook(gb); return; } HANDOFF(0x4d33);  // jp $4d33
 }
 
+// 03:5317
+void s_introCinematic_preTitlescreen_state2__titleDone(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_5317:
+  I(0x5317, 1); alu_xor(gb, A);  // xor a
+  I(0x5318, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
+  I(0x531b, 1); A = alu_dec8(gb, A);  // dec a
+  I(0x531c, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
+  I(0x531f, 4); if (hook_is(gb, 0x4d33, intro_incState_hook)) { intro_incState_hook(gb); return; } HANDOFF(0x4d33);  // jp $4d33
+}
+
 // 03:532e
 void s_introCinematic_preTitlescreen_titleSizeData(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -9745,6 +9900,27 @@ L_5331:
   I(0x5332, 2); B = 0x08;  // ld b,$08
   I(0x5334, 1); C = alu_inc8(gb, C);  // inc c
   I(0x5335, 3); goto L_5331;  // jr $5331
+}
+
+// 03:503f
+void s_introCinematic_preTitlescreen_updateScrollingTree__label_03_063(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_503f:
+  I(0x503f, 2); alu_cp(gb, 0xb0);  // cp $b0
+  if (!(F & FZ)) { I(0x5041, 3); goto L_5048; } I(0x5041, 2);  // jr nz,$5048
+  I(0x5043, 2); A = 0x2a;  // ld a,$2a
+  CALL(0x5045, loadUncompressedGfxHeader_hook, 0x05b6, 0x5048);  // call $05b6
+L_5048:
+  I(0x5048, 2); alu_or(gb, 0x01);  // or $01
+  RET(0x504a); return;  // ret
+}
+
+// 03:5048
+void s_introCinematic_preTitlescreen_updateScrollingTree__ret(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_5048:
+  I(0x5048, 2); alu_or(gb, 0x01);  // or $01
+  RET(0x504a); return;  // ret
 }
 
 // 03:4f54
@@ -10605,6 +10781,19 @@ L_4097:
   I(0x4097, 1); A = alu_dec8(gb, A);  // dec a
   if (!(F & FZ)) { I(0x4098, 3); goto L_4097; } I(0x4098, 2);  // jr nz,$4097
   RET(0x409a); return;  // ret
+}
+
+// 03:4ce9
+void s_runIntro__nextStage(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_4ce9:
+  I(0x4ce9, 3); A = mem_rd(gb, 0xffb7);  // ldh a,($ffb7)
+  I(0x4ceb, 1); alu_add(gb, A);  // add a
+  if ((F & FZ)) { I(0x4cec, 3); if (hook_is(gb, 0x4cf5, intro_runStage_hook)) { intro_runStage_hook(gb); return; } HANDOFF(0x4cf5); } I(0x4cec, 2);  // jr z,$4cf5
+  I(0x4cee, 4); A = mem_rd(gb, 0xc2e6);  // ld a,($c2e6)
+  I(0x4cf1, 2); alu_cp(gb, 0x03);  // cp $03
+  if (!(F & FZ)) { I(0x4cf3, 3); if (hook_is(gb, 0x4d03, intro_gotoTitlescreen_hook)) { intro_gotoTitlescreen_hook(gb); return; } HANDOFF(0x4d03); } I(0x4cf3, 2);  // jr nz,$4d03
+  if (hook_is(gb, 0x4cf5, intro_runStage_hook)) { intro_runStage_hook(gb); return; } HANDOFF(0x4cf5);  // fallthrough
 }
 
 // 03:51fc
@@ -12550,6 +12739,18 @@ L_4acb:
   if (hook_is(gb, 0x4ace, getNumCharactersForSecretType_hook)) { getNumCharactersForSecretType_hook(gb); return; } HANDOFF(0x4ace);  // fallthrough
 }
 
+// 03:4846
+void s_secretFunctionCaller_body__jumpTable(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_4846:
+  I(0x4846, 1); A = B;  // ld a,b
+  RST_PUSH(0x4847, 0x4848);  // rst $00 (jump table)
+  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
+  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
+  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
+  switch (HL) {  default: HANDOFF(HL); }
+}
+
 // 03:71e7
 void s_showCutscene50xxText(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -12674,6 +12875,50 @@ L_4e6a:
   I(0x4e8c, 1); B = B;  // ld b,b
   I(0x4e8d, 1);  // nop
   if (hook_is(gb, 0x4e8e, runIntroCinematic_hook)) { runIntroCinematic_hook(gb); return; } HANDOFF(0x4e8e);  // fallthrough
+}
+
+// 03:4c10
+void s_twinrovaCutscene_deleteAllInteractionsExceptFlames__next(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_4c10:
+  I(0x4c10, 2); L = 0x40;  // ld l,$40
+  I(0x4c12, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x4c13, 1); alu_or(gb, A);  // or a
+  if ((F & FZ)) { I(0x4c14, 3); goto L_4c1c; } I(0x4c14, 2);  // jr z,$4c1c
+  I(0x4c16, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x4c17, 2); alu_cp(gb, 0xb0);  // cp $b0
+  if ((F & FZ)) { CALL(0x4c19, s_twinrovaCutscene_deleteAllInteractionsExceptFlames__delete, 0x4c23, 0x4c1c); } else I(0x4c19, 3);  // call z,$4c23
+L_4c1c:
+  I(0x4c1c, 1); H = alu_inc8(gb, H);  // inc h
+  I(0x4c1d, 1); A = H;  // ld a,h
+  I(0x4c1e, 2); alu_cp(gb, 0xe0);  // cp $e0
+  if ((F & FC)) { I(0x4c20, 3); goto L_4c10; } I(0x4c20, 2);  // jr c,$4c10
+  RET(0x4c22); return;  // ret
+}
+
+// 03:4c23
+void s_twinrovaCutscene_deleteAllInteractionsExceptFlames__delete(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_4c23:
+  I(0x4c23, 1); L = alu_dec8(gb, L);  // dec l
+  I(0x4c24, 2); B = 0x40;  // ld b,$40
+  I(0x4c26, 4); if (hook_is(gb, 0x044b, clearMemory_hook)) { clearMemory_hook(gb); return; } HANDOFF(0x044b);  // jp $044b
+}
+
+// 03:49b8
+void s_verifyUnpackedSecretGameID__fail(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_49b8:
+  I(0x49b8, 2); B = 0x01;  // ld b,$01
+  RET(0x49ba); return;  // ret
+}
+
+// 03:49bb
+void s_verifyUnpackedSecretGameID__success(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_49bb:
+  I(0x49bb, 2); B = 0x00;  // ld b,$00
+  RET(0x49bd); return;  // ret
 }
 
 // 03:7205

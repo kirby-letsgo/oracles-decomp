@@ -448,6 +448,13 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-22 (night): **Seasons: 0 interpreted instructions** on the playthrough and on the
+  demo run. The generated tree now covers the @locals of shared routines that no shared hook
+  spells (`updateTextbox@checkShouldExit`, `loadTreasureDisplayData@getTableIndices`; 14,769
+  generated routines), the RAM function (`wRamFunction`, game-neutral, shared) and
+  `setCpuToDoubleSpeed` (identical bytes, `extra_seasons.sym`). Seasons table 18,335 hooks.
+  Gates as before, all green.
+
 - 2026-09-22 (later): **Seasons runs the whole playthrough in C.** `tools/transliterate.py
   --game=seasons` generates cycle-exact C for every Seasons routine that has no shared hook
   (`src/game/seasons/gen_bankXX.c`, 12,501 routines under `s_` names, calling the shared hooks

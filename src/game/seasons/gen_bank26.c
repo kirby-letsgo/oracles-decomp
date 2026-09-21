@@ -512,7 +512,7 @@ void s_room0597(GB *gb) {
 // 26:63c0
 void s_room059e(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x63c0, 4); HANDOFF(0x3ae0); /* interactionDelete@jump3ae0 */  // jp $3ae0
+  I(0x63c0, 4); s_interactionDelete__jump3ae0(gb); return;  // jp $3ae0
 }
 
 // 26:6453

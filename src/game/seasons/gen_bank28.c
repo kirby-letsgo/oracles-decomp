@@ -341,7 +341,7 @@ L_7e1b:
   I(0x7e24, 1); alu_rra(gb);  // rra
   I(0x7e25, 2); alu_add_hl(gb, BC);  // add hl,bc
   CALL_ASM_RST(0x7e26, 0x0030, 0x7e27);  // rst $30
-  if ((F & FZ)) { I(0x7e27, 4); HANDOFF(0x1500); /* checkGivenCollision_disallowHoles@jump1500 */ } I(0x7e27, 3);  // jp z,$1500
+  if ((F & FZ)) { I(0x7e27, 4); s_checkGivenCollision_disallowHoles__jump1500(gb); return; } I(0x7e27, 3);  // jp z,$1500
   I(0x7e2a, 1); E = A;  // ld e,a
   I(0x7e2b, 3); SET_HL(0xed4f);  // ld hl,$ed4f
   I(0x7e2e, 4); mem_wr(gb, 0x1f09, (uint8_t)gb->sp); TN(1); mem_wr(gb, 0x1f0a, gb->sp >> 8);  // ld ($1f09),sp

@@ -43,7 +43,7 @@ L_7a55:
 void s_gfx_tileset_sidescroll_2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x4644, 3); SET_BC(0xffff);  // ld bc,$ffff
-  I(0x4647, 4); HANDOFF(0x01ff); /* getLowestSetBit@jump01ff */  // jp $01ff
+  I(0x4647, 4); s_getLowestSetBit__jump01ff(gb); return;  // jp $01ff
 }
 
 // 30:7dab

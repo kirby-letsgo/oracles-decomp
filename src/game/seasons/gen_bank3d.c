@@ -1208,10 +1208,10 @@ L_643f:
   I(0x6440, 1); alu_rlca(gb);  // rlca
   I(0x6441, 1); H = B;  // ld h,b
   I(0x6442, 2); SET_BC(BC + 1);  // inc bc
-  if (!(F & FC)) { CALL_ASM(0x6443, 0x0729, 0x6446); /* _label_00_066@jump0729 */ } else I(0x6443, 3);  // call nc,$0729
+  if (!(F & FC)) { CALL(0x6443, s__label_00_066__jump0729, 0x0729, 0x6446); } else I(0x6443, 3);  // call nc,$0729
   I(0x6446, 1); H = B;  // ld h,b
   I(0x6447, 1); B = alu_inc8(gb, B);  // inc b
-  if (!(F & FC)) { I(0x6448, 4); HANDOFF(0x0729); /* _label_00_066@jump0729 */ } I(0x6448, 3);  // jp nc,$0729
+  if (!(F & FC)) { I(0x6448, 4); s__label_00_066__jump0729(gb); return; } I(0x6448, 3);  // jp nc,$0729
   if ((F & FC)) { RET_TAKEN(0x644b); return; } I(0x644b, 2);  // ret c
   if (!(F & FZ)) { I(0x644c, 3); goto L_646a; } I(0x644c, 2);  // jr nz,$646a
 L_644d:

@@ -413,6 +413,11 @@ if names and names[0] == '--out':
             if is_rewritten(n, b, a):
                 entries[(b, a)] = shared_hooks[(b, a)] if SEASONS else cname_at(b, a) + '_hook'
                 items_by_bank.setdefault(b, []).append((n, b, a))
+                if SEASONS:     # a shared routine's @locals that no shared hook covers are generated
+                    for la, ln in sorted(locals_of.get((b, n), [])):
+                        if (b, la) in shared_hooks or (b, la) in entries or not body_ok(b, la): continue
+                        entries[(b, la)] = cname_at(b, la)
+                        items_by_bank[b].append((ln, b, la))
                 # A rewritten routine still gets generated resume tails at its post-yield return
                 # addresses: the yield discards its C frames, so nothing else can run them.
                 # Those tails call the routine's own @-locals, which the hand-written C reaches
@@ -429,7 +434,7 @@ if names and names[0] == '--out':
                     entries[(b, la)] = cname_at(b, la)
                     items_by_bank[b].append((ln, b, la))
                 continue
-            if body_ok(b, a): entries[(b, a)] = cname_at(b, a)
+            if body_ok(b, a): entries[(b, a)] = cname_at(b, a)[2:] if SEASONS and (b, a) in externs else cname_at(b, a)
             items_by_bank.setdefault(b, []).append((n, b, a))
             for la, ln in sorted(locals_of.get((b, n), [])):
                 if SEASONS and (b, la) in shared_hooks: entries[(b, la)] = shared_hooks[(b, la)]; continue
@@ -457,7 +462,8 @@ if names and names[0] == '--out':
                 if not SEASONS: generated.append((b, a, cname_at(b, a) + '_hook', 'H' if (n in rewritten_noverify or cname_at(b, a) in rewritten_noverify) else '-'))
                 continue
             if (b, a) in externs:
-                if not SEASONS: generated.append((b, a, cname_at(b, a), '-'))    # hand-written (ram_code.c); Seasons has none yet
+                # hand-written (ram_code.c), game-neutral: the same function serves both games
+                generated.append((b, a, cname_at(b, a)[2:] if SEASONS else cname_at(b, a), '-'))
                 continue
             if RESUME_TAILS and '@' in n and is_rewritten_parent(n): pending.extend(discover_resume(n.split('@')[0], b, a))
             code = gen(n, b, a)

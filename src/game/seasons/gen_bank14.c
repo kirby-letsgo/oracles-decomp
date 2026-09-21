@@ -551,7 +551,7 @@ void s_interaction11OamDataPointers(GB *gb) {
 // 14:56e1
 void s_interaction12Animations(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  if ((F & FC)) { I(0x56e1, 4); HANDOFF(0x085c); /* dec16_ff8c@jump085c */ } I(0x56e1, 3);  // jp c,$085c
+  if ((F & FC)) { I(0x56e1, 4); s_dec16_ff8c__jump085c(gb); return; } I(0x56e1, 3);  // jp c,$085c
   I(0x56e4, 1); E = H;  // ld e,h
   I(0x56e5, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x56e6, 1); E = H;  // ld e,h
@@ -1212,7 +1212,7 @@ void s_interaction37OamDataPointers(GB *gb) {
   HANDOFF(0x6a15);  // fallthrough to interaction3bOamDataPointers
 L_6a54:
   I(0x6a54, 1); D = B;  // ld d,b
-  if ((F & FC)) { I(0x6a55, 4); HANDOFF(0x3950); /* loadRoomLayout@jump3950 */ } I(0x6a55, 3);  // jp c,$3950
+  if ((F & FC)) { I(0x6a55, 4); s_loadRoomLayout__jump3950(gb); return; } I(0x6a55, 3);  // jp c,$3950
   I(0x6a58, 1); B = C;  // ld b,c
   I(0x6a59, 1); B = D;  // ld b,d
   I(0x6a5a, 1); B = C;  // ld b,c
@@ -27036,7 +27036,7 @@ void s_rosaHidingScript_secondEncounterOnwardsIntro(GB *gb) {
 void s_simpleScript_waterfallEmptyingAboveD4(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x4d80, 2); mem_wr(gb, BC, A);  // ld (bc),a
-  if (!(F & FZ)) { I(0x4d81, 4); HANDOFF(0x1401); /* extractColorComponents@jump1401 */ } I(0x4d81, 3);  // jp nz,$1401
+  if (!(F & FZ)) { I(0x4d81, 4); s_extractColorComponents__jump1401(gb); return; } I(0x4d81, 3);  // jp nz,$1401
   I(0x4d84, 1); B = alu_inc8(gb, B);  // inc b
   I(0x4d85, 1); H = D;  // ld h,d
   I(0x4d86, 1); B = L;  // ld b,l

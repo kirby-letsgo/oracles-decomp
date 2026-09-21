@@ -5853,7 +5853,7 @@ L_7090:
   I(0x709d, 1); D = C;  // ld d,c
   I(0x709e, 1); alu_adc(gb, A);  // adc a
   I(0x709f, 1); D = C;  // ld d,c
-  I(0x70a0, 4); HANDOFF(0x0851); /* loadTilesetHlpr@jump0851 */  // jp $0851
+  I(0x70a0, 4); s_loadTilesetHlpr__jump0851(gb); return;  // jp $0851
 }
 
 // 16:6af1

@@ -1536,7 +1536,7 @@ L_59c0:
   I(0x59c5, 3); SET_BC(0x0419);  // ld bc,$0419
   I(0x59c8, 3); mem_wr(gb, 0xff04, A);  // ldh ($ff04),a
   I(0x59ca, 2); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
-  I(0x59cb, 4); HANDOFF(0x2322); /* objectMimicBgTile@jump2322 */  // jp $2322
+  I(0x59cb, 4); s_objectMimicBgTile__jump2322(gb); return;  // jp $2322
 L_59e4:
   I(0x59e4, 2); C = 0x0e;  // ld c,$0e
   I(0x59e6, 2); alu_add_hl(gb, BC);  // add hl,bc
@@ -1665,7 +1665,7 @@ L_59c0:
   I(0x59c5, 3); SET_BC(0x0419);  // ld bc,$0419
   I(0x59c8, 3); mem_wr(gb, 0xff04, A);  // ldh ($ff04),a
   I(0x59ca, 2); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
-  I(0x59cb, 4); HANDOFF(0x2322); /* objectMimicBgTile@jump2322 */  // jp $2322
+  I(0x59cb, 4); s_objectMimicBgTile__jump2322(gb); return;  // jp $2322
 L_59e4:
   I(0x59e4, 2); C = 0x0e;  // ld c,$0e
   I(0x59e6, 2); alu_add_hl(gb, BC);  // add hl,bc
@@ -1750,7 +1750,7 @@ L_59c0:
   I(0x59c5, 3); SET_BC(0x0419);  // ld bc,$0419
   I(0x59c8, 3); mem_wr(gb, 0xff04, A);  // ldh ($ff04),a
   I(0x59ca, 2); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
-  I(0x59cb, 4); HANDOFF(0x2322); /* objectMimicBgTile@jump2322 */  // jp $2322
+  I(0x59cb, 4); s_objectMimicBgTile__jump2322(gb); return;  // jp $2322
 L_59e4:
   I(0x59e4, 2); C = 0x0e;  // ld c,$0e
   I(0x59e6, 2); alu_add_hl(gb, BC);  // add hl,bc
@@ -2062,7 +2062,7 @@ L_5cc0:
   I(0x5cc3, 2); mem_wr(gb, HL, D);  // ld (hl),d
   I(0x5cc4, 2); mem_wr(gb, HL, D);  // ld (hl),d
   I(0x5cc5, 1); alu_add(gb, C);  // add c
-  I(0x5cc6, 4); HANDOFF(0x0d18); /* timerInterrupt@jump0d18 */  // jp $0d18
+  I(0x5cc6, 4); s_timerInterrupt__jump0d18(gb); return;  // jp $0d18
 }
 
 // 21:5d0a
@@ -3135,7 +3135,7 @@ void s_room0080(GB *gb) {
   if (!(F & FZ)) { CALL_ASM(0x6d6a, 0x0a11, 0x6d6d); /* unported */ } else I(0x6d6a, 3);  // call nz,$0a11
 L_6d6d:
   I(0x6d6d, 1); D = D;  // ld d,d
-  if (!(F & FZ)) { I(0x6d6e, 4); HANDOFF(0x0904); /* startGame__afterSp0925@jump0904 */ } I(0x6d6e, 3);  // jp nz,$0904
+  if (!(F & FZ)) { I(0x6d6e, 4); s_startGame__afterSp0925__jump0904(gb); return; } I(0x6d6e, 3);  // jp nz,$0904
   I(0x6d71, 1); alu_rrca(gb);  // rrca
   I(0x6d72, 3); SET_DE(0x0f11);  // ld de,$0f11
   I(0x6d75, 1); D = D;  // ld d,d
@@ -3156,7 +3156,7 @@ void s_room0080__afterCall6d6d(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6d6d:
   I(0x6d6d, 1); D = D;  // ld d,d
-  if (!(F & FZ)) { I(0x6d6e, 4); HANDOFF(0x0904); /* startGame__afterSp0925@jump0904 */ } I(0x6d6e, 3);  // jp nz,$0904
+  if (!(F & FZ)) { I(0x6d6e, 4); s_startGame__afterSp0925__jump0904(gb); return; } I(0x6d6e, 3);  // jp nz,$0904
   I(0x6d71, 1); alu_rrca(gb);  // rrca
   I(0x6d72, 3); SET_DE(0x0f11);  // ld de,$0f11
   I(0x6d75, 1); D = D;  // ld d,d
@@ -3592,7 +3592,7 @@ void s_room00ac(GB *gb) {
   I(0x78f3, 2); SET_BC(BC - 1);  // dec bc
   I(0x78f4, 2); E = 0x18;  // ld e,$18
   I(0x78f6, 2); alu_add_hl(gb, DE);  // add hl,de
-  I(0x78f7, 4); HANDOFF(0x07c4); /* loadTileset@jump07c4 */  // jp $07c4
+  I(0x78f7, 4); s_loadTileset__jump07c4(gb); return;  // jp $07c4
 }
 
 // 21:7978
@@ -3620,7 +3620,7 @@ void s_room00ae(GB *gb) {
   I(0x798b, 1); alu_add(gb, B);  // add b
   I(0x798c, 1); alu_add(gb, D);  // add d
   I(0x798d, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x798e, 4); HANDOFF(0x15c3); /* backwardsSearch@jump15c3 */  // jp $15c3
+  I(0x798e, 4); s_backwardsSearch__jump15c3(gb); return;  // jp $15c3
 }
 
 // 21:7a06
@@ -3905,7 +3905,7 @@ void s_room00c5(GB *gb) {
   I(0x7f25, 1); alu_add(gb, B);  // add b
   I(0x7f26, 4); mem_wr(gb, 0xe0b7, A);  // ld ($e0b7),a
   I(0x7f29, 2); SET_HL(HL - 1);  // dec hl
-  I(0x7f2a, 4); HANDOFF(0x15c3); /* backwardsSearch@jump15c3 */  // jp $15c3
+  I(0x7f2a, 4); s_backwardsSearch__jump15c3(gb); return;  // jp $15c3
 }
 
 // 21:7f52

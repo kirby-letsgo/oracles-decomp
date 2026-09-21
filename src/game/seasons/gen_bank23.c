@@ -4264,7 +4264,7 @@ void s_room0280(GB *gb) {
   if (!(F & FZ)) { CALL_ASM(0x67cb, 0x0a11, 0x67ce); /* unported */ } else I(0x67cb, 3);  // call nz,$0a11
 L_67ce:
   I(0x67ce, 1); D = D;  // ld d,d
-  if (!(F & FZ)) { I(0x67cf, 4); HANDOFF(0x0904); /* startGame__afterSp0925@jump0904 */ } I(0x67cf, 3);  // jp nz,$0904
+  if (!(F & FZ)) { I(0x67cf, 4); s_startGame__afterSp0925__jump0904(gb); return; } I(0x67cf, 3);  // jp nz,$0904
   I(0x67d2, 1); alu_rrca(gb);  // rrca
   I(0x67d3, 3); SET_DE(0x0f11);  // ld de,$0f11
   I(0x67d6, 1); D = D;  // ld d,d
@@ -4285,7 +4285,7 @@ void s_room0280__afterCall67ce(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_67ce:
   I(0x67ce, 1); D = D;  // ld d,d
-  if (!(F & FZ)) { I(0x67cf, 4); HANDOFF(0x0904); /* startGame__afterSp0925@jump0904 */ } I(0x67cf, 3);  // jp nz,$0904
+  if (!(F & FZ)) { I(0x67cf, 4); s_startGame__afterSp0925__jump0904(gb); return; } I(0x67cf, 3);  // jp nz,$0904
   I(0x67d2, 1); alu_rrca(gb);  // rrca
   I(0x67d3, 3); SET_DE(0x0f11);  // ld de,$0f11
   I(0x67d6, 1); D = D;  // ld d,d
@@ -5426,7 +5426,7 @@ void s_room02ca(GB *gb) {
   I(0x7acb, 1); alu_add(gb, C);  // add c
   if ((F & FZ)) { I(0x7acc, 4); HANDOFF(0x3804); /* unported */ } I(0x7acc, 3);  // jp z,$3804
   I(0x7acf, 1); B = alu_inc8(gb, B);  // inc b
-  if ((F & FZ)) { I(0x7ad0, 4); HANDOFF(0x1aca); /* copy8BytesFromRingMapToCec0@jump1aca */ } I(0x7ad0, 3);  // jp z,$1aca
+  if ((F & FZ)) { I(0x7ad0, 4); s_copy8BytesFromRingMapToCec0__jump1aca(gb); return; } I(0x7ad0, 3);  // jp z,$1aca
   I(0x7ad3, 2); SET_DE(DE - 1);  // dec de
   I(0x7ad4, 1); D = alu_inc8(gb, D);  // inc d
   I(0x7ad5, 2); D = 0xf8;  // ld d,$f8
@@ -5491,7 +5491,7 @@ L_7b66:
   I(0x7b66, 3); goto L_7b28;  // jr $7b28
 L_7b6d:
   I(0x7b6d, 2); alu_add_hl(gb, DE);  // add hl,de
-  if ((F & FZ)) { I(0x7b6e, 4); HANDOFF(0x3252); /* mainThreadStart@jump3252 */ } I(0x7b6e, 3);  // jp z,$3252
+  if ((F & FZ)) { I(0x7b6e, 4); s_mainThreadStart__jump3252(gb); return; } I(0x7b6e, 3);  // jp z,$3252
   HANDOFF(0x7b71);  // fallthrough to room02cd
 }
 

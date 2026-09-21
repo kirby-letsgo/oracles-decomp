@@ -244,6 +244,6 @@ L_569a:
   I(0x569b, 1); alu_and(gb, A);  // and a
   I(0x569c, 1); E = B;  // ld e,b
   I(0x569d, 1);  // nop
-  I(0x569e, 4); HANDOFF(0x233c); /* objectNegateAndHalveSpeedZ@jump233c */  // jp $233c
+  I(0x569e, 4); s_objectNegateAndHalveSpeedZ__jump233c(gb); return;  // jp $233c
 }
 

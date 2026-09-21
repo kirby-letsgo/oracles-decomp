@@ -118,7 +118,7 @@ L_4cc4:
   I(0x4cc7, 1); C = H;  // ld c,h
   I(0x4cc8, 2); A = mem_rd(gb, 0xff00 | C);  // ld a,($ff00+c)
   I(0x4cc9, 1); C = H;  // ld c,h
-  if (!(F & FZ)) { CALL_ASM(0x4cca, 0x1483, 0x4ccd); /* objectCheckSimpleCollision@jump1483 */ } else I(0x4cca, 3);  // call nz,$1483
+  if (!(F & FZ)) { CALL(0x4cca, s_objectCheckSimpleCollision__jump1483, 0x1483, 0x4ccd); } else I(0x4cca, 3);  // call nz,$1483
   I(0x4ccd, 3); SET_BC(0xe048);  // ld bc,$e048
   I(0x4cd0, 1); H = D;  // ld h,d
   I(0x4cd1, 1); D = L;  // ld d,l
@@ -140,7 +140,7 @@ L_4cc4:
   I(0x4cc7, 1); C = H;  // ld c,h
   I(0x4cc8, 2); A = mem_rd(gb, 0xff00 | C);  // ld a,($ff00+c)
   I(0x4cc9, 1); C = H;  // ld c,h
-  if (!(F & FZ)) { CALL_ASM(0x4cca, 0x1483, 0x4ccd); /* objectCheckSimpleCollision@jump1483 */ } else I(0x4cca, 3);  // call nz,$1483
+  if (!(F & FZ)) { CALL(0x4cca, s_objectCheckSimpleCollision__jump1483, 0x1483, 0x4ccd); } else I(0x4cca, 3);  // call nz,$1483
   I(0x4ccd, 3); SET_BC(0xe048);  // ld bc,$e048
   I(0x4cd0, 1); H = D;  // ld h,d
   I(0x4cd1, 1); D = L;  // ld d,l
@@ -8856,7 +8856,7 @@ void s_gameCompleteDialogScript(GB *gb) {
   I(0x4b17, 2); alu_or(gb, 0x98);  // or $98
   I(0x4b19, 1); D = L;  // ld d,l
   I(0x4b1a, 1); C = alu_dec8(gb, C);  // dec c
-  I(0x4b1b, 4); HANDOFF(0x2800); /* enemyDie@jump2800 */  // jp $2800
+  I(0x4b1b, 4); s_enemyDie__jump2800(gb); return;  // jp $2800
 }
 
 // 0b:4b28
@@ -14211,7 +14211,7 @@ L_73c0:
   I(0x73c4, 1); alu_sbc(gb, B);  // sbc b
   if ((F & FC)) { I(0x73c5, 3); goto L_73cc; } I(0x73c5, 2);  // jr c,$73cc
   I(0x73c7, 2); mem_wr(gb, HL, E);  // ld (hl),e
-  I(0x73c8, 4); HANDOFF(0x1483); /* objectCheckSimpleCollision@jump1483 */  // jp $1483
+  I(0x73c8, 4); s_objectCheckSimpleCollision__jump1483(gb); return;  // jp $1483
 L_73cc:
   I(0x73cc, 1); D = C;  // ld d,c
   HANDOFF(0x73cd);  // fallthrough to script73cd
@@ -14227,7 +14227,7 @@ void s_script73bf(GB *gb) {
   I(0x73c4, 1); alu_sbc(gb, B);  // sbc b
   if ((F & FC)) { I(0x73c5, 3); goto L_73cc; } I(0x73c5, 2);  // jr c,$73cc
   I(0x73c7, 2); mem_wr(gb, HL, E);  // ld (hl),e
-  I(0x73c8, 4); HANDOFF(0x1483); /* objectCheckSimpleCollision@jump1483 */  // jp $1483
+  I(0x73c8, 4); s_objectCheckSimpleCollision__jump1483(gb); return;  // jp $1483
 L_73cc:
   I(0x73cc, 1); D = C;  // ld d,c
   HANDOFF(0x73cd);  // fallthrough to script73cd
@@ -14563,6 +14563,23 @@ void s_script7d77(GB *gb) {
   HANDOFF(0x7d87);  // fallthrough to goldenCaveSubrosianScript_7d87
 }
 
+// 0b:45cb
+void s_scriptCmd_delay__delayLengths(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_45cb:
+  I(0x45cb, 3); SET_BC(0x0804);  // ld bc,$0804
+  I(0x45ce, 2); A = mem_rd(gb, BC);  // ld a,(bc)
+  I(0x45cf, 1); alu_rrca(gb);  // rrca
+  I(0x45d0, 1); D = alu_inc8(gb, D);  // inc d
+  I(0x45d1, 2); E = 0x28;  // ld e,$28
+  I(0x45d3, 1); A = alu_inc8(gb, A);  // inc a
+  I(0x45d4, 1); E = D;  // ld e,d
+  I(0x45d5, 1); A = B;  // ld a,b
+  I(0x45d6, 1); alu_or(gb, H);  // or h
+  I(0x45d7, 3); A = mem_rd(gb, 0xff00);  // ldh a,($ff00)
+  HANDOFF(0x45d9);  // fallthrough to genericNpcScript
+}
+
 // 0b:4435
 void s_scriptCmd_df(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -14748,6 +14765,97 @@ void s_scriptCmd_jumpRandom(GB *gb) {
   I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
   if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
   I(0x44af, 4); s_scriptFunc_jump_scf(gb); return;  // jp $257f
+}
+
+// 0b:457a
+void s_scriptCmd_setOrUnsetGlobalFlag__set(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_457a:
+  PUSH(0x457a, HL);  // push hl
+  CALL(0x457b, setGlobalFlag_hook, 0x30cd, 0x457e);  // call $30cd
+  SET_HL(POP(0x457e));  // pop hl
+  I(0x457f, 1); alu_scf(gb);  // scf
+  RET(0x4580); return;  // ret
+}
+
+// 0b:4581
+void s_scriptCmd_setOrUnsetGlobalFlag__unset(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_4581:
+  I(0x4581, 2); alu_and(gb, 0x7f);  // and $7f
+  PUSH(0x4583, HL);  // push hl
+  CALL(0x4584, unsetGlobalFlag_hook, 0x30d3, 0x4587);  // call $30d3
+  SET_HL(POP(0x4587));  // pop hl
+  I(0x4588, 1); alu_scf(gb);  // scf
+  RET(0x4589); return;  // ret
+}
+
+// 0b:4132
+void s_scriptCmd_showPasswordScreen__askForSecret(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_4132:
+  I(0x4132, 1); A = B;  // ld a,b
+  I(0x4133, 2); alu_or(gb, 0x80);  // or $80
+L_4135:
+  CALL(0x4135, openSecretInputMenu_hook, 0x1a0a, 0x4138);  // call $1a0a
+  I(0x4138, 3); goto L_4144;  // jr $4144
+L_4144:
+  SET_HL(POP(0x4144));  // pop hl
+  I(0x4145, 1); alu_xor(gb, A);  // xor a
+  RET(0x4146); return;  // ret
+}
+
+// 0b:4135
+void s_scriptCmd_showPasswordScreen__openSecretMenu(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_4135:
+  CALL(0x4135, openSecretInputMenu_hook, 0x1a0a, 0x4138);  // call $1a0a
+  I(0x4138, 3); goto L_4144;  // jr $4144
+L_4144:
+  SET_HL(POP(0x4144));  // pop hl
+  I(0x4145, 1); alu_xor(gb, A);  // xor a
+  RET(0x4146); return;  // ret
+}
+
+// 0b:413a
+void s_scriptCmd_showPasswordScreen__generateSecret(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_413a:
+  I(0x413a, 1); A = B;  // ld a,b
+  I(0x413b, 4); mem_wr(gb, 0xc6e6, A);  // ld ($c6e6),a
+  I(0x413e, 3); SET_BC(0x0003);  // ld bc,$0003
+  CALL(0x4141, secretFunctionCaller_hook, 0x19f4, 0x4144);  // call $19f4
+  SET_HL(POP(0x4144));  // pop hl
+  I(0x4145, 1); alu_xor(gb, A);  // xor a
+  RET(0x4146); return;  // ret
+}
+
+// 0b:42d5
+void s_scriptCmd_showTextDifferentForLinked__unlinked(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_42d5:
+  I(0x42d5, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x42d6, 2); SET_HL(HL + 1);  // inc hl
+  I(0x42d7, 3); goto L_42db;  // jr $42db
+L_42db:
+  I(0x42db, 1); C = A;  // ld c,a
+  PUSH(0x42dc, HL);  // push hl
+  CALL(0x42dd, showText_hook, 0x184b, 0x42e0);  // call $184b
+  SET_HL(POP(0x42e0));  // pop hl
+  RET(0x42e1); return;  // ret
+}
+
+// 0b:42d9
+void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_42d9:
+  I(0x42d9, 2); SET_HL(HL + 1);  // inc hl
+  I(0x42da, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x42db, 1); C = A;  // ld c,a
+  PUSH(0x42dc, HL);  // push hl
+  CALL(0x42dd, showText_hook, 0x184b, 0x42e0);  // call $184b
+  SET_HL(POP(0x42e0));  // pop hl
+  RET(0x42e1); return;  // ret
 }
 
 // 0b:4faa
@@ -19971,7 +20079,7 @@ L_5203:
   I(0x5204, 2); alu_or(gb, 0x98);  // or $98
   I(0x5206, 2); SET_BC(BC - 1);  // dec bc
   I(0x5207, 1); B = H;  // ld b,h
-  I(0x5208, 4); HANDOFF(0x1500); /* checkGivenCollision_disallowHoles@jump1500 */  // jp $1500
+  I(0x5208, 4); s_checkGivenCollision_disallowHoles__jump1500(gb); return;  // jp $1500
 }
 
 // 0b:5203
@@ -19982,7 +20090,7 @@ L_5203:
   I(0x5204, 2); alu_or(gb, 0x98);  // or $98
   I(0x5206, 2); SET_BC(BC - 1);  // dec bc
   I(0x5207, 1); B = H;  // ld b,h
-  I(0x5208, 4); HANDOFF(0x1500); /* checkGivenCollision_disallowHoles@jump1500 */  // jp $1500
+  I(0x5208, 4); s_checkGivenCollision_disallowHoles__jump1500(gb); return;  // jp $1500
 }
 
 // 0b:5215

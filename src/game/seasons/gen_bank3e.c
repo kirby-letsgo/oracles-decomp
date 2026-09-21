@@ -1040,11 +1040,11 @@ L_42e9:
   I(0x42ea, 3); SET_DE(0xd208);  // ld de,$d208
   I(0x42ed, 3); SET_DE(0x6004);  // ld de,$6004
   I(0x42f0, 1); C = B;  // ld c,b
-  if ((F & FC)) { CALL_ASM(0x42f1, 0x020c, 0x42f4); /* checkFlag@jump020c */ } else I(0x42f1, 3);  // call c,$020c
+  if ((F & FC)) { CALL(0x42f1, s_checkFlag__jump020c, 0x020c, 0x42f4); } else I(0x42f1, 3);  // call c,$020c
   PUSH(0x42f4, DE);  // push de
   I(0x42f5, 1); C = alu_inc8(gb, C);  // inc c
   I(0x42f6, 1); B = alu_inc8(gb, B);  // inc b
-  if (!(F & FC)) { I(0x42f7, 4); HANDOFF(0x020c); /* checkFlag@jump020c */ } I(0x42f7, 3);  // jp nc,$020c
+  if (!(F & FC)) { I(0x42f7, 4); s_checkFlag__jump020c(gb); return; } I(0x42f7, 3);  // jp nc,$020c
   if ((F & FC)) { CALL_ASM(0x42fa, 0x040c, 0x42fd); /* unported */ } else I(0x42fa, 3);  // call c,$040c
 L_42fd:
   PUSH(0x42fd, DE);  // push de
@@ -1096,11 +1096,11 @@ L_42e9:
   I(0x42ea, 3); SET_DE(0xd208);  // ld de,$d208
   I(0x42ed, 3); SET_DE(0x6004);  // ld de,$6004
   I(0x42f0, 1); C = B;  // ld c,b
-  if ((F & FC)) { CALL_ASM(0x42f1, 0x020c, 0x42f4); /* checkFlag@jump020c */ } else I(0x42f1, 3);  // call c,$020c
+  if ((F & FC)) { CALL(0x42f1, s_checkFlag__jump020c, 0x020c, 0x42f4); } else I(0x42f1, 3);  // call c,$020c
   PUSH(0x42f4, DE);  // push de
   I(0x42f5, 1); C = alu_inc8(gb, C);  // inc c
   I(0x42f6, 1); B = alu_inc8(gb, B);  // inc b
-  if (!(F & FC)) { I(0x42f7, 4); HANDOFF(0x020c); /* checkFlag@jump020c */ } I(0x42f7, 3);  // jp nc,$020c
+  if (!(F & FC)) { I(0x42f7, 4); s_checkFlag__jump020c(gb); return; } I(0x42f7, 3);  // jp nc,$020c
   if ((F & FC)) { CALL_ASM(0x42fa, 0x040c, 0x42fd); /* unported */ } else I(0x42fa, 3);  // call c,$040c
 L_42fd:
   PUSH(0x42fd, DE);  // push de
@@ -1146,11 +1146,11 @@ L_42e9:
   I(0x42ea, 3); SET_DE(0xd208);  // ld de,$d208
   I(0x42ed, 3); SET_DE(0x6004);  // ld de,$6004
   I(0x42f0, 1); C = B;  // ld c,b
-  if ((F & FC)) { CALL_ASM(0x42f1, 0x020c, 0x42f4); /* checkFlag@jump020c */ } else I(0x42f1, 3);  // call c,$020c
+  if ((F & FC)) { CALL(0x42f1, s_checkFlag__jump020c, 0x020c, 0x42f4); } else I(0x42f1, 3);  // call c,$020c
   PUSH(0x42f4, DE);  // push de
   I(0x42f5, 1); C = alu_inc8(gb, C);  // inc c
   I(0x42f6, 1); B = alu_inc8(gb, B);  // inc b
-  if (!(F & FC)) { I(0x42f7, 4); HANDOFF(0x020c); /* checkFlag@jump020c */ } I(0x42f7, 3);  // jp nc,$020c
+  if (!(F & FC)) { I(0x42f7, 4); s_checkFlag__jump020c(gb); return; } I(0x42f7, 3);  // jp nc,$020c
   if ((F & FC)) { CALL_ASM(0x42fa, 0x040c, 0x42fd); /* unported */ } else I(0x42fa, 3);  // call c,$040c
 L_42fd:
   PUSH(0x42fd, DE);  // push de
@@ -1190,11 +1190,11 @@ L_42e9:
   I(0x42ea, 3); SET_DE(0xd208);  // ld de,$d208
   I(0x42ed, 3); SET_DE(0x6004);  // ld de,$6004
   I(0x42f0, 1); C = B;  // ld c,b
-  if ((F & FC)) { CALL_ASM(0x42f1, 0x020c, 0x42f4); /* checkFlag@jump020c */ } else I(0x42f1, 3);  // call c,$020c
+  if ((F & FC)) { CALL(0x42f1, s_checkFlag__jump020c, 0x020c, 0x42f4); } else I(0x42f1, 3);  // call c,$020c
   PUSH(0x42f4, DE);  // push de
   I(0x42f5, 1); C = alu_inc8(gb, C);  // inc c
   I(0x42f6, 1); B = alu_inc8(gb, B);  // inc b
-  if (!(F & FC)) { I(0x42f7, 4); HANDOFF(0x020c); /* checkFlag@jump020c */ } I(0x42f7, 3);  // jp nc,$020c
+  if (!(F & FC)) { I(0x42f7, 4); s_checkFlag__jump020c(gb); return; } I(0x42f7, 3);  // jp nc,$020c
   if ((F & FC)) { CALL_ASM(0x42fa, 0x040c, 0x42fd); /* unported */ } else I(0x42fa, 3);  // call c,$040c
 L_42fd:
   PUSH(0x42fd, DE);  // push de
@@ -1619,7 +1619,7 @@ void s_musicfa756(GB *gb) {
   PUSH(0x6bfe, DE);  // push de
   if ((F & FC)) { RET_TAKEN(0x6bff); return; } I(0x6bff, 2);  // ret c
   if ((F & FZ)) { I(0x6c00, 3); goto L_6c03; } I(0x6c00, 2);  // jr z,$6c03
-  if (!(F & FC)) { I(0x6c02, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c02, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c02, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c02, 3);  // jp nc,$0527
 L_6c03:
   I(0x6c03, 1); alu_daa(gb);  // daa
   I(0x6c04, 1); B = alu_dec8(gb, B);  // dec b
@@ -1631,13 +1631,13 @@ L_6c09:
   I(0x6c0a, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6c0b); return; } I(0x6c0b, 2);  // ret c
   if ((F & FZ)) { I(0x6c0c, 3); goto L_6c0f; } I(0x6c0c, 2);  // jr z,$6c0f
-  if (!(F & FC)) { I(0x6c0e, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c0e, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c0e, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c0e, 3);  // jp nc,$0527
 L_6c0f:
   I(0x6c0f, 1); alu_daa(gb);  // daa
   I(0x6c10, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6c11); return; } I(0x6c11, 2);  // ret c
   if ((F & FZ)) { I(0x6c12, 3); goto L_6c15; } I(0x6c12, 2);  // jr z,$6c15
-  if (!(F & FC)) { I(0x6c14, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c14, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c14, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c14, 3);  // jp nc,$0527
 L_6c15:
   I(0x6c15, 1); alu_daa(gb);  // daa
   I(0x6c16, 1); B = alu_dec8(gb, B);  // dec b
@@ -1649,13 +1649,13 @@ L_6c1b:
   I(0x6c1c, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6c1d); return; } I(0x6c1d, 2);  // ret c
   if ((F & FZ)) { I(0x6c1e, 3); goto L_6c21; } I(0x6c1e, 2);  // jr z,$6c21
-  if (!(F & FC)) { I(0x6c20, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c20, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c20, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c20, 3);  // jp nc,$0527
 L_6c21:
   I(0x6c21, 1); alu_daa(gb);  // daa
   I(0x6c22, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6c23); return; } I(0x6c23, 2);  // ret c
   if ((F & FZ)) { I(0x6c24, 3); goto L_6c27; } I(0x6c24, 2);  // jr z,$6c27
-  if (!(F & FC)) { I(0x6c26, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c26, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c26, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c26, 3);  // jp nc,$0527
 L_6c27:
   I(0x6c27, 1); alu_daa(gb);  // daa
   I(0x6c28, 1); B = alu_dec8(gb, B);  // dec b
@@ -1667,37 +1667,37 @@ L_6c2d:
   I(0x6c2e, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6c2f); return; } I(0x6c2f, 2);  // ret c
   if ((F & FZ)) { I(0x6c30, 3); goto L_6c33; } I(0x6c30, 2);  // jr z,$6c33
-  if (!(F & FC)) { I(0x6c32, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c32, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c32, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c32, 3);  // jp nc,$0527
 L_6c33:
   I(0x6c33, 1); alu_daa(gb);  // daa
   I(0x6c34, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6c35); return; } I(0x6c35, 2);  // ret c
   if ((F & FZ)) { I(0x6c36, 3); goto L_6c39; } I(0x6c36, 2);  // jr z,$6c39
-  if (!(F & FC)) { I(0x6c38, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c38, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c38, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c38, 3);  // jp nc,$0527
 L_6c39:
   I(0x6c39, 1); alu_daa(gb);  // daa
   I(0x6c3a, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6c3b); return; } I(0x6c3b, 2);  // ret c
   if ((F & FZ)) { I(0x6c3c, 3); goto L_6c3f; } I(0x6c3c, 2);  // jr z,$6c3f
-  if (!(F & FC)) { I(0x6c3e, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c3e, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c3e, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c3e, 3);  // jp nc,$0527
 L_6c3f:
   I(0x6c3f, 1); alu_daa(gb);  // daa
   I(0x6c40, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6c41); return; } I(0x6c41, 2);  // ret c
   if ((F & FZ)) { I(0x6c42, 3); goto L_6c45; } I(0x6c42, 2);  // jr z,$6c45
-  if (!(F & FC)) { I(0x6c44, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c44, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c44, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c44, 3);  // jp nc,$0527
 L_6c45:
   I(0x6c45, 1); alu_daa(gb);  // daa
   I(0x6c46, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6c47); return; } I(0x6c47, 2);  // ret c
   if ((F & FZ)) { I(0x6c48, 3); goto L_6c4b; } I(0x6c48, 2);  // jr z,$6c4b
-  if (!(F & FC)) { I(0x6c4a, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c4a, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c4a, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c4a, 3);  // jp nc,$0527
 L_6c4b:
   I(0x6c4b, 1); alu_daa(gb);  // daa
   I(0x6c4c, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6c4d); return; } I(0x6c4d, 2);  // ret c
   if ((F & FZ)) { I(0x6c4e, 3); goto L_6c51; } I(0x6c4e, 2);  // jr z,$6c51
-  if (!(F & FC)) { I(0x6c50, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c50, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c50, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c50, 3);  // jp nc,$0527
 L_6c51:
   I(0x6c51, 1); alu_daa(gb);  // daa
   I(0x6c52, 1); B = alu_dec8(gb, B);  // dec b
@@ -1709,13 +1709,13 @@ L_6c57:
   I(0x6c58, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6c59); return; } I(0x6c59, 2);  // ret c
   if ((F & FZ)) { I(0x6c5a, 3); goto L_6c5d; } I(0x6c5a, 2);  // jr z,$6c5d
-  if (!(F & FC)) { I(0x6c5c, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c5c, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c5c, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c5c, 3);  // jp nc,$0527
 L_6c5d:
   I(0x6c5d, 1); alu_daa(gb);  // daa
   I(0x6c5e, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6c5f); return; } I(0x6c5f, 2);  // ret c
   if ((F & FZ)) { I(0x6c60, 3); goto L_6c63; } I(0x6c60, 2);  // jr z,$6c63
-  if (!(F & FC)) { I(0x6c62, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c62, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c62, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c62, 3);  // jp nc,$0527
 L_6c63:
   I(0x6c63, 1); alu_daa(gb);  // daa
   I(0x6c64, 1); B = alu_dec8(gb, B);  // dec b
@@ -1727,13 +1727,13 @@ L_6c69:
   I(0x6c6a, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6c6b); return; } I(0x6c6b, 2);  // ret c
   if ((F & FZ)) { I(0x6c6c, 3); goto L_6c6f; } I(0x6c6c, 2);  // jr z,$6c6f
-  if (!(F & FC)) { I(0x6c6e, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c6e, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c6e, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c6e, 3);  // jp nc,$0527
 L_6c6f:
   I(0x6c6f, 1); alu_daa(gb);  // daa
   I(0x6c70, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6c71); return; } I(0x6c71, 2);  // ret c
   if ((F & FZ)) { I(0x6c72, 3); goto L_6c75; } I(0x6c72, 2);  // jr z,$6c75
-  if (!(F & FC)) { I(0x6c74, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c74, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c74, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c74, 3);  // jp nc,$0527
 L_6c75:
   I(0x6c75, 1); alu_daa(gb);  // daa
   I(0x6c76, 1); B = alu_dec8(gb, B);  // dec b
@@ -1745,13 +1745,13 @@ L_6c7b:
   I(0x6c7c, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6c7d); return; } I(0x6c7d, 2);  // ret c
   if ((F & FZ)) { I(0x6c7e, 3); goto L_6c81; } I(0x6c7e, 2);  // jr z,$6c81
-  if (!(F & FC)) { I(0x6c80, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c80, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c80, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c80, 3);  // jp nc,$0527
 L_6c81:
   I(0x6c81, 1); alu_daa(gb);  // daa
   I(0x6c82, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6c83); return; } I(0x6c83, 2);  // ret c
   if ((F & FZ)) { I(0x6c84, 3); goto L_6c87; } I(0x6c84, 2);  // jr z,$6c87
-  if (!(F & FC)) { I(0x6c86, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c86, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c86, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c86, 3);  // jp nc,$0527
 L_6c87:
   I(0x6c87, 1); alu_daa(gb);  // daa
   I(0x6c88, 1); B = alu_dec8(gb, B);  // dec b
@@ -1763,13 +1763,13 @@ L_6c8d:
   I(0x6c8e, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6c8f); return; } I(0x6c8f, 2);  // ret c
   if ((F & FZ)) { I(0x6c90, 3); goto L_6c93; } I(0x6c90, 2);  // jr z,$6c93
-  if (!(F & FC)) { I(0x6c92, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c92, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c92, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c92, 3);  // jp nc,$0527
 L_6c93:
   I(0x6c93, 1); alu_daa(gb);  // daa
   I(0x6c94, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6c95); return; } I(0x6c95, 2);  // ret c
   if ((F & FZ)) { I(0x6c96, 3); goto L_6c99; } I(0x6c96, 2);  // jr z,$6c99
-  if (!(F & FC)) { I(0x6c98, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6c98, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6c98, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6c98, 3);  // jp nc,$0527
 L_6c99:
   I(0x6c99, 1); alu_daa(gb);  // daa
   I(0x6c9a, 1); B = alu_dec8(gb, B);  // dec b
@@ -1781,13 +1781,13 @@ L_6c9f:
   I(0x6ca0, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6ca1); return; } I(0x6ca1, 2);  // ret c
   if ((F & FZ)) { I(0x6ca2, 3); goto L_6ca5; } I(0x6ca2, 2);  // jr z,$6ca5
-  if (!(F & FC)) { I(0x6ca4, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6ca4, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6ca4, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6ca4, 3);  // jp nc,$0527
 L_6ca5:
   I(0x6ca5, 1); alu_daa(gb);  // daa
   I(0x6ca6, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6ca7); return; } I(0x6ca7, 2);  // ret c
   if ((F & FZ)) { I(0x6ca8, 3); goto L_6cab; } I(0x6ca8, 2);  // jr z,$6cab
-  if (!(F & FC)) { I(0x6caa, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6caa, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6caa, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6caa, 3);  // jp nc,$0527
 L_6cab:
   I(0x6cab, 1); alu_daa(gb);  // daa
   I(0x6cac, 1); B = alu_dec8(gb, B);  // dec b
@@ -1799,13 +1799,13 @@ L_6cb1:
   I(0x6cb2, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6cb3); return; } I(0x6cb3, 2);  // ret c
   if ((F & FZ)) { I(0x6cb4, 3); goto L_6cb7; } I(0x6cb4, 2);  // jr z,$6cb7
-  if (!(F & FC)) { I(0x6cb6, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6cb6, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6cb6, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6cb6, 3);  // jp nc,$0527
 L_6cb7:
   I(0x6cb7, 1); alu_daa(gb);  // daa
   I(0x6cb8, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6cb9); return; } I(0x6cb9, 2);  // ret c
   if ((F & FZ)) { I(0x6cba, 3); goto L_6cbd; } I(0x6cba, 2);  // jr z,$6cbd
-  if (!(F & FC)) { I(0x6cbc, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6cbc, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6cbc, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6cbc, 3);  // jp nc,$0527
 L_6cbd:
   I(0x6cbd, 1); alu_daa(gb);  // daa
   I(0x6cbe, 1); B = alu_dec8(gb, B);  // dec b
@@ -1817,13 +1817,13 @@ L_6cc3:
   I(0x6cc4, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6cc5); return; } I(0x6cc5, 2);  // ret c
   if ((F & FZ)) { I(0x6cc6, 3); goto L_6cc9; } I(0x6cc6, 2);  // jr z,$6cc9
-  if (!(F & FC)) { I(0x6cc8, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6cc8, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6cc8, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6cc8, 3);  // jp nc,$0527
 L_6cc9:
   I(0x6cc9, 1); alu_daa(gb);  // daa
   I(0x6cca, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6ccb); return; } I(0x6ccb, 2);  // ret c
   if ((F & FZ)) { I(0x6ccc, 3); goto L_6ccf; } I(0x6ccc, 2);  // jr z,$6ccf
-  if (!(F & FC)) { I(0x6cce, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6cce, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6cce, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6cce, 3);  // jp nc,$0527
 L_6ccf:
   I(0x6ccf, 1); alu_daa(gb);  // daa
   I(0x6cd0, 1); B = alu_dec8(gb, B);  // dec b
@@ -1835,13 +1835,13 @@ L_6cd5:
   I(0x6cd6, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6cd7); return; } I(0x6cd7, 2);  // ret c
   if ((F & FZ)) { I(0x6cd8, 3); goto L_6cdb; } I(0x6cd8, 2);  // jr z,$6cdb
-  if (!(F & FC)) { I(0x6cda, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6cda, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6cda, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6cda, 3);  // jp nc,$0527
 L_6cdb:
   I(0x6cdb, 1); alu_daa(gb);  // daa
   I(0x6cdc, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6cdd); return; } I(0x6cdd, 2);  // ret c
   if ((F & FZ)) { I(0x6cde, 3); goto L_6ce1; } I(0x6cde, 2);  // jr z,$6ce1
-  if (!(F & FC)) { I(0x6ce0, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6ce0, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6ce0, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6ce0, 3);  // jp nc,$0527
 L_6ce1:
   I(0x6ce1, 1); alu_daa(gb);  // daa
   I(0x6ce2, 1); B = alu_dec8(gb, B);  // dec b
@@ -1853,13 +1853,13 @@ L_6ce7:
   I(0x6ce8, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6ce9); return; } I(0x6ce9, 2);  // ret c
   if ((F & FZ)) { I(0x6cea, 3); goto L_6ced; } I(0x6cea, 2);  // jr z,$6ced
-  if (!(F & FC)) { I(0x6cec, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6cec, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6cec, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6cec, 3);  // jp nc,$0527
 L_6ced:
   I(0x6ced, 1); alu_daa(gb);  // daa
   I(0x6cee, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6cef); return; } I(0x6cef, 2);  // ret c
   if ((F & FZ)) { I(0x6cf0, 3); goto L_6cf3; } I(0x6cf0, 2);  // jr z,$6cf3
-  if (!(F & FC)) { I(0x6cf2, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6cf2, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6cf2, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6cf2, 3);  // jp nc,$0527
 L_6cf3:
   I(0x6cf3, 1); alu_daa(gb);  // daa
   I(0x6cf4, 1); B = alu_dec8(gb, B);  // dec b
@@ -1871,13 +1871,13 @@ L_6cf9:
   I(0x6cfa, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6cfb); return; } I(0x6cfb, 2);  // ret c
   if ((F & FZ)) { I(0x6cfc, 3); goto L_6cff; } I(0x6cfc, 2);  // jr z,$6cff
-  if (!(F & FC)) { I(0x6cfe, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6cfe, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6cfe, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6cfe, 3);  // jp nc,$0527
 L_6cff:
   I(0x6cff, 1); alu_daa(gb);  // daa
   I(0x6d00, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6d01); return; } I(0x6d01, 2);  // ret c
   if ((F & FZ)) { I(0x6d02, 3); goto L_6d05; } I(0x6d02, 2);  // jr z,$6d05
-  if (!(F & FC)) { I(0x6d04, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d04, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d04, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d04, 3);  // jp nc,$0527
 L_6d05:
   I(0x6d05, 1); alu_daa(gb);  // daa
   I(0x6d06, 1); B = alu_dec8(gb, B);  // dec b
@@ -1889,37 +1889,37 @@ L_6d0b:
   I(0x6d0c, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6d0d); return; } I(0x6d0d, 2);  // ret c
   if ((F & FZ)) { I(0x6d0e, 3); goto L_6d11; } I(0x6d0e, 2);  // jr z,$6d11
-  if (!(F & FC)) { I(0x6d10, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d10, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d10, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d10, 3);  // jp nc,$0527
 L_6d11:
   I(0x6d11, 1); alu_daa(gb);  // daa
   I(0x6d12, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6d13); return; } I(0x6d13, 2);  // ret c
   if ((F & FZ)) { I(0x6d14, 3); goto L_6d17; } I(0x6d14, 2);  // jr z,$6d17
-  if (!(F & FC)) { I(0x6d16, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d16, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d16, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d16, 3);  // jp nc,$0527
 L_6d17:
   I(0x6d17, 1); alu_daa(gb);  // daa
   I(0x6d18, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6d19); return; } I(0x6d19, 2);  // ret c
   if ((F & FZ)) { I(0x6d1a, 3); goto L_6d1d; } I(0x6d1a, 2);  // jr z,$6d1d
-  if (!(F & FC)) { I(0x6d1c, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d1c, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d1c, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d1c, 3);  // jp nc,$0527
 L_6d1d:
   I(0x6d1d, 1); alu_daa(gb);  // daa
   I(0x6d1e, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6d1f); return; } I(0x6d1f, 2);  // ret c
   if ((F & FZ)) { I(0x6d20, 3); goto L_6d23; } I(0x6d20, 2);  // jr z,$6d23
-  if (!(F & FC)) { I(0x6d22, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d22, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d22, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d22, 3);  // jp nc,$0527
 L_6d23:
   I(0x6d23, 1); alu_daa(gb);  // daa
   I(0x6d24, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6d25); return; } I(0x6d25, 2);  // ret c
   if ((F & FZ)) { I(0x6d26, 3); goto L_6d29; } I(0x6d26, 2);  // jr z,$6d29
-  if (!(F & FC)) { I(0x6d28, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d28, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d28, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d28, 3);  // jp nc,$0527
 L_6d29:
   I(0x6d29, 1); alu_daa(gb);  // daa
   I(0x6d2a, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6d2b); return; } I(0x6d2b, 2);  // ret c
   if ((F & FZ)) { I(0x6d2c, 3); goto L_6d2f; } I(0x6d2c, 2);  // jr z,$6d2f
-  if (!(F & FC)) { I(0x6d2e, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d2e, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d2e, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d2e, 3);  // jp nc,$0527
 L_6d2f:
   I(0x6d2f, 1); alu_daa(gb);  // daa
   I(0x6d30, 1); B = alu_dec8(gb, B);  // dec b
@@ -1931,13 +1931,13 @@ L_6d35:
   I(0x6d36, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6d37); return; } I(0x6d37, 2);  // ret c
   if ((F & FZ)) { I(0x6d38, 3); goto L_6d3b; } I(0x6d38, 2);  // jr z,$6d3b
-  if (!(F & FC)) { I(0x6d3a, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d3a, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d3a, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d3a, 3);  // jp nc,$0527
 L_6d3b:
   I(0x6d3b, 1); alu_daa(gb);  // daa
   I(0x6d3c, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6d3d); return; } I(0x6d3d, 2);  // ret c
   if ((F & FZ)) { I(0x6d3e, 3); goto L_6d41; } I(0x6d3e, 2);  // jr z,$6d41
-  if (!(F & FC)) { I(0x6d40, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d40, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d40, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d40, 3);  // jp nc,$0527
 L_6d41:
   I(0x6d41, 1); alu_daa(gb);  // daa
   I(0x6d42, 1); B = alu_dec8(gb, B);  // dec b
@@ -1949,13 +1949,13 @@ L_6d47:
   I(0x6d48, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6d49); return; } I(0x6d49, 2);  // ret c
   if ((F & FZ)) { I(0x6d4a, 3); goto L_6d4d; } I(0x6d4a, 2);  // jr z,$6d4d
-  if (!(F & FC)) { I(0x6d4c, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d4c, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d4c, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d4c, 3);  // jp nc,$0527
 L_6d4d:
   I(0x6d4d, 1); alu_daa(gb);  // daa
   I(0x6d4e, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6d4f); return; } I(0x6d4f, 2);  // ret c
   if ((F & FZ)) { I(0x6d50, 3); goto L_6d53; } I(0x6d50, 2);  // jr z,$6d53
-  if (!(F & FC)) { I(0x6d52, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d52, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d52, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d52, 3);  // jp nc,$0527
 L_6d53:
   I(0x6d53, 1); alu_daa(gb);  // daa
   I(0x6d54, 1); B = alu_dec8(gb, B);  // dec b
@@ -1967,37 +1967,37 @@ L_6d59:
   I(0x6d5a, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6d5b); return; } I(0x6d5b, 2);  // ret c
   if ((F & FZ)) { I(0x6d5c, 3); goto L_6d5f; } I(0x6d5c, 2);  // jr z,$6d5f
-  if (!(F & FC)) { I(0x6d5e, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d5e, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d5e, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d5e, 3);  // jp nc,$0527
 L_6d5f:
   I(0x6d5f, 1); alu_daa(gb);  // daa
   I(0x6d60, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6d61); return; } I(0x6d61, 2);  // ret c
   if ((F & FZ)) { I(0x6d62, 3); goto L_6d65; } I(0x6d62, 2);  // jr z,$6d65
-  if (!(F & FC)) { I(0x6d64, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d64, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d64, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d64, 3);  // jp nc,$0527
 L_6d65:
   I(0x6d65, 1); alu_daa(gb);  // daa
   I(0x6d66, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6d67); return; } I(0x6d67, 2);  // ret c
   if ((F & FZ)) { I(0x6d68, 3); goto L_6d6b; } I(0x6d68, 2);  // jr z,$6d6b
-  if (!(F & FC)) { I(0x6d6a, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d6a, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d6a, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d6a, 3);  // jp nc,$0527
 L_6d6b:
   I(0x6d6b, 1); alu_daa(gb);  // daa
   I(0x6d6c, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6d6d); return; } I(0x6d6d, 2);  // ret c
   if ((F & FZ)) { I(0x6d6e, 3); goto L_6d71; } I(0x6d6e, 2);  // jr z,$6d71
-  if (!(F & FC)) { I(0x6d70, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d70, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d70, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d70, 3);  // jp nc,$0527
 L_6d71:
   I(0x6d71, 1); alu_daa(gb);  // daa
   I(0x6d72, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6d73); return; } I(0x6d73, 2);  // ret c
   if ((F & FZ)) { I(0x6d74, 3); goto L_6d77; } I(0x6d74, 2);  // jr z,$6d77
-  if (!(F & FC)) { I(0x6d76, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d76, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d76, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d76, 3);  // jp nc,$0527
 L_6d77:
   I(0x6d77, 1); alu_daa(gb);  // daa
   I(0x6d78, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6d79); return; } I(0x6d79, 2);  // ret c
   if ((F & FZ)) { I(0x6d7a, 3); goto L_6d7d; } I(0x6d7a, 2);  // jr z,$6d7d
-  if (!(F & FC)) { I(0x6d7c, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d7c, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d7c, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d7c, 3);  // jp nc,$0527
 L_6d7d:
   I(0x6d7d, 1); alu_daa(gb);  // daa
   I(0x6d7e, 1); B = alu_dec8(gb, B);  // dec b
@@ -2009,13 +2009,13 @@ L_6d83:
   I(0x6d84, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6d85); return; } I(0x6d85, 2);  // ret c
   if ((F & FZ)) { I(0x6d86, 3); goto L_6d89; } I(0x6d86, 2);  // jr z,$6d89
-  if (!(F & FC)) { I(0x6d88, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d88, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d88, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d88, 3);  // jp nc,$0527
 L_6d89:
   I(0x6d89, 1); alu_daa(gb);  // daa
   I(0x6d8a, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6d8b); return; } I(0x6d8b, 2);  // ret c
   if ((F & FZ)) { I(0x6d8c, 3); goto L_6d8f; } I(0x6d8c, 2);  // jr z,$6d8f
-  if (!(F & FC)) { I(0x6d8e, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d8e, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d8e, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d8e, 3);  // jp nc,$0527
 L_6d8f:
   I(0x6d8f, 1); alu_daa(gb);  // daa
   I(0x6d90, 1); B = alu_dec8(gb, B);  // dec b
@@ -2027,13 +2027,13 @@ L_6d95:
   I(0x6d96, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6d97); return; } I(0x6d97, 2);  // ret c
   if ((F & FZ)) { I(0x6d98, 3); goto L_6d9b; } I(0x6d98, 2);  // jr z,$6d9b
-  if (!(F & FC)) { I(0x6d9a, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6d9a, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6d9a, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6d9a, 3);  // jp nc,$0527
 L_6d9b:
   I(0x6d9b, 1); alu_daa(gb);  // daa
   I(0x6d9c, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6d9d); return; } I(0x6d9d, 2);  // ret c
   if ((F & FZ)) { I(0x6d9e, 3); goto L_6da1; } I(0x6d9e, 2);  // jr z,$6da1
-  if (!(F & FC)) { I(0x6da0, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6da0, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6da0, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6da0, 3);  // jp nc,$0527
 L_6da1:
   I(0x6da1, 1); alu_daa(gb);  // daa
   I(0x6da2, 1); B = alu_dec8(gb, B);  // dec b
@@ -2045,13 +2045,13 @@ L_6da7:
   I(0x6da8, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6da9); return; } I(0x6da9, 2);  // ret c
   if ((F & FZ)) { I(0x6daa, 3); goto L_6dad; } I(0x6daa, 2);  // jr z,$6dad
-  if (!(F & FC)) { I(0x6dac, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6dac, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6dac, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6dac, 3);  // jp nc,$0527
 L_6dad:
   I(0x6dad, 1); alu_daa(gb);  // daa
   I(0x6dae, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6daf); return; } I(0x6daf, 2);  // ret c
   if ((F & FZ)) { I(0x6db0, 3); goto L_6db3; } I(0x6db0, 2);  // jr z,$6db3
-  if (!(F & FC)) { I(0x6db2, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6db2, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6db2, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6db2, 3);  // jp nc,$0527
 L_6db3:
   I(0x6db3, 1); alu_daa(gb);  // daa
   I(0x6db4, 1); B = alu_dec8(gb, B);  // dec b
@@ -2063,13 +2063,13 @@ L_6db9:
   I(0x6dba, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6dbb); return; } I(0x6dbb, 2);  // ret c
   if ((F & FZ)) { I(0x6dbc, 3); goto L_6dbf; } I(0x6dbc, 2);  // jr z,$6dbf
-  if (!(F & FC)) { I(0x6dbe, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6dbe, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6dbe, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6dbe, 3);  // jp nc,$0527
 L_6dbf:
   I(0x6dbf, 1); alu_daa(gb);  // daa
   I(0x6dc0, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6dc1); return; } I(0x6dc1, 2);  // ret c
   if ((F & FZ)) { I(0x6dc2, 3); goto L_6dc5; } I(0x6dc2, 2);  // jr z,$6dc5
-  if (!(F & FC)) { I(0x6dc4, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6dc4, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6dc4, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6dc4, 3);  // jp nc,$0527
 L_6dc5:
   I(0x6dc5, 1); alu_daa(gb);  // daa
   I(0x6dc6, 1); B = alu_dec8(gb, B);  // dec b
@@ -2081,13 +2081,13 @@ L_6dcb:
   I(0x6dcc, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6dcd); return; } I(0x6dcd, 2);  // ret c
   if ((F & FZ)) { I(0x6dce, 3); goto L_6dd1; } I(0x6dce, 2);  // jr z,$6dd1
-  if (!(F & FC)) { I(0x6dd0, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6dd0, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6dd0, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6dd0, 3);  // jp nc,$0527
 L_6dd1:
   I(0x6dd1, 1); alu_daa(gb);  // daa
   I(0x6dd2, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6dd3); return; } I(0x6dd3, 2);  // ret c
   if ((F & FZ)) { I(0x6dd4, 3); goto L_6dd7; } I(0x6dd4, 2);  // jr z,$6dd7
-  if (!(F & FC)) { I(0x6dd6, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6dd6, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6dd6, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6dd6, 3);  // jp nc,$0527
 L_6dd7:
   I(0x6dd7, 1); alu_daa(gb);  // daa
   I(0x6dd8, 1); B = alu_dec8(gb, B);  // dec b
@@ -2099,13 +2099,13 @@ L_6ddd:
   I(0x6dde, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6ddf); return; } I(0x6ddf, 2);  // ret c
   if ((F & FZ)) { I(0x6de0, 3); goto L_6de3; } I(0x6de0, 2);  // jr z,$6de3
-  if (!(F & FC)) { I(0x6de2, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6de2, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6de2, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6de2, 3);  // jp nc,$0527
 L_6de3:
   I(0x6de3, 1); alu_daa(gb);  // daa
   I(0x6de4, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6de5); return; } I(0x6de5, 2);  // ret c
   if ((F & FZ)) { I(0x6de6, 3); goto L_6de9; } I(0x6de6, 2);  // jr z,$6de9
-  if (!(F & FC)) { I(0x6de8, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6de8, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6de8, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6de8, 3);  // jp nc,$0527
 L_6de9:
   I(0x6de9, 1); alu_daa(gb);  // daa
   I(0x6dea, 1); B = alu_dec8(gb, B);  // dec b
@@ -2117,25 +2117,25 @@ L_6def:
   I(0x6df0, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6df1); return; } I(0x6df1, 2);  // ret c
   if ((F & FZ)) { I(0x6df2, 3); goto L_6df5; } I(0x6df2, 2);  // jr z,$6df5
-  if (!(F & FC)) { I(0x6df4, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6df4, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6df4, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6df4, 3);  // jp nc,$0527
 L_6df5:
   I(0x6df5, 1); alu_daa(gb);  // daa
   I(0x6df6, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6df7); return; } I(0x6df7, 2);  // ret c
   if ((F & FZ)) { I(0x6df8, 3); goto L_6dfb; } I(0x6df8, 2);  // jr z,$6dfb
-  if (!(F & FC)) { I(0x6dfa, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6dfa, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6dfa, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6dfa, 3);  // jp nc,$0527
 L_6dfb:
   I(0x6dfb, 1); alu_daa(gb);  // daa
   I(0x6dfc, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6dfd); return; } I(0x6dfd, 2);  // ret c
   if ((F & FZ)) { I(0x6dfe, 3); goto L_6e01; } I(0x6dfe, 2);  // jr z,$6e01
-  if (!(F & FC)) { I(0x6e00, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e00, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e00, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e00, 3);  // jp nc,$0527
 L_6e01:
   I(0x6e01, 1); alu_daa(gb);  // daa
   I(0x6e02, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6e03); return; } I(0x6e03, 2);  // ret c
   if ((F & FZ)) { I(0x6e04, 3); goto L_6e07; } I(0x6e04, 2);  // jr z,$6e07
-  if (!(F & FC)) { I(0x6e06, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e06, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e06, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e06, 3);  // jp nc,$0527
 L_6e07:
   I(0x6e07, 1); alu_daa(gb);  // daa
   I(0x6e08, 1); B = alu_dec8(gb, B);  // dec b
@@ -2153,13 +2153,13 @@ L_6e13:
   I(0x6e14, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6e15); return; } I(0x6e15, 2);  // ret c
   if ((F & FZ)) { I(0x6e16, 3); goto L_6e19; } I(0x6e16, 2);  // jr z,$6e19
-  if (!(F & FC)) { I(0x6e18, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e18, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e18, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e18, 3);  // jp nc,$0527
 L_6e19:
   I(0x6e19, 1); alu_daa(gb);  // daa
   I(0x6e1a, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6e1b); return; } I(0x6e1b, 2);  // ret c
   if ((F & FZ)) { I(0x6e1c, 3); goto L_6e1f; } I(0x6e1c, 2);  // jr z,$6e1f
-  if (!(F & FC)) { I(0x6e1e, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e1e, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e1e, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e1e, 3);  // jp nc,$0527
 L_6e1f:
   I(0x6e1f, 1); alu_daa(gb);  // daa
   I(0x6e20, 1); B = alu_dec8(gb, B);  // dec b
@@ -2171,13 +2171,13 @@ L_6e25:
   I(0x6e26, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6e27); return; } I(0x6e27, 2);  // ret c
   if ((F & FZ)) { I(0x6e28, 3); goto L_6e2b; } I(0x6e28, 2);  // jr z,$6e2b
-  if (!(F & FC)) { I(0x6e2a, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e2a, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e2a, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e2a, 3);  // jp nc,$0527
 L_6e2b:
   I(0x6e2b, 1); alu_daa(gb);  // daa
   I(0x6e2c, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6e2d); return; } I(0x6e2d, 2);  // ret c
   if ((F & FZ)) { I(0x6e2e, 3); goto L_6e31; } I(0x6e2e, 2);  // jr z,$6e31
-  if (!(F & FC)) { I(0x6e30, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e30, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e30, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e30, 3);  // jp nc,$0527
 L_6e31:
   I(0x6e31, 1); alu_daa(gb);  // daa
   I(0x6e32, 1); B = alu_dec8(gb, B);  // dec b
@@ -2189,13 +2189,13 @@ L_6e37:
   I(0x6e38, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6e39); return; } I(0x6e39, 2);  // ret c
   if ((F & FZ)) { I(0x6e3a, 3); goto L_6e3d; } I(0x6e3a, 2);  // jr z,$6e3d
-  if (!(F & FC)) { I(0x6e3c, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e3c, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e3c, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e3c, 3);  // jp nc,$0527
 L_6e3d:
   I(0x6e3d, 1); alu_daa(gb);  // daa
   I(0x6e3e, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6e3f); return; } I(0x6e3f, 2);  // ret c
   if ((F & FZ)) { I(0x6e40, 3); goto L_6e43; } I(0x6e40, 2);  // jr z,$6e43
-  if (!(F & FC)) { I(0x6e42, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e42, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e42, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e42, 3);  // jp nc,$0527
 L_6e43:
   I(0x6e43, 1); alu_daa(gb);  // daa
   I(0x6e44, 1); B = alu_dec8(gb, B);  // dec b
@@ -2207,13 +2207,13 @@ L_6e49:
   I(0x6e4a, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6e4b); return; } I(0x6e4b, 2);  // ret c
   if ((F & FZ)) { I(0x6e4c, 3); goto L_6e4f; } I(0x6e4c, 2);  // jr z,$6e4f
-  if (!(F & FC)) { I(0x6e4e, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e4e, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e4e, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e4e, 3);  // jp nc,$0527
 L_6e4f:
   I(0x6e4f, 1); alu_daa(gb);  // daa
   I(0x6e50, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6e51); return; } I(0x6e51, 2);  // ret c
   if ((F & FZ)) { I(0x6e52, 3); goto L_6e55; } I(0x6e52, 2);  // jr z,$6e55
-  if (!(F & FC)) { I(0x6e54, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e54, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e54, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e54, 3);  // jp nc,$0527
 L_6e55:
   I(0x6e55, 1); alu_daa(gb);  // daa
   I(0x6e56, 1); B = alu_dec8(gb, B);  // dec b
@@ -2225,13 +2225,13 @@ L_6e5b:
   I(0x6e5c, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6e5d); return; } I(0x6e5d, 2);  // ret c
   if ((F & FZ)) { I(0x6e5e, 3); goto L_6e61; } I(0x6e5e, 2);  // jr z,$6e61
-  if (!(F & FC)) { I(0x6e60, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e60, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e60, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e60, 3);  // jp nc,$0527
 L_6e61:
   I(0x6e61, 1); alu_daa(gb);  // daa
   I(0x6e62, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6e63); return; } I(0x6e63, 2);  // ret c
   if ((F & FZ)) { I(0x6e64, 3); goto L_6e67; } I(0x6e64, 2);  // jr z,$6e67
-  if (!(F & FC)) { I(0x6e66, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e66, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e66, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e66, 3);  // jp nc,$0527
 L_6e67:
   I(0x6e67, 1); alu_daa(gb);  // daa
   I(0x6e68, 1); B = alu_dec8(gb, B);  // dec b
@@ -2243,13 +2243,13 @@ L_6e6d:
   I(0x6e6e, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6e6f); return; } I(0x6e6f, 2);  // ret c
   if ((F & FZ)) { I(0x6e70, 3); goto L_6e73; } I(0x6e70, 2);  // jr z,$6e73
-  if (!(F & FC)) { I(0x6e72, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e72, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e72, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e72, 3);  // jp nc,$0527
 L_6e73:
   I(0x6e73, 1); alu_daa(gb);  // daa
   I(0x6e74, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6e75); return; } I(0x6e75, 2);  // ret c
   if ((F & FZ)) { I(0x6e76, 3); goto L_6e79; } I(0x6e76, 2);  // jr z,$6e79
-  if (!(F & FC)) { I(0x6e78, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e78, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e78, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e78, 3);  // jp nc,$0527
 L_6e79:
   I(0x6e79, 1); alu_daa(gb);  // daa
   I(0x6e7a, 1); B = alu_dec8(gb, B);  // dec b
@@ -2261,13 +2261,13 @@ L_6e7f:
   I(0x6e80, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6e81); return; } I(0x6e81, 2);  // ret c
   if ((F & FZ)) { I(0x6e82, 3); goto L_6e85; } I(0x6e82, 2);  // jr z,$6e85
-  if (!(F & FC)) { I(0x6e84, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e84, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e84, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e84, 3);  // jp nc,$0527
 L_6e85:
   I(0x6e85, 1); alu_daa(gb);  // daa
   I(0x6e86, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6e87); return; } I(0x6e87, 2);  // ret c
   if ((F & FZ)) { I(0x6e88, 3); goto L_6e8b; } I(0x6e88, 2);  // jr z,$6e8b
-  if (!(F & FC)) { I(0x6e8a, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e8a, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e8a, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e8a, 3);  // jp nc,$0527
 L_6e8b:
   I(0x6e8b, 1); alu_daa(gb);  // daa
   I(0x6e8c, 1); B = alu_dec8(gb, B);  // dec b
@@ -2279,13 +2279,13 @@ L_6e91:
   I(0x6e92, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6e93); return; } I(0x6e93, 2);  // ret c
   if ((F & FZ)) { I(0x6e94, 3); goto L_6e97; } I(0x6e94, 2);  // jr z,$6e97
-  if (!(F & FC)) { I(0x6e96, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e96, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e96, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e96, 3);  // jp nc,$0527
 L_6e97:
   I(0x6e97, 1); alu_daa(gb);  // daa
   I(0x6e98, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6e99); return; } I(0x6e99, 2);  // ret c
   if ((F & FZ)) { I(0x6e9a, 3); goto L_6e9d; } I(0x6e9a, 2);  // jr z,$6e9d
-  if (!(F & FC)) { I(0x6e9c, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6e9c, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6e9c, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6e9c, 3);  // jp nc,$0527
 L_6e9d:
   I(0x6e9d, 1); alu_daa(gb);  // daa
   I(0x6e9e, 1); B = alu_dec8(gb, B);  // dec b
@@ -2297,13 +2297,13 @@ L_6ea3:
   I(0x6ea4, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6ea5); return; } I(0x6ea5, 2);  // ret c
   if ((F & FZ)) { I(0x6ea6, 3); goto L_6ea9; } I(0x6ea6, 2);  // jr z,$6ea9
-  if (!(F & FC)) { I(0x6ea8, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6ea8, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6ea8, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6ea8, 3);  // jp nc,$0527
 L_6ea9:
   I(0x6ea9, 1); alu_daa(gb);  // daa
   I(0x6eaa, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6eab); return; } I(0x6eab, 2);  // ret c
   if ((F & FZ)) { I(0x6eac, 3); goto L_6eaf; } I(0x6eac, 2);  // jr z,$6eaf
-  if (!(F & FC)) { I(0x6eae, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6eae, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6eae, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6eae, 3);  // jp nc,$0527
 L_6eaf:
   I(0x6eaf, 1); alu_daa(gb);  // daa
   I(0x6eb0, 1); B = alu_dec8(gb, B);  // dec b
@@ -2315,13 +2315,13 @@ L_6eb5:
   I(0x6eb6, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6eb7); return; } I(0x6eb7, 2);  // ret c
   if ((F & FZ)) { I(0x6eb8, 3); goto L_6ebb; } I(0x6eb8, 2);  // jr z,$6ebb
-  if (!(F & FC)) { I(0x6eba, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6eba, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6eba, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6eba, 3);  // jp nc,$0527
 L_6ebb:
   I(0x6ebb, 1); alu_daa(gb);  // daa
   I(0x6ebc, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6ebd); return; } I(0x6ebd, 2);  // ret c
   if ((F & FZ)) { I(0x6ebe, 3); goto L_6ec1; } I(0x6ebe, 2);  // jr z,$6ec1
-  if (!(F & FC)) { I(0x6ec0, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6ec0, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6ec0, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6ec0, 3);  // jp nc,$0527
 L_6ec1:
   I(0x6ec1, 1); alu_daa(gb);  // daa
   I(0x6ec2, 1); B = alu_dec8(gb, B);  // dec b
@@ -2333,37 +2333,37 @@ L_6ec7:
   I(0x6ec8, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6ec9); return; } I(0x6ec9, 2);  // ret c
   if ((F & FZ)) { I(0x6eca, 3); goto L_6ecd; } I(0x6eca, 2);  // jr z,$6ecd
-  if (!(F & FC)) { I(0x6ecc, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6ecc, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6ecc, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6ecc, 3);  // jp nc,$0527
 L_6ecd:
   I(0x6ecd, 1); alu_daa(gb);  // daa
   I(0x6ece, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6ecf); return; } I(0x6ecf, 2);  // ret c
   if ((F & FZ)) { I(0x6ed0, 3); goto L_6ed3; } I(0x6ed0, 2);  // jr z,$6ed3
-  if (!(F & FC)) { I(0x6ed2, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6ed2, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6ed2, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6ed2, 3);  // jp nc,$0527
 L_6ed3:
   I(0x6ed3, 1); alu_daa(gb);  // daa
   I(0x6ed4, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6ed5); return; } I(0x6ed5, 2);  // ret c
   if ((F & FZ)) { I(0x6ed6, 3); goto L_6ed9; } I(0x6ed6, 2);  // jr z,$6ed9
-  if (!(F & FC)) { I(0x6ed8, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6ed8, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6ed8, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6ed8, 3);  // jp nc,$0527
 L_6ed9:
   I(0x6ed9, 1); alu_daa(gb);  // daa
   I(0x6eda, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6edb); return; } I(0x6edb, 2);  // ret c
   if ((F & FZ)) { I(0x6edc, 3); goto L_6edf; } I(0x6edc, 2);  // jr z,$6edf
-  if (!(F & FC)) { I(0x6ede, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6ede, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6ede, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6ede, 3);  // jp nc,$0527
 L_6edf:
   I(0x6edf, 1); alu_daa(gb);  // daa
   I(0x6ee0, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6ee1); return; } I(0x6ee1, 2);  // ret c
   if ((F & FZ)) { I(0x6ee2, 3); goto L_6ee5; } I(0x6ee2, 2);  // jr z,$6ee5
-  if (!(F & FC)) { I(0x6ee4, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6ee4, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6ee4, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6ee4, 3);  // jp nc,$0527
 L_6ee5:
   I(0x6ee5, 1); alu_daa(gb);  // daa
   I(0x6ee6, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6ee7); return; } I(0x6ee7, 2);  // ret c
   if ((F & FZ)) { I(0x6ee8, 3); goto L_6eeb; } I(0x6ee8, 2);  // jr z,$6eeb
-  if (!(F & FC)) { I(0x6eea, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6eea, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6eea, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6eea, 3);  // jp nc,$0527
 L_6eeb:
   I(0x6eeb, 1); alu_daa(gb);  // daa
   I(0x6eec, 1); B = alu_dec8(gb, B);  // dec b
@@ -2375,13 +2375,13 @@ L_6ef1:
   I(0x6ef2, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6ef3); return; } I(0x6ef3, 2);  // ret c
   if ((F & FZ)) { I(0x6ef4, 3); goto L_6ef7; } I(0x6ef4, 2);  // jr z,$6ef7
-  if (!(F & FC)) { I(0x6ef6, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6ef6, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6ef6, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6ef6, 3);  // jp nc,$0527
 L_6ef7:
   I(0x6ef7, 1); alu_daa(gb);  // daa
   I(0x6ef8, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6ef9); return; } I(0x6ef9, 2);  // ret c
   if ((F & FZ)) { I(0x6efa, 3); goto L_6efd; } I(0x6efa, 2);  // jr z,$6efd
-  if (!(F & FC)) { I(0x6efc, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6efc, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6efc, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6efc, 3);  // jp nc,$0527
 L_6efd:
   I(0x6efd, 1); alu_daa(gb);  // daa
   I(0x6efe, 1); B = alu_dec8(gb, B);  // dec b
@@ -2393,13 +2393,13 @@ L_6f03:
   I(0x6f04, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6f05); return; } I(0x6f05, 2);  // ret c
   if ((F & FZ)) { I(0x6f06, 3); goto L_6f09; } I(0x6f06, 2);  // jr z,$6f09
-  if (!(F & FC)) { I(0x6f08, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f08, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f08, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f08, 3);  // jp nc,$0527
 L_6f09:
   I(0x6f09, 1); alu_daa(gb);  // daa
   I(0x6f0a, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6f0b); return; } I(0x6f0b, 2);  // ret c
   if ((F & FZ)) { I(0x6f0c, 3); goto L_6f0f; } I(0x6f0c, 2);  // jr z,$6f0f
-  if (!(F & FC)) { I(0x6f0e, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f0e, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f0e, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f0e, 3);  // jp nc,$0527
 L_6f0f:
   I(0x6f0f, 1); alu_daa(gb);  // daa
   I(0x6f10, 1); B = alu_dec8(gb, B);  // dec b
@@ -2411,13 +2411,13 @@ L_6f15:
   I(0x6f16, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6f17); return; } I(0x6f17, 2);  // ret c
   if ((F & FZ)) { I(0x6f18, 3); goto L_6f1b; } I(0x6f18, 2);  // jr z,$6f1b
-  if (!(F & FC)) { I(0x6f1a, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f1a, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f1a, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f1a, 3);  // jp nc,$0527
 L_6f1b:
   I(0x6f1b, 1); alu_daa(gb);  // daa
   I(0x6f1c, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6f1d); return; } I(0x6f1d, 2);  // ret c
   if ((F & FZ)) { I(0x6f1e, 3); goto L_6f21; } I(0x6f1e, 2);  // jr z,$6f21
-  if (!(F & FC)) { I(0x6f20, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f20, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f20, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f20, 3);  // jp nc,$0527
 L_6f21:
   I(0x6f21, 1); alu_daa(gb);  // daa
   I(0x6f22, 1); B = alu_dec8(gb, B);  // dec b
@@ -2429,13 +2429,13 @@ L_6f27:
   I(0x6f28, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6f29); return; } I(0x6f29, 2);  // ret c
   if ((F & FZ)) { I(0x6f2a, 3); goto L_6f2d; } I(0x6f2a, 2);  // jr z,$6f2d
-  if (!(F & FC)) { I(0x6f2c, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f2c, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f2c, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f2c, 3);  // jp nc,$0527
 L_6f2d:
   I(0x6f2d, 1); alu_daa(gb);  // daa
   I(0x6f2e, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6f2f); return; } I(0x6f2f, 2);  // ret c
   if ((F & FZ)) { I(0x6f30, 3); goto L_6f33; } I(0x6f30, 2);  // jr z,$6f33
-  if (!(F & FC)) { I(0x6f32, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f32, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f32, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f32, 3);  // jp nc,$0527
 L_6f33:
   I(0x6f33, 1); alu_daa(gb);  // daa
   I(0x6f34, 1); B = alu_dec8(gb, B);  // dec b
@@ -2447,13 +2447,13 @@ L_6f39:
   I(0x6f3a, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6f3b); return; } I(0x6f3b, 2);  // ret c
   if ((F & FZ)) { I(0x6f3c, 3); goto L_6f3f; } I(0x6f3c, 2);  // jr z,$6f3f
-  if (!(F & FC)) { I(0x6f3e, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f3e, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f3e, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f3e, 3);  // jp nc,$0527
 L_6f3f:
   I(0x6f3f, 1); alu_daa(gb);  // daa
   I(0x6f40, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6f41); return; } I(0x6f41, 2);  // ret c
   if ((F & FZ)) { I(0x6f42, 3); goto L_6f45; } I(0x6f42, 2);  // jr z,$6f45
-  if (!(F & FC)) { I(0x6f44, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f44, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f44, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f44, 3);  // jp nc,$0527
 L_6f45:
   I(0x6f45, 1); alu_daa(gb);  // daa
   I(0x6f46, 1); B = alu_dec8(gb, B);  // dec b
@@ -2465,13 +2465,13 @@ L_6f4b:
   I(0x6f4c, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6f4d); return; } I(0x6f4d, 2);  // ret c
   if ((F & FZ)) { I(0x6f4e, 3); goto L_6f51; } I(0x6f4e, 2);  // jr z,$6f51
-  if (!(F & FC)) { I(0x6f50, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f50, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f50, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f50, 3);  // jp nc,$0527
 L_6f51:
   I(0x6f51, 1); alu_daa(gb);  // daa
   I(0x6f52, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6f53); return; } I(0x6f53, 2);  // ret c
   if ((F & FZ)) { I(0x6f54, 3); goto L_6f57; } I(0x6f54, 2);  // jr z,$6f57
-  if (!(F & FC)) { I(0x6f56, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f56, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f56, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f56, 3);  // jp nc,$0527
 L_6f57:
   I(0x6f57, 1); alu_daa(gb);  // daa
   I(0x6f58, 1); B = alu_dec8(gb, B);  // dec b
@@ -2483,37 +2483,37 @@ L_6f5d:
   I(0x6f5e, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6f5f); return; } I(0x6f5f, 2);  // ret c
   if ((F & FZ)) { I(0x6f60, 3); goto L_6f63; } I(0x6f60, 2);  // jr z,$6f63
-  if (!(F & FC)) { I(0x6f62, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f62, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f62, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f62, 3);  // jp nc,$0527
 L_6f63:
   I(0x6f63, 1); alu_daa(gb);  // daa
   I(0x6f64, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6f65); return; } I(0x6f65, 2);  // ret c
   if ((F & FZ)) { I(0x6f66, 3); goto L_6f69; } I(0x6f66, 2);  // jr z,$6f69
-  if (!(F & FC)) { I(0x6f68, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f68, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f68, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f68, 3);  // jp nc,$0527
 L_6f69:
   I(0x6f69, 1); alu_daa(gb);  // daa
   I(0x6f6a, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6f6b); return; } I(0x6f6b, 2);  // ret c
   if ((F & FZ)) { I(0x6f6c, 3); goto L_6f6f; } I(0x6f6c, 2);  // jr z,$6f6f
-  if (!(F & FC)) { I(0x6f6e, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f6e, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f6e, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f6e, 3);  // jp nc,$0527
 L_6f6f:
   I(0x6f6f, 1); alu_daa(gb);  // daa
   I(0x6f70, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6f71); return; } I(0x6f71, 2);  // ret c
   if ((F & FZ)) { I(0x6f72, 3); goto L_6f75; } I(0x6f72, 2);  // jr z,$6f75
-  if (!(F & FC)) { I(0x6f74, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f74, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f74, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f74, 3);  // jp nc,$0527
 L_6f75:
   I(0x6f75, 1); alu_daa(gb);  // daa
   I(0x6f76, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6f77); return; } I(0x6f77, 2);  // ret c
   if ((F & FZ)) { I(0x6f78, 3); goto L_6f7b; } I(0x6f78, 2);  // jr z,$6f7b
-  if (!(F & FC)) { I(0x6f7a, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f7a, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f7a, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f7a, 3);  // jp nc,$0527
 L_6f7b:
   I(0x6f7b, 1); alu_daa(gb);  // daa
   I(0x6f7c, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6f7d); return; } I(0x6f7d, 2);  // ret c
   if ((F & FZ)) { I(0x6f7e, 3); goto L_6f81; } I(0x6f7e, 2);  // jr z,$6f81
-  if (!(F & FC)) { I(0x6f80, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f80, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f80, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f80, 3);  // jp nc,$0527
 L_6f81:
   I(0x6f81, 1); alu_daa(gb);  // daa
   I(0x6f82, 1); B = alu_dec8(gb, B);  // dec b
@@ -2525,13 +2525,13 @@ L_6f87:
   I(0x6f88, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6f89); return; } I(0x6f89, 2);  // ret c
   if ((F & FZ)) { I(0x6f8a, 3); goto L_6f8d; } I(0x6f8a, 2);  // jr z,$6f8d
-  if (!(F & FC)) { I(0x6f8c, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f8c, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f8c, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f8c, 3);  // jp nc,$0527
 L_6f8d:
   I(0x6f8d, 1); alu_daa(gb);  // daa
   I(0x6f8e, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6f8f); return; } I(0x6f8f, 2);  // ret c
   if ((F & FZ)) { I(0x6f90, 3); goto L_6f93; } I(0x6f90, 2);  // jr z,$6f93
-  if (!(F & FC)) { I(0x6f92, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f92, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f92, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f92, 3);  // jp nc,$0527
 L_6f93:
   I(0x6f93, 1); alu_daa(gb);  // daa
   I(0x6f94, 1); B = alu_dec8(gb, B);  // dec b
@@ -2543,13 +2543,13 @@ L_6f99:
   I(0x6f9a, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6f9b); return; } I(0x6f9b, 2);  // ret c
   if ((F & FZ)) { I(0x6f9c, 3); goto L_6f9f; } I(0x6f9c, 2);  // jr z,$6f9f
-  if (!(F & FC)) { I(0x6f9e, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6f9e, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6f9e, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6f9e, 3);  // jp nc,$0527
 L_6f9f:
   I(0x6f9f, 1); alu_daa(gb);  // daa
   I(0x6fa0, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6fa1); return; } I(0x6fa1, 2);  // ret c
   if ((F & FZ)) { I(0x6fa2, 3); goto L_6fa5; } I(0x6fa2, 2);  // jr z,$6fa5
-  if (!(F & FC)) { I(0x6fa4, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6fa4, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6fa4, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6fa4, 3);  // jp nc,$0527
 L_6fa5:
   I(0x6fa5, 1); alu_daa(gb);  // daa
   I(0x6fa6, 1); B = alu_dec8(gb, B);  // dec b
@@ -2561,20 +2561,20 @@ L_6fab:
   I(0x6fac, 2); SET_BC(BC - 1);  // dec bc
   if ((F & FC)) { RET_TAKEN(0x6fad); return; } I(0x6fad, 2);  // ret c
   if ((F & FZ)) { I(0x6fae, 3); goto L_6fb1; } I(0x6fae, 2);  // jr z,$6fb1
-  if (!(F & FC)) { I(0x6fb0, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6fb0, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6fb0, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6fb0, 3);  // jp nc,$0527
 L_6fb1:
   I(0x6fb1, 1); alu_daa(gb);  // daa
   I(0x6fb2, 1); B = alu_dec8(gb, B);  // dec b
   if ((F & FC)) { RET_TAKEN(0x6fb3); return; } I(0x6fb3, 2);  // ret c
   if ((F & FZ)) { I(0x6fb4, 3); goto L_6fb7; } I(0x6fb4, 2);  // jr z,$6fb7
-  if (!(F & FC)) { I(0x6fb6, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6fb6, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6fb6, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6fb6, 3);  // jp nc,$0527
 L_6fb7:
   I(0x6fb7, 1); alu_daa(gb);  // daa
   I(0x6fb8, 1); B = alu_dec8(gb, B);  // dec b
   PUSH(0x6fb9, DE);  // push de
   if ((F & FC)) { RET_TAKEN(0x6fba); return; } I(0x6fba, 2);  // ret c
   if ((F & FZ)) { I(0x6fbb, 3); goto L_6fbe; } I(0x6fbb, 2);  // jr z,$6fbe
-  if (!(F & FC)) { I(0x6fbd, 4); HANDOFF(0x0527); /* loadPaletteHeader@jump0527 */ } I(0x6fbd, 3);  // jp nc,$0527
+  if (!(F & FC)) { I(0x6fbd, 4); s_loadPaletteHeader__jump0527(gb); return; } I(0x6fbd, 3);  // jp nc,$0527
 L_6fbe:
   I(0x6fbe, 1); alu_daa(gb);  // daa
   I(0x6fbf, 1); B = alu_dec8(gb, B);  // dec b
