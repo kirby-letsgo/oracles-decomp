@@ -13427,3 +13427,9 @@ cutscene0eFunc6 cutscene0eFunc6 -
 cutscene0eFunc7 cutscene0eFunc7 -
 seasonsFunc_03_7db8 seasonsFunc_03_7db8 -
 seasonsFunc_35cc seasonsFunc_35cc -
+interactionCode4f_state0 interactionCode4f_state0 -
+interactionCode4f_state1 interactionCode4f_state1 -
+dinImprisonedScript_setDinCoords dinImprisonedScript_setDinCoords -
+dinImprisonedScript_OnoxExplainsMotive dinImprisonedScript_OnoxExplainsMotive -
+dinImprisonedScript_OnoxSaysComeIfYouDare dinImprisonedScript_OnoxSaysComeIfYouDare -
+dinImprisonedScript_OnoxSendsTempleDown dinImprisonedScript_OnoxSendsTempleDown -

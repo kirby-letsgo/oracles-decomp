@@ -83,3 +83,5 @@ cutscene0eFunc5
 cutscene0eFunc6
 cutscene0eFunc7
 seasonsFunc_03_7db8
+interactionCode4f_state0
+interactionCode4f_state1

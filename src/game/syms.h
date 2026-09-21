@@ -13431,6 +13431,12 @@ enum {
   S_cutscene0eFunc7,
   S_seasonsFunc_03_7db8,
   S_seasonsFunc_35cc,
+  S_interactionCode4f_state0,
+  S_interactionCode4f_state1,
+  S_dinImprisonedScript_setDinCoords,
+  S_dinImprisonedScript_OnoxExplainsMotive,
+  S_dinImprisonedScript_OnoxSaysComeIfYouDare,
+  S_dinImprisonedScript_OnoxSendsTempleDown,
   SYM_COUNT
 };
 enum {
