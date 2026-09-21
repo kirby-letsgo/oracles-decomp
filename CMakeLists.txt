@@ -56,6 +56,20 @@ if(ORACLES_SDL)
   endif()
   add_executable(oracles src/platform/sdl_main.c)
   target_link_libraries(oracles oraclescore SDL3::SDL3)
+  add_executable(oracles-native src/platform/app.c)
+  target_link_libraries(oracles-native oraclesnative SDL3::SDL3)
+  target_compile_definitions(oracles-native PRIVATE ORACLES_NATIVE=1)
+  if(APPLE)
+    add_executable(oracles-native-app MACOSX_BUNDLE src/platform/app.c)
+    target_link_libraries(oracles-native-app oraclesnative SDL3::SDL3)
+    target_compile_definitions(oracles-native-app PRIVATE ORACLES_NATIVE=1)
+    set_target_properties(oracles-native-app PROPERTIES
+      OUTPUT_NAME "Oracles"
+      MACOSX_BUNDLE_BUNDLE_NAME "Oracles"
+      MACOSX_BUNDLE_GUI_IDENTIFIER "dev.oracles-decomp.oracles"
+      MACOSX_BUNDLE_BUNDLE_VERSION "0.5"
+      MACOSX_BUNDLE_SHORT_VERSION_STRING "0.5")
+  endif()
 endif()
 
 enable_testing()
@@ -66,6 +80,11 @@ target_link_libraries(test_native_tas oraclesnative)
 target_compile_definitions(test_native_tas PRIVATE GAME_ROM_DIR="${GAME_ROM_DIR}" TAS_DIR="${CMAKE_SOURCE_DIR}/tas")
 add_test(NAME native_tas COMMAND test_native_tas)
 set_tests_properties(native_tas PROPERTIES SKIP_RETURN_CODE 77 LABELS "rom")
+set(NATIVE_BINARIES $<TARGET_FILE:oracles-native-run> $<TARGET_FILE:test_native_tas>)
+if(ORACLES_SDL)
+  list(APPEND NATIVE_BINARIES $<TARGET_FILE:oracles-native>)
+endif()
+add_test(NAME native_binary COMMAND python3 ${CMAKE_SOURCE_DIR}/tools/check_native_binary.py $<TARGET_FILE:oraclesnative> ${NATIVE_BINARIES})
 
 foreach(t sha1 bus cpu blargg ppu acid2 tas smoke)
   if(EXISTS ${CMAKE_SOURCE_DIR}/tests/test_${t}.c)

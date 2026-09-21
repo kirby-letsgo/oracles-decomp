@@ -448,6 +448,40 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-23: merged Fable's step 5 (the app, `8c93de0`) and its codemap follow-up (`2203b75`):
+  the codemap conflict resolved to main's Seasons-mode version (it already read both lists),
+  generated files regenerated. Gates: ctest 10/10, whole movie, Ages verify 30k, Seasons
+  playthrough `VERIFY_ALL`, native Ages whole movie and native Seasons playthrough, lint 0.
+
+- 2026-09-21 (night): milestone 5 step 5 for Ages on `worktree-m5-step0` over main `7a15b93`
+  (merged; regenerated, `src/assets/codemap.c` picked up the Seasons hooks main added). The
+  cycle-table decision is recorded in the spec (5.2) and `docs/design.md`. Item 2 (deleting the
+  emulator mode, `cpu.c`, verify) is deliberately not done: the emulator-hosted build with verify
+  mode is still the Seasons porting workflow, so the cut is the *native target*, not the source
+  tree; `oraclesnative` never links `cpu.c` and that is now a test. The shipped app is
+  `src/platform/app.c` → `oracles-native` (SDL3, `oraclesnative`) and on macOS the bundle target
+  `oracles-native-app` (`Oracles.app`). First launch: ROM from the argument or an SDL file
+  dialog, SHA1 against the two known USA hashes (Ages `880374fb…`, Seasons `ba126829…`),
+  cycle table from the original bytes, code bytes zeroed, written to the per-platform cache
+  (`SDL_GetPrefPath` → `<game>/rom.bin`, `cyctab.bin`, `manifest.txt`); later launches load the
+  cache and never see the ROM. Saves are the SRAM image (`sram.sav`) in the cache. The app starts
+  from the standard post-boot state with no boot ROM: the console-verified movie cannot check
+  that start (its inputs and RNG are tied to the boot ROM's timing; with a 185-frame input shift
+  it desyncs after 14 rooms), but the game boots, plays and renders correctly from it, which is
+  what every emulator without a boot ROM does; `--frames N` under `SDL_VIDEO_DRIVER=dummy` runs
+  the app headlessly for tests (extraction and cached launch give the same state after 1,200
+  frames). `tools/make_dmg.sh` builds the bundle, carries `libSDL3.0.dylib` inside
+  `Contents/Frameworks` with `install_name_tool` and an ad-hoc signature, and wraps it in
+  `Oracles.dmg`. Gate `native_binary` (ctest, `tools/check_native_binary.py`): the native library
+  has no `cpu.c` object and none of the native executables contains the Nintendo logo bytes.
+  Open: save states as native context (fibers make them non-trivial; SRAM saves cover the game's
+  own saves), the Android APK (no NDK on this machine: only `cmdline-tools` under
+  `~/Library/Android/sdk`; the engine builds with any C11 toolchain, SDL3 has an Android port,
+  so it is a packaging project once the NDK is installed), and Seasons natively (waits on the
+  `init`/`setCpuToDoubleSpeed` Seasons addresses on your side and step 3 parity). Gates:
+  `ctest` 10/10 in the headless tree (`native_binary` new), `native_binary` in the SDL tree,
+  lint and the four audits clean; the engine did not change in this batch.
+
 - 2026-09-23: **Seasons boots and plays natively**: `oracles-native-run` (no interpreter linked,
   code bytes zeroed, data reads of code fatal) runs the playthrough and the demo to the same
   final states as the emulator build; `test_native_tas` now has `native_seasons_play_matches_reference`.

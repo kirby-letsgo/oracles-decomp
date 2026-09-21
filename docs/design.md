@@ -113,6 +113,14 @@ At first launch the app asks for the ROM, verifies its SHA1 against the known ha
 extracts graphics, maps, text, and music into an `assets/` cache. Until 100 percent the ROM bytes
 also stay loaded for the Core. The app never ships a ROM or extracted assets.
 
+### Cycles in the native build (decision, 2026-09-21)
+
+The native build burns the same per-instruction cycle ranges as the emulator-hosted C, from a
+per-address cycle table built from the ROM at load time (`cyctab` in `src/game/cyc.c`), not from
+constants rewritten into the source. The code bytes are zeroed after the table is built. Folding
+the ranges into `T(n)` constants is a Tier 2 optimisation (block coalescing), never a
+prerequisite.
+
 ## Verification
 
 Three checks, cheapest first. A ported routine counts as done only when all three pass.
