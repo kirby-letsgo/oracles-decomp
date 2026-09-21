@@ -104,6 +104,14 @@ void linkedNpc_generateSecret_hook(GB *gb) {
 
 void linkedNpc_initHighTextIndex_hook(GB *gb) {
   BASE(linkedNpc_initHighTextIndex);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  if (game_seasons) {
+    CYC(b_+S(0), b_+S(1)); C = A;
+    CYC(b_+S(1), b_+S(3)); A = 0x53;
+    CALL_C(b_+S(3), interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+S(6));
+    CYC(b_+S(6), b_+S(7)); A = C;
+    TAIL(linkedNpc_calcLowTextIndex);
+  }
   CYC(b_+0, b_+2); A = 0x4d;
   CYC(b_+2, b_+5); TAIL(interactionSetHighTextIndex);
 }

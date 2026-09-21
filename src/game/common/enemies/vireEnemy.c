@@ -978,31 +978,37 @@ void vire_batForm_gotoStateA_hook(GB *gb) {
 void vire_batForm_stateA_hook(GB *gb) {
   BASE(vire_batForm_stateA);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+0, vire_batForm_updateZPos_hook, SYM(vire_batForm_updateZPos), b_+3);
-  CYC(b_+3, b_+5); A = OBJ_COUNTER2;
-  CALL_C(b_+5, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+8);
-  CYC(b_+8, b_+9); A = mem_rd(gb, HL);
-  CYC(b_+9, b_+10); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+10, b_+12); goto L_59c6; } // jr nz
-  CYC(b_+10, b_+12);
-  CALL_C(b_+12, ecom_incState_b0f_hook, SYM(ecom_incState_b0f), b_+15);
-  CYC(b_+15, b_+17); L = ENEMY_BASE + OBJ_COUNTER1;
-  CYC(b_+17, b_+19); mem_wr(gb, HL, 0x08);
-  RET(b_+19); return;
+  CALL_C(b_+O(0), vire_batForm_updateZPos_hook, SYM(vire_batForm_updateZPos), b_+OE(3));
+  CYC(b_+O(3), b_+OE(5)); A = OBJ_COUNTER2;
+  CALL_C(b_+O(5), objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+OE(8));
+  CYC(b_+O(8), b_+OE(9)); A = mem_rd(gb, HL);
+  CYC(b_+O(9), b_+OE(10)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(10), b_+OE(12)); goto L_59c6; } // jr nz
+  CYC(b_+O(10), b_+OE(12));
+  if (game_seasons) {
+    CYC(b_+S(12), b_+S(13)); H = D;
+    CYC(b_+S(13), b_+S(15)); L = ENEMY_BASE + OBJ_STATE;
+    CYC(b_+S(15), b_+S(16)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  } else {
+    CALL_C(b_+12, ecom_incState_b0f_hook, SYM(ecom_incState_b0f), b_+15);
+  }
+  CYC(b_+O(15), b_+OE(17)); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+O(17), b_+OE(19)); mem_wr(gb, HL, 0x08);
+  RET(b_+O(19)); return;
 
 L_59c6:
-  CALL_C(b_+20, vire_batForm_moveAwayFromLinkIfTooClose_hook, SYM(vire_batForm_moveAwayFromLinkIfTooClose), b_+23);
-  CALL_C(b_+23, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+26);
-  CYC(b_+26, b_+27); B = A;
-  CYC(b_+27, b_+29); E = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(b_+29, b_+30); A = mem_rd(gb, DE);
-  CYC(b_+30, b_+31); alu_add(gb, B);
-  CYC(b_+31, b_+33); alu_and(gb, 0x1f);
-  CYC(b_+33, b_+35); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(b_+35, b_+36); mem_wr(gb, DE, A);
-  CYC(b_+36, b_+38); A = 0x02;
-  CALL_C(b_+38, ecom_getSideviewAdjacentWallsBitset_b0f_hook, SYM(ecom_getSideviewAdjacentWallsBitset_b0f), b_+41);
-  if (F & FZ) { CALL_C_CC(b_+41, objectApplySpeed_hook, SYM(objectApplySpeed), SYM(vire_batForm_animate)); } else { CYC(b_+41, b_+44); } // call z
+  CALL_C(b_+O(20), vire_batForm_moveAwayFromLinkIfTooClose_hook, SYM(vire_batForm_moveAwayFromLinkIfTooClose), b_+OE(23));
+  CALL_C(b_+O(23), objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+OE(26));
+  CYC(b_+O(26), b_+OE(27)); B = A;
+  CYC(b_+O(27), b_+OE(29)); E = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+O(29), b_+OE(30)); A = mem_rd(gb, DE);
+  CYC(b_+O(30), b_+OE(31)); alu_add(gb, B);
+  CYC(b_+O(31), b_+OE(33)); alu_and(gb, 0x1f);
+  CYC(b_+O(33), b_+OE(35)); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+O(35), b_+OE(36)); mem_wr(gb, DE, A);
+  CYC(b_+O(36), b_+OE(38)); A = 0x02;
+  CALL_C(b_+O(38), ecom_getSideviewAdjacentWallsBitset_b0f_hook, SYM(ecom_getSideviewAdjacentWallsBitset_b0f), b_+OE(41));
+  if (F & FZ) { CALL_C_CC(b_+O(41), objectApplySpeed_hook, SYM(objectApplySpeed), SYM(vire_batForm_animate)); } else { CYC(b_+O(41), b_+OE(44)); } // call z
   TAIL(vire_batForm_animate); // fallthrough
 }
 

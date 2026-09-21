@@ -1557,6 +1557,19 @@ L_5ecb:
   I(0x5ed4, 4); s_seasonsFunc_0f_6680(gb); return;  // jp $6680
 }
 
+// 0f:5ecb
+void s_dragonOnox_mainBody_stateC__seasonsFunc_0f_5ecb(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_5ecb:
+  I(0x5ecb, 2); L = 0xb5;  // ld l,$b5
+  I(0x5ecd, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
+  I(0x5ece, 2); C = mem_rd(gb, HL);  // ld c,(hl)
+  I(0x5ecf, 1); B = A;  // ld b,a
+  CALL(0x5ed0, s_seasonsFunc_0f_66aa, 0x66aa, 0x5ed3);  // call $66aa
+  if (!(F & FZ)) { RET_TAKEN(0x5ed3); return; } I(0x5ed3, 2);  // ret nz
+  I(0x5ed4, 4); s_seasonsFunc_0f_6680(gb); return;  // jp $6680
+}
+
 // 0f:5ed7
 void s_dragonOnox_mainBody_state4(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -16262,19 +16275,7 @@ L_75d7:
   I(0x75d7, 2); A = 0x01;  // ld a,$01
   I(0x75d9, 2); mem_wr(gb, DE, A);  // ld (de),a
   CALL(0x75da, interactionInitGraphics_hook, 0x15e9, 0x75dd);  // call $15e9
-  I(0x75dd, 2); E = 0x42;  // ld e,$42
-  I(0x75df, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x75e0, 3); SET_HL(0x75ef);  // ld hl,$75ef
-  RST_PUSH(0x75e3, 0x75e4);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x75e4, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x75e5, 2); E = 0x4b;  // ld e,$4b
-  I(0x75e7, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x75e8, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x75e9, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x75ea, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x75eb, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x75ec, 4); if (hook_is(gb, 0x1e27, objectSetVisible82_hook)) { objectSetVisible82_hook(gb); return; } HANDOFF(0x1e27);  // jp $1e27
+  if (hook_is(gb, 0x75dd, interactionCodecf__afterCall4b19_hook)) { interactionCodecf__afterCall4b19_hook(gb); return; } HANDOFF(0x75dd);  // fallthrough
 }
 
 // 0f:75f5

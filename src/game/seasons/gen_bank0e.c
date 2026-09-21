@@ -6962,7 +6962,7 @@ L_5629:
   I(0x562e, 1); A = B;  // ld a,b
   I(0x562f, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x5630, 4); s_vire_mainForm(gb); return; } I(0x5630, 3);  // jp z,$565d
-  I(0x5633, 4); s_vire_batForm(gb); return;  // jp $59cc
+  I(0x5633, 4); if (hook_is(gb, 0x59cc, vire_batForm_hook)) { vire_batForm_hook(gb); return; } HANDOFF(0x59cc);  // jp $59cc
 L_5636:
   I(0x5636, 2); E = 0x84;  // ld e,$84
   I(0x5638, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -7010,7 +7010,7 @@ L_5629:
   I(0x562e, 1); A = B;  // ld a,b
   I(0x562f, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x5630, 4); s_vire_mainForm(gb); return; } I(0x5630, 3);  // jp z,$565d
-  I(0x5633, 4); s_vire_batForm(gb); return;  // jp $59cc
+  I(0x5633, 4); if (hook_is(gb, 0x59cc, vire_batForm_hook)) { vire_batForm_hook(gb); return; } HANDOFF(0x59cc);  // jp $59cc
 L_5636:
   I(0x5636, 2); E = 0x84;  // ld e,$84
   I(0x5638, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -7047,7 +7047,7 @@ L_5629:
   I(0x562e, 1); A = B;  // ld a,b
   I(0x562f, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x5630, 4); s_vire_mainForm(gb); return; } I(0x5630, 3);  // jp z,$565d
-  I(0x5633, 4); s_vire_batForm(gb); return;  // jp $59cc
+  I(0x5633, 4); if (hook_is(gb, 0x59cc, vire_batForm_hook)) { vire_batForm_hook(gb); return; } HANDOFF(0x59cc);  // jp $59cc
 L_5636:
   I(0x5636, 2); E = 0x84;  // ld e,$84
   I(0x5638, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -7067,7 +7067,7 @@ L_5629:
   I(0x562e, 1); A = B;  // ld a,b
   I(0x562f, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x5630, 4); s_vire_mainForm(gb); return; } I(0x5630, 3);  // jp z,$565d
-  I(0x5633, 4); s_vire_batForm(gb); return;  // jp $59cc
+  I(0x5633, 4); if (hook_is(gb, 0x59cc, vire_batForm_hook)) { vire_batForm_hook(gb); return; } HANDOFF(0x59cc);  // jp $59cc
 L_5636:
   I(0x5636, 2); E = 0x84;  // ld e,$84
   I(0x5638, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -22260,49 +22260,6 @@ L_541f:
   I(0x5426, 2); A = 0x8f;  // ld a,$8f
   CALL(0x5428, playSound_b00_hook, 0x0c74, 0x542b);  // call $0c74
   I(0x542b, 4); s_func_54c9(gb); return;  // jp $54c9
-}
-
-// 0e:59cc
-void s_vire_batForm(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x59cc, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x59cd, 2); alu_sub(gb, 0x08);  // sub $08
-  RST_PUSH(0x59cf, 0x59d0);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
-// 0e:5a2a
-void s_vire_batForm_stateA(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5a2a, vire_batForm_updateZPos_hook, 0x5bd2, 0x5a2d);  // call $5bd2
-  I(0x5a2d, 2); A = 0x07;  // ld a,$07
-  CALL(0x5a2f, objectGetRelatedObject1Var_hook, 0x211e, 0x5a32);  // call $211e
-  I(0x5a32, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5a33, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x5a34, 3); goto L_5a3f; } I(0x5a34, 2);  // jr nz,$5a3f
-  I(0x5a36, 1); H = D;  // ld h,d
-  I(0x5a37, 2); L = 0x84;  // ld l,$84
-  I(0x5a39, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x5a3a, 2); L = 0x86;  // ld l,$86
-  I(0x5a3c, 3); mem_wr(gb, HL, 0x08);  // ld (hl),$08
-  RET(0x5a3e); return;  // ret
-L_5a3f:
-  CALL(0x5a3f, vire_batForm_moveAwayFromLinkIfTooClose_hook, 0x5bb2, 0x5a42);  // call $5bb2
-  CALL(0x5a42, objectGetAngleTowardEnemyTarget_hook, 0x1e52, 0x5a45);  // call $1e52
-  I(0x5a45, 1); B = A;  // ld b,a
-  I(0x5a46, 2); E = 0xb0;  // ld e,$b0
-  I(0x5a48, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5a49, 1); alu_add(gb, B);  // add b
-  I(0x5a4a, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5a4c, 2); E = 0x89;  // ld e,$89
-  I(0x5a4e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x5a4f, 2); A = 0x02;  // ld a,$02
-  CALL(0x5a51, ecom_getSideviewAdjacentWallsBitset_b0f_hook, 0x420b, 0x5a54);  // call $420b
-  if ((F & FZ)) { CALL(0x5a54, objectApplySpeed_hook, 0x1fdb, 0x5a57); } else I(0x5a54, 3);  // call z,$1fdb
-  if (hook_is(gb, 0x5a57, vire_batForm_animate_hook)) { vire_batForm_animate_hook(gb); return; } HANDOFF(0x5a57);  // fallthrough
 }
 
 // 0e:5a92

@@ -401,6 +401,7 @@
 00:2577 _scriptFunc_setupAsmCall_hook -
 00:258a scriptFunc_add3ToHl_scf_hook -
 00:258b scriptFunc_add3ToHl_hook -
+00:258f scriptCmd_loadScript_hook -
 00:25b8 interactionAnimate_hook -
 00:25cb interactionSetAnimation_hook -
 00:25e4 _interactionNextAnimationFrame_hook -
@@ -546,6 +547,7 @@
 00:322b paletteFadeThreadStart_hook -
 00:3248 mainThreadStart_hook -
 00:328a loadScreenMusic_hook -
+00:32be applyWarpDest_hook -
 00:32dc loadScreenMusicAndSetRoomPack_hook -
 00:32f1 dismountCompanionAndSetRememberedPositionToScreenCenter_hook -
 00:3382 updateAllObjects_hook -
@@ -582,7 +584,6 @@
 00:3b0a updateInteractions_hook -
 00:3b36 updateInteraction_hook -
 00:3d53 interactionSetSimpleScript_hook -
-00:3d5b interactionRunSimpleScript_hook -
 00:3e6e interactionFunc_3e6d_hook -
 00:3ea7 getFreePartSlot_hook -
 00:3eba partDelete_hook -
@@ -685,9 +686,11 @@
 01:4b40 cutscene17__state4_hook -
 01:4b74 initWaveScrollValuesForEverySecondLine_hook -
 01:4b8b cutscene15_hook -
+01:4b94 cutscene15__update_hook -
 01:4b9e cutscene15__func_4c03_hook -
 01:4ba6 cutscene15__incTmpcbb3_hook -
 01:4bab cutscene15__state0_hook -
+01:4bc1 cutscene15__state1_hook -
 01:4bcb cutscene15__state1__substate0_hook -
 01:4be3 cutscene15__state1__initWaveScrollValuesInverted_hook -
 01:4bfb cutscene15__state1__substate1_hook -
@@ -695,6 +698,7 @@
 01:4c94 cutscene15__state2__substate1_hook -
 01:4cb1 cutscene18_hook -
 01:4cb5 cutscene19_hook -
+01:4cc2 cutscene18__afterCall4d27_hook -
 01:54c1 loadDungeonLayout_b01_hook -
 01:54eb loadDungeonLayout_b01__nextFloor_hook -
 01:54ed loadDungeonLayout_b01__nextByte_hook -
@@ -732,11 +736,21 @@
 01:5782 func_593a_hook -
 01:57b1 runGameLogic_hook -
 01:5892 loadingRoom_hook -
+01:58a3 func_5a60_hook -
+01:58ea func_5a60__afterCall5aad_hook -
 01:58f9 standardGameState_hook -
 01:5980 cutscene01_hook -
+01:5983 cutscene01__afterCall5b68_hook -
+01:59e7 cutscene03_hook -
+01:5a12 cutscene03__afterCall5c03_hook -
+01:5a27 func_5c18_hook -
+01:5a42 func_5c18__afterCall5c52_hook -
 01:5a58 func_5c6b_hook -
+01:5a61 func_5c6b__afterCall5c74_hook -
 01:5a6f setEnteredWarpPosition_hook -
+01:5a9d cutscene05_hook -
 01:5bb5 func_5d31_hook -
+01:5bb8 func_5d31__afterCall5d34_hook -
 01:5bc5 func_5d41_hook -
 01:5bea cutscene09_hook -
 01:5bfa cutscene0f_hook -
@@ -1010,6 +1024,7 @@
 02:5fd5 dungeonMap_drawSmallKeyCount_hook -
 02:5fe3 dungeonMap_calculateVisitedFloorsAndLinkPosition_hook -
 02:6016 mapMenu_state1_hook -
+02:612d mapMenu_loadPopupData_hook -
 02:619a getMinimapPopupType_hook -
 02:61be minimapPopupType_normal_hook -
 02:61c0 minimapPopupType_advanceShop_hook -
@@ -1039,8 +1054,10 @@
 02:64f9 dungeonMap_drawCursor_hook -
 02:6521 dungeonMap_drawArrows_hook -
 02:655d mapMenu_checkCursorRoomVisited_hook -
+02:6560 mapMenu_checkRoomVisited_hook -
 02:657d mapMenu_drawArrow_hook -
 02:6590 mapMenu_drawCursor_hook -
+02:65a1 mapMenu_drawSpriteAtRoomIndex_hook -
 02:65c0 mapMenu_drawWarpSites_hook -
 02:65d8 mapMenu_drawWarpSites__drawWarpDest_hook -
 02:65ed mapMenu_drawWarpSites__nextTree_hook -
@@ -1167,6 +1184,7 @@
 02:7440 secretListMenu_state1__end_hook -
 02:7445 secretListMenu_state2_hook -
 02:745d secretListMenu_drawCursorSprite_hook -
+02:7475 secretListMenu_printSecret_hook -
 02:74b5 secretListMenu_printSecret__end_hook -
 02:74ba secretListMenu_printSecret__getSecretText_hook -
 02:74c4 secretListMenu_printSecret__val0_hook -
@@ -1237,6 +1255,7 @@
 03:4cc9 runIntro_hook -
 03:4cf5 intro_runStage_hook -
 03:4d03 intro_gotoTitlescreen_hook -
+03:4d09 intro_gotoTitlescreen__afterCall4d09_hook -
 03:4d1b intro_restart_hook -
 03:4d23 intro_gotoNextStage_hook -
 03:4d33 intro_incState_hook -
@@ -1277,6 +1296,7 @@
 03:51e0 clearFadingPalettes_body_hook -
 03:5235 introCinematic_preTitlescreen_hook -
 03:5241 introCinematic_preTitlescreen_state0_hook -
+03:5256 introCinematic_preTitlescreen_state0__afterCall52da_hook -
 03:5293 introCinematic_preTitlescreen_state1_hook -
 03:52c1 introCinematic_preTitlescreen_updateScrollForTitle_hook -
 03:52f1 introCinematic_preTitlescreen_state2_hook -
@@ -1684,6 +1704,7 @@
 06:5727 minecartCreateCollisionItem_hook -
 06:69c9 specialObjectCode_companionCutscene_b06_hook -
 06:6dec specialObjectCode_linkInCutscene_b06_hook -
+06:6e06 linkCutscene0_hook -
 06:6eb0 linkCutscene_createGlowingOrb_hook -
 06:6ec6 linkCutscene_oscillateZ_1_hook -
 06:6ef8 linkCutscene0_substate6_hook -
@@ -1875,7 +1896,6 @@
 07:61a5 itemUpdateThrowingLaterally_hook -
 07:6220 itemBounce_hook -
 07:62a2 itemCode1a_hook -
-08:4000 interactionCode00_hook -
 08:40a0 interactionCode0f_hook -
 08:4110 interactionCode10_hook -
 08:427e interactionCode13_hook -
@@ -1912,7 +1932,6 @@
 08:4f32 introSpriteRunSubid04_hook -
 08:4f4e introSpriteRunSubid08_hook -
 08:4f5d introSpriteSetChildRelatedObject1ToSelf_hook -
-08:4f64 interactionCode50_hook -
 08:5115 interactionCode56_hook -
 08:52d4 interactionCode20_hook -
 08:56b5 interactionCode36_hook -
@@ -1947,7 +1966,6 @@
 09:4813 spinner_setLinkRelativePosition_hook -
 09:4ba3 interaction7f_subid02_hook -
 09:6d3d companionScript_delete_hook -
-0a:4000 interactionCode89_hook -
 0a:41e7 interactionCode91_hook -
 0a:42a8 interactionCode98_hook -
 0a:42b0 interactionCode98__state0_hook -
@@ -1969,17 +1987,17 @@
 0a:4448 childSetVar38ToNumEssencesObtained_hook -
 0a:445d spawnBipinBlossomFamilyObjects_hook -
 0a:4b24 interactionCodeb7_hook -
+0a:4b32 interactionCodeb7__afterCall48b5_hook -
 0a:4b35 interactionCodec0_hook -
 0a:4b3d interactionCodec0__state0_hook -
+0a:4b43 interactionCodec0__afterCall48c6_hook -
 0a:4b46 interactionCodec0__state1_hook -
 0a:4b75 interactionCodec0__updatePosition_hook -
 0a:4b89 interactionCodec7_hook -
 0a:4b9e interactionCodec7__createObject_hook -
 0a:4bca interactionCodec7__ret_hook -
 0a:4bcd interactionCodec7__spawnObjectType_hook -
-0a:6075 interactionCodea1_hook -
 0a:6122 movingPlatform_stateC_hook -
-0a:6129 interactionCodea2_hook -
 0a:61d6 interactionCodea3_hook -
 0a:624c sidescrollingPlatformCommon_hook -
 0a:62a8 sidescrollPlatform_checkLinkSquished_hook -
@@ -1994,7 +2012,6 @@
 0a:63d5 sidescrollPlatformFunc_5bfc_hook -
 0a:63dd sidescrollPlatform_updateLinkSubpixels_hook -
 0a:676f interactionCodea7_hook -
-0a:67e7 interactionCodea8_hook -
 0a:6af3 interactionCodeae_hook -
 0a:6c4d creditsTextHorizontal_6537_hook -
 0a:6c6a creditsTextHorizontal_6554_hook -
@@ -2010,6 +2027,7 @@
 0a:743c interactionCodeb9_hook -
 0a:7962 interactionCodec1_hook -
 0a:796a interactionCodec1__state0_hook -
+0a:7970 interactionCodec1__afterCall71ce_hook -
 0a:7987 interactionCodec1__state1_hook -
 0a:7991 interactionCodec1__substate0_hook -
 0a:799f interactionCodec1__substate1_hook -
@@ -2089,6 +2107,7 @@
 0b:4477 scriptCmd_setTileHere_hook -
 0b:447e scriptCmd_callScript_hook -
 0b:448e scriptCmd_ret_hook -
+0b:44a6 scriptCmd_jumpRandom_hook -
 0b:44b2 scriptCmd_jumpTable_hook -
 0b:44bb scriptCmd_jumpIfMemorySet_hook -
 0b:44ca scriptCmd_writeC6xx_hook -
@@ -2104,6 +2123,7 @@
 0b:4552 scriptCmd_checkNotCollidedWithLink_ignoreZ_hook -
 0b:455c scriptCmd_createPuff_hook -
 0b:4573 scriptCmd_setOrUnsetGlobalFlag_hook -
+0b:458a scriptCmd_initNpcHitbox_hook -
 0b:459e scriptCmd_moveNpcUp_hook -
 0b:45b1 scriptCmd_moveNpcRight_hook -
 0b:45b5 scriptCmd_moveNpcDown_hook -
@@ -2873,9 +2893,11 @@
 0e:58b5 vire_state_moveOffScreen_hook -
 0e:58be vire_mainForm_stateE_hook -
 0e:5901 vire_mainForm_stateF_hook -
+0e:59cc vire_batForm_hook -
 0e:59dc vire_batForm_state8_hook -
 0e:59f7 vire_batForm_state9_hook -
 0e:5a10 vire_batForm_gotoStateA_hook -
+0e:5a2a vire_batForm_stateA_hook -
 0e:5a57 vire_batForm_animate_hook -
 0e:5a5a vire_batForm_stateB_hook -
 0e:5a6d vire_batForm_stateC_hook -
@@ -3097,15 +3119,18 @@
 0f:582a ganon_setTileReplacementMode_hook -
 0f:5834 enemyCode00_hook -
 0f:75cf interactionCodecf_hook -
+0f:75dd interactionCodecf__afterCall4b19_hook -
 0f:76dd interactionCoded1_hook -
 0f:76f7 interactionCoded2_hook -
 0f:76ff interactionCoded2__state0_hook -
+0f:7705 interactionCoded2__afterCall4c5b_hook -
 0f:7728 interactionCoded2__state1_hook -
 0f:7739 interactionCoded2__substate0_hook -
 0f:7745 interactionCoded2__substate1_hook -
 0f:774b introObject_applySpeed_hook -
 0f:776c interactionCoded3_hook -
 0f:7774 interactionCoded3__state0_hook -
+0f:777a interactionCoded3__afterCall4cd0_hook -
 0f:779a interactionCoded3__initializePositionAndCounter1_hook -
 0f:77b2 interactionCoded3__state1_hook -
 0f:77c8 interactionCoded3__substate0_hook -
@@ -3113,6 +3138,7 @@
 0f:77db interactionCoded3__substate2_hook -
 0f:7821 interactionCoded4_hook -
 0f:7829 interactionCoded4__state0_hook -
+0f:7841 interactionCoded4__afterCall4d97_hook -
 0f:7844 interactionCoded4__state1_hook -
 0f:7853 interactionCoded4__ship_hook -
 0f:7871 interactionCoded4__seagull_hook -
@@ -3132,6 +3158,7 @@
 10:42d0 itemDrop_countdownToDisappear_hook -
 10:42f5 itemDrop_initSpeed_hook -
 10:430f itemDrop_updateSpeed_hook -
+10:4316 itemDrop_spawnEnemy_hook -
 10:4348 itemDrop_checkSidescrollingConditions_hook -
 10:437b itemDrop_checkHitGround_hook -
 10:439c itemDrop_checkOnHazard_hook -
@@ -3142,7 +3169,6 @@
 10:4499 partCode02_hook -
 10:44de partCode03_hook -
 10:4524 partCode04_hook -
-10:4558 partCode05_hook -
 10:45a8 partCode06_hook -
 10:469a partCode07_hook -
 10:4700 partCode08_hook -
@@ -3249,6 +3275,7 @@
 10:6f3d kingMoblinBomb_state6_hook -
 10:6f5f kingMoblinBomb_state7_hook -
 10:6f65 kingMoblinBomb_state8_hook -
+10:6fce kingMoblinBomb_explode_hook -
 10:6fed kingMoblinBomb_checkCollisionWithLink_hook -
 10:7015 kingMoblinBomb_checkCollisionWithKingMoblin_hook -
 11:58df parseGivenObjectData_b12_hook -
@@ -3340,7 +3367,6 @@
 15:4680 movingPlatform_loadScript_hook -
 15:469d movingPlatform_runScript_hook -
 15:4715 movingPlatform_setScript_hook -
-15:4901 essence_createEnergySwirl_hook -
 15:4909 essence_stopEnergySwirl_hook -
 15:490f vasu_giveRingBox_hook -
 15:4927 vasu_openRingMenu_hook -
@@ -3350,6 +3376,7 @@
 15:49a6 vasu_giveFriendshipRing_hook -
 15:49aa vasu_giveHundredthRing_hook -
 15:49ae vasu_giveRingInVar3a_hook -
+15:49b7 gameCompleteDialog_markGameAsComplete_hook -
 15:49c4 interactionCoded9_hook -
 15:49ce interactiond9_state0_hook -
 15:49fe interactiond9_getItemID_hook -
@@ -3364,8 +3391,7 @@
 15:4cb6 interactionCodee2__centerOnTileAndGetDirectionToFace_hook -
 15:4cb9 interactionCodee2__getDirectionToFace_hook -
 15:4ce6 interactionCodee2__spawnChild_hook -
-15:4d56 interactionCodee5_hook -
-15:4d6c interactionCodee5__runState_hook -
+15:4e35 parseStaticObjects_hook -
 15:4ea4 loadStaticObjects_body_hook -
 15:5850 bipin_showText_subid1To9_hook -
 15:5866 setNextChildStage_hook -
@@ -3376,6 +3402,7 @@
 15:588d blossom_decideInitialChildStatus_hook -
 15:58a7 blossom_openNameEntryMenu_hook -
 15:5900 linkedNpc_generateSecret_hook -
+15:5916 linkedNpc_initHighTextIndex_hook -
 15:591d linkedNpc_calcLowTextIndex_hook -
 15:598e child_addValueToChildStatus_hook -
 15:5994 child_checkHasRupees_hook -
@@ -3475,8 +3502,10 @@
 3f:4133 agesFunc_3f_4133_hook H
 3f:4154 refreshObjectGfx_body_hook H
 3f:41ec loadObjectGfxHeaderToSlot4_body_hook H
+3f:41f0 loadObjectGfxHeaderToSlot4_body__afterCall41f0_hook H
 3f:41f5 loadTreeGfx_body_hook H
 3f:4201 updateTileIndexBaseForAllObjects_hook H
+3f:4252 updateTileIndexBaseForAllObjects__afterCall4252_hook -
 3f:4256 updateTileIndexBaseForAllObjects__updateTileIndexBase_hook -
 3f:4270 findIndexInLoadedObjectGfx_hook -
 3f:428e findUnusedIndexInLoadedObjectGfx_hook -
@@ -3496,9 +3525,13 @@
 3f:4355 interactionGetObjectGfxIndex_hook -
 3f:435c itemGetObjectGfxIndex_hook -
 3f:4368 enemyLoadGraphicsAndProperties_hook H
+3f:4372 enemyLoadGraphicsAndProperties__afterCall4372_hook -
 3f:43c9 partLoadGraphicsAndProperties_hook H
+3f:43d3 partLoadGraphicsAndProperties__afterCall43d3_hook -
 3f:4404 interactionLoadGraphics_hook H
+3f:440e interactionLoadGraphics__afterCall440e_hook -
 3f:4422 itemLoadGraphics_hook H
+3f:442c itemLoadGraphics__afterCall442c_hook -
 3f:4437 interactionGetData_hook -
 3f:443c getDataForInteraction_hook -
 3f:445b loadWeaponGfx_b3f_hook -
@@ -3528,7 +3561,6 @@
 3f:468d realignUnappraisedRings__findNextFilledSlot_hook -
 3f:469d getNumUnappraisedRings_hook -
 3f:46bc addTreasureToInventory_hook -
-3f:46e2 addTreasureToInventory__addToInventory_hook -
 3f:46fe loadTreasureDisplayData_b3f_hook -
 3f:4757 decideItemDrop_body_hook -
 3f:4b05 checkIncreaseGashaMaturityForGettingTreasure_hook -
@@ -3603,7 +3635,6 @@
 3f:53ac shiftTextboxMapUp_hook -
 3f:53e2 subFirstRowOfTextMapBy20_hook -
 3f:540c func_53dd_hook -
-3f:541a func_53eb_hook -
 3f:54cd doInventoryTextFirstPass_hook -
 3f:55ae shiftTextGfxBufferLeft_hook -
 3f:55c6 decInvTextScrollTimer_hook -
@@ -3633,4 +3664,3 @@
 3f:5917 textControlCodeC_2_hook -
 3f:59b7 interactionCode11_hook -
 3f:59c1 interac11_subid00_hook -
-3f:5a7a interac11_subid01_hook -

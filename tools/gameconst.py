@@ -154,12 +154,21 @@ class Tool:
                 if self.cur_ofs and k in ('rom', 'any') and self.cur_ofs.get(v1 - pbase) == v2 - (sa - (aa - pbase)): continue   # in-routine target, mapped
                 ra, rs = self.A.rom_sym(ab, v1), self.S.rom_sym(sb, v2)
                 ra, rs = self.A.peer_sym(ra, rs), self.S.peer_sym(rs, ra)
-                if k == 'rom' and ra == rs and not ra.startswith('$'): continue
+                if k == 'rom' and ra == rs and not ra.startswith('$'):
+                    # same label, but a call target spelled b_+N is only right when its offset from
+                    # the base is the same in both games
+                    if v1 - pbase == v2 - (sa - (aa - pbase)) or not self.raw_call_target(funcs, off, v1 - pbase): continue
                 if k == 'ram' and self.A.ram_sym(v1) == self.S.ram_sym(v2) and not self.A.ram_sym(v1).startswith('$'): continue
                 if k == 'imm' and v1 == v2: continue
                 if k == 'ram' and v1 == v2 and (v1 >= 0xff00 or v1 < 0x8000): continue      # IO/HRAM or MBC register, same in both
                 if not self.fix_site(name, funcs, off, k, v1, v2, t1, apply, quiet=self.auditing): ok = False
         return ok
+
+    def raw_call_target(self, funcs, off, target):
+        pat = re.compile(rf'\bCALL_[CL](?:_CC)?\(b_\+(?:OE?\()?{off}\)?, \w+, b_\+{target}\b')
+        for f, s, e in funcs:
+            if any(pat.search(self.files[f][i].split('//')[0]) for i in range(s, e + 1)): return True
+        return False
 
     def fix_site(self, name, funcs, off, kind, v1, v2, tmpl, apply, quiet=False, helpers=False):
         for f, s, e in funcs:
@@ -198,7 +207,7 @@ class Tool:
                     cands = [m for m in cands if not re.search(r'burn_rom\(gb, $', code[:m.start()])]
                     if not cands and any(int(m.group(0), 16) == v1 and in_gv(m.start()) for m in re.finditer(r'(?<![\w.])0x[0-9a-f]{2}(?![0-9a-f])', code)): return True
                     if not cands:
-                        cands = [m for m in re.finditer(r'(?<=[=, (])\d{1,3}(?=[;,) ])', code) if int(m.group(0)) == v1 and not re.search(r'\bb_\+$|CYCT?\(b_\+\d+, b_\+$|alu_bit\(gb, $', code[:m.start()])]
+                        cands = [m for m in re.finditer(r'(?<=[=, (])\d{1,3}(?=[;,) ])', code) if int(m.group(0)) == v1 and not re.search(r'\bb_\+$|\bb_\+OE?\($|\bS\($|CYCT?\(b_\+\d+, b_\+$|alu_bit\(gb, $', code[:m.start()])]
                     if not cands:
                         cands = [m for m in re.finditer(r'(?:INTERACTION_BASE|ENEMY_BASE|PART_BASE|ITEM_BASE)? ?\+? ?OBJ_\w+(?: \+ \d+)?', code) if self.eval_expr(m.group(0), 0) == v1]
                     if not cands:

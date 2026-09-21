@@ -431,6 +431,14 @@ if names and names[0] == '--out':
     locals_of = collections.defaultdict(list)
     for (lb, la), ln in local_by_addr.items():
         if (lb, la) not in by_addr and (not SEASONS or (lb, la) in code_targets): locals_of[(lb, ln.split('@')[0])].append((la, ln))
+    alias_names = collections.defaultdict(list)      # several labels can name one routine; its @locals may hang off any of them
+    for n2, insts in instances.items():
+        if '@' not in n2:
+            for inst in insts: alias_names[inst].append(n2)
+    def locals_for(b, a, n):
+        out = set(locals_of.get((b, n), []))
+        for n2 in alias_names.get((b, a), []): out.update(locals_of.get((b, n2), []))
+        return sorted(out)
     items_by_bank = collections.OrderedDict()
     seen_addrs = set()
     for n in names:
@@ -441,7 +449,7 @@ if names and names[0] == '--out':
                 entries[(b, a)] = shared_hooks[(b, a)] if SEASONS else cname_at(b, a) + '_hook'
                 items_by_bank.setdefault(b, []).append((n, b, a))
                 if SEASONS:     # a shared routine's @locals that no shared hook covers are generated
-                    for la, ln in sorted(locals_of.get((b, n), [])):
+                    for la, ln in locals_for(b, a, n):
                         if (b, la) in shared_hooks or (b, la) in entries or not body_ok(b, la): continue
                         entries[(b, la)] = cname_at(b, la)
                         items_by_bank[b].append((ln, b, la))
@@ -452,8 +460,8 @@ if names and names[0] == '--out':
                 if not RESUME_TAILS: continue
                 body = routine_body(b, a)
                 called = set(info[0] for ia, m, ln, cy, kind, info in body if kind in ('call', 'callcc'))
-                tails = [(la, ln) for la, ln in locals_of.get((b, n), []) if (b, la) in resume_points]
-                tails += [(la, ln) for (lb, la), ln in local_by_addr.items() if lb == b and la in called and ln.split('@')[0] == n and (b, la) not in by_addr]
+                tails = [(la, ln) for la, ln in locals_for(b, a, n) if (b, la) in resume_points]
+                tails += [(la, ln) for (lb, la), ln in local_by_addr.items() if lb == b and la in called and ln.split('@')[0] in alias_names.get((b, a), [n]) and (b, la) not in by_addr]
                 for la, ln in sorted(set(tails)):
                     if is_rewritten(ln, b, la): continue
                     if not body_ok(b, la): print(f'warning: {ln} skipped (unsupported)', file=sys.stderr); continue
@@ -463,7 +471,7 @@ if names and names[0] == '--out':
                 continue
             if body_ok(b, a): entries[(b, a)] = cname_at(b, a)[2:] if SEASONS and (b, a) in externs else cname_at(b, a)
             items_by_bank.setdefault(b, []).append((n, b, a))
-            for la, ln in sorted(locals_of.get((b, n), [])):
+            for la, ln in locals_for(b, a, n):
                 if SEASONS and (b, la) in shared_hooks: entries[(b, la)] = shared_hooks[(b, la)]; continue
                 if not body_ok(b, la): print(f'warning: {ln} skipped (unsupported)', file=sys.stderr); continue
                 entries[(b, la)] = cname_at(b, la)

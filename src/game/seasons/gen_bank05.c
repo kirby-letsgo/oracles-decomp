@@ -11466,6 +11466,39 @@ L_6cbc:
   I(0x6cbf, 4); if (hook_is(gb, 0x1dfa, objectSetVisiblec1_hook)) { objectSetVisiblec1_hook(gb); return; } HANDOFF(0x1dfa);  // jp $1dfa
 }
 
+// 05:6cad
+void s_rickyStateB__canTalkToRicky(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_6cad:
+  I(0x6cad, 2); L = 0x04;  // ld l,$04
+  I(0x6caf, 3); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
+  I(0x6cb1, 2); E = 0x3d;  // ld e,$3d
+  CALL(0x6cb3, objectAddToAButtonSensitiveObjectList_hook, 0x1af2, 0x6cb6);  // call $1af2
+  I(0x6cb6, 2); A = 0x00;  // ld a,$00
+  I(0x6cb8, 3); goto L_6cbc;  // jr $6cbc
+L_6cbc:
+  CALL(0x6cbc, specialObjectSetAnimation_hook, 0x2a51, 0x6cbf);  // call $2a51
+  I(0x6cbf, 4); if (hook_is(gb, 0x1dfa, objectSetVisiblec1_hook)) { objectSetVisiblec1_hook(gb); return; } HANDOFF(0x1dfa);  // jp $1dfa
+}
+
+// 05:6cba
+void s_rickyStateB__setAnimation17(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_6cba:
+  I(0x6cba, 2); A = 0x17;  // ld a,$17
+L_6cbc:
+  CALL(0x6cbc, specialObjectSetAnimation_hook, 0x2a51, 0x6cbf);  // call $2a51
+  I(0x6cbf, 4); if (hook_is(gb, 0x1dfa, objectSetVisiblec1_hook)) { objectSetVisiblec1_hook(gb); return; } HANDOFF(0x1dfa);  // jp $1dfa
+}
+
+// 05:6cbc
+void s_rickyStateB__setAnimation(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_6cbc:
+  CALL(0x6cbc, specialObjectSetAnimation_hook, 0x2a51, 0x6cbf);  // call $2a51
+  I(0x6cbf, 4); if (hook_is(gb, 0x1dfa, objectSetVisiblec1_hook)) { objectSetVisiblec1_hook(gb); return; } HANDOFF(0x1dfa);  // jp $1dfa
+}
+
 // 05:6cd3
 void s_rickyState1__didntMount_b05(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

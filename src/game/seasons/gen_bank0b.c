@@ -18,22 +18,6 @@ L_4443:
   RET(0x4445); return;  // ret
 }
 
-// 0b:458a
-void s_scriptCmd_initNpcHitbox(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x458a, 2); A = 0x06;  // ld a,$06
-  CALL(0x458c, objectSetCollideRadius_hook, 0x248d, 0x458f);  // call $248d
-  I(0x458f, 2); E = 0x71;  // ld e,$71
-  CALL(0x4591, objectRemoveFromAButtonSensitiveObjectList_hook, 0x1b07, 0x4594);  // call $1b07
-  I(0x4594, 2); E = 0x71;  // ld e,$71
-  CALL(0x4596, objectAddToAButtonSensitiveObjectList_hook, 0x1af2, 0x4599);  // call $1af2
-  SET_HL(POP(0x4599));  // pop hl
-  if (!(F & FC)) { RET_TAKEN(0x459a); return; } I(0x459a, 2);  // ret nc
-  I(0x459b, 2); SET_HL(HL + 1);  // inc hl
-  I(0x459c, 1); alu_scf(gb);  // scf
-  RET(0x459d); return;  // ret
-}
-
 // 0b:419d
 void s_scriptCmd_jump(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -173,20 +157,6 @@ L_4459:
   I(0x4459, 2); SET_HL(HL + 1);  // inc hl
   I(0x445a, 2); SET_HL(HL + 1);  // inc hl
   RET(0x445b); return;  // ret
-}
-
-// 0b:44a6
-void s_scriptCmd_jumpRandom(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x44a6));  // pop hl
-  I(0x44a7, 2); SET_HL(HL + 1);  // inc hl
-  CALL(0x44a8, getRandomNumber_hook, 0x041a, 0x44ab);  // call $041a
-  I(0x44ab, 2); alu_and(gb, 0x01);  // and $01
-  I(0x44ad, 1); alu_add(gb, A);  // add a
-  RST_PUSH(0x44ae, 0x44af);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x44af, 4); s_scriptFunc_jump_scf(gb); return;  // jp $257f
 }
 
 // 0b:457a

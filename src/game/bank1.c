@@ -4908,45 +4908,45 @@ void initializeGame__summonLinkCutscene_hook(GB *gb) { initialize_game(gb, SYM(i
 
 static void func_5a60_after_initialize_room(GB *gb, uint16_t sp0_) {
   BASE(func_5a60);
-  CALL_C(b_+77, checkDisplayEraOrSeasonInfo_hook, SYM(checkDisplayEraOrSeasonInfo), b_+80);
-  CALL_C(b_+80, updateGrassAnimationModifier_hook, SYM(updateGrassAnimationModifier), b_+83);
-  CALL_C(b_+83, checkPlayRoomMusic_hook, SYM(checkPlayRoomMusic), b_+86);
-  CALL_C(b_+86, checkUpdateDungeonMinimap_hook, SYM(checkUpdateDungeonMinimap), b_+89);
-  CYC(b_+89, b_+92); func_593a_hook(gb);
+  CALL_C(b_+O(77), checkDisplayEraOrSeasonInfo_hook, SYM(checkDisplayEraOrSeasonInfo), b_+OE(80));
+  CALL_C(b_+O(80), updateGrassAnimationModifier_hook, SYM(updateGrassAnimationModifier), b_+OE(83));
+  CALL_C(b_+O(83), checkPlayRoomMusic_hook, SYM(checkPlayRoomMusic), b_+OE(86));
+  CALL_C(b_+O(86), checkUpdateDungeonMinimap_hook, SYM(checkUpdateDungeonMinimap), b_+OE(89));
+  CYC(b_+O(89), b_+OE(92)); func_593a_hook(gb);
 }
 
 void func_5a60_hook(GB *gb) {
   BASE(func_5a60);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+0, clearOam_hook, SYM(clearOam), b_+3);
-  CALL_C(b_+3, initializeVramMaps_hook, SYM(initializeVramMaps), b_+6);
-  CALL_C(b_+6, clearMemoryOnScreenReload_hook, SYM(clearMemoryOnScreenReload), b_+9);
-  CALL_C(b_+9, clearScreenVariables_hook, SYM(clearScreenVariables), b_+12);
-  CALL_C(b_+12, clearEnemiesKilledList_b00_hook, SYM(clearEnemiesKilledList_b00), b_+15);
-  CALL_C(b_+15, clearAllParentItems_hook, SYM(clearAllParentItems), b_+18);
-  CALL_C(b_+18, dropLinkHeldItem_hook, SYM(dropLinkHeldItem), b_+21);
-  CALL_C(b_+21, loadScreenMusicAndSetRoomPack_hook, SYM(loadScreenMusicAndSetRoomPack), b_+24);
-  CALL_C(b_+24, loadTilesetData_hook, SYM(loadTilesetData), b_+27);
-  CALL_C(b_+27, loadTilesetGraphics_hook, SYM(loadTilesetGraphics), b_+30);
+  CALL_C(b_+O(0), clearOam_hook, SYM(clearOam), b_+OE(3));
+  CALL_C(b_+O(3), initializeVramMaps_hook, SYM(initializeVramMaps), b_+OE(6));
+  CALL_C(b_+O(6), clearMemoryOnScreenReload_hook, SYM(clearMemoryOnScreenReload), b_+OE(9));
+  CALL_C(b_+O(9), clearScreenVariables_hook, SYM(clearScreenVariables), b_+OE(12));
+  CALL_C(b_+O(12), clearEnemiesKilledList_b00_hook, SYM(clearEnemiesKilledList_b00), b_+OE(15));
+  CALL_C(b_+O(15), clearAllParentItems_hook, SYM(clearAllParentItems), b_+OE(18));
+  CALL_C(b_+O(18), dropLinkHeldItem_hook, SYM(dropLinkHeldItem), b_+OE(21));
+  CALL_C(b_+O(21), loadScreenMusicAndSetRoomPack_hook, SYM(loadScreenMusicAndSetRoomPack), b_+OE(24));
+  CALL_C(b_+O(24), loadTilesetData_hook, SYM(loadTilesetData), b_+OE(27));
+  CALL_C(b_+O(27), loadTilesetGraphics_hook, SYM(loadTilesetGraphics), b_+OE(30));
   if (!game_seasons) {
     CYC(b_+30, b_+33); A = W8(wLoadingRoomPack);
     CYC(b_+33, b_+36); W8(wRoomPack) = A;
   }
-  CALL_C(b_+36, loadDungeonLayout_hook, SYM(loadDungeonLayout), b_+39);
-  CYC(b_+39, b_+41); A = 0x02;
-  CYC(b_+41, b_+44); mem_wr(gb, wThreadStateBuffer + 0x0e, A);
-  CYC(b_+44, b_+45); alu_xor(gb, A);
-  CYC(b_+45, b_+48); mem_wr(gb, wThreadStateBuffer + 0x0f, A);
-  CYC(b_+48, b_+51); W8(wWarpTransition2) = A;
-  CYC(b_+51, b_+54); W8(wSwitchState) = A;
-  CYC(b_+54, b_+57); W8(wToggleBlocksState) = A;
-  CYC(b_+57, b_+59); A = 0x02;
-  CYC(b_+59, b_+62); W8(wScrollMode) = A;
-  CALL_C(b_+62, loadTilesetAndRoomLayout_hook, SYM(loadTilesetAndRoomLayout), b_+65);
-  CALL_C(b_+65, loadRoomCollisions_hook, SYM(loadRoomCollisions), b_+68);
-  CALL_C(b_+68, generateVramTilesWithRoomChanges_hook, SYM(generateVramTilesWithRoomChanges), b_+71);
-  CALL_C(b_+71, setEnteredWarpPosition_hook, SYM(setEnteredWarpPosition), b_+74);
-  CALL_C(b_+74, initializeRoom_hook, SYM(initializeRoom), b_+77);
+  CALL_C(b_+O(36), loadDungeonLayout_hook, SYM(loadDungeonLayout), b_+OE(39));
+  CYC(b_+O(39), b_+OE(41)); A = 0x02;
+  CYC(b_+O(41), b_+OE(44)); mem_wr(gb, wThreadStateBuffer + 0x0e, A);
+  CYC(b_+O(44), b_+OE(45)); alu_xor(gb, A);
+  CYC(b_+O(45), b_+OE(48)); mem_wr(gb, wThreadStateBuffer + 0x0f, A);
+  CYC(b_+O(48), b_+OE(51)); W8(wWarpTransition2) = A;
+  CYC(b_+O(51), b_+OE(54)); W8(wSwitchState) = A;
+  CYC(b_+O(54), b_+OE(57)); W8(wToggleBlocksState) = A;
+  CYC(b_+O(57), b_+OE(59)); A = 0x02;
+  CYC(b_+O(59), b_+OE(62)); W8(wScrollMode) = A;
+  CALL_C(b_+O(62), loadTilesetAndRoomLayout_hook, SYM(loadTilesetAndRoomLayout), b_+OE(65));
+  CALL_C(b_+O(65), loadRoomCollisions_hook, SYM(loadRoomCollisions), b_+OE(68));
+  CALL_C(b_+O(68), generateVramTilesWithRoomChanges_hook, SYM(generateVramTilesWithRoomChanges), b_+OE(71));
+  CALL_C(b_+O(71), setEnteredWarpPosition_hook, SYM(setEnteredWarpPosition), b_+OE(74));
+  CALL_C(b_+O(74), initializeRoom_hook, SYM(initializeRoom), b_+OE(77));
   func_5a60_after_initialize_room(gb, sp0_);
 }
 
@@ -5090,7 +5090,7 @@ static void cutscene01_after_tree_gfx(GB *gb, uint16_t sp0_) {
   CALL_C(b_+O(6), updateMenus_hook, SYM(updateMenus), b_+OE(9));
   if (!(F & FZ)) { CYCT(b_+O(9), b_+OE(10)); ret_effect(gb); return; }
   CYC(b_+O(9), b_+OE(10));
-  if (!game_seasons) CALL_C(b_+O(10), updatePirateShip_hook, SYM(updatePirateShip), b_+OE(13));
+  if (!game_seasons) CALL_C(b_+10, updatePirateShip_hook, SYM(updatePirateShip), b_+13);
   CALL_C(b_+O(13), updateAllObjects_hook, SYM(updateAllObjects), b_+OE(16));
   if (!game_seasons) {      // underwater waves and the bank 2 tile animation: Ages only
     CALL_C(b_+16, checkUpdateUnderwaterWaves_hook, SYM(checkUpdateUnderwaterWaves), b_+19);
@@ -5099,7 +5099,7 @@ static void cutscene01_after_tree_gfx(GB *gb, uint16_t sp0_) {
     CALL_C(b_+24, interBankCall_hook, 0x008a, b_+27);
   }
   CALL_C(b_+O(27), updateStatusBar_hook, SYM(updateStatusBar), b_+OE(30));
-  if (!game_seasons) CALL_C(b_+O(30), checkUpdateToggleBlocks_hook, SYM(checkUpdateToggleBlocks), b_+OE(33));
+  if (!game_seasons) CALL_C(b_+30, checkUpdateToggleBlocks_hook, SYM(checkUpdateToggleBlocks), b_+33);
   CYC(b_+O(33), b_+OE(36)); A = W8(wCutsceneTrigger);
   CYC(b_+O(36), b_+OE(37)); alu_or(gb, A);
   if (!(F & FZ)) {
@@ -5127,7 +5127,7 @@ static void cutscene01_after_tree_gfx(GB *gb, uint16_t sp0_) {
     TAIL(checkEnemyAndPartCollisionsIfTextInactive);
   }
   CYC(b_+O(53), b_+OE(56));
-  if (!game_seasons) CALL_C(b_+O(56), checkDisableUnderwaterWaves_hook, SYM(checkDisableUnderwaterWaves), b_+OE(59));
+  if (!game_seasons) CALL_C(b_+56, checkDisableUnderwaterWaves_hook, SYM(checkDisableUnderwaterWaves), b_+59);
   CALL_C(b_+O(59), updateSeedTreeRefillData_hook, SYM(updateSeedTreeRefillData), b_+OE(62));
   CYC(b_+O(62), b_+OE(64)); A = 0x05;
   CALL_C(b_+O(64), addToGashaMaturity_hook, SYM(addToGashaMaturity), b_+OE(67));
@@ -5170,52 +5170,56 @@ void cutscene01__afterCall5bd5_hook(GB *gb) { cutscene01_after_initialize_room(g
 
 static void func_5c18_after_initialize_room(GB *gb, uint16_t sp0_) {
   BASE(func_5c18);
-  CALL_C(b_+58, checkDisplayEraOrSeasonInfo_hook, SYM(checkDisplayEraOrSeasonInfo), b_+61);
-  CALL_C(b_+61, checkDarkenRoomAndClearPaletteFadeState_hook, SYM(checkDarkenRoomAndClearPaletteFadeState), b_+64);
-  CALL_C(b_+64, fadeinFromWhiteToRoom_hook, SYM(fadeinFromWhiteToRoom), b_+67);
-  CALL_C(b_+67, checkPlayRoomMusic_hook, SYM(checkPlayRoomMusic), b_+70);
-  CYC(b_+70, b_+71); alu_xor(gb, A);
-  CYC(b_+71, b_+74); mem_wr(gb, wThreadStateBuffer + 0x0f, A);
-  CYC(b_+74, b_+77); W8(wDontUpdateStatusBar) = A;
-  CALL_C(b_+77, func_593a_hook, SYM(func_593a), b_+80);
-  CYC(b_+80, b_+83); resetCamera_hook(gb);
+  CALL_C(b_+O(58), checkDisplayEraOrSeasonInfo_hook, SYM(checkDisplayEraOrSeasonInfo), b_+OE(61));
+  CALL_C(b_+O(61), checkDarkenRoomAndClearPaletteFadeState_hook, SYM(checkDarkenRoomAndClearPaletteFadeState), b_+OE(64));
+  CALL_C(b_+O(64), fadeinFromWhiteToRoom_hook, SYM(fadeinFromWhiteToRoom), b_+OE(67));
+  CALL_C(b_+O(67), checkPlayRoomMusic_hook, SYM(checkPlayRoomMusic), b_+OE(70));
+  CYC(b_+O(70), b_+OE(71)); alu_xor(gb, A);
+  CYC(b_+O(71), b_+OE(74)); mem_wr(gb, wThreadStateBuffer + 0x0f, A);
+  if (!game_seasons) { CYC(b_+74, b_+77); W8(wDontUpdateStatusBar) = A; }
+  CALL_C(b_+O(77), func_593a_hook, SYM(func_593a), b_+OE(80));
+  CYC(b_+O(80), b_+OE(83)); resetCamera_hook(gb);
 }
 
 void func_5c18_hook(GB *gb) {
   BASE(func_5c18);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+0, checkUpdateDungeonMinimap_hook, SYM(checkUpdateDungeonMinimap), b_+3);
-  CYC(b_+3, b_+6); SET_HL(w1Companion_id);
-  CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL - 1);
-  CYC(b_+7, b_+9); alu_cp(gb, 0x13);
-  if (!(F & FZ)) CYCT(b_+9, b_+11);
-  else {
-    CYC(b_+9, b_+11);
-    CYC(b_+11, b_+13); alu_bit(gb, 1, mem_rd(gb, HL));
-    if (!(F & FZ)) CYCT(b_+13, b_+15);
+  if (!game_seasons) {
+    CALL_C(b_+0, checkUpdateDungeonMinimap_hook, SYM(checkUpdateDungeonMinimap), b_+3);
+    CYC(b_+3, b_+6); SET_HL(w1Companion_id);
+    CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL - 1);
+    CYC(b_+7, b_+9); alu_cp(gb, 0x13);
+    if (!(F & FZ)) CYCT(b_+9, b_+11);
     else {
-      CYC(b_+13, b_+15);
-      CYC(b_+15, b_+17); B = 0x40;
-      CALL_C(b_+17, clearMemory_hook, SYM(clearMemory), b_+20);
-      CYC(b_+20, b_+22); A = 0xd0;
-      CYC(b_+22, b_+25); W8(wLinkObjectIndex) = A;
+      CYC(b_+9, b_+11);
+      CYC(b_+11, b_+13); alu_bit(gb, 1, mem_rd(gb, HL));
+      if (!(F & FZ)) CYCT(b_+13, b_+15);
+      else {
+        CYC(b_+13, b_+15);
+        CYC(b_+15, b_+17); B = 0x40;
+        CALL_C(b_+17, clearMemory_hook, SYM(clearMemory), b_+20);
+        CYC(b_+20, b_+22); A = 0xd0;
+        CYC(b_+22, b_+25); W8(wLinkObjectIndex) = A;
+      }
     }
   }
-  CYC(b_+25, b_+28); A = W8(wLinkGrabState2);
-  CYC(b_+28, b_+30); alu_and(gb, 0xf0);
-  CYC(b_+30, b_+32); alu_cp(gb, 0x40);
-  if (F & FZ) CYCT(b_+32, b_+34);
+  CYC(b_+O(25), b_+OE(28)); A = W8(wLinkGrabState2);
+  CYC(b_+O(28), b_+OE(30)); alu_and(gb, 0xf0);
+  CYC(b_+O(30), b_+OE(32)); alu_cp(gb, 0x40);
+  if (F & FZ) CYCT(b_+O(32), b_+OE(34));
   else {
-    CYC(b_+32, b_+34);
-    CALL_C(b_+34, dropLinkHeldItem_hook, SYM(dropLinkHeldItem), b_+37);
-    CALL_C(b_+37, clearAllParentItems_hook, SYM(clearAllParentItems), b_+40);
+    CYC(b_+O(32), b_+OE(34));
+    CALL_C(b_+O(34), dropLinkHeldItem_hook, SYM(dropLinkHeldItem), b_+OE(37));
+    CALL_C(b_+O(37), clearAllParentItems_hook, SYM(clearAllParentItems), b_+OE(40));
   }
-  CYC(b_+40, b_+43); A = W8(wLoadingRoomPack);
-  CYC(b_+43, b_+46); W8(wRoomPack) = A;
-  CALL_C(b_+46, setInstrumentsDisabledCounterAndScrollMode_hook, SYM(setInstrumentsDisabledCounterAndScrollMode), b_+49);
-  CALL_C(b_+49, setEnteredWarpPosition_hook, SYM(setEnteredWarpPosition), b_+52);
-  CALL_C(b_+52, calculateRoomEdge_hook, SYM(calculateRoomEdge), b_+55);
-  CALL_C(b_+55, initializeRoom_hook, SYM(initializeRoom), b_+58);
+  if (!game_seasons) {
+    CYC(b_+40, b_+43); A = W8(wLoadingRoomPack);
+    CYC(b_+43, b_+46); W8(wRoomPack) = A;
+  }
+  CALL_C(b_+O(46), setInstrumentsDisabledCounterAndScrollMode_hook, SYM(setInstrumentsDisabledCounterAndScrollMode), b_+OE(49));
+  CALL_C(b_+O(49), setEnteredWarpPosition_hook, SYM(setEnteredWarpPosition), b_+OE(52));
+  CALL_C(b_+O(52), calculateRoomEdge_hook, SYM(calculateRoomEdge), b_+OE(55));
+  CALL_C(b_+O(55), initializeRoom_hook, SYM(initializeRoom), b_+OE(58));
   func_5c18_after_initialize_room(gb, sp0_);
 }
 
@@ -5282,26 +5286,30 @@ void func_5c6b__afterCall5c74_hook(GB *gb) { func_5c6b_after_initialize_room(gb,
 
 static void cutscene04_05_common(GB *gb, uint16_t sp0_) {
   BASE(cutscene05);
-  CALL_C(b_+14, setInteractionsEnabledTo2_hook, SYM(setInteractionsEnabledTo2), b_+17);
-  CALL_C(b_+17, clearObjectsWithEnabled2_hook, SYM(clearObjectsWithEnabled2), b_+20);
-  CALL_C(b_+20, clearItems_hook, SYM(clearItems), b_+23);
-  CALL_C(b_+23, clearEnemies_hook, SYM(clearEnemies), b_+26);
-  CALL_C(b_+26, clearParts_hook, SYM(clearParts), b_+29);
-  CALL_C(b_+29, clearReservedInteraction0_hook, SYM(clearReservedInteraction0), b_+32);
-  CYC(b_+32, b_+35); A = W8(wScreenTransitionDirection);
-  CYC(b_+35, b_+37); H8(hFF92) = A;
-  CALL_C(b_+37, clearScreenVariables_hook, SYM(clearScreenVariables), b_+40);
-  CYC(b_+40, b_+42); A = H8(hFF92);
-  CYC(b_+42, b_+45); W8(wScreenTransitionDirection) = A;
-  CALL_C(b_+45, clearMemoryOnScreenReload_hook, SYM(clearMemoryOnScreenReload), b_+48);
-  CALL_C(b_+48, loadScreenMusicAndSetRoomPack_hook, SYM(loadScreenMusicAndSetRoomPack), b_+51);
-  CALL_C(b_+51, loadTilesetData_hook, SYM(loadTilesetData), b_+54);
-  CALL_C(b_+54, loadTilesetGraphics_hook, SYM(loadTilesetGraphics), b_+57);
-  CALL_C(b_+57, func_131f_hook, SYM(func_131f), b_+60);
-  CYC(b_+60, b_+63); SET_DE(w1Link_yh);
-  CALL_C(b_+63, getShortPositionFromDE_hook, SYM(getShortPositionFromDE), b_+66);
-  CYC(b_+66, b_+69); W8(wWarpDestPos) = A;
-  CYC(b_+69, b_+72); func_5c18_hook(gb);
+  CALL_C(b_+O(14), setInteractionsEnabledTo2_hook, SYM(setInteractionsEnabledTo2), b_+OE(17));
+  CALL_C(b_+O(17), clearObjectsWithEnabled2_hook, SYM(clearObjectsWithEnabled2), b_+OE(20));
+  CALL_C(b_+O(20), clearItems_hook, SYM(clearItems), b_+OE(23));
+  CALL_C(b_+O(23), clearEnemies_hook, SYM(clearEnemies), b_+OE(26));
+  CALL_C(b_+O(26), clearParts_hook, SYM(clearParts), b_+OE(29));
+  CALL_C(b_+O(29), clearReservedInteraction0_hook, SYM(clearReservedInteraction0), b_+OE(32));
+  if (!game_seasons) {
+    CYC(b_+32, b_+35); A = W8(wScreenTransitionDirection);
+    CYC(b_+35, b_+37); H8(hFF92) = A;
+  }
+  CALL_C(b_+O(37), clearScreenVariables_hook, SYM(clearScreenVariables), b_+OE(40));
+  if (!game_seasons) {
+    CYC(b_+40, b_+42); A = H8(hFF92);
+    CYC(b_+42, b_+45); W8(wScreenTransitionDirection) = A;
+  }
+  CALL_C(b_+O(45), clearMemoryOnScreenReload_hook, SYM(clearMemoryOnScreenReload), b_+OE(48));
+  CALL_C(b_+O(48), loadScreenMusicAndSetRoomPack_hook, SYM(loadScreenMusicAndSetRoomPack), b_+OE(51));
+  CALL_C(b_+O(51), loadTilesetData_hook, SYM(loadTilesetData), b_+OE(54));
+  CALL_C(b_+O(54), loadTilesetGraphics_hook, SYM(loadTilesetGraphics), b_+OE(57));
+  CALL_C(b_+O(57), func_131f_hook, SYM(func_131f), b_+OE(60));
+  CYC(b_+O(60), b_+OE(63)); SET_DE(w1Link_yh);
+  CALL_C(b_+O(63), getShortPositionFromDE_hook, SYM(getShortPositionFromDE), b_+OE(66));
+  CYC(b_+O(66), b_+OE(69)); W8(wWarpDestPos) = A;
+  CYC(b_+O(69), b_+OE(72)); func_5c18_hook(gb);
 }
 
 void cutscene04_hook(GB *gb) {
@@ -5331,13 +5339,13 @@ void cutscene04_hook(GB *gb) {
 void cutscene05_hook(GB *gb) {
   BASE(cutscene05);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); A = W8(wPaletteThread_mode);
-  CYC(b_+3, b_+4); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
-  CYC(b_+4, b_+5);
-  CALL_C(b_+5, disableLcd_hook, SYM(disableLcd), b_+8);
-  CALL_C(b_+8, clearOam_hook, SYM(clearOam), b_+11);
-  CALL_C(b_+11, func_5cfe_hook, SYM(func_5cfe), b_+14);
+  CYC(b_+O(0), b_+OE(3)); A = W8(wPaletteThread_mode);
+  CYC(b_+O(3), b_+OE(4)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(4), b_+OE(5)); ret_effect(gb); return; }
+  CYC(b_+O(4), b_+OE(5));
+  CALL_C(b_+O(5), disableLcd_hook, SYM(disableLcd), b_+OE(8));
+  CALL_C(b_+O(8), clearOam_hook, SYM(clearOam), b_+OE(11));
+  CALL_C(b_+O(11), func_5cfe_hook, SYM(func_5cfe), b_+OE(14));
   cutscene04_05_common(gb, sp0_);
 }
 

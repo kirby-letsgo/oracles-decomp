@@ -68,6 +68,9 @@ copyFileFromHlToDe
 createEnergySwirlGoingIn
 createEnergySwirlGoingOut
 cucco_hitWithMysterySeed
+cutscene15__state1
+cutscene15__state1__substate2
+cutscene15__update
 cutscene17
 cutscene17__state0
 cutscene18_state5
@@ -138,6 +141,7 @@ func_3211
 func_39_400c
 func_4553@getLinkWalkingAnimation
 func_49c9
+gameCompleteDialog_markGameAsComplete
 gameLink_getFile1
 gameLink_getFile2
 gameLink_getFile3
@@ -170,8 +174,6 @@ interac11_subid00
 interactionAnimate
 interactionCode10
 interactionCode1c
-interactionCode60@checkLinkTouched
-interactionCode60@giveTreasure
 interactionCode7d
 interactionCodeae
 interactionCodeaf
@@ -216,6 +218,7 @@ linkState00
 linkState05
 linkUpdateInAir
 linkedNpc_generateSecret
+linkedNpc_initHighTextIndex
 loadEquippedItemSpriteData
 loadGfxHeader
 loadPaletteHeader

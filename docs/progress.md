@@ -448,6 +448,28 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-21 (night): Seasons playthrough extended to 67,281 frames (Hero's Cave, Maku Tree):
+  `tas/seasons-play.ref` re-recorded with `--no-hooks --init-ram tas/gbhawk-wram0.txt` (the
+  33k prefix unchanged), both tests bumped. The longer movie exposed three classes of bug and
+  each got a tool check: (1) call targets spelled `b_+N` whose offset differs per game
+  (giveTreasure_body@applyParameter sits 6 bytes later in Seasons, also
+  mapGetRoomText@checkDungeonEntered, inventoryMenuState2@func_02_57f3) -> `SYM()` spellings,
+  and `gameconst.py` now audits same-name call targets spelled as raw offsets; (2) shared hooks
+  whose C burns into a call-only `@local` that differs (interactionCode0c@doSpecializedInit,
+  15 hooks in all) -> `seasons_hooks.py` maps every raw burn start outside the flow-followed
+  body to its covering label and requires it identical; (3) `transliterate --game=seasons`
+  dropped the `@locals` of aliased routines (interactionCode00..0c share one address, the
+  locals hang off `interactionCode0c`) -> `locals_for()` unions the aliases' locals, 117 more
+  generated locals. Also DIFFERENT batch 5: applyWarpDest (Seasons minimap call), cutscene05,
+  func_5c18, mapMenu_checkRoomVisited, parseStaticObjects, scriptCmd_initNpcHitbox,
+  scriptCmd_jumpRandom (Seasons random branch), vire_batForm_stateA,
+  gameCompleteDialog_markGameAsComplete, itemDrop_spawnEnemy, linkedNpc_initHighTextIndex,
+  mapMenu_drawSpriteAtRoomIndex/loadPopupData; scriptCmd_loadScript 2-cycle fix; 21 Seasons
+  resume points (`__afterCall`) added to `extra_seasons.sym` at the same offset of the paired
+  routine; `gameconst` no longer rewrites a number inside `O()`. Shared Seasons hooks 3,636 ->
+  3,666, table 11,080. Gates: ctest 10/10 (67k Seasons playthrough), whole movie, Ages verify
+  30k, Seasons playthrough 67k `OFS_TRAP=1 VERIFY_ALL=1`, native both, lint 0.
+
 - 2026-09-21 (later): DIFFERENT batch 4, 62 routines in `ofs_routines.txt` plus hand-written
   Seasons bodies in `seasons_ok_manual.txt`: clearEnemies/Items/Parts/DynamicInteractions
   (`clear_object_slots` skips Seasons' extra byte), findFreeStaticObjectSlot (Seasons loop written

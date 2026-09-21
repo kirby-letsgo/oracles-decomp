@@ -67,7 +67,7 @@ def main():
                     verdict[loc] = verdict[loc.replace('@', '__')] = 'IDENTICAL'
 
     # C call graph: function name -> callees, per file (static helpers are file-local)
-    callees, burns, local_calls, tails, ages_only_funcs = {}, {}, {}, {}, set()
+    callees, burns, local_calls, tails, ages_only_funcs, raw_offs = {}, {}, {}, {}, set(), {}
     EXEC = re.compile(r'\b(?:CYCT?[0-9a-f]*|burn_rom|RET|RET_TAKEN|RETI|I|push_effect|BASE)\(([^;]*)')
     for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
         if os.path.basename(path).startswith('gen_') or os.path.basename(path) == 'syms.c': continue
@@ -76,7 +76,7 @@ def main():
         for line, scode in zip(src, seasons_code(src)):
             m = FUNC.match(line)
             if m:
-                cur = (path, m.group(1)); callees[cur] = set(); burns[cur] = set(); local_calls[cur] = set(); tails[cur] = set()
+                cur = (path, m.group(1)); callees[cur] = set(); burns[cur] = set(); local_calls[cur] = set(); tails[cur] = set(); raw_offs[cur] = set()
                 line = line[m.end():]
             elif line.startswith('}'): cur = None; continue
             if cur is None: continue
@@ -95,6 +95,8 @@ def main():
                 local_calls[cur].add((lab or None, int(off or loff)))
             for args in EXEC.findall(code):
                 for lab in re.findall(r'\bSYM\((\w+)\)', args): burns[cur].add(lab)
+                nm = re.match(r'\s*b_\+(\d+)\b', args)      # the range start (an end may be the next label)
+                if nm: raw_offs[cur].add(int(nm.group(1)))
                 bm = re.match(r'\s*(\w+)\)', args)
                 if bm and 'BASE(' in code: burns[cur].add(bm.group(1))
             if oneliner: cur = None
@@ -146,6 +148,7 @@ def main():
         if unpairable.match(name): return local_verdict(name) if name in ages_labels else 'AGES_ONLY'
         if name not in seasons_names: return 'AGES_ONLY'
         if name in verdict: return verdict[name]
+        if name.replace('@', '__') in verdict: return verdict[name.replace('@', '__')]
         if '@' in name and name in ages_labels: return local_verdict(name)
         return verdict.get(name.split('@')[0])
 
@@ -167,6 +170,12 @@ def main():
         return bool(ages_labels.get(base))
 
     real_hooks = set(l.split()[1] for l in open('src/hooks/generated.txt') if len(l.split()) >= 2)
+    hand_checked = set()
+    for path in ('src/hooks/ofs_routines.txt', 'src/hooks/seasons_ok_manual.txt'):
+        if os.path.exists(path):
+            for l in open(path):
+                n = l.split('#')[0].split()
+                if n: hand_checked.add(n[0].split(':')[0].replace('@', '__'))
     eligible, why = {}, {}
     for key, fn in ((k, k[1]) for k in callees):
         # a hook entry needs its routine identical; a helper (even one named *_hook) is judged by what it burns
@@ -178,6 +187,21 @@ def main():
         for lab in tails[key]:
             if label_verdict(lab) == 'AGES_ONLY': ok = False; why.setdefault(key, f'TAIL({lab}) has no Seasons address')
         base_labels = [l for l in burns[key] if l in ages_labels]
+        # burns past the routine's flow-followed body land in a call-only @local (or another
+        # routine): that code must be identical too
+        if len(base_labels) == 1 and base_labels[0] not in hand_checked and raw_offs[key]:
+            base = base_labels[0]
+            for a in ages_labels[base]:
+                try: body_addrs = set(x[0] for x in A.body(a[0], a[1]))
+                except Exception: body_addrs = set()
+                for n in sorted(raw_offs[key]):
+                    if a[1] + n in body_addrs or a[1] + n >= 0x8000: continue
+                    addr = a[1] + n
+                    while addr > a[1] and (a[0] if addr >= 0x4000 else 0, addr) not in A.by_addr: addr -= 1
+                    cover = A.by_addr.get((a[0] if addr >= 0x4000 else 0, addr))
+                    if not cover or cover == base: continue
+                    v = label_verdict(cover.replace('@', '__'))
+                    if v is not None and v != 'IDENTICAL': ok = False; why.setdefault(key, f'burns {base}+{n} in {cover} ({v})'); break
         for lab, off in local_calls[key]:
             base = lab or (base_labels[0] if len(base_labels) == 1 else None)
             if base is None or not local_call_ok(base, off): ok = False; why.setdefault(key, f'CALL_L target at {base}+{off} differs')

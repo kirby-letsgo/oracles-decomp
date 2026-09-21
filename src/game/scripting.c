@@ -37,6 +37,20 @@ static uint16_t script_jump_table(GB *gb) {
   return HL;
 }
 
+static void add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, false);
+    burn_rom(gb, 0x00, 0x0013, 0x0014, false); H = alu_inc8(gb, H);
+    burn_rom(gb, 0x00, 0x0014, 0x0015, false);
+  } else {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, true);
+  }
+  pop_effect(gb);
+}
+
 static void add_double_index_to_hl_from_rst(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
   burn_rom(gb, 0x00, 0x0018, 0x0019, false); push_effect(gb, BC);
@@ -1261,9 +1275,17 @@ void scriptCmd_jumpIfCBA5Eq_hook(GB *gb) {
 
 void scriptCmd_jumpRandom_hook(GB *gb) {
   BASE(scriptCmd_jumpRandom);
-  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
-  CYC(b_+1, b_+2); SET_HL(HL + 1);
-  CYC(b_+2, b_+5); TAIL(scriptFunc_jump_scf);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+O(0), b_+OE(1)); SET_HL(pop_effect(gb));
+  CYC(b_+O(1), b_+OE(2)); SET_HL(HL + 1);
+  if (game_seasons) {
+    CALL_C(b_+S(2), getRandomNumber_hook, SYM(getRandomNumber), b_+S(5));
+    CYC(b_+S(5), b_+S(7)); alu_and(gb, 0x01);
+    CYC(b_+S(7), b_+S(8)); alu_add(gb, A);
+    CYC(b_+S(8), b_+S(9)); add_a_to_hl_from_rst(gb, b_+S(9));
+    CYC(b_+S(9), b_+S(12)); TAIL(scriptFunc_jump_scf);
+  }
+  CYC(b_+O(2), b_+OE(5)); TAIL(scriptFunc_jump_scf);
 }
 
 // 0c:44c3
@@ -1578,30 +1600,32 @@ unset_flag:
 void scriptCmd_initNpcHitbox_hook(GB *gb) {
   BASE(scriptCmd_initNpcHitbox);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+2); E = 0x66;
-  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, b_+4); alu_or(gb, A);
-  if (!(F & FZ)) {
-    CYCT(b_+4, b_+6);
-    goto update_a_button_list;
+  if (!game_seasons) {
+    CYC(b_+0, b_+2); E = 0x66;
+    CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+    CYC(b_+3, b_+4); alu_or(gb, A);
+    if (!(F & FZ)) {
+      CYCT(b_+4, b_+6);
+      goto update_a_button_list;
+    }
+    CYC(b_+4, b_+6);
   }
-  CYC(b_+4, b_+6);
-  CYC(b_+6, b_+8); A = 0x06;
-  CALL_C(b_+8, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+11);
+  CYC(b_+O(6), b_+OE(8)); A = 0x06;
+  CALL_C(b_+O(8), objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+OE(11));
 update_a_button_list:
-  CYC(b_+11, b_+13); E = 0x71;
-  CALL_C(b_+13, objectRemoveFromAButtonSensitiveObjectList_hook, SYM(objectRemoveFromAButtonSensitiveObjectList), b_+16);
-  CYC(b_+16, b_+18); E = 0x71;
-  CALL_C(b_+18, objectAddToAButtonSensitiveObjectList_hook, SYM(objectAddToAButtonSensitiveObjectList), b_+21);
-  CYC(b_+21, b_+22); SET_HL(pop_effect(gb));
+  CYC(b_+O(11), b_+OE(13)); E = 0x71;
+  CALL_C(b_+O(13), objectRemoveFromAButtonSensitiveObjectList_hook, SYM(objectRemoveFromAButtonSensitiveObjectList), b_+OE(16));
+  CYC(b_+O(16), b_+OE(18)); E = 0x71;
+  CALL_C(b_+O(18), objectAddToAButtonSensitiveObjectList_hook, SYM(objectAddToAButtonSensitiveObjectList), b_+OE(21));
+  CYC(b_+O(21), b_+OE(22)); SET_HL(pop_effect(gb));
   if (!(F & FC)) {
-    CYCT(b_+22, b_+23); ret_effect(gb);
+    CYCT(b_+O(22), b_+OE(23)); ret_effect(gb);
     return;
   }
-  CYC(b_+22, b_+23);
-  CYC(b_+23, b_+24); SET_HL(HL + 1);
-  CYC(b_+24, b_+25); alu_scf(gb);
-  CYC(b_+25, b_+26); ret_effect(gb);
+  CYC(b_+O(22), b_+OE(23));
+  CYC(b_+O(23), b_+OE(24)); SET_HL(HL + 1);
+  CYC(b_+O(24), b_+OE(25)); alu_scf(gb);
+  CYC(b_+O(25), b_+OE(26)); ret_effect(gb);
 }
 
 void scriptCmd_moveNpc_body_hook(GB *gb) {

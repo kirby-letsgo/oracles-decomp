@@ -1310,19 +1310,30 @@ void mapMenu_checkCursorRoomVisited_hook(GB *gb) {
 
 void mapMenu_checkRoomVisited_hook(GB *gb) {
   BASE(mapMenu_checkRoomVisited);
-  CYC(b_+0, b_+1); push_effect(gb, HL);
-  CYC(b_+1, b_+2); H = A;
-  CYC(b_+2, b_+5); A = W8(wMapMenu_mode);
-  CYC(b_+5, b_+6); alu_rrca(gb);
-  CYC(b_+6, b_+7); A = H;
-  CYC(b_+7, b_+10); SET_HL(wGroup1RoomFlags);
-  if (F & FC) CYCT(b_+10, b_+12);
-  else { CYC(b_+10, b_+12); CYC(b_+12, b_+15); SET_HL(wGroup0RoomFlags); }
-  CYC(b_+15, b_+16); push_effect(gb, b_+16); add_a_to_hl(gb);
-  CYC(b_+16, b_+17); A = mem_rd(gb, HL);
-  CYC(b_+17, b_+19); alu_bit(gb, 4, A);
-  CYC(b_+19, b_+20); SET_HL(pop_effect(gb));
-  CYC(b_+20, b_+21); ret_effect(gb);
+  CYC(b_+O(0), b_+OE(1)); push_effect(gb, HL);
+  CYC(b_+O(1), b_+OE(2)); H = A;
+  CYC(b_+O(2), b_+OE(5)); A = W8(wMapMenu_mode);
+  CYC(b_+O(5), b_+OE(6)); alu_rrca(gb);
+  CYC(b_+O(6), b_+OE(7)); A = H;
+  CYC(b_+O(7), b_+OE(10)); SET_HL(wGroup1RoomFlags);
+  if (F & FC) CYCT(b_+O(10), b_+OE(12));
+  else {
+    CYC(b_+O(10), b_+OE(12)); CYC(b_+O(12), b_+OE(15)); SET_HL(wGroup0RoomFlags);
+    if (game_seasons) {
+      CYC(b_+S(15), b_+S(17)); alu_cp(gb, 0xc9);
+      if (!(F & FZ)) CYCT(b_+S(17), b_+S(19));
+      else {
+        CYC(b_+S(17), b_+S(19));
+        CYC(b_+S(19), b_+S(22)); SET_HL(wGroup1RoomFlags + 11);
+        CYC(b_+S(22), b_+S(23)); alu_xor(gb, A);
+      }
+    }
+  }
+  CYC(b_+O(15), b_+OE(16)); push_effect(gb, b_+OE(16)); add_a_to_hl(gb);
+  CYC(b_+O(16), b_+OE(17)); A = mem_rd(gb, HL);
+  CYC(b_+O(17), b_+OE(19)); alu_bit(gb, 4, A);
+  CYC(b_+O(19), b_+OE(20)); SET_HL(pop_effect(gb));
+  CYC(b_+O(20), b_+OE(21)); ret_effect(gb);
 }
 
 void mapMenu_drawArrow_hook(GB *gb) {
@@ -1345,21 +1356,27 @@ void mapMenu_drawCursor_hook(GB *gb) {
 
 void mapMenu_drawSpriteAtRoomIndex_hook(GB *gb) {
   BASE(mapMenu_drawSpriteAtRoomIndex);
-  CYC(b_+0, b_+1); C = A;
-  CYC(b_+1, b_+4); SET_DE(0x1018);
-  CYC(b_+4, b_+5); A = C;
-  CYC(b_+5, b_+7); alu_and(gb, 0xf0);
-  CYC(b_+7, b_+9); A = alu_srl(gb, A);
-  CYC(b_+9, b_+10); alu_add(gb, D);
-  CYC(b_+10, b_+11); B = A;
-  CYC(b_+11, b_+12); A = C;
-  CYC(b_+12, b_+14); alu_and(gb, 0x0f);
-  CYC(b_+14, b_+15); alu_add(gb, A);
-  CYC(b_+15, b_+16); alu_add(gb, A);
-  CYC(b_+16, b_+17); alu_add(gb, A);
-  CYC(b_+17, b_+18); alu_add(gb, E);
-  CYC(b_+18, b_+19); C = A;
-  CYC(b_+19, b_+22); TAIL(addSpritesToOam_withOffset);
+  CYC(b_+O(0), b_+OE(1)); C = A;
+  CYC(b_+O(1), b_+OE(4)); SET_DE(GV(GV(0x1018, 0x0811), 0x2820));
+  if (game_seasons) {
+    CYC(b_+S(4), b_+S(7)); A = W8(wMapMenu_mode);
+    CYC(b_+S(7), b_+S(8)); alu_rrca(gb);
+    if (!(F & FC)) CYCT(b_+S(8), b_+S(10));
+    else { CYC(b_+S(8), b_+S(10)); CYC(b_+S(10), b_+S(13)); SET_DE(0x2011); }
+  }
+  CYC(b_+O(4), b_+OE(5)); A = C;
+  CYC(b_+O(5), b_+OE(7)); alu_and(gb, 0xf0);
+  CYC(b_+O(7), b_+OE(9)); A = alu_srl(gb, A);
+  CYC(b_+O(9), b_+OE(10)); alu_add(gb, D);
+  CYC(b_+O(10), b_+OE(11)); B = A;
+  CYC(b_+O(11), b_+OE(12)); A = C;
+  CYC(b_+O(12), b_+OE(14)); alu_and(gb, 0x0f);
+  CYC(b_+O(14), b_+OE(15)); alu_add(gb, A);
+  CYC(b_+O(15), b_+OE(16)); alu_add(gb, A);
+  CYC(b_+O(16), b_+OE(17)); alu_add(gb, A);
+  CYC(b_+O(17), b_+OE(18)); alu_add(gb, E);
+  CYC(b_+O(18), b_+OE(19)); C = A;
+  CYC(b_+O(19), b_+OE(22)); TAIL(addSpritesToOam_withOffset);
 }
 
 void mapMenu_drawWarpSites_hook(GB *gb) {
@@ -1857,108 +1874,114 @@ void dungeonMap_checkCanViewFloor_hook(GB *gb) {
 void mapMenu_loadPopupData_hook(GB *gb) {
   BASE(mapMenu_loadPopupData);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(b_+0, mapMenu_checkCursorRoomVisited_hook, SYM(mapMenu_checkCursorRoomVisited), b_+3);
+  CALL_C(b_+O(0), mapMenu_checkCursorRoomVisited_hook, SYM(mapMenu_checkCursorRoomVisited), b_+OE(3));
   if (F & FZ) {
-    CYCT(b_+3, b_+5);
+    CYCT(b_+O(3), b_+OE(5));
     goto no_icon;
   }
-  CYC(b_+3, b_+5);
-  CYC(b_+5, b_+8); SET_HL(SYM(presentMinimapPopups));
-  CYC(b_+8, b_+11); A = mem_rd(gb, wFakeResetMenu);
-  CYC(b_+11, b_+12); alu_rrca(gb);
+  CYC(b_+O(3), b_+OE(5));
+  CYC(b_+O(5), b_+OE(8)); SET_HL(SYM(presentMinimapPopups));
+  CYC(b_+O(8), b_+OE(11)); A = mem_rd(gb, wFakeResetMenu);
+  CYC(b_+O(11), b_+OE(12)); alu_rrca(gb);
   if (!(F & FC)) {
-    CYCT(b_+12, b_+14);
+    CYCT(b_+O(12), b_+OE(14));
   } else {
-    CYC(b_+12, b_+14);
-    CYC(b_+14, b_+17); SET_HL(SYM(pastMinimapPopups));
+    CYC(b_+O(12), b_+OE(14));
+    CYC(b_+O(14), b_+OE(17)); SET_HL(SYM(pastMinimapPopups));
   }
-  CYC(b_+17, b_+20); A = mem_rd(gb, wFileSelect_cbb6);
-  CYC(b_+20, b_+21); C = A;
+  CYC(b_+O(17), b_+OE(20)); A = mem_rd(gb, wFileSelect_cbb6);
+  CYC(b_+O(20), b_+OE(21)); C = A;
   for (;;) {
-    CYC(b_+21, b_+22); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+22, b_+24); alu_cp(gb, 0xff);
+    CYC(b_+O(21), b_+OE(22)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(22), b_+OE(24)); alu_cp(gb, 0xff);
     if (F & FZ) {
-      CYCT(b_+24, b_+26);
+      CYCT(b_+O(24), b_+OE(26));
       goto no_icon;
     }
-    CYC(b_+24, b_+26);
-    CYC(b_+26, b_+27); alu_cp(gb, C);
-    CYC(b_+27, b_+28); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(24), b_+OE(26));
+    CYC(b_+O(26), b_+OE(27)); alu_cp(gb, C);
+    CYC(b_+O(27), b_+OE(28)); A = mem_rd(gb, HL); SET_HL(HL + 1);
     if (!(F & FZ)) {
-      CYCT(b_+28, b_+30);
+      CYCT(b_+O(28), b_+OE(30));
       continue;
     }
-    CYC(b_+28, b_+30);
-    CYC(b_+30, b_+32);
+    CYC(b_+O(28), b_+OE(30));
+    CYC(b_+O(30), b_+OE(32));
     break;
   }
   goto got_icon;
 
 no_icon:
-  CYC(b_+32, b_+33); alu_xor(gb, A);
+  CYC(b_+O(32), b_+OE(33)); alu_xor(gb, A);
 
 got_icon:
-  CYC(b_+33, b_+34); D = A;
-  CYC(b_+34, b_+36); A = alu_swap(gb, A);
-  CALL_C(b_+36, getMinimapPopupType_hook, SYM(getMinimapPopupType), b_+39);
-  CYC(b_+39, b_+42); mem_wr(gb, wFileSelect_linkTimer, A);
-  CYC(b_+42, b_+43); A = D;
-  CALL_C(b_+43, getMinimapPopupType_hook, SYM(getMinimapPopupType), b_+46);
-  CYC(b_+46, b_+49); SET_HL(wFileSelect_textInputCursorPos);
-  CYC(b_+49, b_+50); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+50, b_+51); alu_or(gb, A);
+  CYC(b_+O(33), b_+OE(34)); D = A;
+  CYC(b_+O(34), b_+OE(36)); A = alu_swap(gb, A);
+  CALL_C(b_+O(36), getMinimapPopupType_hook, SYM(getMinimapPopupType), b_+OE(39));
+  CYC(b_+O(39), b_+OE(42)); mem_wr(gb, wFileSelect_linkTimer, A);
+  CYC(b_+O(42), b_+OE(43)); A = D;
+  CALL_C(b_+O(43), getMinimapPopupType_hook, SYM(getMinimapPopupType), b_+OE(46));
+  CYC(b_+O(46), b_+OE(49)); SET_HL(wFileSelect_textInputCursorPos);
+  CYC(b_+O(49), b_+OE(50)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(50), b_+OE(51)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+51, b_+53);
+    CYCT(b_+O(51), b_+OE(53));
   } else {
-    CYC(b_+51, b_+53);
-    CYC(b_+53, b_+54); A = mem_rd(gb, HL); SET_HL(HL - 1);
-    CYC(b_+54, b_+55); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(b_+O(51), b_+OE(53));
+    CYC(b_+O(53), b_+OE(54)); A = mem_rd(gb, HL); SET_HL(HL - 1);
+    CYC(b_+O(54), b_+OE(55)); mem_wr(gb, HL, A); SET_HL(HL + 1);
   }
-  CYC(b_+55, b_+56); A = mem_rd(gb, HL); SET_HL(HL - 1);
-  CYC(b_+56, b_+57); alu_or(gb, A);
+  CYC(b_+O(55), b_+OE(56)); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(b_+O(56), b_+OE(57)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+57, b_+59);
+    CYCT(b_+O(57), b_+OE(59));
   } else {
-    CYC(b_+57, b_+59);
-    CYC(b_+59, b_+60); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+60, b_+61); mem_wr(gb, HL, A); SET_HL(HL - 1);
+    CYC(b_+O(57), b_+OE(59));
+    CYC(b_+O(59), b_+OE(60)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(60), b_+OE(61)); mem_wr(gb, HL, A); SET_HL(HL - 1);
   }
-  CYC(b_+61, b_+64); SET_DE(0x8008);
-  CYC(b_+64, b_+67); SET_BC(0x2080);
-  CYC(b_+67, b_+70); A = mem_rd(gb, wFileSelect_cbb6);
-  CYC(b_+70, b_+71); alu_cp(gb, D);
+  CYC(b_+O(61), b_+OE(64)); SET_DE(0x8008);
+  if (game_seasons) {
+    CYC(b_+S(64), b_+S(67)); A = W8(wMapMenu_mode);
+    CYC(b_+S(67), b_+S(68)); alu_rrca(gb);
+    if (!(F & FC)) CYCT(b_+S(68), b_+S(70));
+    else { CYC(b_+S(68), b_+S(70)); CYC(b_+S(70), b_+S(73)); SET_DE(0x4011); }
+  }
+  CYC(b_+O(64), b_+OE(67)); SET_BC(0x2080);
+  CYC(b_+O(67), b_+OE(70)); A = mem_rd(gb, wFileSelect_cbb6);
+  CYC(b_+O(70), b_+OE(71)); alu_cp(gb, D);
   if (F & FC) {
-    CYCT(b_+71, b_+73);
+    CYCT(b_+O(71), b_+OE(73));
   } else {
-    CYC(b_+71, b_+73);
-    CYC(b_+73, b_+75); B = 0x70;
+    CYC(b_+O(71), b_+OE(73));
+    CYC(b_+O(73), b_+OE(75)); B = 0x70;
   }
-  CYC(b_+75, b_+77); alu_and(gb, 0x0f);
-  CYC(b_+77, b_+78); alu_cp(gb, E);
+  CYC(b_+O(75), b_+OE(77)); alu_and(gb, 0x0f);
+  CYC(b_+O(77), b_+OE(78)); alu_cp(gb, E);
   if (F & FC) {
-    CYCT(b_+78, b_+80);
+    CYCT(b_+O(78), b_+OE(80));
   } else {
-    CYC(b_+78, b_+80);
-    CYC(b_+80, b_+82); C = 0x20;
+    CYC(b_+O(78), b_+OE(80));
+    CYC(b_+O(80), b_+OE(82)); C = 0x20;
   }
-  CYC(b_+82, b_+85); SET_HL(wFileSelect_cursorOffset);
-  CYC(b_+85, b_+86); A = mem_rd(gb, HL);
-  CYC(b_+86, b_+87); mem_wr(gb, HL, B);
-  CYC(b_+87, b_+88); L = alu_inc8(gb, L);
-  CYC(b_+88, b_+89); alu_sub(gb, B);
-  CYC(b_+89, b_+90); B = A;
-  CYC(b_+90, b_+91); A = mem_rd(gb, HL);
-  CYC(b_+91, b_+92); mem_wr(gb, HL, C);
-  CYC(b_+92, b_+93); alu_sub(gb, C);
-  CYC(b_+93, b_+94); alu_or(gb, B);
+  CYC(b_+O(82), b_+OE(85)); SET_HL(wFileSelect_cursorOffset);
+  CYC(b_+O(85), b_+OE(86)); A = mem_rd(gb, HL);
+  CYC(b_+O(86), b_+OE(87)); mem_wr(gb, HL, B);
+  CYC(b_+O(87), b_+OE(88)); L = alu_inc8(gb, L);
+  CYC(b_+O(88), b_+OE(89)); alu_sub(gb, B);
+  CYC(b_+O(89), b_+OE(90)); B = A;
+  CYC(b_+O(90), b_+OE(91)); A = mem_rd(gb, HL);
+  CYC(b_+O(91), b_+OE(92)); mem_wr(gb, HL, C);
+  CYC(b_+O(92), b_+OE(93)); alu_sub(gb, C);
+  CYC(b_+O(93), b_+OE(94)); alu_or(gb, B);
   if (F & FZ) {
-    CYCT(b_+94, b_+95); ret_effect(gb);
+    CYCT(b_+O(94), b_+OE(95)); ret_effect(gb);
     return;
   }
-  CYC(b_+94, b_+95);
-  CYC(b_+95, b_+97); L = 0xb9;
-  CYC(b_+97, b_+99); mem_wr(gb, HL, 0x00);
-  CYC(b_+99, b_+100); ret_effect(gb);
+  CYC(b_+O(94), b_+OE(95));
+  CYC(b_+O(95), b_+OE(97)); L = 0xb9;
+  CYC(b_+O(97), b_+OE(99)); mem_wr(gb, HL, 0x00);
+  CYC(b_+O(99), b_+OE(100)); ret_effect(gb);
 }
 
 void getMinimapPopupType_hook(GB *gb) {
@@ -3243,7 +3266,7 @@ void mapGetRoomText__specialCode1_hook(GB *gb) {
   CYC(b_+63, b_+65); A = alu_swap(gb, A);
   CYC(b_+65, b_+67); alu_and(gb, 0x0f);
   CYC(b_+67, b_+68); C = A;
-  CALL_C(b_+68, mapGetRoomText__checkDungeonEntered_hook, b_+106, b_+71);
+  CALL_C(b_+68, mapGetRoomText__checkDungeonEntered_hook, SYM(mapGetRoomText__checkDungeonEntered), b_+71);
   if (!(F & FZ)) {
     CYCT(b_+71, b_+73);
     CYC(b_+78, b_+80); B = 0x02;
@@ -5473,7 +5496,7 @@ void loadItemIconGfx__func_hook(GB *gb) {
   CYC(b_+O(18), b_+OE(19)); alu_add(gb, A);
   CALL_C(b_+O(19), multiplyABy16_hook, SYM(multiplyABy16), b_+OE(22));
   CYC(b_+O(22), b_+OE(25)); SET_HL(SYM(spr_item_icons_1));
-  CYC(b_+O(GV(0x19, 0x1b)), b_+OE(26)); alu_add_hl(gb, BC);
+  CYC(b_+O(25), b_+OE(26)); alu_add_hl(gb, BC);
   CYC(b_+O(26), b_+OE(28)); B = SYMBANK(spr_item_icons_1);
   CYC(b_+O(28), b_+OE(31)); TAIL(copy20BytesFromBank);
 }
@@ -8573,7 +8596,7 @@ void inventoryMenuState2__subState1_hook(GB *gb) {
   CYC(b_+88, b_+89); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) { CYCT(b_+89, b_+90); ret_effect(gb); return; }
   CYC(b_+89, b_+90); CYC(b_+90, b_+92); mem_wr(gb, HL, 2);
-  CALL_C(b_+92, inventoryMenuState2__func_02_57f3_hook, b_+190, b_+95);
+  CALL_C(b_+92, inventoryMenuState2__func_02_57f3_hook, SYM(inventoryMenuState2__func_02_57f3), b_+95);
   if (F & FC) { CYCT(b_+95, b_+97); goto done; }
   CYC(b_+95, b_+97); CALL_C(b_+97, func_02_5a35_hook, SYM(func_02_5a35), b_+100);
   CYC(b_+100, b_+103); SET_HL(wSubmenuState);

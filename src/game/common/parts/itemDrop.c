@@ -442,28 +442,36 @@ void itemDrop_updateSpeed_hook(GB *gb) {
 void itemDrop_spawnEnemy_hook(GB *gb) {
   BASE(itemDrop_spawnEnemy);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+1); C = A;
-  CYC(b_+1, b_+4); A = W8(wDiggingUpEnemiesForbidden);
-  CYC(b_+4, b_+5); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+5, b_+7); goto delete_; } // jr nz
-  CYC(b_+5, b_+7);
-  CYC(b_+7, b_+8); A = C;
-  CYC(b_+8, b_+10); alu_and(gb, 0x07);
-  CYC(b_+10, b_+13); SET_HL(b_+33); // @enemiesToSpawn
-  CYC(b_+13, b_+14); itemDrop_addAToHl_from_rst(gb, b_+14);
-  CYC(b_+14, b_+15); B = mem_rd(gb, HL);
-  CALL_C(b_+15, getFreeEnemySlot_hook, SYM(getFreeEnemySlot), b_+18);
-  if (!(F & FZ)) { CYCT(b_+18, b_+20); goto delete_; } // jr nz
-  CYC(b_+18, b_+20);
-  CYC(b_+20, b_+21); mem_wr(gb, HL, B);
-  CALL_C(b_+21, objectCopyPosition_hook, SYM(objectCopyPosition), b_+24);
-  CYC(b_+24, b_+26); E = 0xc3; // Part.var03
-  CYC(b_+26, b_+27); A = mem_rd(gb, DE);
-  CYC(b_+27, b_+29); L = 0x82; // Enemy.subid
-  CYC(b_+29, b_+30); mem_wr(gb, HL, A);
+  CYC(b_+O(0), b_+OE(1)); C = A;
+  CYC(b_+O(1), b_+OE(4)); A = W8(wDiggingUpEnemiesForbidden);
+  CYC(b_+O(4), b_+OE(5)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(5), b_+OE(7)); goto delete_; } // jr nz
+  CYC(b_+O(5), b_+OE(7));
+  if (game_seasons) {
+    CYC(b_+S(7), b_+S(9)); B = 0x2d;
+    CYC(b_+S(9), b_+S(12)); A = W8(wTilesetFlags);
+    CYC(b_+S(12), b_+S(14)); alu_cp(gb, 0x81);
+    if (F & FZ) { CYCT(b_+S(14), b_+S(16)); goto spawn; }
+    CYC(b_+S(14), b_+S(16));
+  }
+  CYC(b_+O(7), b_+OE(8)); A = C;
+  CYC(b_+O(8), b_+OE(10)); alu_and(gb, 0x07);
+  CYC(b_+O(10), b_+OE(13)); SET_HL(b_+O(33)); // @enemiesToSpawn
+  CYC(b_+O(13), b_+OE(14)); itemDrop_addAToHl_from_rst(gb, b_+OE(14));
+  CYC(b_+O(14), b_+OE(15)); B = mem_rd(gb, HL);
+spawn:
+  CALL_C(b_+O(15), getFreeEnemySlot_hook, SYM(getFreeEnemySlot), b_+OE(18));
+  if (!(F & FZ)) { CYCT(b_+O(18), b_+OE(20)); goto delete_; } // jr nz
+  CYC(b_+O(18), b_+OE(20));
+  CYC(b_+O(20), b_+OE(21)); mem_wr(gb, HL, B);
+  CALL_C(b_+O(21), objectCopyPosition_hook, SYM(objectCopyPosition), b_+OE(24));
+  CYC(b_+O(24), b_+OE(26)); E = 0xc3; // Part.var03
+  CYC(b_+O(26), b_+OE(27)); A = mem_rd(gb, DE);
+  CYC(b_+O(27), b_+OE(29)); L = 0x82; // Enemy.subid
+  CYC(b_+O(29), b_+OE(30)); mem_wr(gb, HL, A);
 
 delete_:
-  CYC(b_+30, b_+33); TAIL(partDelete); // jp
+  CYC(b_+O(30), b_+OE(33)); TAIL(partDelete); // jp
 }
 
 void itemDrop_checkSidescrollingConditions_hook(GB *gb) {

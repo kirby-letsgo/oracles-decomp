@@ -44,3 +44,5 @@ addRoomToEnemiesKilledList_b00
 markEnemyAsKilledInRoom_b00
 generateRandomBuffer_b00
 getRandomPositionForEnemy_b00
+gameCompleteDialog_markGameAsComplete   # Seasons tail written out
+linkedNpc_initHighTextIndex   # Seasons body written out, falls into linkedNpc_calcLowTextIndex

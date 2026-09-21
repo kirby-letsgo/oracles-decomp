@@ -138,81 +138,81 @@ animate:
 void kingMoblinBomb_explode_hook(GB *gb) {
   BASE(kingMoblinBomb_explode);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+2); L = 0xc4; // Part.state
-  CYC(b_+2, b_+4); mem_wr(gb, HL, 0x05);
+  CYC(b_+O(0), b_+OE(2)); L = 0xc4; // Part.state
+  CYC(b_+O(2), b_+OE(4)); mem_wr(gb, HL, 0x05);
   if (game_seasons) {
     CYC(b_+S(4), b_+S(6)); L = 0xe4;
     CYC(b_+S(6), b_+S(8)); mem_wr(gb, HL, mem_rd(gb, HL) & 0x7f);
   }
-  CYC(b_+4, b_+6); L = 0xdb; // Part.oamFlagsBackup
-  CYC(b_+6, b_+8); A = 0x0a;
-  CYC(b_+8, b_+9); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+9, b_+10); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+10, b_+12); mem_wr(gb, HL, 0x0c);
-  CYC(b_+12, b_+14); A = 0x01;
-  CALL_C(b_+14, partSetAnimation_hook, SYM(partSetAnimation), b_+17);
-  CALL_C(b_+17, objectSetVisible82_hook, SYM(objectSetVisible82), b_+20);
-  CYC(b_+20, b_+22); A = 0x6f; // SND_EXPLOSION
-  CALL_C(b_+22, playSound_b00_hook, SYM(playSound_b00), b_+25);
-  CYC(b_+25, b_+26); alu_xor(gb, A);
-  RET(b_+26); return; // ret
+  CYC(b_+O(4), b_+OE(6)); L = 0xdb; // Part.oamFlagsBackup
+  CYC(b_+O(6), b_+OE(8)); A = 0x0a;
+  CYC(b_+O(8), b_+OE(9)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(9), b_+OE(10)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(10), b_+OE(12)); mem_wr(gb, HL, 0x0c);
+  CYC(b_+O(12), b_+OE(14)); A = 0x01;
+  CALL_C(b_+O(14), partSetAnimation_hook, SYM(partSetAnimation), b_+OE(17));
+  CALL_C(b_+O(17), objectSetVisible82_hook, SYM(objectSetVisible82), b_+OE(20));
+  CYC(b_+O(20), b_+OE(22)); A = 0x6f; // SND_EXPLOSION
+  CALL_C(b_+O(22), playSound_b00_hook, SYM(playSound_b00), b_+OE(25));
+  CYC(b_+O(25), b_+OE(26)); alu_xor(gb, A);
+  RET(b_+O(26)); return; // ret
 }
 
 void kingMoblinBomb_state2_hook(GB *gb) {
   BASE(kingMoblinBomb_state2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+1); E = alu_inc8(gb, E); // Part.substate
-  CYC(b_+1, b_+2); A = mem_rd(gb, DE);
-  CYC(b_+2, b_+3); push_effect(gb, b_+3);
+  CYC(b_+O(0), b_+OE(1)); E = alu_inc8(gb, E); // Part.substate
+  CYC(b_+O(1), b_+OE(2)); A = mem_rd(gb, DE);
+  CYC(b_+O(2), b_+OE(3)); push_effect(gb, b_+OE(3));
   {
     uint16_t target = kingMoblinBomb_jump_table(gb);
-    if (target == b_+11) goto justGrabbed;
-    if (target == b_+21) goto beingHeld;
-    if (target == b_+28) goto released;
+    if (target == b_+O(11)) goto justGrabbed;
+    if (target == b_+O(21)) goto beingHeld;
+    if (target == b_+O(28)) goto released;
     goto atRest;
   }
 
 justGrabbed:
-  CYC(b_+11, b_+13); A = 0x01;
-  CYC(b_+13, b_+14); mem_wr(gb, DE, A); // Part.substate
-  CYC(b_+14, b_+15); alu_xor(gb, A);
-  CYC(b_+15, b_+18); mem_wr(gb, wLinkGrabState2, A); // wLinkGrabState2
+  CYC(b_+O(11), b_+OE(13)); A = 0x01;
+  CYC(b_+O(13), b_+OE(14)); mem_wr(gb, DE, A); // Part.substate
+  CYC(b_+O(14), b_+OE(15)); alu_xor(gb, A);
+  CYC(b_+O(15), b_+OE(18)); mem_wr(gb, wLinkGrabState2, A); // wLinkGrabState2
   if (game_seasons) { CYC(b_+S(18), b_+S(21)); TAIL(objectSetVisiblec1); }
-  CALL_C(b_+18, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+21);
+  CALL_C(b_+O(18), objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+OE(21));
 
 beingHeld:
-  CALL_C(b_+21, common_kingMoblinBomb_state1_hook, SYM(common_kingMoblinBomb_state1), b_+24);
-  if (!(F & FZ)) { RET_TAKEN(b_+24); return; } // ret nz
-  CYC(b_+24, b_+25);
-  CYC(b_+25, b_+28); TAIL(dropLinkHeldItem); // jp
+  CALL_C(b_+O(21), common_kingMoblinBomb_state1_hook, SYM(common_kingMoblinBomb_state1), b_+OE(24));
+  if (!(F & FZ)) { RET_TAKEN(b_+O(24)); return; } // ret nz
+  CYC(b_+O(24), b_+OE(25));
+  CYC(b_+O(25), b_+OE(28)); TAIL(dropLinkHeldItem); // jp
 
 released:
-  CYC(b_+28, b_+30); E = 0xcb; // Part.yh
-  CYC(b_+30, b_+31); A = mem_rd(gb, DE);
-  CYC(b_+31, b_+33); alu_cp(gb, 0x30);
-  if (!(F & FC)) { CYCT(b_+33, b_+35); goto beingHeld; } // jr nc
-  CYC(b_+33, b_+35);
-  CYC(b_+35, b_+36); H = D;
-  CYC(b_+36, b_+38); L = 0xcf; // Part.zh
-  CYC(b_+38, b_+40); E = 0xc2; // Part.subid
-  CYC(b_+40, b_+41); A = mem_rd(gb, DE);
-  CYC(b_+41, b_+42); alu_or(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(b_+42, b_+44); goto beingHeld; } // jr nz
-  CYC(b_+42, b_+44);
-  CYC(b_+44, b_+47); SET_HL((w1ReservedItemC_speedZ + 1)); // w1ReservedItemC.speedZ+1
-  CYC(b_+47, b_+49); mem_wr(gb, HL, alu_sra(gb, mem_rd(gb, HL)));
-  CYC(b_+49, b_+50); L = alu_dec8(gb, L);
-  CYC(b_+50, b_+52); mem_wr(gb, HL, alu_rr(gb, mem_rd(gb, HL)));
-  CYC(b_+52, b_+54); L = 0x10; // Item.speed
-  CYC(b_+54, b_+56); mem_wr(gb, HL, 0x0a); // SPEED_40
-  CYC(b_+56, b_+59); TAIL(common_kingMoblinBomb_state1); // jp
+  CYC(b_+O(28), b_+OE(30)); E = 0xcb; // Part.yh
+  CYC(b_+O(30), b_+OE(31)); A = mem_rd(gb, DE);
+  CYC(b_+O(31), b_+OE(33)); alu_cp(gb, 0x30);
+  if (!(F & FC)) { CYCT(b_+O(33), b_+OE(35)); goto beingHeld; } // jr nc
+  CYC(b_+O(33), b_+OE(35));
+  CYC(b_+O(35), b_+OE(36)); H = D;
+  CYC(b_+O(36), b_+OE(38)); L = 0xcf; // Part.zh
+  CYC(b_+O(38), b_+OE(40)); E = 0xc2; // Part.subid
+  CYC(b_+O(40), b_+OE(41)); A = mem_rd(gb, DE);
+  CYC(b_+O(41), b_+OE(42)); alu_or(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+O(42), b_+OE(44)); goto beingHeld; } // jr nz
+  CYC(b_+O(42), b_+OE(44));
+  CYC(b_+O(44), b_+OE(47)); SET_HL((w1ReservedItemC_speedZ + 1)); // w1ReservedItemC.speedZ+1
+  CYC(b_+O(47), b_+OE(49)); mem_wr(gb, HL, alu_sra(gb, mem_rd(gb, HL)));
+  CYC(b_+O(49), b_+OE(50)); L = alu_dec8(gb, L);
+  CYC(b_+O(50), b_+OE(52)); mem_wr(gb, HL, alu_rr(gb, mem_rd(gb, HL)));
+  CYC(b_+O(52), b_+OE(54)); L = 0x10; // Item.speed
+  CYC(b_+O(54), b_+OE(56)); mem_wr(gb, HL, 0x0a); // SPEED_40
+  CYC(b_+O(56), b_+OE(59)); TAIL(common_kingMoblinBomb_state1); // jp
 
 atRest:
-  CYC(b_+59, b_+61); E = 0xc4; // Part.state
-  CYC(b_+61, b_+63); A = 0x04;
-  CYC(b_+63, b_+64); mem_wr(gb, DE, A);
-  CALL_C(b_+64, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+67);
-  CYC(b_+67, b_+69); TAIL(kingMoblinBomb_state4); // jr
+  CYC(b_+O(59), b_+OE(61)); E = 0xc4; // Part.state
+  CYC(b_+O(61), b_+OE(63)); A = 0x04;
+  CYC(b_+O(63), b_+OE(64)); mem_wr(gb, DE, A);
+  CALL_C(b_+O(64), objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+OE(67));
+  CYC(b_+O(67), b_+OE(69)); TAIL(kingMoblinBomb_state4); // jr
 }
 
 void kingMoblinBomb_state3_hook(GB *gb) {

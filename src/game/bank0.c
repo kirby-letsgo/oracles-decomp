@@ -3159,6 +3159,8 @@ static void bank_push(GB *gb, uint16_t a, uint8_t bank) {
   CYC(a + 7, a + 10); mem_wr(gb, MBC_ROM_BANK, A);
 }
 
+static void switch_bank(GB *gb, uint16_t a, uint8_t bank);
+
 static void bank_pop(GB *gb, uint16_t a) {
   CYC(a, a + 1); SET_AF(pop_effect(gb));
   CYC(a + 1, a + 3); H8(hRomBank) = A;
@@ -6763,10 +6765,15 @@ void loadScreenMusic_hook(GB *gb) {
 
 void applyWarpDest_hook(GB *gb) {
   BASE(applyWarpDest);
-  bank_push(gb, b_+0, 0x04);
-  CALL_ROM(b_+10, ROM_b04_applyWarpDest_b04);
-  bank_pop(gb, b_+13);
-  CYC(b_+19, b_+20);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  bank_push(gb, b_+O(0), 0x04);
+  CALL_ROM(b_+O(10), ROM_b04_applyWarpDest_b04);
+  if (game_seasons) {
+    switch_bank(gb, b_+S(13), 0x01);
+    CALL_C(b_+S(20), checkUpdateDungeonMinimap_hook, SYM(checkUpdateDungeonMinimap), b_+S(23));
+  }
+  bank_pop(gb, b_+O(13));
+  CYC(b_+O(19), b_+OE(20));
   ret_effect(gb);
 }
 
@@ -11839,37 +11846,37 @@ void scriptCmd_asmCallWithParam_hook(GB *gb) {
 
 void scriptCmd_loadScript_hook(GB *gb) {
   BASE(scriptCmd_loadScript);
-  CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
+  CYC(b_+O(0), b_+OE(1)); SET_HL(pop_effect(gb));
   SET_HL(HL + 1);
-  CYC(b_+1, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(1), b_+OE(3)); A = mem_rd(gb, HL); SET_HL(HL + 1);
   E = A;
-  CYC(b_+3, b_+5); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  C = A;
-  if (!game_seasons) { CYC(b_+5, b_+8); H8(hScriptAddressL) = A; }
-  CYC(b_+8, b_+9); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  B = A;
-  if (!game_seasons) { CYC(b_+9, b_+12); H8(hScriptAddressH) = A; }
-  CYC(b_+12, b_+14); A = H8(hRomBank);
-  CYC(b_+14, b_+15); push_effect(gb, AF);
+  CYC(b_+O(3), b_+OE(5)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(5), b_+OE(6)); C = A;
+  if (!game_seasons) { CYC(b_+6, b_+8); H8(hScriptAddressL) = A; }
+  CYC(b_+O(8), b_+OE(9)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(9), b_+OE(10)); B = A;
+  if (!game_seasons) { CYC(b_+10, b_+12); H8(hScriptAddressH) = A; }
+  CYC(b_+O(12), b_+OE(14)); A = H8(hRomBank);
+  CYC(b_+O(14), b_+OE(15)); push_effect(gb, AF);
   A = E;
-  CYC(b_+15, b_+18); H8(hRomBank) = A;
-  CYC(b_+18, b_+21); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(b_+O(15), b_+OE(18)); H8(hRomBank) = A;
+  CYC(b_+O(18), b_+OE(21)); mem_wr(gb, MBC_ROM_BANK, A);
   H = B;
   L = C;
   SET_DE(wBigBuffer);
   B = 0x00;
-  CYC(b_+21, b_+31);
+  CYC(b_+O(21), b_+OE(31));
   copyMemory(gb, DE, HL, 256);
   SET_HL(HL + 256);
   SET_DE(DE + 256);
-  CYC(b_+31, b_+32); SET_AF(pop_effect(gb));
-  CYC(b_+32, b_+34); H8(hRomBank) = A;
-  CYC(b_+34, b_+37); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+37, b_+39); A = H8(hActiveObject);
+  CYC(b_+O(31), b_+OE(32)); SET_AF(pop_effect(gb));
+  CYC(b_+O(32), b_+OE(34)); H8(hRomBank) = A;
+  CYC(b_+O(34), b_+OE(37)); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(b_+O(37), b_+OE(39)); A = H8(hActiveObject);
   D = A;
   SET_HL(wBigBuffer);
   alu_scf(gb);
-  CYC(b_+39, b_+45);
+  CYC(b_+O(39), b_+OE(45));
   ret_effect(gb);
 }
 

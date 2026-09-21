@@ -154,7 +154,7 @@ void giveTreasure_body__giveTreasure_hook(GB *gb) {
   CYC(b_+95, b_+96); A = mem_rd(gb, HL);
   CYC(b_+96, b_+98); alu_and(gb, 0x0f);
   CYC(b_+98, b_+99); push_effect(gb, HL);
-  CALL_C(b_+99, giveTreasure_body__applyParameter_hook, b_+128, b_+102);
+  CALL_C(b_+99, giveTreasure_body__applyParameter_hook, SYM(giveTreasure_body__applyParameter), b_+102);
   CYC(b_+102, b_+103); SET_HL(pop_effect(gb));
   CYC(b_+103, b_+105); alu_bit(gb, 7, mem_rd(gb, HL));
   CYC(b_+105, b_+106); SET_HL(HL + 1);
