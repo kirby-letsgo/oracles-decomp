@@ -161,7 +161,7 @@ void applyRoomSpecificTileChangesAfterGfxLoad_hook(GB *gb) {
     else if (jt_ == SYM(roomTileChangesAfterLoad08) && hook_enabled_at(gb, SYM(roomTileChangesAfterLoad08))) { roomTileChangesAfterLoad08_hook(gb); return; }
     else if (jt_ == SYM(roomTileChangesAfterLoad09) && hook_enabled_at(gb, SYM(roomTileChangesAfterLoad09))) { roomTileChangesAfterLoad09_hook(gb); return; }
     else if (jt_ == SYM(roomTileChangesAfterLoad0a) && hook_enabled_at(gb, SYM(roomTileChangesAfterLoad0a))) { roomTileChangesAfterLoad0a_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 

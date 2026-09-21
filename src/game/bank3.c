@@ -199,7 +199,7 @@ void secretFunctionCaller_body_hook(GB *gb) {
     else if (jt_ == SYM(verifyUnpackedSecretGameID)) { verifyUnpackedSecretGameID_hook(gb); break; }
     else if (jt_ == SYM(generateGameIDIfNeeded)) { generateGameIDIfNeeded_hook(gb); break; }
     else if (jt_ == SYM(loadUnpackedSecretData)) { loadUnpackedSecretData_hook(gb); break; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
   CYC(b_+11, b_+12); SET_AF(pop_effect(gb));
   CYC(b_+12, b_+14); hram_wr(gb, 0x70, A);
@@ -490,7 +490,7 @@ void loadUnpackedSecretData_hook(GB *gb) {
     if (jt_ == b_+12) { loadUnpackedSecretData__type0_hook(gb); return; }
     else if (jt_ == b_+44) { loadUnpackedSecretData__type3_hook(gb); return; }
     else if (jt_ == b_+45) { loadUnpackedSecretData__type2_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 

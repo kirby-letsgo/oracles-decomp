@@ -1009,6 +1009,7 @@ void endgameCutsceneHandler_0a_hook(GB *gb) {
 
 void endgameCutsceneHandler_0a__runStates_hook(GB *gb) {
   BASE(endgameCutsceneHandler_0a);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+6, b_+9); SET_DE(wGenericCutscene_cbc1);
   CYC(b_+9, b_+10); A = mem_rd(gb, DE);
   CYC(b_+10, b_+11); push_effect(gb, b_+11);
@@ -1017,12 +1018,13 @@ void endgameCutsceneHandler_0a__runStates_hook(GB *gb) {
     else if (jt_ == b_+120) { endgameCutsceneHandler_0a__state1_hook(gb); return; }
     else if (jt_ == b_+453) { endgameCutsceneHandler_0a__state2_hook(gb); return; }
     else if (jt_ == b_+461) { endgameCutsceneHandler_0a__state3_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
 void endgameCutsceneHandler_0a__state0_hook(GB *gb) {
   BASE(endgameCutsceneHandler_0a);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+19, b_+22); SET_DE(wGenericCutscene_cbc2);
   CYC(b_+22, b_+23); A = mem_rd(gb, DE);
   CYC(b_+23, b_+24); push_effect(gb, b_+24);
@@ -1030,12 +1032,13 @@ void endgameCutsceneHandler_0a__state0_hook(GB *gb) {
     if (jt_ == b_+30) { endgameCutsceneHandler_0a__state0__substate0_hook(gb); return; }
     else if (jt_ == b_+61) { endgameCutsceneHandler_0a__state0__substate1_hook(gb); return; }
     else if (jt_ == b_+89) { endgameCutsceneHandler_0a__state0__substate2_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
 void endgameCutsceneHandler_0a__state1_hook(GB *gb) {
   BASE(endgameCutsceneHandler_0a);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+120, b_+123); SET_DE(wGenericCutscene_cbc2);
   CYC(b_+123, b_+124); A = mem_rd(gb, DE);
   CYC(b_+124, b_+125); push_effect(gb, b_+125);
@@ -1045,7 +1048,7 @@ void endgameCutsceneHandler_0a__state1_hook(GB *gb) {
     else if (jt_ == b_+309) { endgameCutsceneHandler_0a__state1__substate2_hook(gb); return; }
     else if (jt_ == b_+377) { endgameCutsceneHandler_0a__state1__substate3_hook(gb); return; }
     else if (jt_ == b_+403) { endgameCutsceneHandler_0a__state1__substate4_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -2563,13 +2566,14 @@ void endgameCutsceneHandler_20__state16_hook(GB *gb) {
 
 void endgameCutsceneHandler_0f_hook(GB *gb) {
   BASE(endgameCutsceneHandler_0f);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_DE(wGenericCutscene_cbc1);
   CYC(b_+3, b_+4); A = mem_rd(gb, DE);
   CYC(b_+4, b_+5); push_effect(gb, b_+5);
   do { uint16_t jt_ = (endgame_jump_table(gb));
     if (jt_ == b_+9) { endgameCutsceneHandler_0f__state0_hook(gb); return; }
     else if (jt_ == b_+346) { endgameCutsceneHandler_0f__state1_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -2583,6 +2587,7 @@ void endgameCutsceneHandler_0f__state0_hook(GB *gb) {
 
 void endgameCutsceneHandler_0f__state0__runSubstates_hook(GB *gb) {
   BASE(endgameCutsceneHandler_0f);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+18, b_+21); SET_DE(wGenericCutscene_cbc2);
   CYC(b_+21, b_+22); A = mem_rd(gb, DE);
   CYC(b_+22, b_+23); push_effect(gb, b_+23);
@@ -2601,7 +2606,7 @@ void endgameCutsceneHandler_0f__state0__runSubstates_hook(GB *gb) {
     else if (jt_ == b_+270) { endgameCutsceneHandler_0f__state0__substateB_hook(gb); return; }
     else if (jt_ == b_+296) { endgameCutsceneHandler_0f__state0__substateC_hook(gb); return; }
     else if (jt_ == b_+314) { endgameCutsceneHandler_0f__state0__substateD_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -2640,6 +2645,7 @@ void endgameCutsceneHandler_0f__state1_hook(GB *gb) {
 
 void endgameCutsceneHandler_0f__state1__runSubstates_hook(GB *gb) {
   BASE(endgameCutsceneHandler_0f);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+355, b_+358); SET_DE(wGenericCutscene_cbc2);
   CYC(b_+358, b_+359); A = mem_rd(gb, DE);
   CYC(b_+359, b_+360); push_effect(gb, b_+360);
@@ -2655,7 +2661,7 @@ void endgameCutsceneHandler_0f__state1__runSubstates_hook(GB *gb) {
     else if (jt_ == b_+571) { endgameCutsceneHandler_0f__state1__substate8_hook(gb); return; }
     else if (jt_ == b_+616) { endgameCutsceneHandler_0f__state1__substate9_hook(gb); return; }
     else if (jt_ == b_+636) { endgameCutsceneHandler_0f__state1__substateA_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -2689,13 +2695,14 @@ void endgameCutsceneHandler_0f__state1__substate0_hook(GB *gb) {
 
 void endgameCutsceneHandler_09_hook(GB *gb) {
   BASE(endgameCutsceneHandler_09);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_DE(wGenericCutscene_cbc1);
   CYC(b_+3, b_+4); A = mem_rd(gb, DE);
   CYC(b_+4, b_+5); push_effect(gb, b_+5);
   do { uint16_t jt_ = (endgame_jump_table(gb));
     if (jt_ == SYM(endgameCutsceneHandler_09_stage0) && hook_enabled_at(gb, SYM(endgameCutsceneHandler_09_stage0))) { endgameCutsceneHandler_09_stage0_hook(gb); return; }
     else if (jt_ == SYM(endgameCutsceneHandler_09_stage1) && hook_enabled_at(gb, SYM(endgameCutsceneHandler_09_stage1))) { endgameCutsceneHandler_09_stage1_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -2709,6 +2716,7 @@ void endgameCutsceneHandler_09_stage0_hook(GB *gb) {
 
 void endgameCutsceneHandler_09_stage0__runStates_hook(GB *gb) {
   BASE(endgameCutsceneHandler_09_stage0);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+9, b_+12); SET_DE(wGenericCutscene_cbc2);
   CYC(b_+12, b_+13); A = mem_rd(gb, DE);
   CYC(b_+13, b_+14); push_effect(gb, b_+14);
@@ -2735,12 +2743,13 @@ void endgameCutsceneHandler_09_stage0__runStates_hook(GB *gb) {
     else if (jt_ == b_+603) { endgameCutsceneHandler_09_stage0__state13_hook(gb); return; }
     else if (jt_ == b_+621) { endgameCutsceneHandler_09_stage0__state14_hook(gb); return; }
     else if (jt_ == b_+639) { endgameCutsceneHandler_09_stage0__state15_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
 void endgameCutsceneHandler_09_stage1__runStates_hook(GB *gb) {
   BASE(endgameCutsceneHandler_09_stage1);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+6, b_+9); SET_DE(wGenericCutscene_cbc2);
   CYC(b_+9, b_+10); A = mem_rd(gb, DE);
   CYC(b_+10, b_+11); push_effect(gb, b_+11);
@@ -2755,6 +2764,6 @@ void endgameCutsceneHandler_09_stage1__runStates_hook(GB *gb) {
     else if (jt_ == b_+219) { endgameCutsceneHandler_09_stage1__state7_hook(gb); return; }
     else if (jt_ == b_+242) { endgameCutsceneHandler_09_stage1__state8_hook(gb); return; }
     else if (jt_ == b_+328) { endgameCutsceneHandler_09_stage1__state9_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }

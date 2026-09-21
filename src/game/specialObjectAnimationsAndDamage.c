@@ -346,6 +346,7 @@ void specialObjectAnimate_optimized_hook(GB *gb) {
 
 void fake_specialObjectLoadAnimationFrameToBuffer_hook(GB *gb) {
   BASE(fake_specialObjectLoadAnimationFrameToBuffer);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(w1Companion_visible);
   CYC(b_+3, b_+5); alu_bit(gb, 7, mem_rd(gb, HL));
   if (F & FZ) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
@@ -360,7 +361,7 @@ void fake_specialObjectLoadAnimationFrameToBuffer_hook(GB *gb) {
   CYC(b_+16, b_+17); L = A;
   CYC(b_+17, b_+20); SET_DE(w1WeaponItem_counter1);
   CYC(b_+20, b_+23);
-  hook_handoff(gb, (SYM(func_3ee4) + 51));
+  HANDOFF((SYM(func_3ee4) + 51));
 }
 
 void linkUpdateDamageToApplyForRings_hook(GB *gb) {

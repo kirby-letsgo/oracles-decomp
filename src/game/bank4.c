@@ -231,6 +231,7 @@ static void applyWarpDest_finish(GB *gb) {
 
 void vblankRunBank4Function_b04_hook(GB *gb) {
   BASE(vblankRunBank4Function_b04);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
   CYC(b_+1, b_+2); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+2, b_+4); hram_wr(gb, 0x4f, A);
@@ -243,7 +244,7 @@ void vblankRunBank4Function_b04_hook(GB *gb) {
   CYC(b_+12, b_+13); L = alu_inc8(gb, L);
   CYC(b_+13, b_+14); C = L;
   CYC(b_+14, b_+15); L = A;
-  CYC(b_+15, b_+16); hook_handoff(gb, HL);
+  CYC(b_+15, b_+16); HANDOFF(HL);
 }
 
 void label_04_033_hook(GB *gb) {

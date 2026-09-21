@@ -524,10 +524,11 @@ static void swap_de_hl_memory(GB *gb) {
 
 void functionCaller_b02_hook(GB *gb) {
   BASE(functionCaller_b02);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); C = L;
   CYC(b_+1, b_+2); A = H;
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
-  hook_handoff(gb, function_caller_jump_table(gb));
+  HANDOFF(function_caller_jump_table(gb));
 }
 
 void addRoomToEnemiesKilledList_b02_hook(GB *gb) {
@@ -1962,6 +1963,7 @@ got_icon:
 
 void getMinimapPopupType_hook(GB *gb) {
   BASE(getMinimapPopupType);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); alu_and(gb, 0x0f);
   CYC(b_+2, b_+3); E = A;
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
@@ -1978,7 +1980,7 @@ void getMinimapPopupType_hook(GB *gb) {
     else if (jt_ == SYM(minimapPopupType_vasuOrSyrup) && hook_enabled_at(gb, SYM(minimapPopupType_vasuOrSyrup))) { minimapPopupType_vasuOrSyrup_hook(gb); return; }
     else if (jt_ == SYM(minimapPopupType_blackTower) && hook_enabled_at(gb, SYM(minimapPopupType_blackTower))) { minimapPopupType_blackTower_hook(gb); return; }
     else if (jt_ == SYM(minimapPopupType_makuTree) && hook_enabled_at(gb, SYM(minimapPopupType_makuTree))) { minimapPopupType_makuTree_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -2372,12 +2374,13 @@ void maupMenu_drawPopup_hook(GB *gb) {
 
 void dungeonMap_checkDirectionButtons_hook(GB *gb) {
   BASE(dungeonMap_checkDirectionButtons);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wSubmenuState);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == SYM(dungeonMap_scrollingState0) && hook_enabled_at(gb, SYM(dungeonMap_scrollingState0))) { dungeonMap_scrollingState0_hook(gb); return; }
     else if (jt_ == SYM(dungeonMap_scrollingState1) && hook_enabled_at(gb, SYM(dungeonMap_scrollingState1))) { dungeonMap_scrollingState1_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -2705,6 +2708,7 @@ void mapMenu_performTileSubstitutions_hook(GB *gb) {
 
 void runGaleSeedMenu__runState_hook(GB *gb) {
   BASE(runGaleSeedMenu);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+9, b_+12); A = W8(wMenuActiveState);
   CYC(b_+12, b_+13); push_effect(gb, b_+13);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
@@ -2712,7 +2716,7 @@ void runGaleSeedMenu__runState_hook(GB *gb) {
     else if (jt_ == SYM(galeSeedMenu_state1) && hook_enabled_at(gb, SYM(galeSeedMenu_state1))) { galeSeedMenu_state1_hook(gb); return; }
     else if (jt_ == SYM(galeSeedMenu_state2) && hook_enabled_at(gb, SYM(galeSeedMenu_state2))) { galeSeedMenu_state2_hook(gb); return; }
     else if (jt_ == SYM(galeSeedMenu_state3) && hook_enabled_at(gb, SYM(galeSeedMenu_state3))) { galeSeedMenu_state3_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -2875,7 +2879,7 @@ void runMapMenu_hook(GB *gb) {
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == SYM(mapMenu_state0) && hook_enabled_at(gb, SYM(mapMenu_state0))) { mapMenu_state0_hook(gb); return; }
     else if (jt_ == SYM(mapMenu_state1) && hook_enabled_at(gb, SYM(mapMenu_state1))) { mapMenu_state1_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -3199,7 +3203,7 @@ void mapGetRoomText_hook(GB *gb) {
     else if (jt_ == b_+81) { mapGetRoomText__specialCode2_hook(gb); return; }
     else if (jt_ == b_+89) { mapGetRoomText__specialCode3_hook(gb); return; }
     else if (jt_ == b_+98) { mapGetRoomText__specialCode4_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -3397,13 +3401,14 @@ void fileSelectMode2_hook(GB *gb) {
 
 void fileSelectMode2__func_hook(GB *gb) {
   BASE(fileSelectMode2);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+6, b_+9); A = W8(wFileSelect_mode2);
   CYC(b_+9, b_+10); push_effect(gb, b_+10);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == b_+16) { fileSelectMode2__mode0_hook(gb); return; }
     else if (jt_ == b_+26) { fileSelectMode2__mode2_hook(gb); return; }
-    else if (jt_ == SYM(runTextInput)) { hook_handoff(gb, HL); return; }
-    else { hook_handoff(gb, HL); return; }
+    else if (jt_ == SYM(runTextInput)) { HANDOFF(HL); }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -3442,13 +3447,14 @@ void runKidNameEntryMenu_hook(GB *gb) {
 
 void runKidNameEntryMenu__func_hook(GB *gb) {
   BASE(runKidNameEntryMenu);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+9, b_+12); A = W8(wFileSelect_mode2);
   CYC(b_+12, b_+13); push_effect(gb, b_+13);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == b_+19) { runKidNameEntryMenu__mode0_hook(gb); return; }
     else if (jt_ == b_+32) { runKidNameEntryMenu__mode1_hook(gb); return; }
     else if (jt_ == b_+40) { runKidNameEntryMenu__mode2_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -3464,11 +3470,12 @@ void runKidNameEntryMenu__mode0_hook(GB *gb) {
 
 void runKidNameEntryMenu__mode1_hook(GB *gb) {
   BASE(runKidNameEntryMenu);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+32, b_+35); A = W8(wPaletteThread_mode);
   CYC(b_+35, b_+36); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+36, b_+37); ret_effect(gb); return; }
   CYC(b_+36, b_+37);
-  CYC(b_+37, b_+40); hook_handoff(gb, SYM(runTextInput));
+  CYC(b_+37, b_+40); HANDOFF(SYM(runTextInput));
 }
 
 void runKidNameEntryMenu__mode2_hook(GB *gb) {
@@ -3501,6 +3508,7 @@ void runSecretEntryMenu_hook(GB *gb) {
 
 void runSecretEntryMenu__func_hook(GB *gb) {
   BASE(runSecretEntryMenu);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+9, b_+12); A = W8(wFileSelect_mode2);
   CYC(b_+12, b_+13); push_effect(gb, b_+13);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
@@ -3508,8 +3516,8 @@ void runSecretEntryMenu__func_hook(GB *gb) {
     else if (jt_ == b_+34) { runSecretEntryMenu__mode1_hook(gb); return; }
     else if (jt_ == b_+42) { runSecretEntryMenu__mode2_hook(gb); return; }
     else if (jt_ == SYM(closeMenu) && hook_enabled_at(gb, SYM(closeMenu))) { closeMenu_hook(gb); return; }
-    else if (jt_ == SYM(textInput_waitForInput)) { hook_handoff(gb, HL); return; }
-    else { hook_handoff(gb, HL); return; }
+    else if (jt_ == SYM(textInput_waitForInput)) { HANDOFF(HL); }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -3524,11 +3532,12 @@ void runSecretEntryMenu__mode0_hook(GB *gb) {
 
 void runSecretEntryMenu__mode1_hook(GB *gb) {
   BASE(runSecretEntryMenu);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+34, b_+37); A = W8(wPaletteThread_mode);
   CYC(b_+37, b_+38); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+38, b_+39); ret_effect(gb); return; }
   CYC(b_+38, b_+39);
-  CYC(b_+39, b_+42); hook_handoff(gb, SYM(runTextInput));
+  CYC(b_+39, b_+42); HANDOFF(SYM(runTextInput));
 }
 
 void runSecretEntryMenu__mode2_hook(GB *gb) {
@@ -3610,6 +3619,7 @@ void fileSelectMode4_hook(GB *gb) {
 
 void fileSelectMode4__mode4Update_hook(GB *gb) {
   BASE(fileSelectMode4);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+9, b_+12); A = W8(wFileSelect_mode2);
   CYC(b_+12, b_+13); push_effect(gb, b_+13);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
@@ -3617,7 +3627,7 @@ void fileSelectMode4__mode4Update_hook(GB *gb) {
     else if (jt_ == b_+54) { fileSelectMode4__mode1_hook(gb); return; }
     else if (jt_ == b_+76) { fileSelectMode4__mode2_hook(gb); return; }
     else if (jt_ == b_+106) { fileSelectMode4__mode3_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -3867,7 +3877,7 @@ void runTextInput_hook(GB *gb) {
     else if (jt_ == b_+190) { runTextInput__leftButton_hook(gb); return; }
     else if (jt_ == b_+240) { runTextInput__upButton_hook(gb); return; }
     else if (jt_ == b_+244) { runTextInput__downButton_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -3946,24 +3956,26 @@ void runTextInput__lowerOptions_hook(GB *gb) {
 
 void runTextInput__nameTable_hook(GB *gb) {
   BASE(runTextInput);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+126, b_+127); push_effect(gb, b_+127);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == b_+147) { runTextInput__selectionLeft_hook(gb); return; }
     else if (jt_ == b_+103) { runTextInput__selectionRight_hook(gb); return; }
     else if (jt_ == b_+271) { runTextInput__startButton_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
 void runTextInput__secretTable_hook(GB *gb) {
   BASE(runTextInput);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+133, b_+134); push_effect(gb, b_+134);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == b_+147) { runTextInput__selectionLeft_hook(gb); return; }
     else if (jt_ == b_+103) { runTextInput__selectionRight_hook(gb); return; }
     else if (jt_ == b_+160) { runTextInput__back_hook(gb); return; }
     else if (jt_ == b_+271) { runTextInput__startButton_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -5521,12 +5533,13 @@ void runInventoryMenu_hook(GB *gb) {
 
 void runInventoryMenu__inventoryMenuStates_hook(GB *gb) {
   BASE(runInventoryMenu);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+23, b_+26); A = W8(wMenuActiveState);
   CYC(b_+26, b_+27); push_effect(gb, b_+27);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == SYM(inventoryMenuState0) && hook_enabled_at(gb, SYM(inventoryMenuState0))) { inventoryMenuState0_hook(gb); return; }
     else if (jt_ == SYM(inventoryMenuState1) && hook_enabled_at(gb, SYM(inventoryMenuState1))) { inventoryMenuState1_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -5624,7 +5637,7 @@ void func_02_55b2_hook(GB *gb) {
     if (jt_ == b_+26) { func_02_55b2__subScreen0_hook(gb); func_02_55a8_hook(gb); return; }
     else if (jt_ == b_+39) { func_02_55b2__subScreen1_hook(gb); func_02_55a8_hook(gb); return; }
     else if (jt_ == b_+47) { func_02_55b2__subScreen2_hook(gb); func_02_55a8_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -5656,6 +5669,7 @@ void func_02_55b2__subScreen2_hook(GB *gb) {
 
 void inventoryMenuState1_hook(GB *gb) {
   BASE(inventoryMenuState1);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = W8(wPaletteThread_mode);
   CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
@@ -5674,7 +5688,7 @@ void inventoryMenuState1_hook(GB *gb) {
     if (jt_ == b_+36) { inventoryMenuState1__subscreen0_hook(gb); return; }
     else if (jt_ == b_+217) { inventoryMenuState1__subscreen1_hook(gb); return; }
     else if (jt_ == b_+274) { inventoryMenuState1__subscreen2_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -5939,13 +5953,14 @@ void runRingMenu_hook(GB *gb) {
 
 void runRingMenu__runStateCode_hook(GB *gb) {
   BASE(runRingMenu);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+27, b_+30); A = W8(wMenuActiveState);
   CYC(b_+30, b_+31); push_effect(gb, b_+31);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == SYM(ringMenu_state0) && hook_enabled_at(gb, SYM(ringMenu_state0))) { ringMenu_state0_hook(gb); return; }
     else if (jt_ == SYM(ringMenu_state1) && hook_enabled_at(gb, SYM(ringMenu_state1))) { ringMenu_state1_hook(gb); return; }
     else if (jt_ == SYM(ringMenu_state2) && hook_enabled_at(gb, SYM(ringMenu_state2))) { ringMenu_state2_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -6001,7 +6016,7 @@ void ringMenu_redrawRingListOrUnappraisedRings_hook(GB *gb) {
   CYC(b_+11, b_+12); push_effect(gb, b_+12);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == SYM(ringMenu_drawRingBox)) { ringMenu_drawRingBox_hook(gb); ringMenu_copyTilemapToVram_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -6031,6 +6046,7 @@ void ringMenu_drawRingBox_hook(GB *gb) {
 
 void ringMenu_state1_hook(GB *gb) {
   BASE(ringMenu_state1);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = W8(wPaletteThread_mode);
   CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
@@ -6040,7 +6056,7 @@ void ringMenu_state1_hook(GB *gb) {
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == SYM(ringMenu_state1_unappraisedRings) && hook_enabled_at(gb, SYM(ringMenu_state1_unappraisedRings))) { ringMenu_state1_unappraisedRings_hook(gb); return; }
     else if (jt_ == SYM(ringMenu_state1_ringList) && hook_enabled_at(gb, SYM(ringMenu_state1_ringList))) { ringMenu_state1_ringList_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -6057,7 +6073,7 @@ void ringMenu_state1_unappraisedRings_hook(GB *gb) {
     else if (jt_ == SYM(ringMenu_unappraisedRings_state3) && hook_enabled_at(gb, SYM(ringMenu_unappraisedRings_state3))) { ringMenu_unappraisedRings_state3_hook(gb); return; }
     else if (jt_ == SYM(ringMenu_unappraisedRings_state4) && hook_enabled_at(gb, SYM(ringMenu_unappraisedRings_state4))) { ringMenu_unappraisedRings_state4_hook(gb); return; }
     else if (jt_ == SYM(ringMenu_unappraisedRings_state5) && hook_enabled_at(gb, SYM(ringMenu_unappraisedRings_state5))) { ringMenu_unappraisedRings_state5_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -6315,13 +6331,14 @@ void runSecretListMenu_hook(GB *gb) {
 
 void runSecretListMenu__runState_hook(GB *gb) {
   BASE(runSecretListMenu);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+13, b_+16); A = W8(wSecretListMenu_state);
   CYC(b_+16, b_+17); push_effect(gb, b_+17);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == SYM(secretListMenu_state0) && hook_enabled_at(gb, SYM(secretListMenu_state0))) { secretListMenu_state0_hook(gb); return; }
     else if (jt_ == SYM(secretListMenu_state1) && hook_enabled_at(gb, SYM(secretListMenu_state1))) { secretListMenu_state1_hook(gb); return; }
     else if (jt_ == SYM(secretListMenu_state2) && hook_enabled_at(gb, SYM(secretListMenu_state2))) { secretListMenu_state2_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -6524,13 +6541,14 @@ void secretListMenu_printSecret__end_hook(GB *gb) {
 
 void secretListMenu_printSecret__getSecretText_hook(GB *gb) {
   BASE(secretListMenu_printSecret);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+69, b_+70); A = B;
   CYC(b_+70, b_+71); push_effect(gb, b_+71);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == b_+79) { secretListMenu_printSecret__val0_hook(gb); return; }
     else if (jt_ == b_+87) { secretListMenu_printSecret__val2_hook(gb); return; }
     else if (jt_ == b_+93) { secretListMenu_printSecret__val3_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -6649,7 +6667,7 @@ void ringMenu_state1_ringList_hook(GB *gb) {
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == SYM(ringMenu_ringList_substate0) && hook_enabled_at(gb, SYM(ringMenu_ringList_substate0))) { ringMenu_ringList_substate0_hook(gb); return; }
     else if (jt_ == SYM(ringMenu_ringList_substate1) && hook_enabled_at(gb, SYM(ringMenu_ringList_substate1))) { ringMenu_ringList_substate1_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -6931,7 +6949,7 @@ dispatch:
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == b_+20) { ringMenu_state2__substate0_hook(gb); return; }
     else if (jt_ == b_+65) { ringMenu_state2__substate1_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -7527,13 +7545,14 @@ void runSaveAndQuitMenu_hook(GB *gb) {
 
 void runSaveAndQuitMenu__runState_hook(GB *gb) {
   BASE(runSaveAndQuitMenu);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+10, b_+13); A = W8(wSaveQuitMenu_state);
   CYC(b_+13, b_+14); push_effect(gb, b_+14);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == SYM(saveQuitMenu_state0) && hook_enabled_at(gb, SYM(saveQuitMenu_state0))) { saveQuitMenu_state0_hook(gb); return; }
     else if (jt_ == SYM(saveQuitMenu_state1) && hook_enabled_at(gb, SYM(saveQuitMenu_state1))) { saveQuitMenu_state1_hook(gb); return; }
     else if (jt_ == SYM(saveQuitMenu_state2) && hook_enabled_at(gb, SYM(saveQuitMenu_state2))) { saveQuitMenu_state2_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -7762,6 +7781,7 @@ void fileSelectMode7_hook(GB *gb) {
 
 void fileSelectMode7__mode7States_hook(GB *gb) {
   BASE(fileSelectMode7);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+18, b_+21); A = W8(wFileSelect_mode2);
   CYC(b_+21, b_+22); push_effect(gb, b_+22);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
@@ -7772,7 +7792,7 @@ void fileSelectMode7__mode7States_hook(GB *gb) {
     else if (jt_ == b_+331) { fileSelectMode7__state4_hook(gb); return; }
     else if (jt_ == b_+385) { fileSelectMode7__state5_hook(gb); return; }
     else if (jt_ == b_+405) { fileSelectMode7__state6_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -8048,12 +8068,13 @@ void fileSelectMode7__state6_hook(GB *gb) {
 
 void runFakeReset_hook(GB *gb) {
   BASE(runFakeReset);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = W8(wFakeResetMenu_state);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == b_+8) { runFakeReset__state0_hook(gb); return; }
     else if (jt_ == b_+51) { runFakeReset__state1_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -8235,12 +8256,13 @@ void fileSelectMode5_hook(GB *gb) {
 
 void fileSelectMode5__mode5States_hook(GB *gb) {
   BASE(fileSelectMode5);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+6, b_+9); A = W8(wFileSelect_mode2);
   CYC(b_+9, b_+10); push_effect(gb, b_+10);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == b_+14) { fileSelectMode5__state0_hook(gb); return; }
     else if (jt_ == b_+42) { fileSelectMode5__state1_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -8311,6 +8333,7 @@ void fileSelectMode3_hook(GB *gb) {
 
 void fileSelectMode3__mode3Update_hook(GB *gb) {
   BASE(fileSelectMode3);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+6, b_+9); A = W8(wFileSelect_mode2);
   CYC(b_+9, b_+10); push_effect(gb, b_+10);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
@@ -8318,7 +8341,7 @@ void fileSelectMode3__mode3Update_hook(GB *gb) {
     else if (jt_ == b_+48) { fileSelectMode3__mode1_hook(gb); return; }
     else if (jt_ == b_+110) { fileSelectMode3__mode2_hook(gb); return; }
     else if (jt_ == b_+141) { fileSelectMode3__mode3_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -8471,13 +8494,14 @@ void inventoryMenuState2_hook(GB *gb) {
 
 void inventoryMenuState2__subStates_hook(GB *gb) {
   BASE(inventoryMenuState2);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+6, b_+9); A = W8(wSubmenuState);
   CYC(b_+9, b_+10); push_effect(gb, b_+10);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == b_+16) { inventoryMenuState2__subState0_hook(gb); return; }
     else if (jt_ == b_+85) { inventoryMenuState2__subState1_hook(gb); return; }
     else if (jt_ == b_+107) { inventoryMenuState2__subState2_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -8639,13 +8663,14 @@ rectangle:
 
 void inventoryMenuState3_hook(GB *gb) {
   BASE(inventoryMenuState3);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = W8(wSubmenuState);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == b_+10) { inventoryMenuState3__subState0_hook(gb); return; }
     else if (jt_ == b_+46) { inventoryMenuState3__subState1_hook(gb); return; }
     else if (jt_ == b_+70) { inventoryMenuState3__subState2_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -9990,13 +10015,14 @@ void fileSelectMode6_hook(GB *gb) {
 
 void fileSelectMode6__updateMode6_hook(GB *gb) {
   BASE(fileSelectMode6);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+6, b_+9); A = W8(wFileSelect_mode2);
   CYC(b_+9, b_+10); push_effect(gb, b_+10);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == b_+20) { fileSelectMode6__mode0_hook(gb); return; }
     else if (jt_ == b_+27) { fileSelectMode6__mode2_hook(gb); return; }
     else if (jt_ == SYM(textInput_waitForInput) && hook_enabled_at(gb, SYM(textInput_waitForInput))) { textInput_waitForInput_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -10039,7 +10065,7 @@ void fileSelectMode6__mode2_hook(GB *gb) {
   CYC(b_+63, b_+66); SET_BC(0x0400);
   CALL_C(b_+66, secretFunctionCaller_hook, SYM(secretFunctionCaller), b_+69);
   CALL_C(b_+69, initializeFile_b00_hook, SYM(initializeFile_b00), b_+72);
-  CYC(b_+72, b_+75); hook_handoff(gb, SYM(setFileSelectModeTo1));
+  CYC(b_+72, b_+75); HANDOFF(SYM(setFileSelectModeTo1));
 }
 
 void b2_updateMenus_hook(GB *gb) {
@@ -10100,6 +10126,7 @@ open_menu:
 
 void b2_updateMenus__updateMenu_hook(GB *gb) {
   BASE(b2_updateMenus);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+74, b_+76); A = 0xff;
   CYC(b_+76, b_+79); mem_wr(gb, wc4b6, A);
   CYC(b_+79, b_+82); A = W8(wMenuLoadState);
@@ -10109,16 +10136,17 @@ void b2_updateMenus__updateMenu_hook(GB *gb) {
     else if (jt_ == SYM(menuSpecificCode) && hook_enabled_at(gb, SYM(menuSpecificCode))) { menuSpecificCode_hook(gb); return; }
     else if (jt_ == SYM(menuStateFadeOutOfMenu) && hook_enabled_at(gb, SYM(menuStateFadeOutOfMenu))) { menuStateFadeOutOfMenu_hook(gb); return; }
     else if (jt_ == SYM(menuStateFadeIntoGame) && hook_enabled_at(gb, SYM(menuStateFadeIntoGame))) { menuStateFadeIntoGame_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
 void menuSpecificCode_hook(GB *gb) {
   BASE(menuSpecificCode);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = W8(wOpenedMenuType);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(runSaveAndQuitMenu) || jt_ == SYM(runSecretListMenu)) { hook_handoff(gb, HL); return; }
+    if (jt_ == SYM(runSaveAndQuitMenu) || jt_ == SYM(runSecretListMenu)) { HANDOFF(HL); }
     else if (jt_ == SYM(runInventoryMenu) && hook_enabled_at(gb, SYM(runInventoryMenu))) { runInventoryMenu_hook(gb); return; }
     else if (jt_ == SYM(runMapMenu) && hook_enabled_at(gb, SYM(runMapMenu))) { runMapMenu_hook(gb); return; }
     else if (jt_ == SYM(runRingMenu) && hook_enabled_at(gb, SYM(runRingMenu))) { runRingMenu_hook(gb); return; }
@@ -10127,7 +10155,7 @@ void menuSpecificCode_hook(GB *gb) {
     else if (jt_ == SYM(runKidNameEntryMenu) && hook_enabled_at(gb, SYM(runKidNameEntryMenu))) { runKidNameEntryMenu_hook(gb); return; }
     else if (jt_ == SYM(runGameLinkMenu) && hook_enabled_at(gb, SYM(runGameLinkMenu))) { runGameLinkMenu_hook(gb); return; }
     else if (jt_ == SYM(runFakeReset) && hook_enabled_at(gb, SYM(runFakeReset))) { runFakeReset_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -10285,7 +10313,7 @@ void b2_fileSelectScreen_hook(GB *gb) {
     else if (jt_ == SYM(fileSelectMode5) && hook_enabled_at(gb, SYM(fileSelectMode5))) { fileSelectMode5_hook(gb); return; }
     else if (jt_ == SYM(fileSelectMode6) && hook_enabled_at(gb, SYM(fileSelectMode6))) { fileSelectMode6_hook(gb); return; }
     else if (jt_ == SYM(fileSelectMode7) && hook_enabled_at(gb, SYM(fileSelectMode7))) { fileSelectMode7_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -10322,6 +10350,7 @@ void fileSelectMode1__afterCall_hook(GB *gb) {
 
 void fileSelectMode1__subModes_hook(GB *gb) {
   BASE(fileSelectMode1);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+9, b_+12); A = W8(wFileSelect_mode2);
   CYC(b_+12, b_+13); push_effect(gb, b_+13);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
@@ -10336,9 +10365,9 @@ void fileSelectMode1__subModes_hook(GB *gb) {
       CYC(b_+210, b_+211); alu_xor(gb, A);
       CYC(b_+211, b_+214); W8(wLastSecretInputLength) = A;
       CYC(b_+214, b_+217); SET_BC(SYM(mainThreadStart));
-      CYC(b_+217, b_+220); hook_handoff(gb, SYM(restartThisThread)); return;
+      CYC(b_+217, b_+220); HANDOFF(SYM(restartThisThread));
     }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -10358,7 +10387,7 @@ void runBank2Function_hook(GB *gb) {
     else if (jt_ == SYM(openMenu_body) && hook_enabled_at(gb, SYM(openMenu_body))) { openMenu_body_hook(gb); return; }
     else if (jt_ == SYM(copyW2TilesetBgPalettesToW4PaletteData_body) && hook_enabled_at(gb, SYM(copyW2TilesetBgPalettesToW4PaletteData_body))) { copyW2TilesetBgPalettesToW4PaletteData_body_hook(gb); return; }
     else if (jt_ == SYM(copyW4PaletteDataToW2TilesetBgPalettes_body) && hook_enabled_at(gb, SYM(copyW4PaletteDataToW2TilesetBgPalettes_body))) { copyW4PaletteDataToW2TilesetBgPalettes_body_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -10440,7 +10469,7 @@ void saveQuitMenu_state2_hook(GB *gb) {
   CYC(b_+4, b_+5);
   CYC(b_+5, b_+8); A = W8(wSaveQuitMenu_cursorIndex);
   CYC(b_+8, b_+10); alu_cp(gb, 2);
-  if (F & FZ) { CYCT(b_+10, b_+13); hook_handoff(gb, SYM(resetGame)); return; }
+  if (F & FZ) { CYCT(b_+10, b_+13); HANDOFF(SYM(resetGame)); }
   CYC(b_+10, b_+13);
   CALL_C(b_+13, saveQuitMenu_checkIsGameOver_hook, SYM(saveQuitMenu_checkIsGameOver), b_+16);
   if (F & FZ) { CYCT(b_+16, b_+19); closeMenu_hook(gb); return; }
@@ -10448,7 +10477,7 @@ void saveQuitMenu_state2_hook(GB *gb) {
   CYC(b_+19, b_+21); A = 0xe8;
   CYC(b_+21, b_+24); SET_BC(SYM(mainThreadStart));
   CALL_C(b_+24, threadRestart_hook, SYM(threadRestart), b_+27);
-  CYC(b_+27, b_+30); hook_handoff(gb, SYM(stubThreadStart));
+  CYC(b_+27, b_+30); HANDOFF(SYM(stubThreadStart));
 }
 
 void fileSelect_printError_hook(GB *gb) {

@@ -59,7 +59,7 @@ found:
     else if (jt_ == b_+53) { goto interaction; }
     else if (jt_ == b_+60) { goto enemy; }
     else if (jt_ == b_+67) { goto part; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 end:
   CYC(b_+47, b_+48); A = E;

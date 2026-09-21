@@ -263,13 +263,15 @@ void asm_call(GB *gb, uint16_t target, uint16_t ret_addr) {
   if (hooklog) fprintf(stderr, "ASM< %04x mc %llu sp %04x ime %d\n", target, (unsigned long long)gb->mcycles, gb->sp, gb->ime);
 }
 
+bool hook_native;
+
 void hook_continue(GB *gb, uint16_t pc, uint16_t sp0) {
   uint16_t ret_addr = (uint16_t)(bus_read(gb, sp0) | (bus_read(gb, sp0 + 1) << 8));
   uint32_t sl0 = gb->sp_loads;
   gb->pc = pc;
   depth--;
   while (!(gb->pc == ret_addr && gb->sp == (uint16_t)(sp0 + 2)) && !gb->hung) {
-    if (gb->sp_loads != sl0 || ((uint16_t)(gb->sp - sp0) > 2 && (uint16_t)(gb->sp - sp0) < 0x8000) || (gb->sp == sp0 && depth > 24 && lookup(gb, gb->pc))) { depth++; hook_handoff(gb, gb->pc); depth--; break; }
+    if (gb->sp_loads != sl0 || ((uint16_t)(gb->sp - sp0) > 2 && (uint16_t)(gb->sp - sp0) < 0x8000) || (gb->sp == sp0 && depth > 24 && !hook_native && lookup(gb, gb->pc))) { depth++; hook_handoff(gb, gb->pc); depth--; break; }
     gb_step(gb);
   }
   depth++;

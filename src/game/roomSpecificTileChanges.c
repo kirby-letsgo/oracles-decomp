@@ -49,7 +49,7 @@ void applyRoomSpecificTileChanges_hook(GB *gb) {
   }
   CYC(b_+9, b_+10);
   CYC(b_+10, b_+11); push_effect(gb, b_+11);
-  hook_handoff(gb, room_tile_changes_jump_table(gb));
+  HANDOFF(room_tile_changes_jump_table(gb));
 }
 
 static void add_a_to_hl_from_rst(GB *gb, uint16_t return_address) {

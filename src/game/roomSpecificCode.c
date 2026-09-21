@@ -36,7 +36,7 @@ void runRoomSpecificCode_hook(GB *gb) {
   }
   CYC(b_+9, b_+10);
   CYC(b_+10, b_+11); push_effect(gb, b_+11);
-  hook_handoff(gb, room_specific_code_jump_table(gb));
+  HANDOFF(room_specific_code_jump_table(gb));
 }
 
 void roomSpecificCode0_hook(GB *gb) {

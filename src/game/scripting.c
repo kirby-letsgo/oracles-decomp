@@ -51,6 +51,7 @@ static void add_double_index_to_hl_from_rst(GB *gb, uint16_t return_address) {
 // 0c:4000
 void runScriptCommand_hook(GB *gb) {
   BASE(runScriptCommand);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); alu_bit(gb, 7, A);
   if (F & FZ) {
     CYCT(b_+2, b_+5);
@@ -60,7 +61,7 @@ void runScriptCommand_hook(GB *gb) {
   CYC(b_+5, b_+6); push_effect(gb, HL);
   CYC(b_+6, b_+8); alu_and(gb, 0x7f);
   CYC(b_+8, b_+9); push_effect(gb, b_+9);
-  hook_handoff(gb, script_jump_table(gb));
+  HANDOFF(script_jump_table(gb));
 }
 
 // 0c:4103
@@ -162,7 +163,7 @@ void scriptCmd_showPasswordScreen_hook(GB *gb) {
   do { uint16_t jt_ = (script_jump_table(gb));
     if (jt_ == b_+22) { scriptCmd_showPasswordScreen_askForSecret(gb, sp0_); return; }
     else if (jt_ == b_+30) { scriptCmd_showPasswordScreen_generateSecret(gb, sp0_); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 

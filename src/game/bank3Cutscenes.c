@@ -48,6 +48,7 @@ static uint16_t intro_jumpTable(GB *gb) {
 
 void twinrovaCutsceneCaller_hook(GB *gb) {
   BASE(twinrovaCutsceneCaller);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); A = C;
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -64,7 +65,7 @@ void twinrovaCutsceneCaller_hook(GB *gb) {
   burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
   burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
   burn_rom(gb, 0x00, 0x000a, 0x000b, false);
-  hook_handoff(gb, HL);
+  HANDOFF(HL);
 }
 
 void incCutsceneState_hook(GB *gb) {
@@ -208,6 +209,7 @@ void twinrovaCutscene_fadeinToRoom_hook(GB *gb) {
 
 void cutscene18_body_hook(GB *gb) {
   BASE(cutscene18_body);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wCutsceneState);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -224,7 +226,7 @@ void cutscene18_body_hook(GB *gb) {
   burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
   burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
   burn_rom(gb, 0x00, 0x000a, 0x000b, false);
-  hook_handoff(gb, HL);
+  HANDOFF(HL);
 }
 
 void twinrovaCutscene_state2_hook(GB *gb) {
@@ -354,6 +356,7 @@ void twinrovaCutscene_deleteAllInteractionsExceptFlames_hook(GB *gb) {
 
 void cutscene19_body_hook(GB *gb) {
   BASE(cutscene19_body);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wCutsceneState);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -370,7 +373,7 @@ void cutscene19_body_hook(GB *gb) {
   burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
   burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
   burn_rom(gb, 0x00, 0x000a, 0x000b, false);
-  hook_handoff(gb, HL);
+  HANDOFF(HL);
 }
 
 void twinrovaCutscene_loadAngryFlames_hook(GB *gb) {
@@ -494,6 +497,7 @@ void cutscene19_state9_hook(GB *gb) {
 
 void intro_runStage_hook(GB *gb) {
   BASE(intro_runStage);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wThreadStateBuffer + 6);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (intro_jumpTable(gb));
@@ -513,7 +517,7 @@ void intro_runStage_hook(GB *gb) {
       TAIL(intro_restart);
     }
     else {
-      hook_handoff(gb, HL);
+      HANDOFF(HL);
       return;
     }
   } while (0);
@@ -673,6 +677,7 @@ void intro_capcomScreen__state2_hook(GB *gb) {
 
 void intro_capcomScreen_hook(GB *gb) {
   BASE(intro_capcomScreen);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wThreadStateBuffer + 7);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (intro_jumpTable(gb));
@@ -686,7 +691,7 @@ void intro_capcomScreen_hook(GB *gb) {
       TAIL(intro_capcomScreen__state2);
     }
     else {
-      hook_handoff(gb, HL);
+      HANDOFF(HL);
       return;
     }
   } while (0);
@@ -701,6 +706,7 @@ void intro_japaneseOnlyScreen_hook(GB *gb) {
 
 void intro_titlescreen__runState_hook(GB *gb) {
   BASE(intro_titlescreen);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+31, b_+34); A = mem_rd(gb, wThreadStateBuffer + 7);
   CYC(b_+34, b_+35); push_effect(gb, b_+35);
   do { uint16_t jt_ = (intro_jumpTable(gb));
@@ -717,7 +723,7 @@ void intro_titlescreen__runState_hook(GB *gb) {
       TAIL(intro_titlescreen_state3);
     }
     else {
-      hook_handoff(gb, HL);
+      HANDOFF(HL);
       return;
     }
   } while (0);
@@ -2154,7 +2160,7 @@ void endgameCutsceneHandler_body_hook(GB *gb) {
       TAIL(endgameCutsceneHandler_20);
     }
     else {
-      hook_handoff(gb, HL);
+      HANDOFF(HL);
       return;
     }
   } while (0);

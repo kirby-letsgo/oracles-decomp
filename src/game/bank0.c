@@ -8527,7 +8527,7 @@ void stopTextThread_hook(GB *gb) {
   CYC(b_+4, b_+7); W8(wTextboxFlags) = A;
   A = 0xf0;
   CYC(b_+7, b_+12);
-  hook_handoff(gb, ROM_threadStop);
+  TAIL(threadStop);
 }
 
 static void show_text_tail(GB *gb) {
@@ -8596,6 +8596,7 @@ void showTextOnInventoryMenu_hook(GB *gb) {
 
 void clearAllItemsAndPutLinkOnGround_hook(GB *gb) {
   BASE(clearAllItemsAndPutLinkOnGround);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   uint16_t de = DE;
   CYC(b_+0, b_+1);
   CALL_ROM(b_+1, ROM_clearAllParentItems);
@@ -8633,7 +8634,7 @@ void clearAllItemsAndPutLinkOnGround_hook(GB *gb) {
   }
   SET_DE(de);
   CYC(b_+46, b_+50);
-  hook_handoff(gb, ROM_putLinkOnGround);
+  HANDOFF(ROM_putLinkOnGround);
 }
 
 // font tile copies
@@ -11680,7 +11681,8 @@ static void script_asm_call_tail(GB *gb) {
   L = C;
   A = E;
   CYC(b_+22, b_+27);
-  hook_handoff(gb, HL);
+  uint16_t sp0_ = cpu_sp(gb);
+  HANDOFF(HL);
 }
 
 void scriptCmd_asmCall_hook(GB *gb) {
@@ -11791,6 +11793,7 @@ void linkState07__substate2_hook(GB *gb) {
 
 void linkState07_hook(GB *gb) {
   BASE(linkState07);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); E = 0x05;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
@@ -11798,7 +11801,7 @@ void linkState07_hook(GB *gb) {
     if (jt_ == b_+10) { linkState07__substate0_hook(gb); return; }
     else if (jt_ == SYM(specialObjectAnimate) && hook_enabled_at(gb, SYM(specialObjectAnimate))) { specialObjectAnimate_hook(gb); return; }
     else if (jt_ == b_+33) { linkState07__substate2_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -12135,6 +12138,7 @@ static void load_small_room_layout(GB *gb) {
 
 void loadRoomLayout_hook(GB *gb) {
   BASE(loadRoomLayout);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   SET_HL(wRoomLayout);
   B = 0xc0;
   CYC(b_+0, b_+5);
@@ -12168,7 +12172,7 @@ void loadRoomLayout_hook(GB *gb) {
   uint16_t target = rst_jump_table(gb);
   if (target == b_+76) load_large_room_layout(gb);
   else if (target == b_+170) load_small_room_layout(gb);
-  else { hook_handoff(gb, target); return; }
+  else { HANDOFF(target); }
   ret_effect(gb);
 }
 
@@ -12838,6 +12842,8 @@ void stubThreadStart_hook(GB *gb) {
   _nextThread_hook(gb);
 }
 
+static void resume_thread_restore_bank(GB *gb);
+
 void resumeThreadNextFrameAndSaveBank_hook(GB *gb) {
   BASE(resumeThreadNextFrameAndSaveBank);
   A = 0x01;
@@ -12850,6 +12856,11 @@ void resumeThreadNextFrameAndSaveBank_hook(GB *gb) {
   CYC(b_+3, b_+8);
   CYC(b_+8, b_+11); push_effect(gb, b_+11);
   resumeThreadInAFrames_hook(gb);
+  resume_thread_restore_bank(gb);
+}
+
+static void resume_thread_restore_bank(GB *gb) {
+  BASE(resumeThreadNextFrameAndSaveBank);
   A = C;
   CYC(b_+11, b_+12);
   CYC(b_+12, b_+14); H8(hRomBank) = A;
@@ -12858,6 +12869,8 @@ void resumeThreadNextFrameAndSaveBank_hook(GB *gb) {
   CYC(b_+18, b_+19);
   ret_effect(gb);
 }
+
+void resumeThreadNextFrameAndSaveBank__afterCall08f6_hook(GB *gb) { resume_thread_restore_bank(gb); }
 
 void resumeThreadNextFrame_hook(GB *gb) {
   BASE(resumeThreadNextFrame);
@@ -13497,7 +13510,7 @@ static void lcd_interrupt_not_status_bar(GB *gb) {
   else if (target == ROM_lcdInterrupt_clearWXY) lcdInterrupt_clearWXY_hook(gb);
   else if (target == ROM_lcdInterrupt_ringMenu) lcdInterrupt_ringMenu_hook(gb);
   else if (target == ROM_lcdInterrupt_0bea) lcdInterrupt_0bea_hook(gb);
-  else hook_handoff(gb, target);
+  else { uint16_t sp0_ = cpu_sp(gb); HANDOFF(target); }
 }
 
 void lcdInterrupt_hook(GB *gb) {
@@ -13859,6 +13872,8 @@ void _initializeThread_hook(GB *gb) {
   hook_handoff(gb, b_+14);
 }
 
+static void text_thread_loop(GB *gb);
+
 void textThreadStart_hook(GB *gb) {
   BASE(textThreadStart);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -13887,6 +13902,12 @@ void textThreadStart_hook(GB *gb) {
   CYC(b_+22, b_+24); H8(hRomBank) = A;
   CYC(b_+24, b_+27); mem_wr(gb, MBC_ROM_BANK, A);
   CALL_C(b_+27, initTextbox_hook, ROM_initTextbox, b_+30);
+  text_thread_loop(gb);
+}
+
+static void text_thread_loop(GB *gb) {
+  BASE(textThreadStart);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   for (;;) {
     A = 0x3f;
     CYC(b_+30, b_+32);
@@ -13898,6 +13919,8 @@ void textThreadStart_hook(GB *gb) {
   }
 }
 
+static void file_select_thread_loop(GB *gb);
+
 void fileSelectThreadStart_hook(GB *gb) {
   BASE(fileSelectThreadStart);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -13906,6 +13929,12 @@ void fileSelectThreadStart_hook(GB *gb) {
   B = 0x10;
   CYC(b_+3, b_+5);
   CALL_C(b_+5, clearMemory_hook, ROM_clearMemory, b_+8);
+  file_select_thread_loop(gb);
+}
+
+static void file_select_thread_loop(GB *gb) {
+  BASE(fileSelectThreadStart);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   for (;;) {
     A = 0x02;
     CYC(b_+8, b_+10);
@@ -13916,6 +13945,8 @@ void fileSelectThreadStart_hook(GB *gb) {
     CYCT(b_+21, b_+23);
   }
 }
+
+static void thread_1b10_loop(GB *gb);
 
 void thread_1b10_hook(GB *gb) {
   BASE(thread_1b10);
@@ -13928,6 +13959,12 @@ void thread_1b10_hook(GB *gb) {
   A = 0x01;
   CYC(b_+8, b_+10);
   CYC(b_+10, b_+13); mem_wr(gb, wSaveQuitMenu_gameOver, A);
+  thread_1b10_loop(gb);
+}
+
+static void thread_1b10_loop(GB *gb) {
+  BASE(thread_1b10);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   for (;;) {
     A = 0x02;
     CYC(b_+13, b_+15);
@@ -13939,9 +13976,9 @@ void thread_1b10_hook(GB *gb) {
   }
 }
 
-void introThreadStart_hook(GB *gb) {
+static void intro_thread_loop(GB *gb) {
   BASE(introThreadStart);
-  uint16_t sp0_ = gb->sp; (void)sp0_;
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   for (;;) {
     SET_HL(wIntro_frameCounter);
     CYC(b_+0, b_+3);
@@ -13956,9 +13993,9 @@ void introThreadStart_hook(GB *gb) {
   }
 }
 
-void paletteFadeThreadStart_hook(GB *gb) {
+static void palette_fade_thread_loop(GB *gb) {
   BASE(paletteFadeThreadStart);
-  uint16_t sp0_ = gb->sp; (void)sp0_;
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   for (;;) {
     A = 0x02;
     CYC(b_+0, b_+2);
@@ -13984,11 +14021,19 @@ void paletteFadeThreadStart_hook(GB *gb) {
   }
 }
 
+static void main_thread_loop(GB *gb);
+
 void mainThreadStart_hook(GB *gb) {
   BASE(mainThreadStart);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, restartSound_hook, ROM_restartSound, b_+3);
   CALL_C(b_+3, stopTextThread_hook, ROM_stopTextThread, b_+6);
+  main_thread_loop(gb);
+}
+
+static void main_thread_loop(GB *gb) {
+  BASE(mainThreadStart);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   for (;;) {
     SET_HL(wPlaytimeCounter);
     CYC(b_+6, b_+9);
@@ -14056,4 +14101,46 @@ void wMusicReadFunction_hook(GB *gb) {
   I((wMusicReadFunction + 11), 4); mem_wr(gb, 0x2000, A);
   I((wMusicReadFunction + 14), 1); A = C;
   RET((wMusicReadFunction + 15)); return;
+}
+
+// Thread entry wrappers and resume points. A thread yields inside resumeThreadNextFrame (an
+// ld sp hand-off that discards the C frames), and comes back by returning to the jr that closes
+// its loop; these hooks sit at those return addresses and re-enter the loop.
+void introThreadStart_hook(GB *gb) { intro_thread_loop(gb); }
+void paletteFadeThreadStart_hook(GB *gb) { palette_fade_thread_loop(gb); }
+
+void mainThreadStart__afterCall33cd_hook(GB *gb) {
+  BASE(mainThreadStart);
+  CYCT(b_+44, b_+46);
+  main_thread_loop(gb);
+}
+
+void paletteFadeThreadStart__afterCall339f_hook(GB *gb) {
+  BASE(paletteFadeThreadStart);
+  CYCT(b_+27, b_+29);
+  palette_fade_thread_loop(gb);
+}
+
+void textThreadStart__afterCall18cb_hook(GB *gb) {
+  BASE(textThreadStart);
+  CYCT(b_+43, b_+45);
+  text_thread_loop(gb);
+}
+
+void thread_1b10__afterCall1b2a_hook(GB *gb) {
+  BASE(thread_1b10);
+  CYCT(b_+26, b_+28);
+  thread_1b10_loop(gb);
+}
+
+void fileSelectThreadStart__afterCall1a2c_hook(GB *gb) {
+  BASE(fileSelectThreadStart);
+  CYCT(b_+21, b_+23);
+  file_select_thread_loop(gb);
+}
+
+void introThreadStart__afterCall2d18_hook(GB *gb) {
+  BASE(introThreadStart);
+  CYCT(b_+17, b_+19);
+  intro_thread_loop(gb);
 }

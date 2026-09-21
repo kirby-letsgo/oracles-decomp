@@ -83,12 +83,13 @@ static uint16_t linked_cutscene_jump_table(GB *gb) {
 
 void func_03_7841_hook(GB *gb) {
   BASE(func_03_7841);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wCutsceneState);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (linked_cutscene_jump_table(gb));
     if (jt_ == SYM(func_03_7851) && hook_enabled_at(gb, SYM(func_03_7851))) { func_03_7851_hook(gb); return; }
     else if (jt_ == SYM(flameOfSorrowState1) && hook_enabled_at(gb, SYM(flameOfSorrowState1))) { flameOfSorrowState1_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -110,6 +111,7 @@ void func_03_7851_hook(GB *gb) {
 
 void flameOfSorrowState1_hook(GB *gb) {
   BASE(flameOfSorrowState1);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wTmpcbb3);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (linked_cutscene_jump_table(gb));
@@ -125,7 +127,7 @@ void flameOfSorrowState1_hook(GB *gb) {
     else if (jt_ == b_+221) { flameOfSorrowState1__substate9_hook(gb); return; }
     else if (jt_ == b_+230) { flameOfSorrowState1__substateA_hook(gb); return; }
     else if (jt_ == b_+245) { flameOfSorrowState1__substateB_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -325,12 +327,13 @@ void flameOfSorrowState1__substateB_hook(GB *gb) {
 
 void func_03_7849_hook(GB *gb) {
   BASE(func_03_7849);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wCutsceneState);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (linked_cutscene_jump_table(gb));
     if (jt_ == SYM(func_03_7851) && hook_enabled_at(gb, SYM(func_03_7851))) { func_03_7851_hook(gb); return; }
     else if (jt_ == SYM(zeldaKidnappedState1) && hook_enabled_at(gb, SYM(zeldaKidnappedState1))) { zeldaKidnappedState1_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -344,6 +347,7 @@ void zeldaKidnappedState1_hook(GB *gb) {
 
 void zeldaKidnappedState1__runStates_hook(GB *gb) {
   BASE(zeldaKidnappedState1);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+6, b_+9); A = mem_rd(gb, wTmpcbb3);
   CYC(b_+9, b_+10); push_effect(gb, b_+10);
   do { uint16_t jt_ = (linked_cutscene_jump_table(gb));
@@ -363,14 +367,14 @@ void zeldaKidnappedState1__runStates_hook(GB *gb) {
     else if (jt_ == b_+294) { zeldaKidnappedState1__substateD_hook(gb); return; }
     else if (jt_ == b_+303) { zeldaKidnappedState1__substateE_hook(gb); return; }
     else if (jt_ == b_+315) { zeldaKidnappedState1__substateF_hook(gb); return; }
-    else if (jt_ == b_+333) { hook_handoff(gb, b_+333); return; }
+    else if (jt_ == b_+333) { HANDOFF(b_+333); }
     else if (jt_ == b_+354) { zeldaKidnappedState1__substate11_hook(gb); return; }
     else if (jt_ == b_+377) { zeldaKidnappedState1__substate12_hook(gb); return; }
     else if (jt_ == b_+386) { zeldaKidnappedState1__substate13_hook(gb); return; }
     else if (jt_ == b_+395) { zeldaKidnappedState1__substate14_hook(gb); return; }
     else if (jt_ == b_+414) { zeldaKidnappedState1__substate15_hook(gb); return; }
     else if (jt_ == b_+435) { zeldaKidnappedState1__substate16_hook(gb); return; }
-    else { hook_handoff(gb, HL); return; }
+    else { HANDOFF(HL); }
   } while (0);
 }
 
@@ -612,7 +616,7 @@ void zeldaKidnappedState1__substateF_hook(GB *gb) {
   CYC(b_+326, b_+327); alu_xor(gb, A);
   CYC(b_+327, b_+330); mem_wr(gb, wTmpcbb4, A);
   CALL_C(b_+330, linkedCutscene_incSubstate_hook, SYM(linkedCutscene_incSubstate), b_+333);
-  hook_handoff(gb, b_+333);
+  HANDOFF(b_+333);
 }
 
 void zeldaKidnappedState1__substate11_hook(GB *gb) {
