@@ -28,3 +28,5 @@ screenTransitionState2@checkCanTransitionOverWater
 updateEnemy                      # Seasons body written out under if (game_seasons)
 specialObjectUpdateAdjacentWallsBitset   # Seasons body written out under if (game_seasons)
 loadRoomLayout@loadLayoutData   # Seasons body written out under if (game_seasons)
+interactionCode60@giveTreasure   # entry points into interactionCode60 (ofs_routines.txt)
+interactionCode60@checkLinkTouched

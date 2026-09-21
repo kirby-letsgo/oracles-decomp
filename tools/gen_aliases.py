@@ -18,6 +18,18 @@ for n in sorted(al):
     if n in sl or '@' in n: continue
     c = by_suffix.get(n.lower())
     if c and len(c) == 1 and len(sl[c[0]]) == 1: out.append((sl[c[0]][0], n, c[0]))
+# an Ages C-spelled local (`parent__local[__sub]`, from extra.sym) whose parent is itself an
+# alias of a Seasons @local: the Seasons routine owning that local spells this one `P@local`
+alias_parent = {}
+for (b, a), n, sname in out:
+    if '@' in sname: alias_parent[n] = sname.split('@')[0]
+for n in sorted(al):
+    if '__' not in n or n in sl or n.replace('__', '@') in sl: continue
+    parent = n.split('__')[0]
+    if parent not in alias_parent: continue
+    cand = alias_parent[parent] + '@' + '@'.join(n.split('__')[1:])
+    hit = next((x for x in sl if x.lower() == cand.lower()), None)
+    if hit and len(sl[hit]) == 1: out.append((sl[hit][0], n, hit))
 ages_by_suffix = {}
 for n in al:
     if '@' in n: ages_by_suffix.setdefault(n.split('@', 1)[1].lower(), []).append(n)

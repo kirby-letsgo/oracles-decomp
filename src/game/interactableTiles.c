@@ -861,15 +861,15 @@ void interactWithTileBeforeLink_b06_hook(GB *gb) {
   CYC(b_+24, b_+26); alu_and(gb, 0x0f);
   CYC(b_+26, b_+27); interactable_tiles_jump_table_from_rst(gb, b_+27);
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(nextToPushableBlock)) { nextToPushableBlock_hook(gb); return; }
-    else if (jt_ == SYM(nextToKeyBlock)) { nextToKeyBlock_hook(gb); return; }
-    else if (jt_ == SYM(nextToKeyDoor)) { nextToKeyDoor_hook(gb); return; }
-    else if (jt_ == SYM(nextToTileWithInfoText)) { nextToTileWithInfoText_hook(gb); return; }
-    else if (jt_ == SYM(nextToChestTile)) { nextToChestTile_hook(gb); return; }
-    else if (jt_ == SYM(nextToSignTile)) { nextToSignTile_hook(gb); return; }
-    else if (jt_ == SYM(nextToOverworldKeyhole)) { nextToOverworldKeyhole_hook(gb); return; }
-    else if (jt_ == SYM(nextToSubrosiaKeydoor)) { nextToSubrosiaKeydoor_hook(gb); return; }
-    else if (jt_ == SYM(nextToGhiniSpawner)) { nextToGhiniSpawner_hook(gb); return; }
+    if (jt_ == SYM(nextToPushableBlock) && hook_is(gb, SYM(nextToPushableBlock), nextToPushableBlock_hook)) { nextToPushableBlock_hook(gb); return; }
+    else if (jt_ == SYM(nextToKeyBlock) && hook_is(gb, SYM(nextToKeyBlock), nextToKeyBlock_hook)) { nextToKeyBlock_hook(gb); return; }
+    else if (jt_ == SYM(nextToKeyDoor) && hook_is(gb, SYM(nextToKeyDoor), nextToKeyDoor_hook)) { nextToKeyDoor_hook(gb); return; }
+    else if (jt_ == SYM(nextToTileWithInfoText) && hook_is(gb, SYM(nextToTileWithInfoText), nextToTileWithInfoText_hook)) { nextToTileWithInfoText_hook(gb); return; }
+    else if (jt_ == SYM(nextToChestTile) && hook_is(gb, SYM(nextToChestTile), nextToChestTile_hook)) { nextToChestTile_hook(gb); return; }
+    else if (jt_ == SYM(nextToSignTile) && hook_is(gb, SYM(nextToSignTile), nextToSignTile_hook)) { nextToSignTile_hook(gb); return; }
+    else if (jt_ == SYM(nextToOverworldKeyhole) && hook_is(gb, SYM(nextToOverworldKeyhole), nextToOverworldKeyhole_hook)) { nextToOverworldKeyhole_hook(gb); return; }
+    else if (jt_ == SYM(nextToSubrosiaKeydoor) && hook_is(gb, SYM(nextToSubrosiaKeydoor), nextToSubrosiaKeydoor_hook)) { nextToSubrosiaKeydoor_hook(gb); return; }
+    else if (jt_ == SYM(nextToGhiniSpawner) && hook_is(gb, SYM(nextToGhiniSpawner), nextToGhiniSpawner_hook)) { nextToGhiniSpawner_hook(gb); return; }
   } while (0);
   hook_continue(gb, HL, sp0_);
 }

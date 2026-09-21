@@ -57,17 +57,21 @@ def align(A, S, a, s, anchors=()):
         opcodes += [(tag, i0 + x1, i0 + x2, j0 + y1, j0 + y2) for tag, x1, x2, y1, y2 in sm.get_opcodes()]
     pairs, ends, ages_only, seasons_only, consts, conflicts = {}, {}, [], [], [], []
     aligned = []        # (ages body index, seasons body index)
-    def put(k, v, table=None):
+    insn_keys = {id(pairs): set(), id(ends): set()}
+    def put(k, v, table=None, insn=False):
         table = pairs if table is None else table
-        if k in table and table[k] != v: conflicts.append((k, table[k], v))
-        table.setdefault(k, v)
+        # a jump target that lands on inserted Seasons code differs from where the aligned
+        # instruction moved to; only two instruction alignments disagreeing is a real conflict
+        if k in table and table[k] != v and insn and k in insn_keys[id(table)]: conflicts.append((k, table[k], v))
+        if insn: table[k] = v; insn_keys[id(table)].add(k)
+        else: table.setdefault(k, v)
     for tag, i1, i2, j1, j2 in opcodes:
         if tag == 'equal':
             for x, y in zip(range(i1, i2), range(j1, j2)):
                 aligned.append((x, y))
                 ia, is_ = ba[x], bs[y]
-                put(ia[0] - a[1], is_[0] - s[1])
-                put(ia[0] + ia[1] - a[1], is_[0] + is_[1] - s[1], ends)
+                put(ia[0] - a[1], is_[0] - s[1], insn=True)
+                put(ia[0] + ia[1] - a[1], is_[0] + is_[1] - s[1], ends, insn=True)
                 oa, os_ = op_texts(na[x][1], ia[3]), op_texts(ns[y][1], is_[3])
                 for u, v in zip(oa, os_):
                     mu, mv = re.match(r'^@([+-]\d+)$', u), re.match(r'^@([+-]\d+)$', v)
@@ -84,8 +88,8 @@ def align(A, S, a, s, anchors=()):
             x = next(x for x in range(i1, i2) if ba[x][2] == 'jumptable'); y = next(y for y in range(j1, j2) if bs[y][2] == 'jumptable')
             aligned.append((x, y))
             ia, is_ = ba[x], bs[y]
-            put(ia[0] - a[1], is_[0] - s[1])
-            put(ia[0] + ia[1] - a[1], is_[0] + is_[1] - s[1], ends)
+            put(ia[0] - a[1], is_[0] - s[1], insn=True)
+            put(ia[0] + ia[1] - a[1], is_[0] + is_[1] - s[1], ends, insn=True)
             for x2 in range(i1, i2):
                 if x2 != x: ages_only.append((ba[x2][0] - a[1], na[x2][1]))
             for y2 in range(j1, j2):
@@ -193,7 +197,7 @@ def main():
         if os.path.basename(path).startswith('gen_') or os.path.basename(path) in ('syms.c', 'ofs.c'): continue
         text = open(path, errors='replace').read()
         lines = text.split('\n')
-        base, out, n, ages_only_depth = None, [], 0, 0
+        base, out, n, ages_only_depth, seasons_depth = None, [], 0, 0, 0
         ages_only_funcs = set()      # start line of every function containing AGES_ONLY()
         for i, line in enumerate(lines):
             if 'AGES_ONLY()' in line:
@@ -218,6 +222,24 @@ def main():
                 keep, line = line[:j], line[j:]
             if re.search(r'!game_seasons\s*&&', code):     # an Ages-only condition on one line
                 out.append(keep + re.sub(r'\bb_\+OE?\((\d+)\)', r'b_+\1', line)); continue
+            # the else branch of `if (game_seasons) { ... } else {` is Ages-only too
+            if seasons_depth:
+                j = 0
+                while j < len(code) and seasons_depth:
+                    if code[j] == '{': seasons_depth += 1
+                    elif code[j] == '}': seasons_depth -= 1
+                    j += 1
+                if not seasons_depth and re.match(r'\s*else\s*\{', code[j:]):
+                    ages_only_depth = 1; out.append(keep + line); continue
+            m3 = re.search(r'if \(game_seasons\)\s*\{', code)
+            if m3:
+                j = m3.end(); seasons_depth = 1
+                while j < len(code) and seasons_depth:
+                    if code[j] == '{': seasons_depth += 1
+                    elif code[j] == '}': seasons_depth -= 1
+                    j += 1
+                if not seasons_depth and re.match(r'\s*else\s*\{', code[j:]):
+                    ages_only_depth = 1; out.append(keep + line); continue
             m2 = re.search(r'if \(!game_seasons\)\s*\{', line)
             if m2:
                 j = m2.end(); ages_only_depth = 1
@@ -228,8 +250,8 @@ def main():
                 if ages_only_depth: out.append(keep + line); continue
                 keep, line = keep + line[:j], line[j:]
             if base in tables:
-                new = re.sub(r'\b(CYCT?\([^;]*?, )b_\+(\d+)\)', r'\1b_+OE(\2))', line)
-                new = re.sub(r'\b((?:CALL_C|CALL_C_CC|CALL_L|CALL_L_CC)\([^;]*?, )b_\+(\d+)\)', r'\1b_+OE(\2))', new)
+                new = re.sub(r'\b(CYCT?\([^;]*?,\s*)b_\+(\d+)\)', r'\1b_+OE(\2))', line)
+                new = re.sub(r'\b((?:CALL_C|CALL_C_CC|CALL_L|CALL_L_CC)\([^;]*?,\s*)b_\+(\d+)\)', r'\1b_+OE(\2))', new)
                 new = re.sub(r'\b((?:push_effect|\w+_from_rst)\(gb, )b_\+(\d+)\)', r'\1b_+OE(\2))', new)
                 new = re.sub(r'\bb_\+(\d+)\b', r'b_+O(\1)', new)
                 if new != line: n += 1

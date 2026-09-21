@@ -1573,6 +1573,7 @@
 05:7a0d mooshStateC_hook -
 05:7b9e mooshUpdateAsNpc_hook -
 05:7ba7 mooshIncVar03_hook -
+06:4000 interactWithTileBeforeLink_b06_hook -
 06:402d nextToChestTile_hook -
 06:40b4 nextToSignTile_hook -
 06:40ef checkFacingBottomOfTileAndPressedA_hook -
@@ -1890,6 +1891,11 @@
 08:660c childIncPositionIndex_hook -
 08:6618 childLoadPositionListPointer_hook -
 08:667b childUpdateCuriousMovement_hook -
+09:4000 interactionCode60_hook -
+09:40d9 interactionCode60__setVisibleIfWithinScreenBoundary_hook -
+09:4231 interactionCode60__setLinkAnimationAndDeleteIfTextClosed_hook -
+09:42c4 interactionCode60__giveTreasure_hook -
+09:431a interactionCode60__checkLinkTouched_hook -
 09:4416 interactionCode78_hook -
 09:4478 interactionCode79_hook -
 09:4528 interactionCode7a_hook -
@@ -3297,6 +3303,7 @@
 15:4bac interactionCodeda_hook -
 15:4bb4 interactionCodeda__state0_hook -
 15:4bc4 interactionCodeda__state1_hook -
+15:4c06 interactionCodee0_hook -
 15:4c5c interactionCodee2_hook -
 15:4cb6 interactionCodee2__centerOnTileAndGetDirectionToFace_hook -
 15:4cb9 interactionCodee2__getDirectionToFace_hook -
@@ -3476,6 +3483,7 @@
 3f:4bc7 standardTextState0_hook -
 3f:4bd3 standardTextState1_hook -
 3f:4be5 standardTextState2_hook -
+3f:4c13 standardTextState2__textFinished_hook -
 3f:4c16 standardTextState3_hook -
 3f:4c2f standardTextState5_hook -
 3f:4c43 standardTextState6_hook -
@@ -3484,6 +3492,10 @@
 3f:4c60 standardTextStateB_hook -
 3f:4c77 standardTextStateE_hook -
 3f:4c86 standardTextStateF_hook -
+3f:4cb3 standardTextStateF__label_3f_096_hook -
+3f:4ccf standardTextStateF__checkShouldExit_hook -
+3f:4ce4 standardTextStateF__checkShouldExit__nonExitable_hook -
+3f:4cee standardTextStateF__checkShouldExit__end_hook -
 3f:4cf0 standardTextState10_hook -
 3f:4cf7 textOptionCode_hook -
 3f:4d0b textOptionCode__state01_hook -

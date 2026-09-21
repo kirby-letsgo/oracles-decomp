@@ -12,10 +12,12 @@ drawAllSpritesUnconditionally@drawObject
 endgameCutsceneHandler_body
 enemyCode79
 functionCaller_b02
+interactionCode60
 interactionCode6b
 interactionCode6c
 interactionCode71
 interactionCodedc
+interactionCodee0
 introCinematic_inTemple
 introCinematic_ridingHorse
 linkApplyTileTypes 233=227 234=228

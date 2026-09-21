@@ -158,6 +158,8 @@ interac11_subid00
 interactionAnimate
 interactionCode10
 interactionCode1c
+interactionCode60@checkLinkTouched
+interactionCode60@giveTreasure
 interactionCode7d
 interactionCodeae
 interactionCodeaf

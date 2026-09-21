@@ -34,7 +34,8 @@ def guard_file(path, syms, apply):
     # jump-table chains without an interpreter fallback: leave their branches alone
     unsafe = set()
     for m in re.finditer(r'do \{ uint16_t jt_ = .*?\n(.*?)\n\s*\} while \(0\);', text0, re.S):
-        if not re.search(r'else \{[^}]*(HANDOFF|hook_continue|hook_handoff)', m.group(1), re.S):
+        after = text0[m.end():m.end() + 200].split('\n')[1:3]     # a fallback right after the chain counts too
+        if not re.search(r'else \{[^}]*(HANDOFF|hook_continue|hook_handoff)', m.group(1), re.S) and not any(re.search(r'HANDOFF|hook_continue|hook_handoff', l) for l in after):
             a = text0.count('\n', 0, m.start()); b = text0.count('\n', 0, m.end())
             unsafe.update(range(a, b + 1))
     out, changed = [], 0

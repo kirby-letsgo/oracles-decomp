@@ -4446,67 +4446,6 @@ L_6dcc:
   RET(0x6ddb); return;  // ret
 }
 
-// 15:4c06
-void s_interactionCodee0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4c06, 2); E = 0x44;  // ld e,$44
-  I(0x4c08, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x4c09, 0x4c0a);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4c12: goto L_4c12; case 0x4c32: goto L_4c32; case 0x4c43: goto L_4c43; case 0x4c4e: goto L_4c4e; default: HANDOFF(HL); }
-L_4c12:
-  I(0x4c12, 2); A = 0x01;  // ld a,$01
-  I(0x4c14, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4c15, 4); A = mem_rd(gb, 0xcc61);  // ld a,($cc61)
-  I(0x4c18, 1); A = alu_inc8(gb, A);  // inc a
-  if ((F & FZ)) { I(0x4c19, 3); goto L_4c1e; } I(0x4c19, 2);  // jr z,$4c1e
-  I(0x4c1b, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
-L_4c1e:
-  I(0x4c1e, 2); E = 0x42;  // ld e,$42
-  I(0x4c20, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x4c21, interactionInitGraphics_hook, 0x15e9, 0x4c24);  // call $15e9
-L_4c24:
-  CALL(0x4c24, interactionSetAlwaysUpdateBit_hook, 0x26ac, 0x4c27);  // call $26ac
-  I(0x4c27, 2); L = 0x4b;  // ld l,$4b
-  I(0x4c29, 3); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
-  I(0x4c2b, 2); L = 0x4d;  // ld l,$4d
-  I(0x4c2d, 3); mem_wr(gb, HL, 0xb0);  // ld (hl),$b0
-  I(0x4c2f, 4); if (hook_is(gb, 0x1e15, objectSetVisible80_hook)) { objectSetVisible80_hook(gb); return; } HANDOFF(0x1e15);  // jp $1e15
-L_4c32:
-  I(0x4c32, 1); H = D;  // ld h,d
-  I(0x4c33, 2); L = 0x4d;  // ld l,$4d
-  I(0x4c35, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4c36, 2); alu_sub(gb, 0x04);  // sub $04
-  I(0x4c38, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4c39, 2); alu_cp(gb, 0x10);  // cp $10
-  if (!(F & FZ)) { RET_TAKEN(0x4c3b); return; } I(0x4c3b, 2);  // ret nz
-  I(0x4c3c, 1); L = E;  // ld l,e
-  I(0x4c3d, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4c3e, 2); L = 0x46;  // ld l,$46
-  I(0x4c40, 3); mem_wr(gb, HL, 0x28);  // ld (hl),$28
-  RET(0x4c42); return;  // ret
-L_4c43:
-  CALL(0x4c43, interactionDecCounter1_hook, 0x2387, 0x4c46);  // call $2387
-  if (!(F & FZ)) { RET_TAKEN(0x4c46); return; } I(0x4c46, 2);  // ret nz
-  I(0x4c47, 1); L = E;  // ld l,e
-  I(0x4c48, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4c49, 2); L = 0x46;  // ld l,$46
-  I(0x4c4b, 3); mem_wr(gb, HL, 0x06);  // ld (hl),$06
-  RET(0x4c4d); return;  // ret
-L_4c4e:
-  I(0x4c4e, 1); H = D;  // ld h,d
-  I(0x4c4f, 2); L = 0x4d;  // ld l,$4d
-  I(0x4c51, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4c52, 2); alu_sub(gb, 0x06);  // sub $06
-  I(0x4c54, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4c55, 2); L = 0x46;  // ld l,$46
-  I(0x4c57, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x4c58); return; } I(0x4c58, 2);  // ret nz
-  I(0x4c59, 4); if (hook_is(gb, 0x3ad9, interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(0x3ad9);  // jp $3ad9
-}
-
 // 15:4c12
 void s_interactionCodee0__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -4521,19 +4460,6 @@ L_4c1e:
   I(0x4c1e, 2); E = 0x42;  // ld e,$42
   I(0x4c20, 2); mem_wr(gb, DE, A);  // ld (de),a
   CALL(0x4c21, interactionInitGraphics_hook, 0x15e9, 0x4c24);  // call $15e9
-L_4c24:
-  CALL(0x4c24, interactionSetAlwaysUpdateBit_hook, 0x26ac, 0x4c27);  // call $26ac
-  I(0x4c27, 2); L = 0x4b;  // ld l,$4b
-  I(0x4c29, 3); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
-  I(0x4c2b, 2); L = 0x4d;  // ld l,$4d
-  I(0x4c2d, 3); mem_wr(gb, HL, 0xb0);  // ld (hl),$b0
-  I(0x4c2f, 4); if (hook_is(gb, 0x1e15, objectSetVisible80_hook)) { objectSetVisible80_hook(gb); return; } HANDOFF(0x1e15);  // jp $1e15
-}
-
-// 15:4c24
-void s_interactionCodee0__afterCall4c24(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4c24:
   CALL(0x4c24, interactionSetAlwaysUpdateBit_hook, 0x26ac, 0x4c27);  // call $26ac
   I(0x4c27, 2); L = 0x4b;  // ld l,$4b
   I(0x4c29, 3); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
