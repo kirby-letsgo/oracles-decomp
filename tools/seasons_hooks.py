@@ -59,7 +59,7 @@ def main():
             n = n[0] if n else ''
             if not n: continue
             if (n + '!') in safe_jt: print(f'{path}: {n} dispatches a jump table without a fallback, left out'); continue
-            verdict[n] = 'IDENTICAL'
+            verdict[n] = verdict[n.replace('@', '__')] = 'IDENTICAL'
 
     # C call graph: function name -> callees, per file (static helpers are file-local)
     callees, burns, local_calls, tails = {}, {}, {}, {}

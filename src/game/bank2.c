@@ -4771,211 +4771,221 @@ done:
 void updateStatusBar_body_hook(GB *gb) {
   BASE(updateStatusBar_body);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); A = W8(wDontUpdateStatusBar);
-  CYC(b_+3, b_+4); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
-  CYC(b_+4, b_+5);
-  CYC(b_+5, b_+7); A = 0x04;
-  CYC(b_+7, b_+9); hram_wr(gb, R_SVBK, A);
-  CALL_C(b_+9, loadStatusBarMap_hook, SYM(loadStatusBarMap), b_+12);
-  CYC(b_+12, b_+15); A = W8(wStatusBarNeedsRefresh);
-  CYC(b_+15, b_+17); alu_bit(gb, 0, A);
-  if (F & FZ) { CYCT(b_+17, b_+19); goto item_count_refresh; }
-  CYC(b_+17, b_+19);
-  CALL_C(b_+19, loadEquippedItemGfx_hook, SYM(loadEquippedItemGfx), b_+22);
-  CALL_C(b_+22, drawItemTilesOnStatusBar_hook, SYM(drawItemTilesOnStatusBar), b_+25);
-  CYC(b_+25, b_+27);
+  CYC(b_+O(0), b_+OE(3)); A = W8(wDontUpdateStatusBar);
+  CYC(b_+O(3), b_+OE(4)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(4), b_+OE(5)); ret_effect(gb); return; }
+  CYC(b_+O(4), b_+OE(5));
+  CYC(b_+O(5), b_+OE(7)); A = 0x04;
+  CYC(b_+O(7), b_+OE(9)); hram_wr(gb, R_SVBK, A);
+  CALL_C(b_+O(9), loadStatusBarMap_hook, SYM(loadStatusBarMap), b_+OE(12));
+  CYC(b_+O(12), b_+OE(15)); A = W8(wStatusBarNeedsRefresh);
+  CYC(b_+O(15), b_+OE(17)); alu_bit(gb, 0, A);
+  if (F & FZ) { CYCT(b_+O(17), b_+OE(19)); goto item_count_refresh; }
+  CYC(b_+O(17), b_+OE(19));
+  CALL_C(b_+O(19), loadEquippedItemGfx_hook, SYM(loadEquippedItemGfx), b_+OE(22));
+  CALL_C(b_+O(22), drawItemTilesOnStatusBar_hook, SYM(drawItemTilesOnStatusBar), b_+OE(25));
+  CYC(b_+O(25), b_+OE(27));
   goto update_rupees;
 item_count_refresh:
-  CYC(b_+27, b_+29); alu_bit(gb, 1, A);
-  if (!(F & FZ)) CALL_C_CC(b_+29, drawItemTilesOnStatusBar_hook, SYM(drawItemTilesOnStatusBar), b_+32);
-  else CYC(b_+29, b_+32);
+  CYC(b_+O(27), b_+OE(29)); alu_bit(gb, 1, A);
+  if (!(F & FZ)) CALL_C_CC(b_+O(29), drawItemTilesOnStatusBar_hook, SYM(drawItemTilesOnStatusBar), b_+OE(32));
+  else CYC(b_+O(29), b_+OE(32));
 update_rupees:
-  CYC(b_+32, b_+35); SET_HL(wNumRupees);
-  CYC(b_+35, b_+36); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+36, b_+37); B = mem_rd(gb, HL);
-  CYC(b_+37, b_+38); C = A;
-  CYC(b_+38, b_+41); SET_HL(wDisplayedRupees);
-  CYC(b_+41, b_+42); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+42, b_+43); H = mem_rd(gb, HL);
-  CYC(b_+43, b_+44); L = A;
-  CALL_C(b_+44, compareHlToBc_hook, SYM(compareHlToBc), b_+47);
-  if (F & FZ) { CYCT(b_+47, b_+49); updateStatusBar_body__updateRupeeDisplay_hook(gb); return; }
-  CYC(b_+47, b_+49);
-  CYC(b_+49, b_+52); SET_HL(wStatusBarNeedsRefresh);
-  CYC(b_+52, b_+54); mem_wr(gb, HL, mem_rd(gb, HL) | 0x08);
-  CYC(b_+54, b_+57); SET_BC(0x0001);
-  CYC(b_+57, b_+59); L = (uint8_t)wDisplayedRupees;
-  CYC(b_+59, b_+60); A = alu_dec8(gb, A);
-  if (F & FZ) { CYCT(b_+60, b_+62); goto subtract_rupee; }
-  CYC(b_+60, b_+62);
-  CALL_C(b_+62, addDecimalToHlRef_hook, SYM(addDecimalToHlRef), b_+65);
-  CYC(b_+65, b_+67);
+  if (!game_seasons) {
+    CYC(b_+32, b_+35); SET_HL(wNumRupees);
+  } else {                  // rupees or ore chunks, whichever the status bar shows
+    CYC(b_+S(32), b_+S(35)); A = W8(wDisplayedMoneyAddress);
+    CYC(b_+S(35), b_+S(36)); L = A;
+    CYC(b_+S(36), b_+S(38)); H = 0xc6;
+  }
+  CYC(b_+O(35), b_+OE(36)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(36), b_+OE(37)); B = mem_rd(gb, HL);
+  CYC(b_+O(37), b_+OE(38)); C = A;
+  CYC(b_+O(38), b_+OE(41)); SET_HL(wDisplayedRupees);
+  CYC(b_+O(41), b_+OE(42)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(42), b_+OE(43)); H = mem_rd(gb, HL);
+  CYC(b_+O(43), b_+OE(44)); L = A;
+  CALL_C(b_+O(44), compareHlToBc_hook, SYM(compareHlToBc), b_+OE(47));
+  if (F & FZ) { CYCT(b_+O(47), b_+OE(49)); updateStatusBar_body__updateRupeeDisplay_hook(gb); return; }
+  CYC(b_+O(47), b_+OE(49));
+  CYC(b_+O(49), b_+OE(52)); SET_HL(wStatusBarNeedsRefresh);
+  CYC(b_+O(52), b_+OE(54)); mem_wr(gb, HL, mem_rd(gb, HL) | 0x08);
+  CYC(b_+O(54), b_+OE(57)); SET_BC(0x0001);
+  CYC(b_+O(57), b_+OE(59)); L = (uint8_t)wDisplayedRupees;
+  CYC(b_+O(59), b_+OE(60)); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(b_+O(60), b_+OE(62)); goto subtract_rupee; }
+  CYC(b_+O(60), b_+OE(62));
+  CALL_C(b_+O(62), addDecimalToHlRef_hook, SYM(addDecimalToHlRef), b_+OE(65));
+  CYC(b_+O(65), b_+OE(67));
   goto play_rupee_sound;
 subtract_rupee:
-  CALL_C(b_+67, subDecimalFromHlRef_hook, SYM(subDecimalFromHlRef), b_+70);
+  CALL_C(b_+O(67), subDecimalFromHlRef_hook, SYM(subDecimalFromHlRef), b_+OE(70));
 play_rupee_sound:
-  CYC(b_+70, b_+72); A = 0x61;
-  CALL_C(b_+72, playSound_b00_hook, SYM(playSound_b00), b_+75);
+  CYC(b_+O(70), b_+OE(72)); A = 0x61;
+  CALL_C(b_+O(72), playSound_b00_hook, SYM(playSound_b00), b_+OE(75));
   TAIL(updateStatusBar_body__updateRupeeDisplay);
 }
 
 void updateStatusBar_body__updateRupeeDisplay_hook(GB *gb) {
   BASE(updateStatusBar_body);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+75, b_+78); A = W8(wStatusBarNeedsRefresh);
-  CYC(b_+78, b_+80); alu_bit(gb, 3, A);
-  if (F & FZ) { CYCT(b_+80, b_+82); goto update_hearts; }
-  CYC(b_+80, b_+82);
-  CYC(b_+82, b_+85); SET_HL(w4StatusBarTileMap + 0x2c);
-  CALL_C(b_+85, correctAddressForExtraHeart_hook, SYM(correctAddressForExtraHeart), b_+88);
-  CYC(b_+88, b_+90); C = 0x10;
-  CYC(b_+90, b_+93); A = W8(wDisplayedRupees);
-  CYC(b_+93, b_+94); B = A;
-  CYC(b_+94, b_+96); alu_and(gb, 0x0f);
-  CYC(b_+96, b_+97); alu_add(gb, C);
-  CYC(b_+97, b_+98); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(b_+98, b_+99); A = B;
-  CYC(b_+99, b_+101); A = alu_swap(gb, A);
-  CYC(b_+101, b_+103); alu_and(gb, 0x0f);
-  CYC(b_+103, b_+104); alu_add(gb, C);
-  CYC(b_+104, b_+105); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(b_+105, b_+108); A = mem_rd(gb, wDisplayedRupees + 1);
-  CYC(b_+108, b_+110); alu_and(gb, 0x0f);
-  CYC(b_+110, b_+111); alu_add(gb, C);
-  CYC(b_+111, b_+112); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+O(75), b_+OE(78)); A = W8(wStatusBarNeedsRefresh);
+  CYC(b_+O(78), b_+OE(80)); alu_bit(gb, 3, A);
+  if (F & FZ) { CYCT(b_+O(80), b_+OE(82)); goto update_hearts; }
+  CYC(b_+O(80), b_+OE(82));
+  CYC(b_+O(82), b_+OE(85)); SET_HL(w4StatusBarTileMap + 0x2c);
+  CALL_C(b_+O(85), correctAddressForExtraHeart_hook, SYM(correctAddressForExtraHeart), b_+OE(88));
+  CYC(b_+O(88), b_+OE(90)); C = 0x10;
+  CYC(b_+O(90), b_+OE(93)); A = W8(wDisplayedRupees);
+  CYC(b_+O(93), b_+OE(94)); B = A;
+  CYC(b_+O(94), b_+OE(96)); alu_and(gb, 0x0f);
+  CYC(b_+O(96), b_+OE(97)); alu_add(gb, C);
+  CYC(b_+O(97), b_+OE(98)); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+O(98), b_+OE(99)); A = B;
+  CYC(b_+O(99), b_+OE(101)); A = alu_swap(gb, A);
+  CYC(b_+O(101), b_+OE(103)); alu_and(gb, 0x0f);
+  CYC(b_+O(103), b_+OE(104)); alu_add(gb, C);
+  CYC(b_+O(104), b_+OE(105)); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+O(105), b_+OE(108)); A = mem_rd(gb, wDisplayedRupees + 1);
+  CYC(b_+O(108), b_+OE(110)); alu_and(gb, 0x0f);
+  CYC(b_+O(110), b_+OE(111)); alu_add(gb, C);
+  CYC(b_+O(111), b_+OE(112)); mem_wr(gb, HL, A); SET_HL(HL - 1);
 update_hearts:
-  CYC(b_+112, b_+115); SET_HL(wDisplayedHearts);
-  CYC(b_+115, b_+118); A = W8(wLinkHealth);
-  CYC(b_+118, b_+119); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(b_+119, b_+121); updateStatusBar_body__updateHeartDisplay_hook(gb); return; }
-  CYC(b_+119, b_+121);
-  if (F & FC) { CYCT(b_+121, b_+123); goto decrement_hearts; }
-  CYC(b_+121, b_+123);
-  CYC(b_+123, b_+126); A = W8(wFrameCounter);
-  CYC(b_+126, b_+128); alu_and(gb, 0x03);
-  if (!(F & FZ)) { CYCT(b_+128, b_+130); updateStatusBar_body__updateHeartDisplay_hook(gb); return; }
-  CYC(b_+128, b_+130);
-  CYC(b_+130, b_+131); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+131, b_+132); A = mem_rd(gb, HL);
-  CYC(b_+132, b_+134); alu_and(gb, 0x03);
-  CYC(b_+134, b_+136); A = 0x57;
-  if (F & FZ) CALL_C_CC(b_+136, playSound_b00_hook, SYM(playSound_b00), b_+139);
-  else CYC(b_+136, b_+139);
-  CYC(b_+139, b_+141);
+  CYC(b_+O(112), b_+OE(115)); SET_HL(wDisplayedHearts);
+  CYC(b_+O(115), b_+OE(118)); A = W8(wLinkHealth);
+  CYC(b_+O(118), b_+OE(119)); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+O(119), b_+OE(121)); updateStatusBar_body__updateHeartDisplay_hook(gb); return; }
+  CYC(b_+O(119), b_+OE(121));
+  if (F & FC) { CYCT(b_+O(121), b_+OE(123)); goto decrement_hearts; }
+  CYC(b_+O(121), b_+OE(123));
+  CYC(b_+O(123), b_+OE(126)); A = W8(wFrameCounter);
+  CYC(b_+O(126), b_+OE(128)); alu_and(gb, 0x03);
+  if (!(F & FZ)) { CYCT(b_+O(128), b_+OE(130)); updateStatusBar_body__updateHeartDisplay_hook(gb); return; }
+  CYC(b_+O(128), b_+OE(130));
+  CYC(b_+O(130), b_+OE(131)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+O(131), b_+OE(132)); A = mem_rd(gb, HL);
+  CYC(b_+O(132), b_+OE(134)); alu_and(gb, 0x03);
+  CYC(b_+O(134), b_+OE(136)); A = 0x57;
+  if (F & FZ) CALL_C_CC(b_+O(136), playSound_b00_hook, SYM(playSound_b00), b_+OE(139));
+  else CYC(b_+O(136), b_+OE(139));
+  CYC(b_+O(139), b_+OE(141));
   goto mark_heart_refresh;
 decrement_hearts:
-  CYC(b_+141, b_+142); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+O(141), b_+OE(142)); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
 mark_heart_refresh:
-  CYC(b_+142, b_+145); SET_HL(wStatusBarNeedsRefresh);
-  CYC(b_+145, b_+147); mem_wr(gb, HL, mem_rd(gb, HL) | 0x04);
+  CYC(b_+O(142), b_+OE(145)); SET_HL(wStatusBarNeedsRefresh);
+  CYC(b_+O(145), b_+OE(147)); mem_wr(gb, HL, mem_rd(gb, HL) | 0x04);
   TAIL(updateStatusBar_body__updateHeartDisplay);
 }
 
 void updateStatusBar_body__updateHeartDisplay_hook(GB *gb) {
   BASE(updateStatusBar_body);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+147, b_+150); A = W8(wStatusBarNeedsRefresh);
-  CYC(b_+150, b_+152); alu_bit(gb, 2, A);
-  if (!(F & FZ)) CALL_C_CC(b_+152, inGameDrawHeartDisplay_hook, SYM(inGameDrawHeartDisplay), b_+155);
-  else CYC(b_+152, b_+155);
-  CYC(b_+155, b_+158); SET_HL(w4StatusBarTileMap + 0x0a);
-  CALL_C(b_+158, correctAddressForExtraHeart_hook, SYM(correctAddressForExtraHeart), b_+161);
-  CYC(b_+161, b_+163); mem_wr(gb, HL, 0x09);
-  CYC(b_+163, b_+166); A = W8(wTilesetFlags);
-  CYC(b_+166, b_+168); alu_bit(gb, 4, A);
-  if (!(F & FZ)) { CYCT(b_+168, b_+170); goto sprites; }
-  CYC(b_+168, b_+170);
-  CYC(b_+170, b_+172); alu_bit(gb, 3, A);
-  if (F & FZ) { CYCT(b_+172, b_+174); goto sprites; }
-  CYC(b_+172, b_+174);
-  CYC(b_+174, b_+175); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+175, b_+176); L = alu_inc8(gb, L);
-  CYC(b_+176, b_+178); mem_wr(gb, HL, 0x1b);
-  CYC(b_+178, b_+181); A = W8(wStatusBarNeedsRefresh);
-  CYC(b_+181, b_+183); alu_bit(gb, 4, A);
-  if (F & FZ) { CYCT(b_+183, b_+185); goto sprites; }
-  CYC(b_+183, b_+185);
-  CYC(b_+185, b_+186); L = alu_inc8(gb, L);
-  CYC(b_+186, b_+189); A = W8(wDungeonIndex);
-  CYC(b_+189, b_+192); SET_BC(wDungeonSmallKeys);
-  CALL_C(b_+192, addAToBc_hook, 0x006d, b_+195);
-  CYC(b_+195, b_+196); A = mem_rd(gb, BC);
-  CYC(b_+196, b_+198); alu_add(gb, 0x10);
-  CYC(b_+198, b_+199); mem_wr(gb, HL, A);
+  CYC(b_+O(147), b_+OE(150)); A = W8(wStatusBarNeedsRefresh);
+  CYC(b_+O(150), b_+OE(152)); alu_bit(gb, 2, A);
+  if (!(F & FZ)) CALL_C_CC(b_+O(152), inGameDrawHeartDisplay_hook, SYM(inGameDrawHeartDisplay), b_+OE(155));
+  else CYC(b_+O(152), b_+OE(155));
+  CYC(b_+O(155), b_+OE(158)); SET_HL(w4StatusBarTileMap + 0x0a);
+  CALL_C(b_+O(158), correctAddressForExtraHeart_hook, SYM(correctAddressForExtraHeart), b_+OE(161));
+  CYC(b_+O(161), b_+OE(163)); mem_wr(gb, HL, 0x09);
+  CYC(b_+O(163), b_+OE(166)); A = W8(wTilesetFlags);
+  if (!game_seasons) {      // sidescrolling underwater areas: Ages only
+    CYC(b_+166, b_+168); alu_bit(gb, 4, A);
+    if (!(F & FZ)) { CYCT(b_+168, b_+170); goto sprites; }
+    CYC(b_+168, b_+170);
+  }
+  CYC(b_+O(170), b_+OE(172)); alu_bit(gb, 3, A);
+  if (F & FZ) { CYCT(b_+O(172), b_+OE(174)); goto sprites; }
+  CYC(b_+O(172), b_+OE(174));
+  if (!game_seasons) { CYC(b_+174, b_+175); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); }
+  CYC(b_+O(175), b_+OE(176)); L = alu_inc8(gb, L);
+  CYC(b_+O(176), b_+OE(178)); mem_wr(gb, HL, 0x1b);
+  CYC(b_+O(178), b_+OE(181)); A = W8(wStatusBarNeedsRefresh);
+  CYC(b_+O(181), b_+OE(183)); alu_bit(gb, 4, A);
+  if (F & FZ) { CYCT(b_+O(183), b_+OE(185)); goto sprites; }
+  CYC(b_+O(183), b_+OE(185));
+  CYC(b_+O(185), b_+OE(186)); L = alu_inc8(gb, L);
+  CYC(b_+O(186), b_+OE(189)); A = W8(wDungeonIndex);
+  CYC(b_+O(189), b_+OE(192)); SET_BC(wDungeonSmallKeys);
+  CALL_C(b_+O(192), addAToBc_hook, 0x006d, b_+OE(195));
+  CYC(b_+O(195), b_+OE(196)); A = mem_rd(gb, BC);
+  CYC(b_+O(196), b_+OE(198)); alu_add(gb, 0x10);
+  CYC(b_+O(198), b_+OE(199)); mem_wr(gb, HL, A);
 sprites:
-  CYC(b_+199, b_+200); alu_xor(gb, A);
-  CYC(b_+200, b_+202); hram_wr(gb, R_SVBK, A);
-  CYC(b_+202, b_+205); A = W8(wcbe8);
-  CYC(b_+205, b_+207); alu_bit(gb, 7, A);
-  if (!(F & FZ)) { CYCT(b_+207, b_+209); updateStatusBar_body__biggoronSword_hook(gb); return; }
-  CYC(b_+207, b_+209);
-  CYC(b_+209, b_+211); E = 0x10;
-  CYC(b_+211, b_+214); SET_BC(0x1038);
-  CYC(b_+214, b_+215); alu_rrca(gb);
-  if (!(F & FC)) { CYCT(b_+215, b_+217); goto positions; }
-  CYC(b_+215, b_+217);
-  CYC(b_+217, b_+219); C = 0x30;
+  CYC(b_+O(199), b_+OE(200)); alu_xor(gb, A);
+  CYC(b_+O(200), b_+OE(202)); hram_wr(gb, R_SVBK, A);
+  CYC(b_+O(202), b_+OE(205)); A = W8(wcbe8);
+  CYC(b_+O(205), b_+OE(207)); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(b_+O(207), b_+OE(209)); updateStatusBar_body__biggoronSword_hook(gb); return; }
+  CYC(b_+O(207), b_+OE(209));
+  CYC(b_+O(209), b_+OE(211)); E = 0x10;
+  CYC(b_+O(211), b_+OE(214)); SET_BC(0x1038);
+  CYC(b_+O(214), b_+OE(215)); alu_rrca(gb);
+  if (!(F & FC)) { CYCT(b_+O(215), b_+OE(217)); goto positions; }
+  CYC(b_+O(215), b_+OE(217));
+  CYC(b_+O(217), b_+OE(219)); C = 0x30;
 positions:
-  CYC(b_+219, b_+222); SET_HL(wInventoryB);
-  CYC(b_+222, b_+224); A = 0x11;
-  CYC(b_+224, b_+225); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(b_+225, b_+227); goto second_item; }
-  CYC(b_+225, b_+227);
-  CYC(b_+227, b_+229); E |= 0x08;
+  if (!game_seasons) {      // the harp's wider icon: Ages only
+    CYC(b_+219, b_+222); SET_HL(wInventoryB);
+    CYC(b_+222, b_+224); A = 0x11;
+    CYC(b_+224, b_+225); alu_cp(gb, mem_rd(gb, HL));
+    if (!(F & FZ)) { CYCT(b_+225, b_+227); goto second_item; }
+    CYC(b_+225, b_+227);
+    CYC(b_+227, b_+229); E |= 0x08;
 second_item:
-  CYC(b_+229, b_+230); L = alu_inc8(gb, L);
-  CYC(b_+230, b_+231); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(b_+231, b_+233); goto write_sprites; }
-  CYC(b_+231, b_+233);
-  CYC(b_+233, b_+234); A = C;
-  CYC(b_+234, b_+236); alu_add(gb, 0x08);
-  CYC(b_+236, b_+237); C = A;
+    CYC(b_+229, b_+230); L = alu_inc8(gb, L);
+    CYC(b_+230, b_+231); alu_cp(gb, mem_rd(gb, HL));
+    if (!(F & FZ)) { CYCT(b_+231, b_+233); goto write_sprites; }
+    CYC(b_+231, b_+233);
+    CYC(b_+233, b_+234); A = C;
+    CYC(b_+234, b_+236); alu_add(gb, 0x08);
+    CYC(b_+236, b_+237); C = A;
+  }
 write_sprites:
-  CYC(b_+237, b_+240); SET_HL(wOam);
-  CYC(b_+240, b_+241); A = B;
-  CYC(b_+241, b_+242); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+242, b_+243); A = E;
-  CYC(b_+243, b_+244); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+244, b_+246); A = 0x78;
-  CYC(b_+246, b_+247); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+247, b_+250); A = W8(wBItemSpriteAttribute1);
-  CYC(b_+250, b_+251); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+251, b_+252); A = B;
-  CYC(b_+252, b_+253); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+253, b_+256); A = W8(wBItemSpriteXOffset);
-  CYC(b_+256, b_+257); alu_add(gb, E);
-  CYC(b_+257, b_+258); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+258, b_+260); A = 0x7a;
-  CYC(b_+260, b_+261); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+261, b_+264); A = W8(wBItemSpriteAttribute2);
-  CYC(b_+264, b_+265); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+265, b_+266); A = B;
-  CYC(b_+266, b_+267); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+267, b_+268); A = C;
-  CYC(b_+268, b_+269); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+269, b_+271); A = 0x7c;
-  CYC(b_+271, b_+272); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+272, b_+275); A = W8(wAItemSpriteAttribute1);
-  CYC(b_+275, b_+276); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+276, b_+277); A = B;
-  CYC(b_+277, b_+278); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+278, b_+281); A = W8(wAItemSpriteXOffset);
-  CYC(b_+281, b_+282); alu_add(gb, C);
-  CYC(b_+282, b_+283); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+283, b_+285); A = 0x7e;
-  CYC(b_+285, b_+286); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+286, b_+289); A = W8(wAItemSpriteAttribute2);
-  CYC(b_+289, b_+290); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+290, b_+291); ret_effect(gb);
+  CYC(b_+O(237), b_+OE(240)); SET_HL(wOam);
+  CYC(b_+O(240), b_+OE(241)); A = B;
+  CYC(b_+O(241), b_+OE(242)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(242), b_+OE(243)); A = E;
+  CYC(b_+O(243), b_+OE(244)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(244), b_+OE(246)); A = 0x78;
+  CYC(b_+O(246), b_+OE(247)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(247), b_+OE(250)); A = W8(wBItemSpriteAttribute1);
+  CYC(b_+O(250), b_+OE(251)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(251), b_+OE(252)); A = B;
+  CYC(b_+O(252), b_+OE(253)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(253), b_+OE(256)); A = W8(wBItemSpriteXOffset);
+  CYC(b_+O(256), b_+OE(257)); alu_add(gb, E);
+  CYC(b_+O(257), b_+OE(258)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(258), b_+OE(260)); A = 0x7a;
+  CYC(b_+O(260), b_+OE(261)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(261), b_+OE(264)); A = W8(wBItemSpriteAttribute2);
+  CYC(b_+O(264), b_+OE(265)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(265), b_+OE(266)); A = B;
+  CYC(b_+O(266), b_+OE(267)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(267), b_+OE(268)); A = C;
+  CYC(b_+O(268), b_+OE(269)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(269), b_+OE(271)); A = 0x7c;
+  CYC(b_+O(271), b_+OE(272)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(272), b_+OE(275)); A = W8(wAItemSpriteAttribute1);
+  CYC(b_+O(275), b_+OE(276)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(276), b_+OE(277)); A = B;
+  CYC(b_+O(277), b_+OE(278)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(278), b_+OE(281)); A = W8(wAItemSpriteXOffset);
+  CYC(b_+O(281), b_+OE(282)); alu_add(gb, C);
+  CYC(b_+O(282), b_+OE(283)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(283), b_+OE(285)); A = 0x7e;
+  CYC(b_+O(285), b_+OE(286)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(286), b_+OE(289)); A = W8(wAItemSpriteAttribute2);
+  CYC(b_+O(289), b_+OE(290)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(290), b_+OE(291)); ret_effect(gb);
 }
 
 void updateStatusBar_body__biggoronSword_hook(GB *gb) {
   BASE(updateStatusBar_body);
-  CYC(b_+291, b_+294); SET_HL(wOam);
-  CYC(b_+294, b_+297); SET_DE(GV(b_+302, 0x528d));
-  CYC(b_+297, b_+299); B = 0x10;
-  CYC(b_+299, b_+302); TAIL(copyMemoryReverse);
+  CYC(b_+O(291), b_+OE(294)); SET_HL(wOam);
+  CYC(b_+O(294), b_+OE(297)); SET_DE(GV(GV(GV(b_+O(302), 0x528d), 0x528d), 0x528d));
+  CYC(b_+O(297), b_+OE(299)); B = 0x10;
+  CYC(b_+O(299), b_+OE(302)); TAIL(copyMemoryReverse);
 }
 
 void correctAddressForExtraHeart_hook(GB *gb) {

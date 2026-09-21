@@ -2863,179 +2863,181 @@ void screen_transition_state2_body_hook(GB *gb) {
   uint16_t entry = gb->hook_pc;
   uint16_t sp0_ = gb->sp; (void)sp0_;
   do { uint16_t jt_ = (entry);
-    if (jt_ == b_+57) { goto transition_up; }
-    else if (jt_ == b_+68) { goto transition_down; }
-    else if (jt_ == b_+78) { goto transition_left; }
-    else if (jt_ == b_+86) { goto transition_right; }
-    else if (jt_ == b_+91) { goto transition; }
-    else if (jt_ == b_+185) { goto done_boundary_checks; }
-    else if (jt_ == b_+209) { goto start_transition; }
+    if (jt_ == b_+O(57)) { goto transition_up; }
+    else if (jt_ == b_+O(68)) { goto transition_down; }
+    else if (jt_ == b_+O(78)) { goto transition_left; }
+    else if (jt_ == b_+O(86)) { goto transition_right; }
+    else if (jt_ == b_+O(91)) { goto transition; }
+    else if (!game_seasons && jt_ == b_+O(185)) { goto done_boundary_checks; }
+    else if (jt_ == b_+O(209)) { goto start_transition; }
   } while (0);
-  if (entry == b_+0) {
-    CYC(b_+0, b_+3); A = mem_rd(gb, wLinkInAir);
-    CYC(b_+3, b_+4); alu_add(gb, A);
-    if (F & FC) { CYCT(b_+4, b_+6); goto check_direction; }
-    CYC(b_+4, b_+6);
-    if (F & FZ) { CYCT(b_+6, b_+8); goto check_direction; }
-    CYC(b_+6, b_+8);
-    CYC(b_+8, b_+10); A = 0x04;
-    CYC(b_+10, b_+13); mem_wr(gb, wScreenTransitionDelay, A);
+  if (entry == b_+O(0)) {
+    CYC(b_+O(0), b_+OE(3)); A = mem_rd(gb, wLinkInAir);
+    CYC(b_+O(3), b_+OE(4)); alu_add(gb, A);
+    if (F & FC) { CYCT(b_+O(4), b_+OE(6)); goto check_direction; }
+    CYC(b_+O(4), b_+OE(6));
+    if (F & FZ) { CYCT(b_+O(6), b_+OE(8)); goto check_direction; }
+    CYC(b_+O(6), b_+OE(8));
+    CYC(b_+O(8), b_+OE(10)); A = 0x04;
+    CYC(b_+O(10), b_+OE(13)); mem_wr(gb, wScreenTransitionDelay, A);
   }
 check_direction:
-  if (entry == b_+0) {
-    CYC(b_+13, b_+16); A = mem_rd(gb, wScreenTransitionDirection);
-    CYC(b_+16, b_+18); alu_bit(gb, 7, A);
+  if (entry == b_+O(0)) {
+    CYC(b_+O(13), b_+OE(16)); A = mem_rd(gb, wScreenTransitionDirection);
+    CYC(b_+O(16), b_+OE(18)); alu_bit(gb, 7, A);
     if (!(F & FZ)) {
-      CYC(b_+18, b_+20);
-      CYC(b_+20, b_+22); alu_and(gb, 0x7f);
-      CYC(b_+22, b_+23); C = A;
-      CYC(b_+23, b_+26); goto start_transition;
+      CYC(b_+O(18), b_+OE(20));
+      CYC(b_+O(20), b_+OE(22)); alu_and(gb, 0x7f);
+      CYC(b_+O(22), b_+OE(23)); C = A;
+      CYC(b_+O(23), b_+OE(26)); goto start_transition;
     }
-    CYCT(b_+18, b_+20);
-    CYC(b_+26, b_+29); A = mem_rd(gb, wLinkObjectIndex);
-    CYC(b_+29, b_+30); H = A;
-    CYC(b_+30, b_+32); L = 0x0b;
-    CYC(b_+32, b_+34); A = 0x05;
-    CYC(b_+34, b_+35); alu_cp(gb, mem_rd(gb, HL));
-    if (!(F & FC)) { CYCT(b_+35, b_+37); entry = b_+57; goto transition_up; }
-    CYC(b_+35, b_+37);
-    CYC(b_+37, b_+40); A = mem_rd(gb, wScreenTransitionBoundaryY);
-    CYC(b_+40, b_+41); alu_cp(gb, mem_rd(gb, HL));
-    if (F & FC) { CYCT(b_+41, b_+43); entry = b_+68; goto transition_down; }
-    CYC(b_+41, b_+43);
+    CYCT(b_+O(18), b_+OE(20));
+    CYC(b_+O(26), b_+OE(29)); A = mem_rd(gb, wLinkObjectIndex);
+    CYC(b_+O(29), b_+OE(30)); H = A;
+    CYC(b_+O(30), b_+OE(32)); L = 0x0b;
+    CYC(b_+O(32), b_+OE(34)); A = 0x05;
+    CYC(b_+O(34), b_+OE(35)); alu_cp(gb, mem_rd(gb, HL));
+    if (!(F & FC)) { CYCT(b_+O(35), b_+OE(37)); entry = b_+O(57); goto transition_up; }
+    CYC(b_+O(35), b_+OE(37));
+    CYC(b_+O(37), b_+OE(40)); A = mem_rd(gb, wScreenTransitionBoundaryY);
+    CYC(b_+O(40), b_+OE(41)); alu_cp(gb, mem_rd(gb, HL));
+    if (F & FC) { CYCT(b_+O(41), b_+OE(43)); entry = b_+O(68); goto transition_down; }
+    CYC(b_+O(41), b_+OE(43));
   }
 check_horizontal:
-  CYC(b_+43, b_+45); L = 0x0d;
-  CYC(b_+45, b_+47); A = 0x05;
-  CYC(b_+47, b_+48); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FC)) { CYCT(b_+48, b_+50); entry = b_+78; goto transition_left; }
-  CYC(b_+48, b_+50);
-  CYC(b_+50, b_+53); A = mem_rd(gb, wScreenTransitionBoundaryX);
-  CYC(b_+53, b_+54); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FC) { CYCT(b_+54, b_+56); entry = b_+86; goto transition_right; }
-  CYC(b_+54, b_+56);
-  CYC(b_+56, b_+57); ret_effect(gb); return;
+  CYC(b_+O(43), b_+OE(45)); L = 0x0d;
+  CYC(b_+O(45), b_+OE(47)); A = 0x05;
+  CYC(b_+O(47), b_+OE(48)); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(b_+O(48), b_+OE(50)); entry = b_+O(78); goto transition_left; }
+  CYC(b_+O(48), b_+OE(50));
+  CYC(b_+O(50), b_+OE(53)); A = mem_rd(gb, wScreenTransitionBoundaryX);
+  CYC(b_+O(53), b_+OE(54)); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) { CYCT(b_+O(54), b_+OE(56)); entry = b_+O(86); goto transition_right; }
+  CYC(b_+O(54), b_+OE(56));
+  CYC(b_+O(56), b_+OE(57)); ret_effect(gb); return;
 transition_up:
-  CYC(b_+57, b_+58); A = alu_inc8(gb, A);
-  CYC(b_+58, b_+59); mem_wr(gb, HL, A);
-  CYC(b_+59, b_+61); B = 0x40;
-  CYC(b_+61, b_+63); C = 0x00;
-  CALL_C(b_+63, screenTransitionState2__transition_hook, b_+91, b_+66);
-  CYC(b_+66, b_+68); goto check_horizontal;
+  CYC(b_+O(57), b_+OE(58)); A = alu_inc8(gb, A);
+  CYC(b_+O(58), b_+OE(59)); mem_wr(gb, HL, A);
+  CYC(b_+O(59), b_+OE(61)); B = 0x40;
+  CYC(b_+O(61), b_+OE(63)); C = 0x00;
+  CALL_C(b_+O(63), screenTransitionState2__transition_hook, b_+O(91), b_+OE(66));
+  CYC(b_+O(66), b_+OE(68)); goto check_horizontal;
 transition_down:
-  CYC(b_+68, b_+69); mem_wr(gb, HL, A);
-  CYC(b_+69, b_+71); B = 0x80;
-  CYC(b_+71, b_+73); C = 0x02;
-  CALL_C(b_+73, screenTransitionState2__transition_hook, b_+91, b_+76);
-  CYC(b_+76, b_+78); goto check_horizontal;
+  CYC(b_+O(68), b_+OE(69)); mem_wr(gb, HL, A);
+  CYC(b_+O(69), b_+OE(71)); B = 0x80;
+  CYC(b_+O(71), b_+OE(73)); C = 0x02;
+  CALL_C(b_+O(73), screenTransitionState2__transition_hook, b_+O(91), b_+OE(76));
+  CYC(b_+O(76), b_+OE(78)); goto check_horizontal;
 transition_left:
-  CYC(b_+78, b_+79); A = alu_inc8(gb, A);
-  CYC(b_+79, b_+80); mem_wr(gb, HL, A);
-  CYC(b_+80, b_+82); B = 0x20;
-  CYC(b_+82, b_+84); C = 0x03;
-  CYC(b_+84, b_+86); goto transition;
+  CYC(b_+O(78), b_+OE(79)); A = alu_inc8(gb, A);
+  CYC(b_+O(79), b_+OE(80)); mem_wr(gb, HL, A);
+  CYC(b_+O(80), b_+OE(82)); B = 0x20;
+  CYC(b_+O(82), b_+OE(84)); C = 0x03;
+  CYC(b_+O(84), b_+OE(86)); goto transition;
 transition_right:
-  CYC(b_+86, b_+87); mem_wr(gb, HL, A);
-  CYC(b_+87, b_+89); B = 0x10;
-  CYC(b_+89, b_+91); C = 0x01;
+  CYC(b_+O(86), b_+OE(87)); mem_wr(gb, HL, A);
+  CYC(b_+O(87), b_+OE(89)); B = 0x10;
+  CYC(b_+O(89), b_+OE(91)); C = 0x01;
 transition:
-  CYC(b_+91, b_+94); A = mem_rd(gb, w1Link_enabled);
-  CYC(b_+94, b_+95); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+95, b_+96); ret_effect(gb); return; }
-  CYC(b_+95, b_+96);
-  CYC(b_+96, b_+99); A = mem_rd(gb, wDisableScreenTransitions);
-  CYC(b_+99, b_+100); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+100, b_+101); ret_effect(gb); return; }
-  CYC(b_+100, b_+101);
-  CYC(b_+101, b_+104); A = mem_rd(gb, wScreenTransitionDelay);
-  CYC(b_+104, b_+105); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+105, b_+107); goto ready_to_transition; }
-  CYC(b_+105, b_+107);
-  CYC(b_+107, b_+108); A = alu_dec8(gb, A);
-  CYC(b_+108, b_+111); mem_wr(gb, wScreenTransitionDelay, A);
-  CYC(b_+111, b_+112); ret_effect(gb); return;
+  CYC(b_+O(91), b_+OE(94)); A = mem_rd(gb, w1Link_enabled);
+  CYC(b_+O(94), b_+OE(95)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(95), b_+OE(96)); ret_effect(gb); return; }
+  CYC(b_+O(95), b_+OE(96));
+  CYC(b_+O(96), b_+OE(99)); A = mem_rd(gb, wDisableScreenTransitions);
+  CYC(b_+O(99), b_+OE(100)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(100), b_+OE(101)); ret_effect(gb); return; }
+  CYC(b_+O(100), b_+OE(101));
+  CYC(b_+O(101), b_+OE(104)); A = mem_rd(gb, wScreenTransitionDelay);
+  CYC(b_+O(104), b_+OE(105)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(105), b_+OE(107)); goto ready_to_transition; }
+  CYC(b_+O(105), b_+OE(107));
+  CYC(b_+O(107), b_+OE(108)); A = alu_dec8(gb, A);
+  CYC(b_+O(108), b_+OE(111)); mem_wr(gb, wScreenTransitionDelay, A);
+  CYC(b_+O(111), b_+OE(112)); ret_effect(gb); return;
 ready_to_transition:
-  CYC(b_+112, b_+115); A = mem_rd(gb, w1Companion_id);
-  CYC(b_+115, b_+117); alu_cp(gb, 0x0a);
-  if (F & FZ) { CYCT(b_+117, b_+119); goto start_transition; }
-  CYC(b_+117, b_+119);
-  CYC(b_+119, b_+122); A = mem_rd(gb, wcc92);
-  CYC(b_+122, b_+123); alu_add(gb, A);
-  if (F & FC) { CYCT(b_+123, b_+124); ret_effect(gb); return; }
-  CYC(b_+123, b_+124);
-  CYC(b_+124, b_+127); A = mem_rd(gb, wLinkInAir);
-  CYC(b_+127, b_+128); alu_add(gb, A);
-  if (F & FC) { CYCT(b_+128, b_+130); goto start_transition; }
-  CYC(b_+128, b_+130);
-  CYC(b_+130, b_+133); A = mem_rd(gb, w1Link_knockbackCounter);
-  CYC(b_+133, b_+134); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+134, b_+135); ret_effect(gb); return; }
-  CYC(b_+134, b_+135);
-  CYC(b_+135, b_+138); A = mem_rd(gb, wcc92);
-  CYC(b_+138, b_+139); alu_add(gb, A);
-  if (!(F & FZ)) { CYCT(b_+139, b_+141); goto boundary_checks; }
-  CYC(b_+139, b_+141);
-  CALL_C(b_+141, convertLinkAngleToDirectionButtons_hook, SYM(convertLinkAngleToDirectionButtons), b_+144);
-  CYC(b_+144, b_+145); alu_and(gb, B);
-  if (F & FZ) { CYCT(b_+145, b_+146); ret_effect(gb); return; }
-  CYC(b_+145, b_+146);
+  CYC(b_+O(112), b_+OE(115)); A = mem_rd(gb, w1Companion_id);
+  CYC(b_+O(115), b_+OE(117)); alu_cp(gb, 0x0a);
+  if (F & FZ) { CYCT(b_+O(117), b_+OE(119)); goto start_transition; }
+  CYC(b_+O(117), b_+OE(119));
+  CYC(b_+O(119), b_+OE(122)); A = mem_rd(gb, wcc92);
+  CYC(b_+O(122), b_+OE(123)); alu_add(gb, A);
+  if (F & FC) { CYCT(b_+O(123), b_+OE(124)); ret_effect(gb); return; }
+  CYC(b_+O(123), b_+OE(124));
+  CYC(b_+O(124), b_+OE(127)); A = mem_rd(gb, wLinkInAir);
+  CYC(b_+O(127), b_+OE(128)); alu_add(gb, A);
+  if (F & FC) { CYCT(b_+O(128), b_+OE(130)); goto start_transition; }
+  CYC(b_+O(128), b_+OE(130));
+  CYC(b_+O(130), b_+OE(133)); A = mem_rd(gb, w1Link_knockbackCounter);
+  CYC(b_+O(133), b_+OE(134)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(134), b_+OE(135)); ret_effect(gb); return; }
+  CYC(b_+O(134), b_+OE(135));
+  CYC(b_+O(135), b_+OE(138)); A = mem_rd(gb, wcc92);
+  CYC(b_+O(138), b_+OE(139)); alu_add(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(139), b_+OE(141)); goto boundary_checks; }
+  CYC(b_+O(139), b_+OE(141));
+  CALL_C(b_+O(141), convertLinkAngleToDirectionButtons_hook, SYM(convertLinkAngleToDirectionButtons), b_+OE(144));
+  CYC(b_+O(144), b_+OE(145)); alu_and(gb, B);
+  if (F & FZ) { CYCT(b_+O(145), b_+OE(146)); ret_effect(gb); return; }
+  CYC(b_+O(145), b_+OE(146));
 boundary_checks:
-  CYC(b_+146, b_+149); A = mem_rd(gb, wTilesetFlags);
-  CYC(b_+149, b_+151); alu_and(gb, 0x01);
-  if (F & FZ) { CYCT(b_+151, b_+153); goto done_boundary_checks; }
-  CYC(b_+151, b_+153);
-  CYC(b_+153, b_+156); A = mem_rd(gb, wActiveRoom);
-  CYC(b_+156, b_+157); E = A;
-  CYC(b_+157, b_+159); alu_and(gb, 0x0f);
-  CYC(b_+159, b_+161); alu_cp(gb, 0x0d);
-  if (!(F & FZ)) { CYCT(b_+161, b_+163); goto right_boundary; }
-  CYC(b_+161, b_+163);
-  CYC(b_+163, b_+164); A = C;
-  CYC(b_+164, b_+166); alu_cp(gb, 0x01);
-  if (F & FZ) { CYCT(b_+166, b_+167); ret_effect(gb); return; }
-  CYC(b_+166, b_+167);
+  if (!game_seasons) {      // room-edge and toggle-block boundary rules: Ages only
+    CYC(b_+146, b_+149); A = mem_rd(gb, wTilesetFlags);
+    CYC(b_+149, b_+151); alu_and(gb, 0x01);
+    if (F & FZ) { CYCT(b_+151, b_+153); goto done_boundary_checks; }
+    CYC(b_+151, b_+153);
+    CYC(b_+153, b_+156); A = mem_rd(gb, wActiveRoom);
+    CYC(b_+156, b_+157); E = A;
+    CYC(b_+157, b_+159); alu_and(gb, 0x0f);
+    CYC(b_+159, b_+161); alu_cp(gb, 0x0d);
+    if (!(F & FZ)) { CYCT(b_+161, b_+163); goto right_boundary; }
+    CYC(b_+161, b_+163);
+    CYC(b_+163, b_+164); A = C;
+    CYC(b_+164, b_+166); alu_cp(gb, 0x01);
+    if (F & FZ) { CYCT(b_+166, b_+167); ret_effect(gb); return; }
+    CYC(b_+166, b_+167);
 right_boundary:
-  CYC(b_+167, b_+168); A = E;
-  CYC(b_+168, b_+170); alu_cp(gb, 0xd0);
-  if (F & FC) { CYCT(b_+170, b_+172); goto left_boundary; }
-  CYC(b_+170, b_+172);
-  CYC(b_+172, b_+173); A = C;
-  CYC(b_+173, b_+175); alu_cp(gb, 0x02);
-  if (F & FZ) { CYCT(b_+175, b_+176); ret_effect(gb); return; }
-  CYC(b_+175, b_+176);
+    CYC(b_+167, b_+168); A = E;
+    CYC(b_+168, b_+170); alu_cp(gb, 0xd0);
+    if (F & FC) { CYCT(b_+170, b_+172); goto left_boundary; }
+    CYC(b_+170, b_+172);
+    CYC(b_+172, b_+173); A = C;
+    CYC(b_+173, b_+175); alu_cp(gb, 0x02);
+    if (F & FZ) { CYCT(b_+175, b_+176); ret_effect(gb); return; }
+    CYC(b_+175, b_+176);
 left_boundary:
-  CYC(b_+176, b_+177); A = E;
-  CYC(b_+177, b_+179); alu_and(gb, 0x0f);
-  if (!(F & FZ)) { CYCT(b_+179, b_+181); goto done_boundary_checks; }
-  CYC(b_+179, b_+181);
-  CYC(b_+181, b_+182); A = C;
-  CYC(b_+182, b_+184); alu_cp(gb, 0x03);
-  if (F & FZ) { CYCT(b_+184, b_+185); ret_effect(gb); return; }
-  CYC(b_+184, b_+185);
+    CYC(b_+176, b_+177); A = E;
+    CYC(b_+177, b_+179); alu_and(gb, 0x0f);
+    if (!(F & FZ)) { CYCT(b_+179, b_+181); goto done_boundary_checks; }
+    CYC(b_+179, b_+181);
+    CYC(b_+181, b_+182); A = C;
+    CYC(b_+182, b_+184); alu_cp(gb, 0x03);
+    if (F & FZ) { CYCT(b_+184, b_+185); ret_effect(gb); return; }
+    CYC(b_+184, b_+185);
 done_boundary_checks:
-  CYC(b_+185, b_+188); A = mem_rd(gb, wTilesetFlags);
-  CYC(b_+188, b_+190); alu_and(gb, 0x40);
-  if (!(F & FZ)) { CYCT(b_+190, b_+192); goto start_transition; }
-  CYC(b_+190, b_+192);
-  CYC(b_+192, b_+195); A = mem_rd(gb, wcc92);
-  CYC(b_+195, b_+197); alu_and(gb, 0x08);
-  if (!(F & FZ)) { CYCT(b_+197, b_+199); goto start_transition; }
-  CYC(b_+197, b_+199);
-  CALL_C(b_+199, checkLinkIsOverHazard_hook, SYM(checkLinkIsOverHazard), b_+202);
-  CYC(b_+202, b_+203); alu_rrca(gb);
-  if (F & FC) CALL_C_CC(b_+203, screenTransitionState2__checkCanTransitionOverWater_hook, b_+224, b_+206);
-  else CYC(b_+203, b_+206);
-  CYC(b_+206, b_+208); alu_and(gb, 0x03);
-  if (!(F & FZ)) { CYCT(b_+208, b_+209); ret_effect(gb); return; }
-  CYC(b_+208, b_+209);
+    CYC(b_+185, b_+188); A = mem_rd(gb, wTilesetFlags);
+    CYC(b_+188, b_+190); alu_and(gb, 0x40);
+    if (!(F & FZ)) { CYCT(b_+190, b_+192); goto start_transition; }
+    CYC(b_+190, b_+192);
+    CYC(b_+192, b_+195); A = mem_rd(gb, wcc92);
+    CYC(b_+195, b_+197); alu_and(gb, 0x08);
+    if (!(F & FZ)) { CYCT(b_+197, b_+199); goto start_transition; }
+    CYC(b_+197, b_+199);
+  }
+  CALL_C(b_+O(199), checkLinkIsOverHazard_hook, SYM(checkLinkIsOverHazard), b_+OE(202));
+  CYC(b_+O(202), b_+OE(203)); alu_rrca(gb);
+  if (F & FC) CALL_C_CC(b_+O(203), screenTransitionState2__checkCanTransitionOverWater_hook, SYM(screenTransitionState2__checkCanTransitionOverWater), b_+OE(206));
+  else CYC(b_+O(203), b_+OE(206));
+  CYC(b_+O(206), b_+OE(208)); alu_and(gb, 0x03);
+  if (!(F & FZ)) { CYCT(b_+O(208), b_+OE(209)); ret_effect(gb); return; }
+  CYC(b_+O(208), b_+OE(209));
 start_transition:
-  CYC(b_+209, b_+211); A = 0x04;
-  CYC(b_+211, b_+214); mem_wr(gb, wScrollMode, A);
-  CYC(b_+214, b_+216); A = 0x03;
-  CYC(b_+216, b_+219); mem_wr(gb, wScreenTransitionState, A);
-  CYC(b_+219, b_+220); A = C;
-  CYC(b_+220, b_+223); mem_wr(gb, wScreenTransitionDirection, A);
-  CYC(b_+223, b_+224); ret_effect(gb); return;
+  CYC(b_+O(209), b_+OE(211)); A = 0x04;
+  CYC(b_+O(211), b_+OE(214)); mem_wr(gb, wScrollMode, A);
+  CYC(b_+O(214), b_+OE(216)); A = 0x03;
+  CYC(b_+O(216), b_+OE(219)); mem_wr(gb, wScreenTransitionState, A);
+  CYC(b_+O(219), b_+OE(220)); A = C;
+  CYC(b_+O(220), b_+OE(223)); mem_wr(gb, wScreenTransitionDirection, A);
+  CYC(b_+O(223), b_+OE(224)); ret_effect(gb); return;
 }
 
 void screenTransitionState2_hook(GB *gb) { gb->hook_pc = SYM(screenTransitionState2); screen_transition_state2_body_hook(gb); }
@@ -3050,29 +3052,31 @@ void screenTransitionState2__startTransition_hook(GB *gb) { gb->hook_pc = SYM(sc
 void screenTransitionState2__checkCanTransitionOverWater_hook(GB *gb) {
   BASE(screenTransitionState2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+224, b_+227); A = mem_rd(gb, wLinkObjectIndex);
-  CYC(b_+227, b_+228); alu_rrca(gb);
-  if (F & FC) { CYCT(b_+228, b_+230); screenTransitionState2__fail_hook(gb); return; }
-  CYC(b_+228, b_+230);
-  CYC(b_+230, b_+232); A = 0x4a;
-  CALL_C(b_+232, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+235);
-  if (F & FC) { CYCT(b_+235, b_+236); ret_effect(gb); return; }
-  CYC(b_+235, b_+236);
-  CYC(b_+236, b_+239); A = mem_rd(gb, wObjectTileIndex);
-  CYC(b_+239, b_+241); alu_cp(gb, 0xfc);
-  if (F & FZ) { CYCT(b_+241, b_+243); screenTransitionState2__fail_hook(gb); return; }
-  CYC(b_+241, b_+243);
-  CYC(b_+243, b_+245); A = 0x2e;
-  CALL_C(b_+245, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+248);
-  if (F & FC) { CYCT(b_+248, b_+249); ret_effect(gb); return; }
-  CYC(b_+248, b_+249);
+  CYC(b_+O(224), b_+OE(227)); A = mem_rd(gb, wLinkObjectIndex);
+  CYC(b_+O(227), b_+OE(228)); alu_rrca(gb);
+  if (F & FC) { CYCT(b_+O(228), b_+OE(230)); screenTransitionState2__fail_hook(gb); return; }
+  CYC(b_+O(228), b_+OE(230));
+  CYC(b_+O(230), b_+OE(232)); A = GV(0x4a, 0x2e);    // TREASURE_MERMAID_SUIT / TREASURE_FLIPPERS
+  CALL_C(b_+O(232), checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+OE(235));
+  if (F & FC) { CYCT(b_+O(235), b_+OE(236)); ret_effect(gb); return; }
+  CYC(b_+O(235), b_+OE(236));
+  if (!game_seasons) {      // flippers as a second chance: Ages only
+    CYC(b_+236, b_+239); A = mem_rd(gb, wObjectTileIndex);
+    CYC(b_+239, b_+241); alu_cp(gb, 0xfc);
+    if (F & FZ) { CYCT(b_+241, b_+243); screenTransitionState2__fail_hook(gb); return; }
+    CYC(b_+241, b_+243);
+    CYC(b_+243, b_+245); A = 0x2e;
+    CALL_C(b_+245, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+248);
+    if (F & FC) { CYCT(b_+248, b_+249); ret_effect(gb); return; }
+    CYC(b_+248, b_+249);
+  }
   TAIL(screenTransitionState2__fail);
 }
 
 void screenTransitionState2__fail_hook(GB *gb) {
   BASE(screenTransitionState2);
-  CYC(b_+249, b_+251); A = 0xff;
-  CYC(b_+251, b_+252); ret_effect(gb);
+  CYC(b_+O(249), b_+OE(251)); A = 0xff;
+  CYC(b_+O(251), b_+OE(252)); ret_effect(gb);
 }
 
 void update_camera_position_body_hook(GB *gb) {

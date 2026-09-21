@@ -19,7 +19,9 @@ loadTilesetLayout
 paletteFadeHandler
 parseGivenObjectData_b12
 rickyStateA
+screenTransitionState2
 specialObjectCode_linkInCutscene_b06
 standardGameState
 updateInteraction
 updateSpecialObjects
+updateStatusBar_body

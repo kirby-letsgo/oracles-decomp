@@ -262,6 +262,12 @@ rope_changeDirection
 runSecretEntryMenu__func
 runSecretEntryMenu__mode2
 saveFile_b07
+screenTransitionState2@checkCanTransitionOverWater
+screenTransitionState2@transition
+screenTransitionState2@transitionDown
+screenTransitionState2@transitionLeft
+screenTransitionState2@transitionRight
+screenTransitionState2@transitionUp
 scriptCmd_loadSprite
 secretListMenu_printSecret__getSecretText
 secretListMenu_printSecret__val0
@@ -297,6 +303,9 @@ twinrova_stateE
 updateAllObjects
 updateHeartRingCounter
 updateSpecialObjects@updateSpecialObject
+updateStatusBar_body@biggoronSword
+updateStatusBar_body@updateHeartDisplay
+updateStatusBar_body@updateRupeeDisplay
 updateSwingableItemAnimation
 updateTextboxArrow
 updateTextbox__standardText

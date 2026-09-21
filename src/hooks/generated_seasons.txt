@@ -565,6 +565,15 @@
 01:40a1 screenTransitionState1__substate1_hook -
 01:40c1 screenTransitionState1__substate2_hook -
 01:40f5 setScreenTransitionState02_hook -
+01:4105 screenTransitionState2_hook -
+01:413e screenTransitionState2__transitionUp_hook -
+01:4149 screenTransitionState2__transitionDown_hook -
+01:4153 screenTransitionState2__transitionLeft_hook -
+01:415b screenTransitionState2__transitionRight_hook -
+01:4160 screenTransitionState2__transition_hook -
+01:41a1 screenTransitionState2__startTransition_hook -
+01:41b0 screenTransitionState2__checkCanTransitionOverWater_hook -
+01:41bc screenTransitionState2__fail_hook -
 01:41bf updateCameraPosition_hook -
 01:41cb updateCameraPosition__smallRoom_hook -
 01:41d1 updateCameraPosition__largeRoom_hook -
@@ -884,6 +893,10 @@
 02:5083 menuStateFadeOutOfMenu_hook -
 02:50fc menuStateFadeIntoGame_hook -
 02:510d playHeartBeepAtInterval_hook -
+02:5173 updateStatusBar_body_hook -
+02:51c1 updateStatusBar_body__updateRupeeDisplay_hook -
+02:5209 updateStatusBar_body__updateHeartDisplay_hook -
+02:5282 updateStatusBar_body__biggoronSword_hook -
 02:529d correctAddressForExtraHeart_hook -
 02:52a4 loadEquippedItemGfx_hook -
 02:52c8 func_02_52f6_hook -
