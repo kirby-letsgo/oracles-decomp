@@ -107,7 +107,7 @@ def main():
 
     seasons_names = set(rom_labels(seasons_sym))
     from symfiles import pair_instances
-    from routine_equiv import Game
+    from routine_equiv import Game, mask_jumptables
     pairs = pair_instances(ages_rom, ages_sym, seasons_rom, seasons_sym)
     A, S = Game(ages_rom, ages_sym), Game(seasons_rom, seasons_sym)
     ages_labels = rom_labels(ages_sym)
@@ -148,7 +148,7 @@ def main():
             ta = A.rd(a[0], a[1] + off + 1) | (A.rd(a[0], a[1] + off + 2) << 8)
             ts = S.rd(s_[0], s_[1] + off + 1) | (S.rd(s_[0], s_[1] + off + 2) << 8)
             try:
-                if A.normalized(a[0], ta)[0] != S.normalized(s_[0], ts)[0]: return False
+                if mask_jumptables(A.normalized(a[0], ta)[0]) != mask_jumptables(S.normalized(s_[0], ts)[0]): return False
             except Exception: return False
         return bool(ages_labels.get(base))
 
@@ -205,14 +205,20 @@ def main():
         fn, flags = p[1], (p[2] if len(p) > 2 else '-')
         if not fn.endswith('_hook'): skipped['not a hook'] += 1; continue
         if not any(eligible.get((path, fn), False) for path in by_name.get(fn, [])):
-            skipped['not eligible'] += 1; continue
+            skipped['not eligible'] += 1
+            if '--why' in sys.argv and not by_name.get(fn): print(f'{fn}: no C function of that name')
+            elif '--why' in sys.argv and hook_verdict(fn) != 'IDENTICAL' and not any(why.get((path, fn)) for path in by_name.get(fn, [])): print(f'{fn}: routine {hook_verdict(fn)}, no other reason')
+            continue
         name = [n for n, inst in ages.items() if (bank, addr) in inst]
         name = [n for n in name if n.replace('@', '__') in fn] or name
         if not name: skipped['no label'] += 1; continue
         name = name[0]
         parent = name.split('@')[0]
         s = pairs.get((name, bank, addr))
-        if s is None: skipped['no seasons label'] += 1; continue
+        if s is None:
+            skipped['no seasons label'] += 1
+            if '--why' in sys.argv: print(f'{fn}: no Seasons pair for {name} at {bank:02x}:{addr:04x}')
+            continue
         rows.append((s[0], s[1], fn, flags))
     rows.sort()
     with open('src/hooks/generated_seasons.txt', 'w') as f:

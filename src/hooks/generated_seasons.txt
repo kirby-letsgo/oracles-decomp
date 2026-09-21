@@ -1,3 +1,7 @@
+00:0040 vblankVector_hook -
+00:0048 lcdVector_hook -
+00:0050 timerVector_hook -
+00:0058 serialVector_hook -
 00:0068 addAToDe_hook -
 00:006d addAToBc_hook -
 00:0072 addDoubleIndexToDe_hook -
@@ -550,6 +554,8 @@
 00:3e6e interactionFunc_3e6d_hook -
 00:3ea7 getFreePartSlot_hook -
 00:3eba partDelete_hook -
+00:c000 wMusicReadFunction_hook -
+00:ff80 hramOamDmaFunction_hook -
 01:4000 func_4000_b01_hook -
 01:400b func_400b_hook -
 01:401b screenTransitionState0_hook -
@@ -608,7 +614,6 @@
 01:47ab loadBigBufferScrollValues_body_hook -
 01:47cd func_47fc_hook -
 01:47d6 checkAndApplyPaletteFadeTransition_hook -
-01:489d makeActiveObjectFollowLink_b01_hook -
 01:48a6 resetFollowingLinkPath_hook -
 01:48da checkUpdateFollowingLinkObject_hook -
 01:48e6 checkUpdateFollowingLinkObject__update_hook -
@@ -639,15 +644,12 @@
 01:4b40 cutscene17__state4_hook -
 01:4b74 initWaveScrollValuesForEverySecondLine_hook -
 01:4b8b cutscene15_hook -
-01:4b94 cutscene15__update_hook -
 01:4b9e cutscene15__func_4c03_hook -
 01:4ba6 cutscene15__incTmpcbb3_hook -
 01:4bab cutscene15__state0_hook -
-01:4bc1 cutscene15__state1_hook -
 01:4bcb cutscene15__state1__substate0_hook -
 01:4be3 cutscene15__state1__initWaveScrollValuesInverted_hook -
 01:4bfb cutscene15__state1__substate1_hook -
-01:4c0f cutscene15__state1__substate2_hook -
 01:4c8c cutscene15__state2_hook -
 01:4c94 cutscene15__state2__substate1_hook -
 01:4cb1 cutscene18_hook -
@@ -745,7 +747,6 @@
 02:413b getFileDisplayVariableAddress_paramE_hook -
 02:4145 fileSelectMode0_hook -
 02:4161 fileSelectMode1_hook -
-02:416a fileSelectMode1__subModes_hook -
 02:4176 fileSelectMode1__state0_hook -
 02:4196 fileSelectMode1__state1_hook -
 02:41be fileSelectMode1__getNextFileSelectMode_hook -
@@ -1010,9 +1011,6 @@
 02:681d dungeonMap_getTileForRoom__ret_hook -
 02:6820 dungeonMap_checkCanViewFloor_hook -
 02:6833 dungeonMap_checkCompassTile_hook -
-02:6848 dungeonMap_checkCompassTile__treasure68e3_hook -
-02:684f dungeonMap_checkCompassTile__nothing68ea_hook -
-02:6851 dungeonMap_checkCompassTile__ret68ec_hook -
 02:6854 dungeonMap_getFloorAddress_hook -
 02:6c67 runRingMenu_hook -
 02:6c82 runRingMenu__runStateCode_hook -
@@ -1721,6 +1719,7 @@
 07:479f func_07_47b7_hook -
 07:47c7 applyDamageToLink_paramE_hook -
 07:47c8 applyDamageToLink_hook -
+07:485a updateItems_hook -
 07:4902 updateItemsPost_hook -
 07:4917 itemCodeNilPost_hook -
 07:4918 updateItemPost_hook -

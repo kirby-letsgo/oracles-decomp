@@ -10,6 +10,7 @@ differs (a different callee or variable). DIFFERENT means the instruction stream
 AGES_ONLY means the label does not exist in seasons.sym.
 """
 import bisect, glob, os, re, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 R8N = ['b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a']
 R16 = ['bc', 'de', 'hl', 'sp']
@@ -37,6 +38,16 @@ class Game:
             if '@' not in n:
                 self.instances.setdefault(n, [])
                 if (b, a) not in self.instances[n]: self.instances[n].append((b, a))
+        # extra labels: vectors and code copied to RAM (read through its ROM source)
+        self.relocs = []
+        self.extra_names = set()        # never end a body: most are resume points inside a routine
+        from symfiles import extra_labels
+        for b, a, n, src, ext in extra_labels(sym_path):
+            self.labels.setdefault(n, (b, a)); self.by_addr.setdefault((b, a), n); self.extra_names.add(n)
+            if '@' not in n and '__' not in n:      # `parent__local` names are C spellings of @locals
+                self.instances.setdefault(n, [])
+                if (b, a) not in self.instances[n]: self.instances[n].append((b, a))
+            if src: self.relocs.append((a, a + 0x80, src))
         self.sorted_by_bank = {}
         for (b, a) in self.by_addr:
             self.sorted_by_bank.setdefault(b, []).append(a)
@@ -46,7 +57,10 @@ class Game:
 
     def rd(self, bank, addr, off=0):
         a = addr + off
-        if a >= 0x8000: return 0
+        if a >= 0x8000:
+            for lo, hi, (sb, sa) in self.relocs:
+                if lo <= a < hi: return self.rd(sb, sa + (a - lo))
+            return 0
         return self.rom[(bank * 0x4000 + (a - 0x4000)) if a >= 0x4000 else a]
 
     def rom_sym(self, bank, t, hint=None):
@@ -146,8 +160,8 @@ class Game:
         seen, work = {}, [start]
         while work:
             a = work.pop()
-            if a in seen or a >= 0x8000: continue
-            if a != start and (bank, a) in self.by_addr and '@' not in self.by_addr[(bank, a)]: continue
+            if a in seen or (a >= 0x8000 and not any(lo <= a < hi for lo, hi, _ in self.relocs)): continue
+            if a != start and (bank, a) in self.by_addr and '@' not in self.by_addr[(bank, a)] and self.by_addr[(bank, a)] not in self.extra_names: continue
             ln, kind, tmpl, ops = self.decode(bank, a)
             succ = []
             if kind == 'rst' and tmpl == 'rst $00':
@@ -169,7 +183,7 @@ class Game:
             else:
                 succ.append(a + ln)
             seen[a] = (a, ln, kind, tmpl, ops)
-            work.extend(t for t in succ if (t < 0x4000) == (start < 0x4000))
+            work.extend(t for t in succ if (t < 0x4000) == (start < 0x4000) or (start >= 0x8000 and t >= 0x8000))
         self._bodies[key] = [seen[a] for a in sorted(seen)]
         return self._bodies[key]
 

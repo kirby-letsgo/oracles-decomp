@@ -33,14 +33,37 @@ def ram_map(sym, generated='src/hooks/generated.txt'):
     return ram
 
 
+def extra_sym_for(sym):
+    """The hand-written extra labels that go with a symbol file (vectors, code run from RAM)."""
+    return 'src/hooks/extra_seasons.sym' if 'seasons' in sym else 'src/hooks/extra.sym'
+
+
+def extra_labels(sym):
+    """[(bank, addr, name, source (bank, addr) or None, extern)] from the extra file."""
+    import os
+    out = []
+    path = extra_sym_for(sym)
+    if not os.path.exists(path): return out
+    for line in open(path):
+        line = line.split('#')[0].strip()
+        m = re.match(r'([0-9a-f]{2}):([0-9a-f]{4}) (\S+)(?: = ([0-9a-f]{2}):([0-9a-f]{4})| (extern))?$', line)
+        if not m: continue
+        out.append((int(m.group(1), 16), int(m.group(2), 16), m.group(3), (int(m.group(4), 16), int(m.group(5), 16)) if m.group(4) else None, bool(m.group(6))))
+    return out
+
+
 def rom_labels(sym):
-    """label name -> [(bank, addr)] sorted by bank, for every ROM label including @locals."""
+    """label name -> [(bank, addr)] sorted by bank, for every ROM label including @locals, plus
+    the extra labels (RAM code keeps its RAM address)."""
     labels = {}
     for line in open(sym):
         m = re.match(r'([0-9a-f]{2}):([0-9a-f]{4}) (\S+)$', line.strip())
         if not m: continue
         b, a, n = int(m.group(1), 16), int(m.group(2), 16), m.group(3)
         if a >= 0x8000: continue
+        lst = labels.setdefault(n, [])
+        if (b, a) not in lst: lst.append((b, a))
+    for b, a, n, src, ext in extra_labels(sym):
         lst = labels.setdefault(n, [])
         if (b, a) not in lst: lst.append((b, a))
     for n in labels: labels[n].sort()

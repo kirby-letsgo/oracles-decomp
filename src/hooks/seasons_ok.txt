@@ -60,9 +60,6 @@ copyFileFromHlToDe
 createEnergySwirlGoingIn
 createEnergySwirlGoingOut
 cucco_hitWithMysterySeed
-cutscene15__state1
-cutscene15__state1__substate2
-cutscene15__update
 cutscene17
 cutscene17__state0
 cutscene18_state5
@@ -130,6 +127,7 @@ func_11_5e8a
 func_2d48
 func_4553@getLinkWalkingAnimation
 func_49c9
+func_5933
 gameLink_getFile1
 gameLink_getFile2
 gameLink_getFile3
@@ -160,6 +158,7 @@ interac11_subid00
 interactionAnimate
 interactionCode10
 interactionCode1c
+interactionCode7a
 interactionCode7d
 interactionCodeae
 interactionCodeaf
@@ -199,6 +198,7 @@ linkCutscene_initOam_setVisible_incState
 linkInteractWithAButtonSensitiveObjects
 linkState00
 linkState05
+linkUpdateFlippersSpeed
 linkUpdateInAir
 linkedNpc_generateSecret
 loadEquippedItemSpriteData
@@ -259,6 +259,8 @@ ringMenu_state2
 ringMenu_state2__substate1
 ringMenu_unappraisedRings_state1
 rope_changeDirection
+runSecretEntryMenu__func
+runSecretEntryMenu__mode2
 saveFile_b07
 scriptCmd_loadSprite
 secretListMenu_printSecret__getSecretText
@@ -296,6 +298,7 @@ updateAllObjects
 updateHeartRingCounter
 updateSpecialObjects@updateSpecialObject
 updateSwingableItemAnimation
+updateTextboxArrow
 updateTextbox__standardText
 updateTextbox__updateText
 vasu_giveRingBox
