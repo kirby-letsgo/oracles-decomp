@@ -13486,6 +13486,23 @@ enum {
   S_checkHoronVillageNPCShouldBeSeen_body,
   S_checkNPCStage,
   S_conditionalHoronNPCLookupTable,
+  S_interactionCodedc_subidF,
+  S_interactionCodedc_subid0,
+  S_func_6744,
+  S_interactionCodedc_subid3,
+  S_interactionCodedc_subid4,
+  S_interactionCodedc_subid5,
+  S_interactionCodedc_subid6,
+  S_interactionCodedc_subid7,
+  S_interactionCodedc_subid8,
+  S_interactionCodedc_subid9,
+  S_func_6a18,
+  S_interactionCodedc_subidA,
+  S_interactionCodedc_subidB,
+  S_interactionCodedc_subidC,
+  S_interactionCodedc_subidD,
+  S_interactionCodedc_subidE,
+  S_table_675a,
   SYM_COUNT
 };
 enum {
