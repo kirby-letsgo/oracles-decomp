@@ -46,7 +46,7 @@ static void floating_image_state0_tail(GB *gb) {
   CYC(b_+39, b_+42); objectSetVisible80_hook(gb);
 }
 
-void interactionCodea0__afterCall40a6_hook(GB *gb) {
+static void floating_image_after_40a6(GB *gb) {
   floating_image_state0_tail(gb);
 }
 
@@ -57,7 +57,7 @@ void interactionCodea0__state0_hook(GB *gb) {
   CYC(b_+10, b_+11); mem_wr(gb, DE, A);
   CALL_C(b_+11, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+14);
   CALL_C(b_+14, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+17);
-  interactionCodea0__afterCall40a6_hook(gb);
+  floating_image_after_40a6(gb);
 }
 
 void interactionCodea0__state1_hook(GB *gb) {

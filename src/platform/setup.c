@@ -1,6 +1,7 @@
 #include "platform/setup.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 uint8_t *oracles_read_file(const char *path, size_t *size) {
   FILE *f = fopen(path, "rb");
@@ -39,12 +40,19 @@ bool oracles_load_init_ram(GB *gb, const char *path) {
   return true;
 }
 
+// A boot state is the GB struct behind a header naming the format and the struct's size, so a
+// file recorded before GB grew is refused instead of misread.
+typedef struct { char magic[8]; uint32_t version, size; } BootStateHeader;
+#define BOOT_STATE_MAGIC "ORCLBOOT"
+#define BOOT_STATE_VERSION 1
+
 bool oracles_save_boot_state(const GB *gb, const char *path) {
   FILE *f = fopen(path, "wb");
   if (!f) return false;
-  size_t n = fwrite(gb, 1, sizeof *gb, f);
+  BootStateHeader h = {BOOT_STATE_MAGIC, BOOT_STATE_VERSION, (uint32_t)sizeof *gb};
+  size_t n = fwrite(&h, 1, sizeof h, f) + fwrite(gb, 1, sizeof *gb, f);
   fclose(f);
-  return n == sizeof *gb;
+  return n == sizeof h + sizeof *gb;
 }
 
 void oracles_copy_state(GB *gb, const GB *src) {
@@ -65,6 +73,12 @@ void oracles_copy_state(GB *gb, const GB *src) {
 bool oracles_load_boot_state(GB *gb, const char *path) {
   FILE *f = fopen(path, "rb");
   if (!f) return false;
+  BootStateHeader h;
+  if (fread(&h, 1, sizeof h, f) != sizeof h || memcmp(h.magic, BOOT_STATE_MAGIC, 8) != 0 || h.version != BOOT_STATE_VERSION || h.size != sizeof *gb) {
+    fprintf(stderr, "%s: not a boot state for this build (want %s v%d, GB %zu bytes); re-record it with oracles-run --boot-state-out\n", path, BOOT_STATE_MAGIC, BOOT_STATE_VERSION, sizeof *gb);
+    fclose(f);
+    return false;
+  }
   GB *tmp = malloc(sizeof *tmp);
   size_t n = fread(tmp, 1, sizeof *tmp, f);
   fclose(f);

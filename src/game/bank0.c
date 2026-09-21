@@ -13,7 +13,6 @@ void checkLockBG7Color3ToBlack_hook(GB *gb);
 void b2_fileSelectScreen_hook(GB *gb);
 void runBank2Function_hook(GB *gb);
 void runIntroCinematic_hook(GB *gb);
-void intro_cinematic__afterCall2d27_hook(GB *gb);
 void updateTextbox_hook(GB *gb);
 void reloadObjectGfx_b3f_hook(GB *gb);
 void refreshObjectGfx_body_hook(GB *gb);
@@ -12649,11 +12648,6 @@ void intro_cinematic_hook(GB *gb) {
   intro_cinematic_after_call(gb, sp0_);
 }
 
-void intro_cinematic__afterCall2d27_hook(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  intro_cinematic_after_call(gb, sp0_);
-}
-
 // the enemy state machine's common prologue: returns the case index in c
 
 void enemyStandardUpdate_hook(GB *gb) {
@@ -12899,7 +12893,6 @@ static void resume_thread_restore_bank(GB *gb) {
   CYC(b_+18, b_+19);
   ret_effect(gb);
 }
-
 
 void resumeThreadNextFrame_hook(GB *gb) {
   BASE(resumeThreadNextFrame);

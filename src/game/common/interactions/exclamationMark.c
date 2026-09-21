@@ -64,7 +64,7 @@ static uint16_t exclamation_jump_table(GB *gb) {
   return HL;
 }
 
-void interactionCode9f__afterCall405b_hook(GB *gb) {
+static void exclamation_mark_after_405b(GB *gb) {
   BASE(interactionCode9f);
   CYC(b_+19, b_+22); TAIL(objectSetVisible80);
 }
@@ -78,7 +78,7 @@ void interactionCode9f__state0_hook(GB *gb) {
   CYC(b_+12, b_+14); L = 0x40;
   CYC(b_+14, b_+16); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
   CALL_C(b_+16, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+19);
-  interactionCode9f__afterCall405b_hook(gb);
+  exclamation_mark_after_405b(gb);
 }
 
 void interactionCode9f__state1_hook(GB *gb) {
