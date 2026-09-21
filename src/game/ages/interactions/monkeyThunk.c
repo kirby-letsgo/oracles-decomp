@@ -14,5 +14,5 @@ void interactionCode39_hook(GB *gb) {
   BASE(interactionCode39);
   CYC(b_+0, b_+3); SET_HL(interactionCode39_body_bank3f);
   CYC(b_+3, b_+5); E = 0x3f;
-  CYC(b_+5, b_+8); interBankCall_hook(gb);
+  CYC(b_+5, b_+8); TAIL(interBankCall);
 }

@@ -944,7 +944,7 @@ void nayruSubid04_hook(GB *gb) {
   // jpab scriptHelp.turnToFaceSomething
   CYC(b_+16, b_+19); SET_HL(turnToFaceSomething_bank15);
   CYC(b_+19, b_+21); E = 0x15;
-  CYC(b_+21, b_+24); interBankCall_hook(gb);
+  CYC(b_+21, b_+24); TAIL(interBankCall);
 }
 
 // Subid $05: ?
@@ -966,7 +966,7 @@ void nayruSubid05_hook(GB *gb) {
   // jpab scriptHelp.turnToFaceSomething
   CYC(b_+12, b_+15); SET_HL(turnToFaceSomething_bank15);
   CYC(b_+15, b_+17); E = 0x15;
-  CYC(b_+17, b_+20); interBankCall_hook(gb);
+  CYC(b_+17, b_+20); TAIL(interBankCall);
 }
 
 // For Nayru subid 0 (getting possessed cutscene), this updates var3a, var3b representing

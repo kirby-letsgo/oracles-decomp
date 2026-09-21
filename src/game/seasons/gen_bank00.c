@@ -581,7 +581,7 @@ void s_checkIfHoronVillageNPCShouldBeSeen(GB *gb) {
   I(0x3e0a, 2); A = 0x08;  // ld a,$08
   I(0x3e0c, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3e0e, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3e11, s_checkHoronVillageNPCShouldBeSeen_body__main, 0x57db, 0x3e14);  // call $57db
+  CALL(0x3e11, s_checkHoronVillageNPCShouldBeSeen_body__main_hook, 0x57db, 0x3e14);  // call $57db
   I(0x3e14, 2); C = 0x01;  // ld c,$01
   if ((F & FC)) { I(0x3e16, 3); goto L_3e19; } I(0x3e16, 2);  // jr c,$3e19
   I(0x3e18, 1); C = alu_dec8(gb, C);  // dec c
@@ -1680,7 +1680,7 @@ void s_getSunkenCityNPCVisibleSubId_caller(GB *gb) {
   I(0x3e41, 2); A = 0x08;  // ld a,$08
   I(0x3e43, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3e45, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3e48, s_getSunkenCityNPCVisibleSubId__main, 0x5874, 0x3e4b);  // call $5874
+  CALL(0x3e48, s_getSunkenCityNPCVisibleSubId__main_hook, 0x5874, 0x3e4b);  // call $5874
   SET_AF(POP(0x3e4b));  // pop af
   I(0x3e4c, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3e4e, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a

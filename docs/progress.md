@@ -448,6 +448,17 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-22: merged Fable's Seasons milestone 3 batches 1 through 4e (`0a51603`..`3e683b2`):
+  270 Seasons-only routines rewritten by hand under `src/game/seasons/` (`rewritten_seasons.txt`),
+  the local-hook rule (a rewritten routine's local that generated code reaches needs a
+  `parent@local` line and an `s_<parent>__<local>_hook`), guard_tailcalls for interBankCall tail
+  jumps. Conflict in `transliterate.py` resolved by combining Fable's rewritten-local hooks with
+  main's `locals_for()` alias union. Fable's `introCutscenes.c` called `s_brightenRoom`, which
+  batch 4 had turned into a shared hook: `gen.h` now defines `s_<label>` as the shared hook for
+  every shared routine so promotions never break hand files. Seasons table 10,883 (3,666 shared).
+  Gates: ctest 10/10, whole movie, Ages verify 30k, Seasons 67k `OFS_TRAP=1 VERIFY_ALL=1` 0
+  failures, native both, lint 0.
+
 - 2026-09-21 (night): Seasons playthrough extended to 67,281 frames (Hero's Cave, Maku Tree):
   `tas/seasons-play.ref` re-recorded with `--no-hooks --init-ram tas/gbhawk-wram0.txt` (the
   33k prefix unchanged), both tests bumped. The longer movie exposed three classes of bug and

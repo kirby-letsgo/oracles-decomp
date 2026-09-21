@@ -28,5 +28,10 @@ for l in open('src/hooks/generated.txt'):
 for n in sorted(rewritten):
     if n in gen: err('src/hooks/generated.txt', 0, f'{n} is in rewritten.txt but still generated')
     if n + '_hook' not in gen: err('src/hooks/rewritten.txt', 0, f'{n} has no {n}_hook entry')
+rewritten_s = set(x for x in (l.split('#')[0].strip() for l in open('src/hooks/rewritten_seasons.txt')) if x) if os.path.exists('src/hooks/rewritten_seasons.txt') else set()
+gen_s = set(l.split()[1] for l in open('src/hooks/generated_seasons_gen.txt') if len(l.split()) >= 2) if os.path.exists('src/hooks/generated_seasons_gen.txt') else set()
+for n in sorted(rewritten_s):
+    if 's_' + n.replace('@', '__').replace('.', '_') in gen_s: err('src/hooks/generated_seasons_gen.txt', 0, f'{n} is in rewritten_seasons.txt but still generated')
+    if 's_' + n.replace('@', '__').replace('.', '_') + '_hook' not in gen_s: err('src/hooks/rewritten_seasons.txt', 0, f'{n} has no s_{n}_hook entry')
 print('lint: %d problems' % bad)
 sys.exit(1 if bad else 0)

@@ -386,7 +386,7 @@ void specialObjectCode_minecart_b05_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(GV(SYM(updateHeartRingCounter), 0x5588));
   CYC(b_+3, b_+5); E = 0x06;
   CYC(b_+5, b_+8);
-  interBankCall_hook(gb);
+  TAIL(interBankCall);
 }
 
 void specialObjectCode_raft_b05_hook(GB *gb) {
@@ -394,5 +394,5 @@ void specialObjectCode_raft_b05_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL((SYM(linkUpdateFlippersSpeed__nextState) + 6));
   CYC(b_+3, b_+5); E = 0x06;
   CYC(b_+5, b_+8);
-  interBankCall_hook(gb);
+  TAIL(interBankCall);
 }

@@ -208,7 +208,7 @@ afterSpawn:
   CALL_C(b_+44, playSound_b00_hook, SYM(playSound_b00), b_+47);
   CYC(b_+47, b_+50); SET_HL((SYM(interactionCode92) + 8)); // scriptHelp.objectWritePositionTocfd5
   CYC(b_+50, b_+52); E = 0x15; // bank of scriptHelp
-  CYC(b_+52, b_+55); interBankCall_hook(gb); return; // jp
+  CYC(b_+52, b_+55); TAIL(interBankCall); // jp
 }
 
 void twinrova_loadAngleAndCounterPreset_hook(GB *gb) {

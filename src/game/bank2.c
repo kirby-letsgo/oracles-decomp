@@ -2336,8 +2336,7 @@ static void secret_list_get_secret_text(GB *gb) {
       E = SYMBANK(generateGameTransferSecret);
       CYC(b_+10, b_+15);
       CYC(b_+15, b_+18);
-      interBankCall_hook(gb);
-      return;
+      TAIL(interBankCall);
     }
     else if (jt_ == b_+18) {
       SET_BC(0x0002);
@@ -4195,7 +4194,7 @@ static void draw_name_input_cursors_tail(GB *gb) {
   CYC(b_+57, b_+58); C = A;
   CYC(b_+58, b_+60); B = 0;
   CYC(b_+60, b_+63); SET_HL(b_+91);
-  CYC(b_+63, b_+66); addSpritesToOam_withOffset_hook(gb);
+  CYC(b_+63, b_+66); TAIL(addSpritesToOam_withOffset);
 }
 
 void drawNameInputCursors_hook(GB *gb) {
@@ -4261,7 +4260,7 @@ static void draw_secret_input_cursors_tail(GB *gb) {
   CYC(b_+62, b_+63); alu_add(gb, A);
   CYC(b_+63, b_+64); C = A;
   CYC(b_+64, b_+67); SET_HL(b_+92);
-  CYC(b_+67, b_+70); addSpritesToOam_withOffset_hook(gb);
+  CYC(b_+67, b_+70); TAIL(addSpritesToOam_withOffset);
 }
 
 void drawSecretInputCursors_hook(GB *gb) {
@@ -6591,7 +6590,7 @@ void secretListMenu_printSecret__val0_hook(GB *gb) {
   BASE(secretListMenu_printSecret);
   CYC(b_+79, b_+82); SET_HL(0x481b);
   CYC(b_+82, b_+84); E = 0x03;
-  CYC(b_+84, b_+87); interBankCall_hook(gb);
+  CYC(b_+84, b_+87); TAIL(interBankCall);
 }
 
 void secretListMenu_printSecret__val2_hook(GB *gb) {
@@ -10492,7 +10491,7 @@ void reloadGraphicsOnExitMenu_body__afterCall_hook(GB *gb) {
   CYC(b_+87, b_+88); SET_DE(pop_effect(gb));
   CYC(b_+88, b_+91); SET_HL((SYM(mapMenu_loadPopupData__gotIcon) + 25));
   CYC(b_+91, b_+93); E = 0x01;
-  CYC(b_+93, b_+96); interBankCall_hook(gb);
+  CYC(b_+93, b_+96); TAIL(interBankCall);
 }
 
 void saveQuitMenu_state2_hook(GB *gb) {

@@ -3718,15 +3718,13 @@ substate1:
   CYC(b_+110, b_+113); SET_HL((SYM(cliffTilesTable__sidescrolling) + 94));
   CYC(b_+113, b_+115); E = 0x01;
   CYC(b_+115, b_+118);
-  interBankCall_hook(gb);
-  return;
+  TAIL(interBankCall);
 
 ordinary_hole_warp:
   CYC(b_+118, b_+121); SET_HL((SYM(warpTransition3) + 45));
   CYC(b_+121, b_+123); E = 0x01;
   CYC(b_+123, b_+126);
-  interBankCall_hook(gb);
-  return;
+  TAIL(interBankCall);
 
 respawn:
   CALL_C(b_+126, specialObjectSetCoordinatesToRespawnYX_hook, SYM(specialObjectSetCoordinatesToRespawnYX), b_+129);
@@ -3907,7 +3905,7 @@ restore:
   CYC(b_+81, b_+82); alu_xor(gb, A);
   CYC(b_+82, b_+85); W8(wLinkForceState) = A;
   CYC(b_+85, b_+88);
-  initLinkStateAndAnimateStanding_hook(gb);
+  TAIL(initLinkStateAndAnimateStanding);
 }
 
 void linkState13_hook(GB *gb) {

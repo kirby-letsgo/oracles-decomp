@@ -183,7 +183,7 @@ void shootingGallery_removeAllTargets_b15_hook(GB *gb) {
   BASE(shootingGallery_removeAllTargets_b15);
   CYC(b_+0, b_+3); SET_HL((SYM(ralphSubid0cScript__landed_b15) + 7));
   CYC(b_+3, b_+5); E = 0x08;
-  CYC(b_+5, b_+8); interBankCall_hook(gb);
+  CYC(b_+5, b_+8); TAIL(interBankCall);
 }
 
 void shootingGallery_setEntranceTiles_hook(GB *gb) {

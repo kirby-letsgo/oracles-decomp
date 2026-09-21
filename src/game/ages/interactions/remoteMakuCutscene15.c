@@ -42,5 +42,5 @@ void remoteMakuCutscene_checkinitUnderwaterWaves_hook(GB *gb) {
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+9); SET_HL((SYM(checkEssenceObtained) + 5));
   CYC(b_+9, b_+11); E = 0x01;
-  CYC(b_+11, b_+14); interBankCall_hook(gb);
+  CYC(b_+11, b_+14); TAIL(interBankCall);
 }

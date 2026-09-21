@@ -691,7 +691,7 @@ afterSpawnBeetleExtra:
 refillFallDownHoleEventBuffer:
   CYC(b_+142, b_+145); SET_HL((SYM(interactionCode7a__state0) + 41)); // commonInteractions1.clearFallDownHoleEventBuffer
   CYC(b_+145, b_+147); E = 0x08; // bank of commonInteractions1
-  CYC(b_+147, b_+150); interBankCall_hook(gb); return; // jp
+  CYC(b_+147, b_+150); TAIL(interBankCall); // jp
 
 allBeetlesKilled:
   CYC(b_+150, b_+151); SET_HL(pop_effect(gb)); // pop hl

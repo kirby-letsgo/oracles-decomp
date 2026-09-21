@@ -980,7 +980,7 @@ void impaSubid2Substate7_hook(GB *gb) {
   // jpab scriptHelp.turnToFaceSomething
   CYC(b_+9, b_+12); SET_HL(turnToFaceSomething_bank15);
   CYC(b_+12, b_+14); E = 0x15;
-  CYC(b_+14, b_+17); interBankCall_hook(gb);
+  CYC(b_+14, b_+17); TAIL(interBankCall);
 }
 
 // Impa tells you about Ralph's heritage (unlinked)

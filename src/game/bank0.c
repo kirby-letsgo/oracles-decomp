@@ -10051,8 +10051,7 @@ void loadTilesetLayout_hook(GB *gb) {
     SET_HL(ROM_b04_setPastCliffPalettesToRed);
     E = 0x04;
     CYC(b_+33, b_+41);
-    interBankCall_hook(gb);
-    return;
+    TAIL(interBankCall);
   }
   alu_xor(gb, A);
   CYC(b_+S(33), b_+S(36)); mem_wr(gb, IO_SVBK, A);
@@ -12665,7 +12664,7 @@ void specialObjectCode_linkInCutscene_b00_hook(GB *gb) {
   SET_HL(ROM_b06_specialObjectCode_linkInCutscene);
   E = 0x06;
   CYC(b_+0, b_+8);
-  interBankCall_hook(gb);
+  TAIL(interBankCall);
 }
 
 void linkApplyDamage_b00_hook(GB *gb) {
@@ -13151,7 +13150,7 @@ void serialFunc_0c85_hook(GB *gb) {
   E = GV(0x16, 0x15);
   CYC(b_+0, b_+5);
   CYC(b_+5, b_+8);
-  interBankCall_hook(gb);
+  TAIL(interBankCall);
 }
 
 void serialFunc_0c8d_hook(GB *gb) {
@@ -13347,7 +13346,7 @@ static void vblank_copy_block(GB *gb, uint16_t a) {
     break;
   }
   CYCT(a + 16, a + 18);
-  vblankFunctionRet_hook(gb);
+  TAIL(vblankFunctionRet);
 }
 
 void vblankFunctionsStart_hook(GB *gb) { vblank_copy_block(gb, SYM(vblankFunctionsStart)); }

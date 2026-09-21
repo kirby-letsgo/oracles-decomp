@@ -72,8 +72,7 @@ interBankToBeginTimewarp:
   CYC(b_+51, b_+54); SET_HL(SYM(interactionBeginTimewarp));
   CYC(b_+54, b_+56); E = 0x10;
   CYC(b_+56, b_+59);
-  interBankCall_hook(gb);
-  return;
+  TAIL(interBankCall);
 state0:
   CYC(b_+59, b_+61); E = INTERACTION_BASE + OBJ_SUBID;
   CYC(b_+61, b_+62); A = mem_rd(gb, DE);

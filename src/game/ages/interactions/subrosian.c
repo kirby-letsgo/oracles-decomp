@@ -99,7 +99,7 @@ void subrosian_subid01_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(SYM(goronSubid01));
   CYC(b_+3, b_+5); E = 9;
-  CYC(b_+5, b_+8); interBankCall_hook(gb);
+  CYC(b_+5, b_+8); TAIL(interBankCall);
 }
 
 void subrosian_subid02_hook(GB *gb) {

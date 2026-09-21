@@ -386,7 +386,7 @@ void roomTileChangesAfterLoad08_hook(GB *gb) {
   CALL_C(b_+38, copyRectangleToRoomLayoutAndCollisions_paramDe_hook, SYM(copyRectangleToRoomLayoutAndCollisions_paramDe), b_+41);
   CYC(b_+41, b_+44); SET_HL((SYM(pastMapTextIndices) + 126));
   CYC(b_+44, b_+46); E = 0x04;
-  CYC(b_+46, b_+49); interBankCall_hook(gb);
+  CYC(b_+46, b_+49); TAIL(interBankCall);
 }
 
 void roomTileChangesAfterLoad05_hook(GB *gb) {

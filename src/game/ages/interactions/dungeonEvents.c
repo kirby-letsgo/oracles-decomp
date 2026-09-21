@@ -534,7 +534,7 @@ enableControl:
   // jpab scriptHelp.moonlitGrotto_enableControlAfterBreakingCrystal
   CYC(b_+106, b_+109); SET_HL(moonlitGrotto_enableControlAfterBreakingCrystal_bank15);
   CYC(b_+109, b_+111); E = 0x15;
-  CYC(b_+111, b_+114); interBankCall_hook(gb);
+  CYC(b_+111, b_+114); TAIL(interBankCall);
 }
 
 // d3: Small key falls when a block is pushed into place
