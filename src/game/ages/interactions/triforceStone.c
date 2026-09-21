@@ -227,7 +227,7 @@ state0:
   CALL_C(b_+11, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+14);
   CYC(b_+14, b_+16); alu_and(gb, 0xc0);
   if (!(F & FZ)) {
-    CYCT(b_+16, b_+19); interactionDelete_hook(gb); return;
+    CYCT(b_+16, b_+19); TAIL(interactionDelete);
   }
   CYC(b_+16, b_+19);
   CYC(b_+19, b_+20); H = D;

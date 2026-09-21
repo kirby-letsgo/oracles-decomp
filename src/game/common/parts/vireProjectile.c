@@ -63,7 +63,7 @@ void vireProjectile_func_6d22_hook(GB *gb) {
   CYC(b_+105, b_+106); E = alu_inc8(gb, E);
   CYC(b_+106, b_+107); A = mem_rd(gb, DE);
   CYC(b_+107, b_+108); mem_wr(gb, HL, A);
-  CYC(b_+108, b_+111); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+108, b_+111); TAIL(objectCopyPosition); // jp
 }
 
 void partCode3a_hook(GB *gb) {
@@ -77,7 +77,7 @@ void partCode3a_hook(GB *gb) {
   CYC(b_+7, b_+9); alu_cp(gb, 0x04);
   if (F & FC) { CYCT(b_+9, b_+12); partDelete_hook(gb); return; } // jp c
   CYC(b_+9, b_+12);
-  CYC(b_+12, b_+15); func_6e4a_hook(gb); return; // jp
+  CYC(b_+12, b_+15); TAIL(func_6e4a); // jp
 
 L_6cd9:
   CYC(b_+15, b_+17); E = 0xc2; // Part.subid
@@ -102,7 +102,7 @@ func_6ceb:
   if (F & FZ) { CYCT(b_+36, b_+39); partDelete_hook(gb); return; } // jp z
   CYC(b_+36, b_+39);
   CALL_C(b_+39, objectApplySpeed_hook, SYM(objectApplySpeed), b_+42);
-  CYC(b_+42, b_+45); partAnimate_hook(gb); return; // jp
+  CYC(b_+42, b_+45); TAIL(partAnimate); // jp
 
 subid0_state0:
   CALL_C(b_+45, func_6e50_hook, SYM(func_6e50), b_+48);
@@ -110,7 +110,7 @@ subid0_state0:
   CYC(b_+51, b_+53); E = 0xc9; // Part.angle
   CYC(b_+53, b_+54); mem_wr(gb, DE, A);
   CALL_C(b_+54, func_6e5d_hook, SYM(func_6e5d), b_+57);
-  CYC(b_+57, b_+60); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+57, b_+60); TAIL(objectSetVisible80); // jp
 
 subid1:
   CYC(b_+60, b_+61); A = mem_rd(gb, DE);
@@ -160,7 +160,7 @@ subid2_state0:
   CALL_C(b_+137, func_6e5d_hook, SYM(func_6e5d), b_+140);
   CYC(b_+140, b_+142); A = 0x01;
   CALL_C(b_+142, partSetAnimation_hook, SYM(partSetAnimation), b_+145);
-  CYC(b_+145, b_+148); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+145, b_+148); TAIL(objectSetVisible82); // jp
 
 fimc_6d5e:
   CALL_C(b_+148, func_6e50_hook, SYM(func_6e50), b_+151);
@@ -185,7 +185,7 @@ L_6d7d:
   CYC(b_+179, b_+181); E = 0xd0; // Part.speed
   CYC(b_+181, b_+182); A = B;
   CYC(b_+182, b_+183); mem_wr(gb, DE, A);
-  CYC(b_+183, b_+186); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+183, b_+186); TAIL(objectSetVisible80); // jp
 
 subid2_state1:
   CYC(b_+186, b_+187); H = D;
@@ -223,14 +223,14 @@ subid2_state1:
   CYC(b_+232, b_+234); E = 0xc4; // Part.state
   CYC(b_+234, b_+236); A = 0x02;
   CYC(b_+236, b_+237); mem_wr(gb, DE, A);
-  CYC(b_+237, b_+240); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+237, b_+240); TAIL(objectSetInvisible); // jp
 
 func_6dba:
   CALL_C(b_+240, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+243);
   CYC(b_+243, b_+245); E = 0xc9; // Part.angle
   CYC(b_+245, b_+246); mem_wr(gb, DE, A);
   CALL_C(b_+246, objectApplySpeed_hook, SYM(objectApplySpeed), b_+249);
-  CYC(b_+249, b_+252); partAnimate_hook(gb); return; // jp
+  CYC(b_+249, b_+252); TAIL(partAnimate); // jp
 
 subid2_state2:
   CYC(b_+252, b_+254); A = 0x21;
@@ -262,7 +262,7 @@ L_6dd6:
   CALL_C(b_+291, func_6e5d_hook, SYM(func_6e5d), b_+294);
   CYC(b_+294, b_+296); A = 0x01;
   CALL_C(b_+296, partSetAnimation_hook, SYM(partSetAnimation), b_+299);
-  CYC(b_+299, b_+302); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+299, b_+302); TAIL(objectSetVisible82); // jp
 
 subid3:
   CYC(b_+307, b_+308); A = mem_rd(gb, DE);
@@ -281,7 +281,7 @@ subid3:
   CALL_C(b_+326, objectNudgeAngleTowards_hook, SYM(objectNudgeAngleTowards), b_+329);
 L_6e13:
   CALL_C(b_+329, objectApplySpeed_hook, SYM(objectApplySpeed), b_+332);
-  CYC(b_+332, b_+335); partAnimate_hook(gb); return; // jp
+  CYC(b_+332, b_+335); TAIL(partAnimate); // jp
 
 subid3_state0:
   CALL_C(b_+335, func_6e50_hook, SYM(func_6e50), b_+338);
@@ -318,14 +318,14 @@ L_6e43:
   CYC(b_+20, b_+22); E = 0xd0; // Part.speed
   CYC(b_+22, b_+23); A = B;
   CYC(b_+23, b_+24); mem_wr(gb, DE, A);
-  CYC(b_+24, b_+27); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+24, b_+27); TAIL(objectSetVisible80); // jp
 }
 
 void func_6e4a_hook(GB *gb) {
   BASE(func_6e4a);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, objectCreatePuff_hook, SYM(objectCreatePuff), b_+3);
-  CYC(b_+3, b_+6); partDelete_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(partDelete); // jp
 }
 
 void func_6e50_hook(GB *gb) {

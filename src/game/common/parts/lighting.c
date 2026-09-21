@@ -84,7 +84,7 @@ state1:
   CYC(b_+50, b_+51); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+51, b_+53); A = 0xd2; // SND_LIGHTNING
   CALL_C(b_+53, playSound_b00_hook, SYM(playSound_b00), b_+56);
-  CYC(b_+56, b_+59); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+56, b_+59); TAIL(objectSetVisible81); // jp
 
 state2:
   CALL_C(b_+59, partAnimate_hook, SYM(partAnimate), b_+62);

@@ -140,12 +140,12 @@ void interactionCodea8_hook(GB *gb) {
   CYC(b_+34, b_+35); L = alu_inc8(gb, L);
   CYC(b_+35, b_+36); mem_wr(gb, HL, A); // [w1Companion.subid]
   CALL_C(b_+36, objectCopyPosition_hook, SYM(objectCopyPosition), b_+39);
-  CYC(b_+39, b_+42); interactionDelete_hook(gb); return; // jp
+  CYC(b_+39, b_+42); TAIL(interactionDelete); // jp
 
 subid4: // interactionCodea8@subid4
   CYC(b_+42, b_+45); SET_HL(w1Link_enabled);
   CYC(b_+45, b_+47); mem_wr(gb, HL, 0x03);
   CALL_C(b_+47, objectCopyPosition_hook, SYM(objectCopyPosition), b_+50);
   CYC(b_+50, b_+53); push_effect(gb, b_+53); interactionCodea8_handleSubidHighNibble(gb, sp0_); // call
-  CYC(b_+53, b_+56); interactionDelete_hook(gb); return; // jp
+  CYC(b_+53, b_+56); TAIL(interactionDelete); // jp
 }

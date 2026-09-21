@@ -84,7 +84,7 @@ void func_7adb_hook(GB *gb) {
   CYC(b_+39, b_+41); alu_sub(gb, 0x07);
   CYC(b_+41, b_+43); E = 0xcf; // Part.zh
   CYC(b_+43, b_+44); mem_wr(gb, DE, A);
-  CYC(b_+44, b_+47); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+44, b_+47); TAIL(objectSetVisiblec1); // jp
 }
 
 void func_7b0a_hook(GB *gb) {
@@ -101,5 +101,5 @@ void func_7b0a_hook(GB *gb) {
   CALL_C(b_+15, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+18);
 
 delete:
-  CYC(b_+18, b_+21); partDelete_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(partDelete); // jp
 }

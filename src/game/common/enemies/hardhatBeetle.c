@@ -67,12 +67,12 @@ state_uninitialized:
   CYC(b_+43, b_+45); A = 0x8d; // PALH_8d
   if (F & FZ) CALL_C_CC(b_+45, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+48); else CYC(b_+45, b_+48); // call z
   CYC(b_+48, b_+50); A = 0x0f; // SPEED_60
-  CYC(b_+50, b_+53); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
+  CYC(b_+50, b_+53); TAIL(ecom_setSpeedAndState8AndVisible_b0e); // jp
 
 state8:
   CALL_C(b_+54, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+57);
   CALL_C(b_+57, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0e), b_+60);
-  CYC(b_+60, b_+63); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+60, b_+63); TAIL(enemyAnimate); // jp
 }
 
 // 0e:60bb, alias of enemyCode4d (ENEMY_HARMLESS_HARDHAT_BEETLE, ages only): identical bytes at

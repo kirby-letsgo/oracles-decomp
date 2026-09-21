@@ -47,7 +47,7 @@ state0:
   CYC(b_+11, b_+13); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+13, b_+15); mem_wr(gb, HL, 0x0a); // SPEED_40
   CALL_C(b_+15, ecom_setRandomAngle_b0e_hook, SYM(ecom_setRandomAngle_b0e), b_+18);
-  CYC(b_+18, b_+21); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(objectSetVisible81); // jp
 
 state1:
   CYC(b_+21, b_+24); SET_BC(0x1f1f);
@@ -62,5 +62,5 @@ state1:
 L_4ffb:
   CALL_C(b_+34, objectApplySpeed_hook, SYM(objectApplySpeed), b_+37);
   CALL_C(b_+37, ecom_bounceOffScreenBoundary_b0e_hook, SYM(ecom_bounceOffScreenBoundary_b0e), b_+40);
-  CYC(b_+40, b_+43); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+40, b_+43); TAIL(enemyAnimate); // jp
 }

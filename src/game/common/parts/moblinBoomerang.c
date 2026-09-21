@@ -130,7 +130,7 @@ state0:
   CYC(b_+42, b_+44); mem_wr(gb, HL, 0x06);
   CYC(b_+44, b_+46); L = 0xd0; // Part.speed
   CYC(b_+46, b_+48); mem_wr(gb, HL, 0x50);
-  CYC(b_+48, b_+51); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+48, b_+51); TAIL(objectSetVisible81); // jp
 
 state1:
   CALL_C(b_+51, objectCheckSimpleCollision_hook, SYM(objectCheckSimpleCollision), b_+54);
@@ -145,7 +145,7 @@ objectApplySpeedExit:
   CALL_C(b_+64, objectApplySpeed_hook, SYM(objectApplySpeed), b_+67);
 
 animate:
-  CYC(b_+67, b_+70); partAnimate_hook(gb); return; // jp
+  CYC(b_+67, b_+70); TAIL(partAnimate); // jp
 
 state2:
   CALL_C(b_+70, func_541a_hook, SYM(func_541a), b_+73);
@@ -159,7 +159,7 @@ state2:
   CYC(b_+85, b_+86); mem_wr(gb, HL, A);
 
 partDeleteExit:
-  CYC(b_+86, b_+89); partDelete_hook(gb); return; // jp
+  CYC(b_+86, b_+89); TAIL(partDelete); // jp
 
 func_53ee:
   CYC(b_+89, b_+91); E = 0xc4; // Part.state

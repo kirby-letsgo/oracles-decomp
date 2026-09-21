@@ -87,20 +87,20 @@ void specialObjectCode_dimitri__runState_hook(GB *gb) {
   CYC(b_+18, b_+19); A = mem_rd(gb, DE);
   CYC(b_+19, b_+20); push_effect(gb, b_+20);
   do { uint16_t jt_ = (dimitri_jump_table(gb));
-    if (jt_ == SYM(dimitriState0)) { dimitriState0_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState1)) { dimitriState1_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState2)) { dimitriState2_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState3)) { dimitriState3_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState4)) { dimitriState4_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState5)) { dimitriState5_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState6)) { dimitriState6_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState7)) { dimitriState7_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState8)) { dimitriState8_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState9)) { dimitriState9_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateA)) { dimitriStateA_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateB)) { dimitriStateB_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateC)) { dimitriStateC_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateD)) { dimitriStateD_hook(gb); return; }
+    if (jt_ == SYM(dimitriState0) && hook_enabled_at(gb, SYM(dimitriState0))) { dimitriState0_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState1) && hook_enabled_at(gb, SYM(dimitriState1))) { dimitriState1_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState2) && hook_enabled_at(gb, SYM(dimitriState2))) { dimitriState2_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState3) && hook_enabled_at(gb, SYM(dimitriState3))) { dimitriState3_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState4) && hook_enabled_at(gb, SYM(dimitriState4))) { dimitriState4_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState5) && hook_enabled_at(gb, SYM(dimitriState5))) { dimitriState5_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState6) && hook_enabled_at(gb, SYM(dimitriState6))) { dimitriState6_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState7) && hook_enabled_at(gb, SYM(dimitriState7))) { dimitriState7_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState8) && hook_enabled_at(gb, SYM(dimitriState8))) { dimitriState8_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState9) && hook_enabled_at(gb, SYM(dimitriState9))) { dimitriState9_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateA) && hook_enabled_at(gb, SYM(dimitriStateA))) { dimitriStateA_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateB) && hook_enabled_at(gb, SYM(dimitriStateB))) { dimitriStateB_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateC) && hook_enabled_at(gb, SYM(dimitriStateC))) { dimitriStateC_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateD) && hook_enabled_at(gb, SYM(dimitriStateD))) { dimitriStateD_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -210,16 +210,14 @@ after_landing:
   CYC(b_+48, b_+49); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+49, b_+52);
-    dimitriGotoState1IfLinkFarAway_hook(gb);
-    return;
+    TAIL(dimitriGotoState1IfLinkFarAway);
   }
   CYC(b_+49, b_+52);
   CYC(b_+52, b_+54); C = 0x09;
   CALL_C(b_+54, objectCheckLinkWithinDistance_hook, SYM(objectCheckLinkWithinDistance), b_+57);
   if (!(F & FC)) {
     CYCT(b_+57, b_+60);
-    dimitriCheckAddToGrabbableObjectBuffer_hook(gb);
-    return;
+    TAIL(dimitriCheckAddToGrabbableObjectBuffer);
   }
   CYC(b_+57, b_+60);
   CYC(b_+60, b_+63); companionTryToMount_hook(gb);
@@ -232,10 +230,10 @@ void dimitriState2_hook(GB *gb) {
   CYC(b_+1, b_+2); A = mem_rd(gb, DE);
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (dimitri_jump_table(gb));
-    if (jt_ == SYM(dimitriState2Substate0)) { dimitriState2Substate0_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState2Substate1)) { dimitriState2Substate1_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState2Substate2)) { dimitriState2Substate2_hook(gb); return; }
-    else if (jt_ == SYM(dimitriState2Substate3)) { dimitriState2Substate3_hook(gb); return; }
+    if (jt_ == SYM(dimitriState2Substate0) && hook_enabled_at(gb, SYM(dimitriState2Substate0))) { dimitriState2Substate0_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState2Substate1) && hook_enabled_at(gb, SYM(dimitriState2Substate1))) { dimitriState2Substate1_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState2Substate2) && hook_enabled_at(gb, SYM(dimitriState2Substate2))) { dimitriState2Substate2_hook(gb); return; }
+    else if (jt_ == SYM(dimitriState2Substate3) && hook_enabled_at(gb, SYM(dimitriState2Substate3))) { dimitriState2Substate3_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -601,8 +599,7 @@ void dimitriState5_hook(GB *gb) {
   CYC(b_+15, b_+17); alu_bit(gb, 0, A);
   if (!(F & FZ)) {
     CYCT(b_+17, b_+19);
-    dimitriGotoEatingState_hook(gb);
-    return;
+    TAIL(dimitriGotoEatingState);
   }
   CYC(b_+17, b_+19);
   CYC(b_+19, b_+21); alu_bit(gb, 1, A);
@@ -610,8 +607,7 @@ void dimitriState5_hook(GB *gb) {
 check_dismount:
   if (!(F & FZ)) {
     CYCT(b_+21, b_+24);
-    companionGotoDismountState_hook(gb);
-    return;
+    TAIL(companionGotoDismountState);
   }
   CYC(b_+21, b_+24);
   CYC(b_+24, b_+27); A = W8(wLinkAngle);
@@ -627,15 +623,13 @@ check_dismount:
   CYC(b_+36, b_+38); C = 0x00;
   if (!(F & FZ)) {
     CYCT(b_+38, b_+41);
-    companionUpdateDirectionAndAnimate_hook(gb);
-    return;
+    TAIL(companionUpdateDirectionAndAnimate);
   }
   CYC(b_+38, b_+41);
   CALL_C(b_+41, companionCheckHopDownCliff_hook, SYM(companionCheckHopDownCliff), b_+44);
   if (F & FZ) { CYCT(b_+44, b_+45); ret_effect(gb); return; }
   CYC(b_+44, b_+45);
-  dimitriUpdateMovement_hook(gb);
-  return;
+  TAIL(dimitriUpdateMovement);
 
 check_hazards:
   CALL_C(SYM(dimitriUpdateMovement__checkHazards), companionCheckHazards_hook, SYM(companionCheckHazards), (SYM(dimitriUpdateMovement__checkHazards) + 3));
@@ -679,8 +673,7 @@ set_water_status:
   CYC((SYM(dimitriUpdateMovement__setWaterStatus) + 5), (SYM(dimitriUpdateMovement__setWaterStatus) + 7)); C = 0x00;
   if (!(F & FZ)) {
     CYCT((SYM(dimitriUpdateMovement__setWaterStatus) + 7), (SYM(dimitriUpdateMovement__setWaterStatus) + 10));
-    companionUpdateDirectionAndSetAnimation_hook(gb);
-    return;
+    TAIL(companionUpdateDirectionAndSetAnimation);
   }
   CYC((SYM(dimitriUpdateMovement__setWaterStatus) + 7), (SYM(dimitriUpdateMovement__setWaterStatus) + 10));
   dimitriState9_hook(gb);
@@ -754,8 +747,7 @@ set_water_status:
   CYC(b_+70, b_+72); C = 0x00;
   if (!(F & FZ)) {
     CYCT(b_+72, b_+75);
-    companionUpdateDirectionAndSetAnimation_hook(gb);
-    return;
+    TAIL(companionUpdateDirectionAndSetAnimation);
   }
   CYC(b_+72, b_+75);
   dimitriState9_hook(gb);
@@ -929,8 +921,7 @@ substate1:
   CYC(b_+64, b_+65); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+65, b_+68);
-    dimitriLandOnGroundAndGotoState5_hook(gb);
-    return;
+    TAIL(dimitriLandOnGroundAndGotoState5);
   }
   CYC(b_+65, b_+68);
   CALL_C(b_+68, itemIncSubstate_hook, SYM(itemIncSubstate), b_+71);
@@ -1042,11 +1033,11 @@ void dimitriStateA_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (dimitri_jump_table(gb));
-    if (jt_ == SYM(dimitriStateASubstate0)) { dimitriStateASubstate0_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateASubstate1)) { dimitriStateASubstate1_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateASubstate2)) { dimitriStateASubstate2_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateASubstate3)) { dimitriStateASubstate3_hook(gb); return; }
-    else if (jt_ == SYM(dimitriStateASubstate4)) { dimitriStateASubstate4_hook(gb); return; }
+    if (jt_ == SYM(dimitriStateASubstate0) && hook_enabled_at(gb, SYM(dimitriStateASubstate0))) { dimitriStateASubstate0_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateASubstate1) && hook_enabled_at(gb, SYM(dimitriStateASubstate1))) { dimitriStateASubstate1_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateASubstate2) && hook_enabled_at(gb, SYM(dimitriStateASubstate2))) { dimitriStateASubstate2_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateASubstate3) && hook_enabled_at(gb, SYM(dimitriStateASubstate3))) { dimitriStateASubstate3_hook(gb); return; }
+    else if (jt_ == SYM(dimitriStateASubstate4) && hook_enabled_at(gb, SYM(dimitriStateASubstate4))) { dimitriStateASubstate4_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

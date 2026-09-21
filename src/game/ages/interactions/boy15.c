@@ -28,7 +28,7 @@ void createExclamationMark_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
   CYC(b_+0, b_+3); SET_BC(0xf300);
-  CYC(b_+3, b_+6); objectCreateExclamationMark_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(objectCreateExclamationMark); // jp
 }
 
 void oscillateXRandomly_hook(GB *gb) {
@@ -52,7 +52,7 @@ void loadNextAnimationFrameAndMore_hook(GB *gb) {
   CYC(b_+5, b_+7); L = INTERACTION_BASE + OBJ_VAR38;
   CYC(b_+7, b_+8); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   CYC(b_+8, b_+11); mem_wr(gb, wTmpcfc0_genericCutscene_cfd3, A);
-  CYC(b_+11, b_+14); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+11, b_+14); TAIL(interactionAnimate); // jp
 }
 
 // Creates lightning for the cutscene where the boy's father turns to stone.

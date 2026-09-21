@@ -116,7 +116,7 @@ void interactionCodec4_hook(GB *gb) {
   CALL_C(b_+36, interactionSetScript_hook, SYM(interactionSetScript), b_+39);
   CALL_C(b_+39, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+42); // SWITCHES THREADS
   CALL_C(b_+42, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+45);
-  CYC(b_+45, b_+48); interactionIncState_hook(gb); return; // jp
+  CYC(b_+45, b_+48); TAIL(interactionIncState); // jp
 
 subid4Init: // interactionCodec4@subid4Init
   CALL_C(b_+48, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+51);
@@ -134,7 +134,7 @@ subid4Init: // interactionCodec4@subid4Init
   CYC(b_+71, b_+72); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+72, b_+73); H = mem_rd(gb, HL);
   CYC(b_+73, b_+74); L = A;
-  CYC(b_+74, b_+77); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+74, b_+77); TAIL(interactionSetScript); // jp
 
 state1: // interactionCodec4@state1
   CYC(b_+87, b_+90); A = W8(wTmpcfc0_genericCutscene_state);
@@ -142,14 +142,14 @@ state1: // interactionCodec4@state1
   if (!(F & FZ)) { CYCT(b_+92, b_+95); goto jump; } // jp nz
   CYC(b_+92, b_+95);
   CALL_C(b_+95, interactionRunScript_hook, SYM(interactionRunScript), b_+98);
-  CYC(b_+98, b_+101); npcFaceLinkAndAnimate_hook(gb); return; // jp
+  CYC(b_+98, b_+101); TAIL(npcFaceLinkAndAnimate); // jp
 
 jump: // interactionCodec4@jump
   CYC(b_+101, b_+103); A = 0x02;
   CALL_C(b_+103, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+106);
   CYC(b_+106, b_+109); SET_BC(0xfe00); // -$200
   CALL_C(b_+109, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+112);
-  CYC(b_+112, b_+115); interactionIncState_hook(gb); return; // jp
+  CYC(b_+112, b_+115); TAIL(interactionIncState); // jp
 
 state2: // interactionCodec4@state2
   CYC(b_+115, b_+117); C = 0x28;
@@ -158,7 +158,7 @@ state2: // interactionCodec4@state2
   CYC(b_+120, b_+121);
   CYC(b_+121, b_+124); SET_HL(wTmpcfc0_genericCutscene_state);
   CYC(b_+124, b_+126); mem_wr(gb, HL, mem_rd(gb, HL) | 0x02); // set 1,(hl)
-  CYC(b_+126, b_+129); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+126, b_+129); TAIL(interactionAnimate); // jp
 
 state3: // interactionCodec4@state3
   CALL_C(b_+150, objectCheckCollidedWithLink_notDead_hook, SYM(objectCheckCollidedWithLink_notDead), b_+153);
@@ -194,5 +194,5 @@ state4: // interactionCodec4@state4
   CALL_C(b_+207, interactionRunScript_hook, SYM(interactionRunScript), b_+210);
   if (!(F & FC)) { CYCT(b_+210, b_+211); ret_effect(gb); return; } // ret nc
   CYC(b_+210, b_+211);
-  CYC(b_+211, b_+214); interactionDelete_hook(gb); return; // jp
+  CYC(b_+211, b_+214); TAIL(interactionDelete); // jp
 }

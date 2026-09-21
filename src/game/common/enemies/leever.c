@@ -126,7 +126,7 @@ void enemyCode0b_nudgeTowardsLink_hook(GB *gb) {
   CYC(b_+470, b_+471);
   CYC(b_+471, b_+473); mem_wr(gb, HL, 0x06);
   CALL_C(b_+473, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+476);
-  CYC(b_+476, b_+479); objectNudgeAngleTowards_hook(gb); return; // jp
+  CYC(b_+476, b_+479); TAIL(objectNudgeAngleTowards); // jp
 }
 
 // ==================================================================================================
@@ -169,7 +169,7 @@ dead:
   CYC(b_+38, b_+39); mem_wr(gb, HL, A);
 
 die:
-  CYC(b_+39, b_+42); enemyDie_hook(gb); return; // jp
+  CYC(b_+39, b_+42); TAIL(enemyDie); // jp
 
 normalStatus:
   CALL_C(b_+42, ecom_getSubidAndCpStateTo08_b0d_hook, SYM(ecom_getSubidAndCpStateTo08_b0d), b_+45);
@@ -198,7 +198,7 @@ normalState:
 
 state_uninitialized:
   CALL_C(b_+72, enemyCode0b_setRandomCounter1_hook, b_+438, b_+75);
-  CYC(b_+75, b_+78); ecom_setSpeedAndState8_b0d_hook(gb); return; // jp
+  CYC(b_+75, b_+78); TAIL(ecom_setSpeedAndState8_b0d); // jp
 
 state_switchHook:
   CYC(b_+78, b_+79); E = alu_inc8(gb, E);
@@ -221,7 +221,7 @@ switchHook_substate3:
   CYC(b_+93, b_+96); SET_HL(b_+101); // @@destStates
   CYC(b_+96, b_+97); enemyCode0b_addAToHl_from_rst(gb, b_+97);
   CYC(b_+97, b_+98); B = mem_rd(gb, HL);
-  CYC(b_+98, b_+101); ecom_fallToGroundAndSetState_b0d_hook(gb); return; // jp
+  CYC(b_+98, b_+101); TAIL(ecom_fallToGroundAndSetState_b0d); // jp
 
 state_stub:
   RET(b_+104); return; // ret
@@ -252,7 +252,7 @@ state8:
   CYC(b_+131, b_+132); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+132, b_+133); alu_xor(gb, A);
   CALL_C(b_+133, enemySetAnimation_hook, SYM(enemySetAnimation), b_+136);
-  CYC(b_+136, b_+139); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+136, b_+139); TAIL(objectSetVisiblec2); // jp
 
 state9:
   CYC(b_+139, b_+140); H = D;
@@ -271,7 +271,7 @@ state9:
   CALL_C(b_+159, enemyCode0b_setRandomHighCounter1_hook, b_+456, b_+162);
 
 animate:
-  CYC(b_+162, b_+165); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+162, b_+165); TAIL(enemyAnimate); // jp
 
 subid00_stateA:
   CALL_C(b_+165, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+168);
@@ -285,7 +285,7 @@ backIntoGround:
   CYC(b_+178, b_+180); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+180, b_+182); mem_wr(gb, HL, 0x05); // SPEED_20
   CYC(b_+182, b_+184); A = 0x02;
-  CYC(b_+184, b_+187); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+184, b_+187); TAIL(enemySetAnimation); // jp
 
 stateB:
   CYC(b_+187, b_+188); H = D;
@@ -297,7 +297,7 @@ stateB:
   CYC(b_+194, b_+195); L = E;
   CYC(b_+195, b_+197); mem_wr(gb, HL, 0x08);
   CALL_C(b_+197, enemyCode0b_setRandomCounter1_hook, b_+438, b_+200);
-  CYC(b_+200, b_+203); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+200, b_+203); TAIL(objectSetInvisible); // jp
 
 normalState_subid01:
   CYC(b_+203, b_+204); A = mem_rd(gb, DE);
@@ -365,7 +365,7 @@ subid02_state9:
   CYC(b_+279, b_+280); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+280, b_+281); alu_xor(gb, A);
   CALL_C(b_+281, enemySetAnimation_hook, SYM(enemySetAnimation), b_+284);
-  CYC(b_+284, b_+287); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+284, b_+287); TAIL(objectSetVisiblec2); // jp
 
 subid02_stateA:
   CYC(b_+287, b_+289); E = ENEMY_BASE + OBJ_ANIM_PARAMETER;
@@ -392,7 +392,7 @@ subid02_stateB:
   CALL_C(b_+322, ecom_applyVelocityForSideviewEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0d), b_+325);
 
 animate2:
-  CYC(b_+325, b_+328); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+325, b_+328); TAIL(enemyAnimate); // jp
 
 subid02_stateC:
   CYC(b_+328, b_+330); E = ENEMY_BASE + OBJ_ANIM_PARAMETER;
@@ -404,7 +404,7 @@ subid02_stateC:
   CYC(b_+336, b_+338); A = 0x09;
   CYC(b_+338, b_+339); mem_wr(gb, DE, A);
   CALL_C(b_+339, enemyCode0b_setRandomCounter1_hook, b_+438, b_+342);
-  CYC(b_+342, b_+345); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+342, b_+345); TAIL(objectSetInvisible); // jp
 
 updatePosition:
   CYC(b_+345, b_+347); A = 0x01;
@@ -412,5 +412,5 @@ updatePosition:
   if (!(F & FZ)) { CYCT(b_+350, b_+353); goto backIntoGround; } // jp nz
   CYC(b_+350, b_+353);
   CALL_C(b_+353, objectApplySpeed_hook, SYM(objectApplySpeed), b_+356);
-  CYC(b_+356, b_+359); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+356, b_+359); TAIL(enemyAnimate); // jp
 }

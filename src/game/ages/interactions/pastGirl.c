@@ -77,12 +77,12 @@ subid0Init:
   CYC(b_+36, b_+37); A = B;
   CYC(b_+37, b_+39); alu_cp(gb, 0x01);
   if (F & FZ) {
-    CYCT(b_+39, b_+42); interactionDelete_hook(gb); return;
+    CYCT(b_+39, b_+42); TAIL(interactionDelete);
   }
   CYC(b_+39, b_+42);
   CYC(b_+42, b_+44); alu_cp(gb, 0x02);
   if (F & FZ) {
-    CYCT(b_+44, b_+47); interactionDelete_hook(gb); return;
+    CYCT(b_+44, b_+47); TAIL(interactionDelete);
   }
   CYC(b_+44, b_+47);
   CYC(b_+47, b_+48); A = B;

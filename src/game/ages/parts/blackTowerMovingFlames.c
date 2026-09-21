@@ -86,7 +86,7 @@ state1:
   CYC(b_+57, b_+58); mem_wr(gb, DE, A);
   CYC(b_+58, b_+60); A = 0x72; // SND_LIGHTTORCH
   CALL_C(b_+60, playSound_b00_hook, SYM(playSound_b00), b_+63);
-  CYC(b_+63, b_+66); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+63, b_+66); TAIL(objectSetVisible83); // jp
 
 state2:
   CALL_C(b_+66, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+69);
@@ -150,12 +150,12 @@ moveToBC:
   CALL_C(b_+144, objectApplySpeed_hook, SYM(objectApplySpeed), b_+147);
 
 animate:
-  CYC(b_+147, b_+150); partAnimate_hook(gb); return; // jp
+  CYC(b_+147, b_+150); TAIL(partAnimate); // jp
 
 state5:
   CALL_C(b_+150, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+153);
   if (!(F & FZ)) { CYCT(b_+153, b_+155); goto animate; } // jr nz
   CYC(b_+153, b_+155);
   CALL_C(b_+155, objectCreatePuff_hook, SYM(objectCreatePuff), b_+158);
-  CYC(b_+158, b_+161); partDelete_hook(gb); return; // jp
+  CYC(b_+158, b_+161); TAIL(partDelete); // jp
 }

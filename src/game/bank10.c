@@ -219,8 +219,7 @@ void agesFunc_10_7298__func_731b_hook(GB *gb) {
   CYC(b_+139, b_+140); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+140, b_+142);
-    agesFunc_10_7298__playWaveSoundAtRandomIntervals_body_hook(gb);
-    return;
+    TAIL(agesFunc_10_7298__playWaveSoundAtRandomIntervals_body);
   }
   CYC(b_+140, b_+142);
   CYC(b_+142, b_+143); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
@@ -296,8 +295,7 @@ void agesFunc_10_70f6__substate2_hook(GB *gb) {
   CALL_C(b_+103, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+106);
   if (!(F & FZ)) {
     CYCT(b_+106, b_+108);
-    agesFunc_10_70f6__func_7174_hook(gb);
-    return;
+    TAIL(agesFunc_10_70f6__func_7174);
   }
   CYC(b_+106, b_+108);
   CYC(b_+108, b_+111); SET_HL((SYM(ramrockArm_state0__initSubid0) + 23));
@@ -350,8 +348,7 @@ void agesFunc_10_70f6__substate3_hook(GB *gb) {
   CYC(b_+169, b_+170); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+170, b_+172);
-    agesFunc_10_70f6__func_71aa_hook(gb);
-    return;
+    TAIL(agesFunc_10_70f6__func_71aa);
   }
   CYC(b_+170, b_+172);
   CYC(b_+172, b_+174); A = 0x78;
@@ -412,8 +409,7 @@ void agesFunc_10_70f6__substate7_hook(GB *gb) {
   CYC(b_+350, b_+352); alu_cp(gb, 0x98);
   if (!(F & FZ)) {
     CYCT(b_+352, b_+354);
-    agesFunc_10_70f6__func_7262_hook(gb);
-    return;
+    TAIL(agesFunc_10_70f6__func_7262);
   }
   CYC(b_+352, b_+354);
   CYC(b_+354, b_+356); A = 0xf0;
@@ -560,8 +556,7 @@ void agesFunc_10_7298__substate7_hook(GB *gb) {
   CALL_C(b_+354, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+357);
   if (F & FZ) {
     CYCT(b_+357, b_+359);
-    agesFunc_10_7298__func_7407_hook(gb);
-    return;
+    TAIL(agesFunc_10_7298__func_7407);
   }
   CYC(b_+357, b_+359);
   CYC(b_+359, b_+362); A = mem_rd(gb, wKeysJustPressed);
@@ -619,8 +614,7 @@ void agesFunc_10_7298__substateA_hook(GB *gb) {
   CYC(b_+461, b_+462); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+462, b_+464);
-    agesFunc_10_7298__func_746a_hook(gb);
-    return;
+    TAIL(agesFunc_10_7298__func_746a);
   }
   CYC(b_+462, b_+464);
   CYC(b_+464, b_+465); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));

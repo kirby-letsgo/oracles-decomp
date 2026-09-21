@@ -13,5 +13,5 @@ void partCodeNil_hook(GB *gb) {
 
 void partCode00_hook(GB *gb) {
   BASE(partCode00);
-  CYC(b_+0, b_+3); partDelete_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(partDelete); // jp
 }

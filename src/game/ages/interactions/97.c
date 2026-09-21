@@ -49,7 +49,7 @@ void interactionCode97_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   uint16_t target = interactionCode97_jump_table(gb);
   if (target == SYM(interaction97_subid00)) { interaction97_subid00_hook(gb); return; }
-  interaction97_subid01_hook(gb); return; // target == 0x7d8a
+  TAIL(interaction97_subid01); // target == 0x7d8a
 }
 
 void interaction97_subid00_hook(GB *gb) {
@@ -83,7 +83,7 @@ void interaction97_subid00_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+41); return; } // ret nz
   CYC(b_+41, b_+42);
   CYC(b_+42, b_+44); mem_wr(gb, HL, 0x05); // INTERAC_PUFF
-  CYC(b_+44, b_+47); objectCopyPositionWithOffset_hook(gb); return; // jp
+  CYC(b_+44, b_+47); TAIL(objectCopyPositionWithOffset); // jp
 
 state0:
   CALL_C(b_+47, interactionIncState_hook, SYM(interactionIncState), b_+50);

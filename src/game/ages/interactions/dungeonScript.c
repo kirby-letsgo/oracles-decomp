@@ -49,7 +49,7 @@ static void dungeonScript_state0(GB *gb, uint16_t sp0_) {
   CYC(b_+23, b_+26); A = mem_rd(gb, wDungeonIndex);
   CYC(b_+26, b_+28); alu_cp(gb, 0xff);
   if (F & FZ) {
-    CYCT(b_+28, b_+31); interactionDelete_hook(gb); return;
+    CYCT(b_+28, b_+31); TAIL(interactionDelete);
   }
   CYC(b_+28, b_+31);
   CYC(b_+31, b_+34); SET_HL(dungeonScriptTable_bank08);

@@ -27,7 +27,7 @@ void partCode2d_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+20, b_+22); goto notNormalStatus; } // jr z
   CYC(b_+20, b_+22);
   CALL_C(b_+22, objectApplySpeed_hook, SYM(objectApplySpeed), b_+25);
-  CYC(b_+25, b_+28); partAnimate_hook(gb); return; // jp
+  CYC(b_+25, b_+28); TAIL(partAnimate); // jp
 
 state0:
   CYC(b_+28, b_+29); H = D;
@@ -40,11 +40,11 @@ state0:
   CYC(b_+40, b_+41); mem_wr(gb, DE, A);
   CALL_C(b_+41, objectSetVisible82_hook, SYM(objectSetVisible82), b_+44);
   CYC(b_+44, b_+46); A = 0xa8; // SND_VERAN_FAIRY_ATTACK
-  CYC(b_+46, b_+49); playSound_b00_hook(gb); return; // jp
+  CYC(b_+46, b_+49); TAIL(playSound_b00); // jp
 
 noRelatedObj:
   CALL_C(b_+49, objectCreatePuff_hook, SYM(objectCreatePuff), b_+52);
 
 notNormalStatus:
-  CYC(b_+52, b_+55); partDelete_hook(gb); return; // jp
+  CYC(b_+52, b_+55); TAIL(partDelete); // jp
 }

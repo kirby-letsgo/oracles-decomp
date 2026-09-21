@@ -92,7 +92,7 @@ stunned:
   CYC(b_+36, b_+37); alu_or(gb, A);
   if (!(F & FZ)) { RET_TAKEN(b_+37); return; } // ret nz
   CYC(b_+37, b_+38);
-  CYC(b_+38, b_+41); fish_enterWater_hook(gb); return; // jp
+  CYC(b_+38, b_+41); TAIL(fish_enterWater); // jp
 
 normalStatus:
   CALL_C(b_+41, ecom_getSubidAndCpStateTo08_b0d_hook, SYM(ecom_getSubidAndCpStateTo08_b0d), b_+44);
@@ -130,7 +130,7 @@ void fish_state_uninitialized_hook(GB *gb) {
   CYC(b_+12, b_+14); L = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+14, b_+16); mem_wr(gb, HL, 0x08); // ANGLE_RIGHT
   CALL_C(b_+16, fish_setRandomCounter1_hook, SYM(fish_setRandomCounter1), b_+19);
-  CYC(b_+19, b_+22); fish_updateAnimationFromAngle_hook(gb); return; // jp
+  CYC(b_+19, b_+22); TAIL(fish_updateAnimationFromAngle); // jp
 }
 
 // 0d:5ac7, bare global; jump-table target from enemyCode1e.
@@ -165,7 +165,7 @@ state8:
 
 afterScentCheck:
   CALL_C(b_+19, fish_updatePosition_hook, SYM(fish_updatePosition), b_+22);
-  CYC(b_+22, b_+25); fish_checkReverseAngle_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(fish_checkReverseAngle); // jp
 
 leapOutOfWater:
   CYC(b_+25, b_+26); L = E;
@@ -184,7 +184,7 @@ leapOutOfWater:
   CALL_C(b_+48, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+51);
   CALL_C(b_+51, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+54);
   CYC(b_+54, b_+56); B = 0x00;
-  CYC(b_+56, b_+59); fish_setAnimation_hook(gb); return; // jp
+  CYC(b_+56, b_+59); TAIL(fish_setAnimation); // jp
 
 state9:
   CYC(b_+59, b_+61); C = 0x10;
@@ -205,7 +205,7 @@ state9:
   CALL_C(b_+79, fish_setAnimation_hook, SYM(fish_setAnimation), b_+82);
 
 state9UpdatePosition:
-  CYC(b_+82, b_+85); fish_updatePosition_hook(gb); return; // jp
+  CYC(b_+82, b_+85); TAIL(fish_updatePosition); // jp
 }
 
 // 0d:5b1d, bare global; called from enemyCode1e and fish_subid00.
@@ -225,7 +225,7 @@ void fish_enterWater_hook(GB *gb) {
   CYC(b_+20, b_+22); B = 0x03; // INTERAC_SPLASH
   CALL_C(b_+22, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+25);
   CALL_C(b_+25, objectSetVisible83_hook, SYM(objectSetVisible83), b_+28);
-  CYC(b_+28, b_+31); fish_updateAnimationFromAngle_hook(gb); return; // jp
+  CYC(b_+28, b_+31); TAIL(fish_updateAnimationFromAngle); // jp
 }
 
 // 0d:5b3c, bare global; jump-table target from enemyCode1e@normalState. Internal @state8
@@ -255,7 +255,7 @@ void fish_checkReverseAngle_hook(GB *gb) {
   CYC(b_+3, b_+4); A = mem_rd(gb, DE);
   CYC(b_+4, b_+6); alu_xor(gb, 0x10);
   CYC(b_+6, b_+7); mem_wr(gb, DE, A);
-  fish_updateAnimationFromAngle_hook(gb); return; // fallthrough
+  TAIL(fish_updateAnimationFromAngle); // fallthrough
 }
 
 // 0d:5b4a, bare global; called from fish_enterWater and fish_state_uninitialized, also
@@ -276,7 +276,7 @@ void fish_updateAnimationFromAngle_hook(GB *gb) {
   if (F & FZ) { RET_TAKEN(b_+15); return; } // ret z
   CYC(b_+15, b_+16);
   CYC(b_+16, b_+17); mem_wr(gb, HL, A);
-  CYC(b_+17, b_+20); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+17, b_+20); TAIL(enemySetAnimation); // jp
 }
 
 // 0d:5b62, bare global; called from fish_subid00. Sets animation (3 or 5 is added to value
@@ -302,7 +302,7 @@ addOffset:
   if (F & FZ) { RET_TAKEN(b_+18); return; } // ret z
   CYC(b_+18, b_+19);
   CYC(b_+19, b_+20); mem_wr(gb, HL, A);
-  CYC(b_+20, b_+23); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(enemySetAnimation); // jp
 }
 
 // 0d:5b79, bare global; called from fish_subid00.

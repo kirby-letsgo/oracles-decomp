@@ -59,7 +59,7 @@ L_4c6b:
   CYC(b_+62, b_+64); mem_wr(gb, HL, 0x01);
 
 delete:
-  CYC(b_+64, b_+67); partDelete_hook(gb); return; // jp
+  CYC(b_+64, b_+67); TAIL(partDelete); // jp
 }
 
 void flame_state0_hook(GB *gb) {
@@ -81,5 +81,5 @@ void flame_state0_hook(GB *gb) {
   CYC(b_+88, b_+89); mem_wr(gb, DE, A);
   CYC(b_+89, b_+91); mem_wr(gb, HL, 0x01);
   CALL_C(b_+91, objectTakePosition_hook, SYM(objectTakePosition), b_+94);
-  CYC(b_+94, b_+97); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+94, b_+97); TAIL(objectSetVisible80); // jp
 }

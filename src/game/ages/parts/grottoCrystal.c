@@ -21,7 +21,7 @@ void partCode24_hook(GB *gb) {
   CYC(b_+16, b_+18); A = 0x01;
   CALL_C(b_+18, partSetAnimation_hook, SYM(partSetAnimation), b_+21);
   CYC(b_+21, b_+24); SET_BC(0x8280);
-  CYC(b_+24, b_+27); objectCreateInteraction_hook(gb); return; // jp
+  CYC(b_+24, b_+27); TAIL(objectCreateInteraction); // jp
 
 normalStatus:
   CYC(b_+27, b_+29); E = 0xc4; // Part.state
@@ -45,5 +45,5 @@ L_6029:
   CALL_C(b_+51, objectMakeTileSolid_hook, SYM(objectMakeTileSolid), b_+54);
   CYC(b_+54, b_+56); H = 0xcf;
   CYC(b_+56, b_+58); mem_wr(gb, HL, 0x0a);
-  CYC(b_+58, b_+61); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+58, b_+61); TAIL(objectSetVisible83); // jp
 }

@@ -49,7 +49,7 @@ void mamamuDog_checkReverseDirection_hook(GB *gb) {
   CYC((SYM(mamamuDog_reverseDirection) + 5), (SYM(mamamuDog_reverseDirection) + 6)); A = mem_rd(gb, HL);
   CYC((SYM(mamamuDog_reverseDirection) + 6), (SYM(mamamuDog_reverseDirection) + 7)); alu_xor(gb, B);
   CYC((SYM(mamamuDog_reverseDirection) + 7), (SYM(mamamuDog_reverseDirection) + 8)); mem_wr(gb, HL, A);
-  CYC((SYM(mamamuDog_reverseDirection) + 8), (SYM(mamamuDog_reverseDirection) + 11)); interactionSetAnimation_hook(gb); return; // jp
+  CYC((SYM(mamamuDog_reverseDirection) + 8), (SYM(mamamuDog_reverseDirection) + 11)); TAIL(interactionSetAnimation); // jp
 }
 
 void mamamuDog_reverseDirection_hook(GB *gb) {
@@ -62,7 +62,7 @@ void mamamuDog_reverseDirection_hook(GB *gb) {
   CYC(b_+5, b_+6); A = mem_rd(gb, HL);
   CYC(b_+6, b_+7); alu_xor(gb, B);
   CYC(b_+7, b_+8); mem_wr(gb, HL, A);
-  CYC(b_+8, b_+11); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+8, b_+11); TAIL(interactionSetAnimation); // jp
 }
 
 void mamamuDog_setCounterRandomly_hook(GB *gb) {
@@ -76,7 +76,7 @@ void mamamuDog_setCounterRandomly_hook(GB *gb) {
   CYC(b_+10, b_+12); E = INTERACTION_BASE + OBJ_VAR3E;
   CYC(b_+12, b_+13); mem_wr(gb, DE, A);
   CALL_C(b_+13, mamamuDog_hop_hook, SYM(mamamuDog_hop), SYM(mamamuDog_setZPositionTo0));
-  mamamuDog_setZPositionTo0_hook(gb); return; // fallthrough
+  TAIL(mamamuDog_setZPositionTo0); // fallthrough
 }
 
 void mamamuDog_setZPositionTo0_hook(GB *gb) {
@@ -98,7 +98,7 @@ void mamamuDog_updateSpeedZ_hook(GB *gb) {
   CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
   if (!(F & FZ)) { RET_TAKEN(b_+5); return; }
   CYC(b_+5, b_+6);
-  mamamuDog_hop_hook(gb); return; // fallthrough
+  TAIL(mamamuDog_hop); // fallthrough
 }
 
 void mamamuDog_hop_hook(GB *gb) {
@@ -106,7 +106,7 @@ void mamamuDog_hop_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
   CYC(b_+0, b_+3); SET_BC(0xff40); // -$c0
-  CYC(b_+3, b_+6); objectSetSpeedZ_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(objectSetSpeedZ); // jp
 }
 
 void mamamuDog_decCounter_hook(GB *gb) {
@@ -116,5 +116,5 @@ void mamamuDog_decCounter_hook(GB *gb) {
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR3E;
   CYC(b_+3, b_+4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+4, b_+7); writeFlagsTocddb_hook(gb); return; // jp
+  CYC(b_+4, b_+7); TAIL(writeFlagsTocddb); // jp
 }

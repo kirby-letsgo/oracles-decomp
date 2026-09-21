@@ -95,7 +95,7 @@ state_09:
   CYC(b_+82, b_+83); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+83, b_+84); alu_xor(gb, A);
   CALL_C(b_+84, enemySetAnimation_hook, SYM(enemySetAnimation), b_+87);
-  CYC(b_+87, b_+90); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+87, b_+90); TAIL(objectSetVisible83); // jp
 
 state_0a:
   CALL_C(b_+90, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+93);
@@ -106,7 +106,7 @@ state_0a:
   CYC(b_+97, b_+99); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+99, b_+101); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
   CYC(b_+101, b_+103); A = 0x01;
-  CYC(b_+103, b_+106); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+103, b_+106); TAIL(enemySetAnimation); // jp
 
 state_0b:
   CYC(b_+106, b_+107); H = D;
@@ -127,7 +127,7 @@ state_0b:
   CYC(b_+127, b_+128); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
 
 animate:
-  CYC(b_+128, b_+131); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+128, b_+131); TAIL(enemyAnimate); // jp
 
 disappear:
   CYC(b_+131, b_+133); A = 0x08;
@@ -141,5 +141,5 @@ disappear:
   CYC(b_+147, b_+148); mem_wr(gb, DE, A);
   CYC(b_+148, b_+150); B = 0x03; // INTERAC_SPLASH
   CALL_C(b_+150, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+153);
-  CYC(b_+153, b_+156); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+153, b_+156); TAIL(objectSetInvisible); // jp
 }

@@ -48,7 +48,7 @@ void interactionCodecc_initialize_hook(GB *gb) {
   CYC(b_+43, b_+44); H = mem_rd(gb, HL);
   CYC(b_+44, b_+45); L = A;
   CALL_C(b_+45, interactionSetScript_hook, SYM(interactionSetScript), b_+48);
-  CYC(b_+48, b_+51); interactionIncState_hook(gb); return; // jp
+  CYC(b_+48, b_+51); TAIL(interactionIncState); // jp
 }
 
 // 0b:77fe, unused/unreachable (no label in the disassembly source, but the raw ROM bytes at
@@ -59,7 +59,7 @@ void interactionCodecc_unusedBytes_77fe_hook(GB *gb) {
   BASE(interactionCodecc);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+26, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+29);
-  CYC(b_+29, b_+32); interactionIncState_hook(gb); return; // jp
+  CYC(b_+29, b_+32); TAIL(interactionIncState); // jp
 }
 
 // ==================================================================================================
@@ -89,5 +89,5 @@ state1:
   CALL_C(b_+17, interactionRunScript_hook, SYM(interactionRunScript), b_+20);
   if (F & FC) { CYCT(b_+20, b_+23); interactionDelete_hook(gb); return; } // jp c
   CYC(b_+20, b_+23);
-  CYC(b_+23, b_+26); interactionAnimateAsNpc_hook(gb); return; // jp
+  CYC(b_+23, b_+26); TAIL(interactionAnimateAsNpc); // jp
 }

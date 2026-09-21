@@ -176,7 +176,7 @@ grabbedSubstate0:
   CYC(b_+82, b_+83); alu_xor(gb, A);
   CYC(b_+83, b_+86); mem_wr(gb, wLinkGrabState2, A);
   CALL_C(b_+86, enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook, b_+181, b_+89);
-  CYC(b_+89, b_+92); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+89, b_+92); TAIL(objectSetVisible81); // jp
 
 grabbedSubstate2:
   CYC(b_+93, b_+94); H = D;
@@ -205,7 +205,7 @@ state_switchHook:
 
 switchHookSubstate0:
   CALL_C(b_+119, enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook, b_+181, b_+122);
-  CYC(b_+122, b_+125); ecom_incSubstate_b0e_hook(gb); return; // jp
+  CYC(b_+122, b_+125); TAIL(ecom_incSubstate_b0e); // jp
 
 switchHookSubstate3:
   CYC(b_+126, b_+128); C = 0x20;
@@ -232,7 +232,7 @@ state8:
   CALL_C(b_+154, enemyCode58_copyParentPosition_hook, b_+194, b_+157);
 
 setPriorityRelativeToLink:
-  CYC(b_+157, b_+160); objectSetPriorityRelativeToLink_hook(gb); return; // jp
+  CYC(b_+157, b_+160); TAIL(objectSetPriorityRelativeToLink); // jp
 
 destroyed:
   CALL_C(b_+160, enemyCode58_makeParentEnemyVisibleAndRemoveReference_hook, b_+181, b_+163);
@@ -244,5 +244,5 @@ makeDebrisAndDelete:
   CYC(b_+169, b_+170); bushOrRock_addAToHl_from_rst(gb, b_+170);
   CYC(b_+170, b_+171); B = mem_rd(gb, HL);
   CALL_C(b_+171, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+174);
-  CYC(b_+174, b_+177); enemyDelete_hook(gb); return; // jp
+  CYC(b_+174, b_+177); TAIL(enemyDelete); // jp
 }

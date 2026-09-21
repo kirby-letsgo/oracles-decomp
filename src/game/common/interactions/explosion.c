@@ -18,10 +18,10 @@ void interactionCode56_hook(GB *gb) {
   CYC(b_+7, b_+8); A = mem_rd(gb, DE);
   CYC(b_+8, b_+9); A = alu_inc8(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+9, b_+12); interactionAnimate_hook(gb); return;
+    CYCT(b_+9, b_+12); TAIL(interactionAnimate);
   }
   CYC(b_+9, b_+12);
-  CYC(b_+12, b_+15); interactionDelete_hook(gb); return;
+  CYC(b_+12, b_+15); TAIL(interactionDelete);
 L_495f:
   CYC(b_+15, b_+16); A = alu_inc8(gb, A);
   CYC(b_+16, b_+17); mem_wr(gb, DE, A);
@@ -32,8 +32,8 @@ L_495f:
   CYC(b_+27, b_+28); A = mem_rd(gb, DE);
   CYC(b_+28, b_+29); alu_rrca(gb);
   if (F & FC) {
-    CYCT(b_+29, b_+32); objectSetVisible81_hook(gb); return;
+    CYCT(b_+29, b_+32); TAIL(objectSetVisible81);
   }
   CYC(b_+29, b_+32);
-  CYC(b_+32, b_+35); objectSetVisible82_hook(gb); return;
+  CYC(b_+32, b_+35); TAIL(objectSetVisible82);
 }

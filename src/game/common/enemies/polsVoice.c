@@ -80,7 +80,7 @@ void polsVoice_state_uninitialized_hook(GB *gb) {
   CYC(b_+8, b_+10); alu_and(gb, 0x3f);
   CYC(b_+10, b_+11); A = alu_inc8(gb, A);
   CYC(b_+11, b_+12); mem_wr(gb, DE, A);
-  CYC(b_+12, b_+14); polsVoice_setLandedAnimation_hook(gb); return; // jr
+  CYC(b_+12, b_+14); TAIL(polsVoice_setLandedAnimation); // jr
 }
 
 // 0d:5c2e, bare global; jump-table target from enemyCode23.
@@ -133,7 +133,7 @@ haveAngle:
   CYC(b_+51, b_+52); mem_wr(gb, DE, A);
   CYC(b_+52, b_+53); alu_xor(gb, A);
   CALL_C(b_+53, enemySetAnimation_hook, SYM(enemySetAnimation), b_+56);
-  CYC(b_+56, b_+59); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+56, b_+59); TAIL(objectSetVisiblec1); // jp
 }
 
 // 0d:5c72, bare global; jump-table target from enemyCode23, falls through into
@@ -155,7 +155,7 @@ void polsVoice_state9_hook(GB *gb) {
   CYC(b_+14, b_+15); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // [state] = 8
   CYC(b_+15, b_+17); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+17, b_+19); mem_wr(gb, HL, 0x20);
-  polsVoice_setLandedAnimation_hook(gb); return; // fallthrough
+  TAIL(polsVoice_setLandedAnimation); // fallthrough
 }
 
 // 0d:5c85, bare global; called from polsVoice_state_uninitialized, falls into from
@@ -165,7 +165,7 @@ void polsVoice_setLandedAnimation_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); A = 0x01;
   CALL_C(b_+2, enemySetAnimation_hook, SYM(enemySetAnimation), b_+5);
-  CYC(b_+5, b_+8); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+5, b_+8); TAIL(objectSetVisiblec2); // jp
 }
 
 // 0d:5c8d, bare global; called from enemyCode23.

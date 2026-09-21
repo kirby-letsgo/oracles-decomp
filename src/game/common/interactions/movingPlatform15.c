@@ -110,8 +110,7 @@ opcode00:
   CYC(b_+41, b_+42); alu_xor(gb, A);
   CYC(b_+42, b_+43); mem_wr(gb, DE, A);
   CYC(b_+43, b_+45);
-  movingPlatform_setScript_hook(gb);
-  return;
+  TAIL(movingPlatform_setScript);
 
 opcode01:
   CYC(b_+45, b_+46); SET_HL(pop_effect(gb));
@@ -122,8 +121,7 @@ opcode01:
   CYC(b_+52, b_+54); A = 0x01;
   CYC(b_+54, b_+55); mem_wr(gb, DE, A);
   CYC(b_+55, b_+57);
-  movingPlatform_setScript_hook(gb);
-  return;
+  TAIL(movingPlatform_setScript);
 
 opcode02:
   CYC(b_+57, b_+58); SET_HL(pop_effect(gb));
@@ -171,8 +169,7 @@ opcode05_linkNotOn:
   CYC(b_+96, b_+98); E = INTERACTION_BASE + OBJ_SUBSTATE;
   CYC(b_+98, b_+99); mem_wr(gb, DE, A);
   CYC(b_+99, b_+101);
-  movingPlatform_setScript_hook(gb);
-  return;
+  TAIL(movingPlatform_setScript);
 
 opcode08:
   CYC(b_+101, b_+103); A = 0x00;

@@ -86,7 +86,7 @@ l_534b:
   CYC(b_+122, b_+123); alu_add(gb, A);
   CYC(b_+123, b_+124); mem_wr(gb, HL, A);
   CYC(b_+124, b_+125); A = C;
-  CYC(b_+125, b_+128); setLinkDirection_hook(gb); return; // jp
+  CYC(b_+125, b_+128); TAIL(setLinkDirection); // jp
 
 substate1:
   CYC(b_+128, b_+129); H = D;
@@ -96,12 +96,12 @@ substate1:
   if (F & FZ) { CYCT(b_+133, b_+135); goto l_5361; } // jr z
   CYC(b_+133, b_+135);
   CYC(b_+135, b_+136); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+136, b_+139); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+136, b_+139); TAIL(objectApplySpeed); // jp
 
 l_5361:
   CALL_C(b_+139, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+142);
   CYC(b_+142, b_+145); SET_HL((SYM(interactiond7_makuSeed__state3Substate2) + 13)); // mainScripts.raftwreckCutsceneScript
-  CYC(b_+145, b_+148); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+145, b_+148); TAIL(interactionSetScript); // jp
 
 substate2:
   CYC(b_+148, b_+151); A = mem_rd(gb, wTmpcfc0_genericCutscene_state);
@@ -115,7 +115,7 @@ initScreenFlashing:
   CYC(b_+157, b_+159); mem_wr(gb, HL, 0x00);
   CYC(b_+159, b_+162); SET_HL(wGenericCutscene_cbba);
   CYC(b_+162, b_+164); mem_wr(gb, HL, 0xff);
-  CYC(b_+164, b_+167); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+164, b_+167); TAIL(interactionIncSubstate); // jp
 
 substate3:
   CYC(b_+167, b_+170); SET_HL(wGenericCutscene_cbb3);
@@ -135,7 +135,7 @@ l_5392:
   CYC(b_+188, b_+189); mem_wr(gb, HL, A);
   CYC(b_+189, b_+191); A = 0xf1;
   CYC(b_+191, b_+194); mem_wr(gb, wPaletteThread_parameter, A);
-  CYC(b_+194, b_+197); darkenRoom_hook(gb); return; // jp
+  CYC(b_+194, b_+197); TAIL(darkenRoom); // jp
 
 substate4:
   CALL_C(b_+197, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+200);
@@ -149,7 +149,7 @@ substate6:
   CYC(b_+206, b_+207);
   CYC(b_+207, b_+209); A = 0x02;
   CYC(b_+209, b_+212); mem_wr(gb, wTmpcfc0_genericCutscene_state, A);
-  CYC(b_+212, b_+215); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+212, b_+215); TAIL(interactionIncSubstate); // jp
 
 substate7:
   CYC(b_+215, b_+218); A = mem_rd(gb, wTmpcfc0_genericCutscene_state);
@@ -182,7 +182,7 @@ substate8:
   CYC(b_+257, b_+259); A = 0xd0; // >w1Link
   CYC(b_+259, b_+262); mem_wr(gb, wLinkObjectIndex, A);
   CYC(b_+262, b_+265); SET_HL(b_+268); // @tokayWarpDest
-  CYC(b_+265, b_+268); setWarpDestVariables_hook(gb); return; // jp
+  CYC(b_+265, b_+268); TAIL(setWarpDestVariables); // jp
 
 oscillateY:
   CYC(b_+273, b_+276); A = mem_rd(gb, wFrameCounter);
@@ -237,12 +237,12 @@ state0:
   CALL_C(b_+33, interactionSetPosition_hook, SYM(interactionSetPosition), b_+36);
   CALL_C(b_+36, setLinkForceStateToState08_hook, SYM(setLinkForceStateToState08), b_+39);
   CYC(b_+39, b_+42); mem_wr(gb, wTmpcfc0_genericCutscene_cfd0, A);
-  CYC(b_+42, b_+45); interactionIncState_hook(gb); return; // jp
+  CYC(b_+42, b_+45); TAIL(interactionIncState); // jp
 
 state1:
   CALL_C(b_+45, interactionCode9b_updateSubstate_hook, b_+57, b_+48);
   CYC(b_+48, b_+51); A = mem_rd(gb, wLinkObjectIndex);
   CYC(b_+51, b_+52); H = A;
   CYC(b_+52, b_+54); L = 0x0b; // SpecialObject.yh
-  CYC(b_+54, b_+57); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+54, b_+57); TAIL(objectCopyPosition); // jp
 }

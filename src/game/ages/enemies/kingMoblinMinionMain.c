@@ -58,17 +58,17 @@ void enemyCode56_body_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (kingMoblinMinion_jump_table(gb));
-    if (jt_ == SYM(kingMoblinMinion_state0)) { kingMoblinMinion_state0_hook(gb); return; }
-    else if (jt_ == SYM(enemyAnimate)) { enemyAnimate_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state2)) { kingMoblinMinion_state2_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state3)) { kingMoblinMinion_state3_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state4)) { kingMoblinMinion_state4_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state5)) { kingMoblinMinion_state5_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state6)) { kingMoblinMinion_state6_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state7)) { kingMoblinMinion_state7_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state8)) { kingMoblinMinion_state8_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_state9)) { kingMoblinMinion_state9_hook(gb); return; }
-    else if (jt_ == SYM(kingMoblinMinion_stateA)) { kingMoblinMinion_stateA_hook(gb); return; }
+    if (jt_ == SYM(kingMoblinMinion_state0) && hook_enabled_at(gb, SYM(kingMoblinMinion_state0))) { kingMoblinMinion_state0_hook(gb); return; }
+    else if (jt_ == SYM(enemyAnimate) && hook_enabled_at(gb, SYM(enemyAnimate))) { enemyAnimate_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state2) && hook_enabled_at(gb, SYM(kingMoblinMinion_state2))) { kingMoblinMinion_state2_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state3) && hook_enabled_at(gb, SYM(kingMoblinMinion_state3))) { kingMoblinMinion_state3_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state4) && hook_enabled_at(gb, SYM(kingMoblinMinion_state4))) { kingMoblinMinion_state4_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state5) && hook_enabled_at(gb, SYM(kingMoblinMinion_state5))) { kingMoblinMinion_state5_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state6) && hook_enabled_at(gb, SYM(kingMoblinMinion_state6))) { kingMoblinMinion_state6_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state7) && hook_enabled_at(gb, SYM(kingMoblinMinion_state7))) { kingMoblinMinion_state7_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state8) && hook_enabled_at(gb, SYM(kingMoblinMinion_state8))) { kingMoblinMinion_state8_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_state9) && hook_enabled_at(gb, SYM(kingMoblinMinion_state9))) { kingMoblinMinion_state9_hook(gb); return; }
+    else if (jt_ == SYM(kingMoblinMinion_stateA) && hook_enabled_at(gb, SYM(kingMoblinMinion_stateA))) { kingMoblinMinion_stateA_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -158,8 +158,7 @@ void kingMoblinMinion_state3_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter2_b10_hook, SYM(ecom_decCounter2_b10), b_+3);
   if (!(F & FZ)) {
     CYCT(b_+3, b_+5);
-    kingMoblinMinion_animate_hook(gb);
-    return;
+    TAIL(kingMoblinMinion_animate);
   }
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+7); B = 0x47;
@@ -186,14 +185,12 @@ void kingMoblinMinion_state4_hook(GB *gb) {
   CYC(b_+9, b_+10); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+10, b_+12);
-    kingMoblinMinion_animate_hook(gb);
-    return;
+    TAIL(kingMoblinMinion_animate);
   }
   CYC(b_+10, b_+12);
   CYC(b_+12, b_+14); mem_wr(gb, HL, 0x07);
   CYC(b_+14, b_+16);
-  kingMoblinMinion_animate_hook(gb);
-  return;
+  TAIL(kingMoblinMinion_animate);
 jump:
   CYC(b_+16, b_+17); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+17, b_+19); L = ENEMY_BASE + OBJ_SPEED_Z;
@@ -246,8 +243,7 @@ void kingMoblinMinion_state6_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
   if (!(F & FZ)) {
     CYCT(b_+3, b_+5);
-    kingMoblinMinion_animate_hook(gb);
-    return;
+    TAIL(kingMoblinMinion_animate);
   }
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0xc8);
@@ -359,8 +355,7 @@ void kingMoblinMinion_stateA_hook(GB *gb) {
   CALL_C(b_+10, objectApplySpeed_hook, SYM(objectApplySpeed), b_+13);
 animate:
   CYC(b_+13, b_+16);
-  enemyAnimate_hook(gb);
-  return;
+  TAIL(enemyAnimate);
 delete_:
   CYC(b_+16, b_+18); A = 0x33;
   CALL_C(b_+18, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+21);

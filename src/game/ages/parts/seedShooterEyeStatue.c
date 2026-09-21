@@ -35,7 +35,7 @@ normalStatus:
   CYC(b_+33, b_+34); A = mem_rd(gb, DE);
   CYC(b_+34, b_+37); SET_HL(wActiveTriggers);
   CALL_C(b_+37, unsetFlag_hook, SYM(unsetFlag), b_+40);
-  CYC(b_+40, b_+43); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+40, b_+43); TAIL(objectSetInvisible); // jp
 
 state0:
   CYC(b_+43, b_+44); A = alu_inc8(gb, A);

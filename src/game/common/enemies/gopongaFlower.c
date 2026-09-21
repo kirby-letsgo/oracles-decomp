@@ -74,7 +74,7 @@ state_uninitialized:
 
 setSpeedAndState8:
   CALL_C(b_+60, ecom_setSpeedAndState8_b0d_hook, SYM(ecom_setSpeedAndState8_b0d), b_+63);
-  CYC(b_+63, b_+66); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+63, b_+66); TAIL(objectSetVisible83); // jp
 
 state_stub:
   RET(b_+66); return; // ret
@@ -87,7 +87,7 @@ state8:
   CYC(b_+73, b_+74); L = E;
   CYC(b_+74, b_+75); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+75, b_+77); A = 0x01;
-  CYC(b_+77, b_+80); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+77, b_+80); TAIL(enemySetAnimation); // jp
 
 state9:
   CALL_C(b_+80, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+83);
@@ -105,7 +105,7 @@ state9:
   if (!(F & FZ)) { RET_TAKEN(b_+98); return; } // ret nz
   CYC(b_+98, b_+99);
   CYC(b_+99, b_+101); B = 0x31; // PART_GOPONGA_PROJECTILE
-  CYC(b_+101, b_+104); ecom_spawnProjectile_b0d_hook(gb); return; // jp
+  CYC(b_+101, b_+104); TAIL(ecom_spawnProjectile_b0d); // jp
 
 closeFlower:
   CYC(b_+104, b_+106); E = ENEMY_BASE + OBJ_SUBID;
@@ -117,5 +117,5 @@ closeFlower:
   CYC(b_+115, b_+117); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+117, b_+118); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   CYC(b_+118, b_+119); alu_xor(gb, A);
-  CYC(b_+119, b_+122); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+119, b_+122); TAIL(enemySetAnimation); // jp
 }

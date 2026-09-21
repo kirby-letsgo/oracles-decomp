@@ -44,8 +44,7 @@ void interactionCodeb7_hook(GB *gb) {
       return;
     }
     else if (jt_ == SYM(interactionAnimate)) {
-      interactionAnimate_hook(gb);
-      return;
+      TAIL(interactionAnimate);
     }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);

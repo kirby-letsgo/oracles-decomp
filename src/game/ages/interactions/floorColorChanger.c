@@ -201,7 +201,7 @@ initialized:
   CYC(b_+116, b_+117); A = mem_rd(gb, HL);
   CYC(b_+117, b_+119); alu_cp(gb, 0xda); // TILEINDEX_SOMARIA_BLOCK
   if (!(F & FZ)) {
-    CYCT(b_+119, b_+122); interactionDelete_hook(gb); return;
+    CYCT(b_+119, b_+122); TAIL(interactionDelete);
   }
   CYC(b_+119, b_+122);
 

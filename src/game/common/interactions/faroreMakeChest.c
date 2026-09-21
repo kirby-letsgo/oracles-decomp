@@ -57,8 +57,8 @@ void interactionCode11_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x0f);
   CYC(b_+5, b_+6); push_effect(gb, b_+6);
   do { uint16_t jt_ = (faroreMakeChest_jumpTable(gb));
-    if (jt_ == SYM(interac11_subid00)) { interac11_subid00_hook(gb); return; }
-    else if (jt_ == SYM(interac11_subid01)) { interac11_subid01_hook(gb); return; }
+    if (jt_ == SYM(interac11_subid00) && hook_enabled_at(gb, SYM(interac11_subid00))) { interac11_subid00_hook(gb); return; }
+    else if (jt_ == SYM(interac11_subid01) && hook_enabled_at(gb, SYM(interac11_subid01))) { interac11_subid01_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

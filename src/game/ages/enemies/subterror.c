@@ -72,7 +72,7 @@ void enemyCode72_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+5, b_+7); goto normalStatus; } // jr nz
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+10);
-  enemyBoss_dead_b0f_hook(gb); return; // jp
+  TAIL(enemyBoss_dead_b0f); // jp
 
 normalStatus:
   CYC(b_+10, b_+12); E = ENEMY_BASE + 0x30; // Enemy.var30
@@ -173,7 +173,7 @@ substate0:
   CYC(b_+61, b_+62); C = L;
   CYC(b_+62, b_+64); A = 0x4c; // TILEINDEX_DUNGEON_DUG_DIRT
   CYC(b_+64, b_+67);
-  setTile_hook(gb); return; // jp
+  TAIL(setTile); // jp
 
 substate1:
   CALL_C(b_+67, subterror_retFromCallerIfAnimationUnfinished_hook, SYM(subterror_retFromCallerIfAnimationUnfinished), b_+70);
@@ -186,7 +186,7 @@ substate1:
   CALL_C(b_+85, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+88);
   CYC(b_+88, b_+90); A = 0x05;
   CYC(b_+90, b_+93);
-  enemySetAnimation_hook(gb); return; // jp
+  TAIL(enemySetAnimation); // jp
 
 substate2:
   CYC(b_+93, b_+95); C = 0x10;
@@ -201,7 +201,7 @@ substate2:
   CYC(b_+108, b_+111); SET_BC(0x2f03); // TX_2f03
   CALL_C(b_+111, showText_hook, SYM(showText), b_+114);
   CYC(b_+114, b_+117);
-  ecom_incSubstate_b0f_hook(gb); return; // jp
+  TAIL(ecom_incSubstate_b0f); // jp
 
 substate3:
   CALL_C(b_+117, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+120);
@@ -209,7 +209,7 @@ substate3:
   CYC(b_+123, b_+124); alu_xor(gb, A);
   CYC(b_+124, b_+127); W8(wDisabledObjects) = A;
   CYC(b_+127, b_+130); W8(wMenuDisabled) = A;
-  subterror_digIntoGround_hook(gb); return; // fallthrough
+  TAIL(subterror_digIntoGround); // fallthrough
 }
 
 void subterror_digIntoGround_hook(GB *gb) {
@@ -219,7 +219,7 @@ void subterror_digIntoGround_hook(GB *gb) {
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);
   CYC(b_+5, b_+7); A = 0x04;
   CYC(b_+7, b_+10);
-  enemySetAnimation_hook(gb); return; // jp
+  TAIL(enemySetAnimation); // jp
 }
 
 // Digging into ground
@@ -227,7 +227,7 @@ void subterror_state9_hook(GB *gb) {
   BASE(subterror_state9);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, subterror_retFromCallerIfAnimationUnfinished_hook, SYM(subterror_retFromCallerIfAnimationUnfinished), SYM(subterror_beginUndergroundMovement));
-  subterror_beginUndergroundMovement_hook(gb); return; // fallthrough
+  TAIL(subterror_beginUndergroundMovement); // fallthrough
 }
 
 // Done digging, about to start moving around
@@ -258,7 +258,7 @@ void subterror_beginUndergroundMovement_hook(GB *gb) {
   CYC(b_+35, b_+37); A = 0xa9; // SND_DIG
   CALL_C(b_+37, playSound_b00_hook, SYM(playSound_b00), b_+40);
   CYC(b_+40, b_+43);
-  subterror_spawnDirt_hook(gb); return; // jp
+  TAIL(subterror_spawnDirt); // jp
 }
 
 // Currently in the ground, moving around
@@ -322,7 +322,7 @@ substate1:
   CALL_C(b_+108, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+111);
   CYC(b_+111, b_+113); A = 0x05;
   CYC(b_+113, b_+116);
-  enemySetAnimation_hook(gb); return; // jp
+  TAIL(enemySetAnimation); // jp
 
 noShovel:
   CALL_C(b_+116, objectApplySpeed_hook, SYM(objectApplySpeed), b_+119);
@@ -390,7 +390,7 @@ stillUnderground:
   CALL_C(b_+199, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+202);
   CYC(b_+202, b_+204); A = 0x06;
   CYC(b_+204, b_+207);
-  enemySetAnimation_hook(gb); return; // jp
+  TAIL(enemySetAnimation); // jp
 
 // Hit a wall; pause before resuming
 substate2:
@@ -434,7 +434,7 @@ haveAngle:
   CYC(b_+51, b_+53); A = 0x0a;
   CALL_C(b_+53, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+56);
   CYC(b_+56, b_+59);
-  subterror_spawnDirt_hook(gb); return; // jp
+  TAIL(subterror_spawnDirt); // jp
 }
 
 // Drilling
@@ -480,7 +480,7 @@ drilling:
   CYC(b_+41, b_+43); A = 0x07;
   CALL_C(b_+43, enemySetAnimation_hook, SYM(enemySetAnimation), b_+46);
   CYC(b_+46, b_+49);
-  ecom_incSubstate_b0f_hook(gb); return; // jp
+  TAIL(ecom_incSubstate_b0f); // jp
 
 substate1:
   CALL_C(b_+49, subterror_retFromCallerIfAnimationUnfinished_hook, SYM(subterror_retFromCallerIfAnimationUnfinished), b_+52);
@@ -523,12 +523,12 @@ substate0:
   CYC(b_+32, b_+34); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+34, b_+36); mem_wr(gb, HL, 0xb4);
   CYC(b_+36, b_+39);
-  ecom_incSubstate_b0f_hook(gb); return; // jp
+  TAIL(ecom_incSubstate_b0f); // jp
 
 popSlowly:
   CYC(b_+39, b_+42); SET_BC(hOamFunc);
   CYC(b_+42, b_+45);
-  objectSetSpeedZ_hook(gb); return; // jp
+  TAIL(objectSetSpeedZ); // jp
 
 substate1:
   CYC(b_+45, b_+47); E = ENEMY_BASE + OBJ_VAR2A;
@@ -557,7 +557,7 @@ pickNewDirection:
   CYC(b_+83, b_+85); E = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+85, b_+86); mem_wr(gb, DE, A);
   CYC(b_+86, b_+89);
-  subterror_setAnimationFromAngle_hook(gb); return; // jp
+  TAIL(subterror_setAnimationFromAngle); // jp
 
 substate2:
   CALL_C(b_+89, enemyAnimate_hook, SYM(enemyAnimate), b_+92);
@@ -575,7 +575,7 @@ substate2:
   if (!(F & FZ)) { RET_TAKEN(b_+113); return; } // ret nz
   CYC(b_+113, b_+114);
   CYC(b_+114, b_+117);
-  subterror_digIntoGround_hook(gb); return; // jp
+  TAIL(subterror_digIntoGround); // jp
 }
 
 void subterror_spawnDirtEvery8Frames_hook(GB *gb) {
@@ -587,7 +587,7 @@ void subterror_spawnDirtEvery8Frames_hook(GB *gb) {
   CYC(b_+3, b_+4); mem_wr(gb, DE, A);
   if (!(F & FZ)) { RET_TAKEN(b_+4); return; } // ret nz
   CYC(b_+4, b_+5);
-  subterror_spawnDirt_hook(gb); return; // fallthrough
+  TAIL(subterror_spawnDirt); // fallthrough
 }
 
 void subterror_spawnDirt_hook(GB *gb) {
@@ -604,7 +604,7 @@ void subterror_spawnDirt_hook(GB *gb) {
   CYC(b_+15, b_+16); C = L;
   CYC(b_+16, b_+18); A = 0xef;
   CYC(b_+18, b_+21);
-  setTile_hook(gb); return; // jp
+  TAIL(setTile); // jp
 }
 
 void subterror_retFromCallerIfAnimationUnfinished_hook(GB *gb) {
@@ -654,5 +654,5 @@ void subterror_setAnimationFromAngle_hook(GB *gb) {
   CYC(b_+9, b_+10); mem_wr(gb, HL, A); // [direction]
   CYC(b_+10, b_+12); alu_add(gb, 0x00);
   CYC(b_+12, b_+15);
-  enemySetAnimation_hook(gb); return; // jp
+  TAIL(enemySetAnimation); // jp
 }

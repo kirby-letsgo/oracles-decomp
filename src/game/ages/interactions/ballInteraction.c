@@ -41,7 +41,7 @@ void interactionCode95_hook(GB *gb) {
   CYC(b_+11, b_+13); L = INTERACTION_BASE + OBJ_SPEED;
   CYC(b_+13, b_+15); mem_wr(gb, HL, 0x50); // SPEED_200
   CALL_C(b_+15, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+18);
-  CYC(b_+18, b_+21); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(objectSetVisible80); // jp
 
 state1:
   CYC(b_+21, b_+23); E = INTERACTION_BASE + OBJ_SUBSTATE;
@@ -80,7 +80,7 @@ afterAngle:
 
 setSpeedZ:
   CYC(b_+66, b_+69); SET_BC(0xfe40); // -0x1c0
-  CYC(b_+69, b_+72); objectSetSpeedZ_hook(gb); return; // jp
+  CYC(b_+69, b_+72); TAIL(objectSetSpeedZ); // jp
 
 substate1:
   CALL_C(b_+72, objectApplySpeed_hook, SYM(objectApplySpeed), b_+75);
@@ -106,7 +106,7 @@ ballLanded:
   CYC(b_+97, b_+100); W8(wTmpcfc0_genericCutscene_cfd3) = A;
   CYC(b_+100, b_+102); E = INTERACTION_BASE + OBJ_SUBSTATE;
   CYC(b_+102, b_+103); mem_wr(gb, DE, A);
-  CYC(b_+103, b_+106); interactionSetPosition_hook(gb); return; // jp
+  CYC(b_+103, b_+106); TAIL(interactionSetPosition); // jp
 
 subid2:
   // [speedZ] = -[speedZ]/2
@@ -132,7 +132,7 @@ subid2:
   CALL_C(b_+129, compareHlToBc_hook, SYM(compareHlToBc), b_+132);
   if (F & FC) { RET_TAKEN(b_+132); return; } // ret c
   CYC(b_+132, b_+133);
-  CYC(b_+133, b_+136); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+133, b_+136); TAIL(interactionIncSubstate); // jp
 
 substate2:
   RET(b_+136); return; // ret

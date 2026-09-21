@@ -85,7 +85,7 @@ L_4818:
   CYC(b_+70, b_+72); L = 0xdb; // Part.oamFlagsBackup
   CYC(b_+72, b_+73); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+73, b_+74); mem_wr(gb, HL, A);
-  CYC(b_+74, b_+77); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+74, b_+77); TAIL(objectSetVisible82); // jp
 
 state8_up:
   CYC(b_+77, b_+78); H = D;
@@ -129,7 +129,7 @@ stateB_left:
 runMovementScript:
   CYC(b_+123, b_+124); A = mem_rd(gb, DE);
   CYC(b_+124, b_+125); mem_wr(gb, HL, A);
-  CYC(b_+125, b_+128); objectRunMovementScript_hook(gb); return; // jp
+  CYC(b_+125, b_+128); TAIL(objectRunMovementScript); // jp
 
 stateC_waiting:
   CYC(b_+128, b_+129); H = D;
@@ -137,5 +137,5 @@ stateC_waiting:
   CYC(b_+131, b_+132); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) { RET_TAKEN(b_+132); return; } // ret nz
   CYC(b_+132, b_+133);
-  CYC(b_+133, b_+136); objectRunMovementScript_hook(gb); return; // jp
+  CYC(b_+133, b_+136); TAIL(objectRunMovementScript); // jp
 }

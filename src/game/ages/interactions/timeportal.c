@@ -80,8 +80,7 @@ void interactionCodede_hook(GB *gb) {
   CYC(b_+8, b_+9); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+9, b_+12);
-    objectSetInvisible_hook(gb);
-    return;
+    TAIL(objectSetInvisible);
   }
   CYC(b_+9, b_+12);
   CALL_C(b_+12, objectSetVisible_hook, SYM(objectSetVisible), b_+15);
@@ -101,8 +100,7 @@ state0:
   CYC(b_+31, b_+32); alu_cp(gb, D);
   if (!(F & FZ)) {
     CYCT(b_+32, b_+35);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+32, b_+35);
   CYC(b_+35, b_+37); A = 0x03;
@@ -120,19 +118,16 @@ state0:
   }
   CALL_C(b_+56, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+59);
   CYC(b_+59, b_+62);
-  objectSetVisible83_hook(gb);
-  return;
+  TAIL(objectSetVisible83);
 state1:
   CALL_C(b_+62, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing), b_+65);
   if (!(F & FC)) {
     CYCT(b_+65, b_+68);
-    interactionIncState_hook(gb);
-    return;
+    TAIL(interactionIncState);
   }
   CYC(b_+65, b_+68);
   CYC(b_+68, b_+70);
-  timeportal_updatePalette_hook(gb);
-  return;
+  TAIL(timeportal_updatePalette);
 state2:
   CYC(b_+70, b_+72); E = INTERACTION_BASE + OBJ_VAR03;
   CYC(b_+72, b_+73); A = mem_rd(gb, DE);
@@ -141,8 +136,7 @@ state2:
   CYC(b_+77, b_+78); alu_cp(gb, B);
   if (!(F & FZ)) {
     CYCT(b_+78, b_+81);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+78, b_+81);
   CALL_C(b_+81, timeportal_updatePalette_hook, SYM(timeportal_updatePalette), b_+84);

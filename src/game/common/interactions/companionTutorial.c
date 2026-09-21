@@ -193,7 +193,7 @@ deleteIfSubid2Or5:
   CYC(b_+95, b_+96);
 
 delete:
-  CYC(b_+96, b_+99); interactionDelete_hook(gb); return; // jp
+  CYC(b_+96, b_+99); TAIL(interactionDelete); // jp
 
 state2:
   CYC(b_+99, b_+102); A = mem_rd(gb, w1Companion_enabled);

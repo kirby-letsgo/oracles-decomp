@@ -61,7 +61,7 @@ state0:
   CYC(b_+37, b_+39); mem_wr(gb, HL, 0x5a);
   CYC(b_+39, b_+41); A = 0x8d; // SND_TELEPORT
   CALL_C(b_+41, playSound_b00_hook, SYM(playSound_b00), b_+44);
-  CYC(b_+44, b_+47); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+44, b_+47); TAIL(objectSetVisible82); // jp
 
 state1:
   CALL_C(b_+47, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+50);
@@ -76,7 +76,7 @@ state1:
   CYC(b_+62, b_+64); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
 
 animate:
-  CYC(b_+64, b_+67); partAnimate_hook(gb); return; // jp
+  CYC(b_+64, b_+67); TAIL(partAnimate); // jp
 
 beginMoving:
   CYC(b_+67, b_+68); L = E;
@@ -94,5 +94,5 @@ state2:
 destroy:
   CYC(b_+82, b_+84); B = 0x09; // INTERAC_SNOWDEBRIS
   CALL_C(b_+84, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+87);
-  CYC(b_+87, b_+90); partDelete_hook(gb); return; // jp
+  CYC(b_+87, b_+90); TAIL(partDelete); // jp
 }

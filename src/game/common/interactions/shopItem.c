@@ -107,12 +107,12 @@ void interactionCode47_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4); SET_HL(shopItem_jump_table(gb));
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(shopItemState0)) { shopItemState0_hook(gb); return; }
-    else if (jt_ == SYM(shopItemState2)) { shopItemState2_hook(gb); return; }
-    else if (jt_ == SYM(shopItemState4)) { shopItemState4_hook(gb); return; }
-    else if (jt_ == SYM(shopItemState5)) { shopItemState5_hook(gb); return; }
-    else if (jt_ == SYM(objectAddToGrabbableObjectBuffer)) { objectAddToGrabbableObjectBuffer_hook(gb); return; }
-    else if (jt_ == SYM(shopItemState3)) { shopItemState3_hook(gb); return; }
+    if (jt_ == SYM(shopItemState0) && hook_enabled_at(gb, SYM(shopItemState0))) { shopItemState0_hook(gb); return; }
+    else if (jt_ == SYM(shopItemState2) && hook_enabled_at(gb, SYM(shopItemState2))) { shopItemState2_hook(gb); return; }
+    else if (jt_ == SYM(shopItemState4) && hook_enabled_at(gb, SYM(shopItemState4))) { shopItemState4_hook(gb); return; }
+    else if (jt_ == SYM(shopItemState5) && hook_enabled_at(gb, SYM(shopItemState5))) { shopItemState5_hook(gb); return; }
+    else if (jt_ == SYM(objectAddToGrabbableObjectBuffer) && hook_enabled_at(gb, SYM(objectAddToGrabbableObjectBuffer))) { objectAddToGrabbableObjectBuffer_hook(gb); return; }
+    else if (jt_ == SYM(shopItemState3) && hook_enabled_at(gb, SYM(shopItemState3))) { shopItemState3_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -249,7 +249,7 @@ L_43a3:
   CYC(b_+11, b_+13); A = 8;
   CYC(b_+13, b_+16); mem_wr(gb, wLinkGrabState2, A);
   CALL_C(b_+16, objectSetVisible80_hook, SYM(objectSetVisible80), b_+19);
-  CYC(b_+19, b_+21); shopItemClearRupeeDisplay_hook(gb); return;
+  CYC(b_+19, b_+21); TAIL(shopItemClearRupeeDisplay);
 L_43b0:
   CALL_C(b_+21, shopItemCheckGrabbed_hook, SYM(shopItemCheckGrabbed), b_+24);
   if (!(F & FZ)) { CYCT(b_+24, b_+25); ret_effect(gb); return; } CYC(b_+24, b_+25);

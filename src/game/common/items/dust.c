@@ -87,7 +87,7 @@ void itemCode1a_hook(GB *gb) {
       CALL_C(b_+19, objectTakePosition_hook, SYM(objectTakePosition), b_+22);
       CYC(b_+22, b_+23); alu_xor(gb, A);
       CALL_C(b_+23, itemSetAnimation_hook, SYM(itemSetAnimation), b_+26);
-      CYC(b_+26, b_+29); objectSetVisible80_hook(gb); return;
+      CYC(b_+26, b_+29); TAIL(objectSetVisible80);
     }
     else if (jt_ == b_+29) {
       CALL_C(b_+29, itemAnimate_hook, SYM(itemAnimate), b_+32);
@@ -112,12 +112,12 @@ void itemCode1a_hook(GB *gb) {
       CYC(b_+53, b_+54); mem_wr(gb, HL, A); SET_HL(HL + 1);
       CYC(b_+54, b_+55); mem_wr(gb, HL, A);
       CALL_C(b_+55, objectSetInvisible_hook, SYM(objectSetInvisible), b_+58);
-      CYC(b_+58, b_+61); itemIncSubstate_hook(gb); return;
+      CYC(b_+58, b_+61); TAIL(itemIncSubstate);
     }
     else if (jt_ == b_+61) {
       CALL_C(b_+61, checkPegasusSeedCounter_hook, SYM(checkPegasusSeedCounter), b_+64);
       if (F & FZ) {
-        CYCT(b_+64, b_+67); itemDelete_hook(gb); return;
+        CYCT(b_+64, b_+67); TAIL(itemDelete);
       }
       CYC(b_+64, b_+67);
       CYC(b_+67, b_+70); push_effect(gb, b_+70); dust_initialize_next_cloud(gb);
@@ -131,7 +131,7 @@ void itemCode1a_hook(GB *gb) {
       }
       CYC(b_+81, b_+83); alu_bit(gb, 7, mem_rd(gb, HL));
       if (F & FZ) {
-        CYCT(b_+83, b_+86); objectSetInvisible_hook(gb); return;
+        CYCT(b_+83, b_+86); TAIL(objectSetInvisible);
       }
       CYC(b_+83, b_+86);
       CYC(b_+86, b_+87); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
@@ -177,7 +177,7 @@ clear_cloud:
       CYC(b_+134, b_+135); mem_wr(gb, HL, A); SET_HL(HL + 1);
       CYC(b_+135, b_+136); mem_wr(gb, HL, A); SET_HL(HL + 1);
       CYC(b_+136, b_+137); mem_wr(gb, HL, A); SET_HL(HL + 1);
-      CYC(b_+137, b_+140); objectSetInvisible_hook(gb); return;
+      CYC(b_+137, b_+140); TAIL(objectSetInvisible);
     }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);

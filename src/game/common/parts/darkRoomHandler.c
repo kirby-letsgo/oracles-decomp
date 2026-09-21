@@ -53,7 +53,7 @@ void partCode08_hook(GB *gb) {
   CYC(b_+45, b_+46); alu_cp(gb, B);
   if (!(F & FC)) { CYCT(b_+46, b_+49); brightenRoomLightly_hook(gb); return; } // jp nc
   CYC(b_+46, b_+49);
-  CYC(b_+49, b_+52); darkenRoomLightly_hook(gb); return; // jp
+  CYC(b_+49, b_+52); TAIL(darkenRoomLightly); // jp
 }
 
 void darkRoomHandler_state0_hook(GB *gb) {

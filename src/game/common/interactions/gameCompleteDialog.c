@@ -32,7 +32,7 @@ void interactionCoded1_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (game_complete_jump_table(gb));
     if (jt_ == b_+8) { break; }
-    else if (jt_ == SYM(interactionRunScript)) { interactionRunScript_hook(gb); return; }
+    else if (jt_ == SYM(interactionRunScript) && hook_enabled_at(gb, SYM(interactionRunScript))) { interactionRunScript_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
   CYC(b_+8, b_+10); A = 1;

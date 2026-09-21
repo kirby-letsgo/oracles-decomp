@@ -109,7 +109,7 @@ L_5482:
   CYC(b_+95, b_+96); A = alu_inc8(gb, A);
 
 L_5499:
-  CYC(b_+96, b_+99); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+96, b_+99); TAIL(partSetAnimation); // jp
 
 state1:
   CALL_C(b_+99, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+102);
@@ -126,5 +126,5 @@ state2:
 
 applySpeedAndAnimate:
   CALL_C(b_+114, objectApplySpeed_hook, SYM(objectApplySpeed), b_+117);
-  CYC(b_+117, b_+120); partAnimate_hook(gb); return; // jp
+  CYC(b_+117, b_+120); TAIL(partAnimate); // jp
 }

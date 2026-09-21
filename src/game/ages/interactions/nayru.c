@@ -174,14 +174,13 @@ init01:
   CYC(b_+80, b_+82); A = 0x0b; // GLOBALFLAG_0b
   CALL_C(b_+82, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+85);
   if (!(F & FZ)) {
-    CYCT(b_+85, b_+88); interactionDelete_hook(gb); return;
+    CYCT(b_+85, b_+88); TAIL(interactionDelete);
   }
   CYC(b_+85, b_+88);
   CALL_C(b_+88, objectSetInvisible_hook, SYM(objectSetInvisible), b_+91);
   CYC(b_+91, b_+94); SET_HL(nayruScript01_bank0c);
   CALL_C(b_+94, interactionSetScript_hook, SYM(interactionSetScript), b_+97);
-  nayruState0__init0e_hook(gb);
-  return;
+  TAIL(nayruState0__init0e);
 
 init02:
   CYC(b_+107, b_+110); A = mem_rd(gb, wTmpcfc0 + 0x10);
@@ -261,19 +260,19 @@ init09:
 init0a:
   CALL_C(b_+220, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+223);
   if (F & FZ) {
-    CYCT(b_+223, b_+226); interactionDelete_hook(gb); return;
+    CYCT(b_+223, b_+226); TAIL(interactionDelete);
   }
   CYC(b_+223, b_+226);
   CYC(b_+226, b_+228); A = 0x36; // TREASURE_MAKU_SEED
   CALL_C(b_+228, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+231);
   if (!(F & FC)) {
-    CYCT(b_+231, b_+234); interactionDelete_hook(gb); return;
+    CYCT(b_+231, b_+234); TAIL(interactionDelete);
   }
   CYC(b_+231, b_+234);
   CYC(b_+234, b_+236); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
   CALL_C(b_+236, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+239);
   if (!(F & FZ)) {
-    CYCT(b_+239, b_+242); interactionDelete_hook(gb); return;
+    CYCT(b_+239, b_+242); TAIL(interactionDelete);
   }
   CYC(b_+239, b_+242);
   CYC(b_+242, b_+244); A = 0x01;
@@ -286,19 +285,19 @@ init0b:
   CYC(b_+253, b_+255); A = 0x14; // GLOBALFLAG_FINISHEDGAME
   CALL_C(b_+255, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+258);
   if (!(F & FZ)) {
-    CYCT(b_+258, b_+261); interactionDelete_hook(gb); return;
+    CYCT(b_+258, b_+261); TAIL(interactionDelete);
   }
   CYC(b_+258, b_+261);
   CYC(b_+261, b_+263); A = 0x11; // GLOBALFLAG_SAVED_NAYRU
   CALL_C(b_+263, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+266);
   if (F & FZ) {
-    CYCT(b_+266, b_+269); interactionDelete_hook(gb); return;
+    CYCT(b_+266, b_+269); TAIL(interactionDelete);
   }
   CYC(b_+266, b_+269);
   CYC(b_+269, b_+271); A = 0x36; // TREASURE_MAKU_SEED
   CALL_C(b_+271, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+274);
   if (F & FC) {
-    CYCT(b_+274, b_+277); interactionDelete_hook(gb); return;
+    CYCT(b_+274, b_+277); TAIL(interactionDelete);
   }
   CYC(b_+274, b_+277);
   CYC(b_+277, b_+279); A = 0x14; // <TX_1d14
@@ -309,19 +308,19 @@ init0c:
   CYC(b_+292, b_+294); A = 0x14; // GLOBALFLAG_FINISHEDGAME
   CALL_C(b_+294, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+297);
   if (!(F & FZ)) {
-    CYCT(b_+297, b_+300); interactionDelete_hook(gb); return;
+    CYCT(b_+297, b_+300); TAIL(interactionDelete);
   }
   CYC(b_+297, b_+300);
   CYC(b_+300, b_+302); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
   CALL_C(b_+302, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+305);
   if (F & FZ) {
-    CYCT(b_+305, b_+308); interactionDelete_hook(gb); return;
+    CYCT(b_+305, b_+308); TAIL(interactionDelete);
   }
   CYC(b_+305, b_+308);
   CYC(b_+308, b_+310); A = 0x3a; // GLOBALFLAG_FLAME_OF_DESPAIR_LIT
   CALL_C(b_+310, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+313);
   if (!(F & FZ)) {
-    CYCT(b_+313, b_+316); interactionDelete_hook(gb); return;
+    CYCT(b_+313, b_+316); TAIL(interactionDelete);
   }
   CYC(b_+313, b_+316);
   CYC(b_+316, b_+318); A = 0x15; // <TX_1d15
@@ -332,13 +331,13 @@ init0d:
   CYC(b_+320, b_+322); A = 0x3a; // GLOBALFLAG_FLAME_OF_DESPAIR_LIT
   CALL_C(b_+322, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+325);
   if (F & FZ) {
-    CYCT(b_+325, b_+328); interactionDelete_hook(gb); return;
+    CYCT(b_+325, b_+328); TAIL(interactionDelete);
   }
   CYC(b_+325, b_+328);
   CYC(b_+328, b_+330); A = 0x14; // GLOBALFLAG_FINISHEDGAME
   CALL_C(b_+330, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+333);
   if (!(F & FZ)) {
-    CYCT(b_+333, b_+336); interactionDelete_hook(gb); return;
+    CYCT(b_+333, b_+336); TAIL(interactionDelete);
   }
   CYC(b_+333, b_+336);
   CYC(b_+336, b_+338); A = 0x17; // <TX_1d17
@@ -349,13 +348,13 @@ init0f:
   CYC(b_+340, b_+342); A = 0x36; // TREASURE_MAKU_SEED
   CALL_C(b_+342, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+345);
   if (!(F & FC)) {
-    CYCT(b_+345, b_+348); interactionDelete_hook(gb); return;
+    CYCT(b_+345, b_+348); TAIL(interactionDelete);
   }
   CYC(b_+345, b_+348);
   CYC(b_+348, b_+350); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
   CALL_C(b_+350, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+353);
   if (!(F & FZ)) {
-    CYCT(b_+353, b_+356); interactionDelete_hook(gb); return;
+    CYCT(b_+353, b_+356); TAIL(interactionDelete);
   }
   CYC(b_+353, b_+356);
   CALL_C(b_+356, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+359);
@@ -402,7 +401,7 @@ init13:
   CYC(b_+416, b_+418); A = 0x14; // GLOBALFLAG_FINISHEDGAME
   CALL_C(b_+418, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+421);
   if (F & FZ) {
-    CYCT(b_+421, b_+424); interactionDelete_hook(gb); return;
+    CYCT(b_+421, b_+424); TAIL(interactionDelete);
   }
   CYC(b_+421, b_+424);
   CYC(b_+424, b_+427); SET_HL(nayruScript13_bank0c);
@@ -474,8 +473,8 @@ void interactionCode36_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (nayru_jumpTable(gb));
-    if (jt_ == SYM(nayruState0)) { nayruState0_hook(gb); return; }
-    else if (jt_ == SYM(nayruState1)) { nayruState1_hook(gb); return; }
+    if (jt_ == SYM(nayruState0) && hook_enabled_at(gb, SYM(nayruState0))) { nayruState0_hook(gb); return; }
+    else if (jt_ == SYM(nayruState1) && hook_enabled_at(gb, SYM(nayruState1))) { nayruState1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -492,7 +491,7 @@ void nayruState0_hook(GB *gb) {
   CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   CYC(b_+15, b_+16); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+16, b_+19); objectMarkSolidPosition_hook(gb); return;
+    CYCT(b_+16, b_+19); TAIL(objectMarkSolidPosition);
   }
   CYC(b_+16, b_+19);
   CYC(b_+19, b_+20); ret_effect(gb);
@@ -505,20 +504,20 @@ void nayruState1_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (nayru_jumpTable(gb));
-    if (jt_ == SYM(nayruSubid00)) { nayruSubid00_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid01)) { nayruSubid01_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid02)) { nayruSubid02_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid03)) { nayruSubid03_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid04)) { nayruSubid04_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid05)) { nayruSubid05_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid07)) { nayruSubid07_hook(gb); return; }
-    else if (jt_ == SYM(nayruAnimateAndRunScript)) { nayruAnimateAndRunScript_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid09)) { nayruSubid09_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid0a)) { nayruSubid0a_hook(gb); return; }
-    else if (jt_ == SYM(nayruAsNpc)) { nayruAsNpc_hook(gb); return; }
-    else if (jt_ == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid10)) { nayruSubid10_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid13)) { nayruSubid13_hook(gb); return; }
+    if (jt_ == SYM(nayruSubid00) && hook_enabled_at(gb, SYM(nayruSubid00))) { nayruSubid00_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid01) && hook_enabled_at(gb, SYM(nayruSubid01))) { nayruSubid01_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid02) && hook_enabled_at(gb, SYM(nayruSubid02))) { nayruSubid02_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid03) && hook_enabled_at(gb, SYM(nayruSubid03))) { nayruSubid03_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid04) && hook_enabled_at(gb, SYM(nayruSubid04))) { nayruSubid04_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid05) && hook_enabled_at(gb, SYM(nayruSubid05))) { nayruSubid05_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid07) && hook_enabled_at(gb, SYM(nayruSubid07))) { nayruSubid07_hook(gb); return; }
+    else if (jt_ == SYM(nayruAnimateAndRunScript) && hook_enabled_at(gb, SYM(nayruAnimateAndRunScript))) { nayruAnimateAndRunScript_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid09) && hook_enabled_at(gb, SYM(nayruSubid09))) { nayruSubid09_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid0a) && hook_enabled_at(gb, SYM(nayruSubid0a))) { nayruSubid0a_hook(gb); return; }
+    else if (jt_ == SYM(nayruAsNpc) && hook_enabled_at(gb, SYM(nayruAsNpc))) { nayruAsNpc_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid10) && hook_enabled_at(gb, SYM(nayruSubid10))) { nayruSubid10_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid13) && hook_enabled_at(gb, SYM(nayruSubid13))) { nayruSubid13_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -788,9 +787,9 @@ void nayruSubid02_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (nayru_jumpTable(gb));
-    if (jt_ == SYM(nayruSubid02Substate0)) { nayruSubid02Substate0_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid02Substate1)) { nayruSubid02Substate1_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid02Substate2)) { nayruSubid02Substate2_hook(gb); return; }
+    if (jt_ == SYM(nayruSubid02Substate0) && hook_enabled_at(gb, SYM(nayruSubid02Substate0))) { nayruSubid02Substate0_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid02Substate1) && hook_enabled_at(gb, SYM(nayruSubid02Substate1))) { nayruSubid02Substate1_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid02Substate2) && hook_enabled_at(gb, SYM(nayruSubid02Substate2))) { nayruSubid02Substate2_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -833,7 +832,7 @@ void nayruSubid02Substate1_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wTmpcfc0 + 0x10);
   CYC(b_+3, b_+5); alu_cp(gb, 0x08);
   if (!(F & FZ)) {
-    CYCT(b_+5, b_+7); nayruFlipDirectionAtRandomIntervals_hook(gb); return;
+    CYCT(b_+5, b_+7); TAIL(nayruFlipDirectionAtRandomIntervals);
   }
   CYC(b_+5, b_+7);
   CALL_C(b_+7, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+10);
@@ -932,13 +931,13 @@ void nayruSubid04_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+3);
   if (F & FZ) {
-    CYCT(b_+3, b_+6); nayruAnimateAndRunScript_hook(gb); return;
+    CYCT(b_+3, b_+6); TAIL(nayruAnimateAndRunScript);
   }
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+9); A = mem_rd(gb, wTmpcfc0 + 0x10);
   CYC(b_+9, b_+11); alu_cp(gb, 0x0b);
   if (F & FC) {
-    CYCT(b_+11, b_+13); nayruAnimateAndRunScript_hook(gb); return;
+    CYCT(b_+11, b_+13); TAIL(nayruAnimateAndRunScript);
   }
   CYC(b_+11, b_+13);
   CALL_C(b_+13, interactionAnimate_hook, SYM(interactionAnimate), b_+16);
@@ -1184,12 +1183,12 @@ void nayruSubid10_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wScreenShakeCounterY);
   CYC(b_+3, b_+5); alu_cp(gb, 0x5a);
   if (!(F & FC)) {
-    CYCT(b_+5, b_+7); nayruSubid0a_hook(gb); return;
+    CYCT(b_+5, b_+7); TAIL(nayruSubid0a);
   }
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+8); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+8, b_+10); nayruSubid0a_hook(gb); return;
+    CYCT(b_+8, b_+10); TAIL(nayruSubid0a);
   }
   CYC(b_+8, b_+10);
   CYC(b_+10, b_+13); A = W8(w1Link_direction);
@@ -1199,7 +1198,7 @@ void nayruSubid10_hook(GB *gb) {
   CYC(b_+17, b_+19); L = INTERACTION_BASE + OBJ_VAR3F;
   CYC(b_+19, b_+20); alu_cp(gb, mem_rd(gb, HL));
   if (F & FZ) {
-    CYCT(b_+20, b_+22); nayruSubid0a_hook(gb); return;
+    CYCT(b_+20, b_+22); TAIL(nayruSubid0a);
   }
   CYC(b_+20, b_+22);
   CYC(b_+22, b_+23); mem_wr(gb, HL, A);

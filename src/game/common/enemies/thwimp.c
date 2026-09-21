@@ -84,7 +84,7 @@ state_uninitialized:
   CYC(b_+44, b_+45); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+45, b_+47); L = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+47, b_+49); mem_wr(gb, HL, 0x10); // ANGLE_DOWN
-  CYC(b_+49, b_+52); ecom_setSpeedAndState8AndVisible_b0d_hook(gb); return; // jp
+  CYC(b_+49, b_+52); TAIL(ecom_setSpeedAndState8AndVisible_b0d); // jp
 
   // Waiting for Link to approach
 state9:
@@ -103,7 +103,7 @@ state9:
   CYC(b_+77, b_+78); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+78, b_+79); mem_wr(gb, HL, A);
   CYC(b_+79, b_+80); A = alu_inc8(gb, A);
-  CYC(b_+80, b_+83); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+80, b_+83); TAIL(enemySetAnimation); // jp
 
   // Falling down
 stateA:
@@ -124,14 +124,14 @@ landed:
   CYC(b_+100, b_+102); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+102, b_+104); mem_wr(gb, HL, 45);
   CYC(b_+104, b_+106); A = 0x50; // SND_CLINK
-  CYC(b_+106, b_+109); playSound_b00_hook(gb); return; // jp
+  CYC(b_+106, b_+109); TAIL(playSound_b00); // jp
 
   // Just landed. Wait for [counter1] frames
 stateB:
   CYC(b_+109, b_+112); push_effect(gb, b_+112); enemyCode2e_state8_hook(gb);
   if (!(F & FZ)) { CYCT(b_+112, b_+113); ret_effect(gb); return; } // ret nz
   CYC(b_+112, b_+113);
-  CYC(b_+113, b_+116); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+113, b_+116); TAIL(enemySetAnimation); // jp
 
   // Moving back up at constant speed
 stateC:

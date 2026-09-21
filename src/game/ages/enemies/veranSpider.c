@@ -86,7 +86,7 @@ afterSpeedOverride:
     if (target == SYM(veranSpider_state9)) { veranSpider_state9_hook(gb); return; }
     if (target == SYM(veranSpider_stateA)) { veranSpider_stateA_hook(gb); return; }
     if (target == SYM(veranSpider_state_uninitialized)) { veranSpider_state_uninitialized_hook(gb); return; }
-    veranSpider_state_stub_hook(gb); return; // states 1, 2, 6, 7 all target 0x68ad
+    TAIL(veranSpider_state_stub); // states 1, 2, 6, 7 all target 0x68ad
   }
 }
 
@@ -127,7 +127,7 @@ retryPosition:
   CYC(b_+45, b_+47); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
   CYC(b_+47, b_+49); A = 0x59; // SND_FALLINHOLE
   CALL_C(b_+49, playSound_b00_hook, SYM(playSound_b00), b_+52);
-  CYC(b_+52, b_+55); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+52, b_+55); TAIL(objectSetVisiblec1); // jp
 }
 
 void veranSpider_state_switchHook_hook(GB *gb) {
@@ -140,7 +140,7 @@ void veranSpider_state_switchHook_hook(GB *gb) {
     if (target == SYM(ecom_incSubstate_b0d)) { ecom_incSubstate_b0d_hook(gb); return; }
     if (target == b_+12) {
       CYC(b_+12, b_+14); B = 0x09;
-      CYC(b_+14, b_+17); ecom_fallToGroundAndSetState_b0d_hook(gb); return; // jp
+      CYC(b_+14, b_+17); TAIL(ecom_fallToGroundAndSetState_b0d); // jp
     }
     RET(b_+11); return; // @substate1/@substate2 both target 0x687b, a bare `ret`
   }
@@ -160,7 +160,7 @@ void veranSpider_state_scentSeed_hook(GB *gb) {
   CYC(b_+14, b_+16); alu_add(gb, 0x04);
   CYC(b_+16, b_+17); mem_wr(gb, DE, A);
   CALL_C(b_+17, ecom_applyVelocityForSideviewEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0d), SYM(veranSpider_updateAnimation));
-  veranSpider_updateAnimation_hook(gb); return; // falls through
+  TAIL(veranSpider_updateAnimation); // falls through
 }
 
 void veranSpider_updateAnimation_hook(GB *gb) {
@@ -176,7 +176,7 @@ void veranSpider_updateAnimation_hook(GB *gb) {
 incAndSet:
   CYC(b_+9, b_+10); A = alu_inc8(gb, A);
   CYC(b_+10, b_+11); mem_wr(gb, HL, A);
-  CYC(b_+11, b_+14); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+11, b_+14); TAIL(enemyAnimate); // jp
 }
 
 void veranSpider_gotoState9_hook(GB *gb) {
@@ -215,7 +215,7 @@ void veranSpider_state8_hook(GB *gb) {
   CYC(b_+20, b_+22); A = 0x52; // SND_BOMB_LAND
   CALL_C(b_+22, playSound_b00_hook, SYM(playSound_b00), b_+25);
   CALL_C(b_+25, veranSpider_setRandomAngleAndCounter1_hook, SYM(veranSpider_setRandomAngleAndCounter1), b_+28);
-  CYC(b_+28, b_+30); veranSpider_animate_hook(gb); return; // jr
+  CYC(b_+28, b_+30); TAIL(veranSpider_animate); // jr
 }
 
 // Moving in some direction for [counter1] frames
@@ -254,12 +254,12 @@ moveNormally:
   if (!(F & FZ)) CALL_C_CC(b_+43, ecom_applyVelocityForSideviewEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0d), b_+46); else CYC(b_+43, b_+46); // call nz
   if (F & FZ) { CYCT(b_+46, b_+49); veranSpider_setRandomAngleAndCounter1_hook(gb); return; } // jp z
   CYC(b_+46, b_+49);
-  veranSpider_animate_hook(gb); return; // falls through
+  TAIL(veranSpider_animate); // falls through
 }
 
 void veranSpider_animate_hook(GB *gb) {
   BASE(veranSpider_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // Charging in some direction for [counter1] frames
@@ -277,7 +277,7 @@ afterCharge:
   CALL_C(b_+11, veranSpider_gotoState9_hook, SYM(veranSpider_gotoState9), b_+14);
   CYC(b_+14, b_+16); L = ENEMY_BASE + OBJ_COUNTER2;
   CYC(b_+16, b_+18); mem_wr(gb, HL, 0x40);
-  veranSpider_setRandomAngleAndCounter1_hook(gb); return; // falls through
+  TAIL(veranSpider_setRandomAngleAndCounter1); // falls through
 }
 
 void veranSpider_setRandomAngleAndCounter1_hook(GB *gb) {

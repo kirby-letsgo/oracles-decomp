@@ -121,7 +121,7 @@ dead:
   CYC(b_+61, b_+62); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)
   CYC(b_+62, b_+64); L = ENEMY_BASE + OBJ_VAR33;
   CYC(b_+64, b_+65); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)
-  CYC(b_+65, b_+68); enemyDie_uncounted_hook(gb); return; // jp
+  CYC(b_+65, b_+68); TAIL(enemyDie_uncounted); // jp
 
 normalStatus:
   CYC(b_+68, b_+70); E = ENEMY_BASE + OBJ_STATE;
@@ -205,7 +205,7 @@ void floormaster_state1_hook(GB *gb) {
 delete_:
   CALL_C(b_+49, decNumEnemies_hook, SYM(decNumEnemies), b_+52);
   CALL_C(b_+52, markEnemyAsKilledInRoom_b00_hook, SYM(markEnemyAsKilledInRoom_b00), b_+55);
-  CYC(b_+55, b_+58); enemyDelete_hook(gb); return; // jp
+  CYC(b_+55, b_+58); TAIL(enemyDelete); // jp
 }
 
 void floormaster_state_galeSeed_hook(GB *gb) {
@@ -219,7 +219,7 @@ void floormaster_state_galeSeed_hook(GB *gb) {
   CYC(b_+9, b_+10); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)
   CYC(b_+10, b_+12); L = ENEMY_BASE + OBJ_VAR33;
   CYC(b_+12, b_+13); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)
-  CYC(b_+13, b_+16); enemyDelete_hook(gb); return; // jp
+  CYC(b_+13, b_+16); TAIL(enemyDelete); // jp
 }
 
 void floormaster_state_stub_hook(GB *gb) {
@@ -335,7 +335,7 @@ void floormaster_state9_hook(GB *gb) {
   CYC(b_+12, b_+14); E = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   CYC(b_+15, b_+17); alu_add(gb, 0x02);
-  CYC(b_+17, b_+20); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+17, b_+20); TAIL(enemySetAnimation); // jp
 }
 
 // Floating in place for [counter1] frames before chasing Link
@@ -379,7 +379,7 @@ L_4c8a:
   CYC(b_+50, b_+51); A = B;
   CYC(b_+51, b_+53); alu_add(gb, 0x02);
   CALL_C(b_+53, enemySetAnimation_hook, SYM(enemySetAnimation), b_+56);
-  CYCT(b_+56, b_+58); floormaster_animate_hook(gb); return; // jr
+  CYCT(b_+56, b_+58); TAIL(floormaster_animate); // jr
 }
 
 // Chasing Link
@@ -398,7 +398,7 @@ void floormaster_stateB_hook(GB *gb) {
   CYC(b_+16, b_+18); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+18, b_+20); A = 0x06;
   CYC(b_+20, b_+21); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+21, b_+24); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+21, b_+24); TAIL(enemySetAnimation); // jp
 
 stillChasing:
   CYC(b_+24, b_+26); E = ENEMY_BASE + 0x30; // Enemy.var30
@@ -418,12 +418,12 @@ L_4cc6:
   CALL_C(b_+44, floormaster_updateZPosition_hook, SYM(floormaster_updateZPosition), b_+47);
   CALL_C(b_+47, floormaster_getAdjacentWallsBitset_hook, SYM(floormaster_getAdjacentWallsBitset), b_+50);
   CALL_C(b_+50, ecom_applyVelocityGivenAdjacentWalls_b0e_hook, SYM(ecom_applyVelocityGivenAdjacentWalls_b0e), SYM(floormaster_animate));
-  floormaster_animate_hook(gb); return; // fallthrough
+  TAIL(floormaster_animate); // fallthrough
 }
 
 void floormaster_animate_hook(GB *gb) {
   BASE(floormaster_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // Grabbing Link
@@ -442,7 +442,7 @@ void floormaster_stateC_hook(GB *gb) {
   CYC(b_+10, b_+12);
   CYC(b_+12, b_+14); A = 0x02;
   CYC(b_+14, b_+17); mem_wr(gb, w1Link_substate, A);
-  CYC(b_+17, b_+20); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+17, b_+20); TAIL(objectSetInvisible); // jp
 
 makeLinkInvisible: // [animParameter] == 1
   CYC(b_+20, b_+21); mem_wr(gb, DE, A);
@@ -460,7 +460,7 @@ setZToZero: // [animParameter] == 2
   CYC(b_+38, b_+39); mem_wr(gb, DE, A);
   CYC(b_+39, b_+41); E = ENEMY_BASE + OBJ_ZH;
   CYC(b_+41, b_+42); mem_wr(gb, DE, A);
-  CYCT(b_+42, b_+44); floormaster_animate_hook(gb); return; // jr
+  CYCT(b_+42, b_+44); TAIL(floormaster_animate); // jr
 }
 
 // Sinking into ground
@@ -476,7 +476,7 @@ void floormaster_stateD_hook(GB *gb) {
   CYC(b_+10, b_+11); H = A;
   CYC(b_+11, b_+13); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+13, b_+14); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)
-  CYC(b_+14, b_+17); enemyDelete_hook(gb); return; // jp
+  CYC(b_+14, b_+17); TAIL(enemyDelete); // jp
 }
 
 // @param[out]  a  Value written to var30 (0 if Link is to the left, 1 if right)
@@ -617,5 +617,5 @@ void floormaster_initSpawner_hook(GB *gb) {
 void floormaster_getAdjacentWallsBitset_hook(GB *gb) {
   BASE(floormaster_getAdjacentWallsBitset);
   CYC(b_+0, b_+2); A = 0x02;
-  CYC(b_+2, b_+5); ecom_getTopDownAdjacentWallsBitset_b0e_hook(gb); return; // jp
+  CYC(b_+2, b_+5); TAIL(ecom_getTopDownAdjacentWallsBitset_b0e); // jp
 }

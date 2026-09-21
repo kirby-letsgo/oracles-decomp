@@ -216,7 +216,7 @@ substate0:
   CYC(b_+39, b_+41); mem_wr(gb, HL, 0x00);
   CYC(b_+41, b_+43); A = 0x0f;
   CYC(b_+43, b_+46); mem_wr(gb, wActiveMusic, A);
-  CYC(b_+46, b_+49); playSound_b00_hook(gb); return;
+  CYC(b_+46, b_+49); TAIL(playSound_b00);
 
 substate1:
   CALL_C(b_+49, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+52);
@@ -256,7 +256,7 @@ sparkle1:
   CYC(b_+105, b_+108); goto update_animation;
 
 create_puff:
-  CYC(b_+108, b_+111); objectCreatePuff_hook(gb); return;
+  CYC(b_+108, b_+111); TAIL(objectCreatePuff);
 
 state1:
   CALL_C(b_+134, objectOscillateZ_body_hook, SYM(objectOscillateZ_body), b_+137);
@@ -268,7 +268,7 @@ state1:
   CYC(b_+148, b_+149); alu_rrca(gb);
   if (!(F & FC)) { CYCT(b_+149, b_+152); objectSetInvisible_hook(gb); return; }
   CYC(b_+149, b_+152);
-  CYC(b_+152, b_+155); objectSetVisible_hook(gb); return;
+  CYC(b_+152, b_+155); TAIL(objectSetVisible);
 
 state1_expired:
   CYC(b_+155, b_+157); L = 0x43;

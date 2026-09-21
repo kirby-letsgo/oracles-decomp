@@ -495,7 +495,7 @@ state3:
   CYC(b_+284, b_+286); L = 0x2f;
   CYC(b_+286, b_+288); alu_bit(gb, 0, mem_rd(gb, HL));
   if (F & FZ) {
-    CYCT(b_+288, b_+291); objectAddToGrabbableObjectBuffer_hook(gb); return;
+    CYCT(b_+288, b_+291); TAIL(objectAddToGrabbableObjectBuffer);
   }
   CYC(b_+288, b_+291);
   CYC(b_+291, b_+293); A = 0x04;

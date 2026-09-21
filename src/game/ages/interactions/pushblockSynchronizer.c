@@ -107,7 +107,7 @@ l7089:
   CYC(b_+38, b_+40); goto l7089; // jr
 
 incState: // interactionCodebd@incState
-  CYC(b_+40, b_+43); interactionIncState_hook(gb); return; // jp
+  CYC(b_+40, b_+43); TAIL(interactionIncState); // jp
 
 state2: // interactionCodebd@state2
   CYC(b_+43, b_+45); E = INTERACTION_BASE + OBJ_STATE;

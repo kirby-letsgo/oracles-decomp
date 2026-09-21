@@ -79,7 +79,7 @@ state0:
   CALL_C(b_+41, objectMakeTileSolid_hook, SYM(objectMakeTileSolid), b_+44);
   CYC(b_+44, b_+46); H = 0xcf; // >wRoomLayout
   CYC(b_+46, b_+48); mem_wr(gb, HL, 0x00);
-  CYC(b_+48, b_+51); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+48, b_+51); TAIL(objectSetVisible83); // jp
 
 stateStub:
   RET(b_+51); return; // ret
@@ -92,7 +92,7 @@ state2:
   CYC(b_+59, b_+60); L = E;
   CYC(b_+60, b_+61); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+61, b_+63); A = 0x01;
-  CYC(b_+63, b_+66); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+63, b_+66); TAIL(partSetAnimation); // jp
 
 L_4cd6:
   CYC(b_+66, b_+67); A = mem_rd(gb, HL);
@@ -112,7 +112,7 @@ L_4cd6:
   if (!(F & FZ)) { RET_TAKEN(b_+85); return; } // ret nz
   CYC(b_+85, b_+86);
   CYC(b_+86, b_+88); mem_wr(gb, HL, 0x84); // INTERAC_SPARKLE
-  CYC(b_+88, b_+91); objectCopyPositionWithOffset_hook(gb); return; // jp
+  CYC(b_+88, b_+91); TAIL(objectCopyPositionWithOffset); // jp
 
 state3:
   CALL_C(b_+103, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+106);
@@ -121,7 +121,7 @@ state3:
   CYC(b_+108, b_+109); L = E;
   CYC(b_+109, b_+111); mem_wr(gb, HL, 0x01);
   CYC(b_+111, b_+112); alu_xor(gb, A);
-  CYC(b_+112, b_+115); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+112, b_+115); TAIL(partSetAnimation); // jp
 
 L_4d07:
   CYC(b_+115, b_+116); A = mem_rd(gb, HL);
@@ -131,5 +131,5 @@ L_4d07:
   CYC(b_+119, b_+121); L = 0xc2; // Part.subid
   CYC(b_+121, b_+122); C = mem_rd(gb, HL);
   CYC(b_+122, b_+124); B = 0x39;
-  CYC(b_+124, b_+127); showText_hook(gb); return; // jp
+  CYC(b_+124, b_+127); TAIL(showText); // jp
 }

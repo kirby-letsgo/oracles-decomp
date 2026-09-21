@@ -64,7 +64,7 @@ void interaction7f_subid01_hook(GB *gb) {
   CYC(b_+18, b_+19); H = alu_dec8(gb, H);
   CYC(b_+19, b_+21); mem_wr(gb, HL, 0x0f);
   CALL_C(b_+21, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+24);
-  CYC(b_+24, b_+27); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+24, b_+27); TAIL(objectSetVisible83); // jp
 }
 
 // interaction7f_subid02@copyEssencePosition: reached by one genuine call, from @state1's
@@ -80,7 +80,7 @@ void interaction7f_subid02_hook(GB *gb) {
   CYC(b_+5, b_+7); A = 0x01;
   CYC(b_+7, b_+8); mem_wr(gb, DE, A);
   CALL_C(b_+8, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+11);
-  CYC(b_+11, b_+14); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+11, b_+14); TAIL(objectSetVisible82); // jp
 
 state1:
   CYC(b_+14, b_+17); push_effect(gb, b_+17); goto copyEssencePosition;
@@ -180,7 +180,7 @@ afterDungeonOverride:
   CYC(b_+108, b_+109); mem_wr(gb, DE, A);
   CYC(b_+109, b_+110); A = mem_rd(gb, HL);
   CALL_C(b_+110, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+113);
-  CYC(b_+113, b_+116); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+113, b_+116); TAIL(objectSetVisible81); // jp
 
 state1:
   CYC(b_+140, b_+143); A = W8(wFrameCounter);
@@ -235,7 +235,7 @@ state1:
   CYC(b_+221, b_+223); A = 0x77; // SND_DROPESSENCE
   CALL_C(b_+223, playSound_b00_hook, SYM(playSound_b00), b_+226);
   CYC(b_+226, b_+228); A = 0xfc; // SNDCTRL_SLOW_FADEOUT
-  CYC(b_+228, b_+231); playSound_b00_hook(gb); return; // jp
+  CYC(b_+228, b_+231); TAIL(playSound_b00); // jp
 
 state2:
   CALL_C(b_+247, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+250);
@@ -248,7 +248,7 @@ state2:
   CYC(b_+260, b_+262); E = INTERACTION_BASE + OBJ_COLLISION_RADIUS_X;
   CYC(b_+262, b_+264); A = 0x06;
   CYC(b_+264, b_+265); mem_wr(gb, DE, A);
-  CYC(b_+265, b_+268); interactionIncState_hook(gb); return; // jp
+  CYC(b_+265, b_+268); TAIL(interactionIncState); // jp
 
 state3:
   CYC(b_+268, b_+270); C = 0x08;
@@ -263,7 +263,7 @@ afterSpeedZCheck:
   CYC(b_+279, b_+280); H = D;
   CYC(b_+280, b_+282); L = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+282, b_+284); mem_wr(gb, HL, 30);
-  CYC(b_+284, b_+287); interactionIncState_hook(gb); return; // jp
+  CYC(b_+284, b_+287); TAIL(interactionIncState); // jp
 
 state4:
   CALL_C(b_+287, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+290);
@@ -298,13 +298,13 @@ state4:
   CYC(b_+341, b_+342); A = mem_rd(gb, DE);
   CYC(b_+342, b_+343); C = A;
   CYC(b_+343, b_+345); A = 0x40; // TREASURE_ESSENCE
-  CYC(b_+345, b_+348); giveTreasure_hook(gb); return; // jp
+  CYC(b_+345, b_+348); TAIL(giveTreasure); // jp
 
 state5:
   CALL_C(b_+356, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+359);
   CALL_C(b_+359, interactionIncState_hook, SYM(interactionIncState), b_+362);
   CYC(b_+362, b_+365); SET_HL((SYM(interactionCode91__subid00__state1) + 31)); // mainScripts.essenceScript_essenceGetCutscene
-  CYC(b_+365, b_+368); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+365, b_+368); TAIL(interactionSetScript); // jp
 
 state6:
   CALL_C(b_+368, interactionRunScript_hook, SYM(interactionRunScript), b_+371);
@@ -335,7 +335,7 @@ state7:
   CYC(b_+409, b_+412); W8(wWarpTransition2) = A;
   CYC(b_+412, b_+413); alu_xor(gb, A);
   CYC(b_+413, b_+416); W8(wActiveMusic) = A;
-  CYC(b_+416, b_+419); clearStaticObjects_hook(gb); return; // jp
+  CYC(b_+416, b_+419); TAIL(clearStaticObjects); // jp
 }
 
 // INTERAC_ESSENCE
@@ -352,6 +352,6 @@ void interactionCode7f_hook(GB *gb) {
     uint16_t target = interactionCode7f_jump_table(gb);
     if (target == SYM(interaction7f_subid00)) { interaction7f_subid00_hook(gb); return; }
     if (target == SYM(interaction7f_subid01)) { interaction7f_subid01_hook(gb); return; }
-    interaction7f_subid02_hook(gb); return;
+    TAIL(interaction7f_subid02);
   }
 }

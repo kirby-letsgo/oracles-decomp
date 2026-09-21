@@ -68,14 +68,14 @@ afterRoomFlagCheck:
   CYC(b_+56, b_+58); mem_wr(gb, HL, 0x00);
   CYC(b_+58, b_+60); H = wRoomCollisions >> 8;
   CYC(b_+60, b_+62); mem_wr(gb, HL, 0x0f);
-  CYC(b_+62, b_+65); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+62, b_+65); TAIL(objectSetVisible83); // jp
 
 state1:
   CYC(b_+65, b_+68); A = W8(wBraceletLevel);
   CYC(b_+68, b_+70); alu_cp(gb, 0x02);
   if (F & FC) { RET_TAKEN(b_+70); return; } // ret c
   CYC(b_+70, b_+71);
-  CYC(b_+71, b_+74); objectAddToGrabbableObjectBuffer_hook(gb); return; // jp
+  CYC(b_+71, b_+74); TAIL(objectAddToGrabbableObjectBuffer); // jp
 
 state2:
   CYC(b_+74, b_+75); E = alu_inc8(gb, E);
@@ -112,7 +112,7 @@ placeGrabbedTile:
   CALL_C(b_+121, setTile_hook, SYM(setTile), b_+124);
   CYC(b_+124, b_+125); alu_xor(gb, A);
   CYC(b_+125, b_+128); W8(wLinkGrabState2) = A;
-  CYC(b_+128, b_+131); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+128, b_+131); TAIL(objectSetVisiblec1); // jp
 
 substate1Holding:
   RET(b_+131); return; // ret
@@ -139,7 +139,7 @@ breakOut:
   CYC(b_+157, b_+159); mem_wr(gb, HL, 0x40); // [oamTileIndexBase] = $40
   CALL_C(b_+159, objectSetVisible83_hook, SYM(objectSetVisible83), b_+162);
   CYC(b_+162, b_+163); alu_xor(gb, A);
-  CYC(b_+163, b_+166); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+163, b_+166); TAIL(interactionSetAnimation); // jp
 
 state3:
   CALL_C(b_+166, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+169);
@@ -150,5 +150,5 @@ state3:
   CYC(b_+177, b_+178); A = alu_inc8(gb, A);
   if (!(F & FZ)) { CYCT(b_+178, b_+181); interactionAnimate_hook(gb); return; } // jp nz
   CYC(b_+178, b_+181);
-  CYC(b_+181, b_+184); interactionDelete_hook(gb); return; // jp
+  CYC(b_+181, b_+184); TAIL(interactionDelete); // jp
 }

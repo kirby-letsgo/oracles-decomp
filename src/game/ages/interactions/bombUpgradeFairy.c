@@ -49,7 +49,7 @@ void interactionCode83_hook(GB *gb) {
     uint16_t target = bombUpgradeFairy_jump_table(gb);
     if (target == SYM(bombUpgradeFairy_subid01)) { bombUpgradeFairy_subid01_hook(gb); return; }
     if (target == SYM(bombUpgradeFairy_subid02)) { bombUpgradeFairy_subid02_hook(gb); return; }
-    bombUpgradeFairy_subid00_hook(gb); return; // target == 0x63ba
+    TAIL(bombUpgradeFairy_subid00); // target == 0x63ba
   }
 }
 
@@ -141,7 +141,7 @@ state1:
   CYC(b_+123, b_+126); W8(wDisabledObjects) = A;
   CYC(b_+126, b_+129); W8(wMenuDisabled) = A;
   CALL_C(b_+129, setLinkForceStateToState08_hook, SYM(setLinkForceStateToState08), b_+132);
-  CYC(b_+132, b_+135); interactionIncState_hook(gb); return; // jp
+  CYC(b_+132, b_+135); TAIL(interactionIncState); // jp
 
 state2:
   // Wait for signal to spawn in silver and gold bombs?
@@ -201,7 +201,7 @@ state3:
   CYC(b_+208, b_+209); A = alu_inc8(gb, A);
   CYC(b_+209, b_+212); W8(wTmpcfc0_bombUpgradeCutscene_state) = A;
   CALL_C(b_+212, objectCreatePuff_hook, SYM(objectCreatePuff), b_+215);
-  CYC(b_+215, b_+218); interactionDelete_hook(gb); return; // jp
+  CYC(b_+215, b_+218); TAIL(interactionDelete); // jp
 }
 
 // Bombs that surround Link (depending on his answer)
@@ -247,7 +247,7 @@ subid1state1:
   CYC(b_+58, b_+59); L = E;
   CYC(b_+59, b_+60); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
   CALL_C(b_+60, objectCreatePuff_hook, SYM(objectCreatePuff), b_+63);
-  CYC(b_+63, b_+66); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+63, b_+66); TAIL(objectSetVisible82); // jp
 
 subid1state2:
   CYC(b_+66, b_+69); A = W8(wTmpcfc0_genericCutscene_cfd0);
@@ -322,7 +322,7 @@ subid2state1:
   if (!(F & FZ)) { RET_TAKEN(b_+65); return; } // ret nz
   CYC(b_+65, b_+66);
   CALL_C(b_+66, interactionIncState_hook, SYM(interactionIncState), b_+69);
-  CYC(b_+69, b_+72); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+69, b_+72); TAIL(objectSetVisible82); // jp
 
 subid2state2:
   CYC(b_+72, b_+75); A = W8(wTmpcfc0_genericCutscene_cfd0);
@@ -330,5 +330,5 @@ subid2state2:
   if (F & FZ) { RET_TAKEN(b_+76); return; } // ret z
   CYC(b_+76, b_+77);
   CALL_C(b_+77, objectCreatePuff_hook, SYM(objectCreatePuff), b_+80);
-  CYC(b_+80, b_+83); interactionDelete_hook(gb); return; // jp
+  CYC(b_+80, b_+83); TAIL(interactionDelete); // jp
 }

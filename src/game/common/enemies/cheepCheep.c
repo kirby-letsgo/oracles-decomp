@@ -63,7 +63,7 @@ normalStatus:
     uint16_t target = enemyCode2c_jump_table(gb);
     if (target == SYM(cheepCheep_state_uninitialized)) { cheepCheep_state_uninitialized_hook(gb); return; }
     if (target == SYM(ecom_blownByGaleSeedState_b0d)) { ecom_blownByGaleSeedState_b0d_hook(gb); return; }
-    cheepCheep_state_stub_hook(gb); return; // states 1-4, 6, 7 all target 0x6528
+    TAIL(cheepCheep_state_stub); // states 1-4, 6, 7 all target 0x6528
   }
 
 normalState:
@@ -72,7 +72,7 @@ normalState:
   {
     uint16_t target = enemyCode2c_jump_table(gb);
     if (target == SYM(cheepCheep_subid01)) { cheepCheep_subid01_hook(gb); return; }
-    cheepCheep_subid00_hook(gb); return; // target == 0x6529
+    TAIL(cheepCheep_subid00); // target == 0x6529
   }
 }
 
@@ -81,7 +81,7 @@ void cheepCheep_state_uninitialized_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); A = 0x14; // SPEED_80
   CALL_C(b_+2, ecom_setSpeedAndState8_b0d_hook, SYM(ecom_setSpeedAndState8_b0d), b_+5);
-  CYC(b_+5, b_+8); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+5, b_+8); TAIL(objectSetVisible82); // jp
 }
 
 void cheepCheep_state_stub_hook(GB *gb) {
@@ -98,7 +98,7 @@ void cheepCheep_subid00_hook(GB *gb) {
     uint16_t target = enemyCode2c_jump_table(gb);
     if (target == SYM(cheepCheep_state9)) { cheepCheep_state9_hook(gb); return; }
     if (target == SYM(cheepCheep_stateA)) { cheepCheep_stateA_hook(gb); return; }
-    cheepCheep_subid00_state8_hook(gb); return; // target == 0x6533
+    TAIL(cheepCheep_subid00_state8); // target == 0x6533
   }
 }
 
@@ -132,12 +132,12 @@ void cheepCheep_state9_hook(GB *gb) {
 
 applySpeed:
   CALL_C(b_+9, objectApplySpeed_hook, SYM(objectApplySpeed), SYM(cheepCheep_animate));
-  cheepCheep_animate_hook(gb); return; // falls through
+  TAIL(cheepCheep_animate); // falls through
 }
 
 void cheepCheep_animate_hook(GB *gb) {
   BASE(cheepCheep_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // Waiting for 60 frames, then reverse direction
@@ -159,7 +159,7 @@ void cheepCheep_stateA_hook(GB *gb) {
   CYC(b_+18, b_+19); A = mem_rd(gb, HL);
   CYC(b_+19, b_+21); alu_xor(gb, 0x01);
   CYC(b_+21, b_+22); mem_wr(gb, HL, A);
-  CYC(b_+22, b_+25); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(enemySetAnimation); // jp
 }
 
 void cheepCheep_subid01_hook(GB *gb) {
@@ -171,7 +171,7 @@ void cheepCheep_subid01_hook(GB *gb) {
     uint16_t target = enemyCode2c_jump_table(gb);
     if (target == SYM(cheepCheep_state9)) { cheepCheep_state9_hook(gb); return; }
     if (target == SYM(cheepCheep_stateA)) { cheepCheep_stateA_hook(gb); return; }
-    cheepCheep_subid01_state8_hook(gb); return; // target == 0x6575
+    TAIL(cheepCheep_subid01_state8); // target == 0x6575
   }
 }
 

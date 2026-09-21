@@ -107,7 +107,7 @@ justHit:
 
   // The wizzrobe is knocked out of its normal position; allow other wizzrobes to
   // spawn there
-  CYC(b_+33, b_+36); wizzrobe_removePositionReservation_hook(gb); return; // jp
+  CYC(b_+33, b_+36); TAIL(wizzrobe_removePositionReservation); // jp
 
 normalStatus:
   CALL_C(b_+36, ecom_getSubidAndCpStateTo08_b0e_hook, SYM(ecom_getSubidAndCpStateTo08_b0e), b_+39);
@@ -166,7 +166,7 @@ subid1:
   CYC(b_+24, b_+26); mem_wr(gb, HL, 0x08); // [state]
   CYC(b_+26, b_+29); SET_HL(wWizzrobePositionReservations);
   CYC(b_+29, b_+31); B = 0x10;
-  CYC(b_+31, b_+34); clearMemory_hook(gb); return; // jp
+  CYC(b_+31, b_+34); TAIL(clearMemory); // jp
 
 subid2:
   CYC(b_+34, b_+36); mem_wr(gb, HL, 0x0b); // [state]
@@ -175,7 +175,7 @@ subid2:
   CYC(b_+40, b_+42); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+42, b_+44); mem_wr(gb, HL, 0x08);
   CALL_C(b_+44, ecom_setRandomCardinalAngle_b0e_hook, SYM(ecom_setRandomCardinalAngle_b0e), b_+47);
-  CYC(b_+47, b_+50); wizzrobe_setAnimationFromAngle_hook(gb); return; // jp
+  CYC(b_+47, b_+50); TAIL(wizzrobe_setAnimationFromAngle); // jp
 }
 
 // 0e:5926, bare global; jump-table target from enemyCode40.
@@ -248,7 +248,7 @@ void wizzrobe_subid0_state8_hook(GB *gb) {
   CYC(b_+4, b_+6); mem_wr(gb, HL, 75);
   CYC(b_+6, b_+7); L = E;
   CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(b_+8, b_+11); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+8, b_+11); TAIL(objectSetVisiblec2); // jp
 }
 
 // 0e:5968, bare global; jump-table target from wizzrobe_subid0. Phasing in for [counter1]
@@ -267,7 +267,7 @@ void wizzrobe_subid0_state9_hook(GB *gb) {
   CYC(b_+12, b_+14); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
 
   CALL_C(b_+14, ecom_updateCardinalAngleTowardTarget_b0e_hook, SYM(ecom_updateCardinalAngleTowardTarget_b0e), b_+17);
-  CYC(b_+17, b_+20); wizzrobe_setAnimationFromAngle_hook(gb); return; // jp
+  CYC(b_+17, b_+20); TAIL(wizzrobe_setAnimationFromAngle); // jp
 }
 
 // 0e:597c, bare global; jump-table target from wizzrobe_subid0. Fully phased in; standing
@@ -285,7 +285,7 @@ void wizzrobe_subid0_stateA_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+8); return; } // ret nz
   CYC(b_+8, b_+9);
   CYC(b_+9, b_+11); B = 0x1f; // PART_WIZZROBE_PROJECTILE
-  CYC(b_+11, b_+14); ecom_spawnProjectile_b0e_hook(gb); return; // jp
+  CYC(b_+11, b_+14); TAIL(ecom_spawnProjectile_b0e); // jp
 
 phaseOut:
   CYC(b_+14, b_+15); L = E;
@@ -295,7 +295,7 @@ phaseOut:
   CYC(b_+18, b_+20); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
 
   CYC(b_+20, b_+21); alu_xor(gb, A);
-  CYC(b_+21, b_+24); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+21, b_+24); TAIL(enemySetAnimation); // jp
 }
 
 // 0e:5994, bare global; jump-table target from wizzrobe_subid0. Phasing out.
@@ -312,7 +312,7 @@ void wizzrobe_subid0_stateB_hook(GB *gb) {
   CYC(b_+10, b_+12); mem_wr(gb, HL, 72); // [counter1]
   CYC(b_+12, b_+13); L = E;
   CYC(b_+13, b_+15); mem_wr(gb, HL, 0x08); // [state]
-  CYC(b_+15, b_+18); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(objectSetInvisible); // jp
 }
 
 // 0e:59a6, bare global; jump-table target from enemyCode40. Red wizzrobe.
@@ -357,7 +357,7 @@ void wizzrobe_subid1_state8_hook(GB *gb) {
   CYC(b_+20, b_+22); mem_wr(gb, HL, 60);
 
   CALL_C(b_+22, ecom_updateCardinalAngleTowardTarget_b0e_hook, SYM(ecom_updateCardinalAngleTowardTarget_b0e), b_+25);
-  CYC(b_+25, b_+28); wizzrobe_setAnimationFromAngle_hook(gb); return; // jp
+  CYC(b_+25, b_+28); TAIL(wizzrobe_setAnimationFromAngle); // jp
 }
 
 // 0e:59ce, bare global; jump-table target from wizzrobe_subid1. Phasing in for [counter1]
@@ -374,7 +374,7 @@ void wizzrobe_subid1_state9_hook(GB *gb) {
 
   CYC(b_+10, b_+12); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+12, b_+14); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
-  CYC(b_+14, b_+17); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+14, b_+17); TAIL(objectSetVisiblec2); // jp
 }
 
 // 0e:59df, bare global; jump-table target from wizzrobe_subid1. Fully phased in; standing
@@ -392,7 +392,7 @@ void wizzrobe_subid1_stateA_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+8); return; } // ret nz
   CYC(b_+8, b_+9);
   CYC(b_+9, b_+11); B = 0x1f; // PART_WIZZROBE_PROJECTILE
-  CYC(b_+11, b_+14); ecom_spawnProjectile_b0e_hook(gb); return; // jp
+  CYC(b_+11, b_+14); TAIL(ecom_spawnProjectile_b0e); // jp
 
 phaseOut:
   CYC(b_+14, b_+16); mem_wr(gb, HL, 180); // [counter1]
@@ -417,12 +417,12 @@ void wizzrobe_subid1_stateB_hook(GB *gb) {
   CYC(b_+8, b_+9);
   if (F & FZ) { CYCT(b_+9, b_+12); objectSetInvisible_hook(gb); return; } // jp z
   CYC(b_+9, b_+12);
-  CYC(b_+12, b_+15); ecom_flickerVisibility_b0e_hook(gb); return; // jp
+  CYC(b_+12, b_+15); TAIL(ecom_flickerVisibility_b0e); // jp
 
 gotoState8:
   CYC(b_+15, b_+16); L = E;
   CYC(b_+16, b_+18); mem_wr(gb, HL, 0x08); // [state]
-  wizzrobe_removePositionReservation_hook(gb); return; // fallthrough
+  TAIL(wizzrobe_removePositionReservation); // fallthrough
 }
 
 // 0e:5a08, bare global; falls into from wizzrobe_subid1_stateB, also reached by genuine jp
@@ -522,7 +522,7 @@ void wizzrobe_subid2_state9_hook(GB *gb) {
   CYC(b_+17, b_+18); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
 
   CALL_C(b_+18, wizzrobe_setAngleTowardTargetPosition_hook, SYM(wizzrobe_setAngleTowardTargetPosition), b_+21);
-  CYC(b_+21, b_+23); wizzrobe_setAnimationFromAngle_hook(gb); return; // jr
+  CYC(b_+21, b_+23); TAIL(wizzrobe_setAnimationFromAngle); // jr
 }
 
 // 0e:5a5f, bare global; jump-table target from wizzrobe_subid2. Currently phased out,
@@ -548,7 +548,7 @@ void wizzrobe_subid2_stateA_hook(GB *gb) {
 
   CALL_C(b_+23, ecom_updateCardinalAngleTowardTarget_b0e_hook, SYM(ecom_updateCardinalAngleTowardTarget_b0e), b_+26);
   CALL_C(b_+26, wizzrobe_setAnimationFromAngle_hook, SYM(wizzrobe_setAnimationFromAngle), b_+29);
-  CYC(b_+29, b_+32); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+29, b_+32); TAIL(objectSetVisiblec2); // jp
 }
 
 // 0e:5a7f, bare global; jump-table target from wizzrobe_subid2. Standing still for
@@ -583,7 +583,7 @@ void wizzrobe_subid2_stateB_hook(GB *gb) {
 
   CALL_C(b_+31, ecom_updateCardinalAngleTowardTarget_b0e_hook, SYM(ecom_updateCardinalAngleTowardTarget_b0e), b_+34);
   CALL_C(b_+34, wizzrobe_setAnimationFromAngle_hook, SYM(wizzrobe_setAnimationFromAngle), b_+37);
-  CYC(b_+37, b_+40); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+37, b_+40); TAIL(objectSetVisiblec2); // jp
 }
 
 // 0e:5aa7, bare global; called from wizzrobe_state_uninitialized, wizzrobe_subid0_state9,
@@ -598,7 +598,7 @@ void wizzrobe_setAnimationFromAngle_hook(GB *gb) {
   CYC(b_+7, b_+9); A = alu_swap(gb, A);
   CYC(b_+9, b_+10); alu_rlca(gb);
   CYC(b_+10, b_+11); A = alu_inc8(gb, A);
-  CYC(b_+11, b_+14); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+11, b_+14); TAIL(enemySetAnimation); // jp
 }
 
 // 0e:5ab5, bare global; called from wizzrobe_subid0_state9 and wizzrobe_subid0_stateB.
@@ -611,7 +611,7 @@ void wizzrobe_checkFlickerVisibility_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_cp(gb, 45);
   if (F & FC) { RET_TAKEN(b_+5); return; } // ret c
   CYC(b_+5, b_+6);
-  CYC(b_+6, b_+9); ecom_flickerVisibility_b0e_hook(gb); return; // jp
+  CYC(b_+6, b_+9); TAIL(ecom_flickerVisibility_b0e); // jp
 }
 
 // 0e:5abe, bare global; called from wizzrobe_subid2_stateA.
@@ -680,7 +680,7 @@ pickX:
   CYC(b_+27, b_+29); alu_and(gb, 0xf0);
   CYC(b_+29, b_+31); alu_add(gb, 0x08);
   CYC(b_+31, b_+32); C = A;
-  CYC(b_+32, b_+35); getTileCollisionsAtPosition_hook(gb); return; // jp
+  CYC(b_+32, b_+35); TAIL(getTileCollisionsAtPosition); // jp
 }
 
 // 0e:5b02, bare global; called from wizzrobe_subid2_state8.
@@ -693,7 +693,7 @@ void wizzrobe_fireEvery32Frames_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+5); return; } // ret nz
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+8); B = 0x1f; // PART_WIZZROBE_PROJECTILE
-  CYC(b_+8, b_+11); ecom_spawnProjectile_b0e_hook(gb); return; // jp
+  CYC(b_+8, b_+11); TAIL(ecom_spawnProjectile_b0e); // jp
 }
 
 // 0e:5b0d, bare global; called from wizzrobe_subid1_state8. Marks a spot as taken in

@@ -136,7 +136,7 @@ runState:
     if (target == SYM(eyesoarChild_stateF)) { eyesoarChild_stateF_hook(gb); return; }
     if (target == SYM(eyesoarChild_state10)) { eyesoarChild_state10_hook(gb); return; }
     if (target == SYM(eyesoarChild_state_uninitialized)) { eyesoarChild_state_uninitialized_hook(gb); return; }
-    eyesoarChild_state_stub_hook(gb); return; // states 1-7 all target 0x69c0
+    TAIL(eyesoarChild_state_stub); // states 1-7 all target 0x69c0
   }
 }
 
@@ -163,7 +163,7 @@ void eyesoarChild_state_uninitialized_hook(GB *gb) {
   CYC(b_+30, b_+32); A = 90;
   CYC(b_+32, b_+33); mem_wr(gb, DE, A);
   CYC(b_+33, b_+35); A = 0x28; // SPEED_100
-  CYC(b_+35, b_+38); ecom_setSpeedAndState8_b0d_hook(gb); return; // jp
+  CYC(b_+35, b_+38); TAIL(ecom_setSpeedAndState8_b0d); // jp
 }
 
 // eyesoarChild_state_uninitialized@initialAnglesForSubids (0d:69bc-69bf): pure data
@@ -191,7 +191,7 @@ void eyesoarChild_state8_hook(GB *gb) {
   CYC(b_+16, b_+17); E = alu_inc8(gb, E);
   CYC(b_+17, b_+18); A = H;
   CYC(b_+18, b_+19); mem_wr(gb, DE, A);
-  CYC(b_+19, b_+22); ecom_incState_b0d_hook(gb); return; // jp
+  CYC(b_+19, b_+22); TAIL(ecom_incState_b0d); // jp
 }
 
 void eyesoarChild_state9_hook(GB *gb) {
@@ -209,7 +209,7 @@ void eyesoarChild_state9_hook(GB *gb) {
   CYC(b_+17, b_+19); mem_wr(gb, HL, 0xfe);
   CYC(b_+19, b_+21); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+21, b_+23); mem_wr(gb, HL, 0x18);
-  CYC(b_+23, b_+26); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+23, b_+26); TAIL(objectSetVisiblec2); // jp
 }
 
 // Moving around Eyesoar in a circle
@@ -228,7 +228,7 @@ void eyesoarChild_stateA_hook(GB *gb) {
   CYC(b_+15, b_+17); E = ENEMY_BASE + OBJ_STATE;
   CYC(b_+17, b_+19); A = 0x0b;
   CYC(b_+19, b_+20); mem_wr(gb, DE, A);
-  eyesoarChild_updatePosition_hook(gb); return; // falls through
+  TAIL(eyesoarChild_updatePosition); // falls through
 }
 
 void eyesoarChild_updatePosition_hook(GB *gb) {
@@ -250,7 +250,7 @@ void eyesoarChild_updatePosition_hook(GB *gb) {
   CYC(b_+18, b_+20); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+20, b_+21); A = mem_rd(gb, HL);
   CALL_C(b_+21, objectSetPositionInCircleArc_hook, SYM(objectSetPositionInCircleArc), b_+24);
-  CYC(b_+24, b_+27); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+24, b_+27); TAIL(enemyAnimate); // jp
 }
 
 void eyesoarChild_stateB_hook(GB *gb) {
@@ -271,7 +271,7 @@ void eyesoarChild_stateB_hook(GB *gb) {
   CYC(b_+12, b_+14); E = ENEMY_BASE + OBJ_SUBID;
   CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   CALL_C(b_+15, setFlag_hook, SYM(setFlag), b_+18);
-  CYC(b_+18, b_+20); eyesoarChild_updatePosition_hook(gb); return; // jr
+  CYC(b_+18, b_+20); TAIL(eyesoarChild_updatePosition); // jr
 }
 
 void eyesoarChild_incOrDecHL_hook(GB *gb) {
@@ -285,7 +285,7 @@ addAndStore:
   CYC(b_+6, b_+7); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+7, b_+8); mem_wr(gb, HL, A);
   CYC(b_+8, b_+9); H = B;
-  CYC(b_+9, b_+11); eyesoarChild_updatePosition_hook(gb); return; // jr
+  CYC(b_+9, b_+11); TAIL(eyesoarChild_updatePosition); // jr
 }
 
 // Was just "killed"; waiting a bit before reappearing
@@ -306,7 +306,7 @@ void eyesoarChild_stateC_hook(GB *gb) {
   CYC(b_+16, b_+18); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
   CALL_C(b_+18, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+21);
   CYC(b_+21, b_+22); H = B;
-  CYC(b_+22, b_+24); eyesoarChild_updatePosition_hook(gb); return; // jr
+  CYC(b_+22, b_+24); TAIL(eyesoarChild_updatePosition); // jr
 
 stillInvisible:
   CYC(b_+24, b_+25); H = B;
@@ -341,7 +341,7 @@ void eyesoarChild_stateD_hook(GB *gb) {
   CYC(b_+12, b_+14); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+14, b_+16); mem_wr(gb, HL, 0x0a);
   CYC(b_+16, b_+17); H = B;
-  CYC(b_+17, b_+20); eyesoarChild_updatePosition_hook(gb); return; // jp
+  CYC(b_+17, b_+20); TAIL(eyesoarChild_updatePosition); // jp
 }
 
 void eyesoarChild_stateE_hook(GB *gb) {
@@ -353,7 +353,7 @@ void eyesoarChild_stateE_hook(GB *gb) {
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+10); A = 0x0b;
   CYC(b_+10, b_+11); mem_wr(gb, DE, A); // [state]
-  CYC(b_+11, b_+14); eyesoarChild_updatePosition_hook(gb); return; // jp
+  CYC(b_+11, b_+14); TAIL(eyesoarChild_updatePosition); // jp
 }
 
 // Moving around randomly
@@ -377,7 +377,7 @@ void eyesoarChild_stateF_hook(GB *gb) {
   // $18 units away from Eyesoar
   CYC(b_+21, b_+23); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+23, b_+25); mem_wr(gb, HL, 0x18);
-  CYC(b_+25, b_+27); eyesoarChild_animate_hook(gb); return; // jr
+  CYC(b_+25, b_+27); TAIL(eyesoarChild_animate); // jr
 
 stillMovingRandomly:
   CYC(b_+27, b_+30); A = W8(wFrameCounter);
@@ -390,12 +390,12 @@ stillMovingRandomly:
 applySpeed:
   CALL_C(b_+40, objectApplySpeed_hook, SYM(objectApplySpeed), b_+43);
   CALL_C(b_+43, ecom_bounceOffScreenBoundary_b0d_hook, SYM(ecom_bounceOffScreenBoundary_b0d), SYM(eyesoarChild_animate));
-  eyesoarChild_animate_hook(gb); return; // falls through
+  TAIL(eyesoarChild_animate); // falls through
 }
 
 void eyesoarChild_animate_hook(GB *gb) {
   BASE(eyesoarChild_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // Moving back toward Eyesoar
@@ -442,7 +442,7 @@ void eyesoarChild_state10_hook(GB *gb) {
 
 moveToward:
   CALL_C(b_+52, ecom_moveTowardPosition_b0d_hook, SYM(ecom_moveTowardPosition_b0d), b_+55);
-  CYC(b_+55, b_+57); eyesoarChild_animate_hook(gb); return; // jr
+  CYC(b_+55, b_+57); TAIL(eyesoarChild_animate); // jr
 
 reachedTargetPosition:
   // Wait for signal to change state
@@ -458,5 +458,5 @@ reachedTargetPosition:
   CYC(b_+69, b_+70); A = mem_rd(gb, DE);
   CYC(b_+70, b_+72); alu_add(gb, 0x04);
   CYC(b_+72, b_+74); L = ENEMY_BASE + 0x3a; // Enemy.var3a (parent, h==b)
-  CYC(b_+74, b_+77); setFlag_hook(gb); return; // jp
+  CYC(b_+74, b_+77); TAIL(setFlag); // jp
 }

@@ -50,7 +50,7 @@ void interactionCodebe_hook(GB *gb) {
   CYC(b_+15, b_+18);
   CYC(b_+18, b_+20); A = 0x02;
   CALL_C(b_+20, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+23);
-  CYC(b_+23, b_+26); interactionIncState_hook(gb); return; // jp
+  CYC(b_+23, b_+26); TAIL(interactionIncState); // jp
 
 state1: // interactionCodebe@state1
   CALL_C(b_+26, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing), b_+29);
@@ -80,7 +80,7 @@ state1: // interactionCodebe@state1
   CALL_C(b_+66, setTile_hook, SYM(setTile), b_+69);
   CYC(b_+69, b_+71); A = 0x6c;
   CALL_C(b_+71, playSound_b00_hook, SYM(playSound_b00), b_+74);
-  CYC(b_+74, b_+77); interactionIncState_hook(gb); return; // jp
+  CYC(b_+74, b_+77); TAIL(interactionIncState); // jp
 
 state2: // interactionCodebe@state2
   CALL_C(b_+77, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+80);
@@ -96,5 +96,5 @@ state2: // interactionCodebe@state2
   CYC(b_+100, b_+101); A = mem_rd(gb, DE);
   CYC(b_+101, b_+104); W8(wGenericCutscene_cbbd) = A;
   CALL_C(b_+104, fadeoutToWhite_hook, SYM(fadeoutToWhite), b_+107);
-  CYC(b_+107, b_+110); interactionDelete_hook(gb); return; // jp
+  CYC(b_+107, b_+110); TAIL(interactionDelete); // jp
 }

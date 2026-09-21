@@ -59,8 +59,7 @@ state0:
   CYC(b_+28, b_+30); mem_wr(gb, HL, 0x02);
   CALL_C(b_+30, itemMimicBgTile_hook, SYM(itemMimicBgTile), b_+33);
   CYC(b_+33, b_+36);
-  objectSetVisiblec0_hook(gb);
-  return;
+  TAIL(objectSetVisiblec0);
 
 held:
   CYC(b_+36, b_+37); H = D;
@@ -161,16 +160,14 @@ no_collision:
   CYC(b_+134, b_+136); A = 0x0b;
   CALL_C(b_+136, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+139);
   CYC(b_+139, b_+142);
-  objectCopyPosition_hook(gb);
-  return;
+  TAIL(objectCopyPosition);
 
 release:
   CYC(b_+142, b_+144); A = 0x05;
   CALL_C(b_+144, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+147);
   CYC(b_+147, b_+149); mem_wr(gb, HL, 0x03);
   CYC(b_+149, b_+152);
-  itemDelete_hook(gb);
-  return;
+  TAIL(itemDelete);
 
 destroy:
   CALL_C(b_+152, objectReplaceWithAnimationIfOnHazard_hook, SYM(objectReplaceWithAnimationIfOnHazard), b_+155);
@@ -231,8 +228,7 @@ void braceletCheckDeleteSelfWhileThrowing_hook(GB *gb) {
 delete_self:
   CYC(b_+27, b_+28); SET_AF(pop_effect(gb));
   CYC(b_+28, b_+31);
-  itemDelete_hook(gb);
-  return;
+  TAIL(itemDelete);
 
 throwing_tile:
   CALL_C(b_+31, objectCheckWithinRoomBoundary_hook, SYM(objectCheckWithinRoomBoundary), b_+34);

@@ -38,9 +38,9 @@ void interactionCodeb8_hook(GB *gb) {
   CYC(b_+0, b_+2); E = 0x42;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4); do { uint16_t jt_ = (vire_jump_table(gb));
-    if (jt_ == SYM(vire_subid0)) { vire_subid0_hook(gb); return; }
-    else if (jt_ == SYM(vire_subid1)) { vire_subid1_hook(gb); return; }
-    else if (jt_ == SYM(vire_subid2)) { vire_subid2_hook(gb); return; }
+    if (jt_ == SYM(vire_subid0) && hook_enabled_at(gb, SYM(vire_subid0))) { vire_subid0_hook(gb); return; }
+    else if (jt_ == SYM(vire_subid1) && hook_enabled_at(gb, SYM(vire_subid1))) { vire_subid1_hook(gb); return; }
+    else if (jt_ == SYM(vire_subid2) && hook_enabled_at(gb, SYM(vire_subid2))) { vire_subid2_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -65,7 +65,7 @@ runScript:
   if (F & FC) { CYC(b_+23, b_+26); vire_deleteAndReturnControl_hook(gb); return; }
   CYC(b_+23, b_+26);
 animate:
-  CYC(b_+26, b_+29); interactionAnimate_hook(gb); return;
+  CYC(b_+26, b_+29); TAIL(interactionAnimate);
 state0:
   CALL_C(b_+29, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+32);
   CYC(b_+32, b_+34); alu_bit(gb, 6, mem_rd(gb, HL));
@@ -86,7 +86,7 @@ void vire_setScript_hook(GB *gb) {
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x50);
   CYC(b_+13, b_+14); alu_xor(gb, A);
   CYC(b_+14, b_+17); mem_wr(gb, wTmpcfc0_armosStatue_killedArmosPositions, A);
-  CYC(b_+17, b_+20); objectSetVisiblec2_hook(gb); return;
+  CYC(b_+17, b_+20); TAIL(objectSetVisiblec2);
 }
 
 void vire_subid1_hook(GB *gb) {
@@ -110,7 +110,7 @@ state0:
   if (F & FZ) { CYCT(b_+26, b_+28); vire_setScript_hook(gb); return; }
   CYC(b_+26, b_+28); CYC(b_+28, b_+31); A = mem_rd(gb, wActiveMusic);
   CYC(b_+31, b_+32); alu_or(gb, A); CYC(b_+32, b_+34); A = 0x2d;
-  if (!(F & FZ)) CALL_C(b_+34, playSound_b00_hook, SYM(playSound_b00), b_+37); else CYC(b_+34, b_+37);
+  if (!(F & FZ)) CALL_C_CC(b_+34, playSound_b00_hook, SYM(playSound_b00), b_+37); else CYC(b_+34, b_+37);
   CYC(b_+37, b_+39); goto gotoState2;
 state1:
   CYC(b_+39, b_+41); E = 0x78; CYC(b_+41, b_+42); A = mem_rd(gb, DE); CYC(b_+42, b_+43); alu_or(gb, A);
@@ -127,7 +127,7 @@ runScript:
 gotoState2:
   CYC(b_+71, b_+72); H = D; CYC(b_+72, b_+74); L = 0x44; CYC(b_+74, b_+76); mem_wr(gb, HL, 0x02); CYC(b_+76, b_+78); L = 0x46; CYC(b_+78, b_+80); mem_wr(gb, HL, 0x08); RET(b_+80); return;
 animate1:
-  CYC(b_+56, b_+60); interactionAnimate_hook(gb); return;
+  CYC(b_+56, b_+60); TAIL(interactionAnimate);
 state2:
   CALL_C(b_+81, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+84);
   if (!(F & FZ)) { RET_TAKEN(b_+84); return; }
@@ -187,7 +187,7 @@ counter:
 setCounter:
   CALL_C(b_+126, vire_setRandomCounter1_hook, SYM(vire_setRandomCounter1), b_+129);
 animate2:
-  CYC(b_+129, b_+132); interactionAnimate_hook(gb); return;
+  CYC(b_+129, b_+132); TAIL(interactionAnimate);
 state2:
   CALL_C(b_+132, interactionIncState_hook, SYM(interactionIncState), b_+135); CYC(b_+135, b_+137); L = 0x46; CYC(b_+137, b_+138); alu_xor(gb, A); CYC(b_+138, b_+139); mem_wr(gb, HL, A); SET_HL(HL + 1); CYC(b_+139, b_+140); mem_wr(gb, HL, A); CYC(b_+140, b_+142); E = 0x48; CYC(b_+142, b_+143); A = mem_rd(gb, DE); CYC(b_+143, b_+144); A = alu_dec8(gb, A); if (F & FZ) CALL_C_CC(b_+144, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+147); else CYC(b_+144, b_+147); CYC(b_+147, b_+149); A = 0x80; CYC(b_+149, b_+152); mem_wr(gb, wDisabledObjects, A); CYC(b_+152, b_+154); A = 0xf0; CALL_C(b_+154, playSound_b00_hook, SYM(playSound_b00), b_+157); goto state3;
 state3:

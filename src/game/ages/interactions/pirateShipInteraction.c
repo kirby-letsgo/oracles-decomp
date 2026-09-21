@@ -68,7 +68,7 @@ void interactionCodec2_hook(GB *gb) {
   CALL_C(b_+34, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+37);
   CYC(b_+37, b_+39); A = 0x06;
   CALL_C(b_+39, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+42);
-  CYC(b_+42, b_+45); interactionIncState_hook(gb); return; // jp
+  CYC(b_+42, b_+45); TAIL(interactionIncState); // jp
 
 subid0State1:
   CYC(b_+45, b_+48); SET_HL(wPirateShipRoom);
@@ -97,10 +97,10 @@ subid0State1:
   CYC(b_+81, b_+83);
   CYC(b_+83, b_+86); SET_HL(b_+95); // @warpDest
   CALL_C(b_+86, setWarpDestVariables_hook, SYM(setWarpDestVariables), b_+89);
-  CYC(b_+89, b_+92); interactionIncState_hook(gb); return; // jp
+  CYC(b_+89, b_+92); TAIL(interactionIncState); // jp
 
 animate: // interactionCodec2@animate
-  CYC(b_+92, b_+95); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+92, b_+95); TAIL(interactionAnimate); // jp
 
   // interactionCodec2@warpDest (0b:729b): pure ROM data (m_HardcodedWarpA table), not ported as
   // code -- referenced only via SET_HL(0x729b) above.
@@ -142,7 +142,7 @@ subid1And2State0Common:
   CYC(b_+152, b_+154); A = 0x81; // DISABLE_ALL_BUT_INTERACTIONS | DISABLE_LINK
   CYC(b_+154, b_+157); W8(wDisabledObjects) = A;
   CYC(b_+157, b_+160); W8(wMenuDisabled) = A;
-  CYC(b_+160, b_+163); interactionIncState_hook(gb); return; // jp
+  CYC(b_+160, b_+163); TAIL(interactionIncState); // jp
 
 subid1And2State1:
   CALL_C(b_+163, interactionAnimate_hook, SYM(interactionAnimate), b_+166);
@@ -152,7 +152,7 @@ subid1And2State1:
   CYC(b_+170, b_+172); mem_wr(gb, HL, 0x80);
   CYC(b_+172, b_+175); SET_BC(0x360c); // TX_360c
   CALL_C(b_+175, showText_hook, SYM(showText), b_+178);
-  CYC(b_+178, b_+181); interactionIncState_hook(gb); return; // jp
+  CYC(b_+178, b_+181); TAIL(interactionIncState); // jp
 
 subid1State2:
   CYC(b_+181, b_+183); C = 0x18; // ANGLE_LEFT
@@ -170,7 +170,7 @@ moveOffScreen:
   CYC(b_+202, b_+203); alu_xor(gb, A); // xor a
   CYC(b_+203, b_+206); W8(wDisabledObjects) = A;
   CYC(b_+206, b_+209); W8(wMenuDisabled) = A;
-  CYC(b_+209, b_+212); interactionDelete_hook(gb); return; // jp
+  CYC(b_+209, b_+212); TAIL(interactionDelete); // jp
 
 subid2:
   CYC(b_+212, b_+214); E = INTERACTION_BASE + OBJ_STATE;

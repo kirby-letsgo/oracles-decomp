@@ -87,13 +87,13 @@ subid0:
   CYC(b_+17, b_+19); A = 0x14;
   CALL_C(b_+19, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+22);
   if (!(F & FZ)) {
-    CYCT(b_+22, b_+25); interactionDelete_hook(gb); return;
+    CYCT(b_+22, b_+25); TAIL(interactionDelete);
   }
   CYC(b_+22, b_+25);
   CYC(b_+25, b_+27); A = 0x0b;
   CALL_C(b_+27, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+30);
   if (!(F & FZ)) {
-    CYCT(b_+30, b_+33); interactionDelete_hook(gb); return;
+    CYCT(b_+30, b_+33); TAIL(interactionDelete);
   }
   CYC(b_+30, b_+33);
   CYC(b_+33, b_+36); push_effect(gb, b_+36);
@@ -115,7 +115,7 @@ subid1:
   CYC(b_+55, b_+56); A = B;
   CYC(b_+56, b_+58); alu_cp(gb, 3);
   if (!(F & FZ)) {
-    CYCT(b_+58, b_+61); interactionDelete_hook(gb); return;
+    CYCT(b_+58, b_+61); TAIL(interactionDelete);
   }
   CYC(b_+58, b_+61);
   CYC(b_+61, b_+64); push_effect(gb, b_+64);
@@ -134,7 +134,7 @@ subid2:
   CALL_C(b_+75, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+78);
   CYC(b_+78, b_+80); alu_bit(gb, 6, A);
   if (!(F & FZ)) {
-    CYCT(b_+80, b_+83); interactionDelete_hook(gb); return;
+    CYCT(b_+80, b_+83); TAIL(interactionDelete);
   }
   CYC(b_+80, b_+83);
   CYC(b_+83, b_+86); push_effect(gb, b_+86);

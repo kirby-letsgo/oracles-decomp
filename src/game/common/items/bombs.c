@@ -66,15 +66,13 @@ void itemCode03_hook(GB *gb) {
   CYC(b_+7, b_+9); alu_bit(gb, 7, A);
   if (!(F & FZ)) {
     CYCT(b_+9, b_+12);
-    bombResetAnimationAndSetVisiblec1_hook(gb);
-    return;
+    TAIL(bombResetAnimationAndSetVisiblec1);
   }
   CYC(b_+9, b_+12);
   CYC(b_+12, b_+14); alu_bit(gb, 4, A);
   if (!(F & FZ)) {
     CYCT(b_+14, b_+17);
-    bombUpdateExplosion_hook(gb);
-    return;
+    TAIL(bombUpdateExplosion);
   }
   CYC(b_+14, b_+17);
   CYC(b_+17, b_+19); E = 0x04;
@@ -100,8 +98,7 @@ delete_bomb:
     else CYC(b_+37, b_+40);
   }
   CYC(b_+40, b_+43);
-  itemDelete_hook(gb);
-  return;
+  TAIL(itemDelete);
 
 state1:
   CYC(b_+43, b_+45); C = 0x20;
@@ -113,14 +110,12 @@ state1:
   CALL_C(b_+49, bombPullTowardPoint_hook, SYM(bombPullTowardPoint), b_+52);
   if (F & FC) {
     CYCT(b_+52, b_+55);
-    itemDelete_hook(gb);
-    return;
+    TAIL(itemDelete);
   }
   CYC(b_+52, b_+55);
   CALL_C(b_+55, itemUpdateConveyorBelt_hook, SYM(itemUpdateConveyorBelt), b_+58);
   CYC(b_+58, b_+61);
-  bombUpdateAnimation_hook(gb);
-  return;
+  TAIL(bombUpdateAnimation);
 
 held_state:
   CYC(b_+61, b_+63); E = 0x05;
@@ -146,8 +141,7 @@ held_state1:
   CALL_C(b_+89, cpActiveRing_hook, SYM(cpActiveRing), b_+92);
   if (F & FZ) {
     CYCT(b_+92, b_+95);
-    bombResetAnimationAndSetVisiblec1_hook(gb);
-    return;
+    TAIL(bombResetAnimationAndSetVisiblec1);
   }
   CYC(b_+92, b_+95);
   CALL_C(b_+95, bombUpdateAnimation_hook, SYM(bombUpdateAnimation), b_+98);
@@ -156,8 +150,7 @@ held_state1:
   }
   CYC(b_+98, b_+99);
   CYC(b_+99, b_+102);
-  dropLinkHeldItem_hook(gb);
-  return;
+  TAIL(dropLinkHeldItem);
 
 held_state2:
   CYC(b_+102, b_+104); A = 0x03;
@@ -185,15 +178,13 @@ held_state2:
   CALL_C(b_+123, bombPullTowardPoint_hook, SYM(bombPullTowardPoint), b_+126);
   if (F & FC) {
     CYCT(b_+126, b_+129);
-    itemDelete_hook(gb);
-    return;
+    TAIL(itemDelete);
   }
   CYC(b_+126, b_+129);
 
 update_animation:
   CYC(b_+129, b_+132);
-  bombUpdateAnimation_hook(gb);
-  return;
+  TAIL(bombUpdateAnimation);
 
 stopped_bouncing:
   CYC(b_+132, b_+133); H = D;
@@ -275,8 +266,7 @@ void itemUpdateExplosion_hook(GB *gb) {
   CYC(b_+4, b_+6); alu_bit(gb, 7, A);
   if (!(F & FZ)) {
     CYCT(b_+6, b_+9);
-    itemDelete_hook(gb);
-    return;
+    TAIL(itemDelete);
   }
   CYC(b_+6, b_+9);
   CYC(b_+9, b_+11); L = 0x24;
@@ -312,8 +302,7 @@ void bombUpdateExplosion_hook(GB *gb) {
   CYC(b_+4, b_+6); alu_cp(gb, 0xff);
   if (!(F & FZ)) {
     CYCT(b_+6, b_+8);
-    itemInitializeBombExplosion_hook(gb);
-    return;
+    TAIL(itemInitializeBombExplosion);
   }
   CYC(b_+6, b_+8);
   CYC(b_+8, b_+10);

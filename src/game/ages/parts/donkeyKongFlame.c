@@ -49,7 +49,7 @@ void func_6261_hook(GB *gb) {
   CYC(b_+8, b_+9); A = mem_rd(gb, DE);
   CYC(b_+9, b_+11); alu_xor(gb, 0x01);
   CYC(b_+11, b_+12); mem_wr(gb, DE, A);
-  CYC(b_+12, b_+15); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+12, b_+15); TAIL(partSetAnimation); // jp
 }
 
 void func_6256_hook(GB *gb) {
@@ -59,7 +59,7 @@ void func_6256_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+3, b_+5); func_6261_hook(gb); return; } // jr nz
   CYC(b_+3, b_+5);
   CALL_C(b_+5, objectApplySpeed_hook, SYM(objectApplySpeed), b_+8);
-  CYC(b_+8, b_+11); partAnimate_hook(gb); return; // jp
+  CYC(b_+8, b_+11); TAIL(partAnimate); // jp
 }
 
 void func_6248_hook(GB *gb) {
@@ -71,7 +71,7 @@ void func_6248_hook(GB *gb) {
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+8); SET_HL(pop_effect(gb));
   CALL_C(b_+8, objectCreatePuff_hook, SYM(objectCreatePuff), b_+11);
-  CYC(b_+11, b_+14); partDelete_hook(gb); return; // jp
+  CYC(b_+11, b_+14); TAIL(partDelete); // jp
 }
 
 void func_6270_hook(GB *gb) {
@@ -121,7 +121,7 @@ void partCode2c_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+7, b_+9); goto L_6169; } // jr z
   CYC(b_+7, b_+9);
   CALL_C(b_+9, objectCreatePuff_hook, SYM(objectCreatePuff), b_+12);
-  CYC(b_+12, b_+15); partDelete_hook(gb); return; // jp
+  CYC(b_+12, b_+15); TAIL(partDelete); // jp
 
 L_6169:
   CYC(b_+15, b_+17); E = 0xc4; // Part.state
@@ -167,7 +167,7 @@ state0:
   CALL_C(b_+74, partSetAnimation_hook, SYM(partSetAnimation), b_+77);
 
 L_61a7:
-  CYC(b_+77, b_+82); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+77, b_+82); TAIL(objectSetVisible82); // jp
 
 state1:
   CYC(b_+82, b_+84); A = 0x20;
@@ -198,7 +198,7 @@ state2:
   CYC(b_+115, b_+117); mem_wr(gb, HL, 0x00);
 
 animate:
-  CYC(b_+117, b_+120); partAnimate_hook(gb); return; // jp
+  CYC(b_+117, b_+120); TAIL(partAnimate); // jp
 
 state3:
   CYC(b_+120, b_+122); E = 0xc5; // Part.substate
@@ -274,5 +274,5 @@ state4:
   if (F & FZ) { RET_TAKEN(b_+217); return; } // ret z
   CYC(b_+217, b_+218);
   CYC(b_+218, b_+219); mem_wr(gb, HL, A);
-  CYC(b_+219, b_+222); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+219, b_+222); TAIL(partSetAnimation); // jp
 }

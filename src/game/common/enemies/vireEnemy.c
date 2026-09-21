@@ -143,7 +143,7 @@ dead:
   CALL_C(b_+48, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+51);
   CYC(b_+51, b_+52); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (F & FZ) { CALL_C_CC(b_+52, objectCopyPosition_hook, SYM(objectCopyPosition), b_+55); } else { CYC(b_+52, b_+55); } // call z
-  CYC(b_+55, b_+58); enemyDelete_hook(gb); return; // jp
+  CYC(b_+55, b_+58); TAIL(enemyDelete); // jp
 
 subid0Dead:
   CYC(b_+58, b_+59); H = D;
@@ -172,7 +172,7 @@ normalStatus:
   CYC(b_+92, b_+93); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+93, b_+96); vire_mainForm_hook(gb); return; } // jp z
   CYC(b_+93, b_+96);
-  CYC(b_+96, b_+99); vire_batForm_hook(gb); return; // jp
+  CYC(b_+96, b_+99); TAIL(vire_batForm); // jp
 
 commonState:
   CYC(b_+99, b_+101); E = ENEMY_BASE + OBJ_STATE;
@@ -199,7 +199,7 @@ void vire_state_uninitialized_hook(GB *gb) {
   CYC(b_+10, b_+12); mem_wr(gb, HL, 0xfc);
   CYC(b_+12, b_+13); A = alu_dec8(gb, A); // a = $ff
   CYC(b_+13, b_+15); B = 0x00;
-  CYC(b_+15, b_+18); enemyBoss_initializeRoom_b0f_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(enemyBoss_initializeRoom_b0f); // jp
 }
 
 void vire_state_stub_hook(GB *gb) {
@@ -306,7 +306,7 @@ substate1:
   CYC(b_+68, b_+69); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+69, b_+70); L = alu_inc8(gb, L);
   CYC(b_+70, b_+72); mem_wr(gb, HL, 0x08); // [counter1]
-  CYC(b_+72, b_+75); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+72, b_+75); TAIL(objectSetVisiblec1); // jp
 
 substate2:
   CALL_C(b_+75, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+78);
@@ -321,7 +321,7 @@ substate2:
   CYC(b_+91, b_+92); C = alu_inc8(gb, C); // TX_2f13
 
 L_566e:
-  CYC(b_+92, b_+95); showText_hook(gb); return; // jp
+  CYC(b_+92, b_+95); TAIL(showText); // jp
 
 substate3:
   CALL_C(b_+95, objectCreatePuff_hook, SYM(objectCreatePuff), b_+98);
@@ -340,7 +340,7 @@ substate3:
   CALL_C(b_+118, objectSetInvisible_hook, SYM(objectSetInvisible), b_+121);
   CYC(b_+121, b_+123); A = 0x2d; // MUS_MINIBOSS
   CYC(b_+123, b_+126); mem_wr(gb, wActiveMusic, A);
-  CYC(b_+126, b_+129); playSound_b00_hook(gb); return; // jp
+  CYC(b_+126, b_+129); TAIL(playSound_b00); // jp
 }
 
 // Off-screen for [counter1] frames
@@ -424,7 +424,7 @@ substate2:
   CYC(b_+59, b_+60); A = mem_rd(gb, HL);
   CYC(b_+60, b_+62); alu_and(gb, 0x1f);
   if (F & FZ) { CALL_C_CC(b_+62, vire_mainForm_fireProjectile_hook, SYM(vire_mainForm_fireProjectile), b_+65); } else { CYC(b_+62, b_+65); } // call z
-  CYC(b_+65, b_+68); vire_mainForm_applySpeedAndAnimate_hook(gb); return; // jp
+  CYC(b_+65, b_+68); TAIL(vire_mainForm_applySpeedAndAnimate); // jp
 }
 
 // Shared block: spawn outside camera, set counter1=120, pick var30 offset (used by state B's
@@ -500,7 +500,7 @@ substate2:
   CALL_C(b_+79, vire_checkOffScreen_hook, SYM(vire_checkOffScreen), b_+82);
   if (!(F & FC)) { CYCT(b_+82, b_+85); vire_mainForm_leftScreen_hook(gb); return; } // jp nc
   CYC(b_+82, b_+85);
-  CYC(b_+85, b_+88); vire_mainForm_applySpeedAndAnimate_hook(gb); return; // jp
+  CYC(b_+85, b_+88); TAIL(vire_mainForm_applySpeedAndAnimate); // jp
 
 updateAngleAway:
   CYC(b_+88, b_+89); L = E;
@@ -508,7 +508,7 @@ updateAngleAway:
   CALL_C(b_+90, ecom_updateCardinalAngleAwayFromTarget_b0f_hook, SYM(ecom_updateCardinalAngleAwayFromTarget_b0f), b_+93);
 
 animate:
-  CYC(b_+93, b_+96); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+93, b_+96); TAIL(enemyAnimate); // jp
 
 substate3:
   CALL_C(b_+96, vire_checkOffScreen_hook, SYM(vire_checkOffScreen), b_+99);
@@ -519,7 +519,7 @@ substate3:
   CYC(b_+106, b_+108); alu_and(gb, 0x1f);
   CYC(b_+108, b_+110); B = 0x01;
   if (F & FZ) { CALL_C_CC(b_+110, vire_mainForm_fireProjectileWithSubid_hook, SYM(vire_mainForm_fireProjectileWithSubid), b_+113); } else { CYC(b_+110, b_+113); } // call z
-  CYC(b_+113, b_+116); vire_mainForm_applySpeedAndAnimate_hook(gb); return; // jp
+  CYC(b_+113, b_+116); TAIL(vire_mainForm_applySpeedAndAnimate); // jp
 }
 
 // Vire creeps in from the screen edge to fire one projectile, then runs away
@@ -571,13 +571,13 @@ substate2:
   CYC(b_+54, b_+56); mem_wr(gb, HL, 0x50); // SPEED_200
 
 animate:
-  CYC(b_+56, b_+59); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+56, b_+59); TAIL(enemyAnimate); // jp
 
 substate3:
   CALL_C(b_+59, vire_checkOffScreen_hook, SYM(vire_checkOffScreen), b_+62);
   if (!(F & FC)) { CYCT(b_+62, b_+65); vire_mainForm_leftScreen_hook(gb); return; } // jp nc
   CYC(b_+62, b_+65);
-  CYC(b_+65, b_+68); vire_mainForm_applySpeedAndAnimate_hook(gb); return; // jp
+  CYC(b_+65, b_+68); TAIL(vire_mainForm_applySpeedAndAnimate); // jp
 }
 
 // Circling Link, runs away if Link attempts to attack (similar to state B)
@@ -624,7 +624,7 @@ beginCharge:
   CALL_C(b_+48, ecom_updateAngleTowardTarget_b0f_hook, SYM(ecom_updateAngleTowardTarget_b0f), b_+51);
 
 animate:
-  CYC(b_+51, b_+54); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+51, b_+54); TAIL(enemyAnimate); // jp
 
 substate2:
   CYC(b_+54, b_+57); A = mem_rd(gb, wLinkUsingItem1);
@@ -645,7 +645,7 @@ moveOffScreen:
   CALL_C(b_+75, vire_checkOffScreen_hook, SYM(vire_checkOffScreen), b_+78);
   if (!(F & FC)) { CYCT(b_+78, b_+81); vire_mainForm_leftScreen_hook(gb); return; } // jp nc
   CYC(b_+78, b_+81);
-  CYC(b_+81, b_+84); vire_mainForm_applySpeedAndAnimate_hook(gb); return; // jp
+  CYC(b_+81, b_+84); TAIL(vire_mainForm_applySpeedAndAnimate); // jp
 
 substate3:
   CALL_C(b_+84, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+87);
@@ -679,7 +679,7 @@ void vire_state_moveOffScreen_hook(GB *gb) {
   CALL_C(b_+0, vire_checkOffScreen_hook, SYM(vire_checkOffScreen), b_+3);
   if (!(F & FC)) { CYCT(b_+3, b_+6); vire_mainForm_leftScreen_hook(gb); return; } // jp nc
   CYC(b_+3, b_+6);
-  CYC(b_+6, b_+9); vire_mainForm_applySpeedAndAnimate_hook(gb); return; // jp
+  CYC(b_+6, b_+9); TAIL(vire_mainForm_applySpeedAndAnimate); // jp
 }
 
 // Just took damage
@@ -711,7 +711,7 @@ substate0:
   CYC(b_+25, b_+26); mem_wr(gb, DE, A);
   CYC(b_+26, b_+28); E = ENEMY_BASE + 0x32; // Enemy.var32
   CYC(b_+28, b_+29); mem_wr(gb, DE, A);
-  CYC(b_+29, b_+32); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+29, b_+32); TAIL(enemySetAnimation); // jp
 
 substate1:
   CALL_C(b_+32, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+35);
@@ -740,7 +740,7 @@ L_587b:
   CYC(b_+59, b_+61); alu_add(gb, 0x13);
   CYC(b_+61, b_+62); C = A;
   CYC(b_+62, b_+64); B = 0x2f; // TX_2f00 hi
-  CYC(b_+64, b_+67); showText_hook(gb); return; // jp
+  CYC(b_+64, b_+67); TAIL(showText); // jp
 }
 
 // "Main form" died, about to split into bats
@@ -768,7 +768,7 @@ substate0:
   CYC(b_+19, b_+20); L = E;
   CYC(b_+20, b_+21); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [substate]
   CYC(b_+21, b_+24); SET_BC(0x2f16); // TX_2f16
-  CYC(b_+24, b_+27); showText_hook(gb); return; // jp
+  CYC(b_+24, b_+27); TAIL(showText); // jp
 
 substate1:
   CYC(b_+27, b_+29); B = 0x02;
@@ -801,7 +801,7 @@ substate2:
   CYC(b_+93, b_+94); L = alu_inc8(gb, L);
   CYC(b_+94, b_+96); mem_wr(gb, HL, 0x3c); // [counter1]
   CYC(b_+96, b_+98); A = 0xf0; // SNDCTRL_STOPMUSIC
-  CYC(b_+98, b_+101); playSound_b00_hook(gb); return; // jp
+  CYC(b_+98, b_+101); TAIL(playSound_b00); // jp
 
 substate3:
   CALL_C(b_+101, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+104);
@@ -810,7 +810,7 @@ substate3:
   CYC(b_+107, b_+109); mem_wr(gb, HL, 0x10); // [counter1]
   CYC(b_+109, b_+110); L = E;
   CYC(b_+110, b_+111); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [substate]
-  CYC(b_+111, b_+114); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+111, b_+114); TAIL(objectSetVisiblec1); // jp
 
 substate4:
   CALL_C(b_+114, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+117);
@@ -829,7 +829,7 @@ substate4:
   CYC(b_+138, b_+139); C = alu_inc8(gb, C); // TX_2f18
 
 L_5914:
-  CYC(b_+139, b_+142); showText_hook(gb); return; // jp
+  CYC(b_+139, b_+142); TAIL(showText); // jp
 
 substate5:
   CALL_C(b_+142, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+145);
@@ -871,7 +871,7 @@ L_592e:
   CYC(b_+191, b_+194); A = mem_rd(gb, wActiveMusic2);
   CYC(b_+194, b_+197); mem_wr(gb, wActiveMusic, A);
   CALL_C(b_+197, playSound_b00_hook, SYM(playSound_b00), b_+200);
-  CYC(b_+200, b_+203); enemyDelete_hook(gb); return; // jp
+  CYC(b_+200, b_+203); TAIL(enemyDelete); // jp
 }
 
 void vire_mainForm_stateF_initBat_hook(GB *gb) {
@@ -892,7 +892,7 @@ L_58cf:
   CYC(b_+75, b_+77); A = ENEMY_BASE; // Enemy.start
   CYC(b_+77, b_+78); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+78, b_+79); mem_wr(gb, HL, D);
-  CYC(b_+79, b_+82); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+79, b_+82); TAIL(objectCopyPosition); // jp
 }
 
 void vire_batForm_hook(GB *gb) {
@@ -930,7 +930,7 @@ void vire_batForm_state8_hook(GB *gb) {
   CYC(b_+17, b_+19); mem_wr(gb, HL, 0x01);
   CYC(b_+19, b_+21); A = 0x02;
   CALL_C(b_+21, enemySetAnimation_hook, SYM(enemySetAnimation), b_+24);
-  CYC(b_+24, b_+27); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+24, b_+27); TAIL(objectSetVisiblec1); // jp
 }
 
 // Moving upward after charging (or after spawning)
@@ -954,7 +954,7 @@ void vire_batForm_state9_hook(GB *gb) {
 
 L_5993:
   CALL_C(b_+20, objectApplySpeed_hook, SYM(objectApplySpeed), b_+23);
-  CYCT(b_+23, b_+25); vire_batForm_animate_hook(gb); return; // jr
+  CYCT(b_+23, b_+25); TAIL(vire_batForm_animate); // jr
 }
 
 void vire_batForm_gotoStateA_hook(GB *gb) {
@@ -972,7 +972,7 @@ void vire_batForm_gotoStateA_hook(GB *gb) {
   CYC(b_+17, b_+19); A = OBJ_COUNTER2;
   CALL_C(b_+19, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+22);
   CYC(b_+22, b_+24); mem_wr(gb, HL, 0xb4); // [mainForm.counter2] = 180
-  CYCT(b_+24, b_+26); vire_batForm_animate_hook(gb); return; // jr
+  CYCT(b_+24, b_+26); TAIL(vire_batForm_animate); // jr
 }
 
 void vire_batForm_stateA_hook(GB *gb) {
@@ -1003,12 +1003,12 @@ L_59c6:
   CYC(b_+36, b_+38); A = 0x02;
   CALL_C(b_+38, ecom_getSideviewAdjacentWallsBitset_b0f_hook, SYM(ecom_getSideviewAdjacentWallsBitset_b0f), b_+41);
   if (F & FZ) { CALL_C_CC(b_+41, objectApplySpeed_hook, SYM(objectApplySpeed), SYM(vire_batForm_animate)); } else { CYC(b_+41, b_+44); } // call z
-  vire_batForm_animate_hook(gb); return; // fallthrough
+  TAIL(vire_batForm_animate); // fallthrough
 }
 
 void vire_batForm_animate_hook(GB *gb) {
   BASE(vire_batForm_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // About to charge toward Link in [counter1] frames
@@ -1057,7 +1057,7 @@ void vire_batForm_stateC_hook(GB *gb) {
   CYC(b_+30, b_+31); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [state]
   CYC(b_+31, b_+33); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+33, b_+35); mem_wr(gb, HL, 0x14);
-  CYCT(b_+35, b_+37); vire_batForm_animate_hook(gb); return; // jr
+  CYCT(b_+35, b_+37); TAIL(vire_batForm_animate); // jr
 
 notReachedPosition:
   CYC(b_+37, b_+39); L = ENEMY_BASE + OBJ_ZH;
@@ -1069,7 +1069,7 @@ notReachedPosition:
 
 L_5a21:
   CALL_C(b_+45, ecom_moveTowardPosition_b0f_hook, SYM(ecom_moveTowardPosition_b0f), b_+48);
-  CYCT(b_+48, b_+50); vire_batForm_animate_hook(gb); return; // jr
+  CYCT(b_+48, b_+50); TAIL(vire_batForm_animate); // jr
 }
 
 // Moving back up after charging
@@ -1095,7 +1095,7 @@ L_5a3b:
   CYC(b_+21, b_+23); A = 0x02;
   CALL_C(b_+23, ecom_getSideviewAdjacentWallsBitset_b0f_hook, SYM(ecom_getSideviewAdjacentWallsBitset_b0f), b_+26);
   if (F & FZ) { CALL_C_CC(b_+26, objectApplySpeed_hook, SYM(objectApplySpeed), b_+29); } else { CYC(b_+26, b_+29); } // call z
-  CYCT(b_+29, b_+31); vire_batForm_animate_hook(gb); return; // jr
+  CYCT(b_+29, b_+31); TAIL(vire_batForm_animate); // jr
 }
 
 // Sets Vire's position to just outside the camera, increments substate.
@@ -1127,7 +1127,7 @@ void vire_spawnOutsideCamera_hook(GB *gb) {
   CYC(b_+33, b_+35); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
   CYC(b_+35, b_+37); L = ENEMY_BASE + OBJ_SUBSTATE;
   CYC(b_+37, b_+38); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+38, b_+41); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+38, b_+41); TAIL(objectSetVisiblec1); // jp
 }
 
 // Vire has left the screen; set state to 9, where he'll wait for 90 frames before attacking again.
@@ -1142,7 +1142,7 @@ void vire_mainForm_leftScreen_hook(GB *gb) {
   CYC(b_+9, b_+11); mem_wr(gb, HL, 0x5a); // [counter1] = 90
   CYC(b_+11, b_+13); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+13, b_+15); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
-  CYC(b_+15, b_+18); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(objectSetInvisible); // jp
 }
 
 // @param[out] cflag c if left screen
@@ -1233,14 +1233,14 @@ offsetAngle:
   CYC(b_+80, b_+82); E = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+82, b_+84); A = 0x23; // SPEED_e0
   CYC(b_+84, b_+85); mem_wr(gb, DE, A);
-  vire_mainForm_applySpeedAndAnimate_hook(gb); return; // fallthrough
+  TAIL(vire_mainForm_applySpeedAndAnimate); // fallthrough
 }
 
 void vire_mainForm_applySpeedAndAnimate_hook(GB *gb) {
   BASE(vire_mainForm_applySpeedAndAnimate);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, objectApplySpeed_hook, SYM(objectApplySpeed), b_+3);
-  CYC(b_+3, b_+6); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(enemyAnimate); // jp
 }
 
 // @param[out] cflag c if Link is too close (Vire will flee)
@@ -1270,7 +1270,7 @@ void vire_mainForm_fireProjectile_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x01);
   CYC(b_+5, b_+6); A = alu_inc8(gb, A);
   CYC(b_+6, b_+7); B = A;
-  vire_mainForm_fireProjectileWithSubid_hook(gb); return; // fallthrough
+  TAIL(vire_mainForm_fireProjectileWithSubid); // fallthrough
 }
 
 // @param b Subid
@@ -1293,7 +1293,7 @@ void vire_mainForm_fireProjectileWithSubid_hook(GB *gb) {
   CYC(b_+22, b_+24); E = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+24, b_+26); A = 0x01;
   CYC(b_+26, b_+27); mem_wr(gb, DE, A);
-  CYC(b_+27, b_+30); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+27, b_+30); TAIL(enemySetAnimation); // jp
 }
 
 void vire_batForm_moveAwayFromLinkIfTooClose_hook(GB *gb) {
@@ -1318,7 +1318,7 @@ void vire_batForm_moveAwayFromLinkIfTooClose_hook(GB *gb) {
   CYC(b_+24, b_+26); alu_xor(gb, 0x10);
   CYC(b_+26, b_+27); C = A;
   CYC(b_+27, b_+29); B = 0x50; // SPEED_200
-  CYC(b_+29, b_+32); ecom_applyGivenVelocity_b0f_hook(gb); return; // jp
+  CYC(b_+29, b_+32); TAIL(ecom_applyGivenVelocity_b0f); // jp
 }
 
 void vire_batForm_updateZPos_hook(GB *gb) {

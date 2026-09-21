@@ -86,7 +86,7 @@ initSubid00:
   CYC(b_+55, b_+57); alu_sub(gb, 0x03);
   CYC(b_+57, b_+58); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+58, b_+59); C = A;
-  CYC(b_+59, b_+62); interactionSetPosition_hook(gb); return; // jp
+  CYC(b_+59, b_+62); TAIL(interactionSetPosition); // jp
 
 initSubid02:
   CYC(b_+62, b_+64); E = INTERACTION_BASE + OBJ_VAR38;

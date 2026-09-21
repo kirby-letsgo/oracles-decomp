@@ -123,7 +123,7 @@ subid00_substate0:
   CYC(b_+315, b_+318); A = mem_rd(gb, wTmpcfc0 + 0x11);
   CYC(b_+318, b_+320); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
-    CYCT(b_+320, b_+323); interactionAnimate_hook(gb); return;
+    CYCT(b_+320, b_+323); TAIL(interactionAnimate);
   }
   CYC(b_+320, b_+323);
   CALL_C(b_+323, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+326);
@@ -241,7 +241,7 @@ subid02_substate1:
   CALL_C(b_+460, interactionAnimateAsNpc_hook, SYM(interactionAnimateAsNpc), b_+463);
   CALL_C(b_+463, interactionRunScript_hook, SYM(interactionRunScript), b_+466);
   if (!(F & FC)) {
-    CYCT(b_+466, b_+469); interactionAnimateBasedOnSpeed_hook(gb); return;
+    CYCT(b_+466, b_+469); TAIL(interactionAnimateBasedOnSpeed);
   }
   CYC(b_+466, b_+469);
   CYC(b_+469, b_+472); push_effect(gb, b_+472); villager_saveXAndLoadScript(gb);
@@ -403,7 +403,7 @@ runSubid0d:
   // Cutscene when you first enter the past
   CALL_C(b_+633, interactionRunScript_hook, SYM(interactionRunScript), b_+636);
   if (F & FC) {
-    CYCT(b_+636, b_+639); interactionDelete_hook(gb); return;
+    CYCT(b_+636, b_+639); TAIL(interactionDelete);
   }
   CYC(b_+636, b_+639);
   CALL_C(b_+639, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+642);
@@ -483,7 +483,7 @@ initSubid04And05:
   CYC(b_+120, b_+122); A = 0x03;
   CALL_C(b_+122, checkNpcShouldExistAtGameStage_hook, SYM(checkNpcShouldExistAtGameStage), b_+125);
   if (!(F & FZ)) {
-    CYCT(b_+125, b_+128); interactionDelete_hook(gb); return;
+    CYCT(b_+125, b_+128); TAIL(interactionDelete);
   }
   CYC(b_+125, b_+128);
   CYC(b_+128, b_+129); A = B;
@@ -504,7 +504,7 @@ initSubid06And07:
   CYC(b_+149, b_+151); A = 0x04;
   CALL_C(b_+151, checkNpcShouldExistAtGameStage_hook, SYM(checkNpcShouldExistAtGameStage), b_+154);
   if (!(F & FZ)) {
-    CYCT(b_+154, b_+157); interactionDelete_hook(gb); return;
+    CYCT(b_+154, b_+157); TAIL(interactionDelete);
   }
   CYC(b_+154, b_+157);
   CYC(b_+157, b_+158); A = B;
@@ -527,7 +527,7 @@ initSubid08:
   CYC(b_+181, b_+182); A = B;
   CYC(b_+182, b_+184); alu_cp(gb, 0x04);
   if (F & FC) {
-    CYCT(b_+184, b_+187); interactionDelete_hook(gb); return;
+    CYCT(b_+184, b_+187); TAIL(interactionDelete);
   }
   CYC(b_+184, b_+187);
   CYC(b_+187, b_+189); alu_sub(gb, 0x04);
@@ -620,7 +620,7 @@ state0:
   CYC(b_+22, b_+23); A = mem_rd(gb, DE);
   CYC(b_+23, b_+24); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+24, b_+27); objectMarkSolidPosition_hook(gb); return;
+    CYCT(b_+24, b_+27); TAIL(objectMarkSolidPosition);
   }
   CYC(b_+24, b_+27);
   CYC(b_+27, b_+28); ret_effect(gb);

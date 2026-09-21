@@ -87,7 +87,7 @@ dead:
   CYC(b_+47, b_+48); H = A;
   CYC(b_+48, b_+50); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+50, b_+51); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+51, b_+54); enemyDie_hook(gb); return; // jp
+  CYC(b_+51, b_+54); TAIL(enemyDie); // jp
 
 normalStatus:
   CYC(b_+54, b_+56); E = ENEMY_BASE + OBJ_RELATED1 + 1; // Enemy.relatedObj1+1
@@ -153,7 +153,7 @@ void giantGhiniChild_state_uninitialized_hook(GB *gb) {
   CYC(b_+39, b_+41); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+41, b_+43); mem_wr(gb, HL, 30);
   CALL_C(b_+43, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+46);
-  CYC(b_+46, b_+49); objectCreatePuff_hook(gb); return; // jp
+  CYC(b_+46, b_+49); TAIL(objectCreatePuff); // jp
 }
 
 // 0e:6ddf, bare global; jump-table target from enemyCode3f. Waiting for battle to start.
@@ -169,7 +169,7 @@ void giantGhiniChild_state8_hook(GB *gb) {
   if (F & FC) { CYCT(b_+9, b_+11); goto battleNotStartedYet; } // jr c
   CYC(b_+9, b_+11);
   CALL_C(b_+11, giantGhiniChild_gotoStateA_hook, SYM(giantGhiniChild_gotoStateA), b_+14);
-  CYC(b_+14, b_+17); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+14, b_+17); TAIL(objectSetVisiblec1); // jp
 
 battleNotStartedYet:
   CYC(b_+17, b_+19); L = ENEMY_BASE + OBJ_VISIBLE;
@@ -188,7 +188,7 @@ void giantGhiniChild_state9_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+3);
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } // ret nz
   CYC(b_+3, b_+4);
-  giantGhiniChild_gotoStateA_hook(gb); return; // fallthrough
+  TAIL(giantGhiniChild_gotoStateA); // fallthrough
 }
 
 // 0e:6dfc, bare global; called from giantGhiniChild_state8, also falls into from
@@ -219,7 +219,7 @@ void giantGhiniChild_stateA_hook(GB *gb) {
   CYC(b_+9, b_+10);
   CYC(b_+10, b_+12); mem_wr(gb, HL, 0x05); // [counter1]
   CALL_C(b_+12, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+15);
-  CYC(b_+15, b_+18); objectNudgeAngleTowards_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(objectNudgeAngleTowards); // jp
 }
 
 // 0e:6e1f, bare global; jump-table target from enemyCode3f. Attached to Link.
@@ -301,5 +301,5 @@ void giantGhiniChild_stateC_hook(GB *gb) {
   CYC(b_+17, b_+19); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+19, b_+20); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   CALL_C(b_+20, decNumEnemies_hook, SYM(decNumEnemies), b_+23);
-  CYC(b_+23, b_+26); enemyDelete_hook(gb); return; // jp
+  CYC(b_+23, b_+26); TAIL(enemyDelete); // jp
 }

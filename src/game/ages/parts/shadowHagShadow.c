@@ -69,7 +69,7 @@ state0:
   CYC(b_+31, b_+32); mem_wr(gb, DE, A);
   CALL_C(b_+32, objectSetVisible82_hook, SYM(objectSetVisible82), b_+35);
   CYC(b_+35, b_+37); A = 0x01;
-  CYC(b_+37, b_+40); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+37, b_+40); TAIL(partSetAnimation); // jp
 
 state1:
   CYC(b_+44, b_+46); A = 0x06; // Object.counter1
@@ -91,7 +91,7 @@ L_7372:
   CALL_C(b_+68, objectNudgeAngleTowards_hook, SYM(objectNudgeAngleTowards), b_+71);
 
 L_737f:
-  CYC(b_+71, b_+74); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+71, b_+74); TAIL(objectApplySpeed); // jp
 
 state2:
   CYC(b_+74, b_+76); A = 0x0b; // Object.yh
@@ -128,5 +128,5 @@ updateAngleAndApplySpeed:
   CALL_C(b_+121, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+124);
   CYC(b_+124, b_+126); E = 0xc9; // Part.angle
   CYC(b_+126, b_+127); mem_wr(gb, DE, A);
-  CYC(b_+127, b_+130); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+127, b_+130); TAIL(objectApplySpeed); // jp
 }

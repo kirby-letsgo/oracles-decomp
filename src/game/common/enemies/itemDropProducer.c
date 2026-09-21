@@ -49,5 +49,5 @@ state1:
   CYC(b_+42, b_+43); mem_wr(gb, HL, A);
   CALL_C(b_+43, objectCopyPosition_hook, SYM(objectCopyPosition), b_+46);
   CALL_C(b_+46, markEnemyAsKilledInRoom_b00_hook, SYM(markEnemyAsKilledInRoom_b00), b_+49);
-  CYC(b_+49, b_+52); enemyDelete_hook(gb); return; // jp
+  CYC(b_+49, b_+52); TAIL(enemyDelete); // jp
 }

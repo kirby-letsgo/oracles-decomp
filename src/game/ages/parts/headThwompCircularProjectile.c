@@ -41,7 +41,7 @@ void partCode3c_hook(GB *gb) {
 
 counter1NonZero:
   CALL_C(b_+40, objectApplySpeed_hook, SYM(objectApplySpeed), b_+43);
-  CYC(b_+43, b_+46); partAnimate_hook(gb); return; // jp
+  CYC(b_+43, b_+46); TAIL(partAnimate); // jp
 
 state0:
   CYC(b_+46, b_+47); H = D;
@@ -55,5 +55,5 @@ state0:
   CYC(b_+57, b_+59); mem_wr(gb, HL, 0x64); // SPEED_280
   CALL_C(b_+59, objectSetVisible82_hook, SYM(objectSetVisible82), b_+62);
   CYC(b_+62, b_+64); A = 0xa4; // SND_BEAM
-  CYC(b_+64, b_+67); playSound_b00_hook(gb); return; // jp
+  CYC(b_+64, b_+67); TAIL(playSound_b00); // jp
 }

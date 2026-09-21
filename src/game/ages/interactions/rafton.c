@@ -131,11 +131,11 @@ runSubid00:
   CYC(b_+113, b_+115); alu_cp(gb, 0x04);
   if (F & FZ) { CYCT(b_+115, b_+118); interactionAnimateBasedOnSpeed_hook(gb); return; } // jp z
   CYC(b_+115, b_+118);
-  CYC(b_+118, b_+121); interactionAnimateAsNpc_hook(gb); return; // jp
+  CYC(b_+118, b_+121); TAIL(interactionAnimateAsNpc); // jp
 
 runSubid01:
   CALL_C(b_+121, interactionAnimateAsNpc_hook, SYM(interactionAnimateAsNpc), b_+124);
-  CYC(b_+124, b_+127); interactionRunScript_hook(gb); return; // jp
+  CYC(b_+124, b_+127); TAIL(interactionRunScript); // jp
 
 loadScript:
   CYC(b_+127, b_+129); E = INTERACTION_BASE + OBJ_SUBID;
@@ -145,5 +145,5 @@ loadScript:
   CYC(b_+134, b_+135); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+135, b_+136); H = mem_rd(gb, HL);
   CYC(b_+136, b_+137); L = A;
-  CYC(b_+137, b_+140); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+137, b_+140); TAIL(interactionSetScript); // jp
 }

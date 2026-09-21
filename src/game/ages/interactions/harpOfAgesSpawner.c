@@ -53,14 +53,14 @@ void interactionCodeb3__state0_hook(GB *gb) {
   CYC(b_+59, b_+60); mem_wr(gb, HL, B);
 inc_state:
   CALL_C(b_+60, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+63);
-  CYC(b_+63, b_+66); interactionIncState_hook(gb); return;
+  CYC(b_+63, b_+66); TAIL(interactionIncState);
 }
 
 void interactionCodeb3__incState_hook(GB *gb) {
   BASE(interactionCodeb3);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+60, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+63);
-  CYC(b_+63, b_+66); interactionIncState_hook(gb); return;
+  CYC(b_+63, b_+66); TAIL(interactionIncState);
 }
 
 void interactionCodeb3__state1_hook(GB *gb) {
@@ -87,7 +87,7 @@ void interactionCodeb3__state2_hook(GB *gb) {
   CYC(b_+92, b_+93);
   CYC(b_+93, b_+94); alu_xor(gb, A);
   CYC(b_+94, b_+97); mem_wr(gb, w1Link_direction, A);
-  CYC(b_+97, b_+100); interactionIncState_hook(gb); return;
+  CYC(b_+97, b_+100); TAIL(interactionIncState);
 }
 
 void interactionCodeb3__state3_hook(GB *gb) {
@@ -135,7 +135,7 @@ void interactionCodeb3__state4_hook(GB *gb) {
   CYC(b_+163, b_+164); L = alu_inc8(gb, L);
   CYC(b_+164, b_+166); mem_wr(gb, HL, 0x07);
   CALL_C(b_+166, objectCopyPosition_hook, SYM(objectCopyPosition), b_+169);
-  CYC(b_+169, b_+172); interactionDelete_hook(gb); return;
+  CYC(b_+169, b_+172); TAIL(interactionDelete);
 }
 
 void interactionCodeb3_hook(GB *gb) {

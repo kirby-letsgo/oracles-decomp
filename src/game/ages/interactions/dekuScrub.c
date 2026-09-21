@@ -12,7 +12,7 @@ void interactionCoded6_initialize_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+62, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+65);
   CALL_C(b_+65, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+68);
-  CYC(b_+68, b_+71); interactionIncState_hook(gb); return; // jp
+  CYC(b_+68, b_+71); TAIL(interactionIncState); // jp
 }
 
 // ==================================================================================================
@@ -56,7 +56,7 @@ state1:
   CYC(b_+46, b_+47); alu_xor(gb, A);
   CYC(b_+47, b_+48); mem_wr(gb, HL, A);
   CYC(b_+48, b_+50); A = 0x03;
-  CYC(b_+50, b_+53); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+50, b_+53); TAIL(interactionSetAnimation); // jp
 
 linkIsClose:
   CYC(b_+53, b_+54); A = mem_rd(gb, HL);
@@ -65,5 +65,5 @@ linkIsClose:
   CYC(b_+55, b_+56);
   CYC(b_+56, b_+57); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+57, b_+59); A = 0x01;
-  CYC(b_+59, b_+62); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+59, b_+62); TAIL(interactionSetAnimation); // jp
 }

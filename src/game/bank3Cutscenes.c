@@ -498,24 +498,19 @@ void intro_runStage_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (intro_jumpTable(gb));
     if (jt_ == SYM(intro_japaneseOnlyScreen)) {
-      intro_japaneseOnlyScreen_hook(gb);
-      return;
+      TAIL(intro_japaneseOnlyScreen);
     }
     else if (jt_ == SYM(intro_capcomScreen)) {
-      intro_capcomScreen_hook(gb);
-      return;
+      TAIL(intro_capcomScreen);
     }
     else if (jt_ == SYM(intro_cinematic)) {
-      intro_cinematic_hook(gb);
-      return;
+      TAIL(intro_cinematic);
     }
     else if (jt_ == SYM(intro_titlescreen)) {
-      intro_titlescreen_hook(gb);
-      return;
+      TAIL(intro_titlescreen);
     }
     else if (jt_ == SYM(intro_restart)) {
-      intro_restart_hook(gb);
-      return;
+      TAIL(intro_restart);
     }
     else {
       hook_handoff(gb, HL);
@@ -530,16 +525,14 @@ static void runIntro_nextStage(GB *gb) {
   CYC(b_+34, b_+35); alu_add(gb, A);
   if (F & FZ) {
     CYCT(b_+35, b_+37);
-    intro_runStage_hook(gb);
-    return;
+    TAIL(intro_runStage);
   }
   CYC(b_+35, b_+37);
   CYC(b_+37, b_+40); A = mem_rd(gb, wThreadStateBuffer + 6);
   CYC(b_+40, b_+42); alu_cp(gb, 0x03);
   if (!(F & FZ)) {
     CYCT(b_+42, b_+44);
-    intro_gotoTitlescreen_hook(gb);
-    return;
+    TAIL(intro_gotoTitlescreen);
   }
   CYC(b_+42, b_+44);
   intro_runStage_hook(gb);
@@ -561,8 +554,7 @@ void runIntro_hook(GB *gb) {
     CYC(b_+28, b_+30); alu_and(gb, 0x08);
     if (F & FZ) {
       CYCT(b_+30, b_+32);
-      intro_runStage_hook(gb);
-      return;
+      TAIL(intro_runStage);
     }
     CYC(b_+30, b_+32);
   } else {
@@ -685,16 +677,13 @@ void intro_capcomScreen_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (intro_jumpTable(gb));
     if (jt_ == b_+10) {
-      intro_capcomScreen__state0_hook(gb);
-      return;
+      TAIL(intro_capcomScreen__state0);
     }
     else if (jt_ == b_+44) {
-      intro_capcomScreen__state1_hook(gb);
-      return;
+      TAIL(intro_capcomScreen__state1);
     }
     else if (jt_ == b_+57) {
-      intro_capcomScreen__state2_hook(gb);
-      return;
+      TAIL(intro_capcomScreen__state2);
     }
     else {
       hook_handoff(gb, HL);
@@ -716,20 +705,16 @@ void intro_titlescreen__runState_hook(GB *gb) {
   CYC(b_+34, b_+35); push_effect(gb, b_+35);
   do { uint16_t jt_ = (intro_jumpTable(gb));
     if (jt_ == SYM(intro_titlescreen_state0)) {
-      intro_titlescreen_state0_hook(gb);
-      return;
+      TAIL(intro_titlescreen_state0);
     }
     else if (jt_ == SYM(intro_titlescreen_state1)) {
-      intro_titlescreen_state1_hook(gb);
-      return;
+      TAIL(intro_titlescreen_state1);
     }
     else if (jt_ == SYM(intro_titlescreen_state2)) {
-      intro_titlescreen_state2_hook(gb);
-      return;
+      TAIL(intro_titlescreen_state2);
     }
     else if (jt_ == SYM(intro_titlescreen_state3)) {
-      intro_titlescreen_state3_hook(gb);
-      return;
+      TAIL(intro_titlescreen_state3);
     }
     else {
       hook_handoff(gb, HL);
@@ -809,8 +794,7 @@ void intro_titlescreen_state1_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x08);
   if (!(F & FZ)) {
     CYCT(b_+5, b_+7);
-    intro_titlescreen_state1__pressedStart_hook(gb);
-    return;
+    TAIL(intro_titlescreen_state1__pressedStart);
   }
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+10); SET_HL(wTmpcbb3);
@@ -860,16 +844,13 @@ void runIntroCinematic_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (intro_jumpTable(gb));
     if (jt_ == SYM(introCinematic_ridingHorse)) {
-      introCinematic_ridingHorse_hook(gb);
-      return;
+      TAIL(introCinematic_ridingHorse);
     }
     else if (jt_ == SYM(introCinematic_inTemple)) {
-      introCinematic_inTemple_hook(gb);
-      return;
+      TAIL(introCinematic_inTemple);
     }
     else if (jt_ == SYM(introCinematic_preTitlescreen)) {
-      introCinematic_preTitlescreen_hook(gb);
-      return;
+      TAIL(introCinematic_preTitlescreen);
     }
     else {
       hook_continue(gb, HL, sp0_);
@@ -884,17 +865,17 @@ void introCinematic_ridingHorse_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wThreadStateBuffer + 7);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (intro_jumpTable(gb));
-    if (jt_ == SYM(introCinematic_ridingHorse_state0)) { introCinematic_ridingHorse_state0_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_ridingHorse_state1)) { introCinematic_ridingHorse_state1_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_ridingHorse_state2)) { introCinematic_ridingHorse_state2_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_ridingHorse_state3)) { introCinematic_ridingHorse_state3_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_ridingHorse_state4)) { introCinematic_ridingHorse_state4_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_ridingHorse_state5)) { introCinematic_ridingHorse_state5_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_ridingHorse_state6)) { introCinematic_ridingHorse_state6_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_ridingHorse_state7)) { introCinematic_ridingHorse_state7_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_ridingHorse_state8)) { introCinematic_ridingHorse_state8_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_ridingHorse_state9)) { introCinematic_ridingHorse_state9_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_ridingHorse_state10)) { introCinematic_ridingHorse_state10_hook(gb); return; }
+    if (jt_ == SYM(introCinematic_ridingHorse_state0) && hook_enabled_at(gb, SYM(introCinematic_ridingHorse_state0))) { introCinematic_ridingHorse_state0_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_ridingHorse_state1) && hook_enabled_at(gb, SYM(introCinematic_ridingHorse_state1))) { introCinematic_ridingHorse_state1_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_ridingHorse_state2) && hook_enabled_at(gb, SYM(introCinematic_ridingHorse_state2))) { introCinematic_ridingHorse_state2_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_ridingHorse_state3) && hook_enabled_at(gb, SYM(introCinematic_ridingHorse_state3))) { introCinematic_ridingHorse_state3_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_ridingHorse_state4) && hook_enabled_at(gb, SYM(introCinematic_ridingHorse_state4))) { introCinematic_ridingHorse_state4_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_ridingHorse_state5) && hook_enabled_at(gb, SYM(introCinematic_ridingHorse_state5))) { introCinematic_ridingHorse_state5_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_ridingHorse_state6) && hook_enabled_at(gb, SYM(introCinematic_ridingHorse_state6))) { introCinematic_ridingHorse_state6_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_ridingHorse_state7) && hook_enabled_at(gb, SYM(introCinematic_ridingHorse_state7))) { introCinematic_ridingHorse_state7_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_ridingHorse_state8) && hook_enabled_at(gb, SYM(introCinematic_ridingHorse_state8))) { introCinematic_ridingHorse_state8_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_ridingHorse_state9) && hook_enabled_at(gb, SYM(introCinematic_ridingHorse_state9))) { introCinematic_ridingHorse_state9_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_ridingHorse_state10) && hook_enabled_at(gb, SYM(introCinematic_ridingHorse_state10))) { introCinematic_ridingHorse_state10_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -905,17 +886,17 @@ void introCinematic_inTemple_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wThreadStateBuffer + 7);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (intro_jumpTable(gb));
-    if (jt_ == SYM(introCinematic_inTemple_state0)) { introCinematic_inTemple_state0_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_inTemple_state1)) { introCinematic_inTemple_state1_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_inTemple_state2)) { introCinematic_inTemple_state2_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_inTemple_state3)) { introCinematic_inTemple_state3_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_inTemple_state4)) { introCinematic_inTemple_state4_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_inTemple_state5)) { introCinematic_inTemple_state5_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_inTemple_state6)) { introCinematic_inTemple_state6_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_inTemple_state7)) { introCinematic_inTemple_state7_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_inTemple_state8)) { introCinematic_inTemple_state8_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_inTemple_state9)) { introCinematic_inTemple_state9_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_inTemple_state10)) { introCinematic_inTemple_state10_hook(gb); return; }
+    if (jt_ == SYM(introCinematic_inTemple_state0) && hook_enabled_at(gb, SYM(introCinematic_inTemple_state0))) { introCinematic_inTemple_state0_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_inTemple_state1) && hook_enabled_at(gb, SYM(introCinematic_inTemple_state1))) { introCinematic_inTemple_state1_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_inTemple_state2) && hook_enabled_at(gb, SYM(introCinematic_inTemple_state2))) { introCinematic_inTemple_state2_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_inTemple_state3) && hook_enabled_at(gb, SYM(introCinematic_inTemple_state3))) { introCinematic_inTemple_state3_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_inTemple_state4) && hook_enabled_at(gb, SYM(introCinematic_inTemple_state4))) { introCinematic_inTemple_state4_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_inTemple_state5) && hook_enabled_at(gb, SYM(introCinematic_inTemple_state5))) { introCinematic_inTemple_state5_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_inTemple_state6) && hook_enabled_at(gb, SYM(introCinematic_inTemple_state6))) { introCinematic_inTemple_state6_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_inTemple_state7) && hook_enabled_at(gb, SYM(introCinematic_inTemple_state7))) { introCinematic_inTemple_state7_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_inTemple_state8) && hook_enabled_at(gb, SYM(introCinematic_inTemple_state8))) { introCinematic_inTemple_state8_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_inTemple_state9) && hook_enabled_at(gb, SYM(introCinematic_inTemple_state9))) { introCinematic_inTemple_state9_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_inTemple_state10) && hook_enabled_at(gb, SYM(introCinematic_inTemple_state10))) { introCinematic_inTemple_state10_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -926,10 +907,10 @@ void introCinematic_preTitlescreen_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wThreadStateBuffer + 7);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (intro_jumpTable(gb));
-    if (jt_ == SYM(introCinematic_preTitlescreen_state0)) { introCinematic_preTitlescreen_state0_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_preTitlescreen_state1)) { introCinematic_preTitlescreen_state1_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_preTitlescreen_state2)) { introCinematic_preTitlescreen_state2_hook(gb); return; }
-    else if (jt_ == SYM(introCinematic_preTitlescreen_state3)) { introCinematic_preTitlescreen_state3_hook(gb); return; }
+    if (jt_ == SYM(introCinematic_preTitlescreen_state0) && hook_enabled_at(gb, SYM(introCinematic_preTitlescreen_state0))) { introCinematic_preTitlescreen_state0_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_preTitlescreen_state1) && hook_enabled_at(gb, SYM(introCinematic_preTitlescreen_state1))) { introCinematic_preTitlescreen_state1_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_preTitlescreen_state2) && hook_enabled_at(gb, SYM(introCinematic_preTitlescreen_state2))) { introCinematic_preTitlescreen_state2_hook(gb); return; }
+    else if (jt_ == SYM(introCinematic_preTitlescreen_state3) && hook_enabled_at(gb, SYM(introCinematic_preTitlescreen_state3))) { introCinematic_preTitlescreen_state3_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -1231,8 +1212,7 @@ void introCinematic_ridingHorse_state7_hook(GB *gb) {
   CYC(b_+3, b_+4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) {
     CYCT(b_+4, b_+6);
-    introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_2_hook(gb);
-    return;
+    TAIL(introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_2);
   }
   CYC(b_+4, b_+6);
   CYC(b_+6, b_+8); A = 0xcc;
@@ -1262,8 +1242,7 @@ void introCinematic_ridingHorse_state8_hook(GB *gb) {
   CYC(b_+3, b_+4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) {
     CYCT(b_+4, b_+6);
-    introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_2_hook(gb);
-    return;
+    TAIL(introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_2);
   }
   CYC(b_+4, b_+6);
   CYC(b_+6, b_+8); A = 0x93;
@@ -1320,16 +1299,14 @@ void introCinematic_ridingHorse_state9_hook(GB *gb) {
     CALL_C(b_+8, fadeoutToWhite_hook, SYM(fadeoutToWhite), b_+11);
     CALL_C(b_+11, intro_incState_hook, SYM(intro_incState), b_+14);
     CYC(b_+14, b_+16);
-    introCinematic_ridingHorse_drawTempleSprites_hook(gb);
-    return;
+    TAIL(introCinematic_ridingHorse_drawTempleSprites);
   }
   CYC(b_+16, b_+19); SET_HL(wTmpcbb6);
   CYC(b_+19, b_+20); A = mem_rd(gb, HL);
   CYC(b_+20, b_+21); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+21, b_+23);
-    introCinematic_ridingHorse_drawTempleSprites_hook(gb);
-    return;
+    TAIL(introCinematic_ridingHorse_drawTempleSprites);
   }
   CYC(b_+21, b_+23);
   CYC(b_+23, b_+24); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
@@ -1337,16 +1314,14 @@ void introCinematic_ridingHorse_state9_hook(GB *gb) {
   CYC(b_+27, b_+28); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+28, b_+30);
-    introCinematic_ridingHorse_drawTempleSprites_hook(gb);
-    return;
+    TAIL(introCinematic_ridingHorse_drawTempleSprites);
   }
   CYC(b_+28, b_+30);
   CYC(b_+30, b_+33); SET_HL(wTmpcbbb);
   CYC(b_+33, b_+34); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) {
     CYCT(b_+34, b_+36);
-    introCinematic_ridingHorse_drawTempleSprites_hook(gb);
-    return;
+    TAIL(introCinematic_ridingHorse_drawTempleSprites);
   }
   CYC(b_+34, b_+36);
   CYC(b_+36, b_+38); mem_wr(gb, HL, 0x05);
@@ -1376,8 +1351,7 @@ void introCinematic_ridingHorse_state10_hook(GB *gb) {
   CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+4, b_+6);
-    introCinematic_ridingHorse_drawTempleSprites_hook(gb);
-    return;
+    TAIL(introCinematic_ridingHorse_drawTempleSprites);
   }
   CYC(b_+4, b_+6);
   CALL_C(b_+6, clearDynamicInteractions_hook, SYM(clearDynamicInteractions), b_+9);
@@ -1496,8 +1470,7 @@ void introCinematic_inTemple_state0__nextTriforce_hook(GB *gb) {
     CALL_C(b_+76, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+79);
     if (!(F & FZ)) {
       CYCT(b_+79, b_+81);
-      introCinematic_inTemple_state0__doneSpawningTriforce_hook(gb);
-      return;
+      TAIL(introCinematic_inTemple_state0__doneSpawningTriforce);
     }
     CYC(b_+79, b_+81);
     CYC(b_+81, b_+83); mem_wr(gb, HL, 0x4a);
@@ -1519,8 +1492,7 @@ void introCinematic_inTemple_state0__nextTriforce_hook(GB *gb) {
       continue;
     }
     CYC(b_+100, b_+102);
-    introCinematic_inTemple_state0__doneSpawningTriforce_hook(gb);
-    return;
+    TAIL(introCinematic_inTemple_state0__doneSpawningTriforce);
   }
 }
 
@@ -1549,8 +1521,7 @@ void introCinematic_inTemple_state1_hook(GB *gb) {
   CYC(b_+8, b_+9); alu_rlca(gb);
   if (!(F & FC)) {
     CYCT(b_+9, b_+12);
-    introCinematic_inTemple_updateCamera_hook(gb);
-    return;
+    TAIL(introCinematic_inTemple_updateCamera);
   }
   CYC(b_+9, b_+12);
   CYC(b_+12, b_+13); alu_xor(gb, A);
@@ -1780,8 +1751,7 @@ void flashScreen_body_hook(GB *gb) {
   CYC(b_+36, b_+37); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+37, b_+39);
-    clearFadingPalettes_body_hook(gb);
-    return;
+    TAIL(clearFadingPalettes_body);
   }
   CYC(b_+37, b_+39);
   CALL_C(b_+39, clearPaletteFadeVariablesAndRefreshPalettes_hook, SYM(clearPaletteFadeVariablesAndRefreshPalettes), b_+42);
@@ -2172,20 +2142,16 @@ void endgameCutsceneHandler_body_hook(GB *gb) {
   CYC(b_+17, b_+18); push_effect(gb, b_+18);
   do { uint16_t jt_ = (intro_jumpTable(gb));
     if (jt_ == SYM(endgameCutsceneHandler_09)) {
-      endgameCutsceneHandler_09_hook(gb);
-      return;
+      TAIL(endgameCutsceneHandler_09);
     }
     else if (jt_ == SYM(endgameCutsceneHandler_0a)) {
-      endgameCutsceneHandler_0a_hook(gb);
-      return;
+      TAIL(endgameCutsceneHandler_0a);
     }
     else if (jt_ == SYM(endgameCutsceneHandler_0f)) {
-      endgameCutsceneHandler_0f_hook(gb);
-      return;
+      TAIL(endgameCutsceneHandler_0f);
     }
     else if (jt_ == SYM(endgameCutsceneHandler_20)) {
-      endgameCutsceneHandler_20_hook(gb);
-      return;
+      TAIL(endgameCutsceneHandler_20);
     }
     else {
       hook_handoff(gb, HL);

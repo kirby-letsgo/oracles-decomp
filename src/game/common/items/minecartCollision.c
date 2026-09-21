@@ -28,8 +28,7 @@ void itemCode1dPost_hook(GB *gb) {
   CYC(b_+4, b_+6); alu_cp(gb, 0x0a);
   if (F & FZ) {
     CYCT(b_+6, b_+9);
-    objectTakePosition_hook(gb);
-    return;
+    TAIL(objectTakePosition);
   }
   CYC(b_+6, b_+9);
   CYC(b_+9, b_+12);

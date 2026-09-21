@@ -40,7 +40,7 @@ void interactionCodeca_func_7781_hook(GB *gb) {
   BASE(interactionCodeca);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+42, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+45);
-  CYC(b_+45, b_+48); interactionIncState_hook(gb); return; // jp
+  CYC(b_+45, b_+48); TAIL(interactionIncState); // jp
 }
 
 // 0b:7787, called (with return) once from interactionCodeca@subid0, and tail-jumped into once
@@ -57,7 +57,7 @@ void interactionCodeca_initialize_hook(GB *gb) {
   CYC(b_+59, b_+60); H = mem_rd(gb, HL);
   CYC(b_+60, b_+61); L = A;
   CALL_C(b_+61, interactionSetScript_hook, SYM(interactionSetScript), b_+64);
-  CYC(b_+64, b_+67); interactionIncState_hook(gb); return; // jp
+  CYC(b_+64, b_+67); TAIL(interactionIncState); // jp
 }
 
 // ==================================================================================================
@@ -90,7 +90,7 @@ state1:
   CALL_C(b_+25, interactionRunScript_hook, SYM(interactionRunScript), b_+28);
   if (F & FC) { CYCT(b_+28, b_+31); interactionDelete_hook(gb); return; } // jp c
   CYC(b_+28, b_+31);
-  CYC(b_+31, b_+34); interactionAnimateAsNpc_hook(gb); return; // jp
+  CYC(b_+31, b_+34); TAIL(interactionAnimateAsNpc); // jp
 
 subid1:
   CALL_C(b_+34, checkInteractionState_hook, SYM(checkInteractionState), b_+37);

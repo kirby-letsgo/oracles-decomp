@@ -44,7 +44,7 @@ void parentItemCode_foolsOre_hook(GB *gb) {
       CYC(b_+12, b_+13); mem_wr(gb, DE, A);
       CALL_C(b_+13, updateLinkDirectionFromAngle_hook, SYM(updateLinkDirectionFromAngle), b_+16);
       CALL_C(b_+16, parentItemLoadAnimationAndIncState_hook, SYM(parentItemLoadAnimationAndIncState), b_+19);
-      CYC(b_+19, b_+22); itemCreateChild_hook(gb); return;
+      CYC(b_+19, b_+22); TAIL(itemCreateChild);
     }
     else if (jt_ == SYM(parentItemCode_punch__state1)) { other_swords_state1(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
@@ -88,7 +88,7 @@ state0:
   if (F & FZ) { CYCT(b_+32, b_+33); ret_effect(gb); return; }
   CYC(b_+32, b_+33);
   CYC(b_+33, b_+35); A = 0x37;
-  CYC(b_+35, b_+38); specialObjectSetAnimationWithLinkData_hook(gb); return;
+  CYC(b_+35, b_+38); TAIL(specialObjectSetAnimationWithLinkData);
 
 experts_ring:
   CYC(b_+38, b_+40); L = 0x02;

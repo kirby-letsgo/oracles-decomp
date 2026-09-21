@@ -77,7 +77,7 @@ state1:
   CYC(b_+65, b_+67); A = 0x0b; // Object.state
   CALL_C(b_+67, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+70);
   CYC(b_+70, b_+73); SET_BC(0x1400);
-  CYC(b_+73, b_+76); objectTakePositionWithOffset_hook(gb); return; // jp
+  CYC(b_+73, b_+76); TAIL(objectTakePositionWithOffset); // jp
 
 incState:
   CYC(b_+76, b_+77); L = E;
@@ -90,7 +90,7 @@ state2:
   CYC(b_+84, b_+86); alu_cp(gb, 0xb0);
   if (F & FC) { RET_TAKEN(b_+86); return; } // ret c
   CYC(b_+86, b_+87);
-  CYC(b_+87, b_+90); partDelete_hook(gb); return; // jp
+  CYC(b_+87, b_+90); TAIL(partDelete); // jp
 
 state3:
   CALL_C(b_+90, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+93);

@@ -85,7 +85,7 @@ state0:
   CYC(b_+56, b_+58); mem_wr(gb, HL, 0x14); // SPEED_80
   CYC(b_+58, b_+60); L = 0xc6; // Part.counter1
   CYC(b_+60, b_+62); mem_wr(gb, HL, 0xb4); // 180
-  CYC(b_+62, b_+65); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+62, b_+65); TAIL(objectSetVisible82); // jp
 
 state1:
   CALL_C(b_+65, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+68);
@@ -103,7 +103,7 @@ state1:
   CALL_C(b_+86, objectApplySpeed_hook, SYM(objectApplySpeed), b_+89);
 
 animate:
-  CYC(b_+89, b_+92); partAnimate_hook(gb); return; // jp
+  CYC(b_+89, b_+92); TAIL(partAnimate); // jp
 
 state2:
   CALL_C(b_+96, partAnimate_hook, SYM(partAnimate), b_+99);
@@ -112,7 +112,7 @@ state2:
   CYC(b_+102, b_+103); A = alu_inc8(gb, A);
   if (!(F & FZ)) { RET_TAKEN(b_+103); return; } // ret nz
   CYC(b_+103, b_+104);
-  CYC(b_+104, b_+107); partDelete_hook(gb); return; // jp
+  CYC(b_+104, b_+107); TAIL(partDelete); // jp
 
 state3:
   CYC(b_+107, b_+110); SET_HL(w1Link);
@@ -134,5 +134,5 @@ gotoState2:
   CYC(b_+131, b_+133); L = 0xe4; // Part.collisionType
   CYC(b_+133, b_+135); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
   CYC(b_+135, b_+137); A = 0x01;
-  CYC(b_+137, b_+140); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+137, b_+140); TAIL(partSetAnimation); // jp
 }

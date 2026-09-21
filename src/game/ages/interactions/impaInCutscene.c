@@ -113,7 +113,7 @@ init0:
   CALL_C(b_+54, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+57);
   CYC(b_+57, b_+59); alu_bit(gb, 6, A);
   if (!(F & FZ)) {
-    CYCT(b_+59, b_+62); interactionDelete_hook(gb); return;
+    CYCT(b_+59, b_+62); TAIL(interactionDelete);
   }
   CYC(b_+59, b_+62);
   // Load a custom palette and use it for possessed impa
@@ -154,18 +154,18 @@ init7:
   CYC(b_+120, b_+123); A = mem_rd(gb, wEssencesObtained);
   CYC(b_+123, b_+125); alu_bit(gb, 2, A);
   if (F & FZ) {
-    CYCT(b_+125, b_+128); interactionDelete_hook(gb); return;
+    CYCT(b_+125, b_+128); TAIL(interactionDelete);
   }
   CYC(b_+125, b_+128);
   CALL_C(b_+128, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+131);
   if (F & FZ) {
-    CYCT(b_+131, b_+134); interactionDelete_hook(gb); return;
+    CYCT(b_+131, b_+134); TAIL(interactionDelete);
   }
   CYC(b_+131, b_+134);
   CYC(b_+134, b_+136); A = 0x38; // GLOBALFLAG_GOT_RING_FROM_ZELDA
   CALL_C(b_+136, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+139);
   if (!(F & FZ)) {
-    CYCT(b_+139, b_+142); interactionDelete_hook(gb); return;
+    CYCT(b_+139, b_+142); TAIL(interactionDelete);
   }
   CYC(b_+139, b_+142);
   CYC(b_+142, b_+144); A = 0x39; // GLOBALFLAG_IMPA_MOVED_AFTER_ZELDA_KIDNAPPED
@@ -219,7 +219,7 @@ setAnimationAndLoadScript:
 init4:
   CALL_C(b_+222, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+225);
   if (!(F & FZ)) {
-    CYCT(b_+225, b_+228); interactionDelete_hook(gb); return;
+    CYCT(b_+225, b_+228); TAIL(interactionDelete);
   }
   CYC(b_+225, b_+228);
   CYC(b_+228, b_+229); alu_xor(gb, A);
@@ -229,13 +229,13 @@ preBlackTowerCutscene:
   CYC(b_+232, b_+234); A = 0x36; // TREASURE_MAKU_SEED
   CALL_C(b_+234, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+237);
   if (!(F & FC)) {
-    CYCT(b_+237, b_+240); interactionDelete_hook(gb); return;
+    CYCT(b_+237, b_+240); TAIL(interactionDelete);
   }
   CYC(b_+237, b_+240);
   CYC(b_+240, b_+242); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
   CALL_C(b_+242, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+245);
   if (!(F & FZ)) {
-    CYCT(b_+245, b_+248); interactionDelete_hook(gb); return;
+    CYCT(b_+245, b_+248); TAIL(interactionDelete);
   }
   CYC(b_+245, b_+248);
   CYC(b_+248, b_+251); impaInCutscene_loadScript(gb);
@@ -244,7 +244,7 @@ preBlackTowerCutscene:
 init5:
   CALL_C(b_+251, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+254);
   if (F & FZ) {
-    CYCT(b_+254, b_+257); interactionDelete_hook(gb); return;
+    CYCT(b_+254, b_+257); TAIL(interactionDelete);
   }
   CYC(b_+254, b_+257);
   CYC(b_+257, b_+259); A = 0x03;
@@ -259,7 +259,7 @@ initA:
 init9:
   CALL_C(b_+269, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+272);
   if (F & FZ) {
-    CYCT(b_+272, b_+275); interactionDelete_hook(gb); return;
+    CYCT(b_+272, b_+275); TAIL(interactionDelete);
   }
   CYC(b_+272, b_+275);
 
@@ -284,7 +284,7 @@ void interactionCode31_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (impaInCutscene_jumpTable(gb));
     if (jt_ == b_+8) { goto state0; }
-    else if (jt_ == SYM(impaState1)) { impaState1_hook(gb); return; }
+    else if (jt_ == SYM(impaState1) && hook_enabled_at(gb, SYM(impaState1))) { impaState1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -298,7 +298,7 @@ state0:
   CYC(b_+22, b_+23); A = mem_rd(gb, DE);
   CYC(b_+23, b_+24); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+24, b_+27); objectMarkSolidPosition_hook(gb); return;
+    CYCT(b_+24, b_+27); TAIL(objectMarkSolidPosition);
   }
   CYC(b_+24, b_+27);
   CYC(b_+27, b_+28); ret_effect(gb);
@@ -311,16 +311,16 @@ void impaState1_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (impaInCutscene_jumpTable(gb));
-    if (jt_ == SYM(impaSubid0)) { impaSubid0_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid1)) { impaSubid1_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid2)) { impaSubid2_hook(gb); return; }
-    else if (jt_ == SYM(impaAnimateAndRunScript)) { impaAnimateAndRunScript_hook(gb); return; } // subids 3 and 6
-    else if (jt_ == SYM(impaSubid4)) { impaSubid4_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid5)) { impaSubid5_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid7)) { impaSubid7_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid8)) { impaSubid8_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid9)) { impaSubid9_hook(gb); return; }
-    else if (jt_ == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
+    if (jt_ == SYM(impaSubid0) && hook_enabled_at(gb, SYM(impaSubid0))) { impaSubid0_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid1) && hook_enabled_at(gb, SYM(impaSubid1))) { impaSubid1_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid2) && hook_enabled_at(gb, SYM(impaSubid2))) { impaSubid2_hook(gb); return; }
+    else if (jt_ == SYM(impaAnimateAndRunScript) && hook_enabled_at(gb, SYM(impaAnimateAndRunScript))) { impaAnimateAndRunScript_hook(gb); return; } // subids 3 and 6
+    else if (jt_ == SYM(impaSubid4) && hook_enabled_at(gb, SYM(impaSubid4))) { impaSubid4_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid5) && hook_enabled_at(gb, SYM(impaSubid5))) { impaSubid5_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid7) && hook_enabled_at(gb, SYM(impaSubid7))) { impaSubid7_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid8) && hook_enabled_at(gb, SYM(impaSubid8))) { impaSubid8_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid9) && hook_enabled_at(gb, SYM(impaSubid9))) { impaSubid9_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -395,7 +395,7 @@ dispatch:
     else if (jt_ == b_+434) { goto substateD; }
     else if (jt_ == b_+463) { goto substateE; }
     else if (jt_ == b_+492) { goto substateF; }
-    else if (jt_ == SYM(impaRet)) { impaRet_hook(gb); return; }
+    else if (jt_ == SYM(impaRet) && hook_enabled_at(gb, SYM(impaRet))) { impaRet_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -749,7 +749,7 @@ void impaSubid1_hook(GB *gb) {
   do { uint16_t jt_ = (impaInCutscene_jumpTable(gb));
     if (jt_ == b_+10) { goto substate0; }
     else if (jt_ == b_+32) { goto substate1; }
-    else if (jt_ == SYM(impaSubid1Substate2)) { impaSubid1Substate2_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid1Substate2) && hook_enabled_at(gb, SYM(impaSubid1Substate2))) { impaSubid1Substate2_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -757,7 +757,7 @@ substate0:
   CYC(b_+10, b_+13); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfd0);
   CYC(b_+13, b_+15); alu_cp(gb, 0x20);
   if (!(F & FZ)) {
-    CYCT(b_+15, b_+18); interactionAnimate_hook(gb); return;
+    CYCT(b_+15, b_+18); TAIL(interactionAnimate);
   }
   CYC(b_+15, b_+18);
   CALL_C(b_+18, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+21);
@@ -773,7 +773,7 @@ substate0:
 substate1:
   CALL_C(b_+32, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+35);
   if (!(F & FZ)) {
-    CYCT(b_+35, b_+37); interactionOscillateXRandomly_hook(gb); return;
+    CYCT(b_+35, b_+37); TAIL(interactionOscillateXRandomly);
   }
   CYC(b_+35, b_+37);
   CYC(b_+37, b_+40); interactionIncSubstate_hook(gb);
@@ -800,14 +800,14 @@ void impaSubid1Substate2_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
   if (F & FC) {
-    CYCT(b_+3, b_+6); interactionDelete_hook(gb); return;
+    CYCT(b_+3, b_+6); TAIL(interactionDelete);
   }
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+8); E = INTERACTION_BASE + OBJ_COUNTER2;
   CYC(b_+8, b_+9); A = mem_rd(gb, DE);
   CYC(b_+9, b_+10); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+10, b_+13); interactionAnimate2Times_hook(gb); return;
+    CYCT(b_+10, b_+13); TAIL(interactionAnimate2Times);
   }
   CYC(b_+10, b_+13);
   CYC(b_+13, b_+16); interactionAnimate_hook(gb);
@@ -824,11 +824,11 @@ void impaSubid2_hook(GB *gb) {
     if (jt_ == b_+20) { goto substate0; }
     else if (jt_ == b_+37) { goto substate1; }
     else if (jt_ == b_+53) { goto substate2; }
-    else if (jt_ == SYM(impaAnimateAndRunScript)) { impaAnimateAndRunScript_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid2Substate4)) { impaSubid2Substate4_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid2Substate5)) { impaSubid2Substate5_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid2Substate6)) { impaSubid2Substate6_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid2Substate7)) { impaSubid2Substate7_hook(gb); return; }
+    else if (jt_ == SYM(impaAnimateAndRunScript) && hook_enabled_at(gb, SYM(impaAnimateAndRunScript))) { impaAnimateAndRunScript_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid2Substate4) && hook_enabled_at(gb, SYM(impaSubid2Substate4))) { impaSubid2Substate4_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid2Substate5) && hook_enabled_at(gb, SYM(impaSubid2Substate5))) { impaSubid2Substate5_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid2Substate6) && hook_enabled_at(gb, SYM(impaSubid2Substate6))) { impaSubid2Substate6_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid2Substate7) && hook_enabled_at(gb, SYM(impaSubid2Substate7))) { impaSubid2Substate7_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -917,7 +917,7 @@ void impaSubid2Substate5_hook(GB *gb) {
   CYC(b_+5, b_+6);
   CALL_C(b_+6, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+9);
   if (!(F & FZ)) {
-    CYCT(b_+9, b_+11); impaSetVisibleAndJump_hook(gb); return;
+    CYCT(b_+9, b_+11); TAIL(impaSetVisibleAndJump);
   }
   CYC(b_+9, b_+11);
   CALL_C(b_+11, objectSetVisible82_hook, SYM(objectSetVisible82), b_+14);
@@ -1029,7 +1029,7 @@ substate1:
   CYC(b_+42, b_+43);
   CALL_C(b_+43, interactionRunScript_hook, SYM(interactionRunScript), b_+46);
   if (F & FC) {
-    CYCT(b_+46, b_+49); interactionDelete_hook(gb); return;
+    CYCT(b_+46, b_+49); TAIL(interactionDelete);
   }
   CYC(b_+46, b_+49);
   CALL_C(b_+49, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+52);
@@ -1212,19 +1212,19 @@ void impaSubid7_hook(GB *gb) {
   CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
   CALL_C(b_+5, interactionRunScript_hook, SYM(interactionRunScript), b_+8);
   if (F & FC) {
-    CYCT(b_+8, b_+11); interactionDelete_hook(gb); return;
+    CYCT(b_+8, b_+11); TAIL(interactionDelete);
   }
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+13); A = 0x39; // GLOBALFLAG_IMPA_MOVED_AFTER_ZELDA_KIDNAPPED
   CALL_C(b_+13, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+16);
   if (F & FZ) {
-    CYCT(b_+16, b_+19); interactionAnimateAsNpc_hook(gb); return;
+    CYCT(b_+16, b_+19); TAIL(interactionAnimateAsNpc);
   }
   CYC(b_+16, b_+19);
   CYC(b_+19, b_+21); A = 0x3c; // GLOBALFLAG_ZELDA_SAVED_FROM_VIRE
   CALL_C(b_+21, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+24);
   if (!(F & FZ)) {
-    CYCT(b_+24, b_+27); interactionAnimate_hook(gb); return;
+    CYCT(b_+24, b_+27); TAIL(interactionAnimate);
   }
   CYC(b_+24, b_+27);
   CYC(b_+27, b_+30); npcFaceLinkAndAnimate_hook(gb);
@@ -1235,7 +1235,7 @@ void impaSubid8_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, impaAnimateAndRunScript_hook, SYM(impaAnimateAndRunScript), b_+3);
   if (F & FC) {
-    CYCT(b_+3, b_+6); interactionDelete_hook(gb); return;
+    CYCT(b_+3, b_+6); TAIL(interactionDelete);
   }
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+7); ret_effect(gb);

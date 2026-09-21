@@ -97,7 +97,7 @@ dead:
   CYC(b_+56, b_+57); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
 
 uncountedDie:
-  CYC(b_+57, b_+60); enemyDie_uncounted_hook(gb); return; // jp
+  CYC(b_+57, b_+60); TAIL(enemyDie_uncounted); // jp
 
 normalStatus:
   CYC(b_+60, b_+62); E = ENEMY_BASE + OBJ_STATE;
@@ -183,7 +183,7 @@ void wallmaster_state1_hook(GB *gb) {
 deleteSpawner:
   CALL_C(b_+48, decNumEnemies_hook, SYM(decNumEnemies), b_+51);
   CALL_C(b_+51, markEnemyAsKilledInRoom_b00_hook, SYM(markEnemyAsKilledInRoom_b00), b_+54);
-  CYC(b_+54, b_+57); enemyDelete_hook(gb); return; // jp
+  CYC(b_+54, b_+57); TAIL(enemyDelete); // jp
 }
 
 // 0d:61c3, bare global; jump-table target from enemyCode28.
@@ -205,7 +205,7 @@ void wallmaster_state_galeSeed_hook(GB *gb) {
   CYC(b_+13, b_+15); mem_wr(gb, HL, 0x00);
 
 deleteMe:
-  CYC(b_+15, b_+18); enemyDelete_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(enemyDelete); // jp
 }
 
 // 0d:61d5, bare global; jump-table target from enemyCode28.
@@ -236,7 +236,7 @@ void wallmaster_state8_hook(GB *gb) {
   CYC(b_+21, b_+22); mem_wr(gb, HL, A);
   CYC(b_+22, b_+24); A = 0x59; // SND_FALLINHOLE
   CALL_C(b_+24, playSound_b00_hook, SYM(playSound_b00), b_+27);
-  CYC(b_+27, b_+30); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+27, b_+30); TAIL(objectSetVisiblec1); // jp
 }
 
 // 0d:61f4, bare global; jump-table target from enemyCode28. Falling to ground.
@@ -290,7 +290,7 @@ checkCounter:
 
   // Close hand when [counter1] == 20
   CYC(b_+14, b_+16); A = 0x01;
-  CYC(b_+16, b_+19); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+16, b_+19); TAIL(enemySetAnimation); // jp
 
 checkAlmostDone:
   CYC(b_+19, b_+20); A = alu_dec8(gb, A);
@@ -364,7 +364,7 @@ void wallmaster_stateC_hook(GB *gb) {
   CYC(b_+9, b_+10); alu_xor(gb, A);
   CYC(b_+10, b_+11); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi
   CYC(b_+11, b_+12); mem_wr(gb, HL, A);
-  CYC(b_+12, b_+15); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+12, b_+15); TAIL(enemySetAnimation); // jp
 }
 
 // 0d:626f, bare global; jump-table target from enemyCode28. Just dragged Link off-screen.
@@ -392,5 +392,5 @@ void wallmaster_flickerVisibilityIfHighUp_hook(GB *gb) {
   CYC(b_+10, b_+12); alu_cp(gb, 0xbc);
   if (!(F & FC)) { RET_TAKEN(b_+12); return; } // ret nc
   CYC(b_+12, b_+13);
-  CYC(b_+13, b_+16); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+13, b_+16); TAIL(objectSetVisiblec1); // jp
 }

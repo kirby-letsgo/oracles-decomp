@@ -75,7 +75,7 @@ subid0State1:
   CYC(b_+31, b_+32); A = mem_rd(gb, DE);
   CYC(b_+32, b_+34); alu_and(gb, 0x8f);
   CYC(b_+34, b_+35); mem_wr(gb, DE, A);
-  CYC(b_+35, b_+38); interactionRunScript_hook(gb); return; // jp
+  CYC(b_+35, b_+38); TAIL(interactionRunScript); // jp
 
 subid1:
   CALL_C(b_+38, checkInteractionState_hook, SYM(checkInteractionState), b_+41);
@@ -95,7 +95,7 @@ subid2:
   CYC(b_+56, b_+59); push_effect(gb, b_+59); goto initializeMakuSprout; // call
 afterInitializeMakuSprout_subid2:
   CYC(b_+59, b_+61); A = 0x01;
-  CYC(b_+61, b_+64); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+61, b_+64); TAIL(interactionSetAnimation); // jp
 
 subid2State1:
   CALL_C(b_+64, checkInteractionSubstate_hook, SYM(checkInteractionSubstate), b_+67);
@@ -106,7 +106,7 @@ subid2State1:
   if (!(F & FZ)) { RET_TAKEN(b_+75); return; } // ret nz
   CYC(b_+75, b_+76);
   CALL_C(b_+76, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+79);
-  CYC(b_+79, b_+82); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+79, b_+82); TAIL(objectSetVisible82); // jp
 
 initSubid0:
   CYC(b_+82, b_+85); A = W8(wMakuTreeState);
@@ -193,7 +193,7 @@ runSubidCode:
   CYC(b_+194, b_+196); E = INTERACTION_BASE + OBJ_SUBID;
   CYC(b_+196, b_+197); mem_wr(gb, DE, A);
   CYC(b_+197, b_+198); SET_AF(pop_effect(gb));
-  CYC(b_+198, b_+201); interactionCode88_hook(gb); return; // jp
+  CYC(b_+198, b_+201); TAIL(interactionCode88); // jp
 
 runSubid0ScriptMode:
   CYC(b_+201, b_+202); H = D;

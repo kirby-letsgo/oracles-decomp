@@ -86,7 +86,7 @@ subid2:
   CYC(b_+72, b_+73); CYC(b_+73, b_+75); A = 0x8d;
   CALL_C(b_+75, playSound_b00_hook, SYM(playSound_b00), b_+78);
   CYC(b_+78, b_+81); SET_HL(b_+84);
-  CYC(b_+81, b_+84); setWarpDestVariables_hook(gb); return;
+  CYC(b_+81, b_+84); TAIL(setWarpDestVariables);
 generic:
   CALL_C(b_+89, checkInteractionState_hook, SYM(checkInteractionState), b_+92);
   if (!(F & FZ)) { CYCT(b_+92, b_+94); goto generic_state1; }

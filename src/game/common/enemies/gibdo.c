@@ -74,7 +74,7 @@ normalStatus:
 
 uninitialized:
   CYC(b_+60, b_+62); A = 0x14; // SPEED_80
-  CYC(b_+62, b_+65); ecom_setSpeedAndState8AndVisible_b0d_hook(gb); return; // jp
+  CYC(b_+62, b_+65); TAIL(ecom_setSpeedAndState8AndVisible_b0d); // jp
 
 state_switchHook:
   CYC(b_+65, b_+66); E = alu_inc8(gb, E);
@@ -117,14 +117,14 @@ state9:
   CYC(b_+107, b_+109);
 
 animate:
-  CYC(b_+109, b_+112); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+109, b_+112); TAIL(enemyAnimate); // jp
 
 stateA:
   CALL_C(b_+112, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+115);
   if (!(F & FZ)) { RET_TAKEN(b_+115); return; } // ret nz
   CYC(b_+115, b_+116);
   CYC(b_+116, b_+119); SET_BC(0x3102); // ENEMY_STALFOS, subid 2
-  CYC(b_+119, b_+122); enemyReplaceWithID_hook(gb); return; // jp
+  CYC(b_+119, b_+122); TAIL(enemyReplaceWithID); // jp
 
 gotoState8:
   CYC(b_+122, b_+124); E = ENEMY_BASE + OBJ_STATE;

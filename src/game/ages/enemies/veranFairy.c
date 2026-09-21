@@ -140,8 +140,7 @@ decCounter:
   CYC(b_+44, b_+45);
   CYC(b_+45, b_+47); A = 0x05;
   CYC(b_+47, b_+50);
-  enemySetAnimation_hook(gb);
-  return;
+  TAIL(enemySetAnimation);
 checkBoundary:
   CALL_C(b_+50, veranFairy_checkWithinBoundary_hook, SYM(veranFairy_checkWithinBoundary), b_+53);
   if (!(F & FC)) { RET_TAKEN(b_+53); return; }
@@ -159,8 +158,7 @@ checkBoundary:
   CALL_C(b_+65, ecom_spawnProjectile_b10_hook, SYM(ecom_spawnProjectile_b10), b_+68);
   CYC(b_+68, b_+70); A = 0x06;
   CYC(b_+70, b_+73);
-  enemySetAnimation_hook(gb);
-  return;
+  TAIL(enemySetAnimation);
 resetCounters:
   CYC(b_+73, b_+75); L = ENEMY_BASE + OBJ_COUNTER2;
   CYC(b_+75, b_+77); mem_wr(gb, HL, 0x5a);
@@ -210,8 +208,7 @@ afterFire:
   CALL_C(b_+49, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+52);
   if (!(F & FZ)) {
     CYCT(b_+52, b_+55);
-    enemyAnimate_hook(gb);
-    return;
+    TAIL(enemyAnimate);
   }
   CYC(b_+52, b_+55);
   CYC(b_+55, b_+56); L = alu_inc8(gb, L);
@@ -249,8 +246,7 @@ afterFire:
   CALL_C(b_+28, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+31);
   if (!(F & FZ)) {
     CYCT(b_+31, b_+34);
-    enemyAnimate_hook(gb);
-    return;
+    TAIL(enemyAnimate);
   }
   CYC(b_+31, b_+34);
   CYC(b_+34, b_+35); L = alu_inc8(gb, L);
@@ -272,9 +268,9 @@ void veranFairy_66ed_hook(GB *gb) {
   CYC(b_+6, b_+7); A = mem_rd(gb, DE);
   CYC(b_+7, b_+8); push_effect(gb, b_+8);
   do { uint16_t jt_ = (veranFairy_jump_table(gb));
-    if (jt_ == SYM(attack0)) { attack0_hook(gb); return; }
-    else if (jt_ == SYM(attack1)) { attack1_hook(gb); return; }
-    else if (jt_ == SYM(attack2)) { attack2_hook(gb); return; }
+    if (jt_ == SYM(attack0) && hook_enabled_at(gb, SYM(attack0))) { attack0_hook(gb); return; }
+    else if (jt_ == SYM(attack1) && hook_enabled_at(gb, SYM(attack1))) { attack1_hook(gb); return; }
+    else if (jt_ == SYM(attack2) && hook_enabled_at(gb, SYM(attack2))) { attack2_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -365,16 +361,14 @@ substate0:
   CALL_C(b_+29, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+32);
   if (!(F & FZ)) {
     CYCT(b_+32, b_+35);
-    ecom_flickerVisibility_b10_hook(gb);
-    return;
+    TAIL(ecom_flickerVisibility_b10);
   }
   CYC(b_+32, b_+35);
   CYC(b_+35, b_+37); mem_wr(gb, HL, 0x08);
   CYC(b_+37, b_+38); L = E;
   CYC(b_+38, b_+39); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+39, b_+42);
-  objectSetVisible83_hook(gb);
-  return;
+  TAIL(objectSetVisible83);
 substate1:
   CALL_C(b_+42, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+45);
   if (!(F & FZ)) { RET_TAKEN(b_+45); return; }
@@ -383,16 +377,14 @@ substate1:
   CYC(b_+47, b_+48); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+48, b_+51); SET_BC((SYM(ganon_stateC_substate8) + 24));
   CYC(b_+51, b_+54);
-  showText_hook(gb);
-  return;
+  TAIL(showText);
 substate2:
   CALL_C(b_+54, ecom_incSubstate_b10_hook, SYM(ecom_incSubstate_b10), b_+57);
   CYC(b_+57, b_+59); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+59, b_+61); mem_wr(gb, HL, 0x1e);
   CYC(b_+61, b_+63); A = 0x04;
   CYC(b_+63, b_+66);
-  enemySetAnimation_hook(gb);
-  return;
+  TAIL(enemySetAnimation);
 substate3:
   CYC(b_+66, b_+68); C = 0x33;
 strikeLightningAfterCountdown:
@@ -409,8 +401,7 @@ strikeLightning:
   CYC(b_+80, b_+82); mem_wr(gb, HL, 0x27);
   CYC(b_+82, b_+84); L = PART_BASE + OBJ_YH;
   CYC(b_+84, b_+87);
-  setShortPosition_paramC_hook(gb);
-  return;
+  TAIL(setShortPosition_paramC);
 substate4:
   CYC(b_+87, b_+89); C = 0x7b;
   CYC(b_+89, b_+91);
@@ -455,8 +446,7 @@ pillarLoop:
   }
   CYC(b_+134, b_+136);
   CYC(b_+136, b_+139);
-  ecom_incSubstate_b10_hook(gb);
-  return;
+  TAIL(ecom_incSubstate_b10);
 substateA:
   CYC(b_+151, b_+153); B = 0x04;
   CYC(b_+153, b_+156); SET_HL(b_+203);
@@ -495,8 +485,7 @@ afterMimicSpawn:
   CALL_C(b_+195, enemySetAnimation_hook, SYM(enemySetAnimation), b_+198);
   CYC(b_+198, b_+200); A = 0x04;
   CYC(b_+200, b_+203);
-  fadeinFromWhiteWithDelay_hook(gb);
-  return;
+  TAIL(fadeinFromWhiteWithDelay);
 substateB:
   CYC(b_+207, b_+210); A = mem_rd(gb, wPaletteThread_mode);
   CYC(b_+210, b_+211); alu_or(gb, A);
@@ -509,8 +498,7 @@ substateB:
   CYC(b_+217, b_+218); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+218, b_+221); SET_BC((SYM(ganon_stateC_substate8) + 25));
   CYC(b_+221, b_+224);
-  showText_hook(gb);
-  return;
+  TAIL(showText);
 substateC:
   CYC(b_+224, b_+225); H = D;
   CYC(b_+225, b_+227); L = ENEMY_BASE + OBJ_STATE;
@@ -613,8 +601,7 @@ void veranFairy_state3_hook(GB *gb) {
   CYC(b_+44, b_+46); A = 0x05;
   CALL_C(b_+46, enemySetAnimation_hook, SYM(enemySetAnimation), b_+49);
   CYC(b_+49, b_+52);
-  ecom_incState_b10_hook(gb);
-  return;
+  TAIL(ecom_incState_b10);
 nextTarget:
   CYC(b_+52, b_+54); E = ENEMY_BASE + OBJ_VAR33;
   CYC(b_+54, b_+55); mem_wr(gb, DE, A);
@@ -637,8 +624,7 @@ void veranFairy_state4_hook(GB *gb) {
   CYC(b_+3, b_+4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) {
     CYCT(b_+4, b_+6);
-    veranFairy_animate_hook(gb);
-    return;
+    TAIL(veranFairy_animate);
   }
   CYC(b_+4, b_+6);
   CYC(b_+6, b_+7); L = E;
@@ -663,23 +649,20 @@ substate0:
   CALL_C(b_+9, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+12);
   if (!(F & FZ)) {
     CYCT(b_+12, b_+15);
-    ecom_flickerVisibility_b10_hook(gb);
-    return;
+    TAIL(ecom_flickerVisibility_b10);
   }
   CYC(b_+12, b_+15);
   CYC(b_+15, b_+16); L = E;
   CYC(b_+16, b_+17); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+17, b_+20);
-  objectSetVisible82_hook(gb);
-  return;
+  TAIL(objectSetVisible82);
 substate1:
   CALL_C(b_+20, ecom_incSubstate_b10_hook, SYM(ecom_incSubstate_b10), b_+23);
   CYC(b_+23, b_+25); L = ENEMY_BASE + OBJ_COUNTER2;
   CYC(b_+25, b_+27); mem_wr(gb, HL, 0x41);
   CYC(b_+27, b_+30); SET_BC((SYM(ganon_stateC_substate8) + 27));
   CYC(b_+30, b_+33);
-  showText_hook(gb);
-  return;
+  TAIL(showText);
 substate2:
   CALL_C(b_+33, ecom_decCounter2_b10_hook, SYM(ecom_decCounter2_b10), b_+36);
   if (F & FZ) {
@@ -717,8 +700,7 @@ substate2:
   CYC(b_+67, b_+69); L = INTERACTION_BASE + OBJ_VAR03;
   CYC(b_+69, b_+70); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+70, b_+73);
-  objectCopyPositionWithOffset_hook(gb);
-  return;
+  TAIL(objectCopyPositionWithOffset);
 triggerCutscene:
   CYC(b_+73, b_+76); A = mem_rd(gb, wPaletteThread_mode);
   CYC(b_+76, b_+77); alu_or(gb, A);
@@ -782,12 +764,12 @@ normalStatus:
   CYC(b_+53, b_+54); A = mem_rd(gb, DE);
   CYC(b_+54, b_+55); push_effect(gb, b_+55);
   do { uint16_t jt_ = (veranFairy_jump_table(gb));
-    if (jt_ == SYM(veranFairy_state0)) { veranFairy_state0_hook(gb); return; }
-    else if (jt_ == SYM(veranFairy_state1)) { veranFairy_state1_hook(gb); return; }
-    else if (jt_ == SYM(veranFairy_state2)) { veranFairy_state2_hook(gb); return; }
-    else if (jt_ == SYM(veranFairy_state3)) { veranFairy_state3_hook(gb); return; }
-    else if (jt_ == SYM(veranFairy_state4)) { veranFairy_state4_hook(gb); return; }
-    else if (jt_ == SYM(veranFairy_state5)) { veranFairy_state5_hook(gb); return; }
+    if (jt_ == SYM(veranFairy_state0) && hook_enabled_at(gb, SYM(veranFairy_state0))) { veranFairy_state0_hook(gb); return; }
+    else if (jt_ == SYM(veranFairy_state1) && hook_enabled_at(gb, SYM(veranFairy_state1))) { veranFairy_state1_hook(gb); return; }
+    else if (jt_ == SYM(veranFairy_state2) && hook_enabled_at(gb, SYM(veranFairy_state2))) { veranFairy_state2_hook(gb); return; }
+    else if (jt_ == SYM(veranFairy_state3) && hook_enabled_at(gb, SYM(veranFairy_state3))) { veranFairy_state3_hook(gb); return; }
+    else if (jt_ == SYM(veranFairy_state4) && hook_enabled_at(gb, SYM(veranFairy_state4))) { veranFairy_state4_hook(gb); return; }
+    else if (jt_ == SYM(veranFairy_state5) && hook_enabled_at(gb, SYM(veranFairy_state5))) { veranFairy_state5_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

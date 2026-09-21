@@ -90,7 +90,7 @@ state_uninitialized:
   CYC(b_+43, b_+44); A = B;
   CYC(b_+44, b_+46); alu_sub(gb, 0x03);
   CYC(b_+46, b_+48); alu_cp(gb, 0x02);
-  if (F & FC) { CALL_C(b_+48, bladeTrap_initCircular_hook, SYM(bladeTrap_initCircular), b_+51); } else { CYC(b_+48, b_+51); } // call c
+  if (F & FC) { CALL_C_CC(b_+48, bladeTrap_initCircular_hook, SYM(bladeTrap_initCircular), b_+51); } else { CYC(b_+48, b_+51); } // call c
   CYC(b_+51, b_+53); E = ENEMY_BASE + OBJ_SUBID;
   CYC(b_+53, b_+54); A = mem_rd(gb, DE);
   CYC(b_+54, b_+55); alu_or(gb, A);
@@ -104,7 +104,7 @@ state_uninitialized:
 setVar3e:
   CYC(b_+66, b_+68); E = ENEMY_BASE + 0x3e; // Enemy.var3e
   CYC(b_+68, b_+69); mem_wr(gb, DE, A);
-  CYC(b_+69, b_+72); ecom_setSpeedAndState8AndVisible_b0d_hook(gb); return; // jp
+  CYC(b_+69, b_+72); TAIL(ecom_setSpeedAndState8AndVisible_b0d); // jp
 
 state_stub:
   RET(b_+72); return; // ret
@@ -133,7 +133,7 @@ state8:
   CYC(b_+15, b_+17); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+17, b_+19); mem_wr(gb, HL, 0x1e); // SPEED_c0
   CYC(b_+19, b_+21); A = 0x01;
-  CYC(b_+21, b_+24); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+21, b_+24); TAIL(enemySetAnimation); // jp
 
 state9:
   CYC(b_+24, b_+26); B = 0x0e;
@@ -151,13 +151,13 @@ state9:
   CYC(b_+43, b_+45); A = 0x71; // SND_MOVEBLOCK
   CALL_C(b_+45, playSound_b00_hook, SYM(playSound_b00), b_+48);
   CYC(b_+48, b_+50); A = 0x02;
-  CYC(b_+50, b_+53); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+50, b_+53); TAIL(enemySetAnimation); // jp
 
 stateA:
   CYC(b_+53, b_+55); E = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+55, b_+56); A = mem_rd(gb, DE);
   CYC(b_+56, b_+57); alu_rrca(gb);
-  if (F & FC) { CALL_C(b_+57, ecom_applyVelocityForTopDownEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForTopDownEnemyNoHoles_b0d), b_+60); } else { CYC(b_+57, b_+60); } // call c
+  if (F & FC) { CALL_C_CC(b_+57, ecom_applyVelocityForTopDownEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForTopDownEnemyNoHoles_b0d), b_+60); } else { CYC(b_+57, b_+60); } // call c
   CALL_C(b_+60, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+63);
   if (!(F & FZ)) { CYCT(b_+63, b_+65); goto animate; } // jr nz
   CYC(b_+63, b_+65);
@@ -165,7 +165,7 @@ stateA:
   CYC(b_+67, b_+69); mem_wr(gb, HL, 0x0b);
 
 animate:
-  CYC(b_+69, b_+72); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+69, b_+72); TAIL(enemyAnimate); // jp
 
 stateB:
   CALL_C(b_+72, ecom_applyVelocityForTopDownEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForTopDownEnemyNoHoles_b0d), b_+75);
@@ -175,7 +175,7 @@ stateB:
   CYC(b_+79, b_+81); A = 0x09;
   CYC(b_+81, b_+82); mem_wr(gb, DE, A);
   CYC(b_+82, b_+84); A = 0x01;
-  CYC(b_+84, b_+87); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+84, b_+87); TAIL(enemySetAnimation); // jp
 }
 
 // 0d:4c3e, bare global; bladeTrap_subid02 aliases the same address (blue/gold blade traps).
@@ -229,7 +229,7 @@ state9:
   CYC(b_+53, b_+54); A = mem_rd(gb, DE);
   CYC(b_+54, b_+55); mem_wr(gb, HL, A);
   CYC(b_+55, b_+57); A = 0x75; // SND_UNKNOWN5
-  CYC(b_+57, b_+60); playSound_b00_hook(gb); return; // jp
+  CYC(b_+57, b_+60); TAIL(playSound_b00); // jp
 
 stateA:
   CALL_C(b_+60, ecom_applyVelocityForTopDownEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForTopDownEnemyNoHoles_b0d), b_+63);
@@ -263,7 +263,7 @@ beginRetracting:
   CYC(b_+97, b_+99); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+99, b_+100); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+100, b_+102); A = 0x50; // SND_CLINK
-  CYC(b_+102, b_+105); playSound_b00_hook(gb); return; // jp
+  CYC(b_+102, b_+105); TAIL(playSound_b00); // jp
 
 stateB:
   CALL_C(b_+105, ecom_applyVelocityForTopDownEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForTopDownEnemyNoHoles_b0d), b_+108);
@@ -299,7 +299,7 @@ void bladeTrap_subid03_hook(GB *gb) {
 state8:
   CYC(b_+6, b_+9); A = mem_rd(gb, wFrameCounter);
   CYC(b_+9, b_+11); alu_and(gb, 0x01);
-  if (F & FZ) { CALL_C(b_+11, bladeTrap_updateAngle_hook, SYM(bladeTrap_updateAngle), b_+14); } else { CYC(b_+11, b_+14); } // call z
+  if (F & FZ) { CALL_C_CC(b_+11, bladeTrap_updateAngle_hook, SYM(bladeTrap_updateAngle), b_+14); } else { CYC(b_+11, b_+14); } // call z
   CYC(b_+14, b_+15); H = D;
   CYC(b_+15, b_+17); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+17, b_+18); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
@@ -308,7 +308,7 @@ state8:
   CYC(b_+20, b_+21); C = A;
   CYC(b_+21, b_+22); A = mem_rd(gb, HL);
   CYC(b_+22, b_+24); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(b_+24, b_+27); objectSetPositionInCircleArc_hook(gb); return; // jp
+  CYC(b_+24, b_+27); TAIL(objectSetPositionInCircleArc); // jp
 }
 
 // 0d:4cd7, bare global; unlimited range green blade.
@@ -355,7 +355,7 @@ state9:
   CYC(b_+44, b_+46); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+46, b_+47); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+47, b_+49); A = 0x75; // SND_UNKNOWN5
-  CYC(b_+49, b_+52); playSound_b00_hook(gb); return; // jp
+  CYC(b_+49, b_+52); TAIL(playSound_b00); // jp
 
 stateA:
   CALL_C(b_+52, ecom_applyVelocityForTopDownEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForTopDownEnemyNoHoles_b0d), b_+55);
@@ -369,7 +369,7 @@ stateA:
   CYC(b_+65, b_+67); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+67, b_+69); mem_wr(gb, HL, 0x28); // SPEED_100
   CYC(b_+69, b_+71); A = 0x50; // SND_CLINK
-  CYC(b_+71, b_+74); playSound_b00_hook(gb); return; // jp
+  CYC(b_+71, b_+74); TAIL(playSound_b00); // jp
 
 stateB:
   CALL_C(b_+74, ecom_applyVelocityForTopDownEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForTopDownEnemyNoHoles_b0d), b_+77);
@@ -398,7 +398,7 @@ void bladeTrap_updateAngle_hook(GB *gb) {
   CYC(b_+5, b_+7); E = ENEMY_BASE + OBJ_ANGLE;
   if (!(F & FZ)) { CYCT(b_+7, b_+10); bladeTrap_decAngle_hook(gb); return; } // jp nz
   CYC(b_+7, b_+10);
-  CYC(b_+10, b_+13); bladeTrap_incAngle_hook(gb); return; // jp
+  CYC(b_+10, b_+13); TAIL(bladeTrap_incAngle); // jp
 }
 
 // 0d:4d43, bare global.
@@ -429,7 +429,7 @@ void bladeTrap_initCircular_hook(GB *gb) {
   CYC(b_+34, b_+36); E = ENEMY_BASE + 0x32; // Enemy.var32
   CYC(b_+36, b_+37); mem_wr(gb, DE, A);
   CYC(b_+37, b_+39); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(b_+39, b_+42); objectSetPositionInCircleArc_hook(gb); return; // jp
+  CYC(b_+39, b_+42); TAIL(objectSetPositionInCircleArc); // jp
 }
 
 // 0d:4dbf, called once from bladeTrap_checkObstructionsToTarget.

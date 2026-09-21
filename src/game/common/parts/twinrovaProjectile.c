@@ -131,7 +131,7 @@ state2:
   CYC(b_+143, b_+145);
 
 animate:
-  CYC(b_+145, b_+148); partAnimate_hook(gb); return; // jp
+  CYC(b_+145, b_+148); TAIL(partAnimate); // jp
 
 state3:
   CYC(b_+148, b_+150); A = 0x00;
@@ -156,9 +156,9 @@ decOtherHealth:
   CALL_C(b_+179, playSound_b00_hook, SYM(playSound_b00), b_+182);
 
 delete:
-  CYC(b_+182, b_+185); partDelete_hook(gb); return; // jp
+  CYC(b_+182, b_+185); TAIL(partDelete); // jp
 
 deleteWithPoof:
   CALL_C(b_+185, objectCreatePuff_hook, SYM(objectCreatePuff), b_+188);
-  CYC(b_+188, b_+191); partDelete_hook(gb); return; // jp
+  CYC(b_+188, b_+191); TAIL(partDelete); // jp
 }

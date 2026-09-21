@@ -106,7 +106,7 @@ state0:
   CYC(b_+62, b_+64); alu_and(gb, 0x1f);
   CYC(b_+64, b_+65); mem_wr(gb, DE, A);
   CALL_C(b_+65, interactionCodea4_func_5a67_hook, b_+121, b_+68);
-  CYC(b_+68, b_+71); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+68, b_+71); TAIL(objectSetVisible82); // jp
 
   // @angles (0b:5a35): pure ROM data (ANGLE_UP, ANGLE_RIGHT, ANGLE_DOWN), referenced only via
   // SET_HL(0x5a35) above.
@@ -159,7 +159,7 @@ void interactionCodea4_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, sidescrollPlatform_checkLinkOnPlatform_hook, SYM(sidescrollPlatform_checkLinkOnPlatform), b_+3);
   CALL_C(b_+3, interactionCodea4_updateState_hook, b_+9, b_+6);
-  CYC(b_+6, b_+9); sidescrollingPlatformCommon_hook(gb); return; // jp
+  CYC(b_+6, b_+9); TAIL(sidescrollingPlatformCommon); // jp
 }
 
 //;;
@@ -236,7 +236,7 @@ l_5ac4:
 
 moveLinkAtAngle:
   CYC(b_+87, b_+89); B = 0x14; // SPEED_80
-  CYC(b_+89, b_+92); updateLinkPositionGivenVelocity_hook(gb); return; // jp
+  CYC(b_+89, b_+92); TAIL(updateLinkPositionGivenVelocity); // jp
 }
 
 // @param[out] cflag c if Link got squished
@@ -352,7 +352,7 @@ l_5b3e:
   CYC(b_+24, b_+25); A = B;
   CYC(b_+25, b_+27); alu_add(gb, 0x08);
   CYC(b_+27, b_+28); B = A;
-  CYC(b_+28, b_+31); getTileCollisionsAtPosition_hook(gb); return; // jp
+  CYC(b_+28, b_+31); TAIL(getTileCollisionsAtPosition); // jp
 }
 
 // @param[out] hl

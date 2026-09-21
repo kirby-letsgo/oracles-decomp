@@ -126,7 +126,7 @@ setState:
   CYC(b_+71, b_+73); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
   CYC(b_+73, b_+75); A = 0x01;
   CALL_C(b_+75, enemySetAnimation_hook, SYM(enemySetAnimation), b_+78);
-  CYC(b_+78, b_+81); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+78, b_+81); TAIL(objectSetVisiblec1); // jp
 
 dead:
   CYC(b_+81, b_+83); E = ENEMY_BASE + OBJ_RELATED1 + 1;
@@ -137,7 +137,7 @@ dead:
   CYC(b_+88, b_+89); H = A;
   CYC(b_+89, b_+91); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+91, b_+92); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+92, b_+95); enemyDie_hook(gb); return; // jp
+  CYC(b_+92, b_+95); TAIL(enemyDie); // jp
 
 normalStatus:
   CALL_C(b_+95, ecom_getSubidAndCpStateTo08_b0d_hook, SYM(ecom_getSubidAndCpStateTo08_b0d), b_+98);
@@ -173,7 +173,7 @@ void likelike_state_uninitialized_hook(GB *gb) {
   CYC(b_+0, b_+2); alu_bit(gb, 0, B);
   if (F & FZ) CALL_C_CC(b_+2, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+5); else CYC(b_+2, b_+5); // call z
   CYC(b_+5, b_+7); A = 0x0a; // SPEED_40
-  CYC(b_+7, b_+10); ecom_setSpeedAndState8_b0d_hook(gb); return; // jp
+  CYC(b_+7, b_+10); TAIL(ecom_setSpeedAndState8_b0d); // jp
 }
 
 // 0d:5d22, bare global; jump-table target from enemyCode24. Internal @substate1/@substate2/
@@ -198,7 +198,7 @@ substate3:
   CYC(b_+15, b_+18); SET_HL(b_+23); // @defaultStates
   CYC(b_+18, b_+19); likelike_addAToHl_from_rst(gb, b_+19);
   CYC(b_+19, b_+20); B = mem_rd(gb, HL);
-  CYC(b_+20, b_+23); ecom_fallToGroundAndSetState_b0d_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(ecom_fallToGroundAndSetState_b0d); // jp
 }
 
 // 0d:5d3d, bare global; jump-table target from enemyCode24.
@@ -219,7 +219,7 @@ void likelike_state_galeSeed_hook(GB *gb) {
 
 decNum:
   CALL_C(b_+14, decNumEnemies_hook, SYM(decNumEnemies), b_+17);
-  CYC(b_+17, b_+20); enemyDelete_hook(gb); return; // jp
+  CYC(b_+17, b_+20); TAIL(enemyDelete); // jp
 }
 
 // 0d:5d51, bare global; jump-table target from enemyCode24.
@@ -256,7 +256,7 @@ void likelike_subid00_state8_hook(GB *gb) {
   CYC(b_+2, b_+3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
   CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+5, b_+7); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
-  likelike_state9_hook(gb); return; // fallthrough
+  TAIL(likelike_state9); // fallthrough
 }
 
 // 0d:5d67, bare global; jump-table target shared by likelike_subid00/02/03, also falls
@@ -276,7 +276,7 @@ void likelike_state9_hook(GB *gb) {
   CYC(b_+15, b_+17); A = 0x38;
   CYC(b_+17, b_+18); alu_add(gb, C);
   CYC(b_+18, b_+19); mem_wr(gb, DE, A);
-  CYC(b_+19, b_+21); likelike_animate_hook(gb); return; // jr
+  CYC(b_+19, b_+21); TAIL(likelike_animate); // jr
 }
 
 // 0d:5d7c, bare global; jump-table target shared by likelike_subid00/02/03. Moving in some
@@ -292,20 +292,20 @@ newDirection:
   CYC(b_+5, b_+6); H = D;
   CYC(b_+6, b_+8); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+8, b_+9); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+9, b_+11); likelike_animate_hook(gb); return; // jr
+  CYC(b_+9, b_+11); TAIL(likelike_animate); // jr
 
 move:
   CALL_C(b_+11, ecom_applyVelocityForSideviewEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0d), b_+14);
   if (F & FZ) { CYCT(b_+14, b_+16); goto newDirection; } // jr z
   CYC(b_+14, b_+16);
-  likelike_animate_hook(gb); return; // fallthrough
+  TAIL(likelike_animate); // fallthrough
 }
 
 // 0d:5d8c, bare global; called from likelike_state9/stateA/stateB/stateC and their
 // subid02/03 aliases.
 void likelike_animate_hook(GB *gb) {
   BASE(likelike_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // 0d:5d8f, bare global; jump-table target shared by likelike_subid00/03. Eating Link.
@@ -322,7 +322,7 @@ void likelike_stateB_hook(GB *gb) {
   CYC(b_+9, b_+11);
   CYC(b_+11, b_+12); L = alu_dec8(gb, L);
   CYC(b_+12, b_+13); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [counter1]++
-  CYC(b_+13, b_+15); likelike_animate_hook(gb); return; // jr
+  CYC(b_+13, b_+15); TAIL(likelike_animate); // jr
 
 releaseLink:
   CYC(b_+15, b_+17); mem_wr(gb, HL, 60);
@@ -348,7 +348,7 @@ afterShieldCheck:
   CYC(b_+50, b_+52); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+52, b_+53); mem_wr(gb, DE, A);
   CALL_C(b_+53, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), SYM(likelike_releaseLink));
-  likelike_releaseLink_hook(gb); return; // fallthrough
+  TAIL(likelike_releaseLink); // fallthrough
 }
 
 // 0d:5dc7, bare global; called from enemyCode24 and likelike_checkHazards, also falls into
@@ -361,7 +361,7 @@ void likelike_releaseLink_hook(GB *gb) {
   CYC(b_+5, b_+7); L = OBJ_COLLISION_TYPE; // <w1Link.collisionType
   CYC(b_+7, b_+9); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
   CYC(b_+9, b_+10); alu_xor(gb, A);
-  CYC(b_+10, b_+13); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+10, b_+13); TAIL(enemySetAnimation); // jp
 }
 
 // 0d:5dd4, bare global; jump-table target shared by likelike_subid00/02/03. Cooldown after
@@ -378,7 +378,7 @@ void likelike_stateC_hook(GB *gb) {
   CYC(b_+9, b_+10); mem_wr(gb, HL, A); // [state] -= 3
   CYC(b_+10, b_+12); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+12, b_+14); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
-  CYC(b_+14, b_+16); likelike_animate_hook(gb); return; // jr
+  CYC(b_+14, b_+16); TAIL(likelike_animate); // jr
 
 ranIntoWall:
   CALL_C(b_+16, ecom_applyVelocityForSideviewEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0d), b_+19);
@@ -388,7 +388,7 @@ ranIntoWall:
   CYC(b_+24, b_+26); alu_and(gb, 0x18);
   CYC(b_+26, b_+28); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+28, b_+29); mem_wr(gb, DE, A);
-  CYC(b_+29, b_+31); likelike_animate_hook(gb); return; // jr
+  CYC(b_+29, b_+31); TAIL(likelike_animate); // jr
 }
 
 // 0d:5df3, bare global; jump-table target from enemyCode24@normalState. Like-like spawner.
@@ -413,7 +413,7 @@ state8:
   CYC(b_+12, b_+13); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
   CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+15, b_+16); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+16, b_+19); likelike_findAllLikelikesWithSubid0_hook(gb); return; // jp
+  CYC(b_+16, b_+19); TAIL(likelike_findAllLikelikesWithSubid0); // jp
 
 state9:
   CYC(b_+19, b_+22); A = mem_rd(gb, w1Link + OBJ_YH);
@@ -517,20 +517,20 @@ state9:
   if (F & FZ) { CYCT(b_+38, b_+40); goto state9SetCollision; } // jr z
   CYC(b_+38, b_+40);
   CALL_C(b_+40, objectApplySpeed_hook, SYM(objectApplySpeed), b_+43);
-  CYC(b_+43, b_+45); likelike_animate2_hook(gb); return; // jr
+  CYC(b_+43, b_+45); TAIL(likelike_animate2); // jr
 
 state9SetCollision:
   CYC(b_+45, b_+46); L = E;
   CYC(b_+46, b_+47); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
   CYC(b_+47, b_+49); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+49, b_+51); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
-  likelike_animate2_hook(gb); return; // fallthrough
+  TAIL(likelike_animate2); // fallthrough
 }
 
 // 0d:5e87, bare global; called from likelike_subid02/03.
 void likelike_animate2_hook(GB *gb) {
   BASE(likelike_animate2);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // 0d:5e8a, bare global; jump-table target from enemyCode24@normalState. Internal @state8/
@@ -562,7 +562,7 @@ state8:
   CYC(b_+25, b_+27); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
   CYC(b_+27, b_+29); L = ENEMY_BASE + OBJ_SPEED_Z + 1;
   CYC(b_+29, b_+31); mem_wr(gb, HL, 0x02);
-  CYC(b_+31, b_+34); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+31, b_+34); TAIL(objectSetVisiblec1); // jp
 
 state9:
   CYC(b_+34, b_+36); C = 0x08;
@@ -572,7 +572,7 @@ state9:
   CYC(b_+41, b_+43); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+43, b_+44); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CALL_C(b_+44, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+47);
-  CYC(b_+47, b_+49); likelike_animate2_hook(gb); return; // jr
+  CYC(b_+47, b_+49); TAIL(likelike_animate2); // jr
 
 stateB:
   CYC(b_+49, b_+51); C = 0x08;
@@ -580,7 +580,7 @@ stateB:
   CYC(b_+54, b_+56); L = ENEMY_BASE + OBJ_ZH;
   CYC(b_+56, b_+57); A = mem_rd(gb, HL);
   CYC(b_+57, b_+60); mem_wr(gb, w1Link + OBJ_ZH, A);
-  CYC(b_+60, b_+63); likelike_stateB_hook(gb); return; // jp
+  CYC(b_+60, b_+63); TAIL(likelike_stateB); // jp
 }
 
 // 0d:5ec9, bare global; called from likelike_subid01. Spawner (subid 1) calls this to make
@@ -705,5 +705,5 @@ void likelike_checkHazards_hook(GB *gb) {
 
 restoreAf:
   SET_AF(POP(b_+29));
-  CYC(b_+30, b_+33); ecom_checkHazards_b0d_hook(gb); return; // jp
+  CYC(b_+30, b_+33); TAIL(ecom_checkHazards_b0d); // jp
 }

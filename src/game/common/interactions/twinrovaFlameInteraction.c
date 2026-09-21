@@ -94,7 +94,7 @@ positionAndVisible:
   CYC(b_+59, b_+60); C = mem_rd(gb, HL);
   CYC(b_+60, b_+61); B = A;
   CALL_C(b_+61, interactionSetPosition_hook, SYM(interactionSetPosition), b_+64);
-  CYC(b_+64, b_+67); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+64, b_+67); TAIL(objectSetVisiblec2); // jp
 
   // @positions (0b:5f91): pure ROM data, not ported as code -- three groups of three (yh, zh)
   // byte pairs indexed by (subid & 3) * 2, referenced only via SET_HL(0x5f91) above.
@@ -105,5 +105,5 @@ state2:
   CYC(b_+91, b_+92); alu_rrca(gb);
   if (F & FC) { CYCT(b_+92, b_+95); objectSetVisible_hook(gb); return; } // jp c
   CYC(b_+92, b_+95);
-  CYC(b_+95, b_+98); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+95, b_+98); TAIL(objectSetInvisible); // jp
 }

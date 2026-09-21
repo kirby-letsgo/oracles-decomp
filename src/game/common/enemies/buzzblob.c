@@ -69,7 +69,7 @@ void enemyCode18_hook(GB *gb) {
   CYC(b_+40, b_+42); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+42, b_+44); mem_wr(gb, HL, 0x3c);
   CYC(b_+44, b_+46); A = 0x01;
-  CYC(b_+46, b_+49); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+46, b_+49); TAIL(enemySetAnimation); // jp
 
 becomeCukeman:
   CYC(b_+49, b_+51); L = ENEMY_BASE + 0x30; // Enemy.var30
@@ -80,7 +80,7 @@ becomeCukeman:
   CYC(b_+55, b_+56); mem_wr(gb, HL, A);
   CALL_C(b_+56, enemySetAnimation_hook, SYM(enemySetAnimation), b_+59);
   CYC(b_+59, b_+61); E = ENEMY_BASE + OBJ_PRESSED_A_BUTTON;
-  CYC(b_+61, b_+64); objectAddToAButtonSensitiveObjectList_hook(gb); return; // jp
+  CYC(b_+61, b_+64); TAIL(objectAddToAButtonSensitiveObjectList); // jp
 
 normalStatus:
   CALL_C(b_+64, buzzblob_checkShowText_hook, SYM(buzzblob_checkShowText), b_+67);
@@ -124,7 +124,7 @@ void buzzblob_state_scentSeed_hook(GB *gb) {
   CYC(b_+4, b_+6);
   CYC(b_+6, b_+8); A = 0x08;
   CYC(b_+8, b_+9); mem_wr(gb, DE, A); // [state] = 8
-  CYC(b_+9, b_+11); buzzblob_animate_hook(gb); return; // jr
+  CYC(b_+9, b_+11); TAIL(buzzblob_animate); // jr
 
 seek:
   CALL_C(b_+11, ecom_updateAngleToScentSeed_b0d_hook, SYM(ecom_updateAngleToScentSeed_b0d), b_+14);
@@ -134,7 +134,7 @@ seek:
   CYC(b_+19, b_+21); alu_and(gb, 0x18);
   CYC(b_+21, b_+22); mem_wr(gb, DE, A);
   CALL_C(b_+22, ecom_applyVelocityForSideviewEnemy_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemy_b0d), b_+25);
-  CYC(b_+25, b_+28); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+25, b_+28); TAIL(enemyAnimate); // jp
 }
 
 // 0d:56c3, bare global.
@@ -158,7 +158,7 @@ void buzzblob_state8_hook(GB *gb) {
   CYC(b_+15, b_+17); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+17, b_+18); A = B;
   CYC(b_+18, b_+19); mem_wr(gb, DE, A);
-  CYC(b_+19, b_+21); buzzblob_animate_hook(gb); return; // jr
+  CYC(b_+19, b_+21); TAIL(buzzblob_animate); // jr
 }
 
 // 0d:56d9, bare global; moving in some direction for a certain amount of time.
@@ -170,13 +170,13 @@ void buzzblob_state9_hook(GB *gb) {
   CYC(b_+3, b_+5);
   CALL_C(b_+5, ecom_bounceOffWallsAndHoles_b0d_hook, SYM(ecom_bounceOffWallsAndHoles_b0d), b_+8);
   CALL_C(b_+8, objectApplySpeed_hook, SYM(objectApplySpeed), SYM(buzzblob_animate));
-  buzzblob_animate_hook(gb); return; // fallthrough
+  TAIL(buzzblob_animate); // fallthrough
 }
 
 // 0d:56e4, bare global.
 void buzzblob_animate_hook(GB *gb) {
   BASE(buzzblob_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // 0d:56e7, bare global; "shocking Link" state.
@@ -189,7 +189,7 @@ void buzzblob_stateA_hook(GB *gb) {
   CYC(b_+5, b_+7); E = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+7, b_+8); A = mem_rd(gb, DE);
   CALL_C(b_+8, enemySetAnimation_hook, SYM(enemySetAnimation), SYM(buzzblob_chooseNewDirection));
-  buzzblob_chooseNewDirection_hook(gb); return; // fallthrough
+  TAIL(buzzblob_chooseNewDirection); // fallthrough
 }
 
 // 0d:56f2, bare global.
@@ -202,7 +202,7 @@ void buzzblob_chooseNewDirection_hook(GB *gb) {
   CYC(b_+7, b_+9); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 4))); // set 4,(hl)
   CYC(b_+9, b_+11); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+11, b_+13); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
-  CYC(b_+13, b_+15); buzzblob_animate_hook(gb); return; // jr
+  CYC(b_+13, b_+15); TAIL(buzzblob_animate); // jr
 }
 
 // 0d:5701, bare global; boundary item shared with the buzzblob source file.
@@ -221,5 +221,5 @@ void buzzblob_checkShowText_hook(GB *gb) {
   CYC(b_+12, b_+14); alu_add(gb, 0x1e); // <TX_2f1e
   CYC(b_+14, b_+15); C = A;
   CYC(b_+15, b_+17); B = 0x2f; // >TX_2f00
-  CYC(b_+17, b_+20); showText_hook(gb); return; // jp
+  CYC(b_+17, b_+20); TAIL(showText); // jp
 }

@@ -45,5 +45,5 @@ relatedObj1_stateLessThan3:
   CYC(b_+47, b_+48); alu_rrca(gb);
   if (F & FC) { CYCT(b_+48, b_+51); objectSetInvisible_hook(gb); return; } // jp c
   CYC(b_+48, b_+51);
-  CYC(b_+51, b_+54); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+51, b_+54); TAIL(objectSetVisible83); // jp
 }

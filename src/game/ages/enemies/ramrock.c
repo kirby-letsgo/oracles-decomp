@@ -350,12 +350,12 @@ void ramrock_state8_hook(GB *gb) {
   CYC(b_+1, b_+2); A = mem_rd(gb, DE);
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (ramrock_jump_table(gb));
-    if (jt_ == SYM(ramrock_state8_substate0)) { ramrock_state8_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_state8_substate1)) { ramrock_state8_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_state8_substate2)) { ramrock_state8_substate2_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_state8_substate3)) { ramrock_state8_substate3_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_state8_substate4)) { ramrock_state8_substate4_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_state8_substate5)) { ramrock_state8_substate5_hook(gb); return; }
+    if (jt_ == SYM(ramrock_state8_substate0) && hook_enabled_at(gb, SYM(ramrock_state8_substate0))) { ramrock_state8_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_state8_substate1) && hook_enabled_at(gb, SYM(ramrock_state8_substate1))) { ramrock_state8_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_state8_substate2) && hook_enabled_at(gb, SYM(ramrock_state8_substate2))) { ramrock_state8_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_state8_substate3) && hook_enabled_at(gb, SYM(ramrock_state8_substate3))) { ramrock_state8_substate3_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_state8_substate4) && hook_enabled_at(gb, SYM(ramrock_state8_substate4))) { ramrock_state8_substate4_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_state8_substate5) && hook_enabled_at(gb, SYM(ramrock_state8_substate5))) { ramrock_state8_substate5_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -392,8 +392,7 @@ void ramrock_swordPhase_hook(GB *gb) {
   CYC(b_+6, b_+8); alu_cp(gb, 0x03);
   if (!(F & FC)) {
     CYCT(b_+8, b_+10);
-    ramrock_updateHorizontalMovement_hook(gb);
-    return;
+    TAIL(ramrock_updateHorizontalMovement);
   }
   CYC(b_+8, b_+10);
   CYC(b_+10, b_+13); alu_xor(gb, A);
@@ -506,8 +505,7 @@ checkVar35:
   CYC(b_+19, b_+21); alu_cp(gb, 0x03);
   if (!(F & FC)) {
     CYCT(b_+21, b_+23);
-    label_10_237_hook(gb);
-    return;
+    TAIL(label_10_237);
   }
   CYC(b_+21, b_+23);
   CALL_C(b_+23, enemyAnimate_hook, SYM(enemyAnimate), b_+26);
@@ -515,8 +513,7 @@ checkVar35:
   CALL_C(b_+29, ecom_decCounter2_b10_hook, SYM(ecom_decCounter2_b10), b_+32);
   if (F & FZ) {
     CYCT(b_+32, b_+34);
-    label_10_236_hook(gb);
-    return;
+    TAIL(label_10_236);
   }
   CYC(b_+32, b_+34);
   CALL_C(b_+34, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+37);
@@ -547,8 +544,7 @@ void ramrock_bombPhase_substate4_hook(GB *gb) {
   CYC(b_+17, b_+19); mem_wr(gb, HL, 0x09);
   CYC(b_+19, b_+21); A = 0x81;
   CYC(b_+21, b_+24);
-  playSound_b00_hook(gb);
-  return;
+  TAIL(playSound_b00);
 rla:
   CYC(b_+24, b_+25); alu_rla(gb);
   if (!(F & FC)) { RET_TAKEN(b_+25); return; }
@@ -566,11 +562,11 @@ void ramrock_bombPhase__func_68fe_hook(GB *gb) {
   CYC(b_+34, b_+35); A = mem_rd(gb, DE);
   CYC(b_+35, b_+36); push_effect(gb, b_+36);
   do { uint16_t jt_ = (ramrock_jump_table(gb));
-    if (jt_ == SYM(ramrock_bombPhase_substate0)) { ramrock_bombPhase_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_bombPhase_substate1)) { ramrock_bombPhase_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_bombPhase_substate2)) { ramrock_bombPhase_substate2_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_bombPhase_substate3)) { ramrock_bombPhase_substate3_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_bombPhase_substate4)) { ramrock_bombPhase_substate4_hook(gb); return; }
+    if (jt_ == SYM(ramrock_bombPhase_substate0) && hook_enabled_at(gb, SYM(ramrock_bombPhase_substate0))) { ramrock_bombPhase_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_bombPhase_substate1) && hook_enabled_at(gb, SYM(ramrock_bombPhase_substate1))) { ramrock_bombPhase_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_bombPhase_substate2) && hook_enabled_at(gb, SYM(ramrock_bombPhase_substate2))) { ramrock_bombPhase_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_bombPhase_substate3) && hook_enabled_at(gb, SYM(ramrock_bombPhase_substate3))) { ramrock_bombPhase_substate3_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_bombPhase_substate4) && hook_enabled_at(gb, SYM(ramrock_bombPhase_substate4))) { ramrock_bombPhase_substate4_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -649,8 +645,7 @@ spawnArm:
   }
   CYC(b_+42, b_+44);
   CYC(b_+44, b_+47);
-  ecom_incSubstate_b10_hook(gb);
-  return;
+  TAIL(ecom_incSubstate_b10);
 updateMovement:
   CALL_C(b_+47, objectGetRelativeAngle_hook, SYM(objectGetRelativeAngle), b_+50);
   CYC(b_+50, b_+52); E = ENEMY_BASE + OBJ_ANGLE;
@@ -672,8 +667,7 @@ void ramrock_seedPhase_substate1_hook(GB *gb) {
   CYC(b_+9, b_+10); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+10, b_+12);
-    label_10_248_hook(gb);
-    return;
+    TAIL(label_10_248);
   }
   CYC(b_+10, b_+12);
   CALL_C(b_+12, enemyAnimate_hook, SYM(enemyAnimate), b_+15);
@@ -740,8 +734,7 @@ void ramrock_seedPhase_substate3_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_cp(gb, 0x0e);
   if (!(F & FZ)) {
     CYCT(b_+5, b_+7);
-    ramrock_seedPhase_resumeNormalMovement_hook(gb);
-    return;
+    TAIL(ramrock_seedPhase_resumeNormalMovement);
   }
   CYC(b_+5, b_+7);
   CALL_C(b_+7, ramrock_updateHorizontalMovement_hook, SYM(ramrock_updateHorizontalMovement), b_+10);
@@ -779,8 +772,7 @@ void ramrock_seedPhase_substate4_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_cp(gb, 0x0e);
   if (!(F & FZ)) {
     CYCT(b_+5, b_+8);
-    ramrock_seedPhase_resumeNormalMovement_hook(gb);
-    return;
+    TAIL(ramrock_seedPhase_resumeNormalMovement);
   }
   CYC(b_+5, b_+8);
   CALL_C(b_+8, ecom_decCounter2_b10_hook, SYM(ecom_decCounter2_b10), b_+11);
@@ -801,8 +793,7 @@ void ramrock_seedPhase_substate4_hook(GB *gb) {
     CYC(b_+22, b_+25);
   }
   CYC(b_+25, b_+28);
-  ramrock_updateHorizontalMovement_hook(gb);
-  return;
+  TAIL(ramrock_updateHorizontalMovement);
 gotoNextSubstate:
   CALL_C(b_+28, ecom_incSubstate_b10_hook, SYM(ecom_incSubstate_b10), b_+31);
   CYC(b_+31, b_+33); L = ENEMY_BASE + OBJ_COUNTER1;
@@ -922,13 +913,13 @@ runSubstate:
   CYC(b_+72, b_+73); A = mem_rd(gb, DE);
   CYC(b_+73, b_+74); push_effect(gb, b_+74);
   do { uint16_t jt_ = (ramrock_jump_table(gb));
-    if (jt_ == SYM(ramrock_seedPhase_substate0)) { ramrock_seedPhase_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_seedPhase_substate1)) { ramrock_seedPhase_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_seedPhase_substate2)) { ramrock_seedPhase_substate2_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_seedPhase_substate3)) { ramrock_seedPhase_substate3_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_seedPhase_substate4)) { ramrock_seedPhase_substate4_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_seedPhase_substate5)) { ramrock_seedPhase_substate5_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_seedPhase_substate6)) { ramrock_seedPhase_substate6_hook(gb); return; }
+    if (jt_ == SYM(ramrock_seedPhase_substate0) && hook_enabled_at(gb, SYM(ramrock_seedPhase_substate0))) { ramrock_seedPhase_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_seedPhase_substate1) && hook_enabled_at(gb, SYM(ramrock_seedPhase_substate1))) { ramrock_seedPhase_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_seedPhase_substate2) && hook_enabled_at(gb, SYM(ramrock_seedPhase_substate2))) { ramrock_seedPhase_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_seedPhase_substate3) && hook_enabled_at(gb, SYM(ramrock_seedPhase_substate3))) { ramrock_seedPhase_substate3_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_seedPhase_substate4) && hook_enabled_at(gb, SYM(ramrock_seedPhase_substate4))) { ramrock_seedPhase_substate4_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_seedPhase_substate5) && hook_enabled_at(gb, SYM(ramrock_seedPhase_substate5))) { ramrock_seedPhase_substate5_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_seedPhase_substate6) && hook_enabled_at(gb, SYM(ramrock_seedPhase_substate6))) { ramrock_seedPhase_substate6_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 seedPhaseEnd:
@@ -982,8 +973,7 @@ spawnArm:
   CYC(b_+40, b_+42); A = 0x04;
   if (!(F & FZ)) {
     CYCT(b_+42, b_+45);
-    enemySetAnimation_hook(gb);
-    return;
+    TAIL(enemySetAnimation);
   }
   CYC(b_+42, b_+45);
   CYC(b_+45, b_+46); A = B;
@@ -1060,16 +1050,14 @@ void ramrock_glovePhase_substate3_hook(GB *gb) {
   CALL_C(b_+16, ecom_decCounter2_b10_hook, SYM(ecom_decCounter2_b10), b_+19);
   if (!(F & FZ)) {
     CYCT(b_+19, b_+21);
-    ramrock_glovePhase_reverseDirection_hook(gb);
-    return;
+    TAIL(ramrock_glovePhase_reverseDirection);
   }
   CYC(b_+19, b_+21);
   CYC(b_+21, b_+23); C = 0x50;
   CALL_C(b_+23, objectCheckLinkWithinDistance_hook, SYM(objectCheckLinkWithinDistance), b_+26);
   if (!(F & FC)) {
     CYCT(b_+26, b_+28);
-    ramrock_glovePhase_reverseDirection_hook(gb);
-    return;
+    TAIL(ramrock_glovePhase_reverseDirection);
   }
   CYC(b_+26, b_+28);
   CYC(b_+28, b_+29); H = D;
@@ -1112,8 +1100,7 @@ void ramrock_glovePhase_substate4_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+15); return; }
   CYC(b_+15, b_+16);
   CYC(b_+16, b_+18);
-  ramrock_glovePhase_gotoSubstate3_hook(gb);
-  return;
+  TAIL(ramrock_glovePhase_gotoSubstate3);
 dead:
   CYC(b_+18, b_+20); E = ENEMY_BASE + OBJ_HEALTH;
   CYC(b_+20, b_+21); alu_xor(gb, A);
@@ -1129,11 +1116,11 @@ void ramrock_glovePhase_hook(GB *gb) {
   CYC(b_+1, b_+2); A = mem_rd(gb, DE);
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (ramrock_jump_table(gb));
-    if (jt_ == SYM(ramrock_glovePhase_substate0)) { ramrock_glovePhase_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_glovePhase_substate1)) { ramrock_glovePhase_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_glovePhase_substate2)) { ramrock_glovePhase_substate2_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_glovePhase_substate3)) { ramrock_glovePhase_substate3_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_glovePhase_substate4)) { ramrock_glovePhase_substate4_hook(gb); return; }
+    if (jt_ == SYM(ramrock_glovePhase_substate0) && hook_enabled_at(gb, SYM(ramrock_glovePhase_substate0))) { ramrock_glovePhase_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_glovePhase_substate1) && hook_enabled_at(gb, SYM(ramrock_glovePhase_substate1))) { ramrock_glovePhase_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_glovePhase_substate2) && hook_enabled_at(gb, SYM(ramrock_glovePhase_substate2))) { ramrock_glovePhase_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_glovePhase_substate3) && hook_enabled_at(gb, SYM(ramrock_glovePhase_substate3))) { ramrock_glovePhase_substate3_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_glovePhase_substate4) && hook_enabled_at(gb, SYM(ramrock_glovePhase_substate4))) { ramrock_glovePhase_substate4_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -1145,13 +1132,13 @@ void enemyCode07_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ramrock_jump_table(gb));
-    if (jt_ == SYM(ramrock_state0)) { ramrock_state0_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_state_stub)) { ramrock_state_stub_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_state8)) { ramrock_state8_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_swordPhase)) { ramrock_swordPhase_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_bombPhase)) { ramrock_bombPhase_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_seedPhase)) { ramrock_seedPhase_hook(gb); return; }
-    else if (jt_ == SYM(ramrock_glovePhase)) { ramrock_glovePhase_hook(gb); return; }
+    if (jt_ == SYM(ramrock_state0) && hook_enabled_at(gb, SYM(ramrock_state0))) { ramrock_state0_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_state_stub) && hook_enabled_at(gb, SYM(ramrock_state_stub))) { ramrock_state_stub_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_state8) && hook_enabled_at(gb, SYM(ramrock_state8))) { ramrock_state8_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_swordPhase) && hook_enabled_at(gb, SYM(ramrock_swordPhase))) { ramrock_swordPhase_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_bombPhase) && hook_enabled_at(gb, SYM(ramrock_bombPhase))) { ramrock_bombPhase_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_seedPhase) && hook_enabled_at(gb, SYM(ramrock_seedPhase))) { ramrock_seedPhase_hook(gb); return; }
+    else if (jt_ == SYM(ramrock_glovePhase) && hook_enabled_at(gb, SYM(ramrock_glovePhase))) { ramrock_glovePhase_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

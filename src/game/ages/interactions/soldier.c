@@ -70,18 +70,18 @@ void interactionCode40_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (soldier_jump_table(gb));
-    if (jt_ == SYM(soldierSubid00)) { soldierSubid00_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid02)) { soldierSubid02_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid03)) { soldierSubid03_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid04)) { soldierSubid04_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid05)) { soldierSubid05_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid06)) { soldierSubid06_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid07)) { soldierSubid07_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid08)) { soldierSubid08_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid0a)) { soldierSubid0a_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid0b)) { soldierSubid0b_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid0c)) { soldierSubid0c_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid0d)) { soldierSubid0d_hook(gb); return; }
+    if (jt_ == SYM(soldierSubid00) && hook_enabled_at(gb, SYM(soldierSubid00))) { soldierSubid00_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid02) && hook_enabled_at(gb, SYM(soldierSubid02))) { soldierSubid02_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid03) && hook_enabled_at(gb, SYM(soldierSubid03))) { soldierSubid03_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid04) && hook_enabled_at(gb, SYM(soldierSubid04))) { soldierSubid04_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid05) && hook_enabled_at(gb, SYM(soldierSubid05))) { soldierSubid05_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid06) && hook_enabled_at(gb, SYM(soldierSubid06))) { soldierSubid06_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid07) && hook_enabled_at(gb, SYM(soldierSubid07))) { soldierSubid07_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid08) && hook_enabled_at(gb, SYM(soldierSubid08))) { soldierSubid08_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid0a) && hook_enabled_at(gb, SYM(soldierSubid0a))) { soldierSubid0a_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid0b) && hook_enabled_at(gb, SYM(soldierSubid0b))) { soldierSubid0b_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid0c) && hook_enabled_at(gb, SYM(soldierSubid0c))) { soldierSubid0c_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid0d) && hook_enabled_at(gb, SYM(soldierSubid0d))) { soldierSubid0d_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -167,11 +167,11 @@ state1:
   CYC(b_+32, b_+33); A = mem_rd(gb, DE);
   CYC(b_+33, b_+34); push_effect(gb, b_+34);
   do { uint16_t jt_ = (soldier_jump_table(gb));
-    if (jt_ == SYM(soldierSubid04Substate0)) { soldierSubid04Substate0_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid04Substate1)) { soldierSubid04Substate1_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid04Substate2)) { soldierSubid04Substate2_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid04Substate3)) { soldierSubid04Substate3_hook(gb); return; }
-    else if (jt_ == SYM(soldierSubid04Substate4)) { soldierSubid04Substate4_hook(gb); return; }
+    if (jt_ == SYM(soldierSubid04Substate0) && hook_enabled_at(gb, SYM(soldierSubid04Substate0))) { soldierSubid04Substate0_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid04Substate1) && hook_enabled_at(gb, SYM(soldierSubid04Substate1))) { soldierSubid04Substate1_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid04Substate2) && hook_enabled_at(gb, SYM(soldierSubid04Substate2))) { soldierSubid04Substate2_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid04Substate3) && hook_enabled_at(gb, SYM(soldierSubid04Substate3))) { soldierSubid04Substate3_hook(gb); return; }
+    else if (jt_ == SYM(soldierSubid04Substate4) && hook_enabled_at(gb, SYM(soldierSubid04Substate4))) { soldierSubid04Substate4_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -258,7 +258,7 @@ void soldierSubid05_hook(GB *gb) {
   CALL_C(b_+23, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+26);
   CYC(b_+26, b_+29); SET_HL(w1Link_xh);
   CYC(b_+29, b_+31); mem_wr(gb, HL, 0x50);
-  CYC(b_+31, b_+34); objectSetVisible82_hook(gb); return;
+  CYC(b_+31, b_+34); TAIL(objectSetVisible82);
 state1:
   CALL_C(b_+34, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+37);
   if (!(F & FC)) { CYCT(b_+37, b_+40); interactionDelete_hook(gb); return; } CYC(b_+37, b_+40);
@@ -287,7 +287,7 @@ void soldierSubid06_hook(GB *gb) {
   CALL_C(b_+19, soldierInitGraphicsAndLoadScript_hook, SYM(soldierInitGraphicsAndLoadScript), b_+22);
   CYC(b_+22, b_+23); alu_xor(gb, A);
   CALL_C(b_+23, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+26);
-  CYC(b_+26, b_+29); objectSetVisible82_hook(gb); return;
+  CYC(b_+26, b_+29); TAIL(objectSetVisible82);
 state1:
   CALL_C(b_+29, checkInteractionSubstate_hook, SYM(checkInteractionSubstate), b_+32);
   if (!(F & FZ)) { CYCT(b_+32, b_+34); goto update; } CYC(b_+32, b_+34);
@@ -311,7 +311,7 @@ void soldierSubid07_hook(GB *gb) {
   CALL_C(b_+5, soldierCheckBeatD6_hook, SYM(soldierCheckBeatD6), b_+8);
   if (!(F & FC)) { CYCT(b_+8, b_+11); interactionDelete_hook(gb); return; } CYC(b_+8, b_+11);
   CALL_C(b_+11, soldierInitGraphicsAndLoadScript_hook, SYM(soldierInitGraphicsAndLoadScript), b_+14);
-  CYC(b_+14, b_+17); objectSetVisible82_hook(gb); return;
+  CYC(b_+14, b_+17); TAIL(objectSetVisible82);
 state1:
   CALL_C(b_+17, interactionRunScript_hook, SYM(interactionRunScript), b_+20);
   CYC(b_+20, b_+23); interactionAnimateAsNpc_hook(gb);
@@ -325,7 +325,7 @@ void soldierSubid08_hook(GB *gb) {
   CALL_C(b_+5, soldierInitGraphics_hook, SYM(soldierInitGraphics), b_+8);
   CYC(b_+8, b_+10); L = 0x5c;
   CYC(b_+10, b_+12); mem_wr(gb, HL, 3);
-  CYC(b_+12, b_+15); objectSetVisible82_hook(gb); return;
+  CYC(b_+12, b_+15); TAIL(objectSetVisible82);
 state1:
   CYC(b_+15, b_+18); SET_HL((SYM(checkNpcShouldExistAtGameStage_body__data5__subid2) + 3));
   CYC(b_+18, b_+20); E = 0x15;
@@ -342,7 +342,7 @@ void soldierSubid0a_hook(GB *gb) {
   CYC(b_+8, b_+10); L = 0x5c;
   CYC(b_+10, b_+12); mem_wr(gb, HL, 2);
   CYC(b_+12, b_+15); SET_BC(SYM(interactionCode55));
-  CYC(b_+15, b_+18); interactionSetPosition_hook(gb); return;
+  CYC(b_+15, b_+18); TAIL(interactionSetPosition);
 state1:
   CALL_C(b_+18, soldierUpdateAnimationAndRunScript_hook, SYM(soldierUpdateAnimationAndRunScript), b_+21);
   if (!(F & FC)) { CYCT(b_+21, b_+22); ret_effect(gb); return; } CYC(b_+21, b_+22);
@@ -404,7 +404,7 @@ state1:
   if (!(F & FZ)) { CYCT(b_+69, b_+71); goto L_51bc; } CYC(b_+69, b_+71);
   CALL_C(b_+71, interactionRunScript_hook, SYM(interactionRunScript), b_+74);
   if (F & FC) { CYCT(b_+74, b_+77); interactionDelete_hook(gb); return; } CYC(b_+74, b_+77);
-  CYC(b_+77, b_+80); npcFaceLinkAndAnimate_hook(gb); return;
+  CYC(b_+77, b_+80); TAIL(npcFaceLinkAndAnimate);
 L_51bc:
   CYC(b_+80, b_+82); E = 0x7f;
   CYC(b_+82, b_+83); A = mem_rd(gb, DE);

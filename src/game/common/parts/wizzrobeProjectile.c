@@ -19,7 +19,7 @@ void func_5369_hook(GB *gb) {
   CYC(b_+10, b_+12); A = alu_swap(gb, A);
   CYC(b_+12, b_+13); alu_rlca(gb);
   CALL_C(b_+13, partSetAnimation_hook, SYM(partSetAnimation), b_+16);
-  CYC(b_+16, b_+19); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+16, b_+19); TAIL(objectSetVisible81); // jp
 }
 
 void partCode1f_hook(GB *gb) {
@@ -40,5 +40,5 @@ void partCode1f_hook(GB *gb) {
   CYC(b_+16, b_+19);
 
 normalStatus:
-  CYC(b_+19, b_+22); partDelete_hook(gb); return; // jp
+  CYC(b_+19, b_+22); TAIL(partDelete); // jp
 }

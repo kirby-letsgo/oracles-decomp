@@ -137,7 +137,7 @@ state0:
   CYC(b_+63, b_+65); L = 0x00;
   CYC(b_+65, b_+67); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
   CALL_C(b_+67, parentItemLoadAnimationAndIncState_hook, SYM(parentItemLoadAnimationAndIncState), b_+70);
-  CYC(b_+70, b_+73); itemCreateChild_hook(gb); return;
+  CYC(b_+70, b_+73); TAIL(itemCreateChild);
 
 state1:
   CYC(b_+73, b_+76); A = W8(wcc63);
@@ -204,7 +204,7 @@ state6:
   CYC(b_+165, b_+166); mem_wr(gb, HL, A);
   CYC(b_+166, b_+168); L = 0x06;
   CYC(b_+168, b_+170); mem_wr(gb, HL, 0x28);
-  CYC(b_+170, b_+173); itemEnableLinkMovement_hook(gb); return;
+  CYC(b_+170, b_+173); TAIL(itemEnableLinkMovement);
 
 enemy_contact:
   CYC(b_+173, b_+175); alu_bit(gb, 0, A);
@@ -261,7 +261,7 @@ charge_without_beam:
   CYC(b_+248, b_+250); A = 0x03;
   CYC(b_+250, b_+253); W8(w1WeaponItem_state) = A;
   CYC(b_+253, b_+255); A = 0x4f;
-  CYC(b_+255, b_+258); playSound_b00_hook(gb); return;
+  CYC(b_+255, b_+258); TAIL(playSound_b00);
 
 state3:
   CYC(b_+258, b_+261); push_effect(gb, b_+261);
@@ -303,7 +303,7 @@ spin_start:
   CYC(b_+321, b_+323); mem_wr(gb, HL, alu_sla(gb, mem_rd(gb, HL)));
   CALL_C(b_+323, itemDisableLinkMovement_hook, SYM(itemDisableLinkMovement), b_+326);
   CYC(b_+326, b_+328); A = 0x6b;
-  CYC(b_+328, b_+331); playSound_b00_hook(gb); return;
+  CYC(b_+328, b_+331); TAIL(playSound_b00);
 
 state4:
   CALL_C(b_+331, specialObjectAnimate_optimized_hook, SYM(specialObjectAnimate_optimized), b_+334);
@@ -344,7 +344,7 @@ state5:
 delete_self:
   CYC(b_+382, b_+383); alu_xor(gb, A);
   CYC(b_+383, b_+386); W8(wcc63) = A;
-  CYC(b_+386, b_+389); clearParentItem_hook(gb); return;
+  CYC(b_+386, b_+389); TAIL(clearParentItem);
 
 trigger_poke:
   CYC(b_+417, b_+418); H = D;
@@ -357,7 +357,7 @@ trigger_poke:
   CYC(b_+432, b_+434); A = 0x1f;
   if (F & FZ) CYCT(b_+434, b_+436);
   else { CYC(b_+434, b_+436); CYC(b_+436, b_+438); A = 0x2c; }
-  CYC(b_+438, b_+441); specialObjectSetAnimationWithLinkData_hook(gb); return;
+  CYC(b_+438, b_+441); TAIL(specialObjectSetAnimationWithLinkData);
 
 check_create_beam:
   CYC(b_+441, b_+443); C = 0x08;

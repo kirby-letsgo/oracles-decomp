@@ -81,7 +81,7 @@ L_4529:
   CYC(b_+63, b_+65); E = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+65, b_+66); mem_wr(gb, DE, A);
   CYC(b_+66, b_+68); A = 0x32; // SPEED_140
-  CYC(b_+68, b_+71); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
+  CYC(b_+68, b_+71); TAIL(ecom_setSpeedAndState8AndVisible_b0e); // jp
 
 state_switchHook:
   CYC(b_+71, b_+72); E = alu_inc8(gb, E);
@@ -122,10 +122,10 @@ state8:
   CYC(b_+111, b_+112); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+112, b_+114); mem_wr(gb, HL, 0x18);
   CYC(b_+114, b_+116); A = 0x01;
-  CYC(b_+116, b_+119); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+116, b_+119); TAIL(enemySetAnimation); // jp
 
 animate:
-  CYC(b_+119, b_+122); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+119, b_+122); TAIL(enemyAnimate); // jp
 
 state9:
   CALL_C(b_+122, ecom_decCounter2_b0e_hook, SYM(ecom_decCounter2_b0e), b_+125);
@@ -134,7 +134,7 @@ state9:
   CYC(b_+126, b_+127); L = E;
   CYC(b_+127, b_+128); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [state]
   CYC(b_+128, b_+130); A = 0x02;
-  CYC(b_+130, b_+133); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+130, b_+133); TAIL(enemySetAnimation); // jp
 
 stateA:
   CYC(b_+133, b_+135); A = 0x0b;
@@ -159,7 +159,7 @@ L_4585:
   CALL_C(b_+160, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+163);
   CYC(b_+163, b_+165); A = 0x8f; // SND_ENEMY_JUMP
   CALL_C(b_+165, playSound_b00_hook, SYM(playSound_b00), b_+168);
-  CYC(b_+168, b_+171); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+168, b_+171); TAIL(objectSetVisiblec1); // jp
 
 stateB:
   CALL_C(b_+177, ecom_bounceOffScreenBoundary_b0e_hook, SYM(ecom_bounceOffScreenBoundary_b0e), b_+180);
@@ -182,5 +182,5 @@ gotoState8:
   CYC(b_+204, b_+206); mem_wr(gb, HL, 0x08);
   CYC(b_+206, b_+207); alu_xor(gb, A);
   CALL_C(b_+207, enemySetAnimation_hook, SYM(enemySetAnimation), b_+210);
-  CYC(b_+210, b_+213); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+210, b_+213); TAIL(objectSetVisiblec2); // jp
 }

@@ -81,6 +81,7 @@ void burn_rom(GB *gb, int bank, uint16_t from, uint16_t to, bool last_taken) {
       exit(4);
     }
     gb->hook_pc = a;
+    { static int bl = -1; if (bl < 0) bl = getenv("BURNLOG") != NULL; if (bl) printf("BURN %02x:%04x op %02x cyc %d mc %llu\n", bank, a, op, insn_cycles(op, op2, last_taken && last), (unsigned long long)gb->mcycles); }
     gb_burn(gb, insn_cycles(op, op2, last_taken && last));
     a = (uint16_t)(a + len);
   }

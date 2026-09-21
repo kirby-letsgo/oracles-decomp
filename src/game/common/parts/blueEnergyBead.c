@@ -25,7 +25,7 @@ void func_5e1a_hook(GB *gb) {
   CYC(b_+16, b_+17); L = alu_dec8(gb, L);
   CYC(b_+17, b_+18); B = mem_rd(gb, HL);
   CYC(b_+18, b_+20); A = 0x38;
-  CYC(b_+20, b_+23); objectSetPositionInCircleArc_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(objectSetPositionInCircleArc); // jp
 
 L_5e31:
   CYC(b_+23, b_+25); E = 0xcd; // Part.xh
@@ -68,7 +68,7 @@ L_5dfb:
 swirl_end:
   CYC(b_+32, b_+33); SET_DE(pop_effect(gb));
   CYC(b_+33, b_+35); A = 0x5c; // SND_ENERGYTHING
-  CYC(b_+35, b_+38); playSound_b00_hook(gb); return; // jp
+  CYC(b_+35, b_+38); TAIL(playSound_b00); // jp
 }
 
 void createEnergySwirlGoingOut_body_hook(GB *gb) {
@@ -127,7 +127,7 @@ L_5d9d:
   CYC(b_+42, b_+43); alu_add(gb, mem_rd(gb, HL));
   CALL_C(b_+43, partSetAnimation_hook, SYM(partSetAnimation), b_+46);
   CALL_C(b_+46, func_5e1a_hook, SYM(func_5e1a), b_+49);
-  CYC(b_+49, b_+52); objectSetVisible_hook(gb); return; // jp
+  CYC(b_+49, b_+52); TAIL(objectSetVisible); // jp
 
 L_5db9:
   CALL_C(b_+52, objectApplySpeed_hook, SYM(objectApplySpeed), b_+55);

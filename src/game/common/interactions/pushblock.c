@@ -79,7 +79,7 @@ static void pushblock_replaceTileUnderneathBlock(GB *gb, uint16_t sp0_) {
   CYC(b_+181, b_+182); C = A;
   CALL_C(b_+182, getTileIndexFromRoomLayoutBuffer_paramC_hook, SYM(getTileIndexFromRoomLayoutBuffer_paramC), b_+185);
   if (!(F & FC)) {
-    CYCT(b_+185, b_+188); setTile_hook(gb); return;
+    CYCT(b_+185, b_+188); TAIL(setTile);
   }
   CYC(b_+185, b_+188);
   CYC(b_+188, b_+190); E = INTERACTION_BASE + OBJ_VAR32;
@@ -173,7 +173,7 @@ static void pushblock_state1(GB *gb, uint16_t sp0_) {
   CYC(b_+108, b_+109);
   CALL_C(b_+109, objectReplaceWithAnimationIfOnHazard_hook, SYM(objectReplaceWithAnimationIfOnHazard), b_+112);
   if (F & FC) {
-    CYCT(b_+112, b_+115); interactionDelete_hook(gb); return;
+    CYCT(b_+112, b_+115); TAIL(interactionDelete);
   }
   CYC(b_+112, b_+115);
   CALL_C(b_+115, objectGetShortPosition_hook, SYM(objectGetShortPosition), b_+118);
@@ -224,7 +224,7 @@ static void pushblock_state0(GB *gb, uint16_t sp0_) {
   CALL_C(b_+24, objectMimicBgTile_hook, SYM(objectMimicBgTile), b_+27);
   CYC(b_+27, b_+30); push_effect(gb, b_+30); pushblock_checkRotatingCubePermitsPushing(gb);
   if (F & FC) {
-    CYCT(b_+30, b_+33); interactionDelete_hook(gb); return;
+    CYCT(b_+30, b_+33); TAIL(interactionDelete);
   }
   CYC(b_+30, b_+33);
   CYC(b_+33, b_+35); A = 0x06;

@@ -127,5 +127,5 @@ void respawnableBush_setTileHere_hook(GB *gb) {
     A = (uint8_t)(af >> 8); F = (uint8_t)(af & 0xff);
   }
   CYC(b_+95, b_+96);
-  CYC(b_+96, b_+99); setTile_hook(gb); return; // jp
+  CYC(b_+96, b_+99); TAIL(setTile); // jp
 }

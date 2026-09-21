@@ -94,7 +94,7 @@ L_5f79:
   CYC(b_+69, b_+71); E = 0xc2; // Part.subid
   CYC(b_+71, b_+72); A = mem_rd(gb, DE);
   CALL_C(b_+72, partSetAnimation_hook, SYM(partSetAnimation), b_+75);
-  CYC(b_+75, b_+78); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+75, b_+78); TAIL(objectSetVisible82); // jp
 
 state1:
   CALL_C(b_+82, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+85);

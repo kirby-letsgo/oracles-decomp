@@ -88,7 +88,7 @@ normalStatus:
     CYC(b_+45, b_+46); push_effect(gb, b_+46);
     uint16_t target = blueStalfosProjectile_jump_table(gb);
     if (target == SYM(blueStalfosProjectile_subid0)) { blueStalfosProjectile_subid0_hook(gb); return; }
-    blueStalfosProjectile_subid1_hook(gb); return;
+    TAIL(blueStalfosProjectile_subid1);
   }
 }
 
@@ -141,7 +141,7 @@ state0:
 L_6fe1:
   CYC(b_+64, b_+66); A = 0xbf; // SND_BLUE_STALFOS_CHARGE
   CALL_C(b_+66, playSound_b00_hook, SYM(playSound_b00), b_+69);
-  CYC(b_+69, b_+73); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+69, b_+73); TAIL(objectSetVisible81); // jp
 
 state1:
   CALL_C(b_+73, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+76);
@@ -182,11 +182,11 @@ state2:
   CYC(b_+127, b_+128); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
 L_7021:
   CALL_C(b_+128, blueStalfosProjectile_checkShouldExplode_hook, SYM(blueStalfosProjectile_checkShouldExplode), b_+131);
-  CYC(b_+131, b_+133); blueStalfosProjectile_applySpeed_hook(gb); return; // jr
+  CYC(b_+131, b_+133); TAIL(blueStalfosProjectile_applySpeed); // jr
 
 state3:
   CALL_C(b_+133, blueStalfosProjectile_checkShouldExplode_hook, SYM(blueStalfosProjectile_checkShouldExplode), b_+136);
-  CYC(b_+136, b_+138); blueStalfosProjectile_applySpeedAndDeleteIfOffScreen_hook(gb); return; // jr
+  CYC(b_+136, b_+138); TAIL(blueStalfosProjectile_applySpeedAndDeleteIfOffScreen); // jr
 
 state4:
   CYC(b_+138, b_+139); H = D;
@@ -197,13 +197,13 @@ state4:
   CYC(b_+146, b_+148); E = 0xc9; // Part.angle
   CYC(b_+148, b_+149); mem_wr(gb, DE, A);
 animate:
-  CYC(b_+149, b_+152); partAnimate_hook(gb); return; // jp
+  CYC(b_+149, b_+152); TAIL(partAnimate); // jp
 
 state5:
   CALL_C(b_+152, blueStalfosProjectile_checkCollidedWithStalfos_hook, SYM(blueStalfosProjectile_checkCollidedWithStalfos), b_+155);
   if (F & FC) { CYCT(b_+155, b_+158); partDelete_hook(gb); return; } // jp c
   CYC(b_+155, b_+158);
-  CYC(b_+158, b_+160); blueStalfosProjectile_applySpeedAndDeleteIfOffScreen_hook(gb); return; // jr
+  CYC(b_+158, b_+160); TAIL(blueStalfosProjectile_applySpeedAndDeleteIfOffScreen); // jr
 
 state6:
   CYC(b_+160, b_+162); B = 0x06;
@@ -213,7 +213,7 @@ state6:
   CALL_C(b_+166, blueStalfosProjectile_explode_hook, SYM(blueStalfosProjectile_explode), b_+169);
   CYC(b_+169, b_+171); A = 0xa4; // SND_BEAM
   CALL_C(b_+171, playSound_b00_hook, SYM(playSound_b00), b_+174);
-  CYC(b_+174, b_+177); partDelete_hook(gb); return; // jp
+  CYC(b_+174, b_+177); TAIL(partDelete); // jp
 }
 
 void blueStalfosProjectile_subid1_hook(GB *gb) {
@@ -239,7 +239,7 @@ void blueStalfosProjectile_applySpeed_hook(GB *gb) {
   BASE(blueStalfosProjectile_applySpeed);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, objectApplySpeed_hook, SYM(objectApplySpeed), b_+3);
-  CYC(b_+3, b_+6); partAnimate_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(partAnimate); // jp
 }
 
 void blueStalfosProjectile_subid1_uninitialized_hook(GB *gb) {
@@ -262,7 +262,7 @@ void blueStalfosProjectile_subid1_uninitialized_hook(GB *gb) {
   CYC(b_+24, b_+25); mem_wr(gb, HL, A);
   CYC(b_+25, b_+26); alu_add(gb, A);
   CALL_C(b_+26, partSetAnimation_hook, SYM(partSetAnimation), b_+29);
-  CYC(b_+29, b_+32); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+29, b_+32); TAIL(objectSetVisible81); // jp
 }
 
 void blueStalfosProjectile_checkShouldExplode_hook(GB *gb) {
@@ -347,5 +347,5 @@ void blueStalfosProjectile_hitLink_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0x04; // Object.state
   CALL_C(b_+2, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+5);
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x10);
-  CYC(b_+7, b_+10); partDelete_hook(gb); return; // jp
+  CYC(b_+7, b_+10); TAIL(partDelete); // jp
 }

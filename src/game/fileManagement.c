@@ -73,10 +73,10 @@ void fileManagementFunction_hook(GB *gb) {
   CYC(b_+0, b_+1); A = C;
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
   do { uint16_t jt_ = (jump_table_from_rst(gb));
-    if (jt_ == SYM(initializeFile_b07)) { initializeFile_b07_hook(gb); return; }
-    else if (jt_ == SYM(saveFile_b07)) { saveFile_b07_hook(gb); return; }
-    else if (jt_ == SYM(loadFile_b07)) { loadFile_b07_hook(gb); return; }
-    else if (jt_ == SYM(eraseFile_b07)) { eraseFile_b07_hook(gb); return; }
+    if (jt_ == SYM(initializeFile_b07) && hook_enabled_at(gb, SYM(initializeFile_b07))) { initializeFile_b07_hook(gb); return; }
+    else if (jt_ == SYM(saveFile_b07) && hook_enabled_at(gb, SYM(saveFile_b07))) { saveFile_b07_hook(gb); return; }
+    else if (jt_ == SYM(loadFile_b07) && hook_enabled_at(gb, SYM(loadFile_b07))) { loadFile_b07_hook(gb); return; }
+    else if (jt_ == SYM(eraseFile_b07) && hook_enabled_at(gb, SYM(eraseFile_b07))) { eraseFile_b07_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

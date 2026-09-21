@@ -55,7 +55,7 @@ void enemyCode33_hook(GB *gb) {
 void babyCucco_state_uninitialized_hook(GB *gb) {
   BASE(babyCucco_state_uninitialized);
   CYC(b_+0, b_+2); A = 0x0a; // SPEED_40
-  CYC(b_+2, b_+5); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
+  CYC(b_+2, b_+5); TAIL(ecom_setSpeedAndState8AndVisible_b0e); // jp
 }
 
 void babyCucco_state_grabbed_hook(GB *gb) {
@@ -87,7 +87,7 @@ justGrabbed:
   CYC(b_+29, b_+31); L = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+31, b_+32); mem_wr(gb, HL, A);
   CALL_C(b_+32, enemySetAnimation_hook, SYM(enemySetAnimation), b_+35);
-  CYC(b_+35, b_+38); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+35, b_+38); TAIL(objectSetVisiblec1); // jp
 
 beingHeld:
   CYC(b_+38, b_+39); H = D;
@@ -99,7 +99,7 @@ beingHeld:
   if (F & FZ) { CYCT(b_+49, b_+51); goto released; } // jr z
   CYC(b_+49, b_+51);
   CYC(b_+51, b_+52); mem_wr(gb, HL, A);
-  CYC(b_+52, b_+55); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+52, b_+55); TAIL(enemySetAnimation); // jp
 
 released:
   CYC(b_+55, b_+57); E = ENEMY_BASE + OBJ_YH;
@@ -114,7 +114,7 @@ released:
   CYC(b_+67, b_+70);
 
 delete_:
-  CYC(b_+70, b_+73); enemyDelete_hook(gb); return; // jp
+  CYC(b_+70, b_+73); TAIL(enemyDelete); // jp
 
 landed:
   CYC(b_+73, b_+74); H = D;
@@ -124,7 +124,7 @@ landed:
   CYC(b_+80, b_+82); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
   CYC(b_+82, b_+84); L = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+84, b_+86); mem_wr(gb, HL, 0xff);
-  CYC(b_+86, b_+89); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+86, b_+89); TAIL(objectSetVisiblec2); // jp
 }
 
 void babyCucco_state_stub_hook(GB *gb) {
@@ -156,12 +156,12 @@ void babyCucco_state8_hook(GB *gb) {
 
 moveCloserToLink:
   CALL_C(b_+36, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0e), SYM(babyCucco_animate));
-  babyCucco_animate_hook(gb); return; // fallthrough
+  TAIL(babyCucco_animate); // fallthrough
 }
 
 void babyCucco_animate_hook(GB *gb) {
   BASE(babyCucco_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // Hopping
@@ -195,5 +195,5 @@ L_4924:
   if (F & FZ) { RET_TAKEN(b_+14); return; } // ret z
   CYC(b_+14, b_+15);
   CYC(b_+15, b_+16); mem_wr(gb, HL, A);
-  CYC(b_+16, b_+19); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+16, b_+19); TAIL(enemySetAnimation); // jp
 }

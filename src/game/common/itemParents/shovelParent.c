@@ -48,7 +48,7 @@ state0:
   CALL_C(b_+8, checkLinkOnGround_hook, SYM(checkLinkOnGround), b_+11);
   if (!(F & FZ)) { CYCT(b_+11, b_+14); clearParentItem_hook(gb); return; }
   CYC(b_+11, b_+14);
-  CYC(b_+14, b_+17); parentItemLoadAnimationAndIncState_hook(gb); return;
+  CYC(b_+14, b_+17); TAIL(parentItemLoadAnimationAndIncState);
 
 state1:
   CALL_C(b_+17, specialObjectAnimate_optimized_hook, SYM(specialObjectAnimate_optimized), b_+20);

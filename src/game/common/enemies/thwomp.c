@@ -48,7 +48,7 @@ static void enemyCode2f_runState(GB *gb) {
   if (target == SYM(thwomp_stateA)) { thwomp_stateA_hook(gb); return; }
   if (target == SYM(thwomp_stateB)) { thwomp_stateB_hook(gb); return; }
   if (target == SYM(thwomp_uninitialized)) { thwomp_uninitialized_hook(gb); return; }
-  thwomp_state_stub_hook(gb); return; // states 1-7 all target 0x6743
+  TAIL(thwomp_state_stub); // states 1-7 all target 0x6743
 }
 
 // ==================================================================================================
@@ -67,7 +67,7 @@ void enemyCode2f_hook(GB *gb) {
 
 normalStatus:
   CYC(b_+5, b_+8); push_effect(gb, b_+8); enemyCode2f_runState(gb);
-  CYC(b_+8, b_+11); thwomp_updateLinkRidingSelf_hook(gb); return; // jp
+  CYC(b_+8, b_+11); TAIL(thwomp_updateLinkRidingSelf); // jp
 }
 
 void thwomp_uninitialized_hook(GB *gb) {
@@ -82,7 +82,7 @@ void thwomp_uninitialized_hook(GB *gb) {
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x10); // ANGLE_DOWN
   CYC(b_+13, b_+15); A = 0x04;
   CALL_C(b_+15, enemySetAnimation_hook, SYM(enemySetAnimation), b_+18);
-  CYC(b_+18, b_+21); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(objectSetVisible82); // jp
 }
 
 void thwomp_state_stub_hook(GB *gb) {
@@ -114,7 +114,7 @@ void thwomp_state8_hook(GB *gb) {
   CYC(b_+25, b_+26); mem_wr(gb, HL, A);
   CYC(b_+26, b_+27); alu_rrca(gb);
   CYC(b_+27, b_+28); alu_rrca(gb);
-  CYC(b_+28, b_+31); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+28, b_+31); TAIL(enemySetAnimation); // jp
 
 linkApproached:
   CALL_C(b_+31, ecom_incState_b0d_hook, SYM(ecom_incState_b0d), b_+34);
@@ -123,7 +123,7 @@ linkApproached:
   CYC(b_+37, b_+38); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+38, b_+39); mem_wr(gb, HL, A);
   CYC(b_+39, b_+41); A = 0x08;
-  CYC(b_+41, b_+44); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+41, b_+44); TAIL(enemySetAnimation); // jp
 }
 
 // Falling to ground
@@ -150,7 +150,7 @@ hitGround:
   CYC(b_+23, b_+25); A = 45;
   CYC(b_+25, b_+28); W8(wScreenShakeCounterY) = A;
   CYC(b_+28, b_+30); A = 0x70; // SND_DOORCLOSE
-  CYC(b_+30, b_+33); playSound_b00_hook(gb); return; // jp
+  CYC(b_+30, b_+33); TAIL(playSound_b00); // jp
 }
 
 // Resting on ground for 50 frames after hitting it, then moving back to starting position
@@ -192,7 +192,7 @@ void thwomp_stateB_hook(GB *gb) {
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+5); L = E;
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x08); // [state] = 8
-  CYC(b_+7, b_+10); thwomp_updateLinkRidingSelf_hook(gb); return; // jp
+  CYC(b_+7, b_+10); TAIL(thwomp_updateLinkRidingSelf); // jp
 }
 
 // Unused function.
@@ -208,7 +208,7 @@ void thwomp_func67ba_hook(GB *gb) {
   CYC(b_+5, b_+7); E = ENEMY_BASE + OBJ_XH;
   CYC(b_+7, b_+8); A = mem_rd(gb, DE);
   CYC(b_+8, b_+9); C = A;
-  CYC(b_+9, b_+12); getTileCollisionsAtPosition_hook(gb); return; // jp
+  CYC(b_+9, b_+12); TAIL(getTileCollisionsAtPosition); // jp
 }
 
 // Checks if Link is riding the thwomp, updates appropriate variables if so.

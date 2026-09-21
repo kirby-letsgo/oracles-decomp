@@ -132,7 +132,7 @@ storeVar30Value:
   CYC(b_+54, b_+55);
   CYC(b_+55, b_+58); SET_HL(GV(wTmpcfc0_genericCutscene_cfdf, wTmpcfc0_wildTokay_cfde));
   CYC(b_+58, b_+60); mem_wr(gb, HL, GV(0xff, 0x01));
-  CYC(b_+60, b_+63); interactionDelete_hook(gb); return; // jp
+  CYC(b_+60, b_+63); TAIL(interactionDelete); // jp
 
 subid1:
   CYC(b_+98, b_+101); A = mem_rd(gb, wPaletteThread_mode);
@@ -149,5 +149,5 @@ subid1:
   CYC(b_+112, b_+115);
   CYC(b_+115, b_+116); L = alu_inc8(gb, L);
   CYC(b_+116, b_+117); C = mem_rd(gb, HL); // [xh]
-  CYC(b_+117, b_+120); interactionFunc_3e6d_hook(gb); return; // jp
+  CYC(b_+117, b_+120); TAIL(interactionFunc_3e6d); // jp
 }

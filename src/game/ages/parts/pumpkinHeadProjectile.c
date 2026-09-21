@@ -119,7 +119,7 @@ L_7417:
   CYC(b_+96, b_+97); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+97, b_+100); objectSetVisible82_hook(gb); return; } // jp z
   CYC(b_+97, b_+100);
-  CYC(b_+100, b_+103); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+100, b_+103); TAIL(objectSetVisible81); // jp
 
 state1:
   CALL_C(b_+114, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+117);
@@ -135,5 +135,5 @@ state2:
   CALL_C(b_+130, partCommon_checkTileCollisionOrOutOfBounds_hook, SYM(partCommon_checkTileCollisionOrOutOfBounds), b_+133);
   if (!(F & FC)) { RET_TAKEN(b_+133); return; } // ret nc
   CYC(b_+133, b_+134);
-  CYC(b_+134, b_+137); partDelete_hook(gb); return; // jp
+  CYC(b_+134, b_+137); TAIL(partDelete); // jp
 }

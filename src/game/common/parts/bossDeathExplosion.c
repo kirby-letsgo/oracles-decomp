@@ -34,10 +34,10 @@ void partCode04_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+28, b_+30); goto delete; } // jr z
   CYC(b_+28, b_+30);
   CYC(b_+30, b_+32); B = 0x01; // PART_ITEM_DROP
-  CYC(b_+32, b_+35); objectReplaceWithID_hook(gb); return; // jp
+  CYC(b_+32, b_+35); TAIL(objectReplaceWithID); // jp
 
 delete:
-  CYC(b_+35, b_+38); partDelete_hook(gb); return; // jp
+  CYC(b_+35, b_+38); TAIL(partDelete); // jp
 
 state0:
   CYC(b_+38, b_+39); A = alu_inc8(gb, A);
@@ -51,5 +51,5 @@ state0:
   } else {
     CYC(b_+46, b_+49);
   }
-  CYC(b_+49, b_+52); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+49, b_+52); TAIL(objectSetVisible80); // jp
 }

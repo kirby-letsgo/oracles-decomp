@@ -82,7 +82,7 @@ void spinner_updateLinkPosition_hook(GB *gb) {
   CYC(b_+19, b_+21); alu_and(gb, 0x0f);
   CYC(b_+21, b_+24); SET_HL(SYM(spinner_linkRelativePositions)); // spinner_linkRelativePositions
   CYC(b_+24, b_+25); interactionCode7d_addDoubleIndexToHl_from_rst(gb, SYM(spinner_setLinkRelativePosition));
-  spinner_setLinkRelativePosition_hook(gb); return; // falls through
+  TAIL(spinner_setLinkRelativePosition); // falls through
 }
 
 void spinner_subid02_hook(GB *gb) {
@@ -135,7 +135,7 @@ afterAnim:
   CYC(b_+53, b_+54); E = L;
   CYC(b_+54, b_+55); A = mem_rd(gb, HL);
   CYC(b_+55, b_+56); mem_wr(gb, DE, A);
-  CYC(b_+56, b_+59); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+56, b_+59); TAIL(interactionAnimate); // jp
 }
 
 // INTERAC_SPINNER
@@ -217,7 +217,7 @@ revertToState1:
   CYC(b_+98, b_+100); A = 0x01;
   CYC(b_+100, b_+101); mem_wr(gb, DE, A);
   CYC(b_+101, b_+104); SET_HL(GV((SYM(interactionCode91__subid00__state1) + 19), 0x49c0)); // mainScripts.spinnerScript_waitForLink
-  CYC(b_+104, b_+107); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+104, b_+107); TAIL(interactionSetScript); // jp
 
 beginTurning:
   CYC(b_+107, b_+109); A = 0x03;
@@ -263,7 +263,7 @@ afterDirectionTable:
   CYC(b_+165, b_+167); A = 0x04;
   CALL_C(b_+167, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+170);
   CYC(b_+170, b_+172); A = 0x6c; // SND_OPENCHEST
-  CYC(b_+172, b_+175); playSound_b00_hook(gb); return; // jp
+  CYC(b_+172, b_+175); TAIL(playSound_b00); // jp
 
 state3:
   CALL_C(b_+175, spinner_updateLinkPosition_hook, SYM(spinner_updateLinkPosition), b_+178);
@@ -312,5 +312,5 @@ state4:
   CYC(b_+246, b_+248); L = INTERACTION_BASE + OBJ_STATE;
   CYC(b_+248, b_+250); mem_wr(gb, HL, 0x01);
   CYC(b_+250, b_+253); SET_HL(GV((SYM(interactionCode91__subid00__state1) + 18), 0x49bf)); // mainScripts.spinnerScript_waitForLinkAfterDelay
-  CYC(b_+253, b_+256); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+253, b_+256); TAIL(interactionSetScript); // jp
 }

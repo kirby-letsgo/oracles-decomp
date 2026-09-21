@@ -56,7 +56,7 @@ void enemyCode4b_hook(GB *gb) {
   CYC(b_+4, b_+5);
   if (!(F & FZ)) { CYCT(b_+5, b_+7); goto normalStatus; } // jr nz
   CYC(b_+5, b_+7);
-  CYC(b_+7, b_+10); enemyDie_hook(gb); return; // jp
+  CYC(b_+7, b_+10); TAIL(enemyDie); // jp
 
 normalStatus:
   CALL_C(b_+10, ecom_checkHazards_b0e_hook, GV(SYM(ecom_checkHazards_b0e), 0x4446), b_+13);
@@ -108,7 +108,7 @@ substate3:
   CYC(b_+12, b_+14); E = ENEMY_BASE + 0x31; // Enemy.var31
   CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   CYC(b_+15, b_+16); B = A;
-  CYC(b_+16, b_+19); ecom_fallToGroundAndSetState_b0e_hook(gb); return; // jp
+  CYC(b_+16, b_+19); TAIL(ecom_fallToGroundAndSetState_b0e); // jp
 }
 
 // 0e:603c, bare global; jump-table target from enemyCode4b.
@@ -133,19 +133,19 @@ void ballAndChain_state8_hook(GB *gb) {
   CYC(b_+17, b_+19); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+19, b_+20); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+20, b_+22); A = 0x01;
-  CYC(b_+22, b_+25); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(enemySetAnimation); // jp
 
 moveTowardLink:
   CALL_C(b_+25, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+28);
   CALL_C(b_+28, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0e), SYM(ballAndChain_animate));
-  ballAndChain_animate_hook(gb); return; // fallthrough
+  TAIL(ballAndChain_animate); // fallthrough
 }
 
 // 0e:605c, bare global; falls into from ballAndChain_state8, also reached by genuine jr from
 // ballAndChain_state9.
 void ballAndChain_animate_hook(GB *gb) {
   BASE(ballAndChain_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // 0e:605f, bare global; jump-table target from enemyCode4b. Spinning up ball for [counter1]
@@ -195,7 +195,7 @@ gotoState8:
   CYC(b_+32, b_+34); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+34, b_+35); alu_xor(gb, A);
   CYC(b_+35, b_+36); mem_wr(gb, HL, A);
-  CYC(b_+36, b_+39); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+36, b_+39); TAIL(enemySetAnimation); // jp
 }
 
 // 0e:6095, bare global; called from ballAndChain_state_uninitialized.

@@ -77,7 +77,7 @@ static void interactionCoded8_loadScriptForSubid(GB *gb) {
   CYC(b_+123, b_+124); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+124, b_+125); H = mem_rd(gb, HL);
   CYC(b_+125, b_+126); L = A;
-  CYC(b_+126, b_+129); interactionSetMiniScript_hook(gb); return; // jp
+  CYC(b_+126, b_+129); TAIL(interactionSetMiniScript); // jp
 }
 
 // interactionCoded8@toggleLavaSource, 0b:7c9e -- reached as a plain fallthrough from @state1 --
@@ -153,7 +153,7 @@ state0:
   CYC(b_+21, b_+22); A = mem_rd(gb, HL);
   CYC(b_+22, b_+24); E = INTERACTION_BASE + OBJ_COUNTER2;
   CYC(b_+24, b_+25); mem_wr(gb, DE, A);
-  CYC(b_+25, b_+28); interactionIncState_hook(gb); return; // jp
+  CYC(b_+25, b_+28); TAIL(interactionIncState); // jp
 
 state1:
   // Waiting for lever to be pulled
@@ -209,7 +209,7 @@ state3:
   CALL_C(b_+170, interactionCoded8_loadScriptForSubid, b_+116, b_+173);
   CALL_C(b_+173, interactionCoded8_toggleLavaSource_hook, b_+57, b_+176);
   CYC(b_+176, b_+178); A = 0x70; // SND_DOORCLOSE
-  CYC(b_+178, b_+181); playSound_b00_hook(gb); return; // jp
+  CYC(b_+178, b_+181); TAIL(playSound_b00); // jp
 
 state4:
   // Tiles are being filled with lava again.
@@ -247,5 +247,5 @@ fillNextGroupWithLava:
 
 playRumbleSound:
   CYC(b_+224, b_+226); A = 0xb8; // SND_RUMBLE2
-  CYC(b_+226, b_+229); playSound_b00_hook(gb); return; // jp
+  CYC(b_+226, b_+229); TAIL(playSound_b00); // jp
 }

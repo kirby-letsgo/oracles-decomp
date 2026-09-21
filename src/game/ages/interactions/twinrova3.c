@@ -393,7 +393,7 @@ l6e93:
 
 l6e95:
   CALL_C(b_+170, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+173);
-  CYC(b_+173, b_+176); interactionAnimate_hook(gb); return; // jp @animate
+  CYC(b_+173, b_+176); TAIL(interactionAnimate); // jp @animate
 
 subid0Substate1: // interactionCodebc@subid0Substate1
   CYC(b_+176, b_+179); interactionCodebc_updateFloating(gb); // call
@@ -449,7 +449,7 @@ looped: // interactionCodebc@subid0Substate3@looped
   if (F & FC) { CYCT(b_+275, b_+277); goto l6f06; } // jr c
   CYC(b_+275, b_+277);
   CYC(b_+277, b_+280); interactionCodebc_func_6eac(gb); // call
-  CYC(b_+280, b_+283); interactionDelete_hook(gb); return; // jp
+  CYC(b_+280, b_+283); TAIL(interactionDelete); // jp
 
 l6f06:
   CYC(b_+283, b_+286); interactionCodebc_func_6eac(gb); // call

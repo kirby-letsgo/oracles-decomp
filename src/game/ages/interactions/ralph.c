@@ -144,13 +144,13 @@ initSubid03:
   CYC(b_+105, b_+107); A = 0x15; // GLOBALFLAG_GAVE_ROPE_TO_RAFTON
   CALL_C(b_+107, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+110);
   if (F & FZ) {
-    CYCT(b_+110, b_+113); interactionDelete_hook(gb); return;
+    CYCT(b_+110, b_+113); TAIL(interactionDelete);
   }
   CYC(b_+110, b_+113);
   CALL_C(b_+113, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+116);
   CYC(b_+116, b_+118); alu_bit(gb, 6, A);
   if (!(F & FZ)) {
-    CYCT(b_+118, b_+121); interactionDelete_hook(gb); return;
+    CYCT(b_+118, b_+121); TAIL(interactionDelete);
   }
   CYC(b_+118, b_+121);
   CYC(b_+121, b_+123); A = 0x01;
@@ -247,19 +247,19 @@ initSubid0a:
   CYC(b_+265, b_+267); A = 0x36; // TREASURE_MAKU_SEED
   CALL_C(b_+267, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+270);
   if (!(F & FC)) {
-    CYCT(b_+270, b_+273); interactionDelete_hook(gb); return;
+    CYCT(b_+270, b_+273); TAIL(interactionDelete);
   }
   CYC(b_+270, b_+273);
   CYC(b_+273, b_+275); A = 0x33; // GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
   CALL_C(b_+275, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+278);
   if (!(F & FZ)) {
-    CYCT(b_+278, b_+281); interactionDelete_hook(gb); return;
+    CYCT(b_+278, b_+281); TAIL(interactionDelete);
   }
   CYC(b_+278, b_+281);
   CYC(b_+281, b_+283); A = 0x45; // GLOBALFLAG_RALPH_ENTERED_BLACK_TOWER
   CALL_C(b_+283, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+286);
   if (!(F & FZ)) {
-    CYCT(b_+286, b_+289); interactionDelete_hook(gb); return;
+    CYCT(b_+286, b_+289); TAIL(interactionDelete);
   }
   CYC(b_+286, b_+289);
   CALL_C(b_+289, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+292);
@@ -349,19 +349,19 @@ initSubid10:
   CALL_C(b_+402, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+405);
   CYC(b_+405, b_+407); alu_and(gb, 0x40);
   if (!(F & FZ)) {
-    CYCT(b_+407, b_+410); interactionDelete_hook(gb); return;
+    CYCT(b_+407, b_+410); TAIL(interactionDelete);
   }
   CYC(b_+407, b_+410);
   CYC(b_+410, b_+412); A = 0x43; // GLOBALFLAG_TALKED_TO_CHEVAL
   CALL_C(b_+412, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+415);
   if (F & FZ) {
-    CYCT(b_+415, b_+418); interactionDelete_hook(gb); return;
+    CYCT(b_+415, b_+418); TAIL(interactionDelete);
   }
   CYC(b_+415, b_+418);
   CYC(b_+418, b_+421); A = mem_rd(gb, wWarpDestPos);
   CYC(b_+421, b_+423); alu_cp(gb, 0x17);
   if (!(F & FZ)) {
-    CYCT(b_+423, b_+426); interactionDelete_hook(gb); return;
+    CYCT(b_+423, b_+426); TAIL(interactionDelete);
   }
   CYC(b_+423, b_+426);
   CYC(b_+426, b_+429); SET_HL(ralphSubid10Script_bank0c);
@@ -371,7 +371,7 @@ initSubid11:
   CYC(b_+431, b_+433); A = 0x14; // GLOBALFLAG_FINISHEDGAME
   CALL_C(b_+433, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+436);
   if (F & FZ) {
-    CYCT(b_+436, b_+439); interactionDelete_hook(gb); return;
+    CYCT(b_+436, b_+439); TAIL(interactionDelete);
   }
   CYC(b_+436, b_+439);
   CYC(b_+439, b_+441); A = 0x03;
@@ -385,7 +385,7 @@ initSubid0c:
   CYC(b_+452, b_+455); SET_HL(wGroup4RoomFlags + 0xfc);
   CYC(b_+455, b_+457); alu_bit(gb, 7, mem_rd(gb, HL));
   if (!(F & FZ)) {
-    CYCT(b_+457, b_+460); interactionDelete_hook(gb); return;
+    CYCT(b_+457, b_+460); TAIL(interactionDelete);
   }
   CYC(b_+457, b_+460);
   CALL_C(b_+460, interactionLoadExtraGraphics_hook, SYM(interactionLoadExtraGraphics), b_+463);
@@ -406,13 +406,13 @@ initSubid0c:
 initSubid12:
   CALL_C(b_+492, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+495);
   if (F & FZ) {
-    CYCT(b_+495, b_+498); interactionDelete_hook(gb); return;
+    CYCT(b_+495, b_+498); TAIL(interactionDelete);
   }
   CYC(b_+495, b_+498);
   CYC(b_+498, b_+501); SET_HL(wGroup4RoomFlags + 0xfc);
   CYC(b_+501, b_+503); alu_bit(gb, 7, mem_rd(gb, HL));
   if (F & FZ) {
-    CYCT(b_+503, b_+506); interactionDelete_hook(gb); return;
+    CYCT(b_+503, b_+506); TAIL(interactionDelete);
   }
   CYC(b_+503, b_+506);
   CALL_C(b_+506, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+509);
@@ -424,7 +424,7 @@ initSubid0d:
   CYC(b_+515, b_+518); A = mem_rd(gb, wScreenTransitionDirection);
   CYC(b_+518, b_+520); alu_cp(gb, 0x01);
   if (!(F & FZ)) {
-    CYCT(b_+520, b_+523); interactionDelete_hook(gb); return;
+    CYCT(b_+520, b_+523); TAIL(interactionDelete);
   }
   CYC(b_+520, b_+523);
   CYC(b_+523, b_+526); SET_HL(ralphSubid0dScript_bank0c);
@@ -536,8 +536,8 @@ void interactionCode37_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ralph_jumpTable(gb));
-    if (jt_ == SYM(ralphState0)) { ralphState0_hook(gb); return; }
-    else if (jt_ == SYM(ralphRunSubid)) { ralphRunSubid_hook(gb); return; }
+    if (jt_ == SYM(ralphState0) && hook_enabled_at(gb, SYM(ralphState0))) { ralphState0_hook(gb); return; }
+    else if (jt_ == SYM(ralphRunSubid) && hook_enabled_at(gb, SYM(ralphRunSubid))) { ralphRunSubid_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -553,7 +553,7 @@ void ralphState0_hook(GB *gb) {
   CYC(b_+11, b_+12); A = mem_rd(gb, DE);
   CYC(b_+12, b_+13); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+13, b_+16); objectMarkSolidPosition_hook(gb); return;
+    CYCT(b_+13, b_+16); TAIL(objectMarkSolidPosition);
   }
   CYC(b_+13, b_+16);
   CYC(b_+16, b_+17); ret_effect(gb);
@@ -566,24 +566,24 @@ void ralphRunSubid_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ralph_jumpTable(gb));
-    if (jt_ == SYM(ralphSubid00)) { ralphSubid00_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid01)) { ralphSubid01_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid02)) { ralphSubid02_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid03)) { ralphSubid03_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid04)) { ralphSubid04_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid05)) { ralphSubid05_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid06)) { ralphSubid06_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid07)) { ralphSubid07_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid08)) { ralphSubid08_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid09)) { ralphSubid09_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid0a)) { ralphSubid0a_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid0b)) { ralphSubid0b_hook(gb); return; } // subids $0b and $10
-    else if (jt_ == SYM(ralphRunScriptAndDeleteWhenOver)) { ralphRunScriptAndDeleteWhenOver_hook(gb); return; }
-    else if (jt_ == SYM(ralphRunScriptWithConditionalAnimation)) { ralphRunScriptWithConditionalAnimation_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid0e)) { ralphSubid0e_hook(gb); return; }
-    else if (jt_ == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
-    else if (jt_ == SYM(nayruRunScriptWithConditionalAnimation)) { nayruRunScriptWithConditionalAnimation_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid12)) { ralphSubid12_hook(gb); return; }
+    if (jt_ == SYM(ralphSubid00) && hook_enabled_at(gb, SYM(ralphSubid00))) { ralphSubid00_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid01) && hook_enabled_at(gb, SYM(ralphSubid01))) { ralphSubid01_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid02) && hook_enabled_at(gb, SYM(ralphSubid02))) { ralphSubid02_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid03) && hook_enabled_at(gb, SYM(ralphSubid03))) { ralphSubid03_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid04) && hook_enabled_at(gb, SYM(ralphSubid04))) { ralphSubid04_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid05) && hook_enabled_at(gb, SYM(ralphSubid05))) { ralphSubid05_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid06) && hook_enabled_at(gb, SYM(ralphSubid06))) { ralphSubid06_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid07) && hook_enabled_at(gb, SYM(ralphSubid07))) { ralphSubid07_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid08) && hook_enabled_at(gb, SYM(ralphSubid08))) { ralphSubid08_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid09) && hook_enabled_at(gb, SYM(ralphSubid09))) { ralphSubid09_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid0a) && hook_enabled_at(gb, SYM(ralphSubid0a))) { ralphSubid0a_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid0b) && hook_enabled_at(gb, SYM(ralphSubid0b))) { ralphSubid0b_hook(gb); return; } // subids $0b and $10
+    else if (jt_ == SYM(ralphRunScriptAndDeleteWhenOver) && hook_enabled_at(gb, SYM(ralphRunScriptAndDeleteWhenOver))) { ralphRunScriptAndDeleteWhenOver_hook(gb); return; }
+    else if (jt_ == SYM(ralphRunScriptWithConditionalAnimation) && hook_enabled_at(gb, SYM(ralphRunScriptWithConditionalAnimation))) { ralphRunScriptWithConditionalAnimation_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid0e) && hook_enabled_at(gb, SYM(ralphSubid0e))) { ralphSubid0e_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
+    else if (jt_ == SYM(nayruRunScriptWithConditionalAnimation) && hook_enabled_at(gb, SYM(nayruRunScriptWithConditionalAnimation))) { nayruRunScriptWithConditionalAnimation_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid12) && hook_enabled_at(gb, SYM(ralphSubid12))) { ralphSubid12_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -635,7 +635,7 @@ substate1:
   CYC(b_+54, b_+55); A = mem_rd(gb, DE);
   CYC(b_+55, b_+57); alu_cp(gb, 0x28); // SPEED_100
   if (!(F & FC)) {
-    CYCT(b_+57, b_+60); interactionAnimate_hook(gb); return;
+    CYCT(b_+57, b_+60); TAIL(interactionAnimate);
   }
   CYC(b_+57, b_+60);
   CYC(b_+60, b_+61); ret_effect(gb);
@@ -696,7 +696,7 @@ void ralphSubid01_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
   if (F & FC) {
-    CYCT(b_+3, b_+6); interactionDelete_hook(gb); return;
+    CYCT(b_+3, b_+6); TAIL(interactionDelete);
   }
   CYC(b_+3, b_+6);
   CALL_C(b_+6, ralphTurnLinkTowardSelf_hook, SYM(ralphTurnLinkTowardSelf), b_+9);
@@ -812,7 +812,7 @@ substate5:
   CALL_C(b_+116, interactionAnimate2Times_hook, SYM(interactionAnimate2Times), b_+119);
   CALL_C(b_+119, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+122);
   if (!(F & FZ)) {
-    CYCT(b_+122, b_+125); objectApplySpeed_hook(gb); return;
+    CYCT(b_+122, b_+125); TAIL(objectApplySpeed);
   }
   CYC(b_+122, b_+125);
   CYC(b_+125, b_+127); mem_wr(gb, HL, 0x06);
@@ -861,7 +861,7 @@ substate7:
   CALL_C(b_+171, interactionAnimate2Times_hook, SYM(interactionAnimate2Times), b_+174);
   CALL_C(b_+174, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+177);
   if (!(F & FZ)) {
-    CYCT(b_+177, b_+180); objectApplySpeed_hook(gb); return;
+    CYCT(b_+177, b_+180); TAIL(objectApplySpeed);
   }
   CYC(b_+177, b_+180);
 
@@ -893,7 +893,7 @@ void ralphSubid04_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ralph_jumpTable(gb));
     // Borrow some of Nayru's code from the same cutscene
-    if (jt_ == SYM(nayruSubid02Substate0)) { nayruSubid02Substate0_hook(gb); return; }
+    if (jt_ == SYM(nayruSubid02Substate0) && hook_enabled_at(gb, SYM(nayruSubid02Substate0))) { nayruSubid02Substate0_hook(gb); return; }
     else if (jt_ == b_+10) { goto substate1; }
     else if (jt_ == b_+30) { goto substate2; }
     else { HANDOFF(HL); }
@@ -903,7 +903,7 @@ substate1:
   CYC(b_+10, b_+13); A = mem_rd(gb, wTmpcfc0 + 0x10);
   CYC(b_+13, b_+15); alu_cp(gb, 0x08);
   if (!(F & FZ)) {
-    CYCT(b_+15, b_+18); nayruFlipDirectionAtRandomIntervals_hook(gb); return;
+    CYCT(b_+15, b_+18); TAIL(nayruFlipDirectionAtRandomIntervals);
   }
   CYC(b_+15, b_+18);
   CALL_C(b_+18, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+21);
@@ -934,7 +934,7 @@ void ralphSubid05_hook(GB *gb) {
     else if (jt_ == b_+29) { goto substate1; }
     else if (jt_ == b_+44) { goto substate2; }
     else if (jt_ == b_+58) { goto substate3; }
-    else if (jt_ == SYM(ralphRunScript)) { ralphRunScript_hook(gb); return; }
+    else if (jt_ == SYM(ralphRunScript) && hook_enabled_at(gb, SYM(ralphRunScript))) { ralphRunScript_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -965,7 +965,7 @@ substate2:
   CYC(b_+44, b_+47); A = mem_rd(gb, wTmpcfc0 + 0x10);
   CYC(b_+47, b_+49); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
-    CYCT(b_+49, b_+52); interactionRunScript_hook(gb); return;
+    CYCT(b_+49, b_+52); TAIL(interactionRunScript);
   }
   CYC(b_+49, b_+52);
   CALL_C(b_+52, startJump_hook, SYM(startJump), b_+55);
@@ -1000,7 +1000,7 @@ void ralphSubid06_hook(GB *gb) {
   do { uint16_t jt_ = (ralph_jumpTable(gb));
     if (jt_ == b_+13) { goto substate0; }
     else if (jt_ == b_+35) { goto substate1; }
-    else if (jt_ == SYM(ralphRunScript)) { ralphRunScript_hook(gb); return; }
+    else if (jt_ == SYM(ralphRunScript) && hook_enabled_at(gb, SYM(ralphRunScript))) { ralphRunScript_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -1012,7 +1012,7 @@ substate0:
   CYC(b_+21, b_+24); A = mem_rd(gb, wTmpcfc0 + 0x10);
   CYC(b_+24, b_+26); alu_cp(gb, 0x08);
   if (!(F & FZ)) {
-    CYCT(b_+26, b_+29); interactionRunScript_hook(gb); return;
+    CYCT(b_+26, b_+29); TAIL(interactionRunScript);
   }
   CYC(b_+26, b_+29);
   CALL_C(b_+29, startJump_hook, SYM(startJump), b_+32);
@@ -1044,9 +1044,9 @@ void ralphSubid07_hook(GB *gb) {
   CYC(b_+10, b_+11); A = mem_rd(gb, DE);
   CYC(b_+11, b_+12); push_effect(gb, b_+12);
   do { uint16_t jt_ = (ralph_jumpTable(gb));
-    if (jt_ == SYM(ralphAnimateBasedOnSpeedAndRunScript)) { ralphAnimateBasedOnSpeedAndRunScript_hook(gb); return; } // substates 0 and 3
-    else if (jt_ == SYM(ralphSubid07Substate1)) { ralphSubid07Substate1_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid07Substate2)) { ralphSubid07Substate2_hook(gb); return; }
+    if (jt_ == SYM(ralphAnimateBasedOnSpeedAndRunScript) && hook_enabled_at(gb, SYM(ralphAnimateBasedOnSpeedAndRunScript))) { ralphAnimateBasedOnSpeedAndRunScript_hook(gb); return; } // substates 0 and 3
+    else if (jt_ == SYM(ralphSubid07Substate1) && hook_enabled_at(gb, SYM(ralphSubid07Substate1))) { ralphSubid07Substate1_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid07Substate2) && hook_enabled_at(gb, SYM(ralphSubid07Substate2))) { ralphSubid07Substate2_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -1150,7 +1150,7 @@ void ralphSubid09_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
   if (!(F & FC)) {
-    CYCT(b_+3, b_+6); interactionAnimateBasedOnSpeed_hook(gb); return;
+    CYCT(b_+3, b_+6); TAIL(interactionAnimateBasedOnSpeed);
   }
   CYC(b_+3, b_+6);
   // Script done
@@ -1166,7 +1166,7 @@ void ralphSubid0a_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+3);
   if (!(F & FZ)) {
-    CYCT(b_+3, b_+6); ralphSubid0a_linked_hook(gb); return;
+    CYCT(b_+3, b_+6); TAIL(ralphSubid0a_linked);
   }
   CYC(b_+3, b_+6);
 
@@ -1235,7 +1235,7 @@ substate3:
 substate4:
   CALL_C(b_+164, interactionRunScript_hook, SYM(interactionRunScript), b_+167);
   if (!(F & FC)) {
-    CYCT(b_+167, b_+170); interactionAnimateBasedOnSpeed_hook(gb); return;
+    CYCT(b_+167, b_+170); TAIL(interactionAnimateBasedOnSpeed);
   }
   CYC(b_+167, b_+170);
   CYC(b_+170, b_+171); alu_xor(gb, A);
@@ -1249,7 +1249,7 @@ void ralphSubid0a_linked_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
   if (F & FC) {
-    CYCT(b_+3, b_+6); interactionDelete_hook(gb); return;
+    CYCT(b_+3, b_+6); TAIL(interactionDelete);
   }
   CYC(b_+3, b_+6);
   CALL_C(b_+6, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+9);
@@ -1307,7 +1307,7 @@ void ralphSubid0b_hook(GB *gb) {
   do { uint16_t jt_ = (ralph_jumpTable(gb));
     if (jt_ == b_+17) { goto substate0; }
     else if (jt_ == b_+22) { goto substate1; }
-    else if (jt_ == SYM(ralphRunScriptWithConditionalAnimation)) { ralphRunScriptWithConditionalAnimation_hook(gb); return; }
+    else if (jt_ == SYM(ralphRunScriptWithConditionalAnimation) && hook_enabled_at(gb, SYM(ralphRunScriptWithConditionalAnimation))) { ralphRunScriptWithConditionalAnimation_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -1321,12 +1321,12 @@ substate1:
   CYC(b_+22, b_+25); A = mem_rd(gb, wFrameCounter);
   CYC(b_+25, b_+27); alu_and(gb, 0x07);
   if (!(F & FZ)) {
-    CYCT(b_+27, b_+29); ralphRunScriptWithConditionalAnimation_hook(gb); return;
+    CYCT(b_+27, b_+29); TAIL(ralphRunScriptWithConditionalAnimation);
   }
   CYC(b_+27, b_+29);
   CALL_C(b_+29, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+32);
   if (!(F & FZ)) {
-    CYCT(b_+32, b_+34); ralphRunScriptWithConditionalAnimation_hook(gb); return;
+    CYCT(b_+32, b_+34); TAIL(ralphRunScriptWithConditionalAnimation);
   }
   CYC(b_+32, b_+34);
   CYC(b_+34, b_+36); mem_wr(gb, HL, 0x05); // INTERAC_PUFF
@@ -1343,14 +1343,14 @@ void ralphRunScriptWithConditionalAnimation_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
   if (F & FC) {
-    CYCT(b_+3, b_+6); interactionDelete_hook(gb); return;
+    CYCT(b_+3, b_+6); TAIL(interactionDelete);
   }
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+8); E = INTERACTION_BASE + OBJ_VAR3F;
   CYC(b_+8, b_+9); A = mem_rd(gb, DE);
   CYC(b_+9, b_+10); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+10, b_+13); interactionAnimate_hook(gb); return;
+    CYCT(b_+10, b_+13); TAIL(interactionAnimate);
   }
   CYC(b_+10, b_+13);
   CYC(b_+13, b_+14); ret_effect(gb);
@@ -1364,12 +1364,12 @@ void ralphSubid0e_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wScreenShakeCounterY);
   CYC(b_+3, b_+5); alu_cp(gb, 0x5a);
   if (!(F & FC)) {
-    CYCT(b_+5, b_+7); ralphRunScriptAndDeleteWhenOver_hook(gb); return;
+    CYCT(b_+5, b_+7); TAIL(ralphRunScriptAndDeleteWhenOver);
   }
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+8); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+8, b_+10); ralphRunScriptAndDeleteWhenOver_hook(gb); return;
+    CYCT(b_+8, b_+10); TAIL(ralphRunScriptAndDeleteWhenOver);
   }
   CYC(b_+8, b_+10);
   CYC(b_+10, b_+13); A = W8(w1Link_direction);
@@ -1379,7 +1379,7 @@ void ralphSubid0e_hook(GB *gb) {
   CYC(b_+18, b_+20); L = INTERACTION_BASE + OBJ_VAR3F;
   CYC(b_+20, b_+21); alu_cp(gb, mem_rd(gb, HL));
   if (F & FZ) {
-    CYCT(b_+21, b_+23); ralphRunScriptAndDeleteWhenOver_hook(gb); return;
+    CYCT(b_+21, b_+23); TAIL(ralphRunScriptAndDeleteWhenOver);
   }
   CYC(b_+21, b_+23);
   CYC(b_+23, b_+24); mem_wr(gb, HL, A);
@@ -1392,7 +1392,7 @@ void ralphRunScriptAndDeleteWhenOver_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
   if (F & FC) {
-    CYCT(b_+3, b_+6); interactionDelete_hook(gb); return;
+    CYCT(b_+3, b_+6); TAIL(interactionDelete);
   }
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+9); interactionAnimateAsNpc_hook(gb);

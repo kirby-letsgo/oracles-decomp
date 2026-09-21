@@ -210,7 +210,7 @@ val0b:
 
 deleteSelfAndReturn:
   CYC(b_+235, b_+236); SET_AF(pop_effect(gb));
-  CYC(b_+236, b_+239); interactionDelete_hook(gb); return; // jp
+  CYC(b_+236, b_+239); TAIL(interactionDelete); // jp
 
 setTextForScript:
   CYC(b_+239, b_+240); H = D;

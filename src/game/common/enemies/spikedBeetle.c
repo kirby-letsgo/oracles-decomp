@@ -102,7 +102,7 @@ alreadyFlipped:
   CYC(b_+78, b_+80); A = 0x52; // SND_BOMB_LAND
   CALL_C(b_+80, playSound_b00_hook, SYM(playSound_b00), b_+83);
   CYC(b_+83, b_+85); A = 0x01;
-  CYC(b_+85, b_+88); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+85, b_+88); TAIL(enemySetAnimation); // jp
 
 knockback:
   CYC(b_+88, b_+90); E = ENEMY_BASE + 0x30; // Enemy.var30
@@ -124,7 +124,7 @@ storeKnockback:
   CYC(b_+110, b_+111); A = mem_rd(gb, DE);
   CYC(b_+111, b_+112); C = A;
   CYC(b_+112, b_+114); B = 0x23; // SPEED_e0
-  CYC(b_+114, b_+117); ecom_applyGivenVelocity_b0d_hook(gb); return; // jp
+  CYC(b_+114, b_+117); TAIL(ecom_applyGivenVelocity_b0d); // jp
 
 normalStatus:
   CYC(b_+117, b_+119); E = ENEMY_BASE + OBJ_STATE;
@@ -147,7 +147,7 @@ uninitialized:
   CYC(b_+147, b_+150); push_effect(gb, b_+150); goto setRandomAngleAndCounter1;
 uninitialized_resume: // resumes at 0x526a
   CYC(b_+150, b_+152); A = 0x0a; // SPEED_40
-  CYC(b_+152, b_+155); ecom_setSpeedAndState8AndVisible_b0d_hook(gb); return; // jp
+  CYC(b_+152, b_+155); TAIL(ecom_setSpeedAndState8AndVisible_b0d); // jp
 
 state_stub:
   RET(b_+155); return; // ret
@@ -165,7 +165,7 @@ state8:
   CYC(b_+173, b_+176);
 
 animate:
-  CYC(b_+176, b_+179); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+176, b_+179); TAIL(enemyAnimate); // jp
 
 state9:
   CALL_C(b_+179, ecom_decCounter2_b0d_hook, SYM(ecom_decCounter2_b0d), b_+182);
@@ -208,7 +208,7 @@ stateB:
   CYC(b_+240, b_+243); SET_BC(0xfe80); // -$180
   CALL_C(b_+243, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+246);
   CYC(b_+246, b_+247); alu_xor(gb, A);
-  CYC(b_+247, b_+250); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+247, b_+250); TAIL(enemySetAnimation); // jp
 
 waitingToFlipBack:
   CYC(b_+250, b_+251); A = mem_rd(gb, HL);

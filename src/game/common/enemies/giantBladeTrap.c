@@ -99,7 +99,7 @@ void enemyCode2a_hook(GB *gb) {
     if (target == SYM(giantBladeTrap_subid01)) { giantBladeTrap_subid01_hook(gb); return; }
     if (target == SYM(giantBladeTrap_subid02)) { giantBladeTrap_subid02_hook(gb); return; }
     if (target == SYM(giantBladeTrap_subid03)) { giantBladeTrap_subid03_hook(gb); return; }
-    giantBladeTrap_subid00_hook(gb); return; // target == 0x63aa
+    TAIL(giantBladeTrap_subid00); // target == 0x63aa
   }
 
 commonState:
@@ -107,7 +107,7 @@ commonState:
   {
     uint16_t target = enemyCode2a_jump_table(gb);
     if (target == SYM(giantBladeTrap_state_uninitialized)) { giantBladeTrap_state_uninitialized_hook(gb); return; }
-    giantBladeTrap_state_stub_hook(gb); return; // states 1-7 all target 0x63a9
+    TAIL(giantBladeTrap_state_stub); // states 1-7 all target 0x63a9
   }
 }
 
@@ -115,7 +115,7 @@ void giantBladeTrap_state_uninitialized_hook(GB *gb) {
   BASE(giantBladeTrap_state_uninitialized);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, ecom_setSpeedAndState8_b0d_hook, SYM(ecom_setSpeedAndState8_b0d), b_+3);
-  CYC(b_+3, b_+6); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(objectSetVisible82); // jp
 }
 
 void giantBladeTrap_state_stub_hook(GB *gb) {
@@ -137,7 +137,7 @@ void giantBladeTrap_subid01_hook(GB *gb) {
     uint16_t target = enemyCode2a_jump_table(gb);
     if (target == SYM(giantBladeTrap_subid01_state9)) { giantBladeTrap_subid01_state9_hook(gb); return; }
     if (target == SYM(giantBladeTrap_subid01_stateA)) { giantBladeTrap_subid01_stateA_hook(gb); return; }
-    giantBladeTrap_subid01_state8_hook(gb); return; // target == 0x63b5
+    TAIL(giantBladeTrap_subid01_state8); // target == 0x63b5
   }
 }
 
@@ -193,7 +193,7 @@ void giantBladeTrap_subid02_hook(GB *gb) {
     uint16_t target = enemyCode2a_jump_table(gb);
     if (target == SYM(giantBladeTrap_commonState9)) { giantBladeTrap_commonState9_hook(gb); return; }
     if (target == SYM(giantBladeTrap_subid02_stateA)) { giantBladeTrap_subid02_stateA_hook(gb); return; }
-    giantBladeTrap_subid02_state8_hook(gb); return; // target == 0x63e8
+    TAIL(giantBladeTrap_subid02_state8); // target == 0x63e8
   }
 }
 
@@ -278,7 +278,7 @@ void giantBladeTrap_subid03_hook(GB *gb) {
     uint16_t target = enemyCode2a_jump_table(gb);
     if (target == SYM(giantBladeTrap_commonState9)) { giantBladeTrap_commonState9_hook(gb); return; }
     if (target == SYM(giantBladeTrap_subid03_stateA)) { giantBladeTrap_subid03_stateA_hook(gb); return; }
-    giantBladeTrap_subid03_state8_hook(gb); return; // target == 0x6447
+    TAIL(giantBladeTrap_subid03_state8); // target == 0x6447
   }
 }
 

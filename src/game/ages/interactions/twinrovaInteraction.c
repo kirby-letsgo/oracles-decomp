@@ -108,7 +108,7 @@ afterLoadGfx:
     if (target == SYM(twinrova_initSubid02)) { twinrova_initSubid02_hook(gb); return; }
     if (target == SYM(twinrova_initSubid04)) { twinrova_initSubid04_hook(gb); return; }
     if (target == SYM(twinrova_initSubid06)) { twinrova_initSubid06_hook(gb); return; }
-    twinrova_initSubid00_hook(gb); return; // target == 0x7675
+    TAIL(twinrova_initSubid00); // target == 0x7675
   }
 }
 
@@ -141,7 +141,7 @@ void twinrova_initSubid06_hook(GB *gb) {
   CYC(b_+3, b_+5); mem_wr(gb, HL, 0x00);
   CALL_C(b_+5, twinrova_loadScript_hook, SYM(twinrova_loadScript), b_+8);
   CYC(b_+8, b_+11); SET_BC((SYM(interactionCode7a__updateLinkPositionWhileRollerMoving) + 30));
-  CYC(b_+11, b_+13); twinrova_genericInitialize_hook(gb); return; // jr
+  CYC(b_+11, b_+13); TAIL(twinrova_genericInitialize); // jr
 }
 
 void twinrova_initSubid02_hook(GB *gb) {
@@ -154,7 +154,7 @@ void twinrova_initSubid02_hook(GB *gb) {
   CYC(b_+7, b_+9); mem_wr(gb, HL, 0x02);
   CALL_C(b_+9, objectSetInvisible_hook, SYM(objectSetInvisible), b_+12);
   CYC(b_+12, b_+15); SET_BC(0x3850);
-  CYC(b_+15, b_+17); twinrova_genericInitialize_hook(gb); return; // jr
+  CYC(b_+15, b_+17); TAIL(twinrova_genericInitialize); // jr
 }
 
 void twinrova_initSubid04_hook(GB *gb) {
@@ -162,7 +162,7 @@ void twinrova_initSubid04_hook(GB *gb) {
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR38;
   CYC(b_+3, b_+5); mem_wr(gb, HL, 0x1e);
-  twinrova_initSubid00_hook(gb); return; // falls through
+  TAIL(twinrova_initSubid00); // falls through
 }
 
 void twinrova_initSubid00_hook(GB *gb) {
@@ -171,7 +171,7 @@ void twinrova_initSubid00_hook(GB *gb) {
   CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR3A;
   CYC(b_+3, b_+5); mem_wr(gb, HL, 0x00);
   CYC(b_+5, b_+8); SET_BC(0xf888);
-  twinrova_genericInitialize_hook(gb); return; // falls through
+  TAIL(twinrova_genericInitialize); // falls through
 }
 
 void twinrova_genericInitialize_hook(GB *gb) {
@@ -216,7 +216,7 @@ void twinrova_loadAngleAndCounterPreset_hook(GB *gb) {
   CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_VAR3A;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); B = A;
-  loadAngleAndCounterPreset_hook(gb); return; // falls through
+  TAIL(loadAngleAndCounterPreset); // falls through
 }
 
 // Loads preset values for angle and counter1 variables for an interaction. The values it
@@ -262,7 +262,7 @@ void twinrova_updateDirectionFromAngle_hook(GB *gb) {
   if (F & FZ) { RET_TAKEN(b_+10); return; } // ret z
   CYC(b_+10, b_+11);
   CYC(b_+11, b_+12); mem_wr(gb, HL, A);
-  CYC(b_+12, b_+15); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+12, b_+15); TAIL(interactionSetAnimation); // jp
 }
 
 // Initialize odd subids (the half of twinrova that just follows along)
@@ -276,7 +276,7 @@ void twinrova_initOtherHalf_hook(GB *gb) {
   // Copy position & stuff from other half, inverted if necessary
   CYC(b_+7, b_+9); A = OBJ_ENABLED;
   CALL_C(b_+9, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), SYM(twinrova_takeInvertedPositionFromObject));
-  twinrova_takeInvertedPositionFromObject_hook(gb); return; // falls through
+  TAIL(twinrova_takeInvertedPositionFromObject); // falls through
 }
 
 // @param h Object to copy visibility, direction, position from
@@ -316,7 +316,7 @@ setDirection:
   if (F & FZ) { RET_TAKEN(b_+41); return; } // ret z
   CYC(b_+41, b_+42);
   CYC(b_+42, b_+43); mem_wr(gb, HL, A);
-  CYC(b_+43, b_+46); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+43, b_+46); TAIL(interactionSetAnimation); // jp
 }
 
 // presetInteractionAnglesAndCounters (0a:771d): pure ROM data, not ported as code -- 6
@@ -359,7 +359,7 @@ subid00State0:
   if (!(F & FZ)) { CYCT(b_+50, b_+53); twinrova_updateDirectionFromAngle_hook(gb); return; } // jp nz
   CYC(b_+50, b_+53);
   CALL_C(b_+53, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+56);
-  CYC(b_+56, b_+59); twinrova_loadScript_hook(gb); return; // jp
+  CYC(b_+56, b_+59); TAIL(twinrova_loadScript); // jp
 
 subid00State1:
   CALL_C(b_+59, interactionAnimate_hook, SYM(interactionAnimate), b_+62);
@@ -377,7 +377,7 @@ subid00State1:
   CYC(b_+87, b_+89); mem_wr(gb, HL, 0x00);
   CYC(b_+89, b_+91); L = INTERACTION_BASE + OBJ_VAR3A;
   CYC(b_+91, b_+92); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
-  CYC(b_+92, b_+95); twinrova_loadAngleAndCounterPreset_hook(gb); return; // jp
+  CYC(b_+92, b_+95); TAIL(twinrova_loadAngleAndCounterPreset); // jp
 
 subid00State2:
   CYC(b_+95, b_+98); SET_HL((SYM(interactionCode92) + 8)); // scriptHelp.objectWritePositionTocfd5
@@ -391,7 +391,7 @@ subid00State2:
   CYC(b_+115, b_+118);
   CYC(b_+118, b_+120); A = 0x09;
   CYC(b_+120, b_+123); W8(wTmpcfc0_genericCutscene_cfd0) = A;
-  CYC(b_+123, b_+126); interactionDelete_hook(gb); return; // jp
+  CYC(b_+123, b_+126); TAIL(interactionDelete); // jp
 
 runOtherHalf:
   CALL_C(b_+126, interactionAnimate_hook, SYM(interactionAnimate), b_+129);
@@ -401,7 +401,7 @@ runOtherHalf:
   CYC(b_+135, b_+136); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+136, b_+139); interactionDelete_hook(gb); return; } // jp z
   CYC(b_+136, b_+139);
-  CYC(b_+139, b_+142); twinrova_takeInvertedPositionFromObject_hook(gb); return; // jp
+  CYC(b_+139, b_+142); TAIL(twinrova_takeInvertedPositionFromObject); // jp
 
 runSubid02: // also runSubid04 (same address; both subid values reuse this dispatch)
   CYC(b_+142, b_+144); E = INTERACTION_BASE + OBJ_SUBSTATE;
@@ -422,7 +422,7 @@ runSubid02: // also runSubid04 (same address; both subid values reuse this dispa
   if (!(F & FZ)) { RET_TAKEN(b_+158); return; } // ret nz
   CYC(b_+158, b_+159);
   CALL_C(b_+159, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+162);
-  CYC(b_+162, b_+165); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+162, b_+165); TAIL(interactionIncSubstate); // jp
 
 runSubid06:
   CYC(b_+165, b_+167); E = INTERACTION_BASE + OBJ_SUBSTATE;
@@ -444,7 +444,7 @@ void twinrova_loadScript_hook(GB *gb) {
   CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+8, b_+9); H = mem_rd(gb, HL);
   CYC(b_+9, b_+10); L = A;
-  CYC(b_+10, b_+13); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+10, b_+13); TAIL(interactionSetScript); // jp
 }
 
 // Gets a position stored in wTmpcfc0_genericCutscene_cfd5/cfd6

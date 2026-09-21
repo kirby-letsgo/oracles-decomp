@@ -103,7 +103,7 @@ static void specialWarp_subid1State0(GB *gb, uint16_t sp0_) {
   CYC(b_+91, b_+94); A = mem_rd(gb, wAnimalCompanion);
   CYC(b_+94, b_+96); alu_cp(gb, SPECIALOBJECT_DIMITRI);
   if (!(F & FZ)) {
-    CYCT(b_+96, b_+99); interactionDelete_hook(gb); return;
+    CYCT(b_+96, b_+99); TAIL(interactionDelete);
   }
   CYC(b_+96, b_+99);
   CYC(b_+99, b_+102); SET_BC(0x0810);

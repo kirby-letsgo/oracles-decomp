@@ -81,7 +81,7 @@ l_6550:
   CYC(b_+25, b_+26); H = D;
   CYC(b_+26, b_+28); L = INTERACTION_BASE + OBJ_COUNTER2;
   CYC(b_+28, b_+29); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
-  creditsTextHorizontal_6554_hook(gb); return; // falls through
+  TAIL(creditsTextHorizontal_6554); // falls through
 }
 
 // 0b:6554, called from interactionCodeae@subsubstate1; falls into (and out of)
@@ -92,7 +92,7 @@ void creditsTextHorizontal_6554_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+3, b_+4); H = mem_rd(gb, HL);
   CYC(b_+4, b_+5); L = A;
-  creditsTextHorizontal_6559_hook(gb); return; // falls through
+  TAIL(creditsTextHorizontal_6559); // falls through
 }
 
 // 0b:6559, called from interactionCodeae@state0.
@@ -127,7 +127,7 @@ void creditsTextHorizontal_6559_hook(GB *gb) {
   CYC(b_+29, b_+30); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+30, b_+31); ret_effect(gb); return; } // ret nz
   CYC(b_+30, b_+31);
-  CYC(b_+31, b_+34); creditsTextHorizontal_6537_hook(gb); return; // jp
+  CYC(b_+31, b_+34); TAIL(creditsTextHorizontal_6537); // jp
 }
 
 // 0b:657b, called from interactionCodeae@state1 (tail `jp`).
@@ -169,7 +169,7 @@ l_659b:
 
 applySpeed:
   CALL_C(b_+36, objectApplySpeed_hook, SYM(objectApplySpeed), b_+39);
-  CYC(b_+39, b_+42); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+39, b_+42); TAIL(objectApplySpeed); // jp
 
 substate1:
   CYC(b_+42, b_+44); E = INTERACTION_BASE + OBJ_COUNTER1;
@@ -258,7 +258,7 @@ l_642b:
   CYC(b_+80, b_+81); mem_wr(gb, HL, B);
   CYC(b_+81, b_+83); L = INTERACTION_BASE + OBJ_ANGLE;
   CYC(b_+83, b_+84); mem_wr(gb, HL, C);
-  CYC(b_+84, b_+87); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+84, b_+87); TAIL(objectSetVisible82); // jp
 
 state1:
   CYC(b_+87, b_+89); A = 0x01;
@@ -466,5 +466,5 @@ substate2:
   CYC(b_+337, b_+338);
   CYC(b_+338, b_+341); SET_HL(GV(wTmpcfc0_genericCutscene_cfdf, wTmpcfc0_wildTokay_cfde));
   CYC(b_+341, b_+343); mem_wr(gb, HL, GV(0xff, 0x01));
-  CYC(b_+343, b_+346); interactionDelete_hook(gb); return; // jp
+  CYC(b_+343, b_+346); TAIL(interactionDelete); // jp
 }

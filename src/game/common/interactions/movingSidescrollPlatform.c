@@ -43,7 +43,7 @@ void movingPlatform_stateC_hook(GB *gb) {
   CALL_C(b_+0, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+3);
   if (!(F & FZ)) { CYCT(b_+3, b_+4); ret_effect(gb); return; } // ret nz
   CYC(b_+3, b_+4);
-  CYC(b_+4, b_+7); sidescrollPlatformFunc_5bfc_hook(gb); return; // jp
+  CYC(b_+4, b_+7); TAIL(sidescrollPlatformFunc_5bfc); // jp
 }
 
 // ==================================================================================================
@@ -176,7 +176,7 @@ l_58bf:
 
 afterUpdateSubid:
   if (!(gb->pc == b_+6 && gb->sp == sp0_)) { hook_continue(gb, gb->pc, sp0_); return; }
-  CYC(b_+6, b_+9); sidescrollingPlatformCommon_hook(gb); return; // jp
+  CYC(b_+6, b_+9); TAIL(sidescrollingPlatformCommon); // jp
 }
 
 // 0b:7fa1, bare-global. Genuinely dead code -- "Garbage function here (partial repeat of the

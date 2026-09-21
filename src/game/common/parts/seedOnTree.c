@@ -97,7 +97,7 @@ state0:
   CYC(b_+46, b_+47); mem_wr(gb, DE, A); // [oamFlagsBackup]
   CYC(b_+47, b_+49); A = 0x01;
   CALL_C(b_+49, partSetAnimation_hook, SYM(partSetAnimation), b_+52);
-  CYC(b_+52, b_+55); objectSetVisiblec3_hook(gb); return; // jp
+  CYC(b_+52, b_+55); TAIL(objectSetVisiblec3); // jp
 
 state1:
   RET(b_+65); return; // ret
@@ -170,7 +170,7 @@ relatedObj2Something:
   CYC(b_+160, b_+162); mem_wr(gb, HL, 0x01);
 
 delete:
-  CYC(b_+162, b_+165); partDelete_hook(gb); return; // jp
+  CYC(b_+162, b_+165); TAIL(partDelete); // jp
 
 substate1:
   CALL_C(b_+165, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+168);
@@ -191,7 +191,7 @@ dead:
   CYC(b_+187, b_+188); A = D;
   CYC(b_+188, b_+191); mem_wr(gb, wRoomLayoutEnd, A);
   CYC(b_+191, b_+194); SET_BC(0x0035); // TX_0035
-  CYC(b_+194, b_+197); showText_hook(gb); return; // jp
+  CYC(b_+194, b_+197); TAIL(showText); // jp
 
 knockOffTree:
   CYC(b_+197, b_+200); SET_BC(0xfec0); // -0x140
@@ -217,5 +217,5 @@ void seedOnTree_giveSeed_hook(GB *gb) {
   CYC(b_+134, b_+136); E = 0xc2; // Part.subid
   CYC(b_+136, b_+137); A = mem_rd(gb, DE);
   CYC(b_+137, b_+139); alu_add(gb, 0x20); // TREASURE_EMBER_SEEDS
-  CYC(b_+139, b_+142); giveTreasure_hook(gb); return; // jp
+  CYC(b_+139, b_+142); TAIL(giveTreasure); // jp
 }

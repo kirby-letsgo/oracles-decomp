@@ -65,7 +65,7 @@ void interactionCode4a_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (introSprites1_jumpTable(gb));
     if (jt_ == b_+8) { goto state0; }
-    else if (jt_ == SYM(introSpritesState1)) { introSpritesState1_hook(gb); return; }
+    else if (jt_ == SYM(introSpritesState1) && hook_enabled_at(gb, SYM(introSpritesState1))) { introSpritesState1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -79,8 +79,8 @@ state0:
     else if (jt_ == b_+59) { goto initMovingSprite; }
     else if (jt_ == b_+78) { goto initTree; }
     else if (jt_ == b_+123) { goto initGlow; }
-    else if (jt_ == SYM(introSpriteIncStateAndLoadGraphics)) { introSpriteIncStateAndLoadGraphics_hook(gb); return; }
-    else if (jt_ == SYM(objectSetVisible82)) { objectSetVisible82_hook(gb); return; }
+    else if (jt_ == SYM(introSpriteIncStateAndLoadGraphics) && hook_enabled_at(gb, SYM(introSpriteIncStateAndLoadGraphics))) { introSpriteIncStateAndLoadGraphics_hook(gb); return; }
+    else if (jt_ == SYM(objectSetVisible82) && hook_enabled_at(gb, SYM(objectSetVisible82))) { objectSetVisible82_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -230,12 +230,12 @@ void introSpritesState1_hook(GB *gb) {
   CYC(b_+15, b_+16); A = mem_rd(gb, DE);
   CYC(b_+16, b_+17); push_effect(gb, b_+17);
   do { uint16_t jt_ = (introSprites1_jumpTable(gb));
-    if (jt_ == SYM(introSpriteTriforceSubid)) { introSpriteTriforceSubid_hook(gb); return; }
-    else if (jt_ == SYM(introSpriteRunTriforceGlowSubid)) { introSpriteRunTriforceGlowSubid_hook(gb); return; }
-    else if (jt_ == SYM(introSpriteRunSubid04)) { introSpriteRunSubid04_hook(gb); return; }
-    else if (jt_ == SYM(introSpriteRunSubid07)) { introSpriteRunSubid07_hook(gb); return; }
-    else if (jt_ == SYM(introSpriteRunSubid08)) { introSpriteRunSubid08_hook(gb); return; }
-    else if (jt_ == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
+    if (jt_ == SYM(introSpriteTriforceSubid) && hook_enabled_at(gb, SYM(introSpriteTriforceSubid))) { introSpriteTriforceSubid_hook(gb); return; }
+    else if (jt_ == SYM(introSpriteRunTriforceGlowSubid) && hook_enabled_at(gb, SYM(introSpriteRunTriforceGlowSubid))) { introSpriteRunTriforceGlowSubid_hook(gb); return; }
+    else if (jt_ == SYM(introSpriteRunSubid04) && hook_enabled_at(gb, SYM(introSpriteRunSubid04))) { introSpriteRunSubid04_hook(gb); return; }
+    else if (jt_ == SYM(introSpriteRunSubid07) && hook_enabled_at(gb, SYM(introSpriteRunSubid07))) { introSpriteRunSubid07_hook(gb); return; }
+    else if (jt_ == SYM(introSpriteRunSubid08) && hook_enabled_at(gb, SYM(introSpriteRunSubid08))) { introSpriteRunSubid08_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -252,7 +252,7 @@ void introSpriteTriforceSubid_hook(GB *gb) {
     else if (jt_ == b_+94) { goto substate2; }
     else if (jt_ == b_+116) { goto substate3; }
     else if (jt_ == b_+148) { goto substate4; }
-    else if (jt_ == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 

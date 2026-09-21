@@ -175,7 +175,7 @@ void interactionCode4d_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ambi_jump_table(gb));
     if (jt_ == b_+8) { goto state0; }
-    else if (jt_ == SYM(ambi_state1)) { ambi_state1_hook(gb); return; }
+    else if (jt_ == SYM(ambi_state1) && hook_enabled_at(gb, SYM(ambi_state1))) { ambi_state1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -200,16 +200,16 @@ void ambi_state1_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ambi_jump_table(gb));
-    if (jt_ == SYM(ambi_updateAnimationAndRunScript)) { ambi_updateAnimationAndRunScript_hook(gb); return; }
-    else if (jt_ == SYM(ambi_runSubid01)) { ambi_runSubid01_hook(gb); return; }
-    else if (jt_ == SYM(ambi_runSubid02)) { ambi_runSubid02_hook(gb); return; }
-    else if (jt_ == SYM(ambi_runSubid03)) { ambi_runSubid03_hook(gb); return; }
-    else if (jt_ == SYM(ambi_runSubid04)) { ambi_runSubid04_hook(gb); return; }
-    else if (jt_ == SYM(ambi_runSubid05)) { ambi_runSubid05_hook(gb); return; }
-    else if (jt_ == SYM(ambi_runSubid06)) { ambi_runSubid06_hook(gb); return; }
-    else if (jt_ == SYM(ambi_runSubid08)) { ambi_runSubid08_hook(gb); return; }
-    else if (jt_ == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
-    else if (jt_ == SYM(ambi_runSubid0a)) { ambi_runSubid0a_hook(gb); return; }
+    if (jt_ == SYM(ambi_updateAnimationAndRunScript) && hook_enabled_at(gb, SYM(ambi_updateAnimationAndRunScript))) { ambi_updateAnimationAndRunScript_hook(gb); return; }
+    else if (jt_ == SYM(ambi_runSubid01) && hook_enabled_at(gb, SYM(ambi_runSubid01))) { ambi_runSubid01_hook(gb); return; }
+    else if (jt_ == SYM(ambi_runSubid02) && hook_enabled_at(gb, SYM(ambi_runSubid02))) { ambi_runSubid02_hook(gb); return; }
+    else if (jt_ == SYM(ambi_runSubid03) && hook_enabled_at(gb, SYM(ambi_runSubid03))) { ambi_runSubid03_hook(gb); return; }
+    else if (jt_ == SYM(ambi_runSubid04) && hook_enabled_at(gb, SYM(ambi_runSubid04))) { ambi_runSubid04_hook(gb); return; }
+    else if (jt_ == SYM(ambi_runSubid05) && hook_enabled_at(gb, SYM(ambi_runSubid05))) { ambi_runSubid05_hook(gb); return; }
+    else if (jt_ == SYM(ambi_runSubid06) && hook_enabled_at(gb, SYM(ambi_runSubid06))) { ambi_runSubid06_hook(gb); return; }
+    else if (jt_ == SYM(ambi_runSubid08) && hook_enabled_at(gb, SYM(ambi_runSubid08))) { ambi_runSubid08_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
+    else if (jt_ == SYM(ambi_runSubid0a) && hook_enabled_at(gb, SYM(ambi_runSubid0a))) { ambi_runSubid0a_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -244,7 +244,7 @@ update_substate:
   do { uint16_t jt_ = (ambi_jump_table(gb));
     if (jt_ == b_+34) { goto substate0; }
     else if (jt_ == b_+52) { goto substate1; }
-    else if (jt_ == SYM(ambi_updateAnimationAndRunScript)) { ambi_updateAnimationAndRunScript_hook(gb); return; }
+    else if (jt_ == SYM(ambi_updateAnimationAndRunScript) && hook_enabled_at(gb, SYM(ambi_updateAnimationAndRunScript))) { ambi_updateAnimationAndRunScript_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -285,7 +285,7 @@ void ambi_runSubid02_hook(GB *gb) {
   do { uint16_t jt_ = (ambi_jump_table(gb));
     if (jt_ == b_+10) { goto substate0; }
     else if (jt_ == b_+17) { goto substate1; }
-    else if (jt_ == SYM(interactionAnimateBasedOnSpeed)) { interactionAnimateBasedOnSpeed_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimateBasedOnSpeed) && hook_enabled_at(gb, SYM(interactionAnimateBasedOnSpeed))) { interactionAnimateBasedOnSpeed_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -390,7 +390,7 @@ void ambi_runSubid04_hook(GB *gb) {
   do { uint16_t jt_ = (ambi_jump_table(gb));
     if (jt_ == b_+10) { goto substate0; }
     else if (jt_ == b_+25) { goto substate1; }
-    else if (jt_ == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 

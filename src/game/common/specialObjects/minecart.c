@@ -75,8 +75,7 @@ void specialObjectCode_minecart_b06_hook(GB *gb) {
   CYC(b_+50, b_+51); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+51, b_+52); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+52, b_+55);
-  objectSetVisiblec2_hook(gb);
-  return;
+  TAIL(objectSetVisiblec2);
 
 state1:
   CYC(b_+55, b_+58); A = W8(wPaletteThread_mode);
@@ -160,8 +159,7 @@ animate:
   }
   CALL_C(b_+139, objectApplySpeed_hook, SYM(objectApplySpeed), b_+142);
   CYC(b_+142, b_+145);
-  specialObjectAnimate_hook(gb);
-  return;
+  TAIL(specialObjectAnimate);
 
 minecart_stopped:
   CYC(b_+145, b_+147); E = 0x04;

@@ -37,7 +37,7 @@ void itemCode29_hook(GB *gb) {
       CYC(b_+16, b_+18); E = 0x30;
       CYC(b_+18, b_+20); A = 0xff;
       CYC(b_+20, b_+21); mem_wr(gb, DE, A);
-      CYC(b_+21, b_+24); objectSetVisible81_hook(gb); return;
+      CYC(b_+21, b_+24); TAIL(objectSetVisible81);
     }
     else if (jt_ == b_+24) { CYC(b_+24, b_+25); ret_effect(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }

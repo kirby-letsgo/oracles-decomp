@@ -141,12 +141,12 @@ state0:
   CYC(b_+65, b_+67);
   CYC(b_+67, b_+69); mem_wr(gb, HL, 0x64);
   CYC(b_+69, b_+71); A = 0x51; // SND_THROW
-  CYC(b_+71, b_+74); playSound_b00_hook(gb); return; // jp
+  CYC(b_+71, b_+74); TAIL(playSound_b00); // jp
 
 func_6ad0:
   CYC(b_+74, b_+76); mem_wr(gb, HL, 0x3c);
   CYC(b_+76, b_+78); A = 0x59; // SND_FALLINHOLE
-  CYC(b_+78, b_+81); playSound_b00_hook(gb); return; // jp
+  CYC(b_+78, b_+81); TAIL(playSound_b00); // jp
 
 state1:
   CALL_C(b_+97, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+100);
@@ -160,10 +160,10 @@ state1:
   CYC(b_+111, b_+113);
   if (F & FZ) { CYCT(b_+113, b_+116); func_6c17_hook(gb); return; } // jp z
   CYC(b_+113, b_+116);
-  CYC(b_+116, b_+119); func_6bf6_hook(gb); return; // jp
+  CYC(b_+116, b_+119); TAIL(func_6bf6); // jp
 
 objectApplySpeedTail:
-  CYC(b_+119, b_+122); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+119, b_+122); TAIL(objectApplySpeed); // jp
 
 state2:
   CYC(b_+134, b_+136); A = 0x03;
@@ -212,7 +212,7 @@ L_6b54:
   CYC(b_+206, b_+208); B = 0xff;
   CALL_C(b_+208, func_6b5f_hook, SYM(func_6b5f), b_+211);
   CALL_C(b_+211, partAnimate_hook, SYM(partAnimate), b_+214);
-  CYC(b_+214, b_+217); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+214, b_+217); TAIL(objectApplySpeed); // jp
 }
 
 void func_6b5f_hook(GB *gb) {
@@ -232,7 +232,7 @@ void func_6b65_hook(GB *gb) {
   CYC(b_+4, b_+6); mem_wr(gb, hFF8C, A);
   CYC(b_+6, b_+7); C = mem_rd(gb, HL);
   CALL_C(b_+7, func_6b71_hook, SYM(func_6b71), b_+10);
-  CYC(b_+10, b_+12); func_6bca_hook(gb); return; // jr
+  CYC(b_+10, b_+12); TAIL(func_6bca); // jr
 }
 
 void func_6b71_hook(GB *gb) {
@@ -268,7 +268,7 @@ L_6b91:
   CYC(b_+31, b_+34); A = mem_rd(gb, wLinkPushingAgainstBedCounter);
   CYC(b_+34, b_+35); alu_or(gb, mem_rd(gb, HL));
   CYC(b_+35, b_+38); mem_wr(gb, wLinkPushingAgainstBedCounter, A);
-  CYC(b_+38, b_+40); func_6baf_hook(gb); return; // jr
+  CYC(b_+38, b_+40); TAIL(func_6baf); // jr
 }
 
 void func_6b9f_hook(GB *gb) {
@@ -299,7 +299,7 @@ void func_6baf_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+21); return; } // ret nz
   CYC(b_+21, b_+22);
   CYC(b_+22, b_+24); A = 0x7e; // SND_SWITCH
-  CYC(b_+24, b_+27); playSound_b00_hook(gb); return; // jp
+  CYC(b_+24, b_+27); TAIL(playSound_b00); // jp
 }
 
 void func_6bca_hook(GB *gb) {
@@ -342,21 +342,21 @@ void func_6bf6_hook(GB *gb) {
   CALL_C(b_+2, playSound_b00_hook, SYM(playSound_b00), b_+5);
   CYC(b_+5, b_+7); A = 0x01;
   CYC(b_+7, b_+10); mem_wr(gb, wTmpcfc0_bigBangGame_prizeIndex, A);
-  CYC(b_+10, b_+12); func_6c27_hook(gb); return; // jr
+  CYC(b_+10, b_+12); TAIL(func_6c27); // jr
 }
 
 void func_6c02_hook(GB *gb) {
   BASE(func_6c02);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, func_6c0e_hook, SYM(func_6c0e), b_+3);
-  CYC(b_+3, b_+6); func_6b65_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(func_6b65); // jp
 }
 
 void func_6c08_hook(GB *gb) {
   BASE(func_6c08);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, func_6c0e_hook, SYM(func_6c0e), b_+3);
-  CYC(b_+3, b_+6); func_6b65_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(func_6b65); // jp
 }
 
 void func_6c0e_hook(GB *gb) {
@@ -386,5 +386,5 @@ void func_6c27_hook(GB *gb) {
   BASE(func_6c27);
   CYC(b_+0, b_+3); SET_HL(wShootingGalleryBallStatus);
   CYC(b_+3, b_+5); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  CYC(b_+5, b_+8); partDelete_hook(gb); return; // jp
+  CYC(b_+5, b_+8); TAIL(partDelete); // jp
 }

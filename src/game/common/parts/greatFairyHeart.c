@@ -48,5 +48,5 @@ L_5903:
   CYC(b_+51, b_+53); A = 0x31;
   CALL_C(b_+53, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+56);
   CYC(b_+56, b_+57); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+57, b_+60); partDelete_hook(gb); return; // jp
+  CYC(b_+57, b_+60); TAIL(partDelete); // jp
 }

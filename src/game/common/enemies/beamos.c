@@ -54,7 +54,7 @@ void enemyCode16_updateAngle_hook(GB *gb) {
   CYC(b_+99, b_+102); SET_HL(b_+107); // @angleToAnimation (data)
   CYC(b_+102, b_+103); enemyCode16_addAToHl_from_rst(gb, b_+103);
   CYC(b_+103, b_+104); A = mem_rd(gb, HL);
-  CYC(b_+104, b_+107); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+104, b_+107); TAIL(enemySetAnimation); // jp
 }
 
 // ==================================================================================================
@@ -86,7 +86,7 @@ state_uninitialized:
   CALL_C(b_+29, ecom_setSpeedAndState8AndVisible_b0d_hook, SYM(ecom_setSpeedAndState8AndVisible_b0d), b_+32);
   CYC(b_+32, b_+34); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+34, b_+36); mem_wr(gb, HL, 0x05);
-  CYC(b_+36, b_+39); objectMakeTileSolid_hook(gb); return; // jp
+  CYC(b_+36, b_+39); TAIL(objectMakeTileSolid); // jp
 
 state_stub:
   RET(b_+39); return; // ret

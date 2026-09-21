@@ -14,7 +14,7 @@ void interactionCode2f_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0x0a; // GLOBALFLAG_INTRO_DONE
   CALL_C(b_+2, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+5);
   if (!(F & FZ)) {
-    CYCT(b_+5, b_+8); interactionDelete_hook(gb); return;
+    CYCT(b_+5, b_+8); TAIL(interactionDelete);
   }
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+11); SET_HL(wActiveMusic);

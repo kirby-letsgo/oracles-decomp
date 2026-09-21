@@ -54,7 +54,7 @@ subid0:
     uint16_t target = enemyArrow_jump_table(gb);
     if (target == b_+29) goto subid0_state0;
     if (target == b_+57) goto subid0_state1;
-    partCommon_updateSpeedAndDeleteWhenCounter1Is0_hook(gb); return;
+    TAIL(partCommon_updateSpeedAndDeleteWhenCounter1Is0);
   }
 
 subid0_state0:
@@ -73,7 +73,7 @@ subid0_state0:
   CYC(b_+48, b_+50); A = alu_swap(gb, A);
   CYC(b_+50, b_+51); alu_rlca(gb);
   CALL_C(b_+51, partSetAnimation_hook, SYM(partSetAnimation), b_+54);
-  CYC(b_+54, b_+57); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+54, b_+57); TAIL(objectSetVisible81); // jp
 
 subid0_state1:
   CALL_C(b_+57, partCommon_checkTileCollisionOrOutOfBounds_hook, SYM(partCommon_checkTileCollisionOrOutOfBounds), b_+60);
@@ -92,7 +92,7 @@ subid1:
     if (target == b_+78) goto subid1_state0;
     if (target == b_+101) goto subid1_state1;
     if (target == b_+57) goto subid0_state1;
-    partCommon_updateSpeedAndDeleteWhenCounter1Is0_hook(gb); return;
+    TAIL(partCommon_updateSpeedAndDeleteWhenCounter1Is0);
   }
 
 subid1_state0:
@@ -108,7 +108,7 @@ subid1_state0:
   CYC(b_+92, b_+94); A = alu_swap(gb, A);
   CYC(b_+94, b_+95); alu_rlca(gb);
   CALL_C(b_+95, partSetAnimation_hook, SYM(partSetAnimation), b_+98);
-  CYC(b_+98, b_+101); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+98, b_+101); TAIL(objectSetVisible81); // jp
 
 subid1_state1:
   CALL_C(b_+101, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+104);
@@ -124,10 +124,10 @@ L_512f:
   CYC(b_+113, b_+115);
 
 objectApplySpeed:
-  CYC(b_+115, b_+118); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+115, b_+118); TAIL(objectApplySpeed); // jp
 
 partDelete:
-  CYC(b_+118, b_+121); partDelete_hook(gb); return; // jp
+  CYC(b_+118, b_+121); TAIL(partDelete); // jp
 
 func_11_513a:
   CYC(b_+121, b_+123); E = 0xc2; // Part.subid
@@ -142,5 +142,5 @@ L_5144:
   CYC(b_+131, b_+133); E = 0xc4; // Part.state
   CYC(b_+133, b_+134); mem_wr(gb, DE, A);
   CYC(b_+134, b_+136); A = 0x04;
-  CYC(b_+136, b_+139); partCommon_bounceWhenCollisionsEnabled_hook(gb); return; // jp
+  CYC(b_+136, b_+139); TAIL(partCommon_bounceWhenCollisionsEnabled); // jp
 }

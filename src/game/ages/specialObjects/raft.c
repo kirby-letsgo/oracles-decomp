@@ -189,7 +189,7 @@ respawning:
   CYC(b_+96, b_+98); E = 0x0d;
   CYC(b_+98, b_+99); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+99, b_+100); mem_wr(gb, DE, A);
-  CYC(b_+100, b_+103); objectSetInvisible_hook(gb); return;
+  CYC(b_+100, b_+103); TAIL(objectSetInvisible);
 
 updateDirection:
   CALL_C(b_+103, updateCompanionDirectionFromAngle_hook, SYM(updateCompanionDirectionFromAngle), b_+106);
@@ -358,7 +358,7 @@ state3:
   CYC(b_+328, b_+329); A = mem_rd(gb, DE);
   CYC(b_+329, b_+331); L = 0x48;
   CYC(b_+331, b_+332); mem_wr(gb, HL, A);
-  CYC(b_+332, b_+335); itemDelete_hook(gb); return;
+  CYC(b_+332, b_+335); TAIL(itemDelete);
 
 saveRaftPosition:
   CYC(b_+335, b_+338); SET_BC(wLastAnimalMountPointY);

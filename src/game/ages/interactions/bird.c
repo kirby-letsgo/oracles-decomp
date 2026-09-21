@@ -132,7 +132,7 @@ L_605e:
 L_6062:
   CYC(b_+114, b_+115); alu_xor(gb, A);
   CALL_C(b_+115, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+118);
-  CYC(b_+118, b_+121); bird_hop_hook(gb); return;
+  CYC(b_+118, b_+121); TAIL(bird_hop);
 }
 
 void interactionCode4c__initSubid00_hook(GB *gb) {
@@ -177,7 +177,7 @@ L_6057:
 L_6062:
   CYC(b_+114, b_+115); alu_xor(gb, A);
   CALL_C(b_+115, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+118);
-  CYC(b_+118, b_+121); bird_hop_hook(gb); return;
+  CYC(b_+118, b_+121); TAIL(bird_hop);
 }
 
 void interactionCode4c__impaNotMoved_hook(GB *gb) {
@@ -191,7 +191,7 @@ L_6057:
 L_6062:
   CYC(b_+114, b_+115); alu_xor(gb, A);
   CALL_C(b_+115, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+118);
-  CYC(b_+118, b_+121); bird_hop_hook(gb); return;
+  CYC(b_+118, b_+121); TAIL(bird_hop);
 }
 
 void interactionCode4c__initSubid01_hook(GB *gb) {
@@ -204,7 +204,7 @@ L_605e:
 L_6062:
   CYC(b_+114, b_+115); alu_xor(gb, A);
   CALL_C(b_+115, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+118);
-  CYC(b_+118, b_+121); bird_hop_hook(gb); return;
+  CYC(b_+118, b_+121); TAIL(bird_hop);
 }
 
 void interactionCode4c__setAnimation0AndJump_hook(GB *gb) {
@@ -213,7 +213,7 @@ void interactionCode4c__setAnimation0AndJump_hook(GB *gb) {
 L_6062:
   CYC(b_+114, b_+115); alu_xor(gb, A);
   CALL_C(b_+115, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+118);
-  CYC(b_+118, b_+121); bird_hop_hook(gb); return;
+  CYC(b_+118, b_+121); TAIL(bird_hop);
 }
 
 void interactionCode4c__state1_hook(GB *gb) {
@@ -224,9 +224,9 @@ L_6069:
   CYC(b_+123, b_+124); A = mem_rd(gb, DE);
   CYC(b_+124, b_+125); push_effect(gb, b_+125); SET_HL(bank09_jump_table(gb));
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(bird_runSubid0)) { bird_runSubid0_hook(gb); return; }
-    else if (jt_ == SYM(bird_runSubid4)) { bird_runSubid4_hook(gb); return; }
-    else if (jt_ == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
+    if (jt_ == SYM(bird_runSubid0) && hook_enabled_at(gb, SYM(bird_runSubid0))) { bird_runSubid0_hook(gb); return; }
+    else if (jt_ == SYM(bird_runSubid4) && hook_enabled_at(gb, SYM(bird_runSubid4))) { bird_runSubid4_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -340,8 +340,7 @@ void bird_updateGravityAndHopWhenHitGround_hook(GB *gb) {
   if (F & FZ) {
     CYC(b_+5, b_+6);
     CYC(b_+6, b_+7); H = D;
-    bird_hop_hook(gb);
-    return;
+    TAIL(bird_hop);
   }
   CYCT(b_+5, b_+6); ret_effect(gb);
 }

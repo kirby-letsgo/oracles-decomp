@@ -308,5 +308,5 @@ void interactionCoded5_hook(GB *gb) {
   CYC(b_+64, b_+65); push_effect(gb, b_+65);
   uint16_t target = great_fairy_jump_table(gb);
   if (target == SYM(greatFairy_subid0)) { greatFairy_subid0_hook(gb); return; }
-  greatFairy_subid1_hook(gb); return; // target == 0x78a5
+  TAIL(greatFairy_subid1); // target == 0x78a5
 }

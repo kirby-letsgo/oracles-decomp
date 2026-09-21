@@ -78,7 +78,7 @@ void interaction6e_subid00_hook(GB *gb) {
   CALL_C(b_+70, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+73);
   CALL_C(b_+73, objectSetVisible82_hook, SYM(objectSetVisible82), b_+76);
   CYC(b_+76, b_+79); SET_HL((SYM(miscPuzzles_subid1a) + 19)); // mainScripts.interaction6e_subid00Script
-  CYC(b_+79, b_+82); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+79, b_+82); TAIL(interactionSetScript); // jp
 
 state1:
   CALL_C(b_+82, interactionRunScript_hook, SYM(interactionRunScript), b_+85);
@@ -86,7 +86,7 @@ state1:
   CYC(b_+85, b_+88);
   CALL_C(b_+88, interactionIncState_hook, SYM(interactionIncState), b_+91);
   CYC(b_+91, b_+93); A = 0x04;
-  CYC(b_+93, b_+96); fadeoutToWhiteWithDelay_hook(gb); return; // jp
+  CYC(b_+93, b_+96); TAIL(fadeoutToWhiteWithDelay); // jp
 
 state2:
   CYC(b_+96, b_+99); A = W8(wPaletteThread_mode);
@@ -97,7 +97,7 @@ state2:
   CALL_C(b_+103, setGlobalFlag_hook, SYM(setGlobalFlag), b_+106);
   CYC(b_+106, b_+108); A = 0x0c; // CUTSCENE_NAYRU_WARP_TO_MAKU_TREE
   CYC(b_+108, b_+111); W8(wCutsceneTrigger) = A;
-  CYC(b_+111, b_+114); interactionDelete_hook(gb); return; // jp
+  CYC(b_+111, b_+114); TAIL(interactionDelete); // jp
 }
 
 // Queen Ambi
@@ -124,7 +124,7 @@ void interaction6e_subid01_hook(GB *gb) {
   CYC(b_+27, b_+28); mem_wr(gb, HL, A);
   CALL_C(b_+28, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+31);
   CYC(b_+31, b_+34); SET_HL((SYM(miscPuzzles_subid1d) + 31)); // mainScripts.interaction6e_subid01Script_part1
-  CYC(b_+34, b_+37); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+34, b_+37); TAIL(interactionSetScript); // jp
 
 state1:
   CYC(b_+37, b_+39); C = 0x30;
@@ -142,7 +142,7 @@ state1:
   CYC(b_+57, b_+59); mem_wr(gb, HL, 0x05);
 
 animate:
-  CYC(b_+59, b_+62); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+59, b_+62); TAIL(interactionAnimate); // jp
 
 state2:
   CALL_C(b_+62, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+65);
@@ -167,7 +167,7 @@ l559f:
   CYC(b_+85, b_+87); A = 0x06;
 
 setAnimation:
-  CYC(b_+87, b_+90); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+87, b_+90); TAIL(interactionSetAnimation); // jp
 
 state3:
   CYC(b_+90, b_+93); A = W8(wTmpcfc0_genericCutscene_cfd0);
@@ -201,7 +201,7 @@ l55bc:
   CYC(b_+136, b_+138); A = 0x21; // MUS_DISASTER
   CALL_C(b_+138, playSound_b00_hook, SYM(playSound_b00), b_+141);
   CYC(b_+141, b_+143); A = 0x04;
-  CYC(b_+143, b_+146); fadeinFromWhiteWithDelay_hook(gb); return; // jp
+  CYC(b_+143, b_+146); TAIL(fadeinFromWhiteWithDelay); // jp
 
 state4:
   CYC(b_+146, b_+149); A = W8(wPaletteThread_mode);
@@ -215,7 +215,7 @@ state4:
   CALL_C(b_+158, interactionRunScript_hook, SYM(interactionRunScript), b_+161);
 
 l55ed:
-  CYC(b_+161, b_+164); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+161, b_+164); TAIL(interactionAnimate); // jp
 }
 
 // Ghost Veran
@@ -243,7 +243,7 @@ void interaction6e_subid02_hook(GB *gb) {
   CALL_C(b_+31, showText_hook, SYM(showText), b_+34);
   CYC(b_+34, b_+36); A = 0xf0; // SNDCTRL_STOPMUSIC
   CALL_C(b_+36, playSound_b00_hook, SYM(playSound_b00), b_+39);
-  CYC(b_+39, b_+42); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+39, b_+42); TAIL(objectSetVisible81); // jp
 
 state1:
   CYC(b_+42, b_+44); E = INTERACTION_BASE + OBJ_COUNTER1;
@@ -294,7 +294,7 @@ l5662:
   CYC(b_+114, b_+116); A = 0x10;
   CYC(b_+116, b_+119); SET_BC((SYM(interaction97_subid01__positions) + 161));
   CALL_C(b_+119, objectSetPositionInCircleArc_hook, SYM(objectSetPositionInCircleArc), b_+122);
-  CYC(b_+122, b_+125); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+122, b_+125); TAIL(interactionAnimate); // jp
 
 beginPossessingAmbi:
   CYC(b_+125, b_+127); mem_wr(gb, HL, 0x50);
@@ -314,7 +314,7 @@ state3:
   CYC(b_+147, b_+149); A = 0x07;
   CYC(b_+149, b_+152); W8(wTmpcfc0_genericCutscene_cfd0) = A;
   CYC(b_+152, b_+154); A = 0x04;
-  CYC(b_+154, b_+157); interactionDelete_hook(gb); return; // jp
+  CYC(b_+154, b_+157); TAIL(interactionDelete); // jp
 
 l568d:
   CYC(b_+157, b_+159); L = INTERACTION_BASE + OBJ_VISIBLE;
@@ -324,14 +324,14 @@ l568d:
 
 applySpeedAndAnimate:
   CALL_C(b_+163, objectApplySpeed_hook, SYM(objectApplySpeed), b_+166);
-  CYC(b_+166, b_+169); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+166, b_+169); TAIL(interactionAnimate); // jp
 }
 
 void interaction6e_runScriptAndAnimate_hook(GB *gb) {
   BASE(interaction6e_runScriptAndAnimate);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
-  CYC(b_+3, b_+6); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(interactionAnimate); // jp
 }
 
 void interaction6e_initRalph_hook(GB *gb) {
@@ -343,7 +343,7 @@ void interaction6e_initRalph_hook(GB *gb) {
   CYC(b_+8, b_+10); mem_wr(gb, HL, 0x50); // SPEED_200
   CALL_C(b_+10, objectSetVisible82_hook, SYM(objectSetVisible82), b_+13);
   CYC(b_+13, b_+16); SET_HL((SYM(miscPuzzles_subid1f__state2) + 10)); // mainScripts.interaction6e_subid03Script
-  CYC(b_+16, b_+19); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+16, b_+19); TAIL(interactionSetScript); // jp
 }
 
 // Ralph
@@ -353,7 +353,7 @@ void interaction6e_subid03_hook(GB *gb) {
   CYC(b_+1, b_+2); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+2, b_+4); interaction6e_initRalph_hook(gb); return; } // jr z
   CYC(b_+2, b_+4);
-  interaction6e_runScriptAndAnimate_hook(gb); return;
+  TAIL(interaction6e_runScriptAndAnimate);
 }
 
 // Guards that run into the room
@@ -380,7 +380,7 @@ void interaction6e_subid04_hook(GB *gb) {
   CYC(b_+32, b_+33); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+33, b_+34); H = mem_rd(gb, HL);
   CYC(b_+34, b_+35); L = A;
-  CYC(b_+35, b_+38); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+35, b_+38); TAIL(interactionSetScript); // jp
 }
 
 // INTERAC_NAYRU_SAVED_CUTSCENE
@@ -396,6 +396,6 @@ void interactionCode6e_hook(GB *gb) {
     if (target == SYM(interaction6e_subid01)) { interaction6e_subid01_hook(gb); return; }
     if (target == SYM(interaction6e_subid02)) { interaction6e_subid02_hook(gb); return; }
     if (target == SYM(interaction6e_subid03)) { interaction6e_subid03_hook(gb); return; }
-    interaction6e_subid04_hook(gb); return; // target == 0x56b6
+    TAIL(interaction6e_subid04); // target == 0x56b6
   }
 }

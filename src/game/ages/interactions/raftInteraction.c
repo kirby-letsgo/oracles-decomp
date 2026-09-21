@@ -37,7 +37,7 @@ void interactionCodee6__checkLinkWithinRange_hook(GB *gb) {
   CYC(b_+157, b_+158); B = A;  // ld b,a
   CYC(b_+158, b_+159); L = alu_inc8(gb, L);  // inc l
   CYC(b_+159, b_+160); C = mem_rd(gb, HL);  // ld c,(hl)
-  CYC(b_+160, b_+164); interactionCheckContainsPoint_hook(gb); return;  // jp interactionCheckContainsPoint
+  CYC(b_+160, b_+164); TAIL(interactionCheckContainsPoint);  // jp interactionCheckContainsPoint
 }
 
 void interactionCodee6_hook(GB *gb) {
@@ -49,7 +49,7 @@ void interactionCodee6_hook(GB *gb) {
   do { uint16_t jt_ = (raftInteraction_jump_table(gb));
     if (jt_ == b_+10) { goto state0; }
     else if (jt_ == b_+78) { goto state1; }
-    else if (jt_ == SYM(interactionDelete)) { interactionDelete_hook(gb); return; }
+    else if (jt_ == SYM(interactionDelete) && hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
@@ -91,7 +91,7 @@ subid2:
   CYC(b_+69, b_+70); A = mem_rd(gb, DE);  // ld a,(de)
   CYC(b_+70, b_+72); alu_and(gb, 0x01);  // and $01
   CALL_C(b_+72, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+75);
-  CYC(b_+75, b_+78); objectSetVisible83_hook(gb); return;  // jp objectSetVisible83
+  CYC(b_+75, b_+78); TAIL(objectSetVisible83);  // jp objectSetVisible83
 
 state1:
   CALL_C(b_+78, interactionAnimate_hook, SYM(interactionAnimate), b_+81);
@@ -130,5 +130,5 @@ afterOverride:
   CYC(b_+140, b_+141); A = mem_rd(gb, DE);  // ld a,(de)
   CYC(b_+141, b_+142); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ldi (hl),a
   CALL_C(b_+142, objectCopyPosition_hook, SYM(objectCopyPosition), b_+145);
-  CYC(b_+145, b_+148); interactionIncState_hook(gb); return;  // jp interactionIncState
+  CYC(b_+145, b_+148); TAIL(interactionIncState);  // jp interactionIncState
 }

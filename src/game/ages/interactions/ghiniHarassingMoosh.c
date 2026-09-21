@@ -92,7 +92,7 @@ checkState:
   CYC(b_+68, b_+69); H = mem_rd(gb, HL);
   CYC(b_+69, b_+70); L = A;
   CALL_C(b_+70, interactionSetScript_hook, SYM(interactionSetScript), b_+73);
-  CYC(b_+73, b_+76); objectSetVisiblec0_hook(gb); return; // jp
+  CYC(b_+73, b_+76); TAIL(objectSetVisiblec0); // jp
 
 state1:
   CALL_C(b_+76, interactionAnimate_hook, SYM(interactionAnimate), b_+79);
@@ -121,5 +121,5 @@ l5e1c:
   CYC(b_+106, b_+107);
 
 deleteThis:
-  CYC(b_+107, b_+110); interactionDelete_hook(gb); return; // jp
+  CYC(b_+107, b_+110); TAIL(interactionDelete); // jp
 }

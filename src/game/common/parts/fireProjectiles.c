@@ -47,7 +47,7 @@ state0:
   CYC(b_+18, b_+20); mem_wr(gb, HL, 0x08);
   CYC(b_+20, b_+22); L = 0xd0; // Part.speed
   CYC(b_+22, b_+24); mem_wr(gb, HL, 0x3c);
-  CYC(b_+24, b_+27); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+24, b_+27); TAIL(objectSetVisible81); // jp
 
 state1:
   CALL_C(b_+27, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+30);
@@ -87,5 +87,5 @@ L_50b5:
   CALL_C(b_+75, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+78);
   if (!(F & FC)) { CYCT(b_+78, b_+81); partDelete_hook(gb); return; } // jp nc
   CYC(b_+78, b_+81);
-  CYC(b_+81, b_+84); partAnimate_hook(gb); return; // jp
+  CYC(b_+81, b_+84); TAIL(partAnimate); // jp
 }

@@ -71,7 +71,7 @@ void interactionCodeb0_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   uint16_t target = twinrovaInCutscene_jump_table(gb);
   if (target == SYM(twinrovaInCutscene_state0)) { twinrovaInCutscene_state0_hook(gb); return; }
-  twinrovaInCutscene_state1_hook(gb); return; // target == 0x6724
+  TAIL(twinrovaInCutscene_state1); // target == 0x6724
 }
 
 void twinrovaInCutscene_state0_hook(GB *gb) {
@@ -97,7 +97,7 @@ void twinrovaInCutscene_state0_hook(GB *gb) {
   // twinrovaInCutscene_state0@subid0
   CYC(b_+26, b_+28); A = 0x01;
   CYC(b_+28, b_+31); push_effect(gb, b_+31); twinrovaInCutscene_state0_commonInit1(gb); // call
-  CYC(b_+31, b_+33); twinrovaInCutscene_loadScript_hook(gb); return; // jr
+  CYC(b_+31, b_+33); TAIL(twinrovaInCutscene_loadScript); // jr
 
 subid1: // twinrovaInCutscene_state0@subid1
   CYC(b_+33, b_+35); A = 0x02;
@@ -115,7 +115,7 @@ subid3: // twinrovaInCutscene_state0@subid3
 commonInit2: // twinrovaInCutscene_state0@commonInit2
   CYC(b_+55, b_+57); E = INTERACTION_BASE + OBJ_OAM_FLAGS;
   CYC(b_+57, b_+58); mem_wr(gb, DE, A);
-  CYC(b_+58, b_+61); interactionSetAlwaysUpdateBit_hook(gb); return; // jp
+  CYC(b_+58, b_+61); TAIL(interactionSetAlwaysUpdateBit); // jp
 }
 
 void twinrovaInCutscene_state1_hook(GB *gb) {
@@ -146,7 +146,7 @@ void twinrovaInCutscene_state1_hook(GB *gb) {
   CYC(b_+30, b_+33); W8(wGenericCutscene_cbb3) = A;
   CYC(b_+33, b_+34); A = alu_dec8(gb, A);
   CYC(b_+34, b_+37); W8(wGenericCutscene_cbba) = A;
-  CYC(b_+37, b_+40); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+37, b_+40); TAIL(interactionIncSubstate); // jp
 
 substate1: // twinrovaInCutscene_state1@substate1
   CYC(b_+40, b_+43); SET_HL(wGenericCutscene_cbb3);
@@ -170,7 +170,7 @@ void twinrovaInCutscene_loadScript_hook(GB *gb) {
   CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+8, b_+9); H = mem_rd(gb, HL);
   CYC(b_+9, b_+10); L = A;
-  CYC(b_+10, b_+13); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+10, b_+13); TAIL(interactionSetScript); // jp
 
   // twinrovaInCutscene_loadScript@scriptTable (0b:676d): pure ROM data (2-entry pointer table),
   // not ported as code -- referenced only via SET_HL(0x676d) above.

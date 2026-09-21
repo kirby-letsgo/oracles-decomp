@@ -63,7 +63,7 @@ static void interactionCodeb9_jump(GB *gb) {
   CYC(b_+95, b_+96); C = mem_rd(gb, HL);
   CYC(b_+96, b_+97); SET_HL(HL + 1); // inc hl
   CYC(b_+97, b_+98); B = mem_rd(gb, HL);
-  CYC(b_+98, b_+101); objectSetSpeedZ_hook(gb); return; // jp
+  CYC(b_+98, b_+101); TAIL(objectSetSpeedZ); // jp
 }
 
 // ==================================================================================================
@@ -170,7 +170,7 @@ setZPosition:
 
 subid7Init:
   CYC(b_+137, b_+140); SET_HL(GV((SYM(interactionCoded8__subid0Script) + 37), 0x7a81)); // mainScripts.horonDogCreditsScript
-  CYC(b_+140, b_+143); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+140, b_+143); TAIL(interactionSetScript); // jp
 
 state1:
   CYC(b_+189, b_+191); E = INTERACTION_BASE + OBJ_SUBSTATE;
@@ -188,7 +188,7 @@ substate0:
   if (!(F & FZ)) { CYCT(b_+202, b_+203); ret_effect(gb); return; } // ret nz
   CYC(b_+202, b_+203);
   CALL_C(b_+203, objectSetVisible_hook, SYM(objectSetVisible), b_+206);
-  CYC(b_+206, b_+209); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+206, b_+209); TAIL(interactionIncSubstate); // jp
 
 substate1:
   CALL_C(b_+209, interactionAnimate_hook, SYM(interactionAnimate), b_+212);
@@ -207,7 +207,7 @@ substate1:
   CYC(b_+233, b_+234); A = mem_rd(gb, HL);
   CYC(b_+234, b_+235); alu_add(gb, A);
   CYC(b_+235, b_+236); A = alu_inc8(gb, A);
-  CYC(b_+236, b_+239); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+236, b_+239); TAIL(interactionSetAnimation); // jp
 
 reachedTargetXPosition:
   CYC(b_+239, b_+241); E = INTERACTION_BASE + OBJ_SUBID;
@@ -285,5 +285,5 @@ substate2_subidNot0:
   // falls through into @animate
 
 animate:
-  CYC(b_+323, b_+326); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+323, b_+326); TAIL(interactionAnimate); // jp
 }

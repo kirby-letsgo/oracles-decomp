@@ -165,5 +165,5 @@ applySpeed:
 
 afterUpdateState:
   if (!(gb->pc == b_+12 && gb->sp == sp0_)) { hook_continue(gb, gb->pc, sp0_); return; }
-  CYC(b_+12, b_+15); sidescrollingPlatformCommon_hook(gb); return; // jp
+  CYC(b_+12, b_+15); TAIL(sidescrollingPlatformCommon); // jp
 }

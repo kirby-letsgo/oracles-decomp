@@ -120,16 +120,16 @@ void interactionCode66_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (goron_jump_table(gb));
-    if (jt_ == SYM(goronSubid00)) { goronSubid00_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid01)) { goronSubid01_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid02)) { goronSubid02_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid03)) { goronSubid03_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid05)) { goronSubid05_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid06)) { goronSubid06_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid07)) { goronSubid07_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid09)) { goronSubid09_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid0b)) { goronSubid0b_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid0f)) { goronSubid0f_hook(gb); return; }
+    if (jt_ == SYM(goronSubid00) && hook_enabled_at(gb, SYM(goronSubid00))) { goronSubid00_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid01) && hook_enabled_at(gb, SYM(goronSubid01))) { goronSubid01_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid02) && hook_enabled_at(gb, SYM(goronSubid02))) { goronSubid02_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid03) && hook_enabled_at(gb, SYM(goronSubid03))) { goronSubid03_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid05) && hook_enabled_at(gb, SYM(goronSubid05))) { goronSubid05_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid06) && hook_enabled_at(gb, SYM(goronSubid06))) { goronSubid06_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid07) && hook_enabled_at(gb, SYM(goronSubid07))) { goronSubid07_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid09) && hook_enabled_at(gb, SYM(goronSubid09))) { goronSubid09_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid0b) && hook_enabled_at(gb, SYM(goronSubid0b))) { goronSubid0b_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid0f) && hook_enabled_at(gb, SYM(goronSubid0f))) { goronSubid0f_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -502,7 +502,7 @@ jump:
   CYC(b_+141, b_+143); mem_wr(gb, HL, 2);
   CYC(b_+143, b_+145); A = 1;
   CYC(b_+145, b_+148); W8(wTmpcfc0_goronDance_linkJumping) = A;
-  CYC(b_+148, b_+151); interactionIncSubstate_hook(gb); return;
+  CYC(b_+148, b_+151); TAIL(interactionIncSubstate);
 round_finished:
   CYC(b_+151, b_+152); alu_xor(gb, A);
   CYC(b_+152, b_+155); W8(wTmpcfc0_goronDance_cfd9) = A;
@@ -898,7 +898,7 @@ update_animation:
   CYC(b_+56, b_+57); mem_wr(gb, DE, A);
   CYC(b_+57, b_+60); A = W8(wTmpcfc0_goronDance_danceAnimation);
   CALL_C(b_+60, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+63);
-  CYC(b_+63, b_+66); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return;
+  CYC(b_+63, b_+66); TAIL(interactionPushLinkAwayAndUpdateDrawPriority);
 goto_state1:
   CYC(b_+66, b_+67); H = D;
   CYC(b_+67, b_+69); L = INTERACTION_BASE + OBJ_STATE;

@@ -602,8 +602,7 @@ void tileReplacement_group0Map2c_hook(GB *gb) {
   CALL_C(b_+3, getVinePosition_hook, SYM(getVinePosition), b_+6);
   if (!(F & FZ)) {
     CYCT(b_+6, b_+9);
-    setTileToWitheredVine_hook(gb);
-    return;
+    TAIL(setTileToWitheredVine);
   }
   CYC(b_+6, b_+9);
   CYC(b_+9, b_+11); L = 0x06;
@@ -633,8 +632,7 @@ void tileReplacement_group0Mapba_hook(GB *gb) {
   CALL_C(b_+3, getVinePosition_hook, SYM(getVinePosition), b_+6);
   if (!(F & FZ)) {
     CYCT(b_+6, b_+9);
-    setTileToWitheredVine_hook(gb);
-    return;
+    TAIL(setTileToWitheredVine);
   }
   CYC(b_+6, b_+9);
   CYC(b_+9, b_+11); L = 0x07;
@@ -667,8 +665,7 @@ void tileReplacement_group0Mapcc_hook(GB *gb) {
   CALL_C(b_+3, getVinePosition_hook, SYM(getVinePosition), b_+6);
   if (!(F & FZ)) {
     CYCT(b_+6, b_+9);
-    setTileToWitheredVine_hook(gb);
-    return;
+    TAIL(setTileToWitheredVine);
   }
   CYC(b_+6, b_+9);
   CYC(b_+9, b_+11); L = 0x00;
@@ -698,8 +695,7 @@ void tileReplacement_group0Mapda_hook(GB *gb) {
   CALL_C(b_+3, getVinePosition_hook, SYM(getVinePosition), b_+6);
   if (!(F & FZ)) {
     CYCT(b_+6, b_+9);
-    setTileToWitheredVine_hook(gb);
-    return;
+    TAIL(setTileToWitheredVine);
   }
   CYC(b_+6, b_+9);
   CYC(b_+9, b_+11); L = 0x07;
@@ -736,8 +732,7 @@ void tileReplacement_group0Map61_hook(GB *gb) {
   CALL_C(b_+11, getVinePosition_hook, SYM(getVinePosition), b_+14);
   if (!(F & FZ)) {
     CYCT(b_+14, b_+17);
-    setTileToWitheredVine_hook(gb);
-    return;
+    TAIL(setTileToWitheredVine);
   }
   CYC(b_+14, b_+17);
   CYC(b_+17, b_+20); SET_HL(wRoomLayout + 0x06);

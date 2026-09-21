@@ -276,12 +276,12 @@ void interaction21_subid07_hook(GB *gb) {
   CYC(b_+12, b_+13); A = mem_rd(gb, BC);
   CYC(b_+13, b_+15); alu_cp(gb, 0xad); // TILEINDEX_RED_TOGGLE_FLOOR
   if (F & FZ) {
-    CYCT(b_+15, b_+17); unsetSwitch_hook(gb); return;
+    CYCT(b_+15, b_+17); TAIL(unsetSwitch);
   }
   CYC(b_+15, b_+17);
   CYC(b_+17, b_+19); alu_cp(gb, 0xae); // TILEINDEX_YELLOW_TOGGLE_FLOOR
   if (F & FZ) {
-    CYCT(b_+19, b_+21); unsetSwitch_hook(gb); return;
+    CYCT(b_+19, b_+21); TAIL(unsetSwitch);
   }
   CYC(b_+19, b_+21);
   setSwitch_hook(gb);
@@ -322,7 +322,7 @@ void interaction21_subid08_hook(GB *gb) {
   CYC(b_+8, b_+9); A = mem_rd(gb, HL);
   CYC(b_+9, b_+11); alu_cp(gb, 0x02);
   if (F & FZ) {
-    CYCT(b_+11, b_+13); setSwitch_hook(gb); return;
+    CYCT(b_+11, b_+13); TAIL(setSwitch);
   }
   CYC(b_+11, b_+13);
   CYC(b_+13, b_+15); unsetSwitch_hook(gb);
@@ -381,7 +381,7 @@ void interaction21_subid0b_hook(GB *gb) {
   CALL_C(b_+5, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+8);
   CYC(b_+8, b_+10); alu_and(gb, 0x80);
   if (!(F & FZ)) {
-    CYCT(b_+10, b_+13); interactionDelete_hook(gb); return;
+    CYCT(b_+10, b_+13); TAIL(interactionDelete);
   }
   CYC(b_+10, b_+13);
   CYC(b_+13, b_+16); SET_HL(objectData77d4_bank12);
@@ -390,28 +390,28 @@ void interaction21_subid0b_hook(GB *gb) {
   CYC(b_+19, b_+22); SET_BC((SYM(interactionCode1f__subid0) + 1));
   CALL_C(b_+22, makeTorchAtPositionTemporarilyLightable_hook, SYM(makeTorchAtPositionTemporarilyLightable), b_+25);
   if (!(F & FZ)) {
-    CYCT(b_+25, b_+28); interactionDelete_hook(gb); return;
+    CYCT(b_+25, b_+28); TAIL(interactionDelete);
   }
   CYC(b_+25, b_+28);
 
   CYC(b_+28, b_+31); SET_BC((SYM(interactionCode1f__subid0) + 31));
   CALL_C(b_+31, makeTorchAtPositionTemporarilyLightable_hook, SYM(makeTorchAtPositionTemporarilyLightable), b_+34);
   if (!(F & FZ)) {
-    CYCT(b_+34, b_+37); interactionDelete_hook(gb); return;
+    CYCT(b_+34, b_+37); TAIL(interactionDelete);
   }
   CYC(b_+34, b_+37);
 
   CYC(b_+37, b_+40); SET_BC((SYM(interactionCode1f__subid0) + 35));
   CALL_C(b_+40, makeTorchAtPositionTemporarilyLightable_hook, SYM(makeTorchAtPositionTemporarilyLightable), b_+43);
   if (!(F & FZ)) {
-    CYCT(b_+43, b_+46); interactionDelete_hook(gb); return;
+    CYCT(b_+43, b_+46); TAIL(interactionDelete);
   }
   CYC(b_+43, b_+46);
 
   CYC(b_+46, b_+49); SET_BC((SYM(interactionCode1f__subid0__initialize) + 14));
   CALL_C(b_+49, makeTorchAtPositionTemporarilyLightable_hook, SYM(makeTorchAtPositionTemporarilyLightable), b_+52);
   if (!(F & FZ)) {
-    CYCT(b_+52, b_+55); interactionDelete_hook(gb); return;
+    CYCT(b_+52, b_+55); TAIL(interactionDelete);
   }
   CYC(b_+52, b_+55);
 
@@ -459,7 +459,7 @@ void interaction21_subid0d_hook(GB *gb) {
   do { uint16_t jt_ = (dungeonEvents_jumpTable(gb));
     if (jt_ == b_+12) { goto state0; }
     else if (jt_ == b_+37) { goto state1; }
-    else if (jt_ == SYM(interactionRunScript)) { interactionRunScript_hook(gb); return; }
+    else if (jt_ == SYM(interactionRunScript) && hook_enabled_at(gb, SYM(interactionRunScript))) { interactionRunScript_hook(gb); return; }
     else if (jt_ == b_+76) { goto state3; }
     else { HANDOFF(HL); }
   } while (0);
@@ -468,13 +468,13 @@ state0:
   CYC(b_+12, b_+14); A = 0x0f; // GLOBALFLAG_D3_CRYSTALS
   CALL_C(b_+14, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+17);
   if (!(F & FZ)) {
-    CYCT(b_+17, b_+20); interactionDelete_hook(gb); return;
+    CYCT(b_+17, b_+20); TAIL(interactionDelete);
   }
   CYC(b_+17, b_+20);
   CALL_C(b_+20, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+23);
   CYC(b_+23, b_+25); alu_and(gb, 0x40);
   if (!(F & FZ)) {
-    CYCT(b_+25, b_+28); interactionDelete_hook(gb); return;
+    CYCT(b_+25, b_+28); TAIL(interactionDelete);
   }
   CYC(b_+25, b_+28);
   CYC(b_+28, b_+31); A = mem_rd(gb, wSwitchState);
@@ -641,7 +641,7 @@ next:
   CYC(b_+11, b_+12); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+12, b_+13); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+13, b_+15); spawnChestAndDeleteSelf_hook(gb); return;
+    CYCT(b_+13, b_+15); TAIL(spawnChestAndDeleteSelf);
   }
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+16); C = A;
@@ -695,7 +695,7 @@ void interaction21_subid16_hook(GB *gb) {
   CYC(b_+6, b_+7); push_effect(gb, b_+7);
   do { uint16_t jt_ = (dungeonEvents_jumpTable(gb));
     if (jt_ == b_+11) { goto state0; }
-    else if (jt_ == SYM(interaction21_subid16_state1)) { interaction21_subid16_state1_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid16_state1) && hook_enabled_at(gb, SYM(interaction21_subid16_state1))) { interaction21_subid16_state1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -799,7 +799,7 @@ void interaction21_subid17_hook(GB *gb) {
   CALL_C(b_+3, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+6);
   CYC(b_+6, b_+8); alu_and(gb, 0x20); // ROOMFLAG_ITEM
   if (!(F & FZ)) {
-    CYCT(b_+8, b_+11); interactionDelete_hook(gb); return;
+    CYCT(b_+8, b_+11); TAIL(interactionDelete);
   }
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+13); E = INTERACTION_BASE + OBJ_XH;
@@ -998,32 +998,32 @@ void interactionCode21_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (dungeonEvents_jumpTable(gb));
-    if (jt_ == SYM(interactionDelete)) { interactionDelete_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid01)) { interaction21_subid01_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid02)) { interaction21_subid02_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid03)) { interaction21_subid03_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid04)) { interaction21_subid04_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid05)) { interaction21_subid05_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid06)) { interaction21_subid06_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid07)) { interaction21_subid07_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid08)) { interaction21_subid08_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid09)) { interaction21_subid09_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid0a)) { interaction21_subid0a_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid0b)) { interaction21_subid0b_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid0c)) { interaction21_subid0c_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid0d)) { interaction21_subid0d_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid0e)) { interaction21_subid0e_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid0f)) { interaction21_subid0f_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid10)) { interaction21_subid10_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid11)) { interaction21_subid11_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid12)) { interaction21_subid12_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid13)) { interaction21_subid13_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid14)) { interaction21_subid14_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid15)) { interaction21_subid15_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid16)) { interaction21_subid16_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid17)) { interaction21_subid17_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid18)) { interaction21_subid18_hook(gb); return; }
-    else if (jt_ == SYM(interaction21_subid19)) { interaction21_subid19_hook(gb); return; }
+    if (jt_ == SYM(interactionDelete) && hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid01) && hook_enabled_at(gb, SYM(interaction21_subid01))) { interaction21_subid01_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid02) && hook_enabled_at(gb, SYM(interaction21_subid02))) { interaction21_subid02_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid03) && hook_enabled_at(gb, SYM(interaction21_subid03))) { interaction21_subid03_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid04) && hook_enabled_at(gb, SYM(interaction21_subid04))) { interaction21_subid04_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid05) && hook_enabled_at(gb, SYM(interaction21_subid05))) { interaction21_subid05_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid06) && hook_enabled_at(gb, SYM(interaction21_subid06))) { interaction21_subid06_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid07) && hook_enabled_at(gb, SYM(interaction21_subid07))) { interaction21_subid07_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid08) && hook_enabled_at(gb, SYM(interaction21_subid08))) { interaction21_subid08_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid09) && hook_enabled_at(gb, SYM(interaction21_subid09))) { interaction21_subid09_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid0a) && hook_enabled_at(gb, SYM(interaction21_subid0a))) { interaction21_subid0a_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid0b) && hook_enabled_at(gb, SYM(interaction21_subid0b))) { interaction21_subid0b_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid0c) && hook_enabled_at(gb, SYM(interaction21_subid0c))) { interaction21_subid0c_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid0d) && hook_enabled_at(gb, SYM(interaction21_subid0d))) { interaction21_subid0d_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid0e) && hook_enabled_at(gb, SYM(interaction21_subid0e))) { interaction21_subid0e_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid0f) && hook_enabled_at(gb, SYM(interaction21_subid0f))) { interaction21_subid0f_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid10) && hook_enabled_at(gb, SYM(interaction21_subid10))) { interaction21_subid10_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid11) && hook_enabled_at(gb, SYM(interaction21_subid11))) { interaction21_subid11_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid12) && hook_enabled_at(gb, SYM(interaction21_subid12))) { interaction21_subid12_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid13) && hook_enabled_at(gb, SYM(interaction21_subid13))) { interaction21_subid13_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid14) && hook_enabled_at(gb, SYM(interaction21_subid14))) { interaction21_subid14_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid15) && hook_enabled_at(gb, SYM(interaction21_subid15))) { interaction21_subid15_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid16) && hook_enabled_at(gb, SYM(interaction21_subid16))) { interaction21_subid16_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid17) && hook_enabled_at(gb, SYM(interaction21_subid17))) { interaction21_subid17_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid18) && hook_enabled_at(gb, SYM(interaction21_subid18))) { interaction21_subid18_hook(gb); return; }
+    else if (jt_ == SYM(interaction21_subid19) && hook_enabled_at(gb, SYM(interaction21_subid19))) { interaction21_subid19_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

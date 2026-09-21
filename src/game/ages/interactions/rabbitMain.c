@@ -53,8 +53,7 @@ static void rabbit_subid0_substate0(GB *gb, uint16_t sp0_) {
   CYC(b_+18, b_+20); alu_cp(gb, 0x0e);
   if (!(F & FZ)) {
     CYCT(b_+20, b_+23);
-    interactionRunScript_hook(gb);
-    return;
+    TAIL(interactionRunScript);
   }
   CYC(b_+20, b_+23);
   CALL_C(b_+23, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+26);
@@ -69,8 +68,7 @@ static void rabbit_subid0_substate1(GB *gb, uint16_t sp0_) {
   CYC(b_+34, b_+36); alu_cp(gb, 0x10);
   if (!(F & FZ)) {
     CYCT(b_+36, b_+39);
-    interactionRunScript_hook(gb);
-    return;
+    TAIL(interactionRunScript);
   }
   CYC(b_+36, b_+39);
   CALL_C(b_+39, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+42);
@@ -84,8 +82,7 @@ static void rabbit_subid0_substate2(GB *gb, uint16_t sp0_) {
   CALL_C(b_+47, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+50);
   if (!(F & FZ)) {
     CYCT(b_+50, b_+53);
-    interactionAnimate_hook(gb);
-    return;
+    TAIL(interactionAnimate);
   }
   CYC(b_+50, b_+53);
   CALL_C(b_+53, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+56);
@@ -101,16 +98,14 @@ static void rabbit_subid0_substate3(GB *gb, uint16_t sp0_) {
   CALL_C(b_+75, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+78);
   if (!(F & FC)) {
     CYCT(b_+78, b_+81);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+78, b_+81);
   CYC(b_+81, b_+83); C = 0x20;
   CALL_C(b_+83, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+86);
   if (!(F & FZ)) {
     CYCT(b_+86, b_+89);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+86, b_+89);
   CYC(b_+89, b_+91);
@@ -166,8 +161,7 @@ static void rabbit_subid1_substate1(GB *gb, uint16_t sp0_) {
   CYC(b_+61, b_+63); alu_cp(gb, 0xd0);
   if (!(F & FC)) {
     CYCT(b_+63, b_+66);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+63, b_+66);
   CALL_C(b_+66, objectApplySpeed_hook, SYM(objectApplySpeed), b_+69);
@@ -384,8 +378,7 @@ void rabbitSubid4Substate2_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
     CYCT(b_+5, b_+8);
-    interactionRunScript_hook(gb);
-    return;
+    TAIL(interactionRunScript);
   }
   CYC(b_+5, b_+8);
   CALL_C(b_+8, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+11);
@@ -427,8 +420,7 @@ static void rabbit_subid4_substate0(GB *gb, uint16_t sp0_) {
     CYC(b_+24, b_+26); mem_wr(gb, HL, 0x02);
     CYC(b_+26, b_+29); SET_HL((SYM(partData) + 655));
     CYC(b_+29, b_+32);
-    interactionSetScript_hook(gb);
-    return;
+    TAIL(interactionSetScript);
   }
   CYCT(b_+19, b_+21);
   CALL_C(b_+32, interactionAnimate_hook, SYM(interactionAnimate), b_+35);
@@ -473,7 +465,7 @@ void rabbitSubid4_hook(GB *gb) {
   do { uint16_t jt_ = (rabbit_jump_table(gb));
     if (jt_ == b_+14) { rabbit_subid4_substate0(gb, sp0_); return; }
     else if (jt_ == b_+43) { rabbit_subid4_substate1(gb, sp0_); return; }
-    else if (jt_ == SYM(rabbitSubid4Substate2)) { rabbitSubid4Substate2_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid4Substate2) && hook_enabled_at(gb, SYM(rabbitSubid4Substate2))) { rabbitSubid4Substate2_hook(gb); return; }
     else if (jt_ == SYM(rabbitSubid5__substate3)) { rabbit_subid5_substate3(gb, sp0_); return; }
     else if (jt_ == SYM(rabbitSubid5__ret)) { rabbit_subid5_ret(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
@@ -486,8 +478,7 @@ void rabbitSubid7_hook(GB *gb) {
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
   if (F & FC) {
     CYCT(b_+3, b_+6);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+9);
@@ -661,14 +652,14 @@ static void rabbit_dispatch_state1(GB *gb, uint16_t sp0_) {
   CYC(b_+186, b_+187); A = mem_rd(gb, DE);
   CYC(b_+187, b_+188); push_effect(gb, b_+188);
   do { uint16_t jt_ = (rabbit_jump_table(gb));
-    if (jt_ == SYM(rabbitSubid0)) { rabbitSubid0_hook(gb); return; }
-    else if (jt_ == SYM(rabbitSubid1)) { rabbitSubid1_hook(gb); return; }
-    else if (jt_ == SYM(rabbitSubid2)) { rabbitSubid2_hook(gb); return; }
-    else if (jt_ == SYM(rabbitSubid3)) { rabbitSubid3_hook(gb); return; }
-    else if (jt_ == SYM(rabbitSubid4)) { rabbitSubid4_hook(gb); return; }
-    else if (jt_ == SYM(rabbitSubid5)) { rabbitSubid5_hook(gb); return; }
-    else if (jt_ == SYM(interactionPushLinkAwayAndUpdateDrawPriority)) { interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return; }
-    else if (jt_ == SYM(rabbitSubid7)) { rabbitSubid7_hook(gb); return; }
+    if (jt_ == SYM(rabbitSubid0) && hook_enabled_at(gb, SYM(rabbitSubid0))) { rabbitSubid0_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid1) && hook_enabled_at(gb, SYM(rabbitSubid1))) { rabbitSubid1_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid2) && hook_enabled_at(gb, SYM(rabbitSubid2))) { rabbitSubid2_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid3) && hook_enabled_at(gb, SYM(rabbitSubid3))) { rabbitSubid3_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid4) && hook_enabled_at(gb, SYM(rabbitSubid4))) { rabbitSubid4_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid5) && hook_enabled_at(gb, SYM(rabbitSubid5))) { rabbitSubid5_hook(gb); return; }
+    else if (jt_ == SYM(interactionPushLinkAwayAndUpdateDrawPriority) && hook_enabled_at(gb, SYM(interactionPushLinkAwayAndUpdateDrawPriority))) { interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid7) && hook_enabled_at(gb, SYM(rabbitSubid7))) { rabbitSubid7_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

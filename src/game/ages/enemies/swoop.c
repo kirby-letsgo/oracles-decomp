@@ -73,7 +73,7 @@ void enemyCode71_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+5, b_+8); goto normalStatus; } // jp nz
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+11);
-  enemyBoss_dead_b0f_hook(gb); return; // jp
+  TAIL(enemyBoss_dead_b0f); // jp
 
 normalStatus:
   CYC(b_+11, b_+13); E = ENEMY_BASE + OBJ_STATE;
@@ -101,7 +101,7 @@ void swoop_state_uninitialized_hook(GB *gb) {
   CYC(b_+10, b_+12); B = 0x01;
   CYC(b_+12, b_+14); C = 0x08;
   CYC(b_+14, b_+17);
-  enemyBoss_spawnShadow_b0f_hook(gb); return; // jp
+  TAIL(enemyBoss_spawnShadow_b0f); // jp
 }
 
 void swoop_state_stub_hook(GB *gb) {
@@ -147,7 +147,7 @@ substate0:
   CALL_C(b_+42, objectSetVisible82_hook, SYM(objectSetVisible82), b_+45);
   CYC(b_+45, b_+47); A = 0x02;
   CYC(b_+47, b_+50);
-  enemySetAnimation_hook(gb); return; // jp
+  TAIL(enemySetAnimation); // jp
 
 // Falling to ground
 substate1:
@@ -176,7 +176,7 @@ bounceAgain:
   CALL_C(b_+81, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+84);
   CYC(b_+84, b_+86); A = 0x70; // SND_DOORCLOSE
   CYC(b_+86, b_+89);
-  playSound_b00_hook(gb); return; // jp
+  TAIL(playSound_b00); // jp
 
 doneBouncing:
   CALL_C(b_+89, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+92);
@@ -185,14 +185,14 @@ doneBouncing:
   CYC(b_+93, b_+96); SET_BC(SYM(updateEnemies__next)); // TX_2f00
   CALL_C(b_+96, showText_hook, SYM(showText), b_+99);
   CYC(b_+99, b_+102);
-  ecom_incSubstate_b0f_hook(gb); return; // jp
+  TAIL(ecom_incSubstate_b0f); // jp
 
 substate2:
   CALL_C(b_+102, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+105);
   CALL_C(b_+105, enemyBoss_beginMiniboss_b0f_hook, SYM(enemyBoss_beginMiniboss_b0f), b_+108);
   CALL_C(b_+108, ecom_incSubstate_b0f_hook, SYM(ecom_incSubstate_b0f), b_+111);
   CYC(b_+111, b_+114);
-  swoop_beginFlyingUp_hook(gb); return; // jp
+  TAIL(swoop_beginFlyingUp); // jp
 
 substate3:
   CALL_C(b_+114, swoop_state9_hook, SYM(swoop_state9), b_+117);
@@ -240,7 +240,7 @@ void swoop_state9_hook(GB *gb) {
   CYC(b_+51, b_+52); mem_wr(gb, DE, A);
   CYC(b_+52, b_+54); A = 0x00;
   CYC(b_+54, b_+57);
-  enemySetAnimation_hook(gb); return; // jp
+  TAIL(enemySetAnimation); // jp
 }
 
 // Flying around, getting closer to Link before stomping
@@ -288,7 +288,7 @@ updatePosition:
 
 applyVelocity:
   CYC(b_+58, b_+61);
-  ecom_applyVelocityForSideviewEnemy_b0f_hook(gb); return; // jp
+  TAIL(ecom_applyVelocityForSideviewEnemy_b0f); // jp
 }
 
 // Stomping
@@ -356,7 +356,7 @@ beginStomp:
   CALL_C(b_+76, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+79);
   CYC(b_+79, b_+81); A = 0x02;
   CYC(b_+81, b_+84);
-  enemySetAnimation_hook(gb); return; // jp
+  TAIL(enemySetAnimation); // jp
 
 // Moving toward stomp position while falling to ground
 substate1:
@@ -417,20 +417,20 @@ reachedStompTarget:
   CALL_C(b_+148, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+151);
   CYC(b_+151, b_+153); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+153, b_+154); mem_wr(gb, DE, A);
-  swoop_setSpeedZForBounce_hook(gb); return; // fallthrough
+  TAIL(swoop_setSpeedZForBounce); // fallthrough
 }
 
 void swoop_setSpeedZForBounce_hook(GB *gb) {
   BASE(swoop_setSpeedZForBounce);
   CYC(b_+0, b_+3); SET_BC(0xff00);
   CYC(b_+3, b_+6);
-  objectSetSpeedZ_hook(gb); return; // jp
+  TAIL(objectSetSpeedZ); // jp
 }
 
 void swoop_setVisible_hook(GB *gb) {
   BASE(swoop_setVisible);
   CYC(b_+0, b_+3);
-  objectSetVisible82_hook(gb); return; // jp
+  TAIL(objectSetVisible82); // jp
 }
 
 // Completed stomp, about to fly back up.
@@ -460,14 +460,14 @@ flyBackUp:
   CYC(b_+26, b_+28); mem_wr(gb, HL, 0x00); // [substate]
   CYC(b_+28, b_+30); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+30, b_+32); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
-  swoop_beginFlyingUp_hook(gb); return; // fallthrough
+  TAIL(swoop_beginFlyingUp); // fallthrough
 }
 
 void swoop_beginFlyingUp_hook(GB *gb) {
   BASE(swoop_beginFlyingUp);
   CYC(b_+0, b_+2); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+2, b_+4); mem_wr(gb, HL, 0x03); // 3 flaps before he goes to next state
-  swoop_flyFurtherUp_hook(gb); return; // fallthrough
+  TAIL(swoop_flyFurtherUp); // fallthrough
 }
 
 void swoop_flyFurtherUp_hook(GB *gb) {
@@ -478,7 +478,7 @@ void swoop_flyFurtherUp_hook(GB *gb) {
   CALL_C(b_+4, objectSetVisible80_hook, SYM(objectSetVisible80), b_+7);
   CYC(b_+7, b_+9); A = 0x03;
   CYC(b_+9, b_+12);
-  enemySetAnimation_hook(gb); return; // jp
+  TAIL(enemySetAnimation); // jp
 }
 
 // Bouncing
@@ -497,7 +497,7 @@ void swoop_stomp_substate3_hook(GB *gb) {
   CYC(b_+17, b_+19); L = ENEMY_BASE + OBJ_SUBSTATE;
   CYC(b_+19, b_+20); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   CYC(b_+20, b_+23);
-  objectSetVisible82_hook(gb); return; // jp
+  TAIL(objectSetVisible82); // jp
 }
 
 // @param[out] a Value from 0-2
@@ -552,7 +552,7 @@ void swoop_hitGround_hook(GB *gb) {
   CALL_C(b_+34, setTile_hook, SYM(setTile), b_+37);
   CYC(b_+37, b_+39); B = 0x06; // INTERAC_ROCKDEBRIS
   CYC(b_+39, b_+42);
-  objectCreateInteractionWithSubid00_hook(gb); return; // jp
+  TAIL(objectCreateInteractionWithSubid00); // jp
 }
 
 // @param[out] de animParameter (if nonzero, just flapped wings)
@@ -567,5 +567,5 @@ void swoop_animate_hook(GB *gb) {
   CYC(b_+7, b_+8);
   CYC(b_+8, b_+10); A = 0x53; // SND_JUMP
   CYC(b_+10, b_+13);
-  playSound_b00_hook(gb); return; // jp
+  TAIL(playSound_b00); // jp
 }

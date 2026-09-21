@@ -138,21 +138,21 @@ void enemyCode04__normalStatus_hook(GB *gb) {
   CYC(b_+72, b_+73); A = mem_rd(gb, DE);  // ld a,(de)
   CYC(b_+73, b_+74); push_effect(gb, b_+74);
   do { uint16_t jt_ = (ganon_jump_table(gb));
-    if (jt_ == SYM(ganon_state_uninitialized)) { ganon_state_uninitialized_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state1)) { ganon_state1_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state2)) { ganon_state2_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state3)) { ganon_state3_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state4)) { ganon_state4_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state5)) { ganon_state5_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state6)) { ganon_state6_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state7)) { ganon_state7_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state8)) { ganon_state8_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state9)) { ganon_state9_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateA)) { ganon_stateA_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateB)) { ganon_stateB_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateC)) { ganon_stateC_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateD)) { ganon_stateD_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateE)) { ganon_stateE_hook(gb); return; }
+    if (jt_ == SYM(ganon_state_uninitialized) && hook_enabled_at(gb, SYM(ganon_state_uninitialized))) { ganon_state_uninitialized_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state1) && hook_enabled_at(gb, SYM(ganon_state1))) { ganon_state1_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state2) && hook_enabled_at(gb, SYM(ganon_state2))) { ganon_state2_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state3) && hook_enabled_at(gb, SYM(ganon_state3))) { ganon_state3_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state4) && hook_enabled_at(gb, SYM(ganon_state4))) { ganon_state4_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state5) && hook_enabled_at(gb, SYM(ganon_state5))) { ganon_state5_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state6) && hook_enabled_at(gb, SYM(ganon_state6))) { ganon_state6_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state7) && hook_enabled_at(gb, SYM(ganon_state7))) { ganon_state7_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state8) && hook_enabled_at(gb, SYM(ganon_state8))) { ganon_state8_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state9) && hook_enabled_at(gb, SYM(ganon_state9))) { ganon_state9_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateA) && hook_enabled_at(gb, SYM(ganon_stateA))) { ganon_stateA_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateB) && hook_enabled_at(gb, SYM(ganon_stateB))) { ganon_stateB_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateC) && hook_enabled_at(gb, SYM(ganon_stateC))) { ganon_stateC_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateD) && hook_enabled_at(gb, SYM(ganon_stateD))) { ganon_stateD_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateE) && hook_enabled_at(gb, SYM(ganon_stateE))) { ganon_stateE_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -404,7 +404,7 @@ void ganon_state7_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0x34;  // ld a,MUS_GANON
   CYC(b_+2, b_+5); mem_wr(gb, wActiveMusic, A);  // ld (wActiveMusic),a
   CALL_C(b_+5, playSound_b00_hook, SYM(playSound_b00), b_+8);
-  CYC(b_+8, b_+11); ganon_decideNextMove_hook(gb); return;  // jp ganon_decideNextMove
+  CYC(b_+8, b_+11); TAIL(ganon_decideNextMove);  // jp ganon_decideNextMove
 }
 
 void ganon_state8_hook(GB *gb) {
@@ -414,14 +414,14 @@ void ganon_state8_hook(GB *gb) {
   CYC(b_+1, b_+2); A = mem_rd(gb, DE);  // ld a,(de) [substate]
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (ganon_jump_table(gb));
-    if (jt_ == SYM(ganon_state8_substate0)) { ganon_state8_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state8_substate1)) { ganon_state8_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state8_substate2)) { ganon_state8_substate2_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state8_substate3)) { ganon_state8_substate3_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state8_substate4)) { ganon_state8_substate4_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state8_substate5)) { ganon_state8_substate5_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state8_substate6)) { ganon_state8_substate6_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state8_substate7)) { ganon_state8_substate7_hook(gb); return; }
+    if (jt_ == SYM(ganon_state8_substate0) && hook_enabled_at(gb, SYM(ganon_state8_substate0))) { ganon_state8_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state8_substate1) && hook_enabled_at(gb, SYM(ganon_state8_substate1))) { ganon_state8_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state8_substate2) && hook_enabled_at(gb, SYM(ganon_state8_substate2))) { ganon_state8_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state8_substate3) && hook_enabled_at(gb, SYM(ganon_state8_substate3))) { ganon_state8_substate3_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state8_substate4) && hook_enabled_at(gb, SYM(ganon_state8_substate4))) { ganon_state8_substate4_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state8_substate5) && hook_enabled_at(gb, SYM(ganon_state8_substate5))) { ganon_state8_substate5_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state8_substate6) && hook_enabled_at(gb, SYM(ganon_state8_substate6))) { ganon_state8_substate6_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state8_substate7) && hook_enabled_at(gb, SYM(ganon_state8_substate7))) { ganon_state8_substate7_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -456,7 +456,7 @@ void ganon_state8_substate2_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
   CYC(b_+4, b_+5); L = E;  // ld l,e
   CYC(b_+5, b_+6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYC(b_+6, b_+9); ganon_updateTeleportVarsAndPlaySound_hook(gb); return;  // jp ganon_updateTeleportVarsAndPlaySound
+  CYC(b_+6, b_+9); TAIL(ganon_updateTeleportVarsAndPlaySound);  // jp ganon_updateTeleportVarsAndPlaySound
 }
 
 void ganon_state8_substate3_hook(GB *gb) {
@@ -485,7 +485,7 @@ void ganon_state8_substate4_hook(GB *gb) {
   CYC(b_+6, b_+7); L = E;  // ld l,e
   CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+8, b_+10); A = 0xb3;  // ld a,GFXH_GANON_C
-  CYC(b_+10, b_+13); ganon_loadGfxHeader_hook(gb); return;  // jp ganon_loadGfxHeader
+  CYC(b_+10, b_+13); TAIL(ganon_loadGfxHeader);  // jp ganon_loadGfxHeader
 }
 
 void ganon_state8_substate5_hook(GB *gb) {
@@ -500,7 +500,7 @@ void ganon_state8_substate5_hook(GB *gb) {
   CALL_C(b_+10, enemySetAnimation_hook, SYM(enemySetAnimation), b_+13);
   CALL_C(b_+13, ecom_updateAngleTowardTarget_b10_hook, SYM(ecom_updateAngleTowardTarget_b10), b_+16);
   CYC(b_+16, b_+19); SET_BC(0x003c);  // ldbc $00,SPEED_180
-  CYC(b_+19, b_+21); ganon_state8_spawnProjectile_hook(gb); return;  // jr ganon_state8_spawnProjectile
+  CYC(b_+19, b_+21); TAIL(ganon_state8_spawnProjectile);  // jr ganon_state8_spawnProjectile
 }
 
 void ganon_state8_substate6_hook(GB *gb) {
@@ -520,7 +520,7 @@ checkAttackDone:
   CYC(b_+18, b_+21); SET_BC(0x0264);  // ldbc $02,SPEED_280
   CALL_C(b_+21, ganon_state8_spawnProjectile_hook, SYM(ganon_state8_spawnProjectile), b_+24);
   CYC(b_+24, b_+27); SET_BC(0xfe64);  // ldbc $fe,SPEED_280
-  ganon_state8_spawnProjectile_hook(gb); return;  // fallthrough
+  TAIL(ganon_state8_spawnProjectile);  // fallthrough
 }
 
 void ganon_state8_spawnProjectile_hook(GB *gb) {
@@ -545,7 +545,7 @@ void ganon_state8_substate7_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
-  CYC(b_+4, b_+7); ganon_finishAttack_hook(gb); return;  // jp ganon_finishAttack
+  CYC(b_+4, b_+7); TAIL(ganon_finishAttack);  // jp ganon_finishAttack
 }
 
 void ganon_state9_hook(GB *gb) {
@@ -555,14 +555,14 @@ void ganon_state9_hook(GB *gb) {
   CYC(b_+1, b_+2); A = mem_rd(gb, DE);  // ld a,(de) [substate]
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (ganon_jump_table(gb));
-    if (jt_ == SYM(ganon_state9_substate0)) { ganon_state9_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state9_substate1)) { ganon_state9_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state8_substate2)) { ganon_state8_substate2_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state9_substate3)) { ganon_state9_substate3_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state9_substate4)) { ganon_state9_substate4_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state9_substate5)) { ganon_state9_substate5_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state9_substate6)) { ganon_state9_substate6_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state9_substate7)) { ganon_state9_substate7_hook(gb); return; }
+    if (jt_ == SYM(ganon_state9_substate0) && hook_enabled_at(gb, SYM(ganon_state9_substate0))) { ganon_state9_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state9_substate1) && hook_enabled_at(gb, SYM(ganon_state9_substate1))) { ganon_state9_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state8_substate2) && hook_enabled_at(gb, SYM(ganon_state8_substate2))) { ganon_state8_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state9_substate3) && hook_enabled_at(gb, SYM(ganon_state9_substate3))) { ganon_state9_substate3_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state9_substate4) && hook_enabled_at(gb, SYM(ganon_state9_substate4))) { ganon_state9_substate4_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state9_substate5) && hook_enabled_at(gb, SYM(ganon_state9_substate5))) { ganon_state9_substate5_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state9_substate6) && hook_enabled_at(gb, SYM(ganon_state9_substate6))) { ganon_state9_substate6_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state9_substate7) && hook_enabled_at(gb, SYM(ganon_state9_substate7))) { ganon_state9_substate7_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -624,7 +624,7 @@ void ganon_state9_substate4_hook(GB *gb) {
   CYC(b_+28, b_+30); B = 0x0c;  // ld b,$0c
   CYC(b_+30, b_+33); push_effect(gb, b_+33); ganon_state9_substate4__spawnProjectile_hook(gb);  // call @spawnProjectile
   CYC(b_+33, b_+35); B = 0x04;  // ld b,$04
-  ganon_state9_substate4__spawnProjectile_hook(gb); return;  // fallthrough
+  TAIL(ganon_state9_substate4__spawnProjectile);  // fallthrough
 }
 
 // 10:531a (real call from three sites above, needs genuine continuation, and also reached
@@ -676,7 +676,7 @@ void ganon_state9_substate7_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
-  CYC(b_+4, b_+7); ganon_finishAttack_hook(gb); return;  // jp ganon_finishAttack
+  CYC(b_+4, b_+7); TAIL(ganon_finishAttack);  // jp ganon_finishAttack
 }
 
 void ganon_stateA_hook(GB *gb) {
@@ -686,14 +686,14 @@ void ganon_stateA_hook(GB *gb) {
   CYC(b_+1, b_+2); A = mem_rd(gb, DE);  // ld a,(de) [substate]
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (ganon_jump_table(gb));
-    if (jt_ == SYM(ganon_state9_substate0)) { ganon_state9_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateA_substate1)) { ganon_stateA_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateA_substate2)) { ganon_stateA_substate2_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateA_substate3)) { ganon_stateA_substate3_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateA_substate4)) { ganon_stateA_substate4_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateA_substate5)) { ganon_stateA_substate5_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateA_substate6)) { ganon_stateA_substate6_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateA_substate7)) { ganon_stateA_substate7_hook(gb); return; }
+    if (jt_ == SYM(ganon_state9_substate0) && hook_enabled_at(gb, SYM(ganon_state9_substate0))) { ganon_state9_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateA_substate1) && hook_enabled_at(gb, SYM(ganon_stateA_substate1))) { ganon_stateA_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateA_substate2) && hook_enabled_at(gb, SYM(ganon_stateA_substate2))) { ganon_stateA_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateA_substate3) && hook_enabled_at(gb, SYM(ganon_stateA_substate3))) { ganon_stateA_substate3_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateA_substate4) && hook_enabled_at(gb, SYM(ganon_stateA_substate4))) { ganon_stateA_substate4_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateA_substate5) && hook_enabled_at(gb, SYM(ganon_stateA_substate5))) { ganon_stateA_substate5_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateA_substate6) && hook_enabled_at(gb, SYM(ganon_stateA_substate6))) { ganon_stateA_substate6_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateA_substate7) && hook_enabled_at(gb, SYM(ganon_stateA_substate7))) { ganon_stateA_substate7_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -742,7 +742,7 @@ setYh:
   CYC(b_+42, b_+43); A = mem_rd(gb, DE);  // ld a,(de)
   CYC(b_+43, b_+45); alu_add(gb, 0x07);  // add $07
   CALL_C(b_+45, enemySetAnimation_hook, SYM(enemySetAnimation), b_+48);
-  CYC(b_+48, b_+51); ganon_updateTeleportVarsAndPlaySound_hook(gb); return;  // jp ganon_updateTeleportVarsAndPlaySound
+  CYC(b_+48, b_+51); TAIL(ganon_updateTeleportVarsAndPlaySound);  // jp ganon_updateTeleportVarsAndPlaySound
 }
 
 void ganon_stateA_substate3_hook(GB *gb) {
@@ -777,7 +777,7 @@ void ganon_stateA_substate4_hook(GB *gb) {
   CYC(b_+15, b_+16); A = mem_rd(gb, DE);  // ld a,(de)
   CYC(b_+16, b_+18); alu_add(gb, 0x08);  // add $08
   CALL_C(b_+18, enemySetAnimation_hook, SYM(enemySetAnimation), SYM(ganon_stateA_substate5));
-  ganon_stateA_substate5_hook(gb); return;  // fallthrough
+  TAIL(ganon_stateA_substate5);  // fallthrough
 }
 
 void ganon_stateA_substate5_hook(GB *gb) {
@@ -839,7 +839,7 @@ void ganon_stateA_substate7_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
   CYC(b_+4, b_+6); A = 0x02;  // ld a,$02
   CALL_C(b_+6, enemySetAnimation_hook, SYM(enemySetAnimation), b_+9);
-  CYC(b_+9, b_+12); ganon_finishAttack_hook(gb); return;  // jp ganon_finishAttack
+  CYC(b_+9, b_+12); TAIL(ganon_finishAttack);  // jp ganon_finishAttack
 }
 
 void ganon_stateB_hook(GB *gb) {
@@ -849,17 +849,17 @@ void ganon_stateB_hook(GB *gb) {
   CYC(b_+1, b_+2); A = mem_rd(gb, DE);  // ld a,(de) [substate]
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (ganon_jump_table(gb));
-    if (jt_ == SYM(ganon_state9_substate0)) { ganon_state9_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateB_substate1)) { ganon_stateB_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateB_substate2)) { ganon_stateB_substate2_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateB_substate3)) { ganon_stateB_substate3_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateB_substate4)) { ganon_stateB_substate4_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateB_substate5)) { ganon_stateB_substate5_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateB_substate6)) { ganon_stateB_substate6_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateB_substate7)) { ganon_stateB_substate7_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateB_substate8)) { ganon_stateB_substate8_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateB_substate9)) { ganon_stateB_substate9_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateB_substateA)) { ganon_stateB_substateA_hook(gb); return; }
+    if (jt_ == SYM(ganon_state9_substate0) && hook_enabled_at(gb, SYM(ganon_state9_substate0))) { ganon_state9_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateB_substate1) && hook_enabled_at(gb, SYM(ganon_stateB_substate1))) { ganon_stateB_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateB_substate2) && hook_enabled_at(gb, SYM(ganon_stateB_substate2))) { ganon_stateB_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateB_substate3) && hook_enabled_at(gb, SYM(ganon_stateB_substate3))) { ganon_stateB_substate3_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateB_substate4) && hook_enabled_at(gb, SYM(ganon_stateB_substate4))) { ganon_stateB_substate4_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateB_substate5) && hook_enabled_at(gb, SYM(ganon_stateB_substate5))) { ganon_stateB_substate5_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateB_substate6) && hook_enabled_at(gb, SYM(ganon_stateB_substate6))) { ganon_stateB_substate6_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateB_substate7) && hook_enabled_at(gb, SYM(ganon_stateB_substate7))) { ganon_stateB_substate7_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateB_substate8) && hook_enabled_at(gb, SYM(ganon_stateB_substate8))) { ganon_stateB_substate8_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateB_substate9) && hook_enabled_at(gb, SYM(ganon_stateB_substate9))) { ganon_stateB_substate9_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateB_substateA) && hook_enabled_at(gb, SYM(ganon_stateB_substateA))) { ganon_stateB_substateA_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -890,7 +890,7 @@ void ganon_stateB_substate2_hook(GB *gb) {
   CALL_C(b_+16, ganon_loadGfxHeader_hook, SYM(ganon_loadGfxHeader), b_+19);
   CYC(b_+19, b_+21); A = 0x04;  // ld a,$04
   CALL_C(b_+21, enemySetAnimation_hook, SYM(enemySetAnimation), b_+24);
-  CYC(b_+24, b_+27); ganon_updateTeleportVarsAndPlaySound_hook(gb); return;  // jp ganon_updateTeleportVarsAndPlaySound
+  CYC(b_+24, b_+27); TAIL(ganon_updateTeleportVarsAndPlaySound);  // jp ganon_updateTeleportVarsAndPlaySound
 }
 
 void ganon_stateB_substate3_hook(GB *gb) {
@@ -1030,7 +1030,7 @@ void ganon_stateB_substateA_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
-  CYC(b_+4, b_+7); ganon_finishAttack_hook(gb); return;  // jp ganon_finishAttack
+  CYC(b_+4, b_+7); TAIL(ganon_finishAttack);  // jp ganon_finishAttack
 }
 
 void ganon_stateC_hook(GB *gb) {
@@ -1040,17 +1040,17 @@ void ganon_stateC_hook(GB *gb) {
   CYC(b_+1, b_+2); A = mem_rd(gb, DE);  // ld a,(de) [substate]
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (ganon_jump_table(gb));
-    if (jt_ == SYM(ganon_state9_substate0)) { ganon_state9_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateC_substate1)) { ganon_stateC_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state8_substate2)) { ganon_state8_substate2_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateC_substate3)) { ganon_stateC_substate3_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateC_substate4)) { ganon_stateC_substate4_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateC_substate5)) { ganon_stateC_substate5_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateC_substate6)) { ganon_stateC_substate6_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateC_substate7)) { ganon_stateC_substate7_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateC_substate8)) { ganon_stateC_substate8_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateC_substate9)) { ganon_stateC_substate9_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateC_substateA)) { ganon_stateC_substateA_hook(gb); return; }
+    if (jt_ == SYM(ganon_state9_substate0) && hook_enabled_at(gb, SYM(ganon_state9_substate0))) { ganon_state9_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateC_substate1) && hook_enabled_at(gb, SYM(ganon_stateC_substate1))) { ganon_stateC_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state8_substate2) && hook_enabled_at(gb, SYM(ganon_state8_substate2))) { ganon_state8_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateC_substate3) && hook_enabled_at(gb, SYM(ganon_stateC_substate3))) { ganon_stateC_substate3_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateC_substate4) && hook_enabled_at(gb, SYM(ganon_stateC_substate4))) { ganon_stateC_substate4_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateC_substate5) && hook_enabled_at(gb, SYM(ganon_stateC_substate5))) { ganon_stateC_substate5_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateC_substate6) && hook_enabled_at(gb, SYM(ganon_stateC_substate6))) { ganon_stateC_substate6_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateC_substate7) && hook_enabled_at(gb, SYM(ganon_stateC_substate7))) { ganon_stateC_substate7_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateC_substate8) && hook_enabled_at(gb, SYM(ganon_stateC_substate8))) { ganon_stateC_substate8_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateC_substate9) && hook_enabled_at(gb, SYM(ganon_stateC_substate9))) { ganon_stateC_substate9_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateC_substateA) && hook_enabled_at(gb, SYM(ganon_stateC_substateA))) { ganon_stateC_substateA_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -1128,7 +1128,7 @@ void ganon_stateC_substate5_hook(GB *gb) {
   CYC(b_+7, b_+8); mem_wr(gb, DE, A);  // ld (de),a [substate]
   CYC(b_+8, b_+10); A = 0x04;  // ld a,$04
   CALL_C(b_+10, ganon_setTileReplacementMode_hook, SYM(ganon_setTileReplacementMode), b_+13);
-  CYC(b_+13, b_+16); ganon_makeRoomBoundarySolid_hook(gb); return;  // jp ganon_makeRoomBoundarySolid
+  CYC(b_+13, b_+16); TAIL(ganon_makeRoomBoundarySolid);  // jp ganon_makeRoomBoundarySolid
 }
 
 void ganon_stateC_substate6_hook(GB *gb) {
@@ -1178,12 +1178,12 @@ checkCounter1:
   CYC(b_+35, b_+37); L = 0x86;  // ld l,Enemy.counter1
   CYC(b_+37, b_+39); mem_wr(gb, HL, 80);  // ld (hl),80
   CYC(b_+39, b_+41); A = 0xb3;  // ld a,GFXH_GANON_C
-  CYC(b_+41, b_+44); ganon_loadGfxHeader_hook(gb); return;  // jp ganon_loadGfxHeader
+  CYC(b_+41, b_+44); TAIL(ganon_loadGfxHeader);  // jp ganon_loadGfxHeader
 loadGfx:
   CALL_C(b_+44, ecom_updateAngleTowardTarget_b10_hook, SYM(ecom_updateAngleTowardTarget_b10), b_+47);
   CALL_C(b_+47, ecom_applyVelocityForSideviewEnemyNoHoles_b10_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b10), b_+50);
   CALL_C(b_+50, enemyAnimate_hook, SYM(enemyAnimate), b_+53);
-  CYC(b_+53, b_+56); ganon_updateSeizurePalette_hook(gb); return;  // jp ganon_updateSeizurePalette
+  CYC(b_+53, b_+56); TAIL(ganon_updateSeizurePalette);  // jp ganon_updateSeizurePalette
 }
 
 void ganon_stateC_substate8_hook(GB *gb) {
@@ -1239,7 +1239,7 @@ void ganon_stateC_substateA_hook(GB *gb) {
   CYC(b_+1, b_+3); L = 0xa4;  // ld l,Enemy.collisionType
   CYC(b_+3, b_+5); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   CALL_C(b_+5, clearPaletteFadeVariablesAndRefreshPalettes_hook, SYM(clearPaletteFadeVariablesAndRefreshPalettes), b_+8);
-  CYC(b_+8, b_+11); ganon_finishAttack_hook(gb); return;  // jp ganon_finishAttack
+  CYC(b_+8, b_+11); TAIL(ganon_finishAttack);  // jp ganon_finishAttack
 }
 
 void ganon_stateD_hook(GB *gb) {
@@ -1249,11 +1249,11 @@ void ganon_stateD_hook(GB *gb) {
   CYC(b_+1, b_+2); A = mem_rd(gb, DE);  // ld a,(de) [substate]
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (ganon_jump_table(gb));
-    if (jt_ == SYM(ganon_state8_substate0)) { ganon_state8_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state8_substate1)) { ganon_state8_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ganon_state8_substate2)) { ganon_state8_substate2_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateD_substate3)) { ganon_stateD_substate3_hook(gb); return; }
-    else if (jt_ == SYM(ganon_finishAttack)) { ganon_finishAttack_hook(gb); return; }
+    if (jt_ == SYM(ganon_state8_substate0) && hook_enabled_at(gb, SYM(ganon_state8_substate0))) { ganon_state8_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state8_substate1) && hook_enabled_at(gb, SYM(ganon_state8_substate1))) { ganon_state8_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ganon_state8_substate2) && hook_enabled_at(gb, SYM(ganon_state8_substate2))) { ganon_state8_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateD_substate3) && hook_enabled_at(gb, SYM(ganon_stateD_substate3))) { ganon_stateD_substate3_hook(gb); return; }
+    else if (jt_ == SYM(ganon_finishAttack) && hook_enabled_at(gb, SYM(ganon_finishAttack))) { ganon_finishAttack_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -1279,10 +1279,10 @@ void ganon_stateE_hook(GB *gb) {
   CYC(b_+1, b_+2); A = mem_rd(gb, DE);  // ld a,(de) [substate]
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (ganon_jump_table(gb));
-    if (jt_ == SYM(ganon_stateE_substate0)) { ganon_stateE_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateE_substate1)) { ganon_stateE_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateE_substate2)) { ganon_stateE_substate2_hook(gb); return; }
-    else if (jt_ == SYM(ganon_stateE_substate3)) { ganon_stateE_substate3_hook(gb); return; }
+    if (jt_ == SYM(ganon_stateE_substate0) && hook_enabled_at(gb, SYM(ganon_stateE_substate0))) { ganon_stateE_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateE_substate1) && hook_enabled_at(gb, SYM(ganon_stateE_substate1))) { ganon_stateE_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateE_substate2) && hook_enabled_at(gb, SYM(ganon_stateE_substate2))) { ganon_stateE_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ganon_stateE_substate3) && hook_enabled_at(gb, SYM(ganon_stateE_substate3))) { ganon_stateE_substate3_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -1389,7 +1389,7 @@ void ganon_updateTeleportAnimationGoingOut_hook(GB *gb) {
   CYC(b_+4, b_+5); B = A;  // ld b,a
   CYC(b_+5, b_+7); A = 0x20;  // ld a,$20
   CYC(b_+7, b_+8); alu_sub(gb, B);  // sub b
-  ganon_updateFlickeringXPosition_hook(gb); return;  // fallthrough
+  TAIL(ganon_updateFlickeringXPosition);  // fallthrough
 }
 
 void ganon_updateFlickeringXPosition_hook(GB *gb) {
@@ -1430,7 +1430,7 @@ void ganon_updateTeleportAnimationComingIn_hook(GB *gb) {
   CYC(b_+0, b_+1); A = mem_rd(gb, HL);  // ld a,(hl)
   CYC(b_+1, b_+3); alu_and(gb, 0x3e);  // and $3e
   CYC(b_+3, b_+4); alu_rrca(gb);  // rrca
-  CYC(b_+4, b_+6); ganon_updateFlickeringXPosition_hook(gb); return;  // jr ganon_updateFlickeringXPosition
+  CYC(b_+4, b_+6); TAIL(ganon_updateFlickeringXPosition);  // jr ganon_updateFlickeringXPosition
 }
 
 void ganon_finishAttack_hook(GB *gb) {
@@ -1444,7 +1444,7 @@ void ganon_finishAttack_hook(GB *gb) {
   CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   CYC(b_+7, b_+8); alu_or(gb, A);  // or a
   if ((F & FZ)) { CYCT(b_+8, b_+10); ganon_decideNextMove_hook(gb); return; } CYC(b_+8, b_+10);  // jr z,ganon_decideNextMove
-  label_10_135_hook(gb); return;  // fallthrough
+  TAIL(label_10_135);  // fallthrough
 }
 
 void label_10_135_hook(GB *gb) {
@@ -1484,7 +1484,7 @@ haveC:
   CYC(b_+22, b_+23); H = mem_rd(gb, HL);  // ld h,(hl)
   CYC(b_+23, b_+24); L = A;  // ld l,a
   CYC(b_+24, b_+25); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  CYC(b_+25, b_+28); label_10_135_hook(gb); return;  // jr label_10_135
+  CYC(b_+25, b_+28); TAIL(label_10_135);  // jr label_10_135
 }
 
 void ganon_decideTeleportLocationAndCounter_hook(GB *gb) {

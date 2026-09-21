@@ -251,7 +251,7 @@ state0:
   CYC(b_+32, b_+34); alu_cp(gb, 0x0c);
   CYC(b_+34, b_+37); SET_HL((SYM(interactiond7_essence__state3) + 9));
   if (F & FZ) {
-    CYCT(b_+37, b_+39); zora_commonInitWithScript_hook(gb); return;
+    CYCT(b_+37, b_+39); TAIL(zora_commonInitWithScript);
   }
   CYC(b_+37, b_+39);
   CYC(b_+39, b_+42); SET_HL(SYM(interactiond7_essence__playCirclingSound));
@@ -286,13 +286,13 @@ subid10:
   CALL_C(b_+43, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+46);
   CYC(b_+46, b_+48); alu_and(gb, 0x20);
   if (!(F & FZ)) {
-    CYCT(b_+48, b_+51); interactionDelete_hook(gb); return;
+    CYCT(b_+48, b_+51); TAIL(interactionDelete);
   }
   CYC(b_+48, b_+51);
   CYC(b_+51, b_+54); A = mem_rd(gb, wEssencesObtained);
   CYC(b_+54, b_+56); alu_bit(gb, 6, A);
   if (F & FZ) {
-    CYCT(b_+56, b_+59); interactionDelete_hook(gb); return;
+    CYCT(b_+56, b_+59); TAIL(interactionDelete);
   }
   CYC(b_+56, b_+59);
   CYC(b_+59, b_+61); A = 3;
@@ -303,7 +303,7 @@ subid10:
 subid11:
   CALL_C(b_+67, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+70);
   if (!(F & FZ)) {
-    CYCT(b_+70, b_+73); interactionDelete_hook(gb); return;
+    CYCT(b_+70, b_+73); TAIL(interactionDelete);
   }
   CYC(b_+70, b_+73);
   CYC(b_+73, b_+75); goto delete_if_flag_set;
@@ -311,7 +311,7 @@ subid11:
 subid12:
   CALL_C(b_+75, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+78);
   if (F & FZ) {
-    CYCT(b_+78, b_+81); interactionDelete_hook(gb); return;
+    CYCT(b_+78, b_+81); TAIL(interactionDelete);
   }
   CYC(b_+78, b_+81);
 
@@ -319,7 +319,7 @@ delete_if_flag_set:
   CALL_C(b_+81, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+84);
   CYC(b_+84, b_+86); alu_and(gb, 0x40);
   if (!(F & FZ)) {
-    CYCT(b_+86, b_+89); interactionDelete_hook(gb); return;
+    CYCT(b_+86, b_+89); TAIL(interactionDelete);
   }
   CYC(b_+86, b_+89);
   CYC(b_+89, b_+90); ret_effect(gb);
@@ -346,7 +346,7 @@ state0:
 state1:
   CALL_C(b_+96, interactionRunScript_hook, SYM(interactionRunScript), b_+99);
   if (F & FC) {
-    CYCT(b_+99, b_+102); interactionDelete_hook(gb); return;
+    CYCT(b_+99, b_+102); TAIL(interactionDelete);
   }
   CYC(b_+99, b_+102);
   CYC(b_+102, b_+105); npcFaceLinkAndAnimate_hook(gb);
@@ -355,7 +355,7 @@ state1:
 state2:
   CALL_C(b_+105, interactionRunScript_hook, SYM(interactionRunScript), b_+108);
   if (F & FC) {
-    CYCT(b_+108, b_+111); interactionDelete_hook(gb); return;
+    CYCT(b_+108, b_+111); TAIL(interactionDelete);
   }
   CYC(b_+108, b_+111);
   CYC(b_+111, b_+114); interactionAnimate_hook(gb);
@@ -487,7 +487,7 @@ state0:
   CYC(b_+36, b_+38);
   CYC(b_+38, b_+40); alu_cp(gb, 6);
   if (!(F & FC)) {
-    CYCT(b_+40, b_+43); interactionDelete_hook(gb); return;
+    CYCT(b_+40, b_+43); TAIL(interactionDelete);
   }
   CYC(b_+40, b_+43);
 
@@ -527,5 +527,5 @@ void interactionCodeab_hook(GB *gb) {
   if (target == SYM(zora_subid0C)) { zora_subid0C_hook(gb); return; }
   if (target == SYM(zora_subid0E)) { zora_subid0E_hook(gb); return; }
   if (target == SYM(zora_subid10)) { zora_subid10_hook(gb); return; }
-  zora_subid13_hook(gb); return; // target == 0x6228
+  TAIL(zora_subid13); // target == 0x6228
 }

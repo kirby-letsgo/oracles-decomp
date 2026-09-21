@@ -68,7 +68,7 @@ void interactionCode72_hook(GB *gb) {
   CYC(b_+29, b_+31); mem_wr(gb, HL, 0x02);
   CYC(b_+31, b_+33); L = INTERACTION_BASE + OBJ_YH;
   CYC(b_+33, b_+35); mem_wr(gb, HL, 0x68);
-  CYC(b_+35, b_+38); interactionDelete_hook(gb); return; // jp
+  CYC(b_+35, b_+38); TAIL(interactionDelete); // jp
 
 subid0State0:
   CALL_C(b_+38, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+41);
@@ -105,7 +105,7 @@ setScriptAndInitStuff:
   CYC(b_+102, b_+104); mem_wr(gb, HL, 0x3c); // SPEED_180
   CYC(b_+104, b_+106); L = INTERACTION_BASE + OBJ_ANGLE;
   CYC(b_+106, b_+108); mem_wr(gb, HL, 0x10); // ANGLE_DOWN
-  CYC(b_+108, b_+111); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+108, b_+111); TAIL(objectSetVisible82); // jp
 
 // Spawn an instance of subid 1, the normal moblins
 spawnSubservientMoblin:
@@ -138,7 +138,7 @@ runScriptAndAnimate:
   CALL_C(b_+130, interactionRunScript_hook, SYM(interactionRunScript), b_+133);
   if (!(F & FC)) { CYCT(b_+133, b_+136); interactionAnimate_hook(gb); return; } // jp nc
   CYC(b_+133, b_+136);
-  CYC(b_+136, b_+139); interactionDelete_hook(gb); return; // jp
+  CYC(b_+136, b_+139); TAIL(interactionDelete); // jp
 
 subid1State0:
   CYC(b_+139, b_+142); SET_HL(SYM(fallingRock_initDiagonalAngle__diagonalAngles)); // mainScripts.kingMoblinDefeated_helperMoblinScript

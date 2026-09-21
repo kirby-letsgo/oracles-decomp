@@ -65,8 +65,7 @@ state1:
   CALL_C(b_+17, interactionRunScript_hook, SYM(interactionRunScript), b_+20);
   if (F & FC) {
     CYCT(b_+20, b_+23);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+20, b_+23);
   CYC(b_+23, b_+26); SET_HL((SYM(ambi_runSubid03__substate0) + 15));

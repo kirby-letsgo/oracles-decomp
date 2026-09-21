@@ -37,7 +37,7 @@ void itemCode0c_hook(GB *gb) {
       CALL_C(b_+13, loadAttributesAndGraphicsAndIncState_hook, SYM(loadAttributesAndGraphicsAndIncState), b_+16);
       CYC(b_+16, b_+18); A = 0xb1;
       CALL_C(b_+18, playSound_b00_hook, SYM(playSound_b00), b_+21);
-      CYC(b_+21, b_+24); objectSetVisible82_hook(gb); return;
+      CYC(b_+21, b_+24); TAIL(objectSetVisible82);
     }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);

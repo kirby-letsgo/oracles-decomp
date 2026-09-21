@@ -66,7 +66,7 @@ state0:
   CYC(b_+55, b_+58); W8(w1Link_direction) = A;
 
 spawn3Fairies:
-  CYC(b_+58, b_+61); fairyHidingMinigame_spawn3FairiesAndDelete_hook(gb); return; // jp
+  CYC(b_+58, b_+61); TAIL(fairyHidingMinigame_spawn3FairiesAndDelete); // jp
 
 state1:
   CALL_C(b_+61, fairyHidingMinigame_checkBeginCutscene_hook, SYM(fairyHidingMinigame_checkBeginCutscene), b_+64);
@@ -77,7 +77,7 @@ state1:
   CYC(b_+71, b_+73); A = 0x01;
   CYC(b_+73, b_+76); W8(wTmpcfc0_fairyHideAndSeek_active) = A;
   CYC(b_+76, b_+79); SET_HL((SYM(miscPuzzles_subid19__state4) + 15)); // mainScripts.fairyHidingMinigame_subid00Script
-  CYC(b_+79, b_+82); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+79, b_+82); TAIL(interactionSetScript); // jp
 
 state2:
   CALL_C(b_+82, interactionRunScript_hook, SYM(interactionRunScript), b_+85);
@@ -85,7 +85,7 @@ state2:
   CYC(b_+85, b_+86);
   CYC(b_+86, b_+88); A = 0x13; // CUTSCENE_FAIRIES_HIDE
   CYC(b_+88, b_+91); W8(wCutsceneTrigger) = A;
-  CYC(b_+91, b_+94); interactionDelete_hook(gb); return; // jp
+  CYC(b_+91, b_+94); TAIL(interactionDelete); // jp
 }
 
 // fairyHidingMinigame_spawn3FairiesAndDelete: spawns the 3 fairies; they should delete
@@ -107,7 +107,7 @@ spawnFairy:
   CYC(b_+12, b_+13); mem_wr(gb, HL, B); // [var03] = 0,1,2
   if (!(F & FZ)) { CYCT(b_+13, b_+15); goto spawnFairy; } // jr nz
   CYC(b_+13, b_+15);
-  CYC(b_+15, b_+18); interactionDelete_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(interactionDelete); // jp
 }
 
 // fairyHidingMinigame_checkBeginCutscene: sets cflag if Link is vulnerable (ready to begin
@@ -180,7 +180,7 @@ state0:
   CYC(b_+49, b_+51); E = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+51, b_+53); A = 0x0c;
   CYC(b_+53, b_+54); mem_wr(gb, DE, A);
-  CYC(b_+54, b_+57); interactionIncState_hook(gb); return; // jp
+  CYC(b_+54, b_+57); TAIL(interactionIncState); // jp
 
 state1:
   CALL_C(b_+64, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+67);
@@ -211,7 +211,7 @@ state2:
   CALL_C(b_+97, objectCreatePuff_hook, SYM(objectCreatePuff), b_+100);
   CALL_C(b_+100, interactionIncState_hook, SYM(interactionIncState), b_+103);
   CYC(b_+103, b_+106); SET_HL((SYM(miscPuzzles_subid19__state4) + 19)); // mainScripts.fairyHidingMinigame_subid01Script
-  CYC(b_+106, b_+109); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+106, b_+109); TAIL(interactionSetScript); // jp
 
 state3:
   CALL_C(b_+109, interactionRunScript_hook, SYM(interactionRunScript), b_+112);
@@ -237,7 +237,7 @@ warpOut:
   CALL_C(b_+146, setWarpDestVariables_hook, SYM(setWarpDestVariables), b_+149);
 
 delete_:
-  CYC(b_+149, b_+152); interactionDelete_hook(gb); return; // jp
+  CYC(b_+149, b_+152); TAIL(interactionDelete); // jp
 }
 
 // fairyHidingMinigame_subid02: checks for Link leaving the hide-and-seek area.
@@ -257,7 +257,7 @@ void fairyHidingMinigame_subid02_hook(GB *gb) {
   CYC(b_+10, b_+13); SET_HL(wTmpcfc0_fairyHideAndSeek_active);
   CYC(b_+13, b_+15); B = 0x10;
   CALL_C(b_+15, clearMemory_hook, SYM(clearMemory), b_+18);
-  CYC(b_+18, b_+21); interactionDelete_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(interactionDelete); // jp
 
 state0:
   CALL_C(b_+21, fairyHidingMinigame_checkMinigameActive_hook, SYM(fairyHidingMinigame_checkMinigameActive), b_+24);
@@ -265,7 +265,7 @@ state0:
   CYC(b_+24, b_+27);
   CALL_C(b_+27, interactionIncState_hook, SYM(interactionIncState), b_+30);
   CYC(b_+30, b_+33); SET_HL((SYM(miscPuzzles_subid19__state4) + 23)); // mainScripts.fairyHidingMinigame_subid02Script
-  CYC(b_+33, b_+36); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+33, b_+36); TAIL(interactionSetScript); // jp
 }
 
 // INTERAC_FAIRY_HIDING_MINIGAME
@@ -278,6 +278,6 @@ void interactionCode6c_hook(GB *gb) {
     uint16_t target = fairyHidingMinigame_jump_table(gb);
     if (target == SYM(fairyHidingMinigame_subid00)) { fairyHidingMinigame_subid00_hook(gb); return; }
     if (target == SYM(fairyHidingMinigame_subid01)) { fairyHidingMinigame_subid01_hook(gb); return; }
-    fairyHidingMinigame_subid02_hook(gb); return; // target == 0x53a3
+    TAIL(fairyHidingMinigame_subid02); // target == 0x53a3
   }
 }

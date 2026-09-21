@@ -200,15 +200,13 @@ applyHazardEffect:
   CYC(b_+85, b_+86); alu_rrca(gb);
   if (F & FC) {
     CYCT(b_+86, b_+88);
-    ecom_makeSplashAndDelete_b10_hook(gb);
-    return;
+    TAIL(ecom_makeSplashAndDelete_b10);
   }
   CYC(b_+86, b_+88);
   CYC(b_+88, b_+89); alu_rrca(gb);
   if (F & FC) {
     CYCT(b_+89, b_+91);
-    ecom_fallingInHole_b10_hook(gb);
-    return;
+    TAIL(ecom_fallingInHole_b10);
   }
   CYC(b_+89, b_+91);
   CYC(b_+91, b_+93);
@@ -275,8 +273,7 @@ void ecom_fallingInHole_b10_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+3);
   if (F & FZ) {
     CYCT(b_+3, b_+5);
-    ecom_fallDownHoleAndDelete_b10_hook(gb);
-    return;
+    TAIL(ecom_fallDownHoleAndDelete_b10);
   }
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+6); A = mem_rd(gb, HL);
@@ -286,8 +283,7 @@ void ecom_fallingInHole_b10_hook(GB *gb) {
     ecom_fallingInHole_checkInCenterOfHole_b10(gb);
     if (F & FZ) {
       CYCT(b_+13, b_+15);
-      ecom_fallDownHoleAndDelete_b10_hook(gb);
-      return;
+      TAIL(ecom_fallDownHoleAndDelete_b10);
     }
     CYC(b_+13, b_+15);
     CALL_C(b_+15, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+18);
@@ -625,8 +621,7 @@ void ecom_getAdjacentWallsBitset_checkCollisionAt_b10_hook(GB *gb) {
   CYC(b_+42, b_+43); A = alu_dec8(gb, A);
   if (F & FZ) {
     CYCT(b_+43, b_+46);
-    checkTileCollisionAt_disallowHoles_hook(gb);
-    return;
+    TAIL(checkTileCollisionAt_disallowHoles);
   }
   CYC(b_+43, b_+46);
   CYC(b_+46, b_+47); A = alu_inc8(gb, A);
@@ -643,8 +638,7 @@ secondCheck:
   CYC(b_+58, b_+60); alu_add(gb, 0x01);
   if (!(F & FC)) {
     CYCT(b_+60, b_+63);
-    checkTileCollisionAt_allowHoles_hook(gb);
-    return;
+    TAIL(checkTileCollisionAt_allowHoles);
   }
   CYC(b_+60, b_+63);
   RET(b_+63); return;
@@ -742,8 +736,7 @@ void ecom_bounceOffScreenBoundary_common_b10_hook(GB *gb) {
   CYC(b_+11, b_+13); alu_cp(gb, 0x05);
   if (F & FZ) {
     CYCT(b_+13, b_+15);
-    ecom_bounceOffScreenBoundary__reverseDirection_b10_hook(gb);
-    return;
+    TAIL(ecom_bounceOffScreenBoundary__reverseDirection_b10);
   }
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+18); SET_HL(b_+74);
@@ -1423,15 +1416,13 @@ applyHazardEffect:
   CYC(b_+85, b_+86); alu_rrca(gb);
   if (F & FC) {
     CYCT(b_+86, b_+88);
-    ecom_makeSplashAndDelete_b0d_hook(gb);
-    return;
+    TAIL(ecom_makeSplashAndDelete_b0d);
   }
   CYC(b_+86, b_+88);
   CYC(b_+88, b_+89); alu_rrca(gb);
   if (F & FC) {
     CYCT(b_+89, b_+91);
-    ecom_fallingInHole_b0d_hook(gb);
-    return;
+    TAIL(ecom_fallingInHole_b0d);
   }
   CYC(b_+89, b_+91);
   CYC(b_+91, b_+93);
@@ -1498,8 +1489,7 @@ void ecom_fallingInHole_b0d_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+3);
   if (F & FZ) {
     CYCT(b_+3, b_+5);
-    ecom_fallDownHoleAndDelete_b0d_hook(gb);
-    return;
+    TAIL(ecom_fallDownHoleAndDelete_b0d);
   }
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+6); A = mem_rd(gb, HL);
@@ -1509,8 +1499,7 @@ void ecom_fallingInHole_b0d_hook(GB *gb) {
     ecom_fallingInHole_checkInCenterOfHole_b0d(gb);
     if (F & FZ) {
       CYCT(b_+13, b_+15);
-      ecom_fallDownHoleAndDelete_b0d_hook(gb);
-      return;
+      TAIL(ecom_fallDownHoleAndDelete_b0d);
     }
     CYC(b_+13, b_+15);
     CALL_C(b_+15, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+18);
@@ -1848,8 +1837,7 @@ void ecom_getAdjacentWallsBitset_checkCollisionAt_b0d_hook(GB *gb) {
   CYC(b_+42, b_+43); A = alu_dec8(gb, A);
   if (F & FZ) {
     CYCT(b_+43, b_+46);
-    checkTileCollisionAt_disallowHoles_hook(gb);
-    return;
+    TAIL(checkTileCollisionAt_disallowHoles);
   }
   CYC(b_+43, b_+46);
   CYC(b_+46, b_+47); A = alu_inc8(gb, A);
@@ -1866,8 +1854,7 @@ secondCheck:
   CYC(b_+58, b_+60); alu_add(gb, 0x01);
   if (!(F & FC)) {
     CYCT(b_+60, b_+63);
-    checkTileCollisionAt_allowHoles_hook(gb);
-    return;
+    TAIL(checkTileCollisionAt_allowHoles);
   }
   CYC(b_+60, b_+63);
   RET(b_+63); return;
@@ -1965,8 +1952,7 @@ void ecom_bounceOffScreenBoundary_common_b0d_hook(GB *gb) {
   CYC(b_+11, b_+13); alu_cp(gb, 0x05);
   if (F & FZ) {
     CYCT(b_+13, b_+15);
-    ecom_bounceOffScreenBoundary__reverseDirection_b0d_hook(gb);
-    return;
+    TAIL(ecom_bounceOffScreenBoundary__reverseDirection_b0d);
   }
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+18); SET_HL(b_+74);
@@ -2647,15 +2633,13 @@ applyHazardEffect:
   CYC(b_+85, b_+86); alu_rrca(gb);
   if (F & FC) {
     CYCT(b_+86, b_+88);
-    ecom_makeSplashAndDelete_b0e_hook(gb);
-    return;
+    TAIL(ecom_makeSplashAndDelete_b0e);
   }
   CYC(b_+86, b_+88);
   CYC(b_+88, b_+89); alu_rrca(gb);
   if (F & FC) {
     CYCT(b_+89, b_+91);
-    ecom_fallingInHole_b0e_hook(gb);
-    return;
+    TAIL(ecom_fallingInHole_b0e);
   }
   CYC(b_+89, b_+91);
   CYC(b_+91, b_+93);
@@ -2722,8 +2706,7 @@ void ecom_fallingInHole_b0e_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+3);
   if (F & FZ) {
     CYCT(b_+3, b_+5);
-    ecom_fallDownHoleAndDelete_b0e_hook(gb);
-    return;
+    TAIL(ecom_fallDownHoleAndDelete_b0e);
   }
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+6); A = mem_rd(gb, HL);
@@ -2733,8 +2716,7 @@ void ecom_fallingInHole_b0e_hook(GB *gb) {
     ecom_fallingInHole_checkInCenterOfHole_b0e(gb);
     if (F & FZ) {
       CYCT(b_+13, b_+15);
-      ecom_fallDownHoleAndDelete_b0e_hook(gb);
-      return;
+      TAIL(ecom_fallDownHoleAndDelete_b0e);
     }
     CYC(b_+13, b_+15);
     CALL_C(b_+15, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+18);
@@ -3072,8 +3054,7 @@ void ecom_getAdjacentWallsBitset_checkCollisionAt_b0e_hook(GB *gb) {
   CYC(b_+42, b_+43); A = alu_dec8(gb, A);
   if (F & FZ) {
     CYCT(b_+43, b_+46);
-    checkTileCollisionAt_disallowHoles_hook(gb);
-    return;
+    TAIL(checkTileCollisionAt_disallowHoles);
   }
   CYC(b_+43, b_+46);
   CYC(b_+46, b_+47); A = alu_inc8(gb, A);
@@ -3090,8 +3071,7 @@ secondCheck:
   CYC(b_+58, b_+60); alu_add(gb, 0x01);
   if (!(F & FC)) {
     CYCT(b_+60, b_+63);
-    checkTileCollisionAt_allowHoles_hook(gb);
-    return;
+    TAIL(checkTileCollisionAt_allowHoles);
   }
   CYC(b_+60, b_+63);
   RET(b_+63); return;
@@ -3189,8 +3169,7 @@ void ecom_bounceOffScreenBoundary_common_b0e_hook(GB *gb) {
   CYC(b_+11, b_+13); alu_cp(gb, 0x05);
   if (F & FZ) {
     CYCT(b_+13, b_+15);
-    ecom_bounceOffScreenBoundary__reverseDirection_b0e_hook(gb);
-    return;
+    TAIL(ecom_bounceOffScreenBoundary__reverseDirection_b0e);
   }
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+18); SET_HL(b_+74);
@@ -3871,15 +3850,13 @@ applyHazardEffect:
   CYC(b_+85, b_+86); alu_rrca(gb);
   if (F & FC) {
     CYCT(b_+86, b_+88);
-    ecom_makeSplashAndDelete_b0f_hook(gb);
-    return;
+    TAIL(ecom_makeSplashAndDelete_b0f);
   }
   CYC(b_+86, b_+88);
   CYC(b_+88, b_+89); alu_rrca(gb);
   if (F & FC) {
     CYCT(b_+89, b_+91);
-    ecom_fallingInHole_b0f_hook(gb);
-    return;
+    TAIL(ecom_fallingInHole_b0f);
   }
   CYC(b_+89, b_+91);
   CYC(b_+91, b_+93);
@@ -3946,8 +3923,7 @@ void ecom_fallingInHole_b0f_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+3);
   if (F & FZ) {
     CYCT(b_+3, b_+5);
-    ecom_fallDownHoleAndDelete_b0f_hook(gb);
-    return;
+    TAIL(ecom_fallDownHoleAndDelete_b0f);
   }
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+6); A = mem_rd(gb, HL);
@@ -3957,8 +3933,7 @@ void ecom_fallingInHole_b0f_hook(GB *gb) {
     ecom_fallingInHole_checkInCenterOfHole_b0f(gb);
     if (F & FZ) {
       CYCT(b_+13, b_+15);
-      ecom_fallDownHoleAndDelete_b0f_hook(gb);
-      return;
+      TAIL(ecom_fallDownHoleAndDelete_b0f);
     }
     CYC(b_+13, b_+15);
     CALL_C(b_+15, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+18);
@@ -4296,8 +4271,7 @@ void ecom_getAdjacentWallsBitset_checkCollisionAt_b0f_hook(GB *gb) {
   CYC(b_+42, b_+43); A = alu_dec8(gb, A);
   if (F & FZ) {
     CYCT(b_+43, b_+46);
-    checkTileCollisionAt_disallowHoles_hook(gb);
-    return;
+    TAIL(checkTileCollisionAt_disallowHoles);
   }
   CYC(b_+43, b_+46);
   CYC(b_+46, b_+47); A = alu_inc8(gb, A);
@@ -4314,8 +4288,7 @@ secondCheck:
   CYC(b_+58, b_+60); alu_add(gb, 0x01);
   if (!(F & FC)) {
     CYCT(b_+60, b_+63);
-    checkTileCollisionAt_allowHoles_hook(gb);
-    return;
+    TAIL(checkTileCollisionAt_allowHoles);
   }
   CYC(b_+60, b_+63);
   RET(b_+63); return;
@@ -4413,8 +4386,7 @@ void ecom_bounceOffScreenBoundary_common_b0f_hook(GB *gb) {
   CYC(b_+11, b_+13); alu_cp(gb, 0x05);
   if (F & FZ) {
     CYCT(b_+13, b_+15);
-    ecom_bounceOffScreenBoundary__reverseDirection_b0f_hook(gb);
-    return;
+    TAIL(ecom_bounceOffScreenBoundary__reverseDirection_b0f);
   }
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+18); SET_HL(b_+74);

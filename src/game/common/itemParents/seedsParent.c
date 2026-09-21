@@ -70,7 +70,7 @@ void parentItemCode_satchel_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (seeds_parent_jump_table(gb));
     if (jt_ == b_+8) { goto state0; }
-    else if (jt_ == SYM(parentItemGenericState1)) { parentItemGenericState1_hook(gb); return; }
+    else if (jt_ == SYM(parentItemGenericState1) && hook_enabled_at(gb, SYM(parentItemGenericState1))) { parentItemGenericState1_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
@@ -102,7 +102,7 @@ state0:
   if (F & FC) { CYCT(b_+51, b_+54); goto clear; }
   CYC(b_+51, b_+54);
   CYC(b_+54, b_+55); A = B;
-  CYC(b_+55, b_+58); decNumActiveSeeds_hook(gb); return;
+  CYC(b_+55, b_+58); TAIL(decNumActiveSeeds);
 
 pegasus:
   CYC(b_+58, b_+61); SET_HL(wPegasusSeedCounter);

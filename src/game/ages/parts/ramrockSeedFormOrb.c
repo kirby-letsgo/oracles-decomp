@@ -46,7 +46,7 @@ state0:
   CYC(b_+17, b_+19); E = 0xc6; // Part.counter1
   CYC(b_+19, b_+21); A = 0x28;
   CYC(b_+21, b_+22); mem_wr(gb, DE, A);
-  CYC(b_+22, b_+25); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(objectSetVisible80); // jp
 
 state1:
   CALL_C(b_+25, partAnimate_hook, SYM(partAnimate), b_+28);
@@ -76,7 +76,7 @@ state2:
   CYC(b_+64, b_+66);
   CYC(b_+66, b_+68); mem_wr(gb, HL, 0x0a);
   CALL_C(b_+68, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+71);
-  CYC(b_+71, b_+74); objectNudgeAngleTowards_hook(gb); return; // jp
+  CYC(b_+71, b_+74); TAIL(objectNudgeAngleTowards); // jp
 
 func_7aa9:
   CALL_C(b_+74, objectApplySpeed_hook, SYM(objectApplySpeed), b_+77);
@@ -85,5 +85,5 @@ func_7aa9:
   CYC(b_+80, b_+81);
 
 delete:
-  CYC(b_+81, b_+84); partDelete_hook(gb); return; // jp
+  CYC(b_+81, b_+84); TAIL(partDelete); // jp
 }

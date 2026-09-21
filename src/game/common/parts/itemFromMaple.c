@@ -73,7 +73,7 @@ static void itemFromMaple_setOamData(GB *gb) {
   CYC(b_+448, b_+449); E = alu_dec8(gb, E);
   CYC(b_+449, b_+450); mem_wr(gb, DE, A);
   CYC(b_+450, b_+451); A = mem_rd(gb, HL);
-  CYC(b_+451, b_+454); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+451, b_+454); TAIL(partSetAnimation); // jp
 }
 
 static void itemFromMaple_setDroppedItemPosition(GB *gb) {
@@ -171,7 +171,7 @@ normalStatus:
     if (target == b_+112) goto state1;
     if (target == b_+136) goto state3;
     if (target == b_+185) goto state4;
-    objectReplaceWithAnimationIfOnHazard_hook(gb); return;
+    TAIL(objectReplaceWithAnimationIfOnHazard);
   }
 
 state0:
@@ -206,7 +206,7 @@ state0:
   CYC(b_+79, b_+81); alu_and(gb, 0x1f);
   CYC(b_+81, b_+82); mem_wr(gb, DE, A);
   CYC(b_+82, b_+85); push_effect(gb, b_+85); itemFromMaple_setOamData(gb);
-  CYC(b_+85, b_+88); objectSetVisiblec3_hook(gb); return; // jp
+  CYC(b_+85, b_+88); TAIL(objectSetVisiblec3); // jp
 
 state1:
   CALL_C(b_+112, objectApplySpeed_hook, SYM(objectApplySpeed), b_+115);
@@ -221,7 +221,7 @@ state1:
   CYC(b_+130, b_+132); L = 0xc4; // Part.state
   CYC(b_+132, b_+133); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
 L_4d98:
-  CYC(b_+133, b_+136); objectReplaceWithAnimationIfOnHazard_hook(gb); return; // jp
+  CYC(b_+133, b_+136); TAIL(objectReplaceWithAnimationIfOnHazard); // jp
 
 state3:
   CYC(b_+136, b_+137); E = alu_inc8(gb, E); // Part.substate
@@ -256,7 +256,7 @@ L_4db3:
   if (F & FZ) { CYCT(b_+179, b_+182); objectTakePosition_hook(gb); return; } // jp z
   CYC(b_+179, b_+182);
 L_4dc9:
-  CYC(b_+182, b_+185); partDelete_hook(gb); return; // jp
+  CYC(b_+182, b_+185); TAIL(partDelete); // jp
 
 state4:
   CYC(b_+185, b_+186); E = alu_inc8(gb, E); // Part.substate
@@ -296,7 +296,7 @@ substate1:
   CYC(b_+225, b_+227); L = 0xe4; // Part.collisionType
   CYC(b_+227, b_+229); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
   CYC(b_+229, b_+232); SET_BC(0xffc0);
-  CYC(b_+232, b_+235); objectSetSpeedZ_hook(gb); return; // jp
+  CYC(b_+232, b_+235); TAIL(objectSetSpeedZ); // jp
 
 substate2:
   CYC(b_+235, b_+237); C = 0x00;
@@ -322,7 +322,7 @@ substate3:
   CYC(b_+264, b_+265); alu_rlca(gb);
   if (!(F & FC)) { RET_TAKEN(b_+265); return; } // ret nc
   CYC(b_+265, b_+266);
-  CYC(b_+266, b_+269); partDelete_hook(gb); return; // jp
+  CYC(b_+266, b_+269); TAIL(partDelete); // jp
 
 linkCollectedItem:
   CYC(b_+269, b_+272); A = mem_rd(gb, wDisabledObjects); // wDisabledObjects
@@ -375,7 +375,7 @@ L_4e5d:
   CYC(b_+339, b_+341); A = 0x2f; // TREASURE_POTION
 L_4e68:
   CALL_C(b_+341, giveTreasure_hook, SYM(giveTreasure), b_+344);
-  CYC(b_+344, b_+347); partDelete_hook(gb); return; // jp
+  CYC(b_+344, b_+347); TAIL(partDelete); // jp
 
 func_4e6e:
   CYC(b_+347, b_+350); SET_BC(0x2b02); // TREASURE_HEART_PIECE, $02
@@ -390,5 +390,5 @@ func_4e6e:
   CYC(b_+364, b_+365); mem_wr(gb, HL, A);
   CYC(b_+365, b_+368); SET_HL(wMapleState); // wMapleState
   CYC(b_+368, b_+370); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  CYC(b_+370, b_+373); partDelete_hook(gb); return; // jp
+  CYC(b_+370, b_+373); TAIL(partDelete); // jp
 }

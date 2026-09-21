@@ -151,7 +151,7 @@ setVar38:
   CYC(b_+123, b_+124); mem_wr(gb, DE, A);
 
 setScript:
-  CYC(b_+124, b_+127); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+124, b_+127); TAIL(interactionSetScript); // jp
 
 state1:
   CYC(b_+127, b_+129); C = 0x20;
@@ -163,7 +163,7 @@ state1:
   CYC(b_+136, b_+139);
   CALL_C(b_+139, interactionIncState_hook, SYM(interactionIncState), b_+142);
   CYC(b_+142, b_+145); SET_HL((SYM(interactionCode94) + 15)); // mainScripts.patch_upstairsMoveToStaircaseScript
-  CYC(b_+145, b_+148); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+145, b_+148); TAIL(interactionSetScript); // jp
 
 state2:
   CALL_C(b_+148, interactionRunScript_hook, SYM(interactionRunScript), b_+151);
@@ -174,7 +174,7 @@ state2:
   CYC(b_+158, b_+161); W8(wMenuDisabled) = A;
   CYC(b_+161, b_+162); A = alu_inc8(gb, A);
   CYC(b_+162, b_+165); W8(wTmpcfc0_patchMinigame_patchDownstairs) = A;
-  CYC(b_+165, b_+168); interactionDelete_hook(gb); return; // jp
+  CYC(b_+165, b_+168); TAIL(interactionDelete); // jp
 }
 
 // Patch in his minigame room
@@ -214,7 +214,7 @@ void patch_subid01_hook(GB *gb) {
   CYC(b_+45, b_+46); A = alu_inc8(gb, A);
   CYC(b_+46, b_+49); W8(wDiggingUpEnemiesForbidden) = A;
   CYC(b_+49, b_+52); SET_HL((SYM(patch_subid00) + 3)); // mainScripts.patch_downstairsScript
-  CYC(b_+52, b_+55); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+52, b_+55); TAIL(interactionSetScript); // jp
 
 state1:
   CYC(b_+55, b_+58); A = W8(wPaletteThread_mode);
@@ -280,7 +280,7 @@ state2:
   CYC(b_+149, b_+151); A = 0x05;
   CYC(b_+151, b_+152); mem_wr(gb, DE, A);
   CYC(b_+152, b_+153); A = alu_dec8(gb, A);
-  CYC(b_+153, b_+156); fadeoutToWhiteWithDelay_hook(gb); return; // jp
+  CYC(b_+153, b_+156); TAIL(fadeoutToWhiteWithDelay); // jp
 
 gameRunning:
   // Subid 3 sets var39 to nonzero when all beetles are killed; wait for the signal.
@@ -318,11 +318,11 @@ gameRunning:
   CALL_C(b_+210, playSound_b00_hook, SYM(playSound_b00), b_+213);
   CYC(b_+213, b_+216); A = W8(wActiveMusic2);
   CYC(b_+216, b_+219); W8(wActiveMusic) = A;
-  CYC(b_+219, b_+222); playSound_b00_hook(gb); return; // jp
+  CYC(b_+219, b_+222); TAIL(playSound_b00); // jp
 
 runScriptAndAnimate:
   CALL_C(b_+222, interactionRunScript_hook, SYM(interactionRunScript), b_+225);
-  CYC(b_+225, b_+228); interactionAnimateAsNpc_hook(gb); return; // jp
+  CYC(b_+225, b_+228); TAIL(interactionAnimateAsNpc); // jp
 
 // Just won the game
 state3:
@@ -336,7 +336,7 @@ state3:
   CYC(b_+238, b_+240);
 
 animateNpc:
-  CYC(b_+240, b_+243); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+240, b_+243); TAIL(interactionAnimate); // jp
 
 state3RunScript:
   CALL_C(b_+243, interactionRunScript_hook, SYM(interactionRunScript), b_+246);
@@ -345,7 +345,7 @@ state3RunScript:
   CYC(b_+248, b_+251); A = W8(wTmpcfc0_patchMinigame_fixingSword);
   CYC(b_+251, b_+252); alu_or(gb, A);
   CYC(b_+252, b_+254); A = 0x1f; // GLOBALFLAG_PATCH_REPAIRED_EVERYTHING
-  if (!(F & FZ)) { CALL_C(b_+254, setGlobalFlag_hook, SYM(setGlobalFlag), b_+257); } // call nz
+  if (!(F & FZ)) { CALL_C_CC(b_+254, setGlobalFlag_hook, SYM(setGlobalFlag), b_+257); } // call nz
   else { CYC(b_+254, b_+257); }
 
 alreadyWonMinigame:
@@ -353,14 +353,14 @@ alreadyWonMinigame:
   CYC(b_+259, b_+261); A = 0x04;
   CYC(b_+261, b_+262); mem_wr(gb, DE, A);
   CYC(b_+262, b_+265); SET_HL((SYM(patch_subid00__setScript) + 1)); // mainScripts.patch_downstairsAfterBeatingMinigameScript
-  CYC(b_+265, b_+268); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+265, b_+268); TAIL(interactionSetScript); // jp
 
 // NPC after winning the game
 state4:
   CALL_C(b_+268, interactionRunScript_hook, SYM(interactionRunScript), b_+271);
 
 faceLinkAndAnimate:
-  CYC(b_+271, b_+274); npcFaceLinkAndAnimate_hook(gb); return; // jp
+  CYC(b_+271, b_+274); TAIL(npcFaceLinkAndAnimate); // jp
 
 // Failed the game
 state5:
@@ -404,7 +404,7 @@ giveBackItem:
   CYC(b_+325, b_+328); W8(wActiveMusic) = A;
   CALL_C(b_+328, playSound_b00_hook, SYM(playSound_b00), b_+331);
   CYC(b_+331, b_+334); SET_HL((SYM(patch_subid00__notRepairingSword) + 5)); // mainScripts.patch_linkFailedMinigameScript
-  CYC(b_+334, b_+337); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+334, b_+337); TAIL(interactionSetScript); // jp
 
 state6:
   CALL_C(b_+337, interactionRunScript_hook, SYM(interactionRunScript), b_+340);
@@ -452,7 +452,7 @@ void patch_subid02_hook(GB *gb) {
   CYC(b_+47, b_+49); mem_wr(gb, HL, 0x28); // SPEED_100
   CYC(b_+49, b_+51); A = 0x06;
   CALL_C(b_+51, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+54);
-  CYC(b_+54, b_+57); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+54, b_+57); TAIL(objectSetVisible82); // jp
 
 state1:
   CYC(b_+57, b_+60); A = W8(wTmpcfc0_patchMinigame_gameStarted);
@@ -471,7 +471,7 @@ state1:
   CYC(b_+77, b_+79); A = 0x40; // Interaction.start
   CYC(b_+79, b_+80); mem_wr(gb, HL, A); SET_HL(HL + 1); // ld (hl+),a
   CYC(b_+80, b_+81); mem_wr(gb, HL, D);
-  CYC(b_+81, b_+84); interactionIncState_hook(gb); return; // jp
+  CYC(b_+81, b_+84); TAIL(interactionIncState); // jp
 
 state2:
   CYC(b_+84, b_+87); SET_HL(wTmpcfc0_patchMinigame_gameStarted);
@@ -494,7 +494,7 @@ state2:
   CYC(b_+105, b_+107); mem_wr(gb, HL, 0x68);
 
 incState:
-  CYC(b_+107, b_+110); interactionIncState_hook(gb); return; // jp
+  CYC(b_+107, b_+110); TAIL(interactionIncState); // jp
 
 gameStillGoing:
   CALL_C(b_+110, objectApplySpeed_hook, SYM(objectApplySpeed), b_+113);
@@ -533,7 +533,7 @@ applyAngle:
   CYC(b_+159, b_+160); A = alu_inc8(gb, A);
 
 setAnim:
-  CYC(b_+160, b_+163); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+160, b_+163); TAIL(interactionSetAnimation); // jp
 
   // @trackTable: TILEINDEX_TRACK_TR->DOWN, TILEINDEX_TRACK_BR->LEFT,
   // TILEINDEX_TRACK_BL->UP, TILEINDEX_TRACK_TL->RIGHT, then a $00 terminator.
@@ -700,7 +700,7 @@ allBeetlesKilled:
   CYC(b_+156, b_+157); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
 
 deleteInteraction:
-  CYC(b_+157, b_+160); interactionDelete_hook(gb); return; // jp
+  CYC(b_+157, b_+160); TAIL(interactionDelete); // jp
 
   // @extraBeetlePositions: pure ROM data (7bec..7bf0), consumed by patch_addAToHl_from_rst above.
 }
@@ -729,7 +729,7 @@ void patch_subid05_hook(GB *gb) {
   CYC(b_+22, b_+24); mem_wr(gb, HL, 0x78);
   CYC(b_+24, b_+27); SET_BC(0x0606);
   CALL_C(b_+27, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+30);
-  CYC(b_+30, b_+33); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+30, b_+33); TAIL(objectSetVisible83); // jp
 
 state1:
   CYC(b_+33, b_+36); A = W8(wPaletteThread_mode);
@@ -753,14 +753,14 @@ state1:
   CYC(b_+65, b_+66); A = mem_rd(gb, HL);
   CYC(b_+66, b_+68); alu_sub(gb, 0x08);
   CYC(b_+68, b_+69); mem_wr(gb, HL, A);
-  CYC(b_+69, b_+72); interactionIncState_hook(gb); return; // jp
+  CYC(b_+69, b_+72); TAIL(interactionIncState); // jp
 
 state2:
   CYC(b_+72, b_+75); A = W8(wTmpcfc0_patchMinigame_screenFadedOut);
   CYC(b_+75, b_+76); alu_or(gb, A);
   if (F & FZ) { RET_TAKEN(b_+76); return; } // ret z
   CYC(b_+76, b_+77);
-  CYC(b_+77, b_+80); interactionDelete_hook(gb); return; // jp
+  CYC(b_+77, b_+80); TAIL(interactionDelete); // jp
 }
 
 void patch_subid04_hook(GB *gb) {
@@ -781,7 +781,7 @@ void patch_subid07_hook(GB *gb) {
   CALL_C(b_+5, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+8);
   if (!(F & FZ)) { RET_TAKEN(b_+8); return; } // ret nz
   CYC(b_+8, b_+9);
-  CYC(b_+9, b_+12); interactionDelete_hook(gb); return; // jp
+  CYC(b_+9, b_+12); TAIL(interactionDelete); // jp
 
 state0:
   CYC(b_+12, b_+15); A = W8(wTmpcfc0_patchMinigame_wonMinigame);
@@ -813,7 +813,7 @@ getPosition:
   CALL_C(b_+53, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+56);
   CYC(b_+56, b_+59); SET_BC(0xf2f8);
   CALL_C(b_+59, objectTakePositionWithOffset_hook, SYM(objectTakePositionWithOffset), b_+62);
-  CYC(b_+62, b_+65); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+62, b_+65); TAIL(objectSetVisible81); // jp
 }
 
 void patch_subid06_hook(GB *gb) {

@@ -147,7 +147,7 @@ state8:
   CYC(b_+74, b_+75); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
   CYC(b_+75, b_+77); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+77, b_+79); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  CYC(b_+79, b_+82); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+79, b_+82); TAIL(objectSetVisible82); // jp
 
   // Rising up out of the ground
 state9:
@@ -181,7 +181,7 @@ stateA:
   CYC(b_+114, b_+115); L = E;
   CYC(b_+115, b_+116); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]++
   CYC(b_+116, b_+118); A = 0x01;
-  CYC(b_+118, b_+121); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+118, b_+121); TAIL(enemySetAnimation); // jp
 
 stateAFireCheck:
   // Randomly fire projectile when [counter1] reaches 0
@@ -198,7 +198,7 @@ stateAFireCheck:
   // falls through to animate
 
 animate:
-  CYC(b_+140, b_+143); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+140, b_+143); TAIL(enemyAnimate); // jp
 
   // Moving back into the ground
 stateB:
@@ -228,7 +228,7 @@ stateC:
   CYC(b_+175, b_+176); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+176, b_+178); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+178, b_+180); mem_wr(gb, HL, 180);
-  CYC(b_+180, b_+183); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+180, b_+183); TAIL(objectSetInvisible); // jp
 
   // Waiting underground for [counter1] frames.
 stateD:
@@ -239,5 +239,5 @@ stateD:
   CYC(b_+189, b_+190); L = E;
   CYC(b_+190, b_+192); mem_wr(gb, HL, 0x08); // [state]
   CYC(b_+192, b_+193); alu_xor(gb, A);
-  CYC(b_+193, b_+196); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+193, b_+196); TAIL(enemySetAnimation); // jp
 }

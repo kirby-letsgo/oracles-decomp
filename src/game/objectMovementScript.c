@@ -69,7 +69,7 @@ void objectLoadMovementScript_body_hook(GB *gb) {
   CYC(b_+28, b_+29); E = alu_inc8(gb, E);
   CYC(b_+29, b_+30); A = H;
   CYC(b_+30, b_+31); mem_wr(gb, DE, A);
-  objectRunMovementScript_body_hook(gb); return; // fallthrough
+  TAIL(objectRunMovementScript_body); // fallthrough
 }
 
 // 0e:6b4c, bare global; called from objectRunMovementScript in bank0, also falls into from

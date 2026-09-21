@@ -42,7 +42,7 @@ void pickaxeWorker_setAnimationFromVar03_hook(GB *gb) {
   CYC(b_+3, b_+6); SET_HL(b_+11); // @animations
   CYC(b_+6, b_+7); pickaxeWorker15_addAToHl_from_rst(gb, b_+7);
   CYC(b_+7, b_+8); A = mem_rd(gb, HL);
-  CYC(b_+8, b_+11); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+8, b_+11); TAIL(interactionSetAnimation); // jp
 }
 
 void pickaxeWorker_chooseRandomBlackTowerText_hook(GB *gb) {

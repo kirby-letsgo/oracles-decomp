@@ -61,7 +61,7 @@ static void interactiond9_state2_createTreasure(GB *gb, uint16_t sp0_, uint16_t 
   CALL_C(b_+271, createTreasure_hook, SYM(createTreasure), b_+274);
   if (!(F & FZ)) { CYCT(b_+274, b_+275); ret_effect(gb); return; } // ret nz
   CYC(b_+274, b_+275);
-  CYC(b_+275, b_+278); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+275, b_+278); TAIL(objectCopyPosition); // jp
 }
 
 // 0b:4f65, interactiond9_state2@createTreasureAndIncSubstate. Reached by plain goto/fallthrough
@@ -77,7 +77,7 @@ void interactiond9_state2_createTreasureAndIncSubstate_hook(GB *gb) {
   CYC(b_+201, b_+203); E = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+203, b_+205); A = 0x1e;
   CYC(b_+205, b_+206); mem_wr(gb, DE, A);
-  CYC(b_+206, b_+209); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+206, b_+209); TAIL(interactionIncSubstate); // jp
 }
 
 // 0b:4de4, called from interactionCoded9@state0.
@@ -97,7 +97,7 @@ void interactiond9_state0_hook(GB *gb) {
   CALL_C(b_+19, showText_hook, SYM(showText), b_+22);
   CYC(b_+22, b_+24); A = 0x02;
   CYC(b_+24, b_+27); mem_wr(gb, wTmpcfc0_genericCutscene_state, A);
-  CYC(b_+27, b_+30); interactionDelete_hook(gb); return; // jp
+  CYC(b_+27, b_+30); TAIL(interactionDelete); // jp
 
 secretNotTold:
   CYC(b_+30, b_+31); A = B;
@@ -137,7 +137,7 @@ void interactiond9_markSecretAsTold_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_add(gb, GV(0x5a, 0x6e)); // GLOBALFLAG_FIRST_AGES_DONE_SECRET
   CALL_C(b_+5, setGlobalFlag_hook, SYM(setGlobalFlag), b_+8);
   CYC(b_+8, b_+10); A = 0x2c; // GLOBALFLAG_SECRET_CHEST_WAITING
-  CYC(b_+10, b_+13); unsetGlobalFlag_hook(gb); return; // jp
+  CYC(b_+10, b_+13); TAIL(unsetGlobalFlag); // jp
 }
 
 // 0b:4e33, called from interactionCoded9@state1. Handles a brand-new (non-upgrade) item: it
@@ -168,7 +168,7 @@ substate0:
   CYC(b_+28, b_+29); A = C;
   CYC(b_+29, b_+32); mem_wr(gb, wChestContentsOverride + 1, A);
   CYC(b_+32, b_+34); B = 0x11; // INTERAC_FARORE_MAKECHEST
-  CYC(b_+34, b_+37); objectCreateInteractionWithSubid00_hook(gb); return; // jp
+  CYC(b_+34, b_+37); TAIL(objectCreateInteractionWithSubid00); // jp
 
 substate1:
   CYC(b_+37, b_+40); A = mem_rd(gb, wTmpcfc0_genericCutscene_state);
@@ -178,7 +178,7 @@ substate1:
   CYC(b_+42, b_+44); E = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+44, b_+46); A = 0x3c;
   CYC(b_+46, b_+47); mem_wr(gb, DE, A);
-  CYC(b_+47, b_+50); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+47, b_+50); TAIL(interactionIncSubstate); // jp
 
 substate2:
   CALL_C(b_+50, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+53);
@@ -190,7 +190,7 @@ substate2:
   CYC(b_+61, b_+64); mem_wr(gb, wTmpcfc0_genericCutscene_state, A);
   CYC(b_+64, b_+67); SET_BC(0x5509); // TX_5509
   CALL_C(b_+67, showText_hook, SYM(showText), b_+70);
-  CYC(b_+70, b_+73); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+70, b_+73); TAIL(interactionIncSubstate); // jp
 
 substate3:
   CYC(b_+73, b_+76); A = mem_rd(gb, wcca2);
@@ -201,7 +201,7 @@ substate3:
   CYC(b_+81, b_+83); E = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+83, b_+85); A = 0x1e;
   CYC(b_+85, b_+86); mem_wr(gb, DE, A);
-  CYC(b_+86, b_+89); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+86, b_+89); TAIL(interactionIncSubstate); // jp
 
 substate4:
   CALL_C(b_+89, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+92);
@@ -212,7 +212,7 @@ substate4:
   CYC(b_+99, b_+100); C = A;
   CYC(b_+100, b_+102); A = 0xac;
   CALL_C(b_+102, setTile_hook, SYM(setTile), b_+105);
-  CYC(b_+105, b_+108); interactionDelete_hook(gb); return; // jp
+  CYC(b_+105, b_+108); TAIL(interactionDelete); // jp
 }
 
 // 0b:4e9f, called from interactionCoded9@state2. Handles an upgrade item (ring box, sword,
@@ -240,7 +240,7 @@ substate0:
   CYC(b_+25, b_+27); L = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+27, b_+29); mem_wr(gb, HL, 0x1e);
   CYC(b_+29, b_+32); SET_HL(w1Link);
-  CYC(b_+32, b_+35); objectTakePosition_hook(gb); return; // jp
+  CYC(b_+32, b_+35); TAIL(objectTakePosition); // jp
 
 substate1:
   CALL_C(b_+35, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+38);
@@ -255,7 +255,7 @@ substate1:
   CYC(b_+49, b_+51); mem_wr(gb, HL, 0x28);
   CYC(b_+51, b_+53); L = INTERACTION_BASE + OBJ_XH;
   CYC(b_+53, b_+55); mem_wr(gb, HL, 0x58);
-  CYC(b_+55, b_+58); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+55, b_+58); TAIL(interactionIncSubstate); // jp
 
 substate2:
   CALL_C(b_+58, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+61);
@@ -268,7 +268,7 @@ substate2:
   CYC(b_+71, b_+72); C = A;
   CYC(b_+72, b_+74); A = 0x78;
   CALL_C(b_+74, createEnergySwirlGoingIn_hook, SYM(createEnergySwirlGoingIn), b_+77);
-  CYC(b_+77, b_+80); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+77, b_+80); TAIL(interactionIncSubstate); // jp
 
 substate3: // also @substate4
   CALL_C(b_+80, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+83);
@@ -281,7 +281,7 @@ substate3: // also @substate4
 playFadeOutSoundAndIncState:
   CYC(b_+89, b_+91); A = 0xb4; // SND_FADEOUT
   CALL_C(b_+91, playSound_b00_hook, SYM(playSound_b00), b_+94);
-  CYC(b_+94, b_+97); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+94, b_+97); TAIL(interactionIncSubstate); // jp
 
 substate5:
   CALL_C(b_+97, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+100);
@@ -341,7 +341,7 @@ bombUpgrade:
   CYC(b_+180, b_+182); alu_add(gb, 0x20);
   CYC(b_+182, b_+183); mem_wr(gb, HL, A); SET_HL(HL - 1); // ldd (hl),a
   CYC(b_+183, b_+184); mem_wr(gb, HL, A);
-  CYC(b_+184, b_+187); setStatusBarNeedsRefreshBit1_hook(gb); return; // jp
+  CYC(b_+184, b_+187); TAIL(setStatusBarNeedsRefreshBit1); // jp
 
 satchelUpgrade:
   CYC(b_+187, b_+190); A = mem_rd(gb, wSeedSatchelLevel);
@@ -387,7 +387,7 @@ cleanup:
   CYC(b_+253, b_+256); SET_BC(0x5509); // TX_5509
   CALL_C(b_+256, showText_hook, SYM(showText), b_+259);
   CALL_C(b_+259, interactiond9_markSecretAsTold_hook, SYM(interactiond9_markSecretAsTold), b_+262);
-  CYC(b_+262, b_+265); interactionDelete_hook(gb); return; // jp
+  CYC(b_+262, b_+265); TAIL(interactionDelete); // jp
 
 substate8:
   CALL_C(b_+265, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+268);
@@ -406,9 +406,9 @@ void interactionCoded9_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (interactiond9_jump_table(gb));
-    if (jt_ == SYM(interactiond9_state0)) { interactiond9_state0_hook(gb); return; }
-    else if (jt_ == SYM(interactiond9_state1)) { interactiond9_state1_hook(gb); return; }
-    else if (jt_ == SYM(interactiond9_state2)) { interactiond9_state2_hook(gb); return; }
+    if (jt_ == SYM(interactiond9_state0) && hook_enabled_at(gb, SYM(interactiond9_state0))) { interactiond9_state0_hook(gb); return; }
+    else if (jt_ == SYM(interactiond9_state1) && hook_enabled_at(gb, SYM(interactiond9_state1))) { interactiond9_state1_hook(gb); return; }
+    else if (jt_ == SYM(interactiond9_state2) && hook_enabled_at(gb, SYM(interactiond9_state2))) { interactiond9_state2_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

@@ -185,7 +185,7 @@ collision0:
   CYC(b_+177, b_+179); L = 0x25;
   CYC(b_+179, b_+181); mem_wr(gb, HL, 0xfe);
   CYC(b_+181, b_+183); A = 0x5f; // SND_DAMAGE_LINK
-  CYC(b_+183, b_+186); playSound_b00_hook(gb); return; // jp
+  CYC(b_+183, b_+186); TAIL(playSound_b00); // jp
 
 collision1:
   CYC(b_+186, b_+189); A = mem_rd(gb, wLinkObjectIndex);
@@ -227,7 +227,7 @@ collision2:
   CYC(b_+238, b_+241); mem_wr(gb, wLinkForceState, A);
   CYC(b_+241, b_+242); alu_xor(gb, A);
   CYC(b_+242, b_+245); mem_wr(gb, wLinkStateParameter, A);
-  CYC(b_+245, b_+248); clearAllParentItems_hook(gb); return; // jp
+  CYC(b_+245, b_+248); TAIL(clearAllParentItems); // jp
 
 func_63d6:
   CYC(b_+248, b_+250); A = 0xff;
@@ -252,5 +252,5 @@ func_63d6:
   CYC(b_+281, b_+283); mem_wr(gb, HL, 0x00);
 
 applyVelocity:
-  CYC(b_+283, b_+286); updateLinkPositionGivenVelocity_hook(gb); return; // jp
+  CYC(b_+283, b_+286); TAIL(updateLinkPositionGivenVelocity); // jp
 }

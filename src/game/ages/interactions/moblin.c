@@ -67,7 +67,7 @@ state1:
   CALL_C(b_+28, interactionAnimate_hook, SYM(interactionAnimate), b_+31);
 
 skipAnimate:
-  CYC(b_+31, b_+34); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return; // jp
+  CYC(b_+31, b_+34); TAIL(interactionPushLinkAwayAndUpdateDrawPriority); // jp
 
   // interactionCode96@initGraphicsAndLoadScript; single caller (@state0, above), same
   // sp0_ depth, entered via a genuine `call`. Its final tail-call resumes @state1.

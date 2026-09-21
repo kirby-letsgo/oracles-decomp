@@ -165,9 +165,9 @@ normalStatus:
   CYC(b_+74, b_+76); E = 0x84;  // ld e,Enemy.state
   CYC(b_+76, b_+77); push_effect(gb, b_+77);
   do { uint16_t jt_ = (veranFinal_jump_table(gb));
-    if (jt_ == SYM(veranFinal_turtleForm)) { veranFinal_turtleForm_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_spiderForm)) { veranFinal_spiderForm_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_beeForm)) { veranFinal_beeForm_hook(gb); return; }
+    if (jt_ == SYM(veranFinal_turtleForm) && hook_enabled_at(gb, SYM(veranFinal_turtleForm))) { veranFinal_turtleForm_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm) && hook_enabled_at(gb, SYM(veranFinal_spiderForm))) { veranFinal_spiderForm_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm) && hook_enabled_at(gb, SYM(veranFinal_beeForm))) { veranFinal_beeForm_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -178,17 +178,17 @@ void veranFinal_turtleForm_hook(GB *gb) {
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);  // ld a,(de)
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
   do { uint16_t jt_ = (veranFinal_jump_table(gb));
-    if (jt_ == SYM(veranFinal_turtleForm_state0)) { veranFinal_turtleForm_state0_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_turtleForm_state1)) { veranFinal_turtleForm_state1_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_turtleForm_state2)) { veranFinal_turtleForm_state2_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_turtleForm_state3)) { veranFinal_turtleForm_state3_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_turtleForm_state4)) { veranFinal_turtleForm_state4_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_turtleForm_state5)) { veranFinal_turtleForm_state5_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_turtleForm_state6)) { veranFinal_turtleForm_state6_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_turtleForm_state7)) { veranFinal_turtleForm_state7_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_turtleForm_state8)) { veranFinal_turtleForm_state8_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_turtleForm_state9)) { veranFinal_turtleForm_state9_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_turtleForm_stateA)) { veranFinal_turtleForm_stateA_hook(gb); return; }
+    if (jt_ == SYM(veranFinal_turtleForm_state0) && hook_enabled_at(gb, SYM(veranFinal_turtleForm_state0))) { veranFinal_turtleForm_state0_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state1) && hook_enabled_at(gb, SYM(veranFinal_turtleForm_state1))) { veranFinal_turtleForm_state1_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state2) && hook_enabled_at(gb, SYM(veranFinal_turtleForm_state2))) { veranFinal_turtleForm_state2_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state3) && hook_enabled_at(gb, SYM(veranFinal_turtleForm_state3))) { veranFinal_turtleForm_state3_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state4) && hook_enabled_at(gb, SYM(veranFinal_turtleForm_state4))) { veranFinal_turtleForm_state4_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state5) && hook_enabled_at(gb, SYM(veranFinal_turtleForm_state5))) { veranFinal_turtleForm_state5_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state6) && hook_enabled_at(gb, SYM(veranFinal_turtleForm_state6))) { veranFinal_turtleForm_state6_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state7) && hook_enabled_at(gb, SYM(veranFinal_turtleForm_state7))) { veranFinal_turtleForm_state7_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state8) && hook_enabled_at(gb, SYM(veranFinal_turtleForm_state8))) { veranFinal_turtleForm_state8_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_state9) && hook_enabled_at(gb, SYM(veranFinal_turtleForm_state9))) { veranFinal_turtleForm_state9_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_turtleForm_stateA) && hook_enabled_at(gb, SYM(veranFinal_turtleForm_stateA))) { veranFinal_turtleForm_stateA_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -547,11 +547,11 @@ void veranFinal_spiderForm_hook(GB *gb) {
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);  // ld a,(de)
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
   do { uint16_t jt_ = (veranFinal_jump_table(gb));
-    if (jt_ == SYM(veranFinal_spiderOrBeeForm_state0)) { veranFinal_spiderOrBeeForm_state0_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_spiderForm_state1)) { veranFinal_spiderForm_state1_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_spiderForm_state2)) { veranFinal_spiderForm_state2_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_spiderForm_state3)) { veranFinal_spiderForm_state3_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_spiderForm_state4)) { veranFinal_spiderForm_state4_hook(gb); return; }
+    if (jt_ == SYM(veranFinal_spiderOrBeeForm_state0) && hook_enabled_at(gb, SYM(veranFinal_spiderOrBeeForm_state0))) { veranFinal_spiderOrBeeForm_state0_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_state1) && hook_enabled_at(gb, SYM(veranFinal_spiderForm_state1))) { veranFinal_spiderForm_state1_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_state2) && hook_enabled_at(gb, SYM(veranFinal_spiderForm_state2))) { veranFinal_spiderForm_state2_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_state3) && hook_enabled_at(gb, SYM(veranFinal_spiderForm_state3))) { veranFinal_spiderForm_state3_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_state4) && hook_enabled_at(gb, SYM(veranFinal_spiderForm_state4))) { veranFinal_spiderForm_state4_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -576,7 +576,7 @@ void veranFinal_spiderForm_state1_hook(GB *gb) {
   CALL_C(b_+15, veranFinal_initializeForm_hook, SYM(veranFinal_initializeForm), b_+18);
   CYC(b_+18, b_+20); A = 0x05;  // ld a,$05
   CALL_C(b_+20, enemySetAnimation_hook, SYM(enemySetAnimation), SYM(veranFinal_spiderForm_setCounter2AndInitState2));
-  veranFinal_spiderForm_setCounter2AndInitState2_hook(gb); return;  // fallthrough
+  TAIL(veranFinal_spiderForm_setCounter2AndInitState2);  // fallthrough
 }
 
 void veranFinal_spiderForm_setCounter2AndInitState2_hook(GB *gb) {
@@ -585,7 +585,7 @@ void veranFinal_spiderForm_setCounter2AndInitState2_hook(GB *gb) {
   CYC(b_+0, b_+2); E = 0x87;  // ld e,Enemy.counter2
   CYC(b_+2, b_+4); A = 120;  // ld a,120
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);  // ld (de),a
-  veranFinal_spiderForm_initState2_hook(gb); return;  // fallthrough
+  TAIL(veranFinal_spiderForm_initState2);  // fallthrough
 }
 
 void veranFinal_spiderForm_initState2_hook(GB *gb) {
@@ -605,7 +605,7 @@ void veranFinal_spiderForm_initState2_hook(GB *gb) {
   CYC(b_+20, b_+21); A = mem_rd(gb, HL);  // ld a,(hl)
   CYC(b_+21, b_+22); mem_wr(gb, DE, A);  // ld (de),a
   CALL_C(b_+22, veranFinal_spiderForm_decideAngle_hook, SYM(veranFinal_spiderForm_decideAngle), b_+25);
-  CYC(b_+25, b_+27); veranFinal_spiderForm_animate_hook(gb); return;  // jr veranFinal_spiderForm_animate
+  CYC(b_+25, b_+27); TAIL(veranFinal_spiderForm_animate);  // jr veranFinal_spiderForm_animate
 }
 
 void veranFinal_spiderForm_state2_hook(GB *gb) {
@@ -619,7 +619,7 @@ void veranFinal_spiderForm_state2_hook(GB *gb) {
 decCounter1:
   CALL_C(b_+11, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+14);
   if ((F & FZ)) { CYCT(b_+14, b_+16); veranFinal_spiderForm_initState2_hook(gb); return; } CYC(b_+14, b_+16);  // jr z,veranFinal_spiderForm_initState2
-  veranFinal_spiderForm_updateMovement_hook(gb); return;  // fallthrough
+  TAIL(veranFinal_spiderForm_updateMovement);  // fallthrough
 }
 
 void veranFinal_spiderForm_updateMovement_hook(GB *gb) {
@@ -627,7 +627,7 @@ void veranFinal_spiderForm_updateMovement_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, ecom_bounceOffWallsAndHoles_b10_hook, SYM(ecom_bounceOffWallsAndHoles_b10), b_+3);
   CALL_C(b_+3, objectApplySpeed_hook, SYM(objectApplySpeed), SYM(veranFinal_spiderForm_animate));
-  veranFinal_spiderForm_animate_hook(gb); return;  // fallthrough
+  TAIL(veranFinal_spiderForm_animate);  // fallthrough
 }
 
 void veranFinal_spiderForm_animate_hook(GB *gb) {
@@ -659,7 +659,7 @@ gotoState2:
   CYC(b_+26, b_+28); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   CALL_C(b_+28, objectSetVisible83_hook, SYM(objectSetVisible83), b_+31);
   CALL_C(b_+31, veranFinal_spiderForm_resetCollisionData_hook, SYM(veranFinal_spiderForm_resetCollisionData), b_+34);
-  CYC(b_+34, (SYM(veranFinal_spiderForm_state4) + 1)); veranFinal_spiderForm_initState2_hook(gb); return;  // jr veranFinal_spiderForm_initState2
+  CYC(b_+34, (SYM(veranFinal_spiderForm_state4) + 1)); TAIL(veranFinal_spiderForm_initState2);  // jr veranFinal_spiderForm_initState2
 }
 
 void veranFinal_spiderForm_state4_hook(GB *gb) {
@@ -670,9 +670,9 @@ void veranFinal_spiderForm_state4_hook(GB *gb) {
   CYC(b_+3, b_+5); E = 0x85;  // ld e,Enemy.substate
   CYC(b_+5, b_+6); push_effect(gb, b_+6);
   do { uint16_t jt_ = (veranFinal_jump_table(gb));
-    if (jt_ == SYM(veranFinal_spiderForm_rushAttack)) { veranFinal_spiderForm_rushAttack_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_spiderForm_jumpAttack)) { veranFinal_spiderForm_jumpAttack_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_spiderForm_webAttack)) { veranFinal_spiderForm_webAttack_hook(gb); return; }
+    if (jt_ == SYM(veranFinal_spiderForm_rushAttack) && hook_enabled_at(gb, SYM(veranFinal_spiderForm_rushAttack))) { veranFinal_spiderForm_rushAttack_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_jumpAttack) && hook_enabled_at(gb, SYM(veranFinal_spiderForm_jumpAttack))) { veranFinal_spiderForm_jumpAttack_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack) && hook_enabled_at(gb, SYM(veranFinal_spiderForm_webAttack))) { veranFinal_spiderForm_webAttack_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -698,7 +698,7 @@ substate0:
   CYC(b_+28, b_+30); alu_and(gb, 0x18);  // and $18
   CYC(b_+30, b_+32); alu_add(gb, 0x04);  // add $04
   CYC(b_+32, b_+33); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(b_+33, (SYM(veranFinal_spiderForm_jumpAttack) + 1)); veranFinal_spiderForm_animate_hook(gb); return;  // jr veranFinal_spiderForm_animate
+  CYC(b_+33, (SYM(veranFinal_spiderForm_jumpAttack) + 1)); TAIL(veranFinal_spiderForm_animate);  // jr veranFinal_spiderForm_animate
 }
 
 void veranFinal_spiderForm_jumpAttack_hook(GB *gb) {
@@ -792,7 +792,7 @@ substate3:
 substate4:
   CALL_C(b_+139, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+142);
   if (!(F & FZ)) { RET_TAKEN(b_+142); return; } CYC(b_+142, b_+143);  // ret nz
-  CYC(b_+143, b_+146); veranFinal_spiderForm_setCounter2AndInitState2_hook(gb); return;  // jp veranFinal_spiderForm_setCounter2AndInitState2
+  CYC(b_+143, b_+146); TAIL(veranFinal_spiderForm_setCounter2AndInitState2);  // jp veranFinal_spiderForm_setCounter2AndInitState2
 }
 
 void veranFinal_spiderForm_webAttack_hook(GB *gb) {
@@ -801,14 +801,14 @@ void veranFinal_spiderForm_webAttack_hook(GB *gb) {
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);  // ld a,(de) [substate]
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
   do { uint16_t jt_ = (veranFinal_jump_table(gb));
-    if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate0)) { veranFinal_spiderForm_webAttack_substate0_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate1)) { veranFinal_spiderForm_webAttack_substate1_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate2)) { veranFinal_spiderForm_webAttack_substate2_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate3)) { veranFinal_spiderForm_webAttack_substate3_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate4)) { veranFinal_spiderForm_webAttack_substate4_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate5)) { veranFinal_spiderForm_webAttack_substate5_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate6)) { veranFinal_spiderForm_webAttack_substate6_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate7)) { veranFinal_spiderForm_webAttack_substate7_hook(gb); return; }
+    if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate0) && hook_enabled_at(gb, SYM(veranFinal_spiderForm_webAttack_substate0))) { veranFinal_spiderForm_webAttack_substate0_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate1) && hook_enabled_at(gb, SYM(veranFinal_spiderForm_webAttack_substate1))) { veranFinal_spiderForm_webAttack_substate1_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate2) && hook_enabled_at(gb, SYM(veranFinal_spiderForm_webAttack_substate2))) { veranFinal_spiderForm_webAttack_substate2_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate3) && hook_enabled_at(gb, SYM(veranFinal_spiderForm_webAttack_substate3))) { veranFinal_spiderForm_webAttack_substate3_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate4) && hook_enabled_at(gb, SYM(veranFinal_spiderForm_webAttack_substate4))) { veranFinal_spiderForm_webAttack_substate4_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate5) && hook_enabled_at(gb, SYM(veranFinal_spiderForm_webAttack_substate5))) { veranFinal_spiderForm_webAttack_substate5_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate6) && hook_enabled_at(gb, SYM(veranFinal_spiderForm_webAttack_substate6))) { veranFinal_spiderForm_webAttack_substate6_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_spiderForm_webAttack_substate7) && hook_enabled_at(gb, SYM(veranFinal_spiderForm_webAttack_substate7))) { veranFinal_spiderForm_webAttack_substate7_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -823,7 +823,7 @@ void veranFinal_spiderForm_webAttack_substate0_hook(GB *gb) {
   CYC(b_+4, b_+6); mem_wr(gb, HL, 30);  // ld (hl),30
   CYC(b_+6, b_+8); L = 0xb8;  // ld l,Enemy.var38
   CYC(b_+8, b_+10); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  veranFinal_spiderForm_resetCollisionData_hook(gb); return;  // fallthrough
+  TAIL(veranFinal_spiderForm_resetCollisionData);  // fallthrough
 }
 
 void veranFinal_spiderForm_resetCollisionData_hook(GB *gb) {
@@ -847,7 +847,7 @@ void veranFinal_spiderForm_webAttack_substate1_hook(GB *gb) {
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x08);  // ld (hl),$08
   CYC(b_+7, b_+8); L = E;  // ld l,e
   CYC(b_+8, b_+9); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  veranFinal_spiderForm_setVulnerableCollisionData_hook(gb); return;  // fallthrough
+  TAIL(veranFinal_spiderForm_setVulnerableCollisionData);  // fallthrough
 }
 
 void veranFinal_spiderForm_setVulnerableCollisionData_hook(GB *gb) {
@@ -875,7 +875,7 @@ void veranFinal_spiderForm_webAttack_substate2_hook(GB *gb) {
   CALL_C(b_+13, ecom_incSubstate_b10_hook, SYM(ecom_incSubstate_b10), b_+16);
   CYC(b_+16, b_+17); L = alu_inc8(gb, L);  // inc l
   CYC(b_+17, b_+19); mem_wr(gb, HL, 90);  // ld (hl),90
-  CYC(b_+19, (SYM(veranFinal_spiderForm_webAttack_substate3) + 1)); veranFinal_spiderForm_resetCollisionData_hook(gb); return;  // jr veranFinal_spiderForm_resetCollisionData
+  CYC(b_+19, (SYM(veranFinal_spiderForm_webAttack_substate3) + 1)); TAIL(veranFinal_spiderForm_resetCollisionData);  // jr veranFinal_spiderForm_resetCollisionData
 }
 
 void veranFinal_spiderForm_webAttack_substate3_hook(GB *gb) {
@@ -896,7 +896,7 @@ void veranFinal_spiderForm_webAttack_substate3_hook(GB *gb) {
   CYC(b_+23, b_+25); A = 0x06;  // ld a,$06
   CALL_C(b_+25, enemySetAnimation_hook, SYM(enemySetAnimation), b_+28);
   CYC(b_+28, b_+30); B = 0xf8;  // ld b,$f8
-  veranFinal_spiderForm_webAttack_updateLinkPosition_hook(gb); return;  // fallthrough
+  TAIL(veranFinal_spiderForm_webAttack_updateLinkPosition);  // fallthrough
 }
 
 void veranFinal_spiderForm_webAttack_updateLinkPosition_hook(GB *gb) {
@@ -922,7 +922,7 @@ void veranFinal_spiderForm_webAttack_substate4_hook(GB *gb) {
   CYC(b_+18, b_+20); B = 0x14;  // ld b,$14
   CALL_C(b_+20, veranFinal_spiderForm_webAttack_updateLinkPosition_hook, SYM(veranFinal_spiderForm_webAttack_updateLinkPosition), b_+23);
   CYC(b_+23, b_+26); SET_BC(0xfa08);  // ld bc,-6,$08
-  veranFinal_spiderForm_webAttack_applyDamageToLink_hook(gb); return;  // fallthrough
+  TAIL(veranFinal_spiderForm_webAttack_applyDamageToLink);  // fallthrough
 }
 
 void veranFinal_spiderForm_webAttack_applyDamageToLink_hook(GB *gb) {
@@ -947,7 +947,7 @@ void veranFinal_spiderForm_webAttack_substate5_hook(GB *gb) {
   CYC(b_+8, b_+10); A = 0x06;  // ld a,$06
   CALL_C(b_+10, enemySetAnimation_hook, SYM(enemySetAnimation), b_+13);
   CYC(b_+13, b_+15); B = 0xf6;  // ld b,$f6
-  CYC(b_+15, b_+17); veranFinal_spiderForm_webAttack_updateLinkPosition_hook(gb); return;  // jr veranFinal_spiderForm_webAttack_updateLinkPosition
+  CYC(b_+15, b_+17); TAIL(veranFinal_spiderForm_webAttack_updateLinkPosition);  // jr veranFinal_spiderForm_webAttack_updateLinkPosition
 }
 
 void veranFinal_spiderForm_webAttack_substate6_hook(GB *gb) {
@@ -965,7 +965,7 @@ void veranFinal_spiderForm_webAttack_substate6_hook(GB *gb) {
   CYC(b_+18, b_+20); B = 0x14;  // ld b,$14
   CALL_C(b_+20, veranFinal_spiderForm_webAttack_updateLinkPosition_hook, SYM(veranFinal_spiderForm_webAttack_updateLinkPosition), b_+23);
   CYC(b_+23, b_+26); SET_BC(0xf618);  // ld bc,-10,$18
-  CYC(b_+26, (SYM(veranFinal_spiderForm_webAttack_substate7) + 1)); veranFinal_spiderForm_webAttack_applyDamageToLink_hook(gb); return;  // jr veranFinal_spiderForm_webAttack_applyDamageToLink
+  CYC(b_+26, (SYM(veranFinal_spiderForm_webAttack_substate7) + 1)); TAIL(veranFinal_spiderForm_webAttack_applyDamageToLink);  // jr veranFinal_spiderForm_webAttack_applyDamageToLink
 }
 
 void veranFinal_spiderForm_webAttack_substate7_hook(GB *gb) {
@@ -976,7 +976,7 @@ void veranFinal_spiderForm_webAttack_substate7_hook(GB *gb) {
   CYC(b_+4, b_+6); L = 0xa4;  // ld l,Enemy.collisionType
   CYC(b_+6, b_+8); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
   CALL_C(b_+8, veranFinal_spiderForm_setCounter2AndInitState2_hook, SYM(veranFinal_spiderForm_setCounter2AndInitState2), SYM(veranFinal_grabbingLink));
-  veranFinal_grabbingLink_hook(gb); return;  // fallthrough
+  TAIL(veranFinal_grabbingLink);  // fallthrough
 }
 
 void veranFinal_grabbingLink_hook(GB *gb) {
@@ -995,18 +995,18 @@ void veranFinal_beeForm_hook(GB *gb) {
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);  // ld a,(de)
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
   do { uint16_t jt_ = (veranFinal_jump_table(gb));
-    if (jt_ == SYM(veranFinal_spiderOrBeeForm_state0)) { veranFinal_spiderOrBeeForm_state0_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_beeForm_state1)) { veranFinal_beeForm_state1_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_beeForm_state2)) { veranFinal_beeForm_state2_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_beeForm_state3)) { veranFinal_beeForm_state3_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_beeForm_state4)) { veranFinal_beeForm_state4_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_beeForm_state5)) { veranFinal_beeForm_state5_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_beeForm_state6)) { veranFinal_beeForm_state6_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_beeForm_state7)) { veranFinal_beeForm_state7_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_beeForm_state8)) { veranFinal_beeForm_state8_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_beeForm_state9)) { veranFinal_beeForm_state9_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_beeForm_stateA)) { veranFinal_beeForm_stateA_hook(gb); return; }
-    else if (jt_ == SYM(veranFinal_beeForm_stateB)) { veranFinal_beeForm_stateB_hook(gb); return; }
+    if (jt_ == SYM(veranFinal_spiderOrBeeForm_state0) && hook_enabled_at(gb, SYM(veranFinal_spiderOrBeeForm_state0))) { veranFinal_spiderOrBeeForm_state0_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state1) && hook_enabled_at(gb, SYM(veranFinal_beeForm_state1))) { veranFinal_beeForm_state1_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state2) && hook_enabled_at(gb, SYM(veranFinal_beeForm_state2))) { veranFinal_beeForm_state2_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state3) && hook_enabled_at(gb, SYM(veranFinal_beeForm_state3))) { veranFinal_beeForm_state3_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state4) && hook_enabled_at(gb, SYM(veranFinal_beeForm_state4))) { veranFinal_beeForm_state4_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state5) && hook_enabled_at(gb, SYM(veranFinal_beeForm_state5))) { veranFinal_beeForm_state5_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state6) && hook_enabled_at(gb, SYM(veranFinal_beeForm_state6))) { veranFinal_beeForm_state6_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state7) && hook_enabled_at(gb, SYM(veranFinal_beeForm_state7))) { veranFinal_beeForm_state7_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state8) && hook_enabled_at(gb, SYM(veranFinal_beeForm_state8))) { veranFinal_beeForm_state8_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_state9) && hook_enabled_at(gb, SYM(veranFinal_beeForm_state9))) { veranFinal_beeForm_state9_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_stateA) && hook_enabled_at(gb, SYM(veranFinal_beeForm_stateA))) { veranFinal_beeForm_stateA_hook(gb); return; }
+    else if (jt_ == SYM(veranFinal_beeForm_stateB) && hook_enabled_at(gb, SYM(veranFinal_beeForm_stateB))) { veranFinal_beeForm_stateB_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -1027,7 +1027,7 @@ void veranFinal_beeForm_state1_hook(GB *gb) {
   CYC(b_+20, b_+23); SET_BC(0x100c);  // ld bc,$100c
   CYC(b_+23, b_+25); E = 0x6b;  // ld e,ENEMYCOLLISION_VERAN_SPIDER_FORM_VULNERABLE
   CYC(b_+25, b_+27); L = 0xb2;  // ld l,Enemy.var32
-  veranFinal_initializeForm_hook(gb); return;  // fallthrough
+  TAIL(veranFinal_initializeForm);  // fallthrough
 }
 
 void veranFinal_initializeForm_hook(GB *gb) {
@@ -1072,10 +1072,10 @@ void veranFinal_beeForm_state2_hook(GB *gb) {
   CYC(b_+25, b_+27); alu_cp(gb, 0x05);  // cp $05
   if (!(F & FC)) { CYCT(b_+27, b_+29); goto updateMovement; } CYC(b_+27, b_+29);  // jr nc,@updateMovement
   CALL_C(b_+29, ecom_incState_b10_hook, SYM(ecom_incState_b10), b_+32);
-  CYC(b_+32, b_+35); veranFinal_beeForm_chooseRandomTargetPosition_hook(gb); return;  // jp veranFinal_beeForm_chooseRandomTargetPosition
+  CYC(b_+32, b_+35); TAIL(veranFinal_beeForm_chooseRandomTargetPosition);  // jp veranFinal_beeForm_chooseRandomTargetPosition
 updateMovement:
   CALL_C(b_+35, ecom_moveTowardPosition_b10_hook, SYM(ecom_moveTowardPosition_b10), SYM(veranFinal_beeForm_animate));
-  veranFinal_beeForm_animate_hook(gb); return;  // fallthrough
+  TAIL(veranFinal_beeForm_animate);  // fallthrough
 }
 
 void veranFinal_beeForm_animate_hook(GB *gb) {
@@ -1109,7 +1109,7 @@ setVar37:
   CYC(b_+36, b_+38); L = 0xb7;  // ld l,Enemy.var37
   CYC(b_+38, b_+39); mem_wr(gb, HL, A); SET_HL(HL - 1);  // ldd (hl),a
   CYC(b_+39, b_+41); mem_wr(gb, HL, 0xe0);  // ld (hl),$e0
-  CYC(b_+41, b_+43); veranFinal_beeForm_animate_hook(gb); return;  // jr veranFinal_beeForm_animate
+  CYC(b_+41, b_+43); TAIL(veranFinal_beeForm_animate);  // jr veranFinal_beeForm_animate
 }
 
 void veranFinal_beeForm_state4_hook(GB *gb) {
@@ -1242,7 +1242,7 @@ void veranFinal_beeForm_state8_hook(GB *gb) {
   CYC(b_+13, b_+14); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+14, b_+16); L = 0x86;  // ld l,Enemy.counter1
   CYC(b_+16, b_+18); mem_wr(gb, HL, 30);  // ld (hl),30
-  CYC(b_+18, b_+20); veranFinal_beeForm_animate2_hook(gb); return;  // jr veranFinal_beeForm_animate2
+  CYC(b_+18, b_+20); TAIL(veranFinal_beeForm_animate2);  // jr veranFinal_beeForm_animate2
 }
 
 void veranFinal_beeForm_state9_hook(GB *gb) {
@@ -1253,7 +1253,7 @@ void veranFinal_beeForm_state9_hook(GB *gb) {
   CYC(b_+5, b_+7); mem_wr(gb, HL, 25);  // ld (hl),25
   CYC(b_+7, b_+8); L = E;  // ld l,e
   CYC(b_+8, b_+9); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  veranFinal_beeForm_animate2_hook(gb); return;  // fallthrough
+  TAIL(veranFinal_beeForm_animate2);  // fallthrough
 }
 
 void veranFinal_beeForm_animate2_hook(GB *gb) {
@@ -1284,7 +1284,7 @@ void veranFinal_beeForm_stateA_hook(GB *gb) {
   CALL_C(b_+27, objectCopyPosition_hook, SYM(objectCopyPosition), b_+30);
   CYC(b_+30, b_+32); A = 0xba;  // ld a,SND_BEAM1
   CALL_C(b_+32, playSound_b00_hook, SYM(playSound_b00), b_+35);
-  CYC(b_+35, b_+37); veranFinal_beeForm_animate2_hook(gb); return;  // jr veranFinal_beeForm_animate2
+  CYC(b_+35, b_+37); TAIL(veranFinal_beeForm_animate2);  // jr veranFinal_beeForm_animate2
 }
 
 void label_10_173_hook(GB *gb) {
@@ -1296,10 +1296,10 @@ void label_10_173_hook(GB *gb) {
   CYC(b_+4, b_+5); L = E;  // ld l,e
   if ((F & FZ)) { CYCT(b_+5, b_+7); goto setState02; } CYC(b_+5, b_+7);  // jr z,+
   CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl) [state]=$0b
-  CYC(b_+8, b_+11); veranFinal_beeForm_animate2_hook(gb); return;  // jr veranFinal_beeForm_animate2
+  CYC(b_+8, b_+11); TAIL(veranFinal_beeForm_animate2);  // jr veranFinal_beeForm_animate2
 setState02:
   CYC(b_+10, b_+12); mem_wr(gb, HL, 0x02);  // ld (hl),$02 [state]
-  CYC(b_+12, (SYM(veranFinal_beeForm_stateB) + 1)); veranFinal_beeForm_animate2_hook(gb); return;  // jr veranFinal_beeForm_animate2
+  CYC(b_+12, (SYM(veranFinal_beeForm_stateB) + 1)); TAIL(veranFinal_beeForm_animate2);  // jr veranFinal_beeForm_animate2
 }
 
 void veranFinal_beeForm_stateB_hook(GB *gb) {
@@ -1330,7 +1330,7 @@ chooseQuadrant:
   CYC(b_+35, b_+36); E = alu_inc8(gb, E);  // inc e
   CYC(b_+36, b_+37); A = mem_rd(gb, HL);  // ld a,(hl)
   CYC(b_+37, b_+38); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(b_+38, (SYM(veranFinal_beeForm_screenCornerEntrances) + 1)); veranFinal_beeForm_animate2_hook(gb); return;  // jr veranFinal_beeForm_animate2
+  CYC(b_+38, (SYM(veranFinal_beeForm_screenCornerEntrances) + 1)); TAIL(veranFinal_beeForm_animate2);  // jr veranFinal_beeForm_animate2
 }
 
 void veranFinal_transformToBeeOrSpider_hook(GB *gb) {
@@ -1526,7 +1526,7 @@ void veranFinal_beeForm_chooseRandomTargetPosition_hook(GB *gb) {
   CYC(b_+15, b_+17); E = 0x87;  // ld e,Enemy.counter2
   CYC(b_+17, b_+18); A = mem_rd(gb, HL);  // ld a,(hl)
   CYC(b_+18, b_+19); mem_wr(gb, DE, A);  // ld (de),a
-  veranFinal_beeForm_nextTargetPosition_hook(gb); return;  // fallthrough
+  TAIL(veranFinal_beeForm_nextTargetPosition);  // fallthrough
 }
 
 void veranFinal_beeForm_nextTargetPosition_hook(GB *gb) {

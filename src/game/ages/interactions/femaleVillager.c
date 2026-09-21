@@ -81,7 +81,7 @@ substate0:
   CYC(b_+248, b_+251); A = mem_rd(gb, wTmpcfc0 + 0x11);
   CYC(b_+251, b_+253); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
-    CYCT(b_+253, b_+256); interactionAnimate_hook(gb); return;
+    CYCT(b_+253, b_+256); TAIL(interactionAnimate);
   }
   CYC(b_+253, b_+256);
   CALL_C(b_+256, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+259);
@@ -152,7 +152,7 @@ runSubid06:
   // Linked game NPC
   CALL_C(b_+334, interactionRunScript_hook, SYM(interactionRunScript), b_+337);
   if (F & FC) {
-    CYCT(b_+337, b_+340); interactionDelete_hook(gb); return;
+    CYCT(b_+337, b_+340); TAIL(interactionDelete);
   }
   CYC(b_+337, b_+340);
   CYC(b_+340, b_+343); npcFaceLinkAndAnimate_hook(gb);
@@ -207,7 +207,7 @@ initSubid01:
   CYC(b_+65, b_+66); alu_xor(gb, A);
   CALL_C(b_+66, checkNpcShouldExistAtGameStage_hook, SYM(checkNpcShouldExistAtGameStage), b_+69);
   if (!(F & FZ)) {
-    CYCT(b_+69, b_+72); interactionDelete_hook(gb); return;
+    CYCT(b_+69, b_+72); TAIL(interactionDelete);
   }
   CYC(b_+69, b_+72);
   CYC(b_+72, b_+73); A = B;
@@ -229,7 +229,7 @@ initSubid03:
   CYC(b_+96, b_+98); A = 0x01;
   CALL_C(b_+98, checkNpcShouldExistAtGameStage_hook, SYM(checkNpcShouldExistAtGameStage), b_+101);
   if (!(F & FZ)) {
-    CYCT(b_+101, b_+104); interactionDelete_hook(gb); return;
+    CYCT(b_+101, b_+104); TAIL(interactionDelete);
   }
   CYC(b_+101, b_+104);
   CYC(b_+104, b_+105); A = B;
@@ -254,7 +254,7 @@ initSubid05:
   CYC(b_+133, b_+135); A = 0x02;
   CALL_C(b_+135, checkNpcShouldExistAtGameStage_hook, SYM(checkNpcShouldExistAtGameStage), b_+138);
   if (!(F & FZ)) {
-    CYCT(b_+138, b_+141); interactionDelete_hook(gb); return;
+    CYCT(b_+138, b_+141); TAIL(interactionDelete);
   }
   CYC(b_+138, b_+141);
   CYC(b_+141, b_+142); A = B;
@@ -332,7 +332,7 @@ state0:
   CYC(b_+22, b_+23); A = mem_rd(gb, DE);
   CYC(b_+23, b_+24); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+24, b_+27); objectMarkSolidPosition_hook(gb); return;
+    CYCT(b_+24, b_+27); TAIL(objectMarkSolidPosition);
   }
   CYC(b_+24, b_+27);
   CYC(b_+27, b_+28); ret_effect(gb);

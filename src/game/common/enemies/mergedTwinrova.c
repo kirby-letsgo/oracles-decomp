@@ -87,20 +87,20 @@ void enemyCode01__normalStatus_hook(GB *gb) {
   if (!(F & FC)) { CYCT(b_+104, b_+106); goto stateCOrHigher; } CYC(b_+104, b_+106);  // jr nc,@stateCOrHigher
   CYC(b_+106, b_+107); push_effect(gb, b_+107);
   do { uint16_t jt_ = (mergedTwinrova_jump_table(gb));
-    if (jt_ == SYM(mergedTwinrova_state_uninitialized)) { mergedTwinrova_state_uninitialized_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_state_stub)) { mergedTwinrova_state_stub_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_state8)) { mergedTwinrova_state8_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_state9)) { mergedTwinrova_state9_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_stateA)) { mergedTwinrova_stateA_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_stateB)) { mergedTwinrova_stateB_hook(gb); return; }
+    if (jt_ == SYM(mergedTwinrova_state_uninitialized) && hook_enabled_at(gb, SYM(mergedTwinrova_state_uninitialized))) { mergedTwinrova_state_uninitialized_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_state_stub) && hook_enabled_at(gb, SYM(mergedTwinrova_state_stub))) { mergedTwinrova_state_stub_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_state8) && hook_enabled_at(gb, SYM(mergedTwinrova_state8))) { mergedTwinrova_state8_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_state9) && hook_enabled_at(gb, SYM(mergedTwinrova_state9))) { mergedTwinrova_state9_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_stateA) && hook_enabled_at(gb, SYM(mergedTwinrova_stateA))) { mergedTwinrova_stateA_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_stateB) && hook_enabled_at(gb, SYM(mergedTwinrova_stateB))) { mergedTwinrova_stateB_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 stateCOrHigher:
   CYC(b_+131, b_+132); A = B;  // ld a,b
   CYC(b_+132, b_+133); push_effect(gb, b_+133);
   do { uint16_t jt_ = (mergedTwinrova_jump_table(gb));
-    if (jt_ == SYM(mergedTwinrova_lavaRoom)) { mergedTwinrova_lavaRoom_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_iceRoom)) { mergedTwinrova_iceRoom_hook(gb); return; }
+    if (jt_ == SYM(mergedTwinrova_lavaRoom) && hook_enabled_at(gb, SYM(mergedTwinrova_lavaRoom))) { mergedTwinrova_lavaRoom_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_iceRoom) && hook_enabled_at(gb, SYM(mergedTwinrova_iceRoom))) { mergedTwinrova_iceRoom_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -376,9 +376,9 @@ void mergedTwinrova_lavaRoom_hook(GB *gb) {
   CYC(b_+1, b_+3); alu_sub(gb, 0x0c);  // sub $0c
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (mergedTwinrova_jump_table(gb));
-    if (jt_ == SYM(mergedTwinrova_lavaRoom_stateC)) { mergedTwinrova_lavaRoom_stateC_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_lavaRoom_stateD)) { mergedTwinrova_lavaRoom_stateD_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_lavaRoom_stateE)) { mergedTwinrova_lavaRoom_stateE_hook(gb); return; }
+    if (jt_ == SYM(mergedTwinrova_lavaRoom_stateC) && hook_enabled_at(gb, SYM(mergedTwinrova_lavaRoom_stateC))) { mergedTwinrova_lavaRoom_stateC_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_lavaRoom_stateD) && hook_enabled_at(gb, SYM(mergedTwinrova_lavaRoom_stateD))) { mergedTwinrova_lavaRoom_stateD_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_lavaRoom_stateE) && hook_enabled_at(gb, SYM(mergedTwinrova_lavaRoom_stateE))) { mergedTwinrova_lavaRoom_stateE_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -390,7 +390,7 @@ void mergedTwinrova_lavaRoom_stateC_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
   CYC(b_+4, b_+6); L = 0x90;  // ld l,Enemy.speed
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0x32);  // ld (hl),SPEED_140
-  mergedTwinrova_chooseTargetPosition_hook(gb); return;  // fallthrough
+  TAIL(mergedTwinrova_chooseTargetPosition);  // fallthrough
 }
 
 void mergedTwinrova_chooseTargetPosition_hook(GB *gb) {
@@ -579,11 +579,11 @@ void mergedTwinrova_iceRoom_hook(GB *gb) {
   CYC(b_+1, b_+3); alu_sub(gb, 0x0c);  // sub $0c
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (mergedTwinrova_jump_table(gb));
-    if (jt_ == SYM(mergedTwinrova_iceRoom_stateC)) { mergedTwinrova_iceRoom_stateC_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_iceRoom_stateD)) { mergedTwinrova_iceRoom_stateD_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_iceRoom_stateE)) { mergedTwinrova_iceRoom_stateE_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_iceRoom_stateF)) { mergedTwinrova_iceRoom_stateF_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_iceRoom_state10)) { mergedTwinrova_iceRoom_state10_hook(gb); return; }
+    if (jt_ == SYM(mergedTwinrova_iceRoom_stateC) && hook_enabled_at(gb, SYM(mergedTwinrova_iceRoom_stateC))) { mergedTwinrova_iceRoom_stateC_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_iceRoom_stateD) && hook_enabled_at(gb, SYM(mergedTwinrova_iceRoom_stateD))) { mergedTwinrova_iceRoom_stateD_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_iceRoom_stateE) && hook_enabled_at(gb, SYM(mergedTwinrova_iceRoom_stateE))) { mergedTwinrova_iceRoom_stateE_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_iceRoom_stateF) && hook_enabled_at(gb, SYM(mergedTwinrova_iceRoom_stateF))) { mergedTwinrova_iceRoom_stateF_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_iceRoom_state10) && hook_enabled_at(gb, SYM(mergedTwinrova_iceRoom_state10))) { mergedTwinrova_iceRoom_state10_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -695,7 +695,7 @@ void mergedTwinrova_iceRoom_stateE_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);  // ret nz
   CYC(b_+4, b_+6); L = 0x90;  // ld l,Enemy.speed
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0x3c);  // ld (hl),SPEED_180
-  CYC(b_+8, b_+11); mergedTwinrova_chooseTargetPosition_hook(gb); return;  // jp mergedTwinrova_chooseTargetPosition
+  CYC(b_+8, b_+11); TAIL(mergedTwinrova_chooseTargetPosition);  // jp mergedTwinrova_chooseTargetPosition
 }
 
 void mergedTwinrova_iceRoom_stateF_hook(GB *gb) {

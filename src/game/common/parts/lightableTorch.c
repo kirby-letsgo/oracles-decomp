@@ -90,7 +90,7 @@ subid0State2:
 
 L_4591:
   CALL_C(b_+65, setTile_hook, SYM(setTile), b_+68);
-  CYC(b_+68, b_+71); partDelete_hook(gb); return; // jp
+  CYC(b_+68, b_+71); TAIL(partDelete); // jp
 
 subid1:
   CYC(b_+71, b_+73); E = 0xc4; // Part.state
@@ -179,7 +179,7 @@ subid2State2:
   CYC(b_+186, b_+188); A = 0x08; // TILEINDEX_UNLIT_TORCH
 
 setTile_:
-  CYC(b_+188, b_+191); setTile_hook(gb); return; // jp
+  CYC(b_+188, b_+191); TAIL(setTile); // jp
 
 subid2State3:
   CYC(b_+191, b_+194); push_effect(gb, b_+194); lightableTorch_getTileAtRelatedObjPosition_hook(gb);
@@ -220,5 +220,5 @@ void lightableTorch_getTileAtRelatedObjPosition_hook(GB *gb) {
   CYC(b_+223, b_+224); B = mem_rd(gb, HL);
   CYC(b_+224, b_+226); L = 0xcd; // xh
   CYC(b_+226, b_+227); C = mem_rd(gb, HL);
-  CYC(b_+227, b_+230); getTileAtPosition_hook(gb); return; // jp
+  CYC(b_+227, b_+230); TAIL(getTileAtPosition); // jp
 }

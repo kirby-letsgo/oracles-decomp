@@ -101,7 +101,7 @@ void headThwomp_state_uninitialized_hook(GB *gb) {
   CYC(b_+10, b_+12); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+12, b_+14); mem_wr(gb, HL, 0x12); // 18
   CALL_C(b_+14, headThwomp_setSolidTilesAroundSelf_hook, SYM(headThwomp_setSolidTilesAroundSelf), b_+17);
-  CYC(b_+17, b_+20); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+17, b_+20); TAIL(objectSetVisible80); // jp
 }
 
 void headThwomp_state_stub_hook(GB *gb) {
@@ -130,7 +130,7 @@ void headThwomp_state8_hook(GB *gb) {
   CYC(b_+31, b_+33); L = ENEMY_BASE + 0x34; // Enemy.var34
   CYC(b_+33, b_+35); mem_wr(gb, HL, 0xf0);
   CALL_C(b_+35, enemyBoss_beginBoss_b0f_hook, SYM(enemyBoss_beginBoss_b0f), SYM(headThwomp_state9));
-  headThwomp_state9_hook(gb); return; // fallthrough
+  TAIL(headThwomp_state9); // fallthrough
 }
 
 // Spinning normally
@@ -165,7 +165,7 @@ L_683e:
   CYC(b_+34, b_+36); A = 0x58; // SND_CLINK2
   if (F & FC) CALL_C_CC(b_+36, playSound_b00_hook, SYM(playSound_b00), b_+39); else CYC(b_+36, b_+39); // call c
   CYC(b_+39, b_+40); A = mem_rd(gb, DE);
-  CYC(b_+40, b_+43); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+40, b_+43); TAIL(enemySetAnimation); // jp
 }
 
 // Bomb just thrown into head thwomp
@@ -241,7 +241,7 @@ L_6894:
   CYC(b_+58, b_+60); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+60, b_+61); mem_wr(gb, HL, A);
   CYC(b_+61, b_+63); B = 0x08;
-  CYC(b_+63, b_+66); headThwomp_rotate_hook(gb); return; // jp
+  CYC(b_+63, b_+66); TAIL(headThwomp_rotate); // jp
 
 startSlowestSpinning:
   CYC(b_+66, b_+68); L = ENEMY_BASE + OBJ_COUNTER1;
@@ -328,7 +328,7 @@ substate1:
   if (!(F & FZ)) { RET_TAKEN(b_+37); return; } // ret nz
   CYC(b_+37, b_+38);
   CYC(b_+38, b_+40); B = 0x39; // PART_HEAD_THWOMP_FIREBALL
-  CYC(b_+40, b_+43); ecom_spawnProjectile_b0f_hook(gb); return; // jp
+  CYC(b_+40, b_+43); TAIL(ecom_spawnProjectile_b0f); // jp
 
 resumeSpinning:
   CYC(b_+43, b_+45); L = ENEMY_BASE + OBJ_STATE;
@@ -401,7 +401,7 @@ substate1:
 L_6955:
   CYC(b_+75, b_+77); E = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+77, b_+78); A = mem_rd(gb, DE);
-  CYC(b_+78, b_+81); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+78, b_+81); TAIL(enemySetAnimation); // jp
 
 substate2:
   CALL_C(b_+81, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+84);
@@ -438,7 +438,7 @@ L_697b:
   CYC(b_+121, b_+123); E = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+123, b_+124); A = mem_rd(gb, DE);
   CYC(b_+124, b_+126); alu_add(gb, 0x08);
-  CYC(b_+126, b_+129); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+126, b_+129); TAIL(enemySetAnimation); // jp
 }
 
 // Purple face (stomps the ground)
@@ -466,7 +466,7 @@ substate0:
   CYC(b_+18, b_+19); alu_xor(gb, A);
   CYC(b_+19, b_+20); mem_wr(gb, HL, A); SET_HL(HL + 1); // ld (hl+),a
   CYC(b_+20, b_+22); mem_wr(gb, HL, 0x02);
-  CYC(b_+22, b_+25); headThwomp_unsetSolidTilesAroundSelf_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(headThwomp_unsetSolidTilesAroundSelf); // jp
 
 substate1:
   CYC(b_+25, b_+27); A = 0x20;
@@ -543,7 +543,7 @@ setSolidity:
   CYC(b_+118, b_+120); mem_wr(gb, HL, 0x11);
   CYC(b_+120, b_+122); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+122, b_+124); mem_wr(gb, HL, 0x10);
-  CYC(b_+124, b_+127); headThwomp_setSolidTilesAroundSelf_hook(gb); return; // jp
+  CYC(b_+124, b_+127); TAIL(headThwomp_setSolidTilesAroundSelf); // jp
 }
 
 // Also used by the death sequence.
@@ -552,7 +552,7 @@ void headThwomp_poundGround_hook(GB *gb) {
   CYC(b_+43, b_+45); A = 0x3c;
   CYC(b_+45, b_+48); mem_wr(gb, wScreenShakeCounterY, A);
   CYC(b_+48, b_+50); A = 0x81; // SND_STRONG_POUND
-  CYC(b_+50, b_+53); playSound_b00_hook(gb); return; // jp
+  CYC(b_+50, b_+53); TAIL(playSound_b00); // jp
 }
 
 // Red face (takes damage)
@@ -589,7 +589,7 @@ L_6a27:
   CYC(b_+36, b_+38); A = 0x10;
   CALL_C(b_+38, enemySetAnimation_hook, SYM(enemySetAnimation), b_+41);
   CYC(b_+41, b_+43); A = 0x63; // SND_BOSS_DAMAGE
-  CYC(b_+43, b_+46); playSound_b00_hook(gb); return; // jp
+  CYC(b_+43, b_+46); TAIL(playSound_b00); // jp
 
 substate1:
   CALL_C(b_+46, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+49);
@@ -621,7 +621,7 @@ state10ResumeSpinning:
   CYC(b_+85, b_+88); SET_HL(wRoomCollisions + 0x47);
   CYC(b_+88, b_+90); mem_wr(gb, HL, 0x00);
   CYC(b_+90, b_+92); A = 0x0e;
-  CYC(b_+92, b_+95); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+92, b_+95); TAIL(enemySetAnimation); // jp
 }
 
 void headThwomp_state11_hook(GB *gb) {
@@ -687,7 +687,7 @@ void headThwomp_rotate_hook(GB *gb) {
   if (F & FC) { RET_TAKEN(b_+15); return; } // ret c
   CYC(b_+15, b_+16);
   CYC(b_+16, b_+18); A = 0x58; // SND_CLINK2
-  CYC(b_+18, b_+21); playSound_b00_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(playSound_b00); // jp
 }
 
 // If a bomb is thrown into head thwomp, this sets the state to $0a.
@@ -789,7 +789,7 @@ void headThwomp_dropHeart_hook(GB *gb) {
   CYC(b_+6, b_+7); L = alu_inc8(gb, L);
   CYC(b_+7, b_+9); mem_wr(gb, HL, 0x01); // ITEM_DROP_HEART
   CYC(b_+9, b_+12); SET_BC(0x1400);
-  CYC(b_+12, b_+15); objectCopyPositionWithOffset_hook(gb); return; // jp
+  CYC(b_+12, b_+15); TAIL(objectCopyPositionWithOffset); // jp
 }
 
 void headThwomp_checkShootProjectile_hook(GB *gb) {
@@ -819,7 +819,7 @@ L_6b38:
   if (F & FZ) { CYCT(b_+25, b_+27); goto dropBomb; } // jr z
   CYC(b_+25, b_+27);
   CYC(b_+27, b_+29); B = 0x39; // PART_HEAD_THWOMP_FIREBALL
-  CYC(b_+29, b_+32); ecom_spawnProjectile_b0f_hook(gb); return; // jp
+  CYC(b_+29, b_+32); TAIL(ecom_spawnProjectile_b0f); // jp
 
 dropBomb:
   CYC(b_+32, b_+34); B = 0x02;
@@ -838,5 +838,5 @@ dropBomb:
   CYC(b_+57, b_+59); A = 0xc0; // Part.start
   CYC(b_+59, b_+60); mem_wr(gb, HL, A); SET_HL(HL + 1); // ld (hl+),a
   CYC(b_+60, b_+61); mem_wr(gb, HL, B);
-  CYC(b_+61, b_+64); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+61, b_+64); TAIL(objectCopyPosition); // jp
 }

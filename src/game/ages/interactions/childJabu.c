@@ -27,9 +27,9 @@ void interactionCodeba_hook(GB *gb) {
   CALL_C(b_+17, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+20);
   CYC(b_+20, b_+23); SET_HL((SYM(interactionCoded8__subid0Script) + 53)); // mainScripts.childJabuScript
   CALL_C(b_+23, interactionSetScript_hook, SYM(interactionSetScript), b_+26);
-  CYC(b_+26, b_+29); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+26, b_+29); TAIL(objectSetVisible82); // jp
 
 state0: // interactionCodeba@state0
   CALL_C(b_+29, interactionAnimateAsNpc_hook, SYM(interactionAnimateAsNpc), b_+32);
-  CYC(b_+32, b_+35); interactionRunScript_hook(gb); return; // jp
+  CYC(b_+32, b_+35); TAIL(interactionRunScript); // jp
 }

@@ -153,7 +153,7 @@ static void doorController_state1(GB *gb, uint16_t sp0_) {
   BASE(interactionCode1e);
   CALL_C(b_+72, interactionRunScript_hook, SYM(interactionRunScript), b_+75);
   if (F & FC) {
-    CYCT(b_+75, b_+78); interactionDelete_hook(gb); return;
+    CYCT(b_+75, b_+78); TAIL(interactionDelete);
   }
   CYC(b_+75, b_+78);
   CYC(b_+78, b_+80); E = INTERACTION_BASE + OBJ_SUBSTATE;

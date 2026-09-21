@@ -117,11 +117,11 @@ L_7c05:
   CYC(b_+118, b_+119); H = C;
   CYC(b_+119, b_+121); L = 0xb8; // Enemy.animParameter?
   CYC(b_+121, b_+122); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+122, b_+125); partDelete_hook(gb); return; // jp
+  CYC(b_+122, b_+125); TAIL(partDelete); // jp
 
 func_7c28:
   CALL_C(b_+125, objectCreatePuff_hook, SYM(objectCreatePuff), b_+128);
-  CYC(b_+128, b_+131); partDelete_hook(gb); return; // jp
+  CYC(b_+128, b_+131); TAIL(partDelete); // jp
 
 func_7c2e:
   CYC(b_+131, b_+132); H = D;
@@ -132,7 +132,7 @@ func_7c2e:
   CALL_C(b_+137, objectSetVisible80_hook, SYM(objectSetVisible80), b_+140);
 beamSound:
   CYC(b_+140, b_+142); A = 0xbb; // SND_BEAM2
-  CYC(b_+142, b_+145); playSound_b00_hook(gb); return; // jp
+  CYC(b_+142, b_+145); TAIL(playSound_b00); // jp
 
 subid1:
   CYC(b_+145, b_+147); A = 0x02;
@@ -292,7 +292,7 @@ subid1_state4:
   if (F & FZ) { CYCT(b_+363, b_+366); partDelete_hook(gb); return; } // jp z
   CYC(b_+363, b_+366);
   CYC(b_+366, b_+369); SET_BC(0x0600);
-  CYC(b_+369, b_+372); objectTakePositionWithOffset_hook(gb); return; // jp
+  CYC(b_+369, b_+372); TAIL(objectTakePositionWithOffset); // jp
 
 subid2:
   CYC(b_+372, b_+373); A = mem_rd(gb, DE);
@@ -314,14 +314,14 @@ subid2:
   if (F & FC) { RET_TAKEN(b_+394); return; } // ret c
   CYC(b_+394, b_+395);
 subid2_delete:
-  CYC(b_+395, b_+398); partDelete_hook(gb); return; // jp
+  CYC(b_+395, b_+398); TAIL(partDelete); // jp
 
 func_7d39:
   CYC(b_+398, b_+399); A = alu_inc8(gb, A);
   CYC(b_+399, b_+400); mem_wr(gb, DE, A);
   CYC(b_+400, b_+401); A = alu_inc8(gb, A);
   CALL_C(b_+401, partSetAnimation_hook, SYM(partSetAnimation), b_+404);
-  CYC(b_+404, b_+407); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+404, b_+407); TAIL(objectSetVisible80); // jp
 
 subid3:
   CYC(b_+407, b_+408); A = mem_rd(gb, DE);
@@ -341,7 +341,7 @@ subid3:
   if (F & FC) { RET_TAKEN(b_+426); return; } // ret c
   CYC(b_+426, b_+427);
 subid3_delete:
-  CYC(b_+427, b_+430); partDelete_hook(gb); return; // jp
+  CYC(b_+427, b_+430); TAIL(partDelete); // jp
 
 func_7d59:
   CYC(b_+430, b_+431); A = alu_inc8(gb, A);
@@ -354,5 +354,5 @@ func_7d59:
   CYC(b_+441, b_+442); alu_rrca(gb);
   CYC(b_+442, b_+443); A = alu_inc8(gb, A);
   CALL_C(b_+443, partSetAnimation_hook, SYM(partSetAnimation), b_+446);
-  CYC(b_+446, b_+449); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+446, b_+449); TAIL(objectSetVisible83); // jp
 }

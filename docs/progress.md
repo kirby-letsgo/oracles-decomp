@@ -448,6 +448,24 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-21 (early): Seasons hooks 2,406 to 2,863. `tools/guard_tailcalls.py` turned 4,082
+  direct tail calls (`x_hook(gb); return;` for a `jp`, and the `jt_ ==` jump-table branches that
+  have an interpreter fallback) into `TAIL(x)` / `hook_enabled_at` guards, so a routine can be
+  hooked in Seasons even when the routine it jumps to is not; `tools/seasons_hooks.py` accepts
+  the guarded calls and pairs label copies by content (`symfiles.pair_instances`; `_label_XX_N`
+  never pair, `func_XX_YYYY` do). The first version keyed the pairing by Ages address and
+  several labels share one (`dungeonLayoutDataStart`, `enemyCode4d`, `linkState01`,
+  `itemCode1e`, `tilesetLayoutGroup33` came out wrong), which broke the playthrough at frame
+  32760 whatever the hook table said; keyed by name now. Bisecting that was misleading until the
+  committed table was retested on the new sources (a ddmin over hook subsets is only sound when
+  the empty set passes). `VERIFY_ALL` then showed `enemyCode09` three cycles short: `call z`
+  written as `CALL_C` instead of `CALL_C_CC`; `tools/audit_calls.py` checks every call site's
+  opcode against the ROM and fixed 12 such sites (octorok, rope, spark, ghini, bubble, blade
+  trap, vire, patch), all latent in Ages. Debug aids added: `VERIFY_ONLY=name`, `BURNLOG=1`
+  (one line per burned instruction, `src/game/cyc.c`), `WRAMDUMP_AT` now dumps VRAM, OAM, IO,
+  palettes and banks. Gates: Ages ctest 8/8, whole movie clean, Seasons demo and playthrough
+  clean, `VERIFY_ALL` on the playthrough 0 failures apart from the lcdInterrupt skew, lint 0.
+
 - 2026-09-20 (late): milestone 5 plan step 1 item 7b, batches 2 to 6, worktree branch
   `worktree-m5-step0` (commits `6a092d6`, `e9804b0`, `4a6528f`, `6c1a76b`, `badecee` on top of
   main `ed9f340`, merged with main first and generated files regenerated, never merged by hand).

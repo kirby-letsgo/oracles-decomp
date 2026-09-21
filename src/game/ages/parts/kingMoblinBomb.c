@@ -68,7 +68,7 @@ void partCode3f_hook(GB *gb) {
     if (target == SYM(kingMoblinBomb_state5)) { kingMoblinBomb_state5_hook(gb); return; }
     if (target == SYM(kingMoblinBomb_state6)) { kingMoblinBomb_state6_hook(gb); return; }
     if (target == SYM(kingMoblinBomb_state7)) { kingMoblinBomb_state7_hook(gb); return; }
-    kingMoblinBomb_state8_hook(gb); return;
+    TAIL(kingMoblinBomb_state8);
   }
 }
 
@@ -100,7 +100,7 @@ void kingMoblinBomb_state0_hook(GB *gb) {
   CYC(b_+37, b_+39); E = 0xf1; // Part.var31
   CYC(b_+39, b_+40); A = mem_rd(gb, HL);
   CYC(b_+40, b_+41); mem_wr(gb, DE, A);
-  CYC(b_+41, b_+44); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+41, b_+44); TAIL(objectSetVisiblec2); // jp
 }
 
 void common_kingMoblinBomb_state1_hook(GB *gb) {
@@ -132,7 +132,7 @@ L_71aa:
   if (!(F & FC)) { CYCT(b_+30, b_+32); kingMoblinBomb_explode_hook(gb); return; } // jr nc
   CYC(b_+30, b_+32);
 animate:
-  CYC(b_+32, b_+35); partAnimate_hook(gb); return; // jp
+  CYC(b_+32, b_+35); TAIL(partAnimate); // jp
 }
 
 void kingMoblinBomb_explode_hook(GB *gb) {
@@ -179,7 +179,7 @@ beingHeld:
   CALL_C(b_+21, common_kingMoblinBomb_state1_hook, SYM(common_kingMoblinBomb_state1), b_+24);
   if (!(F & FZ)) { RET_TAKEN(b_+24); return; } // ret nz
   CYC(b_+24, b_+25);
-  CYC(b_+25, b_+28); dropLinkHeldItem_hook(gb); return; // jp
+  CYC(b_+25, b_+28); TAIL(dropLinkHeldItem); // jp
 
 released:
   CYC(b_+28, b_+30); E = 0xcb; // Part.yh
@@ -200,14 +200,14 @@ released:
   CYC(b_+50, b_+52); mem_wr(gb, HL, alu_rr(gb, mem_rd(gb, HL)));
   CYC(b_+52, b_+54); L = 0x10; // Item.speed
   CYC(b_+54, b_+56); mem_wr(gb, HL, 0x0a); // SPEED_40
-  CYC(b_+56, b_+59); common_kingMoblinBomb_state1_hook(gb); return; // jp
+  CYC(b_+56, b_+59); TAIL(common_kingMoblinBomb_state1); // jp
 
 atRest:
   CYC(b_+59, b_+61); E = 0xc4; // Part.state
   CYC(b_+61, b_+63); A = 0x04;
   CYC(b_+63, b_+64); mem_wr(gb, DE, A);
   CALL_C(b_+64, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+67);
-  CYC(b_+67, b_+69); kingMoblinBomb_state4_hook(gb); return; // jr
+  CYC(b_+67, b_+69); TAIL(kingMoblinBomb_state4); // jr
 }
 
 void kingMoblinBomb_state3_hook(GB *gb) {
@@ -226,7 +226,7 @@ void kingMoblinBomb_state3_hook(GB *gb) {
   } else {
     CYC(b_+13, b_+16);
   }
-  CYC(b_+16, b_+19); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+16, b_+19); TAIL(objectApplySpeed); // jp
 
 doneBouncing:
   CYC(b_+19, b_+21); A = 0x52; // SND_BOMB_LAND
@@ -243,7 +243,7 @@ void kingMoblinBomb_state4_hook(GB *gb) {
   CALL_C(b_+0, common_kingMoblinBomb_state1_hook, SYM(common_kingMoblinBomb_state1), b_+3);
   if (F & FZ) { RET_TAKEN(b_+3); return; } // ret z
   CYC(b_+3, b_+4);
-  CYC(b_+4, b_+7); objectAddToGrabbableObjectBuffer_hook(gb); return; // jp
+  CYC(b_+4, b_+7); TAIL(objectAddToGrabbableObjectBuffer); // jp
 }
 
 void kingMoblinBomb_state5_hook(GB *gb) {
@@ -264,7 +264,7 @@ void kingMoblinBomb_state5_hook(GB *gb) {
   CALL_C(b_+15, kingMoblinBomb_checkCollisionWithLink_hook, SYM(kingMoblinBomb_checkCollisionWithLink), b_+18);
   CALL_C(b_+18, kingMoblinBomb_checkCollisionWithKingMoblin_hook, SYM(kingMoblinBomb_checkCollisionWithKingMoblin), b_+21);
 animate:
-  CYC(b_+21, b_+24); partAnimate_hook(gb); return; // jp
+  CYC(b_+21, b_+24); TAIL(partAnimate); // jp
 }
 
 void kingMoblinBomb_state6_hook(GB *gb) {
@@ -311,7 +311,7 @@ void kingMoblinBomb_state8_hook(GB *gb) {
   if (!(F & FC)) { CYCT(b_+5, b_+8); objectApplySpeed_hook(gb); return; } // jp nc
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+9); H = D;
-  CYC(b_+9, b_+12); kingMoblinBomb_explode_hook(gb); return; // jp
+  CYC(b_+9, b_+12); TAIL(kingMoblinBomb_explode); // jp
 }
 
 void kingMoblinBomb_checkCollisionWithLink_hook(GB *gb) {

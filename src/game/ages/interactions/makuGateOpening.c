@@ -130,7 +130,7 @@ after4_loadPoofs:
 after3_shakeScreen:
   CALL_C(b_+134, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+137);
   CYC(b_+137, b_+139); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80); // set 7,(hl)
-  CYC(b_+139, b_+142); interactionDelete_hook(gb); return; // jp
+  CYC(b_+139, b_+142); TAIL(interactionDelete); // jp
 
 // @param hl Pointer to data
 loadInterleavedTiles:

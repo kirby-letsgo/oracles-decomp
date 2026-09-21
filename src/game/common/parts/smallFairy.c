@@ -60,7 +60,7 @@ L_56c4:
   if (F & FZ) { RET_TAKEN(b_+18); return; } // ret z
   CYC(b_+18, b_+19);
   CYC(b_+19, b_+20); mem_wr(gb, HL, A);
-  CYC(b_+20, b_+23); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(partSetAnimation); // jp
 }
 
 void func_56cd_hook(GB *gb) {
@@ -134,7 +134,7 @@ state0:
   CYC(b_+36, b_+38); E = 0xcd; // Part.xh
   CYC(b_+38, b_+39); A = mem_rd(gb, DE);
   CYC(b_+39, b_+40); mem_wr(gb, HL, A);
-  CYC(b_+40, b_+43); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+40, b_+43); TAIL(objectSetVisiblec2); // jp
 
 state1:
   CALL_C(b_+43, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+46);
@@ -162,7 +162,7 @@ L_5643:
   CYC(b_+82, b_+83); H = D;
   CYC(b_+83, b_+85); L = 0xc9; // Part.angle
   CYC(b_+85, b_+86); mem_wr(gb, HL, A);
-  CYC(b_+86, b_+89); func_56b6_hook(gb); return; // jp
+  CYC(b_+86, b_+89); TAIL(func_56b6); // jp
 
 state2:
   CYC(b_+93, b_+95); E = 0xc5; // Part.substate
@@ -199,7 +199,7 @@ L_5683:
   CYC(b_+137, b_+140);
 
 L_5699:
-  CYC(b_+140, b_+143); partDelete_hook(gb); return; // jp
+  CYC(b_+140, b_+143); TAIL(partDelete); // jp
 
 collected:
   CYC(b_+143, b_+145); A = 0x26;
@@ -218,5 +218,5 @@ L_56ac:
 L_56ae:
   CYC(b_+161, b_+163); A = 0x29;
   CALL_C(b_+163, giveTreasure_hook, SYM(giveTreasure), b_+166);
-  CYC(b_+166, b_+169); partDelete_hook(gb); return; // jp
+  CYC(b_+166, b_+169); TAIL(partDelete); // jp
 }

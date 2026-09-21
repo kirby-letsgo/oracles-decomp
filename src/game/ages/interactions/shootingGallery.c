@@ -85,8 +85,8 @@ void interactionCode30_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (shootingGallery_jumpTable(gb));
-    if (jt_ == SYM(shootingGalleryNpc)) { shootingGalleryNpc_hook(gb); return; }
-    else if (jt_ == SYM(shootingGalleryGame)) { shootingGalleryGame_hook(gb); return; }
+    if (jt_ == SYM(shootingGalleryNpc) && hook_enabled_at(gb, SYM(shootingGalleryNpc))) { shootingGalleryNpc_hook(gb); return; }
+    else if (jt_ == SYM(shootingGalleryGame) && hook_enabled_at(gb, SYM(shootingGalleryGame))) { shootingGalleryGame_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -182,7 +182,7 @@ updateAnimation:
   CYC(b_+59, b_+60); A = mem_rd(gb, DE);
   CYC(b_+60, b_+62); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
-    CYCT(b_+62, b_+65); interactionAnimateAsNpc_hook(gb); return;
+    CYCT(b_+62, b_+65); TAIL(interactionAnimateAsNpc);
   }
   CYC(b_+62, b_+65);
   CYC(b_+65, b_+68); npcFaceLinkAndAnimate_hook(gb);

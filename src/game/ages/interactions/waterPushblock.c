@@ -34,7 +34,7 @@ static void interactionCode9e_setInterleavedTile_tail(GB *gb) {
   CYC(b_+433, b_+434); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+434, b_+436); mem_wr(gb, hFF8E, A);
   CYC(b_+436, b_+437); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(b_+437, b_+440); setInterleavedTile_hook(gb); return; // jp
+  CYC(b_+437, b_+440); TAIL(setInterleavedTile); // jp
 }
 
 // @param a Position
@@ -42,7 +42,7 @@ void interactionCode9e_setHoleTile_hook(GB *gb) {
   BASE(interactionCode9e);
   CYC(b_+372, b_+373); C = A;
   CYC(b_+373, b_+375); A = 0xf3; // TILEINDEX_HOLE
-  CYC(b_+375, b_+378); setTile_hook(gb); return; // jp
+  CYC(b_+375, b_+378); TAIL(setTile); // jp
 }
 
 // @param a Position
@@ -159,7 +159,7 @@ subid0:
     else if (jt_ == b_+55) { goto state1; }
     else if (jt_ == b_+140) { goto state2; }
     else if (jt_ == b_+155) { goto subid0State3; }
-    else if (jt_ == SYM(objectPreventLinkFromPassing)) { objectPreventLinkFromPassing_hook(gb); return; }
+    else if (jt_ == SYM(objectPreventLinkFromPassing) && hook_enabled_at(gb, SYM(objectPreventLinkFromPassing))) { objectPreventLinkFromPassing_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
@@ -179,7 +179,7 @@ initialize:
   CYC(b_+45, b_+47); L = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+47, b_+49); mem_wr(gb, HL, 30);
   CALL_C(b_+49, objectSetVisible82_hook, SYM(objectSetVisible82), b_+52);
-  CYC(b_+52, b_+55); interactionIncState_hook(gb); return; // jp
+  CYC(b_+52, b_+55); TAIL(interactionIncState); // jp
 
 state1:
   CALL_C(b_+55, objectPreventLinkFromPassing_hook, SYM(objectPreventLinkFromPassing), b_+58);
@@ -237,7 +237,7 @@ l_55d7:
   CALL_C(b_+129, playSound_b00_hook, SYM(playSound_b00), b_+132);
   CYC(b_+132, b_+134); A = 0x71; // SND_MOVEBLOCK
   CALL_C(b_+134, playSound_b00_hook, SYM(playSound_b00), b_+137);
-  CYC(b_+137, b_+140); interactionIncState_hook(gb); return; // jp
+  CYC(b_+137, b_+140); TAIL(interactionIncState); // jp
 
 state2:
   CALL_C(b_+140, objectApplySpeed_hook, SYM(objectApplySpeed), b_+143);
@@ -246,7 +246,7 @@ state2:
   if (!(F & FZ)) { CYCT(b_+149, b_+150); ret_effect(gb); return; } // ret nz
   CYC(b_+149, b_+150);
   CYC(b_+150, b_+152); mem_wr(gb, HL, 70);
-  CYC(b_+152, b_+155); interactionIncState_hook(gb); return; // jp
+  CYC(b_+152, b_+155); TAIL(interactionIncState); // jp
 
 subid0State3:
   CYC(b_+155, b_+157); E = INTERACTION_BASE + OBJ_SUBSTATE;
@@ -279,7 +279,7 @@ subid0Substate0:
   CALL_C(b_+196, interactionCode9e_setInterleavedHoleGroundTile_hook, b_+412, b_+199);
   CYC(b_+199, b_+201); A = 0x65;
   CALL_C(b_+201, interactionCode9e_setInterleavedHoleGroundTile_hook, b_+412, b_+204);
-  CYC(b_+204, b_+207); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+204, b_+207); TAIL(interactionIncSubstate); // jp
 
 subid0Substate1:
   CYC(b_+207, b_+210); SET_BC((SYM(zelda_state0__initSubid00) + 5));
@@ -293,7 +293,7 @@ setGroundTilesWhenCounterIsZero:
   CALL_C(b_+217, interactionCode9e_setGroundTile_hook, b_+394, b_+220);
   CYC(b_+220, b_+221); A = C;
   CALL_C(b_+221, interactionCode9e_setPuddleTile_hook, b_+403, b_+224);
-  CYC(b_+224, b_+227); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+224, b_+227); TAIL(interactionIncSubstate); // jp
 
 subid0Substate2:
   CYC(b_+227, b_+230); SET_BC((SYM(zora_subid1B__textTable) + 17));
@@ -307,7 +307,7 @@ setHoleTilesWhenCounterIsZero:
   CALL_C(b_+237, interactionCode9e_setInterleavedHoleGroundTile_hook, b_+412, b_+240);
   CYC(b_+240, b_+241); A = C;
   CALL_C(b_+241, interactionCode9e_setInterleavedHoleGroundTile_hook, b_+412, b_+244);
-  CYC(b_+244, b_+247); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+244, b_+247); TAIL(interactionIncSubstate); // jp
 
 subid0Substate3:
   CYC(b_+247, b_+250); SET_BC((SYM(zora_subid1B__textTable) + 17));
@@ -330,7 +330,7 @@ subid0Substate6:
   CALL_C(b_+270, interactionCode9e_setInterleavedPuddleHoleTile_hook, b_+378, b_+273);
   CYC(b_+273, b_+275); A = 0x68;
   CALL_C(b_+275, interactionCode9e_setInterleavedHoleGroundTile_hook, b_+412, b_+278);
-  CYC(b_+278, b_+281); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+278, b_+281); TAIL(interactionIncSubstate); // jp
 
 subid0Substate7:
   CALL_C(b_+281, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+284);
@@ -341,7 +341,7 @@ subid0Substate7:
   CALL_C(b_+289, interactionCode9e_setHoleTile_hook, b_+372, b_+292);
   CYC(b_+292, b_+294); A = 0x68;
   CALL_C(b_+294, interactionCode9e_setPuddleTile_hook, b_+403, b_+297);
-  CYC(b_+297, b_+300); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+297, b_+300); TAIL(interactionIncSubstate); // jp
 
 subid0Substate8:
   CALL_C(b_+300, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+303);
@@ -350,7 +350,7 @@ subid0Substate8:
   CYC(b_+304, b_+306); mem_wr(gb, HL, 0x08);
   CYC(b_+306, b_+308); A = 0x69;
   CALL_C(b_+308, interactionCode9e_setInterleavedPuddleHoleTile_hook, b_+378, b_+311);
-  CYC(b_+311, b_+314); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+311, b_+314); TAIL(interactionIncSubstate); // jp
 
 subid0Substate9:
   CALL_C(b_+314, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+317);
@@ -362,7 +362,7 @@ subid0Substate9:
 setWaterTileAndIncSubstate:
   CYC(b_+322, b_+324); A = 0xfa; // TILEINDEX_WATER
   CALL_C(b_+324, setTile_hook, SYM(setTile), b_+327);
-  CYC(b_+327, b_+330); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+327, b_+330); TAIL(interactionIncSubstate); // jp
 
 substateA:
   CALL_C(b_+330, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+333);
@@ -373,7 +373,7 @@ substateA:
   CALL_C(b_+338, playSound_b00_hook, SYM(playSound_b00), b_+341);
   CYC(b_+341, b_+343); A = 0x4d; // SND_SOLVEPUZZLE
   CALL_C(b_+343, playSound_b00_hook, SYM(playSound_b00), b_+346);
-  CYC(b_+346, b_+349); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+346, b_+349); TAIL(interactionIncSubstate); // jp
 
 substateB:
   CALL_C(b_+349, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+352);
@@ -385,7 +385,7 @@ substateB:
   CYC(b_+360, b_+363); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+363, b_+366); mem_wr(gb, wMenuDisabled, A);
   CALL_C(b_+366, interactionCode9e_swapRoomLayouts_hook, b_+624, b_+369);
-  CYC(b_+369, b_+372); interactionIncState_hook(gb); return; // jp
+  CYC(b_+369, b_+372); TAIL(interactionIncState); // jp
 
 subid1:
   CYC(b_+440, b_+442); E = INTERACTION_BASE + OBJ_STATE;
@@ -396,7 +396,7 @@ subid1:
     else if (jt_ == b_+55) { goto state1; }
     else if (jt_ == b_+140) { goto state2; }
     else if (jt_ == b_+465) { goto subid1State3; }
-    else if (jt_ == SYM(objectPreventLinkFromPassing)) { objectPreventLinkFromPassing_hook(gb); return; }
+    else if (jt_ == SYM(objectPreventLinkFromPassing) && hook_enabled_at(gb, SYM(objectPreventLinkFromPassing))) { objectPreventLinkFromPassing_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
@@ -438,7 +438,7 @@ subid1Substate0:
   CALL_C(b_+506, interactionCode9e_setInterleavedGroundHoleTile_hook, b_+420, b_+509);
   CYC(b_+509, b_+511); A = 0x65;
   CALL_C(b_+511, interactionCode9e_setInterleavedGroundHoleTile_hook, b_+420, b_+514);
-  CYC(b_+514, b_+517); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+514, b_+517); TAIL(interactionIncSubstate); // jp
 
 subid1Substate1:
   CYC(b_+517, b_+520); SET_BC((SYM(creditsTextHorizontal_6559) + 10));
@@ -456,7 +456,7 @@ setHoleTilesWhenCounterZero_2:
   CALL_C(b_+533, interactionCode9e_setInterleavedGroundHoleTile_hook, b_+420, b_+536);
   CYC(b_+536, b_+537); A = C;
   CALL_C(b_+537, interactionCode9e_setInterleavedGroundHoleTile_hook, b_+420, b_+540);
-  CYC(b_+540, b_+543); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+540, b_+543); TAIL(interactionIncSubstate); // jp
 
 subid1Substate3:
   CYC(b_+543, b_+546); SET_BC((SYM(interactionCodeaf__state1) + 1));
@@ -479,7 +479,7 @@ subid1Substate6:
   CALL_C(b_+569, interactionCode9e_setInterleavedHolePuddleTile_hook, b_+386, b_+572);
   CYC(b_+572, b_+574); A = 0x68;
   CALL_C(b_+574, interactionCode9e_setInterleavedGroundHoleTile_hook, b_+420, b_+577);
-  CYC(b_+577, b_+580); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+577, b_+580); TAIL(interactionIncSubstate); // jp
 
 subid1Substate7:
   CALL_C(b_+580, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+583);
@@ -498,7 +498,7 @@ subid1Substate8:
   CYC(b_+600, b_+602); mem_wr(gb, HL, 0x08);
   CYC(b_+602, b_+604); A = 0x69;
   CALL_C(b_+604, interactionCode9e_setInterleavedHolePuddleTile_hook, b_+386, b_+607);
-  CYC(b_+607, b_+610); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+607, b_+610); TAIL(interactionIncSubstate); // jp
 
 subid1Substate9:
   CALL_C(b_+610, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+613);
@@ -507,5 +507,5 @@ subid1Substate9:
   CYC(b_+614, b_+616); mem_wr(gb, HL, 90);
   CYC(b_+616, b_+618); A = 0x69;
   CALL_C(b_+618, interactionCode9e_setHoleTile_hook, b_+372, b_+621);
-  CYC(b_+621, b_+624); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+621, b_+624); TAIL(interactionIncSubstate); // jp
 }

@@ -149,7 +149,7 @@ clear_self:
   CYC(b_+149, b_+150); alu_xor(gb, A);
   CYC(b_+150, b_+153); W8(wDisabledObjects) = A;
   CYC(b_+153, b_+156); W8(wcc95) = A;
-  CYC(b_+156, b_+159); clearParentItem_hook(gb); return;
+  CYC(b_+156, b_+159); TAIL(clearParentItem);
 
 echoes_in_vain:
   CYC(b_+159, b_+162); SET_BC((SYM(parentItemCode_bracelet__state0) + 26));

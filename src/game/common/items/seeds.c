@@ -80,9 +80,9 @@ void seedItemState3_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_sub(gb, 0x20);
   CYC(b_+5, b_+6); push_effect(gb, b_+6);
   do { uint16_t jt_ = (seed_jump_table(gb));
-    if (jt_ == SYM(emberSeedBurn)) { emberSeedBurn_hook(gb); return; }
-    else if (jt_ == SYM(seedUpdateAnimation)) { seedUpdateAnimation_hook(gb); return; }
-    else if (jt_ == SYM(galeSeedUpdateAnimationAndCounter)) { galeSeedUpdateAnimationAndCounter_hook(gb); return; }
+    if (jt_ == SYM(emberSeedBurn) && hook_enabled_at(gb, SYM(emberSeedBurn))) { emberSeedBurn_hook(gb); return; }
+    else if (jt_ == SYM(seedUpdateAnimation) && hook_enabled_at(gb, SYM(seedUpdateAnimation))) { seedUpdateAnimation_hook(gb); return; }
+    else if (jt_ == SYM(galeSeedUpdateAnimationAndCounter) && hook_enabled_at(gb, SYM(galeSeedUpdateAnimationAndCounter))) { galeSeedUpdateAnimationAndCounter_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -123,8 +123,7 @@ update_position:
   CYC(b_+29, b_+31); C = 0x1c;
   if (!(F & FZ)) {
     CYCT(b_+31, b_+34);
-    objectUpdateSpeedZ_paramC_hook(gb);
-    return;
+    TAIL(objectUpdateSpeedZ_paramC);
   }
   CYC(b_+31, b_+34);
   CYC(b_+34, b_+36); alu_bit(gb, 6, B);
@@ -174,10 +173,10 @@ void seedItemState2_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_sub(gb, 0x20);
   CYC(b_+5, b_+6); push_effect(gb, b_+6);
   do { uint16_t jt_ = (seed_jump_table(gb));
-    if (jt_ == SYM(emberSeedBurn)) { emberSeedBurn_hook(gb); return; }
-    else if (jt_ == SYM(scentSeedSmell)) { scentSeedSmell_hook(gb); return; }
-    else if (jt_ == SYM(seedUpdateAnimation)) { seedUpdateAnimation_hook(gb); return; }
-    else if (jt_ == SYM(galeSeedTryToWarpLink)) { galeSeedTryToWarpLink_hook(gb); return; }
+    if (jt_ == SYM(emberSeedBurn) && hook_enabled_at(gb, SYM(emberSeedBurn))) { emberSeedBurn_hook(gb); return; }
+    else if (jt_ == SYM(scentSeedSmell) && hook_enabled_at(gb, SYM(scentSeedSmell))) { scentSeedSmell_hook(gb); return; }
+    else if (jt_ == SYM(seedUpdateAnimation) && hook_enabled_at(gb, SYM(seedUpdateAnimation))) { seedUpdateAnimation_hook(gb); return; }
+    else if (jt_ == SYM(galeSeedTryToWarpLink) && hook_enabled_at(gb, SYM(galeSeedTryToWarpLink))) { galeSeedTryToWarpLink_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -196,8 +195,7 @@ void scentSeedSmell_hook(GB *gb) {
     CYC(b_+9, b_+10); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
     if (F & FZ) {
       CYCT(b_+10, b_+13);
-      seedItemDelete_hook(gb);
-      return;
+      TAIL(seedItemDelete);
     }
     CYC(b_+10, b_+13);
   }
@@ -224,8 +222,7 @@ void scentSeedSmell_hook(GB *gb) {
   CALL_C(b_+41, bombPullTowardPoint_hook, SYM(bombPullTowardPoint), b_+44);
   if (F & FC) {
     CYCT(b_+44, b_+47);
-    seedItemDelete_hook(gb);
-    return;
+    TAIL(seedItemDelete);
   }
   CYC(b_+44, b_+47);
   CYC(b_+47, b_+50); itemUpdateSpeedZAndCheckHazards_hook(gb);
@@ -238,8 +235,7 @@ void galeSeedUpdateAnimationAndCounter_hook(GB *gb) {
   CALL_C(b_+3, itemDecCounter1_hook, SYM(itemDecCounter1), b_+6);
   if (F & FZ) {
     CYCT(b_+6, b_+9);
-    seedItemDelete_hook(gb);
-    return;
+    TAIL(seedItemDelete);
   }
   CYC(b_+6, b_+9);
   CYC(b_+9, b_+10); A = mem_rd(gb, HL);
@@ -303,16 +299,14 @@ substate0:
   CYC(b_+24, b_+25); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+25, b_+27);
-    galeSeedUpdateAnimationAndCounter_hook(gb);
-    return;
+    TAIL(galeSeedUpdateAnimationAndCounter);
   }
   CYC(b_+25, b_+27);
   CYC(b_+27, b_+30); A = W8(wLinkObjectIndex);
   CYC(b_+30, b_+31); alu_rrca(gb);
   if (F & FC) {
     CYCT(b_+31, b_+33);
-    galeSeedUpdateAnimationAndCounter_hook(gb);
-    return;
+    TAIL(galeSeedUpdateAnimationAndCounter);
   }
   CYC(b_+31, b_+33);
   CYC(b_+33, b_+36); A = W8(wLinkGrabState2);
@@ -320,22 +314,19 @@ substate0:
   CYC(b_+38, b_+40); alu_cp(gb, 0x40);
   if (F & FZ) {
     CYCT(b_+40, b_+42);
-    galeSeedUpdateAnimationAndCounter_hook(gb);
-    return;
+    TAIL(galeSeedUpdateAnimationAndCounter);
   }
   CYC(b_+40, b_+42);
   CALL_C(b_+42, checkLinkVulnerableAndIDZero_hook, SYM(checkLinkVulnerableAndIDZero), b_+45);
   if (!(F & FC)) {
     CYCT(b_+45, b_+47);
-    galeSeedUpdateAnimationAndCounter_hook(gb);
-    return;
+    TAIL(galeSeedUpdateAnimationAndCounter);
   }
   CYC(b_+45, b_+47);
   CALL_C(b_+47, objectCheckCollidedWithLink_hook, SYM(objectCheckCollidedWithLink), b_+50);
   if (!(F & FC)) {
     CYCT(b_+50, b_+52);
-    galeSeedUpdateAnimationAndCounter_hook(gb);
-    return;
+    TAIL(galeSeedUpdateAnimationAndCounter);
   }
   CYC(b_+50, b_+52);
   CYC(b_+52, b_+55); SET_HL(w1Link);
@@ -352,8 +343,7 @@ substate0:
   CYC(b_+77, b_+79); A = 0x07;
   CYC(b_+79, b_+82); W8(wLinkForceState) = A;
   CYC(b_+82, b_+85);
-  objectSetVisible80_hook(gb);
-  return;
+  TAIL(objectSetVisible80);
 
 set_substate3:
   CYC(b_+85, b_+87); E = 0x05;
@@ -410,8 +400,7 @@ substate2:
   CYC(b_+132, b_+134); A = 0x05;
   CALL_C(b_+134, openMenu_hook, SYM(openMenu), b_+137);
   CYC(b_+137, b_+140);
-  seedItemDelete_hook(gb);
-  return;
+  TAIL(seedItemDelete);
 
 flicker_and_copy:
   CYC(b_+140, b_+142); E = 0x1a;
@@ -422,15 +411,13 @@ flicker_and_copy:
   CYC(b_+147, b_+150); W8(wLinkSwimmingState) = A;
   CYC(b_+150, b_+153); SET_HL(w1Link);
   CYC(b_+153, b_+156);
-  objectCopyPosition_hook(gb);
-  return;
+  TAIL(objectCopyPosition);
 
 substate3:
   CALL_C(b_+156, itemDecCounter2_hook, SYM(itemDecCounter2), b_+159);
   if (F & FZ) {
     CYCT(b_+159, b_+162);
-    seedItemDelete_hook(gb);
-    return;
+    TAIL(seedItemDelete);
   }
   CYC(b_+159, b_+162);
   CYC(b_+162, b_+164); L = 0x1a;
@@ -629,8 +616,7 @@ void func_50f4_hook(GB *gb) {
   CYC(b_+12, b_+13); alu_cp(gb, C);
   if (F & FZ) {
     CYCT(b_+13, b_+15);
-    seedItemClearKnockback_hook(gb);
-    return;
+    TAIL(seedItemClearKnockback);
   }
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+16); H = D;
@@ -752,8 +738,7 @@ update_position:
   CALL_C(b_+29, objectCheckWithinRoomBoundary_hook, SYM(objectCheckWithinRoomBoundary), b_+32);
   if (F & FC) {
     CYCT(b_+32, b_+35);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+32, b_+35);
   CYC(b_+35, b_+38); seedItemDelete_hook(gb);
@@ -773,8 +758,7 @@ satchel_update:
   CALL_C(b_+49, objectCheckWithinRoomBoundary_hook, SYM(objectCheckWithinRoomBoundary), b_+52);
   if (!(F & FC)) {
     CYCT(b_+52, b_+55);
-    seedItemDelete_hook(gb);
-    return;
+    TAIL(seedItemDelete);
   }
   CYC(b_+52, b_+55);
   CALL_C(b_+55, objectApplySpeed_hook, SYM(objectApplySpeed), b_+58);
@@ -782,8 +766,7 @@ satchel_update:
   CALL_C(b_+60, itemUpdateThrowingVerticallyAndCheckHazards_hook, SYM(itemUpdateThrowingVerticallyAndCheckHazards), b_+63);
   if (F & FC) {
     CYCT(b_+63, b_+66);
-    seedItemDelete_hook(gb);
-    return;
+    TAIL(seedItemDelete);
   }
   CYC(b_+63, b_+66);
   if (F & FZ) {
@@ -800,7 +783,7 @@ satchel_update:
   do { uint16_t jt_ = (seed_jump_table(gb));
     if (jt_ == b_+133) { goto ember_standard; }
     else if (jt_ == b_+139) { goto scent_landed; }
-    else if (jt_ == SYM(seedItemDelete)) { seedItemDelete_hook(gb); return; }
+    else if (jt_ == SYM(seedItemDelete) && hook_enabled_at(gb, SYM(seedItemDelete))) { seedItemDelete_hook(gb); return; }
     else if (jt_ == b_+167) { goto gale_landed; }
     else if (jt_ == b_+246) { goto mystery_standard; }
     else { hook_continue(gb, HL, sp0_); return; }
@@ -832,7 +815,7 @@ collided_with_enemy:
   do { uint16_t jt_ = (seed_jump_table(gb));
     if (jt_ == b_+133) { goto ember_standard; }
     else if (jt_ == b_+161) { goto scent_or_pegasus_collided; }
-    else if (jt_ == SYM(seedItemDelete)) { seedItemDelete_hook(gb); return; }
+    else if (jt_ == SYM(seedItemDelete) && hook_enabled_at(gb, SYM(seedItemDelete))) { seedItemDelete_hook(gb); return; }
     else if (jt_ == b_+217) { goto mystery_collided_with_enemy; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
@@ -929,9 +912,9 @@ void itemCode20_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (seed_jump_table(gb));
     if (jt_ == b_+12) { break; }
-    else if (jt_ == SYM(seedItemState1)) { seedItemState1_hook(gb); return; }
-    else if (jt_ == SYM(seedItemState2)) { seedItemState2_hook(gb); return; }
-    else if (jt_ == SYM(seedItemState3)) { seedItemState3_hook(gb); return; }
+    else if (jt_ == SYM(seedItemState1) && hook_enabled_at(gb, SYM(seedItemState1))) { seedItemState1_hook(gb); return; }
+    else if (jt_ == SYM(seedItemState2) && hook_enabled_at(gb, SYM(seedItemState2))) { seedItemState2_hook(gb); return; }
+    else if (jt_ == SYM(seedItemState3) && hook_enabled_at(gb, SYM(seedItemState3))) { seedItemState3_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
   CALL_C(b_+12, itemLoadAttributesAndGraphics_hook, SYM(itemLoadAttributesAndGraphics), b_+15);

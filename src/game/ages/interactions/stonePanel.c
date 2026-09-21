@@ -56,7 +56,7 @@ void interactionCode7b_hook(GB *gb) {
   CYC(b_+41, b_+42); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+42, b_+43); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+43, b_+44); mem_wr(gb, HL, A);
-  CYC(b_+44, b_+47); interactionIncState_hook(gb); return; // jp
+  CYC(b_+44, b_+47); TAIL(interactionIncState); // jp
 
 initializeOpenedState:
   CYC(b_+47, b_+49); E = INTERACTION_BASE + OBJ_STATE;
@@ -118,7 +118,7 @@ state1:
   CYC(b_+125, b_+126); mem_wr(gb, DE, A);
   CYC(b_+126, b_+128); A = 0xf0; // SNDCTRL_STOPMUSIC
   CALL_C(b_+128, playSound_b00_hook, SYM(playSound_b00), b_+131);
-  CYC(b_+131, b_+134); interactionIncState_hook(gb); return; // jp
+  CYC(b_+131, b_+134); TAIL(interactionIncState); // jp
 
 state2:
   CALL_C(b_+134, objectPreventLinkFromPassing_hook, SYM(objectPreventLinkFromPassing), b_+137);
@@ -152,7 +152,7 @@ L_6125:
   CYC(b_+170, b_+171); mem_wr(gb, DE, A);
   CYC(b_+171, b_+173); A = 0xb0; // SND_OPENING
   CALL_C(b_+173, playSound_b00_hook, SYM(playSound_b00), b_+176);
-  CYC(b_+176, b_+179); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+176, b_+179); TAIL(interactionIncSubstate); // jp
 
 // @substate1: currently opening
 substate1:
@@ -165,7 +165,7 @@ substate1:
   if (!(F & FZ)) { RET_TAKEN(b_+190); return; } // ret nz
   CYC(b_+190, b_+191);
   CYC(b_+191, b_+193); mem_wr(gb, HL, 0x1e);
-  CYC(b_+193, b_+196); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+193, b_+196); TAIL(interactionIncSubstate); // jp
 
 // @substate2: done opening
 substate2:
@@ -184,5 +184,5 @@ substate2:
 after1_updateSolidityUponOpening:
   CYC(b_+220, b_+223); A = W8(wActiveMusic);
   CALL_C(b_+223, playSound_b00_hook, SYM(playSound_b00), b_+226);
-  CYC(b_+226, b_+229); interactionIncState_hook(gb); return; // jp
+  CYC(b_+226, b_+229); TAIL(interactionIncState); // jp
 }

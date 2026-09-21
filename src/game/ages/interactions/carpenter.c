@@ -144,7 +144,7 @@ l_5140:
   CYC(b_+121, b_+123); A = 0x01;
   CYC(b_+123, b_+124); mem_wr(gb, DE, A); // [substate] = $01
   CYC(b_+124, b_+127); SET_BC(0x2307); // TX_2307
-  CYC(b_+127, b_+130); showText_hook(gb); return; // jp
+  CYC(b_+127, b_+130); TAIL(showText); // jp
 
 substate1:
   CALL_C(b_+130, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+133);
@@ -157,7 +157,7 @@ substate1:
   CALL_C(b_+144, clearMemory_hook, SYM(clearMemory), b_+147);
 
 delete_:
-  CYC(b_+147, b_+150); interactionDelete_hook(gb); return; // jp
+  CYC(b_+147, b_+150); TAIL(interactionDelete); // jp
 
 option0:
   CALL_C(b_+150, resetLinkInvincibility_hook, SYM(resetLinkInvincibility), b_+153);
@@ -310,7 +310,7 @@ runSubid:
   if (!(F & FC)) { CYCT(b_+376, b_+377); ret_effect(gb); return; } // ret nc
 
 delete2:
-  CYC(b_+377, b_+380); interactionDelete_hook(gb); return; // jp
+  CYC(b_+377, b_+380); TAIL(interactionDelete); // jp
 
 runSubid01:
   CYC(b_+380, b_+383); A = mem_rd(gb, wTmpcfc0_carpenterSearch_cfd0);
@@ -340,7 +340,7 @@ state2:
   CYC(b_+421, b_+424); SET_BC(0xfe00); // -$200
   CALL_C(b_+424, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+427);
   CYC(b_+427, b_+429); A = 0x53; // SND_JUMP
-  CYC(b_+429, b_+432); playSound_b00_hook(gb); return; // jp
+  CYC(b_+429, b_+432); TAIL(playSound_b00); // jp
 
 leftScreen:
   CYC(b_+432, b_+434); E = INTERACTION_BASE + OBJ_SUBID;
@@ -367,7 +367,7 @@ loadScript:
   CYC(b_+475, b_+476); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+476, b_+477); H = mem_rd(gb, HL);
   CYC(b_+477, b_+478); L = A;
-  CYC(b_+478, b_+481); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+478, b_+481); TAIL(interactionSetScript); // jp
 
   // @warpDest (0b:52a4): m_HardcodedWarpA ROOM_AGES_025, $00, $48, $03 -- pure ROM data referenced
   // only via SET_HL(0x52a4) above.

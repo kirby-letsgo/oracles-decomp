@@ -74,7 +74,7 @@ substate1: // interactionCodeaa@substate1
   CYC(b_+110, b_+111); mem_wr(gb, HL, A);
   CYC(b_+111, b_+113); L = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+113, b_+115); mem_wr(gb, HL, 30);
-  CYC(b_+115, b_+118); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+115, b_+118); TAIL(interactionAnimate); // jp
 
 substate2: // interactionCodeaa@substate2
   CALL_C(b_+118, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+121);
@@ -87,7 +87,7 @@ substate2: // interactionCodeaa@substate2
   CALL_C(b_+133, showText_hook, SYM(showText), b_+136);
 
 l6038: // L_6038
-  CYC(b_+136, b_+139); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+136, b_+139); TAIL(interactionAnimate); // jp
 
 substate3: // interactionCodeaa@substate3
   CALL_C(b_+139, interactionDecCounter1IfTextNotActive_hook, SYM(interactionDecCounter1IfTextNotActive), b_+142);
@@ -98,7 +98,7 @@ substate3: // interactionCodeaa@substate3
   CYC(b_+150, b_+152); mem_wr(gb, HL, 0x05);
 
 l6048: // L_6048
-  CYC(b_+152, b_+155); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+152, b_+155); TAIL(interactionAnimate); // jp
 
 updateSpeedZ: // interactionCodeaa@updateSpeedZ
   CYC(b_+170, b_+172); C = 0x20;
@@ -109,7 +109,7 @@ updateSpeedZ: // interactionCodeaa@updateSpeedZ
 
 beginJump: // interactionCodeaa@beginJump
   CYC(b_+177, b_+180); SET_BC(0xff00); // -$100
-  CYC(b_+180, b_+183); objectSetSpeedZ_hook(gb); return; // jp
+  CYC(b_+180, b_+183); TAIL(objectSetSpeedZ); // jp
 }
 
 // ==================================================================================================
@@ -147,7 +147,7 @@ void interactionCodeaa_hook(GB *gb) {
 initSubid2: // interactionCodeaa@initSubid2
   CALL_C(b_+28, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+31);
   CYC(b_+31, b_+34); SET_BC((SYM(interactionCodeb6__frame1) + 9));
-  CYC(b_+34, b_+37); interactionSetPosition_hook(gb); return; // jp
+  CYC(b_+34, b_+37); TAIL(interactionSetPosition); // jp
 
 state1: // interactionCodeaa@state1
   CYC(b_+37, b_+39); E = INTERACTION_BASE + OBJ_SUBID;
@@ -166,5 +166,5 @@ state1: // interactionCodeaa@state1
   CYC(b_+53, b_+54); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+54, b_+57); objectSetVisiblec2_hook(gb); return; } // jp nz
   CYC(b_+54, b_+57);
-  CYC(b_+57, b_+60); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+57, b_+60); TAIL(objectSetVisible82); // jp
 }

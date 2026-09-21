@@ -66,7 +66,7 @@ state0:
   CYC(b_+21, b_+22); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+22, b_+24); L = 0xcf; // Part.zh
   CYC(b_+24, b_+26); mem_wr(gb, HL, 0xfc);
-  CYC(b_+26, b_+29); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+26, b_+29); TAIL(objectSetVisible81); // jp
 
 state1:
   CYC(b_+29, b_+30); H = D;
@@ -106,12 +106,12 @@ state2:
   CALL_C(b_+74, objectCopyPosition_hook, SYM(objectCopyPosition), b_+77);
 
 animate:
-  CYC(b_+77, b_+80); partAnimate_hook(gb); return; // jp
+  CYC(b_+77, b_+80); TAIL(partAnimate); // jp
 
 delete:
   CYC(b_+80, b_+83); SET_BC(0x0580);
   CALL_C(b_+83, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+86);
-  CYC(b_+86, b_+89); partDelete_hook(gb); return; // jp
+  CYC(b_+86, b_+89); TAIL(partDelete); // jp
 }
 
 // An individual projectile
@@ -142,7 +142,7 @@ state0:
   CYC(b_+26, b_+28); A = 0xbe; // SND_VERAN_PROJECTILE
   CALL_C(b_+28, playSound_b00_hook, SYM(playSound_b00), b_+31);
   CYC(b_+31, b_+33); A = 0x01;
-  CYC(b_+33, b_+36); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+33, b_+36); TAIL(partSetAnimation); // jp
 
 state1:
   CYC(b_+36, b_+37); H = D;
@@ -158,5 +158,5 @@ state2:
   CALL_C(b_+47, partCommon_checkTileCollisionOrOutOfBounds_hook, SYM(partCommon_checkTileCollisionOrOutOfBounds), b_+50);
   if (!(F & FZ)) { RET_TAKEN(b_+50); return; } // ret nz
   CYC(b_+50, b_+51);
-  CYC(b_+51, b_+54); partDelete_hook(gb); return; // jp
+  CYC(b_+51, b_+54); TAIL(partDelete); // jp
 }

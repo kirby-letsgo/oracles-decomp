@@ -88,7 +88,7 @@ void enemyCode76_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+11, b_+14); enemyBoss_dead_b0f_hook(gb); return; } // jp z
   CYC(b_+11, b_+14);
   CALL_C(b_+14, ecom_killRelatedObj1_b0f_hook, SYM(ecom_killRelatedObj1_b0f), b_+17);
-  CYC(b_+17, b_+20); enemyDelete_hook(gb); return; // jp
+  CYC(b_+17, b_+20); TAIL(enemyDelete); // jp
 
 justHit:
   CYC(b_+20, b_+22); E = ENEMY_BASE + OBJ_SUBID;
@@ -133,7 +133,7 @@ normalStatus:
   CYC(b_+74, b_+75); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+75, b_+78); anglerFish_main_hook(gb); return; } // jp z
   CYC(b_+75, b_+78);
-  CYC(b_+78, b_+81); anglerFish_antenna_hook(gb); return; // jp
+  CYC(b_+78, b_+81); TAIL(anglerFish_antenna); // jp
 
 commonState:
   CYC(b_+81, b_+82); push_effect(gb, b_+82);
@@ -185,7 +185,7 @@ void anglerFish_state_uninitialized_hook(GB *gb) {
   CYC(b_+48, b_+49); mem_wr(gb, DE, A);
 
 doneInit:
-  CYC(b_+49, b_+52); ecom_setSpeedAndState8_b0f_hook(gb); return; // jp
+  CYC(b_+49, b_+52); TAIL(ecom_setSpeedAndState8_b0f); // jp
 }
 
 void anglerFish_state_stub_hook(GB *gb) {
@@ -237,7 +237,7 @@ void anglerFish_main_state8_hook(GB *gb) {
   CYC(b_+35, b_+37); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+37, b_+39); mem_wr(gb, HL, 0x1e);
   CYC(b_+39, b_+41); A = 0x70; // SND_DOORCLOSE
-  CYC(b_+41, b_+44); playSound_b00_hook(gb); return; // jp
+  CYC(b_+41, b_+44); TAIL(playSound_b00); // jp
 }
 
 // Delay before starting fight
@@ -253,7 +253,7 @@ void anglerFish_main_state9_hook(GB *gb) {
   CYC(b_+8, b_+10); mem_wr(gb, HL, 0x18); // ANGLE_LEFT
   CYC(b_+10, b_+12); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+12, b_+14); mem_wr(gb, HL, 0x1e); // SPEED_c0
-  CYC(b_+14, b_+17); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+14, b_+17); TAIL(objectSetVisible82); // jp
 }
 
 // Falling to the ground, then the fight will begin
@@ -278,7 +278,7 @@ hitGround:
   CALL_C(b_+21, ecom_incState_b0f_hook, SYM(ecom_incState_b0f), b_+24);
   CYC(b_+24, b_+26); L = ENEMY_BASE + OBJ_COUNTER2;
   CYC(b_+26, b_+28); mem_wr(gb, HL, 0xb4); // 180
-  anglerFish_bounceOffGround_hook(gb); return; // fallthrough
+  TAIL(anglerFish_bounceOffGround); // fallthrough
 }
 
 void anglerFish_bounceOffGround_hook(GB *gb) {
@@ -289,7 +289,7 @@ void anglerFish_bounceOffGround_hook(GB *gb) {
   CYC(b_+5, b_+6); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0xfc); // -$320 high byte
   CYC(b_+8, b_+10); A = 0x98; // SND_POOF
-  CYC(b_+10, b_+13); playSound_b00_hook(gb); return; // jp
+  CYC(b_+10, b_+13); TAIL(playSound_b00); // jp
 }
 
 // Bouncing around normally
@@ -298,7 +298,7 @@ void anglerFish_main_stateB_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, ecom_decCounter2_b0f_hook, SYM(ecom_decCounter2_b0f), b_+3);
   if (F & FZ) { CALL_C_CC(b_+3, anglerFish_main_checkFireProjectile_hook, SYM(anglerFish_main_checkFireProjectile), SYM(anglerFish_updatePosition)); } else { CYC(b_+3, b_+6); } // call z
-  anglerFish_updatePosition_hook(gb); return; // fallthrough
+  TAIL(anglerFish_updatePosition); // fallthrough
 }
 
 void anglerFish_updatePosition_hook(GB *gb) {
@@ -324,7 +324,7 @@ void anglerFish_updatePosition_hook(GB *gb) {
   CYC(b_+32, b_+34); alu_and(gb, 0x01);
   CYC(b_+34, b_+35); alu_cp(gb, B);
   if (!(F & FZ)) { CALL_C_CC(b_+35, anglerFish_updateAnimation_hook, SYM(anglerFish_updateAnimation), SYM(anglerFish_applySpeed)); } else { CYC(b_+35, b_+38); } // call nz
-  anglerFish_applySpeed_hook(gb); return; // fallthrough
+  TAIL(anglerFish_applySpeed); // fallthrough
 }
 
 void anglerFish_applySpeed_hook(GB *gb) {
@@ -334,7 +334,7 @@ void anglerFish_applySpeed_hook(GB *gb) {
   CALL_C(b_+3, ecom_bounceOffWallsAndHoles_b0f_hook, SYM(ecom_bounceOffWallsAndHoles_b0f), b_+6);
   if (F & FZ) { CYCT(b_+6, b_+9); enemyAnimate_hook(gb); return; } // jp z
   CYC(b_+6, b_+9);
-  anglerFish_updateAnimation_hook(gb); return; // fallthrough
+  TAIL(anglerFish_updateAnimation); // fallthrough
 }
 
 void anglerFish_updateAnimation_hook(GB *gb) {
@@ -344,7 +344,7 @@ void anglerFish_updateAnimation_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+5); alu_xor(gb, 0x01);
   CYC(b_+5, b_+6); mem_wr(gb, DE, A);
-  CYC(b_+6, b_+9); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+6, b_+9); TAIL(enemySetAnimation); // jp
 }
 
 // Firing a projectile
@@ -371,7 +371,7 @@ void anglerFish_main_stateC_hook(GB *gb) {
   CYC(b_+23, b_+24); mem_wr(gb, HL, D);
   CYC(b_+24, b_+26); A = 0x59; // SND_FALLINHOLE
   CALL_C(b_+26, playSound_b00_hook, SYM(playSound_b00), b_+29);
-  CYCT(b_+29, b_+31); anglerFish_updatePosition_hook(gb); return; // jr
+  CYCT(b_+29, b_+31); TAIL(anglerFish_updatePosition); // jr
 
 doneFiring:
   CYC(b_+31, b_+32); H = D;
@@ -382,7 +382,7 @@ doneFiring:
   CYC(b_+38, b_+40); alu_sub(gb, 0x02);
   CYC(b_+40, b_+41); mem_wr(gb, HL, A);
   CALL_C(b_+41, enemySetAnimation_hook, SYM(enemySetAnimation), b_+44);
-  CYCT(b_+44, b_+46); anglerFish_updatePosition_hook(gb); return; // jr
+  CYCT(b_+44, b_+46); TAIL(anglerFish_updatePosition); // jr
 }
 
 // Just hit with a scent seed, falling to ground
@@ -438,7 +438,7 @@ void anglerFish_main_stateF_hook(GB *gb) {
   CYC(b_+28, b_+29); mem_wr(gb, HL, A);
   CALL_C(b_+29, enemySetAnimation_hook, SYM(enemySetAnimation), b_+32);
   CYC(b_+32, b_+34); A = 0x98; // SND_POOF
-  CYC(b_+34, b_+37); playSound_b00_hook(gb); return; // jp
+  CYC(b_+34, b_+37); TAIL(playSound_b00); // jp
 }
 
 void anglerFish_antenna_hook(GB *gb) {
@@ -470,7 +470,7 @@ state9:
   CYC(b_+33, b_+34); alu_rrca(gb);
   if (F & FC) { RET_TAKEN(b_+34); return; } // ret c
   CYC(b_+34, b_+35);
-  CYC(b_+35, b_+38); ecom_flickerVisibility_b0f_hook(gb); return; // jp
+  CYC(b_+35, b_+38); TAIL(ecom_flickerVisibility_b0f); // jp
 
 state8:
   CYC(b_+50, b_+51); H = D;
@@ -489,7 +489,7 @@ state8:
   CYC(b_+71, b_+72); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+72, b_+73); mem_wr(gb, HL, A);
   CYC(b_+73, b_+75); A = 0x06;
-  CYC(b_+75, b_+78); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+75, b_+78); TAIL(enemySetAnimation); // jp
 }
 
 // Changes state to $0c if conditions are appropriate to fire a projectile.
@@ -514,5 +514,5 @@ void anglerFish_main_checkFireProjectile_hook(GB *gb) {
   CYC(b_+21, b_+22); A = mem_rd(gb, HL);
   CYC(b_+22, b_+24); alu_add(gb, 0x02);
   CYC(b_+24, b_+25); mem_wr(gb, HL, A);
-  CYC(b_+25, b_+28); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+25, b_+28); TAIL(enemySetAnimation); // jp
 }

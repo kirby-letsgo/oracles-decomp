@@ -70,7 +70,7 @@ state0:
   CYC(b_+23, b_+26);
   CYC(b_+26, b_+29); SET_HL(b_+29); // mainScripts.slateSlotScript
   CALL_C(b_+29, interactionSetScript_hook, SYM(interactionSetScript), b_+32);
-  CYC(b_+32, b_+35); interactionIncState_hook(gb); return; // jp
+  CYC(b_+32, b_+35); TAIL(interactionIncState); // jp
 
 state1:
   CALL_C(b_+35, objectCheckCollidedWithLink_notDead_hook, SYM(objectCheckCollidedWithLink_notDead), b_+38);
@@ -110,5 +110,5 @@ state2:
   CALL_C(b_+93, interactionRunScript_hook, SYM(interactionRunScript), b_+96);
   if (!(F & FC)) { CYCT(b_+96, b_+97); ret_effect(gb); return; } // ret nc
   CYC(b_+96, b_+97);
-  CYC(b_+97, b_+100); interactionDelete_hook(gb); return; // jp
+  CYC(b_+97, b_+100); TAIL(interactionDelete); // jp
 }

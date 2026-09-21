@@ -21,7 +21,7 @@ void interactionCodeb2__state0_hook(GB *gb) {
   CYC(b_+61, b_+63); mem_wr(gb, DE, A);
   CYC(b_+62, b_+66); mem_wr(gb, wScreenShakeMagnitude, A);
   CYC(b_+65, b_+68); SET_HL(b_+117);
-  CYC(b_+68, b_+72); interactionSetMiniScript_hook(gb); return;
+  CYC(b_+68, b_+72); TAIL(interactionSetMiniScript);
 }
 
 // interactionCodeb2@setRandomCounter1: counter1 = (random & var30) + var31.
@@ -104,7 +104,7 @@ update:
   CYC(b_+52, b_+53); L = alu_inc8(gb, L);
   CYC(b_+53, b_+56); mem_wr(gb, HL, 1);
   CYC(b_+55, b_+57); B = 0;
-  CYC(b_+57, b_+60); objectCopyPositionWithOffset_hook(gb); return;
+  CYC(b_+57, b_+60); TAIL(objectCopyPositionWithOffset);
 }
 
 void interactionCodeb2_hook(GB *gb) {

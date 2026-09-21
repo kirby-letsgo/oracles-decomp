@@ -58,7 +58,7 @@ void partCommon_getTileCollisionAtAngle_hook(GB *gb) {
   CYC(b_+17, b_+18); A = mem_rd(gb, DE);
   CYC(b_+18, b_+19); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+19, b_+20); C = A;
-  CYC(b_+20, b_+23); getTileCollisionsAtPosition_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(getTileCollisionsAtPosition); // jp
 }
 
 void partCommon_getTileCollisionAtAngle_allowHoles_hook(GB *gb) {
@@ -85,7 +85,7 @@ static void commonCode_allowHolesTail(GB *gb) {
   if (F & FC) { RET_TAKEN(b_+6); return; } // ret c
   CYC(b_+6, b_+7);
   CYC(b_+7, b_+8); A = alu_dec8(gb, A);
-  CYC(b_+8, b_+11); checkGivenCollision_allowHoles_hook(gb); return; // jp
+  CYC(b_+8, b_+11); TAIL(checkGivenCollision_allowHoles); // jp
 }
 
 void partCommon_standardUpdate_hook(GB *gb) {
@@ -240,7 +240,7 @@ void partCommon_updateSpeedAndDeleteWhenCounter1Is0_hook(GB *gb) {
   CYC(b_+6, b_+8); C = 0x0e;
   CALL_C(b_+8, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+11);
   CALL_C(b_+11, partAnimate_hook, SYM(partAnimate), b_+14);
-  CYC(b_+14, b_+17); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+14, b_+17); TAIL(objectApplySpeed); // jp
 }
 
 void partCommon_setPositionOffsetAndRadiusFromAngle_hook(GB *gb) {

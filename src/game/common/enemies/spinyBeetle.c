@@ -183,7 +183,7 @@ chargeAtLink:
   CYC(b_+154, b_+156); mem_wr(gb, HL, 0x38);
   CYC(b_+156, b_+158); L = ENEMY_BASE + OBJ_VAR03;
   CYC(b_+158, b_+160); mem_wr(gb, HL, 0x81);
-  CYC(b_+160, b_+163); objectSetVisiblec3_hook(gb); return; // jp
+  CYC(b_+160, b_+163); TAIL(objectSetVisiblec3); // jp
 
 state9:
   CALL_C(b_+163, enemyCode1b_checkBushOrRockGone_hook, b_+229, b_+166);
@@ -206,7 +206,7 @@ state9SlowDown:
   CYC(b_+187, b_+189); mem_wr(gb, HL, 0x80);
   CYC(b_+189, b_+191); L = ENEMY_BASE + OBJ_VAR3B;
   CYC(b_+191, b_+193); mem_wr(gb, HL, 0x00);
-  CYC(b_+193, b_+196); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+193, b_+196); TAIL(objectSetInvisible); // jp
 
 stateA:
   CALL_C(b_+196, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+199);
@@ -232,5 +232,5 @@ stateBApplyVelocity:
   CALL_C(b_+223, ecom_applyVelocityForSideviewEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0d), b_+226);
 
 animate:
-  CYC(b_+226, b_+229); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+226, b_+229); TAIL(enemyAnimate); // jp
 }

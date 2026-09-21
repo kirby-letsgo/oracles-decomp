@@ -159,7 +159,7 @@ L_5d6e:
   CYC(b_+36, b_+38); B = 0x32;
   CYC(b_+38, b_+41); SET_HL(wcc95);
   CYC(b_+41, b_+43); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 5)));
-  CYC(b_+43, b_+46); specialObjectUpdatePositionGivenVelocity_hook(gb); return;
+  CYC(b_+43, b_+46); TAIL(specialObjectUpdatePositionGivenVelocity);
 L_5d89:
   CYC(b_+46, b_+48); E = 0x2d;
   CYC(b_+48, b_+49); alu_xor(gb, A);
@@ -269,7 +269,7 @@ L_5cda:
   CYC(b_+28, b_+29); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FZ)) { CYCT(b_+29, b_+32); specialObjectSetAnimation_hook(gb); return; }
   CYC(b_+29, b_+32);
-  CYC(b_+32, b_+35); specialObjectAnimate_hook(gb); return;
+  CYC(b_+32, b_+35); TAIL(specialObjectAnimate);
 }
 
 void checkForUnderwaterTransition_hook(GB *gb) {
@@ -348,7 +348,7 @@ void checkLinkForceState_hook(GB *gb) {
   if ((F & FZ)) { CYCT(b_+5, b_+6); ret_effect(gb); return; } CYC(b_+5, b_+6);
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0x00);
   CYC(b_+8, b_+9); SET_HL(pop_effect(gb));
-  linkSetState_hook(gb); return;
+  TAIL(linkSetState);
 }
 
 void checkLinkPushingAgainstBed_hook(GB *gb) {
@@ -383,7 +383,7 @@ void checkLinkPushingAgainstBed_hook(GB *gb) {
   CYC(b_+45, b_+48); SET_HL(wInformativeTextsShown);
   CYC(b_+48, b_+50); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1)));
   CYC(b_+50, b_+52); A = 0x05;
-  CYC(b_+52, b_+55); linkSetState_hook(gb); return;
+  CYC(b_+52, b_+55); TAIL(linkSetState);
 }
 
 void specialObjectUpdatePosition_hook(GB *gb) {
@@ -409,7 +409,7 @@ void animateLinkStanding_hook(GB *gb) {
 L_5cc1:
   CYC(b_+12, b_+13); alu_xor(gb, A);
   CYC(b_+13, b_+14); mem_wr(gb, DE, A);
-  animateLinkWalking_hook(gb); return;
+  TAIL(animateLinkWalking);
 }
 
 void linkResetSpeed_hook(GB *gb) {
@@ -439,7 +439,7 @@ void linkSetState_hook(GB *gb) {
   CYC(b_+14, b_+16); alu_cp(gb, 0x0d);
   if (!(F & FZ)) { CYCT(b_+16, b_+17); ret_effect(gb); return; } CYC(b_+16, b_+17);
 L_54da:
-  CYC(b_+17, b_+20); specialObjectCode_link_hook(gb); return;
+  CYC(b_+17, b_+20); TAIL(specialObjectCode_link);
 }
 
 void func_5631_hook(GB *gb) {
@@ -503,7 +503,7 @@ L_56f8:
   CYC(b_+83, b_+84); mem_wr(gb, HL, A);
   CYC(b_+84, b_+85); A = B;
   CALL_C(b_+85, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+88);
-  CYC(b_+88, b_+91); linkCreateSplash_hook(gb); return;
+  CYC(b_+88, b_+91); TAIL(linkCreateSplash);
 }
 
 void forceDrownLink_hook(GB *gb) {
@@ -533,7 +533,7 @@ L_56d8:
   CYC(b_+83, b_+84); mem_wr(gb, HL, A);
   CYC(b_+84, b_+85); A = B;
   CALL_C(b_+85, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+88);
-  CYC(b_+88, b_+91); linkCreateSplash_hook(gb); return;
+  CYC(b_+88, b_+91); TAIL(linkCreateSplash);
 L_5708:
   CYC(SYM(forceDrownLink), (SYM(forceDrownLink) + 3)); SET_HL(wLinkSwimmingState);
   CYC((SYM(forceDrownLink) + 3), (SYM(forceDrownLink) + 5)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));
@@ -557,7 +557,7 @@ void overworldSwimmingState2_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+3, b_+6); specialObjectUpdatePosition_hook(gb); return; } CYC(b_+3, b_+6);
   CYC(b_+6, b_+9); SET_HL(wLinkSwimmingState);
   CYC(b_+9, b_+10); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  overworldSwimmingState3_hook(gb); return;
+  TAIL(overworldSwimmingState3);
 }
 
 void linkUpdateDrowning_hook(GB *gb) {
@@ -577,7 +577,7 @@ void linkUpdateDrowning_hook(GB *gb) {
   CYC(b_+21, b_+23); A = 0x02;
   CYC(b_+23, b_+26); mem_wr(gb, wLinkStateParameter, A);
   CYC(b_+26, b_+28); A = 0x02;
-  CYC(b_+28, b_+31); linkSetState_hook(gb); return;
+  CYC(b_+28, b_+31); TAIL(linkSetState);
 }
 
 void linkSetSwimmingSpeed_hook(GB *gb) {
@@ -680,7 +680,7 @@ L_5841:
 L_5845:
   CYC(b_+53, b_+55); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
   CYC(b_+55, b_+57); A = 0x0b;
-  CYC(b_+57, b_+60); specialObjectSetAnimation_hook(gb); return;
+  CYC(b_+57, b_+60); TAIL(specialObjectSetAnimation);
 L_584c:
   CYC(b_+60, b_+62); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
   CYC(b_+62, b_+64); E = 0x07;
@@ -688,7 +688,7 @@ L_584c:
   CYC(b_+66, b_+67); mem_wr(gb, DE, A);
   CALL_C(b_+67, linkCreateSplash_hook, SYM(linkCreateSplash), b_+70);
   CYC(b_+70, b_+72); A = 0x0c;
-  CYC(b_+72, b_+75); specialObjectSetAnimation_hook(gb); return;
+  CYC(b_+72, b_+75); TAIL(specialObjectSetAnimation);
 }
 
 void func_5933_hook(GB *gb) {
@@ -825,7 +825,7 @@ L_56da:
   CYC((SYM(overworldSwimmingState1__splashAndSetAnimation) + 8), (SYM(overworldSwimmingState1__splashAndSetAnimation) + 9)); mem_wr(gb, HL, A);
   CYC((SYM(overworldSwimmingState1__splashAndSetAnimation) + 9), (SYM(overworldSwimmingState1__splashAndSetAnimation) + 10)); A = B;
   CALL_C((SYM(overworldSwimmingState1__splashAndSetAnimation) + 10), specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), (SYM(overworldSwimmingState1__splashAndSetAnimation) + 13));
-  CYC((SYM(overworldSwimmingState1__splashAndSetAnimation) + 13), (SYM(overworldSwimmingState1__splashAndSetAnimation) + 16)); linkCreateSplash_hook(gb); return;
+  CYC((SYM(overworldSwimmingState1__splashAndSetAnimation) + 13), (SYM(overworldSwimmingState1__splashAndSetAnimation) + 16)); TAIL(linkCreateSplash);
 L_5725:
   CALL_C(b_+0, checkSwimmingOverSeawater_hook, SYM(checkSwimmingOverSeawater), b_+3);
   if ((F & FZ)) { CYCT(b_+3, b_+5); goto L_56d4; } CYC(b_+3, b_+5);
@@ -846,11 +846,11 @@ L_5740:
   CYC(b_+33, b_+35); alu_bit(gb, 6, mem_rd(gb, HL));
   if ((F & FZ)) { CYCT(b_+35, b_+37); goto L_5750; } CYC(b_+35, b_+37);
   CALL_C(b_+37, linkUpdateVelocity_mermaidSuit_hook, SYM(linkUpdateVelocity__mermaidSuit), b_+40);
-  CYC(b_+40, b_+43); specialObjectUpdatePosition_hook(gb); return;
+  CYC(b_+40, b_+43); TAIL(specialObjectUpdatePosition);
 L_5750:
   CALL_C(b_+43, linkUpdateFlippersSpeed_hook, SYM(linkUpdateFlippersSpeed), b_+46);
   CALL_C(b_+46, func_5933_hook, SYM(func_5933), b_+49);
-  CYC(b_+49, b_+52); specialObjectUpdatePosition_hook(gb); return;
+  CYC(b_+49, b_+52); TAIL(specialObjectUpdatePosition);
 }
 
 void linkUpdateVelocity_mermaidSuit_hook(GB *gb) {
@@ -879,7 +879,7 @@ L_5916:
   if ((F & FZ)) { CYCT(b_+43, b_+45); goto L_592c; } CYC(b_+43, b_+45);
   CYC(b_+45, b_+47); A = 0xff;
   CYC(b_+47, b_+48); mem_wr(gb, HL, A);
-  CYC(b_+48, b_+50); func_5933_hook(gb); return;
+  CYC(b_+48, b_+50); TAIL(func_5933);
 L_5922:
   CYC(b_+50, b_+52); A = 0x87;
   CALL_C(b_+52, playSound_b00_hook, SYM(playSound_b00), b_+55);
@@ -890,7 +890,7 @@ L_592c:
   CYC(b_+60, b_+62); L = 0x12;
   CYC(b_+62, b_+64); mem_wr(gb, HL, 0x14);
   CYC(b_+64, b_+67); A = mem_rd(gb, wLinkAngle);
-  func_5933_hook(gb); return;
+  TAIL(func_5933);
 }
 
 void linkUpdateVelocity_hook(GB *gb) {
@@ -901,7 +901,7 @@ void linkUpdateVelocity_hook(GB *gb) {
   linkUpdateVelocity_mermaidSuit_hook(gb); return;
 L_5930:
   CYC(b_+64, b_+67); A = mem_rd(gb, wLinkAngle);
-  func_5933_hook(gb); return;
+  TAIL(func_5933);
 }
 
 void linkUpdateInAir_hook(GB *gb) {
@@ -997,7 +997,7 @@ L_5b85:
   CYC(b_+146, b_+148); A = 0xa3;
   CALL_C(b_+148, playSound_b00_hook, SYM(playSound_b00), b_+151);
   CALL_C(b_+151, specialObjectUpdateAdjacentWallsBitset_hook, SYM(specialObjectUpdateAdjacentWallsBitset), b_+154);
-  CYC(b_+154, b_+157); initLinkState_hook(gb); return;
+  CYC(b_+154, b_+157); TAIL(initLinkState);
 }
 
 void linkUpdateSwimming_hook(GB *gb) {
@@ -1009,11 +1009,11 @@ void linkUpdateSwimming_hook(GB *gb) {
   CYC(b_+8, b_+10); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 4)));
   CYC(b_+10, b_+11); push_effect(gb, b_+11);
   do { uint16_t jt_ = (link_jump_table(gb));
-    if (jt_ == SYM(initLinkState)) { initLinkState_hook(gb); return; }
-    else if (jt_ == SYM(overworldSwimmingState1)) { overworldSwimmingState1_hook(gb); return; }
-    else if (jt_ == SYM(overworldSwimmingState2)) { overworldSwimmingState2_hook(gb); return; }
-    else if (jt_ == SYM(overworldSwimmingState3)) { overworldSwimmingState3_hook(gb); return; }
-    else if (jt_ == SYM(linkUpdateDrowning)) { linkUpdateDrowning_hook(gb); return; }
+    if (jt_ == SYM(initLinkState) && hook_enabled_at(gb, SYM(initLinkState))) { initLinkState_hook(gb); return; }
+    else if (jt_ == SYM(overworldSwimmingState1) && hook_enabled_at(gb, SYM(overworldSwimmingState1))) { overworldSwimmingState1_hook(gb); return; }
+    else if (jt_ == SYM(overworldSwimmingState2) && hook_enabled_at(gb, SYM(overworldSwimmingState2))) { overworldSwimmingState2_hook(gb); return; }
+    else if (jt_ == SYM(overworldSwimmingState3) && hook_enabled_at(gb, SYM(overworldSwimmingState3))) { overworldSwimmingState3_hook(gb); return; }
+    else if (jt_ == SYM(linkUpdateDrowning) && hook_enabled_at(gb, SYM(linkUpdateDrowning))) { linkUpdateDrowning_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -1173,7 +1173,7 @@ void checkLinkJumpingOffCliff_hook(GB *gb) {
   CYC(b_+53, b_+54); SET_HL(pop_effect(gb));
   CYC(b_+54, b_+56); A = 0x12;
   CALL_C(b_+56, linkSetState_hook, SYM(linkSetState), b_+59);
-  CYC(b_+59, b_+61); linkState12_hook(gb); return;
+  CYC(b_+59, b_+61); TAIL(linkState12);
 }
 
 void specialObjectSetPositionToVar38IfSet_hook(GB *gb) {
@@ -1198,7 +1198,7 @@ void specialObjectSetPositionToVar38IfSet_hook(GB *gb) {
   CYC(b_+24, b_+25); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+25, b_+27); E = 0x0d;
   CYC(b_+27, b_+28); mem_wr(gb, DE, A);
-  CYC(b_+28, b_+30); clearVar37AndVar38_hook(gb); return;
+  CYC(b_+28, b_+30); TAIL(clearVar37AndVar38);
 }
 
 void initLinkStateAndAnimateStanding_hook(GB *gb) {
@@ -1207,7 +1207,7 @@ void initLinkStateAndAnimateStanding_hook(GB *gb) {
   CALL_C(b_+0, initLinkState_hook, SYM(initLinkState), b_+3);
   CYC(b_+3, b_+5); L = 0x1a;
   CYC(b_+5, b_+7); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  animateLinkStanding_hook(gb); return;
+  TAIL(animateLinkStanding);
 }
 
 void specialObjectUpdatePositionWithoutTileEdgeAdjust_hook(GB *gb) {
@@ -1402,7 +1402,7 @@ void specialObjectSetVar37AndVar38_hook(GB *gb) {
   CYC(b_+3, b_+4); E = alu_inc8(gb, E);
   CYC(b_+4, b_+5); A = L;
   CYC(b_+5, b_+6); mem_wr(gb, DE, A);
-  specialObjectSetAngleRelativeToVar38_hook(gb); return;
+  TAIL(specialObjectSetAngleRelativeToVar38);
 }
 
 void specialObjectSetAngleRelativeToVar38_hook(GB *gb) {
@@ -1445,11 +1445,11 @@ void linkUpdateSwimming_sidescroll_hook(GB *gb) {
     if (jt_ == b_+21) { goto L_5870; }
     else if (jt_ == b_+24) { goto L_5873; }
     else if (jt_ == b_+69) { goto L_58a0; }
-    else if (jt_ == SYM(linkUpdateDrowning)) { linkUpdateDrowning_hook(gb); return; }
+    else if (jt_ == SYM(linkUpdateDrowning) && hook_enabled_at(gb, SYM(linkUpdateDrowning))) { linkUpdateDrowning_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 L_5870:
-  CYC(b_+21, b_+24); initLinkState_hook(gb); return;
+  CYC(b_+21, b_+24); TAIL(initLinkState);
 L_5873:
   CALL_C(b_+24, linkCancelAllItemUsage_hook, SYM(linkCancelAllItemUsage), b_+27);
   CYC(b_+27, b_+30); SET_HL(wLinkSwimmingState);
@@ -1471,7 +1471,7 @@ L_5896:
   CYC(b_+61, b_+64); mem_wr(gb, wLinkSwimmingState, A);
   CYC(b_+64, b_+66); A = 0x0a;
 L_589d:
-  CYC(b_+66, b_+69); specialObjectSetAnimation_hook(gb); return;
+  CYC(b_+66, b_+69); TAIL(specialObjectSetAnimation);
 L_58a0:
   CYC(b_+69, b_+70); alu_xor(gb, A);
   CYC(b_+70, b_+73); mem_wr(gb, wLinkInAir, A);
@@ -1517,7 +1517,7 @@ L_58d8:
   CYC(b_+141, b_+143); B = 0x91;
   CALL_C(b_+143, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+146);
 L_58ed:
-  CYC(b_+146, b_+149); specialObjectAnimate_hook(gb); return;
+  CYC(b_+146, b_+149); TAIL(specialObjectAnimate);
 }
 
 void linkState01_sidescroll_hook(GB *gb) {
@@ -1572,7 +1572,7 @@ L_5a00:
   if ((F & FZ)) { CYCT(b_+96, b_+99); goto L_5a24; } CYC(b_+96, b_+99);
   CYC(b_+99, b_+100); alu_xor(gb, A);
   CYC(b_+100, b_+103); mem_wr(gb, wLinkInAir, A);
-  CYC(b_+103, b_+106); animateLinkStanding_hook(gb); return;
+  CYC(b_+103, b_+106); TAIL(animateLinkStanding);
 L_5a24:
   CALL_C(b_+106, linkUpdateInAir_sidescroll_hook, SYM(linkUpdateInAir_sidescroll), b_+109);
   if ((F & FZ)) { CYCT(b_+109, b_+110); ret_effect(gb); return; } CYC(b_+109, b_+110);
@@ -1667,7 +1667,7 @@ L_5ac8:
   CYC(b_+270, b_+273); A = mem_rd(gb, wLinkTurningDisabled);
   CYC(b_+273, b_+274); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+274, b_+275); ret_effect(gb); return; } CYC(b_+274, b_+275);
-  CYC(b_+275, b_+278); updateLinkDirectionFromAngle_hook(gb); return;
+  CYC(b_+275, b_+278); TAIL(updateLinkDirectionFromAngle);
 }
 
 void linkUpdateInAir_sidescroll_hook(GB *gb) {
@@ -1758,7 +1758,7 @@ L_5c0d:
   if (!(F & FZ)) { CYCT(b_+140, b_+142); goto L_5c26; } CYC(b_+140, b_+142);
   CYC(b_+142, b_+144); A = 0x5f;
   CALL_C(b_+144, playSound_b00_hook, SYM(playSound_b00), b_+147);
-  CYC(b_+147, b_+150); respawnLink_hook(gb); return;
+  CYC(b_+147, b_+150); TAIL(respawnLink);
 L_5c26:
   CALL_C(b_+150, linkUpdateVelocity_hook, SYM(linkUpdateVelocity), b_+153);
 L_5c29:
@@ -1921,7 +1921,7 @@ L_610c:
   CYC(b_+134, b_+136); A = 0xa3;
   CALL_C(b_+136, playSound_b00_hook, SYM(playSound_b00), b_+139);
   CALL_C(b_+139, specialObjectUpdateAdjacentWallsBitset_hook, SYM(specialObjectUpdateAdjacentWallsBitset), b_+142);
-  CYC(b_+142, b_+145); initLinkStateAndAnimateStanding_hook(gb); return;
+  CYC(b_+142, b_+145); TAIL(initLinkStateAndAnimateStanding);
 L_6136:
   CYC(b_+145, b_+147); C = 0x20;
   CALL_C(b_+147, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+150);
@@ -2048,8 +2048,7 @@ void warpUpdateRespawnPoint_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_cp(gb, 0x06);
   if (!(F & FC)) {
     CYCT(b_+5, b_+7);
-    warpTransition0_hook(gb);
-    return;
+    TAIL(warpTransition0);
   }
   CYC(b_+5, b_+7);
   CALL_C(b_+7, setDeathRespawnPoint_hook, SYM(setDeathRespawnPoint), b_+10);
@@ -2100,8 +2099,7 @@ void warpTransition4_hook(GB *gb) {
   CYC(b_+3, b_+4); alu_rlca(gb);
   if (F & FC) {
     CYCT(b_+4, b_+7);
-    warpTransition0_hook(gb);
-    return;
+    TAIL(warpTransition0);
   }
   CYC(b_+4, b_+7);
   CYC(b_+7, b_+9); A = 0x01;
@@ -2118,9 +2116,9 @@ void warpTransition5_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (link_jump_table(gb));
-    if (jt_ == SYM(warpTransition5_00)) { warpTransition5_00_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition5_01)) { warpTransition5_01_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition5_02)) { warpTransition5_02_hook(gb); return; }
+    if (jt_ == SYM(warpTransition5_00) && hook_enabled_at(gb, SYM(warpTransition5_00))) { warpTransition5_00_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition5_01) && hook_enabled_at(gb, SYM(warpTransition5_01))) { warpTransition5_01_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition5_02) && hook_enabled_at(gb, SYM(warpTransition5_02))) { warpTransition5_02_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -2210,8 +2208,7 @@ state0:
   CALL_C(b_+37, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+40);
   CYC(b_+40, b_+42); A = 0x65;
   CYC(b_+42, b_+45);
-  playSound_b00_hook(gb);
-  return;
+  TAIL(playSound_b00);
 
 state1:
   CALL_C(b_+45, itemDecCounter1_hook, SYM(itemDecCounter1), b_+48);
@@ -2227,16 +2224,14 @@ state1:
   CALL_C(b_+62, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+65);
   CYC(b_+65, b_+67); A = 0x85;
   CYC(b_+67, b_+70);
-  playSound_b00_hook(gb);
-  return;
+  TAIL(playSound_b00);
 
 state2:
   CALL_C(b_+70, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+73);
   CALL_C(b_+73, itemDecCounter1_hook, SYM(itemDecCounter1), b_+76);
   if (!(F & FZ)) {
     CYCT(b_+76, b_+79);
-    specialObjectUpdatePosition_hook(gb);
-    return;
+    TAIL(specialObjectUpdatePosition);
   }
   CYC(b_+76, b_+79);
   warp_transition7_link_collapsed(gb, sp0_);
@@ -2312,8 +2307,7 @@ state0:
   CYC(b_+54, b_+56); A = 0xb4;
   CALL_C(b_+56, playSound_b00_hook, SYM(playSound_b00), b_+59);
   CYC(b_+59, b_+62);
-  objectCenterOnTile_hook(gb);
-  return;
+  TAIL(objectCenterOnTile);
 
 state1:
   CYC(b_+62, b_+64); C = 0x02;
@@ -2335,8 +2329,7 @@ state1:
   if (!(F & FZ)) { CYCT(b_+89, b_+90); ret_effect(gb); return; }
   CYC(b_+89, b_+90);
   CYC(b_+90, b_+93);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 state2:
   CYC(b_+93, b_+95); C = 0x02;
@@ -2352,8 +2345,7 @@ state2:
   CYC(b_+111, b_+113); A = 0x02;
   CALL_C(b_+113, fadeoutToWhiteWithDelay_hook, SYM(fadeoutToWhiteWithDelay), b_+116);
   CYC(b_+116, b_+119);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 state3:
   CALL_C(b_+119, linkIncrementDirectionOnOddFrames_hook, SYM(linkIncrementDirectionOnOddFrames), b_+122);
@@ -2363,8 +2355,7 @@ state3:
   CYC(b_+126, b_+129); SET_HL(wTmpcbb3);
   CYC(b_+129, b_+130); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+130, b_+133);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 state4:
   CALL_C(b_+133, linkIncrementDirectionOnOddFrames_hook, SYM(linkIncrementDirectionOnOddFrames), b_+136);
@@ -2386,8 +2377,7 @@ state5:
   if (!(F & FZ)) { CYCT(b_+161, b_+162); ret_effect(gb); return; }
   CYC(b_+161, b_+162);
   CYC(b_+162, b_+165);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 state6:
   CYC(b_+165, b_+167); C = 0x02;
@@ -2404,8 +2394,7 @@ state6:
   CYC(b_+184, b_+187); SET_HL(wTmpcbb3);
   CYC(b_+187, b_+188); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+188, b_+191);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 state7:
   CYC(b_+191, b_+194); A = W8(wDisabledObjects);
@@ -2420,8 +2409,7 @@ state7:
   if (!(F & FZ)) { CYCT(b_+203, b_+204); ret_effect(gb); return; }
   CYC(b_+203, b_+204);
   CYC(b_+204, b_+207);
-  linkIncrementDirection_hook(gb);
-  return;
+  TAIL(linkIncrementDirection);
 
 finish:
   CYC(b_+207, b_+209); E = (uint8_t)w1Link_direction;
@@ -2429,8 +2417,7 @@ finish:
   CYC(b_+210, b_+212); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
     CYCT(b_+212, b_+215);
-    linkIncrementDirection_hook(gb);
-    return;
+    TAIL(linkIncrementDirection);
   }
   CYC(b_+212, b_+215);
   CYC(b_+215, b_+218); A = W8(wActiveMusic2);
@@ -2450,20 +2437,20 @@ void linkState0a_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x0f);
   CYC(b_+5, b_+6); push_effect(gb, b_+6);
   do { uint16_t jt_ = (link_jump_table(gb));
-    if (jt_ == SYM(warpTransition0)) { warpTransition0_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition1)) { warpTransition1_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition2)) { warpTransition2_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition3)) { warpTransition3_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition4)) { warpTransition4_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition5)) { warpTransition5_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition6)) { warpTransition6_hook(gb); return; }
-    else if (jt_ == SYM(warpTransitionA)) { warpTransitionA_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition8)) { warpTransition8_hook(gb); return; }
-    else if (jt_ == SYM(warpTransition9)) { warpTransition9_hook(gb); return; }
-    else if (jt_ == SYM(warpTransitionB)) { warpTransitionB_hook(gb); return; }
-    else if (jt_ == SYM(warpTransitionC)) { warpTransitionC_hook(gb); return; }
-    else if (jt_ == SYM(warpTransitionE)) { warpTransitionE_hook(gb); return; }
-    else if (jt_ == SYM(warpTransitionF)) { warpTransitionF_hook(gb); return; }
+    if (jt_ == SYM(warpTransition0) && hook_enabled_at(gb, SYM(warpTransition0))) { warpTransition0_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition1) && hook_enabled_at(gb, SYM(warpTransition1))) { warpTransition1_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition2) && hook_enabled_at(gb, SYM(warpTransition2))) { warpTransition2_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition3) && hook_enabled_at(gb, SYM(warpTransition3))) { warpTransition3_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition4) && hook_enabled_at(gb, SYM(warpTransition4))) { warpTransition4_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition5) && hook_enabled_at(gb, SYM(warpTransition5))) { warpTransition5_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition6) && hook_enabled_at(gb, SYM(warpTransition6))) { warpTransition6_hook(gb); return; }
+    else if (jt_ == SYM(warpTransitionA) && hook_enabled_at(gb, SYM(warpTransitionA))) { warpTransitionA_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition8) && hook_enabled_at(gb, SYM(warpTransition8))) { warpTransition8_hook(gb); return; }
+    else if (jt_ == SYM(warpTransition9) && hook_enabled_at(gb, SYM(warpTransition9))) { warpTransition9_hook(gb); return; }
+    else if (jt_ == SYM(warpTransitionB) && hook_enabled_at(gb, SYM(warpTransitionB))) { warpTransitionB_hook(gb); return; }
+    else if (jt_ == SYM(warpTransitionC) && hook_enabled_at(gb, SYM(warpTransitionC))) { warpTransitionC_hook(gb); return; }
+    else if (jt_ == SYM(warpTransitionE) && hook_enabled_at(gb, SYM(warpTransitionE))) { warpTransitionE_hook(gb); return; }
+    else if (jt_ == SYM(warpTransitionF) && hook_enabled_at(gb, SYM(warpTransitionF))) { warpTransitionF_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -2543,8 +2530,7 @@ substate0:
   CALL_C(b_+19, linkCancelAllItemUsageAndClearAdjacentWallsBitset_hook, SYM(linkCancelAllItemUsageAndClearAdjacentWallsBitset), b_+22);
   CYC(b_+22, b_+24); A = 0x10;
   CYC(b_+24, b_+27);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate1:
   CALL_C(b_+27, checkLinkForceState_hook, SYM(checkLinkForceState), b_+30);
@@ -2593,8 +2579,7 @@ substate0:
   CYC(b_+23, b_+25); alu_and(gb, 0x0f);
   CYC(b_+25, b_+27); alu_add(gb, 0x0e);
   CYC(b_+27, b_+30);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate1:
   CALL_C(b_+30, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+33);
@@ -2641,8 +2626,7 @@ substate0:
   CALL_C(b_+25, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+28);
   CYC(b_+28, b_+30); A = 0x65;
   CYC(b_+30, b_+33);
-  playSound_b00_hook(gb);
-  return;
+  TAIL(playSound_b00);
 
 substate1:
   CYC(b_+33, b_+35); E = 0x21;
@@ -2677,8 +2661,7 @@ state0:
   CYC(b_+21, b_+23); mem_wr(gb, HL, 0x02);
   CYC(b_+23, b_+25); A = 0x04;
   CYC(b_+25, b_+28);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 state1:
   CALL_C(b_+28, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+31);
@@ -2690,8 +2673,7 @@ state1:
   CALL_C(b_+40, animateLinkStanding_hook, SYM(animateLinkStanding), b_+43);
   CYC(b_+43, b_+45); A = 0x87;
   CYC(b_+45, b_+48);
-  playSound_b00_hook(gb);
-  return;
+  TAIL(playSound_b00);
 
 state2:
   CYC(b_+48, b_+51); A = W8(wDisabledObjects);
@@ -2806,8 +2788,7 @@ substate0:
   CYC(b_+44, b_+46); A = 0x02;
   CALL_C(b_+46, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+49);
   CYC(b_+49, b_+52);
-  objectSetVisiblec2_hook(gb);
-  return;
+  TAIL(objectSetVisiblec2);
 
 substate1:
   CALL_C(b_+52, objectApplySpeed_hook, SYM(objectApplySpeed), b_+55);
@@ -2816,8 +2797,7 @@ substate1:
   if (!(F & FC)) { CYCT(b_+60, b_+61); ret_effect(gb); return; }
   CYC(b_+60, b_+61);
   CYC(b_+61, b_+64);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 substate2:
   CALL_C(b_+64, itemDecCounter1_hook, SYM(itemDecCounter1), b_+67);
@@ -2858,8 +2838,7 @@ substate1:
   CYC(b_+39, b_+41); mem_wr(gb, HL, 0x00);
   if (!(F & FZ)) {
     CYCT(b_+41, b_+44);
-    specialObjectUpdatePosition_hook(gb);
-    return;
+    TAIL(specialObjectUpdatePosition);
   }
   CYC(b_+41, b_+44);
   CYC(b_+44, b_+47);
@@ -2895,8 +2874,7 @@ substate0:
   CYC(b_+18, b_+19); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+19, b_+22);
-    linkUpdateKnockback_hook(gb);
-    return;
+    TAIL(linkUpdateKnockback);
   }
   CYC(b_+19, b_+22);
   CYC(b_+22, b_+23); H = D;
@@ -2909,8 +2887,7 @@ substate0:
   CALL_C(b_+35, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+38);
   CYC(b_+38, b_+40); A = 0x64;
   CYC(b_+40, b_+43);
-  playSound_b00_hook(gb);
-  return;
+  TAIL(playSound_b00);
 
 substate1:
   CALL_C(b_+43, resetLinkInvincibility_hook, SYM(resetLinkInvincibility), b_+46);
@@ -2929,8 +2906,7 @@ substate1:
   CYC(b_+60, b_+61);
   CYC(b_+61, b_+63); A = 0x02;
   CYC(b_+63, b_+66);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 trigger_game_over:
   CYC(b_+66, b_+68); A = 0xff;
@@ -2997,8 +2973,7 @@ void warpTransition3_hook(GB *gb) {
   CYC(b_+44, b_+46);
   CYC(b_+46, b_+48); A = 0x6e;
   CYC(b_+48, b_+51);
-  playSound_b00_hook(gb);
-  return;
+  TAIL(playSound_b00);
 
 each_frame:
   CYC(b_+55, b_+58); A = W8(wScrollMode);
@@ -3011,8 +2986,7 @@ each_frame:
   CALL_C(b_+69, itemDecCounter1_hook, SYM(itemDecCounter1), b_+72);
   if (!(F & FZ)) {
     CYCT(b_+72, b_+75);
-    specialObjectUpdatePosition_hook(gb);
-    return;
+    TAIL(specialObjectUpdatePosition);
   }
   CYC(b_+72, b_+75);
   CYC(b_+75, b_+77); A = 0x01;
@@ -3023,8 +2997,7 @@ each_frame:
   CYC(b_+87, b_+89); alu_bit(gb, 7, A);
   if (!(F & FZ)) {
     CYCT(b_+89, b_+92);
-    warpUpdateRespawnPoint_hook(gb);
-    return;
+    TAIL(warpUpdateRespawnPoint);
   }
   CYC(b_+89, b_+92);
   CYC(b_+92, b_+94); A = alu_swap(gb, A);
@@ -3054,8 +3027,7 @@ destination_init:
   CYC(b_+117, b_+119); L = 0x06;
   CYC(b_+119, b_+121); mem_wr(gb, HL, 0x1c);
   CYC(b_+121, b_+124);
-  initLinkStateAndAnimateStanding_hook(gb);
-  return;
+  TAIL(initLinkStateAndAnimateStanding);
 
 enter_from_bottom:
   CYC(b_+163, b_+166); push_effect(gb, b_+166);
@@ -3173,8 +3145,7 @@ substate0:
   CYC(b_+120, b_+123); push_effect(gb, b_+123);
   warp_transition6_center_link_on_doorway(gb, sp0_);
   CYC(b_+123, b_+126);
-  objectSetInvisible_hook(gb);
-  return;
+  TAIL(objectSetInvisible);
 
 substate1:
   CYC(b_+126, b_+129); A = W8(wPaletteThread_mode);
@@ -3204,8 +3175,7 @@ substate1:
   if (F & FC) { CYCT(b_+168, b_+170); goto warp_failed; }
   CYC(b_+168, b_+170);
   CYC(b_+170, b_+173);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 warp_failed:
   CYC(b_+173, b_+175); E = 0x05;
@@ -3225,8 +3195,7 @@ make_link_visible_and_play_sound:
   CALL_C(b_+187, playSound_b00_hook, SYM(playSound_b00), b_+190);
   CALL_C(b_+190, objectSetVisiblec0_hook, SYM(objectSetVisiblec0), b_+193);
   CYC(b_+193, b_+196);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 substate3:
   CYC(b_+196, b_+199); push_effect(gb, b_+199);
@@ -3276,8 +3245,7 @@ maybe_show_strange_force_text:
   CALL_C(b_+273, updateLinkLocalRespawnPosition_hook, SYM(updateLinkLocalRespawnPosition), b_+276);
   CALL_C(b_+276, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+279);
   CYC(b_+279, b_+282);
-  initLinkStateAndAnimateStanding_hook(gb);
-  return;
+  TAIL(initLinkStateAndAnimateStanding);
 
 substate4:
   CALL_C(b_+282, itemDecCounter1_hook, SYM(itemDecCounter1), b_+285);
@@ -3296,8 +3264,7 @@ substate5:
   CYC(b_+296, b_+299); push_effect(gb, b_+299);
   warp_transition6_create_destination_timewarp_animation(gb, sp0_);
   CYC(b_+299, b_+302);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 substate6:
   CYC(b_+302, b_+305); push_effect(gb, b_+305);
@@ -3307,8 +3274,7 @@ substate6:
   CYC(b_+306, b_+308); mem_wr(gb, HL, 0x14);
   CALL_C(b_+308, objectSetInvisible_hook, SYM(objectSetInvisible), b_+311);
   CYC(b_+311, b_+314);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 substate7:
   CALL_C(b_+314, itemDecCounter1_hook, SYM(itemDecCounter1), b_+317);
@@ -3377,8 +3343,7 @@ void linkState01_hook(GB *gb) {
   CYC(b_+22, b_+23); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+23, b_+26);
-    setLinkStateToDead_hook(gb);
-    return;
+    TAIL(setLinkStateToDead);
   }
   CYC(b_+23, b_+26);
   CALL_C(b_+26, checkLinkForceState_hook, SYM(checkLinkForceState), b_+29);
@@ -3425,8 +3390,7 @@ interactions_done:
   CYC(b_+91, b_+93); alu_and(gb, 0x20);
   if (!(F & FZ)) {
     CYCT(b_+93, b_+96);
-    linkState01_sidescroll_hook(gb);
-    return;
+    TAIL(linkState01_sidescroll);
   }
   CYC(b_+93, b_+96);
   CALL_C(b_+96, linkApplyTileTypes_hook, SYM(linkApplyTileTypes), b_+99);
@@ -3481,16 +3445,14 @@ update_in_air:
   CALL_C(b_+178, specialObjectSetAngleRelativeToVar38_hook, SYM(specialObjectSetAngleRelativeToVar38), b_+181);
   CALL_C(b_+181, specialObjectUpdatePosition_hook, SYM(specialObjectUpdatePosition), b_+184);
   CYC(b_+184, b_+187);
-  specialObjectAnimate_hook(gb);
-  return;
+  TAIL(specialObjectAnimate);
 
 not_in_air:
   CYC(b_+187, b_+190); A = W8(wMagnetGloveState);
   CYC(b_+190, b_+192); alu_bit(gb, 6, A);
   if (!(F & FZ)) {
     CYCT(b_+192, b_+195);
-    animateLinkStanding_hook(gb);
-    return;
+    TAIL(animateLinkStanding);
   }
   CYC(b_+192, b_+195);
   CYC(b_+195, b_+197); E = 0x2d;
@@ -3498,8 +3460,7 @@ not_in_air:
   CYC(b_+198, b_+199); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+199, b_+202);
-    func_5631_hook(gb);
-    return;
+    TAIL(func_5631);
   }
   CYC(b_+199, b_+202);
   CYC(b_+202, b_+203); H = D;
@@ -3509,8 +3470,7 @@ not_in_air:
   CYC(b_+210, b_+211); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+211, b_+214);
-    linkUpdateSwimming_hook(gb);
-    return;
+    TAIL(linkUpdateSwimming);
   }
   CYC(b_+211, b_+214);
   CALL_C(b_+214, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+217);
@@ -3534,8 +3494,7 @@ check_underwater_transition:
   CYC(b_+244, b_+245); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+245, b_+248);
-    setLinkIDOverride_hook(gb);
-    return;
+    TAIL(setLinkIDOverride);
   }
   CYC(b_+245, b_+248);
   CYC(b_+248, b_+249); H = D;
@@ -3613,26 +3572,26 @@ void specialObjectCode_link_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (link_jump_table(gb));
-    if (jt_ == SYM(linkState00)) { linkState00_hook(gb); return; }
-    else if (jt_ == SYM(linkState01)) { linkState01_hook(gb); return; }
-    else if (jt_ == SYM(linkState02)) { linkState02_hook(gb); return; }
-    else if (jt_ == SYM(linkState03)) { linkState03_hook(gb); return; }
-    else if (jt_ == SYM(linkState04)) { linkState04_hook(gb); return; }
-    else if (jt_ == SYM(linkState05)) { linkState05_hook(gb); return; }
-    else if (jt_ == SYM(linkState06)) { linkState06_hook(gb); return; }
-    else if (jt_ == SYM(linkState07)) { linkState07_hook(gb); return; }
-    else if (jt_ == SYM(linkState08)) { linkState08_hook(gb); return; }
-    else if (jt_ == SYM(linkState09)) { linkState09_hook(gb); return; }
+    if (jt_ == SYM(linkState00) && hook_enabled_at(gb, SYM(linkState00))) { linkState00_hook(gb); return; }
+    else if (jt_ == SYM(linkState01) && hook_enabled_at(gb, SYM(linkState01))) { linkState01_hook(gb); return; }
+    else if (jt_ == SYM(linkState02) && hook_enabled_at(gb, SYM(linkState02))) { linkState02_hook(gb); return; }
+    else if (jt_ == SYM(linkState03) && hook_enabled_at(gb, SYM(linkState03))) { linkState03_hook(gb); return; }
+    else if (jt_ == SYM(linkState04) && hook_enabled_at(gb, SYM(linkState04))) { linkState04_hook(gb); return; }
+    else if (jt_ == SYM(linkState05) && hook_enabled_at(gb, SYM(linkState05))) { linkState05_hook(gb); return; }
+    else if (jt_ == SYM(linkState06) && hook_enabled_at(gb, SYM(linkState06))) { linkState06_hook(gb); return; }
+    else if (jt_ == SYM(linkState07) && hook_enabled_at(gb, SYM(linkState07))) { linkState07_hook(gb); return; }
+    else if (jt_ == SYM(linkState08) && hook_enabled_at(gb, SYM(linkState08))) { linkState08_hook(gb); return; }
+    else if (jt_ == SYM(linkState09) && hook_enabled_at(gb, SYM(linkState09))) { linkState09_hook(gb); return; }
     else if (jt_ == (SYM(linkState00) + 28)) { linkState0a_hook(gb); return; }
-    else if (jt_ == SYM(linkState0b)) { linkState0b_hook(gb); return; }
-    else if (jt_ == SYM(linkState0c)) { linkState0c_hook(gb); return; }
-    else if (jt_ == SYM(linkState0d)) { linkState0d_hook(gb); return; }
-    else if (jt_ == SYM(linkState0e)) { linkState0e_hook(gb); return; }
-    else if (jt_ == SYM(linkState0f)) { linkState0f_hook(gb); return; }
-    else if (jt_ == SYM(linkState11)) { linkState11_hook(gb); return; }
-    else if (jt_ == SYM(linkState12)) { linkState12_hook(gb); return; }
-    else if (jt_ == SYM(linkState13)) { linkState13_hook(gb); return; }
-    else if (jt_ == SYM(linkState14)) { linkState14_hook(gb); return; }
+    else if (jt_ == SYM(linkState0b) && hook_enabled_at(gb, SYM(linkState0b))) { linkState0b_hook(gb); return; }
+    else if (jt_ == SYM(linkState0c) && hook_enabled_at(gb, SYM(linkState0c))) { linkState0c_hook(gb); return; }
+    else if (jt_ == SYM(linkState0d) && hook_enabled_at(gb, SYM(linkState0d))) { linkState0d_hook(gb); return; }
+    else if (jt_ == SYM(linkState0e) && hook_enabled_at(gb, SYM(linkState0e))) { linkState0e_hook(gb); return; }
+    else if (jt_ == SYM(linkState0f) && hook_enabled_at(gb, SYM(linkState0f))) { linkState0f_hook(gb); return; }
+    else if (jt_ == SYM(linkState11) && hook_enabled_at(gb, SYM(linkState11))) { linkState11_hook(gb); return; }
+    else if (jt_ == SYM(linkState12) && hook_enabled_at(gb, SYM(linkState12))) { linkState12_hook(gb); return; }
+    else if (jt_ == SYM(linkState13) && hook_enabled_at(gb, SYM(linkState13))) { linkState13_hook(gb); return; }
+    else if (jt_ == SYM(linkState14) && hook_enabled_at(gb, SYM(linkState14))) { linkState14_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -3676,8 +3635,7 @@ parameter_drown:
   CYC(b_+47, b_+48); mem_wr(gb, DE, A);
   CYC(b_+48, b_+50); A = 0x0a;
   CYC(b_+50, b_+53);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 parameter_fall_down_hole:
   CALL_C(b_+53, objectCenterOnTile_hook, SYM(objectCenterOnTile), b_+56);
@@ -3700,8 +3658,7 @@ start_falling:
   CALL_C(b_+73, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+76);
   CYC(b_+76, b_+78); A = 0x65;
   CYC(b_+78, b_+81);
-  playSound_b00_hook(gb);
-  return;
+  TAIL(playSound_b00);
 
 substate1:
   CYC(b_+81, b_+82); H = D;
@@ -3709,8 +3666,7 @@ substate1:
   CYC(b_+84, b_+86); alu_bit(gb, 7, mem_rd(gb, HL));
   if (F & FZ) {
     CYCT(b_+86, b_+89);
-    specialObjectAnimate_hook(gb);
-    return;
+    TAIL(specialObjectAnimate);
   }
   CYC(b_+86, b_+89);
   CYC(b_+89, b_+92); A = W8(wActiveTileType);
@@ -3749,8 +3705,7 @@ respawn:
   CYC(b_+141, b_+142); A = L;
   CYC(b_+142, b_+145); W8(wEnteredWarpPosition) = A;
   CYC(b_+145, b_+148);
-  objectSetInvisible_hook(gb);
-  return;
+  TAIL(objectSetInvisible);
 
 substate2:
   CYC(b_+148, b_+149); H = D;
@@ -3790,8 +3745,7 @@ substate2:
   CALL_C(b_+198, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+201);
   CALL_C(b_+201, specialObjectUpdateAdjacentWallsBitset_hook, SYM(specialObjectUpdateAdjacentWallsBitset), b_+204);
   CYC(b_+204, b_+207);
-  animateLinkStanding_hook(gb);
-  return;
+  TAIL(animateLinkStanding);
 
 substate3:
   CALL_C(b_+207, itemDecCounter1_hook, SYM(itemDecCounter1), b_+210);
@@ -3800,8 +3754,7 @@ substate3:
   CYC(b_+211, b_+213); L = 0x24;
   CYC(b_+213, b_+215); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
   CYC(b_+215, b_+218);
-  initLinkStateAndAnimateStanding_hook(gb);
-  return;
+  TAIL(initLinkStateAndAnimateStanding);
 
 substate4:
   CYC(b_+218, b_+219); H = D;
@@ -3809,14 +3762,12 @@ substate4:
   CYC(b_+221, b_+223); alu_bit(gb, 7, mem_rd(gb, HL));
   if (F & FZ) {
     CYCT(b_+223, b_+226);
-    specialObjectAnimate_hook(gb);
-    return;
+    TAIL(specialObjectAnimate);
   }
   CYC(b_+223, b_+226);
   CALL_C(b_+226, objectSetInvisible_hook, SYM(objectSetInvisible), b_+229);
   CYC(b_+229, b_+232);
-  checkLinkForceState_hook(gb);
-  return;
+  TAIL(checkLinkForceState);
 
 substate5:
   CYC(b_+232, b_+234); E = 0x21;
@@ -3824,8 +3775,7 @@ substate5:
   CYC(b_+235, b_+236); alu_rlca(gb);
   if (!(F & FC)) {
     CYCT(b_+236, b_+239);
-    specialObjectAnimate_hook(gb);
-    return;
+    TAIL(specialObjectAnimate);
   }
   CYC(b_+236, b_+239);
   CYC(b_+239, b_+241);
@@ -3857,8 +3807,7 @@ substate0:
   CALL_C(b_+25, linkCancelAllItemUsage_hook, SYM(linkCancelAllItemUsage), b_+28);
   CYC(b_+28, b_+30); A = 0x67;
   CYC(b_+30, b_+33);
-  playSound_b00_hook(gb);
-  return;
+  TAIL(playSound_b00);
 
 substate2:
   CYC(b_+33, b_+34); alu_xor(gb, A);
@@ -3992,7 +3941,7 @@ void linkState0d_hook(GB *gb) {
   CYC(b_+8, b_+9); push_effect(gb, b_+9);
   do { uint16_t jt_ = (link_jump_table(gb));
     if (jt_ == b_+19) { goto substate0; }
-    else if (jt_ == SYM(updateLinkDamageTaken)) { updateLinkDamageTaken_hook(gb); return; }
+    else if (jt_ == SYM(updateLinkDamageTaken) && hook_enabled_at(gb, SYM(updateLinkDamageTaken))) { updateLinkDamageTaken_hook(gb); return; }
     else if (jt_ == b_+32) { goto substate2; }
     else if (jt_ == b_+62) { goto substate3; }
     else if (jt_ == b_+81) { goto substate4; }
@@ -4007,8 +3956,7 @@ substate0:
   CYC(b_+27, b_+28); alu_xor(gb, A);
   CYC(b_+28, b_+29); mem_wr(gb, DE, A);
   CYC(b_+29, b_+32);
-  linkCancelAllItemUsage_hook(gb);
-  return;
+  TAIL(linkCancelAllItemUsage);
 
 substate2:
   CYC(b_+32, b_+34); A = 0x03;
@@ -4028,8 +3976,7 @@ substate2:
   CYC(b_+55, b_+57); mem_wr(gb, HL, 0x3c);
   CYC(b_+57, b_+59); A = 0x03;
   CYC(b_+59, b_+62);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate3:
   CALL_C(b_+62, itemDecCounter1_hook, SYM(itemDecCounter1), b_+65);
@@ -4040,8 +3987,7 @@ substate3:
   CALL_C(b_+72, specialObjectUpdateAdjacentWallsBitset_hook, SYM(specialObjectUpdateAdjacentWallsBitset), b_+75);
   CALL_C(b_+75, specialObjectUpdatePosition_hook, SYM(specialObjectUpdatePosition), b_+78);
   CYC(b_+78, b_+81);
-  specialObjectAnimate_hook(gb);
-  return;
+  TAIL(specialObjectAnimate);
 
 substate4:
   CYC(b_+81, b_+82); H = D;
@@ -4081,8 +4027,7 @@ substate0:
   CYC(b_+32, b_+35); W8(wLinkInAir) = A;
   CYC(b_+35, b_+37); A = 0x2f;
   CYC(b_+37, b_+40);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate1:
   CALL_C(b_+40, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+43);
@@ -4094,8 +4039,7 @@ substate1:
   CYC(b_+54, b_+55);
   CALL_C(b_+55, itemIncSubstate_hook, SYM(itemIncSubstate), b_+58);
   CYC(b_+58, b_+61);
-  specialObjectSetPositionToVar38IfSet_hook(gb);
-  return;
+  TAIL(specialObjectSetPositionToVar38IfSet);
 
 substate2:
   CALL_C(b_+61, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+64);
@@ -4131,8 +4075,7 @@ anim_parameter0:
 
 anim_parameter3:
   CYC(b_+96, b_+99);
-  brightenRoom_hook(gb);
-  return;
+  TAIL(brightenRoom);
 
 anim_parameter4:
   CYC(b_+99, b_+102); SET_BC(0xfe80);
@@ -4199,8 +4142,7 @@ substate2:
   CALL_C(b_+66, objectCheckTileCollision_allowHoles_hook, SYM(objectCheckTileCollision_allowHoles), b_+69);
   if (F & FC) {
     CYCT(b_+69, b_+72);
-    specialObjectUpdatePositionWithoutTileEdgeAdjust_hook(gb);
-    return;
+    TAIL(specialObjectUpdatePositionWithoutTileEdgeAdjust);
   }
   CYC(b_+69, b_+72);
   CYC(b_+72, b_+75); SET_BC(0xfe00);
@@ -4289,8 +4231,7 @@ substate3:
   CYC(b_+77, b_+78); mem_wr(gb, HL, A);
   CYC(b_+78, b_+81); SET_BC(0xf4f8);
   CYC(b_+81, b_+84);
-  objectCreateExclamationMark_hook(gb);
-  return;
+  TAIL(objectCreateExclamationMark);
 
 substate4:
   CALL_C(b_+84, itemDecCounter1_hook, SYM(itemDecCounter1), b_+87);
@@ -4304,8 +4245,7 @@ substate4:
   CALL_C(b_+98, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+101);
   CYC(b_+101, b_+103); A = 0x53;
   CYC(b_+103, b_+106);
-  playSound_b00_hook(gb);
-  return;
+  TAIL(playSound_b00);
 
 substate5:
   CYC(b_+106, b_+108); C = 0x18;
@@ -4374,8 +4314,7 @@ substate2:
   CYC(b_+59, b_+60); alu_rrca(gb);
   if (F & FC) {
     CYCT(b_+60, b_+63);
-    objectSetInvisible_hook(gb);
-    return;
+    TAIL(objectSetInvisible);
   }
   CYC(b_+60, b_+63);
   CALL_C(b_+63, objectSetVisible_hook, SYM(objectSetVisible), b_+66);
@@ -4388,8 +4327,7 @@ substate2:
   CYC(b_+75, b_+77);
   CALL_C(b_+77, respawnLink_hook, SYM(respawnLink), b_+80);
   CYC(b_+80, b_+82);
-  checkLinkForceState_hook(gb);
-  return;
+  TAIL(checkLinkForceState);
 
 force_state:
   CYC(b_+82, b_+84); A = 0x03;
@@ -4808,8 +4746,7 @@ void linkUpdateMovement_hook(GB *gb) {
   CYC(b_+26, b_+27);
   CYC(b_+27, b_+28); A = C;
   CYC(b_+28, b_+31);
-  updateHeartRingCounter_hook(gb);
-  return;
+  TAIL(updateHeartRingCounter);
 
 reset_speed:
   CYC(b_+32, b_+35);

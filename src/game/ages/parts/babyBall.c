@@ -58,7 +58,7 @@ state0:
   CYC(b_+32, b_+34); mem_wr(gb, HL, 0x1e);
   CYC(b_+34, b_+36); A = 0xbf; // SND_BLUE_STALFOS_CHARGE
   CALL_C(b_+36, playSound_b00_hook, SYM(playSound_b00), b_+39);
-  CYC(b_+39, b_+42); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+39, b_+42); TAIL(objectSetVisible82); // jp
 
 state1:
   CALL_C(b_+42, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+45);
@@ -98,11 +98,11 @@ applySpeed:
   CALL_C(b_+94, objectApplySpeed_hook, SYM(objectApplySpeed), b_+97);
 
 animate:
-  CYC(b_+97, b_+100); partAnimate_hook(gb); return; // jp
+  CYC(b_+97, b_+100); TAIL(partAnimate); // jp
 
 veranFairyBeat:
   CALL_C(b_+100, objectCreatePuff_hook, SYM(objectCreatePuff), b_+103);
 
 delete:
-  CYC(b_+103, b_+106); partDelete_hook(gb); return; // jp
+  CYC(b_+103, b_+106); TAIL(partDelete); // jp
 }

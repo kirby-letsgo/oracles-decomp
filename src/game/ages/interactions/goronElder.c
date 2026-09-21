@@ -63,7 +63,7 @@ L_6a7f:
   CYC(b_+27, b_+28); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+28, b_+31); npcFaceLinkAndAnimate_hook(gb); return; } // jp z
   CYC(b_+28, b_+31);
-  CYC(b_+31, b_+34); interactionAnimateAsNpc_hook(gb); return; // jp
+  CYC(b_+31, b_+34); TAIL(interactionAnimateAsNpc); // jp
 
 subid2:
   CYC(b_+34, b_+36); A = 0x14; // GLOBALFLAG_FINISHEDGAME

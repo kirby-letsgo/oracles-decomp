@@ -105,13 +105,13 @@ subid00:
   CYC(b_+19, b_+22); A = mem_rd(gb, wScrollMode);
   CYC(b_+22, b_+24); alu_and(gb, 0x02);
   if (F & FZ) {
-    CYCT(b_+24, b_+27); interactionDelete_hook(gb); return;
+    CYCT(b_+24, b_+27); TAIL(interactionDelete);
   }
   CYC(b_+24, b_+27);
   CYC(b_+27, b_+30); A = W8(w1Link_yh);
   CYC(b_+30, b_+32); alu_cp(gb, 0x78);
   if (F & FC) {
-    CYCT(b_+32, b_+35); interactionDelete_hook(gb); return;
+    CYCT(b_+32, b_+35); TAIL(interactionDelete);
   }
   CYC(b_+32, b_+35);
   CALL_C(b_+35, interactionIncState_hook, SYM(interactionIncState), b_+38);
@@ -160,7 +160,7 @@ subid01_substate0:
 runScript:
   CALL_C(b_+132, interactionRunScript_hook, SYM(interactionRunScript), b_+135);
   if (F & FC) {
-    CYCT(b_+135, b_+138); interactionDelete_hook(gb); return;
+    CYCT(b_+135, b_+138); TAIL(interactionDelete);
   }
   CYC(b_+135, b_+138);
   CYC(b_+138, b_+139); ret_effect(gb);
@@ -205,7 +205,7 @@ subid04:
   CALL_C(b_+184, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+187);
   CYC(b_+187, b_+189); alu_bit(gb, 7, A);
   if (!(F & FZ)) {
-    CYCT(b_+189, b_+192); interactionDelete_hook(gb); return;
+    CYCT(b_+189, b_+192); TAIL(interactionDelete);
   }
   CYC(b_+189, b_+192);
   CYC(b_+192, b_+195); A = mem_rd(gb, wNumEnemies);

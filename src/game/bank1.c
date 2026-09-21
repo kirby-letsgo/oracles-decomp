@@ -245,8 +245,7 @@ void func_5d41_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+7, b_+10);
-    applyWarpTransition2_hook(gb);
-    return;
+    TAIL(applyWarpTransition2);
   }
   CYC(b_+7, b_+10);
   CYC(b_+10, b_+13);
@@ -323,8 +322,7 @@ void applyWarpTransition2_hook(GB *gb) {
   CYC(b_+37, b_+39); alu_bit(gb, 7, B);
   if (F & FZ) {
     CYCT(b_+39, b_+42);
-    fadeoutToWhite_hook(gb);
-    return;
+    TAIL(fadeoutToWhite);
   }
   CYC(b_+39, b_+42);
   CYC(b_+42, b_+44); A = 0x04;
@@ -354,8 +352,7 @@ void checkDisplayEraOrSeasonInfo_hook(GB *gb) {
     CYC(b_+5, b_+7);
     CYC(b_+7, b_+9); A = 0x16;
     CYC(b_+9, b_+12);
-    unsetGlobalFlag_hook(gb);
-    return;
+    TAIL(unsetGlobalFlag);
   }
   CYC(b_+12, b_+15); A = mem_rd(gb, wSentBackByStrangeForce);
   CYC(b_+15, b_+16); A = alu_dec8(gb, A);
@@ -517,8 +514,7 @@ void getNextActiveRoom_hook(GB *gb) {
   CALL_C(b_+12, findRoomSpecificData_hook, SYM(findRoomSpecificData), b_+15);
   if (!(F & FC)) {
     CYCT(b_+15, b_+17);
-    screenTransitionStandard_hook(gb);
-    return;
+    TAIL(screenTransitionStandard);
   }
   CYC(b_+15, b_+17);
   CYC(b_+17, b_+18); bank1_jump_table_from_rst(gb, b_+18);
@@ -549,8 +545,7 @@ void screenTransitionForestScrambler_hook(GB *gb) {
   CALL_C(b_+2, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+5);
   if (!(F & FZ)) {
     CYCT(b_+5, b_+8);
-    screenTransitionStandard_hook(gb);
-    return;
+    TAIL(screenTransitionStandard);
   }
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+11); A = W8(wActiveRoom);
@@ -577,8 +572,7 @@ void screenTransitionForestScrambler_hook(GB *gb) {
   CYC(b_+40, b_+41); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+41, b_+44);
-    screenTransitionStandard_hook(gb);
-    return;
+    TAIL(screenTransitionStandard);
   }
   CYC(b_+41, b_+44);
   CYC(b_+44, b_+47); W8(wActiveRoom) = A;
@@ -609,8 +603,7 @@ void screenTransitionEyePuzzle_hook(GB *gb) {
   target = HL;
   do { uint16_t jt_ = (target);
     if (jt_ == SYM(screenTransitionStandard)) {
-      screenTransitionStandard_hook(gb);
-      return;
+      TAIL(screenTransitionStandard);
     }
     else if (jt_ == b_+31) {
       screenTransitionEyePuzzle_up(gb);
@@ -884,24 +877,21 @@ void checkTileWarps_hook(GB *gb) {
   CYC(b_+12, b_+13); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+13, b_+15);
-    noWarpInitiated_hook(gb);
-    return;
+    TAIL(noWarpInitiated);
   }
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+17); A = mem_rd(gb, hFF8C);
   CALL_C(b_+17, checkTileIsWarpTile_hook, SYM(checkTileIsWarpTile), b_+20);
   if (!(F & FC)) {
     CYCT(b_+20, b_+22);
-    noWarpInitiated_hook(gb);
-    return;
+    TAIL(noWarpInitiated);
   }
   CYC(b_+20, b_+22);
   CYC(b_+22, b_+25); A = W8(wLinkGrabState);
   CYC(b_+25, b_+26); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+26, b_+28);
-    noWarpInitiated_hook(gb);
-    return;
+    TAIL(noWarpInitiated);
   }
   CYC(b_+26, b_+28);
   CYC(b_+28, b_+31); push_effect(gb, b_+31);
@@ -915,8 +905,7 @@ void checkTileWarps_hook(GB *gb) {
   CALL_C(b_+33, checkLinkCloseEnoughToWarpTileCenter_hook, SYM(checkLinkCloseEnoughToWarpTileCenter), b_+36);
   if (!(F & FC)) {
     CYCT(b_+36, b_+38);
-    noWarpInitiated_hook(gb);
-    return;
+    TAIL(noWarpInitiated);
   }
   CYC(b_+36, b_+38);
   check_tile_warps_initiate(gb, sp0_);
@@ -976,8 +965,7 @@ void checkScreenEdgeWarps_hook(GB *gb) {
   CYC(b_+16, b_+18); alu_cp(gb, 0xff);
   if (F & FZ) {
     CYCT(b_+18, b_+21);
-    noWarpInitiated_hook(gb);
-    return;
+    TAIL(noWarpInitiated);
   }
   CYC(b_+18, b_+21);
   CYC(b_+21, b_+24); warpInitiated_hook(gb);
@@ -1276,8 +1264,7 @@ void checkSeedTreeRefillIndex_hook(GB *gb) {
     CYC(b_+20, b_+21); alu_cp(gb, C);
     if (F & FZ) {
       CYCT(b_+21, b_+23);
-      checkSeedTreeRefillIndex__treeScreen_hook(gb);
-      return;
+      TAIL(checkSeedTreeRefillIndex__treeScreen);
     }
     CYC(b_+21, b_+23);
   }
@@ -1302,8 +1289,7 @@ void checkSeedTreeRefillIndex_hook(GB *gb) {
     CYC(b_+45, b_+46); alu_or(gb, A);
     if (F & FZ) {
       CYCT(b_+46, b_+48);
-      checkSeedTreeRefillIndex__addRoom_hook(gb);
-      return;
+      TAIL(checkSeedTreeRefillIndex__addRoom);
     }
     CYC(b_+46, b_+48);
     CYC(b_+48, b_+49); alu_cp(gb, B);
@@ -1418,8 +1404,8 @@ void func_60e9_hook(GB *gb) {
   CYC(b_+70, b_+73); A = mem_rd(gb, wActiveGroup);
   CYC(b_+73, b_+74); bank1_jump_table_from_rst(gb, b_+74);
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(checkWarpsTopDown)) { checkWarpsTopDown_hook(gb); return; }
-    else if (jt_ == SYM(checkWarpsSidescrolling)) { checkWarpsSidescrolling_hook(gb); return; }
+    if (jt_ == SYM(checkWarpsTopDown) && hook_enabled_at(gb, SYM(checkWarpsTopDown))) { checkWarpsTopDown_hook(gb); return; }
+    else if (jt_ == SYM(checkWarpsSidescrolling) && hook_enabled_at(gb, SYM(checkWarpsSidescrolling))) { checkWarpsSidescrolling_hook(gb); return; }
     else { hook_handoff(gb, HL); return; }
   } while (0);
 }
@@ -1499,8 +1485,7 @@ void paletteFadeHandler01_hook(GB *gb) {
   CYC(b_+12, b_+14); alu_cp(gb, 0x20);
   if (!(F & FC)) {
     CYCT(b_+14, b_+17);
-    paletteThread_stop_hook(gb);
-    return;
+    TAIL(paletteThread_stop);
   }
   CYC(b_+14, b_+17);
   CYC(b_+17, b_+20); mem_wr(gb, (wThreadStateBuffer + 31), A);
@@ -1535,8 +1520,7 @@ void paletteFadeHandler02_hook(GB *gb) {
   CYC(b_+11, b_+12); alu_sub(gb, C);
   if (F & FC) {
     CYCT(b_+12, b_+14);
-    paletteThread_stop_hook(gb);
-    return;
+    TAIL(paletteThread_stop);
   }
   CYC(b_+12, b_+14);
   CYC(b_+14, b_+17); mem_wr(gb, (wThreadStateBuffer + 31), A);
@@ -1568,8 +1552,7 @@ void paletteFadeHandler03_hook(GB *gb) {
   CYC(b_+11, b_+13); alu_cp(gb, 0xe0);
   if (F & FC) {
     CYCT(b_+13, b_+15);
-    paletteThread_stop_hook(gb);
-    return;
+    TAIL(paletteThread_stop);
   }
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+18); mem_wr(gb, (wThreadStateBuffer + 31), A);
@@ -1600,8 +1583,7 @@ void paletteFadeHandler04_hook(GB *gb) {
   CYC(b_+10, b_+11); alu_add(gb, C);
   if (F & FC) {
     CYCT(b_+11, b_+13);
-    paletteThread_stop_hook(gb);
-    return;
+    TAIL(paletteThread_stop);
   }
   CYC(b_+11, b_+13);
   CYC(b_+13, b_+16); mem_wr(gb, (wThreadStateBuffer + 31), A);
@@ -1660,14 +1642,12 @@ void paletteFadeHandler05_hook(GB *gb) {
   CYC(b_+16, b_+17); alu_cp(gb, B);
   if (F & FZ) {
     CYCT(b_+17, b_+19);
-    paletteThread_stop_hook(gb);
-    return;
+    TAIL(paletteThread_stop);
   }
   CYC(b_+17, b_+19);
   if (F & FC) {
     CYCT(b_+19, b_+21);
-    paletteThread_stop_hook(gb);
-    return;
+    TAIL(paletteThread_stop);
   }
   CYC(b_+19, b_+21);
   CYC(b_+21, b_+24); mem_wr(gb, (wThreadStateBuffer + 31), A);
@@ -1702,14 +1682,12 @@ void paletteFadeHandler06_hook(GB *gb) {
   CYC(b_+19, b_+20); alu_cp(gb, B);
   if (F & FZ) {
     CYCT(b_+20, b_+22);
-    paletteThread_stop_hook(gb);
-    return;
+    TAIL(paletteThread_stop);
   }
   CYC(b_+20, b_+22);
   if (!(F & FC)) {
     CYCT(b_+22, b_+25);
-    paletteThread_setFadeOffsetAndStop_hook(gb);
-    return;
+    TAIL(paletteThread_setFadeOffsetAndStop);
   }
   CYC(b_+22, b_+25);
   CYC(b_+25, b_+27); alu_sub(gb, 0x1f);
@@ -1741,8 +1719,7 @@ void paletteFadeHandler07_hook(GB *gb) {
   CYC(b_+30, b_+31); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+31, b_+33);
-    paletteThread_refreshPalettesAndStop_hook(gb);
-    return;
+    TAIL(paletteThread_refreshPalettesAndStop);
   }
   CYC(b_+31, b_+33);
   CYC(b_+33, b_+34); B = A;
@@ -1752,8 +1729,7 @@ void paletteFadeHandler07_hook(GB *gb) {
   CYC(b_+39, b_+41); alu_cp(gb, 0xf0);
   if (F & FZ) {
     CYCT(b_+41, b_+44);
-    darkenRoom_hook(gb);
-    return;
+    TAIL(darkenRoom);
   }
   CYC(b_+41, b_+44);
   CYC(b_+44, b_+47); darkenRoomLightly_hook(gb);
@@ -1776,8 +1752,7 @@ void palette_fade_handler08_body_hook(GB *gb) {
   CYC(b_+23, b_+24); alu_rrca(gb);
   if (F & FC) {
     CYCT(b_+24, b_+27);
-    paletteThread_mixBG234Palettes_hook(gb);
-    return;
+    TAIL(paletteThread_mixBG234Palettes);
   }
   CYC(b_+24, b_+27);
   CALL_C(b_+27, paletteThread_mixBG567Palettes_hook, SYM(paletteThread_mixBG567Palettes), b_+30);
@@ -1795,8 +1770,7 @@ void paletteFadeHandler08_hook(GB *gb) {
   CYC(b_+3, b_+4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (F & FZ) {
     CYCT(b_+4, b_+6);
-    paletteFadeHandler08__stop_hook(gb);
-    return;
+    TAIL(paletteFadeHandler08__stop);
   }
   CYC(b_+4, b_+6);
   palette_fade_handler08_body_hook(gb);
@@ -2437,16 +2411,14 @@ void checkSymmetryCityPaletteTransition_hook(GB *gb) {
   CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+4, b_+6);
-    checkSymmetryCityPaletteTransition__ok_hook(gb);
-    return;
+    TAIL(checkSymmetryCityPaletteTransition__ok);
   }
   CYC(b_+4, b_+6);
   CYC(b_+6, b_+8); A = 0x29;
   CALL_C(b_+8, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+11);
   if (F & FZ) {
     CYCT(b_+11, b_+13);
-    checkSymmetryCityPaletteTransition__ok_hook(gb);
-    return;
+    TAIL(checkSymmetryCityPaletteTransition__ok);
   }
   CYC(b_+11, b_+13);
   CYC(b_+13, b_+16); A = mem_rd(gb, wActiveRoom);
@@ -2720,12 +2692,12 @@ void func_400b_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wScreenTransitionState);
   CYC(b_+3, b_+4); bank1_jump_table_from_rst(gb, b_+4);
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(screenTransitionState0)) { screenTransitionState0_hook(gb); return; }
-    else if (jt_ == SYM(screenTransitionState1)) { screenTransitionState1_hook(gb); return; }
-    else if (jt_ == SYM(screenTransitionState2)) { screenTransitionState2_hook(gb); return; }
-    else if (jt_ == SYM(screenTransitionState3)) { screenTransitionState3_hook(gb); return; }
-    else if (jt_ == SYM(screenTransitionState4)) { screenTransitionState4_hook(gb); return; }
-    else if (jt_ == SYM(screenTransitionState5)) { screenTransitionState5_hook(gb); return; }
+    if (jt_ == SYM(screenTransitionState0) && hook_enabled_at(gb, SYM(screenTransitionState0))) { screenTransitionState0_hook(gb); return; }
+    else if (jt_ == SYM(screenTransitionState1) && hook_enabled_at(gb, SYM(screenTransitionState1))) { screenTransitionState1_hook(gb); return; }
+    else if (jt_ == SYM(screenTransitionState2) && hook_enabled_at(gb, SYM(screenTransitionState2))) { screenTransitionState2_hook(gb); return; }
+    else if (jt_ == SYM(screenTransitionState3) && hook_enabled_at(gb, SYM(screenTransitionState3))) { screenTransitionState3_hook(gb); return; }
+    else if (jt_ == SYM(screenTransitionState4) && hook_enabled_at(gb, SYM(screenTransitionState4))) { screenTransitionState4_hook(gb); return; }
+    else if (jt_ == SYM(screenTransitionState5) && hook_enabled_at(gb, SYM(screenTransitionState5))) { screenTransitionState5_hook(gb); return; }
     else { hook_handoff(gb, HL); return; }
   } while (0);
 }
@@ -2797,7 +2769,7 @@ void screen_transition_state1_body_hook(GB *gb) {
       if (jt_ == b_+19) { entry = b_+19; break; }
       else if (jt_ == b_+44) { entry = b_+44; break; }
       else if (jt_ == b_+76) { entry = b_+76; break; }
-      else if (jt_ == SYM(setScreenTransitionState02)) { setScreenTransitionState02_hook(gb); return; }
+      else if (jt_ == SYM(setScreenTransitionState02) && hook_enabled_at(gb, SYM(setScreenTransitionState02))) { setScreenTransitionState02_hook(gb); return; }
       else { hook_handoff(gb, HL); return; }
     } while (0);
   }
@@ -2813,7 +2785,7 @@ void screen_transition_state1_body_hook(GB *gb) {
     CYC(b_+34, b_+35); alu_xor(gb, A);
     CYC(b_+35, b_+38); mem_wr(gb, wScreenTransitionState3, A);
     CYC(b_+38, b_+41); mem_wr(gb, wcd03, A);
-    CYC(b_+41, b_+44); resetCamera_hook(gb); return;
+    CYC(b_+41, b_+44); TAIL(resetCamera);
   }
   if (entry == b_+44) {
     CYC(b_+44, b_+47); A = mem_rd(gb, wScreenOffsetX);
@@ -3340,9 +3312,9 @@ void screenTransitionState5_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wScreenTransitionState2);
   CYC(b_+3, b_+4); bank1_jump_table_from_rst(gb, b_+4);
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(screenTransitionState5Substate0)) { screenTransitionState5Substate0_hook(gb); return; }
-    else if (jt_ == SYM(screenTransitionState5Substate1)) { screenTransitionState5Substate1_hook(gb); return; }
-    else if (jt_ == SYM(screenTransitionState5Substate2)) { screenTransitionState5Substate2_hook(gb); return; }
+    if (jt_ == SYM(screenTransitionState5Substate0) && hook_enabled_at(gb, SYM(screenTransitionState5Substate0))) { screenTransitionState5Substate0_hook(gb); return; }
+    else if (jt_ == SYM(screenTransitionState5Substate1) && hook_enabled_at(gb, SYM(screenTransitionState5Substate1))) { screenTransitionState5Substate1_hook(gb); return; }
+    else if (jt_ == SYM(screenTransitionState5Substate2) && hook_enabled_at(gb, SYM(screenTransitionState5Substate2))) { screenTransitionState5Substate2_hook(gb); return; }
     else { hook_handoff(gb, HL); return; }
   } while (0);
 }
@@ -4127,8 +4099,7 @@ void cutscene17__state1_hook(GB *gb) {
   CYC(b_+76, b_+77); A = mem_rd(gb, HL);
   if (!(F & FZ)) {
     CYCT(b_+77, b_+80);
-    initWaveScrollValuesForEverySecondLine_hook(gb);
-    return;
+    TAIL(initWaveScrollValuesForEverySecondLine);
   }
   CYC(b_+77, b_+80);
   CYC(b_+80, b_+82); A = 0x02;
@@ -4351,12 +4322,10 @@ void cutscene15__state2_hook(GB *gb) {
   CYC(b_+257, b_+260); A = mem_rd(gb, wGenericCutscene_cbb3);
   CYC(b_+260, b_+261); bank1_jump_table_from_rst(gb, b_+261);
   if (HL == b_+112) {
-    cutscene15__state1__substate1_hook(gb);
-    return;
+    TAIL(cutscene15__state1__substate1);
   }
   if (HL == b_+265) {
-    cutscene15__state2__substate1_hook(gb);
-    return;
+    TAIL(cutscene15__state2__substate1);
   }
   hook_handoff(gb, HL);
 }
@@ -4664,21 +4633,21 @@ void paletteFadeHandler_hook(GB *gb) {
   CYC(b_+0, b_+3); A = W8(wPaletteThread_mode);
   CYC(b_+3, b_+4); bank1_jump_table_from_rst(gb, b_+4);
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(paletteFadeHandler09)) { paletteFadeHandler09_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler01)) { paletteFadeHandler01_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler00)) { paletteFadeHandler00_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler0a)) { paletteFadeHandler0a_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler02)) { paletteFadeHandler02_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler0b)) { paletteFadeHandler0b_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler03)) { paletteFadeHandler03_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler0c)) { paletteFadeHandler0c_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler04)) { paletteFadeHandler04_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler0d)) { paletteFadeHandler0d_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler05)) { paletteFadeHandler05_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler0e)) { paletteFadeHandler0e_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler06)) { paletteFadeHandler06_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler07)) { paletteFadeHandler07_hook(gb); return; }
-    else if (jt_ == SYM(paletteFadeHandler08)) { paletteFadeHandler08_hook(gb); return; }
+    if (jt_ == SYM(paletteFadeHandler09) && hook_enabled_at(gb, SYM(paletteFadeHandler09))) { paletteFadeHandler09_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler01) && hook_enabled_at(gb, SYM(paletteFadeHandler01))) { paletteFadeHandler01_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler00) && hook_enabled_at(gb, SYM(paletteFadeHandler00))) { paletteFadeHandler00_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler0a) && hook_enabled_at(gb, SYM(paletteFadeHandler0a))) { paletteFadeHandler0a_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler02) && hook_enabled_at(gb, SYM(paletteFadeHandler02))) { paletteFadeHandler02_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler0b) && hook_enabled_at(gb, SYM(paletteFadeHandler0b))) { paletteFadeHandler0b_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler03) && hook_enabled_at(gb, SYM(paletteFadeHandler03))) { paletteFadeHandler03_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler0c) && hook_enabled_at(gb, SYM(paletteFadeHandler0c))) { paletteFadeHandler0c_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler04) && hook_enabled_at(gb, SYM(paletteFadeHandler04))) { paletteFadeHandler04_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler0d) && hook_enabled_at(gb, SYM(paletteFadeHandler0d))) { paletteFadeHandler0d_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler05) && hook_enabled_at(gb, SYM(paletteFadeHandler05))) { paletteFadeHandler05_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler0e) && hook_enabled_at(gb, SYM(paletteFadeHandler0e))) { paletteFadeHandler0e_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler06) && hook_enabled_at(gb, SYM(paletteFadeHandler06))) { paletteFadeHandler06_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler07) && hook_enabled_at(gb, SYM(paletteFadeHandler07))) { paletteFadeHandler07_hook(gb); return; }
+    else if (jt_ == SYM(paletteFadeHandler08) && hook_enabled_at(gb, SYM(paletteFadeHandler08))) { paletteFadeHandler08_hook(gb); return; }
     else { hook_handoff(gb, HL); return; }
   } while (0);
 }
@@ -4745,10 +4714,10 @@ void runGameLogic_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wThreadStateBuffer + 0x0e);
   CYC(b_+3, b_+4); bank1_jump_table_from_rst(gb, b_+4);
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(initializeGame)) { initializeGame_hook(gb); return; }
-    else if (jt_ == SYM(loadingRoom)) { loadingRoom_hook(gb); return; }
-    else if (jt_ == SYM(standardGameState)) { standardGameState_hook(gb); return; }
-    else if (jt_ == SYM(linkSummonedCutscene)) { linkSummonedCutscene_hook(gb); return; }
+    if (jt_ == SYM(initializeGame) && hook_enabled_at(gb, SYM(initializeGame))) { initializeGame_hook(gb); return; }
+    else if (jt_ == SYM(loadingRoom) && hook_enabled_at(gb, SYM(loadingRoom))) { loadingRoom_hook(gb); return; }
+    else if (jt_ == SYM(standardGameState) && hook_enabled_at(gb, SYM(standardGameState))) { standardGameState_hook(gb); return; }
+    else if (jt_ == SYM(linkSummonedCutscene) && hook_enabled_at(gb, SYM(linkSummonedCutscene))) { linkSummonedCutscene_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -4864,8 +4833,7 @@ health_ready:
   CALL_C(b_+182, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+185);
   if (!(F & FZ)) {
     CYCT(b_+185, b_+187);
-    func_5a60_hook(gb);
-    return;
+    TAIL(func_5a60);
   }
   CYC(b_+185, b_+187);
   CYC(b_+187, b_+189); A = 0x3d;
@@ -4876,7 +4844,7 @@ health_ready:
   CYC(b_+196, b_+199); mem_wr(gb, wThreadStateBuffer + 0x0e, A);
   CYC(b_+199, b_+201); A = 0x0d;
   CYC(b_+201, b_+204); mem_wr(gb, wThreadStateBuffer + 0x0f, A);
-  CYC(b_+204, b_+207); cutscene0d_hook(gb); return;
+  CYC(b_+204, b_+207); TAIL(cutscene0d);
 
 summon_link:
   CYC(b_+207, b_+209); A = 0x03;
@@ -4977,40 +4945,40 @@ void standardGameState_hook(GB *gb) {
   CYC(b_+34, b_+37); A = mem_rd(gb, wThreadStateBuffer + 0x0f);
   CYC(b_+37, b_+38); bank1_jump_table_from_rst(gb, b_+38);
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(cutscene00)) { cutscene00_hook(gb); return; }
-    else if (jt_ == SYM(cutscene01)) { cutscene01_hook(gb); return; }
-    else if (jt_ == SYM(cutscene02)) { cutscene02_hook(gb); return; }
-    else if (jt_ == SYM(cutscene03)) { cutscene03_hook(gb); return; }
-    else if (jt_ == SYM(cutscene04)) { cutscene04_hook(gb); return; }
-    else if (jt_ == SYM(cutscene05)) { cutscene05_hook(gb); return; }
-    else if (jt_ == SYM(cutscene06)) { cutscene06_hook(gb); return; }
-    else if (jt_ == SYM(cutscene07)) { cutscene07_hook(gb); return; }
-    else if (jt_ == SYM(cutscene08)) { cutscene08_hook(gb); return; }
-    else if (jt_ == SYM(cutscene09)) { cutscene09_hook(gb); return; }
-    else if (jt_ == SYM(cutscene0a)) { cutscene0a_hook(gb); return; }
-    else if (jt_ == SYM(cutscene0b)) { cutscene0b_hook(gb); return; }
-    else if (jt_ == SYM(cutscene0c)) { cutscene0c_hook(gb); return; }
-    else if (jt_ == SYM(cutscene0d)) { cutscene0d_hook(gb); return; }
-    else if (jt_ == SYM(cutscene0e)) { cutscene0e_hook(gb); return; }
-    else if (jt_ == SYM(cutscene0f)) { cutscene0f_hook(gb); return; }
-    else if (jt_ == SYM(cutscene10)) { cutscene10_hook(gb); return; }
-    else if (jt_ == SYM(cutscene11)) { cutscene11_hook(gb); return; }
-    else if (jt_ == SYM(cutscene12)) { cutscene12_hook(gb); return; }
+    if (jt_ == SYM(cutscene00) && hook_enabled_at(gb, SYM(cutscene00))) { cutscene00_hook(gb); return; }
+    else if (jt_ == SYM(cutscene01) && hook_enabled_at(gb, SYM(cutscene01))) { cutscene01_hook(gb); return; }
+    else if (jt_ == SYM(cutscene02) && hook_enabled_at(gb, SYM(cutscene02))) { cutscene02_hook(gb); return; }
+    else if (jt_ == SYM(cutscene03) && hook_enabled_at(gb, SYM(cutscene03))) { cutscene03_hook(gb); return; }
+    else if (jt_ == SYM(cutscene04) && hook_enabled_at(gb, SYM(cutscene04))) { cutscene04_hook(gb); return; }
+    else if (jt_ == SYM(cutscene05) && hook_enabled_at(gb, SYM(cutscene05))) { cutscene05_hook(gb); return; }
+    else if (jt_ == SYM(cutscene06) && hook_enabled_at(gb, SYM(cutscene06))) { cutscene06_hook(gb); return; }
+    else if (jt_ == SYM(cutscene07) && hook_enabled_at(gb, SYM(cutscene07))) { cutscene07_hook(gb); return; }
+    else if (jt_ == SYM(cutscene08) && hook_enabled_at(gb, SYM(cutscene08))) { cutscene08_hook(gb); return; }
+    else if (jt_ == SYM(cutscene09) && hook_enabled_at(gb, SYM(cutscene09))) { cutscene09_hook(gb); return; }
+    else if (jt_ == SYM(cutscene0a) && hook_enabled_at(gb, SYM(cutscene0a))) { cutscene0a_hook(gb); return; }
+    else if (jt_ == SYM(cutscene0b) && hook_enabled_at(gb, SYM(cutscene0b))) { cutscene0b_hook(gb); return; }
+    else if (jt_ == SYM(cutscene0c) && hook_enabled_at(gb, SYM(cutscene0c))) { cutscene0c_hook(gb); return; }
+    else if (jt_ == SYM(cutscene0d) && hook_enabled_at(gb, SYM(cutscene0d))) { cutscene0d_hook(gb); return; }
+    else if (jt_ == SYM(cutscene0e) && hook_enabled_at(gb, SYM(cutscene0e))) { cutscene0e_hook(gb); return; }
+    else if (jt_ == SYM(cutscene0f) && hook_enabled_at(gb, SYM(cutscene0f))) { cutscene0f_hook(gb); return; }
+    else if (jt_ == SYM(cutscene10) && hook_enabled_at(gb, SYM(cutscene10))) { cutscene10_hook(gb); return; }
+    else if (jt_ == SYM(cutscene11) && hook_enabled_at(gb, SYM(cutscene11))) { cutscene11_hook(gb); return; }
+    else if (jt_ == SYM(cutscene12) && hook_enabled_at(gb, SYM(cutscene12))) { cutscene12_hook(gb); return; }
     else if (jt_ == SYM(tilesetLayoutGroup33)) { cutscene13_hook(gb); return; }
-    else if (jt_ == SYM(cutscene14)) { cutscene14_hook(gb); return; }
-    else if (jt_ == SYM(cutscene15)) { cutscene15_hook(gb); return; }
-    else if (jt_ == SYM(cutscene16)) { cutscene16_hook(gb); return; }
-    else if (jt_ == SYM(cutscene17)) { cutscene17_hook(gb); return; }
-    else if (jt_ == SYM(cutscene18)) { cutscene18_hook(gb); return; }
-    else if (jt_ == SYM(cutscene19)) { cutscene19_hook(gb); return; }
-    else if (jt_ == SYM(cutscene1a)) { cutscene1a_hook(gb); return; }
-    else if (jt_ == SYM(cutscene1b)) { cutscene1b_hook(gb); return; }
-    else if (jt_ == SYM(cutscene1c)) { cutscene1c_hook(gb); return; }
-    else if (jt_ == SYM(cutscene1d)) { cutscene1d_hook(gb); return; }
-    else if (jt_ == SYM(cutscene1e)) { cutscene1e_hook(gb); return; }
-    else if (jt_ == SYM(cutscene1f)) { cutscene1f_hook(gb); return; }
-    else if (jt_ == SYM(cutscene20)) { cutscene20_hook(gb); return; }
-    else if (jt_ == SYM(cutscene21)) { cutscene21_hook(gb); return; }
+    else if (jt_ == SYM(cutscene14) && hook_enabled_at(gb, SYM(cutscene14))) { cutscene14_hook(gb); return; }
+    else if (jt_ == SYM(cutscene15) && hook_enabled_at(gb, SYM(cutscene15))) { cutscene15_hook(gb); return; }
+    else if (jt_ == SYM(cutscene16) && hook_enabled_at(gb, SYM(cutscene16))) { cutscene16_hook(gb); return; }
+    else if (jt_ == SYM(cutscene17) && hook_enabled_at(gb, SYM(cutscene17))) { cutscene17_hook(gb); return; }
+    else if (jt_ == SYM(cutscene18) && hook_enabled_at(gb, SYM(cutscene18))) { cutscene18_hook(gb); return; }
+    else if (jt_ == SYM(cutscene19) && hook_enabled_at(gb, SYM(cutscene19))) { cutscene19_hook(gb); return; }
+    else if (jt_ == SYM(cutscene1a) && hook_enabled_at(gb, SYM(cutscene1a))) { cutscene1a_hook(gb); return; }
+    else if (jt_ == SYM(cutscene1b) && hook_enabled_at(gb, SYM(cutscene1b))) { cutscene1b_hook(gb); return; }
+    else if (jt_ == SYM(cutscene1c) && hook_enabled_at(gb, SYM(cutscene1c))) { cutscene1c_hook(gb); return; }
+    else if (jt_ == SYM(cutscene1d) && hook_enabled_at(gb, SYM(cutscene1d))) { cutscene1d_hook(gb); return; }
+    else if (jt_ == SYM(cutscene1e) && hook_enabled_at(gb, SYM(cutscene1e))) { cutscene1e_hook(gb); return; }
+    else if (jt_ == SYM(cutscene1f) && hook_enabled_at(gb, SYM(cutscene1f))) { cutscene1f_hook(gb); return; }
+    else if (jt_ == SYM(cutscene20) && hook_enabled_at(gb, SYM(cutscene20))) { cutscene20_hook(gb); return; }
+    else if (jt_ == SYM(cutscene21) && hook_enabled_at(gb, SYM(cutscene21))) { cutscene21_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -5085,8 +5053,7 @@ static void cutscene01_after_tree_gfx(GB *gb, uint16_t sp0_) {
   CYC(b_+36, b_+37); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+37, b_+40);
-    setCutsceneIndexIfCutsceneTriggerSet_hook(gb);
-    return;
+    TAIL(setCutsceneIndexIfCutsceneTriggerSet);
   }
   CYC(b_+37, b_+40);
   CALL_C(b_+40, func_60e9_hook, SYM(func_60e9), b_+43);
@@ -5094,15 +5061,13 @@ static void cutscene01_after_tree_gfx(GB *gb, uint16_t sp0_) {
   CYC(b_+46, b_+47); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+47, b_+50);
-    applyWarpTransition2_hook(gb);
-    return;
+    TAIL(applyWarpTransition2);
   }
   CYC(b_+47, b_+50);
   CALL_C(b_+50, getNextActiveRoom_hook, SYM(getNextActiveRoom), b_+53);
   if (!(F & FC)) {
     CYCT(b_+53, b_+56);
-    checkEnemyAndPartCollisionsIfTextInactive_hook(gb);
-    return;
+    TAIL(checkEnemyAndPartCollisionsIfTextInactive);
   }
   CYC(b_+53, b_+56);
   CALL_C(b_+56, checkDisableUnderwaterWaves_hook, SYM(checkDisableUnderwaterWaves), b_+59);
@@ -5116,8 +5081,7 @@ static void cutscene01_after_tree_gfx(GB *gb, uint16_t sp0_) {
   CALL_C(b_+79, checkRoomPack_hook, SYM(checkRoomPack), b_+82);
   if (!(F & FZ)) {
     CYCT(b_+82, b_+85);
-    triggerFadeoutTransition_hook(gb);
-    return;
+    TAIL(triggerFadeoutTransition);
   }
   CYC(b_+82, b_+85);
   CYC(b_+85, b_+88); A = W8(wActiveRoom);
@@ -5423,8 +5387,7 @@ static void func_5d31_after_tree_gfx(GB *gb, uint16_t sp0_) {
   CYC(b_+6, b_+7); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+7, b_+10);
-    applyWarpTransition2_hook(gb);
-    return;
+    TAIL(applyWarpTransition2);
   }
   CYC(b_+7, b_+10);
   CALL_C(b_+10, updateStatusBar_hook, SYM(updateStatusBar), b_+13);

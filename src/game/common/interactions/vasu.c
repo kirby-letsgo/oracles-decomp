@@ -72,7 +72,7 @@ afterUpdateState:
   CYC(b_+22, b_+23); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+23, b_+26); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb); return; } // jp nz
   CYC(b_+23, b_+26);
-  CYC(b_+26, b_+29); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return; // jp
+  CYC(b_+26, b_+29); TAIL(interactionPushLinkAwayAndUpdateDrawPriority); // jp
 
 updateState:
   sp1_ = gb->sp;

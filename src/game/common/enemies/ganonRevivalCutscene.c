@@ -40,7 +40,7 @@ void enemyCode60_hook(GB *gb) {
   CALL_C(b_+19, objectSetVisible83_hook, SYM(objectSetVisible83), b_+22);
   CYC(b_+22, b_+24); A = 0xd3; // SND_WIND
   CALL_C(b_+24, playSound_b00_hook, SYM(playSound_b00), SYM(label_266));
-  label_266_hook(gb); return; // fallthrough
+  TAIL(label_266); // fallthrough
 }
 
 // 0e:6a6c, bare global; falls into from enemyCode60, also reached by genuine jr from same.
@@ -66,7 +66,7 @@ void label_266_hook(GB *gb) {
   CYC(b_+27, b_+30);
 
 checkOtherAxis:
-  label_267_hook(gb); return; // fallthrough
+  TAIL(label_267); // fallthrough
 }
 
 // 0e:6a8a, bare global; falls into from label_266.
@@ -82,7 +82,7 @@ void label_267_hook(GB *gb) {
 
 skipNudge:
   CALL_C(b_+13, objectApplySpeed_hook, SYM(objectApplySpeed), b_+16);
-  CYC(b_+16, b_+19); ecom_flickerVisibility_b0e_hook(gb); return; // jp
+  CYC(b_+16, b_+19); TAIL(ecom_flickerVisibility_b0e); // jp
 }
 
 // 0e:6a9d, bare global; called from enemyCode60.
@@ -109,7 +109,7 @@ void ganonRevivalCutscene_controller_hook(GB *gb) {
   CYC(b_+27, b_+28); alu_xor(gb, A);
   CYC(b_+28, b_+31); mem_wr(gb, wDirtyFadeSprPalettes, A);
   CYC(b_+31, b_+34); mem_wr(gb, wFadeSprPaletteSources, A);
-  label_270_hook(gb); return; // fallthrough
+  TAIL(label_270); // fallthrough
 }
 
 // 0e:6abf, bare global; falls into from ganonRevivalCutscene_controller.
@@ -143,7 +143,7 @@ delete:
   CYC(b_+30, b_+32); A = 0x06; // Object.counter1
   CALL_C(b_+32, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+35);
   CYC(b_+35, b_+36); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+36, b_+39); enemyDelete_hook(gb); return; // jp
+  CYC(b_+36, b_+39); TAIL(enemyDelete); // jp
 }
 
 // 0e:6ae6, bare global; called from label_270.

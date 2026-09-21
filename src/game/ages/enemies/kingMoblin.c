@@ -199,7 +199,7 @@ void kingMoblin_state_uninitialized_hook(GB *gb) {
   CALL_C(b_+46, ecom_setSpeedAndState8_b0f_hook, SYM(ecom_setSpeedAndState8_b0f), b_+49);
   CALL_C(b_+49, objectSetVisible83_hook, SYM(objectSetVisible83), b_+52);
   CYC(b_+52, b_+54); A = 0x02;
-  CYC(b_+54, b_+57); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+54, b_+57); TAIL(enemySetAnimation); // jp
 }
 
 void kingMoblin_state_stub_hook(GB *gb) {
@@ -247,12 +247,12 @@ L_7d65:
   CALL_C(b_+57, ecom_incState_b0f_hook, SYM(ecom_incState_b0f), b_+60);
   CYC(b_+60, b_+62); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+62, b_+64); mem_wr(gb, HL, 0x18);
-  kingMoblin_animate_hook(gb); return; // fallthrough
+  TAIL(kingMoblin_animate); // fallthrough
 }
 
 void kingMoblin_animate_hook(GB *gb) {
   BASE(kingMoblin_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // Delay before showing text
@@ -271,7 +271,7 @@ void kingMoblin_state9_hook(GB *gb) {
   CYC(b_+15, b_+18); SET_BC(0x2f1a); // TX_2f1a
 
 L_7d81:
-  CYC(b_+18, b_+21); showText_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(showText); // jp
 }
 
 // Starting fight
@@ -293,7 +293,7 @@ void kingMoblin_stateA_hook(GB *gb) {
   CYC(b_+16, b_+17); mem_wr(gb, BC, A); // [minion2.state] = $02
   CALL_C(b_+17, enemyBoss_beginBoss_b0f_hook, SYM(enemyBoss_beginBoss_b0f), b_+20);
   CYC(b_+20, b_+21); alu_xor(gb, A);
-  CYC(b_+21, b_+24); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+21, b_+24); TAIL(enemySetAnimation); // jp
 }
 
 // Facing backwards while picking up a bomb
@@ -308,7 +308,7 @@ void kingMoblin_stateB_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+10); return; } // ret nz
   CYC(b_+10, b_+11);
   CALL_C(b_+11, ecom_incState_b0f_hook, SYM(ecom_incState_b0f), SYM(kingMoblin_initBombPickupAnimation));
-  kingMoblin_initBombPickupAnimation_hook(gb); return; // fallthrough
+  TAIL(kingMoblin_initBombPickupAnimation); // fallthrough
 }
 
 void kingMoblin_initBombPickupAnimation_hook(GB *gb) {
@@ -323,7 +323,7 @@ void kingMoblin_initBombPickupAnimation_hook(GB *gb) {
   CYC(b_+10, b_+11); A = mem_rd(gb, HL);
   CYC(b_+11, b_+12); mem_wr(gb, DE, A);
   CYC(b_+12, b_+14); A = 0x04;
-  CYC(b_+14, b_+17); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+14, b_+17); TAIL(enemySetAnimation); // jp
 }
 
 // Will raise bomb over head in [counter2] frames?
@@ -357,7 +357,7 @@ void kingMoblin_stateC_hook(GB *gb) {
 
 L_7de8:
   CYC(b_+39, b_+41); A = 0x02;
-  CYC(b_+41, b_+44); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+41, b_+44); TAIL(enemySetAnimation); // jp
 }
 
 // Delay before throwing bomb
@@ -402,7 +402,7 @@ L_7e11:
 
 L_7e27:
   CYC(b_+52, b_+54); A = 0x05;
-  CYC(b_+54, b_+57); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+54, b_+57); TAIL(enemySetAnimation); // jp
 }
 
 // Delay after throwing bomb
@@ -415,7 +415,7 @@ void kingMoblin_stateE_hook(GB *gb) {
   CYC(b_+4, b_+5); L = E;
   CYC(b_+5, b_+6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = $0f
   CYC(b_+6, b_+8); A = 0x02;
-  CYC(b_+8, b_+11); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+8, b_+11); TAIL(enemySetAnimation); // jp
 }
 
 // Waiting for something to do
@@ -458,7 +458,7 @@ void kingMoblin_stateF_hook(GB *gb) {
   CYC(b_+47, b_+49); L = ENEMY_BASE + 0x32; // var32
   CYC(b_+49, b_+50); mem_wr(gb, HL, A);
   CYC(b_+50, b_+52); B = 0x11; // state $11
-  CYC(b_+52, b_+55); kingMoblin_setAngleStateAndAnimation_hook(gb); return; // jp
+  CYC(b_+52, b_+55); TAIL(kingMoblin_setAngleStateAndAnimation); // jp
 }
 
 void kingMoblin_grabBomb_hook(GB *gb) {
@@ -478,7 +478,7 @@ L_7e80:
   CYC(b_+18, b_+19); H = D;
   CYC(b_+19, b_+21); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+21, b_+23); mem_wr(gb, HL, 0x0c);
-  CYC(b_+23, b_+26); kingMoblin_initBombPickupAnimation_hook(gb); return; // jp
+  CYC(b_+23, b_+26); TAIL(kingMoblin_initBombPickupAnimation); // jp
 }
 
 // Moving to centre of screen
@@ -497,16 +497,16 @@ void kingMoblin_state10_hook(GB *gb) {
   CYC(b_+14, b_+16); L = ENEMY_BASE + OBJ_COUNTER2;
   CYC(b_+16, b_+18); mem_wr(gb, HL, 30);
   CYC(b_+18, b_+19); alu_xor(gb, A);
-  CYC(b_+19, b_+22); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+19, b_+22); TAIL(enemySetAnimation); // jp
 
 L_7e9e:
   CALL_C(b_+22, objectApplySpeed_hook, SYM(objectApplySpeed), SYM(kingMoblin_animate2));
-  kingMoblin_animate2_hook(gb); return; // fallthrough
+  TAIL(kingMoblin_animate2); // fallthrough
 }
 
 void kingMoblin_animate2_hook(GB *gb) {
   BASE(kingMoblin_animate2);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // Moving toward bomb
@@ -526,7 +526,7 @@ void kingMoblin_state11_hook(GB *gb) {
   CYC(b_+16, b_+18); alu_cp(gb, 0x11);
   if (F & FC) { CYCT(b_+18, b_+20); kingMoblin_grabBomb_hook(gb); return; } // jr c
   CYC(b_+18, b_+20);
-  CYC(b_+20, b_+23); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(enemyAnimate); // jp
 }
 
 // Just died
@@ -549,7 +549,7 @@ void kingMoblin_state12_hook(GB *gb) {
   CYC(b_+24, b_+25); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+25, b_+27); mem_wr(gb, HL, 0xfe); // >(-$160)
   CYC(b_+27, b_+29); A = 60;
-  CYC(b_+29, b_+32); setScreenShakeCounter_hook(gb); return; // jp
+  CYC(b_+29, b_+32); TAIL(setScreenShakeCounter); // jp
 }
 
 // Falling to ground
@@ -589,7 +589,7 @@ void kingMoblin_state14_hook(GB *gb) {
   CYC(b_+19, b_+21); L = ENEMY_BASE + OBJ_COUNTER2;
   CYC(b_+21, b_+23); mem_wr(gb, HL, 30);
   CYC(b_+23, b_+24); alu_xor(gb, A);
-  CYC(b_+24, b_+27); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+24, b_+27); TAIL(enemySetAnimation); // jp
 
 gotoState15:
   CALL_C(b_+27, ecom_incState_b0f_hook, SYM(ecom_incState_b0f), b_+30);
@@ -629,7 +629,7 @@ void kingMoblin_state15_hook(GB *gb) {
   CALL_C(b_+35, getTileAtPosition_hook, SYM(getTileAtPosition), b_+38);
   CYC(b_+38, b_+39); C = L;
   CYC(b_+39, b_+41); A = 0xa1;
-  CYC(b_+41, b_+44); setTile_hook(gb); return; // jp
+  CYC(b_+41, b_+44); TAIL(setTile); // jp
 
 warpOutside:
   CYC(b_+44, b_+47); SET_HL((wGroup0RoomFlags + 9)); // wPresentRoomFlags+9
@@ -639,7 +639,7 @@ warpOutside:
   CYC(b_+54, b_+56); A = 0x16; // GLOBALFLAG_16
   CALL_C(b_+56, setGlobalFlag_hook, SYM(setGlobalFlag), b_+59);
   CYC(b_+59, b_+62); SET_HL(b_+69); // @warpDest
-  CYC(b_+62, b_+65); setWarpDestVariables_hook(gb); return; // jp
+  CYC(b_+62, b_+65); TAIL(setWarpDestVariables); // jp
 }
 
 // Updates state and angle values to move king moblin to centre of screen, if there is no
@@ -654,7 +654,7 @@ void kingMoblin_checkMoveToCentre_hook(GB *gb) {
   CYC(b_+6, b_+8); alu_cp(gb, 0x3f); // PART_KING_MOBLIN_BOMB
   if (F & FZ) { RET_TAKEN(b_+8); return; } // ret z
   CYC(b_+8, b_+9);
-  kingMoblin_moveToCentre_hook(gb); return; // fallthrough
+  TAIL(kingMoblin_moveToCentre); // fallthrough
 }
 
 void kingMoblin_moveToCentre_hook(GB *gb) {
@@ -671,12 +671,12 @@ void kingMoblin_moveToCentre_hook(GB *gb) {
   CYC(b_+12, b_+14); mem_wr(gb, HL, 30);
   CYC(b_+14, b_+16); B = 0x0b;
   CYC(b_+16, b_+17); alu_xor(gb, A);
-  CYCT(b_+17, b_+19); kingMoblin_setStateAndAnimation_hook(gb); return; // jr
+  CYCT(b_+17, b_+19); TAIL(kingMoblin_setStateAndAnimation); // jr
 
 moveTowardCentre:
   CYC(b_+19, b_+21); alu_cp(gb, 0xb0);
   CYC(b_+21, b_+23); B = 0x10;
-  kingMoblin_setAngleStateAndAnimation_hook(gb); return; // fallthrough
+  TAIL(kingMoblin_setAngleStateAndAnimation); // fallthrough
 }
 
 void kingMoblin_setAngleStateAndAnimation_hook(GB *gb) {
@@ -692,7 +692,7 @@ L_7f82:
   CYC(b_+8, b_+9); mem_wr(gb, DE, A);
   CYC(b_+9, b_+11); A = alu_swap(gb, A);
   CYC(b_+11, b_+12); alu_rlca(gb);
-  kingMoblin_setStateAndAnimation_hook(gb); return; // fallthrough
+  TAIL(kingMoblin_setStateAndAnimation); // fallthrough
 }
 
 void kingMoblin_setStateAndAnimation_hook(GB *gb) {

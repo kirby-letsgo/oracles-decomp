@@ -53,13 +53,11 @@ state0:
   CYC(b_+30, b_+31); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+31, b_+34);
-    objectSetVisiblec2_hook(gb);
-    return;
+    TAIL(objectSetVisiblec2);
   }
   CYC(b_+31, b_+34);
   CYC(b_+34, b_+37);
-  objectSetVisiblec0_hook(gb);
-  return;
+  TAIL(objectSetVisiblec0);
 state1:
   CYC(b_+37, b_+39); E = INTERACTION_BASE + OBJ_SUBSTATE;
   CYC(b_+39, b_+40); A = mem_rd(gb, DE);
@@ -95,8 +93,7 @@ substate1:
   CYC(b_+82, b_+83);
   CYC(b_+83, b_+85); A = 0x05;
   CYC(b_+85, b_+88);
-  interactionSetAnimation_hook(gb);
-  return;
+  TAIL(interactionSetAnimation);
 substate2:
   CALL_C(b_+88, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+91);
   if (!(F & FZ)) { RET_TAKEN(b_+91); return; }
@@ -191,8 +188,7 @@ storeCounter1_4:
   CYC(b_+204, b_+207); SET_HL(wTmpcfc0_armosStatue_killedArmosPositions);
   CYC(b_+207, b_+209); mem_wr(gb, HL, 0x03);
   CYC(b_+209, b_+212);
-  interactionIncSubstate_hook(gb);
-  return;
+  TAIL(interactionIncSubstate);
 substate5:
   CALL_C(b_+212, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+215);
   if (!(F & FZ)) { RET_TAKEN(b_+215); return; }
@@ -201,8 +197,7 @@ substate5:
   CYC(b_+218, b_+221); SET_HL(wTmpcfc0_armosStatue_killedArmosPositions);
   CYC(b_+221, b_+223); mem_wr(gb, HL, 0x04);
   CYC(b_+223, b_+226);
-  interactionIncSubstate_hook(gb);
-  return;
+  TAIL(interactionIncSubstate);
 substate6:
   CALL_C(b_+226, interactionAnimate_hook, SYM(interactionAnimate), b_+229);
   CALL_C(b_+229, objectApplySpeed_hook, SYM(objectApplySpeed), b_+232);

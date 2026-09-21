@@ -172,8 +172,7 @@ subid02:
   A = 0xf0;
   CYC(b_+105, b_+107);
   CYC(b_+107, b_+110);
-  playSound_b00_hook(gb);
-  return;
+  TAIL(playSound_b00);
 initLinkRobberyTokay:
   CALL_C(b_+110, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+113);
   CALL_C(b_+113, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+116);
@@ -182,8 +181,7 @@ initLinkRobberyTokay:
   if (!(F & FZ)) { CYCT(b_+118, b_+121); goto deleteSelf; }
   CYC(b_+118, b_+121);
   CYC(b_+121, b_+124);
-  tokayLoadScript_hook(gb);
-  return;
+  TAIL(tokayLoadScript);
 subid1d:
   CALL_C(b_+124, tokayLoadScript_hook, SYM(tokayLoadScript), b_+127);
   CALL_C(b_+127, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+130);
@@ -219,8 +217,7 @@ subid1d:
   A = 0x06;
   CYC(b_+162, b_+164);
   CYC(b_+164, b_+167);
-  interactionSetAnimation_hook(gb);
-  return;
+  TAIL(interactionSetAnimation);
 subid07:
   CALL_C(b_+167, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+170);
   if (!(F & FZ)) { CYCT(b_+170, b_+173); interactionDelete_hook(gb); return; }
@@ -285,8 +282,7 @@ endLoop:
     A = 0x02;
     CYC(b_+258, b_+260);
     CYC(b_+260, b_+263);
-    interactionSetAnimation_hook(gb);
-    return;
+    TAIL(interactionSetAnimation);
   }
   CYC(b_+230, b_+232);
   A = 0x06;
@@ -312,8 +308,7 @@ endLoop:
   B = A;
   CYC(b_+252, b_+255);
   CYC(b_+255, b_+258);
-  tokayInitHeldItem_hook(gb);
-  return;
+  TAIL(tokayInitHeldItem);
 subid11:
   CALL_C(b_+263, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+266);
   alu_bit(gb, 7, A);
@@ -368,12 +363,10 @@ subid05:
   CALL_C(b_+321, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+324);
   CALL_C(b_+324, tokayLoadScript_hook, SYM(tokayLoadScript), b_+327);
   CYC(b_+327, b_+330);
-  tokayState1_hook(gb);
-  return;
+  TAIL(tokayState1);
 deleteSelf:
   CYC(b_+330, b_+333);
-  interactionDelete_hook(gb);
-  return;
+  TAIL(interactionDelete);
 subid0b:
   CALL_C(b_+333, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+336);
   if (F & FZ) { CYCT(b_+336, b_+339); interactionDelete_hook(gb); return; }
@@ -392,8 +385,7 @@ subid0b:
   CYC(b_+355, b_+357);
   CYC(b_+357, b_+360); mem_wr(gb, wDiggingUpEnemiesForbidden, A);
   CYC(b_+360, b_+363);
-  tokayLoadScript_hook(gb);
-  return;
+  TAIL(tokayLoadScript);
 subid0c:
   H = D;
   CYC(b_+363, b_+364);
@@ -448,14 +440,12 @@ subid12:
   CYC(b_+455, b_+456); A = mem_rd(gb, HL);
   CYC(b_+456, b_+457); mem_wr(gb, DE, A);
   CYC(b_+457, b_+460);
-  tokayLoadScript_hook(gb);
-  return;
+  TAIL(tokayLoadScript);
 subid19:
   CYC(b_+467, b_+470); push_effect(gb, b_+470);
   tokay_init_subid0d(gb);
   CYC(b_+470, b_+473);
-  tokayLoadScript_hook(gb);
-  return;
+  TAIL(tokayLoadScript);
 subid1a:
   E = INTERACTION_BASE + OBJ_OAM_FLAGS;
   A = 0x02;
@@ -466,8 +456,7 @@ subid1a:
   CYC(b_+478, b_+482);
   CYC(b_+482, b_+483); mem_wr(gb, DE, A);
   CYC(b_+483, b_+486);
-  interactionAnimate_hook(gb);
-  return;
+  TAIL(interactionAnimate);
 subid1c:
   A = 0x09;
   CYC(b_+486, b_+488);

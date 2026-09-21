@@ -55,7 +55,7 @@ void soldierGiveMysterySeeds_hook(GB *gb) {
   (void)sp0_;
   CYC(b_+0, b_+2); A = 0x24; // TREASURE_MYSTERY_SEEDS
   CYC(b_+2, b_+4); C = 0x00;
-  CYC(b_+4, b_+7); giveTreasure_hook(gb); return; // jp
+  CYC(b_+4, b_+7); TAIL(giveTreasure); // jp
 }
 
 void soldierUpdateMinimap_hook(GB *gb) {

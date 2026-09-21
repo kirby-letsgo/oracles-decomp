@@ -28,5 +28,5 @@ void interactionCode74_hook(GB *gb) {
   CYC(b_+24, b_+25);
 
 deleteThis:
-  CYC(b_+25, b_+28); interactionDelete_hook(gb); return; // jp
+  CYC(b_+25, b_+28); TAIL(interactionDelete); // jp
 }

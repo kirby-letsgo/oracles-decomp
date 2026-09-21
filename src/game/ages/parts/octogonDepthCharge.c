@@ -76,7 +76,7 @@ state1:
   CALL_C(b_+7, partCommon_checkTileCollisionOrOutOfBounds_hook, SYM(partCommon_checkTileCollisionOrOutOfBounds), b_+10);
   if (!(F & FZ)) { CYCT(b_+10, b_+13); partAnimate_hook(gb); return; } // jp nz
   CYC(b_+10, b_+13);
-  CYC(b_+13, b_+16); partDelete_hook(gb); return; // jp
+  CYC(b_+13, b_+16); TAIL(partDelete); // jp
 
 state0:
   CYC(b_+16, b_+17); H = D;
@@ -90,7 +90,7 @@ state0:
   CYC(b_+27, b_+29); mem_wr(gb, HL, 0x3c); // SPEED_180
   CYC(b_+29, b_+31); A = 0x01;
   CALL_C(b_+31, partSetAnimation_hook, SYM(partSetAnimation), b_+34);
-  CYC(b_+34, b_+37); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+34, b_+37); TAIL(objectSetVisible82); // jp
 }
 
 // Large projectile, before being split into 4 smaller ones (subid 1)
@@ -149,7 +149,7 @@ aboveWater:
   CALL_C(b_+79, playSound_b00_hook, SYM(playSound_b00), b_+82);
 
 setVisible81:
-  CYC(b_+82, b_+85); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+82, b_+85); TAIL(objectSetVisible81); // jp
 
 state1:
   CYC(b_+85, b_+86); H = D;
@@ -175,7 +175,7 @@ state1:
   CYC(b_+114, b_+115); L = alu_inc8(gb, L);
   CYC(b_+115, b_+117); A = mem_rd(gb, hEnemyTargetX); // hEnemyTargetX
   CYC(b_+117, b_+118); mem_wr(gb, HL, A);
-  CYC(b_+118, b_+121); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+118, b_+121); TAIL(objectSetInvisible); // jp
 
 flickerVisibility:
   CYC(b_+121, b_+123); L = 0xda; // Part.visible
@@ -184,7 +184,7 @@ flickerVisibility:
   CYC(b_+126, b_+127); mem_wr(gb, HL, A);
 
 animate:
-  CYC(b_+127, b_+130); partAnimate_hook(gb); return; // jp
+  CYC(b_+127, b_+130); TAIL(partAnimate); // jp
 
 state2:
   CALL_C(b_+130, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+133);
@@ -194,7 +194,7 @@ state2:
   CYC(b_+135, b_+136); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+136, b_+138); L = 0xe4; // Part.collisionType
   CYC(b_+138, b_+140); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
-  CYC(b_+140, b_+143); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+140, b_+143); TAIL(objectSetVisiblec1); // jp
 
 state3:
   CYC(b_+143, b_+145); E = 0xf0; // Part.var30
@@ -227,5 +227,5 @@ L_772a:
   CYC(b_+179, b_+181);
   CYC(b_+181, b_+183); A = 0x68; // SND_UNKNOWN3
   CALL_C(b_+183, playSound_b00_hook, SYM(playSound_b00), b_+186);
-  CYC(b_+186, b_+189); partDelete_hook(gb); return; // jp
+  CYC(b_+186, b_+189); TAIL(partDelete); // jp
 }

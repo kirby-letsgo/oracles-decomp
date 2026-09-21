@@ -91,7 +91,7 @@ void hardhatWorker_setPatrolDirection_hook(GB *gb) {
   CYC(b_+8, b_+10); L = INTERACTION_BASE + OBJ_ANGLE;
   CYC(b_+10, b_+11); mem_wr(gb, HL, A);
   CYC(b_+11, b_+12); A = B;
-  CYC(b_+12, b_+15); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+12, b_+15); TAIL(interactionSetAnimation); // jp
 }
 
 void hardhatWorker_setPatrolCounter_hook(GB *gb) {
@@ -109,7 +109,7 @@ void hardhatWorker_updatePatrolAnimation_hook(GB *gb) {
   (void)sp0_;
   CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_VAR3E;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, b_+6); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(interactionSetAnimation); // jp
 }
 
 void hardhatWorker_decPatrolCounter_hook(GB *gb) {
@@ -119,7 +119,7 @@ void hardhatWorker_decPatrolCounter_hook(GB *gb) {
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR3C;
   CYC(b_+3, b_+4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+4, b_+7); writeFlagsTocddb_hook(gb); return; // jp
+  CYC(b_+4, b_+7); TAIL(writeFlagsTocddb); // jp
 }
 
 void hardhatWorker_chooseTextForPatroller_hook(GB *gb) {
@@ -150,7 +150,7 @@ void hardhatWorker_checkBlackTowerProgressIs00_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
   CALL_C(b_+0, getBlackTowerProgress_hook, SYM(getBlackTowerProgress), b_+3);
-  CYC(b_+3, b_+6); writeFlagsTocddb_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(writeFlagsTocddb); // jp
 }
 
 void hardhatWorker_checkBlackTowerProgressIs01_hook(GB *gb) {
@@ -159,5 +159,5 @@ void hardhatWorker_checkBlackTowerProgressIs01_hook(GB *gb) {
   (void)sp0_;
   CALL_C(b_+0, getBlackTowerProgress_hook, SYM(getBlackTowerProgress), b_+3);
   CYC(b_+3, b_+5); alu_cp(gb, 0x01);
-  CYC(b_+5, b_+8); writeFlagsTocddb_hook(gb); return; // jp
+  CYC(b_+5, b_+8); TAIL(writeFlagsTocddb); // jp
 }

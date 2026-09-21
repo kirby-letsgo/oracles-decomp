@@ -96,7 +96,7 @@ after1_checkTransformItem:
   CYC(b_+67, b_+69); E = INTERACTION_BASE + OBJ_PRESSED_A_BUTTON;
   CALL_C(b_+69, objectAddToAButtonSensitiveObjectList_hook, SYM(objectAddToAButtonSensitiveObjectList), b_+72);
   CALL_C(b_+72, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+75);
-  CYC(b_+75, b_+78); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+75, b_+78); TAIL(objectSetVisible82); // jp
 
 state1:
   CALL_C(b_+95, interactionAnimateAsNpc_hook, SYM(interactionAnimateAsNpc), b_+98);
@@ -108,7 +108,7 @@ after2_checkTransformItem:
   CYC(b_+107, b_+108);
   CYC(b_+108, b_+109); alu_xor(gb, A);
   CYC(b_+109, b_+112); W8(wDisabledObjects) = A;
-  CYC(b_+112, b_+115); interactionDelete_hook(gb); return; // jp
+  CYC(b_+112, b_+115); TAIL(interactionDelete); // jp
 
   // This checks whether to replace the feather/bracelet with the shovel, changing the subid
   // accordingly and initializing the graphics after doing so. Returns nz if item should be deleted.

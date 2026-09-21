@@ -106,6 +106,15 @@ static void on_frame(GB *gb, const GBSample *sm, void *ctx) {
       fprintf(wf, "\n");
       for (int i = 0; i < 127; i++) fprintf(wf, "%02x", sm->hram[i]);
       fprintf(wf, "\n");
+      for (size_t i = 0; i < sizeof sm->vram; i++) fprintf(wf, "%02x", ((const unsigned char *)sm->vram)[i]);
+      fprintf(wf, "\n");
+      for (size_t i = 0; i < sizeof sm->oam; i++) fprintf(wf, "%02x", sm->oam[i]);
+      fprintf(wf, "\n");
+      for (size_t i = 0; i < sizeof sm->io; i++) fprintf(wf, "%02x", sm->io[i]);
+      fprintf(wf, "\n");
+      for (size_t i = 0; i < sizeof sm->bg_pal; i++) fprintf(wf, "%02x", ((const unsigned char *)sm->bg_pal)[i]);
+      for (size_t i = 0; i < sizeof sm->ob_pal; i++) fprintf(wf, "%02x", ((const unsigned char *)sm->ob_pal)[i]);
+      fprintf(wf, " ie %02x rom_bank %u ram_bank %u\n", sm->ie, (unsigned)sm->rom_bank, (unsigned)sm->ram_bank);
       fclose(wf);
     }
     if ((movie_frame + 1) % 60 == 0) {

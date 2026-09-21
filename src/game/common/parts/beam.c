@@ -49,7 +49,7 @@ void func_5758_hook(GB *gb) {
   CYC(b_+10, b_+11); alu_and(gb, B);
   if (F & FZ) { CYCT(b_+11, b_+14); objectSetVisible81_hook(gb); return; } // jp z
   CYC(b_+11, b_+14);
-  CYC(b_+14, b_+17); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+14, b_+17); TAIL(objectSetInvisible); // jp
 }
 
 void partCode29_hook(GB *gb) {
@@ -91,7 +91,7 @@ state0:
   CYC(b_+42, b_+45); SET_HL(b_+50); // table_5737
   CYC(b_+45, b_+46); beam_addAToHl_from_rst(gb, b_+46);
   CYC(b_+46, b_+47); A = mem_rd(gb, HL);
-  CYC(b_+47, b_+50); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+47, b_+50); TAIL(partSetAnimation); // jp
 
 state1:
   CALL_C(b_+66, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+69);

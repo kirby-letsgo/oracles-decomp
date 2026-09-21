@@ -92,7 +92,7 @@ afterSpawnFlower_subid0102:
 
 runScriptAndAnimate:
   CALL_C(b_+90, interactionRunScript_hook, SYM(interactionRunScript), b_+93);
-  CYC(b_+93, b_+96); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+93, b_+96); TAIL(interactionAnimate); // jp
 
 subid03:
   CALL_C(b_+96, checkInteractionState_hook, SYM(checkInteractionState), b_+99);
@@ -256,13 +256,13 @@ state10Linked:
 
 state01:
   CYC(b_+331, b_+332); SET_AF(pop_effect(gb));
-  CYC(b_+332, b_+335); interactionDelete_hook(gb); return; // jp
+  CYC(b_+332, b_+335); TAIL(interactionDelete); // jp
 
 runSubidCode:
   CYC(b_+335, b_+337); E = INTERACTION_BASE + OBJ_SUBID;
   CYC(b_+337, b_+338); mem_wr(gb, DE, A);
   CYC(b_+338, b_+339); SET_AF(pop_effect(gb));
-  CYC(b_+339, b_+342); interactionCode87_hook(gb); return; // jp
+  CYC(b_+339, b_+342); TAIL(interactionCode87); // jp
 
 runSubid0ScriptMode:
   CYC(b_+342, b_+343); H = D;

@@ -226,7 +226,7 @@ void interactionCode35_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (child_jumpTable(gb));
     if (jt_ == b_+8) { child_state0(gb, sp0_); return; }
-    else if (jt_ == SYM(interac65_state1)) { interac65_state1_hook(gb); return; }
+    else if (jt_ == SYM(interac65_state1) && hook_enabled_at(gb, SYM(interac65_state1))) { interac65_state1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -388,7 +388,7 @@ void childUpdateSolidityAndVisibility_hook(GB *gb) {
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+9); alu_cp(gb, 0x02);
   if (F & FZ) {
-    CYCT(b_+9, b_+12); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb); return;
+    CYCT(b_+9, b_+12); TAIL(objectSetPriorityRelativeToLink_withTerrainEffects);
   }
   CYC(b_+9, b_+12);
   CALL_C(b_+12, objectPreventLinkFromPassing_hook, SYM(objectPreventLinkFromPassing), b_+15);
@@ -677,7 +677,7 @@ substate1:
   CYC(b_+40, b_+42); C = 0x50;
   CALL_C(b_+42, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+45);
   if (!(F & FZ)) {
-    CYCT(b_+45, b_+48); objectApplySpeed_hook(gb); return;
+    CYCT(b_+45, b_+48); TAIL(objectApplySpeed);
   }
   CYC(b_+45, b_+48);
   CALL_C(b_+48, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+51);

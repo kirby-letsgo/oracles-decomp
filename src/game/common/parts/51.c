@@ -95,7 +95,7 @@ L_5ba9:
   CYC(b_+68, b_+69); A = mem_rd(gb, DE);
   CYC(b_+69, b_+71); alu_xor(gb, 0x80);
   CYC(b_+71, b_+72); mem_wr(gb, DE, A);
-  CYC(b_+72, b_+75); partAnimate_hook(gb); return; // jp
+  CYC(b_+72, b_+75); TAIL(partAnimate); // jp
 
 L_5bb2:
   CYC(b_+75, b_+76); H = D;
@@ -129,7 +129,7 @@ L_5bc8:
   CYC(b_+111, b_+112); mem_wr(gb, DE, A);
   CYC(b_+112, b_+113); A = B;
   CALL_C(b_+113, partSetAnimation_hook, SYM(partSetAnimation), b_+116);
-  CYC(b_+116, b_+119); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+116, b_+119); TAIL(objectSetVisible83); // jp
 
 subid1:
   CYC(b_+123, b_+124); A = mem_rd(gb, DE);
@@ -153,7 +153,7 @@ state0:
   CYC(b_+142, b_+144); mem_wr(gb, HL, 0x18);
   CYC(b_+144, b_+146); A = 0x04;
   CALL_C(b_+146, partSetAnimation_hook, SYM(partSetAnimation), b_+149);
-  CYC(b_+149, b_+152); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+149, b_+152); TAIL(objectSetVisible82); // jp
 
 state1:
   CALL_C(b_+152, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+155);
@@ -182,7 +182,7 @@ state1:
   CYC(b_+187, b_+188); C = A;
   CYC(b_+188, b_+190); B = 0x50;
   CYC(b_+190, b_+192); A = 0x02;
-  CYC(b_+192, b_+195); objectSetComponentSpeedByScaledVelocity_hook(gb); return; // jp
+  CYC(b_+192, b_+195); TAIL(objectSetComponentSpeedByScaledVelocity); // jp
 
 state2:
   CALL_C(b_+195, partCommon_checkTileCollisionOrOutOfBounds_hook, SYM(partCommon_checkTileCollisionOrOutOfBounds), b_+198);
@@ -192,7 +192,7 @@ state2:
   CALL_C(b_+202, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+205);
   CYC(b_+205, b_+207); A = 0x3c;
   if (F & FZ) { CALL_C_CC(b_+207, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+210); } else { CYC(b_+207, b_+210); } // call z
-  CYC(b_+210, b_+213); partDelete_hook(gb); return; // jp
+  CYC(b_+210, b_+213); TAIL(partDelete); // jp
 
 L_5c3c:
   CALL_C(b_+213, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+216);
@@ -216,5 +216,5 @@ L_5c56:
   CALL_C(b_+239, objectApplyComponentSpeed_hook, SYM(objectApplyComponentSpeed), b_+242);
 
 animate:
-  CYC(b_+242, b_+245); partAnimate_hook(gb); return; // jp
+  CYC(b_+242, b_+245); TAIL(partAnimate); // jp
 }

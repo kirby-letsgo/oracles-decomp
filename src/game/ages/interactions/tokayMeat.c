@@ -50,7 +50,7 @@ void interactionCode8c_hook(GB *gb) {
   CYC(b_+33, b_+35); L = INTERACTION_BASE + OBJ_ZH;
   CYC(b_+35, b_+37); mem_wr(gb, HL, 0xc0); // -0x40
   CYC(b_+37, b_+40); SET_BC(0x0000);
-  CYC(b_+40, b_+43); objectSetSpeedZ_hook(gb); return; // jp
+  CYC(b_+40, b_+43); TAIL(objectSetSpeedZ); // jp
 
 state1:
   CALL_C(b_+43, objectAddToGrabbableObjectBuffer_hook, SYM(objectAddToGrabbableObjectBuffer), b_+46);
@@ -73,7 +73,7 @@ state1:
   CALL_C(b_+64, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+67);
   CALL_C(b_+67, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+70);
   CYC(b_+70, b_+72); A = 0x59; // SND_FALLINHOLE
-  CYC(b_+72, b_+75); playSound_b00_hook(gb); return; // jp
+  CYC(b_+72, b_+75); TAIL(playSound_b00); // jp
 
 state1_substate1: // Wait for it to land
   CYC(b_+75, b_+77); C = 0x28;
@@ -82,10 +82,10 @@ state1_substate1: // Wait for it to land
   CYC(b_+80, b_+81);
   CALL_C(b_+81, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+84);
   CYC(b_+84, b_+86); A = 0x52; // SND_BOMB_LAND
-  CYC(b_+86, b_+89); playSound_b00_hook(gb); return; // jp
+  CYC(b_+86, b_+89); TAIL(playSound_b00); // jp
 
 state1_substate2: // Sitting on the ground
-  CYC(b_+89, b_+92); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb); return; // jp
+  CYC(b_+89, b_+92); TAIL(objectSetPriorityRelativeToLink_withTerrainEffects); // jp
 
 // State 2 = grabbed by power bracelet state
 state2:
@@ -107,7 +107,7 @@ state2:
   if (!(F & FZ)) { RET_TAKEN(b_+112); return; } // ret nz
   CYC(b_+112, b_+113);
   CYC(b_+113, b_+115); mem_wr(gb, HL, 0x8c); // INTERAC_TOKAY_MEAT
-  CYC(b_+115, b_+118); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+115, b_+118); TAIL(interactionIncSubstate); // jp
 
 beingHeld:
   RET(b_+118); return; // ret
@@ -122,18 +122,18 @@ released:
   CALL_C(b_+127, interactionIncState_hook, SYM(interactionIncState), b_+130);
   CYC(b_+130, b_+132); L = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+132, b_+134); mem_wr(gb, HL, 0x14); // 20
-  CYC(b_+134, b_+137); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+134, b_+137); TAIL(objectSetVisible83); // jp
 
 state3: // Disappearing after being dropped on the ground
   CALL_C(b_+137, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+140);
   if (!(F & FZ)) { CYCT(b_+140, b_+142); goto state3_stillDisappearing; } // jr nz
   CYC(b_+140, b_+142);
-  CYC(b_+142, b_+145); interactionDelete_hook(gb); return; // jp
+  CYC(b_+142, b_+145); TAIL(interactionDelete); // jp
 
 state3_stillDisappearing:
   CYC(b_+145, b_+148); A = W8(wFrameCounter);
   CYC(b_+148, b_+150); alu_and(gb, 0x01);
   if (F & FZ) { CYCT(b_+150, b_+153); objectSetInvisible_hook(gb); return; } // jp z
   CYC(b_+150, b_+153);
-  CYC(b_+153, b_+156); objectSetPriorityRelativeToLink_hook(gb); return; // jp
+  CYC(b_+153, b_+156); TAIL(objectSetPriorityRelativeToLink); // jp
 }

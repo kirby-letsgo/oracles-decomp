@@ -94,7 +94,7 @@ void enemyCode27_hook(GB *gb) {
   CYC(b_+18, b_+20); mem_wr(gb, HL, 0x0c);
   CYC(b_+20, b_+22); L = ENEMY_BASE + 0x31; // Enemy.var31
   CYC(b_+22, b_+23); H = mem_rd(gb, HL);
-  CYC(b_+23, b_+26); ecom_killObjectH_b0d_hook(gb); return; // jp
+  CYC(b_+23, b_+26); TAIL(ecom_killObjectH_b0d); // jp
 
 dead:
   CYC(b_+26, b_+28); E = ENEMY_BASE + OBJ_SUBID;
@@ -171,7 +171,7 @@ void dekuScrub_state8_hook(GB *gb) {
   CYC(b_+17, b_+19); mem_wr(gb, HL, 0x02);
   CYC(b_+19, b_+20); alu_xor(gb, A);
   CALL_C(b_+20, enemySetAnimation_hook, SYM(enemySetAnimation), b_+23);
-  CYC(b_+23, b_+26); objectSetVisiblec3_hook(gb); return; // jp
+  CYC(b_+23, b_+26); TAIL(objectSetVisiblec3); // jp
 }
 
 // 0d:6041, bare global; jump-table target from enemyCode27. Link is at a good distance,
@@ -211,7 +211,7 @@ void dekuScrub_state9_hook(GB *gb) {
   CYC(b_+41, b_+44); SET_HL(SYM(dekuScrub_fireAnimations)); // dekuScrub_fireAnimations (data)
   CYC(b_+44, b_+45); dekuScrub_addAToHl_from_rst(gb, b_+45);
   CYC(b_+45, b_+46); A = mem_rd(gb, HL);
-  CYC(b_+46, b_+49); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+46, b_+49); TAIL(enemySetAnimation); // jp
 }
 
 // 0d:6072, bare global; jump-table target from enemyCode27. Firing sequence; falls through
@@ -235,13 +235,13 @@ void dekuScrub_stateA_hook(GB *gb) {
   CYC(b_+17, b_+18); mem_wr(gb, DE, A);
   CYC(b_+18, b_+20); B = 0x1e; // PART_DEKU_SCRUB_PROJECTILE
   CALL_C(b_+20, ecom_spawnProjectile_b0d_hook, SYM(ecom_spawnProjectile_b0d), SYM(dekuScrub_animate));
-  dekuScrub_animate_hook(gb); return; // fallthrough
+  TAIL(dekuScrub_animate); // fallthrough
 }
 
 // 0d:6089, bare global; called from dekuScrub_state9/stateA/stateB/stateD.
 void dekuScrub_animate_hook(GB *gb) {
   BASE(dekuScrub_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // 0d:608c, bare global; jump-table target from enemyCode27. Go hide in the bush again.
@@ -258,7 +258,7 @@ void dekuScrub_stateB_hook(GB *gb) {
   CYC(b_+9, b_+11); mem_wr(gb, HL, 0x08);
   CYC(b_+11, b_+13); L = ENEMY_BASE + OBJ_VAR03;
   CYC(b_+13, b_+15); mem_wr(gb, HL, 0x00);
-  CYC(b_+15, b_+18); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(objectSetInvisible); // jp
 }
 
 // 0d:609e, bare global; jump-table target from enemyCode27. He's just been defeated; falls
@@ -275,7 +275,7 @@ void dekuScrub_stateC_hook(GB *gb) {
   CALL_C(b_+9, objectAddToAButtonSensitiveObjectList_hook, SYM(objectAddToAButtonSensitiveObjectList), b_+12);
   CYC(b_+12, b_+14); A = 0x07;
   CALL_C(b_+14, enemySetAnimation_hook, SYM(enemySetAnimation), SYM(dekuScrub_stateD));
-  dekuScrub_stateD_hook(gb); return; // fallthrough
+  TAIL(dekuScrub_stateD); // fallthrough
 }
 
 // 0d:60af, bare global; jump-table target from enemyCode27, also falls into from
@@ -300,7 +300,7 @@ void dekuScrub_stateD_hook(GB *gb) {
   CYC(b_+15, b_+16); A = mem_rd(gb, DE);
   CYC(b_+16, b_+17); C = A;
   CYC(b_+17, b_+19); B = 0x45; // >TX_4500
-  CYC(b_+19, b_+22); showText_hook(gb); return; // jp
+  CYC(b_+19, b_+22); TAIL(showText); // jp
 }
 
 // 0d:60c5, bare global; called from dekuScrub_state9 and dekuScrub_stateA.
@@ -317,7 +317,7 @@ void dekuScrub_hideInBush_hook(GB *gb) {
   CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_VAR03;
   CYC(b_+15, b_+17); mem_wr(gb, HL, 0x02);
   CYC(b_+17, b_+19); A = 0x06;
-  CYC(b_+19, b_+22); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+19, b_+22); TAIL(enemySetAnimation); // jp
 }
 
 // 0d:6100, bare global; called from dekuScrub_state_uninitialized.

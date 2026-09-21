@@ -389,7 +389,7 @@ state0:
   CALL_C(b_+26, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+29);
   CYC(b_+29, b_+31); alu_bit(gb, 7, A);
   if (!(F & FZ)) {
-    CYCT(b_+31, b_+34); interactionDelete_hook(gb); return;
+    CYCT(b_+31, b_+34); TAIL(interactionDelete);
   }
   CYC(b_+31, b_+34);
   CYC(b_+34, b_+36); A = 0x01;
@@ -531,7 +531,7 @@ state6:
   CYC(b_+171, b_+172); A = mem_rd(gb, HL);
   CYC(b_+172, b_+173); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+173, b_+176); interactionIncState_hook(gb); return;
+    CYCT(b_+173, b_+176); TAIL(interactionIncState);
   }
   CYC(b_+173, b_+176);
   // First byte read was position; move interaction here for the purpose of creating
@@ -606,7 +606,7 @@ state8:
   CYC(b_+251, b_+254); A = mem_rd(gb, wNumEnemies);
   CYC(b_+254, b_+255); A = alu_dec8(gb, A);
   if (F & FZ) {
-    CYCT(b_+255, b_+258); interactionIncState_hook(gb); return;
+    CYCT(b_+255, b_+258); TAIL(interactionIncState);
   }
   CYC(b_+255, b_+258);
   // If [wNumEnemies] == 2, there's only one, big smog on-screen

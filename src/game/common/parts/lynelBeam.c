@@ -54,5 +54,5 @@ L_5174:
   CYC(b_+59, b_+61); A = alu_swap(gb, A);
   CYC(b_+61, b_+62); alu_rlca(gb);
   CALL_C(b_+62, partSetAnimation_hook, SYM(partSetAnimation), b_+65);
-  CYC(b_+65, b_+68); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+65, b_+68); TAIL(objectSetVisible81); // jp
 }

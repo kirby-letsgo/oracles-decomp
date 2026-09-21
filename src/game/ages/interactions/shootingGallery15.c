@@ -111,8 +111,7 @@ void shootingGallery_equipSword_hook(GB *gb) {
   CYC(b_+12, b_+14); A = 0x05;
   CYC(b_+14, b_+15); mem_wr(gb, HL, A);
   CYC(b_+15, b_+17);
-  shootingGallery_changeEquips_hook(gb);
-  return;
+  TAIL(shootingGallery_changeEquips);
 
 equipOnB:
   CYC(b_+17, b_+19); A = 0x05;

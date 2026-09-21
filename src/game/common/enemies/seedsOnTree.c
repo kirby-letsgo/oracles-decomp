@@ -76,7 +76,7 @@ state1:
   CYC(b_+113, b_+115); alu_and(gb, 0x0f);
   CYC(b_+115, b_+118); SET_HL(wSeedTreeRefilledBitset);
   CALL_C(b_+118, unsetFlag_hook, SYM(unsetFlag), b_+121);
-  CYC(b_+121, b_+124); enemyDelete_hook(gb); return; // jp
+  CYC(b_+121, b_+124); TAIL(enemyDelete); // jp
 }
 
 // 0e:68d1, bare local (no exported symbol); called twice via genuine call/ret from

@@ -114,18 +114,18 @@ void updateItemPost_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (item_post_jump_table(gb));
-    if (jt_ == SYM(itemCodeNilPost)) { itemCodeNilPost_hook(gb); return; }
-    else if (jt_ == SYM(itemCode00Post)) { itemCode00Post_hook(gb); return; }
-    else if (jt_ == SYM(itemCode04Post)) { itemCode04Post_hook(gb); return; }
-    else if (jt_ == SYM(itemCode08Post)) { itemCode08Post_hook(gb); return; }
-    else if (jt_ == SYM(itemCode0aPost)) { itemCode0aPost_hook(gb); return; }
-    else if (jt_ == SYM(itemCode0bPost)) { itemCode0bPost_hook(gb); return; }
-    else if (jt_ == SYM(itemCode0cPost)) { itemCode0cPost_hook(gb); return; }
-    else if (jt_ == SYM(itemCode0fPost)) { itemCode0fPost_hook(gb); return; }
-    else if (jt_ == SYM(itemCode13Post)) { itemCode13Post_hook(gb); return; }
-    else if (jt_ == SYM(itemCode1dPost)) { itemCode1dPost_hook(gb); return; }
-    else if (jt_ == SYM(itemCode1ePost)) { itemCode1ePost_hook(gb); return; }
-    else if (jt_ == SYM(itemDelete)) { itemDelete_hook(gb); return; }
+    if (jt_ == SYM(itemCodeNilPost) && hook_enabled_at(gb, SYM(itemCodeNilPost))) { itemCodeNilPost_hook(gb); return; }
+    else if (jt_ == SYM(itemCode00Post) && hook_enabled_at(gb, SYM(itemCode00Post))) { itemCode00Post_hook(gb); return; }
+    else if (jt_ == SYM(itemCode04Post) && hook_enabled_at(gb, SYM(itemCode04Post))) { itemCode04Post_hook(gb); return; }
+    else if (jt_ == SYM(itemCode08Post) && hook_enabled_at(gb, SYM(itemCode08Post))) { itemCode08Post_hook(gb); return; }
+    else if (jt_ == SYM(itemCode0aPost) && hook_enabled_at(gb, SYM(itemCode0aPost))) { itemCode0aPost_hook(gb); return; }
+    else if (jt_ == SYM(itemCode0bPost) && hook_enabled_at(gb, SYM(itemCode0bPost))) { itemCode0bPost_hook(gb); return; }
+    else if (jt_ == SYM(itemCode0cPost) && hook_enabled_at(gb, SYM(itemCode0cPost))) { itemCode0cPost_hook(gb); return; }
+    else if (jt_ == SYM(itemCode0fPost) && hook_enabled_at(gb, SYM(itemCode0fPost))) { itemCode0fPost_hook(gb); return; }
+    else if (jt_ == SYM(itemCode13Post) && hook_enabled_at(gb, SYM(itemCode13Post))) { itemCode13Post_hook(gb); return; }
+    else if (jt_ == SYM(itemCode1dPost) && hook_enabled_at(gb, SYM(itemCode1dPost))) { itemCode1dPost_hook(gb); return; }
+    else if (jt_ == SYM(itemCode1ePost) && hook_enabled_at(gb, SYM(itemCode1ePost))) { itemCode1ePost_hook(gb); return; }
+    else if (jt_ == SYM(itemDelete) && hook_enabled_at(gb, SYM(itemDelete))) { itemDelete_hook(gb); return; }
     else { HANDOFF(jt_); }
   } while (0);
 }

@@ -99,7 +99,7 @@ void targetCartCrystal_state0_hook(GB *gb) {
   CALL_C(b_+11, targetCartCrystal_initSpeed_hook, SYM(targetCartCrystal_initSpeed), b_+14);
 
 skipInitSpeed:
-  CYC(b_+14, b_+17); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+14, b_+17); TAIL(objectSetVisible80); // jp
 }
 
 // 0e:7d9b, bare global; jump-table target from enemyCode63. Standard update state
@@ -125,7 +125,7 @@ checkDeleteInFirstRoom:
   CYC(b_+20, b_+23);
 
 animate:
-  CYC(b_+23, b_+26); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+23, b_+26); TAIL(enemyAnimate); // jp
 }
 
 // 0e:7db5, bare global; jump-table target from enemyCode63. Target destroyed.
@@ -161,7 +161,7 @@ spawnNext:
   CYC(b_+40, b_+42);
 
 delete:
-  CYC(b_+42, b_+45); enemyDelete_hook(gb); return; // jp
+  CYC(b_+42, b_+45); TAIL(enemyDelete); // jp
 }
 
 // 0e:7de2, bare global; called from targetCartCrystal_state0. Sets var03 to a
@@ -245,5 +245,5 @@ void targetCartCrystal_updateMovement_hook(GB *gb) {
   CYC(b_+12, b_+13); mem_wr(gb, HL, A);
 
 applySpeed:
-  CYC(b_+13, b_+16); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+13, b_+16); TAIL(objectApplySpeed); // jp
 }

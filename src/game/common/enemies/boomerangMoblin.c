@@ -68,7 +68,7 @@ dead:
   CYC(b_+24, b_+26); mem_wr(gb, HL, 0xff);
 
 skipClearBoomerang:
-  CYC(b_+26, b_+29); enemyDie_hook(gb); return; // jp
+  CYC(b_+26, b_+29); TAIL(enemyDie); // jp
 
 normalStatus:
   CALL_C(b_+29, ecom_checkScentSeedActive_b0d_hook, SYM(ecom_checkScentSeedActive_b0d), b_+32);
@@ -108,7 +108,7 @@ state_scentSeed:
   CYC(b_+87, b_+88); mem_wr(gb, DE, A);
   CALL_C(b_+88, ecom_updateAnimationFromAngle_b0d_hook, SYM(ecom_updateAnimationFromAngle_b0d), b_+91);
   CALL_C(b_+91, ecom_applyVelocityForSideviewEnemy_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemy_b0d), b_+94);
-  CYC(b_+94, b_+97); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+94, b_+97); TAIL(enemyAnimate); // jp
 
 state_switchHook:
   CYC(b_+97, b_+98); E = alu_inc8(gb, E);
@@ -127,7 +127,7 @@ switchHook_substate1:
 
 switchHook_substate3:
   CYC(b_+109, b_+111); B = 0x0a;
-  CYC(b_+111, b_+114); ecom_fallToGroundAndSetState_b0d_hook(gb); return; // jp
+  CYC(b_+111, b_+114); TAIL(ecom_fallToGroundAndSetState_b0d); // jp
 
 state_stub:
   RET(b_+114); return; // ret
@@ -146,7 +146,7 @@ state_8_setState9:
   CYC(b_+129, b_+130); mem_wr(gb, DE, A);
 
 state_8_animate:
-  CYC(b_+130, b_+133); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+130, b_+133); TAIL(enemyAnimate); // jp
 
 state_9:
   CYC(b_+133, b_+136); push_effect(gb, b_+136); goto gotoState8WithRandomAngleAndCounter;

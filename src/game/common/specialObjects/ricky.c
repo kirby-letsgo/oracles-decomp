@@ -86,18 +86,18 @@ static void ricky_run_state(GB *gb, uint16_t sp0_) {
   CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   CYC(b_+15, b_+16); push_effect(gb, b_+16);
   do { uint16_t jt_ = (ricky_jump_table(gb));
-    if (jt_ == SYM(rickyState0)) { rickyState0_hook(gb); return; }
-    else if (jt_ == SYM(rickyState1)) { rickyState1_hook(gb); return; }
-    else if (jt_ == SYM(rickyState2)) { rickyState2_hook(gb); return; }
-    else if (jt_ == SYM(rickyState3)) { rickyState3_hook(gb); return; }
-    else if (jt_ == SYM(rickyState4)) { rickyState4_hook(gb); return; }
-    else if (jt_ == SYM(rickyState5)) { rickyState5_hook(gb); return; }
-    else if (jt_ == SYM(rickyState6)) { rickyState6_hook(gb); return; }
-    else if (jt_ == SYM(rickyState7)) { rickyState7_hook(gb); return; }
-    else if (jt_ == SYM(rickyState8)) { rickyState8_hook(gb); return; }
-    else if (jt_ == SYM(rickyState9)) { rickyState9_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateA)) { rickyStateA_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateC)) { rickyStateC_hook(gb); return; }
+    if (jt_ == SYM(rickyState0) && hook_enabled_at(gb, SYM(rickyState0))) { rickyState0_hook(gb); return; }
+    else if (jt_ == SYM(rickyState1) && hook_enabled_at(gb, SYM(rickyState1))) { rickyState1_hook(gb); return; }
+    else if (jt_ == SYM(rickyState2) && hook_enabled_at(gb, SYM(rickyState2))) { rickyState2_hook(gb); return; }
+    else if (jt_ == SYM(rickyState3) && hook_enabled_at(gb, SYM(rickyState3))) { rickyState3_hook(gb); return; }
+    else if (jt_ == SYM(rickyState4) && hook_enabled_at(gb, SYM(rickyState4))) { rickyState4_hook(gb); return; }
+    else if (jt_ == SYM(rickyState5) && hook_enabled_at(gb, SYM(rickyState5))) { rickyState5_hook(gb); return; }
+    else if (jt_ == SYM(rickyState6) && hook_enabled_at(gb, SYM(rickyState6))) { rickyState6_hook(gb); return; }
+    else if (jt_ == SYM(rickyState7) && hook_enabled_at(gb, SYM(rickyState7))) { rickyState7_hook(gb); return; }
+    else if (jt_ == SYM(rickyState8) && hook_enabled_at(gb, SYM(rickyState8))) { rickyState8_hook(gb); return; }
+    else if (jt_ == SYM(rickyState9) && hook_enabled_at(gb, SYM(rickyState9))) { rickyState9_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateA) && hook_enabled_at(gb, SYM(rickyStateA))) { rickyStateA_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateC) && hook_enabled_at(gb, SYM(rickyStateC))) { rickyStateC_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -180,14 +180,14 @@ didntMount:
   CYC(b_+20, b_+22); alu_and(gb, 0xc0);
   if (F & FZ) {
     CYCT(b_+22, b_+24);
-    rickyCheckHazards_hook(gb); return;
+    TAIL(rickyCheckHazards);
   }
   CYC(b_+22, b_+24);
   CYC(b_+24, b_+25); alu_rlca(gb);
   CYC(b_+25, b_+27); C = 0x40;
   if (!(F & FC)) {
     CYCT(b_+27, b_+30);
-    objectUpdateSpeedZ_paramC_hook(gb); return;
+    TAIL(objectUpdateSpeedZ_paramC);
   }
   CYC(b_+27, b_+30);
   CYC(b_+30, b_+33); SET_BC(0xff00);
@@ -201,7 +201,7 @@ void rickyCheckHazards_hook(GB *gb) {
   CALL_C(b_+0, companionCheckHazards_hook, SYM(companionCheckHazards), b_+3);
   if (F & FC) {
     CYCT(b_+3, b_+6);
-    rickyFunc_70cc_hook(gb); return;
+    TAIL(rickyFunc_70cc);
   }
   CYC(b_+3, b_+6);
   rickyState9_hook(gb);
@@ -302,7 +302,7 @@ countdown:
   }
   CYC(b_+31, b_+33);
   CYC(b_+33, b_+35); A = 0x65;
-  CYC(b_+35, b_+38); playSound_b00_hook(gb); return;
+  CYC(b_+35, b_+38); TAIL(playSound_b00);
 animate:
   CALL_C(b_+38, companionAnimateDrowningOrFallingThenRespawn_hook, SYM(companionAnimateDrowningOrFallingThenRespawn), b_+41);
   if (!(F & FC)) { CYCT(b_+41, b_+42); ret_effect(gb); return; }
@@ -326,10 +326,10 @@ void rickyState5_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ricky_jump_table(gb));
-    if (jt_ == SYM(rickyState5Substate0)) { rickyState5Substate0_hook(gb); return; }
-    else if (jt_ == SYM(rickyState5Substate1)) { rickyState5Substate1_hook(gb); return; }
-    else if (jt_ == SYM(rickyState5Substate2)) { rickyState5Substate2_hook(gb); return; }
-    else if (jt_ == SYM(rickyState5Substate3)) { rickyState5Substate3_hook(gb); return; }
+    if (jt_ == SYM(rickyState5Substate0) && hook_enabled_at(gb, SYM(rickyState5Substate0))) { rickyState5Substate0_hook(gb); return; }
+    else if (jt_ == SYM(rickyState5Substate1) && hook_enabled_at(gb, SYM(rickyState5Substate1))) { rickyState5Substate1_hook(gb); return; }
+    else if (jt_ == SYM(rickyState5Substate2) && hook_enabled_at(gb, SYM(rickyState5Substate2))) { rickyState5Substate2_hook(gb); return; }
+    else if (jt_ == SYM(rickyState5Substate3) && hook_enabled_at(gb, SYM(rickyState5Substate3))) { rickyState5Substate3_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -348,14 +348,14 @@ void rickyState5Substate0_hook(GB *gb) {
   CYC(b_+9, b_+11); alu_bit(gb, 0, A);
   if (!(F & FZ)) {
     CYCT(b_+11, b_+14);
-    rickyStartPunch_hook(gb); return;
+    TAIL(rickyStartPunch);
   }
   CYC(b_+11, b_+14);
   CYC(b_+14, b_+16); alu_bit(gb, 1, A);
 checkDismount:
   if (!(F & FZ)) {
     CYCT(b_+16, b_+19);
-    companionGotoDismountState_hook(gb); return;
+    TAIL(companionGotoDismountState);
   }
   CYC(b_+16, b_+19);
   CYC(b_+19, b_+20); H = D;
@@ -373,7 +373,7 @@ checkDismount:
   CYC(b_+33, b_+34); mem_wr(gb, HL, A);
   CYC(b_+34, b_+36); C = 0x20;
   CALL_C(b_+36, companionSetAnimation_hook, SYM(companionSetAnimation), b_+39);
-  CYC(b_+39, b_+42); rickyCheckHazards_hook(gb); return;
+  CYC(b_+39, b_+42); TAIL(rickyCheckHazards);
 moving:
   CYC(b_+42, b_+44); L = 0x39;
   CYC(b_+44, b_+45); A = mem_rd(gb, HL);
@@ -391,7 +391,7 @@ moving:
   CALL_C(b_+58, rickyCheckForHoleInFront_hook, SYM(rickyCheckForHoleInFront), b_+61);
   if (F & FZ) {
     CYCT(b_+61, b_+64);
-    rickyBeginJumpOverHole_hook(gb); return;
+    TAIL(rickyBeginJumpOverHole);
   }
   CYC(b_+61, b_+64);
   CALL_C(b_+64, companionCheckHopDownCliff_hook, SYM(companionCheckHopDownCliff), b_+67);
@@ -400,7 +400,7 @@ moving:
     goto checkHopUp;
   }
   CYC(b_+67, b_+69);
-  CYC(b_+69, b_+72); rickySetJumpSpeed_hook(gb); return;
+  CYC(b_+69, b_+72); TAIL(rickySetJumpSpeed);
 checkHopUp:
   CALL_C(b_+72, rickyCheckHopUpCliff_hook, SYM(rickyCheckHopUpCliff), b_+75);
   if (!(F & FZ)) {
@@ -408,10 +408,10 @@ checkHopUp:
     goto updateMovement;
   }
   CYC(b_+75, b_+77);
-  CYC(b_+77, b_+80); rickySetJumpSpeed_andcc91_hook(gb); return;
+  CYC(b_+77, b_+80); TAIL(rickySetJumpSpeed_andcc91);
 updateMovement:
   CALL_C(b_+80, companionUpdateMovement_hook, SYM(companionUpdateMovement), b_+83);
-  CYC(b_+83, b_+86); rickyCheckHazards_hook(gb); return;
+  CYC(b_+83, b_+86); TAIL(rickyCheckHazards);
 tryToJump:
   CYC(b_+86, b_+87); H = D;
   CYC(b_+87, b_+89); L = 0x09;
@@ -437,13 +437,13 @@ tryToJump:
   CYC(b_+109, b_+111);
   CYC(b_+111, b_+114); W8(wDisableScreenTransitions) = A;
   CYC(b_+114, b_+116); C = 0x0f;
-  CYC(b_+116, b_+119); companionSetAnimation_hook(gb); return;
+  CYC(b_+116, b_+119); TAIL(companionSetAnimation);
 checkHopUpForJump:
   CALL_C(b_+119, rickyCheckHopUpCliff_hook, SYM(rickyCheckHopUpCliff), b_+122);
   CYC(b_+122, b_+124); C = 0x0f;
   if (F & FZ) {
     CYCT(b_+124, b_+127);
-    companionSetAnimation_hook(gb); return;
+    TAIL(companionSetAnimation);
   }
   CYC(b_+124, b_+127);
 jump:
@@ -453,7 +453,7 @@ jump:
   CALL_C(b_+132, rickyCheckForHoleInFront_hook, SYM(rickyCheckForHoleInFront), b_+135);
   if (F & FZ) {
     CYCT(b_+135, b_+138);
-    rickyBeginJumpOverHole_hook(gb); return;
+    TAIL(rickyBeginJumpOverHole);
   }
   CYC(b_+135, b_+138);
   CYC(b_+138, b_+141); SET_BC(0xfe80);
@@ -535,7 +535,7 @@ void rickyState5Substate1_hook(GB *gb) {
   CYC(b_+9, b_+11); alu_bit(gb, 0, A);
   if (!(F & FZ)) {
     CYCT(b_+11, b_+14);
-    rickyStartPunch_hook(gb); return;
+    TAIL(rickyStartPunch);
   }
   CYC(b_+11, b_+14);
   CYC(b_+14, b_+17); A = W8(wLinkAngle);
@@ -590,7 +590,7 @@ checkHole:
   if (F & FZ) { CYCT(b_+71, b_+72); ret_effect(gb); return; }
   CYC(b_+71, b_+72);
 updateMovement:
-  CYC(b_+72, b_+75); companionUpdateMovement_hook(gb); return;
+  CYC(b_+72, b_+75); TAIL(companionUpdateMovement);
 landed:
   CALL_C(b_+75, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+78);
   CALL_C(b_+78, companionDecCounter1IfNonzero_hook, SYM(companionDecCounter1IfNonzero), b_+81);
@@ -618,7 +618,7 @@ update:
   CALL_C(b_+14, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+17);
   if (F & FZ) {
     CYCT(b_+17, b_+20);
-    rickyStopUntilLandedOnGround_hook(gb); return;
+    TAIL(rickyStopUntilLandedOnGround);
   }
   CYC(b_+17, b_+20);
   CALL_C(b_+20, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+23);
@@ -626,7 +626,7 @@ update:
   CALL_C(b_+26, specialObjectCheckMovingTowardWall_hook, SYM(specialObjectCheckMovingTowardWall), b_+29);
   if (!(F & FZ)) {
     CYCT(b_+29, b_+32);
-    rickyStopUntilLandedOnGround_hook(gb); return;
+    TAIL(rickyStopUntilLandedOnGround);
   }
   CYC(b_+29, b_+32);
   CYC(b_+32, b_+33); ret_effect(gb);
@@ -685,7 +685,7 @@ animate:
   }
   CYC(b_+36, b_+38);
   CYC(b_+38, b_+40); A = 0x75;
-  CYC(b_+40, b_+43); playSound_b00_hook(gb); return;
+  CYC(b_+40, b_+43); TAIL(playSound_b00);
 startTornadoCharge:
   CYC(b_+43, b_+45); E = 0x0f;
   CYC(b_+45, b_+46); A = mem_rd(gb, DE);
@@ -696,7 +696,7 @@ startTornadoCharge:
   CYC(b_+51, b_+53); alu_and(gb, 0x01);
   if (F & FZ) {
     CYCT(b_+53, b_+56);
-    rickyStopUntilLandedOnGround_hook(gb); return;
+    TAIL(rickyStopUntilLandedOnGround);
   }
   CYC(b_+53, b_+56);
   CALL_C(b_+56, itemIncSubstate_hook, SYM(itemIncSubstate), b_+59);
@@ -705,7 +705,7 @@ startTornadoCharge:
   CALL_C(b_+64, companionCheckHazards_hook, SYM(companionCheckHazards), b_+67);
   if (!(F & FC)) { CYCT(b_+67, b_+68); ret_effect(gb); return; }
   CYC(b_+67, b_+68);
-  CYC(b_+68, b_+71); rickyFunc_70cc_hook(gb); return;
+  CYC(b_+68, b_+71); TAIL(rickyFunc_70cc);
 substate1:
   CYC(b_+71, b_+74); A = W8(wLinkAngle);
   CYC(b_+74, b_+76); alu_bit(gb, 7, A);
@@ -740,7 +740,7 @@ animateCharge:
   CALL_C(b_+105, companionTryToBreakTileFromMoving_hook, SYM(companionTryToBreakTileFromMoving), b_+108);
   CALL_C(b_+108, rickyCheckHazards_hook, SYM(rickyCheckHazards), b_+111);
   CYC(b_+111, b_+113); C = 0x04;
-  CYC(b_+113, b_+116); companionFlashFromChargingAnimation_hook(gb); return;
+  CYC(b_+113, b_+116); TAIL(companionFlashFromChargingAnimation);
 continueCharging:
   CYC(b_+116, b_+117); A = alu_inc8(gb, A);
   CYC(b_+117, b_+118); mem_wr(gb, DE, A);
@@ -748,7 +748,7 @@ continueCharging:
   if (!(F & FZ)) { CYCT(b_+120, b_+121); ret_effect(gb); return; }
   CYC(b_+120, b_+121);
   CYC(b_+121, b_+123); A = 0x4f;
-  CYC(b_+123, b_+126); playSound_b00_hook(gb); return;
+  CYC(b_+123, b_+126); TAIL(playSound_b00);
 releasedAButton:
   CYC(b_+126, b_+129); SET_HL(w1Link_oamFlagsBackup);
   CYC(b_+129, b_+130); A = mem_rd(gb, HL); SET_HL(HL + 1);
@@ -768,7 +768,7 @@ releasedAButton:
   CYC(b_+149, b_+151); A = 0x6b;
   CALL_C(b_+151, playSound_b00_hook, SYM(playSound_b00), b_+154);
   CYC(b_+154, b_+156);
-  rickyStartPunch_hook(gb); return;
+  TAIL(rickyStartPunch);
 notCharged:
   CYC(b_+156, b_+158); C = 0x05;
   CYC(b_+158, b_+161); companionSetAnimationAndGotoState5_hook(gb);
@@ -816,20 +816,20 @@ substate0:
   CALL_C(b_+16, itemIncSubstate_hook, SYM(itemIncSubstate), b_+19);
   CALL_C(b_+19, companionDismountAndSavePosition_hook, SYM(companionDismountAndSavePosition), b_+22);
   CYC(b_+22, b_+24); A = 0x17;
-  CYC(b_+24, b_+27); specialObjectSetAnimation_hook(gb); return;
+  CYC(b_+24, b_+27); TAIL(specialObjectSetAnimation);
 substate1:
   CYC(b_+27, b_+30); A = W8(wLinkInAir);
   CYC(b_+30, b_+31); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+31, b_+32); ret_effect(gb); return; }
   CYC(b_+31, b_+32);
-  CYC(b_+32, b_+35); itemIncSubstate_hook(gb); return;
+  CYC(b_+32, b_+35); TAIL(itemIncSubstate);
 substate2:
   CALL_C(b_+35, companionSetPriorityRelativeToLink_hook, SYM(companionSetPriorityRelativeToLink), b_+38);
   CYC(b_+38, b_+40); C = 0x09;
   CALL_C(b_+40, objectCheckLinkWithinDistance_hook, SYM(objectCheckLinkWithinDistance), b_+43);
   if (F & FC) {
     CYCT(b_+43, b_+46);
-    rickyCheckHazards_hook(gb); return;
+    TAIL(rickyCheckHazards);
   }
   CYC(b_+43, b_+46);
   CYC(b_+46, b_+48); E = 0x05;
@@ -888,7 +888,7 @@ setState:
   CALL_C(b_+23, rickyCheckAtScreenEdge_hook, SYM(rickyCheckAtScreenEdge), b_+26);
   if (F & FZ) {
     CYCT(b_+26, b_+28);
-    rickyCheckHazards2_hook(gb); return;
+    TAIL(rickyCheckHazards2);
   }
   CYC(b_+26, b_+28);
   CYC(b_+28, b_+30); E = 0x39;
@@ -904,7 +904,7 @@ void rickyCheckHazards2_hook(GB *gb) {
   CYC(b_+3, b_+5); C = 0x20;
   if (!(F & FC)) {
     CYCT(b_+5, b_+8);
-    companionSetAnimation_hook(gb); return;
+    TAIL(companionSetAnimation);
   }
   CYC(b_+5, b_+8);
   rickyFunc_70cc_hook(gb);
@@ -936,13 +936,13 @@ void rickyStateA_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ricky_jump_table(gb));
-    if (jt_ == SYM(rickyStateASubstate0)) { rickyStateASubstate0_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateASubstate1)) { rickyStateASubstate1_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateASubstate2)) { rickyStateASubstate2_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateASubstate3)) { rickyStateASubstate3_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateASubstate4)) { rickyStateASubstate4_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateASubstate5)) { rickyStateASubstate5_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateASubstate6)) { rickyStateASubstate6_hook(gb); return; }
+    if (jt_ == SYM(rickyStateASubstate0) && hook_enabled_at(gb, SYM(rickyStateASubstate0))) { rickyStateASubstate0_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateASubstate1) && hook_enabled_at(gb, SYM(rickyStateASubstate1))) { rickyStateASubstate1_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateASubstate2) && hook_enabled_at(gb, SYM(rickyStateASubstate2))) { rickyStateASubstate2_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateASubstate3) && hook_enabled_at(gb, SYM(rickyStateASubstate3))) { rickyStateASubstate3_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateASubstate4) && hook_enabled_at(gb, SYM(rickyStateASubstate4))) { rickyStateASubstate4_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateASubstate5) && hook_enabled_at(gb, SYM(rickyStateASubstate5))) { rickyStateASubstate5_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateASubstate6) && hook_enabled_at(gb, SYM(rickyStateASubstate6))) { rickyStateASubstate6_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -959,7 +959,7 @@ void rickyStateASubstate0_hook(GB *gb) {
   CYC(b_+13, b_+15); C = 0x40;
   if (!(F & FC)) {
     CYCT(b_+15, b_+18);
-    objectUpdateSpeedZ_paramC_hook(gb); return;
+    TAIL(objectUpdateSpeedZ_paramC);
   }
   CYC(b_+15, b_+18);
   CYC(b_+18, b_+21); SET_BC(0xff00);
@@ -1041,7 +1041,7 @@ void rickyStateASubstate6_hook(GB *gb) {
   CYC(b_+7, b_+9); A = 0xc3;
   if (F & FZ) {
     CYCT(b_+9, b_+12);
-    playSound_b00_hook(gb); return;
+    TAIL(playSound_b00);
   }
   CYC(b_+9, b_+12);
   CYC(b_+12, b_+13); A = mem_rd(gb, DE);

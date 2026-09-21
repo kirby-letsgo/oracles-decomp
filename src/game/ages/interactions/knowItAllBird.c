@@ -37,7 +37,7 @@ void interactionCodee3__beginJump_hook(GB *gb) {
   BASE(interactionCodee3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+163, b_+166); SET_BC(0xff40);  // ld bc,-$c0
-  CYC(b_+166, b_+169); objectSetSpeedZ_hook(gb); return;  // jp objectSetSpeedZ
+  CYC(b_+166, b_+169); TAIL(objectSetSpeedZ);  // jp objectSetSpeedZ
 }
 
 void interactionCodee3_hook(GB *gb) {
@@ -74,7 +74,7 @@ state0:
   CYC(b_+51, b_+52); mem_wr(gb, DE, A);  // ld (de),a
   CYC(b_+52, b_+54); A = 0x32;  // ld a,>TX_3200
   CALL_C(b_+54, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+57);
-  CYC(b_+57, b_+60); objectSetVisible82_hook(gb); return;  // jp objectSetVisible82
+  CYC(b_+57, b_+60); TAIL(objectSetVisible82);  // jp objectSetVisible82
 
 state1:
   CALL_C(b_+70, interactionRunScript_hook, SYM(interactionRunScript), b_+73);
@@ -89,7 +89,7 @@ substate0:
   CYC(b_+87, b_+89); L = INTERACTION_BASE + OBJ_DIRECTION;  // ld l,Interaction.direction
   CYC(b_+89, b_+90); A = mem_rd(gb, HL);  // ld a,(hl)
   CYC(b_+90, b_+92); alu_add(gb, 0x02);  // add $02
-  CYC(b_+92, b_+95); interactionSetAnimation_hook(gb); return;  // jp interactionSetAnimation
+  CYC(b_+92, b_+95); TAIL(interactionSetAnimation);  // jp interactionSetAnimation
 label_10_337:
   CYC(b_+95, b_+98); push_effect(gb, b_+98); interactionCodee3__decVar36_hook(gb);  // call @decVar36
   if (!(F & FZ)) { CYCT(b_+98, b_+100); goto animate; } CYC(b_+98, b_+100);  // jr nz,@animate
@@ -102,9 +102,9 @@ label_10_337:
   CYC(b_+113, b_+114); A = mem_rd(gb, HL);  // ld a,(hl)
   CYC(b_+114, b_+116); alu_xor(gb, 0x01);  // xor $01
   CYC(b_+116, b_+117); mem_wr(gb, HL, A);  // ld (hl),a
-  CYC(b_+117, b_+120); interactionSetAnimation_hook(gb); return;  // jp interactionSetAnimation
+  CYC(b_+117, b_+120); TAIL(interactionSetAnimation);  // jp interactionSetAnimation
 animate:
-  CYC(b_+120, b_+123); interactionAnimateAsNpc_hook(gb); return;  // jp interactionAnimateAsNpc
+  CYC(b_+120, b_+123); TAIL(interactionAnimateAsNpc);  // jp interactionAnimateAsNpc
 substate1:
   CALL_C(b_+123, interactionAnimate_hook, SYM(interactionAnimate), b_+126);
   CYC(b_+126, b_+127); H = D;  // ld h,d
@@ -121,11 +121,11 @@ substate1:
   CYC(b_+144, b_+145); mem_wr(gb, HL, A);  // ld (hl),a
   CYC(b_+145, b_+147); L = INTERACTION_BASE + OBJ_DIRECTION;  // ld l,Interaction.direction
   CYC(b_+147, b_+148); A = mem_rd(gb, HL);  // ld a,(hl)
-  CYC(b_+148, b_+151); interactionSetAnimation_hook(gb); return;  // jp interactionSetAnimation
+  CYC(b_+148, b_+151); TAIL(interactionSetAnimation);  // jp interactionSetAnimation
 updateSpeedZ:
   CYC(b_+156, b_+158); C = 0x20;  // ld c,$20
   CALL_C(b_+158, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+161);
   if (!(F & FZ)) { RET_TAKEN(b_+161); return; } CYC(b_+161, b_+162);  // ret nz
   CYC(b_+162, b_+163); H = D;  // ld h,d
-  interactionCodee3__beginJump_hook(gb); return;  // falls into @beginJump
+  TAIL(interactionCodee3__beginJump);  // falls into @beginJump
 }

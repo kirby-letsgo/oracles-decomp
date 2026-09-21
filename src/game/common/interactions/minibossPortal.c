@@ -105,7 +105,7 @@ commonState0:
 afterIncA:
   CYC(b_+64, b_+66); E = INTERACTION_BASE + OBJ_STATE;
   CYC(b_+66, b_+67); mem_wr(gb, DE, A);
-  CYC(b_+67, b_+70); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+67, b_+70); TAIL(objectSetVisible83); // jp
 
 state1:
   CALL_C(b_+70, interactionAnimate_hook, SYM(interactionAnimate), b_+73);
@@ -132,7 +132,7 @@ state1:
   CYC(b_+112, b_+114); A = 0x01;
   CYC(b_+114, b_+117); W8(wDisabledObjects) = A;
   CYC(b_+117, b_+119); A = 0x8d; // SND_TELEPORT
-  CYC(b_+119, b_+122); playSound_b00_hook(gb); return; // jp
+  CYC(b_+119, b_+122); TAIL(playSound_b00); // jp
 
 state2:
   CALL_C(b_+122, interactionAnimate_hook, SYM(interactionAnimate), b_+125);

@@ -101,7 +101,7 @@ randomNumberFrom0To4:
   CYC(b_+114, b_+116); alu_and(gb, 0x1f);
   CYC(b_+116, b_+118); E = INTERACTION_BASE + OBJ_ANGLE;
   CYC(b_+118, b_+119); mem_wr(gb, DE, A);
-  CYC(b_+119, b_+122); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+119, b_+122); TAIL(objectSetVisible81); // jp
 
 subid01:
   CYC(b_+122, b_+123); alu_or(gb, A);
@@ -120,7 +120,7 @@ subid01:
   CYC(b_+141, b_+142);
   CYC(b_+142, b_+144); mem_wr(gb, HL, 90);
   CYC(b_+144, b_+146); B = 0x91; // INTERAC_BUBBLE
-  CYC(b_+146, b_+149); objectCreateInteractionWithSubid00_hook(gb); return; // jp
+  CYC(b_+146, b_+149); TAIL(objectCreateInteractionWithSubid00); // jp
 
 subid01_state0:
   CALL_C(b_+149, interactionIncState_hook, SYM(interactionIncState), b_+152);

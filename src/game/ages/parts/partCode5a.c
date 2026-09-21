@@ -35,5 +35,5 @@ L_7f52:
   CYC(b_+31, b_+33); mem_wr(gb, HL, 0x00);
   CYC(b_+33, b_+35); A = 0x98; // PALH_98
   CALL_C(b_+35, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+38);
-  CYC(b_+38, b_+41); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+38, b_+41); TAIL(objectSetVisible83); // jp
 }

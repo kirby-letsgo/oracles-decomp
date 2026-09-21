@@ -131,7 +131,7 @@ subid0:
 
 state1:
   CALL_C(b_+16, interactionRunScript_hook, SYM(interactionRunScript), b_+19);
-  CYC(b_+19, b_+22); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+19, b_+22); TAIL(interactionAnimate); // jp
 
 subid0State0:
   CYC(b_+22, b_+24); A = 0x27; // GLOBALFLAG_KING_ZORA_CURED
@@ -149,7 +149,7 @@ setScriptAndInit:
   CALL_C(b_+47, interactionIncState_hook, SYM(interactionIncState), b_+50);
   CYC(b_+50, b_+52); A = 0x0a;
   CALL_C(b_+52, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+55);
-  CYC(b_+55, b_+58); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+55, b_+58); TAIL(objectSetVisible82); // jp
 
 subid1:
   CYC(b_+58, b_+59); A = mem_rd(gb, DE);
@@ -169,12 +169,12 @@ subid2:
   CALL_C(b_+71, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+74);
   if (!(F & FZ)) { CYCT(b_+74, b_+75); ret_effect(gb); return; } // ret nz
   CYC(b_+74, b_+75);
-  CYC(b_+75, b_+78); interactionDelete_hook(gb); return; // jp
+  CYC(b_+75, b_+78); TAIL(interactionDelete); // jp
 
 subid2State0:
   CALL_C(b_+78, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+81);
   CALL_C(b_+81, interactionIncState_hook, SYM(interactionIncState), b_+84);
   CYC(b_+84, b_+86); L = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+86, b_+88); mem_wr(gb, HL, 0x24);
-  CYC(b_+88, b_+91); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+88, b_+91); TAIL(objectSetVisible81); // jp
 }

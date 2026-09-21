@@ -102,7 +102,7 @@ void keese_state_uninitialized_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, ecom_setSpeedAndState8_b0e_hook, SYM(ecom_setSpeedAndState8_b0e), b_+3);
   CALL_C(b_+3, keese_initializeSubid_hook, SYM(keese_initializeSubid), b_+6);
-  CYC(b_+6, b_+9); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+6, b_+9); TAIL(objectSetVisible82); // jp
 }
 
 void keese_state_stub_hook(GB *gb) {
@@ -145,7 +145,7 @@ void keese_subid00_state8_hook(GB *gb) {
   CYC(b_+25, b_+26); mem_wr(gb, HL, A);
   CYC(b_+26, b_+28); A = 0x01;
   CALL_C(b_+28, enemySetAnimation_hook, SYM(enemySetAnimation), b_+31);
-  CYCT(b_+31, b_+33); keese_animate_hook(gb); return; // jr
+  CYCT(b_+31, b_+33); TAIL(keese_animate); // jr
 }
 
 // Moving in some direction for [counter1] frames
@@ -169,17 +169,17 @@ void keese_subid00_state9_hook(GB *gb) {
   CYC(b_+26, b_+28); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+28, b_+29); A = C;
   CYC(b_+29, b_+30); mem_wr(gb, DE, A);
-  CYCT(b_+30, b_+32); keese_animate_hook(gb); return; // jr
+  CYCT(b_+30, b_+32); TAIL(keese_animate); // jr
 
 timeToStop:
   CYC(b_+32, b_+34); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+34, b_+35); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
-  keese_animate_hook(gb); return; // fallthrough
+  TAIL(keese_animate); // fallthrough
 }
 
 void keese_animate_hook(GB *gb) {
   BASE(keese_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // Decelerating until [counter1] counts up to $7f, when it stops completely.
@@ -211,7 +211,7 @@ L_47ad:
   CYC(b_+35, b_+37); alu_add(gb, 0x20);
   CYC(b_+37, b_+38); mem_wr(gb, DE, A);
   CYC(b_+38, b_+39); alu_xor(gb, A);
-  CYC(b_+39, b_+42); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+39, b_+42); TAIL(enemySetAnimation); // jp
 }
 
 void keese_subid01_hook(GB *gb) {
@@ -251,7 +251,7 @@ void keese_subid01_state8_hook(GB *gb) {
   CYC(b_+29, b_+30); L = alu_inc8(gb, L);
   CYC(b_+30, b_+32); mem_wr(gb, HL, 12); // [counter2]
   CYC(b_+32, b_+34); A = 0x01;
-  CYC(b_+34, b_+37); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+34, b_+37); TAIL(enemySetAnimation); // jp
 }
 
 void keese_subid02_state9_hook(GB *gb) {
@@ -277,7 +277,7 @@ void keese_subid02_state9_hook(GB *gb) {
   CYC(b_+29, b_+30); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)
   CALL_C(b_+30, keese_chooseWhetherToReverseTurningAngle_hook, SYM(keese_chooseWhetherToReverseTurningAngle), b_+33);
   CYC(b_+33, b_+34); alu_xor(gb, A);
-  CYC(b_+34, b_+37); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+34, b_+37); TAIL(enemySetAnimation); // jp
 }
 
 // Every 16 frames (based on counter1) this updates the keese's speed as it's decelerating.
@@ -326,7 +326,7 @@ subid1:
   CYC(b_+10, b_+12); mem_wr(gb, HL, 0xff);
   CYC(b_+12, b_+14); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+14, b_+16); mem_wr(gb, HL, 0x02);
-  keese_chooseWhetherToReverseTurningAngle_hook(gb); return; // fallthrough
+  TAIL(keese_chooseWhetherToReverseTurningAngle); // fallthrough
 }
 
 // For subid 1 only, this has a 1 in 4 chance of deciding to reverse the turning angle

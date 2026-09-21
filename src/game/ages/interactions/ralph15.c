@@ -40,7 +40,7 @@ void ralph_createLinkedSwordAnimation_hook(GB *gb) {
   CYC(b_+6, b_+8); L = INTERACTION_BASE + OBJ_RELATED1 + 1;
   CYC(b_+8, b_+9); A = D;
   CYC(b_+9, b_+10); mem_wr(gb, HL, A);
-  CYC(b_+10, b_+13); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+10, b_+13); TAIL(objectCopyPosition); // jp
 }
 
 void ralph_faceLinkAndCreateExclamationMark_hook(GB *gb) {
@@ -53,14 +53,14 @@ void ralph_faceLinkAndCreateExclamationMark_hook(GB *gb) {
   CYC(b_+9, b_+10); alu_rlca(gb);
   CALL_C(b_+10, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+13);
   CYC(b_+13, b_+15); A = 0x1e;
-  ralph_createExclamationMarkShiftedRight_hook(gb); return; // fallthrough
+  TAIL(ralph_createExclamationMarkShiftedRight); // fallthrough
 }
 
 void ralph_createExclamationMarkShiftedRight_hook(GB *gb) {
   BASE(ralph_createExclamationMarkShiftedRight);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+3); SET_BC(0xf30d);
-  CYC(b_+3, b_+6); objectCreateExclamationMark_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(objectCreateExclamationMark); // jp
 }
 
 void ralph_beginHighJump_hook(GB *gb) {
@@ -73,7 +73,7 @@ void ralph_beginHighJump_hook(GB *gb) {
   CYC(b_+5, b_+6); SET_HL(HL + 1);
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0xfc);
   CYC(b_+8, b_+10); A = 0x53; // SND_JUMP
-  CYC(b_+10, b_+13); playSound_b00_hook(gb); return; // jp
+  CYC(b_+10, b_+13); TAIL(playSound_b00); // jp
 }
 
 void ralph_updateGravity_hook(GB *gb) {
@@ -82,7 +82,7 @@ void ralph_updateGravity_hook(GB *gb) {
   (void)sp0_;
   CYC(b_+0, b_+2); C = 0xc0;
   CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
-  CYC(b_+5, b_+8); writeFlagsTocddb_hook(gb); return; // jp
+  CYC(b_+5, b_+8); TAIL(writeFlagsTocddb); // jp
 }
 
 void ralph_restoreMusic_hook(GB *gb) {
@@ -92,7 +92,7 @@ void ralph_restoreMusic_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0x03; // MUS_OVERWORLD
   CYC(b_+2, b_+5); mem_wr(gb, wActiveMusic2, A);
   CYC(b_+5, b_+8); mem_wr(gb, wActiveMusic, A);
-  CYC(b_+8, b_+11); playSound_b00_hook(gb); return; // jp
+  CYC(b_+8, b_+11); TAIL(playSound_b00); // jp
 }
 
 // ralph_flashScreen@func (15:5682) plus its @thing0-@thing4/@inccfde sub-labels: only reached via
@@ -144,7 +144,7 @@ void ralph_flashScreen_hook(GB *gb) {
   BASE(ralph_flashScreen);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+3); push_effect(gb, b_+3); ralph_flashScreen_func(gb, sp0_); // call
-  CYC(b_+3, b_+6); writeFlagsTocddb_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(writeFlagsTocddb); // jp
 }
 
 void ralph_flickerVisibility_hook(GB *gb) {
@@ -152,7 +152,7 @@ void ralph_flickerVisibility_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   (void)sp0_;
   CYC(b_+0, b_+2); B = 0x01;
-  CYC(b_+2, b_+5); objectFlickerVisibility_hook(gb); return; // jp
+  CYC(b_+2, b_+5); TAIL(objectFlickerVisibility); // jp
 }
 
 void ralph_decVar3f_hook(GB *gb) {
@@ -162,5 +162,5 @@ void ralph_decVar3f_hook(GB *gb) {
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = INTERACTION_BASE + OBJ_VAR3F;
   CYC(b_+3, b_+4); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+4, b_+7); writeFlagsTocddb_hook(gb); return; // jp
+  CYC(b_+4, b_+7); TAIL(writeFlagsTocddb); // jp
 }

@@ -54,12 +54,12 @@ static void punch_body(GB *gb, uint16_t sp0_) {
         CYC(b_+42, b_+44); C = 0x6f;
       }
       CYC(b_+44, b_+45); A = C;
-      CYC(b_+45, b_+48); playSound_b00_hook(gb); return;
+      CYC(b_+45, b_+48); TAIL(playSound_b00);
     }
     else if (jt_ == b_+48) {
       CALL_C(b_+48, itemDecCounter1_hook, SYM(itemDecCounter1), b_+51);
       if (F & FZ) {
-        CYCT(b_+51, b_+54); itemDelete_hook(gb); return;
+        CYCT(b_+51, b_+54); TAIL(itemDelete);
       }
       CYC(b_+51, b_+54);
       CYC(b_+54, b_+55); ret_effect(gb); return;

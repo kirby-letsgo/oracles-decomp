@@ -57,7 +57,7 @@ dead:
   CYC(b_+12, b_+14); A = 0x30; // Object.var30
   CALL_C(b_+14, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+17);
   CYC(b_+17, b_+18); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+18, b_+21); enemyDie_uncounted_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(enemyDie_uncounted); // jp
 
 commonState:
   CYC(b_+21, b_+23); E = ENEMY_BASE + OBJ_STATE;
@@ -88,7 +88,7 @@ void shadowHagBug_state_uninitialized_hook(GB *gb) {
   CYC(b_+15, b_+17); alu_and(gb, 0x1f);
   CYC(b_+17, b_+19); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+19, b_+20); mem_wr(gb, DE, A);
-  CYC(b_+20, b_+23); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(objectSetVisible82); // jp
 }
 
 // 0e:6ed0, bare global; jump-table target from enemyCode42.
@@ -98,7 +98,7 @@ void shadowHagBug_state_galeSeed_hook(GB *gb) {
   CALL_C(b_+0, ecom_galeSeedEffect_b0e_hook, SYM(ecom_galeSeedEffect_b0e), b_+3);
   if (F & FC) { RET_TAKEN(b_+3); return; } // ret c
   CYC(b_+3, b_+4);
-  CYC(b_+4, b_+7); enemyDelete_hook(gb); return; // jp
+  CYC(b_+4, b_+7); TAIL(enemyDelete); // jp
 }
 
 // 0e:6ed7, bare global; jump-table target from enemyCode42.
@@ -122,7 +122,7 @@ void shadowHagBug_state8_hook(GB *gb) {
   CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+15, b_+16); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+16, b_+18); mem_wr(gb, HL, 0xb4); // [counter2] = 180
-  shadowHagBug_state9_hook(gb); return; // fallthrough
+  TAIL(shadowHagBug_state9); // fallthrough
 }
 
 // 0e:6eea, bare global; jump-table target from enemyCode42, also falls into from
@@ -160,7 +160,7 @@ void shadowHagBug_state9_hook(GB *gb) {
   CYC(b_+44, b_+46); hram_wr(gb, (uint8_t)hFF8E, A);
   CALL_C(b_+46, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+49);
   CALL_C(b_+49, objectNudgeAngleTowards_hook, SYM(objectNudgeAngleTowards), SYM(shadowHagBug_applySpeedAndAnimate));
-  shadowHagBug_applySpeedAndAnimate_hook(gb); return; // fallthrough
+  TAIL(shadowHagBug_applySpeedAndAnimate); // fallthrough
 }
 
 // 0e:6f1e, bare global; falls into from shadowHagBug_state9, also reached by genuine jr from
@@ -169,7 +169,7 @@ void shadowHagBug_applySpeedAndAnimate_hook(GB *gb) {
   BASE(shadowHagBug_applySpeedAndAnimate);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, objectApplySpeed_hook, SYM(objectApplySpeed), b_+3);
-  CYC(b_+3, b_+6); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(enemyAnimate); // jp
 }
 
 // 0e:6f24, bare global; called from shadowHagBug_state9.
@@ -179,5 +179,5 @@ void shadowHagBug_delete_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0x30; // Object.var30
   CALL_C(b_+2, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+5);
   CYC(b_+5, b_+6); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+6, b_+9); enemyDelete_hook(gb); return; // jp
+  CYC(b_+6, b_+9); TAIL(enemyDelete); // jp
 }

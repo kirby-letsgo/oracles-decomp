@@ -80,7 +80,7 @@ runSubid0:
   CYC(b_+148, b_+149); A = mem_rd(gb, DE);
   CYC(b_+149, b_+150); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+150, b_+153); interactionAnimateAsNpc_hook(gb); return;
+    CYCT(b_+150, b_+153); TAIL(interactionAnimateAsNpc);
   }
   CYC(b_+150, b_+153);
   CYC(b_+153, b_+156); npcFaceLinkAndAnimate_hook(gb);
@@ -117,7 +117,7 @@ subid1_substate0_scriptRunning:
   CYC(b_+186, b_+187); A = mem_rd(gb, DE);
   CYC(b_+187, b_+188); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+188, b_+191); interactionAnimate2Times_hook(gb); return;
+    CYCT(b_+188, b_+191); TAIL(interactionAnimate2Times);
   }
   CYC(b_+188, b_+191);
   CYC(b_+191, b_+192); ret_effect(gb);
@@ -136,7 +136,7 @@ subid1_substate1:
 subid1_substate2:
   CALL_C(b_+201, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+204);
   if (!(F & FZ)) {
-    CYCT(b_+204, b_+207); interactionAnimate3Times_hook(gb); return;
+    CYCT(b_+204, b_+207); TAIL(interactionAnimate3Times);
   }
   CYC(b_+204, b_+207);
   CYC(b_+207, b_+209); mem_wr(gb, HL, 60);
@@ -214,7 +214,7 @@ runSubid4:
   // Linked game NPC (subids 4 and 5)
   CALL_C(b_+281, interactionRunScript_hook, SYM(interactionRunScript), b_+284);
   if (F & FC) {
-    CYCT(b_+284, b_+287); interactionDelete_hook(gb); return;
+    CYCT(b_+284, b_+287); TAIL(interactionDelete);
   }
   CYC(b_+284, b_+287);
   CYC(b_+287, b_+290); npcFaceLinkAndAnimate_hook(gb);
@@ -266,7 +266,7 @@ initSubid2:
   CYC(b_+90, b_+91); A = mem_rd(gb, DE);
   CYC(b_+91, b_+92); alu_cp(gb, B);
   if (!(F & FZ)) {
-    CYCT(b_+92, b_+95); interactionDelete_hook(gb); return;
+    CYCT(b_+92, b_+95); TAIL(interactionDelete);
   }
   CYC(b_+92, b_+95);
   CYC(b_+95, b_+97); oldLady_loadScript(gb);
@@ -319,7 +319,7 @@ state0:
   CYC(b_+22, b_+23); A = mem_rd(gb, DE);
   CYC(b_+23, b_+24); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+24, b_+27); objectMarkSolidPosition_hook(gb); return;
+    CYCT(b_+24, b_+27); TAIL(objectMarkSolidPosition);
   }
   CYC(b_+24, b_+27);
   CYC(b_+27, b_+28); ret_effect(gb);

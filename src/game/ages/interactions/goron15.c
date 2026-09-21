@@ -91,7 +91,7 @@ showPresentText:
 
 showText:
   CYC(b_+19, b_+21); B = 0x24;
-  CYC(b_+21, b_+24); showText_hook(gb); return;
+  CYC(b_+21, b_+24); TAIL(showText);
 
 linked:
   CYC(b_+24, b_+27); A = mem_rd(gb, wTilesetFlags);
@@ -582,7 +582,7 @@ void goron_tryTakeEmberSeedsAndBombs_hook(GB *gb) {
   CYC(b_+40, b_+43); mem_wr(gb, wNumEmberSeeds, A);
   CALL_C(b_+43, setStatusBarNeedsRefreshBit1_hook, SYM(setStatusBarNeedsRefreshBit1), b_+46);
   CYC(b_+46, b_+47); alu_xor(gb, A);
-  CYC(b_+47, b_+50); writeFlagsTocddb_hook(gb); return;
+  CYC(b_+47, b_+50); TAIL(writeFlagsTocddb);
 
 popAndDontGiveItems:
   CYC(b_+50, b_+51); SET_AF(pop_effect(gb));
@@ -721,7 +721,7 @@ showTipForItem:
   CYC(b_+68, b_+69); alu_add(gb, B);
   CYC(b_+69, b_+71); B = 0x31;
   CYC(b_+71, b_+72); C = A;
-  CYC(b_+72, b_+75); showText_hook(gb); return;
+  CYC(b_+72, b_+75); TAIL(showText);
 
 present:
   CYC(b_+75, b_+77); A = 0x4f;

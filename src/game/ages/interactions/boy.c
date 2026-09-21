@@ -123,7 +123,7 @@ initSubid03:
   CALL_C(b_+66, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+69);
   CYC(b_+69, b_+71); alu_bit(gb, 6, A);
   if (!(F & FZ)) {
-    CYCT(b_+71, b_+74); interactionDelete_hook(gb); return;
+    CYCT(b_+71, b_+74); TAIL(interactionDelete);
   }
   CYC(b_+71, b_+74);
   CYC(b_+74, b_+77); push_effect(gb, b_+77); boy_saveXToVar3d(gb);
@@ -147,7 +147,7 @@ initSubid04:
   CALL_C(b_+100, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+103);
   CYC(b_+103, b_+105); alu_bit(gb, 6, A);
   if (!(F & FZ)) {
-    CYCT(b_+105, b_+108); interactionDelete_hook(gb); return;
+    CYCT(b_+105, b_+108); TAIL(interactionDelete);
   }
   CYC(b_+105, b_+108);
   CYC(b_+108, b_+110); E = INTERACTION_BASE + OBJ_COUNTER1;
@@ -247,7 +247,7 @@ initSubid02:
   CYC(b_+248, b_+250); A = 0x19; // TREASURE_SEED_SATCHEL
   CALL_C(b_+250, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+253);
   if (!(F & FC)) {
-    CYCT(b_+253, b_+256); interactionDelete_hook(gb); return;
+    CYCT(b_+253, b_+256); TAIL(interactionDelete);
   }
   CYC(b_+253, b_+256);
   CYC(b_+256, b_+257); alu_xor(gb, A);
@@ -329,7 +329,7 @@ initSubid10:
   CYC(b_+352, b_+354); A = 0x14; // GLOBALFLAG_FINISHEDGAME
   CALL_C(b_+354, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+357);
   if (F & FZ) {
-    CYCT(b_+357, b_+360); interactionDelete_hook(gb); return;
+    CYCT(b_+357, b_+360); TAIL(interactionDelete);
   }
   CYC(b_+357, b_+360);
 
@@ -418,7 +418,7 @@ void interactionCode3c_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (boy_jumpTable(gb));
     if (jt_ == b_+8) { goto state0; }
-    else if (jt_ == SYM(boyState1)) { boyState1_hook(gb); return; }
+    else if (jt_ == SYM(boyState1) && hook_enabled_at(gb, SYM(boyState1))) { boyState1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -432,7 +432,7 @@ state0:
   CYC(b_+22, b_+23); A = mem_rd(gb, DE);
   CYC(b_+23, b_+24); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+24, b_+27); objectMarkSolidPosition_hook(gb); return;
+    CYCT(b_+24, b_+27); TAIL(objectMarkSolidPosition);
   }
   CYC(b_+24, b_+27);
   CYC(b_+27, b_+28); ret_effect(gb);
@@ -445,21 +445,21 @@ void boyState1_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (boy_jumpTable(gb));
-    if (jt_ == SYM(boyRunSubid00)) { boyRunSubid00_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid01)) { boyRunSubid01_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid02)) { boyRunSubid02_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid03)) { boyRunSubid03_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid04)) { boyRunSubid04_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid05)) { boyRunSubid05_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid06)) { boyRunSubid06_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid07)) { boyRunSubid07_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid08)) { boyRunSubid08_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid0a)) { boyRunSubid0a_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid0b)) { boyRunSubid0b_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid0c)) { boyRunSubid0c_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid0d)) { boyRunSubid0d_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid0e)) { boyRunSubid0e_hook(gb); return; }
-    else if (jt_ == SYM(boyRunSubid0f)) { boyRunSubid0f_hook(gb); return; }
+    if (jt_ == SYM(boyRunSubid00) && hook_enabled_at(gb, SYM(boyRunSubid00))) { boyRunSubid00_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid01) && hook_enabled_at(gb, SYM(boyRunSubid01))) { boyRunSubid01_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid02) && hook_enabled_at(gb, SYM(boyRunSubid02))) { boyRunSubid02_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid03) && hook_enabled_at(gb, SYM(boyRunSubid03))) { boyRunSubid03_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid04) && hook_enabled_at(gb, SYM(boyRunSubid04))) { boyRunSubid04_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid05) && hook_enabled_at(gb, SYM(boyRunSubid05))) { boyRunSubid05_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid06) && hook_enabled_at(gb, SYM(boyRunSubid06))) { boyRunSubid06_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid07) && hook_enabled_at(gb, SYM(boyRunSubid07))) { boyRunSubid07_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid08) && hook_enabled_at(gb, SYM(boyRunSubid08))) { boyRunSubid08_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid0a) && hook_enabled_at(gb, SYM(boyRunSubid0a))) { boyRunSubid0a_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid0b) && hook_enabled_at(gb, SYM(boyRunSubid0b))) { boyRunSubid0b_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid0c) && hook_enabled_at(gb, SYM(boyRunSubid0c))) { boyRunSubid0c_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid0d) && hook_enabled_at(gb, SYM(boyRunSubid0d))) { boyRunSubid0d_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid0e) && hook_enabled_at(gb, SYM(boyRunSubid0e))) { boyRunSubid0e_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid0f) && hook_enabled_at(gb, SYM(boyRunSubid0f))) { boyRunSubid0f_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -493,7 +493,7 @@ substate0:
   CYC(b_+25, b_+28); A = mem_rd(gb, wTmpcfc0 + 0x10);
   CYC(b_+28, b_+30); alu_cp(gb, 0x0e);
   if (!(F & FZ)) {
-    CYCT(b_+30, b_+33); interactionRunScript_hook(gb); return;
+    CYCT(b_+30, b_+33); TAIL(interactionRunScript);
   }
   CYC(b_+30, b_+33);
   CALL_C(b_+33, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+36);
@@ -536,7 +536,7 @@ substate2:
 substate3:
   CALL_C(b_+85, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+88);
   if (!(F & FC)) {
-    CYCT(b_+88, b_+91); interactionDelete_hook(gb); return;
+    CYCT(b_+88, b_+91); TAIL(interactionDelete);
   }
   CYC(b_+88, b_+91);
   CYC(b_+91, b_+94); objectApplySpeed_hook(gb);
@@ -608,7 +608,7 @@ substate1_flicker:
 substate2:
   CALL_C(b_+62, interactionRunScript_hook, SYM(interactionRunScript), b_+65);
   if (!(F & FC)) {
-    CYCT(b_+65, b_+68); interactionAnimate_hook(gb); return;
+    CYCT(b_+65, b_+68); TAIL(interactionAnimate);
   }
   CYC(b_+65, b_+68);
   CYC(b_+68, b_+69); ret_effect(gb);
@@ -659,7 +659,7 @@ void boyRunSubid04_hook(GB *gb) {
   do { uint16_t jt_ = (boy_jumpTable(gb));
     if (jt_ == b_+10) { goto substate0; }
     else if (jt_ == b_+23) { goto substate1; }
-    else if (jt_ == SYM(boyRunSubid03)) { boyRunSubid03_hook(gb); return; }
+    else if (jt_ == SYM(boyRunSubid03) && hook_enabled_at(gb, SYM(boyRunSubid03))) { boyRunSubid03_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -695,8 +695,8 @@ void boyRunSubid05_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (boy_jumpTable(gb));
     if (jt_ == b_+10) { goto substate0; }
-    else if (jt_ == SYM(childSubid05Substate1)) { childSubid05Substate1_hook(gb); return; }
-    else if (jt_ == SYM(childAnimateIfVar39IsZeroAndRunScript)) { childAnimateIfVar39IsZeroAndRunScript_hook(gb); return; }
+    else if (jt_ == SYM(childSubid05Substate1) && hook_enabled_at(gb, SYM(childSubid05Substate1))) { childSubid05Substate1_hook(gb); return; }
+    else if (jt_ == SYM(childAnimateIfVar39IsZeroAndRunScript) && hook_enabled_at(gb, SYM(childAnimateIfVar39IsZeroAndRunScript))) { childAnimateIfVar39IsZeroAndRunScript_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -726,7 +726,7 @@ void childSubid05Substate1_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+3);
   if (!(F & FZ)) {
-    CYCT(b_+3, b_+5); childFlickerBetweenStone_hook(gb); return;
+    CYCT(b_+3, b_+5); TAIL(childFlickerBetweenStone);
   }
   CYC(b_+3, b_+5);
   CALL_C(b_+5, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+8);
@@ -787,7 +787,7 @@ void boyRunSubid07_hook(GB *gb) {
   CYC(b_+5, b_+6); A = mem_rd(gb, DE);
   CYC(b_+6, b_+7); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+7, b_+10); npcFaceLinkAndAnimate_hook(gb); return;
+    CYCT(b_+7, b_+10); TAIL(npcFaceLinkAndAnimate);
   }
   CYC(b_+7, b_+10);
   CALL_C(b_+10, interactionAnimate_hook, SYM(interactionAnimate), b_+13);
@@ -1069,7 +1069,7 @@ substateB:
   CYC(b_+405, b_+408); push_effect(gb, b_+408); boy_updateAnimationTwiceAndApplySpeed(gb, sp0_);
   CALL_C(b_+408, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+411);
   if (F & FZ) {
-    CYCT(b_+411, b_+414); interactionDelete_hook(gb); return;
+    CYCT(b_+411, b_+414); TAIL(interactionDelete);
   }
   CYC(b_+411, b_+414);
   CYC(b_+414, b_+415); ret_effect(gb);
@@ -1104,7 +1104,7 @@ void boyRunSubid0c_hook(GB *gb) {
     else if (jt_ == b_+58) { goto substate2; }
     else if (jt_ == b_+77) { goto substate3; }
     else if (jt_ == b_+86) { goto substate4; }
-    else if (jt_ == SYM(childAnimateIfVar39IsZeroAndRunScript)) { childAnimateIfVar39IsZeroAndRunScript_hook(gb); return; }
+    else if (jt_ == SYM(childAnimateIfVar39IsZeroAndRunScript) && hook_enabled_at(gb, SYM(childAnimateIfVar39IsZeroAndRunScript))) { childAnimateIfVar39IsZeroAndRunScript_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -1180,7 +1180,7 @@ void boyRunSubid0d_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+4, b_+7); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return;
+    CYCT(b_+4, b_+7); TAIL(interactionPushLinkAwayAndUpdateDrawPriority);
   }
   CYC(b_+4, b_+7);
   CALL_C(b_+7, interactionRunScript_hook, SYM(interactionRunScript), b_+10);
@@ -1226,7 +1226,7 @@ void boyRunSubid0f_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionRunScript_hook, SYM(interactionRunScript), b_+3);
   if (F & FC) {
-    CYCT(b_+3, b_+6); interactionDelete_hook(gb); return;
+    CYCT(b_+3, b_+6); TAIL(interactionDelete);
   }
   CYC(b_+3, b_+6);
   CALL_C(b_+6, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+9);

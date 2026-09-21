@@ -76,8 +76,7 @@ state1:
   CYC(b_+33, b_+35); alu_bit(gb, 7, mem_rd(gb, HL));
   if (F & FZ) {
     CYCT(b_+35, b_+38);
-    objectSetInvisible_hook(gb);
-    return;
+    TAIL(objectSetInvisible);
   }
   CYC(b_+35, b_+38);
   CALL_C(b_+38, objectSetVisible80_hook, SYM(objectSetVisible80), b_+41);
@@ -123,8 +122,7 @@ animation_done:
 
 take_position_with_offset:
   CYC(b_+82, b_+85);
-  objectTakePositionWithOffset_hook(gb);
-  return;
+  TAIL(objectTakePositionWithOffset);
 
 delete:
   CYC(b_+85, b_+88);

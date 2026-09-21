@@ -49,7 +49,11 @@ def main():
             code = line.split('//')[0]
             if m and code.count('}') > code.count('{'): oneliner = True
             else: oneliner = False
-            for c in CALL.findall(code): callees[cur].add(c)
+            guarded = set(re.findall(r'hook_enabled_at\(gb, SYM\((\w+)\)\)', code)) | set(re.findall(r'\bTAIL\((\w+)\)', code))
+            for c in CALL.findall(code):
+                if c.endswith('_hook') and c[:-5] in guarded: continue
+                callees[cur].add(c)
+            for c in re.findall(r'\bCALL_L(?:_CC)?\(b_\+\d+, (\w+),', code): callees[cur].add(c)   # CALL_L calls fn unconditionally
             for args in EXEC.findall(code):
                 for lab in re.findall(r'\bSYM\((\w+)\)', args): burns[cur].add(lab)
                 bm = re.match(r'\s*(\w+)\)', args)
@@ -100,6 +104,8 @@ def main():
                     eligible[key] = False; changed = True; break
 
     ages, seasons = rom_labels(ages_sym), rom_labels(seasons_sym)
+    from symfiles import pair_instances
+    pairs = pair_instances(ages_rom, ages_sym, seasons_rom, seasons_sym)
     rows, skipped = [], defaultdict(int)
     for l in open('src/hooks/generated.txt'):
         p = l.split()
@@ -114,13 +120,8 @@ def main():
         if not name: skipped['no label'] += 1; continue
         name = name[0]
         parent = name.split('@')[0]
-        a_inst = ages.get(parent, [])
-        rank = [b for b, a in a_inst].index(bank) if bank in [b for b, a in a_inst] else 0
-        s_inst = seasons.get(name, [])
-        if re.match(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)', parent): s_inst = []
-        if len(s_inst) == len(a_inst) and s_inst: s = s_inst[rank]
-        elif len(s_inst) == 1: s = s_inst[0]
-        else: skipped['no seasons label'] += 1; continue
+        s = None if unpairable.match(parent) else pairs.get((name, bank, addr))
+        if s is None: skipped['no seasons label'] += 1; continue
         rows.append((s[0], s[1], fn, flags))
     rows.sort()
     with open('src/hooks/generated_seasons.txt', 'w') as f:

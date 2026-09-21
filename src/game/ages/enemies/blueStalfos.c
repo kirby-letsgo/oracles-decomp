@@ -147,7 +147,7 @@ void blueStalfos_state_uninitialized_hook(GB *gb) {
   CYC(b_+14, b_+16); L = ENEMY_BASE + OBJ_ZH;
   CYC(b_+16, b_+18); mem_wr(gb, HL, 0xff);
   CYC(b_+18, b_+20); A = 0x77; // ENEMY_BLUE_STALFOS
-  CYC(b_+20, b_+23); enemyBoss_initializeRoom_b0f_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(enemyBoss_initializeRoom_b0f); // jp
 }
 
 void blueStalfos_state_spawner_hook(GB *gb) {
@@ -179,7 +179,7 @@ void blueStalfos_state_spawner_hook(GB *gb) {
   CYC(b_+42, b_+43); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+43, b_+44); mem_wr(gb, HL, C);
   CALL_C(b_+44, objectCopyPosition_hook, SYM(objectCopyPosition), b_+47);
-  CYC(b_+47, b_+50); enemyDelete_hook(gb); return; // jp
+  CYC(b_+47, b_+50); TAIL(enemyDelete); // jp
 }
 
 void blueStalfos_state_stub_hook(GB *gb) {
@@ -252,7 +252,7 @@ void blueStalfos_main_state09_hook(GB *gb) {
   CYC(b_+31, b_+34); SET_BC(0x3030);
   CALL_C(b_+34, ecom_randomBitwiseAndBCE_b0f_hook, SYM(ecom_randomBitwiseAndBCE_b0f), b_+37);
   CYC(b_+37, b_+38); A = E;
-  CYC(b_+38, b_+41); blueStalfos_main_moveToQuadrant_hook(gb); return; // jp
+  CYC(b_+38, b_+41); TAIL(blueStalfos_main_moveToQuadrant); // jp
 }
 
 // Moving to position in var30/var31
@@ -278,12 +278,12 @@ void blueStalfos_main_state0a_hook(GB *gb) {
   CYC(b_+25, b_+27); mem_wr(gb, HL, 0x0b);
   CYC(b_+27, b_+29); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+29, b_+31); mem_wr(gb, HL, 0x10); // 16
-  CYCT(b_+31, b_+33); blueStalfos_main_animate_hook(gb); return; // jr
+  CYCT(b_+31, b_+33); TAIL(blueStalfos_main_animate); // jr
 
 moveToPosition:
   CALL_C(b_+33, blueStalfos_main_accelerate_hook, SYM(blueStalfos_main_accelerate), b_+36);
   CALL_C(b_+36, ecom_moveTowardPosition_b0f_hook, SYM(ecom_moveTowardPosition_b0f), b_+39);
-  CYCT(b_+39, b_+41); blueStalfos_main_animate_hook(gb); return; // jr
+  CYCT(b_+39, b_+41); TAIL(blueStalfos_main_animate); // jr
 }
 
 // Reached position, standing still for [counter1] frames
@@ -295,12 +295,12 @@ void blueStalfos_main_state0b_hook(GB *gb) {
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+6); L = E;
   CYC(b_+6, b_+7); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [state]
-  blueStalfos_main_animate_hook(gb); return; // fallthrough
+  TAIL(blueStalfos_main_animate); // fallthrough
 }
 
 void blueStalfos_main_animate_hook(GB *gb) {
   BASE(blueStalfos_main_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // Decide which attack to do
@@ -339,7 +339,7 @@ projectileAttack:
   CYC(b_+42, b_+44); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+44, b_+46); mem_wr(gb, HL, 0x0e);
   CYC(b_+46, b_+48); A = 0x02;
-  CYC(b_+48, b_+51); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+48, b_+51); TAIL(enemySetAnimation); // jp
 }
 
 // Sickle attack
@@ -358,7 +358,7 @@ void blueStalfos_main_state0d_hook(GB *gb) {
   CYC(b_+11, b_+13); A = 0x08;
   CYC(b_+13, b_+14); mem_wr(gb, DE, A); // [animParameter]
   CYC(b_+14, b_+16); A = 0x6b; // SND_SWORDSPIN
-  CYC(b_+16, b_+19); playSound_b00_hook(gb); return; // jp
+  CYC(b_+16, b_+19); TAIL(playSound_b00); // jp
 }
 
 // Charging a projectile
@@ -372,7 +372,7 @@ void blueStalfos_main_state0e_hook(GB *gb) {
   CYC(b_+7, b_+8); L = E;
   CYC(b_+8, b_+9); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [state]
   CYC(b_+9, b_+11); A = 0x03;
-  CYC(b_+11, b_+14); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+11, b_+14); TAIL(enemySetAnimation); // jp
 }
 
 // Just fired projectile
@@ -382,7 +382,7 @@ void blueStalfos_main_state0f_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+3);
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } // ret nz
   CYC(b_+3, b_+4);
-  blueStalfos_main_finishedAttack_hook(gb); return; // fallthrough
+  TAIL(blueStalfos_main_finishedAttack); // fallthrough
 }
 
 void blueStalfos_main_finishedAttack_hook(GB *gb) {
@@ -397,7 +397,7 @@ void blueStalfos_main_finishedAttack_hook(GB *gb) {
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x05); // SPEED_20
   CYC(b_+13, b_+14); alu_xor(gb, A);
   CALL_C(b_+14, enemySetAnimation_hook, SYM(enemySetAnimation), b_+17);
-  CYC(b_+17, b_+20); blueStalfos_main_decideNextPosition_hook(gb); return; // jp
+  CYC(b_+17, b_+20); TAIL(blueStalfos_main_decideNextPosition); // jp
 }
 
 // Link just turned into a baby; about to turn transparent and warp to top of room
@@ -434,7 +434,7 @@ void blueStalfos_main_state11_hook(GB *gb) {
   CYC(b_+22, b_+23); mem_wr(gb, HL, A);
   CYC(b_+23, b_+24); alu_xor(gb, A);
   CALL_C(b_+24, enemySetAnimation_hook, SYM(enemySetAnimation), b_+27);
-  CYC(b_+27, b_+30); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+27, b_+30); TAIL(objectSetInvisible); // jp
 }
 
 // Just warped to top of room; standing in place
@@ -455,7 +455,7 @@ void blueStalfos_main_state12_hook(GB *gb) {
   CYC(b_+21, b_+23); E = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+23, b_+24); A = mem_rd(gb, HL);
   CYC(b_+24, b_+25); mem_wr(gb, DE, A);
-  CYC(b_+25, b_+32); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+25, b_+32); TAIL(objectSetVisible82); // jp
 }
 
 // Moving down toward baby Link before attacking with sickle
@@ -469,7 +469,7 @@ void blueStalfos_main_state13_hook(GB *gb) {
   CYC(b_+6, b_+8); alu_cp(gb, 0x18);
   if (!(F & FC)) { CYCT(b_+8, b_+11); objectApplySpeed_hook(gb); return; } // jp nc
   CYC(b_+8, b_+11);
-  blueStalfos_main_beginSickleAttack_hook(gb); return; // fallthrough
+  TAIL(blueStalfos_main_beginSickleAttack); // fallthrough
 }
 
 void blueStalfos_main_beginSickleAttack_hook(GB *gb) {
@@ -478,7 +478,7 @@ void blueStalfos_main_beginSickleAttack_hook(GB *gb) {
   CYC(b_+2, b_+4); A = 0x0d;
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);
   CYC(b_+5, b_+7); A = 0x01;
-  CYC(b_+7, b_+10); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+7, b_+10); TAIL(enemySetAnimation); // jp
 }
 
 // Just hit by PART_BLUE_STALFOS_PROJECTILE; turning into a small bat
@@ -504,7 +504,7 @@ void blueStalfos_main_state14_hook(GB *gb) {
   CYC(b_+28, b_+30); A = 0x85; // SND_SCENT_SEED
   CALL_C(b_+30, playSound_b00_hook, SYM(playSound_b00), b_+33);
   CYC(b_+33, b_+35); A = 0x04;
-  CYC(b_+35, b_+38); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+35, b_+38); TAIL(enemySetAnimation); // jp
 }
 
 // Transforming into bat
@@ -521,7 +521,7 @@ void blueStalfos_main_state15_hook(GB *gb) {
   CYC(b_+13, b_+15); mem_wr(gb, HL, 0x65); // ENEMYCOLLISION_BLUE_STALFOS_BAT
   CYC(b_+15, b_+17); L = ENEMY_BASE + OBJ_ZH;
   CYC(b_+17, b_+19); mem_wr(gb, HL, 0x00);
-  CYC(b_+19, b_+22); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+19, b_+22); TAIL(objectSetVisiblec2); // jp
 }
 
 // Flying around as a bat
@@ -541,7 +541,7 @@ void blueStalfos_main_state16_hook(GB *gb) {
   CYC(b_+15, b_+17); mem_wr(gb, HL, 0x48); // ENEMYCOLLISION_BLUE_STALFOS
   CYC(b_+17, b_+19); L = ENEMY_BASE + OBJ_ZH;
   CYC(b_+19, b_+21); mem_wr(gb, HL, 0xff);
-  CYC(b_+21, b_+24); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+21, b_+24); TAIL(objectSetInvisible); // jp
 
 flyAround:
   CALL_C(b_+24, ecom_decCounter2_b0f_hook, SYM(ecom_decCounter2_b0f), b_+27);
@@ -553,7 +553,7 @@ flyAround:
 L_5fce:
   CALL_C(b_+34, ecom_bounceOffWallsAndHoles_b0f_hook, SYM(ecom_bounceOffWallsAndHoles_b0f), b_+37);
   CALL_C(b_+37, objectApplySpeed_hook, SYM(objectApplySpeed), b_+40);
-  CYC(b_+40, b_+43); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+40, b_+43); TAIL(enemyAnimate); // jp
 }
 
 // Transforming back into stalfos
@@ -573,7 +573,7 @@ void blueStalfos_main_state17_hook(GB *gb) {
   CALL_C(b_+15, blueStalfos_main_finishedAttack_hook, SYM(blueStalfos_main_finishedAttack), b_+18);
   CYC(b_+18, b_+20); A = 0x85; // SND_SCENT_SEED
   CALL_C(b_+20, playSound_b00_hook, SYM(playSound_b00), b_+23);
-  CYC(b_+23, b_+26); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+23, b_+26); TAIL(objectSetVisible82); // jp
 }
 
 // Hitbox for the sickle (invisible)
@@ -726,7 +726,7 @@ void blueStalfos_subid3_hook(GB *gb) {
   CYC(b_+100, b_+102); alu_sub(gb, 0x08);
   CYC(b_+102, b_+103); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+103, b_+104); mem_wr(gb, HL, A);
-  CYC(b_+104, b_+107); ecom_flickerVisibility_b0f_hook(gb); return; // jp
+  CYC(b_+104, b_+107); TAIL(ecom_flickerVisibility_b0f); // jp
 
 state8:
   CALL_C(b_+107, blueStalfos_initSubid2Or3_hook, SYM(blueStalfos_initSubid2Or3), b_+110);
@@ -734,7 +734,7 @@ state8:
   CYC(b_+113, b_+115); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+115, b_+117); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
   CALL_C(b_+117, objectSetVisible83_hook, SYM(objectSetVisible83), b_+120);
-  CYC(b_+120, b_+123); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+120, b_+123); TAIL(objectSetInvisible); // jp
 }
 
 // Decides the next position for the blue stalfos. It will always choose a different
@@ -767,7 +767,7 @@ L_60fe:
   CYC(b_+29, b_+30); alu_add(gb, A);
   CYC(b_+30, b_+31); alu_add(gb, A);
   CYC(b_+31, b_+32); alu_add(gb, H);
-  blueStalfos_main_moveToQuadrant_hook(gb); return; // fallthrough
+  TAIL(blueStalfos_main_moveToQuadrant); // fallthrough
 }
 
 // @param a Position index to use

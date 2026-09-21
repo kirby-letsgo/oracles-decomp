@@ -87,16 +87,14 @@ void itemCode0bPost_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_cp(gb, 0x0a);
   if (!(F & FZ)) {
     CYCT(b_+5, b_+8);
-    itemDelete_hook(gb);
-    return;
+    TAIL(itemDelete);
   }
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+11); A = W8(w1WeaponItem_var2f);
   CYC(b_+11, b_+13); alu_bit(gb, 4, A);
   if (!(F & FZ)) {
     CYCT(b_+13, b_+16);
-    itemDelete_hook(gb);
-    return;
+    TAIL(itemDelete);
   }
   CYC(b_+13, b_+16);
   CYC(b_+16, b_+17); H = D;
@@ -135,8 +133,7 @@ void itemCode0aPost_hook(GB *gb) {
   CYC(b_+7, b_+8); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+8, b_+11);
-    itemDelete_hook(gb);
-    return;
+    TAIL(itemDelete);
   }
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+14);
@@ -193,7 +190,7 @@ void itemCode0a_hook(GB *gb) {
     if (jt_ == b_+22) { goto state0; }
     else if (jt_ == b_+83) { goto state1; }
     else if (jt_ == b_+204) { goto state2; }
-    else if (jt_ == SYM(switchHookState3)) { switchHookState3_hook(gb); return; }
+    else if (jt_ == SYM(switchHookState3) && hook_enabled_at(gb, SYM(switchHookState3))) { switchHookState3_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
@@ -224,8 +221,7 @@ state0:
   CYC(b_+65, b_+66); A = mem_rd(gb, HL);
   CYC(b_+66, b_+68); alu_add(gb, 0x02);
   CYC(b_+68, b_+71);
-  itemSetAnimation_hook(gb);
-  return;
+  TAIL(itemSetAnimation);
 
 state1:
   CYC(b_+83, b_+85); E = 0x2a;
@@ -289,8 +285,7 @@ no_collision:
   }
   CALL_C(b_+144, updateSwitchHookSound_hook, SYM(updateSwitchHookSound), b_+147);
   CYC(b_+147, b_+150);
-  objectApplySpeed_hook(gb);
-  return;
+  TAIL(objectApplySpeed);
 
 collision:
   CALL_C(b_+150, objectCreateClinkInteraction_hook, SYM(objectCreateClinkInteraction), b_+153);
@@ -312,8 +307,7 @@ go_to_state3:
   CYC(b_+179, b_+181); A = 0x01;
   CYC(b_+181, b_+184); W8(wSwitchHookState) = A;
   CYC(b_+184, b_+187);
-  resetLinkInvincibility_hook(gb);
-  return;
+  TAIL(resetLinkInvincibility);
 
 state2:
   CYC(b_+204, b_+206); E = 0x05;
@@ -327,8 +321,7 @@ state2:
     if (!(F & FZ)) { CYCT(b_+254, b_+255); ret_effect(gb); return; }
     CYC(b_+254, b_+255);
     CYC(b_+255, b_+258);
-    itemDelete_hook(gb);
-    return;
+    TAIL(itemDelete);
   }
   CYC(b_+208, b_+210);
   CALL_C(b_+210, itemDecCounter1_hook, SYM(itemDecCounter1), b_+213);
@@ -536,8 +529,7 @@ initialize_swap:
   CYC(b_+143, b_+144); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CALL_C(b_+144, objectCopyPosition_hook, SYM(objectCopyPosition), b_+147);
   CYC(b_+147, b_+150);
-  resetLinkInvincibility_hook(gb);
-  return;
+  TAIL(resetLinkInvincibility);
 
 reject_object:
   CYC(b_+150, b_+152); A = 0x05;

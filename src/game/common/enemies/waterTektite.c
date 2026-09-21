@@ -104,7 +104,7 @@ void waterTektite_state_uninitialized_hook(GB *gb) {
   BASE(waterTektite_state_uninitialized);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, objectSetVisible82_hook, SYM(objectSetVisible82), SYM(waterTektike_decideNewAngle));
-  waterTektike_decideNewAngle_hook(gb); return; // fallthrough
+  TAIL(waterTektike_decideNewAngle); // fallthrough
 }
 
 // 0e:54b1, bare global; falls into from waterTektite_state_uninitialized, also reached by
@@ -128,7 +128,7 @@ void waterTektike_decideNewAngle_hook(GB *gb) {
   CYC(b_+20, b_+22); alu_add(gb, 0x04);
   CYC(b_+22, b_+24); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+24, b_+25); mem_wr(gb, DE, A);
-  CYC(b_+25, b_+27); waterTektike_animate_hook(gb); return; // jr
+  CYC(b_+25, b_+27); TAIL(waterTektike_animate); // jr
 
 scentSeedActive:
   CYC(b_+27, b_+29); A = mem_rd(gb, hFFB2); // hFFB2
@@ -143,7 +143,7 @@ scentSeedActive:
   CALL_C(b_+41, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+44);
   CYC(b_+44, b_+46); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+46, b_+47); mem_wr(gb, DE, A);
-  CYC(b_+47, b_+49); waterTektike_animate_hook(gb); return; // jr
+  CYC(b_+47, b_+49); TAIL(waterTektike_animate); // jr
 }
 
 // 0e:54e2, bare global; jump-table target from enemyCode3a.
@@ -164,7 +164,7 @@ void waterTektike_state8_hook(GB *gb) {
   CYC(b_+6, b_+7); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
   CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+9, b_+11); mem_wr(gb, HL, 0x08);
-  CYC(b_+11, b_+13); waterTektike_animate_hook(gb); return; // jr
+  CYC(b_+11, b_+13); TAIL(waterTektike_animate); // jr
 
 keepMoving:
   CALL_C(b_+13, waterTektike_setSpeedFromCounter1_hook, SYM(waterTektike_setSpeedFromCounter1), b_+16);
@@ -172,7 +172,7 @@ keepMoving:
   CYC(b_+19, b_+21); E = ENEMY_BASE + OBJ_ANGLE;
   CALL_C(b_+21, ecom_applyVelocityGivenAdjacentWalls_b0e_hook, SYM(ecom_applyVelocityGivenAdjacentWalls_b0e), b_+24);
   CALL_C(b_+24, ecom_bounceOffScreenBoundary_b0e_hook, SYM(ecom_bounceOffScreenBoundary_b0e), SYM(waterTektike_animate));
-  waterTektike_animate_hook(gb); return; // fallthrough
+  TAIL(waterTektike_animate); // fallthrough
 }
 
 // 0e:54fe, bare global; falls into from waterTektike_state8, also reached by genuine jr
@@ -180,7 +180,7 @@ keepMoving:
 // waterTektike_state9.
 void waterTektike_animate_hook(GB *gb) {
   BASE(waterTektike_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // 0e:5501, bare global; jump-table target from enemyCode3a. Not moving for [counter1]
@@ -191,7 +191,7 @@ void waterTektike_state9_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+3);
   if (!(F & FZ)) { CYCT(b_+3, b_+5); waterTektike_animate_hook(gb); return; } // jr nz
   CYC(b_+3, b_+5);
-  CYC(b_+5, b_+7); waterTektike_decideNewAngle_hook(gb); return; // jr
+  CYC(b_+5, b_+7); TAIL(waterTektike_decideNewAngle); // jr
 }
 
 // 0e:5508, bare global; called from waterTektike_state8. Gets the "adjacent walls bitset"
@@ -200,7 +200,7 @@ void waterTektike_state9_hook(GB *gb) {
 void waterTektite_getAdjacentWallsBitset_hook(GB *gb) {
   BASE(waterTektite_getAdjacentWallsBitset);
   CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_ANGLE;
-  waterTektite_getAdjacentWallsBitsetGivenAngle_hook(gb); return; // fallthrough
+  TAIL(waterTektite_getAdjacentWallsBitsetGivenAngle); // fallthrough
 }
 
 // 0e:550a, bare global; falls into from waterTektite_getAdjacentWallsBitset, also reached

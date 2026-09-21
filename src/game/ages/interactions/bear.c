@@ -45,8 +45,8 @@ void interactionCode5d_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4); SET_HL(bank09_jump_table(gb));
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(bear_state0)) { bear_state0_hook(gb); return; }
-    else if (jt_ == SYM(bear_state1)) { bear_state1_hook(gb); return; }
+    if (jt_ == SYM(bear_state0) && hook_enabled_at(gb, SYM(bear_state0))) { bear_state0_hook(gb); return; }
+    else if (jt_ == SYM(bear_state1) && hook_enabled_at(gb, SYM(bear_state1))) { bear_state1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -238,7 +238,7 @@ L_6dc8:
   CYC(b_+131, b_+132); mem_wr(gb, DE, A);
   CYC(b_+132, b_+133); SET_DE(DE + 1);
   CYC(b_+133, b_+134); D = alu_inc8(gb, D);
-  bear_state1_hook(gb); return;
+  TAIL(bear_state1);
 }
 
 void bear_state1_hook(GB *gb) {
@@ -249,7 +249,7 @@ void bear_state1_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4); SET_HL(bank09_jump_table(gb));
   do { uint16_t jt_ = (HL);
     if (jt_ == b_+10) { bear_state1__runSubid00_hook(gb); return; }
-    else if (jt_ == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
     else if (jt_ == b_+129) { bear_state1__runSubid02_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);

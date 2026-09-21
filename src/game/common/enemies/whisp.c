@@ -99,7 +99,7 @@ void whisp_state_uninitialized_hook(GB *gb) {
   CYC(b_+9, b_+10); mem_wr(gb, DE, A);
   CYC(b_+10, b_+12); A = 0x1e; // SPEED_c0
   CALL_C(b_+12, ecom_setSpeedAndState8_b0d_hook, SYM(ecom_setSpeedAndState8_b0d), b_+15);
-  CYC(b_+15, b_+18); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(objectSetVisible82); // jp
 }
 
 // 0d:5142, bare global.
@@ -108,7 +108,7 @@ void whisp_state8_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, ecom_bounceOffWalls_b0d_hook, SYM(ecom_bounceOffWalls_b0d), b_+3);
   CALL_C(b_+3, objectApplySpeed_hook, SYM(objectApplySpeed), b_+6);
-  CYC(b_+6, b_+9); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+6, b_+9); TAIL(enemyAnimate); // jp
 }
 
 // 0d:514b, bare global; updates the spark's moving angle by checking for walls.
@@ -221,5 +221,5 @@ void spark_checkWallInDirection_hook(GB *gb) {
   CYC(b_+30, b_+31); A = mem_rd(gb, HL);
   CYC(b_+31, b_+32); alu_add(gb, C);
   CYC(b_+32, b_+33); C = A;
-  CYC(b_+33, b_+36); checkTileCollisionAt_disallowHoles_hook(gb); return; // jp
+  CYC(b_+33, b_+36); TAIL(checkTileCollisionAt_disallowHoles); // jp
 }

@@ -54,8 +54,7 @@ state0:
   CYC(b_+34, b_+36); L = INTERACTION_BASE + OBJ_XH;
   CYC(b_+36, b_+38); mem_wr(gb, HL, 0xb0);
   CYC(b_+38, b_+41);
-  objectSetVisible80_hook(gb);
-  return;
+  TAIL(objectSetVisible80);
 state1:
   CYC(b_+41, b_+42); H = D;
   CYC(b_+42, b_+44); L = INTERACTION_BASE + OBJ_XH;

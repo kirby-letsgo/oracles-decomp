@@ -95,7 +95,7 @@ afterInitGraphicsAndLoadScript:
 
 subid00_alreadyGaveShovel:
   CYC(b_+54, b_+57); SET_HL((SYM(miscPuzzles_subid0e__state1) + 1)); // mainScripts.rosa_subid00Script_alreadyGaveShovel
-  CYC(b_+57, b_+60); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+57, b_+60); TAIL(interactionSetScript); // jp
 
 subid00_state1:
   CALL_C(b_+60, interactionRunScript_hook, SYM(interactionRunScript), b_+63);
@@ -103,7 +103,7 @@ subid00_state1:
   CALL_C(b_+65, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+68);
   if (F & FC) { CYCT(b_+68, b_+71); npcFaceLinkAndAnimate_hook(gb); return; } // jp c
   CYC(b_+68, b_+71);
-  CYC(b_+71, b_+74); interactionAnimateAsNpc_hook(gb); return; // jp
+  CYC(b_+71, b_+74); TAIL(interactionAnimateAsNpc); // jp
 
 subid01:
   CALL_C(b_+74, checkInteractionState_hook, SYM(checkInteractionState), b_+77);
@@ -121,7 +121,7 @@ subid01_state1:
   CALL_C(b_+89, interactionRunScript_hook, SYM(interactionRunScript), b_+92);
   if (F & FC) { CYCT(b_+92, b_+95); interactionDelete_hook(gb); return; } // jp c
   CYC(b_+92, b_+95);
-  CYC(b_+95, b_+98); npcFaceLinkAndAnimate_hook(gb); return; // jp
+  CYC(b_+95, b_+98); TAIL(npcFaceLinkAndAnimate); // jp
 
 initGraphicsAndLoadScript:
   CALL_C(b_+107, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+110);

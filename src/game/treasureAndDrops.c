@@ -405,8 +405,7 @@ void addTreasureToInventory_hook(GB *gb) {
   CYC(b_+10, b_+11);
   if (F & FZ) {
     CYCT(b_+11, b_+14);
-    setStatusBarNeedsRefreshBit1_hook(gb);
-    return;
+    TAIL(setStatusBarNeedsRefreshBit1);
   }
   CYC(b_+11, b_+14);
   CYC(b_+14, b_+15); push_effect(gb, BC);
@@ -602,8 +601,7 @@ void decideItemDrop_body_hook(GB *gb) {
   CYC(b_+59, b_+60); treasure_add_index_to_hl_from_rst(gb, b_+60);
   CYC(b_+60, b_+61); A = mem_rd(gb, HL);
   CYC(b_+61, b_+62); C = A;
-  checkItemDropAvailable_body_hook(gb);
-  return;
+  TAIL(checkItemDropAvailable_body);
 
 unavailable:
   CYC(SYM(checkItemDropAvailable_body__done), (SYM(checkItemDropAvailable_body__done) + 2)); C = 0xff;

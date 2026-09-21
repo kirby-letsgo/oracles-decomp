@@ -89,7 +89,7 @@ state0:
   CYC(b_+47, b_+49); mem_wr(gb, HL, 0x08);
   CYC(b_+49, b_+51); A = 0x98; // SND_POOF
   CALL_C(b_+51, playSound_b00_hook, SYM(playSound_b00), b_+54);
-  CYC(b_+54, b_+57); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+54, b_+57); TAIL(objectSetVisible82); // jp
 
 state1:
   CALL_C(b_+57, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+60);
@@ -115,11 +115,11 @@ state2:
   if (F & FZ) { RET_TAKEN(b_+87); return; } // ret z
   CYC(b_+87, b_+88);
   CYC(b_+88, b_+90); A = 0x50; // SND_CLINK
-  CYC(b_+90, b_+93); playSound_b00_hook(gb); return; // jp
+  CYC(b_+90, b_+93); TAIL(playSound_b00); // jp
 
 delete:
   CALL_C(b_+93, objectCreatePuff_hook, SYM(objectCreatePuff), b_+96);
-  CYC(b_+96, b_+99); enemyDelete_hook(gb); return; // jp
+  CYC(b_+96, b_+99); TAIL(enemyDelete); // jp
 }
 
 // 0e:6972, bare global; called from enemyCode5d. This doesn't appear to do anything other
@@ -138,5 +138,5 @@ void twinrovaIce_bounceOffShield_hook(GB *gb) {
   CYC(b_+16, b_+17); A = mem_rd(gb, HL);
   CYC(b_+17, b_+18); mem_wr(gb, DE, A);
   CYC(b_+18, b_+20); A = 0x50; // SND_CLINK
-  CYC(b_+20, b_+23); playSound_b00_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(playSound_b00); // jp
 }

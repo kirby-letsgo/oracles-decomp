@@ -128,8 +128,7 @@ static void book_of_seals_replace_tiles(GB *gb) {
     CYC(b_+44, b_+46);
     CYC(b_+46, b_+47); mem_wr(gb, DE, A);
     CYC(b_+47, b_+50);
-    interactionIncState_hook(gb);
-    return;
+    TAIL(interactionIncState);
   }
   CYC(b_+18, b_+20);
   C = A;

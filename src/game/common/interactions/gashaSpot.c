@@ -104,7 +104,7 @@ l_442b:
   CYC(b_+63, b_+65); A = 0x0a;
   CALL_C(b_+65, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+68);
   CYC(b_+68, b_+70); E = INTERACTION_BASE + OBJ_PRESSED_A_BUTTON;
-  CYC(b_+70, b_+73); objectAddToAButtonSensitiveObjectList_hook(gb); return; // jp
+  CYC(b_+70, b_+73); TAIL(objectAddToAButtonSensitiveObjectList); // jp
 
 seedPlanted:
   CYC(b_+73, b_+74); A = mem_rd(gb, DE);
@@ -145,7 +145,7 @@ seedPlanted:
   CYC(b_+124, b_+126); L = INTERACTION_BASE + OBJ_SUBID;
   CYC(b_+126, b_+128); mem_wr(gb, HL, 0x0a);
   CALL_C(b_+128, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+131);
-  CYC(b_+131, b_+134); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+131, b_+134); TAIL(objectSetVisible83); // jp
 
 state1:
   CYC(b_+134, b_+136); E = INTERACTION_BASE + OBJ_PRESSED_A_BUTTON;
@@ -166,7 +166,7 @@ state1:
   CYC(b_+153, b_+155); C = 0x00; // <TX_3500
 
 l_4490:
-  CYC(b_+155, b_+158); showText_hook(gb); return; // jp
+  CYC(b_+155, b_+158); TAIL(showText); // jp
 
 state2:
   CYC(b_+158, b_+161); A = mem_rd(gb, wSelectedTextOption);
@@ -199,7 +199,7 @@ l_449d:
   CALL_C(b_+201, playSound_b00_hook, SYM(playSound_b00), b_+204);
 
 delete_:
-  CYC(b_+204, b_+207); interactionDelete_hook(gb); return; // jp
+  CYC(b_+204, b_+207); TAIL(interactionDelete); // jp
 
 state3:
   CYC(b_+207, b_+209); E = INTERACTION_BASE + OBJ_VAR2A;
@@ -222,7 +222,7 @@ state3:
   CALL_C(b_+241, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+244);
   CYC(b_+244, b_+246); E = INTERACTION_BASE + OBJ_ANGLE;
   CYC(b_+246, b_+247); mem_wr(gb, DE, A);
-  CYC(b_+247, b_+250); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+247, b_+250); TAIL(objectSetVisible80); // jp
 
 state4:
   CYC(b_+250, b_+253); A = mem_rd(gb, wLinkDeathTrigger);
@@ -234,14 +234,14 @@ state4:
   CYC(b_+260, b_+262);
   CALL_C(b_+262, objectApplySpeed_hook, SYM(objectApplySpeed), b_+265);
   CYC(b_+265, b_+267); C = 0x20;
-  CYC(b_+267, b_+270); objectUpdateSpeedZ_paramC_hook(gb); return; // jp
+  CYC(b_+267, b_+270); TAIL(objectUpdateSpeedZ_paramC); // jp
 
 l_4503:
   CALL_C(b_+270, interactionIncState_hook, SYM(interactionIncState), b_+273);
   CYC(b_+273, b_+275); L = INTERACTION_BASE + OBJ_VISIBLE;
   CYC(b_+275, b_+277); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
   CYC(b_+277, b_+280); SET_BC(0x3501); // TX_3501
-  CYC(b_+280, b_+283); showText_hook(gb); return; // jp
+  CYC(b_+280, b_+283); TAIL(showText); // jp
 
 state5:
   CYC(b_+283, b_+286); SET_HL(wGashaSpotFlags);
@@ -364,7 +364,7 @@ l_4588:
   CYC(b_+450, b_+451); interactionCodeb6_addAToHl(gb, b_+451);
   CYC(b_+451, b_+452); C = mem_rd(gb, HL);
   CYC(b_+452, b_+454); B = 0x35; // >TX_3500
-  CYC(b_+454, b_+457); showText_hook(gb); return; // jp
+  CYC(b_+454, b_+457); TAIL(showText); // jp
 
 state6:
   CYC(b_+467, b_+470); SET_HL(wNumRupees);
@@ -573,5 +573,5 @@ counter2Done:
   CYC(b_+752, b_+753); A = B;
   CYC(b_+753, b_+754); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+754, b_+755); mem_wr(gb, HL, A);
-  CYC(b_+755, b_+758); interactionDelete_hook(gb); return; // jp
+  CYC(b_+755, b_+758); TAIL(interactionDelete); // jp
 }

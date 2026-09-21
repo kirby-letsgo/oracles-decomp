@@ -78,7 +78,7 @@ state0:
   CYC(b_+56, b_+57); mem_wr(gb, DE, A);
   CYC(b_+57, b_+59); A = 0xa8; // SND_VERAN_FAIRY_ATTACK
   CALL_C(b_+59, playSound_b00_hook, SYM(playSound_b00), b_+62);
-  CYC(b_+62, b_+65); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+62, b_+65); TAIL(objectSetVisible82); // jp
 
 state1:
   CALL_C(b_+65, enemyCode5e_updateOamFlags_hook, b_+105, b_+68);
@@ -97,7 +97,7 @@ state2:
   CALL_C(b_+87, objectApplySpeed_hook, SYM(objectApplySpeed), b_+90);
 
 animate:
-  CYC(b_+90, b_+93); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+90, b_+93); TAIL(enemyAnimate); // jp
 }
 
 // 0e:6a36, bare local (no exported symbol); called via genuine call/ret from

@@ -79,7 +79,7 @@ state0:
   CALL_C(b_+80, interactionIncState_hook, SYM(interactionIncState), b_+83);
   CALL_C(b_+83, objectSetVisible82_hook, SYM(objectSetVisible82), b_+86);
   CYC(b_+86, b_+89); SET_HL((SYM(miscPuzzles_subid19__state4) + 27)); // mainScripts.possessedNayru_beginFightScript
-  CYC(b_+89, b_+92); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+89, b_+92); TAIL(interactionSetScript); // jp
 
 state1:
   CALL_C(b_+92, interactionRunScript_hook, SYM(interactionRunScript), b_+95);
@@ -106,7 +106,7 @@ state3:
   CYC(b_+123, b_+126); W8(wMenuDisabled) = A;
   CYC(b_+126, b_+127); A = alu_inc8(gb, A);
   CYC(b_+127, b_+130); W8(wLoadedTreeGfxIndex) = A;
-  CYC(b_+130, b_+133); interactionDelete_hook(gb); return; // jp
+  CYC(b_+130, b_+133); TAIL(interactionDelete); // jp
 }
 
 // possessedNayru_ghost: also relies on E already holding INTERACTION_BASE + OBJ_STATE, set by
@@ -143,7 +143,7 @@ state1:
   CYC(b_+33, b_+35); mem_wr(gb, HL, 0x14); // SPEED_80
   CALL_C(b_+35, objectSetVisible81_hook, SYM(objectSetVisible81), b_+38);
   CYC(b_+38, b_+41); SET_HL((SYM(miscPuzzles_subid1a) + 1)); // mainScripts.possessedNayru_veranGhostScript
-  CYC(b_+41, b_+44); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+41, b_+44); TAIL(interactionSetScript); // jp
 
 state2:
   CALL_C(b_+44, interactionRunScript_hook, SYM(interactionRunScript), b_+47);
@@ -152,7 +152,7 @@ state2:
   CYC(b_+50, b_+52); A = 0x37; // Object.var37
   CALL_C(b_+52, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+55);
   CYC(b_+55, b_+57); mem_wr(gb, HL, 0x00);
-  CYC(b_+57, b_+60); interactionDelete_hook(gb); return; // jp
+  CYC(b_+57, b_+60); TAIL(interactionDelete); // jp
 }
 
 // INTERAC_POSSESSED_NAYRU
@@ -165,6 +165,6 @@ void interactionCode6d_hook(GB *gb) {
     CYC(b_+5, b_+6); push_effect(gb, b_+6);
     uint16_t target = possessedNayru_jump_table(gb);
     if (target == SYM(possessedNayru_subid00)) { possessedNayru_subid00_hook(gb); return; }
-    possessedNayru_ghost_hook(gb); return; // target == 0x548e (subid01 and subid02 alias here)
+    TAIL(possessedNayru_ghost); // target == 0x548e (subid01 and subid02 alias here)
   }
 }

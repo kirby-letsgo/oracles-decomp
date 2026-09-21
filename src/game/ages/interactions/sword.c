@@ -113,7 +113,7 @@ set_damage:
       CYC(b_+100, b_+102); E = 0x04;
       CYC(b_+102, b_+104); A = 0x01;
       CYC(b_+104, b_+105); mem_wr(gb, DE, A);
-      CYC(b_+105, b_+108); objectSetVisible82_hook(gb); return;
+      CYC(b_+105, b_+108); TAIL(objectSetVisible82);
     }
     else if (jt_ == b_+114) {
       CYC(b_+114, b_+116); E = 0x24;
@@ -154,7 +154,7 @@ set_damage:
     else if (jt_ == b_+147) {
       CYC(b_+147, b_+149); A = 0x08;
       CALL_C(b_+149, tryBreakTileWithSword_calculateLevel_hook, SYM(tryBreakTileWithSword_calculateLevel), b_+152);
-      CYC(b_+152, b_+155); itemDelete_hook(gb); return;
+      CYC(b_+152, b_+155); TAIL(itemDelete);
     }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
@@ -195,7 +195,7 @@ void interactionCode5e__afterCall6e68_hook(GB *gb) {
   CYC(b_+31, b_+33); L = 0x40;
   CYC(b_+33, b_+34); alu_and(gb, mem_rd(gb, HL));
   if (F & FZ) {
-    CYCT(b_+34, b_+37); interactionDelete_hook(gb); return;
+    CYCT(b_+34, b_+37); TAIL(interactionDelete);
   }
   CYC(b_+34, b_+37);
   CYC(b_+37, b_+39); L = 0x61;
@@ -221,7 +221,7 @@ void interactionCode5e__afterCall6e68_hook(GB *gb) {
 L_6e8f:
   SET_HL(POP(b_+58));
   CALL_C(b_+59, objectTakePosition_hook, SYM(objectTakePosition), b_+62);
-  CYC(b_+62, b_+65); objectSetVisible83_hook(gb); return;
+  CYC(b_+62, b_+65); TAIL(objectSetVisible83);
 }
 
 void interactionCode5e_hook(GB *gb) {

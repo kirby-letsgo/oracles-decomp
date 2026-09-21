@@ -32,7 +32,7 @@ void interactionCodec9_updateAnimation_hook(GB *gb) {
   CYC(b_+23, b_+24); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+24, b_+25); ret_effect(gb); return; } // ret z
   CYC(b_+24, b_+25);
-  CYC(b_+25, b_+28); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+25, b_+28); TAIL(interactionAnimate); // jp
 }
 
 // 0b:76f0, called (real `call`) from interactionCodec9@state0, and reached by plain fallthrough
@@ -40,7 +40,7 @@ void interactionCodec9_updateAnimation_hook(GB *gb) {
 void interactionCodec9_beginHop_hook(GB *gb) {
   BASE(interactionCodec9);
   CYC(b_+230, b_+233); SET_BC(0xff40);
-  CYC(b_+233, b_+236); objectSetSpeedZ_hook(gb); return; // jp
+  CYC(b_+233, b_+236); TAIL(objectSetSpeedZ); // jp
 }
 
 // 0b:76e9, called (real `call`) from interactionCodec9@state1, @state2 and @state3.
@@ -74,7 +74,7 @@ void interactionCodec9_updateMovement_hook(GB *gb) {
   CYC(b_+255, b_+256); A = mem_rd(gb, DE);
   CYC(b_+256, b_+258); alu_xor(gb, 0x01);
   CYC(b_+258, b_+259); mem_wr(gb, DE, A);
-  CYC(b_+259, b_+262); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+259, b_+262); TAIL(interactionSetAnimation); // jp
 }
 
 // 0b:768f, real jump-table target reached by `jp` from interactionCodec9@state2, and by
@@ -84,7 +84,7 @@ void interactionCodec9_setScriptAndGotoState4_hook(GB *gb) {
   CYC(b_+133, b_+135); E = INTERACTION_BASE + OBJ_STATE;
   CYC(b_+135, b_+137); A = 0x04;
   CYC(b_+137, b_+138); mem_wr(gb, DE, A);
-  CYC(b_+138, b_+141); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+138, b_+141); TAIL(interactionSetScript); // jp
 }
 
 // 0b:768c, unreachable in practice (only interactionCodec9_func_766f_hook's dead `jr z` branch
@@ -258,7 +258,7 @@ l_7724:
   CYC(b_+295, b_+297); L = INTERACTION_BASE + OBJ_VAR3E;
   CYC(b_+297, b_+299); A = 0x00;
   CYC(b_+299, b_+300); mem_wr(gb, HL, A);
-  CYC(b_+300, b_+303); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+300, b_+303); TAIL(interactionSetAnimation); // jp
 
 initState3:
   CYC(b_+303, b_+304); H = D;
@@ -277,7 +277,7 @@ initState3:
   CYC(b_+325, b_+327); L = INTERACTION_BASE + OBJ_VAR3E;
   CYC(b_+327, b_+329); A = 0x01;
   CYC(b_+329, b_+330); mem_wr(gb, HL, A);
-  CYC(b_+330, b_+333); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+330, b_+333); TAIL(interactionSetAnimation); // jp
 }
 
 // ==================================================================================================

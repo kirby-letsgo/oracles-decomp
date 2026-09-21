@@ -54,7 +54,7 @@ state0:
 state1:
   CYC(b_+29, b_+31); A = 0x00; // Object.id
   CALL_C(b_+31, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+34);
-  CYC(b_+34, b_+37); objectTakePosition_hook(gb); return; // jp
+  CYC(b_+34, b_+37); TAIL(objectTakePosition); // jp
 
 state2:
   CALL_C(b_+37, objectApplySpeed_hook, SYM(objectApplySpeed), b_+40);
@@ -75,7 +75,7 @@ state2:
   CALL_C(b_+65, partSetAnimation_hook, SYM(partSetAnimation), b_+68);
   CYC(b_+68, b_+70); A = 0x6f; // SND_EXPLOSION
   CALL_C(b_+70, playSound_b00_hook, SYM(playSound_b00), b_+73);
-  CYC(b_+73, b_+76); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+73, b_+76); TAIL(objectSetVisible83); // jp
 
 state3:
   CALL_C(b_+76, partAnimate_hook, SYM(partAnimate), b_+79);

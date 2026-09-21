@@ -69,7 +69,7 @@ void interactionCode3e_hook(GB *gb) {
           CYC(b_+27, b_+29); E = 0x46;
           CYC(b_+29, b_+31); A = 0x78;
           CYC(b_+31, b_+32); mem_wr(gb, DE, A);
-          CYC(b_+32, b_+35); interactionSetAlwaysUpdateBit_hook(gb); return;
+          CYC(b_+32, b_+35); TAIL(interactionSetAlwaysUpdateBit);
         }
         else if (jt_ == b_+35) {
           CYC(b_+35, b_+36); H = D;
@@ -80,14 +80,14 @@ void interactionCode3e_hook(GB *gb) {
           CYC(b_+44, b_+47); SET_HL((SYM(forestFairy_subid00State3) + 9));
           CALL_C(b_+47, interactionSetScript_hook, SYM(interactionSetScript), b_+50);
           CALL_C(b_+50, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+53);
-          CYC(b_+53, b_+56); objectSetVisible81_hook(gb); return;
+          CYC(b_+53, b_+56); TAIL(objectSetVisible81);
         }
         else if (jt_ == b_+56) {
           CYC(b_+56, b_+58); E = 0x50;
           CYC(b_+58, b_+60); A = 0x50;
           CYC(b_+60, b_+61); mem_wr(gb, DE, A);
           CYC(b_+61, b_+63); A = 0xa4;
-          CYC(b_+63, b_+66); playSound_b00_hook(gb); return;
+          CYC(b_+63, b_+66); TAIL(playSound_b00);
         }
         else { HANDOFF(HL); }
       } while (0);
@@ -99,9 +99,9 @@ void interactionCode3e_hook(GB *gb) {
       CYC(b_+68, b_+69); A = mem_rd(gb, DE);
       CYC(b_+69, b_+70); push_effect(gb, b_+70);
       do { uint16_t jt_ = (ghost_veran_jump_table(gb));
-        if (jt_ == SYM(runVeranGhostSubid0)) { runVeranGhostSubid0_hook(gb); return; }
-        else if (jt_ == SYM(runVeranGhostSubid1)) { runVeranGhostSubid1_hook(gb); return; }
-        else if (jt_ == SYM(runVeranGhostSubid2)) { runVeranGhostSubid2_hook(gb); return; }
+        if (jt_ == SYM(runVeranGhostSubid0) && hook_enabled_at(gb, SYM(runVeranGhostSubid0))) { runVeranGhostSubid0_hook(gb); return; }
+        else if (jt_ == SYM(runVeranGhostSubid1) && hook_enabled_at(gb, SYM(runVeranGhostSubid1))) { runVeranGhostSubid1_hook(gb); return; }
+        else if (jt_ == SYM(runVeranGhostSubid2) && hook_enabled_at(gb, SYM(runVeranGhostSubid2))) { runVeranGhostSubid2_hook(gb); return; }
         else { HANDOFF(HL); }
       } while (0);
       goto jt_fall3;
@@ -136,13 +136,13 @@ void runVeranGhostSubid0_hook(GB *gb) {
       CALL_C(b_+44, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+47);
       CYC(b_+47, b_+49); A = 0x1d;
       CALL_C(b_+49, playSound_b00_hook, SYM(playSound_b00), b_+52);
-      CYC(b_+52, b_+55); objectSetVisible80_hook(gb); return;
+      CYC(b_+52, b_+55); TAIL(objectSetVisible80);
 substate0_visible:
       CYC(b_+55, b_+58); A = mem_rd(gb, wFrameCounter);
       CYC(b_+58, b_+59); alu_rrca(gb);
       if (!(F & FC)) { CYCT(b_+59, b_+62); objectSetVisible83_hook(gb); return; }
       CYC(b_+59, b_+62);
-      CYC(b_+62, b_+65); objectSetVisible80_hook(gb); return;
+      CYC(b_+62, b_+65); TAIL(objectSetVisible80);
     }
     else if (jt_ == b_+65) {
       CALL_C(b_+65, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+68);
@@ -150,7 +150,7 @@ substate0_visible:
       CYC(b_+68, b_+71);
       CALL_C(b_+71, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+74);
       CYC(b_+74, b_+77); SET_HL((SYM(forestFairy_subid00State2) + 5));
-      CYC(b_+77, b_+80); interactionSetScript_hook(gb); return;
+      CYC(b_+77, b_+80); TAIL(interactionSetScript);
     }
     else if (jt_ == b_+80) {
       CYC(b_+80, b_+83); A = mem_rd(gb, wTmpcfc0_carpenterSearch_carpentersFound);
@@ -173,10 +173,10 @@ substate0_visible:
       CYC(b_+109, b_+110); alu_xor(gb, A);
       CALL_C(b_+110, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+113);
       CYC(b_+113, b_+115); A = 0x8d;
-      CYC(b_+115, b_+118); playSound_b00_hook(gb); return;
+      CYC(b_+115, b_+118); TAIL(playSound_b00);
 script_position:
       ghost_veran_update_script_position(gb, sp0_, b_+118, b_+121);
-      CYC(b_+131, b_+134); interactionRunScript_hook(gb); return;
+      CYC(b_+131, b_+134); TAIL(interactionRunScript);
     }
     else if (jt_ == b_+134) {
       CYC(b_+134, b_+135); H = D;
@@ -194,7 +194,7 @@ script_position:
       CYC(b_+152, b_+155);
       CALL_C(b_+155, objectSetInvisible_hook, SYM(objectSetInvisible), b_+158);
       CYC(b_+158, b_+160); A = 0xab;
-      CYC(b_+160, b_+163); playSound_b00_hook(gb); return;
+      CYC(b_+160, b_+163); TAIL(playSound_b00);
     }
     else if (jt_ == b_+163) {
       CYC(b_+163, b_+166); A = mem_rd(gb, wTmpcfc0_carpenterSearch_carpentersFound);
@@ -210,7 +210,7 @@ script_position:
       CYC(b_+109, b_+110); alu_xor(gb, A);
       CALL_C(b_+110, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+113);
       CYC(b_+113, b_+115); A = 0x8d;
-      CYC(b_+115, b_+118); playSound_b00_hook(gb); return;
+      CYC(b_+115, b_+118); TAIL(playSound_b00);
     }
     else if (jt_ == b_+171) {
       CYC(b_+171, b_+174); A = mem_rd(gb, wTmpcfc0_armosStatue_killedArmosPositions);
@@ -228,7 +228,7 @@ run_script:
       if (!(F & FC)) { CYCT(b_+202, b_+203); ret_effect(gb); return; }
       CYC(b_+202, b_+203);
       CALL_C(b_+203, objectSetInvisible_hook, SYM(objectSetInvisible), b_+206);
-      CYC(b_+206, b_+209); interactionIncSubstate_hook(gb); return;
+      CYC(b_+206, b_+209); TAIL(interactionIncSubstate);
     }
     else if (jt_ == b_+232) {
       CYC(b_+232, b_+235); A = mem_rd(gb, wTmpcfc0_armosStatue_killedArmosPositions);
@@ -246,7 +246,7 @@ run_script:
       CALL_C(b_+250, interactionRunScript_hook, SYM(interactionRunScript), b_+253);
       if (!(F & FC)) { CYCT(b_+253, b_+254); ret_effect(gb); return; }
       CYC(b_+253, b_+254);
-      CYC(b_+254, b_+257); interactionDelete_hook(gb); return;
+      CYC(b_+254, b_+257); TAIL(interactionDelete);
     }
     else { HANDOFF(HL); }
   } while (0);
@@ -306,7 +306,7 @@ move:
       CYC(b_+59, b_+60); mem_wr(gb, DE, A);
       CALL_C(b_+60, objectApplySpeed_hook, SYM(objectApplySpeed), b_+63);
 animate:
-      CYC(b_+63, b_+66); interactionAnimate_hook(gb); return;
+      CYC(b_+63, b_+66); TAIL(interactionAnimate);
     }
     else if (jt_ == b_+66) {
       CALL_C(b_+66, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+69);
@@ -315,7 +315,7 @@ animate:
       CYC(b_+71, b_+72); L = E;
       CYC(b_+72, b_+73); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
       CYC(b_+73, b_+76); SET_BC((SYM(checkNpcShouldExistAtGameStage_body__data5__subid1) + 1));
-      CYC(b_+76, b_+79); showText_hook(gb); return;
+      CYC(b_+76, b_+79); TAIL(showText);
     }
     else if (jt_ == b_+79) {
       CALL_C(b_+79, getFreeEnemySlot_hook, SYM(getFreeEnemySlot), b_+82);
@@ -343,11 +343,11 @@ animate:
       CYC(b_+114, b_+116); alu_bit(gb, 7, mem_rd(gb, HL));
       if (F & FZ) { CYCT(b_+116, b_+119); objectSetVisible82_hook(gb); return; }
       CYC(b_+116, b_+119);
-      CYC(b_+119, b_+122); objectSetInvisible_hook(gb); return;
+      CYC(b_+119, b_+122); TAIL(objectSetInvisible);
 delete:
       CYC(b_+122, b_+124); A = 1;
       CYC(b_+124, b_+127); W8(wLoadedTreeGfxIndex) = A;
-      CYC(b_+127, b_+130); interactionDelete_hook(gb); return;
+      CYC(b_+127, b_+130); TAIL(interactionDelete);
     }
     else { HANDOFF(HL); }
   } while (0);

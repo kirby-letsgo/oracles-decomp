@@ -60,7 +60,7 @@ void func_52f4_hook(GB *gb) {
   CYC(b_+2, b_+4); A = 0x04;
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);
   CYC(b_+5, b_+6); alu_xor(gb, A);
-  CYC(b_+6, b_+9); partCommon_bounceWhenCollisionsEnabled_hook(gb); return; // jp
+  CYC(b_+6, b_+9); TAIL(partCommon_bounceWhenCollisionsEnabled); // jp
 }
 
 void func_52fd_hook(GB *gb) {
@@ -134,7 +134,7 @@ normalStatus:
     if (target == b_+63) goto state2;
     if (target == b_+80) goto state3;
     if (target == b_+85) goto state5;
-    partCommon_updateSpeedAndDeleteWhenCounter1Is0_hook(gb); return;
+    TAIL(partCommon_updateSpeedAndDeleteWhenCounter1Is0);
   }
 
 state0:
@@ -147,7 +147,7 @@ state0:
   CYC(b_+46, b_+48); mem_wr(gb, HL, 0x08);
   CYC(b_+48, b_+50); A = 0xa6; // SND_STRIKE
   CALL_C(b_+50, playSound_b00_hook, SYM(playSound_b00), b_+53);
-  CYC(b_+53, b_+56); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+53, b_+56); TAIL(objectSetVisible81); // jp
 
 state1:
   CALL_C(b_+56, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+59);
@@ -175,5 +175,5 @@ state3:
   CYC(b_+83, b_+85); goto state2; // jr
 
 state5:
-  CYC(b_+85, b_+88); partDelete_hook(gb); return; // jp
+  CYC(b_+85, b_+88); TAIL(partDelete); // jp
 }

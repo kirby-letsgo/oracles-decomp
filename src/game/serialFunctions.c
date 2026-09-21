@@ -140,10 +140,10 @@ void func_4036_hook(GB *gb) {
   CYC(b_+0, b_+2); A = H8(hFFBE);
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (serial_jump_table(gb));
-    if (jt_ == SYM(FFBE_00)) { FFBE_00_hook(gb); return; }
-    else if (jt_ == SYM(FFBE_02)) { FFBE_02_hook(gb); return; }
-    else if (jt_ == SYM(FFBE_03)) { FFBE_03_hook(gb); return; }
-    else if (jt_ == SYM(FFBE_04)) { FFBE_04_hook(gb); return; }
+    if (jt_ == SYM(FFBE_00) && hook_enabled_at(gb, SYM(FFBE_00))) { FFBE_00_hook(gb); return; }
+    else if (jt_ == SYM(FFBE_02) && hook_enabled_at(gb, SYM(FFBE_02))) { FFBE_02_hook(gb); return; }
+    else if (jt_ == SYM(FFBE_03) && hook_enabled_at(gb, SYM(FFBE_03))) { FFBE_03_hook(gb); return; }
+    else if (jt_ == SYM(FFBE_04) && hook_enabled_at(gb, SYM(FFBE_04))) { FFBE_04_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -231,8 +231,7 @@ void func_4096_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_cp(gb, 0x80);
   if (F & FZ) {
     CYCT(b_+5, b_+8);
-    disableSerialPort_hook(gb);
-    return;
+    TAIL(disableSerialPort);
   }
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+11);
@@ -344,21 +343,21 @@ void FFBE_04_hook(GB *gb) {
   CYC(b_+0, b_+2); A = H8(hSerialLinkState);
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (serial_jump_table(gb));
-    if (jt_ == SYM(gameLink_getFile1)) { gameLink_getFile1_hook(gb); return; }
-    else if (jt_ == SYM(waitForNextPacket)) { waitForNextPacket_hook(gb); return; }
-    else if (jt_ == SYM(gameLink_getFile2)) { gameLink_getFile2_hook(gb); return; }
-    else if (jt_ == SYM(gameLink_getFile3)) { gameLink_getFile3_hook(gb); return; }
-    else if (jt_ == SYM(func_438e)) { func_438e_hook(gb); return; }
-    else if (jt_ == SYM(func_4087)) { func_4087_hook(gb); return; }
-    else if (jt_ == SYM(gameLinkState08)) { gameLinkState08_hook(gb); return; }
-    else if (jt_ == SYM(gameLinkState09)) { gameLinkState09_hook(gb); return; }
-    else if (jt_ == SYM(gameLinkState0b)) { gameLinkState0b_hook(gb); return; }
-    else if (jt_ == SYM(gameLinkState0c)) { gameLinkState0c_hook(gb); return; }
-    else if (jt_ == SYM(gameLinkState0f)) { gameLinkState0f_hook(gb); return; }
-    else if (jt_ == SYM(func_4096)) { func_4096_hook(gb); return; }
-    else if (jt_ == SYM(gameLinkState12)) { gameLinkState12_hook(gb); return; }
-    else if (jt_ == SYM(sendAckPacket)) { sendAckPacket_hook(gb); return; }
-    else if (jt_ == SYM(func_437b)) { func_437b_hook(gb); return; }
+    if (jt_ == SYM(gameLink_getFile1) && hook_enabled_at(gb, SYM(gameLink_getFile1))) { gameLink_getFile1_hook(gb); return; }
+    else if (jt_ == SYM(waitForNextPacket) && hook_enabled_at(gb, SYM(waitForNextPacket))) { waitForNextPacket_hook(gb); return; }
+    else if (jt_ == SYM(gameLink_getFile2) && hook_enabled_at(gb, SYM(gameLink_getFile2))) { gameLink_getFile2_hook(gb); return; }
+    else if (jt_ == SYM(gameLink_getFile3) && hook_enabled_at(gb, SYM(gameLink_getFile3))) { gameLink_getFile3_hook(gb); return; }
+    else if (jt_ == SYM(func_438e) && hook_enabled_at(gb, SYM(func_438e))) { func_438e_hook(gb); return; }
+    else if (jt_ == SYM(func_4087) && hook_enabled_at(gb, SYM(func_4087))) { func_4087_hook(gb); return; }
+    else if (jt_ == SYM(gameLinkState08) && hook_enabled_at(gb, SYM(gameLinkState08))) { gameLinkState08_hook(gb); return; }
+    else if (jt_ == SYM(gameLinkState09) && hook_enabled_at(gb, SYM(gameLinkState09))) { gameLinkState09_hook(gb); return; }
+    else if (jt_ == SYM(gameLinkState0b) && hook_enabled_at(gb, SYM(gameLinkState0b))) { gameLinkState0b_hook(gb); return; }
+    else if (jt_ == SYM(gameLinkState0c) && hook_enabled_at(gb, SYM(gameLinkState0c))) { gameLinkState0c_hook(gb); return; }
+    else if (jt_ == SYM(gameLinkState0f) && hook_enabled_at(gb, SYM(gameLinkState0f))) { gameLinkState0f_hook(gb); return; }
+    else if (jt_ == SYM(func_4096) && hook_enabled_at(gb, SYM(func_4096))) { func_4096_hook(gb); return; }
+    else if (jt_ == SYM(gameLinkState12) && hook_enabled_at(gb, SYM(gameLinkState12))) { gameLinkState12_hook(gb); return; }
+    else if (jt_ == SYM(sendAckPacket) && hook_enabled_at(gb, SYM(sendAckPacket))) { sendAckPacket_hook(gb); return; }
+    else if (jt_ == SYM(func_437b) && hook_enabled_at(gb, SYM(func_437b))) { func_437b_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -369,18 +368,18 @@ void FFBE_03_hook(GB *gb) {
   CYC(b_+0, b_+2); A = H8(hSerialLinkState);
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (serial_jump_table(gb));
-    if (jt_ == SYM(receiveLinkState00)) { receiveLinkState00_hook(gb); return; }
-    else if (jt_ == SYM(waitForNextPacket)) { waitForNextPacket_hook(gb); return; }
-    else if (jt_ == SYM(func_438e)) { func_438e_hook(gb); return; }
-    else if (jt_ == SYM(receiveLinkState03)) { receiveLinkState03_hook(gb); return; }
-    else if (jt_ == SYM(receiveLinkState06)) { receiveLinkState06_hook(gb); return; }
-    else if (jt_ == SYM(sendAckPacket)) { sendAckPacket_hook(gb); return; }
-    else if (jt_ == SYM(receiveLinkState0b)) { receiveLinkState0b_hook(gb); return; }
-    else if (jt_ == SYM(disableSerialIfByteReceived)) { disableSerialIfByteReceived_hook(gb); return; }
-    else if (jt_ == SYM(func_4096)) { func_4096_hook(gb); return; }
-    else if (jt_ == SYM(receiveLinkState10)) { receiveLinkState10_hook(gb); return; }
-    else if (jt_ == SYM(receiveLinkState13)) { receiveLinkState13_hook(gb); return; }
-    else if (jt_ == SYM(func_437b)) { func_437b_hook(gb); return; }
+    if (jt_ == SYM(receiveLinkState00) && hook_enabled_at(gb, SYM(receiveLinkState00))) { receiveLinkState00_hook(gb); return; }
+    else if (jt_ == SYM(waitForNextPacket) && hook_enabled_at(gb, SYM(waitForNextPacket))) { waitForNextPacket_hook(gb); return; }
+    else if (jt_ == SYM(func_438e) && hook_enabled_at(gb, SYM(func_438e))) { func_438e_hook(gb); return; }
+    else if (jt_ == SYM(receiveLinkState03) && hook_enabled_at(gb, SYM(receiveLinkState03))) { receiveLinkState03_hook(gb); return; }
+    else if (jt_ == SYM(receiveLinkState06) && hook_enabled_at(gb, SYM(receiveLinkState06))) { receiveLinkState06_hook(gb); return; }
+    else if (jt_ == SYM(sendAckPacket) && hook_enabled_at(gb, SYM(sendAckPacket))) { sendAckPacket_hook(gb); return; }
+    else if (jt_ == SYM(receiveLinkState0b) && hook_enabled_at(gb, SYM(receiveLinkState0b))) { receiveLinkState0b_hook(gb); return; }
+    else if (jt_ == SYM(disableSerialIfByteReceived) && hook_enabled_at(gb, SYM(disableSerialIfByteReceived))) { disableSerialIfByteReceived_hook(gb); return; }
+    else if (jt_ == SYM(func_4096) && hook_enabled_at(gb, SYM(func_4096))) { func_4096_hook(gb); return; }
+    else if (jt_ == SYM(receiveLinkState10) && hook_enabled_at(gb, SYM(receiveLinkState10))) { receiveLinkState10_hook(gb); return; }
+    else if (jt_ == SYM(receiveLinkState13) && hook_enabled_at(gb, SYM(receiveLinkState13))) { receiveLinkState13_hook(gb); return; }
+    else if (jt_ == SYM(func_437b) && hook_enabled_at(gb, SYM(func_437b))) { func_437b_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -534,12 +533,12 @@ void FFBE_00_hook(GB *gb) {
   CYC(b_+0, b_+2); A = H8(hSerialLinkState);
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (serial_jump_table(gb));
-    if (jt_ == SYM(sendFileHeader)) { sendFileHeader_hook(gb); return; }
-    else if (jt_ == SYM(waitForNextPacket)) { waitForNextPacket_hook(gb); return; }
-    else if (jt_ == SYM(func_438e)) { func_438e_hook(gb); return; }
-    else if (jt_ == SYM(func_4293)) { func_4293_hook(gb); return; }
-    else if (jt_ == SYM(func_4096)) { func_4096_hook(gb); return; }
-    else if (jt_ == SYM(determineRingFortuneRing)) { determineRingFortuneRing_hook(gb); return; }
+    if (jt_ == SYM(sendFileHeader) && hook_enabled_at(gb, SYM(sendFileHeader))) { sendFileHeader_hook(gb); return; }
+    else if (jt_ == SYM(waitForNextPacket) && hook_enabled_at(gb, SYM(waitForNextPacket))) { waitForNextPacket_hook(gb); return; }
+    else if (jt_ == SYM(func_438e) && hook_enabled_at(gb, SYM(func_438e))) { func_438e_hook(gb); return; }
+    else if (jt_ == SYM(func_4293) && hook_enabled_at(gb, SYM(func_4293))) { func_4293_hook(gb); return; }
+    else if (jt_ == SYM(func_4096) && hook_enabled_at(gb, SYM(func_4096))) { func_4096_hook(gb); return; }
+    else if (jt_ == SYM(determineRingFortuneRing) && hook_enabled_at(gb, SYM(determineRingFortuneRing))) { determineRingFortuneRing_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -550,12 +549,12 @@ void FFBE_02_hook(GB *gb) {
   CYC(b_+0, b_+2); A = H8(hSerialLinkState);
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (serial_jump_table(gb));
-    if (jt_ == SYM(func_4293)) { func_4293_hook(gb); return; }
-    else if (jt_ == SYM(waitForNextPacket)) { waitForNextPacket_hook(gb); return; }
-    else if (jt_ == SYM(func_4096)) { func_4096_hook(gb); return; }
-    else if (jt_ == SYM(sendFileHeader)) { sendFileHeader_hook(gb); return; }
-    else if (jt_ == SYM(func_438e)) { func_438e_hook(gb); return; }
-    else if (jt_ == SYM(determineRingFortuneRing)) { determineRingFortuneRing_hook(gb); return; }
+    if (jt_ == SYM(func_4293) && hook_enabled_at(gb, SYM(func_4293))) { func_4293_hook(gb); return; }
+    else if (jt_ == SYM(waitForNextPacket) && hook_enabled_at(gb, SYM(waitForNextPacket))) { waitForNextPacket_hook(gb); return; }
+    else if (jt_ == SYM(func_4096) && hook_enabled_at(gb, SYM(func_4096))) { func_4096_hook(gb); return; }
+    else if (jt_ == SYM(sendFileHeader) && hook_enabled_at(gb, SYM(sendFileHeader))) { sendFileHeader_hook(gb); return; }
+    else if (jt_ == SYM(func_438e) && hook_enabled_at(gb, SYM(func_438e))) { func_438e_hook(gb); return; }
+    else if (jt_ == SYM(determineRingFortuneRing) && hook_enabled_at(gb, SYM(determineRingFortuneRing))) { determineRingFortuneRing_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -644,8 +643,7 @@ void waitForNextPacket_hook(GB *gb) {
   CYC(b_+9, b_+10); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+10, b_+12);
-    prepareForNextPacket_hook(gb);
-    return;
+    TAIL(prepareForNextPacket);
   }
   CYC(b_+10, b_+12);
   CYC(b_+12, b_+14); A = H8(hSerialLinkState);
@@ -692,8 +690,7 @@ set_timeout_mode:
   CYC(b_+23, b_+25); alu_cp(gb, 0xc0);
   if (!(F & FZ)) {
     CYCT(b_+25, b_+27);
-    func_42c5_hook(gb);
-    return;
+    TAIL(func_42c5);
   }
   CYC(b_+25, b_+27);
   CYC(b_+27, b_+30); sendAckPacket_hook(gb);
@@ -705,8 +702,7 @@ void func_42c5_hook(GB *gb) {
   CYC(b_+0, b_+2); alu_cp(gb, 0xb0);
   if (!(F & FZ)) {
     CYCT(b_+2, b_+5);
-    sendRetryPacket_hook(gb);
-    return;
+    TAIL(sendRetryPacket);
   }
   CYC(b_+2, b_+5);
   CYC(b_+5, b_+8); A = mem_rd(gb, w4PacketBuffer + 2);
@@ -714,8 +710,7 @@ void func_42c5_hook(GB *gb) {
   CYC(b_+10, b_+12); alu_cp(gb, 0x03);
   if (!(F & FC)) {
     CYCT(b_+12, b_+15);
-    disableSerialPort_hook(gb);
-    return;
+    TAIL(disableSerialPort);
   }
   CYC(b_+12, b_+15);
   CALL_C(b_+15, loadFile_b00_hook, SYM(loadFile_b00), b_+18);
@@ -768,8 +763,7 @@ void receiveLinkState13_hook(GB *gb) {
   CYC(b_+8, b_+10); alu_cp(gb, 0x81);
   if (F & FZ) {
     CYCT(b_+10, b_+13);
-    prepareForNextPacket_hook(gb);
-    return;
+    TAIL(prepareForNextPacket);
   }
   CYC(b_+10, b_+13);
   CYC(b_+13, b_+16); SET_HL(w4RingFortuneStuff);
@@ -849,8 +843,7 @@ void gameLinkState0b_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_cp(gb, 0x80);
   if (F & FZ) {
     CYCT(b_+5, b_+8);
-    disableSerialPort_hook(gb);
-    return;
+    TAIL(disableSerialPort);
   }
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+11); disableSerialPort_hook(gb);
@@ -889,8 +882,7 @@ void func_439a_hook(GB *gb) {
   CYC(b_+10, b_+11); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+11, b_+13);
-    func_43ab_hook(gb);
-    return;
+    TAIL(func_43ab);
   }
   CYC(b_+11, b_+13);
   CYC(b_+13, b_+14); SET_AF(pop_effect(gb));
@@ -903,8 +895,7 @@ void func_43ab_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_cp(gb, 0xb1);
   if (!(F & FZ)) {
     CYCT(b_+5, b_+7);
-    func_43bd_hook(gb);
-    return;
+    TAIL(func_43bd);
   }
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+8); alu_xor(gb, A);
@@ -952,8 +943,7 @@ void sendRetryPacket_hook(GB *gb) {
   CYC(b_+10, b_+12); alu_cp(gb, 0x05);
   if (F & FC) {
     CYCT(b_+12, b_+14);
-    setPacketBuffer_hook(gb);
-    return;
+    TAIL(setPacketBuffer);
   }
   CYC(b_+12, b_+14);
   CYC(b_+14, b_+16); A = 0x80;
@@ -999,8 +989,7 @@ static void game_link_get_file_body(GB *gb, uint16_t sp0_) {
   CYC(b_+12, b_+15); SET_HL(w2ColorComponentBuffer1 + 5);
   if (!(F & FZ)) {
     CYCT(b_+15, b_+17);
-    sendRetryPacket_hook(gb);
-    return;
+    TAIL(sendRetryPacket);
   }
   CYC(b_+15, b_+17);
   CYC(b_+17, b_+19); A = alu_swap(gb, A);
@@ -1061,8 +1050,7 @@ copy_file_header:
   CALL_C(b_+86, compareFileIDsAndNames_hook, SYM(compareFileIDsAndNames), b_+89);
   if (!(F & FZ)) {
     CYCT(b_+89, b_+91);
-    markFileAsBlank_hook(gb);
-    return;
+    TAIL(markFileAsBlank);
   }
   CYC(b_+89, b_+91);
   CYC(b_+91, b_+94); SET_HL(w2ColorComponentBuffer1);
@@ -1072,8 +1060,7 @@ copy_file_header:
   CYC(b_+97, b_+98); alu_or(gb, mem_rd(gb, HL));
   if (F & FZ) {
     CYCT(b_+98, b_+100);
-    markFileAsBlank_hook(gb);
-    return;
+    TAIL(markFileAsBlank);
   }
   CYC(b_+98, b_+100);
   CYC(b_+100, b_+103); sendAckPacket_hook(gb);
@@ -1084,16 +1071,14 @@ verify_other_mode:
   CYC(b_+106, b_+108); alu_cp(gb, GV(0xa0, 0xa1));
   if (!(F & FZ)) {
     CYCT(b_+108, b_+110);
-    markFileAsBlank_hook(gb);
-    return;
+    TAIL(markFileAsBlank);
   }
   CYC(b_+108, b_+110);
   CYC(b_+110, b_+113); A = mem_rd(gb, w2ColorComponentBuffer1 + 2);
   CYC(b_+113, b_+114); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+114, b_+116);
-    markFileAsBlank_hook(gb);
-    return;
+    TAIL(markFileAsBlank);
   }
   CYC(b_+114, b_+116);
   CYC(b_+116, b_+119); sendAckPacket_hook(gb);
@@ -1192,8 +1177,7 @@ packet_complete:
   CYC(b_+12, b_+14); alu_cp(gb, 0x81);
   if (F & FZ) {
     CYCT(b_+14, b_+17);
-    sendRetryPacket_hook(gb);
-    return;
+    TAIL(sendRetryPacket);
   }
   CYC(b_+14, b_+17);
   CYC(b_+17, b_+18); SET_AF(pop_effect(gb));

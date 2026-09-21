@@ -72,15 +72,13 @@ void updateSwingableItemAnimation_hook(GB *gb) {
   CYC(b_+2, b_+4); alu_cp(gb, GV(0x04, 0x07));
   if (F & FZ) {
     CYCT(b_+4, b_+6);
-    label_07_227_hook(gb);
-    return;
+    TAIL(label_07_227);
   }
   CYC(b_+4, b_+6);
   CYC(b_+6, b_+8); alu_bit(gb, 6, mem_rd(gb, HL));
   if (F & FZ) {
     CYCT(b_+8, b_+10);
-    label_07_227_hook(gb);
-    return;
+    TAIL(label_07_227);
   }
   CYC(b_+8, b_+10);
   CYC(b_+10, b_+12); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 6)));
@@ -154,8 +152,7 @@ void itemCode08Post_hook(GB *gb) {
   CALL_C(b_+0, cpRelatedObject1ID_hook, SYM(cpRelatedObject1ID), b_+3);
   if (!(F & FZ)) {
     CYCT(b_+3, b_+6);
-    itemDelete_hook(gb);
-    return;
+    TAIL(itemDelete);
   }
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+9); SET_HL(w1Link_yh);
@@ -177,8 +174,7 @@ void itemCode13Post_hook(GB *gb) {
   CALL_C(b_+0, cpRelatedObject1ID_hook, SYM(cpRelatedObject1ID), b_+3);
   if (!(F & FZ)) {
     CYCT(b_+3, b_+6);
-    itemDelete_hook(gb);
-    return;
+    TAIL(itemDelete);
   }
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+9); SET_HL(w1Link_yh);
@@ -196,8 +192,7 @@ void itemCode1ePost_hook(GB *gb) {
   CALL_C(b_+0, cpRelatedObject1ID_hook, SYM(cpRelatedObject1ID), b_+3);
   if (!(F & FZ)) {
     CYCT(b_+3, b_+6);
-    itemDelete_hook(gb);
-    return;
+    TAIL(itemDelete);
   }
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+8); L = 0x21;
@@ -229,8 +224,7 @@ void itemCode0cPost_hook(GB *gb) {
   CALL_C(b_+0, cpRelatedObject1ID_hook, SYM(cpRelatedObject1ID), b_+3);
   if (!(F & FZ)) {
     CYCT(b_+3, b_+6);
-    itemDelete_hook(gb);
-    return;
+    TAIL(itemDelete);
   }
   CYC(b_+3, b_+6);
   CALL_C(b_+6, updateBiggoronSwordAnimation_hook, SYM(updateBiggoronSwordAnimation), b_+9);
@@ -248,8 +242,7 @@ void itemCode04Post_hook(GB *gb) {
   CALL_C(b_+0, cpRelatedObject1ID_hook, SYM(cpRelatedObject1ID), b_+3);
   if (!(F & FZ)) {
     CYCT(b_+3, b_+6);
-    itemDelete_hook(gb);
-    return;
+    TAIL(itemDelete);
   }
   CYC(b_+3, b_+6);
   CALL_C(b_+6, updateSwingableItemAnimation_hook, SYM(updateSwingableItemAnimation), b_+9);

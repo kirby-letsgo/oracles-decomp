@@ -63,8 +63,7 @@ setScript:
   CALL_C(b_+66, interactionSetScript_hook, SYM(interactionSetScript), b_+69);
   CYC(b_+69, b_+71); E = INTERACTION_BASE + OBJ_PRESSED_A_BUTTON;
   CYC(b_+71, b_+74);
-  objectAddToAButtonSensitiveObjectList_hook(gb);
-  return;
+  TAIL(objectAddToAButtonSensitiveObjectList);
 state1:
   CYC(b_+74, b_+77);
   interactionRunScript_hook(gb);

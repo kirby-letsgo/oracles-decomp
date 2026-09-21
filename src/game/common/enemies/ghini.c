@@ -102,7 +102,7 @@ nextGhiniStep:
   CYC(b_+51, b_+53); alu_cp(gb, 0xe0); // LAST_ENEMY_INDEX+1
   if (F & FC) { CYCT(b_+53, b_+55); goto nextGhini; } // jr c
   CYC(b_+53, b_+55);
-  CYC(b_+55, b_+58); enemyDie_hook(gb); return; // jp
+  CYC(b_+55, b_+58); TAIL(enemyDie); // jp
 
 normalStatus:
   CALL_C(b_+58, ecom_getSubidAndCpStateTo08_b0d_hook, SYM(ecom_getSubidAndCpStateTo08_b0d), b_+61);
@@ -145,7 +145,7 @@ state_uninitialized:
   CYC(b_+111, b_+113); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
 
 afterSubid1Setup:
-  CYC(b_+113, b_+116); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+113, b_+116); TAIL(objectSetVisiblec1); // jp
 
 state_stub:
   RET(b_+116); return; // ret
@@ -177,7 +177,7 @@ state8:
   CYC(b_+23, b_+24); mem_wr(gb, HL, B);
   CYC(b_+24, b_+26); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+26, b_+27); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+27, b_+30); ghini_updateAnimationFromAngle_hook(gb); return; // jp
+  CYC(b_+27, b_+30); TAIL(ghini_updateAnimationFromAngle); // jp
 
 state9:
   CALL_C(b_+30, ghini_updateMovement_hook, SYM(ghini_updateMovement), b_+33);
@@ -188,7 +188,7 @@ state9:
   CYC(b_+40, b_+41); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
 
 animate:
-  CYC(b_+41, b_+44); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+41, b_+44); TAIL(enemyAnimate); // jp
 }
 
 // 0d:54de, bare global; takes a second to spawn in, and killing one of subid 1 makes all
@@ -217,7 +217,7 @@ state8:
   CYC(b_+20, b_+22); alu_and(gb, 0x01);
   if (!(F & FZ)) { RET_TAKEN(b_+22); return; } // ret nz
   CYC(b_+22, b_+23);
-  CYC(b_+23, b_+26); ecom_flickerVisibility_b0d_hook(gb); return; // jp
+  CYC(b_+23, b_+26); TAIL(ecom_flickerVisibility_b0d); // jp
 
 makeVisible:
   CYC(b_+26, b_+28); L = ENEMY_BASE + OBJ_VISIBLE;
@@ -245,7 +245,7 @@ state9:
   CALL_C(b_+63, ecom_randomBitwiseAndBCE_b0d_hook, SYM(ecom_randomBitwiseAndBCE_b0d), b_+66);
   CYC(b_+66, b_+67); alu_or(gb, B);
   CYC(b_+67, b_+68); A = C;
-  if (F & FZ) { CALL_C(b_+68, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+71); } else { CYC(b_+68, b_+71); } // call z
+  if (F & FZ) { CALL_C_CC(b_+68, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+71); } else { CYC(b_+68, b_+71); } // call z
   CYC(b_+71, b_+73); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+73, b_+74); mem_wr(gb, DE, A);
   CALL_C(b_+74, ghini_updateAnimationFromAngle_hook, SYM(ghini_updateAnimationFromAngle), b_+77);
@@ -372,7 +372,7 @@ moveTowardTarget:
   CALL_C(b_+79, ghini_updateAnimationFromAngle_hook, SYM(ghini_updateAnimationFromAngle), b_+82);
 
 animate:
-  CYC(b_+82, b_+85); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+82, b_+85); TAIL(enemyAnimate); // jp
 
 stateB:
   CALL_C(b_+85, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+88);
@@ -422,7 +422,7 @@ haveIndex:
   CYC(b_+23, b_+25); E = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+25, b_+26); A = mem_rd(gb, HL);
   CYC(b_+26, b_+27); mem_wr(gb, DE, A);
-  CYC(b_+27, b_+30); enemyAnimate_hook(gb); return; // jr to the trampoline at 0d:55c1, which is just enemyAnimate
+  CYC(b_+27, b_+30); TAIL(enemyAnimate); // jr to the trampoline at 0d:55c1, which is just enemyAnimate
 }
 
 // 0d:55fe, bare global.
@@ -433,7 +433,7 @@ void ghini_updateMovement_hook(GB *gb) {
   CALL_C(b_+3, ecom_bounceOffScreenBoundary_b0d_hook, SYM(ecom_bounceOffScreenBoundary_b0d), b_+6);
   if (F & FZ) { RET_TAKEN(b_+6); return; } // ret z
   CYC(b_+6, b_+7);
-  ghini_updateAnimationFromAngle_hook(gb); return; // fallthrough
+  TAIL(ghini_updateAnimationFromAngle); // fallthrough
 }
 
 // 0d:5605, bare global.
@@ -453,7 +453,7 @@ compare:
   if (F & FZ) { RET_TAKEN(b_+12); return; } // ret z
   CYC(b_+12, b_+13);
   CYC(b_+13, b_+14); mem_wr(gb, HL, A);
-  CYC(b_+14, b_+17); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+14, b_+17); TAIL(enemySetAnimation); // jp
 }
 
 // 0d:5616, bare global; sets var30/var31 to target position for subid 2.

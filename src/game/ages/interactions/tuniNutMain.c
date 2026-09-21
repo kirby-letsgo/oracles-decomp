@@ -50,8 +50,7 @@ static void tuni_nut_state0_after_graphics(GB *gb, uint16_t sp0_) {
   CALL_C(b_+5, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+8);
   if (!(F & FZ)) {
     CYCT(b_+8, b_+10);
-    tuniNut_gotoState4_hook(gb);
-    return;
+    TAIL(tuniNut_gotoState4);
   }
   CYC(b_+8, b_+10);
   CYC(b_+10, b_+12); A = 0x4c;
@@ -59,16 +58,14 @@ static void tuni_nut_state0_after_graphics(GB *gb, uint16_t sp0_) {
   if (!(F & FC)) {
     CYCT(b_+15, b_+17);
     CYC(b_+30, b_+33);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+15, b_+17);
   CYC(b_+17, b_+19); alu_cp(gb, 0x02);
   if (!(F & FZ)) {
     CYCT(b_+19, b_+21);
     CYC(b_+30, b_+33);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+19, b_+21);
   CYC(b_+21, b_+24); SET_BC(0x0810);
@@ -138,8 +135,7 @@ void tuniNut_state1_hook(GB *gb) {
     CYCT(b_+26, b_+28);
     CALL_C(b_+62, interactionIncState_hook, SYM(interactionIncState), b_+65);
     CYC(b_+65, b_+67);
-    tuniNut_beginMovingIntoPlace_hook(gb);
-    return;
+    TAIL(tuniNut_beginMovingIntoPlace);
   }
   CYC(b_+26, b_+28);
   if (F & FC) {
@@ -305,8 +301,7 @@ void tuniNut_state3_hook(GB *gb) {
       CYC(b_+129, b_+132); A = mem_rd(gb, wActiveMusic);
       CALL_C(b_+132, playSound_b00_hook, SYM(playSound_b00), b_+135);
       CYC(b_+135, b_+138);
-      tuniNut_gotoState4_hook(gb);
-      return;
+      TAIL(tuniNut_gotoState4);
     }
     else {
       hook_continue(gb, HL, sp0_);
@@ -322,11 +317,11 @@ void interactionCodeb1_body_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (tuni_nut_jump_table(gb));
-    if (jt_ == SYM(tuniNut_state0)) { tuniNut_state0_hook(gb); return; }
-    else if (jt_ == SYM(tuniNut_state1)) { tuniNut_state1_hook(gb); return; }
-    else if (jt_ == SYM(tuniNut_state2)) { tuniNut_state2_hook(gb); return; }
-    else if (jt_ == SYM(tuniNut_state3)) { tuniNut_state3_hook(gb); return; }
-    else if (jt_ == SYM(objectPreventLinkFromPassing)) { objectPreventLinkFromPassing_hook(gb); return; }
+    if (jt_ == SYM(tuniNut_state0) && hook_enabled_at(gb, SYM(tuniNut_state0))) { tuniNut_state0_hook(gb); return; }
+    else if (jt_ == SYM(tuniNut_state1) && hook_enabled_at(gb, SYM(tuniNut_state1))) { tuniNut_state1_hook(gb); return; }
+    else if (jt_ == SYM(tuniNut_state2) && hook_enabled_at(gb, SYM(tuniNut_state2))) { tuniNut_state2_hook(gb); return; }
+    else if (jt_ == SYM(tuniNut_state3) && hook_enabled_at(gb, SYM(tuniNut_state3))) { tuniNut_state3_hook(gb); return; }
+    else if (jt_ == SYM(objectPreventLinkFromPassing) && hook_enabled_at(gb, SYM(objectPreventLinkFromPassing))) { objectPreventLinkFromPassing_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

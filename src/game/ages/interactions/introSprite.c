@@ -67,7 +67,7 @@ initSpeedToScrollLeft:
   CYC(b_+45, b_+47); L = INTERACTION_BASE + OBJ_SPEED;
   CYC(b_+47, b_+49); mem_wr(gb, HL, 0x05); // SPEED_20
   CYC(b_+49, b_+52); SET_BC((SYM(miscPuzzles_dropSmallKeyHere) + 11));
-  CYC(b_+52, b_+55); interactionSetPosition_hook(gb); return; // jp
+  CYC(b_+52, b_+55); TAIL(interactionSetPosition); // jp
 
 subid2Init:
   CALL_C(b_+55, objectSetVisible83_hook, SYM(objectSetVisible83), b_+58);
@@ -85,7 +85,7 @@ subid3Init:
 
 subid4Init:
   CYC(b_+76, b_+79); SET_BC(0x1838);
-  CYC(b_+79, b_+82); interactionSetPosition_hook(gb); return; // jp
+  CYC(b_+79, b_+82); TAIL(interactionSetPosition); // jp
 
 subid6Init:
   CYC(b_+82, b_+83); H = D;
@@ -114,7 +114,7 @@ state1:
   CYC(b_+113, b_+114); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+114, b_+117); interactionAnimate_hook(gb); return; } // jp z
   CYC(b_+114, b_+117);
-  CYC(b_+117, b_+120); interactionDelete_hook(gb); return; // jp
+  CYC(b_+117, b_+120); TAIL(interactionDelete); // jp
 
 runSubid1:
   CALL_C(b_+120, checkInteractionSubstate_hook, SYM(checkInteractionSubstate), b_+123);
@@ -143,7 +143,7 @@ updateSpeed:
   CYC(b_+154, b_+155); alu_or(gb, A);
   if (F & FZ) { RET_TAKEN(b_+155); return; } // ret z
   CYC(b_+155, b_+156);
-  CYC(b_+156, b_+159); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+156, b_+159); TAIL(objectApplySpeed); // jp
 
 runSubid3:
   CALL_C(b_+159, interactionAnimate_hook, SYM(interactionAnimate), b_+162);
@@ -151,7 +151,7 @@ runSubid3:
   CYC(b_+165, b_+167); alu_and(gb, 0x03);
   if (!(F & FZ)) { RET_TAKEN(b_+167); return; } // ret nz
   CYC(b_+167, b_+168);
-  CYC(b_+168, b_+171); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+168, b_+171); TAIL(objectApplySpeed); // jp
 
 runSubid6:
   CYC(b_+171, b_+174); A = W8(wTmpcbba);
@@ -163,5 +163,5 @@ runSubid6:
   if (!(F & FZ)) { RET_TAKEN(b_+182); return; } // ret nz
   CYC(b_+182, b_+183);
   CALL_C(b_+183, interactionAnimate_hook, SYM(interactionAnimate), b_+186);
-  CYC(b_+186, b_+189); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+186, b_+189); TAIL(objectApplySpeed); // jp
 }

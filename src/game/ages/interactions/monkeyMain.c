@@ -58,16 +58,14 @@ void monkeySubid0State1Substate3_hook(GB *gb) {
     CYC(b_+5, b_+7); A = 0x01;
     CYC(b_+7, b_+10); mem_wr(gb, wLoadedTreeGfxIndex, A);
     CYC(b_+10, b_+13);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYCT(b_+3, b_+5);
   CYC(b_+13, b_+15); C = 0x20;
   CALL_C(b_+15, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+18);
   if (!(F & FZ)) {
     CYCT(b_+18, b_+21);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+18, b_+21);
   CYC(b_+21, b_+23); A = 0x04;
@@ -156,8 +154,7 @@ void monkeyFlickerUntilDeletion_hook(GB *gb) {
     CYCT(b_+3, b_+5);
     CYC(b_+8, b_+10); B = 0x01;
     CYC(b_+10, b_+13);
-    objectFlickerVisibility_hook(gb);
-    return;
+    TAIL(objectFlickerVisibility);
   }
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+8);
@@ -183,8 +180,7 @@ static void monkey0_disappearance_substate1_hook(GB *gb, uint16_t sp0_) {
   if (F & FZ) {
     CYC(b_+25, b_+27);
     CYC(b_+27, b_+29);
-    monkeyBeginDisappearing_hook(gb);
-    return;
+    TAIL(monkeyBeginDisappearing);
   }
   CYCT(b_+25, b_+27);
   CALL_C(b_+29, monkeyUpdateGravityAndJumpIfLanded_hook, SYM(monkeyUpdateGravityAndJumpIfLanded), b_+32);
@@ -201,8 +197,8 @@ void monkey0Disappearance_hook(GB *gb) {
   do { uint16_t jt_ = (monkey_jump_table(gb));
     if (jt_ == b_+12) { monkey0_disappearance_substate0_hook(gb, sp0_); return; }
     else if (jt_ == b_+22) { monkey0_disappearance_substate1_hook(gb, sp0_); return; }
-    else if (jt_ == SYM(monkeyWaitBeforeFlickering)) { monkeyWaitBeforeFlickering_hook(gb); return; }
-    else if (jt_ == SYM(monkeyFlickerUntilDeletion)) { monkeyFlickerUntilDeletion_hook(gb); return; }
+    else if (jt_ == SYM(monkeyWaitBeforeFlickering) && hook_enabled_at(gb, SYM(monkeyWaitBeforeFlickering))) { monkeyWaitBeforeFlickering_hook(gb); return; }
+    else if (jt_ == SYM(monkeyFlickerUntilDeletion) && hook_enabled_at(gb, SYM(monkeyFlickerUntilDeletion))) { monkeyFlickerUntilDeletion_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -212,8 +208,7 @@ static void monkey3_disappearance_substate0_hook(GB *gb, uint16_t sp0_) {
   CALL_C(b_+10, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+13);
   if (!(F & FZ)) {
     CYCT(b_+13, b_+16);
-    interactionAnimate_hook(gb);
-    return;
+    TAIL(interactionAnimate);
   }
   CYC(b_+13, b_+16);
   CYC(b_+16, b_+18);
@@ -228,8 +223,8 @@ void monkey3Disappearance_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (monkey_jump_table(gb));
     if (jt_ == b_+10) { monkey3_disappearance_substate0_hook(gb, sp0_); return; }
-    else if (jt_ == SYM(monkeyWaitBeforeFlickering)) { monkeyWaitBeforeFlickering_hook(gb); return; }
-    else if (jt_ == SYM(monkeyFlickerUntilDeletion)) { monkeyFlickerUntilDeletion_hook(gb); return; }
+    else if (jt_ == SYM(monkeyWaitBeforeFlickering) && hook_enabled_at(gb, SYM(monkeyWaitBeforeFlickering))) { monkeyWaitBeforeFlickering_hook(gb); return; }
+    else if (jt_ == SYM(monkeyFlickerUntilDeletion) && hook_enabled_at(gb, SYM(monkeyFlickerUntilDeletion))) { monkeyFlickerUntilDeletion_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -280,8 +275,8 @@ void monkey5Disappearance_hook(GB *gb) {
     if (jt_ == b_+14) { monkey5_disappearance_substate0_hook(gb, sp0_); return; }
     else if (jt_ == b_+21) { monkey5_disappearance_substate1_hook(gb, sp0_); return; }
     else if (jt_ == b_+38) { monkey5_disappearance_substate2_hook(gb, sp0_); return; }
-    else if (jt_ == SYM(monkeyWaitBeforeFlickering)) { monkeyWaitBeforeFlickering_hook(gb); return; }
-    else if (jt_ == SYM(monkeyFlickerUntilDeletion)) { monkeyFlickerUntilDeletion_hook(gb); return; }
+    else if (jt_ == SYM(monkeyWaitBeforeFlickering) && hook_enabled_at(gb, SYM(monkeyWaitBeforeFlickering))) { monkeyWaitBeforeFlickering_hook(gb); return; }
+    else if (jt_ == SYM(monkeyFlickerUntilDeletion) && hook_enabled_at(gb, SYM(monkeyFlickerUntilDeletion))) { monkeyFlickerUntilDeletion_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -334,8 +329,7 @@ static void monkey9_disappearance_substate1_hook(GB *gb, uint16_t sp0_) {
   CALL_C(b_+57, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+60);
   if (!(F & FZ)) {
     CYCT(b_+60, b_+63);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+60, b_+63);
   CALL_C(b_+63, monkeyJumpSpeed100_hook, SYM(monkeyJumpSpeed100), b_+66);
@@ -432,8 +426,8 @@ void monkey9Disappearance_hook(GB *gb) {
     else if (jt_ == b_+55) { monkey9_disappearance_substate1_hook(gb, sp0_); return; }
     else if (jt_ == b_+81) { monkey9_disappearance_substate2_hook(gb, sp0_); return; }
     else if (jt_ == b_+112) { monkey9_disappearance_substate3_hook(gb, sp0_); return; }
-    else if (jt_ == SYM(monkeyWaitBeforeFlickering)) { monkeyWaitBeforeFlickering_hook(gb); return; }
-    else if (jt_ == SYM(monkeyFlickerUntilDeletion)) { monkeyFlickerUntilDeletion_hook(gb); return; }
+    else if (jt_ == SYM(monkeyWaitBeforeFlickering) && hook_enabled_at(gb, SYM(monkeyWaitBeforeFlickering))) { monkeyWaitBeforeFlickering_hook(gb); return; }
+    else if (jt_ == SYM(monkeyFlickerUntilDeletion) && hook_enabled_at(gb, SYM(monkeyFlickerUntilDeletion))) { monkeyFlickerUntilDeletion_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -448,8 +442,7 @@ static void monkey8_disappearance_substate0_hook(GB *gb, uint16_t sp0_) {
     CYC(b_+26, b_+29); SET_BC(0xf3f8);
     CYC(b_+29, b_+31); A = 0x3c;
     CYC(b_+31, b_+34);
-    objectCreateExclamationMark_hook(gb);
-    return;
+    TAIL(objectCreateExclamationMark);
   }
   CYCT(b_+19, b_+21);
   CYC(b_+34, b_+37); A = W8(wFrameCounter);
@@ -482,8 +475,7 @@ static void monkey8_disappearance_substate2_hook(GB *gb, uint16_t sp0_) {
   if (F & FZ) {
     CYC(b_+55, b_+57);
     CYC(b_+57, b_+60);
-    monkeyBeginDisappearing_hook(gb);
-    return;
+    TAIL(monkeyBeginDisappearing);
   }
   CYCT(b_+55, b_+57);
   CYC(b_+60, b_+63); A = W8(wFrameCounter);
@@ -509,8 +501,7 @@ static void monkey8_disappearance_substate3_hook(GB *gb, uint16_t sp0_) {
     CYC(b_+80, b_+82); mem_wr(gb, HL, 0x1e);
     CALL_C(b_+82, objectSetInvisible_hook, SYM(objectSetInvisible), b_+85);
     CYC(b_+85, b_+88);
-    interactionIncSubstate_hook(gb);
-    return;
+    TAIL(interactionIncSubstate);
   }
   CYCT(b_+78, b_+80);
   CYC(b_+88, b_+90); B = 0x01;
@@ -542,7 +533,7 @@ void monkey8Disappearance_hook(GB *gb) {
     if (jt_ == b_+16) { monkey8_disappearance_substate0_hook(gb, sp0_); return; }
     else if (jt_ == b_+43) { monkey8_disappearance_substate1_hook(gb, sp0_); return; }
     else if (jt_ == b_+52) { monkey8_disappearance_substate2_hook(gb, sp0_); return; }
-    else if (jt_ == SYM(monkeyWaitBeforeFlickering)) { monkeyWaitBeforeFlickering_hook(gb); return; }
+    else if (jt_ == SYM(monkeyWaitBeforeFlickering) && hook_enabled_at(gb, SYM(monkeyWaitBeforeFlickering))) { monkeyWaitBeforeFlickering_hook(gb); return; }
     else if (jt_ == b_+75) { monkey8_disappearance_substate3_hook(gb, sp0_); return; }
     else if (jt_ == b_+93) { monkey8_disappearance_substate4_hook(gb, sp0_); return; }
     else { hook_continue(gb, HL, sp0_); return; }
@@ -564,11 +555,11 @@ void monkeySubid1State1_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (monkey_jump_table(gb));
-    if (jt_ == SYM(monkey0Disappearance)) { monkey0Disappearance_hook(gb); return; }
-    else if (jt_ == SYM(monkey3Disappearance)) { monkey3Disappearance_hook(gb); return; }
-    else if (jt_ == SYM(monkey5Disappearance)) { monkey5Disappearance_hook(gb); return; }
-    else if (jt_ == SYM(monkey8Disappearance)) { monkey8Disappearance_hook(gb); return; }
-    else if (jt_ == SYM(monkey9Disappearance)) { monkey9Disappearance_hook(gb); return; }
+    if (jt_ == SYM(monkey0Disappearance) && hook_enabled_at(gb, SYM(monkey0Disappearance))) { monkey0Disappearance_hook(gb); return; }
+    else if (jt_ == SYM(monkey3Disappearance) && hook_enabled_at(gb, SYM(monkey3Disappearance))) { monkey3Disappearance_hook(gb); return; }
+    else if (jt_ == SYM(monkey5Disappearance) && hook_enabled_at(gb, SYM(monkey5Disappearance))) { monkey5Disappearance_hook(gb); return; }
+    else if (jt_ == SYM(monkey8Disappearance) && hook_enabled_at(gb, SYM(monkey8Disappearance))) { monkey8Disappearance_hook(gb); return; }
+    else if (jt_ == SYM(monkey9Disappearance) && hook_enabled_at(gb, SYM(monkey9Disappearance))) { monkey9Disappearance_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -579,8 +570,7 @@ static void monkey_subid0_substate0_hook(GB *gb, uint16_t sp0_) {
   CYC(b_+28, b_+30); alu_cp(gb, 0x0e);
   if (!(F & FZ)) {
     CYCT(b_+30, b_+33);
-    interactionRunScript_hook(gb);
-    return;
+    TAIL(interactionRunScript);
   }
   CYC(b_+30, b_+33);
   CALL_C(b_+33, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+36);
@@ -612,8 +602,7 @@ static void monkey_subid0_substate2_hook(GB *gb, uint16_t sp0_) {
   CALL_C(b_+61, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+64);
   if (!(F & FZ)) {
     CYCT(b_+64, b_+66);
-    monkeyUpdateGravityAndHop_hook(gb);
-    return;
+    TAIL(monkeyUpdateGravityAndHop);
   }
   CYC(b_+64, b_+66);
   CALL_C(b_+66, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+69);
@@ -643,7 +632,7 @@ void monkeySubid0State1_hook(GB *gb) {
     if (jt_ == b_+25) { monkey_subid0_substate0_hook(gb, sp0_); return; }
     else if (jt_ == b_+41) { monkey_subid0_substate1_hook(gb, sp0_); return; }
     else if (jt_ == b_+61) { monkey_subid0_substate2_hook(gb, sp0_); return; }
-    else if (jt_ == SYM(monkeySubid0State1Substate3)) { monkeySubid0State1Substate3_hook(gb); return; }
+    else if (jt_ == SYM(monkeySubid0State1Substate3) && hook_enabled_at(gb, SYM(monkeySubid0State1Substate3))) { monkeySubid0State1Substate3_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -694,8 +683,7 @@ static void monkey_subid4_substate2_hook(GB *gb, uint16_t sp0_) {
     CYCT(b_+78, b_+80);
     CYC(b_+88, b_+90); B = 0x01;
     CYC(b_+90, b_+93);
-    objectFlickerVisibility_hook(gb);
-    return;
+    TAIL(objectFlickerVisibility);
   }
   CYC(b_+78, b_+80);
   CYC(b_+80, b_+82); mem_wr(gb, HL, 0x3c);
@@ -884,8 +872,8 @@ void monkeySubid5State1_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (monkey_jump_table(gb));
     if (jt_ == b_+24) { monkey_subid5_monkey0_hook(gb, sp0_); return; }
-    else if (jt_ == SYM(monkeyAnimateAndRunScript)) { monkeyAnimateAndRunScript_hook(gb); return; }
-    else if (jt_ == SYM(monkeySubid5State1_monkey9)) { monkeySubid5State1_monkey9_hook(gb); return; }
+    else if (jt_ == SYM(monkeyAnimateAndRunScript) && hook_enabled_at(gb, SYM(monkeyAnimateAndRunScript))) { monkeyAnimateAndRunScript_hook(gb); return; }
+    else if (jt_ == SYM(monkeySubid5State1_monkey9) && hook_enabled_at(gb, SYM(monkeySubid5State1_monkey9))) { monkeySubid5State1_monkey9_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -897,13 +885,13 @@ void monkeyState1_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (monkey_jump_table(gb));
-    if (jt_ == SYM(monkeySubid0State1)) { monkeySubid0State1_hook(gb); return; }
-    else if (jt_ == SYM(monkeySubid1State1)) { monkeySubid1State1_hook(gb); return; }
-    else if (jt_ == SYM(monkeySubid2State1)) { monkeySubid2State1_hook(gb); return; }
-    else if (jt_ == SYM(monkeySubid4State1)) { monkeySubid4State1_hook(gb); return; }
-    else if (jt_ == SYM(monkeySubid5State1)) { monkeySubid5State1_hook(gb); return; }
-    else if (jt_ == SYM(interactionAnimate)) { interactionAnimate_hook(gb); return; }
-    else if (jt_ == SYM(monkeyAnimateAndRunScript)) { monkeyAnimateAndRunScript_hook(gb); return; }
+    if (jt_ == SYM(monkeySubid0State1) && hook_enabled_at(gb, SYM(monkeySubid0State1))) { monkeySubid0State1_hook(gb); return; }
+    else if (jt_ == SYM(monkeySubid1State1) && hook_enabled_at(gb, SYM(monkeySubid1State1))) { monkeySubid1State1_hook(gb); return; }
+    else if (jt_ == SYM(monkeySubid2State1) && hook_enabled_at(gb, SYM(monkeySubid2State1))) { monkeySubid2State1_hook(gb); return; }
+    else if (jt_ == SYM(monkeySubid4State1) && hook_enabled_at(gb, SYM(monkeySubid4State1))) { monkeySubid4State1_hook(gb); return; }
+    else if (jt_ == SYM(monkeySubid5State1) && hook_enabled_at(gb, SYM(monkeySubid5State1))) { monkeySubid5State1_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
+    else if (jt_ == SYM(monkeyAnimateAndRunScript) && hook_enabled_at(gb, SYM(monkeyAnimateAndRunScript))) { monkeyAnimateAndRunScript_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -914,8 +902,7 @@ static void monkey_init_subid23_shared(GB *gb, uint16_t sp0_) {
   CALL_C(b_+89, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+92);
   if (!(F & FZ)) {
     CYCT(b_+92, b_+95);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+92, b_+95);
   CYC(b_+95, b_+97); E = 0x42;
@@ -1084,8 +1071,7 @@ static void monkey_init_subid4(GB *gb, uint16_t sp0_) {
     CYC(b_+278, b_+279); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
     CYC(b_+279, b_+282); SET_BC((SYM(itemData) + 127));
     CYC(b_+282, b_+285);
-    interactionSetPosition_hook(gb);
-    return;
+    TAIL(interactionSetPosition);
   }
   CYCT(b_+274, b_+276);
   CYC(b_+285, b_+287); alu_cp(gb, 0x08);
@@ -1106,8 +1092,7 @@ static void monkey_init_subid5(GB *gb, uint16_t sp0_) {
   CALL_C(b_+323, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+326);
   if (F & FZ) {
     CYCT(b_+326, b_+329);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+326, b_+329);
   CYC(b_+329, b_+332); push_effect(gb, b_+332);
@@ -1161,13 +1146,13 @@ static void monkey_init_subid7(GB *gb, uint16_t sp0_) {
       CYC(b_+383, b_+385); A = 0x14;
       CALL_C(b_+385, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+388);
       if (!(F & FZ)) {
-        CYCT(b_+388, b_+391); interactionDelete_hook(gb); return;
+        CYCT(b_+388, b_+391); TAIL(interactionDelete);
       }
       CYC(b_+388, b_+391);
       CYC(b_+391, b_+393); A = 0x11;
       CALL_C(b_+393, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+396);
       if (F & FZ) {
-        CYCT(b_+396, b_+399); interactionDelete_hook(gb); return;
+        CYCT(b_+396, b_+399); TAIL(interactionDelete);
       }
       CYC(b_+396, b_+399);
       CYC(b_+399, b_+402); SET_HL((SYM(objectGfxHeaderTable) + 132));
@@ -1181,7 +1166,7 @@ static void monkey_init_subid7(GB *gb, uint16_t sp0_) {
       CYC(b_+409, b_+411); A = 0x14;
       CALL_C(b_+411, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+414);
       if (F & FZ) {
-        CYCT(b_+414, b_+417); interactionDelete_hook(gb); return;
+        CYCT(b_+414, b_+417); TAIL(interactionDelete);
       }
       CYC(b_+414, b_+417);
       CYC(b_+417, b_+420); SET_HL((SYM(objectGfxHeaderTable) + 144));
@@ -1195,13 +1180,13 @@ static void monkey_init_subid7(GB *gb, uint16_t sp0_) {
       CYC(b_+427, b_+429); A = 0x14;
       CALL_C(b_+429, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+432);
       if (!(F & FZ)) {
-        CYCT(b_+432, b_+435); interactionDelete_hook(gb); return;
+        CYCT(b_+432, b_+435); TAIL(interactionDelete);
       }
       CYC(b_+432, b_+435);
       CYC(b_+435, b_+437); A = 0x12;
       CALL_C(b_+437, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+440);
       if (F & FZ) {
-        CYCT(b_+440, b_+443); interactionDelete_hook(gb); return;
+        CYCT(b_+440, b_+443); TAIL(interactionDelete);
       }
       CYC(b_+440, b_+443);
       CYC(b_+443, b_+445); A = 0x11;
@@ -1268,7 +1253,7 @@ static void monkey_state0_after_init_subid_hook(GB *gb) {
   CYC(b_+33, b_+34); A = mem_rd(gb, DE);
   CYC(b_+34, b_+35); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+35, b_+38); objectMarkSolidPosition_hook(gb); return;
+    CYCT(b_+35, b_+38); TAIL(objectMarkSolidPosition);
   }
   CYC(b_+35, b_+38);
   CYC(b_+38, b_+39); ret_effect(gb);
@@ -1301,8 +1286,7 @@ void interactionCode39_body_hook(GB *gb) {
       return;
     }
     else if (jt_ == SYM(monkeyState1)) {
-      monkeyState1_hook(gb);
-      return;
+      TAIL(monkeyState1);
     }
     else {
       hook_continue(gb, HL, sp0_);

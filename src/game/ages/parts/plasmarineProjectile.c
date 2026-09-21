@@ -87,7 +87,7 @@ L_74a1:
   CALL_C(b_+96, playSound_b00_hook, SYM(playSound_b00), b_+99);
 
 delete:
-  CYC(b_+99, b_+102); partDelete_hook(gb); return; // jp
+  CYC(b_+99, b_+102); TAIL(partDelete); // jp
 
 state0:
   CYC(b_+102, b_+104); L = 0xa9; // Enemy.health
@@ -119,5 +119,5 @@ L_74b4:
   CALL_C(b_+138, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+141);
   CYC(b_+141, b_+143); E = 0xc9; // Part.angle
   CYC(b_+143, b_+144); mem_wr(gb, DE, A);
-  CYC(b_+144, b_+147); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+144, b_+147); TAIL(objectSetVisible82); // jp
 }

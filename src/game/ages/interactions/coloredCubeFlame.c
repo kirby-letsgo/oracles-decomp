@@ -60,7 +60,7 @@ initialized:
   CYC(b_+22, b_+25); A = mem_rd(gb, wRotatingCubeColor);
   CYC(b_+25, b_+26); alu_rlca(gb);
   if (!(F & FC)) {
-    CYCT(b_+26, b_+29); objectSetInvisible_hook(gb); return;
+    CYCT(b_+26, b_+29); TAIL(objectSetInvisible);
   }
   CYC(b_+26, b_+29);
   CALL_C(b_+29, objectSetVisible_hook, SYM(objectSetVisible), b_+32);

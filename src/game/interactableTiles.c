@@ -158,7 +158,7 @@ void nextToGhiniSpawner_hook(GB *gb) {
   CYC(b_+4, b_+5);
   CALL_C(b_+5, specialObjectCheckPushingAgainstTile_hook, SYM(specialObjectCheckPushingAgainstTile), b_+8);
   if (F & FZ) {
-    CYCT(b_+8, b_+11); resetPushingAgainstTileCounter_hook(gb); return;
+    CYCT(b_+8, b_+11); TAIL(resetPushingAgainstTileCounter);
   }
   CYC(b_+8, b_+11);
   CALL_C(b_+11, decPushingAgainstTileCounter_hook, SYM(decPushingAgainstTileCounter), b_+14);
@@ -191,7 +191,7 @@ void nextToTileWithInfoText_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, specialObjectCheckPushingAgainstTile_hook, SYM(specialObjectCheckPushingAgainstTile), b_+3);
   if (F & FZ) {
-    CYCT(b_+3, b_+6); resetPushingAgainstTileCounter_hook(gb); return;
+    CYCT(b_+3, b_+6); TAIL(resetPushingAgainstTileCounter);
   }
   CYC(b_+3, b_+6);
   CALL_C(b_+6, decPushingAgainstTileCounter_hook, SYM(decPushingAgainstTileCounter), b_+9);
@@ -214,23 +214,23 @@ void nextToTileWithInfoText_hook(GB *gb) {
       }
       CYC(b_+35, b_+36);
       CYC(b_+36, b_+38); A = 0x03;
-      CYC(b_+38, b_+40); showInfoTextForTile_hook(gb); return;
+      CYC(b_+38, b_+40); TAIL(showInfoTextForTile);
     }
     else if (jt_ == b_+40) {
       CYC(b_+40, b_+42); A = 0x05;
-      CYC(b_+42, b_+44); showInfoTextForTile_hook(gb); return;
+      CYC(b_+42, b_+44); TAIL(showInfoTextForTile);
     }
     else if (jt_ == b_+44) {
       CYC(b_+44, b_+46); A = 0x06;
-      CYC(b_+46, b_+48); showInfoTextForTile_hook(gb); return;
+      CYC(b_+46, b_+48); TAIL(showInfoTextForTile);
     }
     else if (jt_ == b_+48) {
       CYC(b_+48, b_+50); A = 0x07;
-      CYC(b_+50, b_+52); showInfoTextForTile_hook(gb); return;
+      CYC(b_+50, b_+52); TAIL(showInfoTextForTile);
     }
     else if (jt_ == b_+52) {
       CYC(b_+52, b_+54); A = 0x04;
-      CYC(b_+54, b_+56); showInfoTextForTile_hook(gb); return;
+      CYC(b_+54, b_+56); TAIL(showInfoTextForTile);
     }
   } while (0);
   hook_continue(gb, HL, sp0_);
@@ -327,7 +327,7 @@ void checkAndDecKeyCount_hook(GB *gb) {
   if (!(F & FC)) {
     CYCT(b_+14, b_+16);
     CYC(b_+30, b_+32); L = 0x82;
-    CYC(b_+32, b_+35); checkFlag_hook(gb); return;
+    CYC(b_+32, b_+35); TAIL(checkFlag);
   }
   CYC(b_+14, b_+16);
   CYC(b_+16, b_+18); alu_add(gb, 0x72);
@@ -554,7 +554,7 @@ void nextToPushableBlock_hook(GB *gb) {
   CYC(b_+5, b_+6);
   CALL_C(b_+6, specialObjectCheckPushingAgainstTile_hook, SYM(specialObjectCheckPushingAgainstTile), b_+9);
   if (F & FZ) {
-    CYCT(b_+9, b_+12); resetPushingAgainstTileCounter_hook(gb); return;
+    CYCT(b_+9, b_+12); TAIL(resetPushingAgainstTileCounter);
   }
   CYC(b_+9, b_+12);
   CALL_C(b_+12, decPushingAgainstTileCounter_hook, SYM(decPushingAgainstTileCounter), b_+15);
@@ -571,7 +571,7 @@ void nextToPushableBlock_hook(GB *gb) {
   CALL_C(b_+22, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+25);
   CYC(b_+25, b_+27); A = 0x03;
   if (!(F & FC)) {
-    CYCT(b_+27, b_+30); showInfoTextForTile_hook(gb); return;
+    CYCT(b_+27, b_+30); TAIL(showInfoTextForTile);
   }
   CYC(b_+27, b_+30);
 
@@ -666,7 +666,7 @@ void nextToKeyBlock_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, specialObjectCheckPushingAgainstTile_hook, SYM(specialObjectCheckPushingAgainstTile), b_+3);
   if (F & FZ) {
-    CYCT(b_+3, b_+6); resetPushingAgainstTileCounter_hook(gb); return;
+    CYCT(b_+3, b_+6); TAIL(resetPushingAgainstTileCounter);
   }
   CYC(b_+3, b_+6);
   CALL_C(b_+6, decPushingAgainstTileCounter_hook, SYM(decPushingAgainstTileCounter), b_+9);
@@ -677,7 +677,7 @@ void nextToKeyBlock_hook(GB *gb) {
   CALL_C(b_+10, checkAndDecKeyCount_hook, SYM(checkAndDecKeyCount), b_+13);
   CYC(b_+13, b_+15); A = 0x02;
   if (F & FZ) {
-    CYCT(b_+15, b_+18); showInfoTextForTile_hook(gb); return;
+    CYCT(b_+15, b_+18); TAIL(showInfoTextForTile);
   }
   CYC(b_+15, b_+18);
   CALL_C(b_+18, createKeySpriteInteraction_hook, SYM(createKeySpriteInteraction), b_+21);
@@ -707,7 +707,7 @@ void nextToKeyDoor_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, specialObjectCheckPushingAgainstTile_hook, SYM(specialObjectCheckPushingAgainstTile), b_+3);
   if (F & FZ) {
-    CYCT(b_+3, b_+5); resetPushingAgainstTileCounter_hook(gb); return;
+    CYCT(b_+3, b_+5); TAIL(resetPushingAgainstTileCounter);
   }
   CYC(b_+3, b_+5);
   CALL_C(b_+5, decPushingAgainstTileCounter_hook, SYM(decPushingAgainstTileCounter), b_+8);
@@ -763,7 +763,7 @@ no_key:
   CYC(b_+59, b_+61); alu_cp(gb, 0x40);
   CYC(b_+61, b_+63); A = 0x01;
   if (!(F & FC)) {
-    CYCT(b_+63, b_+66); showInfoTextForTile_hook(gb); return;
+    CYCT(b_+63, b_+66); TAIL(showInfoTextForTile);
   }
   CYC(b_+63, b_+66);
   CYC(b_+66, b_+67); alu_xor(gb, A);
@@ -781,7 +781,7 @@ void nextToOverworldKeyhole_hook(GB *gb) {
   CYC(b_+5, b_+6);
   CALL_C(b_+6, specialObjectCheckPushingAgainstTile_hook, SYM(specialObjectCheckPushingAgainstTile), b_+9);
   if (F & FZ) {
-    CYCT(b_+9, b_+11); resetPushingAgainstTileCounter_hook(gb); return;
+    CYCT(b_+9, b_+11); TAIL(resetPushingAgainstTileCounter);
   }
   CYC(b_+9, b_+11);
   CALL_C(b_+11, checkFacingBottomOfTile_hook, SYM(checkFacingBottomOfTile), b_+14);
@@ -808,12 +808,12 @@ void nextToOverworldKeyhole_hook(GB *gb) {
   CALL_C(b_+31, findRoomSpecificData_hook, SYM(findRoomSpecificData), b_+34);
   CYC(b_+34, b_+35); B = A;
   if (!(F & FC)) {
-    CYCT(b_+35, b_+37); jumpToShowInfoText_hook(gb); return;
+    CYCT(b_+35, b_+37); TAIL(jumpToShowInfoText);
   }
   CYC(b_+35, b_+37);
   CALL_C(b_+37, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+40);
   if (!(F & FC)) {
-    CYCT(b_+40, b_+42); jumpToShowInfoText_hook(gb); return;
+    CYCT(b_+40, b_+42); TAIL(jumpToShowInfoText);
   }
   CYC(b_+40, b_+42);
   CYC(b_+42, b_+44); A = 0x6c;
@@ -854,7 +854,7 @@ void interactWithTileBeforeLink_b06_hook(GB *gb) {
   CYC(b_+14, b_+17); SET_HL(SYM(interactableTilesTable));
   CALL_C(b_+17, lookupCollisionTable_paramE_hook, SYM(lookupCollisionTable_paramE), b_+20);
   if (!(F & FC)) {
-    CYCT(b_+20, b_+23); resetPushingAgainstTileCounter_hook(gb); return;
+    CYCT(b_+20, b_+23); TAIL(resetPushingAgainstTileCounter);
   }
   CYC(b_+20, b_+23);
   CYC(b_+23, b_+24); B = A;

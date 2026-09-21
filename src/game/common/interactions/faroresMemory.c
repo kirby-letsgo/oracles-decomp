@@ -15,7 +15,7 @@ void interactionCode1c_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
   if (!(F & FZ)) {
-    CYCT(b_+3, b_+6); interactionRunScript_hook(gb); return;
+    CYCT(b_+3, b_+6); TAIL(interactionRunScript);
   }
   CYC(b_+3, b_+6);
 
@@ -27,7 +27,7 @@ void interactionCode1c_hook(GB *gb) {
   CYC(b_+11, b_+13);
   CALL_C(b_+13, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+16);
   if (F & FZ) {
-    CYCT(b_+16, b_+19); interactionDelete_hook(gb); return;
+    CYCT(b_+16, b_+19); TAIL(interactionDelete);
   }
   CYC(b_+16, b_+19);
 

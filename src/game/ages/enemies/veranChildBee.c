@@ -85,7 +85,7 @@ stateUninitialized:
   CYC(b_+55, b_+57); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+57, b_+58); A = mem_rd(gb, HL);
   CYC(b_+58, b_+59); mem_wr(gb, DE, A);
-  CYC(b_+59, b_+62); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+59, b_+62); TAIL(objectSetVisible83); // jp
 
   // enemyCode1f@angleVals (0d:6c8a-6c8c): pure data ($10 $16 $0a), read only through the
   // addAToHl indexing above.
@@ -104,7 +104,7 @@ counter1AndState:
   // falls into @animate
 
 animate:
-  CYC(b_+80, b_+83); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+80, b_+83); TAIL(enemyAnimate); // jp
 
 state9:
   CALL_C(b_+83, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+86);
@@ -121,5 +121,5 @@ stateA:
   if (F & FC) { CYCT(b_+99, b_+101); goto animate; } // jr c
   CYC(b_+99, b_+101);
   CALL_C(b_+101, decNumEnemies_hook, SYM(decNumEnemies), b_+104);
-  CYC(b_+104, b_+107); enemyDelete_hook(gb); return; // jp
+  CYC(b_+104, b_+107); TAIL(enemyDelete); // jp
 }

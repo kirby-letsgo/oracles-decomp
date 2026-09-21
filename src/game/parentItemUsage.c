@@ -362,7 +362,7 @@ void checkUseItems_b06_hook(GB *gb) {
   CYC(b_+25, b_+28); A = W8(wInShop);
   CYC(b_+28, b_+29); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+29, b_+32); checkShopInput_hook(gb); return;
+    CYCT(b_+29, b_+32); TAIL(checkShopInput);
   }
   CYC(b_+29, b_+32);
   CYC(b_+32, b_+35); A = W8(wcc95);
@@ -484,9 +484,9 @@ void functionCaller_b06_hook(GB *gb) {
   CYC(b_+0, b_+1); A = C;
   CYC(b_+1, b_+2); parent_item_jump_table_from_rst(gb, b_+2);
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(clearAllParentItems_body)) { clearAllParentItems_body_hook(gb); return; }
-    else if (jt_ == SYM(updateParentItemButtonAssignment_body)) { updateParentItemButtonAssignment_body_hook(gb); return; }
-    else if (jt_ == SYM(checkUseItems_b06)) { checkUseItems_b06_hook(gb); return; }
+    if (jt_ == SYM(clearAllParentItems_body) && hook_enabled_at(gb, SYM(clearAllParentItems_body))) { clearAllParentItems_body_hook(gb); return; }
+    else if (jt_ == SYM(updateParentItemButtonAssignment_body) && hook_enabled_at(gb, SYM(updateParentItemButtonAssignment_body))) { updateParentItemButtonAssignment_body_hook(gb); return; }
+    else if (jt_ == SYM(checkUseItems_b06) && hook_enabled_at(gb, SYM(checkUseItems_b06))) { checkUseItems_b06_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

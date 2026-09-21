@@ -51,7 +51,7 @@ normalStatus:
     if (target == b_+32) goto state0;
     if (target == b_+42) goto state1;
     if (target == b_+64) goto state2;
-    partCommon_updateSpeedAndDeleteWhenCounter1Is0_hook(gb); return;
+    TAIL(partCommon_updateSpeedAndDeleteWhenCounter1Is0);
   }
 
 state0:
@@ -60,7 +60,7 @@ state0:
   CYC(b_+34, b_+35); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+35, b_+37); L = 0xd0; // Part.speed
   CYC(b_+37, b_+39); mem_wr(gb, HL, 0x50);
-  CYC(b_+39, b_+42); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+39, b_+42); TAIL(objectSetVisible81); // jp
 
 state1:
   CALL_C(b_+42, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+45);
@@ -76,11 +76,11 @@ state1:
   CYC(b_+60, b_+61); mem_wr(gb, DE, A);
 
 L_5063:
-  CYC(b_+61, b_+64); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+61, b_+64); TAIL(objectApplySpeed); // jp
 
 state2:
   CYC(b_+64, b_+66); A = 0x03;
   CYC(b_+66, b_+67); mem_wr(gb, DE, A);
   CYC(b_+67, b_+68); alu_xor(gb, A);
-  CYC(b_+68, b_+71); partCommon_bounceWhenCollisionsEnabled_hook(gb); return; // jp
+  CYC(b_+68, b_+71); TAIL(partCommon_bounceWhenCollisionsEnabled); // jp
 }

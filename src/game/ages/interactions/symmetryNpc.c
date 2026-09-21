@@ -83,7 +83,7 @@ loadScript: // interactionCodebf@loadScript
   CYC(b_+69, b_+70); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+70, b_+71); H = mem_rd(gb, HL);
   CYC(b_+71, b_+72); L = A;
-  CYC(b_+72, b_+75); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+72, b_+75); TAIL(interactionSetScript); // jp
 
 state2: // interactionCodebf@state2
   CYC(b_+101, b_+104); SET_HL(wTmpcfc0_genericCutscene_state);
@@ -98,5 +98,5 @@ state2: // interactionCodebf@state2
 
 runScriptAndAnimate: // interactionCodebf@runScriptAndAnimate
   CALL_C(b_+119, interactionRunScript_hook, SYM(interactionRunScript), b_+122);
-  CYC(b_+122, b_+125); npcFaceLinkAndAnimate_hook(gb); return; // jp
+  CYC(b_+122, b_+125); TAIL(npcFaceLinkAndAnimate); // jp
 }

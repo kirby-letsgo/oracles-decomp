@@ -61,7 +61,7 @@ void partCode11_hook(GB *gb) {
     uint16_t target = volcanoRock_jump_table(gb);
     if (target == SYM(volcanoRock_subid0)) { volcanoRock_subid0_hook(gb); return; }
     if (target == SYM(volcanoRock_subid1)) { volcanoRock_subid1_hook(gb); return; }
-    volcanoRock_subid2_hook(gb); return;
+    TAIL(volcanoRock_subid2);
   }
 }
 
@@ -92,7 +92,7 @@ void volcanoRock_subid0_hook(GB *gb) {
 
 setAngleAndSpeed:
   CYC(b_+29, b_+30); mem_wr(gb, DE, A);
-  CYC(b_+30, b_+33); volcanoRock_subid0_setSpeedFromAngle_hook(gb); return; // jp
+  CYC(b_+30, b_+33); TAIL(volcanoRock_subid0_setSpeedFromAngle); // jp
 
 state0:
   CYC(b_+33, b_+36); SET_BC(0xfd80); // -0x280
@@ -121,7 +121,7 @@ void volcanoRock_subid1_hook(GB *gb) {
     if (target == SYM(volcanoRock_common_substate2)) { volcanoRock_common_substate2_hook(gb); return; }
     if (target == SYM(volcanoRock_common_substate3)) { volcanoRock_common_substate3_hook(gb); return; }
     if (target == SYM(volcanoRock_common_substate4)) { volcanoRock_common_substate4_hook(gb); return; }
-    volcanoRock_common_substate5_hook(gb); return;
+    TAIL(volcanoRock_common_substate5);
   }
 
 substate0:
@@ -148,7 +148,7 @@ substate0:
   CYC(b_+47, b_+48); mem_wr(gb, DE, A);
   CYC(b_+48, b_+50); A = 0x01;
   CALL_C(b_+50, partSetAnimation_hook, SYM(partSetAnimation), b_+53);
-  CYC(b_+53, b_+56); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+53, b_+56); TAIL(objectSetVisible80); // jp
 
 substate1:
   CYC(b_+56, b_+57); H = D;
@@ -166,7 +166,7 @@ substate1:
   CYC(b_+75, b_+77); L = 0xc6; // Part.counter1
   CYC(b_+77, b_+79); mem_wr(gb, HL, 0x1e);
   CALL_C(b_+79, objectSetInvisible_hook, SYM(objectSetInvisible), b_+82);
-  CYC(b_+82, b_+84); volcanoRock_setRandomPosition_hook(gb); return; // jr
+  CYC(b_+82, b_+84); TAIL(volcanoRock_setRandomPosition); // jr
 }
 
 void volcanoRock_common_substate2_hook(GB *gb) {
@@ -178,7 +178,7 @@ void volcanoRock_common_substate2_hook(GB *gb) {
   CYC(b_+4, b_+6); mem_wr(gb, HL, 0x10); // Part.counter1
   CYC(b_+6, b_+7); L = E; // Part.substate
   CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+8, b_+11); objectSetVisiblec0_hook(gb); return; // jp
+  CYC(b_+8, b_+11); TAIL(objectSetVisiblec0); // jp
 }
 
 void volcanoRock_common_substate3_hook(GB *gb) {
@@ -201,7 +201,7 @@ void volcanoRock_common_substate3_hook(GB *gb) {
   CYC(b_+21, b_+22); alu_xor(gb, A);
   CYC(b_+22, b_+23); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+23, b_+24); mem_wr(gb, HL, A);
-  CYC(b_+24, b_+27); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+24, b_+27); TAIL(objectSetVisible82); // jp
 }
 
 void volcanoRock_common_substate4_hook(GB *gb) {
@@ -219,7 +219,7 @@ void volcanoRock_common_substate4_hook(GB *gb) {
   CYC(b_+18, b_+20); A = 0x03;
   CALL_C(b_+20, partSetAnimation_hook, SYM(partSetAnimation), b_+23);
   CYC(b_+23, b_+25); A = 0x81; // SND_STRONG_POUND
-  CYC(b_+25, b_+28); playSound_b00_hook(gb); return; // jp
+  CYC(b_+25, b_+28); TAIL(playSound_b00); // jp
 }
 
 void volcanoRock_common_substate5_hook(GB *gb) {
@@ -231,7 +231,7 @@ void volcanoRock_common_substate5_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+4, b_+7); partDelete_hook(gb); return; } // jp z
   CYC(b_+4, b_+7);
   CALL_C(b_+7, volcanoRock_setCollisionSize_hook, SYM(volcanoRock_setCollisionSize), b_+10);
-  CYC(b_+10, b_+13); partAnimate_hook(gb); return; // jp
+  CYC(b_+10, b_+13); TAIL(partAnimate); // jp
 }
 
 void volcanoRock_subid2_hook(GB *gb) {
@@ -244,7 +244,7 @@ void volcanoRock_subid2_hook(GB *gb) {
     if (target == SYM(volcanoRock_common_substate2)) { volcanoRock_common_substate2_hook(gb); return; }
     if (target == SYM(volcanoRock_common_substate3)) { volcanoRock_common_substate3_hook(gb); return; }
     if (target == SYM(volcanoRock_common_substate4)) { volcanoRock_common_substate4_hook(gb); return; }
-    volcanoRock_common_substate5_hook(gb); return;
+    TAIL(volcanoRock_common_substate5);
   }
 
 substate0:
@@ -279,7 +279,7 @@ void volcanoRock_setRandomPosition_hook(GB *gb) {
   CYC(b_+34, b_+35); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+35, b_+36); mem_wr(gb, DE, A);
   CYC(b_+36, b_+38); A = 0x02;
-  CYC(b_+38, b_+41); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+38, b_+41); TAIL(partSetAnimation); // jp
 }
 
 void volcanoRock_subid0_setSpeedFromAngle_hook(GB *gb) {

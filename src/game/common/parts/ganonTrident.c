@@ -78,7 +78,7 @@ L_5b3e:
   CYC(b_+44, b_+45); C = A;
 
 L_5b58:
-  CYC(b_+45, b_+48); objectTakePositionWithOffset_hook(gb); return; // jp
+  CYC(b_+45, b_+48); TAIL(objectTakePositionWithOffset); // jp
 }
 
 void partCode50_hook(GB *gb) {
@@ -114,7 +114,7 @@ state0:
   CYC(b_+35, b_+37); A = 0x01;
 
 L_5b05:
-  CYC(b_+37, b_+40); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+37, b_+40); TAIL(partSetAnimation); // jp
 
 state1:
   CALL_C(b_+40, partAnimate_hook, SYM(partAnimate), b_+43);
@@ -140,5 +140,5 @@ state2:
   if (F & FZ) { CYCT(b_+66, b_+69); partDelete_hook(gb); return; } // jp z
   CYC(b_+66, b_+69);
   CYC(b_+69, b_+72); SET_BC(0x2000);
-  CYC(b_+72, b_+75); objectTakePositionWithOffset_hook(gb); return; // jp
+  CYC(b_+72, b_+75); TAIL(objectTakePositionWithOffset); // jp
 }

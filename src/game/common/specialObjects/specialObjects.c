@@ -132,17 +132,17 @@ static void update_special_object(GB *gb) {
   CYC(b_+12, b_+13); A = mem_rd(gb, HL);
   CYC(b_+13, b_+14); push_effect(gb, b_+14);
   do { uint16_t jt_ = (func_410d_jump_table(gb));
-    if (jt_ == SYM(specialObjectCode_link)) { specialObjectCode_link_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectCode_transformedLink)) { specialObjectCode_transformedLink_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectCode_linkInCutscene_b00)) { specialObjectCode_linkInCutscene_b00_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectCode_linkRidingAnimal)) { specialObjectCode_linkRidingAnimal_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectCode_minecart_b05)) { specialObjectCode_minecart_b05_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectCode_ricky)) { specialObjectCode_ricky_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectCode_dimitri)) { specialObjectCode_dimitri_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectCode_moosh)) { specialObjectCode_moosh_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectCode_maple)) { specialObjectCode_maple_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectCode_companionCutscene_b00)) { specialObjectCode_companionCutscene_b00_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectCode_raft_b05)) { specialObjectCode_raft_b05_hook(gb); return; }
+    if (jt_ == SYM(specialObjectCode_link) && hook_enabled_at(gb, SYM(specialObjectCode_link))) { specialObjectCode_link_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_transformedLink) && hook_enabled_at(gb, SYM(specialObjectCode_transformedLink))) { specialObjectCode_transformedLink_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_linkInCutscene_b00) && hook_enabled_at(gb, SYM(specialObjectCode_linkInCutscene_b00))) { specialObjectCode_linkInCutscene_b00_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_linkRidingAnimal) && hook_enabled_at(gb, SYM(specialObjectCode_linkRidingAnimal))) { specialObjectCode_linkRidingAnimal_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_minecart_b05) && hook_enabled_at(gb, SYM(specialObjectCode_minecart_b05))) { specialObjectCode_minecart_b05_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_ricky) && hook_enabled_at(gb, SYM(specialObjectCode_ricky))) { specialObjectCode_ricky_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_dimitri) && hook_enabled_at(gb, SYM(specialObjectCode_dimitri))) { specialObjectCode_dimitri_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_moosh) && hook_enabled_at(gb, SYM(specialObjectCode_moosh))) { specialObjectCode_moosh_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_maple) && hook_enabled_at(gb, SYM(specialObjectCode_maple))) { specialObjectCode_maple_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_companionCutscene_b00) && hook_enabled_at(gb, SYM(specialObjectCode_companionCutscene_b00))) { specialObjectCode_companionCutscene_b00_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_raft_b05) && hook_enabled_at(gb, SYM(specialObjectCode_raft_b05))) { specialObjectCode_raft_b05_hook(gb); return; }
     else { HANDOFF(jt_); }
   } while (0);
 }

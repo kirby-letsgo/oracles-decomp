@@ -77,8 +77,7 @@ make_visible:
   CALL_C(b_+56, objectSetVisible82_hook, SYM(objectSetVisible82), b_+59);
   CYC(b_+59, b_+60); alu_xor(gb, A);
   CYC(b_+60, b_+63);
-  itemSetAnimation_hook(gb);
-  return;
+  TAIL(itemSetAnimation);
 
 state1:
   CYC(b_+63, b_+65); E = 0x2a;
@@ -200,23 +199,20 @@ state3:
   CYC(b_+185, b_+187); L = 0x24;
   CYC(b_+187, b_+189); mem_wr(gb, HL, 0x00);
   CYC(b_+189, b_+192);
-  objectSetInvisible_hook(gb);
-  return;
+  TAIL(objectSetInvisible);
 
 state4:
   CALL_C(b_+192, itemDecCounter1_hook, SYM(itemDecCounter1), b_+195);
   if (F & FZ) {
     CYCT(b_+195, b_+198);
-    itemDelete_hook(gb);
-    return;
+    TAIL(itemDelete);
   }
   CYC(b_+195, b_+198);
   CYC(b_+198, b_+201); A = W8(wLinkObjectIndex);
   CYC(b_+201, b_+202); H = A;
   CYC(b_+202, b_+204); L = 0x0b;
   CYC(b_+204, b_+207);
-  objectTakePosition_hook(gb);
-  return;
+  TAIL(objectTakePosition);
 
 update_speed_and_animation:
   CALL_C(b_+207, objectApplySpeed_hook, SYM(objectApplySpeed), b_+210);

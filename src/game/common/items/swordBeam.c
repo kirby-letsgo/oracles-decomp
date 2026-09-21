@@ -47,7 +47,7 @@ void itemCode27_hook(GB *gb) {
       CALL_C(b_+33, itemSetAnimation_hook, SYM(itemSetAnimation), b_+36);
       CALL_C(b_+36, objectSetVisible81_hook, SYM(objectSetVisible81), b_+39);
       CYC(b_+39, b_+41); A = 0x5d;
-      CYC(b_+41, b_+44); playSound_b00_hook(gb); return;
+      CYC(b_+41, b_+44); TAIL(playSound_b00);
     }
     else if (jt_ == b_+56) {
       CALL_C(b_+56, itemUpdateDamageToApply_hook, SYM(itemUpdateDamageToApply), b_+59);
@@ -89,12 +89,12 @@ no_collision:
         CYCT(b_+92, b_+93); ret_effect(gb); return;
       }
       CYC(b_+92, b_+93);
-      CYC(b_+93, b_+96); itemDelete_hook(gb); return;
+      CYC(b_+93, b_+96); TAIL(itemDelete);
 
 collision:
       CYC(b_+96, b_+99); SET_BC(0x0781);
       CALL_C(b_+99, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+102);
-      CYC(b_+102, b_+105); itemDelete_hook(gb); return;
+      CYC(b_+102, b_+105); TAIL(itemDelete);
     }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);

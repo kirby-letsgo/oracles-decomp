@@ -109,7 +109,7 @@ dead:
   CYC(b_+54, b_+55); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
 
 die:
-  CYC(b_+55, b_+58); enemyDie_hook(gb); return; // jp
+  CYC(b_+55, b_+58); TAIL(enemyDie); // jp
 
 normalStatus:
   CALL_C(b_+58, ecom_getSubidAndCpStateTo08_b0e_hook, SYM(ecom_getSubidAndCpStateTo08_b0e), b_+61);
@@ -150,7 +150,7 @@ void beetle_state_uninitialized_hook(GB *gb) {
   CYC(b_+4, b_+7);
   CYC(b_+7, b_+9); A = 0x01;
   CYC(b_+9, b_+10); mem_wr(gb, DE, A); // [state] = 1
-  beetle_state_spawner_hook(gb); return; // fallthrough
+  TAIL(beetle_state_spawner); // fallthrough
 }
 
 // 0e:6445, bare global; jump-table target from enemyCode51, also falls into from
@@ -173,7 +173,7 @@ void beetle_state_spawner_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+20); return; } // ret nz
   CYC(b_+20, b_+21);
   CYC(b_+21, b_+22); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [subid] = 2
-  CYC(b_+22, b_+25); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(objectCopyPosition); // jp
 }
 
 // 0e:645e, bare global; jump-table target from enemyCode51.
@@ -194,7 +194,7 @@ void beetle_state_galeSeed_hook(GB *gb) {
 
 skip:
   CALL_C(b_+14, decNumEnemies_hook, SYM(decNumEnemies), b_+17);
-  CYC(b_+17, b_+20); enemyDelete_hook(gb); return; // jp
+  CYC(b_+17, b_+20); TAIL(enemyDelete); // jp
 }
 
 // 0e:6472, bare global; jump-table target from enemyCode51.
@@ -214,7 +214,7 @@ void beetle_state_switchHook_hook(GB *gb) {
 
 substate3:
   CYC(b_+12, b_+14); B = 0x0a;
-  CYC(b_+14, b_+17); ecom_fallToGroundAndSetState_b0e_hook(gb); return; // jp
+  CYC(b_+14, b_+17); TAIL(ecom_fallToGroundAndSetState_b0e); // jp
 }
 
 // 0e:6483, bare global; jump-table target from enemyCode51.
@@ -248,7 +248,7 @@ state8:
   CALL_C(b_+19, ecom_setZAboveScreen_b0e_hook, SYM(ecom_setZAboveScreen_b0e), b_+22);
   CALL_C(b_+22, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+25);
   CYC(b_+25, b_+27); A = 0x59; // SND_FALLINHOLE
-  CYC(b_+27, b_+30); playSound_b00_hook(gb); return; // jp
+  CYC(b_+27, b_+30); TAIL(playSound_b00); // jp
 
 state9:
   CYC(b_+30, b_+32); C = 0x0e;
@@ -264,7 +264,7 @@ state9:
   CYC(b_+46, b_+48); A = 0x52; // SND_BOMB_LAND
   CALL_C(b_+48, playSound_b00_hook, SYM(playSound_b00), b_+51);
   CALL_C(b_+51, beetle_chooseRandomAngleAndCounter1_hook, SYM(beetle_chooseRandomAngleAndCounter1), b_+54);
-  CYC(b_+54, b_+56); beetle_animate_hook(gb); return; // jr
+  CYC(b_+54, b_+56); TAIL(beetle_animate); // jr
 }
 
 // 0e:64bc, bare global; jump-table target from beetle_subid1/beetle_subid2/beetle_subid3.
@@ -275,14 +275,14 @@ void beetle_stateA_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+3);
   if (F & FZ) CALL_C_CC(b_+3, beetle_chooseRandomAngleAndCounter1_hook, SYM(beetle_chooseRandomAngleAndCounter1), b_+6); else CYC(b_+3, b_+6); // call z
   CALL_C(b_+6, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0e), SYM(beetle_animate));
-  beetle_animate_hook(gb); return; // fallthrough
+  TAIL(beetle_animate); // fallthrough
 }
 
 // 0e:64c5, bare global; falls into from beetle_stateA, also reached by genuine jr from
 // beetle_subid1/beetle_subid2.
 void beetle_animate_hook(GB *gb) {
   BASE(beetle_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // 0e:64c8, bare global; jump-table target from enemyCode51@normalState. Spawns in instantly.
@@ -307,7 +307,7 @@ state8:
   CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+15, b_+17); mem_wr(gb, HL, 0x1e);
   CALL_C(b_+17, ecom_updateCardinalAngleTowardTarget_b0e_hook, SYM(ecom_updateCardinalAngleTowardTarget_b0e), b_+20);
-  CYC(b_+20, b_+23); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(objectSetVisiblec2); // jp
 
 state9:
   CALL_C(b_+23, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+26);
@@ -316,7 +316,7 @@ state9:
   CYC(b_+28, b_+29); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [counter1] = 1
   CYC(b_+29, b_+30); L = E;
   CYC(b_+30, b_+31); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
-  CYC(b_+31, b_+33); beetle_stateA_hook(gb); return; // jr
+  CYC(b_+31, b_+33); TAIL(beetle_stateA); // jr
 
 keepMovingTowardLink:
   CYC(b_+33, b_+34); A = mem_rd(gb, HL);
@@ -328,7 +328,7 @@ keepMovingTowardLink:
 
 applyVelocity:
   CALL_C(b_+42, ecom_applyVelocityForSideviewEnemy_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemy_b0e), b_+45);
-  CYC(b_+45, b_+47); beetle_animate_hook(gb); return; // jr
+  CYC(b_+45, b_+47); TAIL(beetle_animate); // jr
 }
 
 // 0e:64f7, bare global; jump-table target from enemyCode51@normalState. "Bounces in" when it
@@ -362,7 +362,7 @@ state8:
   CYC(b_+29, b_+31); A = alu_swap(gb, A);
   CYC(b_+31, b_+32); alu_rrca(gb);
   CYC(b_+32, b_+33); mem_wr(gb, HL, A);
-  CYC(b_+33, b_+36); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+33, b_+36); TAIL(objectSetVisiblec2); // jp
 
 state9:
   CYC(b_+36, b_+38); C = 0x0e;
@@ -381,13 +381,13 @@ state9:
   CYC(b_+57, b_+59); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
 
 applyVelocity:
-  CYC(b_+59, b_+62); ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook(gb); return; // jp
+  CYC(b_+59, b_+62); TAIL(ecom_applyVelocityForSideviewEnemyNoHoles_b0e); // jp
 
 doneBouncing:
   CALL_C(b_+62, ecom_incState_b0e_hook, SYM(ecom_incState_b0e), b_+65);
   CYC(b_+65, b_+67); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+67, b_+69); mem_wr(gb, HL, 0x14); // SPEED_80
-  beetle_chooseRandomAngleAndCounter1_hook(gb); return; // fallthrough
+  TAIL(beetle_chooseRandomAngleAndCounter1); // fallthrough
 }
 
 // 0e:653c, bare global; called from beetle_stateA and beetle_subid1, also falls into from
@@ -441,5 +441,5 @@ void beetle_checkHazards_hook(GB *gb) {
 
 checkHazards:
   CYC(b_+32, b_+33); A = B;
-  CYC(b_+33, b_+36); ecom_checkHazards_b0e_hook(gb); return; // jp
+  CYC(b_+33, b_+36); TAIL(ecom_checkHazards_b0e); // jp
 }

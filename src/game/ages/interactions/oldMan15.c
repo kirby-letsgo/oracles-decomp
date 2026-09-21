@@ -95,17 +95,17 @@ void oldManWarpLinkToLibrary_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(b_+11);
   CALL_C(b_+3, setWarpDestVariables_hook, SYM(setWarpDestVariables), b_+6);
   CYC(b_+6, b_+8); A = 0x8d;
-  CYC(b_+8, b_+11); playSound_b00_hook(gb); return; // jp
+  CYC(b_+8, b_+11); TAIL(playSound_b00); // jp
 }
 
 void oldManSetAnimationToVar38_hook(GB *gb) {
   BASE(oldManSetAnimationToVar38);
   CYC(b_+0, b_+2); E = 0x78;
-  label_15_097_hook(gb); return;
+  TAIL(label_15_097);
 }
 
 void label_15_097_hook(GB *gb) {
   BASE(label_15_097);
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);
-  CYC(b_+1, b_+4); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+1, b_+4); TAIL(interactionSetAnimation); // jp
 }

@@ -153,7 +153,7 @@ void eyesoar_state_uninitialized_hook(GB *gb) {
   CYC(b_+20, b_+22); A = 0xff;
   CYC(b_+22, b_+24); B = 0x00;
   CALL_C(b_+24, enemyBoss_initializeRoom_b0f_hook, SYM(enemyBoss_initializeRoom_b0f), SYM(eyesoar_state1));
-  eyesoar_state1_hook(gb); return; // fallthrough
+  TAIL(eyesoar_state1); // fallthrough
 }
 
 // Spawning "real" eyesoar and children.
@@ -192,7 +192,7 @@ spawnChildLoop:
   CYC(b_+41, b_+42); mem_wr(gb, HL, A); SET_HL(HL + 1); // ld (hl+),a [var30+i]
   if (!(F & FZ)) { CYCT(b_+42, b_+44); goto spawnChildLoop; } // jr nz
   CYC(b_+42, b_+44);
-  CYC(b_+44, b_+47); enemyDelete_hook(gb); return; // jp
+  CYC(b_+44, b_+47); TAIL(enemyDelete); // jp
 }
 
 void eyesoar_state_switchHook_hook(GB *gb) {
@@ -226,7 +226,7 @@ substate0:
   CYC(b_+30, b_+32); mem_wr(gb, HL, 0x96); // 150
   CYC(b_+32, b_+34); L = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+34, b_+36); mem_wr(gb, HL, 0x00);
-  CYC(b_+36, b_+39); ecom_incSubstate_b0f_hook(gb); return; // jp
+  CYC(b_+36, b_+39); TAIL(ecom_incSubstate_b0f); // jp
 
 substate1:
   RET(b_+39); return; // ret
@@ -239,11 +239,11 @@ substate2:
   CYC(b_+44, b_+45);
   CYC(b_+45, b_+46); A = alu_inc8(gb, A);
   CYC(b_+46, b_+47); mem_wr(gb, DE, A);
-  CYC(b_+47, b_+50); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+47, b_+50); TAIL(enemySetAnimation); // jp
 
 substate3:
   CYC(b_+50, b_+52); B = 0x0c;
-  CYC(b_+52, b_+55); ecom_fallToGroundAndSetState_b0f_hook(gb); return; // jp
+  CYC(b_+52, b_+55); TAIL(ecom_fallToGroundAndSetState_b0f); // jp
 }
 
 void eyesoar_state_stub_hook(GB *gb) {
@@ -271,7 +271,7 @@ void eyesoar_state8_hook(GB *gb) {
   CYC(b_+22, b_+23); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)
   CYC(b_+23, b_+24); L = E;
   CYC(b_+24, b_+25); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl) [state]
-  CYC(b_+25, b_+28); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+25, b_+28); TAIL(objectSetVisiblec2); // jp
 }
 
 // Waiting [counter1] frames until fight begins
@@ -286,7 +286,7 @@ void eyesoar_state9_hook(GB *gb) {
   CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+9, b_+10); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
   CALL_C(b_+10, enemyBoss_beginBoss_b0f_hook, SYM(enemyBoss_beginBoss_b0f), b_+13);
-  CYCT(b_+13, b_+15); eyesoar_animate_hook(gb); return; // jr
+  CYCT(b_+13, b_+15); TAIL(eyesoar_animate); // jr
 }
 
 // Standing still for [counter1] frames?
@@ -329,7 +329,7 @@ L_6f62:
 
 L_6f75:
   CYC(b_+49, b_+50); mem_wr(gb, HL, B); // [var37]
-  CYCT(b_+50, b_+52); eyesoar_animate_hook(gb); return; // jr
+  CYCT(b_+50, b_+52); TAIL(eyesoar_animate); // jr
 }
 
 // Moving until it reaches its target position
@@ -355,16 +355,16 @@ void eyesoar_stateB_hook(GB *gb) {
   CYC(b_+27, b_+28); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)
   CYC(b_+28, b_+30); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+30, b_+32); mem_wr(gb, HL, 0x3c); // 60
-  CYCT(b_+32, b_+34); eyesoar_animate_hook(gb); return; // jr
+  CYCT(b_+32, b_+34); TAIL(eyesoar_animate); // jr
 
 L_6f9a:
   CALL_C(b_+34, ecom_moveTowardPosition_b0f_hook, SYM(ecom_moveTowardPosition_b0f), SYM(eyesoar_animate));
-  eyesoar_animate_hook(gb); return; // fallthrough
+  TAIL(eyesoar_animate); // fallthrough
 }
 
 void eyesoar_animate_hook(GB *gb) {
   BASE(eyesoar_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // Spinning in place after being switch hook'd
@@ -380,7 +380,7 @@ void eyesoar_stateC_hook(GB *gb) {
   CYC(b_+9, b_+11); mem_wr(gb, HL, 0x6d); // ENEMYCOLLISION_EYESOAR
   CYC(b_+11, b_+12); alu_xor(gb, A);
   CALL_C(b_+12, enemySetAnimation_hook, SYM(enemySetAnimation), SYM(eyesoar_stateD));
-  eyesoar_stateD_hook(gb); return; // fallthrough
+  TAIL(eyesoar_stateD); // fallthrough
 }
 
 // Moving back up into the air
@@ -407,7 +407,7 @@ void eyesoar_stateD_hook(GB *gb) {
   CYC(b_+25, b_+27); L = ENEMY_BASE + OBJ_VAR39;
   CYC(b_+27, b_+29); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 1))); // res 1,(hl)
   CALL_C(b_+29, eyesoar_chooseNewAngle_hook, SYM(eyesoar_chooseNewAngle), SYM(eyesoar_stateE));
-  eyesoar_stateE_hook(gb); return; // fallthrough
+  TAIL(eyesoar_stateE); // fallthrough
 }
 
 // Flying around kinda randomly
@@ -442,7 +442,7 @@ L_6fed:
   CYC(b_+33, b_+35); alu_and(gb, 0x3f);
   if (F & FZ) CALL_C_CC(b_+35, eyesoar_chooseNewAngle_hook, SYM(eyesoar_chooseNewAngle), b_+38); else CYC(b_+35, b_+38); // call z
   CALL_C(b_+38, ecom_applyVelocityForSideviewEnemyNoHoles_b0f_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0f), b_+41);
-  CYCT(b_+41, b_+43); eyesoar_animate_hook(gb); return; // jr
+  CYCT(b_+41, b_+43); TAIL(eyesoar_animate); // jr
 }
 
 // Checks to update the "formation", that is, the distances away from Eyesoar for the
@@ -521,7 +521,7 @@ killNextChild:
   CYC(b_+18, b_+20);
 
 doneKillingChildren:
-  CYC(b_+20, b_+23); enemyBoss_dead_b0f_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(enemyBoss_dead_b0f); // jp
 }
 
 // Chooses an angle which roughly goes toward the center of the room, plus a small, random

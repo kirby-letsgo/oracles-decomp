@@ -63,7 +63,7 @@ state_uninitialized:
   CYC(b_+40, b_+41); H = D;
   CYC(b_+41, b_+43); L = ENEMY_BASE + 0x3f; // Enemy.var3f
   CYC(b_+43, b_+45); mem_wr(gb, HL, mem_rd(gb, HL) | (1 << 4)); // set 4,(hl)
-  CYC(b_+45, b_+48); ecom_setSpeedAndState8AndVisible_b0d_hook(gb); return; // jp
+  CYC(b_+45, b_+48); TAIL(ecom_setSpeedAndState8AndVisible_b0d); // jp
 
 state_scentSeed:
   CYC(b_+48, b_+51); A = mem_rd(gb, wScentSeedActive);
@@ -148,5 +148,5 @@ state9SetState8:
   CYC(b_+145, b_+146); mem_wr(gb, DE, A);
 
 animate:
-  CYC(b_+146, b_+149); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+146, b_+149); TAIL(enemyAnimate); // jp
 }

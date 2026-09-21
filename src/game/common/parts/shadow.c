@@ -67,7 +67,7 @@ void partCode07_hook(GB *gb) {
 
 setAnim:
   CYC(b_+72, b_+73); A = mem_rd(gb, BC);
-  CYC(b_+73, b_+76); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+73, b_+76); TAIL(partSetAnimation); // jp
 }
 
 void shadow_initialize_hook(GB *gb) {
@@ -80,5 +80,5 @@ void shadow_initialize_hook(GB *gb) {
   CYC(b_+95, b_+97); E = 0xf0; // Part.var30
   CYC(b_+97, b_+98); A = mem_rd(gb, HL);
   CYC(b_+98, b_+99); mem_wr(gb, DE, A);
-  CYC(b_+99, b_+102); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+99, b_+102); TAIL(objectSetVisible83); // jp
 }

@@ -99,17 +99,17 @@ void enemyCode03__runState_hook(GB *gb) {
   if (!(F & FC)) { CYCT(b_+67, b_+69); goto state8OrHigher; } CYC(b_+67, b_+69);  // jr nc,@state8OrHigher
   CYC(b_+69, b_+70); push_effect(gb, b_+70);
   do { uint16_t jt_ = (twinrova_jump_table(gb));
-    if (jt_ == SYM(twinrova_state_uninitialized)) { twinrova_state_uninitialized_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_state_spawner)) { twinrova_state_spawner_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_state_stub)) { twinrova_state_stub_hook(gb); return; }
+    if (jt_ == SYM(twinrova_state_uninitialized) && hook_enabled_at(gb, SYM(twinrova_state_uninitialized))) { twinrova_state_uninitialized_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_state_spawner) && hook_enabled_at(gb, SYM(twinrova_state_spawner))) { twinrova_state_spawner_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_state_stub) && hook_enabled_at(gb, SYM(twinrova_state_stub))) { twinrova_state_stub_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 state8OrHigher:
   CYC(b_+86, b_+87); A = B;  // ld a,b
   CYC(b_+87, b_+88); push_effect(gb, b_+88);
   do { uint16_t jt_ = (twinrova_jump_table(gb));
-    if (jt_ == SYM(twinrova_subid0)) { twinrova_subid0_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_subid1)) { twinrova_subid1_hook(gb); return; }
+    if (jt_ == SYM(twinrova_subid0) && hook_enabled_at(gb, SYM(twinrova_subid0))) { twinrova_subid0_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_subid1) && hook_enabled_at(gb, SYM(twinrova_subid1))) { twinrova_subid1_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -169,7 +169,7 @@ void twinrova_state_uninitialized_hook(GB *gb) {
   CYC(b_+26, b_+27); A = alu_inc8(gb, A);  // inc a
   CYC(b_+27, b_+30); mem_wr(gb, wDisabledObjects, A);  // ld (wDisabledObjects),a
   CYC(b_+30, b_+33); mem_wr(gb, wMenuDisabled, A);  // ld (wMenuDisabled),a
-  twinrova_state_spawner_hook(gb); return;  // fallthrough
+  TAIL(twinrova_state_spawner);  // fallthrough
 }
 
 void twinrova_state_spawner_hook(GB *gb) {
@@ -224,15 +224,15 @@ void twinrova_subid0_hook(GB *gb) {
   CYC(b_+1, b_+3); alu_sub(gb, 0x08);  // sub $08
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (twinrova_jump_table(gb));
-    if (jt_ == SYM(twinrova_state8)) { twinrova_state8_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_state9)) { twinrova_state9_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_subid0_stateA)) { twinrova_subid0_stateA_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_subid0_stateB)) { twinrova_subid0_stateB_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_subid0_stateC)) { twinrova_subid0_stateC_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_stateD)) { twinrova_stateD_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_stateE)) { twinrova_stateE_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_stateF)) { twinrova_stateF_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_state10)) { twinrova_state10_hook(gb); return; }
+    if (jt_ == SYM(twinrova_state8) && hook_enabled_at(gb, SYM(twinrova_state8))) { twinrova_state8_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_state9) && hook_enabled_at(gb, SYM(twinrova_state9))) { twinrova_state9_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_subid0_stateA) && hook_enabled_at(gb, SYM(twinrova_subid0_stateA))) { twinrova_subid0_stateA_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_subid0_stateB) && hook_enabled_at(gb, SYM(twinrova_subid0_stateB))) { twinrova_subid0_stateB_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_subid0_stateC) && hook_enabled_at(gb, SYM(twinrova_subid0_stateC))) { twinrova_subid0_stateC_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_stateD) && hook_enabled_at(gb, SYM(twinrova_stateD))) { twinrova_stateD_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_stateE) && hook_enabled_at(gb, SYM(twinrova_stateE))) { twinrova_stateE_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_stateF) && hook_enabled_at(gb, SYM(twinrova_stateF))) { twinrova_stateF_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_state10) && hook_enabled_at(gb, SYM(twinrova_state10))) { twinrova_state10_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -278,7 +278,7 @@ void twinrova_state8_hook(GB *gb) {
   CALL_C(b_+53, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+56);
   CYC(b_+56, b_+58); E = 0xb1;  // ld e,Enemy.var31
   CYC(b_+58, b_+59); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(b_+59, b_+62); twinrova_updateAnimationFromAngle_hook(gb); return;  // jp twinrova_updateAnimationFromAngle
+  CYC(b_+59, b_+62); TAIL(twinrova_updateAnimationFromAngle);  // jp twinrova_updateAnimationFromAngle
 }
 
 void twinrova_state9_hook(GB *gb) {
@@ -385,7 +385,7 @@ void twinrova_subid0_stateA_hook(GB *gb) {
   CYC(b_+3, b_+5); A = 0x33;  // ld a,MUS_TWINROVA
   CYC(b_+5, b_+8); mem_wr(gb, wActiveMusic, A);  // ld (wActiveMusic),a
   CALL_C(b_+8, playSound_b00_hook, SYM(playSound_b00), b_+11);
-  CYC(b_+11, b_+14); twinrova_subid0_updateTargetPosition_hook(gb); return;  // jp twinrova_subid0_updateTargetPosition
+  CYC(b_+11, b_+14); TAIL(twinrova_subid0_updateTargetPosition);  // jp twinrova_subid0_updateTargetPosition
 }
 
 void twinrova_subid0_stateB_hook(GB *gb) {
@@ -431,7 +431,7 @@ void twinrova_subid0_stateC_hook(GB *gb) {
   CYC(b_+16, b_+17); E = alu_inc8(gb, E);  // inc e
   CYC(b_+17, b_+18); alu_xor(gb, A);  // xor a
   CYC(b_+18, b_+19); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(b_+19, b_+22); twinrova_subid0_updateTargetPosition_hook(gb); return;  // jp twinrova_subid0_updateTargetPosition
+  CYC(b_+19, b_+22); TAIL(twinrova_subid0_updateTargetPosition);  // jp twinrova_subid0_updateTargetPosition
 }
 
 void twinrova_stateD_hook(GB *gb) {
@@ -469,7 +469,7 @@ void twinrova_stateE_hook(GB *gb) {
   CYC(b_+19, b_+20); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
   CYC(b_+20, b_+23); SET_BC(0x2f09);  // ld bc,TX_2f09
   CALL_C(b_+23, showText_hook, SYM(showText), SYM(twinrova_animate));
-  twinrova_animate_hook(gb); return;  // fallthrough
+  TAIL(twinrova_animate);  // fallthrough
 }
 
 void twinrova_animate_hook(GB *gb) {
@@ -489,14 +489,14 @@ void twinrova_stateF_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+12, b_+14); goto nextState; } CYC(b_+12, b_+14);  // jr nz,@nextState
   CALL_C(b_+14, ecom_updateAngleTowardTarget_b10_hook, SYM(ecom_updateAngleTowardTarget_b10), b_+17);
   CALL_C(b_+17, twinrova_updateMovingAnimation_hook, SYM(twinrova_updateMovingAnimation), b_+20);
-  CYC(b_+20, b_+22); twinrova_animate_hook(gb); return;  // jr twinrova_animate
+  CYC(b_+20, b_+22); TAIL(twinrova_animate);  // jr twinrova_animate
 nextState:
   CALL_C(b_+22, ecom_incState_b10_hook, SYM(ecom_incState_b10), b_+25);
   CYC(b_+25, b_+26); L = alu_inc8(gb, L);  // inc l
   CYC(b_+26, b_+28); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   CYC(b_+28, b_+30); L = 0xb2;  // ld l,Enemy.var32
   CYC(b_+30, b_+32); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 3)));  // res 3,(hl)
-  CYC(b_+32, b_+34); twinrova_animate_hook(gb); return;  // jr twinrova_animate
+  CYC(b_+32, b_+34); TAIL(twinrova_animate);  // jr twinrova_animate
 }
 
 void twinrova_state10_hook(GB *gb) {
@@ -693,15 +693,15 @@ void twinrova_subid1_hook(GB *gb) {
   CYC(b_+1, b_+3); alu_sub(gb, 0x08);  // sub $08
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (twinrova_jump_table(gb));
-    if (jt_ == SYM(twinrova_state8)) { twinrova_state8_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_state9)) { twinrova_state9_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_subid1_stateA)) { twinrova_subid1_stateA_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_subid1_stateB)) { twinrova_subid1_stateB_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_subid1_stateC)) { twinrova_subid1_stateC_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_stateD)) { twinrova_stateD_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_stateE)) { twinrova_stateE_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_stateF)) { twinrova_stateF_hook(gb); return; }
-    else if (jt_ == SYM(twinrova_state10)) { twinrova_state10_hook(gb); return; }
+    if (jt_ == SYM(twinrova_state8) && hook_enabled_at(gb, SYM(twinrova_state8))) { twinrova_state8_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_state9) && hook_enabled_at(gb, SYM(twinrova_state9))) { twinrova_state9_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_subid1_stateA) && hook_enabled_at(gb, SYM(twinrova_subid1_stateA))) { twinrova_subid1_stateA_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_subid1_stateB) && hook_enabled_at(gb, SYM(twinrova_subid1_stateB))) { twinrova_subid1_stateB_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_subid1_stateC) && hook_enabled_at(gb, SYM(twinrova_subid1_stateC))) { twinrova_subid1_stateC_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_stateD) && hook_enabled_at(gb, SYM(twinrova_stateD))) { twinrova_stateD_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_stateE) && hook_enabled_at(gb, SYM(twinrova_stateE))) { twinrova_stateE_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_stateF) && hook_enabled_at(gb, SYM(twinrova_stateF))) { twinrova_stateF_hook(gb); return; }
+    else if (jt_ == SYM(twinrova_state10) && hook_enabled_at(gb, SYM(twinrova_state10))) { twinrova_state10_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -711,7 +711,7 @@ void twinrova_subid1_stateA_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); A = 0x0b;  // ld a,$0b
   CYC(b_+2, b_+3); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(b_+3, b_+6); twinrova_subid1_updateTargetPosition_hook(gb); return;  // jp twinrova_subid1_updateTargetPosition
+  CYC(b_+3, b_+6); TAIL(twinrova_subid1_updateTargetPosition);  // jp twinrova_subid1_updateTargetPosition
 }
 
 void twinrova_subid1_stateB_hook(GB *gb) {
@@ -741,7 +741,7 @@ void twinrova_subid1_stateC_hook(GB *gb) {
   CYC(b_+16, b_+17); E = alu_inc8(gb, E);  // inc e
   CYC(b_+17, b_+18); alu_xor(gb, A);  // xor a
   CYC(b_+18, b_+19); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(b_+19, b_+22); twinrova_subid1_updateTargetPosition_hook(gb); return;  // jp twinrova_subid1_updateTargetPosition
+  CYC(b_+19, b_+22); TAIL(twinrova_subid1_updateTargetPosition);  // jp twinrova_subid1_updateTargetPosition
 }
 
 void twinrova_initialize_hook(GB *gb) {
@@ -893,7 +893,7 @@ void twinrova_setTargetPositionToObject_hook(GB *gb) {
   CYC(b_+11, b_+12); A = mem_rd(gb, DE);  // ld a,(de)
   CYC(b_+12, b_+14); mem_wr(gb, hFF8E, A);  // ldh (<hFF8E),a
   CALL_C(b_+14, ecom_moveTowardPosition_b10_hook, SYM(ecom_moveTowardPosition_b10), b_+17);
-  CYC(b_+17, b_+19); twinrova_updateMovingAnimation_hook(gb); return;  // jr twinrova_updateMovingAnimation
+  CYC(b_+17, b_+19); TAIL(twinrova_updateMovingAnimation);  // jr twinrova_updateMovingAnimation
 }
 
 void twinrova_updateAnimationFromAngle_hook(GB *gb) {
@@ -912,7 +912,7 @@ void twinrova_updateMovingAnimation_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); E = 0x89;  // ld e,Enemy.angle
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);  // ld a,(de)
-  twinrova_updateMovingAnimationGivenAngle_hook(gb); return;  // fallthrough
+  TAIL(twinrova_updateMovingAnimationGivenAngle);  // fallthrough
 }
 
 void twinrova_updateMovingAnimationGivenAngle_hook(GB *gb) {
@@ -987,7 +987,7 @@ shared:
   CYC(b_+27, b_+28); E = alu_inc8(gb, E);  // inc e
   CYC(b_+28, b_+29); A = mem_rd(gb, HL);  // ld a,(hl)
   CYC(b_+29, b_+30); mem_wr(gb, DE, A);  // ld (de),a
-  twinrova_moveTowardTargetPosition_hook(gb); return;  // fallthrough
+  TAIL(twinrova_moveTowardTargetPosition);  // fallthrough
 }
 
 void twinrova_subid1_updateTargetPosition_hook(GB *gb) {
@@ -1020,7 +1020,7 @@ void twinrova_subid1_updateTargetPosition_hook(GB *gb) {
   CYC(b_+27, b_+28); E = alu_inc8(gb, E);  // inc e
   CYC(b_+28, b_+29); A = mem_rd(gb, HL);  // ld a,(hl)
   CYC(b_+29, b_+30); mem_wr(gb, DE, A);  // ld (de),a
-  twinrova_moveTowardTargetPosition_hook(gb); return;  // fallthrough
+  TAIL(twinrova_moveTowardTargetPosition);  // fallthrough
 }
 
 void twinrova_moveTowardTargetPosition_hook(GB *gb) {

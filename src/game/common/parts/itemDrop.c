@@ -83,8 +83,7 @@ void partCode01_hook(GB *gb) {
     CYC(b_+2, b_+4); alu_cp(gb, 0x02); // cp PARTSTATUS_DEAD
     if (F & FZ) {
       CYCT(b_+4, b_+7); // jp z,@linkCollectedItem
-      partCode01__linkCollectedItem_hook(gb);
-      return;
+      TAIL(partCode01__linkCollectedItem);
     }
     CYC(b_+4, b_+7);
     CYC(b_+7, b_+9); E = 0xc4; // Part.state
@@ -166,7 +165,7 @@ label_11_008:
   CALL_C(b_+95, itemDrop_initSpeed_hook, SYM(itemDrop_initSpeed), b_+98);
   CYC(b_+98, b_+100); E = 0xc2; // Part.subid
   CYC(b_+100, b_+101); A = mem_rd(gb, DE);
-  CYC(b_+101, b_+104); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+101, b_+104); TAIL(partSetAnimation); // jp
 
 state1:
   CALL_C(b_+104, partCommon_getTileCollisionInFront_allowHoles_hook, SYM(partCommon_getTileCollisionInFront_allowHoles), b_+107);
@@ -208,7 +207,7 @@ label_11_010:
   CYC(b_+154, b_+155);
   CYC(b_+155, b_+156); C = A;
   CYC(b_+156, b_+158); B = 0x14; // SPEED_80
-  CYC(b_+158, b_+161); itemDrop_applySpeed_hook(gb); return; // jp
+  CYC(b_+158, b_+161); TAIL(itemDrop_applySpeed); // jp
 
 state2:
   CALL_C(b_+161, itemDrop_checkSidescrollingConditions_hook, SYM(itemDrop_checkSidescrollingConditions), b_+164);
@@ -223,7 +222,7 @@ state2:
   CYC(b_+179, b_+180); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+180, b_+182); goto label_11_010; } // jr nz
   CYC(b_+180, b_+182);
-  CYC(b_+182, b_+185); itemDrop_updateFairyMovement_hook(gb); return; // jp
+  CYC(b_+182, b_+185); TAIL(itemDrop_updateFairyMovement); // jp
 
 reachedPoint:
   CYC(b_+185, b_+186); H = D;
@@ -235,7 +234,7 @@ reachedPoint:
   CYC(b_+192, b_+193);
   CYC(b_+193, b_+194); L = L + 1; // Part.xh
   CYC(b_+194, b_+195); mem_wr(gb, HL, C);
-  CYC(b_+195, b_+198); partDelete_hook(gb); return; // jp
+  CYC(b_+195, b_+198); TAIL(partDelete); // jp
 
 state3:
   CYC(b_+198, b_+200); E = 0xc5; // Part.substate
@@ -264,7 +263,7 @@ state3:
   CYC(b_+224, b_+227);
 
 label_11_006:
-  CYC(b_+227, b_+230); partDelete_hook(gb); return; // jp
+  CYC(b_+227, b_+230); TAIL(partDelete); // jp
 }
 
 void partCode01__getRelatedObj1ID_hook(GB *gb) {
@@ -343,7 +342,7 @@ giveDrop:
   CYC(b_+310, b_+312); mem_wr(gb, HL, mem_rd(gb, HL) | 0x20);
 
 deleteSelf:
-  CYC(b_+312, b_+315); partDelete_hook(gb); return; // jp
+  CYC(b_+312, b_+315); TAIL(partDelete); // jp
 }
 
 void itemDrop_initGfx_hook(GB *gb) {
@@ -363,7 +362,7 @@ void itemDrop_initGfx_hook(GB *gb) {
   CYC(b_+15, b_+16); mem_wr(gb, DE, A); // [oamFlags]
   CYC(b_+16, b_+17); E = 0xdb; // Part.oamFlagsBackup
   CYC(b_+17, b_+18); mem_wr(gb, DE, A); // [oamFlagsBackup]
-  CYC(b_+18, b_+21); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(objectSetVisiblec1); // jp
 }
 
 void itemDrop_countdownToDisappear_hook(GB *gb) {
@@ -428,7 +427,7 @@ fairy:
   CYC(b_+19, b_+21); L = 0xcb; // Part.yh
   CYC(b_+21, b_+22); A = A + mem_rd(gb, HL);
   CYC(b_+22, b_+23); mem_wr(gb, HL, A);
-  CYC(b_+23, b_+26); itemDrop_chooseRandomFairyMovement_hook(gb); return; // jp
+  CYC(b_+23, b_+26); TAIL(itemDrop_chooseRandomFairyMovement); // jp
 }
 
 void itemDrop_updateSpeed_hook(GB *gb) {
@@ -437,7 +436,7 @@ void itemDrop_updateSpeed_hook(GB *gb) {
   CALL_C(b_+0, objectCheckTileCollision_allowHoles_hook, SYM(objectCheckTileCollision_allowHoles), b_+3);
   if (F & FC) { RET_TAKEN(b_+3); return; } // ret c
   CYC(b_+3, b_+4);
-  CYC(b_+4, b_+7); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+4, b_+7); TAIL(objectApplySpeed); // jp
 }
 
 void itemDrop_spawnEnemy_hook(GB *gb) {
@@ -464,7 +463,7 @@ void itemDrop_spawnEnemy_hook(GB *gb) {
   CYC(b_+29, b_+30); mem_wr(gb, HL, A);
 
 delete_:
-  CYC(b_+30, b_+33); partDelete_hook(gb); return; // jp
+  CYC(b_+30, b_+33); TAIL(partDelete); // jp
 }
 
 void itemDrop_checkSidescrollingConditions_hook(GB *gb) {
@@ -511,7 +510,7 @@ checkY:
   if (F & FC) { RET_TAKEN(b_+46); return; } // ret c
   CYC(b_+46, b_+47);
   CYC(b_+47, b_+48); SET_HL(pop_effect(gb)); // pop hl (discard return address)
-  CYC(b_+48, b_+51); partDelete_hook(gb); return; // jp
+  CYC(b_+48, b_+51); TAIL(partDelete); // jp
 }
 
 void itemDrop_checkHitGround_hook(GB *gb) {
@@ -595,7 +594,7 @@ onWater:
 
 onWaterSidescrolling:
   CYC(b_+53, b_+54); mem_wr(gb, DE, A);
-  CYC(b_+54, b_+57); objectCreateInteractionWithSubid00_hook(gb); return; // jp
+  CYC(b_+54, b_+57); TAIL(objectCreateInteractionWithSubid00); // jp
 }
 
 void itemDrop_updateFairyMovement_hook(GB *gb) {
@@ -610,7 +609,7 @@ void itemDrop_updateFairyMovement_hook(GB *gb) {
   CYC(b_+9, b_+10); A = alu_inc8(gb, A);
   if (!(F & FZ)) { CYCT(b_+10, b_+13); objectApplySpeed_hook(gb); return; } // jp nz
   CYC(b_+10, b_+13);
-  itemDrop_chooseRandomFairyMovement_hook(gb); return; // fallthrough
+  TAIL(itemDrop_chooseRandomFairyMovement); // fallthrough
 }
 
 void itemDrop_chooseRandomFairyMovement_hook(GB *gb) {

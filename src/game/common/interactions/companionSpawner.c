@@ -289,7 +289,7 @@ showTextAndDelete:
   if (F & FZ) { CALL_C_CC(b_+284, showText_hook, SYM(showText), b_+287); } else { CYC(b_+284, b_+287); } // call z
 
 deleteSelf:
-  CYC(b_+287, b_+290); interactionDelete_hook(gb); return; // jp
+  CYC(b_+287, b_+290); TAIL(interactionDelete); // jp
 
 // Moosh being attacked by ghosts
 subid00:

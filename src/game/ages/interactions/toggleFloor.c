@@ -130,7 +130,7 @@ static void toggleFloor_subid01(GB *gb, uint16_t sp0_) {
   CALL_C(b_+103, getLinkTilePosition_hook, SYM(getLinkTilePosition), b_+106);
   CYC(b_+106, b_+107); alu_cp(gb, B);
   if (F & FZ) {
-    CYCT(b_+107, b_+110); interactionDelete_hook(gb); return;
+    CYCT(b_+107, b_+110); TAIL(interactionDelete);
   }
   CYC(b_+107, b_+110);
   CYC(b_+110, b_+112); B = wRoomLayout >> 8;

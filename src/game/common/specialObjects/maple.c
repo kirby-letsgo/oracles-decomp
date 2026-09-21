@@ -108,19 +108,19 @@ void specialObjectCode_maple_hook(GB *gb) {
   CYC(b_+5, b_+6); A = mem_rd(gb, DE);
   CYC(b_+6, b_+7); push_effect(gb, b_+7);
   do { uint16_t jt_ = (maple_jump_table(gb));
-    if (jt_ == SYM(mapleState0)) { mapleState0_hook(gb); return; }
-    else if (jt_ == SYM(mapleState1)) { mapleState1_hook(gb); return; }
-    else if (jt_ == SYM(mapleState2)) { mapleState2_hook(gb); return; }
-    else if (jt_ == SYM(mapleState3)) { mapleState3_hook(gb); return; }
-    else if (jt_ == SYM(mapleState4)) { mapleState4_hook(gb); return; }
-    else if (jt_ == SYM(mapleState5)) { mapleState5_hook(gb); return; }
-    else if (jt_ == SYM(mapleState6)) { mapleState6_hook(gb); return; }
-    else if (jt_ == SYM(mapleState7)) { mapleState7_hook(gb); return; }
-    else if (jt_ == SYM(mapleState8)) { mapleState8_hook(gb); return; }
-    else if (jt_ == SYM(mapleState9)) { mapleState9_hook(gb); return; }
-    else if (jt_ == SYM(mapleStateA)) { mapleStateA_hook(gb); return; }
-    else if (jt_ == SYM(mapleStateB)) { mapleStateB_hook(gb); return; }
-    else if (jt_ == SYM(mapleStateC)) { mapleStateC_hook(gb); return; }
+    if (jt_ == SYM(mapleState0) && hook_enabled_at(gb, SYM(mapleState0))) { mapleState0_hook(gb); return; }
+    else if (jt_ == SYM(mapleState1) && hook_enabled_at(gb, SYM(mapleState1))) { mapleState1_hook(gb); return; }
+    else if (jt_ == SYM(mapleState2) && hook_enabled_at(gb, SYM(mapleState2))) { mapleState2_hook(gb); return; }
+    else if (jt_ == SYM(mapleState3) && hook_enabled_at(gb, SYM(mapleState3))) { mapleState3_hook(gb); return; }
+    else if (jt_ == SYM(mapleState4) && hook_enabled_at(gb, SYM(mapleState4))) { mapleState4_hook(gb); return; }
+    else if (jt_ == SYM(mapleState5) && hook_enabled_at(gb, SYM(mapleState5))) { mapleState5_hook(gb); return; }
+    else if (jt_ == SYM(mapleState6) && hook_enabled_at(gb, SYM(mapleState6))) { mapleState6_hook(gb); return; }
+    else if (jt_ == SYM(mapleState7) && hook_enabled_at(gb, SYM(mapleState7))) { mapleState7_hook(gb); return; }
+    else if (jt_ == SYM(mapleState8) && hook_enabled_at(gb, SYM(mapleState8))) { mapleState8_hook(gb); return; }
+    else if (jt_ == SYM(mapleState9) && hook_enabled_at(gb, SYM(mapleState9))) { mapleState9_hook(gb); return; }
+    else if (jt_ == SYM(mapleStateA) && hook_enabled_at(gb, SYM(mapleStateA))) { mapleStateA_hook(gb); return; }
+    else if (jt_ == SYM(mapleStateB) && hook_enabled_at(gb, SYM(mapleStateB))) { mapleStateB_hook(gb); return; }
+    else if (jt_ == SYM(mapleStateC) && hook_enabled_at(gb, SYM(mapleStateC))) { mapleStateC_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -240,7 +240,7 @@ void mapleState1_hook(GB *gb) {
   CYC(b_+4, b_+7); A = W8(wMenuDisabled);
   CYC(b_+7, b_+8); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+8, b_+11); mapleDeleteSelf_hook(gb); return;
+    CYCT(b_+8, b_+11); TAIL(mapleDeleteSelf);
   }
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+13); A = 0x2b;
@@ -326,20 +326,20 @@ move:
   CYC(b_+47, b_+49);
   CALL_C(b_+49, objectCheckCollidedWithLink_ignoreZ_hook, SYM(objectCheckCollidedWithLink_ignoreZ), b_+52);
   if (F & FC) {
-    CYCT(b_+52, b_+54); mapleCollideWithLink_hook(gb); return;
+    CYCT(b_+52, b_+54); TAIL(mapleCollideWithLink);
   }
   CYC(b_+52, b_+54);
 
 animate:
   CALL_C(b_+54, mapleUpdateOscillation_hook, SYM(mapleUpdateOscillation), b_+57);
-  CYC(b_+57, b_+60); specialObjectAnimate_hook(gb); return;
+  CYC(b_+57, b_+60); TAIL(specialObjectAnimate);
 
 choose_path:
   CYC(b_+60, b_+63); SET_HL(w1Companion_var3e);
   CYC(b_+63, b_+64); A = mem_rd(gb, HL);
   CYC(b_+64, b_+65); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+65, b_+68); mapleDeleteSelf_hook(gb); return;
+    CYCT(b_+65, b_+68); TAIL(mapleDeleteSelf);
   }
   CYC(b_+65, b_+68);
   CYC(b_+68, b_+69); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
@@ -543,7 +543,7 @@ animate:
   CYC(b_+56, b_+57); A = mem_rd(gb, DE);
   CYC(b_+57, b_+59); alu_cp(gb, 0xff);
   if (!(F & FZ)) {
-    CYCT(b_+59, b_+62); specialObjectAnimate_hook(gb); return;
+    CYCT(b_+59, b_+62); TAIL(specialObjectAnimate);
   }
   CYC(b_+59, b_+62);
   CYC(b_+62, b_+64); E = 0x2d;
@@ -705,7 +705,7 @@ show_text:
   CYC(b_+137, b_+138); alu_xor(gb, A);
   CYC(b_+138, b_+141); W8(wDisabledObjects) = A;
   CYC(b_+141, b_+144); W8(wMenuDisabled) = A;
-  CYC(b_+144, b_+147); mapleDecideItemToCollectAndUpdateTargetAngle_hook(gb); return;
+  CYC(b_+144, b_+147); TAIL(mapleDecideItemToCollectAndUpdateTargetAngle);
 
 exchange_touching_book:
   CYC(b_+147, b_+149); A = 0x0b;
@@ -848,8 +848,7 @@ update_angle:
   CALL_C(b_+46, checkObjectsCollided_hook, SYM(checkObjectsCollided), b_+49);
   if (!(F & FC)) {
     CYCT(b_+49, b_+52);
-    mapleKeepInBounds_hook(gb);
-    return;
+    TAIL(mapleKeepInBounds);
   }
   CYC(b_+49, b_+52);
   CYC(b_+52, b_+54); E = 0x18;
@@ -1414,8 +1413,7 @@ wait_for_text:
   CYC(b_+55, b_+56); alu_rlca(gb);
   if (!(F & FC)) {
     CYCT(b_+56, b_+59);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+56, b_+59);
   CYC(b_+59, b_+60); ret_effect(gb); return;
@@ -1553,7 +1551,7 @@ obtained:
   CYC(b_+120, b_+122); H8(hFF8B) = A;
   CYC(b_+122, b_+124); alu_cp(gb, 0x05);
   if (!(F & FC)) {
-    CYCT(b_+124, b_+127); mapleSpawnItemDrop_hook(gb); return;
+    CYCT(b_+124, b_+127); TAIL(mapleSpawnItemDrop);
   }
   CYC(b_+124, b_+127);
   CYC(b_+127, b_+128); alu_or(gb, A);
@@ -2036,7 +2034,7 @@ void mapleDecideItemToCollectAndUpdateTargetAngle_hook(GB *gb) {
   CYC(b_+12, b_+14); E = 0x25;
   CYC(b_+14, b_+15); alu_xor(gb, A);
   CYC(b_+15, b_+16); mem_wr(gb, DE, A);
-  CYC(b_+16, b_+18); mapleSetTargetDirectionToRelatedObj2_hook(gb); return;
+  CYC(b_+16, b_+18); TAIL(mapleSetTargetDirectionToRelatedObj2);
 
 no_more_items:
   CYC(b_+18, b_+20); E = 0x04;

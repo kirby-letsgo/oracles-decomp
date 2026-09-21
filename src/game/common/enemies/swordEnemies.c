@@ -79,7 +79,7 @@ void enemyCode3d_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, ecom_checkHazards_b0e_hook, SYM(ecom_checkHazards_b0e), b_+3);
   CALL_C(b_+3, enemyCode3d_runState_hook, b_+9, b_+6);
-  CYC(b_+6, b_+9); swordEnemy_updateEnemyCollisionMode_hook(gb); return; // jp
+  CYC(b_+6, b_+9); TAIL(swordEnemy_updateEnemyCollisionMode); // jp
 }
 
 // 0e:5569, local sub-label of enemyCode3d/enemyCode49/enemyCode4a (@runState); called with
@@ -101,7 +101,7 @@ void enemyCode3d_runState_hook(GB *gb) {
 
 dead:
   POP(b_+21); // pop hl -- discards this call's return address
-  CYC(b_+22, b_+25); enemyDie_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(enemyDie); // jp
 
 normalStatus:
   CALL_C(b_+25, ecom_checkScentSeedActive_b0e_hook, SYM(ecom_checkScentSeedActive_b0e), b_+28);
@@ -148,7 +148,7 @@ void swordEnemy_state_uninitialized_hook(GB *gb) {
   // Enable scent seeds
   CYC(b_+20, b_+22); L = ENEMY_BASE + 0x3f; // Enemy.var3f
   CYC(b_+22, b_+24); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 4))); // set 4,(hl)
-  CYC(b_+24, b_+27); swordEnemy_setChaseCooldown_hook(gb); return; // jp
+  CYC(b_+24, b_+27); TAIL(swordEnemy_setChaseCooldown); // jp
 }
 
 // 0e:55b8, bare global; jump-table target from enemyCode3d_runState and enemyCode48_runState.
@@ -187,7 +187,7 @@ void swordEnemy_state_scentSeed_hook(GB *gb) {
   CALL_C(b_+11, ecom_updateAnimationFromAngle_b0e_hook, SYM(ecom_updateAnimationFromAngle_b0e), b_+14);
   CALL_C(b_+14, ecom_applyVelocityForSideviewEnemy_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemy_b0e), b_+17);
   CALL_C(b_+17, enemyAnimate_hook, SYM(enemyAnimate), b_+20);
-  CYC(b_+20, b_+22); swordEnemy_animate_hook(gb); return; // jr
+  CYC(b_+20, b_+22); TAIL(swordEnemy_animate); // jr
 }
 
 // 0e:55e4, bare global; jump-table target from enemyCode3d_runState and enemyCode48_runState.
@@ -215,14 +215,14 @@ void swordEnemy_state8_hook(GB *gb) {
   CALL_C(b_+17, ecom_bounceOffWallsAndHoles_b0e_hook, SYM(ecom_bounceOffWallsAndHoles_b0e), b_+20);
   if (!(F & FZ)) { CYCT(b_+20, b_+23); ecom_updateAnimationFromAngle_b0e_hook(gb); return; } // jp nz
   CYC(b_+20, b_+23);
-  swordEnemy_animate_hook(gb); return; // fallthrough
+  TAIL(swordEnemy_animate); // fallthrough
 }
 
 // 0e:55fc, bare global; falls into from swordEnemy_state8, also reached by genuine jr/jp
 // from swordEnemy_gotoState8, swordEnemy_stateA and swordEnemy_state_scentSeed.
 void swordEnemy_animate_hook(GB *gb) {
   BASE(swordEnemy_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // 0e:55ff, bare global; jump-table target from enemyCode3d_runState. Started chasing Link
@@ -262,7 +262,7 @@ applyVelocity:
 
   // Animate at double speed
   CALL_C(b_+23, enemyAnimate_hook, SYM(enemyAnimate), b_+26);
-  CYC(b_+26, b_+28); swordEnemy_animate_hook(gb); return; // jr
+  CYC(b_+26, b_+28); TAIL(swordEnemy_animate); // jr
 }
 
 // 0e:5628, bare global; called from swordEnemy_stateA, swordEnemy_state_scentSeed and
@@ -281,7 +281,7 @@ void swordEnemy_gotoState8_hook(GB *gb) {
   CYC(b_+14, b_+15); mem_wr(gb, HL, A);
   CALL_C(b_+15, ecom_updateAnimationFromAngle_b0e_hook, SYM(ecom_updateAnimationFromAngle_b0e), b_+18);
   CALL_C(b_+18, swordEnemy_setChaseCooldown_hook, SYM(swordEnemy_setChaseCooldown), b_+21);
-  CYC(b_+21, b_+23); swordEnemy_animate_hook(gb); return; // jr
+  CYC(b_+21, b_+23); TAIL(swordEnemy_animate); // jr
 }
 
 // ==================================================================================================
@@ -292,7 +292,7 @@ void enemyCode48_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, ecom_checkHazards_b0e_hook, GV(SYM(ecom_checkHazards_b0e), 0x4446), b_+3);
   CALL_C(b_+3, enemyCode48_runState_hook, b_+9, b_+6);
-  CYC(b_+6, b_+9); swordDarknut_updateEnemyCollisionMode_hook(gb); return; // jp
+  CYC(b_+6, b_+9); TAIL(swordDarknut_updateEnemyCollisionMode); // jp
 }
 
 // 0e:5648, local sub-label of enemyCode48 (@runState); called with a real `call` (its
@@ -309,7 +309,7 @@ void enemyCode48_runState_hook(GB *gb) {
   CYC(b_+14, b_+16);
   CYC(b_+16, b_+17); A = alu_dec8(gb, A);
   if (!(F & FZ)) CALL_C_CC(b_+17, ecom_updateKnockbackAndCheckHazards_b0e_hook, SYM(ecom_updateKnockbackAndCheckHazards_b0e), b_+20); else CYC(b_+17, b_+20); // call nz
-  CYC(b_+20, b_+23); swordDarknut_updateEnemyCollisionMode_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(swordDarknut_updateEnemyCollisionMode); // jp
 
 dead:
   CYC(b_+23, b_+25); E = ENEMY_BASE + OBJ_SUBID;
@@ -322,7 +322,7 @@ dead:
 
 popDead:
   POP(b_+35); // pop hl -- discards this call's return address
-  CYC(b_+36, b_+39); enemyDie_hook(gb); return; // jp
+  CYC(b_+36, b_+39); TAIL(enemyDie); // jp
 
 normalStatus:
   CYC(b_+39, b_+41); E = ENEMY_BASE + OBJ_STATE;
@@ -355,7 +355,7 @@ void swordDarknut_state_uninitialized_hook(GB *gb) {
   CYC(b_+12, b_+15);
 
 notGolden:
-  CYC(b_+15, b_+18); swordEnemy_state_uninitialized_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(swordEnemy_state_uninitialized); // jp
 }
 
 // 0e:5692, bare global; jump-table target from enemyCode48_runState. Moving slowly in
@@ -377,14 +377,14 @@ void swordDarknut_state8_hook(GB *gb) {
   CALL_C(b_+15, ecom_bounceOffWallsAndHoles_b0e_hook, SYM(ecom_bounceOffWallsAndHoles_b0e), b_+18);
   if (!(F & FZ)) { CYCT(b_+18, b_+21); ecom_updateAnimationFromAngle_b0e_hook(gb); return; } // jp nz
   CYC(b_+18, b_+21);
-  swordDarknut_animate_hook(gb); return; // fallthrough
+  TAIL(swordDarknut_animate); // fallthrough
 }
 
 // 0e:56a7, bare global; falls into from swordDarknut_state8, also reached by genuine jr
 // from swordDarknut_stateA.
 void swordDarknut_animate_hook(GB *gb) {
   BASE(swordDarknut_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // 0e:56aa, bare global; jump-table target from enemyCode48_runState. Started chasing Link
@@ -426,7 +426,7 @@ applyVelocity:
 
   // Animate at double speed
   CALL_C(b_+23, enemyAnimate_hook, SYM(enemyAnimate), b_+26);
-  CYC(b_+26, b_+28); swordDarknut_animate_hook(gb); return; // jr
+  CYC(b_+26, b_+28); TAIL(swordDarknut_animate); // jr
 }
 
 // 0e:56d3, bare global; called from swordEnemy_state8 and swordDarknut_state8.
@@ -438,7 +438,7 @@ void swordEnemy_beginChasingLink_hook(GB *gb) {
   CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x10);
   CALL_C(b_+7, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+10);
-  CYC(b_+10, b_+13); ecom_updateAnimationFromAngle_b0e_hook(gb); return; // jp
+  CYC(b_+10, b_+13); TAIL(ecom_updateAnimationFromAngle_b0e); // jp
 }
 
 // 0e:56e0, bare global; called from swordEnemy_state8 and swordDarknut_state8.
@@ -452,7 +452,7 @@ void swordEnemy_chooseRandomAngleAndCounter1_hook(GB *gb) {
   CYC(b_+10, b_+11); alu_add(gb, B);
   CYC(b_+11, b_+12); mem_wr(gb, DE, A);
   CALL_C(b_+12, swordEnemy_chooseRandomAngleAndCounter1_chooseAngle_hook, b_+18, b_+15);
-  CYC(b_+15, b_+18); ecom_updateAnimationFromAngle_b0e_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(ecom_updateAnimationFromAngle_b0e); // jp
 }
 
 // 0e:56f2, local sub-label of swordEnemy_chooseRandomAngleAndCounter1 (@chooseAngle),
@@ -464,7 +464,7 @@ void swordEnemy_chooseRandomAngleAndCounter1_chooseAngle_hook(GB *gb) {
   CYC(b_+19, b_+20); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+20, (SYM(ecom_updateCardinalAngleAwayFromTarget_b0e) + 9)); ecom_updateCardinalAngleTowardTarget_b0e_hook(gb); return; } // jp z
   CYC(b_+20, b_+23);
-  CYC(b_+23, (SYM(ecom_updateAngleTowardTarget_b0e) + 7)); ecom_setRandomCardinalAngle_b0e_hook(gb); return; // jp
+  CYC(b_+23, (SYM(ecom_updateAngleTowardTarget_b0e) + 7)); TAIL(ecom_setRandomCardinalAngle_b0e); // jp
 }
 
 // 0e:56fa, bare global; called from swordEnemy_state8.
@@ -630,7 +630,7 @@ void swordEnemy_checkIgnoreCollision_hook(GB *gb) {
   CYC(b_+13, b_+16); SET_HL(b_+21); // @angleBits
   swordEnemy_addDoubleIndexToHl_from_rst(gb, b_+17);
   CYC(b_+17, b_+18); A = B;
-  CYC(b_+18, b_+21); checkFlag_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(checkFlag); // jp
 }
 
 // 0e:57a1, bare global; called from swordDarknut_state_uninitialized.
@@ -638,5 +638,5 @@ void swordDarknut_delete_hook(GB *gb) {
   BASE(swordDarknut_delete);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, decNumEnemies_hook, SYM(decNumEnemies), b_+3);
-  CYC(b_+3, b_+6); enemyDelete_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(enemyDelete); // jp
 }

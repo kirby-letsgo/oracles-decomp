@@ -55,7 +55,7 @@ void enemyCode7c_hook(GB *gb) {
   CYC(b_+4, b_+5);
   if (!(F & FZ)) { CYCT(b_+5, b_+7); goto normalStatus; } // jr nz
   CYC(b_+5, b_+7);
-  CYC(b_+7, b_+10); enemyBoss_dead_b0f_hook(gb); return; // jp
+  CYC(b_+7, b_+10); TAIL(enemyBoss_dead_b0f); // jp
 
 normalStatus:
   CYC(b_+10, b_+12); E = ENEMY_BASE + OBJ_STATE;

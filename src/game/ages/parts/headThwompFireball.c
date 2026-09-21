@@ -76,7 +76,7 @@ state0:
   CYC(b_+46, b_+47); mem_wr(gb, DE, A);
   CALL_C(b_+47, objectSetVisible82_hook, SYM(objectSetVisible82), b_+50);
   CYC(b_+50, b_+52); A = 0x59; // SND_FALLINHOLE
-  CYC(b_+52, b_+55); playSound_b00_hook(gb); return; // jp
+  CYC(b_+52, b_+55); TAIL(playSound_b00); // jp
 
 state1:
   CALL_C(b_+59, objectApplySpeed_hook, SYM(objectApplySpeed), b_+62);
@@ -116,7 +116,7 @@ state1:
   CYC(b_+113, b_+115); A = 0x01;
   CALL_C(b_+115, partSetAnimation_hook, SYM(partSetAnimation), b_+118);
   CYC(b_+118, b_+120); A = 0xa5; // SND_BREAK_ROCK
-  CYC(b_+120, b_+123); playSound_b00_hook(gb); return; // jp
+  CYC(b_+120, b_+123); TAIL(playSound_b00); // jp
 
 state2:
   CYC(b_+123, b_+125); E = 0xe1; // Part.animParameter
@@ -134,5 +134,5 @@ state2:
   CYC(b_+141, b_+142); mem_wr(gb, DE, A);
 
 animate:
-  CYC(b_+142, b_+145); partAnimate_hook(gb); return; // jp
+  CYC(b_+142, b_+145); TAIL(partAnimate); // jp
 }

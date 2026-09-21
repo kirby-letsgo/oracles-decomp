@@ -213,7 +213,7 @@ afterCollisionCheck:
 rollerSound:
   CYC(b_+250, b_+252); mem_wr(gb, HL, 0x01);
   CYC(b_+252, b_+254); A = 0x82; // SND_ROLLER
-  CYC(b_+254, b_+257); playSound_b00_hook(gb); return; // jp
+  CYC(b_+254, b_+257); TAIL(playSound_b00); // jp
 
 // interactionCode7a@updateLinkPositionWhileRollerMoving / @squashLink: reached only by
 // one genuine call, from @state2's return address 0x41fb above; never separately hooked.

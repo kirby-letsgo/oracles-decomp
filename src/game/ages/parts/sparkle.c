@@ -98,7 +98,7 @@ counter1NonZero:
   CYC(b_+88, b_+89); mem_wr(gb, HL, A);
 
 animate:
-  CYC(b_+89, b_+92); partAnimate_hook(gb); return; // jp
+  CYC(b_+89, b_+92); TAIL(partAnimate); // jp
 
 state0:
   CYC(b_+92, b_+93); H = D;
@@ -135,5 +135,5 @@ var03_00:
   CYC(b_+134, b_+135); A = alu_dec8(gb, A);
   CYC(b_+135, b_+136); alu_add(gb, A);
   CYC(b_+136, b_+137); mem_wr(gb, DE, A);
-  CYC(b_+137, b_+140); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+137, b_+140); TAIL(objectSetVisible81); // jp
 }

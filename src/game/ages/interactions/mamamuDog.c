@@ -161,9 +161,9 @@ state1:
   CALL_C(b_+92, interBankCall_hook, 0x008a, b_+95);
   CALL_C(b_+95, interactionAnimate_hook, SYM(interactionAnimate), b_+98);
   CALL_C(b_+98, objectSetPriorityRelativeToLink_withTerrainEffects_hook, SYM(objectSetPriorityRelativeToLink_withTerrainEffects), b_+101);
-  CYC(b_+101, b_+104); objectAddToGrabbableObjectBuffer_hook(gb); return;
+  CYC(b_+101, b_+104); TAIL(objectAddToGrabbableObjectBuffer);
 delete:
-  CYC(b_+104, b_+107); interactionDelete_hook(gb); return;
+  CYC(b_+104, b_+107); TAIL(interactionDelete);
 state2:
   CYC(b_+107, b_+108); E = alu_inc8(gb, E);
   CYC(b_+108, b_+109); A = mem_rd(gb, DE);
@@ -185,7 +185,7 @@ substate0:
   CYC(b_+129, b_+131); A = 0x81;
   CYC(b_+131, b_+134); W8(wMenuDisabled) = A;
   CYC(b_+134, b_+137); W8(wDisableScreenTransitions) = A;
-  CYC(b_+137, b_+140); objectSetVisiblec1_hook(gb); return;
+  CYC(b_+137, b_+140); TAIL(objectSetVisiblec1);
 substate1:
   CYC(b_+140, b_+142); E = INTERACTION_BASE + OBJ_VAR39;
   CYC(b_+142, b_+143); A = mem_rd(gb, DE);
@@ -218,7 +218,7 @@ minor1:
   CYC(b_+179, b_+181); L = INTERACTION_BASE + OBJ_VAR39;
   CYC(b_+181, b_+182); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+182, b_+185); SET_BC(0x007f);
-  CYC(b_+185, b_+188); showText_hook(gb); return;
+  CYC(b_+185, b_+188); TAIL(showText);
 minor2:
   CYC(b_+188, b_+191); A = W8(wTextIsActive);
   CYC(b_+191, b_+192); alu_or(gb, A);

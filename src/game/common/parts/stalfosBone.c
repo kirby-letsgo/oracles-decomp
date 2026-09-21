@@ -56,7 +56,7 @@ state0:
   CALL_C(b_+28, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+31);
   CYC(b_+31, b_+33); E = 0xc9; // Part.angle
   CYC(b_+33, b_+34); mem_wr(gb, DE, A);
-  CYC(b_+34, b_+37); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+34, b_+37); TAIL(objectSetVisible81); // jp
 
 state1:
   CALL_C(b_+37, partCommon_checkTileCollisionOrOutOfBounds_hook, SYM(partCommon_checkTileCollisionOrOutOfBounds), b_+40);
@@ -68,7 +68,7 @@ state1:
   CYC(b_+48, b_+51);
 
 partDelete:
-  CYC(b_+51, b_+54); partDelete_hook(gb); return; // jp
+  CYC(b_+51, b_+54); TAIL(partDelete); // jp
 
 state2:
   CALL_C(b_+54, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+57);
@@ -81,7 +81,7 @@ state2:
   CYC(b_+70, b_+71); alu_rrca(gb);
   if (F & FC) { RET_TAKEN(b_+71); return; } // ret c
   CYC(b_+71, b_+72);
-  CYC(b_+72, b_+75); partAnimate_hook(gb); return; // jp
+  CYC(b_+72, b_+75); TAIL(partAnimate); // jp
 
 L_51db:
   if (F & FZ) { CYCT(b_+75, b_+77); goto partDelete; } // jr z
@@ -92,5 +92,5 @@ func_11_51dd:
   CYC(b_+79, b_+81); A = 0x02;
   CYC(b_+81, b_+82); mem_wr(gb, DE, A);
   CYC(b_+82, b_+83); alu_xor(gb, A);
-  CYC(b_+83, b_+86); partCommon_bounceWhenCollisionsEnabled_hook(gb); return; // jp
+  CYC(b_+83, b_+86); TAIL(partCommon_bounceWhenCollisionsEnabled); // jp
 }

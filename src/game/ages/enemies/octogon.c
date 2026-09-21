@@ -162,7 +162,7 @@ void enemyCode7d_hook(GB *gb) {
   CYC(b_+17, b_+18); A = mem_rd(gb, DE);
   CYC(b_+18, b_+19); alu_or(gb, A);
   if (!(F & FZ)) { CALL_C_CC(b_+19, ecom_killRelatedObj1_b0f_hook, SYM(ecom_killRelatedObj1_b0f), b_+22); } else { CYC(b_+19, b_+22); } // call nz
-  CYC(b_+22, b_+25); enemyBoss_dead_b0f_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(enemyBoss_dead_b0f); // jp
 
 justHit:
   CYC(b_+25, b_+27); A = OBJ_INVINCIBILITY_COUNTER;
@@ -263,7 +263,7 @@ void octogon_state_uninitialized_hook(GB *gb) {
   CYC(b_+7, b_+9); E = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
   CYC(b_+9, b_+11); A = 0x67; // ENEMYCOLLISION_OCTOGON_SHELL
   CYC(b_+11, b_+12); mem_wr(gb, DE, A);
-  CYC(b_+12, b_+15); ecom_setSpeedAndState8_b0f_hook(gb); return; // jp
+  CYC(b_+12, b_+15); TAIL(ecom_setSpeedAndState8_b0f); // jp
 
 notSubid2:
   CYC(b_+15, b_+17); A = 0x7d; // ENEMY_OCTOGON
@@ -356,11 +356,11 @@ subid0_0:
   CYC(b_+138, b_+139); A = mem_rd(gb, HL);
   CYC(b_+139, b_+141); E = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+141, b_+142); mem_wr(gb, DE, A);
-  CYC(b_+142, b_+145); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+142, b_+145); TAIL(enemySetAnimation); // jp
 
 subid0_1:
   CALL_C(b_+145, octogon_fixPositionAboveWater_hook, SYM(octogon_fixPositionAboveWater), b_+148);
-  CYC(b_+148, b_+151); octogon_loadNormalSubmergedAnimation_hook(gb); return; // jp
+  CYC(b_+148, b_+151); TAIL(octogon_loadNormalSubmergedAnimation); // jp
 
 subid1_0:
   CYC(b_+151, b_+152); H = D;
@@ -370,7 +370,7 @@ subid1_0:
   CALL_C(b_+158, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+161);
   CYC(b_+161, b_+163); B = 0x40;
   CALL_C(b_+163, clearMemory_hook, SYM(clearMemory), b_+166);
-  CYC(b_+166, b_+169); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+166, b_+169); TAIL(objectSetInvisible); // jp
 
 subid1_1:
   CYC(b_+169, b_+171); A = 0x01;
@@ -466,7 +466,7 @@ void octogon_subid0AboveWater_state8_hook(GB *gb) {
   CYC(b_+13, b_+14);
   CYC(b_+14, b_+16); mem_wr(gb, HL, 0x00);
   CYC(b_+16, b_+18); A = 0x2e; // MUS_BOSS
-  CYC(b_+18, b_+21); playSound_b00_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(playSound_b00); // jp
 }
 
 // Moving normally around the room
@@ -532,7 +532,7 @@ void octogon_subid0_pauseMovement_hook(GB *gb) {
   CYC(b_+11, b_+13); alu_and(gb, 0x07);
   if (!(F & FZ)) { CYCT(b_+13, b_+15); octogon_loadTargetPosition_hook(gb); return; } // jr nz
   CYC(b_+13, b_+15);
-  octogon_chooseRandomTargetPosition_hook(gb); return; // fallthrough
+  TAIL(octogon_chooseRandomTargetPosition); // fallthrough
 }
 
 void octogon_subid0AboveWater_stateA_hook(GB *gb) {
@@ -545,7 +545,7 @@ void octogon_chooseRandomTargetPosition_hook(GB *gb) {
   CALL_C(b_+0, getRandomNumber_hook, SYM(getRandomNumber), b_+3);
   CYC(b_+3, b_+5); alu_and(gb, 0x18);
   CYC(b_+5, b_+6); mem_wr(gb, HL, A);
-  octogon_loadTargetPosition_hook(gb); return; // fallthrough
+  TAIL(octogon_loadTargetPosition); // fallthrough
 }
 
 // @param hl Pointer to index for a table
@@ -586,7 +586,7 @@ void octogon_loadTargetPosition_hook(GB *gb) {
 void octogon_subid0AboveWater_stateB_hook(GB *gb) {
   BASE(octogon_subid0AboveWater_stateB);
   CYC(b_+0, b_+2); B = 0x06;
-  CYCT(b_+2, b_+4); octogon_subid0AboveWater_turningAround_hook(gb); return; // jr
+  CYCT(b_+2, b_+4); TAIL(octogon_subid0AboveWater_turningAround); // jr
 }
 
 void octogon_subid0AboveWater_stateF_hook(GB *gb) {
@@ -597,7 +597,7 @@ void octogon_subid0AboveWater_stateF_hook(GB *gb) {
 void octogon_subid0AboveWater_stateC_hook(GB *gb) {
   BASE(octogon_subid0AboveWater_stateC);
   CYC(b_+0, b_+2); B = 0x18;
-  octogon_subid0AboveWater_turningAround_hook(gb); return; // fallthrough
+  TAIL(octogon_subid0AboveWater_turningAround); // fallthrough
 }
 
 void octogon_subid0AboveWater_turningAround_hook(GB *gb) {
@@ -614,7 +614,7 @@ void octogon_subid0AboveWater_turningAround_hook(GB *gb) {
   CYC(b_+10, b_+12); alu_add(gb, 0x04);
   CYC(b_+12, b_+14); alu_and(gb, 0x0c);
   CYC(b_+14, b_+15); mem_wr(gb, HL, A);
-  CYC(b_+15, b_+18); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(enemySetAnimation); // jp
 }
 
 // About to fire projectile?
@@ -631,7 +631,7 @@ void octogon_subid0AboveWater_stateD_hook(GB *gb) {
   CYC(b_+10, b_+11); A = mem_rd(gb, HL);
   CYC(b_+11, b_+13); alu_add(gb, 0x02);
   CYC(b_+13, b_+14); mem_wr(gb, HL, A);
-  CYC(b_+14, b_+17); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+14, b_+17); TAIL(enemySetAnimation); // jp
 }
 
 // Firing projectile
@@ -648,14 +648,14 @@ void octogon_subid0AboveWater_stateE_hook(GB *gb) {
   CYC(b_+10, b_+11); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+11, b_+12); A = mem_rd(gb, HL);
   CALL_C(b_+12, enemySetAnimation_hook, SYM(enemySetAnimation), b_+15);
-  CYC(b_+15, b_+18); octogon_fireOctorokProjectile_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(octogon_fireOctorokProjectile); // jp
 }
 
 // Turning around after firing projectile?
 void octogon_subid0AboveWater_state10_hook(GB *gb) {
   BASE(octogon_subid0AboveWater_state10);
   CYC(b_+0, b_+2); B = 0x0c;
-  CYCT(b_+2, b_+4); octogon_subid0AboveWater_turningAround_hook(gb); return; // jr
+  CYCT(b_+2, b_+4); TAIL(octogon_subid0AboveWater_turningAround); // jr
 }
 
 // Delay before resuming normal movement
@@ -716,7 +716,7 @@ L_7722:
   CYC(b_+34, b_+36); mem_wr(gb, HL, 0x0a);
   CYC(b_+36, b_+38); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+38, b_+40); mem_wr(gb, HL, 60);
-  CYCT(b_+40, b_+42); octogon_loadNormalSubmergedAnimation_hook(gb); return; // jr
+  CYCT(b_+40, b_+42); TAIL(octogon_loadNormalSubmergedAnimation); // jr
 }
 
 // Waiting in place before moving again
@@ -724,12 +724,12 @@ void octogon_subid0BelowWater_state9_hook(GB *gb) {
   BASE(octogon_subid0BelowWater_state9);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, octogon_subid0_pauseMovement_hook, SYM(octogon_subid0AboveWater_stateA), SYM(octogon_animate));
-  octogon_animate_hook(gb); return; // fallthrough
+  TAIL(octogon_animate); // fallthrough
 }
 
 void octogon_animate_hook(GB *gb) {
   BASE(octogon_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // Delay before firing projectile
@@ -747,13 +747,13 @@ void octogon_subid0BelowWater_stateA_hook(GB *gb) {
   CYC(b_+11, b_+12); A = mem_rd(gb, HL);
   CYC(b_+12, b_+14); alu_xor(gb, 0x01);
   CYC(b_+14, b_+15); mem_wr(gb, HL, A);
-  CYC(b_+15, b_+18); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(enemySetAnimation); // jp
 
 beginFiring:
   CYC(b_+18, b_+20); mem_wr(gb, HL, 0x08);
   CYC(b_+20, b_+21); L = E;
   CYC(b_+21, b_+22); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = $0b
-  octogon_loadNormalSubmergedAnimation_hook(gb); return; // fallthrough
+  TAIL(octogon_loadNormalSubmergedAnimation); // fallthrough
 }
 
 void octogon_loadNormalSubmergedAnimation_hook(GB *gb) {
@@ -761,7 +761,7 @@ void octogon_loadNormalSubmergedAnimation_hook(GB *gb) {
   CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+2, b_+4); A = 0x12;
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);
-  CYC(b_+5, b_+8); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+5, b_+8); TAIL(enemySetAnimation); // jp
 }
 
 // Firing projectile
@@ -778,7 +778,7 @@ void octogon_subid0BelowWater_stateB_hook(GB *gb) {
   CYC(b_+9, b_+11); L = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+11, b_+13); A = 0x14;
   CYC(b_+13, b_+14); mem_wr(gb, HL, A);
-  CYC(b_+14, b_+17); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+14, b_+17); TAIL(enemySetAnimation); // jp
 
 fireProjectile:
   CYC(b_+17, b_+19); mem_wr(gb, HL, 60); // [counter1]
@@ -786,7 +786,7 @@ fireProjectile:
   CYC(b_+20, b_+21); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = $0c
   CYC(b_+21, b_+23); B = 0x48; // PART_OCTOGON_DEPTH_CHARGE
   CALL_C(b_+23, ecom_spawnProjectile_b0f_hook, SYM(ecom_spawnProjectile_b0f), b_+26);
-  CYCT(b_+26, b_+28); octogon_loadNormalSubmergedAnimation_hook(gb); return; // jr
+  CYCT(b_+26, b_+28); TAIL(octogon_loadNormalSubmergedAnimation); // jr
 }
 
 // Delay before moving again
@@ -800,7 +800,7 @@ void octogon_subid0BelowWater_stateC_hook(GB *gb) {
   CYC(b_+7, b_+9); mem_wr(gb, HL, 90);
   CYC(b_+9, b_+10); L = E;
   CYC(b_+10, b_+12); mem_wr(gb, HL, 0x08); // [state]
-  CYCT(b_+12, b_+14); octogon_animate_hook(gb); return; // jr
+  CYCT(b_+12, b_+14); TAIL(octogon_animate); // jr
 }
 
 // Just submerged into water
@@ -813,7 +813,7 @@ void octogon_subid0BelowWater_stateD_hook(GB *gb) {
   CYC(b_+4, b_+6); mem_wr(gb, HL, 30);
   CYC(b_+6, b_+7); L = E;
   CYC(b_+7, b_+9); mem_wr(gb, HL, 0x08); // [state]
-  CYCT(b_+9, b_+11); octogon_loadNormalSubmergedAnimation_hook(gb); return; // jr
+  CYCT(b_+9, b_+11); TAIL(octogon_loadNormalSubmergedAnimation); // jr
 }
 
 // Link is below water
@@ -881,7 +881,7 @@ void octogon_subid1_belowWater_state8_hook(GB *gb) {
   CYC(b_+43, b_+45); alu_and(gb, 0x0c);
   CYC(b_+45, b_+47); alu_add(gb, 0x02);
   CYC(b_+47, b_+48); mem_wr(gb, HL, A);
-  CYC(b_+48, b_+51); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+48, b_+51); TAIL(enemySetAnimation); // jp
 
 normalMovement:
   CYC(b_+51, b_+54); A = mem_rd(gb, wFrameCounter);
@@ -925,7 +925,7 @@ void octogon_updateMovementAndAnimation_hook(GB *gb) {
   CYC(b_+23, b_+25); A = 0x88; // SND_LINK_SWIM
   if (!(F & FZ)) { CYCT(b_+25, b_+28); playSound_b00_hook(gb); return; } // jp nz
   CYC(b_+25, b_+28);
-  octogon_doSplashAnimation_hook(gb); return; // fallthrough
+  TAIL(octogon_doSplashAnimation); // fallthrough
 }
 
 // Above-water only (subid 0)
@@ -943,7 +943,7 @@ void octogon_doSplashAnimation_hook(GB *gb) {
   CYC(b_+14, b_+16); alu_and(gb, 0x0c);
   CYC(b_+16, b_+18); L = INTERACTION_BASE + OBJ_DIRECTION;
   CYC(b_+18, b_+19); mem_wr(gb, HL, A);
-  CYC(b_+19, b_+22); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+19, b_+22); TAIL(objectCopyPosition); // jp
 }
 
 // Waiting in place until counter1 reaches 0, then will charge at Link.
@@ -987,7 +987,7 @@ L_7863:
   CYC(b_+47, b_+48); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+48, b_+50); alu_and(gb, 0x0c);
   CYC(b_+50, b_+51); mem_wr(gb, HL, A);
-  CYC(b_+51, b_+54); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+51, b_+54); TAIL(enemySetAnimation); // jp
 }
 
 // Waiting for a split second before charging
@@ -1006,7 +1006,7 @@ void octogon_subid1_belowWater_stateA_hook(GB *gb) {
   CYC(b_+14, b_+16); alu_and(gb, 0x18);
   CYC(b_+16, b_+17); alu_rrca(gb);
   CYC(b_+17, b_+18); mem_wr(gb, HL, A);
-  CYC(b_+18, b_+21); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(enemySetAnimation); // jp
 }
 
 // Delay before firing bubble
@@ -1030,7 +1030,7 @@ void octogon_subid1_belowWater_stateB_hook(GB *gb) {
   CALL_C(b_+22, octogon_initializeProjectile_hook, SYM(octogon_initializeProjectile), b_+25);
 
 L_7898:
-  CYC(b_+25, b_+28); octogon_doSplashAnimation_hook(gb); return; // jp
+  CYC(b_+25, b_+28); TAIL(octogon_doSplashAnimation); // jp
 }
 
 // Delay after firing bubble
@@ -1046,7 +1046,7 @@ void octogon_subid1_belowWater_stateC_hook(GB *gb) {
   CYC(b_+9, b_+10); A = mem_rd(gb, HL);
   CYC(b_+10, b_+12); alu_and(gb, 0x0c);
   CYC(b_+12, b_+13); mem_wr(gb, HL, A);
-  CYC(b_+13, b_+16); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+13, b_+16); TAIL(enemySetAnimation); // jp
 }
 
 // Octogon is above water, but Link is below water
@@ -1069,7 +1069,7 @@ state8:
   CYC(b_+12, b_+13);
   CYC(b_+13, b_+15); mem_wr(gb, HL, 120);
   CYC(b_+15, b_+17); B = 0x48; // PART_OCTOGON_DEPTH_CHARGE
-  CYC(b_+17, b_+20); ecom_spawnProjectile_b0f_hook(gb); return; // jp
+  CYC(b_+17, b_+20); TAIL(ecom_spawnProjectile_b0f); // jp
 
 state9:
   CALL_C(b_+20, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+23);
@@ -1084,7 +1084,7 @@ state9:
   CYC(b_+34, b_+36); A = 0x8f; // SND_ENEMY_JUMP
   CALL_C(b_+36, playSound_b00_hook, SYM(playSound_b00), b_+39);
   CYC(b_+39, b_+42); SET_BC(0x0208);
-  CYC(b_+42, b_+45); enemyBoss_spawnShadow_b0f_hook(gb); return; // jp
+  CYC(b_+42, b_+45); TAIL(enemyBoss_spawnShadow_b0f); // jp
 
 stateA:
   CYC(b_+45, b_+46); H = D;
@@ -1109,7 +1109,7 @@ stateA:
   CYC(b_+73, b_+75); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+75, b_+77); mem_wr(gb, HL, 60);
   CALL_C(b_+77, objectSetInvisible_hook, SYM(objectSetInvisible), b_+80);
-  CYC(b_+80, b_+83); ecom_killRelatedObj1_b0f_hook(gb); return; // jp
+  CYC(b_+80, b_+83); TAIL(ecom_killRelatedObj1_b0f); // jp
 }
 
 // Invisible collision box for the shell
@@ -1160,7 +1160,7 @@ void octogon_subid0_submergeIntoWater_hook(GB *gb) {
   CYC(b_+21, b_+23); L = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+23, b_+25); A = 0x15;
   CYC(b_+25, b_+26); mem_wr(gb, HL, A);
-  CYC(b_+26, b_+29); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+26, b_+29); TAIL(enemySetAnimation); // jp
 }
 
 void octogon_beginRisingAboveWater_hook(GB *gb) {
@@ -1177,7 +1177,7 @@ void octogon_beginRisingAboveWater_hook(GB *gb) {
   CYC(b_+17, b_+19); L = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+19, b_+21); A = 0x10;
   CYC(b_+21, b_+22); mem_wr(gb, HL, A);
-  CYC(b_+22, b_+25); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(enemySetAnimation); // jp
 }
 
 // Takes current position, fixes it to the closest valid spot above water, and decides
@@ -1230,7 +1230,7 @@ L_798f:
   CYC(b_+59, b_+61); alu_bit(gb, 7, A);
   if (!(F & FZ)) { CYCT(b_+61, b_+64); octogon_chooseRandomTargetPosition_hook(gb); return; } // jp nz
   CYC(b_+61, b_+64);
-  octogon_loadTargetPosition_hook(gb); return; // jp
+  TAIL(octogon_loadTargetPosition); // jp
 }
 
 void octogon_fireOctorokProjectile_hook(GB *gb) {
@@ -1240,7 +1240,7 @@ void octogon_fireOctorokProjectile_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } // ret nz
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+6); mem_wr(gb, HL, 0x18); // PART_OCTOROK_PROJECTILE
-  octogon_initializeProjectile_hook(gb); return; // fallthrough
+  TAIL(octogon_initializeProjectile); // fallthrough
 }
 
 // @param h Projectile (could be PART_OCTOROK_PROJECTILE or PART_OCTOGON_BUBBLE)
@@ -1265,7 +1265,7 @@ void octogon_initializeProjectile_hook(GB *gb) {
   CYC(b_+20, b_+21); SET_HL(pop_effect(gb));
   CALL_C(b_+21, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+24);
   CYC(b_+24, b_+26); A = 0xa6; // SND_STRIKE
-  CYC(b_+26, b_+29); playSound_b00_hook(gb); return; // jp
+  CYC(b_+26, b_+29); TAIL(playSound_b00); // jp
 }
 
 void octogon_decVar36IfNonzero_hook(GB *gb) {

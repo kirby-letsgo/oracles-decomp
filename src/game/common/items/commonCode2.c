@@ -50,8 +50,7 @@ void tryBreakTileWithSword_calculateLevel_hook(GB *gb) {
   CYC(b_+4, b_+6); alu_cp(gb, 0x01);
   if (F & FZ) {
     CYCT(b_+6, b_+8);
-    tryBreakTileWithSword_hook(gb);
-    return;
+    TAIL(tryBreakTileWithSword);
   }
   CYC(b_+6, b_+8);
   CYC(b_+8, b_+10); A = 0x02;

@@ -138,7 +138,7 @@ sawLink:
   CYC(b_+140, b_+142); mem_wr(gb, HL, 0xff);
 
 delete:
-  CYC(b_+142, b_+145); partDelete_hook(gb); return; // jp
+  CYC(b_+142, b_+145); TAIL(partDelete); // jp
 
 subid1_state0:
   CYC(b_+145, b_+146); A = alu_inc8(gb, A);
@@ -199,7 +199,7 @@ initSpeed:
   CYC(b_+213, b_+214); C = mem_rd(gb, HL);
   CYC(b_+214, b_+216); B = 0x64; // SPEED_280
   CYC(b_+216, b_+218); A = 0x04;
-  CYC(b_+218, b_+221); objectSetComponentSpeedByScaledVelocity_hook(gb); return; // jp
+  CYC(b_+218, b_+221); TAIL(objectSetComponentSpeedByScaledVelocity); // jp
 }
 
 void detectionHelper_spawnCollisionHelper_hook(GB *gb) {

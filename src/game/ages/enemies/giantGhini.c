@@ -57,7 +57,7 @@ void enemyCode70_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+5, b_+7); goto normalStatus; } // jr nz
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+10);
-  enemyBoss_dead_b0f_hook(gb); return; // jp
+  TAIL(enemyBoss_dead_b0f); // jp
 
 normalStatus:
   CALL_C(b_+10, giantGhini_updateZPos_hook, SYM(giantGhini_updateZPos), b_+13);
@@ -93,7 +93,7 @@ void giantGhini_state_uninitialized_hook(GB *gb) {
   CYC(b_+28, b_+30); L = ENEMY_BASE + OBJ_VAR33;
   CYC(b_+30, b_+32); mem_wr(gb, HL, 0x10);
   CYC(b_+32, b_+35);
-  giantGhini_spawnChildren_hook(gb); return; // jp
+  TAIL(giantGhini_spawnChildren); // jp
 }
 
 void giantGhini_state_stub_hook(GB *gb) {
@@ -133,7 +133,7 @@ substate0:
   CYC(b_+28, b_+30); A = 0x1e;
   CYC(b_+30, b_+31); mem_wr(gb, DE, A); // [counter2]
   CYC(b_+31, b_+34);
-  ecom_incSubstate_b0f_hook(gb); return; // jp
+  TAIL(ecom_incSubstate_b0f); // jp
 
 substate1:
   CALL_C(b_+34, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+37);
@@ -146,7 +146,7 @@ substate1:
   CYC(b_+46, b_+48); C = 0x0c;
   CALL_C(b_+48, enemyBoss_spawnShadow_b0f_hook, SYM(enemyBoss_spawnShadow_b0f), b_+51);
   CYC(b_+51, b_+54);
-  ecom_incSubstate_b0f_hook(gb); return; // jp
+  TAIL(ecom_incSubstate_b0f); // jp
 
 substate2:
   // Flicker visibility
@@ -161,7 +161,7 @@ substate2:
   // Finally begin the fight
   CALL_C(b_+64, enemyBoss_beginMiniboss_b0f_hook, SYM(enemyBoss_beginMiniboss_b0f), b_+67);
   CALL_C(b_+67, objectSetVisible80_hook, SYM(objectSetVisible80), SYM(giantGhini_gotoState9));
-  giantGhini_gotoState9_hook(gb); return; // fallthrough
+  TAIL(giantGhini_gotoState9); // fallthrough
 }
 
 void giantGhini_gotoState9_hook(GB *gb) {
@@ -181,7 +181,7 @@ void giantGhini_gotoState9_hook(GB *gb) {
   CYC(b_+21, b_+23); mem_wr(gb, HL, 0x02);
   CYC(b_+23, b_+25); L = ENEMY_BASE + OBJ_VAR32;
   CYC(b_+25, b_+27); mem_wr(gb, HL, 0x00);
-  giantGhini_setChildRespawnTimer_hook(gb); return; // fallthrough
+  TAIL(giantGhini_setChildRespawnTimer); // fallthrough
 }
 
 void giantGhini_setChildRespawnTimer_hook(GB *gb) {
@@ -229,7 +229,7 @@ skipNudge:
   CYC(b_+40, b_+42); alu_and(gb, 0x03);
   if (!(F & FZ)) {
     CYCT(b_+42, b_+45);
-    giantGhini_spawnChildren_hook(gb); return; // jp nz
+    TAIL(giantGhini_spawnChildren); // jp nz
   }
   CYC(b_+42, b_+45);
 
@@ -241,7 +241,7 @@ beginCharge:
   CYC(b_+55, b_+57); mem_wr(gb, HL, 0x96);
   CYC(b_+57, b_+59); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+59, b_+61); mem_wr(gb, HL, 0x05); // SPEED_20
-  giantGhini_updateChargeTargetPosition_hook(gb); return; // fallthrough
+  TAIL(giantGhini_updateChargeTargetPosition); // fallthrough
 }
 
 void giantGhini_updateChargeTargetPosition_hook(GB *gb) {
@@ -408,5 +408,5 @@ haveAngle:
   CYC(b_+43, b_+45); alu_add(gb, 0x50); // (SCREEN_WIDTH/2)<<4
   CYC(b_+45, b_+46); C = A;
   CYC(b_+46, b_+49);
-  objectGetRelativeAngle_hook(gb); return; // jp
+  TAIL(objectGetRelativeAngle); // jp
 }

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Generate src/game/syms.h and src/game/syms.c: the per-game address tables behind SYM()/RAMSYM().
 
-usage: tools/gen_syms.py [ages.sym] [seasons.sym]
+usage: tools/gen_syms.py [ages.sym] [seasons.sym] [ages.gbc] [seasons.gbc]
 Reads src/hooks/syms_used.txt (written by tools/symbolize.py: id, label, Ages bank:addr) and
 src/hooks/ram_syms.txt (written by tools/gen_ram.py). A label that a game does not have gets the
 poison value 0xffffffff there; a hook that reaches it would burn at address 0xffff in bank 0xff.
-Labels with several copies in Ages are paired with Seasons copies by bank order.
+Labels with several copies in Ages are paired with Seasons copies by content (symfiles.pair_instances).
 """
 import os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -18,18 +18,14 @@ POISON = 0xffffffff
 
 rows = []
 missing = []
+from symfiles import pair_instances
+pairs = pair_instances(sys.argv[3] if len(sys.argv) > 3 else "roms/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc", ages_sym,
+                       sys.argv[4] if len(sys.argv) > 4 else "roms/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc", seasons_sym)
 for line in open('src/hooks/syms_used.txt'):
     sid, name, ba = line.split()
     bank, addr = int(ba[:2], 16), int(ba[3:], 16)
     parent = name.split('@')[0]
-    a_inst = ages.get(parent, [])
-    rank = [b for b, a in a_inst].index(bank) if bank in [b for b, a in a_inst] else 0
-    s_inst = seasons.get(name, [])
-    if re.match(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)', parent): s_inst = []
-    if len(s_inst) == len(a_inst) and s_inst: s = s_inst[rank]
-    elif len(s_inst) == 1: s = s_inst[0]
-    elif s_inst and len(s_inst) == len(seasons.get(parent, [])) and rank < len(s_inst): s = s_inst[rank]
-    else: s = None
+    s = None if re.match(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)', parent) else pairs.get((name, bank, addr))
     if s is None: missing.append(sid)
     rows.append((sid, (bank << 16) | addr, POISON if s is None else (s[0] << 16) | s[1]))
 

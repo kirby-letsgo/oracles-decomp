@@ -39,7 +39,7 @@ void interactionCodeb5__state0_hook(GB *gb) {
   CYC(b_+30, b_+32); E = 0x46;
   CYC(b_+32, b_+33); mem_wr(gb, DE, A);
   CYC(b_+33, b_+36); SET_BC((SYM(interactionCodea1__state9) + 11));
-  CYC(b_+36, b_+39); createEnergySwirlGoingIn_hook(gb); return;
+  CYC(b_+36, b_+39); TAIL(createEnergySwirlGoingIn);
 }
 
 void interactionCodeb5__substate0_hook(GB *gb) {
@@ -78,7 +78,7 @@ after_force_state:
   CYC(b_+96, b_+97);
   CALL_C(b_+97, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+100);
   CYC(b_+100, b_+102); A = 3;
-  CYC(b_+102, b_+106); fadeinFromWhiteWithDelay_hook(gb); return;
+  CYC(b_+102, b_+106); TAIL(fadeinFromWhiteWithDelay);
 }
 
 void interactionCodeb5__substate2_hook(GB *gb) {
@@ -92,7 +92,7 @@ void interactionCodeb5__substate2_hook(GB *gb) {
   CYC(b_+111, b_+114); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+114, b_+117); mem_wr(gb, wMenuDisabled, A);
   CYC(b_+117, b_+120); mem_wr(gb, wMenuUnionEnd, A);
-  CYC(b_+120, b_+123); interactionDelete_hook(gb); return;
+  CYC(b_+120, b_+123); TAIL(interactionDelete);
 }
 
 void interactionCodeb5__state1_hook(GB *gb) {

@@ -106,7 +106,7 @@ state1:
   CYC(b_+82, b_+85); gashaTree_func_4fb2_hook(gb);
   if (F & FZ) { RET_TAKEN(b_+85); return; } // ret z
   CYC(b_+85, b_+86);
-  CYC(b_+86, b_+89); partDelete_hook(gb); return; // jp
+  CYC(b_+86, b_+89); TAIL(partDelete); // jp
 
 state2:
   CYC(b_+99, b_+102); gashaTree_func_4fb2_hook(gb);
@@ -143,7 +143,7 @@ substate0:
   CYC(b_+138, b_+140); E = 0xc9; // Part.angle
   CYC(b_+140, b_+141); mem_wr(gb, DE, A);
   CYC(b_+141, b_+144); SET_BC(0xfec0); // -0x140
-  CYC(b_+144, b_+147); objectSetSpeedZ_hook(gb); return; // jp
+  CYC(b_+144, b_+147); TAIL(objectSetSpeedZ); // jp
 
 substate1:
   CYC(b_+147, b_+149); C = 0x18;
@@ -153,7 +153,7 @@ substate1:
   CALL_C(b_+154, objectApplySpeed_hook, SYM(objectApplySpeed), b_+157);
   CYC(b_+157, b_+159); A = 0x00;
   CALL_C(b_+159, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+162);
-  CYC(b_+162, b_+165); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+162, b_+165); TAIL(objectCopyPosition); // jp
 
 L_4ffe:
   CYC(b_+165, b_+167); E = 0xc5; // Part.substate
@@ -166,7 +166,7 @@ substate2:
   if (!(F & FC)) { CYCT(b_+175, b_+177); func_5010_hook(gb); return; } // jr nc
   CYC(b_+175, b_+177);
   CALL_C(b_+177, func_5010_hook, SYM(func_5010), b_+180);
-  CYC(b_+180, b_+183); partDelete_hook(gb); return; // jp
+  CYC(b_+180, b_+183); TAIL(partDelete); // jp
 }
 
 void gashaTree_func_4fb2_hook(GB *gb) {
@@ -191,5 +191,5 @@ void func_5010_hook(GB *gb) {
   }
   CYC(b_+6, b_+8); A = 0x00;
   CALL_C(b_+8, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+11);
-  CYC(b_+11, b_+14); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+11, b_+14); TAIL(objectCopyPosition); // jp
 }

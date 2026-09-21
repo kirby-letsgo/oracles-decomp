@@ -130,11 +130,11 @@ void updateTextbox__textOption_hook(GB *gb) {
   CYC(b_+91, b_+92); A = mem_rd(gb, DE);
   CYC(b_+92, b_+93); push_effect(gb, b_+93);
   do { uint16_t jt_ = (textbox_jump_table(gb));
-    if (jt_ == SYM(textOptionCode)) { textOptionCode_hook(gb); return; }
-    else if (jt_ == SYM(textOptionCode__state01)) { textOptionCode__state01_hook(gb); return; }
-    else if (jt_ == SYM(textOptionCode__state02)) { textOptionCode__state02_hook(gb); return; }
-    else if (jt_ == SYM(textOptionCode__state03)) { textOptionCode__state03_hook(gb); return; }
-    else if (jt_ == SYM(textOptionCode__state04)) { textOptionCode__state04_hook(gb); return; }
+    if (jt_ == SYM(textOptionCode) && hook_enabled_at(gb, SYM(textOptionCode))) { textOptionCode_hook(gb); return; }
+    else if (jt_ == SYM(textOptionCode__state01) && hook_enabled_at(gb, SYM(textOptionCode__state01))) { textOptionCode__state01_hook(gb); return; }
+    else if (jt_ == SYM(textOptionCode__state02) && hook_enabled_at(gb, SYM(textOptionCode__state02))) { textOptionCode__state02_hook(gb); return; }
+    else if (jt_ == SYM(textOptionCode__state03) && hook_enabled_at(gb, SYM(textOptionCode__state03))) { textOptionCode__state03_hook(gb); return; }
+    else if (jt_ == SYM(textOptionCode__state04) && hook_enabled_at(gb, SYM(textOptionCode__state04))) { textOptionCode__state04_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -145,14 +145,14 @@ void updateTextbox__inventoryText_hook(GB *gb) {
   CYC(b_+103, b_+104); A = mem_rd(gb, DE);
   CYC(b_+104, b_+105); push_effect(gb, b_+105);
   do { uint16_t jt_ = (textbox_jump_table(gb));
-    if (jt_ == SYM(inventoryTextCode)) { inventoryTextCode_hook(gb); return; }
-    else if (jt_ == SYM(inventoryTextCode__state01)) { inventoryTextCode__state01_hook(gb); return; }
-    else if (jt_ == SYM(inventoryTextCode__state02)) { inventoryTextCode__state02_hook(gb); return; }
-    else if (jt_ == SYM(inventoryTextCode__state03)) { inventoryTextCode__state03_hook(gb); return; }
-    else if (jt_ == SYM(inventoryTextCode__state04)) { inventoryTextCode__state04_hook(gb); return; }
-    else if (jt_ == SYM(inventoryTextCode__state05)) { inventoryTextCode__state05_hook(gb); return; }
-    else if (jt_ == SYM(inventoryTextCode__state06)) { inventoryTextCode__state06_hook(gb); return; }
-    else if (jt_ == SYM(inventoryTextCode__state07)) { inventoryTextCode__state07_hook(gb); return; }
+    if (jt_ == SYM(inventoryTextCode) && hook_enabled_at(gb, SYM(inventoryTextCode))) { inventoryTextCode_hook(gb); return; }
+    else if (jt_ == SYM(inventoryTextCode__state01) && hook_enabled_at(gb, SYM(inventoryTextCode__state01))) { inventoryTextCode__state01_hook(gb); return; }
+    else if (jt_ == SYM(inventoryTextCode__state02) && hook_enabled_at(gb, SYM(inventoryTextCode__state02))) { inventoryTextCode__state02_hook(gb); return; }
+    else if (jt_ == SYM(inventoryTextCode__state03) && hook_enabled_at(gb, SYM(inventoryTextCode__state03))) { inventoryTextCode__state03_hook(gb); return; }
+    else if (jt_ == SYM(inventoryTextCode__state04) && hook_enabled_at(gb, SYM(inventoryTextCode__state04))) { inventoryTextCode__state04_hook(gb); return; }
+    else if (jt_ == SYM(inventoryTextCode__state05) && hook_enabled_at(gb, SYM(inventoryTextCode__state05))) { inventoryTextCode__state05_hook(gb); return; }
+    else if (jt_ == SYM(inventoryTextCode__state06) && hook_enabled_at(gb, SYM(inventoryTextCode__state06))) { inventoryTextCode__state06_hook(gb); return; }
+    else if (jt_ == SYM(inventoryTextCode__state07) && hook_enabled_at(gb, SYM(inventoryTextCode__state07))) { inventoryTextCode__state07_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -504,8 +504,7 @@ void textOptionCode__state02_hook(GB *gb) {
   CYC(b_+33, b_+35); alu_and(gb, 0x03);
   if (F & FZ) {
     CYCT(b_+35, b_+38);
-    textOptionCode_checkDirectionButtons_hook(gb);
-    return;
+    TAIL(textOptionCode_checkDirectionButtons);
   }
   CYC(b_+35, b_+38);
   CALL_C(b_+38, textOptionCode_checkBButton_hook, SYM(textOptionCode_checkBButton), b_+41);
@@ -550,8 +549,7 @@ void textOptionCode__state03_hook(GB *gb) {
       CYC(b_+92, b_+95); mem_wr(gb, wTextIndexL, A);
       CALL_C(b_+95, checkInitialTextCommands_hook, SYM(checkInitialTextCommands), b_+98);
       CYC(b_+98, b_+101);
-      func_53dd_hook(gb);
-      return;
+      TAIL(func_53dd);
     }
   }
   CYC(b_+101, b_+103); mem_wr(gb, HL, mem_rd(gb, HL) | 0x08);
@@ -633,8 +631,7 @@ void inventoryTextCode_hook(GB *gb) {
   CYC(b_+48, b_+49); A = alu_inc8(gb, A);
   if (F & FZ) {
     CYCT(b_+49, b_+51);
-    inventoryTextCode__state00__stopText_hook(gb);
-    return;
+    TAIL(inventoryTextCode__state00__stopText);
   }
   CYC(b_+49, b_+51);
 check_inventory_text_status:
@@ -643,8 +640,7 @@ check_inventory_text_status:
   CYC(b_+54, b_+55); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+55, b_+57);
-    inventoryTextCode__state00__end_hook(gb);
-    return;
+    TAIL(inventoryTextCode__state00__end);
   }
   CYC(b_+55, b_+57);
   inventoryTextCode__state00__stopText_hook(gb);
@@ -689,22 +685,19 @@ void inventoryTextCode__state02_hook(GB *gb) {
     CYC(b_+88, b_+90); alu_cp(gb, 0x10);
     if (!(F & FC)) {
       CYCT(b_+90, b_+92);
-      inventoryTextCode__drawCharacter_hook(gb);
-      return;
+      TAIL(inventoryTextCode__drawCharacter);
     }
     CYC(b_+90, b_+92);
     CYC(b_+92, b_+94); alu_cp(gb, 0x01);
     if (F & FZ) {
       CYCT(b_+94, b_+96);
-      inventoryTextCode__drawSpace_hook(gb);
-      return;
+      TAIL(inventoryTextCode__drawSpace);
     }
     CYC(b_+94, b_+96);
     CALL_C(b_+96, handleTextControlCodeWithSpecialCase_hook, SYM(handleTextControlCodeWithSpecialCase), b_+99);
     if (F & FZ) {
       CYCT(b_+99, b_+101);
-      inventoryTextCode__saveTextAddressAndDmaTextGfxBuffer_hook(gb);
-      return;
+      TAIL(inventoryTextCode__saveTextAddressAndDmaTextGfxBuffer);
     }
     CYC(b_+99, b_+101);
     CYC(b_+101, b_+104); A = mem_rd(gb, w7TextStatus);
@@ -747,8 +740,7 @@ void inventoryTextCode__state03_hook(GB *gb) {
   CYC(b_+140, b_+141); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) {
     CYCT(b_+141, b_+143);
-    inventoryTextCode__insertSpace_hook(gb);
-    return;
+    TAIL(inventoryTextCode__insertSpace);
   }
   CYC(b_+141, b_+143);
   CYC(b_+143, b_+144); L = E;
@@ -811,8 +803,7 @@ void inventoryTextCode__state04_hook(GB *gb) {
     CYC(b_+194, b_+196); alu_cp(gb, 0x10);
     if (!(F & FC)) {
       CYCT(b_+196, b_+198);
-      inventoryTextCode__drawCharacter_hook(gb);
-      return;
+      TAIL(inventoryTextCode__drawCharacter);
     }
     CYC(b_+196, b_+198);
     CYC(b_+198, b_+200); alu_cp(gb, 0x01);
@@ -833,8 +824,7 @@ void inventoryTextCode__state04_hook(GB *gb) {
       CYC(b_+220, b_+221); alu_or(gb, A);
       if (!(F & FZ)) {
         CYCT(b_+221, b_+223);
-        inventoryTextCode__drawSpaceWithoutSavingTextAddress_hook(gb);
-        return;
+        TAIL(inventoryTextCode__drawSpaceWithoutSavingTextAddress);
       }
       CYC(b_+221, b_+223);
       CYC(b_+223, b_+224); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
@@ -845,8 +835,7 @@ void inventoryTextCode__state04_hook(GB *gb) {
     CALL_C(b_+225, handleTextControlCodeWithSpecialCase_hook, SYM(handleTextControlCodeWithSpecialCase), b_+228);
     if (F & FZ) {
       CYCT(b_+228, b_+230);
-      inventoryTextCode__saveTextAddressAndDmaTextGfxBuffer_hook(gb);
-      return;
+      TAIL(inventoryTextCode__saveTextAddressAndDmaTextGfxBuffer);
     }
     CYC(b_+228, b_+230);
     CYC(b_+230, b_+232);
@@ -863,8 +852,7 @@ void inventoryTextCode__state05_hook(GB *gb) {
   CYC(b_+237, b_+238); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) {
     CYCT(b_+238, b_+240);
-    inventoryTextCode__insertSpace_hook(gb);
-    return;
+    TAIL(inventoryTextCode__insertSpace);
   }
   CYC(b_+238, b_+240);
   CYC(b_+240, b_+241); L = alu_dec8(gb, L);
@@ -1362,14 +1350,14 @@ static void text_cc_c(GB *gb) {
   CYC(b_+5, b_+15);
   CYC(b_+15, b_+16); push_effect(gb, b_+16);
   do { uint16_t jt_ = (textbox_jump_table(gb));
-    if (jt_ == SYM(textControlCodeC_0)) { textControlCodeC_0_hook(gb); return; }
-    else if (jt_ == SYM(textControlCodeC_1)) { textControlCodeC_1_hook(gb); return; }
-    else if (jt_ == SYM(textControlCodeC_2)) { textControlCodeC_2_hook(gb); return; }
-    else if (jt_ == SYM(textControlCodeC_3)) { textControlCodeC_3_hook(gb); return; }
-    else if (jt_ == SYM(textControlCodeC_ret)) { textControlCodeC_ret_hook(gb); return; }
-    else if (jt_ == SYM(textControlCodeC_5)) { textControlCodeC_5_hook(gb); return; }
-    else if (jt_ == SYM(textControlCodeC_6)) { textControlCodeC_6_hook(gb); return; }
-    else if (jt_ == SYM(textControlCodeC_7)) { textControlCodeC_7_hook(gb); return; }
+    if (jt_ == SYM(textControlCodeC_0) && hook_enabled_at(gb, SYM(textControlCodeC_0))) { textControlCodeC_0_hook(gb); return; }
+    else if (jt_ == SYM(textControlCodeC_1) && hook_enabled_at(gb, SYM(textControlCodeC_1))) { textControlCodeC_1_hook(gb); return; }
+    else if (jt_ == SYM(textControlCodeC_2) && hook_enabled_at(gb, SYM(textControlCodeC_2))) { textControlCodeC_2_hook(gb); return; }
+    else if (jt_ == SYM(textControlCodeC_3) && hook_enabled_at(gb, SYM(textControlCodeC_3))) { textControlCodeC_3_hook(gb); return; }
+    else if (jt_ == SYM(textControlCodeC_ret) && hook_enabled_at(gb, SYM(textControlCodeC_ret))) { textControlCodeC_ret_hook(gb); return; }
+    else if (jt_ == SYM(textControlCodeC_5) && hook_enabled_at(gb, SYM(textControlCodeC_5))) { textControlCodeC_5_hook(gb); return; }
+    else if (jt_ == SYM(textControlCodeC_6) && hook_enabled_at(gb, SYM(textControlCodeC_6))) { textControlCodeC_6_hook(gb); return; }
+    else if (jt_ == SYM(textControlCodeC_7) && hook_enabled_at(gb, SYM(textControlCodeC_7))) { textControlCodeC_7_hook(gb); return; }
     else { HANDOFF(jt_); }
   } while (0);
 }

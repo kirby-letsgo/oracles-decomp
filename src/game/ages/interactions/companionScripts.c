@@ -89,7 +89,7 @@ static void companionScripts_restrictTail(GB *gb) {
   CYC(b_+26, b_+27); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+27, b_+28); B = mem_rd(gb, HL);
   CYC(b_+28, b_+29); C = A;
-  CYC(b_+29, b_+32); showText_hook(gb); return; // jp
+  CYC(b_+29, b_+32); TAIL(showText); // jp
 }
 
 void companionScript_restrictHigherX_hook(GB *gb) {
@@ -132,12 +132,12 @@ void companionScript_restrictHigherY_hook(GB *gb) {
 
 void companionScript_deleteSelf_hook(GB *gb) {
   BASE(companionScript_deleteSelf);
-  CYC(b_+0, b_+3); interactionDelete_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(interactionDelete); // jp
 }
 
 void companionScript_delete_hook(GB *gb) {
   BASE(companionScript_delete);
-  CYC(b_+0, b_+3); interactionDelete_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(interactionDelete); // jp
 }
 
 // Delete self if game is completed; otherwise, stay in state 0 until Link mounts the companion.
@@ -173,7 +173,7 @@ void companionScript_runScript_hook(GB *gb) {
   if (!(F & FC)) { RET_TAKEN(b_+3); return; } // ret nc
   CYC(b_+3, b_+4);
   CALL_C(b_+4, setStatusBarNeedsRefreshBit1_hook, SYM(setStatusBarNeedsRefreshBit1), SYM(companionScript_delete));
-  companionScript_delete_hook(gb); return;
+  TAIL(companionScript_delete);
 }
 
 void companionScript_subid00_state1_hook(GB *gb) {
@@ -192,7 +192,7 @@ void companionScript_subid00_state1_hook(GB *gb) {
   CYC(b_+12, b_+15); A = W8(w1Companion_xh);
   CYC(b_+15, b_+17); alu_xor(gb, 0x02);
   CYC(b_+17, b_+20); W8(w1Companion_xh) = A;
-  companionScript_runScript_hook(gb); return;
+  TAIL(companionScript_runScript);
 }
 
 void companionScript_subid01_hook(GB *gb) {
@@ -202,7 +202,7 @@ void companionScript_subid01_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   uint16_t target = companionScripts_jump_table(gb);
   if (target == SYM(companionScript_restrictHigherX)) { companionScript_restrictHigherX_hook(gb); return; }
-  companionScript_genericState0_hook(gb); return;
+  TAIL(companionScript_genericState0);
 }
 
 void companionScript_subid02_hook(GB *gb) {
@@ -212,7 +212,7 @@ void companionScript_subid02_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   uint16_t target = companionScripts_jump_table(gb);
   if (target == SYM(companionScript_restrictLowerY)) { companionScript_restrictLowerY_hook(gb); return; }
-  companionScript_genericState0_hook(gb); return;
+  TAIL(companionScript_genericState0);
 }
 
 void companionScript_subid04_hook(GB *gb) {
@@ -222,7 +222,7 @@ void companionScript_subid04_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   uint16_t target = companionScripts_jump_table(gb);
   if (target == SYM(companionScript_restrictHigherY)) { companionScript_restrictHigherY_hook(gb); return; }
-  companionScript_genericState0_hook(gb); return;
+  TAIL(companionScript_genericState0);
 }
 
 void companionScript_subid05_hook(GB *gb) {
@@ -232,7 +232,7 @@ void companionScript_subid05_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   uint16_t target = companionScripts_jump_table(gb);
   if (target == SYM(companionScript_restrictLowerX)) { companionScript_restrictLowerX_hook(gb); return; }
-  companionScript_genericState0_hook(gb); return;
+  TAIL(companionScript_genericState0);
 }
 
 void companionScript_subid00_hook(GB *gb) {
@@ -261,7 +261,7 @@ void companionScript_subid00_hook(GB *gb) {
   CYC(b_+37, b_+40); W8(wDisableScreenTransitions) = A;
   CYC(b_+40, b_+43); W8(wDiggingUpEnemiesForbidden) = A;
   CYC(b_+43, b_+46); SET_HL((SYM(fallingRock_subid01__state1) + 11)); // mainScripts.companionScript_subid00Script
-  CYC(b_+46, b_+49); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+46, b_+49); TAIL(interactionSetScript); // jp
 }
 
 // Ricky script when he loses his gloves
@@ -281,7 +281,7 @@ void companionScript_subid03_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+17, b_+19); companionScript_deleteSelf_hook(gb); return; } // jr nz
   CYC(b_+17, b_+19);
   CYC(b_+19, b_+22); SET_HL((SYM(fallingRock_subid02__angles) + 3)); // mainScripts.companionScript_subid03Script
-  CYC(b_+22, b_+25); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(interactionSetScript); // jp
 }
 
 // Dimitri script where he's harrassed by tokays
@@ -300,7 +300,7 @@ void companionScript_subid07_hook(GB *gb) {
   CYC(b_+15, b_+17); A = 0x01;
   CYC(b_+17, b_+18); mem_wr(gb, DE, A);
   CYC(b_+18, b_+21); SET_HL((SYM(fallingRock_subid02__angles) + 7)); // mainScripts.companionScript_subid07Script
-  CYC(b_+21, b_+24); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+21, b_+24); TAIL(interactionSetScript); // jp
 }
 
 // Dimitri script where he leaves Link after bringing him to the mainland
@@ -337,7 +337,7 @@ void companionScript_subid06_hook(GB *gb) {
   CYC(b_+38, b_+39); L = alu_inc8(gb, L);
   CYC(b_+39, b_+41); mem_wr(gb, HL, 0x0a);
   CYC(b_+41, b_+44); SET_HL((SYM(fallingRock_subid02__angles) + 11)); // mainScripts.companionScript_subid06Script
-  CYC(b_+44, b_+47); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+44, b_+47); TAIL(interactionSetScript); // jp
 }
 
 // A fairy appears to tell you about the animal companion in the forest
@@ -381,7 +381,7 @@ l5ac8:
   CYC(b_+56, b_+58); alu_bit(gb, 6, A);
   if (!(F & FZ)) { CYCT(b_+58, b_+60); companionScript_deleteSelf_hook(gb); return; } // jr nz
   CYC(b_+58, b_+60);
-  CYC(b_+60, b_+63); interactionIncState_hook(gb); return; // jp
+  CYC(b_+60, b_+63); TAIL(interactionIncState); // jp
 
 state1:
   CYC(b_+63, b_+66); A = W8(w1Link_xh);
@@ -398,7 +398,7 @@ state1:
   CYC(b_+88, b_+90); mem_wr(gb, HL, 0x0f);
   CYC(b_+90, b_+93); SET_HL((SYM(fallingRock_updateSpeedAndDeleteWhenLanded) + 7)); // mainScripts.companionScript_subid08Script
   CALL_C(b_+93, interactionSetScript_hook, SYM(interactionSetScript), b_+96);
-  CYC(b_+96, b_+99); interactionIncState_hook(gb); return; // jp
+  CYC(b_+96, b_+99); TAIL(interactionIncState); // jp
 }
 
 // Companion script where they're found in the fairy forest
@@ -451,7 +451,7 @@ l5b4b:
   CYC(b_+64, b_+65); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+65, b_+68); mem_wr(gb, wTextSubstitutions + 1, A);
   CYC(b_+68, b_+71); SET_HL(SYM(fallingRock_subid03)); // mainScripts.companionScript_subid09Script
-  CYC(b_+71, b_+74); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+71, b_+74); TAIL(interactionSetScript); // jp
 }
 
 // Script just outside the forest, where you get the flute
@@ -516,7 +516,7 @@ nextFairy:
   if (!(F & FZ)) { CYCT(b_+89, b_+91); goto nextFairy; } // jr nz
   CYC(b_+89, b_+91);
   CYC(b_+91, b_+94); SET_HL((SYM(fallingRock_subid03) + 4)); // mainScripts.companionScript_subid0aScript
-  CYC(b_+94, b_+97); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+94, b_+97); TAIL(interactionSetScript); // jp
 }
 
 // This is the part which gives Link the flute.
@@ -584,7 +584,7 @@ l5c44:
   CYC(b_+91, b_+92); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+92, b_+94); mem_wr(gb, HL, 0x01); // [wcc50] = $01
   CALL_C(b_+94, objectSetVisible80_hook, SYM(objectSetVisible80), b_+97);
-  CYC(b_+97, b_+100); interactionRunScript_hook(gb); return; // jp
+  CYC(b_+97, b_+100); TAIL(interactionRunScript); // jp
 }
 
 void companionScript_subid0a_state3_hook(GB *gb) {
@@ -606,7 +606,7 @@ void companionScript_subid0a_state3_hook(GB *gb) {
   CYC(b_+21, b_+22); alu_xor(gb, A);
   CYC(b_+22, b_+25); W8(wDisabledObjects) = A;
   CYC(b_+25, b_+28); W8(wMenuDisabled) = A;
-  CYC(b_+28, b_+31); companionScript_delete_hook(gb); return; // jp
+  CYC(b_+28, b_+31); TAIL(companionScript_delete); // jp
 }
 
 // Script in first screen of forest, where fairy leads you to the companion
@@ -642,7 +642,7 @@ void companionScript_subid0b_hook(GB *gb) {
   CYC(b_+48, b_+51); W8(wTmpcfc0_fairyHideAndSeek_cfd2) = A;
   CYC(b_+51, b_+54); SET_HL((SYM(fallingRock_subid03__state0) + 3)); // mainScripts.companionScript_subid0bScript
   CALL_C(b_+54, interactionSetScript_hook, SYM(interactionSetScript), b_+57);
-  CYC(b_+57, b_+60); interactionIncState_hook(gb); return; // jp
+  CYC(b_+57, b_+60); TAIL(interactionIncState); // jp
 }
 
 // Sets bit 6 of wDimitriState so he disappears from Tokay Island
@@ -654,7 +654,7 @@ void companionScript_subid0c_hook(GB *gb) {
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+9); alu_or(gb, 0x40);
   CYC(b_+9, b_+12); W8(wDimitriState) = A;
-  CYC(b_+12, b_+14); companionScript_delete_hook(gb); return; // jr
+  CYC(b_+12, b_+14); TAIL(companionScript_delete); // jr
 }
 
 // Companion barrier to Symmetry City, until the tuni nut is restored
@@ -718,7 +718,7 @@ l5a30:
   CYC(b_+72, b_+73); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+73, b_+74); B = mem_rd(gb, HL);
   CYC(b_+74, b_+75); C = A;
-  CYC(b_+75, b_+78); showText_hook(gb); return; // jp
+  CYC(b_+75, b_+78); TAIL(showText); // jp
 }
 
 // INTERAC_COMPANION_SCRIPTS
@@ -730,7 +730,7 @@ void interactionCode71_hook(GB *gb) {
   CYC(b_+4, b_+6);
   CYC(b_+6, b_+7); alu_xor(gb, A);
   CYC(b_+7, b_+10); W8(wDisabledObjects) = A;
-  CYC(b_+10, b_+13); interactionDelete_hook(gb); return; // jp
+  CYC(b_+10, b_+13); TAIL(interactionDelete); // jp
 
 l5915:
   CYC(b_+13, b_+15); E = INTERACTION_BASE + OBJ_SUBID;
@@ -751,6 +751,6 @@ l5915:
     if (target == SYM(companionScript_subid0b)) { companionScript_subid0b_hook(gb); return; }
     if (target == SYM(companionScript_subid0c)) { companionScript_subid0c_hook(gb); return; }
     if (target == SYM(companionScript_subid0d)) { companionScript_subid0d_hook(gb); return; }
-    companionScript_subid00_hook(gb); return; // target == 0x5935
+    TAIL(companionScript_subid00); // target == 0x5935
   }
 }

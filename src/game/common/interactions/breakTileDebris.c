@@ -126,10 +126,10 @@ state0:
   CYC(b_+45, b_+46); A = E;
   CYC(b_+46, b_+47); push_effect(gb, b_+47);
   do { uint16_t jt_ = (breakTileDebris_jumpTable(gb));
-    if (jt_ == SYM(objectSetVisible80)) { objectSetVisible80_hook(gb); return; }
-    else if (jt_ == SYM(objectSetVisible81)) { objectSetVisible81_hook(gb); return; }
-    else if (jt_ == SYM(objectSetVisible82)) { objectSetVisible82_hook(gb); return; }
-    else if (jt_ == SYM(objectSetVisible83)) { objectSetVisible83_hook(gb); return; }
+    if (jt_ == SYM(objectSetVisible80) && hook_enabled_at(gb, SYM(objectSetVisible80))) { objectSetVisible80_hook(gb); return; }
+    else if (jt_ == SYM(objectSetVisible81) && hook_enabled_at(gb, SYM(objectSetVisible81))) { objectSetVisible81_hook(gb); return; }
+    else if (jt_ == SYM(objectSetVisible82) && hook_enabled_at(gb, SYM(objectSetVisible82))) { objectSetVisible82_hook(gb); return; }
+    else if (jt_ == SYM(objectSetVisible83) && hook_enabled_at(gb, SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -140,7 +140,7 @@ state1:
   if (F & FZ) {
     CYC(b_+86, b_+89);
   } else {
-    CYCT(b_+86, b_+89); interactionDelete_hook(gb); return;
+    CYCT(b_+86, b_+89); TAIL(interactionDelete);
   }
   CYC(b_+89, b_+91); L = INTERACTION_BASE + OBJ_SUBID;
   CYC(b_+91, b_+93); alu_bit(gb, 0, mem_rd(gb, HL));

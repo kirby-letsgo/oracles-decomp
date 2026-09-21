@@ -93,14 +93,14 @@ disable_transformation:
 
 create_green_poof:
   CYC(b_+83, b_+85); B = 0x02;
-  CYC(b_+85, b_+88); objectCreateInteractionWithSubid00_hook(gb); return;
+  CYC(b_+85, b_+88); TAIL(objectCreateInteractionWithSubid00);
 
 reset_id_to_normal:
   CYC(b_+88, b_+89); alu_xor(gb, A);
   CALL_C(b_+89, setLinkID_hook, SYM(setLinkID), b_+92);
   CYC(b_+92, b_+94); A = 0x01;
   CYC(b_+94, b_+97); W8(wDisableRingTransformations) = A;
-  CYC(b_+97, b_+100); specialObjectCode_link_hook(gb); return;
+  CYC(b_+97, b_+100); TAIL(specialObjectCode_link);
 
 state1:
   CYC(b_+100, b_+103); A = W8(wLinkForceState);
@@ -309,11 +309,11 @@ set_animation:
   CYC(b_+308, b_+309); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+309, b_+312);
-    specialObjectAnimate_hook(gb); return;
+    TAIL(specialObjectAnimate);
   }
   CYC(b_+309, b_+312);
   CYC(b_+312, b_+313); alu_xor(gb, A);
-  CYC(b_+313, b_+316); specialObjectSetAnimation_hook(gb); return;
+  CYC(b_+313, b_+316); TAIL(specialObjectSetAnimation);
 
 animate_if_pegasus_seeds_active:
   CALL_C(b_+316, checkPegasusSeedCounter_hook, SYM(checkPegasusSeedCounter), b_+319);

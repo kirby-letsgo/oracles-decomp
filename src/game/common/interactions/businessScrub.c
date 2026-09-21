@@ -133,7 +133,7 @@ afterSellingShield:
   CYC(b_+89, b_+90); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+90, b_+92); L = INTERACTION_BASE + OBJ_RELATED2;
   CYC(b_+92, b_+93); mem_wr(gb, HL, D);
-  CYC(b_+93, b_+96); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+93, b_+96); TAIL(objectCopyPosition); // jp
 
 // Subid $80 initialization (the bush above the scrub)
 mimicBush:
@@ -148,7 +148,7 @@ mimicBushSetTile:
   CALL_C(b_+106, objectMimicBgTile_hook, SYM(objectMimicBgTile), b_+109);
   CYC(b_+109, b_+111); A = 0x05;
   CALL_C(b_+111, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+114);
-  CYC(b_+114, b_+117); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+114, b_+117); TAIL(objectSetVisible80); // jp
 
 state1:
   CYC(b_+117, b_+120); A = mem_rd(gb, wScrollMode);
@@ -176,7 +176,7 @@ state1:
   CYC(b_+148, b_+149); alu_xor(gb, A);
   CYC(b_+149, b_+150); mem_wr(gb, DE, A);
   CYC(b_+150, b_+152); A = 0x03;
-  CYC(b_+152, b_+155); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+152, b_+155); TAIL(interactionSetAnimation); // jp
 
 linkIsClose:
   CYC(b_+155, b_+156); A = mem_rd(gb, DE);
@@ -186,7 +186,7 @@ linkIsClose:
   CYC(b_+159, b_+160); A = alu_inc8(gb, A);
   CYC(b_+160, b_+161); mem_wr(gb, DE, A);
   CYC(b_+161, b_+163); A = 0x01;
-  CYC(b_+163, b_+166); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+163, b_+166); TAIL(interactionSetAnimation); // jp
 
 afterTalkedCheck:
   CYC(b_+166, b_+168); E = INTERACTION_BASE + OBJ_PRESSED_A_BUTTON;
@@ -205,7 +205,7 @@ afterTalkedCheck:
   CYC(b_+185, b_+186); interactionCodece_addAToHl(gb, b_+186);
   CYC(b_+186, b_+187); C = mem_rd(gb, HL);
   CYC(b_+187, b_+189); B = 0x45; // >TX_4500
-  CYC(b_+189, b_+192); showTextNonExitable_hook(gb); return; // jp
+  CYC(b_+189, b_+192); TAIL(showTextNonExitable); // jp
 
 // Subid $80: the bush above the scrub
 subid80State1:
@@ -250,7 +250,7 @@ state2:
   CYC(b_+246, b_+247); A = alu_dec8(gb, A);
   CYC(b_+247, b_+250); mem_wr(gb, wSelectedTextOption, A);
   CYC(b_+250, b_+252); A = 0x04;
-  CYC(b_+252, b_+255); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+252, b_+255); TAIL(interactionSetAnimation); // jp
 
 label_0b_103:
   CYC(b_+255, b_+258); A = mem_rd(gb, wSelectedTextOption);
@@ -335,5 +335,5 @@ giveTreasure:
   CYC(b_+360, b_+363); SET_BC((SYM(interactionCodeb6__state4) + 22)); // TX_4505
 
 showTextLabel:
-  CYC(b_+363, b_+366); showText_hook(gb); return; // jp
+  CYC(b_+363, b_+366); TAIL(showText); // jp
 }

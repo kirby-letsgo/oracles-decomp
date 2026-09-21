@@ -175,8 +175,7 @@ void cutscene_rumbleSoundWhenFrameCounterLowerNibbleIs0_hook(GB *gb) {
   CYC(b_+5, b_+7); A = 0xb8;
   if (F & FZ) {
     CYCT(b_+7, b_+10);
-    playSound_b00_hook(gb);
-    return;
+    TAIL(playSound_b00);
   }
   CYC(b_+7, b_+10);
   CYC(b_+10, b_+11); ret_effect(gb);
@@ -276,29 +275,25 @@ void cutsceneFunc_6026_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_cp(gb, 0x00);
   if (F & FZ) {
     CYCT(b_+5, b_+7);
-    cutscene_load_04_ObjectGfx2Times_andReload_hook(gb);
-    return;
+    TAIL(cutscene_load_04_ObjectGfx2Times_andReload);
   }
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+9); alu_cp(gb, 0x01);
   if (F & FZ) {
     CYCT(b_+9, b_+11);
-    cutscene_load_26_ObjectGfx2Times_andReload_hook(gb);
-    return;
+    TAIL(cutscene_load_26_ObjectGfx2Times_andReload);
   }
   CYC(b_+9, b_+11);
   CYC(b_+11, b_+13); alu_cp(gb, 0x02);
   if (F & FZ) {
     CYCT(b_+13, b_+15);
-    cutscene_load_24_ObjectGfx2Times_andReload_hook(gb);
-    return;
+    TAIL(cutscene_load_24_ObjectGfx2Times_andReload);
   }
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+17); alu_cp(gb, 0x04);
   if (F & FZ) {
     CYCT(b_+17, b_+19);
-    cutscene_load_26_ObjectGfx2Times_andReload_hook(gb);
-    return;
+    TAIL(cutscene_load_26_ObjectGfx2Times_andReload);
   }
   CYC(b_+17, b_+19);
   CYC(b_+19, b_+20); ret_effect(gb);
@@ -555,8 +550,7 @@ void endgameCutsceneHandler_0a__state1__substate4_hook(GB *gb) {
   CYC(b_+429, b_+430); alu_cp(gb, B);
   if (!(F & FC)) {
     CYCT(b_+430, b_+432);
-    endgameCutsceneHandler_0a__state1__func_5fc7_hook(gb);
-    return;
+    TAIL(endgameCutsceneHandler_0a__state1__func_5fc7);
   }
   CYC(b_+430, b_+432);
   CYC(b_+432, b_+433); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
@@ -1250,8 +1244,7 @@ void endgameCutsceneHandler_09_stage0__state2_hook(GB *gb) {
   CALL_C(b_+130, decCbb3_hook, SYM(decCbb3), b_+133);
   if (!(F & FZ)) {
     CYCT(b_+133, b_+135);
-    endgameCutsceneHandler_09_stage0__updateExplosionSoundsAndScreenShake_hook(gb);
-    return;
+    TAIL(endgameCutsceneHandler_09_stage0__updateExplosionSoundsAndScreenShake);
   }
   CYC(b_+133, b_+135);
   CYC(b_+135, b_+137); mem_wr(gb, HL, 0x3c);
@@ -1294,8 +1287,7 @@ void endgameCutsceneHandler_09_stage0__state5_hook(GB *gb) {
   CALL_C(b_+187, decCbb3_hook, SYM(decCbb3), b_+190);
   if (!(F & FZ)) {
     CYCT(b_+190, b_+192);
-    endgameCutsceneHandler_09_stage0__explosions_hook(gb);
-    return;
+    TAIL(endgameCutsceneHandler_09_stage0__explosions);
   }
   CYC(b_+190, b_+192);
   CYC(b_+192, b_+194); mem_wr(gb, HL, 0x28);
@@ -1321,8 +1313,7 @@ void endgameCutsceneHandler_09_stage0__state6_hook(GB *gb) {
   CALL_C(b_+247, decCbb3_hook, SYM(decCbb3), b_+250);
   if (!(F & FZ)) {
     CYCT(b_+250, b_+252);
-    endgameCutsceneHandler_09_stage0__explosions_hook(gb);
-    return;
+    TAIL(endgameCutsceneHandler_09_stage0__explosions);
   }
   CYC(b_+250, b_+252); incCbc2_hook(gb);
 }
@@ -1761,8 +1752,7 @@ void endgameCutsceneHandler_09_stage1__state3_hook(GB *gb) {
   CYC(b_+132, b_+133); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) {
     CYCT(b_+133, b_+135);
-    endgameCutsceneHandler_09_stage1__loadCertainOamData1_hook(gb);
-    return;
+    TAIL(endgameCutsceneHandler_09_stage1__loadCertainOamData1);
   }
   CYC(b_+133, b_+135);
   CALL_C(b_+135, clearOam_hook, SYM(clearOam), b_+138);
@@ -2107,8 +2097,7 @@ continue_state3:
   CYC(b_+177, b_+178); B = A;
   if (!(F & FZ)) {
     CYCT(b_+178, b_+180);
-    endgameCutsceneHandler_20__func_5920_hook(gb);
-    return;
+    TAIL(endgameCutsceneHandler_20__func_5920);
   }
   CYC(b_+178, b_+180);
   CALL_C(b_+180, fadeinFromBlack_hook, SYM(fadeinFromBlack), b_+183);
@@ -2704,8 +2693,8 @@ void endgameCutsceneHandler_09_hook(GB *gb) {
   CYC(b_+3, b_+4); A = mem_rd(gb, DE);
   CYC(b_+4, b_+5); push_effect(gb, b_+5);
   do { uint16_t jt_ = (endgame_jump_table(gb));
-    if (jt_ == SYM(endgameCutsceneHandler_09_stage0)) { endgameCutsceneHandler_09_stage0_hook(gb); return; }
-    else if (jt_ == SYM(endgameCutsceneHandler_09_stage1)) { endgameCutsceneHandler_09_stage1_hook(gb); return; }
+    if (jt_ == SYM(endgameCutsceneHandler_09_stage0) && hook_enabled_at(gb, SYM(endgameCutsceneHandler_09_stage0))) { endgameCutsceneHandler_09_stage0_hook(gb); return; }
+    else if (jt_ == SYM(endgameCutsceneHandler_09_stage1) && hook_enabled_at(gb, SYM(endgameCutsceneHandler_09_stage1))) { endgameCutsceneHandler_09_stage1_hook(gb); return; }
     else { hook_handoff(gb, HL); return; }
   } while (0);
 }

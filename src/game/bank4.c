@@ -294,8 +294,7 @@ void findWarpSourceAndDest_hook(GB *gb) {
   CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+4, b_+7);
-    setWarpDestDefault_hook(gb);
-    return;
+    TAIL(setWarpDestDefault);
   }
   CYC(b_+4, b_+7);
   CYC(b_+7, b_+10); A = W8(wActiveGroup);
@@ -366,8 +365,7 @@ skip:
   CYC(b_+84, b_+86); alu_and(gb, 0x08);
   if (F & FZ) {
     CYCT(b_+86, b_+88);
-    setWarpDestDefault_hook(gb);
-    return;
+    TAIL(setWarpDestDefault);
   }
   CYC(b_+86, b_+88);
   CYC(b_+88, b_+90); A = mem_rd(gb, hFF8C);

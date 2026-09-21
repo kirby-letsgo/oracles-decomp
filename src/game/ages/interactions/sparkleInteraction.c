@@ -65,10 +65,10 @@ initSubid00:
   CYC(b_+62, b_+65);
 
 lowDrawPriority:
-  CYC(b_+65, b_+68); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+65, b_+68); TAIL(objectSetVisible82); // jp
 
 highDrawPriority:
-  CYC(b_+68, b_+71); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+68, b_+71); TAIL(objectSetVisible80); // jp
 
 initSubid0b:
   CYC(b_+71, b_+72); H = D;
@@ -76,7 +76,7 @@ initSubid0b:
   CYC(b_+74, b_+76); mem_wr(gb, HL, 0xc0);
   CYC(b_+76, b_+77); L = alu_inc8(gb, L); // Interaction.speedY high byte
   CYC(b_+77, b_+79); mem_wr(gb, HL, 0xff);
-  CYC(b_+79, b_+82); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+79, b_+82); TAIL(objectSetVisible81); // jp
 
 initSubid0c:
   CYC(b_+82, b_+84); A = OBJ_ID; // Object.id
@@ -114,7 +114,7 @@ runSubid00:
   CYC(b_+135, b_+137); alu_cp(gb, 0xff);
   if (F & FZ) { CYCT(b_+137, b_+140); interactionDelete_hook(gb); return; } // jp z
   CYC(b_+137, b_+140);
-  CYC(b_+140, b_+143); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+140, b_+143); TAIL(interactionAnimate); // jp
 
 animateAndFlickerAndDeleteWhenCounter1Zero:
   CALL_C(b_+143, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+146);
@@ -129,7 +129,7 @@ flicker:
   CYC(b_+155, b_+156); alu_rrca(gb);
   if (F & FC) { CYCT(b_+156, b_+159); objectSetInvisible_hook(gb); return; } // jp c
   CYC(b_+156, b_+159);
-  CYC(b_+159, b_+162); objectSetVisible_hook(gb); return; // jp
+  CYC(b_+159, b_+162); TAIL(objectSetVisible); // jp
 
 runSubid05:
   CYC(b_+162, b_+164); A = OBJ_YH; // Object.yh
@@ -169,7 +169,7 @@ runSubid0a:
   CALL_C(b_+220, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+223);
   if (F & FC) { CYCT(b_+223, b_+226); interactionAnimate_hook(gb); return; } // jp c
   CYC(b_+223, b_+226);
-  CYC(b_+226, b_+229); interactionDelete_hook(gb); return; // jp
+  CYC(b_+226, b_+229); TAIL(interactionDelete); // jp
 
 runSubid0c:
   CYC(b_+229, b_+231); A = OBJ_ID; // Object.id

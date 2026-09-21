@@ -51,7 +51,7 @@ L_4457:
   if (F & FZ) { CYCT(b_+39, b_+42); partDelete_hook(gb); return; } // jp z
   CYC(b_+39, b_+42);
   CYC(b_+42, b_+44); B = 0x01; // PART_ITEM_DROP
-  CYC(b_+44, b_+47); objectReplaceWithID_hook(gb); return; // jp
+  CYC(b_+44, b_+47); TAIL(objectReplaceWithID); // jp
 }
 
 void enemyDestroyed_initialize_hook(GB *gb) {
@@ -68,7 +68,7 @@ void enemyDestroyed_initialize_hook(GB *gb) {
   } else {
     CYC(b_+55, b_+58);
   }
-  CYC(b_+58, b_+61); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+58, b_+61); TAIL(objectSetVisible82); // jp
 }
 
 static void enemyDestroyed_decCounter2_hook(GB *gb) {
@@ -78,5 +78,5 @@ static void enemyDestroyed_decCounter2_hook(GB *gb) {
   CYC(b_+64, b_+65); alu_rrca(gb);
   if (!(F & FC)) { RET_TAKEN(b_+65); return; } // ret nc
   CYC(b_+65, b_+66);
-  CYC(b_+66, b_+69); decNumEnemies_hook(gb); return; // jp
+  CYC(b_+66, b_+69); TAIL(decNumEnemies); // jp
 }

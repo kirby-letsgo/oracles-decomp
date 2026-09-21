@@ -51,7 +51,7 @@ normalStatus:
   CALL_C(b_+28, partCommon_checkTileCollisionOrOutOfBounds_hook, SYM(partCommon_checkTileCollisionOrOutOfBounds), b_+31);
   if (!(F & FZ)) { RET_TAKEN(b_+31); return; } // ret nz
   CYC(b_+31, b_+32);
-  CYC(b_+32, b_+35); partDelete_hook(gb); return; // jp
+  CYC(b_+32, b_+35); TAIL(partDelete); // jp
 
 L_5a11:
   CYC(b_+35, b_+36); H = D;
@@ -71,7 +71,7 @@ L_5a11:
   CALL_C(b_+56, playSound_b00_hook, SYM(playSound_b00), b_+59);
   CYC(b_+59, b_+61); A = 0x01;
   CALL_C(b_+61, partSetAnimation_hook, SYM(partSetAnimation), b_+64);
-  CYC(b_+64, b_+67); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+64, b_+67); TAIL(objectSetVisible82); // jp
 
 subid0:
   CYC(b_+67, b_+68); push_effect(gb, b_+68);
@@ -90,7 +90,7 @@ state0:
   CYC(b_+79, b_+81); mem_wr(gb, HL, 0x46);
   CYC(b_+81, b_+83); L = 0xc6; // Part.counter1
   CYC(b_+83, b_+85); mem_wr(gb, HL, 0x1e);
-  CYC(b_+85, b_+88); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+85, b_+88); TAIL(objectSetVisible82); // jp
 
 state1:
   CALL_C(b_+88, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+91);
@@ -134,5 +134,5 @@ L_5a77:
   if (!(F & FZ)) { CYCT(b_+144, b_+146); goto L_5a68; } // jr nz
   CYC(b_+144, b_+146);
   CALL_C(b_+146, objectCreatePuff_hook, SYM(objectCreatePuff), b_+149);
-  CYC(b_+149, b_+152); partDelete_hook(gb); return; // jp
+  CYC(b_+149, b_+152); TAIL(partDelete); // jp
 }

@@ -52,5 +52,5 @@ state1:
   CYC(b_+25, b_+26); alu_or(gb, A);
   if (!(F & FZ)) { RET_TAKEN(b_+26); return; } // ret nz
   CYC(b_+26, b_+27);
-  CYC(b_+27, b_+30); partDelete_hook(gb); return; // jp
+  CYC(b_+27, b_+30); TAIL(partDelete); // jp
 }

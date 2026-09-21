@@ -126,7 +126,7 @@ substate2:
 substate3:
   CALL_C(b_+85, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+88);
   if (!(F & FC)) {
-    CYCT(b_+88, b_+91); interactionDelete_hook(gb); return;
+    CYCT(b_+88, b_+91); TAIL(interactionDelete);
   }
   CYC(b_+88, b_+91);
   CALL_C(b_+91, interactionAnimate2Times_hook, SYM(interactionAnimate2Times), b_+94);
@@ -191,7 +191,7 @@ init0:
   CALL_C(b_+24, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+27);
   CYC(b_+27, b_+29); alu_bit(gb, 6, A);
   if (!(F & FZ)) {
-    CYCT(b_+29, b_+32); interactionDelete_hook(gb); return;
+    CYCT(b_+29, b_+32); TAIL(interactionDelete);
   }
   CYC(b_+29, b_+32);
   CALL_C(b_+32, objectSetVisible82_hook, SYM(objectSetVisible82), b_+35);
@@ -241,8 +241,8 @@ state1:
   CYC(b_+105, b_+106); A = mem_rd(gb, DE);
   CYC(b_+106, b_+107); push_effect(gb, b_+107);
   do { uint16_t jt_ = (fakeOctorok_jumpTable(gb));
-    if (jt_ == SYM(impaOctorokCode)) { impaOctorokCode_hook(gb); return; }
-    else if (jt_ == SYM(greatFairyOctorokCode)) { greatFairyOctorokCode_hook(gb); return; }
+    if (jt_ == SYM(impaOctorokCode) && hook_enabled_at(gb, SYM(impaOctorokCode))) { impaOctorokCode_hook(gb); return; }
+    else if (jt_ == SYM(greatFairyOctorokCode) && hook_enabled_at(gb, SYM(greatFairyOctorokCode))) { greatFairyOctorokCode_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

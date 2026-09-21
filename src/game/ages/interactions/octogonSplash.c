@@ -22,7 +22,7 @@ void interactionCode8e_hook(GB *gb) {
   CYC(b_+9, b_+10); A = alu_inc8(gb, A);
   if (!(F & FZ)) { CYCT(b_+10, b_+13); interactionAnimate_hook(gb); return; } // jp nz
   CYC(b_+10, b_+13);
-  CYC(b_+13, b_+16); interactionDelete_hook(gb); return; // jp
+  CYC(b_+13, b_+16); TAIL(interactionDelete); // jp
 
 state0:
   CALL_C(b_+16, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+19);
@@ -32,5 +32,5 @@ state0:
   CYC(b_+25, b_+26); alu_rrca(gb);
   CYC(b_+26, b_+27); alu_rrca(gb);
   CALL_C(b_+27, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+30);
-  CYC(b_+30, b_+33); objectSetVisible81_hook(gb); return; // jp
+  CYC(b_+30, b_+33); TAIL(objectSetVisible81); // jp
 }

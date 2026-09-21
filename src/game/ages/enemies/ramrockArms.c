@@ -47,9 +47,9 @@ void enemyCode05_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ramrockArm_jump_table(gb));
-    if (jt_ == SYM(ramrockArm_state0)) { ramrockArm_state0_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_state_stub)) { ramrockArm_state_stub_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_state8)) { ramrockArm_state8_hook(gb); return; }
+    if (jt_ == SYM(ramrockArm_state0) && hook_enabled_at(gb, SYM(ramrockArm_state0))) { ramrockArm_state0_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_state_stub) && hook_enabled_at(gb, SYM(ramrockArm_state_stub))) { ramrockArm_state_stub_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_state8) && hook_enabled_at(gb, SYM(ramrockArm_state8))) { ramrockArm_state8_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -92,8 +92,7 @@ initSubid0:
 commonInit:
   CALL_C(b_+53, ecom_setSpeedAndState8_b10_hook, SYM(ecom_setSpeedAndState8_b10), b_+56);
   CYC(b_+56, b_+59);
-  objectSetVisiblec0_hook(gb);
-  return;
+  TAIL(objectSetVisiblec0);
 initSubid2:
   CYC(b_+59, b_+60); A = mem_rd(gb, DE);
   CYC(b_+60, b_+62); alu_add(gb, 0x02);
@@ -147,9 +146,9 @@ void ramrockArm_state8_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x7f);
   CYC(b_+5, b_+6); push_effect(gb, b_+6);
   do { uint16_t jt_ = (ramrockArm_jump_table(gb));
-    if (jt_ == SYM(ramrockArm_subid0)) { ramrockArm_subid0_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid2)) { ramrockArm_subid2_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid4)) { ramrockArm_subid4_hook(gb); return; }
+    if (jt_ == SYM(ramrockArm_subid0) && hook_enabled_at(gb, SYM(ramrockArm_subid0))) { ramrockArm_subid0_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid2) && hook_enabled_at(gb, SYM(ramrockArm_subid2))) { ramrockArm_subid2_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid4) && hook_enabled_at(gb, SYM(ramrockArm_subid4))) { ramrockArm_subid4_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -187,13 +186,13 @@ runStates:
   CYC(b_+30, b_+31); A = mem_rd(gb, DE);
   CYC(b_+31, b_+32); push_effect(gb, b_+32);
   do { uint16_t jt_ = (ramrockArm_jump_table(gb));
-    if (jt_ == SYM(ramrockArm_subid0_substate0)) { ramrockArm_subid0_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid0_substate1)) { ramrockArm_subid0_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid0_substate2)) { ramrockArm_subid0_substate2_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid0_substate3)) { ramrockArm_subid0_substate3_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid0_substate4)) { ramrockArm_subid0_substate4_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid0_substate5)) { ramrockArm_subid0_substate5_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid0_substate6)) { ramrockArm_subid0_substate6_hook(gb); return; }
+    if (jt_ == SYM(ramrockArm_subid0_substate0) && hook_enabled_at(gb, SYM(ramrockArm_subid0_substate0))) { ramrockArm_subid0_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate1) && hook_enabled_at(gb, SYM(ramrockArm_subid0_substate1))) { ramrockArm_subid0_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate2) && hook_enabled_at(gb, SYM(ramrockArm_subid0_substate2))) { ramrockArm_subid0_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate3) && hook_enabled_at(gb, SYM(ramrockArm_subid0_substate3))) { ramrockArm_subid0_substate3_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate4) && hook_enabled_at(gb, SYM(ramrockArm_subid0_substate4))) { ramrockArm_subid0_substate4_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate5) && hook_enabled_at(gb, SYM(ramrockArm_subid0_substate5))) { ramrockArm_subid0_substate5_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate6) && hook_enabled_at(gb, SYM(ramrockArm_subid0_substate6))) { ramrockArm_subid0_substate6_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -298,8 +297,7 @@ void ramrockArm_subid0_substate3_hook(GB *gb) {
   CYC(b_+6, b_+8); alu_cp(gb, 0x80);
   if (F & FZ) {
     CYCT(b_+8, b_+10);
-    ramrockArm_subid0_moveBackToRamrock_hook(gb);
-    return;
+    TAIL(ramrockArm_subid0_moveBackToRamrock);
   }
   CYC(b_+8, b_+10);
   CYC(b_+10, b_+12); alu_cp(gb, 0x84);
@@ -336,8 +334,7 @@ moveTowardLink:
   CALL_C(b_+39, ecom_getSideviewAdjacentWallsBitset_b10_hook, SYM(ecom_getSideviewAdjacentWallsBitset_b10), b_+42);
   if (!(F & FZ)) {
     CYCT(b_+42, b_+44);
-    ramrockArm_subid0_moveBackToRamrock_hook(gb);
-    return;
+    TAIL(ramrockArm_subid0_moveBackToRamrock);
   }
   CYC(b_+42, b_+44);
   CALL_C(b_+44, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+47);
@@ -434,8 +431,7 @@ noDamage:
   CALL_C(b_+41, ecom_getSideviewAdjacentWallsBitset_b10_hook, SYM(ecom_getSideviewAdjacentWallsBitset_b10), b_+44);
   if (F & FZ) {
     CYCT(b_+44, b_+47);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+44, b_+47);
   CYC(b_+47, b_+49); E = ENEMY_BASE + OBJ_ANIM_PARAMETER;
@@ -500,8 +496,7 @@ void ramrockArm_checkPositionAtRamrock_hook(GB *gb) {
   CYC(b_+5, b_+6); alu_cp(gb, mem_rd(gb, HL));
   if (F & FC) {
     CYCT(b_+6, b_+8);
-    label_10_212_hook(gb);
-    return;
+    TAIL(label_10_212);
   }
   CYC(b_+6, b_+8);
   CYC(b_+8, b_+9); alu_sub(gb, E);
@@ -514,8 +509,7 @@ void label_10_211_hook(GB *gb) {
   CYC(b_+1, b_+2); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FC)) {
     CYCT(b_+2, b_+4);
-    label_10_212_hook(gb);
-    return;
+    TAIL(label_10_212);
   }
   CYC(b_+2, b_+4);
   CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_XH;
@@ -524,8 +518,7 @@ void label_10_211_hook(GB *gb) {
   CYC(b_+8, b_+9); alu_cp(gb, mem_rd(gb, HL));
   if (F & FC) {
     CYCT(b_+9, b_+11);
-    label_10_212_hook(gb);
-    return;
+    TAIL(label_10_212);
   }
   CYC(b_+9, b_+11);
   CYC(b_+11, b_+12); alu_sub(gb, E);
@@ -533,8 +526,7 @@ void label_10_211_hook(GB *gb) {
   CYC(b_+13, b_+14); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FC)) {
     CYCT(b_+14, b_+16);
-    label_10_212_hook(gb);
-    return;
+    TAIL(label_10_212);
   }
   CYC(b_+14, b_+16);
   CYC(b_+16, b_+17); alu_xor(gb, A);
@@ -580,9 +572,9 @@ void ramrockArm_subid2_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ramrockArm_jump_table(gb));
-    if (jt_ == SYM(ramrockArm_subid2_substate0)) { ramrockArm_subid2_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid2_substate1)) { ramrockArm_subid2_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid2_substate2)) { ramrockArm_subid2_substate2_hook(gb); return; }
+    if (jt_ == SYM(ramrockArm_subid2_substate0) && hook_enabled_at(gb, SYM(ramrockArm_subid2_substate0))) { ramrockArm_subid2_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid2_substate1) && hook_enabled_at(gb, SYM(ramrockArm_subid2_substate1))) { ramrockArm_subid2_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid2_substate2) && hook_enabled_at(gb, SYM(ramrockArm_subid2_substate2))) { ramrockArm_subid2_substate2_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -617,8 +609,7 @@ void ramrockArm_subid2_substate1_hook(GB *gb) {
   CYC(b_+11, b_+12); alu_rrca(gb);
   if (F & FC) {
     CYCT(b_+12, b_+14);
-    ramrockArm_deleteSelf_hook(gb);
-    return;
+    TAIL(ramrockArm_deleteSelf);
   }
   CYC(b_+12, b_+14);
   CYC(b_+14, b_+16); L = ENEMY_BASE + OBJ_VISIBLE;
@@ -719,10 +710,10 @@ void ramrockArm_subid4_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ramrockArm_jump_table(gb));
-    if (jt_ == SYM(ramrockArm_subid4_substate0)) { ramrockArm_subid4_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid4_substate1)) { ramrockArm_subid4_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid4_substate2)) { ramrockArm_subid4_substate2_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid4_substate3)) { ramrockArm_subid4_substate3_hook(gb); return; }
+    if (jt_ == SYM(ramrockArm_subid4_substate0) && hook_enabled_at(gb, SYM(ramrockArm_subid4_substate0))) { ramrockArm_subid4_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid4_substate1) && hook_enabled_at(gb, SYM(ramrockArm_subid4_substate1))) { ramrockArm_subid4_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid4_substate2) && hook_enabled_at(gb, SYM(ramrockArm_subid4_substate2))) { ramrockArm_subid4_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid4_substate3) && hook_enabled_at(gb, SYM(ramrockArm_subid4_substate3))) { ramrockArm_subid4_substate3_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -755,15 +746,13 @@ void ramrockArm_subid4_substate1_hook(GB *gb) {
   CYC(b_+5, b_+7); C = 0x00;
   if (!(F & FZ)) {
     CYCT(b_+7, b_+10);
-    objectUpdateSpeedZ_paramC_hook(gb);
-    return;
+    TAIL(objectUpdateSpeedZ_paramC);
   }
   CYC(b_+7, b_+10);
   CALL_C(b_+10, ecom_decCounter2_b10_hook, SYM(ecom_decCounter2_b10), b_+13);
   if (!(F & FZ)) {
     CYCT(b_+13, b_+16);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+13, b_+16);
   CALL_C(b_+16, ecom_incSubstate_b10_hook, SYM(ecom_incSubstate_b10), b_+19);
@@ -826,8 +815,7 @@ void ramrockArm_subid4_substate2_hook(GB *gb) {
   CYC(b_+6, b_+7); A = alu_dec8(gb, A);
   if (F & FZ) {
     CYCT(b_+7, b_+9);
-    ramrockArm_subid4_substate3_hook(gb);
-    return;
+    TAIL(ramrockArm_subid4_substate3);
   }
   CYC(b_+7, b_+9);
   CYC(b_+9, b_+11); E = ENEMY_BASE + OBJ_INVINCIBILITY_COUNTER;
@@ -835,8 +823,7 @@ void ramrockArm_subid4_substate2_hook(GB *gb) {
   CYC(b_+12, b_+13); alu_rlca(gb);
   if (F & FC) {
     CYCT(b_+13, b_+15);
-    ramrockArm_subid4_collisionOccurred_hook(gb);
-    return;
+    TAIL(ramrockArm_subid4_collisionOccurred);
   }
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+17); A = 0x02;
@@ -845,15 +832,13 @@ void ramrockArm_subid4_substate2_hook(GB *gb) {
   CYC(b_+21, b_+23); alu_cp(gb, 0x0d);
   if (F & FZ) {
     CYCT(b_+23, b_+25);
-    ramrockArm_subid4_collisionOccurred_hook(gb);
-    return;
+    TAIL(ramrockArm_subid4_collisionOccurred);
   }
   CYC(b_+23, b_+25);
   CYC(b_+25, b_+27); alu_cp(gb, 0x10);
   if (!(F & FZ)) {
     CYCT(b_+27, b_+29);
-    ramrockArm_subid4_substate3_hook(gb);
-    return;
+    TAIL(ramrockArm_subid4_substate3);
   }
   CYC(b_+27, b_+29);
   CYC(b_+29, b_+31); E = ENEMY_BASE + OBJ_VAR36;
@@ -861,16 +846,14 @@ void ramrockArm_subid4_substate2_hook(GB *gb) {
   CYC(b_+32, b_+33); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+33, b_+35);
-    ramrockArm_subid4_substate3_hook(gb);
-    return;
+    TAIL(ramrockArm_subid4_substate3);
   }
   CYC(b_+33, b_+35);
   CYC(b_+35, b_+36); A = alu_dec8(gb, A);
   CYC(b_+36, b_+37); mem_wr(gb, DE, A);
   if (F & FZ) {
     CYCT(b_+37, b_+39);
-    ramrockArm_subid4_collisionOccurred_hook(gb);
-    return;
+    TAIL(ramrockArm_subid4_collisionOccurred);
   }
   CYC(b_+37, b_+39);
   CYC(b_+39, b_+45);
@@ -908,8 +891,7 @@ atLimit:
   CYC(b_+26, b_+27); mem_wr(gb, DE, A);
   CYC(b_+27, b_+28); B = A;
   CYC(b_+28, b_+31);
-  ramrockArm_subid4_updateXPosition_hook(gb);
-  return;
+  TAIL(ramrockArm_subid4_updateXPosition);
 checkSubid:
   CYC(b_+30, b_+32); A = 0x02;
   CALL_C(b_+32, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+35);
@@ -917,8 +899,7 @@ checkSubid:
   CYC(b_+36, b_+38); alu_cp(gb, 0x0d);
   if (F & FZ) {
     CYCT(b_+38, b_+40);
-    ramrockArm_subid4_updateXPosition_hook(gb);
-    return;
+    TAIL(ramrockArm_subid4_updateXPosition);
   }
   CYC(b_+38, b_+40);
   CYC(b_+40, b_+42); E = ENEMY_BASE + OBJ_SUBSTATE;

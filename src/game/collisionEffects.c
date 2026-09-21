@@ -925,8 +925,7 @@ void collisionEffect3c_hook(GB *gb) {
     CYC(b_+10, b_+11); alu_or(gb, A);
     if (F & FZ) {
       CYCT(b_+11, b_+13);
-      collisionEffect02_hook(gb);
-      return;
+      TAIL(collisionEffect02);
     }
     CYC(b_+11, b_+13);
     CYC(b_+13, b_+14); alu_cp(gb, C);
@@ -943,16 +942,14 @@ void collisionEffect3c_hook(GB *gb) {
   CALL_C(b_+20, cpActiveRing_hook, SYM(cpActiveRing), b_+23);
   if (!(F & FZ)) {
     CYCT(b_+23, b_+25);
-    collisionEffect02_hook(gb);
-    return;
+    TAIL(collisionEffect02);
   }
   CYC(b_+23, b_+25);
   CYC(b_+25, b_+27); alu_bit(gb, 7, C);
   CYC(b_+27, b_+29); A = 0x40;
   if (F & FZ) {
     CYCT(b_+29, b_+32);
-    applyDamageToEnemyOrPart_hook(gb);
-    return;
+    TAIL(applyDamageToEnemyOrPart);
   }
   CYC(b_+29, b_+32);
   CALL_C(b_+32, collisionEffect02_hook, SYM(collisionEffect02), b_+35);
@@ -989,8 +986,7 @@ void collisionEffect2e_hook(GB *gb) {
   CYC(b_+7, b_+8); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+8, b_+10);
-    collisionEffect1c_hook(gb);
-    return;
+    TAIL(collisionEffect1c);
   }
   CYC(b_+8, b_+10);
   CYC(b_+10, b_+11); A = L;

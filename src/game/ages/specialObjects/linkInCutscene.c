@@ -140,8 +140,7 @@ void linkCutscene0_substate6_hook(GB *gb) {
   CYC(b_+18, b_+19); alu_rrca(gb);
   if (!(F & FC)) {
     CYCT(b_+19, b_+22);
-    objectSetInvisible_hook(gb);
-    return;
+    TAIL(objectSetInvisible);
   }
   CYC(b_+19, b_+22);
   CYC(b_+22, b_+25);
@@ -176,7 +175,7 @@ state1:
     else if (jt_ == b_+125) { goto substate3; }
     else if (jt_ == b_+148) { goto substate4; }
     else if (jt_ == b_+162) { goto substate5; }
-    else if (jt_ == SYM(linkCutscene0_substate6)) { linkCutscene0_substate6_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene0_substate6) && hook_enabled_at(gb, SYM(linkCutscene0_substate6))) { linkCutscene0_substate6_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
@@ -186,8 +185,7 @@ substate0:
   CYC(b_+40, b_+42); A = 0x00;
   if (F & FC) {
     CYCT(b_+42, b_+45);
-    specialObjectSetAnimation_hook(gb);
-    return;
+    TAIL(specialObjectSetAnimation);
   }
   CYC(b_+42, b_+45);
   CYC(b_+45, b_+46); H = D;
@@ -211,8 +209,7 @@ substate0:
   CYC(b_+62, b_+64); alu_cp(gb, 0x40);
   if (!(F & FC)) {
     CYCT(b_+64, b_+67);
-    specialObjectAnimate_hook(gb);
-    return;
+    TAIL(specialObjectAnimate);
   }
   CYC(b_+64, b_+67);
   CYC(b_+67, b_+69); A = 0x01;
@@ -220,8 +217,7 @@ substate0:
   CYC(b_+72, b_+74); A = 0x77;
   CALL_C(b_+74, playSound_b00_hook, SYM(playSound_b00), b_+77);
   CYC(b_+77, b_+80);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 substate1:
   CYC(b_+80, b_+83); A = W8(wTmpcbb9);
@@ -236,15 +232,13 @@ substate1:
   CYC(b_+97, b_+98); mem_wr(gb, DE, A);
   CYC(b_+98, b_+100); A = 0x04;
   CYC(b_+100, b_+103);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate2:
   CALL_C(b_+103, itemDecCounter1_hook, SYM(itemDecCounter1), b_+106);
   if (!(F & FZ)) {
     CYCT(b_+106, b_+109);
-    specialObjectAnimate_hook(gb);
-    return;
+    TAIL(specialObjectAnimate);
   }
   CYC(b_+106, b_+109);
   CYC(b_+109, b_+111); L = 0x10;
@@ -255,8 +249,7 @@ substate2:
   CYC(b_+119, b_+121); E = 0x06;
   CYC(b_+121, b_+122); mem_wr(gb, DE, A);
   CYC(b_+122, b_+125);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 substate3:
   CALL_C(b_+125, itemDecCounter1_hook, SYM(itemDecCounter1), b_+128);
@@ -274,15 +267,13 @@ substate3:
 oscillate:
   CYC(b_+143, b_+146); SET_HL(linkCutscene0OscillationData_bank06);
   CYC(b_+146, b_+148);
-  linkCutscene_oscillateZ_hook(gb);
-  return;
+  TAIL(linkCutscene_oscillateZ);
 
 substate4:
   CALL_C(b_+148, itemDecCounter1_hook, SYM(itemDecCounter1), b_+151);
   if (!(F & FZ)) {
     CYCT(b_+151, b_+154);
-    linkCutscene_oscillateZ_1_hook(gb);
-    return;
+    TAIL(linkCutscene_oscillateZ_1);
   }
   CYC(b_+151, b_+154);
   CYC(b_+154, b_+156); A = 0x03;
@@ -294,8 +285,7 @@ substate5:
   CYC(b_+165, b_+167); alu_cp(gb, 0x06);
   if (!(F & FZ)) {
     CYCT(b_+167, b_+169);
-    linkCutscene_oscillateZ_1_hook(gb);
-    return;
+    TAIL(linkCutscene_oscillateZ_1);
   }
   CYC(b_+167, b_+169);
   linkCutscene_createGlowingOrb_hook(gb);
@@ -469,8 +459,7 @@ state0:
   CALL_C(b_+8, linkCutscene_initOam_setVisible_incState_hook, SYM(linkCutscene_initOam_setVisible_incState), b_+11);
   CYC(b_+11, b_+13); A = 0x01;
   CYC(b_+13, b_+16);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 state1:
   CYC(b_+16, b_+18); E = 0x05;
@@ -504,8 +493,7 @@ substate0:
   CYC(b_+57, b_+58); mem_wr(gb, HL, A);
   CYC(b_+58, b_+60); A = 0x01;
   CYC(b_+60, b_+63);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate1:
   CYC(b_+63, b_+66); A = W8(wTmpcfc0_genericCutscene_cfd0);
@@ -525,8 +513,7 @@ substate2:
   CALL_C(b_+81, itemIncSubstate_hook, SYM(itemIncSubstate), b_+84);
   CYC(b_+84, b_+85); alu_xor(gb, A);
   CYC(b_+85, b_+88);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate3:
   CYC(b_+88, b_+90); B = 0x0e;
@@ -538,8 +525,7 @@ substate3:
   CALL_C(b_+97, itemIncSubstate_hook, SYM(itemIncSubstate), b_+100);
   CYC(b_+100, b_+101); A = C;
   CYC(b_+101, b_+104);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate4:
   CYC(b_+104, b_+107); A = W8(wTmpcfc0_genericCutscene_cfd0);
@@ -557,15 +543,13 @@ substate4:
   CALL_C(b_+127, playSound_b00_hook, SYM(playSound_b00), b_+130);
   CYC(b_+130, b_+132); A = 0x03;
   CYC(b_+132, b_+135);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate5:
   CALL_C(b_+135, linkCutscene_animateAndDecCounter1_hook, SYM(linkCutscene_animateAndDecCounter1), b_+138);
   if (!(F & FZ)) {
     CYCT(b_+138, b_+141);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+138, b_+141);
   CALL_C(b_+141, itemIncSubstate_hook, SYM(itemIncSubstate), b_+144);
@@ -588,30 +572,26 @@ substate6:
   CYC(b_+163, b_+164); mem_wr(gb, HL, A);
   CALL_C(b_+164, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+167);
   CYC(b_+167, b_+170);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 substate7:
   CALL_C(b_+170, linkCutscene_animateAndDecCounter1_hook, SYM(linkCutscene_animateAndDecCounter1), b_+173);
   if (!(F & FZ)) {
     CYCT(b_+173, b_+176);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+173, b_+176);
   CYC(b_+176, b_+178); A = 0x75;
   CALL_C(b_+178, playSound_b00_hook, SYM(playSound_b00), b_+181);
   CYC(b_+181, b_+184);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 substate8:
   CYC(b_+184, b_+187); A = W8(wTmpcfc0_genericCutscene_cfd2);
   CYC(b_+187, b_+188); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+188, b_+190);
-    linkCutsceneFunc_73e8_hook(gb);
-    return;
+    TAIL(linkCutsceneFunc_73e8);
   }
   CYC(b_+188, b_+190);
   CYC(b_+190, b_+192); A = 0x03;
@@ -642,8 +622,7 @@ state0:
   CYC(b_+19, b_+20); mem_wr(gb, HL, A);
   CYC(b_+20, b_+21); alu_xor(gb, A);
   CYC(b_+21, b_+24);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 state1:
   CYC(b_+24, b_+26); E = 0x05;
@@ -665,16 +644,14 @@ substate0:
   if (!(F & FZ)) { CYCT(b_+45, b_+46); ret_effect(gb); return; }
   CYC(b_+45, b_+46);
   CYC(b_+46, b_+49);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 substate1:
   CYC(b_+49, b_+52); A = W8(wTmpcfc0_genericCutscene_cfd0);
   CYC(b_+52, b_+54); alu_cp(gb, 0x20);
   if (!(F & FZ)) {
     CYCT(b_+54, b_+57);
-    linkCutsceneFunc_73e8_hook(gb);
-    return;
+    TAIL(linkCutsceneFunc_73e8);
   }
   CYC(b_+54, b_+57);
   CALL_C(b_+57, itemIncSubstate_hook, SYM(itemIncSubstate), b_+60);
@@ -699,14 +676,12 @@ substate3:
   CALL_C(b_+80, linkCutscene_animateAndDecCounter1_hook, SYM(linkCutscene_animateAndDecCounter1), b_+83);
   if (!(F & FZ)) {
     CYCT(b_+83, b_+86);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+83, b_+86);
   CYC(b_+86, b_+88); mem_wr(gb, HL, 0x08);
   CYC(b_+88, b_+91);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 substate4:
   CALL_C(b_+91, itemDecCounter1_hook, SYM(itemDecCounter1), b_+94);
@@ -722,8 +697,7 @@ substate5:
   CALL_C(b_+102, linkCutscene_animateAndDecCounter1_hook, SYM(linkCutscene_animateAndDecCounter1), b_+105);
   if (!(F & FZ)) {
     CYCT(b_+105, b_+108);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+105, b_+108);
   CYC(b_+108, b_+110); A = 0x21;
@@ -770,7 +744,7 @@ state1:
     else if (jt_ == b_+72) { goto substate1; }
     else if (jt_ == b_+93) { goto substate2; }
     else if (jt_ == b_+110) { goto substate3; }
-    else if (jt_ == SYM(linkCutsceneRet)) { linkCutsceneRet_hook(gb); return; }
+    else if (jt_ == SYM(linkCutsceneRet) && hook_enabled_at(gb, SYM(linkCutsceneRet))) { linkCutsceneRet_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
@@ -802,8 +776,7 @@ substate0:
   CYC(b_+66, b_+68); A = alu_swap(gb, A);
   CYC(b_+68, b_+69); alu_rlca(gb);
   CYC(b_+69, b_+72);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate1:
   CYC(b_+72, b_+74); E = 0x0d;
@@ -813,8 +786,7 @@ substate1:
     CYCT(b_+77, b_+79);
     CALL_C(b_+87, objectApplySpeed_hook, SYM(objectApplySpeed), b_+90);
     CYC(b_+90, b_+93);
-    specialObjectAnimate_hook(gb);
-    return;
+    TAIL(specialObjectAnimate);
   }
   CYC(b_+77, b_+79);
   CALL_C(b_+79, itemIncSubstate_hook, SYM(itemIncSubstate), b_+82);
@@ -833,8 +805,7 @@ substate2:
   CYC(b_+104, b_+106); mem_wr(gb, HL, 0x00);
   CYC(b_+106, b_+107); alu_xor(gb, A);
   CYC(b_+107, b_+110);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate3:
   CALL_C(b_+110, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+113);
@@ -870,8 +841,7 @@ state0:
   CYC(b_+19, b_+20); mem_wr(gb, DE, A);
   CALL_C(b_+20, convertAngleDeToDirection_hook, SYM(convertAngleDeToDirection), b_+23);
   CYC(b_+23, b_+26);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 state1:
   CYC(b_+26, b_+28); E = 0x05;
@@ -936,16 +906,14 @@ substate0:
   CYC(b_+94, b_+96); A = alu_swap(gb, A);
   CYC(b_+96, b_+97); alu_rlca(gb);
   CYC(b_+97, b_+100);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate1:
   CALL_C(b_+100, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+103);
   CALL_C(b_+103, linkCutscene_cpxTo38_hook, SYM(linkCutscene_cpxTo38), b_+106);
   if (!(F & FZ)) {
     CYCT(b_+106, b_+109);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+106, b_+109);
   CALL_C(b_+109, itemIncSubstate_hook, SYM(itemIncSubstate), b_+112);
@@ -963,8 +931,7 @@ substate3:
   CALL_C(b_+139, linkCutscene_cpyTo48_hook, SYM(linkCutscene_cpyTo48), b_+142);
   if (!(F & FZ)) {
     CYCT(b_+142, b_+145);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+142, b_+145);
   goto goto_state7;
@@ -974,8 +941,7 @@ substate4:
   CALL_C(b_+161, linkCutscene_cpyTo48_hook, SYM(linkCutscene_cpyTo48), b_+164);
   if (!(F & FZ)) {
     CYCT(b_+164, b_+167);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+164, b_+167);
   CALL_C(b_+167, itemIncSubstate_hook, SYM(itemIncSubstate), b_+170);
@@ -994,8 +960,7 @@ substate6:
   CALL_C(b_+183, linkCutscene_cpxTo38_hook, SYM(linkCutscene_cpxTo38), b_+186);
   if (!(F & FZ)) {
     CYCT(b_+186, b_+189);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+186, b_+189);
   CYC(b_+189, b_+191);
@@ -1065,8 +1030,7 @@ state1:
     CYC(b_+26, b_+28);
     CALL_C(b_+28, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+31);
     CYC(b_+31, b_+34);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+34, b_+36); A = 0x00;
   CYC(b_+36, b_+39);
@@ -1119,13 +1083,11 @@ substate0:
   CYC(b_+46, b_+48); alu_and(gb, 0xc0);
   if (F & FZ) {
     CYCT(b_+48, b_+51);
-    objectApplySpeed_hook(gb);
-    return;
+    TAIL(objectApplySpeed);
   }
   CYC(b_+48, b_+51);
   CYC(b_+51, b_+54);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 substate1:
   CYC(b_+54, b_+57); A = W8(wTmpcfc0_genericCutscene_cfd0);
@@ -1135,8 +1097,7 @@ substate1:
   CALL_C(b_+60, itemIncSubstate_hook, SYM(itemIncSubstate), b_+63);
   CYC(b_+63, b_+65); A = 0x02;
   CYC(b_+65, b_+68);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate2:
   CYC(b_+68, b_+69); ret_effect(gb);
@@ -1160,8 +1121,7 @@ state0:
   CYC(b_+13, b_+15); mem_wr(gb, HL, 0xf0);
   CYC(b_+15, b_+17); A = 0x14;
   CYC(b_+17, b_+20);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 state1:
   CALL_C(b_+20, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+23);
@@ -1199,8 +1159,7 @@ state0:
   CYC(b_+19, b_+21); A = 0x00;
   CALL_C(b_+21, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+24);
   CYC(b_+24, b_+27);
-  objectSetInvisible_hook(gb);
-  return;
+  TAIL(objectSetInvisible);
 
 state1:
   CYC(b_+27, b_+29); E = 0x05;
@@ -1226,8 +1185,7 @@ substate0:
   }
   CALL_C(b_+48, itemIncSubstate_hook, SYM(itemIncSubstate), b_+51);
   CYC(b_+51, b_+54);
-  objectSetVisiblec2_hook(gb);
-  return;
+  TAIL(objectSetVisiblec2);
 
 substate1:
   CYC(b_+54, b_+55); ret_effect(gb);
@@ -1250,8 +1208,7 @@ state0:
   CYC(b_+11, b_+13); A = 0x02;
   CALL_C(b_+13, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+16);
   CYC(b_+16, b_+19);
-  objectSetInvisible_hook(gb);
-  return;
+  TAIL(objectSetInvisible);
 
 state1:
   CYC(b_+19, b_+21); E = 0x05;
@@ -1273,8 +1230,7 @@ substate0:
   CYC(b_+38, b_+39);
   CALL_C(b_+39, itemIncSubstate_hook, SYM(itemIncSubstate), b_+42);
   CYC(b_+42, b_+45);
-  objectSetVisible82_hook(gb);
-  return;
+  TAIL(objectSetVisible82);
 
 substate1:
   CYC(b_+45, b_+48); A = W8(wTmpcfc0_genericCutscene_state);
@@ -1288,8 +1244,7 @@ substate2:
   CYC(b_+57, b_+59); alu_cp(gb, 0x06);
   if (!(F & FZ)) {
     CYCT(b_+59, b_+62);
-    linkCutsceneFunc_73e8_hook(gb);
-    return;
+    TAIL(linkCutsceneFunc_73e8);
   }
   CYC(b_+59, b_+62);
   CALL_C(b_+62, itemIncSubstate_hook, SYM(itemIncSubstate), b_+65);
@@ -1297,8 +1252,7 @@ substate2:
   CALL_C(b_+68, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+71);
   CYC(b_+71, b_+73); A = 0x0d;
   CYC(b_+73, b_+76);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate3:
   CYC(b_+76, b_+78); C = 0x20;
@@ -1317,8 +1271,7 @@ substate4:
   CALL_C(b_+94, itemDecCounter1_hook, SYM(itemDecCounter1), b_+97);
   if (!(F & FZ)) {
     CYCT(b_+97, b_+100);
-    specialObjectAnimate_hook(gb);
-    return;
+    TAIL(specialObjectAnimate);
   }
   CYC(b_+97, b_+100);
   CYC(b_+100, b_+103); SET_HL(wTmpcfc0_genericCutscene_cfdf);
@@ -1363,8 +1316,7 @@ state0:
     CYC(b_+21, b_+23); A = 0x0f;
   }
   CYC(b_+23, b_+26);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 state1:
   CYC(b_+36, b_+38); E = 0x05;
@@ -1385,8 +1337,7 @@ substate0:
   CYC(b_+53, b_+54);
   CALL_C(b_+54, itemIncSubstate_hook, SYM(itemIncSubstate), b_+57);
   CYC(b_+57, b_+60);
-  objectSetVisible82_hook(gb);
-  return;
+  TAIL(objectSetVisible82);
 
 substate1:
   CYC(b_+60, b_+63); A = W8(wTmpcfc0_genericCutscene_state);
@@ -1404,8 +1355,7 @@ substate1:
     CYC(b_+76, b_+77); A = alu_inc8(gb, A);
   }
   CYC(b_+77, b_+80);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate2:
   CYC(b_+80, b_+83); A = W8(wTmpcfc0_genericCutscene_state);
@@ -1442,8 +1392,7 @@ spawn_heart:
 set_animation:
   CYC(b_+115, b_+117); A = 0x12;
   CYC(b_+117, b_+120);
-  specialObjectSetAnimation_hook(gb);
-  return;
+  TAIL(specialObjectSetAnimation);
 
 substate3:
   CALL_C(b_+120, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+123);
@@ -1518,8 +1467,7 @@ substate0:
   CYC(b_+79, b_+80);
   CYC(b_+80, b_+82); mem_wr(gb, HL, 0x3c);
   CYC(b_+82, b_+85);
-  itemIncSubstate_hook(gb);
-  return;
+  TAIL(itemIncSubstate);
 
 substate1:
   CALL_C(b_+85, linkCutscene_oscillateZ_2_hook, SYM(linkCutscene_oscillateZ_2), b_+88);
@@ -1529,8 +1477,7 @@ substate1:
   CALL_C(b_+92, itemIncSubstate_hook, SYM(itemIncSubstate), b_+95);
   CYC(b_+95, b_+98); SET_BC(0x1213);
   CYC(b_+98, b_+101);
-  showText_hook(gb);
-  return;
+  TAIL(showText);
 
 substate2:
   CYC(b_+101, b_+104); SET_HL(SYM(linkCutscene_zOscillation1));
@@ -1544,8 +1491,7 @@ substate2:
   CYC(b_+117, b_+119); A = 0x91;
   CALL_C(b_+119, playSound_b00_hook, SYM(playSound_b00), b_+122);
   CYC(b_+122, b_+125);
-  linkCutscene_createGlowingOrb_hook(gb);
-  return;
+  TAIL(linkCutscene_createGlowingOrb);
 
 substate3:
   CYC(b_+125, b_+127); E = 0x21;
@@ -1565,8 +1511,7 @@ substate3:
   CYC(b_+143, b_+144); alu_rrca(gb);
   if (!(F & FC)) {
     CYCT(b_+144, b_+147);
-    objectSetInvisible_hook(gb);
-    return;
+    TAIL(objectSetInvisible);
   }
   CYC(b_+144, b_+147);
   CYC(b_+147, b_+150);
@@ -1581,7 +1526,7 @@ void linkCutsceneC_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (link_cutscene_jump_table(gb));
     if (jt_ == b_+8) { goto state0; }
-    else if (jt_ == SYM(linkCutsceneRet)) { linkCutsceneRet_hook(gb); return; }
+    else if (jt_ == SYM(linkCutsceneRet) && hook_enabled_at(gb, SYM(linkCutsceneRet))) { linkCutsceneRet_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
@@ -1604,19 +1549,19 @@ void specialObjectCode_linkInCutscene_b06_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (link_cutscene_jump_table(gb));
-    if (jt_ == SYM(linkCutscene0)) { linkCutscene0_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene1)) { linkCutscene1_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene2)) { linkCutscene2_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene3)) { linkCutscene3_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene4)) { linkCutscene4_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene5)) { linkCutscene5_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene6)) { linkCutscene6_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene7)) { linkCutscene7_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene8)) { linkCutscene8_hook(gb); return; }
-    else if (jt_ == SYM(linkCutscene9)) { linkCutscene9_hook(gb); return; }
-    else if (jt_ == SYM(linkCutsceneA)) { linkCutsceneA_hook(gb); return; }
-    else if (jt_ == SYM(linkCutsceneB)) { linkCutsceneB_hook(gb); return; }
-    else if (jt_ == SYM(linkCutsceneC)) { linkCutsceneC_hook(gb); return; }
+    if (jt_ == SYM(linkCutscene0) && hook_enabled_at(gb, SYM(linkCutscene0))) { linkCutscene0_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene1) && hook_enabled_at(gb, SYM(linkCutscene1))) { linkCutscene1_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene2) && hook_enabled_at(gb, SYM(linkCutscene2))) { linkCutscene2_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene3) && hook_enabled_at(gb, SYM(linkCutscene3))) { linkCutscene3_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene4) && hook_enabled_at(gb, SYM(linkCutscene4))) { linkCutscene4_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene5) && hook_enabled_at(gb, SYM(linkCutscene5))) { linkCutscene5_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene6) && hook_enabled_at(gb, SYM(linkCutscene6))) { linkCutscene6_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene7) && hook_enabled_at(gb, SYM(linkCutscene7))) { linkCutscene7_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene8) && hook_enabled_at(gb, SYM(linkCutscene8))) { linkCutscene8_hook(gb); return; }
+    else if (jt_ == SYM(linkCutscene9) && hook_enabled_at(gb, SYM(linkCutscene9))) { linkCutscene9_hook(gb); return; }
+    else if (jt_ == SYM(linkCutsceneA) && hook_enabled_at(gb, SYM(linkCutsceneA))) { linkCutsceneA_hook(gb); return; }
+    else if (jt_ == SYM(linkCutsceneB) && hook_enabled_at(gb, SYM(linkCutsceneB))) { linkCutsceneB_hook(gb); return; }
+    else if (jt_ == SYM(linkCutsceneC) && hook_enabled_at(gb, SYM(linkCutsceneC))) { linkCutsceneC_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

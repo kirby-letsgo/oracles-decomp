@@ -253,8 +253,7 @@ void generateSecret__determineXorCipher_hook(GB *gb) {
   CYC(b_+63, b_+64); A = B;
   if (!(F & FZ)) {
     CYCT(b_+64, b_+66);
-    generateSecret__ret_hook(gb);
-    return;
+    TAIL(generateSecret__ret);
   }
   CYC(b_+64, b_+66);
   CYC(b_+66, b_+68); L = GV(0xfb, 0xe6);
@@ -356,8 +355,7 @@ void unpackSecret_hook(GB *gb) {
   CALL_C(b_+11, loadSecretBufferFromText_hook, SYM(loadSecretBufferFromText), b_+14);
   if (F & FC) {
     CYCT(b_+14, b_+16);
-    unpackSecret__fail_hook(gb);
-    return;
+    TAIL(unpackSecret__fail);
   }
   CYC(b_+14, b_+16);
   CALL_C(b_+16, runXorCipherOnSecretBuffer_hook, SYM(runXorCipherOnSecretBuffer), b_+19);
@@ -373,8 +371,7 @@ void unpackSecret_hook(GB *gb) {
   CYC(b_+35, b_+36); alu_cp(gb, E);
   if (!(F & FZ)) {
     CYCT(b_+36, b_+38);
-    unpackSecret__fail_hook(gb);
-    return;
+    TAIL(unpackSecret__fail);
   }
   CYC(b_+36, b_+38);
   CALL_C(b_+38, unpackSecret__unpackSecretData_hook, b_+53, b_+41);
@@ -382,8 +379,7 @@ void unpackSecret_hook(GB *gb) {
   CYC(b_+44, b_+45); alu_cp(gb, C);
   if (!(F & FZ)) {
     CYCT(b_+45, b_+47);
-    unpackSecret__fail_hook(gb);
-    return;
+    TAIL(unpackSecret__fail);
   }
   CYC(b_+45, b_+47);
   CYC(b_+47, b_+49); B = 0x00;
@@ -706,8 +702,7 @@ void loadSecretBufferFromText__textCharacterToByte_hook(GB *gb) {
     CYC(b_+28, b_+29); alu_cp(gb, mem_rd(gb, HL));
     if (F & FZ) {
       CYCT(b_+29, b_+31);
-      loadSecretBufferFromText__end_hook(gb);
-      return;
+      TAIL(loadSecretBufferFromText__end);
     }
     CYC(b_+29, b_+31);
     CYC(b_+31, b_+32); SET_HL(HL + 1);
@@ -716,8 +711,7 @@ void loadSecretBufferFromText__textCharacterToByte_hook(GB *gb) {
     if (!(F & FZ)) { CYCT(b_+34, b_+36); continue; }
     CYC(b_+34, b_+36);
     CYC(b_+36, b_+37); alu_scf(gb);
-    loadSecretBufferFromText__end_hook(gb);
-    return;
+    TAIL(loadSecretBufferFromText__end);
   }
 }
 

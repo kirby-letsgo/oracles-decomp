@@ -74,14 +74,14 @@ void interactionCode8d_hook(GB *gb) {
 initSubid2:
   CYC(b_+43, b_+46); push_effect(gb, b_+46); goto loadScript; // call
 afterLoadScript:
-  CYC(b_+46, b_+49); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+46, b_+49); TAIL(objectSetInvisible); // jp
 
 initSubid1:
   CYC(b_+49, b_+52); SET_BC((SYM(interactionCode78__tileReplacement) + 27));
   CALL_C(b_+52, interactionSetPosition_hook, SYM(interactionSetPosition), b_+55);
   CYC(b_+55, b_+57); L = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+57, b_+59); mem_wr(gb, HL, 30);
-  CYC(b_+59, b_+62); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+59, b_+62); TAIL(objectSetInvisible); // jp
 
 state1:
   CYC(b_+62, b_+64); E = INTERACTION_BASE + OBJ_SUBID;
@@ -107,7 +107,7 @@ state1:
   CALL_C(b_+90, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+93);
 
 L_6bb5:
-  CYC(b_+93, b_+96); interactionDelete_hook(gb); return; // jp
+  CYC(b_+93, b_+96); TAIL(interactionDelete); // jp
 
 runSubid1:
   CALL_C(b_+96, interactionAnimate_hook, SYM(interactionAnimate), b_+99);
@@ -137,7 +137,7 @@ runSubid1:
   CYC(b_+136, b_+138); A = 0x03;
   CYC(b_+138, b_+141); W8(wDirtyFadeBgPalettes) = A;
   CYC(b_+141, b_+144); W8(wFadeBgPaletteSources) = A;
-  CYC(b_+144, b_+147); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+144, b_+147); TAIL(interactionIncSubstate); // jp
 
 subid1Substate1:
   CALL_C(b_+147, interactionDecCounter1IfPaletteNotFading_hook, SYM(interactionDecCounter1IfPaletteNotFading), b_+150);
@@ -146,7 +146,7 @@ subid1Substate1:
   CYC(b_+151, b_+153); mem_wr(gb, HL, 20);
   CALL_C(b_+153, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+156);
   CYC(b_+156, b_+159); SET_BC(0x2808); // TX_2808
-  CYC(b_+159, b_+162); showText_hook(gb); return; // jp
+  CYC(b_+159, b_+162); TAIL(showText); // jp
 
 subid1Substate2:
   CALL_C(b_+162, interactionDecCounter1IfTextNotActive_hook, SYM(interactionDecCounter1IfTextNotActive), b_+165);
@@ -158,7 +158,7 @@ subid1Substate2:
   CYC(b_+174, b_+176); mem_wr(gb, HL, 0x00);
   CYC(b_+176, b_+179); SET_HL(wGenericCutscene_cbba);
   CYC(b_+179, b_+181); mem_wr(gb, HL, 0xff);
-  CYC(b_+181, b_+184); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+181, b_+184); TAIL(interactionIncSubstate); // jp
 
 subid1Substate3:
   CYC(b_+184, b_+187); SET_HL(wGenericCutscene_cbb3);
@@ -170,7 +170,7 @@ subid1Substate3:
   CYC(b_+195, b_+198); W8(wGenericCutscene_cbb8) = A;
   CYC(b_+198, b_+200); A = 0x08; // CUTSCENE_BLACK_TOWER_EXPLANATION
   CYC(b_+200, b_+203); W8(wCutsceneTrigger) = A;
-  CYC(b_+203, b_+206); interactionDelete_hook(gb); return; // jp
+  CYC(b_+203, b_+206); TAIL(interactionDelete); // jp
 
 // interactionCode8d@loadScript
 loadScript:

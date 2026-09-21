@@ -45,7 +45,7 @@ void linkedNpc_checkShouldSpawn_hook(GB *gb) {
   CALL_C(b_+0, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+3);
   if (!(F & FZ)) { CYCT(b_+3, b_+5); goto notLinked; }
   CYC(b_+3, b_+5);
-  CYC(b_+5, b_+8); writeFlagsTocddb_hook(gb); return;
+  CYC(b_+5, b_+8); TAIL(writeFlagsTocddb);
 notLinked:
   CYC(b_+8, b_+10); E = 0x7f;
   CYC(b_+10, b_+11); A = mem_rd(gb, DE);
@@ -60,16 +60,16 @@ notLinked:
   } while (0);
 checkd4:
   CYC(b_+32, b_+34); A = 0x03;
-  CYC(b_+34, b_+37); checkEssenceNotObtained_hook(gb); return;
+  CYC(b_+34, b_+37); TAIL(checkEssenceNotObtained);
 checkd1:
   CYC(b_+37, b_+39); A = 0x00;
-  CYC(b_+39, b_+42); checkEssenceNotObtained_hook(gb); return;
+  CYC(b_+39, b_+42); TAIL(checkEssenceNotObtained);
 checkd2:
   CYC(b_+42, b_+44); A = 0x01;
-  CYC(b_+44, b_+47); checkEssenceNotObtained_hook(gb); return;
+  CYC(b_+44, b_+47); TAIL(checkEssenceNotObtained);
 checkd2_2:
   CYC(b_+47, b_+49); A = 0x01;
-  CYC(b_+49, b_+52); checkEssenceNotObtained_hook(gb); return;
+  CYC(b_+49, b_+52); TAIL(checkEssenceNotObtained);
 always:
   CYC(b_+52, b_+53); alu_or(gb, D);
   CYC(b_+53, b_+56); writeFlagsTocddb_hook(gb);

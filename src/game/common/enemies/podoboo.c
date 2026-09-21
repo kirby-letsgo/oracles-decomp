@@ -78,7 +78,7 @@ void enemyCode29_hook(GB *gb) {
     if (target == SYM(podoboo_stateA)) { podoboo_stateA_hook(gb); return; }
     if (target == SYM(podoboo_stateB)) { podoboo_stateB_hook(gb); return; }
     if (target == SYM(podoboo_stateC)) { podoboo_stateC_hook(gb); return; }
-    podoboo_state_stub_hook(gb); return; // states 1-7 all target 0x62be
+    TAIL(podoboo_state_stub); // states 1-7 all target 0x62be
   }
 }
 
@@ -98,7 +98,7 @@ void podoboo_state_uninitialized_hook(GB *gb) {
   CYC(b_+15, b_+16); A = mem_rd(gb, HL);
   CYC(b_+16, b_+17); A = alu_inc8(gb, A);
   CALL_C(b_+17, enemySetAnimation_hook, SYM(enemySetAnimation), b_+20);
-  CYC(b_+20, b_+23); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(objectSetVisible83); // jp
 }
 
 void podoboo_state_stub_hook(GB *gb) {
@@ -121,7 +121,7 @@ void podoboo_state8_hook(GB *gb) {
   CYC(b_+13, b_+14); A = mem_rd(gb, HL);
   CYC(b_+14, b_+16); L = ENEMY_BASE + 0x31; // Enemy.var31
   CYC(b_+16, b_+17); mem_wr(gb, HL, A);
-  CYC(b_+17, b_+19); podoboo_beginMovingUp_hook(gb); return; // jr
+  CYC(b_+17, b_+19); TAIL(podoboo_beginMovingUp); // jr
 }
 
 // Leaping out of lava
@@ -142,14 +142,14 @@ void podoboo_state9_hook(GB *gb) {
   CYC(b_+15, b_+16);
   CYC(b_+16, b_+17); mem_wr(gb, HL, A);
   CALL_C(b_+17, enemySetAnimation_hook, SYM(enemySetAnimation), b_+20);
-  CYC(b_+20, b_+22); podoboo_spawnLavaParticle_hook(gb); return; // jr
+  CYC(b_+20, b_+22); TAIL(podoboo_spawnLavaParticle); // jr
 
 doneLeaping:
   CYC(b_+22, b_+24); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+24, b_+25); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+25, b_+27); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+27, b_+29); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
-  podoboo_stateA_hook(gb); return; // falls through
+  TAIL(podoboo_stateA); // falls through
 }
 
 // Just re-entered the lava
@@ -167,7 +167,7 @@ void podoboo_stateA_hook(GB *gb) {
   CYC(b_+15, b_+16); A = mem_rd(gb, HL);
   CYC(b_+16, b_+17); mem_wr(gb, DE, A);
   CALL_C(b_+17, ecom_incState_b0d_hook, SYM(ecom_incState_b0d), b_+20);
-  CYC(b_+20, b_+23); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(objectSetInvisible); // jp
 }
 
 // Waiting for [counter1] frames before jumping out again.
@@ -178,7 +178,7 @@ void podoboo_stateB_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+3, b_+4); ret_effect(gb); return; } // ret nz
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+5); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+5, b_+7); podoboo_beginMovingUp_hook(gb); return; // jr
+  CYC(b_+5, b_+7); TAIL(podoboo_beginMovingUp); // jr
 }
 
 // State for "lava particle" (subid 1); just animate until time to delete self.
@@ -194,7 +194,7 @@ void podoboo_stateC_hook(GB *gb) {
   CYC(b_+10, b_+11); A = alu_dec8(gb, A);
   if (!(F & FZ)) { CYCT(b_+11, b_+14); objectSetInvisible_hook(gb); return; } // jp nz
   CYC(b_+11, b_+14);
-  CYC(b_+14, b_+17); ecom_flickerVisibility_b0d_hook(gb); return; // jp
+  CYC(b_+14, b_+17); TAIL(ecom_flickerVisibility_b0d); // jp
 }
 
 void podoboo_spawnLavaParticleEvery16Frames_hook(GB *gb) {
@@ -205,7 +205,7 @@ void podoboo_spawnLavaParticleEvery16Frames_hook(GB *gb) {
   CYC(b_+4, b_+6); alu_and(gb, 0x0f);
   if (!(F & FZ)) { CYCT(b_+6, b_+7); ret_effect(gb); return; } // ret nz
   CYC(b_+6, b_+7);
-  podoboo_spawnLavaParticle_hook(gb); return; // falls through
+  TAIL(podoboo_spawnLavaParticle); // falls through
 }
 
 void podoboo_spawnLavaParticle_hook(GB *gb) {
@@ -250,7 +250,7 @@ void podoboo_beginMovingUp_hook(GB *gb) {
 void podoboo_makeLavaSplash_hook(GB *gb) {
   BASE(podoboo_makeLavaSplash);
   CYC(b_+0, b_+3); SET_BC(0x0401); // INTERAC_LAVASPLASH, $01
-  CYC(b_+3, b_+6); objectCreateInteraction_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(objectCreateInteraction); // jp
 }
 
 // podoboo_counter1Vals (0d:635a) is pure data (.db $10 $50 $50 $50), not code -- confirmed via

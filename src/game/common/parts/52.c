@@ -60,7 +60,7 @@ subid0_state0:
   CYC(b_+33, b_+34); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+34, b_+36); L = 0xc6; // Part.counter1
   CYC(b_+36, b_+38); mem_wr(gb, HL, 0x0a);
-  CYC(b_+38, b_+41); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+38, b_+41); TAIL(objectSetVisible82); // jp
 
 subid0_state1:
   CALL_C(b_+41, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+44);
@@ -80,7 +80,7 @@ subid0_state2:
   CALL_C(b_+64, objectApplySpeed_hook, SYM(objectApplySpeed), b_+67);
 
 L_5c9f:
-  CYC(b_+67, b_+70); partAnimate_hook(gb); return; // jp
+  CYC(b_+67, b_+70); TAIL(partAnimate); // jp
 
 subid1:
   CYC(b_+70, b_+71); A = mem_rd(gb, DE);
@@ -166,7 +166,7 @@ L_5d02:
   CALL_C(b_+175, objectSetVisible82_hook, SYM(objectSetVisible82), b_+178);
 
 subid1_animate:
-  CYC(b_+178, b_+181); partAnimate_hook(gb); return; // jp
+  CYC(b_+178, b_+181); TAIL(partAnimate); // jp
 
 subid1_state2:
   CALL_C(b_+181, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+184);
@@ -223,7 +223,7 @@ func_5d31_call2:
   CYC(b_+227, b_+228); alu_add(gb, B);
   CYC(b_+228, b_+230); alu_and(gb, 0x1f);
   CYC(b_+230, b_+231); mem_wr(gb, HL, A);
-  CYC(b_+231, b_+234); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+231, b_+234); TAIL(objectCopyPosition); // jp
 
 subid2:
   CYC(b_+234, b_+235); A = mem_rd(gb, DE);
@@ -242,7 +242,7 @@ subid2_state0:
   CYC(b_+246, b_+247); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+247, b_+249); L = 0xc6; // Part.counter1
   CYC(b_+249, b_+251); mem_wr(gb, HL, 0x0f);
-  CYC(b_+251, b_+254); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+251, b_+254); TAIL(objectSetVisible82); // jp
 
 subid2_state1:
   CALL_C(b_+254, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+257);
@@ -254,7 +254,7 @@ subid2_state1:
   CYC(b_+264, b_+266); A = 0xa8; // SND_VERAN_FAIRY_ATTACK
   CALL_C(b_+266, playSound_b00_hook, SYM(playSound_b00), b_+269);
   CYC(b_+269, b_+271); A = 0x01;
-  CYC(b_+271, b_+274); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+271, b_+274); TAIL(partSetAnimation); // jp
 
 subid2_state2:
   CALL_C(b_+274, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+277);
@@ -268,5 +268,5 @@ subid2_state2:
   CYC(b_+289, b_+291); E = 0xc9; // Part.angle
   CYC(b_+291, b_+292); mem_wr(gb, DE, A);
   CYC(b_+292, b_+294); A = 0x02;
-  CYC(b_+294, b_+297); partSetAnimation_hook(gb); return; // jp
+  CYC(b_+294, b_+297); TAIL(partSetAnimation); // jp
 }

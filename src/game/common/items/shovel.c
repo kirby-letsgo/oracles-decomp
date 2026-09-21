@@ -32,7 +32,7 @@ void itemCode15_hook(GB *gb) {
     CALL_C(b_+27, addToGashaMaturity_hook, SYM(addToGashaMaturity), b_+30);
     CYC(b_+30, b_+32); A = 0xa9;
   }
-  CYC(b_+32, b_+35); playSound_b00_hook(gb); return;
+  CYC(b_+32, b_+35); TAIL(playSound_b00);
 
 state1:
   CALL_C(b_+35, itemDecCounter1_hook, SYM(itemDecCounter1), b_+38);

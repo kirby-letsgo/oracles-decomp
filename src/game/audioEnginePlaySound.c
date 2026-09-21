@@ -115,7 +115,7 @@ void handleEnvelopes_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_cp(gb, 0x04);
   if (!(F & FZ)) { CYCT(b_+5, b_+7); goto notChannel4; } // jr nz
   CYC(b_+5, b_+7);
-  CYC(b_+7, b_+10); updateChannel4Volume_hook(gb); return; // jp
+  CYC(b_+7, b_+10); TAIL(updateChannel4Volume); // jp
 notChannel4:
   CYC(b_+10, b_+13); SET_HL(wChannelEnvelopeStates);
   CYC(b_+13, b_+16); A = W8(wSoundChannel);
@@ -168,7 +168,7 @@ checkEnvelopeRequested:
   CYC(b_+90, b_+91); alu_add_hl(gb, DE);
   CYC(b_+91, b_+92); SET_AF(pop_effect(gb));
   CYC(b_+92, b_+93); mem_wr(gb, HL, A);
-  CYC(b_+93, b_+96); updateSquareChannelVolume_hook(gb); return; // jp
+  CYC(b_+93, b_+96); TAIL(updateSquareChannelVolume); // jp
 waitForNoteStartEnvelope:
   CYC(b_+96, b_+99); SET_HL(wChannelEnvelopeWaitCounters);
   CYC(b_+99, b_+102); A = W8(wSoundChannel);
@@ -230,7 +230,7 @@ haveEnvelopeState:
   CYC(b_+190, b_+193); A = W8(wSoundCmdEnvelope);
   CYC(b_+193, b_+194); alu_or(gb, C);
   CYC(b_+194, b_+197); W8(wSoundCmdEnvelope) = A;
-  CYC(b_+197, b_+200); updateSquareChannelVolume_hook(gb); return; // jp
+  CYC(b_+197, b_+200); TAIL(updateSquareChannelVolume); // jp
 }
 
 void updateSquareChannelVolume_hook(GB *gb) {
@@ -430,7 +430,7 @@ freqOrCmd:
   CYC(b_+83, b_+84); A = mem_rd(gb, HL);
   CYC(b_+84, b_+86); mem_wr(gb, 0xff1c, A);
 waitCmd60:
-  CYC(b_+86, b_+89); setChannelWaitCounter_hook(gb); return; // jp
+  CYC(b_+86, b_+89); TAIL(setChannelWaitCounter); // jp
 freqCommand:
   CYC(b_+89, b_+91); A = 0x00;
   CYC(b_+91, b_+94); SET_HL(wChannelIsPlayingRest);
@@ -499,7 +499,7 @@ arbitraryFrequency:
   CYC(b_+206, b_+209); A = W8(wSoundFrequencyH);
   CYC(b_+209, b_+211); mem_wr(gb, 0xff1e, A);
 waitFreq:
-  CYC(b_+211, b_+214); setChannelWaitCounter_hook(gb); return; // jp
+  CYC(b_+211, b_+214); TAIL(setChannelWaitCounter); // jp
 }
 
 // @param[out] a Volume of channel wSoundChannel dependent of wMusicVolume,
@@ -589,7 +589,7 @@ found:
   CYC(b_+51, b_+53); A = 0x80;
   CYC(b_+53, b_+55); mem_wr(gb, 0xff23, A);
 wait:
-  CYC(b_+55, b_+58); setChannelWaitCounter_hook(gb); return; // jp
+  CYC(b_+55, b_+58); TAIL(setChannelWaitCounter); // jp
 }
 
 void standardCmdChannel7_hook(GB *gb) {
@@ -606,7 +606,7 @@ void standardCmdChannel7_hook(GB *gb) {
 skipTrigger:
   CYC(b_+18, b_+20); A = 0x00;
   CYC(b_+20, b_+23); W8(wChannel7TriggerOnNextSound) = A;
-  CYC(b_+23, b_+26); setChannelWaitCounter_hook(gb); return; // jp
+  CYC(b_+23, b_+26); TAIL(setChannelWaitCounter); // jp
 }
 
 // Disables and silences the current channel
@@ -686,7 +686,7 @@ silenceAndUpdate:
   CYC(b_+77, b_+79); A = 0x08;
   CYC(b_+79, b_+82); W8(wSoundCmdEnvelope) = A;
   CALL_C(b_+82, updateSquareChannelVolume_hook, SYM(updateSquareChannelVolume), b_+85);
-  CYC(b_+85, b_+88); updatePlayedFrequency_hook(gb); return; // jp
+  CYC(b_+85, b_+88); TAIL(updatePlayedFrequency); // jp
 musicWaveChannel:
   CALL_C(b_+88, isWaveChannelUnavailable_hook, SYM(isWaveChannelUnavailable), b_+91);
   CYC(b_+91, b_+93); alu_cp(gb, 0x00);
@@ -784,7 +784,7 @@ void channelCmdfe_hook(GB *gb) {
   CYC(b_+20, b_+21); A = H;
   CYC(b_+21, b_+22); mem_wr(gb, 0xff00 | C, A);
   CYC(b_+22, b_+23); C = alu_inc8(gb, C);
-  CYC(b_+23, b_+26); doNextChannelCommand_hook(gb); return; // jp
+  CYC(b_+23, b_+26); TAIL(doNextChannelCommand); // jp
 }
 
 void multiplyHlByA_hook(GB *gb) {

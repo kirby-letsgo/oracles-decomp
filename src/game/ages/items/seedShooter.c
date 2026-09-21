@@ -14,8 +14,7 @@ void itemCode0fPost_hook(GB *gb) {
   CALL_C(b_+0, cpRelatedObject1ID_hook, SYM(cpRelatedObject1ID), b_+3);
   if (!(F & FZ)) {
     CYCT(b_+3, b_+6);
-    itemDelete_hook(gb);
-    return;
+    TAIL(itemDelete);
   }
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+9); SET_HL(b_+30);

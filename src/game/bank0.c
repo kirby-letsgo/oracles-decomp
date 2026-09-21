@@ -10060,8 +10060,7 @@ void initializeRoom_hook(GB *gb) {
     CYC(b_+11, b_+14);
     B = 0x7c;
     CYC(b_+14, b_+19);
-    objectCreateInteractionWithSubid00_hook(gb);
-    return;
+    TAIL(objectCreateInteractionWithSubid00);
   }
   CYCT(b_+11, b_+14);
   inter_bank_call(gb, b_+19, 0x02, ROM_b02_calculateRoomStateModifier);
@@ -11793,7 +11792,7 @@ void linkState07_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (rst_jump_table(gb));
     if (jt_ == b_+10) { linkState07__substate0_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectAnimate)) { specialObjectAnimate_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectAnimate) && hook_enabled_at(gb, SYM(specialObjectAnimate))) { specialObjectAnimate_hook(gb); return; }
     else if (jt_ == b_+33) { linkState07__substate2_hook(gb); return; }
     else { hook_handoff(gb, HL); return; }
   } while (0);
@@ -12184,8 +12183,7 @@ void _getObjectPositionOnScreen_duringScreenTransition_hook(GB *gb) {
   alu_cp(gb, 0x03);
   if (F & FZ) {
     CYCT(b_+6, b_+12);
-    _label_00_152_hook(gb);
-    return;
+    TAIL(_label_00_152);
   }
   CYC(b_+6, b_+12);
   D = 0x00;
@@ -13446,8 +13444,7 @@ void lcdInterrupt_ringMenu_hook(GB *gb) {
     CYC(b_+26, b_+28);
     CYC(b_+28, b_+30); H8(hLcdInterruptCounter) = A;
     CYCT(b_+30, b_+32);
-    _lcdInterruptEnd_hook(gb);
-    return;
+    TAIL(_lcdInterruptEnd);
   }
   A = 0x80;
   CYC(b_+32, b_+34);
@@ -13878,8 +13875,7 @@ void textThreadStart_hook(GB *gb) {
       CYC(b_+11, b_+14); mem_wr(gb, wTextIsActive, A);
       CYC(b_+14, b_+17); mem_wr(gb, wTextboxFlags, A);
       CYCT(b_+17, b_+20);
-      stubThreadStart_hook(gb);
-      return;
+      TAIL(stubThreadStart);
     }
   }
   A = 0x3f;

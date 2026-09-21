@@ -141,5 +141,5 @@ state2_afterBounceCall:
   CYC(b_+129, b_+130); L = alu_inc8(gb, L);
   CYC(b_+130, b_+131); A = mem_rd(gb, DE);
   CYC(b_+131, b_+132); mem_wr(gb, HL, A);
-  CYC(b_+132, b_+135); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+132, b_+135); TAIL(objectSetInvisible); // jp
 }

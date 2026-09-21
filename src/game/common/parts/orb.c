@@ -25,7 +25,7 @@ void partCode03_hook(GB *gb) {
   CYC(b_+20, b_+21); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+21, b_+22); mem_wr(gb, HL, A);
   CYC(b_+22, b_+24); A = 0x7e; // SND_SWITCH
-  CYC(b_+24, b_+27); playSound_b00_hook(gb); return; // jp
+  CYC(b_+24, b_+27); TAIL(playSound_b00); // jp
 
 notJustHit:
   CYC(b_+27, b_+29); E = 0xc4; // Part.state
@@ -59,5 +59,5 @@ L_44c5:
   CYC(b_+63, b_+65); L = 0xdb; // Part.oamFlagsBackup
   CYC(b_+65, b_+66); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+66, b_+67); mem_wr(gb, HL, A);
-  CYC(b_+67, b_+70); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+67, b_+70); TAIL(objectSetVisible82); // jp
 }

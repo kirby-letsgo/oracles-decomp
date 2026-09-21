@@ -45,3 +45,47 @@ def rom_labels(sym):
         if (b, a) not in lst: lst.append((b, a))
     for n in labels: labels[n].sort()
     return labels
+
+
+def pair_instances(ages_rom, ages_sym, seasons_rom, seasons_sym):
+    """(label name, ages bank, addr) -> (seasons bank, addr) for every ROM label, pairing copies of a
+    label by content (normalized instruction stream), then by same bank, then by bank order. Keyed
+    by name as well as address because several labels can share an Ages address."""
+    import os, sys
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from routine_equiv import Game
+    A, S = Game(ages_rom, ages_sym), Game(seasons_rom, seasons_sym)
+    al, sl = rom_labels(ages_sym), rom_labels(seasons_sym)
+    pairs = {}
+    parent_pairs = {}      # (parent name, ages bank) -> seasons bank
+    for name, ainst in al.items():
+        if '@' in name: continue
+        sinst = sl.get(name)
+        if not sinst: continue
+        if len(ainst) == 1 and len(sinst) == 1:
+            pairs[(name,) + ainst[0]] = sinst[0]; parent_pairs[(name, ainst[0][0])] = sinst[0][0]; continue
+        def norm(g, b, a):
+            try: return g.normalized(b, a)[0]
+            except Exception: return None
+        sn = {s: norm(S, *s) for s in sinst}
+        taken = set()
+        for a in ainst:
+            an = norm(A, *a)
+            cands = [s for s in sinst if s not in taken]
+            best = [s for s in cands if an is not None and sn[s] == an] or \
+                   [s for s in cands if an is not None and sn[s] is not None and [x[1].split(' ')[0] for x in sn[s]] == [x[1].split(' ')[0] for x in an]] or \
+                   [s for s in cands if s[0] == a[0]] or cands
+            if not best: continue
+            s = best[0]; taken.add(s)
+            pairs[(name,) + a] = s; parent_pairs[(name, a[0])] = s[0]
+    for name, ainst in al.items():
+        if '@' not in name: continue
+        parent = name.split('@')[0]
+        sinst = sl.get(name)
+        if not sinst: continue
+        for a in ainst:
+            sb = parent_pairs.get((parent, a[0]))
+            cand = [s for s in sinst if s[0] == sb] if sb is not None else []
+            if not cand and len(sinst) == len(ainst): cand = [sinst[ainst.index(a)]]
+            if cand: pairs[(name,) + a] = cand[0]
+    return pairs

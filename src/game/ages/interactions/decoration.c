@@ -65,21 +65,21 @@ deleteIfMoblinsKeepDestroyed:
   CALL_C(b_+69, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+72);
   if (F & FZ) { RET_TAKEN(b_+72); return; } // ret z
   CYC(b_+72, b_+73);
-  CYC(b_+73, b_+76); interactionDelete_hook(gb); return; // jp
+  CYC(b_+73, b_+76); TAIL(interactionDelete); // jp
 
 deleteIfRoomFlagBit7Unset:
   CALL_C(b_+76, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+79);
   CYC(b_+79, b_+81); alu_bit(gb, 7, A);
   if (!(F & FZ)) { RET_TAKEN(b_+81); return; } // ret nz
   CYC(b_+81, b_+82);
-  CYC(b_+82, b_+85); interactionDelete_hook(gb); return; // jp
+  CYC(b_+82, b_+85); TAIL(interactionDelete); // jp
 
 deleteIfGotRoomItem:
   CALL_C(b_+85, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+88);
   CYC(b_+88, b_+90); alu_bit(gb, 5, A); // ROOMFLAG_BIT_ITEM
   if (F & FZ) { RET_TAKEN(b_+90); return; } // ret z
   CYC(b_+90, b_+91);
-  CYC(b_+91, b_+94); interactionDelete_hook(gb); return; // jp
+  CYC(b_+91, b_+94); TAIL(interactionDelete); // jp
 
 subid0a:
   CALL_C(b_+94, objectSetVisible80_hook, SYM(objectSetVisible80), b_+97);
@@ -99,7 +99,7 @@ subid0a:
 
 normalPalette:
   CYC(b_+102, b_+104); A = 0x7d; // PALH_7d
-  CYC(b_+104, b_+107); loadPaletteHeader_hook(gb); return; // jp
+  CYC(b_+104, b_+107); TAIL(loadPaletteHeader); // jp
 
 isSymmetryCity:
   CYC(b_+107, b_+110); A = W8(wActiveGroup);
@@ -113,5 +113,5 @@ isSymmetryCity:
 
 ruinedSymmetryPalette:
   CYC(b_+120, b_+122); A = 0x7c; // PALH_7c
-  CYC(b_+122, b_+125); loadPaletteHeader_hook(gb); return; // jp
+  CYC(b_+122, b_+125); TAIL(loadPaletteHeader); // jp
 }

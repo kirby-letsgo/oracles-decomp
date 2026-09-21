@@ -45,7 +45,7 @@ void interactionCode8f_hook(GB *gb) {
   CALL_C(b_+18, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+21);
   CALL_C(b_+21, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+24);
   CALL_C(b_+24, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+27);
-  CYC(b_+27, b_+30); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+27, b_+30); TAIL(objectSetVisible80); // jp
 
 state1:
   CYC(b_+30, b_+32); C = 0x10;
@@ -74,12 +74,12 @@ state2:
   CYC(b_+64, b_+66); mem_wr(gb, HL, 0x3a); // 58
   CYC(b_+66, b_+68); A = 0x0b;
   CALL_C(b_+68, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+71);
-  CYC(b_+71, b_+74); objectSetVisible_hook(gb); return; // jp
+  CYC(b_+71, b_+74); TAIL(objectSetVisible); // jp
 
 state3:
   CALL_C(b_+74, interactionAnimate_hook, SYM(interactionAnimate), b_+77);
   CALL_C(b_+77, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+80);
   if (!(F & FZ)) { RET_TAKEN(b_+80); return; } // ret nz
   CYC(b_+80, b_+81);
-  CYC(b_+81, b_+84); interactionDelete_hook(gb); return; // jp
+  CYC(b_+81, b_+84); TAIL(interactionDelete); // jp
 }

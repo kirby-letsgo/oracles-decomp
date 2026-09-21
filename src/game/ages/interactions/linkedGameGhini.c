@@ -23,7 +23,7 @@ void interactionCodecb_initialize_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+32, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+35);
   CALL_C(b_+35, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+38);
-  CYC(b_+38, b_+41); interactionIncState_hook(gb); return; // jp
+  CYC(b_+38, b_+41); TAIL(interactionIncState); // jp
 }
 
 // 0b:77c7, unused (no callers).
@@ -42,7 +42,7 @@ void interactionCodecb_func_77c7_hook(GB *gb) {
   CYC(b_+60, b_+61); H = mem_rd(gb, HL);
   CYC(b_+61, b_+62); L = A;
   CALL_C(b_+62, interactionSetScript_hook, SYM(interactionSetScript), b_+65);
-  CYC(b_+65, b_+68); interactionIncState_hook(gb); return; // jp
+  CYC(b_+65, b_+68); TAIL(interactionIncState); // jp
 }
 
 // ==================================================================================================
@@ -72,5 +72,5 @@ state1:
   CALL_C(b_+23, interactionRunScript_hook, SYM(interactionRunScript), b_+26);
   if (F & FC) { CYCT(b_+26, b_+29); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; } // jp c
   CYC(b_+26, b_+29);
-  CYC(b_+29, b_+32); interactionAnimateAsNpc_hook(gb); return; // jp
+  CYC(b_+29, b_+32); TAIL(interactionAnimateAsNpc); // jp
 }

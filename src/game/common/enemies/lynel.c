@@ -67,7 +67,7 @@ dead:
   CYC(b_+25, b_+27); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 3))); // set 3,(hl)
 
 die:
-  CYC(b_+27, b_+30); enemyDie_hook(gb); return; // jp
+  CYC(b_+27, b_+30); TAIL(enemyDie); // jp
 
 normalStatus:
   CALL_C(b_+30, ecom_checkScentSeedActive_b0d_hook, SYM(ecom_checkScentSeedActive_b0d), b_+33);
@@ -136,7 +136,7 @@ state_scentSeed:
   CYC(b_+134, b_+137); push_effect(gb, b_+137); goto updateAnimationFromAngle;
 state_scentSeed_resume: // resumes at 0x4b00
   CALL_C(b_+137, ecom_applyVelocityForSideviewEnemy_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemy_b0d), b_+140);
-  CYC(b_+140, b_+143); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+140, b_+143); TAIL(enemyAnimate); // jp
 
 state_stub:
   RET(b_+143); return; // ret
@@ -166,7 +166,7 @@ prepareProjectile:
   CYC(b_+171, b_+173); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+173, b_+175); mem_wr(gb, HL, 0x08);
   CALL_C(b_+175, ecom_updateCardinalAngleTowardTarget_b0d_hook, SYM(ecom_updateCardinalAngleTowardTarget_b0d), b_+178);
-  CYC(b_+178, b_+181); ecom_updateAnimationFromAngle_b0d_hook(gb); return; // jp
+  CYC(b_+178, b_+181); TAIL(ecom_updateAnimationFromAngle_b0d); // jp
 
 state_09:
   CALL_C(b_+181, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+184);
@@ -177,7 +177,7 @@ state_09:
   CYC(b_+189, b_+191);
 
 animate:
-  CYC(b_+191, b_+194); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+191, b_+194); TAIL(enemyAnimate); // jp
 
 state_0a:
   CALL_C(b_+194, ecom_decCounter1_b0d_hook, SYM(ecom_decCounter1_b0d), b_+197);

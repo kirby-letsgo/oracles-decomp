@@ -92,7 +92,7 @@ afterTakeRelatedObj2Position:
   CYC(b_+76, b_+78); A = OBJ_VISIBLE; // Object.visible
   CALL_C(b_+78, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+81);
   CYC(b_+81, b_+83); B = 0x01;
-  CYC(b_+83, b_+86); objectFlickerVisibility_hook(gb); return; // jp
+  CYC(b_+83, b_+86); TAIL(objectFlickerVisibility); // jp
 
 state2:
   CALL_C(b_+86, objectSetVisible_hook, SYM(objectSetVisible), b_+89);
@@ -103,5 +103,5 @@ state2:
   CYC(b_+95, b_+98); SET_BC(0x3000); // TREASURE_SMALL_KEY, $00
   CALL_C(b_+98, createTreasure_hook, SYM(createTreasure), b_+101);
   CALL_C(b_+101, objectCopyPosition_hook, SYM(objectCopyPosition), b_+104);
-  CYC(b_+104, b_+107); interactionDelete_hook(gb); return; // jp
+  CYC(b_+104, b_+107); TAIL(interactionDelete); // jp
 }

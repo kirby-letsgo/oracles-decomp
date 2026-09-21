@@ -42,7 +42,7 @@ void partCode40_hook(GB *gb) {
   CALL_C(b_+25, objectApplySpeed_hook, SYM(objectApplySpeed), b_+28);
   CYC(b_+28, b_+30); A = 0x00; // Object.state
   CALL_C(b_+30, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+33);
-  CYC(b_+33, b_+36); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+33, b_+36); TAIL(objectCopyPosition); // jp
 
 state0:
   CYC(b_+36, b_+37); H = D;

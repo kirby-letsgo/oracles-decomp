@@ -54,8 +54,7 @@ void runScriptCommand_hook(GB *gb) {
   CYC(b_+0, b_+2); alu_bit(gb, 7, A);
   if (F & FZ) {
     CYCT(b_+2, b_+5);
-    scriptCmd_jump_hook(gb);
-    return;
+    TAIL(scriptCmd_jump);
   }
   CYC(b_+2, b_+5);
   CYC(b_+5, b_+6); push_effect(gb, HL);
@@ -102,8 +101,7 @@ void scriptFunc_checkRoomFlag_hook(GB *gb) {
   CYC(b_+3, b_+4); alu_and(gb, B);
   if (F & FZ) {
     CYCT(b_+4, b_+7);
-    scriptFunc_popHlAndInc_hook(gb);
-    return;
+    TAIL(scriptFunc_popHlAndInc);
   }
   CYC(b_+4, b_+7);
   CYC(b_+7, b_+8); SET_HL(pop_effect(gb));
@@ -409,8 +407,7 @@ void scriptCmd_spawnEnemyHere_hook(GB *gb) {
   CALL_C(b_+16, getFreeEnemySlot_hook, SYM(getFreeEnemySlot), b_+19);
   if (!(F & FZ)) {
     CYCT(b_+19, b_+21);
-    scriptFunc_restoreActiveObject_hook(gb);
-    return;
+    TAIL(scriptFunc_restoreActiveObject);
   }
   CYC(b_+19, b_+21);
   CYC(b_+21, b_+23); A = 0x8b;
@@ -842,8 +839,7 @@ void scriptCmd_jumpIfNoEnemies_hook(GB *gb) {
   CYC(b_+4, b_+5); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+5, b_+8);
-    scriptFunc_add3ToHl_hook(gb);
-    return;
+    TAIL(scriptFunc_add3ToHl);
   }
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+9); SET_HL(HL + 1);
@@ -861,8 +857,7 @@ void scriptCmd_jumpIfC6xxSet_hook(GB *gb) {
   CYC(b_+7, b_+8); alu_and(gb, mem_rd(gb, HL));
   if (F & FZ) {
     CYCT(b_+8, b_+11);
-    scriptFunc_add3ToHl_hook(gb);
-    return;
+    TAIL(scriptFunc_add3ToHl);
   }
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+12); SET_HL(HL + 1);
@@ -918,8 +913,7 @@ static void scriptCmd_compareMemoryThenJump(GB *gb) {
   CYC(b_+7, b_+8); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FZ)) {
     CYCT(b_+8, b_+11);
-    scriptFunc_add3ToHl_scf_hook(gb);
-    return;
+    TAIL(scriptFunc_add3ToHl_scf);
   }
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+12); SET_HL(HL + 1);
@@ -1084,8 +1078,7 @@ void scriptCmd_spawnItem_hook(GB *gb) {
   CALL_C(b_+8, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+11);
   if (!(F & FZ)) {
     CYCT(b_+11, b_+14);
-    scriptFunc_restoreActiveObject_hook(gb);
-    return;
+    TAIL(scriptFunc_restoreActiveObject);
   }
   CYC(b_+11, b_+14);
   CYC(b_+14, b_+16); mem_wr(gb, HL, 0x60);
@@ -1296,8 +1289,7 @@ void scriptCmd_jumpIfMemorySet_hook(GB *gb) {
   CYC(b_+7, b_+8); alu_and(gb, mem_rd(gb, HL));
   if (F & FZ) {
     CYCT(b_+8, b_+11);
-    scriptFunc_add3ToHl_hook(gb);
-    return;
+    TAIL(scriptFunc_add3ToHl);
   }
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+12); SET_HL(HL + 1);
@@ -1496,8 +1488,7 @@ void scriptCmd_checkRupeeDisplayUpdated_hook(GB *gb) {
   CYC(b_+13, b_+14); alu_cp(gb, mem_rd(gb, HL));
   if (F & FZ) {
     CYCT(b_+14, b_+17);
-    scriptFunc_popHlAndInc_hook(gb);
-    return;
+    TAIL(scriptFunc_popHlAndInc);
   }
   CYC(b_+14, b_+17);
 not_updated:

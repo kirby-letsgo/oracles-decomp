@@ -43,7 +43,7 @@ state1:
   CYC(b_+37, b_+38); mem_wr(gb, DE, A);
   CYC(b_+38, b_+41); SET_BC(0x0100); // TX_0100
   CALL_C(b_+41, showText_hook, SYM(showText), b_+44);
-  CYC(b_+44, b_+47); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+44, b_+47); TAIL(interactionIncSubstate); // jp
 
 substate1:
   CYC(b_+47, b_+50); push_effect(gb, b_+50); goto decCounter1IfTextNotActive;
@@ -59,7 +59,7 @@ afterDecCounter1IfTextNotActive:
   CYC(b_+64, b_+65); SET_DE(pop_effect(gb));
   CALL_C(b_+65, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+68);
   CYC(b_+68, b_+70); mem_wr(gb, HL, mem_rd(gb, HL) | 0x40);
-  CYC(b_+70, b_+73); interactionDelete_hook(gb); return; // jp
+  CYC(b_+70, b_+73); TAIL(interactionDelete); // jp
 
 decCounter1IfTextNotActive:
   CYC(b_+73, b_+76); A = W8(wTextIsActive);
@@ -147,7 +147,7 @@ state0:
   CYC(b_+35, b_+36); SET_DE(pop_effect(gb));
 
 delete_:
-  CYC(b_+36, b_+39); interactionDelete_hook(gb); return; // jp
+  CYC(b_+36, b_+39); TAIL(interactionDelete); // jp
 
 state1:
   // Never executed (deletes self before running state 1).
@@ -171,7 +171,7 @@ void interaction6b_subid02_hook(GB *gb) {
   CALL_C(b_+7, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+10);
   if (F & FC) { CYCT(b_+10, b_+13); interactionDelete_hook(gb); return; } // jp c
   CYC(b_+10, b_+13);
-  CYC(b_+13, b_+16); interaction6b_loadScript_hook(gb); return; // jp
+  CYC(b_+13, b_+16); TAIL(interaction6b_loadScript); // jp
 
 state1:
   CALL_C(b_+16, interactionRunScript_hook, SYM(interactionRunScript), b_+19);
@@ -206,14 +206,14 @@ void interaction6b_loadScript_hook(GB *gb) {
   CYC(b_+8, b_+9); H = mem_rd(gb, HL);
   CYC(b_+9, b_+10); L = A;
   CALL_C(b_+10, interactionSetScript_hook, SYM(interactionSetScript), b_+13);
-  CYC(b_+13, b_+16); interactionIncState_hook(gb); return; // jp
+  CYC(b_+13, b_+16); TAIL(interactionIncState); // jp
 }
 
 void interaction6b_initGraphicsAndIncState_hook(GB *gb) {
   BASE(interaction6b_initGraphicsAndIncState);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+3);
-  CYC(b_+3, b_+6); interactionIncState_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(interactionIncState); // jp
 }
 
 // interaction6b_subid03 (also interaction6b_subid12, an alias for the same code): the Seasons
@@ -227,7 +227,7 @@ void interaction6b_subid03_hook(GB *gb) {
 
   // interaction6b_subid12@state0
   CALL_C(b_+6, interaction6b_initGraphicsAndIncState_hook, SYM(interaction6b_initGraphicsAndIncState), b_+9);
-  CYC(b_+9, b_+12); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+9, b_+12); TAIL(objectSetVisible82); // jp
 }
 
 // interaction6b_subid04: script for the cutscene where moblins attack the maku sapling. Reaches
@@ -297,7 +297,7 @@ substate1:
   CYC(b_+39, b_+42);
   CYC(b_+42, b_+44); A = 0x03;
   CYC(b_+44, b_+47); mem_wr(gb, wTmpcfc0_genericCutscene_cfd1, A);
-  CYC(b_+47, b_+50); interactionDelete_hook(gb); return; // jp
+  CYC(b_+47, b_+50); TAIL(interactionDelete); // jp
 
 l4f12:
   CYC(b_+50, b_+51); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
@@ -347,7 +347,7 @@ void interaction6b_subid06_hook(GB *gb) {
   RET(b_+35); return; // ret
 
 delete_:
-  CYC(b_+36, b_+39); interactionDelete_hook(gb); return; // jp
+  CYC(b_+36, b_+39); TAIL(interactionDelete); // jp
 
 state1:
   CYC(b_+39, b_+41); E = INTERACTION_BASE + OBJ_SUBSTATE;
@@ -372,7 +372,7 @@ substate0:
   CYC(b_+62, b_+63); mem_wr(gb, HL, A);
   CYC(b_+63, b_+65); A = 0xd2; // SND_LIGHTNING
   CALL_C(b_+65, playSound_b00_hook, SYM(playSound_b00), b_+68);
-  CYC(b_+68, b_+71); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+68, b_+71); TAIL(interactionIncSubstate); // jp
 
 substate1:
   CYC(b_+71, b_+74); SET_HL(wGenericCutscene_cbb3);
@@ -381,7 +381,7 @@ substate1:
   if (F & FZ) { RET_TAKEN(b_+79); return; } // ret z
   CYC(b_+79, b_+80);
   CALL_C(b_+80, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+83);
-  CYC(b_+83, b_+86); fadeoutToWhite_hook(gb); return; // jp
+  CYC(b_+83, b_+86); TAIL(fadeoutToWhite); // jp
 
 substate2:
   CYC(b_+86, b_+89); A = W8(wPaletteThread_mode);
@@ -399,7 +399,7 @@ substate2:
   CYC(b_+112, b_+113); SET_DE(pop_effect(gb));
   CYC(b_+113, b_+115); A = 0x21; // MUS_DISASTER
   CALL_C(b_+115, playSound_b00_hook, SYM(playSound_b00), b_+118);
-  CYC(b_+118, b_+121); fadeinFromWhite_hook(gb); return; // jp
+  CYC(b_+118, b_+121); TAIL(fadeinFromWhite); // jp
 }
 
 // interaction6b_subid07: a seed satchel that slowly falls toward Link. Possibly unused.
@@ -433,7 +433,7 @@ state1:
   CYC(b_+37, b_+38); A = B;
   CYC(b_+38, b_+39); alu_adc(gb, mem_rd(gb, HL));
   CYC(b_+39, b_+40); mem_wr(gb, HL, A);
-  CYC(b_+40, b_+43); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb); return; // jp
+  CYC(b_+40, b_+43); TAIL(objectSetPriorityRelativeToLink_withTerrainEffects); // jp
 }
 
 // interaction6b_subid08: part of the cutscene where tokays steal your stuff.
@@ -449,7 +449,7 @@ void interaction6b_subid08_hook(GB *gb) {
   CYC(b_+8, b_+10); alu_bit(gb, 6, A);
   if (!(F & FZ)) { CYCT(b_+10, b_+13); interactionDelete_hook(gb); return; } // jp nz
   CYC(b_+10, b_+13);
-  CYC(b_+13, b_+16); interactionIncState_hook(gb); return; // jp
+  CYC(b_+13, b_+16); TAIL(interactionIncState); // jp
 
 state1:
   CYC(b_+16, b_+19); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfd1);
@@ -478,7 +478,7 @@ void interaction6b_subid09_hook(GB *gb) {
   CALL_C(b_+5, interaction6b_initGraphicsAndIncState_hook, SYM(interaction6b_initGraphicsAndIncState), b_+8);
   CYC(b_+8, b_+11); SET_BC(0x3848);
   CALL_C(b_+11, interactionSetPosition_hook, SYM(interactionSetPosition), b_+14);
-  CYC(b_+14, b_+17); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+14, b_+17); TAIL(objectSetVisible80); // jp
 
 state1:
   CYC(b_+17, b_+19); A = 0x00; // Object.enabled
@@ -497,14 +497,14 @@ state1:
   CYC(b_+35, b_+36); alu_or(gb, A);
   if (!(F & FZ)) CALL_C_CC(b_+36, objectSetVisible83_hook, SYM(objectSetVisible83), b_+39); else CYC(b_+36, b_+39); // call nz
   CYC(b_+39, b_+41); B = 0x00;
-  CYC(b_+41, b_+44); objectTakePositionWithOffset_hook(gb); return; // jp
+  CYC(b_+41, b_+44); TAIL(objectTakePositionWithOffset); // jp
 }
 
 void interaction6b_initGraphicsAndLoadScript_hook(GB *gb) {
   BASE(interaction6b_initGraphicsAndLoadScript);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionInitGraphics_hook, SYM(interactionInitGraphics), SYM(interaction6b_loadScript));
-  interaction6b_loadScript_hook(gb); return; // falls through
+  TAIL(interaction6b_loadScript); // falls through
 }
 
 // interaction6b_subid0a (also interaction6b_subid0b and interaction6b_subid0c, aliases for the
@@ -535,7 +535,7 @@ state1:
   CYC(b_+28, b_+29); alu_xor(gb, A);
   CYC(b_+29, b_+32); W8(wDisabledObjects) = A;
   CYC(b_+32, b_+35); W8(wMenuDisabled) = A;
-  CYC(b_+35, b_+38); interactionDelete_hook(gb); return; // jp
+  CYC(b_+35, b_+38); TAIL(interactionDelete); // jp
 
 l504a:
   CALL_C(b_+38, checkInteractionSubstate_hook, SYM(checkInteractionSubstate), b_+41);
@@ -604,7 +604,7 @@ updateXAndDraw:
   CYC(b_+66, b_+67); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+67, b_+69); L = INTERACTION_BASE + OBJ_XH;
   CYC(b_+69, b_+70); mem_wr(gb, HL, A);
-  CYC(b_+70, b_+73); interactionAnimateAsNpc_hook(gb); return; // jp
+  CYC(b_+70, b_+73); TAIL(interactionAnimateAsNpc); // jp
 
 checkLinkSquished:
   CYC(b_+73, b_+74); push_effect(gb, AF);
@@ -701,7 +701,7 @@ state0:
   CYC(b_+25, b_+27); mem_wr(gb, HL, 0x05); // PART_SWITCH
   CYC(b_+27, b_+28); L = alu_inc8(gb, L);
   CYC(b_+28, b_+30); mem_wr(gb, HL, 0x01);
-  CYC(b_+30, b_+33); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+30, b_+33); TAIL(objectCopyPosition); // jp
 
 state1:
   CYC(b_+33, b_+36); A = W8(wSwitchState);
@@ -716,7 +716,7 @@ state1:
   CYC(b_+52, b_+54); mem_wr(gb, HL, mem_rd(gb, HL) | 0x40);
   CALL_C(b_+54, interactionIncState_hook, SYM(interactionIncState), b_+57);
   CYC(b_+57, b_+60); SET_HL((SYM(miscPuzzles_subid19__state1) + 2)); // mainScripts.interaction6b_bridgeToNuunSimpleScript
-  CYC(b_+60, b_+63); interactionSetSimpleScript_hook(gb); return; // jp
+  CYC(b_+60, b_+63); TAIL(interactionSetSimpleScript); // jp
 
 state2:
   CYC(b_+63, b_+65); E = INTERACTION_BASE + OBJ_COUNTER1;
@@ -738,7 +738,7 @@ l5136:
   CYC(b_+78, b_+81); W8(wMenuDisabled) = A;
   CYC(b_+81, b_+84); W8(wDisabledObjects) = A;
   CYC(b_+84, b_+87); W8(wDisableScreenTransitions) = A;
-  CYC(b_+87, b_+90); interactionDelete_hook(gb); return; // jp
+  CYC(b_+87, b_+90); TAIL(interactionDelete); // jp
 }
 
 // interaction6b_subid10: the unfinished stone statue of Link in the credits cutscene.
@@ -753,7 +753,7 @@ void interaction6b_subid10_hook(GB *gb) {
   CYC(b_+5, b_+7); A = 0xc8; // PALH_c8
   CALL_C(b_+7, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+10);
   CALL_C(b_+10, interaction6b_initGraphicsAndLoadScript_hook, SYM(interaction6b_initGraphicsAndLoadScript), b_+13);
-  CYC(b_+13, b_+16); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+13, b_+16); TAIL(objectSetVisiblec2); // jp
 
 state1:
   CYC(b_+16, b_+18); E = INTERACTION_BASE + OBJ_SUBSTATE;
@@ -788,7 +788,7 @@ substate1:
   CYC(b_+56, b_+58);
   CYC(b_+58, b_+60); A = 0x03;
   CYC(b_+60, b_+63); W8(wTmpcfc0_genericCutscene_state) = A;
-  CYC(b_+63, b_+66); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+63, b_+66); TAIL(interactionIncSubstate); // jp
 
 l518a:
   CYC(b_+66, b_+67); A = mem_rd(gb, HL);
@@ -803,7 +803,7 @@ substate2:
   CALL_C(b_+74, interactionRunScript_hook, SYM(interactionRunScript), b_+77);
   if (!(F & FC)) { RET_TAKEN(b_+77); return; } // ret nc
   CYC(b_+77, b_+78);
-  CYC(b_+78, b_+81); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+78, b_+81); TAIL(interactionIncSubstate); // jp
 
 substate3:
   CALL_C(b_+81, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+84);
@@ -814,14 +814,14 @@ substate3:
   CYC(b_+92, b_+93);
   CALL_C(b_+93, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+96);
   CYC(b_+96, b_+99); SET_BC((SYM(interactionCode79__state0) + 23));
-  CYC(b_+99, b_+102); interactionSetPosition_hook(gb); return; // jp
+  CYC(b_+99, b_+102); TAIL(interactionSetPosition); // jp
 
 substate4:
   CYC(b_+102, b_+105); A = W8(wTmpcfc0_genericCutscene_state);
   CYC(b_+105, b_+107); alu_cp(gb, 0x07);
   if (!(F & FZ)) { RET_TAKEN(b_+107); return; } // ret nz
   CYC(b_+107, b_+108);
-  CYC(b_+108, b_+111); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+108, b_+111); TAIL(interactionIncSubstate); // jp
 
 substate5:
   CYC(b_+111, b_+113); C = 0x01;
@@ -833,7 +833,7 @@ substate5:
   CYC(b_+122, b_+124); mem_wr(gb, HL, 30);
   CALL_C(b_+124, objectSetVisible82_hook, SYM(objectSetVisible82), b_+127);
   CYC(b_+127, b_+129); A = 0x05;
-  CYC(b_+129, b_+132); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+129, b_+132); TAIL(interactionSetAnimation); // jp
 
 substate6:
   CALL_C(b_+132, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+135);
@@ -841,7 +841,7 @@ substate6:
   CYC(b_+135, b_+137);
   CYC(b_+137, b_+138); alu_xor(gb, A);
   CYC(b_+138, b_+141); W8(wGfxRegs1_SCY) = A;
-  CYC(b_+141, b_+144); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+141, b_+144); TAIL(interactionIncSubstate); // jp
 
 l51d8:
   CYC(b_+144, b_+145); A = mem_rd(gb, HL);
@@ -877,7 +877,7 @@ void interaction6b_subid11_hook(GB *gb) {
   CYC(b_+24, b_+27); W8(wCutsceneTrigger) = A;
 
 delete_:
-  CYC(b_+27, b_+30); interactionDelete_hook(gb); return; // jp
+  CYC(b_+27, b_+30); TAIL(interactionDelete); // jp
 }
 
 // interaction6b_subid13 (also interaction6b_subid14, an alias for the same code): the Goron
@@ -901,7 +901,7 @@ void interaction6b_subid13_hook(GB *gb) {
   CYC(b_+21, b_+22); mem_wr(gb, BC, A);
 
 state1:
-  CYC(b_+22, b_+25); interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(interactionPushLinkAwayAndUpdateDrawPriority); // jp
 }
 
 // interaction6b_subid15: the stone statue of Link as seen in-game. Both of its exits are tail
@@ -973,13 +973,13 @@ void interaction6b_subid16_hook(GB *gb) {
   CALL_C(b_+5, interaction6b_initGraphicsAndIncState_hook, SYM(interaction6b_initGraphicsAndIncState), b_+8);
   CALL_C(b_+8, objectSetVisible81_hook, SYM(objectSetVisible81), b_+11);
   CYC(b_+11, b_+13); A = 0x72; // SND_LIGHTTORCH
-  CYC(b_+13, b_+16); playSound_b00_hook(gb); return; // jp
+  CYC(b_+13, b_+16); TAIL(playSound_b00); // jp
 
 state1:
   CALL_C(b_+16, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+19);
   if (F & FZ) { CYCT(b_+19, b_+22); interactionDelete_hook(gb); return; } // jp z
   CYC(b_+19, b_+22);
-  CYC(b_+22, b_+25); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(interactionAnimate); // jp
 }
 
 // INTERAC_MISCELLANEOUS_1
@@ -1008,6 +1008,6 @@ void interactionCode6b_hook(GB *gb) {
     if (target == SYM(interaction6b_subid11)) { interaction6b_subid11_hook(gb); return; }
     if (target == SYM(interaction6b_subid13)) { interaction6b_subid13_hook(gb); return; } // also subid14
     if (target == SYM(interaction6b_subid15)) { interaction6b_subid15_hook(gb); return; }
-    interaction6b_subid16_hook(gb); return; // target == 0x5233
+    TAIL(interaction6b_subid16); // target == 0x5233
   }
 }

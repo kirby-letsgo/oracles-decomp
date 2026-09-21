@@ -28,5 +28,5 @@ void poe_decCounterAndFlickerVisibility_hook(GB *gb) {
   CYC(b_+16, b_+19);
 
 set_visible:
-  CYC(b_+19, b_+22); objectSetVisible_hook(gb); return; // jp
+  CYC(b_+19, b_+22); TAIL(objectSetVisible); // jp
 }

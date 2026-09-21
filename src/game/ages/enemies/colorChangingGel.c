@@ -151,7 +151,7 @@ void colorChangingGel_state_uninitialized_hook(GB *gb) {
   CYC(b_+26, b_+28); A = 0xbf; // PALH_bf
   CALL_C(b_+28, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+31);
   CYC(b_+31, b_+33); A = 0x03;
-  CYC(b_+33, b_+36); enemySetAnimation_hook(gb); return; // jp $282b
+  CYC(b_+33, b_+36); TAIL(enemySetAnimation); // jp $282b
 }
 
 // 0e:6fa1, bare global; jump-table target from enemyCode47.
@@ -197,7 +197,7 @@ void colorChangingGel_state8_hook(GB *gb) {
   CYC(b_+46, b_+47); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+47, b_+49); mem_wr(gb, HL, 0xfe); // speedZ = -$180
   CYC(b_+49, b_+51); A = 0x02;
-  CYC(b_+51, b_+54); enemySetAnimation_hook(gb); return; // jp $282b
+  CYC(b_+51, b_+54); TAIL(enemySetAnimation); // jp $282b
 }
 
 // 0e:6fe8, bare global; jump-table target from enemyCode47. Waiting [counter1]
@@ -216,7 +216,7 @@ void colorChangingGel_state9_hook(GB *gb) {
   CALL_C(b_+14, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+17);
   CYC(b_+17, b_+19); alu_and(gb, 0x10);
   CYC(b_+19, b_+21); A = alu_swap(gb, A);
-  CYC(b_+21, b_+24); enemySetAnimation_hook(gb); return; // jp $282b
+  CYC(b_+21, b_+24); TAIL(enemySetAnimation); // jp $282b
 }
 
 // 0e:7000, bare global; jump-table target from enemyCode47. Hopping to the target
@@ -234,7 +234,7 @@ void colorChangingGel_stateA_hook(GB *gb) {
   CYC(b_+13, b_+15); mem_wr(gb, HL, 0x96);
   CALL_C(b_+15, objectCenterOnTile_hook, SYM(objectCenterOnTile), b_+18);
   CYC(b_+18, b_+20); A = 0x03;
-  CYC(b_+20, b_+23); enemySetAnimation_hook(gb); return; // jp $282b
+  CYC(b_+20, b_+23); TAIL(enemySetAnimation); // jp $282b
 
 stillInAir:
   CYC(b_+23, b_+25); L = ENEMY_BASE + OBJ_USE_TEXT_ID; // Enemy.var30
@@ -252,7 +252,7 @@ stillInAir:
   CYC(b_+40, b_+41);
 
 notThereYetX:
-  CYC(b_+41, b_+44); ecom_moveTowardPosition_b0e_hook(gb); return; // jp
+  CYC(b_+41, b_+44); TAIL(ecom_moveTowardPosition_b0e); // jp
 }
 
 // 0e:702c, bare global; called from enemyCode47. Updates the gel's color with

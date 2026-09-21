@@ -89,7 +89,7 @@ substate2:
   CYC(b_+69, b_+70); A = mem_rd(gb, DE);
   CYC(b_+70, b_+72); alu_bit(gb, 7, A);
   if (!(F & FZ)) {
-    CYCT(b_+72, b_+75); interactionIncSubstate_hook(gb); return;
+    CYCT(b_+72, b_+75); TAIL(interactionIncSubstate);
   }
   CYC(b_+72, b_+75);
   CYC(b_+75, b_+76); alu_or(gb, A);

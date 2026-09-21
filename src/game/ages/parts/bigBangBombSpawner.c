@@ -99,7 +99,7 @@ state0:
   CYC(b_+22, b_+24);
   CYC(b_+24, b_+26); L = 0xc4;
   CYC(b_+26, b_+28); mem_wr(gb, HL, 0x05);
-  CYC(b_+28, b_+31); func_77f0_hook(gb); return; // jp
+  CYC(b_+28, b_+31); TAIL(func_77f0); // jp
 
 func_7754:
   CYC(b_+31, b_+33); L = 0xc4;
@@ -126,7 +126,7 @@ state1:
   CYC(b_+67, b_+68); mem_wr(gb, DE, A);
 
 state1_inAir:
-  CYC(b_+68, b_+71); partAnimate_hook(gb); return; // jp
+  CYC(b_+68, b_+71); TAIL(partAnimate); // jp
 
 state1_noBounce:
   CYC(b_+71, b_+72); H = D;
@@ -134,7 +134,7 @@ state1_noBounce:
   CYC(b_+74, b_+76); mem_wr(gb, HL, 0x03);
   CYC(b_+76, b_+78); L = 0xc6;
   CYC(b_+78, b_+80); mem_wr(gb, HL, 0x14);
-  CYC(b_+80, b_+83); partAnimate_hook(gb); return; // jp
+  CYC(b_+80, b_+83); TAIL(partAnimate); // jp
 
 state2:
   CYC(b_+83, b_+84); E = alu_inc8(gb, E);
@@ -152,7 +152,7 @@ state2_substate0:
   CYC(b_+95, b_+98); mem_wr(gb, wLinkGrabState2, A); // wLinkGrabState2
   CYC(b_+98, b_+99); A = alu_inc8(gb, A);
   CYC(b_+99, b_+100); mem_wr(gb, DE, A);
-  CYC(b_+100, b_+103); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+100, b_+103); TAIL(objectSetVisiblec1); // jp
 
 state2_substateStub:
   RET(b_+103); return; // ret
@@ -169,7 +169,7 @@ state3:
   CYC(b_+113, b_+115);
   CALL_C(b_+115, partAnimate_hook, SYM(partAnimate), b_+118);
   CALL_C(b_+118, func_79ab_hook, SYM(func_79ab), b_+121);
-  CYC(b_+121, b_+124); objectAddToGrabbableObjectBuffer_hook(gb); return; // jp
+  CYC(b_+121, b_+124); TAIL(objectAddToGrabbableObjectBuffer); // jp
 
 func_77b1:
   CYC(b_+124, b_+125); H = D;
@@ -186,7 +186,7 @@ func_77b1:
   CALL_C(b_+143, partSetAnimation_hook, SYM(partSetAnimation), b_+146);
   CYC(b_+146, b_+148); A = 0x6f; // SND_EXPLOSION
   CALL_C(b_+148, playSound_b00_hook, SYM(playSound_b00), b_+151);
-  CYC(b_+151, b_+154); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+151, b_+154); TAIL(objectSetVisible83); // jp
 
 state4:
   CALL_C(b_+154, partAnimate_hook, SYM(partAnimate), b_+157);
@@ -213,7 +213,7 @@ state5:
   CALL_C(b_+179, func_77f0_hook, SYM(func_77f0), b_+182);
   if (F & FZ) { CYCT(b_+182, b_+185); partDelete_hook(gb); return; } // jp z
   CYC(b_+182, b_+185);
-  CYC(b_+185, b_+187); func_7858_hook(gb); return; // jr
+  CYC(b_+185, b_+187); TAIL(func_7858); // jr
 }
 
 void func_77f0_hook(GB *gb) {
@@ -295,7 +295,7 @@ restart:
   CYC(b_+39, b_+40); mem_wr(gb, HL, A);
   CYC(b_+40, b_+41); H = D;
   CYC(b_+41, b_+43); L = 0xf2;
-  CYC(b_+43, b_+46); setFlag_hook(gb); return; // jp
+  CYC(b_+43, b_+46); TAIL(setFlag); // jp
 }
 
 void func_78bd_hook(GB *gb) {
@@ -419,7 +419,7 @@ void func_79c4_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(SYM(table_79e3));
   CYC(b_+3, b_+5); E = 0xca;
   CYC(b_+5, b_+7); // jr $79de
-  CYC((SYM(func_79d9) + 5), (SYM(func_79d9) + 8)); add16BitRefs_hook(gb); return; // jp
+  CYC((SYM(func_79d9) + 5), (SYM(func_79d9) + 8)); TAIL(add16BitRefs); // jp
 }
 
 void func_79cb_hook(GB *gb) {
@@ -427,7 +427,7 @@ void func_79cb_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(SYM(table_79e1));
   CYC(b_+3, b_+5); E = 0xcc;
   CYC(b_+5, b_+7); // jr $79de
-  CYC((SYM(func_79d9) + 5), (SYM(func_79d9) + 8)); add16BitRefs_hook(gb); return; // jp
+  CYC((SYM(func_79d9) + 5), (SYM(func_79d9) + 8)); TAIL(add16BitRefs); // jp
 }
 
 void func_79d2_hook(GB *gb) {
@@ -435,12 +435,12 @@ void func_79d2_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(SYM(table_79e1));
   CYC(b_+3, b_+5); E = 0xca;
   CYC(b_+5, b_+7); // jr $79de
-  CYC((SYM(func_79d9) + 5), (SYM(func_79d9) + 8)); add16BitRefs_hook(gb); return; // jp
+  CYC((SYM(func_79d9) + 5), (SYM(func_79d9) + 8)); TAIL(add16BitRefs); // jp
 }
 
 void func_79d9_hook(GB *gb) {
   BASE(func_79d9);
   CYC(b_+0, b_+3); SET_HL(SYM(table_79e3));
   CYC(b_+3, b_+5); E = 0xcc;
-  CYC(b_+5, b_+8); add16BitRefs_hook(gb); return; // jp
+  CYC(b_+5, b_+8); TAIL(add16BitRefs); // jp
 }

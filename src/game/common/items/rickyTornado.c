@@ -79,7 +79,7 @@ state1:
   CYC(b_+71, b_+73); alu_and(gb, 0x0f);
   CYC(b_+73, b_+75); alu_cp(gb, 0x0f);
   if (F & FZ) {
-    CYCT(b_+75, b_+78); itemDelete_hook(gb); return;
+    CYCT(b_+75, b_+78); TAIL(itemDelete);
   }
   CYC(b_+75, b_+78);
   CYC(b_+78, b_+81); itemAnimate_hook(gb);

@@ -79,7 +79,7 @@ state1:
 
 runSubid00:
   CALL_C(b_+34, interactionRunScript_hook, SYM(interactionRunScript), b_+37);
-  CYC(b_+37, b_+40); interactionAnimateAsNpc_hook(gb); return; // jp
+  CYC(b_+37, b_+40); TAIL(interactionAnimateAsNpc); // jp
 
 loadScript:
   CYC(b_+40, b_+42); E = INTERACTION_BASE + OBJ_SUBID;
@@ -89,5 +89,5 @@ loadScript:
   CYC(b_+47, b_+48); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+48, b_+49); H = mem_rd(gb, HL);
   CYC(b_+49, b_+50); L = A;
-  CYC(b_+50, b_+53); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+50, b_+53); TAIL(interactionSetScript); // jp
 }

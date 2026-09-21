@@ -76,5 +76,5 @@ state2:
   CYC(b_+57, b_+59); E = 0xcf; // Part.zh
   CYC(b_+59, b_+61); A = 0xf3;
   CYC(b_+61, b_+62); mem_wr(gb, DE, A);
-  CYC(b_+62, b_+65); partAnimate_hook(gb); return; // jp
+  CYC(b_+62, b_+65); TAIL(partAnimate); // jp
 }

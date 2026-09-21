@@ -118,7 +118,7 @@ state2:
   CYC(b_+82, b_+84); mem_wr(gb, HL, 150);
   CYC(b_+84, b_+85); L = E;
   CYC(b_+85, b_+86); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+86, b_+89); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+86, b_+89); TAIL(objectSetInvisible); // jp
 
 flickerVisibility:
   CYC(b_+89, b_+91); E = INTERACTION_BASE + OBJ_VISIBLE;
@@ -132,7 +132,7 @@ state3:
   if (!(F & FZ)) { CYCT(b_+99, b_+100); ret_effect(gb); return; } // ret nz
   CYC(b_+99, b_+100);
   CYC(b_+100, b_+102); A = 0x7b; // SND_MYSTERY_SEED
-  CYC(b_+102, b_+105); playSound_b00_hook(gb); return; // jp
+  CYC(b_+102, b_+105); TAIL(playSound_b00); // jp
 
 state4:
   CALL_C(b_+105, sidescrollPlatform_decCounter1_hook, SYM(sidescrollPlatform_decCounter1), b_+108);
@@ -141,5 +141,5 @@ state4:
   CYC(b_+110, b_+112); mem_wr(gb, HL, 120);
   CYC(b_+112, b_+113); L = E;
   CYC(b_+113, b_+115); mem_wr(gb, HL, 0x01);
-  CYC(b_+115, b_+118); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+115, b_+118); TAIL(objectSetVisible83); // jp
 }

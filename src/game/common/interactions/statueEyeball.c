@@ -130,15 +130,13 @@ subid0:
   CYC(b_+25, b_+28); push_effect(gb, b_+28);
   interactionCodee2__getDirectionToFace_hook(gb);
   CYC(b_+28, b_+31);
-  interactionSetAnimation_hook(gb);
-  return;
+  TAIL(interactionSetAnimation);
 state0Common:
   CYC(b_+31, b_+33); A = 0x01;
   CYC(b_+33, b_+34); mem_wr(gb, DE, A);
   CALL_C(b_+34, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+37);
   CYC(b_+37, b_+40);
-  objectSetVisible83_hook(gb);
-  return;
+  TAIL(objectSetVisible83);
 subid2:
   CALL_C(b_+40, checkInteractionState_hook, SYM(checkInteractionState), b_+43);
   if (F & FZ) {
@@ -189,8 +187,7 @@ spawnChildrenLoop:
   }
   CYC(b_+133, b_+135);
   CYC(b_+135, b_+138);
-  interactionDelete_hook(gb);
-  return;
+  TAIL(interactionDelete);
 subid3:
   CALL_C(b_+160, returnIfScrollMode01Unset_hook, SYM(returnIfScrollMode01Unset), b_+163);
   CYC(b_+163, b_+166); A = mem_rd(gb, wEyePuzzleTransitionCounter);
@@ -222,7 +219,7 @@ subid4:
   do { uint16_t jt_ = (interactionCodee2_jump_table(gb));
     if (jt_ == b_+31) { goto state0Common; }
     else if (jt_ == b_+198) { goto subid4State1; }
-    else if (jt_ == SYM(objectSetVisible83)) { objectSetVisible83_hook(gb); return; }
+    else if (jt_ == SYM(objectSetVisible83) && hook_enabled_at(gb, SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 subid4State1:

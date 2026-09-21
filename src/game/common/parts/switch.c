@@ -22,7 +22,7 @@ void partCode05_hook(GB *gb) {
   CYC(b_+9, b_+12); mem_wr(gb, wSwitchState, A); // wSwitchState
   CYC(b_+12, b_+15); push_effect(gb, b_+15); switch_updateTile_hook(gb);
   CYC(b_+15, b_+17); A = 0x7e; // SND_SWITCH
-  CYC(b_+17, b_+20); playSound_b00_hook(gb); return; // jp
+  CYC(b_+17, b_+20); TAIL(playSound_b00); // jp
 
 normalStatus:
   CYC(b_+20, b_+22); E = 0xc4; // Part.state
@@ -62,7 +62,7 @@ void switch_updateTile_hook(GB *gb) {
   CYC(b_+59, b_+60); A = alu_inc8(gb, A); // TILEINDEX_DUNGEON_SWITCH_ON
 
 L_453c:
-  CYC(b_+60, b_+63); setTile_hook(gb); return; // jp
+  CYC(b_+60, b_+63); TAIL(setTile); // jp
 
 flipOverworldSwitch:
   CYC(b_+63, b_+65); A = 0x9f; // TILEINDEX_OVERWORLD_SWITCH_ON
@@ -72,5 +72,5 @@ flipOverworldSwitch:
   CYC(b_+71, b_+72); mem_wr(gb, BC, A);
   CALL_C(b_+72, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+75);
   CYC(b_+75, b_+77); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));
-  CYC(b_+77, b_+80); partDelete_hook(gb); return; // jp
+  CYC(b_+77, b_+80); TAIL(partDelete); // jp
 }

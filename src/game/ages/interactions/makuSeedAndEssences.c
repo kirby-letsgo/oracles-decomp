@@ -44,7 +44,7 @@ static void interactiond7_addAToHl(GB *gb, uint16_t return_address) {
 static void interactiond7_essence_playCirclingSound(GB *gb) {
   BASE(interactiond7_essence);
   CYC(b_+94, b_+96); A = 0xc9; // SND_CIRCLING
-  CYC(b_+96, b_+99); playSound_b00_hook(gb); return; // jp
+  CYC(b_+96, b_+99); TAIL(playSound_b00); // jp
 }
 
 // 0b:7c0f, called from interactiond7_makuSeed@state2 and @state3.
@@ -128,21 +128,21 @@ state0:
   CYC(b_+35, b_+36); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+36, b_+37); mem_wr(gb, HL, A);
   CALL_C(b_+37, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+40);
-  CYC(b_+40, b_+43); objectSetVisible80_hook(gb); return; // jp
+  CYC(b_+40, b_+43); TAIL(objectSetVisible80); // jp
 
 state1:
   CALL_C(b_+43, objectApplySpeed_hook, SYM(objectApplySpeed), b_+46);
   CALL_C(b_+46, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+49);
   if (!(F & FZ)) { CYCT(b_+49, b_+50); ret_effect(gb); return; } // ret nz
   CYC(b_+49, b_+50);
-  CYC(b_+50, b_+53); interactionIncState_hook(gb); return; // jp
+  CYC(b_+50, b_+53); TAIL(interactionIncState); // jp
 
 state2:
   CYC(b_+53, b_+56); A = mem_rd(gb, wTmpcfc0_genericCutscene_state);
   CYC(b_+56, b_+57); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+57, b_+58); ret_effect(gb); return; } // ret z
   CYC(b_+57, b_+58);
-  CYC(b_+58, b_+61); interactionIncState_hook(gb); return; // jp
+  CYC(b_+58, b_+61); TAIL(interactionIncState); // jp
 
 state3:
   CALL_C(b_+61, objectCheckWithinScreenBoundary_hook, SYM(objectCheckWithinScreenBoundary), b_+64);
@@ -168,7 +168,7 @@ state3:
   }
   CYC(b_+85, b_+88); SET_BC((SYM(interactionCodea1__state9) + 11));
   CYC(b_+88, b_+91); A = mem_rd(gb, wTmpcfc0_genericCutscene_cfc1);
-  CYC(b_+91, b_+94); objectSetPositionInCircleArc_hook(gb); return; // jp
+  CYC(b_+91, b_+94); TAIL(objectSetPositionInCircleArc); // jp
 }
 
 // 0b:79d8, called from interactionCoded7 (subid 0).
@@ -212,7 +212,7 @@ state0:
   CYC(b_+57, b_+59); A = 0x78; // 120
   CYC(b_+59, b_+60); mem_wr(gb, HL, A);
   CYC(b_+60, b_+61); mem_wr(gb, DE, A);
-  CYC(b_+61, b_+64); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+61, b_+64); TAIL(objectSetVisible82); // jp
 
 state1:
   CYC(b_+64, b_+66); A = 0x0f; // LINK_ANIM_MODE_GETITEM2HAND
@@ -223,7 +223,7 @@ state1:
   CYC(b_+73, b_+75); mem_wr(gb, HL, 0x40); // [counter1]
   CYC(b_+75, b_+77); L = INTERACTION_BASE + OBJ_SPEED;
   CYC(b_+77, b_+79); mem_wr(gb, HL, 0x14); // SPEED_80
-  CYC(b_+79, b_+82); interactionIncState_hook(gb); return; // jp
+  CYC(b_+79, b_+82); TAIL(interactionIncState); // jp
 
 state2:
   CALL_C(b_+82, objectApplySpeed_hook, SYM(objectApplySpeed), b_+85);
@@ -242,7 +242,7 @@ state2:
   CALL_C(b_+109, playSound_b00_hook, SYM(playSound_b00), b_+112);
   CYC(b_+112, b_+114); A = 0x03;
   CALL_C(b_+114, fadeinFromWhiteWithDelay_hook, SYM(fadeinFromWhiteWithDelay), b_+117);
-  CYC(b_+117, b_+120); interactionIncState_hook(gb); return; // jp
+  CYC(b_+117, b_+120); TAIL(interactionIncState); // jp
 
 state3:
   CALL_C(b_+120, interactiond7_updateSmallSparkles_hook, SYM(interactiond7_updateSmallSparkles), b_+123);
@@ -268,7 +268,7 @@ state3Substate0:
   CYC(b_+154, b_+156); mem_wr(gb, HL, 0x14); // [counter1]
   CYC(b_+156, b_+157); L = alu_inc8(gb, L);
   CYC(b_+157, b_+159); mem_wr(gb, HL, 0x08); // [counter2]
-  CYC(b_+159, b_+162); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+159, b_+162); TAIL(interactionIncSubstate); // jp
 
 state3Substate1:
   CALL_C(b_+162, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+165);
@@ -312,7 +312,7 @@ state3Substate2:
   CYC(b_+233, b_+236); mem_wr(gb, wTmpcfc0_genericCutscene_state, A);
   CYC(b_+236, b_+238); A = 0x20;
   CYC(b_+238, b_+241); mem_wr(gb, wTmpcfc0_genericCutscene_cfc1, A);
-  CYC(b_+241, b_+244); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+241, b_+244); TAIL(interactionIncSubstate); // jp
 
 state3Substate3: // also @state3Substate5, @state3Substate7
   CYC(b_+244, b_+247); A = mem_rd(gb, wFrameCounter);
@@ -337,7 +337,7 @@ essenceRotationCommon:
   if (!(F & FZ)) { CYCT(b_+271, b_+272); ret_effect(gb); return; } // ret nz
   CYC(b_+271, b_+272);
   CYC(b_+272, b_+274); mem_wr(gb, HL, 0x3c); // [counter1], 60
-  CYC(b_+274, b_+277); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+274, b_+277); TAIL(interactionIncSubstate); // jp
 
 state3Substate8:
   CYC(b_+277, b_+280); SET_HL(wTmpcfc0_genericCutscene_cfc1);
@@ -346,7 +346,7 @@ state3Substate8:
   CALL_C(b_+283, playSound_b00_hook, SYM(playSound_b00), b_+286);
   CYC(b_+286, b_+288); A = 0x04;
   CALL_C(b_+288, fadeoutToWhiteWithDelay_hook, SYM(fadeoutToWhiteWithDelay), b_+291);
-  CYC(b_+291, b_+294); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+291, b_+294); TAIL(interactionIncSubstate); // jp
 
 state3Substate9:
   CYC(b_+294, b_+297); SET_HL(wTmpcfc0_genericCutscene_cfc1);
@@ -358,7 +358,7 @@ state3Substate9:
   CALL_C(b_+303, interactionIncState_hook, SYM(interactionIncState), b_+306);
   CYC(b_+306, b_+307); L = alu_inc8(gb, L);
   CYC(b_+307, b_+309); mem_wr(gb, HL, 0x00);
-  CYC(b_+309, b_+312); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+309, b_+312); TAIL(objectSetInvisible); // jp
 
 state4:
   CYC(b_+312, b_+314); E = INTERACTION_BASE + OBJ_SUBSTATE;
@@ -392,7 +392,7 @@ l_7b2e:
   CYC(b_+342, b_+344); E = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+344, b_+346); A = 0x1e; // 30
   CYC(b_+346, b_+347); mem_wr(gb, DE, A);
-  CYC(b_+347, b_+350); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+347, b_+350); TAIL(interactionIncSubstate); // jp
 
 state4Substate1:
   CALL_C(b_+387, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+390);
@@ -401,7 +401,7 @@ state4Substate1:
   CYC(b_+391, b_+393); mem_wr(gb, HL, 0x78); // [counter1], 120
   CYC(b_+393, b_+395); A = 0x08;
   CALL_C(b_+395, fadeinFromWhiteWithDelay_hook, SYM(fadeinFromWhiteWithDelay), b_+398);
-  CYC(b_+398, b_+401); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+398, b_+401); TAIL(interactionIncSubstate); // jp
 
 state4Substate2:
   CYC(b_+401, b_+404); A = mem_rd(gb, wPaletteThread_mode);
@@ -410,7 +410,7 @@ state4Substate2:
   CYC(b_+405, b_+406);
   CYC(b_+406, b_+408); A = 0x5b; // SND_SOLVEPUZZLE_2
   CALL_C(b_+408, playSound_b00_hook, SYM(playSound_b00), b_+411);
-  CYC(b_+411, b_+414); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+411, b_+414); TAIL(interactionIncSubstate); // jp
 
 state4Substate3:
   CALL_C(b_+414, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+417);
@@ -424,7 +424,7 @@ state4Substate3:
   if (F & FZ) { CYCT(b_+431, b_+433); goto unlinkedGame; } // jr z
   CYC(b_+431, b_+433);
   CALL_C(b_+433, fadeoutToBlack_hook, SYM(fadeoutToBlack), b_+436);
-  CYC(b_+436, b_+439); interactionIncSubstate_hook(gb); return; // jp
+  CYC(b_+436, b_+439); TAIL(interactionIncSubstate); // jp
 
 unlinkedGame:
   CYC(b_+439, b_+440); alu_xor(gb, A);
@@ -432,7 +432,7 @@ unlinkedGame:
   CYC(b_+443, b_+446); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+446, b_+449); A = mem_rd(gb, wActiveMusic);
   CALL_C(b_+449, playSound_b00_hook, SYM(playSound_b00), b_+452);
-  CYC(b_+452, b_+455); interactionDelete_hook(gb); return; // jp
+  CYC(b_+452, b_+455); TAIL(interactionDelete); // jp
 
 state4Substate4:
   CYC(b_+455, b_+458); A = mem_rd(gb, wPaletteThread_mode);
@@ -441,7 +441,7 @@ state4Substate4:
   CYC(b_+459, b_+460);
   CYC(b_+460, b_+462); A = 0x11; // CUTSCENE_FLAME_OF_SORROW
   CYC(b_+462, b_+465); mem_wr(gb, wCutsceneTrigger, A);
-  CYC(b_+465, b_+468); interactionDelete_hook(gb); return; // jp
+  CYC(b_+465, b_+468); TAIL(interactionDelete); // jp
 }
 
 // ==================================================================================================
@@ -457,8 +457,8 @@ void interactionCoded7_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (interactiond7_jump_table(gb));
-    if (jt_ == SYM(interactiond7_makuSeed)) { interactiond7_makuSeed_hook(gb); return; }
-    else if (jt_ == SYM(interactiond7_essence)) { interactiond7_essence_hook(gb); return; }
+    if (jt_ == SYM(interactiond7_makuSeed) && hook_enabled_at(gb, SYM(interactiond7_makuSeed))) { interactiond7_makuSeed_hook(gb); return; }
+    else if (jt_ == SYM(interactiond7_essence) && hook_enabled_at(gb, SYM(interactiond7_essence))) { interactiond7_essence_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

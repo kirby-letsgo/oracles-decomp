@@ -111,7 +111,7 @@ normalStatus:
   CYC(b_+60, b_+61); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+61, b_+64); bari_subid0_hook(gb); return; } // jp z
   CYC(b_+61, b_+64);
-  CYC(b_+64, b_+67); bari_subid1_hook(gb); return; // jp
+  CYC(b_+64, b_+67); TAIL(bari_subid1); // jp
 
 commonState:
   CYC(b_+67, b_+68); A = mem_rd(gb, DE);
@@ -154,7 +154,7 @@ void bari_state_uninitialized_hook(GB *gb) {
   CYC(b_+38, b_+40); A = 0x0a; // SPEED_40
   CYC(b_+40, b_+41); mem_wr(gb, DE, A);
   CYC(b_+41, b_+43); A = 0x02;
-  CYC(b_+43, b_+46); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+43, b_+46); TAIL(enemySetAnimation); // jp
 }
 
 // 0e:6c6c, bare global; jump-table target from enemyCode3c@commonState.
@@ -192,7 +192,7 @@ void bari_subid0_state8_hook(GB *gb) {
   CYC(b_+9, b_+11); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x59); // ENEMYCOLLISION_BARI_ELECTRIC_SHOCK
   CYC(b_+13, b_+15); A = 0x01;
-  CYC(b_+15, b_+18); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(enemySetAnimation); // jp
 
 dontShockYet:
   CALL_C(b_+18, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+21);
@@ -206,7 +206,7 @@ dontShockYet:
   CALL_C(b_+33, ecom_readPositionVars_b0e_hook, SYM(ecom_readPositionVars_b0e), b_+36);
   CALL_C(b_+36, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+39);
   CALL_C(b_+39, objectNudgeAngleTowards_hook, SYM(objectNudgeAngleTowards), SYM(bari_applySpeed));
-  bari_applySpeed_hook(gb); return; // fallthrough
+  TAIL(bari_applySpeed); // fallthrough
 }
 
 // 0e:6ca1, bare global; falls into from bari_subid0_state8, also reached by genuine jr/jp from
@@ -216,14 +216,14 @@ void bari_applySpeed_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, objectApplySpeed_hook, SYM(objectApplySpeed), b_+3);
   CALL_C(b_+3, ecom_bounceOffScreenBoundary_b0e_hook, SYM(ecom_bounceOffScreenBoundary_b0e), SYM(bari_animate));
-  bari_animate_hook(gb); return; // fallthrough
+  TAIL(bari_animate); // fallthrough
 }
 
 // 0e:6ca7, bare global; falls into from bari_applySpeed, also reached by genuine jr from
 // bari_state9.
 void bari_animate_hook(GB *gb) {
   BASE(bari_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // 0e:6caa, bare global; jump-table target from bari_subid0, also called from bari_subid1. In
@@ -243,7 +243,7 @@ void bari_state9_hook(GB *gb) {
   CYC(b_+12, b_+14); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
   CYC(b_+14, b_+15); alu_xor(gb, A);
   CALL_C(b_+15, enemySetAnimation_hook, SYM(enemySetAnimation), SYM(bari_setRandomAngleAndCounter2));
-  bari_setRandomAngleAndCounter2_hook(gb); return; // fallthrough
+  TAIL(bari_setRandomAngleAndCounter2); // fallthrough
 }
 
 // 0e:6cbc, bare global; called from bari_state_uninitialized, also falls into from
@@ -258,7 +258,7 @@ void bari_setRandomAngleAndCounter2_hook(GB *gb) {
   CYC(b_+9, b_+11); E = ENEMY_BASE + OBJ_COUNTER2;
   CYC(b_+11, b_+12); A = mem_rd(gb, HL);
   CYC(b_+12, b_+13); mem_wr(gb, DE, A);
-  CYC(b_+13, b_+16); ecom_setRandomAngle_b0e_hook(gb); return; // jp
+  CYC(b_+13, b_+16); TAIL(ecom_setRandomAngle_b0e); // jp
 }
 
 // 0e:6cd0, bare global; jump-table target from bari_subid0. Bari has just been attacked; now
@@ -281,7 +281,7 @@ void bari_subid0_stateA_hook(GB *gb) {
   CYC(b_+17, b_+19); C = 0xfc;
   CALL_C(b_+19, bari_subid0_stateA_spawnSmallBari_hook, b_+28, b_+22);
   CALL_C(b_+22, decNumEnemies_hook, SYM(decNumEnemies), b_+25);
-  CYC(b_+25, b_+28); enemyDelete_hook(gb); return; // jp
+  CYC(b_+25, b_+28); TAIL(enemyDelete); // jp
 
 substate0:
   CYC(b_+52, b_+54); B = 0x08; // INTERAC_KILLENEMYPUFF
@@ -295,7 +295,7 @@ substate0:
   CYC(b_+68, b_+69); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+69, b_+71); A = 0x73; // SND_KILLENEMY
   CALL_C(b_+71, playSound_b00_hook, SYM(playSound_b00), b_+74);
-  CYC(b_+74, b_+77); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+74, b_+77); TAIL(objectSetInvisible); // jp
 }
 
 // 0e:6cec, bare local (no exported symbol); called via genuine call/ret twice from
@@ -319,7 +319,7 @@ void bari_subid0_stateA_spawnSmallBari_hook(GB *gb) {
   CYC(b_+44, b_+46); alu_and(gb, 0x1f);
   CYC(b_+46, b_+47); mem_wr(gb, HL, A);
   CYC(b_+47, b_+49); B = 0x00;
-  CYC(b_+49, b_+52); objectCopyPositionWithOffset_hook(gb); return; // jp
+  CYC(b_+49, b_+52); TAIL(objectCopyPositionWithOffset); // jp
 }
 
 // 0e:6d1d, bare global; called from enemyCode3c. A small bari.
@@ -340,7 +340,7 @@ void bari_subid1_hook(GB *gb) {
   CYC(b_+18, b_+19); mem_wr(gb, HL, A); // [counter1]
   CALL_C(b_+19, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+22);
   CALL_C(b_+22, objectNudgeAngleTowards_hook, SYM(objectNudgeAngleTowards), b_+25);
-  CYC(b_+25, b_+28); bari_applySpeed_hook(gb); return; // jp
+  CYC(b_+25, b_+28); TAIL(bari_applySpeed); // jp
 }
 
 // 0e:6d39, bare global; called from enemyCode3c. Bobs up and down.

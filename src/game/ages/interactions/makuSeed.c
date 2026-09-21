@@ -120,7 +120,7 @@ state1:
   CYC(b_+53, b_+55);
   CYC(b_+55, b_+57); A = 0x01;
   CYC(b_+57, b_+60); mem_wr(gb, wTmpcfc0_genericCutscene_state, A);
-  CYC(b_+60, b_+63); interactionDelete_hook(gb); return; // jp
+  CYC(b_+60, b_+63); TAIL(interactionDelete); // jp
 
 l_5d70:
   CYC(b_+63, b_+66); SET_BC(0x0080);

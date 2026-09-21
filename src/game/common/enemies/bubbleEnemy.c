@@ -95,15 +95,15 @@ state_uninitialized:
   CYC(b_+53, b_+54); mem_wr(gb, DE, A);
   CYC(b_+54, b_+56); A = 0x1e; // SPEED_c0
   CALL_C(b_+56, ecom_setSpeedAndState8_b0d_hook, SYM(ecom_setSpeedAndState8_b0d), b_+59);
-  CYC(b_+59, b_+62); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+59, b_+62); TAIL(objectSetVisible82); // jp
 
 state_stub:
   RET(b_+62); return; // ret
 
 state8:
   CALL_C(b_+63, enemyCode15_checkCenteredOnTile, b_+91, b_+66);
-  if (F & FZ) { CALL_C(b_+66, enemyCode15_chooseNewDirection_hook, b_+78, b_+69); } else { CYC(b_+66, b_+69); } // call z
+  if (F & FZ) { CALL_C_CC(b_+66, enemyCode15_chooseNewDirection_hook, b_+78, b_+69); } else { CYC(b_+66, b_+69); } // call z
   CALL_C(b_+69, ecom_applyVelocityForSideviewEnemyNoHoles_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0d), b_+72);
-  if (F & FZ) { CALL_C(b_+72, enemyCode15_chooseNewDirection_hook, b_+78, b_+75); } else { CYC(b_+72, b_+75); } // call z
-  CYC(b_+75, b_+78); enemyAnimate_hook(gb); return; // jp
+  if (F & FZ) { CALL_C_CC(b_+72, enemyCode15_chooseNewDirection_hook, b_+78, b_+75); } else { CYC(b_+72, b_+75); } // call z
+  CYC(b_+75, b_+78); TAIL(enemyAnimate); // jp
 }

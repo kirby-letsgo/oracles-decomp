@@ -202,8 +202,7 @@ void cutscene02__func_7ced_hook(GB *gb) {
   CALL_C(b_+115, findTileInRoom_hook, SYM(findTileInRoom), b_+118);
   if (!(F & FZ)) {
     CYCT(b_+118, b_+120);
-    cutscene02__loopEnd_hook(gb);
-    return;
+    TAIL(cutscene02__loopEnd);
   }
   CYC(b_+118, b_+120);
   for (;;) {

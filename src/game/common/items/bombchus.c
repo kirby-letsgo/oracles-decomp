@@ -193,8 +193,7 @@ static void bombchu_update_wall_climbing(GB *gb, uint16_t sp0_) {
   CYC(b_+24, b_+26); alu_xor(gb, 0x10);
   CYC(b_+26, b_+27); mem_wr(gb, DE, A);
   CYC(b_+27, b_+30);
-  bombchuSetAnimationFromAngle_hook(gb);
-  return;
+  TAIL(bombchuSetAnimationFromAngle);
 
 start_climbing:
   CYC(b_+30, b_+31); H = D;
@@ -206,8 +205,7 @@ start_climbing:
   CYC(b_+39, b_+41); L = 0x32;
   CYC(b_+41, b_+43); mem_wr(gb, HL, 0x01);
   CYC(b_+43, b_+46);
-  bombchuSetAnimationFromAngle_hook(gb);
-  return;
+  TAIL(bombchuSetAnimationFromAngle);
 
 climbing:
   CYC(b_+46, b_+48); E = 0x33;
@@ -243,8 +241,7 @@ climbing:
   CYC(b_+78, b_+80); L = 0x08;
   CYC(b_+80, b_+82); mem_wr(gb, HL, 0xff);
   CYC(b_+82, b_+85);
-  bombchuSetAnimationFromAngle_hook(gb);
-  return;
+  TAIL(bombchuSetAnimationFromAngle);
 
 touching_wall:
   CYC(b_+85, b_+87); E = 0x09;
@@ -279,8 +276,7 @@ touching_wall:
   CYC(b_+118, b_+120); mem_wr(gb, HL, 0x00);
   if (!(F & FZ)) {
     CYCT(b_+120, b_+122);
-    bombchuSetAnimationFromAngle_hook(gb);
-    return;
+    TAIL(bombchuSetAnimationFromAngle);
   }
   CYC(b_+120, b_+122);
   CYC(b_+122, b_+123); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
@@ -611,12 +607,12 @@ void itemCode0d_hook(GB *gb) {
   CYC(b_+5, b_+6); A = mem_rd(gb, DE);
   CYC(b_+6, b_+8); alu_cp(gb, 0xff);
   if (!(F & FC)) {
-    CYCT(b_+8, b_+11); itemUpdateExplosion_hook(gb); return;
+    CYCT(b_+8, b_+11); TAIL(itemUpdateExplosion);
   }
   CYC(b_+8, b_+11);
   CALL_C(b_+11, objectCheckWithinRoomBoundary_hook, SYM(objectCheckWithinRoomBoundary), b_+14);
   if (!(F & FC)) {
-    CYCT(b_+14, b_+17); itemDelete_hook(gb); return;
+    CYCT(b_+14, b_+17); TAIL(itemDelete);
   }
   CYC(b_+14, b_+17);
   CALL_C(b_+17, objectSetPriorityRelativeToLink_withTerrainEffects_hook, SYM(objectSetPriorityRelativeToLink_withTerrainEffects), b_+20);
@@ -652,7 +648,7 @@ sidescroll:
     CYC(b_+52, b_+54); C = 0x18;
     CALL_C(b_+54, itemUpdateThrowingVerticallyAndCheckHazards_hook, SYM(itemUpdateThrowingVerticallyAndCheckHazards), b_+57);
     if (F & FC) {
-      CYCT(b_+57, b_+60); itemDelete_hook(gb); return;
+      CYCT(b_+57, b_+60); TAIL(itemDelete);
     }
     CYC(b_+57, b_+60);
   }
@@ -699,7 +695,7 @@ td_state3:
   CYC(b_+149, b_+151); L = 0x06;
   CYC(b_+151, b_+152); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (!(F & FZ)) {
-    CYCT(b_+152, b_+155); itemUpdateConveyorBelt_hook(gb); return;
+    CYCT(b_+152, b_+155); TAIL(itemUpdateConveyorBelt);
   }
   CYC(b_+152, b_+155);
   CYC(b_+155, b_+157); mem_wr(gb, HL, 0x0a);
@@ -709,7 +705,7 @@ td_state3:
 td_state4:
   CALL_C(b_+159, bombchuCheckCollidedWithTarget_hook, SYM(bombchuCheckCollidedWithTarget), b_+162);
   if (F & FC) {
-    CYCT(b_+162, b_+165); bombchuClearCounter2AndInitializeExplosion_hook(gb); return;
+    CYCT(b_+162, b_+165); TAIL(bombchuClearCounter2AndInitializeExplosion);
   }
   CYC(b_+162, b_+165);
   CALL_C(b_+165, bombchuUpdateVelocity_hook, SYM(bombchuUpdateVelocity), b_+168);
@@ -759,7 +755,7 @@ ss_state2:
 ss_state3:
   CALL_C(b_+211, bombchuCheckCollidedWithTarget_hook, SYM(bombchuCheckCollidedWithTarget), b_+214);
   if (F & FC) {
-    CYCT(b_+214, b_+217); bombchuClearCounter2AndInitializeExplosion_hook(gb); return;
+    CYCT(b_+214, b_+217); TAIL(bombchuClearCounter2AndInitializeExplosion);
   }
   CYC(b_+214, b_+217);
   CALL_C(b_+217, bombchuUpdateVelocityAndClimbing_sidescroll_hook, SYM(bombchuUpdateVelocityAndClimbing_sidescroll), b_+220);

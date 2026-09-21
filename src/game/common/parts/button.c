@@ -60,7 +60,7 @@ void partCode09_hook(GB *gb) {
   CYC(b_+63, b_+64); alu_xor(gb, A);
   CYC(b_+64, b_+65); mem_wr(gb, DE, A);
   CYC(b_+65, b_+67); A = 0x87; // SND_SPLASH
-  CYC(b_+67, b_+70); playSound_b00_hook(gb); return; // jp
+  CYC(b_+67, b_+70); TAIL(playSound_b00); // jp
 
 somethingOnButton:
   CYC(b_+70, b_+71); H = D;
@@ -82,7 +82,7 @@ somethingOnButton:
 
 delete:
   CYC(b_+97, b_+100); push_effect(gb, b_+100); button_updateTileBeforeDeletion_hook(gb);
-  CYC(b_+100, b_+103); partDelete_hook(gb); return; // jp
+  CYC(b_+100, b_+103); TAIL(partDelete); // jp
 
 linkTouchedButton:
   CYC(b_+103, b_+106); A = mem_rd(gb, w1Link_zh); // w1Link.zh
@@ -115,7 +115,7 @@ setTriggerAndPlaySound:
   CYC(b_+139, b_+141); A = 0x01;
   CYC(b_+141, b_+142); mem_wr(gb, DE, A);
   CYC(b_+142, b_+144); A = 0x87; // SND_SPLASH
-  CYC(b_+144, b_+147); playSound_b00_hook(gb); return; // jp
+  CYC(b_+144, b_+147); TAIL(playSound_b00); // jp
 }
 
 void button_state0_hook(GB *gb) {
@@ -163,5 +163,5 @@ dupSetTriggerAndPlaySound:
   CYC(b_+139, b_+141); A = 0x01;
   CYC(b_+141, b_+142); mem_wr(gb, DE, A);
   CYC(b_+142, b_+144); A = 0x87; // SND_SPLASH
-  CYC(b_+144, b_+147); playSound_b00_hook(gb); return; // jp
+  CYC(b_+144, b_+147); TAIL(playSound_b00); // jp
 }

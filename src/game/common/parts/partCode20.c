@@ -17,7 +17,7 @@ void partCode20_hook(GB *gb) {
   CALL_C(b_+6, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+9);
   if (F & FZ) { CYCT(b_+9, b_+12); partDelete_hook(gb); return; } // jp z
   CYC(b_+9, b_+12);
-  CYC(b_+12, b_+15); partAnimate_hook(gb); return; // jp
+  CYC(b_+12, b_+15); TAIL(partAnimate); // jp
 
 state0:
   CYC(b_+15, b_+16); H = D;
@@ -25,5 +25,5 @@ state0:
   CYC(b_+17, b_+18); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+18, b_+20); L = 0xc6; // Part.counter1
   CYC(b_+20, b_+22); mem_wr(gb, HL, 0xb4);
-  CYC(b_+22, b_+25); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(objectSetVisible82); // jp
 }

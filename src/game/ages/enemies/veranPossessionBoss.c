@@ -179,7 +179,7 @@ substate0:
   CYC(b_+11, b_+12); H = D;
   CYC(b_+12, b_+14); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+14, b_+16); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
-  CYC(b_+16, b_+19); ecom_incSubstate_b0e_hook(gb); return; // jp
+  CYC(b_+16, b_+19); TAIL(ecom_incSubstate_b0e); // jp
 
 substate3:
   CYC(b_+19, b_+21); B = 0x0b;
@@ -247,7 +247,7 @@ void veranPossessionBoss_nayruAmbi_state8_hook(GB *gb) {
   CYC(b_+30, b_+33); mem_wr(gb, wTmpcfc0_genericCutscene_cfd0, A);
   CYC(b_+33, b_+35); A = 0x2e; // MUS_BOSS
   CYC(b_+35, b_+38); mem_wr(gb, wActiveMusic, A);
-  CYC(b_+38, b_+41); playSound_b00_hook(gb); return; // jp
+  CYC(b_+38, b_+41); TAIL(playSound_b00); // jp
 }
 
 // 0e:77b5, bare global; jump-table target from veranPossessionBoss_subid0/subid1.
@@ -303,7 +303,7 @@ choosePillar:
   CYC(b_+68, b_+69); E = alu_inc8(gb, E);
   CYC(b_+69, b_+70); mem_wr(gb, DE, A); // [var32]
   CYC(b_+70, b_+72); A = 0xc9; // SND_CIRCLING
-  CYC(b_+72, b_+75); playSound_b00_hook(gb); return; // jp
+  CYC(b_+72, b_+75); TAIL(playSound_b00); // jp
 }
 
 // 0e:7814, bare global; jump-table target from veranPossessionBoss_subid0/subid1.
@@ -366,7 +366,7 @@ void veranPossessionBoss_nayruAmbi_stateB_hook(GB *gb) {
   CYC(b_+29, b_+31);
   CALL_C(b_+31, veranPossessionBoss_nayruAmbi_beginMoving_hook, SYM(veranPossessionBoss_nayruAmbi_beginMoving), b_+34);
   CYC(b_+34, b_+36); mem_wr(gb, HL, 0x1e); // 30
-  CYC(b_+36, b_+39); ecom_flickerVisibility_b0e_hook(gb); return; // jp
+  CYC(b_+36, b_+39); TAIL(ecom_flickerVisibility_b0e); // jp
 
 beginAttacking:
   CALL_C(b_+39, ecom_incState_b0e_hook, SYM(ecom_incState_b0e), b_+42);
@@ -378,7 +378,7 @@ beginAttacking:
   CYC(b_+52, b_+53); A = mem_rd(gb, HL);
   CYC(b_+53, b_+54); A = alu_inc8(gb, A);
   CALL_C(b_+54, enemySetAnimation_hook, SYM(enemySetAnimation), b_+57);
-  CYC(b_+57, b_+60); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+57, b_+60); TAIL(objectSetVisiblec2); // jp
 }
 
 // 0e:7883, bare global; jump-table target from veranPossessionBoss_subid0. Delay before
@@ -393,7 +393,7 @@ void veranPossessionBoss_nayru_stateC_hook(GB *gb) {
   CYC(b_+6, b_+7); L = E;
   CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]
   CYC(b_+8, b_+10); B = 0x37; // PART_VERAN_PROJECTILE
-  CYC(b_+10, b_+13); ecom_spawnProjectile_b0e_hook(gb); return; // jp
+  CYC(b_+10, b_+13); TAIL(ecom_spawnProjectile_b0e); // jp
 }
 
 // 0e:7890, bare global; jump-table target from veranPossessionBoss_subid0, also called
@@ -404,7 +404,7 @@ void veranPossessionBoss_nayru_stateD_hook(GB *gb) {
   CALL_C(b_+0, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+3);
   if (!(F & FZ)) { RET_TAKEN(b_+3); return; } // ret nz
   CYC(b_+3, b_+4);
-  veranPossessionBoss_doneAttacking_hook(gb); return; // fallthrough
+  TAIL(veranPossessionBoss_doneAttacking); // fallthrough
 }
 
 // 0e:7894, bare global; falls into from veranPossessionBoss_nayru_stateD, also called
@@ -417,7 +417,7 @@ void veranPossessionBoss_doneAttacking_hook(GB *gb) {
   CYC(b_+5, b_+7); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
   CYC(b_+7, b_+9); L = ENEMY_BASE + OBJ_USE_TEXT_ID; // Enemy.var30
   CYC(b_+9, b_+10); A = mem_rd(gb, HL);
-  CYC(b_+10, b_+13); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+10, b_+13); TAIL(enemySetAnimation); // jp
 }
 
 // 0e:78a1, bare global; jump-table target from veranPossessionBoss_subid0/subid1. Just
@@ -451,7 +451,7 @@ void veranPossessionBoss_nayruAmbi_stateE_hook(GB *gb) {
   CYC(b_+39, b_+41); A = 0x01;
   CYC(b_+41, b_+42); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+42, b_+43); mem_wr(gb, HL, A);
-  CYC(b_+43, b_+46); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+43, b_+46); TAIL(objectSetVisible83); // jp
 }
 
 // 0e:78cf, bare global; jump-table target from veranPossessionBoss_subid0/subid1.
@@ -475,7 +475,7 @@ void veranPossessionBoss_nayruAmbi_state10_hook(GB *gb) {
   CYC(b_+8, b_+9); mem_wr(gb, HL, A);
   CYC(b_+9, b_+11); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x0f);
-  CYC(b_+13, b_+16); objectSetVisible82_hook(gb); return; // jp
+  CYC(b_+13, b_+16); TAIL(objectSetVisible82); // jp
 }
 
 // 0e:78e0, bare global; jump-table target from veranPossessionBoss_subid0/subid1.
@@ -489,7 +489,7 @@ void veranPossessionBoss_nayruAmbi_state11_hook(GB *gb) {
   CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_USE_TEXT_ID; // Enemy.var30
   CYC(b_+6, b_+7); A = mem_rd(gb, HL);
   CALL_C(b_+7, enemySetAnimation_hook, SYM(enemySetAnimation), SYM(veranPossessionBoss_nayruAmbi_beginMoving));
-  veranPossessionBoss_nayruAmbi_beginMoving_hook(gb); return; // fallthrough
+  TAIL(veranPossessionBoss_nayruAmbi_beginMoving); // fallthrough
 }
 
 // 0e:78ea, bare global; falls into from veranPossessionBoss_nayruAmbi_state11, also
@@ -516,7 +516,7 @@ void veranPossessionBoss_nayruAmbi_state12_hook(GB *gb) {
   CYC(b_+4, b_+5);
   CALL_C(b_+5, ecom_incState_b0e_hook, SYM(ecom_incState_b0e), b_+8);
   CYC(b_+8, b_+10); A = 0x02;
-  CYC(b_+10, b_+13); fadeoutToWhiteWithDelay_hook(gb); return; // jp
+  CYC(b_+10, b_+13); TAIL(fadeoutToWhiteWithDelay); // jp
 }
 
 // 0e:7901, bare global; jump-table target from veranPossessionBoss_subid0/subid1.
@@ -601,7 +601,7 @@ void veranPossessionBoss_ambi_stateC_hook(GB *gb) {
   CYC(b_+29, b_+30);
   CYC(b_+30, b_+31); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   CYC(b_+31, b_+33); B = 0x37; // PART_VERAN_PROJECTILE
-  CYC(b_+33, b_+36); ecom_spawnProjectile_b0e_hook(gb); return; // jp
+  CYC(b_+33, b_+36); TAIL(ecom_spawnProjectile_b0e); // jp
 }
 
 // 0e:7966, bare global; jump-table target from veranPossessionBoss_subid1. Attacking
@@ -626,7 +626,7 @@ void veranPossessionBoss_ambi_stateD_hook(GB *gb) {
   if (!(F & FC)) { RET_TAKEN(b_+22); return; } // ret nc
   CYC(b_+22, b_+23);
   CYC(b_+23, b_+25); B = 0x0f; // ENEMY_VERAN_SPIDER
-  CYC(b_+25, b_+28); ecom_spawnEnemyWithSubid01_b0e_hook(gb); return; // jp
+  CYC(b_+25, b_+28); TAIL(ecom_spawnEnemyWithSubid01_b0e); // jp
 }
 
 // 0e:7982, bare global; jump-table target from veranPossessionBoss_subid1.
@@ -712,7 +712,7 @@ void veranPossessionBoss_humanForm_state8_hook(GB *gb) {
   CYC(b_+36, b_+37); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [var35] |= 1
   CYC(b_+37, b_+40); SET_BC(0x2f2a); // TX_2f2a
   CALL_C(b_+40, showText_hook, SYM(showText), b_+43);
-  CYC(b_+43, b_+45); veranPossessionBoss_animate_hook(gb); return; // jr
+  CYC(b_+43, b_+45); TAIL(veranPossessionBoss_animate); // jr
 }
 
 // 0e:79f6, bare global; jump-table target from veranPossessionBoss_subid2. Waiting for
@@ -730,14 +730,14 @@ void veranPossessionBoss_humanForm_state9_hook(GB *gb) {
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x10); // ANGLE_DOWN
   CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+15, b_+17); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
-  veranPossessionBoss_animate_hook(gb); return; // fallthrough
+  TAIL(veranPossessionBoss_animate); // fallthrough
 }
 
 // 0e:7a07, bare global; falls into from veranPossessionBoss_humanForm_state9, also
 // reached via tail-jump from several other states.
 void veranPossessionBoss_animate_hook(GB *gb) {
   BASE(veranPossessionBoss_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // 0e:7a0a, bare global; jump-table target from veranPossessionBoss_subid2. Moving down
@@ -751,7 +751,7 @@ void veranPossessionBoss_humanForm_stateA_hook(GB *gb) {
   CYC(b_+6, b_+8);
   CYC(b_+8, b_+10); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+10, b_+12); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
-  veranPossessionBoss_humanForm_returnToHost_hook(gb); return; // fallthrough
+  TAIL(veranPossessionBoss_humanForm_returnToHost); // fallthrough
 }
 
 // 0e:7a16, bare global; falls into from veranPossessionBoss_humanForm_stateA, also
@@ -766,7 +766,7 @@ void veranPossessionBoss_humanForm_returnToHost_hook(GB *gb) {
   CYC(b_+8, b_+9); E = L;
   CYC(b_+9, b_+10); A = mem_rd(gb, DE);
   CYC(b_+10, b_+11); mem_wr(gb, HL, A);
-  CYC(b_+11, b_+14); enemyDelete_hook(gb); return; // jp
+  CYC(b_+11, b_+14); TAIL(enemyDelete); // jp
 }
 
 // 0e:7a24, bare global; jump-table target from veranPossessionBoss_subid2. Just
@@ -794,7 +794,7 @@ flickerBetweenForms:
   CYC(b_+23, b_+25); A = 0x06;
 
 setFlickerAnimation:
-  CYC(b_+25, b_+28); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+25, b_+28); TAIL(enemySetAnimation); // jp
 }
 
 // 0e:7a40, bare global; jump-table target from veranPossessionBoss_subid2. Veran is
@@ -825,7 +825,7 @@ void veranPossessionBoss_humanForm_stateC_hook(GB *gb) {
   CYC(b_+35, b_+36); L = alu_inc8(gb, L);
   CYC(b_+36, b_+37); A = mem_rd(gb, HL);
   CYC(b_+37, b_+38); mem_wr(gb, DE, A); // [this.var32]
-  CYC(b_+38, b_+40); veranPossessionBoss_animate_hook(gb); return; // jr
+  CYC(b_+38, b_+40); TAIL(veranPossessionBoss_animate); // jr
 }
 
 // 0e:7a68, bare global; jump-table target from veranPossessionBoss_subid2. Moving back
@@ -857,7 +857,7 @@ void veranPossessionBoss_humanForm_stateD_hook(GB *gb) {
   CYC(b_+37, b_+38); alu_or(gb, A);
   if (!(F & FZ)) { RET_TAKEN(b_+38); return; } // ret nz
   CYC(b_+38, b_+39);
-  CYC(b_+39, b_+42); veranPossessionBoss_humanForm_returnToHost_hook(gb); return; // jp
+  CYC(b_+39, b_+42); TAIL(veranPossessionBoss_humanForm_returnToHost); // jp
 }
 
 // 0e:7a92, bare global; jump-table target from veranPossessionBoss_subid2. Health is
@@ -887,7 +887,7 @@ void veranPossessionBoss_humanForm_stateE_hook(GB *gb) {
   CYC(b_+26, b_+28); A = 0x01; // DISABLE_LINK
   CYC(b_+28, b_+31); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+31, b_+34); mem_wr(gb, wMenuDisabled, A);
-  CYC(b_+34, b_+37); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+34, b_+37); TAIL(objectSetInvisible); // jp
 }
 
 // 0e:7ab7, bare global; jump-table target from veranPossessionBoss_subid2. Waiting for
@@ -900,7 +900,7 @@ void veranPossessionBoss_humanForm_stateF_hook(GB *gb) {
   CYC(b_+5, b_+7); alu_bit(gb, 7, mem_rd(gb, HL));
   if (F & FZ) { RET_TAKEN(b_+7); return; } // ret z
   CYC(b_+7, b_+8);
-  CYC(b_+8, b_+11); ecom_incState_b0e_hook(gb); return; // jp
+  CYC(b_+8, b_+11); TAIL(ecom_incState_b0e); // jp
 }
 
 // 0e:7ac2, bare global; jump-table target from veranPossessionBoss_subid2. Sets
@@ -920,7 +920,7 @@ void veranPossessionBoss_humanForm_state10_hook(GB *gb) {
 
 showText:
   CALL_C(b_+19, showText_hook, SYM(showText), b_+22);
-  CYC(b_+22, b_+25); enemyDelete_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(enemyDelete); // jp
 }
 
 // 0e:7adb, bare global; jump-table target from enemyCode61. Collapsed Ambi after the
@@ -942,7 +942,7 @@ void veranPossessionBoss_subid3_hook(GB *gb) {
   CYC(b_+15, b_+17); mem_wr(gb, HL, 0x3c); // 60
   CYC(b_+17, b_+19); A = 0x05;
   CALL_C(b_+19, enemySetAnimation_hook, SYM(enemySetAnimation), b_+22);
-  CYC(b_+22, b_+25); fadeinFromWhite_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(fadeinFromWhite); // jp
 
 state9:
   CYC(b_+25, b_+28); A = mem_rd(gb, wPaletteThread_mode);
@@ -961,7 +961,7 @@ state9:
   CALL_C(b_+43, objectCopyPosition_hook, SYM(objectCopyPosition), b_+46);
   CYC(b_+46, b_+48); A = 0x01; // TREE_GFXH_01
   CYC(b_+48, b_+51); mem_wr(gb, wLoadedTreeGfxIndex, A);
-  CYC(b_+51, b_+54); enemyDelete_hook(gb); return; // jp
+  CYC(b_+51, b_+54); TAIL(enemyDelete); // jp
 }
 
 // 0e:7b11, bare global; called from enemyCode61.
@@ -1012,7 +1012,7 @@ mysterySeed:
   CYC(b_+62, b_+64); L = ENEMY_BASE + OBJ_USE_TEXT_ID; // Enemy.var30
   CYC(b_+64, b_+65); A = mem_rd(gb, HL);
   CYC(b_+65, b_+67); alu_add(gb, 0x02);
-  CYC(b_+67, b_+70); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+67, b_+70); TAIL(enemySetAnimation); // jp
 
 subid2:
   CYC(b_+70, b_+72); A = (uint8_t)(A & ~(1 << 7)); // res 7,a
@@ -1047,5 +1047,5 @@ damagePillarForm:
   CYC(b_+110, b_+112); A = 0x01;
   CYC(b_+112, b_+115); mem_wr(gb, wTmpcfc0_genericCutscene_cfd0, A);
   CYC(b_+115, b_+117); A = 0xf0; // SNDCTRL_STOPMUSIC
-  CYC(b_+117, b_+120); playSound_b00_hook(gb); return; // jp
+  CYC(b_+117, b_+120); TAIL(playSound_b00); // jp
 }

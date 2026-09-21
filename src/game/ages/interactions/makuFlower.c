@@ -73,7 +73,7 @@ setAnimB:
   CYC(b_+52, b_+53); A = B;
 
 setAnimA:
-  CYC(b_+53, b_+56); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+53, b_+56); TAIL(interactionSetAnimation); // jp
 
 subid1:
   CALL_C(b_+61, checkInteractionState_hook, SYM(checkInteractionState), b_+64);

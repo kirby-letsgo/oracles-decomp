@@ -101,7 +101,7 @@ substate0:
   CALL_C(b_+91, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+94);
 
 l_5e29:
-  CYC(b_+94, b_+97); interactionAnimate_hook(gb); return; // jp
+  CYC(b_+94, b_+97); TAIL(interactionAnimate); // jp
 
 substate1:
   CYC(b_+97, b_+99); C = 0x20;
@@ -118,5 +118,5 @@ substate2:
   if (!(F & FZ)) { CYCT(b_+114, b_+115); ret_effect(gb); return; } // ret nz
   CYC(b_+114, b_+115);
   CYC(b_+115, b_+117); A = 0x03;
-  CYC(b_+117, b_+120); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+117, b_+120); TAIL(interactionSetAnimation); // jp
 }

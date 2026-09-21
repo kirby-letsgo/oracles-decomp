@@ -44,8 +44,7 @@ alreadyPlayedDeathSound:
   CALL_C(b_+23, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+26);
   if (!(F & FZ)) {
     CYCT(b_+26, b_+29);
-    ecom_flickerVisibility_b0f_hook(gb);
-    return;
+    TAIL(ecom_flickerVisibility_b0f);
   }
   CYC(b_+26, b_+29);
   CYC(b_+29, b_+30); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));

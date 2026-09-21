@@ -117,5 +117,5 @@ state2:
   CYC(b_+118, b_+119);
 
 delete:
-  CYC(b_+119, b_+122); partDelete_hook(gb); return; // jp
+  CYC(b_+119, b_+122); TAIL(partDelete); // jp
 }

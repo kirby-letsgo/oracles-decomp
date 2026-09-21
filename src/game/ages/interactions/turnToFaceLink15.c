@@ -15,5 +15,5 @@ void turnToFaceLink_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+3);
   CALL_C(b_+3, convertAngleToDirection_hook, SYM(convertAngleToDirection), b_+6);
-  CYC(b_+6, b_+9); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+6, b_+9); TAIL(interactionSetAnimation); // jp
 }

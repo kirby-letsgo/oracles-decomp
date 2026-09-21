@@ -284,7 +284,7 @@ increment_standing_counter:
     else if (jt_ == b_+257) { goto lava; }
     else if (jt_ == b_+288) { goto conveyor; }
     else if (jt_ == b_+327) { goto current; }
-    else if (jt_ == SYM(dealSpikeDamageToLink)) { dealSpikeDamageToLink_hook(gb); return; }
+    else if (jt_ == SYM(dealSpikeDamageToLink) && hook_enabled_at(gb, SYM(dealSpikeDamageToLink))) { dealSpikeDamageToLink_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
@@ -411,8 +411,7 @@ pull_into_hole:
   CYC(b_+199, b_+201); A = 0x80;
   CYC(b_+201, b_+204); W8(wcc92) = A;
   CYC(b_+204, b_+207);
-  linkPullIntoHole_hook(gb);
-  return;
+  TAIL(linkPullIntoHole);
 
 ice:
   CYC(b_+207, b_+209); A = 0x21;
@@ -641,8 +640,7 @@ void checkCollisionForCompanion_hook(GB *gb) {
   CYC(b_+14, b_+16); A = 0x03;
   if (F & FZ) {
     CYCT(b_+16, b_+19);
-    checkGivenCollision_allowHoles_hook(gb);
-    return;
+    TAIL(checkGivenCollision_allowHoles);
   }
   CYC(b_+16, b_+19);
   CYC(b_+19, b_+21); E = 0x01;
@@ -860,14 +858,14 @@ void companionUpdateDirectionAndAnimate_hook(GB *gb) {
   CYC(b_+8, b_+9); A = mem_rd(gb, DE);
   CYC(b_+9, b_+11); alu_cp(gb, 0x0c);
   if (F & FZ) {
-    CYCT(b_+11, b_+14); specialObjectAnimate_hook(gb); return;
+    CYCT(b_+11, b_+14); TAIL(specialObjectAnimate);
   }
   CYC(b_+11, b_+14);
   CALL_C(b_+14, updateLinkDirectionFromAngle_hook, SYM(updateLinkDirectionFromAngle), b_+17);
   CYC(b_+17, b_+20); SET_HL(w1Companion_direction);
   CYC(b_+20, b_+21); alu_cp(gb, mem_rd(gb, HL));
   if (F & FZ) {
-    CYCT(b_+21, b_+24); specialObjectAnimate_hook(gb); return;
+    CYCT(b_+21, b_+24); TAIL(specialObjectAnimate);
   }
   CYC(b_+21, b_+24);
   companionUpdateDirectionAndSetAnimation_hook(gb);
@@ -1505,8 +1503,7 @@ void companionCheckCanSpawn_hook(GB *gb) {
     CYC(b_+36, b_+38);
     CYC(b_+38, b_+39); SET_AF(pop_effect(gb));
     CYC(b_+39, b_+42);
-    itemDelete_hook(gb);
-    return;
+    TAIL(itemDelete);
   }
   CYC(b_+42, b_+44); E = 0x0b;
   CYC(b_+44, b_+45); A = mem_rd(gb, DE);
@@ -1545,8 +1542,7 @@ try_last_mount_point:
   CYC(b_+77, b_+79);
   CYC(b_+79, b_+80); SET_AF(pop_effect(gb));
   CYC(b_+80, b_+83);
-  itemDelete_hook(gb);
-  return;
+  TAIL(itemDelete);
 
 can_spawn:
   CALL_C(b_+83, specialObjectSetOamVariables_hook, SYM(specialObjectSetOamVariables), b_+86);
@@ -1615,8 +1611,7 @@ void companionSetAnimationToVar3f_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FZ)) {
     CYCT(b_+7, b_+10);
-    specialObjectSetAnimation_hook(gb);
-    return;
+    TAIL(specialObjectSetAnimation);
   }
   CYC(b_+7, b_+10);
   CYC(b_+10, b_+11); ret_effect(gb);

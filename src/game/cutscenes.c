@@ -32,8 +32,7 @@ void func_5d5d_hook(GB *gb) {
   CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+4, b_+7);
-    applyWarpTransition2_hook(gb);
-    return;
+    TAIL(applyWarpTransition2);
   }
   CYC(b_+4, b_+7);
   CYC(b_+7, b_+10); SET_HL((SYM(checkLinkCanStandOnTile) + 29));
@@ -66,8 +65,7 @@ void cutscene09_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+7, b_+10);
-    setCutsceneIndexIfCutsceneTriggerSet_hook(gb);
-    return;
+    TAIL(setCutsceneIndexIfCutsceneTriggerSet);
   }
   CYC(b_+7, b_+10);
   CYC(b_+10, b_+12); E = 0x00;
@@ -134,8 +132,7 @@ void cutscene0e_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+7, b_+9);
-    applyWarpTransition2_hook(gb);
-    return;
+    TAIL(applyWarpTransition2);
   }
   CYC(b_+7, b_+9);
   CYC(b_+9, b_+11); C = 0x05;
@@ -151,8 +148,7 @@ void cutscene21_hook(GB *gb) {
   CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+4, b_+7);
-    setCutsceneIndexIfCutsceneTriggerSet_hook(gb);
-    return;
+    TAIL(setCutsceneIndexIfCutsceneTriggerSet);
   }
   CYC(b_+4, b_+7);
   CYC(b_+7, b_+9); C = 0x07;
@@ -182,8 +178,7 @@ void cutscene12_hook(GB *gb) {
   CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) {
     CYCT(b_+4, b_+7);
-    setCutsceneIndexIfCutsceneTriggerSet_hook(gb);
-    return;
+    TAIL(setCutsceneIndexIfCutsceneTriggerSet);
   }
   CYC(b_+4, b_+7);
   CALL_C(b_+7, func_3ee4_hook, SYM(func_3ee4), b_+10);

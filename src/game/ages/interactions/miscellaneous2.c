@@ -45,8 +45,7 @@ void interactiondc_subid00_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x20);
   if (!(F & FZ)) {
     CYCT(b_+5, b_+8);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+11); A = mem_rd(gb, wNumTorchesLit);
@@ -66,16 +65,14 @@ void interactiondc_subid01_hook(GB *gb) {
   CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
   if (!(F & FZ)) {
     CYCT(b_+3, b_+6);
-    interactionRunScript_hook(gb);
-    return;
+    TAIL(interactionRunScript);
   }
   CYC(b_+3, b_+6);
   CALL_C(b_+6, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+9);
   CYC(b_+9, b_+11); alu_and(gb, 0x80);
   if (!(F & FZ)) {
     CYCT(b_+11, b_+14);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+11, b_+14);
   CYC(b_+14, b_+17); SET_HL((SYM(interactionCodee6__checkLinkWithinRange) + 125));
@@ -103,8 +100,7 @@ state0:
   CYC(b_+16, b_+18); alu_and(gb, 0x80);
   if (!(F & FZ)) {
     CYCT(b_+18, b_+21);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+18, b_+21);
   CYC(b_+21, b_+22); A = D;
@@ -117,8 +113,7 @@ state0:
   CYC(b_+32, b_+34); A = 0x1c;
   CALL_C(b_+34, setTile_hook, SYM(setTile), b_+37);
   CYC(b_+37, b_+40);
-  interactionIncState_hook(gb);
-  return;
+  TAIL(interactionIncState);
 state1:
   CYC(b_+40, b_+43); A = mem_rd(gb, wLinkGrabState);
   CYC(b_+43, b_+45); alu_cp(gb, 0x83);
@@ -139,8 +134,7 @@ state1:
   CYC(b_+71, b_+73); A = 0xf0;
   CALL_C(b_+73, playSound_b00_hook, SYM(playSound_b00), b_+76);
   CYC(b_+76, b_+79);
-  interactionIncState_hook(gb);
-  return;
+  TAIL(interactionIncState);
 state2:
   CYC(b_+79, b_+81); E = INTERACTION_BASE + OBJ_SUBSTATE;
   CYC(b_+81, b_+82); A = mem_rd(gb, DE);
@@ -161,8 +155,7 @@ substate0:
   CALL_C(b_+101, clearAllParentItems_hook, SYM(clearAllParentItems), b_+104);
   CALL_C(b_+104, dropLinkHeldItem_hook, SYM(dropLinkHeldItem), b_+107);
   CYC(b_+107, b_+110);
-  interactionIncSubstate_hook(gb);
-  return;
+  TAIL(interactionIncSubstate);
 substate1:
   CYC(b_+110, b_+112); A = 0x28;
   CALL_C(b_+112, setScreenShakeCounter_hook, SYM(setScreenShakeCounter), b_+115);
@@ -202,16 +195,14 @@ void interactiondc_subid03_hook(GB *gb) {
   CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
   if (!(F & FZ)) {
     CYCT(b_+3, b_+5);
-    interactiondc_subid3And4_state1_hook(gb);
-    return;
+    TAIL(interactiondc_subid3And4_state1);
   }
   CYC(b_+3, b_+5);
   CALL_C(b_+5, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+8);
   CYC(b_+8, b_+10); alu_and(gb, 0x02);
   if (!(F & FZ)) {
     CYCT(b_+10, b_+13);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+10, b_+13);
   CYC(b_+13, b_+15); E = INTERACTION_BASE + OBJ_VAR03;
@@ -227,16 +218,14 @@ void interactiondc_subid04_hook(GB *gb) {
   CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
   if (!(F & FZ)) {
     CYCT(b_+3, b_+5);
-    interactiondc_subid3And4_state1_hook(gb);
-    return;
+    TAIL(interactiondc_subid3And4_state1);
   }
   CYC(b_+3, b_+5);
   CALL_C(b_+5, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+8);
   CYC(b_+8, b_+10); alu_and(gb, 0x04);
   if (!(F & FZ)) {
     CYCT(b_+10, b_+13);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+10, b_+13);
   CYC(b_+13, b_+15); E = INTERACTION_BASE + OBJ_VAR03;
@@ -287,8 +276,7 @@ state0:
   CALL_C(b_+12, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+15);
   if (!(F & FZ)) {
     CYCT(b_+15, b_+18);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+15, b_+18);
   CALL_C(b_+18, returnIfScrollMode01Unset_hook, SYM(returnIfScrollMode01Unset), b_+21);
@@ -306,8 +294,7 @@ state0:
     CYC(b_+38, b_+41);
   }
   CYC(b_+41, b_+44);
-  interactionIncState_hook(gb);
-  return;
+  TAIL(interactionIncState);
 state1:
   CYC(b_+44, b_+45); alu_xor(gb, A);
   CYC(b_+45, b_+48); push_effect(gb, b_+48);
@@ -316,8 +303,7 @@ state1:
   CYC(b_+48, b_+49); push_effect(gb, b_+52);
   interactiondc_subid05_setRandomShakeDuration_hook(gb);
   CYC(b_+52, b_+55);
-  interactionIncState_hook(gb);
-  return;
+  TAIL(interactionIncState);
 state2:
   CYC(b_+55, b_+58); A = mem_rd(gb, wFrameCounter);
   CYC(b_+58, b_+60); alu_and(gb, 0x0f);
@@ -361,8 +347,7 @@ void interactiondc_subid07_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x20);
   if (!(F & FZ)) {
     CYCT(b_+5, b_+8);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+11); SET_BC(0x2b00);
@@ -398,8 +383,7 @@ void interactiondc_subid08_hook(GB *gb) {
   CYC(b_+24, b_+25); alu_or(gb, mem_rd(gb, HL));
   CYC(b_+25, b_+26); mem_wr(gb, HL, A);
   CYC(b_+26, b_+29);
-  interactionDelete_hook(gb);
-  return;
+  TAIL(interactionDelete);
 state0:
   CALL_C(b_+29, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+32);
   CYC(b_+32, b_+34); E = INTERACTION_BASE + OBJ_XH;
@@ -407,8 +391,7 @@ state0:
   CYC(b_+35, b_+36); alu_and(gb, mem_rd(gb, HL));
   if (!(F & FZ)) {
     CYCT(b_+36, b_+39);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+36, b_+39);
   CYC(b_+39, b_+41); E = INTERACTION_BASE + OBJ_YH;
@@ -472,8 +455,7 @@ replaceTileListAndIncSubstate:
   CYC(b_+60, b_+63); push_effect(gb, b_+63);
   interactiondc_subid09_replaceTileList_hook(gb);
   CYC(b_+63, b_+66);
-  interactionIncSubstate_hook(gb);
-  return;
+  TAIL(interactionIncSubstate);
 substate1:
   CALL_C(b_+66, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+69);
   if (!(F & FZ)) { RET_TAKEN(b_+69); return; }
@@ -506,8 +488,7 @@ replaceTileListAndIncSubstate:
   CYC(b_+107, b_+110); push_effect(gb, b_+110);
   interactiondc_subid09_replaceTileList_hook(gb);
   CYC(b_+110, b_+113);
-  interactionIncSubstate_hook(gb);
-  return;
+  TAIL(interactionIncSubstate);
 substate1:
   CALL_C(b_+113, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+116);
   if (!(F & FZ)) { RET_TAKEN(b_+116); return; }
@@ -533,7 +514,7 @@ void interactiondc_subid09_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (interactiondc_jump_table(gb));
-    if (jt_ == SYM(interactionIncState)) { interactionIncState_hook(gb); return; }
+    if (jt_ == SYM(interactionIncState) && hook_enabled_at(gb, SYM(interactionIncState))) { interactionIncState_hook(gb); return; }
     else if (jt_ == b_+12) { goto state1; }
     else if (jt_ == b_+42) { interactiondc_subid09_state2_hook(gb); return; }
     else if (jt_ == b_+87) { interactiondc_subid09_state3_hook(gb); return; }
@@ -579,8 +560,7 @@ void interactiondc_subid0A_hook(GB *gb) {
   CALL_C(b_+7, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+10);
   if (F & FZ) {
     CYCT(b_+10, b_+13);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+10, b_+13);
   CYC(b_+13, b_+15); A = 0x81;
@@ -591,15 +571,13 @@ void interactiondc_subid0A_hook(GB *gb) {
   CYC(b_+25, b_+27); A = 0x1d;
   CYC(b_+27, b_+30); mem_wr(gb, wCutsceneTrigger, A);
   CYC(b_+30, b_+33);
-  interactionDelete_hook(gb);
-  return;
+  TAIL(interactionDelete);
 state0:
   CALL_C(b_+33, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+36);
   CYC(b_+36, b_+38); alu_and(gb, 0x02);
   if (!(F & FZ)) {
     CYCT(b_+38, b_+41);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+38, b_+41);
   CYC(b_+41, b_+44);
@@ -626,8 +604,7 @@ state0:
   CALL_C(b_+17, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+20);
   CYC(b_+20, b_+23); SET_HL(b_+101);
   CYC(b_+23, b_+26);
-  interactionSetMiniScript_hook(gb);
-  return;
+  TAIL(interactionSetMiniScript);
 state1:
   CALL_C(b_+26, objectCheckCollidedWithLink_ignoreZ_hook, SYM(objectCheckCollidedWithLink_ignoreZ), b_+29);
   if (!(F & FC)) { RET_TAKEN(b_+29); return; }
@@ -647,8 +624,7 @@ state1:
   CYC(b_+55, b_+58); SET_BC(0xf808);
   CALL_C(b_+58, objectCreateExclamationMark_hook, SYM(objectCreateExclamationMark), b_+61);
   CYC(b_+61, b_+64);
-  interactionIncState_hook(gb);
-  return;
+  TAIL(interactionIncState);
 state2:
   CALL_C(b_+64, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+67);
   if (!(F & FZ)) { RET_TAKEN(b_+67); return; }
@@ -657,8 +633,7 @@ state2:
   CYC(b_+70, b_+71); alu_xor(gb, A);
   CYC(b_+71, b_+74); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+74, b_+77);
-  interactionIncState_hook(gb);
-  return;
+  TAIL(interactionIncState);
 state3:
   CALL_C(b_+77, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+80);
   if (!(F & FZ)) { RET_TAKEN(b_+80); return; }
@@ -672,8 +647,7 @@ state3:
   CYC(b_+92, b_+93); alu_or(gb, A);
   if (F & FZ) {
     CYCT(b_+93, b_+96);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+93, b_+96);
   CYC(b_+96, b_+98); A = 0x48;
@@ -722,15 +696,13 @@ spawnBridge:
   CYC(b_+47, b_+49); A = 0x4d;
   CALL_C(b_+49, playSound_b00_hook, SYM(playSound_b00), b_+52);
   CYC(b_+52, b_+55);
-  interactionDelete_hook(gb);
-  return;
+  TAIL(interactionDelete);
 state0:
   CALL_C(b_+55, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+58);
   CYC(b_+58, b_+60); alu_and(gb, 0x80);
   if (!(F & FZ)) {
     CYCT(b_+60, b_+63);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+60, b_+63);
   CYC(b_+63, b_+66);
@@ -766,13 +738,11 @@ state0:
   CYC(b_+13, b_+15); alu_and(gb, 0x80);
   if (!(F & FZ)) {
     CYCT(b_+15, b_+18);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+15, b_+18);
   CYC(b_+18, b_+21);
-  interactionIncState_hook(gb);
-  return;
+  TAIL(interactionIncState);
 state1:
   CALL_C(b_+21, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+24);
   CYC(b_+24, b_+26); alu_cp(gb, 0x02);
@@ -851,23 +821,20 @@ void interactiondc_subid0F_hook(GB *gb) {
 showText:
   CALL_C(b_+22, showText_hook, SYM(showText), b_+25);
   CYC(b_+25, b_+28);
-  interactionDelete_hook(gb);
-  return;
+  TAIL(interactionDelete);
 state0:
   CYC(b_+28, b_+31); A = mem_rd(gb, wScreenVariables);
   CYC(b_+31, b_+33); alu_and(gb, 0x02);
   if (F & FZ) {
     CYCT(b_+33, b_+36);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+33, b_+36);
   CYC(b_+36, b_+39); A = mem_rd(gb, w1Link_yh);
   CYC(b_+39, b_+41); alu_cp(gb, 0x78);
   if (F & FC) {
     CYCT(b_+41, b_+44);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+41, b_+44);
   CYC(b_+44, b_+46); A = 0x08;
@@ -902,15 +869,13 @@ state0:
     CYC(b_+25, b_+28);
   }
   CYC(b_+28, b_+31);
-  interactionIncState_hook(gb);
-  return;
+  TAIL(interactionIncState);
 state1:
   CALL_C(b_+31, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing), b_+34);
   if (F & FC) { RET_TAKEN(b_+34); return; }
   CYC(b_+34, b_+35);
   CYC(b_+35, b_+38);
-  interactionIncState_hook(gb);
-  return;
+  TAIL(interactionIncState);
 state2:
   CALL_C(b_+38, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing), b_+41);
   if (!(F & FC)) { RET_TAKEN(b_+41); return; }
@@ -955,8 +920,7 @@ void interactiondc_subid12_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x40);
   if (!(F & FZ)) {
     CYCT(b_+5, b_+8);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+11); A = mem_rd(gb, wToggleBlocksState);
@@ -1037,8 +1001,7 @@ void interactiondc_subid15And16_state0_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x20);
   if (!(F & FZ)) {
     CYCT(b_+5, b_+8);
-    interactionDelete_hook(gb);
-    return;
+    TAIL(interactionDelete);
   }
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+11);
@@ -1051,16 +1014,14 @@ void interactiondc_subid15_hook(GB *gb) {
   CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
   if (F & FZ) {
     CYCT(b_+3, b_+5);
-    interactiondc_subid15And16_state0_hook(gb);
-    return;
+    TAIL(interactiondc_subid15And16_state0);
   }
   CYC(b_+3, b_+5);
   CALL_C(b_+5, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+8);
   CYC(b_+8, b_+10); A = 0x01;
   if (!(F & FZ)) {
     CYCT(b_+10, b_+12);
-    interactiondc_subid15And16_setChestContents_hook(gb);
-    return;
+    TAIL(interactiondc_subid15And16_setChestContents);
   }
   CYC(b_+10, b_+12);
   CYC(b_+12, b_+13); A = alu_dec8(gb, A);
@@ -1073,16 +1034,14 @@ void interactiondc_subid16_hook(GB *gb) {
   CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
   if (F & FZ) {
     CYCT(b_+3, b_+5);
-    interactiondc_subid15And16_state0_hook(gb);
-    return;
+    TAIL(interactiondc_subid15And16_state0);
   }
   CYC(b_+3, b_+5);
   CALL_C(b_+5, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+8);
   CYC(b_+8, b_+10); A = 0x00;
   if (!(F & FZ)) {
     CYCT(b_+10, b_+12);
-    interactiondc_subid15And16_setChestContents_hook(gb);
-    return;
+    TAIL(interactiondc_subid15And16_setChestContents);
   }
   CYC(b_+10, b_+12);
   CYC(b_+12, b_+13); A = alu_inc8(gb, A);
@@ -1096,8 +1055,7 @@ void interactiondc_subid17_hook(GB *gb) {
   CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
   if (F & FZ) {
     CYCT(b_+3, b_+6);
-    interactionIncState_hook(gb);
-    return;
+    TAIL(interactionIncState);
   }
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+9); A = mem_rd(gb, w1Link_yh);
@@ -1135,29 +1093,29 @@ void interactionCodedc_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (interactiondc_jump_table(gb));
-    if (jt_ == SYM(interactiondc_subid00)) { interactiondc_subid00_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid01)) { interactiondc_subid01_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid02)) { interactiondc_subid02_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid03)) { interactiondc_subid03_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid04)) { interactiondc_subid04_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid05)) { interactiondc_subid05_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid06)) { interactiondc_subid06_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid07)) { interactiondc_subid07_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid08)) { interactiondc_subid08_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid09)) { interactiondc_subid09_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid0A)) { interactiondc_subid0A_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid0B)) { interactiondc_subid0B_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid0C)) { interactiondc_subid0C_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid0E)) { interactiondc_subid0E_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid0F)) { interactiondc_subid0F_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid10)) { interactiondc_subid10_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid11)) { interactiondc_subid11_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid12)) { interactiondc_subid12_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid13)) { interactiondc_subid13_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid14)) { interactiondc_subid14_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid15)) { interactiondc_subid15_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid16)) { interactiondc_subid16_hook(gb); return; }
-    else if (jt_ == SYM(interactiondc_subid17)) { interactiondc_subid17_hook(gb); return; }
+    if (jt_ == SYM(interactiondc_subid00) && hook_enabled_at(gb, SYM(interactiondc_subid00))) { interactiondc_subid00_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid01) && hook_enabled_at(gb, SYM(interactiondc_subid01))) { interactiondc_subid01_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid02) && hook_enabled_at(gb, SYM(interactiondc_subid02))) { interactiondc_subid02_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid03) && hook_enabled_at(gb, SYM(interactiondc_subid03))) { interactiondc_subid03_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid04) && hook_enabled_at(gb, SYM(interactiondc_subid04))) { interactiondc_subid04_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid05) && hook_enabled_at(gb, SYM(interactiondc_subid05))) { interactiondc_subid05_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid06) && hook_enabled_at(gb, SYM(interactiondc_subid06))) { interactiondc_subid06_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid07) && hook_enabled_at(gb, SYM(interactiondc_subid07))) { interactiondc_subid07_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid08) && hook_enabled_at(gb, SYM(interactiondc_subid08))) { interactiondc_subid08_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid09) && hook_enabled_at(gb, SYM(interactiondc_subid09))) { interactiondc_subid09_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid0A) && hook_enabled_at(gb, SYM(interactiondc_subid0A))) { interactiondc_subid0A_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid0B) && hook_enabled_at(gb, SYM(interactiondc_subid0B))) { interactiondc_subid0B_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid0C) && hook_enabled_at(gb, SYM(interactiondc_subid0C))) { interactiondc_subid0C_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid0E) && hook_enabled_at(gb, SYM(interactiondc_subid0E))) { interactiondc_subid0E_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid0F) && hook_enabled_at(gb, SYM(interactiondc_subid0F))) { interactiondc_subid0F_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid10) && hook_enabled_at(gb, SYM(interactiondc_subid10))) { interactiondc_subid10_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid11) && hook_enabled_at(gb, SYM(interactiondc_subid11))) { interactiondc_subid11_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid12) && hook_enabled_at(gb, SYM(interactiondc_subid12))) { interactiondc_subid12_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid13) && hook_enabled_at(gb, SYM(interactiondc_subid13))) { interactiondc_subid13_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid14) && hook_enabled_at(gb, SYM(interactiondc_subid14))) { interactiondc_subid14_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid15) && hook_enabled_at(gb, SYM(interactiondc_subid15))) { interactiondc_subid15_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid16) && hook_enabled_at(gb, SYM(interactiondc_subid16))) { interactiondc_subid16_hook(gb); return; }
+    else if (jt_ == SYM(interactiondc_subid17) && hook_enabled_at(gb, SYM(interactiondc_subid17))) { interactiondc_subid17_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

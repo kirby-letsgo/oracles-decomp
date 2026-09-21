@@ -146,7 +146,7 @@ state0:
   CYC(b_+116, b_+117); mem_wr(gb, DE, A);
   CYC(b_+117, b_+119); A = 0x51; // SND_THROW
   CALL_C(b_+119, playSound_b00_hook, SYM(playSound_b00), b_+122);
-  CYC(b_+122, b_+125); objectSetVisiblec0_hook(gb); return; // jp
+  CYC(b_+122, b_+125); TAIL(objectSetVisiblec0); // jp
 
 subidBit7SetArm_state0:
   CYC(b_+127, b_+130); ramrock35_state0func_6731(gb);
@@ -172,7 +172,7 @@ subidBit7SetArm_state0:
   CYC(b_+164, b_+165); A = mem_rd(gb, DE);
   CYC(b_+165, b_+167); A = (uint8_t)(A & ~(1 << 7));
   CYC(b_+167, b_+168); mem_wr(gb, DE, A);
-  CYC(b_+168, b_+171); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+168, b_+171); TAIL(objectSetVisiblec1); // jp
 
 state1:
   CYC(b_+180, b_+182); C = 0x10;
@@ -201,7 +201,7 @@ subidBit7SetArm_state1:
   CYC(b_+207, b_+209);
   CYC(b_+209, b_+210); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+210, b_+213); SET_BC(0xfe80);
-  CYC(b_+213, b_+216); objectSetSpeedZ_hook(gb); return; // jp
+  CYC(b_+213, b_+216); TAIL(objectSetSpeedZ); // jp
 
 func_675e:
   CYC(b_+216, b_+218); A = 0x78;
@@ -255,7 +255,7 @@ state2_substate0:
   CYC(b_+287, b_+289); E = 0xc2;
   CYC(b_+289, b_+290); A = mem_rd(gb, DE);
   CYC(b_+290, b_+292); A = alu_swap(gb, A);
-  CYC(b_+292, b_+295); unsetFlag_hook(gb); return; // jp
+  CYC(b_+292, b_+295); TAIL(unsetFlag); // jp
 
 state2_dropLinkHeldItem:
   CALL_C(b_+295, dropLinkHeldItem_hook, SYM(dropLinkHeldItem), b_+298);
@@ -308,7 +308,7 @@ L_67e4:
   CYC(b_+354, b_+356); L = 0xd0;
   CYC(b_+356, b_+357); B = mem_rd(gb, HL);
   CALL_C(b_+357, updateLinkPositionGivenVelocity_hook, SYM(updateLinkPositionGivenVelocity), b_+360);
-  CYC(b_+360, b_+363); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+360, b_+363); TAIL(objectApplySpeed); // jp
 
 subidBit7SetArm_state2:
   CYC(b_+363, b_+365); A = 0x0b;
@@ -341,7 +341,7 @@ state3:
   CYC(b_+397, b_+399);
   CYC(b_+399, b_+400); A = alu_dec8(gb, A);
   CYC(b_+400, b_+401); mem_wr(gb, DE, A);
-  CYC(b_+401, b_+404); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+401, b_+404); TAIL(objectApplySpeed); // jp
 
 state3func_681a:
   CALL_C(b_+404, func_693b_hook, SYM(func_693b), b_+407);
@@ -438,7 +438,7 @@ state4:
   CYC(b_+528, b_+529); H = D;
   CYC(b_+529, b_+531); L = 0xe4;
   CYC(b_+531, b_+533); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7)));
-  CYC(b_+533, b_+536); objectAddToGrabbableObjectBuffer_hook(gb); return; // jp
+  CYC(b_+533, b_+536); TAIL(objectAddToGrabbableObjectBuffer); // jp
 
 state4func_689e:
   CYC(b_+536, b_+538); A = 0x6f; // SND_EXPLOSION
@@ -458,7 +458,7 @@ state4func_689e:
   CYC(b_+565, b_+567); E = 0xc2;
   CYC(b_+567, b_+568); A = mem_rd(gb, DE);
   CYC(b_+568, b_+570); A = alu_swap(gb, A);
-  CYC(b_+570, b_+573); unsetFlag_hook(gb); return; // jp
+  CYC(b_+570, b_+573); TAIL(unsetFlag); // jp
 
 subidBit7SetArm_state4:
   CYC(b_+573, b_+575); A = 0x04;
@@ -473,7 +473,7 @@ subidBit7SetArm_state4:
   CYC(b_+587, b_+588); E = L;
   CYC(b_+588, b_+589); A = mem_rd(gb, HL);
   CYC(b_+589, b_+590); mem_wr(gb, DE, A);
-  CYC(b_+590, b_+593); objectSetVisible_hook(gb); return; // jp
+  CYC(b_+590, b_+593); TAIL(objectSetVisible); // jp
 
 state4func_68d7:
   CALL_C(b_+593, func_693b_hook, SYM(func_693b), b_+596);
@@ -649,7 +649,7 @@ void state0func_6992_hook(GB *gb) {
   CYC(b_+10, b_+11); C = mem_rd(gb, HL);
   CYC(b_+11, b_+13); B = 0xfc;
   CYC(b_+13, b_+14); SET_HL(pop_effect(gb));
-  CYC(b_+14, b_+17); objectCopyPositionWithOffset_hook(gb); return; // jp
+  CYC(b_+14, b_+17); TAIL(objectCopyPositionWithOffset); // jp
 }
 
 void func_69a5_hook(GB *gb) {

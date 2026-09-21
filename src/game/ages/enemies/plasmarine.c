@@ -144,7 +144,7 @@ void plasmarine_state_uninitialized_hook(GB *gb) {
   CYC(b_+28, b_+30); A = 0x7e; // ENEMY_PLASMARINE
   CYC(b_+30, b_+32); B = 0x00;
   CALL_C(b_+32, enemyBoss_initializeRoom_b0f_hook, SYM(enemyBoss_initializeRoom_b0f), b_+35);
-  CYC(b_+35, b_+38); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+35, b_+38); TAIL(objectSetVisible83); // jp
 }
 
 void plasmarine_state_switchHook_hook(GB *gb) {
@@ -167,7 +167,7 @@ justLatched:
   CYC(b_+12, b_+14); E = ENEMY_BASE + OBJ_VAR33;
   CYC(b_+14, b_+15); mem_wr(gb, DE, A);
   CALL_C(b_+15, enemySetAnimation_hook, SYM(enemySetAnimation), b_+18);
-  CYC(b_+18, b_+21); ecom_incSubstate_b0f_hook(gb); return; // jp
+  CYC(b_+18, b_+21); TAIL(ecom_incSubstate_b0f); // jp
 
 afterSwitch:
   CYC(b_+21, b_+23); E = ENEMY_BASE + OBJ_VAR33;
@@ -188,7 +188,7 @@ released:
   CYC(b_+51, b_+52);
   CYC(b_+52, b_+54); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+54, b_+56); mem_wr(gb, HL, 60);
-  CYC(b_+56, b_+59); plasmarine_decideNumberOfShockAttacks_hook(gb); return; // jp
+  CYC(b_+56, b_+59); TAIL(plasmarine_decideNumberOfShockAttacks); // jp
 }
 
 void plasmarine_state_stub_hook(GB *gb) {
@@ -212,7 +212,7 @@ void plasmarine_state8_hook(GB *gb) {
 
 L_7b0d:
   CALL_C(b_+18, objectApplySpeed_hook, SYM(objectApplySpeed), b_+21);
-  CYCT(b_+21, b_+23); plasmarine_animate_hook(gb); return; // jr
+  CYCT(b_+21, b_+23); TAIL(plasmarine_animate); // jr
 
 reachedTarget:
   CYC(b_+23, b_+24); L = E;
@@ -223,7 +223,7 @@ reachedTarget:
   CYC(b_+31, b_+32); mem_wr(gb, HL, B);
   CYC(b_+32, b_+34); L = ENEMY_BASE + OBJ_XH;
   CYC(b_+34, b_+35); mem_wr(gb, HL, C);
-  CYCT(b_+35, b_+37); plasmarine_animate_hook(gb); return; // jr
+  CYCT(b_+35, b_+37); TAIL(plasmarine_animate); // jr
 }
 
 // 60 frame delay before starting fight
@@ -241,7 +241,7 @@ void plasmarine_state9_hook(GB *gb) {
   CALL_C(b_+13, plasmarine_decideNumberOfShockAttacks_hook, SYM(plasmarine_decideNumberOfShockAttacks), b_+16);
   CALL_C(b_+16, enemyBoss_beginBoss_b0f_hook, SYM(enemyBoss_beginBoss_b0f), b_+19);
   CYC(b_+19, b_+20); alu_xor(gb, A);
-  CYC(b_+20, b_+23); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(enemySetAnimation); // jp
 }
 
 // Standing in place before charging
@@ -267,12 +267,12 @@ void plasmarine_stateA_hook(GB *gb) {
   CYC(b_+26, b_+27); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+27, b_+29); A = mem_rd(gb, hEnemyTargetX); // hEnemyTargetX
   CYC(b_+29, b_+30); mem_wr(gb, HL, A);
-  plasmarine_animate_hook(gb); return; // fallthrough
+  TAIL(plasmarine_animate); // fallthrough
 }
 
 void plasmarine_animate_hook(GB *gb) {
   BASE(plasmarine_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // Charging toward Link
@@ -290,7 +290,7 @@ L_7b5f:
   CYC(b_+9, b_+10); A = mem_rd(gb, HL);
   CYC(b_+10, b_+12); alu_sub(gb, 0x05); // SPEED_20
   CYC(b_+12, b_+13); mem_wr(gb, HL, A);
-  plasmarine_stateC_hook(gb); return; // fallthrough
+  TAIL(plasmarine_stateC); // fallthrough
 }
 
 void plasmarine_stateC_hook(GB *gb) {
@@ -318,7 +318,7 @@ void plasmarine_stateC_hook(GB *gb) {
   CYC(b_+31, b_+33); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
   CYC(b_+33, b_+35); mem_wr(gb, HL, 0x68); // ENEMYCOLLISION_PLASMARINE_SHOCK
   CYC(b_+35, b_+37); A = 0x02;
-  CYC(b_+37, b_+40); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+37, b_+40); TAIL(enemySetAnimation); // jp
 
 fireProjectiles:
   CYC(b_+40, b_+42); mem_wr(gb, HL, 0x0e); // [state]
@@ -331,7 +331,7 @@ fireProjectiles:
   CYC(b_+52, b_+53); A = mem_rd(gb, HL);
   CYC(b_+53, b_+54); mem_wr(gb, DE, A);
   CYC(b_+54, b_+56); A = 0x01;
-  CYC(b_+56, b_+59); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+56, b_+59); TAIL(enemySetAnimation); // jp
 }
 
 // Shock attack
@@ -361,7 +361,7 @@ L_7bbe:
   CYC(b_+28, b_+30); L = ENEMY_BASE + OBJ_OAM_FLAGS_BACKUP;
   CYC(b_+30, b_+31); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+31, b_+32); mem_wr(gb, HL, A);
-  CYCT(b_+32, b_+34); plasmarine_animate_hook(gb); return; // jr
+  CYCT(b_+32, b_+34); TAIL(plasmarine_animate); // jr
 
 doneAttack:
   CYC(b_+34, b_+36); mem_wr(gb, HL, 60); // [counter1]
@@ -380,7 +380,7 @@ doneAttack:
   CYC(b_+55, b_+57); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
   CYC(b_+57, b_+59); mem_wr(gb, HL, 0x4f); // ENEMYCOLLISION_PLASMARINE
   CYC(b_+59, b_+60); alu_xor(gb, A);
-  CYC(b_+60, b_+63); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+60, b_+63); TAIL(enemySetAnimation); // jp
 }
 
 // Firing projectiles
@@ -400,7 +400,7 @@ void plasmarine_stateE_hook(GB *gb) {
   CYC(b_+14, b_+16); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+16, b_+18); mem_wr(gb, HL, 60);
   CYC(b_+18, b_+19); alu_xor(gb, A);
-  CYC(b_+19, b_+22); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+19, b_+22); TAIL(enemySetAnimation); // jp
 
 fire:
   CYC(b_+22, b_+23); mem_wr(gb, DE, A); // [animParameter] = 0
@@ -420,7 +420,7 @@ fire:
   CYC(b_+41, b_+44); SET_BC(0xec00);
   CALL_C(b_+44, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+47);
   CYC(b_+47, b_+49); A = 0xa8; // SND_VERAN_FAIRY_ATTACK
-  CYC(b_+49, b_+52); playSound_b00_hook(gb); return; // jp
+  CYC(b_+49, b_+52); TAIL(playSound_b00); // jp
 }
 
 // Decides whether to return to state $0e (fire another projectile) or charge at Link again
@@ -437,13 +437,13 @@ void plasmarine_stateF_hook(GB *gb) {
   CYC(b_+10, b_+12);
   CYC(b_+12, b_+13); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // [state] = $0e
   CYC(b_+13, b_+15); A = 0x01;
-  CYC(b_+15, b_+18); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(enemySetAnimation); // jp
 
 chargeAtLink:
   CYC(b_+18, b_+20); mem_wr(gb, HL, 0x0a);
   CYC(b_+20, b_+22); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+22, b_+24); mem_wr(gb, HL, 30);
-  plasmarine_decideNumberOfShockAttacks_hook(gb); return; // fallthrough
+  TAIL(plasmarine_decideNumberOfShockAttacks); // fallthrough
 }
 
 void plasmarine_decideNumberOfShockAttacks_hook(GB *gb) {

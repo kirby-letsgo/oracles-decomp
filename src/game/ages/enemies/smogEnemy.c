@@ -94,7 +94,7 @@ static void smog_func_72b2(GB *gb, uint16_t sp0_) {
   CYC(b_+79, b_+81);
   CYC(b_+81, b_+83); A = 0x04;
   CALL_C(b_+83, enemySetAnimation_hook, SYM(enemySetAnimation), b_+86);
-  CYC(b_+86, b_+89); smog_setCounterToFireProjectile_hook(gb); return; // jp
+  CYC(b_+86, b_+89); TAIL(smog_setCounterToFireProjectile); // jp
 
 parameter1:
   CYC(b_+89, b_+91); B = 0x4a; // PART_SMOG_PROJECTILE
@@ -102,7 +102,7 @@ parameter1:
   CYC(b_+94, b_+96); L = PART_BASE + OBJ_SUBID; // Part.subid
   CYC(b_+96, b_+97); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+97, b_+100); SET_BC(0x0800);
-  CYC(b_+100, b_+103); objectCopyPositionWithOffset_hook(gb); return; // jp
+  CYC(b_+100, b_+103); TAIL(objectCopyPositionWithOffset); // jp
 
 parameter0:
   CALL_C(b_+103, smog_decCounterToFireProjectile_hook, SYM(smog_decCounterToFireProjectile), b_+106);
@@ -225,7 +225,7 @@ setAnimationAndCommonInit:
   CYC(b_+125, b_+128); SET_HL(b_+157); // @subidSpeedTable
   CYC(b_+128, b_+129); smog_addAToHl_from_rst(gb, b_+129);
   CYC(b_+129, b_+130); A = mem_rd(gb, HL);
-  CYC(b_+130, b_+133); ecom_setSpeedAndState8AndVisible_b0f_hook(gb); return; // jp
+  CYC(b_+130, b_+133); TAIL(ecom_setSpeedAndState8AndVisible_b0f); // jp
 
 subid5Init:
   CYC(b_+133, b_+135); A = 0x7c; // ENEMY_SMOG
@@ -282,7 +282,7 @@ void smog_state8_subid0_hook(GB *gb) {
   CYC(b_+30, b_+32); mem_wr(gb, HL, 0x01); // [child.subid]
   CYC(b_+32, b_+35); SET_BC(0x0010);
   CALL_C(b_+35, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+38);
-  CYCT(b_+38, b_+40); smog_deleteSelf_hook(gb); return; // jr
+  CYCT(b_+38, b_+40); TAIL(smog_deleteSelf); // jr
 }
 
 void smog_state8_subid1_hook(GB *gb) {
@@ -292,7 +292,7 @@ void smog_state8_subid1_hook(GB *gb) {
   CALL_C(b_+3, ecom_decCounter2_b0f_hook, SYM(ecom_decCounter2_b0f), b_+6);
   if (!(F & FZ)) { RET_TAKEN(b_+6); return; } // ret nz
   CYC(b_+6, b_+7);
-  smog_deleteSelf_hook(gb); return; // fallthrough
+  TAIL(smog_deleteSelf); // fallthrough
 }
 
 void smog_deleteSelf_hook(GB *gb) {
@@ -300,7 +300,7 @@ void smog_deleteSelf_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, objectCreatePuff_hook, SYM(objectCreatePuff), b_+3);
   CALL_C(b_+3, decNumEnemies_hook, SYM(decNumEnemies), b_+6);
-  CYC(b_+6, b_+9); enemyDelete_hook(gb); return; // jp
+  CYC(b_+6, b_+9); TAIL(enemyDelete); // jp
 }
 
 // Small or medium-sized smog; identical to smog_state8_subid3 (the disassembly labels
@@ -394,7 +394,7 @@ gotoState1:
   CYC(b_+112, b_+114); E = ENEMY_BASE + OBJ_SUBSTATE;
   CYC(b_+114, b_+116); A = 0x01;
   CYC(b_+116, b_+117); mem_wr(gb, DE, A);
-  CYC(b_+117, b_+120); smog_applySpeed_hook(gb); return; // jp
+  CYC(b_+117, b_+120); TAIL(smog_applySpeed); // jp
 
 checkHitWall:
   CALL_C(b_+120, smog_checkHitWall_hook, SYM(smog_checkHitWall), b_+123);
@@ -467,7 +467,7 @@ notHuggingWall:
   CYC(b_+207, b_+209); E = ENEMY_BASE + OBJ_SUBSTATE;
   CYC(b_+209, b_+210); alu_xor(gb, A);
   CYC(b_+210, b_+211); mem_wr(gb, DE, A);
-  CYC(b_+211, b_+214); smog_applySpeed_hook(gb); return; // jp
+  CYC(b_+211, b_+214); TAIL(smog_applySpeed); // jp
 }
 
 // Large smog (can be attacked)
@@ -520,7 +520,7 @@ substate1:
   CYC(b_+54, b_+56); alu_cp(gb, 0x1e); // SPEED_c0
   if (!(F & FZ)) { RET_TAKEN(b_+56); return; } // ret nz
   CYC(b_+56, b_+57);
-  CYC(b_+57, b_+60); ecom_incSubstate_b0f_hook(gb); return; // jp
+  CYC(b_+57, b_+60); TAIL(ecom_incSubstate_b0f); // jp
 
 substate2:
   CYC(b_+60, b_+63); push_effect(gb, b_+63); smog_func_72b2(gb, sp0_);
@@ -559,7 +559,7 @@ void smog_checkHitWall_hook(GB *gb) {
   CYC(b_+5, b_+6); alu_rrca(gb);
   CYC(b_+6, b_+7); E = alu_inc8(gb, E);
   CYC(b_+7, b_+8); mem_wr(gb, DE, A);
-  CYCT(b_+8, b_+10); smog_checkAdjacentWallsBitset_hook(gb); return; // jr
+  CYCT(b_+8, b_+10); TAIL(smog_checkAdjacentWallsBitset); // jr
 }
 
 // @param[out] zflag nz if hugging a wall
@@ -601,7 +601,7 @@ L_7314:
   CYC(b_+45, b_+47); alu_and(gb, 0x0f);
   CYC(b_+47, b_+48); alu_add(gb, C);
   CYC(b_+48, b_+49); mem_wr(gb, DE, A);
-  smog_checkAdjacentWallsBitset_hook(gb); return; // fallthrough
+  TAIL(smog_checkAdjacentWallsBitset); // fallthrough
 }
 
 // Checks if there is a wall in the direction of the "angle" variable. (Angle could be
@@ -654,7 +654,7 @@ void smog_applySpeed_hook(GB *gb) {
   CYC(b_+6, b_+7); E = alu_inc8(gb, E);
   CYC(b_+7, b_+8); mem_wr(gb, DE, A);
   CALL_C(b_+8, objectApplySpeed_hook, SYM(objectApplySpeed), SYM(smog_updateAdjacentWallsBitset));
-  smog_updateAdjacentWallsBitset_hook(gb); return; // fallthrough
+  TAIL(smog_updateAdjacentWallsBitset); // fallthrough
 }
 
 void smog_updateAdjacentWallsBitset_hook(GB *gb) {

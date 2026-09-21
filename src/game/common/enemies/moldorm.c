@@ -97,7 +97,7 @@ dead:
   CYC(b_+49, b_+50); A = mem_rd(gb, DE);
   CYC(b_+50, b_+51); H = A;
   CALL_C(b_+51, ecom_killObjectH_b0e_hook, SYM(ecom_killObjectH_b0e), b_+54);
-  CYC(b_+54, b_+57); enemyDie_hook(gb); return; // jp
+  CYC(b_+54, b_+57); TAIL(enemyDie); // jp
 
 knockback:
   CYC(b_+57, b_+59); E = ENEMY_BASE + OBJ_SUBID;
@@ -105,7 +105,7 @@ knockback:
   CYC(b_+60, b_+61); A = alu_dec8(gb, A);
   if (!(F & FZ)) { CYCT(b_+61, b_+63); goto normalStatus; } // jr nz
   CYC(b_+61, b_+63);
-  CYC(b_+63, b_+66); ecom_updateKnockbackAndCheckHazards_b0e_hook(gb); return; // jp
+  CYC(b_+63, b_+66); TAIL(ecom_updateKnockbackAndCheckHazards_b0e); // jp
 
 normalStatus:
   CALL_C(b_+66, ecom_getSubidAndCpStateTo08_b0e_hook, SYM(ecom_getSubidAndCpStateTo08_b0e), b_+69);
@@ -142,7 +142,7 @@ void moldorm_state_uninitialized_hook(GB *gb) {
   CYC(b_+2, b_+4);
   CYC(b_+4, b_+5); A = alu_inc8(gb, A);
   CYC(b_+5, b_+6); mem_wr(gb, DE, A); // [state] = 1
-  CYC(b_+6, b_+8); moldorm_state1_hook(gb); return; // jr
+  CYC(b_+6, b_+8); TAIL(moldorm_state1); // jr
 
 notSpawner:
   CALL_C(b_+8, ecom_setSpeedAndState8AndVisible_b0e_hook, SYM(ecom_setSpeedAndState8AndVisible_b0e), b_+11);
@@ -151,7 +151,7 @@ notSpawner:
   if (F & FZ) { RET_TAKEN(b_+13); return; } // ret z
   CYC(b_+13, b_+14);
   CYC(b_+14, b_+16); alu_add(gb, 0x07);
-  CYC(b_+16, b_+19); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+16, b_+19); TAIL(enemySetAnimation); // jp
 }
 
 // 0e:620b, bare global; jump-table target from enemyCode4f, also falls into from
@@ -186,7 +186,7 @@ void moldorm_state1_hook(GB *gb) {
   CYC(b_+41, b_+42); A = mem_rd(gb, DE);
   CYC(b_+42, b_+43); mem_wr(gb, HL, A);
   CALL_C(b_+43, objectCopyPosition_hook, SYM(objectCopyPosition), b_+46);
-  CYC(b_+46, b_+49); enemyDelete_hook(gb); return; // jp
+  CYC(b_+46, b_+49); TAIL(enemyDelete); // jp
 }
 
 // 0e:623c, bare global; jump-table target from enemyCode4f.
@@ -220,7 +220,7 @@ state8:
   CYC(b_+19, b_+21); L = ENEMY_BASE + OBJ_VAR33;
   CYC(b_+21, b_+23); mem_wr(gb, HL, 0x02);
   CALL_C(b_+23, ecom_setRandomAngle_b0e_hook, SYM(ecom_setRandomAngle_b0e), b_+26);
-  CYC(b_+26, b_+29); moldorm_head_updateAnimationFromAngle_hook(gb); return; // jp
+  CYC(b_+26, b_+29); TAIL(moldorm_head_updateAnimationFromAngle); // jp
 
 state9:
   CALL_C(b_+29, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+32);
@@ -247,7 +247,7 @@ state9:
 applySpeed:
   CALL_C(b_+61, ecom_bounceOffWallsAndHoles_b0e_hook, SYM(ecom_bounceOffWallsAndHoles_b0e), b_+64);
   if (!(F & FZ)) CALL_C_CC(b_+64, moldorm_head_updateAnimationFromAngle_hook, SYM(moldorm_head_updateAnimationFromAngle), b_+67); else CYC(b_+64, b_+67); // call nz
-  CYC(b_+67, b_+70); objectApplySpeed_hook(gb); return; // jp
+  CYC(b_+67, b_+70); TAIL(objectApplySpeed); // jp
 }
 
 // 0e:6283, bare global; jump-table target from enemyCode4f@normalState.
@@ -281,7 +281,7 @@ state8:
   CYC(b_+27, b_+28); L = alu_inc8(gb, L);
   CYC(b_+28, b_+29); A = mem_rd(gb, HL);
   CYC(b_+29, b_+30); mem_wr(gb, DE, A);
-  CYC(b_+30, b_+33); moldorm_tail_clearOffsetBuffer_hook(gb); return; // jp
+  CYC(b_+30, b_+33); TAIL(moldorm_tail_clearOffsetBuffer); // jp
 
 state9:
   CYC(b_+33, b_+35); A = OBJ_ENABLED; // Object.enabled
@@ -350,7 +350,7 @@ void moldorm_tail_delete_hook(GB *gb) {
   BASE(moldorm_tail_delete);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, decNumEnemies_hook, SYM(decNumEnemies), b_+3);
-  CYC(b_+3, b_+6); enemyDelete_hook(gb); return; // jp
+  CYC(b_+3, b_+6); TAIL(enemyDelete); // jp
 }
 
 // 0e:62f8, bare global; called from moldorm_state1 for each spawned tail.
@@ -361,7 +361,7 @@ void moldorm_tail_setRelatedObj1AndCopyPosition_hook(GB *gb) {
   CYC(b_+2, b_+4); A = ENEMY_BASE; // Enemy.start
   CYC(b_+4, b_+5); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+5, b_+6); mem_wr(gb, HL, C);
-  CYC(b_+6, b_+9); objectCopyPosition_hook(gb); return; // jp
+  CYC(b_+6, b_+9); TAIL(objectCopyPosition); // jp
 }
 
 // 0e:6301, bare global; called from moldorm_head.
@@ -379,7 +379,7 @@ void moldorm_head_updateAnimationFromAngle_hook(GB *gb) {
   if (F & FZ) { RET_TAKEN(b_+13); return; } // ret z
   CYC(b_+13, b_+14);
   CYC(b_+14, b_+15); mem_wr(gb, HL, A);
-  CYC(b_+15, b_+18); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+15, b_+18); TAIL(enemySetAnimation); // jp
 }
 
 // 0e:6313, bare global; called from moldorm_tail.
@@ -423,5 +423,5 @@ void moldorm_checkHazards_hook(GB *gb) {
 
 checkHazards:
   CYC(b_+20, b_+21); A = B;
-  CYC(b_+21, b_+24); ecom_checkHazardsNoAnimationForHoles_b0e_hook(gb); return; // jp
+  CYC(b_+21, b_+24); TAIL(ecom_checkHazardsNoAnimationForHoles_b0e); // jp
 }

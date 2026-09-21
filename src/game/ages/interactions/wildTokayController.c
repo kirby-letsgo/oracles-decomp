@@ -148,7 +148,7 @@ substate1:
   CYC(b_+153, b_+155); mem_wr(gb, HL, 0x0a);
   CYC(b_+155, b_+157); A = 0x02; // MUS_MINIGAME
   CALL_C(b_+157, playSound_b00_hook, SYM(playSound_b00), b_+160);
-  CYC(b_+160, b_+163); fadeinFromWhite_hook(gb); return; // jp
+  CYC(b_+160, b_+163); TAIL(fadeinFromWhite); // jp
 
 substate2:
   CALL_C(b_+163, interactionDecCounter1IfPaletteNotFading_hook, SYM(interactionDecCounter1IfPaletteNotFading), b_+166);
@@ -158,7 +158,7 @@ substate2:
   CYC(b_+170, b_+171); alu_xor(gb, A);
   CYC(b_+171, b_+174); W8(wDisabledObjects) = A;
   CYC(b_+174, b_+177); SET_BC(0x0a16); // TX_0a16
-  CYC(b_+177, b_+180); showText_hook(gb); return; // jp
+  CYC(b_+177, b_+180); TAIL(showText); // jp
 
 substate3:
   CYC(b_+180, b_+183); A = W8(wTextIsActive);
@@ -173,7 +173,7 @@ substate3:
   CYC(b_+195, b_+196);
   CYC(b_+196, b_+198); mem_wr(gb, HL, 0x8c); // INTERAC_TOKAY_MEAT
   CYC(b_+198, b_+200); A = 0xcc; // SND_WHISTLE
-  CYC(b_+200, b_+203); playSound_b00_hook(gb); return; // jp
+  CYC(b_+200, b_+203); TAIL(playSound_b00); // jp
 
 substate4:
   CYC(b_+203, b_+206); A = W8(wTmpcfc0_wildTokay_cfde);
@@ -222,7 +222,7 @@ substate5:
   CYC(b_+266, b_+267); A = mem_rd(gb, HL);
   CYC(b_+267, b_+268); alu_add(gb, C);
   CYC(b_+268, b_+269); C = A;
-  CYC(b_+269, b_+272); showText_hook(gb); return; // jp
+  CYC(b_+269, b_+272); TAIL(showText); // jp
 
 substate6:
   CYC(b_+272, b_+275); A = W8(wTmpcfc0_wildTokay_inPresent);
@@ -260,7 +260,7 @@ l5808:
   CYC(b_+317, b_+320); SET_HL(b_+328); // @@presentWarpDest
 
 l5828:
-  CYC(b_+320, b_+323); setWarpDestVariables_hook(gb); return; // jp
+  CYC(b_+320, b_+323); TAIL(setWarpDestVariables); // jp
 
 checkSpawnNextTokay:
   CALL_C(b_+333, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+336);
@@ -317,7 +317,7 @@ l586d:
 loadTokay:
   CYC(b_+399, b_+400); B = C;
   CALL_C(b_+400, getWildTokayObjectDataIndex_hook, SYM(getWildTokayObjectDataIndex), b_+403);
-  CYC(b_+403, b_+406); parseGivenObjectData_b00_hook(gb); return; // jp
+  CYC(b_+403, b_+406); TAIL(parseGivenObjectData_b00); // jp
 
 decVar3b:
   CYC(b_+406, b_+408); mem_wr(gb, HL, 0x00);

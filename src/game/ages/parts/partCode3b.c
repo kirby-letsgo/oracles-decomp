@@ -85,7 +85,7 @@ subid0_state0:
 after_random:
   CALL_C(b_+48, objectSetVisible82_hook, SYM(objectSetVisible82), b_+51);
   CYC(b_+51, b_+53); A = 0x59; // SND_FALLINHOLE
-  CYC(b_+53, b_+56); playSound_b00_hook(gb); return; // jp
+  CYC(b_+53, b_+56); TAIL(playSound_b00); // jp
 
 subid0_state1:
   CYC(b_+56, b_+58); A = 0x20;
@@ -96,7 +96,7 @@ subid0_state1:
   CYC(b_+64, b_+66); alu_cp(gb, 0xb0);
   if (F & FC) { CYCT(b_+66, b_+68); goto animate; } // jr c
   CYC(b_+66, b_+68);
-  CYC(b_+68, b_+71); partDelete_hook(gb); return; // jp
+  CYC(b_+68, b_+71); TAIL(partDelete); // jp
 
 func_6ebd:
   CYC(b_+71, b_+72); H = D;
@@ -110,7 +110,7 @@ func_6ebd:
   CYC(b_+83, b_+85); A = 0x01;
   CALL_C(b_+85, partSetAnimation_hook, SYM(partSetAnimation), b_+88);
   CYC(b_+88, b_+90); A = 0xa5; // SND_BREAK_ROCK
-  CYC(b_+90, b_+93); playSound_b00_hook(gb); return; // jp
+  CYC(b_+90, b_+93); TAIL(playSound_b00); // jp
 
 state2:
   CYC(b_+93, b_+95); E = 0xe1; // Part.animParameter
@@ -128,7 +128,7 @@ state2:
   CYC(b_+111, b_+112); mem_wr(gb, DE, A);
 
 animate:
-  CYC(b_+112, b_+115); partAnimate_hook(gb); return; // jp
+  CYC(b_+112, b_+115); TAIL(partAnimate); // jp
 
 subid1:
   CYC(b_+125, b_+126); A = mem_rd(gb, DE);
@@ -168,7 +168,7 @@ subid1_state0:
   CYC(b_+169, b_+170); mem_wr(gb, DE, A);
 
 setVisiblec2:
-  CYC(b_+170, b_+173); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+170, b_+173); TAIL(objectSetVisiblec2); // jp
 
 subid1_state1:
   CYC(b_+173, b_+175); C = 0x20;

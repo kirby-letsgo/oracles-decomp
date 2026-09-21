@@ -105,14 +105,14 @@ state0:
   CYC(b_+69, b_+71); E = INTERACTION_BASE + OBJ_VISIBLE;
   CYC(b_+71, b_+72); mem_wr(gb, DE, A);
   CYC(b_+72, b_+74); A = 0x57; // SND_GAINHEART
-  CYC(b_+74, b_+77); playSound_b00_hook(gb); return; // jp
+  CYC(b_+74, b_+77); TAIL(playSound_b00); // jp
 
 state1:
   CYC(b_+77, b_+79); C = 0x20;
   CALL_C(b_+79, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+82);
   if (!(F & FZ)) { CYCT(b_+82, b_+85); objectApplySpeed_hook(gb); return; } // jp nz
   CYC(b_+82, b_+85);
-  CYC(b_+85, b_+88); interactionIncState_hook(gb); return; // jp
+  CYC(b_+85, b_+88); TAIL(interactionIncState); // jp
 
 state2:
   CALL_C(b_+88, interactionCodea5_updateMapleAngle_hook, b_+253, b_+91);
@@ -125,7 +125,7 @@ state2:
   CYC(b_+103, b_+105); A = 0x5e; // SND_GETSEED
   CALL_C(b_+105, playSound_b00_hook, SYM(playSound_b00), b_+108);
   CYC(b_+108, b_+111); SET_BC(0x070e); // TX_070e
-  CYC(b_+111, b_+114); showText_hook(gb); return; // jp
+  CYC(b_+111, b_+114); TAIL(showText); // jp
 
 state3:
   CALL_C(b_+114, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+117);
@@ -147,7 +147,7 @@ l_5c92:
   CYC(b_+137, b_+138); mem_wr(gb, DE, A);
   CYC(b_+138, b_+139); alu_xor(gb, A);
   CYC(b_+139, b_+142); mem_wr(gb, w1Companion_angle, A);
-  CYC(b_+142, b_+145); interactionIncState_hook(gb); return; // jp
+  CYC(b_+142, b_+145); TAIL(interactionIncState); // jp
 
 state4:
   CALL_C(b_+145, interactionCodea5_updateMapleAngle_hook, b_+253, b_+148);
@@ -162,7 +162,7 @@ state4:
   CYC(b_+159, b_+160); mem_wr(gb, HL, A); // [w1Link.direction]
   CALL_C(b_+160, interactionIncState_hook, SYM(interactionIncState), b_+163);
   CYC(b_+163, b_+166); SET_BC(0x070f); // TX_070f
-  CYC(b_+166, b_+169); showText_hook(gb); return; // jp
+  CYC(b_+166, b_+169); TAIL(showText); // jp
 
 state5:
   CALL_C(b_+169, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+172);
@@ -172,14 +172,14 @@ state5:
   CYC(b_+179, b_+182); mem_wr(gb, w1Companion_direction, A);
   CALL_C(b_+182, interactionIncState_hook, SYM(interactionIncState), b_+185);
   CYC(b_+185, b_+188); SET_BC(0x0710); // TX_0710
-  CYC(b_+188, b_+191); showText_hook(gb); return; // jp
+  CYC(b_+188, b_+191); TAIL(showText); // jp
 
 state6:
   CALL_C(b_+191, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+194);
   CYC(b_+194, b_+197); A = mem_rd(gb, w1Companion_direction);
   CYC(b_+197, b_+199); A = (uint8_t)(A & ~(1 << 7));
   CYC(b_+199, b_+202); mem_wr(gb, w1Companion_direction, A);
-  CYC(b_+202, b_+205); interactionIncState_hook(gb); return; // jp
+  CYC(b_+202, b_+205); TAIL(interactionIncState); // jp
 
 state7:
   CYC(b_+205, b_+208); SET_BC((SYM(interactionCodeac) + 17)); // TREASURE_TRADEITEM, TRADEITEM_MAGIC_OAR
@@ -193,7 +193,7 @@ state7:
   CYC(b_+218, b_+221); SET_DE(w1Link_yh);
   CALL_C(b_+221, objectCopyPosition_rawAddress_hook, SYM(objectCopyPosition_rawAddress), b_+224);
   CYC(b_+224, b_+225); SET_DE(pop_effect(gb));
-  CYC(b_+225, b_+228); interactionIncState_hook(gb); return; // jp
+  CYC(b_+225, b_+228); TAIL(interactionIncState); // jp
 
 state8:
   CYC(b_+228, b_+230); E = INTERACTION_BASE + OBJ_COUNTER1;
@@ -211,5 +211,5 @@ l_5cfe:
   CYC(b_+242, b_+245); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+245, b_+247); A = 0x02;
   CYC(b_+247, b_+250); mem_wr(gb, w1Companion_substate, A);
-  CYC(b_+250, b_+253); interactionDelete_hook(gb); return; // jp
+  CYC(b_+250, b_+253); TAIL(interactionDelete); // jp
 }

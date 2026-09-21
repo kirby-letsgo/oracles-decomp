@@ -124,7 +124,7 @@ state2: // interactionCodec8@state2
   CYC(b_+119, b_+121); A = 0x02;
 
 setAnimation: // interactionCodec8@setAnimation
-  CYC(b_+121, b_+124); interactionSetAnimation_hook(gb); return; // jp
+  CYC(b_+121, b_+124); TAIL(interactionSetAnimation); // jp
 
 state4: // interactionCodec8@state4
   CYC(b_+124, b_+126); A = 0x19; // TREASURE_SEED_SATCHEL

@@ -98,7 +98,7 @@ state0:
   CYC(b_+57, b_+60); SET_HL(GV((SYM(interactionCode7a__state0) + 28), 0x469d)); // scriptHelp.movingPlatform_runScript
   CYC(b_+60, b_+62); E = 0x15;
   CALL_C(b_+62, interBankCall_hook, 0x008a, b_+65);
-  CYC(b_+65, b_+68); objectSetVisible83_hook(gb); return; // jp
+  CYC(b_+65, b_+68); TAIL(objectSetVisible83); // jp
 
 state1:
   CYC(b_+80, b_+83); A = W8(wLinkRidingObject);

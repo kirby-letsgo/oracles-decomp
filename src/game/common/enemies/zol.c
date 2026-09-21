@@ -124,7 +124,7 @@ void zol_state_uninitialized_hook(GB *gb) {
   CYC(b_+14, b_+16); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
   CYC(b_+16, b_+18); A = 0x04;
   CALL_C(b_+18, enemySetAnimation_hook, SYM(enemySetAnimation), b_+21);
-  CYC(b_+21, b_+24); ecom_setSpeedAndState8AndVisible_b0e_hook(gb); return; // jp
+  CYC(b_+21, b_+24); TAIL(ecom_setSpeedAndState8AndVisible_b0e); // jp
 }
 
 void zol_state_stub_hook(GB *gb) {
@@ -164,7 +164,7 @@ void zol_subid00_state8_hook(GB *gb) {
   CYC(b_+14, b_+15); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
   CYC(b_+15, b_+17); L = ENEMY_BASE + OBJ_COUNTER2;
   CYC(b_+17, b_+19); mem_wr(gb, HL, 0x04);
-  CYC(b_+19, b_+22); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+19, b_+22); TAIL(objectSetVisiblec2); // jp
 }
 
 // Jumping out of ground
@@ -196,7 +196,7 @@ L_49c3:
   CYC(b_+32, b_+34); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
   CYC(b_+34, b_+36); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
   CYC(b_+36, b_+37); A = alu_inc8(gb, A);
-  CYC(b_+37, b_+40); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+37, b_+40); TAIL(enemySetAnimation); // jp
 }
 
 // Holding still for [counter1] frames, preparing to hop toward Link
@@ -215,12 +215,12 @@ void zol_subid00_stateA_hook(GB *gb) {
   CALL_C(b_+17, enemySetAnimation_hook, SYM(enemySetAnimation), b_+20);
   CYC(b_+20, b_+22); A = 0x8f; // SND_ENEMY_JUMP
   CALL_C(b_+22, playSound_b00_hook, SYM(playSound_b00), SYM(zol_animate));
-  zol_animate_hook(gb); return; // fallthrough
+  TAIL(zol_animate); // fallthrough
 }
 
 void zol_animate_hook(GB *gb) {
   BASE(zol_animate);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // Hopping toward Link
@@ -250,7 +250,7 @@ L_4a12:
   CYC(b_+30, b_+32); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+32, b_+33); mem_wr(gb, HL, A);
   CYC(b_+33, b_+34); A = B;
-  CYC(b_+34, b_+37); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+34, b_+37); TAIL(enemySetAnimation); // jp
 }
 
 // Disappearing into the ground
@@ -271,7 +271,7 @@ void zol_subid00_stateC_hook(GB *gb) {
   CYC(b_+15, b_+16); alu_xor(gb, A);
   CYC(b_+16, b_+17); mem_wr(gb, HL, A);
   CALL_C(b_+17, enemySetAnimation_hook, SYM(enemySetAnimation), b_+20);
-  CYC(b_+20, b_+23); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+20, b_+23); TAIL(objectSetInvisible); // jp
 }
 
 // Fully disappeared into ground. Wait [counter1] frames before we can emerge again
@@ -284,7 +284,7 @@ void zol_subid00_stateD_hook(GB *gb) {
   CYC(b_+4, b_+5); L = E;
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x08); // [state]
   CYC(b_+7, b_+8); alu_xor(gb, A);
-  CYC(b_+8, b_+11); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+8, b_+11); TAIL(enemySetAnimation); // jp
 }
 
 void zol_subid01_hook(GB *gb) {
@@ -324,14 +324,14 @@ void zol_subid01_state8_hook(GB *gb) {
   CYC(b_+20, b_+22); L = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+22, b_+24); mem_wr(gb, HL, 0x14); // SPEED_80
   CALL_C(b_+24, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+27);
-  CYCT(b_+27, b_+29); zol_animate2_hook(gb); return; // jr
+  CYCT(b_+27, b_+29); TAIL(zol_animate2); // jr
 
 hopTowardLink:
   CYC(b_+29, b_+31); mem_wr(gb, HL, 0x20); // [counter1]
   CYC(b_+31, b_+33); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+33, b_+35); mem_wr(gb, HL, 0x0a);
   CYC(b_+35, b_+37); A = 0x05;
-  CYC(b_+37, b_+40); enemySetAnimation_hook(gb); return; // jp
+  CYC(b_+37, b_+40); TAIL(enemySetAnimation); // jp
 }
 
 // Sliding toward Link
@@ -346,12 +346,12 @@ void zol_subid01_state9_hook(GB *gb) {
   CYC(b_+11, b_+13); mem_wr(gb, HL, 0x18); // [counter1]
   CYC(b_+13, b_+15); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+15, b_+16); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL))); // dec (hl)
-  zol_animate2_hook(gb); return; // fallthrough
+  TAIL(zol_animate2); // fallthrough
 }
 
 void zol_animate2_hook(GB *gb) {
   BASE(zol_animate2);
-  CYC(b_+0, b_+3); enemyAnimate_hook(gb); return; // jp
+  CYC(b_+0, b_+3); TAIL(enemyAnimate); // jp
 }
 
 // Shaking before hopping toward Link
@@ -373,7 +373,7 @@ void zol_subid01_stateA_hook(GB *gb) {
   CALL_C(b_+24, enemySetAnimation_hook, SYM(enemySetAnimation), b_+27);
   CYC(b_+27, b_+29); A = 0x8f; // SND_ENEMY_JUMP
   CALL_C(b_+29, playSound_b00_hook, SYM(playSound_b00), b_+32);
-  CYC(b_+32, b_+35); objectSetVisiblec1_hook(gb); return; // jp
+  CYC(b_+32, b_+35); TAIL(objectSetVisiblec1); // jp
 }
 
 // Hopping toward Link
@@ -392,7 +392,7 @@ void zol_subid01_stateB_hook(GB *gb) {
   CYC(b_+16, b_+18); mem_wr(gb, HL, 0x08);
   CYC(b_+18, b_+20); A = 0x04;
   CALL_C(b_+20, enemySetAnimation_hook, SYM(enemySetAnimation), b_+23);
-  CYC(b_+23, b_+26); objectSetVisiblec2_hook(gb); return; // jp
+  CYC(b_+23, b_+26); TAIL(objectSetVisiblec2); // jp
 }
 
 // Zol has been attacked, create puff, disable collisions, prepare to spawn two gels in the
@@ -411,7 +411,7 @@ void zol_subid01_stateC_hook(GB *gb) {
   CYC(b_+16, b_+17); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // inc (hl)
   CYC(b_+17, b_+19); A = 0x73; // SND_KILLENEMY
   CALL_C(b_+19, playSound_b00_hook, SYM(playSound_b00), b_+22);
-  CYC(b_+22, b_+25); objectSetInvisible_hook(gb); return; // jp
+  CYC(b_+22, b_+25); TAIL(objectSetInvisible); // jp
 }
 
 // Zol has been attacked, spawn gels after [counter2] frames
@@ -426,7 +426,7 @@ void zol_subid01_stateD_hook(GB *gb) {
   CYC(b_+9, b_+11); C = 0xfc;
   CALL_C(b_+11, zol_spawnGel_hook, SYM(zol_spawnGel), b_+14);
   CALL_C(b_+14, decNumEnemies_hook, SYM(decNumEnemies), b_+17);
-  CYC(b_+17, b_+20); enemyDelete_hook(gb); return; // jp
+  CYC(b_+17, b_+20); TAIL(enemyDelete); // jp
 }
 
 // @param  c  X offset

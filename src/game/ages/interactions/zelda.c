@@ -45,7 +45,7 @@ void zelda_loadScript_hook(GB *gb) {
   CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+8, b_+9); H = mem_rd(gb, HL);
   CYC(b_+9, b_+10); L = A;
-  CYC(b_+10, b_+13); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+10, b_+13); TAIL(interactionSetScript); // jp
 }
 
 // 0b:6381, falls into from zelda_state0@commonInit's own tail call chain (see below).
@@ -65,24 +65,24 @@ void zelda_state1_hook(GB *gb) {
 
 animateAndRunScript:
   CALL_C(b_+26, interactionAnimate_hook, SYM(interactionAnimate), b_+29);
-  CYC(b_+29, b_+32); interactionRunScript_hook(gb); return; // jp
+  CYC(b_+29, b_+32); TAIL(interactionRunScript); // jp
 
 runSubid2:
   CYC(b_+32, b_+34); E = INTERACTION_BASE + OBJ_VAR39;
   CYC(b_+34, b_+35); A = mem_rd(gb, DE);
   CYC(b_+35, b_+36); alu_or(gb, A);
   if (F & FZ) { CALL_C_CC(b_+36, interactionAnimate_hook, SYM(interactionAnimate), b_+39); } else { CYC(b_+36, b_+39); } // call z
-  CYC(b_+39, b_+42); interactionRunScript_hook(gb); return; // jp
+  CYC(b_+39, b_+42); TAIL(interactionRunScript); // jp
 
 runSubid4:
   CALL_C(b_+42, interactionRunScript_hook, SYM(interactionRunScript), b_+45);
   if (!(F & FC)) { CYCT(b_+45, b_+48); interactionAnimateBasedOnSpeed_hook(gb); return; } // jp nc
   CYC(b_+45, b_+48);
-  CYC(b_+48, b_+51); interactionDeleteAndUnmarkSolidPosition_hook(gb); return; // jp
+  CYC(b_+48, b_+51); TAIL(interactionDeleteAndUnmarkSolidPosition); // jp
 
 faceLinkAndRunScript:
   CALL_C(b_+51, interactionRunScript_hook, SYM(interactionRunScript), b_+54);
-  CYC(b_+54, b_+57); npcFaceLinkAndAnimate_hook(gb); return; // jp
+  CYC(b_+54, b_+57); TAIL(npcFaceLinkAndAnimate); // jp
 }
 
 // 0b:62b1, called from interactionCodead@state0 (top-level jump table).
@@ -157,7 +157,7 @@ actAsGenericNpc:
   CYC(b_+114, b_+116); A = 0x06; // >TX_0600
   CYC(b_+116, b_+117); mem_wr(gb, DE, A);
   CYC(b_+117, b_+120); SET_HL((SYM(interactionCodeb6__state6) + 40)); // mainScripts.genericNpcScript
-  CYC(b_+120, b_+123); interactionSetScript_hook(gb); return; // jp
+  CYC(b_+120, b_+123); TAIL(interactionSetScript); // jp
 
 initSubid08:
   CALL_C(b_+123, checkIsLinkedGame_hook, SYM(checkIsLinkedGame), b_+126);
@@ -210,7 +210,7 @@ commonInitWithExtraGraphics:
 
 commonInit:
   CALL_C(b_+205, zelda_loadScript_hook, SYM(zelda_loadScript), SYM(zelda_state1));
-  zelda_state1_hook(gb); return;
+  TAIL(zelda_state1);
 }
 
 // ==================================================================================================
@@ -223,8 +223,8 @@ void interactionCodead_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (interactionCodead_jump_table(gb));
-    if (jt_ == SYM(zelda_state0)) { zelda_state0_hook(gb); return; }
-    else if (jt_ == SYM(zelda_state1)) { zelda_state1_hook(gb); return; }
+    if (jt_ == SYM(zelda_state0) && hook_enabled_at(gb, SYM(zelda_state0))) { zelda_state0_hook(gb); return; }
+    else if (jt_ == SYM(zelda_state1) && hook_enabled_at(gb, SYM(zelda_state1))) { zelda_state1_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
